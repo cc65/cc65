@@ -846,16 +846,16 @@ Here's a list of all control commands and a description, what they do:
   id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> commands are actually shortcuts
   for <tt/.CONDES/ with a type of <tt/constructor/ resp. <tt/destructor/.
 
-  After the type, an optional priority may be specified. If no priority is
-  given, the default priority of 7 is used. Be careful when assigning
-  priorities to your own module constructors so they won't interfere with the
-  ones in the cc65 library.
+  After the type, an optional priority may be specified. Higher numeric values
+  mean higher priority. If no priority is given, the default priority of 7 is
+  used. Be careful when assigning priorities to your own module constructors
+  so they won't interfere with the ones in the cc65 library.
 
   Example:
 
   <tscreen><verb>
-   	.condes		ModuleInit, constructor
-	.condes		ModInit, 0, 16
+   	.condes	      	ModuleInit, constructor
+	.condes	      	ModInit, 0, 16
   </verb></tscreen>
 
   See the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> and <tt><ref
@@ -911,9 +911,10 @@ Here's a list of all control commands and a description, what they do:
   A constructor is always exported as an absolute (16 bit) symbol. You don't
   need to use an additional <tt/.export/ statement, this is implied by
   <tt/.constructor/. It may have an optional priority that is separated by a
-  comma. If no priority is given, the default priority of 7 is used. Be
-  careful when assigning priorities to your own module constructors so they
-  won't interfere with the ones in the cc65 library.
+  comma. Higher numeric values mean a higher priority. If no priority is
+  given, the default priority of 7 is used. Be careful when assigning
+  priorities to your own module constructors so they won't interfere with the
+  ones in the cc65 library.
 
   Example:
 
@@ -1041,9 +1042,10 @@ Here's a list of all control commands and a description, what they do:
   A destructor is always exported as an absolute (16 bit) symbol. You don't
   need to use an additional <tt/.export/ statement, this is implied by
   <tt/.destructor/. It may have an optional priority that is separated by a
-  comma. If no priority is given, the default priority of 7 is used. Be
-  careful when assigning priorities to your own module destructors so they
-  won't interfere with the ones in the cc65 library.
+  comma. Higher numerical values mean a higher priority. If no priority is
+  given, the default priority of 7 is used. Be careful when assigning
+  priorities to your own module destructors so they won't interfere with the
+  ones in the cc65 library.
 
   Example:
 
@@ -2266,7 +2268,7 @@ Here's a list of all control commands and a description, what they do:
   "proprietary and confidential".
 
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
-  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>, and 
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>, and
   <tt><ref id=".P816" name=".P816"></tt>
 
 
@@ -2841,6 +2843,19 @@ The feature saves memory: Each additional initialization function needs just
 two bytes in the table (a pointer to the function).
 
 </enum>
+
+
+<sect1>Calling order<p>
+
+Both, constructors and destructors are sorted in increasing priority order by
+the linker when using one of the builtin linker configurations, so the
+functions with lower priorities come first and are followed by those with
+higher priorities. The C library runtime subroutine that walks over the
+constructor and destructor tables calls the functions starting from the top of
+the table - which means that functions with a high priority are called first.
+
+So when using the C runtime, both constructors and destructors are called with
+high priority functions first, followed by low priority functions.
 
 
 <sect1>Pitfalls<p>

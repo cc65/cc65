@@ -6,17 +6,19 @@
 ; on the Atari this function is a dummy, it returns
 ; cylinder and head 0 and as sector the sectnum it got
 ;
-; void __fastcall__ _dio_snum_to_chs(_sectnum_t sect_num,
-;				     unsigned int *cyl,
-;				     unsigned int *head,
-;				     unsigned int *sector);
+; void       __fastcall__ _dio_snum_to_chs(_dhandle_t handle,
+;                                          _sectnum_t sect_num,
+;                                          unsigned int *cyl,
+;                                          unsigned int *head,
+;                                          unsigned int *sector);
+; _dhandle_t - 16bit (ptr)
 ; _sectnum_t - 16bit
 ;
 
  	.export		__dio_snum_to_chs
 	.include	"atari.inc"
 	.importzp	ptr1,ptr2
-	.import		popax
+	.import		popax,addsp2
 
 .proc	__dio_snum_to_chs
 
@@ -45,6 +47,8 @@
 	iny
 	txa
 	sta	(ptr1),y
+
+	jsr	addsp2
 
 	rts
 

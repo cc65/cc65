@@ -52,7 +52,7 @@
 typedef unsigned o65_size;
 
 
-/* Define a structure with the sid register offsets */
+/* Define a structure that defines the o65 file header */
 typedef struct o65_header o65_header;
 struct o65_header {
     char        marker[2];      /* Non-C64 marker */

@@ -79,8 +79,8 @@ inv_drv:
 ; Copy one byte from the jump vectors
 
 copy:   lda     (ptr1),y
+        sta     emd_vectors,x
         iny
-set:    sta     emd_vectors,x
         inx
         rts
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -34,6 +34,7 @@
 
 
 /* common */
+#include "check.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -59,19 +60,16 @@ static LoopDesc* LoopStack = 0;
 
 
 
-LoopDesc* AddLoop (unsigned sp, unsigned loop, unsigned label,
-	     	   unsigned linc, unsigned lstat)
-/* Create and add a new loop descriptor */
+LoopDesc* AddLoop (unsigned SP, unsigned BreakLabel, unsigned ContinueLabel)
+/* Create and add a new loop descriptor. */
 {
     /* Allocate a new struct */
-    LoopDesc* L = (LoopDesc*) xmalloc (sizeof (LoopDesc));
+    LoopDesc* L = xmalloc (sizeof (LoopDesc));
 
     /* Fill in the data */
-    L->StackPtr	= sp;
-    L->Loop    	= loop;
-    L->Label   	= label;
-    L->linc    	= linc;
-    L->lstat   	= lstat;
+    L->StackPtr	        = SP;
+    L->BreakLabel       = BreakLabel;
+    L->ContinueLabel   	= ContinueLabel;
 
     /* Insert it into the list */
     L->Next = LoopStack;
@@ -95,6 +93,7 @@ void DelLoop (void)
 /* Remove the current loop */
 {
     LoopDesc* L = LoopStack;
+    CHECK (L != 0);
     LoopStack = LoopStack->Next;
     xfree (L);
 }

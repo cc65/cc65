@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*	  	  		     data		     		     */
+/*	   	  		     data		     		     */
 /*****************************************************************************/
 
 
@@ -48,10 +48,8 @@ typedef struct LoopDesc LoopDesc;
 struct LoopDesc {
     LoopDesc* 	Next;
     unsigned 	StackPtr;
-    unsigned	Loop;
-    unsigned	Label;
-    unsigned	linc;
-    unsigned	lstat;
+    unsigned   	BreakLabel;
+    unsigned	ContinueLabel;
 };
 
 
@@ -62,9 +60,8 @@ struct LoopDesc {
 
 
 
-LoopDesc* AddLoop (unsigned sp, unsigned loop, unsigned label,
-	     	   unsigned linc, unsigned lstat);
-/* Create and add a new loop descriptor */
+LoopDesc* AddLoop (unsigned SP, unsigned BreakLabel, unsigned ContinueLabel);
+/* Create and add a new loop descriptor. */
 
 LoopDesc* CurrentLoop (void);
 /* Return a pointer to the descriptor of the current loop */

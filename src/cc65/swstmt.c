@@ -117,7 +117,7 @@ void SwitchStatement (void)
     ExitLabel = GetLocalLabel ();
 
     /* Create a loop so we may use break. */
-    AddLoop (oursp, 0, ExitLabel, 0, 0);
+    AddLoop (oursp, ExitLabel, 0);
 
     /* Create the collection for the case node tree */
     Nodes = NewCollection ();

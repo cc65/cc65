@@ -7,8 +7,8 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -184,28 +184,32 @@ static void DoStatement (void)
 /* Handle the 'do' statement */
 {
     /* Get the loop control labels */
-    unsigned loop = GetLocalLabel ();
-    unsigned lab = GetLocalLabel ();
+    unsigned LoopLabel      = GetLocalLabel ();
+    unsigned BreakLabel     = GetLocalLabel ();
+    unsigned ContinueLabel  = GetLocalLabel ();
 
     /* Skip the while token */
     NextToken ();
 
     /* Add the loop to the loop stack */
-    AddLoop (oursp, loop, lab, 0, 0);
+    AddLoop (oursp, BreakLabel, ContinueLabel);
 
-    /* Define the head label */
-    g_defcodelabel (loop);
+    /* Define the loop label */
+    g_defcodelabel (LoopLabel);
 
     /* Parse the loop body */
     Statement (0);
 
+    /* Output the label for a continue */
+    g_defcodelabel (ContinueLabel);
+
     /* Parse the end condition */
     Consume (TOK_WHILE, "`while' expected");
-    TestInParens (loop, 1);
+    TestInParens (LoopLabel, 1);
     ConsumeSemi ();
 
     /* Define the break label */
-    g_defcodelabel (lab);
+    g_defcodelabel (BreakLabel);
 
     /* Remove the loop from the loop stack */
     DelLoop ();
@@ -219,29 +223,31 @@ static void WhileStatement (void)
     int PendingToken;
 
     /* Get the loop control labels */
-    unsigned loop = GetLocalLabel ();
-    unsigned lab = GetLocalLabel ();
+    unsigned LoopLabel  = GetLocalLabel ();
+    unsigned BreakLabel = GetLocalLabel ();
 
     /* Skip the while token */
     NextToken ();
 
-    /* Add the loop to the loop stack */
-    AddLoop (oursp, loop, lab, 0, 0);
+    /* Add the loop to the loop stack. In case of a while loop, the loop head
+     * label is used for continue statements.
+     */
+    AddLoop (oursp, BreakLabel, LoopLabel);
 
     /* Define the head label */
-    g_defcodelabel (loop);
+    g_defcodelabel (LoopLabel);
 
     /* Test the loop condition */
-    TestInParens (lab, 0);
+    TestInParens (BreakLabel, 0);
 
     /* Loop body */
     Statement (&PendingToken);
 
     /* Jump back to loop top */
-    g_jump (loop);
+    g_jump (LoopLabel);
 
     /* Exit label */
-    g_defcodelabel (lab);
+    g_defcodelabel (BreakLabel);
 
     /* Eat remaining tokens that were delayed because of line info
      * correctness
@@ -316,7 +322,7 @@ static void BreakStatement (void)
     g_space (oursp - L->StackPtr);
 
     /* Jump to the exit label of the loop */
-    g_jump (L->Label);
+    g_jump (L->BreakLabel);
 }
 
 
@@ -332,10 +338,10 @@ static void ContinueStatement (void)
     /* Get the current loop descriptor */
     L = CurrentLoop ();
     if (L) {
-     	/* Search for the correct loop */
+     	/* Search for a loop that has a continue label. */
      	do {
-     	    if (L->Loop) {
-     		break;
+     	    if (L->ContinueLabel) {
+     	    	break;
      	    }
      	    L = L->Next;
      	} while (L);
@@ -350,12 +356,8 @@ static void ContinueStatement (void)
     /* Correct the stackpointer if needed */
     g_space (oursp - L->StackPtr);
 
-    /* Output the loop code */
-    if (L->linc) {
-       	g_jump (L->linc);
-    } else {
-       	g_jump (L->Loop);
-    }
+    /* Jump to next loop iteration */
+    g_jump (L->ContinueLabel);
 }
 
 
@@ -371,23 +373,25 @@ static void ForStatement (void)
     int PendingToken;
 
     /* Get several local labels needed later */
-    unsigned TestLabel = GetLocalLabel ();
-    unsigned lab       = GetLocalLabel ();
-    unsigned IncLabel  = GetLocalLabel ();
-    unsigned lstat     = GetLocalLabel ();
+    unsigned TestLabel    = GetLocalLabel ();
+    unsigned BreakLabel   = GetLocalLabel ();
+    unsigned IncLabel     = GetLocalLabel ();
+    unsigned BodyLabel    = GetLocalLabel ();
 
     /* Skip the FOR token */
     NextToken ();
 
-    /* Add the loop to the loop stack */
-    AddLoop (oursp, TestLabel, lab, IncLabel, lstat);
+    /* Add the loop to the loop stack. A continue jumps to the start of the
+     * the increment condition.
+     */
+    AddLoop (oursp, BreakLabel, IncLabel);
 
     /* Skip the opening paren */
     ConsumeLParen ();
 
     /* Parse the initializer expression */
     if (CurTok.Tok != TOK_SEMI) {
-	expression (&lval1);
+    	expression (&lval1);
     }
     ConsumeSemi ();
 
@@ -396,10 +400,10 @@ static void ForStatement (void)
 
     /* Parse the test expression */
     if (CurTok.Tok != TOK_SEMI) {
-        Test (lstat, 1);
-    	g_jump (lab);
+        Test (BodyLabel, 1);
+    	g_jump (BreakLabel);
     } else {
-    	g_jump (lstat);
+    	g_jump (BodyLabel);
     }
     ConsumeSemi ();
 
@@ -425,7 +429,7 @@ static void ForStatement (void)
     ConsumeRParen ();
 
     /* Loop body */
-    g_defcodelabel (lstat);
+    g_defcodelabel (BodyLabel);
     Statement (&PendingToken);
 
     /* If we had an increment expression, move the code to the bottom of
@@ -433,17 +437,17 @@ static void ForStatement (void)
      * the loop body.
      */
     if (HaveIncExpr) {
-	MoveCode (IncExprStart, IncExprEnd, GetCodePos());
+    	MoveCode (IncExprStart, IncExprEnd, GetCodePos());
     } else {
-	/* Jump back to the increment expression */
-	g_jump (IncLabel);
+    	/* Jump back to the increment expression */
+    	g_jump (IncLabel);
     }
 
     /* Skip a pending token if we have one */
     SkipPending (PendingToken);
 
     /* Declare the break label */
-    g_defcodelabel (lab);
+    g_defcodelabel (BreakLabel);
 
     /* Remove the loop from the loop stack */
     DelLoop ();

@@ -162,6 +162,14 @@ series of <tt/lda/ and <tt/sta/, so you can't do it better :-).
 Don't hesitate to use library functions. Everything was written with size and speed in mind. In
 fact many calls are just redirections to GEOS kernal which results in simple <tt/jsr/.
 <p>
+The <tt/main/ function receives the standard <tt/argc/ and <tt/argv/ parameters. There are
+always either 1 or 3 parameters. DOS application name is always set as <tt/argv[0]/.
+If present, <tt/argv[1]/ and <tt/argv[2]/ will be set to data filename and data diskname (it only
+works if user double-clicks on data file associated with your application). Note that it is up
+to your application to determine which of the available (up to four) disk drives has the disk
+with given diskname inside. If this fails your program should ask to insert the proper disk into
+one of available drives.
+<p>
 You might wonder why I have chosen sometimes weird order of arguments in functions. I just
 wanted to avoid unnecessary pushing and popping arguments from stack because cc65 can pass single
 <tt/unsigned int/ through CPU registers.

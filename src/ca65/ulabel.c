@@ -79,7 +79,7 @@ static ULabel** ULabList	= 0;	/* Array with pointers to all labels */
 
 static ULabel* NewULabel (ExprNode* Val)
 /* Create a new ULabel and insert it into the list. The function will move
- * ULabelLast, but not ULabelLastDef. The created label structure is returned.
+ * ULabLast, but not ULabLastDef. The created label structure is returned.
  */
 {
     /* Allocate memory for the ULabel structure */

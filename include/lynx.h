@@ -83,6 +83,23 @@ void __fastcall__ lynx_change_framerate (unsigned char rate);
 
 
 
+/*****************************************************************************/
+/*                           Accessing the EEPROM                            */
+/*****************************************************************************/
+
+
+
+unsigned __fastcall__ lynx_eeprom_read (unsigned char cell);
+/* Read a 16 bit word from the given address */
+
+unsigned __fastcall__ lynx_eeprom_write (unsigned char cell, unsigned val);
+/* Write the word at the given address */
+
+void __fastcall__ lynx_eeprom_erase (unsigned char cell);
+/* Clear the word at the given address */
+
+
+
 /* End of lynx.h */
 #endif
 

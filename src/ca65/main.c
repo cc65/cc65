@@ -138,6 +138,133 @@ static void SetOptions (void)
 
 
 
+static void NewSymbol (const char* SymName, long Val)
+/* Define a symbol with a fixed numeric value in the current scope */
+{
+    ExprNode* Expr;
+
+    /* Search for the symbol, allocate a new one if it doesn't exist */
+    SymEntry* Sym = SymFind (CurrentScope, SymName, SYM_ALLOC_NEW);
+
+    /* Check if have already a symbol with this name */
+    if (SymIsDef (Sym)) {
+    	AbEnd ("`%s' is already defined", SymName);
+    }
+
+    /* Generate an expression for the symbol */
+    Expr = GenLiteralExpr (Val);
+
+    /* Mark the symbol as defined */
+    SymDef (Sym, Expr, ADDR_SIZE_DEFAULT, SF_NONE);
+}
+
+
+
+static void CBMSystem (const char* Sys)
+/* Define a CBM system */
+{
+    NewSymbol ("__CBM__", 1);
+    NewSymbol (Sys, 1);
+}
+
+
+                     
+static void SetSys (const char* Sys)
+/* Define a target system */
+{
+    switch (Target = FindTarget (Sys)) {
+
+	case TGT_NONE:
+	    break;
+
+        case TGT_MODULE:
+            AbEnd ("Cannot use `module' as a target for the assembler");
+            break;
+
+	case TGT_ATARI:
+    	    NewSymbol ("__ATARI__", 1);
+	    break;
+
+	case TGT_C16:
+	    CBMSystem ("__C16__");
+	    break;
+
+	case TGT_C64:
+	    CBMSystem ("__C64__");
+	    break;
+
+	case TGT_VIC20:
+	    CBMSystem ("__VIC20__");
+	    break;
+
+	case TGT_C128:
+	    CBMSystem ("__C128__");
+	    break;
+
+	case TGT_ACE:
+	    CBMSystem ("__ACE__");
+	    break;
+
+	case TGT_PLUS4:
+	    CBMSystem ("__PLUS4__");
+	    break;
+
+	case TGT_CBM510:
+	    CBMSystem ("__CBM510__");
+	    break;
+
+	case TGT_CBM610:
+	    CBMSystem ("__CBM610__");
+	    break;
+
+	case TGT_PET:
+     	    CBMSystem ("__PET__");
+     	    break;
+
+     	case TGT_BBC:
+     	    NewSymbol ("__BBC__", 1);
+     	    break;
+
+     	case TGT_APPLE2:
+     	    NewSymbol ("__APPLE2__", 1);
+     	    break;
+
+     	case TGT_APPLE2ENH:
+            NewSymbol ("__APPLE2ENH__", 1);
+     	    break;
+
+     	case TGT_GEOS:
+     	    /* Do not handle as a CBM system */
+     	    NewSymbol ("__GEOS__", 1);
+     	    break;
+
+	case TGT_LUNIX:
+	    NewSymbol ("__LUNIX__", 1);
+	    break;
+
+        case TGT_ATMOS:
+            NewSymbol ("__ATMOS__", 1);
+            break;
+
+        case TGT_NES:
+            NewSymbol ("__NES__", 1);
+            break;
+
+        case TGT_SUPERVISION:
+            NewSymbol ("__SUPERVISION__", 1);
+            break;
+
+     	default:
+            AbEnd ("Invalid target name: `%s'", Sys);
+
+    }
+
+    /* Initialize the translation tables for the target system */
+    TgtTranslateInit ();
+}
+
+
+
 static void DefineSymbol (const char* Def)
 /* Define a symbol from the command line */
 {
@@ -145,8 +272,6 @@ static void DefineSymbol (const char* Def)
     unsigned I;
     long Val;
     char SymName [MAX_STR_LEN+1];
-    SymEntry* Sym;
-    ExprNode* Expr;
 
 
     /* The symbol must start with a character or underline */
@@ -172,39 +297,28 @@ static void DefineSymbol (const char* Def)
 	}
 	Val = 0;
     } else {
-	/* We have a value */
-	++P;
-	if (*P == '$') {
-	    ++P;
-	    if (sscanf (P, "%lx", &Val) != 1) {
-	 	InvDef (Def);
-	    }
-	} else {
-	    if (sscanf (P, "%li", &Val) != 1) {
-     		InvDef (Def);
-	    }
+    	/* We have a value */
+    	++P;
+    	if (*P == '$') {
+    	    ++P;
+    	    if (sscanf (P, "%lx", &Val) != 1) {
+    	       	InvDef (Def);
+    	    }
+    	} else {
+    	    if (sscanf (P, "%li", &Val) != 1) {
+     	       	InvDef (Def);
+    	    }
        	}
     }
-
-    /* Search for the symbol, allocate a new one if it doesn't exist */
-    Sym = SymFind (CurrentScope, SymName, SYM_ALLOC_NEW);
-
-    /* Check if have already a symbol with this name */
-    if (SymIsDef (Sym)) {
-	AbEnd ("`%s' is already defined", SymName);
-    }
-
-    /* Generate an expression for the symbol */
-    Expr = GenLiteralExpr (Val);
-
-    /* Mark the symbol as defined */
-    SymDef (Sym, Expr, ADDR_SIZE_DEFAULT, SF_NONE);
+                     
+    /* Define the new symbol */
+    NewSymbol (SymName, Val);
 }
 
 
 
 static void OptAutoImport (const char* Opt attribute ((unused)),
-	    		   const char* Arg attribute ((unused)))
+    	    	     	   const char* Arg attribute ((unused)))
 /* Mark unresolved symbols as imported */
 {
     AutoImport = 1;
@@ -226,7 +340,7 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptDebugInfo (const char* Opt attribute ((unused)),
-			  const char* Arg attribute ((unused)))
+		     	  const char* Arg attribute ((unused)))
 /* Add debug info to the object file */
 {
     DbgSyms = 1;
@@ -351,13 +465,7 @@ static void OptSmart (const char* Opt attribute ((unused)),
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the target system */
 {
-    /* Map the target name to a target id */
-    Target = FindTarget (Arg);
-    if (Target == TGT_UNKNOWN) {
-     	AbEnd ("Invalid target name: `%s'", Arg);
-    } else if (Target == TGT_MODULE) {
-        AbEnd ("Cannot use `module' as a target for the assembler");
-    }
+    SetSys (Arg);
 }
 
 
@@ -750,9 +858,6 @@ int main (int argc, char* argv [])
     if (MemoryModel == MMODEL_UNKNOWN) {
         SetMemoryModel (MMODEL_NEAR);
     }
-
-    /* Intialize the target translation tables */
-    TgtTranslateInit ();
 
     /* Initialize the segments */
     InitSegments ();

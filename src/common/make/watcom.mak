@@ -84,6 +84,7 @@ OBJS =	abend.obj	\
 	strutil.obj	\
 	target.obj	\
 	tgttrans.obj	\
+        wildargv.obj    \
 	xmalloc.obj	\
 	xsprintf.obj
 
@@ -99,6 +100,9 @@ $(LIB): $(OBJS)
 	@echo Creating library...
 	$(AR) -q -b -P=32 $(LIB) $(foreach OBJ, $(OBJS), +-$(OBJ))
 	@echo Done!
+
+wildargv.obj:
+	$(CC) $(CFLAGS) $(WATCOM)\\src\\startup\\wildargv.c
 
 clean:
 	@rm -f *~ core

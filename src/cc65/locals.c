@@ -171,6 +171,13 @@ static void ParseOneDecl (const DeclSpec* Spec)
 	/* Get the size of the variable */
 	Size = SizeOf (Decl.Type);
 
+        /* Cannot allocate a variable of zero size */
+        if (Size == 0) {
+            Error ("Variable `%s' has unknown size", Decl.Ident);
+            return;
+        }
+
+        /* */
        	if (SC & (SC_AUTO | SC_REGISTER)) {
 
 	    /* Auto variable */

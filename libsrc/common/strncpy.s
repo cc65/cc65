@@ -1,16 +1,20 @@
 ;
-; Ullrich von Bassewitz, 31.05.1998
+; Ullrich von Bassewitz, 2003-05-04
 ;
-; char* strncpy (char* dest, const char* src, unsigned size);
+; char* __fastcall__ strncpy (char* dest, const char* src, unsigned size);
 ;
 
-	.export		_strncpy
-	.import		popax
-	.importzp	ptr1, ptr2, ptr3, tmp1, tmp2
+	.export	   	_strncpy
+	.import	   	popax
+	.importzp  	ptr1, ptr2, ptr3, tmp1, tmp2
 
-_strncpy:
-	sta	tmp1		; Save size
-       	stx	tmp2
+.proc   _strncpy
+
+        eor     #$FF
+        sta     tmp1
+        txa
+        eor     #$FF
+        sta     tmp2            ; Store -size - 1
        	jsr    	popax 	  	; get src
 	sta	ptr1
 	stx	ptr1+1
@@ -20,79 +24,44 @@ _strncpy:
 	sta	ptr3  		; remember for function return
 	stx    	ptr3+1
 
+; Copy src -> dest up to size bytes
+
+        ldx     tmp1            ; Load low byte of ones complement of size
 	ldy	#$00
-	ldx	tmp1		; Low byte of size
-	beq	L1
+L1:     inx
+        bne     L2
+        inc     tmp2
+        beq     L9
 
-; Copy the first chunk < 256
+L2:     lda     (ptr1),y        ; Copy one character
+        sta     (ptr2),y
+        beq     L3              ; Bail out if terminator reached
+        iny
+        bne     L1
+        inc     ptr1+1
+        inc     ptr2+1          ; Bump high bytes
+        bne     L1              ; Branch always
+                   
+; Fill the remaining bytes. A is zero if we come here
 
-	jsr	CopyChunk
-       	bcs 	L3		; Jump if end of string found
+L3:     inx
+        bne     L4
+        inc     tmp2
+        beq     L9
 
-; Copy full 256 byte chunks
+L4:     sta     (ptr2),y
+        iny
+        bne     L3
+        inc     ptr2+1          ; Bump high byte
+        bne     L3              ; Branch always
 
-L1:    	lda	tmp2		; High byte of size
-   	beq	L3
-   	ldx	#$00		; Copy 256 bytes
-L2:  	jsr	CopyChunk
-   	bcs	L3
-   	dec	tmp2
-   	bne	L2
-	beq	L9
+; Done, return dest
 
-; Fill the remaining space with zeroes. If we come here, the value in X
-; is the low byte of the fill count, tmp2 holds the high byte. Y is the index
-; into the target string.
+L9:     lda     ptr3
+        ldx     ptr3+1
+        rts
 
-L3:	tax			; Test low byte
-	beq	L4
-	jsr	FillChunk
-
-L4:	lda	tmp2		; Test high byte
-	beq	L9
-L5:	jsr	FillChunk
-   	dec	tmp2
-   	bne	L5
-
-; Done - return a pointer to the string
-
-L9:	lda	ptr3
-	ldx	ptr3+1
-	rts
-
-
-; -------------------------------------------------------------------
-; Copy byte count in X from ptr1 to ptr2
-
-.proc	CopyChunk
-L1:	lda	(ptr1),y
-	sta	(ptr2),y
-	beq	L3
-	iny
-	bne	L2
-	inc	ptr1+1
-	inc	ptr2+1
-L2:	dex
-	bne	L1
-	clc
-	rts
-L3:	sec
-	rts
 .endproc
 
-
-; -------------------------------------------------------------------
-; Fill byte count in X with zeroes
-
-.proc	FillChunk
-	lda	#$00
-L1:	sta	(ptr1),y
-	iny
-	bne	L2
-   	inc	ptr1+1
-L2:	dex
-	bne	L1
-	rts
-.endproc
 
 

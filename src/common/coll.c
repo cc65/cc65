@@ -56,8 +56,8 @@ Collection* InitCollection (Collection* C)
 {
     /* Intialize the fields. */
     C->Count = 0;
-    C->Size  = 8;
-    C->Items = xmalloc (8 * sizeof (void*));
+    C->Size  = 0;
+    C->Items = 0;
 
     /* Return the new struct */
     return C;

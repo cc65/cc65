@@ -76,6 +76,7 @@ OBJS =	abend.obj	\
 	fname.obj	\
 	hashstr.obj	\
 	print.obj	\
+	strutil.obj	\
 	target.obj	\
 	tgttrans.obj	\
 	wildargv.obj	\

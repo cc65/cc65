@@ -6,7 +6,7 @@
 ; drive_id = (slot * 2) + (drive - 1)
 
         .export 	_dio_open
-        .import		decaxy, return0
+        .import		return0
 
         .include	"zeropage.inc"
         .include	"errno.inc"
@@ -21,15 +21,19 @@ _dio_open:
         asl
         asl
         asl
+        tay			; Save handle
+
+        ; Set handle
         sta	mliparam + MLI::ON_LINE::UNIT_NUM
 
         ; Alloc 16-byte buffer just below stack
-        ldy	#16
         lda	sp
-        ldx	sp+1
-        jsr	decaxy
+        sec
+        sbc	#16
         sta	mliparam + MLI::ON_LINE::DATA_BUFFER
-        stx	mliparam + MLI::ON_LINE::DATA_BUFFER+1
+        lda	sp+1
+        sbc	#$00
+        sta	mliparam + MLI::ON_LINE::DATA_BUFFER+1
 
         ; Get device state
         lda	#ON_LINE_CALL
@@ -43,7 +47,7 @@ _dio_open:
         bcc	oserr
 
         ; Return success
-:       lda	mliparam + MLI::ON_LINE::UNIT_NUM
+:       tya			; Restore handle
         ldx	#$00
         stx	__oserror
         rts

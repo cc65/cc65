@@ -49,12 +49,20 @@ OBJS=	_scrsize.o	\
      	crt0.o		\
      	ctype.o		\
      	cvline.o	\
+	dioclose.o	\
+	diocommon.o	\
+	dioopen.o	\
+	dioread.o	\
+	diosectcount.o	\
+	diosectsize.o	\
+	diowrite.o	\
 	dosdetect.o	\
         get_ostype.o    \
         getenv.o        \
         joy_stddrv.o    \
      	kbhit.o		\
         mainargs.o      \
+	mli.o		\
         oserrlist.o     \
         randomize.o     \
         rcout.o         \

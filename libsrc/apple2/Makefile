@@ -53,6 +53,8 @@ OBJS=	_scrsize.o	\
 	diocommon.o	\
 	dioopen.o	\
 	dioread.o	\
+	diosectcount.o	\
+	diosectsize.o	\
 	diowrite.o	\
 	dosdetect.o	\
         get_ostype.o    \

@@ -37,6 +37,9 @@ int vsprintf (char* buf, char* format, va_list ap)
     /* Do formatting and output */
     _printf (&d, format, ap);
 
+    /* Terminate the result string */
+    buf [d.ccount++] = '\0';
+
     /* Return bytes written */
     return d.ccount;
 }

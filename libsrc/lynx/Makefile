@@ -27,19 +27,19 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-%.emd:	%.o ../runtime/zeropage.o
+%.emd:	%.o ../runtime/zeropage.o extzp.o
 	@$(LD) -t module -o $@ $^
 
-%.joy:	%.o ../runtime/zeropage.o
+%.joy:	%.o ../runtime/zeropage.o extzp.o
 	@$(LD) -t module -o $@ $^
 
-%.mou:	%.o ../runtime/zeropage.o
+%.mou:	%.o ../runtime/zeropage.o extzp.o
 	@$(LD) -t module -o $@ $^
 
-%.ser:	%.o ../runtime/zeropage.o
+%.ser:	%.o ../runtime/zeropage.o extzp.o
 	@$(LD) -t module -o $@ $^
 
-%.tgi:	%.o ../runtime/zeropage.o
+%.tgi:	%.o ../runtime/zeropage.o extzp.o
 	@$(LD) -t module -o $@ $^
 
 #--------------------------------------------------------------------------
@@ -48,6 +48,7 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 OBJS =	crt0.o          \
 	ctype.o		\
         eeprom.o        \
+        extzp.o         \
         framerate.o     \
 	getenv.o	\
 	mainargs.o	\

@@ -19,7 +19,6 @@
 
 	.include        "lynx.inc"
 	.export         _exit
-	.exportzp       __iodat,__iodir,__viddma,__sprsys
 
 	.import         initlib, donelib
 	.import         zerobss
@@ -29,6 +28,7 @@
 	.import         __RAM_START__, __RAM_SIZE__
 
 	.include        "zeropage.inc"
+        .include        "extzp.inc"
 
 
 ; ------------------------------------------------------------------------
@@ -52,17 +52,6 @@ SuzyInitData:   .byte $7f,$7f,$00,$00,$24,$f3,$01
 
 MikeyInitReg:   .byte $00,$01,$08,$09,$20,$28,$30,$38,$44,$50,$8a,$8b,$8c,$92,$93
 MikeyInitData:  .byte $9e,$18,$68,$1f,$00,$00,$00,$00,$00,$ff,$1a,$1b,$04,$0d,$29
-
-
-; ------------------------------------------------------------------------
-; mikey and suzy shadow registers
-
-       .segment "EXTZP" : zeropage
-
-__iodat:    .res    1
-__iodir:    .res    1
-__viddma:   .res    1
-__sprsys:   .res    1
 
 
 ; ------------------------------------------------------------------------

@@ -12,6 +12,7 @@
       	.include 	"joy-kernel.inc"
         .include        "joy-error.inc"
         .include        "lynx.inc"
+        .include        "extzp.inc"
 
         .macpack        generic
 
@@ -28,6 +29,7 @@
 
 ; Button state masks (8 values)
 
+joy_mask:
         .byte   $80                     ; JOY_UP
         .byte   $40                     ; JOY_DOWN
         .byte   $20                     ; JOY_LEFT
@@ -39,10 +41,11 @@
 
 ; Jump table.
 
-        .word   INSTALL
-        .word   UNINSTALL
-        .word   COUNT
-        .word   READ
+        .addr   INSTALL
+        .addr   UNINSTALL
+        .addr   COUNT
+        .addr   READ
+        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -62,9 +65,37 @@ JOY_COUNT       = 1             ; Number of joysticks we support
 ; memory available.
 ; Must return an JOY_ERR_xx code in a/x.
 ;
+; Here we also flip the joypad in case the display is flipped.
+; This install routine should be called after you send the flip code
+; to the display hardware.
 
 INSTALL:
-        lda     #<JOY_ERR_OK
+	lda	__viddma	; Process flipped displays
+	and	#2
+	beq	@L2
+
+; Set joypad for flipped display
+
+        lda     #$10
+        ldx     #$00
+@L1:    sta     joy_mask,x
+        inx
+        asl     a
+        bcc     @L1
+        bra     @L4
+
+; Set joypad for normal display
+
+@L2:    lda     #$10
+        ldx     #$03
+@L3:    sta     joy_mask,x
+        dex
+        asl     a
+        bcc     @L3
+
+; Done
+
+@L4:    lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
 ;	rts                     ; Run into UNINSTALL instead
 

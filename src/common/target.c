@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -52,7 +52,8 @@ target_t Target	= TGT_NONE;
 
 /* Table with target names */
 const char* TargetNames [TGT_COUNT] = {
-    "none",
+    "none",     
+    "module",
     "atari",
     "c64",
     "c128",
@@ -60,7 +61,7 @@ const char* TargetNames [TGT_COUNT] = {
     "plus4",
     "cbm510",
     "cbm610",
-    "pet", 
+    "pet",
     "bbc",
     "apple2",
     "geos",
@@ -103,3 +104,4 @@ target_t FindTarget (const char* Name)
 
 
 
+             

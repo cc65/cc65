@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -742,6 +742,58 @@ void DumpObjLineInfo (FILE* F, unsigned long Offset)
     }
 }
 
+
+
+void DumpObjSegSize (FILE* F, unsigned long Offset)
+/* Dump the sizes of the segment in the object file */
+{
+    ObjHeader H;
+    unsigned Count;
+
+    /* Seek to the header position */
+    FileSeek (F, Offset);
+
+    /* Read the header */
+    ReadObjHeader (F, &H);
+
+    /* Seek to the start of the segments */
+    FileSeek (F, Offset + H.SegOffs);
+
+    /* Output a header */
+    printf ("  Segment sizes:\n");
+
+    /* Read the number of segments */
+    Count = ReadVar (F);
+
+    /* Read and print the sizes of all segments */
+    while (Count--) {
+
+       	/* Read the data for one segments */
+	char*	      Name  = ReadStr (F);
+	unsigned      Len   = strlen (Name);
+	unsigned long Size  = Read32 (F);
+
+        /* Skip alignment and type */
+        (void) Read8 (F);
+        (void) Read8 (F);
+
+	/* Print the size for this segment */
+	printf ("    %s:%*s%6lu\n", Name, 24-Len, "", Size);
+
+	/* Free the Name */
+	xfree (Name);
+
+	/* Skip the fragments for this segment, counting them */
+	while (Size > 0) {
+	    unsigned FragSize = SkipFragment (F);
+	    if (FragSize > Size) {
+	    	/* OOPS - file data invalid */
+	    	Error ("Invalid fragment data - file corrupt!");
+	    }
+	    Size -= FragSize;
+	}
+    }
+}
 
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -74,6 +74,8 @@ static void Usage (void)
     	     "Usage: %s [options] file [options] [file]\n"
     	     "Short options:\n"
        	     "  -h\t\t\tHelp (this text)\n"
+       	     "  -H\t\t\tDump the object file header\n"
+       	     "  -S\t\t\tDump segments sizes\n"
        	     "  -V\t\t\tPrint the version number and exit\n"
 	     "\n"
 	     "Long options:\n"
@@ -86,6 +88,7 @@ static void Usage (void)
 	     "  --dump-lineinfo\tDump line information\n"
 	     "  --dump-options\tDump object file options\n"
 	     "  --dump-segments\tDump the segments in the file\n"
+       	     "  --dump-segsize\tDump segments sizes\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --version\t\tPrint the version number and exit\n",
     	     ProgName);
@@ -174,6 +177,15 @@ static void OptDumpSegments (const char* Opt attribute ((unused)),
 
 
 
+static void OptDumpSegSize (const char* Opt attribute ((unused)),
+			    const char* Arg attribute ((unused)))
+/* Dump the segments in the object file */
+{
+    What |= D_SEGSIZE;
+}
+
+
+
 static void OptHelp (const char* Opt attribute ((unused)),
 		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
@@ -250,6 +262,9 @@ static void DumpFile (const char* Name)
 	if (What & D_LINEINFO) {
 	    DumpObjLineInfo (F, 0);
 	}
+	if (What & D_SEGSIZE) {
+       	    DumpObjSegSize (F, 0);
+	}
     }
 
     /* Close the file */
@@ -272,8 +287,9 @@ int main (int argc, char* argv [])
         { "--dump-lineinfo",    0,      OptDumpLineInfo         },
 	{ "--dump-options",	0,	OptDumpOptions		},
 	{ "--dump-segments",	0,	OptDumpSegments		},
-	{ "--help",		0,	OptHelp			},
-	{ "--version",	       	0,	OptVersion		},
+       	{ "--dump-segsize",    	0,     	OptDumpSegSize          },
+	{ "--help",    		0,	OptHelp			},
+	{ "--version", 	       	0,	OptVersion		},
     };
 
     unsigned I;
@@ -302,6 +318,10 @@ int main (int argc, char* argv [])
 
 	 	case 'H':
 		    OptDumpHeader (Arg, 0);
+		    break;
+
+	 	case 'S':
+		    OptDumpSegSize (Arg, 0);
 		    break;
 
        	        case 'V':

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -71,6 +71,9 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset);
 
 void DumpObjLineInfo (FILE* F, unsigned long Offset);
 /* Dump the line infos from an object file */
+
+void DumpObjSegSize (FILE* F, unsigned long Offset);
+/* Dump the sizes of the segment in the object file */
 
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -52,6 +52,7 @@
 #define D_EXPORTS      	0x0020U		/* Dump exported symbols */
 #define D_DBGSYMS      	0x0040U		/* Dump debug symbols */
 #define D_LINEINFO      0x0080U         /* Dump line infos */
+#define D_SEGSIZE       0x0100U         /* Dump segment sizes */
 #define D_ALL  	       	0xFFFFU		/* Dump anything */
 
 

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -191,7 +191,10 @@ const char* GetSourceFileName (const ObjData* O, unsigned Index)
     } else {
 
 	/* Check the parameter */
-	PRECONDITION (Index < O->FileCount);
+        if (Index >= O->FileCount) {
+            Error ("Invalid file index (%u) in module `%s' (input file corrupt?)",
+                   Index, GetObjFileName (O));
+        }
 
 	/* Return the name */
 	return GetString (O->Files[Index]->Name);

@@ -55,6 +55,38 @@ static void SetResult (typecmp_t* Result, typecmp_t Val)
 
 
 
+static int EqualFuncParams (SymTable* Tab1, SymTable* Tab2)
+/* Compare two function symbol tables regarding function parameters. Return 1
+ * if they are equal and 0 otherwise.
+ */
+{
+    /* Compare the parameter lists */
+    SymEntry* Sym1 = Tab1->SymHead;
+    SymEntry* Sym2 = Tab2->SymHead;
+
+    /* Compare the fields */
+    while (Sym1 && (Sym1->Flags & SC_PARAM) && Sym2 && (Sym2->Flags & SC_PARAM)) {
+
+	/* Compare this field */
+       	if (TypeCmp (Sym1->Type, Sym2->Type) < TC_EQUAL) {
+	    /* Field types not equal */
+	    return 0;
+	}
+
+	/* Get the pointers to the next fields */
+	Sym1 = Sym1->NextSym;
+	Sym2 = Sym2->NextSym;
+    }
+
+    /* Check both pointers against NULL or a non parameter to compare the 
+     * field count 
+     */
+    return (Sym1 == 0 || (Sym1->Flags & SC_PARAM) == 0) &&
+	   (Sym2 == 0 || (Sym2->Flags & SC_PARAM) == 0);
+}
+
+
+
 static int EqualSymTables (SymTable* Tab1, SymTable* Tab2)
 /* Compare two symbol tables. Return 1 if they are equal and 0 otherwise */
 {
@@ -216,7 +248,7 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
        		    }
 
        		    /* Compare the parameter lists */
-       		    if (EqualSymTables (F1->SymTab, F2->SymTab) == 0 ||
+       		    if (EqualFuncParams (F1->SymTab, F2->SymTab) == 0 ||
        		    	EqualSymTables (F1->TagTab, F2->TagTab) == 0) {
        		    	/* One of the tables is not identical */
 			SetResult (Result, TC_INCOMPATIBLE);

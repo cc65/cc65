@@ -4,7 +4,7 @@
 
 		     Compile and link utility for cc65
 
-		 (C) Copyright 1999 Ullrich von Bassewitz
+	       (C) Copyright 1998-2000 Ullrich von Bassewitz
 			    (uz@musoftware.de)
 
 
@@ -35,67 +35,94 @@ available, and the use of cl65 is much simpler.
 
 
 
-2. Usage
---------
+2. Basic Usage
+--------------
 
 The cl65 compile and link utility may be used to compile, assemble and
 link files. While the separate tools do just one step, cl65 knows how to
 build object files from C files (by calling the compiler, then the
 assembler) and other things.
 
-	Usage: cl65 [options] file
-	Options:
-		-A              Strict ANSI mode
-		-C name         Use linker config file
-		-D sym[=defn]   Define a preprocessor symbol
-		-I path         Set an include directory path
-		-Ln name        Create a VICE label file
-		-O              Optimize code
-		-Oi             Optimize code, inline functions
-		-Or             Optimize code, honour the register keyword
-		-Os             Optimize code, inline known C funtions
-		-S              Compile but don't assemble and link
-		-V              Print the version number
-		-W              Suppress warnings
-		-c              Compiler and assemble but don't link
-		-d              Debug mode
-		-g              Add debug info
-		-h              Help (this text)
-		-m name         Create a map file
-		-o name         Name the output file
-		-t system       Set the target system
-		-v              Verbose mode
-		-vm             Verbose map file
+---------------------------------------------------------------------------
+Usage: cl65 [options] file
+Short options:
+  -A		       	Strict ANSI mode
+  -C name	       	Use linker config file
+  -Cl		       	Make local variables static
+  -D sym[=defn]	       	Define a preprocessor symbol
+  -I dir	       	Set a compiler include directory path
+  -Ln name	       	Create a VICE label file
+  -O		       	Optimize code
+  -Oi			Optimize code, inline functions
+  -Or			Optimize code, honour the register keyword
+  -Os			Optimize code, inline known C funtions
+  -S			Compile but don't assemble and link
+  -V			Print the version number
+  -W			Suppress warnings
+  -c			Compiler and assemble but don't link
+  -d	 		Debug mode
+  -g			Add debug info
+  -h			Help (this text)
+  -m name		Create a map file
+  -o name		Name the output file
+  -t sys		Set the target system
+  -v			Verbose mode
+  -vm			Verbose map file
+
+Long options:
+  --ansi		Strict ANSI mode
+  --asm-include-dir dir	Set an assembler include directory
+  --debug		Debug mode
+  --debug-info		Add debug info
+  --help		Help (this text)
+  --include-dir dir	Set a compiler include directory path
+  --target sys		Set the target system
+  --version		Print the version number
+  --verbose		Verbose mode
+---------------------------------------------------------------------------
 
 Most of the options have the same meaning than the corresponding compiler,
-assembler or linker option. If an option is available for more than one
-of the tools, it is set for all tools, where it is available. One example
-for this is -v: The compiler, the assembler and the linker are all called
-with the -v switch.
+assembler or linker option. See the documentation for these tools for an
+explanation. If an option is available for more than one of the tools, it
+is set for all tools, where it is available. One example for this is -v:
+The compiler, the assembler and the linker are all called with the -v
+switch.
 
 There are a few remaining options that control the behaviour of cl65:
 
-The -S option forces cl65 to stop after the assembly step. This means that
-C files are translated into assembler files, but nothing more is done.
-Assembler files, object files and libraries given on the command line are
-ignored.
+  -S
 
-The -c options forces cl65 to stop after the assembly step. This means
-that C and assembler files given on the command line are translated into
-object files, but there is no link step, and object files and libraries
-given on the command line are ignored.
+  This option forces cl65 to stop after the assembly step. This means that
+  C files are translated into assembler files, but nothing more is done.
+  Assembler files, object files and libraries given on the command line
+  are ignored.
 
-The -o option is used for the target name in the final step. This causes
-problems, if the linker will not be called, and there are several input
-files on the command line. In this case, the name given with -o will be
-used for all of them, which makes the option pretty useless. You shouldn't
-use -o when more than one output file is created.
 
-The default for the -t option is different from the compiler and linker in
-the case that the option is missing: While the compiler and linker will
-use the "none" system settings by default, cl65 will use the C64 as a
-target system by default. This was choosen since most people seem to use
-cc65 to develop for the C64.
+  -c
+
+  This options forces cl65 to stop after the assembly step. This means
+  that C and assembler files given on the command line are translated into
+  object files, but there is no link step, and object files and libraries
+  given on the command line are ignored.
+
+
+  -o name
+
+  The -o option is used for the target name in the final step. This causes
+  problems, if the linker will not be called, and there are several input
+  files on the command line. In this case, the name given with -o will be
+  used for all of them, which makes the option pretty useless. You
+  shouldn't use -o when more than one output file is created.
+
+
+  -t sys
+  --target sys
+
+  The default for this option is different from the compiler and linker in
+  the case that the option is missing: While the compiler and linker will
+  use the "none" system settings by default, cl65 will use the C64 as a
+  target system by default. This was choosen since most people seem to use
+  cc65 to develop for the C64.
 
 
 
@@ -141,7 +168,7 @@ As a general rule, you may use cl65 instead of cc65 at most times,
 especially in makefiles to build object files directly from C files. Use
 
 	.c.o:
-		cl65 -g -Oi $<
+	      	cl65 -g -Oi $<
 
 to do this.
 
@@ -159,7 +186,7 @@ Feel free to contact me by email (uz@musoftware.de).
 6. Copyright
 ------------
 
-cl65 is (C) Copyright 1998 Ullrich von Bassewitz. For usage of the
+cl65 is (C) Copyright 1998-2000 Ullrich von Bassewitz. For usage of the
 binaries and/or sources the following conditions do apply:
 
 This software is provided 'as-is', without any expressed or implied

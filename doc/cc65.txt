@@ -66,139 +66,226 @@ the assembler, have a look at ca65.txt).
 
 The compiler may be called as follows:
 
+---------------------------------------------------------------------------
 Usage: cc65 [options] file
-	-d  		Debug mode
-	-g  		Add debug info to object files
-	-h  		Print this help
-        -j              Default characters are signed
-	-o name		Name the output file
-	-s  		Print some statistics
-	-tx 		Set target system x
-	-v		Verbose mode
-	-A		Strict ANSI mode
-	-Cl		Make local variables static
-	-Dsym[=defn]	Define a symbol
-	-I path		Set include directory
-	-O		Optimize code
-	-Oi		Optimize code, inline more code
-	-Or		Enable register variables
-	-Os		Inline some known functions
-	-T		Include source as comment
-	-V		Print version number
-	-W		Suppress warnings
+Short options:
+  -d			Debug mode
+  -g			Add debug info to object file
+  -h			Help (this text)
+  -j			Default characters are signed
+  -o name		Name the output file
+  -t sys		Set the target system
+  -v			Increase verbosity
+  -A			Strict ANSI mode
+  -Cl			Make local variables static
+  -Dsym[=defn]		Define a symbol
+  -I dir		Set an include directory search path
+  -O			Optimize code
+  -Oi			Optimize code, inline more code
+  -Or			Enable register variables
+  -Os			Inline some known functions
+  -T			Include source as comment
+  -V			Print the compiler version number
+  -W			Suppress warnings
 
-The -A option disables any compiler exensions. Have a look at section 5
-for a discussion of compiler extensions. In addition, the macro
+Long options:
+  --ansi		Strict ANSI mode
+  --cpu type		Set cpu type
+  --debug		Debug mode
+  --debug-info		Add debug info to object file
+  --help		Help (this text)
+  --include-dir dir	Set an include directory search path
+  --signed-chars	Default characters are signed
+  --static-locals	Make local variables static
+  --target sys		Set the target system
+  --verbose		Increase verbosity
+  --version		Print the compiler version number
+---------------------------------------------------------------------------
+
+
+  -A
+  --ansi
+
+  This option disables any compiler exensions. Have a look at section 5
+  for a discussion of compiler extensions. In addition, the macro
 
        	__STRICT_ANSI__
 
-is defined, when compiling with -A.
+  is defined, when using one of these options.
 
--d enables debug mode, something that should not be needed for mere
-mortals:-)
 
--g will cause the compiler to insert a .DEBUGINFO command into the
-generated assembler code. This will cause the assembler to include all
-symbols in a special section in the object file.
+  --cpu CPU
 
--h and -s print some statistics, nothing spectacular.
+  A new, still experimental option. You may specify "6502" or "65C02" as
+  the CPU. 6502 is the default, so this will not change anything.
+  Specifying 65C02 will use a few 65C02 instructions when generating code.
+  Don't expect too much from this option: It is still new (and may have
+  bugs), and the additional instructions for the 65C02 are not that
+  overwhelming.
 
-Using -j you can make the default characters signed. Since the 6502 has
-no provisions for sign extending characters (which is needed on almost
-any load operation), this will make the code larger and slower. A better
-way is to declare characters explicitly as "signed" if needed. You can
-also use "#pragma signedchars" for better control of this option (see
-section 7).
 
-The -t option is used to set the target system. The target system
-determines things like the character set that is used for strings and
-character constants. The following target systems are supported:
+  -d
+  --debug
 
-	none
-	c64
-	c128
-	ace		(no library support)
-	plus4
+  Enables debug mode, something that should not be needed for mere
+  mortals:-)
+
+
+  -D sym[=definition]
+
+  Define a macro on the command line. If no definition is given, the macro
+  is defined to the value "1".
+
+
+  -g
+  --debug-info
+
+  This will cause the compiler to insert a .DEBUGINFO command into the
+  generated assembler code. This will cause the assembler to include all
+  symbols in a special section in the object file.
+
+
+  -h
+  --help
+
+  Print the short option summary shown above.
+
+
+  -j
+  --signed-chars
+
+  Using this option, you can make the default characters signed. Since the
+  6502 has no provisions for sign extending characters (which is needed on
+  almost any load operation), this will make the code larger and slower. A
+  better way is to declare characters explicitly as "signed" if needed.
+  You can also use "#pragma signedchars" for better control of this option
+  (see section 7).
+
+
+  -t target
+  --target target
+
+  This option is used to set the target system. The target system
+  determines things like the character set that is used for strings and
+  character constants. The following target systems are supported:
+
+  	none
+     	c64
+ 	c128
+ 	ace	 	(no library support)
+ 	plus4
        	cbm610
-	pet		(all CBM PET systems except the 2001)
-	nes		(Nintendo Entertainment System)
-	apple2
-	geos
+ 	pet	 	(all CBM PET systems except the 2001)
+ 	nes	 	(Nintendo Entertainment System)
+ 	apple2
+ 	geos
 
-Using -v, the compiler will be somewhat more verbose if errors or warnings
-are encountered.
 
--Cl will use static storage for local variables instead of storage on the
-stack. Since the stack is emulated in software, this gives shorter and
-usually faster code, but the code is no longer reentrant. The difference
-between -Cl and declaring local variables as static yourself is, that
-initializer code is executed each time, the function is entered. So when
-using
+  -v
+  --verbose
 
-	void f (void)
-	{
-	    unsigned a = 1;
-	    ...
-	}
+  Using this option, the compiler will be somewhat more verbose if errors
+  or warnings are encountered.
+ 
 
-the variable a will always have the value 1 when entering the function and
-using -Cl, while in
+  -Cl
+  --static-locals
 
-	void f (void)
-	{
-	    static unsigned a = 1;
-	    ....
-	}
+  Use static storage for local variables instead of storage on the stack.
+  Since the stack is emulated in software, this gives shorter and usually
+  faster code, but the code is no longer reentrant. The difference between
+  -Cl and declaring local variables as static yourself is, that
+  initializer code is executed each time, the function is entered. So when
+  using
 
-the variable a will have the value 1 only the first time, the function is
-entered, and will keep the old value from one call of the function to the
-next.
+   	void f (void)
+   	{
+   	    unsigned a = 1;
+   	    ...
+   	}
 
-You may also use #pragma staticlocals to change this setting in your
-sources (see section 7).
+  the variable a will always have the value 1 when entering the function
+  and using -Cl, while in
 
--I sets the directory where the compiler searches for include files. You
-may use -I multiple times to add more than one directory to the search
-list.
+   	void f (void)
+   	{
+   	    static unsigned a = 1;
+   	    ....
+   	}
 
--O will	enable an optimizer run over the produced code. Using -Oi, the
-code generator will inline some code where otherwise a runtime functions
-would have been called, even if the generated code is larger. This will
-not only remove the overhead for a function call, but will make the code
-visible for the optimizer.
+  the variable a will have the value 1 only the first time, the function
+  is entered, and will keep the old value from one call of the function to
+  the next.
 
--Or will make the compiler honor the "register" keyword. Local variables
-may be placed in registers (which are actually zero page locations).
-There is some overhead involved with register variables, since the old
-contents of the registers must be saved and restored. In addition, the
-current implementation does not make good use of register variables, so
-using -Or may make your program even slower and larger. Use with care!
+  You may also use #pragma staticlocals to change this setting in your
+  sources (see section 7).
 
-Using -Os will force the compiler to inline some known functions from the
-C library like strlen. Note: This has two consequences:
 
-  * You may not use names of standard C functions in your own code. If
-    you do that, your program is not standard compliant anyway, but
-    using -Os will actually break things.
+  -I dir
+  --include-dir dir
 
-  * The inlined string and memory functions will not handle strings or
-    memory areas larger than 255 bytes. Similar, the inlined is..()
-    functions will not work with values outside char range.
+  Set a directory where the compiler searches for include files. You may
+  use this option multiple times to add more than one directory to the
+  search list.	 
 
-It is possible to concatenate the modifiers for -O. For example, to
-enable register variables and inlining of known functions, you may use
--Ors.
 
--T will include the source code as comments in the generated code. This is
-normally not needed.
+  -o name
+  
+  Specify the name of the output file. If you don't specify a name, the
+  name of the C input file is used, with the extension replaced by ".s".
 
--V prints the version number of the compiler. When submitting a bug
-report, please include the operating system you're using, and the compiler
-version.
 
-The -W switch suppresses any warnings generated by the compiler. Since any
-source file may be written in a manner that it will not produce compiler
-warnings, using this option is usually not a good idea.
+  -O, -Oi, -Or, -Os
+
+  Enable an optimizer run over the produced code.
+
+  Using -Oi, the code generator will inline some code where otherwise a
+  runtime functions would have been called, even if the generated code is
+  larger. This will not only remove the overhead for a function call, but
+  will make the code visible for the optimizer.
+
+  -Or will make the compiler honor the "register" keyword. Local variables
+  may be placed in registers (which are actually zero page locations).
+  There is some overhead involved with register variables, since the old
+  contents of the registers must be saved and restored. In addition, the
+  current implementation does not make good use of register variables, so
+  using -Or may make your program even slower and larger. Use with care!
+
+  Using -Os will force the compiler to inline some known functions from
+  the C library like strlen. Note: This has two consequences:
+
+    * You may not use names of standard C functions in your own code. If
+      you do that, your program is not standard compliant anyway, but
+      using -Os will actually break things.
+
+    * The inlined string and memory functions will not handle strings or
+      memory areas larger than 255 bytes. Similar, the inlined is..()
+      functions will not work with values outside char range.
+
+  It is possible to concatenate the modifiers for -O. For example, to
+  enable register variables and inlining of known functions, you may use
+  -Ors.
+
+
+  -T
+
+  This include the source code as comments in the generated code. This is
+  normally not needed.
+
+
+  -V   
+  --version
+
+  Print the version number of the compiler. When submitting a bug report,
+  please include the operating system you're using, and the compiler
+  version.
+    
+
+  -W
+
+  This option will suppress any warnings generated by the compiler. Since
+  any source file may be written in a manner that it will not produce
+  compiler warnings, using this option is usually not a good idea.
 
 
 
@@ -232,7 +319,8 @@ and the one defined by the ISO standard:
 
   * The compiler has some additional keywords:
 
-	asm, __asm__, fastcall, __fastcall__, __AX__, __EAX__, __func__
+	asm, __asm__, fastcall, __fastcall__, __AX__, __EAX__, __func__,
+	__attribute__
 
     The keywords without the underlines are disabled in strict ANSI mode.
 
@@ -249,29 +337,16 @@ and the one defined by the ISO standard:
     an additional macro needed to access parameters in a variable
     parameter list in a C function.
 
-  * The compiler has only one symbol table. Because of that, it's not
-    possible to use the name of a local variable in a nested block in the
-    same function (global and local names are distinct, however).
-
-  + The preprocessor does not understand the "defined" keyword in
-    expressions evaluated in #if statements.
-
-  * Functions may not return structs, struct assignment is not possible.
-
-  * The size of any struct referenced via a pointer may not exceed 256
-    bytes (this is because the Y register is used as index).
-
-  * In a function, the size of the parameters plus the size of all local
-    variables may not exceed 256 bytes (in fact, the limit may be even less
-    depeding on the complexity of your expressions).
+  * Functions may not return structs. However, struct assignment *is*
+    possible.
 
   * Part of the C library is available only with fastcall calling
     conventions (see below). This means, that you may not mix pointers to
     those functions with pointers to user written functions.
 
 There may be some more minor differences, I'm currently not aware off. The
-biggest problems are the missing const and float data types. With both
-these things in mind, you should be able to write fairly portable code.
+biggest problem is the missing float data type. With this limitation in
+mind, you should be able to write fairly portable code.
 
 
 
@@ -323,10 +398,6 @@ This cc65 version has some extensions to the ISO C standard.
     pushed on the stack but left in the primary register when the function
     is called. This will reduce the cost when calling assembler functions
     significantly, especially when the function itself is rather small.
-
-    BEWARE: You must not declare C functions as fastcall! This will not
-    work for now and is not checked by the assembler, so you will get
-    wrong code.
 
   * There are two pseudo variables named __AX__ and __EAX__. Both refer to
     the primary register that is used by the compiler to evaluate
@@ -514,7 +585,7 @@ generation and other stuff.
   Changed the signedness of the default character type. If the argument
   is not zero, default characters are signed, otherwise characters are
   unsigned. The compiler default is to make characters unsigned since this
-  creates a lot better code. 
+  creates a lot better code.
 
 
 #pragma staticlocals (<const int>)

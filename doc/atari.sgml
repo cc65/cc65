@@ -183,6 +183,10 @@ platform. There is a static driver you can use.
 
 <sect>Other hints<p>
 
+<sect1>Function keys<p>
+
+These are defined to be Atari + number key.
+
 
 
 <sect>Bugs/Feedback<p>

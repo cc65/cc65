@@ -5,6 +5,7 @@
 ;
 
         .include        "tgi-kernel.inc"
+        .include        "tgi-error.inc"
 
         .export         _tgi_setup
         .importzp       ptr1
@@ -20,7 +21,9 @@ _tgi_error:	.res	1		; Last error code
 _tgi_mode:      .res    1               ; Graphics mode or zero
 _tgi_xres:      .res    2               ; X resolution of the current mode
 _tgi_yres:      .res    2               ; Y resolution of the current mode
-        
+_tgi_colors:    .res    1               ; Number of available colors
+_tgi_pagecount: .res    1               ; Number of available screen pages
+
 
 .data
 
@@ -32,6 +35,8 @@ tgi_init:       jmp	$0000
 tgi_done:       jmp	$0000
 tgi_control:    jmp	$0000
 tgi_clear:      jmp     $0000
+tgi_setviewpage:jmp     $0000
+tgi_setdrawpage:jmp     $0000
 tgi_setcolor:   jmp     $0000
 tgi_setpixel:   jmp     $0000
 tgi_getpixel:   jmp     $0000
@@ -65,20 +70,27 @@ _tgi_setup:
         cpx     #(TGI_HDR_JUMPCOUNT*3)
         bne     @L1
 
-; Copy the screen dimensions
+; Check for emulation vectors needed
 
-        ldy     #TGI_HDR_XRES
-        lda     (ptr1),y
-        sta     _tgi_xres
+        lda     tgi_bar+1
+        ora     tgi_bar+2               ; Do we have a BAR vector?
+        bne     @L2                     ; Jump if yes
+        lda     #<tgi_emu_bar           ; Use emulation if no
+        sta     tgi_bar+1
+        lda     #>tgi_emu_bar
+        sta     tgi_bar+2
+
+; Copy variables. Beware: We are using internal knowledge about variable
+; layout here!
+
+@L2:    ldy     #TGI_HDR_XRES
+        ldx     #0
+@L3:    lda     (ptr1),y
+        sta     _tgi_xres,x
         iny
-        lda     (ptr1),y
-        sta     _tgi_xres+1
-        ldy     #TGI_HDR_YRES
-        lda     (ptr1),y
-        sta     _tgi_yres
-        iny
-        lda     (ptr1),y
-        sta     _tgi_yres+1
+        inx
+        cpx     #6
+        bne     @L3
 
 ; Initialize variables
 
@@ -110,5 +122,13 @@ tgi_set_ptr:
   	sta	ptr1
   	lda	_tgi_drv+1
   	sta	ptr1+1
+        rts
+
+;----------------------------------------------------------------------------
+; Set an invalid argument error
+
+tgi_inv_arg:
+        lda     #TGI_ERR_INV_ARG
+        sta     _tgi_error
         rts
 

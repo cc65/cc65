@@ -68,44 +68,63 @@ _tgi_bar:
 
 ; Check if X1 is negative. If so, clip it to the left border (zero).
 
-        lda     #$00
         bit     ptr1+1
         bpl     @L3
+        lda     #$00
         sta     ptr1
         sta     ptr1+1
+        beq     @L4             ; Branch always, skip following test
 
-; Dito for Y1
+; Check if X1 is beyond the right border. If so, the bar is invisible.
 
-@L3:    bit     ptr2+1
-        bpl     @L4
+@L3:    lda     ptr1
+        cmp     _tgi_xres
+        lda     ptr1+1
+        sbc     _tgi_xres
+        bcs     @L9             ; Bail out if invisible
+
+; Check if Y1 is negative. If so, clip it to the top border (zero).
+
+@L4:    bit     ptr2+1
+        bpl     @L5
+        lda     #$00
         sta     ptr2
         sta     ptr2+1
+        beq     @L6             ; Branch always, skip following test
+
+; Check if Y1 is beyond the bottom border. If so, the bar is invisible.
+
+@L5:    lda     ptr2
+        cmp     _tgi_yres
+        lda     ptr2+1
+        sbc     _tgi_yres
+        bcs     @L9             ; Bail out if invisible
 
 ; Check if X2 is larger than the maximum x coord. If so, clip it.
 
-@L4:    lda     ptr3
+@L6:    lda     ptr3
         cmp     _tgi_xres
         lda     ptr3+1
         sbc     _tgi_xres+1
-        bcs     @L5
+        bcc     @L7
         jsr     _tgi_getmaxx
         sta     ptr3
         stx     ptr3+1
 
 ; Check if Y2 is larger than the maximum y coord. If so, clip it.
 
-@L5:    lda     ptr4
+@L7:    lda     ptr4
         cmp     _tgi_yres
         lda     ptr4+1
         sbc     _tgi_yres+1
-        bcs     @L6
+        bcc     @L8
         jsr     _tgi_getmaxy
         sta     ptr4
         stx     ptr4+1
 
 ; The coordinates are now valid. Call the driver.
 
-@L6:    jmp     tgi_bar
+@L8:    jmp     tgi_bar
 
 ; Error exit
 

@@ -66,6 +66,7 @@ OBJS = 	add.o		\
 	incsp6.o	\
 	incsp7.o	\
 	incsp8.o	\
+	jmpvec.o	\
        	ladd.o		\
        	laddeq.o	\
        	laddeqsp.o	\

@@ -51,7 +51,6 @@ S_OBJS =	_fdesc.o	\
 		isupper.o	\
 		isxdigit.o	\
 		itoa.o		\
-		jmpvec.o	\
 		labs.o		\
 	 	longjmp.o	\
 	 	ltoa.o	    	\
@@ -95,4 +94,4 @@ clean:
 	@rm -f $(C_OBJS:.o=.s)
 	@rm -f $(C_OBJS)
 	@rm -f $(S_OBJS)
-				 
+

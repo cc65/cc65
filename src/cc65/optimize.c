@@ -1845,8 +1845,8 @@ static int OptPtrOps1 (Line** Start)
 	    /* Cannot get lines */
 	    return 0;
 	}
-	if (LineFullMatch (L2[3], "\tclc")			&&
-	    LineMatch (L2[4], "\tadc\t#$")			&&
+	if (LineFullMatch (L2[3], "\tclc") 			&&
+	    LineMatch (L2[4], "\tadc\t#$") 			&&
 	    LineFullMatch (L2[5], "\tbcc\t*+3")			&&
 	    LineFullMatch (L2[6], "\tinx")) {
 	    /* Inlined increment */
@@ -1860,9 +1860,9 @@ static int OptPtrOps1 (Line** Start)
     }
 
     /* Check for the remainder */
-    if (!LineMatch (L3[0], "\tsta\t") 				||
+    if (!LineMatch (L3[0], "\tsta\t") 	   			||
 	strcmp (L3[0]->Line+5, L->Line+5) != 0			||
-	!LineMatch (L3[1], "\tstx\t") 				||
+	!LineMatch (L3[1], "\tstx\t") 	   			||
 	strcmp (L3[1]->Line+5, L2[0]->Line+5) != 0		||
 	!LineFullMatch (L3[2], "\tlda\tregsave")		||
 	!LineFullMatch (L3[3], "\tldx\tregsave+1")) {
@@ -1872,18 +1872,14 @@ static int OptPtrOps1 (Line** Start)
     }
 
     /* Check if AX is actually used following the code above. If not,
-     * we don't need to load A/X from regsave. Since X will never by
+     * we don't need to load A/X from regsave. Since X will never be
      * used without A, check just for A.
      */
-    NeedLoad = 1;
-    if (!RegAUsed (L3[3])) {
-    	/* We don't need to load regsave */
-    	NeedLoad = 0;
-    }
+    NeedLoad = RegAUsed (L3[3]);
 
     /* Special code for register variables */
     Done = 0;
-    if (LineMatch (L, "\tlda\tregbank+") 	&&
+    if (LineMatch (L, "\tlda\tregbank+")   	&&
        	GetNextCodeLines (L3[3], &L3[4], 1)	&&
 	Inc == 1) {
 
@@ -2042,8 +2038,8 @@ static int OptPtrOps1 (Line** Start)
 
 	/* If we need to load a/x, add the code */
 	if (NeedLoad) {
-	    L = NewLineAfter (L, "\ttax");
 	    L = NewLineAfter (L, "\tlda\tptr1");
+	    L = NewLineAfter (L, "\tldx\tptr1+1");
 	}
     }
 
@@ -2157,11 +2153,7 @@ static int OptPtrOps2 (Line** Start)
      * we don't need to load A/X from regsave. Since X will never by
      * used without A, check just for A.
      */
-    NeedLoad = 1;
-    if (!RegAUsed (L3[0])) {
-	/* We don't need to load regsave */
-	NeedLoad = 0;
-    }
+    NeedLoad = RegAUsed (L3[0]);
 
     /* Replace the ldy instruction, offset must point to the low byte */
     sprintf (L->Line+7, "%02X", Offs);
@@ -2251,8 +2243,8 @@ static int OptPtrOps2 (Line** Start)
 
     /* If we need to load a/x, add the code */
     if (NeedLoad) {
-	L = NewLineAfter (L, "\ttax");
 	L = NewLineAfter (L, "\tlda\tptr1");
+	L = NewLineAfter (L, "\tldx\tptr1+1");
     }
 
     /* Remove the code that is no longer needed */
@@ -2273,7 +2265,7 @@ static void OptPtrOps (void)
     Line* L = FirstCode;
     while (L) {
 
-       	if (OptPtrOps1 (&L)) {
+       	if (OptPtrOps1 (&L)) {		       
 	    continue;
 	} else if (OptPtrOps2 (&L)) {
 	    continue;

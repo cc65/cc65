@@ -98,29 +98,29 @@ static void CheckLocalOffs (unsigned Offs)
 
 static char* GetLabelName (unsigned flags, unsigned long label, long offs)
 {
-    static char lbuf [128];		/* Label name */
+    static char lbuf [256];		/* Label name */
 
     /* Create the correct label name */
     switch (flags & CF_ADDRMASK) {
 
 	case CF_STATIC:
        	    /* Static memory cell */
-	    sprintf (lbuf, "%s%+ld", LocalLabelName (label), offs);
+	    xsprintf (lbuf, sizeof (lbuf), "%s%+ld", LocalLabelName (label), offs);
 	    break;
 
 	case CF_EXTERNAL:
 	    /* External label */
-	    sprintf (lbuf, "_%s%+ld", (char*) label, offs);
+	    xsprintf (lbuf, sizeof (lbuf), "_%s%+ld", (char*) label, offs);
 	    break;
 
 	case CF_ABSOLUTE:
 	    /* Absolute address */
-	    sprintf (lbuf, "$%04X", (unsigned)((label+offs) & 0xFFFF));
+	    xsprintf (lbuf, sizeof (lbuf), "$%04X", (unsigned)((label+offs) & 0xFFFF));
 	    break;
 
 	case CF_REGVAR:
 	    /* Variable in register bank */
-	    sprintf (lbuf, "regbank+%u", (unsigned)((label+offs) & 0xFFFF));
+	    xsprintf (lbuf, sizeof (lbuf), "regbank+%u", (unsigned)((label+offs) & 0xFFFF));
 	    break;
 
 	default:
@@ -1202,7 +1202,7 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 }
 
 
-							    
+
 unsigned g_typecast (unsigned lhs, unsigned rhs)
 /* Cast the value in the primary register to the operand size that is flagged
  * by the lhs value. Return the result value.
@@ -1467,7 +1467,7 @@ void g_addstatic (unsigned flags, unsigned long label, long offs)
 	    g_getstatic (flags, label, offs);
 	    g_add (flags, 0);
 	    break;
-							      
+
 	default:
 	    typeerror (flags);
 

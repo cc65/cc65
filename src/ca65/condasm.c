@@ -279,7 +279,12 @@ void DoConditionals (void)
 		D = AllocIf (".IFBLANK", 1);
 		NextTok ();
 		if (IfCond) {
-		    SetIfCond (D, Tok == TOK_SEP);
+                    if (Tok == TOK_SEP) {
+                        SetIfCond (D, 1);
+                    } else {
+		        SetIfCond (D, 0);
+                        SkipUntilSep ();
+                    }
 		}
 		IfCond = GetCurrentIfCond ();
 		break;

@@ -38,6 +38,7 @@
 
 
 	ldy	#diopp_head
+	lda	(ptr2),y
 	bne	_inv_data	; there is only head 0
 	ldy	#diopp_track
 	lda	(ptr2),y
@@ -53,7 +54,7 @@
 	iny
 	lda	(ptr2),y
 	bne	_inv_data	; there are no more than 256 sectors
-	
+
 ; tmp1 (int) holds track+sector, translate it using device info
 
 	ldy	#sst_driveno
@@ -67,7 +68,7 @@
 	beq	dio_cts1571
 	cmp	#DRV_1581
 	beq	dio_cts1581
-	
+
 ; unknown device, return what you have got
 
 dio_ctsend:

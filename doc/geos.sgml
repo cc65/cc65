@@ -537,7 +537,8 @@ description of bits in return values - they describe the position in detail.
 <sect2>Sprites
 <p>
 You are free to use any of the eight sprites, but keep in mind that sprite 0 is actually the mouse
-pointer and sprite 1 can be overwritten when using text prompt.
+pointer and sprite 1 can be overwritten when using text prompt. You don't have to worry about
+40/80 column issues because GEOS128 has pretty good sprite emulator for VDC.
 
 <sect3>DrawSprite
 <p>
@@ -578,7 +579,7 @@ range 1-48.
 <p>
 <tt/void PromptOff (void)/
 <p>
-The first function places text prompt in given place and enables its blinking
+The first function places text prompt in given place and enables blinking.
 The second one is pretty self-explanatory.
 
 <sect3>GetNextChar
@@ -616,7 +617,7 @@ These functions are taking single data sector (256 bytes) to read or write on a 
 <p>
 <tt/char WriteBuff (struct tr_se *myTrSe)/
 <p>
-These functions are reading and writting sector placed at <tt/diskBlkBuf/.
+These functions read and write sector placed at <tt/diskBlkBuf/.
 
 <sect3>GetBlock and ReadBlock
 <p>
@@ -694,7 +695,7 @@ In fact, this function could be used in a following way:
 <tscreen><verb>
 &num;define BlockInUse FindBAMBit
 ...
-if (!SectInUse(&amp;myTrSe)) &lcub;
+if (!BlockInUse(&amp;myTrSe)) &lcub;
 ... block not allocated ...
 &rcub;
 </verb></tscreen>
@@ -927,7 +928,7 @@ E.g. size of whole VLIR file can be retrieved by reading <tt/VLIRInfo.fileSize/.
 <p>
 <tt/char OpenRecordFile (char *fName)/
 <p>
-This function finds and opens given file. An error is returned if file is not found or it is not
+This function finds and opens given file. An error is returned if file is not found or if it is not
 in VLIR format. Information in <tt/VLIRInfo/ is initialized. VLIR track and sector table is
 loaded at <tt/fileTrScTab/ and will be valid until call to <tt/CloseRecordFile/ so don't modify it.
 You should <tt/PointRecord/ before trying to do something with file.
@@ -942,8 +943,8 @@ This function calls <tt/UpdateRecordFile/ and clears internal GEOS variables.
 <p>
 <tt/char UpdateRecordFile (void)/
 <p>
-This function fill check <tt/VLIRInfo.fileWritten/ flag and if it is set, then <tt/curDirHead/ will
-be updated along with size and date stamps in directory entry.
+This function will check <tt/VLIRInfo.fileWritten/ flag and if it is set, then <tt/curDirHead/ is
+updated along with size and date stamps in directory entry.
 
 <sect3>PointRecord
 <p>
@@ -1233,6 +1234,26 @@ but by calling this function you are sure that the results will be always differ
 This function sets current device to given. It might be used together with <tt/InitForIO/,
 <tt/DoneWithIO/ and some Kernal routines. Unless new device is a disk drive this only sets
 new value in <tt/curDevice/, in other case new disk driver is loaded from REU or internal RAM.
+
+<sect2>get_ostype
+<p>
+<tt/char get_ostype (void)/
+<p>
+This function returns GEOS Kernal version combined (by logical OR) with machine type. Read
+<tt/gsys.h/ for definitions of returned values.
+
+<sect2>get_tv
+<p>
+<tt/char get_tv (void)/
+<p>
+This function returns PAL/NTSC flag combined (by logical OR) with 40/80 columns flag. This is
+not the best way to check if screen has 40 or 80 columns since PAL/NTSC check is always
+performed and it can take as long as full raster frame. If you just want to know if
+screen has 40 or 80 columns use expression <tt/graphMode & 0x80/ which returns <tt/0/ for
+40 columns and <tt/0x80/ for 80 columns. Remember that this parameter can be changed during
+runtime. It is unclear if this will work for GEOS 64 so you probably do not want to test
+anything if not running under GEOS128. Use <tt/get_ostype/ to check it. Read <tt/gsys.h/ for
+definitions of returned values.
 
 <sect>Library Structures
 <p>

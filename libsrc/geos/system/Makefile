@@ -9,7 +9,7 @@
 
 
 S_OBJS	= callroutine.o enterdesktop.o firstinit.o getrandom.o getserialnumber.o\
-	  initdoneio.o mainloop.o panic.o tobasic.o setdevice.o
+	  initdoneio.o mainloop.o panic.o tobasic.o setdevice.o get_ostype.o
 
 all: $(S_OBJS)
 

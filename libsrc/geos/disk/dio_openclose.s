@@ -29,7 +29,8 @@ sectsizetab:
 	pha
 	tax
 	lda driveType,x		; check if there's a device
-	bne _inv_drive
+	beq _inv_drive
+	txa
 	clc
 	adc #8			; normalize devnum
 	sta curDevice

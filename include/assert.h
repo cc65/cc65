@@ -43,7 +43,7 @@
 #  define assert(expr)
 #else
 extern void _afailed (const char*, unsigned);
-#  define assert(expr)	if ((expr) == 0) _afailed (__FILE__, __LINE__)
+#  define assert(expr) 	((expr)? (void)0 : _afailed(__FILE__, __LINE__))
 #endif
 
 

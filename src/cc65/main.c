@@ -833,7 +833,7 @@ int main (int argc, char* argv[])
        	       	    break;
 
        	       	case 'W':
-       	       	    NoWarn = 1;
+       	       	    IS_Set (&WarnDisable, 1);
        	       	    break;
 
        	       	default:

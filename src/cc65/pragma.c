@@ -66,12 +66,15 @@ typedef enum {
     PR_CHARMAP,
     PR_CHECKSTACK,
     PR_CODESEG,
+    PR_CODESIZE,
     PR_DATASEG,
+    PR_OPTIMIZE,
     PR_REGVARADDR,
     PR_REGVARS,
     PR_RODATASEG,
     PR_SIGNEDCHARS,
     PR_STATICLOCALS,
+    PR_WARN,
     PR_ZPSYM,
     PR_COUNT
 } pragma_t;
@@ -85,12 +88,15 @@ static const struct Pragma {
     {   "charmap",      PR_CHARMAP      },
     {	"checkstack",	PR_CHECKSTACK	},
     {   "codeseg",    	PR_CODESEG	},
+    {   "codesize",     PR_CODESIZE     },
     {   "dataseg",    	PR_DATASEG	},
+    {   "optimize",     PR_OPTIMIZE     },
     {   "regvaraddr", 	PR_REGVARADDR	},
     {   "regvars",      PR_REGVARS      },
     {   "rodataseg",  	PR_RODATASEG	},
     {	"signedchars",	PR_SIGNEDCHARS	},
     {	"staticlocals",	PR_STATICLOCALS	},
+    {   "warn",         PR_WARN         },
     {   "zpsym",       	PR_ZPSYM  	},
 };
 
@@ -214,7 +220,7 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
     } else {
         SetSegName (Seg, Name);
     }
-    g_segname (Seg);          
+    g_segname (Seg);
 
     /* Call the string buf destructor */
     DoneStrBuf (&S);
@@ -322,6 +328,67 @@ static void FlagPragma (StrBuf* B, IntStack* Stack)
 
 
 
+static void IntPragma (StrBuf* B, IntStack* Stack, long Low, long High)
+/* Handle a pragma that expects an int paramater */
+{
+    ident Ident;
+    long  Val;
+    int   Push;
+
+    /* Try to read an identifier */
+    int IsIdent = SB_GetSym (B, Ident);
+
+    /* Check if we have a first argument named "pop" */
+    if (IsIdent && strcmp (Ident, "pop") == 0) {
+        if (IS_GetCount (Stack) < 2) {
+            Error ("Cannot pop, stack is empty");
+        } else {
+            IS_Drop (Stack);
+        }
+        /* No other arguments allowed */
+        return;
+    }
+
+    /* Check if we have a first argument named "push" */
+    if (IsIdent && strcmp (Ident, "push") == 0) {
+        Push = 1;
+        SB_SkipWhite (B);
+        if (SB_Get (B) != ',') {
+            Error ("Comma expected");
+            return;
+        }
+        SB_SkipWhite (B);
+        IsIdent = 0;
+    } else {
+        Push = 0;
+    }
+
+    /* Integer argument follows */
+    if (IsIdent || !SB_GetNumber (B, &Val)) {
+        Error ("Pragma argument must be numeric");
+        return;
+    }
+
+    /* Check the argument */
+    if (Val < Low || Val > High) {
+        Error ("Pragma argument out of bounds (%ld-%ld)", Low, High);
+        return;
+    }
+
+    /* Set/push the new value */
+    if (Push) {
+        if (IS_IsFull (Stack)) {
+            Error ("Cannot push: stack overflow");
+        } else {
+            IS_Push (Stack, Val);
+        }
+    } else {
+        IS_Set (Stack, Val);
+    }
+}
+
+
+
 static void ParsePragma (void)
 /* Parse the contents of the _Pragma statement */
 {
@@ -391,9 +458,17 @@ static void ParsePragma (void)
      	    SegNamePragma (&B, SEG_CODE);
      	    break;
 
+     	case PR_CODESIZE:
+     	    IntPragma (&B, &CodeSizeFactor, 10, 1000);
+     	    break;
+
      	case PR_DATASEG:
      	    SegNamePragma (&B, SEG_DATA);
      	    break;
+
+        case PR_OPTIMIZE:
+            FlagPragma (&B, &Optimize);
+            break;
 
      	case PR_REGVARADDR:
        	    FlagPragma (&B, &AllowRegVarAddr);
@@ -415,7 +490,11 @@ static void ParsePragma (void)
      	    FlagPragma (&B, &StaticLocals);
      	    break;
 
-     	case PR_ZPSYM:
+        case PR_WARN:
+            FlagPragma (&B, &WarnDisable);
+            break;
+
+     	case PR_ZPSYM:                    
      	    StringPragma (&B, MakeZPSym);
      	    break;
 

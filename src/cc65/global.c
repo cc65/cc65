@@ -47,11 +47,11 @@ unsigned char AddSource		= 0; 	/* Add source lines as comments */
 unsigned char DebugInfo		= 0;	/* Add debug info to the obj */
 unsigned char CreateDep		= 0;	/* Create a dependency file */
 unsigned char ANSI   	       	= 0;	/* Strict ANSI flag */
-unsigned char NoWarn		= 0;   	/* Suppress warnings */
 unsigned long OptDisable	= 0;	/* Optimizer passes to disable */
 unsigned      RegisterSpace     = 6;    /* Space available for register vars */
 
 /* Stackable options */
+IntStack WarnDisable        = INTSTACK(0);  /* Suppress warnings */
 IntStack WritableStrings    = INTSTACK(0);  /* Literal strings are r/w */
 IntStack InlineStdFuncs     = INTSTACK(0);  /* Inline some known functions */
 IntStack EnableRegVars      = INTSTACK(0);  /* Enable register variables */

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -71,7 +71,7 @@ unsigned WarningCount	= 0;
 static void IntWarning (const char* Filename, unsigned Line, const char* Msg, va_list ap)
 /* Print warning message - internal function. */
 {
-    if (!NoWarn) {
+    if (!IS_Get (&WarnDisable)) {
        	fprintf (stderr, "%s(%u): Warning: ", Filename, Line);
      	vfprintf (stderr, Msg, ap);
      	fprintf (stderr, "\n");
@@ -196,7 +196,7 @@ void Internal (const char* Format, ...)
 
     /* Use abort to create a core dump */
     abort ();
-}		
+}
 
 
 

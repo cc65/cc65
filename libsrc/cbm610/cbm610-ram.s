@@ -1,5 +1,6 @@
 ;
-; Extended memory driver for the CBM610 additional RAM banks
+; Extended memory driver for the CBM610 additional RAM banks. Driver works
+; without problems when linked statically.
 ;
 ; Ullrich von Bassewitz, 2002-12-09        !!! UNTESTED !!!
 ;
@@ -26,7 +27,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   PAGECOUNT
         .word   MAP
         .word   USE
@@ -43,10 +44,9 @@ OFFS    = 2
 ; ------------------------------------------------------------------------
 ; Data.
 
-.data
-curpage:        .byte	$FF	   	; Current page number (invalid)
-
 .bss
+curpage:        .res    1               ; Current page number
+
 window:         .res    256             ; Memory "window"
 pagecount:	.res	1               ; Number of available pages
 
@@ -62,6 +62,7 @@ pagecount:	.res	1               ; Number of available pages
 
 INSTALL:
        	lda	#$FF
+        sta     curpage                 ; Invalidate the current page
 
 	ldx	UsrMemTop+2
 	cpx    	#RAMBANK                ; Top of memory in bank 2?
@@ -75,11 +76,11 @@ INSTALL:
         rts
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 

@@ -1,7 +1,7 @@
 ;
 ; Extended memory driver for the VDC RAM available on all C128 machines
 ; version for GEOS enters safe I/O config on C64 (transparent on C128)
-; 
+;
 ; Maciej 'YTM/Elysium' Witkowiak <ytm@elysium.pl>
 ; 06,20,25.12.2002
 
@@ -27,7 +27,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   PAGECOUNT
         .word   MAP
 	.word	USE
@@ -152,11 +152,11 @@ settestadr2:
 	jmp	vdcsetsrcaddr
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
     	;on C128 restore font and clear the screen?
         rts
 
@@ -284,7 +284,7 @@ COPYFROM:
 	jsr	setup
 	beq	@L2			; Skip if no full pages
 
-; Copy full pages 
+; Copy full pages
 
 @L1:    jsr     transferin
         inc     ptr1+1
@@ -328,7 +328,7 @@ COPYTO:
 	jsr	setup
 	beq	@L2			; Skip if no full pages
 
-; Copy full pages 
+; Copy full pages
 
 @L1:    jsr     transferout
         inc     ptr1+1

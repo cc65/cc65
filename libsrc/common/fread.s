@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 22.11.2002
 ;
-; size_t __fastcall__ fread (void* buf, size_t size, size_t count, FILE* f);
+; size_t __fastcall__ fread (void* buf, size_t size, size_t count, FILE* file);
 ; /* Read from a file */
 ;
 
@@ -22,11 +22,11 @@
 
 .proc   _fread
 
-; Save f and place it into ptr1
+; Save file and place it into ptr1
 
-	sta  	f
+	sta  	file
 	sta  	ptr1
-	stx  	f+1
+	stx  	file+1
 	stx  	ptr1+1
 
 ; Check if the file is open
@@ -47,7 +47,7 @@
 
 ; Check if the stream is in an error state
 
-@L2:	lda  	(ptr1),y		; get f->f_flags again
+@L2:	lda  	(ptr1),y		; get file->f_flags again
 	and  	#_FERROR
 	bne     @L1
 
@@ -56,12 +56,12 @@
         ldy     #_FILE_f_fd
         lda     (ptr1),y
         ldx     #$00
-        jsr     pushax                  ; f->f_fd
+        jsr     pushax                  ; file->f_fd
 
         ldy     #9
         jsr     pushwysp                ; buf
 
-; Stack is now: buf/size/count/f->fd/buf
+; Stack is now: buf/size/count/file->fd/buf
 ; Calculate the number of bytes to read: count * size
 
         ldy     #7
@@ -100,9 +100,9 @@
 
         lda     #_FERROR
 @L4:    sta     tmp1
-        lda     f
+        lda     file
         sta     ptr1
-        lda     f+1
+        lda     file+1
         sta     ptr1+1
         ldy     #_FILE_f_flags
         lda     (ptr1),y
@@ -137,5 +137,5 @@
 ; Data
 
 .bss
-f:	.res	2
+file:  	.res	2
 

@@ -22,8 +22,8 @@
 
 .proc   __fopen
 
-        sta     f
-        stx     f+1             ; Save f
+        sta     file
+        stx     file            ; Save f
 
 ; Get a pointer to the mode string
 
@@ -97,15 +97,15 @@ modeok: ldy     #$00
 
 ; Open call succeeded
 
-openok: ldy     f
+openok: ldy     file
         sty     ptr1
-        ldy     f+1
+        ldy     file+1
         sty     ptr1+1
         ldy     #_FILE_f_fd
-        sta     (ptr1),y        ; f->f_fd = fd;
+        sta     (ptr1),y        ; file->f_fd = fd;
         ldy     #_FILE_f_flags
         lda     #_FOPEN
-        sta     (ptr1),y        ; f->f_flags = _FOPEN;
+        sta     (ptr1),y        ; file->f_flags = _FOPEN;
 
 ; Return the pointer to the file structure
 
@@ -119,6 +119,6 @@ openok: ldy     f
 ; Data
 
 .bss
-f:      .res    2
+file:   .res    2
 
 

@@ -1,9 +1,39 @@
+/*****************************************************************************/
+/*                                                                           */
+/*				    conio.h				     */
+/*                                                                           */
+/*			      Direct console I/O			     */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
+
+
+
 /*
- * conio.h
- *
- * Ullrich von Bassewitz, 06.08.1998
- *
- *
  * This is the direct console interface for cc65. I do not like the function
  * names very much, but the first version started as a rewrite of Borlands
  * conio, and, even if the interface has changed, the names did not.
@@ -15,7 +45,6 @@
  *
  * Most routines do not check the parameters. This may be unfortunate but is
  * also related to speed. The coordinates are always 0/0 based.
- *
  */
 
 
@@ -149,6 +178,7 @@ void __fastcall__ screensize (unsigned char* x, unsigned char* y);
 void __fastcall__ cputhex8 (unsigned char val);
 void __fastcall__ cputhex16 (unsigned val);
 /* These shouldn't be here... */
+
 
 
 /* End of conio.h */

@@ -239,10 +239,6 @@ static int kcalc (token_t tok, long val1, long val2)
   	    return (val1 ^ val2);
        	case TOK_AND:
   	    return (val1 & val2);
-       	case TOK_SHR:
-  	    return (val1 >> val2);
-       	case TOK_SHL:
-  	    return (val1 << val2);
        	case TOK_STAR:
   	    return (val1 * val2);
        	case TOK_DIV:

@@ -1,9 +1,0 @@
-att c64.d64
-
-delete nachtm
-delete hello
-write nachtm
-write hello
-quit
-
-

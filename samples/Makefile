@@ -18,7 +18,7 @@ C1541  	= c1541
 
 .c.o:
 	@echo $<
-	@$(CC) -Oirs --codesize 500 -g -t $(SYS) -I../include/ $<
+	@$(CC) -Oirs -T --codesize 500 -g -t $(SYS) -I../include/ $<
 	@$(AS) $(basename $<).s
 
 .s.o:
@@ -27,7 +27,7 @@ C1541  	= c1541
 
 
 .PHONY:	all
-all:   	nachtm hello sieve
+all:   	nachtm hello sieve mousedemo
 
 nachtm:	$(CRT0) nachtm.o $(CLIB)
 	@$(LD) -t $(SYS) -m nachtm.map -Ln nachtm.lbl -o $@ $^
@@ -38,11 +38,15 @@ hello: 	$(CRT0) hello.o $(CLIB)
 sieve: 	$(CRT0) sieve.o $(CLIB)
 	@$(LD) -t $(SYS) -m sieve.map -Ln sieve.lbl -o $@ $^
 
-.PHONY:	disk
-disk:	c64.d64
+mousedemo:     	$(CRT0) mousedemo.o $(CLIB)
+	@$(LD) -t $(SYS) -m mousedemo.map -Ln mousedemo.lbl -o $@ $^
 
-c64.d64:    	all
-	$(C1541) < c1541.rsp
+.PHONY:	disk
+disk:  	samples.d64
+
+samples.d64:	all
+	$(C1541) -format samples,AA  d64 $@
+	$(C1541) -attach $@ -write nachtm -write hello -write sieve -write mousedemo
 
 .PHONY:	clean
 clean:
@@ -50,7 +54,7 @@ clean:
 
 .PHONY:	zap
 zap:	clean
-	rm -f nachtm hello
+	rm -f nachtm hello sieve mousedemo samples.d64
 
 
 

@@ -413,8 +413,10 @@ void CheckBoolExpr (ExprDesc* lval)
 
 
 
-void exprhs (unsigned Flags, int k, ExprDesc* Expr)
-/* Put the result of an expression into the primary register */
+void ExprLoad (unsigned Flags, int k, ExprDesc* Expr)
+/* Place the result of an expression into the primary register if it is not
+ * already there.
+ */
 {
     int f;
 
@@ -561,7 +563,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
 
       	/* If we don't have an argument spec, accept anything, otherwise
 	 * convert the actual argument to the type needed.
-	 */ 
+	 */
         Flags = CF_NONE;
        	if (!Ellipsis) {
 	    /* Convert the argument to the parameter type if needed */
@@ -572,7 +574,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
        	}
 
         /* Load the value into the primary if it is not already there */
-        exprhs (Flags, k, &Expr);
+        ExprLoad (Flags, k, &Expr);
 
 	/* Use the type of the argument for the push */
        	Flags |= TypeOf (Expr.Type);
@@ -598,7 +600,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	    } else {
 	    	/* Push the argument */
 	    	g_push (Flags, Expr.ConstVal);
-	    }           
+	    }
 
 	    /* Calculate total parameter size */
      	    ParamSize += ArgSize;
@@ -664,7 +666,7 @@ static void FunctionCall (int k, ExprDesc* lval)
 	    /* Not a global or local variable, or a fastcall function. Load
 	     * the pointer into the primary and mark it as an expression.
 	     */
-	    exprhs (CF_NONE, k, lval);
+	    ExprLoad (CF_NONE, k, lval);
 	    lval->Flags |= E_MEXPR;
 
 	    /* Remember the code position */
@@ -714,7 +716,7 @@ static void FunctionCall (int k, ExprDesc* lval)
 	    	}
 	    } else {
 	     	/* Load from original location */
-	     	exprhs (CF_NONE, k, lval);
+	     	ExprLoad (CF_NONE, k, lval);
 	    }
 
 	    /* Call the function */
@@ -984,7 +986,7 @@ static int arrayref (int k, ExprDesc* lval)
     Mark2 = 0;	       	/* Silence gcc */
     if (!ConstBaseAddr) {
     	/* Get a pointer to the array into the primary */
-    	exprhs (CF_NONE, k, lval);
+    	ExprLoad (CF_NONE, k, lval);
 
     	/* Get the array pointer on stack. Do not push more than 16
     	 * bit, even if this value is greater, since we cannot handle
@@ -1004,7 +1006,7 @@ static int arrayref (int k, ExprDesc* lval)
      	    pop (CF_PTR);
       	} else {
     	    /* Get an array pointer into the primary */
-    	    exprhs (CF_NONE, k, lval);
+    	    ExprLoad (CF_NONE, k, lval);
     	}
 
      	if (IsClassPtr (tptr1)) {
@@ -1029,7 +1031,7 @@ static int arrayref (int k, ExprDesc* lval)
     	    } else {
 	   	/* Pointer - load into primary and remember offset */
 	   	if ((lval->Flags & E_MEXPR) == 0 || k != 0) {
-	   	    exprhs (CF_NONE, k, lval);
+	   	    ExprLoad (CF_NONE, k, lval);
 	   	}
 	   	lval->ConstVal = lval2.ConstVal;
 	   	lval->Flags = E_MEOFFS;
@@ -1063,7 +1065,7 @@ static int arrayref (int k, ExprDesc* lval)
 
     	/* Array subscript is not constant. Load it into the primary */
 	Mark2 = GetCodePos ();
-        exprhs (CF_NONE, l, &lval2);
+        ExprLoad (CF_NONE, l, &lval2);
 
 	tptr2 = lval2.Type;
 	if (IsClassPtr (tptr1)) {
@@ -1090,7 +1092,7 @@ static int arrayref (int k, ExprDesc* lval)
     	     */
 	    if (ConstBaseAddr) {
 	    	g_push (CF_INT, 0);
-	    	exprhs (CF_NONE, k, lval);
+	    	ExprLoad (CF_NONE, k, lval);
 	    	ConstBaseAddr = 0;
 	    } else {
 	        g_swap (CF_INT);
@@ -1140,7 +1142,7 @@ static int arrayref (int k, ExprDesc* lval)
 	    	 */
 	    	SavedType = lval->Type;
 	     	lval->Type = tptr1;
-	    	exprhs (CF_NONE, k, lval);
+	    	ExprLoad (CF_NONE, k, lval);
 	    	lval->Type = SavedType;
 
 	    	/* Add the variable */
@@ -1217,7 +1219,7 @@ static int structref (int k, ExprDesc* lval)
 	lval->ConstVal += Field->V.Offs;
     } else {
 	if ((flags & E_MEXPR) == 0 || k != 0) {
-	    exprhs (CF_NONE, k, lval);
+	    ExprLoad (CF_NONE, k, lval);
 	}
 	lval->ConstVal = Field->V.Offs;
 	lval->Flags = E_MEOFFS;
@@ -1370,7 +1372,7 @@ static void pre_incdec (ExprDesc* lval, void (*inc) (unsigned, unsigned long))
 	PushAddr (lval);
 
 	/* Fetch the value */
-	exprhs (CF_NONE, k, lval);
+	ExprLoad (CF_NONE, k, lval);
 
 	/* Increment value in primary */
        	inc (flags, val);
@@ -1441,7 +1443,7 @@ static void post_incdec (ExprDesc* lval, int k, void (*inc) (unsigned, unsigned 
     PushAddr (lval);
 
     /* Fetch the value and save it (since it's the result of the expression) */
-    exprhs (CF_NONE, 1, lval);
+    ExprLoad (CF_NONE, 1, lval);
     g_save (flags | CF_FORCECHAR);
 
     /* If we have a pointer expression, increment by the size of the type */
@@ -1479,7 +1481,7 @@ static void unaryop (int tok, ExprDesc* lval)
 	}
     } else {
     	/* Value is not constant */
-     	exprhs (CF_NONE, k, lval);
+     	ExprLoad (CF_NONE, k, lval);
 
     	/* Get the type of the expression */
     	flags = TypeOf (lval->Type);
@@ -1659,7 +1661,7 @@ static int hie_internal (const GenDesc** ops,  	/* List of generators */
        	    g_push (ltype | CF_CONST, lval->ConstVal);
 	} else {
 	    /* Value not constant */
-	    exprhs (CF_NONE, k, lval);
+	    ExprLoad (CF_NONE, k, lval);
 	    Mark2 = GetCodePos ();
 	    g_push (ltype, 0);
 	}
@@ -1759,7 +1761,7 @@ static int hie_compare (const GenDesc** ops,	/* List of generators */
        	    g_push (ltype | CF_CONST, lval->ConstVal);
 	} else {
 	    /* Value not constant */
-	    exprhs (CF_NONE, k, lval);
+	    ExprLoad (CF_NONE, k, lval);
 	    Mark2 = GetCodePos ();
 	    g_push (ltype, 0);
       	}
@@ -1921,7 +1923,7 @@ static void parseadd (int k, ExprDesc* lval)
 	    /* lhs is a constant and rhs is not constant. Load rhs into
 	     * the primary.
 	     */
-	    exprhs (CF_NONE, k, &lval2);
+	    ExprLoad (CF_NONE, k, &lval2);
 
        	    /* Beware: The check above (for lhs) lets not only pass numeric
 	     * constants, but also constant addresses (labels), maybe even
@@ -2007,7 +2009,7 @@ static void parseadd (int k, ExprDesc* lval)
     } else {
 
     	/* Left hand side is not constant. Get the value onto the stack. */
-    	exprhs (CF_NONE, k, lval);		/* --> primary register */
+    	ExprLoad (CF_NONE, k, lval);		/* --> primary register */
        	Mark = GetCodePos ();
     	g_push (TypeOf (lval->Type), 0);	/* --> stack */
 
@@ -2122,7 +2124,7 @@ static void parsesub (int k, ExprDesc* lval)
 
     /* Remember the output queue position, then bring the value onto the stack */
     Mark1 = GetCodePos ();
-    exprhs (CF_NONE, k, lval); 	/* --> primary register */
+    ExprLoad (CF_NONE, k, lval); 	/* --> primary register */
     Mark2 = GetCodePos ();
     g_push (TypeOf (lhst), 0);	/* --> stack */
 
@@ -2454,7 +2456,7 @@ static int hieAnd (ExprDesc* lval, unsigned TrueLab, int* BoolOp)
        	}
 
        	/* Load the value */
-       	exprhs (CF_FORCECHAR, k, lval);
+       	ExprLoad (CF_FORCECHAR, k, lval);
 
        	/* Generate the jump */
        	g_falsejump (CF_NONE, lab);
@@ -2470,7 +2472,7 @@ static int hieAnd (ExprDesc* lval, unsigned TrueLab, int* BoolOp)
     	    if ((lval2.Test & E_CC) == 0) {
     		lval2.Test |= E_FORCETEST;
     	    }
-    	    exprhs (CF_FORCECHAR, k, &lval2);
+    	    ExprLoad (CF_FORCECHAR, k, &lval2);
 
        	    /* Do short circuit evaluation */
     	    if (CurTok.Tok == TOK_BOOL_AND) {
@@ -2519,7 +2521,7 @@ static int hieOr (ExprDesc *lval)
     	}
 
     	/* Get first expr */
-      	exprhs (CF_FORCECHAR, k, lval);
+      	ExprLoad (CF_FORCECHAR, k, lval);
 
        	/* For each expression jump to TrueLab if true. Beware: If we
     	 * had && operators, the jump is already in place!
@@ -2543,7 +2545,7 @@ static int hieOr (ExprDesc *lval)
        	    if ((lval2.Test & E_CC) == 0) {
     		lval2.Test |= E_FORCETEST;
     	    }
-    	    exprhs (CF_FORCECHAR, k, &lval2);
+    	    ExprLoad (CF_FORCECHAR, k, &lval2);
 
        	    /* If there is more to come, add shortcut boolean eval. */
     	    g_truejump (CF_NONE, TrueLab);
@@ -2588,7 +2590,7 @@ static int hieQuest (ExprDesc* lval)
     	    /* Condition codes not set, force a test */
     	    lval->Test |= E_FORCETEST;
     	}
-    	exprhs (CF_NONE, k1, lval);
+    	ExprLoad (CF_NONE, k1, lval);
     	labf = GetLocalLabel ();
     	g_falsejump (CF_NONE, labf);
 
@@ -2599,7 +2601,7 @@ static int hieQuest (ExprDesc* lval)
         Expr2IsNULL = IsNullPtr (&Expr2);
         if (!IsTypeVoid (Expr2.Type)) {
             /* Load it into the primary */
-            exprhs (CF_NONE, k2, &Expr2);
+            ExprLoad (CF_NONE, k2, &Expr2);
 	    Expr2.Flags = E_MEXPR;
 	    k2 = 0;
         }
@@ -2617,7 +2619,7 @@ static int hieQuest (ExprDesc* lval)
         Expr3IsNULL = IsNullPtr (&Expr3);
         if (!IsTypeVoid (Expr3.Type)) {
             /* Load it into the primary */
-            exprhs (CF_NONE, k3, &Expr3);
+            ExprLoad (CF_NONE, k3, &Expr3);
 	    Expr3.Flags = E_MEXPR;
 	    k3 = 0;
         }
@@ -2718,7 +2720,7 @@ static void opeq (const GenDesc* Gen, ExprDesc *lval, int k)
     PushAddr (lval);
 
     /* Fetch the lhs into the primary register if needed */
-    exprhs (CF_NONE, k, lval);
+    ExprLoad (CF_NONE, k, lval);
 
     /* Bring the lhs on stack */
     Mark = GetCodePos ();
@@ -2822,7 +2824,7 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *lval, int k)
     	lflags |= CF_CONST;
     } else {
      	/* Not constant, load into the primary */
-        exprhs (CF_NONE, k, &lval2);
+        ExprLoad (CF_NONE, k, &lval2);
        	if (MustScale) {
      	    /* lhs is a pointer, scale rhs */
        	    g_scale (TypeOf (lval2.Type), CheckedSizeOf (lval->Type+1));
@@ -2962,7 +2964,7 @@ int hie0 (ExprDesc *lval)
 int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval)
 /* Will evaluate an expression via the given function. If the result is a
  * constant, 0 is returned and the value is put in the lval struct. If the
- * result is not constant, exprhs is called to bring the value into the
+ * result is not constant, ExprLoad is called to bring the value into the
  * primary register and 1 is returned.
  */
 {
@@ -2975,7 +2977,7 @@ int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval)
      	return 0;
     } else {
      	/* Not constant, load into the primary */
-        exprhs (flags, k, lval);
+        ExprLoad (flags, k, lval);
      	return 1;
     }
 }
@@ -3011,7 +3013,7 @@ void expression1 (ExprDesc* lval)
  */
 {
     InitExprDesc (lval);
-    exprhs (CF_NONE, expr (hie1, lval), lval);
+    ExprLoad (CF_NONE, expr (hie1, lval), lval);
 }
 
 
@@ -3020,7 +3022,7 @@ void expression (ExprDesc* lval)
 /* Evaluate an expression and put it into the primary register */
 {
     InitExprDesc (lval);
-    exprhs (CF_NONE, expr (hie0, lval), lval);
+    ExprLoad (CF_NONE, expr (hie0, lval), lval);
 }
 
 
@@ -3099,7 +3101,7 @@ void Test (unsigned Label, int Invert)
         }
 
         /* Load the value into the primary register */
-        exprhs (CF_FORCECHAR, k, &lval);
+        ExprLoad (CF_FORCECHAR, k, &lval);
 
         /* Generate the jump */
         if (Invert) {

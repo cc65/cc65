@@ -117,7 +117,7 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
             k = TypeConversion (&lval, k, Decl->Type);
 
             /* Load the value into the primary */
-            exprhs (CF_NONE, k, &lval);
+            ExprLoad (CF_NONE, k, &lval);
 
             /* Store the value into the variable */
             g_putstatic (CF_REGVAR | TypeOf (Decl->Type), Reg, 0);
@@ -218,7 +218,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
                  * Otherwise pass the information to the code generator.
                  */
                 if (k != 0 || lval.Flags != E_MCONST) {
-                    exprhs (CF_NONE, k, &lval);
+                    ExprLoad (CF_NONE, k, &lval);
                     k = 0;
                 } else {
                     Flags |= CF_CONST;
@@ -291,7 +291,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
                 k = TypeConversion (&lval, k, Decl->Type);
 
                 /* Load the value into the primary */
-                exprhs (CF_NONE, k, &lval);
+                ExprLoad (CF_NONE, k, &lval);
 
                 /* Store the value into the variable */
                 g_putstatic (TypeOf (Decl->Type), SymData, 0);

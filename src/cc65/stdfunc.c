@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -125,7 +125,7 @@ static unsigned ParseArg (type* Type, ExprDesc* Arg)
     if (k != 0 || Arg->Flags != E_MCONST) {
 
         /* Load into the primary */
-        exprhs (CF_NONE, k, Arg);
+        ExprLoad (CF_NONE, k, Arg);
         k = 0;
 
     } else {
@@ -194,7 +194,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)),
      */
     Flags = ParseArg (Arg3Type, &Arg);
     if (Flags & CF_CONST) {
-        exprhs (CF_FORCECHAR, 0, &Arg);
+        ExprLoad (CF_FORCECHAR, 0, &Arg);
     }
 
     /* Emit the actual function call */
@@ -264,7 +264,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
                     ExprDesc Length;
                     MakeConstIntExpr (&Length, strlen (GetLiteral (Param.ConstVal)));
                     ResetLiteralPoolOffs (Param.ConstVal);
-                    exprhs (CF_NONE, 0, &Length);
+                    ExprLoad (CF_NONE, 0, &Length);
                     goto ExitPoint;
                 } else {
                     CodeFlags |= CF_CONST | CF_STATIC;
@@ -279,7 +279,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
     } else {
 
      	/* Not an array with a constant address. Load parameter into primary */
-     	exprhs (CF_NONE, k, &Param);
+     	ExprLoad (CF_NONE, k, &Param);
 
     }
 

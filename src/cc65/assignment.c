@@ -87,7 +87,7 @@ int Assignment (ExprDesc* lval)
         if (UseReg) {
             PushAddr (lval);
         } else {
-    	    exprhs (0, 0, lval);
+    	    ExprLoad (0, 0, lval);
             g_push (CF_PTR | CF_UNSIGNED, 0);
         }
 
@@ -107,7 +107,7 @@ int Assignment (ExprDesc* lval)
                 lval2.Type = stype;
 
                 /* Load the value into the primary */
-                exprhs (CF_FORCECHAR, k, &lval2);
+                ExprLoad (CF_FORCECHAR, k, &lval2);
 
                 /* Store it into the new location */
                 Store (lval, stype);
@@ -115,7 +115,7 @@ int Assignment (ExprDesc* lval)
             } else {
 
                 /* We will use memcpy. Push the address of the rhs */
-                exprhs (0, 0, &lval2);
+                ExprLoad (0, 0, &lval2);
 
                 /* Push the address (or whatever is in ax in case of errors) */
                 g_push (CF_PTR | CF_UNSIGNED, 0);
@@ -158,7 +158,7 @@ int Assignment (ExprDesc* lval)
 	k = TypeConversion (&lval2, k, ltype);
 
 	/* If necessary, load the value into the primary register */
-	exprhs (CF_NONE, k, &lval2);
+	ExprLoad (CF_NONE, k, &lval2);
 
      	/* Generate a store instruction */
      	Store (lval, 0);

@@ -109,7 +109,7 @@ static int DoConversion (ExprDesc* Expr, int k, type* NewType)
          */
         if (NewSize > OldSize) {
             /* Load the value into the primary */
-            exprhs (CF_NONE, k, Expr);
+            ExprLoad (CF_NONE, k, Expr);
 
             /* Emit typecast code */
             g_typecast (TypeOf (NewType), TypeOf (OldType));
@@ -158,7 +158,7 @@ static int DoConversion (ExprDesc* Expr, int k, type* NewType)
             if (OldSize != NewSize) {
 
                 /* Load the value into the primary */
-                exprhs (CF_NONE, k, Expr);
+                ExprLoad (CF_NONE, k, Expr);
 
                 /* Emit typecast code. */
                 g_typecast (TypeOf (NewType) | CF_FORCECHAR, TypeOf (OldType));

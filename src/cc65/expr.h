@@ -42,7 +42,7 @@ void CheckBoolExpr (ExprDesc* lval);
  * if not.
  */
 
-void exprhs (unsigned flags, int k, ExprDesc *lval);
+void ExprLoad (unsigned flags, int k, ExprDesc *lval);
 /* Put the result of an expression into the primary register */
 
 void Store (ExprDesc* lval, const type* StoreType);
@@ -57,7 +57,7 @@ int hie0 (ExprDesc *lval);
 int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval);
 /* Will evaluate an expression via the given function. If the result is a
  * constant, 0 is returned and the value is put in the lval struct. If the
- * result is not constant, exprhs is called to bring the value into the
+ * result is not constant, ExprLoad is called to bring the value into the
  * primary register and 1 is returned.
  */
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -278,7 +278,7 @@ static void ReturnStatement (void)
 	    TypeConversion (&Expr, k, F_GetReturnType (CurrentFunc));
 
 	    /* Load the value into the primary */
-	    exprhs (CF_NONE, k, &Expr);
+	    ExprLoad (CF_NONE, k, &Expr);
     	}
 
     } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {

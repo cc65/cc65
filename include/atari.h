@@ -33,7 +33,7 @@
 #ifndef _ATARI_H
 #define _ATARI_H
 
-/* Characters codes */
+/* Character codes */
 #define CH_DEL 	    	0xFE
 #define CH_ESC 	    	0x1B
 #define CH_CURS_UP  	28
@@ -42,7 +42,7 @@
 #define CH_CURS_RIGHT   31
 
 #define CH_TAB          0x7F   /* tabulator */
-#define CH_EOL          0x0B   /* end-of-line marker */
+#define CH_EOL          0x9B   /* end-of-line marker */
 #define CH_CLR          0x7D   /* clear screen */
 #define CH_BEL          0xFD   /* bell */
 #define CH_RUBOUT       0x7E   /* back space (rubout) */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -65,7 +65,8 @@ const char* TargetNames [TGT_COUNT] = {
     "cbm610",
     "pet",
     "bbc",
-    "apple2",
+    "apple2",   
+    "apple2enh",
     "geos",
     "lunix",
     "atmos",
@@ -91,6 +92,7 @@ const cpu_t DefaultCPU[TGT_COUNT] = {
     CPU_6502,           /* pet */
     CPU_6502,           /* bbc */
     CPU_6502,           /* apple2 */
+    CPU_65C02,          /* apple2enh */
     CPU_6502,           /* geos */
     CPU_6502,           /* lunix */
     CPU_6502,           /* atmos */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -154,6 +154,7 @@ void TgtTranslateInit (void)
 	case TGT_PET:		memcpy (Tab, CTPET, sizeof (Tab));	break;
 	case TGT_BBC:  	       	memcpy (Tab, CTNone, sizeof (Tab));  	break;
 	case TGT_APPLE2:	memcpy (Tab, CTNone, sizeof (Tab));  	break;
+        case TGT_APPLE2ENH:     memcpy (Tab, CTNone, sizeof (Tab));     break;
 	case TGT_GEOS:		memcpy (Tab, CTNone, sizeof (Tab));  	break;
 	case TGT_LUNIX:		memcpy (Tab, CTNone, sizeof (Tab));  	break;
        	case TGT_ATMOS:		memcpy (Tab, CTNone, sizeof (Tab));  	break;

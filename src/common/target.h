@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -66,6 +66,7 @@ typedef enum {
     TGT_PET,
     TGT_BBC,
     TGT_APPLE2,
+    TGT_APPLE2ENH,
     TGT_GEOS,
     TGT_LUNIX,
     TGT_ATMOS,

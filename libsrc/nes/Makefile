@@ -20,14 +20,27 @@
 C_OBJS =
 
 S_OBJS  =       _scrsize.o      \
+                cclear.o        \
+                chline.o        \
                 clock.o         \
+                clrscr.o        \
                 color.o         \
                 cputc.o         \
                 crt0.o          \
+                cvline.o        \
+                getenv.o        \
+                gotox.o         \
+                gotoxy.o        \
+                gotoy.o         \
+                mainargs.o      \
                 ppu.o           \
                 ppubuf.o        \
+                randomize.o     \
+                revers.o        \
                 setcursor.o     \
-                waitvblank.o
+                waitvblank.o    \
+                wherex.o        \
+                wherey.o
 
 #--------------------------------------------------------------------------
 # Targets

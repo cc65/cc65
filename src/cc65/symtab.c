@@ -50,7 +50,6 @@
 #include "error.h"
 #include "funcdesc.h"
 #include "global.h"
-#include "io.h"
 #include "symentry.h"
 #include "symtab.h"
 

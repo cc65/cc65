@@ -19,7 +19,6 @@
 #include "global.h"
 #include "ident.h"
 #include "input.h"
-#include "io.h"
 #include "litpool.h"
 #include "preproc.h"
 #include "symtab.h"

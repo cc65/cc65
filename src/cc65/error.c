@@ -39,7 +39,6 @@
 
 #include "global.h"
 #include "input.h"
-#include "io.h"
 #include "scanner.h"
 #include "stmt.h"
 #include "error.h"

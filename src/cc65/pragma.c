@@ -38,7 +38,6 @@
 
 #include "global.h"
 #include "error.h"
-#include "io.h"
 #include "litpool.h"
 #include "symtab.h"
 #include "preproc.h"

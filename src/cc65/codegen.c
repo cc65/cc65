@@ -45,7 +45,6 @@
 #include "cpu.h"
 #include "error.h"
 #include "global.h"
-#include "io.h"
 #include "litpool.h"
 #include "optimize.h"
 #include "util.h"

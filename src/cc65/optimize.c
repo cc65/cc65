@@ -34,6 +34,7 @@
 
 
 #include <stdarg.h>
+#include <stdio.h>
 #include <string.h>
 #include <ctype.h>
 
@@ -45,7 +46,6 @@
 #include "cpu.h"
 #include "error.h"
 #include "global.h"
-#include "io.h"
 #include "optimize.h"
 
 

@@ -16,7 +16,6 @@
 #include "ident.h"
 #include "incpath.h"
 #include "input.h"
-#include "io.h"
 #include "macrotab.h"
 #include "scanner.h"
 #include "util.h"
@@ -154,11 +153,11 @@ static char* CopyQuotedString (int Quote, char* Target)
 
 
 static int macname (char *sname)
-/* Get macro symbol name.  If error, print message and kill line. */
+/* Get macro symbol name.  If error, print message and clear line. */
 {
     if (issym (sname) == 0) {
 	PPError (ERR_IDENT_EXPECTED);
-     	kill ();
+     	ClearLine ();					     
 	return 0;
     } else {
     	return 1;
@@ -319,7 +318,7 @@ static void ExpandMacro (Macro* M)
     if (M->ArgCount >= 0) {
 	/* Function like macro */
        	if (MacroCall (M) == 0) {
-     	    kill ();
+     	    ClearLine ();
      	}
     } else {
 	/* Just copy the replacement text */
@@ -371,7 +370,7 @@ static void addmac (void)
      	}
      	if (*lptr != ')') {
        	    PPError (ERR_RPAREN_EXPECTED);
-     	    kill ();
+     	    ClearLine ();
      	    return;
      	}
      	gch ();
@@ -677,8 +676,10 @@ static void doinclude (void)
     xfree (Name);
 
 Done:
-    /* clear rest of line so next read will come from new file (if open) */
-    kill ();
+    /* Clear the remaining line so the next input will come from the new 
+     * file (if open) 
+     */
+    ClearLine ();
 }
 
 
@@ -694,7 +695,7 @@ static void doerror (void)
     }
 
     /* clear rest of line */
-    kill ();
+    ClearLine ();
 }
 
 
@@ -771,7 +772,7 @@ void preprocess (void)
     	    }
     	    if (!issym (sname)) {
     	    	PPError (ERR_CPP_DIRECTIVE_EXPECTED);
-    	    	kill ();
+    	    	ClearLine ();
     	    } else {
        	       	switch (searchtok (sname, pre_toks)) {
 
@@ -828,7 +829,7 @@ void preprocess (void)
 			/* Not allowed in strict ANSI mode */
 			if (ANSI) {
 			    PPError (ERR_CPP_DIRECTIVE_EXPECTED);
-			    kill ();
+			    ClearLine ();
 			}
 			break;
 
@@ -849,7 +850,7 @@ void preprocess (void)
 
     		    default:
     			PPError (ERR_CPP_DIRECTIVE_EXPECTED);
-    	    		kill ();
+    	    		ClearLine ();
     		}
 	    }
 

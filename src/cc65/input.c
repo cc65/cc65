@@ -44,7 +44,6 @@
 #include "error.h"
 #include "global.h"
 #include "incpath.h"
-#include "io.h"
 #include "input.h"
 
 
@@ -54,6 +53,11 @@
 /*****************************************************************************/
 
 
+
+/* Input line stuff */
+static char LineBuf [LINESIZE];
+char* line = LineBuf;
+char* lptr = LineBuf;
 
 /* Maximum count of nested includes */
 #define MAX_INC_NESTING 	16
@@ -78,7 +82,7 @@ static IFile*   Input	   = 0; /* Single linked list of active files	*/
 
 
 /*****************************************************************************/
-/*				 struct IFile				     */
+/*		      		 struct IFile				     */
 /*****************************************************************************/
 
 
@@ -142,7 +146,7 @@ void OpenIncludeFile (const char* Name, unsigned DirSpec)
     /* Check for the maximum include nesting */
     if (IFileCount > MAX_INC_NESTING) {
      	PPError (ERR_INCLUDE_NESTING);
-     	return;
+      	return;
     }
 
     /* Search for the file */
@@ -196,7 +200,7 @@ int NextLine (void)
     int	       	Done;
 
     /* Setup the line */
-    kill ();
+    ClearLine ();
 
     /* If there is no file open, bail out */
     if (Input == 0) {
@@ -210,8 +214,8 @@ int NextLine (void)
 
        	while (fgets (line + Len, LINESIZE - Len, Input->F) == 0) {
 
-      	    /* eof */
-      	    kill ();
+      	    /* Assume EOF */
+      	    ClearLine ();
 
       	    /* Leave the current file */
       	    CloseIncludeFile ();
@@ -232,7 +236,7 @@ int NextLine (void)
 	while (Len > 0 && line [Len-1] == '\n') {
 	    --Len;
 	}
-	line [Len] = '\0';
+      	line [Len] = '\0';
 
 	/* Output the source line in the generated assembler file
 	 * if requested.
@@ -246,9 +250,9 @@ int NextLine (void)
 	 */
 	if (Len > 0 && line[Len-1] == '\\') {
 	    line[Len-1] = '\n';		/* Replace by newline */
-	} else {
-	    Done = 1;
-	}
+      	} else {
+      	    Done = 1;
+      	}
     }
 
     /* Got a line */
@@ -257,13 +261,22 @@ int NextLine (void)
 
 
 
+void ClearLine (void)
+/* Clear the current input line */
+{
+    line [0] = '\0';
+    lptr = line;
+}
+
+
+
 const char* GetCurrentFile (void)
 /* Return the name of the current input file */
 {
     if (Input == 0) {
-	return "(outside file scope)";
+      	return "(outside file scope)";
     } else {
-	return Input->Name;
+      	return Input->Name;
     }
 }
 
@@ -273,6 +286,42 @@ unsigned GetCurrentLine (void)
 /* Return the line number in the current input file */
 {
     return Input? Input->Line : 0;
+}
+
+
+
+int nch (void)
+/* Get the next char in input stream (the one behind the current one) */
+{
+    if (*lptr == '\0') {
+    	return 0;
+    } else {
+    	return lptr[1] & 0xFF;
+    }
+}
+
+
+
+int cgch (void)
+/* Get the current character in the input stream and advance line
+ * pointer (unless already at end of line).
+ */
+{
+    if (*lptr == '\0') {
+   	return (0);
+    } else {
+   	return (*lptr++ & 0xFF);
+    }
+}
+
+
+
+int gch (void)
+/* Get the current character in the input stream and advance line
+ * pointer (no end of line check is performed).
+ */
+{
+    return (*lptr++ & 0xFF);
 }
 
 

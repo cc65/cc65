@@ -22,7 +22,6 @@
 #include "funcdesc.h"
 #include "function.h"
 #include "global.h"
-#include "io.h"
 #include "litpool.h"
 #include "macrotab.h"
 #include "preproc.h"

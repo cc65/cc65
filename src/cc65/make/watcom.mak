@@ -83,7 +83,6 @@ OBJS =	anonname.obj	\
 	ident.obj	\
 	incpath.obj    	\
 	input.obj	\
-	io.obj		\
 	litpool.obj	\
 	locals.obj	\
 	loop.obj	\

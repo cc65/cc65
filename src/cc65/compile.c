@@ -45,7 +45,6 @@
 #include "function.h"
 #include "global.h"
 #include "incpath.h"
-#include "io.h"
 #include "litpool.h"
 #include "macrotab.h"
 #include "pragma.h"
@@ -66,7 +65,6 @@ static void Parse (void)
     int comma;
     SymEntry* Entry;
 
-    kill ();
     NextToken ();		 	/* "prime" the pump */
     NextToken ();
     while (curtok != TOK_CEOF) {

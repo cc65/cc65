@@ -39,6 +39,22 @@
 
 
 /*****************************************************************************/
+/*	 			     data				     */
+/*****************************************************************************/
+
+
+
+/* Maximum length of an input line and the corresponding char array */
+#define LINEMAX		4095
+#define LINESIZE 	LINEMAX+1
+
+/* Input line stuff */
+extern char* line;
+extern char* lptr;
+
+
+
+/*****************************************************************************/
 /*	       	     	     	     Code		     		     */
 /*****************************************************************************/
 
@@ -53,11 +69,29 @@ void OpenIncludeFile (const char* Name, unsigned DirSpec);
 int NextLine (void);
 /* Get a line from the current input. Returns 0 on end of file. */
 
+void ClearLine (void);
+/* Clear the current input line */
+
 const char* GetCurrentFile (void);
 /* Return the name of the current input file */
 
 unsigned GetCurrentLine (void);
 /* Return the line number in the current input file */
+
+int nch (void);
+/* Get the next char in input stream (the one behind the current one) */
+
+int cgch (void);
+/* Get the current character in the input stream and advance line
+ * pointer (unless already at end of line).
+ */
+
+int gch (void);
+/* Get the current character in the input stream and advance line
+ * pointer (no end of line check is performed).
+ */
+
+
 
 
 

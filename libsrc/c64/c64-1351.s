@@ -37,11 +37,6 @@ HEADER:
         .addr   IOCTL
         .addr   IRQ
 
-; Data that is visible to the outside. Initialized by the kernel.
-
-XPos:   .word   0                       ; Current mouse position, X
-YPos:   .word   0                       ; Current mouse position, Y
-
 ; Callback table, set by the kernel before INSTALL is called
 
 CHIDE:  jmp     $0000                   ; Hide the cursor
@@ -57,9 +52,8 @@ SCREEN_HEIGHT   = 200
 SCREEN_WIDTH    = 320
 
 ;----------------------------------------------------------------------------
-;
-; Global variables
-;
+; Global variables. The bounding box values are sorted so that they can be
+; written with the least effort in the BOX routine, so don't reorder them.
 
 .bss
 
@@ -67,10 +61,12 @@ Vars:
 OldPotX:   	.res   	1	     	; Old hw counter values
 OldPotY:	.res   	1
 
-XMin:		.res	2	     	; X1 value of bounding box
-YMin:		.res	2	     	; Y1 value of bounding box
-XMax:		.res	2	     	; X2 value of bounding box
+YPos:           .res    2               ; Current mouse position, Y
+XPos:           .res    2               ; Current mouse position, X
 YMax:		.res	2	     	; Y2 value of bounding box
+XMax:		.res	2	     	; X2 value of bounding box
+YMin:		.res	2	     	; Y1 value of bounding box
+XMin:		.res	2	     	; X1 value of bounding box
 
 OldValue:	.res   	1	     	; Temp for MoveCheck routine
 NewValue:	.res   	1	     	; Temp for MoveCheck routine
@@ -81,9 +77,12 @@ NewValue:	.res   	1	     	; Temp for MoveCheck routine
 
 .proc   DefVars
         .byte   0, 0                    ; OldPotX/OldPotY
-        .word   0, 0                    ; XMin/YMin
-        .word   SCREEN_WIDTH            ; XMax
+        .word   SCREEN_HEIGHT/2         ; YPos
+        .word   SCREEN_WIDTH/2          ; XPos
         .word   SCREEN_HEIGHT           ; YMax
+        .word   SCREEN_WIDTH            ; XMax
+        .word   0                       ; YMin
+        .word   0                       ; XMin
 .endproc
 
 .code
@@ -103,18 +102,31 @@ INSTALL:
         dex
         bpl     @L1
 
+; Be sure the mouse cursor is invisible and at the default location. We
+; need to do that here, because our mouse interrupt handler doesn't set the
+; mouse position if it hasn't changed.
+
+        sei
+        jsr     CHIDE
+        lda     XPos
+        ldx     XPos+1
+        jsr     CMOVEX
+        lda     YPos
+        ldx     YPos+1
+        jsr     CMOVEY
+        cli
+
 ; Done, return zero (= MOUSE_ERR_OK)
 
-        inx                             ; X = 0
+        ldx     #$00
         txa
-;       rts                             ; Run into UNINSTALL instead
+        rts                             ; Run into UNINSTALL instead
 
 ;----------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
 ; No return code required (the driver is removed from memory on return).
 
-UNINSTALL:
-        rts
+UNINSTALL       = HIDE                  ; Hide cursor on exit
 
 ;----------------------------------------------------------------------------
 ; HIDE routine. Is called to hide the mouse pointer. The mouse kernel manages
@@ -123,7 +135,10 @@ UNINSTALL:
 ; no special action is required besides hiding the mouse cursor.
 ; No return code required.
 
-HIDE    = CHIDE
+HIDE:   sei
+        jsr     CHIDE
+        cli
+        rts
 
 ;----------------------------------------------------------------------------
 ; SHOW routine. Is called to show the mouse pointer. The mouse kernel manages
@@ -132,15 +147,31 @@ HIDE    = CHIDE
 ; no special action is required besides enabling the mouse cursor.
 ; No return code required.
 
-SHOW    = CSHOW
+SHOW:   sei
+        jsr     CSHOW
+        cli
+        rts
 
 ;----------------------------------------------------------------------------
-; BOX: Set the mouse bounding box. No checks are done if the mouse is
-; currently inside the box, this is the job of the caller. It is not necessary
-; to validate the parameters, trust the caller and save some code here.
-; No return code required.
+; BOX: Set the mouse bounding box. The parameters are passed as they come from
+; the C program, that is, maxy in a/x and the other parameters on the stack.
+; The C wrapper will remove the parameters from the stack when the driver
+; routine returns.
+; No checks are done if the mouse is currently inside the box, this is the job
+; of the caller. It is not necessary to validate the parameters, trust the
+; caller and save some code here. No return code required.
 
-BOX:
+BOX:    ldy     #5
+        sei
+        sta     YMax
+        stx     YMax+1
+
+@L1:    lda     (sp),y
+        sta     XMax,y
+        dey
+        bpl     @L1
+
+        cli
        	rts
 
 ;----------------------------------------------------------------------------
@@ -243,8 +274,7 @@ IRQ:    lda	SID_ADConv1		; Get mouse X movement
 
 ; Skip processing if nothing has changed
 
-        tay
-        beq     @SkipX
+        bcc     @SkipX
 
 ; Calculate the new X coordinate (--> a/y)
 
@@ -275,19 +305,18 @@ IRQ:    lda	SID_ADConv1		; Get mouse X movement
 ; Move the mouse pointer to the new X pos
 
         tya
-        jsr     CMOVEY
+        jsr     CMOVEX
 
 ; Calculate the Y movement vector
 
 @SkipX: lda	SID_ADConv2	 	; Get mouse Y movement
-	ldy	OldPotY
-	jsr	MoveCheck	 	; Calculate movement
-	sty	OldPotY
+ 	ldy	OldPotY
+ 	jsr	MoveCheck	 	; Calculate movement
+ 	sty	OldPotY
 
 ; Skip processing if nothing has changed
 
-        tay
-        beq     @SkipY
+        bcc     @SkipY
 
 ; Calculate the new Y coordinate (--> a/y)
 
@@ -303,8 +332,8 @@ IRQ:    lda	SID_ADConv1		; Get mouse X movement
 ; Limit the Y coordinate to the bounding box
 
    	cpy	YMin
-	sbc	YMin+1
-	bpl	@L3
+ 	sbc	YMin+1
+ 	bpl	@L3
        	ldy    	YMin
        	ldx	YMin+1
     	jmp	@L4
@@ -316,12 +345,12 @@ IRQ:    lda	SID_ADConv1		; Get mouse X movement
     	ldy	YMax
     	ldx	YMax+1
 @L4:	sty	YPos
-	stx	YPos+1
+ 	stx	YPos+1
 
 ; Move the mouse pointer to the new X pos
 
         tya
-        jsr     CMOVEX
+        jmp     CMOVEY
 
 ; Done
 
@@ -342,24 +371,27 @@ MoveCheck:
       	sta	NewValue
       	ldx 	#$00
 
-      	sub	OldValue		; a = mod64 (new - old)
+      	sub	OldValue	   	; a = mod64 (new - old)
       	and	#%01111111
-      	cmp	#%01000000		; if (a > 0)
-      	bcs	@L1 			;
-      	lsr	a   			;   a /= 2;
-      	beq	@L2 			;   if (a != 0)
-      	ldy   	NewValue     		;     y = NewValue
-      	rts   	    			;   return
+      	cmp	#%01000000	   	; if (a > 0)
+      	bcs	@L1 		   	;
+      	lsr	a   		   	;   a /= 2;
+      	beq	@L2 		   	;   if (a != 0)
+      	ldy   	NewValue     	   	;     y = NewValue
+        sec
+      	rts   	    		   	;   return
 
-@L1:  	ora   	#%11000000		; else or in high order bits
-      	cmp   	#$FF			; if (a != -1)
+@L1:  	ora   	#%11000000	   	; else or in high order bits
+      	cmp   	#$FF		   	; if (a != -1)
       	beq   	@L2
       	sec
-      	ror   	a   			;   a /= 2
-       	dex				;   high byte = -1 (X = $FF)
+      	ror   	a   		   	;   a /= 2
+       	dex			   	;   high byte = -1 (X = $FF)
       	ldy   	NewValue
+        sec
       	rts
 
-@L2:   	txa				; A = $00
+@L2:   	txa			   	; A = $00
+        clc
       	rts
 

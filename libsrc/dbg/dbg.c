@@ -695,7 +695,7 @@ static void DbgResetTmpBreaks (void)
 
 
 
-static int DbgTmpBreaksOk (void)
+static unsigned char DbgTmpBreaksOk (void)
 /* Check if the temporary breakpoints can be set, if so, return 1, if not,
  * reset them all and return 0.
  */

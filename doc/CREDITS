@@ -69,6 +69,10 @@ More special thanks to:
     ...for his public domain Swiftlink/Turbo232 drivers which are part
     of the cc65 library in modified form.
 
+  * Debrune Jérôme <jede@oric.org>
+
+    for help with preliminary Oric Atmos support.
+
 
 
 Thanks to

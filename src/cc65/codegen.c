@@ -585,39 +585,49 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
     /* Don't loop for up to two bytes */
     if (Bytes == 1) {
 
-     	ldyconst (StackOffs);
-     	AddCodeLine ("lda (sp),y");
-	AddCodeLine ("sta regbank%+d", RegOffs);
+       	ldyconst (StackOffs);
+       	AddCodeLine ("lda (sp),y");
+       	AddCodeLine ("sta regbank%+d", RegOffs);
 
     } else if (Bytes == 2) {
 
-     	ldyconst (StackOffs);
-     	AddCodeLine ("lda (sp),y");
-	AddCodeLine ("sta regbank%+d", RegOffs);
-	AddCodeLine ("iny");
-	AddCodeLine ("lda (sp),y");
-	AddCodeLine ("sta regbank%+d", RegOffs+1);
+       	ldyconst (StackOffs);
+       	AddCodeLine ("lda (sp),y");
+       	AddCodeLine ("sta regbank%+d", RegOffs);
+       	AddCodeLine ("iny");
+       	AddCodeLine ("lda (sp),y");
+       	AddCodeLine ("sta regbank%+d", RegOffs+1);
+
+    } else if (Bytes == 3 && CodeSizeFactor >= 133) {
+
+       	ldyconst (StackOffs);
+       	AddCodeLine ("lda (sp),y");
+       	AddCodeLine ("sta regbank%+d", RegOffs);
+       	AddCodeLine ("iny");
+       	AddCodeLine ("lda (sp),y");
+       	AddCodeLine ("sta regbank%+d", RegOffs+1);
+       	AddCodeLine ("iny");
+       	AddCodeLine ("lda (sp),y");
+       	AddCodeLine ("sta regbank%+d", RegOffs+2);
 
     } else {
 
-     	/* More than two bytes - loop */
-     	unsigned Label = GetLocalLabel ();
-     	ldyconst (StackOffs+Bytes-1);
-     	ldxconst (Bytes);
-     	g_defcodelabel (Label);
+       	/* More bytes - loop */
+       	unsigned Label = GetLocalLabel ();
+	ldyconst (StackOffs);
+       	g_defcodelabel (Label);
 	AddCodeLine ("lda (sp),y");
-	AddCodeLine ("sta regbank%+d,x", RegOffs-1);
-	AddCodeLine ("dey");
-	AddCodeLine ("dex");
+	AddCodeLine ("sta regbank%+d,y", RegOffs - StackOffs);
+	AddCodeLine ("iny");
+	AddCodeLine ("cpy #$%02X", StackOffs + Bytes);
 	AddCodeLine ("bne %s", LocalLabelName (Label));
-
     }
 }
 
 
 
 /*****************************************************************************/
-/*			     Fetching memory cells	   		     */
+/*     			     Fetching memory cells	   		     */
 /*****************************************************************************/
 
 

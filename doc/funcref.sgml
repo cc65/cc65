@@ -138,8 +138,12 @@ function.
 <item><ref id="strchr" name="strchr">
 <item><ref id="strcpy" name="strcpy">
 <item><ref id="strlen" name="strlen">
+<item><ref id="strlower" name="strlower">
+<item><ref id="strlwr" name="strlwr">
 <item><ref id="strncpy" name="strncpy">
 <item><ref id="strrchr" name="strrchr">
+<item><ref id="strupper" name="strupper">
+<item><ref id="strupr" name="strupr">
 </itemize>
 
 
@@ -156,8 +160,11 @@ function.
 <tag/Declaration/<tt/void BRK (void);/
 <tag/Description/The function will insert a 6502 BRK instruction into the code
 which may be used to trigger a debugger.
-<tag/Limits/The function is actually a macro. The inserted instruction may lead
-to unexpected results if no debugger is present.
+<tag/Limits/<itemize>
+<item>The function is actually a macro.
+<item>The inserted instruction may lead to unexpected results if no debugger
+is present.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="CLI" name="CLI">,
@@ -177,8 +184,10 @@ to unexpected results if no debugger is present.
 <tag/Description/The function will insert a 6502 CLI instruction into the code,
 so interrupts are disabled. Note that non maskable interrupts cannot be
 disabled.
-<tag/Limits/The function is actually a macro. Disabling interrupts may lead to
-unexpected results.
+<tag/Limits/<itemize>
+<item>The function is actually a macro.
+<item>Disabling interrupts may lead to unexpected results.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="BRK" name="BRK">,
@@ -198,7 +207,9 @@ unexpected results.
 <tag/Description/The function will insert a 6502 SEI instruction into the code,
 so interrupts are enabled. Enabling interrupts has no effects if they are
 already enabled (the default).
-<tag/Limits/The function is actually a macro.
+<tag/Limits/<itemize>
+<item>The function is actually a macro.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="BRK" name="BRK">,
@@ -236,7 +247,9 @@ terminates the program with an exit code of 3.
 <tag/Description/<tt/assert/ is a macro that expands to a <tt/id/
 statement. If the condition evaluates t zero (false), assert prints a message
 on stderr and aborts the program.
-<tag/Limits/The function is actually a macro.
+<tag/Limits/<itemize>
+<item>The function is actually a macro.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="abort" name="abort">,
@@ -258,9 +271,12 @@ on stderr and aborts the program.
 terminates, they are called in LIFO order (the last function registered is
 called first). <tt/atexit/ returns zero on success and a nonzero value on
 failure.
-<tag/Limits/A maximum of 5 exit functions can be registered. There is no way
-to unregister an exit function. The function is only available as fastcall
-function, so it may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>A maximum of 5 exit functions can be registered.
+<item>There is no way to unregister an exit function.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="abort" name="abort">,
@@ -279,10 +295,12 @@ function, so it may only be used in presence of a prototype.
 <tag/Declaration/<tt/unsigned char __fastcall__ bgcolor (unsigned char color);/
 <tag/Description/The function will set a new background text color. It returns
 the old (current) background color.
-<tag/Limits/Background colors are system dependent. The function may have no effect
-on systems where the background color cannot be changed. The function is only
-available as fastcall function, so it may only be used in presence of a
-prototype.
+<tag/Limits/<itemize>
+<item>Background colors are system dependent. The function may have no effect
+on systems where the background color cannot be changed.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="bordercolor" name="bordercolor">,
@@ -301,10 +319,12 @@ prototype.
 <tag/Declaration/<tt/unsigned char __fastcall__ bordercolor (unsigned char color);/
 <tag/Description/The function will set a new border color. It returns the old
 (current) border color.
-<tag/Limits/Border colors are system dependent. The function may have no effect
-on systems where the border color cannot be changed. The function is only
-available as fastcall function, so it may only be used in presence of a
-prototype.
+<tag/Limits/<itemize>
+<item>Border colors are system dependent. The function may have no effect
+on systems where the border color cannot be changed.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="bgcolor" name="bgcolor">,
@@ -323,8 +343,10 @@ prototype.
 <tag/Declaration/<tt/void __fastcall__ cclear (unsigned char length);/
 <tag/Description/The function clears part of a line by writing <tt/length/
 spaces in the current text color.
-<tag/Limits/The function is only available as fastcall function, so it may
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cclearxy" name="cclearxy">,
@@ -345,8 +367,10 @@ at a specific screen position.
 <tag/Description/The function moves the cursor to a specific position, and
 will then clear part of the line by writing <tt/length/ spaces in the current
 text color.
-<tag/Limits/The function is only available as fastcall function, so it may
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cclear" name="cclear">,
@@ -367,8 +391,10 @@ only be used in presence of a prototype.
 no character available, <tt/cgetc/ waits until the user presses a key. If the
 cursor is enabled by use of the <tt/cursor/ function, a blinking cursor is
 displayed while waiting.
-<tag/Limits/If the system supports a keyboard buffer, <tt/cgetc/ will fetch a
-key from this buffer and wait only if the buffer is empty.
+<tag/Limits/<itemize>
+<item>If the system supports a keyboard buffer, <tt/cgetc/ will fetch a key
+from this buffer and wait only if the buffer is empty.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cursor" name="cursor">,
@@ -387,10 +413,13 @@ key from this buffer and wait only if the buffer is empty.
 <tag/Declaration/<tt/void __fastcall__ chline (unsigned char length);/
 <tag/Description/The function outputs a horizontal line with the given length
 starting at the current cursor position.
-<tag/Limits/The character used to draw the horizontal line is system dependent.
+<tag/Limits/<itemize>
+<item>The character used to draw the horizontal line is system dependent.
 If available, a line drawing character is used. Drawing a line that is partially
-off screen leads to undefined behaviour. The function is only available
-as fastcall function, so it may only be used in presence of a prototype.
+off screen leads to undefined behaviour.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="chlinexy" name="chlinexy">,
@@ -410,10 +439,13 @@ as fastcall function, so it may only be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ chlinexy (unsigned char x, unsigned char y, unsigned char length);/
 <tag/Description/The function outputs a horizontal line with the given length
 starting at a given position.
-<tag/Limits/The character used to draw the horizontal line is system dependent.
+<tag/Limits/<itemize>
+<item>The character used to draw the horizontal line is system dependent.
 If available, a line drawing character is used. Drawing a line that is partially
-off screen leads to undefined behaviour. The function is only available
-as fastcall function, so it may only be used in presence of a prototype.
+off screen leads to undefined behaviour.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="chline" name="chline">,
@@ -452,8 +484,10 @@ the upper left corner.
 <tag/Description/If the argument to the function is non zero, a blinking cursor
 will be enabled when the <tt/cgetc/ function waits for input from the keyboard.
 If the argument is zero, <tt/cgetc/ will wait without a blinking cursor.
-<tag/Limits/The function is only available as fastcall function, so it may only
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cgetc" name="cgetc">,
@@ -472,10 +506,13 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ cvline (unsigned char length);/
 <tag/Description/The function outputs a vertical line with the given length
 starting at the current cursor position.
-<tag/Limits/The character used to draw the vertical line is system dependent.
+<tag/Limits/<itemize>
+<item>The character used to draw the vertical line is system dependent.
 If available, a line drawing character is used. Drawing a line that is partially
-off screen leads to undefined behaviour. The function is only available
-as fastcall function, so it may only be used in presence of a prototype.
+off screen leads to undefined behaviour.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="chline" name="chline">,
@@ -495,10 +532,13 @@ as fastcall function, so it may only be used in presence of a prototype.
 <tag/Declaration/<tt/void __fastcall__ cvlinexy (unsigned char x, unsigned char y, unsigned char length);/
 <tag/Description/The function outputs a vertical line with the given length
 starting at a given position.
-<tag/Limits/The character used to draw the vertical line is system dependent.
+<tag/Limits/<itemize>
+<item>The character used to draw the vertical line is system dependent.
 If available, a line drawing character is used. Drawing a line that is partially
-off screen leads to undefined behaviour. The function is only available
-as fastcall function, so it may only be used in presence of a prototype.
+off screen leads to undefined behaviour.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="chline" name="chline">,
@@ -522,9 +562,12 @@ output is written and any functions registered with <tt/<ref id="atexit"
 name="atexit">/ are called. Common values for status are <tt/EXIT_SUCCESS/ and
 <tt/EXIT_FAILURE/ which are also defined in <tt/<ref id="stdlib.h"
 name="stdlib.h">/.
-<tag/Limits/The function is only available as fastcall function, so it may only
-be used in presence of a prototype. It depends on the host machine if the
-program return code can be evaluated or is ignored.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>It depends on the host machine if the program return code can be
+evaluated or is ignored.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="abort" name="abort">,
@@ -544,9 +587,12 @@ program return code can be evaluated or is ignored.
 <tag/Description/The function moves the text mode cursor to the specified X
 position while leaving the Y position untouched. The leftmost position on the
 screen has the coordinate 0.
-<tag/Limits/The function is only available as fastcall function, so it may
-only be used in presence of a prototype. Invalid values for the X position
-(out of screen coordinates) may lead to undefined behaviour.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+<item>Invalid values for the X position (out of screen coordinates) may
+lead to undefined behaviour.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="gotoy" name="gotoy">,
@@ -568,9 +614,12 @@ only be used in presence of a prototype. Invalid values for the X position
 <tag/Description/The function moves the text mode cursor to the specified
 position. The leftmost position on the screen has the X coordinate 0, the
 topmost line has the Y coordinate 0.
-<tag/Limits/The function is only available as fastcall function, so it may
-only be used in presence of a prototype. Invalid values for any of both
-coordinates (out of screen positions) may lead to undefined behaviour.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+<item>Invalid values for any of both coordinates (out of screen positions) may
+lead to undefined behaviour.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="gotox" name="gotox">,
@@ -592,9 +641,12 @@ coordinates (out of screen positions) may lead to undefined behaviour.
 <tag/Description/The function moves the text mode cursor to the specified Y
 position while leaving the X position untouched. The uppermost position on the
 screen has the coordinate 0.
-<tag/Limits/The function is only available as fastcall function, so it may
-only be used in presence of a prototype. Invalid values for the Y position
-(out of screen coordinates) may lead to undefined behaviour.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+<item>Invalid values for the Y position (out of screen coordinates) may lead 
+to undefined behaviour.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="gotox" name="gotox">,
@@ -616,12 +668,15 @@ only be used in presence of a prototype. Invalid values for the Y position
 <tag/Description/The function returns a value of zero if the given argument
 is a letter or digit. The return value is non zero if the character
 is anything else.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values 
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of 
+this range. The non inline function may be accessed by <tt/#undef/'ing 
+the macro. 
+<item>When compiling without <tt/-Os/, the function is only available as 
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalpha" name="isalpha">,
@@ -650,12 +705,15 @@ may only be used in presence of a prototype.
 <tag/Declaration/<tt/int __fastcall__ isalpha (int c);/
 <tag/Description/The function returns a value of zero if the given argument
 is a letter. The return value is non zero if the character is anything else.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -685,12 +743,15 @@ may only be used in presence of a prototype.
 <tag/Description/The function returns a value of zero if the given argument
 is in the range 0..127 (the range of valid ASCII characters) and a non zero
 value if not.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -720,12 +781,15 @@ may only be used in presence of a prototype.
 <tag/Description/The function returns a value of zero if the given argument
 is a blank or space character. The return value is non zero if the character
 is anything else.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -755,12 +819,15 @@ may only be used in presence of a prototype.
 <tag/Description/The function returns a value of zero if the given argument
 is a control character. The return value is non zero if the character
 is anything else.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -789,12 +856,15 @@ may only be used in presence of a prototype.
 <tag/Declaration/<tt/int __fastcall__ isdigit (int c);/
 <tag/Description/The function returns a value of zero if the given argument
 is a digit. The return value is non zero if the character is anything else.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -825,12 +895,15 @@ space).
 <tag/Description/The function returns a value of zero if the given argument
 is a printable character with the exception of space. The return value is non
 zero if the character is anything else.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -860,12 +933,15 @@ may only be used in presence of a prototype.
 <tag/Description/The function returns a value of zero if the given argument
 is a lower case letter. The return value is non zero if the character is
 anything else.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -895,12 +971,15 @@ may only be used in presence of a prototype.
 <tag/Description/The function returns a value of zero if the given argument
 is a printable character (this includes the space character). The return value
 is non zero if the character is anything else.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -931,12 +1010,15 @@ space or an alphanumeric character.
 <tag/Description/The function returns a value of zero if the given argument
 is a printable character, but not a space or anything alphanumeric. The return
 value is non zero if the character is anything else.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -968,12 +1050,15 @@ is a white space character. The return value is non zero if the character is
 anything else. The standard white space characters are: space, formfeed ('\f'),
 newline ('\n'), carriage return ('\r'), horizontal tab ('\t'), and vertical tab
 ('\v').
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -1003,12 +1088,15 @@ may only be used in presence of a prototype.
 <tag/Description/The function returns a value of zero if the given argument
 is an upper case letter. The return value is non zero if the character is
 anything else.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -1038,12 +1126,15 @@ may only be used in presence of a prototype.
 <tag/Description/The function returns a value of zero if the given argument
 is a hexadecimal digit (0..9, a..f and A..F). The return value is non zero
 if the character is anything else.
-<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
-generated inline sequence will not work correctly for values outside the range
-0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
-inline function may be accessed by <tt/#undef/'ing the macro. When compiling
-without <tt/-Os/, the function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>When compiling with <tt/-Os/ the function is actually a macro. The
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing the
+macro.
+<item>When compiling without <tt/-Os/, the function is only available as
+fastcall function, so it may only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="isalnum" name="isalnum">,
@@ -1072,8 +1163,10 @@ may only be used in presence of a prototype.
 <tag/Declaration/<tt/unsigned char kbhit (void);/
 <tag/Description/The function returns a value of zero if there is no character
 waiting to be read from the keyboard. It returns non zero otherwise.
-<tag/Limits/If the system does not support a keyboard buffer (most systems
+<tag/Limits/<itemize>
+<item>If the system does not support a keyboard buffer (most systems
 do), the function is rather useless.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cgetc" name="cgetc">,
@@ -1093,9 +1186,12 @@ do), the function is rather useless.
 <tag/Description/If the argument is non zero, the function enables reverse
 character display. If the argument is zero, reverse character display is
 switched off. The old value of the setting is returned.
-<tag/Limits/The function may not be supported by the hardware, in which case
-the call is ignored. The function is only available as fastcall function, so it
-may only be used in presence of a prototype.
+<tag/Limits/<itemize>
+<item>The function may not be supported by the hardware, in which case
+the call is ignored.
+<item>The function is only available as fastcall function, so it may only 
+be used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="textcolor" name="textcolor">
@@ -1112,8 +1208,10 @@ may only be used in presence of a prototype.
 <tag/Header/<tt/<ref id="conio.h" name="conio.h">/
 <tag/Declaration/<tt/void __fastcall__ screensize (unsigned char* x, unsigned char* y);/
 <tag/Description/The function returns the dimensions of the text mode screen.
-<tag/Limits/The function is only available as fastcall function, so it may only
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="gotox" name="gotox">,
@@ -1136,10 +1234,13 @@ be used in presence of a prototype.
 <tag/Description/The <tt/strcat/ function appends a copy of the string
 pointed to by s2 (including the terminating null byte) to the end of the
 string pointed to by s1. The initial byte of s2 overwrites the null byte at
-the end of s1. If copying takes place between objects that overlap, the
-behavior is undefined.
-<tag/Limits/The function is only available as fastcall function, so it may only
+the end of s1.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+<item>If copying takes place between objects that overlap, the behavior
+is undefined.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strcpy" name="strcpy">
@@ -1160,8 +1261,10 @@ be used in presence of a prototype.
 (converted to a char) in the string pointed to by <tt/s/. The terminating null
 byte is considered to be part of the string. Upon completion, the function
 returns a pointer to the byte, or a null pointer if the byte was not found.
-<tag/Limits/The function is only available as fastcall function, so it may only
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strrchr" name="strrchr">
@@ -1179,10 +1282,13 @@ be used in presence of a prototype.
 <tag/Declaration/<tt/char* __fastcall__ strcpy (char* s1, const char* s2);/
 <tag/Description/The <tt/strcpy/ function copies the string pointed to by
 <tt/s2/ (including the terminating null byte) into the array pointed to by
-<tt/s1/. If copying takes place between objects that overlap, the behavior
-is undefined. The function will always return <tt/s1/.
-<tag/Limits/The function is only available as fastcall function, so it may only
+<tt/s1/. The function will always return <tt/s1/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+<item>If copying takes place between objects that overlap, the behavior
+is undefined.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strcat" name="strcat">
@@ -1208,15 +1314,48 @@ strcpy (hello, "Hello world!\n");
 <tag/Declaration/<tt/size_t __fastcall__ strlen (const char* s);/
 <tag/Description/The <tt/strlen/ function computes the number of bytes in the
 string to which s points, not including the terminating null byte.
-<tag/Limits/The function is only available as fastcall function, so it may only
-be used in presence of a prototype. When compiling with <tt/-Os/ (inline known
-standard functions), the function does not work correctly for strings with more
-then 255 characters.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>When compiling with <tt/-Os/ (inline known standard functions), the
+function does not work correctly for strings with more than 255 characters.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strcpy" name="strcpy">
 <tag/Example/None.
 </descrip>
+</quote>
+
+
+<sect1>strlower<label id="strlower"><p>
+
+<quote>
+<descrip>
+<tag/Function/Make a string lower case.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strlower (char* s);/
+<tag/Description/The <tt/strlower/ function will apply the <tt/tolower/
+function to each character of a string. The function will always return <tt/s/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function prototype is unavailable when compiling in strict ANSI mode.
+<item>An alias name for this function is <tt/strlwr/.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="strupper" name="strupper">
+<ref id="tolower" name="tolower">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strlwr<label id="strlwr"><p>
+
+<quote>
+See <tt/strlower/.
 </quote>
 
 
@@ -1228,15 +1367,17 @@ then 255 characters.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
 <tag/Declaration/<tt/char* __fastcall__ strcpy (char* s1, const char* s2, size_t n);/
 <tag/Description/The <tt/strncpy/ function copies not more than n bytes from
-the array pointed to by <tt/s2/ to the array pointed to by <tt/s1/. If copying 
-takes place between objects that overlap, the behavior is undefined.<p>
-If the array pointed to by <tt/s2/ is a string that is shorter than n bytes, 
-null bytes are appended to the copy in the array pointed to by <tt/s1/, until 
-<tt/n/ bytes are written.<p>
-The function will always return <tt/s1/.
-<tag/Limits/The function is only available as fastcall function, so it may only
+the array pointed to by <tt/s2/ to the array pointed to by <tt/s1/. If the array 
+pointed to by <tt/s2/ is a string that is shorter than n bytes, null bytes are 
+appended to the copy in the array pointed to by <tt/s1/, until <tt/n/ bytes are 
+written. The function will always return <tt/s1/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype. If there is no null byte in the first <tt/n/
 bytes of the array pointed to by <tt/s2/, the result is not null-terminated.
+<item>If copying takes place between objects that overlap, the behavior is 
+undefined.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strcat" name="strcat">
@@ -1265,13 +1406,46 @@ hello[5] = '\0';
 (converted to a char) in the string pointed to by <tt/s/. The terminating null
 byte is considered to be part of the string. Upon completion, the function
 returns a pointer to the byte, or a null pointer if the byte was not found.
-<tag/Limits/The function is only available as fastcall function, so it may only
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strchr" name="strchr">
 <tag/Example/None.
 </descrip>
+</quote>
+
+
+<sect1>strupper<label id="strupper"><p>
+
+<quote>
+<descrip>
+<tag/Function/Make a string upper case.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strupper (char* s);/
+<tag/Description/The <tt/strupper/ function will apply the <tt/toupper/
+function to each character of a string. The function will always return <tt/s/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function prototype is unavailable when compiling in strict ANSI mode.
+<item>An alias name for this function is <tt/strupr/.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="strlower" name="strlower">
+<ref id="toupper" name="toupper">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strupr<label id="strupr"><p>
+
+<quote>
+See <tt/strupper/.
 </quote>
 
 
@@ -1285,10 +1459,12 @@ be used in presence of a prototype.
 <tag/Description/The function will set a new text color. It returns the old
 (current) text color. Text output using any <tt/conio.h/ function will use
 the color set by this function.
-<tag/Limits/Text colors are system dependent. The function may have no effect
-on systems where the text color cannot be changed. The function is only
-available as fastcall function, so it may only be used in presence of a
-prototype.
+<tag/Limits/<itemize>
+<item>Text colors are system dependent. The function may have no effect
+on systems where the text color cannot be changed.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
 <tag/Availability/cc65
 <tag/See also/
 <ref id="bgcolor" name="bgcolor">,
@@ -1307,8 +1483,10 @@ prototype.
 <tag/Declaration/<tt/int __fastcall__ tolower (int c);/
 <tag/Description/The function returns the given character converted to lower
 case. If the given character is not a letter, it is returned unchanged.
-<tag/Limits/The function is only available as fastcall function, so it may
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="islower" name="islower">,
@@ -1328,8 +1506,10 @@ only be used in presence of a prototype.
 <tag/Declaration/<tt/int __fastcall__ toupper (int c);/
 <tag/Description/The function returns the given character converted to upper
 case. If the given character is not a letter, it is returned unchanged.
-<tag/Limits/The function is only available as fastcall function, so it may
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
+</itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="islower" name="islower">,

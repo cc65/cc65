@@ -43,6 +43,9 @@ TEX   = $(SGML:.sgml=.tex)
 %.tex:	%.sgml
       	sgml2latex --output=tex $<
 
+funcref.html:	funcref.sgml
+	sgml2html --split=2 $<
+
 # ------------------------------------------------------------------------------
 # Targets
 

@@ -17,7 +17,7 @@ __sys:	sta	ptr1
 	ldy	#5
 	lda	(ptr1),y
 	sta	jmpvec+2
-	dey	
+	dey
 	lda	(ptr1),y
 	sta	jmpvec+1
 
@@ -25,7 +25,7 @@ __sys:	sta	ptr1
 
 	dey
 	lda	(ptr1),y
-	and	#%11001011
+	and	#%11001111      ; Mask out break and unused flag
 	pha
 	ldy	#0
 	lda	(ptr1),y
@@ -35,7 +35,7 @@ __sys:	sta	ptr1
 
 	iny
 	lda	(ptr1),y
-	tay
+	tax
 	iny
 	lda	(ptr1),y
 	tay

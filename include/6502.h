@@ -49,9 +49,9 @@ unsigned char getcpu (void);
 
 
 /* Macros for CPU instructions */
-#define	BRK()	__asm__ ("\tbrk")
-#define CLI()	__asm__ ("\tcli")
-#define SEI()	__asm__ ("\tsei")
+#define	BRK()	__asm__ ("brk")
+#define CLI()	__asm__ ("cli")
+#define SEI()	__asm__ ("sei")
 
 
 
@@ -86,9 +86,9 @@ struct regs {
 
 /* Function to call any machine language subroutine. All registers in the
  * regs structure are passed into the routine and the results are passed
- * out. Some of the flags are ignored on input. The called routine must
- * end with an RTS.
- */   
+ * out. The B flag is ignored on input. The called routine must end with
+ * an RTS.
+ */
 void __fastcall__ _sys (struct regs* r);
 
 

@@ -327,6 +327,11 @@ int main (int argc, char* argv [])
 	       	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
 	       	    break;
 
+		case 'h':
+		case '?':
+	       	    OptHelp (Arg, 0);
+		    break;
+
 	       	case 'm':
 	       	    OptMapFile (Arg, GetArg (&I, 2));
 	       	    break;

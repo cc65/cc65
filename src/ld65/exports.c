@@ -554,21 +554,33 @@ static void CheckSymType (const Export* E)
     while (Imp) {
        	if (E->AddrSize != Imp->AddrSize) {
 	    /* Export is ZP, import is abs or the other way round */
+            const char* ExpAddrSize = AddrSizeToStr (E->AddrSize);
+            const char* ImpAddrSize = AddrSizeToStr (Imp->AddrSize);
+            const char* ExpObjName  = GetObjFileName (E->Obj);
+            const char* ImpObjName  = GetObjFileName (Imp->Obj);
 	    if (E->Obj) {
 	      	/* User defined export */
-       	       	Warning ("Address size mismatch for `%s', export in "
-			 "%s(%lu), import in %s(%lu)",
+       	       	Warning ("Address size mismatch for `%s': Exported from %s, "
+			 "%s(%lu) as `%s', import in %s, %s(%lu) as `%s'",
 			 GetString (E->Name),
+                         ExpObjName,
                          GetSourceFileName (E->Obj, E->Pos.Name),
     			 E->Pos.Line,
+                         ExpAddrSize,
+                         ImpObjName,
                          GetSourceFileName (Imp->Obj, Imp->Pos.Name),
-		   	 Imp->Pos.Line);
+		   	 Imp->Pos.Line,
+                         ImpAddrSize);
 	    } else {
 		/* Export created by the linker */
-		Warning ("Address size mismatch for `%s', imported from %s(%lu)",
+		Warning ("Address size mismatch for `%s': Symbol is `%s'"
+                         ", but imported from %s, %s(%lu) as `%s'",
 			 GetString (E->Name),
+                         ExpAddrSize,             
+                         ImpObjName,
                          GetSourceFileName (Imp->Obj, Imp->Pos.Name),
-			 Imp->Pos.Line);
+			 Imp->Pos.Line,
+                         ImpAddrSize);
 	    }
 	}
 	Imp = Imp->Next;

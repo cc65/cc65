@@ -38,7 +38,7 @@
 /* common */
 #include "check.h"
 #include "coll.h"
-#include "hashstr.h"
+#include "hashtab.h"
 #include "xmalloc.h"
 
 /* ca65 */
@@ -50,16 +50,40 @@
 
 
 /*****************************************************************************/
+/*                                 Forwards                                  */
+/*****************************************************************************/
+
+
+
+static unsigned GenHash (const void* Index);
+/* Generate the hash over an index. */
+
+static const void* GetIndex (void* Entry);
+/* Given a pointer to the user entry data, return a pointer to the index */
+
+static HashNode* GetHashNode (void* Entry);
+/* Given a pointer to the user entry data, return a pointer to the hash node */
+
+static int Compare (const void* Index1, const void* Index2);
+/* Compare two indices for equality */
+
+
+
+/*****************************************************************************/
 /*     	       	    		     Data			   	     */
 /*****************************************************************************/
 
 
 
+/* Number of entries in the table and the mask to generate the hash */
+#define HASHTAB_MASK    0x1F
+#define HASHTAB_COUNT   (HASHTAB_MASK + 1)
+
 /* An entry in the file table */
 typedef struct FileEntry FileEntry;
 struct FileEntry {
+    HashNode            Node;
     unsigned            Name;           /* File name */
-    FileEntry* 	      	Next;		/* Next in hash list */
     unsigned	      	Index;		/* Index of entry */
     unsigned long     	Size;		/* Size of file */
     unsigned long     	MTime;		/* Time of last modification */
@@ -68,10 +92,54 @@ struct FileEntry {
 /* Array of all entries, listed by index */
 static Collection FileTab = STATIC_COLLECTION_INITIALIZER;
 
+/* Hash table functions */
+static const HashFunctions HashFunc = {
+    GenHash,
+    GetIndex,
+    GetHashNode,
+    Compare
+};
+
 /* Hash table, hashed by name */
-#define HASHTAB_MASK    0x1FU
-#define HASHTAB_SIZE   	(HASHTAB_MASK + 1)
-static FileEntry*	HashTab[HASHTAB_SIZE];
+static HashTable HashTab = STATIC_HASHTABLE_INITIALIZER (HASHTAB_COUNT, &HashFunc);
+
+
+
+/*****************************************************************************/
+/*                           Hash table functions                            */
+/*****************************************************************************/
+
+
+
+static unsigned GenHash (const void* Index)
+/* Generate the hash over an index. */
+{
+    return (*(const unsigned*)Index & HASHTAB_MASK);
+}
+
+
+
+static const void* GetIndex (void* Entry)
+/* Given a pointer to the user entry data, return a pointer to the index */
+{
+    return &((FileEntry*) Entry)->Name;
+}
+
+
+
+static HashNode* GetHashNode (void* Entry)
+/* Given a pointer to the user entry data, return a pointer to the hash node */
+{
+    return &((FileEntry*) Entry)->Node;
+}
+
+
+
+static int Compare (const void* Index1, const void* Index2)
+/* Compare two indices for equality */
+{
+    return (*(const unsigned*)Index1 == *(const unsigned*)Index2);
+}
 
 
 
@@ -84,13 +152,11 @@ static FileEntry*	HashTab[HASHTAB_SIZE];
 static FileEntry* NewFileEntry (unsigned Name, unsigned long Size, unsigned long MTime)
 /* Create a new FileEntry, insert it into the tables and return it */
 {
-    /* Get the hash over the name */
-    unsigned Hash = (Name & HASHTAB_MASK);
-
     /* Allocate memory for the entry */
     FileEntry* F = xmalloc (sizeof (FileEntry));
 
     /* Initialize the fields */
+    InitHashNode (&F->Node, F);
     F->Name     = Name;
     F->Index  	= CollCount (&FileTab) + 1;     /* First file has index #1 */
     F->Size   	= Size;
@@ -100,8 +166,7 @@ static FileEntry* NewFileEntry (unsigned Name, unsigned long Size, unsigned long
     CollAppend (&FileTab, F);
 
     /* Insert the entry into the hash table */
-    F->Next = HashTab[Hash];
-    HashTab[Hash] = F;
+    HT_Insert (&HashTab, &F->Node);
 
     /* Return the new entry */
     return F;
@@ -139,24 +204,16 @@ unsigned GetFileIndex (const char* Name)
     /* Get the string pool index from the name */
     unsigned NameIdx = GetStringId (Name);
 
-    /* Get the hash over the name */
-    unsigned Hash = (NameIdx & HASHTAB_MASK);
+    /* Search in the hash table for the name */
+    FileEntry* F = HT_FindEntry (&HashTab, &NameIdx);
 
-    /* Search the linear hash list */
-    FileEntry* F = HashTab[Hash];
-    while (F) {
-	/* Is it this one? */
-       	if (NameIdx == F->Name) {
-	    /* Found, return the index */
-	    return F->Index;
-	}
-	/* No, check next */
-	F = F->Next;
+    /* If we don't have this index, print a diagnostic and use the main file */
+    if (F == 0) {
+        Error (ERR_FILENAME_NOT_FOUND, Name);
+        return 0;
+    } else {
+        return F->Index;
     }
-
-    /* Not found, use main file */
-    Error (ERR_FILENAME_NOT_FOUND, Name);
-    return 0;
 }
 
 

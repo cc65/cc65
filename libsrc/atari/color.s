@@ -6,28 +6,13 @@
 ; unsigned char __fastcall__ bordercolor (unsigned char color);
 ;
 
-
  	.export		_textcolor, _bgcolor, _bordercolor
+	.import		return0, return1
 
-	.include	"atari.inc"
+_textcolor	= return1
 
-_textcolor:
-	ldx	COLOR1	; get old value
- 	sta	COLOR1	; set new value
-	txa
-	rts
+_bgcolor 	= return0
 
+_bordercolor	= return0
 
-_bgcolor:
-	ldx	COLOR2	; get old value
-	sta	COLOR2	; set new value
-	txa
-	rts
-
-
-_bordercolor:
-	ldx	COLOR4	; get old value
-	sta	COLOR4	; set new value
-	txa
-	rts
 

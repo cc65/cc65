@@ -306,7 +306,8 @@ static void DoASCIIZ (void)
 	Len = strlen (SVal);
 
 	/* Translate into target charset and emit */
-       	EmitData ((unsigned char*) TgtTranslateBuf (SVal, Len), Len);
+	TgtTranslateBuf (SVal, Len);
+       	EmitData ((unsigned char*) SVal, Len);
 	NextTok ();
 	if (Tok == TOK_COMMA) {
 	    NextTok ();
@@ -342,7 +343,8 @@ static void DoByte (void)
 	if (Tok == TOK_STRCON) {
 	    /* A string, translate into target charset and emit */
 	    unsigned Len = strlen (SVal);
-	    EmitData ((unsigned char*) TgtTranslateBuf (SVal, Len), Len);
+	    TgtTranslateBuf (SVal, Len);
+	    EmitData ((unsigned char*) SVal, Len);
 	    NextTok ();
 	} else {
 	    EmitByte (Expression ());

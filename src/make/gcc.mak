@@ -12,6 +12,7 @@ SUBDIRS	=		\
 	ca65		\
 	cc65		\
 	cl65		\
+        co65            \
 	da65		\
 	grc		\
 	ld65		\

@@ -38,7 +38,8 @@ FILE *outCVT, *input;
 unsigned char *buffer;
 unsigned char vlirtabt[127];
 unsigned char vlirtabs[127];
-int i,j,lastarg;
+int i,j,lastarg;         
+unsigned l;
 int bytes;
 int blocks,rest;
 
@@ -66,7 +67,7 @@ int blocks,rest;
 	bytes = fread(buffer,1,1024,input);
 	fclose(input);
 	if (bytes!=508)
-		AbEnd("%s is not a cvt header\n",argv[i]);
+	   	AbEnd("%s is not a cvt header\n",argv[i]);
 
 	fwrite(buffer,1,bytes,outCVT);
 
@@ -75,9 +76,9 @@ int blocks,rest;
 	/* clear out things */
 	memset(buffer,0,512);
 	fwrite(buffer,1,254,outCVT);
-	for (j=0;j<sizeof(vlirtabt)/sizeof(vlirtabt[0]);j++) {
-		vlirtabt[j]=0;
-		vlirtabs[j]=0;
+	for (l=0;l<sizeof(vlirtabt)/sizeof(vlirtabt[0]);l++) {
+	   	vlirtabt[l]=0;
+	   	vlirtabs[l]=0;
 	}
 
 	/* scan arguments for the last one that is not blank or nonexistant */
@@ -133,9 +134,9 @@ int blocks,rest;
 
 	fflush(outCVT);
 	fseek(outCVT,508,SEEK_SET);
-	for (i=0;i<sizeof(vlirtabt)/sizeof(vlirtabt[0]);i++) {
-		fputc(vlirtabt[i],outCVT);
-		fputc(vlirtabs[i],outCVT);
+	for (l=0;l<sizeof(vlirtabt)/sizeof(vlirtabt[0]);l++) {
+		fputc(vlirtabt[l],outCVT);
+		fputc(vlirtabs[l],outCVT);
 	}
 	fclose(outCVT);
 	exit(EXIT_SUCCESS);

@@ -13,9 +13,8 @@ _tgi_done:
         beq     @L1                     ; Jump if not
         jsr     tgi_done                ; Call the driver routine
         jsr     tgi_fetch_error         ; Get the error code
-        lda     _tgi_error              ; Did we have an error?
-        bne     @L1                     ; Jump if yes
-        sta     _tgi_mode               ; Reset the current mode
+        bne     @L1                     ; Jump if we had an error
+        sta     _tgi_mode               ; Reset the current mode (A = 0)
 @L1:    rts
 
 

@@ -14,11 +14,12 @@
 _tgi_init:
         pha                             ; Save mode
         jsr     _tgi_done               ; Switch off graphics if needed
-        jsr     tgi_init                ; Initialize the mode
+        pla
+        sta     _tgi_mode               ; Remember the mode
+        jsr     tgi_init                ; Go into graphics mode
         jsr     tgi_fetch_error         ; Get the error code
-        pla                             ; Restore the mode
-        ldx     _tgi_error              ; Did we have an error before?
-        bne     @L1                     ; Jump if yes
-        sta     _tgi_mode               ; Set the current mode if not
+        beq     @L1                     ; Jump if no error
+        lda     #$00
+        sta     _tgi_mode               ; Clear the mode if init was not successful
 @L1:    rts
 

@@ -6,6 +6,7 @@
 
         .include        "tgi-kernel.inc"
 
+        .export         _tgi_setup
         .importzp       ptr1
 
 
@@ -20,13 +21,13 @@ _tgi_mode:      .res    1               ; Graphics mode or zero
 
 
 .data
-                         
+
 ; Jump table for the driver functions.
 
 tgi_install:	jmp	$0000
 tgi_deinstall:	jmp	$0000
 tgi_init:       jmp	$0000
-tgi_post:       jmp	$0000
+tgi_done:       jmp	$0000
 tgi_control:    jmp	$0000
 tgi_clear:      jmp     $0000
 tgi_setcolor:   jmp     $0000
@@ -38,27 +39,29 @@ tgi_circle:     jmp     $0000
 
 
 ;----------------------------------------------------------------------------
-; Setup the TGI driver once it is loaded.
+; void __fastcall__ tgi_setup (void);
+; /* Setup the driver and graphics kernel once the driver is loaded */
 
-tgi_setup:
-	lda	_tgi_drv
-	sta	ptr1
-	lda	_tgi_drv+1
-	sta	ptr1+1
 
-        ldy     #TGI_HDR_JUMPTAB
-        ldx     #1
-
-@L1:    lda     (ptr1),y
+copy:   lda     (ptr1),y
         sta     tgi_install,x
         iny
         inx
-        lda     (ptr1),y
-        sta     tgi_install,x
-        inx
+        rts
+
+
+_tgi_setup:
+ 	jsr     tgi_set_ptr
+
+        ldy     #TGI_HDR_JUMPTAB
+        ldx     #0
+
+@L1:    inx                             ; Skip JMP opcode
+        jsr     copy                    ; Copy one byte
+        jsr     copy                    ; Copy one byte
         cpx     #(TGI_HDR_JUMPCOUNT*3)
         bne     @L1
-                
+
 ; Initialize variables
 
         lda     #$00
@@ -71,7 +74,8 @@ tgi_setup:
 
 ;----------------------------------------------------------------------------
 ; Fetch the error code from the driver and place it into the global error
-; variable.
+; variable. The function will also return the error in A and the flags from
+; loading the error code are set.
 
 tgi_fetch_error:
         jsr     tgi_set_ptr

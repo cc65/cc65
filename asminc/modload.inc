@@ -59,8 +59,10 @@ MODCTRL_SIZE            =      10       ; Total size of struct
 ;  */
 .global         _mod_load
 
-; void mod_free (struct mod_ctrl* ctrl);
-; /* Free a loaded module. */
+; void mod_free (void* module);
+; /* Free a loaded module. Note: The given pointer is the pointer to the
+;  * module memory, not a pointer to a control structure.
+;  */
 .global		_mod_free
 
 

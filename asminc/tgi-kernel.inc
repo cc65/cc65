@@ -89,5 +89,4 @@ TGI_HDR_JUMPCOUNT       = 12            ; Number of jump vectors
 
         .global tgi_fetch_error
         .global tgi_set_ptr
-        .global tgi_setup
 

@@ -81,7 +81,7 @@ atmoslib:
 # C64
 
 c64lib:
-	for i in c64 cbm common runtime conio dbg; do \
+	for i in c64 cbm common runtime conio dbg tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
@@ -89,7 +89,7 @@ c64lib:
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv c64/crt0.o c64.o
-	for i in c64 cbm common runtime conio dbg; do \
+	for i in c64 cbm common runtime conio dbg tgi; do \
 	    $(AR) a c64.lib $$i/*.o;\
 	done
 

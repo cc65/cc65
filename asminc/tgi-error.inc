@@ -34,10 +34,11 @@
 
 
 ; Error constants
-TGI_ERR_OK              = 0       ; No error
-TGI_ERR_NO_DRIVER       = 1       ; No driver available
-TGI_ERR_LOAD_ERROR      = 2       ; Error loading driver
-TGI_ERR_INV_MODE        = 3       ; Mode not supported by driver
+TGI_ERR_OK              = 0     ; No error
+TGI_ERR_NO_DRIVER       = 1     ; No driver available
+TGI_ERR_LOAD_ERROR      = 2     ; Error loading driver
+TGI_ERR_INV_DRIVER      = 3     ; Invalid driver
+TGI_ERR_INV_MODE        = 4     ; Mode not supported by driver
 
 
 

@@ -46,8 +46,9 @@
 
 #define TGI_ERR_OK              0       /* No error */
 #define TGI_ERR_NO_DRIVER       1       /* No driver available */
-#define TGI_ERR_LOAD_ERROR      2       /* Error loading driver */
-#define TGI_ERR_INV_MODE        3       /* Mode not supported by driver */
+#define TGI_ERR_CANNOT_LOAD     2       /* Error loading driver */
+#define TGI_ERR_INV_DRIVER      3       /* Invalid driver */
+#define TGI_ERR_INV_MODE        4       /* Mode not supported by driver */
 
 
 

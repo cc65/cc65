@@ -1,5 +1,5 @@
 #
-# makefile for the TGI graphics kernel
+# Makefile for the TGI graphics kernel
 #
 
 .SUFFIXES: .o .s .c
@@ -11,7 +11,7 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-C_OBJS =
+C_OBJS =        tgi_load.o
 
 S_OBJS =	tgi-kernel.o	\
                 tgi_bar.o       \

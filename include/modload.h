@@ -75,8 +75,10 @@ unsigned char mod_load (struct mod_ctrl* ctrl);
  * loaded.
  */
 
-void mod_free (struct mod_ctrl* ctrl);
-/* Free a loaded module. */
+void mod_free (void* module);
+/* Free a loaded module. Note: The given pointer is the pointer to the
+ * module memory, not a pointer to a control structure. 
+ */
 
 
 

@@ -1,26 +1,24 @@
 ;
-; Ullrich von Bassewitz, 25.10.2000
+; Piotr Fusik, 24.10.2003
+; originally by Ullrich von Bassewitz
 ;
 ; CC65 runtime: Decrement the stackpointer by value in y
 ;
 
-       	.export	  	subysp
-	.importzp	sp, tmp1
+	.export		subysp
+	.importzp	sp
 
 .proc	subysp
 
-       	sty    	tmp1		; Save the value
-	lda	sp    		; Get lo byte
+	tya
+	eor	#$ff
 	sec
-	sbc	tmp1   	       	; Subtract y value
-	sta	sp  	  	; Put result back
+	adc	sp
+	sta	sp
 	bcs	@L1
 	dec	sp+1
-@L1:   	rts			; Done
+@L1:	rts
 
 .endproc
-
-
-
 
 

@@ -1247,7 +1247,9 @@ static void DoSegment (void)
 	"FAR", "LONG"
     };
     char Name [sizeof (SVal)];
-    SegDef Def = { Name, SEGTYPE_DEFAULT };
+    SegDef Def;
+    Def.Name = Name;
+    Def.Type = SEGTYPE_DEFAULT;
 
     if (Tok != TOK_STRCON) {
 	ErrorSkip (ERR_STRCON_EXPECTED);

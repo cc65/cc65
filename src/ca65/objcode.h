@@ -56,12 +56,12 @@
 extern int 	RelocMode;
 
 /* Definitions for predefined segments */
-SegDef NullSegDef;
-SegDef ZeropageSegDef;
-SegDef DataSegDef;
-SegDef BssSegDef;
-SegDef RODataSegDef;
-SegDef CodeSegDef;
+extern SegDef NullSegDef;
+extern SegDef ZeropageSegDef;
+extern SegDef DataSegDef;
+extern SegDef BssSegDef;
+extern SegDef RODataSegDef;
+extern SegDef CodeSegDef;
 
 
 

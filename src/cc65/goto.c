@@ -80,7 +80,7 @@ void DoLabel (void)
     SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_DEF);
 
     /* Emit the jump label */
-    g_defloclabel (Entry->V.Label);
+    g_defcodelabel (Entry->V.Label);
 
     /* Eat the ident and colon */
     NextToken ();

@@ -95,11 +95,8 @@ CodeSeg* PopCodeSeg (void);
 void AddCodeSegLine (CodeSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
 /* Add a line to the given code segment */
 
-void AddExtCodeLabel (CodeSeg* S, const char* Name);
-/* Add an external code label for the next instruction to follow */
-
-void AddLocCodeLabel (CodeSeg* S, const char* Name);
-/* Add a local code label for the next instruction to follow */
+void AddCodeLabel (CodeSeg* S, const char* Name);
+/* Add a code label for the next instruction to follow */
 
 void AddCodeSegHint (CodeSeg* S, unsigned Hint);
 /* Add a hint for the preceeding instruction */

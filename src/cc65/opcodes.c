@@ -91,7 +91,7 @@ static const OPCDesc OPCTable[OPC_COUNT] = {
     { "jmp", OPC_JMP, 3, CI_BRA        	       	},
     { "jne", OPC_JNE, 5, CI_BRA		  	},
     { "jpl", OPC_JPL, 5, CI_BRA		  	},
-    { "jsr", OPC_JSR, 3, CI_BRA	 		},
+    { "jsr", OPC_JSR, 3, CI_NONE		},
     { "jvc", OPC_JVC, 5, CI_BRA		  	},
     { "jvs", OPC_JVS, 5, CI_BRA		  	},
     { "lda", OPC_LDA, 0, CI_CHG_A      	       	},

@@ -270,18 +270,25 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
     }
 
     /* If the instruction is a branch, check for the label and generate it
-     * if it does not exist.
+     * if it does not exist. In case of a PC relative branch (*+x) we will
+     * not generate a label, because the target label will not be defined.
      */
     Label = 0;
-    if ((OPC->Info & CI_MASK_BRA) == CI_BRA) {
+    if ((OPC->Info & CI_MASK_BRA) == CI_BRA && Expr[0] != '*') {
 
 	unsigned Hash;
 
-	/* ### Check for local labels here */
+	/* Addressing mode must be alsobute or something is really wrong */
 	CHECK (AM == AM_ABS);
+
+	/* Addressing mode is a branch/jump */
 	AM = AM_BRA;
+
+	/* Generate the hash over the label, then search for the label */
 	Hash = HashStr (Expr) % CS_LABEL_HASH_SIZE;
 	Label = FindCodeLabel (S, Expr, Hash);
+
+	/* If we don't have the label, it's a forward ref - create it */
 	if (Label == 0) {
 	    /* Generate a new label */
 	    Label = NewCodeSegLabel (S, Expr, Hash);
@@ -461,7 +468,7 @@ void AddCodeSegLine (CodeSeg* S, const char* Format, ...)
 
 
 
-CodeLabel* AddCodeLabel (CodeSeg* S, const char* Name)
+void AddCodeLabel (CodeSeg* S, const char* Name)
 /* Add a code label for the next instruction to follow */
 {
     /* Calculate the hash from the name */
@@ -481,30 +488,6 @@ CodeLabel* AddCodeLabel (CodeSeg* S, const char* Name)
 
     /* We do now have a valid label. Remember it for later */
     CollAppend (&S->Labels, L);
-
-    /* Return the label */
-    return L;
-}
-
-
-
-void AddExtCodeLabel (CodeSeg* S, const char* Name)
-/* Add an external code label for the next instruction to follow */
-{
-    /* Add the code label */
-    CodeLabel* L = AddCodeLabel (S, Name);
-
-    /* Mark it as external label */
-    L->Flags |= LF_EXT;
-}
-
-
-
-void AddLocCodeLabel (CodeSeg* S, const char* Name)
-/* Add a local code label for the next instruction to follow */
-{
-    /* Add the code label */
-    AddCodeLabel (S, Name);
 }
 
 
@@ -630,11 +613,7 @@ void MergeCodeLabels (CodeSeg* S)
     	    continue;
     	}
 
-    	/* We have at least one label. Use the first one as reference label.
-    	 * We don't have a notification for global labels for now, and using
-    	 * the first one will also keep the global function labels, since these
-    	 * are inserted at position 0.
-    	 */
+    	/* We have at least one label. Use the first one as reference label. */
     	RefLab = CollAt (&E->Labels, 0);
 
     	/* Walk through the remaining labels and change references to these
@@ -663,29 +642,21 @@ void MergeCodeLabels (CodeSeg* S)
 
     	    }
 
-    	    /* If the label is not an external label, we may remove the
-	     * label completely.
-	     */
-#if 0
-     	    if ((L->Flags & LF_EXT) == 0) {
-     		FreeCodeLabel (L);
-     		CollDelete (&E->Labels, J);
-     	    }
-#endif
+       	    /* Remove the label completely. */
+	    FreeCodeLabel (L);
+     	    CollDelete (&E->Labels, J);
      	}
 
-    	/* The reference label is the only remaining label. If it is not an
-	 * external label, check if there are any references to this label,
-	 * and delete it if this is not the case.
+    	/* The reference label is the only remaining label. Check if there
+	 * are any references to this label, and delete it if this is not
+	 * the case.
 	 */
-#if 0
-     	if ((RefLab->Flags & LF_EXT) == 0 && CollCount (&RefLab->JumpFrom) == 0) {
+       	if (CollCount (&RefLab->JumpFrom) == 0) {
      	    /* Delete the label */
      	    FreeCodeLabel (RefLab);
      	    /* Remove it from the list */
      	    CollDelete (&E->Labels, 0);
      	}
-#endif
     }
 }
 

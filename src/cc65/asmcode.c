@@ -33,6 +33,9 @@
 
 
 
+/* common */
+#include "check.h"
+
 /* b6502 */
 #include "codeseg.h"
 #include "dataseg.h"
@@ -94,22 +97,23 @@ void WriteOutput (FILE* F)
     SymTable* SymTab;
     SymEntry* Entry;
 
-    /* Output the global code and data segments */
-    MergeCodeLabels (CS);
+    /* Output the data segment (the global code segment should be empty) */
     OutputDataSeg (F, DS);
-    OutputCodeSeg (F, CS);
+    CHECK (GetCodeSegEntries (CS) == 0);
 
     /* Output all global or referenced functions */
     SymTab = GetGlobalSymTab ();
     Entry  = SymTab->SymHead;
     while (Entry) {
-       	if (IsTypeFunc (Entry->Type) 		&&
-	    (Entry->Flags & SC_DEF) != 0	&&
+       	if (IsTypeFunc (Entry->Type) 	  	&&
+	    (Entry->Flags & SC_DEF) != 0  	&&
 	    (Entry->Flags & (SC_REF | SC_EXTERN)) != 0) {
 	    /* Function which is defined and referenced or extern */
 	    PrintFunctionHeader (F, Entry);
 	    MergeCodeLabels (Entry->V.F.CS);
+	    fprintf (F, "; Data segment for function %s:\n", Entry->Name);
 	    OutputDataSeg (F, Entry->V.F.DS);
+	    fprintf (F, "; Code segment for function %s:\n", Entry->Name);
 	    OutputCodeSeg (F, Entry->V.F.CS);
      	}
 	Entry = Entry->NextSym;

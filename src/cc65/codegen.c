@@ -107,7 +107,7 @@ static char* GetLabelName (unsigned flags, unsigned long label, unsigned offs)
 
 	case CF_STATIC:
        	    /* Static memory cell */
-	    sprintf (lbuf, "L%04X+%u", (unsigned)(label & 0xFFFF), offs);
+	    sprintf (lbuf, "%s+%u", LocalLabelName (label), offs);
 	    break;
 
 	case CF_EXTERNAL:
@@ -214,14 +214,6 @@ void g_popseg (void)
 {
     PopCodeSeg ();
     PopDataSeg ();
-}
-
-
-
-void g_usecode (void)
-/* Switch to the code segment */
-{
-    UseSeg (SEG_CODE);
 }
 
 
@@ -379,20 +371,24 @@ static unsigned MakeByteOffs (unsigned Flags, unsigned Offs)
 
 
 
-void g_defloclabel (unsigned label)
-/* Define a local label */
+void g_defcodelabel (unsigned label)
+/* Define a local code label */
 {
-    if (CurSeg == SEG_CODE) {
-     	AddLocCodeLabel (CS, LocalLabelName (label));
-    } else {
-     	AddDataSegLine (DS, "%s:", LocalLabelName (label));
-    }
+    AddCodeLabel (CS, LocalLabelName (label));
+}
+
+
+
+void g_defdatalabel (unsigned label)
+/* Define a local data label */
+{
+    AddDataSegLine (DS, "%s:", LocalLabelName (label));
 }
 
 
 
 /*****************************************************************************/
-/*   	     	       Functions handling global labels			     */
+/*     	     	       Functions handling global labels			     */
 /*****************************************************************************/
 
 
@@ -400,14 +396,8 @@ void g_defloclabel (unsigned label)
 void g_defgloblabel (const char* Name)
 /* Define a global label with the given name */
 {
-    if (CurSeg == SEG_CODE) {
-	/* ##### */
-	char Buf[64];
-	xsprintf (Buf, sizeof (Buf), "_%s", Name);
-       	AddExtCodeLabel (CS, Buf);
-    } else {
-       	AddDataSegLine (DS, "_%s:", Name);
-    }
+    /* Global labels are always data labels */
+    AddDataSegLine (DS, "_%s:", Name);
 }
 
 
@@ -597,12 +587,12 @@ void g_save_regvars (int RegOffs, unsigned Bytes)
      	g_space (Bytes);
      	ldyconst (Bytes - 1);
      	ldxconst (Bytes);
-     	g_defloclabel (Label);
+     	g_defcodelabel (Label);
 	AddCodeSegLine (CS, "lda regbank%+d,x", RegOffs-1);
 	AddCodeSegLine (CS, "sta (sp),y");
      	AddCodeSegLine (CS, "dey");
      	AddCodeSegLine (CS, "dex");
-     	AddCodeSegLine (CS, "bne L%04X", Label);
+     	AddCodeSegLine (CS, "bne %s", LocalLabelName (Label));
 
     }
 
@@ -641,12 +631,12 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
      	unsigned Label = GetLocalLabel ();
      	ldyconst (StackOffs+Bytes-1);
      	ldxconst (Bytes);
-     	g_defloclabel (Label);
+     	g_defcodelabel (Label);
 	AddCodeSegLine (CS, "lda (sp),y");
 	AddCodeSegLine (CS, "sta regbank%+d,x", RegOffs-1);
 	AddCodeSegLine (CS, "dey");
 	AddCodeSegLine (CS, "dex");
-	AddCodeSegLine (CS, "bne L%04X", Label);
+	AddCodeSegLine (CS, "bne %s", LocalLabelName (Label));
 
     }
 }
@@ -1706,11 +1696,11 @@ void g_addeqstatic (unsigned flags, unsigned long label, unsigned offs,
        	case CF_INT:
        	    if (flags & CF_CONST) {
      		if (val == 1) {
-     		    label = GetLocalLabel ();
+     		    unsigned L = GetLocalLabel ();
      		    AddCodeSegLine (CS, "inc %s", lbuf);
-     		    AddCodeSegLine (CS, "bne L%04X", (int)label);
+     		    AddCodeSegLine (CS, "bne %s", LocalLabelName (L));
      		    AddCodeSegLine (CS, "inc %s+1", lbuf);
-     		    g_defloclabel (label);
+     		    g_defcodelabel (L);
      		    AddCodeSegLine (CS, "lda %s", lbuf);  		/* Hmmm... */
      		    AddCodeSegLine (CS, "ldx %s+1", lbuf);
      		} else {
@@ -1719,10 +1709,10 @@ void g_addeqstatic (unsigned flags, unsigned long label, unsigned offs,
      		    AddCodeSegLine (CS, "adc %s", lbuf);
      		    AddCodeSegLine (CS, "sta %s", lbuf);
      		    if (val < 0x100) {
-     		       	label = GetLocalLabel ();
-     		       	AddCodeSegLine (CS, "bcc L%04X", (int)label);
+     		       	unsigned L = GetLocalLabel ();
+     		       	AddCodeSegLine (CS, "bcc %s", LocalLabelName (L));
      		       	AddCodeSegLine (CS, "inc %s+1", lbuf);
-       		       	g_defloclabel (label);
+       		       	g_defcodelabel (L);
      		       	AddCodeSegLine (CS, "ldx %s+1", lbuf);
      		    } else {
        	       	       	AddCodeSegLine (CS, "lda #$%02X", (unsigned char)(val >> 8));
@@ -1967,10 +1957,10 @@ void g_subeqstatic (unsigned flags, unsigned long label, unsigned offs,
 	  	AddCodeSegLine (CS, "sbc #$%02X", (unsigned char)val);
 	  	AddCodeSegLine (CS, "sta %s", lbuf);
 	   	if (val < 0x100) {
-	  	    label = GetLocalLabel ();
-	  	    AddCodeSegLine (CS, "bcs L%04X", (unsigned)label);
+	  	    unsigned L = GetLocalLabel ();
+	  	    AddCodeSegLine (CS, "bcs %s", LocalLabelName (L));
 		    AddCodeSegLine (CS, "dec %s+1", lbuf);
-		    g_defloclabel (label);
+		    g_defcodelabel (L);
 		    AddCodeSegLine (CS, "ldx %s+1", lbuf);
 		} else {
 		    AddCodeSegLine (CS, "lda %s+1", lbuf);
@@ -2243,7 +2233,7 @@ void g_save (unsigned flags)
 
 
 void g_restore (unsigned flags)
-/* Copy hold register to P. */
+/* Copy hold register to primary. */
 {
     /* Check the size and determine operation */
     switch (flags & CF_TYPE) {
@@ -2360,7 +2350,7 @@ static void oper (unsigned flags, unsigned long val, char** subs)
 
 
 void g_test (unsigned flags)
-/* Force a test to set cond codes right */
+/* Test the value in the primary and set the condition codes */
 {
     switch (flags & CF_TYPE) {
 
@@ -2519,7 +2509,7 @@ void g_callind (unsigned Flags, unsigned ArgSize)
 void g_jump (unsigned Label)
 /* Jump to specified internal label number */
 {
-    AddCodeSegLine (CS, "jmp L%04X", Label);
+    AddCodeSegLine (CS, "jmp %s", LocalLabelName (Label));
 }
 
 
@@ -2553,14 +2543,14 @@ void g_case (unsigned flags, unsigned label, unsigned long val)
 
      	case CF_CHAR:
     	case CF_INT:
-    	    AddCodeSegLine (CS, ".word $%04X, L%04X",
+    	    AddCodeSegLine (CS, ".word $%04X, %s",
 			 (unsigned)(val & 0xFFFF),
-			 (unsigned)(label & 0xFFFF));
+			 LocalLabelName (label));
        	    break;
 
     	case CF_LONG:
 	    AddCodeSegLine (CS, ".dword $%08lX", val);
-	    AddCodeSegLine (CS, ".word L%04X", label & 0xFFFF);
+	    AddCodeSegLine (CS, ".word %s", LocalLabelName (label));
     	    break;
 
     	default:
@@ -2574,11 +2564,7 @@ void g_case (unsigned flags, unsigned label, unsigned long val)
 void g_truejump (unsigned flags, unsigned label)
 /* Jump to label if zero flag clear */
 {
-    if (flags & CF_SHORT) {
-	AddCodeSegLine (CS, "bne L%04X", label);
-    } else {
-        AddCodeSegLine (CS, "jne L%04X", label);
-    }
+    AddCodeSegLine (CS, "jne %s", LocalLabelName (label));
 }
 
 
@@ -2586,11 +2572,7 @@ void g_truejump (unsigned flags, unsigned label)
 void g_falsejump (unsigned flags, unsigned label)
 /* Jump to label if zero flag set */
 {
-    if (flags & CF_SHORT) {
-    	AddCodeSegLine (CS, "beq L%04X", label);
-    } else {
-       	AddCodeSegLine (CS, "jeq L%04X", label);
-    }
+    AddCodeSegLine (CS, "jeq %s", LocalLabelName (label));
 }
 
 
@@ -3970,10 +3952,10 @@ void g_strlen (unsigned flags, unsigned long val, unsigned offs)
 
 	/* Generate the strlen code */
 	AddCodeSegLine (CS, "ldy #$FF");
-	g_defloclabel (label);
+	g_defcodelabel (label);
 	AddCodeSegLine (CS, "iny");
 	AddCodeSegLine (CS, "lda %s,y", lbuf);
-	AddCodeSegLine (CS, "bne L%04X", label);
+	AddCodeSegLine (CS, "bne %s", LocalLabelName (label));
        	AddCodeSegLine (CS, "tax");
 	AddCodeSegLine (CS, "tya");
 
@@ -3988,10 +3970,10 @@ void g_strlen (unsigned flags, unsigned long val, unsigned offs)
 	    AddCodeSegLine (CS, "sta ptr1");
 	    AddCodeSegLine (CS, "stx ptr1+1");
 	    AddCodeSegLine (CS, "ldy #$FF");
-	    g_defloclabel (label);
+	    g_defcodelabel (label);
 	    AddCodeSegLine (CS, "iny");
 	    AddCodeSegLine (CS, "lda (ptr1),y");
-	    AddCodeSegLine (CS, "bne L%04X", label);
+	    AddCodeSegLine (CS, "bne %s", LocalLabelName (label));
        	    AddCodeSegLine (CS, "tax");
 	    AddCodeSegLine (CS, "tya");
      	}

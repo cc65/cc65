@@ -190,9 +190,6 @@ void AllocLocalSpace (Function* F)
 {
     if (F->Reserved > 0) {
 
-	/* Switch to the code segment */
-	g_usecode ();
-
 	/* Create space on the stack */
 	g_space (F->Reserved);
 
@@ -317,7 +314,7 @@ void NewFunc (SymEntry* Func)
 #endif
 
     /* Output the function exit code label */
-    g_defloclabel (GetRetLab (CurrentFunc));
+    g_defcodelabel (GetRetLab (CurrentFunc));
 
     /* Restore the register variables */
     RestoreRegVars (!IsVoidFunc);

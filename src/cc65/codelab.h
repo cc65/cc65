@@ -53,7 +53,6 @@
 
 /* Label flags, bitmapped */
 #define LF_DEF		0x0001U		/* Label was defined */
-#define LF_EXT		0x0002U		/* Label is external */
 
 /* Label structure */
 typedef struct CodeLabel CodeLabel;

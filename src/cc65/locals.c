@@ -185,9 +185,6 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		    /* Allocate previously reserved local space */
 		    AllocLocalSpace (CurrentFunc);
 
-		    /* Switch to the code segment. */
-		    g_usecode ();
-
 		    /* Skip the '=' */
 		    NextToken ();
 
@@ -230,7 +227,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
 		/* Define the variable label */
 		SymData = GetLocalLabel ();
-		g_defloclabel (SymData);
+		g_defdatalabel (SymData);
 
 		/* Reserve space for the data */
 		g_res (Size);
@@ -239,9 +236,6 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		if (curtok == TOK_ASSIGN) {
 
 		    struct expent lval;
-
-		    /* Switch to the code segment. */
-		    g_usecode ();
 
 		    /* Skip the '=' */
 		    NextToken ();
@@ -280,7 +274,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
 	      	/* Define the variable label */
 	      	SymData = GetLocalLabel ();
-	      	g_defloclabel (SymData);
+	      	g_defdatalabel (SymData);
 
 	      	/* Skip the '=' */
 	      	NextToken ();
@@ -298,7 +292,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
 		/* Define the variable label */
 		SymData = GetLocalLabel ();
-		g_defloclabel (SymData);
+		g_defdatalabel (SymData);
 
 		/* Reserve space for the data */
 		g_res (Size);
@@ -370,9 +364,6 @@ void DeclareLocals (void)
 
     /* Be sure to allocate any reserved space for locals */
     AllocLocalSpace (CurrentFunc);
-
-    /* In case we switched away from code segment, switch back now */
-    g_usecode ();
 
     /* In case we've allocated local variables in this block, emit a call to
      * the stack checking routine if stack checks are enabled.

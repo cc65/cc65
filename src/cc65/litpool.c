@@ -103,16 +103,13 @@ void DumpLiteralPool (void)
     }
 
     /* Define the label */
-    g_defloclabel (LiteralPoolLabel);
+    g_defdatalabel (LiteralPoolLabel);
 
     /* Translate the buffer contents into the target charset */
     TranslateLiteralPool (0);
 
     /* Output the buffer data */
     g_defbytes (LiteralPoolBuf, LiteralPoolOffs);
-
-    /* Switch back to the code segment */
-    g_usecode ();
 }
 
 

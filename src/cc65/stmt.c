@@ -71,7 +71,7 @@ static int doif (void)
     /* Else clause present? */
     if (curtok != TOK_ELSE) {
 
-      	g_defloclabel (flab1);
+      	g_defcodelabel (flab1);
      	/* Since there's no else clause, we're not sure, if the a break
      	 * statement is really executed.
      	 */
@@ -93,12 +93,12 @@ static int doif (void)
      	    /* Mark the label as unused */
      	    flab2 = 0;
      	}
-     	g_defloclabel (flab1);
+     	g_defcodelabel (flab1);
      	gotbreak &= Statement ();
 
      	/* Generate the label for the else clause */
      	if (flab2) {
-     	    g_defloclabel (flab2);
+     	    g_defcodelabel (flab2);
      	}
 
      	/* Done */
@@ -118,7 +118,7 @@ static void dowhile (char wtype)
     loop = GetLocalLabel ();
     lab = GetLocalLabel ();
     AddLoop (oursp, loop, lab, 0, 0);
-    g_defloclabel (loop);
+    g_defcodelabel (loop);
     if (wtype == 'w') {
 
 	/* While loop */
@@ -139,7 +139,7 @@ static void dowhile (char wtype)
 	    /* There is code inside the while loop */
 	    Statement ();
 	    g_jump (loop);
-	    g_defloclabel (lab);
+	    g_defcodelabel (lab);
      	}
 
     } else {
@@ -149,7 +149,7 @@ static void dowhile (char wtype)
 	Consume (TOK_WHILE, "`while' expected");
     	test (loop, 1);
     	ConsumeSemi ();
-	g_defloclabel (lab);
+	g_defcodelabel (lab);
 
     }
     DelLoop ();
@@ -297,7 +297,7 @@ static void cascadeswitch (struct expent* eval)
 
 	    /* If we have a cascade label, emit it */
 	    if (NextLab) {
-		g_defloclabel (NextLab);
+		g_defcodelabel (NextLab);
 		NextLab = 0;
 	    }
 
@@ -400,7 +400,7 @@ static void cascadeswitch (struct expent* eval)
 
 	/* Emit a code label if we have one */
 	if (CodeLab) {
-	    g_defloclabel (CodeLab);
+	    g_defcodelabel (CodeLab);
 	    CodeLab = 0;
 	}
 
@@ -422,9 +422,9 @@ static void cascadeswitch (struct expent* eval)
      * one, too.
      */
     if (NextLab) {
-	g_defloclabel (NextLab);
+	g_defcodelabel (NextLab);
     }
-    g_defloclabel (ExitLab);
+    g_defcodelabel (ExitLab);
 
     /* End the loop */
     DelLoop ();
@@ -491,7 +491,7 @@ static void tableswitch (struct expent* eval)
     	    	}
     	    	ConsumeColon ();
     	    } while (curtok == TOK_CASE || curtok == TOK_DEFAULT);
-    	    g_defloclabel (label);
+    	    g_defcodelabel (label);
 	    HaveBreak = 0;
     	}
     	if (curtok != TOK_RCURLY) {
@@ -513,7 +513,7 @@ static void tableswitch (struct expent* eval)
     }
 
     /* Actual selector code goes here */
-    g_defloclabel (lcase);
+    g_defcodelabel (lcase);
 
     /* Create the call to the switch subroutine */
     Flags = TypeOf (eval->e_tptr);
@@ -534,7 +534,7 @@ static void tableswitch (struct expent* eval)
     if (dlabel) {
        	g_jump (dlabel);
     }
-    g_defloclabel (lab);
+    g_defcodelabel (lab);
     DelLoop ();
 
     /* Free the allocated space for the labels */
@@ -591,7 +591,7 @@ static void dofor (void)
 	expression (&lval1);
     }
     ConsumeSemi ();
-    g_defloclabel (loop);
+    g_defcodelabel (loop);
     if (curtok != TOK_SEMI) { 	/* exp2 */
 	boolexpr (&lval2);
 	g_truejump (CF_NONE, lstat);
@@ -600,16 +600,16 @@ static void dofor (void)
 	g_jump (lstat);
     }
     ConsumeSemi ();
-    g_defloclabel (linc);
+    g_defcodelabel (linc);
     if (curtok != TOK_RPAREN) {	/* exp3 */
     	expression (&lval3);
     }
     ConsumeRParen ();
     g_jump (loop);
-    g_defloclabel (lstat);
+    g_defcodelabel (lstat);
     Statement ();
     g_jump (linc);
-    g_defloclabel (lab);
+    g_defcodelabel (lab);
     DelLoop ();
 }
 

@@ -75,7 +75,6 @@ struct DataSeg;
 #define CF_TEST	       	0x0080 	/* Test value */
 #define CF_FIXARGC     	0x0100 	/* Function has fixed arg count */
 #define CF_FORCECHAR	0x0200	/* Handle chars as chars, not ints */
-#define CF_SHORT	0x0400	/* Use short addressing */
 #define CF_REG		0x0800	/* Value is in primary register */
 
 /* Type of static address */
@@ -116,9 +115,6 @@ void g_pushseg (struct CodeSeg** CS, struct DataSeg** DS, const char* FuncName);
 void g_popseg (void);
 /* Restore the old segments */
 
-void g_usecode (void);
-/* Switch to the code segment */
-
 void g_userodata (void);
 /* Switch to the read only data segment */
 
@@ -148,8 +144,11 @@ void g_bssname (const char* Name);
 
 
 
-void g_defloclabel (unsigned label);
-/* Define a local label */
+void g_defcodelabel (unsigned label);
+/* Define a local code label */
+
+void g_defdatalabel (unsigned label);
+/* Define a local data label */
 
 
 
@@ -376,7 +375,10 @@ void g_addaddr_static (unsigned flags, unsigned long label, unsigned offs);
 
 
 void g_save (unsigned flags);
+/* Copy primary register to hold register. */
+
 void g_restore (unsigned flags);
+/* Copy hold register to primary. */
 
 void g_cmp (unsigned flags, unsigned long val);
 /* Immidiate compare. The primary register will not be changed, Z flag
@@ -384,8 +386,15 @@ void g_cmp (unsigned flags, unsigned long val);
  */
 
 void g_test (unsigned flags);
+/* Test the value in the primary and set the condition codes */
+
 void g_push (unsigned flags, unsigned long val);
+/* Push the primary register or a constant value onto the stack */
+
 void g_swap (unsigned flags);
+/* Swap the primary register and the top of the stack. flags give the type
+ * of *both* values (must have same size).
+ */
 
 void g_call (unsigned Flags, const char* Label, unsigned ArgSize);
 /* Call the specified subroutine name */

@@ -2450,7 +2450,7 @@ static int hieAnd (struct expent* lval, unsigned TrueLab, int* BoolOp)
        	}
 
        	/* Define the false jump label here */
-       	g_defloclabel (lab);
+       	g_defcodelabel (lab);
 
        	/* Define the label */
        	lval->e_flags = E_MEXPR;
@@ -2536,9 +2536,9 @@ static int hieOr (struct expent *lval)
     	DoneLab = GetLocalLabel ();
     	g_getimmed (CF_INT | CF_CONST, 0, 0);	/* Load FALSE */
        	g_falsejump (CF_NONE, DoneLab);
-    	g_defloclabel (TrueLab);
+    	g_defcodelabel (TrueLab);
     	g_getimmed (CF_INT | CF_CONST, 1, 0); 	/* Load TRUE */
-    	g_defloclabel (DoneLab);
+    	g_defcodelabel (DoneLab);
     }
     return k;
 }
@@ -2577,7 +2577,7 @@ static int hieQuest (struct expent *lval)
     	labt = GetLocalLabel ();
     	ConsumeColon ();
     	g_jump (labt);
-    	g_defloclabel (labf);
+    	g_defcodelabel (labf);
     	expression1 (&lval3);
 
     	/* Check if any conversions are needed, if so, do them.
@@ -2609,7 +2609,7 @@ static int hieQuest (struct expent *lval)
 	    g_jump (labf);	    	/* Jump around code */
 
 	    /* The jump for expr2 goes here */
-    	    g_defloclabel (labt);
+    	    g_defcodelabel (labt);
 
 	    /* Create the typecast code for expr2 */
 	    Mark2 = GetCodePos ();	/* Remember position */
@@ -2622,7 +2622,7 @@ static int hieQuest (struct expent *lval)
 		RemoveCode (Mark1);	/* Remove code */
 	    } else {
 		/* We have typecast code, output label */
-	    	g_defloclabel (labf);
+	    	g_defcodelabel (labf);
 	    	labt = 0;		/* Mark other label as invalid */
 	    }
 
@@ -2646,7 +2646,7 @@ static int hieQuest (struct expent *lval)
 
 	/* If we don't have the label defined until now, do it */
 	if (labt) {
-	    g_defloclabel (labt);
+	    g_defcodelabel (labt);
 	}
 
 	/* Setup the target expression */

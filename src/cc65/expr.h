@@ -42,7 +42,8 @@
 #define E_FORCETEST    	0x0002  /* if expr has NOT set CC, force a test */
 
 /* Describe the result of an expression */
-struct expent {
+typedef struct ExprDesc ExprDesc;
+struct ExprDesc {
     struct SymEntry*	Sym;	 /* Symbol table entry if known */
     type*		e_tptr;  /* Type array of expression */
     long		e_const; /* Value if expression constant */
@@ -65,50 +66,50 @@ void doasm (void);
  * a string literal in parenthesis.
  */
 
-unsigned assignadjust (type* lhst, struct expent* rhs);
+unsigned assignadjust (type* lhst, ExprDesc* rhs);
 /* Adjust the type of the right hand expression so that it can be assigned to
  * the type on the left hand side. This function is used for assignment and
  * for converting parameters in a function call. It returns the code generator
  * flags for the operation.
  */
 
-void exprhs (unsigned flags, int k, struct expent *lval);
+void exprhs (unsigned flags, int k, ExprDesc *lval);
 /* Put the result of an expression into the primary register */
 
-void expression1 (struct expent* lval);
+void expression1 (ExprDesc* lval);
 /* Evaluate an expression on level 1 (no comma operator) and put it into
  * the primary register
  */
 
-void expression (struct expent* lval);
+void expression (ExprDesc* lval);
 /* Evaluate an expression and put it into the primary register */
 
-int evalexpr (unsigned flags, int (*f) (struct expent*), struct expent* lval);
+int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval);
 /* Will evaluate an expression via the given function. If the result is a
  * constant, 0 is returned and the value is put in the lval struct. If the
  * result is not constant, exprhs is called to bring the value into the
  * primary register and 1 is returned.
  */
 
-void constexpr (struct expent* lval);
+void constexpr (ExprDesc* lval);
 /* Get a constant value */
 
-void intexpr (struct expent* lval);
+void intexpr (ExprDesc* lval);
 /* Get an integer expression */
 
-void boolexpr (struct expent* lval);
+void boolexpr (ExprDesc* lval);
 /* Get a boolean expression */
 
 void test (unsigned label, int cond);
 /* Generate code to perform test and jump if false. */
 
-int hie1 (struct expent* lval);
+int hie1 (ExprDesc* lval);
 /* Parse first level of expression hierarchy. */
 
-int hie0 (struct expent* lval);
+int hie0 (ExprDesc* lval);
 /* Parse comma operator (highest level of expression hierarchy) */
 
-void DefineData (struct expent* lval);
+void DefineData (ExprDesc* lval);
 /* Output a data definition for the given expression */
 
 

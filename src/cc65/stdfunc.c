@@ -54,7 +54,7 @@
 
 
 
-static void StdFunc_strlen (struct expent*);
+static void StdFunc_strlen (ExprDesc*);
 
 
 
@@ -69,7 +69,7 @@ static void StdFunc_strlen (struct expent*);
  */
 static struct StdFuncDesc {
     const char*	 	Name;
-    void 	 	(*Handler) (struct expent*);
+    void 	 	(*Handler) (ExprDesc*);
 } StdFuncs [] = {
     {  	"strlen",	StdFunc_strlen	  	},
 
@@ -107,10 +107,10 @@ static struct StdFuncDesc* FindFunc (const char* Name)
 
 
 
-static void StdFunc_strlen (struct expent* lval)
+static void StdFunc_strlen (ExprDesc* lval)
 /* Handle the strlen function */
 {
-    struct expent pval;
+    ExprDesc pval;
     static type ArgType[] = { T_PTR, T_SCHAR, T_END };
 
 
@@ -169,7 +169,7 @@ int IsStdFunc (const char* Name)
 
 
 
-void HandleStdFunc (struct expent* lval)
+void HandleStdFunc (ExprDesc* lval)
 /* Generate code for a known standard function. */
 {
     /* Get a pointer to the table entry */

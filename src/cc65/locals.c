@@ -180,7 +180,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		SC = (SC & ~SC_REGISTER) | SC_AUTO;
 		if (CurTok.Tok == TOK_ASSIGN) {
 
-		    struct expent lval;
+		    ExprDesc lval;
 
 		    /* Allocate previously reserved local space */
 		    AllocLocalSpace (CurrentFunc);
@@ -235,7 +235,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		/* Allow assignments */
 		if (CurTok.Tok == TOK_ASSIGN) {
 
-		    struct expent lval;
+		    ExprDesc lval;
 
 		    /* Skip the '=' */
 		    NextToken ();

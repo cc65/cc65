@@ -616,7 +616,7 @@ static int setmflag (int skip, int flag, int cond)
 static int doiff (int skip)
 /* Process #if directive */
 {
-    struct expent lval;
+    ExprDesc lval;
     char* S;
 
     /* We're about to abuse the compiler expression parser to evaluate the

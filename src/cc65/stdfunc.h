@@ -54,7 +54,7 @@ int IsStdFunc (const char* Name);
  * called in a special way.
  */
 
-void HandleStdFunc (struct expent* lval);
+void HandleStdFunc (ExprDesc* lval);
 /* Generate code for a known standard function. */
 
 

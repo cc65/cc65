@@ -85,7 +85,7 @@ static GenDesc GenOASGN  = { TOK_OR_ASSIGN,	GEN_NOPUSH,     g_or  };
 
 
 
-static int hie10 (struct expent* lval);
+static int hie10 (ExprDesc* lval);
 /* Handle ++, --, !, unary - etc. */
 
 
@@ -114,7 +114,7 @@ static unsigned GlobalModeFlags (unsigned flags)
 
 
 
-static int IsNullPtr (struct expent* lval)
+static int IsNullPtr (ExprDesc* lval)
 /* Return true if this is the NULL pointer constant */
 {
     return (IsClassInt (lval->e_tptr) &&	/* Is it an int? */
@@ -149,7 +149,7 @@ static type* promoteint (type* lhst, type* rhst)
 
 
 
-static unsigned typeadjust (struct expent* lhs, struct expent* rhs, int NoPush)
+static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
 /* Adjust the two values for a binary operation. lhs is expected on stack or
  * to be constant, rhs is expected to be in the primary register or constant.
  * The function will put the type of the result into lhs and return the
@@ -190,7 +190,7 @@ static unsigned typeadjust (struct expent* lhs, struct expent* rhs, int NoPush)
 
 
 
-unsigned assignadjust (type* lhst, struct expent* rhs)
+unsigned assignadjust (type* lhst, ExprDesc* rhs)
 /* Adjust the type of the right hand expression so that it can be assigned to
  * the type on the left hand side. This function is used for assignment and
  * for converting parameters in a function call. It returns the code generator
@@ -280,7 +280,7 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
 
 
 
-void DefineData (struct expent* lval)
+void DefineData (ExprDesc* lval)
 /* Output a data definition for the given expression */
 {
     unsigned flags = lval->e_flags;
@@ -319,7 +319,7 @@ void DefineData (struct expent* lval)
 
 
 
-static void lconst (unsigned flags, struct expent* lval)
+static void lconst (unsigned flags, ExprDesc* lval)
 /* Load primary reg with some constant value. */
 {
     switch (lval->e_flags & E_MCTYPE) {
@@ -441,7 +441,7 @@ static int istypeexpr (void)
 
 
 
-static void PushAddr (struct expent* lval)
+static void PushAddr (ExprDesc* lval)
 /* If the expression contains an address that was somehow evaluated,
  * push this address on the stack. This is a helper function for all
  * sorts of implicit or explicit assignment functions where the lvalue
@@ -463,7 +463,7 @@ static void PushAddr (struct expent* lval)
 
 
 
-void exprhs (unsigned flags, int k, struct expent *lval)
+void exprhs (unsigned flags, int k, ExprDesc *lval)
 /* Put the result of an expression into the primary register */
 {
     int f;
@@ -517,7 +517,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
  * The function returns the size of the parameters pushed.
  */
 {
-    struct expent lval;
+    ExprDesc lval;
 
     /* Initialize variables */
     SymEntry* Param    	  = 0;	/* Keep gcc silent */
@@ -679,7 +679,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
 
 
 
-static void CallFunction (struct expent* lval)
+static void CallFunction (ExprDesc* lval)
 /* Perform a function call.  Called from hie11, this routine will
  * either call the named function, or the function pointer in a/x.
  */
@@ -784,7 +784,7 @@ void doasm (void)
 
 
 
-static int primary (struct expent* lval)
+static int primary (ExprDesc* lval)
 /* This is the lowest level of the expression parser. */
 {
     int k;
@@ -977,7 +977,7 @@ static int primary (struct expent* lval)
 
 
 
-static int arrayref (int k, struct expent* lval)
+static int arrayref (int k, ExprDesc* lval)
 /* Handle an array reference */
 {
     unsigned lflags;
@@ -985,7 +985,7 @@ static int arrayref (int k, struct expent* lval)
     int ConstBaseAddr;
     int ConstSubAddr;
     int l;
-    struct expent lval2;
+    ExprDesc lval2;
     CodeMark Mark1;
     CodeMark Mark2;
     type* tptr1;
@@ -1210,7 +1210,7 @@ end_array:
 
 
 
-static int structref (int k, struct expent* lval)
+static int structref (int k, ExprDesc* lval)
 /* Process struct field after . or ->. */
 {
     ident Ident;
@@ -1255,7 +1255,7 @@ static int structref (int k, struct expent* lval)
 
 
 
-static int hie11 (struct expent *lval)
+static int hie11 (ExprDesc *lval)
 /* Handle compound types (structs and arrays) */
 {
     int k;
@@ -1318,7 +1318,7 @@ static int hie11 (struct expent *lval)
 
 
 
-static void store (struct expent* lval)
+static void store (ExprDesc* lval)
 /* Store primary reg into this reference */
 {
     int f;
@@ -1355,7 +1355,7 @@ static void store (struct expent* lval)
 
 
 
-static void pre_incdec (struct expent* lval, void (*inc) (unsigned, unsigned long))
+static void pre_incdec (ExprDesc* lval, void (*inc) (unsigned, unsigned long))
 /* Handle --i and ++i */
 {
     int k;
@@ -1437,7 +1437,7 @@ static void pre_incdec (struct expent* lval, void (*inc) (unsigned, unsigned lon
 
 
 
-static void post_incdec (struct expent *lval, int k, void (*inc) (unsigned, unsigned long))
+static void post_incdec (ExprDesc *lval, int k, void (*inc) (unsigned, unsigned long))
 /* Handle i-- and i++ */
 {
     unsigned flags;
@@ -1475,7 +1475,7 @@ static void post_incdec (struct expent *lval, int k, void (*inc) (unsigned, unsi
 
 
 
-static void unaryop (int tok, struct expent* lval)
+static void unaryop (int tok, ExprDesc* lval)
 /* Handle unary -/+ and ~ */
 {
     int k;
@@ -1511,7 +1511,7 @@ static void unaryop (int tok, struct expent* lval)
 
 
 
-static int typecast (struct expent* lval)
+static int typecast (ExprDesc* lval)
 /* Handle an explicit cast */
 {
     int k;
@@ -1605,7 +1605,7 @@ static int typecast (struct expent* lval)
 
 
 
-static int hie10 (struct expent* lval)
+static int hie10 (ExprDesc* lval)
 /* Handle ++, --, !, unary - etc. */
 {
     int k;
@@ -1718,13 +1718,13 @@ static int hie10 (struct expent* lval)
 
 
 static int hie_internal (GenDesc** ops,		/* List of generators */
-       	                 struct expent* lval,	/* parent expr's lval */
-       	                 int (*hienext) (struct expent*),
+       	                 ExprDesc* lval,	/* parent expr's lval */
+       	                 int (*hienext) (ExprDesc*),
 	     	       	 int* UsedGen) 		/* next higher level */
 /* Helper function */
 {
     int k;
-    struct expent lval2;
+    ExprDesc lval2;
     CodeMark Mark1;
     CodeMark Mark2;
     GenDesc* Gen;
@@ -1828,12 +1828,12 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 
 
 static int hie_compare (GenDesc** ops,		/* List of generators */
-       	                struct expent* lval,	/* parent expr's lval */
-       	                int (*hienext) (struct expent*))
+       	                ExprDesc* lval,	/* parent expr's lval */
+       	                int (*hienext) (ExprDesc*))
 /* Helper function for the compare operators */
 {
     int k;
-    struct expent lval2;
+    ExprDesc lval2;
     CodeMark Mark1;
     CodeMark Mark2;
     GenDesc* Gen;
@@ -1951,7 +1951,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 
 
 
-static int hie9 (struct expent *lval)
+static int hie9 (ExprDesc *lval)
 /* Process * and / operators. */
 {
     static GenDesc* hie9_ops [] = {
@@ -1964,13 +1964,13 @@ static int hie9 (struct expent *lval)
 
 
 
-static void parseadd (int k, struct expent* lval)
+static void parseadd (int k, ExprDesc* lval)
 /* Parse an expression with the binary plus operator. lval contains the
  * unprocessed left hand side of the expression and will contain the
  * result of the expression on return.
  */
 {
-    struct expent lval2;
+    ExprDesc lval2;
     unsigned flags;         	/* Operation flags */
     CodeMark Mark;		/* Remember code position */
     type* lhst;	   	    	/* Type of left hand side */
@@ -2134,13 +2134,13 @@ static void parseadd (int k, struct expent* lval)
 
 
 
-static void parsesub (int k, struct expent* lval)
+static void parsesub (int k, ExprDesc* lval)
 /* Parse an expression with the binary minus operator. lval contains the
  * unprocessed left hand side of the expression and will contain the
  * result of the expression on return.
  */
 {
-    struct expent lval2;
+    ExprDesc lval2;
     unsigned flags;         	/* Operation flags */
     type* lhst;	    	    	/* Type of left hand side */
     type* rhst;	    	    	/* Type of right hand side */
@@ -2300,7 +2300,7 @@ static void parsesub (int k, struct expent* lval)
 
 
 
-static int hie8 (struct expent* lval)
+static int hie8 (ExprDesc* lval)
 /* Process + and - binary operators. */
 {
     int k = hie9 (lval);
@@ -2319,7 +2319,7 @@ static int hie8 (struct expent* lval)
 
 
 
-static int hie7 (struct expent *lval)
+static int hie7 (ExprDesc *lval)
 /* Parse << and >>. */
 {
     static GenDesc* hie7_ops [] = {
@@ -2332,7 +2332,7 @@ static int hie7 (struct expent *lval)
 
 
 
-static int hie6 (struct expent *lval)
+static int hie6 (ExprDesc *lval)
 /* process greater-than type comparators */
 {
     static GenDesc* hie6_ops [] = {
@@ -2343,7 +2343,7 @@ static int hie6 (struct expent *lval)
 
 
 
-static int hie5 (struct expent *lval)
+static int hie5 (ExprDesc *lval)
 {
     static GenDesc* hie5_ops[] = {
        	&GenEQ, &GenNE, 0
@@ -2353,7 +2353,7 @@ static int hie5 (struct expent *lval)
 
 
 
-static int hie4 (struct expent* lval)
+static int hie4 (ExprDesc* lval)
 /* Handle & (bitwise and) */
 {
     static GenDesc* hie4_ops [] = {
@@ -2366,7 +2366,7 @@ static int hie4 (struct expent* lval)
 
 
 
-static int hie3 (struct expent *lval)
+static int hie3 (ExprDesc *lval)
 /* Handle ^ (bitwise exclusive or) */
 {
     static GenDesc* hie3_ops [] = {
@@ -2379,7 +2379,7 @@ static int hie3 (struct expent *lval)
 
 
 
-static int hie2 (struct expent *lval)
+static int hie2 (ExprDesc *lval)
 /* Handle | (bitwise or) */
 {
     static GenDesc* hie2_ops [] = {
@@ -2392,12 +2392,12 @@ static int hie2 (struct expent *lval)
 
 
 
-static int hieAnd (struct expent* lval, unsigned TrueLab, int* BoolOp)
+static int hieAnd (ExprDesc* lval, unsigned TrueLab, int* BoolOp)
 /* Process "exp && exp" */
 {
     int k;
     int lab;
-    struct expent lval2;
+    ExprDesc lval2;
 
     k = hie2 (lval);
     if (CurTok.Tok == TOK_BOOL_AND) {
@@ -2454,11 +2454,11 @@ static int hieAnd (struct expent* lval, unsigned TrueLab, int* BoolOp)
 
 
 
-static int hieOr (struct expent *lval)
+static int hieOr (ExprDesc *lval)
 /* Process "exp || exp". */
 {
     int k;
-    struct expent lval2;
+    ExprDesc lval2;
     int BoolOp = 0;  		/* Did we have a boolean op? */
     int AndOp;			/* Did we have a && operation? */
     unsigned TrueLab;		/* Jump to this label if true */
@@ -2537,14 +2537,14 @@ static int hieOr (struct expent *lval)
 
 
 
-static int hieQuest (struct expent *lval)
+static int hieQuest (ExprDesc *lval)
 /* Parse "lvalue ? exp : exp" */
 {
     int k;
     int labf;
     int labt;
-    struct expent lval2;       	/* Expression 2 */
-    struct expent lval3;       	/* Expression 3 */
+    ExprDesc lval2;       	/* Expression 2 */
+    ExprDesc lval3;       	/* Expression 3 */
     type* type2; 	       	/* Type of expression 2 */
     type* type3;	       	/* Type of expression 3 */
     type* rtype;	       	/* Type of result */
@@ -2644,10 +2644,10 @@ static int hieQuest (struct expent *lval)
 
 
 
-static void opeq (GenDesc* Gen, struct expent *lval, int k)
+static void opeq (GenDesc* Gen, ExprDesc *lval, int k)
 /* Process "op=" operators. */
 {
-    struct expent lval2;
+    ExprDesc lval2;
     unsigned flags;
     CodeMark Mark;
     int MustScale;
@@ -2725,10 +2725,10 @@ static void opeq (GenDesc* Gen, struct expent *lval, int k)
 
 
 
-static void addsubeq (GenDesc* Gen, struct expent *lval, int k)
+static void addsubeq (GenDesc* Gen, ExprDesc *lval, int k)
 /* Process the += and -= operators */
 {
-    struct expent lval2;
+    ExprDesc lval2;
     unsigned flags;
     int MustScale;
 
@@ -2817,11 +2817,11 @@ static void addsubeq (GenDesc* Gen, struct expent *lval, int k)
 
 
 
-static void Assignment (struct expent* lval)
+static void Assignment (ExprDesc* lval)
 /* Parse an assignment */
 {
     int k;
-    struct expent lval2;
+    ExprDesc lval2;
     unsigned flags;
     type* ltype = lval->e_tptr;
 
@@ -2894,7 +2894,7 @@ static void Assignment (struct expent* lval)
 
 
 
-int hie1 (struct expent* lval)
+int hie1 (ExprDesc* lval)
 /* Parse first level of expression hierarchy. */
 {
     int k;
@@ -2963,7 +2963,7 @@ int hie1 (struct expent* lval)
 
 
 
-int hie0 (struct expent *lval)
+int hie0 (ExprDesc *lval)
 /* Parse comma operator. */
 {
     int k;
@@ -2978,7 +2978,7 @@ int hie0 (struct expent *lval)
 
 
 
-int evalexpr (unsigned flags, int (*f) (struct expent*), struct expent* lval)
+int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval)
 /* Will evaluate an expression via the given function. If the result is a
  * constant, 0 is returned and the value is put in the lval struct. If the
  * result is not constant, exprhs is called to bring the value into the
@@ -3001,7 +3001,7 @@ int evalexpr (unsigned flags, int (*f) (struct expent*), struct expent* lval)
 
 
 
-int expr (int (*func) (struct expent*), struct expent *lval)
+int expr (int (*func) (ExprDesc*), ExprDesc *lval)
 /* Expression parser; func is either hie0 or hie1. */
 {
     int k;
@@ -3024,7 +3024,7 @@ int expr (int (*func) (struct expent*), struct expent *lval)
 
 
 
-void expression1 (struct expent* lval)
+void expression1 (ExprDesc* lval)
 /* Evaluate an expression on level 1 (no comma operator) and put it into
  * the primary register
  */
@@ -3035,7 +3035,7 @@ void expression1 (struct expent* lval)
 
 
 
-void expression (struct expent* lval)
+void expression (ExprDesc* lval)
 /* Evaluate an expression and put it into the primary register */
 {
     memset (lval, 0, sizeof (*lval));
@@ -3044,7 +3044,7 @@ void expression (struct expent* lval)
 
 
 
-void constexpr (struct expent* lval)
+void constexpr (ExprDesc* lval)
 /* Get a constant value */
 {
     memset (lval, 0, sizeof (*lval));
@@ -3059,7 +3059,7 @@ void constexpr (struct expent* lval)
 
 
 
-void intexpr (struct expent* lval)
+void intexpr (ExprDesc* lval)
 /* Get an integer expression */
 {
     expression (lval);
@@ -3074,7 +3074,7 @@ void intexpr (struct expent* lval)
 
 
 
-void boolexpr (struct expent* lval)
+void boolexpr (ExprDesc* lval)
 /* Get a boolean expression */
 {
     /* Read an expression */
@@ -3098,7 +3098,7 @@ void test (unsigned label, int cond)
 /* Generate code to perform test and jump if false. */
 {
     int k;
-    struct expent lval;
+    ExprDesc lval;
 
     /* Eat the parenthesis */
     ConsumeLParen ();

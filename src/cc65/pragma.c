@@ -174,7 +174,7 @@ static void FlagPragma (unsigned char* Flag)
 /* Handle a pragma that expects a boolean paramater */
 {
     /* Read a constant expression */
-    struct expent val;
+    ExprDesc val;
     constexpr (&val);
 
     /* Store the value into the flag parameter */

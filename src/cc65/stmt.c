@@ -201,13 +201,13 @@ static void WhileStatement (void)
 
     /* Loop body */
     Statement (&PendingToken);
-    
+
     /* Jump back to loop top */
     g_jump (loop);
-    
+
     /* Exit label */
     g_defcodelabel (lab);
-    
+
     /* Eat remaining tokens that were delay because of line info correctness */
     SkipPending (PendingToken);
 
@@ -220,7 +220,7 @@ static void WhileStatement (void)
 static void ReturnStatement (void)
 /* Handle the 'return' statement */
 {
-    struct expent lval;
+    ExprDesc lval;
 
     NextToken ();
     if (CurTok.Tok != TOK_SEMI) {
@@ -314,7 +314,7 @@ static void ContinueStatement (void)
 
 
 
-static void CascadeSwitch (struct expent* eval)
+static void CascadeSwitch (ExprDesc* eval)
 /* Handle a switch statement for chars with a cmp cascade for the selector */
 {
     unsigned ExitLab;  	     	/* Exit label */
@@ -324,7 +324,7 @@ static void CascadeSwitch (struct expent* eval)
     int HaveDefault;		/* Remember if we had a default label */
     int lcount;	       	       	/* Label count */
     unsigned Flags;    		/* Code generator flags */
-    struct expent lval;		/* Case label expression */
+    ExprDesc lval;		/* Case label expression */
     long Val;	       		/* Case label value */
 
 
@@ -492,7 +492,7 @@ static void CascadeSwitch (struct expent* eval)
 
 
 
-static void TableSwitch (struct expent* eval)
+static void TableSwitch (ExprDesc* eval)
 /* Handle a switch statement via table based selector */
 {
     /* Entry for one case in a switch statement */
@@ -509,7 +509,7 @@ static void TableSwitch (struct expent* eval)
     int HaveBreak;  		/* Last statement has a break */
     int HaveDefault;		/* Remember if we had a default label */
     unsigned Flags;  		/* Code generator flags */
-    struct expent lval;		/* Case label expression */
+    ExprDesc lval;		/* Case label expression */
     struct swent *p;
     struct swent *swtab;
 
@@ -605,7 +605,7 @@ static void TableSwitch (struct expent* eval)
 static void SwitchStatement (void)
 /* Handle a 'switch' statement */
 {
-    struct expent eval;	       	/* Switch statement expression */
+    ExprDesc eval;	       	/* Switch statement expression */
 
     /* Eat the "switch" */
     NextToken ();
@@ -631,9 +631,9 @@ static void SwitchStatement (void)
 static void ForStatement (void)
 /* Handle a 'for' statement */
 {
-    struct expent lval1;
-    struct expent lval2;
-    struct expent lval3;
+    ExprDesc lval1;
+    ExprDesc lval2;
+    ExprDesc lval3;
     int HaveIncExpr;
     CodeMark IncExprStart;
     CodeMark IncExprEnd;
@@ -774,7 +774,7 @@ int Statement (int* PendingToken)
  * NULL, the function will skip the token.
  */
 {
-    struct expent lval;
+    ExprDesc lval;
     int GotBreak;
 
     /* Assume no pending token */

@@ -228,7 +228,7 @@ static void ParseEnumDecl (void)
 
 	/* Check for an assigned value */
    	if (CurTok.Tok == TOK_ASSIGN) {
-    	    struct expent lval;
+    	    ExprDesc lval;
    	    NextToken ();
    	    constexpr (&lval);
    	    EnumVal = lval.e_const;
@@ -857,7 +857,7 @@ static void Decl (Declaration* D, unsigned Mode)
        	    NextToken ();
 	    /* Read the size if it is given */
        	    if (CurTok.Tok != TOK_RBRACK) {
-    	     	struct expent lval;
+    	     	ExprDesc lval;
        	       	constexpr (&lval);
        	       	Size = lval.e_const;
        	    }
@@ -955,7 +955,7 @@ void CheckEmptyDecl (const DeclSpec* D)
 static void ParseVoidInit (void)
 /* Parse an initialization of a void variable (special cc65 extension) */
 {
-    struct expent lval;
+    ExprDesc lval;
 
     /* Allow an arbitrary list of values */
     ConsumeLCurly ();
@@ -1059,7 +1059,7 @@ static void ParseStructInit (type* Type)
 void ParseInit (type* T)
 /* Parse initialization of variables. */
 {
-    struct expent lval;
+    ExprDesc lval;
     type* t;
     const char* str;
     int Count;

@@ -3559,31 +3559,31 @@ void g_le (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
-	/* <= is not very effective on the 6502, so try to convert
-	 * it into < if the value is in a valid range.
-	 */
+     	/* <= is not very effective on the 6502, so try to convert
+     	 * it into < if the value is in a valid range.
+     	 */
 
      	/* Look at the type */
      	switch (flags & CF_TYPE) {
 
-	    case CF_CHAR:
-		if (flags & CF_FORCECHAR) {
-		    if (flags & CF_UNSIGNED) {
-			if (val < 255) {
-			    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
-			    AddCodeLine ("jsr boolult");
-			} else {
-			    AddCodeLine ("cmp #$%02X", (unsigned char)val);
-			    AddCodeLine ("jsr boolule");
-			}
-		    } else {
-			if (val < 127) {
-			    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
-			    AddCodeLine ("jsr boollt");
-			} else {
-			    AddCodeLine ("cmp #$%02X", (unsigned char)val);
-			    AddCodeLine ("jsr boolle");
-			}
+     	    case CF_CHAR:
+     		if (flags & CF_FORCECHAR) {
+     		    if (flags & CF_UNSIGNED) {
+     		     	if (val < 255) {
+     		     	    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
+     		     	    AddCodeLine ("jsr boolult");
+     		     	} else {
+     		     	    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+     		     	    AddCodeLine ("jsr boolule");
+     		     	}
+     		    } else {
+     		     	if (val < 127) {
+     		     	    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
+     		     	    AddCodeLine ("jsr boollt");
+     		     	} else {
+     		     	    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+     		     	    AddCodeLine ("jsr boolle");
+     		     	}
 		    }
 		    return;
 		}
@@ -3595,7 +3595,7 @@ void g_le (unsigned flags, unsigned long val)
 		    const char* Name = "boolule";
 		    if (val < 65535) {
 		     	++val;
-			Name = "boolult";
+		     	Name = "boolult";
 		    }
 		    AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
 		    AddCodeLine ("bne %s", LocalLabelName (L));
@@ -3630,10 +3630,10 @@ void g_gt (unsigned flags, unsigned long val)
 /* Test for greater than */
 {
     static char* ops [12] = {
-	"tosgt00",    	"tosgta0",	"tosgtax",
-	"tosugt00",   	"tosugta0",	"tosugtax",
-	0,	      	0,	    	"tosgteax",
-	0,	      	0, 	    	"tosugteax",
+     	"tosgt00",    	"tosgta0",	"tosgtax",
+     	"tosugt00",   	"tosugta0",	"tosugtax",
+     	0,	      	0,	    	"tosgteax",
+     	0,	      	0, 	    	"tosugteax",
     };
 
 
@@ -3642,46 +3642,65 @@ void g_gt (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
+       	/* > is not very effective on the 6502, so try to convert
+     	 * it into >= if the value is in a valid range.
+     	 */
+
      	/* Look at the type */
      	switch (flags & CF_TYPE) {
 
-	    case CF_CHAR:
-		if (flags & CF_FORCECHAR) {
-		    AddCodeLine ("cmp #$%02X", (unsigned char)val);
-		    if (flags & CF_UNSIGNED) {
-		      	/* If we have a compare > 0, we will replace it by
-		      	 * != 0 here, since both are identical but the latter
-		      	 * is easier to optimize.
-		      	 */
-		      	if (val & 0xFF) {
-		       	    AddCodeLine ("jsr boolugt");
-		      	} else {
-		      	    AddCodeLine ("jsr boolne");
-		      	}
-		    } else {
-	     	        AddCodeLine ("jsr boolgt");
-		    }
-		    return;
-		}
-		/* FALLTHROUGH */
+     	    case CF_CHAR:
+     		if (flags & CF_FORCECHAR) {
+     		    if (flags & CF_UNSIGNED) {
+     		      	/* If we have a compare > 0, we will replace it by
+     		      	 * != 0 here, since both are identical but the latter
+     		      	 * is easier to optimize.
+     		      	 */
+       	       	       	if (val == 0) {
+			    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+     		      	    AddCodeLine ("jsr boolne");
+     		      	} else if (val < 255) {
+			    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
+     		      	    AddCodeLine ("jsr booluge");
+     		      	} else {
+			    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+     		       	    AddCodeLine ("jsr boolugt");
+			}
+     		    } else {
+			if (val < 127) {
+			    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
+			    AddCodeLine ("jsr boolge");
+			} else {
+			    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+			    AddCodeLine ("jsr boolgt");
+			}
+     		    }
+     		    return;
+     		}
+     		/* FALLTHROUGH */
 
-	    case CF_INT:
-		if (flags & CF_UNSIGNED) {
-		    /* If we have a compare > 0, we will replace it by
-		     * != 0 here, since both are identical but the latter
-	 	     * is easier to optimize.
+     	    case CF_INT:
+     		if (flags & CF_UNSIGNED) {
+     		    /* If we have a compare > 0, we will replace it by
+     		     * != 0 here, since both are identical but the latter
+     	 	     * is easier to optimize.
 	 	     */
-	 	    if ((val & 0xFFFF) == 0) {
-	 		AddCodeLine ("stx tmp1");
-	 		AddCodeLine ("ora tmp1");
-	 		AddCodeLine ("jsr boolne");
+	 	    if (val == 0) {
+	 	     	AddCodeLine ("stx tmp1");
+	 	     	AddCodeLine ("ora tmp1");
+	 	     	AddCodeLine ("jsr boolne");
 	 	    } else {
-			unsigned L = GetLocalLabel();
+		     	unsigned L = GetLocalLabel();
+			const char* Name = "boolugt";
+			if (val < 65535) {
+			    ++val;
+			    Name = "booluge";
+			}
        	       	       	AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
-	 		AddCodeLine ("bne %s", LocalLabelName (L));
-	 		AddCodeLine ("cmp #$%02X", (unsigned char)val);
-			g_defcodelabel (L);
-       	       	       	AddCodeLine ("jsr boolugt");
+	 	     	AddCodeLine ("bne %s", LocalLabelName (L));
+	 	     	AddCodeLine ("cmp #$%02X", (unsigned char)val);
+		     	g_defcodelabel (L);
+       	       	       	AddCodeLine ("jsr %s", Name);
 	 	    }
 	 	    return;
        	       	}

@@ -405,7 +405,7 @@ void SymDef (const char* Name, ExprNode* Expr, int ZP)
     SymEntry* S = SymFind (SymTab, Name, SF_ALLOC_NEW);
     if (S->Flags & SF_IMPORT) {
        	/* Defined symbol is marked as imported external symbol */
-       	Error (ERR_SYM_ALREADY_IMPORT);
+       	Error (ERR_SYM_ALREADY_IMPORT, Name);
        	return;
     }
     if (S->Flags & SF_DEFINED) {
@@ -643,7 +643,7 @@ int SymIsRef (const char* Name)
 {
     SymEntry* S = SymFindAny (SymTab, Name);
     return S != 0 && (S->Flags & SF_REFERENCED) != 0;
-}					   
+}
 
 
 
@@ -905,7 +905,7 @@ static void SymCheckUndefined (SymEntry* S)
        	if (S->Flags & SF_EXPORT) {
 	    if (Sym->Flags & SF_IMPORT) {
 	       	/* The symbol is already marked as imported external symbol */
-	       	PError (&S->Pos, ERR_SYM_ALREADY_IMPORT);
+	       	PError (&S->Pos, ERR_SYM_ALREADY_IMPORT, S->Name);
 	    }
 	    Sym->Flags |= S->Flags & (SF_EXPORT | SF_ZP);
 	}

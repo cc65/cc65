@@ -1,20 +1,24 @@
 ;
-; Ullrich von Bassewitz, 25.10.2000
+; Ullrich von Bassewitz, 2003-05-04
 ;
 ; CC65 runtime: Increment the stackpointer by 7
 ;
 
        	.export		incsp7
-	.import		addysp
+        .importzp       sp
 
 .proc	incsp7
 
-	ldy   	#7
-	jmp   	addysp
+        lda     sp
+        clc
+        adc     #7
+        sta     sp
+        bcs     @L1
+        rts
+
+@L1:    inc     sp+1
+        rts
 
 .endproc
 
-
-
-
-	
+                  

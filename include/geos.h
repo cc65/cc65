@@ -12,6 +12,13 @@
 
 
 
+/* Check for errors */
+#if !defined(__GEOS__)
+#  error This module may only be used when compiling for GEOS!
+#endif
+
+
+
 #ifndef _GCONST_H
 #include <geos/gconst.h>
 #endif

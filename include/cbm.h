@@ -38,6 +38,13 @@
 
 
 
+/* Check for errors */
+#if !defined(__CBM__)
+#  error This module may only be used when compiling for CBM machines!
+#endif
+
+
+
 /* Load the system specific files here, if needed */
 #if defined(__C64__) && !defined(_C64_H)
 #  include <c64.h>

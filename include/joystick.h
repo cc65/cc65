@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -39,9 +39,11 @@
 
 
 /* Define __JOYSTICK__ for systems that support a joystick */
-#if defined(__ATARI__) || defined(__C64__) || defined(__C128__) || defined(__PLUS4__)
+#if defined(__ATARI__) || defined(__C64__) || defined(__C128__) || defined(__PLUS4__) || defined(__CBM510__)
 #  define __JOYSTICK__
-#endif
+#else
+#  error The target system does not support a joystick!
+# endif
 
 /* Argument for the function */
 #define JOY_1		0

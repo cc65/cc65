@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2000 Ullrich von Bassewitz                                       */
+/* (C) 1999-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -39,9 +39,11 @@
 
 
 /* Define __MOUSE__ for systems that support a mouse */
-#if defined(__ATARI__) || defined(__C64__) || defined(__C128__)
+#if defined(__ATARI__) || defined(__C64__) || defined(__C128__) || defined(__CBM510__)
 #  define __MOUSE__
-#endif
+#else
+#  error The target system does not support a mouse!
+# endif
 
 
 
@@ -55,7 +57,7 @@
 #define MOUSE_TRAKBALL 		0
 #define MOUSE_ST		1
 #define MOUSE_AMIGA		2
-#define MOUSE_C64		3      /* 1351 mouse */
+#define MOUSE_CBM1351  	        3      /* 1351 mouse */
 
 /* Mouse button masks */
 #define MOUSE_BTN_LEFT	     0x10

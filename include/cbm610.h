@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -35,6 +35,13 @@
 
 #ifndef _CBM610_H
 #define _CBM610_H
+
+
+
+/* Check for errors */
+#if !defined(__CBM610__)
+#  error This module may only be used when compiling for the CBM 610!
+#endif
 
 
 

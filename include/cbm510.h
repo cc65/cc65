@@ -38,6 +38,13 @@
 
 
 
+/* Check for errors */
+#if !defined(__CBM510__)
+#  error This module may only be used when compiling for the CBM 510!
+#endif
+
+
+
 /* Additional key defines */
 #define CH_F1			224
 #define CH_F2			225
@@ -93,7 +100,7 @@ void __fastcall__ pokewsys (unsigned addr, unsigned val);
 /* Define hardware */
 #include <_vic.h>
 #define VIC    	(*(struct __vic*)0xD800)
-
+								  
 #include <_sid.h>
 #define	SID	(*(struct __sid*)0xDA00)
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -33,16 +33,15 @@
 
 
 
-/*
- * c128.h
- *
- * Ullrich von Bassewitz, 12.08.1998
- */
-
-
-
 #ifndef _C128_H
 #define _C128_H
+
+
+
+/* Check for errors */
+#if !defined(__C128__)
+#  error This module may only be used when compiling for the C128!
+#endif
 
 
 

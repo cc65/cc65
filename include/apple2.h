@@ -11,6 +11,13 @@
 
 
 
+/* Check for errors */
+#if !defined(__APPLE2__)
+#  error This module may only be used when compiling for the Apple ][!
+#endif
+
+
+
 /* Color Defines
  * Since Apple2 does not support color text these defines are only
  * used to get the library to compile correctly.  They should not be used

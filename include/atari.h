@@ -30,8 +30,19 @@
 /*                                                                           */
 /*****************************************************************************/
 
+
+
 #ifndef _ATARI_H
 #define _ATARI_H
+
+
+
+/* Check for errors */
+#if !defined(__ATARI__)
+#  error This module may only be used when compiling for the Atari!
+#endif
+
+
 
 /* Character codes */
 #define CH_DEL 	    	0xFE
@@ -96,7 +107,7 @@
 #define HUE_GREEN       12
 #define HUE_YELLOWGREEN 13
 #define HUE_YELLOW      14
-#define HUE_YELLOWRED   15
+#define HUE_YELLOWRED   15					  
 
 /* Color defines, similar to c64 colors (untested) */
 #define COLOR_BLACK  	       	_gtia_mkcolor(HUE_GREY,0)

@@ -31,7 +31,7 @@ TEX   = $(SGML:.sgml=.tex)
 	sgml2txt $<
 
 %.html:	%.sgml
-      	sgml2html --split=1 $<
+	sgml2html --split=1 $<
 
 %.info:	%.sgml
 	sgml2info $<

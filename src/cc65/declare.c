@@ -191,7 +191,7 @@ static void AddEncodeToDeclaration (Declaration* D, type T, unsigned long Val)
     D->Index += DECODE_SIZE;
 }
 
-                                                                              
+
 
 static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
 /* Parse a storage class */
@@ -281,7 +281,7 @@ static void ParseEnumDecl (void)
     	    break;
     	NextToken ();
     }
-    ConsumeRCurly ();     
+    ConsumeRCurly ();
 }
 
 
@@ -1109,12 +1109,15 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     TypeCpy (D->Type + D->Index, Spec->Type);
 
     /* Check the size of the generated type */
-    if (!IsTypeFunc (D->Type) && !IsTypeVoid (D->Type) && SizeOf (D->Type) >= 0x10000) {
-    	if (D->Ident[0] != '\0') {
-    	    Error ("Size of `%s' is invalid", D->Ident);
-    	} else {
-    	    Error ("Invalid size");
-    	}
+    if (!IsTypeFunc (D->Type) && !IsTypeVoid (D->Type)) {
+	unsigned Size = SizeOf (D->Type);
+	if (Size >= 0x10000) {
+	    if (D->Ident[0] != '\0') {
+	       	Error ("Size of `%s' is invalid (0x%06X)", D->Ident, Size);
+	    } else {
+	 	Error ("Invalid size in declaration (0x%06X)", Size);
+	    }
+	}
     }
 }
 

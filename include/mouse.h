@@ -39,13 +39,7 @@
 
 
 /* Define __MOUSE__ for systems that support a mouse */
-#ifdef __C64__
-#  define __MOUSE__
-#endif
-#ifdef __C128__
-#  define __MOUSE__
-#endif
-#ifdef __ATARI__
+#if defined(__ATARI__) || defined(__C64__) || defined(__C128__)
 #  define __MOUSE__
 #endif
 
@@ -74,8 +68,8 @@
 
 
 
-unsigned char __fastcall__ mouse_init (unsigned char port, 
-				       unsigned char sprite, 
+unsigned char __fastcall__ mouse_init (unsigned char port,
+				       unsigned char sprite,
 				       unsigned char type);
 /* Setup the mouse interrupt handler. If the sprite value is != zero, the
  * mouse routines will manage the sprite with this number. That means, it

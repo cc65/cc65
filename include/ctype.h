@@ -67,18 +67,18 @@ int __fastcall__ tolower (int c);	/* Always external */
 
 extern unsigned char _ctype[256];
 
-#define isalnum(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$07"), __AX__)
-#define isalpha(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$03"), __AX__)
-#define isblank(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$80"), __AX__)
-#define iscntrl(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$10"), __AX__)
-#define isdigit(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$04"), __AX__)
-#define isgraph(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\teor\t#$30\n\tand\t#$30"), __AX__)
-#define islower(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$01"), __AX__)
-#define isprint(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\teor\t#$10\n\tand\t#$10"), __AX__)
-#define ispunct(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\teor\t#$37\n\tand\t#$37"), __AX__)
-#define isspace(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$60"), __AX__)
-#define isupper(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$02"), __AX__)
-#define isxdigit(c) (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$08"), __AX__)
+#define isalnum(c)  (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n and #$07"), __AX__)
+#define isalpha(c)  (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n and #$03"), __AX__)
+#define isblank(c)  (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n and #$80"), __AX__)
+#define iscntrl(c)  (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n and #$10"), __AX__)
+#define isdigit(c)  (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n and #$04"), __AX__)
+#define isgraph(c)  (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n eor #$30\n and #$30"), __AX__)
+#define islower(c)  (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n and #$01"), __AX__)
+#define isprint(c)  (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n eor #$10\n and #$10"), __AX__)
+#define ispunct(c)  (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n eor #$37\n and #$37"), __AX__)
+#define isspace(c)  (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n and #$60"), __AX__)
+#define isupper(c)  (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n and #$02"), __AX__)
+#define isxdigit(c) (__AX__ = (c), __asm__ ("tay\n lda __ctype,y\n and #$08"), __AX__)
 
 
 

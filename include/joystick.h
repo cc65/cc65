@@ -39,16 +39,7 @@
 
 
 /* Define __JOYSTICK__ for systems that support a joystick */
-#ifdef __ATARI__
-#  define __JOYSTICK__
-#endif
-#ifdef __C64__
-#  define __JOYSTICK__
-#endif
-#ifdef __C128__
-#  define __JOYSTICK__
-#endif
-#ifdef __PLUS4__
+#if defined(__ATARI__) || defined(__C64__) || defined(__C128__) || defined(__PLUS4__)
 #  define __JOYSTICK__
 #endif
 

@@ -39,34 +39,16 @@
 
 
 /* Load the system specific files here, if needed */
-#ifdef __C64__
-#ifndef _C64_H
-#include <c64.h>
-#endif
-#endif
-
-#ifdef __C128__
-#ifndef _C128_H
-#include <c128.h>
-#endif
-#endif
-
-#ifdef __PLUS4__
-#ifndef _PLUS4_H
-#include <plus4.h>
-#endif
-#endif
-
-#ifdef __CBM610__
-#ifndef _CBM610_H
-#include <cbm610.h>
-#endif
-#endif
-
-#ifdef __PET__
-#ifndef _PET_H
-#include <pet.h>
-#endif
+#if defined(__C64__) && !defined(_C64_H)
+#  include <c64.h>
+#elif defined(__C128__) && !defined(_C128_H)
+#  include <c128.h>
+#elif defined(__PLUS4__) && !defined(_PLUS4_H)
+#  include <plus4.h>
+#elif defined(__CBM610__) && !defined(_CBM610_H)
+#  include <cbm610.h>
+#elif defined(__PET__) && !defined(_PET_H)
+#  include <pet.h>
 #endif
 
 
@@ -109,11 +91,16 @@ unsigned char __fastcall__ cbm_k_basin (void);
 void __fastcall__ cbm_k_bsout (unsigned char C);
 void __fastcall__ cbm_k_clrch (void);
 
-/* BASIC-like functions
+
+
+/* BASIC-like file I/O functions
  *
- * All cbm_* IO functions set extern unsigned char _oserror in case
- * of an error. For the meaning of the errorcode see the table below.
+ * All cbm_* IO functions set _oserror (see errno.h) in case of an
+ * error. For the meaning of the errorcode see the table below.
  */
+
+
+
 unsigned char cbm_load(const char* name, unsigned char device,
                        unsigned int addr);
 /* Loads file "name" from given device to given address or to the load
@@ -166,5 +153,9 @@ int cbm_write(unsigned char lfn, void* buffer, unsigned int size);
  *	9   =	illegal device number
  */
 
+
+
 /* End of cbm.h */
 #endif
+
+

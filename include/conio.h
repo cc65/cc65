@@ -54,27 +54,17 @@
 
 
 
-#ifndef _STDARG_H
+#if !defined(_STDARG_H)
 #  include <stdarg.h>
 #endif
 
-/* Read the CBM file if we're compiling for a CBM machine */
-#ifdef __CBM__
-#  ifndef _CBM_H
-#    include <cbm.h>
-#  endif
-#endif
-
-#ifdef __APPLE2__
-#  ifndef _APPLE2_H
-#    include <apple2.h>
-#  endif
-#endif
-
-#ifdef __ATARI__
-#  ifndef _ATARI_H
-#    include <atari.h>
-#  endif
+/* Include the correct machine specific file */
+#if defined(__CBM__) && !defined(_CBM_H)
+#  include <cbm.h>
+#elif defined(__APPLE2__) && !defined(_APPLE2_H)
+#  include <apple2.h>
+#elif defined(__ATARI__) && !defined(_ATARI_H)
+#  include <atari.h>
 #endif
 
 

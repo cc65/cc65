@@ -392,7 +392,7 @@ _exit:  pha			; Save the return code
 ; Place the program return code into ST
 
 	pla
-	ldy	#ST
+	ldy	#$9C		; ST
 	sta	(sysp0),y
 
 ; Setup the welcome code at the stack bottom in the system bank.

@@ -217,10 +217,10 @@ void PrintDbgSyms (ObjData* O, FILE* F)
 
 	    /* Emit the debug file line */
        	    fprintf (F,
-                     "sym\t\"%s\", 0x%02X, 0x%08lX\n",
+                     "sym\t\"%s\", %08lX, %s\n",
                      GetString (D->Name),
-                     D->Type,
-                     Val);
+                     Val,
+                     IS_EXP_LABEL (D->Type)? "label" : "equate");
 
 	    /* Insert the symbol into the table */
 	    InsertDbgSym (D, Val);

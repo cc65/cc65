@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -307,7 +307,7 @@ void DoConditionals (void)
 		    if (Tok != TOK_IDENT) {
 	       	  	ErrorSkip (ERR_IDENT_EXPECTED);
 		    } else {
-		  	SetIfCond (D, SymIsDef (SVal));
+		  	SetIfCond (D, SymIsDef (SVal, SCOPE_ANY));
 		  	NextTok ();
 		    }
 		}
@@ -346,7 +346,7 @@ void DoConditionals (void)
 		    if (Tok != TOK_IDENT) {
 		  	ErrorSkip (ERR_IDENT_EXPECTED);
 		    } else {
-		  	SetIfCond (D, !SymIsDef (SVal));
+		  	SetIfCond (D, !SymIsDef (SVal, SCOPE_ANY));
 		  	NextTok ();
 		    }
 		}
@@ -360,7 +360,7 @@ void DoConditionals (void)
 		    if (Tok != TOK_IDENT) {
 		  	ErrorSkip (ERR_IDENT_EXPECTED);
 		    } else {
-		  	SetIfCond (D, !SymIsRef (SVal));
+		  	SetIfCond (D, !SymIsRef (SVal, SCOPE_ANY));
 		  	NextTok ();
 		    }
 	     	}
@@ -401,7 +401,7 @@ void DoConditionals (void)
      		    if (Tok != TOK_IDENT) {
      		  	ErrorSkip (ERR_IDENT_EXPECTED);
      		    } else {
-     		  	SetIfCond (D, SymIsRef (SVal));
+     		  	SetIfCond (D, SymIsRef (SVal, SCOPE_ANY));
      		  	NextTok ();
      		    }
      		}

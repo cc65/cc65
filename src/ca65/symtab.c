@@ -360,21 +360,6 @@ static SymEntry* SymFindAny (SymTable* Tab, const char* Name)
 
 
 
-static SymEntry* SymRefInternal (SymTable* Table, const char* Name)
-/* Search for the symbol in the given table and return it */
-{
-    /* Try to find the symbol, create a new one if the symbol does not exist */
-    SymEntry* S = SymFind (Table, Name, SF_ALLOC_NEW);
-
-    /* Mark the symbol as referenced */
-    S->Flags |= SF_REFERENCED;
-
-    /* Return it */
-    return S;
-}
-
-
-
 void SymEnterLevel (void)
 /* Enter a new lexical level */
 {
@@ -451,20 +436,28 @@ void SymDef (const char* Name, ExprNode* Expr, int ZP, int Label)
 
 
 
-SymEntry* SymRef (const char* Name)
+SymEntry* SymRef (const char* Name, int Scope)
 /* Search for the symbol and return it */
-{                                           
-    /* Reference the symbol in the current table */
-    return SymRefInternal (SymTab, Name);
-}
-
-
-
-SymEntry* SymRefGlobal (const char* Name)
-/* Search for the symbol in the global namespace and return it */
 {
-    /* Reference the symbol in the current table */
-    return SymRefInternal (RootTab, Name);
+    SymEntry* S;
+
+    switch (Scope) {
+        case SCOPE_GLOBAL:  S = SymFind (RootTab, Name, SF_ALLOC_NEW);  break;
+        case SCOPE_LOCAL:   S = SymFind (SymTab, Name, SF_ALLOC_NEW);   break;
+
+        /* Others are not allowed */
+        case SCOPE_ANY:
+        default:
+            Internal ("Invalid scope in SymRef: %d", Scope);
+            /* NOTREACHED */
+            S = 0;
+    }
+
+    /* Mark the symbol as referenced */
+    S->Flags |= SF_REFERENCED;
+
+    /* Return it */
+    return S;
 }
 
 
@@ -639,19 +632,39 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
 
 
 
-int SymIsDef (const char* Name)
+int SymIsDef (const char* Name, int Scope)
 /* Return true if the given symbol is already defined */
 {
-    SymEntry* S = SymFindAny (SymTab, Name);
+    SymEntry* S = 0;
+
+    /* Search for the symbol */
+    switch (Scope) {
+        case SCOPE_ANY:    S = SymFindAny (SymTab, Name);                 break;
+        case SCOPE_GLOBAL: S = SymFind (RootTab, Name, SF_FIND_EXISTING); break;
+        case SCOPE_LOCAL:  S = SymFind (SymTab, Name, SF_FIND_EXISTING);  break;
+        default:           Internal ("Invalid scope in SymIsDef: %d", Scope);
+    }
+
+    /* Check if it's defined */
     return S != 0 && (S->Flags & SF_DEFINED) != 0;
 }
 
 
 
-int SymIsRef (const char* Name)
+int SymIsRef (const char* Name, int Scope)
 /* Return true if the given symbol has been referenced */
 {
-    SymEntry* S = SymFindAny (SymTab, Name);
+    SymEntry* S = 0;
+
+    /* Search for the symbol */
+    switch (Scope) {
+        case SCOPE_ANY:    S = SymFindAny (SymTab, Name);                 break;
+        case SCOPE_GLOBAL: S = SymFind (RootTab, Name, SF_FIND_EXISTING); break;
+        case SCOPE_LOCAL:  S = SymFind (SymTab, Name, SF_FIND_EXISTING);  break;
+        default:           Internal ("Invalid scope in SymIsRef: %d", Scope);
+    }
+
+    /* Check if it's defined */
     return S != 0 && (S->Flags & SF_REFERENCED) != 0;
 }
 

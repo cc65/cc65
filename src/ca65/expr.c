@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -199,17 +199,68 @@ static int FuncConst (void)
 static int FuncDefined (void)
 /* Handle the .DEFINED builtin function */
 {
-    int Result = 0;
+    static const char* Keys[] = {
+       	"ANY",
+	"GLOBAL",
+        "LOCAL",
+    };
 
+    char Name [sizeof (SVal)];
+    int Result = 0;
+    int Scope;
+
+    /* First argument is a symbol name */
     if (Tok != TOK_IDENT) {
 	Error (ERR_IDENT_EXPECTED);
 	if (Tok != TOK_RPAREN) {
 	    NextTok ();
 	}
-    } else {
-	Result = SymIsDef (SVal);
-	NextTok ();
+        return 0;
     }
+
+    /* Remember the name, then skip it */
+    strcpy (Name, SVal);
+    NextTok ();
+
+    /* Comma and scope spec may follow */
+    if (Tok == TOK_COMMA) {
+
+        /* Skip the comma */
+        NextTok ();
+
+        /* An identifier must follow */
+        if (Tok != TOK_IDENT) {
+            Error (ERR_IDENT_EXPECTED);
+            return 0;
+        }
+
+        /* Get the scope, then skip it */
+        Scope = GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]));
+        NextTok ();
+
+        /* Check if we got a valid keyword */
+        if (Scope < 0) {
+            Error (ERR_ILLEGAL_SCOPE);
+            return 0;
+        }
+
+        /* Map the scope */
+        switch (Scope) {
+            case 0:     Scope = SCOPE_ANY;    break;
+            case 1:     Scope = SCOPE_GLOBAL; break;
+            case 2:     Scope = SCOPE_LOCAL;  break;
+            default:    Internal ("Invalid scope: %d", Scope);
+        }
+
+    } else {
+
+        /* Any scope */
+        Scope = SCOPE_ANY;
+
+    }
+
+    /* Search for the symbol */
+    Result = SymIsDef (SVal, Scope);
 
     /* Done */
     return Result;
@@ -325,7 +376,7 @@ static int FuncReferenced (void)
 	    NextTok ();
 	}
     } else {
-	Result = SymIsRef (SVal);
+	Result = SymIsRef (SVal, SCOPE_ANY);
 	NextTok ();
     }
 
@@ -499,7 +550,7 @@ static ExprNode* Factor (void)
 	     	Error (ERR_IDENT_EXPECTED);
 		N = LiteralExpr (0);	/* Dummy */
 	    } else {
-		S = SymRefGlobal (SVal);
+		S = SymRef (SVal, SCOPE_GLOBAL);
 		if (SymIsConst (S)) {
 		    /* Use the literal value instead */
 		    N = LiteralExpr (GetSymVal (S));
@@ -514,7 +565,7 @@ static ExprNode* Factor (void)
 	    break;
 
         case TOK_IDENT:
-	    S = SymRef (SVal);
+	    S = SymRef (SVal, SCOPE_LOCAL);
 	    if (SymIsConst (S)) {
 	     	/* Use the literal value instead */
 	     	N = LiteralExpr (GetSymVal (S));

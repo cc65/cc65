@@ -176,7 +176,7 @@ static void DefineSymbol (const char* Def)
     }
 
     /* Check if have already a symbol with this name */
-    if (SymIsDef (SymName)) {
+    if (SymIsDef (SymName, SCOPE_ANY)) {
 	AbEnd ("`%s' is already defined", SymName);
     }
 

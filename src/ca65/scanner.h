@@ -118,7 +118,7 @@ enum Token {
     TOK_BLANK,
     TOK_BSS,
     TOK_BYTE,
-    TOK_CASE,	
+    TOK_CASE,
     TOK_CHARMAP,
     TOK_CODE,
     TOK_CONCAT,

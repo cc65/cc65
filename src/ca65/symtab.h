@@ -49,6 +49,19 @@
 
 
 /*****************************************************************************/
+/*   	       		      	     Data				     */
+/*****************************************************************************/
+
+
+
+/* Scope identifiers */
+#define SCOPE_ANY       0
+#define SCOPE_GLOBAL    1
+#define SCOPE_LOCAL     2
+
+
+
+/*****************************************************************************/
 /*   	       		      	     Code				     */
 /*****************************************************************************/
 
@@ -63,16 +76,13 @@ void SymLeaveLevel (void);
 void SymDef (const char* Name, ExprNode* Expr, int ZP, int Label);
 /* Define a new symbol */
 
-SymEntry* SymRef (const char* Name);
+SymEntry* SymRef (const char* Name, int Scope);
 /* Search for the symbol and return it */
 
-SymEntry* SymRefGlobal (const char* Name);
-/* Search for the symbol in the global namespace and return it */
-
-int SymIsDef (const char* Name);
+int SymIsDef (const char* Name, int Scope);
 /* Return true if the given symbol is already defined */
 
-int SymIsRef (const char* Name);
+int SymIsRef (const char* Name, int Scope);
 /* Return true if the given symbol has been referenced */
 
 void SymImport (const char* Name, int ZP);

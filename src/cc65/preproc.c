@@ -661,7 +661,7 @@ static int Pass2 (const char* From, char* To)
 
 
 
-static void xlateline (void)
+static void TranslateLine (void)
 /* Translate one line. */
 {
     int cnt;
@@ -765,7 +765,7 @@ static int DoIf (int Skip)
     Preprocessing = 1;
 
     /* Expand macros in this line */
-    xlateline ();
+    TranslateLine ();
 
     /* Prime the token pump (remove old tokens from the stream) */
     NextToken ();
@@ -1030,7 +1030,7 @@ void Preprocess (void)
     }
 
 Done:
-    xlateline ();
+    TranslateLine ();
     Print (stdout, 2, "line: %s\n", line);
 }
 

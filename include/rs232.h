@@ -112,6 +112,7 @@
 #define RS_ERR_BAUD_NOT_AVAIL		0x03   	/* Baud rate not available */
 #define RS_ERR_NO_DATA		  	0x04   	/* Nothing to read */
 #define RS_ERR_OVERFLOW       	       	0x05   	/* No room in send buffer */
+#define RS_ERR_INIT_FAILED     	       	0x06   	/* Initialization of RS232 routines failed */
 
 
 

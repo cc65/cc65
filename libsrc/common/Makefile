@@ -4,12 +4,18 @@
 
 .SUFFIXES: .o .s .c
 
+#--------------------------------------------------------------------------
+# Rules
+
 %.o:   	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -g -o $@ $(AFLAGS) $(*).s
 
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
+
+#--------------------------------------------------------------------------
+# Object files
 
 C_OBJS =	_afailed.o	\
 		_hextab.o	\
@@ -132,6 +138,11 @@ S_OBJS = 	_fdesc.o 	\
 		zerobss.o
 
 
+#--------------------------------------------------------------------------
+# Targets
+
+.PHONY:	all clean zap
+
 all:  	$(C_OBJS) $(S_OBJS)
 
 clean:
@@ -139,4 +150,6 @@ clean:
 	@rm -f $(C_OBJS:.o=.s)
 	@rm -f $(C_OBJS)
 	@rm -f $(S_OBJS)
+
+zap:	clean
 

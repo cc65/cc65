@@ -63,6 +63,8 @@ EMDS =	cbm510-ram.emd
 #--------------------------------------------------------------------------
 # Targets
 
+.PHONY:	all clean zap
+
 all:	$(OBJS) $(EMDS) $(TGIS)
 
 ../runtime/zeropage.o:
@@ -70,4 +72,7 @@ all:	$(OBJS) $(EMDS) $(TGIS)
 
 clean:
 	@rm -f $(OBJS) $(EMDS:.emd=.o) $(TGIS:.tgi=.o)
+
+zap:	clean
+	@rm -f $(EMDS) $(JOYS) $(TGIS)
 

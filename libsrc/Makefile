@@ -28,6 +28,7 @@ ALLTARGETS =   	apple2	\
 
 #-----------------------------------------------------------------------------
 
+.PHONY:	all
 all:
 	for tgt in $(ALLTARGETS); do		\
 	    $(MAKE) clean "$$tgt"lib || exit 1;	\
@@ -246,10 +247,15 @@ plus4lib:
 
 .PHONY: clean
 clean:
-	@for i in common conio dbg em joystick runtime tgi $(ALLTARGETS); do 	\
-	   $(MAKE) -C $$i clean;     	    	       	  	   					\
+	@for i in cbm common conio dbg em joystick runtime tgi $(ALLTARGETS); do\
+       	   $(MAKE) -C $$i clean;						\
 	done
 
 .PHONY: zap
 zap:	clean
+	@for i in cbm common conio dbg em joystick runtime tgi $(ALLTARGETS); do\
+	   $(MAKE) -C $$i zap;     	    	       	  	   		\
+	done
 	@rm -f *.o *.emd *.joy *.lib *.tgi
+
+

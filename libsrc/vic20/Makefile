@@ -53,6 +53,8 @@ TGIS =
 #--------------------------------------------------------------------------
 # Targets
 
+.PHONY:	all clean zap
+
 all: 	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
 
 ../runtime/zeropage.o:
@@ -61,3 +63,7 @@ all: 	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
 clean:
 	@rm -f $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
 
+zap:	clean
+	@rm -f $(EMDS) $(JOYS) $(TGIS)
+
+		     

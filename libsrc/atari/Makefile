@@ -105,3 +105,6 @@ all: 	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
 clean:
 	@rm -f $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
 
+zap:	clean
+	@rm -f $(EMDS) $(JOYS) $(TGIS)
+

@@ -4,12 +4,18 @@
 
 .SUFFIXES: .o .s .c
 
+#--------------------------------------------------------------------------
+# Rules
+
 %.o:   	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
+
+#--------------------------------------------------------------------------
+# Object files
 
 OBJS =	_scrsize.o	\
 	break.o		\
@@ -33,9 +39,17 @@ OBJS =	_scrsize.o	\
         ksetlfs.o       \
         ksetnam.o       \
         randomize.o	\
-	revers.o	
+	revers.o
+
+#--------------------------------------------------------------------------
+# Targets
+
+.PHONY:	all clean zap
 
 all:	$(OBJS)
 
 clean:
 	@rm -f $(OBJS)
+
+zap:	clean
+

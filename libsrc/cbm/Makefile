@@ -4,12 +4,18 @@
 
 .SUFFIXES: .o .s .c
 
+#--------------------------------------------------------------------------
+# Rules
+
 %.o:   	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
+
+#--------------------------------------------------------------------------
+# Object files
 
 C_OBJS =  	cbm_dir.o       \
                 cbm_load.o	\
@@ -65,8 +71,15 @@ S_OBJS =	c_acptr.o	\
                 wherey.o        \
                 write.o
 
+#--------------------------------------------------------------------------
+# Targets
+
+.PHONY:	all clean zap
+
 all:	$(C_OBJS) $(S_OBJS)
 
 clean:
 	@rm -f *~ *.bck $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS)
+
+zap:	clean
 

@@ -4,6 +4,9 @@
 
 .SUFFIXES: .o .s .c
 
+#--------------------------------------------------------------------------
+# Rules
+
 %.o:   	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
@@ -11,9 +14,10 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-C_OBJS =
+#--------------------------------------------------------------------------
+# Object files
 
-S_OBJS=	_scrsize.o	\
+OBJS=	_scrsize.o	\
 	break.o		\
 	cclear.o	\
 	cgetc.o		\
@@ -32,9 +36,15 @@ S_OBJS=	_scrsize.o	\
 	where.o		\
 	write.o
 
-all:	$(C_OBJS) $(S_OBJS)
+#--------------------------------------------------------------------------
+# Targets
+
+.PHONY:	all clean zap
+
+all:	$(OBJS)
 
 clean:
-	@rm -f $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS)
+	@rm -f $(OBJS)
 
+zap:	clean
 

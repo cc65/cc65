@@ -82,14 +82,15 @@ static const struct Keyword {
 } Keywords [] = {
     { "_Pragma",        TOK_PRAGMA,     TT_C    },
     { "__A__",	       	TOK_A,	       	TT_C   	},
-    { "__AX__",	       	TOK_AX,		TT_C	},
-    { "__EAX__",       	TOK_EAX,   	TT_C	},
-    { "__X__", 	       	TOK_X,		TT_C	},
-    { "__Y__", 	       	TOK_Y,		TT_C	},
-    { "__asm__",       	TOK_ASM,   	TT_C	},
-    { "__attribute__",	TOK_ATTRIBUTE,	TT_C	},
-    { "__far__",	TOK_FAR,	TT_C	},
-    { "__fastcall__",  	TOK_FASTCALL,   TT_C	},
+    { "__AX__",	       	TOK_AX,		TT_C  	},
+    { "__EAX__",       	TOK_EAX,   	TT_C  	},
+    { "__X__", 	       	TOK_X,		TT_C  	},
+    { "__Y__", 	       	TOK_Y,		TT_C  	},
+    { "__asm__",       	TOK_ASM,   	TT_C  	},
+    { "__attribute__",	TOK_ATTRIBUTE,	TT_C  	},
+    { "__far__",	TOK_FAR,	TT_C  	},
+    { "__fastcall__",  	TOK_FASTCALL,   TT_C  	},
+    { "__near__",      	TOK_NEAR,	TT_C  	},
     { "asm",   	       	TOK_ASM,   	TT_EXT 	},
     { "auto",  	       	TOK_AUTO,  	TT_C  	},
     { "break", 	       	TOK_BREAK, 	TT_C  	},
@@ -111,6 +112,7 @@ static const struct Keyword {
     { "if",    	       	TOK_IF,    	TT_C  	},
     { "int",   	       	TOK_INT,   	TT_C  	},
     { "long",  	       	TOK_LONG,  	TT_C  	},
+    { "near",          	TOK_NEAR,       TT_EXT 	},
     { "register",      	TOK_REGISTER,   TT_C  	},
     { "restrict",      	TOK_RESTRICT,   TT_C  	},
     { "return",        	TOK_RETURN,	TT_C  	},
@@ -126,7 +128,7 @@ static const struct Keyword {
     { "void",  	       	TOK_VOID,  	TT_C	},
     { "volatile",      	TOK_VOLATILE,   TT_C	},
     { "while", 	       	TOK_WHILE, 	TT_C	},
-};
+};                              
 #define KEY_COUNT	(sizeof (Keywords) / sizeof (Keywords [0]))
 
 

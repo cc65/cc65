@@ -157,6 +157,7 @@ typedef enum token_t {
 
     TOK_ATTRIBUTE,
     TOK_FAR,
+    TOK_NEAR,
     TOK_FASTCALL,
     TOK_A,
     TOK_X,

@@ -47,6 +47,9 @@
 unsigned ByteTable (void);
 /* Output a table of bytes */
 
+unsigned DByteTable (void);
+/* Output a table of dbytes */
+
 unsigned WordTable (void);
 /* Output a table of words */
 

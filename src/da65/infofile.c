@@ -67,6 +67,7 @@ static void GlobalSection (void)
 /* Parse a global section */
 {
     static const IdentTok GlobalDefs[] = {
+        {   "COMMENTS",         INFOTOK_COMMENTS        },
        	{   "CPU",     	        INFOTOK_CPU     	},
        	{   "INPUTNAME",  	INFOTOK_INPUTNAME	},
 	{   "OUTPUTNAME",      	INFOTOK_OUTPUTNAME	},
@@ -88,6 +89,14 @@ static void GlobalSection (void)
 
 	/* Look at the token */
 	switch (InfoTok) {
+
+            case INFOTOK_COMMENTS:
+		InfoNextTok ();
+		InfoAssureInt ();
+                InfoRangeCheck (MIN_COMMENTS, MAX_COMMENTS);
+		Comments = InfoIVal;
+		InfoNextTok ();
+		break;
 
             case INFOTOK_CPU:
                 InfoNextTok ();
@@ -155,35 +164,39 @@ static void RangeSection (void)
 /* Parse a range section */
 {
     static const IdentTok RangeDefs[] = {
-       	{   "START",   	    	INFOTOK_START	},
 	{   "END",	    	INFOTOK_END 	},
-	{   "TYPE",            	INFOTOK_TYPE	},
+        {   "NAME",             INFOTOK_NAME    },
+       	{   "START",   	    	INFOTOK_START	},
+      	{   "TYPE",            	INFOTOK_TYPE	},
     };
 
     static const IdentTok TypeDefs[] = {
-	{   "CODE",	    	INFOTOK_CODE	 },
-	{   "BYTETABLE",    	INFOTOK_BYTETAB	 },
-	{   "WORDTABLE",    	INFOTOK_WORDTAB	 },
-	{   "DWORDTABLE",	INFOTOK_DWORDTAB },
-	{   "ADDRTABLE",	INFOTOK_ADDRTAB	 },
-	{   "RTSTABLE",	    	INFOTOK_RTSTAB	 },
-	{   "TEXTTABLE",        INFOTOK_TEXTTAB  },
+      	{   "CODE",	    	INFOTOK_CODE	 },
+      	{   "BYTETABLE",    	INFOTOK_BYTETAB	 },
+        {   "DBYTETABLE",       INFOTOK_DBYTETAB },
+      	{   "WORDTABLE",    	INFOTOK_WORDTAB	 },       
+      	{   "DWORDTABLE",	INFOTOK_DWORDTAB },
+      	{   "ADDRTABLE",	INFOTOK_ADDRTAB	 },
+      	{   "RTSTABLE",	    	INFOTOK_RTSTAB	 },
+      	{   "TEXTTABLE",        INFOTOK_TEXTTAB  },
     };
 
 
     /* Which values did we get? */
     enum {
-	tNone	= 0x00,
-	tStart	= 0x01,
-	tEnd	= 0x02,
-	tType	= 0x04,
-	tAll	= 0x07
-    } Needed = tNone;
+      	tNone	= 0x00,
+      	tStart	= 0x01,
+      	tEnd	= 0x02,
+      	tType	= 0x04,
+        tName   = 0x08,
+       	tNeeded = (tStart | tEnd | tType)
+    } Attributes = tNone;
 
     /* Locals - initialize to avoid gcc warnings */
     unsigned Start	= 0;
     unsigned End	= 0;
     unsigned char Type	= 0;
+    char* Name          = 0;
 
     /* Skip the token */
     InfoNextTok ();
@@ -200,21 +213,35 @@ static void RangeSection (void)
 	/* Look at the token */
 	switch (InfoTok) {
 
-	    case INFOTOK_START:
-	        InfoNextTok ();
-		InfoAssureInt ();
-		InfoRangeCheck (0x0000, 0xFFFF);
-		Start = InfoIVal;
-	       	Needed |= tStart;
-	     	InfoNextTok ();
-	     	break;
-
 	    case INFOTOK_END:
 	     	InfoNextTok ();
 		InfoAssureInt ();
 		InfoRangeCheck (0x0000, 0xFFFF);
 		End = InfoIVal;
-	       	Needed |= tEnd;
+	       	Attributes |= tEnd;
+	     	InfoNextTok ();
+	     	break;
+
+	    case INFOTOK_NAME:
+	        InfoNextTok ();
+	       	if (Name) {
+      	       	    InfoError ("Name already given");
+	       	}
+	       	InfoAssureStr ();
+		if (InfoSVal[0] == '\0') {
+		    InfoError ("Name may not be empty");
+		}
+	       	Name = xstrdup (InfoSVal);
+                Attributes |= tName;
+	       	InfoNextTok ();
+      	       	break;
+
+	    case INFOTOK_START:
+	        InfoNextTok ();
+		InfoAssureInt ();
+		InfoRangeCheck (0x0000, 0xFFFF);
+		Start = InfoIVal;
+	       	Attributes |= tStart;
 	     	InfoNextTok ();
 	     	break;
 
@@ -224,13 +251,14 @@ static void RangeSection (void)
 		switch (InfoTok) {
 		    case INFOTOK_CODE:		Type = atCode;		break;
 		    case INFOTOK_BYTETAB:	Type = atByteTab;	break;
+                    case INFOTOK_DBYTETAB:      Type = atDByteTab;      break;
 		    case INFOTOK_WORDTAB:	Type = atWordTab;	break;
 		    case INFOTOK_DWORDTAB:	Type = atDWordTab;	break;
 		    case INFOTOK_ADDRTAB:	Type = atAddrTab;	break;
        		    case INFOTOK_RTSTAB:       	Type = atRtsTab;	break;
 		    case INFOTOK_TEXTTAB:       Type = atTextTab;       break;
 		}
-		Needed |= tType;
+		Attributes |= tType;
 		InfoNextTok ();
 		break;
 	}
@@ -241,7 +269,7 @@ static void RangeSection (void)
     }
 
     /* Did we get all required values? */
-    if (Needed != tAll) {
+    if ((Attributes & tNeeded) != tNeeded) {
     	InfoError ("Required values missing from this section");
     }
 
@@ -252,6 +280,14 @@ static void RangeSection (void)
 
     /* Set the range */
     MarkRange (Start, End, Type);
+
+    /* Do we have a label? */
+    if (Attributes & tName) {
+        /* Define a label for the table */
+        AddLabel (Start, atExtLabel, Name);
+        /* Delete the name */
+        xfree (Name);
+    }
 
     /* Consume the closing brace */
     InfoConsumeRCurly ();
@@ -347,31 +383,8 @@ static void LabelSection (void)
 	InfoError ("Label for address $%04lX already defined", Value);
     }
 
-    /* Define the label */
-    AddLabel ((unsigned) Value, atExtLabel, Name);
-
-    /* Define dependent labels if necessary */
-    if (Size > 1) {
-	unsigned Offs;
-
-	/* Allocate memory for the dependent label names */
-	unsigned NameLen = strlen (Name);
-	char*	 DepName = xmalloc (NameLen + 7);
-	char*	 DepOffs = DepName + NameLen + 1;
-
-	/* Copy the original name into the buffer */
-	memcpy (DepName, Name, NameLen);
-	DepName[NameLen] = '+';
-
-	/* Define the labels */
-	for (Offs = 1; Offs < (unsigned) Size; ++Offs) {
-	    sprintf (DepOffs, "%u", Offs);
-	    AddLabel ((unsigned) Value+Offs, atDepLabel, DepName);
-	}
-
-	/* Free the name buffer */
-	xfree (DepName);
-    }
+    /* Define the label(s) */
+    AddExtLabelRange ((unsigned) Value, Name, Size);
 
     /* Delete the dynamically allocated memory for Name */
     xfree (Name);

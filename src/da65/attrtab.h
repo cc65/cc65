@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,11 +51,12 @@ typedef enum attr_t {
     atCode	= 0x01,
     atIllegal	= 0x02,
     atByteTab  	= 0x03,		/* Same as illegal */
-    atWordTab	= 0x04,
-    atDWordTab	= 0x05,
-    atAddrTab	= 0x06,
-    atRtsTab	= 0x07,
-    atTextTab   = 0x08,
+    atDByteTab  = 0x04,
+    atWordTab	= 0x05,
+    atDWordTab	= 0x06,
+    atAddrTab	= 0x07,
+    atRtsTab	= 0x08,
+    atTextTab   = 0x09,
 
     /* Label flags */
     atNoLabel	= 0x00,		/* No label for this address */
@@ -88,6 +89,11 @@ const char* MakeLabelName (unsigned Addr);
 
 void AddLabel (unsigned Addr, attr_t Attr, const char* Name);
 /* Add a label */
+
+void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count);
+/* Add an external label for a range. The first entry gets the label "Name"
+ * while the others get "Name+offs".
+ */
 
 int HaveLabel (unsigned Addr);
 /* Check if there is a label for the given address */

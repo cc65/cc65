@@ -41,7 +41,6 @@
 
 /* common */
 #include "cpu.h"
-#include "print.h"
 #include "version.h"
 
 /* da65 */
@@ -188,6 +187,27 @@ void DataByteLine (unsigned ByteCount)
 
 
 
+void DataDByteLine (unsigned ByteCount)
+/* Output a line with dbytes */
+{
+    unsigned I;
+
+    Indent (MIndent);
+    Output (".dbyte");
+    Indent (AIndent);
+    for (I = 0; I < ByteCount; I += 2) {
+	if (I > 0) {
+       	    Output (",$%04X", GetCodeDByte (PC+I));
+	} else {
+	    Output ("$%04X", GetCodeDByte (PC+I));
+	}
+    }
+    LineComment (PC, ByteCount);
+    LineFeed ();
+}
+
+
+
 void DataWordLine (unsigned ByteCount)
 /* Output a line with words */
 {
@@ -233,7 +253,7 @@ void DataDWordLine (unsigned ByteCount)
 void SeparatorLine (void)
 /* Print a separator line */
 {
-    if (Pass == PassCount && Verbosity >= 1) {
+    if (Pass == PassCount && Comments >= 1) {
 	Output ("; ----------------------------------------------------------------------------");
 	LineFeed ();
     }
@@ -246,14 +266,14 @@ void LineComment (unsigned PC, unsigned Count)
 {
     unsigned I;
 
-    if (Pass == PassCount && Verbosity >= 2) {
+    if (Pass == PassCount && Comments >= 2) {
 	Indent (CIndent);
 	Output ("; %04X", PC);
-	if (Verbosity >= 3) {
+	if (Comments >= 3) {
 	    for (I = 0; I < Count; ++I) {
 		Output (" %02X", CodeBuf [PC+I]);
 	    }
-	    if (Verbosity >= 4) {
+	    if (Comments >= 4) {
 		Indent (TIndent);
 		for (I = 0; I < Count; ++I) {
 		    unsigned char C = CodeBuf [PC+I];

@@ -63,6 +63,9 @@ void LoadCode (void);
 unsigned char GetCodeByte (unsigned Addr);
 /* Get a byte from the given address */
 
+unsigned GetCodeDByte (unsigned Addr);
+/* Get a dbyte from the given address */
+
 unsigned GetCodeWord (unsigned Addr);
 /* Get a word from the given address */
 

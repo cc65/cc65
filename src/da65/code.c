@@ -139,6 +139,16 @@ unsigned char GetCodeByte (unsigned Addr)
 
 
 
+unsigned GetCodeDByte (unsigned Addr)
+/* Get a dbyte from the given address */
+{
+    unsigned Lo = GetCodeByte (Addr);
+    unsigned Hi = GetCodeByte (Addr+1);
+    return (Lo <<8) | Hi;
+}
+
+
+
 unsigned GetCodeWord (unsigned Addr)
 /* Get a word from the given address */
 {

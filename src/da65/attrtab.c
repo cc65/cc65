@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -112,7 +112,7 @@ void MarkAddr (unsigned Addr, attr_t Attr)
 const char* MakeLabelName (unsigned Addr)
 /* Make the default label name from the given address and return it in a
  * static buffer.
- */    
+ */
 {
     static char LabelBuf [32];
     xsprintf (LabelBuf, sizeof (LabelBuf), "L%04X", Addr);
@@ -141,6 +141,40 @@ void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
 
     /* Remember the attribute */
     AttrTab[Addr] |= Attr;
+}
+
+
+
+void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count)
+/* Add an external label for a range. The first entry gets the label "Name"
+ * while the others get "Name+offs".
+ */
+{
+    /* Define the label */
+    AddLabel (Addr, atExtLabel, Name);
+
+    /* Define dependent labels if necessary */
+    if (Count > 1) {
+	unsigned Offs;
+
+	/* Allocate memory for the dependent label names */
+	unsigned NameLen = strlen (Name);
+	char* 	 DepName = xmalloc (NameLen + 7);
+	char* 	 DepOffs = DepName + NameLen + 1;
+
+	/* Copy the original name into the buffer */
+	memcpy (DepName, Name, NameLen);
+	DepName[NameLen] = '+';
+
+	/* Define the labels */
+	for (Offs = 1; Offs < Count; ++Offs) {
+	    sprintf (DepOffs, "%u", Offs);
+	    AddLabel (Addr + Offs, atDepLabel, DepName);
+	}
+
+	/* Free the name buffer */
+	xfree (DepName);
+    }
 }
 
 

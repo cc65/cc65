@@ -73,6 +73,9 @@ void OneDataByte (void);
 void DataByteLine (unsigned ByteCount);
 /* Output a line with bytes */
 
+void DataDByteLine (unsigned ByteCount);
+/* Output a line with dbytes */
+
 void DataWordLine (unsigned ByteCount);
 /* Output a line with words */
 

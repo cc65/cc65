@@ -62,6 +62,11 @@ extern long    		StartAddr;	/* Start/load address of the program */
 /* Stuff needed by many routines */
 extern unsigned char	Pass;		/* Disassembler pass */
 
+/* Comments */
+#define MIN_COMMENTS    0
+#define MAX_COMMENTS    4
+extern unsigned char    Comments;       /* Add which comments to the output? */
+
 /* Page formatting */
 #define MIN_PAGE_LEN	32
 #define MAX_PAGE_LEN	127

@@ -82,6 +82,7 @@ static void Usage (void)
        	     "  -V\t\t\tPrint the disassembler version\n"
 	     "\n"
 	     "Long options:\n"
+             "  --comments n\t\tSet the comment level for the output\n"
        	     "  --cpu type\t\tSet cpu type\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
 	     "  --formfeeds\t\tAdd formfeeds to the output\n"
@@ -103,13 +104,14 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
 {
     unsigned long Val;
     int 	  Converted;
+    char          BoundsCheck;
 
     /* Convert */
     if (*Number == '$') {
 	++Number;
-	Converted = sscanf (Number, "%lx", &Val);
+      	Converted = sscanf (Number, "%lx%c", &Val, &BoundsCheck);
     } else {
-	Converted = sscanf (Number, "%li", (long*)&Val);
+      	Converted = sscanf (Number, "%li%c", (long*)&Val, &BoundsCheck);
     }
 
     /* Check if we do really have a number */
@@ -119,6 +121,24 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
 
     /* Return the result */
     return Val;
+}
+
+
+
+static void OptComments (const char* Opt, const char* Arg)
+/* Handle the --comments option */
+{
+    /* Convert the argument to a number */
+    unsigned long Val = CvtNumber (Opt, Arg);
+
+    /* Check for a valid range */
+    if (Val > MAX_COMMENTS) {
+        Error ("Argument for %s outside valid range (%d-%d)",
+               Opt, MIN_COMMENTS, MAX_COMMENTS);
+    }
+
+    /* Use the value */
+    Comments = (unsigned char) Val;
 }
 
 
@@ -134,7 +154,7 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptDebugInfo (const char* Opt attribute ((unused)),
-		    	  const char* Arg attribute ((unused)))
+      		    	  const char* Arg attribute ((unused)))
 /* Add debug info to the object file */
 {
     DebugInfo = 1;
@@ -258,6 +278,10 @@ static void OneOpcode (unsigned RemainingBytes)
 	    ByteTable ();
 	    break;
 
+        case atDByteTab:
+            DByteTable ();
+            break;
+
 	case atWordTab:
 	    WordTable ();
 	    break;
@@ -326,6 +350,7 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
+        { "--comments",         1,      OptComments             },
         { "--cpu",     	       	1,	OptCPU 			},
        	{ "--debug-info",      	0,     	OptDebugInfo            },
 	{ "--formfeeds",  	0,	OptFormFeeds		},

@@ -128,6 +128,15 @@ unsigned ByteTable (void)
 
 
 
+unsigned DByteTable (void)
+/* Output a table of dbytes */
+{
+    /* Call the low level function */
+    return DoTable (atDByteTab, 2, DataDByteLine);
+}
+
+
+
 unsigned WordTable (void)
 /* Output a table of words */
 {
@@ -154,7 +163,7 @@ unsigned AddrTable (void)
     /* Count how many bytes may be output. */
     unsigned Count = GetSpan (atAddrTab);
 
-    /* Handle Count == 1 ### */
+    /* Handle Count == 1 */
     if (Count == 1) {
 	ByteTable ();
     }
@@ -214,7 +223,10 @@ unsigned RtsTable (void)
     /* Count how many bytes may be output. */
     unsigned Count = GetSpan (atRtsTab);
 
-    /* Need to handle Count == 1 here!!! ### */
+    /* Handle Count == 1 */
+    if (Count == 1) {
+	ByteTable ();
+    }
 
     /* Make the given number even */
     Count &= ~1U;

@@ -60,6 +60,9 @@ long 	      StartAddr	      = -1;	/* Start/load address of the program */
 /* Stuff needed by many routines */
 unsigned char Pass	      = 0;	/* Disassembler pass */
 
+/* Comments */
+unsigned char Comments        = 0;      /* Add which comments to the output? */
+
 /* Page formatting */
 unsigned PageLength    	      = 0;	/* Length of a listing page */
 unsigned MIndent	      = 9;	/* Mnemonic indent */

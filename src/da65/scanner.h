@@ -65,6 +65,7 @@ typedef enum token_t {
     INFOTOK_LABEL,
 
     /* Global section */
+    INFOTOK_COMMENTS,
     INFOTOK_CPU,
     INFOTOK_INPUTNAME,
     INFOTOK_OUTPUTNAME,
@@ -77,7 +78,8 @@ typedef enum token_t {
     INFOTOK_TYPE,
 
     INFOTOK_CODE,
-    INFOTOK_BYTETAB,
+    INFOTOK_BYTETAB, 
+    INFOTOK_DBYTETAB,
     INFOTOK_WORDTAB,
     INFOTOK_DWORDTAB,
     INFOTOK_ADDRTAB,

@@ -58,6 +58,7 @@
 #define COLOR_WHITE	0x01
 
 /* Characters codes */
+#define CH_ENTER	0x0D
 #define CH_ESC		0x1B
 #define CH_CURS_LEFT	0x08
 #define CH_CURS_RIGHT	0x15

@@ -37,6 +37,9 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="compile.txt" name="compile.txt"></tag>
   How to compile cc65 and the support tools.
 
+  <tag><htmlurl url="da65.html" name="da65.html"></tag>
+  Describes the da65 6502/65C02 disassembler.
+
   <tag><htmlurl url="debugging.html" name="debugging.html"></tag>
   Debug programs using the VICE emulator.
 

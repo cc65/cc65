@@ -1,0 +1,190 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>da65 Users Guide
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
+<date>2003-08-08
+
+<abstract>
+da65 is a 6502/65C02 disassembler that is able to read user supplied
+information about its input data for better results. The output is ready for
+feeding into ca65, the macro assembler supplied with the cc65 C compiler.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+da65 is a disassembler for 6502/65C02 code. It is supplied as a utility with
+the cc65 C compiler and generates output that is suitable for the ca65
+macro assembler.
+
+Besides generating output for ca65, one of the design goals was that the user
+is able to feed additional information about the code into the disassembler
+for improved results. This information may include the location and size of
+tables, and their format.
+
+One nice advantage of this concept is that disassembly information for
+copyrighted binaries may be handled without problems: One can just pass the
+information file for disassembling the binary, so everyone with a legal copy
+of the binary can generate a nicely formatted disassembly with readable labels
+and other information.
+
+
+<sect>Usage<p>
+
+
+<sect1>Command line option overview<p>
+
+The assembler accepts the following options:
+
+<tscreen><verb>
+---------------------------------------------------------------------------
+Usage: da65 [options] file
+Short options:
+  -g                    Add debug info to object file
+  -h                    Help (this text)
+  -o name               Name the output file
+  -v                    Increase verbosity
+  -F                    Add formfeeds to the output
+  -S addr               Set the start/load address
+  -V                    Print the disassembler version
+
+Long options:
+  --cpu type            Set cpu type
+  --debug-info          Add debug info to object file
+  --formfeeds           Add formfeeds to the output
+  --help                Help (this text)
+  --pagelength n        Set the page length for the listing
+  --start-addr addr     Set the start/load address
+  --verbose             Increase verbosity
+  --version             Print the disassembler version
+---------------------------------------------------------------------------
+</verb></tscreen>
+
+
+<sect1>Command line options in detail<p>
+
+Here is a description of all the command line options:
+
+<descrip>
+
+  <label id="option--cpu">
+  <tag><tt>--cpu type</tt></tag>
+
+  Set the CPU type. The option takes a parameter, which may be one of
+
+       	6502, 65SC02, 65C02
+
+  Support for the 65816 is currently not available.
+
+
+  <label id="option--formfeeds">
+  <tag><tt>-F, --formfeeds</tt></tag>
+
+  Add formfeeds to the generated output. This feature is useful together
+  with the <tt><ref id="option--pagelength" name="--pagelength"></tt> option.
+  If <tt/--formfeeds/ is given, a formfeed is added to the output after each
+  page.
+
+
+  <tag><tt>-g, --debug-info</tt></tag>
+
+  This option adds the <tt/.DEBUGINFO/ command to the output file, so the
+  assembler will generate debug information when reassembling the generated
+  output.
+
+
+  <tag><tt>-h, --help</tt></tag>
+
+  Print the short option summary shown above.
+
+
+  <tag><tt>-o name</tt></tag>
+
+  The default output name is the name of the input file with the extension
+  replaced by ".dis". If you don't like that, you may give another name with
+  the -o option. The output file will be placed in the same directory as
+  the source file, or, if -o is given, the full path in this name is used.
+
+
+  <label id="option--pagelength">
+  <tag><tt>--pagelength n</tt></tag>
+
+  Sets the length of a listing page in lines. After this number of lines, a
+  new page header is generated. If the <tt><ref id="option--formfeeds"
+  name="--formfeeds"></tt> is also given, a formfeed is inserted before
+  generating the page header.
+
+  A value of -1 for the page length will disable paging of the output.
+
+
+  <tag><tt>-S addr, --start-addr addr</tt></tag>
+
+  Specify the start/load address of the binary code that is going to be
+  disassembled. The given address is interpreted as an octal value if
+  preceeded with a '0' digit, as a hexadecimal value if preceeded with '0x',
+  '0X', or '$', and as a decimal value in all other cases. If no start address
+  is specified, 0xC000 is used - which is often not what you want.
+
+
+  <tag><tt>-v, --verbose</tt></tag>
+
+  Increase the assembler verbosity. Usually only needed for debugging
+  purposes. You may use this option more than one time for even more
+  verbose output.
+
+
+  <tag><tt>-V, --version</tt></tag>
+
+  Print the version number of the assembler. If you send any suggestions
+  or bugfixes, please include the version number.
+
+</descrip>
+<p>
+
+
+<sect>Bugs/Feedback<p>
+
+If you have problems using the disassembler, if you find any bugs, or if
+you're doing something interesting with the assembler, I would be glad to hear
+from you. Feel free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
+name="uz@cc65.org">).
+
+
+
+<sect>Copyright<p>
+
+da65 (and all cc65 binutils) are (C) Copyright 1998-2003 Ullrich von
+Bassewitz. For usage of the binaries and/or sources the following
+conditions do apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item> 	The origin of this software must not be misrepresented; you must not
+       	claim that you wrote the original software. If you use this software
+       	in a product, an acknowledgment in the product documentation would be
+	appreciated but is not required.
+<item>	Altered source versions must be plainly marked as such, and must not
+	be misrepresented as being the original software.
+<item>	This notice may not be removed or altered from any source
+	distribution.
+</enum>
+
+
+
+</article>
+
+
+
+

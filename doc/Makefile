@@ -11,6 +11,7 @@ SGML  =	ar65.sgml	\
 	cl65.sgml   	\
         co65.sgml       \
 	coding.sgml	\
+        da65.sgml       \
 	debugging.sgml	\
 	dio.sgml    	\
         funcref.sgml    \

@@ -8,3 +8,6 @@ getsp.s		-	Helper routine for ft.c
 joytest.c	-	readjoy function test program
 
 cprintf.c	-	test program for cprintf \n and \r operators
+
+deb.c		-	test program for the library debugger
+

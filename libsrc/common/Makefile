@@ -88,6 +88,8 @@ S_OBJS = 	_fdesc.o	\
 		memcmp.o    	\
 	 	memcpy.o      	\
 	 	memset.o      	\
+		modfree.o       \
+		modload.o       \
 		printf.o      	\
 	 	rand.o	      	\
 	 	setjmp.o      	\

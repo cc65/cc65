@@ -38,8 +38,10 @@
 
 
 
-#include "../common/exprdefs.h"
-
+/* common */
+#include "exprdefs.h"
+	  
+/* ld65 */
 #include "objdata.h"
 #include "exports.h"
 #include "config.h"

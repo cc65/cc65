@@ -43,7 +43,7 @@
 /* common */
 #include "exprdefs.h"
 #include "filepos.h"
-	  
+
 /* ld65 */
 #include "objdata.h"
 #include "config.h"
@@ -57,29 +57,29 @@
 
 
 /* Import symbol structure */
-typedef struct Import_ Import;
-struct Import_ {
-    Import*		Next;		/* Single linked list */
-    ObjData*		Obj;		/* Object file that imports the name */
-    FilePos		Pos;		/* File position of reference */
+typedef struct Import Import;
+struct Import {
+    Import*  		Next;		/* Single linked list */
+    ObjData* 		Obj;		/* Object file that imports the name */
+    FilePos  		Pos;		/* File position of reference */
     union {
-	struct Export_*	Exp;		/* Matching export for this import */
-	const char*	Name;		/* Name if not in table */
+	struct Export*	Exp;		/* Matching export for this import */
+	const char*  	Name;		/* Name if not in table */
     } V;
-    unsigned char	Type;		/* Type of import */
+    unsigned char    	Type;		/* Type of import */
 };
 
 
 
 /* Export symbol structure */
-typedef struct Export_ Export;
-struct Export_ {
+typedef struct Export Export;
+struct Export {
     Export*    	       	Next;  		/* Hash table link */
-    unsigned		Flags;		/* Generic flags */
-    ObjData*		Obj;		/* Object file that exports the name */
-    unsigned		ImpCount;	/* How many imports for this symbol? */
-    Import*		ImpList;	/* List of imports for this symbol */
-    FilePos		Pos;		/* File position of definition */
+    unsigned 		Flags;		/* Generic flags */
+    ObjData* 		Obj;		/* Object file that exports the name */
+    unsigned 		ImpCount;	/* How many imports for this symbol? */
+    Import*  		ImpList;	/* List of imports for this symbol */
+    FilePos  		Pos;		/* File position of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned char	Type;		/* Type of export */
     char*      	       	Name;		/* Name - dynamically allocated */
@@ -157,7 +157,7 @@ void CircularRefError (const Export* E);
 /* Print an error about a circular reference using to define the given export */
 
 
-
+	     
 /* End of exports.h */
 
 #endif

@@ -76,6 +76,7 @@ OBJS =	bin.obj		\
 	expr.obj	\
 	extsyms.obj	\
 	fileio.obj	\
+	fragment.obj	\
 	global.obj	\
 	library.obj	\
 	main.obj	\

@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   objdata.h				     */
+/*				  fragment.h				     */
 /*                                                                           */
-/*		 Handling object file data for the ld65 linker		     */
+/*			  Code/data fragment routines			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,73 +33,48 @@
 
 
 
-#ifndef OBJDATA_H
-#define OBJDATA_H
+#ifndef FRAGMENT_H
+#define FRAGMENT_H
 
 
 
 /* common */
-#include "objdefs.h"
+#include "filepos.h"
 
 
 
 /*****************************************************************************/
-/*     	      	    	      	     Data		      		     */
+/*     	       	     		     Data  				     */
 /*****************************************************************************/
 
 
 
-/* Values for the Flags field */
-#define	OBJ_REF		0x0001 	       	/* We have a reference to this file */
-#define OBJ_HAVEDATA	0x0002		/* We have this object file already */
-#define OBJ_MARKED     	0x0004 		/* Generic marker bit */
-
-
-/* Internal structure holding object file data */
-typedef struct ObjData ObjData;
-struct ObjData {
-    ObjData*	     	Next; 		/* Linked list of all objects */
-    char*   	     	Name; 		/* Module name */
-    char*      	       	LibName;	/* Name of library */
-    ObjHeader	 	Header;		/* Header of file */
-    unsigned long	Start;		/* Start offset of data in library */
-    unsigned 	     	Flags;
-    unsigned 	 	FileCount;	/* Input file count */
-    char**	 	Files;		/* List of input files */
-    unsigned	 	SectionCount;	/* Count of sections in this object */
-    struct Section**  	Sections;	/* List of all sections */
-    unsigned	  	ExportCount;	/* Count of exports */
-    struct Export**	Exports;       	/* List of all exports */
-    unsigned	 	ImportCount;	/* Count of imports */
-    struct Import**	Imports;	/* List of all imports */
-    unsigned	 	DbgSymCount;	/* Count of debug symbols */
-    struct DbgSym**   	DbgSyms;       	/* List of debug symbols */
+/* Fragment structure */
+typedef struct Fragment Fragment;
+struct Fragment {
+    Fragment*	   	Next;  		/* Next fragment in list */
+    struct ObjData*	Obj;		/* Source of fragment */
+    unsigned long      	Size;  		/* Size of data/expression */
+    struct ExprNode*	Expr;		/* Expression if FRAG_EXPR */
+    FilePos  		Pos;		/* File position in source */
+    unsigned char    	Type;  		/* Type of fragment */
+    unsigned char      	LitBuf [1]; 	/* Dynamically alloc'ed literal buffer */
 };
 
 
 
-/* Object data list management */
-extern unsigned		ObjCount;	/* Count of files in the list */
-extern ObjData*		ObjRoot;	/* List of object files */
-extern ObjData*		ObjLast;	/* Last entry in list */
-
-
-
 /*****************************************************************************/
-/*     	      	    		     Code		  	   	     */
+/*     	      	     	   	     Code  	      	  	  	     */
 /*****************************************************************************/
 
 
 
-ObjData* NewObjData (void);
-/* Allocate a new structure on the heap, insert it into the list, return it */
-
-void FreeObjData (ObjData* O);
-/* Free a complete struct */
+Fragment* NewFragment (unsigned char Type, unsigned long Size, struct Section* S);
+/* Create a new fragment and insert it into the section S */
 
 
 
-/* End of objdata.h */
+/* End of fragment.h */
 
 #endif
 

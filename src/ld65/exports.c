@@ -2,7 +2,7 @@
 /*                                                                           */
 /*				   exports.c				     */
 /*                                                                           */
-/*		      Exports handing for the ld65 linker		     */
+/*		     Exports handling for the ld65 linker		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

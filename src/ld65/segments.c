@@ -48,6 +48,7 @@
 #include "error.h"
 #include "expr.h"
 #include "fileio.h"
+#include "fragment.h"
 #include "global.h"
 #include "segments.h"
 
@@ -56,20 +57,6 @@
 /*****************************************************************************/
 /*     	       	     	       	     Data				     */
 /*****************************************************************************/
-
-
-
-/* Fragment structure */
-typedef struct Fragment_ Fragment;
-struct Fragment_ {
-    Fragment*	   	Next;  		/* Next fragment in list */
-    ObjData*		Obj;		/* Source of fragment */
-    unsigned long      	Size;  		/* Size of data/expression */
-    ExprNode*  	 	Expr;		/* Expression if FRAG_EXPR */
-    FilePos  		Pos;		/* File position in source */
-    unsigned char    	Type;  		/* Type of fragment */
-    unsigned char      	LitBuf [1]; 	/* Dynamically alloc'ed literal buffer */
-};
 
 
 
@@ -85,35 +72,6 @@ static Segment*	     	SegRoot = 0;	/* List of all segments */
 /*****************************************************************************/
 /*     	       	     	   	     Code  	      	  	  	     */
 /*****************************************************************************/
-
-
-
-static Fragment* NewFragment (unsigned char Type, unsigned long Size, Section* S)
-/* Create a new fragment and insert it into the segment S */
-{
-    /* Allocate memory */
-    Fragment* F = xmalloc (sizeof (Fragment) - 1 + Size);  	/* Portable? */
-
-    /* Initialize the data */
-    F->Next = 0;
-    F->Obj  = 0;
-    F->Size = Size;
-    F->Expr = 0;
-    F->Type = Type;
-
-    /* Insert the code fragment into the segment */
-    if (S->FragRoot == 0) {
-      	/* First fragment */
-      	S->FragRoot = F;
-    } else {
-      	S->FragLast->Next = F;
-    }
-    S->FragLast = F;
-    S->Size += Size;
-
-    /* Return the new fragment */
-    return F;
-}
 
 
 
@@ -413,7 +371,7 @@ void SegDump (void)
 			while (Count--) {
 			    if (I > 75) {
 				printf ("\n   ");
-				I = 3;
+		     		I = 3;
 			    }
 			    printf (" %02X", *Data++);
 			    I += 3;
@@ -435,7 +393,7 @@ void SegDump (void)
 
 		    case FRAG_FILL:
 			printf ("    Empty space (%lu bytes)\n", F->Size);
-			break;
+		     	break;
 
 		    default:
 			Internal ("Invalid fragment type: %02X", F->Type);

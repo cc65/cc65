@@ -36,9 +36,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-
-#include "../common/xmalloc.h"
-
+					    
+/* common */
+#include "xmalloc.h"
+	  
+/* ld65 */
 #include "global.h"
 #include "error.h"
 #include "fileio.h"
@@ -91,7 +93,7 @@ void FreeBinDesc (BinDesc* D)
 /* Free a binary format descriptor */
 {
     xfree (D);
-}    
+}
 
 
 
@@ -206,7 +208,7 @@ static int BinUnresolved (const char* Name, void* D)
 
 
 
-void BinWriteTarget (BinDesc* D, struct File_* F)
+void BinWriteTarget (BinDesc* D, struct File* F)
 /* Write a binary output file */
 {
     Memory* M;

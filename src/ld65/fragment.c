@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   dbgsyms.h				     */
+/*				  fragment.c				     */
 /*                                                                           */
-/*		   Debug symbol handing for the ld65 linker		     */
+/*			  Code/data fragment routines			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -31,66 +31,49 @@
 /*                                                                           */
 /*****************************************************************************/
 
-
-
-#ifndef DBGSYMS_H
-#define DBGSYMS_H
-
-
-
-#include <stdio.h>
+		    
 
 /* common */
-#include "exprdefs.h"
-#include "filepos.h"
+#include "xmalloc.h"
 
 /* ld65 */
-#include "objdata.h"
+#include "segments.h"
+#include "fragment.h"
 
 
 
 /*****************************************************************************/
-/*     	       	    	      	     Data				     */
+/*     	      	     	   	     Code  	      	  	  	     */
 /*****************************************************************************/
 
 
 
-/* Debug symbol structure */
-typedef struct DbgSym DbgSym;
-struct DbgSym {
-    DbgSym*    	       	Next;  		/* Pool linear list link */
-    unsigned   		Flags;		/* Generic flags */
-    ObjData*   		Obj;	    	/* Object file that exports the name */
-    FilePos    		Pos;		/* File position of definition */
-    ExprNode*  		Expr;		/* Expression (0 if not def'd) */
-    unsigned char	Type;		/* Type of symbol */
-    char*      	       	Name;		/* Name - dynamically allocated */
-};
+Fragment* NewFragment (unsigned char Type, unsigned long Size, Section* S)
+/* Create a new fragment and insert it into the section S */
+{
+    /* Allocate memory */
+    Fragment* F = xmalloc (sizeof (Fragment) - 1 + Size);  	/* Portable? */
+
+    /* Initialize the data */
+    F->Next = 0;
+    F->Obj  = 0;
+    F->Size = Size;
+    F->Expr = 0;
+    F->Type = Type;
+
+    /* Insert the code fragment into the segment */
+    if (S->FragRoot == 0) {
+      	/* First fragment */
+      	S->FragRoot = F;
+    } else {
+      	S->FragLast->Next = F;
+    }
+    S->FragLast = F;
+    S->Size += Size;
+
+    /* Return the new fragment */
+    return F;
+}
 
 
 
-/*****************************************************************************/
-/*     	      	    		     Code			       	     */
-/*****************************************************************************/
-
-
-
-DbgSym* ReadDbgSym (FILE* F, ObjData* Obj);
-/* Read a debug symbol from a file, insert and return it */
-
-long GetDbgSymVal (DbgSym* D);
-/* Get the value of this symbol */
-
-void PrintDbgSymLabels (ObjData* O, FILE* F);
-/* Print the debug symbols in a VICE label file */
-
-
-
-/* End of dbgsyms.h */
-
-#endif
-
-
-
-
-	     

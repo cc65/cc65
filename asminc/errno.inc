@@ -21,7 +21,8 @@ EIO		=	11	; I/O error
 EINTR		=	12	; Interrupted system call
 ENOSYS		=	13	; Function not implemented
 ESPIPE		=	14	; Illegal seek
-EUNKNOWN       	=      	15	; Unknown OS specific error - must be last!
+ERANGE          =       15      ; Range error
+EUNKNOWN       	=      	16	; Unknown OS specific error - must be last!
 
-EMAX		=	15	; Highest error code
+EMAX		=	16	; Highest error code
 

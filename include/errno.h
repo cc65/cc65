@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -70,7 +70,8 @@ extern int _errno;
 #define EINTR		12	/* Interrupted system call */
 #define ENOSYS		13	/* Function not implemented */
 #define ESPIPE		14	/* Illegal seek */
-#define EUNKNOWN       	15	/* Unknown OS specific error */
+#define ERANGE          15      /* Range error */
+#define EUNKNOWN       	16	/* Unknown OS specific error */
 
 
 

@@ -25,6 +25,7 @@ const char* const _sys_errlist[] = {
     "Interrupted system call",      /* 12 */
     "Function not implemented",     /* 13 */
     "Illegal seek",                 /* 14 */
+    "Range error",                  /* 15 */
 };
 
 

@@ -23,8 +23,10 @@ initmainargs:
 
 	lda	__dos_type	; which DOS?
 	cmp	#ATARIDOS
+	beq	nargdos		; DOS does not support arguments
+	cmp	#MYDOS
 	bne	argdos		; DOS supports arguments
-	rts
+nargdos:rts
 
 ; Initialize ourcl buffer
 

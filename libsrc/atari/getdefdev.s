@@ -25,6 +25,8 @@ _getdefdev:
 	lda	__dos_type	; which DOS?
 	cmp	#ATARIDOS
 	beq	finish
+	cmp	#MYDOS
+	beq	finish
 
 	ldy	#BUFOFF
 	lda	#0

@@ -273,11 +273,7 @@ COPYFROM:
 ; Transfer the bytes in the last page
 
     	ldy	#0
-	ldx	#VDC_DATA
-	stx	VDC_ADDR_REG
-@L3:	bit	VDC_ADDR_REG
-	bpl	@L3
-	lda	VDC_DATA_REG
+@L3:	jsr	vdcgetbyte
 	sta	(ptr2),y
 	iny
 	dec	tmp1
@@ -313,12 +309,8 @@ COPYTO:
 ; Transfer the bytes in the last page
 
     	ldy	#0
-	ldx	#VDC_DATA
-	stx	VDC_ADDR_REG
-@L3:	bit	VDC_ADDR_REG
-	bpl	@L3
-	lda	(ptr2),y
-	sta	VDC_DATA_REG
+@L3:	lda	(ptr2),y
+	jsr	vdcputbyte
 	iny
 	dec	tmp1
 	lda	tmp1

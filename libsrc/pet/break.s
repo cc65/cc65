@@ -6,8 +6,8 @@
 ;
 
        	.export	   	_set_brk, _reset_brk
+	.destructor	_reset_brk
        	.export	       	_brk_a, _brk_x, _brk_y, _brk_sr, _brk_pc
-	.import	   	_atexit
 
 	.include   	"pet.inc"
 
@@ -43,10 +43,6 @@ uservec:    	jmp	$FFFF 		; Patched at runtime
  	lda 	BRKVec+1
  	sta	oldvec+1      	; Save the old vector
 
-	lda	#<_reset_brk
-	ldx	#>_reset_brk
-	jsr	_atexit	      	; Install an exit handler
-
 L1:	lda	#<brk_handler 	; Set the break vector to our routine
 	sta	BRKVec
 	lda	#>brk_handler
@@ -59,11 +55,13 @@ L1:	lda	#<brk_handler 	; Set the break vector to our routine
 ; Reset the break vector
 .proc	_reset_brk
 
-	lda	oldvec
-	sta	BRKVec
-	lda	oldvec+1
-	sta	BRKVec+1
-	rts
+	lda  	oldvec
+	bne  	@L1
+	ldx  	oldvec
+	beq  	@L9		; Jump if vector not installed
+@L1:	sta    	BRKVec
+	stx  	BRKVec+1
+@L9:	rts
 
 .endproc
 
@@ -106,4 +104,4 @@ L1:	lda	#<brk_handler 	; Set the break vector to our routine
 .endproc
 
 
-			      
+

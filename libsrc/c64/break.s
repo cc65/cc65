@@ -6,24 +6,24 @@
 ;
 
        	.export	   	_set_brk, _reset_brk
+	.destructor	_reset_brk
        	.export	       	_brk_a, _brk_x, _brk_y, _brk_sr, _brk_pc
-	.import	   	_atexit
 
 	.include   	"c64.inc"
 
 
 .bss
-_brk_a:		.res	1
-_brk_x:		.res   	1
-_brk_y:		.res   	1
-_brk_sr:	.res	1
-_brk_pc:	.res	2
+_brk_a:	     	.res	1
+_brk_x:	     	.res   	1
+_brk_y:	     	.res   	1
+_brk_sr:     	.res	1
+_brk_pc:     	.res	2
 
 oldvec:       	.res	2   		; Old vector
 
 
 .data
-uservec:    	jmp	$FFFF		; Patched at runtime
+uservec:     	jmp	$FFFF		; Patched at runtime
 
 
 .code
@@ -31,26 +31,22 @@ uservec:    	jmp	$FFFF		; Patched at runtime
 ; Set the break vector
 .proc	_set_brk
 
-	sta	uservec+1
-  	stx	uservec+2 	; Set the user vector
+	sta  	uservec+1
+  	stx  	uservec+2 	; Set the user vector
 
-	lda	oldvec
-	ora	oldvec+1	; Did we save the vector already?
-       	bne	L1		; Jump if we installed the handler already
+	lda  	oldvec
+	ora  	oldvec+1	; Did we save the vector already?
+       	bne  	L1		; Jump if we installed the handler already
 
-	lda	BRKVec
+	lda  	BRKVec
  	sta    	oldvec
- 	lda 	BRKVec+1
- 	sta	oldvec+1	; Save the old vector
+ 	lda  	BRKVec+1
+ 	sta  	oldvec+1	; Save the old vector
 
-	lda	#<_reset_brk
-	ldx	#>_reset_brk
-	jsr	_atexit		; Install an exit handler
-
-L1:	lda	#<brk_handler	; Set the break vector to our routine
-	sta	BRKVec
-	lda	#>brk_handler
-	sta	BRKVec+1
+L1:	lda  	#<brk_handler	; Set the break vector to our routine
+	sta  	BRKVec
+	lda  	#>brk_handler
+	sta  	BRKVec+1
 	rts
 
 .endproc
@@ -59,11 +55,13 @@ L1:	lda	#<brk_handler	; Set the break vector to our routine
 ; Reset the break vector
 .proc	_reset_brk
 
-	lda	oldvec
-	sta	BRKVec
-	lda	oldvec+1
-	sta	BRKVec+1
-	rts
+	lda  	oldvec
+	bne  	@L1
+	ldx  	oldvec
+	beq  	@L9		; Jump if vector not installed
+@L1:	sta    	BRKVec
+	stx  	BRKVec+1
+@L9:	rts
 
 .endproc
 

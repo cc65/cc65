@@ -9,13 +9,14 @@
 ###############################################################################
 
 Summary: Crosscompiler/Crossassembler for 6502 systems
-Name: cc65
+%define name cc65
+Name: %{name}
 %define version 2.8.0
 Version: %{version}
 Release: 1
 Copyright: Freeware with exceptions - see docs
 Group: Development/Languages
-Source: ftp://ftp.musoftware.de/uz/cc65/cc65-sources-%{version}.tar.bz2
+Source: ftp://ftp.musoftware.de/uz/cc65/%{name}-sources-%{version}.tar.bz2
 Vendor: MU Softwareentwicklung
 Packager: Ullrich von Bassewitz <uz@musoftware.de>
 %ifos linux
@@ -52,6 +53,7 @@ machines, you have to install at least one of the library packages.
 %attr(755,root,root)   		/usr/bin/od65
 %attr(755,root,root) %dir	/usr/lib/cc65
 %attr(755,root,root) %dir	/usr/lib/cc65/lib
+%attr(755,root,root) %dir	/usr/lib/cc65/tgi
 %attr(755,root,root) %dir	/usr/lib/cc65/include
 %attr(644,root,root)   		/usr/lib/cc65/include/*.h
 %attr(755,root,root) %dir	/usr/lib/cc65/include/tgi
@@ -99,7 +101,8 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 %files c64
 %attr(644,root,root) 		/usr/lib/cc65/lib/c64.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/c64.o
-%attr(644,root,root) 		/usr/lib/cc65/lib/c64-*.tgi
+%attr(755,root,root) %dir	/usr/lib/cc65/tgi/c64
+%attr(644,root,root) 		/usr/lib/cc65/tgi/c64/c64-*.tgi
 %doc src/ld65/cfg/c64.cfg
 
 
@@ -305,7 +308,7 @@ cd ..
 
 
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{lib,include/{geos,tgi}}}
+mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{tgi/{c64},lib,include/{geos,tgi}}}
 
 # Binaries
 install -s -m 755 src/ar65/ar65 $RPM_BUILD_ROOT/usr/bin
@@ -318,7 +321,8 @@ install -s -m 755 src/grc/grc $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/ld65/ld65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/od65/od65 $RPM_BUILD_ROOT/usr/bin
 # Libraries and includes
-install -m 644 libsrc/*.lib libsrc/*.o libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/lib
+install -m 644 libsrc/*.lib libsrc/*.o $RPM_BUILD_ROOT/usr/lib/cc65/lib
+install -m 644 libsrc/c64-*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi/c64
 install -m 644 include/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include
 install -m 644 include/geos/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/geos
 install -m 644 include/tgi/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/tgi
@@ -326,6 +330,9 @@ install -m 644 asminc/*.inc $RPM_BUILD_ROOT/usr/lib/cc65/asminc
 
 
 %changelog
+* Wen Nov 20 2002 Ullrich von Bassewitz <uz@cc65.org>
+Added TGI stuff.
+
 * Mon Apr 08 2002 Ullrich von Bassewitz <uz@cc65.org>
 Update to version 2.8.0 of the compiler package.
 

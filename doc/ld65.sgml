@@ -605,6 +605,55 @@ name="-S"></tt> option).
 
 
 
+<sect1>The FILES section<p>
+
+The <tt/FILES/ section is used to support other formats than straight binary
+(which is the default, so binary output files do not need an explicit entry
+in the <tt/FILES/ section).
+
+The <tt/FILES/ section lists output files and as only attribute the format of
+each output file. Assigning binary format to the default output file would
+look like this:
+
+<tscreen><verb>
+     	FILES {
+     	    %O: format = bin;
+     	}
+</verb></tscreen>
+
+The only other available output format is the o65 format specified by Andre
+Fachat. It is defined like this:
+
+<tscreen><verb>
+     	FILES {
+     	    %O: format = o65;
+     	}
+</verb></tscreen>
+
+The necessary o65 attributes are defined in a special section labeled
+<tt/FORMAT/.
+
+
+
+<sect1>The FORMAT section<p>
+
+The <tt/FORMAT/ section is used to describe file formats. The default (binary)
+format has currently no attributes, so, while it may be listed in this
+section, the attribute list is empty. The second supported format, o65, has
+several attributes that may be defined here.
+
+<tscreen><verb>
+    FORMATS {
+        o65: os = lunix, version = 0, type = small,
+             import = LUNIXKERNEL,
+             export = _main;
+    }
+</verb></tscreen>
+
+
+
+
+
 <sect1>Features<p>
 
 In addition to the <tt/MEMORY/ and <tt/SEGMENTS/ sections described above, the

@@ -147,22 +147,6 @@ void CreateLabelFile (void)
 	PrintDbgSymLabels (O, F);
     }
 
-    /* If we should mark write protected areas as such, do it */
-    if (WProtSegs) {
-	SegDesc* S = SegDescList;
-	while (S) {
-	    /* Is this segment write protected and contains data? */
-	    if (S->Flags & SF_WPROT && S->Seg->Size > 0) {
-		/* Write protect the memory area in VICE */
-		fprintf (F, "wp %04lX %04lX\n",
-			 S->Seg->PC,
-			 S->Seg->PC + S->Seg->Size - 1);
-	    }
-	    /* Next segment */
-	    S = S->Next;
-	}
-    }
-
     /* Close the file */
     if (fclose (F) != 0) {
 	Error ("Error closing map file `%s': %s", LabelFileName, strerror (errno));

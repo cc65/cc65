@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -55,7 +55,6 @@ extern unsigned char	VerboseMap;	/* Verbose map file */
 extern const char*	MapFileName;	/* Name of the map file */
 extern const char*	LabelFileName;	/* Name of the label file */
 extern const char*      DbgFileName;    /* Name of the debug file */
-extern unsigned char   	WProtSegs;	/* Mark write protected segments */
 
 
 

@@ -94,7 +94,6 @@ static void Usage (void)
        	     "  -C name\t\tUse linker config file\n"
              "  -L path\t\tSpecify a library search path\n"
        	     "  -Ln name\t\tCreate a VICE label file\n"
-       	     "  -Lp\t\t\tMark write protected segments as such (VICE)\n"
        	     "  -S addr\t\tSet the default start address\n"
        	     "  -V\t\t\tPrint the linker version\n"
        	     "  -h\t\t\tHelp (this text)\n"
@@ -107,6 +106,7 @@ static void Usage (void)
 	     "Long options:\n"
              "  --cfg-path path\tSpecify a config file search path\n"
        	     "  --config name\t\tUse linker config file\n"
+	     "  --dbgfile name\t\tGenerate debug information\n"
              "  --dump-config name\tDump a builtin configuration\n"
 	     "  --help\t\tHelp (this text)\n"
              "  --lib file\t\tLink this library\n"
@@ -459,9 +459,8 @@ int main (int argc, char* argv [])
 
 		case 'L':
 		    switch (Arg [2]) {
-                        /* ## The first two are obsolete and will go */
+                        /* ## The first one is obsolete and will go */
 		      	case 'n': LabelFileName = GetArg (&I, 3);   break;
-		      	case 'p': WProtSegs = 1;    	      	    break;
 		      	default:  OptLibPath (Arg, GetArg (&I, 2)); break;
 		    }
 		    break;

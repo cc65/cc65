@@ -1,4 +1,4 @@
-;
+;     
 ; Startup code for cc65 (C64 version)
 ;
 ; This must be the *first* file on the linker command line
@@ -15,19 +15,24 @@
 	.include     	"c64.inc"
 
 
-.code
+; ------------------------------------------------------------------------
+; Create an empty LOWCODE segment to avoid linker warnings
+
+.segment        "LOWCODE"
 
 ; ------------------------------------------------------------------------
+; Place the startup code in a special segment.
+
+.segment       	"STARTUP"
+
 ; BASIC header with a SYS call
 
-	.org	$7FF
         .word   Head            ; Load address
 Head:   .word   @Next
         .word   1000            ; Line number
         .byte   $9E,"2061"      ; SYS 2061
         .byte   $00             ; End of BASIC line
 @Next:  .word   0               ; BASIC end marker
-	.reloc
 
 ; ------------------------------------------------------------------------
 ; Actual code
@@ -102,6 +107,9 @@ L2:	lda	zpsave,x
 
 	jmp	RESTOR
 
+
+; ------------------------------------------------------------------------
+; Data
 
 .data
 

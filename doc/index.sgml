@@ -37,7 +37,7 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="compile.txt" name="compile.txt"></tag>
   How to compile cc65 and the support tools.
 
-  <tag><htmlurl url="debugging.txt" name="debugging.txt"></tag>
+  <tag><htmlurl url="debugging.html" name="debugging.html"></tag>
   Debug programs using the VICE emulator.
 
   <tag><htmlurl url="dio.html" name="dio.html"></tag>

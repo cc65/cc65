@@ -10,6 +10,7 @@ SGML  =	ar65.sgml	\
 	cc65.sgml	\
 	cl65.sgml   	\
 	coding.sgml	\
+	debugging.sgml	\
 	dio.sgml    	\
 	geos.sgml   	\
 	index.sgml  	\

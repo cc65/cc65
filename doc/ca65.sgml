@@ -667,6 +667,24 @@ because they don't have a name which would allow to access them.
 
 
 
+<sect>Scopes<label id="scopes">
+
+<p>
+
+
+
+
+
+
+<sect>Address sizes<label id="address-sizes">
+
+<p>
+
+
+
+
+
+
 <sect>Control commands<label id="control-commands">
 
 <p>
@@ -1131,6 +1149,11 @@ Here's a list of all control commands and a description, what they do:
   is read from an include file.
 
 
+<sect1><tt>.ENDENUM</tt><label id=".ENDENUM"><p>
+
+  End a <tt><ref id=".ENUM" name=".ENUM"></tt> declaration.
+
+
 <sect1><tt>.ENDIF</tt><label id=".ENDIF"><p>
 
   Conditional assembly: Close a <tt><ref id=".IF" name=".IF..."></tt> or
@@ -1150,6 +1173,66 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.ENDREP, .ENDREPEAT</tt><label id=".ENDREPEAT"><p>
 
   End a <tt><ref id=".REPEAT" name=".REPEAT"></tt> block.
+
+
+<sect1><tt>.ENUM</tt><label id=".ENUM"><p>
+
+  Start an enumeration. This directive is very similar to the C <tt/enum/
+  keyword. If a name is given, a new scope is created for the enumeration,
+  otherwise the enumeration members are placed in the enclosing scope.
+
+  In the enumeration body, symbols are declared. The first symbol has a value
+  of zero, and each following symbol will get the value of the preceeding plus
+  one. This behaviour may be overriden by an explicit assignment. Two symbols
+  may have the same value.
+
+  Example:
+
+  <tscreen><verb>
+        .enum   errorcodes
+                no_error
+                file_error
+                parse_error
+        .endenum
+  </verb></tscreen>
+
+  Above example will create a new scope named <tt/errorcodes/ with three
+  symbols in it that get the values 0, 1 and 2 respectively. Another way
+  to write this would have been:
+
+  <tscreen><verb>
+        .scope  errorcodes
+                no_error        = 0
+                file_error      = 1
+                parse_error     = 2
+        .endscope
+  </verb></tscreen>
+
+  Please note that explicit scoping must be used to access the identifiers:
+
+  <tscreen><verb>
+        .word   errorcodes::no_error
+  </verb></tscreen>
+
+  A more complex example:
+
+  <tscreen><verb>
+        .enum
+                EUNKNOWN        = -1
+                EOK
+                EFILE
+                EBUSY
+                EAGAIN
+                EWOULDBLOCK     = EAGAIN
+        .endenum
+  </verb></tscreen>
+
+  In this example, the enumeration does not have a name, which means that the
+  members will be visible in the enclosing scope and can be used in this scope
+  without explicit scoping. The first member (<tt/EUNKNOWN/) has the value -1.
+  The value for the following members is incremented by one, so <tt/EOK/ would
+  be zero and so on. <tt/EWOULDBLOCK/ is an alias for <tt/EGAIN/, so it has an
+  override for the value using an already defined symbol.
 
 
 <sect1><tt>.ERROR</tt><label id=".ERROR"><p>
@@ -3118,7 +3201,7 @@ hear from you. Feel free to contact me by email
 
 <sect>Copyright<p>
 
-ca65 (and all cc65 binutils) are (C) Copyright 1998-2001 Ullrich von
+ca65 (and all cc65 binutils) are (C) Copyright 1998-2003 Ullrich von
 Bassewitz. For usage of the binaries and/or sources the following
 conditions do apply:
 

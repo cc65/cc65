@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -103,7 +103,7 @@ int IsConstExpr (ExprNode* Root)
 {
     int         Const;
     Export*     E;
-    Section*    S;      
+    Section*    S;
 
     if (EXPR_IS_LEAF (Root->Op)) {
       	switch (Root->Op) {
@@ -157,7 +157,7 @@ int IsConstExpr (ExprNode* Root)
       	/* We must handle shortcut boolean expressions here */
       	switch (Root->Op) {
 
-      	    case EXPR_BAND:
+      	    case EXPR_BOOLAND:
       	 	if (IsConstExpr (Root->Left)) {
       	 	    /* lhs is const, if it is zero, don't eval right */
       	 	    if (GetExprVal (Root->Left) == 0) {
@@ -171,7 +171,7 @@ int IsConstExpr (ExprNode* Root)
       	 	}
       	 	break;
 
-      	    case EXPR_BOR:
+      	    case EXPR_BOOLOR:
       	 	if (IsConstExpr (Root->Left)) {
       	 	    /* lhs is const, if it is not zero, don't eval right */
       	 	    if (GetExprVal (Root->Left) != 0) {
@@ -357,16 +357,16 @@ long GetExprVal (ExprNode* Expr)
 	    Left = GetExprVal (Expr->Left);
 	    return ((Left >> 8) & 0x00FF) | ((Left << 8) & 0xFF00);
 
-	case EXPR_BAND:
+	case EXPR_BOOLAND:
 	    return GetExprVal (Expr->Left) && GetExprVal (Expr->Right);
 
-	case EXPR_BOR:
+	case EXPR_BOOLOR:
 	    return GetExprVal (Expr->Left) || GetExprVal (Expr->Right);
 
-	case EXPR_BXOR:
+	case EXPR_BOOLXOR:
 	    return (GetExprVal (Expr->Left) != 0) ^ (GetExprVal (Expr->Right) != 0);
 
-	case EXPR_BNOT:
+	case EXPR_BOOLNOT:
        	    return !GetExprVal (Expr->Left);
 
         default:

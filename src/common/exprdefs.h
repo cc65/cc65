@@ -78,15 +78,15 @@
 #define EXPR_GT        	       	(EXPR_BINARYNODE | 0x0E)
 #define EXPR_LE        	       	(EXPR_BINARYNODE | 0x0F)
 #define EXPR_GE        	       	(EXPR_BINARYNODE | 0x10)
-#define EXPR_BAND		(EXPR_BINARYNODE | 0x11)
-#define EXPR_BOR		(EXPR_BINARYNODE | 0x12)
-#define EXPR_BXOR		(EXPR_BINARYNODE | 0x13)
+#define EXPR_BOOLAND		(EXPR_BINARYNODE | 0x11)
+#define EXPR_BOOLOR 		(EXPR_BINARYNODE | 0x12)
+#define EXPR_BOOLXOR		(EXPR_BINARYNODE | 0x13)
 
 /* Unary operations, right hand side is empty */
 #define EXPR_UNARY_MINUS       	(EXPR_UNARYNODE | 0x01)
 #define EXPR_NOT       	       	(EXPR_UNARYNODE | 0x02)
 #define EXPR_SWAP      	       	(EXPR_UNARYNODE | 0x03)
-#define EXPR_BNOT		(EXPR_UNARYNODE | 0x04)
+#define EXPR_BOOLNOT		(EXPR_UNARYNODE | 0x04)
 #define EXPR_FORCEWORD		(EXPR_UNARYNODE | 0x05)
 #define EXPR_FORCEFAR		(EXPR_UNARYNODE | 0x06)
 
@@ -101,7 +101,7 @@
 
 /* The expression node itself */
 typedef struct ExprNode ExprNode;
-struct ExprNode {                                    
+struct ExprNode {
     unsigned char    	    Op;	    	/* Operand/Type */
     ExprNode*  	     	    Left;      	/* Left leaf */
     ExprNode*  	     	    Right;     	/* Right leaf */

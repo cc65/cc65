@@ -138,15 +138,15 @@ static void InternalDumpExpr (const ExprNode* Expr)
      	    printf (" >=");
      	    break;
 
-	case EXPR_BAND:
+	case EXPR_BOOLAND:
 	    printf (" BOOL_AND");
 	    break;
 
-	case EXPR_BOR:
+	case EXPR_BOOLOR:
 	    printf (" BOOL_OR");
 	    break;
 
-	case EXPR_BXOR:
+	case EXPR_BOOLXOR:
 	    printf (" BOOL_XOR");
 	    break;
 
@@ -162,7 +162,7 @@ static void InternalDumpExpr (const ExprNode* Expr)
 	    printf (" SWAP");
 	    break;
 
-	case EXPR_BNOT:
+	case EXPR_BOOLNOT:
     	    printf (" BOOL_NOT");
 	    break;
 
@@ -200,7 +200,7 @@ static void InternalDumpExpr (const ExprNode* Expr)
 
         default:
        	    AbEnd ("Unknown Op type: %u", Expr->Op);
-                          
+
     }
 }
 

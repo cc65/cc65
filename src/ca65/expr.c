@@ -364,8 +364,10 @@ static int FuncStrAt (void)
 	return 0;
     }
 
-    /* Return the char, handle as unsigned */
-    return (unsigned char) Str[(size_t)Index];
+    /* Return the char, handle as unsigned. Be sure to translate it into
+     * the target character set.
+     */
+    return (unsigned char) TgtTranslateChar (Str [(size_t)Index]);
 }
 
 

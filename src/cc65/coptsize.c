@@ -221,6 +221,7 @@ unsigned OptSize1 (CodeSeg* S)
                 if ((D->A < 0 || D->A == E->RI->In.RegA) &&
                     (D->X < 0 || D->X == E->RI->In.RegX) &&
                     (D->Y < 0 || D->Y == E->RI->In.RegY)) {
+
                     /* Ok, match for all registers */
                     CodeEntry* X;
                     X = NewCodeEntry (E->OPC, E->AM, D->ShortFunc, 0, E->LI);
@@ -229,6 +230,9 @@ unsigned OptSize1 (CodeSeg* S)
 
                     /* Remember that we had changes */
                     ++Changes;
+
+                    /* Done */
+                    break;
                 }
 
                 /* Next table entry, bail out if next entry not valid */

@@ -21,6 +21,7 @@ OBJS =	_scrsize.o	\
 	cputc.o		\
 	kbhit.o		\
         kernal.o        \
+        kplot.o         \
         randomize.o     \
 	readjoy.o
 

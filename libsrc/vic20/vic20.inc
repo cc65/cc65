@@ -33,9 +33,6 @@ PALFLAG		= $2A6		; $01 = PAL, $00 = NTSC
 ; Direct entries
 CLRSCR		= $E55F
 KBDREAD		= $E5CF
-NAMED_OPEN	= $F495
-NAMED_CLOSE	= $F6DA
-PLOTCHAR	= $EAAA	 	; Char in A, color in X
 
 ; ---------------------------------------------------------------------------
 ; Vector and other locations
@@ -47,7 +44,7 @@ NMIVec		= $0318
 ; ---------------------------------------------------------------------------
 ; I/O: 6560 VIC
 
-VIC 		= $9000                               
+VIC 		= $9000
 VIC_LINES       = $9003         ; Screen lines, bit 7 is bit 0 from VIC_HLINE
 VIC_HLINE       = $9004         ; Rasterline, bits 1-8
 VIC_COLOR	= $900F         ; Border and background color

@@ -41,7 +41,6 @@
         .export         CLALL
         .export         UDTIM
         .export         SCREEN
-        .export         PLOT
         .export         IOBASE
 
 
@@ -85,6 +84,5 @@ GETIN		= $FFE4
 CLALL		= $FFE7
 UDTIM		= $FFEA
 SCREEN		= $FFED
-PLOT		= $FFF0
 IOBASE		= $FFF3
 

@@ -3,7 +3,7 @@
 <article>
 <title>Diskette Sector I/O Routines
 <author>Christian Groessler, <htmlurl url="mailto:cpg@aladdin.de" name="cpg@aladdin.de">
-<date>21.11.2000
+<date>20-Feb-2005
 
 <abstract>
 The cc65 library provides functions to read and write raw disk sectors.
@@ -45,7 +45,7 @@ The read and write functions are:
                                          void *buffer);
 </verb></tscreen>
 
-This function will read the sector specified by sect_num into the memory
+This function will read the sector specified by <tt>sect_num</tt> into the memory
 location at buffer.
 
 <tscreen><verb>
@@ -67,10 +67,24 @@ This function will write the memory contents at buffer to the sector specified
 by <tt>sect_num</tt>. A verification is performed.
 <p>
 
+Use the <tt><ref name="dio_query_sectsize" id="sectsize"></tt> function to query the size of a sector.
+
 All these functions will return 0 for success and an OS specific error code in
 case of failure.
 <p>
 
+<sect>Querying sector size<label id="sectsize"><p>
+
+Some systems support multiple diskette formats which have different sector sizes.
+The following function returns the sector size of the currently inserted disk:
+
+<tscreen><verb>
+    sectsize_t __fastcall__ dio_query_sectsize(dhandle_t handle);
+</verb></tscreen>
+
+On the Atari platform, the sector size is handled specially. Please refer
+to the DIO section in the <htmlurl url="atari.html" name="Atari">
+specific platform documentation.
 
 <sect>Converting sector numbers<p>
 

@@ -126,6 +126,7 @@ OBJS =	anonname.obj	\
     	symentry.obj	\
     	symtab.obj	\
 	textseg.obj	\
+        typecast.obj    \
     	typecmp.obj	\
 	util.obj
 
@@ -209,6 +210,7 @@ FILE swstmt.obj
 FILE symentry.obj
 FILE symtab.obj
 FILE textseg.obj
+FILE typecast.obj
 FILE typecmp.obj
 FILE util.obj
 LIBRARY ..\common\common.lib

@@ -81,6 +81,7 @@ OBJS =	anonname.o	\
     	symentry.o	\
     	symtab.o       	\
 	textseg.o	\
+        typecast.o      \
     	typecmp.o	\
     	util.o
 

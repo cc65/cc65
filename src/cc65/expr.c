@@ -31,6 +31,7 @@
 #include "scanner.h"
 #include "stdfunc.h"
 #include "symtab.h"
+#include "typecast.h"
 #include "typecmp.h"
 #include "expr.h"
 
@@ -85,9 +86,6 @@ static GenDesc GenOASGN  = { TOK_OR_ASSIGN,	GEN_NOPUSH,     g_or  };
 /*****************************************************************************/
 
 
-
-static int hie10 (ExprDesc* lval);
-/* Handle ++, --, !, unary - etc. */
 
 static int expr (int (*func) (ExprDesc*), ExprDesc *lval);
 /* Expression parser; func is either hie0 or hie1. */
@@ -501,7 +499,7 @@ void exprhs (unsigned flags, int k, ExprDesc *lval)
     f = lval->Flags;
     if (k) {
        	/* Dereferenced lvalue */
-     	flags |= TypeOf (lval->Type);
+       	flags |= TypeOf (lval->Type);
      	if (lval->Test & E_FORCETEST) {
      	    flags |= CF_TEST;
      	    lval->Test &= ~E_FORCETEST;
@@ -529,10 +527,11 @@ void exprhs (unsigned flags, int k, ExprDesc *lval)
      	/* Constant of some sort, load it into the primary */
      	lconst (flags, lval);
     }
-    if (lval->Test & E_FORCETEST) {	/* we testing this value? */
-     	/* debug... */
+    /* Are we testing this value? */
+    if (lval->Test & E_FORCETEST) {
+        /* Yes, force a test */
      	flags |= TypeOf (lval->Type);
-       	g_test (flags);	       	       	/* yes, force a test */
+       	g_test (flags);
        	lval->Test &= ~E_FORCETEST;
     }
 }
@@ -1234,7 +1233,7 @@ static int arrayref (int k, ExprDesc* lval)
 	     	    /* Constant numeric address. Just add it */
 	     	    g_inc (CF_INT | CF_UNSIGNED, lval->ConstVal);
 	     	} else if (lflags == E_MLOCAL) {
-	     	    /* Base address is a local variable address */
+	       	    /* Base address is a local variable address */
 		    if (IsTypeArray (tptr1)) {
 	     	        g_addaddr_local (CF_INT, lval->ConstVal);
 		    } else {
@@ -1291,8 +1290,8 @@ static int structref (int k, ExprDesc* lval)
     flags = lval->Flags & ~E_MCTYPE;
     if (flags == E_MCONST ||
        	(k == 0 && (flags == E_MLOCAL ||
-	     	    (flags & E_MGLOBAL) != 0 ||
-	     	    lval->Flags  == E_MEOFFS))) {
+	       	    (flags & E_MGLOBAL) != 0 ||
+	       	    lval->Flags  == E_MEOFFS))) {
 	lval->ConstVal += Field->V.Offs;
     } else {
 	if ((flags & E_MEXPR) == 0 || k != 0) {
@@ -1490,7 +1489,7 @@ static void pre_incdec (ExprDesc* lval, void (*inc) (unsigned, unsigned long))
 
 
 
-static void post_incdec (ExprDesc *lval, int k, void (*inc) (unsigned, unsigned long))
+static void post_incdec (ExprDesc* lval, int k, void (*inc) (unsigned, unsigned long))
 /* Handle i-- and i++ */
 {
     unsigned flags;
@@ -1564,99 +1563,7 @@ static void unaryop (int tok, ExprDesc* lval)
 
 
 
-static int typecast (ExprDesc* lval)
-/* Handle an explicit cast */
-{
-    int k;
-    type Type[MAXTYPELEN];
-
-    /* Skip the left paren */
-    NextToken ();
-
-    /* Read the type */
-    ParseType (Type);
-
-    /* Closing paren */
-    ConsumeRParen ();
-
-    /* Read the expression we have to cast */
-    k = hie10 (lval);
-
-    /* If the expression is a function, treat it as pointer-to-function */
-    if (IsTypeFunc (lval->Type)) {
-	lval->Type = PointerTo (lval->Type);
-    }
-
-    /* Check for a constant on the right side */
-    if (k == 0 && lval->Flags == E_MCONST) {
-
-	/* A cast of a constant to something else. If the new type is an int,
-	 * be sure to handle the size extension correctly. If the new type is
-	 * not an int, the cast is implementation specific anyway, so leave
-	 * the value alone.
-	 */
-	if (IsClassInt (Type)) {
-
-	    /* Get the current and new size of the value */
-	    unsigned OldBits = CheckedSizeOf (lval->Type) * 8;
-	    unsigned NewBits = CheckedSizeOf (Type)       * 8;
-
-	    /* Check if the new datatype will have a smaller range */
-       	    if (NewBits <= OldBits) {
-
-	     	/* Cut the value to the new size */
-	     	lval->ConstVal &= (0xFFFFFFFFUL >> (32 - NewBits));
-
-	   	/* If the new type is signed, sign extend the value */
-	   	if (!IsSignUnsigned (Type)) {
-	   	    lval->ConstVal |= ((~0L) << NewBits);
-	   	}
-
-	    } else {
-
-	   	/* Sign extend the value if needed */
-	     	if (!IsSignUnsigned (lval->Type) && !IsSignUnsigned (Type)) {
-	     	    if (lval->ConstVal & (0x01UL << (OldBits-1))) {
-	     	   	lval->ConstVal |= ((~0L) << OldBits);
-	     	    }
-	     	}
-	    }
-	}
-
-    } else {
-
-	/* Not a constant. Be sure to ignore casts to void */
-	if (!IsTypeVoid (Type)) {
-
-	    /* If the size does not change, leave the value alone. Otherwise,
-	     * we have to load the value into the primary and generate code to
-	     * cast the value in the primary register.
-	     */
-	    if (SizeOf (Type) != SizeOf (lval->Type)) {
-
-	   	/* Load the value into the primary */
-	   	exprhs (CF_NONE, k, lval);
-
-       	       	/* Emit typecast code */
-	   	g_typecast (TypeOf (Type), TypeOf (lval->Type));
-
-	   	/* Value is now in primary */
-	   	lval->Flags = E_MEXPR;
-       	       	k = 0;
-	    }
-	}
-    }
-
-    /* In any case, use the new type */
-    lval->Type = TypeDup (Type);
-
-    /* Done */
-    return k;
-}
-
-
-
-static int hie10 (ExprDesc* lval)
+int hie10 (ExprDesc* lval)
 /* Handle ++, --, !, unary - etc. */
 {
     int k;
@@ -1747,7 +1654,7 @@ static int hie10 (ExprDesc* lval)
      	default:
        	    if (istypeexpr ()) {
      	     	/* A cast */
-    	     	return typecast (lval);
+    	     	return TypeCast (lval);
      	    }
     }
 

@@ -107,6 +107,9 @@ void boolexpr (ExprDesc* lval);
 void test (unsigned label, int cond);
 /* Generate code to perform test and jump if false. */
 
+int hie10 (ExprDesc* lval);
+/* Handle ++, --, !, unary - etc. */
+
 int hie1 (ExprDesc* lval);
 /* Parse first level of expression hierarchy. */
 

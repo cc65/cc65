@@ -100,7 +100,7 @@ void __fastcall__ GraphicsString(char *myGfxString);
 /* VDC screen constants	*/
 #define	SCREENBYTEWIDTH		80
 #define	SCREENPIXELWIDTH	640
-/* control characters for use as numbers, not chars */
+/* control characters for use as numbers, not characters */
 #define	BACKSPACE	8
 #define	FORWARDSPACE	9
 #define	TAB		9
@@ -124,7 +124,7 @@ void __fastcall__ GraphicsString(char *myGfxString);
 #define	OUTLINEON	26
 #define	PLAINTEXT	27
 /* control characters for use in
-   strings: eg: str[10]=BOLD "Hello";	*/
+   strings: eg: str[10]=CBOLDON "Hello"; */
 #define CCR		"\015"
 #define CULINEON	"\016"
 #define CULINEOFF	"\017"

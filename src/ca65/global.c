@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.c				     */
+/*				   global.c		   		     */
 /*                                                                           */
 /*		 Global variables for the ca65 macroassembler		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -76,7 +76,7 @@ unsigned char LeadingDotInIdents = 0;   /* Allow '.' to start an identifier */
 unsigned char PCAssignment       = 0;	/* Allow "* = $XXX" or "$ = $XXX" */
 
 /* Misc stuff */
-const char Copyright[]           = "(C) Copyright 1998-2003 Ullrich von Bassewitz";
+const char Copyright[]           = "(C) Copyright 1998-2004 Ullrich von Bassewitz";
 
 
 

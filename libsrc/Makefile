@@ -6,9 +6,10 @@
 
 # Defines for executables. The first two are passed to the submakes and are
 # relative to the subdirectories, the last one is used directly.
-CC = ../../src/cc65/cc65
 AS = ../../src/ca65/ca65
 AR = ../src/ar65/ar65
+CC = ../../src/cc65/cc65
+LD = ../../src/ld65/ld65
 
 # List of all targets
 ALLTARGETS =	apple2lib	\
@@ -28,7 +29,7 @@ all:
 	for tgt in $(ALLTARGETS); do		\
 	    $(MAKE) clean $$tgt || exit 1;	\
 	done
-
+			
 #-----------------------------------------------------------------------------
 # Apple ][
 
@@ -82,10 +83,11 @@ atmoslib:
 
 c64lib:
 	for i in c64 cbm common runtime conio dbg tgi; do \
-	    CC=$(CC) \
 	    AS=$(AS) \
-	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
+	    CC=$(CC) \
+	    LD=$(LD) \
 	    AFLAGS="-t c64 -I../../asminc" \
+	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv c64/crt0.o c64.o

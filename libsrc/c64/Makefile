@@ -11,23 +11,29 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-OBJS =	_scrsize.o	\
-	break.o		\
-	crt0.o		\
-	cgetc.o		\
-	clrscr.o	\
-	color.o		\
-	conio.o		\
-	cputc.o		\
-	kbhit.o		\
-	mouse.o		\
-	readjoy.o      	\
-	rs232.o		\
-        tgi_mode_table.o\
+%.tgi:	%.o
+	@$(LD) -t module -o $@ $< ../runtime/zeropage.o
+
+OBJS = 	_scrsize.o     	 	\
+       	break.o	       	 	\
+       	crt0.o 	       	 	\
+       	cgetc.o	       	 	\
+       	clrscr.o       	 	\
+       	color.o	       	 	\
+       	conio.o	       	 	\
+       	cputc.o	       	 	\
+       	kbhit.o	       	 	\
+       	mouse.o	       	 	\
+       	readjoy.o      	 	\
+       	rs232.o	       	 	\
+        tgi_mode_table.o 	\
 	write.o
 
-all:	$(OBJS)
+TGIS =	c64-320-200-2.tgi
+
+
+all:	$(OBJS) $(TGIS)
 
 clean:
-	@rm -f $(OBJS)
+	@rm -f $(OBJS) $(TGIS:.tgi=.o)
 

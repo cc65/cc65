@@ -94,19 +94,6 @@ void __fastcall__ pokewsys (unsigned addr, unsigned val);
         asm ("stx $01"),        \
         asm ("ldx #$00"),       \
         __AX__
-
-#define pokebsys(addr,val)      \
-        __AX__ = (addr),        \
-        asm ("sta ptr1"),       \
-        asm ("stx ptr1+1"),     \
-        __AX__ = (val),         \
-        asm ("ldx $01"),        \
-        asm ("ldy #$0F"),       \
-        asm ("sty $01"),        \
-        asm ("ldy #$00"),       \
-        asm ("sta (ptr1),y"),   \
-        asm ("stx $01")
-
 #endif
 
 

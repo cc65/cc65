@@ -970,7 +970,6 @@ unsigned OptStoreLoad (CodeSeg* S)
 	if ((E->Info & OF_STORE) != 0                       &&
 	    (N = CS_GetNextEntry (S, I)) != 0  	            &&
 	    !CE_HasLabel (N)                                &&
-       	    (N->Info & OF_LOAD) != 0                        &&
 	    E->AM == N->AM                                  &&
        	    ((E->OPC == OP65_STA && N->OPC == OP65_LDA) ||
 	     (E->OPC == OP65_STX && N->OPC == OP65_LDX) ||
@@ -979,7 +978,7 @@ unsigned OptStoreLoad (CodeSeg* S)
 	    (X = CS_GetNextEntry (S, I+1)) != 0             &&
        	    (X->Info & OF_FBRA) == 0) {
 
-	    /* Register value is not used, remove the load */
+       	    /* Register has already the correct value, remove the load */
 	    CS_DelEntry (S, I+1);
 
 	    /* Remember, we had changes */
@@ -1118,11 +1117,11 @@ unsigned OptBranchDist (CodeSeg* S)
 		}
 
 		/* Make the branch short/long according to distance */
-		if ((E->Info & OF_LBRA) == 0 && Distance > 120) {
+	    	if ((E->Info & OF_LBRA) == 0 && Distance > 125) {
 		    /* Short branch but long distance */
 		    CE_ReplaceOPC (E, MakeLongBranch (E->OPC));
 		    ++Changes;
-		} else if ((E->Info & OF_LBRA) != 0 && Distance < 120) {
+		} else if ((E->Info & OF_LBRA) != 0 && Distance < 125) {
 		    /* Long branch but short distance */
 		    CE_ReplaceOPC (E, MakeShortBranch (E->OPC));
 		    ++Changes;

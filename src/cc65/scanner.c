@@ -340,7 +340,7 @@ static void CharConst (void)
 static void StringConst (void)
 /* Parse a quoted string */
 {
-    nxtval = GetLiteralOffs ();
+    nxtval = GetLiteralPoolOffs ();
     nxttok = TOK_SCONST;
 
     /* Be sure to concatenate strings */

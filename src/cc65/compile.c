@@ -253,9 +253,6 @@ void Compile (void)
     char* Path;
 
 
-    /* Setup variables */
-    LiteralLabel = GetLabel ();
-
     /* Add some standard paths to the include search path */
     AddIncludePath ("", INC_USER);		/* Current directory */
     AddIncludePath ("include", INC_SYS);
@@ -291,6 +288,9 @@ void Compile (void)
 	}
     }
 
+    /* Initialize the literal pool */
+    InitLiteralPool ();
+
     /* Create the base lexical level */
     EnterGlobalLevel ();
 
@@ -300,14 +300,14 @@ void Compile (void)
     /* Ok, start the ball rolling... */
     Parse ();
 
-    /* Dump literal pool. */
+    /* Dump the literal pool. */
     DumpLiteralPool ();
 
     /* Write imported/exported symbols */
     EmitExternals ();
 
     if (Debug) {
-	PrintLiteralStats (stdout);
+	PrintLiteralPoolStats (stdout);
 	PrintMacroStats (stdout);
     }
 

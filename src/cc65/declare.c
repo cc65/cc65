@@ -1,8 +1,35 @@
-/*
- * declare.c
- *
- * Ullrich von Bassewitz, 20.06.1998
- */
+/*****************************************************************************/
+/*                                                                           */
+/*				   declare.c				     */
+/*                                                                           */
+/*		   Parse variable and function declarations		     */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
 
 
 
@@ -1025,11 +1052,11 @@ static void ParseStructInit (type* Type)
 void ParseInit (type* T)
 /* Parse initialization of variables. */
 {
-    int count;
     struct expent lval;
     type* t;
     const char* str;
-    int sz;
+    int Count;
+    int Size;
 
     switch (UnqualifiedType (*T)) {
 
@@ -1070,32 +1097,32 @@ void ParseInit (type* T)
      	    break;
 
      	case T_ARRAY:
-     	    sz = Decode (T + 1);
+     	    Size = Decode (T + 1);
 	    t = T + DECODE_SIZE + 1;
        	    if (IsTypeChar(t) && curtok == TOK_SCONST) {
      	     	str = GetLiteral (curval);
-     	     	count = strlen (str) + 1;
+     	     	Count = strlen (str) + 1;
 	    	TranslateLiteralPool (curval);	/* Translate into target charset */
-     	     	g_defbytes (str, count);
-     	     	ResetLiteralOffs (curval);	/* Remove string from pool */
+     	     	g_defbytes (str, Count);
+     	     	ResetLiteralPoolOffs (curval);	/* Remove string from pool */
      	     	NextToken ();
      	    } else {
      	     	ConsumeLCurly ();
-     	     	count = 0;
+     	     	Count = 0;
      	     	while (curtok != TOK_RCURLY) {
      	     	    ParseInit (T + DECODE_SIZE + 1);
-     	     	    ++count;
+     	     	    ++Count;
      	     	    if (curtok != TOK_COMMA)
      	     	 	break;
      	     	    NextToken ();
      	     	}
      	     	ConsumeRCurly ();
      	    }
-     	    if (sz == 0) {
-     	     	Encode (T + 1, count);
-     	    } else if (count < sz) {
-     	     	g_zerobytes ((sz - count) * SizeOf (T + DECODE_SIZE + 1));
-     	    } else if (count > sz) {
+     	    if (Size == 0) {
+     	     	Encode (T + 1, Count);
+     	    } else if (Count < Size) {
+     	     	g_zerobytes ((Size - Count) * SizeOf (T + DECODE_SIZE + 1));
+     	    } else if (Count > Size) {
      	     	Error ("Too many initializers");
      	    }
      	    break;

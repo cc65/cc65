@@ -333,9 +333,6 @@ void NewFunc (SymEntry* Func)
     /* Emit references to imports/exports */
     EmitExternals ();
 
-    /* Dump literal data created by the function */
-    DumpLiteralPool ();
-
     /* Cleanup register variables */
     DoneRegVars ();
 

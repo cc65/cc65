@@ -179,7 +179,7 @@ ExprNode* DoAsm (void)
      	 * will fail if the next token is also a string token, but that's a
      	 * syntax error anyway, because we expect a right paren.
      	 */
-     	ResetLiteralOffs (CurTok.IVal);
+     	ResetLiteralPoolOffs (CurTok.IVal);
     }
 
     /* Skip the string token */

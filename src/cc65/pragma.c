@@ -129,7 +129,7 @@ static void StringPragma (void (*Func) (const char*))
 	Func (Name);
 
      	/* Reset the string pointer, removing the string from the pool */
-     	ResetLiteralOffs (curval);
+     	ResetLiteralPoolOffs (curval);
     }
 
     /* Skip the string (or error) token */
@@ -161,7 +161,7 @@ static void SegNamePragma (void (*Func) (const char*))
 	}
 
      	/* Reset the string pointer, removing the string from the pool */
-     	ResetLiteralOffs (curval);
+     	ResetLiteralPoolOffs (curval);
     }
 
     /* Skip the string (or error) token */

@@ -48,15 +48,18 @@
 
 
 
-extern unsigned LiteralLabel;		/* Pool asm label */
+extern unsigned LiteralPoolLabel;		/* Pool asm label */
 
 
 
 /*****************************************************************************/
-/*		 		     Code				     */
+/*		 	    	     Code				     */
 /*****************************************************************************/
 
 
+
+void InitLiteralPool (void);
+/* Initialize the literal pool */
 
 void TranslateLiteralPool (unsigned Offs);
 /* Translate the literals starting from the given offset into the target
@@ -66,10 +69,10 @@ void TranslateLiteralPool (unsigned Offs);
 void DumpLiteralPool (void);
 /* Dump the literal pool */
 
-unsigned GetLiteralOffs (void);
+unsigned GetLiteralPoolOffs (void);
 /* Return the current offset into the literal pool */
 
-void ResetLiteralOffs (unsigned Offs);
+void ResetLiteralPoolOffs (unsigned Offs);
 /* Reset the offset into the literal pool to some earlier value, effectively
  * removing values from the pool.
  */
@@ -85,13 +88,14 @@ unsigned AddLiteral (const char* S);
 const char* GetLiteral (unsigned Offs);
 /* Get a pointer to the literal with the given offset in the pool */
 
-void PrintLiteralStats (FILE* F);
+void PrintLiteralPoolStats (FILE* F);
 /* Print statistics about the literal space used */
 
 
 
 /* End of litpool.h */
 #endif
+
 
 
 

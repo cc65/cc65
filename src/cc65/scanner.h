@@ -153,7 +153,7 @@ struct Token_ {
     double	FVal;		/* The float attribute */
     ident	Ident;		/* Identifier if IDENT */
     unsigned	Pos;		/* Source line where the token comes from */
-    type*      	Type;		/* Type if integer or float constant */
+    type*	Type;		/* Type if integer or float constant */
 };
 
 extern Token CurTok;		/* The current token */

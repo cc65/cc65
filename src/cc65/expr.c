@@ -309,7 +309,7 @@ void DefineData (struct expent* lval)
 
        	case E_TLIT:
 	    /* a literal of some kind */
-       	    g_defdata (CF_STATIC, LiteralLabel, lval->e_const);
+       	    g_defdata (CF_STATIC, LiteralPoolLabel, lval->e_const);
        	    break;
 
        	default:
@@ -352,7 +352,7 @@ static void lconst (unsigned flags, struct expent* lval)
 
        	case E_TLIT:
 	    /* Literal string */
-	    g_getimmed (CF_STATIC, LiteralLabel, lval->e_const);
+	    g_getimmed (CF_STATIC, LiteralPoolLabel, lval->e_const);
        	    break;
 
        	default:
@@ -756,7 +756,7 @@ void doasm (void)
      	 * will fail if the next token is also a string token, but that's a
      	 * syntax error anyway, because we expect a right paren.
      	 */
-     	ResetLiteralOffs (curval);
+     	ResetLiteralPoolOffs (curval);
     }
 
     /* Skip the string token */

@@ -87,7 +87,8 @@ More special thanks to:
 
   * MagerValp <magervalp@cling.gu.se>
 
-    for sample code regarding the Plus/4 banking.
+    for sample code regarding the Plus/4 banking and the base for the new
+    C128 conio library supporting 80 column mode.
 
   * Piotr Fusik <P.Fusik@elka.pw.edu.pl>
 
@@ -105,15 +106,24 @@ Thanks to
     Darrell Krulce <dkrulce@atcomm.com>
     Dennis Lin <dennis@mosart.com.tw>
     Eric Bacher <ebacher@teaser.fr>
+    Gábor Lénárt <lgb@lgb.hu>
     Ingo Korb <unseen@gmx.net>
+    Jacek Jozwiak <jacek.jozwiak@interia.pl>
     Jaleco <jaleco@gameone.com.tw>
     Jari Tuominen <jer64@kolumbus.fi>
     Jesse Beach <agmorion@erols.com>
+    Joerg Schwedes <joerg.schwedes@siemens.com>
     John Weidman <jweidman@slip.net>
+    Jonathan Wright <jonathan.wright@adtran.com>
     Mark Nasgowitz <MNasgowitz@NAZdesign.com>
+    Peter Karlsson <peter@softwolves.pp.se>
     Robert R. Wal <rrw@reptile.eu.org>
+    Shawn Jefferson <sjefferson@sd62.bc.ca>
+    Stefan Andree <sandree@physik.tu-berlin.de>
     Stefan A. Haubenthal <polluks@web.de>
+    Stephan Lesch <slesch@studcs.uni-sb.de>
     Tim Vanderhoek <hoek@FreeBSD.org>
+    Todd Elliott <eyeth@videocam.net.au>
 
 for bug reports and suggestions.
 

@@ -170,7 +170,6 @@ OBJS = 	add.o		\
        	shreax3.o	\
 	shreax4.o	\
 	staspidx.o	\
-	staspp.o	\
        	staxsp.o	\
 	staxspi.o	\
 	staxspp.o	\

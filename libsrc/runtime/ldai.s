@@ -4,15 +4,16 @@
 ; CC65 runtime: Load a indirect from address in ax
 ;
 
-	.export		ldai, ldaidx
+	.export		ldaidx
 	.importzp	ptr1
 
-ldai:	ldy	#$00
-ldaidx:	sta	ptr1
+.proc	ldaidx
+	sta 	ptr1
 	stx	ptr1+1
 	ldx	#$00
 	lda	(ptr1),y
-	bpl	L9
+	bpl	@L1
 	dex
-L9:	rts
+@L1:	rts
+.endproc
 

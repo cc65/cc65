@@ -22,15 +22,14 @@
 	lda	#CLOSE
 	sta	ICCOM,x
 	jsr	CIOV
-	bpl	ok
-	jmp	__do_oserror
-
+	bmi	closerr
 ok:	ldx	#0
 	stx	__oserror		; clear system specific error code
 	txa
 	rts
 
 inverr:	jmp	__inviocb
+closerr:jmp	__do_oserror
 
 .endproc
 

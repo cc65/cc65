@@ -59,17 +59,17 @@
 #endif
 
 /* Include the correct machine specific file */
-#if defined(__APPLE2__) && !defined(_APPLE2_H)
+#if defined(__APPLE2__)
 #  include <apple2.h>
-#elif defined(__APPLE2ENH__) && !defined(_APPLE2ENH_H)
+#elif defined(__APPLE2ENH__)
 #  include <apple2enh.h>
-#elif defined(__ATARI__) && !defined(_ATARI_H)
+#elif defined(__ATARI__)
 #  include <atari.h>
-#elif defined(__ATMOS__) && !defined(_ATMOS_H)
+#elif defined(__ATMOS__)
 #  include <atmos.h>
-#elif defined(__CBM__) && !defined(_CBM_H)
+#elif defined(__CBM__)
 #  include <cbm.h>
-#elif defined(__NES__) && !defined(_NES_H)
+#elif defined(__NES__)
 #  include <nes.h>
 #else
 #  error "Unknown platform in conio.h"

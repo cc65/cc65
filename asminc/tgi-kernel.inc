@@ -72,6 +72,11 @@ TGI_HDR_OUTTEXT         = TGI_HDR_JUMPTAB+42    ; OUTTEXT routine
 TGI_HDR_JUMPCOUNT       = 21            ; Number of jump vectors
 
 ;------------------------------------------------------------------------------
+; The TGI API version, stored at TGI_HDR_VERSION
+
+TGI_API_VERSION         = $01
+
+;------------------------------------------------------------------------------
 ; Text style constants
 
 TGI_TEXT_HORIZONTAL     = 0

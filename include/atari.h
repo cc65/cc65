@@ -163,7 +163,7 @@ extern unsigned char _dos_type;        /* the DOS flavour */
 #define get_ostype   _get_ostype
 #define get_tv       _get_tv
 #define getdefdev    _getdefdev
-#endif  /* #ifdef ATARI_COMPAT_PRE_2_10 */
+#endif  /* #ifdef ATARI_COMPAT_PRE_2_11 */
 
 /* get_ostype return value defines (for explanation, see ostype.s) */
 /* masks */

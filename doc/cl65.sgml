@@ -58,6 +58,7 @@ Short options:
 Long options:
   --ansi       		Strict ANSI mode
   --asm-include-dir dir	Set an assembler include directory
+  --cpu type		Set cpu type
   --debug      		Debug mode
   --debug-info 		Add debug info
   --feature name        Set an emulation feature

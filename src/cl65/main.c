@@ -561,6 +561,7 @@ static void Usage (void)
 	     "Long options:\n"
        	     "  --ansi\t\tStrict ANSI mode\n"
 	     "  --asm-include-dir dir\tSet an assembler include directory\n"
+       	     "  --cpu type\t\tSet cpu type\n"
        	     "  --debug\t\tDebug mode\n"
        	     "  --debug-info\t\tAdd debug info\n"
 	     "  --feature name\tSet an emulation feature\n"
@@ -589,6 +590,18 @@ static void OptAsmIncludeDir (const char* Opt, const char* Arg)
 /* Include directory (assembler) */
 {
     CmdAddArg (&CA65, "-I");
+    CmdAddArg (&CA65, Arg);
+}
+
+
+
+static void OptCPU (const char* Opt, const char* Arg)
+/* Handle the --cpu option */
+{
+    /* Add the cpu type to the assembler and compiler */
+    CmdAddArg (&CA65, "--cpu");
+    CmdAddArg (&CA65, Arg);
+    CmdAddArg (&CC65, "--cpu");
     CmdAddArg (&CA65, Arg);
 }
 
@@ -703,6 +716,7 @@ int main (int argc, char* argv [])
     static const LongOpt OptTab[] = {
 	{ "--ansi",		0,	OptAnsi			},
 	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
+        { "--cpu",     	       	1, 	OptCPU 			},
 	{ "--debug",		0,	OptDebug		},
 	{ "--debug-info",	0,	OptDebugInfo		},
 	{ "--feature",	  	1,	OptFeature		},

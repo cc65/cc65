@@ -68,7 +68,7 @@ machines, you have to install at least one of the library packages.
 ###############################################################################
 
 %package vic20
-Requires: cc65 = %{version}
+Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: VIC20 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
@@ -89,7 +89,7 @@ programs for the Commodore VIC20 using the cc65 crosscompiler.
 ###############################################################################
 
 %package c16
-Requires: cc65 = %{version}
+Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: C16/116 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
@@ -110,7 +110,7 @@ programs for the Commodore C16/116 using the cc65 crosscompiler.
 ###############################################################################
 
 %package c64
-Requires: cc65 = %{version}
+Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: C64 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
@@ -133,7 +133,7 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 ###############################################################################
 
 %package c128
-Requires: cc65 = %{version}
+Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: C128 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
@@ -154,7 +154,7 @@ programs for the Commodore C128 using the cc65 crosscompiler.
 ###############################################################################
 
 %package atari
-Requires: cc65 = %{version}
+Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: Atari specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
@@ -175,7 +175,7 @@ programs for the 8 bit Atari machines using the cc65 crosscompiler.
 ###############################################################################
 
 %package plus4
-Requires: cc65 = %{version}
+Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: Plus/4 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
@@ -197,7 +197,7 @@ crosscompiler.
 ###############################################################################
 
 %package pet
-Requires: cc65 = %{version}
+Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: PET specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
@@ -219,7 +219,7 @@ crosscompiler.
 ###############################################################################
 
 %package cbm510
-Requires: cc65 = %{version}
+Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: CBM 510 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
@@ -241,7 +241,7 @@ crosscompiler.
 ###############################################################################
 
 %package cbm610
-Requires: cc65 = %{version}
+Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: CBM 610 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
@@ -263,7 +263,7 @@ the cc65 crosscompiler.
 ###############################################################################
 
 %package apple2
-Requires: cc65 = %{version}
+Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: Apple ][ specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
@@ -284,7 +284,7 @@ programs for the Apple ][ using the cc65 crosscompiler.
 ###############################################################################
 
 %package geos
-Requires: cc65 = %{version}
+Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: GEOS specific libraries and headers for the cc65 compiler.
 Group: Development/Languages

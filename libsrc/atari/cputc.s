@@ -9,7 +9,7 @@
 	.export		plot, cputdirect, putchar
 	.import		popa, _gotoxy, mul40
 	.importzp	tmp4,ptr4
-	.import		_revflag
+	.import		_revflag,setcursor
 
 	.include	"atari.inc"
 
@@ -25,7 +25,7 @@ _cputc:
 	lda	#0
 	sta	COLCRS
 	beq	plot		; return
-	
+
 L4:	cmp	#$0A		; LF
 	beq	newline
 	cmp	#ATEOL 	  	; Atari-EOL?
@@ -45,18 +45,6 @@ L4:	cmp	#$0A		; LF
 cputdirect:			; accepts screen code
 	jsr	putchar
 
-	; update cursor position pointer
-	ldy	#0
-	lda	OLDCHR
-	sta	(OLDADR),y
-	inc	OLDADR
-	bne	L1
-	inc	OLDADR+1
-L1:	lda	(OLDADR),y
-	sta	OLDCHR
-	ora	_revflag
-	sta	(OLDADR),y
-	
 ; advance cursor
 	inc	COLCRS
 	lda	COLCRS
@@ -73,7 +61,8 @@ newline:
 	bne	plot
 	lda	#0
 	sta	ROWCRS
-plot:	ldy	COLCRS
+plot:	jsr	setcursor
+	ldy	COLCRS
 	ldx	ROWCRS
 	rts
 
@@ -86,32 +75,21 @@ putchar:
 	sta	(OLDADR),y
 
 	lda	ROWCRS
-	jsr	mul40
-L3:	clc
+	jsr	mul40		; destroys tmp4
+	clc
 	adc	SAVMSC		; add start of screen memory
 	sta	ptr4
-	lda	tmp4
+	txa
 	adc	SAVMSC+1
 	sta	ptr4+1
 	pla			; get char again
 
+	ora	_revflag
 	sta	OLDCHR
 
-	ora	_revflag
 	ldy	COLCRS
 	sta	(ptr4),y
-
-	; update OLDADR (maybe ROWCRS and COLCRS were changed)
-	sty	tmp4
-	lda	ptr4
-	clc
-	adc	tmp4
-	sta	OLDADR
-	lda	ptr4+1
-	adc	#0
-	sta	OLDADR+1
-	rts
+	jmp	setcursor
 
 	.rodata
 ataint:	.byte	64,0,32,96
-

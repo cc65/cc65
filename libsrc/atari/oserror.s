@@ -58,6 +58,7 @@ maptable:
 	.byte	ENOMEM	;SCRMEM	= 147		;($93) insufficient memory for screen mode
 ; codes below taken from "Mein Atari Computer" (german version of "Your Atari Computer")
 ; also SpartaDOS codes from http://www.atari-central.com/programming/cio_errors.txt
+; MyDOS codes from Stefan Haubenthal
 	.byte	EUNKNOWN	; 148 - [SpartaDOS] unrecognized disk format
 	.byte	EUNKNOWN	; 149 - [SpartaDOS] disk created by incompatible version of SD
 	.byte	EBUSY		; 150 - serial port already open
@@ -86,12 +87,17 @@ maptable:
 	.byte	ENOSPC		; 169 - directory full
 	.byte	ENOENT		; 170 - file not found
 	.byte	ESPIPE		; 171 - point command invalid
-	.byte	EUNKNOWN	; 172 - haven't found documentation
+	.byte	EUNKNOWN	; 172 - [MYDOS] already exists in parent directory
 	.byte	EUNKNOWN	; 173 - bad disk - format couldn't complete
-	.byte	EUNKNOWN	; 174 - haven't found documentation
-	.byte	EUNKNOWN	; 175 - haven't found documentation
+	.byte	EUNKNOWN	; 174 - [MYDOS] directory not in parent directory
+	.byte	EUNKNOWN	; 175 - [MYDOS] directory not empty
 	.byte	EUNKNOWN	; 176 - [DOS 3] incompatible file system
+	.byte	EUNKNOWN	; 177 - haven't found documentation
+	.byte	EUNKNOWN	; 178 - haven't found documentation
+	.byte	EUNKNOWN	; 179 - haven't found documentation
+	.byte	EUNKNOWN	; 180 - not a binary file
+	.byte	EUNKNOWN	; 181 - [MYDOS] invalid address range
 
-	.byte	EINVAL		; 177 - dummy (used by cc65 rtl)
+	.byte	EINVAL		; 182 - dummy (used by cc65 rtl, see sysremove.s)
 
 MAX_OSERR_VAL = (* - maptable)

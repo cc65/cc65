@@ -42,6 +42,7 @@ OBJS =	anonname.o	\
 	coptpush.o	\
         coptsize.o      \
 	coptstop.o	\
+        coptstore.o     \
 	coptsub.o	\
 	copttest.o	\
 	cpu.o	  	\

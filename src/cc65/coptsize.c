@@ -266,9 +266,11 @@ unsigned OptSize2 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Get the input registers */
+        const RegContents* In = &E->RI->In;
 
 	/* Assume we have no replacement */
 	CodeEntry* X = 0;
@@ -279,14 +281,14 @@ unsigned OptSize2 (CodeSeg* S)
 	    case OP65_LDA:
 	        if (CE_KnownImm (E)) {
 		    short Val = (short) E->Num;
-		    if (Val == E->RI->In.RegX) {
+		    if (Val == In->RegX) {
 		    	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
-		    } else if (Val == E->RI->In.RegY) {
+		    } else if (Val == In->RegY) {
 		    	X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
-		    } else if (E->RI->In.RegA >= 0 && CPU >= CPU_65C02) {
-		    	if (Val == ((E->RI->In.RegA - 1) & 0xFF)) {
+		    } else if (RegValIsKnown (In->RegA) && CPU >= CPU_65C02) {
+		    	if (Val == ((In->RegA - 1) & 0xFF)) {
 		     	    X = NewCodeEntry (OP65_DEA, AM65_IMP, 0, 0, E->LI);
-		    	} else if (Val == ((E->RI->In.RegA + 1) & 0xFF)) {
+		    	} else if (Val == ((In->RegA + 1) & 0xFF)) {
 		    	    X = NewCodeEntry (OP65_INA, AM65_IMP, 0, 0, E->LI);
 	      	    	}
 		    }
@@ -296,11 +298,11 @@ unsigned OptSize2 (CodeSeg* S)
 	    case OP65_LDX:
 	        if (CE_KnownImm (E)) {
 		    short Val = (short) E->Num;
-		    if (E->RI->In.RegX >= 0 && Val == ((E->RI->In.RegX - 1) & 0xFF)) {
+		    if (RegValIsKnown (In->RegX) && Val == ((In->RegX - 1) & 0xFF)) {
 			X = NewCodeEntry (OP65_DEX, AM65_IMP, 0, 0, E->LI);
-		    } else if (E->RI->In.RegX >= 0 && Val == ((E->RI->In.RegX + 1) & 0xFF)) {
+       	       	    } else if (RegValIsKnown (In->RegX) && Val == ((In->RegX + 1) & 0xFF)) {
 			X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
-		    } else if (Val == E->RI->In.RegA) {
+		    } else if (Val == In->RegA) {
 			X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
                     }
 		}
@@ -309,11 +311,11 @@ unsigned OptSize2 (CodeSeg* S)
        	    case OP65_LDY:
 	        if (CE_KnownImm (E)) {
 		    short Val = (short) E->Num;
-		    if (E->RI->In.RegY >= 0 && Val == ((E->RI->In.RegY - 1) & 0xFF)) {
+		    if (RegValIsKnown (In->RegY) && Val == ((In->RegY - 1) & 0xFF)) {
 			X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, E->LI);
-		    } else if (E->RI->In.RegY >= 0 && Val == ((E->RI->In.RegY + 1) & 0xFF)) {
+		    } else if (RegValIsKnown (In->RegY) && Val == ((In->RegY + 1) & 0xFF)) {
 			X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, E->LI);
-		    } else if (Val == E->RI->In.RegA) {
+		    } else if (Val == In->RegA) {
 			X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
 		    }
 		}

@@ -800,7 +800,7 @@ unsigned OptDupLoads (CodeSeg* S)
 	switch (E->OPC) {
 
 	    case OP65_LDA:
-       	        if (In->RegA >= 0                     && /* Value of A is known */
+       	        if (RegValIsKnown (In->RegA)          && /* Value of A is known */
        		    CE_KnownImm (E)                   && /* Value to be loaded is known */
        	       	    In->RegA == (long) E->Num         && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
@@ -810,7 +810,7 @@ unsigned OptDupLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_LDX:
-       	        if (In->RegX >= 0                     && /* Value of X is known */
+       	        if (RegValIsKnown (In->RegX)          && /* Value of X is known */
 		    CE_KnownImm (E)                   && /* Value to be loaded is known */
 		    In->RegX == (long) E->Num         && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
@@ -820,7 +820,7 @@ unsigned OptDupLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_LDY:
-       	        if (In->RegY >= 0                     && /* Value of Y is known */
+       	        if (RegValIsKnown (In->RegY)          && /* Value of Y is known */
 		    CE_KnownImm (E)                   && /* Value to be loaded is known */
 		    In->RegY == (long) E->Num         && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
@@ -834,7 +834,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 * location does already contain the value to be stored,
 		 * remove the store.
 		 */
-	        if (In->RegA >= 0                     && /* Value of A is known */
+	        if (RegValIsKnown (In->RegA)          && /* Value of A is known */
 		    E->AM == AM65_ZP                  && /* Store into zp */
 		    In->RegA == RegVal (E->Chg, In)) { 	 /* Value identical */
 
@@ -847,7 +847,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 * location does already contain the value to be stored,
 		 * remove the store.
 		 */
-	        if (In->RegX >= 0                     && /* Value of A is known */
+	        if (RegValIsKnown (In->RegX)          && /* Value of A is known */
 		    E->AM == AM65_ZP                  && /* Store into zp */
        	       	    In->RegX == RegVal (E->Chg, In)) { 	 /* Value identical */
 
@@ -859,7 +859,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 * later. STX does support the zeropage,y addressing mode,
 		 * so be sure to check for that.
 		 */
-       	        } else if (In->RegX >= 0              &&
+       	        } else if (RegValIsKnown (In->RegX)   &&
 		    	   In->RegX == In->RegA       &&
 		    	   E->AM != AM65_ABSY         &&
 		    	   E->AM != AM65_ZPY) {
@@ -873,7 +873,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 * location does already contain the value to be stored,
 		 * remove the store.
 		 */
-	        if (In->RegY >= 0                     && /* Value of Y is known */
+	        if (RegValIsKnown (In->RegY)          && /* Value of Y is known */
 		    E->AM == AM65_ZP                  && /* Store into zp */
        	       	    In->RegY == RegVal (E->Chg, In)) { 	 /* Value identical */
 
@@ -886,7 +886,7 @@ unsigned OptDupLoads (CodeSeg* S)
 	 	 * replacement by X, but check for invalid addressing modes
 		 * in this case.
 		 */
-       	        } else if (In->RegY >= 0) {
+       	        } else if (RegValIsKnown (In->RegY)) {
 		    if (In->RegY == In->RegA) {
 		     	CE_ReplaceOPC (E, OP65_STA);
 		    } else if (In->RegY == In->RegX   &&
@@ -910,7 +910,7 @@ unsigned OptDupLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_TAX:
-                if (In->RegA >= 0                     &&
+                if (RegValIsKnown (In->RegA)          &&
 		    In->RegA == In->RegX              &&
 		    (N = CS_GetNextEntry (S, I)) != 0 &&
        	       	    !CE_UseLoadFlags (N)) {
@@ -920,7 +920,7 @@ unsigned OptDupLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_TAY:
-                if (In->RegA >= 0                       &&
+                if (RegValIsKnown (In->RegA)            &&
 		    In->RegA == In->RegY                &&
 		    (N = CS_GetNextEntry (S, I)) != 0   &&
        	       	    !CE_UseLoadFlags (N)) {
@@ -930,7 +930,7 @@ unsigned OptDupLoads (CodeSeg* S)
 	        break;
 
        	    case OP65_TXA:
-                if (In->RegX >= 0                       &&
+                if (RegValIsKnown (In->RegX)            &&
 		    In->RegX == In->RegA                &&
 		    (N = CS_GetNextEntry (S, I)) != 0   &&
        	       	    !CE_UseLoadFlags (N)) {
@@ -940,7 +940,7 @@ unsigned OptDupLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_TYA:
-                if (In->RegY >= 0                       &&
+                if (RegValIsKnown (In->RegY)            &&
 		    In->RegY == In->RegA                &&
 		    (N = CS_GetNextEntry (S, I)) != 0   &&
        	       	    !CE_UseLoadFlags (N)) {
@@ -961,7 +961,7 @@ unsigned OptDupLoads (CodeSeg* S)
 	    CS_DelEntry (S, I);
 
 	    /* Remember, we had changes */
-	    ++Changes;
+	    ++Changes;                      
 
 	} else {
 

@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*  	       	   	  	     Data				     */
+/*  	       	   	       	     Data				     */
 /*****************************************************************************/
 
 
@@ -82,6 +82,26 @@ void RC_Invalidate (RegContents* C);
 void RC_InvalidateZP (RegContents* C);
 /* Invalidate all ZP registers */
 
+#if defined(HAVE_INLINE)
+INLINE int RegValIsKnown (short Val)
+/* Return true if the register value is known */
+{
+    return (Val >= 0);
+}
+#else
+#  define RegValIsKnown(S)      ((S) >= 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int RegValIsUnknown (short Val)
+/* Return true if the register value is not known */
+{
+    return (Val < 0);
+}
+#else
+#  define RegValIsUnknown(S)      ((S) < 0)
+#endif
+
 RegInfo* NewRegInfo (const RegContents* RC);
 /* Allocate a new register info, initialize and return it. If RC is not
  * a NULL pointer, it is used to initialize both, the input and output
@@ -93,9 +113,11 @@ void FreeRegInfo (RegInfo* RI);
 
 
 
+
+
 /* End of reginfo.h */
 #endif
 
 
 
-		    
+

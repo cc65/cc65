@@ -87,6 +87,7 @@ OBJS =	anonname.obj	\
 	coptpush.obj	\
         coptsize.obj    \
 	coptstop.obj	\
+        coptstore.obj   \
 	coptsub.obj	\
 	copttest.obj	\
 	cpu.obj		\
@@ -169,6 +170,7 @@ FILE coptneg.obj
 FILE coptpush.obj
 FILE coptsize.obj
 FILE coptstop.obj
+FILE coptstore.obj
 FILE coptsub.obj
 FILE copttest.obj
 FILE cpu.obj

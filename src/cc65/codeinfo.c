@@ -590,6 +590,14 @@ int RegAXUsed (struct CodeSeg* S, unsigned Index)
 
 
 
+int RegEAXUsed (struct CodeSeg* S, unsigned Index)
+/* Check if any of the four bytes in EAX are used. */
+{
+    return (GetRegInfo (S, Index, REG_EAX) & REG_EAX) != 0;
+}
+
+
+
 unsigned GetKnownReg (unsigned Use, const RegContents* RC)
 /* Return the register or zero page location from the set in Use, thats
  * contents are known. If Use does not contain any register, or if the

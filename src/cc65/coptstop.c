@@ -207,9 +207,9 @@ static void CheckDirectOp (StackOpData* D)
         if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS) {
             /* These insns are all ok and replaceable */
             D->Flags |= OP_DIRECT;
-        } else if (E->AM == AM65_ZP_INDY &&
-                   E->RI->In.RegY >= 0   &&
-       	       	   (E->Use & REG_SP) != 0) {
+        } else if (E->AM == AM65_ZP_INDY          &&
+                   RegValIsKnown (E->RI->In.RegY) &&
+       	       	   (E->Use & REG_SP) != 0) {      
             /* Load from stack with known offset is also ok */
             D->Flags |= (OP_DIRECT | OP_ONSTACK);
         }
@@ -337,7 +337,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
     InsertEntry (D, X, D->OpIndex+1);
     X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+2);
-    if (D->OpEntry->RI->In.RegX >= 0) {
+    if (RegValIsKnown (D->OpEntry->RI->In.RegX)) {
 	/* Value of X is known */
 	const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegX);
        	X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, D->OpEntry->LI);
@@ -396,7 +396,7 @@ static unsigned Opt_tosaddax (StackOpData* D)
     } else if (D->OpEntry->RI->In.RegX == 0) {
        	/* The high byte is that of the first operand plus carry */
      	CodeLabel* L;
-     	if (D->PushEntry->RI->In.RegX >= 0) {
+     	if (RegValIsKnown (D->PushEntry->RI->In.RegX)) {
      	    /* Value of first op high byte is known */
 	    const char* Arg = MakeHexArg (D->PushEntry->RI->In.RegX);
 	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
@@ -482,7 +482,8 @@ static unsigned Opt_tosorax (StackOpData* D)
     AddOpLow (D, OP65_ORA);
 
     /* High byte */
-    if (D->PushEntry->RI->In.RegX >= 0 && D->OpEntry->RI->In.RegX >= 0) {
+    if (RegValIsKnown (D->PushEntry->RI->In.RegX) && 
+        RegValIsKnown (D->OpEntry->RI->In.RegX)) {
      	/* Both values known, precalculate the result */
 	const char* Arg = MakeHexArg (D->PushEntry->RI->In.RegX | D->OpEntry->RI->In.RegX);
        	X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
@@ -521,7 +522,8 @@ static unsigned Opt_tosxorax (StackOpData* D)
     AddOpLow (D, OP65_EOR);
 
     /* High byte */
-    if (D->PushEntry->RI->In.RegX >= 0 && D->OpEntry->RI->In.RegX >= 0) {
+    if (RegValIsKnown (D->PushEntry->RI->In.RegX) && 
+        RegValIsKnown (D->OpEntry->RI->In.RegX)) {
      	/* Both values known, precalculate the result */
      	const char* Arg = MakeHexArg (D->PushEntry->RI->In.RegX ^ D->OpEntry->RI->In.RegX);
        	X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
@@ -661,8 +663,8 @@ unsigned OptStackOps (CodeSeg* S)
 	/* Handling depends if we're inside a sequence or not */
 	if (InSeq) {
 
-       	    if (((E->Use & REG_SP) != 0                         &&
-		 (E->AM != AM65_ZP_INDY || E->RI->In.RegY < 0))) {
+       	    if (((E->Use & REG_SP) != 0 &&
+		 (E->AM != AM65_ZP_INDY || RegValIsUnknown (E->RI->In.RegY)))) {
 
 	    	/* All this stuff is not allowed in a sequence */
 	    	InSeq = 0;

@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  coptpush.c                                 */
+/*                                  coptstore.h                              */
 /*                                                                           */
-/*			    Optimize push sequences                          */
+/*                                Optimize stores                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
+/* (C) 2002      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,84 +33,39 @@
 
 
 
+#ifndef COPTSTORE_H
+#define COPTSTORE_H
+
+
+
 /* cc65 */
-#include "codeent.h"
-#include "codeinfo.h"
-#include "coptpush.h"
+#include "codeseg.h"
 
 
 
 /*****************************************************************************/
-/*				     Code                                    */
+/*		 		     Code                                    */
 /*****************************************************************************/
 
 
 
-unsigned OptPush1 (CodeSeg* S)
-/* Given a sequence
- *
- *     ldy     #xx
- *     jsr     ldaxysp
- *     jsr     pushax
- *
- * If a/x are not used later, replace that by
- *
- *     ldy     #xx+2
- *     jsr     pushwysp
- *
- * saving 3 bytes and several cycles.
+unsigned OptStore1 (CodeSeg* S);
+/* Search for a call to staxysp. If the ax register is not used later, and
+ * the value is constant, just use the A register and store directly into the
+ * stack.
  */
-{
-    unsigned Changes = 0;
 
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
+unsigned OptStore2 (CodeSeg* S);               
+/* Search for a call to steaxysp. If the eax register is not used later, and
+ * the value is constant, just use the A register and store directly into the
+ * stack.
+ */
 
-     	CodeEntry* L[3];
 
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
 
-     	/* Check for the sequence */
-	if (L[0]->OPC == OP65_LDY               &&
-	    CE_KnownImm (L[0])                  &&
-	    L[0]->Num < 0xFE                    &&
-	    !CS_RangeHasLabel (S, I+1, 2)       &&
-       	    CS_GetEntries (S, L+1, I+1, 2)   	&&
-	    CE_IsCallTo (L[1], "ldaxysp")       &&
-       	    CE_IsCallTo (L[2], "pushax")        &&
-       	    !RegAXUsed (S, I+3)) {
+/* End of coptstore.h */
 
-	    /* Insert new code behind the pushax */
-	    const char* Arg;
-	    CodeEntry* X;
-
-	    /* ldy     #xx+1 */
-	    Arg = MakeHexArg (L[0]->Num+2);
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+3);
-
-	    /* jsr pushwysp */
-	    X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushwysp", 0, L[2]->LI);
-	    CS_InsertEntry (S, X, I+4);
-
-	    /* Delete the old code */
-	    CS_DelEntries (S, I, 3);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
+#endif
 
 
 

@@ -11,15 +11,6 @@
 ;
 ; div_t __fastcall__ div (int numer, int denom);
 ;
-; Both sides of an assignment-expression must be cast to (long)
-; because cc65 functions can't return structures -- yet.  Example:
-;
-; #include <stdlib.h>
-; div_t answer;
-;
-; (long)answer = (long)div(-41, +3);
-; printf("The quotient is %d, and the remainder is %d.\n",
-;	answer.quot, answer.rem);
 
 	.export		_div
 

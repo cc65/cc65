@@ -15,6 +15,7 @@ OBJS =  anonname.o      \
         condasm.o	\
 	dbginfo.o	\
 	ea.o	      	\
+        enum.o          \
         error.o	      	\
         expr.o	      	\
 	feature.o	\

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 struct.h                                  */
+/*                                  enum.c                                   */
 /*                                                                           */
-/*                          .STRUCT/.UNION commands                          */
+/*                               .ENUM command                               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,41 +33,103 @@
 
 
 
-#ifndef STRUCT_H
-#define STRUCT_H
+/* common */
+#include "addrsize.h"
+
+/* ca65 */
+#include "enum.h"
+#include "error.h"
+#include "expr.h"
+#include "nexttok.h"
+#include "scanner.h"
+#include "symbol.h"
+#include "symtab.h"
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*     	       	      		     Code				     */
 /*****************************************************************************/
 
 
 
-struct SymTable;
+void DoEnum (void)
+/* Handle the .ENUM command */
+{
+    /* Start at zero */
+    ExprNode* NextExpr = GenLiteralExpr (0);
 
+    /* Check for a name */
+    int Anon = (Tok != TOK_IDENT);
+    if (!Anon) {
+        /* Enter a new scope, then skip the name */
+        SymEnterLevel (SVal, ST_ENUM, ADDR_SIZE_ABS);
+        NextTok ();
+    }
 
+    /* Test for end of line */
+    ConsumeSep ();
 
-/*****************************************************************************/
-/*     	       	    		     Code				     */
-/*****************************************************************************/
+    /* Read until end of struct */
+    while (Tok != TOK_ENDENUM && Tok != TOK_EOF) {
 
+        SymEntry* Sym;
+        ExprNode* EnumExpr;
+        
 
+        /* The format is "identifier [ = value ]" */
+        if (Tok != TOK_IDENT) {
+            ErrorSkip ("Identifier expected");
+            continue;
+        }
 
-long GetStructSize (struct SymTable* Struct);
-/* Get the size of a struct */
+        /* We have an identifier, generate a symbol */
+        Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
 
-void DoStruct (void);
-/* Handle the .STRUCT command */
+        /* Skip the member name */
+        NextTok ();
 
-void DoUnion (void);
-/* Handle the .UNION command */
+        /* Check for an assignment */
+        if (Tok == TOK_EQ) {
 
+            /* Skip the equal sign */
+            NextTok ();
 
+            /* Delete the old next expression */
+            FreeExpr (NextExpr);
 
-/* End of struct.h */
+            /* Read the new one */
+            EnumExpr = Expression ();
 
-#endif
+        } else {
+
+            EnumExpr = NextExpr;
+
+        }
+
+        /* Generate the next expression from the current one */
+        NextExpr = GenAddExpr (CloneExpr (EnumExpr), GenLiteralExpr (1));
+        NextExpr = SimplifyExpr (NextExpr);
+
+        /* Assign the value to the enum member */
+        SymDef (Sym, EnumExpr, ADDR_SIZE_DEFAULT, SF_NONE);
+
+        /* Expect end of line */
+        ConsumeSep ();
+    }
+
+    /* If this is not an anon enum, leave its scope */
+    if (!Anon) {
+        /* Close the enum scope */
+        SymLeaveLevel ();
+    }
+
+    /* End of enum definition */
+    Consume (TOK_ENDENUM, "`.ENDENUM' expected");
+
+    /* Free the last (unused) enum expression */
+    FreeExpr (NextExpr);
+}
 
 
 

@@ -2,7 +2,7 @@
 /*                                                                           */
 /*                                 struct.c                                  */
 /*                                                                           */
-/*                              .STRUCT command                              */
+/*                          .STRUCT/.UNION commands                          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

@@ -1523,30 +1523,6 @@ static void StudyExpr (ExprNode* Expr, ExprDesc* D, int Sign)
 
 
 
-static ExprNode* SimplifyExpr (ExprNode* Expr)
-/* Try to simplify the given expression tree */
-{
-    if (Expr && Expr->Op != EXPR_LITERAL) {
-
-        /* Create an expression description and initialize it */
-        ExprDesc D;
-        InitExprDesc (&D);
-
-        /* Study the expression */
-        StudyExpr (Expr, &D, 1);
-
-        /* Now check if we can generate a literal value */
-        if (ExprDescIsConst (&D)) {
-            /* No external references */
-            FreeExpr (Expr);
-            Expr = GenLiteralExpr (D.Val);
-        }
-    }
-    return Expr;
-}
-
-
-
 ExprNode* Expression (void)
 /* Evaluate an expression, build the expression tree on the heap and return
  * a pointer to the root of the tree.
@@ -1606,6 +1582,30 @@ void FreeExpr (ExprNode* Root)
     	FreeExpr (Root->Right);
     	FreeExprNode (Root);
     }
+}
+
+
+
+ExprNode* SimplifyExpr (ExprNode* Expr)
+/* Try to simplify the given expression tree */
+{
+    if (Expr && Expr->Op != EXPR_LITERAL) {
+
+        /* Create an expression description and initialize it */
+        ExprDesc D;
+        InitExprDesc (&D);
+
+        /* Study the expression */
+        StudyExpr (Expr, &D, 1);
+
+        /* Now check if we can generate a literal value */
+        if (ExprDescIsConst (&D)) {
+            /* No external references */
+            FreeExpr (Expr);
+            Expr = GenLiteralExpr (D.Val);
+        }
+    }
+    return Expr;
 }
 
 

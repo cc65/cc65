@@ -64,6 +64,7 @@ OBJS = 	anonname.obj    \
         condasm.obj	\
 	dbginfo.obj	\
 	ea.obj		\
+        enum.obj        \
 	error.obj	\
 	expr.obj	\
 	feature.obj	\

@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*     	      	     		     Code		     		     */
+/*     	      	     		     Code	       	     		     */
 /*****************************************************************************/
 
 
@@ -63,7 +63,10 @@ long ConstExpression (void);
 void FreeExpr (ExprNode* Root);
 /* Free the expression tree, Root is pointing to. */
 
-ExprNode* GenLiteralExpr (long Val);
+ExprNode* SimplifyExpr (ExprNode* Expr);
+/* Try to simplify the given expression tree */
+
+ExprNode* GenLiteralExpr (long Val);                   
 /* Return an expression tree that encodes the given literal value */
 
 ExprNode* GenSymExpr (struct SymEntry* Sym);

@@ -63,8 +63,8 @@
 #define ST_GLOBAL       0x00            /* Root level */
 #define ST_PROC         0x01            /* .PROC */
 #define ST_SCOPE        0x02            /* .SCOPE */
-#define ST_STRUCT       0x03            /* .STRUCT */
-#define ST_UNION        0x04            /* .UNION */
+#define ST_STRUCT       0x03            /* .STRUCT/.UNION */
+#define ST_ENUM         0x04            /* .ENUM */
 #define ST_UNDEF        0xFF
 
 /* A symbol table */

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 struct.h                                  */
+/*                                  enum.h                                   */
 /*                                                                           */
-/*                          .STRUCT/.UNION commands                          */
+/*                               .ENUM command                               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,18 +33,8 @@
 
 
 
-#ifndef STRUCT_H
-#define STRUCT_H
-
-
-
-/*****************************************************************************/
-/*     	       	    		     Data				     */
-/*****************************************************************************/
-
-
-
-struct SymTable;
+#ifndef ENUM_H
+#define ENUM_H
 
 
 
@@ -54,18 +44,12 @@ struct SymTable;
 
 
 
-long GetStructSize (struct SymTable* Struct);
-/* Get the size of a struct */
-
-void DoStruct (void);
-/* Handle the .STRUCT command */
-
-void DoUnion (void);
-/* Handle the .UNION command */
+void DoEnum (void);
+/* Handle the .ENUM command */
 
 
 
-/* End of struct.h */
+/* End of enum.h */
 
 #endif
 

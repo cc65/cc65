@@ -53,6 +53,7 @@
 #include "asserts.h"
 #include "condasm.h"
 #include "dbginfo.h"
+#include "enum.h"
 #include "error.h"
 #include "expr.h"
 #include "feature.h"
@@ -1639,6 +1640,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,	DoConditionals	},	/* .ELSE */
     { ccKeepToken,	DoConditionals	},	/* .ELSEIF */
     { ccKeepToken,     	DoEnd	  	},
+    { ccNone,           DoUnexpected    },      /* .ENDENUM */
     { ccKeepToken,    	DoConditionals	},	/* .ENDIF */
     { ccNone,     	DoUnexpected	},	/* .ENDMACRO */
     { ccNone,		DoEndProc	},
@@ -1646,6 +1648,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,           DoEndScope      },
     { ccNone,           DoUnexpected    },      /* .ENDSTRUCT */
     { ccNone,           DoUnexpected    },      /* .ENDUNION */
+    { ccNone,           DoEnum          },
     { ccNone,		DoError	  	},
     { ccNone,		DoExitMacro	},
     { ccNone,		DoExport  	},

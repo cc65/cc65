@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -844,7 +844,7 @@ void g_getlocal (unsigned flags, int offs)
     	    } else {
     	 	AddCodeLine ("\tjsr\tldeax0sp");
     	    }
-	    break;
+       	    break;
 
        	default:
     	    typeerror (flags);
@@ -887,7 +887,7 @@ void g_getind (unsigned flags, unsigned offs)
      	     	        AddCodeLine ("\tjsr\tldaui");
      		    }
      	     	} else {
-     	     	    AddCodeLine ("\tjsr\tldai");
+       	     	    AddCodeLine ("\tjsr\tldai");
      	     	}
        	    }
      	    break;
@@ -938,30 +938,30 @@ void g_leasp (int offs)
 
     /* For value 0 we do direct code */
     if (offs == 0) {
-     	AddCodeLine ("\tlda\tsp");
-     	AddCodeLine ("\tldx\tsp+1");
+       	AddCodeLine ("\tlda\tsp");
+       	AddCodeLine ("\tldx\tsp+1");
     } else {
-     	if (CodeSizeFactor < 300) {
-     	    ldaconst (offs);         		/* Load A with offset value */
-     	    AddCodeLine ("\tjsr\tleaasp");	/* Load effective address */
-     	} else {
-     	    if (CPU == CPU_65C02 && offs == 1) {
-     	     	AddCodeLine ("\tlda\tsp");
-     	     	AddCodeLine ("\tldx\tsp+1");
-     	    	AddCodeLine ("\tina");
-     	     	AddCodeLine ("\tbne\t*+3");
-     	     	AddCodeLine ("\tinx");
-     	     	AddCodeHint ("x:!");		/* Invalidate X */
-     	    } else {
-     	     	ldaconst (offs);
-     	     	AddCodeLine ("\tclc");
-     	     	AddCodeLine ("\tldx\tsp+1");
-     	     	AddCodeLine ("\tadc\tsp");
-     	     	AddCodeLine ("\tbcc\t*+3");
-     	     	AddCodeLine ("\tinx");
-     	     	AddCodeHint ("x:!");		/* Invalidate X */
-     	    }
-     	}
+       	if (CodeSizeFactor < 300) {
+       	    ldaconst (offs);         		/* Load A with offset value */
+       	    AddCodeLine ("\tjsr\tleaasp");	/* Load effective address */
+       	} else {
+       	    if (CPU == CPU_65C02 && offs == 1) {
+       	     	AddCodeLine ("\tlda\tsp");
+       	     	AddCodeLine ("\tldx\tsp+1");
+       	    	AddCodeLine ("\tina");
+       	     	AddCodeLine ("\tbne\t*+3");
+       	     	AddCodeLine ("\tinx");
+       	     	AddCodeHint ("x:!");		/* Invalidate X */
+       	    } else {
+       	     	ldaconst (offs);
+       	     	AddCodeLine ("\tclc");
+       	     	AddCodeLine ("\tldx\tsp+1");
+       	     	AddCodeLine ("\tadc\tsp");
+       	     	AddCodeLine ("\tbcc\t*+3");
+       	     	AddCodeLine ("\tinx");
+       	     	AddCodeHint ("x:!");		/* Invalidate X */
+       	    }
+       	}
     }
 }
 
@@ -984,61 +984,32 @@ void g_leavariadic (int Offs)
     ArgSizeOffs = -oursp;
     CheckLocalOffs (ArgSizeOffs);
 
-    /* Get the stack pointer plus offset. Clear the carry as the result of
-     * this sequence.
-     */
-    if (Offs > 0) {
-     	AddCodeLine ("\tclc");
-     	AddCodeLine ("\tlda\tsp");
-     	AddCodeLine ("\tadc\t#$%02X", Offs & 0xFF);
-     	if (Offs >= 256) {
-     	    AddCodeLine ("\tpha");
-     	    AddCodeLine ("\tlda\tsp+1");
-     	    AddCodeLine ("\tadc\t#$%02X", (Offs >> 8) & 0xFF);
-     	    AddCodeLine ("\ttax");
-     	    AddCodeLine ("\tpla");
-	    AddCodeLine ("\tclc");
- 	} else {
-     	    AddCodeLine ("\tldx\tsp+1");
-     	    AddCodeLine ("\tbcc\t*+4");	/* Jump over the clc */
-     	    AddCodeLine ("\tinx");
-     	    AddCodeHint ("x:!");	/* Invalidate X */
-	    AddCodeLine ("\tclc");
-     	}
-    } else if (Offs < 0) {
-     	Offs = -Offs;
-     	AddCodeLine ("\tsec");
-     	AddCodeLine ("\tlda\tsp");
-     	AddCodeLine ("\tsbc\t#$%02X", Offs & 0xFF);
-     	if (Offs >= 256) {
-     	    AddCodeLine ("\tpha");
-     	    AddCodeLine ("\tlda\tsp+1");
-     	    AddCodeLine ("\tsbc\t#$%02X", (Offs >> 8) & 0xFF);
-     	    AddCodeLine ("\ttax");
-     	    AddCodeLine ("\tpla");
-     	} else {
-     	    AddCodeLine ("\tldx\tsp+1");
-     	    AddCodeLine ("\tbcs\t*+3");
-     	    AddCodeLine ("\tdex");
-     	    AddCodeHint ("x:!");	/* Invalidate X */
-     	}
-	AddCodeLine ("\tclc");
+    /* Get the size of all parameters. */
+    if (ArgSizeOffs == 0 && CPU == CPU_65C02) {
+       	AddCodeLine ("\tlda\t(sp)");
     } else {
-     	AddCodeLine ("\tlda\tsp");
-     	AddCodeLine ("\tldx\tsp+1");
-	AddCodeLine ("\tclc");
+       	ldyconst (ArgSizeOffs);
+       	AddCodeLine ("\tlda\t(sp),y");
     }
 
-    /* Add the size of all parameters. Carry is clear on entry. */
-    if (ArgSizeOffs == 0 && CPU == CPU_65C02) {
-     	AddCodeLine ("\tadc\t(sp)");
+    /* Add the value of the stackpointer */
+    if (CodeSizeFactor > 250) {
+       	AddCodeLine ("\tldx\tsp+1");
+       	AddCodeLine ("\tclc");
+       	AddCodeLine ("\tadc\tsp");
+       	AddCodeLine ("\tbcc\t*+3");
+       	AddCodeLine ("\tinx");
+       	AddCodeHint ("x:!");		/* Invalidate X */
     } else {
-     	ldyconst (ArgSizeOffs);
-     	AddCodeLine ("\tadc\t(sp),y");
+       	AddCodeLine ("\tjsr\tleaasp");
     }
-    AddCodeLine ("\tbcc\t*+3");
-    AddCodeLine ("\tinx");
-    AddCodeHint ("x:!");       		/* Invalidate X */
+
+    /* Add the offset to the primary */
+    if (Offs > 0) {
+	g_inc (CF_INT | CF_CONST, Offs);
+    } else if (Offs < 0) {
+	g_dec (CF_INT | CF_CONST, -Offs);
+    }
 }
 
 
@@ -3396,7 +3367,7 @@ void g_dec (unsigned flags, unsigned long val)
 	    /* FALLTHROUGH */
 
      	case CF_INT:
-     	    if (val <= 2) {
+     	    if (val <= 8) {
      		AddCodeLine ("\tjsr\tdecax%d", (int) val);
      	    } else if (val <= 255) {
 		ldyconst (val);

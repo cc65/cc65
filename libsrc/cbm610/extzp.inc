@@ -10,7 +10,7 @@
         .globalzp       ktab1, ktab2, ktab3, ktab4
 
         .globalzp       sysp0, time, segsave, ktmp, CURS_X, CURS_Y, RVS, config
-        .globalzp       CharPtr, keyidx, keybuf, keyscanbuf, keysave, modkey
-        .globalzp       norkey, graphmode, lastidx, rptdelay, rptcount          
+        .globalzp       CharPtr, keyidx, keybuf, keyscanbuf, keysave
+        .globalzp       modkey, norkey, graphmode, lastidx, rptdelay, rptcount
 
 

@@ -73,17 +73,116 @@
 
 
 ;------------------------------------------------------------------------------
+; Page 3 data. This page contains the break vector and the bankswitch
+; subroutine that is copied into high memory on startup. The space occupied by
+; this routine will later be used for a copy of the bank 15 stack. It must be
+; saved, since we're going to destroy it when calling bank 15.
+
+.segment        "PAGE3"
+
+BRKVec: .addr   _exit           ; BRK indirect vector
+
+.proc   callbank15
+
+        excrts  = $FF05
+
+.org    $FECB
+
+entry:  php
+        pha
+        lda     #$0F                    ; Bank 15
+        sta     IndReg
+        txa
+        pha
+        tya
+        pha
+        sei
+        ldy     #$FF
+        lda     (sysp1),y
+        tay
+        lda     ExecReg
+        sta     (sysp1),y
+        dey
+
+        lda     #.hibyte(excrts-1)
+        sta     (sysp1),y
+        dey
+        lda     #.lobyte(excrts-1)
+        sta     (sysp1),y
+
+        tya
+        sec
+        sbc     #7
+        sta     $1FF                    ; Save new sp
+        tay
+
+        tsx
+
+        pla
+        iny
+        sta     (sysp1),y
+        pla
+        iny
+        sta     (sysp1),y
+        pla
+        iny
+        sta     (sysp1),y
+        pla
+        iny
+        sta     (sysp1),y
+
+        lda     $105,x
+        sec
+        sbc     #3
+        iny
+        sta     (sysp1),y
+        lda     $106,x
+        sbc     #0
+        iny
+        sta     (sysp1),y
+
+        ldy     $1FF                    ; Restore sp in bank 15
+
+        lda     #.hibyte(expull-1)
+        sta     (sysp1),y
+        dey
+        lda     #.lobyte(expull-1)
+        sta     (sysp1),y
+        dey
+        pla
+        pla
+        tsx
+        stx     $1FF
+        tya
+        tax
+        txs
+        lda     IndReg
+        jmp     $FFF6
+
+expull: pla
+        tay
+        pla
+        tax
+        pla
+        plp
+        rts
+
+.if (expull <> $FF2E)
+.error "Symbol expull must be aligned with kernal in bank 15"
+.endif
+
+.reloc
+
+.endproc
+
+;------------------------------------------------------------------------------
 ; The code in the target bank when switching back will be put at the bottom
 ; of the stack. We will jump here to switch segments. The range $F2..$FF is
 ; not used by any kernal routine.
 
 .segment        "STARTUP"
 
-Back:	sei
-        ldx	spsave
-   	txs
-   	lda    	IndReg
-   	sta	ExecReg
+Back:   sta	ExecReg
 
 ; We are at $100 now. The following snippet is a copy of the code that is poked
 ; in the system bank memory by the basic header program, it's only for
@@ -100,7 +199,7 @@ Back:	sei
 
         jmp     Origin
 
-; Hardware vectors, copied to $FFFA
+; Hardware vectors, copied to $FFF6
 
 .proc   vectors
         sta     ExecReg
@@ -129,27 +228,9 @@ Back:	sei
         .word  	$eb49           ; ktab4
 .endproc
 
-; The following code is part of the kernal call subroutine. It is copied
-; to $FFAE
-
-.proc   callsysbank_15
-        php
-        pha
-        lda     #$0F                    ; Bank 15
-        sta     IndReg
-        sei
-.endproc
-
-; Save the old stack pointer from the system bank and setup our hw sp
-
-Origin: tsx
-       	stx	spsave 	       	; Save the system stackpointer
- 	ldx	#$FE            ; Leave $1FF untouched for cross bank calls
- 	txs	       	       	; Set up our own stack
-
 ; Switch the indirect segment to the system bank
 
-      	lda	#$0F
+Origin: lda	#$0F
       	sta	IndReg
 
 ; Initialize the extended zeropage
@@ -159,6 +240,15 @@ L1:     lda     extzp,x
         sta     <__EXTZP_RUN__,x
         dex
         bpl     L1
+
+; Save the old stack pointer from the system bank and setup our hw sp
+
+        tsx
+        txa
+        ldy     #$FF
+        sta     (sysp1),y       ; Save system stack point into $F:$1FF
+ 	ldx	#$FE            ; Leave $1FF untouched for cross bank calls
+ 	txs	       	       	; Set up our own stack
 
 ; Copy stuff from the system zeropage to ours
 
@@ -184,57 +274,34 @@ L3:    	lda    	vectors,x
 
 ; Setup the C stack
 
-	lda    	#.lobyte($FEB5 - .sizeof(callsysbank_15))
+	lda    	#.lobyte(callbank15::entry)
      	sta	sp
-	lda   	#.hibyte($FEB5 - .sizeof(callsysbank_15))
+	lda   	#.hibyte(callbank15::entry)
 	sta	sp+1
 
 ; Setup the subroutine and jump vector table that redirects kernal calls to
-; the system bank. Copy the bank switch routines starting at $FEB5 from the
-; system bank into the current bank.
+; the system bank.
 
-
-        ldy     #.sizeof(callsysbank_15)-1      ; Copy the modified part
-@L1:    lda     callsysbank_15,y
-        sta     $FEB5 - .sizeof(callsysbank_15),y
+        ldy     #.sizeof(callbank15)
+@L1:    lda     callbank15-1,y
+        sta     callbank15::entry-1,y
         dey
-        bpl     @L1
+        bne     @L1
 
-        lda     #.lobyte($FEB5)                 ; Copy the ROM part
-        sta     ptr1
-        lda     #.hibyte($FEB5)
-        sta     ptr1+1
-        ldy     #$00
-@L2:    lda     (ptr1),y
-        sta     $FEB5,y
-        iny
-        cpy     #<($FF6F-$FEB5)
-        bne     @L2
+; Setup the jump vector table. Y is zero on entry.
 
-; Setup the jump vector table
-
-        ldy     #$00
         ldx     #45-1                   ; Number of vectors
-@L3:    lda     #$20                    ; JSR opcode
+@L2:    lda     #$20                    ; JSR opcode
         sta     $FF6F,y
         iny
-        lda     #.lobyte($FEB5 - .sizeof(callsysbank_15))
+        lda     #.lobyte(callbank15::entry)
         sta     $FF6F,y
         iny
-        lda     #.hibyte($FEB5 - .sizeof(callsysbank_15))
+        lda     #.hibyte(callbank15::entry)
         sta     $FF6F,y
         iny
         dex
-        bpl     @L3
-
-; Copy the stack from the system bank into page 3
-
-        ldy     #$FF
-L4:     lda     (sysp1),y
-        sta     $300,y
-        dey
-        cpy     spsave
-        bne     L4
+        bpl     @L2
 
 ; Set the indirect segment to bank we're executing in
 
@@ -321,23 +388,20 @@ _exit:  lda     #$00
         bne     @L0
 .endif
 
-; Copy back the old system bank stack contents
-
-        ldy     #$FF
-@L1:    lda     $300,y
-        sta     (sysp1),y
-        dey
-        cpy     spsave
-        bne     @L1
-
 ; Setup the welcome code at the stack bottom in the system bank.
 
-        ldy     #$00
+        ldy     #$FF
+        lda     (sysp1),y       ; Load system bank sp
+        tax
+        iny                     ; Y = 0
         lda     #$58            ; CLI opcode
         sta     (sysp1),y
         iny
         lda     #$60            ; RTS opcode
         sta     (sysp1),y
+   	lda    	IndReg
+        sei
+   	txs
         jmp     Back
 
 ; -------------------------------------------------------------------------
@@ -412,18 +476,7 @@ nmi:	rti
 dobrk:  jmp	(BRKVec)
 
 ; -------------------------------------------------------------------------
-; Page 3
-
-.segment        "PAGE3"
-
-BRKVec: .addr   _exit           ; BRK indirect vector
-
-
-; -------------------------------------------------------------------------
 ; Data area.
-
-.data
-spsave:	.res	1
 
 .bss
 irqcount:       .byte   0

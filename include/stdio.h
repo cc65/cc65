@@ -87,18 +87,18 @@ int __fastcall__ fputs (const char* s, FILE* f);
 size_t __fastcall__ fread (void* buf, size_t size, size_t count, FILE* f);
 FILE* freopen (const char* name, const char* mode, FILE* f);
 size_t __fastcall__ fwrite (const void* buf, size_t size, size_t count, FILE* f);
-int fgetpos(FILE* f, fpos_t *pos);
-int fsetpos(FILE* f, const fpos_t* pos);
-long ftell(FILE* f);
-int fseek(FILE* f, long offset, int whence);
-void rewind(FILE *f);
+int fgetpos (FILE* f, fpos_t *pos);
+int fsetpos (FILE* f, const fpos_t* pos);
+long ftell (FILE* f);
+int fseek (FILE* f, long offset, int whence);
+void rewind (FILE *f);
 int getchar (void);
 char* gets (char* s);
 void __fastcall__ perror (const char* s);
 int printf (const char* format, ...);
 int putchar (int c);
 int puts (const char* s);
-int remove (const char* name);
+int __fastcall__ remove (const char* name);
 int rename (const char* old, const char* new);
 int sprintf (char* buf, const char* format, ...);
 int __fastcall__ vfprintf (FILE* f, const char* format, va_list ap);
@@ -138,3 +138,4 @@ void __fastcall__ _poserror (const char* msg);  /* cc65 */
 
 
 
+            

@@ -57,7 +57,7 @@ _mouse_init:
 	sta	YMax
    	stx	YMax+1			; YMax = 250
 	inx	      			; X = 1
-       	stx	Visible			; Mouse *not* visible
+       	stx	Invisible		; Mouse *not* visible
 	lda    	#<344
 	sta	XMax
 	stx	XMax+1			; XMax = 344
@@ -72,7 +72,7 @@ _mouse_init:
 ; Set our own IRQ vector. We cheat here to save a few bytes of code:
 ; The function is expected to return a value not equal to zero on success,
 ; and since we know that the high byte of the IRQ handler address is never
-; zweo, we will return just this byte.
+; zero, we will return just this byte.
 
      	ldx    	#<MouseIRQ
      	lda   	#>MouseIRQ
@@ -105,7 +105,7 @@ Done: 	rts
 ;
 
 _mouse_hide:
-       	lda 	Visible			; Get the flag
+       	lda 	Invisible		; Get the flag
 	bne 	@L1			; Jump if already invisible
        	ldx 	MouseSprite		; Sprite defined?
 	beq 	@L1			; Jump if no
@@ -117,7 +117,7 @@ _mouse_hide:
 	sta 	VIC_SPR_ENA	     	; Disable sprite
 	cli 				; Enable interrupts
 
-@L1:	inc 	Visible			; Set the flag to invisible
+@L1:	inc 	Invisible		; Set the flag to invisible
 	rts
 
 ; --------------------------------------------------------------------------
@@ -126,10 +126,10 @@ _mouse_hide:
 ;
 
 _mouse_show:
-	lda 	Visible			; Mouse already visible?
-	beq 	@L1			; Jump if yes
-       	dec 	Visible			; Get the flag
-	bne 	@L1			; Jump if still invisible
+	lda 	Invisible		; Mouse invisible?
+	beq 	@L1			; Jump if no
+       	dec 	Invisible 		; Set the flag
+	bne 	@L1	  		; Jump if still invisible
        	ldx 	MouseSprite		; Sprite defined?
 	beq 	@L1			; Jump if no
 
@@ -392,7 +392,7 @@ MoveCheck:
 
 MoveSprite:
 
-	lda   	Visible			; Mouse visible?
+	lda   	Invisible		; Mouse visible?
        	bne    	MoveSpriteDone		; Jump if no
 	ldx    	MouseSprite		; Sprite defined?
 	beq	MoveSpriteDone		; Jump if no
@@ -438,7 +438,7 @@ MouseSprite:	.res   	1		; Number of sprite to control
 OldValue:	.res   	1		; Temp for MoveCheck routine
 NewValue:	.res   	1		; Temp for MoveCheck routine
 
-Visible:	.res   	1		; Is the mouse visible?
+Invisible:	.res   	1		; Is the mouse invisible?
 OldPotX:   	.res   	1		; Old hw counter values
 OldPotY:	.res   	1
 

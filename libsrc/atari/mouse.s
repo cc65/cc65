@@ -122,7 +122,7 @@ setup:	tax
 
 	ldx	#0
 	lda	#1
-	stx	mouse_on
+	sta    	mouse_off
 	rts
 
 ;--------------------------------------------------------------------
@@ -150,10 +150,11 @@ _mouse_done:
         ldx     vbi_jmp+2
 	jsr	SETVBV
 
-	lda	#0
-	sta	GRACTL
-	sta	HPOSP0
-	sta	mouse_on
+	ldx    	#0
+	stx	GRACTL
+	stx	HPOSP0
+	inx
+	stx    	mouse_off
 	rts
 
 ;--------------------------------------------------------------------
@@ -185,18 +186,18 @@ _mouse_move:
 ; void mouse_show(void)
 
 _mouse_show:
-	inc	mouse_on
-	rts
+	lda     mouse_off	; Already on?
+	beq	@L1
+       	dec	mouse_off
+@L1:	rts
 
 ;--------------------------------------------------------------------
 ; Hide mouse arrow
 ; void mouse_hide(void)
 
 _mouse_hide:
-	lda     mouse_on
-	beq	@L1
-	dec	mouse_on
-@L1:	rts
+	inc	mouse_off
+	rts
 
 ;--------------------------------------------------------------------
 ; Ask mouse button
@@ -441,8 +442,8 @@ ok3:    lda     ymax
 
 ok4:    jsr     clrpm
 
-	lda	mouse_on
-        bne     mon
+	lda	mouse_off
+        beq     mon
         lda     #0
         sta     HPOSP0
         beq     moff
@@ -590,7 +591,7 @@ dumx:	.res 1
 dumy:	.res 1
 omy:	.res 1		; old y pos
 
-mouse_on:
+mouse_off:
 	.res 1
 port_nr:
 	.res 1

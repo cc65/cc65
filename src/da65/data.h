@@ -58,7 +58,10 @@ unsigned AddrTable (void);
 
 unsigned RtsTable (void);
 /* Output a table of RTS addresses (address - 1) */
-	 
+
+unsigned TextTable (void);
+/* Output a table of text messages */
+
 
 
 /* End of data.h */

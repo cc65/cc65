@@ -81,6 +81,7 @@ typedef enum token_t {
     CFGTOK_DWORDTAB,
     CFGTOK_ADDRTAB,
     CFGTOK_RTSTAB,
+    CFGTOK_TEXTTAB,
 
     /* Label section */
     CFGTOK_NAME,

@@ -267,6 +267,10 @@ static void OneOpcode (unsigned RemainingBytes)
 	    RtsTable ();
 	    break;
 
+	case atTextTab:
+	    TextTable ();
+	    break;
+
 	default:
 	    DataByteLine (1);
 	    ++PC;

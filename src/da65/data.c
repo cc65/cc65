@@ -263,3 +263,82 @@ unsigned RtsTable (void)
 
 
 
+unsigned TextTable (void)
+/* Output a table of text messages */
+{
+    /* Count how many bytes may be output. */
+    unsigned ByteCount = GetSpan (atTextTab);
+
+    /* Output as many data bytes lines as needed. */
+    unsigned BytesLeft = ByteCount;
+    while (BytesLeft > 0) {
+
+	unsigned I;
+
+	/* Count the number of characters that can be output as such */
+	unsigned Count = 0;
+	while (Count < BytesLeft && Count < BytesPerLine*4-1) {
+	    unsigned char C = GetCodeByte (PC + Count);
+	    if (C >= 0x20 && C <= 0x7E && C != '\"') {
+	    	++Count;
+	    } else {
+	    	break;
+	    }
+	}
+
+	/* If we have text, output it */
+	if (Count > 0) {
+	    unsigned CBytes;
+	    Indent (MIndent);
+	    Output (".text");
+	    Indent (AIndent);
+	    Output ("\"");
+	    for (I = 0; I < Count; ++I) {
+	     	Output ("%c", GetCodeByte (PC+I));
+	    }
+	    Output ("\"");
+	    CBytes = Count;
+	    while (CBytes > 0) {
+		unsigned Chunk = CBytes;
+		if (Chunk > BytesPerLine) {
+		    Chunk = BytesPerLine;
+		}
+		LineComment (PC, Chunk);
+		LineFeed ();
+	     	CBytes -= Chunk;
+		PC += Chunk;
+	    }
+	    BytesLeft -= Count;
+	}
+
+	/* Count the number of bytes that must be output as bytes */
+	Count = 0;
+	while (Count < BytesLeft && Count < BytesPerLine) {
+	    unsigned char C = GetCodeByte (PC + Count);
+       	    if (C < 0x20 || C > 0x7E || C == '\"') {  
+	    	++Count;
+	    } else {
+	    	break;
+	    }
+	}
+
+	/* If we have raw output bytes, print them */
+	if (Count > 0) {
+	    DataByteLine (Count);
+	    PC += Count;
+	    BytesLeft -= Count;
+	}
+
+    }
+
+    /* If the next line is not a byte table line, add a separator */
+    if (CodeLeft() && GetStyleAttr (PC) != atTextTab) {
+	SeparatorLine ();
+    }
+
+    /* Return the number of bytes output */
+    return ByteCount;
+}
+
+
+

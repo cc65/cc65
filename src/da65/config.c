@@ -153,6 +153,7 @@ static void RangeSection (void)
 	{   "DWORDTABLE",	CFGTOK_DWORDTAB	},
 	{   "ADDRTABLE",	CFGTOK_ADDRTAB	},
 	{   "RTSTABLE",	    	CFGTOK_RTSTAB	},
+	{   "TEXTTABLE",        CFGTOK_TEXTTAB  },
     };
 
 
@@ -213,6 +214,7 @@ static void RangeSection (void)
 		    case CFGTOK_DWORDTAB:	Type = atDWordTab;	break;
 		    case CFGTOK_ADDRTAB:	Type = atAddrTab;	break;
        		    case CFGTOK_RTSTAB:		Type = atRtsTab;	break;
+		    case CFGTOK_TEXTTAB:       	Type = atTextTab;       break;
 		}
 		Needed |= tType;
 		CfgNextTok ();

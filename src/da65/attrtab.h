@@ -55,6 +55,7 @@ typedef enum attr_t {
     atDWordTab	= 0x05,
     atAddrTab	= 0x06,
     atRtsTab	= 0x07,
+    atTextTab   = 0x08,
 
     /* Label flags */
     atNoLabel	= 0x00,		/* No label for this address */

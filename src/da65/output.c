@@ -138,9 +138,9 @@ void Indent (unsigned N)
 void LineFeed (void)
 /* Add a linefeed to the output file */
 {
-    if (Pass == PassCount && PageLength > 0) {
+    if (Pass == PassCount) {
 	fputc ('\n', F);
-	if (++Line >= PageLength) {
+       	if (PageLength > 0 && ++Line >= PageLength) {
 	    if (FormFeeds) {
 		fputc ('\f', F);
 	    }

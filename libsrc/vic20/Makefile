@@ -5,6 +5,18 @@
 .SUFFIXES: .o .s .c
 
 #--------------------------------------------------------------------------
+# Programs and flags
+
+SYS = vic20
+
+AS = ../../src/ca65/ca65
+CC = ../../src/cc65/cc65
+LD = ../../src/ld65/ld65
+
+AFLAGS=-t $(SYS) -I../../asminc
+CFLAGS=-Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
+
+#--------------------------------------------------------------------------
 # Rules
 
 %.o:   	%.c
@@ -34,6 +46,7 @@ OBJS =	_scrsize.o	\
 	color.o		\
 	conio.o		\
 	cputc.o		\
+	get_tv.o	\
 	joy_stddrv.o	\
 	kbhit.o		\
         kernal.o        \

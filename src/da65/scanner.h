@@ -87,6 +87,7 @@ typedef enum token_t {
     INFOTOK_ADDRTAB,
     INFOTOK_RTSTAB,
     INFOTOK_TEXTTAB,
+    INFOTOK_SKIP,
 
     /* Label section */
     INFOTOK_NAME,

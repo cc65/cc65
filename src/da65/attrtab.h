@@ -57,6 +57,7 @@ typedef enum attr_t {
     atAddrTab	= 0x07,
     atRtsTab	= 0x08,
     atTextTab   = 0x09,
+    atSkip      = 0x0A,         /* Skip code completely */
 
     /* Label flags */
     atNoLabel	= 0x00,		/* No label for this address */

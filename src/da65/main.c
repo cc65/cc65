@@ -238,8 +238,13 @@ static void OneOpcode (unsigned RemainingBytes)
     /* Get the opcode description for the opcode byte */
     const OpcDesc* D = &OpcTable[OPC];
 
-    /* If we have a label at this address, output the label */
-    if (MustDefLabel (PC)) {
+    /* Get the output style for the current PC */
+    attr_t Style = GetStyleAttr (PC);
+
+    /* If we have a label at this address, output the label, provided that
+     * we aren't in a skip area.
+     */
+    if (Style != atSkip && MustDefLabel (PC)) {
 	DefLabel (GetLabel (PC));
     }
 
@@ -249,7 +254,7 @@ static void OneOpcode (unsigned RemainingBytes)
      *   - ...if there is no label somewhere between the instruction bytes.
      * If any of these conditions is false, switch to data mode.
      */
-    if (GetStyleAttr (PC) == atDefault) {
+    if (Style == atDefault) {
 	if (D->Size > RemainingBytes) {
 	    MarkAddr (PC, atIllegal);
        	} else if (D->Flags & flIllegal) {
@@ -257,16 +262,16 @@ static void OneOpcode (unsigned RemainingBytes)
 	} else {
 	    unsigned I;
 	    for (I = 1; I < D->Size; ++I) {
-		if (HaveLabel (PC+I)) {
-     		    MarkAddr (PC, atIllegal);
-		    break;
-		}
+	     	if (HaveLabel (PC+I)) {
+     	     	    MarkAddr (PC, atIllegal);
+	     	    break;
+	     	}
 	    }
 	}
     }
 
     /* Disassemble the line */
-    switch (GetStyleAttr (PC)) {
+    switch (Style) {
 
 	case atDefault:
 	case atCode:
@@ -293,7 +298,7 @@ static void OneOpcode (unsigned RemainingBytes)
 	case atAddrTab:
 	    AddrTable ();
 	    break;
-
+                    
 	case atRtsTab:
 	    RtsTable ();
 	    break;
@@ -301,6 +306,10 @@ static void OneOpcode (unsigned RemainingBytes)
 	case atTextTab:
 	    TextTable ();
 	    break;
+
+        case atSkip:
+            ++PC;
+            break;
 
 	default:
 	    DataByteLine (1);

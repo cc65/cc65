@@ -260,17 +260,28 @@ void DefOutOfRangeLabels (void)
     SeparatorLine ();
 
     /* Low range */
-    for (Addr = 0; Addr < CodeStart; ++Addr) {
+    Addr = 0;
+    while (Addr < CodeStart) {
 	if (MustDefLabel (Addr)) {
 	    DefineConst (Addr);
 	}
+        ++Addr;
+    }
+
+    /* Skip areas in code range */
+    while (Addr <= CodeEnd) {
+        if ((AttrTab[Addr] & atStyleMask) == atSkip && MustDefLabel (Addr)) {
+            DefineConst (Addr);
+        }
+        ++Addr;
     }
 
     /* High range */
-    for (Addr = CodeEnd+1; Addr < 0x10000; ++Addr) {
+    while (Addr < 0x10000) {
 	if (MustDefLabel (Addr)) {
 	    DefineConst (Addr);
 	}
+        ++Addr;
     }
 
     SeparatorLine ();

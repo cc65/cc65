@@ -270,9 +270,9 @@ following attributes are recognized:
 
   <tag><tt>INPUTSIZE</tt></tag>
 
-  INPUTSIZE is followed by a numerical value that gives the amount of data
-  to read from the input file. Data beyond <tt/INPUTOFFS+INPUTSIZE/ is 
-  ignored.
+  <tt/INPUTSIZE/ is followed by a numerical value that gives the amount of
+  data to read from the input file. Data beyond <tt/INPUTOFFS + INPUTSIZE/
+  is ignored.
 
 
   <tag><tt>OUTPUTNAME</tt></tag>
@@ -363,6 +363,14 @@ following attributes are recognized:
 
     <tag><tt>TEXTTABLE</tt></tag>
     The range consists of readable text.
+
+    <tag><tt>SKIP</tt></tag>
+    The range is simply ignored when generating the output file. Please note 
+    that this means that reassembling the output file will <em/not/ generate
+    the original file, not only because the missing piece in between, but also
+    because the following code will located on wrong addresses. Output 
+    generated with <tt/SKIP/ ranges will need manual rework.
+
   </descrip>
 
 </descrip>

@@ -63,6 +63,18 @@
 
 
 
+static void AddAttr (const char* Name, unsigned* Set, unsigned Attr)
+/* Add an attribute to the set and check that it is not given twice */
+{
+    if (*Set & Attr) {
+        /* Attribute is already in the set */
+        InfoError ("%s given twice", Name);
+    }
+    *Set |= Attr;
+}
+
+
+
 static void GlobalSection (void)
 /* Parse a global section */
 {
@@ -96,7 +108,7 @@ static void GlobalSection (void)
 		InfoNextTok ();
 		InfoAssureInt ();
                 InfoRangeCheck (MIN_COMMENTS, MAX_COMMENTS);
-		Comments = InfoIVal;
+	     	Comments = InfoIVal;
 		InfoNextTok ();
 		break;
 
@@ -139,7 +151,7 @@ static void GlobalSection (void)
 	    case INFOTOK_OUTPUTNAME:
 		InfoNextTok ();
 		InfoAssureStr ();
-		if (OutFile) {
+	     	if (OutFile) {
 		    InfoError ("Output file name already given");
 		}
 		OutFile = xstrdup (InfoSVal);
@@ -147,7 +159,7 @@ static void GlobalSection (void)
 		break;
 
 	    case INFOTOK_PAGELENGTH:
-		InfoNextTok ();
+	     	InfoNextTok ();
 		InfoAssureInt ();
 		if (InfoIVal != 0) {
 		    InfoRangeCheck (MIN_PAGE_LEN, MAX_PAGE_LEN);
@@ -188,14 +200,15 @@ static void RangeSection (void)
     };
 
     static const IdentTok TypeDefs[] = {
-      	{   "CODE",	    	INFOTOK_CODE	 },
-      	{   "BYTETABLE",    	INFOTOK_BYTETAB	 },
-        {   "DBYTETABLE",       INFOTOK_DBYTETAB },
-      	{   "WORDTABLE",    	INFOTOK_WORDTAB	 },
-      	{   "DWORDTABLE",	INFOTOK_DWORDTAB },
       	{   "ADDRTABLE",	INFOTOK_ADDRTAB	 },
+      	{   "BYTETABLE",    	INFOTOK_BYTETAB	 },
+      	{   "CODE",	    	INFOTOK_CODE	 },
+        {   "DBYTETABLE",       INFOTOK_DBYTETAB },
+      	{   "DWORDTABLE",	INFOTOK_DWORDTAB },
       	{   "RTSTABLE",	    	INFOTOK_RTSTAB	 },
+        {   "SKIP",             INFOTOK_SKIP     },
       	{   "TEXTTABLE",        INFOTOK_TEXTTAB  },
+      	{   "WORDTABLE",    	INFOTOK_WORDTAB	 },
     };
 
 
@@ -207,7 +220,8 @@ static void RangeSection (void)
       	tType	= 0x04,
         tName   = 0x08,
        	tNeeded = (tStart | tEnd | tType)
-    } Attributes = tNone;
+    };
+    unsigned Attributes = tNone;
 
     /* Locals - initialize to avoid gcc warnings */
     unsigned Start	= 0;
@@ -231,51 +245,50 @@ static void RangeSection (void)
 	switch (InfoTok) {
 
 	    case INFOTOK_END:
+                AddAttr ("END", &Attributes, tEnd);
 	     	InfoNextTok ();
-		InfoAssureInt ();
-		InfoRangeCheck (0x0000, 0xFFFF);
-		End = InfoIVal;
-	       	Attributes |= tEnd;
+	     	InfoAssureInt ();
+	     	InfoRangeCheck (0x0000, 0xFFFF);
+	     	End = InfoIVal;
 	     	InfoNextTok ();
 	     	break;
 
 	    case INFOTOK_NAME:
+                AddAttr ("NAME", &Attributes, tName);
 	        InfoNextTok ();
-	       	if (Name) {
-      	       	    InfoError ("Name already given");
-	       	}
 	       	InfoAssureStr ();
-		if (InfoSVal[0] == '\0') {
-		    InfoError ("Name may not be empty");
-		}
+	     	if (InfoSVal[0] == '\0') {
+	     	    InfoError ("Name may not be empty");
+	     	}
 	       	Name = xstrdup (InfoSVal);
                 Attributes |= tName;
 	       	InfoNextTok ();
       	       	break;
 
 	    case INFOTOK_START:
+                AddAttr ("START", &Attributes, tStart);
 	        InfoNextTok ();
 		InfoAssureInt ();
 		InfoRangeCheck (0x0000, 0xFFFF);
 		Start = InfoIVal;
-	       	Attributes |= tStart;
 	     	InfoNextTok ();
 	     	break;
 
 	    case INFOTOK_TYPE:
+                AddAttr ("TYPE", &Attributes, tType);
 	     	InfoNextTok ();
-		InfoSpecialToken (TypeDefs, ENTRY_COUNT (TypeDefs), "Type");
+		InfoSpecialToken (TypeDefs, ENTRY_COUNT (TypeDefs), "TYPE");
 		switch (InfoTok) {
-		    case INFOTOK_CODE:		Type = atCode;		break;
-		    case INFOTOK_BYTETAB:	Type = atByteTab;	break;
-                    case INFOTOK_DBYTETAB:      Type = atDByteTab;      break;
-		    case INFOTOK_WORDTAB:	Type = atWordTab;	break;
-		    case INFOTOK_DWORDTAB:	Type = atDWordTab;	break;
 		    case INFOTOK_ADDRTAB:	Type = atAddrTab;	break;
+		    case INFOTOK_BYTETAB:	Type = atByteTab;	break;
+		    case INFOTOK_CODE:		Type = atCode;		break;
+                    case INFOTOK_DBYTETAB:      Type = atDByteTab;      break;
+		    case INFOTOK_DWORDTAB:	Type = atDWordTab;	break;
        		    case INFOTOK_RTSTAB:       	Type = atRtsTab;	break;
+                    case INFOTOK_SKIP:          Type = atSkip;          break;
 		    case INFOTOK_TEXTTAB:       Type = atTextTab;       break;
+		    case INFOTOK_WORDTAB:	Type = atWordTab;	break;
 		}
-		Attributes |= tType;
 		InfoNextTok ();
 		break;
 	}

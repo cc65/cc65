@@ -92,10 +92,18 @@ header file.
 The functions listed below are special for the Atari. See the <htmlurl
 url="funcref.html" name="function reference"> for declaration and usage.
 
-<!-- TODO: the other functions -->
 <itemize>
+<item>_gtia_mkcolor
 <item>get_ostype
+<item>get_tv
+<item>getcolor
+<item>getdefdev
 <item>graphics
+<item>rest_vecs
+<item>save_vecs
+<item>scroll
+<item>setcolor
+<item>setcolor_low
 </itemize>
 
 
@@ -125,7 +133,10 @@ chip registers.
   See the <tt/_antic.h/ header file located in the include directory
   for the declaration of the structure.
 
-<!-- TODO: the other things from atari.h -->
+  <tag><tt/PIA/</tag>
+  The <tt/PIA/ structure allows read access to the PIA 6520.
+  See the <tt/_pia.h/ header file located in the include directory
+  for the declaration of the structure.
 
 </descrip><p>
 

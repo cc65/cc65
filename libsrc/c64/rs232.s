@@ -28,6 +28,7 @@
 	.export	      	_rs232_put, _rs232_pause, _rs232_unpause, _rs232_status
 
 	.include	"c64.inc"
+        .include        "../common/rs232.inc"
 
 
 NmiExit = $febc     ;exit address for nmi
@@ -73,12 +74,6 @@ RegCommand  		= 2     ; Command register
 RegControl  		= 3     ; Control register
 RegClock    		= 7     ; Turbo232 external baud-rate generator
 
-; Error codes. Beware: The codes must match the codes in the C header file
-ErrNotInitialized 	= $01
-ErrBaudTooFast    	= $02
-ErrBaudNotAvail   	= $03
-ErrNoData         	= $04
-ErrOverflow       	= $05
 
 
 .code
@@ -167,11 +162,12 @@ _rs232_init:
       	lda 	#$06
       	sta 	BaudCode
 
-;** return
-      	lda 	#$ff
-      	sta 	Initialized
-      	lda	#$00
-   	tax
+; Done
+
+       	ldx  	#$ff
+      	stx 	Initialized
+	inx		   		; X = 0
+   	txa				; A = 0
       	rts
 
 ;----------------------------------------------------------------------------
@@ -194,9 +190,9 @@ _rs232_init:
 ;
 
 _rs232_params:
-       	jsr	CheckInitialized	;** check initialized
-       	bcc    	@L1
- 	rts
+      	bit 	Initialized
+      	bmi 	@L1
+	jmp	NotInitialized		; Return an error code
 
 ; Save new parity
 
@@ -218,7 +214,7 @@ _rs232_params:
    	beq 	@L3
    	cpx 	#4
    	bcs 	@L3
-@L2:	lda 	#ErrBaudTooFast
+@L2:	lda 	#RS_ERR_BAUD_TOO_FAST
    	bne	@L9
 
 ; Set baud/parameters
@@ -232,7 +228,7 @@ _rs232_params:
    	lda 	HackBauds,x
 @L4:  	cmp 	#$ff
    	bne 	@L5
-   	lda 	#ErrBaudNotAvail
+   	lda 	#RS_ERR_BAUD_NOT_AVAIL
    	bne	@L9
 
 @L5:  	tax
@@ -240,7 +236,7 @@ _rs232_params:
        	beq 	@L6
     	bit 	Turbo232
     	bmi 	@L6
-    	lda 	#ErrBaudNotAvail
+    	lda 	#RS_ERR_BAUD_NOT_AVAIL
    	bne	@L9
 
 @L6:  	lda 	tmp1
@@ -331,13 +327,12 @@ _rs232_done:
 ;
 
 _rs232_get:
-   	jsr 	CheckInitialized	; Check if initialized
-   	bcc 	@L1
-   	rts
+      	bit 	Initialized
+      	bpl    	NotInitialized		; Jump if not initialized
 
 ; Check for bytes to send
 
-@L1:  	sta	ptr1
+  	sta	ptr1
  	stx	ptr1+1			; Store pointer to received char
 	ldx 	SendFreeCnt
    	cpx 	#$ff
@@ -350,7 +345,7 @@ _rs232_get:
 @L2:  	lda 	RecvFreeCnt
    	cmp 	#$ff
    	bne 	@L3
-   	lda	#ErrNoData
+   	lda	#RS_ERR_NO_DATA
    	ldx 	#0
    	rts
 
@@ -379,6 +374,15 @@ _rs232_get:
 
 ;----------------------------------------------------------------------------
 ;
+; RS232 module not initialized
+
+NotInitialized:
+	lda    	#<RS_ERR_NOT_INITIALIZED
+	ldx	#>RS_ERR_NOT_INITIALIZED
+	rts
+
+;----------------------------------------------------------------------------
+;
 ; unsigned char __fastcall__ rs232_put (char B);
 ; /* Send a character via the serial port. There is a transmit buffer, but
 ;  * transmitting is not done via interrupt. The function returns
@@ -387,13 +391,12 @@ _rs232_get:
 ;
 
 _rs232_put:
-   	jsr 	CheckInitialized	; Check initialized
-   	bcc 	@L1
-   	rts
+      	bit 	Initialized
+      	bpl    	NotInitialized		; Jump if not initialized
 
 ; Try to send
 
-@L1:  	ldx 	SendFreeCnt
+        ldx 	SendFreeCnt
    	cpx 	#$ff
    	beq 	@L2
    	pha
@@ -405,7 +408,7 @@ _rs232_put:
 
 @L2:  	ldx 	SendFreeCnt
    	bne 	@L3
-   	lda 	#ErrOverflow
+   	lda 	#RS_ERR_OVERFLOW
    	ldx	#$00
    	rts
 
@@ -426,14 +429,12 @@ _rs232_put:
 ;
 
 _rs232_pause:
-; Check initialized
-   	jsr 	CheckInitialized
-   	bcc 	@L1
-      	rts
+      	bit 	Initialized
+      	bpl    	NotInitialized		; Jump if not initialized
 
 ; Assert flow control
 
-@L1:	lda 	RtsOff
+  	lda 	RtsOff
    	sta 	Stopped
    	sta	ACIA+RegCommand
 
@@ -469,10 +470,8 @@ PauseTimes:
 ;
 
 _rs232_unpause:
-; Check initialized
-     	jsr 	CheckInitialized
-   	bcc 	@L1
-   	rts
+      	bit 	Initialized
+      	bpl    	NotInitialized		; Jump if not initialized
 
 ; Re-enable rx interrupts & release flow control
 
@@ -501,13 +500,14 @@ _rs232_status:
  	stx    	ptr2+1
  	jsr    	popax
  	sta    	ptr1
- 	stx    	ptr1+1
-   	jsr    	CheckInitialized
-       	bcs    	@L9
+    	stx    	ptr1+1
+	bit	Initialized
+	bmi	@L1
+	jmp	NotInitialized
 
 ; Get status
 
- 	lda    	ACIA+RegStatus
+@L1: 	lda    	ACIA+RegStatus
  	ldy    	#0
  	sta    	(ptr1),y
     	jsr    	PollReceive  		; bug-recovery hack
@@ -564,7 +564,7 @@ NmiHandler:
 
 ; Drop this char
 
-@L3:	inc 	DropCnt+0    		;not time-critical
+@L3:	inc 	DropCnt+0    		; not time-critical
     	bne 	@L4
     	inc 	DropCnt+1
     	bne 	@L4
@@ -574,25 +574,7 @@ NmiHandler:
 @L4:   	jmp 	NmiExit
 
 @L9:	pla
-	jmp NmiContinue
-
-;----------------------------------------------------------------------------
-;
-; CheckInitialized  -  internal check if initialized
-; Set carry and an error code if not initialized, clear carry and do not
-; change any registers if initialized.
-;
-
-CheckInitialized:
-      	bit 	Initialized
-      	bmi 	@L1
-      	lda 	#ErrNotInitialized
-      	ldx	#0
-      	sec
-      	rts
-
-@L1:  	clc
-      	rts
+	jmp 	NmiContinue
 
 ;----------------------------------------------------------------------------
 ; Try to send a byte. Internal routine. A = TryHard

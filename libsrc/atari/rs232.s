@@ -29,6 +29,7 @@
 
 	.include	"atari.inc"
 	.include	"../common/errno.inc"
+        .include        "../common/rs232.inc"
 
 	.rodata
 
@@ -130,17 +131,13 @@ cioerr:	jsr	fddecusage	; decrement usage counter of fd as open failed
 ; using 8 bit word size. So only 8 bit is currently tested.
 ;
 
-; shouldn't this come from a "rs232.inc" ??
-ErrNotInitialized 	= $01
-ErrNoData         	= $04
-
 .proc	_rs232_params
 
 	sta	tmp2
 	lda	rshand
 	cmp	#$ff
 	bne	work		; work only if initialized
-	lda	#ErrNotInitialized
+	lda	#RS_ERR_NOT_INITIALIZED
 	bne	done
 work:	lda	rshand
 	ldx	#0
@@ -241,7 +238,7 @@ done:	rts
 	ldy	rshand
 	cpy	#$ff
 	bne	work		; work only if initialized
-	lda	#ErrNotInitialized
+	lda	#RS_ERR_NOT_INITIALIZED
 	bne	nierr
 
 work: 	sta	ptr1
@@ -267,7 +264,7 @@ go:	; check whether there is any input available
 	beq	nix_da		; no input waiting...
 
 	; input is available: get it!
-	
+
 	lda	#GETCHR		; get raw bytes
 	sta	ICCOM,x		; in command code
 	lda	#0
@@ -282,11 +279,11 @@ go:	; check whether there is any input available
 	sta	(ptr1,x)	; return received byte
 	txa
 	rts
-	
+
 nierr:	ldx	#0
 	rts
 
-nix_da:	lda	#ErrNoData
+nix_da:	lda	#RS_ERR_NO_DATA
    	ldx 	#0
    	rts
 
@@ -307,7 +304,7 @@ nix_da:	lda	#ErrNoData
 	ldy	rshand
 	cpy	#$ff
 	bne	work		; work only if initialized
-	lda	#ErrNotInitialized
+	lda	#RS_ERR_NOT_INITIALIZED
 	bne	nierr
 
 work:	pha

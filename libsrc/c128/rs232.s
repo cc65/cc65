@@ -25,9 +25,10 @@
 	.importzp     	ptr1, ptr2, tmp1, tmp2
 	.import	      	popa, popax
 	.export	       	_rs232_init, _rs232_params, _rs232_done, _rs232_get
-	.export	      	_rs232_put, _rs232_pause, _rs232_unpause, _rs232_status
+    	.export	      	_rs232_put, _rs232_pause, _rs232_unpause, _rs232_status
 
 	.include	"c128.inc"
+        .include        "../common/rs232.inc"
 
 
 NmiExit = $ff33     ;exit address for nmi
@@ -73,12 +74,6 @@ RegCommand  		= 2     ; Command register
 RegControl  		= 3     ; Control register
 RegClock    		= 7     ; Turbo232 external baud-rate generator
 
-; Error codes. Beware: The codes must match the codes in the C header file
-ErrNotInitialized 	= $01
-ErrBaudTooFast    	= $02
-ErrBaudNotAvail   	= $03
-ErrNoData         	= $04
-ErrOverflow       	= $05
 
 
 .code
@@ -170,11 +165,12 @@ _rs232_init:
       	lda 	#$06
       	sta 	BaudCode
 
-;** return
-      	lda 	#$ff
-      	sta 	Initialized
-      	lda	#$00
-   	tax
+; Done
+
+       	ldx  	#$ff
+      	stx 	Initialized
+	inx		   		; X = 0
+   	txa				; A = 0
       	rts
 
 ;----------------------------------------------------------------------------
@@ -197,9 +193,9 @@ _rs232_init:
 ;
 
 _rs232_params:
-       	jsr	CheckInitialized	;** check initialized
-       	bcc    	@L1
- 	rts
+      	bit 	Initialized
+      	bmi 	@L1
+	jmp	NotInitialized		; Return an error code
 
 ; Save new parity
 
@@ -221,8 +217,8 @@ _rs232_params:
    	beq 	@L3
    	cpx 	#4
    	bcs 	@L3
-@L2:	lda 	#ErrBaudTooFast
-   	bne	@L9
+@L2:	lda 	#RS_ERR_BAUD_TOO_FAST
+     	bne	@L9
 
 ; Set baud/parameters
 
@@ -235,16 +231,16 @@ _rs232_params:
    	lda 	HackBauds,x
 @L4:  	cmp 	#$ff
    	bne 	@L5
-   	lda 	#ErrBaudNotAvail
+   	lda 	#RS_ERR_BAUD_NOT_AVAIL
    	bne	@L9
 
 @L5:  	tax
       	and 	#$30
        	beq 	@L6
     	bit 	Turbo232
-    	bmi 	@L6
-    	lda 	#ErrBaudNotAvail
-   	bne	@L9
+     	bmi 	@L6
+    	lda 	#RS_ERR_BAUD_NOT_AVAIL
+    	bne	@L9
 
 @L6:  	lda 	tmp1
     	and 	#$0f
@@ -262,7 +258,7 @@ _rs232_params:
     	beq 	@L7
     	lsr
     	lsr
-    	lsr
+     	lsr
     	lsr
     	eor 	#%00000011
     	sta	ACIA+RegClock
@@ -322,7 +318,7 @@ _rs232_done:
 
 @L9:   	lda 	#$00
    	sta 	Initialized
-   	tax
+     	tax
    	rts
 
 ;----------------------------------------------------------------------------
@@ -334,15 +330,14 @@ _rs232_done:
 ;
 
 _rs232_get:
-   	jsr 	CheckInitialized	; Check if initialized
-   	bcc 	@L1
-   	rts
+      	bit 	Initialized
+      	bpl    	NotInitialized		; Jump if not initialized
 
 ; Check for bytes to send
 
 @L1:  	sta	ptr1
  	stx	ptr1+1			; Store pointer to received char
-	ldx 	SendFreeCnt
+     	ldx 	SendFreeCnt
    	cpx 	#$ff
    	beq 	@L2
    	lda 	#$00
@@ -353,7 +348,7 @@ _rs232_get:
 @L2:  	lda 	RecvFreeCnt
    	cmp 	#$ff
    	bne 	@L3
-   	lda	#ErrNoData
+   	lda	#RS_ERR_NO_DATA
    	ldx 	#0
    	rts
 
@@ -362,7 +357,7 @@ _rs232_get:
 @L3:  	ldx 	Stopped
    	beq 	@L4
    	cmp 	#63
-   	bcc 	@L4
+     	bcc 	@L4
    	lda 	#$00
    	sta 	Stopped
    	lda 	RtsOff
@@ -374,11 +369,20 @@ _rs232_get:
 @L4:  	ldx 	RecvHead
        	lda 	RecvBuf,x
       	inc 	RecvHead
-   	inc 	RecvFreeCnt
+    	inc 	RecvFreeCnt
        	ldx 	#$00
    	sta    	(ptr1,x)
        	txa				; Return code = 0
    	rts
+
+;----------------------------------------------------------------------------
+;
+; RS232 module not initialized
+
+NotInitialized:
+	lda    	#<RS_ERR_NOT_INITIALIZED
+    	ldx	#>RS_ERR_NOT_INITIALIZED
+	rts
 
 ;----------------------------------------------------------------------------
 ;
@@ -390,9 +394,8 @@ _rs232_get:
 ;
 
 _rs232_put:
-   	jsr 	CheckInitialized	; Check initialized
-   	bcc 	@L1
-   	rts
+      	bit 	Initialized
+      	bpl    	NotInitialized		; Jump if not initialized
 
 ; Try to send
 
@@ -402,14 +405,14 @@ _rs232_put:
    	pha
    	lda 	#$00
    	jsr 	TryToSend
-   	pla
+     	pla
 
 ; Put byte into send buffer & send
 
 @L2:  	ldx 	SendFreeCnt
    	bne 	@L3
-   	lda 	#ErrOverflow
-   	ldx	#$00
+   	lda 	#RS_ERR_OVERFLOW
+    	ldx	#$00
    	rts
 
 @L3:  	ldx 	SendTail
@@ -429,10 +432,8 @@ _rs232_put:
 ;
 
 _rs232_pause:
-; Check initialized
-   	jsr 	CheckInitialized
-   	bcc 	@L1
-      	rts
+      	bit 	Initialized
+      	bpl    	NotInitialized		; Jump if not initialized
 
 ; Assert flow control
 
@@ -442,7 +443,7 @@ _rs232_pause:
 
 ; Delay for flow stop to be received
 
-   	ldx 	BaudCode
+     	ldx 	BaudCode
    	lda 	PauseTimes,x
    	jsr 	DelayMs
 
@@ -472,17 +473,15 @@ PauseTimes:
 ;
 
 _rs232_unpause:
-; Check initialized
-     	jsr 	CheckInitialized
-   	bcc 	@L1
-   	rts
+      	bit 	Initialized
+      	bpl    	NotInitialized		; Jump if not initialized
 
 ; Re-enable rx interrupts & release flow control
 
 @L1:  	lda 	#$00
     	sta 	Stopped
     	lda 	RtsOff
-    	ora 	#%00001000
+     	ora 	#%00001000
    	sta	ACIA+RegCommand
 
 ; Poll for stalled char & exit
@@ -500,17 +499,18 @@ _rs232_unpause:
 ;
 
 _rs232_status:
- 	sta    	ptr2
- 	stx    	ptr2+1
- 	jsr    	popax
- 	sta    	ptr1
- 	stx    	ptr1+1
-   	jsr    	CheckInitialized
-       	bcs    	@L9
+    	sta    	ptr2
+    	stx    	ptr2+1
+     	jsr    	popax
+    	sta    	ptr1
+    	stx    	ptr1+1
+    	bit	Initialized
+    	bmi	@L1
+    	jmp	NotInitialized
 
 ; Get status
 
- 	lda    	ACIA+RegStatus
+@L1: 	lda    	ACIA+RegStatus
  	ldy    	#0
  	sta    	(ptr1),y
     	jsr    	PollReceive  		; bug-recovery hack
@@ -535,14 +535,14 @@ _rs232_status:
 ; Because of the C128 banking, the NMI handler must go into the non banked
 ; memory, since the ROM NMI entry point will switch to a configuration where
 ; only the lowest 16K of RAM are visible. We will place the NMI handler into
-; it's own segment and map this segment into the lower 16K in the linker 
+; it's own segment and map this segment into the lower 16K in the linker
 ; config.
-  
+
 .segment 	"NMI"
 
 NmiHandler:
 	lda	#CC65_MMU_CFG		;(2)
-	sta	MMU_CR			;(4)
+     	sta	MMU_CR			;(4)
        	lda    	ACIA+RegStatus       	;(4) ;status ;check for byte received
      	and 	#$08           		;(2)
      	beq 	@L9			;(2*)
@@ -580,27 +580,9 @@ NmiHandler:
 @L4:   	jmp 	NmiExit
 
 @L9:	jmp 	NmiContinue
-		     
+
 
 .code
-
-;----------------------------------------------------------------------------
-;
-; CheckInitialized  -  internal check if initialized
-; Set carry and an error code if not initialized, clear carry and do not
-; change any registers if initialized.
-;
-
-CheckInitialized:
-      	bit 	Initialized
-      	bmi 	@L1
-      	lda 	#ErrNotInitialized
-      	ldx	#0
-      	sec
-      	rts
-
-@L1:  	clc
-      	rts
 
 ;----------------------------------------------------------------------------
 ; Try to send a byte. Internal routine. A = TryHard

@@ -9,7 +9,7 @@
 /* (C) 2000-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,7 +57,7 @@
 #include "error.h"
 #include "global.h"
 #include "incpath.h"
-#include "input.h" 
+#include "input.h"
 #include "macrotab.h"
 #include "scanner.h"
 #include "segments.h"
@@ -99,7 +99,7 @@ static void Usage (void)
 	     "  --bss-name seg\tSet the name of the BSS segment\n"
        	     "  --check-stack\t\tGenerate stack overflow checks\n"
        	     "  --code-name seg\tSet the name of the CODE segment\n"
-	     "  --codesize x\tAccept larger code by factor x\n"
+	     "  --codesize x\t\tAccept larger code by factor x\n"
        	     "  --cpu type\t\tSet cpu type\n"
        	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug\t\tDebug mode\n"
@@ -593,14 +593,14 @@ int main (int argc, char* argv[])
 		    	     	break;
 	       	    	    case 'i':
 	       	    	     	FavourSize = 0;
-				CodeSizeFactor = 200;
+			        CodeSizeFactor = 200;
     	       	    	     	break;
 	       	    	    case 'r':
-	       	    	 	EnableRegVars = 1;
+	       	    	  	EnableRegVars = 1;
 	       		  	break;
 	       		    case 's':
 	       		       	InlineStdFuncs = 1;
-	       	   		break;
+	       	   	  	break;
 	       		}
 	       	    }
 	       	    break;

@@ -5,6 +5,18 @@
 .SUFFIXES: .o .s .c
 
 #--------------------------------------------------------------------------
+# Programs and flags
+
+SYS	= c16
+
+AS	= ../../src/ca65/ca65
+CC	= ../../src/cc65/cc65
+LD	= ../../src/ld65/ld65
+
+AFLAGS	= -t $(SYS) -I../../asminc
+CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
+
+#--------------------------------------------------------------------------
 # Rules
 
 %.o:   	%.c
@@ -94,5 +106,5 @@ clean:
 	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
 zap:	clean
-	@$(RM) $(EMDS) $(JOYS) $(SERS) $(TGIS)				       
+	@$(RM) $(EMDS) $(JOYS) $(SERS) $(TGIS)
 

@@ -6,6 +6,18 @@
 
 
 #--------------------------------------------------------------------------
+# Programs and flags
+
+SYS	= lynx
+
+AS	= ../../src/ca65/ca65
+CC	= ../../src/cc65/cc65
+LD	= ../../src/ld65/ld65
+
+AFLAGS	= -t $(SYS) -I../../asminc
+CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
+
+#--------------------------------------------------------------------------
 # Rules
 
 %.o:   	%.c
@@ -34,9 +46,13 @@
 # Object files
 
 OBJS =	crt0.o          \
+	ctype.o		\
         eeprom.o        \
         framerate.o     \
-        upload.o        
+	getenv.o	\
+	mainargs.o	\
+	sysuname.o	\
+        upload.o
 
 #--------------------------------------------------------------------------
 # Drivers

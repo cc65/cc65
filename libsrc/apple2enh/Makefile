@@ -5,6 +5,18 @@
 .SUFFIXES: .o .s .c
 
 #--------------------------------------------------------------------------
+# Programs and flags
+
+SYS	= apple2enh
+
+AS	= ../../src/ca65/ca65
+CC	= ../../src/cc65/cc65
+LD	= ../../src/ld65/ld65
+
+AFLAGS	= -t $(SYS) -I../../asminc
+CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
+
+#--------------------------------------------------------------------------
 # Rules
 
 %.o:   	%.c

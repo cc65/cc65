@@ -5,6 +5,18 @@
 .SUFFIXES: .o .s .c
 
 #--------------------------------------------------------------------------
+# Programs and flags
+
+SYS	= pet
+
+AS	= ../../src/ca65/ca65
+CC	= ../../src/cc65/cc65
+LD	= ../../src/ld65/ld65
+
+AFLAGS	= -t $(SYS) -I../../asminc
+CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
+
+#--------------------------------------------------------------------------
 # Rules
 
 %.o:   	%.c
@@ -26,6 +38,7 @@ OBJS =	_scrsize.o	\
 	conio.o		\
 	cputc.o		\
 	crt0.o		\
+	get_tv.o	\
 	kbhit.o         \
         kbsout.o        \
         kchkin.o        \

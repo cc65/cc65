@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -49,6 +49,7 @@ typedef enum token_t {
     INFOTOK_NONE,
     INFOTOK_INTCON,
     INFOTOK_STRCON,
+    INFOTOK_CHARCON,
     INFOTOK_IDENT,
     INFOTOK_LCURLY,
     INFOTOK_RCURLY,
@@ -63,6 +64,7 @@ typedef enum token_t {
     INFOTOK_GLOBAL,
     INFOTOK_RANGE,
     INFOTOK_LABEL,
+    INFOTOK_ASMINC,
 
     /* Global section */
     INFOTOK_COMMENTS,
@@ -95,6 +97,11 @@ typedef enum token_t {
     INFOTOK_ADDR,
     INFOTOK_SIZE,
 
+    /* ASMINC section */
+    INFOTOK_FILE,
+    INFOTOK_COMMENTSTART,
+    INFOTOK_IGNOREUNKNOWN,
+
     /* */
     INFOTOK_TRUE,
     INFOTOK_FALSE
@@ -104,8 +111,8 @@ typedef enum token_t {
 /* Mapping table entry, special identifier --> token */
 typedef struct IdentTok IdentTok;
 struct IdentTok {
-    const char*	 	Ident;	     	/* Identifier */
-    token_t	 	Tok;	     	/* Token for identifier */
+    const char*	    	Ident;	     	/* Identifier */
+    token_t	    	Tok;	     	/* Token for identifier */
 };
 #define ENTRY_COUNT(s) 	(sizeof (s) / sizeof (s [0]))
 
@@ -113,8 +120,8 @@ struct IdentTok {
 
 /* Current token and attributes */
 #define CFG_MAX_IDENT_LEN  255
-extern unsigned		InfoTok;
-extern char    	       	InfoSVal [CFG_MAX_IDENT_LEN+1];
+extern unsigned	    	InfoTok;
+extern char    	       	InfoSVal[CFG_MAX_IDENT_LEN+1];
 extern long	        InfoIVal;
 
 /* Error location */
@@ -164,6 +171,9 @@ void InfoAssureInt (void);
 
 void InfoAssureStr (void);
 /* Make sure the next token is a string constant */
+
+void InfoAssureChar (void);
+/* Make sure the next token is a char constant */
 
 void InfoAssureIdent (void);
 /* Make sure the next token is an identifier */

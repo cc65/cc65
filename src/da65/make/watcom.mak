@@ -59,7 +59,8 @@ endif
 # ------------------------------------------------------------------------------
 # All OBJ files
 
-OBJS = 	attrtab.obj	\
+OBJS = 	asminc.obj      \
+        attrtab.obj	\
 	code.obj       	\
 	data.obj	\
 	error.obj  	\

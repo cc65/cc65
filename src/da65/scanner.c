@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -262,6 +262,20 @@ Again:
 	    InfoTok = INFOTOK_STRCON;
 	    break;
 
+        case '\'':
+            NextChar ();
+            if (C == EOF || IsControl (C)) {
+                InfoError ("Invalid character constant");
+            }
+            InfoIVal = C;
+            NextChar ();
+            if (C != '\'') {
+                InfoError ("Unterminated character constant");
+            }
+            NextChar ();
+            InfoTok = INFOTOK_CHARCON;
+            break;
+
         case '#':
 	    /* Comment */
 	    while (C != '\n' && C != EOF) {
@@ -368,6 +382,16 @@ void InfoAssureStr (void)
 
 
 
+void InfoAssureChar (void)
+/* Make sure the next token is a char constant */
+{
+    if (InfoTok != INFOTOK_STRCON) {
+       	InfoError ("Character constant expected");
+    }
+}
+
+
+
 void InfoAssureIdent (void)
 /* Make sure the next token is an identifier */
 {
@@ -427,6 +451,8 @@ void InfoBoolToken (void)
 	{   "NO",    	INFOTOK_FALSE    },
         {   "TRUE",     INFOTOK_TRUE     },
         {   "FALSE",    INFOTOK_FALSE    },
+       	{   "ON",     	INFOTOK_TRUE     },
+	{   "OFF",      INFOTOK_FALSE    },
     };
 
     /* If we have an identifier, map it to a boolean token */

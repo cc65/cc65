@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/* (C) 2000-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -48,6 +48,7 @@
 #include "xmalloc.h"
 
 /* da65 */
+#include "asminc.h"
 #include "attrtab.h"
 #include "error.h"
 #include "global.h"
@@ -425,10 +426,10 @@ static void LabelSection (void)
 	Size = 1;
     }
     if (Value + Size > 0x10000) {
-	InfoError ("Invalid size (address out of range)");
+    	InfoError ("Invalid size (address out of range)");
     }
     if (HaveLabel ((unsigned) Value)) {
-	InfoError ("Label for address $%04lX already defined", Value);
+    	InfoError ("Label for address $%04lX already defined", Value);
     }
 
     /* Define the label(s) */
@@ -443,13 +444,104 @@ static void LabelSection (void)
 
 
 
+static void AsmIncSection (void)
+/* Parse a asminc section */
+{
+    static const IdentTok LabelDefs[] = {
+        {   "COMMENTSTART",     INFOTOK_COMMENTSTART    },
+       	{   "FILE",    	        INFOTOK_FILE            },
+        {   "IGNOREUNKNOWN",    INFOTOK_IGNOREUNKNOWN   },
+    };
+
+    /* Locals - initialize to avoid gcc warnings */
+    char* Name = 0;
+    int CommentStart = EOF;
+    int IgnoreUnknown = -1;
+
+    /* Skip the token */
+    InfoNextTok ();
+
+    /* Expect the opening curly brace */
+    InfoConsumeLCurly ();
+
+    /* Look for section tokens */
+    while (InfoTok != INFOTOK_RCURLY) {
+
+	/* Convert to special token */
+       	InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Asminc directive");
+
+	/* Look at the token */
+	switch (InfoTok) {
+
+            case INFOTOK_COMMENTSTART:
+                InfoNextTok ();
+                if (CommentStart != EOF) {
+                    InfoError ("Commentstart already given");
+                }
+                InfoAssureChar ();
+                CommentStart = (char) InfoIVal;
+                InfoNextTok ();
+                break;
+
+	    case INFOTOK_FILE:
+	        InfoNextTok ();
+	       	if (Name) {
+	       	    InfoError ("File name already given");
+	       	}
+	       	InfoAssureStr ();
+		if (InfoSVal[0] == '\0') {
+		    InfoError ("File name may not be empty");
+		}
+	       	Name = xstrdup (InfoSVal);
+	       	InfoNextTok ();
+	       	break;
+
+            case INFOTOK_IGNOREUNKNOWN:
+                InfoNextTok ();
+                if (IgnoreUnknown != -1) {
+                    InfoError ("Ignoreunknown already specified");
+                }
+                InfoBoolToken ();
+                IgnoreUnknown = (InfoTok != INFOTOK_FALSE);
+                InfoNextTok ();
+                break;
+	}
+
+	/* Directive is followed by a semicolon */
+	InfoConsumeSemi ();
+    }
+
+    /* Check for the necessary data and assume defaults */
+    if (Name == 0) {
+	InfoError ("File name is missing");
+    }
+    if (CommentStart == EOF) {
+	CommentStart = ';';
+    }
+    if (IgnoreUnknown == -1) {
+        IgnoreUnknown = 0;
+    }
+
+    /* Open the file and read the symbol definitions */
+    AsmInc (Name, CommentStart, IgnoreUnknown);
+
+    /* Delete the dynamically allocated memory for Name */
+    xfree (Name);
+
+    /* Consume the closing brace */
+    InfoConsumeRCurly ();
+}
+
+
+
 static void InfoParse (void)
 /* Parse the config file */
 {
     static const IdentTok Globals[] = {
-     	{   "GLOBAL", 	INFOTOK_GLOBAL	},
-     	{   "RANGE",	INFOTOK_RANGE	},
-	{   "LABEL",	INFOTOK_LABEL	},
+     	{   "GLOBAL", 	INFOTOK_GLOBAL  },
+     	{   "RANGE",	INFOTOK_RANGE 	},
+	{   "LABEL",	INFOTOK_LABEL 	},
+        {   "ASMINC",   INFOTOK_ASMINC  },
     };
 
     while (InfoTok != INFOTOK_EOF) {
@@ -472,6 +564,9 @@ static void InfoParse (void)
 		LabelSection ();
 		break;
 
+            case INFOTOK_ASMINC:
+                AsmIncSection ();
+                break;
 	}
 
 	/* Semicolon expected */

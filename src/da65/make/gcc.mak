@@ -10,7 +10,8 @@ CC=gcc
 EBIND=emxbind
 LDFLAGS=
 
-OBJS = 	attrtab.o	\
+OBJS = 	asminc.o        \
+        attrtab.o	\
 	code.o	 	\
 	data.o		\
 	error.o	 	\

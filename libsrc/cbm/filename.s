@@ -74,16 +74,23 @@ nameloop:
         lda     (ptr1),y        ; Get next char from filename
         beq     namedone        ; Jump if end of name reached
 
-; Check for valid chars in the file name
+; Check for valid chars in the file name. We allow letters, digits, plus some
+; additional chars from a table.
 
+        ldx     #fncharcount-1
+namecheck:
+        cmp     fnchars,x
+        beq     nameok
+        dex
+        bpl     namecheck
         tax
         lda     __ctype,x
-        and     #CT_ALNUM       ; Letters and digits are allowed
+        and     #(CT_LOWER|CT_DIGIT)
         beq     invalidname
 
 ; Check the maximum length, store the character
 
-        ldx     fnlen
+nameok: ldx     fnlen
         cpx     #14             ; Maximum length reached?
         bcs     invalidname
         lda     (ptr1),y        ; Reload char
@@ -154,5 +161,9 @@ fnlen:  .res    1
 fncmd:  .byte   's'             ; Use as scratch command
 fnbuf:  .res    20
 
+.rodata
+; Characters that are ok in filenames besides digits and letters
+fnchars:.byte   ".,-_+()"
+fncharcount = *-fnchars
 
 

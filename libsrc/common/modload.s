@@ -201,16 +201,15 @@ CleanupAndExit:
 ; Check if we have to free the allocated block
 
         lda     Module
-        ora     Module+1
-        beq     @L1                     ; Jump if no memory allocated
-
-        lda     Module
         ldx     Module+1
-        jsr     _free                   ; Free the allocated block
+        bne     @L1
+        tay                             ; Test high byte
+        beq     @L2
+@L1:    jsr     _free                   ; Free the allocated block
 
 ; Restore the register bank
 
-@L1:    jsr     RestoreRegBank
+@L2:    jsr     RestoreRegBank
 
 ; Restore the  error code and return to the caller
 
@@ -390,7 +389,7 @@ Opt:    jsr     ReadByte                ; Read the length byte
         bne     OSError
 
         jsr     ReadByte                ; Get the operating system
-        cmp     #O65_OS_CC65_MODULE
+        cmp     #O65_OS_CC65
         bne     OSError                 ; Wrong operating system
 
         jsr     ReadByte                ; Get the version number, expect zero

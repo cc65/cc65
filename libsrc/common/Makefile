@@ -73,6 +73,7 @@ S_OBJS = 	_fdesc.o 	\
 		atoi.o	  	\
 		calloc.o  	\
 		copydata.o	\
+                creat.o         \
                 ctime.o         \
                 divt.o          \
 		errno.o		\

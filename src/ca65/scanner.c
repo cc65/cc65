@@ -133,6 +133,7 @@ struct DotKeyword {
     { ".BYT", 	    	TOK_BYTE	},
     { ".BYTE", 	    	TOK_BYTE	},
     { ".CASE",  	TOK_CASE	},
+    { ".CHARMAP",    	TOK_CHARMAP 	},
     { ".CODE", 	    	TOK_CODE    	},
     { ".CONCAT",       	TOK_CONCAT	},
     { ".CONDES",	TOK_CONDES	},

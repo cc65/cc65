@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -118,9 +118,10 @@ enum Token {
     TOK_BLANK,
     TOK_BSS,
     TOK_BYTE,
-    TOK_CASE,
+    TOK_CASE,	
+    TOK_CHARMAP,
     TOK_CODE,
-    TOK_CONCAT,	    
+    TOK_CONCAT,
     TOK_CONDES,
     TOK_CONST,
     TOK_CONSTRUCTOR,

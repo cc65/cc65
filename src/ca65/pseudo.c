@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -369,6 +369,37 @@ static void DoCase (void)
 {
     SetBoolOption (&IgnoreCase);
     IgnoreCase = !IgnoreCase;
+}
+
+
+
+static void DoCharMap (void)
+/* Allow custome character mappings */
+{
+    long Index;
+    long Code;
+
+    /* Read the index as numerical value */
+    Index = ConstExpression ();
+    if (Index < 1 || Index > 255) {
+      	/* Value out of range */
+       	ErrorSkip (ERR_RANGE);
+      	return;
+    }
+
+    /* Comma follows */
+    ConsumeComma ();
+
+    /* Read the character code */
+    Code = ConstExpression ();
+    if (Code < 1 || Code > 255) {
+	/* Value out of range */
+       	ErrorSkip (ERR_RANGE);
+	return;
+    }
+
+    /* Set the character translation */
+    TgtTranslateSet ((unsigned) Index, (unsigned char) Code);
 }
 
 
@@ -1317,6 +1348,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,       	DoBss		},
     { ccNone,       	DoByte		},
     { ccNone,       	DoCase		},
+    { ccNone,  	       	DoCharMap       },
     { ccNone,		DoCode		},
     { ccNone,		DoUnexpected,	},	/* .CONCAT */
     { ccNone,		DoConDes	},

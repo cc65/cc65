@@ -203,7 +203,7 @@ static void DumpFile (const char* Name)
     /* Try to open the file */
     FILE* F = fopen (Name, "rb");
     if (F == 0) {
-	Warning ("Cannot open `%s': %s", Name, strerror (errno));
+	Error ("Cannot open `%s': %s", Name, strerror (errno));
     }
 
     /* Read the magic word */

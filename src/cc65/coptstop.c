@@ -481,7 +481,13 @@ static unsigned Opt_staxspidx (StackOpData* D)
     /* Inline the store */
     X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+1);
-    X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, D->OpEntry->LI);
+    if (RegValIsKnown (D->OpEntry->RI->In.RegY)) {
+        /* Value of Y is known */
+	const char* Arg = MakeHexArg (D->OpEntry->RI->In.RegY + 1);
+       	X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+    } else {
+        X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, D->OpEntry->LI);
+    }
     InsertEntry (D, X, D->OpIndex+2);
     if (RegValIsKnown (D->OpEntry->RI->In.RegX)) {
 	/* Value of X is known */

@@ -681,7 +681,8 @@ unsigned OptDuplicateLoads (CodeSeg* S)
     while (I < CS_GetEntryCount (S)) {
 
 	unsigned char Use, Chg;
-
+	CodeEntry* N;
+				     
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
@@ -858,7 +859,7 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 
 	    case OP65_LDA:
 	        if (IsKnownImm (E)) {
-		    CodeEntry* N = CS_GetNextEntry (S, I);
+		    N = CS_GetNextEntry (S, I);
 		    if (RegA >= 0 && RegA == E->Num && N && (N->Info & OF_FBRA) == 0) {
 		     	Delete = 1;
 		    } else {
@@ -872,7 +873,7 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 
 	    case OP65_LDX:
 	        if (IsKnownImm (E)) {
-		    CodeEntry* N = CS_GetNextEntry (S, I);
+		    N = CS_GetNextEntry (S, I);
        	       	    if (RegX >= 0 && RegX == E->Num && N && (N->Info & OF_FBRA) == 0) {
 		     	Delete = 1;
 		    } else {
@@ -886,7 +887,7 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 
 	    case OP65_LDY:
 	        if (IsKnownImm (E)) {
-		    CodeEntry* N = CS_GetNextEntry (S, I);
+		    N = CS_GetNextEntry (S, I);
        	       	    if (RegY >= 0 && RegY == E->Num && N && (N->Info & OF_FBRA) == 0) {
 	    	     	Delete = 1;
 	    	    } else {
@@ -1001,11 +1002,23 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_TAX:
-	        RegX = RegA;
+		N = CS_GetNextEntry (S, I);
+		if (RegA >= 0 && RegA == RegX && N && (N->Info & OF_FBRA) == 0) {
+		    /* Value is identical and not followed by a branch */
+		    Delete = 1;
+		} else {
+		    RegX = RegA;
+		}
 	        break;
 
 	    case OP65_TAY:
-	        RegY = RegA;
+		N = CS_GetNextEntry (S, I);
+       	       	if (RegA >= 0 && RegA == RegY && N && (N->Info & OF_FBRA) == 0) {
+		    /* Value is identical and not followed by a branch */
+		    Delete = 1;
+		} else {
+		    RegY = RegA;
+		}
 	        break;
 
 	    case OP65_TRB:
@@ -1019,14 +1032,26 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_TXA:
-	        RegA = RegX;
+		N = CS_GetNextEntry (S, I);
+       	       	if (RegX >= 0 && RegX == RegA && N && (N->Info & OF_FBRA) == 0) {
+		    /* Value is identical and not followed by a branch */
+		    Delete = 1;
+		} else {
+		    RegA = RegX;
+		}
 	        break;
 
 	    case OP65_TXS:
 	        break;
 
 	    case OP65_TYA:
-	        RegA = RegY;
+		N = CS_GetNextEntry (S, I);
+       	       	if (RegY >= 0 && RegY == RegA && N && (N->Info & OF_FBRA) == 0) {
+		    /* Value is identical and not followed by a branch */
+		    Delete = 1;
+		} else {
+		    RegA = RegY;
+		}
 	        break;
 
 	    default:

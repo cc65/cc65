@@ -259,7 +259,7 @@ const OpcDesc OpcTable_65C02[256] = {
     {   "cmp",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $d1 */
     {   "cmp",  2,  flUseLabel,               OH_DirectIndirect        }, /* $d2 */
     {   "",     1,  flIllegal,                OH_Illegal,              }, /* $d3 */
-    {   "pei",  2,  flUseLabel,               OH_Direct                }, /* $d4 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $d4 */
     {   "cmp",  2,  flUseLabel,               OH_DirectX               }, /* $d5 */
     {   "dec",  2,  flUseLabel,               OH_DirectX               }, /* $d6 */
     {   "smb5", 1,  flUseLabel,               OH_Direct,               }, /* $d7 */

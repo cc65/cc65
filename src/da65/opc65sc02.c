@@ -32,7 +32,7 @@
 /*****************************************************************************/
 
 
-         
+
 /* da65 */
 #include "handler.h"
 #include "opc65sc02.h"
@@ -259,7 +259,7 @@ const OpcDesc OpcTable_65SC02[256] = {
     {   "cmp",  2,  flUseLabel,               OH_DirectIndirectY       }, /* $d1 */
     {   "cmp",  2,  flUseLabel,               OH_DirectIndirect        }, /* $d2 */
     {   "",     1,  flIllegal,                OH_Illegal,              }, /* $d3 */
-    {   "pei",  2,  flUseLabel,               OH_Direct                }, /* $d4 */
+    {   "",     1,  flIllegal,                OH_Illegal,              }, /* $d4 */
     {   "cmp",  2,  flUseLabel,               OH_DirectX               }, /* $d5 */
     {   "dec",  2,  flUseLabel,               OH_DirectX               }, /* $d6 */
     {   "",     1,  flIllegal,                OH_Illegal,              }, /* $d7 */

@@ -766,6 +766,22 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
+<sect1><tt>.CHARMAP</tt><label id=".CHARMAP"><p>
+
+  Apply a custom mapping for characters. The command is followed by two
+  numbers in the range 1..255. The first one is the index of the source
+  character, the second one is the mapping. The mapping applies to all
+  character and string constants when they generate output, and overrides
+  a mapping table specified with the <tt><ref id="option-t" name="-t"></tt>
+  command line switch.
+
+  Example:
+
+  <tscreen><verb>
+       	.charmap        $41, $61        ; Map 'A' to 'a'
+  </verb></tscreen>
+
+
 <sect1><tt>.CODE</tt><label id=".CODE"><p>
 
   Switch to the CODE segment. The name of the CODE segment is always

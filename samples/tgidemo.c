@@ -166,14 +166,14 @@ static void DoLines (void)
 
     tgi_setpalette (Palette);
     tgi_setcolor (1);
-    
+
     for	(X = 0; X < 200; X+=10) {
 	tgi_line(0, 0, 200, X);
 	tgi_line(0, 0, X, 200);
 	tgi_line(200, 200, 0, 200-X);
 	tgi_line(200, 200, 200-X, 0);
     }
-    
+
     cgetc ();
     tgi_clear ();
 }
@@ -188,7 +188,7 @@ int main (void)
     /* Load and initialize the driver */
     tgi_load (TGI_MODE_320_200_2);
     CheckError ("tgi_load");
-    tgi_init (TGI_MODE_320_200_2);
+    tgi_init ();
     CheckError ("tgi_init");
 
     /* Get stuff from the driver */

@@ -43,12 +43,7 @@ all:
 
 apple2lib:
 	for i in apple2 common runtime conio dbg em joystick tgi zlib; do \
-	    AS=$(AS) \
-	    CC=$(CC) \
-	    LD=$(LD) \
-	    AFLAGS="-t apple2 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t apple2 --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+       	    $(MAKE) SYS=apple2 -C $$i || exit 1; \
 	    $(AR) a apple2.lib $$i/*.o;\
 	done
 	mv apple2/crt0.o apple2.o
@@ -62,12 +57,7 @@ apple2lib:
 
 apple2enhlib:
 	for i in apple2 apple2enh common runtime conio dbg em joystick tgi zlib; do \
-	    AS=$(AS) \
-	    CC=$(CC) \
-	    LD=$(LD) \
-	    AFLAGS="-t apple2enh -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t apple2enh --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=apple2enh -C $$i || exit 1; \
 	done
 	for i in common runtime conio dbg em joystick tgi zlib; do \
 	    $(AR) a apple2enh.lib $$i/*.o;\
@@ -97,12 +87,7 @@ apple2enhlib:
 
 atarilib:
 	for i in atari common runtime conio dbg em joystick tgi zlib; do \
-	    AS=$(AS) \
-	    CC=$(CC) \
-	    LD=$(LD) \
-	    AFLAGS="-t atari -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t atari --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+       	    $(MAKE) SYS=atari -C $$i || exit 1; \
 	    $(AR) a atari.lib $$i/*.o;\
 	done
 	mv atari/crt0.o atari.o
@@ -113,12 +98,7 @@ atarilib:
 
 atmoslib:
 	for i in atmos common conio runtime em joystick tgi zlib; do \
-	    AS=$(AS) \
-	    CC=$(CC) \
-	    LD=$(LD) \
-	    AFLAGS="-t atmos -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t atmos --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+       	    $(MAKE) SYS=atmos -C $$i || exit 1; \
 	    $(AR) a atmos.lib $$i/*.o;\
 	done
 	mv atmos/crt0.o atmos.o
@@ -129,12 +109,7 @@ atmoslib:
 
 c16lib:
 	for i in c16 cbm common runtime conio dbg em joystick tgi zlib; do \
-	    AS=$(AS) \
-	    CC=$(CC) \
-	    LD=$(LD) \
-	    AFLAGS="-t c16 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t c16 --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+       	    $(MAKE) SYS=c16 -C $$i || exit 1; \
 	    $(AR) a c16.lib $$i/*.o;\
 	done
 	mv c16/crt0.o c16.o
@@ -146,12 +121,7 @@ c16lib:
 
 c64lib:
 	for i in c64 cbm common runtime conio dbg em joystick mouse serial tgi zlib; do \
-	    AS=$(AS) \
-	    CC=$(CC) \
-	    LD=$(LD) \
-	    AFLAGS="-t c64 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t c64 --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=c64 -C $$i || exit 1; \
 	    $(AR) a c64.lib $$i/*.o;\
 	done
 	mv c64/crt0.o c64.o
@@ -167,12 +137,7 @@ c64lib:
 
 c128lib:
 	for i in c128 cbm common runtime conio dbg em joystick mouse serial tgi zlib; do \
-	    AS=$(AS) \
-	    CC=$(CC) \
-	    LD=$(LD) \
-	    AFLAGS="-t c128 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t c128 --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=c128 -C $$i || exit 1; \
 	    $(AR) a c128.lib $$i/*.o;\
 	done
 	mv c128/crt0.o c128.o
@@ -189,12 +154,7 @@ c128lib:
 
 cbm510lib:
 	for i in cbm510 cbm common runtime conio dbg em joystick serial tgi zlib; do \
-	    CC=$(CC) \
-	    AS=$(AS) \
-	    LD=$(LD) \
-	    AFLAGS="-t cbm510 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t cbm510 --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=cbm510 -C $$i || exit 1; \
 	    $(AR) a cbm510.lib $$i/*.o;\
 	done
 	mv cbm510/crt0.o cbm510.o
@@ -207,12 +167,7 @@ cbm510lib:
 
 cbm610lib:
 	for i in cbm610 cbm common runtime conio dbg em joystick serial tgi zlib; do \
-     	    CC=$(CC) \
-	    AS=$(AS) \
-	    LD=$(LD) \
-	    AFLAGS="-t cbm610 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t cbm610 --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=cbm610 -C $$i || exit 1; \
 	    $(AR) a cbm610.lib $$i/*.o;\
 	done
 	mv cbm610/crt0.o cbm610.o
@@ -237,7 +192,7 @@ geoslib:
 	    AR=$(AR) \
 	    AFLAGS="-t geos -I../../asminc" \
 	    CFLAGS="-Osir -g -T -t geos --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=geos -C $$i || exit 1; \
 	    for objfile in $$i/*.o; do \
 	        if [ -f geos/$$objfile ]; then \
 	      	    $(AR) a geos.lib geos/$$objfile; \
@@ -255,44 +210,30 @@ geoslib:
 
 lynxlib:
 	for i in lynx common conio runtime em joystick tgi zlib; do \
-	    AS=$(AS) \
-	    CC=$(CC) \
-	    LD=$(LD) \
-	    AFLAGS="-t lynx -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t lynx --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=lynx -C $$i || exit 1; \
 	    $(AR) a lynx.lib $$i/*.o;\
 	done
 	mv lynx/crt0.o lynx.o
 	cp lynx/*.joy .
 	cp lynx/*.tgi .
-		       
+
 #-----------------------------------------------------------------------------
 # NES
 
 neslib:
 	for i in nes common runtime conio em joystick tgi zlib; do \
-	    CC=$(CC) \
-	    AS=$(AS) \
-	    LD=$(LD) \
-	    AFLAGS="-t nes -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t nes --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=nes -C $$i || exit 1; \
 	    $(AR) a nes.lib $$i/*.o;\
 	done
 	mv nes/crt0.o nes.o
+	cp nes/*.joy .
 
 #-----------------------------------------------------------------------------
 # CBM PET machines
 
 petlib:
 	for i in pet cbm common runtime conio dbg em joystick tgi zlib; do \
-	    CC=$(CC) \
-	    AS=$(AS) \
-	    LD=$(LD) \
-	    AFLAGS="-t pet -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t pet --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=pet -C $$i || exit 1; \
 	    $(AR) a pet.lib $$i/*.o;\
 	done
 	mv pet/crt0.o pet.o
@@ -302,12 +243,7 @@ petlib:
 
 plus4lib:
 	for i in plus4 cbm common runtime conio dbg em joystick serial tgi zlib; do \
-	    CC=$(CC) \
-	    AS=$(AS) \
-	    LD=$(LD) \
-	    AFLAGS="-t plus4 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t plus4 --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=plus4 -C $$i || exit 1; \
 	    $(AR) a plus4.lib $$i/*.o;\
 	done
 	mv plus4/crt0.o plus4.o
@@ -319,12 +255,7 @@ plus4lib:
 
 supervisionlib:
 	for i in supervision common runtime; do \
-	    CC=$(CC) \
-	    AS=$(AS) \
-	    LD=$(LD) \
-	    AFLAGS="-t supervision -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t supervision --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=supervision -C $$i || exit 1; \
 	    $(AR) a supervision.lib $$i/*.o;\
 	done
 	mv supervision/crt0.o supervision.o
@@ -334,12 +265,7 @@ supervisionlib:
 
 vic20lib:
 	for i in vic20 cbm common runtime conio dbg em joystick tgi zlib; do \
-	    AS=$(AS) \
-	    CC=$(CC) \
-	    LD=$(LD) \
-	    AFLAGS="-t vic20 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t vic20 --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
+	    $(MAKE) SYS=vic20 -C $$i || exit 1; \
 	    $(AR) a vic20.lib $$i/*.o;\
 	done
 	mv vic20/crt0.o vic20.o

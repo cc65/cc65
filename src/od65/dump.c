@@ -112,7 +112,7 @@ static void SkipExpr (FILE* F)
 	   	(void) Read16 (F);
 	   	break;
 
-	    case EXPR_SEGMENT:
+	    case EXPR_SECTION:
 	   	/* Read the segment number */
 	   	(void) Read8 (F);
 	   	break;

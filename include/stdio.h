@@ -80,7 +80,7 @@ int __fastcall__ ferror (FILE* f);
 int __fastcall__ fflush (FILE* f);
 int fgetc (FILE* f);
 char* fgets (char* buf, size_t size, FILE* f);
-FILE* fopen (const char* name, const char* mode);
+FILE* __fastcall__ fopen (const char* name, const char* mode);
 int fprintf (FILE* f, const char* format, ...);
 int fputc (int c, FILE* f);
 int fputs (const char* s, FILE* f);

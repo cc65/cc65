@@ -37,6 +37,7 @@
 
 /* common */
 #include "abend.h"
+#include "chartype.h"
 #include "print.h"
 #include "xsprintf.h"
 
@@ -692,7 +693,7 @@ static unsigned OptAdd2 (CodeSeg* S)
        	    strcmp (L[6]->Arg, "addeqysp") == 0 &&
 	    !CE_HasLabel (L[6])                 &&
 	    (GetRegInfo (S, I+7) & REG_AX) == 0) {
-		
+
 	    char Buf [20];
 	    CodeEntry* X;
 	    int Offs;
@@ -792,6 +793,60 @@ static unsigned OptAdd3 (CodeSeg* S)
 
 	    /* Remove the bcs/dex */
 	    CS_DelEntries (S, I+1, 2);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*				Optimize shifts                              */
+/*****************************************************************************/
+
+
+
+static unsigned OptShift1 (CodeSeg* S)
+/* A call to the shlaxN routine may get replaced by one or more asl insns
+ * if the value of X is not used later.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+	if (E->OPC == OP65_JSR                       &&
+       	    (strncmp (E->Arg, "shlax", 5) == 0 ||
+	     strncmp (E->Arg, "aslax", 5) == 0)	     &&
+	    strlen (E->Arg) == 6                     &&
+	    IsDigit (E->Arg[5])                      &&
+	    !RegXUsed (S, I+1)) {
+
+	    /* Insert shift insns */
+	    unsigned Count = E->Arg[5] - '0';
+	    while (Count--) {
+	    	CodeEntry* X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, E->LI);
+	    	CS_InsertEntry (S, X, I+1);
+	    }
+
+	    /* Delete the call to shlax */
+	    CS_DelEntry (S, I);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -984,7 +1039,7 @@ static unsigned OptCmp3 (CodeSeg* S)
 		CE_ReplaceOPC (L[1], OP65_CMP);
 
 		/* Beware: If the first LDA instruction had a label, we have
-		 * to move this label to the top of the sequence again.
+	     	 * to move this label to the top of the sequence again.
 		 */
 		if (CE_HasLabel (E)) {
 		    CS_MoveLabels (S, E, L[0]);
@@ -1629,7 +1684,7 @@ static unsigned OptNegAX4 (CodeSeg* S)
 
 	    /* Insert apropriate test code */
 	    if (ByteSized) {
-	    	/* Test bytes */
+	     	/* Test bytes */
 	    	X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
   	    	CS_InsertEntry (S, X, I+2);
 	    } else {
@@ -2017,7 +2072,7 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
 	    L[7]->OPC == OP65_JSR               &&
        	    strcmp (L[7]->Arg, "ldauidx") == 0  &&
 	    !CE_HasLabel (L[7])) {
-		
+
 	    CodeEntry* X;
 
        	    /* Store the low byte and remove the TAY instead */
@@ -2278,6 +2333,8 @@ static OptFunc OptFuncs [] = {
     OptEntry (OptAdd1, optPre),
     OptEntry (OptAdd2, optPre),
     OptEntry (OptAdd3, optMain),
+    /* Optimize shifts */
+    OptEntry (OptShift1, optPre),
     /* Optimize jump cascades */
     OptEntry (OptJumpCascades, optMain),
     /* Remove dead jumps */

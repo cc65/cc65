@@ -67,6 +67,10 @@ struct FuncInfo {
 
 static const FuncInfo FuncInfoTable[] = {
     { "addysp",	       	REG_Y, 	       	REG_NONE	},
+    { "aslax1",         REG_AX,		REG_AX          },
+    { "aslax2",         REG_AX,		REG_AX          },
+    { "aslax3",         REG_AX,		REG_AX          },
+    { "aslax4",         REG_AX,		REG_AX          },
     { "bnega",          REG_A,          REG_AX          },
     { "bnegax",         REG_AX,         REG_AX          },
     { "bnegeax",        REG_AX,         REG_AX          },
@@ -122,6 +126,10 @@ static const FuncInfo FuncInfoTable[] = {
     { "pusheax",        REG_AX,         REG_Y           },
     { "pushw0sp",  	REG_NONE,	REG_AXY	    	},
     { "pushwysp",  	REG_Y,		REG_AXY	    	},
+    { "shlax1",         REG_AX,		REG_AX          },
+    { "shlax2",         REG_AX,		REG_AX          },
+    { "shlax3",         REG_AX,		REG_AX          },
+    { "shlax4",         REG_AX,		REG_AX          },
     { "shrax1",         REG_AX,         REG_AX          },
     { "shrax2",         REG_AX,         REG_AX          },
     { "shrax3",         REG_AX,         REG_AX          },

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2005 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -151,7 +151,8 @@ struct o65_header {
 /* Operating system codes for O65_OPT_OS */
 #define O65_OS_OSA65		1
 #define O65_OS_LUNIX		2
-#define O65_OS_CC65_MODULE      3
+#define O65_OS_CC65             3
+#define O65_OS_OPENCBM          4
 
 
 

@@ -1084,6 +1084,9 @@ static unsigned ParseStructInit (type* Type, int AllowFlexibleMembers)
     unsigned  StructSize;
     unsigned  Size;
 
+    static const token_t EndTokens[] = { TOK_RCURLY, TOK_SEMI };
+
+
     /* Consume the opening curly brace */
     ConsumeLCurly ();
 
@@ -1099,7 +1102,12 @@ static unsigned ParseStructInit (type* Type, int AllowFlexibleMembers)
     Tab = Entry->V.S.SymTab;
     if (Tab == 0) {
      	Error ("Cannot initialize variables with incomplete type");
-    	/* Returning here will cause lots of errors, but recovery is difficult */
+        /* Try error recovery */
+        SkipTokens (EndTokens, sizeof(EndTokens)/sizeof(EndTokens[0]));
+        if (CurTok.Tok == TOK_RCURLY) {
+            NextToken ();
+        }
+    	/* Nothing initialized */
     	return 0;
     }
 

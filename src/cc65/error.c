@@ -107,7 +107,8 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "Unexpected `#else'",
     "`#endif' expected",
     "Compiler directive expected",
-    "Symbol `%s' defined more than once",
+    "Redefinition of `%s'",
+    "Conflicting types for `%s'",
     "String literal expected",
     "`while' expected",
     "Function must return a value",
@@ -152,8 +153,8 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "Variable has unknown size",
     "Unknown identifier: `%s'",
     "Duplicate qualifier: `%s'",
-    "Assignment discards `const' qualifier",
-    "Passing argument %u discards `const' qualifier",
+    "Assignment to const",
+    "Pointer types differ in type qualifiers",
 };
 
 

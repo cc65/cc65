@@ -62,8 +62,6 @@ type type_uint []   	= { T_UINT,	T_END };
 type type_long []   	= { T_LONG,	T_END };
 type type_ulong []  	= { T_ULONG,	T_END };
 type type_void []   	= { T_VOID,	T_END };
-type type_pschar []	= { T_PTR, T_SCHAR, T_END };
-type type_puchar []	= { T_PTR, T_UCHAR, T_END };
 
 
 
@@ -77,24 +75,10 @@ unsigned TypeLen (const type* T)
 /* Return the length of the type string */
 {
     const type* Start = T;
-    while (*T) {
+    while (*T != T_END) {
 	++T;
     }
     return T - Start;
-}
-
-
-
-int TypeCmp (const type* T1, const type* T2)
-/* Compare two type strings */
-{
-    int A, B, D;
-    do {
-	A = *T1++;
-	B = *T2++;
-	D = A - B;
-    } while (D == 0 && A != 0);
-    return D;
 }
 
 
@@ -502,48 +486,18 @@ type* Indirect (type* T)
 
 
 
-int IsConst (const type* T)
-/* Return true if the given type has a const memory image */
-{
-    /* If this is an array, look at the element type, otherwise look at the
-     * type itself.
-     */
-    if (IsTypeArray (T)) {
-	T += DECODE_SIZE + 1;
-    }
-    return ((T[0] & T_QUAL_CONST) == T_QUAL_CONST);
-}
-
-
-
-int IsTypeVoid (const type* T)
-/* Return true if this is a void type */
-{
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_VOID && T[1] == T_END);
-}
-
-
-
-int IsClassPtr (const type* T)
-/* Return true if this is a pointer type */
-{
-    return (T[0] & T_MASK_CLASS) == T_CLASS_PTR;
-}
-
-
-
 int IsTypeChar (const type* T)
 /* Return true if this is a character type */
 {
-    return (T[0] & T_MASK_TYPE) == T_TYPE_CHAR && T[1] == T_END;
+    return (T[0] & T_MASK_TYPE) == T_TYPE_CHAR;
 }
 
 
 
-int IsClassInt (const type* T)
-/* Return true if this is an integer type */
+int IsTypeInt (const type* T)
+/* Return true if this is an int type (signed or unsigned) */
 {
-    return (T[0] & T_MASK_CLASS) == T_CLASS_INT;
+    return (T[0] & T_MASK_TYPE) == T_TYPE_INT;
 }
 
 
@@ -556,10 +510,50 @@ int IsTypeLong (const type* T)
 
 
 
-int IsUnsigned (const type* T)
-/* Return true if this is an unsigned type */
+int IsTypePtr (const type* T)
+/* Return true if this is a pointer type */
 {
-    return (T[0] & T_MASK_SIGN) == T_SIGN_UNSIGNED;
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_PTR);
+}
+
+
+
+int IsTypeArray (const type* T)
+/* Return true if this is an array type */
+{
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_ARRAY);
+}
+
+
+
+int IsTypeVoid (const type* T)
+/* Return true if this is a void type */
+{
+    return (T[0] & T_MASK_TYPE) == T_TYPE_VOID;
+}
+
+
+
+int IsTypeFunc (const type* T)
+/* Return true if this is a function class */
+{
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_FUNC);
+}
+
+
+
+int IsClassInt (const type* T)
+/* Return true if this is an integer type */
+{
+    return (T[0] & T_MASK_CLASS) == T_CLASS_INT;
+}
+
+
+
+int IsClassPtr (const type* T)
+/* Return true if this is a pointer type */
+{
+    return (T[0] & T_MASK_CLASS) == T_CLASS_PTR;
 }
 
 
@@ -572,10 +566,26 @@ int IsClassStruct (const type* T)
 
 
 
-int IsTypeFunc (const type* T)
-/* Return true if this is a function class */
+int IsSignUnsigned (const type* T)
+/* Return true if this is an unsigned type */
 {
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_FUNC);
+    return (T[0] & T_MASK_SIGN) == T_SIGN_UNSIGNED;
+}
+
+
+
+int IsQualConst (const type* T)
+/* Return true if the given type has a const memory image */
+{
+    return (GetQualifier (T) & T_QUAL_CONST) != 0;
+}
+
+
+
+int IsQualVolatile (const type* T)
+/* Return true if the given type has a volatile type qualifier */
+{
+    return (GetQualifier (T) & T_QUAL_VOLATILE) != 0;
 }
 
 
@@ -599,10 +609,52 @@ int IsTypeFuncPtr (const type* T)
 
 
 
-int IsTypeArray (const type* T)
-/* Return true if this is an array type */
+type GetType (const type* T)
+/* Get the raw type */
 {
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_ARRAY);
+    PRECONDITION (T[0] != T_END);
+    return (T[0] & T_MASK_TYPE);
+}
+
+
+
+type GetClass (const type* T)
+/* Get the class of a type string */
+{
+    PRECONDITION (T[0] != T_END);
+    return (T[0] & T_MASK_CLASS);
+}
+
+
+
+type GetSignedness (const type* T)
+/* Get the sign of a type */
+{
+    PRECONDITION (T[0] != T_END);
+    return (T[0] & T_MASK_SIGN);
+}
+
+
+
+type GetSizeModifier (const type* T)
+/* Get the size modifier of a type */
+{
+    PRECONDITION (T[0] != T_END);
+    return (T[0] & T_MASK_SIZE);
+}
+
+
+
+type GetQualifier (const type* T)
+/* Get the qualifier from the given type string */
+{
+    /* If this is an array, look at the element type, otherwise look at the
+     * type itself.
+     */
+    if (IsTypeArray (T)) {
+    	T += DECODE_SIZE + 1;
+    }
+    return (T[0] & T_QUAL_CONST);
 }
 
 

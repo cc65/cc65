@@ -52,6 +52,7 @@ static const struct Keyword {
     { "__EAX__",       	TOK_EAX,   	TT_C	},
     { "__asm__",       	TOK_ASM,   	TT_C	},
     { "__attribute__",	TOK_ATTRIBUTE,	TT_C	},
+    { "__far__",	TOK_FAR,	TT_C	},
     { "__fastcall__",  	TOK_FASTCALL,   TT_C	},
     { "asm",   	       	TOK_ASM,   	TT_EXT 	},
     { "auto",  	       	TOK_AUTO,  	TT_C  	},
@@ -66,6 +67,7 @@ static const struct Keyword {
     { "else",  	       	TOK_ELSE,  	TT_C  	},
     { "enum",  	       	TOK_ENUM,  	TT_C  	},
     { "extern",        	TOK_EXTERN,	TT_C   	},
+    { "far",		TOK_FAR,	TT_EXT	},
     { "fastcall",      	TOK_FASTCALL,	TT_EXT 	},
     { "float", 	       	TOK_FLOAT, 	TT_C  	},
     { "for",   	       	TOK_FOR,   	TT_C  	},
@@ -129,7 +131,7 @@ static int FindKey (const char* Key)
 }
 
 
-			  
+
 static int SkipWhite (void)
 /* Skip white space in the input stream, reading and preprocessing new lines
  * if necessary. Return 0 if end of file is reached, return 1 otherwise.

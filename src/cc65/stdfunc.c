@@ -111,6 +111,8 @@ static void StdFunc_strlen (struct expent* lval)
 /* Handle the strlen function */
 {
     struct expent pval;
+    static type ArgType[] = { T_PTR, T_SCHAR, T_END };
+
 
     /* Fetch the parameter */
     int k = hie1 (&pval);
@@ -135,8 +137,11 @@ static void StdFunc_strlen (struct expent* lval)
      	exprhs (CF_NONE, k, &pval);
     }
 
+    /* Setup the argument type string */
+    ArgType[1] = GetDefaultChar () | T_QUAL_CONST;
+
     /* Convert the parameter type to the type needed, check for mismatches */
-    assignadjust (SignedChars? type_pschar : type_puchar, &pval);
+    assignadjust (ArgType, &pval);
 
     /* Generate the strlen code */
     g_strlen (flags, pval.e_name, pval.e_const);

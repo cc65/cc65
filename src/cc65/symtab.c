@@ -53,6 +53,7 @@
 #include "funcdesc.h"
 #include "global.h"
 #include "symentry.h"
+#include "typecmp.h"
 #include "symtab.h"
 
 
@@ -692,9 +693,9 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
     	    unsigned ESize = Decode (EType + 1);
 
     	    if ((Size != 0 && ESize != 0) ||
-    	  	TypeCmp (Type+DECODE_SIZE+1, EType+DECODE_SIZE+1) != 0) {
-    	  	/* Types not identical: Duplicate definition */
-    	  	Error (ERR_MULTIPLE_DEFINITION, Name);
+    	  	TypeCmp (Type+DECODE_SIZE+1, EType+DECODE_SIZE+1) < TC_EQUAL) {
+    	  	/* Types not identical: Conflicting types */
+    	  	Error (ERR_CONFLICTING_TYPES, Name);
     	    } else {
     	  	/* Check if we have a size in the existing definition */
     	  	if (ESize == 0) {
@@ -705,8 +706,8 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
 
        	} else {
 	    /* New type must be identical */
-	    if (!EqualTypes (EType, Type) != 0) {
-     	     	Error (ERR_MULTIPLE_DEFINITION, Name);
+	    if (TypeCmp (EType, Type) < TC_EQUAL) {
+     	     	Error (ERR_CONFLICTING_TYPES, Name);
 	    }
 
 	    /* In case of a function, use the new type descriptor, since it
@@ -757,152 +758,6 @@ int SymIsLocal (SymEntry* Sym)
 /* Return true if the symbol is defined in the highest lexical level */
 {
     return (Sym->Owner == SymTab || Sym->Owner == TagTab);
-}
-
-
-
-static int EqualSymTables (SymTable* Tab1, SymTable* Tab2)
-/* Compare two symbol tables. Return 1 if they are equal and 0 otherwise */
-{
-    /* Compare the parameter lists */
-    SymEntry* Sym1 = Tab1->SymHead;
-    SymEntry* Sym2 = Tab2->SymHead;
-
-    /* Compare the fields */
-    while (Sym1 && Sym2) {
-
-	/* Compare this field */
-	if (!EqualTypes (Sym1->Type, Sym2->Type)) {
-	    /* Field types not equal */
-	    return 0;
-	}
-
-	/* Get the pointers to the next fields */
-	Sym1 = Sym1->NextSym;
-	Sym2 = Sym2->NextSym;
-    }
-
-    /* Check both pointers against NULL to compare the field count */
-    return (Sym1 == 0 && Sym2 == 0);
-}
-
-
-
-int EqualTypes (const type* Type1, const type* Type2)
-/* Recursively compare two types. Return 1 if the types match, return 0
- * otherwise.
- */
-{
-    int v1, v2;
-    SymEntry* Sym1;
-    SymEntry* Sym2;
-    SymTable* Tab1;
-    SymTable* Tab2;
-    FuncDesc* F1;
-    FuncDesc* F2;
-    int	      Ok;
-
-
-    /* Shortcut here: If the pointers are identical, the types are identical */
-    if (Type1 == Type2) {
-    	return 1;
-    }
-
-    /* Compare two types. Determine, where they differ */
-    while (*Type1 == *Type2 && *Type1 != T_END) {
-
-    	switch (*Type1) {
-
-    	    case T_FUNC:
-    	       	/* Compare the function descriptors */
-		F1 = DecodePtr (Type1+1);
-		F2 = DecodePtr (Type2+1);
-
-		/* If one of the functions is implicitly declared, both
-		 * functions are considered equal. If one of the functions is
-		 * old style, and the other is empty, the functions are
-		 * considered equal.
-		 */
-       	       	if ((F1->Flags & FD_IMPLICIT) != 0 || (F2->Flags & FD_IMPLICIT) != 0) {
-		    Ok = 1;
-		} else if ((F1->Flags & FD_OLDSTYLE) != 0 && (F2->Flags & FD_EMPTY) != 0) {
-		    Ok = 1;
-		} else if ((F1->Flags & FD_EMPTY) != 0 && (F2->Flags & FD_OLDSTYLE) != 0) {
-		    Ok = 1;
-		} else {
-		    Ok = 0;
-		}
-
-		if (!Ok) {
-
-		    /* Check the remaining flags */
-		    if ((F1->Flags & ~FD_IGNORE) != (F2->Flags & ~FD_IGNORE)) {
-		    	/* Flags differ */
-		    	return 0;
-		    }
-
-		    /* Compare the parameter lists */
-		    if (EqualSymTables (F1->SymTab, F2->SymTab) == 0 ||
-		    	EqualSymTables (F1->TagTab, F2->TagTab) == 0) {
-		    	/* One of the tables is not identical */
-		    	return 0;
-		    }
-		}
-
-		/* Skip the FuncDesc pointers to compare the return type */
-    	       	Type1 += DECODE_SIZE;
-    	       	Type2 += DECODE_SIZE;
-    	       	break;
-
-    	    case T_ARRAY:
-    	       	/* Check member count */
-    	       	v1 = Decode (Type1+1);
-    	       	v2 = Decode (Type2+1);
-    	       	if (v1 != 0 && v2 != 0 && v1 != v2) {
-    	       	    /* Member count given but different */
-    	       	    return 0;
-    	       	}
-    	       	Type1 += DECODE_SIZE;
-     	       	Type2 += DECODE_SIZE;
-    	       	break;
-
-    	    case T_STRUCT:
-    	    case T_UNION:
-       	       	/* Compare the fields recursively. To do that, we fetch the
-    	       	 * pointer to the struct definition from the type, and compare
-    	       	 * the fields.
-    	       	 */
-    	       	Sym1 = DecodePtr (Type1+1);
-    	       	Sym2 = DecodePtr (Type2+1);
-
-		/* Get the field tables from the struct entry */
-		Tab1 = Sym1->V.S.SymTab;
-		Tab2 = Sym2->V.S.SymTab;
-
-		/* One or both structs may be forward definitions. In this case,
-		 * the symbol tables are both non existant. Assume that the
-		 * structs are equal in this case.
-		 */
-		if (Tab1 != 0 && Tab2 != 0) {
-
-		    if (EqualSymTables (Tab1, Tab2) == 0) {
-			/* Field lists are not equal */
-			return 0;
-		    }
-
-		}
-
-    		/* Structs are equal */
-    		Type1 += DECODE_SIZE;
-    		Type2 += DECODE_SIZE;
-     		break;
-    	}
-    	++Type1;
-       	++Type2;
-    }
-
-    /* Done, types are equal */
-    return 1;
 }
 
 

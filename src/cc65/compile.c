@@ -173,7 +173,7 @@ static void Parse (void)
 	     	    }
 
 	     	    /* Switch to the data or rodata segment */
-		    if (IsConst (Decl.Type)) {
+		    if (IsQualConst (Decl.Type)) {
 			g_userodata ();
 		    } else {
 			g_usedata ();

@@ -143,8 +143,6 @@ extern type type_uint [];
 extern type type_long [];
 extern type type_ulong [];
 extern type type_void [];
-extern type type_pschar [];
-extern type type_puchar [];
 
 
 
@@ -156,9 +154,6 @@ extern type type_puchar [];
 
 unsigned TypeLen (const type* Type);
 /* Return the length of the type string */
-
-int TypeCmp (const type* T1, const type* T2);
-/* Compare two type strings */
 
 type* TypeCpy (type* Dest, const type* Src);
 /* Copy a type string */
@@ -227,43 +222,67 @@ type* Indirect (type* Type);
  * given type points to.
  */
 
-int IsConst (const type* T);
-/* Return true if the given type has a const memory image */
-
-int IsTypeVoid (const type* Type);
-/* Return true if this is a void type */
-
-int IsClassPtr (const type* Type);
-/* Return true if this is a pointer type */
-
-int IsTypeChar (const type* Type);
+int IsTypeChar (const type* T);
 /* Return true if this is a character type */
 
-int IsClassInt (const type* Type);
-/* Return true if this is an integer type */
+int IsTypeInt (const type* T);
+/* Return true if this is an int type (signed or unsigned) */
 
-int IsTypeLong (const type* Type);
+int IsTypeLong (const type* T);
 /* Return true if this is a long type (signed or unsigned) */
 
-int IsUnsigned (const type* Type);
-/* Return true if this is an unsigned type */
-
-int IsClassStruct (const type* Type);
-/* Return true if this is a struct type */
-
-int IsTypeFunc (const type* Type);
-/* Return true if this is a function class */
-
-int IsFastCallFunc (const type* Type);
-/* Return true if this is a function type with __fastcall__ calling conventions */
-
-int IsTypeFuncPtr (const type* Type);
-/* Return true if this is a function pointer */
+int IsTypePtr (const type* Type);
+/* Return true if this is a pointer type */
 
 int IsTypeArray (const type* Type);
 /* Return true if this is an array type */
 
-struct FuncDesc* GetFuncDesc (const type* Type);
+int IsTypeVoid (const type* Type);
+/* Return true if this is a void type */
+
+int IsTypeFunc (const type* Type);
+/* Return true if this is a function class */
+
+int IsClassInt (const type* Type);
+/* Return true if this is an integer type */
+
+int IsClassPtr (const type* Type);
+/* Return true if this is a pointer type */
+
+int IsClassStruct (const type* Type);
+/* Return true if this is a struct type */
+
+int IsSignUnsigned (const type* Type);
+/* Return true if this is an unsigned type */
+
+int IsQualConst (const type* T);
+/* Return true if the given type has a const memory image */
+
+int IsQualVolatile (const type* T);
+/* Return true if the given type has a volatile type qualifier */
+
+int IsFastCallFunc (const type* T);
+/* Return true if this is a function type with __fastcall__ calling conventions */
+
+int IsTypeFuncPtr (const type* T);
+/* Return true if this is a function pointer */
+
+type GetType (const type* T);
+/* Get the raw type */
+
+type GetClass (const type* T);
+/* Get the class of a type string */
+
+type GetSignedness (const type* T);
+/* Get the sign of a type */
+
+type GetSizeModifier (const type* T);
+/* Get the size modifier of a type */
+
+type GetQualifier (const type* T);
+/* Get the qualifier from the given type string */
+
+struct FuncDesc* GetFuncDesc (const type* T);
 /* Get the FuncDesc pointer from a function or pointer-to-function type */
 
 

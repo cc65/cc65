@@ -163,11 +163,6 @@ SymTable* GetSymTab (void);
 int SymIsLocal (SymEntry* Sym);
 /* Return true if the symbol is defined in the highest lexical level */
 
-int EqualTypes (const type* t1, const type* t2);
-/* Recursively compare two types. Return 1 if the types match, return 0
- * otherwise.
- */
-
 void MakeZPSym (const char* Name);
 /* Mark the given symbol as zero page symbol */
 
@@ -182,9 +177,6 @@ void EmitExternals (void);
 /* End of symtab.h */
 
 #endif
-
-
-
 
 
 

@@ -125,10 +125,11 @@ typedef enum token_t {
     TOK_FCONST,
 
     TOK_ATTRIBUTE,
+    TOK_FAR,
     TOK_FASTCALL,
     TOK_AX,
     TOK_EAX,
-
+	    
     TOK_PRAGMA
 } token_t;
 

@@ -45,6 +45,7 @@ OBJS =	anonname.o	\
 	stmt.o 		\
 	symentry.o	\
 	symtab.o       	\
+	typecmp.o	\
 	util.o
 
 LIBS = $(COMMON)/common.a

@@ -269,7 +269,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 	    if (curtok == TOK_ASSIGN) {
 
 	      	/* Initialization ahead, switch to data segment */
-		if (IsConst (Decl.Type)) {
+		if (IsQualConst (Decl.Type)) {
 		    g_userodata ();
 		} else {
 		    g_usedata ();

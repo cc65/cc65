@@ -100,6 +100,7 @@ OBJS =	anonname.obj	\
 	stdfunc.obj	\
 	symentry.obj	\
 	symtab.obj	\
+	typecmp.obj	\
 	util.obj
 
 LIBS = ..\common\common.lib
@@ -156,6 +157,7 @@ FILE segname.obj
 FILE stdfunc.obj
 FILE symentry.obj
 FILE symtab.obj
+FILE typecmp.obj
 FILE util.obj
 LIBRARY ..\common\common.lib
 |

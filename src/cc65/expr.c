@@ -30,6 +30,7 @@
 #include "scanner.h"
 #include "stdfunc.h"
 #include "symtab.h"
+#include "typecmp.h"
 #include "expr.h"
 
 
@@ -132,13 +133,13 @@ static type* promoteint (type* lhst, type* rhst)
      *   - Otherwise the result is an int.
      */
     if (IsTypeLong (lhst) || IsTypeLong (rhst)) {
-	if (IsUnsigned (lhst) || IsUnsigned (rhst)) {
+       	if (IsSignUnsigned (lhst) || IsSignUnsigned (rhst)) {
        	    return type_ulong;
 	} else {
 	    return type_long;
 	}
     } else {
-	if (IsUnsigned (lhst) || IsUnsigned (rhst)) {
+	if (IsSignUnsigned (lhst) || IsSignUnsigned (rhst)) {
 	    return type_uint;
 	} else {
 	    return type_int;
@@ -232,11 +233,23 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
      	     *   - the rhs pointer is a void pointer, or
 	     *   - the lhs pointer is a void pointer.
      	     */
-	    type* left  = Indirect (lhst);
-     	    type* right = Indirect (rhst);
-       	    if (!EqualTypes (left, right) && *left != T_VOID && *right != T_VOID) {
-     	       	Error (ERR_INCOMPATIBLE_POINTERS);
-     	    }
+	    if (!IsTypeVoid (Indirect (lhst)) && !IsTypeVoid (Indirect (rhst))) {
+		/* Compare the types */
+		switch (TypeCmp (lhst, rhst)) {
+
+		    case TC_INCOMPATIBLE:
+			Error (ERR_INCOMPATIBLE_POINTERS);
+			break;
+
+		    case TC_QUAL_DIFF:
+			Error (ERR_QUAL_DIFF);
+			break;
+
+		    default:
+			/* Ok */
+			break;
+		}
+	    }
      	} else if (IsClassInt (rhst)) {
      	    /* Int to pointer assignment is valid only for constant zero */
      	    if ((rhs->e_flags & E_MCONST) == 0 || rhs->e_const != 0) {
@@ -246,7 +259,7 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
 	    /* Assignment of function to function pointer is allowed, provided
 	     * that both functions have the same parameter list.
 	     */
-	    if (!EqualTypes(Indirect (lhst), rhst)) {
+	    if (TypeCmp (Indirect (lhst), rhst) < TC_EQUAL) {
 	 	Error (ERR_INCOMPATIBLE_TYPES);
 	    }
      	} else {
@@ -580,18 +593,9 @@ static void callfunction (struct expent* lval)
 	 * convert the actual argument to the type needed.
 	 */
        	if (!Ellipsis) {
-	    /* If the left side is not const and the right is const, print
-	     * an error. Note: This is an incomplete check, since other parts
-	     * of the type string may have a const qualifier, but it catches
-	     * some errors and is cheap here. We will redo it the right way
-	     * as soon as the parser is rewritten. ####
-	     */
-	    if (!IsConst (Param->Type) && IsConst (lval2.e_tptr)) {
-		Error (ERR_CONST_PARAM, ParamCount);
-	    }
-
 	    /* Promote the argument if needed */
        	    assignadjust (Param->Type, &lval2);
+
 	    /* If we have a prototype, chars may be pushed as chars */
 	    Flags |= CF_FORCECHAR;
        	}
@@ -1713,7 +1717,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	         */
        	       	type* left  = Indirect (lval->e_tptr);
 	   	type* right = Indirect (lval2.e_tptr);
-	   	if (!EqualTypes (left, right) && *left != T_VOID && *right != T_VOID) {
+	   	if (TypeCmp (left, right) < TC_EQUAL && *left != T_VOID && *right != T_VOID) {
 	   	    /* Incomatible pointers */
 	   	    Error (ERR_INCOMPATIBLE_TYPES);
 	   	}
@@ -1756,7 +1760,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	     */
 	    if (IsTypeChar (lval->e_tptr) && (IsTypeChar (lval2.e_tptr) || rconst)) {
 	       	flags |= CF_CHAR;
-	       	if (IsUnsigned (lval->e_tptr) || IsUnsigned (lval2.e_tptr)) {
+	       	if (IsSignUnsigned (lval->e_tptr) || IsSignUnsigned (lval2.e_tptr)) {
 	       	    flags |= CF_UNSIGNED;
 	       	}
 	       	if (rconst) {
@@ -2017,7 +2021,7 @@ static void parsesub (int k, struct expent* lval)
     	    	/* Operate on pointers, result type is a pointer */
     	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is pointer, right is pointer, must scale result */
-    	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) != 0) {
+    	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_EQUAL) {
     	    	    Error (ERR_INCOMPATIBLE_POINTERS);
     	    	} else {
     	    	    lval->e_const = (lval->e_const - lval2.e_const) / PSizeOf (lhst);
@@ -2052,7 +2056,7 @@ static void parsesub (int k, struct expent* lval)
     	    	flags = CF_PTR;
     	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is pointer, right is pointer, must scale result */
-    	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) != 0) {
+    	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_EQUAL) {
     	    	    Error (ERR_INCOMPATIBLE_POINTERS);
     	    	} else {
     	    	    rscale = PSizeOf (lhst);
@@ -2095,7 +2099,7 @@ static void parsesub (int k, struct expent* lval)
  	    flags = CF_PTR;
  	} else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
  	    /* Left is pointer, right is pointer, must scale result */
- 	    if (TypeCmp (Indirect (lhst), Indirect (rhst)) != 0) {
+ 	    if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_EQUAL) {
  	       	Error (ERR_INCOMPATIBLE_POINTERS);
  	    } else {
  	    	rscale = PSizeOf (lhst);
@@ -2454,7 +2458,7 @@ static int hieQuest (struct expent *lval)
 
 	} else if (IsClassPtr (type2) && IsClassPtr (type3)) {
 	    /* Must point to same type */
-	    if (TypeCmp (Indirect (type2), Indirect (type3)) != 0) {
+	    if (TypeCmp (Indirect (type2), Indirect (type3)) < TC_EQUAL) {
 		Error (ERR_INCOMPATIBLE_TYPES);
 	    }
 	    /* Result has the common type */
@@ -2667,7 +2671,7 @@ static void Assignment (struct expent* lval)
     type* ltype = lval->e_tptr;
 
     /* Check for assignment to const */
-    if (IsConst (ltype)) {
+    if (IsQualConst (ltype)) {
 	Error (ERR_CONST_ASSIGN);
     }
 
@@ -2695,7 +2699,7 @@ static void Assignment (struct expent* lval)
 	g_push (CF_PTR | CF_UNSIGNED, 0);
 
 	/* Check for equality of the structs */
-	if (!EqualTypes (ltype, lval2.e_tptr)) {
+	if (TypeCmp (ltype, lval2.e_tptr) < TC_EQUAL) {
      	    Error (ERR_INCOMPATIBLE_TYPES);
 	}
 

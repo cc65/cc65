@@ -38,13 +38,14 @@
 
 
 
-#include "../common/exprdefs.h"
-#include "../common/filepos.h"
+/* common */
+#include "exprdefs.h"
+#include "filepos.h"
 
 
 
 /*****************************************************************************/
-/*				struct Fragment				     */
+/*	  			struct Fragment				     */
 /*****************************************************************************/
 
 
@@ -76,3 +77,4 @@ extern Fragment* FragLast;
 
 
 
+	  

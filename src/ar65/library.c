@@ -389,13 +389,20 @@ static void LibCheckExports (ObjData* O)
         printf ("Module `%s' (%u exports):\n", O->Name, Count);
     }
     while (Count--) {
+		      
+	unsigned char	Tag;
+	unsigned	Len;
+	char*		Name;
 
       	/* Get the export tag */
-      	unsigned char Tag = *Exports++;
+      	Tag = *Exports++;
+
+	/* condes decls may follow */
+	Exports += GET_EXP_CONDES_COUNT (Tag);
 
        	/* Next thing is name of symbol */
-     	unsigned Len = GetVar (&Exports);
-	char* Name = xmalloc (Len + 1);
+     	Len = GetVar (&Exports);
+	Name = xmalloc (Len + 1);
      	memcpy (Name, Exports, Len);
      	Name [Len] = '\0';
      	Exports += Len;
@@ -414,7 +421,7 @@ static void LibCheckExports (ObjData* O)
 
       	/* Insert the name into the hash table */
 	if (Verbose > 1) {
-      		printf ("  %s\n", Name);
+      	    	printf ("  %s\n", Name);
 	}
      	ExpInsert (Name, O->Index);
 

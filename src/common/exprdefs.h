@@ -111,6 +111,7 @@ struct ExprNode {
 	unsigned       	    SegNum;  	/* If this is a segment */
 	unsigned	    ImpNum;	/* If this is an import */
 	struct Memory*	    MemArea;	/* If this is a memory area */
+	struct Section*	    Sec;	/* If segment and Obj is NULL */
     } V;
 };
 

@@ -13,16 +13,16 @@
 ;	tmp3 - amount of bytes used on the stack (needed for cleanup)
 ; Uses:
 ;       ptr4 - scratch pointer used to remember original AX pointer
-; 
+;
 ;
 
 	.include	"atari.inc"
-	
+
 	.importzp tmp3,ptr4,sp
 	.import	_strupr,subysp
 	.export	ucase_fn
 
-ucase_fn:	.proc
+.proc   ucase_fn
 
 	; we make sure that the filename doesn't contain lowercase letters
 	; we copy the filename we got onto the stack, uppercase it and use this
@@ -70,4 +70,4 @@ loop2:	lda	(ptr4),y
 	clc			; indicate success
 	rts
 
-ucase_fn:	.endproc
+.endproc

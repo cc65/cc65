@@ -38,6 +38,10 @@ only40:	    ldx #0			; COLUMNS40
 tvmode:					; PAL/NTSC check here, result in A
             php
 	    sei                         ; disable interrupts
+	    lda CPU_DATA		; this is for C64
+	    pha
+	    lda #IO_IN			; enable access to I/O
+	    sta CPU_DATA
             bit rasreg
 	    bpl tvmode			; wait for rasterline  127<x<256
 	    lda #24			; (rasterline now >=256!)
@@ -51,6 +55,10 @@ ntsc:	    lda #$80			; NTSC
 
 modeend:    stx tmp1
 	    ora tmp1
+	    sta tmp1
 	    ldx #0
+	    pla
+	    sta CPU_DATA		; restore memory config
 	    plp                         ; restore interrupt state
+	    lda tmp1
 	    rts

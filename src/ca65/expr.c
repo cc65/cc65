@@ -189,6 +189,35 @@ int IsWordRange (long Val)
 
 
 
+static int IsEasyConst (const ExprNode* E, long* Val)
+/* Do some light checking if the given node is a constant. Don't care if E is
+ * a complex expression. If E is a constant, return true and place its value
+ * into Val, provided that Val is not NULL.
+ */
+{
+    /* Resolve symbols, follow symbol chains */
+    while (E->Op == EXPR_SYMBOL) {
+        E = SymResolve (E->V.Sym);
+        if (E == 0) {
+            /* Could not resolve */
+            return 0;
+        }
+    }
+
+    /* Symbols resolved, check for a literal */
+    if (E->Op == EXPR_LITERAL) {
+        if (Val) {
+            *Val = E->V.Val;
+        }
+        return 1;
+    }
+
+    /* Not found to be a const according to our tests */
+    return 0;
+}
+
+
+
 static int FuncBlank (void)
 /* Handle the .BLANK builtin function */
 {
@@ -503,8 +532,10 @@ static ExprNode* Function (int (*F) (void))
 
 static ExprNode* Factor (void)
 {
+    ExprNode* L;
     ExprNode* N;
     SymEntry* S;
+    long      Val;
 
     switch (Tok) {
 
@@ -540,14 +571,26 @@ static ExprNode* Factor (void)
 
 	case TOK_MINUS:
 	    NextTok ();
-	    N = NewExprNode (EXPR_UNARY_MINUS);
-       	    N->Left = Factor ();
+            L = Factor ();
+            if (IsEasyConst (L, &Val)) {
+                FreeExpr (L);
+                N = GenLiteralExpr (-Val);
+            } else {
+                N = NewExprNode (EXPR_UNARY_MINUS);
+       	        N->Left = L;
+            }
      	    break;
 
      	case TOK_NOT:
      	    NextTok ();
-     	    N = NewExprNode (EXPR_NOT);
-     	    N->Left = Factor ();
+            L = Factor ();
+            if (IsEasyConst (L, &Val)) {
+                FreeExpr (L);
+                N = GenLiteralExpr (~Val);
+            } else {
+                N = NewExprNode (EXPR_NOT);
+                N->Left = L;
+            }
      	    break;
 
      	case TOK_STAR:
@@ -558,20 +601,38 @@ static ExprNode* Factor (void)
 
 	case TOK_LT:
 	    NextTok ();
-	    N = NewExprNode (EXPR_BYTE0);
-	    N->Left = Factor ();
+            L = Factor ();
+            if (IsEasyConst (L, &Val)) {
+                FreeExpr (L);
+                N = GenLiteralExpr (Val & 0xFF);
+            } else {
+                N = NewExprNode (EXPR_BYTE0);
+                N->Left = L;
+            }
 	    break;
 
 	case TOK_GT:
 	    NextTok ();
-	    N = NewExprNode (EXPR_BYTE1);
-	    N->Left = Factor ();
+            L = Factor ();
+            if (IsEasyConst (L, &Val)) {
+                FreeExpr (L);
+                N = GenLiteralExpr ((Val >> 8) & 0xFF);
+            } else {
+                N = NewExprNode (EXPR_BYTE1);
+                N->Left = L;
+            }
 	    break;
 
         case TOK_BANK:
             NextTok ();
-            N = NewExprNode (EXPR_BYTE2);
-            N->Left = Factor ();
+            L = Factor ();
+            if (IsEasyConst (L, &Val)) {
+                FreeExpr (L);
+                N = GenLiteralExpr ((Val >> 16) & 0xFF);
+            } else {
+                N = NewExprNode (EXPR_BYTE2);
+                N->Left = L;
+            }
             break;
 
 	case TOK_LPAREN:
@@ -627,7 +688,6 @@ static ExprNode* Factor (void)
             NextTok ();
             break;
 
-
 	case TOK_XMATCH:
 	    N = Function (FuncXMatch);
 	    break;
@@ -658,25 +718,90 @@ static ExprNode* Term (void)
 	   Tok == TOK_AND || Tok == TOK_XOR || Tok == TOK_SHL ||
 	   Tok == TOK_SHR) {
 
-	/* Create the new node */
-	ExprNode* Left = Root;
-	switch (Tok) {
-       	    case TOK_MUL:      	Root = NewExprNode (EXPR_MUL);	break;
-       	    case TOK_DIV:      	Root = NewExprNode (EXPR_DIV);  break;
-       	    case TOK_MOD:      	Root = NewExprNode (EXPR_MOD);  break;
-       	    case TOK_AND:      	Root = NewExprNode (EXPR_AND);  break;
-       	    case TOK_XOR:      	Root = NewExprNode (EXPR_XOR);  break;
-       	    case TOK_SHL:      	Root = NewExprNode (EXPR_SHL);  break;
-       	    case TOK_SHR:      	Root = NewExprNode (EXPR_SHR);  break;
-	    default:   	    	Internal ("Invalid token");
-      	}
-	Root->Left = Left;
+        long LVal, RVal, Val;
+        ExprNode* Left;
+        ExprNode* Right;
 
-        /* Skip the operator token */
-	NextTok ();
+        /* Remember the token and skip it */
+        enum Token T = Tok;
+        NextTok ();
 
-	/* Parse the right hand side */
-	Root->Right = Factor ();
+        /* Move root to left side and read the right side */
+        Left  = Root;
+        Right = Factor ();
+
+        /* If both expressions are constant, we can evaluate the term */
+        if (IsEasyConst (Left, &LVal) && IsEasyConst (Right, &RVal)) {
+
+            switch (T) {
+                case TOK_MUL:
+                    Val = LVal * RVal;
+                    break;
+
+                case TOK_DIV:
+                    if (RVal == 0) {
+                        Error ("Division by zero");
+                        Val = 1;
+                    } else {
+                        Val = LVal / RVal;
+                    }
+                    break;
+
+                case TOK_MOD:
+                    if (RVal == 0) {
+                        Error ("Modulo operation with zero");
+                        Val = 1;
+                    } else {
+                        Val = LVal % RVal;
+                    }
+                    break;
+
+                case TOK_AND:
+                    Val = LVal & RVal;
+                    break;
+
+                case TOK_XOR:
+                    Val = LVal ^ RVal;
+                    break;
+
+                case TOK_SHL:
+                    Val = shl_l (LVal, RVal);
+                    break;
+
+                case TOK_SHR:
+                    Val = shr_l (LVal, RVal);
+                    break;
+
+                default:
+                    Internal ("Invalid token");
+            }
+
+            /* Generate a literal expression and delete the old left and
+             * right sides.
+             */
+            FreeExpr (Left);
+            FreeExpr (Right);
+            Root = GenLiteralExpr (Val);
+
+        } else {
+
+            /* Generate an expression tree */
+            unsigned char Op;
+            switch (T) {                           
+                case TOK_MUL:   Op = EXPR_MUL;	break;
+                case TOK_DIV:   Op = EXPR_DIV;  break;
+                case TOK_MOD:   Op = EXPR_MOD;  break;
+                case TOK_AND:   Op = EXPR_AND;  break;
+                case TOK_XOR:   Op = EXPR_XOR;  break;
+                case TOK_SHL:   Op = EXPR_SHL;  break;
+                case TOK_SHR:   Op = EXPR_SHR;  break;
+                default:       	Internal ("Invalid token");
+            }
+            Root        = NewExprNode (Op);
+            Root->Left  = Left;
+            Root->Right = Right;
+
+        }
 
     }
 

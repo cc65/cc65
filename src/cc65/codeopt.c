@@ -1515,6 +1515,7 @@ static OptFunc DOptNegAX1      	= { OptNegAX1,       "OptNegAX1",      	100, 0, 
 static OptFunc DOptNegAX2      	= { OptNegAX2,       "OptNegAX2",      	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptNegAX3      	= { OptNegAX3,       "OptNegAX3",      	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptNegAX4      	= { OptNegAX4,       "OptNegAX4",      	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPrecalc      = { OptPrecalc,      "OptPrecalc",     	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad1    	= { OptPtrLoad1,     "OptPtrLoad1",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad2    	= { OptPtrLoad2,     "OptPtrLoad2",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad3    	= { OptPtrLoad3,     "OptPtrLoad3",    	100, 0, 0, 0, 0, 0 };
@@ -1579,6 +1580,7 @@ static OptFunc* OptFuncs[] = {
     &DOptNegAX2,
     &DOptNegAX3,
     &DOptNegAX4,
+    &DOptPrecalc,
     &DOptPtrLoad1,
     &DOptPtrLoad2,
     &DOptPtrLoad3,
@@ -1846,6 +1848,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
 
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
     Changes += RunOptFunc (S, &DOptPtrStore2, 1);
+    Changes += RunOptFunc (S, &DOptPrecalc, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad1, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad2, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad3, 1);

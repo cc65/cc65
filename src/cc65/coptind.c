@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -1199,6 +1199,75 @@ unsigned OptPushPop (CodeSeg* S)
 	/* Next entry */
 	++I;
     }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPrecalc (CodeSeg* S)
+/* Replace immediate operations with the accu where the current contents are
+ * known by a load of the final value.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+       	/* Get a pointer to the input registers of the insn */
+	const RegContents* In  = &E->RI->In;
+
+        /* Check for a known register value and known operand */
+        if (RegValIsKnown (In->RegA) && CE_KnownImm (E)) {
+
+            const char* Arg;
+
+            /* Handle the different instructions */
+            switch (E->OPC) {
+
+                case OP65_AND:
+                    Arg = MakeHexArg (In->RegA & E->Num);
+                    break;
+
+                case OP65_EOR:
+                    Arg = MakeHexArg (In->RegA ^ E->Num);
+                    break;
+
+                case OP65_ORA:
+                    Arg = MakeHexArg (In->RegA | E->Num);
+                    break;
+
+                default:
+                    Arg = 0;
+                    break;
+
+            }
+
+            /* If we have a new entry, replace the old one */
+            if (Arg) {
+                CodeEntry* X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+                CS_InsertEntry (S, X, I+1);
+                CS_DelEntry (S, I);
+                ++Changes;
+            }
+        }
+
+	/* Next entry */
+	++I;
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

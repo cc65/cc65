@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -107,6 +107,11 @@ unsigned OptTransfers (CodeSeg* S);
 
 unsigned OptPushPop (CodeSeg* S);
 /* Remove a PHA/PLA sequence were A is not used later */
+
+unsigned OptPrecalc (CodeSeg* S);
+/* Replace immediate operations with the accu where the current contents are
+ * known by a load of the final value.
+ */
 
 unsigned OptBranchDist (CodeSeg* S);
 /* Change branches for the distance needed. */

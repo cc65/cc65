@@ -373,10 +373,10 @@ segment, where this attribute is true, the linker will export three symbols.
 
 <tscreen><verb>
      	__NAME_LOAD__  	This is set to the address where the
-		  	segment is loaded.
+	 	  	segment is loaded.
      	__NAME_RUN__   	This is set to the run address of the
-		  	segment. We will cover run addresses
-		  	later.
+	 	  	segment. We will cover run addresses
+	 	  	later.
      	__NAME_SIZE__  	This is set to the segment size.
 </verb></tscreen>
 
@@ -486,10 +486,10 @@ external symbols for the data segment that may be accessed from your code:
 
 <tscreen><verb>
        	__DATA_LOAD__	This is set to the address where the segment
-			is loaded, in this case, it is an address in
-		  	ROM2.
+	 		is loaded, in this case, it is an address in
+	 	  	ROM2.
      	__DATA_RUN__	This is set to the run address of the segment,
-			in this case, it is an address in RAM2.
+	 		in this case, it is an address in RAM2.
      	__DATA_SIZE__	This is set to the segment size.
 </verb></tscreen>
 
@@ -593,6 +593,12 @@ or (for the segment definitions from above)
      	    VECTORS: load = ROM2, type = ro, offset = $1FFA;
      	}
 </verb></tscreen>
+
+To suppress the warning, the linker issues if it encounters a segment that is
+not found in any of the input files, use "<tt/optional=yes/" as additional
+segment attribute. Be careful when using this attribute, because a missing
+segment may be a sign of a problem, and if you're suppressing the warning,
+there is no one left to tell you about it.
 
 File names may be empty, data from segments assigned to a memory area with
 an empty file name is discarded. This is useful, if the a memory area has

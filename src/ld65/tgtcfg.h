@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,6 +38,8 @@
 
 
 
+#include <stdio.h>
+
 /* common */
 #include "target.h"
 
@@ -61,8 +63,18 @@ extern const TargetDesc Targets [TGT_COUNT];
 
 
 
-/* End of tgtcfg.h */
+/*****************************************************************************/
+/*     	      	     	       	     Code     	 			     */
+/*****************************************************************************/
 
+
+
+void DumpBuiltinConfig (FILE* F, target_t T);
+/* Dump a builtin linker configuration */
+
+
+
+/* End of tgtcfg.h */
 #endif
 
 

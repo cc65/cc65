@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,6 +33,10 @@
 
 
 
+/* common */
+#include "check.h"
+
+/* ld65 */
 #include "binfmt.h"
 #include "tgtcfg.h"
 
@@ -96,4 +100,21 @@ const TargetDesc Targets [TGT_COUNT] = {
 
 
 
-                  
+/*****************************************************************************/
+/*     	      	     	       	     Code     	 			     */
+/*****************************************************************************/
+
+
+
+void DumpBuiltinConfig (FILE* F, target_t T)
+/* Dump a builtin linker configuration */
+{
+    /* Check the given parameter */
+    PRECONDITION (T > TGT_UNKNOWN && T < TGT_COUNT);
+
+    /* Dump the config */
+    fprintf (F, "%s\n", Targets[T].Cfg);
+}
+
+
+

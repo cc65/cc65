@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2002 Ullrich von Bassewitz					     */
-/*		 Wacholderweg 14					     */
-/*		 D-70597 Stuttgart					     */
-/* EMail:	 uz@musoftware.de					     */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -103,6 +103,7 @@ static void Usage (void)
 	     "\n"
 	     "Long options:\n"
        	     "  --config name\t\tUse linker config file\n"
+             "  --dump-config name\tDump a builtin configuration\n"
 	     "  --help\t\tHelp (this text)\n"
 	     "  --mapfile name\tCreate a map file\n"
              "  --module-id id\tSpecify a module id\n"
@@ -236,6 +237,21 @@ static void OptDbgFile (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptDumpConfig (const char* Opt attribute ((unused)), const char* Arg)
+/* Dump a builtin linker configuration */
+{
+    /* Map the given target name to its id */
+    target_t T = FindTarget (Arg);
+    if (T == TGT_UNKNOWN) {
+        Error ("Target system `%s' is unknown", Arg);
+    }
+
+    /* Dump the builtin configuration */
+    DumpBuiltinConfig (stdout, T);
+}
+
+
+
 static void OptHelp (const char* Opt attribute ((unused)),
 		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
@@ -314,6 +330,7 @@ int main (int argc, char* argv [])
     static const LongOpt OptTab[] = {
        	{ "--config",  	       	1,     	OptConfig    	    	},
      	{ "--dbgfile",          1,      OptDbgFile              },
+       	{ "--dump-config",     	1,     	OptDumpConfig           },
      	{ "--help",	       	0,     	OptHelp	     	    	},
      	{ "--mapfile",		1,	OptMapFile	    	},
        	{ "--module-id",        1,     	OptModuleId             },

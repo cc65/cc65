@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -36,7 +36,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
+                
+/* common */
+#include "cmdline.h"
 
+/* ld65 */
 #include "error.h"
 
 
@@ -52,7 +56,7 @@ void Warning (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    fprintf (stderr, "Warning: ");
+    fprintf (stderr, "%s: Warning: ", ProgName);
     vfprintf (stderr, Format, ap);
     putc ('\n', stderr);
     va_end (ap);
@@ -65,7 +69,7 @@ void Error (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    fprintf (stderr, "Error: ");
+    fprintf (stderr, "%s: Error: ", ProgName);
     vfprintf (stderr, Format, ap);
     putc ('\n', stderr);
     va_end (ap);
@@ -79,7 +83,7 @@ void Internal (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    fprintf (stderr, "Internal error: ");
+    fprintf (stderr, "%s: Internal error: ", ProgName);
     vfprintf (stderr, Format, ap);
     putc ('\n', stderr);
     va_end (ap);
@@ -87,4 +91,4 @@ void Internal (const char* Format, ...)
 }
 
 
-
+                                                     

@@ -48,6 +48,7 @@ machines, you have to install at least one of the library packages.
 %attr(755,root,root) 		/usr/bin/ca65html
 %attr(755,root,root)   		/usr/bin/cc65
 %attr(755,root,root)   		/usr/bin/cl65
+%attr(755,root,root)   		/usr/bin/co65
 %attr(755,root,root) 		/usr/bin/da65
 %attr(755,root,root)   		/usr/bin/ld65
 %attr(755,root,root)   		/usr/bin/od65
@@ -365,8 +366,11 @@ install -m 644 libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi
 
 
 %changelog
+* Mon Feb 10 2003 Ullrich von Bassewitz <uz@cc65.org>
+Added the object file conversion utility co65.
+
 * Fri Dec 13 2002 Ullrich von Bassewitz <uz@cc65.org>
-Updated the version number.                           
+Updated the version number.
 
 * Mon Dec 2 2002 Ullrich von Bassewitz <uz@cc65.org>
 Changed location of TGI drivers, added EM drivers.

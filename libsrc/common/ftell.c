@@ -1,7 +1,8 @@
 /*
  * ftell.c
  *
- * Christian Groessler, 07-Aug-2000
+ * Christian Groessler, 2000-08-07
+ * Ullrich von Bassewitz, 2004-05-13
  */
 
 
@@ -19,7 +20,7 @@
 
 
 
-long __fastcall__ ftell (FILE* f)
+long __fastcall__ ftell (register FILE* f)
 {
     long pos;
 
@@ -29,7 +30,17 @@ long __fastcall__ ftell (FILE* f)
         return -1L;
     }
 
-    pos = lseek(f->f_fd, 0L, SEEK_CUR);
-    return pos;    /* -1 for error, comes from lseek() */
+    /* Call the low level function */
+    pos = lseek (f->f_fd, 0L, SEEK_CUR);
+
+    /* If we didn't have an error, correct the return value in case we have
+     * a pushed back character.
+     */
+    if (pos > 0 && (f->f_flags & _FPUSHBACK)) {
+        --pos;
+    }
+
+    /* -1 for error, comes from lseek() */
+    return pos;
 }
 

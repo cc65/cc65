@@ -96,7 +96,7 @@ void FreeCollection (Collection* C)
 
 
 
-unsigned CollCount (Collection* C)
+unsigned CollCount (const Collection* C)
 /* Return the number of items in the collection */
 {
     return C->Count;
@@ -158,7 +158,31 @@ void* CollAt (Collection* C, unsigned Index)
 
 
 
+const void* CollConstAt (const Collection* C, unsigned Index)
+/* Return the item at the given index */
+{
+    /* Check the index */
+    PRECONDITION (Index < C->Count);
+
+    /* Return the element */	 
+    return C->Items[Index];
+}
+
+
+
 void* CollLast (Collection* C)
+/* Return the last item in a collection */
+{
+    /* We must have at least one entry */
+    PRECONDITION (C->Count > 0);
+
+    /* Return the element */
+    return C->Items[C->Count-1];
+}
+
+
+
+const void* CollConstLast (const Collection* C)
 /* Return the last item in a collection */
 {
     /* We must have at least one entry */

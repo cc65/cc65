@@ -26,6 +26,8 @@ nt:
 	make -f make\watcom.mak
 	cd ..\cl65
 	make -f make\watcom.mak
+	cd ..\da65
+	make -f make\watcom.mak
 	cd ..\grc
 	make -f make\watcom.mak
 	cd ..\ld65
@@ -44,6 +46,8 @@ dos:
 	cd ..\cc65
        	make -DTARGET=DOS32 -f make\watcom.mak
 	cd ..\cl65
+       	make -DTARGET=DOS32 -f make\watcom.mak
+	cd ..\da65
        	make -DTARGET=DOS32 -f make\watcom.mak
 	cd ..\grc
        	make -DTARGET=DOS32 -f make\watcom.mak
@@ -64,6 +68,8 @@ os2:
        	make -DTARGET=OS2 -f make\watcom.mak
 	cd ..\cl65
        	make -DTARGET=OS2 -f make\watcom.mak
+	cd ..\da65
+       	make -DTARGET=OS2 -f make\watcom.mak
 	cd ..\grc
        	make -DTARGET=OS2 -f make\watcom.mak
 	cd ..\ld65
@@ -83,6 +89,8 @@ clean:
 	make -f make\watcom.mak clean
 	cd ..\cl65
 	make -f make\watcom.mak clean
+	cd ..\da65
+       	make -f make\watcom.mak clean
 	cd ..\grc
 	make -f make\watcom.mak clean
 	cd ..\ld65
@@ -100,7 +108,9 @@ strip:
 	@-make -f make\watcom.mak strip
 	@cd ..\cl65
 	@-make -f make\watcom.mak strip
-	@cd ..\grc
+	@cd ..\da65
+       	@-make -f make\watcom.mak strip
+	@cd ..\grc		     
 	@-make -f make\watcom.mak strip
 	@cd ..\ld65
 	@-make -f make\watcom.mak strip

@@ -12,9 +12,10 @@ SUBDIRS	=		\
 	ca65		\
 	cc65		\
 	cl65		\
+	da65		\
 	grc		\
 	ld65		\
-	od65	
+	od65
 
 .PHONY: all
 all:

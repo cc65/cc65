@@ -8,6 +8,7 @@
 
 /* common */
 #include "chartype.h"
+#include "print.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -916,8 +917,6 @@ void Preprocess (void)
 
 Done:
     xlateline ();
-    if (Verbose > 1) {
-    	printf ("line: %s\n", line);
-    }
+    Print (stdout, 2, "line: %s\n", line);
 }
 

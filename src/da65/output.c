@@ -40,6 +40,7 @@
 #include <errno.h>
 
 /* common */
+#include "print.h"
 #include "version.h"
 
 /* da65 */

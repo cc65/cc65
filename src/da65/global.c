@@ -52,7 +52,6 @@ const char OutExt[]	      = ".dis";	/* Output file extension */
 const char CfgExt[]    	      = ".cfg";	/* Config file extension */
 
 /* Flags and other command line stuff */
-unsigned char Verbosity	      = 4;	/* Verbosity of the output file */
 unsigned char FormFeeds	      = 0;	/* Add form feeds to the output? */
 unsigned char PassCount	      = 2;	/* How many passed do we do? */
 unsigned long StartAddr	      = 0xC000;	/* Start/load address of the program */

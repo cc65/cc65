@@ -38,6 +38,7 @@
 #include <errno.h>
 
 /* common */
+#include "print.h"
 #include "xmalloc.h"
 
 /* ld65 */
@@ -133,9 +134,7 @@ static void BinWriteMem (BinDesc* D, Memory* M)
     	SegDesc* S = N->Seg;
 
 	/* Keep the user happy */
-	if (Verbose) {
-	    printf ("    Writing `%s'\n", S->Name);
-	}
+       	Print (stdout, 1, "    Writing `%s'\n", S->Name);
 
 	/* Writes do only occur in the load area and not for BSS segments */
        	DoWrite = (S->Flags & SF_BSS) == 0 	&& 	/* No BSS segment */
@@ -143,7 +142,7 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 		   S->Seg->Dumped == 0;			/* Not already written */
 
 	/* Output the DoWrite flag for debugging */
-	if (Verbose > 1) {
+	if (Verbosity > 1) {
        	    PrintBoolVal ("bss", S->Flags & SF_BSS);
 	    PrintBoolVal ("LoadArea", S->Load == M);
        	    PrintBoolVal ("Dumped", S->Seg->Dumped);
@@ -253,16 +252,12 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     }
 
     /* Keep the user happy */
-    if (Verbose) {
-	printf ("Opened `%s'...\n", F->Name);
-    }
+    Print (stdout, 1, "Opened `%s'...\n", F->Name);
 
     /* Dump all memory areas */
     M = F->MemList;
     while (M) {
-	if (Verbose) {
-	    printf ("  Dumping `%s'\n", M->Name);
-	}
+	Print (stdout, 1, "  Dumping `%s'\n", M->Name);
 	BinWriteMem (D, M);
 	M = M->FNext;
     }

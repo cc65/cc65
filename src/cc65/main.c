@@ -43,6 +43,7 @@
 #include "chartype.h"
 #include "cmdline.h"
 #include "fname.h"
+#include "print.h"
 #include "target.h"
 #include "tgttrans.h"
 #include "version.h"
@@ -410,7 +411,7 @@ static void OptTarget (const char* Opt, const char* Arg)
 static void OptVerbose (const char* Opt, const char* Arg)
 /* Increase verbosity */
 {
-    ++Verbose;
+    ++Verbosity;
 }
 
 

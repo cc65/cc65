@@ -40,6 +40,7 @@
 
 /* common */
 #include "check.h"
+#include "print.h"
 #include "version.h"
 #include "xmalloc.h"
 
@@ -575,9 +576,7 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
        	S = Seg [I];
 
 	/* Keep the user happy */
-	if (Verbose) {
-	    printf ("    Writing `%s'\n", S->Name);
-	}
+	Print (stdout, 1, "    Writing `%s'\n", S->Name);
 
 	/* Write this segment */
 	if (DoWrite) {
@@ -1018,9 +1017,7 @@ void O65WriteTarget (O65Desc* D, File* F)
     }
 
     /* Keep the user happy */
-    if (Verbose) {
-    	printf ("Opened `%s'...\n", F->Name);
-    }
+    Print (stdout, 1, "Opened `%s'...\n", F->Name);
 
     /* Define some more options: A timestamp and the linker version */
     T = time (0);

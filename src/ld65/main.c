@@ -42,6 +42,7 @@
 #include "cmdline.h"
 #include "libdefs.h"
 #include "objdefs.h"
+#include "print.h"
 #include "target.h"
 #include "version.h"
 #include "xmalloc.h"
@@ -351,7 +352,7 @@ int main (int argc, char* argv [])
 	       	case 'v':
 	       	    switch (Arg [2]) {
 	       	      	case 'm':   VerboseMap = 1; 	break;
-    		      	case '\0':  ++Verbose;	    	break;
+    		      	case '\0':  ++Verbosity;    	break;
 		      	default:    UnknownOption (Arg);
 		    }
 		    break;
@@ -426,7 +427,7 @@ int main (int argc, char* argv [])
     }
 
     /* Dump the data for debugging */
-    if (Verbose > 1) {
+    if (Verbosity > 1) {
 	SegDump ();
 	ConDesDump ();
     }

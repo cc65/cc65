@@ -33,7 +33,6 @@
 
 
 
-#include <stdio.h>
 #include <stdarg.h>
 
 /* common */
@@ -57,7 +56,7 @@ unsigned char Verbosity = 0;    	/* Verbose operation flag */
 
 
 
-void Print (unsigned V, const char* Format, ...)
+void Print (FILE* F, unsigned V, const char* Format, ...)
 /* Output according to Verbosity */
 {
     va_list ap;
@@ -70,7 +69,7 @@ void Print (unsigned V, const char* Format, ...)
 
     /* Output */
     va_start (ap, Format);
-    vprintf (Format, ap);
+    vfprintf (F, Format, ap);
     va_end (ap);
 }
 

@@ -48,7 +48,6 @@ extern const char*	OutputName;	/* Name of output file */
 
 extern unsigned long 	StartAddr;	/* Start address */
 
-extern unsigned char	Verbose;    	/* Verbose operation flag */
 extern unsigned char	VerboseMap;	/* Verbose map file */
 extern const char*	MapFileName;	/* Name of the map file */
 extern const char*	LabelFileName;	/* Name of the label file */

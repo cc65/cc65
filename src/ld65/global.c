@@ -47,7 +47,6 @@ const char* OutputName	    = "a.out"; 	/* Name of output file */
 
 unsigned long StartAddr	    = 0x200;	/* Start address */
 
-unsigned char Verbose       = 0;       	/* Verbose operation flag */
 unsigned char VerboseMap    = 0;	/* Verbose map file */
 const char* MapFileName	    = 0;       	/* Name of the map file */
 const char* LabelFileName   = 0;	/* Name of the label file */

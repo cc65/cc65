@@ -57,7 +57,6 @@ extern char		LocalStart;	/* This char starts local symbols */
 
 extern unsigned char	IgnoreCase;	/* Ignore case on identifiers? */
 extern unsigned char	AutoImport;	/* Mark unresolveds as import */
-extern unsigned char	Verbose;    	/* Verbose operation flag */
 extern unsigned char	SmartMode;	/* Smart mode */
 extern unsigned char   	DbgSyms;	/* Add debug symbols */
 extern unsigned char	Listing;        /* Create listing file */

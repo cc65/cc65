@@ -44,10 +44,6 @@
 
 
 
-extern int 	     	Verbose;    	/* Verbose operation flag */
-
-
-
 /* End of global.h */
 
 #endif

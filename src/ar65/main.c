@@ -40,6 +40,7 @@
 
 /* common */
 #include "cmdline.h"
+#include "print.h"
 #include "version.h"
 
 #include "global.h"
@@ -79,7 +80,7 @@ int main (int argc, char* argv [])
     int I;
 
     /* Initialize the cmdline module */
-    InitCmdLine (&argc, &argv, "ar65");	 
+    InitCmdLine (&argc, &argv, "ar65");
 
     /* We must have a file name */
     if (ArgCount < 2) {
@@ -112,7 +113,7 @@ int main (int argc, char* argv [])
 		break;
 
 	    case 'v':
-		++Verbose;
+		++Verbosity;
 		break;
 
 	    case 'x':

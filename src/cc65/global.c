@@ -54,7 +54,6 @@ unsigned char AllowRegVarAddr	= 0;	/* Allow taking addresses of register vars */
 unsigned char RegVarsToCallStack= 0;   	/* Save reg variables on call stack */
 unsigned char StaticLocals	= 0;   	/* Make local variables static */
 unsigned char SignedChars	= 0;	/* Make characters signed by default */
-unsigned char Verbose		= 0;   	/* Verbose flag */
 unsigned char AddSource		= 0; 	/* Add source lines as comments */
 unsigned char DebugInfo		= 0;	/* Add debug info to the obj */
 unsigned char Debug		= 0;	/* Debug mode */

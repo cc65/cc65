@@ -43,6 +43,7 @@
 #include "abend.h"
 #include "cmdline.h"
 #include "fname.h"
+#include "print.h"
 #include "version.h"
 
 /* da65 */

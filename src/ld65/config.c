@@ -41,6 +41,7 @@
 /* common */
 #include "check.h"
 #include "bitops.h"
+#include "print.h"
 #include "xmalloc.h"
 
 /* ld65 */
@@ -1405,9 +1406,7 @@ void CfgWriteTarget (void)
 		    MemListNode* N;
 
 		    /* Debugging */
-		    if (Verbose > 1) {
-			printf ("Skipping `%s'...\n", M->Name);
-		    }
+       	       	    Print (stdout, 2, "Skipping `%s'...\n", M->Name);
 
   		    /* Walk throught the segments */
   		    N = M->SegList;

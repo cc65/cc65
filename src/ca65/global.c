@@ -56,7 +56,6 @@ char LocalStart	              = '@';  	/* This char starts local symbols */
 
 unsigned char IgnoreCase      = 0;    	/* Ignore case on identifiers? */
 unsigned char AutoImport      = 0;    	/* Mark unresolveds as import */
-unsigned char Verbose         = 0;      /* Verbose operation flag */
 unsigned char SmartMode	      = 0;    	/* Smart mode */
 unsigned char DbgSyms	      = 0;    	/* Add debug symbols */
 unsigned char Listing  	      = 0;    	/* Create listing file */

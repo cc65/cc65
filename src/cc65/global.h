@@ -55,7 +55,6 @@ extern unsigned char	AllowRegVarAddr;	/* Allow taking addresses of register vars
 extern unsigned char	RegVarsToCallStack;	/* Save reg variables on call stack */
 extern unsigned char   	StaticLocals;		/* Make local variables static */
 extern unsigned char	SignedChars;		/* Make characters signed by default */
-extern unsigned char	Verbose;		/* Verbose flag */
 extern unsigned char	AddSource;		/* Add source lines as comments */
 extern unsigned char	DebugInfo;		/* Add debug info to the obj */
 extern unsigned char	Debug;			/* Debug mode */

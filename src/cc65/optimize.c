@@ -36,12 +36,12 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-//#include <ctype.h>
 
 /* common */
 #include "attrib.h"
 #include "chartype.h"
 #include "check.h"
+#include "print.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
 
@@ -4627,7 +4627,7 @@ void OptDoOpt (void)
     for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I, Flags <<= 1) {
        	if ((OptDisable & Flags) == 0) {
 	    OptFuncs[I] ();
-	} else if (Verbose || Debug) {
+	} else if (Verbosity > 0 || Debug) {
 	    printf ("Optimizer pass %u skipped\n", I);
 	}
     }

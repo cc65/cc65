@@ -42,6 +42,7 @@
 #include "exprdefs.h"
 #include "filepos.h"
 #include "libdefs.h"
+#include "print.h"
 #include "symdefs.h"
 #include "xmalloc.h"
 
@@ -385,11 +386,9 @@ static void LibCheckExports (ObjData* O)
     unsigned Count = GetVar (&Exports);
 
     /* Read the exports */
-    if (Verbose > 1) {
-        printf ("Module `%s' (%u exports):\n", O->Name, Count);
-    }
+    Print (stdout, 1, "Module `%s' (%u exports):\n", O->Name, Count);
     while (Count--) {
-		      
+
 	unsigned char	Tag;
 	unsigned	Len;
 	char*		Name;
@@ -420,9 +419,7 @@ static void LibCheckExports (ObjData* O)
        	SkipFilePos (&Exports);
 
       	/* Insert the name into the hash table */
-	if (Verbose > 1) {
-      	    	printf ("  %s\n", Name);
-	}
+	Print (stdout, 1, "  %s\n", Name);
      	ExpInsert (Name, O->Index);
 
 	/* Free the name */

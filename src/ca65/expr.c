@@ -38,6 +38,7 @@
 /* common */
 #include "check.h"
 #include "exprdefs.h"
+#include "print.h"
 #include "tgttrans.h"
 #include "xmalloc.h"
 
@@ -1036,7 +1037,7 @@ int IsConstExpr (ExprNode* Root)
 	    case EXPR_SYMBOL:
 	 	Sym = Root->V.Sym;
 	       	if (SymHasUserMark (Sym)) {
-		    if (Verbose) {
+		    if (Verbosity > 0) {
 		      	DumpExpr (Root);
 		    }
 		    PError (GetSymPos (Sym), ERR_CIRCULAR_REFERENCE);
@@ -1311,7 +1312,7 @@ static ExprNode* RemoveSyms (ExprNode* Expr, int MustClone)
 		SymEntry* Sym = Expr->V.Sym;
 		if (SymHasUserMark (Sym)) {
 		    /* Circular definition */
-		    if (Verbose) {
+		    if (Verbosity) {
 			DumpExpr (Expr);
 		    }
 		    PError (GetSymPos (Sym), ERR_CIRCULAR_REFERENCE);

@@ -38,13 +38,15 @@
 
 
 
+#include <stdio.h>
+
 /* common */
 #include "attrib.h"
 
 
 
 /*****************************************************************************/
-/*     	      	       		     Data				     */
+/*     	      	       	      	     Data				     */
 /*****************************************************************************/
 
 
@@ -59,7 +61,8 @@ extern unsigned char Verbosity;    	/* Verbose operation flag */
 
 
 
-void Print (unsigned V, const char* Format, ...) attribute ((format (printf, 2, 3)));
+void Print (FILE* F, unsigned V, const char* Format, ...)
+	attribute ((format (printf, 3, 4)));
 /* Output according to Verbosity */
 
 

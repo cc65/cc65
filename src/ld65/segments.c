@@ -40,6 +40,7 @@
 #include "check.h"
 #include "exprdefs.h"
 #include "hashstr.h"
+#include "print.h"
 #include "segdefs.h"
 #include "symdefs.h"
 #include "xmalloc.h"
@@ -229,10 +230,8 @@ Section* ReadSection (FILE* F, ObjData* O)
     Type = Read8 (F);
 
     /* Print some data */
-    if (Verbose > 1) {
-       	printf ("Module `%s': Found segment `%s', size = %lu, align = %u, type = %u\n",
-	       	GetObjFileName (O), Name, Size, Align, Type);
-    }
+    Print (stdout, 1, "Module `%s': Found segment `%s', size = %lu, align = %u, type = %u\n",
+	   GetObjFileName (O), Name, Size, Align, Type);
 
     /* Get the segment for this section */
     S = GetSegment (Name, Type, GetObjFileName (O));

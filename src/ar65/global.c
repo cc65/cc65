@@ -43,7 +43,3 @@
 
 
 
-int Verbose    	       	    = 0;       	/* Verbose operation flag */
-
-
-

@@ -37,6 +37,10 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
+/* common */
+#include "print.h"
+
+/* cc65 */
 #include "global.h"
 #include "input.h"
 #include "scanner.h"
@@ -71,9 +75,7 @@ static void IntWarning (const char* Filename, unsigned Line, const char* Msg, va
      	vfprintf (stderr, Msg, ap);
      	fprintf (stderr, "\n");
 
-     	if (Verbose) {
-     	    fprintf (stderr, "Line: %s\n", line);
-     	}
+     	Print (stderr, 1, "Line: %s\n", line);
 	++WarningCount;
     }
 }
@@ -109,9 +111,7 @@ static void IntError (const char* Filename, unsigned Line, const char* Msg, va_l
     vfprintf (stderr, Msg, ap);
     fprintf (stderr, "\n");
 
-    if (Verbose) {
-       	fprintf (stderr, "Line: %s\n", line);
-    }
+    Print (stderr, 1, "Line: %s\n", line);
     ++ErrorCount;
     if (ErrorCount > 10) {
        	Fatal ("Too many errors");
@@ -154,9 +154,7 @@ void Fatal (const char* Format, ...)
     va_end (ap);
     fprintf (stderr, "\n");
 
-    if (Verbose) {
-       	fprintf (stderr, "Line: %s\n", line);
-    }
+    Print (stderr, 1, "Line: %s\n", line);
     exit (EXIT_FAILURE);
 }
 
@@ -184,7 +182,7 @@ void Internal (char* Format, ...)
 void ErrorReport (void)
 /* Report errors (called at end of compile) */
 {
-    if (ErrorCount == 0 && Verbose) {
+    if (ErrorCount == 0 && Verbosity > 0) {
      	printf ("No errors.\n");
     }
 }

@@ -59,7 +59,7 @@ struct Fragment {
     unsigned short 	Len;		/* Length for this fragment */
     unsigned char   	Type;		/* Fragment type */
     union {
-       	unsigned char	Data [4];       /* Literal values */
+       	unsigned char  	Data[4];        /* Literal values */
        	ExprNode*   	Expr;		/* Expression */
     } V;
 };

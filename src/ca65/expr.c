@@ -111,6 +111,11 @@ static void FreeExprNode (ExprNode* E)
 /* Free a node */
 {
     if (E) {
+        if (E->Op == EXPR_SYMBOL) {
+            /* Remove the symbol reference */
+            SymDelRef (E->V.Sym, E);
+        }
+        /* Place the symbol into the free nodes list if possible */
 	if (FreeNodeCount < MAX_FREE_NODES) {
 	    /* Remember this node for later */
 	    E->Left = FreeExprNodes;
@@ -951,10 +956,6 @@ void FreeExpr (ExprNode* Root)
     if (Root) {
      	FreeExpr (Root->Left);
     	FreeExpr (Root->Right);
-        if (Root->Op == EXPR_SYMBOL) {
-            /* Remove the symbol reference */
-            SymDelRef (Root->V.Sym, Root);
-        }
     	FreeExprNode (Root);
     }
 }
@@ -1508,7 +1509,7 @@ static ExprNode* ConstExtract (ExprNode* Expr, long* Val, int Sign)
      	     	/* SEG - SEG, remove it completely */
      	       	FreeExprNode (Left);
      	 	FreeExprNode (Right);
-     	 	FreeExprNode (Expr);
+     	  	FreeExprNode (Expr);
      	     	return 0;
      	    } else {
 		Expr->Left  = Left;

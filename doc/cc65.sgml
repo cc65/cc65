@@ -6,7 +6,7 @@
 <date>03.09.2000
 
 <abstract>
-cc65 is a C compiler for 6502 targets. It supports several old 6502 based home
+cc65 is a C compiler for 6502 targets. It supports several 6502 based home
 computers like the Commodore and Atari machines, but it is easily retargetable.
 </abstract>
 
@@ -45,7 +45,10 @@ The compiler translates C files into files containing assembler code that
 may be translated by the ca65 macroassembler (for more information about
 the assembler, have a look at ca65.txt).
 
-The compiler may be called as follows:
+
+<sect1>Command line option overview<p>
+
+The compiler may be called as follows:			   
 
 <tscreen><verb>
 ---------------------------------------------------------------------------
@@ -84,6 +87,9 @@ Long options:
   --version		Print the compiler version number
 ---------------------------------------------------------------------------
 </verb></tscreen>
+
+
+<sect1>Command line options in detail<p>
 
 Here is a description of all the command line options:
 

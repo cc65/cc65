@@ -23,7 +23,7 @@ DVI   = $(SGML:.sgml=.dvi)
 	sgml2txt $<
 
 %.html:	%.sgml
-	sgml2html --split=0 $<
+	sgml2html --split=1 $<
 
 %.info:	%.sgml
 	sgml2info $<

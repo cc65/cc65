@@ -3,10 +3,12 @@
 <article>
 <title>cl65 Users Guide
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>01.08.2000
+<date>01.08.2000, 27.11.2000
 
 <abstract>
-cl65 is the compile &amp; link utility for cc65, the 6502 C compiler.
+cl65 is the compile &amp; link utility for cc65, the 6502 C compiler. It was
+designed as a smart frontend for the C compiler (cc65), the assembler (ca65)
+and the linker (ld65).
 </abstract>
 
 <!-- Table of contents -->
@@ -60,7 +62,7 @@ Long options:
   --asm-include-dir dir	Set an assembler include directory
   --cpu type		Set cpu type
   --debug      		Debug mode
-  --debug-info 		Add debug info
+  --debug-info 	      	Add debug info
   --feature name        Set an emulation feature
   --help       		Help (this text)
   --include-dir dir	Set a compiler include directory path

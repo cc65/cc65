@@ -3,12 +3,12 @@
 <article>
 <title>ca65 Users Guide
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>19.07.2000
+<date>19.07.2000, 29.11.2000
 
 <abstract>
-ca65 is a macro assembler for the 6502, 65C02 and 65816 CPUs. It is used as a
-companion assembler for the cc65 crosscompiler, but it may also be used as a
-standalone product.
+ca65 is a powerful macro assembler for the 6502, 65C02 and 65816 CPUs. It is
+used as a companion assembler for the cc65 crosscompiler, but it may also be
+used as a standalone product.
 </abstract>
 
 <!-- Table of contents -->
@@ -27,6 +27,9 @@ suite for the cc65 compiler. ca65 is part of this suite.
 Some parts of the assembler (code generation and some routines for symbol
 table handling) are taken from an older crossassembler named a816 written
 by me a long time ago.
+
+
+<sect1>Design criteria<p>
 
 Here's a list of the design criteria, that I considered important for the
 development:
@@ -75,6 +78,9 @@ development:
 
 <sect>Usage<p>
 
+
+<sect1>Command line option overview<p>
+
 The assembler accepts the following options:
 
 <tscreen><verb>
@@ -112,6 +118,9 @@ Long options:
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
+
+<sect1>Command line options in detail<p>
+
 Here is a description of all the command line options:
 
 <descrip>
@@ -127,6 +136,7 @@ Here is a description of all the command line options:
   instruction set of the sunplus CPU is "confidential".
 
 
+  <label id="option--feature">
   <tag><tt>--feature name</tt></tag>
 
   Enable an emulation feature. This is identical as using <tt/.FEATURE/
@@ -134,10 +144,11 @@ Here is a description of all the command line options:
   each feature must be specified by using an extra <tt/--feature/ option,
   comma separated lists are not allowed.
 
-  See the discussion of the <tt/.FEATURE/ command for a list of emulation
-  features.
+  See the discussion of the <tt><ref id=".FEATURE" name=".FEATURE"></tt>
+  command for a list of emulation features.
 
 
+  <label id="option-g">
   <tag><tt>-g, --debug-info</tt></tag>
 
   When this option (or the equivalent control command <tt/.DEBUGINFO/) is
@@ -155,9 +166,9 @@ Here is a description of all the command line options:
 
   <tag><tt>-i, --ignore-case</tt></tag>
 
-  This option makes the assembler case insensitive on identifiers and
-  labels. This option will override the default, but may itself be
-  overriden by the <tt/.CASE/ control command (see section 6).
+  This option makes the assembler case insensitive on identifiers and labels.
+  This option will override the default, but may itself be overriden by the
+  <tt><ref id=".CASE" name=".CASE"></tt> control command.
 
 
   <tag><tt>-l, --listing</tt></tag>
@@ -177,17 +188,18 @@ Here is a description of all the command line options:
 
   <tag><tt>--pagelength n</tt></tag>
 
-  sets the length of a listing page in lines. See the <tt/.PAGELENGTH/
-  directive for more information.
+  sets the length of a listing page in lines. See the <tt><ref
+  id=".PAGELENGTH" name=".PAGELENGTH"></tt> directive for more information.
 
 
   <tag><tt>-s, --smart-mode</tt></tag>
 
-  In smart mode (enabled by -s or the <tt/.SMART/ pseudo instruction) the
-  assembler will track usage of the REP and SEP instructions in 65816 mode
-  and update the operand sizes accordingly. If the operand of such an
-  instruction cannot be evaluated by the assembler (for example, because
-  the operand is an imported symbol), a warning is issued.
+  In smart mode (enabled by -s or the <tt><ref id=".SMART" name=".SMART"></tt>
+  pseudo instruction) the assembler will track usage of the <tt/REP/ and
+  <tt/SEP/ instructions in 65816 mode and update the operand sizes
+  accordingly. If the operand of such an instruction cannot be evaluated by
+  the assembler (for example, because the operand is an imported symbol), a
+  warning is issued.
 
   Beware: Since the assembler cannot trace the execution flow this may
   lead to false results in some cases. If in doubt, use the .ixx and .axx
@@ -195,6 +207,7 @@ Here is a description of all the command line options:
   mode is off by default.
 
 
+  <label id="option-t">
   <tag><tt>-t sys, --target sys</tt></tag>
 
   Set the target system. This will enable translation of character strings
@@ -230,13 +243,13 @@ Here is a description of all the command line options:
 
   <tag><tt>-U, --auto-import</tt></tag>
 
-  Mark symbols that are not defined in the sources as imported symbols.
-  This should be used with care since it delays error messages about typos
-  and such until the linker is run. The compiler uses the equivalent of
-  this switch (<tt/.AUTOIMPORT/, see control command section below) to enable
-  auto imported symbols for the runtime library. However, the compiler is
-  supposed to generate code that runs through the assembler without
-  problems, something which is not always true for assembler programmers.
+  Mark symbols that are not defined in the sources as imported symbols. This
+  should be used with care since it delays error messages about typos and such
+  until the linker is run. The compiler uses the equivalent of this switch
+  (<tt><ref id=".AUTOIMPORT" name=".AUTOIMPORT"></tt>) to enable auto imported
+  symbols for the runtime library. However, the compiler is supposed to
+  generate code that runs through the assembler without problems, something
+  which is not always true for assembler programmers.
 
 
   <tag><tt>-V, --version</tt></tag>
@@ -258,12 +271,13 @@ Here is a description of all the command line options:
 
 <sect>Input format<p>
 
-The assembler accepts the standard 6502/65816 assembler syntax. One line
-may contain a label (which is identified by a colon), and, in addition to
-the label, an assembler mnemonic, a macro, or a control command (see
-section 6 for supported control commands). Alternatively, the line may
-contain a symbol definition using the '=' token. Everything after a
-semicolon is handled as a comment (that is, it is ignored).
+The assembler accepts the standard 6502/65816 assembler syntax. One line may
+contain a label (which is identified by a colon), and, in addition to the
+label, an assembler mnemonic, a macro, or a control command (see section <ref
+id="control-commands" name="Control Commands"> for supported control
+commands). Alternatively, the line may contain a symbol definition using the
+'=' token. Everything after a semicolon is handled as a comment (that is, it
+is ignored).
 
 Here are some examples for valid input lines:
 
@@ -278,10 +292,10 @@ Here are some examples for valid input lines:
 </verb></tscreen>
 
 The assembler accepts all valid 6502 mnemonics when in 6502 mode (the
-default). The assembler accepts all valid 65SC02 mnemonics when in 65SC02
-mode (after a <tt/.PC02/ command is found). The assembler accepts all valid
-65816 mnemonics with a few exceptions after a .P816 command is found.
-These exceptions are listed below.
+default). The assembler accepts all valid 65SC02 mnemonics when in 65SC02 mode
+(after a <tt><ref id=".PC02" name=".PC02"></tt> command is found). The
+assembler accepts all valid 65816 mnemonics with a few exceptions after a
+.P816 command is found. These exceptions are listed below.
 
 In 65816 mode several aliases are accepted in addition to the official
 mnemonics:
@@ -318,15 +332,20 @@ currently no octal values and no floats.
 <p>
 
 
-<sect>Expressions
+<sect>Expressions<p>
 
-<p>
+
+<sect1>Expression evaluation<p>
+
 All expressions are evaluated with (at least) 32 bit precision. An
 expression may contain constant values and any combination of internal and
 external symbols. Expressions that cannot be evaluated at assembly time
 are stored inside the object file for evaluation by the linker.
 Expressions referencing imported symbols must always be evaluated by the
 linker.
+
+
+<sect1>Size of an expressions result<p>
 
 Sometimes, the assembler must know about the size of the value that is the
 result of an expression. This is usually the case, if a decision has to be
@@ -355,7 +374,7 @@ time, the linker will evaluate it and check for range errors as soon as
 the result is known.
 
 
-<bf>Boolean expressions:</bf>
+<sect1>Boolean expressions<p>
 
 In the context of a boolean expression, any non zero value is evaluated as
 true, any other value to false. The result of a boolean expression is 1 if
@@ -366,68 +385,70 @@ already known, after evaluating the left hand side, the right hand side is
 not evaluated.
 
 
+<sect1>Available operators<p>
+
 Available operators sorted by precedence:
 
 <tscreen><verb>
     Op 	        Description  		     	      	Precedence
   -------------------------------------------------------------------
     .CONCAT     Builtin function                        0
-    .LEFT      	Builtin function	     		0
-    .MID       	Builtin function	     		0
-    .RIGHT     	Builtin function	     		0
-    .STRING    	Builtin function	     		0
+    .LEFT      	Builtin function	     	     	0
+    .MID       	Builtin function	     	     	0
+    .RIGHT     	Builtin function	     	     	0
+    .STRING    	Builtin function	     	     	0
 
     *	       	Builtin pseudo variable (r/o)	      	1
-    .BLANK     	Builtin function	     		1
-    .CONST     	Builtin function	     		1
-    .CPU       	Builtin pseudo variable (r/o)		1
-    .DEFINED   	Builtin function	     		1
-    .MATCH     	Builtin function	     		1
-    .TCOUNT    	Builtin function	     		1
-    .XMATCH    	Builtin function	     		1
-    .PARAMCOUNT Builtin pseudo variable	(r/o)		1
+    .BLANK     	Builtin function	     	     	1
+    .CONST     	Builtin function	     	     	1
+    .CPU       	Builtin pseudo variable (r/o)	     	1
+    .DEFINED   	Builtin function	     	     	1
+    .MATCH     	Builtin function	     	     	1
+    .TCOUNT    	Builtin function	     	     	1
+    .XMATCH    	Builtin function	     	     	1
+    .PARAMCOUNT Builtin pseudo variable	(r/o)	      	1
     .REFERENCED Builtin function	     	       	1
-    :: 	       	Global namespace override    		1
-    +  	       	Unary plus		     	   	1
-    -  	       	Unary minus		     		1
-    ~  	       	Unary bitwise not	     		1
+    :: 	       	Global namespace override    	     	1
+    +  	       	Unary plus   		     	     	1
+    -  	       	Unary minus  		     	     	1
+    ~  	       	Unary bitwise not	     	     	1
     .BITNOT    	Unary bitwise not      	       	       	1
-    &lt;	Low byte operator	     		1
-    &gt;	High byte operator	     		1
+    &lt;	   Low byte operator	     	     	   1
+    &gt;	   High byte operator	     	     	   1
 
-    *  	       	Multiplication		     		2
-    /  	       	Division		     		2
-    .MOD       	Modulo operation	     		2
-    &amp;      	Bitwise and	 	     		2
-    .BITAND    	Bitwise and  		     		2
-    ^  	       	Bitwise xor  		     		2
-    .BITXOR    	Bitwise xor		     		2
-    &lt;&lt;   	Shift left operator	     		2
-    .SHL       	Shift left operator	     		2
-    &gt;&gt;   	Shift right operator	     		2
-    .SHR       	Shift right operator 	     		2
+    *  	       	Multiplication		     	     	2
+    /  	       	Division     		     	     	2
+    .MOD       	Modulo operation	     	     	2
+    &amp;      	    Bitwise and	 	     	     	    2
+    .BITAND    	Bitwise and  		     	     	2
+    ^  	       	Bitwise xor  		     	     	2
+    .BITXOR    	Bitwise xor  		     	     	2
+    &lt;&lt;   	      Shift left operator	     	      2
+    .SHL       	Shift left operator	     	     	2
+    &gt;&gt;   	      Shift right operator
+    .SHR       	Shift right operator 	     	     	2
 
-    +  	       	Binary plus		   		3
-    -  	       	Binary minus				3
+    +  	       	Binary plus  		   	     	3
+    -  	       	Binary minus 			     	3
     |  	       	Binary or      			      	3
-    .BITOR     	Binary or			      	3
+    .BITOR     	Binary or    			      	3
 
     =          	Compare operation (equal)	      	4
-    &lt;&gt;   	Compare operation (not equal)	      	4
-    &lt;       	Compare operation (less)  	      	4
-    &gt;       	Compare operation (greater)    	      	4
-    &lt;=      	Compare operation (less or equal)     	4
-    &gt;=      	Compare operation (greater or equal)    4
+    &lt;&gt;	      Compare operation (not equal)	      4
+    &lt;       	   Compare operation (less)  	      	   4
+    &gt;       	   Compare operation (greater)    	   4
+    &lt;=      	   Compare operation (less or equal)       4
+    &gt;=      	   Compare operation (greater or equal)    4
 
-    &amp;&amp;		Boolean and				5
-    .AND       	Boolean and			      	5
-    .XOR       	Boolean xor			      	5
+    &amp;&amp;		Boolean and		     	   	5
+    .AND       	Boolean and  			      	5
+    .XOR       	Boolean xor  			      	5
 
-    ||	       	Boolean or			      	6
-    .OR	       	Boolean or			      	6
+    ||	       	Boolean or   			      	6
+    .OR	       	Boolean or   			      	6
 
-    !  	       	Boolean not			      	7
-    .NOT       	Boolean not			      	7
+    !  	       	Boolean not  			      	7
+    .NOT       	Boolean not  			      	7
 </verb></tscreen>
 
 
@@ -446,174 +467,174 @@ Some of the pseudo variables mentioned above need some more explanation:
 
 
 
-<sect>Symbols and labels
+<sect>Symbols and labels<p>
 
-<p>
 The assembler allows you to use symbols instead of naked values to make
 the source more readable. There are a lot of different ways to define and
 use symbols and labels, giving a lot of flexibility.
 
-<descrip>
+
+<sect1>Numeric constants<p>
+
+Numeric constants are defined using the equal sign. After doing
+
+<tscreen><verb>
+      two = 2
+</verb></tscreen>
+
+may use the symbol "two" in every place where a number is expected, and it is
+evaluated to the value 2 in this context. An example would be
+
+<tscreen><verb>
+      four = two * two
+</verb></tscreen>
 
 
-<tag/Numeric constants/
+<sect1>Standard labels<p>
 
-    Numeric constants are defined using the equal sign. After doing
-
-    <tscreen><verb>
-    	  two = 2
-    </verb></tscreen>
-
-    may use the symbol "two" in every place where a number is expected,
-    and it is evaluated to the value 2 in this context. An example would be
-
-    <tscreen><verb>
-    	  four = two * two
-    </verb></tscreen>
+A label is defined by writing the name of the label at the start of the line
+(before any instruction mnemonic, macro or pseudo directive), followed by a
+colon. This will declare a symbol with the given name and the value of the
+current program counter.
 
 
-<tag/Standard labels/
+<sect1>Local labels and symbols<p>
 
-    A label is defined by writing the name of the label at the start of
-    the line (before any instruction mnemonic, macro or pseudo
-    directive), followed by a colon. This will declare a symbol with the
-    given name and the value of the current program counter.
+Using the <tt><ref id=".PROC" name=".PROC"></tt> directive, it is possible
+to create regions of code where the names of labels and symbols are local
+to this region. They are not know outside and cannot be accessed from
+there. Such regions may be nested like PROCEDUREs in Pascal.
+
+See the description of the <tt><ref id=".PROC" name=".PROC"></tt>
+directive for more information.
 
 
-<tag/Local labels and symbols/
+<sect1>Cheap local labels<p>
 
-    Using the <tt/.PROC/ directive, it is possible to create regions of code
-    where the names of labels and symbols are local to this region. They
-    are not know outside and cannot be accessed from there. Such regions
-    may be nested like PROCEDUREs in Pascal.
+Cheap local labels are defined like standard labels, but the name of the
+label must begin with a special symbol (usually '@', but this can be
+changed by the <tt><ref id=".LOCALCHAR" name=".LOCALCHAR"></tt>
+directive).
 
-    See the description of the <tt/.PROC/ directive for more information.
+Cheap local labels are visible only between two no cheap labels. As soon
+as a standard symbol is encountered (this may also be a local symbol if
+inside a region defined with the <tt><ref id=".PROC" name=".PROC"></tt>
+directive), the cheap local symbol goes out of scope.
 
-<tag/Cheap local labels/
+You may use cheap local labels as an easy way to reuse common label
+names like "Loop". Here is an example:
 
-    Cheap local labels are defined like standard labels, but the name of
-    the label must begin with a special symbol (usually '@', but this can
-    be changed by the <tt/.LOCALCHAR/ directive).
+<tscreen><verb>
+	Clear:  lda    #$00   	     	; Global label
+		ldy    #$20
+	@Loop:  sta    Mem,y  	     	; Local label
+		dey
+		bne    @Loop  	     	; Ok
+		rts
+	Sub:    ... 	       	     	; New global label
+		bne    @Loop  	     	; ERROR: Unknown identifier!
+</verb></tscreen>
 
-    Cheap local labels are visible only between two no cheap labels. As
-    soon as a standard symbol is encountered (this may also be a local
-    symbol if inside a region defined with the .PROC directive), the
-    cheap local symbol goes out of scope.
+<sect1>Unnamed labels<p>
 
-    You may use cheap local labels as an easy way to reuse common label
-    names like "Loop". Here is an example:
+If you really want to write messy code, there are also unnamed
+labels. These labels do not have a name (you guessed that already,
+didn't you?). A colon is used to mark the absence of the name.
 
-    <tscreen><verb>
-    	Clear: 	lda 	#$00	     	; Global label
-    	       	ldy 	#$20
-       	@Loop: 	sta 	Mem,y	     	; Local label
-       	       	dey
-    	       	bne    	@Loop	     	; Ok
-    	       	rts
-    	Sub:   	... 	 	     	; New global label
-    	       	bne 	@Loop	     	; ERROR: Unknown identifier!
-    </verb></tscreen>
+Unnamed labels may be accessed by using the colon plus several minus
+or plus characters as a label designator. Using the '-' characters
+will create a back reference (use the n'th label backwards), using
+'+' will create a forward reference (use the n'th label in forward
+direction). An example will help to understand this:
 
-<tag/Unnamed labels/
+<tscreen><verb>
+	:	lda	(ptr1),y	; #1
+		cmp	(ptr2),y
+		bne    	:+     		; -> #2
+		tax
+		beq	:+++   		; -> #4
+		iny
+		bne	:-     		; -> #1
+		inc	ptr1+1
+		inc	ptr2+1
+		bne	:-     		; -> #1
 
-    If you really want to write messy code, there are also unnamed
-    labels. These labels do not have a name (you guessed that already,
-    didn't you?). A colon is used to mark the absence of the name.
+	:	bcs	:+     	       	; #2 -> #3
+		ldx	#$FF
+		rts
 
-    Unnamed labels may be accessed by using the colon plus several minus
-    or plus characters as a label designator. Using the '-' characters
-    will create a back reference (use the n'th label backwards), using
-    '+' will create a forward reference (use the n'th label in forward
-    direction). An example will help to understand this:
+	:	ldx	#$01   		; #3
+	:	rts	       		; #4
+</verb></tscreen>
 
-    <tscreen><verb>
-       	:	lda	(ptr1),y	; #1
-    		cmp	(ptr2),y
-    		bne    	:+		; -> #2
-    		tax
-    		beq	:+++ 		; -> #4
-    		iny
-    		bne	:-		; -> #1
-    		inc	ptr1+1
-    		inc	ptr2+1
-    		bne	:-		; -> #1
+As you can see from the example, unnamed labels will make even short
+sections of code hard to understand, because you have to count labels
+to find branch targets (this is the reason why I for my part do
+prefer the "cheap" local labels). Nevertheless, unnamed labels are
+convenient in some situations, so it's your decision.
 
-       	:	bcs	:+     	       	; #2 -> #3
-    		ldx	#$FF
-    		rts
 
-    	:	ldx	#$01		; #3
-    	:	rts	  		; #4
-    </verb></tscreen>
+<sect1>Using macros to define labels and constants<p>
 
-    As you can see from the example, unnamed labels will make even short
-    sections of code hard to understand, because you have to count labels
-    to find branch targets (this is the reason why I for my part do
-    prefer the "cheap" local labels). Nevertheless, unnamed labels are
-    convenient in some situations, so it's your decision.
+While there are drawbacks with this approach, it may be handy in some
+situations. Using <tt><ref id=".DEFINE" name=".DEFINE"></tt>, it is
+possible to define symbols or constants that may be used elsewhere. Since
+the macro facility works on a very low level, there is no scoping. On the
+other side, you may also define string constants this way (this is not
+possible with the other symbol types).
 
-<tag/Using macros to define labels and constants/
+Example:
 
-    While there are drawbacks with this approach, it may be handy in some
-    situations. Using <tt/.DEFINE/, it is possible to define symbols or
-    constants that may be used elsewhere. Since the macro facility works
-    on a very low level, there is no scoping. On the other side, you may
-    also define string constants this way (this is not possible with the
-    other symbol types).
-
-    Example:
-
-    <tscreen><verb>
+<tscreen><verb>
 	.DEFINE	two	2
 	.DEFINE version	"SOS V2.3"
 
 	four = two * two       	; Ok
-	.byte	version		; Ok
+	.byte	version	       	; Ok
 
-	.PROC			; Start local scope
-	two = 3			; Will give "2 = 3" - invalid!
+	.PROC		       	; Start local scope
+	two = 3		       	; Will give "2 = 3" - invalid!
 	.ENDPROC
-    </verb></tscreen>
-
-</descrip>
+</verb></tscreen>
 
 
-If <tt/.DEBUGINFO/ is enabled (or -g is given on the command line), global,
-local and cheap local labels are written to the object file and will be
-available in the symbol file via the linker. Unnamed labels are not
-written to the object file, because they don't have a name which would
-allow to access them.
+<sect1>Symbols and <tt>.DEBUGINFO</tt><p>
+
+If <tt><ref id=".DEBUGINFO" name=".DEBUGINFO"></tt> is enabled (or <ref
+id="option-g" name="-g"> is given on the command line), global, local and
+cheap local labels are written to the object file and will be available in the
+symbol file via the linker. Unnamed labels are not written to the object file,
+because they don't have a name which would allow to access them.
 
 
 
-<sect>Control commands
+<sect>Control commands<label id="control-commands">
 
 <p>
 Here's a list of all control commands and a description, what they do:
 
-<descrip>
 
-<tag><tt><idx>.A16</idx></tt></tag>
+<sect1><tt>.A16</tt><label id=".A16"><p>
 
   Valid only in 65816 mode. Switch the accumulator to 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate accumulator adressing mode.
 
-  See also: <tt/.SMART/
+  See also: <tt><ref id=".SMART" name=".SMART"></tt>
 
 
-<tag><tt><idx>.A8</idx></tt></tag>
+<sect1><tt>.A8</tt><label id=".A8"><p>
 
   Valid only in 65816 mode. Switch the accumulator to 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate accu adressing mode.
 
-  See also: <tt/.SMART/
+  See also: <tt><ref id=".SMART" name=".SMART"></tt>
 
 
-<tag><tt><idx>.ADDR</idx></tt></tag>
+<sect1><tt>.ADDR</tt><label id=".ADDR"><p>
 
   Define word sized data. In 6502 mode, this is an alias for <tt/.WORD/ and
   may be used for better readability if the data words are address values.
@@ -627,8 +648,10 @@ Here's a list of all control commands and a description, what they do:
   	.addr  	$0D00, $AF13, _Clear
   </verb></tscreen>
 
+  See: <tt><ref id=".FARADDR" name=".FARADDR"></tt>
 
-<tag><tt><idx>.ALIGN</idx></tt></tag>
+
+<sect1><tt>.ALIGN</tt><label id=".ALIGN"><p>
 
   Align data to a given boundary. The command expects a constant integer
   argument that must be a power of two, plus an optional second argument
@@ -647,7 +670,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.ASCIIZ</idx></tt></tag>
+<sect1><tt>.ASCIIZ</tt><label id=".ASCIIZ"><p>
 
   Define a string with a trailing zero.
 
@@ -662,7 +685,7 @@ Here's a list of all control commands and a description, what they do:
   the binary zero is only appended once (after the last one).
 
 
-<tag><tt><idx>.AUTOIMPORT</idx></tt></tag>
+<sect1><tt>.AUTOIMPORT</tt><label id=".AUTOIMPORT"><p>
 
   Is followd by a plus or a minus character. When switched on (using a
   +), undefined symbols are automatically marked as import instead of
@@ -687,7 +710,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.BLANK</idx></tt></tag>
+<sect1><tt>.BLANK</tt><label id=".BLANK"><p>
 
   Builtin function. The function evaluates its argument in braces and
   yields "false" if the argument is non blank (there is an argument), and
@@ -699,7 +722,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.BSS</idx></tt></tag>
+<sect1><tt>.BSS</tt><label id=".BSS"><p>
 
   Switch to the BSS segment. The name of the BSS segment is always "BSS",
   so this is a shortcut for
@@ -708,10 +731,10 @@ Here's a list of all control commands and a description, what they do:
   	.segment  "BSS"
   </verb></tscreen>
 
-  See also the <tt/.SEGMENT/ command.
+  See also the <tt><ref id=".SEGMENT" name=".SEGMENT"></tt> command.
 
 
-<tag><tt><idx>.BYTE</idx></tt></tag>
+<sect1><tt>.BYTE</tt><label id=".BYTE"><p>
 
   Define byte sized data. Must be followed by a sequence of (byte ranged)
   expressions or strings.
@@ -723,7 +746,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.CASE</idx></tt></tag>
+<sect1><tt>.CASE</tt><label id=".CASE"><p>
 
   Switch on or off case sensitivity on identifiers. The default is off
   (that is, identifiers are case sensitive), but may be changed by the
@@ -738,7 +761,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.CODE</idx></tt></tag>
+<sect1><tt>.CODE</tt><label id=".CODE"><p>
 
   Switch to the CODE segment. The name of the CODE segment is always
   "CODE", so this is a shortcut for
@@ -747,10 +770,49 @@ Here's a list of all control commands and a description, what they do:
        	.segment  "CODE"
   </verb></tscreen>
 
-  See also the <tt/.SEGMENT/ command.
+  See also the <tt><ref id=".SEGMENT" name=".SEGMENT"></tt> command.
 
 
-<tag><tt><idx>.CONCAT</idx></tt></tag>
+<sect1><tt>.CONDES</tt><label id=".CONDES"><p>
+
+  Export a symbol and mark it in a special way. The linker is able to build
+  tables of all such symbols. This may be used to automatically create a list
+  of functions needed to initialize linked library modules.
+
+  Note: The linker has a feature to build a table of marked routines, but it
+  is your code that must call these routines, so just declaring a symbol with
+  <tt/.CONDES/ does nothing by itself.
+
+  All symbols are exported as an absolute (16 bit) symbol. You don't need to
+  use an additional <tt><ref id=".EXPORT" name=".EXPORT"></tt> statement, this
+  is implied by <tt/.CONDES/.
+
+  <tt/.CONDES/ is followed by the type, which may be <tt/constructor/,
+  <tt/destructor/ or a numeric value between 0 and 6 (where 0 is the same as
+  specifiying <tt/constructor/ and 1 is equal to specifying <tt/destructor/).
+  The <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> and <tt><ref
+  id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> commands are actually shortcuts
+  for <tt/.CONDES/ with a type of <tt/constructor/ resp. <tt/destructor/.
+
+  After the type, an optional priority may be specified. If no priority is
+  given, the default priority of 7 is used. Be careful when assigning
+  priorities to your own module constructors so they won't interfere with the
+  ones in the cc65 library.
+
+  Example:
+
+  <tscreen><verb>
+   	.condes		ModuleInit, constructor
+	.condes		ModInit, 0, 16
+  </verb></tscreen>
+
+  See the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> and <tt><ref
+  id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> commands and the separate section
+  <ref id="condes" name="Module constructors/destructors"> explaining the
+  feature in more detail.
+
+
+<sect1><tt>.CONCAT</tt><label id=".CONCAT"><p>
 
   Builtin function. The function allows to concatenate a list of string
   constants separated by commas. The result is a string constant that
@@ -772,7 +834,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.CONST</idx></tt></tag>
+<sect1><tt>.CONST</tt><label id=".CONST"><p>
 
   Builtin function. The function evaluates its argument in braces and
   yields "true" if the argument is a constant expression (that is, an
@@ -784,13 +846,43 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.CPU</idx></tt></tag>
+<sect1><tt>.CONSTRUCTOR</tt><label id=".CONSTRUCTOR"><p>
+
+  Export a symbol and mark it as a module constructor. This may be used
+  together with the linker to build a table of constructor subroutines that
+  are called by the startup code.
+
+  Note: The linker has a feature to build a table of marked routines, but it
+  is your code that must call these routines, so just declaring a symbol as
+  constructor does nothing by itself.
+
+  A constructor is always exported as an absolute (16 bit) symbol. You don't
+  need to use an additional <tt/.export/ statement, this is implied by
+  <tt/.constructor/. It may have an optional priority that is separated by a
+  comma. If no priority is given, the default priority of 7 is used. Be
+  careful when assigning priorities to your own module constructors so they
+  won't interfere with the ones in the cc65 library.
+
+  Example:
+
+  <tscreen><verb>
+   	.constructor	ModuleInit
+	.constructor	ModInit, 16
+  </verb></tscreen>
+
+  See the <tt><ref id=".CONDES" name=".CONDES"></tt> and <tt><ref
+  id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> commands and the separate section
+  <ref id="condes" name="Module constructors/destructors"> explaining the
+  feature in more detail.
+
+
+<sect1><tt>.CPU</tt><label id=".CPU"><p>
 
   Reading this pseudo variable will give a constant integer value that
   tells which instruction set is currently enabled. Possible values are:
 
   <tscreen><verb>
-  	0 -->	6502
+  	0 -->  	6502
   	1 -->	65SC02
   	2 -->	65SC816
   	3 -->	SunPlus SPC
@@ -814,7 +906,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.DATA</idx></tt></tag>
+<sect1><tt>.DATA</tt><label id=".DATA"><p>
 
   Switch to the DATA segment. The name of the DATA segment is always
   "DATA", so this is a shortcut for
@@ -823,10 +915,10 @@ Here's a list of all control commands and a description, what they do:
        	.segment  "DATA"
   </verb></tscreen>
 
-  See also the <tt/.SEGMENT/ command.
+  See also the <tt><ref id=".SEGMENT" name=".SEGMENT"></tt> command.
 
 
-<tag><tt><idx>.DBYT</idx></tt></tag>
+<sect1><tt>.DBYT</tt><label id=".DBYT"><p>
 
   Define word sized data with the hi and lo bytes swapped (use <tt/.WORD/ to
   create word sized data in native 65XX format). Must be followed by a
@@ -847,7 +939,7 @@ Here's a list of all control commands and a description, what they do:
   into the current segment in that order.
 
 
-<tag><tt><idx>.DEBUGINFO</idx></tt></tag>
+<sect1><tt>.DEBUGINFO</tt><label id=".DEBUGINFO"><p>
 
   Switch on or off debug info generation. The default is off (that is,
   the object file will not contain debug infos), but may be changed by the
@@ -862,28 +954,58 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.DEFINE</idx></tt></tag>
+<sect1><tt>.DEFINE</tt><label id=".DEFINE"><p>
 
   Start a define style macro definition. The command is followed by an
   identifier (the macro name) and optionally by a list of formal arguments
   in braces.
-  See separate section about macros.
+  See section <ref id="macros" name="Macros">.
 
 
-<tag><tt><idx>.DEF,</idx> <idx>.DEFINED</idx></tt></tag>
+<sect1><tt>.DEF, .DEFINED</tt><label id=".DEFINED"><p>
 
-  Builtin function. The function expects an identifier as argument in
-  braces. The argument is evaluated, and the function yields "true" if the
-  identifier is a symbol that is already defined somewhere in the source
-  file up to the current position. Otherwise the function yields false. As
-  an example, the <tt/.IFDEF/ statement may be replaced by
+  Builtin function. The function expects an identifier as argument in braces.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is a symbol that is already defined somewhere in the source file up to the
+  current position. Otherwise the function yields false. As an example, the
+  <tt><ref id=".IFDEF" name=".IFDEF"></tt> statement may be replaced by
 
   <tscreen><verb>
 	.if	.defined(a)
   </verb></tscreen>
 
 
-<tag><tt><idx>.DWORD</idx></tt></tag>
+<sect1><tt>.DESTRUCTOR</tt><label id=".DESTRUCTOR"><p>
+
+  Export a symbol and mark it as a module destructor. This may be used
+  together with the linker to build a table of destructor subroutines that
+  are called by the startup code.
+
+  Note: The linker has a feature to build a table of marked routines, but it
+  is your code that must call these routines, so just declaring a symbol as
+  constructor does nothing by itself.
+
+  A destructor is always exported as an absolute (16 bit) symbol. You don't
+  need to use an additional <tt/.export/ statement, this is implied by
+  <tt/.destructor/. It may have an optional priority that is separated by a
+  comma. If no priority is given, the default priority of 7 is used. Be
+  careful when assigning priorities to your own module destructors so they
+  won't interfere with the ones in the cc65 library.
+
+  Example:
+
+  <tscreen><verb>
+   	.destructor	ModuleDone
+	.destructor	ModDone, 16
+  </verb></tscreen>
+
+  See the <tt><ref id=".CONDES" name=".CONDES"></tt> and <tt><ref
+  id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> commands and the separate
+  section <ref id="condes" name="Module constructors/destructors"> explaining
+  the feature in more detail.
+
+
+<sect1><tt>.DWORD</tt><label id=".DWORD"><p>
 
   Define dword sized data (4 bytes) Must be followed by a sequence of
   expressions.
@@ -895,43 +1017,44 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.ELSE</idx></tt></tag>
+<sect1><tt>.ELSE</tt><label id=".ELSE"><p>
 
   Conditional assembly: Reverse the current condition.
 
 
-<tag><tt><idx>.ELSEIF</idx></tt></tag>
+<sect1><tt>.ELSEIF</tt><label id=".ELSEIF"><p>
 
   Conditional assembly: Reverse current condition and test a new one.
 
 
-<tag><tt><idx>.END</idx></tt></tag>
+<sect1><tt>.END</tt><label id=".END"><p>
 
   Forced end of assembly. Assembly stops at this point, even if the command
   is read from an include file.
 
 
-<tag><tt><idx>.ENDIF</idx></tt></tag>
+<sect1><tt>.ENDIF</tt><label id=".ENDIF"><p>
 
-  Conditional assembly: Close a <tt/.IF.../ or <tt/.ELSE/ branch.
-
-
-<tag><tt><idx>.ENDMAC,</idx> <idx>.ENDMACRO</idx></tt></tag>
-
-  End of macro definition (see separate section).
+  Conditional assembly: Close a <tt><ref id=".IF" name=".IF..."></tt> or
+  <tt><ref id=".ELSE" name=".ELSE"></tt> branch.
 
 
-<tag><tt><idx>.ENDPROC</idx></tt></tag>
+<sect1><tt>.ENDMAC, .ENDMACRO</tt><label id=".ENDMACRO"><p>
 
-  End of local lexical level (see <tt/.PROC/).
-
-
-<tag><tt><idx>.ENDREP,</idx> <idx>.ENDREPEAT</idx></tt></tag>
-
-  End a <tt/.REPEAT/ block. See the <tt/.REPEAT/ command.
+  End of macro definition (see section <ref id="macros" name="Macros">).
 
 
-<tag><tt><idx>.ERROR</idx></tt></tag>
+<sect1><tt>.ENDPROC</tt><label id=".ENDPROC"><p>
+
+  End of local lexical level (see <tt><ref id=".PROC" name=".PROC"></tt>).
+
+
+<sect1><tt>.ENDREP, .ENDREPEAT</tt><label id=".ENDREPEAT"><p>
+
+  End a <tt><ref id=".REPEAT" name=".REPEAT"></tt> block.
+
+
+<sect1><tt>.ERROR</tt><label id=".ERROR"><p>
 
   Force an assembly error. The assembler will output an error message
   preceeded by "User error" and will <em/not/ produce an object file.
@@ -951,16 +1074,17 @@ Here's a list of all control commands and a description, what they do:
 	.endif
   </verb></tscreen>
 
-  See also the <tt/.WARNING/ and <tt/.OUT/ directives.
+  See also the <tt><ref id=".WARNING" name=".WARNING"></tt> and <tt><ref
+  id=".OUT" name=".OUT"></tt> directives.
 
 
-<tag><tt><idx>.EXITMAC,</idx> <idx>.EXITMACRO</idx></tt></tag>
+<sect1><tt>.EXITMAC, .EXITMACRO</tt><label id=".EXITMACRO"><p>
 
   Abort a macro expansion immidiately. This command is often useful in
-  recursive macros. See separate chapter about macros.
+  recursive macros. See separate section <ref id="macros" name="Macros">.
 
 
-<tag><tt><idx>.EXPORT</idx></tt></tag>
+<sect1><tt>.EXPORT</tt><label id=".EXPORT"><p>
 
   Make symbols accessible from other modules. Must be followed by a comma
   separated list of symbols to export.
@@ -971,8 +1095,10 @@ Here's a list of all control commands and a description, what they do:
 	.export	foo, bar
   </verb></tscreen>
 
+  See: <tt><ref id=".EXPORTZP" name=".EXPORTZP"></tt>
 
-<tag><tt><idx>.EXPORTZP</idx></tt></tag>
+
+<sect1><tt>.EXPORTZP</tt><label id=".EXPORTZP"><p>
 
   Make symbols accessible from other modules. Must be followed by a comma
   separated list of symbols to export. The exported symbols are explicitly
@@ -984,8 +1110,10 @@ Here's a list of all control commands and a description, what they do:
   	.exportzp  foo, bar
   </verb></tscreen>
 
+  See: <tt><ref id=".EXPORT" name=".EXPORT"></tt>
 
-<tag><tt><idx>.FARADDR</idx></tt></tag>
+
+<sect1><tt>.FARADDR</tt><label id=".FARADDR"><p>
 
   Define far (24 bit) address data. The command must be followed by a
   sequence of (not necessarily constant) expressions.
@@ -996,8 +1124,10 @@ Here's a list of all control commands and a description, what they do:
   	.faraddr	DrawCircle, DrawRectangle, DrawHexagon
   </verb></tscreen>
 
+  See: <tt><ref id=".ADDR" name=".ADDR"></tt>
 
-<tag><tt><idx>.FEATURE</idx></tt></tag>
+
+<sect1><tt>.FEATURE</tt><label id=".FEATURE"><p>
 
   This directive may be used to enable one or more compatibility features
   of the assembler. While the use of <tt/.FEATURE/ should be avoided when
@@ -1015,46 +1145,68 @@ Here's a list of all control commands and a description, what they do:
 
   <descrip>
 
-  <tag><tt><idx>dollar_is_pc</idx></tt></tag>
+  <tag><tt>dollar_is_pc</tt></tag>
 
     The dollar sign may be used as an alias for the star (`*'), which
     gives the value of the current PC in expressions.
     Note: Assignment to the pseudo variable is not allowed.
 
-  <tag><tt><idx>labels_without_colons</idx></tt></tag>
+  <tag><tt>labels_without_colons</tt></tag>
 
     Allow labels without a trailing colon. These labels are only accepted,
     if they start at the beginning of a line (no leading white space).
 
-  <tag><tt><idx>loose_string_term</idx></tt></tag>
+  <tag><tt>loose_string_term</tt></tag>
 
     Accept single quotes as well as double quotes as terminators for string
     constants.
 
-  <tag><tt><idx>at_in_identifiers</idx></tt></tag>
+  <tag><tt>loose_char_term</tt></tag>
+
+    Accept single quotes as well as double quotes as terminators for char
+    constants.
+
+  <tag><tt>at_in_identifiers</tt></tag>
 
     Accept the at character (`@') as a valid character in identifiers. The
     at character is not allowed to start an identifier, even with this
     feature enabled.
 
-  <tag><tt><idx>dollar_in_identifiers</idx></tt></tag>
+  <tag><tt>dollar_in_identifiers</tt></tag>
 
     Accept the dollar sign (`&dollar;') as a valid character in identifiers. The
     at character is not allowed to start an identifier, even with this
     feature enabled.
 
-  <tag><tt><idx>pc_assignment</idx></tt></tag>
+  <tag><tt>pc_assignment</tt></tag>
 
-    Allow assignments to the PC symbol (`*' or `&dollar;' if dollar_is_pc is
-    enabled). Such an assignment is handled identical to the <tt/.ORG/
-    command (which is usually not needed, so just removing the lines with
-    the assignments may also be an option when porting code written for older
-    assemblers).
+    Allow assignments to the PC symbol (`*' or `&dollar;' if <tt/dollar_is_pc/
+    is enabled). Such an assignment is handled identical to the <tt><ref
+    id=".ORG" name=".ORG"></tt> command (which is usually not needed, so just
+    removing the lines with the assignments may also be an option when porting
+    code written for older assemblers).
 
   </descrip>
 
+  It is also possible to specify features on the command line using the
+  <tt><ref id="option--feature" name="--feature"></tt> command line option.
+  This is useful when translating sources written for older assemblers, when
+  you don't want to change the source code.
 
-<tag><tt><idx>.FILEOPT,</idx> <idx>.FOPT</idx></tt></tag>
+  As an example, to translate sources written for Andre Fachats xa65
+  assembler, the features
+
+  <verb>
+  	labels_without_colons, pc_assignment, loose_char_term
+  </verb>
+
+  may be helpful. They do not make ca65 completely compatible, so you may not
+  be able to translate the sources without changes, even when enabling these
+  features. However, I have found several sources that translate without
+  problems when enabling these features on the command line.
+
+
+<sect1><tt>.FILEOPT, .FOPT</tt><label id=".FOPT"><p>
 
   Insert an option string into the object file. There are two forms of
   this command, one specifies the option by a keyword, the second
@@ -1084,13 +1236,13 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.GLOBAL</idx></tt></tag>
+<sect1><tt>.GLOBAL</tt><label id=".GLOBAL"><p>
 
-  Declare symbols as global. Must be followed by a comma separated list
-  of symbols to declare. Symbols from the list, that are defined somewhere
-  in the source, are exported, all others are imported. An additional
-  explicit <tt/.IMPORT/ or <tt/.EXPORT/ command for the same symbol is
-  allowed.
+  Declare symbols as global. Must be followed by a comma separated list of
+  symbols to declare. Symbols from the list, that are defined somewhere in the
+  source, are exported, all others are imported. Additional <tt><ref
+  id=".IMPORT" name=".IMPORT"></tt> or <tt><ref id=".EXPORT"
+  name=".EXPORT"></tt> commands for the same symbol are allowed.
 
   Example:
 
@@ -1099,14 +1251,14 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.GLOBALZP</idx></tt></tag>
+<sect1><tt>.GLOBALZP</tt><label id=".GLOBALZP"><p>
 
-  Declare symbols as global. Must be followed by a comma separated list
-  of symbols to declare. Symbols from the list, that are defined
-  somewhere in the source, are exported, all others are imported. An
-  additional explicit <tt/.IMPORT/ or <tt/.EXPORT/ command for the same
-  symbol is explicitly allowed. The symbols in the list are explicitly
-  marked as zero page symols.
+  Declare symbols as global. Must be followed by a comma separated list of
+  symbols to declare. Symbols from the list, that are defined somewhere in the
+  source, are exported, all others are imported. Additional <tt><ref
+  id=".IMPORTZP" name=".IMPORTZP"></tt> or <tt><ref id=".EXPORTZP"
+  name=".EXPORTZP"></tt> commands for the same symbol are allowed. The symbols
+  in the list are explicitly marked as zero page symols.
 
   Example:
 
@@ -1115,27 +1267,29 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.I16</idx></tt></tag>
+<sect1><tt>.I16</tt><label id=".I16"><p>
 
   Valid only in 65816 mode. Switch the index registers to 16 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 16 bit operands for immediate operands.
 
-  See also the <tt/.SMART/ command.
+  See also the <tt><ref id=".I8" name=".I8"></tt> and <tt><ref id=".SMART"
+  name=".SMART"></tt> commands.
 
 
-<tag><tt><idx>.I8</idx></tt></tag>
+<sect1><tt>.I8</tt><label id=".I8"><p>
 
   Valid only in 65816 mode. Switch the index registers to 8 bit.
 
   Note: This command will not emit any code, it will tell the assembler to
   create 8 bit operands for immediate operands.
 
-  See also the <tt/.SMART/ command.
+  See also the <tt><ref id=".I16" name=".I16"></tt> and <tt><ref id=".SMART"
+  name=".SMART"></tt> commands.
 
 
-<tag><tt><idx>.IF</idx></tt></tag>
+<sect1><tt>.IF</tt><label id=".IF"><p>
 
   Conditional assembly: Evalute an expression and switch assembler output
   on or off depending on the expression. The expression must be a constant
@@ -1145,33 +1299,34 @@ Here's a list of all control commands and a description, what they do:
   to TRUE.
 
 
-<tag><tt><idx>.IFBLANK</idx></tt></tag>
+<sect1><tt>.IFBLANK</tt><label id=".IFBLANK"><p>
 
-  Conditional assembly: Check if there are any remaining tokens in this
-  line, and evaluate to FALSE if this is the case, and to TRUE otherwise.
-  If the condition is not true, further lines are not assembled until
-  an <tt/.ELSE/, <tt/.ELSEIF/ or <tt/.ENDIF/ directive.
+  Conditional assembly: Check if there are any remaining tokens in this line,
+  and evaluate to FALSE if this is the case, and to TRUE otherwise. If the
+  condition is not true, further lines are not assembled until an <tt><ref
+  id=".ELSE" name=".ESLE"></tt>, <tt><ref id=".ELSEIF" name=".ELSEIF"></tt> or
+  <tt><ref id=".ENDIF" name=".ENDIF"></tt> directive.
 
-  This command is often used to check if a macro parameter was given.
-  Since an empty macro parameter will evaluate to nothing, the condition
-  will evaluate to FALSE if an empty parameter was given.
+  This command is often used to check if a macro parameter was given. Since an
+  empty macro parameter will evaluate to nothing, the condition will evaluate
+  to FALSE if an empty parameter was given.
 
   Example:
 
   <tscreen><verb>
-   	.macro	   arg1, arg2
-   	.ifblank   arg2
-   		   lda     #arg1
-   	.else
-   	 	   lda	   #arg2
-   	.endif
-   	.endmacro
+       	.macro	   arg1, arg2
+       	.ifblank   arg2
+       		   lda     #arg1
+       	.else
+       	 	   lda	   #arg2
+       	.endif
+       	.endmacro
   </verb></tscreen>
 
-  See also: <tt/.BLANK/
+  See also: <tt><ref id=".BLANK" name=".BLANK"></tt>
 
 
-<tag><tt><idx>.IFCONST</idx></tt></tag>
+<sect1><tt>.IFCONST</tt><label id=".IFCONST"><p>
 
   Conditional assembly: Evaluate an expression and switch assembler output
   on or off depending on the constness of the expression.
@@ -1180,24 +1335,25 @@ Here's a list of all control commands and a description, what they do:
   containing an imported or currently undefined symbol) evaluates to
   FALSE.
 
-  See also: <tt/.CONST/
+  See also: <tt><ref id=".CONST" name=".CONST"></tt>
 
 
-<tag><tt><idx>.IFDEF</idx></tt></tag>
+<sect1><tt>.IFDEF</tt><label id=".IFDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
   a symbol name. The condition is true if the the given symbol is already
   defined, and false otherwise.
 
-  See also: <tt/.DEFINED/
+  See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
 
 
-<tag><tt><idx>.IFNBLANK</idx></tt></tag>
+<sect1><tt>.IFNBLANK</tt><label id=".IFNBLANK"><p>
 
-  Conditional assembly: Check if there are any remaining tokens in this
-  line, and evaluate to TRUE if this is the case, and to FALSE otherwise.
-  If the condition is not true, further lines are not assembled until
-  an <tt/.ELSE/, <tt/.ELSEIF/ or <tt/.ENDIF/ directive.
+  Conditional assembly: Check if there are any remaining tokens in this line,
+  and evaluate to TRUE if this is the case, and to FALSE otherwise. If the
+  condition is not true, further lines are not assembled until an <tt><ref
+  id=".ELSE" name=".ELSE"></tt>, <tt><ref id=".ELSEIF" name=".ELSEIF"></tt> or
+  <tt><ref id=".ENDIF" name=".ENDIF"></tt> directive.
 
   This command is often used to check if a macro parameter was given.
   Since an empty macro parameter will evaluate to nothing, the condition
@@ -1214,46 +1370,46 @@ Here's a list of all control commands and a description, what they do:
    	.endmacro
   </verb></tscreen>
 
-  See also: <tt/.BLANK/
+  See also: <tt><ref id=".BLANK" name=".BLANK"></tt>
 
 
-<tag><tt><idx>.IFNDEF</idx></tt></tag>
+<sect1><tt>.IFNDEF</tt><label id=".IFNDEF"><p>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
   a symbol name. The condition is true if the the given symbol is not
   defined, and false otherwise.
 
-  See also: <tt/.DEFINED/
+  See also: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
 
 
-<tag><tt><idx>.IFNREF</idx></tt></tag>
+<sect1><tt>.IFNREF</tt><label id=".IFNREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
   by a symbol name. The condition is true if if the the given symbol was
   not referenced before, and false otherwise.
 
-  See also: <tt/.REFERENCED/
+  See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
 
 
-<tag><tt><idx>.IFP02</idx></tt></tag>
+<sect1><tt>.IFP02</tt><label id=".IFP02"><p>
 
   Conditional assembly: Check if the assembler is currently in 6502 mode
-  (see <tt/.P02/ command).
+  (see <tt><ref id=".P02" name=".P02"></tt> command).
 
 
-<tag><tt><idx>.IFP816</idx></tt></tag>
+<sect1><tt>.IFP816</tt><label id=".IFP816"><p>
 
   Conditional assembly: Check if the assembler is currently in 65816 mode
-  (see <tt/.P816/ command).
+  (see <tt><ref id=".P816" name=".P816"></tt> command).
 
 
-<tag><tt><idx>.IFPC02</idx></tt></tag>
+<sect1><tt>.IFPC02</tt><label id=".IFPC02"><p>
 
   Conditional assembly: Check if the assembler is currently in 65C02 mode
-  (see <tt/.PC02/ command).
+  (see <tt><ref id=".PC02" name=".PC02"></tt> command).
 
 
-<tag><tt><idx>.IFREF</idx></tt></tag>
+<sect1><tt>.IFREF</tt><label id=".IFREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
   by a symbol name. The condition is true if if the the given symbol was
@@ -1272,10 +1428,10 @@ Here's a list of all control commands and a description, what they do:
    	.endif
   </verb></tscreen>
 
-  See also: <tt/.REFERENCED/
+  See also: <tt><ref id=".REFERENCED" name=".REFERENCED"></tt>
 
 
-<tag><tt><idx>.IMPORT</idx></tt></tag>
+<sect1><tt>.IMPORT</tt><label id=".IMPORT"><p>
 
   Import a symbol from another module. The command is followed by a comma
   separated list of symbols to import.
@@ -1286,8 +1442,10 @@ Here's a list of all control commands and a description, what they do:
    	.import	foo, bar
   </verb></tscreen>
 
+  See: <tt><ref id=".IMPORTZP" name=".IMPORTZP"></tt>
 
-<tag><tt><idx>.IMPORTZP</idx></tt></tag>
+
+<sect1><tt>.IMPORTZP</tt><label id=".IMPORTZP"><p>
 
   Import a symbol from another module. The command is followed by a comma
   separated list of symbols to import. The symbols are explicitly imported
@@ -1299,8 +1457,10 @@ Here's a list of all control commands and a description, what they do:
    	.includezp  foo, bar
   </verb></tscreen>
 
+  See: <tt><ref id=".IMPORT" name=".IMPORT"></tt>
 
-<tag><tt><idx>.INCBIN</idx></tt></tag>
+
+<sect1><tt>.INCBIN</tt><label id=".INCBIN"><p>
 
   Include a file as binary data. The command expects a string argument
   that is the name of a file to include literally in the current segment.
@@ -1312,7 +1472,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.INCLUDE</idx></tt></tag>
+<sect1><tt>.INCLUDE</tt><label id=".INCLUDE"><p>
 
   Include another file. Include files may be nested up to a depth of 16.
 
@@ -1323,32 +1483,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.INITIALIZER</idx></tt></tag>
-
-  Export a symbol and mark it as an initializer. This may be used together
-  with the linker to build a table of initializer subroutines that are called
-  by the startup code. 
-
-  Note: The linker has a feature to build a table of initializer routines, but
-  it is your code that must call these routines, so just declaring a symbol
-  as initializer does nothing by itself.
-
-  An initializer is always exported as an absolute (16 bit) symbol. It may
-  have an optional initializer priority that is separated by a comma. If no
-  priority is given, the default priority of 24 is used. Priority values 1-15
-  are reserved for the runtime and C libraries of the cc65 C compiler.
-
-  Example:
-
-  <tscreen><verb>
-   	.initializer	ModuleInit
-	.initializer	ModInit, 16
-  </verb></tscreen>
-
-  See the C runtime libraries for more examples how to use initializers.
-
-
-<tag><tt><idx>.LEFT</idx></tt></tag>
+<sect1><tt>.LEFT</tt><label id=".LEFT"><p>
 
   Builtin function. Extracts the left part of a given token list.
 
@@ -1379,10 +1514,11 @@ Here's a list of all control commands and a description, what they do:
        	.endmacro
   </verb></tscreen>
 
-  See also the <tt/.MID/ and <tt/.RIGHT/ builtin functions.
+  See also the <tt><ref id=".MID" name=".MID"></tt> and <tt><ref id=".RIGHT"
+  name=".RIGHT"></tt> builtin functions.
 
 
-<tag><tt><idx>.LINECONT</idx></tt></tag>
+<sect1><tt>.LINECONT</tt><label id=".LINECONT"><p>
 
   Switch on or off line continuations using the backslash character
   before a newline. The option is off by default.
@@ -1402,7 +1538,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.LIST</idx></tt></tag>
+<sect1><tt>.LIST</tt><label id=".LIST"><p>
 
   Enable output to the listing. The command must be followed by a boolean
   switch ("on", "off", "+" or "-") and will enable or disable listing
@@ -1420,7 +1556,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.LISTBYTES</idx></tt></tag>
+<sect1><tt>.LISTBYTES</tt><label id=".LISTBYTES"><p>
 
   Set, how many bytes are shown in the listing for one source line. The
   default is 12, so the listing will show only the first 12 bytes for any
@@ -1437,26 +1573,28 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.LOCAL</idx></tt></tag>
+<sect1><tt>.LOCAL</tt><label id=".LOCAL"><p>
 
   This command may only be used inside a macro definition. It declares a
   list of identifiers as local to the macro expansion.
 
-  A problem when using macros are labels: Since they don't change their
-  name, you get a "duplicate symbol" error if the macro is expanded the
-  second time. Labels declared with <tt/.LOCAL/ have their name mapped to
-  an internal unique name (<tt/___ABCD__/) with each macro invocation.
+  A problem when using macros are labels: Since they don't change their name,
+  you get a "duplicate symbol" error if the macro is expanded the second time.
+  Labels declared with <tt><ref id=".LOCAL" name=".LOCAL"></tt> have their
+  name mapped to an internal unique name (<tt/___ABCD__/) with each macro
+  invocation.
 
-  Some other assemblers start a new lexical block inside a macro
-  expansion. This has some drawbacks however, since that will not allow
-  <em/any/ symbol to be visible outside a macro, a feature that is sometimes
-  useful. The <tt/.LOCAL/ command is in my eyes a better way to address
-  the problem.
+  Some other assemblers start a new lexical block inside a macro expansion.
+  This has some drawbacks however, since that will not allow <em/any/ symbol
+  to be visible outside a macro, a feature that is sometimes useful. The
+  <tt><ref id=".LOCAL" name=".LOCAL"></tt> command is in my eyes a better way
+  to address the problem.
 
-  You get an error when using <tt/.LOCAL/ outside a macro.
+  You get an error when using <tt><ref id=".LOCAL" name=".LOCAL"></tt> outside
+  a macro.
 
 
-<tag><tt><idx>.LOCALCHAR</idx></tt></tag>
+<sect1><tt>.LOCALCHAR</tt><label id=".LOCALCHAR"><p>
 
   Defines the character that start "cheap" local labels. You may use one
   of '@' and '?' as start character. The default is '@'.
@@ -1480,7 +1618,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.MACPACK</idx></tt></tag>
+<sect1><tt>.MACPACK</tt><label id=".MACPACK"><p>
 
   Insert a predefined macro package. The command is followed by an
   identifier specifying the macro package to insert. Available macro
@@ -1501,18 +1639,19 @@ Here's a list of all control commands and a description, what they do:
        		jne    	Label		; Jump long on condition
   </verb></tscreen>
 
-  See separate section about macros packages.
+  See section <ref id="macros" name="Macros">).
 
 
-<tag><tt><idx>.MAC,</idx> <idx>.MACRO</idx></tt></tag>
+<sect1><tt>.MAC, .MACRO</tt><label id=".MAC"><p>
 
   Start a classic macro definition. The command is followed by an identifier
   (the macro name) and optionally by a comma separated list of identifiers
   that are macro parameters.
-  See separate section about macros.
+
+  See section <ref id="macros" name="Macros">).
 
 
-<tag><tt><idx>.MATCH</idx></tt></tag>
+<sect1><tt>.MATCH</tt><label id=".MATCH"><p>
 
   Builtin function. Matches two token lists against each other. This is
   most useful within macros, since macros are not stored as strings, but
@@ -1535,20 +1674,21 @@ Here's a list of all control commands and a description, what they do:
   Often a macro parameter is used for any of the token lists.
 
   Please note that the function does only compare tokens, not token
-  attributes. So any number is equal to any other number, regardless of
-  the actual value. The same is true for strings. If you need to compare
-  tokens <em/and/ token attributes, use the <tt/.XMATCH/ function.
+  attributes. So any number is equal to any other number, regardless of the
+  actual value. The same is true for strings. If you need to compare tokens
+  <em/and/ token attributes, use the <tt><ref id=".XMATCH"
+  name=".XMATCH"></tt> function.
 
   Example:
 
-  Assume the macro <tt/ASR/, that will shift right the accumulator by one, while
-  honoring the sign bit. The builtin processor instructions will allow an
-  optional "A" for accu addressing for instructions like <tt/ROL/ and <tt/ROR/.
-  We will use the <tt/.MATCH/ function to check for this and print and error
-  for invalid calls.
+  Assume the macro <tt/ASR/, that will shift right the accumulator by one,
+  while honoring the sign bit. The builtin processor instructions will allow
+  an optional "A" for accu addressing for instructions like <tt/ROL/ and
+  <tt/ROR/. We will use the <tt><ref id=".MATCH" name=".MATCH"></tt> function
+  to check for this and print and error for invalid calls.
 
   <tscreen><verb>
-  	.macro	asr	arg
+  	.macro	asr 	arg
 
        	       	.if (.not .blank(arg)) .and (.not .match (arg, a))
     	    	.error "Syntax error"
@@ -1563,8 +1703,10 @@ Here's a list of all control commands and a description, what they do:
   The macro will only accept no arguments, or one argument that must be the
   reserved keyword "A".
 
+  See: <tt><ref id=".XMATCH" name=".XMATCH"></tt>
 
-<tag><tt><idx>.MID</idx></tt></tag>
+
+<sect1><tt>.MID</tt><label id=".MID"><p>
 
   Builtin function. Takes a starting index, a count and a token list as
   arguments. Will return part of the token list.
@@ -1598,14 +1740,20 @@ Here's a list of all control commands and a description, what they do:
        	.endmacro
   </verb></tscreen>
 
-  See also the <tt/.LEFT/ and <tt/.RIGHT/ builtin functions.
+  See also the <tt><ref id=".LEFT" name=".LEFT"></tt> and <tt><ref id=".RIGHT"
+  name=".RIGHT"></tt> builtin functions.
 
 
-<tag><tt><idx>.ORG</idx></tt></tag>
+<sect1><tt>.ORG</tt><label id=".ORG"><p>
 
   Start a section of absolute code. The command is followed by a constant
   expression that gives the new PC counter location for which the code is
-  assembled. Use <tt/.RELOC/ to switch back to relocatable code.
+  assembled. Use <tt><ref id=".RELOC" name=".RELOC"></tt> to switch back to
+  relocatable code.
+
+  Please note that you <em/do not need/ this command in most cases. Placing
+  code at a specific address is the job of the linker, not the assembler, so
+  there is usually no reason to assemble code to a specific address.
 
   You may not switch segments while inside a section of absolute code.
 
@@ -1616,7 +1764,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.OUT</idx></tt></tag>
+<sect1><tt>.OUT</tt><label id=".OUT"><p>
 
   Output a string to the console without producing an error. This command
   is similiar to <tt/.ERROR/, however, it does not force an assembler error
@@ -1628,23 +1776,30 @@ Here's a list of all control commands and a description, what they do:
   	.out	"This code was written by the codebuster(tm)"
   </verb></tscreen>
 
-  See also the <tt/.WARNING/ and <tt/.ERROR/ directives.
+  See also the <tt><ref id=".WARNING" name=".WARNING"></tt> and <tt><ref
+  id=".ERROR" name=".ERROR"></tt> directives.
 
 
-<tag><tt><idx>.P02</idx></tt></tag>
+<sect1><tt>.P02</tt><label id=".P02"><p>
 
   Enable the 6502 instruction set, disable 65C02 and 65816 instructions.
   This is the default if not overridden by the <tt/--cpu/ command line
   option.
 
+  See: <tt><ref id=".PC02" name=".PC02"></tt> and <tt><ref id=".P816"
+  name=".P816"></tt>
 
-<tag><tt><idx>.P816</idx></tt></tag>
+
+<sect1><tt>.P816</tt><label id=".P816"><p>
 
   Enable the 65816 instruction set. This is a superset of the 65C02 and
   6502 instruction sets.
 
+  See: <tt><ref id=".P02" name=".P02"></tt> and <tt><ref id=".PC02"
+  name=".PC02"></tt>
 
-<tag><tt><idx>.PAGELEN,</idx> <idx>.PAGELENGTH</idx></tt></tag>
+
+<sect1><tt>.PAGELEN, .PAGELENGTH</tt><label id=".PAGELENGTH"><p>
 
   Set the page length for the listing. Must be followed by an integer
   constant. The value may be "unlimited", or in the range 32 to 127. The
@@ -1663,11 +1818,10 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.PARAMCOUNT</idx></tt></tag>
+<sect1><tt>.PARAMCOUNT</tt><label id=".PARAMCOUNT"><p>
 
-  This builtin pseudo variable is only available in macros. It is replaced
-  by the actual number of parameters that were given in the macro
-  invocation.
+  This builtin pseudo variable is only available in macros. It is replaced by
+  the actual number of parameters that were given in the macro invocation.
 
   Example:
 
@@ -1680,22 +1834,27 @@ Here's a list of all control commands and a description, what they do:
  	.endmacro
   </verb></tscreen>
 
+  See section <ref id="macros" name="Macros">).
 
-<tag><tt><idx>.PC02</idx></tt></tag>
+
+<sect1><tt>.PC02</tt><label id=".PC02"><p>
 
   Enable the 65C02 instructions set. This instruction set includes all
   6502 instructions.
 
+  See: <tt><ref id=".P02" name=".P02"></tt> and <tt><ref id=".P816"
+  name=".P816"></tt>
 
-<tag><tt><idx>.PROC</idx></tt></tag>
 
-  Start a nested lexical level. All new symbols from now on are in the
-  local lexical level and are not accessible from outside. Symbols defined
-  outside this local level may be accessed as long as their names are not
-  used for new symbols inside the level. Symbols names in other lexical
-  levels do not clash, so you may use the same names for identifiers. The
-  lexical level ends when the <tt/.ENDPROC/ command is read. Lexical levels
-  may be nested up to a depth of 16.
+<sect1><tt>.PROC</tt><label id=".PROC"><p>
+
+  Start a nested lexical level. All new symbols from now on are in the local
+  lexical level and are not accessible from outside. Symbols defined outside
+  this local level may be accessed as long as their names are not used for new
+  symbols inside the level. Symbols names in other lexical levels do not
+  clash, so you may use the same names for identifiers. The lexical level ends
+  when the <tt><ref id=".ENDPROC" name=".ENDPROC"></tt> command is read.
+  Lexical levels may be nested up to a depth of 16.
 
   The command may be followed by an identifier, in this case the
   identifier is declared in the outer level as a label having the value of
@@ -1719,28 +1878,33 @@ Here's a list of all control commands and a description, what they do:
       	.endproc	      	; Leave lexical level
   </verb></tscreen>
 
+  See: <tt><ref id=".ENDPROC" name=".ENDPROC"></tt>
 
-<tag><tt><idx>.REF,</idx> <idx>.REFERENCED</idx></tt></tag>
 
-  Builtin function. The function expects an identifier as argument in
-  braces. The argument is evaluated, and the function yields "true" if the
-  identifier is a symbol that has already been referenced somewhere in the
-  source file up to the current position. Otherwise the function yields
-  false. As an example, the <tt/.IFREF/ statement may be replaced by
+<sect1><tt>.REF, .REFERENCED</tt><label id=".REFERENCED"><p>
+
+  Builtin function. The function expects an identifier as argument in braces.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is a symbol that has already been referenced somewhere in the source file up
+  to the current position. Otherwise the function yields false. As an example,
+  the <tt><ref id=".IFREF" name=".IFREF"></tt> statement may be replaced by
 
   <tscreen><verb>
 	.if	.referenced(a)
   </verb></tscreen>
 
+  See: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
 
-<tag><tt><idx>.REPEAT</idx></tt></tag>
 
-  Repeat all commands between <tt/.REPEAT/ and <tt/.ENDREPEAT/ a constant
-  number of times. The command is followed by a constant expression that tells
-  how many times the commands in the body should get repeated. Optionally, a
-  comma and an identifier may be specified. If this identifier is found in
-  the body of the repeat statement, it is replaced by the current repeat
-  count (starting with zero for the first time the body is repeated).
+<sect1><tt>.REPEAT</tt><label id=".REPEAT"><p>
+
+  Repeat all commands between <tt/.REPEAT/ and <tt><ref id=".ENDREPEAT"
+  name=".ENDREPEAT"></tt> constant number of times. The command is followed by
+  a constant expression that tells how many times the commands in the body
+  should get repeated. Optionally, a comma and an identifier may be specified.
+  If this identifier is found in the body of the repeat statement, it is
+  replaced by the current repeat count (starting with zero for the first time
+  the body is repeated).
 
   <tt/.REPEAT/ statements may be nested. If you use the same repeat count
   identifier for a nested <tt/.REPEAT/ statement, the one from the inner
@@ -1752,20 +1916,23 @@ Here's a list of all control commands and a description, what they do:
   characters of the string are XORed by the value $55.
 
   <tscreen><verb>
-	.macro	Crypt	Arg
+	.macro	Crypt  	Arg
 		.repeat	strlen(Arg), I
-		.byte	strat(Arg, I) .xor $55
+		.byte  	strat(Arg, I) .xor $55
 		.endrep
 	.endmacro
   </verb></tscreen>
 
-
-<tag><tt><idx>.RELOC</idx></tt></tag>
-
-  Switch back to relocatable mode. See the <tt/.ORG/ command.
+  See: <tt><ref id=".ENDREPEAT" name=".ENDREPEAT"></tt>
 
 
-<tag><tt><idx>.RES</idx></tt></tag>
+<sect1><tt>.RELOC</tt><label id=".RELOC"><p>
+
+  Switch back to relocatable mode. See the <tt><ref id=".ORG"
+  name=".ORG"></tt> command.
+
+
+<sect1><tt>.RES</tt><label id=".RES"><p>
 
   Reserve storage. The command is followed by one or two constant
   expressions. The first one is mandatory and defines, how many bytes of
@@ -1782,7 +1949,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.RIGHT</idx></tt></tag>
+<sect1><tt>.RIGHT</tt><label id=".RIGHT"><p>
 
   Builtin function. Extracts the right part of a given token list.
 
@@ -1795,10 +1962,11 @@ Here's a list of all control commands and a description, what they do:
   The first integer expression gives the number of tokens to extract from
   the token list. The second argument is the token list itself.
 
-  See also the <tt/.LEFT/ and <tt/.MID/ builtin functions.
+  See also the <tt><ref id=".LEFT" name=".LEFT"></tt> and <tt><ref id=".MID"
+  name=".MID"></tt> builtin functions.
 
 
-<tag><tt><idx>.RODATA</idx></tt></tag>
+<sect1><tt>.RODATA</tt><label id=".RODATA"><p>
 
   Switch to the RODATA segment. The name of the RODATA segment is always
   "RODATA", so this is a shortcut for
@@ -1808,10 +1976,12 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   The RODATA segment is a segment that is used by the compiler for
-  readonly data like string constants. See also the <tt/.SEGMENT/ command.
+  readonly data like string constants.
+
+  See also the <tt><ref id=".SEGMENT" name=".SEGMENT"></tt> command.
 
 
-<tag><tt><idx>.SEGMENT</idx></tt></tag>
+<sect1><tt>.SEGMENT</tt><label id=".SEGMENT"><p>
 
   Switch to another segment. Code and data is always emitted into a
   segment, that is, a named section of data. The default segment is
@@ -1848,8 +2018,12 @@ Here's a list of all control commands and a description, what they do:
 	.segment "ZP2", absolute	; Error, redecl mismatch
   </verb></tscreen>
 
+  See: <tt><ref id=".BSS" name=".BSS"></tt>, <tt><ref id=".CODE"
+  name=".CODE"></tt>, <tt><ref id=".DATA" name=".DATA"></tt> and <tt><ref
+  id=".RODATA" name=".RODATA"></tt>
 
-<tag><tt><idx>.SMART</idx></tt></tag>
+
+<sect1><tt>.SMART</tt><label id=".SMART"><p>
 
   Switch on or off smart mode. The command must be followed by a '+' or
   '-' character to switch the option on or off respectively. The default
@@ -1872,7 +2046,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.STRAT</idx></tt></tag>
+<sect1><tt>.STRAT</tt><label id=".STRAT"><p>
 
   Builtin function. The function accepts a string and an index as
   arguments and returns the value of the character at the given position
@@ -1890,14 +2064,14 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.STRING</idx></tt></tag>
+<sect1><tt>.STRING</tt><label id=".STRING"><p>
 
-  Builtin function. The function accepts an argument in braces and
-  converts this argument into a string constant. The argument may be an
-  identifier, or a constant numeric value.
-  Since you can use a string in the first place, the use of the function
-  may not be obvious. However, it is useful in macros, or more complex
-  setups.
+  Builtin function. The function accepts an argument in braces and converts
+  this argument into a string constant. The argument may be an identifier, or
+  a constant numeric value.
+
+  Since you can use a string in the first place, the use of the function may
+  not be obvious. However, it is useful in macros, or more complex setups.
 
   Example:
 
@@ -1909,7 +2083,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.STRLEN</idx></tt></tag>
+<sect1><tt>.STRLEN</tt><label id=".STRLEN"><p>
 
   Builtin function. The function accepts a string argument in braces and
   eveluates to the length of the string.
@@ -1926,7 +2100,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.TCOUNT</idx></tt></tag>
+<sect1><tt>.TCOUNT</tt><label id=".TCOUNT"><p>
 
   Builtin function. The function accepts a token list in braces. The
   function result is the number of tokens given as argument.
@@ -1950,7 +2124,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.WARNING</idx></tt></tag>
+<sect1><tt>.WARNING</tt><label id=".WARNING"><p>
 
   Force an assembly warning. The assembler will output a warning message
   preceeded by "User warning". This warning will always be output, even
@@ -1975,10 +2149,11 @@ Here's a list of all control commands and a description, what they do:
 	.endmacro
   </verb></tscreen>
 
-  See also the <tt/.ERROR/ and <tt/.OUT/ directives.
+  See also the <tt><ref id=".ERROR" name=".ERROR"></tt> and <tt><ref id=".OUT"
+  name=".OUT"></tt> directives.
 
 
-<tag><tt><idx>.WORD</idx></tt></tag>
+<sect1><tt>.WORD</tt><label id=".WORD"><p>
 
   Define word sized data. Must be followed by a sequence of (word ranged,
   but not necessarily constant) expressions.
@@ -1990,7 +2165,36 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt><idx>.ZEROPAGE</idx></tt></tag>
+<sect1><tt>.XMATCH</tt><label id=".XMATCH"><p>
+
+  Builtin function. Matches two token lists against each other. This is
+  most useful within macros, since macros are not stored as strings, but
+  as lists of tokens.
+
+  The syntax is
+
+  <tscreen><verb>
+       	.XMATCH(&lt;token list #1&gt;, &lt;token list #2&gt;)
+  </verb></tscreen>
+
+  Both token list may contain arbitrary tokens with the exception of the
+  terminator token (comma resp. right parenthesis) and
+
+  <itemize>
+  <item>end-of-line
+  <item>end-of-file
+  </itemize>
+
+  Often a macro parameter is used for any of the token lists.
+
+  The function compares tokens <em/and/ token values. If you need a function
+  that just compares the type of tokens, have a look at the <tt><ref
+  id=".MATCH" name=".MATCH"></tt> function.
+
+  See: <tt><ref id=".MATCH" name=".MATCH"></tt>
+
+
+<sect1><tt>.ZEROPAGE</tt><label id=".ZEROPAGE"><p>
 
   Switch to the ZEROPAGE segment and mark it as direct (zeropage) segment.
   The name of the ZEROPAGE segment is always "ZEROPAGE", so this is a
@@ -2005,17 +2209,22 @@ Here's a list of all control commands and a description, what they do:
   the linker to place this segment somewhere in the address range 0..$FF
   otherwise you will get errors.
 
-</descrip>
+  See: <tt><ref id=".SEGMENT" name=".SEGMENT"></tt>
 
 
 
-<sect>Macros
+<sect>Macros<label id="macros"><p>
 
-<p>
+
+<sect1>Introduction<p>
+
 Macros may be thought of as "parametrized super instructions". Macros are
 sequences of tokens that have a name. If that name is used in the source
 file, the macro is "expanded", that is, it is replaced by the tokens that
 were specified when the macro was defined.
+
+
+<sect1>Macros without parameters<p>
 
 In it's simplest form, a macro does not have parameters. Here's an
 example:
@@ -2036,6 +2245,9 @@ by using the name, like this:
   	asr
   	sta	$2010
 </verb></tscreen>
+
+
+<sect1>Parametrized macros<p>
 
 When using macro parameters, macros can be even more useful:
 
@@ -2080,10 +2292,11 @@ macro definition above, you will see, that replacing the "addr" parameter
 by nothing will lead to wrong code in most lines. To help you, writing
 macros with a variable parameter list, there are some control commands:
 
-<tt/.IFBLANK/ tests the rest of the line and returns true, if there are any
-tokens on the remainder of the line. Since empty parameters are replaced by
-nothing, this may be used to test if a given parameter is empty.
-<tt/.IFNBLANK/ tests the opposite.
+<tt><ref id=".IFBLANK" name=".IFBLANK"></tt> tests the rest of the line and
+returns true, if there are any tokens on the remainder of the line. Since
+empty parameters are replaced by nothing, this may be used to test if a given
+parameter is empty. <tt><ref id=".IFNBLANK" name=".IFNBLANK"></tt> tests the
+opposite.
 
 Look at this example:
 
@@ -2112,16 +2325,20 @@ This macro may be called as follows:
 </verb></tscreen>
 
 There's another helper command for determining, which macro parameters are
-valid: <tt/.PARAMCOUNT/. This command is replaced by the parameter count
-given, <em/including/ intermediate empty macro parameters:
+valid: <tt><ref id=".PARAMCOUNT" name=".PARAMCOUNT"></tt> This command is
+replaced by the parameter count given, <em/including/ intermediate empty macro
+parameters:
 
 <tscreen><verb>
-  	ldaxy  	1      		; .PARAMCOUNT = 1
-  	ldaxy	1,,3   		; .PARAMCOUNT = 3
-  	ldaxy	1,2    		; .PARAMCOUNT = 2
-  	ldaxy	1,     		; .PARAMCOUNT = 2
-  	ldaxy	1,2,3  		; .PARAMCOUNT = 3
+  	ldaxy  	1      	       	; .PARAMCOUNT = 1
+  	ldaxy	1,,3   	       	; .PARAMCOUNT = 3
+  	ldaxy	1,2    	       	; .PARAMCOUNT = 2
+  	ldaxy	1,     	       	; .PARAMCOUNT = 2
+  	ldaxy	1,2,3  	       	; .PARAMCOUNT = 3
 </verb></tscreen>
+
+
+<sect1>Recursive macros<p>
 
 Macros may be used recursively:
 
@@ -2135,19 +2352,20 @@ Macros may be used recursively:
   	.endmacro
 </verb></tscreen>
 
-There's also a special macro to help writing recursive macros:
-<tt/.EXITMACRO/. This command will stop macro expansion immidiately:
+There's also a special macro to help writing recursive macros: <tt><ref
+id=".EXITMACRO" name=".EXITMACRO"></tt> This command will stop macro expansion
+immidiately:
 
 <tscreen><verb>
   	.macro 	push   	r1, r2, r3, r4, r5, r6, r7
   	.ifblank       	r1
-  		; First parameter is empty
-  		.exitmacro
+  	      	; First parameter is empty
+  	      	.exitmacro
   	.else
-  		lda    	r1
-  		pha
+  	      	lda    	r1
+  	      	pha
   	.endif
-  		push   	r2, r3, r4, r5, r6, r7
+  	      	push   	r2, r3, r4, r5, r6, r7
   	.endmacro
 </verb></tscreen>
 
@@ -2156,21 +2374,25 @@ until an empty one is encountered. The macro may be called like this:
 
 <tscreen><verb>
   	push   	$20, $21, $32		; Push 3 ZP locations
-  	push	$21    			; Push one ZP location
+  	push  	$21    			; Push one ZP location
 </verb></tscreen>
 
-Now, with recursive macros, <tt/.IFBLANK/ and <tt/.PARAMCOUNT/, what else do
-you need? Have a look at the inc16 macro above. Here is it again:
+
+<sect1>Local symbols inside macros<p>
+
+Now, with recursive macros, <tt><ref id=".IFBLANK" name=".IFBLANK"></tt> and
+<tt><ref id=".PARAMCOUNT" name=".PARAMCOUNT"></tt>, what else do you need?
+Have a look at the inc16 macro above. Here is it again:
 
 <tscreen><verb>
   	.macro 	inc16  	addr
-  		clc
-  		lda    	addr
-  		adc    	#$01
-  		sta    	addr
-  		lda    	addr+1
-  		adc    	#$00
-  		sta    	addr+1
+  	      	clc
+  	      	lda    	addr
+  	      	adc    	#$01
+  	      	sta    	addr
+  	      	lda    	addr+1
+  	      	adc    	#$00
+  	      	sta    	addr+1
   	.endmacro
 </verb></tscreen>
 
@@ -2181,7 +2403,7 @@ written more efficiently, like this:
   	.macro 	inc16  	addr
   		clc
   		lda    	addr
-  	 	adc    	#$01
+  	    	adc    	#$01
   		sta    	addr
   	   	bcc    	Skip
   	   	inc    	addr+1
@@ -2212,10 +2434,10 @@ macro:
 Now the label is local to the block and not visible outside. However,
 sometimes you want a label inside the macro to be visible outside. To make
 that possible, there's a new command that's only usable inside a macro
-definition: <tt/.LOCAL/. <tt/.LOCAL/ declares one or more symbols as local to
-the macro expansion. The names of local variables are replaced by a unique
-name in each separate macro expansion. So we could also solve the problem
-above by using <tt/.LOCAL/:
+definition: <tt><ref id=".LOCAL" name=".LOCAL"></tt>. <tt/.LOCAL/ declares one
+or more symbols as local to the macro expansion. The names of local variables
+are replaced by a unique name in each separate macro expansion. So we could
+also solve the problem above by using <tt/.LOCAL/:
 
 <tscreen><verb>
      	.macro 	inc16	addr
@@ -2230,6 +2452,9 @@ above by using <tt/.LOCAL/:
   	.endmacro
 </verb></tscreen>
 
+
+<sect1>C style macros<p>
+
 Starting with version 2.5 of the assembler, there is a second macro type
 available: C style macros using the <tt/.DEFINE/ directive. These macros are
 similar to the classic macro type speified above, but behaviour is sometimes
@@ -2237,31 +2462,34 @@ different:
 
 <itemize>
 
-<item>	Macros defined with <tt/.DEFINE/ may not span more than a line. You
-	may use line continuation (see <tt/.LINECONT/) to spread the
-	definition over more than one line for increased readability, but the
-	macro itself does not contain an end-of-line token.
+<item>	Macros defined with <tt><ref id=".DEFINE" name=".DEFINE"></tt> may not
+	span more than a line. You may use line continuation (see <tt><ref
+	id=".LINECONT" name=".LINECONT"></tt>) to spread the definition over
+	more than one line for increased readability, but the macro itself
+	does not contain an end-of-line token.
 
-<item>	Macros defined with <tt/.DEFINE/ share the name space with classic
-	macros, but they are detected and replaced at the scanner level. While
-	classic macros may be used in every place, where a mnemonic or other
-	directive is allowed, <tt/.DEFINE/ style macros are allowed anywhere
-	in a line. So they are more versatile in some situations.
+<item>	Macros defined with <tt><ref id=".DEFINE" name=".DEFINE"></tt> share
+	the name space with classic macros, but they are detected and replaced
+	at the scanner level. While classic macros may be used in every place,
+	where a mnemonic or other directive is allowed, <tt><ref id=".DEFINE"
+	name=".DEFINE"></tt> style macros are allowed anywhere in a line. So
+	they are more versatile in some situations.
 
-<item>	<tt/.DEFINE/ style macros may take parameters. While classic macros
-	may have empty parameters, this is not true for <tt/.DEFINE/ style
-	macros. For this macro type, the number of actual parameters must
-	match exactly the number of formal parameters.
+<item>	<tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros may take
+	parameters. While classic macros may have empty parameters, this is
+	not true for <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros.
+	For this macro type, the number of actual parameters must match
+	exactly the number of formal parameters.
 
 	To make this possible, formal parameters are enclosed in braces when
 	defining the macro. If there are no parameters, the empty braces may
 	be omitted.
 
-<item>	Since <tt/.DEFINE/ style macros may not contain end-of-line tokens,
-	there are things that cannot be done. They may not contain several
-	processor instructions for example. So, while some things may be done
-	with both macro types, each type has special usages. The types
-	complement each other.
+<item>	Since <tt><ref id=".DEFINE" name=".DEFINE"></tt> style macros may not
+	contain end-of-line tokens, there are things that cannot be done. They
+	may not contain several processor instructions for example. So, while
+	some things may be done with both macro types, each type has special
+	usages. The types complement each other.
 
 </itemize>
 
@@ -2274,7 +2502,7 @@ following <tt/.DEFINE/:
 <tscreen><verb>
       	.define	EQU   	=
 
-      	foo	EQU   	$1234	   	; This is accepted now
+      	foo  	EQU   	$1234	   	; This is accepted now
 </verb></tscreen>
 
 You may use the directive to define string constants used elsewhere:
@@ -2302,30 +2530,47 @@ don't like that, use classic macros instead:
 
 <tscreen><verb>
    	.macro 	message
-   		.out	message
+   	     	.out	message
    	.endmacro
 </verb></tscreen>
 
 (This is an example where a problem can be solved with both macro types).
 
 
+<sect1>Characters in macros<p>
 
-<sect>Macro packages
+When using the <ref id="option-t" name="-t"> option, characters are translated
+into the target character set of the specific machine. However, this happens
+as late as possible. This means that strings are translated if they are part
+of a <tt><ref id=".BYTE" name=".BYTE"></tt> or <tt><ref id=".ASCIIZ"
+name=".ASCIIZ"></tt> command. Characters are translated as soon as they are
+used as part of an expression.
 
-<p>
-Using the <tt/.MACPACK/ directive, predefined macro packages may be included
-with just one command. Available macro packages are:
+This behaviour is very intuitive - outside of macros. With macros, it will
+lead sometimes to problems, since the exact time of translation depends on the
+exact use.
 
-<descrip>
 
-<tag><tt><idx>generic</idx></tt></tag>
 
-  This macro package defines macros that are useful in almost any program.
-  Currently, two macros are defined:
 
-  <tscreen><verb>
-   	.macro  add     Arg
-   	     	clc
+
+
+
+<sect>Macro packages<p>
+
+Using the <tt><ref id=".MACPACK" name=".MACPACK"></tt> directive, predefined
+macro packages may be included with just one command. Available macro packages
+are:
+
+
+<sect1><tt>.MACPACK generic</tt><p>
+
+This macro package defines macros that are useful in almost any program.
+Currently, two macros are defined:
+
+<tscreen><verb>
+      	.macro  add     Arg
+      	     	clc
    	     	adc     Arg
    	.endmacro
 
@@ -2333,17 +2578,17 @@ with just one command. Available macro packages are:
    	     	sec
    	     	sbc     Arg
    	.endmacro
-  </verb></tscreen>
+</verb></tscreen>
 
 
-<tag><tt><idx>longbranch</idx></tt></tag>
+<sect1><tt>.MACPACK longbranch</tt><p>
 
-  This macro package defines long conditional jumps. They are named like the
-  short counterpart but with the 'b' replaced by a 'j'. Here is a sample
-  definition for the "<tt/jeq/" macro, the other macros are built using the
-  same scheme:
+This macro package defines long conditional jumps. They are named like the
+short counterpart but with the 'b' replaced by a 'j'. Here is a sample
+definition for the "<tt/jeq/" macro, the other macros are built using the same
+scheme:
 
-  <tscreen><verb>
+<tscreen><verb>
        	.macro	jeq	Target
        	    	.if	.def(Target) .and ((*+2)-(Target) <= 127)
        	    	beq	Target
@@ -2352,20 +2597,117 @@ with just one command. Available macro packages are:
        	    	jmp	Target
        	    	.endif
        	.endmacro
-  </verb></tscreen>
+</verb></tscreen>
 
-  All macros expand to a short branch, if the label is already defined (back
-  jump) and is reachable with a short jump. Otherwise the macro expands to a
-  conditional branch with the branch condition inverted, followed by an
-  absolute jump to the actual branch target.
+All macros expand to a short branch, if the label is already defined (back
+jump) and is reachable with a short jump. Otherwise the macro expands to a
+conditional branch with the branch condition inverted, followed by an absolute
+jump to the actual branch target.
 
-  The package defines the following macros:
+The package defines the following macros:
 
-  <tscreen><verb>
+<tscreen><verb>
        	jeq, jne, jmi, jpl, jcs, jcc, jvs, jvc
-  </verb></tscreen>
+</verb></tscreen>
 
-</descrip>
+
+
+<sect>Module constructors/destructors<label id="condes"><p>
+
+<em>Note:</em> This section applies mostly to C programs, so the explanation
+below uses examples from the C libraries. However, the feature may also be
+useful for assembler programs.
+
+
+<sect1>Overview<p>
+
+Using the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> and <tt><ref
+id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> keywords it it possible to export
+functions in a special way. The linker is able to generate tables with all
+functions of a specific type. Such a table will <em>only</em> include symbols
+from object files that are linked into a specific executable. This may be used
+to add initialization and cleanup code for library modules.
+
+The C heap functions are an example where module initialization code is used.
+All heap functions (<tt>malloc</tt>, <tt>free</tt>, ...) work with a few
+variables that contain the start and the end of the heap, pointers to the free
+list and so on. Since the end of the heap depends on the size and start of the
+stack, it must be initialized at runtime. However, initializing these
+variables for programs that do not use the heap are a waste of time and
+memory.
+
+So the central module defines a function that contains initialization code and
+exports this function using the <tt/.CONSTRUCTOR/ statement. If (and only if)
+this module is added to an executable by the linker, the initialization
+function will be placed into the table of constructors by the linker. The C
+startup code will call all constructors before <tt/main/ and all destructors
+after <tt/main/, so without any further work, the heap initialization code is
+called once the module is linked in.
+
+While it would be possible to add explicit calls to initialization functions
+in the startup code, the new approach has several advantages:
+
+<enum>
+<item>
+If a module is not included, the initialization code is not linked in and not
+called. So you don't pay for things you don't need.
+
+<item>
+Adding another library that needs initialization does not mean that the
+startup code has to be changed. Before we had module constructors and
+destructors, the startup code for all systems had to be adjusted to call the
+new initialization code.
+
+<item>
+The feature saves memory: Each additional initialization function needs just
+two bytes in the table (a pointer to the function).
+
+</enum>
+
+
+<sect1>Pitfalls<p>
+
+When creating and using module constructors and destructors, please take care
+of the following:
+
+<itemize>
+
+<item>
+The linker will only generate function tables, it will not generate code to
+call these functions. If you're using the feature in some other than the
+existing C environments, you have to write code to call all functions in a
+linker generated table yourself. See the <tt>condes</tt> module in the C
+runtime for an example on how to do this.
+
+<item>
+The linker will only add addresses of functions that are in modules linked to
+the executable. This means that you have to be careful where to place the
+condes functions. If initialization is needed for a group of functions, be
+sure to place the initialization function into a module that is linked in
+regardless of which function is called by the user.
+
+<item>
+The linker will generate the tables only when requested to do so by the
+<tt/FEATURE CONDES/ statement in the linker config file. Each table has to
+be requested separately.
+
+<item>
+Constructors and destructors may have priorities. These priorities determine
+the order of the functions in the table. If your intialization or cleanup code
+does depend on other intiialization or cleanup code, you have to choose the
+priority for the functions accordingly.
+
+<item>
+Besides the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> and <tt><ref
+id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> statements, there is also a more
+generic command: <tt><ref id=".CONDES" name=".CONDES"></tt>. This allows to
+specify an additional type. Predefined types are 0 (constructor) and 1
+(destructor). The linker generates a separate table for each type on request.
+
+</itemize>
+
+
+
 
 
 <sect>Bugs/Feedback<p>

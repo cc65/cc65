@@ -1,5 +1,6 @@
 ;
-; Extended memory driver for the Commodore REU
+; Extended memory driver for the Commodore REU. Driver works without
+; problems when statically linked.
 ;
 ; Ullrich von Bassewitz, 2002-11-29
 ;
@@ -91,7 +92,7 @@ INSTALL:
         beq     @L1
         ldx     #>(256*4)               ; 256KB when size bit is set
 @L1:    stx     pagecount+1
-         
+
         ldx     #$FF
         stx     curpage
         stx     curpage+1               ; Invalidate the current page

@@ -403,7 +403,7 @@ static unsigned Opt_tosorax (CodeSeg* S, unsigned Push, unsigned Or,
     X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
     CS_InsertEntry (S, X, Push+1);
     ++Or;  /* Correct the index */
-    if (DirectOr) {
+    if (!DirectOr) {
      	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
      	CS_InsertEntry (S, X, Push+1);
      	++Or;  /* Correct the index */
@@ -471,13 +471,13 @@ static unsigned Opt_tosxorax (CodeSeg* S, unsigned Push, unsigned Xor,
      * value in the zero page location.
      */
     DirectXor = (P->OPC == OP65_LDA &&
-		 (P->AM == AM65_IMM || P->AM == AM65_ZP || P->AM == AM65_ABS));
+	 	 (P->AM == AM65_IMM || P->AM == AM65_ZP || P->AM == AM65_ABS));
 
     /* Store the value into the zeropage instead of pushing it */
     X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
     CS_InsertEntry (S, X, Push+1);
     ++Xor;  /* Correct the index */
-    if (DirectXor) {
+    if (!DirectXor) {
 	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
 	CS_InsertEntry (S, X, Push+1);
 	++Xor;  /* Correct the index */

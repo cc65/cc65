@@ -346,7 +346,8 @@ DONE:
 	jsr VDCWriteReg		; restore color (background)
 	lda #$47
 	ldx #VDC_HSCROLL
-	jmp VDCWriteReg		; switch to text screen
+	jsr VDCWriteReg		; switch to text screen
+; fall through to GETERROR in order to clear ERROR status
 
 ; ------------------------------------------------------------------------
 ; GETERROR: Return the error code in A and clear it.

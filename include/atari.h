@@ -127,32 +127,37 @@ extern void __fastcall__ scroll (signed char numlines);
                                           /* numlines < 0  scrolls down */
 
 /* misc. functions */
-extern void save_vecs(void);          /* save system vectors */
-extern void rest_vecs(void);          /* restore system vectors */
-extern unsigned int get_ostype(void); /* get ROM version */
+extern void save_vecs(void);           /* save system vectors */
+extern void rest_vecs(void);           /* restore system vectors */
+extern unsigned char get_ostype(void); /* get ROM version */
+extern unsigned char get_tv(void);     /* get TV system */
 
 /* get_ostype return value defines (for explanation, see ostype.s) */
 /* masks */
 #define AT_OS_TYPE_MAIN  7
-#define AT_OS_PALNTSC    (3 << 3)
-#define AT_OS_TYPE_MINOR (7 << 5)
+#define AT_OS_TYPE_MINOR (7 << 3)
 /* AT_OS_TYPE_MAIN values */
 #define AT_OS_UNKNOWN  0
 #define AT_OS_400800   1
 #define AT_OS_1200XL   2
 #define AT_OS_XLXE     3
-/* AT_OS_PALNTSC values */
-#define AT_OS_PAL      1
-#define AT_OS_NTSC     2
 /* AS_OS_TYPE_MINOR values */
-#define AT_OS_400800_A 1
-#define AT_OS_400800_B 2
+/* for 400/800 remember this are the ROM versions */
+/* to check whether the hw is PAL or NTSC, use get_tv() */
+#define AT_OS_400800PAL_A  1
+#define AT_OS_400800PAL_B  2
+#define AT_OS_400800NTSC_A 1
+#define AT_OS_400800NTSC_B 2
 #define AT_OS_1200_10  1
 #define AT_OS_1200_11  2
 #define AT_OS_XLXE_1   1
 #define AT_OS_XLXE_2   2
 #define AT_OS_XLXE_3   3
 #define AT_OS_XLXE_4   4
+
+/* get_tv return values */
+#define AT_NTSC     0
+#define AT_PAL      1
 
 /* Define hardware */
 #include <_gtia.h>

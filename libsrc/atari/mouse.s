@@ -28,7 +28,7 @@ MAX_TYPE	= 3	; first illegal device type
 
 ; the default values force the mouse cursor inside the test screen (no access to border)
 defxmin = 48		; default x minimum
-defymin = 32		; default y minimum
+defymin = 31		; default y minimum
 defxmax = 204		; default x maximum
 defymax = 211		; default y maximum
 

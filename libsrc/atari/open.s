@@ -1,5 +1,5 @@
 ;
-; Christian Groessler, May-2002
+; Christian Groessler, Jan-2003
 ;
 ; int open(const char *name,int flags,...);
 ;
@@ -7,7 +7,12 @@
 	.include "atari.inc"
 	.include "fcntl.inc"
 	.include "errno.inc"
+	.include "fd.inc"
+
 	.export	_open
+        .destructor     closeallfiles, 17
+
+	.import _close
 	.import	clriocb
 	.import	fddecusage,newfd
 	.import	findfreeiocb
@@ -47,7 +52,6 @@ iocbok:	stx	tmp4
 	jsr	clriocb		; init with zero
 	ldy	#1
 	jsr	ldaxysp		; get mode
-	;brk
 	ldx	tmp4
 	pha
 	and	#O_APPEND
@@ -146,6 +150,23 @@ finish:	php
 ok:	lda	tmp2		; get fd
 	ldx	#0
 	stx	__oserror
+	rts
+
+.endproc
+
+
+; closeallfiles: Close all files opened by the program.
+
+.proc   closeallfiles
+
+	lda	#MAX_FD_INDEX-1
+loop:	ldx	#0
+	pha
+	jsr	_close
+	pla
+	clc
+	sbc	#0
+	bpl	loop
 	rts
 
 .endproc

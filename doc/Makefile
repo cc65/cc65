@@ -6,6 +6,7 @@
 # Default for the compiler lib search path as compiler define
 
 SGML  =	ar65.sgml	\
+        c64.sgml        \
 	ca65.sgml	\
 	cc65.sgml	\
 	cl65.sgml   	\

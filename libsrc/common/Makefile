@@ -23,7 +23,6 @@ C_OBJS =	_afailed.o	\
 		fgetc.o		\
 		fgetpos.o	\
 		fgets.o		\
-		fopen.o		\
 		fputc.o		\
 		fputs.o		\
 		fread.o		\
@@ -72,6 +71,7 @@ S_OBJS = 	_fdesc.o 	\
                 divt.o          \
 		errno.o		\
 		fmisc.o 	\
+		fopen.o		\
 		fprintf.o	\
 		free.o		\
 		getcpu.o	\

@@ -87,7 +87,7 @@ enum {
     FILETYPE_ASM,
     FILETYPE_OBJ,
     FILETYPE_LIB,
-    FILETYPE_GR,  		/* GEOS resource file */
+    FILETYPE_GR  		/* GEOS resource file */
 };
 
 /* Default file type, used if type unknown */
@@ -948,4 +948,4 @@ int main (int argc, char* argv [])
 
 
 
-				
+

@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1999-2002 Ullrich von Bassewitz					     */
-/*		 Wacholderweg 14					     */
-/*		 D-70597 Stuttgart					     */
-/* EMail:	 uz@musoftware.de					     */
+/* (C) 1999-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -91,6 +91,7 @@ struct CmdDesc {
 /* Command descriptors for the different programs */
 static CmdDesc CC65 = { 0, 0, 0, 0, 0, 0, 0 };
 static CmdDesc CA65 = { 0, 0, 0, 0, 0, 0, 0 };
+static CmdDesc CO65 = { 0, 0, 0, 0, 0, 0, 0 };
 static CmdDesc LD65 = { 0, 0, 0, 0, 0, 0, 0 };
 static CmdDesc GRC  = { 0, 0, 0, 0, 0, 0, 0 };
 
@@ -101,7 +102,8 @@ enum {
     FILETYPE_ASM,
     FILETYPE_OBJ,
     FILETYPE_LIB,
-    FILETYPE_GR  		/* GEOS resource file */
+    FILETYPE_GR,  		/* GEOS resource file */
+    FILETYPE_O65                /* O65 object file */
 };
 
 /* Default file type, used if type unknown */
@@ -175,6 +177,10 @@ static unsigned GetFileType (const char* File)
 	{   ".a",	FILETYPE_LIB	},
 	{   ".lib",	FILETYPE_LIB	},
 	{   ".grc",	FILETYPE_GR	},
+        {   ".o65",     FILETYPE_O65    },
+        {   ".emd",     FILETYPE_O65    },
+        {   ".joy",     FILETYPE_O65    },
+        {   ".tgi",     FILETYPE_O65    },
     };
 
     unsigned I;
@@ -496,7 +502,7 @@ static void Compile (const char* File)
 {
     char* AsmName = 0;
 
-    /* Remember the current assembler argument count */
+    /* Remember the current compiler argument count */
     unsigned ArgCount = CC65.ArgCount;
 
     /* Set the target system */
@@ -565,6 +571,55 @@ static void CompileRes (const char* File)
 
     /* Remove the excess arguments */
     CmdDelArgs (&GRC, ArgCount);
+
+    /* If this is not the final step, assemble the generated file, then
+     * remove it
+     */
+    if (!DontAssemble) {
+	Assemble (AsmName);
+	if (remove (AsmName) < 0) {
+	    Warning ("Cannot remove temporary file `%s': %s",
+		     AsmName, strerror (errno));
+	}
+    }
+
+    /* Free the assembler file name which was allocated from the heap */
+    xfree (AsmName);
+}
+
+
+
+static void ConvertO65 (const char* File)
+/* Convert an o65 object file into an assembler file */
+{
+    char* AsmName = 0;
+
+    /* Remember the current converter argument count */
+    unsigned ArgCount = CO65.ArgCount;
+
+    /* If we won't link, this is the final step. In this case, set the
+     * output name.
+     */
+    if (DontAssemble && OutputName) {
+	CmdSetOutput (&CO65, OutputName);
+    } else {
+	/* The assembler file name will be the name of the source file
+	 * with .c replaced by ".s".
+	 */
+	AsmName = MakeFilename (File, ".s");
+    }
+
+    /* Add the file as argument for the object file converter */
+    CmdAddArg (&CO65, File);
+
+    /* Add a NULL pointer to terminate the argument list */
+    CmdAddArg (&CO65, 0);
+
+    /* Run the converter */
+    ExecProgram (&CO65);
+
+    /* Remove the excess arguments */
+    CmdDelArgs (&CO65, ArgCount);
 
     /* If this is not the final step, assemble the generated file, then
      * remove it
@@ -917,7 +972,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print version number */
 {
     fprintf (stderr,
- 	     "cl65 V%u.%u.%u - (C) Copyright 1998-2002 Ullrich von Bassewitz\n",
+ 	     "cl65 V%u.%u.%u - (C) Copyright 1998-2003 Ullrich von Bassewitz\n",
  	     VER_MAJOR, VER_MINOR, VER_PATCH);
 }
 
@@ -966,6 +1021,7 @@ int main (int argc, char* argv [])
     /* Initialize the command descriptors */
     CmdInit (&CC65, "cc65");
     CmdInit (&CA65, "ca65");
+    CmdInit (&CO65, "co65");
     CmdInit (&LD65, "ld65");
     CmdInit (&GRC,  "grc");
 
@@ -1147,6 +1203,11 @@ int main (int argc, char* argv [])
 		    /* Add to the resource compiler files */
 		    CompileRes (Arg);
 		    break;
+
+                case FILETYPE_O65:
+                    /* Add the the object file converter files */
+                    ConvertO65 (Arg);
+                    break;
 
 	     	default:
 	     	    Error ("Don't know what to do with `%s'", Arg);

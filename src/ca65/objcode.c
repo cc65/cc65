@@ -458,8 +458,6 @@ static void WriteOneSeg (Segment* Seg)
 /* Write one segment to the object file */
 {
     Fragment* Frag;
-    Fragment* F;
-    unsigned long Size;
     unsigned LineInfoIndex;
 
     /* Write the segment name followed by the byte count in this segment */
@@ -478,26 +476,9 @@ static void WriteOneSeg (Segment* Seg)
        	switch (Frag->Type) {
 
     	    case FRAG_LITERAL:
-    		/* To make the object file somewhat smaller, write all literal
-    		 * data of this and the following fragments preceeded by the
-    		 * length.
-    		 */
-    		F = Frag;
-    		Size = 0;
-    		while (F && F->Type == FRAG_LITERAL) {
-    		    Size += F->Len;
-    		    F = F->Next;
-    		}
 		ObjWrite8 (FRAG_LITERAL);
-		ObjWriteVar (Size);
-
-    		/* Now write the literal data */
-    		F = Frag;
-    		while (F && F->Type == FRAG_LITERAL) {
-    		    ObjWriteData (F->V.Data, F->Len);
-    		    Frag = F;
-    		    F = F->Next;
-    		}
+		ObjWriteVar (Frag->Len);
+	        ObjWriteData (Frag->V.Data, Frag->Len);
     		break;
 
     	    case FRAG_EXPR:
@@ -537,7 +518,7 @@ static void WriteOneSeg (Segment* Seg)
 
 	/* Write extra line info for this fragment. Zero is considered
 	 * "no line info", so add one to the value.
-	 */		   
+	 */
 	LineInfoIndex = Frag->LI? Frag->LI->Index + 1 : 0;
 	ObjWriteVar (LineInfoIndex);
 

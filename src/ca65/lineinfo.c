@@ -166,8 +166,17 @@ static int CmpLineInfo (void* Data, const void* LI1_, const void* LI2_)
 void MakeLineInfoIndex (void)
 /* Sort the line infos and drop all unreferenced ones */
 {
+    unsigned I;
+
     /* Sort the collection */
     CollSort (&LineInfoColl, CmpLineInfo, 0);
+
+    /* Walk over the list and index the line infos. */
+    for (I = 0; I < LineInfoValid; ++I) {
+	/* Get a pointer to this line info */
+	LineInfo* LI = CollAtUnchecked (&LineInfoColl, I);
+	LI->Index = I;
+    }
 }
 
 
@@ -203,6 +212,9 @@ void WriteLineInfo (void)
 	ObjWriteVar (0);
 
     }
+
+    /* End of line infos */
+    ObjEndLineInfos ();
 }
 
 

@@ -8,8 +8,7 @@
  */
 
 #include <cbm.h>
-
-extern unsigned char _oserror;
+#include <errno.h>
 
 /* saves a memory area from start to end-1 to a file.
  */

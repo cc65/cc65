@@ -5,8 +5,7 @@
  */
 
 #include <cbm.h>
-
-extern unsigned char _oserror;         
+#include <errno.h>
 
 /* loads file "name" from given device to given address or to the load address
  * of the file if addr is 0

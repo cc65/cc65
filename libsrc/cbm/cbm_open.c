@@ -6,8 +6,7 @@
  */
  
 #include <cbm.h>
-
-extern unsigned char _oserror;
+#include <errno.h>
 
 /* It's like BASIC's: OPEN lfn, device, sec_addr, "name"
  */

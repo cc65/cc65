@@ -5,8 +5,7 @@
  */
 
 #include <cbm.h>
-
-extern unsigned char _oserror;
+#include <errno.h>
 
 int cbm_write(unsigned char lfn, void* buffer, unsigned int size) {
 
@@ -22,7 +21,7 @@ int cbm_write(unsigned char lfn, void* buffer, unsigned int size) {
     }
 
     if (cbm_k_readst()) {
-        _oserror = 5; /* device not present */
+        _oserror = 5;       /* device not present */
         byteswritten = -1;
     }
         

@@ -5,8 +5,7 @@
  */
 
 #include <cbm.h>
-
-extern unsigned char _oserror;
+#include <errno.h>
 
 int cbm_read(unsigned char lfn, void* buffer, unsigned int size)
 {

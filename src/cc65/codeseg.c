@@ -42,9 +42,9 @@
 #include "debugflag.h"
 #include "global.h"
 #include "hashstr.h"
+#include "strbuf.h"
 #include "strutil.h"
 #include "xmalloc.h"
-#include "xsprintf.h"
 
 /* cc65 */
 #include "asmlabel.h"
@@ -506,11 +506,11 @@ void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
     char        Token[IDENTSIZE+10];
 
     /* Format the line */
-    char Buf [256];
-    xvsprintf (Buf, sizeof (Buf), Format, ap);
+    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
+    SB_VPrintf (&Buf, Format, ap);
 
     /* Skip whitespace */
-    L = SkipSpace (Buf);
+    L = SkipSpace (SB_GetConstBuf (&Buf));
 
     /* Check which type of instruction we have */
     E = 0;  	/* Assume no insn created */
@@ -539,6 +539,9 @@ void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
     if (E) {
 	CS_AddEntry (S, E);
     }
+
+    /* Cleanup the string buffer */
+    DoneStrBuf (&Buf);
 }
 
 

@@ -271,9 +271,8 @@ static void Parse (void)
 void Compile (const char* FileName)
 /* Top level compile routine. Will setup things and call the parser. */
 {
-    char        Buf[20];
-    char        DateStr[20];
-    char        TimeStr[20];
+    char        DateStr[32];
+    char        TimeStr[32];
     time_t      Time;
     struct tm*  TM;
 
@@ -300,23 +299,23 @@ void Compile (const char* FileName)
      */
     if (IS_Get (&Optimize)) {
         long CodeSize = IS_Get (&CodeSizeFactor);
-	DefineNumericMacro ("__OPT__", 1);
+    	DefineNumericMacro ("__OPT__", 1);
        	if (CodeSize > 100) {
-	    DefineNumericMacro ("__OPT_i__", CodeSize);
-	}
-	if (IS_Get (&EnableRegVars)) {
-	    DefineNumericMacro ("__OPT_r__", 1);
-	}
+    	    DefineNumericMacro ("__OPT_i__", CodeSize);
+    	}
+    	if (IS_Get (&EnableRegVars)) {
+    	    DefineNumericMacro ("__OPT_r__", 1);
+    	}
        	if (IS_Get (&InlineStdFuncs)) {
-	    DefineNumericMacro ("__OPT_s__", 1);
-	}
+    	    DefineNumericMacro ("__OPT_s__", 1);
+    	}
     }
 
     /* __TIME__ and __DATE__ macros */
     Time = time (0);
     TM   = localtime (&Time);
-    strftime (Buf, sizeof (Buf), "%e %Y", TM);
-    xsprintf (DateStr, sizeof (DateStr), "\"%s %s\"", MonthNames[TM->tm_mon], Buf);
+    xsprintf (DateStr, sizeof (DateStr), "\"%s %2d %d\"",
+              MonthNames[TM->tm_mon], TM->tm_mday, TM->tm_year + 1900);
     strftime (TimeStr, sizeof (TimeStr), "\"%H:%M:%S\"", TM);
     DefineTextMacro ("__DATE__", DateStr);
     DefineTextMacro ("__TIME__", TimeStr);

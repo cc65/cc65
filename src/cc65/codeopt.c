@@ -42,7 +42,6 @@
 #include "cpu.h"
 #include "print.h"
 #include "xmalloc.h"
-#include "xsprintf.h"
 
 /* cc65 */
 #include "asmlabel.h"

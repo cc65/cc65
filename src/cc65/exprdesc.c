@@ -35,7 +35,7 @@
 
 /* common */
 #include "check.h"
-#include "xsprintf.h"
+#include "strbuf.h"
 
 /* cc65 */
 #include "asmlabel.h"
@@ -73,7 +73,7 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
  * call to the function.
  */
 {
-    static char Buf[256];
+    static StrBuf Buf = STATIC_STRBUF_INITIALIZER;
 
     /* Expr may have it's own offset, adjust Offs accordingly */
     Offs += Expr->IVal;
@@ -83,35 +83,30 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
 
         case E_LOC_ABS:
             /* Absolute: numeric address or const */
-      	    xsprintf (Buf, sizeof (Buf), "$%04X", (int)(Offs & 0xFFFF));
+       	    SB_Printf (&Buf, "$%04X", (int)(Offs & 0xFFFF));
             break;
 
         case E_LOC_GLOBAL:
         case E_LOC_STATIC:
             /* Global or static variable */
       	    if (Offs) {
-      	       	xsprintf (Buf, sizeof (Buf), "%s%+ld",
-                          SymGetAsmName (Expr->Sym), Offs);
+      	       	SB_Printf (&Buf, "%s%+ld", SymGetAsmName (Expr->Sym), Offs);
       	    } else {
-      	       	xsprintf (Buf, sizeof (Buf), "%s",
-                          SymGetAsmName (Expr->Sym));
+      	       	SB_Printf (&Buf, "%s", SymGetAsmName (Expr->Sym));
       	    }
             break;
 
         case E_LOC_REGISTER:
             /* Register variable */
-      	    xsprintf (Buf, sizeof (Buf), "regbank+%u",
-                      (unsigned)((Offs + Expr->Name) & 0xFFFFU));
+      	    SB_Printf (&Buf, "regbank+%u", (unsigned)((Offs + Expr->Name) & 0xFFFFU));
             break;
 
         case E_LOC_LITERAL:
             /* Literal in the literal pool */
       	    if (Offs) {
-      	       	xsprintf (Buf, sizeof (Buf), "%s%+ld",
-                          LocalLabelName (Expr->Name), Offs);
+      	       	SB_Printf (&Buf, "%s%+ld", LocalLabelName (Expr->Name), Offs);
       	    } else {
-       	       	xsprintf (Buf, sizeof (Buf), "%s",
-                          LocalLabelName (Expr->Name));
+       	       	SB_Printf (&Buf, "%s", LocalLabelName (Expr->Name));
 	    }
             break;
 
@@ -120,7 +115,7 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
     }
 
     /* Return a pointer to the static buffer */
-    return Buf;
+    return SB_GetConstBuf (&Buf);
 }
 
 

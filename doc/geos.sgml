@@ -343,9 +343,9 @@ See <tt/ggraph.h/ for list of tokens that you can also place in the string - lik
 <tt/void PutDecimal (char parameter, int value, char y, unsigned x)/
 <p>
 This function converts <tt/value/ to its decimal representation and outputs it to the screen.
-Depending on given <tt/parameter/ the string can be filled with zeroes (string always 5 characters
-long) or not, to be left or right justified to given pixel. See <tt/ggraph.h/ for predefined
-values for <tt/parameter/.
+The <tt/parameter/ is the field width in pixels (range 1-31) and mode bits. Depending on them
+the string can be filled with zeroes (string always 5 characters long) or not and left or right
+justified to given pixel. See <tt/ggraph.h/ for predefined values for <tt/parameter/.
 
 <sect2>Font Handling
 

@@ -198,8 +198,13 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
  * set to the type of the left hand side.
  */
 {
-    /* Get the type of the right hand side */
+    /* Get the type of the right hand side. Treat function types as 
+     * pointer-to-function 
+     */
     type* rhst = rhs->e_tptr;
+    if (IsTypeFunc (rhst)) {
+	rhst = PointerTo (rhst);
+    }
 
     /* After calling this function, rhs will have the type of the lhs */
     rhs->e_tptr = lhst;
@@ -1291,29 +1296,29 @@ static void pre_incdec (struct expent* lval, void (*inc) (unsigned, unsigned lon
 	if (lval->e_flags & E_MGLOBAL) {
 	    flags |= GlobalModeFlags (lval->e_flags);
 	    if (inc == g_inc) {
-	    	g_addeqstatic (flags, lval->e_name, lval->e_const, val);
+	     	g_addeqstatic (flags, lval->e_name, lval->e_const, val);
 	    } else {
-	    	g_subeqstatic (flags, lval->e_name, lval->e_const, val);
+	     	g_subeqstatic (flags, lval->e_name, lval->e_const, val);
 	    }
 	} else if (lval->e_flags & E_MLOCAL) {
 	    /* ref to localvar */
 	    if (inc == g_inc) {
-	    	g_addeqlocal (flags, lval->e_const, val);
+	     	g_addeqlocal (flags, lval->e_const, val);
 	    } else {
-	    	g_subeqlocal (flags, lval->e_const, val);
+	     	g_subeqlocal (flags, lval->e_const, val);
 	    }
 	} else if (lval->e_flags & E_MCONST) {
 	    /* ref to absolute address */
 	    flags |= CF_ABSOLUTE;
 	    if (inc == g_inc) {
-	    	g_addeqstatic (flags, lval->e_const, 0, val);
+	     	g_addeqstatic (flags, lval->e_const, 0, val);
 	    } else {
-	    	g_subeqstatic (flags, lval->e_const, 0, val);
+	     	g_subeqstatic (flags, lval->e_const, 0, val);
 	    }
 	} else if (lval->e_flags & E_MEXPR) {
 	    /* Address in a/x. */
 	    if (inc == g_inc) {
-		g_addeqind (flags, lval->e_const, val);
+	     	g_addeqind (flags, lval->e_const, val);
 	    } else {
 	       	g_subeqind (flags, lval->e_const, val);
 	    }
@@ -1421,7 +1426,12 @@ static int typecast (struct expent* lval)
     /* Read the expression we have to cast */
     k = hie10 (lval);
 
-    /* Check for a const expression */
+    /* If the expression is a function, treat it as pointer-to-function */
+    if (IsTypeFunc (lval->e_tptr)) {
+	lval->e_tptr = PointerTo (lval->e_tptr);
+    }
+
+    /* Check for a constant on the right side */
     if (k == 0 && lval->e_flags == E_MCONST) {
 
 	/* A cast of a constant to something else. If the new type is an int,
@@ -1453,7 +1463,7 @@ static int typecast (struct expent* lval)
 	   	/* Sign extend the value if needed */
 	     	if (!IsSignUnsigned (Type) && !IsSignUnsigned (lval->e_tptr)) {
 	     	    if (lval->e_const & (0x01UL << (OldBits-1))) {
-	     		lval->e_const |= ((~0L) << OldBits);
+	     	   	lval->e_const |= ((~0L) << OldBits);
 	     	    }
 	     	}
 	    }
@@ -1524,7 +1534,7 @@ static int hie10 (struct expent* lval)
     	   	lval->e_test |= E_CC;			/* bneg will set cc */
     	   	lval->e_flags = E_MEXPR;	 	/* say it's an expr */
     	    }
-     	    return 0; 	      	     		/* expr not storable */
+     	    return 0;  	      	     		/* expr not storable */
 
      	case TOK_STAR:
      	    NextToken ();
@@ -1544,7 +1554,10 @@ static int hie10 (struct expent* lval)
      	case TOK_AND:
      	    NextToken ();
      	    k = hie10 (lval);
-     	    if (k == 0) {
+	    /* The & operator may be applied to any lvalue, and it may be
+	     * applied to functions, even if they're no lvalues.
+	     */
+     	    if (k == 0 && !IsTypeFunc (lval->e_tptr)) {
 	    	/* Allow the & operator with an array */
 	     	if (!IsTypeArray (lval->e_tptr)) {
      	     	    Error ("Illegal address");
@@ -1604,7 +1617,7 @@ static int hie10 (struct expent* lval)
 static int hie_internal (GenDesc** ops,		/* List of generators */
        	                 struct expent* lval,	/* parent expr's lval */
        	                 int (*hienext) (struct expent*),
-	     	    	 int* UsedGen) 		/* next higher level */
+	     	       	 int* UsedGen) 		/* next higher level */
 /* Helper function */
 {
     int k;
@@ -1612,7 +1625,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
     CodeMark Mark1;
     CodeMark Mark2;
     GenDesc* Gen;
-    token_t tok;			/* The operator token */
+    token_t tok;       			/* The operator token */
     unsigned ltype, type;
     int rconst;	       	       	       	/* Operand is a constant */
 

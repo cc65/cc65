@@ -752,23 +752,15 @@ void g_getlocal (unsigned flags, int offs)
 		    AddCodeLine ("dey");
 		    AddCodeLine ("lda (sp),y");
 		} else {
-		    if (offs) {
-			ldyconst (offs+1);
-       			AddCodeLine ("jsr ldaxysp");
-		    } else {
-			AddCodeLine ("jsr ldax0sp");
-		    }
+		    ldyconst (offs+1);
+		    AddCodeLine ("jsr ldaxysp");
 		}
 	    }
 	    break;
 
 	case CF_LONG:
-    	    if (offs) {
-    	 	ldyconst (offs+3);
-    	 	AddCodeLine ("jsr ldeaxysp");
-    	    } else {
-    	 	AddCodeLine ("jsr ldeax0sp");
-    	    }
+	    ldyconst (offs+3);
+	    AddCodeLine ("jsr ldeaxysp");
        	    break;
 
        	default:
@@ -812,22 +804,14 @@ void g_getind (unsigned flags, unsigned offs)
      		AddCodeLine ("iny");
      		AddCodeLine ("ora (ptr1),y");
      	    } else {
-     		if (offs == 0) {
-     		    AddCodeLine ("jsr ldaxi");
-     		} else {
-     		    ldyconst (offs+1);
-     		    AddCodeLine ("jsr ldaxidx");
-     		}
+		ldyconst (offs+1);
+		AddCodeLine ("jsr ldaxidx");
      	    }
      	    break;
 
        	case CF_LONG:
-     	    if (offs == 0) {
-     		AddCodeLine ("jsr ldeaxi");
-     	    } else {
-     		ldyconst (offs+3);
-     		AddCodeLine ("jsr ldeaxidx");
-     	    }
+	    ldyconst (offs+3);
+	    AddCodeLine ("jsr ldeaxidx");
      	    if (flags & CF_TEST) {
        		AddCodeLine ("jsr tsteax");
      	    }
@@ -1034,12 +1018,8 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 	    if (Flags & CF_CONST) {
 	     	g_getimmed (Flags, Val, 0);
 	    }
-     	    if (Offs) {
-     	     	ldyconst (Offs);
-     	     	AddCodeLine ("jsr steaxysp");
-     	    } else {
-     	     	AddCodeLine ("jsr steax0sp");
-     	    }
+	    ldyconst (Offs);
+     	    AddCodeLine ("jsr steaxysp");
      	    break;
 
        	default:
@@ -1528,28 +1508,6 @@ void g_addstatic (unsigned flags, unsigned long label, unsigned offs)
 
 
 /*****************************************************************************/
-/*	       Compares of ax with a variable with fixed address	     */
-/*****************************************************************************/
-
-
-
-void g_cmplocal (unsigned flags, int offs)
-/* Compare a local variable to ax */
-{
-    Internal ("g_cmplocal not implemented");
-}
-
-
-
-void g_cmpstatic (unsigned flags, unsigned label, unsigned offs)
-/* Compare a static variable to ax */
-{
-    Internal ("g_cmpstatic not implemented");
-}
-
-
-
-/*****************************************************************************/
 /*   	    	       	     Special op= functions			     */
 /*****************************************************************************/
 
@@ -1728,12 +1686,8 @@ void g_addeqlocal (unsigned flags, int offs, unsigned long val)
      	    if (flags & CF_CONST) {
 	     	g_getimmed (flags, val, 0);
 	    }
-	    if (offs == 0) {
-		AddCodeLine ("jsr laddeq0sp");
-	    } else {
-		ldyconst (offs);
-		AddCodeLine ("jsr laddeqysp");
-	    }
+	    ldyconst (offs);
+	    AddCodeLine ("jsr laddeqysp");
        	    break;
 
        	default:
@@ -1881,12 +1835,8 @@ void g_subeqstatic (unsigned flags, unsigned long label, unsigned offs,
 		    AddCodeLine ("ldy #<(%s)", lbuf);
 		    AddCodeLine ("sty ptr1");
 		    AddCodeLine ("ldy #>(%s+1)", lbuf);
-		    if (val == 1) {
-	     		AddCodeLine ("jsr lsubeq1");
-		    } else {
-			AddCodeLine ("lda #$%02X", (unsigned char)val);
-			AddCodeLine ("jsr lsubeqa");
-		    }
+		    AddCodeLine ("lda #$%02X", (unsigned char)val);
+		    AddCodeLine ("jsr lsubeqa");
      		} else {
 		    g_getstatic (flags, label, offs);
 		    g_dec (flags, val);
@@ -1945,24 +1895,16 @@ void g_subeqlocal (unsigned flags, int offs, unsigned long val)
 	    if (flags & CF_CONST) {
 	     	g_getimmed (flags, val, 0);
 	    }
-	    if (offs == 0) {
-	 	AddCodeLine ("jsr subeq0sp");
-	    } else {
-	 	ldyconst (offs);
-	 	AddCodeLine ("jsr subeqysp");
-	    }
+	    ldyconst (offs);
+	    AddCodeLine ("jsr subeqysp");
        	    break;
 
        	case CF_LONG:
 	    if (flags & CF_CONST) {
 	     	g_getimmed (flags, val, 0);
 	    }
-	    if (offs == 0) {
-		AddCodeLine ("jsr lsubeq0sp");
-	    } else {
-		ldyconst (offs);
-		AddCodeLine ("jsr lsubeqysp");
-	    }
+	    ldyconst (offs);
+	    AddCodeLine ("jsr lsubeqysp");
        	    break;
 
        	default:
@@ -2037,7 +1979,7 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
 
 
 
-void g_addaddr_local (unsigned flags, int offs)
+void g_addaddr_local (unsigned flags attribute ((unused)), int offs)
 /* Add the address of a local variable to ax */
 {
     unsigned L = 0;
@@ -2281,36 +2223,20 @@ void g_test (unsigned flags)
 void g_push (unsigned flags, unsigned long val)
 /* Push the primary register or a constant value onto the stack */
 {
-    unsigned char hi;
-
     if (flags & CF_CONST && (flags & CF_TYPE) != CF_LONG) {
 
      	/* We have a constant 8 or 16 bit value */
      	if ((flags & CF_TYPE) == CF_CHAR && (flags & CF_FORCECHAR)) {
 
      	    /* Handle as 8 bit value */
-	    if (CodeSizeFactor >= 165 || val > 2) {
-     	    	ldaconst (val);
-     	    	AddCodeLine ("jsr pusha");
-     	    } else {
-     	    	AddCodeLine ("jsr pushc%d", (int) val);
-     	    }
+	    ldaconst (val);
+	    AddCodeLine ("jsr pusha");
 
      	} else {
 
      	    /* Handle as 16 bit value */
-     	    hi = (unsigned char) (val >> 8);
-     	    if (val <= 7) {
-		AddCodeLine ("jsr push%u", (unsigned) val);
-     	    } else if (hi == 0 || hi == 0xFF) {
-     	    	/* Use special function */
-     	    	ldaconst (val);
-       	       	AddCodeLine ("jsr %s", (hi == 0)? "pusha0" : "pushaFF");
-     	    } else {
-     	    	/* Long way ... */
-     	    	g_getimmed (flags, val, 0);
-     	    	AddCodeLine ("jsr pushax");
-     	    }
+	    g_getimmed (flags, val, 0);
+	    AddCodeLine ("jsr pushax");
      	}
 
     } else {
@@ -2475,7 +2401,7 @@ void g_case (unsigned flags, unsigned label, unsigned long val)
 
 
 
-void g_truejump (unsigned flags, unsigned label)
+void g_truejump (unsigned flags attribute ((unused)), unsigned label)
 /* Jump to label if zero flag clear */
 {
     AddCodeLine ("jne %s", LocalLabelName (label));
@@ -2483,7 +2409,7 @@ void g_truejump (unsigned flags, unsigned label)
 
 
 
-void g_falsejump (unsigned flags, unsigned label)
+void g_falsejump (unsigned flags attribute ((unused)), unsigned label)   
 /* Jump to label if zero flag set */
 {
     AddCodeLine ("jeq %s", LocalLabelName (label));

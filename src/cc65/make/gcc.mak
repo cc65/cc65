@@ -14,7 +14,7 @@ COMMON	= ../common
 
 # Default for the compiler lib search path as compiler define
 CDEFS=-DCC65_INC=\"/usr/lib/cc65/include/\"
-CFLAGS = -O2 -g -Wall -W -Wno-unused-parameter -I$(COMMON) $(CDEFS)
+CFLAGS = -O2 -g -Wall -W -I$(COMMON) $(CDEFS)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=
@@ -36,6 +36,7 @@ OBJS =	anonname.o	\
 	coptadd.o	\
 	coptcmp.o	\
 	coptind.o	\
+	coptneg.o	\
 	coptstop.o	\
 	coptsub.o	\
 	copttest.o	\

@@ -190,7 +190,7 @@ static void ParseWordArg (StrBuf* T, unsigned Arg)
 
 
 
-static void ParseLongArg (StrBuf* T, unsigned Arg)
+static void ParseLongArg (StrBuf* T, unsigned Arg attribute ((unused)))
 /* Parse the %l format specifier */
 {
     ExprDesc Expr;

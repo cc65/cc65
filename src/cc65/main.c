@@ -277,7 +277,8 @@ static void CheckSegName (const char* Seg)
 
 
 
-static void OptAddSource (const char* Opt, const char* Arg)
+static void OptAddSource (const char* Opt attribute ((unused)),
+			  const char* Arg attribute ((unused)))
 /* Add source lines as comments in generated assembler file */
 {
     AddSource = 1;
@@ -285,7 +286,8 @@ static void OptAddSource (const char* Opt, const char* Arg)
 
 
 
-static void OptAnsi (const char* Opt, const char* Arg)
+static void OptAnsi (const char* Opt attribute ((unused)),
+		     const char* Arg attribute ((unused)))
 /* Compile in strict ANSI mode */
 {
     ANSI = 1;
@@ -293,7 +295,7 @@ static void OptAnsi (const char* Opt, const char* Arg)
 
 
 
-static void OptBssName (const char* Opt, const char* Arg)
+static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --bss-name option */
 {
     /* Check for a valid name */
@@ -305,7 +307,8 @@ static void OptBssName (const char* Opt, const char* Arg)
 
 
 
-static void OptCheckStack (const char* Opt, const char* Arg)
+static void OptCheckStack (const char* Opt attribute ((unused)),
+			   const char* Arg attribute ((unused)))
 /* Handle the --check-stack option */
 {
     CheckStack = 1;
@@ -313,7 +316,7 @@ static void OptCheckStack (const char* Opt, const char* Arg)
 
 
 
-static void OptCodeName (const char* Opt, const char* Arg)
+static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --code-name option */
 {
     /* Check for a valid name */
@@ -338,7 +341,8 @@ static void OptCodeSize (const char* Opt, const char* Arg)
 
 
 
-static void OptCreateDep (const char* Opt, const char* Arg)
+static void OptCreateDep (const char* Opt attribute ((unused)),
+			  const char* Arg attribute ((unused)))
 /* Handle the --create-dep option */
 {
     CreateDep = 1;
@@ -354,13 +358,13 @@ static void OptCPU (const char* Opt, const char* Arg)
     } else if (strcmp (Arg, "65C02") == 0) {
 	CPU = CPU_65C02;
     } else {
-	AbEnd ("Invalid CPU: `%s'", Arg);
+       	AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
     }
 }
 
 
 
-static void OptDataName (const char* Opt, const char* Arg)
+static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --data-name option */
 {
     /* Check for a valid name */
@@ -372,7 +376,8 @@ static void OptDataName (const char* Opt, const char* Arg)
 
 
 
-static void OptDebug (const char* Opt, const char* Arg)
+static void OptDebug (const char* Opt attribute ((unused)),
+		      const char* Arg attribute ((unused)))
 /* Compiler debug mode */
 {
     Debug = 1;
@@ -380,7 +385,8 @@ static void OptDebug (const char* Opt, const char* Arg)
 
 
 
-static void OptDebugInfo (const char* Opt, const char* Arg)
+static void OptDebugInfo (const char* Opt attribute ((unused)),
+			  const char* Arg attribute ((unused)))
 /* Add debug info to the object file */
 {
     DebugInfo = 1;
@@ -388,7 +394,7 @@ static void OptDebugInfo (const char* Opt, const char* Arg)
 
 
 
-static void OptDebugOpt (const char* Opt, const char* Arg)
+static void OptDebugOpt (const char* Opt attribute ((unused)), const char* Arg)
 /* Debug optimization steps */
 {
     char Buf [128];
@@ -455,7 +461,7 @@ static void OptDebugOpt (const char* Opt, const char* Arg)
 
 
 
-static void OptDisableOpt (const char* Opt, const char* Arg)
+static void OptDisableOpt (const char* Opt attribute ((unused)), const char* Arg)
 /* Disable an optimization step */
 {
     DisableOpt (Arg);
@@ -463,7 +469,7 @@ static void OptDisableOpt (const char* Opt, const char* Arg)
 
 
 
-static void OptEnableOpt (const char* Opt, const char* Arg)
+static void OptEnableOpt (const char* Opt attribute ((unused)), const char* Arg)
 /* Enable an optimization step */
 {
     EnableOpt (Arg);
@@ -471,7 +477,8 @@ static void OptEnableOpt (const char* Opt, const char* Arg)
 
 
 
-static void OptHelp (const char* Opt, const char* Arg)
+static void OptHelp (const char* Opt attribute ((unused)),
+		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -480,7 +487,7 @@ static void OptHelp (const char* Opt, const char* Arg)
 
 
 
-static void OptIncludeDir (const char* Opt, const char* Arg)
+static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Add an include search path */
 {
     AddIncludePath (Arg, INC_SYS | INC_USER);
@@ -488,7 +495,8 @@ static void OptIncludeDir (const char* Opt, const char* Arg)
 
 
 
-static void OptListOptSteps (const char* Opt, const char* Arg)
+static void OptListOptSteps (const char* Opt attribute ((unused)),
+			     const char* Arg attribute ((unused)))
 /* List all optimizer steps */
 {
     /* List the optimizer steps */
@@ -500,7 +508,7 @@ static void OptListOptSteps (const char* Opt, const char* Arg)
 
 
 
-static void OptRodataName (const char* Opt, const char* Arg)
+static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --rodata-name option */
 {
     /* Check for a valid name */
@@ -512,7 +520,8 @@ static void OptRodataName (const char* Opt, const char* Arg)
 
 
 
-static void OptSignedChars (const char* Opt, const char* Arg)
+static void OptSignedChars (const char* Opt attribute ((unused)),
+			    const char* Arg attribute ((unused)))
 /* Make default characters signed */
 {
     SignedChars = 1;
@@ -520,7 +529,8 @@ static void OptSignedChars (const char* Opt, const char* Arg)
 
 
 
-static void OptStaticLocals (const char* Opt, const char* Arg)
+static void OptStaticLocals (const char* Opt attribute ((unused)),
+			     const char* Arg attribute ((unused)))
 /* Place local variables in static storage */
 {
     StaticLocals = 1;
@@ -528,7 +538,7 @@ static void OptStaticLocals (const char* Opt, const char* Arg)
 
 
 
-static void OptTarget (const char* Opt, const char* Arg)
+static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the target system */
 {
     SetSys (Arg);
@@ -536,7 +546,8 @@ static void OptTarget (const char* Opt, const char* Arg)
 
 
 
-static void OptVerbose (const char* Opt, const char* Arg)
+static void OptVerbose (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Increase verbosity */
 {
     ++Verbosity;
@@ -544,7 +555,8 @@ static void OptVerbose (const char* Opt, const char* Arg)
 
 
 
-static void OptVersion (const char* Opt, const char* Arg)
+static void OptVersion (const char* Opt attribute ((unused)),
+			const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr,

@@ -107,7 +107,7 @@ static struct StdFuncDesc* FindFunc (const char* Name)
 
 
 
-static void StdFunc_strlen (ExprDesc* lval)
+static void StdFunc_strlen (ExprDesc* lval attribute ((unused)))
 /* Handle the strlen function */
 {
     ExprDesc pval;

@@ -246,7 +246,7 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 
 
 
-static int IsImmCmp16 (CodeSeg* S, CodeEntry** L)
+static int IsImmCmp16 (CodeEntry** L)
 /* Check if the instructions at L are an immidiate compare of a/x:
  *
  *
@@ -405,7 +405,7 @@ unsigned OptBoolTrans (CodeSeg* S)
 /*****************************************************************************/
 /*		  	  Optimizations for compares                         */
 /*****************************************************************************/
-				    
+
 
 
 unsigned OptCmp1 (CodeSeg* S)
@@ -565,7 +565,7 @@ unsigned OptCmp3 (CodeSeg* S)
 	    CS_GetEntries (S, L, I+1, 5) &&
 	    L[0]->OPC == OP65_LDX            &&
 	    !CE_HasLabel (L[0])              &&
-	    IsImmCmp16 (S, L+1)) {
+	    IsImmCmp16 (L+1)) {
 
 	    if (L[1]->Num == 0 && L[3]->Num == 0) {
 		/* The value is zero, we may use the simple code version. */
@@ -628,7 +628,7 @@ unsigned OptCmp4 (CodeSeg* S)
 	CodeEntry* L[9];
 
      	/* Check for the sequence */
-       	if (IsLocalLoad16 (S, I, L, 9) && IsImmCmp16 (S, L+5)) {
+       	if (IsLocalLoad16 (S, I, L, 9) && IsImmCmp16 (L+5)) {
 
        	    if (L[5]->Num == 0 && L[7]->Num == 0) {
 

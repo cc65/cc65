@@ -50,6 +50,7 @@
 #include "coptadd.h"
 #include "coptcmp.h"
 #include "coptind.h"
+#include "coptneg.h"
 #include "coptstop.h"
 #include "coptsub.h"
 #include "copttest.h"
@@ -97,383 +98,6 @@ static unsigned OptShift1 (CodeSeg* S)
 
 	    /* Delete the call to shlax */
 	    CS_DelEntry (S, I);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-/*****************************************************************************/
-/*		  	      nega optimizations			     */
-/*****************************************************************************/
-
-
-
-static unsigned OptNegA1 (CodeSeg* S)
-/* Check for
- *
- *	ldx 	#$00
- *	lda 	..
- * 	jsr 	bnega
- *
- * Remove the ldx if the lda does not use it.
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[2];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for a ldx */
-       	if (E->OPC == OP65_LDX 			&&
-	    E->AM == AM65_IMM	    		&&
-	    (E->Flags & CEF_NUMARG) != 0	&&
-	    E->Num == 0	   			&&
-  	    CS_GetEntries (S, L, I+1, 2)	&&
-	    L[0]->OPC == OP65_LDA		&&
-	    (L[0]->Use & REG_X) == 0	    	&&
-	    !CE_HasLabel (L[0])                 &&
-	    CE_IsCall (L[1], "bnega")           &&
-	    !CE_HasLabel (L[1])) {
-
-	    /* Remove the ldx instruction */
-	    CS_DelEntry (S, I);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptNegA2 (CodeSeg* S)
-/* Check for
- *
- *	lda 	..
- * 	jsr 	bnega
- *	jeq/jne	..
- *
- * Adjust the conditional branch and remove the call to the subroutine.
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[2];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-	if ((E->OPC == OP65_ADC ||
-	     E->OPC == OP65_AND ||
-	     E->OPC == OP65_DEA ||
-	     E->OPC == OP65_EOR ||
-	     E->OPC == OP65_INA ||
-       	     E->OPC == OP65_LDA ||
-	     E->OPC == OP65_ORA	||
-	     E->OPC == OP65_PLA ||
-	     E->OPC == OP65_SBC ||
-	     E->OPC == OP65_TXA ||
-	     E->OPC == OP65_TYA)                &&
-	    CS_GetEntries (S, L, I+1, 2)	&&
-       	    CE_IsCall (L[0], "bnega")           &&
-	    !CE_HasLabel (L[0])	  	        &&
-	    (L[1]->Info & OF_ZBRA) != 0         &&
-	    !CE_HasLabel (L[1])) {
-
-	    /* Invert the branch */
-	    CE_ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));
-
-	    /* Delete the subroutine call */
-	    CS_DelEntry (S, I+1);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-/*****************************************************************************/
-/*		   	      negax optimizations			     */
-/*****************************************************************************/
-
-
-
-static unsigned OptNegAX1 (CodeSeg* S)
-/* On a call to bnegax, if X is zero, the result depends only on the value in
- * A, so change the call to a call to bnega. This will get further optimized
- * later if possible.
- */
-{
-    unsigned Changes = 0;
-    unsigned I;
-
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
-
-    /* Walk over the entries */
-    I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-	/* Check if this is a call to bnegax, and if X is known and zero */
-	if (E->RI->In.RegX == 0             &&
-       	    CE_IsCall (E, "bnegax")) {
-
-	    /* We're cheating somewhat here ... */
-	    E->Arg[5] = '\0';
-	    E->Use &= ~REG_X;
-
-	    /* We had changes */
-	    ++Changes;
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptNegAX2 (CodeSeg* S)
-/* Search for the sequence:
- *
- *  	lda	(xx),y
- *  	tax
- *  	dey
- *  	lda	(xx),y
- *  	jsr	bnegax
- *  	jne/jeq	...
- *
- * and replace it by
- *
- *  	lda    	(xx),y
- *  	dey
- *  	ora    	(xx),y
- *	jeq/jne	...
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[5];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_LDA  	      	&&
-	    E->AM == AM65_ZP_INDY	      	&&
-	    CS_GetEntries (S, L, I+1, 5)	&&
-	    L[0]->OPC == OP65_TAX    		&&
-	    L[1]->OPC == OP65_DEY    		&&
-      	    L[2]->OPC == OP65_LDA    		&&
-	    L[2]->AM == AM65_ZP_INDY  		&&
-	    strcmp (L[2]->Arg, E->Arg) == 0	&&
-	    !CE_HasLabel (L[2])		        &&
-       	    CE_IsCall (L[3], "bnegax")          &&
-	    !CE_HasLabel (L[3])		        &&
-       	    (L[4]->Info & OF_ZBRA) != 0         &&
-	    !CE_HasLabel (L[4])) {
-
-	    /* lda --> ora */
-	    CE_ReplaceOPC (L[2], OP65_ORA);
-
-  	    /* Invert the branch */
-	    CE_ReplaceOPC (L[4], GetInverseBranch (L[4]->OPC));
-
-      	    /* Delete the entries no longer needed. Beware: Deleting entries
-	     * will change the indices.
-	     */
-       	    CS_DelEntry (S, I+4);	    	/* jsr bnegax */
-	    CS_DelEntry (S, I+1);	    	/* tax */
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptNegAX3 (CodeSeg* S)
-/* Search for the sequence:
- *
- *  	lda	xx
- *  	ldx	yy
- *  	jsr	bnegax
- *    	jne/jeq	...
- *
- * and replace it by
- *
- *  	lda    	xx
- *	ora	xx+1
- *	jeq/jne	...
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-      	CodeEntry* L[3];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_LDA  	      	&&
-       	    CS_GetEntries (S, L, I+1, 3)	&&
-	    L[0]->OPC == OP65_LDX       	&&
-	    !CE_HasLabel (L[0]) 		&&
-       	    CE_IsCall (L[1], "bnegax")          &&
-	    !CE_HasLabel (L[1]) 		&&
-       	    (L[2]->Info & OF_ZBRA) != 0         &&
-	    !CE_HasLabel (L[2])) {
-
-	    /* ldx --> ora */
-	    CE_ReplaceOPC (L[0], OP65_ORA);
-
-	    /* Invert the branch */
-       	    CE_ReplaceOPC (L[2], GetInverseBranch (L[2]->OPC));
-
-	    /* Delete the subroutine call */
-       	    CS_DelEntry (S, I+2);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptNegAX4 (CodeSeg* S)
-/* Search for the sequence:
- *
- *    	jsr   	xxx
- *  	jsr   	bnega(x)
- *  	jeq/jne	...
- *
- * and replace it by:
- *
- *      jsr	xxx
- *  	<boolean test>
- *  	jne/jeq	...
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[2];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_JSR  	      	&&
-       	    CS_GetEntries (S, L, I+1, 2)   	&&
-       	    L[0]->OPC == OP65_JSR              	&&
-	    strncmp (L[0]->Arg,"bnega",5) == 0 	&&
-	    !CE_HasLabel (L[0]) 	       	&&
-       	    (L[1]->Info & OF_ZBRA) != 0         &&
-	    !CE_HasLabel (L[1])) {
-
-	    CodeEntry* X;
-
-	    /* Check if we're calling bnega or bnegax */
-	    int ByteSized = (strcmp (L[0]->Arg, "bnega") == 0);
-
-	    /* Insert apropriate test code */
-	    if (ByteSized) {
-	     	/* Test bytes */
-	    	X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
-  	    	CS_InsertEntry (S, X, I+2);
-	    } else {
-	    	/* Test words */
-	    	X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, L[0]->LI);
-      	    	CS_InsertEntry (S, X, I+2);
-	    	X = NewCodeEntry (OP65_ORA, AM65_ZP, "tmp1", 0, L[0]->LI);
-	    	CS_InsertEntry (S, X, I+3);
-	    }
-
-	    /* Delete the subroutine call */
-	    CS_DelEntry (S, I+1);
-
-	    /* Invert the branch */
-       	    CE_ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -1403,7 +1027,118 @@ static unsigned OptDecouple (CodeSeg* S)
 
 
 
-static unsigned OptSize (CodeSeg* S)
+static unsigned OptSize1 (CodeSeg* S)
+/* Do size optimization by calling special subroutines that preload registers.
+ * This routine does not work standalone, it needs a following register load
+ * removal pass.
+ */
+{
+#if 0
+    static const char* Func = {
+	"stax0sp",           /* staxysp, y = 0 */
+	"addeq0sp",
+	"ldax0sp",           /* ldaxysp, y = 1 */
+       	"ldeax0sp",          /* ldeaxysp, y = 3 */
+	"push0",             /* pushax, a = 0, x = 0 */
+	"pusha0",            /* pushax, x = 0 */
+	"pushaFF",           /* pushax, x = ff */
+	"pusha0sp",          /* pushaysp, y = 0 */
+	"tosadda0",          /* tosaddax, x = 0 */
+	"tosanda0",          /* tosandax, x = 0 */
+	"tosdiva0",          /* tosdivax, x = 0 */
+	"toseqa0",           /* toseqax, x = 0 */
+	"tosgea0",           /* tosgeax, x = 0 */
+       	"tosgta0",           /* tosgtax, x = 0 */
+	"tosadd0ax",         /* tosaddeax, sreg = 0 */
+	"laddeqa",           /* laddeq, sreg = 0, x = 0 */
+	"laddeq1",           /* laddeq, sreg = 0, x = 0, a = 1 */
+	"laddeq0sp",         /* laddeqysp, y = 0 */
+       	"tosand0ax",         /* tosandeax, sreg = 0 */
+        "ldaxi",             /* ldaxidx, y = 1 */
+	"ldeaxi",            /* ldeaxidx, y = 3 */
+	"ldeax0sp",          /* ldeaxysp, y = 3 */
+	"tosdiv0ax",         /* tosdiveax, sreg = 0 */
+	"toslea0",           /* tosleax, x = 0 */
+	"tosmod0ax",         /* tosmodeax, sreg = 0 */
+	"tosmul0ax",         /* tosmuleax, sreg = 0 */
+       	"tosumul0ax",        /* tosumuleax, sreg = 0 */
+	"tosor0ax",          /* tosoreax, sreg = 0 */
+	"push0ax",           /* pusheax, sreg = 0 */
+	"tosrsub0ax",        /* tosrsubeax, sreg = 0 */
+	"tosshl0ax",         /* tosshleax, sreg = 0 */
+	"tosasl0ax",         /* tosasleax, sreg = 0 */
+	"tosshr0ax",         /* tosshreax, sreg = 0 */
+	"tosasr0ax",         /* tosasreax, sreg = 0 */
+	"tossub0ax",         /* tossubeax, sreg = 0 */
+	"lsubeqa",           /* lsubeq, sreg = 0, x = 0 */
+	"lsubeq1",           /* lsubeq, sreg = 0, x = 0, a = 1 */
+	"lsubeq0sp",         /* lsubeqysp, y = 0 */
+	"toslta0",           /* tosltax, x = 0 */
+	"tosudiv0ax",        /* tosudiveax, sreg = 0 */
+	"tosumod0ax",        /* tosumodeax, sreg = 0 */
+     	"tosxor0ax",         /* tosxoreax, sreg = 0 */
+	"tosmoda0",          /* tosmodax, x = 0 */
+	"tosmula0",          /* tosmulax, x = 0 */
+	"tosumula0",         /* tosumulax, x = 0 */
+	"tosnea0",           /* tosneax, x = 0 */
+	"tosora0",           /* tosorax, x = 0 */
+	"push1",             /* pushax, x = 0, a = 1 */
+       	"push2",             /* pushax, x = 0, a = 2 */
+	"push3",             /* pushax, x = 0, a = 3 */
+	"push4",             /* pushax, x = 0, a = 4 */
+	"push5",             /* pushax, x = 0, a = 5 */
+	"push6",             /* pushax, x = 0, a = 6 */
+	"push7",             /* pushax, x = 0, a = 7 */
+	"pushc0",            /* pusha, a = 0 */
+       	"pushc1",            /* pusha, a = 1 */
+	"pushc2",            /* pusha, a = 2 */
+	"tosrsuba0",         /* tosrsubax, x = 0 */
+	"tosshla0",          /* tosshlax, x = 0 */
+	"tosasla0",          /* tosaslax, x = 0 */
+	"tosshra0",          /* tosshrax, x = 0 */
+	"tosasra0",          /* tosasrax, x = 0 */
+	"steax0sp",          /* steaxsp, y = 0 */
+	"tossuba0",          /* tossubax, x = 0 */
+	"subeq0sp",          /* subeqysp, y = 0 */
+	"tosudiva0",         /* tosudivax, x = 0 */
+	"tosugea0",          /* tosugeax, x = 0 */
+       	"tosugta0",          /* tosugtax, x = 0 */
+       	"tosulea0",          /* tosuleax, x = 0 */
+       	"tosulta0",          /* tosultax, x = 0 */
+       	"tosumoda0",         /* tosumodax, x = 0 */
+       	"tosxora0",          /* tosxorax, x = 0 */
+    };
+#endif
+
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for the following step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptSize2 (CodeSeg* S)
 /* Do size optimization by using shorter code sequences, even if this
  * introduces relations between instructions. This step must be one of the
  * last steps, because it makes further work much more difficult.
@@ -1443,7 +1178,7 @@ static unsigned OptSize (CodeSeg* S)
 		    	    X = NewCodeEntry (OP65_INA, AM65_IMP, 0, 0, E->LI);
 	      	    	}
 		    }
-		}
+	      	}
 	        break;
 
 	    case OP65_LDX:
@@ -1564,7 +1299,8 @@ static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",  	0, 0, 0, 0
 static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    0, 0, 0, 0, 0 };
 static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",    	0, 0, 0, 0, 0 };
-static OptFunc DOptSize         = { OptSize,         "OptSize",         0, 0, 0, 0, 0 };
+static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        0, 0, 0, 0, 0 };
+static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        0, 0, 0, 0, 0 };
 static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",  	0, 0, 0, 0, 0 };
 static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",    0, 0, 0, 0, 0 };
 static OptFunc DOptSub1	       	= { OptSub1,   	     "OptSub1",      	0, 0, 0, 0, 0 };
@@ -1602,22 +1338,23 @@ static OptFunc* OptFuncs[] = {
     &DOptNegAX2,
     &DOptNegAX3,
     &DOptNegAX4,
-    &DOptPtrStore1,
-    &DOptPtrStore2,
     &DOptPtrLoad1,
     &DOptPtrLoad2,
     &DOptPtrLoad3,
     &DOptPtrLoad4,
     &DOptPtrLoad5,
     &DOptPtrLoad6,
+    &DOptPtrStore1,
+    &DOptPtrStore2,
     &DOptRTS,
     &DOptRTSJumps,
     &DOptShift1,
-    &DOptSize,
-    &DOptSub1,
-    &DOptSub2,
+    &DOptSize1,
+    &DOptSize2,
     &DOptStackOps,
     &DOptStoreLoad,
+    &DOptSub1,
+    &DOptSub2,
     &DOptTest1,
     &DOptTransfers,
     &DOptUnusedLoads,
@@ -1929,7 +1666,7 @@ static void RunOptGroup4 (CodeSeg* S)
      * if this does hinder further optimizations (no problem since we're
      * done soon).
      */
-    RunOptFunc (S, &DOptSize, 1);
+    RunOptFunc (S, &DOptSize2, 1);
 
     /* Run the jump target optimization again, since the size optimization
      * above may have opened new oportunities.

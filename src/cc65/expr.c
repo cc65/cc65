@@ -463,7 +463,7 @@ static void MakeConstIntExpr (ExprDesc* Expr, long Value)
 {
     Expr->Flags = E_MCONST;
     Expr->Type = type_int;
-    Expr->ConstVal = 1;
+    Expr->ConstVal = Value;
 }
 
 
@@ -813,7 +813,7 @@ static void FunctionCall (int k, ExprDesc* lval)
 	    g_space (- (int) sizeofarg (CF_PTR));
 	    pop (CF_PTR);
 	}
-							      
+
 	/* Skip T_PTR */
     	++lval->Type;
 

@@ -32,16 +32,15 @@ L2:	sta	(ptr1),y
 
 ; Clear remaining page (y is zero on entry)
 
-L3:	ldx	#<__BSS_SIZE__
-   	beq	L5
-L4:	sta	(ptr1),y
-   	iny
-   	dex
-   	bne	L4
+L3:	cpy	#<__BSS_SIZE__
+	beq	L4
+	sta	(ptr1),y
+	iny
+	bne	L3
 
 ; Done
 
-L5:	rts
+L4:	rts
 
 
 

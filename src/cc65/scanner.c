@@ -688,7 +688,7 @@ void NextToken (void)
     }
 
     /* Determine the next token from the lookahead */
-    if (IsDigit (CurC)) {
+    if (IsDigit (CurC) || (CurC == '.' && IsDigit (NextC))) {
      	/* A number */
         NumericConst ();
      	return;
@@ -824,21 +824,17 @@ void NextToken (void)
     	    }
     	    break;
 
-    	case '.':     
-            if (IsDigit (NextC)) {
-                NumericConst ();
-            } else {
+    	case '.':
+            NextChar ();
+            if (CurC == '.') {
                 NextChar ();
                 if (CurC == '.') {
-                    NextChar ();
-                    if (CurC == '.') {
-                        SetTok (TOK_ELLIPSIS);
-                    } else {
-                        UnknownChar (CurC);
-                    }
+                    SetTok (TOK_ELLIPSIS);
                 } else {
-                    NextTok.Tok = TOK_DOT;
+                    UnknownChar (CurC);
                 }
+            } else {
+                NextTok.Tok = TOK_DOT;
             }
     	    break;
 

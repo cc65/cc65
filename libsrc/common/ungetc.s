@@ -31,7 +31,7 @@
 
 ; c must be in char range
 
-        tax
+        txa
         bne     error
 
 ; Check if the file is open
@@ -68,4 +68,4 @@ error:  lda     #EINVAL
         rts
 
 .endproc
-
+           

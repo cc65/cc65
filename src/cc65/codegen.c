@@ -2785,7 +2785,7 @@ void g_and (unsigned flags, unsigned long val)
 			AddCodeLine ("tax");
 			AddCodeLine ("tya");
 			if ((val & 0x00FF) != 0x00FF) {
-			    AddCodeLine ("and #$%02X", (unsigned char)val);
+		       	    AddCodeLine ("and #$%02X", (unsigned char)val);
 			}
 		    }
 		}
@@ -2829,10 +2829,10 @@ void g_asr (unsigned flags, unsigned long val)
 /* Primary = TOS >> Primary */
 {
     static char* ops [12] = {
-      	0,	     	"tosasra0",	"tosasrax",
-      	0,	     	"tosshra0",	"tosshrax",
-      	0,	     	0,		"tosasreax",
-      	0,	     	0,		"tosshreax",
+      	0,	       	"tosasra0",	"tosasrax",
+      	0,	       	"tosshra0",	"tosshrax",
+      	0,	       	0,		"tosasreax",
+      	0,	       	0,		"tosshreax",
     };
 
     /* If the right hand side is const, the lhs is not on stack but still
@@ -2848,12 +2848,11 @@ void g_asr (unsigned flags, unsigned long val)
       		    AddCodeLine ("txa");
       		    ldxconst (0);
      		    val -= 8;
-     		    if (val == 0) {
-     			/* Done */
-     		     	return;
-     		    }
      		}
-     		if (val >= 1 && val <= 4) {
+	        if (val == 0) {
+		    /* Done */
+		    return;
+		} else if (val >= 1 && val <= 4) {
      		    if (flags & CF_UNSIGNED) {
      		       	AddCodeLine ("jsr shrax%ld", val);
      		    } else {
@@ -2864,7 +2863,10 @@ void g_asr (unsigned flags, unsigned long val)
      		break;
 
      	    case CF_LONG:
-     		if (val >= 1 && val <= 4) {
+	        if (val == 0) {
+		    /* Nothing to do */
+		    return;
+		} else if (val >= 1 && val <= 4) {
      		    if (flags & CF_UNSIGNED) {
      		       	AddCodeLine ("jsr shreax%ld", val);
      		    } else {
@@ -2883,10 +2885,10 @@ void g_asr (unsigned flags, unsigned long val)
      		    AddCodeLine ("ldy #$00");
      		    AddCodeLine ("ldx sreg+1");
      		    if ((flags & CF_UNSIGNED) == 0) {
-     			unsigned L = GetLocalLabel();
+     		       	unsigned L = GetLocalLabel();
      		        AddCodeLine ("bpl %s", LocalLabelName (L));
      		        AddCodeLine ("dey");
-     			g_defcodelabel (L);
+     		       	g_defcodelabel (L);
      		    }
      		    AddCodeLine ("lda sreg");
      		    AddCodeLine ("sty sreg+1");
@@ -2901,8 +2903,8 @@ void g_asr (unsigned flags, unsigned long val)
 
      	/* If we go here, we didn't emit code. Push the lhs on stack and fall
       	 * into the normal, non-optimized stuff.
-	 */
-	g_push (flags & ~CF_CONST, 0);
+     	 */
+     	g_push (flags & ~CF_CONST, 0);
 
     }
 
@@ -2916,10 +2918,10 @@ void g_asl (unsigned flags, unsigned long val)
 /* Primary = TOS << Primary */
 {
     static char* ops [12] = {
-	0,	     	"tosasla0",    	"tosaslax",
-	0,	     	"tosshla0",    	"tosshlax",
-	0,	     	0,     	       	"tosasleax",
-	0,	     	0,     	       	"tosshleax",
+	0,	       	"tosasla0",    	"tosaslax",
+	0,	       	"tosshla0",    	"tosshlax",
+	0,	       	0,     	       	"tosasleax",
+	0,	       	0,     	       	"tosshleax",
     };
 
 
@@ -2936,23 +2938,25 @@ void g_asl (unsigned flags, unsigned long val)
       		    AddCodeLine ("tax");
       		    AddCodeLine ("lda #$00");
 		    val -= 8;
-		    if (val == 0) {
-			/* Done */
-		     	return;
-		    }
      		}
-		if (val >= 1 && val <= 4) {
+	        if (val == 0) {
+		    /* Done */
+		    return;
+		} else if (val >= 1 && val <= 4) {
 		    if (flags & CF_UNSIGNED) {
 		       	AddCodeLine ("jsr shlax%ld", val);
 		    } else {
-	     	    	AddCodeLine ("jsr aslax%ld", val);
+	     	       	AddCodeLine ("jsr aslax%ld", val);
 		    }
 		    return;
       		}
      		break;
 
 	    case CF_LONG:
-		if (val >= 1 && val <= 4) {
+	        if (val == 0) {
+		    /* Nothing to do */
+		    return;
+		} else if (val >= 1 && val <= 4) {
 		    if (flags & CF_UNSIGNED) {
 		       	AddCodeLine ("jsr shleax%ld", val);
 		    } else {

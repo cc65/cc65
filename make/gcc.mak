@@ -53,7 +53,7 @@ install:	all
 	    echo "";						      \
 	    false;						      \
 	fi
-	@$(MKDIR) -p $(BINDIR) $(CC66DOC) $(CC65LIB)
+	@$(MKDIR) -p $(BINDIR) $(CC65DOC) $(CC65LIB)
 	@$(MKDIR) -p $(CC65DATA)/asminc $(CC65DATA)/emd $(CC65DATA)/joy $(CC65DATA)/lib $(CC65DATA)/mou $(CC65DATA)/ser $(CC65DATA)/tgi
 	@$(MKDIR) -p $(CC65INC)/em $(CC65INC)/geos $(CC65INC)/joystick $(CC65INC)/mouse $(CC65INC)/sys $(CC65INC)/tgi
 	@$(INSTALL) -s -m 755 src/ar65/ar65 $(BINDIR)
@@ -82,4 +82,4 @@ install:	all
 	@$(INSTALL) -m 644 src/ld65/cfg/*.cfg $(CC65DOC)
 	@$(INSTALL) -m 644 doc/*.html $(CC65DOC)
 	@$(INSTALL) -m 644 doc/{compile.txt,grc.txt,internal.txt,newvers.txt} $(CC65DOC)
-  
+

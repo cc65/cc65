@@ -1066,20 +1066,28 @@ static void ClosingCurlyBraces (unsigned BracesExpected)
 
 
 
-static unsigned ParseSimpleInit (type* T)
-/* Parse initializaton for simple data types. Return the number of data bytes. */
+static unsigned ParseScalarInit (type* T)
+/* Parse initializaton for scalar data types. Return the number of data bytes. */
 {
     static const unsigned long Masks[] = {
         0x000000FFUL, 0x0000FFFFUL, 0x00FFFFFFUL, 0xFFFFFFFFUL
     };
+    unsigned BraceCount;
     ExprDesc ED;
-
-    /* Optional opening brace */
-    unsigned BraceCount = OpeningCurlyBraces (0);
 
     /* Get the size of the expected type */
     unsigned Size = SizeOf (T);
     CHECK (Size > 0 && Size <= sizeof(Masks)/sizeof(Masks[0]));
+
+    /* Optional opening brace */
+    BraceCount = OpeningCurlyBraces (0);
+
+    /* We warn if an initializer for a scalar contains braces, because this is
+     * quite unusual and often a sign for some problem in the input.
+     */
+    if (BraceCount > 0) {
+        Warning ("Braces around scalar initializer");
+    }
 
     /* Expression */
     ConstExpr (&ED);
@@ -1097,6 +1105,33 @@ static unsigned ParseSimpleInit (type* T)
 
     /* Done */
     return Size;
+}
+
+
+
+static unsigned ParsePointerInit (type* T)
+/* Parse initializaton for pointer data types. Return the number of data bytes. */
+{
+    /* Optional opening brace */
+    unsigned BraceCount = OpeningCurlyBraces (0);
+
+    /* Expression */
+    ExprDesc ED;
+    ConstExpr (&ED);
+    if ((ED.Flags & E_MCTYPE) == E_TCONST) {
+        /* Make the const value the correct size */
+        ED.ConstVal &= 0xFFFF;
+    }
+    assignadjust (T, &ED);
+
+    /* Output the data */
+    DefineData (&ED);
+
+    /* Close eventually opening braces */
+    ClosingCurlyBraces (BraceCount);
+
+    /* Done */
+    return SIZEOF_PTR;
 }
 
 
@@ -1319,10 +1354,12 @@ static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers)
     	case T_USHORT:
      	case T_INT:
      	case T_UINT:
-     	case T_PTR:
     	case T_LONG:
     	case T_ULONG:
-            return ParseSimpleInit (T);
+            return ParseScalarInit (T);
+
+     	case T_PTR:
+            return ParsePointerInit (T);
 
      	case T_ARRAY:
             return ParseArrayInit (T, AllowFlexibleMembers);
@@ -1344,7 +1381,7 @@ static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers)
 
     }
 }
-                     
+
 
 
 unsigned ParseInit (type* T)

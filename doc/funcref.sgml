@@ -111,12 +111,22 @@ function.
 
 <sect1><tt/cbm510.h/<label id="cbm510.h"><p>
 
-(incomplete)
+<itemize>
+<item><ref id="peekbsys" name="peekbsys">
+<item><ref id="peekwsys" name="peekwsys">
+<item><ref id="pokebsys" name="pokebsys">
+<item><ref id="pokewsys" name="pokewsys">
+</itemize>
 
 
 <sect1><tt/cbm610.h/<label id="cbm610.h"><p>
 
-(incomplete)
+<itemize>
+<item><ref id="peekbsys" name="peekbsys">
+<item><ref id="peekwsys" name="peekwsys">
+<item><ref id="pokebsys" name="pokebsys">
+<item><ref id="pokewsys" name="pokewsys">
+</itemize>
 
 
 <sect1><tt/conio.h/<label id="conio.h"><p>
@@ -2825,7 +2835,7 @@ used in presence of a prototype.
 <tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
 <tag/Declaration/<tt/unsigned char __fastcall__ joy_unload (void);/
 <tag/Description/The function uninstalls the currently installed joystick
-driver and removes it from memory. An error code is returned, which is 
+driver and removes it from memory. An error code is returned, which is
 <tt/JOY_ERR_OK/ if the driver was successfully uninstalled.
 <tag/Limits/<itemize>
 <item>A joystick driver must be loaded using <ref id="joy_load_driver"
@@ -3189,6 +3199,65 @@ cc65 allows to pass this argument, it is ignored.
 </quote>
 
 
+<sect1>peekbsys<label id="peekbsys"><p>
+
+<quote>
+<descrip>
+<tag/Function/Read one byte from a location in the system bank.
+<tag/Header/<tt/<ref id="cbm610.h" name="cbm610.h">/,
+<tt/<ref id="cbm510.h" name="cbm510.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ peekbsys (unsigned addr);/
+<tag/Description/<tt/peekbsys/ reads one byte from the given address in the
+system bank (bank 15) of the CBM PET-II machines and returns it.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>This function may be a macro depending on the compiler options. The
+actual function is accessible by #undef'ing the macro.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="PEEK" name="PEEK">,
+<ref id="PEEKW" name="PEEKW">,
+<ref id="peekwsys" name="peekwsys">,
+<ref id="pokebsys" name="pokebsys">,
+<ref id="pokewsys" name="pokewsys">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>peekwsys<label id="peekwsys"><p>
+
+<quote>
+<descrip>
+<tag/Function/Read one word from a location in the system bank.
+<tag/Header/<tt/<ref id="cbm610.h" name="cbm610.h">/,
+<tt/<ref id="cbm510.h" name="cbm510.h">/
+<tag/Declaration/<tt/unsigned __fastcall__ peekwsys (unsigned addr);/
+<tag/Description/<tt/peekwsys/ reads one word from the given address in the
+system bank (bank 15) of the CBM PET-II machines and returns it. Following
+the usual 6502 conventions, the low byte is read from <tt/addr/, and the
+high byte is read from <tt/addr+1/.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The order in which the two bytes are read is undefined.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="PEEK" name="PEEK">,
+<ref id="PEEKW" name="PEEKW">,
+<ref id="peekbsys" name="peekbsys">,
+<ref id="pokebsys" name="pokebsys">,
+<ref id="pokewsys" name="pokewsys">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>perror<label id="perror"><p>
 
 <quote>
@@ -3209,7 +3278,64 @@ be used in presence of a prototype.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="_poserror" name="_poserror">,
-<ref id="strerror" name="strerror">,
+<ref id="strerror" name="strerror">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>pokebsys<label id="pokebsys"><p>
+
+<quote>
+<descrip>
+<tag/Function/Write one byte to a location in the system bank.
+<tag/Header/<tt/<ref id="cbm610.h" name="cbm610.h">/,
+<tt/<ref id="cbm510.h" name="cbm510.h">/
+<tag/Declaration/<tt/void __fastcall__ pokebsys (unsigned addr, unsigned char val);/
+<tag/Description/<tt/pokebsys/ writes one byte to the given address in the
+system bank (bank 15) of the CBM PET-II machines.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="POKE" name="POKE">,
+<ref id="POKEW" name="POKEW">,
+<ref id="peekbsys" name="peekbsys">,
+<ref id="peekwsys" name="peekwsys">,
+<ref id="pokewsys" name="pokewsys">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>pokewsys<label id="pokewsys"><p>
+
+<quote>
+<descrip>
+<tag/Function/Write one word to a location in the system bank.
+<tag/Header/<tt/<ref id="cbm610.h" name="cbm610.h">/,
+<tt/<ref id="cbm510.h" name="cbm510.h">/
+<tag/Declaration/<tt/void __fastcall__ pokewsys (unsigned addr, unsigned val);/
+<tag/Description/<tt/pokewsys/ writes one word to the given address in the
+system bank (bank 15) of the CBM PET-II machines. Following the usual 6502
+conventions, the low byte of <tt/val/ is written to <tt/addr/, and the
+high byte is written to <tt/addr+1/.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The order in which the two bytes are written is undefined.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="POKE" name="POKE">,
+<ref id="POKEW" name="POKEW">,
+<ref id="peekbsys" name="peekbsys">,
+<ref id="peekwsys" name="peekwsys">,
+<ref id="pokebsys" name="pokebsys">
 <tag/Example/None.
 </descrip>
 </quote>

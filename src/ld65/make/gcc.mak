@@ -53,14 +53,15 @@ INCS =	apple2.inc	\
 	atari.inc	\
         atmos.inc       \
 	bbc.inc		\
+	c128.inc	\
 	c16.inc		\
 	c64.inc		\
-	c128.inc	\
 	cbm510.inc	\
 	cbm610.inc	\
 	geos.inc	\
 	lunix.inc	\
         module.inc      \
+	nes.inc		\
 	none.inc	\
 	pet.inc		\
 	plus4.inc	\

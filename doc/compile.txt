@@ -68,56 +68,77 @@ using DJGPP (add your system type to CFLAGS if needed):
 
 Here's my current batch file:
 
-cd cc65
-if exist .depend goto ahead1
-make -f make\gcc.mak
-:ahead1
-make -f make\gcc.mak
-move *.exe ..\binutils
+cd djgpp_v2\cc65
 
-cd ..\cl65
-if exist .depend goto ahead2
-make -f make\gcc.mak
-:ahead2
-make -f make\gcc.mak
-move *.exe ..\binutils
+if exist bin\nul goto ahead
+mkdir bin
+mkdir lib
+:ahead
 
-cd ..\binutils\common
-if exist .depend goto ahead3
+cd src\common
 make -f make\gcc.mak
-:ahead3
-make -f make\gcc.mak
-
-cd ..\ca65
-if exist .depend goto ahead4
-make -f make\gcc.mak
-:ahead4
-make -f make\gcc.mak
-move *.exe ..
-
-cd ..\ld65
-if exist .depend goto ahead5
-make -f make\gcc.mak
-:ahead5
-make -f make\gcc.mak
-move *.exe ..
 
 cd ..\ar65
-if exist .depend goto ahead6
 make -f make\gcc.mak
-:ahead6
-make -f make\gcc.mak
-move *.exe ..
+del ar65
+strip ar65.exe
+move ar65.exe ..\..\bin
 
-cd ..\..\lib\common
-make 'CFLAGS=-Oi -I../../include/'
+cd ..\ca65
+make -f make\gcc.mak
+del ca65
+strip ca65.exe
+move ca65.exe ..\..\bin
+
+cd ..\cc65
+make -f make\gcc.mak
+del cc65
+strip cc65.exe
+move cc65.exe ..\..\bin
+
+cd ..\cl65
+make -f make\gcc.mak
+del cl65
+strip cl65.exe
+move cl65.exe ..\..\bin
+
+cd ..\da65
+make -f make\gcc.mak
+del da65
+strip da65.exe
+move da65.exe ..\..\bin
+
+cd ..\grc
+make -f make\gcc.mak
+del grc
+strip grc.exe
+move grc.exe ..\..\bin
+
+cd ..\ld65
+make -f make\gcc.mak
+del ld65
+strip ld65.exe
+move ld65.exe ..\..\bin
+
+cd ..\od65
+make -f make\gcc.mak
+del od65
+strip od65.exe
+move od65.exe ..\..\bin
+
+cd ..\..
+
+cd libsrc\common
+make "CC=cc65" "CFLAGS=-Osir -g -t none -I../../include" "AS=ca65"
+"AFLAGS=-t none"
 ar65 a common.lib *.o
-move common.lib ..
+move common.lib ..\..\lib
 
 cd ..\runtime
-make 'CFLAGS=-Oi -I../../include/'
+make "CC=cc65" "CFLAGS=-Osir -g -t none -I../../include" "AS=ca65"
+"AFLAGS=-t none"
 ar65 a runtime.lib *.o
-move runtime.lib ..
+move runtime.lib ..\..\lib
 
  --
 

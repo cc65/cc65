@@ -110,7 +110,8 @@ _mouse_pos:
 
 	ldy	#0			; Structure offset
 
-	sei				; Disable interrupts
+        php
+        sei				; Disable interrupts
 
        	lda     mouseXPos		; Transfer the position
 	sta	(ptr1),y
@@ -124,7 +125,7 @@ _mouse_pos:
 	iny
 	sta	(ptr1),y
 
-	cli				; Reenable interrupts
+	plp				; Reenable interrupts
 	rts				; Done
 
 ; --------------------------------------------------------------------------
@@ -157,13 +158,14 @@ _mouse_info:
 
 _mouse_move:
 	jsr	popsreg			; Get X
-	sei				; Disable interrupts
+        php
+        sei				; Disable interrupts
 	sta	mouseYPos
 	lda	sreg
 	ldx	sreg+1
    	sta	mouseXPos
 	stx	mouseXPos+1
-	cli		   		; Enable interrupts
+	plp		   		; Enable interrupts
 	rts
 
 ; --------------------------------------------------------------------------

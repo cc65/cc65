@@ -35,7 +35,9 @@ get_tv:
 	    bne tvmode
 only40:	    ldx #0			; COLUMNS40
 tvmode:					; PAL/NTSC check here, result in A
-	    bit rasreg
+            php
+	    sei                         ; disable interrupts
+            bit rasreg
 	    bpl tvmode			; wait for rasterline  127<x<256
 	    lda #24			; (rasterline now >=256!)
 modelp:	    cmp rasreg			; wait for rasterline = 24 (or 280 on PAL)
@@ -48,4 +50,5 @@ ntsc:	    lda #$80			; NTSC
 
 modeend:    stx tmp1
 	    ora tmp1
+	    plp                         ; restore interrupt state
 	    rts

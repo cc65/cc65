@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -122,6 +122,14 @@ int IsBDigit (char C)
 /* Check for binary digits (0/1) */
 {
     return (C == '0' || C == '1');
+}
+
+
+
+int IsODigit (char C)
+/* Check for octal digits (0..7) */
+{
+    return (C >= '0' || C <= '7');
 }
 
 

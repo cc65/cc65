@@ -132,14 +132,6 @@ and reduce the code to one fetch, one addition and one store.
 </enum>
 
 
-<sect>Case labels in a switch statments are checked in source order<p>
-
-Labels that appear first in a switch statement are tested first. So, if your
-switch statement contains labels that are selected most of the time, put them
-first in your source code. This will speed up the code.
-
-
-
 <sect>Use the preincrement and predecrement operators<p>
 
 The compiler is not always smart enough to figure out, if the rvalue of an

@@ -38,6 +38,11 @@
 
 
 
+/* common */
+#include "inline.h"
+
+
+
 /*****************************************************************************/
 /*  	       	 	  	     Data				     */
 /*****************************************************************************/
@@ -155,7 +160,8 @@ typedef enum {
 #define OF_NONE	0x0000U	       		/* No additional information */
 #define OF_UBRA	0x0001U	       		/* Unconditional branch */
 #define OF_CBRA	0x0002U	       		/* Conditional branch */
-#define OF_LBRA 0x0004U			/* Jump/branch is long */
+#define OF_ZBRA 0x0004U			/* Branch on zero flag condition */
+#define OF_LBRA 0x0008U			/* Jump/branch is long */
 #define OF_RET 	0x0010U	       		/* Return from function */
 #define OF_LOAD 0x0020U			/* Register load */
 #define OF_BRA 	(OF_UBRA|OF_CBRA)	/* Operation is a jump/branch */
@@ -170,6 +176,9 @@ typedef struct {
     unsigned char   Chg;       		/* Registers changed by this insn */
     unsigned char   Info;      		/* Additional information */
 } OPCDesc;
+
+/* Opcode description table */
+extern const OPCDesc OPCTable[OPC_COUNT];
 
 
 
@@ -187,11 +196,27 @@ const OPCDesc* FindOpcode (const char* OPC);
 unsigned GetInsnSize (opc_t OPC, am_t AM);
 /* Return the size of the given instruction */
 
-const OPCDesc* GetOPCDesc (opc_t OPC);
+#if defined(HAVE_INLINE)
+INLINE const OPCDesc* GetOPCDesc (opc_t OPC)
 /* Get an opcode description */
+{
+    /* Return the description */
+    return &OPCTable [OPC];
+}
+#else
+#  define GetOPCDesc(OPC)	(&OPCTable [(OPC)])
+#endif
 
-unsigned char GetOPCInfo (opc_t OPC);
+#if defined(HAVE_INLINE)
+INLINE unsigned char GetOPCInfo (opc_t OPC)
 /* Get opcode information */
+{
+    /* Return the info */
+    return OPCTable[OPC].Info;
+}
+#else
+#  define GetOPCInfo(OPC)	(OPCTable[(OPC)].Info)
+#endif
 
 unsigned char GetAMUseInfo (am_t AM);
 /* Get usage info for the given addressing mode (addressing modes that use

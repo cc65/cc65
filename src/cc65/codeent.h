@@ -42,6 +42,7 @@
 
 /* common */
 #include "coll.h"
+#include "inline.h"
 
 /* cc65 */
 #include "codelab.h"
@@ -84,7 +85,7 @@ struct CodeEntry {
 
 
 
-CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* JumpTo);
+CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg, CodeLabel* JumpTo);
 /* Create a new code entry, initialize and return it */
 
 void FreeCodeEntry (CodeEntry* E);
@@ -101,26 +102,68 @@ int CodeEntriesAreEqual (const CodeEntry* E1, const CodeEntry* E2);
 void AttachCodeLabel (CodeEntry* E, CodeLabel* L);
 /* Attach the label to the entry */
 
-int CodeEntryHasLabel (const CodeEntry* E);
+#if defined(HAVE_INLINE)
+INLINE int CodeEntryHasLabel (const CodeEntry* E)
 /* Check if the given code entry has labels attached */
+{
+    return (CollCount (&E->Labels) > 0);
+}
+#else
+#  define CodeEntryHasLabel(E)	(CollCount (&(E)->Labels) > 0)
+#endif
 
-unsigned GetCodeLabelCount (const CodeEntry* E);
+#if defined(HAVE_INLINE)
+INLINE unsigned GetCodeLabelCount (const CodeEntry* E)
 /* Get the number of labels attached to this entry */
+{
+    return CollCount (&E->Labels);
+}
+#else
+#  define GetCodeLabelCount(E)	CollCount (&(E)->Labels)
+#endif
 
-CodeLabel* GetCodeLabel (CodeEntry* E, unsigned Index);
+#if defined(HAVE_INLINE)
+INLINE CodeLabel* GetCodeLabel (CodeEntry* E, unsigned Index)
 /* Get a label from this code entry */
+{
+    return CollAt (&E->Labels, Index);
+}
+#else
+#  define GetCodeLabel(E, Index)	CollAt (&(E)->Labels, (Index))
+#endif
 
 void MoveCodeLabel (CodeLabel* L, CodeEntry* E);
 /* Move the code label L from it's former owner to the code entry E. */
 
-int CodeEntryHasMark (const CodeEntry* E);
+#if defined(HAVE_INLINE)
+INLINE int CodeEntryHasMark (const CodeEntry* E)
 /* Return true if the given code entry has the CEF_USERMARK flag set */
+{
+    return (E->Flags & CEF_USERMARK) != 0;
+}
+#else
+#  define CodeEntryHasMark(E)	(((E)->Flags & CEF_USERMARK) != 0)
+#endif
 
-void CodeEntrySetMark (CodeEntry* E);
+#if defined(HAVE_INLINE)
+INLINE void CodeEntrySetMark (CodeEntry* E)
 /* Set the CEF_USERMARK flag for the given entry */
+{
+    E->Flags |= CEF_USERMARK;
+}
+#else
+#  define CodeEntrySetMark(E)	((E)->Flags |= CEF_USERMARK)
+#endif
 
-void CodeEntryResetMark (CodeEntry* E);
+#if defined(HAVE_INLINE)
+INLINE void CodeEntryResetMark (CodeEntry* E)
 /* Reset the CEF_USERMARK flag for the given entry */
+{
+    E->Flags &= ~CEF_USERMARK;
+}
+#else
+#  define CodeEntryResetMark(E)	((E)->Flags &= ~CEF_USERMARK)
+#endif
 
 void CodeEntrySetArg (CodeEntry* E, const char* Arg);
 /* Set a new argument for the given code entry. An old string is deleted. */

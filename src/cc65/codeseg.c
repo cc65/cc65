@@ -155,7 +155,7 @@ static const char* SkipSpace (const char* S)
 
 
 static const char* ReadToken (const char* L, const char* Term,
-			      char* Buf, unsigned BufSize)
+		     	      char* Buf, unsigned BufSize)
 /* Read the next token into Buf, return the updated line pointer. The
  * token is terminated by one of the characters given in term.
  */
@@ -181,7 +181,7 @@ static const char* ReadToken (const char* L, const char* Term,
     /* Return the updated line pointer */
     return L;
 }
-
+	
 
 
 static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
@@ -197,7 +197,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
     am_t     		AM = 0;		/* Initialize to keep gcc silent */
     char     		Arg[64];
     char     	   	Reg;
-    CodeEntry*		E;
+    CodeEntry*	     	E;
     CodeLabel*		Label;
 
     /* Mnemonic */
@@ -353,7 +353,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
     /* We do now have the addressing mode in AM. Allocate a new CodeEntry
      * structure and initialize it.
      */
-    E = NewCodeEntry (OPC, AM, Arg, Label);
+    E = NewCodeEntry (OPC->OPC, AM, Arg, Label);
 
     /* Return the new code entry */
     return E;
@@ -393,7 +393,7 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
 	S->ExitRegs = REG_NONE;
     }
 
-    /* Return the new struct */	     
+    /* Return the new struct */
     return S;
 }
 
@@ -527,14 +527,6 @@ void DelCodeEntry (CodeSeg* S, unsigned Index)
 
 
 
-struct CodeEntry* GetCodeEntry (CodeSeg* S, unsigned Index)
-/* Get an entry from the given code segment */
-{
-    return CollAt (&S->Entries, Index);
-}
-
-
-
 struct CodeEntry* GetNextCodeEntry (CodeSeg* S, unsigned Index)
 /* Get the code entry following the one with the index Index. If there is no
  * following code entry, return NULL.
@@ -545,8 +537,30 @@ struct CodeEntry* GetNextCodeEntry (CodeSeg* S, unsigned Index)
 	return 0;
     } else {
 	/* Code entries left */
-	return CollAt (&S->Entries, Index+1);
+       	return CollAtUnchecked (&S->Entries, Index+1);
     }
+}
+
+
+
+int GetCodeEntries (CodeSeg* S, struct CodeEntry** List,
+       		    unsigned Start, unsigned Count)
+/* Get Count code entries into List starting at index start. Return true if
+ * we got the lines, return false if not enough lines were available.
+ */
+{
+    /* Check if enough entries are available */
+    if (Start + Count > CollCount (&S->Entries)) {
+	return 0;
+    }
+
+    /* Copy the entries */
+    while (Count--) {
+	*List++ = CollAtUnchecked (&S->Entries, Start++);
+    }
+
+    /* We have the entries */
+    return 1;
 }
 
 
@@ -917,11 +931,6 @@ void OutputCodeSeg (const CodeSeg* S, FILE* F)
 
 
 
-unsigned GetCodeEntryCount (const CodeSeg* S)
-/* Return the number of entries for the given code segment */
-{
-    return CollCount (&S->Entries);
-}
 
 
 

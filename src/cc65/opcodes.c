@@ -54,81 +54,81 @@
 
 
 
-/* Mapper table, mnemonic --> opcode */
-static const OPCDesc OPCTable[OPC_COUNT] = {
-    { OPC_ADC, "adc", 0, REG_A,	   REG_A,    OF_NONE		},
-    { OPC_AND, "and", 0, REG_A,    REG_A,    OF_NONE		},
-    { OPC_ASL, "asl", 0, REG_A,    REG_A,    OF_NONE		},
-    { OPC_BCC, "bcc", 2, REG_NONE, REG_NONE, OF_CBRA		},
-    { OPC_BCS, "bcs", 2, REG_NONE, REG_NONE, OF_CBRA		},
-    { OPC_BEQ, "beq", 2, REG_NONE, REG_NONE, OF_CBRA		},
-    { OPC_BIT, "bit", 0, REG_A,    REG_NONE, OF_NONE		},
-    { OPC_BMI, "bmi", 2, REG_NONE, REG_NONE, OF_CBRA		},
-    { OPC_BNE, "bne", 2, REG_NONE, REG_NONE, OF_CBRA		},
-    { OPC_BPL, "bpl", 2, REG_NONE, REG_NONE, OF_CBRA		},
-    { OPC_BRA, "bra", 2, REG_NONE, REG_NONE, OF_UBRA		},
-    { OPC_BRK, "brk", 1, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_BVC, "bvc", 2, REG_NONE, REG_NONE, OF_CBRA		},
-    { OPC_BVS, "bvs", 2, REG_NONE, REG_NONE, OF_CBRA		},
-    { OPC_CLC, "clc", 1, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_CLD, "cld", 1, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_CLI, "cli", 1, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_CLV, "clv", 1, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_CMP, "cmp", 0, REG_A,    REG_NONE, OF_NONE		},
-    { OPC_CPX, "cpx", 0, REG_X,    REG_NONE, OF_NONE		},
-    { OPC_CPY, "cpy", 0, REG_Y,    REG_NONE, OF_NONE		},
-    { OPC_DEA, "dea", 1, REG_A,    REG_A,    OF_NONE		},
-    { OPC_DEC, "dec", 0, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_DEX, "dex", 1, REG_X,    REG_X,    OF_NONE		},
-    { OPC_DEY, "dey", 1, REG_Y,    REG_Y,    OF_NONE		},
-    { OPC_EOR, "eor", 0, REG_A,    REG_A,    OF_NONE		},
-    { OPC_INA, "ina", 1, REG_A,    REG_A,    OF_NONE		},
-    { OPC_INC, "inc", 0, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_INX, "inx", 1, REG_X,    REG_X,    OF_NONE		},
-    { OPC_INY, "iny", 1, REG_Y,    REG_Y,    OF_NONE		},
-    { OPC_JCC, "jcc", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  },
-    { OPC_JCS, "jcs", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  },
-    { OPC_JEQ, "jeq", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  },
-    { OPC_JMI, "jmi", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  },
-    { OPC_JMP, "jmp", 3, REG_NONE, REG_NONE, OF_UBRA | OF_LBRA  },
-    { OPC_JNE, "jne", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  },
-    { OPC_JPL, "jpl", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  },
-    { OPC_JSR, "jsr", 3, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_JVC, "jvc", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  },
-    { OPC_JVS, "jvs", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  },
-    { OPC_LDA, "lda", 0, REG_NONE, REG_A,    OF_LOAD   		},
-    { OPC_LDX, "ldx", 0, REG_NONE, REG_X,    OF_LOAD		},
-    { OPC_LDY, "ldy", 0, REG_NONE, REG_Y,    OF_LOAD		},
-    { OPC_LSR, "lsr", 0, REG_A,    REG_A,    OF_NONE		},
-    { OPC_NOP, "nop", 1, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_ORA, "ora", 0, REG_A,    REG_A,    OF_NONE		},
-    { OPC_PHA, "pha", 1, REG_A,    REG_NONE, OF_NONE		},
-    { OPC_PHP, "php", 1, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_PHX, "phx", 1, REG_X,    REG_NONE, OF_NONE		},
-    { OPC_PHY, "phy", 1, REG_Y,    REG_NONE, OF_NONE		},
-    { OPC_PLA, "pla", 1, REG_NONE, REG_A,    OF_NONE		},
-    { OPC_PLP, "plp", 1, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_PLX, "plx", 1, REG_NONE, REG_X,    OF_NONE		},
-    { OPC_PLY, "ply", 1, REG_NONE, REG_Y,    OF_NONE		},
-    { OPC_ROL, "rol", 0, REG_A,    REG_A,    OF_NONE		},
-    { OPC_ROR, "ror", 0, REG_A,    REG_A,    OF_NONE		},
-    { OPC_RTI, "rti", 1, REG_NONE, REG_NONE, OF_RET   		},
-    { OPC_RTS, "rts", 1, REG_NONE, REG_NONE, OF_RET   		},
-    { OPC_SBC, "sbc", 0, REG_A,    REG_A,    OF_NONE		},
-    { OPC_SEC, "sec", 1, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_SED, "sed", 1, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_SEI, "sei", 1, REG_NONE, REG_NONE, OF_NONE		},
-    { OPC_STA, "sta", 0, REG_A,    REG_NONE, OF_NONE		},
-    { OPC_STX, "stx", 0, REG_X,    REG_NONE, OF_NONE		},
-    { OPC_STY, "sty", 0, REG_Y,    REG_NONE, OF_NONE		},
-    { OPC_TAX, "tax", 1, REG_A,    REG_X,    OF_NONE		},
-    { OPC_TAY, "tay", 1, REG_A,    REG_Y,    OF_NONE		},
-    { OPC_TRB, "trb", 0, REG_A,    REG_NONE, OF_NONE		},
-    { OPC_TSB, "tsb", 0, REG_A,    REG_NONE, OF_NONE		},
-    { OPC_TSX, "tsx", 1, REG_NONE, REG_X,    OF_NONE		},
-    { OPC_TXA, "txa", 1, REG_X,    REG_A,    OF_NONE		},
-    { OPC_TXS, "txs", 1, REG_X,    REG_NONE, OF_NONE		},
-    { OPC_TYA, "tya", 1, REG_A,    REG_A,    OF_NONE		},
+/* Opcode description table */
+const OPCDesc OPCTable[OPC_COUNT] = {
+    { OPC_ADC, "adc", 0, REG_A,	   REG_A,    OF_NONE			    },
+    { OPC_AND, "and", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OPC_ASL, "asl", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OPC_BCC, "bcc", 2, REG_NONE, REG_NONE, OF_CBRA			    },
+    { OPC_BCS, "bcs", 2, REG_NONE, REG_NONE, OF_CBRA			    },
+    { OPC_BEQ, "beq", 2, REG_NONE, REG_NONE, OF_CBRA | OF_ZBRA		    },
+    { OPC_BIT, "bit", 0, REG_A,    REG_NONE, OF_NONE			    },
+    { OPC_BMI, "bmi", 2, REG_NONE, REG_NONE, OF_CBRA			    },
+    { OPC_BNE, "bne", 2, REG_NONE, REG_NONE, OF_CBRA | OF_ZBRA		    },
+    { OPC_BPL, "bpl", 2, REG_NONE, REG_NONE, OF_CBRA			    },
+    { OPC_BRA, "bra", 2, REG_NONE, REG_NONE, OF_UBRA			    },
+    { OPC_BRK, "brk", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_BVC, "bvc", 2, REG_NONE, REG_NONE, OF_CBRA			    },
+    { OPC_BVS, "bvs", 2, REG_NONE, REG_NONE, OF_CBRA			    },
+    { OPC_CLC, "clc", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_CLD, "cld", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_CLI, "cli", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_CLV, "clv", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_CMP, "cmp", 0, REG_A,    REG_NONE, OF_NONE			    },
+    { OPC_CPX, "cpx", 0, REG_X,    REG_NONE, OF_NONE			    },
+    { OPC_CPY, "cpy", 0, REG_Y,    REG_NONE, OF_NONE			    },
+    { OPC_DEA, "dea", 1, REG_A,    REG_A,    OF_NONE			    },
+    { OPC_DEC, "dec", 0, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_DEX, "dex", 1, REG_X,    REG_X,    OF_NONE			    },
+    { OPC_DEY, "dey", 1, REG_Y,    REG_Y,    OF_NONE			    },
+    { OPC_EOR, "eor", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OPC_INA, "ina", 1, REG_A,    REG_A,    OF_NONE			    },
+    { OPC_INC, "inc", 0, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_INX, "inx", 1, REG_X,    REG_X,    OF_NONE			    },
+    { OPC_INY, "iny", 1, REG_Y,    REG_Y,    OF_NONE			    },
+    { OPC_JCC, "jcc", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
+    { OPC_JCS, "jcs", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
+    { OPC_JEQ, "jeq", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_ZBRA    },
+    { OPC_JMI, "jmi", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
+    { OPC_JMP, "jmp", 3, REG_NONE, REG_NONE, OF_UBRA | OF_LBRA  	    },
+    { OPC_JNE, "jne", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_ZBRA    },
+    { OPC_JPL, "jpl", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
+    { OPC_JSR, "jsr", 3, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_JVC, "jvc", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
+    { OPC_JVS, "jvs", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
+    { OPC_LDA, "lda", 0, REG_NONE, REG_A,    OF_LOAD   			    },
+    { OPC_LDX, "ldx", 0, REG_NONE, REG_X,    OF_LOAD			    },
+    { OPC_LDY, "ldy", 0, REG_NONE, REG_Y,    OF_LOAD			    },
+    { OPC_LSR, "lsr", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OPC_NOP, "nop", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_ORA, "ora", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OPC_PHA, "pha", 1, REG_A,    REG_NONE, OF_NONE			    },
+    { OPC_PHP, "php", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_PHX, "phx", 1, REG_X,    REG_NONE, OF_NONE			    },
+    { OPC_PHY, "phy", 1, REG_Y,    REG_NONE, OF_NONE			    },
+    { OPC_PLA, "pla", 1, REG_NONE, REG_A,    OF_NONE			    },
+    { OPC_PLP, "plp", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_PLX, "plx", 1, REG_NONE, REG_X,    OF_NONE			    },
+    { OPC_PLY, "ply", 1, REG_NONE, REG_Y,    OF_NONE			    },
+    { OPC_ROL, "rol", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OPC_ROR, "ror", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OPC_RTI, "rti", 1, REG_NONE, REG_NONE, OF_RET   			    },
+    { OPC_RTS, "rts", 1, REG_NONE, REG_NONE, OF_RET   			    },
+    { OPC_SBC, "sbc", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OPC_SEC, "sec", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_SED, "sed", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_SEI, "sei", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OPC_STA, "sta", 0, REG_A,    REG_NONE, OF_NONE			    },
+    { OPC_STX, "stx", 0, REG_X,    REG_NONE, OF_NONE			    },
+    { OPC_STY, "sty", 0, REG_Y,    REG_NONE, OF_NONE			    },
+    { OPC_TAX, "tax", 1, REG_A,    REG_X,    OF_NONE			    },
+    { OPC_TAY, "tay", 1, REG_A,    REG_Y,    OF_NONE			    },
+    { OPC_TRB, "trb", 0, REG_A,    REG_NONE, OF_NONE			    },
+    { OPC_TSB, "tsb", 0, REG_A,    REG_NONE, OF_NONE			    },
+    { OPC_TSX, "tsx", 1, REG_NONE, REG_X,    OF_NONE			    },
+    { OPC_TXA, "txa", 1, REG_X,    REG_A,    OF_NONE			    },
+    { OPC_TXS, "txs", 1, REG_X,    REG_NONE, OF_NONE			    },
+    { OPC_TYA, "tya", 1, REG_A,    REG_A,    OF_NONE			    },
 };
 
 
@@ -199,30 +199,6 @@ unsigned GetInsnSize (opc_t OPC, am_t AM)
 	case AM_ZP_IND:   return 2;
 	default:	  FAIL ("Invalid addressing mode");
     }
-}
-
-
-
-const OPCDesc* GetOPCDesc (opc_t OPC)
-/* Get an opcode description */
-{
-    /* Check the range */
-    PRECONDITION (OPC >= (opc_t)0 && OPC < OPC_COUNT);
-
-    /* Return the description */
-    return &OPCTable [OPC];
-}
-
-
-
-unsigned char GetOPCInfo (opc_t OPC)
-/* Get opcode information */
-{
-    /* Check the range */
-    PRECONDITION (OPC >= (opc_t)0 && OPC < OPC_COUNT);
-
-    /* Return the info */
-    return OPCTable[OPC].Info;
 }
 
 

@@ -243,6 +243,322 @@ NextEntry:
 
 
 /*****************************************************************************/
+/*			      nega optimizations			     */
+/*****************************************************************************/
+
+
+
+static unsigned OptNegA1 (CodeSeg* S)
+/* Check for
+ *
+ *	ldx	#$00
+ *	lda	..
+ * 	jsr	bnega
+ *
+ * Remove the ldx if the lda does not use it.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[2];
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for a ldx */
+       	if (E->OPC == OPC_LDX 			&&
+	    E->AM == AM_IMM	    		&&
+	    (E->Flags & CEF_NUMARG) != 0	&&
+	    E->Num == 0	   			&&
+	    GetCodeEntries (S, L, I+1, 2)	&&
+	    L[0]->OPC == OPC_LDA		&&
+	    (L[0]->Use & REG_X) == 0	    	&&
+	    L[1]->OPC == OPC_JSR	    	&&
+	    strcmp (L[1]->Arg, "bnega") == 0) {
+
+	    /* Remove the ldx instruction */
+	    DelCodeEntry (S, I);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptNegA2 (CodeSeg* S)
+/* Check for
+ *
+ *	lda	..
+ * 	jsr	bnega
+ *	jeq/jne	..
+ *
+ * Adjust the conditional branch and remove the call to the subroutine.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[2];
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (E->OPC == OPC_LDA  	  	    	&&
+	    GetCodeEntries (S, L, I+1, 2)	&&
+       	    L[0]->OPC == OPC_JSR  	    	&&
+	    strcmp (L[0]->Arg, "bnega") == 0	&&
+	    !CodeEntryHasLabel (L[0])		&&
+	    (L[1]->Info & OF_ZBRA) != 0) {
+
+	    /* Invert the branch */
+	    ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));
+
+	    /* Delete the subroutine call */
+	    DelCodeEntry (S, I+1);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*		   	      negax optimizations			     */
+/*****************************************************************************/
+
+
+
+static unsigned OptNegAX1 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *  	lda	(xx),y
+ *  	tax
+ *  	dey
+ *  	lda	(xx),y
+ *  	jsr	bnegax
+ *  	jne/jeq	...
+ *
+ * and replace it by
+ *
+ *  	lda    	(xx),y
+ *  	dey
+ *  	ora    	(xx),y
+ *	jeq/jne	...
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[5];
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (E->OPC == OPC_LDA  	      		&&
+	    E->AM == AM_ZP_INDY	      		&&
+	    GetCodeEntries (S, L, I+1, 5)	&&
+	    L[0]->OPC == OPC_TAX    		&&
+	    L[1]->OPC == OPC_DEY    		&&
+	    L[2]->OPC == OPC_LDA    		&&
+	    L[2]->AM == AM_ZP_INDY  		&&
+	    strcmp (L[2]->Arg, E->Arg) == 0	&&
+	    !CodeEntryHasLabel (L[2])		&&
+	    L[3]->OPC == OPC_JSR    		&&
+	    strcmp (L[3]->Arg, "bnegax") == 0	&&
+	    !CodeEntryHasLabel (L[3])		&&
+       	    (L[4]->Info & OF_ZBRA) != 0) {
+
+	    /* lda --> ora */
+	    ReplaceOPC (L[2], OPC_ORA);
+
+	    /* Invert the branch */
+	    ReplaceOPC (L[4], GetInverseBranch (L[4]->OPC));
+
+	    /* Delete the entries no longer needed. Beware: Deleting entries
+	     * will change the indices.
+	     */
+       	    DelCodeEntry (S, I+4);	    	/* jsr bnegax */
+	    DelCodeEntry (S, I+1);	    	/* tax */
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptNegAX2 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *  	lda	xx
+ *  	ldx	yy
+ *  	jsr	bnegax
+ *  	jne/jeq	...
+ *
+ * and replace it by
+ *
+ *  	lda    	xx
+ *	ora	xx+1
+ *	jeq/jne	...
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[3];
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (E->OPC == OPC_LDA  	      		&&
+       	    GetCodeEntries (S, L, I+1, 3)	&&
+	    L[0]->OPC == OPC_LDX       	       	&&
+	    !CodeEntryHasLabel (L[0]) 		&&
+       	    L[1]->OPC == OPC_JSR      		&&
+	    strcmp (L[1]->Arg, "bnegax") == 0	&&
+	    !CodeEntryHasLabel (L[1]) 		&&
+       	    (L[2]->Info & OF_ZBRA) != 0) {
+
+	    /* ldx --> ora */
+	    ReplaceOPC (L[0], OPC_ORA);
+
+	    /* Invert the branch */
+       	    ReplaceOPC (L[2], GetInverseBranch (L[2]->OPC));
+
+	    /* Delete the subroutine call */
+       	    DelCodeEntry (S, I+2);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptNegAX3 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *  	jsr   	_xxx
+ *  	jsr   	bnega(x)
+ *  	jeq/jne	...
+ *
+ * and replace it by:
+ *
+ *      jsr	_xxx
+ *  	<boolean test>
+ *  	jne/jeq	...
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[2];
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (E->OPC == OPC_JSR  	      		&&
+	    E->Arg[0] == '_'	      		&&
+       	    GetCodeEntries (S, L, I+1, 2)	&&
+       	    L[0]->OPC == OPC_JSR       	       	&&
+	    strncmp (L[0]->Arg,"bnega",5) == 0	&&
+	    !CodeEntryHasLabel (L[0]) 		&&
+       	    (L[1]->Info & OF_ZBRA) != 0) {
+
+	    /* Check if we're calling bnega or bnegax */
+	    int ByteSized = (strcmp (L[0]->Arg, "bnega") == 0);
+
+	    /* Delete the subroutine call */
+	    DelCodeEntry (S, I+1);
+
+	    /* Insert apropriate test code */
+	    if (ByteSized) {
+		/* Test bytes */
+		InsertCodeEntry (S, NewCodeEntry (OPC_TAX, AM_IMP, 0, 0), I+1);
+	    } else {
+		/* Test words */
+		InsertCodeEntry (S, NewCodeEntry (OPC_STX, AM_ZP, "tmp1", 0), I+1);
+		InsertCodeEntry (S, NewCodeEntry (OPC_ORA, AM_ZP, "tmp1", 0), I+2);
+	    }
+
+	    /* Invert the branch */
+       	    ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
 /*     	       	      	  	     Code	   			     */
 /*****************************************************************************/
 
@@ -271,9 +587,21 @@ static OptFunc OptFuncs [] = {
     /* Optimize jump targets */
     { OptJumpTarget,   	    "OptJumpTarget",		0      	},
     /* Optimize conditional branches */
-    { OptCondBranches,	    "OptCondBranches", 		0    	},
+    { OptCondBranches, 	    "OptCondBranches", 		0    	},
+    /* Replace jumps to RTS by RTS */
+    { OptRTSJumps,     	    "OptRTSJumps",		0      	},
     /* Remove calls to the bool transformer subroutines	*/
     { OptBoolTransforms,    "OptBoolTransforms",	0	},
+    /* Optimize calls to nega */
+    { OptNegA1,	       	    "OptNegA1",			0	},
+    /* Optimize calls to nega */
+    { OptNegA2,	       	    "OptNegA2",			0	},
+    /* Optimize calls to negax */
+    { OptNegAX1,       	    "OptNegAX1",		0	},
+    /* Optimize calls to negax */
+    { OptNegAX2,       	    "OptNegAX2",       	       	0      	},
+    /* Optimize calls to negax */
+    { OptNegAX3,       	    "OptNegAX3",       	       	0      	},
     /* Remove unused loads */
     { OptUnusedLoads,	    "OptUnusedLoads",		0	},
     /* Optimize branch distance */

@@ -45,6 +45,51 @@
 
 
 /*****************************************************************************/
+/*			  Replace jumps to RTS by RTS			     */
+/*****************************************************************************/
+
+
+
+unsigned OptRTSJumps (CodeSeg* S)
+/* Replace jumps to RTS by RTS */
+{
+    unsigned Changes = 0;
+
+    /* Walk over all entries minus the last one */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	/* Get the next entry */
+	CodeEntry* E = GetCodeEntry (S, I);
+
+       	/* Check if it's an unconditional branch to a local target */
+       	if ((E->Info & OF_UBRA) != 0 		&&
+	    E->JumpTo != 0  			&&
+	    E->JumpTo->Owner->OPC == OPC_RTS) {
+
+	    /* Delete the jump */
+	    DelCodeEntry (S, I);
+
+	    /* Insert an RTS instruction instead */
+	    InsertCodeEntry (S, NewCodeEntry (OPC_RTS, AM_IMP, 0, 0), I);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
 /*	      	  	       Remove dead jumps		      	     */
 /*****************************************************************************/
 
@@ -118,9 +163,11 @@ unsigned OptDeadCode (CodeSeg* S)
      	return 0;
     }
 
-    /* Walk over all entries minus the last one */
+    /* Walk over all entries */
     I = 0;
-    while (I < Count-1) {
+    while (I < Count) {
+
+	CodeEntry* N;
 
  	/* Get this entry */
  	CodeEntry* E = GetCodeEntry (S, I);
@@ -128,7 +175,9 @@ unsigned OptDeadCode (CodeSeg* S)
        	/* Check if it's an unconditional branch, and if the next entry has
  	 * no labels attached
  	 */
-       	if ((E->Info & OF_DEAD) != 0 && !CodeEntryHasLabel (GetCodeEntry (S, I+1))) {
+       	if ((E->Info & OF_DEAD) != 0 		&&
+	    (N = GetNextCodeEntry (S, I)) != 0	&&
+	    !CodeEntryHasLabel (N)) {
 
  	    /* Delete the next entry */
  	    DelCodeEntry (S, I+1);

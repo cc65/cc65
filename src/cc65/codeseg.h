@@ -44,6 +44,7 @@
 /* common */
 #include "attrib.h"
 #include "coll.h"
+#include "inline.h"
 
 /* cc65 */
 #include "codelab.h"
@@ -106,12 +107,25 @@ void DelCodeEntry (CodeSeg* S, unsigned Index);
  * if the reference count drops to zero.
  */
 
-struct CodeEntry* GetCodeEntry (CodeSeg* S, unsigned Index);
+#if defined(HAVE_INLINE)
+INLINE struct CodeEntry* GetCodeEntry (CodeSeg* S, unsigned Index)
 /* Get an entry from the given code segment */
+{
+    return CollAt (&S->Entries, Index);
+}
+#else
+#  define GetCodeEntry(S, Index)	CollAt(&(S)->Entries, (Index))
+#endif
 
 struct CodeEntry* GetNextCodeEntry (CodeSeg* S, unsigned Index);
 /* Get the code entry following the one with the index Index. If there is no
  * following code entry, return NULL.
+ */
+
+int GetCodeEntries (CodeSeg* S, struct CodeEntry** List,
+       		    unsigned Start, unsigned Count);
+/* Get Count code entries into List starting at index start. Return true if
+ * we got the lines, return false if not enough lines were available.
  */
 
 unsigned GetCodeEntryIndex (CodeSeg* S, struct CodeEntry* E);
@@ -162,8 +176,15 @@ void DelCodeSegAfter (CodeSeg* S, unsigned Last);
 void OutputCodeSeg (const CodeSeg* S, FILE* F);
 /* Output the code segment data to a file */
 
-unsigned GetCodeEntryCount (const CodeSeg* S);
+#if defined(HAVE_INLINE)
+INLINE unsigned GetCodeEntryCount (const CodeSeg* S)
 /* Return the number of entries for the given code segment */
+{
+    return CollCount (&S->Entries);
+}
+#else
+#  define GetCodeEntryCount(S)	CollCount (&(S)->Entries)
+#endif
 
 
 

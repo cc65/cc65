@@ -139,10 +139,13 @@ static int NumArg (const char* Arg, unsigned long* Num)
 
 
 
-CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* JumpTo)
+CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg, CodeLabel* JumpTo)
 /* Create a new code entry, initialize and return it */
 {
-    /* Allocate memory */
+    /* Get the opcode description */
+    const OPCDesc* D = GetOPCDesc (OPC);
+
+    /* Allocate memory */	  
     CodeEntry* E = xmalloc (sizeof (CodeEntry));
 
     /* Initialize the fields */
@@ -246,30 +249,6 @@ void AttachCodeLabel (CodeEntry* E, CodeLabel* L)
 
 
 
-int CodeEntryHasLabel (const CodeEntry* E)
-/* Check if the given code entry has labels attached */
-{
-    return (CollCount (&E->Labels) > 0);
-}
-
-
-
-unsigned GetCodeLabelCount (const CodeEntry* E)
-/* Get the number of labels attached to this entry */
-{
-    return CollCount (&E->Labels);
-}
-
-
-
-CodeLabel* GetCodeLabel (CodeEntry* E, unsigned Index)
-/* Get a label from this code entry */
-{
-    return CollAt (&E->Labels, Index);
-}
-
-
-
 void MoveCodeLabel (CodeLabel* L, CodeEntry* E)
 /* Move the code label L from it's former owner to the code entry E. */
 {
@@ -279,30 +258,6 @@ void MoveCodeLabel (CodeLabel* L, CodeEntry* E)
     /* Set the new owner */
     CollAppend (&E->Labels, L);
     L->Owner = E;
-}
-
-
-
-int CodeEntryHasMark (const CodeEntry* E)
-/* Return true if the given code entry has the CEF_USERMARK flag set */
-{
-    return (E->Flags & CEF_USERMARK) != 0;
-}
-
-
-
-void CodeEntrySetMark (CodeEntry* E)
-/* Set the CEF_USERMARK flag for the given entry */
-{
-    E->Flags |= CEF_USERMARK;
-}
-
-
-
-void CodeEntryResetMark (CodeEntry* E)
-/* Reset the CEF_USERMARK flag for the given entry */
-{
-    E->Flags &= ~CEF_USERMARK;
 }
 
 

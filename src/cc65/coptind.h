@@ -48,7 +48,10 @@
 
 
 
-unsigned OptDeadJumps (CodeSeg* S);
+unsigned OptRTSJumps (CodeSeg* S);
+/* Replace jumps to RTS by RTS */
+
+unsigned OptDeadJumps (CodeSeg* S); 
 /* Remove dead jumps (jumps to the next instruction) */
 
 unsigned OptDeadCode (CodeSeg* S);

@@ -121,10 +121,10 @@ static long DoStructInternal (long Offs, unsigned Type)
     while (Tok != TOK_ENDSTRUCT && Tok != TOK_ENDUNION && Tok != TOK_EOF) {
 
         long      MemberSize;
-        SymEntry* Sym;
         SymTable* Struct;
 
         /* The format is "[identifier] storage-allocator [, multiplicator]" */
+        SymEntry* Sym = 0;
         if (Tok == TOK_IDENT) {
             /* We have an identifier, generate a symbol */
             Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
@@ -168,7 +168,7 @@ static long DoStructInternal (long Offs, unsigned Type)
 
             case TOK_TAG:
                 NextTok ();
-                Struct = ParseScopedSymTable (SYM_FIND_EXISTING);
+                Struct = ParseScopedSymTable ();
                 if (Struct == 0) {
                     Error ("Unknown struct/union");
                 } else if (GetSymTabType (Struct) != ST_STRUCT) {
@@ -198,6 +198,11 @@ static long DoStructInternal (long Offs, unsigned Type)
                     /* Not a conditional directive */
                     ErrorSkip ("Invalid storage allocator in struct/union");
                 }
+        }
+
+        /* Assign the size to the member if it has a name */
+        if (Sym) {
+            DefSizeOfSymbol (Sym, MemberSize);
         }
 
         /* Next member */

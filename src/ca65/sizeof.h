@@ -66,6 +66,12 @@ struct SymEntry* GetSizeOfSymbol (struct SymEntry* Sym);
  * does not exist.
  */
 
+struct SymEntry* DefSizeOfScope (struct SymTable* Scope, long Size);
+/* Define the size of a scope and return the size symbol */
+
+struct SymEntry* DefSizeOfSymbol (struct SymEntry* Sym, long Size);
+/* Define the size of a symbol and return the size symbol */
+
 
 
 /* End of sizeof.h */

@@ -69,6 +69,7 @@
 #include "pseudo.h"
 #include "repeat.h"
 #include "segment.h"
+#include "sizeof.h"
 #include "spool.h"
 #include "struct.h"
 #include "symbol.h"
@@ -1507,11 +1508,12 @@ static void DoSunPlus (void)
 
 static void DoTag (void)
 /* Allocate space for a struct */
-{
+{                                           
+    SymEntry* SizeSym;
     long Size;
 
     /* Read the struct name */
-    SymTable* Struct = ParseScopedSymTable (SYM_FIND_EXISTING);
+    SymTable* Struct = ParseScopedSymTable ();
 
     /* Check the supposed struct */
     if (Struct == 0) {
@@ -1523,8 +1525,14 @@ static void DoTag (void)
         return;
     }
 
-    /* Get the size of the struct */
-    Size = GetSymVal (SymFind (Struct, ".size", SYM_FIND_EXISTING));
+    /* Get the symbol that defines the size of the struct */
+    SizeSym = GetSizeOfScope (Struct);
+
+    /* Check if it does exist and if its value is known */
+    if (SizeSym == 0 || !SymIsConst (SizeSym, &Size)) {
+        ErrorSkip ("Size of struct/union is unknown");
+        return;
+    }
 
     /* Optional multiplicator may follow */
     if (Tok == TOK_COMMA) {

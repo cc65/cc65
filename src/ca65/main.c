@@ -68,6 +68,7 @@
 #include "pseudo.h"
 #include "scanner.h"
 #include "segment.h"
+#include "sizeof.h"
 #include "spool.h"
 #include "symtab.h"
 #include "ulabel.h"
@@ -373,8 +374,11 @@ static void DoPCAssign (void)
 
 static void OneLine (void)
 /* Assemble one line */
-{
-    int Done = 0;
+{            
+    Segment*      Seg  = 0;
+    unsigned long PC   = 0;
+    SymEntry*     Sym  = 0;
+    int           Done = 0;
 
     /* Initialize the new listing line if we are actually reading from file
      * and not from internally pushed input.
@@ -396,7 +400,6 @@ static void OneLine (void)
         int HadWS = WS;
 
         /* Generate the symbol table entry, then skip the name */
-        SymEntry* Sym;
         if (Tok == TOK_IDENT) {
             Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
         } else {
@@ -417,8 +420,15 @@ static void OneLine (void)
             /* Don't allow anything after a symbol definition */
             Done = 1;
         } else {
-            /* Define a label */
+            /* A label. Remember the current segment, so we can later
+             * determine the size of the data stored under the label.
+             */
+            Seg = ActiveSeg;
+            PC  = GetPC ();
+
+            /* Define the label */
             SymDef (Sym, GenCurrentPC (), ADDR_SIZE_DEFAULT, SF_LABEL);
+
             /* Skip the colon. If NoColonLabels is enabled, allow labels
              * without a colon if there is no whitespace before the
              * identifier.
@@ -461,6 +471,22 @@ static void OneLine (void)
 		DoPCAssign ();
 	    }
 	}
+
+        /* If we have defined a label, remember its size. Sym is also set by
+         * a symbol assignment, but in this case Done is false, so we don't
+         * come here.
+         */
+        if (Sym) {
+            unsigned long Size;
+            if (Seg == ActiveSeg) {
+                /* Same segment */
+                Size = GetPC () - PC;
+            } else {
+                /* The line has switched the segment */
+                Size = 0;
+            }
+            DefSizeOfSymbol (Sym, Size);
+        }
     }
 
     /* Line separator must come here */

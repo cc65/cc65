@@ -42,6 +42,7 @@
 #include "exprdefs.h"
 #include "print.h"
 #include "shift.h"
+#include "strbuf.h"
 #include "tgttrans.h"
 #include "version.h"
 #include "xmalloc.h"
@@ -385,16 +386,43 @@ static ExprNode* FuncReferenced (void)
 static ExprNode* FuncSizeOf (void)
 /* Handle the .SIZEOF function */
 {
-    /* Get the struct for the scoped struct name */
-    SymTable* Struct = ParseScopedSymTable (SYM_FIND_EXISTING);
+    StrBuf    FullName = AUTO_STRBUF_INITIALIZER;
+    char      Name[sizeof (SVal)];
+    SymTable* Scope;
+    SymEntry* Sym;
+    SymEntry* SizeSym;
+    long      Size;
 
-    /* Check if the given symbol is really a struct */
-    if (GetSymTabType (Struct) != ST_STRUCT) {
-        Error ("Argument to .SIZEOF is not a struct");
+
+    /* Parse the scope and the name */
+    SymTable* ParentScope = ParseScopedIdent (Name, &FullName);
+
+    /* Check if the parent scope is valid */
+    if (ParentScope == 0) {
+        /* No such scope */
+        DoneStrBuf (&FullName);
         return GenLiteralExpr (0);
-    } else {
-        return Symbol (GetSizeOfScope (Struct));
     }
+
+    /* The scope is valid, search first for a child scope, then for a symbol */
+    if ((Scope = SymFindScope (ParentScope, Name, SYM_FIND_EXISTING)) != 0) {
+        /* Yep, it's a scope */
+        SizeSym = GetSizeOfScope (Scope);
+    } else if ((Sym = SymFind (ParentScope, Name, SYM_FIND_EXISTING)) != 0) {
+        SizeSym = GetSizeOfSymbol (Sym);
+    } else {
+        Error ("Unknown symbol or scope: `%s'", SB_GetConstBuf (&FullName));
+        return GenLiteralExpr (0);
+    }
+
+    /* Check if we have a size */
+    if (SizeSym == 0 || !SymIsConst (SizeSym, &Size)) {
+        Error ("Size of `%s' is unknown", SB_GetConstBuf (&FullName));
+        return GenLiteralExpr (0);
+    }
+
+    /* Return the size */
+    return GenLiteralExpr (Size);
 }
 
 

@@ -33,6 +33,9 @@
 
 
 
+/* common */
+#include "addrsize.h"
+
 /* ca65 */
 #include "sizeof.h"
 #include "symtab.h"
@@ -76,6 +79,24 @@ SymEntry* GetSizeOfSymbol (SymEntry* Sym)
  */
 {
     return SymFindLocal (Sym, SizeEntryName, SYM_ALLOC_NEW);
+}
+
+
+
+SymEntry* DefSizeOfScope (SymTable* Scope, long Size)
+/* Define the size of a scope and return the size symbol */
+{
+    SymEntry* SizeSym = GetSizeOfScope (Scope);
+    SymDef (SizeSym, GenLiteralExpr (Size), ADDR_SIZE_DEFAULT, SF_NONE);
+}
+
+
+
+SymEntry* DefSizeOfSymbol (SymEntry* Sym, long Size)
+/* Define the size of a symbol and return the size symbol */
+{
+    SymEntry* SizeSym = GetSizeOfSymbol (Sym);
+    SymDef (SizeSym, GenLiteralExpr (Size), ADDR_SIZE_DEFAULT, SF_NONE);
 }
 
 

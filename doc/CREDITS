@@ -61,21 +61,34 @@ More special thanks to:
     Miroc contributed Makefile additions, docs and patches to compile cc65
     cleanly under OS/2 using the EMX toolkit.
 
+  * Marc 'BlackJack' Rintsch <blackjack@civitas64.de>
+
+    Marc wrote and contributed BASIC compatible file I/O routines for the
+    Commodore machines.
+
 
 
 Thanks to
 
-    Mark Nasgowitz <MNasgowitz@NAZdesign.com>
     da Blondie <db@tvnet.hu>
-    Jari Tuominen <jer64@kolumbus.fi>
-    MagerValp <magervalp@cling.gu.se>
-    Ingo Korb <unseen@gmx.net>
-    Robert R. Wal <rrw@reptile.eu.org>
-    Jesse Beach <agmorion@erols.com>
-    Chris Ward <chris.ward@freenet.co.uk>
-    Tim Vanderhoek <hoek@FreeBSD.org>
+    Adam Dunkels <adam@sics.se>
     Bill Craig <craigw@gusun.georgetown.edu>
+    C. N. Wong <superufo@netvigator.com>
+    Chris Ward <chris.ward@freenet.co.uk>
+    Dagan Galarneau <dagan@dnai.com>
+    Darrell Krulce <dkrulce@atcomm.com>
+    Dennis Lin <dennis@mosart.com.tw>
+    Eric Bacher <ebacher@teaser.fr>
     Greg King <gngking@erols.com>
+    Ingo Korb <unseen@gmx.net>
+    Jaleco <jaleco@gameone.com.tw>
+    Jari Tuominen <jer64@kolumbus.fi>
+    Jesse Beach <agmorion@erols.com>
+    John Weidman <jweidman@slip.net>
+    MagerValp <magervalp@cling.gu.se>
+    Mark Nasgowitz <MNasgowitz@NAZdesign.com>
+    Robert R. Wal <rrw@reptile.eu.org>
+    Tim Vanderhoek <hoek@FreeBSD.org>
 
 for bug reports and suggestions.
 

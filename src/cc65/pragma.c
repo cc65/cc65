@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -36,13 +36,14 @@
 #include <stdlib.h>
 #include <ctype.h>
 
-#include "global.h"
-#include "error.h"
-#include "litpool.h"
-#include "symtab.h"
-#include "scanner.h"
 #include "codegen.h"
+#include "error.h"
 #include "expr.h"
+#include "global.h"
+#include "litpool.h"
+#include "scanner.h"
+#include "segname.h"
+#include "symtab.h"
 #include "pragma.h"
 
 
@@ -134,6 +135,38 @@ static void StringPragma (void (*Func) (const char*))
 
 
 
+static void SegNamePragma (void (*Func) (const char*))
+/* Handle a pragma that expects a segment name parameter */
+{
+    if (curtok != TOK_SCONST) {
+	Error (ERR_STRLIT_EXPECTED);
+    } else {
+     	/* Get the segment name */
+     	const char* Name = GetLiteral (curval);
+
+	/* Check if the name is valid */
+	if (ValidSegName (Name)) {
+
+       	    /* Call the given function to set the name */
+	    Func (Name);
+
+	} else {
+			   
+	    /* Segment name is invalid */
+	    Error (ERR_ILLEGAL_SEG_NAME, Name);
+
+	}
+
+     	/* Reset the string pointer, removing the string from the pool */
+     	ResetLiteralOffs (curval);
+    }
+
+    /* Skip the string (or error) token */
+    NextToken ();
+}
+
+
+
 static void FlagPragma (unsigned char* Flag)
 /* Handle a pragma that expects a boolean paramater */
 {
@@ -180,15 +213,15 @@ void DoPragma (void)
     switch (Pragma) {
 
 	case PR_BSSSEG:
-	    StringPragma (g_bssname);
+	    SegNamePragma (g_bssname);
 	    break;
 
 	case PR_CODESEG:
-	    StringPragma (g_codename);
+	    SegNamePragma (g_codename);
 	    break;
 
 	case PR_DATASEG:
-	    StringPragma (g_dataname);
+	    SegNamePragma (g_dataname);
 	    break;
 
 	case PR_REGVARADDR:
@@ -196,7 +229,7 @@ void DoPragma (void)
 	    break;
 
 	case PR_RODATASEG:
-	    StringPragma (g_rodataname);
+	    SegNamePragma (g_rodataname);
 	    break;
 
 	case PR_SIGNEDCHARS:

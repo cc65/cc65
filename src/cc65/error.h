@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -131,6 +131,7 @@ enum Errors {
     ERR_ILLEGAL_CHARCONST,
     ERR_ILLEGAL_MODIFIER,
     ERR_ILLEGAL_STORAGE_CLASS,
+    ERR_ILLEGAL_SEG_NAME,
     ERR_DIV_BY_ZERO,
     ERR_MOD_BY_ZERO,
     ERR_RANGE,

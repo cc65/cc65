@@ -41,6 +41,9 @@
 /* common */
 #include "coll.h"
 
+/* sim65 */
+#include "chipdata.h"
+
 
 
 /*****************************************************************************/
@@ -58,8 +61,6 @@ struct ChipLibrary {
     char*                   LibName;    /* Name of the library as given */
     char*                   PathName;   /* Name of library including path */
     void*                   Handle;     /* Pointer to libary handle */
-    const struct ChipData*  Data;       /* Pointer to chip data */
-    unsigned                ChipCount;  /* Number of chips in this library */
     Collection              Chips;      /* Chips in this library */
 };
 
@@ -75,13 +76,9 @@ extern Collection ChipLibraries;
 
 
 void LoadChipLibrary (const char* LibName);
-/* Load a chip library . This includes loading the shared libary, allocating
- * and initializing the data structure.
- */
-
-void* GetChipLibSym (const ChipLibrary* L, const char* SymName);
-/* Locate a symbol in a module and return it. Abort on errors (may be modified
- * later to return NULL).
+/* Load a chip library. This includes loading the shared libary, allocating
+ * and initializing the data structure, and loading all chip data from the
+ * library.
  */
 
 

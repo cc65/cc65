@@ -37,12 +37,17 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <dirent.h>
+#include <unistd.h>
 
 /* common */
 #include "abend.h"
 #include "cmdline.h"
 #include "print.h"
 #include "version.h"
+#include "xmalloc.h"
 
 /* sim65 */
 #include "chip.h"
@@ -92,7 +97,47 @@ static void Usage (void)
 static void OptChipDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --chipdir option */
 {
-    AddChipPath (Arg);
+    struct dirent* E;
+
+    /* Get the length of the directory name */
+    unsigned DirLen = strlen (Arg);
+
+    /* Open the directory */
+    DIR* D = opendir (Arg);
+    if (D == 0) {
+        AbEnd ("Cannot read directory `%s': %s", Arg, strerror (errno));
+    }
+
+    /* Read in all files and treat them as libraries */
+    while ((E = readdir (D)) != 0) {
+
+        struct stat S;
+
+        /* Create the full file name */
+        char* Name = xmalloc (DirLen + 1 + strlen (E->d_name) + 1);
+        strcpy (Name, Arg);
+        strcpy (Name + DirLen, "/");
+        strcpy (Name + DirLen + 1, E->d_name);
+
+        /* Stat the file */
+        if (stat (Name, &S) != 0) {
+            Warning ("Cannot stat `%s': %s", Name, strerror (errno));
+            xfree (Name);
+            continue;
+        }
+
+        /* Check if this is a regular file */
+        if (S_ISREG (S.st_mode)) {
+            /* Treat it as a library */
+            LoadChipLibrary (Name);
+        }
+
+        /* Free the name */
+        xfree (Name);
+    }
+
+    /* Close the directory */
+    closedir (D);
 }
 
 
@@ -239,15 +284,13 @@ int main (int argc, char* argv[])
 	++I;
     }
 
+    /* Sort the already loaded chips */
+    SortChips ();
+
     /* Check if we have a valid configuration */
     if (!CfgAvail ()) {
        	Error ("Simulator configuration missing");
     }
-
-    /* Load the chips */
-    AddChipPath ("chips");
-    LoadChipLibrary ("ram.so");
-    LoadChips ();
 
     /* Read the config file */
     CfgRead ();

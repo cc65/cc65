@@ -53,19 +53,21 @@
 
 
 
-#if 0
+/* Forwards */
+struct CfgData;
+struct ChipLibrary;
+typedef struct Chip Chip;
 typedef struct ChipInstance ChipInstance;
+
+/* One instance of a chip */
 struct ChipInstance {
-    Chip*       C;                      /* Pointer to corresponding chip */
-    unsigned    Addr;                   /* Start address of range */
-    unsigned    Size;                   /* Size of range */
+    Chip*           C;                  /* Pointer to corresponding chip */
+    unsigned long   Addr;               /* Start address of range */
+    unsigned        Size;               /* Size of range */
+    void*           InstanceData;       /* Chip instance data */
 };
-#endif
-
-
 
 /* Chip structure */
-typedef struct Chip Chip;
 struct Chip {
     struct ChipLibrary* Library;        /* Pointer to library data structure */
     const ChipData*     Data;           /* Chip data as given by the library */
@@ -75,24 +77,32 @@ struct Chip {
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*     	      	    		     Code		  		     */
 /*****************************************************************************/
 
 
 
-void LoadChips (void);
-/* Load all chips from all libraries */
+Chip* NewChip (struct ChipLibrary* Library, const ChipData* Data);
+/* Allocate a new chip structure, initialize and return it */
 
-const Chip* FindChip (const char* Name);
-/* Find a chip by name. Returns the Chip data structure or NULL if the chip
- * could not be found.
+ChipInstance* NewChipInstance (unsigned long Addr, unsigned Size);
+/* Allocate a new chip instance for the chip. */
+
+void InitChipInstance (ChipInstance* CI, const char* ChipName,
+                       const struct CfgData** Data, unsigned Count);
+/* Initialize the given chip instance. Assign it to the chip named ChipName,
+ * and call the init function of the chip passing the given config data.
  */
+
+void SortChips (void);
+/* Sort all chips by name. Called after loading */
 
 
 
 /* End of chip.h */
 
 #endif
+
 
 
 

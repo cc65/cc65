@@ -113,9 +113,9 @@ int CPUHalted;
 /* Special test and set macros. The meaning of the parameter depends on the
  * actual flag that should be set or reset.
  */
-#define TEST_ZF(v)              SET_ZF (((v) & 0xFF) == 0)
-#define TEST_SF(v)              SET_SF (((v) & 0x80) != 0)
-#define TEST_CF(v)              SET_CF (((v) & 0xFF00) != 0)
+#define TEST_ZF(v)      SET_ZF (((v) & 0xFF) == 0)
+#define TEST_SF(v)      SET_SF (((v) & 0x80) != 0)
+#define TEST_CF(v)      SET_CF (((v) & 0xFF00) != 0)
 
 /* Program counter halves */
 #define PCL	       	(PC & 0xFF)

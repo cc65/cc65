@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -49,6 +49,7 @@
 #define CHIPDATA_VER_MINOR      0U
 
 /* Forwards */
+struct CfgData;
 struct SimData;
 
 /* ChipDesc structure */
@@ -60,7 +61,8 @@ struct ChipData {
 
     /* -- Exported functions -- */
     int           (*InitChip) (const struct SimData* Data);
-    void*         (*InitInstance) (unsigned Addr, unsigned Range);
+    void*         (*InitInstance) (unsigned Addr, unsigned Range, 
+                                   const struct CfgData** Data, unsigned CfgDataCount);
     void          (*WriteCtrl) (void* Data, unsigned Offs, unsigned char Val);
     void          (*Write) (void* Data, unsigned Offs, unsigned char Val);
     unsigned char (*ReadCtrl) (void* Data, unsigned Offs);

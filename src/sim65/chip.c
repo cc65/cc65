@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -94,7 +94,7 @@ static int CmpChips (void* Data attribute ((unused)),
 
 
 
-static Chip* NewChip (ChipLibrary* Library, const ChipData* Data)
+Chip* NewChip (ChipLibrary* Library, const ChipData* Data)
 /* Allocate a new chip structure, initialize and return it */
 {
     /* Allocate memory */
@@ -105,68 +105,34 @@ static Chip* NewChip (ChipLibrary* Library, const ChipData* Data)
     C->Data      = Data;
     C->Instances = EmptyCollection;
 
+    /* Insert the new chip into the collection of all chips */
+    CollAppend (&Chips, C);
+
     /* Return the structure */
     return C;
 }
 
 
 
-#if 0
-static void FreeChip (Chip* C)
-/* ## Free the given chip structure */
+ChipInstance* NewChipInstance (unsigned long Addr, unsigned Size)
+/* Allocate a new chip instance for the chip. */
 {
-    /* Free the structure itself */
-    xfree (C);
-}
-#endif
+    /* Allocate a new ChipInstance structure */
+    ChipInstance* Instance = xmalloc (sizeof (*Instance));
 
+    /* Initialize the fields */
+    Instance->C             = 0;
+    Instance->Addr          = Addr;
+    Instance->Size          = Size;
+    Instance->InstanceData  = 0;
 
-
-void LoadChips (void)
-/* Load all chips from all libraries */
-{
-    unsigned I, J;
-
-    /* Walk through all libraries */
-    for (I = 0; I < CollCount (&ChipLibraries); ++I) {
-
-        /* Get the library entry */
-        ChipLibrary* L = CollAt (&ChipLibraries, I);
-
-        /* Create the chips */
-        for (J = 0; J < L->ChipCount; ++J) {
-
-            /* Get a pointer to the chip data */
-            const ChipData* Data = L->Data + J;
-
-            /* Check if the chip data has the correct version */
-            if (Data->MajorVersion != CHIPDATA_VER_MAJOR) {
-                Warning ("Version mismatch for `%s' (%s), expected %u, got %u",
-                         Data->ChipName, L->LibName,
-                         CHIPDATA_VER_MAJOR, Data->MajorVersion);
-                /* Ignore this chip */
-                continue;
-            }
-
-            /* Generate a new chip and insert it into the collection */
-            CollAppend (&Chips, NewChip (L, Data));
-
-	    /* Output chip name and version to keep the user happy */
-	    Print (stdout, 1,
-		   "Found chip `%s' version %u.%u\n",
-		   Data->ChipName,
-		   Data->MajorVersion,
-		   Data->MinorVersion);
-        }
-    }
-
-    /* Last act: Sort the chips by name */
-    CollSort (&Chips, CmpChips, 0);
+    /* Return the new struct */
+    return Instance;
 }
 
 
 
-const Chip* FindChip (const char* Name)
+static Chip* FindChip (const char* Name)
 /* Find a chip by name. Returns the Chip data structure or NULL if the chip
  * could not be found.
  */
@@ -176,18 +142,49 @@ const Chip* FindChip (const char* Name)
     /* ## We do a linear search for now */
     for (I = 0; I < CollCount (&Chips); ++I) {
 
-	/* Get the chip at this position */
-	const Chip* C = CollConstAt (&Chips, I);
+    	/* Get the chip at this position */
+    	Chip* C = CollAt (&Chips, I);
 
-	/* Compare the name */
-	if (strcmp (Name, C->Data->ChipName) == 0) {
-	    /* Found */
-	    return C;
-	}
+    	/* Compare the name */
+    	if (strcmp (Name, C->Data->ChipName) == 0) {
+    	    /* Found */
+    	    return C;
+    	}
     }
 
     /* Not found */
     return 0;
+}
+
+
+
+void InitChipInstance (ChipInstance* CI, const char* ChipName,
+                       const struct CfgData** Data, unsigned Count)
+/* Initialize the given chip instance. Assign it to the chip named ChipName,
+ * and call the init function of the chip passing the given config data.
+ */
+{
+    /* Find the chip with the given name */
+    Chip* C = FindChip (ChipName);
+    if (C == 0) {
+        Error ("No chip `%s' found for address $%6lX", ChipName, CI->Addr);
+    }
+
+    /* Call the initialization function */
+    CI->InstanceData = C->Data->InitInstance (CI->Addr, CI->Size, Data, Count);
+
+    /* Assign the chip instance to the chip */
+    CI->C = C;
+    CollAppend (&C->Instances, CI);
+}
+
+
+
+void SortChips (void)
+/* Sort all chips by name. Called after loading */
+{
+    /* Last act: Sort the chips by name */
+    CollSort (&Chips, CmpChips, 0);
 }
 
 

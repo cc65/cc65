@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -42,6 +42,7 @@
 #include "check.h"
 #include "bitops.h"
 #include "print.h"
+#include "strutil.h"
 #include "xmalloc.h"
 
 /* sim65 */
@@ -55,20 +56,48 @@
 
 
 /*****************************************************************************/
-/*		    		struct CfgData				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-static CfgData* NewCfgData (const char* Tok)
-/* Create and intialize a new CfgData struct, then return it */
+/* List of all memory locations */
+static Collection Locations;
+
+/* One memory location */
+typedef struct Location Location;
+struct Location {
+    unsigned long       Start;          /* Start of memory location */
+    unsigned long       End;            /* End memory location */
+    Collection          Attributes;     /* Attributes given */
+    unsigned            Line;           /* Line in config file */
+    unsigned            Col;            /* Column in config file */
+};
+
+
+
+/*****************************************************************************/
+/*		      		struct CfgData		       		     */
+/*****************************************************************************/
+
+
+
+static CfgData* NewCfgData (void)
+/* Create and intialize a new CfgData struct, then return it. The function
+ * uses the current output of the config scanner.
+ */
 {
+    /* Get the length of the identifier */
+    unsigned AttrLen = strlen (CfgSVal);
+
     /* Allocate memory */
-    CfgData* D = xmalloc (sizeof (CfgData));
+    CfgData* D = xmalloc (sizeof (CfgData) + AttrLen);
 
     /* Initialize the fields */
-    D->Attr = xstrdup (Tok);
-    D->Type = Invalid;
+    D->Type = CfgDataInvalid;                 
+    D->Line = CfgErrorLine;
+    D->Col  = CfgErrorCol;
+    memcpy (D->Attr, CfgSVal, AttrLen+1);
 
     /* Return the new struct */
     return D;
@@ -77,7 +106,87 @@ static CfgData* NewCfgData (const char* Tok)
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*                              struct Location                              */
+/*****************************************************************************/
+
+
+
+static Location* NewLocation (unsigned long Start, unsigned long End)
+/* Create a new location, initialize and return it */
+{
+    /* Allocate memory */
+    Location* L = xmalloc (sizeof (Location));
+
+    /* Initialize the fields */
+    L->Start      = Start;
+    L->End        = End;
+    L->Attributes = EmptyCollection;
+    L->Line       = CfgErrorLine;
+    L->Col        = CfgErrorCol;
+
+    /* Return the new struct */
+    return L;
+}
+
+
+
+static int CmpLocations (void* Data attribute ((unused)),
+		         const void* lhs, const void* rhs)
+/* Compare function for CollSort */
+{
+    /* Cast the object pointers */
+    const Location* Left  = (const Location*) rhs;
+    const Location* Right = (const Location*) lhs;
+
+    /* Do the compare */
+    if (Left->Start < Right->Start) {
+        return 1;
+    } else if (Left->Start > Right->Start) {
+        return -1;
+    } else {
+        return 0;
+    }
+}
+
+
+
+static const CfgData* LocationFindAttr (const Location* L, const char* AttrName)
+/* Find the attribute with the given name and return it. Return NULL if the
+ * attribute was not found.
+ */
+{
+    unsigned I;
+
+    /* Walk through the attributes checking for a "mirror" attribute */
+    for (I = 0; I < CollCount (&L->Attributes); ++I) {
+
+        /* Get the next attribute */
+        const CfgData* D = CollConstAt (&L->Attributes, I);
+
+        /* Compare the name */
+        if (StrCaseCmp (D->Attr, AttrName) == 0) {
+            /* Found */
+            return D;
+        }
+    }
+
+    /* Not found */
+    return 0;
+}
+
+
+
+static int LocationIsMirror (const Location* L)
+/* Return true if the given location is a mirror of another one. */
+{
+    /* Find the "mirror" attribute */
+    return (LocationFindAttr (L, "mirror") != 0);
+}
+
+
+
+/*****************************************************************************/
+/*     	      	    		     Code				     */
 /*****************************************************************************/
 
 
@@ -105,72 +214,72 @@ static void AttrCheck (unsigned Attr, unsigned Mask, const char* Name)
 
 
 
-static void ParseChips (void)
-/* Parse a CHIPS section */
+static void ParseMemory (void)
+/* Parse a MEMORY section */
 {
-    static const IdentTok Attributes [] = {
-       	{   "ADDR",    	CFGTOK_ADDR     },
-	{   "RANGE",   	CFGTOK_RANGE    },
-    };
+    unsigned I;
+    const Location* Last;
 
-    /* Bits and stuff to remember which attributes we have read */
-    enum {
-	CA_ADDR  = 0x01,
-	CA_RANGE = 0x02
-    };
-    unsigned Attr;
 
-    /* Attribute values. Initialize to make gcc happy. */
-    const Chip* C;
-    unsigned Addr  = 0;
-    unsigned Range = 0;
+    while (CfgTok == CFGTOK_INTCON) {
 
-    while (CfgTok == CFGTOK_IDENT) {
+        Location* L;
 
-	/* Search the chip with the given name */
-	C = FindChip (CfgSVal);
-	if (C == 0) {
-	    CfgError ("No such chip: `%s'", CfgSVal);
-	}
+        /* Remember the start address and skip it */
+        unsigned long Start = CfgIVal;
+        CfgNextTok ();
 
-	/* Skip the name plus the following colon */
-	CfgNextTok ();
-	CfgConsumeColon ();
+        /* .. must follow */
+        CfgConsume (CFGTOK_DOTDOT, "`..' expected");
 
-       	/* Read the attributes */
-	Attr = 0;
-	while (CfgTok == CFGTOK_IDENT) {
+        /* End address must follow and must be greater than start */
+        CfgAssureInt ();
+        if (CfgIVal < Start) {
+            CfgError ("Start address must be greater than end address");
+        }
 
-	    /* Map the identifier to a token */
-	    cfgtok_t AttrTok;
-	    CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
-	    AttrTok = CfgTok;
+        /* Create a new location and add it to the list */
+        L = NewLocation (Start, CfgIVal);
+        CollAppend (&Locations, L);
+
+        /* Skip the end address and the following colon */
+        CfgNextTok ();
+        CfgConsumeColon ();
+
+        /* Parse attributes terminated by a semicolon */
+        while (CfgTok == CFGTOK_IDENT) {
+
+            /* Generate a new attribute with the given name, then skip it */
+            CfgData* D = NewCfgData ();
+            CfgNextTok ();
 
 	    /* An optional assignment follows */
-	    CfgNextTok ();
 	    CfgOptionalAssign ();
 
-	    /* Check which attribute was given */
-	    switch (AttrTok) {
+            /* Check and assign the attribute value */
+            switch (CfgTok) {
 
-		case CFGTOK_ADDR:
-		    CfgAssureInt ();
- 		    CfgRangeCheck (0, 0xFFFF);
-	      	    FlagAttr (&Attr, CA_ADDR, "ADDR");
-		    Addr = (unsigned) CfgIVal;
-		    break;
+                case CFGTOK_INTCON:
+                    D->Type   = CfgDataNumber;
+                    D->V.IVal = CfgIVal;
+                    break;
 
-		case CFGTOK_RANGE:
-		    CfgAssureInt ();
-		    CfgRangeCheck (0, 0xFFFF);
-      		    FlagAttr (&Attr, CA_RANGE, "RANGE");
- 		    Range = (unsigned) CfgIVal;
-		    break;
+                case CFGTOK_STRCON:
+                    D->Type   = CfgDataString;
+                    D->V.SVal = xstrdup (CfgSVal);
+                    break;
 
-		default:
-       	       	    FAIL ("Unexpected attribute token");
+                case CFGTOK_IDENT:
+                    D->Type   = CfgDataId;
+                    D->V.SVal = xstrdup (CfgSVal);
+                    break;
 
-	    }
+                default:
+                    CfgError ("Invalid attribute type");
+            }
+
+            /* Add the attribute to the location */
+            CollAppend (&L->Attributes, D);
 
 	    /* Skip the attribute value and an optional comma */
 	    CfgNextTok ();
@@ -179,18 +288,42 @@ static void ParseChips (void)
 
 	/* Skip the semicolon */
 	CfgConsumeSemi ();
+    }
 
-	/* Check for mandatory parameters */
-	AttrCheck (Attr, CA_ADDR, "ADDR");
-	AttrCheck (Attr, CA_RANGE, "RANGE");
+    /* Sort all memory locations */
+    CollSort (&Locations, CmpLocations, 0);
 
-	/* Address + Range may not exceed 16 bits */
-       	if (((unsigned long) Range) > 0x10000UL - Addr) {
-	    CfgError ("Range error");
-	}
+    /* Check for overlaps and other problems */
+    Last = 0;
+    for (I = 0; I < CollCount (&Locations); ++I) {
 
-	/* Create the chip ## */
+        /* Get this location */
+        const Location* L = CollAtUnchecked (&Locations, I);
 
+        /* Check for an overlap with the following location */
+        if (Last && Last->End >= L->Start) {
+            Error ("%s(%u): Address range overlap (overlapping entry is in line %u)",
+                   CfgGetName(), L->Line, Last->Line);
+        }
+
+        /* If the location is a mirror, it must not have other attributes,
+         * and the mirror attribute must be an integer.
+         */
+        if (LocationIsMirror (L)) {
+            const CfgData* D;
+            if (CollCount (&L->Attributes) > 1) {
+                Error ("%s(%u): Location at address $%06lX is a mirror "
+                       "but has attributes", CfgGetName(), L->Line, L->Start);
+            }
+            D = CollConstAt (&L->Attributes, 0);
+            if (D->Type != CfgDataNumber) {
+                Error ("%s(%u): Mirror attribute is not an integer",
+                       CfgGetName (), L->Line);
+            }
+        }
+
+        /* Remember this entry */
+        Last = L;
     }
 }
 
@@ -200,7 +333,7 @@ static void ParseConfig (void)
 /* Parse the config file */
 {
     static const IdentTok BlockNames [] = {
-       	{   "CHIPS",   	CFGTOK_CHIPS	},
+       	{   "MEMORY",  	CFGTOK_MEMORY   },
     };
     cfgtok_t BlockTok;
 
@@ -217,9 +350,9 @@ static void ParseConfig (void)
 	/* Read the block */
 	switch (BlockTok) {
 
-	    case CFGTOK_CHIPS:
-       	       	ParseChips ();
-	     	break;
+            case CFGTOK_MEMORY:
+                ParseMemory ();
+                break;
 
 	    default:
 	     	FAIL ("Unexpected block token");

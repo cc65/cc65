@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,17 +46,19 @@
 
 typedef struct CfgData CfgData;
 struct CfgData {
-    char*	Attr;		/* The attribute name */
     enum {
-        Invalid,
-	Id,
-	Number,
-	String
+        CfgDataInvalid,
+	CfgDataId,
+	CfgDataNumber,
+	CfgDataString 
     }		Type;		/* Type of the value */
     union {
 	char*	SVal;		/* String or id value */
 	long	IVal;		/* Integer value */
     } V;
+    unsigned    Line;           /* Line where the attribute was defined */
+    unsigned    Col;            /* Column of attribute definition */
+    char       	Attr[1];        /* The attribute name */
 };
 
 

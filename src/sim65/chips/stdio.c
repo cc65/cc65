@@ -54,8 +54,10 @@
 int InitChip (const struct SimData* Data);
 /* Initialize the chip, return an error code */
 
-static void* InitInstance (unsigned Addr, unsigned Range);
+static void* InitInstance (unsigned Addr, unsigned Range,
+                           const CfgData** Data, unsigned CfgDataCount);
 /* Initialize a new chip instance */
+
 
 static void Write (void* Data, unsigned Offs, unsigned char Val);
 /* Write user data */
@@ -129,9 +131,10 @@ int InitChip (const struct SimData* Data)
 
 
 
-static void* InitInstance (unsigned Addr attribute ((unused)),
-			   unsigned Range attribute ((unused)))
+static void* InitInstance (unsigned Addr, unsigned Range,
+                           const CfgData** Data, unsigned CfgDataCount)
 /* Initialize a new chip instance */
+
 {
     /* We don't need any instance data */
     return 0;
@@ -159,4 +162,4 @@ static unsigned char Read (void* Data attribute ((unused)),
 
 
 
-					 
+

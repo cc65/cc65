@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -36,10 +36,12 @@
 #include <dlfcn.h>
 
 /* common */
+#include "fname.h"
 #include "print.h"
 #include "xmalloc.h"
 
 /* sim65 */
+#include "chip.h"
 #include "chippath.h"
 #include "error.h"
 #include "chiplib.h"
@@ -52,9 +54,6 @@
 
 
 
-/* Forwards */
-struct ChipData;
-
 /* A collection containing all libraries */
 Collection ChipLibraries = STATIC_COLLECTION_INITIALIZER;
 
@@ -66,18 +65,16 @@ Collection ChipLibraries = STATIC_COLLECTION_INITIALIZER;
 
 
 
-static ChipLibrary* NewChipLibrary (const char* LibName)
+static ChipLibrary* NewChipLibrary (const char* PathName)
 /* Create, initialize and return a new ChipLibrary structure */
 {
     /* Allocate memory */
     ChipLibrary* L = xmalloc (sizeof (ChipLibrary));
 
     /* Initialize the fields */
-    L->LibName   = xstrdup (LibName);
-    L->PathName  = 0;
+    L->LibName   = xstrdup (FindName (PathName));
+    L->PathName  = xstrdup (PathName);
     L->Handle    = 0;
-    L->Data      = 0;
-    L->ChipCount = 0;
     L->Chips     = EmptyCollection;
 
     /* Return the allocated structure */
@@ -109,25 +106,21 @@ static void FreeChipLibrary (ChipLibrary* L)
 
 
 void LoadChipLibrary (const char* LibName)
-/* Load a chip library . This includes loading the shared libary, allocating
- * and initializing the data structure.
+/* Load a chip library. This includes loading the shared libary, allocating
+ * and initializing the data structure, and loading all chip data from the
+ * library.
  */
 {
     const char* Msg;
     int (*GetChipData) (const struct ChipData**, unsigned*);
     int ErrorCode;
+    const ChipData* Data;       /* Pointer to chip data */
+    unsigned ChipCount;         /* Number of chips in this library */
+    unsigned I;
+
 
     /* Allocate a new ChipLibrary structure */
     ChipLibrary* L = NewChipLibrary (LibName);
-
-    /* Locate the library */
-    L->PathName = FindChipLib (LibName);
-    if (L->PathName == 0) {
-        /* Library not found */
-        Error ("Cannot find chip plugin library `%s'", LibName);
-        FreeChipLibrary (L);
-        return;
-    }
 
     /* Open the library */
     L->Handle = dlopen (L->PathName, RTLD_GLOBAL | RTLD_LAZY);
@@ -153,7 +146,7 @@ void LoadChipLibrary (const char* LibName)
     }
 
     /* Call the function to read the chip data */
-    ErrorCode = GetChipData (&L->Data, &L->ChipCount);
+    ErrorCode = GetChipData (&Data, &ChipCount);
     if (ErrorCode != 0) {
         Error ("Function `GetChipData' in `%s' returned error %d", L->LibName, ErrorCode);
         FreeChipLibrary (L);
@@ -165,6 +158,38 @@ void LoadChipLibrary (const char* LibName)
 
     /* Print some information */
     Print (stderr, 1, "Opened chip library `%s'\n", L->PathName);
+
+    /* Create the chips */
+    for (I = 0; I < ChipCount; ++I) {
+
+        Chip* C;
+
+        /* Get a pointer to the chip data */
+        const ChipData* D = Data + I;
+
+        /* Check if the chip data has the correct version */
+        if (Data->MajorVersion != CHIPDATA_VER_MAJOR) {
+            Warning ("Version mismatch for `%s' (%s), expected %u, got %u",
+                     D->ChipName, L->LibName,
+                     CHIPDATA_VER_MAJOR, D->MajorVersion);
+            /* Ignore this chip */
+            continue;
+        }
+
+        /* Generate a new chip */
+        C = NewChip (L, D);
+
+        /* Insert a reference to the chip into the library exporting it */
+        CollAppend (&L->Chips, C);
+
+        /* Output chip name and version to keep the user happy */
+        Print (stdout, 1,
+               "  Found `%s', version %u.%u in library `%s'\n",
+               Data->ChipName,
+               Data->MajorVersion,
+               Data->MinorVersion,
+               L->LibName);
+    }
 }
 
 

@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     pet.h                                   */
+/*                                   pet.h                                   */
 /*                                                                           */
-/*		        PET system specific definitions			     */
+/*                      PET system specific definitions			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -45,19 +45,39 @@
 
 
 
+/*****************************************************************************/
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
 /* Color defines */
-#define COLOR_BLACK  	       	0x00
-#define COLOR_WHITE  	       	0x01
-
-
+#define COLOR_BLACK            	0x00
+#define COLOR_WHITE            	0x01
 
 /* Define hardware */
 #include <_pia.h>
-#define PIA1	(*(struct __pia*)0xE810)
-#define PIA2	(*(struct __pia*)0xE820)
+#define PIA1    (*(struct __pia*)0xE810)
+#define PIA2    (*(struct __pia*)0xE820)
 
 #include <_6522.h>
-#define VIA    	(*(struct __6522*)0xE840)
+#define VIA     (*(struct __6522*)0xE840)
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
+
+/* The following #defines will cause the matching functions calls in conio.h
+ * to be overlaid by macros with the same names, saving the function call
+ * overhead.
+ */
+#define _textcolor(color)       COLOR_WHITE
+#define _bgcolor(color)         COLOR_BLACK
+#define _bordercolor(color)     COLOR_BLACK
 
 
 

@@ -1,32 +1,32 @@
 /*****************************************************************************/
-/*									     */
-/*				   apple2.h				     */
-/*									     */
-/*		     Apple ][ system specific definitions		     */
-/*									     */
-/*									     */
-/*									     */
-/* (C) 2000  Kevin Ruland, <kevin@rodin.wustl.edu>			     */
-/* (C) 2003  Ullrich von Bassewitz, <uz@cc65.org>			     */
-/*									     */
-/*									     */
-/* This software is provided 'as-is', without any expressed or implied	     */
+/*                                                                           */
+/*                                 apple2.h				     */
+/*                                                                           */
+/*                   Apple ][ system specific definitions		     */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 2000  Kevin Ruland, <kevin@rodin.wustl.edu>                           */
+/* (C) 2003  Ullrich von Bassewitz, <uz@cc65.org>                            */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
 /* warranty.  In no event will the authors be held liable for any damages    */
-/* arising from the use of this software.				     */
-/*									     */
+/* arising from the use of this software.                                    */
+/*                                                                           */
 /* Permission is granted to anyone to use this software for any purpose,     */
 /* including commercial applications, and to alter it and redistribute it    */
-/* freely, subject to the following restrictions:			     */
-/*									     */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
 /* 1. The origin of this software must not be misrepresented; you must not   */
 /*    claim that you wrote the original software. If you use this software   */
 /*    in a product, an acknowledgment in the product documentation would be  */
-/*    appreciated but is not required.					     */
+/*    appreciated but is not required.                                       */
 /* 2. Altered source versions must be plainly marked as such, and must not   */
-/*    be misrepresented as being the original software. 		     */
-/* 3. This notice may not be removed or altered from any source 	     */
-/*    distribution.							     */
-/*									     */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
 /*****************************************************************************/
 
 
@@ -44,7 +44,7 @@
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*                                   Data				     */
 /*****************************************************************************/
 
 
@@ -54,51 +54,80 @@
  * used to get the library to compile correctly.  They should not be used
  * in user code
  */
-#define COLOR_BLACK	0x00
-#define COLOR_WHITE	0x01
+#define COLOR_BLACK     0x00
+#define COLOR_WHITE     0x01
 
 /* Characters codes */
-#define CH_ENTER	0x0D
-#define CH_ESC		0x1B
-#define CH_CURS_LEFT	0x08
-#define CH_CURS_RIGHT	0x15
+#define CH_ENTER        0x0D
+#define CH_ESC          0x1B
+#define CH_CURS_LEFT    0x08
+#define CH_CURS_RIGHT   0x15
 
-#define CH_ULCORNER	'+'
-#define CH_URCORNER	'+'
-#define CH_LLCORNER	'+'
-#define CH_LRCORNER	'+'
-#define CH_TTEE 	'+'
-#define CH_BTEE 	'+'
-#define CH_LTEE 	'+'
-#define CH_RTEE 	'+'
-#define CH_CROSS	'+'
+#define CH_ULCORNER     '+'
+#define CH_URCORNER     '+'
+#define CH_LLCORNER     '+'
+#define CH_LRCORNER     '+'
+#define CH_TTEE         '+'
+#define CH_BTEE         '+'
+#define CH_LTEE         '+'
+#define CH_RTEE         '+'
+#define CH_CROSS        '+'
 
 /* Return codes for get_ostype */
 #define APPLE_UNKNOWN 0x00
-#define APPLE_II      0x10		/* Apple ][			*/
-#define APPLE_IIPLUS  0x11		/* Apple ][+			*/
-#define APPLE_IIIEM   0x20		/* Apple /// (emulation)	*/
-#define APPLE_IIE     0x30		/* Apple //e			*/
-#define APPLE_IIEENH  0x31		/* Apple //e (enhanced)		*/
-#define APPLE_IIECARD 0x40		/* Apple //e Option Card	*/
-#define APPLE_IIC     0x50		/* Apple //c			*/
-#define APPLE_IIC35   0x51		/* Apple //c (3.5 ROM)		*/
-#define APPLE_IICEXP  0x53		/* Apple //c (Mem. Exp.)	*/
-#define APPLE_IICREV  0x54		/* Apple //c (Rev. Mem. Exp.)	*/
-#define APPLE_IICPLUS 0x55		/* Apple //c Plus		*/
-#define	APPLE_IIGS    0x80		/* Apple IIgs			*/
-#define	APPLE_IIGS1   0x81		/* Apple IIgs (ROM 1)		*/
-#define	APPLE_IIGS3   0x83		/* Apple IIgs (ROM 3)		*/
+#define APPLE_II      0x10              /* Apple ][			*/
+#define APPLE_IIPLUS  0x11              /* Apple ][+			*/
+#define APPLE_IIIEM   0x20              /* Apple /// (emulation)	*/
+#define APPLE_IIE     0x30              /* Apple //e			*/
+#define APPLE_IIEENH  0x31              /* Apple //e (enhanced)		*/
+#define APPLE_IIECARD 0x40              /* Apple //e Option Card	*/
+#define APPLE_IIC     0x50              /* Apple //c			*/
+#define APPLE_IIC35   0x51              /* Apple //c (3.5 ROM)		*/
+#define APPLE_IICEXP  0x53              /* Apple //c (Mem. Exp.)	*/
+#define APPLE_IICREV  0x54              /* Apple //c (Rev. Mem. Exp.)	*/
+#define APPLE_IICPLUS 0x55              /* Apple //c Plus		*/
+#define APPLE_IIGS    0x80		/* Apple IIgs			*/
+#define APPLE_IIGS1   0x81		/* Apple IIgs (ROM 1)		*/
+#define APPLE_IIGS3   0x83		/* Apple IIgs (ROM 3)		*/
+
+extern unsigned char _dos_type;
+/* Valid _dos_type values:
+ *
+ * AppleDOS 3.3   - 0x00
+ * ProDOS 8 1.0.1 - 0x10
+ * ProDOS 8 1.0.2 - 0x10
+ * ProDOS 8 1.1.1 - 0x11
+ * ProDOS 8 1.2   - 0x12
+ * ProDOS 8 1.3   - 0x13
+ * ProDOS 8 1.4   - 0x14
+ * ProDOS 8 1.5   - 0x15
+ * ProDOS 8 1.6   - 0x16
+ * ProDOS 8 1.7   - 0x17
+ * ProDOS 8 1.8   - 0x18
+ * ProDOS 8 1.9   - 0x18
+ * ProDOS 8 2.0.1 - 0x21
+ * ProDOS 8 2.0.2 - 0x22
+ * ProDOS 8 2.0.3 - 0x23
+ */
+
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*                                   Code				     */
 /*****************************************************************************/
 
 
 
 unsigned char get_ostype (void);
 /* Get the machine type. Returns one of the APPLE_xxx codes. */
+
+/* The following #defines will cause the matching functions calls in conio.h
+ * to be overlaid by macros with the same names, saving the function call
+ * overhead.
+ */
+#define _textcolor(color)       COLOR_WHITE
+#define _bgcolor(color)         COLOR_BLACK
+#define _bordercolor(color)     COLOR_BLACK
 
 
 

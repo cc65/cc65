@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -188,6 +188,34 @@ void __fastcall__ screensize (unsigned char* x, unsigned char* y);
 void __fastcall__ cputhex8 (unsigned char val);
 void __fastcall__ cputhex16 (unsigned val);
 /* These shouldn't be here... */
+
+
+
+/*****************************************************************************/
+/*                                  Macros                                   */
+/*****************************************************************************/
+
+
+
+/* On some platforms, functions are not available or are dummys. To suppress
+ * the call to these functions completely, the platform header files may
+ * define macros for these functions that start with an underline. If such a
+ * macro exists, a new macro is defined here, that expands to the one with the
+ * underline. The reason for this two stepped approach is that it is sometimes
+ * necessary to take the address of the function, which is not possible when
+ * using a macro. Since the function prototype is still present, #undefining
+ * the macro will give access to the actual function.
+ */
+
+#if defined(_textcolor)
+#  define textcolor(x)          _textcolor(x)
+#endif
+#if defined(_bgcolor)
+#  define bgcolor(x)            _bgcolor(x)
+#endif
+#if defined(_bordercolor)
+#  define bordercolor(x)        _bordercolor(x)
+#endif
 
 
 

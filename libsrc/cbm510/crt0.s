@@ -274,7 +274,7 @@ Z4:
 	lda	(vic),y
 	sta	vidsave+2
 	and	#$0F
-       	ora    	#<(((>__VIDRAM_START__) & $3F) << 2)
+       	ora    	#<(((>__VIDRAM_START__) << 2) & $F0)
 	sta	(vic),y
 
 ; Switch back to the execution bank

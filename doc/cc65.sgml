@@ -74,17 +74,22 @@ Short options:
   -W			Suppress warnings
 
 Long options:
-  --ansi		Strict ANSI mode
-  --cpu type		Set cpu type
-  --debug		Debug mode
-  --debug-info		Add debug info to object file
-  --help		Help (this text)
-  --include-dir dir	Set an include directory search path
-  --signed-chars	Default characters are signed
-  --static-locals	Make local variables static
-  --target sys		Set the target system
-  --verbose		Increase verbosity
-  --version		Print the compiler version number
+  --ansi                Strict ANSI mode
+  --bss-name seg        Set the name of the BSS segment
+  --check-stack         Generate stack overflow checks
+  --code-name seg       Set the name of the CODE segment
+  --cpu type            Set cpu type
+  --data-name seg       Set the name of the DATA segment
+  --debug               Debug mode
+  --debug-info          Add debug info to object file
+  --help                Help (this text)
+  --include-dir dir     Set an include directory search path
+  --rodata-name seg     Set the name of the RODATA segment
+  --signed-chars        Default characters are signed
+  --static-locals       Make local variables static
+  --target sys          Set the target system
+  --verbose             Increase verbosity
+  --version             Print the compiler version number
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -101,6 +106,23 @@ Here is a description of all the command line options:
   This option disables any compiler exensions. Have a look at section 5
   for a discussion of compiler extensions. In addition, the macro
   <tt/__STRICT_ANSI__/ is defined, when using one of these options.
+
+
+  <tag><tt>--bss-name seg</tt></tag>
+
+  Set the name of the bss segment.
+
+
+  <tag><tt>--check-stack</tt></tag>
+			
+  Tells the compiler to generate code that checks for stack overflows. See
+  <tt><ref id="pragma-checkstack" name="#pragma checkstack"></tt> for an
+  explanation of this feature.
+
+
+  <tag><tt>--code-name seg</tt></tag>
+
+  Set the name of the code segment.
 
 
   <tag><tt>--cpu CPU</tt></tag>
@@ -135,6 +157,11 @@ Here is a description of all the command line options:
   <tag><tt>-h, --help</tt></tag>
 
   Print the short option summary shown above.
+
+
+  <tag><tt>--rodata-name seg</tt></tag>
+
+  Set the name of the rodata segment (the segment used for readonly data).
 
 
   <tag><tt>-j, --signed-chars</tt></tag>
@@ -430,8 +457,8 @@ This cc65 version has some extensions to the ISO C standard.
 	string.
 	<p>
 
-<item> 	cc65 allows the initialization of <tt/void/ variables. This may be 
-	used to create variable structures that are more compatible with 
+<item> 	cc65 allows the initialization of <tt/void/ variables. This may be
+	used to create variable structures that are more compatible with
 	interfaces written for assembler languages. Here is an example:
 
 	<tscreen><verb>
@@ -447,7 +474,7 @@ This cc65 version has some extensions to the ISO C standard.
 		.word	$3000
 	</verb></tscreen>
 
-	Since the variable is of type <tt/void/ you may not use it as is. 
+	Since the variable is of type <tt/void/ you may not use it as is.
 	However, taking the address of the variable results in a <tt/void*/
 	which may be passed to any function expecting a pointer.
 
@@ -567,6 +594,19 @@ generation and other stuff.
   </verb></tscreen>
 
 
+<sect1><tt>#pragma checkstack (&lt;const int&gt;)</tt><label
+id="pragma-checkstack"><p>
+
+  Tells the compiler to insert calls to a stack checking subroutine to detect
+  stack overflows. The stack checking code will lead to somewhat larger and
+  slower programs, so you may want to use this pragma when debugging your
+  program and switch it off for the release version. If a stack overflow is
+  detected, the program is aborted.
+
+  If the argument is zero, stack checks are disabled (the default), otherwise
+  they're enabled.
+
+
 <sect1><tt>#pragma codeseg (&lt;name&gt;)</tt><p>
 
   This pragma changes the name used for the CODE segment (the CODE segment
@@ -579,7 +619,7 @@ generation and other stuff.
 
   Example:
   <tscreen><verb>
-  	#pragma bssseg ("MyCODE")
+      	#pragma bssseg ("MyCODE")
   </verb></tscreen>
 
 
@@ -595,7 +635,7 @@ generation and other stuff.
 
   Example:
   <tscreen><verb>
-  	#pragma bssseg ("MyDATA")
+      	#pragma bssseg ("MyDATA")
   </verb></tscreen>
 
 
@@ -611,7 +651,7 @@ generation and other stuff.
 
   Example:
   <tscreen><verb>
-	#pragma bssseg ("MyRODATA")
+      	#pragma bssseg ("MyRODATA")
   </verb></tscreen>
 
 
@@ -640,7 +680,7 @@ generation and other stuff.
 <sect1><tt>#pragma signedchars (&lt;const int&gt;)</tt><label
 id="pragma-signedchars"><p>
 
-  Changed the signedness of the default character type. If the argument
+  Changes the signedness of the default character type. If the argument
   is not zero, default characters are signed, otherwise characters are
   unsigned. The compiler default is to make characters unsigned since this
   creates a lot better code. This default may be overridden by the

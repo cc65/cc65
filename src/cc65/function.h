@@ -98,6 +98,12 @@ void F_AllocLocalSpace (Function* F);
  * nothing if there is no reserved local space.
  */
 
+int F_AllocRegVar (Function* F, const type* Type);
+/* Allocate a register variable for the given variable type. If the allocation
+ * was successful, return the offset of the register variable in the register
+ * bank (zero page storage). If there is no register space left, return -1.
+ */
+
 void NewFunc (struct SymEntry* Func);
 /* Parse argument declarations and function body. */
 

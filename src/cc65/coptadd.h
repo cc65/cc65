@@ -101,7 +101,7 @@ unsigned OptAdd3 (CodeSeg* S);
  *
  *  	jsr     pushax
  *      lda     xxx
- *  	ldy     yyy
+ *     	ldx     yyy
  *      jsr     tosaddax
  *
  * and replace it by
@@ -113,7 +113,7 @@ unsigned OptAdd3 (CodeSeg* S);
  *      adc     yyy
  *      tax
  *      pla
- */                           
+ */
 
 unsigned OptAdd4 (CodeSeg* S);
 /* Search for the sequence

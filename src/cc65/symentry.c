@@ -149,6 +149,18 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
 
 
 
+void CvtRegVarToAuto (SymEntry* Sym)
+/* Convert a register variable to an auto variable */
+{
+    /* Change the storage class */
+    Sym->Flags = (Sym->Flags & ~(SC_REGISTER | SC_STATIC | SC_EXTERN)) | SC_AUTO;
+
+    /* Transfer the stack offset from register save area to actual offset */
+    Sym->V.Offs = Sym->V.R.SaveOffs;
+}
+
+
+
 void ChangeSymType (SymEntry* Entry, type* Type)
 /* Change the type of the given symbol */
 {

@@ -50,12 +50,12 @@
 void RC_Invalidate (RegContents* C)
 /* Invalidate all registers */
 {
-    C->RegA   = -1;
-    C->RegX   = -1;
-    C->RegY   = -1;
-    C->SRegLo = -1;
-    C->SRegHi = -1;
-    C->Tmp1   = -1;
+    C->RegA   = UNKNOWN_REGVAL;
+    C->RegX   = UNKNOWN_REGVAL;
+    C->RegY   = UNKNOWN_REGVAL;
+    C->SRegLo = UNKNOWN_REGVAL;
+    C->SRegHi = UNKNOWN_REGVAL;
+    C->Tmp1   = UNKNOWN_REGVAL;
 }
 
 
@@ -63,9 +63,9 @@ void RC_Invalidate (RegContents* C)
 void RC_InvalidateZP (RegContents* C)
 /* Invalidate all ZP registers */
 {
-    C->SRegLo = -1;
-    C->SRegHi = -1;
-    C->Tmp1   = -1;
+    C->SRegLo = UNKNOWN_REGVAL;
+    C->SRegHi = UNKNOWN_REGVAL;
+    C->Tmp1   = UNKNOWN_REGVAL;
 }
 
 
@@ -104,4 +104,4 @@ void FreeRegInfo (RegInfo* RI)
 
 
 
-		   
+

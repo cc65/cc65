@@ -461,11 +461,11 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    /* We don't know the value of the carry, so the result is
 	     * always unknown.
 	     */
-	    Out->RegA = -1;
+	    Out->RegA = UNKNOWN_REGVAL;
 	    break;
 
 	case OP65_AND:
-       	    if (In->RegA >= 0) {
+       	    if (RegValIsKnown (In->RegA)) {
 		if (CE_KnownImm (E)) {
 		    Out->RegA = In->RegA & (short) E->Num;
 		} else if (E->AM == AM65_ZP) {
@@ -480,11 +480,11 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			    Out->RegA = In->RegA & In->SRegHi;
 			    break;
 		    	default:
-		    	    Out->RegA = -1;
+		    	    Out->RegA = UNKNOWN_REGVAL;
 		    	    break;
 		    }
 		} else {
-		    Out->RegA = -1;
+		    Out->RegA = UNKNOWN_REGVAL;
 		}
 	    }
 	    break;
@@ -565,7 +565,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_DEA:
-	    if (In->RegA >= 0) {
+       	    if (RegValIsKnown (In->RegA)) {
 	    	Out->RegA = (In->RegA - 1) & 0xFF;
 	    }
 	    break;
@@ -592,19 +592,19 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_DEX:
-       	    if (In->RegX >= 0) {
+       	    if (RegValIsKnown (In->RegX)) {
 	    	Out->RegX = (In->RegX - 1) & 0xFF;
 	    }
 	    break;
 
 	case OP65_DEY:
-       	    if (In->RegY >= 0) {
+       	    if (RegValIsKnown (In->RegY)) {
 	    	Out->RegY = (In->RegY - 1) & 0xFF;
 	    }
 	    break;
 
 	case OP65_EOR:
-       	    if (In->RegA >= 0) {
+       	    if (RegValIsKnown (In->RegA)) {
 		if (CE_KnownImm (E)) {
 		    Out->RegA = In->RegA ^ (short) E->Num;
 		} else if (E->AM == AM65_ZP) {
@@ -619,17 +619,17 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			    Out->RegA = In->RegA ^ In->SRegHi;
 			    break;
 		    	default:
-		    	    Out->RegA = -1;
+		    	    Out->RegA = UNKNOWN_REGVAL;
 		    	    break;
 		    }
 		} else {
-		    Out->RegA = -1;
+		    Out->RegA = UNKNOWN_REGVAL;
 		}
 	    }
 	    break;
 
 	case OP65_INA:
-	    if (In->RegA >= 0) {
+	    if (RegValIsKnown (In->RegA)) {
 		Out->RegA = (In->RegA + 1) & 0xFF;
 	    }
 	    break;
@@ -656,13 +656,13 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_INX:
-	    if (In->RegX >= 0) {
+	    if (RegValIsKnown (In->RegX)) {
 		Out->RegX = (In->RegX + 1) & 0xFF;
 	    }
 	    break;
 
 	case OP65_INY:
-	    if (In->RegY >= 0) {
+	    if (RegValIsKnown (In->RegY)) {
 		Out->RegY = (In->RegY + 1) & 0xFF;
 	    }
 	    break;
@@ -692,22 +692,22 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    /* Get the code info for the function */
 	    GetFuncInfo (E->Arg, &Use, &Chg);
 	    if (Chg & REG_A) {
-		Out->RegA = -1;
+		Out->RegA = UNKNOWN_REGVAL;
 	    }
 	    if (Chg & REG_X) {
-		Out->RegX = -1;
+		Out->RegX = UNKNOWN_REGVAL;
 	    }
 	    if (Chg & REG_Y) {
-		Out->RegY = -1;
+		Out->RegY = UNKNOWN_REGVAL;
 	    }
 	    if (Chg & REG_TMP1) {
-		Out->Tmp1 = -1;
+		Out->Tmp1 = UNKNOWN_REGVAL;
 	    }
             if (Chg & REG_SREG_LO) {
-	     	Out->SRegLo = -1;
+	     	Out->SRegLo = UNKNOWN_REGVAL;
 	    }
 	    if (Chg & REG_SREG_HI) {
-	     	Out->SRegHi = -1;
+	     	Out->SRegHi = UNKNOWN_REGVAL;
 	    }
        	    /* ## FIXME: Quick hack for some known functions: */
 	    if (strcmp (E->Arg, "tosandax") == 0) {
@@ -750,12 +750,12 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			Out->RegA = In->SRegHi;
 			break;
 		    default:
-			Out->RegA = -1;
+			Out->RegA = UNKNOWN_REGVAL;
 			break;
 		}
 	    } else {
 	     	/* A is now unknown */
-	     	Out->RegA = -1;
+	     	Out->RegA = UNKNOWN_REGVAL;
 	    }
 	    break;
 
@@ -774,12 +774,12 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			Out->RegX = In->SRegHi;
 			break;
 		    default:
-			Out->RegX = -1;
+			Out->RegX = UNKNOWN_REGVAL;
 			break;
 		}
 	    } else {
 	     	/* X is now unknown */
-	     	Out->RegX = -1;
+	     	Out->RegX = UNKNOWN_REGVAL;
 	    }
 	    break;
 
@@ -798,12 +798,12 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			Out->RegY = In->SRegHi;
 			break;
 		    default:
-			Out->RegY = -1;
+			Out->RegY = UNKNOWN_REGVAL;
 			break;
 		}
 	    } else {
 		/* Y is now unknown */
-		Out->RegY = -1;
+		Out->RegY = UNKNOWN_REGVAL;
 	    }
 	    break;
 
@@ -832,7 +832,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_ORA:
-	    if (In->RegA >= 0) {
+	    if (RegValIsKnown (In->RegA)) {
 		if (CE_KnownImm (E)) {
 		    Out->RegA = In->RegA | (short) E->Num;
 		} else if (E->AM == AM65_ZP) {
@@ -847,12 +847,12 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			    Out->RegA = In->RegA | In->SRegHi;
 			    break;
 		    	default:
-		    	    Out->RegA = -1;
+		    	    Out->RegA = UNKNOWN_REGVAL;
 		    	    break;
 		    }
 		} else {
 		    /* A is now unknown */
-		    Out->RegA = -1;
+		    Out->RegA = UNKNOWN_REGVAL;
 		}
 	    }
 	    break;
@@ -887,17 +887,17 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
     	case OP65_ROL:
 	    /* We don't know the value of the carry bit */
     	    if (E->AM == AM65_ACC) {
-    		Out->RegA = -1;
+    		Out->RegA = UNKNOWN_REGVAL;
     	    } else if (E->AM == AM65_ZP) {
 	     	switch (GetKnownReg (E->Chg, In)) {
 		    case REG_TMP1:
-			Out->Tmp1 = -1;
+			Out->Tmp1 = UNKNOWN_REGVAL;
 			break;
 		    case REG_SREG_LO:
-			Out->SRegLo = -1;
+			Out->SRegLo = UNKNOWN_REGVAL;
 			break;
 		    case REG_SREG_HI:
-			Out->SRegHi = -1;
+			Out->SRegHi = UNKNOWN_REGVAL;
 			break;
 		}
 	    } else if (E->AM == AM65_ZPX) {
@@ -909,17 +909,17 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
     	case OP65_ROR:
 	    /* We don't know the value of the carry bit */
     	    if (E->AM == AM65_ACC) {
-    		Out->RegA = -1;
+    		Out->RegA = UNKNOWN_REGVAL;
     	    } else if (E->AM == AM65_ZP) {
 	     	switch (GetKnownReg (E->Chg, In)) {
 		    case REG_TMP1:
-			Out->Tmp1 = -1;
+			Out->Tmp1 = UNKNOWN_REGVAL;
 			break;
 		    case REG_SREG_LO:
-			Out->SRegLo = -1;
+			Out->SRegLo = UNKNOWN_REGVAL;
 			break;
 		    case REG_SREG_HI:
-			Out->SRegHi = -1;
+			Out->SRegHi = UNKNOWN_REGVAL;
 			break;
 		}
 	    } else if (E->AM == AM65_ZPX) {
@@ -1052,13 +1052,13 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    	} else {
 		    switch (GetKnownReg (E->Chg, In)) {
 			case REG_TMP1:
-			    Out->Tmp1 = -1;
+			    Out->Tmp1 = UNKNOWN_REGVAL;
 			    break;
 			case REG_SREG_LO:
-			    Out->SRegLo = -1;
+			    Out->SRegLo = UNKNOWN_REGVAL;
 			    break;
 			case REG_SREG_HI:
-			    Out->SRegHi = -1;
+			    Out->SRegHi = UNKNOWN_REGVAL;
 			    break;
 		    }
 	    	}
@@ -1085,13 +1085,13 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    	} else {
 		    switch (GetKnownReg (E->Chg, In)) {
 			case REG_TMP1:
-			    Out->Tmp1 = -1;
+			    Out->Tmp1 = UNKNOWN_REGVAL;
 			    break;
 			case REG_SREG_LO:
-			    Out->SRegLo = -1;
+			    Out->SRegLo = UNKNOWN_REGVAL;
 			    break;
 			case REG_SREG_HI:
-			    Out->SRegHi = -1;
+			    Out->SRegHi = UNKNOWN_REGVAL;
 			    break;
 		    }
 	    	}
@@ -1099,7 +1099,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_TSX:
-	    Out->RegX = -1;
+	    Out->RegX = UNKNOWN_REGVAL;
 	    break;
 
 	case OP65_TXA:

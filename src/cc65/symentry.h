@@ -186,6 +186,19 @@ INLINE int SymIsRef (const SymEntry* Sym)
 #  define SymIsRef(Sym)     (((Sym)->Flags & SC_REF) == SC_REF)
 #endif
 
+#if defined(HAVE_INLINE)
+INLINE int SymIsRegVar (const SymEntry* Sym)
+/* Return true if the given entry is a register variable */
+{
+    return ((Sym->Flags & SC_REGISTER) == SC_REGISTER);
+}
+#else
+#  define SymIsRegVar(Sym)      (((Sym)->Flags & SC_REGISTER) == SC_REGISTER)
+#endif
+
+void CvtRegVarToAuto (SymEntry* Sym);
+/* Convert a register variable to an auto variable */
+
 void ChangeSymType (SymEntry* Entry, type* Type);
 /* Change the type of the given symbol */
 

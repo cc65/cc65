@@ -132,9 +132,9 @@ static const char* GetLabelName (unsigned Flags, unsigned long Label, long Offs)
 	    break;
 
 	default:
-	    Internal ("Invalid address flags");
+	    Internal ("Invalid address flags: %04X", Flags);
     }
-                   
+
     /* Return a pointer to the static buffer */
     return Buf;
 }
@@ -485,8 +485,48 @@ void g_leave (void)
 
 
 /*****************************************************************************/
-/*   		       	      Register variables			     */
+/*     		       	      Register variables			     */
 /*****************************************************************************/
+
+
+
+void g_swap_regvars (int StackOffs, int RegOffs, unsigned Bytes)
+/* Swap a register variable with a location on the stack */
+{
+    /* Calculate the actual stack offset and check it */
+    StackOffs -= oursp;
+    CheckLocalOffs (StackOffs);
+
+    /* Generate code */
+    if (Bytes == 1) {
+
+        if (CodeSizeFactor < 165) {
+            ldyconst (StackOffs);
+            ldxconst (RegOffs);
+            AddCodeLine ("jsr regswap1");
+        } else {
+            ldyconst (StackOffs);
+            AddCodeLine ("lda (sp),y");
+            AddCodeLine ("ldx regbank%+d", RegOffs);
+            AddCodeLine ("sta regbank%+d", RegOffs);
+            AddCodeLine ("txa");
+            AddCodeLine ("sta (sp),y");
+        }
+
+    } else if (Bytes == 2) {
+
+        ldyconst (StackOffs);
+        ldxconst (RegOffs);
+        AddCodeLine ("jsr regswap2");
+
+    } else {
+
+        ldyconst (StackOffs);
+        ldxconst (RegOffs);
+        ldaconst (Bytes);
+        AddCodeLine ("jsr regswap");
+    }
+}
 
 
 

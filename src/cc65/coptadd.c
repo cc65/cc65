@@ -288,7 +288,7 @@ unsigned OptAdd3 (CodeSeg* S)
  *
  *  	jsr     pushax
  *      lda     xxx
- *  	ldy     yyy
+ *     	ldx     yyy
  *      jsr     tosaddax
  *
  * and replace it by

@@ -34,6 +34,7 @@
 
 
 #include <stdlib.h>
+#include <ctype.h>
 
 /* cc65 */
 #include "codeent.h"
@@ -66,7 +67,7 @@ struct StackOpData {
 
 /* Flags returned by DirectOp */
 #define OP_DIRECT       0x01            /* Direct op may be used */
-#define OP_ONSTACK      0x02            /* Operand is on stack */
+#define OP_RELOAD_Y     0x02            /* Must reload index register Y */
 
 
 
@@ -207,11 +208,9 @@ static void CheckDirectOp (StackOpData* D)
         if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS) {
             /* These insns are all ok and replaceable */
             D->Flags |= OP_DIRECT;
-        } else if (E->AM == AM65_ZP_INDY          &&
-                   RegValIsKnown (E->RI->In.RegY) &&
-       	       	   (E->Use & REG_SP) != 0) {
-            /* Load from stack with known offset is also ok */
-            D->Flags |= (OP_DIRECT | OP_ONSTACK);
+        } else if (E->AM == AM65_ZP_INDY && RegValIsKnown (E->RI->In.RegY)) {
+            /* Load indirect with known offset is also ok */
+            D->Flags |= (OP_DIRECT | OP_RELOAD_Y);
         }
     }
 }
@@ -222,7 +221,7 @@ static void ReplacePushByStore (StackOpData* D)
 /* Replace the call to the push subroutine by a store into the zero page
  * location (actually, the push is not replaced, because we need it for
  * later, but the name is still ok since the push will get removed at the
- * end of each routine.
+ * end of each routine).
  */
 {
     CodeEntry* X;
@@ -240,7 +239,7 @@ static void ReplacePushByStore (StackOpData* D)
 
 static void AddOpLow (StackOpData* D, opc_t OPC)
 /* Add an op for the low byte of an operator. This function honours the
- * OP_DIRECT and OP_ONSTACK flags and generates the necessary instructions.
+ * OP_DIRECT and OP_RELOAD_Y flags and generates the necessary instructions.
  * All code is inserted at the current insertion point.
  */
 {
@@ -250,7 +249,7 @@ static void AddOpLow (StackOpData* D, opc_t OPC)
        	/* Op with a variable location. If the location is on the stack, we
          * need to reload the Y register.
          */
-        if ((D->Flags & OP_ONSTACK) != 0) {
+        if ((D->Flags & OP_RELOAD_Y) != 0) {
             const char* Arg = MakeHexArg (D->PrevEntry->RI->In.RegY);
             X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
             InsertEntry (D, X, D->IP++);
@@ -297,6 +296,33 @@ static void RemovePushAndOp (StackOpData* D)
 
 
 
+static const char* IsRegVar (const StackOpData* D)
+/* If the value pushed is that of a register variable, return the name of the
+ * entry in the register bank. Otherwise return NULL.
+ */
+{
+    CodeEntry* P;
+
+    if (D->PushIndex >= 2                                &&
+        (P = D->PrevEntry) != 0                          &&
+        P->OPC == OP65_LDX                               &&
+        P->AM == AM65_ZP                                 &&
+        strncmp (P->Arg, "regbank+", 7) == 0             &&
+        isdigit (P->Arg[8])                              &&
+        (P = CS_GetEntry (D->Code, D->PushIndex-2)) != 0 &&
+        P->OPC == OP65_LDA                               &&
+        P->AM == AM65_ZP                                 &&
+        strncmp (P->Arg, "regbank+", 7) == 0             &&
+        isdigit (P->Arg[8])) {
+        /* Ok, it loads the register variable */
+        return P->Arg;
+    } else {
+        return 0;
+    }
+}
+
+
+
 /*****************************************************************************/
 /*   	       		 Actual optimization functions                       */
 /*****************************************************************************/
@@ -307,12 +333,20 @@ static unsigned Opt_staspidx (StackOpData* D)
 /* Optimize the staspidx sequence if possible */
 {
     CodeEntry* X;
+    const char* ZPLo;
 
-    /* Store the value into the zeropage instead of pushing it */
-    ReplacePushByStore (D);
+    /* Check if we're using a register variable */
+    if ((ZPLo = IsRegVar (D)) == 0) {
+
+        /* Store the value into the zeropage instead of pushing it */
+        ReplacePushByStore (D);
+
+        /* Use the given zero page loc */
+        ZPLo = D->ZPLo;
+    }
 
     /* Replace the store subroutine call by a direct op */
-    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
+    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+1);
 
     /* Remove the push and the call to the staspidx function */
@@ -328,12 +362,20 @@ static unsigned Opt_staxspidx (StackOpData* D)
 /* Optimize the staxspidx sequence if possible */
 {
     CodeEntry* X;
+    const char* ZPLo;
 
-    /* Store the value into the zeropage instead of pushing it */
-    ReplacePushByStore (D);
+    /* Check if we're using a register variable */
+    if ((ZPLo = IsRegVar (D)) == 0) {
+
+        /* Store the value into the zeropage instead of pushing it */
+        ReplacePushByStore (D);
+
+        /* Use the given zero page loc */
+        ZPLo = D->ZPLo;
+    }
 
     /* Inline the store */
-    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
+    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+1);
     X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+2);
@@ -346,7 +388,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
      	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
     }
     InsertEntry (D, X, D->OpIndex+3);
-    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
+    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+4);
 
     /* Remove the push and the call to the staspidx function */
@@ -607,7 +649,7 @@ static int HarmlessCall (const char* Name)
  */
 {
     static const char* Tab[] = {
-        "ldaxidx", 
+        "ldaxidx",
         "ldaxysp",
     };
 

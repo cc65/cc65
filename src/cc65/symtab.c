@@ -81,9 +81,6 @@ SymTable	EmptySymTab = {
 #define SYMTAB_SIZE_STRUCT	 19U
 #define SYMTAB_SIZE_LABEL	  7U
 
-/* Predefined lexical levels */
-#define LEX_LEVEL_GLOBAL	1U
-
 /* The current and root symbol tables */
 static unsigned		LexicalLevel   	= 0;	/* For safety checks */
 static SymTable*	SymTab0	       	= 0;
@@ -198,6 +195,14 @@ static void CheckSymTable (SymTable* Tab)
 
 
 
+unsigned GetLexicalLevel (void)
+/* Return the current lexical level */
+{
+    return LexicalLevel;
+}
+
+
+
 void EnterGlobalLevel (void)
 /* Enter the program global lexical level */
 {
@@ -241,7 +246,7 @@ void EnterFunctionLevel (void)
     SymTable* S;
 
     /* New lexical level */
-    ++LexicalLevel;
+    PRECONDITION (++LexicalLevel == LEX_LEVEL_FUNCTION);
 
     /* Get a new symbol table and make it current */
     S = NewSymTable (SYMTAB_SIZE_FUNCTION);
@@ -263,7 +268,7 @@ void RememberFunctionLevel (struct FuncDesc* F)
 /* Remember the symbol tables for the level and leave the level without checks */
 {
     /* Leave the lexical level */
-    --LexicalLevel;
+    PRECONDITION (LexicalLevel-- == LEX_LEVEL_FUNCTION);
 
     /* Remember the tables */
     F->SymTab = SymTab;
@@ -280,7 +285,7 @@ void ReenterFunctionLevel (struct FuncDesc* F)
 /* Reenter the function lexical level using the existing tables from F */
 {
     /* New lexical level */
-    ++LexicalLevel;
+    PRECONDITION (++LexicalLevel == LEX_LEVEL_FUNCTION);
 
     /* Make the tables current again */
     F->SymTab->PrevTab = SymTab;
@@ -299,7 +304,7 @@ void LeaveFunctionLevel (void)
 /* Leave function lexical level */
 {
     /* Leave the lexical level */
-    --LexicalLevel;
+    PRECONDITION (LexicalLevel-- == LEX_LEVEL_FUNCTION);
 
     /* Check the tables */
     CheckSymTable (SymTab);

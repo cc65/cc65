@@ -49,6 +49,9 @@
 
 
 
+/* Encoding for an unknown register value */
+#define UNKNOWN_REGVAL  -1
+
 /* Register contents */
 typedef struct RegContents RegContents;
 struct RegContents {

@@ -83,7 +83,7 @@ static type OptionalQualifiers (type Q)
 	switch (CurTok.Tok) {
 
 	    case TOK_CONST:
-		if (Q & T_QUAL_CONST) {
+	    	if (Q & T_QUAL_CONST) {
 		    Error ("Duplicate qualifier: `const'");
 		}
 		Q |= T_QUAL_CONST;
@@ -339,7 +339,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     ident     	Ident;
     SymEntry* 	Entry;
     type 	StructType;
-    type	Qualifiers;	/* Type qualifiers */
+    type    	Qualifiers;	/* Type qualifiers */
 
     /* Assume we have an explicit type */
     D->Flags &= ~DS_DEF_TYPE;
@@ -427,7 +427,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     		    /* FALL THROUGH */
 
     		default:
-		    D->Type[0] = T_INT;
+	    	    D->Type[0] = T_INT;
 		    D->Type[1] = T_END;
 	  	    break;
     	    }
@@ -663,14 +663,15 @@ static void ParseAnsiParamList (FuncDesc* F)
 	/* Read the declaration specifier */
 	ParseDeclSpec (&Spec, SC_AUTO, T_INT);
 
-       	/* We accept only auto and register as storage class specifiers, but
-	 * we ignore all this and use auto.
-	 */
-	if ((Spec.StorageClass & SC_AUTO) == 0 &&
-	    (Spec.StorageClass & SC_REGISTER) == 0) {
+       	/* We accept only auto and register as storage class specifiers */
+        if ((Spec.StorageClass & SC_AUTO) == SC_AUTO) {
+            Spec.StorageClass = SC_AUTO | SC_PARAM | SC_DEF;
+        } else if ((Spec.StorageClass & SC_REGISTER) == SC_REGISTER) {
+            Spec.StorageClass = SC_REGISTER | SC_STATIC | SC_PARAM | SC_DEF;
+        } else {
 	    Error ("Illegal storage class");
+            Spec.StorageClass = SC_AUTO | SC_PARAM | SC_DEF;
 	}
-	Spec.StorageClass = SC_AUTO | SC_PARAM | SC_DEF;
 
 	/* Allow parameters without a name, but remember if we had some to
       	 * eventually print an error message later.
@@ -755,10 +756,10 @@ static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
 
 	    /* Check for an implicit int return in the K&R function */
 	    if ((Spec->Flags & DS_DEF_TYPE) != 0 &&
-		Spec->Type[0] == T_INT 	 &&
-		Spec->Type[1] == T_END) {
-		/* Function has an implicit int return */
-		F->Flags |= FD_OLDSTYLE_INTRET;
+	    	Spec->Type[0] == T_INT 	 &&
+	    	Spec->Type[1] == T_END) {
+	    	/* Function has an implicit int return */
+	    	F->Flags |= FD_OLDSTYLE_INTRET;
 	    }
 	}
     }
@@ -779,7 +780,11 @@ static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
     Sym = GetSymTab()->SymTail;
     while (Sym) {
 	unsigned Size = CheckedSizeOf (Sym->Type);
-     	Sym->V.Offs = Offs;
+        if (SymIsRegVar (Sym)) {
+            Sym->V.R.SaveOffs = Offs;
+        } else {
+     	    Sym->V.Offs = Offs;
+        }
        	Offs += Size;
 	F->ParamSize += Size;
      	Sym = Sym->PrevSym;

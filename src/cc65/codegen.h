@@ -232,6 +232,9 @@ void g_leave (void);
 
 
 
+void g_swap_regvars (int StackOffs, int RegOffs, unsigned Bytes);
+/* Swap a register variable with a location on the stack */
+
 void g_save_regvars (int RegOffs, unsigned Bytes);
 /* Save register variables */
 

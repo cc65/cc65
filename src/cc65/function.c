@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -60,14 +60,18 @@
 
 
 
+/* Maximum register variable size */
+#define MAX_REG_SPACE   6
+
 /* Structure that holds all data needed for function activation */
 struct Function {
-    struct SymEntry*   	FuncEntry;	/* Symbol table entry */
-    type*		ReturnType;	/* Function return type */
-    struct FuncDesc*	Desc;	  	/* Function descriptor */
-    int			Reserved;	/* Reserved local space */
+    struct SymEntry*   	FuncEntry;  	/* Symbol table entry */
+    type*		ReturnType; 	/* Function return type */
+    struct FuncDesc*	Desc;	    	/* Function descriptor */
+    int			Reserved;   	/* Reserved local space */
     unsigned	  	RetLab;	    	/* Return code label */
     int			TopLevelSP;	/* SP at function top level */
+    unsigned            RegOffs;        /* Register variable space offset */
 };
 
 /* Pointer to current function */
@@ -94,6 +98,7 @@ static Function* NewFunction (struct SymEntry* Sym)
     F->Reserved	  = 0;
     F->RetLab	  = GetLocalLabel ();
     F->TopLevelSP = 0;
+    F->RegOffs    = MAX_REG_SPACE;
 
     /* Return the new structure */
     return F;
@@ -220,6 +225,108 @@ void F_AllocLocalSpace (Function* F)
 
 
 
+int F_AllocRegVar (Function* F, const type* Type)
+/* Allocate a register variable for the given variable type. If the allocation
+ * was successful, return the offset of the register variable in the register
+ * bank (zero page storage). If there is no register space left, return -1.
+ */
+{
+    /* Allow register variables only on top level and if enabled */
+    if (EnableRegVars && GetLexicalLevel () == LEX_LEVEL_FUNCTION) {
+
+      	/* Get the size of the variable */
+      	unsigned Size = CheckedSizeOf (Type);
+
+      	/* Do we have space left? */
+      	if (F->RegOffs >= Size) {
+      	    /* Space left. We allocate the variables from high to low addresses,
+      	     * so the adressing is compatible with the saved values on stack.
+      	     * This allows shorter code when saving/restoring the variables.
+      	     */
+      	    F->RegOffs -= Size;
+      	    return F->RegOffs;
+      	}
+    }
+
+    /* No space left or no allocation */
+    return -1;
+}
+
+
+
+static void F_RestoreRegVars (Function* F)
+/* Restore the register variables for the local function if there are any. */
+{
+    const SymEntry* Sym;
+
+    /* If we don't have register variables in this function, bail out early */
+    if (F->RegOffs == MAX_REG_SPACE) {
+       	return;
+    }
+
+    /* Save the accumulator if needed */
+    if (!F_HasVoidReturn (F)) {
+       	g_save (CF_CHAR | CF_FORCECHAR);
+    }
+
+    /* Get the first symbol from the function symbol table */
+    Sym = F->FuncEntry->V.F.Func->SymTab->SymHead;
+
+    /* Walk through all symbols checking for register variables */
+    while (Sym) {
+        if (SymIsRegVar (Sym)) {
+
+            /* Check for more than one variable */
+            int Offs       = Sym->V.R.SaveOffs;
+            unsigned Bytes = CheckedSizeOf (Sym->Type);
+
+            while (1) {
+
+                /* Find next register variable */
+                const SymEntry* NextSym = Sym->NextSym;
+                while (NextSym && !SymIsRegVar (NextSym)) {
+                    NextSym = NextSym->NextSym;
+                }
+
+                /* If we have a next one, compare the stack offsets */
+                if (NextSym) {
+
+                    /* We have a following register variable. Get the size */
+                    int Size = CheckedSizeOf (NextSym->Type);
+
+                    /* Adjacent variable? */
+                    if (NextSym->V.R.SaveOffs + Size != Offs) {
+                        /* No */
+                        break;
+                    }
+
+                    /* Adjacent variable */
+                    Bytes += Size;
+                    Offs  -= Size;
+                    Sym   = NextSym;
+
+                } else {
+                    break;
+                }
+            }
+
+            /* Restore the memory range */
+            g_restore_regvars (Offs, Sym->V.R.RegOffs, Bytes);
+
+        }
+
+        /* Check next symbol */
+        Sym = Sym->NextSym;
+    }
+
+    /* Restore the accumulator if needed */
+    if (!F_HasVoidReturn (F)) {
+     	g_restore (CF_CHAR | CF_FORCECHAR);
+    }
+}
+
+
+
 /*****************************************************************************/
 /*     	      	  	    	     code	      		 	     */
 /*****************************************************************************/
@@ -230,8 +337,8 @@ void NewFunc (SymEntry* Func)
 /* Parse argument declarations and function body. */
 {
     int HadReturn;
-    int IsVoidFunc;
     SymEntry* LastParam;
+    SymEntry* Param;
 
     /* Get the function descriptor from the function entry */
     FuncDesc* D = Func->V.F.Func;
@@ -262,9 +369,6 @@ void NewFunc (SymEntry* Func)
     /* Function body now defined */
     Func->Flags |= SC_DEF;
 
-    /* Setup register variables */
-    InitRegVars ();
-
     /* Allocate code and data segments for this function */
     Func->V.F.Seg = PushSegments (Func);
 
@@ -281,18 +385,49 @@ void NewFunc (SymEntry* Func)
 	    /* Pointer to function */
 	    Flags = CF_PTR;
 	} else {
-	    Flags = TypeOf (LastParam->Type) | CF_FORCECHAR;
+    	    Flags = TypeOf (LastParam->Type) | CF_FORCECHAR;
 	}
 	g_push (Flags, 0);
     }
 
-    /* If stack checking code is requested, emit a call to the helper routine */
-    if (CheckStack) {
-	g_stackcheck ();
-    }
-
     /* Generate function entry code if needed */
     g_enter (TypeOf (Func->Type), F_GetParamSize (CurrentFunc));
+
+    /* If stack checking code is requested, emit a call to the helper routine */
+    if (CheckStack) {
+    	g_stackcheck ();
+    }
+
+    /* Walk through the parameter list and allocate register variable space
+     * for parameters declared as register. Generate code to swap the contents
+     * of the register bank with the save area on the stack.
+     */
+    Param = D->SymTab->SymHead;
+    while (Param && (Param->Flags & SC_PARAM) != 0) {
+
+        /* Check for a register variable */
+        if (SymIsRegVar (Param)) {
+
+            /* Allocate space */
+            int Reg = F_AllocRegVar (CurrentFunc, Param->Type);
+
+            /* Could we allocate a register? */
+            if (Reg < 0) {
+                /* No register available: Convert parameter to auto */
+                CvtRegVarToAuto (Param);
+            } else {
+                /* Remember the register offset */
+                Param->V.R.RegOffs = Reg;
+
+                /* Generate swap code */
+                g_swap_regvars (Param->V.R.SaveOffs, Reg, CheckedSizeOf (Param->Type));
+
+            }
+        }
+
+        /* Next parameter */
+        Param = Param->NextSym;
+    }
 
     /* Setup the stack */
     oursp = 0;
@@ -318,22 +453,11 @@ void NewFunc (SymEntry* Func)
      	}
     }
 
-    /* If the function has a return type but no return statement, flag
-     * a warning
-     */
-    IsVoidFunc = F_HasVoidReturn (CurrentFunc);
-#if 0
-    /* Does not work reliably */
-    if (!F_IsVoidFunc && !HadReturn) {
-	Warning ("Function `%s' should return a value", Func->Name);
-    }
-#endif
-
     /* Output the function exit code label */
     g_defcodelabel (F_GetRetLab (CurrentFunc));
 
     /* Restore the register variables */
-    RestoreRegVars (!IsVoidFunc);
+    F_RestoreRegVars (CurrentFunc);
 
     /* Generate the exit code */
     g_leave ();
@@ -343,9 +467,6 @@ void NewFunc (SymEntry* Func)
 
     /* Emit references to imports/exports */
     EmitExternals ();
-
-    /* Cleanup register variables */
-    DoneRegVars ();
 
     /* Leave the lexical level */
     LeaveFunctionLevel ();

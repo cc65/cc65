@@ -1391,19 +1391,22 @@ void CS_GenRegInfo (CodeSeg* S)
 			break;
 		    }
 		    if (J->RI->Out2.RegA != Regs.RegA) {
-			Regs.RegA = -1;
+			Regs.RegA = UNKNOWN_REGVAL;
 		    }
 		    if (J->RI->Out2.RegX != Regs.RegX) {
-			Regs.RegX = -1;
+			Regs.RegX = UNKNOWN_REGVAL;
 		    }
 		    if (J->RI->Out2.RegY != Regs.RegY) {
-			Regs.RegY = -1;
+			Regs.RegY = UNKNOWN_REGVAL;
 		    }
 		    if (J->RI->Out2.SRegLo != Regs.SRegLo) {
-			Regs.SRegLo = -1;
+			Regs.SRegLo = UNKNOWN_REGVAL;
 		    }
 		    if (J->RI->Out2.SRegHi != Regs.SRegHi) {
-			Regs.SRegHi = -1;
+			Regs.SRegHi = UNKNOWN_REGVAL;
+		    }
+       	       	    if (J->RI->Out2.Tmp1 != Regs.Tmp1) {
+			Regs.Tmp1 = UNKNOWN_REGVAL;
 		    }
 		    ++Entry;
 		}

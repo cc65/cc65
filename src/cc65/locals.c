@@ -52,89 +52,8 @@
 
 
 /*****************************************************************************/
-/*	     	    		     Data			 	     */
-/*****************************************************************************/
-
-
-
-/* Register variable management */
-unsigned MaxRegSpace 	      	= 6; 	/* Maximum space available */
-static unsigned RegOffs 	= 0;	/* Offset into register space */
-static const SymEntry** RegSyms	= 0;    /* The register variables */
-static unsigned RegSymCount 	= 0;    /* Number of register variables */
-
-
-
-/*****************************************************************************/
 /*		   		     Code		       		     */
 /*****************************************************************************/
-
-
-
-void InitRegVars (void)
-/* Initialize register variable control data */
-{
-    /* If the register space is zero, bail out */
-    if (MaxRegSpace == 0) {
-       	return;
-    }
-
-    /* The maximum number of register variables is equal to the register
-     * variable space available. So allocate one pointer per byte. This
-     * will usually waste some space but we don't need to dynamically
-     * grow the array.
-     */
-    RegSyms = (const SymEntry**) xmalloc (MaxRegSpace * sizeof (RegSyms[0]));
-    RegOffs = MaxRegSpace;
-}
-
-
-
-void DoneRegVars (void)
-/* Free the register variables */
-{
-    xfree (RegSyms);
-    RegSyms = 0;
-    RegOffs = MaxRegSpace;
-    RegSymCount = 0;
-}
-
-
-
-static int AllocRegVar (const type* Type)
-/* Allocate a register variable for the given variable type. If the allocation
- * was successful, return the offset of the register variable in the register
- * bank (zero page storage). If there is no register space left, return -1.
- */
-{
-    /* Maybe register variables are disabled... */
-    if (EnableRegVars) {
-
-	/* Get the size of the variable */
-	unsigned Size = CheckedSizeOf (Type);
-
-	/* Do we have space left? */
-	if (RegOffs >= Size) {
-	    /* Space left. We allocate the variables from high to low addresses,
-	     * so the adressing is compatible with the saved values on stack.
-	     * This allows shorter code when saving/restoring the variables.
-	     */
-	    RegOffs -= Size;
-	    return RegOffs;
-	}
-    }
-
-    /* No space left or no allocation */
-    return -1;
-}
-
-
-
-static void RememberRegVar (const SymEntry* Sym)
-/* Remember the given register variable */
-{
-    RegSyms[RegSymCount++] = Sym;
-}
 
 
 
@@ -185,7 +104,7 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
         } else {
 
             /* Setup the type flags for the assignment */
-            Flags = CF_REGVAR;
+            Flags = CF_NONE;
             if (Size == SIZEOF_CHAR) {
                 Flags |= CF_FORCECHAR;
             }
@@ -195,12 +114,15 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
                 /* Constant expression. Adjust the types */
                 assignadjust (Decl->Type, &lval);
                 Flags |= CF_CONST;
+                /* Load it into the primary */
+                exprhs (Flags, 0, &lval);
             } else {
                 /* Expression is not constant and in the primary */
                 assignadjust (Decl->Type, &lval);
             }
 
             /* Store the value into the variable */
+            Flags |= CF_REGVAR;
             g_putstatic (Flags | TypeOf (Decl->Type), Reg, 0);
 
         }
@@ -456,7 +378,6 @@ static void ParseOneDecl (const DeclSpec* Spec)
     unsigned    SC;      	/* Storage class for symbol */
     unsigned    SymData = 0;    /* Symbol data (offset, label name, ...) */
     Declaration Decl;	       	/* Declaration data structure */
-    SymEntry*   Sym;            /* Symbol declared */
 
 
     /* Remember the storage class for the new symbol */
@@ -467,10 +388,10 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
     /* Set the correct storage class for functions */
     if (IsTypeFunc (Decl.Type)) {
-	/* Function prototypes are always external */
-	if ((SC & SC_EXTERN) == 0) {
+    	/* Function prototypes are always external */
+    	if ((SC & SC_EXTERN) == 0) {
        	    Warning ("Function must be extern");
-	}
+    	}
        	SC |= SC_FUNC | SC_EXTERN;
 
     }
@@ -489,19 +410,19 @@ static void ParseOneDecl (const DeclSpec* Spec)
          * convert the declaration to "auto" if this is not possible.
          */
         int Reg = 0;    /* Initialize to avoid gcc complains */
-        if ((SC & SC_REGISTER) != 0 && (Reg = AllocRegVar (Decl.Type)) < 0) {
+        if ((SC & SC_REGISTER) != 0 && (Reg = F_AllocRegVar (CurrentFunc, Decl.Type)) < 0) {
             /* No space for this register variable, convert to auto */
             SC = (SC & ~SC_REGISTER) | SC_AUTO;
         }
 
         /* Check the variable type */
-        if (SC & SC_REGISTER) {
+        if ((SC & SC_REGISTER) == SC_REGISTER) {
             /* Register variable */
             SymData = ParseRegisterDecl (&Decl, &SC, Reg);
-       	} else if (SC & SC_AUTO) {
+       	} else if ((SC & SC_AUTO) == SC_AUTO) {
             /* Auto variable */
             SymData = ParseAutoDecl (&Decl, &SC);
-       	} else if (SC & SC_STATIC) {
+       	} else if ((SC & SC_STATIC) == SC_STATIC) {
             /* Static variable */
             SymData = ParseStaticDecl (&Decl, &SC);
        	} else {
@@ -515,12 +436,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
     }
 
     /* Add the symbol to the symbol table */
-    Sym = AddLocalSym (Decl.Ident, Decl.Type, SC, SymData);
-
-    /* If we had declared a register variable, remember it now */
-    if (SC & SC_REGISTER) {
-        RememberRegVar (Sym);
-    }
+    AddLocalSym (Decl.Ident, Decl.Type, SC, SymData);
 }
 
 
@@ -582,73 +498,6 @@ void DeclareLocals (void)
      */
     if (CheckStack && InitialStack != oursp) {
        	g_cstackcheck ();
-    }
-}
-
-
-
-void RestoreRegVars (int HaveResult)
-/* Restore the register variables for the local function if there are any.
- * The parameter tells us if there is a return value in ax, in that case,
- * the accumulator must be saved across the restore.
- */
-{
-    unsigned I, J;
-    int Bytes, Offs;
-
-    /* If we don't have register variables in this function, bail out early */
-    if (RegSymCount == 0) {
-    	return;
-    }
-
-    /* Save the accumulator if needed */
-    if (!F_HasVoidReturn (CurrentFunc) && HaveResult) {
-     	g_save (CF_CHAR | CF_FORCECHAR);
-    }
-
-    /* Walk through all variables. If there are several variables in a row
-     * (that is, with increasing stack offset), restore them in one chunk.
-     */
-    I = 0;
-    while (I < RegSymCount) {
-
-	/* Check for more than one variable */
-       	const SymEntry* Sym = RegSyms[I];    
-	Offs  = Sym->V.R.SaveOffs;
-	Bytes = CheckedSizeOf (Sym->Type);
-	J = I+1;
-
-       	while (J < RegSymCount) {
-
-	    /* Get the next symbol */
-	    const SymEntry* NextSym = RegSyms [J];
-
-	    /* Get the size */
-	    int Size = CheckedSizeOf (NextSym->Type);
-
-	    /* Adjacent variable? */
-	    if (NextSym->V.R.SaveOffs + Size != Offs) {
-	      	/* No */
-	      	break;
-	    }
-
-	    /* Adjacent variable */
-	    Bytes += Size;
-	    Offs  -= Size;
-	    Sym   = NextSym;
-	    ++J;
-	}
-
-	/* Restore the memory range */
-       	g_restore_regvars (Offs, Sym->V.R.RegOffs, Bytes);
-
-	/* Next round */
-	I = J;
-    }
-
-    /* Restore the accumulator if needed */
-    if (!F_HasVoidReturn (CurrentFunc) && HaveResult) {
-     	g_restore (CF_CHAR | CF_FORCECHAR);
     }
 }
 

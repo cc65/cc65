@@ -68,6 +68,10 @@ extern SymTable		EmptySymTab;
 /* Forwards */
 struct FuncDesc;
 
+/* Predefined lexical levels */
+#define LEX_LEVEL_GLOBAL	1U
+#define LEX_LEVEL_FUNCTION      2U
+
 
 
 /*****************************************************************************/
@@ -75,6 +79,9 @@ struct FuncDesc;
 /*****************************************************************************/
 
 
+
+unsigned GetLexicalLevel (void);
+/* Return the current lexical level */
 
 void EnterGlobalLevel (void);
 /* Enter the program global lexical level */

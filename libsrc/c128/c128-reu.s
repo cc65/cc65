@@ -23,7 +23,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   $00                     ; EM API version number
+        .byte   EMD_API_VERSION		; EM API version number
 
 ; Jump table.
 

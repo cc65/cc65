@@ -22,7 +22,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   $00                     ; EM API version number
+        .byte   EMD_API_VERSION		; EM API version number
 
 ; Jump table.
 
@@ -73,7 +73,7 @@ INSTALL:
 
         lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
-        rts
+;       rts				; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -263,23 +263,23 @@ COPYTO: jsr     setup
 setup:  sta     ptr3
         stx     ptr3+1                  ; Save the passed em_copy pointer
 
-        ldy     #EM_COPY_OFFS
+        ldy     #EM_COPY::OFFS
         lda     (ptr3),y
         add     #OFFS
         sta     ptr1
-        ldy     #EM_COPY_PAGE
+        ldy     #EM_COPY::PAGE
         lda     (ptr3),y
         adc     #$00
         sta     ptr1+1
 
-        ldy     #EM_COPY_COUNT
+        ldy     #EM_COPY::COUNT
         lda     (ptr3),y
         sta     ptr2
         iny
         lda     (ptr3),y
         sta     ptr2+1                  ; Get count into ptr2
 
-        ldy     #EM_COPY_BUF+1
+        ldy     #EM_COPY::BUF+1
         lda     (ptr1),y
         tax
         dey

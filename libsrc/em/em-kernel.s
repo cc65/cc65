@@ -33,8 +33,7 @@ emd_copyto:     jmp     return0
 
 ; Driver header signature
 .rodata
-emd_sig:        .byte   $65, $6d, $64, $00      ; "emd", version
-emd_sig_len     = * - emd_sig
+emd_sig:        .byte   $65, $6d, $64, EMD_API_VERSION	; "emd", version
 
 
 ;----------------------------------------------------------------------------
@@ -50,7 +49,7 @@ _em_install:
 
 ; Check the driver signature
 
-        ldy     #emd_sig_len-1
+        ldy     #.sizeof(emd_sig)-1
 @L0:    lda     (ptr1),y
         cmp     emd_sig,y
         bne     inv_drv
@@ -59,12 +58,12 @@ _em_install:
 
 ; Copy the jump vectors
 
-        ldy     #EMD_HDR_JUMPTAB
+        ldy     #EMD_HDR::JUMPTAB
         ldx     #0
 @L1:    inx                             ; Skip the JMP opcode
         jsr     copy                    ; Copy one byte
         jsr     copy                    ; Copy one byte
-        cpx     #(EMD_HDR_JUMPCOUNT*3)
+        cpy     #(EMD_HDR::JUMPTAB + .sizeof(EMD_HDR::JUMPTAB))
         bne     @L1
 
         jmp     emd_install             ; Call driver install routine

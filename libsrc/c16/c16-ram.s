@@ -22,7 +22,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   $00                     ; EM API version number
+        .byte   EMD_API_VERSION		; EM API version number
 
 ; Jump table.
 
@@ -183,22 +183,22 @@ COPYFROM:
         sta     ptr3
         stx     ptr3+1                  ; Save the passed em_copy pointer
 
-        ldy     #EM_COPY_OFFS
+        ldy     #EM_COPY::OFFS
         lda     (ptr3),y
         sta     ptr1
-        ldy     #EM_COPY_PAGE
+        ldy     #EM_COPY::PAGE
         lda     (ptr3),y
         add     #>BASE
         sta     ptr1+1                  ; From
 
-        ldy     #EM_COPY_BUF
+        ldy     #EM_COPY::BUF
         lda     (ptr3),y
         sta     ptr2
         iny
         lda     (ptr3),y
         sta     ptr2+1                  ; To
 
-common: ldy     #EM_COPY_COUNT+1
+common: ldy     #EM_COPY::COUNT+1
         lda     (ptr3),y                ; Get number of pages
         beq     @L2                     ; Skip if no full pages
         sta     tmp1
@@ -214,7 +214,7 @@ common: ldy     #EM_COPY_COUNT+1
 
 ; Copy the remainder of the page
 
-@L2:    ldy     #EM_COPY_COUNT
+@L2:    ldy     #EM_COPY::COUNT
         lda     (ptr3),y                ; Get bytes in last page
         beq     @L4
         tax
@@ -249,15 +249,15 @@ common: ldy     #EM_COPY_COUNT+1
 COPYTO: sta     ptr3
         stx     ptr3+1                  ; Save the passed em_copy pointer
 
-        ldy     #EM_COPY_OFFS
+        ldy     #EM_COPY::OFFS
         lda     (ptr3),y
         sta     ptr2
-        ldy     #EM_COPY_PAGE
+        ldy     #EM_COPY::PAGE
         lda     (ptr3),y
         add     #>BASE
         sta     ptr2+1                  ; To
 
-        ldy     #EM_COPY_BUF
+        ldy     #EM_COPY::BUF
         lda     (ptr3),y
         sta     ptr1
         iny

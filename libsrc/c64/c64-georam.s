@@ -22,7 +22,7 @@
 ; Driver signature
 
         .byte   $65, $6d, $64           ; "emd"
-        .byte   $00                     ; EM API version number
+        .byte   EMD_API_VERSION		; EM API version number
 
 ; Jump table.
 
@@ -86,7 +86,7 @@ PAGECOUNT:
 ; The GeoRAM cartridge does not copy but actually map the window, so USE is
 ; identical to MAP.
 
-USE     = MAP
+USE     = MAP		  
 
 ; ------------------------------------------------------------------------
 ; MAP: Map the page in a/x into memory and return a pointer to the page in
@@ -225,7 +225,7 @@ setup:  sta     ptr1
 ; Get the page number from the struct and adjust it so that it may be used
 ; with the hardware. That is: lower 6 bits in tmp1, high bits in tmp2.
 
-        ldy     #EM_COPY_PAGE+1
+        ldy     #EM_COPY::PAGE+1
         lda     (ptr1),y
         sta     tmp2
         dey
@@ -240,7 +240,7 @@ setup:  sta     ptr1
 
 ; Get the buffer pointer into ptr2
 
-        ldy     #EM_COPY_BUF
+        ldy     #EM_COPY::BUF
         lda     (ptr1),y
         sta     ptr2
         iny
@@ -249,7 +249,7 @@ setup:  sta     ptr1
 
 ; Get the count, calculate -(count-1) and store it into ptr3
 
-        ldy     #EM_COPY_COUNT
+        ldy     #EM_COPY::COUNT
         lda     (ptr1),y
         eor     #$FF
         sta     ptr3
@@ -260,7 +260,7 @@ setup:  sta     ptr1
 
 ; Get the page offset into X and clear Y
 
-        ldy     #EM_COPY_OFFS
+        ldy     #EM_COPY::OFFS
         lda     (ptr1),y
         tax
         ldy     #$00

@@ -121,6 +121,7 @@ atmoslib:
 	    $(AR) a atmos.lib $$i/*.o;\
 	done
 	mv atmos/crt0.o atmos.o
+	cp atmos/*.tgi .
 
 #-----------------------------------------------------------------------------
 # C16, C116

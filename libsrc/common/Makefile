@@ -72,6 +72,7 @@ S_OBJS = 	_fdesc.o 	\
 		atexit.o  	\
 		atoi.o	  	\
 		calloc.o  	\
+                chdir.o         \
 		copydata.o	\
                 creat.o         \
                 ctime.o         \

@@ -4,18 +4,16 @@
 ; CC65 runtime: Load effective address with offset in Y relative to SP
 ;
 
-    	.export		lea0sp, leaysp, plea0sp, pleaysp
-	.import		pushax
-	.importzp	sp
+    	.export		leaasp, plea0sp, pleaysp
+    	.import		pushax
+    	.importzp	sp
 
-lea0sp:	ldy	#0   		; Load offset zero
-leaysp:	tya
-	ldx	sp+1		; Get high byte
+leaasp:	ldx	sp+1		; Get high byte
  	clc
 	adc	sp
-   	bcc	L8
+   	bcc	@L1
    	inx
-L8:	rts
+@L1:	rts
 
 
 plea0sp:

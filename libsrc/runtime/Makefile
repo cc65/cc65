@@ -18,7 +18,7 @@ OBJS   = runtime.o mul.o div.o push.o inc.o dec.o shl.o shr.o add.o\
 	 uge.o lt.o ult.o le.o ule.o eq.o ne.o test.o subeqsp.o\
 	 udiv.o umod.o mod.o shelp.o aslax1.o asrax1.o shrax1.o\
          aslax2.o asrax2.o shrax2.o aslax3.o asrax3.o shrax3.o\
-	 enter.o leave.o leaysp.o popsreg.o ldai.o ldaxi.o ldauisp.o\
+	 enter.o leave.o leasp.o popsreg.o ldai.o ldaxi.o ldauisp.o\
 	 ldaui.o pushw.o pushb.o staxsp.o ldaxsp.o addeqsp.o\
 	 bpushbsp.o pushwsp.o pushbsp.o
 

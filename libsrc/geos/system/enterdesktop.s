@@ -9,4 +9,7 @@
 	    .import _exit
 	    .export _EnterDeskTop
 
-_EnterDeskTop = _exit
+_EnterDeskTop:
+	    lda #0
+	    tax
+	    jmp _exit

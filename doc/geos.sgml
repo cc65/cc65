@@ -549,6 +549,9 @@ after a click. Otherwise the user must choose an icon.
 <p>
 Note: use it if you really need (or if you will use it in many places) as
 it adds quite amount of code to your program.
+<p>
+Note: the formatted text <em/cannot exceed/ 255 bytes in length, there is no check
+for that.
 
 <sect1>Mouse, Sprites and Cursors
 <p>
@@ -796,7 +799,7 @@ struct tr_se myTrSe;
 <p>
 In this example <tt/otherTrSe/ can be replaced by <tt/myTrSe/.
 <p>
-NOTE that you <em/must/ use casting to have correct values.
+Note: you <em/must/ use casting to have correct values.
 
 <sect2>Low-level disk IO
 <p>
@@ -1071,12 +1074,14 @@ This function will load or save at most <tt/fLength/ bytes from currently pointe
 Functions covered in this section are common for whole C world - copying memory parts and
 strings is one of the main computer tasks. GEOS also has interface to do this. These functions
 are replacement for those like <tt/memset, memcpy, strcpy/ etc. from standard libraries.
-
+If you are dealing with short strings (up to 255 characters) you should use these functions
+instead of standard ones. E.g. <tt/CopyString/ instead of <tt/strcpy/. It will work faster.
+<p>
 However some of them have slighty different calling convention (order of arguments to be specific),
 so please check their syntax here before direct replacing.
-
-Please note that the memory described as <em/strings/ are up to 255 characters (without
-counting the terminating <tt/NULL/), and <em/regions/ cover whole 64K of memory.
+<p>
+Please note that the memory areas described here as <em/strings/ are up to 255 characters (without
+counting the terminating <tt/NULL/), and <em/regions/ can cover whole 64K of memory.
 
 <sect2>CopyString
 <p>
@@ -1146,7 +1151,8 @@ This is done with <tt/table/ where everything is defined. See structures chapter
 <tt/ char VerifyRAM (char bank, unsigned length, char *reuAddress, char *cpuAddress)/
 <p>
 These functions are interface to REU - Ram Expansion Unit. I think that they are self-explanatory.
-You can check for REU presence by taking value of <tt/ramExpSize/.
+You can check for REU presence by taking value of <tt/ramExpSize/. You have to do it before
+using any of these functions.
 
 <sect1>Processes and Multitasking
 <p>
@@ -1208,18 +1214,18 @@ It means that if you call <tt/UnBlockProcess/ before timer runs out, the process
 <tt/void UnFreezeProcess (char processNumber)/
 <p>
 <tt/FreezeProcess/ disables timer for given process. <tt/UnFreezeProcess/ does the opposite.
-This is not equal to <tt/RestartProcess/ as timers are not filled with initial value.
+This is not equal to <tt/RestartProcess/ as timers are not reloaded with initial value.
 
 <sect2>Sleep
 <p>
 <tt/void Sleep (unsigned jiffies)/
 <p>
-This function is multitasking sleep - the program is halted, but it doesn't block other functions.
-The only argument here is the number of jiffies to wait until app will wake up.
-<p>
-You can force to sleep not only the main application routine, but also processes-tasks. Be warned
-that the maximum number of sleeping functions is 20. If it would be larger it will overwrite
-parameters of already sleeping functions in GEOS kernal data space, leading to crash.
+This function is multitasking sleep - the program is halted, but it doesn't block other functions
+e.g. callbacks from menus and icons.
+The only argument here is the number of jiffies to wait until app will wake up. It depends on
+video mode (PAL or NTSC) how many jiffies there are per second (50 or 60, respectively).
+If you don't want to worry about it and need only full second resolution, call standard
+<tt/sleep/ function from <tt/unistd.h/.
 
 <sect1>System Functions
 
@@ -1237,7 +1243,8 @@ up. You shouldn't use this unless you know what you are doing.
 <tt/void DoneWithIO (void)/
 <p>
 These functions are called by some disk routines. You should call them only if you want to
-do something with IO registers or call one of Kernal's routines.
+do something with IO registers or call one of Kernal ROM routines. Note that this is rather an
+expensive way of turning off IRQs and enabling IO.
 
 <sect2>MainLoop
 <p>
@@ -1252,10 +1259,9 @@ proper handlers before that.
 <p>
 <tt/void EnterDeskTop (void)/
 <p>
-Calling this function will instantly terminate your program and bring you back to DeskTop.
-WARNING! It is not an equivalent of <tt/exit()/, library destructors code and functions
-registered with <tt/atexit()/ will not be called. In fact, you should always use
-<tt/exit()/ instead.
+This is an alias for <tt/exit(0)/ so you will never burn yourself. Anyway, you should not
+use it. Always use <tt/exit()/ instead. Library destructors and functions registered with
+<tt/atexit()/ are called.
 
 <sect2>ToBASIC
 <p>
@@ -1263,7 +1269,9 @@ registered with <tt/atexit()/ will not be called. In fact, you should always use
 <p>
 This one is another way of finishing application - forcing GEOS to shutdown and exit to BASIC.
 I was considering whether to include it or not, but maybe someone will need it. Which is I doubt.
-It has the same dangerous features as <tt/EnterDeskTop/.
+<p>
+<em/WARNING:/ library destructors and functions registered with <tt/atexit()/ will not be called
+so it is quite unsafe way to finish your program.
 
 <sect2>Panic
 <p>
@@ -1344,7 +1352,7 @@ definitions of returned values.
 <p>
 To simplify usage and optimize passing parameters to functions I have declared several structures
 which describe most common objects. Some of these structures are bound to static addresses in
-GEOS data space ($8000-$8fff), so you can use their fields directly in optimized way.
+GEOS data space (<tt/$8000-$8fff/), so you can use their fields directly in optimized way.
 Please see <tt/gsym.h/ and find them. All structures are defined in <tt/gstruct.h/ and you may
 find also some comments there.
 
@@ -1358,7 +1366,7 @@ One simple structure describing a point on the screen.
 <p>
 This structure describes a font in one pointsize. There is current font - <tt/struct fontdesc/
 bound to <tt/curFontDesc/. You can also force GEOS to use your own fonts by calling
-<tt/LoadCharSet/. You just need to open a VLIR font file and load one record - one pointsize
+<tt/LoadCharSet/. You just need to open a VLIR font file and load one record - one pointsize -
 somewhere. At the start of this area you already have all data for <tt/fontdesc/ so you can
 pass a pointer to the load adress of that pointsize to <tt/LoadCharSet/. (Note that although
 it has 'Load' in the name, that function loads only GEOS internal data structures, not data

@@ -166,7 +166,7 @@ void g_preamble (void)
 
     /* If we're producing code for some other CPU, switch the command set */
     if (CPU == CPU_65C02) {
-    	AddTextLine ("\t.pc02");
+    	AddTextLine ("\t.setcpu\t\t\"65C02\"");
     }
 
     /* Allow auto import for runtime library routines */

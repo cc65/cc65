@@ -383,6 +383,7 @@ static void OptCreateDep (const char* Opt attribute ((unused)),
 static void OptCPU (const char* Opt, const char* Arg)
 /* Handle the --cpu option */
 {
+    /* Find the CPU from the given name */
     CPU = FindCPU (Arg);
     if (CPU != CPU_6502 && CPU != CPU_65C02) {
        	AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);

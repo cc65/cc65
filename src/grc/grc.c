@@ -35,7 +35,7 @@
 
 void VLIRLinker(int argc, char *argv[]) {
 FILE *outCVT, *input;
-unsigned char buffer[THIS_BUFFER_IS_SOOO_HUGE];
+unsigned char *buffer;
 unsigned char vlirtabt[127];
 unsigned char vlirtabs[127];
 int i,j,lastarg;
@@ -60,7 +60,10 @@ int blocks,rest;
 	if (input==NULL)
 	    AbEnd("can't open input:%s\n",strerror(errno));
 
-	bytes = fread(buffer,1,BLOODY_BIG_BUFFER,input);
+	buffer = malloc(THIS_BUFFER_IS_SOOO_HUGE);
+	memset(buffer,0,THIS_BUFFER_IS_SOOO_HUGE);
+
+	bytes = fread(buffer,1,1024,input);
 	fclose(input);
 	if (bytes!=508)
 		AbEnd("%s is not a cvt header\n",argv[i]);
@@ -70,9 +73,9 @@ int blocks,rest;
 	/* now put 254 bytes of VLIR table, to update later */
 
 	/* clear out things */
-	memset(buffer,0,254);
+	memset(buffer,0,512);
 	fwrite(buffer,1,254,outCVT);
-	for (j=0;j!=126;j++) {
+	for (j=0;j<sizeof(vlirtabt)/sizeof(vlirtabt[0]);j++) {
 		vlirtabt[j]=0;
 		vlirtabs[j]=0;
 	}
@@ -96,11 +99,11 @@ int blocks,rest;
 		else if (strcmp(argv[i],"noexist")==0) {
 			vlirtabt[j]=0; vlirtabs[j]=0xff; }
 		else {
-			memset(buffer,0,BLOODY_BIG_BUFFER);
+			memset(buffer,0,bytes+512);
                         input = fopen(argv[i],"rb");
 			if (input==NULL)
 				AbEnd("couldn't open %s:%s\n",argv[i],strerror(errno));
-			bytes = fread(buffer,1,BLOODY_BIG_BUFFER,input);
+			bytes = fread(buffer,1,THIS_BUFFER_IS_SOOO_HUGE,input);
 			fclose(input);
 			if (bytes==0)
 				AbEnd("couldn't read %s:%s\n",argv[i],strerror(errno));
@@ -124,11 +127,13 @@ int blocks,rest;
 		++i;
 	}
 
+	free(buffer);
+
 	/* now rewind and update VLIR table */
 
 	fflush(outCVT);
 	fseek(outCVT,508,SEEK_SET);
-	for (i=0;i!=127;i++) {
+	for (i=0;i<sizeof(vlirtabt)/sizeof(vlirtabt[0]);i++) {
 		fputc(vlirtabt[i],outCVT);
 		fputc(vlirtabs[i],outCVT);
 	}

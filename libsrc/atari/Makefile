@@ -70,7 +70,6 @@ OBJS = 	_scrsize.o      \
        	ostype.o        \
        	randomize.o     \
        	read.o 	        \
-       	remove.o        \
        	revers.o        \
        	rs232.o	        \
        	rwcommon.o      \
@@ -78,6 +77,7 @@ OBJS = 	_scrsize.o      \
        	scroll.o        \
        	setcolor.o      \
        	siocall.o       \
+       	sysremove.o     \
         systime.o       \
        	tvtype.o        \
         sysuname.o      \

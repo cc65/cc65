@@ -142,13 +142,15 @@ void SwitchStatement (void)
 		      	    Error ("Range error");
 		      	}
 		      	break;
-
+			     
+		    case T_SHORT:
 		    case T_INT:
 		      	if (Val < -32768 || Val > 32767) {
 		      	    Error ("Range error");
 		      	}
 		      	break;
-
+				 
+		    case T_USHORT:
 		    case T_UINT:
 		      	if (Val < 0 || Val > 65535) {
      		      	    Error ("Range error");
@@ -225,7 +227,7 @@ void SwitchStatement (void)
 
     /* Eat the closing curly brace */
     NextToken ();
-		    
+
     /* Free the case value tree */
     FreeCaseNodeColl (Nodes);
 

@@ -196,7 +196,7 @@ int main (void)
     initflag = *(unsigned char*) 0xA04;
     *(unsigned char*) 0xA04 &= 0xFE;
     graphflag = *(unsigned char*) 0xD8;
-    *(unsigned char*) 0xD8 = 0xFF;     
+    *(unsigned char*) 0xD8 = 0xFF;
 #endif
 
     /* Remember the VIC address register */
@@ -207,17 +207,17 @@ int main (void)
     while (!kbhit()) {
       	/* Build page 1, then make it visible */
         scrn = (unsigned char*)SCREEN1;
-        doplasma();
+        doplasma ();
       	outb (&VIC.addr, PAGE1);
 
       	/* Build page 2, then make it visible */
         scrn = (unsigned char*)SCREEN2;
-        doplasma();
+        doplasma ();
       	outb (&VIC.addr, PAGE2);
 
       	/* Count frames */
         f += 2;
-    };
+    }
     t = clock() - t;
 
     /* Switch back the VIC screen */
@@ -240,7 +240,7 @@ int main (void)
     bordercolor (border);
     bgcolor (background);
     textcolor (text);
-    clrscr();
+    clrscr ();
 
     /* Calculate stats */
     sec   = (t * 10) / CLK_TCK;

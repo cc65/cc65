@@ -2,7 +2,7 @@
 # makefile for CC65 Atari runtime library
 #
 
-ATARIDEFS = -DDIRECT_SCREEN
+ATARIDEFS =
 
 .SUFFIXES: .o .s .c
 

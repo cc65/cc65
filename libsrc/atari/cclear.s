@@ -19,11 +19,7 @@ _cclear:
        	cmp	#0		; Is the length zero?
        	beq	L9  		; Jump if done
     	sta	tmp1				     
-.ifdef DIRECT_SCREEN
 L1:    	lda    	#0		; Blank - screen code
-.else
-L1:    	lda    	#$20		; Blank
-.endif
    	jsr	cputdirect	; Direct output
    	dec	tmp1
 	bne	L1

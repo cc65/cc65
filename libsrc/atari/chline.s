@@ -19,11 +19,7 @@ _chline:
    	cmp	#0		; Is the length zero?
    	beq	L9  		; Jump if done
 	sta	tmp1
-.ifdef DIRECT_SCREEN
 L1:    	lda    	#$12+64		; Horizontal line, screen code
-.else
-L1:    	lda    	#$12 		; Horizontal line
-.endif
    	jsr	cputdirect	; Direct output
    	dec	tmp1
 	bne	L1

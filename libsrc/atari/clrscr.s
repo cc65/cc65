@@ -5,11 +5,7 @@
 ;
 
 	.export		_clrscr
-
 	.include	"atari.inc"
-
-.ifdef DIRECT_SCREEN
-
 	.importzp	ptr1
 
 _clrscr:lda	SAVMSC		; screen memory
@@ -37,11 +33,3 @@ done:	sta	COLCRS
 	sta	ROWCRS
 	rts
 
-.else
-
-	.import		putchar
-_clrscr:
-	lda	#ATCLR
-	jmp	putchar
-
-.endif

@@ -303,7 +303,7 @@ Group: Development/Languages
 This package contains the header files and libraries needed to write
 programs for the Oric Atmos using the cc65 crosscompiler.
 
-%files apple2
+%files atmos
 %attr(644,root,root)		/usr/lib/cc65/lib/atmos.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/atmos.o
 %doc src/ld65/cfg/atmos.cfg

@@ -6,9 +6,9 @@
 ; 2005-02-11, Greg King
 
         .export	      	_vfprintf
-        .import	       	pushax, popax, push1, pushwysp, ldaxysp, ldaxidx, incsp6
+        .import	       	push1, pushwysp, incsp6
         .import	       	_fwrite, __printf
-        .importzp      	sp, ptr1, ptr2
+        .importzp      	sp, ptr1
 
         .macpack      	generic
 
@@ -29,72 +29,61 @@ ptr:    .res	2		; Points to output file
 ; ----------------------------------------------------------------------------
 ; Callback routine used for the actual output.
 ;
+; Since we know, that this routine is always called with "our" outdesc, we
+; can ignore the passed pointer d, and access the data directly. While this
+; is not very clean, it gives better and shorter code.
+;
 ; static void out (struct outdesc* d, const char* buf, unsigned count)
 ; /* Routine used for writing */
 ; {
 ;     register size_t cnt;
+;
 ;     /* Write to the file */
-;     if ((cnt = fwrite(buf, 1, count, (FILE *)d->ptr)) == 0) {
-;         d->ccount = -1;
+;     if ((cnt = fwrite(buf, 1, count, ptr)) == 0) {
+;         ccount = -1;
 ;     } else {
-;         d->ccount += cnt;
+;         ccount += cnt;
 ;     }
 ; }
 
 ; About to call
 ;
-;       fwrite (buf, 1, count, (FILE*) d->ptr);
+;       fwrite (buf, 1, count, ptr);
 ;
 out:    ldy     #5
         jsr     pushwysp        ; Push buf
         jsr     push1           ; Push #1
         ldy     #7
         jsr     pushwysp        ; Push count
-        ldy     #11             ; Current offset of D
-        jsr     ldaxysp         ; Load D
-        ldy     #5              ; Offset of ptr1+1 in struct outdesc
-        jsr     ldaxidx         ; Load
+        lda     ptr
+        ldx     ptr+1   
         jsr	_fwrite
-        sta	ptr2 		; Save function result
-        stx	ptr2+1
-
-; Get D and store it in ptr1
-
-        ldy     #5
-        jsr     ldaxysp
-        sta     ptr1
-        stx     ptr1+1
-
-; Load the offset of ccount in struct outdesc
-
-        ldy	#$00
+        sta	ptr1 	       	; Save function result
+        stx	ptr1+1
 
 ; Check the return value.
 
-        lda	ptr2+1
-        ora	ptr2
+        ora     ptr1+1
         bne	@Ok
 
-; We had an error. Store -1 into d->ccount
+; We had an error. Store -1 into ccount
 
 .ifp02
         lda	#<-1
 .else
         dec	a
 .endif
-        sta	(ptr1),y
-        iny
+        sta     ccount
         bne     @Done           ; Branch always
 
 ; Result was ok, count bytes written
 
-@Ok:    lda	(ptr1),y
-        add	ptr2
-        sta	(ptr1),y
-        iny
-        lda	(ptr1),y
-        adc	ptr2+1
-@Done:  sta     (ptr1),y
+@Ok:    lda     ptr1
+        add     ccount
+        sta     ccount
+        txa
+        adc     ccount+1
+@Done:  sta     ccount+1
         jmp     incsp6          ; Drop stackframe
 
 

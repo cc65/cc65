@@ -11,8 +11,8 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-%.tgi:	%.o
-	@$(LD) -t module -o $@ $< ../runtime/zeropage.o
+%.tgi:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
 
 OBJS = 	_scrsize.o     	 	\
        	break.o	       	 	\
@@ -32,7 +32,14 @@ OBJS = 	_scrsize.o     	 	\
 TGIS =	c64-320-200-2.tgi
 
 
+#--------------------------------------------------------------------------
+# Targets
+
 all:	$(OBJS) $(TGIS)
+
+../runtime/zeropage.o:
+	$(MAKE) -C $(dir $@) $(notdir $@)
+
 
 clean:
 	@rm -f $(OBJS) $(TGIS:.tgi=.o)

@@ -2,6 +2,7 @@
 # makefile for CC65 Atari runtime library
 #
 # NUMDRVS - number of supported drives (max. 16)
+# UCASE_FILENAME - all filenames get uppercased
 
 ATARIDEFS = -DNUMDRVS=4 -DUCASE_FILENAME=1
 
@@ -46,6 +47,7 @@ OBJS =	_scrsize.o   \
 	mouse.o      \
 	mul40.o      \
 	open.o 	     \
+	oserrlist.o  \
 	oserror.o    \
 	ostype.o     \
 	read.o 	     \

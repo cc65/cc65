@@ -72,6 +72,9 @@ extern const unsigned char joy_masks[8];
 #define JOY_BTN_RIGHT(v)        ((v) & joy_masks[JOY_RIGHT])
 #define JOY_BTN_FIRE(v)         ((v) & joy_masks[JOY_FIRE])
 
+/* The name of the standard joystick driver for a platform */
+extern const char joy_stddrv[];
+
 
 
 /*****************************************************************************/

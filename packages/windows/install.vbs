@@ -673,7 +673,7 @@ sub CheckFilesToInstall ()
     ' in the registry, but it will not work, which means that the package
     ' cannot be deinstalled or overwritten. So we have to check that at least
     ' the uninstaller is available in the same directory as the installer.
-    if not FileExists (Uninstaller) then
+    if not FileExists (BuildPath (InstallSource, "uninstall.vbs")) then
         Abort (GetMsg ("MSG_INCOMPLETE"))
     end if
 end sub

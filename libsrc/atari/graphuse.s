@@ -8,5 +8,7 @@
 	.data
 
 __graphmode_used:
-	.byte	9		; mode with max. memory usage
+	.byte	0		; text screen
+; disabled, because currently there aren't any screen mode functions available
+;	.byte	9		; mode with max. memory usage
 

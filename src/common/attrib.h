@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  xsprintf.h				     */
+/*				  typeattr.h				     */
 /*                                                                           */
-/*			 Replacement sprintf function			     */
+/*			     Handle gcc attributes			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,14 +33,8 @@
 
 
 
-#ifndef XSPRINTF_H
-#define XSPRINTF_H
-
-
-
-#include <stdarg.h>
-
-#include "attrib.h"
+#ifndef ATTRIB_H
+#define ATTRIB_H
 
 
 
@@ -50,19 +44,17 @@
 
 
 
-int xsprintf (char* Buf, size_t BufSize, const char* Format, ...)
-	attribute ((format (printf, 3, 4)));
-/* Replacement function for sprintf */
-
-int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap);
-/* Replacement function for sprintf */
-
-
-
-/* End of xsprintf.h */
-
+#if defined(__GNUC__)
+#  define attribute(a)	__attribute__(a)
+#else
+#  define attribute(a)	
 #endif
 
+
+
+/* End of attrib.h */
+
+#endif
 
 
 

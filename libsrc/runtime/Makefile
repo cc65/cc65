@@ -118,9 +118,21 @@ OBJS = 	add.o		\
        	or.o  		\
 	popa.o		\
        	popsreg.o	\
-       	push.o		\
+	push1.o	       	\
+       	push2.o	       	\
+	push3.o	       	\
+	push4.o	       	\
+	push5.o	       	\
+	push6.o	       	\
+	push7.o	       	\
+	pusha.o		\
+	pushaff.o	\
+	pushax.o	\
        	pushb.o		\
        	pushbsp.o	\
+	pushc0.o	\
+       	pushc1.o	\
+	pushc2.o	\
        	pushw.o		\
        	pushwsp.o	\
 	return0.o	\

@@ -42,6 +42,7 @@
 #include "expr.h"
 #include "nexttok.h"
 #include "scanner.h"
+#include "sizeof.h"
 #include "symbol.h"
 #include "symtab.h"
 #include "struct.h"
@@ -173,7 +174,12 @@ static long DoStructInternal (long Offs, unsigned Type)
                 } else if (GetSymTabType (Struct) != ST_STRUCT) {
                     Error ("Not a struct/union");
                 } else {
-                    MemberSize = Member (GetStructSize (Struct));
+                    SymEntry* SizeSym = GetSizeOfScope (Struct);
+                    if (!SymIsDef (SizeSym)) {
+                        Error ("Size of struct/union is unknown");
+                    } else {
+                        MemberSize = GetSymVal (SizeSym);
+                    }
                 }
                 break;
 
@@ -218,7 +224,7 @@ static long DoStructInternal (long Offs, unsigned Type)
      */
     if (!Anon) {
         /* Add a symbol */
-        SymEntry* SizeSym = SymFind (CurrentScope, ".size", SYM_ALLOC_NEW);
+        SymEntry* SizeSym = GetSizeOfScope (CurrentScope);
         SymDef (SizeSym, GenLiteralExpr (Size), ADDR_SIZE_DEFAULT, SF_NONE);
 
         /* Close the struct scope */

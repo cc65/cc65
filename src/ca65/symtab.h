@@ -111,7 +111,7 @@ SymTable* SymFindAnyScope (SymTable* Parent, const char* Name);
  * scope.
  */
 
-SymEntry* SymFindLocal (const char* Name, int AllocNew);
+SymEntry* SymFindLocal (SymEntry* Parent, const char* Name, int AllocNew);
 /* Find a cheap local symbol. If AllocNew is given and the entry is not
  * found, create a new one. Return the entry found, or the new entry created,
  * or - in case AllocNew is zero - return 0.

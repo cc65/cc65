@@ -87,6 +87,7 @@ OBJS = 	anonname.obj    \
 	repeat.obj	\
 	scanner.obj	\
         segment.obj     \
+        sizeof.obj      \
         spool.obj       \
         struct.obj      \
         studyexpr.obj   \

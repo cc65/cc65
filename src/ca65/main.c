@@ -400,7 +400,7 @@ static void OneLine (void)
         if (Tok == TOK_IDENT) {
             Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
         } else {
-            Sym = SymFindLocal (SVal, SYM_ALLOC_NEW);
+            Sym = SymFindLocal (SymLast, SVal, SYM_ALLOC_NEW);
         }
         NextTok ();
 

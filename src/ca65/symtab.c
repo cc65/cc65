@@ -255,7 +255,7 @@ SymTable* SymFindAnyScope (SymTable* Parent, const char* Name)
 
 
 
-SymEntry* SymFindLocal (const char* Name, int AllocNew)
+SymEntry* SymFindLocal (SymEntry* Parent, const char* Name, int AllocNew)
 /* Find a cheap local symbol. If AllocNew is given and the entry is not
  * found, create a new one. Return the entry found, or the new entry created,
  * or - in case AllocNew is zero - return 0.
@@ -265,7 +265,7 @@ SymEntry* SymFindLocal (const char* Name, int AllocNew)
     int Cmp;
 
     /* Local symbol, get the table */
-    if (!SymLast) {
+    if (!Parent) {
         /* No last global, so there's no local table */
         Error ("No preceeding global symbol");
         if (AllocNew) {
@@ -276,7 +276,7 @@ SymEntry* SymFindLocal (const char* Name, int AllocNew)
     }
 
     /* Search for the symbol if we have a table */
-    Cmp = SymSearchTree (SymLast->Locals, Name, &S);
+    Cmp = SymSearchTree (Parent->Locals, Name, &S);
 
     /* If we found an entry, return it */
     if (Cmp == 0) {
@@ -288,7 +288,7 @@ SymEntry* SymFindLocal (const char* Name, int AllocNew)
         /* Otherwise create a new entry, insert and return it */
         SymEntry* N = NewSymEntry (Name);
         if (S == 0) {
-            SymLast->Locals = N;
+            Parent->Locals = N;
         } else if (Cmp < 0) {
             S->Left = N;
         } else {

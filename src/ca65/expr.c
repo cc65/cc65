@@ -54,7 +54,7 @@
 #include "nexttok.h"
 #include "objfile.h"
 #include "segment.h"
-#include "struct.h"
+#include "sizeof.h"
 #include "studyexpr.h"
 #include "symbol.h"
 #include "symtab.h"
@@ -191,6 +191,27 @@ static int IsEasyConst (const ExprNode* E, long* Val)
 
     /* Not found to be a const according to our tests */
     return 0;
+}
+
+
+
+static ExprNode* Symbol (SymEntry* S)
+/* Reference a symbol and return an expression for it */
+{
+    if (S == 0) {
+        /* Some weird error happened before */
+        return GenLiteralExpr (0);
+    } else {
+        /* Mark the symbol as referenced */
+        SymRef (S);
+        /* Remove the symbol if possible */
+        if (SymHasExpr (S)) {
+            return CloneExpr (GetSymExpr (S));
+        } else {
+            /* Create symbol node */
+            return GenSymExpr (S);
+        }
+    }
 }
 
 
@@ -369,21 +390,16 @@ static ExprNode* FuncReferenced (void)
 static ExprNode* FuncSizeOf (void)
 /* Handle the .SIZEOF function */
 {
-    long Size;
-
     /* Get the struct for the scoped struct name */
     SymTable* Struct = ParseScopedSymTable (SYM_FIND_EXISTING);
 
     /* Check if the given symbol is really a struct */
     if (GetSymTabType (Struct) != ST_STRUCT) {
         Error ("Argument to .SIZEOF is not a struct");
-        Size = 1;
+        return GenLiteralExpr (0);
     } else {
-        Size = GetStructSize (Struct);
+        return Symbol (GetSizeOfScope (Struct));
     }
-
-    /* Return the size */
-    return GenLiteralExpr (Size);
 }
 
 
@@ -534,27 +550,6 @@ static ExprNode* Function (ExprNode* (*F) (void))
 
 
 
-static ExprNode* Symbol (SymEntry* S)
-/* Reference a symbol and return an expression for it */
-{
-    if (S == 0) {
-        /* Some weird error happened before */
-        return GenLiteralExpr (0);
-    } else {
-        /* Mark the symbol as referenced */
-        SymRef (S);
-        /* Remove the symbol if possible */
-        if (SymHasExpr (S)) {
-            return CloneExpr (GetSymExpr (S));
-        } else {
-            /* Create symbol node */
-            return GenSymExpr (S);
-        }
-    }
-}
-
-
-
 static ExprNode* Factor (void)
 {
     ExprNode* L;
@@ -579,7 +574,7 @@ static ExprNode* Factor (void)
 	    break;
 
         case TOK_LOCAL_IDENT:
-            N = Symbol (SymFindLocal (SVal, SYM_ALLOC_NEW));
+            N = Symbol (SymFindLocal (SymLast, SVal, SYM_ALLOC_NEW));
             NextTok ();
             break;
 

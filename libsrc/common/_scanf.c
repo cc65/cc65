@@ -207,15 +207,26 @@ static void AssignInt (void)
  */
 {
     if (!NoAssign) {
-	/* Get the next argument pointer */
-	void* P = va_arg (ap, void*);
 
-	/* Assign to the converted value */
-	if (IsLong) {
-	    *(long*)P = IntVal;
-	} else {
-	    *(int*)P = (int) IntVal;
-	}
+        /* Get the next argument pointer */
+        __AX__ = (unsigned) va_arg (ap, void*);
+
+        /* Store the argument pointer into ptr1 */
+        asm ("sta ptr1");
+        asm ("stx ptr1+1");
+
+        /* Get the number of bytes-1 to copy */
+        asm ("ldy #3");
+        asm ("lda %v", IsLong);
+        asm ("bne L1");
+        asm ("ldy #1");
+
+        /* Assign the integer value */
+        asm ("L1: lda %v,y", IntVal);
+        asm ("sta (ptr1),y");
+        asm ("dey");
+        asm ("bpl L1");
+
     }
 }
 
@@ -343,11 +354,11 @@ FlagsDone:
       	      	    case 'i':
       	      	   	/* Optionally signed integer with a base */
 			SkipWhite ();
-			ReadSign ();
+		   	ReadSign ();
 			if (C == '0') {
 			    ReadChar ();
 			    switch (C) {
-			 	case 'x':
+		   	 	case 'x':
 			 	case 'X':
 			 	    Base = 16;
 			    	    ReadChar();
@@ -396,11 +407,11 @@ FlagsDone:
 	      		break;
 
 	      	    case 's':
-	      		/* Whitespace terminated string */
+	      	   	/* Whitespace terminated string */
 			SkipWhite ();
 			if (!NoAssign) {
 			    S = va_arg (ap, char*);
-			}
+		   	}
        	       	       	while (!isspace (C) && Width--) {
 			    if (!NoAssign) {
 			       	*S++ = C;
@@ -433,7 +444,7 @@ FlagsDone:
                             }
                         }
 			++Conversions;
-			break;
+		   	break;
 
 		    case '[':
 			/* String using characters from a set */
@@ -502,11 +513,11 @@ FlagsDone:
                             }
                         }
                         ++Conversions;
-			break;
+		   	break;
 
      		    case 'p':
      			/* Pointer, format is 0xABCD */
-			SkipWhite ();
+		   	SkipWhite ();
 			if (C != '0') {
                             longjmp (JumpBuf, RC_NOCONV);
                         }

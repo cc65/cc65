@@ -635,7 +635,7 @@ int SymIsDef (const char* Name)
 /* Return true if the given symbol is already defined */
 {
     SymEntry* S = SymFindAny (SymTab, Name);
-    return S != 0 && (S->Flags & (SF_DEFINED | SF_IMPORT)) != 0;
+    return S != 0 && (S->Flags & SF_DEFINED) != 0;
 }
 
 

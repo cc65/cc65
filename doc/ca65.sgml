@@ -273,6 +273,8 @@ Here is a description of all the command line options:
 
 <sect>Input format<p>
 
+<sect1>Assembler syntax<p>
+
 The assembler accepts the standard 6502/65816 assembler syntax. One line may
 contain a label (which is identified by a colon), and, in addition to the
 label, an assembler mnemonic, a macro, or a control command (see section <ref
@@ -308,6 +310,9 @@ The assembler accepts
       <tt><ref id=".SUNPLUS" name=".SUNPLUS"></tt> command was given).
 </itemize>
 
+
+<sect1>65816 mode<p>
+
 In 65816 mode several aliases are accepted in addition to the official
 mnemonics:
 
@@ -336,11 +341,23 @@ separated by a dot:
    	jsl	3.$1234	       	; Call subroutine at $1234 in bank 3
 </verb></tscreen>
 
+<sect1>Number format<p>
+
 For literal values, the assembler accepts the widely used number formats:
 A preceeding '&dollar;' denotes a hex value, a preceeding '%' denotes a
 binary value, and a bare number is interpeted as a decimal. There are
 currently no octal values and no floats.
-<p>
+
+
+<sect1>Conditional assembly<p>
+
+Please note that when using the conditional directives (<tt/.IF/ and friends),
+the input must consist of valid assembler tokens, even in <tt/.IF/ branches
+that are not assembled. The reason for this behaviour is that the assembler
+must still be able to detect the ending tokens (like <tt/.ENDIF/), so
+conversion of the input stream into tokens still takes place. As a consequence
+conditional assembly directives may <bf/not/ be used to prevent normal text
+(used as a comment or similar) from being assembled. <p>
 
 
 <sect>Expressions<p>
@@ -2315,7 +2332,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.VERSION</tt><label id=".VERSION"><p>
 
-  Reading this pseudo variable will give the assembler version according to 
+  Reading this pseudo variable will give the assembler version according to
   the following formula:
 
         VER_MAJOR*$100 + VER_MINOR*$10 + VER_PATCH

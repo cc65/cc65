@@ -68,7 +68,7 @@ int spawnvp (int Mode attribute ((unused)),
     SB_Terminate (&Command);
 
     /* Invoke the shell to execute the command */
-    Status = System (SB->GetConstBuf (&Command), TAG_END)
+    Status = System (SB_GetConstBuf (&Command), TAG_END)
 
     /* Free the string buf data */
     DoneStrBuf (&Command);

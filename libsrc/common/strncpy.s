@@ -6,7 +6,7 @@
 
 	.export	   	_strncpy
 	.import	   	popax
-	.importzp  	ptr1, ptr2, ptr3, tmp1, tmp2
+	.importzp  	ptr1, ptr2, tmp1, tmp2, tmp3
 
 .proc   _strncpy
 
@@ -15,14 +15,14 @@
         txa
         eor     #$FF
         sta     tmp2            ; Store -size - 1
+
        	jsr    	popax 	  	; get src
 	sta	ptr1
 	stx	ptr1+1
 	jsr	popax 		; get dest
 	sta	ptr2
 	stx	ptr2+1
-	sta	ptr3  		; remember for function return
-	stx    	ptr3+1
+       	stx    	tmp3            ; remember for function return
 
 ; Copy src -> dest up to size bytes
 
@@ -41,7 +41,7 @@ L2:     lda     (ptr1),y        ; Copy one character
         inc     ptr1+1
         inc     ptr2+1          ; Bump high bytes
         bne     L1              ; Branch always
-                   
+
 ; Fill the remaining bytes. A is zero if we come here
 
 L3:     inx
@@ -57,8 +57,8 @@ L4:     sta     (ptr2),y
 
 ; Done, return dest
 
-L9:     lda     ptr3
-        ldx     ptr3+1
+L9:     lda     ptr2            ; Get low byte
+        ldx     tmp3            ; Get unchanged high byte
         rts
 
 .endproc

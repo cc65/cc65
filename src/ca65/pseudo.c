@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -524,7 +524,8 @@ static void DoConDes (void)
 {
     static const char* Keys[] = {
        	"CONSTRUCTOR",
-	"DESTRUCTOR",
+	"DESTRUCTOR", 
+        "INTERRUPTOR",
     };
     char Name [sizeof (SVal)];
     long Type;
@@ -567,7 +568,7 @@ static void DoConDes (void)
     /* Parse the remainder of the line and export the symbol */
     ConDes (Name, (unsigned) Type);
 }
-
+                      
 
 
 static void DoConstructor (void)
@@ -1094,6 +1095,25 @@ static void DoInclude (void)
     	NextTok ();
     	NewInputFile (Name);
     }
+}
+
+
+
+static void DoInterruptor (void)
+/* Export a symbol as interruptor */
+{
+    char Name [sizeof (SVal)];
+
+    /* Symbol name follows */
+    if (Tok != TOK_IDENT) {
+    	ErrorSkip ("Identifier expected");
+    	return;
+    }
+    strcpy (Name, SVal);
+    NextTok ();
+
+    /* Parse the remainder of the line and export the symbol */
+    ConDes (Name, CD_TYPE_INT);
 }
 
 
@@ -1692,6 +1712,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoImportZP	},
     { ccNone,		DoIncBin	},
     { ccNone,      	DoInclude	},
+    { ccNone,           DoInterruptor   },
     { ccNone,		DoInvalid	},	/* .LEFT */
     { ccNone,		DoLineCont	},
     { ccNone,		DoList		},

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -60,6 +60,7 @@
 /* Predefined types */
 #define CD_TYPE_CON	0 		/* Constructor */
 #define CD_TYPE_DES	1		/* Destructor */
+#define CD_TYPE_INT     2               /* Interruptor */
 
 /* When part of an export in an object file, type and priority are encoded in
  * one byte. In this case, the following macros access the fields:

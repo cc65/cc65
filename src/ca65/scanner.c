@@ -200,6 +200,7 @@ struct DotKeyword {
     { ".IMPORTZP",	TOK_IMPORTZP	},
     { ".INCBIN",	TOK_INCBIN	},
     { ".INCLUDE",    	TOK_INCLUDE 	},
+    { ".INTERRUPTOR",   TOK_INTERRUPTOR },
     { ".LEFT",		TOK_LEFT	},
     { ".LINECONT",	TOK_LINECONT	},
     { ".LIST",		TOK_LIST	},
@@ -480,7 +481,7 @@ static void NextChar (void)
 
             /* For better handling of files with unusual line endings (DOS
              * files that are accidently translated on Unix for example),
-             * first remove all whitespace at the end, then add a single 
+             * first remove all whitespace at the end, then add a single
              * newline.
              */
             Len = strlen (IFile->Line);

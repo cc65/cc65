@@ -1,7 +1,7 @@
 /*
- * testprogram for get_ostype() function
+ * testprogram for get_ostype() and get_tv() functions
  *
- * 17-Jul-2000, cpg@aladdin.de
+ * 09-Jul-2004, cpg@aladdin.de
  */
 
 #include <stdio.h>
@@ -9,17 +9,18 @@
 
 int main(void)
 {
-    unsigned int t;
+    unsigned int t, v;
     unsigned char palntsc;
     unsigned char *rev;
     unsigned char minor;
     unsigned char c;
 
     t = get_ostype();    /* get computer type */
+    v = get_tv();        /* get tv system */
 
-    palntsc = (t & AT_OS_PALNTSC) >> 3;
+    palntsc = (v == AT_PAL);
+
     minor = (t & AT_OS_TYPE_MINOR) >> 5;
-    if (palntsc != AT_OS_PAL) palntsc = 0; /* 1 - PAL; 0 - NTSC */
     switch(t & AT_OS_TYPE_MAIN) {
         case AT_OS_UNKNOWN:
         default:

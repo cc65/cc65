@@ -46,7 +46,7 @@
 unsigned char AddSource		= 0; 	/* Add source lines as comments */
 unsigned char DebugInfo		= 0;	/* Add debug info to the obj */
 unsigned char CreateDep		= 0;	/* Create a dependency file */
-unsigned char ANSI   	       	= 0;	/* Strict ANSI flag */
+unsigned char PreprocessOnly    = 0;    /* Just preprocess the input */
 unsigned      RegisterSpace     = 6;    /* Space available for register vars */
 
 /* Stackable options */
@@ -61,7 +61,6 @@ IntStack SignedChars        = INTSTACK(0);  /* Make characters signed by default
 IntStack CheckStack         = INTSTACK(0);  /* Generate stack overflow checks */
 IntStack Optimize      	    = INTSTACK(0);  /* Optimize flag */
 IntStack CodeSizeFactor	    = INTSTACK(100);/* Size factor for generated code */
-
 
 
 

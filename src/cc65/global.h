@@ -53,7 +53,7 @@
 extern unsigned char	AddSource;		/* Add source lines as comments */
 extern unsigned char	DebugInfo;		/* Add debug info to the obj */
 extern unsigned char	CreateDep;		/* Create a dependency file */
-extern unsigned char	ANSI;			/* Strict ANSI flag */
+extern unsigned char    PreprocessOnly;         /* Just preprocess the input */
 extern unsigned         RegisterSpace;          /* Space available for register vars */
 
 /* Stackable options */

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -40,6 +40,9 @@
 
 #include <stdio.h>
 
+/* common */
+#include "strbuf.h"
+
 
 
 /*****************************************************************************/
@@ -48,13 +51,8 @@
 
 
 
-/* Maximum length of an input line and the corresponding char array */
-#define LINEMAX		4095
-#define LINESIZE 	LINEMAX+1
-
-/* Input line stuff */
-extern char* line;
-extern const char* lptr;		/* ### Remove this */
+/* The current input line */
+extern StrBuf* Line;
 
 /* Current and next input character */
 extern char CurC;
@@ -64,7 +62,7 @@ extern char NextC;
 typedef struct IFile IFile;
 struct IFile {
     unsigned	    Index;     	/* File index */
-    unsigned	    Usage;	/* Usage counter */
+    unsigned	    Usage;     	/* Usage counter */
     unsigned long   Size;       /* File size */
     unsigned long   MTime;      /* Time of last modification */
     char       	    Name[1];  	/* Name of file (dynamically allocated) */
@@ -73,7 +71,7 @@ struct IFile {
 
 
 /*****************************************************************************/
-/*	       	     	     	     Code		     		     */
+/*     	       	     	     	     Code		     		     */
 /*****************************************************************************/
 
 
@@ -84,16 +82,18 @@ void OpenMainFile (const char* Name);
 void OpenIncludeFile (const char* Name, unsigned DirSpec);
 /* Open an include file and insert it into the tables. */
 
-void ClearLine (void);
-/* Clear the current input line */
-							     
-void InitLine (const char* Buf);
-/* Initialize lptr from Buf and read CurC and NextC from the new input line */
-
 void NextChar (void);
 /* Read the next character from the input stream and make CurC and NextC
  * valid. If end of line is reached, both are set to NUL, no more lines
  * are read by this function.
+ */
+
+void ClearLine (void);
+/* Clear the current input line */
+
+StrBuf* InitLine (StrBuf* Buf);
+/* Initialize Line from Buf and read CurC and NextC from the new input line.
+ * The function returns the old input line.
  */
 
 int NextLine (void);

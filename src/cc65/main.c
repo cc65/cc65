@@ -82,6 +82,7 @@ static void Usage (void)
 	     "Short options:\n"
        	     "  -Cl\t\t\tMake local variables static\n"
        	     "  -Dsym[=defn]\t\tDefine a symbol\n"
+             "  -E\t\t\tStop after the preprocessing stage\n"
        	     "  -I dir\t\tSet an include directory search path\n"
        	     "  -O\t\t\tOptimize code\n"
        	     "  -Oi\t\t\tOptimize code, inline more code\n"
@@ -802,7 +803,11 @@ int main (int argc, char* argv[])
 		    DefineSym (GetArg (&I, 2));
 		    break;
 
-       		case 'I':
+                case 'E':
+                    PreprocessOnly = 1;
+                    break;
+
+       		case 'I':                               
 		    OptIncludeDir (Arg, GetArg (&I, 2));
 		    break;
 
@@ -908,7 +913,7 @@ int main (int argc, char* argv[])
 	/* Create dependencies if requested */
 	if (CreateDep) {
 	    DoCreateDep (OutputFile);
-	    Print (stdout, 1, "Creating dependeny file");
+	    Print (stdout, 1, "Creating dependeny file\n");
 	}
 
     }

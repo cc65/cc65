@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,27 +38,35 @@
 
 
 
+/* common */
+#include "coll.h"
+#include "inline.h"
+#include "strbuf.h"
+
+
+
 /*****************************************************************************/
-/*				     data				     */
+/*  		 		     data				     */
 /*****************************************************************************/
 
 
 
+/* Structure describing a macro */
 typedef struct Macro Macro;
 struct Macro {
     Macro*  	 Next;		/* Next macro with same hash value */
+    int          Expanding;     /* Are we currently expanding this macro? */
     int	    	 ArgCount;	/* Number of parameters, -1 = no parens */
     unsigned	 MaxArgs;	/* Size of formal argument list */
-    char**     	 FormalArgs;	/* Formal argument list */
-    char const** ActualArgs;	/* Actual argument list */
-    char*      	 Replacement;   /* Replacement text */
+    Collection   FormalArgs;	/* Formal argument list (char*) */
+    StrBuf       Replacement;   /* Replacement text */
     char    	 Name[1];   	/* Name, dynamically allocated */
 };
 
 
 
 /*****************************************************************************/
-/*	    		   	     code	    			     */
+/*	    	 	   	     Code	    			     */
 /*****************************************************************************/
 
 
@@ -80,9 +88,7 @@ void DefineTextMacro (const char* Name, const char* Val);
 /* Define a macro for a textual constant */
 
 void InsertMacro (Macro* M);
-/* Insert the given macro into the macro table. This call will also allocate
- * the ActualArgs parameter array.
- */
+/* Insert the given macro into the macro table. */
 
 int UndefineMacro (const char* Name);
 /* Search for the macro with the given name and remove it from the macro
@@ -93,17 +99,19 @@ int UndefineMacro (const char* Name);
 Macro* FindMacro (const char* Name);
 /* Find a macro with the given name. Return the macro definition or NULL */
 
-int IsMacro (const char* Name);
+#if defined(HAVE_INLINE)
+INLINE int IsMacro (const char* Name)
 /* Return true if the given name is the name of a macro, return false otherwise */
+{
+    return FindMacro (Name) != 0;
+}
+#else
+#  define IsMacro(Name)         (FindMacro (Name) != 0)
+#endif
 
-int MaybeMacro (unsigned char C);
-/* Return true if the given character may be the start of the name of an
- * existing macro, return false if not.
- */
-
-const char* FindMacroArg (Macro* M, const char* Arg);
-/* Search for a formal macro argument. If found, return the actual
- * (replacement) argument. If the argument was not found, return NULL.
+int FindMacroArg (Macro* M, const char* Arg);
+/* Search for a formal macro argument. If found, return the index of the
+ * argument. If the argument was not found, return -1.
  */
 
 void AddMacroArg (Macro* M, const char* Arg);

@@ -223,11 +223,14 @@ INLINE int TokIsTypeQual (const Token* T)
 #  define TokIsTypeQual(T)  ((T)->Tok >= TOK_FIRST_TYPEQUAL && (T)->Tok <= TOK_LAST_TYPEQUAL)
 #endif
 
-void SymName (char* s);
-/* Get symbol from input stream */
+void SymName (char* S);
+/* Read a symbol from the input stream. The first character must have been
+ * checked before calling this function. The buffer is expected to be at
+ * least of size MAX_IDENTLEN+1.
+ */
 
-int IsSym (char* s);
-/* Get symbol from input stream or return 0 if not a symbol. */
+int IsSym (char* S);
+/* If a symbol follows, read it and return 1, otherwise return 0 */
 
 void NextToken (void);
 /* Get next token from input stream */

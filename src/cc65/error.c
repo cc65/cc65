@@ -68,15 +68,15 @@ unsigned WarningCount	= 0;
 
 
 
-static void IntWarning (const char* Filename, unsigned Line, const char* Msg, va_list ap)
+static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
 /* Print warning message - internal function. */
 {
     if (!IS_Get (&WarnDisable)) {
-       	fprintf (stderr, "%s(%u): Warning: ", Filename, Line);
+       	fprintf (stderr, "%s(%u): Warning: ", Filename, LineNo);
      	vfprintf (stderr, Msg, ap);
      	fprintf (stderr, "\n");
 
-     	Print (stderr, 1, "Line: %s\n", line);
+     	Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
 	++WarningCount;
     }
 }
@@ -105,14 +105,14 @@ void PPWarning (const char* Format, ...)
 
 
 
-static void IntError (const char* Filename, unsigned Line, const char* Msg, va_list ap)
+static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va_list ap)
 /* Print an error message - internal function*/
 {
-    fprintf (stderr, "%s(%u): Error: ", Filename, Line);
+    fprintf (stderr, "%s(%u): Error: ", Filename, LineNo);
     vfprintf (stderr, Msg, ap);
     fprintf (stderr, "\n");
 
-    Print (stderr, 1, "Line: %s\n", line);
+    Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
     ++ErrorCount;
     if (ErrorCount > 10) {
        	Fatal ("Too many errors");
@@ -165,7 +165,7 @@ void Fatal (const char* Format, ...)
     va_end (ap);
     fprintf (stderr, "\n");
 
-    Print (stderr, 1, "Line: %s\n", line);
+    Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
     exit (EXIT_FAILURE);
 }
 
@@ -192,7 +192,7 @@ void Internal (const char* Format, ...)
     va_start (ap, Format);
     vfprintf (stderr, Format, ap);
     va_end (ap);
-    fprintf (stderr, "\nLine: %s\n", line);
+    fprintf (stderr, "\nInput: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
 
     /* Use abort to create a core dump */
     abort ();
@@ -203,12 +203,8 @@ void Internal (const char* Format, ...)
 void ErrorReport (void)
 /* Report errors (called at end of compile) */
 {
-    if (ErrorCount == 0 && Verbosity > 0) {
-     	printf ("No errors.\n");
-    }
+    Print (stdout, 1, "%u errors, %u warnings\n", ErrorCount, WarningCount);
 }
-
-
 
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,7 +46,6 @@
 #include "xmalloc.h"
 
 /* cc65 */
-#include "asmcode.h"
 #include "codegen.h"
 #include "error.h"
 #include "incpath.h"
@@ -61,10 +60,8 @@
 
 
 
-/* Input line stuff */
-static char LineBuf [LINESIZE];
-char* line = LineBuf;
-const char* lptr = LineBuf;
+/* The current input line */
+StrBuf* Line;
 
 /* Current and next input character */
 char CurC  = '\0';
@@ -86,6 +83,9 @@ static Collection IFiles = STATIC_COLLECTION_INITIALIZER;
 
 /* List of all active files */
 static Collection AFiles = STATIC_COLLECTION_INITIALIZER;
+
+/* Input stack used when preprocessing. */
+static Collection InputStack = STATIC_COLLECTION_INITIALIZER;
 
 
 
@@ -217,6 +217,9 @@ void OpenMainFile (const char* Name)
 
     /* Allocate a new AFile structure for the file */
     (void) NewAFile (IF, F);
+
+    /* Allocate the input line buffer */
+    Line = NewStrBuf ();
 }
 
 
@@ -297,48 +300,101 @@ static void CloseIncludeFile (void)
 
 
 
-void ClearLine (void)
-/* Clear the current input line */
+static void GetInputChar (void)
+/* Read the next character from the input stream and make CurC and NextC
+ * valid. If end of line is reached, both are set to NUL, no more lines
+ * are read by this function.
+ */
 {
-    line[0] = '\0';
-    lptr    = line;
-    CurC    = '\0';
-    NextC   = '\0';
-}
+    /* Drop all pushed fragments that don't have data left */
+    while (SB_GetIndex (Line) >= SB_GetLen (Line)) {
+        /* Cannot read more from this line, check next line on stack if any */
+        if (CollCount (&InputStack) == 0) {
+            /* This is THE line */
+            break;
+        }
+        FreeStrBuf (Line);
+        Line = CollPop (&InputStack);
+    }
 
-
-
-void InitLine (const char* Buf)
-/* Initialize lptr from Buf and read CurC and NextC from the new input line */
-{
-    lptr = Buf;
-    CurC = lptr[0];
-    if (CurC != '\0') {
-	NextC = lptr[1];
+    /* Now get the next characters from the line */
+    if (SB_GetIndex (Line) >= SB_GetLen (Line)) {
+        CurC = NextC = '\0';
     } else {
-	NextC = '\0';
+        CurC = SB_AtUnchecked (Line, SB_GetIndex (Line));
+        if (SB_GetIndex (Line) + 1 < SB_GetLen (Line)) {
+            /* NextC comes from this fragment */
+            NextC = SB_AtUnchecked (Line, SB_GetIndex (Line) + 1);
+        } else {
+            /* NextC comes from next fragment */
+            if (CollCount (&InputStack) > 0) {
+                NextC = ' ';
+            } else {
+                NextC = '\0';
+            }
+        }
     }
 }
 
 
 
 void NextChar (void)
-/* Read the next character from the input stream and make CurC and NextC
- * valid. If end of line is reached, both are set to NUL, no more lines
- * are read by this function.
+/* Skip the current input character and read the next one from the input
+ * stream. CurC and NextC are valid after the call. If end of line is 
+ * reached, both are set to NUL, no more lines are read by this function.
  */
 {
-    if (lptr[0] != '\0') {
-	++lptr;
-       	CurC = lptr[0];
-	if (CurC != '\0') {
-	    NextC = lptr[1];
-	} else {
-	    NextC = '\0';
-	}
-    } else {
-	CurC = NextC = '\0';
+    /* Skip the last character read */
+    SB_Skip (Line);
+
+    /* Read the next one */
+    GetInputChar ();
+}
+
+
+
+void ClearLine (void)
+/* Clear the current input line */
+{
+    unsigned I;
+
+    /* Remove all pushed fragments from the input stack */
+    for (I = 0; I < CollCount (&InputStack); ++I) {
+        FreeStrBuf (CollAtUnchecked (&InputStack, I));
     }
+    CollDeleteAll (&InputStack);
+
+    /* Clear the contents of Line */
+    SB_Clear (Line);
+    CurC    = '\0';
+    NextC   = '\0';
+}
+
+
+
+StrBuf* InitLine (StrBuf* Buf)
+/* Initialize Line from Buf and read CurC and NextC from the new input line.
+ * The function returns the old input line.
+ */
+{
+    StrBuf* OldLine = Line;
+    Line  = Buf;
+    CurC  = SB_LookAt (Buf, SB_GetIndex (Buf));
+    NextC = SB_LookAt (Buf, SB_GetIndex (Buf) + 1);
+    return OldLine;
+}
+
+
+
+void PushLine (const StrBuf* Buf)
+/* Push a copy of Buf onto the input stack */
+{
+    CollAppend (&InputStack, Line);
+    Line = NewStrBuf ();
+    SB_Copy (Line, Buf);
+
+    /* Make CurC and NextC valid */
+    GetInputChar ();
 }
 
 
@@ -346,74 +402,83 @@ void NextChar (void)
 int NextLine (void)
 /* Get a line from the current input. Returns 0 on end of file. */
 {
-    AFile*	Input;
-    unsigned   	Len;
-    unsigned   	Part;
-    unsigned   	Start;
-    int	       	Done;
+    AFile*     	Input;
 
-    /* Setup the line */
+    /* Clear the current line */
     ClearLine ();
 
     /* If there is no file open, bail out, otherwise get the current input file */
     if (CollCount (&AFiles) == 0) {
 	return 0;
     }
-    Input = (AFile*) CollLast (&AFiles);
+    Input = CollLast (&AFiles);
 
-    /* Read lines until we get one with real contents */
-    Len = 0;
-    Done = 0;
-    while (!Done && Len < LINESIZE) {
+    /* Read characters until we have one complete line */
+    while (1) {
 
-       	while (fgets (line + Len, LINESIZE - Len, Input->F) == 0) {
+        /* Read the next character */
+        int C = fgetc (Input->F);
 
-      	    /* Assume EOF */
-      	    ClearLine ();
+        /* Check for EOF */
+        if (C == EOF) {
 
       	    /* Leave the current file */
       	    CloseIncludeFile ();
 
-	    /* If there is no file open, bail out, otherwise get the
-	     * current input file
-	     */
-	    if (CollCount (&AFiles) == 0) {
-		return 0;
-	    }
-	    Input = (AFile*) CollLast (&AFiles);
+            /* Accept files without a newline at the end */
+            if (SB_NotEmpty (Line)) {
+                break;
+            }
 
-       	}
+            /* If there is no file open, bail out, otherwise get the
+             * previous input file and start over.
+             */
+            if (CollCount (&AFiles) == 0) {
+                return 0;
+            }
+            Input = CollLast (&AFiles);
+            continue;
+        }
 
-	/* We got a new line */
-	++Input->Line;
+        /* Check for end of line */
+        if (C == '\n') {
 
-	/* Remove the trailing cr/lf if we have one. We will ignore both, cr
-	 * and lf on all systems since this enables us to compile DOS/Windows
-	 * stuff also on unix systems (where fgets does not remove the cr).
-	 */
-	Part = strlen (line + Len);
-	Start = Len;
-	Len += Part;
-	while (Len > 0 && (line[Len-1] == '\n' || line[Len-1] == '\r')) {
-	    --Len;
-	}
-      	line [Len] = '\0';
+            /* We got a new line */
+            ++Input->Line;
 
-	/* Check if we have a line continuation character at the end. If not,
-	 * we're done.
-	 */
-	if (Len > 0 && line[Len-1] == '\\') {
-	    line[Len-1] = '\n';		/* Replace by newline */
-      	} else {
-      	    Done = 1;
-      	}
+            /* If the \n is preceeded by a \r, remove the \r, so we can read
+             * DOS/Windows files under *nix.
+             */
+            if (SB_LookAtLast (Line) == '\r') {
+                SB_Drop (Line, 1);
+            }
+
+            /* If we don't have a line continuation character at the end,
+             * we're done with this line. Otherwise replace the character
+             * by a newline and continue reading.
+             */
+            if (SB_LookAtLast (Line) == '\\') {
+                Line->Buf[Line->Len-1] = '\n';
+            } else {
+                break;
+            }
+
+        } else if (C != '\0') {         /* Ignore embedded NULs */
+
+            /* Just some character, add it to the line */
+            SB_AppendChar (Line, C);
+
+        }
     }
 
-    /* Got a line. Initialize the current and next characters. */
-    InitLine (line);
+    /* Add a termination character to the string buffer */
+    SB_Terminate (Line);
+
+    /* Initialize the current and next characters. */
+    InitLine (Line);
 
     /* Create line information for this line */
-    UpdateLineInfo (Input->Input, Input->Line, line);
+    UpdateLineInfo (Input->Input, Input->Line, SB_GetConstBuf (Line));
 
     /* Done */
     return 1;
@@ -426,17 +491,17 @@ const char* GetCurrentFile (void)
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
-	const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
-	return AF->Input->Name;
+    	const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
+    	return AF->Input->Name;
     } else {
-	/* No open file. Use the main file if we have one. */
-	unsigned IFileCount = CollCount (&IFiles);
-	if (IFileCount > 0) {
-	    const IFile* IF = (const IFile*) CollAt (&IFiles, 0);
-	    return IF->Name;
-	} else {
+    	/* No open file. Use the main file if we have one. */
+    	unsigned IFileCount = CollCount (&IFiles);
+    	if (IFileCount > 0) {
+    	    const IFile* IF = (const IFile*) CollAt (&IFiles, 0);
+    	    return IF->Name;
+    	} else {
       	    return "(outside file scope)";
-	}
+    	}
     }
 }
 

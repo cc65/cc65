@@ -181,7 +181,7 @@ static int SkipWhite (void)
  */
 {
     while (1) {
-       	while (CurC == 0) {
+       	while (CurC == '\0') {
 	    if (NextLine () == 0) {
 	     	return 0;
      	    }
@@ -197,27 +197,30 @@ static int SkipWhite (void)
 
 
 
-void SymName (char* s)
-/* Get symbol from input stream */
+void SymName (char* S)
+/* Read a symbol from the input stream. The first character must have been
+ * checked before calling this function. The buffer is expected to be at
+ * least of size MAX_IDENTLEN+1.
+ */
 {
-    unsigned k = 0;
+    unsigned Len = 0;
     do {
-       	if (k != MAX_IDENTLEN) {
-       	    ++k;
-       	    *s++ = CurC;
-     	}
+       	if (Len < MAX_IDENTLEN) {
+       	    ++Len;
+       	    *S++ = CurC;
+      	}
        	NextChar ();
     } while (IsIdent (CurC) || IsDigit (CurC));
-    *s = '\0';
+    *S = '\0';
 }
 
 
 
-int IsSym (char *s)
-/* Get symbol from input stream or return 0 if not a symbol. */
+int IsSym (char* S)
+/* If a symbol follows, read it and return 1, otherwise return 0 */
 {
     if (IsIdent (CurC)) {
-     	SymName (s);
+     	SymName (S);
      	return 1;
     } else {
      	return 0;
@@ -245,7 +248,7 @@ static void SetTok (int tok)
 
 
 static int ParseChar (void)
-/* Parse a character. Converts \n into EOL, etc. */
+/* Parse a character. Converts escape chars into character codes. */
 {
     int I;
     unsigned Val;
@@ -292,9 +295,20 @@ static int ParseChar (void)
 	    case 'X':
 	      	/* Hex character constant */
 	      	NextChar ();
-	       	Val = HexVal (CurC) << 4;
-	      	NextChar ();
-       	       	C = Val | HexVal (CurC); 	/* Do not translate */
+                if (!IsXDigit (CurC)) {
+                    Error ("\\x used with no following hex digits");
+                    C = ' ';
+                }
+                I = 0;
+                C = 0;
+                while (IsXDigit (CurC)) {
+                    if (++I <= 2) {
+                        C = (C << 4) | HexVal (CurC);
+                    } else if (I == 3) {
+                        Error ("Too many digits in hex character constant");
+                    }
+                    NextChar ();
+                }
 	      	break;
 	    case '0':
 	    case '1':
@@ -304,16 +318,16 @@ static int ParseChar (void)
 	    case '5':
 	    case '6':
 	    case '7':
-		/* Octal constant */
+		/* Octal constant ### FIXME: Eat all available octal chars! */
 		I = 0;
        	       	Val = CurC - '0';
-       	       	while (NextC >= '0' && NextC <= '7' && ++I <= 3) {
+       	       	while (IsODigit (NextC) && ++I <= 3) {
      	 	    NextChar ();
      	       	    Val = (Val << 3) | (CurC - '0');
      		}
                 C = (int) Val;
                 if (Val >= 256) {
-                    Error ("Character constant out of range");
+                    Error ("Character constant out of range: %u", Val);
                     C = ' ';
                 }
      		break;

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -56,12 +56,6 @@
 #define MACRO_TAB_SIZE	211
 static Macro* MacroTab[MACRO_TAB_SIZE];
 
-/* A table that holds the count of macros that start with a specific character.
- * It is used to determine quickly, if an identifier may be a macro or not
- * without calculating the hash over the name.
- */
-static unsigned short MacroFlagTab[256];
-
 
 
 /*****************************************************************************/
@@ -83,11 +77,11 @@ Macro* NewMacro (const char* Name)
 
     /* Initialize the data */
     M->Next   	   = 0;
+    M->Expanding   = 0;
     M->ArgCount    = -1;	/* Flag: Not a function like macro */
     M->MaxArgs	   = 0;
-    M->FormalArgs  = 0;
-    M->ActualArgs  = 0;
-    M->Replacement = 0;
+    InitCollection (&M->FormalArgs);
+    InitStrBuf (&M->Replacement);
     memcpy (M->Name, Name, Len+1);
 
     /* Return the new macro */
@@ -101,14 +95,13 @@ void FreeMacro (Macro* M)
  * table, use UndefineMacro for that.
  */
 {
-    int I;
+    unsigned I;
 
-    for (I = 0; I < M->ArgCount; ++I) {
-	xfree (M->FormalArgs[I]);
+    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
+	xfree (CollAtUnchecked (&M->FormalArgs, I));
     }
-    xfree (M->FormalArgs);
-    xfree (M->ActualArgs);
-    xfree (M->Replacement);
+    DoneCollection (&M->FormalArgs);
+    DoneStrBuf (&M->Replacement);
     xfree (M);
 }
 
@@ -135,7 +128,7 @@ void DefineTextMacro (const char* Name, const char* Val)
     Macro* M = NewMacro (Name);
 
     /* Set the value as replacement text */
-    M->Replacement = xstrdup (Val);
+    SB_CopyStr (&M->Replacement, Val);
 
     /* Insert the macro into the macro table */
     InsertMacro (M);
@@ -144,26 +137,14 @@ void DefineTextMacro (const char* Name, const char* Val)
 
 
 void InsertMacro (Macro* M)
-/* Insert the given macro into the macro table. This call will also allocate
- * the ActualArgs parameter array.
- */
+/* Insert the given macro into the macro table. */
 {
-    unsigned Hash;
-
-    /* Allocate the ActualArgs parameter array */
-    if (M->ArgCount > 0) {
-    	M->ActualArgs = (char const**) xmalloc (M->ArgCount * sizeof(char*));
-    }
-
     /* Get the hash value of the macro name */
-    Hash = HashStr (M->Name) % MACRO_TAB_SIZE;
+    unsigned Hash = HashStr (M->Name) % MACRO_TAB_SIZE;
 
     /* Insert the macro */
     M->Next = MacroTab[Hash];
     MacroTab[Hash] = M;
-
-    /* Increment the number of macros starting with this char */
-    MacroFlagTab[(unsigned)(unsigned char)M->Name[0]]++;
 }
 
 
@@ -190,9 +171,6 @@ int UndefineMacro (const char* Name)
 	    } else {
 	       	L->Next = M->Next;
 	    }
-
-	    /* Decrement the number of macros starting with this char */
-	    MacroFlagTab[(unsigned)(unsigned char)M->Name[0]]--;
 
 	    /* Delete the macro */
 	    FreeMacro (M);
@@ -236,38 +214,21 @@ Macro* FindMacro (const char* Name)
 
 
 
-int IsMacro (const char* Name)
-/* Return true if the given name is the name of a macro, return false otherwise */
-{
-    return MaybeMacro(Name[0]) && FindMacro(Name) != 0;
-}	       
-
-
-
-int MaybeMacro (unsigned char C)
-/* Return true if the given character may be the start of the name of an
- * existing macro, return false if not.
+int FindMacroArg (Macro* M, const char* Arg)
+/* Search for a formal macro argument. If found, return the index of the
+ * argument. If the argument was not found, return -1.
  */
 {
-    return (MacroFlagTab[C] > 0);
-}
-
-
-
-const char* FindMacroArg (Macro* M, const char* Arg)
-/* Search for a formal macro argument. If found, return the actual
- * (replacement) argument. If the argument was not found, return NULL.
- */
-{
-    int I;
-    for (I = 0; I < M->ArgCount; ++I) {
-	if (strcmp (M->FormalArgs[I], Arg) == 0) {
-	    /* Found */
-	    return M->ActualArgs[I];
+    unsigned I;
+    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
+       	if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
+      	    /* Found */
+       	    return I;
 	}
     }
+
     /* Not found */
-    return 0;
+    return -1;
 }
 
 
@@ -279,29 +240,18 @@ void AddMacroArg (Macro* M, const char* Arg)
      * Beware: Don't use FindMacroArg here, since the actual argument array
      * may not be initialized.
      */
-    int I;
-    for (I = 0; I < M->ArgCount; ++I) {
-	if (strcmp (M->FormalArgs[I], Arg) == 0) {
+    unsigned I;
+    for (I = 0; I < CollCount (&M->FormalArgs); ++I) {
+       	if (strcmp (CollAtUnchecked (&M->FormalArgs, I), Arg) == 0) {
 	    /* Found */
 	    Error ("Duplicate macro parameter: `%s'", Arg);
 	    break;
 	}
     }
 
-    /* Check if we have enough room available, otherwise expand the array
-     * that holds the formal argument list.
-     */
-    if (M->ArgCount >= (int) M->MaxArgs) {
-	/* We must expand the array */
-	char** OldArgs = M->FormalArgs;
-	M->MaxArgs += 10;
-	M->FormalArgs = (char**) xmalloc (M->MaxArgs * sizeof(char*));
-	memcpy (M->FormalArgs, OldArgs, M->ArgCount * sizeof (char*));
-	xfree (OldArgs);
-    }
-
     /* Add the new argument */
-    M->FormalArgs[M->ArgCount++] = xstrdup (Arg);
+    CollAppend (&M->FormalArgs, xstrdup (Arg));
+    ++M->ArgCount;
 }
 
 
@@ -318,13 +268,14 @@ int MacroCmp (const Macro* M1, const Macro* M2)
 
     /* Compare the arguments */
     for (I = 0; I < M1->ArgCount; ++I) {
-	if (strcmp (M1->FormalArgs[I], M2->FormalArgs[I]) != 0) {
+       	if (strcmp (CollConstAt (&M1->FormalArgs, I),
+                    CollConstAt (&M2->FormalArgs, I)) != 0) {
 	    return 1;
 	}
     }
 
     /* Compare the replacement */
-    return strcmp (M1->Replacement, M2->Replacement);
+    return SB_Compare (&M1->Replacement, &M2->Replacement);
 }
 
 

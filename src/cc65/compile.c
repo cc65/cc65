@@ -56,6 +56,7 @@
 #include "litpool.h"
 #include "macrotab.h"
 #include "pragma.h"
+#include "preproc.h"
 #include "standard.h"
 #include "symtab.h"
 
@@ -178,7 +179,7 @@ static void Parse (void)
 	     	      	      	/* Size is unknown and not an array */
 	     	    	      	Error ("Variable `%s' has unknown size", Decl.Ident);
 	     	    	    }
-	     	    	} else if (ANSI) {
+	     	    	} else if (IS_Get (&Standard) != STD_CC65) {
 	     	    	    /* We cannot declare variables of type void */
 	     	    	    Error ("Illegal type for variable `%s'", Decl.Ident);
 	     	    	}
@@ -332,18 +333,34 @@ void Compile (const char* FileName)
     /* Open the input file */
     OpenMainFile (FileName);
 
-    /* Ok, start the ball rolling... */
-    Parse ();
+    /* Are we supposed to compile or just preprocess the input? */
+    if (PreprocessOnly) {
 
-    /* Dump the literal pool. */
-    DumpLiteralPool ();
+        while (NextLine ()) {
+            Preprocess ();
+            printf ("%.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+        }
 
-    /* Write imported/exported symbols */
-    EmitExternals ();
+        if (Debug) {
+            PrintMacroStats (stdout);
+        }
 
-    if (Debug) {
-	PrintLiteralPoolStats (stdout);
-	PrintMacroStats (stdout);
+    } else {
+
+        /* Ok, start the ball rolling... */
+        Parse ();
+
+        /* Dump the literal pool. */
+        DumpLiteralPool ();
+
+        /* Write imported/exported symbols */
+        EmitExternals ();
+
+        if (Debug) {
+            PrintLiteralPoolStats (stdout);
+            PrintMacroStats (stdout);
+        }
+
     }
 
     /* Leave the main lexical level */

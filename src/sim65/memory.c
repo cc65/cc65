@@ -33,10 +33,14 @@
 
 
 
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
+
 /* common */
 #include "coll.h"
 
-/* sim65 */            
+/* sim65 */
 #include "error.h"
 #include "memory.h"
 
@@ -140,7 +144,7 @@ unsigned char MemReadByte (unsigned Addr)
 {
     /* Get the reader function */
     unsigned  RI = (MemAttr[Addr] & RA_READFUNC_MASK) >> RA_READFUNC_SHIFT;
-    ReadFunc RF = CollAt (&WriteFuncs, RI);
+    ReadFunc RF = CollAt (&ReadFuncs, RI);
 
     /* Call the reader function */
     return RF (Addr);
@@ -169,6 +173,50 @@ unsigned MemReadZPWord (unsigned char Addr)
 
 
 
+void MemLoad (const char* Filename, unsigned Addr, unsigned Size)
+/* Load the contents of the given file into the RAM at the given address.
+ * If Size is not zero, we will read exactly Size bytes from the file and
+ * consider it an error if this is not possible. The memory attributes
+ * for the range is set to initialized.
+ */
+{
+    unsigned BytesToRead;
+    unsigned BytesRead;
+    unsigned I;
+
+    /* Open the file */
+    FILE* F = fopen (Filename, "rb");
+    if (F == 0) {
+        Error ("Cannot open `%s': %s", Filename, strerror (errno));
+    }
+
+    /* Set the number of bytes to read */
+    BytesToRead = 0x10000 - Addr;
+    if (Size > 0) {
+        CHECK (Size <= BytesToRead);    /* Must not exceed RAM */
+        BytesToRead = Size;
+    }
+
+    /* Read data from the file */
+    BytesRead = fread (Mem + Addr, 1, BytesToRead, F);
+    if (ferror (F)) {
+        Error ("Error reading from `%s': %s", Filename, strerror (errno));
+    }
+    if (Size > 0 && BytesRead != Size) {
+        Error ("Cannot read %u bytes from `%s'", Size, Filename);
+    }
+
+    /* Close the file. Ignore errors, we were just reading. */
+    fclose (F);
+
+    /* Set the memory attribute for the range to initialized */
+    for (I = 0; I < BytesRead; ++I) {
+        MemAttr[Addr+I] |= RA_INITIALIZED;
+    }
+}
+
+
+
 void MemInit (void)
 /* Initialize the memory subsystem */
 {
@@ -188,4 +236,10 @@ void MemInit (void)
     /* Add the default reader and writer functions to the collection */
     CollAppend (&ReadFuncs, MemRead);
     CollAppend (&WriteFuncs, MemWrite);
+
+    MemWriteByte (0xFFFC, 0x00);
+    MemWriteByte (0xFFFD, 0x02);
 }
+
+
+

@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   memory.h				     */
+/*                                  chippath.h                               */
 /*                                                                           */
-/*		    Memory subsystem for the 6502 simulator		     */
+/*                Chip path handling for the sim65 6502 simulator            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,51 +33,28 @@
 
 
 
-#ifndef MEMORY_H
-#define MEMORY_H
+#ifndef CHIPPATH_H
+#define CHIPPATH_H
 
 
 
 /*****************************************************************************/
-/*  				     Data				     */
+/*     	     	    		     Code   				     */
 /*****************************************************************************/
 
 
 
-/*****************************************************************************/
-/*  				     Code				     */
-/*****************************************************************************/
+void AddChipPath (const char* NewPath);
+/* Add a search path for chips */
 
-
-
-void MemWriteByte (unsigned Addr, unsigned char Val);
-/* Write a byte to a memory location */
-
-unsigned char MemReadByte (unsigned Addr);
-/* Read a byte from a memory location */
-
-unsigned MemReadWord (unsigned Addr);
-/* Read a word from a memory location */
-
-unsigned MemReadZPWord (unsigned char Addr);
-/* Read a word from the zero page. This function differs from ReadMemW in that
- * the read will always be in the zero page, even in case of an address
- * overflow.
+char* FindChip (const char* LibName);
+/* Find a chip library. Return a pointer to a malloced area that contains
+ * the complete path, if found, return 0 otherwise.
  */
 
-void MemLoad (const char* Filename, unsigned Addr, unsigned Size);
-/* Load the contents of the given file into the RAM at the given address.
- * If Size is not zero, we will read exactly Size bytes from the file and
- * consider it an error if this is not possible. The memory attributes
- * for the range is set to initialized.
- */
-
-void MemInit (void);
-/* Initialize the memory subsystem */
 
 
-
-/* End of memory.h */
+/* End of chippath.h */
 
 #endif
 

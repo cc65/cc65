@@ -199,14 +199,11 @@ int main (int argc, char* argv[])
 	++I;
     }
 
-    /* Did we have a file spec on the command line? */
-    if (InputFile == 0) {
-	AbEnd ("No input files");
-    }
-
     /* Initialize modules */
     MemInit ();
+    MemLoad ("uz.bin", 0x200, 0);
     CPUInit ();
+    CPURun ();
 
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;

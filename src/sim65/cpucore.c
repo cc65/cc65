@@ -42,6 +42,7 @@
 
 /* sim65 */
 #include "cputype.h"
+#include "error.h"
 #include "global.h"
 #include "memory.h"
 #include "cpucore.h"
@@ -74,7 +75,7 @@ static unsigned StackPage = 0x100;
 #define ZF	0x02		/* Zero flag */
 #define IF	0x04		/* Interrupt flag */
 #define DF	0x08		/* Decimal flag */
-#define BF	0x10		/* Break flag */
+#define BF	0x10   		/* Break flag */
 #define OF	0x40		/* Overflow flag */
 #define SF	0x80		/* Sign flag */
 
@@ -84,7 +85,7 @@ int CPUHalted;
 
 
 /*****************************************************************************/
-/*			  Helper functions and macros			     */
+/*		  	  Helper functions and macros			     */
 /*****************************************************************************/
 
 
@@ -117,7 +118,7 @@ int CPUHalted;
 #define TEST_CF(v)              SET_CF (((v) & 0xFF00) != 0)
 
 /* Program counter halves */
-#define PCL		(PC & 0xFF)
+#define PCL	       	(PC & 0xFF)
 #define PCH		((PC >> 8) & 0xFF)
 
 /* Stack operations */
@@ -226,7 +227,7 @@ int CPUHalted;
 /* ADC */
 #define ADC(v)                                  \
     if (GET_DF ()) {                            \
-        NotImplemented ();                      \
+        Warning ("Decimal mode not available"); \
     } else {                                    \
         unsigned Val;                           \
         unsigned char rhs = v;                  \
@@ -289,7 +290,7 @@ int CPUHalted;
 /* SBC */
 #define SBC(v)                                  \
     if (GET_DF ()) {                            \
-        NotImplemented ();                      \
+        Warning ("Decimal mode not available"); \
     } else {                                    \
         unsigned Val;                           \
         unsigned char rhs = v;                  \
@@ -309,26 +310,15 @@ int CPUHalted;
 
 
 
-static void OPC_Illegal (void) attribute ((noreturn));
 static void OPC_Illegal (void)
 {
-    fprintf (stderr, "Illegal: $%02X\n", MemReadByte (PC));
-    exit (EXIT_FAILURE);
-}
-
-
-
-static void NotImplemented (void) attribute ((noreturn));
-static void NotImplemented (void)
-{
-    fprintf (stderr, "Not implemented: $%02X\n", MemReadByte (PC));
-    exit (EXIT_FAILURE);
+    Warning ("Illegal opcode $%02X at address $%04X\n", MemReadByte (PC), PC);
 }
 
 
 
 /*****************************************************************************/
-/*  	  			     Code				     */
+/*  	    			     Code				     */
 /*****************************************************************************/
 
 
@@ -344,6 +334,7 @@ static void OPC_6502_00 (void)
     PUSH (SR);
     SET_IF (1);
     PC = MemReadWord (0xFFFE);
+    CPUHalted = 1;
 }
 
 
@@ -2505,10 +2496,20 @@ void CPURun (void)
     while (!CPUHalted) {
 
 	/* Get the next opcode */
-	unsigned char B = MemReadByte (PC);
+	unsigned char OPC = MemReadByte (PC);
+
+        printf ("%6lu %04X %02X A=%02X X=%02X Y=%02X %c%c%c%c%c%c%c\n",
+                TotalCycles, PC, OPC, AC, XR, YR,
+                GET_SF()? 'S' : '-',
+                GET_ZF()? 'Z' : '-',
+                GET_CF()? 'C' : '-',
+                GET_IF()? 'I' : '-',
+                GET_BF()? 'B' : '-',
+                GET_DF()? 'D' : '-',
+                GET_OF()? 'V' : '-');
 
 	/* Execute it */
-	OPCTable[B] ();
+	OPCTable[OPC] ();
 
         /* Count cycles */
         TotalCycles += Cycles;

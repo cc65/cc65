@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   memory.h				     */
+/*                                    chip.h                                 */
 /*                                                                           */
-/*		    Memory subsystem for the 6502 simulator		     */
+/*                        Interface for the chip plugins                     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,51 +33,63 @@
 
 
 
-#ifndef MEMORY_H
-#define MEMORY_H
+#ifndef CHIP_H
+#define CHIP_H
 
 
 
 /*****************************************************************************/
-/*  				     Data				     */
+/*                                     Data                                  */
 /*****************************************************************************/
 
 
 
+/* Forward */
+struct SimData;
+
+/* Chip structure */
+typedef struct Chip Chip;
+struct Chip {
+    char*       Name;                   /* Name - must be unique */
+    char*       LibName;                /* Name of the associated library */
+    void*       Handle;                 /* Library handle or pointer to it */
+
+    /* -- Exported functions -- */
+    unsigned        (*InitChip) (const struct SimData* Data);
+    const char*     (*GetName) (void);
+    unsigned        (*GetVersion) (void);
+
+    void            (*WriteCtrl) (unsigned Addr, unsigned char Val);
+    void            (*Write) (unsigned Addr, unsigned char Val);
+
+    unsigned char   (*ReadCtrl) (unsigned Addr);
+    unsigned char   (*Read) (unsigned Addr);
+};
+
+
+
 /*****************************************************************************/
-/*  				     Code				     */
+/*     	      	    		     Code				     */
 /*****************************************************************************/
 
 
 
-void MemWriteByte (unsigned Addr, unsigned char Val);
-/* Write a byte to a memory location */
-
-unsigned char MemReadByte (unsigned Addr);
-/* Read a byte from a memory location */
-
-unsigned MemReadWord (unsigned Addr);
-/* Read a word from a memory location */
-
-unsigned MemReadZPWord (unsigned char Addr);
-/* Read a word from the zero page. This function differs from ReadMemW in that
- * the read will always be in the zero page, even in case of an address
- * overflow.
+void LoadChip (const char* LibName);
+/* Load a chip. This includes loading the shared libary, allocating and
+ * initializing the data structure.
  */
 
-void MemLoad (const char* Filename, unsigned Addr, unsigned Size);
-/* Load the contents of the given file into the RAM at the given address.
- * If Size is not zero, we will read exactly Size bytes from the file and
- * consider it an error if this is not possible. The memory attributes
- * for the range is set to initialized.
+void InitChips (void);
+/* Initialize the chips. Must be called *after* all chips are loaded */
+
+const Chip* GetChip (const char* Name);
+/* Find a chip by name. Returns the Chip data structure or NULL if the chip
+ * could not be found.
  */
 
-void MemInit (void);
-/* Initialize the memory subsystem */
 
 
-
-/* End of memory.h */
+/* End of chip.h */
 
 #endif
 

@@ -10,7 +10,9 @@ CC	= gcc
 EBIND	= emxbind
 LDFLAGS	=
 
-OBJS = 	cpucore.o	\
+OBJS = 	chip.o          \
+        chippath.o      \
+        cpucore.o	\
 	cputype.o	\
         error.o         \
 	global.o	\
@@ -33,7 +35,7 @@ endif
 
 
 sim65:	$(OBJS) $(LIBS)
-	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
+	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS) -ldl
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
 
 clean:

@@ -17,6 +17,8 @@ OBJS =	_scrsize.o	\
        	cgetc.o		\
 	clrscr.o	\
        	color.o	 	\
+	conio.o		\
+	cputc.o		\
        	crt0.o 	 	\
        	kbhit.o	 	\
        	kirq.o 	 	\

@@ -176,34 +176,6 @@ L3:	lda	(ptr1),y
    	iny
    	bne	L3
 
-; Reprogram the VIC so that the text screen is at $F800 in the execution bank
-
-; Place the VIC video RAM into bank 0
-; CA (STATVID) = 0
-
-  	ldy	#tpiCtrlReg
-  	lda	(tpi1),y
-  	and	#$CF
-  	ora	#$20
-  	sta	(tpi1),y
-
-; Set bit 14/15 of the VIC address range to the high bits of VIDEO_RAM
-; PC6/PC7 (VICBANKSEL 0/1) = 11
-
-	ldy    	#tpiPortC
-	lda	(tpi2),y
-	and	#$3F
-       	ora    	#((>VIDEO_RAM) & $C0)
-	sta	(tpi2),y
-
-; Set bits 10-13 of the VIC address range to address F800
-
-        ldy	#VIC_VIDEO_ADR
-	lda	(vic),y
-	and	#$0F
-       	ora    	#(((>VIDEO_RAM) & $3F) << 2)
-	sta	(vic),y
-
 ; Set the indirect segment to bank we're executing in
 
   	lda	ExecReg
@@ -263,9 +235,51 @@ Z4:
 
 ; This code is in page 2, so we may now start calling subroutines safely,
 ; since the code we execute is no longer in the stack page.
-; Clear the video memory
+
+; Clear the video memory. We will do this before switching the video to bank 0
+; to avoid garbage when doing so.
 
         jsr     _clrscr
+
+; Reprogram the VIC so that the text screen is at $F800 in the execution bank
+; This is done in three steps:
+
+        lda     #$0F  	      		; We need access to the system bank
+	sta	IndReg
+
+; Place the VIC video RAM into bank 0
+; CA (STATVID) = 0
+
+  	ldy	#tpiCtrlReg
+  	lda	(tpi1),y
+	sta	vidsave+0
+  	and	#$CF
+  	ora	#$20
+  	sta	(tpi1),y
+
+; Set bit 14/15 of the VIC address range to the high bits of VIDEO_RAM
+; PC6/PC7 (VICBANKSEL 0/1) = 11
+
+	ldy    	#tpiPortC
+	lda	(tpi2),y
+	sta	vidsave+1
+	and	#$3F
+       	ora    	#((>VIDEO_RAM) & $C0)
+	sta	(tpi2),y
+
+; Set bits 10-13 of the VIC address range to address F800
+
+        ldy	#VIC_VIDEO_ADR
+	lda	(vic),y
+	sta	vidsave+2
+	and	#$0F
+       	ora    	#(((>VIDEO_RAM) & $3F) << 2)
+	sta	(vic),y
+
+; Switch back to the execution bank
+
+        lda     ExecReg
+	sta	IndReg
 
 ; Call module constructors
 
@@ -359,6 +373,25 @@ Start:
 
 _exit:	jsr	donelib		; Run module destructors
 
+; We need access to the system bank now
+
+      	lda	#$0F
+      	sta	IndReg
+
+; Switch back the video to the system bank
+
+  	ldy	#tpiCtrlReg
+	lda	vidsave+0
+  	sta	(tpi1),y
+
+	ldy    	#tpiPortC
+   	lda	vidsave+1
+   	sta	(tpi2),y
+
+        ldy	#VIC_VIDEO_ADR
+	lda	vidsave+2
+	sta	(vic),y
+
 ; Clear the start of the zero page, since it will be interpreted as a
 ; (garbage) BASIC program otherwise. This is also the default entry for
 ; the break vector.
@@ -373,8 +406,6 @@ Clear:	sta	$02,x
 ; Setup the welcome code at the stack bottom in the system bank. Use
 ; the F4/F5 vector to access the system bank
 
-      	lda	#$0F
-      	sta	IndReg
       	ldy    	#$00
        	sty	$F4
       	iny
@@ -445,6 +476,6 @@ k_settim:
 
 .data
 spsave:	.res	1
-
+vidsave:.res	3
 
 

@@ -154,5 +154,5 @@ VIC_BG_COLOR3  	= $24
 ; Out video memory address
 
 VIDEO_RAM   = $F800
-
+COLOR_RAM   = $D400
 

@@ -9,58 +9,33 @@
 
       	.include      	"zeropage.inc"
 	.include	"io.inc"
-	
-	
+
+	.macpack	generic
+
 ; ------------------------------------------------------------------------
 ;
 
 .proc	k_plot
 
-	bcc    	set
-	ldx    	CURS_Y
-	ldy    	CURS_X
-	rts
+       	bcs    	get
 
-set:   	stx    	CURS_Y
+	stx    	CURS_Y
      	sty    	CURS_X
 
-	lda    	LineLSBTab,x
-	sta    	CharPtr
-	lda    	LineMSBTab,x
-	sta    	CharPtr+1
+    	lda    	LineLSBTab,x
+    	sta    	SCREEN_PTR
+    	sta	CRAM_PTR
+    	lda    	LineMSBTab,x
+    	sta    	SCREEN_PTR+1
+    	sub	#>VIDEO_RAM
+    	add	#>COLOR_RAM
+    	sta	CRAM_PTR+1
 
-.if	0
-	lda    	IndReg
-	pha
-	lda    	#$0F
-	sta    	IndReg
+get:	ldx	CURS_Y
+	ldy	CURS_X
 
-	ldy    	#$00
-	clc
-	sei
-	sta    	(crtc),y
-	lda    	CharPtr
-	adc    	CURS_X
-	iny
-	sta    	(crtc),y
-	dey
-	lda    	#$0E
-	sta    	(crtc),y
-	iny
-	lda    	(crtc),y
-	and    	#$F8
-	sta    	sedt1
-	lda    	CharPtr+1
-	adc    	#$00
-	and    	#$07
-	ora    	sedt1
-	sta    	(crtc),y
-	cli
-
-	pla
-	sta    	IndReg
-.endif
 	rts
+
 .endproc
 
 ; -------------------------------------------------------------------------

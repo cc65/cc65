@@ -87,7 +87,7 @@ void __fastcall__ tgi_init (unsigned char mode);
 void __fastcall__ tgi_done (void);
 /* End graphics mode, switch back to text mode. Will NOT unload the driver! */
 
-unsigned char __fastcall__ tgi_error (void);
+unsigned char __fastcall__ tgi_geterror (void);
 /* Return the error code for the last operation. */
 
 void __fastcall__ tgi_clear (void);

@@ -55,7 +55,8 @@ typedef struct {
     unsigned            xres;           /* X resolution */
     unsigned            yres;           /* Y resolution */
     unsigned char       colors;         /* Number of available colors */
-    unsigned char       res[7];         /* Reserved for extensions */
+    unsigned char	error;		/* Error code */
+    unsigned char       res[6];         /* Reserved for extensions */
 
     /* Jump vectors. Note that these are not C callable */
     void*               install;        /* INSTALL routine */
@@ -72,6 +73,23 @@ typedef struct {
     void*               circle;         /* CIRCLE routine */
 
 } tgi_drv_header;
+
+
+
+/* TGI kernel variables */
+extern tgi_drv_header	tgi_drv;	/* Pointer to driver */
+extern unsigned char	tgi_error;	/* Last error code */
+
+
+
+/*****************************************************************************/
+/*                                     Code                                  */
+/*****************************************************************************/
+
+
+
+const char* __fastcall__ tgi_map_mode (unsigned char mode);
+/* Map a tgi mode to a driver name. Returns NULL if no driver available. */
 
 
 

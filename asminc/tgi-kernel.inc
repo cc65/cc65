@@ -33,25 +33,60 @@
 
 
 
+;------------------------------------------------------------------------------
 ; Offsets into the driver header
+
 TGI_HDR_ID              = 0             ; Contains 0x74, 0x67, 0x69 ("tgi")
 TGI_HDR_VERSION         = 3             ; Interface version
 TGI_HDR_XRES            = 4             ; X resolution
 TGI_HDR_YRES            = 6             ; Y resolution
 TGI_HDR_COLORS          = 8             ; Number of available colors
-TGI_HDR_RES             = 9             ; Reserved for extensions
+TGI_HDR_ERROR		= 9		; Error code
+TGI_HDR_RES             = 10            ; Reserved for extensions
 
-TGI_HDR_INSTALL         = 16            ; INSTALL routine
-TGI_HDR_DEINSTALL       = 18            ; DEINSTALL routine
-TGI_HDR_INIT            = 20            ; INIT routine
-TGI_HDR_POST            = 22            ; POST routine
-TGI_HDR_CONTROL         = 24            ; CONTROL routine
-TGI_HDR_CLEAR           = 26            ; CLEAR routine
-TGI_HDR_SETCOLOR        = 28            ; SETCOLOR routine
-TGI_HDR_SETPIXEL        = 30            ; SETPIXEL routine
-TGI_HDR_GETPIXEL        = 32            ; GETPIXEL routine
-TGI_HDR_LINE            = 34            ; LINE routine
-TGI_HDR_BAR             = 36            ; BAR routine
-TGI_HDR_CIRCLE          = 38            ; CIRCLE routine
+TGI_HDR_JUMPTAB         = 16
+TGI_HDR_INSTALL         = TGI_HDR_JUMPTAB+0     ; INSTALL routine
+TGI_HDR_DEINSTALL       = TGI_HDR_JUMPTAB+2     ; DEINSTALL routine
+TGI_HDR_INIT            = TGI_HDR_JUMPTAB+4     ; INIT routine
+TGI_HDR_POST            = TGI_HDR_JUMPTAB+6     ; POST routine
+TGI_HDR_CONTROL         = TGI_HDR_JUMPTAB+8     ; CONTROL routine
+TGI_HDR_CLEAR           = TGI_HDR_JUMPTAB+10    ; CLEAR routine
+TGI_HDR_SETCOLOR        = TGI_HDR_JUMPTAB+12    ; SETCOLOR routine
+TGI_HDR_SETPIXEL        = TGI_HDR_JUMPTAB+14    ; SETPIXEL routine
+TGI_HDR_GETPIXEL        = TGI_HDR_JUMPTAB+16    ; GETPIXEL routine
+TGI_HDR_LINE            = TGI_HDR_JUMPTAB+18    ; LINE routine
+TGI_HDR_BAR             = TGI_HDR_JUMPTAB+20    ; BAR routine
+TGI_HDR_CIRCLE          = TGI_HDR_JUMPTAB+22    ; CIRCLE routine
 
+TGI_HDR_JUMPCOUNT       = 12            ; Number of jump vectors
+
+;------------------------------------------------------------------------------
+; Variables
+
+	.global	_tgi_drv      		; Pointer to driver
+	.global	_tgi_error    		; Last error code
+
+;------------------------------------------------------------------------------
+; Driver entry points
+
+        .global tgi_install
+        .global tgi_deinstall
+        .global tgi_init
+        .global tgi_post
+        .global tgi_control
+        .global tgi_clear
+        .global tgi_setcolor
+        .global tgi_setpixel
+        .global tgi_getpixel
+        .global tgi_line
+        .global tgi_bar
+        .global tgi_circle
+
+
+;------------------------------------------------------------------------------
+; ASM functions
+
+        .global tgi_fetch_error
+        .global tgi_set_ptr
+        .global tgi_setup
 

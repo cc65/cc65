@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -98,6 +98,7 @@ struct SymEntry {
     struct SymTable*		Owner; 	  /* Symbol table the symbol is in */
     unsigned   			Flags; 	  /* Symbol flags */
     type*      			Type;  	  /* Symbol type */
+    char*                       AsmName;  /* Assembler name if any */
 
     /* Data that differs for the different symbol types */
     union {
@@ -149,6 +150,9 @@ int IsTypeDef (const SymEntry* E);
 
 void ChangeSymType (SymEntry* Entry, type* Type);
 /* Change the type of the given symbol */
+
+void ChangeAsmName (SymEntry* Entry, const char* NewAsmName);
+/* Change the assembler name of the symbol */
 
 
 

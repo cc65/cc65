@@ -832,8 +832,9 @@ static int primary (ExprDesc* lval)
 {
     int k;
 
-    /* not a test at all, yet */
-    lval->Test = 0;
+    /* Initialize fields in the expression stucture */
+    lval->Test = 0;             /* No test */
+    lval->Sym  = 0;             /* Symbol unknown */
 
     /* Character and integer constants. */
     if (CurTok.Tok == TOK_ICONST || CurTok.Tok == TOK_CCONST) {
@@ -872,7 +873,7 @@ static int primary (ExprDesc* lval)
 	ident Ident;
 
 	/* Get a pointer to the symbol table entry */
-       	Sym = FindSym (CurTok.Ident);
+       	Sym = lval->Sym = FindSym (CurTok.Ident);
 
 	/* Is the symbol known? */
  	if (Sym) {
@@ -2283,7 +2284,7 @@ static void parsesub (int k, ExprDesc* lval)
     	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
     	    	    Error ("Incompatible pointer types");
     	    	} else {
-    	    	    lval->ConstVal = (lval->ConstVal - lval2.ConstVal) / 
+    	    	    lval->ConstVal = (lval->ConstVal - lval2.ConstVal) /
                                       CheckedPSizeOf (lhst);
     	    	}
     	    	/* Operate on pointers, result type is an integer */

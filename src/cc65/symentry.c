@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -66,6 +66,7 @@ SymEntry* NewSymEntry (const char* Name, unsigned Flags)
     E->Owner	= 0;
     E->Flags	= Flags;
     E->Type	= 0;
+    E->AsmName  = 0;
     memcpy (E->Name, Name, Len+1);
 
     /* Return the new entry */
@@ -78,6 +79,7 @@ void FreeSymEntry (SymEntry* E)
 /* Free a symbol entry */
 {
     TypeFree (E->Type);
+    xfree (E->AsmName);
     xfree (E);
 }
 
@@ -87,19 +89,19 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
 /* Dump the given symbol table entry to the file in readable form */
 {
     static const struct {
-    	const char*	    Name;
-    	unsigned	    Val;
+    	const char*    	    Name;
+    	unsigned       	    Val;
     } Flags [] = {
 	/* Beware: Order is important! */
       	{ "SC_TYPEDEF",	    SC_TYPEDEF	},
-      	{ "SC_SFLD",	    SC_SFLD	},
-      	{ "SC_STRUCT",	    SC_STRUCT	},
+      	{ "SC_SFLD",   	    SC_SFLD	},
+      	{ "SC_STRUCT", 	    SC_STRUCT	},
     	{ "SC_AUTO",   	    SC_AUTO	},
     	{ "SC_REGISTER",    SC_REGISTER	},
     	{ "SC_STATIC",      SC_STATIC	},
-    	{ "SC_EXTERN",	    SC_EXTERN	},
-    	{ "SC_ENUM",	    SC_ENUM	},
-	{ "SC_CONST",	    SC_CONST	},
+    	{ "SC_EXTERN", 	    SC_EXTERN	},
+    	{ "SC_ENUM",   	    SC_ENUM	},
+	{ "SC_CONST",  	    SC_CONST	},
     	{ "SC_LABEL",	    SC_LABEL	},
     	{ "SC_PARAM",	    SC_PARAM	},
 	{ "SC_FUNC",	    SC_FUNC	},
@@ -114,6 +116,11 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
 
     /* Print the name */
     fprintf (F, "%s:\n", E->Name);
+
+    /* Print the assembler name if we have one */
+    if (E->AsmName) {
+        fprintf (F, "    AsmName: %s\n", E->AsmName);
+    }
 
     /* Print the flags */
     SymFlags = E->Flags;
@@ -156,6 +163,14 @@ void ChangeSymType (SymEntry* Entry, type* Type)
     Entry->Type = TypeDup (Type);
 }
 
+
+
+void ChangeAsmName (SymEntry* Entry, const char* NewAsmName)
+/* Change the assembler name of the symbol */		    
+{
+    xfree (Entry->AsmName);
+    Entry->AsmName = xstrdup (NewAsmName);
+}
 
 
 

@@ -12,6 +12,7 @@
 #include <string.h>
 
 /* common */
+#include "coll.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -379,7 +380,7 @@ static void CascadeSwitch (ExprDesc* Expr)
 		    }
 
 		    /* Check the range of the expression */
-		    Val = lval.e_const;
+		    Val = lval.ConstVal;
 		    switch (*Expr->Type) {
 
 			case T_SCHAR:
@@ -496,62 +497,58 @@ static void TableSwitch (ExprDesc* Expr)
 /* Handle a switch statement via table based selector */
 {
     /* Entry for one case in a switch statement */
-    struct swent {
-    	long     sw_const;	/* selector value */
-       	unsigned sw_lab; 	/* label for this selector */
-    };
+    typedef struct {
+    	long     Value;	        /* selector value */
+       	unsigned Label; 	/* label for this selector */
+    } SwitchEntry;
 
-    int dlabel;	       	   	/* for default */
-    int lab;   	       	   	/* exit label */
-    int label; 	       	   	/* label for case */
+    unsigned DefaultLabel;      /* Label for default case */
+    unsigned ExitLabel;	   	/* exit label */
     int lcase; 	       	       	/* label for compares */
-    int lcount;	     	       	/* Label count */
-    int HaveBreak;  		/* Last statement has a break */
-    int HaveDefault;		/* Remember if we had a default label */
-    unsigned Flags;  		/* Code generator flags */
-    ExprDesc lval;		/* Case label expression */
-    struct swent *p;
-    struct swent *swtab;
+    int HaveBreak;     	     	/* Last statement has a break */
+    unsigned Flags;    	     	/* Code generator flags */
+    ExprDesc lval;     	     	/* Case label expression */
+    unsigned I;
+    SwitchEntry* P;
+    Collection SwitchTab;
 
-    /* Allocate memory for the switch table */
-    swtab = xmalloc (CASE_MAX * sizeof (struct swent));
+    /* Initialize the collection for the switch entries */
+    InitCollection (&SwitchTab);
 
     /* Create a look so we may break out, init labels */
-    HaveBreak = 0;  		/* Keep gcc silent */
-    HaveDefault = 0;		/* No default case until now */
-    dlabel = 0;	     	   	/* init */
-    lab = GetLocalLabel ();	/* get exit */
-    p = swtab;
-    AddLoop (oursp, 0, lab, 0, 0);
+    HaveBreak    = 0;     		/* Keep gcc silent */
+    DefaultLabel = 0;  	       	        /* No default case until now */
+    ExitLabel    = GetLocalLabel ();	/* get exit */
+    AddLoop (oursp, 0, ExitLabel, 0, 0);
 
     /* Jump behind the code for the CASE labels */
     g_jump (lcase = GetLocalLabel ());
-    lcount = 0;
     while (CurTok.Tok != TOK_RCURLY) {
     	if (CurTok.Tok == TOK_CASE || CurTok.Tok == TOK_DEFAULT) {
-	    if (lcount >= CASE_MAX) {
-       	       	Fatal ("Too many case labels");
-     	    }
-    	    label = GetLocalLabel ();
     	    do {
     	    	if (CurTok.Tok == TOK_CASE) {
        	    	    NextToken ();
     	    	    constexpr (&lval);
 	    	    if (!IsClassInt (lval.Type)) {
-	    		Error ("Switch quantity not an integer");
+	    	     	Error ("Switch quantity not an integer");
 	      	    }
-     	    	    p->sw_const = lval.e_const;
-    	    	    p->sw_lab = label;
-    	    	    ++p;
-	    	    ++lcount;
-    	    	} else {
+		    P = xmalloc (sizeof (SwitchEntry));
+     	    	    P->Value = lval.ConstVal;
+    	    	    P->Label = GetLocalLabel ();
+		    CollAppend (&SwitchTab, P);
+		    g_defcodelabel (P->Label);
+    	    	} else if (DefaultLabel == 0) {
     	    	    NextToken ();
-     	    	    dlabel = label;
-		    HaveDefault = 1;
-    	    	}
+     	    	    DefaultLabel = GetLocalLabel ();
+		    g_defcodelabel (DefaultLabel);
+    	    	} else {
+		    /* We already had a default label */
+		    Error ("Multiple default labels in one switch");
+		    /* Try to recover */
+		    NextToken ();
+		}
     	    	ConsumeColon ();
     	    } while (CurTok.Tok == TOK_CASE || CurTok.Tok == TOK_DEFAULT);
-    	    g_defcodelabel (label);
 	    HaveBreak = 0;
     	}
     	if (CurTok.Tok != TOK_RCURLY) {
@@ -560,7 +557,7 @@ static void TableSwitch (ExprDesc* Expr)
     }
 
     /* Check if we have any labels */
-    if (lcount == 0 && !HaveDefault) {
+    if (CollCount(&SwitchTab) == 0 && DefaultLabel == 0) {
      	Warning ("No case labels");
     }
 
@@ -569,7 +566,7 @@ static void TableSwitch (ExprDesc* Expr)
 
     /* If the last statement doesn't have a break or return, add one */
     if (!HaveBreak) {
-        g_jump (lab);
+        g_jump (ExitLabel);
     }
 
     /* Actual selector code goes here */
@@ -580,24 +577,27 @@ static void TableSwitch (ExprDesc* Expr)
     g_switch (Flags);
 
     /* First entry is negative of label count */
-    g_defdata (CF_INT | CF_CONST, -((int)lcount)-1, 0);
+    g_defdata (CF_INT | CF_CONST, -((int)CollCount(&SwitchTab))-1, 0);
 
     /* Create the case selector table */
-    p = swtab;
-    while (lcount) {
-       	g_case (Flags, p->sw_lab, p->sw_const);	/* Create one label */
-	--lcount;
-	++p;
+    for (I = 0; I < CollCount (&SwitchTab); ++I) {
+	P = CollAt (&SwitchTab, I);
+       	g_case (Flags, P->Label, P->Value);	/* Create one label */
     }
 
-    if (dlabel) {
-       	g_jump (dlabel);
+    if (DefaultLabel != 0) {
+       	g_jump (DefaultLabel);
     }
-    g_defcodelabel (lab);
+    g_defcodelabel (ExitLabel);
     DelLoop ();
 
     /* Free the allocated space for the labels */
-    xfree (swtab);
+    for (I = 0; I < CollCount (&SwitchTab); ++I) {
+	xfree (CollAt (&SwitchTab, I));
+    }
+
+    /* Free the collection itself */
+    DoneCollection (&SwitchTab);
 }
 
 

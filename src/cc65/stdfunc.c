@@ -119,14 +119,14 @@ static void StdFunc_strlen (ExprDesc* lval)
 
     /* Check if the parameter is a const address */
     unsigned flags = 0;
-    unsigned pflags = pval.e_flags & ~E_MCTYPE;
+    unsigned pflags = pval.Flags & ~E_MCTYPE;
     if (pflags == E_MCONST) {
     	/* Constant numeric address */
     	flags |= CF_CONST | CF_ABSOLUTE;
-    } else if (k == 0 && ((pflags & E_MGLOBAL) != 0 || pval.e_flags == E_MEOFFS)) {
+    } else if (k == 0 && ((pflags & E_MGLOBAL) != 0 || pval.Flags == E_MEOFFS)) {
     	/* Global array with or without offset */
     	flags |= CF_CONST;
-    	if (pval.e_flags & E_TGLAB) {
+    	if (pval.Flags & E_TGLAB) {
     	    /* External linkage */
     	    flags |= CF_EXTERNAL;
     	} else {
@@ -144,7 +144,7 @@ static void StdFunc_strlen (ExprDesc* lval)
     assignadjust (ArgType, &pval);
 
     /* Generate the strlen code */
-    g_strlen (flags, pval.e_name, pval.e_const);
+    g_strlen (flags, pval.Name, pval.ConstVal);
 
     /* We expect the closing brace */
     ConsumeRParen ();
@@ -173,7 +173,7 @@ void HandleStdFunc (ExprDesc* lval)
 /* Generate code for a known standard function. */
 {
     /* Get a pointer to the table entry */
-    struct StdFuncDesc* F = FindFunc ((const char*) lval->e_name);
+    struct StdFuncDesc* F = FindFunc ((const char*) lval->Name);
     CHECK (F != 0);
 
     /* Call the handler function */

@@ -118,8 +118,8 @@ static int IsNullPtr (ExprDesc* lval)
 /* Return true if this is the NULL pointer constant */
 {
     return (IsClassInt (lval->Type) && 	        /* Is it an int? */
-       	    lval->e_flags == E_MCONST &&	/* Is it constant? */
-	    lval->e_const == 0);		/* And is it's value zero? */
+       	    lval->Flags == E_MCONST && 	        /* Is it constant? */
+	    lval->ConstVal == 0);		/* And is it's value zero? */
 }
 
 
@@ -168,7 +168,7 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
 
     /* Generate type adjustment code if needed */
     ltype = TypeOf (lhst);
-    if (lhs->e_flags == E_MCONST) {
+    if (lhs->Flags == E_MCONST) {
 	ltype |= CF_CONST;
     }
     if (NoPush) {
@@ -176,7 +176,7 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
      	ltype |= CF_REG;
     }
     rtype = TypeOf (rhst);
-    if (rhs->e_flags == E_MCONST) {
+    if (rhs->Flags == E_MCONST) {
 	rtype |= CF_CONST;
     }
     flags = g_typeadjust (ltype, rtype);
@@ -226,7 +226,7 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
    	     * as const.
    	     */
    	    unsigned flags = TypeOf (rhst);
-       	    if (rhs->e_flags == E_MCONST) {
+       	    if (rhs->Flags == E_MCONST) {
    	 	flags |= CF_CONST;
    	    }
    	    return g_typeadjust (TypeOf (lhst) | CF_CONST, flags);
@@ -257,7 +257,7 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
 	    }
      	} else if (IsClassInt (rhst)) {
      	    /* Int to pointer assignment is valid only for constant zero */
-     	    if (rhs->e_flags != E_MCONST || rhs->e_const != 0) {
+     	    if (rhs->Flags != E_MCONST || rhs->ConstVal != 0) {
      	       	Warning ("Converting integer to pointer without a cast");
      	    }
 	} else if (IsTypeFuncPtr (lhst) && IsTypeFunc(rhst)) {
@@ -283,13 +283,13 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
 void DefineData (ExprDesc* lval)
 /* Output a data definition for the given expression */
 {
-    unsigned flags = lval->e_flags;
+    unsigned flags = lval->Flags;
 
     switch (flags & E_MCTYPE) {
 
        	case E_TCONST:
 	    /* Number */
-	    g_defdata (TypeOf (lval->Type) | CF_CONST, lval->e_const, 0);
+	    g_defdata (TypeOf (lval->Type) | CF_CONST, lval->ConstVal, 0);
        	    break;
 
 	case E_TREGISTER:
@@ -304,12 +304,12 @@ void DefineData (ExprDesc* lval)
        	case E_TGLAB:
         case E_TLLAB:
        	    /* Local or global symbol */
-	    g_defdata (GlobalModeFlags (flags), lval->e_name, lval->e_const);
+	    g_defdata (GlobalModeFlags (flags), lval->Name, lval->ConstVal);
 	    break;
 
        	case E_TLIT:
 	    /* a literal of some kind */
-       	    g_defdata (CF_STATIC, LiteralPoolLabel, lval->e_const);
+       	    g_defdata (CF_STATIC, LiteralPoolLabel, lval->ConstVal);
        	    break;
 
        	default:
@@ -322,15 +322,15 @@ void DefineData (ExprDesc* lval)
 static void lconst (unsigned flags, ExprDesc* lval)
 /* Load primary reg with some constant value. */
 {
-    switch (lval->e_flags & E_MCTYPE) {
+    switch (lval->Flags & E_MCTYPE) {
 
     	case E_TLOFFS:
-       	    g_leasp (lval->e_const);
+       	    g_leasp (lval->ConstVal);
 	    break;
 
        	case E_TCONST:
 	    /* Number constant */
-       	    g_getimmed (flags | TypeOf (lval->Type) | CF_CONST, lval->e_const, 0);
+       	    g_getimmed (flags | TypeOf (lval->Type) | CF_CONST, lval->ConstVal, 0);
        	    break;
 
 	case E_TREGISTER:
@@ -345,18 +345,18 @@ static void lconst (unsigned flags, ExprDesc* lval)
        	case E_TGLAB:
         case E_TLLAB:
        	    /* Local or global symbol, load address */
-	    flags |= GlobalModeFlags (lval->e_flags);
+	    flags |= GlobalModeFlags (lval->Flags);
 	    flags &= ~CF_CONST;
-	    g_getimmed (flags, lval->e_name, lval->e_const);
+	    g_getimmed (flags, lval->Name, lval->ConstVal);
        	    break;
 
        	case E_TLIT:
 	    /* Literal string */
-	    g_getimmed (CF_STATIC, LiteralPoolLabel, lval->e_const);
+	    g_getimmed (CF_STATIC, LiteralPoolLabel, lval->ConstVal);
        	    break;
 
        	default:
-	    Internal ("Unknown constant type: %04X", lval->e_flags);
+	    Internal ("Unknown constant type: %04X", lval->Flags);
     }
 }
 
@@ -449,7 +449,7 @@ static void PushAddr (ExprDesc* lval)
  */
 {
     /* Get the address on stack if needed */
-    if (lval->e_flags != E_MREG && (lval->e_flags & E_MEXPR)) {
+    if (lval->Flags != E_MREG && (lval->Flags & E_MEXPR)) {
 	/* Push the address (always a pointer) */
 	g_push (CF_PTR, 0);
     }
@@ -468,42 +468,42 @@ void exprhs (unsigned flags, int k, ExprDesc *lval)
 {
     int f;
 
-    f = lval->e_flags;
+    f = lval->Flags;
     if (k) {
        	/* Dereferenced lvalue */
      	flags |= TypeOf (lval->Type);
-     	if (lval->e_test & E_FORCETEST) {
+     	if (lval->Test & E_FORCETEST) {
      	    flags |= CF_TEST;
-     	    lval->e_test &= ~E_FORCETEST;
+     	    lval->Test &= ~E_FORCETEST;
      	}
        	if (f & E_MGLOBAL) {	/* ref to globalvar */
        	    /* Generate code */
      	    flags |= GlobalModeFlags (f);
-       	    g_getstatic (flags, lval->e_name, lval->e_const);
+       	    g_getstatic (flags, lval->Name, lval->ConstVal);
        	} else if (f & E_MLOCAL) {
      	    /* ref to localvar */
-       	    g_getlocal (flags, lval->e_const);
+       	    g_getlocal (flags, lval->ConstVal);
      	} else if (f & E_MCONST) {
      	    /* ref to absolute address */
-     	    g_getstatic (flags | CF_ABSOLUTE, lval->e_const, 0);
+     	    g_getstatic (flags | CF_ABSOLUTE, lval->ConstVal, 0);
      	} else if (f == E_MEOFFS) {
-     	    g_getind (flags, lval->e_const);
+     	    g_getind (flags, lval->ConstVal);
      	} else if (f != E_MREG) {
      	    g_getind (flags, 0);
      	}
     } else if (f == E_MEOFFS) {
      	/* reference not storable */
      	flags |= TypeOf (lval->Type);
-       	g_inc (flags | CF_CONST, lval->e_const);
+       	g_inc (flags | CF_CONST, lval->ConstVal);
     } else if ((f & E_MEXPR) == 0) {
      	/* Constant of some sort, load it into the primary */
      	lconst (flags, lval);
     }
-    if (lval->e_test & E_FORCETEST) {	/* we testing this value? */
+    if (lval->Test & E_FORCETEST) {	/* we testing this value? */
      	/* debug... */
      	flags |= TypeOf (lval->Type);
        	g_test (flags);	       	       	/* yes, force a test */
-       	lval->e_test &= ~E_FORCETEST;
+       	lval->Test &= ~E_FORCETEST;
     }
 }
 
@@ -644,10 +644,10 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	    	FrameSize -= ArgSize;
 	    	FrameOffs -= ArgSize;
 	    	/* Store */
-	    	g_putlocal (Flags | CF_NOKEEP, FrameOffs, lval.e_const);
+	    	g_putlocal (Flags | CF_NOKEEP, FrameOffs, lval.ConstVal);
 	    } else {
 	    	/* Push the argument */
-	    	g_push (Flags, lval.e_const);
+	    	g_push (Flags, lval.ConstVal);
 	    }
 
 	    /* Calculate total parameter size */
@@ -698,11 +698,11 @@ static void CallFunction (ExprDesc* lval)
     /* Check if this is a function pointer. If so, save it. If not, check for
      * special known library functions that may be inlined.
      */
-    if (lval->e_flags & E_MEXPR) {
+    if (lval->Flags & E_MEXPR) {
        	/* Function pointer is in primary register, save it */
        	Mark = GetCodePos ();
        	g_save (CF_PTR);
-    } else if (InlineStdFuncs && IsStdFunc ((const char*) lval->e_name)) {
+    } else if (InlineStdFuncs && IsStdFunc ((const char*) lval->Name)) {
        	/* Inline this function */
        	HandleStdFunc (lval);
        	return;
@@ -715,7 +715,7 @@ static void CallFunction (ExprDesc* lval)
     ConsumeRParen ();
 
     /* */
-    if (lval->e_flags & E_MEXPR) {
+    if (lval->Flags & E_MEXPR) {
  	/* Function called via pointer: Restore it and call function */
 	if (ParamSize != 0) {
      	    g_restore (CF_PTR);
@@ -725,7 +725,7 @@ static void CallFunction (ExprDesc* lval)
 	}
      	g_callind (TypeOf (lval->Type), ParamSize);
     } else {
-       	g_call (TypeOf (lval->Type), (const char*) lval->e_name, ParamSize);
+       	g_call (TypeOf (lval->Type), (const char*) lval->Name, ParamSize);
     }
 }
 
@@ -790,13 +790,13 @@ static int primary (ExprDesc* lval)
     int k;
 
     /* not a test at all, yet */
-    lval->e_test = 0;
+    lval->Test = 0;
 
     /* Character and integer constants. */
     if (CurTok.Tok == TOK_ICONST || CurTok.Tok == TOK_CCONST) {
-    	lval->e_flags = E_MCONST | E_TCONST;
+    	lval->Flags = E_MCONST | E_TCONST;
     	lval->Type  = CurTok.Type;
-    	lval->e_const = CurTok.IVal;
+    	lval->ConstVal = CurTok.IVal;
     	NextToken ();
     	return 0;
     }
@@ -818,7 +818,7 @@ static int primary (ExprDesc* lval)
     if (Preprocessing) {
        	/* Illegal expression in PP mode */
 	Error ("Preprocessor expression expected");
-	lval->e_flags = E_MCONST;
+	lval->Flags = E_MCONST;
 	lval->Type = type_int;
 	return 0;
     }
@@ -847,23 +847,23 @@ static int primary (ExprDesc* lval)
 	       	/* Cannot use type symbols */
 	       	Error ("Variable identifier expected");
 	       	/* Assume an int type to make lval valid */
-	       	lval->e_flags = E_MLOCAL | E_TLOFFS;
+	       	lval->Flags = E_MLOCAL | E_TLOFFS;
 	       	lval->Type = type_int;
-	        lval->e_const = 0;
+	        lval->ConstVal = 0;
 	       	return 0;
 	    }
 
 	    /* Check for legal symbol types */
        	    if ((Sym->Flags & SC_CONST) == SC_CONST) {
 		/* Enum or some other numeric constant */
-	       	lval->e_flags = E_MCONST;
-	    	lval->e_const = Sym->V.ConstVal;
+	       	lval->Flags = E_MCONST;
+	    	lval->ConstVal = Sym->V.ConstVal;
 	       	return 0;
 	    } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
 	   	/* Function */
-	    	lval->e_flags = E_MGLOBAL | E_MCONST | E_TGLAB;
-	   	lval->e_name = (unsigned long) Sym->Name;
-	    	lval->e_const = 0;
+	    	lval->Flags = E_MGLOBAL | E_MCONST | E_TGLAB;
+	   	lval->Name = (unsigned long) Sym->Name;
+	    	lval->ConstVal = 0;
 	    } else if ((Sym->Flags & SC_AUTO) == SC_AUTO) {
 	    	/* Local variable. If this is a parameter for a variadic
 		 * function, we have to add some address calculations, and the
@@ -872,33 +872,33 @@ static int primary (ExprDesc* lval)
        	       	if ((Sym->Flags & SC_PARAM) == SC_PARAM && IsVariadic (CurrentFunc)) {
 		    /* Variadic parameter */
 		    g_leavariadic (Sym->V.Offs - GetParamSize (CurrentFunc));
-		    lval->e_flags = E_MEXPR;
-		    lval->e_const = 0;
+		    lval->Flags = E_MEXPR;
+		    lval->ConstVal = 0;
 		} else {
 		    /* Normal parameter */
-		    lval->e_flags = E_MLOCAL | E_TLOFFS;
-		    lval->e_const = Sym->V.Offs;
+		    lval->Flags = E_MLOCAL | E_TLOFFS;
+		    lval->ConstVal = Sym->V.Offs;
 		}
 	    } else if ((Sym->Flags & SC_STATIC) == SC_STATIC) {
 	    	/* Static variable */
 	   	if (Sym->Flags & (SC_EXTERN | SC_STORAGE)) {
-	    	    lval->e_flags = E_MGLOBAL | E_MCONST | E_TGLAB;
-	    	    lval->e_name = (unsigned long) Sym->Name;
+	    	    lval->Flags = E_MGLOBAL | E_MCONST | E_TGLAB;
+	    	    lval->Name = (unsigned long) Sym->Name;
 	   	} else {
-	    	    lval->e_flags = E_MGLOBAL | E_MCONST | E_TLLAB;
-	   	    lval->e_name = Sym->V.Label;
+	    	    lval->Flags = E_MGLOBAL | E_MCONST | E_TLLAB;
+	   	    lval->Name = Sym->V.Label;
 	   	}
-	    	lval->e_const = 0;
+	    	lval->ConstVal = 0;
 	    } else if ((Sym->Flags & SC_REGISTER) == SC_REGISTER) {
 	    	/* Register variable, zero page based */
-	    	lval->e_flags = E_MGLOBAL | E_MCONST | E_TREGISTER;
-	    	lval->e_name  = Sym->V.Offs;
-	    	lval->e_const = 0;
+	    	lval->Flags = E_MGLOBAL | E_MCONST | E_TREGISTER;
+	    	lval->Name  = Sym->V.Offs;
+	    	lval->ConstVal = 0;
        	    } else {
 	    	/* Local static variable */
-	    	lval->e_flags = E_MGLOBAL | E_MCONST | E_TLLAB;
-	    	lval->e_name  = Sym->V.Offs;
-	    	lval->e_const = 0;
+	    	lval->Flags = E_MGLOBAL | E_MCONST | E_TLLAB;
+	    	lval->Name  = Sym->V.Offs;
+	    	lval->ConstVal = 0;
     	    }
 
 	    /* The symbol is referenced now */
@@ -922,18 +922,18 @@ static int primary (ExprDesc* lval)
 	    Warning ("Function call without a prototype");
 	    Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_EXTERN | SC_REF | SC_FUNC);
 	    lval->Type  = Sym->Type;
-	    lval->e_flags = E_MGLOBAL | E_MCONST | E_TGLAB;
-       	    lval->e_name  = (unsigned long) Sym->Name;
-	    lval->e_const = 0;
+	    lval->Flags = E_MGLOBAL | E_MCONST | E_TGLAB;
+       	    lval->Name  = (unsigned long) Sym->Name;
+	    lval->ConstVal = 0;
    	    return 0;
 
 	} else {
 
 	    /* Undeclared Variable */
 	    Sym = AddLocalSym (Ident, type_int, SC_AUTO | SC_REF, 0);
-	    lval->e_flags = E_MLOCAL | E_TLOFFS;
+	    lval->Flags = E_MLOCAL | E_TLOFFS;
 	    lval->Type = type_int;
-	    lval->e_const = 0;
+	    lval->ConstVal = 0;
 	    Error ("Undefined symbol: `%s'", Ident);
 	    return 1;
 
@@ -942,8 +942,8 @@ static int primary (ExprDesc* lval)
 
     /* String literal? */
     if (CurTok.Tok == TOK_SCONST) {
-   	lval->e_flags = E_MCONST | E_TLIT;
-       	lval->e_const = CurTok.IVal;
+   	lval->Flags = E_MCONST | E_TLIT;
+       	lval->ConstVal = CurTok.IVal;
 	lval->Type  = GetCharArrayType (strlen (GetLiteral (CurTok.IVal)));
     	NextToken ();
 	return 0;
@@ -953,24 +953,24 @@ static int primary (ExprDesc* lval)
     if (CurTok.Tok == TOK_ASM) {
 	doasm ();
 	lval->Type  = type_void;
-	lval->e_flags = E_MEXPR;
-	lval->e_const = 0;
+	lval->Flags = E_MEXPR;
+	lval->ConstVal = 0;
 	return 0;
     }
 
     /* __AX__ and __EAX__ pseudo values? */
     if (CurTok.Tok == TOK_AX || CurTok.Tok == TOK_EAX) {
        	lval->Type  = (CurTok.Tok == TOK_AX)? type_uint : type_ulong;
-   	lval->e_flags = E_MREG;
-	lval->e_test &= ~E_CC;
-   	lval->e_const = 0;
+   	lval->Flags = E_MREG;
+	lval->Test &= ~E_CC;
+   	lval->ConstVal = 0;
 	NextToken ();
     	return 1;    	  	/* May be used as lvalue */
     }
 
     /* Illegal primary. */
     Error ("Expression expected");
-    lval->e_flags = E_MCONST;
+    lval->Flags = E_MCONST;
     lval->Type = type_int;
     return 0;
 }
@@ -1002,7 +1002,7 @@ static int arrayref (int k, ExprDesc* lval)
      * address. This is true for most arrays and will produce a lot better
      * code. Check if this is a const base address.
      */
-    lflags = lval->e_flags & ~E_MCTYPE;
+    lflags = lval->Flags & ~E_MCTYPE;
     ConstBaseAddr = (lflags == E_MCONST)       || /* Constant numeric address */
        	       	     (lflags & E_MGLOBAL) != 0 || /* Static array, or ... */
        	       	     lflags == E_MLOCAL;     	  /* Local array */
@@ -1024,7 +1024,7 @@ static int arrayref (int k, ExprDesc* lval)
 
     /* TOS now contains ptr to array elements. Get the subscript. */
     l = hie0 (&lval2);
-    if (l == 0 && lval2.e_flags == E_MCONST) {
+    if (l == 0 && lval2.Flags == E_MCONST) {
 
      	/* The array subscript is a constant - remove value from stack */
     	if (!ConstBaseAddr) {
@@ -1038,7 +1038,7 @@ static int arrayref (int k, ExprDesc* lval)
      	if (IsClassPtr (tptr1)) {
 
      	    /* Scale the subscript value according to element size */
-     	    lval2.e_const *= PSizeOf (tptr1);
+     	    lval2.ConstVal *= PSizeOf (tptr1);
 
 	    /* Remove code for lhs load */
 	    RemoveCode (Mark1);
@@ -1047,19 +1047,19 @@ static int arrayref (int k, ExprDesc* lval)
     	     * handle pointers the same way, this won't work.
     	     */
     	    if (IsTypeArray (tptr1) &&
-    	       	((lval->e_flags & ~E_MCTYPE) == E_MCONST ||
-    	   	(lval->e_flags & ~E_MCTYPE) == E_MLOCAL ||
-    	   	(lval->e_flags & E_MGLOBAL) != 0 ||
-    	   	(lval->e_flags == E_MEOFFS))) {
-    	   	lval->e_const += lval2.e_const;
+    	       	((lval->Flags & ~E_MCTYPE) == E_MCONST ||
+    	   	(lval->Flags & ~E_MCTYPE) == E_MLOCAL ||
+    	   	(lval->Flags & E_MGLOBAL) != 0 ||
+    	   	(lval->Flags == E_MEOFFS))) {
+    	   	lval->ConstVal += lval2.ConstVal;
 
     	    } else {
 	   	/* Pointer - load into primary and remember offset */
-	   	if ((lval->e_flags & E_MEXPR) == 0 || k != 0) {
+	   	if ((lval->Flags & E_MEXPR) == 0 || k != 0) {
 	   	    exprhs (CF_NONE, k, lval);
 	   	}
-	   	lval->e_const = lval2.e_const;
-	   	lval->e_flags = E_MEOFFS;
+	   	lval->ConstVal = lval2.ConstVal;
+	   	lval->Flags = E_MEOFFS;
 	    }
 
        	    /* Result is of element type */
@@ -1084,7 +1084,7 @@ static int arrayref (int k, ExprDesc* lval)
     	 * we will ignore the true type of the subscript here and
     	 * use always an int.
     	 */
-    	g_inc (CF_INT | CF_CONST, lval2.e_const);
+    	g_inc (CF_INT | CF_CONST, lval2.ConstVal);
 
     } else {
 
@@ -1148,7 +1148,7 @@ static int arrayref (int k, ExprDesc* lval)
 	     * subscript was not scaled, that is, if this was a byte array
 	     * or pointer.
 	     */
-	    rflags = lval2.e_flags & ~E_MCTYPE;
+	    rflags = lval2.Flags & ~E_MCTYPE;
 	    ConstSubAddr = (rflags == E_MCONST)       || /* Constant numeric address */
        	       	       	    (rflags & E_MGLOBAL) != 0 || /* Static array, or ... */
 	    	    	    rflags == E_MLOCAL;      	 /* Local array */
@@ -1172,36 +1172,36 @@ static int arrayref (int k, ExprDesc* lval)
 
 	    	/* Add the variable */
 	    	if (rflags == E_MLOCAL) {
-	    	    g_addlocal (flags, lval2.e_const);
+	    	    g_addlocal (flags, lval2.ConstVal);
 	    	} else {
-		    flags |= GlobalModeFlags (lval2.e_flags);
-	    	    g_addstatic (flags, lval2.e_name, lval2.e_const);
+		    flags |= GlobalModeFlags (lval2.Flags);
+	    	    g_addstatic (flags, lval2.Name, lval2.ConstVal);
 	    	}
 	    } else {
 	     	if (lflags == E_MCONST) {
 	     	    /* Constant numeric address. Just add it */
-	     	    g_inc (CF_INT | CF_UNSIGNED, lval->e_const);
+	     	    g_inc (CF_INT | CF_UNSIGNED, lval->ConstVal);
 	     	} else if (lflags == E_MLOCAL) {
 	     	    /* Base address is a local variable address */
 		    if (IsTypeArray (tptr1)) {
-	     	        g_addaddr_local (CF_INT, lval->e_const);
+	     	        g_addaddr_local (CF_INT, lval->ConstVal);
 		    } else {
-	   		g_addlocal (CF_PTR, lval->e_const);
+	   		g_addlocal (CF_PTR, lval->ConstVal);
 		    }
 	     	} else {
 	     	    /* Base address is a static variable address */
 	     	    unsigned flags = CF_INT;
-		    flags |= GlobalModeFlags (lval->e_flags);
+		    flags |= GlobalModeFlags (lval->Flags);
 		    if (IsTypeArray (tptr1)) {
-	     	        g_addaddr_static (flags, lval->e_name, lval->e_const);
+	     	        g_addaddr_static (flags, lval->Name, lval->ConstVal);
 		    } else {
-			g_addstatic (flags, lval->e_name, lval->e_const);
+			g_addstatic (flags, lval->Name, lval->ConstVal);
 		    }
 	     	}
 	    }
 	}
     }
-    lval->e_flags = E_MEXPR;
+    lval->Flags = E_MEXPR;
 end_array:
     ConsumeRBrack ();
     return !IsTypeArray (lval->Type);
@@ -1236,18 +1236,18 @@ static int structref (int k, ExprDesc* lval)
     }
 
     /* If we have constant input data, the result is also constant */
-    flags = lval->e_flags & ~E_MCTYPE;
+    flags = lval->Flags & ~E_MCTYPE;
     if (flags == E_MCONST ||
        	(k == 0 && (flags == E_MLOCAL ||
 	     	    (flags & E_MGLOBAL) != 0 ||
-	     	    lval->e_flags  == E_MEOFFS))) {
-	lval->e_const += Field->V.Offs;
+	     	    lval->Flags  == E_MEOFFS))) {
+	lval->ConstVal += Field->V.Offs;
     } else {
 	if ((flags & E_MEXPR) == 0 || k != 0) {
 	    exprhs (CF_NONE, k, lval);
 	}
-	lval->e_const = Field->V.Offs;
-	lval->e_flags = E_MEOFFS;
+	lval->ConstVal = Field->V.Offs;
+	lval->Flags = E_MEOFFS;
     }
     lval->Type = Field->Type;
     return !IsTypeArray (Field->Type);
@@ -1285,10 +1285,10 @@ static int hie11 (ExprDesc *lval)
 	    	    /* Pointer to function. Handle transparently */
     	    	    exprhs (CF_NONE, k, lval);  /* Function pointer to A/X */
 	    	    ++lval->Type; 	    	/* Skip T_PTR */
-	    	    lval->e_flags |= E_MEXPR;
+	    	    lval->Flags |= E_MEXPR;
      	    	}
      	    	CallFunction (lval);
-     	    	lval->e_flags = E_MEXPR;
+     	    	lval->Flags = E_MEXPR;
      	    	lval->Type += DECODE_SIZE + 1;       	/* Set to result */
      	    } else {
      	    	Error ("Illegal function call");
@@ -1324,33 +1324,33 @@ static void store (ExprDesc* lval)
     int f;
     unsigned flags;
 
-    f = lval->e_flags;
+    f = lval->Flags;
     flags = TypeOf (lval->Type);
     if (f & E_MGLOBAL) {
 	flags |= GlobalModeFlags (f);
-     	if (lval->e_test) {
+     	if (lval->Test) {
 	    /* Just testing */
        	    flags |= CF_TEST;
 	}
 
     	/* Generate code */
-       	g_putstatic (flags, lval->e_name, lval->e_const);
+       	g_putstatic (flags, lval->Name, lval->ConstVal);
 
     } else if (f & E_MLOCAL) {
-       	g_putlocal (flags, lval->e_const, 0);
+       	g_putlocal (flags, lval->ConstVal, 0);
     } else if (f == E_MEOFFS) {
-    	g_putind (flags, lval->e_const);
+    	g_putind (flags, lval->ConstVal);
     } else if (f != E_MREG) {
     	if (f & E_MEXPR) {
     	    g_putind (flags, 0);
     	} else {
     	    /* Store into absolute address */
-    	    g_putstatic (flags | CF_ABSOLUTE, lval->e_const, 0);
+    	    g_putstatic (flags | CF_ABSOLUTE, lval->ConstVal, 0);
     	}
     }
 
     /* Assume that each one of the stores will invalidate CC */
-    lval->e_test &= ~E_CC;
+    lval->Test &= ~E_CC;
 }
 
 
@@ -1375,10 +1375,10 @@ static void pre_incdec (ExprDesc* lval, void (*inc) (unsigned, unsigned long))
     val = (lval->Type [0] == T_PTR)? PSizeOf (lval->Type) : 1;
 
     /* We're currently only able to handle some adressing modes */
-    if ((lval->e_flags & E_MGLOBAL) == 0 && 	/* Global address? */
-	(lval->e_flags & E_MLOCAL) == 0  && 	/* Local address? */
-	(lval->e_flags & E_MCONST) == 0  &&  	/* Constant address? */
-	(lval->e_flags & E_MEXPR) == 0) { 	/* Address in a/x? */
+    if ((lval->Flags & E_MGLOBAL) == 0 && 	/* Global address? */
+	(lval->Flags & E_MLOCAL) == 0  && 	/* Local address? */
+	(lval->Flags & E_MCONST) == 0  &&  	/* Constant address? */
+	(lval->Flags & E_MEXPR) == 0) { 	/* Address in a/x? */
 
 	/* Use generic code. Push the address if needed */
 	PushAddr (lval);
@@ -1395,31 +1395,31 @@ static void pre_incdec (ExprDesc* lval, void (*inc) (unsigned, unsigned long))
     } else {
 
 	/* Special code for some addressing modes - use the special += ops */
-	if (lval->e_flags & E_MGLOBAL) {
-	    flags |= GlobalModeFlags (lval->e_flags);
+	if (lval->Flags & E_MGLOBAL) {
+	    flags |= GlobalModeFlags (lval->Flags);
 	    if (inc == g_inc) {
-	     	g_addeqstatic (flags, lval->e_name, lval->e_const, val);
+	     	g_addeqstatic (flags, lval->Name, lval->ConstVal, val);
 	    } else {
-	     	g_subeqstatic (flags, lval->e_name, lval->e_const, val);
+	     	g_subeqstatic (flags, lval->Name, lval->ConstVal, val);
 	    }
-	} else if (lval->e_flags & E_MLOCAL) {
+	} else if (lval->Flags & E_MLOCAL) {
 	    /* ref to localvar */
 	    if (inc == g_inc) {
-	     	g_addeqlocal (flags, lval->e_const, val);
+	     	g_addeqlocal (flags, lval->ConstVal, val);
 	    } else {
-	     	g_subeqlocal (flags, lval->e_const, val);
+	     	g_subeqlocal (flags, lval->ConstVal, val);
 	    }
-	} else if (lval->e_flags & E_MCONST) {
+	} else if (lval->Flags & E_MCONST) {
 	    /* ref to absolute address */
 	    flags |= CF_ABSOLUTE;
 	    if (inc == g_inc) {
-	     	g_addeqstatic (flags, lval->e_const, 0, val);
+	     	g_addeqstatic (flags, lval->ConstVal, 0, val);
 	    } else {
-	     	g_subeqstatic (flags, lval->e_const, 0, val);
+	     	g_subeqstatic (flags, lval->ConstVal, 0, val);
 	    }
-	} else if (lval->e_flags & E_MEXPR) {
+	} else if (lval->Flags & E_MEXPR) {
 	    /* Address in a/x, check if we have an offset */
-	    unsigned Offs = (lval->e_flags == E_MEOFFS)? lval->e_const : 0;
+	    unsigned Offs = (lval->Flags == E_MEOFFS)? lval->ConstVal : 0;
 	    if (inc == g_inc) {
 	     	g_addeqind (flags, Offs, val);
 	    } else {
@@ -1432,7 +1432,7 @@ static void pre_incdec (ExprDesc* lval, void (*inc) (unsigned, unsigned long))
     }
 
     /* Result is an expression */
-    lval->e_flags = E_MEXPR;
+    lval->Flags = E_MEXPR;
 }
 
 
@@ -1470,7 +1470,7 @@ static void post_incdec (ExprDesc *lval, int k, void (*inc) (unsigned, unsigned 
 
     /* Restore the original value */
     g_restore (flags | CF_FORCECHAR);
-    lval->e_flags = E_MEXPR;
+    lval->Flags = E_MEXPR;
 }
 
 
@@ -1483,12 +1483,12 @@ static void unaryop (int tok, ExprDesc* lval)
 
     NextToken ();
     k = hie10 (lval);
-    if (k == 0 && (lval->e_flags & E_MCONST) != 0) {
+    if (k == 0 && (lval->Flags & E_MCONST) != 0) {
     	/* Value is constant */
 	switch (tok) {
-	    case TOK_MINUS: lval->e_const = -lval->e_const;	break;
+	    case TOK_MINUS: lval->ConstVal = -lval->ConstVal;	break;
 	    case TOK_PLUS:  	  				break;
-	    case TOK_COMP:  lval->e_const = ~lval->e_const; 	break;
+	    case TOK_COMP:  lval->ConstVal = ~lval->ConstVal; 	break;
 	    default:	    Internal ("Unexpected token: %d", tok);
 	}
     } else {
@@ -1505,7 +1505,7 @@ static void unaryop (int tok, ExprDesc* lval)
 	    case TOK_COMP:  g_com (flags);  break;
 	    default:	Internal ("Unexpected token: %d", tok);
 	}
-     	lval->e_flags = E_MEXPR;
+     	lval->Flags = E_MEXPR;
     }
 }
 
@@ -1535,7 +1535,7 @@ static int typecast (ExprDesc* lval)
     }
 
     /* Check for a constant on the right side */
-    if (k == 0 && lval->e_flags == E_MCONST) {
+    if (k == 0 && lval->Flags == E_MCONST) {
 
 	/* A cast of a constant to something else. If the new type is an int,
 	 * be sure to handle the size extension correctly. If the new type is
@@ -1554,19 +1554,19 @@ static int typecast (ExprDesc* lval)
 	    if (NewSize < OldSize) {
 
 	     	/* Cut the value to the new size */
-	     	lval->e_const &= (0xFFFFFFFFUL >> (32 - NewBits));
+	     	lval->ConstVal &= (0xFFFFFFFFUL >> (32 - NewBits));
 
 	   	/* If the new value is signed, sign extend the value */
 	   	if (!IsSignUnsigned (Type)) {
-	   	    lval->e_const |= ((~0L) << NewBits);
+	   	    lval->ConstVal |= ((~0L) << NewBits);
 	   	}
 
 	    } else if (NewSize > OldSize) {
 
 	   	/* Sign extend the value if needed */
 	     	if (!IsSignUnsigned (Type) && !IsSignUnsigned (lval->Type)) {
-	     	    if (lval->e_const & (0x01UL << (OldBits-1))) {
-	     	   	lval->e_const |= ((~0L) << OldBits);
+	     	    if (lval->ConstVal & (0x01UL << (OldBits-1))) {
+	     	   	lval->ConstVal |= ((~0L) << OldBits);
 	     	    }
 	     	}
 	    }
@@ -1590,7 +1590,7 @@ static int typecast (ExprDesc* lval)
 	   	g_typecast (TypeOf (Type) | CF_CONST, TypeOf (lval->Type));
 
 	   	/* Value is now in primary */
-	   	lval->e_flags = E_MEXPR;
+	   	lval->Flags = E_MEXPR;
        	       	k = 0;
 	    }
 	}
@@ -1631,11 +1631,11 @@ static int hie10 (ExprDesc* lval)
      	    NextToken ();
     	    if (evalexpr (CF_NONE, hie10, lval) == 0) {
     	     	/* Constant expression */
-    	   	lval->e_const = !lval->e_const;
+    	   	lval->ConstVal = !lval->ConstVal;
     	    } else {
     	   	g_bneg (TypeOf (lval->Type));
-    	   	lval->e_test |= E_CC;			/* bneg will set cc */
-    	   	lval->e_flags = E_MEXPR;	 	/* say it's an expr */
+    	   	lval->Test |= E_CC;			/* bneg will set cc */
+    	   	lval->Flags = E_MEXPR;	 	/* say it's an expr */
     	    }
      	    return 0;  	      	     		/* expr not storable */
 
@@ -1643,8 +1643,8 @@ static int hie10 (ExprDesc* lval)
      	    NextToken ();
     	    if (evalexpr (CF_NONE, hie10, lval) != 0) {
     	     	/* Expression is not const, indirect value loaded into primary */
-	     	lval->e_flags = E_MEXPR;
-	     	lval->e_const = 0;		/* Offset is zero now */
+	     	lval->Flags = E_MEXPR;
+	     	lval->ConstVal = 0;		/* Offset is zero now */
     	    }
 	    t = lval->Type;
        	    if (IsClassPtr (t)) {
@@ -1678,19 +1678,19 @@ static int hie10 (ExprDesc* lval)
        	    if (istypeexpr ()) {
     		type Type[MAXTYPELEN];
      	     	NextToken ();
-		lval->e_const = SizeOf (ParseType (Type));
+		lval->ConstVal = SizeOf (ParseType (Type));
      	     	ConsumeRParen ();
      	    } else {
     	   	/* Remember the output queue pointer */
     	    	CodeMark Mark = GetCodePos ();
      	     	hie10 (lval);
-     	       	lval->e_const = SizeOf (lval->Type);
+     	       	lval->ConstVal = SizeOf (lval->Type);
     	   	/* Remove any generated code */
     	   	RemoveCode (Mark);
      	    }
-     	    lval->e_flags = E_MCONST | E_TCONST;
+     	    lval->Flags = E_MCONST | E_TCONST;
      	    lval->Type = type_uint;
-	    lval->e_test &= ~E_CC;
+	    lval->Test &= ~E_CC;
      	    return 0;
 
      	default:
@@ -1753,10 +1753,10 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	/* Get the lhs on stack */
        	Mark1 = GetCodePos ();
 	ltype = TypeOf (lval->Type);
-	if (k == 0 && lval->e_flags == E_MCONST) {
+	if (k == 0 && lval->Flags == E_MCONST) {
 	    /* Constant value */
 	    Mark2 = GetCodePos ();
-       	    g_push (ltype | CF_CONST, lval->e_const);
+       	    g_push (ltype | CF_CONST, lval->ConstVal);
 	} else {
 	    /* Value not constant */
 	    exprhs (CF_NONE, k, lval);
@@ -1773,14 +1773,14 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	}
 
 	/* Check for const operands */
-	if (k == 0 && lval->e_flags == E_MCONST && rconst) {
+	if (k == 0 && lval->Flags == E_MCONST && rconst) {
 
 	    /* Both operands are constant, remove the generated code */
     	    RemoveCode (Mark1);
 	    pop (ltype);
 
 	    /* Evaluate the result */
-	    lval->e_const = kcalc (tok, lval->e_const, lval2.e_const);
+	    lval->ConstVal = kcalc (tok, lval->ConstVal, lval2.ConstVal);
 
 	    /* Get the type of the result */
 	    lval->Type = promoteint (lval->Type, lval2.Type);
@@ -1797,9 +1797,9 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	     	/* Second value is constant - check for div */
 	     	type |= CF_CONST;
 		rtype |= CF_CONST;
-	     	if (tok == TOK_DIV && lval2.e_const == 0) {
+	     	if (tok == TOK_DIV && lval2.ConstVal == 0) {
 	      	    Error ("Division by zero");
-	     	} else if (tok == TOK_MOD && lval2.e_const == 0) {
+	     	} else if (tok == TOK_MOD && lval2.ConstVal == 0) {
 	     	    Error ("Modulo operation with zero");
 	     	}
 		if ((Gen->Flags & GEN_NOPUSH) != 0) {
@@ -1814,8 +1814,8 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	    lval->Type = promoteint (lval->Type, lval2.Type);
 
 	    /* Generate code */
-	    Gen->Func (type, lval2.e_const);
-	    lval->e_flags = E_MEXPR;
+	    Gen->Func (type, lval2.ConstVal);
+	    lval->Flags = E_MEXPR;
 	}
 
 	/* We have a rvalue now */
@@ -1853,10 +1853,10 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	/* Get the lhs on stack */
 	Mark1 = GetCodePos ();
 	ltype = TypeOf (lval->Type);
-	if (k == 0 && lval->e_flags == E_MCONST) {
+	if (k == 0 && lval->Flags == E_MCONST) {
 	    /* Constant value */
 	    Mark2 = GetCodePos ();
-       	    g_push (ltype | CF_CONST, lval->e_const);
+       	    g_push (ltype | CF_CONST, lval->ConstVal);
 	} else {
 	    /* Value not constant */
 	    exprhs (CF_NONE, k, lval);
@@ -1889,14 +1889,14 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	}
 
 	/* Check for const operands */
-	if (k == 0 && lval->e_flags == E_MCONST && rconst) {
+	if (k == 0 && lval->Flags == E_MCONST && rconst) {
 
 	    /* Both operands are constant, remove the generated code */
     	    RemoveCode (Mark1);
 	    pop (ltype);
 
 	    /* Evaluate the result */
-	    lval->e_const = kcalc (tok, lval->e_const, lval2.e_const);
+	    lval->ConstVal = kcalc (tok, lval->ConstVal, lval2.ConstVal);
 
 	} else {
 
@@ -1934,8 +1934,8 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	    }
 
 	    /* Generate code */
-	    Gen->Func (flags, lval2.e_const);
-	    lval->e_flags = E_MEXPR;
+	    Gen->Func (flags, lval2.ConstVal);
+	    lval->Flags = E_MEXPR;
 	}
 
 	/* Result type is always int */
@@ -1943,7 +1943,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 
 	/* We have a rvalue now, condition codes are set */
 	k = 0;
-	lval->e_test |= E_CC;
+	lval->Test |= E_CC;
     }
 
     return k;
@@ -1985,7 +1985,7 @@ static void parseadd (int k, ExprDesc* lval)
     flags = 0;
 
     /* Check for constness on both sides */
-    if (k == 0 && (lval->e_flags & E_MCONST) != 0) {
+    if (k == 0 && (lval->Flags & E_MCONST) != 0) {
 
     	/* The left hand side is a constant. Good. Get rhs */
        	if (evalexpr (CF_NONE, hie9, &lval2) == 0) {
@@ -1996,16 +1996,16 @@ static void parseadd (int k, ExprDesc* lval)
     	    /* Both expressions are constants. Check for pointer arithmetic */
        	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
        	    	/* Left is pointer, right is int, must scale rhs */
-    	    	lval->e_const = lval->e_const + lval2.e_const * PSizeOf (lhst);
+    	    	lval->ConstVal = lval->ConstVal + lval2.ConstVal * PSizeOf (lhst);
     	    	/* Result type is a pointer */
     	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is int, right is pointer, must scale lhs */
-       	       	lval->e_const = lval->e_const * PSizeOf (rhst) + lval2.e_const;
+       	       	lval->ConstVal = lval->ConstVal * PSizeOf (rhst) + lval2.ConstVal;
     	    	/* Result type is a pointer */
     	    	lval->Type = lval2.Type;
        	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	    	/* Integer addition */
-    	    	lval->e_const += lval2.e_const;
+    	    	lval->ConstVal += lval2.ConstVal;
     	    	typeadjust (lval, &lval2, 1);
     	    } else {
        	       	/* OOPS */
@@ -2013,7 +2013,7 @@ static void parseadd (int k, ExprDesc* lval)
     	    }
 
        	    /* Result is constant, condition codes not set */
-       	    lval->e_test &= ~E_CC;
+       	    lval->Test &= ~E_CC;
 
     	} else {
 
@@ -2028,7 +2028,7 @@ static void parseadd (int k, ExprDesc* lval)
       	    	flags = CF_PTR;
     	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
     	      	/* Left is int, right is pointer, must scale lhs */
-       	       	lval->e_const *= PSizeOf (rhst);
+       	       	lval->ConstVal *= PSizeOf (rhst);
     	      	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
     	      	lval->Type = lval2.Type;
@@ -2041,11 +2041,11 @@ static void parseadd (int k, ExprDesc* lval)
        	    }
 
     	    /* Generate code for the add */
-    	    g_inc (flags | CF_CONST, lval->e_const);
+    	    g_inc (flags | CF_CONST, lval->ConstVal);
 
     	    /* Result is in primary register */
-    	    lval->e_flags = E_MEXPR;
-    	    lval->e_test &= ~E_CC;
+    	    lval->Flags = E_MEXPR;
+    	    lval->Test &= ~E_CC;
 
        	}
 
@@ -2069,7 +2069,7 @@ static void parseadd (int k, ExprDesc* lval)
        	    /* Check for pointer arithmetic */
        	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	       	/* Left is pointer, right is int, must scale rhs */
-    	       	lval2.e_const *= PSizeOf (lhst);
+    	       	lval2.ConstVal *= PSizeOf (lhst);
     	      	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
     	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
@@ -2087,11 +2087,11 @@ static void parseadd (int k, ExprDesc* lval)
     	    }
 
     	    /* Generate code for the add */
-       	    g_inc (flags | CF_CONST, lval2.e_const);
+       	    g_inc (flags | CF_CONST, lval2.ConstVal);
 
     	    /* Result is in primary register */
-    	    lval->e_flags = E_MEXPR;
-    	    lval->e_test &= ~E_CC;
+    	    lval->Flags = E_MEXPR;
+    	    lval->Test &= ~E_CC;
 
     	} else {
 
@@ -2124,8 +2124,8 @@ static void parseadd (int k, ExprDesc* lval)
        	    g_add (flags, 0);
 
     	    /* Result is in primary register */
-       	    lval->e_flags = E_MEXPR;
-    	    lval->e_test &= ~E_CC;
+       	    lval->Flags = E_MEXPR;
+    	    lval->Test &= ~E_CC;
 
        	}
 
@@ -2170,7 +2170,7 @@ static void parsesub (int k, ExprDesc* lval)
        	rhst = lval2.Type;
 
     	/* Check left hand side */
-    	if (k == 0 && (lval->e_flags & E_MCONST) != 0) {
+    	if (k == 0 && (lval->Flags & E_MCONST) != 0) {
 
     	    /* Both sides are constant, remove generated code */
       	    RemoveCode (Mark1);
@@ -2179,29 +2179,29 @@ static void parsesub (int k, ExprDesc* lval)
     	    /* Check for pointer arithmetic */
     	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    	/* Left is pointer, right is int, must scale rhs */
-    	    	lval->e_const -= lval2.e_const * PSizeOf (lhst);
+    	    	lval->ConstVal -= lval2.ConstVal * PSizeOf (lhst);
     	    	/* Operate on pointers, result type is a pointer */
     	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is pointer, right is pointer, must scale result */
     	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_EQUAL) {
     	    	    Error ("Incompatible pointer types");
     	    	} else {
-    	    	    lval->e_const = (lval->e_const - lval2.e_const) / PSizeOf (lhst);
+    	    	    lval->ConstVal = (lval->ConstVal - lval2.ConstVal) / PSizeOf (lhst);
     	    	}
     	    	/* Operate on pointers, result type is an integer */
     	    	lval->Type = type_int;
     	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	    	/* Integer subtraction */
        	       	typeadjust (lval, &lval2, 1);
-    	    	lval->e_const -= lval2.e_const;
+    	    	lval->ConstVal -= lval2.ConstVal;
     	    } else {
     	    	/* OOPS */
     	    	Error ("Invalid operands for binary operator `-'");
     	    }
 
     	    /* Result is constant, condition codes not set */
-    	    /* lval->e_flags = E_MCONST; ### */
-    	    lval->e_test &= ~E_CC;
+    	    /* lval->Flags = E_MCONST; ### */
+    	    lval->Test &= ~E_CC;
 
     	} else {
 
@@ -2213,7 +2213,7 @@ static void parsesub (int k, ExprDesc* lval)
 
     	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    	/* Left is pointer, right is int, must scale rhs */
-       	       	lval2.e_const *= PSizeOf (lhst);
+       	       	lval2.ConstVal *= PSizeOf (lhst);
     	    	/* Operate on pointers, result type is a pointer */
     	    	flags = CF_PTR;
     	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
@@ -2235,7 +2235,7 @@ static void parsesub (int k, ExprDesc* lval)
     	    }
 
     	    /* Do the subtraction */
-    	    g_dec (flags | CF_CONST, lval2.e_const);
+    	    g_dec (flags | CF_CONST, lval2.ConstVal);
 
  	    /* If this was a pointer subtraction, we must scale the result */
  	    if (rscale != 1) {
@@ -2243,8 +2243,8 @@ static void parsesub (int k, ExprDesc* lval)
  	    }
 
  	    /* Result is in primary register */
- 	    lval->e_flags = E_MEXPR;
- 	    lval->e_test &= ~E_CC;
+ 	    lval->Flags = E_MEXPR;
+ 	    lval->Test &= ~E_CC;
 
  	}
 
@@ -2274,8 +2274,8 @@ static void parsesub (int k, ExprDesc* lval)
 	     * the lhs is const, we have to remove this mark, since this is no
 	     * longer true, lhs is on stack instead.
 	     */
-	    if (lval->e_flags == E_MCONST) {
-		lval->e_flags = E_MEXPR;
+	    if (lval->Flags == E_MCONST) {
+		lval->Flags = E_MEXPR;
 	    }
 	    /* Adjust operand types */
  	    flags = typeadjust (lval, &lval2, 0);
@@ -2293,8 +2293,8 @@ static void parsesub (int k, ExprDesc* lval)
       	}
 
 	/* Result is in primary register */
-	lval->e_flags = E_MEXPR;
-	lval->e_test &= ~E_CC;
+	lval->Flags = E_MEXPR;
+	lval->Test &= ~E_CC;
     }
 }
 
@@ -2409,8 +2409,8 @@ static int hieAnd (ExprDesc* lval, unsigned TrueLab, int* BoolOp)
        	lab = GetLocalLabel ();
 
        	/* If the expr hasn't set condition codes, set the force-test flag */
-       	if ((lval->e_test & E_CC) == 0) {
-       	    lval->e_test |= E_FORCETEST;
+       	if ((lval->Test & E_CC) == 0) {
+       	    lval->Test |= E_FORCETEST;
        	}
 
        	/* Load the value */
@@ -2427,8 +2427,8 @@ static int hieAnd (ExprDesc* lval, unsigned TrueLab, int* BoolOp)
 
     	    /* Get rhs */
     	    k = hie2 (&lval2);
-    	    if ((lval2.e_test & E_CC) == 0) {
-    		lval2.e_test |= E_FORCETEST;
+    	    if ((lval2.Test & E_CC) == 0) {
+    		lval2.Test |= E_FORCETEST;
     	    }
     	    exprhs (CF_FORCECHAR, k, &lval2);
 
@@ -2445,8 +2445,8 @@ static int hieAnd (ExprDesc* lval, unsigned TrueLab, int* BoolOp)
        	g_defcodelabel (lab);
 
        	/* Define the label */
-       	lval->e_flags = E_MEXPR;
-       	lval->e_test |= E_CC;	/* Condition codes are set */
+       	lval->Flags = E_MEXPR;
+       	lval->Test |= E_CC;	/* Condition codes are set */
        	k = 0;
     }
     return k;
@@ -2474,8 +2474,8 @@ static int hieOr (ExprDesc *lval)
     if (CurTok.Tok == TOK_BOOL_OR) {
 
     	/* If the expr hasn't set condition codes, set the force-test flag */
-       	if ((lval->e_test & E_CC) == 0) {
-    	    lval->e_test |= E_FORCETEST;
+       	if ((lval->Test & E_CC) == 0) {
+    	    lval->Test |= E_FORCETEST;
     	}
 
     	/* Get first expr */
@@ -2500,8 +2500,8 @@ static int hieOr (ExprDesc *lval)
        	    /* Get a subexpr */
     	    AndOp = 0;
     	    k = hieAnd (&lval2, TrueLab, &AndOp);
-       	    if ((lval2.e_test & E_CC) == 0) {
-    		lval2.e_test |= E_FORCETEST;
+       	    if ((lval2.Test & E_CC) == 0) {
+    		lval2.Test |= E_FORCETEST;
     	    }
     	    exprhs (CF_FORCECHAR, k, &lval2);
 
@@ -2518,8 +2518,8 @@ static int hieOr (ExprDesc *lval)
     	    g_truejump (CF_NONE, TrueLab);
 #endif
     	}
-    	lval->e_flags = E_MEXPR;
-    	lval->e_test |= E_CC;		       	/* Condition codes are set */
+    	lval->Flags = E_MEXPR;
+    	lval->Test |= E_CC;		       	/* Condition codes are set */
     	k = 0;
     }
 
@@ -2556,9 +2556,9 @@ static int hieQuest (ExprDesc *lval)
     k = hieOr (lval);
     if (CurTok.Tok == TOK_QUEST) {
     	NextToken ();
-    	if ((lval->e_test & E_CC) == 0) {
+    	if ((lval->Test & E_CC) == 0) {
     	    /* Condition codes not set, force a test */
-    	    lval->e_test |= E_FORCETEST;
+    	    lval->Test |= E_FORCETEST;
     	}
     	exprhs (CF_NONE, k, lval);
     	labf = GetLocalLabel ();
@@ -2635,7 +2635,7 @@ static int hieQuest (ExprDesc *lval)
 	}
 
 	/* Setup the target expression */
-       	lval->e_flags = E_MEXPR;
+       	lval->Flags = E_MEXPR;
     	lval->Type = rtype;
     	k = 0;
     }
@@ -2684,7 +2684,7 @@ static void opeq (GenDesc* Gen, ExprDesc *lval, int k)
 	}
        	if (MustScale) {
 	    /* lhs is a pointer, scale rhs */
-	    lval2.e_const *= SizeOf (lval->Type+1);
+	    lval2.ConstVal *= SizeOf (lval->Type+1);
 	}
 
 	/* If the lhs is character sized, the operation may be later done
@@ -2696,11 +2696,11 @@ static void opeq (GenDesc* Gen, ExprDesc *lval, int k)
 
      	/* Special handling for add and sub - some sort of a hack, but short code */
 	if (Gen->Func == g_add) {
-	    g_inc (flags | CF_CONST, lval2.e_const);
+	    g_inc (flags | CF_CONST, lval2.ConstVal);
 	} else if (Gen->Func == g_sub) {
-	    g_dec (flags | CF_CONST, lval2.e_const);
+	    g_dec (flags | CF_CONST, lval2.ConstVal);
 	} else {
-       	    Gen->Func (flags | CF_CONST, lval2.e_const);
+       	    Gen->Func (flags | CF_CONST, lval2.ConstVal);
 	}
     } else {
 	/* rhs is not constant and already in the primary register */
@@ -2720,7 +2720,7 @@ static void opeq (GenDesc* Gen, ExprDesc *lval, int k)
        	Gen->Func (g_typeadjust (flags, TypeOf (lval2.Type)), 0);
     }
     store (lval);
-    lval->e_flags = E_MEXPR;
+    lval->Flags = E_MEXPR;
 }
 
 
@@ -2740,9 +2740,9 @@ static void addsubeq (GenDesc* Gen, ExprDesc *lval, int k)
 
 
     /* We're currently only able to handle some adressing modes */
-    if ((lval->e_flags & E_MGLOBAL) == 0 && 	/* Global address? */
-	(lval->e_flags & E_MLOCAL) == 0  && 	/* Local address? */
-       	(lval->e_flags & E_MCONST) == 0) {	/* Constant address? */
+    if ((lval->Flags & E_MGLOBAL) == 0 && 	/* Global address? */
+	(lval->Flags & E_MLOCAL) == 0  && 	/* Local address? */
+       	(lval->Flags & E_MCONST) == 0) {	/* Constant address? */
 	/* Use generic routine */
        	opeq (Gen, lval, k);
 	return;
@@ -2762,7 +2762,7 @@ static void addsubeq (GenDesc* Gen, ExprDesc *lval, int k)
 	/* The resulting value is a constant. */
        	if (MustScale) {
 	    /* lhs is a pointer, scale rhs */
-	    lval2.e_const *= SizeOf (lval->Type+1);
+	    lval2.ConstVal *= SizeOf (lval->Type+1);
 	}
 	flags |= CF_CONST;
     } else {
@@ -2777,42 +2777,42 @@ static void addsubeq (GenDesc* Gen, ExprDesc *lval, int k)
     g_typeadjust (flags, TypeOf (lval2.Type));
 
     /* Output apropriate code */
-    if (lval->e_flags & E_MGLOBAL) {
+    if (lval->Flags & E_MGLOBAL) {
 	/* Static variable */
-	flags |= GlobalModeFlags (lval->e_flags);
+	flags |= GlobalModeFlags (lval->Flags);
 	if (Gen->Tok == TOK_PLUS_ASSIGN) {
-	    g_addeqstatic (flags, lval->e_name, lval->e_const, lval2.e_const);
+	    g_addeqstatic (flags, lval->Name, lval->ConstVal, lval2.ConstVal);
 	} else {
-       	    g_subeqstatic (flags, lval->e_name, lval->e_const, lval2.e_const);
+       	    g_subeqstatic (flags, lval->Name, lval->ConstVal, lval2.ConstVal);
 	}
-    } else if (lval->e_flags & E_MLOCAL) {
+    } else if (lval->Flags & E_MLOCAL) {
 	/* ref to localvar */
 	if (Gen->Tok == TOK_PLUS_ASSIGN) {
-    	    g_addeqlocal (flags, lval->e_const, lval2.e_const);
+    	    g_addeqlocal (flags, lval->ConstVal, lval2.ConstVal);
 	} else {
-	    g_subeqlocal (flags, lval->e_const, lval2.e_const);
+	    g_subeqlocal (flags, lval->ConstVal, lval2.ConstVal);
 	}
-    } else if (lval->e_flags & E_MCONST) {
+    } else if (lval->Flags & E_MCONST) {
 	/* ref to absolute address */
 	flags |= CF_ABSOLUTE;
 	if (Gen->Tok == TOK_PLUS_ASSIGN) {
-	    g_addeqstatic (flags, lval->e_const, 0, lval2.e_const);
+	    g_addeqstatic (flags, lval->ConstVal, 0, lval2.ConstVal);
 	} else {
-       	    g_subeqstatic (flags, lval->e_const, 0, lval2.e_const);
+       	    g_subeqstatic (flags, lval->ConstVal, 0, lval2.ConstVal);
 	}
-    } else if (lval->e_flags & E_MEXPR) {
+    } else if (lval->Flags & E_MEXPR) {
        	/* Address in a/x. */
 	if (Gen->Tok == TOK_PLUS_ASSIGN) {
-       	    g_addeqind (flags, lval->e_const, lval2.e_const);
+       	    g_addeqind (flags, lval->ConstVal, lval2.ConstVal);
 	} else {
-       	    g_subeqind (flags, lval->e_const, lval2.e_const);
+       	    g_subeqind (flags, lval->ConstVal, lval2.ConstVal);
 	}
     } else {
        	Internal ("Invalid addressing mode");
     }
 
     /* Expression is in the primary now */
-    lval->e_flags = E_MEXPR;
+    lval->Flags = E_MEXPR;
 }
 
 
@@ -2889,7 +2889,7 @@ static void Assignment (ExprDesc* lval)
     }
 
     /* Value is still in primary */
-    lval->e_flags = E_MEXPR;
+    lval->Flags = E_MEXPR;
 }
 
 
@@ -2989,7 +2989,7 @@ int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval)
 
     /* Evaluate */
     k = f (lval);
-    if (k == 0 && lval->e_flags == E_MCONST) {
+    if (k == 0 && lval->Flags == E_MCONST) {
      	/* Constant expression */
      	return 0;
     } else {
@@ -3048,12 +3048,12 @@ void constexpr (ExprDesc* lval)
 /* Get a constant value */
 {
     memset (lval, 0, sizeof (*lval));
-    if (expr (hie1, lval) != 0 || (lval->e_flags & E_MCONST) == 0) {
+    if (expr (hie1, lval) != 0 || (lval->Flags & E_MCONST) == 0) {
      	Error ("Constant expression expected");
      	/* To avoid any compiler errors, make the expression a valid const */
-     	lval->e_flags = E_MCONST;
+     	lval->Flags = E_MCONST;
      	lval->Type = type_int;
-     	lval->e_const = 0;
+     	lval->ConstVal = 0;
     }
 }
 
@@ -3066,9 +3066,9 @@ void intexpr (ExprDesc* lval)
     if (!IsClassInt (lval->Type)) {
      	Error ("Integer expression expected");
      	/* To avoid any compiler errors, make the expression a valid int */
-     	lval->e_flags = E_MCONST;
+     	lval->Flags = E_MCONST;
      	lval->Type = type_int;
-     	lval->e_const = 0;
+     	lval->ConstVal = 0;
     }
 }
 
@@ -3086,9 +3086,9 @@ void boolexpr (ExprDesc* lval)
     if (!IsClassInt (lval->Type) && !IsClassPtr (lval->Type)) {
  	Error ("Boolean expression expected");
  	/* To avoid any compiler errors, make the expression a valid int */
- 	lval->e_flags = E_MCONST;
+ 	lval->Flags = E_MCONST;
  	lval->Type    = type_int;
- 	lval->e_const = 0;
+ 	lval->ConstVal = 0;
     }
 }
 
@@ -3108,12 +3108,12 @@ void test (unsigned label, int cond)
 
     /* Generate code to eval the expr */
     k = expr (hie0, &lval);
-    if (k == 0 && lval.e_flags == E_MCONST) {
+    if (k == 0 && lval.Flags == E_MCONST) {
       	/* Constant rvalue */
-       	if (cond == 0 && lval.e_const == 0) {
+       	if (cond == 0 && lval.ConstVal == 0) {
       	    g_jump (label);
      	    Warning ("Unreachable code");
-     	} else if (cond && lval.e_const) {
+     	} else if (cond && lval.ConstVal) {
  	    g_jump (label);
       	}
      	ConsumeRParen ();
@@ -3121,8 +3121,8 @@ void test (unsigned label, int cond)
     }
 
     /* If the expr hasn't set condition codes, set the force-test flag */
-    if ((lval.e_test & E_CC) == 0) {
-     	lval.e_test |= E_FORCETEST;
+    if ((lval.Test & E_CC) == 0) {
+     	lval.Test |= E_FORCETEST;
     }
 
     /* Load the value into the primary register */

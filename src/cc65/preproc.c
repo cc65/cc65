@@ -670,7 +670,7 @@ static int doiff (int skip)
     NextTok = sv2;
 
     /* Set the #if condition according to the expression result */
-    return (setmflag (skip, 1, lval.e_const != 0));
+    return (setmflag (skip, 1, lval.ConstVal != 0));
 }
 
 

@@ -178,7 +178,7 @@ static void FlagPragma (unsigned char* Flag)
     constexpr (&val);
 
     /* Store the value into the flag parameter */
-    *Flag = (val.e_const != 0);
+    *Flag = (val.ConstVal != 0);
 }
 
 

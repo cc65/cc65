@@ -231,7 +231,7 @@ static void ParseEnumDecl (void)
     	    ExprDesc lval;
    	    NextToken ();
    	    constexpr (&lval);
-   	    EnumVal = lval.e_const;
+   	    EnumVal = lval.ConstVal;
     	}
 
 	/* Add an entry to the symbol table */
@@ -859,7 +859,7 @@ static void Decl (Declaration* D, unsigned Mode)
        	    if (CurTok.Tok != TOK_RBRACK) {
     	     	ExprDesc lval;
        	       	constexpr (&lval);
-       	       	Size = lval.e_const;
+       	       	Size = lval.ConstVal;
        	    }
        	    ConsumeRBrack ();
        	    *D->T++ = T_ARRAY;
@@ -965,9 +965,9 @@ static void ParseVoidInit (void)
 
 	    case T_SCHAR:
 	    case T_UCHAR:
-		if ((lval.e_flags & E_MCTYPE) == E_TCONST) {
+		if ((lval.Flags & E_MCTYPE) == E_TCONST) {
 		    /* Make it byte sized */
-		    lval.e_const &= 0xFF;
+		    lval.ConstVal &= 0xFF;
 		}
 		DefineData (&lval);
 		break;
@@ -978,9 +978,9 @@ static void ParseVoidInit (void)
 	    case T_UINT:
 	    case T_PTR:
 	    case T_ARRAY:
-		if ((lval.e_flags & E_MCTYPE) == E_TCONST) {
+		if ((lval.Flags & E_MCTYPE) == E_TCONST) {
     		    /* Make it word sized */
-		    lval.e_const &= 0xFFFF;
+		    lval.ConstVal &= 0xFFFF;
 		}
 		DefineData (&lval);
 		break;
@@ -1070,9 +1070,9 @@ void ParseInit (type* T)
      	case T_SCHAR:
      	case T_UCHAR:
      	    constexpr (&lval);
-	    if ((lval.e_flags & E_MCTYPE) == E_TCONST) {
+	    if ((lval.Flags & E_MCTYPE) == E_TCONST) {
 	    	/* Make it byte sized */
-	    	lval.e_const &= 0xFF;
+	    	lval.ConstVal &= 0xFF;
 	    }
 	    assignadjust (T, &lval);
 	    DefineData (&lval);
@@ -1084,9 +1084,9 @@ void ParseInit (type* T)
      	case T_UINT:
      	case T_PTR:
      	    constexpr (&lval);
-	    if ((lval.e_flags & E_MCTYPE) == E_TCONST) {
+	    if ((lval.Flags & E_MCTYPE) == E_TCONST) {
 	    	/* Make it word sized */
-	    	lval.e_const &= 0xFFFF;
+	    	lval.ConstVal &= 0xFFFF;
 	    }
 	    assignadjust (T, &lval);
 	    DefineData (&lval);
@@ -1095,9 +1095,9 @@ void ParseInit (type* T)
     	case T_LONG:
     	case T_ULONG:
 	    constexpr (&lval);
-	    if ((lval.e_flags & E_MCTYPE) == E_TCONST) {
+	    if ((lval.Flags & E_MCTYPE) == E_TCONST) {
 	    	/* Make it long sized */
-	    	lval.e_const &= 0xFFFFFFFF;
+	    	lval.ConstVal &= 0xFFFFFFFF;
 	    }
 	    assignadjust (T, &lval);
 	    DefineData (&lval);

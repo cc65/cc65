@@ -202,7 +202,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		    }
 
 		    /* Push the value */
-		    g_push (flags | TypeOf (Decl.Type), lval.e_const);
+		    g_push (flags | TypeOf (Decl.Type), lval.ConstVal);
 
 		    /* Mark the variable as referenced */
 		    SC |= SC_REF;

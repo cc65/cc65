@@ -52,6 +52,7 @@
 #define MOUSE_ERR_CANNOT_LOAD   2       /* Error loading driver */
 #define MOUSE_ERR_INV_DRIVER    3       /* Invalid driver */
 #define MOUSE_ERR_NO_DEVICE     4       /* Mouse hardware not found */
+#define MOUSE_ERR_INV_IOCTL     5       /* Invalid ioctl code */
 
 /* Mouse button masks */
 #define MOUSE_BTN_LEFT	     0x10
@@ -152,6 +153,11 @@ void __fastcall__ mouse_pos (struct mouse_pos* pos);
 
 void __fastcall__ mouse_info (struct mouse_info* info);
 /* Return the state of the mouse buttons and the position of the mouse */
+
+unsigned char __fastcall__ mouse_ioctl (unsigned char code, void* data);
+/* Call the driver specific ioctl function. NON PORTABLE! Returns an error 
+ * code. 
+ */
 
 
 

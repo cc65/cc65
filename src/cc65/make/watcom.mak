@@ -139,7 +139,6 @@ FILE goto.obj
 FILE ident.obj
 FILE incpath.obj
 FILE input.obj
-FILE io.obj
 FILE litpool.obj
 FILE locals.obj
 FILE loop.obj

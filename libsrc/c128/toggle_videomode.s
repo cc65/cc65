@@ -6,10 +6,9 @@
 ;
 
 	.export		_toggle_videomode
+        .import         SWAPPER, BSOUT
 
-	.include	"c128.inc"
-
-.proc   _toggle_videomode 
+.proc   _toggle_videomode
 
         jsr     SWAPPER                 ; Toggle the mode
  	lda     #14

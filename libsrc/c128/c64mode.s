@@ -6,8 +6,7 @@
 ;
 
 	.export		_c64mode
-
-	.include	"c128.inc"
+        .import         C64MODE
 
        	_c64mode	= C64MODE
 

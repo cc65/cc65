@@ -4,6 +4,10 @@
 ; C128 kernal functions
 ;
 
+        .export         C64MODE
+        .export         SWAPPER
+        .export         SETBNK
+
         .export         CINT
         .export         IOINIT
         .export         RAMTAS
@@ -47,7 +51,13 @@
 
 ;-----------------------------------------------------------------------------
 ; All functions are available in the kernal jump table
+ 
+; Extended jump table
+C64MODE		= $FF4D
+SWAPPER		= $FF5F
+SETBNK          = $FF68
 
+;
 CINT		= $FF81
 IOINIT		= $FF84
 RAMTAS		= $FF87

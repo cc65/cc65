@@ -81,7 +81,7 @@
 #define CH_BTEE     	0x18
 #define CH_LTEE     	0x01
 #define CH_RTEE     	0x04
-#define CH_CROSS    	0x19
+#define CH_CROSS    	0x13
 #define CH_HLINE        0x12
 #define CH_VLINE        0x16
 
@@ -108,7 +108,7 @@
 #define HUE_GREEN       12
 #define HUE_YELLOWGREEN 13
 #define HUE_YELLOW      14
-#define HUE_YELLOWRED   15					  
+#define HUE_YELLOWRED   15
 
 /* Color defines, similar to c64 colors (untested) */
 /* Note that the conio color implementation is monochrome (bgcolor and textcolor are only placeholders) */

@@ -595,7 +595,7 @@ int main (int argc, char* argv[])
 	{ "--version",	       	0,	OptVersion   	       	},
     };
 
-    int I;
+    unsigned I;
 
     /* Initialize the output file name */
     const char* OutputFile = 0;
@@ -609,7 +609,7 @@ int main (int argc, char* argv[])
 
     /* Parse the command line */
     I = 1;
-    while (I < (int)ArgCount) {
+    while (I < ArgCount) {
 
 	const char* P;
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    conio.h				     */
+/*                                  conio.h				     */
 /*                                                                           */
-/*			      Direct console I/O			     */
+/*                            Direct console I/O			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -35,7 +35,7 @@
 
 /*
  * This is the direct console interface for cc65. I do not like the function
- * names very much, but the first version started as a rewrite of Borlands
+ * names very much, but the first version started as a rewrite of Borland's
  * conio, and, even if the interface has changed, the names did not.
  *
  * The interface does direct screen I/O, so it is fast enough for most
@@ -58,7 +58,7 @@
 #  include <stdarg.h>
 #endif
 
-/* Include the correct machine specific file */
+/* Include the correct machine-specific file */
 #if defined(__APPLE2__)
 #  include <apple2.h>
 #elif defined(__APPLE2ENH__)
@@ -69,6 +69,10 @@
 #  include <atmos.h>
 #elif defined(__CBM__)
 #  include <cbm.h>
+#elif defined(__GEOS__)
+#  include <geos.h>
+#elif defined(__LUNIX__)
+#  include <lunix.h>
 #elif defined(__LYNX__)
 #  include <lynx.h>
 #elif defined(__NES__)
@@ -80,7 +84,7 @@
 
 
 /*****************************************************************************/
-/*   	      			   Functions	     			     */
+/*            			   Functions	     			     */
 /*****************************************************************************/
 
 
@@ -113,25 +117,31 @@ void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);
 /* Same as "gotoxy (x, y); cputc (c);" */
 
 void __fastcall__ cputs (const char* s);
-/* Output a NUL terminated string at the current cursor position */
+/* Output a NUL-terminated string at the current cursor position */
 
 void __fastcall__ cputsxy (unsigned char x, unsigned char y, const char* s);
 /* Same as "gotoxy (x, y); puts (s);" */
 
 int cprintf (const char* format, ...);
-/* Like printf, but uses direct screen I/O */
+/* Like printf(), but uses direct screen output */
 
 int __fastcall__ vcprintf (const char* format, va_list ap);
-/* Like vprintf, but uses direct screen I/O */
+/* Like vprintf(), but uses direct screen output */
 
 char cgetc (void);
 /* Return a character from the keyboard. If there is no character available,
- * the functions waits until the user does press a key. If cursor is set to
+ * the function waits until the user does press a key. If cursor is set to
  * 1 (see below), a blinking cursor is displayed while waiting.
  */
 
+int cscanf (const char* format, ...);
+/* Like scanf(), but uses direct keyboard input */
+
+int __fastcall__ vcscanf (const char* format, va_list ap);
+/* Like vscanf(), but uses direct keyboard input */
+
 unsigned char __fastcall__ cursor (unsigned char onoff);
-/* If onoff is 1, a cursor is display when waiting for keyboard input. If
+/* If onoff is 1, a cursor is displayed when waiting for keyboard input. If
  * onoff is 0, the cursor is hidden when waiting for keyboard input. The
  * function returns the old cursor setting.
  */

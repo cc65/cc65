@@ -232,7 +232,7 @@ INIT:
 ; Switch into graphics mode
 
 	jsr	HGR
-	bit     MIXOFF
+	bit	MIXOFF
 
 ; Done, reset the error code
 
@@ -288,9 +288,9 @@ CLEAR		= HCLR
 SETVIEWPAGE:
 	tax
 	beq	@L1
-	bit     PG2ON
+	bit	PG2ON
 	rts
-@L1:	bit     PG2OFF
+@L1:	bit	PG2OFF
 	rts
 
 ; ------------------------------------------------------------------------
@@ -392,7 +392,7 @@ SETPIXEL:
 	ldy	X1+1
 	lda	Y1
 	jmp	HPLOT
-       
+
 ; ------------------------------------------------------------------------
 ; GETPIXEL: Read the color value of a pixel and return it in A/X. The
 ; coordinates passed to this function are never outside the visible screen
@@ -400,38 +400,40 @@ SETPIXEL:
 
 
 GETPIXEL:
-       	ldx	X1
-       	ldy	X1+1
-       	lda	Y1
-       	jsr	HPOSN		; 1st pixel
-HBASL  	=	$26
-HMASK  	=	$30
-       	ldx	#0
-       	lda	(HBASL),y
-       	and	HMASK
-       	beq	@L1
-       	inx
-@L1:   	stx	tmp1
-       	lda	$E0		; which neighbour
-       	tax
-       	and	#$01
-       	bne	@odd
-       	asl	tmp1
-       	inx
-       	.byte	$24
-@odd:  	dex
-       	ldy	$E1
-       	lda	$E2
-       	jsr	HPOSN		; 2nd pixel
-       	ldx	#0
-       	lda	(HBASL),y
-       	and	HMASK
-       	beq	@L2
-       	inx
-@L2:   	txa
-       	ora	tmp1
-       	ldx	#0
-        rts
+	ldx	X1
+	ldy	X1+1
+	lda	Y1
+	jsr	HPOSN		; 1st pixel
+HBASL	=	$26
+HMASK	=	$30
+	ldx	#0
+	lda	(HBASL),y
+	and	HMASK
+	beq	@L1
+	inx
+@L1:	stx	tmp1
+
+	lda	$E0		; which neighbour
+	tax
+	and	#$01
+	bne	@odd
+	asl	tmp1
+	inx
+	.byte	$24
+@odd:	dex
+
+	ldy	$E1
+	lda	$E2
+	jsr	HPOSN		; 2nd pixel
+	ldx	#0
+	lda	(HBASL),y
+	and	HMASK
+	beq	@L2
+	inx
+@L2:	txa
+	ora	tmp1
+	ldx	#0
+	rts
 
 ; ------------------------------------------------------------------------
 ; LINE: Draw a line from X1/Y1 to X2/Y2, where X1/Y1 = ptr1/ptr2 and
@@ -441,14 +443,14 @@ HMASK  	=	$30
 ;
 
 LINE:
-       	ldx	X1
-       	ldy	X1+1
-       	lda	Y1
-       	jsr	HPOSN
-       	lda	X2
-       	ldx	X2+1
-       	ldy	Y2
-       	jmp	HLIN
+	ldx	X1
+	ldy	X1+1
+	lda	Y1
+	jsr	HPOSN
+	lda	X2
+	ldx	X2+1
+	ldy	Y2
+	jmp	HLIN
 
 ; ------------------------------------------------------------------------
 ; BAR: Draw a filled rectangle with the corners X1/Y1, X2/Y2, where
@@ -456,12 +458,12 @@ LINE:
 ; Contrary to most other functions, the graphics kernel will sort and clip
 ; the coordinates before calling the driver, so on entry the following
 ; conditions are valid:
-;      	X1 <= X2
-;      	Y1 <= Y2
-;      	(X1 >= 0) && (X1 < XRES)
-;      	(X2 >= 0) && (X2 < XRES)
-;      	(Y1 >= 0) && (Y1 < YRES)
-;      	(Y2 >= 0) && (Y2 < YRES)
+;	X1 <= X2
+;	Y1 <= Y2
+;	(X1 >= 0) && (X1 < XRES)
+;	(X2 >= 0) && (X2 < XRES)
+;	(Y1 >= 0) && (Y1 < YRES)
+;	(Y2 >= 0) && (Y2 < YRES)
 ;
 ; Must set an error code: NO
 ;
@@ -743,8 +745,7 @@ OUTTEXT:
 
 abs:
 	; a/y := abs(a/y)
-	dey
-	iny
+	cpy	#0
 	bpl	@L1
 	; negay
 	clc

@@ -9,8 +9,9 @@
    	.export	    	_mouse_hide, _mouse_show
    	.export	    	_mouse_box, _mouse_info
    	.export		_mouse_x, _mouse_y
-   	.export	    	_mouse_move
-
+   	.export	    	_mouse_move, _mouse_buttons
+						   
+	.import		_readjoy
        	.import	       	popa, popsreg, addysp1
    	.importzp   	sp, sreg
 
@@ -22,7 +23,9 @@
 
 ; --------------------------------------------------------------------------
 ;
-; void __fastcall__ mouse_init (unsigned char port, unsigned char sprite, unsigned char type);
+; unsigned char __fastcall__ mouse_init (unsigned char port,
+;					 unsigned char sprite,
+;					 unsigned char type);
 ;
 
 _mouse_init:
@@ -31,7 +34,7 @@ _mouse_init:
    	jsr	popa			; Get the port number
 
        	ldy    	OldIRQ+1		; Already initialized?
-       	bne    	Done			; Jump if yes
+       	bne    	AlreadyInitialized	; Jump if yes
 
    	stx	MouseSprite		; Remember the sprite number
    	sta	MousePort		; Remember the port number
@@ -66,11 +69,18 @@ _mouse_init:
      	lda   	IRQVec+1
      	sta   	OldIRQ+1
 
-; Set our own IRQ vector
+; Set our own IRQ vector. We cheat here to save a few bytes of code:
+; The function is expected to return a value not equal to zero on success,
+; and since we know that the high byte of the IRQ handler address is never
+; zweo, we will return just this byte.
 
-     	lda    	#<MouseIRQ
-     	ldx   	#>MouseIRQ
-     	bne   	SetIRQ
+     	ldx    	#<MouseIRQ
+     	lda   	#>MouseIRQ
+     	bne   	SetIRQ			; Branch always
+
+AlreadyInitialized:
+	lda	#0			; Error
+	rts
 
 ; --------------------------------------------------------------------------
 ;
@@ -78,14 +88,14 @@ _mouse_init:
 ;
 
 _mouse_done:
-       	lda    	OldIRQ	  		; Initialized?
-     	ldx 	OldIRQ+1
-     	beq    	Done  	  		; Jump if no
+       	ldx    	OldIRQ	  	      	; Initialized?
+     	lda 	OldIRQ+1
+     	beq    	Done   	       	      	; Jump if no
 	ldy 	#0
    	sty 	OldIRQ+1  		; Reset the initialized flag
 SetIRQ:	sei 		  		; Disable interrupts
-      	sta 	IRQVec	  		; Set the new/old vector
-      	stx 	IRQVec+1
+      	stx 	IRQVec	  		; Set the new/old vector
+      	sta 	IRQVec+1
    	cli 				; Enable interrupts
 Done: 	rts
 
@@ -228,6 +238,16 @@ _mouse_move:
 
 @L9:	cli				; Enable interrupts
 	rts
+
+
+; --------------------------------------------------------------------------
+;
+; unsigned char mouse_buttons (void);
+;
+
+_mouse_buttons:
+	lda	MousePort		; Get the port 
+	jmp	_readjoy		; Same as joystick
 
 ; --------------------------------------------------------------------------
 ;

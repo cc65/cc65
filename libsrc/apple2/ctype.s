@@ -60,21 +60,21 @@ __ctype:
 	.byte	CT_CTRL			;  30/1e ___ctrl_^___
 	.byte	CT_CTRL			;  31/1f ___ctrl_____
 	.byte	CT_SPACE | CT_SPACE_TAB	;  32/20 ___SPACE___
-	.byte	$00			;  33/21 _____!_____
-	.byte	$00			;  34/22 _____"_____
-	.byte	$00			;  35/23 _____#_____
-	.byte	$00			;  36/24 _____$_____
-	.byte	$00			;  37/25 _____%_____
-	.byte	$00			;  38/26 _____&_____
-	.byte	$00			;  39/27 _____'_____
-	.byte	$00			;  40/28 _____(_____
-	.byte	$00			;  41/29 _____)_____
-	.byte	$00			;  42/2a _____*_____
-	.byte	$00			;  43/2b _____+_____
-	.byte	$00			;  44/2c _____,_____
-	.byte	$00			;  45/2d _____-_____
-	.byte	$00			;  46/2e _____._____
-	.byte	$00			;  47/2f _____/_____
+       	.byte  	CT_NONE                 ;  33/21 _____!_____
+       	.byte  	CT_NONE                 ;  34/22 _____"_____
+       	.byte  	CT_NONE                 ;  35/23 _____#_____
+       	.byte  	CT_NONE                 ;  36/24 _____$_____
+       	.byte  	CT_NONE                 ;  37/25 _____%_____
+       	.byte  	CT_NONE                 ;  38/26 _____&_____
+       	.byte  	CT_NONE                 ;  39/27 _____'_____
+       	.byte  	CT_NONE                 ;  40/28 _____(_____
+       	.byte  	CT_NONE                 ;  41/29 _____)_____
+       	.byte  	CT_NONE                 ;  42/2a _____*_____
+       	.byte  	CT_NONE                 ;  43/2b _____+_____
+       	.byte  	CT_NONE                 ;  44/2c _____,_____
+       	.byte  	CT_NONE                 ;  45/2d _____-_____
+       	.byte  	CT_NONE                 ;  46/2e _____._____
+       	.byte  	CT_NONE                 ;  47/2f _____/_____
 	.byte	CT_DIGIT | CT_XDIGIT	;  48/30 _____0_____
 	.byte	CT_DIGIT | CT_XDIGIT	;  49/31 _____1_____
 	.byte	CT_DIGIT | CT_XDIGIT	;  50/32 _____2_____
@@ -85,14 +85,14 @@ __ctype:
 	.byte	CT_DIGIT | CT_XDIGIT	;  55/37 _____7_____
 	.byte	CT_DIGIT | CT_XDIGIT	;  56/38 _____8_____
 	.byte	CT_DIGIT | CT_XDIGIT	;  57/39 _____9_____
-	.byte	$00			;  58/3a _____:_____
-	.byte	$00			;  59/3b _____;_____
-	.byte	$00			;  60/3c _____<_____
-	.byte	$00			;  61/3d _____=_____
-	.byte	$00			;  62/3e _____>_____
-	.byte	$00			;  63/3f _____?_____
+       	.byte  	CT_NONE                 ;  58/3a _____:_____
+       	.byte  	CT_NONE                 ;  59/3b _____;_____
+       	.byte  	CT_NONE                 ;  60/3c _____<_____
+       	.byte  	CT_NONE                 ;  61/3d _____=_____
+       	.byte  	CT_NONE                 ;  62/3e _____>_____
+       	.byte  	CT_NONE                 ;  63/3f _____?_____
 
-	.byte	$00			;  64/40 _____@_____
+       	.byte  	CT_NONE                 ;  64/40 _____@_____
 	.byte	CT_UPPER | CT_XDIGIT	;  65/41 _____A_____
 	.byte	CT_UPPER | CT_XDIGIT	;  66/42 _____B_____
 	.byte	CT_UPPER | CT_XDIGIT	;  67/43 _____C_____
@@ -119,12 +119,12 @@ __ctype:
 	.byte	CT_UPPER		;  88/58 _____X_____
 	.byte	CT_UPPER		;  89/59 _____Y_____
 	.byte	CT_UPPER		;  90/5a _____Z_____
-	.byte	$00			;  91/5b _____[_____
-	.byte	$00			;  92/5c _____\_____
-	.byte	$00			;  93/5d _____]_____
-	.byte	$00			;  94/5e _____^_____
-	.byte	$00			;  95/5f _UNDERLINE_
-	.byte	$00			;  96/60 ___grave___
+       	.byte  	CT_NONE                 ;  91/5b _____[_____
+       	.byte  	CT_NONE                 ;  92/5c _____\_____
+       	.byte  	CT_NONE                 ;  93/5d _____]_____
+       	.byte  	CT_NONE                 ;  94/5e _____^_____
+       	.byte  	CT_NONE                 ;  95/5f _UNDERLINE_
+       	.byte  	CT_NONE                 ;  96/60 ___grave___
 	.byte	CT_LOWER | CT_XDIGIT	;  97/61 _____a_____
 	.byte	CT_LOWER | CT_XDIGIT	;  98/62 _____b_____
 	.byte	CT_LOWER | CT_XDIGIT	;  99/63 _____c_____
@@ -151,10 +151,10 @@ __ctype:
 	.byte	CT_LOWER		; 120/78 _____x_____
 	.byte	CT_LOWER		; 121/79 _____y_____
 	.byte	CT_LOWER		; 122/7a _____z_____
-	.byte	$00			; 123/7b _____{_____
-	.byte	$00			; 124/7c _____|_____
-	.byte	$00			; 125/7d _____}_____
-	.byte	$00			; 126/7e _____~_____
+       	.byte  	CT_NONE                 ; 123/7b _____{_____
+       	.byte  	CT_NONE                 ; 124/7c _____|_____
+       	.byte  	CT_NONE                 ; 125/7d _____}_____
+       	.byte  	CT_NONE                 ; 126/7e _____~_____
 	.byte	CT_OTHER_WS		; 127/7f ____DEL____
         .endrepeat
 

@@ -11,6 +11,12 @@
 	.importzp   	sp, sreg, regsave
 	.importzp   	ptr1, ptr2, ptr3, ptr4
 	.importzp   	tmp1, tmp2, tmp3, tmp4
-	.importzp   	regbank, zpspace
+	.importzp   	regbank
+
+; The total amount of zero page space used
+
+zpspace = 24
+
+
 
 

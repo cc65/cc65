@@ -2504,7 +2504,7 @@ Here's a list of all control commands and a description, what they do:
   In addition to that, a start offset and a size value may be specified,
   separated by commas. If no size is specified, all of the file from the
   start offset to end-of-file is used. If no start position is specified
-  either, zero is assume (which means that the whole file is inserted).
+  either, zero is assumed (which means that the whole file is inserted).
 
   Example:
 

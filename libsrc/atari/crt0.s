@@ -19,6 +19,7 @@
 	.import		__CODE_LOAD__, __BSS_LOAD__
 
 	.include	"atari.inc"
+        .include        "../common/_file.inc"
 
 ; ------------------------------------------------------------------------
 ; Define and export the ZP variables for the runtime
@@ -125,13 +126,13 @@ L1:	lda	sp,x
 
 	lda	#0
 	jsr	getfd
-	sta	__filetab		; setup stdin
+       	sta    	__filetab + (0 * _FILE_size)    ; setup stdin
 	lda	#0
 	jsr	getfd
-	sta	__filetab + 2		; setup stdout
+	sta	__filetab + (1 * _FILE_size)    ; setup stdout
 	lda	#0
 	jsr	getfd
-	sta	__filetab + 4		; setup stderr
+	sta	__filetab + (2 * _FILE_size)    ; setup stderr
 
 ; Pass command line if present
 

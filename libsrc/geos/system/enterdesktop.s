@@ -7,6 +7,7 @@
 ; void EnterDeskTop (void);
 
 	    .export _EnterDeskTop
+	    .import _exit
 
 	    .include "../inc/jumptab.inc"
 

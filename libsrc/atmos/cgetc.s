@@ -5,8 +5,7 @@
 ;
 
 	.export		_cgetc
-        .constructor    cursoroff
-        .destructor     cursoron
+        .constructor    initcgetc
 	.import		cursor
 
 	.include	"atmos.inc"
@@ -25,14 +24,17 @@
 
         lda     cursor          ; Cursor currently off?
         beq     @L1             ; Skip if so
-        jsr     cursoron
+        lda     STATUS
+        ora     #%00000001      ; Cursor ON
+        sta     STATUS
 @L1:    lda     KEYBUF
         bpl     @L1
 
 ; If the cursor was enabled, disable it now
 
         ldx     cursor
-        beq     @L3
+        beq     @L2
+        ldx     #$00            ; Zero high byte
         dec     STATUS          ; Clear bit zero
 
 ; We have the character, clear avail flag
@@ -42,26 +44,18 @@
 
 ; Done
 
-@L3:    ldx     #$00
         rts
 
 .endproc
 
 ; ------------------------------------------------------------------------
-; Switch the cursor on
+; Switch the cursor off, disable capslock
 
-cursoron:
-        lda     STATUS
-        ora     #%00000001
-        sta     STATUS
-        rts
-
-; ------------------------------------------------------------------------
-; Switch the cursor off
-
-cursoroff:
+initcgetc:
         lda     STATUS
         and     #%11111110
         sta     STATUS
+        lda     #$7F
+        sta     CAPSLOCK
         rts
 

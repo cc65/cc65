@@ -244,10 +244,10 @@ CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
     /* Initialize the fields */
     E->OPC    = D->OPC;
     E->AM     = AM;
-    E->Arg    = GetArgCopy (Arg);
-    E->Flags  = NumArg (E->Arg, &E->Num)? CEF_NUMARG : 0;
-    E->Info   = D->Info;
     E->Size   = GetInsnSize (E->OPC, E->AM);
+    E->Flags  = NumArg (E->Arg, &E->Num)? CEF_NUMARG : 0;
+    E->Arg    = GetArgCopy (Arg);
+    E->Info   = D->Info;
     E->JumpTo = JumpTo;
     E->LI     = UseLineInfo (LI);
     E->RI     = 0;

@@ -66,15 +66,15 @@
 /* Code entry structure */
 typedef struct CodeEntry CodeEntry;
 struct CodeEntry {
-    opc_t	     	OPC;		/* Opcode */
-    am_t	     	AM;		/* Adressing mode */
+    unsigned char       OPC;		/* Opcode */
+    unsigned char       AM;		/* Adressing mode */
+    unsigned char    	Size;		/* Estimated size */
+    unsigned char       Flags;		/* Flags */
     char*      	       	Arg;   	       	/* Argument as string */
     unsigned long    	Num;		/* Numeric argument */
-    unsigned short   	Flags;		/* Flags */
     unsigned short      Info;		/* Additional code info */
     unsigned short      Use;		/* Registers used */
     unsigned short      Chg;		/* Registers changed/destroyed */
-    unsigned char    	Size;		/* Estimated size */
     CodeLabel*	     	JumpTo;		/* Jump label */
     Collection	     	Labels;		/* Labels for this instruction */
     LineInfo*           LI;             /* Source line info for this insn */

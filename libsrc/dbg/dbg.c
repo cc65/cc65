@@ -357,7 +357,7 @@ static void DrawFrame (register FrameDesc* F, char Active)
     cvlinexy (F->fd_x2, y1, F->fd_height);
 
     /* If the window has static text associated, print the text */
-    textcolor (COLOR_TEXTLOW);
+    (void) textcolor (COLOR_TEXTLOW);
     Count = F->fd_textcount;
     T = F->fd_text;
     while (Count--) {
@@ -366,7 +366,7 @@ static void DrawFrame (register FrameDesc* F, char Active)
     }
 
     /* Set the old color */
-    textcolor (OldColor);
+    (void) textcolor (OldColor);
 }
 
 
@@ -437,7 +437,7 @@ static void DisplayPrompt (char* s)
 
     /* Clear the old prompt if there is one */
     if (ActivePrompt) {
-	textcolor (PromptColor);
+	(void) textcolor (PromptColor);
 	chlinexy ((MAX_X - PromptLength) / 2, MAX_Y-1, PromptLength);
     }
 
@@ -447,11 +447,11 @@ static void DisplayPrompt (char* s)
     PromptLength = strlen (ActivePrompt);
 
     /* Display the new prompt */
-    textcolor (COLOR_TEXTHIGH);
+    (void) textcolor (COLOR_TEXTHIGH);
     cputsxy ((MAX_X - PromptLength) / 2, MAX_Y-1, ActivePrompt);
 
     /* Restore the old color */
-    textcolor (PromptColor);
+    (void) textcolor (PromptColor);
 }
 
 
@@ -506,7 +506,7 @@ static char Input (char* Prompt, char* Buf, unsigned char Count)
     /* Display the new prompt */
     OldColor = textcolor (COLOR_TEXTHIGH);
     cputsxy (0, MAX_Y-1, Prompt);
-    textcolor (COLOR_TEXTLOW);
+    (void) textcolor (COLOR_TEXTLOW);
 
     /* Remember where we are, enable the cursor */
     x1 = wherex ();
@@ -535,7 +535,7 @@ static char Input (char* Prompt, char* Buf, unsigned char Count)
 
     /* Reset settings, display old prompt line */
     cursor (OldCursor);
-    textcolor (OldColor);
+    (void) textcolor (OldColor);
     DrawFrames ();
     Frame = ActiveFrame;
     ActiveFrame = -1;
@@ -1354,13 +1354,13 @@ static void RedrawStatic (char Frame)
     ActiveFrame = -1;
 
     /* Clear the screen hide the cursor */
-    bordercolor (COLOR_BORDER);
-    bgcolor (COLOR_BACKGROUND);
+    (void) bordercolor (COLOR_BORDER);
+    (void) bgcolor (COLOR_BACKGROUND);
     clrscr ();
     cursor (0);
 
     /* Build the frame layout of the screen */
-    textcolor (COLOR_FRAMELOW);
+    (void) textcolor (COLOR_FRAMELOW);
     DrawFrames ();
 
     /* Draw the prompt line */

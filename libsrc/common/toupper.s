@@ -10,13 +10,10 @@
 _toupper:
 	tay			; Get c into Y
 	lda	__ctype,y	; Get character classification
-	and	#$01		; Mask lower char bit
-	beq	L1		; Jump if not lower char
+	lsr	a		; Get bit 0 (lower char) into carry
 	tya			; Get C back into A
+       	bcc    	L9		; Jump if not lower char
        	clc
 	adc	__cdiff		; make upper case char
-	rts			; CC are set
-
-L1:	tya	     		; Get C back
-	rts			; CC are set
+L9:	rts	  		; CC are set
 

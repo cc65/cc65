@@ -961,7 +961,7 @@ static void ParseVoidInit (void)
     ConsumeLCurly ();
     do {
 	constexpr (&lval);
-	switch (lval.e_tptr[0]) {
+	switch (lval.Type[0]) {
 
 	    case T_SCHAR:
 	    case T_UCHAR:

@@ -314,7 +314,7 @@ static void ContinueStatement (void)
 
 
 
-static void CascadeSwitch (ExprDesc* eval)
+static void CascadeSwitch (ExprDesc* Expr)
 /* Handle a switch statement for chars with a cmp cascade for the selector */
 {
     unsigned ExitLab;  	     	/* Exit label */
@@ -333,7 +333,7 @@ static void CascadeSwitch (ExprDesc* eval)
     AddLoop (oursp, 0, ExitLab, 0, 0);
 
     /* Setup some variables needed in the loop  below */
-    Flags = TypeOf (eval->e_tptr) | CF_CONST | CF_FORCECHAR;
+    Flags = TypeOf (Expr->Type) | CF_CONST | CF_FORCECHAR;
     CodeLab = NextLab = 0;
     HaveBreak = 1;
     HaveDefault = 0;
@@ -374,13 +374,13 @@ static void CascadeSwitch (ExprDesc* eval)
 
 		    /* Read the selector expression */
 		    constexpr (&lval);
-		    if (!IsClassInt (lval.e_tptr)) {
+		    if (!IsClassInt (lval.Type)) {
 			Error ("Switch quantity not an integer");
 		    }
 
 		    /* Check the range of the expression */
 		    Val = lval.e_const;
-		    switch (*eval->e_tptr) {
+		    switch (*Expr->Type) {
 
 			case T_SCHAR:
 			    /* Signed char */
@@ -408,7 +408,7 @@ static void CascadeSwitch (ExprDesc* eval)
 		     	    break;
 
 		     	default:
-		     	    Internal ("Invalid type: %02X", *eval->e_tptr & 0xFF);
+		     	    Internal ("Invalid type: %02X", *Expr->Type & 0xFF);
 		    }
 
 		    /* Emit a compare */
@@ -492,7 +492,7 @@ static void CascadeSwitch (ExprDesc* eval)
 
 
 
-static void TableSwitch (ExprDesc* eval)
+static void TableSwitch (ExprDesc* Expr)
 /* Handle a switch statement via table based selector */
 {
     /* Entry for one case in a switch statement */
@@ -537,7 +537,7 @@ static void TableSwitch (ExprDesc* eval)
     	    	if (CurTok.Tok == TOK_CASE) {
        	    	    NextToken ();
     	    	    constexpr (&lval);
-	    	    if (!IsClassInt (lval.e_tptr)) {
+	    	    if (!IsClassInt (lval.Type)) {
 	    		Error ("Switch quantity not an integer");
 	      	    }
      	    	    p->sw_const = lval.e_const;
@@ -576,7 +576,7 @@ static void TableSwitch (ExprDesc* eval)
     g_defcodelabel (lcase);
 
     /* Create the call to the switch subroutine */
-    Flags = TypeOf (eval->e_tptr);
+    Flags = TypeOf (Expr->Type);
     g_switch (Flags);
 
     /* First entry is negative of label count */
@@ -605,24 +605,24 @@ static void TableSwitch (ExprDesc* eval)
 static void SwitchStatement (void)
 /* Handle a 'switch' statement */
 {
-    ExprDesc eval;	       	/* Switch statement expression */
+    ExprDesc Expr;	       	/* Switch statement expression */
 
     /* Eat the "switch" */
     NextToken ();
 
     /* Read the switch expression */
     ConsumeLParen ();
-    intexpr (&eval);
+    intexpr (&Expr);
     ConsumeRParen ();
 
     /* result of expr is in P */
     ConsumeLCurly ();
 
     /* Now decide which sort of switch we will create: */
-    if (IsTypeChar (eval.e_tptr) || (CodeSizeFactor >= 200 && IsClassInt (eval.e_tptr))) {
-       	CascadeSwitch (&eval);
+    if (IsTypeChar (Expr.Type) || (CodeSizeFactor >= 200 && IsClassInt (Expr.Type))) {
+       	CascadeSwitch (&Expr);
     } else {
-      	TableSwitch (&eval);
+      	TableSwitch (&Expr);
     }
 }
 

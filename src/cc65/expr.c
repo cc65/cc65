@@ -117,7 +117,7 @@ static unsigned GlobalModeFlags (unsigned flags)
 static int IsNullPtr (ExprDesc* lval)
 /* Return true if this is the NULL pointer constant */
 {
-    return (IsClassInt (lval->e_tptr) &&	/* Is it an int? */
+    return (IsClassInt (lval->Type) && 	        /* Is it an int? */
        	    lval->e_flags == E_MCONST &&	/* Is it constant? */
 	    lval->e_const == 0);		/* And is it's value zero? */
 }
@@ -163,8 +163,8 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
     unsigned flags;
 
     /* Get the type strings */
-    type* lhst = lhs->e_tptr;
-    type* rhst = rhs->e_tptr;
+    type* lhst = lhs->Type;
+    type* rhst = rhs->Type;
 
     /* Generate type adjustment code if needed */
     ltype = TypeOf (lhst);
@@ -182,7 +182,7 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
     flags = g_typeadjust (ltype, rtype);
 
     /* Set the type of the result */
-    lhs->e_tptr = promoteint (lhst, rhst);
+    lhs->Type = promoteint (lhst, rhst);
 
     /* Return the code generator flags */
     return flags;
@@ -201,13 +201,13 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
     /* Get the type of the right hand side. Treat function types as
      * pointer-to-function
      */
-    type* rhst = rhs->e_tptr;
+    type* rhst = rhs->Type;
     if (IsTypeFunc (rhst)) {
 	rhst = PointerTo (rhst);
     }
 
     /* After calling this function, rhs will have the type of the lhs */
-    rhs->e_tptr = lhst;
+    rhs->Type = lhst;
 
     /* First, do some type checking */
     if (IsTypeVoid (lhst) || IsTypeVoid (rhst)) {
@@ -289,7 +289,7 @@ void DefineData (ExprDesc* lval)
 
        	case E_TCONST:
 	    /* Number */
-	    g_defdata (TypeOf (lval->e_tptr) | CF_CONST, lval->e_const, 0);
+	    g_defdata (TypeOf (lval->Type) | CF_CONST, lval->e_const, 0);
        	    break;
 
 	case E_TREGISTER:
@@ -330,7 +330,7 @@ static void lconst (unsigned flags, ExprDesc* lval)
 
        	case E_TCONST:
 	    /* Number constant */
-       	    g_getimmed (flags | TypeOf (lval->e_tptr) | CF_CONST, lval->e_const, 0);
+       	    g_getimmed (flags | TypeOf (lval->Type) | CF_CONST, lval->e_const, 0);
        	    break;
 
 	case E_TREGISTER:
@@ -471,7 +471,7 @@ void exprhs (unsigned flags, int k, ExprDesc *lval)
     f = lval->e_flags;
     if (k) {
        	/* Dereferenced lvalue */
-     	flags |= TypeOf (lval->e_tptr);
+     	flags |= TypeOf (lval->Type);
      	if (lval->e_test & E_FORCETEST) {
      	    flags |= CF_TEST;
      	    lval->e_test &= ~E_FORCETEST;
@@ -493,7 +493,7 @@ void exprhs (unsigned flags, int k, ExprDesc *lval)
      	}
     } else if (f == E_MEOFFS) {
      	/* reference not storable */
-     	flags |= TypeOf (lval->e_tptr);
+     	flags |= TypeOf (lval->Type);
        	g_inc (flags | CF_CONST, lval->e_const);
     } else if ((f & E_MEXPR) == 0) {
      	/* Constant of some sort, load it into the primary */
@@ -501,7 +501,7 @@ void exprhs (unsigned flags, int k, ExprDesc *lval)
     }
     if (lval->e_test & E_FORCETEST) {	/* we testing this value? */
      	/* debug... */
-     	flags |= TypeOf (lval->e_tptr);
+     	flags |= TypeOf (lval->Type);
        	g_test (flags);	       	       	/* yes, force a test */
        	lval->e_test &= ~E_FORCETEST;
     }
@@ -625,7 +625,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
        	}
 
 	/* Use the type of the argument for the push */
-       	Flags |= TypeOf (lval.e_tptr);
+       	Flags |= TypeOf (lval.Type);
 
 	/* If this is a fastcall function, don't push the last argument */
        	if (ParamCount == Func->ParamCount && (Func->Flags & FD_FASTCALL) != 0) {
@@ -690,7 +690,7 @@ static void CallFunction (ExprDesc* lval)
 
 
     /* Get a pointer to the function descriptor from the type string */
-    Func = GetFuncDesc (lval->e_tptr);
+    Func = GetFuncDesc (lval->Type);
 
     /* Initialize vars to keep gcc silent */
     Mark  = 0;
@@ -723,9 +723,9 @@ static void CallFunction (ExprDesc* lval)
 	    /* We had no parameters - remove save code */
        	    RemoveCode (Mark);
 	}
-     	g_callind (TypeOf (lval->e_tptr), ParamSize);
+     	g_callind (TypeOf (lval->Type), ParamSize);
     } else {
-       	g_call (TypeOf (lval->e_tptr), (const char*) lval->e_name, ParamSize);
+       	g_call (TypeOf (lval->Type), (const char*) lval->e_name, ParamSize);
     }
 }
 
@@ -795,7 +795,7 @@ static int primary (ExprDesc* lval)
     /* Character and integer constants. */
     if (CurTok.Tok == TOK_ICONST || CurTok.Tok == TOK_CCONST) {
     	lval->e_flags = E_MCONST | E_TCONST;
-    	lval->e_tptr  = CurTok.Type;
+    	lval->Type  = CurTok.Type;
     	lval->e_const = CurTok.IVal;
     	NextToken ();
     	return 0;
@@ -819,7 +819,7 @@ static int primary (ExprDesc* lval)
        	/* Illegal expression in PP mode */
 	Error ("Preprocessor expression expected");
 	lval->e_flags = E_MCONST;
-	lval->e_tptr = type_int;
+	lval->Type = type_int;
 	return 0;
     }
 
@@ -839,7 +839,7 @@ static int primary (ExprDesc* lval)
      	    NextToken ();
 
 	    /* The expression type is the symbol type */
-	    lval->e_tptr = Sym->Type;
+	    lval->Type = Sym->Type;
 
     	    /* Check for illegal symbol types */
 	    CHECK ((Sym->Flags & SC_LABEL) != SC_LABEL);
@@ -848,7 +848,7 @@ static int primary (ExprDesc* lval)
 	       	Error ("Variable identifier expected");
 	       	/* Assume an int type to make lval valid */
 	       	lval->e_flags = E_MLOCAL | E_TLOFFS;
-	       	lval->e_tptr = type_int;
+	       	lval->Type = type_int;
 	        lval->e_const = 0;
 	       	return 0;
 	    }
@@ -903,7 +903,7 @@ static int primary (ExprDesc* lval)
 
 	    /* The symbol is referenced now */
 	    Sym->Flags |= SC_REF;
-       	    if (IsTypeFunc (lval->e_tptr) || IsTypeArray (lval->e_tptr)) {
+       	    if (IsTypeFunc (lval->Type) || IsTypeArray (lval->Type)) {
 	    	return 0;
 	    }
    	    return 1;
@@ -921,7 +921,7 @@ static int primary (ExprDesc* lval)
 	     */
 	    Warning ("Function call without a prototype");
 	    Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_EXTERN | SC_REF | SC_FUNC);
-	    lval->e_tptr  = Sym->Type;
+	    lval->Type  = Sym->Type;
 	    lval->e_flags = E_MGLOBAL | E_MCONST | E_TGLAB;
        	    lval->e_name  = (unsigned long) Sym->Name;
 	    lval->e_const = 0;
@@ -932,7 +932,7 @@ static int primary (ExprDesc* lval)
 	    /* Undeclared Variable */
 	    Sym = AddLocalSym (Ident, type_int, SC_AUTO | SC_REF, 0);
 	    lval->e_flags = E_MLOCAL | E_TLOFFS;
-	    lval->e_tptr = type_int;
+	    lval->Type = type_int;
 	    lval->e_const = 0;
 	    Error ("Undefined symbol: `%s'", Ident);
 	    return 1;
@@ -944,7 +944,7 @@ static int primary (ExprDesc* lval)
     if (CurTok.Tok == TOK_SCONST) {
    	lval->e_flags = E_MCONST | E_TLIT;
        	lval->e_const = CurTok.IVal;
-	lval->e_tptr  = GetCharArrayType (strlen (GetLiteral (CurTok.IVal)));
+	lval->Type  = GetCharArrayType (strlen (GetLiteral (CurTok.IVal)));
     	NextToken ();
 	return 0;
     }
@@ -952,7 +952,7 @@ static int primary (ExprDesc* lval)
     /* ASM statement? */
     if (CurTok.Tok == TOK_ASM) {
 	doasm ();
-	lval->e_tptr  = type_void;
+	lval->Type  = type_void;
 	lval->e_flags = E_MEXPR;
 	lval->e_const = 0;
 	return 0;
@@ -960,7 +960,7 @@ static int primary (ExprDesc* lval)
 
     /* __AX__ and __EAX__ pseudo values? */
     if (CurTok.Tok == TOK_AX || CurTok.Tok == TOK_EAX) {
-       	lval->e_tptr  = (CurTok.Tok == TOK_AX)? type_uint : type_ulong;
+       	lval->Type  = (CurTok.Tok == TOK_AX)? type_uint : type_ulong;
    	lval->e_flags = E_MREG;
 	lval->e_test &= ~E_CC;
    	lval->e_const = 0;
@@ -971,7 +971,7 @@ static int primary (ExprDesc* lval)
     /* Illegal primary. */
     Error ("Expression expected");
     lval->e_flags = E_MCONST;
-    lval->e_tptr = type_int;
+    lval->Type = type_int;
     return 0;
 }
 
@@ -996,7 +996,7 @@ static int arrayref (int k, ExprDesc* lval)
     NextToken ();
 
     /* Get the type of left side */
-    tptr1 = lval->e_tptr;
+    tptr1 = lval->Type;
 
     /* We can apply a special treatment for arrays that have a const base
      * address. This is true for most arrays and will produce a lot better
@@ -1063,19 +1063,19 @@ static int arrayref (int k, ExprDesc* lval)
 	    }
 
        	    /* Result is of element type */
-	    lval->e_tptr = Indirect (tptr1);
+	    lval->Type = Indirect (tptr1);
 
 	    /* Done */
     	    goto end_array;
 
-       	} else if (IsClassPtr (tptr2 = lval2.e_tptr)) {
+       	} else if (IsClassPtr (tptr2 = lval2.Type)) {
     	    /* Subscript is pointer, get element type */
-    	    lval2.e_tptr = Indirect (tptr2);
+    	    lval2.Type = Indirect (tptr2);
 
     	    /* Scale the rhs value in the primary register */
-    	    g_scale (TypeOf (tptr1), SizeOf (lval2.e_tptr));
+    	    g_scale (TypeOf (tptr1), SizeOf (lval2.Type));
     	    /* */
-    	    lval->e_tptr = lval2.e_tptr;
+    	    lval->Type = lval2.Type;
     	} else {
     	    Error ("Cannot subscript");
     	}
@@ -1092,22 +1092,22 @@ static int arrayref (int k, ExprDesc* lval)
 	Mark2 = GetCodePos ();
         exprhs (CF_NONE, l, &lval2);
 
-	tptr2 = lval2.e_tptr;
+	tptr2 = lval2.Type;
 	if (IsClassPtr (tptr1)) {
 
 	    /* Get the element type */
-	    lval->e_tptr = Indirect (tptr1);
+	    lval->Type = Indirect (tptr1);
 
        	    /* Indexing is based on int's, so we will just use the integer
 	     * portion of the index (which is in (e)ax, so there's no further
 	     * action required).
 	     */
-	    g_scale (CF_INT, SizeOf (lval->e_tptr));
+	    g_scale (CF_INT, SizeOf (lval->Type));
 
 	} else if (IsClassPtr (tptr2)) {
 
 	    /* Get the element type */
-	    lval2.e_tptr = Indirect (tptr2);
+	    lval2.Type = Indirect (tptr2);
 
 	    /* Get the int value on top. If we go here, we're sure,
 	     * both values are 16 bit (the first one was truncated
@@ -1124,8 +1124,8 @@ static int arrayref (int k, ExprDesc* lval)
 	    }
 
 	    /* Scale it */
-	    g_scale (TypeOf (tptr1), SizeOf (lval2.e_tptr));
-	    lval->e_tptr = lval2.e_tptr;
+	    g_scale (TypeOf (tptr1), SizeOf (lval2.Type));
+	    lval->Type = lval2.Type;
 	} else {
 	    Error ("Cannot subscript");
 	}
@@ -1153,22 +1153,22 @@ static int arrayref (int k, ExprDesc* lval)
        	       	       	    (rflags & E_MGLOBAL) != 0 || /* Static array, or ... */
 	    	    	    rflags == E_MLOCAL;      	 /* Local array */
 
-       	    if (ConstSubAddr && SizeOf (lval->e_tptr) == 1) {
+       	    if (ConstSubAddr && SizeOf (lval->Type) == 1) {
 
 	    	type* SavedType;
 
 	    	/* Reverse the order of evaluation */
-	    	unsigned flags = (SizeOf (lval2.e_tptr) == 1)? CF_CHAR : CF_INT;
+	    	unsigned flags = (SizeOf (lval2.Type) == 1)? CF_CHAR : CF_INT;
     	     	RemoveCode (Mark2);
 
 	    	/* Get a pointer to the array into the primary. We have changed
-	    	 * e_tptr above but we need the original type to load the
+	    	 * Type above but we need the original type to load the
 	    	 * address, so restore it temporarily.
 	    	 */
-	    	SavedType = lval->e_tptr;
-	     	lval->e_tptr = tptr1;
+	    	SavedType = lval->Type;
+	     	lval->Type = tptr1;
 	    	exprhs (CF_NONE, k, lval);
-	    	lval->e_tptr = SavedType;
+	    	lval->Type = SavedType;
 
 	    	/* Add the variable */
 	    	if (rflags == E_MLOCAL) {
@@ -1204,7 +1204,7 @@ static int arrayref (int k, ExprDesc* lval)
     lval->e_flags = E_MEXPR;
 end_array:
     ConsumeRBrack ();
-    return !IsTypeArray (lval->e_tptr);
+    return !IsTypeArray (lval->Type);
 
 }
 
@@ -1221,17 +1221,17 @@ static int structref (int k, ExprDesc* lval)
     NextToken ();
     if (CurTok.Tok != TOK_IDENT) {
     	Error ("Identifier expected");
-    	lval->e_tptr = type_int;
+    	lval->Type = type_int;
     	return 0;
     }
 
     /* Get the symbol table entry and check for a struct field */
     strcpy (Ident, CurTok.Ident);
     NextToken ();
-    Field = FindStructField (lval->e_tptr, Ident);
+    Field = FindStructField (lval->Type, Ident);
     if (Field == 0) {
      	Error ("Struct/union has no field named `%s'", Ident);
-       	lval->e_tptr = type_int;
+       	lval->Type = type_int;
      	return 0;
     }
 
@@ -1249,7 +1249,7 @@ static int structref (int k, ExprDesc* lval)
 	lval->e_const = Field->V.Offs;
 	lval->e_flags = E_MEOFFS;
     }
-    lval->e_tptr = Field->Type;
+    lval->Type = Field->Type;
     return !IsTypeArray (Field->Type);
 }
 
@@ -1279,17 +1279,17 @@ static int hie11 (ExprDesc *lval)
 
 	    /* Function call. Skip the opening parenthesis */
 	    NextToken ();
-	    tptr = lval->e_tptr;
+	    tptr = lval->Type;
 	    if (IsTypeFunc (tptr) || IsTypeFuncPtr (tptr)) {
 	    	if (IsTypeFuncPtr (tptr)) {
 	    	    /* Pointer to function. Handle transparently */
     	    	    exprhs (CF_NONE, k, lval);  /* Function pointer to A/X */
-	    	    ++lval->e_tptr; 	    	/* Skip T_PTR */
+	    	    ++lval->Type; 	    	/* Skip T_PTR */
 	    	    lval->e_flags |= E_MEXPR;
      	    	}
      	    	CallFunction (lval);
      	    	lval->e_flags = E_MEXPR;
-     	    	lval->e_tptr += DECODE_SIZE + 1;       	/* Set to result */
+     	    	lval->Type += DECODE_SIZE + 1;       	/* Set to result */
      	    } else {
      	    	Error ("Illegal function call");
      	    }
@@ -1297,14 +1297,14 @@ static int hie11 (ExprDesc *lval)
 
      	} else if (CurTok.Tok == TOK_DOT) {
 
-     	    if (!IsClassStruct (lval->e_tptr)) {
+     	    if (!IsClassStruct (lval->Type)) {
      	   	Error ("Struct expected");
      	    }
      	    k = structref (0, lval);
 
      	} else if (CurTok.Tok == TOK_PTR_REF) {
 
-     	    tptr = lval->e_tptr;
+     	    tptr = lval->Type;
      	    if (tptr[0] != T_PTR || (tptr[1] & T_STRUCT) == 0) {
      	   	Error ("Struct pointer expected");
      	    }
@@ -1325,7 +1325,7 @@ static void store (ExprDesc* lval)
     unsigned flags;
 
     f = lval->e_flags;
-    flags = TypeOf (lval->e_tptr);
+    flags = TypeOf (lval->Type);
     if (f & E_MGLOBAL) {
 	flags |= GlobalModeFlags (f);
      	if (lval->e_test) {
@@ -1369,10 +1369,10 @@ static void pre_incdec (ExprDesc* lval, void (*inc) (unsigned, unsigned long))
     }
 
     /* Get the data type */
-    flags = TypeOf (lval->e_tptr) | CF_FORCECHAR | CF_CONST;
+    flags = TypeOf (lval->Type) | CF_FORCECHAR | CF_CONST;
 
     /* Get the increment value in bytes */
-    val = (lval->e_tptr [0] == T_PTR)? PSizeOf (lval->e_tptr) : 1;
+    val = (lval->Type [0] == T_PTR)? PSizeOf (lval->Type) : 1;
 
     /* We're currently only able to handle some adressing modes */
     if ((lval->e_flags & E_MGLOBAL) == 0 && 	/* Global address? */
@@ -1449,7 +1449,7 @@ static void post_incdec (ExprDesc *lval, int k, void (*inc) (unsigned, unsigned 
     }
 
     /* Get the data type */
-    flags = TypeOf (lval->e_tptr);
+    flags = TypeOf (lval->Type);
 
     /* Push the address if needed */
     PushAddr (lval);
@@ -1459,8 +1459,8 @@ static void post_incdec (ExprDesc *lval, int k, void (*inc) (unsigned, unsigned 
     g_save (flags | CF_FORCECHAR);
 
     /* If we have a pointer expression, increment by the size of the type */
-    if (lval->e_tptr[0] == T_PTR) {
-    	inc (flags | CF_CONST | CF_FORCECHAR, SizeOf (lval->e_tptr + 1));
+    if (lval->Type[0] == T_PTR) {
+    	inc (flags | CF_CONST | CF_FORCECHAR, SizeOf (lval->Type + 1));
     } else {
      	inc (flags | CF_CONST | CF_FORCECHAR, 1);
     }
@@ -1496,7 +1496,7 @@ static void unaryop (int tok, ExprDesc* lval)
      	exprhs (CF_NONE, k, lval);
 
     	/* Get the type of the expression */
-    	flags = TypeOf (lval->e_tptr);
+    	flags = TypeOf (lval->Type);
 
     	/* Handle the operation */
 	switch (tok) {
@@ -1530,8 +1530,8 @@ static int typecast (ExprDesc* lval)
     k = hie10 (lval);
 
     /* If the expression is a function, treat it as pointer-to-function */
-    if (IsTypeFunc (lval->e_tptr)) {
-	lval->e_tptr = PointerTo (lval->e_tptr);
+    if (IsTypeFunc (lval->Type)) {
+	lval->Type = PointerTo (lval->Type);
     }
 
     /* Check for a constant on the right side */
@@ -1545,7 +1545,7 @@ static int typecast (ExprDesc* lval)
 	if (IsClassInt (Type)) {
 
 	    /* Get the current and new size of the value */
-	    unsigned OldSize = SizeOf (lval->e_tptr);
+	    unsigned OldSize = SizeOf (lval->Type);
 	    unsigned NewSize = SizeOf (Type);
 	    unsigned OldBits = OldSize * 8;
 	    unsigned NewBits = NewSize * 8;
@@ -1564,7 +1564,7 @@ static int typecast (ExprDesc* lval)
 	    } else if (NewSize > OldSize) {
 
 	   	/* Sign extend the value if needed */
-	     	if (!IsSignUnsigned (Type) && !IsSignUnsigned (lval->e_tptr)) {
+	     	if (!IsSignUnsigned (Type) && !IsSignUnsigned (lval->Type)) {
 	     	    if (lval->e_const & (0x01UL << (OldBits-1))) {
 	     	   	lval->e_const |= ((~0L) << OldBits);
 	     	    }
@@ -1581,13 +1581,13 @@ static int typecast (ExprDesc* lval)
 	     * we have to load the value into the primary and generate code to
 	     * cast the value in the primary register.
 	     */
-	    if (SizeOf (Type) != SizeOf (lval->e_tptr)) {
+	    if (SizeOf (Type) != SizeOf (lval->Type)) {
 
 	   	/* Load the value into the primary */
 	   	exprhs (CF_NONE, k, lval);
 
 	   	/* Mark the lhs as const to avoid a manipulation of TOS */
-	   	g_typecast (TypeOf (Type) | CF_CONST, TypeOf (lval->e_tptr));
+	   	g_typecast (TypeOf (Type) | CF_CONST, TypeOf (lval->Type));
 
 	   	/* Value is now in primary */
 	   	lval->e_flags = E_MEXPR;
@@ -1597,7 +1597,7 @@ static int typecast (ExprDesc* lval)
     }
 
     /* In any case, use the new type */
-    lval->e_tptr = TypeDup (Type);
+    lval->Type = TypeDup (Type);
 
     /* Done */
     return k;
@@ -1633,7 +1633,7 @@ static int hie10 (ExprDesc* lval)
     	     	/* Constant expression */
     	   	lval->e_const = !lval->e_const;
     	    } else {
-    	   	g_bneg (TypeOf (lval->e_tptr));
+    	   	g_bneg (TypeOf (lval->Type));
     	   	lval->e_test |= E_CC;			/* bneg will set cc */
     	   	lval->e_flags = E_MEXPR;	 	/* say it's an expr */
     	    }
@@ -1646,9 +1646,9 @@ static int hie10 (ExprDesc* lval)
 	     	lval->e_flags = E_MEXPR;
 	     	lval->e_const = 0;		/* Offset is zero now */
     	    }
-	    t = lval->e_tptr;
+	    t = lval->Type;
        	    if (IsClassPtr (t)) {
-       	       	lval->e_tptr = Indirect (t);
+       	       	lval->Type = Indirect (t);
      	    } else {
      	     	Error ("Illegal indirection");
      	    }
@@ -1660,16 +1660,16 @@ static int hie10 (ExprDesc* lval)
 	    /* The & operator may be applied to any lvalue, and it may be
 	     * applied to functions, even if they're no lvalues.
 	     */
-     	    if (k == 0 && !IsTypeFunc (lval->e_tptr)) {
+     	    if (k == 0 && !IsTypeFunc (lval->Type)) {
 	    	/* Allow the & operator with an array */
-	     	if (!IsTypeArray (lval->e_tptr)) {
+	     	if (!IsTypeArray (lval->Type)) {
      	     	    Error ("Illegal address");
 	     	}
      	    } else {
-	     	t = TypeAlloc (TypeLen (lval->e_tptr) + 2);
+	     	t = TypeAlloc (TypeLen (lval->Type) + 2);
 	     	t [0] = T_PTR;
-	     	TypeCpy (t + 1, lval->e_tptr);
-	     	lval->e_tptr = t;
+	     	TypeCpy (t + 1, lval->Type);
+	     	lval->Type = t;
 	    }
      	    return 0;
 
@@ -1684,12 +1684,12 @@ static int hie10 (ExprDesc* lval)
     	   	/* Remember the output queue pointer */
     	    	CodeMark Mark = GetCodePos ();
      	     	hie10 (lval);
-     	       	lval->e_const = SizeOf (lval->e_tptr);
+     	       	lval->e_const = SizeOf (lval->Type);
     	   	/* Remove any generated code */
     	   	RemoveCode (Mark);
      	    }
      	    lval->e_flags = E_MCONST | E_TCONST;
-     	    lval->e_tptr = type_uint;
+     	    lval->Type = type_uint;
 	    lval->e_test &= ~E_CC;
      	    return 0;
 
@@ -1742,7 +1742,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	*UsedGen = 1;
 
 	/* All operators that call this function expect an int on the lhs */
-	if (!IsClassInt (lval->e_tptr)) {
+	if (!IsClassInt (lval->Type)) {
 	    Error ("Integer expression expected");
 	}
 
@@ -1752,7 +1752,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 
 	/* Get the lhs on stack */
        	Mark1 = GetCodePos ();
-	ltype = TypeOf (lval->e_tptr);
+	ltype = TypeOf (lval->Type);
 	if (k == 0 && lval->e_flags == E_MCONST) {
 	    /* Constant value */
 	    Mark2 = GetCodePos ();
@@ -1768,7 +1768,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	rconst = (evalexpr (CF_NONE, hienext, &lval2) == 0);
 
 	/* Check the type of the rhs */
-	if (!IsClassInt (lval2.e_tptr)) {
+	if (!IsClassInt (lval2.Type)) {
 	    Error ("Integer expression expected");
 	}
 
@@ -1783,7 +1783,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	    lval->e_const = kcalc (tok, lval->e_const, lval2.e_const);
 
 	    /* Get the type of the result */
-	    lval->e_tptr = promoteint (lval->e_tptr, lval2.e_tptr);
+	    lval->Type = promoteint (lval->Type, lval2.Type);
 
 	} else {
 
@@ -1791,7 +1791,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	     * expects the lhs in the primary, remove the push of the primary
 	     * now.
 	     */
-	    unsigned rtype = TypeOf (lval2.e_tptr);
+	    unsigned rtype = TypeOf (lval2.Type);
 	    type = 0;
 	    if (rconst) {
 	     	/* Second value is constant - check for div */
@@ -1811,7 +1811,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 
  	    /* Determine the type of the operation result. */
        	    type |= g_typeadjust (ltype, rtype);
-	    lval->e_tptr = promoteint (lval->e_tptr, lval2.e_tptr);
+	    lval->Type = promoteint (lval->Type, lval2.Type);
 
 	    /* Generate code */
 	    Gen->Func (type, lval2.e_const);
@@ -1852,7 +1852,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 
 	/* Get the lhs on stack */
 	Mark1 = GetCodePos ();
-	ltype = TypeOf (lval->e_tptr);
+	ltype = TypeOf (lval->Type);
 	if (k == 0 && lval->e_flags == E_MCONST) {
 	    /* Constant value */
 	    Mark2 = GetCodePos ();
@@ -1868,17 +1868,17 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	rconst = (evalexpr (CF_NONE, hienext, &lval2) == 0);
 
 	/* Make sure, the types are compatible */
-	if (IsClassInt (lval->e_tptr)) {
-	    if (!IsClassInt (lval2.e_tptr) && !(IsClassPtr(lval2.e_tptr) && IsNullPtr(lval))) {
+	if (IsClassInt (lval->Type)) {
+	    if (!IsClassInt (lval2.Type) && !(IsClassPtr(lval2.Type) && IsNullPtr(lval))) {
 	   	Error ("Incompatible types");
 	    }
-	} else if (IsClassPtr (lval->e_tptr)) {
-	    if (IsClassPtr (lval2.e_tptr)) {
+	} else if (IsClassPtr (lval->Type)) {
+	    if (IsClassPtr (lval2.Type)) {
 	   	/* Both pointers are allowed in comparison if they point to
 	   	 * the same type, or if one of them is a void pointer.
 	         */
-       	       	type* left  = Indirect (lval->e_tptr);
-	   	type* right = Indirect (lval2.e_tptr);
+       	       	type* left  = Indirect (lval->Type);
+	   	type* right = Indirect (lval2.Type);
 	   	if (TypeCmp (left, right) < TC_EQUAL && *left != T_VOID && *right != T_VOID) {
 	   	    /* Incomatible pointers */
 	   	    Error ("Incompatible types");
@@ -1920,16 +1920,16 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	     * operation as char operation. Otherwise the default
 	     * promotions are used.
 	     */
-	    if (IsTypeChar (lval->e_tptr) && (IsTypeChar (lval2.e_tptr) || rconst)) {
+	    if (IsTypeChar (lval->Type) && (IsTypeChar (lval2.Type) || rconst)) {
 	       	flags |= CF_CHAR;
-	       	if (IsSignUnsigned (lval->e_tptr) || IsSignUnsigned (lval2.e_tptr)) {
+	       	if (IsSignUnsigned (lval->Type) || IsSignUnsigned (lval2.Type)) {
 	       	    flags |= CF_UNSIGNED;
 	       	}
 	       	if (rconst) {
 	       	    flags |= CF_FORCECHAR;
 	       	}
 	    } else {
-		unsigned rtype = TypeOf (lval2.e_tptr) | (flags & CF_CONST);
+		unsigned rtype = TypeOf (lval2.Type) | (flags & CF_CONST);
        	        flags |= g_typeadjust (ltype, rtype);
 	    }
 
@@ -1939,7 +1939,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	}
 
 	/* Result type is always int */
-       	lval->e_tptr = type_int;
+       	lval->Type = type_int;
 
 	/* We have a rvalue now, condition codes are set */
 	k = 0;
@@ -1981,7 +1981,7 @@ static void parseadd (int k, ExprDesc* lval)
     NextToken ();
 
     /* Get the left hand side type, initialize operation flags */
-    lhst = lval->e_tptr;
+    lhst = lval->Type;
     flags = 0;
 
     /* Check for constness on both sides */
@@ -1991,7 +1991,7 @@ static void parseadd (int k, ExprDesc* lval)
        	if (evalexpr (CF_NONE, hie9, &lval2) == 0) {
 
        	    /* Right hand side is also constant. Get the rhs type */
-    	    rhst = lval2.e_tptr;
+    	    rhst = lval2.Type;
 
     	    /* Both expressions are constants. Check for pointer arithmetic */
        	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -2002,7 +2002,7 @@ static void parseadd (int k, ExprDesc* lval)
     	    	/* Left is int, right is pointer, must scale lhs */
        	       	lval->e_const = lval->e_const * PSizeOf (rhst) + lval2.e_const;
     	    	/* Result type is a pointer */
-    	    	lval->e_tptr = lval2.e_tptr;
+    	    	lval->Type = lval2.Type;
        	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	    	/* Integer addition */
     	    	lval->e_const += lval2.e_const;
@@ -2018,7 +2018,7 @@ static void parseadd (int k, ExprDesc* lval)
     	} else {
 
     	    /* lhs is constant, rhs is not. Get the rhs type. */
-    	    rhst = lval2.e_tptr;
+    	    rhst = lval2.Type;
 
     	    /* Check for pointer arithmetic */
     	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -2031,7 +2031,7 @@ static void parseadd (int k, ExprDesc* lval)
        	       	lval->e_const *= PSizeOf (rhst);
     	      	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
-    	      	lval->e_tptr = lval2.e_tptr;
+    	      	lval->Type = lval2.Type;
        	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	      	/* Integer addition */
        	       	flags = typeadjust (lval, &lval2, 1);
@@ -2054,17 +2054,17 @@ static void parseadd (int k, ExprDesc* lval)
     	/* Left hand side is not constant. Get the value onto the stack. */
     	exprhs (CF_NONE, k, lval);		/* --> primary register */
        	Mark = GetCodePos ();
-    	g_push (TypeOf (lval->e_tptr), 0);	/* --> stack */
+    	g_push (TypeOf (lval->Type), 0);	/* --> stack */
 
     	/* Evaluate the rhs */
        	if (evalexpr (CF_NONE, hie9, &lval2) == 0) {
 
        	    /* Right hand side is a constant. Get the rhs type */
-    	    rhst = lval2.e_tptr;
+    	    rhst = lval2.Type;
 
       	    /* Remove pushed value from stack */
     	    RemoveCode (Mark);
-    	    pop (TypeOf (lval->e_tptr));
+    	    pop (TypeOf (lval->Type));
 
        	    /* Check for pointer arithmetic */
        	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -2077,7 +2077,7 @@ static void parseadd (int k, ExprDesc* lval)
        	       	g_scale (CF_INT | CF_CONST, PSizeOf (rhst));
        	       	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
-    	      	lval->e_tptr = lval2.e_tptr;
+    	      	lval->Type = lval2.Type;
        	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	      	/* Integer addition */
     	      	flags = typeadjust (lval, &lval2, 1);
@@ -2096,7 +2096,7 @@ static void parseadd (int k, ExprDesc* lval)
     	} else {
 
     	    /* lhs and rhs are not constant. Get the rhs type. */
-    	    rhst = lval2.e_tptr;
+    	    rhst = lval2.Type;
 
     	    /* Check for pointer arithmetic */
       	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -2111,7 +2111,7 @@ static void parseadd (int k, ExprDesc* lval)
     	    	g_scale (CF_INT, PSizeOf (rhst));
     	      	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
-    	      	lval->e_tptr = lval2.e_tptr;
+    	      	lval->Type = lval2.Type;
        	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	      	/* Integer addition */
        	       	flags = typeadjust (lval, &lval2, 0);
@@ -2153,7 +2153,7 @@ static void parsesub (int k, ExprDesc* lval)
     NextToken ();
 
     /* Get the left hand side type, initialize operation flags */
-    lhst = lval->e_tptr;
+    lhst = lval->Type;
     flags = 0;
     rscale = 1;	     	    	/* Scale by 1, that is, don't scale */
 
@@ -2167,7 +2167,7 @@ static void parsesub (int k, ExprDesc* lval)
     if (evalexpr (CF_NONE, hie9, &lval2) == 0) {
 
     	/* The right hand side is constant. Get the rhs type. */
-       	rhst = lval2.e_tptr;
+       	rhst = lval2.Type;
 
     	/* Check left hand side */
     	if (k == 0 && (lval->e_flags & E_MCONST) != 0) {
@@ -2189,7 +2189,7 @@ static void parsesub (int k, ExprDesc* lval)
     	    	    lval->e_const = (lval->e_const - lval2.e_const) / PSizeOf (lhst);
     	    	}
     	    	/* Operate on pointers, result type is an integer */
-    	    	lval->e_tptr = type_int;
+    	    	lval->Type = type_int;
     	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	    	/* Integer subtraction */
        	       	typeadjust (lval, &lval2, 1);
@@ -2225,7 +2225,7 @@ static void parsesub (int k, ExprDesc* lval)
     	    	}
     	    	/* Operate on pointers, result type is an integer */
     	    	flags = CF_PTR;
-    	    	lval->e_tptr = type_int;
+    	    	lval->Type = type_int;
     	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	    	/* Integer subtraction */
        	       	flags = typeadjust (lval, &lval2, 1);
@@ -2251,7 +2251,7 @@ static void parsesub (int k, ExprDesc* lval)
     } else {
 
  	/* Right hand side is not constant. Get the rhs type. */
- 	rhst = lval2.e_tptr;
+ 	rhst = lval2.Type;
 
        	/* Check for pointer arithmetic */
  	if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -2268,7 +2268,7 @@ static void parsesub (int k, ExprDesc* lval)
  	    }
  	    /* Operate on pointers, result type is an integer */
  	    flags = CF_PTR;
- 	    lval->e_tptr = type_int;
+ 	    lval->Type = type_int;
  	} else if (IsClassInt (lhst) && IsClassInt (rhst)) {
  	    /* Integer subtraction. If the left hand side descriptor says that
 	     * the lhs is const, we have to remove this mark, since this is no
@@ -2583,8 +2583,8 @@ static int hieQuest (ExprDesc *lval)
 	 *     type.
 	 *   - all other cases are flagged by an error.
 	 */
- 	type2 = lval2.e_tptr;
-	type3 = lval3.e_tptr;
+ 	type2 = lval2.Type;
+	type3 = lval3.Type;
 	if (IsClassInt (type2) && IsClassInt (type3)) {
 
 	    /* Get common type */
@@ -2617,16 +2617,16 @@ static int hieQuest (ExprDesc *lval)
 		Error ("Incompatible pointer types");
 	    }
 	    /* Result has the common type */
-	    rtype = lval2.e_tptr;
+	    rtype = lval2.Type;
 	} else if (IsClassPtr (type2) && IsNullPtr (&lval3)) {
 	    /* Result type is pointer, no cast needed */
-	    rtype = lval2.e_tptr;
+	    rtype = lval2.Type;
 	} else if (IsNullPtr (&lval2) && IsClassPtr (type3)) {
 	    /* Result type is pointer, no cast needed */
-	    rtype = lval3.e_tptr;
+	    rtype = lval3.Type;
 	} else {
 	    Error ("Incompatible types");
-	    rtype = lval2.e_tptr;	 	/* Doesn't matter here */
+	    rtype = lval2.Type;	 	/* Doesn't matter here */
 	}
 
 	/* If we don't have the label defined until now, do it */
@@ -2636,7 +2636,7 @@ static int hieQuest (ExprDesc *lval)
 
 	/* Setup the target expression */
        	lval->e_flags = E_MEXPR;
-    	lval->e_tptr = rtype;
+    	lval->Type = rtype;
     	k = 0;
     }
     return k;
@@ -2659,9 +2659,9 @@ static void opeq (GenDesc* Gen, ExprDesc *lval, int k)
     }
 
     /* Determine the type of the lhs */
-    flags = TypeOf (lval->e_tptr);
+    flags = TypeOf (lval->Type);
     MustScale = (Gen->Func == g_add || Gen->Func == g_sub) &&
-	    	lval->e_tptr [0] == T_PTR;
+	    	lval->Type [0] == T_PTR;
 
     /* Get the lhs address on stack (if needed) */
     PushAddr (lval);
@@ -2684,13 +2684,13 @@ static void opeq (GenDesc* Gen, ExprDesc *lval, int k)
 	}
        	if (MustScale) {
 	    /* lhs is a pointer, scale rhs */
-	    lval2.e_const *= SizeOf (lval->e_tptr+1);
+	    lval2.e_const *= SizeOf (lval->Type+1);
 	}
 
 	/* If the lhs is character sized, the operation may be later done
 	 * with characters.
 	 */
-	if (SizeOf (lval->e_tptr) == 1) {
+	if (SizeOf (lval->Type) == 1) {
 	    flags |= CF_FORCECHAR;
 	}
 
@@ -2706,18 +2706,18 @@ static void opeq (GenDesc* Gen, ExprDesc *lval, int k)
 	/* rhs is not constant and already in the primary register */
        	if (MustScale) {
  	    /* lhs is a pointer, scale rhs */
-       	    g_scale (TypeOf (lval2.e_tptr), SizeOf (lval->e_tptr+1));
+       	    g_scale (TypeOf (lval2.Type), SizeOf (lval->Type+1));
 	}
 
 	/* If the lhs is character sized, the operation may be later done
 	 * with characters.
 	 */
-	if (SizeOf (lval->e_tptr) == 1) {
+	if (SizeOf (lval->Type) == 1) {
 	    flags |= CF_FORCECHAR;
 	}
 
 	/* Adjust the types of the operands if needed */
-       	Gen->Func (g_typeadjust (flags, TypeOf (lval2.e_tptr)), 0);
+       	Gen->Func (g_typeadjust (flags, TypeOf (lval2.Type)), 0);
     }
     store (lval);
     lval->e_flags = E_MEXPR;
@@ -2752,29 +2752,29 @@ static void addsubeq (GenDesc* Gen, ExprDesc *lval, int k)
     NextToken ();
 
     /* Check if we have a pointer expression and must scale rhs */
-    MustScale = (lval->e_tptr [0] == T_PTR);
+    MustScale = (lval->Type [0] == T_PTR);
 
     /* Determine the code generator flags */
-    flags = TypeOf (lval->e_tptr) | CF_FORCECHAR;
+    flags = TypeOf (lval->Type) | CF_FORCECHAR;
 
     /* Evaluate the rhs */
     if (evalexpr (CF_NONE, hie1, &lval2) == 0) {
 	/* The resulting value is a constant. */
        	if (MustScale) {
 	    /* lhs is a pointer, scale rhs */
-	    lval2.e_const *= SizeOf (lval->e_tptr+1);
+	    lval2.e_const *= SizeOf (lval->Type+1);
 	}
 	flags |= CF_CONST;
     } else {
 	/* rhs is not constant and already in the primary register */
        	if (MustScale) {
  	    /* lhs is a pointer, scale rhs */
-       	    g_scale (TypeOf (lval2.e_tptr), SizeOf (lval->e_tptr+1));
+       	    g_scale (TypeOf (lval2.Type), SizeOf (lval->Type+1));
 	}
     }
 
     /* Adjust the rhs to the lhs */
-    g_typeadjust (flags, TypeOf (lval2.e_tptr));
+    g_typeadjust (flags, TypeOf (lval2.Type));
 
     /* Output apropriate code */
     if (lval->e_flags & E_MGLOBAL) {
@@ -2823,7 +2823,7 @@ static void Assignment (ExprDesc* lval)
     int k;
     ExprDesc lval2;
     unsigned flags;
-    type* ltype = lval->e_tptr;
+    type* ltype = lval->Type;
 
     /* Check for assignment to const */
     if (IsQualConst (ltype)) {
@@ -2854,7 +2854,7 @@ static void Assignment (ExprDesc* lval)
 	g_push (CF_PTR | CF_UNSIGNED, 0);
 
 	/* Check for equality of the structs */
-	if (TypeCmp (ltype, lval2.e_tptr) < TC_EQUAL) {
+	if (TypeCmp (ltype, lval2.Type) < TC_EQUAL) {
      	    Error ("Incompatible types");
 	}
 
@@ -3052,7 +3052,7 @@ void constexpr (ExprDesc* lval)
      	Error ("Constant expression expected");
      	/* To avoid any compiler errors, make the expression a valid const */
      	lval->e_flags = E_MCONST;
-     	lval->e_tptr = type_int;
+     	lval->Type = type_int;
      	lval->e_const = 0;
     }
 }
@@ -3063,11 +3063,11 @@ void intexpr (ExprDesc* lval)
 /* Get an integer expression */
 {
     expression (lval);
-    if (!IsClassInt (lval->e_tptr)) {
+    if (!IsClassInt (lval->Type)) {
      	Error ("Integer expression expected");
      	/* To avoid any compiler errors, make the expression a valid int */
      	lval->e_flags = E_MCONST;
-     	lval->e_tptr = type_int;
+     	lval->Type = type_int;
      	lval->e_const = 0;
     }
 }
@@ -3083,11 +3083,11 @@ void boolexpr (ExprDesc* lval)
     /* If it's an integer, it's ok. If it's not an integer, but a pointer,
      * the pointer used in a boolean context is also ok
      */
-    if (!IsClassInt (lval->e_tptr) && !IsClassPtr (lval->e_tptr)) {
+    if (!IsClassInt (lval->Type) && !IsClassPtr (lval->Type)) {
  	Error ("Boolean expression expected");
  	/* To avoid any compiler errors, make the expression a valid int */
  	lval->e_flags = E_MCONST;
- 	lval->e_tptr = type_int;
+ 	lval->Type    = type_int;
  	lval->e_const = 0;
     }
 }

@@ -45,11 +45,11 @@
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
     struct SymEntry*	Sym;	 /* Symbol table entry if known */
-    type*		e_tptr;  /* Type array of expression */
-    long		e_const; /* Value if expression constant */
-    unsigned		e_flags;
-    unsigned		e_test;	 /* */
-    unsigned long	e_name;	 /* Name or label number */
+    type*	       	Type;    /* Type array of expression */
+    long	  	e_const; /* Value if expression constant */
+    unsigned short     	e_flags;
+    unsigned short  	e_test;	 /* */
+    unsigned long 	e_name;	 /* Name or label number */
 };
 
 
@@ -65,7 +65,7 @@ void doasm (void);
  * looks like the one defined for C++ (C has no ASM directive), that is,
  * a string literal in parenthesis.
  */
-
+				
 unsigned assignadjust (type* lhst, ExprDesc* rhs);
 /* Adjust the type of the right hand expression so that it can be assigned to
  * the type on the left hand side. This function is used for assignment and

@@ -69,7 +69,6 @@ pages:	.byte   1                       ; Number of screens available
         .word   GETDEFPALETTE
         .word   SETPIXEL
         .word   GETPIXEL
-        .word   HORLINE
         .word   LINE
         .word   BAR
         .word   CIRCLE
@@ -567,36 +566,6 @@ GETPIXEL:
 	rts
 
 ; ------------------------------------------------------------------------
-; HORLINE: Draw a horizontal line from X1/Y to X2/Y, where X1 = ptr1,
-; Y = ptr2 and X2 = ptr3, using the current drawing color.
-;
-; This is a special line drawing entry used when the line is know to be
-; horizontal, for example by the BAR emulation routine. If the driver does
-; not have special code for horizontal lines, it may just copy Y to Y2 and
-; proceed with the generic line drawing code.
-;
-; Note: Line coordinates will always be sorted (Y1 <= X2) and clipped.
-;
-; Must set an error code: NO
-;
-
-HORLINE:
-	lda	X1
-	ldx	X1+1
-	ldy	Y1
-	sta	r3L
-	stx	r3H
-	sty	r11L
-	lda	X2
-	ldx	X2+1
-	sta	r4L
-	stx	r4H
-	lda	BITMASK
-	beq	@L1
-	lda	#%11111111		; pattern
-@L1:	jmp	HorizontalLine
-
-; ------------------------------------------------------------------------
 ; LINE: Draw a line from X1/Y1 to X2/Y2, where X1/Y1 = ptr1/ptr2 and
 ; X2/Y2 = ptr3/ptr4 using the current drawing color.
 ;
@@ -670,7 +639,7 @@ CIRCLE:
 	; x = r;
 	lda	#0
 	sta	XX+1
-	sta	YY
+  	sta	YY
 	sta	YY+1
 	sta	MaxO
 	sta	MaxO+1

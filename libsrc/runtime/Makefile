@@ -33,7 +33,9 @@ OBJS = 	add.o		\
        	bpushbsp.o	\
        	call.o		\
        	compl.o		\
-       	dec.o		\
+	decax1.o	\
+	decax2.o	\
+	decaxy.o	\
 	decsp1.o	\
        	decsp2.o	\
 	decsp3.o	\
@@ -48,7 +50,14 @@ OBJS = 	add.o		\
        	ge.o		\
        	gt.o		\
        	icmp.o		\
-       	inc.o		\
+	incax1.o	\
+	incax2.o	\
+       	incax3.o	\
+	incax5.o	\
+	incax6.o	\
+	incax7.o	\
+	incax8.o	\
+       	incaxy.o	\
 	incsp1.o	\
        	incsp2.o	\
 	incsp3.o	\

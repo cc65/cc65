@@ -4,9 +4,9 @@
 ; unsigned char __fastcall__ cbm_k_open (void);
 ;
 
-	.include    	"cbm.inc"
-
        	.export	       	_cbm_k_open
+        .import         OPEN
+
 
 _cbm_k_open:
 	jsr	OPEN

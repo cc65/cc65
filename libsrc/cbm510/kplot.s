@@ -4,7 +4,7 @@
 ; PLOT routine for the 510.
 ;
 
-      	.export		k_plot
+      	.export		PLOT
 	.import		__VIDRAM_START__
 	.importzp	crtc
 
@@ -15,7 +15,7 @@
 ; ------------------------------------------------------------------------
 ;
 
-.proc	k_plot
+.proc	PLOT
 
        	bcs    	get
 
@@ -63,3 +63,4 @@ LineLSBTab:    	LineLoTab
 LineMSBTab:	LineHiTab
 
 
+            

@@ -3,9 +3,9 @@
 ;
 ; Original C code by Marc 'BlackJack' Rintsch, 25.03.2001
 ;
-; int __fastcall__ cbm_write(unsigned char lfn, void* buffer, unsigned int size) 
+; int __fastcall__ cbm_write(unsigned char lfn, void* buffer, unsigned int size)
 ; {
-; 
+;
 ;     static unsigned int byteswritten;
 ;
 ;     /* if we can't change to the outputchannel #lfn then return an error */
@@ -31,9 +31,11 @@
         .include        "cbm.inc"
 
        	.export	       	_cbm_write
+        .import         CKOUT, READST, BSOUT, CLRCH
         .importzp       ptr1, ptr2, ptr3
 	.import	      	popax, popa
         .import         __oserror
+                                                   
 
 _cbm_write:
         sta     ptr3

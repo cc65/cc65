@@ -20,8 +20,9 @@ OBJS =	_scrsize.o	\
 	conio.o		\
 	cputc.o		\
 	kbhit.o		\
+        kernal.o        \
         randomize.o     \
-	readjoy.o      	
+	readjoy.o
 
 all:	$(OBJS)
 

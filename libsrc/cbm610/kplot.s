@@ -4,13 +4,13 @@
 ; PLOT routine for the 610.
 ;
 
-      	.export		k_plot
+      	.export		PLOT
 	.importzp	crtc
 
       	.include      	"cbm610.inc"
 
 
-.proc	k_plot
+.proc	PLOT
 
 	bcc	set
 	ldx	CURS_Y

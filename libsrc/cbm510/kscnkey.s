@@ -1,16 +1,16 @@
-;
+;             
 ; Ullrich von Bassewitz, 13.09.2001
 ;
 ; Keyboard polling stuff for the 510.
 ;
 
- 	.export	  	k_scnkey
+ 	.export	  	SCNKEY
 	.importzp     	tpi2, ktab1, ktab2, ktab3, ktab4
 
 	.include      	"cbm510.inc"
 
 
-.proc	k_scnkey
+.proc	SCNKEY
 
         lda     #$FF
         sta     ModKey
@@ -50,7 +50,7 @@ L4:	lsr     a
         sec
 	ldy	#tpiPortB
   	lda	(tpi2),y
-  	rol	a
+  	rol   	a
   	sta	(tpi2),y
        	ldy	#tpiPortA
   	lda	(tpi2),y
@@ -102,7 +102,7 @@ End:	lda	#$7F
 	sta	(tpi2),y
 	ldy	#tpiPortB
 	lda	#$FF
-	sta	(tpi2),y
+	sta   	(tpi2),y
         rts
 
 Repeat:	dec     RepeatDelay
@@ -130,7 +130,7 @@ PutKey:	sta     KeyBuf,x
 	ldy	#tpiPortC
 L1:	lda	(tpi2),y
 	sta	KeySave
-	lda	(tpi2),y
+	lda   	(tpi2),y
 	cmp	KeySave
 	bne	L1
 	rts

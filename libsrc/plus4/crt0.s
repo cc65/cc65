@@ -7,10 +7,11 @@
 	.export		_exit
 	.import		initlib, donelib
 	.import	     	push0, _main, zerobss
+        .import         MEMTOP, RESTOR, BSOUT, CLRCH
 
         .include        "zeropage.inc"
 	.include	"plus4.inc"
-	.include	"../cbm/cbm.inc"
+
 
 ; ------------------------------------------------------------------------
 ; BASIC header with a SYS call

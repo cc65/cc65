@@ -4,11 +4,11 @@
 ; unsigned char __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
 ;
 
-        .include        "cbm.inc"
-
         .export         _cbm_k_save
+        .import         SAVE
         .import         popax
         .importzp       ptr1, tmp1
+                            
 
 _cbm_k_save:
         sta     tmp1            ; store end address

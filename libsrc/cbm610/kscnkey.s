@@ -4,13 +4,13 @@
 ; Keyboard polling stuff for the 610.
 ;
 
- 	.export	  	k_scnkey
+ 	.export	  	SCNKEY
 	.importzp     	tpi2, ktab1, ktab2, ktab3, ktab4
 
 	.include      	"cbm610.inc"
 
 
-.proc	k_scnkey
+.proc	SCNKEY
 
         lda     #$FF
         sta     ModKey

@@ -4,9 +4,9 @@
 ; void __fastcall__ cbm_untlk (void);
 ;
 
-	.include    	"cbm.inc"
-
        	.export	       	_cbm_untlk
+        .import         UNTLK
+
 
 _cbm_untlk = UNTLK
 

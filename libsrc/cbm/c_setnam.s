@@ -4,10 +4,10 @@
 ; void __fastcall__ cbm_k_setnam (const char* Name);
 ;
 
-       	.include     	"cbm.inc"
-
        	.export	       	_cbm_k_setnam
+        .import         SETNAM
 	.importzp	ptr1
+                              
 
 _cbm_k_setnam:
 	sta	ptr1		; Store pointer to file name

@@ -9,9 +9,10 @@
 	.export		newline, plot
 	.import		popa, _gotoxy
 	.import		xsize, revers
+        .import         PLOT
 
 	.include	"plus4.inc"
-	.include	"../cbm/cbm.inc"
+
 
 _cputcxy:
 	pha	    		; Save C
@@ -28,7 +29,7 @@ _cputc: cmp    	#$0A  		; CR?
        	beq    	plot		; Recalculate pointers
 
 L1: 	cmp	#$0D  	  	; LF?
-       	beq	newline		; Recalculate pointers
+       	beq	newline	    	; Recalculate pointers
 
 ; Printable char of some sort
 
@@ -88,7 +89,7 @@ L11:	ora	#$40
 
 plot:	ldy	CURS_X
 	ldx	CURS_Y
-	clc
+	clc                 
 	jmp	PLOT		; Set the new cursor
 
 

@@ -5,11 +5,11 @@
 ; C programs will not use it.
 ;
 
-      	.export	    	k_udtim
+      	.export	    	UDTIM
 	.importzp	time
 
 
-.proc	k_udtim
+.proc	UDTIM
 
 	inc	time
 	bne	L9
@@ -23,3 +23,4 @@ L9:	rts
 .endproc
 
 
+             

@@ -4,13 +4,13 @@
 ; unsigned char __fastcall__ cbm_acptr (void);
 ;
 
-	.include    	"cbm.inc"
-
        	.export	       	_cbm_acptr
+        .import         ACPTR
+
 
 _cbm_acptr:
 	jsr	ACPTR
 	ldx	#0
 	rts
 
-		     
+

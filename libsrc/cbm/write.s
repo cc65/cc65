@@ -7,6 +7,7 @@
         .export         _write
         .constructor    initstdout
 
+        .import         SETLFS, OPEN, CKOUT, BSOUT, CLRCH
         .import         rwcommon
         .import         __errno, __oserror
         .importzp       sp, ptr1, ptr2, ptr3

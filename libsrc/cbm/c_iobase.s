@@ -4,9 +4,8 @@
 ; unsigned __fastcall__ cbm_iobase (void);
 ;
 
-       	.include     	"cbm.inc"
-
        	.export	       	_cbm_iobase
+        .import         IOBASE
 
 _cbm_iobase:
 	jsr	IOBASE

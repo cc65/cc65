@@ -6,6 +6,7 @@
 
         .export         _close
 
+        .import         CLOSE
         .import         readdiskerror, closecmdchannel
         .import         __errno, __oserror
         .importzp       tmp2

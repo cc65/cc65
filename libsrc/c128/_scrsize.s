@@ -5,9 +5,9 @@
 ;
 
 	.export		xsize, ysize
+        .import         SCREEN
 	.constructor	initscrsize
 
-	.include	"../cbm/cbm.inc"
 
 .code
 
@@ -26,4 +26,4 @@ ysize:	.res	1
 
 
 
-		 
+

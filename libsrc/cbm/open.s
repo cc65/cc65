@@ -6,6 +6,7 @@
 
         .export         _open
 
+        .import         SETLFS, OPEN, CLOSE
         .import         addysp, popax
         .import         scratch, fnparse, fncomplete, fnset
         .import         opencmdchannel, closecmdchannel, readdiskerror
@@ -15,7 +16,6 @@
 
         .include        "errno.inc"
         .include        "fcntl.inc"
-        .include        "cbm.inc"
         .include        "filedes.inc"
 
 

@@ -10,6 +10,8 @@
         .export         readdiskerror
         .export         writediskcmd
 
+        .import         SETLFS, SETNAM, OPEN, CLOSE, BSOUT, BASIN
+        .import         CHKIN, CKOUT, CLRCH
         .importzp       tmp1, ptr1
 
         .include        "cbm.inc"
@@ -203,7 +205,7 @@ writediskcmd:
         rts
 
 
-           
+
 ;--------------------------------------------------------------------------
 ; Data
 

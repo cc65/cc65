@@ -8,11 +8,12 @@
 	.import		initlib, donelib
        	.import	       	zerobss, push0
 	.import	     	_main
+        .import         RESTOR, BSOUT, CLRCH
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 
         .include        "zeropage.inc"
 	.include     	"c64.inc"
-	.include     	"../cbm/cbm.inc"
+
 
 .code
 

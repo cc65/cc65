@@ -20,6 +20,7 @@ OBJS =	_scrsize.o	\
        	color.o	       	\
      	cputc.o	       	\
      	kbhit.o	       	\
+        kernal.o        \
 	mouse.o		\
         randomize.o     \
 	readjoy.o	\

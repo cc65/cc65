@@ -7,11 +7,12 @@
 
     	.export	       	_cputcxy, _cputc, cputdirect, putchar
 	.export		newline, plot
+
+        .import         PLOT
 	.import		popa, _gotoxy
 	.import		xsize, revers
 
 	.include	"cbm510.inc"
-	.include	"../cbm/cbm.inc"
 
 ; ------------------------------------------------------------------------
 ;

@@ -23,6 +23,7 @@ OBJS = 	_scrsize.o     	 	\
        	conio.o	       	 	\
        	cputc.o	       	 	\
        	kbhit.o	       	 	\
+        kernal.o                \
        	mouse.o	       	 	\
         randomize.o             \
        	readjoy.o      	 	\

@@ -9,9 +9,10 @@
 	.export		newline, plot
 	.import		popa, _gotoxy
 	.import		xsize, revers
+        .import         PLOT
 
 	.include	"c128.inc"
-	.include	"../cbm/cbm.inc"
+
 
 _cputcxy:
 	pha	    		; Save C

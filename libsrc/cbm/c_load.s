@@ -4,9 +4,8 @@
 ; unsigned int __fastcall__ cbm_k_load (unsigned char flag, unsigned addr);
 ;
 
-	.include    	"cbm.inc"
-
        	.export	       	_cbm_k_load
+        .import         LOAD
         .import         __oserror
 	.import		popa
 	.importzp	ptr1
@@ -28,4 +27,4 @@ _cbm_k_load:
         tax
         pla
         rts
-	
+

@@ -9,12 +9,13 @@
     	.import	     	condes, initlib, donelib
     	.import	     	initconio, doneconio, zerobss
     	.import		push0, _main
+        .import         RESTOR, BSOUT, CLRCH
 	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
     	.import	 	__RAM_START__, __RAM_SIZE__
 
         .include        "zeropage.inc"
     	.include 	"c128.inc"
-	.include 	"../cbm/cbm.inc"
+
 
 ; ------------------------------------------------------------------------
 ; Constants

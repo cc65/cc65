@@ -7,11 +7,11 @@
         .export         fnparse, fnset, fncomplete
         .export         fnunit, fnlen, fncmd, fnbuf
 
+        .import         SETNAM
         .import         __curunit, __filetype
         .importzp       ptr1
 
         .include        "ctype.inc"
-        .include        "cbm.inc"
 
 
 ;--------------------------------------------------------------------------

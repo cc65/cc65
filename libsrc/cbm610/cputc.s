@@ -8,12 +8,14 @@
     	.export	     	_cputcxy, _cputc, cputdirect, putchar
 	.export	     	newline, plot
 	.exportzp	CURS_X, CURS_Y
+
+        .import         PLOT
 	.import		_gotoxy
 	.import	     	popa
 	.import	     	xsize, revers
 
 	.include     	"cbm610.inc"
-	.include     	"../cbm/cbm.inc"
+
 
 _cputcxy:
 	pha	     		; Save C

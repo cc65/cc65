@@ -20,7 +20,12 @@ OBJS =	_scrsize.o	\
 	cputc.o		\
 	crt0.o		\
 	kbhit.o         \
-        randomize.o     
+        kernal.o        \
+        krdtim.o        \
+        kreadst.o       \
+        ksetlfs.o       \
+        ksetnam.o       \
+        randomize.o
 
 all:	$(OBJS)
 

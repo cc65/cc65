@@ -8,6 +8,7 @@
 	.import		initlib, donelib
        	.import	       	zerobss, push0
 	.import		_main
+        .import         CLRCH, BSOUT
 
         .include        "zeropage.inc"
 	.include	"pet.inc"

@@ -4,8 +4,8 @@
 ; unsigned char __fastcall__ cbm_k_readst (void);
 ;
 
-	.include    	"cbm.inc"
-
        	.export	       	_cbm_k_readst
+        .import         READST
+
 
 _cbm_k_readst = READST

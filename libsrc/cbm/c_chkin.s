@@ -4,9 +4,8 @@
 ; unsigned char __fastcall__ cbm_k_chkin (unsigned char FN);
 ;
 
-       	.include     	"cbm.inc"
-
        	.export	       	_cbm_k_chkin
+        .import         CHKIN
 
 _cbm_k_chkin:
 	tax

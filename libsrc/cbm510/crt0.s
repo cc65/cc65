@@ -13,7 +13,7 @@
 	.import	   	__CHARRAM_START__, __CHARRAM_SIZE__, __VIDRAM_START__
 	.import	       	__BSS_RUN__, __BSS_SIZE__
      	.import		irq, nmi
-       	.import	       	k_irq, k_nmi, k_plot, k_udtim, k_scnkey
+       	.import	       	k_irq, k_nmi, PLOT, UDTIM, SCNKEY
 
      	.include     	"zeropage.inc"
      	.include    	"cbm510.inc"
@@ -319,7 +319,7 @@ vectable:
       	jmp	$0000	      	; TKSA
       	jmp	$0000	      	; MEMTOP
       	jmp	$0000	      	; MEMBOT
-      	jmp	k_scnkey	; SCNKEY
+       	jmp    	SCNKEY
       	jmp	$0000	      	; SETTMO
       	jmp	$0000	      	; ACPTR
       	jmp	$0000	      	; CIOUT
@@ -328,26 +328,26 @@ vectable:
       	jmp	$0000	      	; LISTEN
       	jmp	$0000	      	; TALK
    	jmp	$0000	      	; READST
-       	jmp    	k_setlfs	; SETLFS
-       	jmp    	k_setnam 	; SETNAM
+       	jmp    	SETLFS
+       	jmp    	SETNAM
      	jmp	$0000	      	; OPEN
 	jmp	$0000 	      	; CLOSE
-	jmp	$0000	      	; CHKIN
+     	jmp	$0000	      	; CHKIN
 	jmp	$0000	      	; CKOUT
 	jmp	$0000	      	; CLRCH
 	jmp	$0000	      	; BASIN
       	jmp	$0000	      	; BSOUT
 	jmp	$0000	      	; LOAD
 	jmp	$0000	      	; SAVE
-	jmp	k_settim	; SETTIM
-       	jmp    	k_rdtim		; RDTIM
+	jmp	SETTIM
+       	jmp    	RDTIM
 	jmp	$0000	      	; STOP
    	jmp	$0000	      	; GETIN
 	jmp	$0000	      	; CLALL
-	jmp	k_udtim		; UDTIM
-   	jmp	k_screen  	; SCREEN
-	jmp	k_plot		; PLOT
-	jmp	k_iobase	; IOBASE
+	jmp	UDTIM
+   	jmp	SCREEN
+	jmp	PLOT
+	jmp	IOBASE
    	sta	ExecReg
 	rts
 	.byte  	$01 	      	; Filler
@@ -437,23 +437,30 @@ reset_size = * - reset
 ; ------------------------------------------------------------------------
 ; Code for a few simpler kernal calls goes here
 
-k_iobase:
-	ldx	cia2
+.export IOBASE
+.proc   IOBASE
+         ldx	cia2
 	ldy	cia2+1
 	rts
+.endproc
 
-k_screen:
+.export SCREEN
+.proc   SCREEN
        	ldx    	#40	   	; Columns
 	ldy	#25	   	; Lines
 	rts
+.endproc
 
-k_setlfs:
+.export SETLFS
+.proc   SETLFS
         sta     LogicalAdr
         stx     FirstAdr
         sty     SecondAdr
         rts
+.endproc
 
-k_setnam:
+.export SETNAM
+.proc   SETNAM
         sta     FileNameLen
         lda     $00,x
         sta     FileNameAdrLo
@@ -462,22 +469,27 @@ k_setnam:
         lda     $02,x
         sta     FileNameAdrSeg
         rts
+.endproc
 
-k_rdtim:
-	sei
-	lda	time+0
-   	ldx	time+1
-	ldy	time+2
-	cli
-	rts
+.export RDTIM
+.proc   RDTIM
+     	sei
+     	lda   	time+0
+     	ldx   	time+1
+     	ldy   	time+2
+     	cli
+     	rts
+.endproc
 
-k_settim:
-	sei
-	sta	time+0
-   	stx	time+1
-	sty	time+2
-	cli
-	rts
+.export SETTIM
+.proc   SETTIM
+     	sei
+     	sta	time+0
+     	stx	time+1
+     	sty	time+2
+     	cli
+     	rts
+.endproc
 
 ; -------------------------------------------------------------------------
 ; Data area - switch back to relocatable mode

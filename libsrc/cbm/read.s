@@ -6,7 +6,8 @@
 
         .export         _read
         .constructor    initstdin
-           
+
+        .import         SETLFS, OPEN, CHKIN, BASIN, CLRCH, READST
         .import         rwcommon
         .import         popax
         .import         __errno, __oserror
@@ -135,7 +136,7 @@ invalidfd:
 notopen:
         lda     #3              ; File not open
         bne     error
-                    
+
 ; Error entry, status not ok
 
 error5: lda     #5              ; Device not present

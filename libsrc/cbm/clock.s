@@ -5,9 +5,9 @@
 ;
 
       	.export	       	_clock
+        .import         RDTIM
 	.importzp	sreg
 
-	.include	"cbm.inc"
 
 
 .proc	_clock
@@ -16,7 +16,7 @@
        	sta    	sreg+1
 	jsr	RDTIM
 	sty	sreg
-       	rts    	       	       	
+       	rts
 
 .endproc
 

@@ -4,9 +4,9 @@
 ; void __fastcall__ cbm_unlsn (void);
 ;
 
-	.include    	"cbm.inc"
-
        	.export	       	_cbm_unlsn
+        .import         UNLSN
+
 
 _cbm_unlsn = UNLSN
 

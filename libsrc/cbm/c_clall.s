@@ -4,9 +4,9 @@
 ; void __fastcall__ cbm_clall (void);
 ;
 
-       	.include     	"cbm.inc"
-
        	.export	       	_cbm_clall
+        .import         CLALL
+
 
 _cbm_clall = CLALL
 

@@ -4,9 +4,10 @@
 ; unsigned char wherex (void);
 ; unsigned char wherey (void);
 
+
 	.export		_wherex, _wherey
-	
-	.include	"cbm.inc"
+        .import         PLOT
+
 
 _wherex:
 	sec

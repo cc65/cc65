@@ -1,4 +1,4 @@
-;             
+;
 ; Ullrich von Bassewitz, 13.09.2001
 ;
 ; Keyboard polling stuff for the 510.
@@ -17,9 +17,9 @@
         sta     NorKey
         lda	#$00
 	sta	KbdScanBuf
-	ldy	#tpiPortB
+	ldy	#TPI::PRB
 	sta	(tpi2),y
-	ldy	#tpiPortA
+	ldy	#TPI::PRA
 	sta	(tpi2),y
         jsr     Poll
         and     #$3F
@@ -28,10 +28,10 @@
         jmp     NoKey
 
 L1:	lda     #$FF
-	ldy	#tpiPortA
+	ldy	#TPI::PRA
 	sta	(tpi2),y
         asl     a
-	ldy	#tpiPortB
+	ldy	#TPI::PRB
 	sta	(tpi2),y
         jsr     Poll
         pha
@@ -48,11 +48,11 @@ L4:	lsr     a
         dex
         bpl     L4
         sec
-	ldy	#tpiPortB
+	ldy	TPI::PRB
   	lda	(tpi2),y
   	rol   	a
   	sta	(tpi2),y
-       	ldy	#tpiPortA
+       	ldy	#TPI::PRA
   	lda	(tpi2),y
   	rol	a
   	sta	(tpi2),y
@@ -98,9 +98,9 @@ L8:	tax
 NoKey:	ldy     #$FF
 Done:  	sty     LastIndex
 End:	lda	#$7F
-	ldy	#tpiPortA
+	ldy	#TPI::PRA
 	sta	(tpi2),y
-	ldy	#tpiPortB
+	ldy	#TPI::PRB
 	lda	#$FF
 	sta   	(tpi2),y
         rts
@@ -127,7 +127,7 @@ PutKey:	sta     KeyBuf,x
 ; Poll the keyboard port until it's stable
 
 .proc	Poll
-	ldy	#tpiPortC
+	ldy	TPI::PRC
 L1:	lda	(tpi2),y
 	sta	KeySave
 	lda   	(tpi2),y

@@ -25,6 +25,4 @@ ktab2:	       	.res    2
 ktab3:		.res    2
 ktab4:		.res    2
 time:		.res    4
-RecvBuf:	.res    2               ; RS232 receive buffer
-SendBuf:	.res    2               ; RS232 transmit buffer
 

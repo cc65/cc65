@@ -244,7 +244,7 @@ ccopy2:	lda	__VIDRAM_START__,y
 ; CA (STATVID)   = 0
 ; CB (VICDOTSEL) = 0
 
-       	ldy	#tpiCtrlReg
+       	ldy	#TPI::CR
        	lda	(tpi1),y
        	sta	vidsave+0
        	and	#%00001111
@@ -254,7 +254,7 @@ ccopy2:	lda	__VIDRAM_START__,y
 ; Set bit 14/15 of the VIC address range to the high bits of __VIDRAM_START__
 ; PC6/PC7 (VICBANKSEL 0/1) = 11
 
-       	ldy    	#tpiPortC
+       	ldy    	#TPI::PRC
        	lda	(tpi2),y
        	sta	vidsave+1
        	and	#$3F
@@ -388,11 +388,11 @@ _exit:	jsr	donelib		; Run module destructors
 
 ; Switch back the video to the system bank
 
-  	ldy	#tpiCtrlReg
+  	ldy	#TPI::CR
 	lda	vidsave+0
   	sta	(tpi1),y
 
-	ldy    	#tpiPortC
+	ldy    	#TPI::PRC
    	lda	vidsave+1
    	sta	(tpi2),y
 

@@ -7,5 +7,5 @@
 ; ------------------------------------------------------------------------
 
        	.globalzp       vic, sid, cia1, cia2, acia, tpi1, tpi2, ktab1
-	.globalzp       ktab2, ktab3, ktab4, time, RecvBuf, SendBuf
+	.globalzp       ktab2, ktab3, ktab4, time
 

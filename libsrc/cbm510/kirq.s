@@ -63,7 +63,7 @@ k_irq:
         cld
 	lda	#$0F
 	sta	IndReg
-	ldy	#tpiActIntReg
+	ldy	#TPI::AIR
 	lda	(tpi1),y		; Interrupt Register 6525
 	beq	noirq
 
@@ -96,7 +96,7 @@ irq1:	cmp	#%00010000    		; interrupt from uart?
 ; -------------------------------------------------------------------------
 ; Done
 
-irqend:	ldy	#tpiActIntReg
+irqend:	ldy	#TPI::AIR
        	sta	(tpi1),y		; Clear interrupt
 
 noirq:	pla

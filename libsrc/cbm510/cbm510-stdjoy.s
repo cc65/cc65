@@ -95,13 +95,13 @@ READ:   ldx     #$0F            ; Switch to the system bank
 
 ; Get the direction bits
 
-	ldy	#CIA_PRB
+	ldy	#CIA::PRB
 	lda	(cia2),y    	; Read joystick inputs
 	sta	tmp1
 
 ; Get the fire bits
 
-        ldy     #CIA_PRA
+        ldy     #CIA::PRA
 	lda	(cia2),y
 
 ; Make the result value

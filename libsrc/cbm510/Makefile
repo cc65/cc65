@@ -20,6 +20,9 @@
 %.joy:	%.o ../runtime/zeropage.o extzp.o
 	@$(LD) -t module -o $@ $^
 
+%.ser:	%.o ../runtime/zeropage.o extzp.o
+	@$(LD) -t module -o $@ $^
+
 %.tgi:	%.o ../runtime/zeropage.o extzp.o
 	@$(LD) -t module -o $@ $^
 
@@ -54,7 +57,6 @@ OBJS =	_scrsize.o	\
 	pokesys.o	\
         randomize.o     \
 	revers.o	\
-	rs232.o		\
         sysuname.o      \
 	tgi_mode_table.o
 
@@ -65,6 +67,8 @@ EMDS =	cbm510-ram.emd
 
 JOYS = cbm510-stdjoy.joy
 
+SERS = cbm510-stdser.ser
+
 TGIS =
 
 #--------------------------------------------------------------------------
@@ -72,14 +76,14 @@ TGIS =
 
 .PHONY:	all clean zap
 
-all:	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
+all: 	$(OBJS) $(EMDS) $(JOYS) $(SERS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
 zap:	clean
-	@$(RM) $(EMDS) $(JOYS) $(TGIS)
+	@$(RM) $(EMDS) $(JOYS) $(SERS) $(TGIS)
 

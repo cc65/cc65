@@ -773,7 +773,7 @@ HPOSM3	= $D007		;missile 3 horizontal position
 
 SIZEP0	= $D008		;player 0 size
 SIZEP1	= $D009		;player 1 size
-SIZEF2	= $D00A		;player 2 size
+SIZEP2	= $D00A		;player 2 size
 SIZEP3	= $D00B		;player 3 size
 
 SIZEM	= $D00C		;missile sizes

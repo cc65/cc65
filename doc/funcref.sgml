@@ -45,6 +45,26 @@ function.
 
 <sect>Functions by header file<p>
 
+<sect1><tt/6502.h/<label id="6502.h"><p>
+
+<itemize>
+<item><ref id="BRK" name="BRK">
+<item><ref id="CLI" name="CLI">
+<item><ref id="SEI" name="SEI">
+<!-- <item><ref id="_sys" name="_sys"> -->
+<!-- <item><ref id="getcpu" name="getcpu"> -->
+<!-- <item><ref id="reset_brk" name="reset_brk"> -->
+<!-- <item><ref id="set_brk" name="set_brk"> -->
+</itemize>
+
+
+<sect1><tt/assert.h/<label id="assert.h"><p>
+
+<itemize>
+<item><ref id="assert" name="assert">
+</itemize>
+
+
 <sect1><tt/conio.h/<label id="conio.h"><p>
 
 <itemize>
@@ -53,26 +73,27 @@ function.
 <item><ref id="cclear" name="cclear">
 <item><ref id="cclearxy" name="cclearxy">
 <item><ref id="cgetc" name="cgetc">
-<!-- <item><ref id="chline" name="chline"> -->
-<!-- <item><ref id="chlinexy" name="chlinexy"> -->
+<item><ref id="chline" name="chline">
+<item><ref id="chlinexy" name="chlinexy">
 <item><ref id="clrscr" name="clrscr">
 <!-- <item><ref id="cprintf" name="cprintf"> -->
 <!-- <item><ref id="cputc" name="cputc"> -->
 <!-- <item><ref id="cputcxy" name="cputcxy"> -->
 <!-- <item><ref id="cputs" name="cputs"> -->
 <!-- <item><ref id="cputsxy" name="cputsxy"> -->
-<!-- <item><ref id="cursor" name="cursor"> -->
-<!-- <item><ref id="cvline" name="cvline"> -->
-<!-- <item><ref id="cvlinexy" name="cvlinexy"> -->
-<!-- <item><ref id="gotox" name="gotox"> -->
-<!-- <item><ref id="gotoxy" name="gotoxy"> -->
-<!-- <item><ref id="gotoy" name="gotoy"> -->
+<item><ref id="cursor" name="cursor">
+<item><ref id="cvline" name="cvline">
+<item><ref id="cvlinexy" name="cvlinexy">
+<item><ref id="gotox" name="gotox">
+<item><ref id="gotoxy" name="gotoxy">
+<item><ref id="gotoy" name="gotoy">
 <item><ref id="kbhit" name="kbhit">
-<!-- <item><ref id="revers" name="revers"> -->
-<!-- <item><ref id="screensize" name="screensize"> -->
+<item><ref id="revers" name="revers">
+<item><ref id="screensize" name="screensize">
 <item><ref id="textcolor" name="textcolor">
 <!-- <item><ref id="vcprintf" name="vcprintf"> -->
-<!-- <item><ref id="wherex" name="wherey"> -->
+<item><ref id="wherex" name="wherex">
+<item><ref id="wherey" name="wherey">
 </itemize>
 
 
@@ -97,9 +118,141 @@ function.
 </itemize>
 
 
+<sect1><tt/stdlib.h/<label id="stdlib.h"><p>
+
+<itemize>
+<item><ref id="abort" name="abort">
+<item><ref id="atexit" name="atexit">
+<item><ref id="exit" name="exit">
+</itemize>
+
+
 
 
 <sect>Alphabetical function reference<p>
+
+<sect1>BRK<label id="BRK"><p>
+
+<quote>
+<descrip>
+<tag/Function/Insert a 6502 BRK instrunction into the code.
+<tag/Header/<tt/<ref id="6502.h" name="6502.h">/
+<tag/Declaration/<tt/void BRK (void);/
+<tag/Description/The function will insert a 6502 BRK instruction into the code
+which may be used to trigger a debugger.
+<tag/Limits/The function is actually a macro. The inserted instruction may lead
+to unexpected results if no debugger is present.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="CLI" name="CLI">,
+<ref id="SEI" name="SEI">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>CLI<label id="CLI"><p>
+
+<quote>
+<descrip>
+<tag/Function/Insert a 6502 CLI instrunction into the code.
+<tag/Header/<tt/<ref id="6502.h" name="6502.h">/
+<tag/Declaration/<tt/void CLI (void);/
+<tag/Description/The function will insert a 6502 CLI instruction into the code,
+so interrupts are disabled. Note that non maskable interrupts cannot be
+disabled.
+<tag/Limits/The function is actually a macro. Disabling interrupts may lead to
+unexpected results.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="BRK" name="BRK">,
+<ref id="SEI" name="SEI">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>SEI<label id="SEI"><p>
+
+<quote>
+<descrip>
+<tag/Function/Insert a 6502 SEI instrunction into the code.
+<tag/Header/<tt/<ref id="6502.h" name="6502.h">/
+<tag/Declaration/<tt/void SEI (void);/
+<tag/Description/The function will insert a 6502 SEI instruction into the code,
+so interrupts are enabled. Enabling interrupts has no effects if they are
+already enabled (the default).
+<tag/Limits/The function is actually a macro.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="BRK" name="BRK">,
+<ref id="CLI" name="CLI">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>abort<label id="abort"><p>
+
+<quote>
+<descrip>
+<tag/Function/Terminates a program abnormally.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void abort (void);/
+<tag/Description/<tt/abort/ writes a termination message on stderr, then
+terminates the program with an exit code of 3.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="assert" name="assert">,
+<ref id="exit" name="exit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>assert<label id="assert"><p>
+
+<quote>
+<descrip>
+<tag/Function/Test a condition and possibly abort.
+<tag/Header/<tt/<ref id="assert.h" name="assert.h">/
+<tag/Declaration/<tt/void assert (int cond);/
+<tag/Description/<tt/assert/ is a macro that expands to a <tt/id/
+statement. If the condition evaluates t zero (false), assert prints a message
+on stderr and aborts the program.
+<tag/Limits/The function is actually a macro.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="abort" name="abort">,
+<ref id="exit" name="exit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>atexit<label id="atexit"><p>
+
+<quote>
+<descrip>
+<tag/Function/Register an exit function.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/int __fastcall__ atexit (void (*exitfunc) (void));/
+<tag/Description/<tt/atexit/ registers the function pointed to by
+<tt/exitfunc/ as an exit function. Exit functions are called when the program
+terminates, they are called in LIFO order (the last function registered is
+called first). <tt/atexit/ returns zero on success and a nonzero value on 
+failure.
+<tag/Limits/A maximum of 5 exit functions can be registered. There is no way
+to unregister an exit function. The function is only available as fastcall
+function, so it may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="abort" name="abort">,
+<ref id="exit" name="exit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
 
 <sect1>bgcolor<label id="bgcolor"><p>
 
@@ -209,6 +362,52 @@ key from this buffer and wait only if the buffer is empty.
 </quote>
 
 
+<sect1>chline<label id="chline"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output a horizontal line in text mode.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ chline (unsigned char length);/
+<tag/Description/The function outputs a horizontal line with the given length
+starting at the current cursor position.
+<tag/Limits/The character used to draw the horizontal line is system dependent.
+If available, a line drawing character is used. Drawing a line that is partially
+off screen leads to undefined behaviour. The function is only available
+as fastcall function, so it may only be used in presence of a prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="chlinexy" name="chlinexy">,
+<ref id="cvline" name="cvline">,
+<ref id="cvlinexy" name="cvlinexy">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>chlinexy<label id="chlinexy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output a horizontal line at a given position in text mode.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ chlinexy (unsigned char x, unsigned char y, unsigned char length);/
+<tag/Description/The function outputs a horizontal line with the given length
+starting at a given position.
+<tag/Limits/The character used to draw the horizontal line is system dependent.
+If available, a line drawing character is used. Drawing a line that is partially
+off screen leads to undefined behaviour. The function is only available
+as fastcall function, so it may only be used in presence of a prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="chline" name="chline">,
+<ref id="cvline" name="cvline">,
+<ref id="cvlinexy" name="cvlinexy">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
 <sect1>clrscr<label id="clrscr"><p>
 
 <quote>
@@ -237,12 +436,155 @@ the upper left corner.
 <tag/Description/If the argument to the function is non zero, a blinking cursor
 will be enabled when the <tt/cgetc/ function waits for input from the keyboard.
 If the argument is zero, <tt/cgetc/ will wait without a blinking cursor.
-<tag/Limits/The function is only available as fastcall function, so it may only 
+<tag/Limits/The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="cgetc" name="cgetc">,
 <ref id="kbhit" name="kbhit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>cvline<label id="cvline"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output a vertical line in text mode.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ cvline (unsigned char length);/
+<tag/Description/The function outputs a vertical line with the given length
+starting at the current cursor position.
+<tag/Limits/The character used to draw the vertical line is system dependent.
+If available, a line drawing character is used. Drawing a line that is partially
+off screen leads to undefined behaviour. The function is only available
+as fastcall function, so it may only be used in presence of a prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="chline" name="chline">,
+<ref id="chlinexy" name="chlinexy">,
+<ref id="cvlinexy" name="cvlinexy">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>cvlinexy<label id="cvlinexy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output a vertical line at a given position in text mode.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ cvlinexy (unsigned char x, unsigned char y, unsigned char length);/
+<tag/Description/The function outputs a vertical line with the given length
+starting at a given position.
+<tag/Limits/The character used to draw the vertical line is system dependent.
+If available, a line drawing character is used. Drawing a line that is partially
+off screen leads to undefined behaviour. The function is only available
+as fastcall function, so it may only be used in presence of a prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="chline" name="chline">,
+<ref id="chlinexy" name="chlinexy">,
+<ref id="cvline" name="cvline">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>exit<label id="exit"><p>
+
+<quote>
+<descrip>
+<tag/Function/Terminate the program.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void __fastcall__ exit (int status);/
+<tag/Description/<tt/exit/ terminates the program. The argument specifies the
+return code of the program. Before termination, all files are closed, buffered
+output is written and any functions registered with <tt/<ref id="atexit"
+name="atexit">/ are called. Common values for status are <tt/EXIT_SUCCESS/ and
+<tt/EXIT_FAILURE/ which are also defined in <tt/<ref id="stdlib.h"
+name="stdlib.h">/.
+<tag/Limits/The function is only available as fastcall function, so it may only
+be used in presence of a prototype. It depends on the host machine if the
+program return code can be evaluated or is ignored.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="abort" name="abort">,
+<ref id="exit" name="exit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>gotox<label id="gotox"><p>
+
+<quote>
+<descrip>
+<tag/Function/Move the text mode cursor to a new X position.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ gotox (unsigned char x);/
+<tag/Description/The function moves the text mode cursor to the specified X
+position while leaving the Y position untouched. The leftmost position on the
+screen has the coordinate 0.
+<tag/Limits/The function is only available as fastcall function, so it may
+only be used in presence of a prototype. Invalid values for the X position
+(out of screen coordinates) may lead to undefined behaviour.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="gotoy" name="gotoy">,
+<ref id="gotoxy" name="gotoxy">,
+<ref id="wherex" name="wherex">,
+<ref id="wherey" name="wherey">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>gotoxy<label id="gotoxy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Move the text mode cursor to a new position.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ gotoxy (unsigned char x, unsigned char y);/
+<tag/Description/The function moves the text mode cursor to the specified
+position. The leftmost position on the screen has the X coordinate 0, the
+topmost line has the Y coordinate 0.
+<tag/Limits/The function is only available as fastcall function, so it may
+only be used in presence of a prototype. Invalid values for any of both
+coordinates (out of screen positions) may lead to undefined behaviour.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="gotox" name="gotox">,
+<ref id="gotoy" name="gotoy">,
+<ref id="wherex" name="wherex">,
+<ref id="wherey" name="wherey">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>gotoy<label id="gotoy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Move the text mode cursor to a new Y position.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ gotoy (unsigned char x);/
+<tag/Description/The function moves the text mode cursor to the specified Y
+position while leaving the X position untouched. The uppermost position on the
+screen has the coordinate 0.
+<tag/Limits/The function is only available as fastcall function, so it may
+only be used in presence of a prototype. Invalid values for the Y position
+(out of screen coordinates) may lead to undefined behaviour.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="gotox" name="gotox">,
+<ref id="gotoxy" name="gotoxy">,
+<ref id="wherex" name="wherex">,
+<ref id="wherey" name="wherey">
 <tag/Example/Actual code using the function.
 </descrip>
 </quote>
@@ -725,6 +1067,49 @@ do), the function is rather useless.
 </quote>
 
 
+<sect1>revers<label id="revers"><p>
+
+<quote>
+<descrip>
+<tag/Function/Control revers character display.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ revers (unsigned char onoff);/
+<tag/Description/If the argument is non zero, the function enables reverse
+character display. If the argument is zero, reverse character display is
+switched off. The old value of the setting is returned.
+<tag/Limits/The function may not be supported by the hardware, in which case
+the call is ignored. The function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="textcolor" name="textcolor">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>screensize<label id="screensize"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the dimensions of the text mode screen.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ screensize (unsigned char* x, unsigned char* y);/
+<tag/Description/The function returns the dimensions of the text mode screen.
+<tag/Limits/The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="gotox" name="gotox">,
+<ref id="gotoxy" name="gotoxy">,
+<ref id="gotoy" name="gotoy">,
+<ref id="wherex" name="wherex">,
+<ref id="wherey" name="wherey">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
 <sect1>textcolor<label id="textcolor"><p>
 
 <quote>
@@ -785,6 +1170,46 @@ only be used in presence of a prototype.
 <ref id="islower" name="islower">,
 <ref id="isupper" name="isupper">,
 <ref id="tolower" name="tolower">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>wherex<label id="wherex"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the current X position of the text mode cursor.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char wherex (void);/
+<tag/Description/The function returns the current X position of the text mode
+cursor. Zero is returned for the leftmost screen position.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="gotox" name="gotox">,
+<ref id="gotoy" name="gotoy">,
+<ref id="gotoxy" name="gotoxy">,
+<ref id="wherey" name="wherey">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>wherey<label id="wherey"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the current Y position of the text mode cursor.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char wherey (void);/
+<tag/Description/The function returns the current Y position of the text mode
+cursor. Zero is returned for the uppermost screen position.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="gotox" name="gotox">,
+<ref id="gotoy" name="gotoy">,
+<ref id="gotoxy" name="gotoxy">,
+<ref id="wherex" name="wherex">
 <tag/Example/Actual code using the function.
 </descrip>
 </quote>

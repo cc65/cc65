@@ -428,7 +428,7 @@ static int MacroCall (Macro* M)
      	       	ArgStart = B;
  	    	NextChar ();
      	    } else {
- 	    	/* Comma or right paren inside nested parenthesis */
+    	    	/* Comma or right paren inside nested parenthesis */
      	       	if (CurC == ')') {
      	       	    --ParCount;
      	       	}
@@ -772,16 +772,14 @@ static int DoIf (int Skip)
     	UseLineInfo (sv2.LI);
     }
 
-    /* Remove the #if from the line and add two semicolons as sentinels */
+    /* Remove the #if from the line */
     SkipBlank ();
     S = line;
     while (CurC != '\0') {
     	*S++ = CurC;
     	NextChar ();
     }
-    *S++ = ';';
-    *S++ = ';';
-    *S   = '\0';
+    *S = '\0';
 
     /* Start over parsing from line */
     InitLine (line);
@@ -791,6 +789,12 @@ static int DoIf (int Skip)
 
     /* Expand macros in this line */
     PreprocessLine ();
+
+    /* Add two semicolons as sentinels to the line, so the following
+     * expression evaluation will eat these two tokens but nothing from
+     * the following line.
+     */
+    strcat (line, ";;");
 
     /* Prime the token pump (remove old tokens from the stream) */
     NextToken ();

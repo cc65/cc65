@@ -1146,20 +1146,30 @@ void WriteDbgSyms (void)
 		/* Check if the symbol is const */
 		ExprMask = (SymIsConst (S))? EXP_CONST : EXP_EXPR;
 
-		/* Write the type */
-		if (S->Flags & SF_ZP) {
-		    ObjWrite8 (EXP_ZP | ExprMask);
-		} else {
-		    ObjWrite8 (EXP_ABS | ExprMask);
+		/* Add zeropage/abs bits */
+		ExprMask |= (S->Flags & SF_ZP)? EXP_ZP : EXP_ABS;
+
+		/* Add the initializer bits */
+		if (S->Flags & SF_INITIALIZER) {
+		    ExprMask |= EXP_INITIALIZER;
 		}
+
+		/* Write the type */
+		ObjWrite8 (ExprMask);
+
+		/* Write the name */
 		ObjWriteStr (S->Name);
-		if (ExprMask == EXP_CONST) {
+
+		/* Write the value */
+		if ((ExprMask & EXP_MASK_VAL) == EXP_CONST) {
 		    /* Constant value */
 		    ObjWrite32 (S->V.Val);
 		} else {
 		    /* Expression involved */
 		    WriteExpr (S->V.Expr);
 		}
+
+		/* Write the source file position */
 		ObjWritePos (&S->Pos);
 	    }
 	    S = S->List;

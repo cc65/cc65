@@ -97,34 +97,6 @@ static char GetKeyUpdate (void);
 
 
 
-/* Key definitions */
-#ifndef CH_F1
-#  define CH_F1		'?'
-#endif
-#ifndef CH_F2
-#  define CH_F2		0
-#endif
-#ifndef CH_F3
-#  define CH_F3		0
-#endif
-#ifndef CH_F4
-#  define CH_F4		0
-#endif
-#ifndef CH_F5
-#  define CH_F5		0
-#endif
-#ifndef CH_F6
-#  define CH_F6		0
-#endif
-#ifndef CH_F7
-#  define CH_F7		0
-#endif
-#ifndef CH_F8
-#  define CH_F8		0
-#endif
-
-
-
 /* Defines for opcodes */
 #define	OPC_BRK		0x00
 #define OPC_BPL		0x10
@@ -186,23 +158,23 @@ static TextDesc RegText [] = {
     { 1,  7, "HI" }
 };
 static TextDesc HelpText [] = {
-    { 1,  0, "F1      Help"	     			},
-    { 1,  1, "F2      Toggle breakpoint"		},
-    { 1,  2, "F3      Run until subroutine returns"	},
-    { 1,  3, "F4      Run to cursor" 			},
-    { 1,  4, "F7      Step into"     			},
-    { 1,  5, "F8      Step over"     			},
-    { 1,  6, "1-5     Select active window"		},
-    { 1,  7, "+       Page down"     			},
-    { 1,  8, "-       Page up"	     			},
-    { 1,  9, "Cursor  Move up/down"  			},
-    { 1, 10, "c       Continue"	     			},
-    { 1, 11, "f       Follow instruction"		},
-    { 1, 12, "o       Goto origin"   			},
-    { 1, 13, "p       Use as new PC value"		},
-    { 1, 14, "r       Redraw screen" 			},
-    { 1, 15, "q       Quit"	     			},
-    { 1, 16, "s       Skip next instruction"		},
+    { 1,  0, "F1, ?      Help"	     			},
+    { 1,  1, "F2, t      Toggle breakpoint"		},
+    { 1,  2, "F3, u      Run until subroutine returns" 	},
+    { 1,  3, "F4, h      Run to cursor" 		},
+    { 1,  4, "F7, space  Step into"     		},
+    { 1,  5, "F8, enter  Step over"     		},
+    { 1,  6, "1-5        Select active window"		},
+    { 1,  7, "+          Page down"     		},
+    { 1,  8, "-          Page up"	     		},
+    { 1,  9, "Cursor     Move up/down"  		},
+    { 1, 10, "c          Continue"	     		},
+    { 1, 11, "f          Follow instruction"		},
+    { 1, 12, "o          Goto origin"   		},
+    { 1, 13, "p          Use as new PC value"		},
+    { 1, 14, "q          Quit"	     			},
+    { 1, 15, "r          Redraw screen" 		},
+    { 1, 16, "s          Skip next instruction"		},
 };
 
 
@@ -351,7 +323,7 @@ static void DrawFrame (FrameDesc* F, char Active)
 	br = CH_LRCORNER;
     } else {
 	OldColor = textcolor (COLOR_FRAMELOW);
-	tl = F->fd_tl;
+       	tl = F->fd_tl;
 	tr = F->fd_tr;
 	bl = F->fd_bl;
 	br = F->fd_br;
@@ -523,7 +495,7 @@ static char Input (char* Prompt, char* Buf, unsigned char Count)
     	if (isalnum (c) && i < Count) {
 	    Buf [i] = c;
 	    cputcxy (x1 + i, MAX_Y-1, c);
-	    ++i;
+       	    ++i;
 	} else if (i > 0 && c == CH_DEL) {
        	    --i;
 	    cputcxy (x1 + i, MAX_Y-1, ' ');
@@ -566,7 +538,7 @@ static int InputHex (char* Prompt, unsigned* Val)
 	V = 0;
 	while ((C = *P) && isxdigit (C)) {
 	    V <<= 4;
-	    if (isdigit (C)) {
+       	    if (isdigit (C)) {
 	    	C -= '0';
 	    } else {
 	    	C = toupper (C) - ('A' - 10);
@@ -652,7 +624,7 @@ static void DbgToggleUserBreak (unsigned Addr)
 	--DbgBreakCount;
     } else {
 	/* We don't have a breakpoint, set one */
-	if (DbgBreakCount >= MAX_USERBREAKS) {
+       	if (DbgBreakCount >= MAX_USERBREAKS) {
 	    ErrorPrompt ("Too many breakpoints - press a key");
 	} else {
 	    /* Test if we can set a breakpoint at that address */
@@ -695,7 +667,7 @@ static unsigned char DbgTmpBreaksOk (void)
     unsigned char i;
     BreakPoint* B = DbgBreaks;
     for (i = 0; i < MAX_USERBREAKS; ++i) {
-    	if (B->bk_use == BRK_TMP && !DbgIsRAM (B->bk_addr)) {
+       	if (B->bk_use == BRK_TMP && !DbgIsRAM (B->bk_addr)) {
 	    BreakInRomError ();
 	    DbgResetTmpBreaks ();
 	    return 0;
@@ -738,7 +710,7 @@ static unsigned AsmBack (unsigned mem, unsigned char lines)
 	     	    /* The requested address is inside an instruction, go back
 	    	     * one more byte and try again.
 	    	     */
-	     	    ++offs;
+       	     	    ++offs;
 	     	    break;
 	     	}
 	    }
@@ -866,7 +838,10 @@ static char AsmHandler (void)
 	       	AsmAddr = AsmBack (AsmAddr, AsmFrame.fd_height);
 	       	break;
 
-	    case CH_F2:
+	    case 't':
+#ifdef CH_F2
+      	    case CH_F2:
+#endif
 	    	DbgToggleUserBreak (AsmAddr);
 	    	break;
 
@@ -1446,41 +1421,61 @@ void DbgEntry (void)
 	    	ActivateFrame (c - '1', 0);
 	    	break;
 
-	    case CH_F1:
-	    	HelpHandler ();
-	    	break;
+	    case '?':
+#ifdef CH_F1
+       	    case CH_F1:
+#endif
+       	    	HelpHandler ();
+       	    	break;
 
-	    case CH_F3:
-	        /* Go until return */
-	    	SetRTSBreak ();
-	    	done = 1;
-	    	break;
+	    case 'u':
+#ifdef CH_F3
+       	    case CH_F3:
+#endif
+      	        /* Go until return */
+      	    	SetRTSBreak ();
+      	    	done = 1;
+      	    	break;
 
-	    case CH_F4:
-	        /* Go to cursor, only possible if cursor not at current PC */
-	    	if (AsmAddr != brk_pc) {
-	    	    DbgSetTmpBreak (AsmAddr);
-	    	    done = 1;
-	    	}
-	    	break;
+	    case 'h':
+#ifdef CH_F4
+      	    case CH_F4:
+#endif
+      	        /* Go to cursor, only possible if cursor not at current PC */
+      	    	if (AsmAddr != brk_pc) {
+      	    	    DbgSetTmpBreak (AsmAddr);
+      	    	    done = 1;
+      	    	}
+      	    	break;
 
-	    case ' ':
+      	    case ' ':
+#ifdef CH_F7
+      	    case CH_F7:
+#endif
+      	    	SingleStep (1);
+      	    	if (DbgTmpBreaksOk ()) {
+      	    	    /* Could set breakpoints */
+      	    	    done = 1;
+      	    	}
+      	    	break;
+
 	    case '\n':
-	    case CH_F7:
-	    case CH_F8:
-	    	SingleStep (c == CH_F7 || c == ' ');
-	    	if (DbgTmpBreaksOk ()) {
-	    	    /* Could set breakpoints */
-	    	    done = 1;
-	    	}
+#ifdef CH_F8
+      	    case CH_F8:
+#endif
+      	    	SingleStep (0);
+      	    	if (DbgTmpBreaksOk ()) {
+      	    	    /* Could set breakpoints */
+      	    	    done = 1;
+      	    	}
+      	    	break;
+
+      	    case 'c':
+      	    case 0:
+      	    	done = 1;
 	    	break;
 
-	    case 'c':
-	    case 0:
-	    	done = 1;
-	    	break;
-
-	    case 's':
+       	    case 's':
 	    	/* Skip instruction */
 	    	brk_pc += DbgDisAsmLen (brk_pc);
 	    	InitAsm ();

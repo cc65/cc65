@@ -21,8 +21,7 @@ _strerror:
 
 ; Load the pointer to the error message and return
 
-	lda	__sys_errlist+1,y
-	tax
+       	ldx	__sys_errlist+1,y
 	lda	__sys_errlist,y
 	rts
 

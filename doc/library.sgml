@@ -152,8 +152,8 @@ The header files contain
   accesses.
 
   <item>Other routines that make only sense for a specific system. One example
-  are routines to write memory locations in the system bank for the CBM
-  600/700 family (called B128/B256 in the US).
+  are routines to write memory locations in the system bank for the CBM PET-II
+  family.
 
 </itemize>
 
@@ -165,12 +165,13 @@ and keyboard I/O. The functions will write directly to the screen or poll the
 keyboard directly with no more help from the operating system than needed.
 This has some disadvantages, but on the other side it's fast and reasonably
 portable. conio implementations exist for the following targets:
-		    
+
   <itemize>
   <item>atari
   <item>c64
   <item>c128
   <item>plus4
+  <item>cbm510 (40 column video)
   <item>cbm610 (all CBM series-II computers with 80 column video)
   <item>pet (all CBM PET systems except the 2001)
   <item>apple2
@@ -199,6 +200,7 @@ the following targets:
   <item>atari
   <item>c64
   <item>c128
+  <item>cbm510
   </itemize>
 
 The available functions are declared in <tt/mouse.h/ To help writing portable

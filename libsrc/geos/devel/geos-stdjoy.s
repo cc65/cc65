@@ -89,14 +89,16 @@ COUNT:
 ; READ: Read a particular joystick passed in A.
 ;
 
-READ:	php
+READ:
+	tax
+	php
      	sei	  		; disable IRQ
 	lda	$01
 	pha
 	lda	#$35
 	sta	$01		; enable I/O
 
-	tax	  		; Joystick number into X
+	txa	  		; Joystick number into X
 	bne    	joy2
 
 ; Read joystick 1
@@ -105,19 +107,19 @@ joy1:
 	lda	#$7F
      	sta	cia1base
      	lda	cia1base+1
-back:	tax
+back:	tay
 	pla
 	sta	$01
 	plp
-	txa
+	tya
      	and	#$1F
      	eor	#$1F
-	ldx	#0
      	rts
 
 ; Read joystick 2
 
-joy2:	lda	#$E0
+joy2:	ldx	#0
+	lda	#$E0
 	ldy	#$FF
 	sta	cia1base+2
 	lda	cia1base+1

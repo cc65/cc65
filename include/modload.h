@@ -63,12 +63,7 @@ struct mod_ctrl {
     /* Parameters set by the loader routine */
     void*           module;             /* Pointer to module data */
     unsigned        module_size;        /* Total size of loaded module */
-    void*           code;               /* Pointer to code segment */
-    unsigned        code_size;          /* Size of code segment */
-    void*           data;               /* Pointer to data segment */
-    unsigned        data_size;          /* Size of data segment */
-    void*           bss;                /* Pointer to bss segment */
-    unsigned        bss_size;           /* Size of bss segment */
+    unsigned        module_id;          /* Module id */
 };
 
 

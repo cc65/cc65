@@ -47,13 +47,8 @@ MODCTRL_READ            =       0
 MODCTRL_CALLERDATA      =       2
 MODCTRL_MODULE          =       4       ; Pointer to module data
 MODCTRL_MODULE_SIZE     =       6       ; Total size of loaded module
-MODCTRL_CODE            =       8       ; Pointer to code segment
-MODCTRL_CODE_SIZE       =      10       ; Size of code segment
-MODCTRL_DATA            =      12       ; Pointer to data segment
-MODCTRL_DATA_SIZE       =      14       ; Size of data segment
-MODCTRL_BSS             =      16       ; Pointer to bss segment
-MODCTRL_BSS_SIZE        =      18       ; Size of bss segment
-MODCTRL_SIZE            =      20       ; Total size of struct
+MODCTRL_MODULE_ID       =       8
+MODCTRL_SIZE            =      10       ; Total size of struct
 
 
 ; unsigned char mod_load (struct mod_ctrl* ctrl);

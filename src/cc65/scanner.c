@@ -801,6 +801,30 @@ void NextToken (void)
 
 
 
+void SkipTokens (const token_t* TokenList, unsigned TokenCount)
+/* Skip tokens until we reach TOK_CEOF or a token in the given token list.
+ * This routine is used for error recovery.
+ */
+{    							       
+    while (CurTok.Tok != TOK_CEOF) {
+
+    	/* Check if the current token is in the token list */
+	unsigned I;
+    	for (I = 0; I < TokenCount; ++I) {
+    	    if (CurTok.Tok == TokenList[I]) {
+    	    	/* Found a token in the list */
+    	    	return;
+    	    }
+    	}
+
+    	/* Not in the list: Skip it */
+    	NextToken ();
+
+    }
+}
+
+
+
 void Consume (token_t Token, const char* ErrorMsg)
 /* Eat token if it is the next in the input stream, otherwise print an error
  * message.

@@ -40,10 +40,13 @@
 
 #include <stdio.h>
 
+/* common */
+#include "strbuf.h"
+
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/* 				     Data				     */
 /*****************************************************************************/
 
 
@@ -87,6 +90,11 @@ unsigned AddLiteral (const char* S);
 
 const char* GetLiteral (unsigned Offs);
 /* Get a pointer to the literal with the given offset in the pool */
+
+void GetLiteralStrBuf (StrBuf* Target, unsigned Offs);
+/* Copy the string starting at Offs and lasting to the end of the buffer
+ * into Target.
+ */
 
 void PrintLiteralPoolStats (FILE* F);
 /* Print statistics about the literal space used */

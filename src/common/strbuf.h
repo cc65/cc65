@@ -42,6 +42,7 @@
 
 /* common */
 #include "attrib.h"
+#include "check.h"
 #include "inline.h"
 
 
@@ -59,8 +60,14 @@ struct StrBuf {
     char*       Buf;
 };
 
+/* An empty string buf */
+extern const StrBuf EmptyStrBuf;
+
 /* Initializer for static string bufs */
 #define STATIC_STRBUF_INITIALIZER 	{ 0, 0, 0 }
+
+/* Initializer for auto string bufs */
+#define AUTO_STRBUF_INITIALIZER         EmptyStrBuf
 
 
 
@@ -118,6 +125,39 @@ INLINE char* SB_GetBuf (StrBuf* B)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE char SB_At (const StrBuf* B, unsigned Index)
+/* Get a character from the buffer */
+{
+    PRECONDITION (Index < B->Len);
+    return B->Buf[Index];
+}
+#else
+#  define SB_At(B, Index)        	       	\
+      	(PRECONDITION ((Index) < (B)->Len),     \
+        (B)->Buf[Index])
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE char SB_AtUnchecked (const StrBuf* B, unsigned Index)
+/* Get a character from the buffer */
+{
+    return B->Buf[Index];
+}
+#else
+#  define SB_AtUnchecked(B, Index)      ((B)->Buf[Index])
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int SB_IsEmpty (const StrBuf* B)
+/* Return true if the string buffer is empty */
+{
+    return (B->Len == 0);
+}
+#else
+#  define SB_IsEmpty(B) ((B)->Len == 0)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE void SB_Clear (StrBuf* B)
 /* Clear the string buffer (make it empty) */
 {
@@ -131,6 +171,29 @@ void SB_Terminate (StrBuf* B);
 /* Zero terminate the given string buffer. NOTE: The terminating zero is not
  * accounted for in B->Len, if you want that, you have to use AppendChar!
  */
+
+void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size);
+/* Copy Buf to Target, discarding the old contents of Target */
+
+#if defined(HAVE_INLINE)
+INLINE void SB_CopyStr (StrBuf* Target, const char* S)
+/* Copy S to Target, discarding the old contents of Target */
+{
+    SB_CopyBuf (Target, S, strlen (S));
+}
+#else
+#  define SB_CopyStr(Target, S) SB_CopyBuf (Target, S, strlen (S))
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void SB_Copy (StrBuf* Target, const StrBuf* Source)
+/* Copy Source to Target, discarding the old contents of Target */
+{
+    SB_CopyBuf (Target, Source->Buf, Source->Len);
+}
+#else
+#  define SB_Copy(Target, Source)       SB_CopyBuf (Target, (Source)->Buf, (Source)->Len)
+#endif
 
 void SB_AppendChar (StrBuf* B, char C);
 /* Append a character to a string buffer */
@@ -147,9 +210,6 @@ INLINE void SB_AppendStr (StrBuf* B, const char* S)
 #else
 #  define SB_AppendStr(B, S)    SB_AppendBuf (B, S, strlen (S))
 #endif
-
-void SB_Copy (StrBuf* Target, const StrBuf* Source);
-/* Copy Source to Target, discarding the old contents of Target */
 
 #if defined(HAVE_INLINE)
 INLINE void SB_Append (StrBuf* Target, const StrBuf* Source)

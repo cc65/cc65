@@ -42,31 +42,13 @@
 
 
 /*****************************************************************************/
-/*				    Helpers                                  */
+/*				     Data                                    */
 /*****************************************************************************/
 
 
 
-void SB_Realloc (StrBuf* B, unsigned NewSize)
-/* Reallocate the string buffer space, make sure at least NewSize bytes are
- * available.
- */
-{
-    /* Get the current size, use a minimum of 8 bytes */
-    unsigned NewAllocated = B->Allocated;
-    if (NewAllocated == 0) {
-     	NewAllocated = 8;
-    }
-
-    /* Round up to the next power of two */
-    while (NewAllocated < NewSize) {
-     	NewAllocated *= 2;
-    }
-
-    /* Reallocate the buffer */
-    B->Buf       = xrealloc (B->Buf, NewAllocated);
-    B->Allocated = NewAllocated;
-}
+/* An empty string buf */
+const StrBuf EmptyStrBuf = STATIC_STRBUF_INITIALIZER;
 
 
 
@@ -119,6 +101,29 @@ void FreeStrBuf (StrBuf* B)
 
 
 
+void SB_Realloc (StrBuf* B, unsigned NewSize)
+/* Reallocate the string buffer space, make sure at least NewSize bytes are
+ * available.
+ */
+{
+    /* Get the current size, use a minimum of 8 bytes */
+    unsigned NewAllocated = B->Allocated;
+    if (NewAllocated == 0) {
+     	NewAllocated = 8;
+    }
+
+    /* Round up to the next power of two */
+    while (NewAllocated < NewSize) {
+     	NewAllocated *= 2;
+    }
+
+    /* Reallocate the buffer */
+    B->Buf       = xrealloc (B->Buf, NewAllocated);
+    B->Allocated = NewAllocated;
+}
+
+
+
 void SB_Terminate (StrBuf* B)
 /* Zero terminate the given string buffer. NOTE: The terminating zero is not
  * accounted for in B->Len, if you want that, you have to use AppendChar!
@@ -129,6 +134,18 @@ void SB_Terminate (StrBuf* B)
 	SB_Realloc (B, NewLen);
     }
     B->Buf[B->Len] = '\0';
+}
+
+
+
+void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
+/* Copy Buf to Target, discarding the old contents of Target */
+{
+    if (Target->Allocated < Size) {
+	SB_Realloc (Target, Size);
+    }
+    memcpy (Target->Buf, Buf, Size);
+    Target->Len = Size;
 }
 
 
@@ -155,18 +172,6 @@ void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
     }
     memcpy (B->Buf + B->Len, S, Size);
     B->Len = NewLen;
-}
-
-
-
-void SB_Copy (StrBuf* Target, const StrBuf* Source)
-/* Copy Source to Target, discarding the old contents of Target */
-{
-    if (Target->Allocated < Source->Allocated) {
-	SB_Realloc (Target, Source->Allocated);
-    }
-    memcpy (Target->Buf, Source->Buf, Source->Len);
-    Target->Len = Source->Len;
 }
 
 

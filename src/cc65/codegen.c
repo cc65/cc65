@@ -39,6 +39,7 @@
 
 /* common */
 #include "check.h"
+#include "strbuf.h"
 #include "version.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -3877,16 +3878,10 @@ void g_zerobytes (unsigned n)
 
 
 
-void g_asmcode (const char* Line, int Len)
-/* Output one line of assembler code. If Len is greater than zero, it is used
- * as the maximum number of characters to use from Line.
- */
+void g_asmcode (struct StrBuf* B)
+/* Output one line of assembler code. */
 {
-    if (Len >= 0) {
-	AddCodeLine ("%.*s", Len, Line);
-    } else {
-	AddCodeLine ("%s", Line);
-    }
+    AddCodeLine ("%.*s", SB_GetLen (B), SB_GetConstBuf (B));
 }
 
 

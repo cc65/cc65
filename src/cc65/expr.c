@@ -468,7 +468,7 @@ static void MakeConstIntExpr (ExprDesc* Expr, long Value)
 
 
 
-static void ConstSubExpr (int (*F) (ExprDesc*), ExprDesc* Expr)
+void ConstSubExpr (int (*F) (ExprDesc*), ExprDesc* Expr)
 /* Will evaluate an expression via the given function. If the result is not
  * a constant, a diagnostic will be printed, and the value is replaced by
  * a constant one to make sure there are no internal errors that result

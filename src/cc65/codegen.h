@@ -84,6 +84,9 @@
 /* Compiler relative stackpointer */
 extern int oursp;
 
+/* Forward */
+struct StrBuf;
+
 
 
 /*****************************************************************************/
@@ -437,10 +440,8 @@ void g_zerobytes (unsigned n);
 
 
 
-void g_asmcode (const char* Line, int Len);
-/* Output one line of assembler code. If Len is greater than zero, it is used
- * as the maximum number of characters to use from Line.
- */
+void g_asmcode (struct StrBuf* B);
+/* Output one line of assembler code. */
 
 
 

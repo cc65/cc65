@@ -60,10 +60,11 @@ struct ExprDesc {
 
 
 
-void doasm (void);
-/* This function parses ASM statements. The syntax of the ASM directive
- * looks like the one defined for C++ (C has no ASM directive), that is,
- * a string literal in parenthesis.
+void ConstSubExpr (int (*F) (ExprDesc*), ExprDesc* Expr);
+/* Will evaluate an expression via the given function. If the result is not
+ * a constant, a diagnostic will be printed, and the value is replaced by
+ * a constant one to make sure there are no internal errors that result
+ * from this input error.
  */
 
 unsigned assignadjust (type* lhst, ExprDesc* rhs);

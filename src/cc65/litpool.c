@@ -37,7 +37,6 @@
 
 /* common */
 #include "check.h"
-#include "strbuf.h"
 #include "tgttrans.h"
 
 /* cc65 */
@@ -161,6 +160,17 @@ const char* GetLiteral (unsigned Offs)
 {
     CHECK (Offs < SB_GetLen (&LiteralPool));
     return SB_GetConstBuf (&LiteralPool) + Offs;
+}
+
+
+
+void GetLiteralStrBuf (StrBuf* Target, unsigned Offs)
+/* Copy the string starting at Offs and lasting to the end of the buffer
+ * into Target.
+ */
+{					  
+    CHECK (Offs <= SB_GetLen (&LiteralPool));
+    SB_Slice (Target, &LiteralPool, Offs, SB_GetLen (&LiteralPool) - Offs);
 }
 
 

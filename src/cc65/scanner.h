@@ -191,7 +191,7 @@ extern Token NextTok;		/* The next token */
 
 
 /*****************************************************************************/
-/*	   			     code				     */
+/*	   			     code     				     */
 /*****************************************************************************/
 
 
@@ -204,6 +204,11 @@ int IsSym (char* s);
 
 void NextToken (void);
 /* Get next token from input stream */
+
+void SkipTokens (const token_t* TokenList, unsigned TokenCount);
+/* Skip tokens until we reach TOK_CEOF or a token in the given token list.
+ * This routine is used for error recovery.
+ */
 
 void Consume (token_t Token, const char* ErrorMsg);
 /* Eat token if it is the next in the input stream, otherwise print an error

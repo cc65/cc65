@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                   cpu.c                                 */
+/*                                   cpu.c                                   */
 /*                                                                           */
 /*                            CPU specifications                             */
 /*                                                                           */
@@ -56,6 +56,15 @@ const char* CPUNames[CPU_COUNT] = {
     "65C02",
     "65816",
     "sunplus",
+};
+
+/* Tables with CPU instruction sets */
+const unsigned CPUIsets[CPU_COUNT] = {
+    CPU_ISET_6502,
+    CPU_ISET_6502 | CPU_ISET_65SC02,
+    CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
+    CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02 | CPU_ISET_65816,
+    CPU_ISET_SUNPLUS
 };
 
 

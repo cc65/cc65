@@ -55,11 +55,23 @@ typedef enum {
     CPU_COUNT  	    	        /* Number of different CPUs */
 } cpu_t;
 
+/* CPU instruction sets */
+enum {
+    CPU_ISET_6502       = 1 << CPU_6502,
+    CPU_ISET_65SC02     = 1 << CPU_65SC02,
+    CPU_ISET_65C02      = 1 << CPU_65C02,
+    CPU_ISET_65816      = 1 << CPU_65816,
+    CPU_ISET_SUNPLUS    = 1 << CPU_SUNPLUS
+};
+
 /* CPU used */
 extern cpu_t CPU;
 
-/* Table with target names */
+/* Table with CPU names */
 extern const char* CPUNames[CPU_COUNT];
+
+/* Table with CPU the instruction sets */
+extern const unsigned CPUIsets[CPU_COUNT];
 
 
 
@@ -78,7 +90,7 @@ cpu_t FindCPU (const char* Name);
 
 /* End of cpu.h */
 
-#endif                     
+#endif
 
 
 

@@ -65,7 +65,7 @@
 /* Combined symbol entry flags used within this module */
 #define SF_UNDEFMASK	(SF_REFERENCED | SF_DEFINED | SF_IMPORT)
 #define SF_UNDEFVAL	(SF_REFERENCED)
-#define SF_DBGINFOMASK 	(SF_UNUSED | SF_DEFINED | SF_EXPORT | SF_IMPORT)
+#define SF_DBGINFOMASK 	(SF_UNUSED | SF_DEFINED | SF_IMPORT)
 #define SF_DBGINFOVAL 	(SF_DEFINED)
 
 /* Symbol tables */

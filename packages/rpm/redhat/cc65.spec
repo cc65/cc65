@@ -418,7 +418,7 @@ make -C doc html
 
 
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,emd,include/{em,geos,joystick,sys,tgi},joy,lib,tgi}}
+mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,emd,include/{em,geos,joystick,ser,sys,tgi},joy,lib,tgi}}
 
 # Binaries
 install -s -m 755 src/ar65/ar65 $RPM_BUILD_ROOT/usr/bin

@@ -7,7 +7,8 @@
    	.export	     	_exit
      	.import		_clrscr, initlib, donelib
      	.import	     	push0, _main
-     	.import	       	__BSS_RUN__, __BSS_SIZE__
+	.import		__VIDRAM_START__
+	.import	       	__BSS_RUN__, __BSS_SIZE__
      	.import		irq, nmi
        	.import	       	k_irq, k_nmi, k_plot, k_udtim, k_scnkey
 
@@ -257,14 +258,14 @@ Z4:
   	ora	#$20
   	sta	(tpi1),y
 
-; Set bit 14/15 of the VIC address range to the high bits of VIDEO_RAM
+; Set bit 14/15 of the VIC address range to the high bits of __VIDRAM_START__
 ; PC6/PC7 (VICBANKSEL 0/1) = 11
 
 	ldy    	#tpiPortC
 	lda	(tpi2),y
 	sta	vidsave+1
 	and	#$3F
-       	ora    	#((>VIDEO_RAM) & $C0)
+       	ora    	#<((>__VIDRAM_START__) & $C0)
 	sta	(tpi2),y
 
 ; Set bits 10-13 of the VIC address range to address F800
@@ -273,7 +274,7 @@ Z4:
 	lda	(vic),y
 	sta	vidsave+2
 	and	#$0F
-       	ora    	#(((>VIDEO_RAM) & $3F) << 2)
+       	ora    	#<(((>__VIDRAM_START__) & $3F) << 2)
 	sta	(vic),y
 
 ; Switch back to the execution bank

@@ -5,6 +5,7 @@
 ;
 
       	.export		k_plot
+	.import		__VIDRAM_START__
 	.importzp	crtc
 
       	.include      	"zeropage.inc"
@@ -27,7 +28,7 @@
     	sta	CRAM_PTR
     	lda    	LineMSBTab,x
     	sta    	SCREEN_PTR+1
-    	sub	#>VIDEO_RAM
+    	sub	#>__VIDRAM_START__
     	add	#>COLOR_RAM
     	sta	CRAM_PTR+1
 
@@ -45,7 +46,7 @@ get:	ldx	CURS_Y
 
 .macro  LineLoTab
 	.repeat 25, I
-	.byte   <(VIDEO_RAM + I * 40)
+	.byte   <(__VIDRAM_START__ + I * 40)
 	.endrep
 .endmacro
 
@@ -56,7 +57,7 @@ LineLSBTab:    	LineLoTab
 
 .macro  LineHiTab
 	.repeat 25, I
-	.byte   >(VIDEO_RAM + I * 40)
+	.byte   >(__VIDRAM_START__ + I * 40)
 	.endrep
 .endmacro
 

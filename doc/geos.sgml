@@ -6,7 +6,7 @@
 
 <title>GEOSLib docs
 <author>Maciej Witkowiak, <htmlurl url="mailto:ytm@elysium.pl" name="ytm@elysium.pl">
-<date>v1.1, 26.12.1999, 16.03.2000, 19-22.03.2000, 11,29.07.2000, 03.07.2001
+<date>v1.2, 26.12.1999, 16.03.2000, 19-22.03.2000, 11,29.07.2000, 3-4.07.2001
 <abstract>
 This is the documentation of cc65's GEOSLib, but information contained here may be also
 useful for writting GEOS applications in general.
@@ -54,10 +54,15 @@ The software needed:
     <item><em/VICE/ This is portable C64, C128 and few other Commodore computers emulator, you
 		can obtain it from: <htmlurl url="http://www.cs.cmu.edu/~dsladic/vice/vice.html"
 		name="http://www.cs.cmu.edu/~dsladic/vice/vice.html">
-    <item><em/Star Commander/ This tool is for DOS right now. You will need it for transferring
+    <item><em/Star Commander/ This tool is only for DOS. You will need it for transferring
 		object files from PC to 1541. There's also one important ability of this
 		tool - it automatically un-converts .cvt files into GEOS native format on
 		disk image files.
+    <item><em/cbm4linux/ A Linux kernel module that allows for communication with 1541 and
+		other Commodore IEC bus drives. It can be replacement for Star Commander if
+		you want only to transfer files to a disk and uncovert using GEOS program for
+		this purpose. Check out: <htmlurl url="http://www.lb.shuttle.de/puffin/cbm4linux/"
+		name="http://www.lb.shuttle.de/puffin/cbm4linux">
 </itemize>
 <p>
 VICE and cc65 are portable - they run on variety of platforms - DOS, Win32 and UNIX. GEOSLib only
@@ -451,11 +456,11 @@ GEOS application.
 
 <sect3>DlgBoxYesNo, DlgBoxOkCancel, DlgBoxOk
 <p>
-<tt/char DlgBoxYesNo (char *line1, char*line2)/
+<tt/char DlgBoxYesNo (char *line1, char *line2)/
 <p>
-<tt/char DlgBoxOkCancel (char *line1, char*line2)/
+<tt/char DlgBoxOkCancel (char *line1, char *line2)/
 <p>
-<tt/void DlgBoxOk (char *line1, char*line2)/
+<tt/void DlgBoxOk (char *line1, char *line2)/
 <p>
 These function show two lines of text in standard-sized DialogBox. You can read the code of
 pressed icon from return value. E.g. for <tt/DlgBoxYesNo/ it can only be <tt/YES/ or <tt/NO/.
@@ -587,10 +592,12 @@ dangerous.
 For some purposes you might consider using <tt/dio.h/ interface to disk access. It is native.
 <p>
 All GEOS disk functions return error code in X register. In some cases this is returned by
-GEOSLib function (if its type is <tt/char/), but in all cases last error is saved in <tt/errno/
-location. If it is nonzero - an error occured. See <tt/gdisk.h/ for list of errorcodes.
+GEOSLib function (if its type is <tt/char/), but in all cases last error is saved in <tt/__oserror/
+location. If it is nonzero - an error occured. See <tt/gdisk.h/ for the list of possible errorcodes.
+You need to include <tt/errno.h/ to get <tt/__oserror/, together with standard <tt/errno/. The
+latter gives less verbose, but still usable information and can be used with <tt/strerror/.
 <p>
-Passing parameters use always e.g. <tt/ReadBuff (&amp;myTrSe)/.
+For passing parameters use almost always pointer to your data e.g. <tt/ReadBuff (&amp;myTrSe)/.
 
 <sect2>Buffer functions
 <p>
@@ -862,7 +869,7 @@ Remember to not modify <tt/r1/, <tt/r4/ and <tt/r5/. These registers must be pre
 calls to <tt/ReadByte/.
 <p>
 Returned value is valid only if there was no error. End of file is marked as <tt/BFR_OVERFLOW/
-in <tt/errno/, this is set when trying to read one byte after the end of file, in this case
+in <tt/__oserror/, this is set when trying to read one byte after the end of file, in this case
 returned value is invalid.
 
 <sect3>SaveFile
@@ -1050,13 +1057,13 @@ This is done with <tt/table/ where everything is defined. See structures chapter
 
 <sect2>Stash, Fetch, Swap, and VerifyRAM
 <p>
-<tt/void StashRAM (char bank, int length, char *reuAddy, char *cpuAddy)/
+<tt/void StashRAM (char bank, int length, char *reuAddress, char *cpuAddress)/
 <p>
-<tt/void FetchRAM (char bank, int length, char *reuAddy, char *cpuAddy)/
+<tt/void FetchRAM (char bank, int length, char *reuAddress, char *cpuAddress)/
 <p>
-<tt/void SwapRAM (char bank, int length, char *reuAddy, char *cpuAddy)/
+<tt/void SwapRAM (char bank, int length, char *reuAddress, char *cpuAddress)/
 <p>
-<tt/ char VerifyRAM (char bank, int length, char *reuAddy, char *cpuAddy)/
+<tt/ char VerifyRAM (char bank, int length, char *reuAddress, char *cpuAddress)/
 <p>
 These functions are interface to REU - Ram Expansion Unit. I think that they are self-explanatory.
 

@@ -11,6 +11,7 @@
 	    .export _get_tv
 	    .importzp tmp1
 
+	    .include "../inc/const.inc"
 	    .include "../inc/geossym.inc"
 	    .include "../inc/geossym2.inc"
 

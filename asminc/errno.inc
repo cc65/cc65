@@ -6,6 +6,7 @@
 
         .global         __errno, __oserror
         .global         __maperrno, __osmaperrno
+        .global         __seterrno
 
 ; Error codes, must match the values in the C headers
 .enum

@@ -40,9 +40,11 @@
 #include <errno.h>
 #include <sys/stat.h>
 
-#include "../common/fname.h"
-#include "../common/xmalloc.h"
-
+/* common */
+#include "fname.h"
+#include "xmalloc.h"
+	  
+/* ca65 */
 #include "condasm.h"
 #include "error.h"
 #include "global.h"
@@ -64,7 +66,7 @@
 
 
 enum Token Tok = TOK_NONE;		/* Current token */
-int WS;					/* Flag: Whitespace before token */
+int WS;	  				/* Flag: Whitespace before token */
 long IVal;	       	       	    	/* Integer token attribute */
 char SVal [MAX_STR_LEN+1];	    	/* String token attribute */
 

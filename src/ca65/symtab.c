@@ -35,10 +35,12 @@
 
 #include <string.h>
 
-#include "../common/symdefs.h"
-#include "../common/hashstr.h"
-#include "../common/xmalloc.h"
-
+/* common */
+#include "symdefs.h"
+#include "hashstr.h"
+#include "xmalloc.h"
+	  
+/* ca65 */
 #include "global.h"
 #include "error.h"
 #include "expr.h"
@@ -985,18 +987,18 @@ void WriteImports (void)
     /* Walk throught list and write all imports to the file */
     S = SymList;
     while (S) {
-	if ((S->Flags & SF_IMPMASK) == SF_IMPVAL) {
-	    if (S->Flags & SF_ZP) {
-		ObjWrite8 (IMP_ZP);
-	    } else {
-		ObjWrite8 (IMP_ABS);
-	    }
+     	if ((S->Flags & SF_IMPMASK) == SF_IMPVAL) {
+     	    if (S->Flags & SF_ZP) {
+     		ObjWrite8 (IMP_ZP);
+     	    } else {
+     		ObjWrite8 (IMP_ABS);
+     	    }
        	    ObjWriteStr (S->Name);
-	    ObjWritePos (&S->Pos);
-	}
+     	    ObjWritePos (&S->Pos);
+     	}
      	S = S->List;
     }
-
+     
     /* Done writing imports */
     ObjEndImports ();
 }

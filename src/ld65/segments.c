@@ -36,12 +36,14 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/exprdefs.h"
-#include "../common/hashstr.h"
-#include "../common/segdefs.h"
-#include "../common/symdefs.h"
-#include "../common/xmalloc.h"
-
+/* common */
+#include "exprdefs.h"
+#include "hashstr.h"
+#include "segdefs.h"
+#include "symdefs.h"
+#include "xmalloc.h"
+	  
+/* ld65 */
 #include "error.h"
 #include "expr.h"
 #include "fileio.h"
@@ -303,17 +305,17 @@ Section* ReadSection (FILE* F, ObjData* O)
 	    case FRAG_SEXPR24:
 	    case FRAG_SEXPR32:
        	       	Frag = NewFragment (Type & FRAG_TYPEMASK, Type & FRAG_BYTEMASK, Sec);
-		break;
+	  	break;
 
 	    case FRAG_FILL:
-		/* Will allocate memory, but we don't care... */
-		Frag = NewFragment (FRAG_FILL, Read16 (F), Sec);
-		break;
+	  	/* Will allocate memory, but we don't care... */
+	  	Frag = NewFragment (FRAG_FILL, Read16 (F), Sec);
+	  	break;
 
 	    default:
-		Error ("Unknown fragment type in module `%s', segment `%s': %02X",
-	 	       O->Name,	S->Name, Type);
-		/* NOTREACHED */
+	  	Error ("Unknown fragment type in module `%s', segment `%s': %02X",
+	  	       O->Name,	S->Name, Type);
+	  	/* NOTREACHED */
 	 	return 0;
        	}
 

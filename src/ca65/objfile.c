@@ -38,9 +38,11 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../common/fname.h"
-#include "../common/objdefs.h"
-
+/* common */
+#include "fname.h"
+#include "objdefs.h"
+	  
+/* ca65 */
 #include "global.h"
 #include "error.h"
 #include "objfile.h"

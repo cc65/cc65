@@ -65,7 +65,7 @@ CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
 
 OBJS =	error.obj	\
 	global.obj	\
-	main.obj	
+	main.obj
 
 .PRECIOUS $(OBJS:.obj=.c)
 
@@ -89,6 +89,7 @@ NAME $<
 FILE error.obj
 FILE global.obj
 FILE main.obj
+LIBRARY ..\common\common.lib
 |
 
 

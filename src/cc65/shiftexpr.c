@@ -47,13 +47,13 @@
 
 
 /*****************************************************************************/
-/*		     		     Data				     */
+/*		     	       	     Data    				     */
 /*****************************************************************************/
 
 
 
 /*****************************************************************************/
-/*	   	  		     Code				     */
+/*	   	  		     Code    				     */
 /*****************************************************************************/
 
 
@@ -65,8 +65,11 @@ void ShiftExpr (struct ExprDesc* Expr)
     CodeMark Mark1;
     CodeMark Mark2;
     token_t Tok;       	      	 	/* The operator token */
+    type* EffType;                      /* Effective lhs type */
+    type* ResultType;                   /* Type of the result */
     unsigned ExprBits;                  /* Bits of the lhs operand */
-    unsigned ltype, rtype, flags;
+    unsigned GenFlags;                  /* Generator flags */
+    unsigned ltype;
     int rconst;	       	       	       	/* Operand is a constant */
 
 
@@ -85,20 +88,26 @@ void ShiftExpr (struct ExprDesc* Expr)
        	Tok = CurTok.Tok;
 	NextToken ();
 
+        /* Get the type of the result */
+        ResultType = EffType = IntPromotion (Expr->Type);
+
+        /* Prepare the code generator flags */
+        GenFlags = TypeOf (ResultType);
+
         /* Calculate the number of bits the lhs operand has */
-        ExprBits = SizeOf (Expr->Type) * 8;
+        ExprBits = SizeOf (ResultType) * 8;
 
 	/* Get the lhs on stack */
-       	Mark1 = GetCodePos ();
-	ltype = TypeOf (Expr->Type);
+       	GetCodePos (&Mark1);
+       	ltype = TypeOf (Expr->Type);
        	if (ED_IsConstAbs (Expr)) {
 	    /* Constant value */
-	    Mark2 = GetCodePos ();
+	    GetCodePos (&Mark2);
        	    g_push (ltype | CF_CONST, Expr->IVal);
 	} else {
 	    /* Value not constant */
 	    LoadExpr (CF_NONE, Expr);
-	    Mark2 = GetCodePos ();
+	    GetCodePos (&Mark2);
 	    g_push (ltype, 0);
 	}
 
@@ -120,7 +129,11 @@ void ShiftExpr (struct ExprDesc* Expr)
 
         } else {
 
-            /* The rhs is a constant numeric value */
+            /* The rhs is a constant numeric value. */
+            GenFlags |= CF_CONST;
+
+            /* Remove the code that pushes the rhs onto the stack. */
+            RemoveCode (&Mark2);
 
             /* If the shift count is greater or equal than the bit count of
              * the operand, the behaviour is undefined according to the
@@ -137,8 +150,7 @@ void ShiftExpr (struct ExprDesc* Expr)
             if (Expr2.IVal == 0) {
 
                 /* Result is already in Expr, remove the generated code */
-                RemoveCode (Mark1);
-                pop (ltype);
+                RemoveCode (&Mark1);
 
                 /* Done */
                 goto Next;
@@ -155,8 +167,7 @@ void ShiftExpr (struct ExprDesc* Expr)
                 }
 
                 /* Both operands are constant, remove the generated code */
-                RemoveCode (Mark1);
-                pop (ltype);
+                RemoveCode (&Mark1);
 
                 /* Done */
                 goto Next;
@@ -191,8 +202,7 @@ void ShiftExpr (struct ExprDesc* Expr)
                 }
 
                 /* Remove the generated load code */
-                RemoveCode (Mark1);
-                pop (ltype);
+                RemoveCode (&Mark1);
 
                 /* Generate again code for the load */
                 LoadExpr (CF_NONE, Expr);
@@ -203,46 +213,26 @@ void ShiftExpr (struct ExprDesc* Expr)
                 /* If the shift count is now zero, we're done */
                 if (Expr2.IVal == 0) {
                     /* Be sure to mark the value as in the primary */
-                    goto Loaded;
+                    goto MakeRVal;
                 }
-
-                /* Otherwise generate code to push the value */
-                Mark2 = GetCodePos ();
-                g_push (ltype, 0);
             }
-
+        
         }
-
-        /* If the right hand side is a constant, remove the push of the
-         * primary register.
-         */
-        rtype = TypeOf (Expr2.Type);
-        flags = 0;
-        if (rconst) {
-            flags |= CF_CONST;
-            rtype |= CF_CONST;
-            RemoveCode (Mark2);
-            pop (ltype);
-            ltype |= CF_REG;      	/* Value is in register */
-        }
-
-        /* Determine the type of the operation result. */
-        flags |= g_typeadjust (ltype, rtype);
 
         /* Generate code */
         switch (Tok) {
-            case TOK_SHL: g_asl (flags, Expr2.IVal); break;
-            case TOK_SHR: g_asr (flags, Expr2.IVal); break;
-            default:                                 break;
+            case TOK_SHL: g_asl (GenFlags, Expr2.IVal); break;
+            case TOK_SHR: g_asr (GenFlags, Expr2.IVal); break;
+            default:                                    break;
         }
 
-Loaded:
+MakeRVal:
         /* We have a rvalue in the primary now */
         ED_MakeRValExpr (Expr);
 
 Next:
-        /* Get the type of the result */
-       	Expr->Type = IntPromotion (Expr->Type);
+        /* Set the type of the result */
+       	Expr->Type = ResultType;
     }
 }
 

@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -52,7 +52,10 @@
 
 
 /* Marker for an assembler code position */
-typedef unsigned CodeMark;
+typedef struct {
+    unsigned    Pos;            /* Code position */
+    int         SP;             /* Stack pointer at this position */
+} CodeMark;
 
 
 
@@ -62,16 +65,19 @@ typedef unsigned CodeMark;
 
 
 
-CodeMark GetCodePos (void);
+void GetCodePos (CodeMark* M);
 /* Get a marker pointing to the current output position */
 
-void RemoveCode (CodeMark M);
+void RemoveCode (const CodeMark* M);
 /* Remove all code after the given code marker */
 
-void MoveCode (CodeMark Start, CodeMark End, CodeMark Target);
+void MoveCode (const CodeMark* Start, const CodeMark* End, const CodeMark* Target);
 /* Move the code between Start (inclusive) and End (exclusive) to
- * (before) Target.
+ * (before) Target. The code marks aren't updated.
  */
+
+int CodeRangeIsEmpty (const CodeMark* Start, const CodeMark* End);
+/* Return true if the given code range is empty (no code between Start and End) */
 
 void WriteOutput (FILE* F);
 /* Write the final output to a file */

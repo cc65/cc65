@@ -151,7 +151,7 @@ static void ParseArg (ArgDesc* Arg, type* Type)
     Arg->ArgType = Type;
 
     /* Remember the current code position */
-    Arg->Start = GetCodePos ();
+    GetCodePos (&Arg->Start);
 
     /* Read the expression we're going to pass to the function */
     ExprWithCheck (hie1, &Arg->Expr);
@@ -174,7 +174,8 @@ static void ParseArg (ArgDesc* Arg, type* Type)
     }
 
     /* Remember the following code position */
-    Arg->End = Arg->Push = GetCodePos ();
+    GetCodePos (&Arg->Push);
+    GetCodePos (&Arg->End);
 
     /* Use the type of the argument for the push */
     Arg->Flags |= TypeOf (Arg->Expr.Type);
@@ -202,19 +203,19 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     unsigned Label;
 
     /* Remember where we are now */
-    Start = GetCodePos ();
+    GetCodePos (&Start);
 
     /* Argument #1 */
     ParseArg (&Arg1, Arg1Type);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
-    Arg1.End = GetCodePos ();
+    GetCodePos (&Arg1.End);
     ParamSize += SizeOf (Arg1Type);
     ConsumeComma ();
 
     /* Argument #2 */
     ParseArg (&Arg2, Arg2Type);
     g_push (Arg2.Flags, Arg2.Expr.IVal);
-    Arg2.End = GetCodePos ();
+    GetCodePos (&Arg2.End);
     ParamSize += SizeOf (Arg2Type);
     ConsumeComma ();
 
@@ -239,7 +240,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         /* Remove all of the generated code but the load of the first
          * argument, which is what memcpy returns.
          */
-        RemoveCode (Arg1.Push);
+        RemoveCode (&Arg1.Push);
 
         /* Set the function result to the first argument */
         *Expr = Arg1.Expr;
@@ -263,7 +264,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Reg2 = ED_IsLVal (&Arg2.Expr) && ED_IsLocRegister (&Arg2.Expr);
 
         /* Drop the generated code */
-        RemoveCode (Start);
+        RemoveCode (&Start);
 
         /* We need a label */
         Label = GetLocalLabel ();
@@ -332,7 +333,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
 
         /* Drop the generated code */
-        RemoveCode (Start);
+        RemoveCode (&Start);
 
         /* We need a label */
         Label = GetLocalLabel ();
@@ -406,7 +407,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Offs = ED_GetStackOffs (&Arg2.Expr, 0);
 
         /* Drop the generated code */
-        RemoveCode (Start);
+        RemoveCode (&Start);
 
         /* We need a label */
         Label = GetLocalLabel ();
@@ -497,12 +498,12 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     unsigned Label;
 
     /* Remember where we are now */
-    Start = GetCodePos ();
+    GetCodePos (&Start);
 
     /* Argument #1 */
     ParseArg (&Arg1, Arg1Type);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
-    Arg1.End = GetCodePos ();
+    GetCodePos (&Arg1.End);
     ParamSize += SizeOf (Arg1Type);
     ConsumeComma ();
 
@@ -516,7 +517,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     } else {
         /* Push the argument */
         g_push (Arg2.Flags, Arg2.Expr.IVal);
-        Arg2.End = GetCodePos ();
+        GetCodePos (&Arg2.End);
         ParamSize += SizeOf (Arg2Type);
     }
     ConsumeComma ();
@@ -542,7 +543,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         /* Remove all of the generated code but the load of the first
          * argument, which is what memset returns.
          */
-        RemoveCode (Arg1.Push);
+        RemoveCode (&Arg1.Push);
 
         /* Set the function result to the first argument */
         *Expr = Arg1.Expr;
@@ -568,7 +569,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Reg = ED_IsLVal (&Arg1.Expr) && ED_IsLocRegister (&Arg1.Expr);
 
         /* Drop the generated code */
-        RemoveCode (Start);
+        RemoveCode (&Start);
 
         /* We need a label */
         Label = GetLocalLabel ();
@@ -617,7 +618,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
 
         /* Drop the generated code */
-        RemoveCode (Start);
+        RemoveCode (&Start);
 
         /* We need a label */
         Label = GetLocalLabel ();
@@ -643,7 +644,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         /* Remove all of the generated code but the load of the first
          * argument.
          */
-        RemoveCode (Arg1.Push);
+        RemoveCode (&Arg1.Push);
 
         /* We need a label */
         Label = GetLocalLabel ();
@@ -716,12 +717,12 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     Arg2Type[1] = GetDefaultChar () | T_QUAL_CONST;
 
     /* Remember where we are now */
-    Start = GetCodePos ();
+    GetCodePos (&Start);
 
     /* Argument #1 */
     ParseArg (&Arg1, Arg1Type);
     g_push (Arg1.Flags, Arg1.Expr.IVal);
-    Arg1.End = GetCodePos ();
+    GetCodePos (&Arg1.End);
     ParamSize += SizeOf (Arg1Type);
     ConsumeComma ();
 
@@ -767,7 +768,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         }
 
         /* Drop the generated code */
-        RemoveCode (Start);
+        RemoveCode (&Start);
 
         /* We need labels */
         L1 = GetLocalLabel ();
@@ -801,7 +802,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Offs = ED_GetStackOffs (&Arg2.Expr, 0);
 
         /* Drop the generated code */
-        RemoveCode (Start);
+        RemoveCode (&Start);
 
         /* We need labels */
         L1 = GetLocalLabel ();
@@ -844,7 +845,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         int Offs = ED_GetStackOffs (&Arg1.Expr, 0);
 
         /* Drop the generated code */
-        RemoveCode (Start);
+        RemoveCode (&Start);
 
         /* We need labels */
         L1 = GetLocalLabel ();
@@ -1057,7 +1058,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
 
 /*****************************************************************************/
-/*  		    	 	     Code	       	 		     */
+/*  		     	 	     Code	       	 		     */
 /*****************************************************************************/
 
 

@@ -37,6 +37,11 @@
 #define STACKPTR_H
 
 
+                     
+/* cc65 */
+#include "datatype.h"
+
+
 
 /*****************************************************************************/
 /*		     		     Data				     */
@@ -52,6 +57,14 @@ extern int StackPtr;
 /*****************************************************************************/
 /*		     		     Code				     */
 /*****************************************************************************/
+
+
+
+void SP_Push (const type* T);
+/* Adjust the stackpointer for a push of an argument of the given type */
+
+void SP_Pop (const type* T);
+/* Adjust the stackpointer for a pop of an argument of the given type */
 
 
 

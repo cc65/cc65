@@ -56,7 +56,7 @@
 
 
 /*****************************************************************************/
-/*	  	    		     Code		     		     */
+/*	  	    		     Code  		     		     */
 /*****************************************************************************/
 
 
@@ -109,7 +109,7 @@ void SwitchStatement (void)
     /* Remember the current code position. We will move the switch code
      * to this position later.
      */
-    CaseCodeStart = GetCodePos();
+    GetCodePos (&CaseCodeStart);
 
     /* Opening curly brace */
     ConsumeLCurly ();
@@ -232,7 +232,7 @@ void SwitchStatement (void)
 
     } else {
 
-        CodeMark SwitchCodeStart;
+        CodeMark SwitchCodeStart, SwitchCodeEnd;
 
         /* If the last statement did not have a break, we may have an open
          * label (maybe from an if or similar). Emitting code and then moving
@@ -246,7 +246,7 @@ void SwitchStatement (void)
         }
 
 	/* Remember the current position */
-	SwitchCodeStart = GetCodePos();
+	GetCodePos (&SwitchCodeStart);
 
         /* Output the switch code label */
         g_defcodelabel (SwitchCodeLabel);
@@ -255,7 +255,8 @@ void SwitchStatement (void)
        	g_switch (Nodes, DefaultLabel? DefaultLabel : ExitLabel, Depth);
 
 	/* Move the code to the front */
-	MoveCode (SwitchCodeStart, GetCodePos(), CaseCodeStart);
+        GetCodePos (&SwitchCodeEnd);
+	MoveCode (&SwitchCodeStart, &SwitchCodeEnd, &CaseCodeStart);
 
     }
 

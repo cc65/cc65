@@ -494,7 +494,7 @@ static void FunctionCall (ExprDesc* Expr)
     int           IsFuncPtr;      /* Flag */
     int           StdFunc;        /* Standard function index */
     unsigned 	  ParamSize;	  /* Number of parameter bytes */
-    CodeMark 	  Mark = 0;       /* Initialize to keep gcc silent */
+    CodeMark   	  Mark;
     int           PtrOffs = 0;    /* Offset of function pointer on stack */
     int           IsFastCall = 0; /* True if it's a fast call function */
     int           PtrOnStack = 0; /* True if a pointer copy is on stack */
@@ -530,7 +530,7 @@ static void FunctionCall (ExprDesc* Expr)
        	    ED_MakeRValExpr (Expr);
 
 	    /* Remember the code position */
-	    Mark = GetCodePos ();
+	    GetCodePos (&Mark);
 
 	    /* Push the pointer onto the stack and remember the offset */
 	    g_push (CF_PTR, 0);
@@ -567,8 +567,7 @@ static void FunctionCall (ExprDesc* Expr)
 	    	 * stack pointer.
 	    	 */
 	    	if (ParamSize == 0) {
-	    	    RemoveCode (Mark);
-	       	    pop (CF_PTR);
+	    	    RemoveCode (&Mark);
 	    	    PtrOnStack = 0;
 	    	} else {
 	    	    /* Load from the saved copy */
@@ -850,8 +849,7 @@ static void ArrayRef (ExprDesc* Expr)
     ConstBaseAddr = (ED_IsLocConst (Expr) || ED_IsLocStack (Expr));
 
     /* If we have a constant base, we delay the address fetch */
-    Mark1 = GetCodePos ();
-    Mark2 = 0; 	       	/* Silence gcc */
+    GetCodePos (&Mark1);
     if (!ConstBaseAddr) {
     	/* Get a pointer to the array into the primary */
     	LoadExpr (CF_NONE, Expr);
@@ -860,7 +858,7 @@ static void ArrayRef (ExprDesc* Expr)
     	 * bit, even if this value is greater, since we cannot handle
     	 * other than 16bit stuff when doing indexing.
     	 */
-    	Mark2 = GetCodePos ();
+    	GetCodePos (&Mark2);
     	g_push (CF_PTR, 0);
     }
 
@@ -908,8 +906,7 @@ static void ArrayRef (ExprDesc* Expr)
          * since we can generate expression+offset.
          */
     	if (!ConstBaseAddr) {
-     	    RemoveCode (Mark2);
-     	    pop (CF_PTR);
+     	    RemoveCode (&Mark2);
       	} else {
     	    /* Get an array pointer into the primary */
     	    LoadExpr (CF_NONE, Expr);
@@ -923,7 +920,7 @@ static void ArrayRef (ExprDesc* Expr)
      	    SubScript.IVal *= CheckedSizeOf (ElementType);
 
             /* Remove the address load code */
-            RemoveCode (Mark1);
+            RemoveCode (&Mark1);
 
             /* In case of an array, we can adjust the offset of the expression
              * already in Expr. If the base address was a constant, we can even
@@ -964,7 +961,7 @@ static void ArrayRef (ExprDesc* Expr)
     } else {
 
     	/* Array subscript is not constant. Load it into the primary */
-	Mark2 = GetCodePos ();
+	GetCodePos (&Mark2);
         LoadExpr (CF_NONE, &SubScript);
 
         /* Do scaling */
@@ -1031,7 +1028,7 @@ static void ArrayRef (ExprDesc* Expr)
                 } else {
                     Flags = CF_INT;
                 }
-    	     	RemoveCode (Mark2);
+    	     	RemoveCode (&Mark2);
 
 	    	/* Get a pointer to the array into the primary. */
 	    	LoadExpr (CF_NONE, Expr);
@@ -1592,11 +1589,12 @@ void hie10 (ExprDesc* Expr)
      	       	ConsumeRParen ();
      	    } else {
     	       	/* Remember the output queue pointer */
-    	       	CodeMark Mark = GetCodePos ();
+    	       	CodeMark Mark;
+                GetCodePos (&Mark);
      	       	hie10 (Expr);
      	       	Size = CheckedSizeOf (Expr->Type);
     	       	/* Remove any generated code */
-    	       	RemoveCode (Mark);
+    	       	RemoveCode (&Mark);
      	    }
             ED_MakeConstAbs (Expr, Size, type_size_t);
 	    ED_MarkAsUntested (Expr);
@@ -1660,16 +1658,16 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 	NextToken ();
 
 	/* Get the lhs on stack */
-       	Mark1 = GetCodePos ();
+       	GetCodePos (&Mark1);
 	ltype = TypeOf (Expr->Type);
        	if (ED_IsConstAbs (Expr)) {
 	    /* Constant value */
-	    Mark2 = GetCodePos ();
+	    GetCodePos (&Mark2);
        	    g_push (ltype | CF_CONST, Expr->IVal);
 	} else {
 	    /* Value not constant */
 	    LoadExpr (CF_NONE, Expr);
-	    Mark2 = GetCodePos ();
+	    GetCodePos (&Mark2);
 	    g_push (ltype, 0);
 	}
 
@@ -1685,8 +1683,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 	if (ED_IsConstAbs (Expr) && rconst) {
 
 	    /* Both operands are constant, remove the generated code */
-    	    RemoveCode (Mark1);
-	    pop (ltype);
+    	    RemoveCode (&Mark1);
 
 	    /* Evaluate the result */
 	    Expr->IVal = kcalc (Tok, Expr->IVal, Expr2.IVal);
@@ -1712,8 +1709,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 	     	    Error ("Modulo operation with zero");
 	     	}
 	 	if ((Gen->Flags & GEN_NOPUSH) != 0) {
-	 	    RemoveCode (Mark2);
-	       	    pop (ltype);
+	 	    RemoveCode (&Mark2);
 	 	    ltype |= CF_REG;   	/* Value is in register */
 	 	}
 	    }
@@ -1756,16 +1752,16 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
     	NextToken ();
 
     	/* Get the lhs on stack */
-    	Mark1 = GetCodePos ();
+    	GetCodePos (&Mark1);
     	ltype = TypeOf (Expr->Type);
     	if (ED_IsConstAbs (Expr)) {
     	    /* Constant value */
-    	    Mark2 = GetCodePos ();
+    	    GetCodePos (&Mark2);
        	    g_push (ltype | CF_CONST, Expr->IVal);
     	} else {
     	    /* Value not constant */
     	    LoadExpr (CF_NONE, Expr);
-    	    Mark2 = GetCodePos ();
+    	    GetCodePos (&Mark2);
     	    g_push (ltype, 0);
       	}
 
@@ -1797,8 +1793,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 	if (ED_IsConstAbs (Expr) && rconst) {
 
 	    /* Both operands are constant, remove the generated code */
-    	    RemoveCode (Mark1);
-	    pop (ltype);
+    	    RemoveCode (&Mark1);
 
 	    /* Evaluate the result */
 	    Expr->IVal = kcalc (tok, Expr->IVal, Expr2.IVal);
@@ -1813,8 +1808,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
 	    if (rconst) {
 	    	flags |= CF_CONST;
 	    	if ((Gen->Flags & GEN_NOPUSH) != 0) {
-	    	    RemoveCode (Mark2);
-	       	    pop (ltype);
+	    	    RemoveCode (&Mark2);
 	    	    ltype |= CF_REG;	/* Value is in register */
 	    	}
 	    }
@@ -2010,7 +2004,7 @@ static void parseadd (ExprDesc* Expr)
 
     	/* Left hand side is not constant. Get the value onto the stack. */
     	LoadExpr (CF_NONE, Expr);              /* --> primary register */
-       	Mark = GetCodePos ();
+       	GetCodePos (&Mark);
     	g_push (TypeOf (Expr->Type), 0);	/* --> stack */
 
     	/* Evaluate the rhs */
@@ -2020,8 +2014,7 @@ static void parseadd (ExprDesc* Expr)
     	    rhst = Expr2.Type;
 
       	    /* Remove pushed value from stack */
-    	    RemoveCode (Mark);
-    	    pop (TypeOf (Expr->Type));
+    	    RemoveCode (&Mark);
 
        	    /* Check for pointer arithmetic */
        	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -2121,9 +2114,9 @@ static void parsesub (ExprDesc* Expr)
     rscale = 1;	     	    	/* Scale by 1, that is, don't scale */
 
     /* Remember the output queue position, then bring the value onto the stack */
-    Mark1 = GetCodePos ();
+    GetCodePos (&Mark1);
     LoadExpr (CF_NONE, Expr);  /* --> primary register */
-    Mark2 = GetCodePos ();
+    GetCodePos (&Mark2);
     g_push (TypeOf (lhst), 0);	/* --> stack */
 
     /* Parse the right hand side */
@@ -2136,8 +2129,7 @@ static void parsesub (ExprDesc* Expr)
     	if (ED_IsConstAbs (Expr)) {
 
     	    /* Both sides are constant, remove generated code */
-      	    RemoveCode (Mark1);
-    	    pop (TypeOf (lhst));       	/* Clean up the stack */
+      	    RemoveCode (&Mark1);
 
     	    /* Check for pointer arithmetic */
     	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
@@ -2171,8 +2163,7 @@ static void parsesub (ExprDesc* Expr)
     	    /* Left hand side is not constant, right hand side is.
     	     * Remove pushed value from stack.
     	     */
-    	    RemoveCode (Mark2);
-    	    pop (TypeOf (lhst));
+    	    RemoveCode (&Mark2);
 
     	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    	/* Left is pointer, right is int, must scale rhs */
@@ -2691,17 +2682,16 @@ static void opeq (const GenDesc* Gen, ExprDesc* Expr)
     LoadExpr (CF_NONE, Expr);
 
     /* Bring the lhs on stack */
-    Mark = GetCodePos ();
+    GetCodePos (&Mark);
     g_push (flags, 0);
 
     /* Evaluate the rhs */
     if (evalexpr (CF_NONE, hie1, &Expr2) == 0) {
-	/* The resulting value is a constant. If the generator has the NOPUSH
-	 * flag set, don't push the lhs.
-	 */
-	if (Gen->Flags & GEN_NOPUSH) {
-	    RemoveCode (Mark);
-	    pop (flags);
+    	/* The resulting value is a constant. If the generator has the NOPUSH
+    	 * flag set, don't push the lhs.
+    	 */
+    	if (Gen->Flags & GEN_NOPUSH) {
+    	    RemoveCode (&Mark);
 	}
        	if (MustScale) {
 	    /* lhs is a pointer, scale rhs */

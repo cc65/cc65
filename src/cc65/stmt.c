@@ -418,7 +418,7 @@ static void ForStatement (void)
     ConsumeSemi ();
 
     /* Remember the start of the increment expression */
-    IncExprStart = GetCodePos();
+    GetCodePos (&IncExprStart);
 
     /* Label for the increment expression */
     g_defcodelabel (IncLabel);
@@ -433,7 +433,7 @@ static void ForStatement (void)
     g_jump (TestLabel);
 
     /* Remember the end of the increment expression */
-    IncExprEnd = GetCodePos();
+    GetCodePos (&IncExprEnd);
 
     /* Skip the closing paren */
     ConsumeRParen ();
@@ -447,7 +447,9 @@ static void ForStatement (void)
      * the loop body.
      */
     if (HaveIncExpr) {
-    	MoveCode (IncExprStart, IncExprEnd, GetCodePos());
+        CodeMark Here;
+        GetCodePos (&Here);
+       	MoveCode (&IncExprStart, &IncExprEnd, &Here);
     } else {
     	/* Jump back to the increment expression */
     	g_jump (IncLabel);
@@ -520,7 +522,7 @@ int Statement (int* PendingToken)
 {
     ExprDesc Expr;
     int GotBreak;
-    CodeMark Start;
+    CodeMark Start, End;
 
     /* Assume no pending token */
     if (PendingToken) {
@@ -593,7 +595,7 @@ int Statement (int* PendingToken)
 
 	    default:
                 /* Remember the current code position */
-                Start = GetCodePos ();
+                GetCodePos (&Start);
 	        /* Actual statement */
                 ExprWithCheck (hie0, &Expr);
                 /* Load the result only if it is an lvalue and the type is
@@ -603,9 +605,10 @@ int Statement (int* PendingToken)
                     LoadExpr (CF_NONE, &Expr);
                 }
                 /* If the statement didn't generate code, and is not of type
-                 * void, emit a warning
-                 */
-                if (GetCodePos () == Start && !IsTypeVoid (Expr.Type)) {
+                 * void, emit a warning.
+                 */     
+                GetCodePos (&End);
+                if (CodeRangeIsEmpty (&Start, &End) && !IsTypeVoid (Expr.Type)) {
                     Warning ("Statement has no effect");
                 }
 	    	CheckSemi (PendingToken);

@@ -561,6 +561,7 @@ static void Usage (void)
        	     "  --debug-info\t\tAdd debug info\n"
        	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet a compiler include directory path\n"
+	     "  --mapfile name\tCreate a map file\n"
        	     "  --target sys\t\tSet the target system\n"
        	     "  --version\t\tPrint the version number\n"
        	     "  --verbose\t\tVerbose mode\n",
@@ -580,9 +581,6 @@ static void OptAnsi (const char* Opt, const char* Arg)
 static void OptAsmIncludeDir (const char* Opt, const char* Arg)
 /* Include directory (assembler) */
 {
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
     CmdAddArg (&CA65, "-I");
     CmdAddArg (&CA65, Arg);
 }
@@ -618,11 +616,18 @@ static void OptHelp (const char* Opt, const char* Arg)
 static void OptIncludeDir (const char* Opt, const char* Arg)
 /* Include directory (compiler) */
 {
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
     CmdAddArg (&CC65, "-I");
     CmdAddArg (&CC65, Arg);
+}
+
+
+
+static void OptMapFile (const char* Opt, const char* Arg)
+/* Create a map file */
+{
+    /* Create a map file (linker) */
+    CmdAddArg (&LD65, "-m");
+    CmdAddArg (&LD65, Arg);
 }
 
 
@@ -630,9 +635,6 @@ static void OptIncludeDir (const char* Opt, const char* Arg)
 static void OptTarget (const char* Opt, const char* Arg)
 /* Set the target system */
 {
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
     Target = FindTarget (Arg);
     if (Target == TGT_UNKNOWN) {
 	Error ("No such target system: `%s'", Arg);
@@ -672,6 +674,7 @@ int main (int argc, char* argv [])
 	{ "--debug-info",	0,	OptDebugInfo		},
 	{ "--help",		0,	OptHelp			},
 	{ "--include-dir",	1,	OptIncludeDir		},
+	{ "--mapfile",		1,	OptMapFile		},
 	{ "--target",		1,	OptTarget		},
 	{ "--verbose",		0,	OptVerbose		},
 	{ "--version",		0,	OptVersion		},
@@ -793,8 +796,7 @@ int main (int argc, char* argv [])
 
 	   	case 'm':
 		    /* Create a map file (linker) */
-		    CmdAddArg (&LD65, "-m");
-		    CmdAddArg (&LD65, GetArg (&I, 2));
+		    OptMapFile (Arg, GetArg (&I, 2));
 		    break;
 
 		case 'o':

@@ -9,10 +9,9 @@
 ; unsigned char wherey (void);
 
 	    .export _wherex, _wherey
-	    .importzp tmp1, tmp2
+	    .importzp cursor_c, cursor_r
 
 	    .include "../inc/jumptab.inc"
-	    .include "../inc/cursor.inc"
 
 _wherex:    lda cursor_c
 	    rts

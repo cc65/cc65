@@ -8,10 +8,10 @@
 
 	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
-	    .include "../inc/cursor.inc"
 
     	    .export		_cclearxy, _cclear
 	    .import		popa, _gotoxy, fixcursor
+	    .importzp		cursor_x, cursor_y, cursor_c
 
 _cclearxy:
        	pha	    		; Save the length

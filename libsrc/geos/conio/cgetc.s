@@ -9,10 +9,10 @@
 
 	    .export _cgetc
 	    .import update_cursor
+	    .importzp cursor_x, cursor_y, cursor_flag
 
 	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
-	    .include "../inc/cursor.inc"
 
 _cgetc:
 ; show cursor if needed

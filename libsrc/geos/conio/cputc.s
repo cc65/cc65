@@ -13,11 +13,11 @@
 	    .import _gotoxy, fixcursor
 	    .import popa
 	    .import xsize,ysize
+	    .importzp cursor_x, cursor_y, cursor_c, cursor_r
 
 	    .include "../inc/const.inc"
 	    .include "../inc/geossym.inc"
 	    .include "../inc/jumptab.inc"
-	    .include "../inc/cursor.inc"
 
 _cputcxy:
 	pha	    		; Save C

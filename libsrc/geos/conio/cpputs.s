@@ -15,11 +15,11 @@
 
 	    .import _gotoxy
 	    .import popa
+	    .importzp cursor_x, cursor_y
 
 	    .include "../inc/const.inc"
 	    .include "../inc/geossym.inc"
 	    .include "../inc/jumptab.inc"
-	    .include "../inc/cursor.inc"
 
 _cpputsxy:
 	sta	r0L		; Save s for later

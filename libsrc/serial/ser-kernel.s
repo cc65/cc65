@@ -33,8 +33,7 @@ ser_ioctl:      jmp     return0
 
 ; Driver header signature
 .rodata
-ser_sig:        .byte   $73, $65, $72, $00      ; "ser", version
-ser_sig_len     = * - ser_sig
+ser_sig:        .byte   $73, $65, $72, SER_API_VERSION  ; "ser", version
 
 
 ;----------------------------------------------------------------------------
@@ -50,7 +49,7 @@ _ser_install:
 
 ; Check the driver signature
 
-        ldy     #ser_sig_len-1
+        ldy     #.sizeof(ser_sig)-1
 @L0:    lda     (ptr1),y
         cmp     ser_sig,y
         bne     inv_drv
@@ -64,7 +63,7 @@ _ser_install:
 @L1:    inx                             ; Skip the JMP opcode
         jsr     copy                    ; Copy one byte
         jsr     copy                    ; Copy one byte
-        cpx     #(SER_HDR::JUMPTAB + .sizeof(SER_HDR::JUMPTAB))
+        cpy     #(SER_HDR::JUMPTAB + .sizeof(SER_HDR::JUMPTAB))
         bne     @L1
 
         jmp     ser_install             ; Call driver install routine

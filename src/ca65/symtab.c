@@ -498,7 +498,7 @@ void SymImport (const char* Name, int ZP)
      */
     if (S->Flags & SF_GLOBAL) {
      	if ((ZP != 0) != ((S->Flags & SF_ZP) != 0)) {
-     	    Error (ERR_SYM_REDECL_MISMATCH);
+     	    Error (ERR_SYM_REDECL_MISMATCH, Name);
      	}
         S->Flags &= ~SF_GLOBAL;
     }
@@ -536,7 +536,7 @@ void SymExport (const char* Name, int ZP)
      */
     if (S->Flags & SF_GLOBAL) {
      	if ((ZP != 0) != ((S->Flags & SF_ZP) != 0)) {
-     	    Error (ERR_SYM_REDECL_MISMATCH);
+     	    Error (ERR_SYM_REDECL_MISMATCH, Name);
      	}
         S->Flags &= ~SF_GLOBAL;
     }
@@ -570,7 +570,7 @@ void SymGlobal (const char* Name, int ZP)
      * size of the definition, then bail out. */
     if (S->Flags & SF_IMPORT || S->Flags & SF_EXPORT) {
      	if ((ZP != 0) != ((S->Flags & SF_ZP) != 0)) {
-     	    Error (ERR_SYM_REDECL_MISMATCH);
+     	    Error (ERR_SYM_REDECL_MISMATCH, Name);
      	}
      	return;
     }
@@ -620,7 +620,7 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
 
     /* Check if the symbol was not already defined as ZP symbol */
     if ((S->Flags & SF_ZP) != 0) {
-	Error (ERR_SYM_REDECL_MISMATCH);
+	Error (ERR_SYM_REDECL_MISMATCH, Name);
     }
 
     /* If the symbol was already declared as a condes, check if the new
@@ -628,7 +628,7 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
      */
     if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
 	if (S->ConDesPrio[Type] != Prio) {
-	    Error (ERR_SYM_REDECL_MISMATCH);
+	    Error (ERR_SYM_REDECL_MISMATCH, Name);
 	}
     }
     S->ConDesPrio[Type] = Prio;

@@ -178,7 +178,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
 	"Too many macro parameters",
 	"Macro parameter expected",
 	"Circular reference in symbol definition",
-       	"Symbol redeclaration mismatch",
+       	"Symbol `%s' redeclaration mismatch",
         "Alignment value must be a power of 2",
      	"Duplicate `.ELSE'",
        	"Conditional assembly branch was never closed",

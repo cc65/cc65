@@ -247,6 +247,11 @@ INLINE int SymHasUserMark (SymEntry* S)
 #else
 #  define SymHasUserMark(S) (((S)->Flags & SF_USER) != 0)
 #endif
+       
+struct SymTable* GetSymParentScope (SymEntry* S);
+/* Get the parent scope of the symbol (not the one it is defined in). Return
+ * NULL if the symbol is a cheap local, or defined on global level.
+ */
 
 struct ExprNode* GetSymExpr (SymEntry* Sym);
 /* Get the expression for a non-const symbol */

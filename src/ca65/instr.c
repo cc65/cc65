@@ -43,6 +43,7 @@
 #include "attrib.h"
 #include "bitops.h"
 #include "check.h"
+#include "mmodel.h"
 
 /* ca65 */
 #include "asserts.h"
@@ -586,16 +587,21 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
         /* Simplify it if possible */
         A->Expr = SimplifyExpr (A->Expr, &ED);
 
+        /* If we don't know how big the expression is, assume the default
+         * address size for data.
+         */
+        if (ED.AddrSize == ADDR_SIZE_DEFAULT) {
+            ED.AddrSize = DataAddrSize;
+        }
+
         /* Check the size */
         switch (ED.AddrSize) {
 
             case ADDR_SIZE_ABS:
-                printf ("abs\n");
                 A->AddrModeSet &= ~AM_SET_ZP;
                 break;
 
             case ADDR_SIZE_FAR:
-                printf ("far\n");
                 A->AddrModeSet &= ~(AM_SET_ZP | AM_SET_ABS);
                 break;
         }

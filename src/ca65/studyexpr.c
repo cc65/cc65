@@ -126,8 +126,47 @@ static void ED_Invalidate (ExprDesc* D)
 static void ED_UpdateAddrSize (ExprDesc* ED, unsigned char AddrSize)
 /* Update the address size of the expression */
 {
-    if (ED->AddrSize == ADDR_SIZE_DEFAULT || AddrSize > ED->AddrSize) {
-        ED->AddrSize = AddrSize;
+    if (ED_IsValid (ED)) {
+        /* ADDR_SIZE_DEFAULT may get overridden */
+        if (ED->AddrSize == ADDR_SIZE_DEFAULT || AddrSize > ED->AddrSize) {
+            ED->AddrSize = AddrSize;
+        }
+    } else {
+        /* ADDR_SIZE_DEFAULT takes precedence */
+        if (ED->AddrSize != ADDR_SIZE_DEFAULT) {
+            if (AddrSize == ADDR_SIZE_DEFAULT || AddrSize > ED->AddrSize) {
+                ED->AddrSize = AddrSize;
+            }
+        }
+    }
+}
+
+
+
+static void ED_MergeAddrSize (ExprDesc* ED, const ExprDesc* Right)
+/* Merge the address sizes of two expressions into ED */
+{
+    if (ED->AddrSize == ADDR_SIZE_DEFAULT) {
+        /* If ED is valid, ADDR_SIZE_DEFAULT gets always overridden, otherwise
+         * it takes precedence over anything else.
+         */
+        if (ED_IsValid (ED)) {
+            ED->AddrSize = Right->AddrSize;
+        }
+    } else if (Right->AddrSize == ADDR_SIZE_DEFAULT) {
+        /* If Right is valid, ADDR_SIZE_DEFAULT gets always overridden,
+         * otherwise it takes precedence over anything else.
+         */
+        if (!ED_IsValid (Right)) {
+            ED->AddrSize = Right->AddrSize;
+        }
+    } else {
+        /* Neither ED nor Right has a default address size, use the larger of
+         * the two.
+         */
+        if (Right->AddrSize > ED->AddrSize) {
+            ED->AddrSize = Right->AddrSize;
+        }
     }
 }
 
@@ -301,7 +340,7 @@ static void ED_Add (ExprDesc* ED, const ExprDesc* Right)
 {
     ED->Val += Right->Val;
     ED_MergeRefs (ED, Right);
-    ED_UpdateAddrSize (ED, Right->AddrSize);
+    ED_MergeAddrSize (ED, Right);
 }
 
 
@@ -318,7 +357,7 @@ static void ED_Mul (ExprDesc* ED, const ExprDesc* Right)
     for (I = 0; I < ED->SecCount; ++I) {
         ED->SecRef[I].Count *= Right->Val;
     }
-    ED_UpdateAddrSize (ED, Right->AddrSize);
+    ED_MergeAddrSize (ED, Right);
 }
 
 
@@ -398,7 +437,7 @@ static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
 
         /* Merge references and update address size */
         ED_MergeRefs (D, &Right);
-        ED_UpdateAddrSize (D, Right.AddrSize);
+        ED_MergeAddrSize (D, &Right);
 
     }
 
@@ -411,6 +450,7 @@ static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
 static void StudyLiteral (ExprNode* Expr, ExprDesc* D)
 /* Study a literal expression node */
 {
+
     /* This one is easy */
     D->Val = Expr->V.Val;
 }
@@ -429,6 +469,7 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
      * a circular reference.
      */
     if (SymHasExpr (Sym)) {
+
         if (SymHasUserMark (Sym)) {
             if (Verbosity > 0) {
                 DumpExpr (Expr, SymResolve);
@@ -448,26 +489,52 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
 
             /* If the symbol has an explicit address size, use it. This may
              * lead to range errors later (maybe even in the linker stage), if
-             * the user lied about the address size, but for now we trust the
-             * user.
+             * the user lied about the address size, but for now we trust him.
              */
             AddrSize = GetSymAddrSize (Sym);
             if (AddrSize != ADDR_SIZE_DEFAULT) {
                 D->AddrSize = AddrSize;
             }
         }
-    } else {
-        /* The symbol is either undefined or an import. In both cases, track
-         * the symbols used and update the address size, but in case of an
-         * undefined symbol also set the "too complex" flag, since we cannot
-         * evaluate the final result.
+
+    } else if (SymIsImport (Sym)) {
+
+        /* The symbol is an import. Track the symbols used and update the
+         * address size.
          */
         ED_SymRef* SymRef = ED_GetSymRef (D, Sym);
         ++SymRef->Count;
         ED_UpdateAddrSize (D, GetSymAddrSize (Sym));
-        if (!SymIsImport (Sym)) {
-            /* Cannot handle */
-            ED_Invalidate (D);
+
+    } else {
+
+        unsigned char AddrSize;
+        SymTable* Parent;
+
+        /* The symbol is undefined. Track symbol usage but set the "too
+         * complex" flag, since we cannot evaluate the final result.
+         */
+        ED_SymRef* SymRef = ED_GetSymRef (D, Sym);
+        ++SymRef->Count;
+        ED_Invalidate (D);
+
+        /* Since the symbol may be a forward, and we may need a statement
+         * about the address size, check higher lexical levels for a symbol
+         * with the same name and use its address size if we find such a
+         * symbol which is defined.
+         */
+        AddrSize = GetSymAddrSize (Sym);
+        Parent = GetSymParentScope (Sym);
+        if (AddrSize == ADDR_SIZE_DEFAULT && Parent != 0) {
+            SymEntry* H = SymFindAny (Parent, GetSymName (Sym));
+            if (H) {
+                AddrSize = GetSymAddrSize (H);
+                if (AddrSize != ADDR_SIZE_DEFAULT) {
+                    D->AddrSize = AddrSize;
+                }
+            }
+        } else {
+            D->AddrSize = AddrSize;
         }
     }
 }
@@ -528,7 +595,7 @@ static void StudyPlus (ExprNode* Expr, ExprDesc* D)
 
         /* Merge references and update address size */
         ED_MergeRefs (D, &Right);
-        ED_UpdateAddrSize (D, Right.AddrSize);
+        ED_MergeAddrSize (D, &Right);
 
     }
 
@@ -564,7 +631,7 @@ static void StudyMinus (ExprNode* Expr, ExprDesc* D)
 
         /* Merge references and update address size */
         ED_MergeRefs (D, &Right);
-        ED_UpdateAddrSize (D, Right.AddrSize);
+        ED_MergeAddrSize (D, &Right);
 
     }
 
@@ -612,7 +679,7 @@ static void StudyMul (ExprNode* Expr, ExprDesc* D)
     /* If we could not handle the op, merge references and update address size */
     if (!ED_IsValid (D)) {
         ED_MergeRefs (D, &Right);
-        ED_UpdateAddrSize (D, Right.AddrSize);
+        ED_MergeAddrSize (D, &Right);
     }
 
     /* Done */

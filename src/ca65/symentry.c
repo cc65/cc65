@@ -485,6 +485,16 @@ int SymIsConst (SymEntry* S, long* Val)
 
 
 
+SymTable* GetSymParentScope (SymEntry* S)
+/* Get the parent scope of the symbol (not the one it is defined in). Return
+ * NULL if the symbol is a cheap local, or defined on global level.
+ */
+{
+    return (S->SymTab && S->SymTab->Parent)? S->SymTab->Parent : 0;
+}
+
+
+
 struct ExprNode* GetSymExpr (SymEntry* S)
 /* Get the expression for a non-const symbol */
 {

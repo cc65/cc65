@@ -355,6 +355,11 @@ void SegCheck (void)
                     if ((F->Len == 1 && ED.AddrSize > ADDR_SIZE_ZP)  ||
                         (F->Len == 2 && ED.AddrSize > ADDR_SIZE_ABS) ||
                         (F->Len == 3 && ED.AddrSize > ADDR_SIZE_FAR)) {
+                        printf ("Range error\n");
+                        printf ("F->Len = %u, ED.AddrSize = %s\n",
+                                F->Len, AddrSizeToStr (ED.AddrSize));
+                        DumpExpr (F->V.Expr, SymResolve);
+                        printf ("-------------------------------------------\n");
      	       	        PError (&F->Pos, "Range error");
      	     	    }
      		}

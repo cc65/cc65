@@ -1524,37 +1524,37 @@ static void CheckByteExpr (const ExprNode* N, int* IsByte)
     	switch (N->Op & EXPR_TYPEMASK) {
 
     	    case EXPR_LEAFNODE:
-		switch (N->Op) {
+	       	switch (N->Op) {
 
-    		    case EXPR_SYMBOL:
-    			if (SymIsZP (N->V.Sym)) {
-    			    *IsByte = 1;
-    	     	       	} else if (SymHasExpr (N->V.Sym)) {
-			    /* Check if this expression is a byte expression */
-			    *IsByte = IsByteExpr (GetSymExpr (N->V.Sym));
-			}
-			break;
+    	       	    case EXPR_SYMBOL:
+    	       		if (SymIsZP (N->V.Sym)) {
+    	       		    *IsByte = 1;
+    	       	       	} else if (SymHasExpr (N->V.Sym)) {
+	       		    /* Check if this expression is a byte expression */
+	       		    CheckByteExpr (GetSymExpr (N->V.Sym), IsByte);
+	       		}
+	       		break;
 
-		    case EXPR_SECTION:
-			if (GetSegAddrSize (N->V.SegNum) == ADDR_SIZE_ZP) {
-			    *IsByte = 1;
-			}
-			break;
+	       	    case EXPR_SECTION:
+	       		if (GetSegAddrSize (N->V.SegNum) == ADDR_SIZE_ZP) {
+	       		    *IsByte = 1;
+	       		}
+	       		break;
 
-		}
-    		break;
+	       	}
+    	       	break;
 
     	    case EXPR_UNARYNODE:
-    		CheckByteExpr (N->Left, IsByte);
-    		break;
+    	       	CheckByteExpr (N->Left, IsByte);
+    	       	break;
 
     	    case EXPR_BINARYNODE:
-    		CheckByteExpr (N->Left, IsByte);
-    		CheckByteExpr (N->Right, IsByte);
-    		break;
+    	       	CheckByteExpr (N->Left, IsByte);
+    	       	CheckByteExpr (N->Right, IsByte);
+    	       	break;
 
     	    default:
-    		Internal ("Unknown expression op: %02X", N->Op);
+    	       	Internal ("Unknown expression op: %02X", N->Op);
     	}
     }
 }

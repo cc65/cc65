@@ -468,7 +468,7 @@ const struct ExprNode* SymResolve (const SymEntry* S)
 
 
 
-const char* GetSymName (SymEntry* S)
+const char* GetSymName (const SymEntry* S)
 /* Return the name of the symbol */
 {
     /* Resolve trampoline entries */
@@ -480,7 +480,20 @@ const char* GetSymName (SymEntry* S)
 
 
 
-unsigned GetSymIndex (SymEntry* S)
+unsigned GetSymAddrSize (const SymEntry* S)
+/* Return the address size of the symbol. Beware: This function will just
+ * return the AddrSize member, it will not look at the expression!
+ */
+{
+    if (S->Flags & SF_TRAMPOLINE) {
+	S = S->V.Sym;
+    }
+    return S->AddrSize;
+}
+
+
+
+unsigned GetSymIndex (const SymEntry* S)
 /* Return the symbol index for the given symbol */
 {
     /* Resolve trampoline entries */
@@ -493,7 +506,7 @@ unsigned GetSymIndex (SymEntry* S)
 
 
 
-const FilePos* GetSymPos (SymEntry* S)
+const FilePos* GetSymPos (const SymEntry* S)
 /* Return the position of first occurence in the source for the given symbol */
 {
     /* Resolve trampoline entries */

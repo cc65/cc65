@@ -187,13 +187,18 @@ const struct ExprNode* SymResolve (const SymEntry* Sym);
  * NULL. Do not call in other contexts!
  */
 
-const char* GetSymName (SymEntry* Sym);
+const char* GetSymName (const SymEntry* Sym);
 /* Return the name of the symbol */
 
-unsigned GetSymIndex (SymEntry* Sym);
+unsigned GetSymAddrSize (const SymEntry* Sym);
+/* Return the address size of the symbol. Beware: This function will just
+ * return the AddrSize member, it will not look at the expression!
+ */
+
+unsigned GetSymIndex (const SymEntry* Sym);
 /* Return the symbol index for the given symbol */
 
-const FilePos* GetSymPos (SymEntry* Sym);
+const FilePos* GetSymPos (const SymEntry* Sym);
 /* Return the position of first occurence in the source for the given symbol */
 
 

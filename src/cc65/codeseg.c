@@ -160,6 +160,48 @@ static void CS_RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
 
 
 
+static CodeLabel* CS_AddLabelInternal (CodeSeg* S, const char* Name, int UserCode)
+/* Add a code label for the next instruction to follow */
+{
+    /* Calculate the hash from the name */
+    unsigned Hash = HashStr (Name) % CS_LABEL_HASH_SIZE;
+
+    /* Try to find the code label if it does already exist */
+    CodeLabel* L = CS_FindLabel (S, Name, Hash);
+
+    /* Did we find it? */
+    if (L) {
+     	/* We found it - be sure it does not already have an owner */
+	if (L->Owner) {
+	    if (UserCode) {
+		Error ("ASM label `%s' is already defined", Name);
+	    } else {
+		Internal ("CS_AddLabelInternal: Label `%s' already defined", Name);
+	    }
+	}
+    } else {
+     	/* Not found - create a new one */
+     	L = CS_NewCodeLabel (S, Name, Hash);
+    }
+
+    /* Safety. This call is quite costly, but safety is better */
+    if (CollIndex (&S->Labels, L) >= 0) {
+	if (UserCode) {
+	    Error ("ASM label `%s' is already defined", Name);
+	} else {
+	    Internal ("CS_AddLabelInternal: Label `%s' already defined", Name);
+	}
+    }
+
+    /* We do now have a valid label. Remember it for later */
+    CollAppend (&S->Labels, L);
+
+    /* Return the label */
+    return L;
+}
+
+
+
 /*****************************************************************************/
 /*		      Functions for parsing instructions		     */
 /*****************************************************************************/
@@ -223,8 +265,27 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
     CodeEntry*	     	E;
     CodeLabel*		Label;
 
-    /* Mnemonic */
-    L = ReadToken (L, " \t", Mnemo, sizeof (Mnemo));
+    /* Read the first token and skip white space after it */
+    L = SkipSpace (ReadToken (L, " \t:", Mnemo, sizeof (Mnemo)));
+
+    /* Check if we have a label */
+    if (*L == ':') {
+
+	/* Skip the colon and following white space */
+	L = SkipSpace (L+1);
+
+	/* Add the label */
+	CS_AddLabelInternal (S,	Mnemo, 1);
+
+	/* If we have reached end of line, bail out, otherwise a mnemonic
+	 * may follow.
+	 */
+	if (*L == '\0') {
+	    return 0;
+	}
+
+	L = SkipSpace (ReadToken (L, " \t", Mnemo, sizeof (Mnemo)));
+    }
 
     /* Try to find the opcode description for the mnemonic */
     OPC = FindOP65 (Mnemo);
@@ -234,9 +295,6 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	Error ("ASM code error: %s is not a valid mnemonic", Mnemo);
 	return 0;
     }
-
-    /* Skip separator white space */
-    L = SkipSpace (L);
 
     /* Get the addressing mode */
     Arg[0] = '\0';
@@ -669,31 +727,7 @@ unsigned CS_GetEntryIndex (CodeSeg* S, struct CodeEntry* E)
 CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
 /* Add a code label for the next instruction to follow */
 {
-    /* Calculate the hash from the name */
-    unsigned Hash = HashStr (Name) % CS_LABEL_HASH_SIZE;
-
-    /* Try to find the code label if it does already exist */
-    CodeLabel* L = CS_FindLabel (S, Name, Hash);
-
-    /* Did we find it? */
-    if (L) {
-     	/* We found it - be sure it does not already have an owner */
-     	CHECK (L->Owner == 0);
-    } else {
-     	/* Not found - create a new one */
-     	L = CS_NewCodeLabel (S, Name, Hash);
-    }
-
-    /* Safety. This call is quite costly, but safety is better */
-    if (CollIndex (&S->Labels, L) >= 0) {
-     	Internal ("AddCodeLabel: Label `%s' already defined", Name);
-    }
-
-    /* We do now have a valid label. Remember it for later */
-    CollAppend (&S->Labels, L);
-
-    /* Return the label */
-    return L;
+    return CS_AddLabelInternal (S, Name, 0);
 }
 
 

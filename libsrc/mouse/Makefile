@@ -19,7 +19,11 @@
 
 C_OBJS =        mouse_load.o
 
-S_OBJS =        mouse-kernel.o  
+S_OBJS =        mouse-kernel.o  \
+                mouse_info.o    \
+                mouse_ioctl.o   \
+                mouse_pos.o
+
 
 
 #--------------------------------------------------------------------------

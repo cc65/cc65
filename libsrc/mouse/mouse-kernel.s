@@ -6,6 +6,7 @@
 
         .import         return0
         .importzp       ptr1
+       	.condes	       	mouse_irq, 2		; Export as IRQ handler
 
         .include        "mouse-kernel.inc"
 
@@ -30,6 +31,8 @@ mouse_move:     jmp     return0
 mouse_buttons:  jmp     return0
 mouse_pos:      jmp     return0
 mouse_info:     jmp     return0
+mouse_ioctl:    jmp     return0
+mouse_irq:	.byte	$60, $00, $00	; RTS plus two dummy bytes
 
 ; Driver header signature
 .rodata
@@ -69,6 +72,12 @@ _mouse_install:
 
         jmp     mouse_install           ; Call driver install routine
 
+        ldy     mouse_irq+2             ; Check high byte of IRQ vector
+        beq     @L2                     ; Jump if vector invalid
+	ldy	#$4C			; Jump opcode
+       	sty    	mouse_irq               ; Activate IRQ routine
+@L2:    rts
+
 ; Driver signature invalid
 
 inv_drv:
@@ -90,6 +99,9 @@ copy:   lda     (ptr1),y
 
 _mouse_uninstall:
         jsr     mouse_uninstall         ; Call driver routine
+
+	lda	#$60                    ; RTS opcode
+	sta	mouse_irq               ; Disable IRQ entry point
 
 mouse_clear_ptr:                        ; External entry point
         lda     #0

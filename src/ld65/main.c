@@ -245,7 +245,6 @@ static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
         Error ("Cannot find config file `%s'", Arg);
     } else {
         CfgSetName (PathName);
-        xfree (PathName);
     }
 }
 

@@ -422,14 +422,6 @@ void CopyEncode (const type* Source, type* Target)
 
 
 
-type UnqualifiedType (type T)
-/* Return the unqalified type */
-{
-    return (T & ~T_MASK_QUAL);
-}
-
-
-
 unsigned SizeOf (const type* T)
 /* Compute size of object represented by type array. */
 {
@@ -677,42 +669,6 @@ int IsVariadicFunc (const type* T)
 {
     FuncDesc* F = GetFuncDesc (T);
     return (F->Flags & FD_VARIADIC) != 0;
-}
-
-
-
-type GetType (const type* T)
-/* Get the raw type */
-{
-    PRECONDITION (T[0] != T_END);
-    return (T[0] & T_MASK_TYPE);
-}
-
-
-
-type GetClass (const type* T)
-/* Get the class of a type string */
-{
-    PRECONDITION (T[0] != T_END);
-    return (T[0] & T_MASK_CLASS);
-}
-
-
-
-type GetSignedness (const type* T)
-/* Get the sign of a type */
-{
-    PRECONDITION (T[0] != T_END);
-    return (T[0] & T_MASK_SIGN);
-}
-
-
-
-type GetSizeModifier (const type* T)
-/* Get the size modifier of a type */
-{
-    PRECONDITION (T[0] != T_END);
-    return (T[0] & T_MASK_SIZE);
 }
 
 

@@ -234,8 +234,15 @@ int HasEncode (const type* Type);
 void CopyEncode (const type* Source, type* Target);
 /* Copy encoded data from Source to Target */
 
-type UnqualifiedType (type T);
+#if defined(HAVE_INLINE)
+INLINE type UnqualifiedType (type T)
 /* Return the unqalified type */
+{
+    return (T & ~T_MASK_QUAL);
+}
+#else
+#  define UnqualifiedType(T)    ((T) & ~T_MASK_QUAL)
+#endif
 
 unsigned SizeOf (const type* Type);
 /* Compute size of object represented by type array. */
@@ -414,17 +421,45 @@ int IsVariadicFunc (const type* T) attribute ((const));
  * variable parameter list
  */
 
-type GetType (const type* T) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE type GetType (const type* T)
 /* Get the raw type */
+{
+    return (T[0] & T_MASK_TYPE);
+}
+#else
+#  define GetType(T)    ((T)[0] & T_MASK_TYPE)
+#endif
 
-type GetClass (const type* T) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE type GetClass (const type* T)
 /* Get the class of a type string */
+{
+    return (T[0] & T_MASK_CLASS);
+}
+#else
+#  define GetClass(T)    ((T)[0] & T_MASK_CLASS)
+#endif
 
-type GetSignedness (const type* T) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE type GetSignedness (const type* T)
 /* Get the sign of a type */
+{
+    return (T[0] & T_MASK_SIGN);
+}
+#else
+#  define GetSignedness(T)      ((T)[0] & T_MASK_SIGN)
+#endif
 
-type GetSizeModifier (const type* T) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE type GetSizeModifier (const type* T)
 /* Get the size modifier of a type */
+{
+    return (T[0] & T_MASK_SIZE);
+}
+#else
+#  define GetSizeModifier(T)      ((T)[0] & T_MASK_SIZE)
+#endif
 
 type GetQualifier (const type* T) attribute ((const));
 /* Get the qualifier from the given type string */

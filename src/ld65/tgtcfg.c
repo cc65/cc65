@@ -68,6 +68,7 @@ static const char CfgEmpty[] = "";
 #include "none.inc"
 #include "pet.inc"
 #include "plus4.inc"
+#include "supervision.inc"
 #include "vic20.inc"
 
 
@@ -98,6 +99,7 @@ const TargetDesc Targets [TGT_COUNT] = {
     {   BINFMT_O65,     CfgLunix        },
     {  	BINFMT_BINARY,	CfgAtmos        },
     {  	BINFMT_BINARY, 	CfgNES          },
+    {  	BINFMT_BINARY, 	CfgSupervision  },
 };
 
 
@@ -120,4 +122,4 @@ void DumpBuiltinConfig (FILE* F, target_t T)
 
 
 
-                                
+

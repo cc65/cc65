@@ -66,6 +66,7 @@ INCS =	apple2.inc	\
 	none.inc	\
 	pet.inc		\
 	plus4.inc	\
+        supervision.inc \
 	vic20.inc
 
 # -----------------------------------------------------------------------------
@@ -158,6 +159,9 @@ pet.inc:       	cfg/pet.cfg
 
 plus4.inc:     	cfg/plus4.cfg
 	@$(CVT) $< $@ CfgPlus4
+
+supervision.inc:	cfg/supervision.cfg
+	@$(CVT) $< $@ CfgSupervision
 
 vic20.inc:     	cfg/vic20.cfg
 	@$(CVT) $< $@ CfgVic20

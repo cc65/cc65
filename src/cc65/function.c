@@ -395,6 +395,9 @@ void NewFunc (SymEntry* Func)
     	g_stackcheck ();
     }
 
+    /* Setup the stack */
+    oursp = 0;
+
     /* Walk through the parameter list and allocate register variable space
      * for parameters declared as register. Generate code to swap the contents
      * of the register bank with the save area on the stack.
@@ -425,9 +428,6 @@ void NewFunc (SymEntry* Func)
         /* Next parameter */
         Param = Param->NextSym;
     }
-
-    /* Setup the stack */
-    oursp = 0;
 
     /* Need a starting curly brace */
     ConsumeLCurly ();

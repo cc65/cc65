@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -131,6 +131,18 @@ void TypeFree (type* T)
 /* Free a type string */
 {
     xfree (T);
+}
+
+
+
+int SignExtendChar (int C)
+/* Do correct sign extension of a character */
+{
+    if (SignedChars && (C & 0x80) != 0) {
+       	return C | ~0xFF;
+    } else {
+       	return C & 0xFF;
+    }
 }
 
 

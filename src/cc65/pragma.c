@@ -175,7 +175,7 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
 
     } else {
 	Error ("String literal expected");
-    }             
+    }
 
     /* Call the string buf destructor */
     DoneStrBuf (&S);
@@ -186,33 +186,37 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
 static void CharMapPragma (StrBuf* B)
 /* Change the character map */
 {
-    unsigned Index, C;
-
-    ExprDesc Val;
+    long Index, C;
 
     /* Read the character index */
-    ConstIntExpr (&Val);
-    if (Val.ConstVal < 1 || Val.ConstVal > 255) {
-    	Error ("Character index out of range");
-    	Index = 'A';
-    } else {
-    	Index = Val.ConstVal;
+    if (!SB_GetNumber (B, &Index)) {
+        return;
+    }
+    if (Index < 1 || Index > 255) {
+     	Error ("Character index out of range");
+     	return;
     }
 
     /* Comma follows */
-    ConsumeComma ();
+    SB_SkipWhite (B);
+    if (SB_Get (B) != ',') {
+        Error ("Comma expected");
+        return;
+    }
+    SB_SkipWhite (B);
 
     /* Read the character code */
-    ConstIntExpr (&Val);
-    if (Val.ConstVal < 1 || Val.ConstVal > 255) {
+    if (!SB_GetNumber (B, &C)) {
+        return;
+    }
+    if (C < 1 || C > 255) {
     	Error ("Character code out of range");
-    	C = 'A';
-    } else {
-    	C = Val.ConstVal;
+    	return;
     }
 
     /* Remap the character */
-    TgtTranslateSet (Index, C);
+    printf ("Translating %04lX to %04lX\n", Index, C);
+    TgtTranslateSet ((unsigned) Index, (unsigned char) C);
 }
 
 
@@ -346,9 +350,15 @@ static void ParsePragma (void)
         Error ("')' expected");
         return;
     }
+    SB_SkipWhite (&B);
+
+    /* Allow an optional semicolon to be compatible with the old syntax */
+    if (SB_Peek (&B) == ';') {
+        SB_Skip (&B);
+        SB_SkipWhite (&B);
+    }
 
     /* Make sure nothing follows */
-    SB_SkipWhite (&B);
     if (SB_Peek (&B) != '\0') {
         Error ("Unexpected input following pragma directive");
     }

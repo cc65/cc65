@@ -35,8 +35,10 @@
 
 /* common */
 #include "chartype.h"
+#include "tgttrans.h"
 
 /* cc65 */
+#include "datatype.h"
 #include "error.h"
 #include "hexval.h"
 #include "ident.h"
@@ -205,6 +207,103 @@ int SB_GetString (StrBuf* B, StrBuf* S)
         SB_Terminate (S);
         return 0;
     }
+}
+
+
+
+int SB_GetNumber (StrBuf* B, long* Val)
+/* Get a number from the string buffer. Accepted formats are decimal, octal,
+ * hex and character constants. Numeric constants may be preceeded by a
+ * minus or plus sign. The function returns 1 if a number was found and
+ * zero otherwise.
+ */
+{
+    int      Sign;
+    char     C;
+    unsigned Base;
+    unsigned DigitVal;
+
+    /* Initialize Val */
+    *Val = 0;
+
+    /* Check for a sign */
+    Sign = 1;
+    switch (SB_Peek (B)) {
+        case '-':
+            Sign = -1;
+            /* FALLTHROUGH */
+        case '+':
+            SB_Skip (B);
+            SB_SkipWhite (B);
+            break;
+    }
+
+    /* Check for the different formats */
+    C = SB_Peek (B);
+    if (IsDigit (C)) {
+
+        if (C == '0') {
+            /* Hex or octal */
+            SB_Skip (B);
+            if (tolower (SB_Peek (B)) == 'x') {
+                SB_Skip (B);
+                Base = 16;
+                if (!IsXDigit (SB_Peek (B))) {
+                    Error ("Invalid hexadecimal number");
+                    return 0;
+                }
+            } else {
+                Base = 8;
+            }
+        } else {
+            Base = 10;
+        }
+
+        /* Read the number */
+        while (IsXDigit (C = SB_Peek (B)) && (DigitVal = HexVal (C)) < Base) {
+            *Val = (*Val * Base) + DigitVal;
+            SB_Skip (B);
+        }
+
+        /* Allow optional 'U' and 'L' modifiers */
+        C = SB_Peek (B);
+        if (C == 'u' || C == 'U') {
+            SB_Skip (B);
+            C = SB_Peek (B);
+            if (C == 'l' || C == 'L') {
+                SB_Skip (B);
+            }
+        } else if (C == 'l' || C == 'L') {
+            SB_Skip (B);
+            C = SB_Peek (B);
+            if (C == 'u' || C == 'U') {
+                SB_Skip (B);
+            }
+        }
+
+    } else if (C == '\'') {
+
+        /* Character constant */
+        SB_Skip (B);
+        *Val = SignExtendChar (TgtTranslateChar (ParseChar (B)));
+        if (SB_Peek (B) != '\'') {
+            Error ("`\'' expected");
+            return 0;
+        } else {
+            /* Skip the quote */
+            SB_Skip (B);
+        }
+
+    } else {
+
+        /* Invalid number */
+        Error ("Numeric constant expected");
+        return 0;
+
+    }
+
+    /* Success, value read is in Val */
+    return 1;
 }
 
 

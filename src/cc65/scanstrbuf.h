@@ -63,6 +63,12 @@ int SB_GetString (StrBuf* B, StrBuf* S);
  * returns 1 if a string was found and 0 otherwise.
  */
 
+int SB_GetNumber (StrBuf* B, long* Val);
+/* Get a number from the string buffer. Accepted formats are decimal, octal,
+ * hex and character constants. Numeric constants may be preceeded by a 
+ * minus or plus sign. The function returns 1 if a number was found and
+ * zero otherwise.
+ */
 
 
 

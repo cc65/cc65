@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -179,6 +179,9 @@ type* TypeAlloc (unsigned Len);
 
 void TypeFree (type* Type);
 /* Free a type string */
+
+int SignExtendChar (int C);
+/* Do correct sign extension of a character */
 
 type GetDefaultChar (void);
 /* Return the default char type (signed/unsigned) depending on the settings */

@@ -237,18 +237,6 @@ static void SetTok (int tok)
 
 
 
-static int SignExtendChar (int C)
-/* Do correct sign extension of a character */
-{
-    if (SignedChars && (C & 0x80) != 0) {
-       	return C | ~0xFF;
-    } else {
-       	return C & 0xFF;
-    }
-}
-
-
-
 static int ParseChar (void)
 /* Parse a character. Converts \n into EOL, etc. */
 {
@@ -387,7 +375,7 @@ static void StringConst (void)
 
 void NextToken (void)
 /* Get next token from input stream */
-{
+{        
     ident token;
 
     /* We have to skip white space here before shifting tokens, since the
@@ -419,11 +407,12 @@ void NextToken (void)
      	/* A number */
    	int HaveSuffix;		/* True if we have a type suffix */
      	unsigned types;		/* Possible types */
-     	unsigned base;
-     	unsigned long k;	/* Value */
+     	unsigned Base;
+        unsigned DigitVal;
+     	unsigned long k;  	/* Value */
 
      	k     = 0;
-     	base  = 10;
+     	Base  = 10;
      	types = IT_INT | IT_LONG | IT_ULONG;
 
        	if (CurC == '0') {
@@ -432,23 +421,30 @@ void NextToken (void)
      	    /* gobble 0 and examin next char */
 	    NextChar ();
      	    if (toupper (CurC) == 'X') {
-     	     	base = 16;
-     	    	NextTok.Type = type_uint;
+     	       	Base = 16;
+     	       	NextTok.Type = type_uint;
        	       	NextChar ();	/* gobble "x" */
      	    } else {
-     	     	base = 8;
+     	       	Base = 8;
      	    }
      	}
-     	while (1) {
-     	    if (IsDigit (CurC)) {
-     	     	k = k * base + (CurC - '0');
-     	    } else if (base == 16 && IsXDigit (CurC)) {
-     	     	k = (k << 4) + HexVal (CurC);
-     	    } else {
-     	     	break; 	      	/* not digit */
-     	    }
-       	    NextChar ();	/* gobble char */
-     	}
+        while (IsXDigit (CurC) && (DigitVal = HexVal (CurC)) < Base) {
+            k = k * Base + DigitVal;
+            NextChar ();
+        }
+        /* Check for errorneous digits */
+        if (Base == 8 && IsDigit (CurC)) {
+            Error ("Numeric constant contains digits beyond the radix");
+            /* Do error recovery */
+            do {
+                NextChar ();
+            } while (IsDigit (CurC));
+        } else if (Base != 16 && IsXDigit (CurC)) {
+            Error ("Nondigits in number and not hexadecimal");
+            do {
+                NextChar ();
+            } while (IsXDigit (CurC));
+        }
 
      	/* Check for a suffix */
 	HaveSuffix = 1;

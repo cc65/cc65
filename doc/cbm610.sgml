@@ -62,9 +62,6 @@ compatible jump table at &dollar;FF81. The main startup code is located at
 &dollar;0400, so about 63K of the complete bank are actually usable for
 applications.
 
-<bf>Note:</bf> The zero page from &dollar;02 to &dollar;5F is free to use for
-applications!
-
 Special locations:
 
 <descrip>

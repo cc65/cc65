@@ -64,10 +64,10 @@ loop:	ldy	index
      	beq	done
 	dey
 	jsr	getbyt
-        sta     jmpvec+1
-	dey
-	jsr	getbyt  
         sta     jmpvec+2
+	dey
+	jsr	getbyt
+        sta     jmpvec+1
 	sty	index
 	jsr	jmpvec
 .if (.cpu .bitand ::CPU_ISET_65SC02)

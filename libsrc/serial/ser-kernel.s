@@ -69,10 +69,10 @@ _ser_install:
 
         jsr     ser_install             ; Call driver install routine
 
-        lda     ser_irq+2               ; Check high byte of IRQ vector
+        ldy     ser_irq+2               ; Check high byte of IRQ vector
         beq     @L2                     ; Jump if vector invalid
-	lda	#$4C			; Jump opcode
-	sta	ser_irq			; Activate IRQ routine
+	ldy	#$4C			; Jump opcode
+	sty	ser_irq			; Activate IRQ routine
 @L2:    rts
 
 ; Driver signature invalid

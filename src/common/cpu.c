@@ -35,7 +35,7 @@
 
 #include <string.h>
 
-/* common */              
+/* common */
 #include "cpu.h"
 
 
@@ -51,7 +51,7 @@ cpu_t CPU = CPU_UNKNOWN;
 
 /* Table with target names */
 const char* CPUNames [CPU_COUNT] = {
-    "6502"
+    "6502",
     "65C02",
     "65816",
     "sunplus",

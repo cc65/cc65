@@ -79,7 +79,10 @@ struct TextSeg {
 TextSeg* NewTextSeg (SymEntry* Func);
 /* Create a new text segment, initialize and return it */
 
-void TS_AddLine (TextSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
+void TS_AddVLine (TextSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
+/* Add a line to the given text segment */
+
+void TS_AddLine (TextSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
 /* Add a line to the given text segment */
 
 void TS_Output (const TextSeg* S, FILE* F);

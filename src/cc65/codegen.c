@@ -52,6 +52,7 @@
 #include "error.h"
 #include "global.h"
 #include "segments.h"
+#include "textseg.h"
 #include "util.h"
 #include "codegen.h"
 
@@ -139,8 +140,9 @@ static char* GetLabelName (unsigned flags, unsigned long label, unsigned offs)
 void g_preamble (void)
 /* Generate the assembler code preamble */
 {
-    /* Create a new segment list */
+    /* Create a new (global) segment list and remember it */
     PushSegments (0);
+    GS = CS;
 
     /* Identify the compiler version */
     AddTextLine (";");
@@ -179,7 +181,10 @@ void g_fileinfo (const char* Name, unsigned long Size, unsigned long MTime)
 /* If debug info is enabled, place a file info into the source */
 {
     if (DebugInfo) {
-       	AddTextLine ("\t.dbg\t\tfile, \"%s\", %lu, %lu", Name, Size, MTime);
+	/* We have to place this into the global text segment, so it will
+	 * appear before all .dbg line statements.
+	 */
+       	TS_AddLine (GS->Text, "\t.dbg\t\tfile, \"%s\", %lu, %lu", Name, Size, MTime);
     }
 }
 
@@ -215,17 +220,6 @@ void g_usebss (void)
 
 
 
-static void OutputDataLine (DataSeg* S, const char* Format, ...)
-/* Add a line to the current data segment */
-{
-    va_list ap;
-    va_start (ap, Format);
-    DS_AddLine (S, Format, ap);
-    va_end (ap);
-}
-
-
-
 void g_segname (segment_t Seg, const char* Name)
 /* Set the name of a segment */
 {
@@ -242,7 +236,7 @@ void g_segname (segment_t Seg, const char* Name)
 	default:         S = 0;          break;
     }
     if (S) {
-       	OutputDataLine (S, ".segment\t\"%s\"", Name);
+       	DS_AddLine (S, ".segment\t\"%s\"", Name);
     }
 }
 

@@ -91,6 +91,9 @@ struct Segments {
 /* Pointer to the current segment list. Output goes here. */
 extern Segments* CS;
 
+/* Pointer to the global segment list */
+extern Segments* GS;
+
 
 
 /*****************************************************************************/
@@ -121,7 +124,7 @@ struct DataSeg* GetDataSeg (void);
 /* Return the current data segment */
 
 void AddTextLine (const char* Format, ...) attribute ((format (printf, 1, 2)));
-/* Add a line of code to the current text segment */
+/* Add a line to the current text segment */
 
 void AddCodeLine (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Add a line of code to the current code segment */

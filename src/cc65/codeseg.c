@@ -437,7 +437,7 @@ void CS_AddEntry (CodeSeg* S, struct CodeEntry* E)
 
 
 
-void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
+void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
 /* Add a line to the given code segment */
 {
     const char* L;
@@ -478,6 +478,17 @@ void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
     if (E) {
 	CS_AddEntry (S, E);
     }
+}
+
+
+
+void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, ...)
+/* Add a line to the given code segment */
+{    
+    va_list ap;
+    va_start (ap, Format);
+    CS_AddVLine (S, LI, Format, ap);
+    va_end (ap);
 }
 
 

@@ -77,7 +77,10 @@ DataSeg* NewDataSeg (const char* SegName, SymEntry* Func);
 void DS_Append (DataSeg* Target, const DataSeg* Source);
 /* Append the data from Source to Target. */
 
-void DS_AddLine (DataSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
+void DS_AddVLine (DataSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
+/* Add a line to the given data segment */
+
+void DS_AddLine (DataSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
 /* Add a line to the given data segment */
 
 void DS_Output (const DataSeg* S, FILE* F);

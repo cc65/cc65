@@ -61,6 +61,9 @@
 /* Pointer to the current segment list. Output goes here. */
 Segments* CS = 0;
 
+/* Pointer to the global segment list */
+Segments* GS = 0;
+
 /* Actual names for the segments */
 static char* SegmentNames[SEG_COUNT];
 
@@ -202,7 +205,7 @@ void AddTextLine (const char* Format, ...)
     va_list ap;
     va_start (ap, Format);
     CHECK (CS != 0);
-    TS_AddLine (CS->Text, Format, ap);
+    TS_AddVLine (CS->Text, Format, ap);
     va_end (ap);
 }
 
@@ -214,7 +217,7 @@ void AddCodeLine (const char* Format, ...)
     va_list ap;
     va_start (ap, Format);
     CHECK (CS != 0);
-    CS_AddLine (CS->Code, CurTok.LI, Format, ap);
+    CS_AddVLine (CS->Code, CurTok.LI, Format, ap);
     va_end (ap);
 }
 
@@ -235,7 +238,7 @@ void AddDataLine (const char* Format, ...)
     va_list ap;
     va_start (ap, Format);
     CHECK (CS != 0);
-    DS_AddLine (GetDataSeg(), Format, ap);
+    DS_AddVLine (GetDataSeg(), Format, ap);
     va_end (ap);
 }
 

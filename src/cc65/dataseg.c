@@ -81,7 +81,7 @@ void DS_Append (DataSeg* Target, const DataSeg* Source)
 
 
 
-void DS_AddLine (DataSeg* S, const char* Format, va_list ap)
+void DS_AddVLine (DataSeg* S, const char* Format, va_list ap)
 /* Add a line to the given data segment */
 {
     /* Format the line */
@@ -90,6 +90,17 @@ void DS_AddLine (DataSeg* S, const char* Format, va_list ap)
 
     /* Add a copy to the data segment */
     CollAppend (&S->Lines, xstrdup (Buf));
+}
+
+
+
+void DS_AddLine (DataSeg* S, const char* Format, ...)
+/* Add a line to the given data segment */
+{
+    va_list ap;
+    va_start (ap, Format);
+    DS_AddVLine (S, Format, ap);
+    va_end (ap);
 }
 
 

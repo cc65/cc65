@@ -70,7 +70,7 @@ TextSeg* NewTextSeg (SymEntry* Func)
 
 
 
-void TS_AddLine (TextSeg* S, const char* Format, va_list ap)
+void TS_AddVLine (TextSeg* S, const char* Format, va_list ap)
 /* Add a line to the given text segment */
 {
     /* Format the line */
@@ -79,6 +79,17 @@ void TS_AddLine (TextSeg* S, const char* Format, va_list ap)
 
     /* Add a copy to the data segment */
     CollAppend (&S->Lines, xstrdup (Buf));
+}
+
+
+
+void TS_AddLine (TextSeg* S, const char* Format, ...)
+/* Add a line to the given text segment */	      
+{
+    va_list ap;
+    va_start (ap, Format);
+    TS_AddVLine (S, Format, ap);
+    va_end (ap);
 }
 
 

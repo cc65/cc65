@@ -97,7 +97,10 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func);
 void CS_AddEntry (CodeSeg* S, struct CodeEntry* E);
 /* Add an entry to the given code segment */
 
-void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap) attribute ((format(printf,3,0)));
+void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap) attribute ((format(printf,3,0)));
+/* Add a line to the given code segment */
+
+void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, ...) attribute ((format(printf,3,4)));
 /* Add a line to the given code segment */
 
 void CS_InsertEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index);

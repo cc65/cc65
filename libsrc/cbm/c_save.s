@@ -1,7 +1,7 @@
 ;
 ; Marc 'BlackJack' Rintsch, 11.06.1999
 ;
-; unsigned __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
+; unsigned char __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
 ;
 
         .include        "cbm.inc"
@@ -20,9 +20,6 @@ _cbm_k_save:
         ldx     tmp1
         ldy     tmp1+1
         jsr     SAVE
-        ldx     #0
-        bcc     @Ok
-        inx
-        rts
-@Ok:    txa
-        rts
+	bcs	@NotOk
+        lda     #0
+@NotOk:	rts

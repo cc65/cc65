@@ -98,17 +98,52 @@
 void __fastcall__ cbm_k_setlfs (unsigned char LFN, unsigned char DEV,
                                 unsigned char SA);
 void __fastcall__ cbm_k_setnam (const char* Name);
-unsigned __fastcall__ cbm_k_load (unsigned char flag, unsigned addr);
-unsigned __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
+unsigned char __fastcall__ cbm_k_load(unsigned char flag, unsigned addr);
+unsigned char __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
+unsigned char __fastcall__ cbm_k_open (void);
+void __fastcall__ cbm_k_close (unsigned char FN);
+unsigned char __fastcall__ cbm_k_readst (void);
+unsigned char __fastcall__ cbm_k_chkin (unsigned char FN);
+unsigned char __fastcall__ cbm_k_basin (void);
+void __fastcall__ cbm_k_clrch (void);
 
 /* BASIC-like functions */
-unsigned int cbm_load(const char* name, char device, unsigned int addr);
-unsigned int cbm_save(const char* name, char device,
-                      unsigned int start, unsigned int end);
+unsigned char cbm_load(const char* name, unsigned char device, unsigned int addr);
+/* Loads file "name" from given device to given address or to the load address
+ * of the file if addr is 0 (like load"name",8,1 in BASIC)
+ * Returns 0 if loading was successful otherwise an errorcode (see table below).
+ */
 
+unsigned char cbm_save(const char* name, unsigned char device,
+                      unsigned int start, unsigned int end);
+/* Saves a memory area from start to end-1 to a file.
+ * Returns 0 if saving was successful, otherwise an errorcode (see table below).
+ */
+
+unsigned char cbm_open(unsigned char lfn, unsigned char device,
+                       unsigned char sec_addr, const char* name);
+/* Opens a file. Works just like the BASIC command.
+ * Returns 0 if opening was successful, otherwise an errorcode (see table below).
+ */
+
+void __fastcall__ cbm_close (unsigned char lfn);
+/* Closes a file */
+
+int cbm_read(unsigned char lfn, void* buffer, unsigned int size);
+
+/* Errorcodes of load, save, open functions:
+ *
+ * errorcode	BASIC error
+ *	1   =	too many files
+ *	2   =	file open
+ *	3   =	file not open
+ *	4   =	file not found
+ *	5   =	device not present
+ *	6   =	not input file
+ *	7   =	not output file
+ *	8   =	missing filename
+ *	9   =	illegal device number
+ */
 
 /* End of cbm.h */
 #endif
-
-
-

@@ -1,12 +1,12 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; void __fastcall__ cbm_clrch (void);
+; void __fastcall__ cbm_k_clrch (void);
 ;
 
        	.include     	"cbm.inc"
 
-       	.export	       	_cbm_clrch
+       	.export	       	_cbm_k_clrch
 
-_cbm_clrch = CLRCH
+_cbm_k_clrch = CLRCH
 

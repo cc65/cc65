@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; unsigned __fastcall__ cbm_k_load (unsigned char flag, unsigned addr);
+; unsigned char __fastcall__ cbm_k_load (unsigned char flag, unsigned addr);
 ;
 
 	.include    	"cbm.inc"
@@ -17,9 +17,7 @@ _cbm_k_load:
 	ldx	ptr1
 	ldy	ptr1+1
 	jsr	LOAD
-	ldx	#0
-	bcc	@Ok
-	inx
-	rts
-@Ok:	txa
-	rts
+	bcs	@NotOk
+	lda     #0
+@NotOk:	rts
+	

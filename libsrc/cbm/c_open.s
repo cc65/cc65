@@ -1,19 +1,15 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; unsigned __fastcall__ cbm_open (void);
+; unsigned char __fastcall__ cbm_k_open (void);
 ;
 
 	.include    	"cbm.inc"
 
-       	.export	       	_cbm_open
+       	.export	       	_cbm_k_open
 
-_cbm_open:
+_cbm_k_open:
 	jsr	OPEN
-	ldx	#0
-	bcc	@Ok
-	inx
-	rts
-@Ok:	txa
-	rts
-
+	bcs	@NotOk
+        lda     #0
+@NotOk:	rts

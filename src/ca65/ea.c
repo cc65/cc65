@@ -55,7 +55,6 @@ void GetEA (EffAddr* A)
 
     /* Clear the output struct */
     A->AddrModeSet = 0;
-    A->Bank = 0;
     A->Expr = 0;
 
     /* Handle an addressing size override */

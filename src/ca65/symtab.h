@@ -134,9 +134,6 @@ SymEntry* SymFindAny (SymTable* Scope, const char* Name);
  * scope.
  */
 
-int SymIsZP (SymEntry* Sym);
-/* Return true if the symbol is explicitly marked as zeropage symbol */
-
 #if defined(HAVE_INLINE)
 INLINE unsigned char GetSymTabType (const SymTable* S)
 /* Return the type of the given symbol table */

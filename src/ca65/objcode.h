@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -60,9 +60,6 @@ void Emit2 (unsigned char OPC, ExprNode* Value);
 
 void Emit3 (unsigned char OPC, ExprNode* Expr);
 /* Emit an instruction with a three byte argument */
-
-void Emit3b (unsigned char OPC, ExprNode* Expr, ExprNode* Bank);
-/* Emit an instruction with a three byte argument and separate bank */
 
 void EmitSigned (ExprNode* Expr, unsigned Size);
 /* Emit a signed expression with the given size */

@@ -54,6 +54,7 @@
 #include "nexttok.h"
 #include "objcode.h"
 #include "spool.h"
+#include "studyexpr.h"
 #include "symtab.h"
 
 
@@ -571,12 +572,36 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
      */
     A->AddrModeSet &= Ins->AddrMode;
 
-    /* If we have possible zero page addressing modes, and the expression
-     * involved (if any) is not in byte range, remove the zero page addressing
-     * modes.
+    /* If we have an expression, check it and remove any addressing modes that
+     * are too small for the expression size. Since we have to study the
+     * expression anyway, do also replace it by a simpler one if possible.
      */
-    if (A->Expr && (A->AddrModeSet & AM_ZP) && !IsByteExpr (A->Expr)) {
-       	A->AddrModeSet &= ~AM_ZP;
+    if (A->Expr) {
+        ExprDesc ED;
+        ED_Init (&ED);
+
+        /* Study the expression */
+        StudyExpr (A->Expr, &ED);
+
+        /* Simplify it if possible */
+        A->Expr = SimplifyExpr (A->Expr, &ED);
+
+        /* Check the size */
+        switch (ED.AddrSize) {
+
+            case ADDR_SIZE_ABS:
+                printf ("abs\n");
+                A->AddrModeSet &= ~AM_SET_ZP;
+                break;
+
+            case ADDR_SIZE_FAR:
+                printf ("far\n");
+                A->AddrModeSet &= ~(AM_SET_ZP | AM_SET_ABS);
+                break;
+        }
+
+        /* Free any resource associated with the expression desc */
+        ED_Done (&ED);
     }
 
     /* Check if we have any adressing modes left */
@@ -600,8 +625,8 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
         /* Found, check the expression */
         ExprNode* Left = A->Expr->Left;
         if ((A->Expr->Op == EXPR_BYTE0 || A->Expr->Op == EXPR_BYTE1) &&
-            Left->Op == EXPR_SYMBOL                                &&
-            !SymIsZP (Left->V.Sym)) {
+            Left->Op == EXPR_SYMBOL                                  &&
+            GetSymAddrSize (Left->V.Sym) != ADDR_SIZE_ZP) {
 
             /* Output a warning */
             Warning (1, "Suspicious address expression");
@@ -644,13 +669,8 @@ static void EmitCode (EffAddr* A)
 	    break;
 
 	case 3:
-	    if (A->Bank) {
-	      	/* Separate bank given */
-	       	Emit3b (A->Opcode, A->Expr, A->Bank);
-	    } else {
-	      	/* One far argument */
-	      	Emit3 (A->Opcode, A->Expr);
-	    }
+            /* Far argument */
+	    Emit3 (A->Opcode, A->Expr);
 	    break;
 
 	default:

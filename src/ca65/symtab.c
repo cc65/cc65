@@ -223,7 +223,7 @@ void SymLeaveLevel (void)
      * active, when the scope was opened. Set the size of the scope to the
      * number of data bytes emitted into this segment.
      */
-    if (CollCount (&CurrentScope->SegRanges) > 0) {                                       
+    if (CollCount (&CurrentScope->SegRanges) > 0) {
         const SegRange* R = CollAtUnchecked (&CurrentScope->SegRanges, 0);
         DefSizeOfScope (CurrentScope, GetSegRangeSize (R));
     }
@@ -393,31 +393,6 @@ SymEntry* SymFindAny (SymTable* Scope, const char* Name)
 
     /* Not found */
     return 0;
-}
-
-
-
-int SymIsZP (SymEntry* S)
-/* Return true if the symbol is explicitly marked as zeropage symbol */
-{
-    /* If the symbol is not a global symbol, was not defined before, check the
-     * enclosing scope for a symbol with the same name, and return the ZP
-     * attribute of this symbol if we find one.
-     */
-    if ((S->Flags & (SF_DEFINED | SF_IMPORT | SF_LOCAL)) == 0 &&
-	S->SymTab->Parent != 0) {
-
-	/* Try to find a symbol with the same name in the enclosing scope */
-	SymEntry* E = SymFindAny (S->SymTab->Parent, GetString (S->Name));
-
-	/* If we found one, use the ZP flag */
-       	if (E && E->AddrSize == ADDR_SIZE_ZP) {
-            S->AddrSize = ADDR_SIZE_ZP;
-	}
-    }
-
-    /* Check the ZP flag */
-    return (S->AddrSize == ADDR_SIZE_ZP);
 }
 
 

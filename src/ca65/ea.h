@@ -50,7 +50,6 @@ struct EffAddr {
     /* First three fields get filled when calling GetEA */
     unsigned long       AddrModeSet;    /* Possible addressing modes */
     struct ExprNode*    Expr;           /* Expression if any (NULL otherwise) */
-    struct ExprNode*    Bank;           /* Bank expression if any */
 
     /* The following fields are used inside instr.c */
     unsigned            AddrMode;       /* Actual addressing mode used */

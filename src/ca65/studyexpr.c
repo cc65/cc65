@@ -438,10 +438,23 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
                     GetSymName (Sym));
             ED_Invalidate (D);
         } else {
+
+            unsigned char AddrSize;
+
+            /* Mark the symbol and study its associated expression */
             SymMarkUser (Sym);
             StudyExprInternal (GetSymExpr (Sym), D);
             SymUnmarkUser (Sym);
-            ED_UpdateAddrSize (D, GetSymAddrSize (Sym));
+
+            /* If the symbol has an explicit address size, use it. This may
+             * lead to range errors later (maybe even in the linker stage), if
+             * the user lied about the address size, but for now we trust the
+             * user.
+             */
+            AddrSize = GetSymAddrSize (Sym);
+            if (AddrSize != ADDR_SIZE_DEFAULT) {
+                D->AddrSize = AddrSize;
+            }
         }
     } else {
         /* The symbol is either undefined or an import. In both cases, track

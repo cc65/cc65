@@ -66,31 +66,34 @@
 #define AM_ABS_X            	0x00000040UL
 #define AM_ABS_LONG_X		0x00000080UL
 #define AM_DIR_Y               	0x00000100UL
-#define AM_ABS_Y           	0x00000200UL
-#define AM_DIR_IND      	0x00000400UL
-#define AM_ABS_IND     		0x00000800UL
-#define AM_DIR_IND_LONG     	0x00001000UL
-#define AM_DIR_IND_Y     	0x00002000UL
-#define AM_DIR_IND_LONG_Y    	0x00004000UL
-#define AM_DIR_X_IND         	0x00008000UL
-#define AM_ABS_X_IND    	0x00010000UL
-#define AM_REL             	0x00020000UL
+#define AM_ABS_Y               	0x00000200UL
+#define AM_DIR_IND             	0x00000400UL
+#define AM_ABS_IND     	       	0x00000800UL
+#define AM_DIR_IND_LONG        	0x00001000UL
+#define AM_DIR_IND_Y           	0x00002000UL
+#define AM_DIR_IND_LONG_Y      	0x00004000UL
+#define AM_DIR_X_IND           	0x00008000UL
+#define AM_ABS_X_IND           	0x00010000UL
+#define AM_REL                 	0x00020000UL
 #define AM_REL_LONG            	0x00040000UL
-#define AM_STACK_REL        	0x00080000UL
-#define AM_STACK_REL_IND_Y	0x00100000UL
-#define AM_IMM_ACCU		0x00200000UL
-#define AM_IMM_INDEX		0x00400000UL
-#define AM_IMM_IMPLICIT		0x00800000UL
-#define AM_IMM           	(AM_IMM_ACCU | AM_IMM_INDEX | AM_IMM_IMPLICIT)
+#define AM_STACK_REL           	0x00080000UL
+#define AM_STACK_REL_IND_Y     	0x00100000UL
+#define AM_IMM_ACCU	       	0x00200000UL
+#define AM_IMM_INDEX	       	0x00400000UL
+#define AM_IMM_IMPLICIT	       	0x00800000UL
+#define AM_IMM                 	(AM_IMM_ACCU | AM_IMM_INDEX | AM_IMM_IMPLICIT)
 #define AM_BLOCKMOVE           	0x01000000UL
 
 /* Bitmask for all ZP operations that have correspondent ABS ops */
-#define AM_ZP	(AM_DIR | AM_DIR_X | AM_DIR_Y | AM_DIR_IND | AM_DIR_X_IND)
+#define AM_SET_ZP 	(AM_DIR | AM_DIR_X | AM_DIR_Y | AM_DIR_IND | AM_DIR_X_IND)
+
+/* Bitmask for all ABS operations that have correspondent FAR ops */
+#define AM_SET_ABS      (AM_ABS | AM_ABS_X)
 
 /* Bit numbers and count */
-#define AMI_IMM_ACCU		21
-#define AMI_IMM_INDEX		22
-#define AMI_COUNT		25
+#define AMI_IMM_ACCU	       	21
+#define AMI_IMM_INDEX	       	22
+#define AMI_COUNT	       	25
 
 
 

@@ -86,16 +86,6 @@ void Emit3 (unsigned char OPC, ExprNode* Expr)
 
 
 
-void Emit3b (unsigned char OPC, ExprNode* Expr, ExprNode* Bank)
-/* Emit an instruction with a three byte argument and separate bank */
-{
-    Emit0 (OPC);
-    EmitWord (Expr);
-    EmitByte (Bank);
-}
-
-
-
 void EmitSigned (ExprNode* Expr, unsigned Size)
 /* Emit a signed expression with the given size */
 {

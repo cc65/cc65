@@ -6,8 +6,9 @@
 
         .export         _close
 
-        .import         getdiskerror
+        .import         readdiskerror, closecmdchannel
         .import         __errno, __oserror
+        .importzp       tmp2
 
         .include        "errno.inc"
         .include        "cbm.inc"
@@ -25,36 +26,40 @@
         bne     invalidfd
         cmp     #MAX_FDS        ; Is it valid?
         bcs     invalidfd       ; Jump if no
+        sta     tmp2            ; Save the handle
 
-; Check if the LFN is valid and the file is open for writing
+; Check if the file is actually open
 
-        adc     #LFN_OFFS       ; Carry is already clear
         tax
-        lda     fdtab-LFN_OFFS,x; Get flags for this handle
+        lda     fdtab,x         ; Get flags for this handle
+        and     #LFN_OPEN
         beq     notopen
 
 ; Valid lfn, close it. The close call is always error free, at least as far
 ; as the kernal is involved
 
         lda     #LFN_CLOSED
-        sta     fdtab-LFN_OFFS,x
-        lda     unittab,x
-        pha                     ; Push unit for this file
-        txa
+        sta     fdtab,x
+        lda     tmp2            ; Get the handle
+        clc
+        adc     #LFN_OFFS       ; Make LFN from handle
         jsr     CLOSE
-        pla
 
-; Read the drive error channel
+; Read the drive error channel, then close it
 
-        lda     unittab,x
-        tax
-        jsr     getdiskerror
-        cmp     #$00
-        bne     error
+        ldy     tmp2            ; Get the handle
+        ldx     unittab,y       ; Get teh disk for this handle
+        jsr     readdiskerror   ; Read the disk error code
+        pha                     ; Save it on stack
+        ldy     tmp2
+        ldx     unittab,y
+        jsr     closecmdchannel ; Close the disk command channel
+        pla                     ; Get the error code from the disk
+        bne     error           ; Jump if error
 
 ; Successful
 
-        tax
+        tax                     ; Return zero in a/x
         rts
 
 ; Error entry, file descriptor is invalid

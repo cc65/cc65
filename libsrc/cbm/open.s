@@ -8,7 +8,7 @@
 
         .import         addysp, popax
         .import         scratch, fnparse, fncomplete, fnset
-        .import         getdiskerror
+        .import         opencmdchannel, closecmdchannel, readdiskerror
         .import         __errno, __oserror
         .import         fnunit
         .importzp       sp, tmp2, tmp3
@@ -110,26 +110,18 @@ common: sta     tmp3
         jsr     OPEN
         bcs     error
 
-; Read the error channel
+; Open the the drive command channel and read it
 
         ldx     fnunit
-        jsr     getdiskerror
-        cmp     #0
-        beq     isopen          ; Branch if no error
-
-; We had an error, close the file
-
-        pha
-        lda     tmp2
-        clc
-        adc     #LFN_OFFS
-        jsr     CLOSE
-        pla
-        bne     error           ; Branch always
+        jsr     opencmdchannel
+        bne     closeandexit
+        ldx     fnunit
+        jsr     readdiskerror
+        bne     closeandexit    ; Branch on error
 
 ; File is open. Mark it as open in the table
 
-isopen: ldx     tmp2
+        ldx     tmp2
         lda     tmp3
         sta     fdtab,x
         lda     fnunit
@@ -161,7 +153,18 @@ invflags:
         sta     __errno+1
         beq     errout
 
+; Error entry: Close the file and exit
 
+closeandexit:
+        pha
+        lda     tmp2
+        clc
+        adc     #LFN_OFFS
+        jsr     CLOSE
+        ldx     fnunit
+        jsr     closecmdchannel
+        pla
+        bne     error           ; Branch always
 
 .endproc
 

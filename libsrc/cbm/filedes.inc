@@ -14,6 +14,8 @@ LFN_OFFS        = 3     ; Start with logical file number 3
 LFN_CLOSED      = $00   ; LFN is closed
 LFN_READ        = $01   ; Open for reading
 LFN_WRITE       = $02   ; Open for writing
+LFN_OPEN        = (LFN_READ | LFN_WRITE)
+LFN_EOF         = $80   ; Read to EOF
 
 LFN_STDIN       = LFN_OFFS+0
 LFN_STDOUT      = LFN_OFFS+1

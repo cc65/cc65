@@ -5,8 +5,9 @@
 ;
 
         .export         scratch
-        .import         readdiskerror
+        .import         opencmdchannel, closecmdchannel, writediskcmd
         .import         fnunit, fnlen, fncmd
+        .importzp       ptr1
 
         .include        "cbm.inc"
 
@@ -18,28 +19,27 @@
 
 .proc   scratch
 
-        lda     #15             ; Command channel
-        ldx     fnunit          ; Unit
-        tay                     ; Secondary address
-        jsr     SETLFS
+        ldx     fnunit
+        jsr     opencmdchannel
+        bne     done
 
         lda     #'s'            ; Scratch command
         sta     fncmd
+
+        lda     #<fncmd
+        sta     ptr1
+        lda     #>fncmd
+        sta     ptr1+1
+
         ldx     fnlen
         inx                     ; Account for "S"
         txa                     ; Length of name into A
-        ldx     #<fncmd
-        ldy     #>fncmd
-        jsr     SETNAM
-
-        jsr     OPEN
-        bcs     done
-
-        jsr     readdiskerror   ; Read the command channel
+        ldx     fnunit          ; Unit
+        jsr     writediskcmd
 
         pha
-        lda     #15
-        jsr     CLOSE
+        ldx     fnunit
+        jsr     closecmdchannel
         pla
 
 done:   rts

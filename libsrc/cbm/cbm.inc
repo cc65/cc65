@@ -51,8 +51,17 @@ IOBASE		= $FFF3
 ;-----------------------------------------------------------------------------
 ; Device numbers
 ;
-                
+
 CBMDEV_KBD      = 0
 CBMDEV_DATASETTE= 1
 CBMDEV_RS232    = 2
 CBMDEV_SCREEN   = 3
+
+;-----------------------------------------------------------------------------
+; Disk stuff
+;
+            
+MAX_DRIVES      = 24
+FIRST_DRIVE     = 8
+
+

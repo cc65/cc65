@@ -44,7 +44,7 @@ S_OBJS =	c_acptr.o	\
                 close.o         \
 		ctype.o 	\
 		cvline.o 	\
-                diskerror.o     \
+                diskcmd.o       \
                 filedes.o       \
                 filename.o      \
                 filevars.o      \
@@ -57,6 +57,7 @@ S_OBJS =	c_acptr.o	\
 		oserror.o	\
                 read.o          \
 		revers.o	\
+                rwcommon.o      \
                 scratch.o       \
                 sysremove.o     \
                 systime.o       \

@@ -6,10 +6,11 @@
 
         .export         _read
         .constructor    initstdin
-
+           
+        .import         rwcommon
         .import         popax
         .import         __errno, __oserror
-        .importzp       ptr1, ptr2, ptr3, tmp1, tmp2
+        .importzp       ptr1, ptr2, ptr3, tmp1, tmp2, tmp3
 
         .include        "errno.inc"
         .include        "fcntl.inc"
@@ -39,31 +40,8 @@
 
 .proc   _read
 
-; Retrieve count
-
-        jsr     popax           ; Get count
-        eor     #$FF
-        sta     ptr1
-        txa
-        eor     #$FF
-        sta     ptr1+1          ; Remember -count-1
-
-; Retrieve buf
-
-        jsr     popax
-        sta     ptr2
-        stx     ptr2+1
-
-; Retrieve the handle
-
-        jsr     popax
-
-; Check if we have a valid handle
-
-        cpx     #$00
-        bne     invalidfd
-        cmp     #MAX_FDS        ; Is it valid?
-        bcs     invalidfd       ; Jump if no
+        jsr     rwcommon        ; Pop params, check handle
+        bcs     invalidfd       ; Branch if handle not ok
 
 ; Check if the LFN is valid and the file is open for writing
 
@@ -73,34 +51,27 @@
         and     #LFN_READ       ; File open for writing?
         beq     notopen
 
+; Check the EOF flag. If it is set, don't read anything
+
+        lda     fdtab-LFN_OFFS,x; Get flags for this handle
+        bmi     eof
+
 ; Valid lfn. Make it the input file
 
         jsr     CHKIN
         bcs     error
 
-; Clear the byte counter
-
-        lda     #$00
-        sta     ptr3
-        sta     ptr3+1
-
-; Read the status to check if we are already at the end of the file
-        
-        jsr     READST
-        and     #%01000000
-        bne     done
-
 ; Go looping...
 
-        beq     deccount        ; Branch always
+        bcc     @L3             ; Branch always
 
 ; Read the next byte
 
-loop:   jsr     BASIN
+@L0:    jsr     BASIN
         sta     tmp1            ; Save the input byte
 
         jsr     READST          ; Read the IEEE status
-        sta     tmp2            ; Save it
+        sta     tmp3            ; Save it
         and     #%10111111      ; Check anything but the EOI bit
         bne     error5          ; Assume device not present
 
@@ -121,17 +92,24 @@ loop:   jsr     BASIN
 
 ; Get the status again and check the EOI bit
 
-@L2:    lda     tmp2
+@L2:    lda     tmp3
         and     #%01000000      ; Check for EOI
-        bne     done            ; Jump if end of file reached
+        bne     @L4             ; Jump if end of file reached
 
 ; Decrement the count
 
-deccount:
-        inc     ptr1
-        bne     loop
+@L3:    inc     ptr1
+        bne     @L0
         inc     ptr1+1
-        bne     loop
+        bne     @L0
+        beq     done            ; Branch always
+
+; Set the EOI flag and bail out
+
+@L4:    ldx     tmp2            ; Get the handle
+        lda     #LFN_EOF
+        ora     fdtab,x
+        sta     fdtab,x
 
 ; Read done, close the input channel
 
@@ -139,7 +117,7 @@ done:   jsr     CLRCH
 
 ; Return the number of chars read
 
-        lda     ptr3
+eof:    lda     ptr3
         ldx     ptr3+1
         rts
 
@@ -157,7 +135,7 @@ invalidfd:
 notopen:
         lda     #3              ; File not open
         bne     error
-
+                    
 ; Error entry, status not ok
 
 error5: lda     #5              ; Device not present

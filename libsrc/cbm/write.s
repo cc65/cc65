@@ -7,9 +7,9 @@
         .export         _write
         .constructor    initstdout
 
-        .import         incsp6
+        .import         rwcommon
         .import         __errno, __oserror
-        .importzp       sp, ptr1, ptr2
+        .importzp       sp, ptr1, ptr2, ptr3
 
         .include        "errno.inc"
         .include        "fcntl.inc"
@@ -44,13 +44,8 @@
 
 .proc   _write
 
-        ldy     #4
-        lda     (sp),y          ; Get fd
-
-; Check if we have a valid handle
-
-        cmp     #MAX_FDS        ; Is it valid?
-        bcs     invalidfd       ; Jump if no
+        jsr     rwcommon        ; Pop params, check handle
+        bcs     invalidfd       ; Branch if handle not ok
 
 ; Check if the LFN is valid and the file is open for writing
 
@@ -64,49 +59,35 @@
 
         jsr     CKOUT
         bcs     error
-
-; Calculate -count-1 for easier looping
-
-        ldy     #0
-        lda     (sp),y
-        eor     #$FF
-        sta     ptr1
-        iny
-        lda     (sp),y
-        eor     #$FF
-        sta     ptr1+1
-
-; Get the pointer to the data buffer
-
-        iny
-        lda     (sp),y
-        sta     ptr2
-        iny
-        lda     (sp),y
-        sta     ptr2+1
-        jmp     deccount
+        bcc     @L2
 
 ; Read the IEEE488 status
 
-loop:   jsr     READST
+@L0:    jsr     READST
         cmp     #0
         bne     error5
+
+; Output the next character from the buffer
 
         ldy     #0
         lda     (ptr2),y
         inc     ptr2
         bne     @L1
         inc     ptr2+1          ; A = *buf++;
-
 @L1:    jsr     BSOUT
+
+; Count characters written
+
+        inc     ptr3
+        bne     @L2
+        inc     ptr3+1
 
 ; Decrement count
 
-deccount:
-        inc     ptr1
-        bne     loop
+@L2:    inc     ptr1
+        bne     @L0
         inc     ptr1+1
-        bne     loop
+        bne     @L0
 
 ; Wrote all chars, close the output channel
 
@@ -114,12 +95,9 @@ deccount:
 
 ; Return the number of chars written
 
-        ldy     #1
-        lda     (sp),y
-        tax
-        dey
-        lda     (sp),y
-        jmp     incsp6
+        lda     ptr3
+        ldx     ptr3+1
+        rts
 
 ; Error entry, file descriptor is invalid
 
@@ -142,7 +120,7 @@ error5: lda     #5              ; Device not present
 error:  sta     __oserror
 errout: lda     #$FF
         tax                     ; Return -1
-        jmp     incsp6
+        rts
 
 .endproc
 

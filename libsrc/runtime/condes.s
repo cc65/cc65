@@ -4,9 +4,9 @@
 ; CC65 runtime: Support for calling module constructors/destructors
 ;
 ; The condes routine must be called with the table address in a/x and the
-; size of the table in y. The current implementation limits the table size
-; to 254 bytes (127 vectors) but this shouldn't be problem for now and may
-; be changed later.
+; size of the table (which must not be zero!) in y. The current implementation
+; limits the table size to 254 bytes (127 vectors) but this shouldn't be
+; problem for now and may be changed later.
 ;
 ; libinit and libdone call condes with the predefined module constructor and
 ; destructor tables, they must be called from the platform specific startup
@@ -27,11 +27,12 @@
 
 .proc	initlib
 
+	ldy    	#<(__CONSTRUCTOR_COUNT__*2)
+       	beq    	exit
 	lda    	#<__CONSTRUCTOR_TABLE__
 	ldx    	#>__CONSTRUCTOR_TABLE__
-	ldy    	#<(__CONSTRUCTOR_COUNT__*2)
-	bne    	condes
-	rts
+        jmp     condes
+exit:   rts
 
 .endproc
 
@@ -41,57 +42,41 @@
 
 .proc	donelib
 
-	lda 	#<__DESTRUCTOR_TABLE__
-	ldx 	#>__DESTRUCTOR_TABLE__
-	ldy 	#<(__DESTRUCTOR_COUNT__*2)
-	bne 	condes
-	rts
+    	ldy 	#<(__DESTRUCTOR_COUNT__*2)
+    	beq     initlib::exit
+    	lda 	#<__DESTRUCTOR_TABLE__
+    	ldx 	#>__DESTRUCTOR_TABLE__
+    	jmp     condes
 
 .endproc
 
 
 ; --------------------------------------------------------------------------
-; Generic table call handler. We cannot use callax here, since condes is also
-; used for interrupt handlers, and callax clobbers ptr1.
-
-.proc	condes
-
-	sta   	getbyt+1
-	stx	getbyt+2
-	sty	index
-
-loop:	ldy	index
-     	beq	done
-	dey
-	jsr	getbyt
-        sta     jmpvec+2
-	dey
-	jsr	getbyt
-        sta     jmpvec+1
-	sty	index
-	jsr	jmpvec
-.if (.cpu .bitand ::CPU_ISET_65SC02)
-	bra	loop
-.else
-     	jmp	loop
-.endif
-
-done:	rts
-
-.endproc
-
-
-; --------------------------------------------------------------------------
-; Data. The getbyte and jmpvec routines are placed in the data segment
-; cause they're patched at runtime.
-
-.bss
-
-index:	.byte	0
+; Generic table call handler. Since the routine is also used to call a table
+; of interrupt handlers, it uses heavily self modifying code for performance
+; reasons. It will go into the data segment for this reason ...
+; NOTE: The routine must not be called if the table is empty!
 
 .data
 
-getbyt:	lda	$FFFF,y
-	rts
+.proc	condes
 
-jmpvec: jmp     $0000
+     	sta   	fetch1+1
+     	stx	fetch1+2
+     	sta   	fetch2+1
+     	stx	fetch2+2
+loop:   dey
+fetch1: lda     $FFFF,y                 ; Patched at runtime
+        sta     jmpvec+2
+     	dey
+fetch2: lda     $FFFF,y                 ; Patched at runtime
+        sta     jmpvec+1
+       	sty    	index+1
+jmpvec: jsr    	$FFFF                   ; Patched at runtime
+index: 	ldy    	#$FF                    ; Patched at runtime
+       	bne     loop
+        rts
+
+.endproc
+
+

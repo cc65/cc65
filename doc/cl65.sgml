@@ -41,6 +41,7 @@ Short options:
   -l                    Create an assembler listing
   -m name               Create a map file
   -o name               Name the output file
+  -r                    Enable register variables
   -t sys                Set the target system
   -v                    Verbose mode
   -vm                   Verbose map file
@@ -77,6 +78,8 @@ Long options:
   --include-dir dir     Set a compiler include directory path
   --listing             Create an assembler listing
   --mapfile name        Create a map file
+  --register-space b    Set space available for register variables
+  --register-vars       Enable register variables
   --rodata-name seg     Set the name of the RODATA segment
   --signed-chars        Default characters are signed
   --start-addr addr     Set the default start address

@@ -70,6 +70,7 @@ Short options:
   -h                    Help (this text)
   -j                    Default characters are signed
   -o name               Name the output file
+  -r                    Enable register variables
   -t sys                Set the target system
   -v                    Increase verbosity
 
@@ -87,6 +88,8 @@ Long options:
   --debug-info          Add debug info to object file
   --help                Help (this text)
   --include-dir dir     Set an include directory search path
+  --register-space b    Set space available for register variables
+  --register-vars       Enable register variables
   --rodata-name seg     Set the name of the RODATA segment
   --signed-chars        Default characters are signed
   --static-locals       Make local variables static
@@ -177,6 +180,38 @@ Here is a description of all the command line options:
   Print the short option summary shown above.
 
 
+  <tag><tt>-o name</tt></tag>
+
+  Specify the name of the output file. If you don't specify a name, the
+  name of the C input file is used, with the extension replaced by ".s".
+
+
+  <tag><tt>-r, --register-vars</tt></tag>
+
+  <tt/-r/ will make the compiler honor the <tt/register/ keyword. Local
+  variables may be placed in registers (which are actually zero page
+  locations). There is some overhead involved with register variables, since
+  the old contents of the registers must be saved and restored. Since register
+  variables are of limited use without the optimizer, there is also a combined
+  switch: <tt/-Or/ will enable both, the optmizer and register variables.
+
+  For more information about register variables see <ref id="regvars"
+  name="register variables">.
+
+
+  <tag><tt>--register-space</tt></tag>
+
+  This option takes a numeric parameter and is used to specify, how much
+  zero page register space is available. Please note that just giving this
+  option will not increase or decrease by itself, it will just tell the
+  compiler about the available space. You will have to allocate that space
+  yourself using an assembler module with the necessary allocations, and a
+  linker configuration that matches the assembler module. The default value
+  for this option is 6 (bytes).
+
+  If you don't know what all this means, please don't use this option.
+
+
   <tag><tt>--rodata-name seg</tt></tag>
 
   Set the name of the rodata segment (the segment used for readonly data).
@@ -260,12 +295,6 @@ Here is a description of all the command line options:
   Set a directory where the compiler searches for include files. You may
   use this option multiple times to add more than one directory to the
   search list.
-
-
-  <tag><tt>-o name</tt></tag>
-
-  Specify the name of the output file. If you don't specify a name, the
-  name of the C input file is used, with the extension replaced by ".s".
 
 
   <tag><tt>-O, -Oi, -Or, -Os</tt></tag>
@@ -372,12 +401,8 @@ and the one defined by the ISO standard:
       	<p>
 <item>	The compiler does not support bit fields.
       	<p>
-<item>	Because of the "wrong" order of the parameters on the stack, there is
-      	an additional macro needed to access parameters in a variable
-      	parameter list in a C function.
-      	<p>
-<item>	Functions may not return structs (or unions), and structs may not be
-      	passed as parameters by value. However, struct assignment *is*
+<item> 	C Functions may not return structs (or unions), and structs may not
+        be passed as parameters by value. However, struct assignment *is*
       	possible.
       	<p>
 <item>	Part of the C library is available only with fastcall calling
@@ -485,9 +510,9 @@ This cc65 version has some extensions to the ISO C standard.
 
 	<tscreen><verb>
 	_GCmd:
-	 	.byte	3
-		.word	$2000
-		.word	$3000
+	   	.byte	3
+	   	.word	$2000
+	   	.word	$3000
 	</verb></tscreen>
 
 	Since the variable is of type <tt/void/ you may not use it as is.
@@ -513,6 +538,19 @@ The compiler defines several macros at startup:
   This macro is always defined. Its value is the version number of the
   compiler in hex. Version 2.0.1 of the compiler will have this macro defined
   as 0x0201.
+
+  <tag><tt>__APPLE2__</tt></tag>
+
+  This macro is defined if the target is the Apple ][ (-t apple2).
+
+  <tag><tt>__ATARI__</tt></tag>
+
+  This macro is defined if the target is one of the Atari computers
+  (400/800/130XL/800XL).
+
+  <tag><tt>__ATMOS__</tt></tag>
+
+  This macro is defined if the target is the Oric Atmos (-t atmos).
 
   <tag><tt>__CBM__</tt></tag>
 
@@ -546,15 +584,6 @@ The compiler defines several macros at startup:
   <tag><tt>__PET__</tt></tag>
 
   This macro is defined if the target is the PET family of computers (-t pet).
-
-  <tag><tt>__ATARI__</tt></tag>
-
-  This macro is defined if the target is one of the Atari computers
-  (400/800/130XL/800XL).
-
-  <tag><tt>__APPLE2__</tt></tag>
-
-  This macro is defined if the target is the Apple ][ (-t apple2).
 
   <tag><tt>__GEOS__</tt></tag>
 
@@ -765,6 +794,48 @@ id="pragma-staticlocals"<p>
       	#pragma zpsym ("foo");	/* foo is in the zeropage */
   </verb></tscreen>
 
+
+
+
+<sect>Register variables<label id="regvars"><p>
+
+The runtime for all supported platforms has 6 bytes of zero page space
+available for register variables (this could be increased, but I think it's a
+good value). So you can declare register variables up to a total size of 6 per
+function. The compiler will allocate register space on a "first come, first
+served" base and convert any <tt/register/ declarations that exceed the
+available register space silently to <tt/auto/. Parameters can also be
+declared as <tt/register/, this will in fact give slightly shorter code than
+using a register variable.
+
+Since a function must save the current values of the registers on entry and
+restore them on exit, there is an overhead associated with register variables,
+and this overhead is quite high (about 20 bytes per variable). This means that
+just declaring anything as <tt/register/ is not a good idea.
+
+The best use for register variables are pointers, especially those that point
+to structures. The magic number here is about 3 uses of a struct field: If the
+function contains this number or even more, the generated code will be usually
+shorter and faster when using a register variable for the struct pointer. The
+reason for this is that the register variable can in many cases be used as a
+pointer directly. Having a pointer in an auto variable means that this pointer
+must first be copied into a zero page location, before it can be dereferenced.
+
+Second best use for register variables are counters. However, there is not
+much difference in the code generated for counters, so you will need at least
+100 operations on this variable (for example in a loop) to make it worth the
+trouble. The only savings you get here are by the use of a zero page variable
+instead of one on the stack or in the data segment.
+
+Register variables must be explicitly enabled by using <tt/-Or/ or <tt/-r/ on
+the command line. Register variables are only accepted on function top level,
+register variables declared in interior blocks are silently converted to
+<tt/auto/. With register variables disabled, all variables declared as
+<tt/register/ are actually auto variables.
+
+Please take care when using register variables: While they are helpful and can
+lead to a tremendous speedup when used correctly, improper usage will cause
+bloated code and a slowdown.
 
 
 

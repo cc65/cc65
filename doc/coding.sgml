@@ -312,6 +312,10 @@ As a general rule: Use register variables only for pointers that are
 dereferenced several times in your function, or for heavily used induction
 variables in a loop (with several 100 accesses).
 
+When declaring register variables, try to keep them together, because this
+will allow the compiler to save and restore the old values in one chunk, and
+not in several.
+
 And remember: Register variables must be enabled with <tt/-r/ or <tt/-Or/.
 
 

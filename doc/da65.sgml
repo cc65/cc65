@@ -313,6 +313,11 @@ following attributes are recognized:
 
 <descrip>
 
+  <tag><tt>COMMENT</tt></tag>
+  This attribute is only allowed if a label is also given. It takes a string
+  as argument. See the description of the <tt><ref id="infofile-label"
+  name="LABEL"></tt> directive for an explanation.
+
   <tag><tt>END</tt></tag>
   This gives the end address of the range. The end address is inclusive, that
   means, it is part of the range. Of course, it may not be smaller than the
@@ -387,6 +392,20 @@ code. The following attributes are recognized:
 
   <tag><tt>ADDR</tt></tag>
   Followed by a numerical value. Specifies the value of the label.
+
+  <tag><tt>COMMENT</tt></tag>
+  Attribute argument is a string. The comment will show up in a separate line
+  before the label, if the label is within code or data range, or after the
+  label if it is outside.
+
+  Example output:
+
+<tscreen><verb>
+        foo     := $0001        ; Comment for label named "foo"
+
+        ; Comment for label named "bar"
+        bar:
+</verb></tscreen>
 
   <tag><tt>NAME</tt></tag>
   The attribute is followed by a string value which gives the name of the

@@ -1015,11 +1015,11 @@ static unsigned OptTest1 (CodeSeg* S)
 
 	    /* Insert the compare */
        	    CodeEntry* N = NewCodeEntry (OP65_CMP, AM65_IMM, "$00", 0, L[0]->LI);
-	    CS_InsertEntry (S, N, I);
+	    CS_InsertEntry (S, N, I+2);
 
 	    /* Remove the two other insns */
-	    CS_DelEntry (S, I+2);
 	    CS_DelEntry (S, I+1);
+	    CS_DelEntry (S, I);
 
 	    /* We had changes */
 	    ++Changes;
@@ -1053,8 +1053,8 @@ static unsigned OptNegA1 (CodeSeg* S)
 /* Check for
  *
  *	ldx 	#$00
- *	lda	..
- * 	jsr	bnega
+ *	lda 	..
+ * 	jsr 	bnega
  *
  * Remove the ldx if the lda does not use it.
  */
@@ -1078,8 +1078,10 @@ static unsigned OptNegA1 (CodeSeg* S)
   	    CS_GetEntries (S, L, I+1, 2)	&&
 	    L[0]->OPC == OP65_LDA		&&
 	    (L[0]->Use & REG_X) == 0	    	&&
+	    !CE_HasLabel (L[0])                 &&
 	    L[1]->OPC == OP65_JSR	    	&&
-	    strcmp (L[1]->Arg, "bnega") == 0) {
+	    strcmp (L[1]->Arg, "bnega") == 0    &&
+	    !CE_HasLabel (L[1])) {
 
 	    /* Remove the ldx instruction */
 	    CS_DelEntry (S, I);
@@ -1103,8 +1105,8 @@ static unsigned OptNegA1 (CodeSeg* S)
 static unsigned OptNegA2 (CodeSeg* S)
 /* Check for
  *
- *	lda	..
- * 	jsr	bnega
+ *	lda 	..
+ * 	jsr 	bnega
  *	jeq/jne	..
  *
  * Adjust the conditional branch and remove the call to the subroutine.
@@ -1137,7 +1139,8 @@ static unsigned OptNegA2 (CodeSeg* S)
        	    L[0]->OPC == OP65_JSR  	    	&&
 	    strcmp (L[0]->Arg, "bnega") == 0	&&
 	    !CE_HasLabel (L[0])	  	        &&
-	    (L[1]->Info & OF_ZBRA) != 0) {
+	    (L[1]->Info & OF_ZBRA) != 0         &&
+	    !CE_HasLabel (L[1])) {
 
 	    /* Invert the branch */
 	    CE_ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));
@@ -1255,7 +1258,8 @@ static unsigned OptNegAX2 (CodeSeg* S)
 	    L[3]->OPC == OP65_JSR    		&&
 	    strcmp (L[3]->Arg, "bnegax") == 0	&&
 	    !CE_HasLabel (L[3])		        &&
-       	    (L[4]->Info & OF_ZBRA) != 0) {
+       	    (L[4]->Info & OF_ZBRA) != 0         &&
+	    !CE_HasLabel (L[4])) {
 
 	    /* lda --> ora */
 	    CE_ReplaceOPC (L[2], OP65_ORA);
@@ -1319,7 +1323,8 @@ static unsigned OptNegAX3 (CodeSeg* S)
        	    L[1]->OPC == OP65_JSR      		&&
 	    strcmp (L[1]->Arg, "bnegax") == 0	&&
 	    !CE_HasLabel (L[1]) 		&&
-       	    (L[2]->Info & OF_ZBRA) != 0) {
+       	    (L[2]->Info & OF_ZBRA) != 0         &&
+	    !CE_HasLabel (L[2])) {
 
 	    /* ldx --> ora */
 	    CE_ReplaceOPC (L[0], OP65_ORA);
@@ -1377,7 +1382,8 @@ static unsigned OptNegAX4 (CodeSeg* S)
        	    L[0]->OPC == OP65_JSR              	&&
 	    strncmp (L[0]->Arg,"bnega",5) == 0 	&&
 	    !CE_HasLabel (L[0]) 	       	&&
-       	    (L[1]->Info & OF_ZBRA) != 0) {
+       	    (L[1]->Info & OF_ZBRA) != 0         &&
+	    !CE_HasLabel (L[1])) {
 
 	    CodeEntry* X;
 
@@ -1386,15 +1392,15 @@ static unsigned OptNegAX4 (CodeSeg* S)
 
 	    /* Insert apropriate test code */
 	    if (ByteSized) {
-		/* Test bytes */
-		X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
-  		CS_InsertEntry (S, X, I+2);
+	    	/* Test bytes */
+	    	X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
+  	    	CS_InsertEntry (S, X, I+2);
 	    } else {
-		/* Test words */
-		X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, L[0]->LI);
-      		CS_InsertEntry (S, X, I+2);
-		X = NewCodeEntry (OP65_ORA, AM65_ZP, "tmp1", 0, L[0]->LI);
-		CS_InsertEntry (S, X, I+3);
+	    	/* Test words */
+	    	X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, L[0]->LI);
+      	    	CS_InsertEntry (S, X, I+2);
+	    	X = NewCodeEntry (OP65_ORA, AM65_ZP, "tmp1", 0, L[0]->LI);
+	    	CS_InsertEntry (S, X, I+3);
 	    }
 
 	    /* Delete the subroutine call */
@@ -1469,13 +1475,13 @@ static unsigned OptPtrStore1 (CodeSeg* S)
 
 	    /* Create and insert the stores */
        	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I);
-
-	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
 	    CS_InsertEntry (S, X, I+1);
 
+	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+2);
+
 	    /* Delete the call to pushax */
-	    CS_DelEntry (S, I+2);
+	    CS_DelEntry (S, I);
 
 	    /* Insert the store through ptr1 */
 	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "ptr1", 0, L[3]->LI);
@@ -1554,8 +1560,8 @@ static unsigned OptPtrLoad1 (CodeSeg* S)
 
        	    /* Store the high byte and remove the TAX instead */
 	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I);
-	    CS_DelEntry (S, I+1);
+	    CS_InsertEntry (S, X, I+1);
+	    CS_DelEntry (S, I);
 
 	    /* Store the low byte */
 	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[2]->LI);
@@ -1594,9 +1600,9 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
  *
  * and replace it by:
  *
+ *      ldy     ...
  *      stx     ptr1+1
  *      sta     ptr1
- *      ldy     ...
  *      ldx     #$00
  *      lda     (ptr1),y
  *
@@ -1624,12 +1630,12 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
 	    CodeEntry* X;
 
        	    /* Store the high byte */
-	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I);
-
-	    /* Store the low byte */
        	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
 	    CS_InsertEntry (S, X, I+1);
+
+	    /* Store the low byte */
+	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+2);
 
 	    /* Delete the call to ldauidx */
 	    CS_DelEntry (S, I+3);

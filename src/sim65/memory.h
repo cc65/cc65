@@ -50,18 +50,18 @@
 
 
 
-void WriteMem (unsigned Addr, unsigned char Val);
+void MemWriteByte (unsigned Addr, unsigned char Val);
 /* Write a byte to a memory location */
 
-unsigned char ReadMem (unsigned Addr);
+unsigned char MemReadByte (unsigned Addr);
 /* Read a byte from a memory location */
 
-unsigned ReadMemW (unsigned Addr);
+unsigned MemReadWord (unsigned Addr);
 /* Read a word from a memory location */
 
-unsigned ReadZeroPageW (unsigned char Addr);
+unsigned MemReadZPWord (unsigned char Addr);
 /* Read a word from the zero page. This function differs from ReadMemW in that
- * the read will always be in the zero page, even in case of an address 
+ * the read will always be in the zero page, even in case of an address
  * overflow.
  */
 

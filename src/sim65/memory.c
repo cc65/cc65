@@ -54,7 +54,7 @@ static unsigned char RAM[0x10000];
 
 
 
-void WriteMem (unsigned Addr, unsigned char Val)
+void MemWriteByte (unsigned Addr, unsigned char Val)
 /* Write a byte to a memory location */
 {
     RAM[Addr] = Val;
@@ -62,7 +62,7 @@ void WriteMem (unsigned Addr, unsigned char Val)
 
 
 
-unsigned char ReadMem (unsigned Addr)
+unsigned char MemReadByte (unsigned Addr)
 /* Read a byte from a memory location */
 {
     return RAM[Addr];
@@ -70,23 +70,23 @@ unsigned char ReadMem (unsigned Addr)
 
 
 
-unsigned ReadMemW (unsigned Addr)
+unsigned MemReadWord (unsigned Addr)
 /* Read a word from a memory location */
 {
-    unsigned W = ReadMem (Addr++);
-    return (W | (ReadMem (Addr) << 8));
+    unsigned W = MemReadByte (Addr++);
+    return (W | (MemReadByte (Addr) << 8));
 }
 
 
 
-unsigned ReadZeroPageW (unsigned char Addr)
+unsigned MemReadZPWord (unsigned char Addr)
 /* Read a word from the zero page. This function differs from ReadMemW in that
 * the read will always be in the zero page, even in case of an address
 * overflow.
 */
 {
-    unsigned W = ReadMem (Addr++);
-    return (W | (ReadMem (Addr) << 8));
+    unsigned W = MemReadByte (Addr++);
+    return (W | (MemReadByte (Addr) << 8));
 }
 
 

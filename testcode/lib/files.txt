@@ -12,5 +12,5 @@ ft.c		-	file I/O test program (open + read functions)
 getsp.s		-	helper routine for ft.c
 joytest.c	-	readjoy function test program
 posixio-test.c  -       test POSIX file i/o routines (open/read/write/close)
-seek.c		-	test lseek()/fseek()/fell()
+seek.c		-	test lseek()/fseek()/ftell()
 time-test.c     -       test the time/mktime/gmtime/asctime functions

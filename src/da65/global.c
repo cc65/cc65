@@ -54,15 +54,17 @@ const char CfgExt[]    	      = ".cfg";	/* Config file extension */
 /* Flags and other command line stuff */
 unsigned char Verbosity	      = 4;	/* Verbosity of the output file */
 unsigned char FormFeeds	      = 0;	/* Add form feeds to the output? */
-				  
+unsigned char PassCount	      = 2;	/* How many passed do we do? */
+
 /* Stuff needed by many routines */
-unsigned Pass		      = 0;	/* Disassembler pass */
+unsigned char Pass	      = 0;	/* Disassembler pass */
 
 /* Page formatting */
 int PageLength		      = -1;	/* Length of a listing page */
 unsigned MIndent	      = 9;	/* Mnemonic indent */
 unsigned AIndent	      = 17;	/* Argument indent */
 unsigned CIndent	      = 49;	/* Comment indent */
+unsigned TIndent	      = 81;	/* Text bytes indent */
 unsigned BytesPerLine	      = 8;	/* Max. number of data bytes per line */
 
 

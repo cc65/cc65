@@ -66,8 +66,14 @@ unsigned char GetCodeByte (unsigned Addr);
 unsigned GetCodeWord (unsigned Addr);
 /* Get a word from the given address */
 
+unsigned long GetCodeDWord (unsigned Addr);
+/* Get a dword from the given address */
+
 unsigned GetRemainingBytes (void);
 /* Return the number of remaining code bytes */
+
+int CodeLeft (void);
+/* Return true if there are code bytes left */
 
 void ResetCode (void);
 /* Reset the code input to start over for the next pass */

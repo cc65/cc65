@@ -51,8 +51,9 @@ enum attr_t {
     atIllegal	= 0x02,
     atByteTab  	= 0x03,		/* Same as illegal */
     atWordTab	= 0x04,
-    atAddrTab	= 0x05,
-    atRtsTab	= 0x06,
+    atDWordTab	= 0x05,
+    atAddrTab	= 0x06,
+    atRtsTab	= 0x07,
 
     atStyleMask = 0x0F		/* Output style */
 };

@@ -70,11 +70,14 @@ void DefLabel (const char* Name);
 void OneDataByte (void);
 /* Output a .byte line with the current code byte */
 
-void DataByteLine (unsigned Count);
-/* Output a line with Count data bytes */
+void DataByteLine (unsigned ByteCount);
+/* Output a line with bytes */
 
-void DataWordLine (unsigned Count);
-/* Output a line with Count data words */
+void DataWordLine (unsigned ByteCount);
+/* Output a line with words */
+
+void DataDWordLine (unsigned ByteCount);
+/* Output a line with dwords */
 
 void SeparatorLine (void);
 /* Print a separator line */

@@ -211,15 +211,19 @@ static void OneOpcode (unsigned RemainingBytes)
 	    break;
 
 	case atByteTab:
-	    ByteTable (RemainingBytes);
+	    ByteTable ();
 	    break;
 
 	case atWordTab:
-	    WordTable (RemainingBytes);
+	    WordTable ();
+	    break;
+
+	case atDWordTab:
+	    DWordTable ();
 	    break;
 
 	case atAddrTab:
-	    AddrTable (RemainingBytes);
+	    AddrTable ();
 	    break;
 
 	default:

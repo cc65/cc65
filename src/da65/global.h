@@ -55,9 +55,10 @@ extern const char 	CfgExt[];	/* Config file extension */
 /* Flags and other command line stuff */
 extern unsigned char   	Verbosity;	/* Verbosity of the output file */
 extern unsigned char	FormFeeds;	/* Add form feeds to the output? */
+extern unsigned char	PassCount;	/* How many passed do we do? */
 
 /* Stuff needed by many routines */
-extern unsigned 	Pass;		/* Disassembler pass */
+extern unsigned char	Pass;		/* Disassembler pass */
 
 /* Page formatting */
 #define MIN_PAGE_LEN	32
@@ -66,6 +67,7 @@ extern int	     	PageLength;	/* Length of a listing page */
 extern unsigned		MIndent;	/* Mnemonic indent */
 extern unsigned		AIndent;	/* Argument indent */
 extern unsigned 	CIndent;	/* Comment indent */
+extern unsigned 	TIndent;	/* Text bytes indent */
 extern unsigned		BytesPerLine;	/* Max. number of data bytes per line */
 
 

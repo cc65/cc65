@@ -44,13 +44,16 @@
 
 
 
-void ByteTable (unsigned RemainingBytes);
+unsigned ByteTable (void);
 /* Output a table of bytes */
 
-void WordTable (unsigned RemainingBytes);
+unsigned WordTable (void);
 /* Output a table of words */
 
-void AddrTable (unsigned RemainingBytes);
+unsigned DWordTable (void);
+/* Output a table of double words */
+
+unsigned AddrTable (void);
 /* Output a table of addresses */
 
 

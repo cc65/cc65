@@ -89,7 +89,7 @@ void LoadCode (const char* Name, unsigned long StartAddress)
 	Error ("Error reading from `%s': %s", Name, strerror (errno));
     }
     if (Count == 0) {
-	Error ("File `%s' contains no data", Name);
+    	Error ("File `%s' contains no data", Name);
     }
 
     /* Set the buffer variables */
@@ -118,14 +118,32 @@ unsigned GetCodeWord (unsigned Addr)
 
 
 
+unsigned long GetCodeDWord (unsigned Addr)
+/* Get a dword from the given address */
+{
+    unsigned long Lo = GetCodeWord (Addr);
+    unsigned long Hi = GetCodeWord (Addr+2);
+    return Lo | (Hi << 16);
+}
+
+
+
 unsigned GetRemainingBytes (void)
 /* Return the number of remaining code bytes */
 {
     if (CodeEnd >= PC) {
-	return (CodeEnd - PC + 1);
+    	return (CodeEnd - PC + 1);
     } else {
-	return 0;
+    	return 0;
     }
+}
+
+
+
+int CodeLeft (void)
+/* Return true if there are code bytes left */
+{
+    return (PC <= CodeEnd);
 }
 
 

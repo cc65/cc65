@@ -77,6 +77,7 @@ typedef enum token_t {
     CFGTOK_CODE,
     CFGTOK_BYTETAB,
     CFGTOK_WORDTAB,
+    CFGTOK_DWORDTAB,
     CFGTOK_ADDRTAB,
     CFGTOK_RTSTAB,
 

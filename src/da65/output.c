@@ -36,6 +36,7 @@
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>
+#include <ctype.h>
 #include <errno.h>
 
 /* common */
@@ -110,7 +111,7 @@ void CloseOutput (void)
 void Output (const char* Format, ...)
 /* Write to the output file */
 {
-    if (Pass > 1) {
+    if (Pass == PassCount) {
 	va_list ap;
 	va_start (ap, Format);
 	Col += vfprintf (F, Format, ap);
@@ -123,7 +124,7 @@ void Output (const char* Format, ...)
 void Indent (unsigned N)
 /* Make sure the current line column is at position N (zero based) */
 {
-    if (Pass > 1) {
+    if (Pass == PassCount) {
 	while (Col < N) {
 	    fputc (' ', F);
 	    ++Col;
@@ -136,7 +137,7 @@ void Indent (unsigned N)
 void LineFeed (void)
 /* Add a linefeed to the output file */
 {
-    if (Pass > 1) {
+    if (Pass == PassCount) {
 	fputc ('\n', F);
 	if (++Line >= PageLength) {
 	    if (FormFeeds) {
@@ -156,48 +157,72 @@ void DefLabel (const char* Name)
 /* Define a label with the given name */
 {
     Output ("%s:", Name);
-    LineFeed ();
+    /* Don't start a new line if the label is fully in the left column */
+    if (Col >= MIndent-1) {
+     	LineFeed ();
+    }
 }
 
 
 
-void DataByteLine (unsigned Count)
-/* Output a line with Count data bytes */
+void DataByteLine (unsigned ByteCount)
+/* Output a line with bytes */
 {
     unsigned I;
 
     Indent (MIndent);
     Output (".byte");
     Indent (AIndent);
-    for (I = 0; I < Count; ++I) {
+    for (I = 0; I < ByteCount; ++I) {
 	if (I > 0) {
 	    Output (",$%02X", CodeBuf[PC+I]);
 	} else {
 	    Output ("$%02X", CodeBuf[PC+I]);
 	}
     }
-    LineComment (PC, Count);
+    LineComment (PC, ByteCount);
     LineFeed ();
 }
 
 
 
-void DataWordLine (unsigned Count)
-/* Output a line with Count data words */
+void DataWordLine (unsigned ByteCount)
+/* Output a line with words */
 {
     unsigned I;
 
     Indent (MIndent);
     Output (".word");
     Indent (AIndent);
-    for (I = 0; I < Count; I += 2) {
+    for (I = 0; I < ByteCount; I += 2) {
 	if (I > 0) {
 	    Output (",$%04X", GetCodeWord (PC+I));
 	} else {
 	    Output ("$%04X", GetCodeWord (PC+I));
 	}
     }
-    LineComment (PC, Count);
+    LineComment (PC, ByteCount);
+    LineFeed ();
+}
+
+
+
+void DataDWordLine (unsigned ByteCount)
+/* Output a line with dwords */
+{
+    unsigned I;
+
+    Indent (MIndent);
+    Output (".dword");
+    Indent (AIndent);
+    for (I = 0; I < ByteCount; I += 4) {
+	if (I > 0) {
+	    Output (",$%08lX", GetCodeDWord (PC+I));
+	} else {
+	    Output ("$%08lX", GetCodeDWord (PC+I));
+	}
+    }
+    LineComment (PC, ByteCount);
     LineFeed ();
 }
 
@@ -206,8 +231,10 @@ void DataWordLine (unsigned Count)
 void SeparatorLine (void)
 /* Print a separator line */
 {
-    Output ("; ----------------------------------------------------------------------------");
-    LineFeed ();
+    if (Pass == PassCount && Verbosity >= 1) {
+	Output ("; ----------------------------------------------------------------------------");
+	LineFeed ();
+    }
 }
 
 
@@ -215,12 +242,24 @@ void SeparatorLine (void)
 void LineComment (unsigned PC, unsigned Count)
 /* Add a line comment with the PC and data bytes */
 {
-    if (Pass > 1 && Verbosity >= 3) {
+    unsigned I;
+
+    if (Pass == PassCount && Verbosity >= 2) {
 	Indent (CIndent);
 	Output ("; %04X", PC);
-	if (Verbosity >= 4) {
-	    while (Count--) {
-		Output (" %02X", CodeBuf [PC++]);
+	if (Verbosity >= 3) {
+	    for (I = 0; I < Count; ++I) {
+		Output (" %02X", CodeBuf [PC+I]);
+	    }
+	    if (Verbosity >= 4) {
+		Indent (TIndent);
+		for (I = 0; I < Count; ++I) {
+		    unsigned char C = CodeBuf [PC+I];
+		    if (!isprint (C)) {
+			C = '.';
+		    }
+		    Output ("%c", C);
+		}
 	    }
 	}
     }

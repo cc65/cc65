@@ -138,6 +138,7 @@ static void RangeSection (void)
 	{   "CODE",	    	CFGTOK_CODE	},
 	{   "BYTETABLE",    	CFGTOK_BYTETAB	},
 	{   "WORDTABLE",    	CFGTOK_WORDTAB	},
+	{   "DWORDTABLE",	CFGTOK_DWORDTAB	},
 	{   "ADDRTABLE",	CFGTOK_ADDRTAB	},
 	{   "RTSTABLE",	    	CFGTOK_RTSTAB	},
     };
@@ -197,6 +198,7 @@ static void RangeSection (void)
 		    case CFGTOK_CODE:		Type = atCode;		break;
 		    case CFGTOK_BYTETAB:	Type = atByteTab;	break;
 		    case CFGTOK_WORDTAB:	Type = atWordTab;	break;
+		    case CFGTOK_DWORDTAB:	Type = atDWordTab;	break;
 		    case CFGTOK_ADDRTAB:	Type = atAddrTab;	break;
 		    case CFGTOK_RTSTAB:		Type = atRtsTab;	break;
 		}

@@ -41,9 +41,9 @@ L1:	lda	sp,x
        	tsx
        	stx    	spsave 		; Save the system stack ptr
 
-	lda    	#<TOPMEM
+	lda    	MEMSIZE
 	sta	sp
-	lda	#>TOPMEM
+	lda	MEMSIZE+1
        	sta	sp+1   		; Set argument stack ptr
 
 ; Call module constructors

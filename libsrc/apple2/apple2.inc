@@ -29,6 +29,7 @@ CH	=	$24
 CV	=	$25
 BASL	=	$28
 TEXTTYP	=	$32
+MEMSIZE	=	$73		; Highest free RAM location
 HOME	=	$FC58
 VTABZ	=	$FC24
 COUT    = 	$FDED

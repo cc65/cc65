@@ -13,7 +13,7 @@ RVS		= $68
 CURS_X		= $69
 CURS_Y		= $6a
 
-_tickcount      = $6b           ;2
+tickcount       = $6b           ;2
 
 VBLANK_FLAG	= $70
 

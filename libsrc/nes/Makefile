@@ -20,7 +20,12 @@
 C_OBJS =
 
 S_OBJS  =       _scrsize.o      \
-                crt0.o
+                clock.o         \
+                color.o         \
+                crt0.o          \
+                ppu.o           \
+                ppubuf.o        \
+                waitvblank.o
 
 #--------------------------------------------------------------------------
 # Targets

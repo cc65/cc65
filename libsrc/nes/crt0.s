@@ -20,7 +20,7 @@
 	.import		__CODE_LOAD__,__CODE_RUN__, __CODE_SIZE__
 	.import		__RODATA_LOAD__,__RODATA_RUN__, __RODATA_SIZE__
 	.import		__DATA_LOAD__,__DATA_RUN__, __DATA_SIZE__
-        
+
         .include        "zeropage.inc"
 	.include        "nes.inc"
 
@@ -165,7 +165,7 @@ _exit:  jsr	donelib		; Run module destructors
 ; ------------------------------------------------------------------------
 ; System V-Blank Interupt
 ; updates PPU Memory (buffered)
-; updates VBLANK_FLAG and _tickcount
+; updates VBLANK_FLAG and tickcount
 ; ------------------------------------------------------------------------
 
 nmi:    pha
@@ -177,9 +177,9 @@ nmi:    pha
         lda     #1
         sta     VBLANK_FLAG
 
-        inc     _tickcount
+        inc     tickcount
         bne     @s
-        inc     _tickcount+1
+        inc     tickcount+1
 
 @s:     jsr     ppubuf_flush
 

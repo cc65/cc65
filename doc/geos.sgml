@@ -282,7 +282,7 @@ This function outputs single character using current style and font to screen.
 
 <sect3>PutString
 <p>
-<tt/void PutString (char y, int x, char *myString)/
+<tt/void PutString (char *myString, char y, int x)/
 <p>
 Same as <tt/PutChar/ except the fact that you can output whole <tt/NULL/-terminated string.
 See <tt/ggraph.h/ for list of tokens that you can also place in the string - like <tt/CBOLDON/ or
@@ -816,17 +816,19 @@ other registers set as described in <tt/GetNxtDirEntry/.
 <p>
 This function scans directory and fills a table at <tt/buffer/ with <tt/char &lsqb;17&rsqb;/ entries.
 <tt/fType/ is GEOS type of searched files and <tt/classTxt/ is a string for Class field in file
-header. Class will match if given will be shorter than that found in file's header block. This
-way if you want just to find all files with given GEOS type you must pass empty string as
-<tt/classTxt/. <tt/fMaxNum/ is the maximal number of found files, thus the <tt/buffer/ must
-provide area of size equal to <tt/17 * fMaxNum/. This function returns errorcode. The number of
-actually found files can be restored from <tt/r7H/.
+header. Class will match if given will be equal or shorter than that found in file's header block.
+If you want just to find all files with given GEOS type you should pass empty string or <tt/NULL/ as
+<tt/classTxt/. Be warned that for searching NON_GEOS files must pass <tt/NULL/ as <tt/classTxt/.
+<tt/fMaxNum/ is the maximal number of found files, thus the <tt/buffer/ must
+provide area of size equal to <tt/17 * fMaxNum/.
+This function returns the number of found files, ranging from 0 to number passed as fMaxNum.
+Return value from kernal FindFTypes can be restored from <tt/r7H/.
 
 <sect3>DeleteFile
 <p>
 <tt/char DeleteFile (char *fName)/
 <p>
-This function delets a file by its name. It works for SEQ and VLIR files.
+This function deletes a file by its name. It works for SEQ and VLIR files.
 
 <sect3>RenameFile
 <p>

@@ -34,6 +34,12 @@ OBJS = 	add.o		\
 	condes.o	\
 	decax1.o	\
 	decax2.o	\
+       	decax3.o	\
+	decax4.o	\
+	decax5.o	\
+	decax6.o	\
+	decax7.o	\
+	decax8.o	\
 	decaxy.o	\
 	decsp1.o	\
        	decsp2.o	\

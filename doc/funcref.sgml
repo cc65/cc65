@@ -105,11 +105,11 @@ function.
 <item><ref id="chline" name="chline">
 <item><ref id="chlinexy" name="chlinexy">
 <item><ref id="clrscr" name="clrscr">
-<!-- <item><ref id="cprintf" name="cprintf"> -->
-<!-- <item><ref id="cputc" name="cputc"> -->
-<!-- <item><ref id="cputcxy" name="cputcxy"> -->
-<!-- <item><ref id="cputs" name="cputs"> -->
-<!-- <item><ref id="cputsxy" name="cputsxy"> -->
+<item><ref id="cprintf" name="cprintf">
+<item><ref id="cputc" name="cputc">
+<item><ref id="cputcxy" name="cputcxy">
+<item><ref id="cputs" name="cputs">
+<item><ref id="cputsxy" name="cputsxy">
 <item><ref id="cursor" name="cursor">
 <item><ref id="cvline" name="cvline">
 <item><ref id="cvlinexy" name="cvlinexy">
@@ -120,7 +120,7 @@ function.
 <item><ref id="revers" name="revers">
 <item><ref id="screensize" name="screensize">
 <item><ref id="textcolor" name="textcolor">
-<!-- <item><ref id="vcprintf" name="vcprintf"> -->
+<item><ref id="vcprintf" name="vcprintf">
 <item><ref id="wherex" name="wherex">
 <item><ref id="wherey" name="wherey">
 </itemize>
@@ -283,7 +283,7 @@ function.
 <sect1><tt/string.h/<label id="string.h"><p>
 
 <itemize>
-<!-- <item><ref id="_stroserror" name="_stroserror"> -->
+<item><ref id="_stroserror" name="_stroserror">
 <item><ref id="bzero" name="bzero">
 <!-- <item><ref id="memchr" name="memchr"> -->
 <item><ref id="memcpy" name="memcpy">
@@ -296,8 +296,8 @@ function.
 <item><ref id="strcoll" name="strcoll">
 <item><ref id="strcpy" name="strcpy">
 <!-- <item><ref id="strcspn" name="strcspn"> -->
-<!-- <item><ref id="strdup" name="strdup"> -->
-<!-- <item><ref id="strerror" name="strerror"> -->
+<item><ref id="strdup" name="strdup">
+<item><ref id="strerror" name="strerror">
 <item><ref id="stricmp" name="stricmp">
 <item><ref id="strlen" name="strlen">
 <item><ref id="strlower" name="strlower">
@@ -454,6 +454,30 @@ considered random to a certain degree.
 <tag/See also/
 <ref id="rand" name="rand">,
 <ref id="srand" name="srand">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_stroserror<label id="_stroserror"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return a string describing an OS specific error code.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/const char* __fastcall__ _stroserror (unsigned char errcode);/
+<tag/Description/<tt/_stroserror/ will return a string describing the given
+operating system specific error code.
+<tag/Limits/<itemize>
+<item>Since operating system specific error code are - you guessed it -
+operating system specific, the parameter and the string returned depend on the
+cc65 target.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="strerror" name="strerror">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -978,7 +1002,7 @@ be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Clear part of a line (write a given amount of spaces).
+<tag/Function/Clear part of a line (write a given number of spaces).
 <tag/Header/<tt/<ref id="conio.h" name="conio.h">/
 <tag/Declaration/<tt/void __fastcall__ cclear (unsigned char length);/
 <tag/Description/The function clears part of a line by writing <tt/length/
@@ -1000,10 +1024,10 @@ only be used in presence of a prototype.
 
 <quote>
 <descrip>
-<tag/Function/Clear part of a line (write a given amount of spaces) starting
+<tag/Function/Clear part of a line (write a given number of spaces) starting
 at a specific screen position.
 <tag/Header/<tt/<ref id="conio.h" name="conio.h">/
-<tag/Declaration/<tt/void __fastcall__ cclearxy (unsigned char length);/
+<tag/Declaration/<tt/void __fastcall__ cclearxy (unsigned char x, unsigned char y, unsigned char length);/
 <tag/Description/The function moves the cursor to a specific position, and
 will then clear part of the line by writing <tt/length/ spaces in the current
 text color.
@@ -1157,6 +1181,141 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="close" name="close">,
 <ref id="open" name="open">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cprintf<label id="cprintf"><p>
+
+<quote>
+<descrip>
+<tag/Function/Formatted output to the console.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/int cprintf (const char* format, ...);/
+<tag/Description/The arguments are converted to text where necessary and
+formatted according to the format string given. The resulting string is output
+to the console. <tt/cprintf/ supports the same format specifiers as
+<tt/printf/. <!-- <tt/<ref id="printf" name="printf">/. -->
+<tag/Limits/<itemize>
+<item>Like all other <tt/conio/ output functions, <tt/cprintf/ distinguishes
+between <tt/\r/ and <tt/\n/.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cputc" name="cputc">,
+<ref id="cputcxy" name="cputcxy">,
+<ref id="cputs" name="cputs">,
+<ref id="cputsxy" name="cputsxy">,
+<ref id="vcprintf" name="vcprintf">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cputc<label id="cputc"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output a character directly to the console.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ cputc (char c);/
+<tag/Description/Output one character to the console at the current cursor
+position.
+<tag/Limits/<itemize>
+<item>Like all other <tt/conio/ output functions, <tt/cputc/ distinguishes
+between <tt/\r/ and <tt/\n/.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cprintf" name="cprintf">,
+<ref id="cputcxy" name="cputcxy">,
+<ref id="cputs" name="cputs">,
+<ref id="cputsxy" name="cputsxy">,
+<ref id="vcprintf" name="vcprintf">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cputcxy<label id="cputcxy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output a character at a specific screen position.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);/
+<tag/Description/<tt/cputcxy/ moves the cursor to the given x/y position on
+the screen and outputs one character.
+<tag/Limits/<itemize>
+<item>Like all other <tt/conio/ output functions, <tt/cputcxy/ distinguishes
+between <tt/\r/ and <tt/\n/.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cprintf" name="cprintf">,
+<ref id="cputc" name="cputc">,
+<ref id="cputs" name="cputs">,
+<ref id="cputsxy" name="cputsxy">,
+<ref id="vcprintf" name="vcprintf">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cputs<label id="cputs"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output a string directly to the console.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ cputs (const char* s);/
+<tag/Description/The function outputs the given string on the console at the
+current cursor position.
+<tag/Limits/<itemize>
+<item>Like all other <tt/conio/ output functions, <tt/cputs/ distinguishes
+between <tt/\r/ and <tt/\n/.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cprintf" name="cprintf">,
+<ref id="cputc" name="cputc">,
+<ref id="cputcxy" name="cputcxy">,
+<ref id="cputsxy" name="cputsxy">,
+<ref id="vcprintf" name="vcprintf">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>cputsxy<label id="cputsxy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Output a string to the console at a given position.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ cputsxy (unsigned char x, unsigned char y, const char* s);/
+<tag/Description/<tt/cputsxy/ moves the cursor to the given x/y position,
+and outputs the string <tt/s/.
+<tag/Limits/<itemize>
+<item>Like all other <tt/conio/ output functions, <tt/cputsxy/ distinguishes
+between <tt/\r/ and <tt/\n/.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cprintf" name="cprintf">,
+<ref id="cputc" name="cputc">,
+<ref id="cputcxy" name="cputcxy">,
+<ref id="cputs" name="cputs">,
+<ref id="vcprintf" name="vcprintf">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2328,7 +2487,8 @@ be used in presence of a prototype.
 <ref id="_heapmemavail" name="_heapmemavail">,
 <ref id="calloc" name="calloc">,
 <ref id="free" name="free">,
-<ref id="realloc" name="realloc">
+<ref id="realloc" name="realloc">,
+<ref id="strdup" name="strdup">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2932,16 +3092,66 @@ is undefined.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
-<ref id="strcat" name="strcat">
+<ref id="strcat" name="strcat">,
 <ref id="strncpy" name="strncpy">
 <tag/Example/
 <verb>
-#include <string.h>
+#include &lt;string.h&gt;
 
 static char hello[14];
 
 strcpy (hello, "Hello world!\n");
 </verb>
+</descrip>
+</quote>
+
+
+<sect1>strdup<label id="strdup"><p>
+
+<quote>
+<descrip>
+<tag/Function/Allocate a copy of a string on the heap.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strdup (const char* s);/
+<tag/Description/<tt/strdup/ allocates a memory block on the heap, big enough
+to hold a copy of <tt/s/ including the terminating zero. If the allocation
+fails, <tt/NULL/ is returned, otherwise <tt/s/ is copied into the allocated
+memory block, and a pointer to the block is returned.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>It is up to the caller to free the allocated memory block.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="free" name="free">,
+<ref id="malloc" name="malloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strerror<label id="strerror"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return a string describing an error code.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strerror (int errcode);/
+<tag/Description/The <tt/strerror/ function returns a string describing the
+given error code. If an invalid error code is passed, the string "Unknown
+error" is returned, and <tt/errno/ is set to <tt/EINVAL/. In all other cases,
+<tt/errno/ is left untouched.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>While the return type of the function is a <tt/char*/, the returned
+string must not be modified by the caller!
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="_stroserror" name="_stroserror">
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -3260,6 +3470,35 @@ used in presence of a prototype.
 <ref id="itoa" name="itoa">,
 <ref id="ltoa" name="ltoa">,
 <ref id="ultoa" name="ultoa">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>vcprintf<label id="vcprintf"><p>
+
+<quote>
+<descrip>
+<tag/Function/Formatted output to the console.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/int __fastcall__ vcprintf (const char* format, va_list ap);/
+<tag/Description/The arguments specified as a <tt/va_list/ are converted to
+text where necessary and formatted according to the format string given. The
+resulting string is output to the console. <tt/vcprintf/ supports the same
+format specifiers as <tt/vprintf/. <!-- <tt/<ref id="vprintf" name="vprintf">/. -->
+<tag/Limits/<itemize>
+<item>Like all other <tt/conio/ output functions, <tt/vcprintf/ distinguishes
+between <tt/\r/ and <tt/\n/.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cprintf" name="cprintf">,
+<ref id="cputc" name="cputc">,
+<ref id="cputcxy" name="cputcxy">,
+<ref id="cputs" name="cputs">,
+<ref id="cputsxy" name="cputsxy">
 <tag/Example/None.
 </descrip>
 </quote>

@@ -37,6 +37,7 @@
 #include <time.h>
 
 /* common */
+#include "addrsize.h"
 #include "cddefs.h"
 #include "coll.h"
 #include "exprdefs.h"
@@ -438,18 +439,8 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 	unsigned      Len       = strlen (Name);
 	unsigned long Size      = Read32 (F);
 	unsigned      Align     = (1U << Read8 (F));
-	unsigned char Type      = Read8 (F);
+       	unsigned char AddrSize  = Read8 (F);
         unsigned long FragCount = ReadVar (F);
-
-	/* Get the description for the type */
-	const char* TypeDesc;
-	switch (Type) {
-	    case SEGTYPE_DEFAULT: 	TypeDesc = "SEGTYPE_DEFAULT";	break;
-	    case SEGTYPE_ABS:  	  	TypeDesc = "SEGTYPE_ABS";	break;
-	    case SEGTYPE_ZP:   	  	TypeDesc = "SEGTYPE_ZP";	break;
-	    case SEGTYPE_FAR:  	  	TypeDesc = "SEGTYPE_FAR";	break;
-	    default:  	       	   	TypeDesc = "SEGTYPE_UNKNOWN";	break;
-	}
 
 	/* Print the header */
 	printf ("    Index:%27u\n", I);
@@ -458,7 +449,8 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
        	printf ("      Size:%26lu\n", Size);
 	printf ("      Alignment:%21u\n", Align);
-	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
+	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
+                AddrSizeToStr (AddrSize));
        	printf ("      Fragment count:%16lu\n", FragCount);
 
         /* Seek to the end of the segment data (start of next) */

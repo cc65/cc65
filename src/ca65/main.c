@@ -39,6 +39,7 @@
 #include <time.h>
 
 /* common */
+#include "addrsize.h"
 #include "chartype.h"
 #include "cmdline.h"
 #include "print.h"
@@ -188,7 +189,7 @@ static void DefineSymbol (const char* Def)
     }
 
     /* Mark the symbol as defined */
-    SymDef (Sym, GenLiteralExpr (Val), SYM_DEFAULT);
+    SymDef (Sym, GenLiteralExpr (Val), ADDR_SIZE_DEFAULT, SF_NONE);
 }
 
 
@@ -381,18 +382,16 @@ static void OneLine (void)
      	     */
        	    if (Tok == TOK_EQ || Tok == TOK_ASSIGN) {
                 /* If it's an assign token, we have a label */
-                unsigned Flags = (Tok == TOK_ASSIGN)? SYM_LABEL : SYM_DEFAULT;
+                unsigned Flags = (Tok == TOK_ASSIGN)? SF_LABEL : SF_NONE;
      	    	/* Skip the '=' */
      	    	NextTok ();
      	    	/* Define the symbol with the expression following the '=' */
-     	    	SymDef (Sym, Expression(), Flags);
+     	    	SymDef (Sym, Expression(), ADDR_SIZE_DEFAULT, Flags);
      	    	/* Don't allow anything after a symbol definition */
      	    	Done = 1;
      	    } else {
-                /* Define the symbol flags */
-                unsigned Flags = IsZPSeg ()? SYM_ZP | SYM_LABEL : SYM_LABEL;
      	    	/* Define a label */
-     	    	SymDef (Sym, GenCurrentPC (), Flags);
+       	       	SymDef (Sym, GenCurrentPC (), ADDR_SIZE_DEFAULT, SF_LABEL);
      	    	/* Skip the colon. If NoColonLabels is enabled, allow labels
      	    	 * without a colon if there is no whitespace before the
      	    	 * identifier.
@@ -525,7 +524,7 @@ int main (int argc, char* argv [])
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
      */
-    SymEnterLevel ("");
+    SymEnterLevel ("", ADDR_SIZE_DEFAULT);
 
     /* Check the parameters */
     I = 1;

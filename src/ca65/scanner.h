@@ -291,6 +291,12 @@ int GetSubKey (const char** Keys, unsigned Count);
  * or -1 if the keyword was not found.
  */
 
+unsigned ParseAddrSize (void);
+/* Check if the next token is a keyword that denotes an address size specifier.
+ * If so, return the corresponding address size constant, otherwise output an
+ * error message and return ADDR_SIZE_DEFAULT.
+ */
+
 void InitScanner (const char* InFile);
 /* Initialize the scanner, open the given input file */
 

@@ -36,6 +36,7 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "check.h"
 #include "coll.h"
 #include "fragdefs.h"
@@ -127,7 +128,7 @@ static int ConDesCompare (void* Data, const void* E1, const void* E2)
 static void ConDesCreateOne (ConDesDesc* CD)
 /* Create one table if requested */
 {
-    Segment*	Seg;		/* Segment for table */
+    Segment*	Seg; 		/* Segment for table */
     Section*	Sec;		/* Section for table */
     unsigned	Count;		/* Number of exports */
     unsigned	I;
@@ -151,10 +152,10 @@ static void ConDesCreateOne (ConDesDesc* CD)
     CollSort (&CD->ExpList, ConDesCompare, CD);
 
     /* Get the segment for the table, create it if needed */
-    Seg = GetSegment (CD->SegName, SEGTYPE_ABS, 0);
+    Seg = GetSegment (CD->SegName, ADDR_SIZE_ABS, 0);
 
     /* Create a new section for the table */
-    Sec = NewSection (Seg, 1, SEGTYPE_ABS);
+    Sec = NewSection (Seg, 1, ADDR_SIZE_ABS);
 
     /* Walk over the exports and create a fragment for each one. We will use
      * the exported expression without copying it, since it's cheap and there

@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  symentry.c				     */
+/*			   	  symentry.c				     */
 /*                                                                           */
 /*	    Symbol table entry forward for the ca65 macroassembler	     */
 /*                                                                           */
@@ -36,6 +36,7 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "xmalloc.h"
 
 /* ca65 */
@@ -63,7 +64,7 @@ SymEntry* SymLast = 0;
 
 
 /*****************************************************************************/
-/*     	       		  	     Code			   	     */
+/*     	       	   	  	     Code			   	     */
 /*****************************************************************************/
 
 
@@ -84,6 +85,20 @@ int IsLocalNameId (unsigned Name)
 
 
 
+static unsigned SymAddrSize (const SymEntry* S)
+/* Get the default address size for a symbol. */
+{
+    /* Local symbols are always near (is this ok?) */
+    if (IsLocalNameId (S->Name)) {
+        return ADDR_SIZE_ABS;
+    }
+
+    /* Return the address size of the enclosing scope */
+    return S->SymTab->AddrSize;
+}
+
+
+
 SymEntry* NewSymEntry (const char* Name)
 /* Allocate a symbol table entry, initialize and return it */
 {
@@ -91,16 +106,18 @@ SymEntry* NewSymEntry (const char* Name)
     SymEntry* S = xmalloc (sizeof (SymEntry));
 
     /* Initialize the entry */
-    S->Left	= 0;
-    S->Right	= 0;
-    S->Locals	= 0;
-    S->SymTab	= 0;
-    S->Pos	= CurPos;
-    S->Flags	= 0;
-    S->V.Expr	= 0;
-    S->ExprRefs = AUTO_COLLECTION_INITIALIZER;
+    S->Left	  = 0;
+    S->Right	  = 0;
+    S->Locals	  = 0;
+    S->SymTab	  = 0;
+    S->Pos	  = CurPos;
+    S->Flags	  = 0;
+    S->V.Expr	  = 0;
+    S->ExprRefs   = AUTO_COLLECTION_INITIALIZER;
+    S->ExportSize = ADDR_SIZE_DEFAULT;
+    S->AddrSize   = ADDR_SIZE_DEFAULT;
     memset (S->ConDesPrio, 0, sizeof (S->ConDesPrio));
-    S->Name     = GetStringId (Name);
+    S->Name       = GetStringId (Name);
 
     /* Insert it into the list of all entries */
     S->List = SymList;
@@ -121,7 +138,7 @@ void SymRef (SymEntry* S)
 
 
 
-void SymDef (SymEntry* S, ExprNode* Expr, unsigned Flags)
+void SymDef (SymEntry* S, ExprNode* Expr, unsigned AddrSize, unsigned Flags)
 /* Define a new symbol */
 {
     if (S->Flags & SF_IMPORT) {
@@ -136,7 +153,12 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned Flags)
        	return;
     }
 
-    /* Set the symbol data */
+    /* Map a default address size to a real value */
+    if (AddrSize == ADDR_SIZE_DEFAULT) {
+        AddrSize = SymAddrSize (S);
+    }
+
+    /* Set the symbol value */
     if (IsConstExpr (Expr)) {
        	/* Expression is const, store the value */
        	S->Flags |= SF_CONST;
@@ -146,16 +168,26 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned Flags)
        	/* Not const, store the expression */
         S->V.Expr  = Expr;
     }
-    S->Flags |= SF_DEFINED;
-    if (Flags & SYM_ZP) {
-	S->Flags |= SF_ZP;
+
+    /* If the symbol is marked as global, export it */
+    if (S->Flags & SF_GLOBAL) {
+        S->ExportSize = S->AddrSize;
+        S->Flags = (S->Flags & ~SF_GLOBAL) | SF_EXPORT;
     }
-    if (Flags & SYM_LABEL) {
-	S->Flags |= SF_LABEL;
+
+    /* Mark the symbol as defined and use the given address size */
+    S->Flags |= (SF_DEFINED | Flags);
+    S->AddrSize = AddrSize;
+
+    /* If the symbol is exported, check the address sizes */
+    if (S->Flags & SF_EXPORT) {
+        if (S->AddrSize > S->ExportSize) {
+            Warning (WARN_ADDR_SIZE_MISMATCH, GetSymName (S));
+        }
     }
 
     /* If the symbol is a ZP symbol, check if the value is in correct range */
-    if (S->Flags & SF_ZP) {
+    if (S->AddrSize == ADDR_SIZE_ZP) {
      	/* Already marked as ZP symbol by some means */
      	if (!IsByteExpr (Expr)) {
      	    Error (ERR_RANGE);
@@ -165,6 +197,147 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned Flags)
     /* If this is not a local symbol, remember it as the last global one */
     if (!IsLocalNameId (S->Name)) {
        	SymLast = S;
+    }
+}
+
+
+
+void SymImport (SymEntry* S, unsigned AddrSize, unsigned Flags)
+/* Mark the given symbol as an imported symbol */
+{
+    /* Don't accept local symbols */
+    if (IsLocalNameId (S->Name)) {
+     	Error (ERR_ILLEGAL_LOCAL_USE);
+     	return;
+    }
+
+    if (S->Flags & SF_DEFINED) {
+     	Error (ERR_SYM_ALREADY_DEFINED, GetSymName (S));
+     	S->Flags |= SF_MULTDEF;
+     	return;
+    }
+    if (S->Flags & SF_EXPORT) {
+     	/* The symbol is already marked as exported symbol */
+     	Error (ERR_SYM_ALREADY_EXPORT, GetSymName (S));
+     	return;
+    }
+
+    /* Map a default address size to a real value */
+    if (AddrSize == ADDR_SIZE_DEFAULT) {
+        AddrSize = SymAddrSize (S);
+    }
+
+    /* If the symbol is marked as import or global, check the symbol flags,
+     * then do silently remove the global flag
+     */
+    if (S->Flags & (SF_IMPORT | SF_GLOBAL)) {
+     	if ((Flags & SF_FORCED) != (S->Flags & SF_FORCED) ||
+            AddrSize != S->AddrSize) {
+     	    Error (ERR_SYM_REDECL_MISMATCH, GetSymName (S));
+     	}
+        S->Flags &= ~SF_GLOBAL;
+    }
+
+    /* Set the symbol data */
+    S->Flags |= (SF_IMPORT | Flags);
+    S->AddrSize = AddrSize;
+}
+
+
+
+void SymExport (SymEntry* S, unsigned AddrSize, unsigned Flags)
+/* Mark the given symbol as an exported symbol */
+{
+    /* Don't accept local symbols */
+    if (IsLocalNameId (S->Name)) {
+     	Error (ERR_ILLEGAL_LOCAL_USE);
+     	return;
+    }
+
+    /* Check if it's ok to export the symbol */
+    if (S->Flags & SF_IMPORT) {
+     	/* The symbol is already marked as imported external symbol */
+     	Error (ERR_SYM_ALREADY_IMPORT, GetSymName (S));
+     	return;
+    }
+
+    /* Map a default address size to a real value */
+    if (AddrSize == ADDR_SIZE_DEFAULT) {
+        AddrSize = SymAddrSize (S);
+    }
+
+    /* If the symbol was already marked as an export or global, check if
+     * this was done specifiying the same address size. In case of a global
+     * declaration, silently remove the global flag.
+     */
+    if (S->Flags & (SF_EXPORT | SF_GLOBAL)) {
+        if (S->ExportSize != AddrSize) {
+            Error (ERR_ADDR_SIZE_MISMATCH, GetSymName (S));
+        }
+        S->Flags &= ~SF_GLOBAL;
+    }
+    S->ExportSize = AddrSize;
+
+    /* If the symbol is already defined, check symbol size against the
+     * exported size.
+     */
+    if (S->Flags & SF_DEFINED) {
+        if (S->AddrSize > S->ExportSize) {
+            Warning (WARN_ADDR_SIZE_MISMATCH, GetSymName (S));
+        }
+    }
+
+    /* Set the symbol data */
+    S->Flags |= (SF_EXPORT | SF_REFERENCED | Flags);
+}
+
+
+
+void SymGlobal (SymEntry* S, unsigned AddrSize, unsigned Flags)
+/* Mark the given symbol as a global symbol, that is, as a symbol that is
+ * either imported or exported.
+ */
+{
+    /* Don't accept local symbols */
+    if (IsLocalNameId (S->Name)) {
+     	Error (ERR_ILLEGAL_LOCAL_USE);
+     	return;
+    }
+
+    /* Map a default address size to a real value */
+    if (AddrSize == ADDR_SIZE_DEFAULT) {
+        AddrSize = SymAddrSize (S);
+    }
+
+    /* If the symbol is already marked as import or export, check the
+     * size of the definition, then bail out.
+     */
+    if (S->Flags & SF_IMPORT) {
+        if (AddrSize != S->AddrSize) {
+            Error (ERR_ADDR_SIZE_MISMATCH, GetSymName (S));
+        }
+        return;
+    }
+    if (S->Flags & SF_EXPORT) {
+        if (AddrSize != S->ExportSize) {
+            Error (ERR_ADDR_SIZE_MISMATCH, GetSymName (S));
+        }
+        return;
+    }
+
+    /* If the symbol is already defined, export it. Otherwise mark it as
+     * global.
+     */
+    if (S->Flags & SF_DEFINED) {
+        /* The symbol is defined, export it */
+        if (S->ExportSize != AddrSize) {
+            Error (ERR_ADDR_SIZE_MISMATCH, GetSymName (S));
+        }
+        S->Flags |= (SF_EXPORT | Flags);
+        S->ExportSize = AddrSize;
+    } else {
+        S->Flags |= (SF_GLOBAL | Flags);
+        S->AddrSize = AddrSize;
     }
 }
 

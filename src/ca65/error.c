@@ -51,7 +51,7 @@
 
 
 /* Warning level */
-unsigned WarnLevel	    = 1;
+unsigned WarnLevel	= 1;
 
 /* Statistics */
 unsigned ErrorCount	= 0;
@@ -72,11 +72,13 @@ void WarningMsg (const FilePos* Pos, unsigned WarnNum, va_list ap)
 	unsigned char 	Level;
 	const char*	Msg;
     } Warnings [WARN_COUNT-1] = {
-       	{   2,  "Symbol `%s' is defined but never used" 	},
-        {   2,  "Symbol `%s' is imported but never used"	},
-	{   1,  "Cannot track processor status byte"		},
-       	{   1,  "Suspicious address expression"                 },
-       	{   0,	"User warning: %s"				},
+       	{   2,  "Symbol `%s' is defined but never used" 	        },
+        {   2,  "Symbol `%s' is imported but never used"	        },
+	{   1,  "Cannot track processor status byte"		        },
+       	{   1,  "Suspicious address expression"                         },
+        {   0,  "Unnamed .PROCs are deprecated, please use .SCOPE"      },
+        {   1,  "Address size mismatch for symbol `%s'"                 },
+       	{   0,	"User warning: %s"	  			        },
     };
 
     if (Warnings [WarnNum-1].Level <= WarnLevel) {
@@ -149,6 +151,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
 	"`.ENDMACRO' expected",
 	"Option key expected",
 	"`=' expected",
+        "Address size specifier expected",
 	"Command is only valid in 65816 mode",
 	"User error: %s",
 	"String constant too long",
@@ -158,7 +161,6 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
  	"Illegal character to start local symbols",
 	"Illegal use of local symbol",
 	"Illegal segment name: `%s'",
-     	"Illegal segment attribute",
      	"Illegal macro package name",
      	"Illegal emulation feature",
         "Illegal scope specifier",
@@ -180,6 +182,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
 	"Macro parameter expected",
 	"Circular reference in symbol definition",
        	"Symbol `%s' redeclaration mismatch",
+        "Address size mismatch for symbol `%s'",
         "Alignment value must be a power of 2",
      	"Duplicate `.ELSE'",
        	"Conditional assembly branch was never closed",

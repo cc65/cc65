@@ -42,6 +42,7 @@
 #include <sys/stat.h>
 
 /* common */
+#include "addrsize.h"
 #include "chartype.h"
 #include "check.h"
 #include "fname.h"
@@ -1131,6 +1132,41 @@ int GetSubKey (const char** Keys, unsigned Count)
 
     /* Not found */
     return -1;
+}
+
+
+
+unsigned ParseAddrSize (void)
+/* Check if the next token is a keyword that denotes an address size specifier.
+ * If so, return the corresponding address size constant, otherwise output an
+ * error message and return ADDR_SIZE_DEFAULT.
+ */
+{
+    static const char* Keys[] = {
+        "DIRECT", "ZEROPAGE", "ZP",
+        "ABSOLUTE", "ABS", "NEAR",
+        "FAR",
+    };
+
+    /* Check for an identifier */
+    if (Tok != TOK_IDENT) {
+        Error (ERR_ADDR_SIZE_EXPECTED);
+        return ADDR_SIZE_DEFAULT;
+    }
+
+    /* Search for the attribute */
+    switch (GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]))) {
+        case 0:
+        case 1:
+        case 2: return ADDR_SIZE_FAR;
+        case 3:
+        case 4:
+        case 5: return ADDR_SIZE_ABS;
+        case 6: return ADDR_SIZE_FAR;
+        default:
+            Error (ERR_ADDR_SIZE_EXPECTED);
+            return ADDR_SIZE_DEFAULT;
+    }
 }
 
 

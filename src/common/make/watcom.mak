@@ -10,7 +10,7 @@ export WATCOM  = c:\\watcom
 export INCLUDE = $(WATCOM)\\h
 
 # We will use the windows compiler under linux (define as empty for windows)
-WINE = wine -- 
+WINE = wine --
 
 # Programs
 AR     	= $(WINE) WLIB
@@ -55,6 +55,7 @@ endif
 # All library OBJ files
 
 OBJS =	abend.obj	\
+        addrsize.obj    \
 	bitops.obj	\
 	chartype.obj	\
 	check.obj	\

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -70,7 +70,7 @@
 static Segment*        	HashTab [HASHTAB_SIZE];
 
 static unsigned	       	SegCount = 0; 	/* Segment count */
-static Segment*	     	SegRoot = 0;	/* List of all segments */
+static Segment*	     	SegRoot = 0;  	/* List of all segments */
 
 
 
@@ -80,7 +80,7 @@ static Segment*	     	SegRoot = 0;	/* List of all segments */
 
 
 
-static Segment* NewSegment (unsigned Name, unsigned char Type)
+static Segment* NewSegment (unsigned Name, unsigned char AddrSize)
 /* Create a new segment and initialize it */
 {
     unsigned Hash;
@@ -98,7 +98,7 @@ static Segment* NewSegment (unsigned Name, unsigned char Type)
     S->AlignObj	   = 0;
     S->Align       = 0;
     S->FillVal	   = 0;
-    S->Type        = Type;
+    S->AddrSize    = AddrSize;
     S->ReadOnly    = 0;
     S->Relocatable = 0;
     S->Dumped      = 0;
@@ -119,7 +119,7 @@ static Segment* NewSegment (unsigned Name, unsigned char Type)
 
 
 
-Segment* GetSegment (unsigned Name, unsigned char Type, const char* ObjName)
+Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName)
 /* Search for a segment and return an existing one. If the segment does not
  * exist, create a new one and return that. ObjName is only used for the error
  * message and may be NULL if the segment is linker generated.
@@ -133,10 +133,10 @@ Segment* GetSegment (unsigned Name, unsigned char Type, const char* ObjName)
      */
     if (S == 0) {
       	/* Create a new segment */
-      	S = NewSegment (Name, Type);
+      	S = NewSegment (Name, AddrSize);
     } else {
-       	/* Check if the existing segment has the requested type */
-       	if (S->Type != Type) {
+       	/* Check if the existing segment has the requested address size */
+       	if (S->AddrSize != AddrSize) {
      	    /* Allow an empty object name */
 	    if (ObjName == 0) {
 		ObjName = "[linker generated]";
@@ -152,7 +152,7 @@ Segment* GetSegment (unsigned Name, unsigned char Type, const char* ObjName)
 
 
 
-Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Type)
+Section* NewSection (Segment* Seg, unsigned char Align, unsigned char AddrSize)
 /* Create a new section for the given segment */
 {
     unsigned long V;
@@ -168,7 +168,7 @@ Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Type)
     S->FragLast = 0;
     S->Size  	= 0;
     S->Align    = Align;
-    S->Type     = Type;
+    S->AddrSize = AddrSize;
 
     /* Calculate the alignment bytes needed for the section */
     V = (0x01UL << S->Align) - 1;
@@ -637,7 +637,7 @@ void PrintDbgSegments (FILE* F)
      	    /* Print the segment data */
        	    fprintf (F, "segment\t\"%s\", 0x%06lX, 0x%04lX, %s, %s\n",
        	       	     GetString (S->Name), S->PC, S->Size,
-                     SegTypeToStr (S->Type),
+                     AddrSizeToStr (S->AddrSize),
                      S->ReadOnly? "ro" : "rw");
      	}
 

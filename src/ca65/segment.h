@@ -40,6 +40,7 @@
 
 /* common */
 #include "fragdefs.h"
+#include "inline.h"
 #include "segdefs.h"
 
 /* ca65 */
@@ -48,13 +49,26 @@
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*	   			     Data				     */
 /*****************************************************************************/
 
 
 
+/* Segment definition */
+typedef struct Segment Segment;
+struct Segment {
+    Segment*   	    List;      	       	/* List of all segments */
+    Fragment*  	    Root;      	  	/* Root of fragment list */
+    Fragment*  	    Last;      	  	/* Pointer to last fragment */
+    unsigned long   FragCount;          /* Number of fragments */
+    unsigned        Num;       		/* Segment number */
+    unsigned        Align;     		/* Segment alignment */
+    unsigned long   PC;
+    SegDef*         Def;                /* Segment definition (name and type) */
+};
+
 /* Are we in absolute mode or in relocatable mode? */
-extern int 	RelocMode;
+extern int RelocMode;
 
 /* Definitions for predefined segments */
 extern SegDef NullSegDef;
@@ -63,6 +77,9 @@ extern SegDef DataSegDef;
 extern SegDef BssSegDef;
 extern SegDef RODataSegDef;
 extern SegDef CodeSegDef;
+
+/* Currently active segment */
+extern Segment* ActiveSeg;
 
 
 
@@ -78,11 +95,35 @@ Fragment* GenFragment (unsigned char Type, unsigned short Len);
 void UseSeg (const SegDef* D);
 /* Use the given segment */
 
-const SegDef* GetCurrentSeg (void);
+#if defined(HAVE_INLINE)
+INLINE const SegDef* GetCurrentSegDef (void)
 /* Get a pointer to the segment defininition of the current segment */
+{
+    return ActiveSeg->Def;
+}
+#else
+#  define GetCurrentSegDef()    (ActiveSeg->Def)
+#endif
 
-unsigned GetSegNum (void);
+#if defined(HAVE_INLINE)
+INLINE unsigned GetCurrentSegNum (void)
 /* Get the number of the current segment */
+{
+    return ActiveSeg->Num;
+}
+#else
+#  define GetCurrentSegNum()    (ActiveSeg->Num)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE unsigned GetCurrentSegAddrSize (void)
+/* Get the address size of the current segment */
+{
+    return ActiveSeg->Def->AddrSize;
+}
+#else
+#  define GetCurrentSegAddrSize()    (ActiveSeg->Def->AddrSize)
+#endif
 
 void SegAlign (unsigned Power, int Val);
 /* Align the PC segment to 2^Power. If Val is -1, emit fill fragments (the
@@ -90,14 +131,8 @@ void SegAlign (unsigned Power, int Val);
  * given value.
  */
 
-int IsZPSeg (void);
-/* Return true if the current segment is a zeropage segment */
-
-int IsFarSeg (void);
-/* Return true if the current segment is a far segment */
-
-unsigned GetSegType (unsigned SegNum);
-/* Return the type of the segment with the given number */
+unsigned GetSegAddrSize (unsigned SegNum);
+/* Return the address size of the segment with the given number */
 
 unsigned long GetPC (void);
 /* Get the program counter of the current segment */

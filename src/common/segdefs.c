@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -45,17 +45,15 @@
 
 
 
-SegDef* NewSegDef (const char* Name, unsigned Type)
+SegDef* NewSegDef (const char* Name, unsigned AddrSize)
 /* Create a new segment definition and return it */
 {
     /* Allocate memory */
     SegDef* D = xmalloc (sizeof (SegDef));
 
     /* Initialize it */
-    if (D) {
-        D->Name = xstrdup (Name);
-        D->Type = Type;
-    }
+    D->Name     = xstrdup (Name);
+    D->AddrSize = AddrSize;
 
     /* Return the result */
     return D;
@@ -75,20 +73,7 @@ void FreeSegDef (SegDef* D)
 SegDef* DupSegDef (const SegDef* Def)
 /* Duplicate a segment definition and return it */
 {
-    return NewSegDef (Def->Name, Def->Type);
-}
-
-
-
-const char* SegTypeToStr (unsigned char Type)
-/* Map a segment type into a string */
-{
-    switch (Type) {
-        case SEGTYPE_ABS:       return "abs";
-        case SEGTYPE_ZP:        return "zp";
-        case SEGTYPE_FAR:       return "far";
-        default:                return "unknown";
-    }
+    return NewSegDef (Def->Name, Def->AddrSize);
 }
 
 

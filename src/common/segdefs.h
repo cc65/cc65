@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -37,6 +37,11 @@
 #define SEGDEFS_H
 
 
+                     
+/* common */
+#include "addrsize.h"
+
+
 
 /*****************************************************************************/
 /*     	       	    	    	     Data				     */
@@ -44,21 +49,15 @@
 
 
 
-/* Available segment types */
-#define SEGTYPE_DEFAULT	        0
-#define SEGTYPE_ABS    	        1
-#define SEGTYPE_ZP     	        2
-#define SEGTYPE_FAR    	        3
-
 /* Segment definition */
 typedef struct SegDef SegDef;
 struct SegDef {
     char*       Name;           /* Segment name */
-    unsigned    Type;           /* Segment type, see above */
+    unsigned    AddrSize;       /* Default address size */
 };
 
 /* Initializer for static SegDefs */
-#define STATIC_SEGDEF_INITIALIZER(name, type) { (name), (type) }
+#define STATIC_SEGDEF_INITIALIZER(name, addrsize) { name, addrsize }
 
 
 
@@ -68,7 +67,7 @@ struct SegDef {
 
 
 
-SegDef* NewSegDef (const char* Name, unsigned Type);
+SegDef* NewSegDef (const char* Name, unsigned AddrSize);
 /* Create a new segment definition and return it */
 
 void FreeSegDef (SegDef* D);
@@ -76,9 +75,6 @@ void FreeSegDef (SegDef* D);
 
 SegDef* DupSegDef (const SegDef* D);
 /* Duplicate a segment definition and return it */
-
-const char* SegTypeToStr (unsigned char Type);
-/* Map a segment type into a string */
 
 
 

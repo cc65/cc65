@@ -36,6 +36,7 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "check.h"
 #include "hashstr.h"
 #include "symdefs.h"
@@ -82,7 +83,7 @@ static unsigned     	ExportCount = 0;/* Counter for export symbols */
 
 
 
-static unsigned SymTableSize (unsigned Level)
+static unsigned ScopeTableSize (unsigned Level)
 /* Get the size of a table for the given lexical level */
 {
     switch (Level) {
@@ -94,12 +95,12 @@ static unsigned SymTableSize (unsigned Level)
 
 
 
-static SymTable* NewSymTable (SymTable* Parent, const char* Name)
+static SymTable* NewSymTable (SymTable* Parent, unsigned AddrSize, const char* Name)
 /* Allocate a symbol table on the heap and return it */
 {
     /* Determine the lexical level and the number of table slots */
     unsigned Level = Parent? Parent->Level + 1 : 0;
-    unsigned Slots = SymTableSize (Level);
+    unsigned Slots = ScopeTableSize (Level);
 
     /* Allocate memory */
     SymTable* S = xmalloc (sizeof (SymTable) + (Slots-1) * sizeof (SymEntry*));
@@ -108,6 +109,8 @@ static SymTable* NewSymTable (SymTable* Parent, const char* Name)
     S->Left         = 0;
     S->Right        = 0;
     S->Childs       = 0;
+    S->AddrSize     = AddrSize;
+    S->Type         = 0;
     S->Level        = Level;
     S->TableSlots   = Slots;
     S->TableEntries = 0;
@@ -201,10 +204,16 @@ static int SearchSymTree (SymEntry* T, const char* Name, SymEntry** E)
 
 
 
-void SymEnterLevel (const char* ScopeName)
+void SymEnterLevel (const char* ScopeName, unsigned AddrSize)
 /* Enter a new lexical level */
 {
     /* ### Check existing scope */
+
+    /* Map a default address size to something real */
+    if (AddrSize == ADDR_SIZE_DEFAULT) {                            
+        /* Use the segment address size */
+        AddrSize = GetCurrentSegAddrSize ();
+    }
 
     /* Create the new table */
     CurrentScope = NewSymTable (CurrentScope, ScopeName);
@@ -220,7 +229,7 @@ void SymLeaveLevel (void)
 
 
 
-SymTable* SymFindScope (SymTable* Parent, const char* Name, unsigned Flags)
+SymTable* SymFindScope (SymTable* Parent, const char* Name, int AllocNew)
 /* Find a scope in the given enclosing scope */
 {
     SymTable** T = &Parent->Childs;
@@ -237,7 +246,7 @@ SymTable* SymFindScope (SymTable* Parent, const char* Name, unsigned Flags)
     }
 
     /* Create a new scope if requested and we didn't find one */
-    if (*T == 0 && Flags == SYM_ALLOC_NEW) {
+    if (*T == 0 && AllocNew) {
         *T = NewSymTable (Parent, Name);
     }
 
@@ -359,172 +368,6 @@ static SymEntry* SymFindAny (SymTable* Scope, const char* Name)
 
 
 
-static void SymImportInternal (const char* Name, unsigned Flags)
-/* Mark the given symbol as an imported symbol */
-{
-    SymEntry* S;
-
-    /* Don't accept local symbols */
-    if (IsLocalName (Name)) {
-     	Error (ERR_ILLEGAL_LOCAL_USE);
-     	return;
-    }
-
-    /* Do we have such a symbol? */
-    S = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
-    if (S->Flags & SF_DEFINED) {
-     	Error (ERR_SYM_ALREADY_DEFINED, Name);
-     	S->Flags |= SF_MULTDEF;
-     	return;
-    }
-    if (S->Flags & SF_EXPORT) {
-     	/* The symbol is already marked as exported symbol */
-     	Error (ERR_SYM_ALREADY_EXPORT, Name);
-     	return;
-    }
-
-    /* If the symbol is marked as global, check the symbol flags, then do
-     * silently remove the global flag
-     */
-    if (S->Flags & SF_GLOBAL) {
-     	if ((Flags & (SF_ZP | SF_FORCED)) != (S->Flags & (SF_ZP | SF_FORCED))) {
-     	    Error (ERR_SYM_REDECL_MISMATCH, Name);
-     	}
-        S->Flags &= ~SF_GLOBAL;
-    }
-
-    /* Set the symbol data */
-    S->Flags |= (SF_IMPORT | Flags);
-}
-
-
-
-void SymImport (const char* Name)
-/* Mark the given symbol as an imported symbol */
-{
-    SymImportInternal (Name, SF_NONE);
-}
-
-
-
-void SymImportZP (const char* Name)
-/* Mark the given symbol as a forced imported symbol */
-{
-    SymImportInternal (Name, SF_ZP);
-}
-
-
-
-void SymImportForced (const char* Name)
-/* Mark the given symbol as a forced imported symbol */
-{
-    SymImportInternal (Name, SF_FORCED);
-}
-
-
-
-static void SymExportInternal (const char* Name, unsigned Flags)
-/* Mark the given symbol as an exported symbol */
-{
-    SymEntry* S;
-
-    /* Don't accept local symbols */
-    if (IsLocalName (Name)) {
-     	Error (ERR_ILLEGAL_LOCAL_USE);
-     	return;
-    }
-
-    /* Do we have such a symbol? */
-    S = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
-    if (S->Flags & SF_IMPORT) {
-     	/* The symbol is already marked as imported external symbol */
-     	Error (ERR_SYM_ALREADY_IMPORT, Name);
-     	return;
-    }
-
-    /* If the symbol is marked as global, check the symbol size, then do
-     * silently remove the global flag
-     */
-    if (S->Flags & SF_GLOBAL) {
-       	if ((Flags & SF_ZP) != (S->Flags & SF_ZP)) {
-     	    Error (ERR_SYM_REDECL_MISMATCH, Name);
-     	}
-        S->Flags &= ~SF_GLOBAL;
-    }
-
-    /* Set the symbol data */
-    S->Flags |= (SF_EXPORT | SF_REFERENCED | Flags);
-}
-
-
-
-void SymExport (const char* Name)
-/* Mark the given symbol as an exported symbol */
-{
-    SymExportInternal (Name, SF_NONE);
-}
-
-
-
-void SymExportZP (const char* Name)
-/* Mark the given symbol as an exported zeropage symbol */
-{
-    SymExportInternal (Name, SF_ZP);
-}
-
-
-
-static void SymGlobalInternal (const char* Name, unsigned Flags)
-/* Mark the given symbol as a global symbol, that is, as a symbol that is
- * either imported or exported.
- */
-{
-    SymEntry* S;
-
-    /* Don't accept local symbols */
-    if (IsLocalName (Name)) {
-     	Error (ERR_ILLEGAL_LOCAL_USE);
-     	return;
-    }
-
-    /* Search for this symbol, create a new entry if needed */
-    S = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
-
-    /* If the symbol is already marked as import or export, check the
-     * size of the definition, then bail out. */
-    if (S->Flags & SF_IMPORT || S->Flags & SF_EXPORT) {
-       	if ((Flags & SF_ZP) != (S->Flags & SF_ZP)) {
-     	    Error (ERR_SYM_REDECL_MISMATCH, Name);
-     	}
-     	return;
-    }
-
-    /* Mark the symbol */
-    S->Flags |= (SF_GLOBAL | Flags);
-}
-
-
-
-void SymGlobal (const char* Name)
-/* Mark the given symbol as a global symbol, that is, as a symbol that is
- * either imported or exported.
- */
-{
-    SymGlobalInternal (Name, SF_NONE);
-}
-
-
-
-void SymGlobalZP (const char* Name)
-/* Mark the given symbol as a global zeropage symbol, that is, as a symbol
- * that is either imported or exported.
- */
-{
-    SymGlobalInternal (Name, SF_ZP);
-}
-
-
-
 void SymConDes (const char* Name, unsigned Type, unsigned Prio)
 /* Mark the given symbol as a module constructor/destructor. This will also
  * mark the symbol as an export. Initializers may never be zero page symbols.
@@ -560,7 +403,7 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
     }
 
     /* Check if the symbol was not already defined as ZP symbol */
-    if ((S->Flags & SF_ZP) != 0) {
+    if (S->AddrSize == ADDR_SIZE_ZP) {
 	Error (ERR_SYM_REDECL_MISMATCH, Name);
     }
 

@@ -64,31 +64,17 @@
 int 		RelocMode = 1;
 unsigned long	AbsPC	  = 0;		/* PC if in absolute mode */
 
-
-
-typedef struct Segment Segment;
-struct Segment {
-    Segment*   	    List;      	       	/* List of all segments */
-    Fragment*  	    Root;  	  	/* Root of fragment list */
-    Fragment*  	    Last;  	  	/* Pointer to last fragment */
-    unsigned long   FragCount;          /* Number of fragments */
-    unsigned        Num;   		/* Segment number */
-    unsigned        Align; 		/* Segment alignment */
-    unsigned long   PC;
-    SegDef*         Def;                /* Segment definition (name and type) */
-};
-
-
+/* Segment initializer macro */
 #define SEG(segdef, num, prev)      \
     { prev, 0, 0, 0, num, 0, 0, segdef }
 
 /* Definitions for predefined segments */
-SegDef NullSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_NULL,     SEGTYPE_ABS);
-SegDef ZeropageSegDef = STATIC_SEGDEF_INITIALIZER (SEGNAME_ZEROPAGE, SEGTYPE_ZP);
-SegDef DataSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_DATA,     SEGTYPE_ABS);
-SegDef BssSegDef      = STATIC_SEGDEF_INITIALIZER (SEGNAME_BSS,      SEGTYPE_ABS);
-SegDef RODataSegDef   = STATIC_SEGDEF_INITIALIZER (SEGNAME_RODATA,   SEGTYPE_ABS);
-SegDef CodeSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_CODE,     SEGTYPE_ABS);
+SegDef NullSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_NULL,     ADDR_SIZE_ABS);
+SegDef ZeropageSegDef = STATIC_SEGDEF_INITIALIZER (SEGNAME_ZEROPAGE, ADDR_SIZE_ZP);
+SegDef DataSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_DATA,     ADDR_SIZE_ABS);
+SegDef BssSegDef      = STATIC_SEGDEF_INITIALIZER (SEGNAME_BSS,      ADDR_SIZE_ABS);
+SegDef RODataSegDef   = STATIC_SEGDEF_INITIALIZER (SEGNAME_RODATA,   ADDR_SIZE_ABS);
+SegDef CodeSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_CODE,     ADDR_SIZE_ABS);
 
 /* Predefined segments */
 static Segment NullSeg     = SEG (&NullSegDef,     5, NULL);
@@ -106,7 +92,7 @@ static Segment* SegmentList = &CodeSeg;
 static Segment* SegmentLast = &NullSeg;
 
 /* Currently active segment */
-static Segment*	ActiveSeg = &CodeSeg;
+Segment* ActiveSeg = &CodeSeg;
 
 
 
@@ -116,7 +102,7 @@ static Segment*	ActiveSeg = &CodeSeg;
 
 
 
-static Segment* NewSegment (const char* Name, unsigned SegType)
+static Segment* NewSegment (const char* Name, unsigned AddrSize)
 /* Create a new segment, insert it into the global list and return it */
 {
     Segment* S;
@@ -142,7 +128,7 @@ static Segment* NewSegment (const char* Name, unsigned SegType)
     S->Num       = SegmentCount++;
     S->Align     = 0;
     S->PC        = 0;
-    S->Def       = NewSegDef (Name, SegType);
+    S->Def       = NewSegDef (Name, AddrSize);
 
     /* Insert it into the segment list */
     SegmentLast->List = S;
@@ -198,10 +184,11 @@ void UseSeg (const SegDef* D)
     while (Seg) {
        	if (strcmp (Seg->Def->Name, D->Name) == 0) {
      	    /* We found this segment. Check if the type is identical */
-	    if (D->Type != SEGTYPE_DEFAULT && Seg->Def->Type != D->Type) {
+	    if (D->AddrSize != ADDR_SIZE_DEFAULT &&
+                Seg->Def->AddrSize != D->AddrSize) {
 		Error (ERR_SEG_ATTR_MISMATCH);
 		/* Use the new attribute to avoid errors */
-	        Seg->Def->Type = D->Type;
+	        Seg->Def->AddrSize = D->AddrSize;
        	    }
        	    ActiveSeg = Seg;
      	    return;
@@ -211,10 +198,10 @@ void UseSeg (const SegDef* D)
     }
 
     /* Segment is not in list, create a new one */
-    if (D->Type == SEGTYPE_DEFAULT) {
-        Seg = NewSegment (D->Name, SEGTYPE_ABS);
+    if (D->AddrSize == ADDR_SIZE_DEFAULT) {
+        Seg = NewSegment (D->Name, ADDR_SIZE_ABS);
     } else {
-        Seg = NewSegment (D->Name, D->Type);
+        Seg = NewSegment (D->Name, D->AddrSize);
     }
     ActiveSeg = Seg;
 }
@@ -234,22 +221,6 @@ void SetAbsPC (unsigned long PC)
 {
     RelocMode = 0;
     AbsPC = PC;
-}
-
-
-
-const SegDef* GetCurrentSeg (void)
-/* Get a pointer to the segment defininition of the current segment */
-{
-    return ActiveSeg->Def;
-}
-
-
-
-unsigned GetSegNum (void)
-/* Get the number of the current segment */
-{
-    return ActiveSeg->Num;
 }
 
 
@@ -290,24 +261,8 @@ void SegAlign (unsigned Power, int Val)
 
 
 
-int IsZPSeg (void)
-/* Return true if the current segment is a zeropage segment */
-{
-    return (ActiveSeg->Def->Type == SEGTYPE_ZP);
-}
-
-
-
-int IsFarSeg (void)
-/* Return true if the current segment is a far segment */
-{
-    return (ActiveSeg->Def->Type == SEGTYPE_FAR);
-}
-
-
-
-unsigned GetSegType (unsigned SegNum)
-/* Return the type of the segment with the given number */
+unsigned GetSegAddrSize (unsigned SegNum)
+/* Return the address size of the segment with the given number */
 {
     /* Search for the segment */
     Segment* S = SegmentList;
@@ -321,8 +276,8 @@ unsigned GetSegType (unsigned SegNum)
     	FAIL ("Invalid segment number");
     }
 
-    /* Return the segment type */
-    return S->Def->Type;
+    /* Return the address size */
+    return S->Def->AddrSize;
 }
 
 
@@ -461,7 +416,7 @@ static void WriteOneSeg (Segment* Seg)
     ObjWriteVar (GetStringId (Seg->Def->Name)); /* Name of the segment */
     ObjWrite32 (Seg->PC);                       /* Size */
     ObjWrite8 (Seg->Align);                     /* Segment alignment */
-    ObjWrite8 (Seg->Def->Type);                 /* Type of the segment */
+    ObjWrite8 (Seg->Def->AddrSize);             /* Address size of the segment */
     ObjWriteVar (Seg->FragCount);               /* Number of fragments */
 
     /* Now walk through the fragment list for this segment and write the

@@ -54,11 +54,6 @@
 
 
 
-/* Scope identifiers */
-#define SCOPE_ANY       0
-#define SCOPE_GLOBAL    1
-#define SCOPE_LOCAL     2
-
 /* A symbol table */
 typedef struct SymTable SymTable;
 struct SymTable {
@@ -66,6 +61,8 @@ struct SymTable {
     SymTable*           Right;          /* Pointer to greater entry */
     SymTable*          	Parent;   	/* Link to enclosing scope if any */
     SymTable*           Childs;         /* Pointer to child scopes */
+    unsigned char	AddrSize;       /* Address size */
+    unsigned char       Type;           /* Type of the scope */
     unsigned            Level;          /* Lexical level */
     unsigned   	     	TableSlots;	/* Number of hash table slots */
     unsigned   	    	TableEntries;	/* Number of entries in the table */
@@ -85,44 +82,19 @@ SymTable*	RootScope;      /* Root symbol table */
 
 
 
-void SymEnterLevel (const char* ScopeName);
+void SymEnterLevel (const char* ScopeName, unsigned AddrSize);
 /* Enter a new lexical level */
 
 void SymLeaveLevel (void);
 /* Leave the current lexical level */
 
-SymTable* SymFindScope (SymTable* Parent, const char* Name, unsigned Flags);
+SymTable* SymFindScope (SymTable* Parent, const char* Name, int AllocNew);
 /* Find a scope in the given enclosing scope */
 
 SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew);
 /* Find a new symbol table entry in the given table. If AllocNew is given and
  * the entry is not found, create a new one. Return the entry found, or the
  * new entry created, or - in case AllocNew is zero - return 0.
- */
-
-void SymImport (const char* Name);
-/* Mark the given symbol as an imported symbol */
-
-void SymImportZP (const char* Name);
-/* Mark the given symbol as a imported zeropage symbol */
-
-void SymImportForced (const char* Name);
-/* Mark the given symbol as a forced imported symbol */
-
-void SymExport (const char* Name);
-/* Mark the given symbol as an exported symbol */
-
-void SymExportZP (const char* Name);
-/* Mark the given symbol as an exported zeropage symbol */
-
-void SymGlobal (const char* Name);
-/* Mark the given symbol as a global symbol, that is, as a symbol that is
- * either imported or exported.
- */
-
-void SymGlobalZP (const char* Name);
-/* Mark the given symbol as a global zeropage symbol, that is, as a symbol
- * that is either imported or exported.
  */
 
 void SymConDes (const char* Name, unsigned Type, unsigned Prio);

@@ -57,6 +57,8 @@ enum Warnings {
     WARN_IMPORT_NOT_REFERENCED,
     WARN_CANNOT_TRACK_STATUS,
     WARN_SUSPICIOUS_ADDREXPR,
+    WARN_UNNAMED_PROC,
+    WARN_ADDR_SIZE_MISMATCH,
     WARN_USER,
     WARN_COUNT	     	    	      	/* Warning count */
 };
@@ -64,7 +66,7 @@ enum Warnings {
 /* Error numbers */
 enum Errors {
     ERR_NONE,  	       	       	      	/* No error */
-    ERR_NOT_IMPLEMENTED,		/* Command/operation not implemented */
+    ERR_NOT_IMPLEMENTED,   		/* Command/operation not implemented */
     ERR_CANNOT_OPEN_INCLUDE,
     ERR_CANNOT_READ_INCLUDE,
     ERR_INCLUDE_NESTING,
@@ -91,6 +93,7 @@ enum Errors {
     ERR_ENDMACRO_EXPECTED,
     ERR_OPTION_KEY_EXPECTED,
     ERR_EQ_EXPECTED,
+    ERR_ADDR_SIZE_EXPECTED,
     ERR_816_MODE_ONLY,
     ERR_USER,
     ERR_STRING_TOO_LONG,
@@ -99,8 +102,7 @@ enum Errors {
     ERR_ILLEGAL_ADDR_MODE,
     ERR_ILLEGAL_LOCALSTART,
     ERR_ILLEGAL_LOCAL_USE,
-    ERR_ILLEGAL_SEGMENT,
-    ERR_ILLEGAL_SEG_ATTR,
+    ERR_ILLEGAL_SEGMENT,    
     ERR_ILLEGAL_MACPACK,
     ERR_ILLEGAL_FEATURE,
     ERR_ILLEGAL_SCOPE,
@@ -122,6 +124,7 @@ enum Errors {
     ERR_MACRO_PARAM_EXPECTED,
     ERR_CIRCULAR_REFERENCE,
     ERR_SYM_REDECL_MISMATCH,
+    ERR_ADDR_SIZE_MISMATCH,
     ERR_ALIGN,
     ERR_DUPLICATE_ELSE,
     ERR_OPEN_IF,
@@ -156,7 +159,7 @@ enum Fatals {
     FAT_NESTING,
     FAT_IF_NESTING,
     FAT_TOO_MANY_SYMBOLS,
-    FAT_COUNT	    	  	      	/* Fatal error count */
+    FAT_COUNT	    	   	      	/* Fatal error count */
 };
 
 

@@ -114,6 +114,22 @@ static void DoInvalid (void);
 
 
 
+static unsigned OptionalAddrSize (void)
+/* If a colon follows, parse an optional address size spec and return it.
+ * Otherwise return ADDR_SIZE_DEFAULT.
+ */
+{
+    unsigned AddrSize = ADDR_SIZE_DEFAULT;
+    if (Tok == TOK_COLON) {
+        NextTok ();
+        AddrSize = ParseAddrSize ();
+        NextTok ();
+    }
+    return AddrSize;
+}
+
+
+
 static void SetBoolOption (unsigned char* Flag)
 /* Read a on/off/+/- option and set flag accordingly */
 {
@@ -145,16 +161,37 @@ static void SetBoolOption (unsigned char* Flag)
 
 
 
-static void ExportImport (void (*SymFunc) (const char*))
+static void ExportImport (void (*Func) (SymEntry*, unsigned, unsigned),
+                          unsigned DefAddrSize, unsigned Flags)
 /* Export or import symbols */
 {
+    SymEntry* Sym;
+    unsigned  AddrSize;
+
     while (1) {
+
+        /* We need an identifier here */
      	if (Tok != TOK_IDENT) {
        	    ErrorSkip (ERR_IDENT_EXPECTED);
-     	    break;
+     	    return;
      	}
-     	SymFunc (SVal);
-     	NextTok ();
+
+        /* Find the symbol table entry, allocate a new one if necessary */
+        Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
+
+        /* Skip the name */
+        NextTok ();
+
+        /* Get an optional address size */
+        AddrSize = OptionalAddrSize ();
+        if (AddrSize == ADDR_SIZE_DEFAULT) {
+            AddrSize = DefAddrSize;
+        }
+
+        /* Call the actual import/export function */
+        Func (Sym, AddrSize, Flags);
+
+        /* More symbols? */
      	if (Tok == TOK_COMMA) {
      	    NextTok ();
      	} else {
@@ -366,7 +403,7 @@ static void DoAssert (void)
             break;
 
         default:
-            Error (ERR_ILLEGAL_SEG_ATTR);
+            Error (ERR_ILLEGAL_ASSERT_ACTION);
     }
     NextTok ();
     ConsumeComma ();
@@ -702,7 +739,7 @@ static void DoExitMacro (void)
 static void DoExport (void)
 /* Export a symbol */
 {
-    ExportImport (SymExport);
+    ExportImport (SymExport, ADDR_SIZE_DEFAULT, SF_NONE);
 }
 
 
@@ -710,7 +747,7 @@ static void DoExport (void)
 static void DoExportZP (void)
 /* Export a zeropage symbol */
 {
-    ExportImport (SymExportZP);
+    ExportImport (SymExport, ADDR_SIZE_ZP, SF_NONE);
 }
 
 
@@ -856,7 +893,7 @@ static void DoFileOpt (void)
 static void DoForceImport (void)
 /* Do a forced import on a symbol */
 {
-    ExportImport (SymImportForced);
+    ExportImport (SymImport, ADDR_SIZE_DEFAULT, SF_FORCED);
 }
 
 
@@ -864,7 +901,7 @@ static void DoForceImport (void)
 static void DoGlobal (void)
 /* Declare a global symbol */
 {
-    ExportImport (SymGlobal);
+    ExportImport (SymGlobal, ADDR_SIZE_DEFAULT, SF_NONE);
 }
 
 
@@ -872,7 +909,7 @@ static void DoGlobal (void)
 static void DoGlobalZP (void)
 /* Declare a global zeropage symbol */
 {
-    ExportImport (SymGlobalZP);
+    ExportImport (SymGlobal, ADDR_SIZE_ZP, SF_NONE);
 }
 
 
@@ -906,7 +943,7 @@ static void DoI8 (void)
 static void DoImport (void)
 /* Import a symbol */
 {
-    ExportImport (SymImport);
+    ExportImport (SymImport, ADDR_SIZE_DEFAULT, SF_NONE);
 }
 
 
@@ -914,7 +951,7 @@ static void DoImport (void)
 static void DoImportZP (void)
 /* Import a zero page symbol */
 {
-    ExportImport (SymImportZP);
+    ExportImport (SymImport, ADDR_SIZE_ZP, SF_NONE);
 }
 
 
@@ -1244,18 +1281,35 @@ static void DoProc (void)
 /* Start a new lexical scope */
 {
     if (Tok == TOK_IDENT) {
-	/* The new scope has a name */
-	SymEntry* Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
-        unsigned Flags = SYM_LABEL;
-        if (IsZPSeg ()) {
-            Flags |= SYM_ZP;
-        }
-    	SymDef (Sym, GenCurrentPC (), Flags);
-        SymEnterLevel (SVal);
-    	NextTok ();
+
+        unsigned AddrSize;
+
+	/* The new scope has a name. Remember it. */
+        char Name[sizeof(SVal)];
+        strcpy (Name, SVal);
+
+        /* Search for the symbol, generate a new one if needed */
+	SymEntry* Sym = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
+
+        /* Skip the scope name */
+        NextTok ();
+
+        /* Read an optional address size specifier */
+        AddrSize = OptionalAddrSize ();
+
+        /* Mark the symbol as defined */
+    	SymDef (Sym, GenCurrentPC (), AddrSize, SF_LABEL);
+
+        /* Enter a new scope with the given name */
+        SymEnterLevel (Name, AddrSize);
+
     } else {
+
+        /* A .PROC statement without a name */
         char Buf[sizeof (SVal)];
-        SymEnterLevel (AnonName (Buf, sizeof (Buf), "Scope"));
+        SymEnterLevel (AnonName (Buf, sizeof (Buf), "Scope"), ADDR_SIZE_DEFAULT);
+        Warning (WARN_UNNAMED_PROC);
+
     }
 }
 
@@ -1279,7 +1333,7 @@ static void DoPushSeg (void)
     }
 
     /* Get the current segment and push it */
-    CollAppend (&SegStack, DupSegDef (GetCurrentSeg ()));
+    CollAppend (&SegStack, DupSegDef (GetCurrentSegDef ()));
 }
 
 
@@ -1344,15 +1398,9 @@ static void DoROData (void)
 static void DoSegment (void)
 /* Switch to another segment */
 {
-    static const char* AttrTab [] = {
-	"ZEROPAGE", "DIRECT",
-	"ABSOLUTE",
-	"FAR", "LONG"
-    };
     char Name [sizeof (SVal)];
     SegDef Def;
     Def.Name = Name;
-    Def.Type = SEGTYPE_DEFAULT;
 
     if (Tok != TOK_STRCON) {
 	ErrorSkip (ERR_STRCON_EXPECTED);
@@ -1362,38 +1410,8 @@ static void DoSegment (void)
 	strcpy (Name, SVal);
 	NextTok ();
 
-    	/* Check for an optional segment attribute */
-    	if (Tok == TOK_COMMA) {
-    	    NextTok ();
-    	    if (Tok != TOK_IDENT) {
-	     	ErrorSkip (ERR_IDENT_EXPECTED);
-    	    } else {
-		int Attr = GetSubKey (AttrTab, sizeof (AttrTab) / sizeof (AttrTab [0]));
-		switch (Attr) {
-
-		    case 0:
-		    case 1:
-			/* Zeropage */
-		    	Def.Type = SEGTYPE_ZP;
-			break;
-
-		    case 2:
-			/* Absolute */
-		    	Def.Type = SEGTYPE_ABS;
-			break;
-
-    		    case 3:
-		    case 4:
-			/* Far */
-    		    	Def.Type = SEGTYPE_FAR;
-			break;
-
-		    default:
-	     	        Error (ERR_ILLEGAL_SEG_ATTR);
-	     	}
-		NextTok ();
-	    }
-	}
+    	/* Check for an optional address size modifier */
+        Def.AddrSize = OptionalAddrSize ();
 
 	/* Set the segment */
      	UseSeg (&Def);

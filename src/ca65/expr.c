@@ -917,7 +917,7 @@ ExprNode* GenCurrentPC (void)
     if (RelocMode) {
 	/* Create SegmentBase + Offset */
 	Root = NewExprNode (EXPR_PLUS);
-	Root->Left  = GenSectionExpr (GetSegNum ());
+	Root->Left  = GenSectionExpr (GetCurrentSegNum ());
 	Root->Right = GenLiteralExpr (GetPC ());
     } else {
      	/* Absolute mode, just return PC value */
@@ -950,7 +950,7 @@ ExprNode* GenBranchExpr (unsigned Offs)
     /* Create *+Offs */
     if (RelocMode) {
 	N = NewExprNode (EXPR_PLUS);
-	N->Left  = GenSectionExpr (GetSegNum ());
+	N->Left  = GenSectionExpr (GetCurrentSegNum ());
 	N->Right = GenLiteralExpr (GetPC () + Offs);
     } else {
 	N = GenLiteralExpr (GetPC () + Offs);
@@ -1120,7 +1120,7 @@ static void CheckByteExpr (const ExprNode* N, int* IsByte)
 			break;
 
 		    case EXPR_SECTION:
-			if (GetSegType (N->V.SegNum) == SEGTYPE_ZP) {
+			if (GetSegAddrSize (N->V.SegNum) == ADDR_SIZE_ZP) {
 			    *IsByte = 1;
 			}
 			break;

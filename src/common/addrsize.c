@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                addrsize.h                                 */
+/*                                addrsize.c                                 */
 /*                                                                           */
 /*                         Address size definitions                          */
 /*                                                                           */
@@ -33,21 +33,8 @@
 
 
 
-#ifndef ADDRSIZE_H
-#define ADDRSIZE_H
-
-
-
-/*****************************************************************************/
-/*     	       	    		     Data				     */
-/*****************************************************************************/
-
-
-
-#define ADDR_SIZE_DEFAULT       0x00
-#define ADDR_SIZE_ZP            0x01
-#define ADDR_SIZE_ABS           0x02
-#define ADDR_SIZE_FAR           0x03
+/* common */
+#include "addrsize.h"
 
 
 
@@ -57,14 +44,17 @@
 
 
 
-const char* AddrSizeToStr (unsigned char AddrSize);
+const char* AddrSizeToStr (unsigned char AddrSize)
 /* Return the name for an address size specifier */
-
-
-
-/* End of addrsize.h */
-
-#endif
+{
+    switch (AddrSize) {
+        case ADDR_SIZE_DEFAULT:         return "default";
+        case ADDR_SIZE_ZP:              return "zeropage";
+        case ADDR_SIZE_ABS:             return "absolute";
+        case ADDR_SIZE_FAR:             return "far";
+        default:                        return "unknown";
+    }
+}
 
 
 

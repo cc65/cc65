@@ -69,11 +69,6 @@
 #define	SF_DEFINED  	0x4000 	       	/* Defined */
 #define SF_REFERENCED	0x8000 	       	/* Referenced */
 
-/* Flags used in SymDef */
-#define SYM_DEFAULT     0x00
-#define SYM_ZP          0x01
-#define SYM_LABEL       0x02
-
 /* Arguments for SymFind... */
 #define SYM_FIND_EXISTING 	0
 #define SYM_ALLOC_NEW		1
@@ -95,6 +90,8 @@ struct SymEntry {
 	SymEntry*  	    Sym;	/* Symbol (if trampoline entry) */
     } V;
     Collection              ExprRefs;   /* Expressions using this symbol */
+    unsigned char           ExportSize; /* Export address size */
+    unsigned char           AddrSize;   /* Address size of label */
     unsigned char      	    ConDesPrio[CD_TYPE_COUNT];	/* ConDes priorities... */
 					/* ...actually value+1 (used as flag) */
     unsigned                Name;      	/* Name index in global string pool */
@@ -143,11 +140,22 @@ INLINE void SymDelExprRef (SymEntry* Sym, struct ExprNode* Expr)
 #define SymDelExprRef(Sym,Expr)     CollDeleteItem (&(Sym)->ExprRefs, Expr)
 #endif
 
-void SymDef (SymEntry* Sym, ExprNode* Expr, unsigned Flags);
+void SymDef (SymEntry* Sym, ExprNode* Expr, unsigned AddrSize, unsigned Flags);
 /* Mark a symbol as defined */
 
 void SymRef (SymEntry* Sym);
 /* Mark the given symbol as referenced */
+
+void SymImport (SymEntry* Sym, unsigned AddrSize, unsigned Flags);
+/* Mark the given symbol as an imported symbol */
+
+void SymExport (SymEntry* Sym, unsigned AddrSize, unsigned Flags);
+/* Mark the given symbol as an exported symbol */
+
+void SymGlobal (SymEntry* S, unsigned AddrSize, unsigned Flags);
+/* Mark the given symbol as a global symbol, that is, as a symbol that is
+ * either imported or exported.
+ */
 
 int SymIsDef (const SymEntry* Sym);
 /* Return true if the given symbol is already defined */

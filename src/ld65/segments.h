@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -64,7 +64,7 @@ struct Segment {
     struct ObjData*	AlignObj;	/* Module that requested the alignment */
     unsigned char     	Align;		/* Alignment needed */
     unsigned char     	FillVal;	/* Value to use for fill bytes */
-    unsigned char     	Type;		/* Type of segment */
+    unsigned char     	AddrSize;      	/* Address size of segment */
     unsigned char       ReadOnly;       /* True for readonly segments (config) */
     unsigned char       Relocatable;    /* True if the segment is relocatable */
     unsigned char      	Dumped;		/* Did we dump this segment? */
@@ -83,7 +83,7 @@ struct Section {
     unsigned long   	Size;		/* Size of the section */
     unsigned char   	Align;		/* Alignment */
     unsigned char	Fill;		/* Fill bytes for alignment */
-    unsigned char	Type;		/* Type of segment */
+    unsigned char	AddrSize;       /* Address size of segment */
 };
 
 
@@ -110,13 +110,13 @@ typedef unsigned (*SegWriteFunc) (ExprNode* E, 	      /* The expression to write
 
 
 
-Segment* GetSegment (unsigned Name, unsigned char Type, const char* ObjName);
+Segment* GetSegment (unsigned Name, unsigned char AddrSize, const char* ObjName);
 /* Search for a segment and return an existing one. If the segment does not
  * exist, create a new one and return that. ObjName is only used for the error
  * message and may be NULL if the segment is linker generated.
  */
 
-Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Type);
+Section* NewSection (Segment* Seg, unsigned char Align, unsigned char AddrSize);
 /* Create a new section for the given segment */
 
 Section* ReadSection (FILE* F, struct ObjData* O);

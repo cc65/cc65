@@ -1,5 +1,5 @@
 ;
-; Ullrich von Bassewitz, 17.09.1998
+; Ullrich von Bassewitz, 1998-09-17, 2005-02-26.
 ;
 ; Zero the bss segment.
 ;
@@ -9,7 +9,7 @@
 	.importzp	ptr1
 
 
-.code
+.segment "INIT"
 
 zerobss:
 	lda	#<__BSS_RUN__

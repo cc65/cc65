@@ -20,17 +20,17 @@
 
         .macpack        cpu
 
-.code
-
 ; --------------------------------------------------------------------------
 ; Initialize library modules
 
+.segment        "INIT"
+
 .proc	initlib
 
-	ldy    	#<(__CONSTRUCTOR_COUNT__*2)
+     	ldy    	#<(__CONSTRUCTOR_COUNT__*2)
        	beq    	exit
-	lda    	#<__CONSTRUCTOR_TABLE__
-	ldx    	#>__CONSTRUCTOR_TABLE__
+     	lda    	#<__CONSTRUCTOR_TABLE__
+     	ldx    	#>__CONSTRUCTOR_TABLE__
         jmp     condes
 exit:   rts
 
@@ -40,13 +40,16 @@ exit:   rts
 ; --------------------------------------------------------------------------
 ; Cleanup library modules
 
+.code
+
 .proc	donelib
 
     	ldy 	#<(__DESTRUCTOR_COUNT__*2)
-    	beq     initlib::exit
+    	beq     exit
     	lda 	#<__DESTRUCTOR_TABLE__
     	ldx 	#>__DESTRUCTOR_TABLE__
     	jmp     condes
+exit:   rts
 
 .endproc
 

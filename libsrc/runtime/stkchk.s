@@ -22,24 +22,25 @@
 	; Use macros for better readability
 	.macpack	generic
 
-.code
 
 ; ----------------------------------------------------------------------------
 ; Initialization code. This is a constructor, so it is called on startup if
 ; the linker has detected references to this module.
 
+.segment        "INIT"
+
 .proc	initstkchk
 
-	lda  	sp
-	sta  	initialsp
-	sub  	#<__STACKSIZE__
-	sta  	lowwater
-	lda  	sp+1
-	sta  	initialsp+1
-	sbc  	#>__STACKSIZE__
-	add  	#1	 		; Add 256 bytes safety area
-	sta  	lowwater+1
-	rts
+     	lda  	sp
+     	sta  	initialsp
+     	sub  	#<__STACKSIZE__
+     	sta  	lowwater
+     	lda  	sp+1
+     	sta  	initialsp+1
+     	sbc  	#>__STACKSIZE__
+     	add  	#1	 		; Add 256 bytes safety area
+     	sta  	lowwater+1
+     	rts
 
 .endproc
 
@@ -47,13 +48,17 @@
 ; 6502 stack checking routine. Does not need to save any registers.
 ; Safety zone for the hardware stack is 12 bytes.
 
+.code
+
 stkchk:	tsx
        	cpx  	#12
        	bcc    	Fail	     	; Jump on stack overflow
-	rts	  		; Return if ok
+     	rts	  		; Return if ok
 
 ; ----------------------------------------------------------------------------
 ; C stack checking routine. Does not need to save any registers.
+
+.code
 
 cstkchk:
 
@@ -101,4 +106,4 @@ initialsp: 	.word	0
 lowwater:  	.word	0
 
 
-                  
+

@@ -874,19 +874,23 @@ int main (int argc, char* argv[])
 	if (F == 0) {
 	    Fatal ("Cannot open output file `%s': %s", OutputFile, strerror (errno));
 	}
+	Print (stdout, 1, "Opened output file `%s'\n", OutputFile);
 
 	/* Write the output to the file */
 	WriteOutput (F);
+       	Print (stdout, 1, "Wrote output to `%s'\n", OutputFile);
 
 	/* Close the file, check for errors */
 	if (fclose (F) != 0) {
 	    remove (OutputFile);
 	    Fatal ("Cannot write to output file (disk full?)");
 	}
+       	Print (stdout, 1, "Closed output file `%s'\n", OutputFile);
 
 	/* Create dependencies if requested */
 	if (CreateDep) {
 	    DoCreateDep (OutputFile);
+	    Print (stdout, 1, "Creating dependeny file");
 	}
 
     }

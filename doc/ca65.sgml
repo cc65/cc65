@@ -651,7 +651,7 @@ Here's a list of all control commands and a description, what they do:
 
   See: <tt><ref id=".FARADDR" name=".FARADDR"></tt>, <tt><ref id=".WORD"
        name=".WORD"></tt>
-		   
+
 
 <sect1><tt>.ALIGN</tt><label id=".ALIGN"><p>
 
@@ -826,7 +826,7 @@ Here's a list of all control commands and a description, what they do:
   Example:
 
   <tscreen><verb>
-	.include 	.concat ("myheader", ".", "inc)
+	.include 	.concat ("myheader", ".", "inc")
   </verb></tscreen>
 
   This is the same as the command
@@ -1664,7 +1664,7 @@ Here's a list of all control commands and a description, what they do:
   (the macro name) and optionally by a comma separated list of identifiers
   that are macro parameters.
 
-  See section <ref id="macros" name="Macros">).
+  See section <ref id="macros" name="Macros">.
 
 
 <sect1><tt>.MATCH</tt><label id=".MATCH"><p>
@@ -1711,7 +1711,7 @@ Here's a list of all control commands and a description, what they do:
     	    	.endif
 
     	    	cmp 	#$80		; Bit 7 into carry
-    	    	lsr 	a		; Shit carry into bit 7
+    	    	lsr 	a		; Shift carry into bit 7
 
     	.endmacro
   </verb></tscreen>
@@ -2402,30 +2402,27 @@ Now, with recursive macros, <tt><ref id=".IFBLANK" name=".IFBLANK"></tt> and
 Have a look at the inc16 macro above. Here is it again:
 
 <tscreen><verb>
-  	.macro 	inc16  	addr
-  	      	clc
-  	      	lda    	addr
-  	      	adc    	#$01
-  	      	sta    	addr
-  	      	lda    	addr+1
-  	      	adc    	#$00
-  	      	sta    	addr+1
-  	.endmacro
+       	.macro 	inc16  	addr
+       	      	clc
+       	      	lda    	addr
+       	      	adc    	#$01
+       	      	sta    	addr
+       	      	lda    	addr+1
+       	      	adc    	#$00
+       	      	sta    	addr+1
+       	.endmacro
 </verb></tscreen>
 
 If you have a closer look at the code, you will notice, that it could be
 written more efficiently, like this:
 
 <tscreen><verb>
-  	.macro 	inc16  	addr
-  		clc
-  		lda    	addr
-  	    	adc    	#$01
-  		sta    	addr
-  	   	bcc    	Skip
-  	   	inc    	addr+1
-  	Skip:
-  	.endmacro
+       	.macro 	inc16  	addr
+       	       	inc	addr
+       	       	bne    	Skip
+       	   	inc    	addr+1
+       	Skip:
+       	.endmacro
 </verb></tscreen>
 
 But imagine what happens, if you use this macro twice? Since the label
@@ -2437,12 +2434,9 @@ macro:
 <tscreen><verb>
   	.macro 	inc16  	addr
   	.proc
-  	     	clc
-  	     	lda    	addr
-  	     	adc    	#$01
-  	     	sta    	addr
-  	     	bcc    	Skip
-  	     	inc    	addr+1
+       	       	inc	addr
+       	       	bne    	Skip
+       	   	inc    	addr+1
   	Skip:
   	.endproc
   	.endmacro
@@ -2474,7 +2468,7 @@ also solve the problem above by using <tt/.LOCAL/:
 
 Starting with version 2.5 of the assembler, there is a second macro type
 available: C style macros using the <tt/.DEFINE/ directive. These macros are
-similar to the classic macro type speified above, but behaviour is sometimes
+similar to the classic macro type described above, but behaviour is sometimes
 different:
 
 <itemize>
@@ -2735,7 +2729,7 @@ hear from you. Feel free to contact me by email
 
 <sect>Copyright<p>
 
-ca65 (and all cc65 binutils) are (C) Copyright 1998-2000 Ullrich von
+ca65 (and all cc65 binutils) are (C) Copyright 1998-2001 Ullrich von
 Bassewitz. For usage of the binaries and/or sources the following
 conditions do apply:
 

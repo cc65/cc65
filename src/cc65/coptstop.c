@@ -157,6 +157,55 @@ static unsigned Opt_staspidx (CodeSeg* S, unsigned Push, unsigned Store,
 
 
 
+static unsigned Opt_staxspidx (CodeSeg* S, unsigned Push, unsigned Store,
+     		       	       const char* ZPLo, const char* ZPHi)
+/* Optimize the staxspidx sequence if possible */
+{
+    CodeEntry* X;
+    CodeEntry* PushEntry;
+    CodeEntry* StoreEntry;
+
+    /* Get the push entry */
+    PushEntry = CS_GetEntry (S, Push);
+
+    /* Store the value into the zeropage instead of pushing it */
+    X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
+    CS_InsertEntry (S, X, Push+1);
+    X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
+    CS_InsertEntry (S, X, Push+2);
+
+    /* Correct the index of the store and get a pointer to the entry */
+    Store += 2;
+    StoreEntry = CS_GetEntry (S, Store);
+
+    /* Inline the store */
+    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLo, 0, StoreEntry->LI);
+    CS_InsertEntry (S, X, Store+1);
+    X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, StoreEntry->LI);
+    CS_InsertEntry (S, X, Store+2);
+    if (StoreEntry->RI->In.RegX >= 0) {
+	/* Value of X is known */
+	char Buf [16];
+	xsprintf (Buf, sizeof (Buf), "$%02X", StoreEntry->RI->In.RegX);
+       	X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, StoreEntry->LI);
+    } else {
+     	/* Value unknown */
+     	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, StoreEntry->LI);
+    }
+    CS_InsertEntry (S, X, Store+3);
+    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLo, 0, StoreEntry->LI);
+    CS_InsertEntry (S, X, Store+4);
+
+    /* Remove the push and the call to the staspidx function */
+    CS_DelEntry (S, Store);
+    CS_DelEntry (S, Push);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
 static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add,
 			      const char* ZPLo, const char* ZPHi)
 /* Optimize the tosaddax sequence if possible */
@@ -492,20 +541,29 @@ static unsigned Opt_tosxorax (CodeSeg* S, unsigned Push, unsigned Xor,
 
 
 
+/* Flags for the functions */
+typedef enum {
+    STOP_NONE,		    /* Nothing special */
+    STOP_A_UNUSED           /* Call only if a unused later */
+} STOP_FLAGS;
+
+
 typedef unsigned (*OptFunc) (CodeSeg* S, unsigned Push, unsigned Store,
-     			     const char* ZPLo, const char* ZPHi);
+     	    		     const char* ZPLo, const char* ZPHi);
 typedef struct OptFuncDesc OptFuncDesc;
 struct OptFuncDesc {
-    const char*         Name;   /* Name of the replaced runtime function */
-    OptFunc             Func;   /* Function pointer */
+    const char*     Name;   /* Name of the replaced runtime function */
+    OptFunc         Func;   /* Function pointer */
+    STOP_FLAGS      Flags;  /* Flags */
 };
 
 static const OptFuncDesc FuncTable[] = {
-    { "staspidx",       Opt_staspidx    },
-    { "tosaddax",       Opt_tosaddax    },
-    { "tosandax",       Opt_tosandax    },
-    { "tosorax",        Opt_tosorax     },
-    { "tosxorax",       Opt_tosxorax    },
+    { "staspidx",   Opt_staspidx,  STOP_NONE },
+    { "staxspidx",  Opt_staxspidx, STOP_A_UNUSED },
+    { "tosaddax",   Opt_tosaddax,  STOP_NONE },
+    { "tosandax",   Opt_tosandax,  STOP_NONE },
+    { "tosorax",    Opt_tosorax,   STOP_NONE },
+    { "tosxorax",   Opt_tosxorax,  STOP_NONE },
 };
 #define FUNC_COUNT (sizeof(FuncTable) / sizeof(FuncTable[0]))
 
@@ -586,28 +644,40 @@ unsigned OptStackOps (CodeSeg* S)
 	    	const OptFuncDesc* F = FindFunc (E->Arg);
 	    	if (F) {
 
-	    	    /* Determine the register to use */
-	    	    const char* ZPLo;
-	    	    const char* ZPHi;
-       	       	    UsedRegs |= GetRegInfo (S, I+1, REG_SREG | REG_PTR1 | REG_PTR2);
-	    	    if ((UsedRegs & REG_SREG) == REG_NONE) {
-	    		/* SREG is available */
-	    		ZPLo = "sreg";
-	    		ZPHi = "sreg+1";
-	    	    } else if ((UsedRegs & REG_PTR1) == REG_NONE) {
-	    		ZPLo = "ptr1";
-	    	     	ZPHi = "ptr1+1";
-	    	    } else if ((UsedRegs & REG_PTR2) == REG_NONE) {
-	    	     	ZPLo = "ptr2";
-	    	     	ZPHi = "ptr2+1";
-	    	    } else {
-	    	     	/* No registers available */
-	    	     	ZPLo = 0;
-	    	     	ZPHi = 0;
-	    	    }
+	    	    const char* ZPLo = 0;
+	    	    const char* ZPHi = 0;
+		    int PreCondOk    = 1;
 
-	    	    /* If we have a register, call the optimizer function */
-	    	    if (ZPLo && ZPHi) {
+		    /* Check the flags */
+		    if (F->Flags & STOP_A_UNUSED) {
+			/* a must be unused later */
+			if (RegAUsed (S, I+1)) {
+			    /* Cannot optimize */
+			    PreCondOk = 0;
+			}
+		    }
+
+	    	    /* Determine the zero page locations to use */
+		    if (PreCondOk) {
+			UsedRegs |= GetRegInfo (S, I+1, REG_SREG | REG_PTR1 | REG_PTR2);
+		     	if ((UsedRegs & REG_SREG) == REG_NONE) {
+		     	    /* SREG is available */
+		     	    ZPLo = "sreg";
+		     	    ZPHi = "sreg+1";
+		     	} else if ((UsedRegs & REG_PTR1) == REG_NONE) {
+		     	    ZPLo = "ptr1";
+		     	    ZPHi = "ptr1+1";
+		     	} else if ((UsedRegs & REG_PTR2) == REG_NONE) {
+		     	    ZPLo = "ptr2";
+		     	    ZPHi = "ptr2+1";
+		     	} else {
+		     	    /* No registers available */
+		     	    PreCondOk = 0;
+		     	}
+		    }
+
+	    	    /* If preconditions are ok, call the optimizer function */
+	    	    if (PreCondOk) {
 
 	    		/* Adjust stack offsets */
 	    		unsigned Op = I + AdjustStackOffset (S, Push, I, 2);

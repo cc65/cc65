@@ -195,7 +195,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)),
     }
 
     /* Emit the actual function call */
-    g_call (CF_NONE, MemSet? "memset" : "_bzero", ParamSize);
+    g_call (CF_NONE, MemSet? Func_memset : Func__bzero, ParamSize);
 
     /* We expect the closing brace */
     ConsumeRParen ();

@@ -40,6 +40,7 @@
 #include "error.h"
 #include "expr.h"
 #include "scanner.h"
+#include "stdnames.h"
 #include "typecmp.h"
 #include "typeconv.h"
 
@@ -133,7 +134,7 @@ void Assignment (ExprDesc* lval)
                 g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, CheckedSizeOf (ltype), 0);
 
                 /* Call the memcpy function */
-                g_call (CF_FIXARGC, "memcpy", 4);
+                g_call (CF_FIXARGC, Func_memcpy, 4);
             }
 
         } else {

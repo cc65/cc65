@@ -80,7 +80,8 @@ OBJS =	anonname.o	\
         scanstrbuf.o    \
 	segments.o	\
     	stdfunc.o	\
-    	stmt.o 		\
+        stdnames.o      \
+        stmt.o 	 	\
 	swstmt.o	\
     	symentry.o	\
     	symtab.o       	\

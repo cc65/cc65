@@ -2470,13 +2470,42 @@ static OPCFunc OPCTable[256] = {
 
 
 
-void RunCPU (void)
+void CPUInit (void)
+/* Initialize the CPU */
+{
+    PC = MemReadWord (0xFFFC);
+}
+
+
+
+void Reset (void)
+/* Reset the CPU */
+{
+}
+
+
+
+void IRQ (void)
+/* Generate an IRQ */
+{
+}
+
+
+
+void NMI (void)
+/* Generate an NMI */
+{
+}
+
+
+
+void CPURun (void)
 /* Run the CPU */
 {
     while (!CPUHalted) {
 
 	/* Get the next opcode */
-	unsigned char B = 0x00;
+	unsigned char B = MemReadByte (PC);
 
 	/* Execute it */
 	OPCTable[B] ();

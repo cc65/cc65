@@ -65,6 +65,9 @@ unsigned MemReadZPWord (unsigned char Addr);
  * overflow.
  */
 
+void MemInit (void);
+/* Initialize the memory subsystem */
+
 
 
 /* End of memory.h */

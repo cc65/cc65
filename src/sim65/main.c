@@ -47,7 +47,7 @@
 /* sim65 */
 #include "cputype.h"
 #include "global.h"
-
+#include "memory.h"
 
 
 /*****************************************************************************/
@@ -202,6 +202,10 @@ int main (int argc, char* argv[])
     if (InputFile == 0) {
 	AbEnd ("No input files");
     }
+
+    /* Initialize modules */
+    MemInit ();
+
 
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;

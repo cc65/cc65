@@ -63,6 +63,29 @@ extern unsigned	     	PC;		/* Program counter */
 
 
 
+/*****************************************************************************/
+/*  				     Code				     */
+/*****************************************************************************/
+
+
+
+void CPUInit (void);
+/* Initialize the CPU */
+
+void Reset (void);
+/* Reset the CPU */
+
+void IRQ (void);
+/* Generate an IRQ */
+
+void NMI (void);
+/* Generate an NMI */
+
+void CPURun (void);
+/* Run the CPU */
+
+
+
 /* End of cpucore.h */
 
 #endif

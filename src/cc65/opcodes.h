@@ -53,17 +53,21 @@
 typedef enum {
 
     /* Opcodes for the virtual stack machine */
+    OPC_CALL,
+    OPC_ENTER,
+    OPC_JMP,
     OPC_LDA,
     OPC_LDAX,
     OPC_LDEAX,
+    OPC_LEA,
+    OPC_LEAVE,
     OPC_PHA,
     OPC_PHAX,
     OPC_PHEAX,
+    OPC_SPACE,
     OPC_STA,
     OPC_STAX,
     OPC_STEAX,
-    OPC_LEA,
-    OPC_JMP,
 
     /* 65XX opcodes */
     OP65_ADC,

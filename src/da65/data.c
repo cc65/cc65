@@ -192,7 +192,7 @@ unsigned AddrTable (void)
 	 	Internal ("OOPS - Label for address %04X disappeard!", Addr);
 	    }
 	    Indent (MIndent);
-	    Output (".word");
+	    Output (".addr");
 	    Indent (AIndent);
 	    Output ("%s", Label);
 	    LineComment (PC, 2);

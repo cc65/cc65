@@ -38,6 +38,7 @@
 #include <errno.h>
 
 /* common */
+#include "chartype.h"
 #include "xmalloc.h"
 
 /* co65 */
@@ -153,14 +154,18 @@ static O65Option* ReadO65Option (FILE* F)
     if (Len == 0) {
         return 0;
     }
+    if (Len < 2) {
+        Error ("Found option with length < 2 (input file corrupt)");
+    }
+    Len -= 2;
 
     /* Allocate a new O65Option structure of the needed size */
-    O = xmalloc (sizeof (*O) - sizeof (O->Data) + Len - 2);
+    O = xmalloc (sizeof (*O) - sizeof (O->Data) + Len);
 
     /* Assign the length and read the remaining option data */
     O->Len  = Len;
     O->Type = Read8 (F);
-    ReadData (F, O->Data, Len - 2);
+    ReadData (F, O->Data, Len);
 
     /* Return the new struct */
     return O;
@@ -363,6 +368,67 @@ O65Data* ReadO65File (const char* Name)
 
     /* Return the data read */
     return D;
+}
+
+
+
+const char* GetO65OSName (unsigned char OS)
+/* Return the name of the operating system given by OS */
+{
+    switch (OS) {
+        case O65_OS_OSA65:              return "OS/A65";
+        case O65_OS_LUNIX:              return "Lunix";
+        case O65_OS_CC65_MODULE:        return "cc65 module";
+        default:                        return "unknown";
+    }
+}
+
+
+
+const char* GetO65OptionText (const O65Option* O)
+/* Return the data of the given option as a readable text. The function returns
+ * a pointer to a static buffer that is reused on the next call, so if in doubt,
+ * make a copy (and no, the function is not thread safe).
+ */
+{
+    static char Buf[256];
+    unsigned I, J;
+
+    /* Get the length of the text */
+    unsigned Len = 0;
+    while (Len < O->Len && O->Data[Len] != '\0') {
+        ++Len;
+    }
+
+    /* Copy into the buffer converting non readable characters */
+    I = J = 0;
+    while (I < sizeof (Buf) - 1 && J < Len) {
+        if (!IsControl (O->Data[J])) {
+            Buf[I++] = O->Data[J];
+        } else {
+            Buf[I++] = '\\';
+            if (I >= sizeof (Buf) - 4) {
+                --I;
+                break;
+            }
+            switch (O->Data[J]) {
+                case '\t':      Buf[I++] = 't'; break;
+                case '\b':      Buf[I++] = 'b'; break;
+                case '\n':      Buf[I++] = 'n'; break;
+                case '\r':      Buf[I++] = 'r'; break;
+                case '\v':      Buf[I++] = 'v'; break;
+                default:
+                    sprintf (Buf + I, "x%02X", O->Data[J]);
+                    I += 3;
+                    break;
+            }
+        }
+        ++J;
+    }
+
+    /* Terminate the string and return it */
+    Buf[I] = '\0';
+    return Buf;
 }
 
 

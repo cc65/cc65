@@ -212,6 +212,15 @@ O65Data* ReadO65File (const char* Name);
  * created O65Data struct.
  */
 
+const char* GetO65OSName (unsigned char OS);
+/* Return the name of the operating system given by OS */
+
+const char* GetO65OptionText (const O65Option* O);
+/* Return the data of the given option as a readable text. The function returns
+ * a pointer to a static buffer that is reused on the next call, so if in doubt,
+ * make a copy (and no, the function is not thread safe).
+ */
+
 
 
 /* End of o65.h */

@@ -45,8 +45,8 @@
 
 
 /* File names */
-extern const char*     	InFilename;         /* Name of input file */
-extern const char*     	OutFilename;        /* Name of output file */
+extern const char*     	InputName;          /* Name of input file */
+extern const char*     	OutputName;         /* Name of output file */
 
 /* Default extensions */
 extern const char      	AsmExt[];      	    /* Default assembler extension */
@@ -56,6 +56,12 @@ extern const char*      CodeSeg;            /* Name of the code segment */
 extern const char*      DataSeg;            /* Name of the data segment */
 extern const char*      BssSeg;             /* Name of the bss segment */
 extern const char*      ZeropageSeg;        /* Name of the zeropage segment */
+
+/* Labels */
+extern const char*      CodeLabel;          /* Label for the code segment */
+extern const char*      DataLabel;          /* Label for the data segment */
+extern const char*      BssLabel;           /* Label for the bss segment */
+extern const char*      ZeropageLabel;      /* Label for the zeropage segment */
 
 /* Flags */
 extern unsigned char    DebugInfo;          /* Enable debug info */

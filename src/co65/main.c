@@ -40,6 +40,7 @@
 #include <time.h>
 
 /* common */
+#include "chartype.h"
 #include "cmdline.h"
 #include "fname.h"
 #include "print.h"
@@ -74,15 +75,39 @@ static void Usage (void)
        	     "  -v\t\t\tIncrease verbosity\n"
 	     "\n"
 	     "Long options:\n"
+             "  --bss-label name\tDefine and export a BSS segment label\n"
 	     "  --bss-name seg\tSet the name of the BSS segment\n"
+             "  --code-label name\tDefine and export a CODE segment label\n"
        	     "  --code-name seg\tSet the name of the CODE segment\n"
+             "  --data-label name\tDefine and export a DATA segment label\n"
        	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --verbose\t\tIncrease verbosity\n"
        	     "  --version\t\tPrint the version number\n"
+             "  --zeropage-label name\tDefine and export a ZEROPAGE segment label\n"
        	     "  --zeropage-name seg\tSet the name of the ZEROPAGE segment\n",
     	     ProgName);
+}
+
+
+
+static void CheckLabelName (const char* Label)
+/* Check if the given label is a valid label name */
+{
+    const char* L = Label;
+
+    if (strlen (L) < 256 && (IsAlpha (*L) || *L== '_')) {
+        while (*++L) {
+            if (!IsAlNum (*L) && *L != '_') {
+                break;
+            }
+        }
+    }
+
+    if (*L) {
+        Error ("Label name `%s' is invalid", Label);
+    }
 }
 
 
@@ -94,6 +119,18 @@ static void CheckSegName (const char* Seg)
     if (!ValidSegName (Seg)) {
 	Error ("Segment name `%s' is invalid", Seg);
     }
+}
+
+
+
+static void OptBssLabel (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --bss-label option */
+{
+    /* Check for a label name */
+    CheckLabelName (Arg);
+
+    /* Set the label */
+    BssLabel = xstrdup (Arg);
 }
 
 
@@ -110,6 +147,18 @@ static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptCodeLabel (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --code-label option */
+{
+    /* Check for a label name */
+    CheckLabelName (Arg);
+
+    /* Set the label */
+    CodeLabel = xstrdup (Arg);
+}
+
+
+
 static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --code-name option */
 {
@@ -118,6 +167,18 @@ static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
 
     /* Set the name */
     CodeSeg = xstrdup (Arg);
+}
+
+
+
+static void OptDataLabel (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --data-label option */
+{
+    /* Check for a label name */
+    CheckLabelName (Arg);
+
+    /* Set the label */
+    DataLabel = xstrdup (Arg);
 }
 
 
@@ -173,6 +234,18 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
+static void OptZeropageLabel (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --zeropage-label option */
+{
+    /* Check for a label name */
+    CheckLabelName (Arg);
+
+    /* Set the label */
+    ZeropageLabel = xstrdup (Arg);
+}
+
+
+
 static void OptZeropageName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --zeropage-name option */
 {
@@ -201,19 +274,19 @@ static const char* SegReloc (const O65Data* D, const O65Reloc* R, unsigned long 
             break;
 
         case O65_SEGID_TEXT:
-            xsprintf (Buf, sizeof (Buf), "%s%+ld", CodeSeg, (long) (Val - D->Header.tbase));
+            xsprintf (Buf, sizeof (Buf), "%s%+ld", CodeLabel, (long) (Val - D->Header.tbase));
             break;
 
         case O65_SEGID_DATA:
-            xsprintf (Buf, sizeof (Buf), "%s%+ld", DataSeg, (long) (Val - D->Header.dbase));
+            xsprintf (Buf, sizeof (Buf), "%s%+ld", DataLabel, (long) (Val - D->Header.dbase));
             break;
 
         case O65_SEGID_BSS:
-            xsprintf (Buf, sizeof (Buf), "%s%+ld", BssSeg, (long) (Val - D->Header.bbase));
+            xsprintf (Buf, sizeof (Buf), "%s%+ld", BssLabel, (long) (Val - D->Header.bbase));
             break;
 
         case O65_SEGID_ZP:
-            xsprintf (Buf, sizeof (Buf), "%s%+ld", ZeropageSeg, (long) Val - D->Header.zbase);
+            xsprintf (Buf, sizeof (Buf), "%s%+ld", ZeropageLabel, (long) Val - D->Header.zbase);
             break;
 
         case O65_SEGID_ABS:
@@ -284,9 +357,12 @@ static void ConvertSeg (FILE* F, const O65Data* D, const Collection* Relocs,
                         fprintf (F, "\t.faraddr\t%s\n", SegReloc (D, R, Val));
                     }
                     break;
+
                 case O65_RTYPE_SEG:
+                    /* FALLTHROUGH for now */
                 default:
-                    Internal ("Invalid relocation type at %lu", Byte);
+                    Internal ("Cannot handle relocation type %d at %lu",
+                              R->Type, Byte);
             }
 
             /* Get the next relocation entry */
@@ -310,11 +386,13 @@ static void ConvertSeg (FILE* F, const O65Data* D, const Collection* Relocs,
 static void Convert (void)
 /* Do file conversion */
 {
-    FILE* F;
-    unsigned  I;
+    FILE*       F;
+    unsigned    I;
+    int         cc65;
+    char*       Author = 0;
 
     /* Read the o65 file into memory */
-    O65Data* D = ReadO65File (InFilename);
+    O65Data* D = ReadO65File (InputName);
 
     /* For now, we do only accept o65 files generated by the ld65 linker which
      * have a specific format.
@@ -322,7 +400,7 @@ static void Convert (void)
     if (D->Header.mode != O65_MODE_CC65) {
         Error ("Cannot convert o65 files of this type");
     }
-                     
+
     /* Output statistics */
     Print (stdout, 1, "Size of text segment:               %5lu\n", D->Header.tlen);
     Print (stdout, 1, "Size of data segment:               %5lu\n", D->Header.dlen);
@@ -333,22 +411,110 @@ static void Convert (void)
     Print (stdout, 1, "Number of text segment relocations: %5u\n", CollCount (&D->TextReloc));
     Print (stdout, 1, "Number of data segment relocations: %5u\n", CollCount (&D->DataReloc));
 
+    /* Walk through the options and print them if verbose mode is enabled.
+     * Check for a os=cc65 option and bail out if we didn't find one (for
+     * now - later we switch to special handling).
+     */
+    cc65 = 0;
+    for (I = 0; I < CollCount (&D->Options); ++I) {
+
+        /* Get the next option */
+        const O65Option* O = CollConstAt (&D->Options, I);
+
+        /* Check the type */
+        switch (O->Type) {
+            case O65_OPT_FILENAME:
+                Print (stdout, 1, "O65 filename option:         `%s'\n",
+                       GetO65OptionText (O));
+                break;
+            case O65_OPT_OS:
+                if (O->Len == 2) {
+                    Warning ("Operating system option without data found");
+                } else {
+                    cc65 = (O->Data[0] == O65_OS_CC65_MODULE);
+                    Print (stdout, 1, "O65 operating system option: `%s'\n",
+                           GetO65OSName (O->Data[0]));
+                }
+                break;
+            case O65_OPT_ASM:
+                Print (stdout, 1, "O65 assembler option:        `%s'\n",
+                       GetO65OptionText (O));
+                break;
+            case O65_OPT_AUTHOR:
+                if (Author) {
+                    xfree (Author);
+                }
+                Author = xstrdup (GetO65OptionText (O));
+                Print (stdout, 1, "O65 author option:           `%s'\n", Author);
+                break;
+            case O65_OPT_TIMESTAMP:
+                Print (stdout, 1, "O65 timestamp option:        `%s'\n",
+                       GetO65OptionText (O));
+                break;
+            default:
+                Warning ("Found unknown option, type %d, length %d",
+                         O->Type, O->Len);
+                break;
+        }
+    }
+
     /* Open the output file */
-    F = fopen (OutFilename, "wb");
+    F = fopen (OutputName, "wb");
     if (F == 0) {
-        Error ("Cannot open `%s': %s", OutFilename, strerror (errno));
+        Error ("Cannot open `%s': %s", OutputName, strerror (errno));
     }
 
     /* Create a header */
-    if ((D->Header.mode & O65_CPU_MASK) == O65_CPU_65816) {
-	fprintf (F, "\t.p816\n");
-    }
     fprintf (F, ";\n; File generated by co65 v %u.%u.%u\n;\n",
              VER_MAJOR, VER_MINOR, VER_PATCH);
+
+    /* Select the CPU */
+    if ((D->Header.mode & O65_CPU_MASK) == O65_CPU_65816) {
+    	fprintf (F, "\t.p816\n");
+    }
+
+    /* Object file options */
     fprintf (F, "\t.fopt\t\tcompiler,\"co65 v %u.%u.%u\"\n",
              VER_MAJOR, VER_MINOR, VER_PATCH);
+    if (Author) {
+        fprintf (F, "\t.fopt\t\tauthor, \"%s\"\n", Author);
+        xfree (Author);
+        Author = 0;
+    }
+
+    /* Several other assembler options */
     fprintf (F, "\t.case\t\ton\n");
     fprintf (F, "\t.debuginfo\t%s\n", (DebugInfo != 0)? "on" : "off");
+
+    /* Setup/export the segment labels */
+    if (BssLabel) {
+        fprintf (F, "\t.export\t\t%s\n", BssLabel);
+    } else {
+        BssLabel = xstrdup ("__BSS__");
+    }
+    if (CodeLabel) {
+        fprintf (F, "\t.export\t\t%s\n", CodeLabel);
+    } else {
+        CodeLabel = xstrdup ("__CODE__");
+    }
+    if (DataLabel) {
+        fprintf (F, "\t.export\t\t%s\n", DataLabel);
+    } else {
+        DataLabel = xstrdup ("__DATA__");
+    }
+    if (ZeropageLabel) {
+        fprintf (F, "\t.export\t\t%s\n", ZeropageLabel);
+    } else {
+        /* If this is a cc65 module, override the name for the zeropage segment */
+        if (cc65) {
+            ZeropageLabel = "__ZP_RUN__";
+            fprintf (F, "\t.import\t\t__ZP_RUN__\t; Linker generated symbol\n");
+        } else {
+            ZeropageLabel = xstrdup ("__ZEROPAGE__");
+        }
+    }
+
+    /* End of header */
     fprintf (F, "\n");
 
     /* Imported identifiers */
@@ -371,7 +537,10 @@ static void Convert (void)
             /* Get the next import */
             O65Export* Export = CollAtUnchecked (&D->Exports, I);
 
-            /* Import it by name */
+            /* First define it */
+            fprintf (F, "%s = XXX\n", Export->Name);    /* ### */
+
+            /* The export it by name */
             fprintf (F, "\t.export\t%s\n", Export->Name);
         }
         fprintf (F, "\n");
@@ -379,17 +548,17 @@ static void Convert (void)
 
     /* Code segment */
     fprintf (F, ".segment\t\"%s\"\n", CodeSeg);
-    fprintf (F, "%s:\n", CodeSeg);
+    fprintf (F, "%s:\n", CodeLabel);
     ConvertSeg (F, D, &D->TextReloc, D->Text, D->Header.tlen);
 
     /* Data segment */
     fprintf (F, ".segment\t\"%s\"\n", DataSeg);
-    fprintf (F, "%s:\n", DataSeg);
+    fprintf (F, "%s:\n", DataLabel);
     ConvertSeg (F, D, &D->DataReloc, D->Data, D->Header.dlen);
 
     /* BSS segment */
     fprintf (F, ".segment\t\"%s\"\n", BssSeg);
-    fprintf (F, "%s:\n", BssSeg);
+    fprintf (F, "%s:\n", BssLabel);
     fprintf (F, "\t.res\t%lu\n", D->Header.blen);
     fprintf (F, "\n");
 
@@ -404,13 +573,17 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
+       	{ "--bss-label",	1,     	OptBssLabel   		},
 	{ "--bss-name",		1, 	OptBssName   		},
+       	{ "--code-label",      	1,     	OptCodeLabel   		},
 	{ "--code-name",	1, 	OptCodeName  		},
+       	{ "--data-label",      	1,     	OptDataLabel   		},
 	{ "--data-name",	1, 	OptDataName  		},
 	{ "--debug-info",      	0, 	OptDebugInfo 		},
 	{ "--help",    		0,	OptHelp			},
 	{ "--verbose", 	       	0,	OptVerbose		},
 	{ "--version", 	       	0,	OptVersion		},
+       	{ "--zeropage-label",   1,     	OptZeropageLabel        },
        	{ "--zeropage-name",   	1,     	OptZeropageName         },
     };
 
@@ -443,7 +616,7 @@ int main (int argc, char* argv [])
 		    break;
 
        	        case 'o':
-       	  	    OutFilename = GetArg (&I, 2);
+       	  	    OutputName = GetArg (&I, 2);
        	       	    break;
 
        	       	case 'v':
@@ -461,10 +634,10 @@ int main (int argc, char* argv [])
      	    }
        	} else {
     	    /* Filename. Check if we already had one */
-    	    if (InFilename) {
+    	    if (InputName) {
     	       	Error ("Don't know what to do with `%s'\n", Arg);
     	    } else {
-	       	InFilename = Arg;
+	       	InputName = Arg;
 	    }
      	}
 
@@ -473,13 +646,13 @@ int main (int argc, char* argv [])
     }
 
     /* Do we have an input file? */
-    if (InFilename == 0) {
+    if (InputName == 0) {
        	Error ("No input file\n");
     }
 
     /* Generate the name of the output file if none was specified */
-    if (OutFilename == 0) {
-        OutFilename = MakeFilename (InFilename, AsmExt);
+    if (OutputName == 0) {
+        OutputName = MakeFilename (InputName, AsmExt);
     }
 
     /* Do the conversion */

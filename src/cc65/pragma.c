@@ -215,7 +215,6 @@ static void CharMapPragma (StrBuf* B)
     }
 
     /* Remap the character */
-    printf ("Translating %04lX to %04lX\n", Index, C);
     TgtTranslateSet ((unsigned) Index, (unsigned char) C);
 }
 

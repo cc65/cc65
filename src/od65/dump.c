@@ -196,6 +196,32 @@ static unsigned SkipFragment (FILE* F)
 
 
 
+static const char* GetExportFlags (unsigned Flags)
+/* Get the export flags as a (static) string */
+{
+    /* Static buffer */
+    static char TypeDesc[128];
+
+    /* Get the flags */
+    TypeDesc[0] = '\0';
+    switch (Flags & EXP_MASK_SIZE) {
+ 	case EXP_ABS:   strcat (TypeDesc, "EXP_ABS");		break;
+ 	case EXP_ZP:	strcat (TypeDesc, "EXP_ZP");		break;
+    }
+    switch (Flags & EXP_MASK_VAL) {
+ 	case EXP_CONST:	strcat (TypeDesc, ",EXP_CONST");	break;
+ 	case EXP_EXPR:	strcat (TypeDesc, ",EXP_EXPR");		break;
+    }
+    if (IS_EXP_INIT (Flags)) {
+ 	strcat (TypeDesc, ",EXP_INIT");
+    }
+
+    /* Return the result */
+    return TypeDesc;
+}
+
+
+
 void DumpObjHeader (FILE* F, unsigned long Offset)
 /* Dump the header of the given object file */
 {
@@ -537,7 +563,6 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 
 	unsigned long 	Value = 0;
 	int 		HaveValue;
- 	char    	TypeDesc[128];
 
        	/* Read the data for one export */
        	unsigned char Type  = Read8 (F);
@@ -552,25 +577,11 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 	}
 	ReadFilePos (F, &Pos);
 
-	/* Get a description for the type */
-	TypeDesc[0] = '\0';
-	switch (Type & EXP_MASK_SIZE) {
-	    case EXP_ABS:      	strcat (TypeDesc, "EXP_ABS");		break;
-	    case EXP_ZP:	strcat (TypeDesc, "EXP_ZP");		break;
-	}
-	switch (Type & EXP_MASK_VAL) {
-	    case EXP_CONST:	strcat (TypeDesc, ",EXP_CONST");	break;
-	    case EXP_EXPR:	strcat (TypeDesc, ",EXP_EXPR");		break;
-	}
-	if (Type & EXP_INITIALIZER) {
-	    strcat (TypeDesc, ",EXP_INITIALIZER");
-	}
-
 	/* Print the header */
 	printf ("    Index:%27u\n", I);
 
 	/* Print the data */
-       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
+       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type));
 	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
 	if (HaveValue) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
@@ -619,7 +630,6 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 
 	unsigned long 	Value = 0;
 	int 	   	HaveValue;
- 	const char* 	TypeDesc;
 
        	/* Read the data for one symbol */
        	unsigned char Type  = Read8 (F);
@@ -634,20 +644,11 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	}
 	ReadFilePos (F, &Pos);
 
-	/* Get a description for the type */
-	switch (Type) {
-	    case EXP_ABS|EXP_CONST:	TypeDesc = "EXP_ABS,EXP_CONST";	break;
-	    case EXP_ZP|EXP_CONST:	TypeDesc = "EXP_ZP,EXP_CONST";	break;
-	    case EXP_ABS|EXP_EXPR:	TypeDesc = "EXP_ABS,EXP_EXPR";	break;
-       	    case EXP_ZP|EXP_EXPR:	TypeDesc = "EXP_ZP,EXP_EXPR";	break;
-	    default:	  		TypeDesc = "EXP_UNKNOWN";	break;
-	}
-
 	/* Print the header */
 	printf ("    Index:%27u\n", I);
 
 	/* Print the data */
-       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
+       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type));
 	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
 	if (HaveValue) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);

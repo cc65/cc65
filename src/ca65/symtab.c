@@ -1079,7 +1079,7 @@ void WriteExports (void)
 
 	    /* Add the initializer bits */
 	    if (S->Flags & SF_INITIALIZER) {
-	     	ExprMask |= EXP_INITIALIZER;
+	     	ExprMask |= EXP_INIT;
 	    }
 
 	    /* Write the type */
@@ -1151,7 +1151,7 @@ void WriteDbgSyms (void)
 
 		/* Add the initializer bits */
 		if (S->Flags & SF_INITIALIZER) {
-		    ExprMask |= EXP_INITIALIZER;
+		    ExprMask |= EXP_INIT;
 		}
 
 		/* Write the type */

@@ -1111,21 +1111,13 @@ void g_putind (unsigned Flags, unsigned Offs)
      	    break;
 
      	case CF_INT:
-     	    if (Offs) {
-     	        ldyconst (Offs);
-     	     	AddCodeLine ("jsr staxspidx");
-     	    } else {
-     	     	AddCodeLine ("jsr staxspp");
-     	    }
+	    ldyconst (Offs);
+	    AddCodeLine ("jsr staxspidx");
      	    break;
 
      	case CF_LONG:
-     	    if (Offs) {
-     	        ldyconst (Offs);
-     	     	AddCodeLine ("jsr steaxspidx");
-     	    } else {
-     	     	AddCodeLine ("jsr steaxspp");
-     	    }
+	    ldyconst (Offs);
+     	    AddCodeLine ("jsr steaxspidx");
      	    break;
 
      	default:

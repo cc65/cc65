@@ -24,6 +24,7 @@ tosulong:
       	ldy    	#3
 .endif
       	lda    	(sp),y
+toslong1:
       	ldy	#1
       	sta	(sp),y
      	lda    	#0    		; Zero extend
@@ -49,14 +50,9 @@ toslong:
      	ldy    	#3
 .endif
      	lda    	(sp),y
-     	bmi	toslong1
-     	ldy	#1
-     	sta	(sp),y
-     	lda	#$00  		; Positive, high word is zero
-     	bne	toslong2
-toslong1:
+     	bpl	toslong1	; Jump if positive, high word is zero
      	ldy	#1
      	sta	(sp),y
      	lda	#$FF
-     	bne	toslong2
+     	bne	toslong2	; Branch always
 

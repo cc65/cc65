@@ -171,12 +171,6 @@ static void ParseOneDecl (const DeclSpec* Spec)
 	/* Get the size of the variable */
 	Size = SizeOf (Decl.Type);
 
-        /* Cannot allocate a variable of zero size */
-        if (Size == 0) {
-            Error ("Variable `%s' has unknown size", Decl.Ident);
-            return;
-        }
-
         /* */
        	if (SC & (SC_AUTO | SC_REGISTER)) {
 
@@ -192,82 +186,82 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		    /* Allocate previously reserved local space */
 		    AllocLocalSpace (CurrentFunc);
 
-		    /* Skip the '=' */
-		    NextToken ();
+	 	    /* Skip the '=' */
+	 	    NextToken ();
 
-		    /* Setup the type flags for the assignment */
-		    flags = Size == 1? CF_FORCECHAR : CF_NONE;
+	 	    /* Setup the type flags for the assignment */
+	 	    flags = Size == 1? CF_FORCECHAR : CF_NONE;
 
 	      	    /* Get the expression into the primary */
-		    if (evalexpr (flags, hie1, &lval) == 0) {
-			/* Constant expression. Adjust the types */
-			assignadjust (Decl.Type, &lval);
-			flags |= CF_CONST;
-		    } else {
-			/* Expression is not constant and in the primary */
-			assignadjust (Decl.Type, &lval);
-		    }
+	 	    if (evalexpr (flags, hie1, &lval) == 0) {
+	 		/* Constant expression. Adjust the types */
+	 		assignadjust (Decl.Type, &lval);
+	 		flags |= CF_CONST;
+	 	    } else {
+	 		/* Expression is not constant and in the primary */
+	 		assignadjust (Decl.Type, &lval);
+	 	    }
 
-		    /* Push the value */
-		    g_push (flags | TypeOf (Decl.Type), lval.ConstVal);
+	 	    /* Push the value */
+	 	    g_push (flags | TypeOf (Decl.Type), lval.ConstVal);
 
-		    /* Mark the variable as referenced */
-		    SC |= SC_REF;
+	 	    /* Mark the variable as referenced */
+	 	    SC |= SC_REF;
 
-		    /* Variable is located at the current SP */
-		    SymData = oursp;
+	 	    /* Variable is located at the current SP */
+    	 	    SymData = oursp;
 
-		} else {
-		    /* Non-initialized local variable. Just keep track of
-		     * the space needed.
-		     */
-		    SymData = ReserveLocalSpace (CurrentFunc, Size);
-		}
+	 	} else {
+	 	    /* Non-initialized local variable. Just keep track of
+	 	     * the space needed.
+	 	     */
+	 	    SymData = ReserveLocalSpace (CurrentFunc, Size);
+	 	}
 
 	    } else {
 
-		/* Static local variables. */
-		SC = (SC & ~(SC_REGISTER | SC_AUTO)) | SC_STATIC;
+	 	/* Static local variables. */
+	 	SC = (SC & ~(SC_REGISTER | SC_AUTO)) | SC_STATIC;
 
-		/* Put them into the BSS */
-		g_usebss ();
+	 	/* Put them into the BSS */
+	 	g_usebss ();
 
-		/* Define the variable label */
-		SymData = GetLocalLabel ();
-		g_defdatalabel (SymData);
+	 	/* Define the variable label */
+	 	SymData = GetLocalLabel ();
+	 	g_defdatalabel (SymData);
 
-		/* Reserve space for the data */
-		g_res (Size);
+	 	/* Reserve space for the data */
+	 	g_res (Size);
 
-		/* Allow assignments */
-		if (CurTok.Tok == TOK_ASSIGN) {
+	 	/* Allow assignments */
+	 	if (CurTok.Tok == TOK_ASSIGN) {
 
-		    ExprDesc lval;
+	 	    ExprDesc lval;
 
-		    /* Skip the '=' */
-		    NextToken ();
+	 	    /* Skip the '=' */
+	 	    NextToken ();
 
-		    /* Setup the type flags for the assignment */
-		    flags = Size == 1? CF_FORCECHAR : CF_NONE;
+	 	    /* Setup the type flags for the assignment */
+	 	    flags = Size == 1? CF_FORCECHAR : CF_NONE;
 
 	      	    /* Get the expression into the primary */
-		    if (evalexpr (flags, hie1, &lval) == 0) {
-			/* Constant expression. Adjust the types */
-			assignadjust (Decl.Type, &lval);
-			flags |= CF_CONST;
-			/* Load it into the primary */
-			exprhs (flags, 0, &lval);
-		    } else {
-			/* Expression is not constant and in the primary */
-			assignadjust (Decl.Type, &lval);
-		    }
+	 	    if (evalexpr (flags, hie1, &lval) == 0) {
+	 		/* Constant expression. Adjust the types */
+	 		assignadjust (Decl.Type, &lval);
+	 		flags |= CF_CONST;
+	 		/* Load it into the primary */
+	 		exprhs (flags, 0, &lval);
+	 	    } else {
+    	 		/* Expression is not constant and in the primary */
+	 		assignadjust (Decl.Type, &lval);
+	 	    }
 
-		    /* Store the value into the variable */
-		    g_putstatic (flags | TypeOf (Decl.Type), SymData, 0);
+	 	    /* Store the value into the variable */
+	 	    g_putstatic (flags | TypeOf (Decl.Type), SymData, 0);
 
-		    /* Mark the variable as referenced */
-		    SC |= SC_REF;
-		}
+	 	    /* Mark the variable as referenced */
+	 	    SC |= SC_REF;
+	 	}
      	    }
 
 	} else if ((SC & SC_STATIC) == SC_STATIC) {
@@ -276,11 +270,11 @@ static void ParseOneDecl (const DeclSpec* Spec)
 	    if (CurTok.Tok == TOK_ASSIGN) {
 
 	      	/* Initialization ahead, switch to data segment */
-		if (IsQualConst (Decl.Type)) {
-		    g_userodata ();
-		} else {
-		    g_usedata ();
-		}
+	 	if (IsQualConst (Decl.Type)) {
+	 	    g_userodata ();
+	 	} else {
+	 	    g_usedata ();
+	 	}
 
 	      	/* Define the variable label */
 	      	SymData = GetLocalLabel ();
@@ -292,29 +286,39 @@ static void ParseOneDecl (const DeclSpec* Spec)
 	      	/* Allow initialization of static vars */
 	      	ParseInit (Decl.Type);
 
+		/* If the previous size has been unknown, it must be known now */
+		if (Size == 0) {
+       	       	    Size = SizeOf (Decl.Type);
+		}
+
 	      	/* Mark the variable as referenced */
-		SC |= SC_REF;
+	 	SC |= SC_REF;
 
 	    } else {
 
-		/* Uninitialized data, use BSS segment */
-		g_usebss ();
+    	 	/* Uninitialized data, use BSS segment */
+    	 	g_usebss ();
 
-		/* Define the variable label */
-		SymData = GetLocalLabel ();
-		g_defdatalabel (SymData);
+    	 	/* Define the variable label */
+    	 	SymData = GetLocalLabel ();
+    	 	g_defdatalabel (SymData);
 
-		/* Reserve space for the data */
-		g_res (Size);
+    	 	/* Reserve space for the data */
+    	 	g_res (Size);
 
-	    }
+    	    }
+    	}
+
+	/* Cannot allocate a variable of zero size */
+	if (Size == 0) {
+	    Error ("Variable `%s' has unknown size", Decl.Ident);
+	    return;
 	}
-
     }
 
     /* If the symbol is not marked as external, it will be defined */
     if ((SC & SC_EXTERN) == 0) {
-	SC |= SC_DEF;
+    	SC |= SC_DEF;
     }
 
     /* Add the symbol to the symbol table */
@@ -333,7 +337,7 @@ void DeclareLocals (void)
     while (1) {
 
 	/* Check variable declarations. We need to distinguish between a
-	 * default int type and the end of variable declarations. So we
+    	 * default int type and the end of variable declarations. So we
 	 * will do the following: If there is no explicit storage class
 	 * specifier *and* no explicit type given, it is assume that we
        	 * have reached the end of declarations.

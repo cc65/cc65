@@ -4,12 +4,13 @@
 ;
 ; Screen size variables
 ;
-; 6.3.2001
+; 6.3.2001, 17.4.2003
 
 	
 	.include 	"../inc/geossym.inc"
 
 	.export		xsize, ysize
+	.export		screensize
 	.importzp	cursor_r, cursor_c
 	.import		_cursor
 	.constructor	initscrsize
@@ -31,6 +32,11 @@ L1:	lda	#40		; 40 columns (more or less)
 	stx	cursor_c
 	txa
 	jmp	_cursor		; home and update cursor
+
+screensize:
+	ldx	xsize
+	ldy	ysize
+	rts
 
 .bss
 

@@ -63,7 +63,7 @@ type type_uint []   	= { T_UINT,	T_END };
 type type_long []   	= { T_LONG,	T_END };
 type type_ulong []  	= { T_ULONG,	T_END };
 type type_void []   	= { T_VOID,	T_END };
-type type_size_t []	= { T_UINT,     T_END };
+type type_size_t []	= { T_SIZE_T,   T_END };
 
 
 

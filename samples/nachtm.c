@@ -1035,7 +1035,7 @@ static void TimeSync (void)
 static void DisplayTime (void)
 /* Display the running time */
 {
-    clock_t Time = (clock () - StartTime) / CLOCKS_PER_TICK;
+    clock_t Time = (clock () - StartTime) / CLOCKS_PER_SEC;
     unsigned Sec = Time % 60;
     unsigned Min = Time / 60;
 
@@ -1063,7 +1063,7 @@ int main (void)
     unsigned char       I;
     unsigned char       Tone;
     unsigned char       Octave;
-    unsigned		Val;	
+    unsigned		Val;
     struct __sid_voice*	Voice;
     VoiceCtrl*	        VC;
 

@@ -74,7 +74,7 @@ extern FILE* stderr;
 
 /* Functions */
 void __fastcall__ clearerr (FILE* f);
-int fclose (FILE* f);
+int __fastcall__ fclose (FILE* f);
 int __fastcall__ feof (FILE* f);
 int __fastcall__ ferror (FILE* f);
 int __fastcall__ fflush (FILE* f);

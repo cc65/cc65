@@ -253,7 +253,8 @@ following attributes are recognized:
 
   This attribute may be used instead of the <tt><ref id="option--pagelength"
   name="--pagelength"></tt> option on the command line. It takes a numerical
-  parameter.
+  parameter. Using zero as page length (which is the default) means that no 
+  pages are generated.
 
 
   <tag><tt>STARTADDR</tt></tag>
@@ -362,13 +363,13 @@ code. The following attributes are recognized:
 
 The following is a short example for an info file that contains most of the
 directives explained above:
-                                                             
+
 <tscreen><verb>
         GLOBAL {
                 OUTPUTNAME "kernal.s";
                 INPUTNAME  "kernal.bin";
                 STARTADDR  $E000;
-                PAGELENGTH -1;          # No paging
+                PAGELENGTH 0;       	# No paging
                 CPU        "6502";
         };
 

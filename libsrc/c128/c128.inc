@@ -25,6 +25,7 @@ CRAM_PTR       	= $E2  	       	; Pointer to current char in color RAM
 
 CHARCOLOR       = $F1
 RVS             = $F3           ; Reverse output flag
+SCROLL		= $F8		; Disable scrolling flag
 FETCH           = $2A2          ; Fetch subroutine in RAM
 FETVEC          = $2AA          ; Vector patch location for FETCH
 STASH           = $2AF          ; Stash routine in RAM

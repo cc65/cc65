@@ -19,6 +19,9 @@ keyvec:	.res	2
 
 initconio:
 
+	lda	#$80
+	sta	SCROLL
+
 ; Save the old vector
 
 	lda	KeyStoreVec

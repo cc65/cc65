@@ -144,6 +144,7 @@ static const struct {
     { "\tjsr\tbool",   	  0,   	REG_NONE,   REG_AX     	  },
     { "\tjsr\tdecaxy",	  1,	REG_ALL,    REG_AX	  },
     { "\tjsr\tdecax",  	  0,   	REG_AX,	    REG_AX    	  },
+    { "\tjsr\tdecsp",	  0,	REG_NONE,   REG_A	  },
     { "\tjsr\tldax0sp",   1,   	REG_Y, 	    REG_AX	  },
     { "\tjsr\tldaxysp",   1,   	REG_Y,      REG_AX 	  },
     { "\tjsr\tpusha",  	  1,   	REG_A, 	    REG_Y	  },
@@ -4027,6 +4028,9 @@ static Line* OptOneBlock (Line* L)
 	} else if (LineFullMatch (L, "\tjsr\tdeceaxy")) {
 	    /* We know about this function */
 	    A = X = -1;
+	} else if (LineMatch (L, "\tjsr\tdecsp") && IsDigit (L->Line[10])) {
+	    /* We know about this function */
+	    A = -1;
       	} else if (LineFullMatch (L, "\tjsr\tincax1")) {
 	    /* We know about this function */
 	    A = X = -1;
@@ -4126,6 +4130,9 @@ static Line* OptOneBlock (Line* L)
 	    A = 0;
 	    X = 0;
 	    Y = 1;
+	} else if (LineFullMatch (L, "\tjsr\tpush0ax")) {
+	    /* We know about this function */
+	    Y = 0;
 	} else if (LineFullMatch (L, "\tjsr\tpush1")) {
 	    /* We know about this function */
 	    A = 1;
@@ -4161,7 +4168,7 @@ static Line* OptOneBlock (Line* L)
 	    A = 7;
 	    X = 0;
 	    Y = 1;
-	} else if (CPU == CPU_65C02 && LineFullMatch (L, "\tjsr\tpusha")) {
+	} else if (CPU != CPU_65C02 && LineFullMatch (L, "\tjsr\tpusha")) {
 	    /* We know about this function */
 	    Y = 0;
 	} else if (LineFullMatch (L, "\tjsr\tpusha0")) {
@@ -4173,11 +4180,11 @@ static Line* OptOneBlock (Line* L)
 	    	L = ReplaceLine (L, "\tjsr\tpushax");
 	    }
 	    X = 0;
-	    Y = 1;
+	    Y = 0;
 	} else if (LineFullMatch (L, "\tjsr\tpushax")) {
 	    /* We know about this function */
-	    Y = 1;
-	} else if (LineFullMatch (L, "\tjsr\tpushaysp")) {
+	    Y = 0;
+	} else if (CPU != CPU_65C02  && LineFullMatch (L, "\tjsr\tpushaysp")) {
 	    /* We know about this function */
 	    A = -1;
 	    Y = 0;
@@ -4192,6 +4199,9 @@ static Line* OptOneBlock (Line* L)
 	} else if (LineFullMatch (L, "\tjsr\tpushc2")) {
 	    /* We know about this function */
 	    A = 2;
+	    Y = 0;
+	} else if (LineFullMatch (L, "\tjsr\tpusheax")) {
+	    /* We know about this function */
 	    Y = 0;
 	} else if (LineFullMatch (L, "\tjsr\tpushw")) {
 	    /* We know about this function (calls pushax) */
@@ -4253,6 +4263,9 @@ static Line* OptOneBlock (Line* L)
 	    /* We know about this function */
 	    A = X = -1;
 	    INC (Y, 1);
+	} else if (LineFullMatch (L, "\tjsr\tsubysp")) {
+	    /* We know about this function */
+	    A = -1;
 	} else if (LineFullMatch (L, "\tjsr\ttosadda0")) {
 	    /* We know about this function */
 	    A = X = -1;

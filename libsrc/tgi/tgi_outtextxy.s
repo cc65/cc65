@@ -14,6 +14,7 @@
 _tgi_outtextxy:
         sta     ptr3
         stx     ptr3+1          ; Save s
+	jsr	popax		; get y from stack
         jsr     tgi_popxy       ; Pop x/y into ptr1/ptr2
         jmp     tgi_outtext     ; Call the driver
 

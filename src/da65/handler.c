@@ -95,7 +95,7 @@ static const char* GetAbsOverride (unsigned Flags, unsigned Addr)
  * string, otherwise return the empty string.
  */
 {
-    if (Flags & flAbsOverride && Addr < 0x100) {
+    if ((Flags & flAbsOverride) != 0 && Addr < 0x100) {
         return "a:";
     } else {
         return "";

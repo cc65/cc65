@@ -6,7 +6,7 @@
 ;
 
     	.export	       	_cputcxy, _cputc, cputdirect, putchar
-	.export		advance, newline, plot
+	.export		plot
 	.import		popa, _gotoxy
 	.import		xsize, revers
 
@@ -54,8 +54,8 @@ advance:
    	iny
    	cpy	xsize
    	bne	L9
-   	ldy	#0    	    	; new line
 newline:
+   	ldy	#0    	    	; new line
    	clc
    	lda	xsize
    	adc	SCREEN_PTR

@@ -6,7 +6,7 @@
 ;
 
     	.export	     	_cputcxy, _cputc, cputdirect, putchar
-	.export	     	advance, newline, plot
+	.export	     	plot
 	.exportzp	CURS_X, CURS_Y
 	.import		_gotoxy
 	.import	     	popa
@@ -57,8 +57,8 @@ advance:
    	iny
    	cpy	xsize
    	bne	L9
-   	ldy	#0    	       	; new line
 newline:
+   	ldy	#0    	       	; new line
    	clc
    	lda	xsize
    	adc	CharPtr

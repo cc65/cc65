@@ -73,9 +73,8 @@ static long Member (long AllocSize)
 {
     long Multiplicator;
 
-    /* A comma and a multiplicator may follow */
-    if (Tok == TOK_COMMA) {
-        NextTok ();
+    /* A multiplicator may follow */
+    if (Tok != TOK_SEP) {
         Multiplicator = ConstExpression ();
         if (Multiplicator <= 0) {
             Error ("Range error");
@@ -163,7 +162,11 @@ static long DoStructInternal (long Offs, unsigned Type)
                 break;
 
             case TOK_RES:
-                Error ("Not implemented");
+                if (Tok == TOK_SEP) {
+                    Error ("Size is missing");
+                } else {
+                    MemberSize = Member (1);
+                }
                 break;
 
             case TOK_TAG:
@@ -181,6 +184,7 @@ static long DoStructInternal (long Offs, unsigned Type)
                         MemberSize = GetSymVal (SizeSym);
                     }
                 }
+                MemberSize *= Member (MemberSize);
                 break;
 
             case TOK_STRUCT:

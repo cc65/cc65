@@ -41,7 +41,7 @@
 /* Define __JOYSTICK__ for systems that support a joystick */
 #if defined(__ATARI__) || defined(__C64__) || defined(__C128__) || defined(__PLUS4__) || defined(__CBM510__) || defined(__VIC20__)
 #  define __JOYSTICK__
-#else
+#else                      
 #  error The target system does not support a joystick!
 # endif
 
@@ -53,11 +53,11 @@
  * of one or more of the following values.
  */
 #if defined(__VIC20__)
-#  define JOY_UP        0x04
-#  define JOY_DOWN      0x08
-#  define JOY_LEFT      0x10
+#  define JOY_UP        0x02
+#  define JOY_DOWN      0x04
+#  define JOY_LEFT      0x08
 #  define JOY_RIGHT     0x80
-#  define JOY_FIRE      0x20
+#  define JOY_FIRE      0x10
 #else
 #  define JOY_UP       	0x01
 #  define JOY_DOWN	0x02

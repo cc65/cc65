@@ -417,7 +417,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     	 	    optionalint ();
 		    D->Type[0] = T_LONG;
 		    D->Type[1] = T_END;
-    		    break;
+    	     	    break;
 
     		case TOK_INT:
     		    NextToken ();
@@ -454,13 +454,13 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 		    D->Type[1] = T_END;
     		    break;
 
-    		case TOK_INT:
+    	     	case TOK_INT:
     		    NextToken ();
     		    /* FALL THROUGH */
 
     		default:
 		    D->Type[0] = T_UINT;
-		    D->Type[1] = T_END;
+	     	    D->Type[1] = T_END;
 		    break;
     	    }
 	    break;
@@ -497,7 +497,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 			if (SymIsLocal (Entry) && (Entry->Flags & SC_ENUM) == 0) {
 		    	    Error ("Symbol `%s' is already different kind", Entry->Name);
 			}
-		    } else {
+	     	    } else {
 			/* Insert entry into table ### */
 		    }
 		    /* Skip the identifier */
@@ -626,7 +626,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 	    }
 
      	    if (CurTok.Tok == TOK_COMMA) {
-		NextToken ();
+	     	NextToken ();
 	    } else {
      	      	break;
 	    }
@@ -720,7 +720,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
 
 
-static FuncDesc* ParseFuncDecl (void)
+static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
 /* Parse the argument list of a function. */
 {
     unsigned Offs;
@@ -749,6 +749,14 @@ static FuncDesc* ParseFuncDecl (void)
 	if (Sym == 0 || !IsTypeDef (Sym)) {
 	    /* Old style (K&R) function. Assume variable param list. */
 	    F->Flags |= (FD_OLDSTYLE | FD_VARIADIC);
+
+	    /* Check for an implicit int return in the K&R function */
+	    if ((Spec->Flags & DS_DEF_TYPE) != 0 &&
+		Spec->Type[0] == T_INT 	 &&
+		Spec->Type[1] == T_END) {
+		/* Function has an implicit int return */
+		F->Flags |= FD_OLDSTYLE_INTRET;
+	    }
 	}
     }
 
@@ -783,21 +791,21 @@ static FuncDesc* ParseFuncDecl (void)
 
 
 
-static void Decl (Declaration* D, unsigned Mode)
+static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 /* Recursively process declarators. Build a type array in reverse order. */
 {
 
     if (CurTok.Tok == TOK_STAR) {
-	type T = T_PTR;
+    	type T = T_PTR;
        	NextToken ();
-	/* Allow optional const or volatile qualifiers */
-	T |= OptionalQualifiers (T_QUAL_NONE);
-       	Decl (D, Mode);
+    	/* Allow optional const or volatile qualifiers */
+    	T |= OptionalQualifiers (T_QUAL_NONE);
+       	Decl (Spec, D, Mode);
        	*D->T++ = T;
        	return;
     } else if (CurTok.Tok == TOK_LPAREN) {
        	NextToken ();
-       	Decl (D, Mode);
+       	Decl (Spec, D, Mode);
        	ConsumeRParen ();
     } else if (CurTok.Tok == TOK_FASTCALL) {
 	/* Remember the current type pointer */
@@ -805,7 +813,7 @@ static void Decl (Declaration* D, unsigned Mode)
 	/* Skip the fastcall token */
       	NextToken ();
 	/* Parse the function */
-	Decl (D, Mode);
+	Decl (Spec, D, Mode);
 	/* Set the fastcall flag */
 	if (!IsTypeFunc (T) && !IsTypeFuncPtr (T)) {
 	    Error ("__fastcall__ modifier applied to non function");
@@ -821,11 +829,11 @@ static void Decl (Declaration* D, unsigned Mode)
        	 *  - Mode == DM_NEED_IDENT means:
      	 *   	we *must* have a type and a variable identifer.
      	 *  - Mode == DM_NO_IDENT means:
-     	 *	we must have a type but no variable identifer
+     	 *   	we must have a type but no variable identifer
      	 *     	(if there is one, it's not read).
      	 *  - Mode == DM_ACCEPT_IDENT means:
-     	 *	we *may* have an identifier. If there is an identifier,
-     	 *	it is read, but it is no error, if there is none.
+     	 *   	we *may* have an identifier. If there is an identifier,
+     	 *   	it is read, but it is no error, if there is none.
      	 */
      	if (Mode == DM_NO_IDENT) {
      	    D->Ident[0] = '\0';
@@ -847,7 +855,7 @@ static void Decl (Declaration* D, unsigned Mode)
 	    FuncDesc* F;
        	    NextToken ();
 	    /* Parse the function declaration */
-       	    F = ParseFuncDecl ();
+       	    F = ParseFuncDecl (Spec);
 	    *D->T++ = T_FUNC;
 	    EncodePtr (D->T, F);
 	    D->T += DECODE_SIZE;
@@ -907,18 +915,18 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     InitDeclaration (D);
 
     /* Get additional declarators and the identifier */
-    Decl (D, Mode);
+    Decl (Spec, D, Mode);
 
     /* Add the base type. */
     TypeCpy (D->T, Spec->Type);
 
     /* Check the size of the generated type */
     if (!IsTypeFunc (D->Type) && !IsTypeVoid (D->Type) && SizeOf (D->Type) >= 0x10000) {
-	if (D->Ident[0] != '\0') {
-	    Error ("Size of `%s' is invalid", D->Ident);
-	} else {
-	    Error ("Invalid size");
-	}
+    	if (D->Ident[0] != '\0') {
+    	    Error ("Size of `%s' is invalid", D->Ident);
+    	} else {
+    	    Error ("Invalid size");
+    	}
     }
 }
 

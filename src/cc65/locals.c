@@ -184,7 +184,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		    ExprDesc lval;
 
 		    /* Allocate previously reserved local space */
-		    AllocLocalSpace (CurrentFunc);
+		    F_AllocLocalSpace (CurrentFunc);
 
 	 	    /* Skip the '=' */
 	 	    NextToken ();
@@ -215,7 +215,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 	 	    /* Non-initialized local variable. Just keep track of
 	 	     * the space needed.
 	 	     */
-	 	    SymData = ReserveLocalSpace (CurrentFunc, Size);
+	 	    SymData = F_ReserveLocalSpace (CurrentFunc, Size);
 	 	}
 
 	    } else {
@@ -377,7 +377,7 @@ void DeclareLocals (void)
     }
 
     /* Be sure to allocate any reserved space for locals */
-    AllocLocalSpace (CurrentFunc);
+    F_AllocLocalSpace (CurrentFunc);
 
     /* In case we've allocated local variables in this block, emit a call to
      * the stack checking routine if stack checks are enabled.
@@ -404,7 +404,7 @@ void RestoreRegVars (int HaveResult)
     }
 
     /* Save the accumulator if needed */
-    if (!HasVoidReturn (CurrentFunc) && HaveResult) {
+    if (!F_HasVoidReturn (CurrentFunc) && HaveResult) {
      	g_save (CF_CHAR | CF_FORCECHAR);
     }
 
@@ -449,7 +449,7 @@ void RestoreRegVars (int HaveResult)
     }
 
     /* Restore the accumulator if needed */
-    if (!HasVoidReturn (CurrentFunc) && HaveResult) {
+    if (!F_HasVoidReturn (CurrentFunc) && HaveResult) {
      	g_restore (CF_CHAR | CF_FORCECHAR);
     }
 }

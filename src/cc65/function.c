@@ -109,7 +109,7 @@ static void FreeFunction (Function* F)
 
 
 
-const char* GetFuncName (const Function* F)
+const char* F_GetFuncName (const Function* F)
 /* Return the name of the current function */
 {
     return F->FuncEntry->Name;
@@ -117,7 +117,7 @@ const char* GetFuncName (const Function* F)
 
 
 
-unsigned GetParamCount (const Function* F)
+unsigned F_GetParamCount (const Function* F)
 /* Return the parameter count for the current function */
 {
     return F->Desc->ParamCount;
@@ -125,7 +125,7 @@ unsigned GetParamCount (const Function* F)
 
 
 
-unsigned GetParamSize (const Function* F)
+unsigned F_GetParamSize (const Function* F)
 /* Return the parameter size for the current function */
 {
     return F->Desc->ParamSize;
@@ -133,7 +133,7 @@ unsigned GetParamSize (const Function* F)
 
 
 
-type* GetReturnType (Function* F)
+type* F_GetReturnType (Function* F)
 /* Get the return type for the function */
 {
     return F->ReturnType;
@@ -141,7 +141,7 @@ type* GetReturnType (Function* F)
 
 
 
-int HasVoidReturn (const Function* F)
+int F_HasVoidReturn (const Function* F)
 /* Return true if the function does not have a return value */
 {
     return IsTypeVoid (F->ReturnType);
@@ -149,15 +149,31 @@ int HasVoidReturn (const Function* F)
 
 
 
-int IsVariadic (const Function* F)
+int F_IsVariadic (const Function* F)
 /* Return true if this is a variadic function */
 {
-    return (F->Desc->Flags & FD_VARIADIC) != 0;
+    return (F->Desc->Flags & FD_OLDSTYLE) != 0;
 }
 
 
 
-unsigned GetRetLab (const Function* F)
+int F_IsOldStyle (const Function* F)
+/* Return true if this is an old style (K&R) function */
+{
+    return (F->Desc->Flags & FD_OLDSTYLE) != 0;
+}
+
+
+
+int F_HasOldStyleIntRet (const Function* F)
+/* Return true if this is an old style (K&R) function with an implicit int return */
+{
+    return (F->Desc->Flags & FD_OLDSTYLE_INTRET) != 0;
+}
+
+
+
+unsigned F_GetRetLab (const Function* F)
 /* Return the return jump label */
 {
     return F->RetLab;
@@ -165,7 +181,7 @@ unsigned GetRetLab (const Function* F)
 
 
 
-int GetTopLevelSP (const Function* F)
+int F_GetTopLevelSP (const Function* F)
 /* Get the value of the stack pointer on function top level */
 {
     return F->TopLevelSP;
@@ -173,7 +189,7 @@ int GetTopLevelSP (const Function* F)
 
 
 
-int ReserveLocalSpace (Function* F, unsigned Size)
+int F_ReserveLocalSpace (Function* F, unsigned Size)
 /* Reserve (but don't allocate) the given local space and return the stack
  * offset.
  */
@@ -184,21 +200,21 @@ int ReserveLocalSpace (Function* F, unsigned Size)
 
 
 
-void AllocLocalSpace (Function* F)
+void F_AllocLocalSpace (Function* F)
 /* Allocate any local space previously reserved. The function will do
  * nothing if there is no reserved local space.
  */
 {
     if (F->Reserved > 0) {
 
-	/* Create space on the stack */
-	g_space (F->Reserved);
+       	/* Create space on the stack */
+       	g_space (F->Reserved);
 
-	/* Correct the stack pointer */
-	oursp -= F->Reserved;
+       	/* Correct the stack pointer */
+       	oursp -= F->Reserved;
 
-	/* Nothing more reserved */
-	F->Reserved = 0;
+       	/* Nothing more reserved */
+       	F->Reserved = 0;
     }
 }
 
@@ -276,7 +292,7 @@ void NewFunc (SymEntry* Func)
     }
 
     /* Generate function entry code if needed */
-    g_enter (TypeOf (Func->Type), GetParamSize (CurrentFunc));
+    g_enter (TypeOf (Func->Type), F_GetParamSize (CurrentFunc));
 
     /* Setup the stack */
     oursp = 0;
@@ -305,16 +321,16 @@ void NewFunc (SymEntry* Func)
     /* If the function has a return type but no return statement, flag
      * a warning
      */
-    IsVoidFunc = HasVoidReturn (CurrentFunc);
+    IsVoidFunc = F_HasVoidReturn (CurrentFunc);
 #if 0
     /* Does not work reliably */
-    if (!IsVoidFunc && !HadReturn) {
+    if (!F_IsVoidFunc && !HadReturn) {
 	Warning ("Function `%s' should return a value", Func->Name);
     }
 #endif
 
     /* Output the function exit code label */
-    g_defcodelabel (GetRetLab (CurrentFunc));
+    g_defcodelabel (F_GetRetLab (CurrentFunc));
 
     /* Restore the register variables */
     RestoreRegVars (!IsVoidFunc);

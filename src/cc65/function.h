@@ -58,36 +58,42 @@ extern Function* CurrentFunc;
 
 
 
-const char* GetFuncName (const Function* F);
+const char* F_GetFuncName (const Function* F);
 /* Return the name of the current function */
 
-unsigned GetParamCount (const Function* F);
+unsigned F_GetParamCount (const Function* F);
 /* Return the parameter count for the current function */
 
-unsigned GetParamSize (const Function* F);
+unsigned F_GetParamSize (const Function* F);
 /* Return the parameter size for the current function */
 
-type* GetReturnType (Function* F);
+type* F_GetReturnType (Function* F);
 /* Get the return type for the function */
 
-int HasVoidReturn (const Function* F);
+int F_HasVoidReturn (const Function* F);
 /* Return true if the function does not have a return value */
 
-int IsVariadic (const Function* F);
+int F_IsVariadic (const Function* F);
 /* Return true if this is a variadic function */
 
-unsigned GetRetLab (const Function* F);
+int F_IsOldStyle (const Function* F);
+/* Return true if this is an old style (K&R) function */
+
+int F_HasOldStyleIntRet (const Function* F);
+/* Return true if this is an old style (K&R) function with an implicit int return */
+
+unsigned F_GetRetLab (const Function* F);
 /* Return the return jump label */
 
-int GetTopLevelSP (const Function* F);
+int F_GetTopLevelSP (const Function* F);
 /* Get the value of the stack pointer on function top level */
 
-int ReserveLocalSpace (Function* F, unsigned Size);
+int F_ReserveLocalSpace (Function* F, unsigned Size);
 /* Reserve (but don't allocate) the given local space and return the stack
  * offset.
  */
 
-void AllocLocalSpace (Function* F);
+void F_AllocLocalSpace (Function* F);
 /* Allocate any local space previously reserved. The function will do
  * nothing if there is no reserved local space.
  */

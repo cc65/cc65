@@ -51,7 +51,8 @@
 #define FD_VARIADIC		0x0008U	/* Function with variable param list */
 #define FD_FASTCALL		0x0010U	/* __fastcall__ function 	     */
 #define FD_OLDSTYLE		0x0020U	/* Old style (K&R) function	     */
-#define FD_UNNAMED_PARAMS	0x0040U	/* Function has unnamed params	     */
+#define FD_OLDSTYLE_INTRET    	0x0040U	/* K&R func has implicit int return  */
+#define FD_UNNAMED_PARAMS      	0x0080U	/* Function has unnamed params	     */
 
 /* Bits that must be ignored when comparing funcs */
 #define FD_IGNORE 	(FD_IMPLICIT | FD_UNNAMED_PARAMS)

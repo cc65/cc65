@@ -547,7 +547,7 @@ void NextToken (void)
     	    } else if (strcmp (token, "__func__") == 0) {
 	       	/* __func__ is only defined in functions */
 	       	if (CurrentFunc) {
-	       	    NextTok.IVal = AddLiteral (GetFuncName (CurrentFunc));
+	       	    NextTok.IVal = AddLiteral (F_GetFuncName (CurrentFunc));
 	       	    NextTok.Tok  = TOK_SCONST;
 	       	    return;
 	       	}
@@ -805,7 +805,7 @@ void SkipTokens (const token_t* TokenList, unsigned TokenCount)
 /* Skip tokens until we reach TOK_CEOF or a token in the given token list.
  * This routine is used for error recovery.
  */
-{    							       
+{
     while (CurTok.Tok != TOK_CEOF) {
 
     	/* Check if the current token is in the token list */

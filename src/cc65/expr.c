@@ -913,9 +913,9 @@ static int primary (ExprDesc* lval)
 	   	 * function, we have to add some address calculations, and the
 	   	 * address is not const.
 	   	 */
-       	       	if ((Sym->Flags & SC_PARAM) == SC_PARAM && IsVariadic (CurrentFunc)) {
+       	       	if ((Sym->Flags & SC_PARAM) == SC_PARAM && F_IsVariadic (CurrentFunc)) {
 	   	    /* Variadic parameter */
-	   	    g_leavariadic (Sym->V.Offs - GetParamSize (CurrentFunc));
+	   	    g_leavariadic (Sym->V.Offs - F_GetParamSize (CurrentFunc));
 	   	    lval->Flags = E_MEXPR;
 	   	    lval->ConstVal = 0;
 	   	} else {

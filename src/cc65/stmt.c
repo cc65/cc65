@@ -242,7 +242,7 @@ static void ReturnStatement (void)
 
     NextToken ();
     if (CurTok.Tok != TOK_SEMI) {
-       	if (HasVoidReturn (CurrentFunc)) {
+       	if (F_HasVoidReturn (CurrentFunc)) {
        	    Error ("Returning a value in function with return type void");
        	}
 
@@ -250,18 +250,18 @@ static void ReturnStatement (void)
 	expression (&lval);
 
     	/* Convert the return value to the type of the function result */
-    	if (!HasVoidReturn (CurrentFunc)) {
-       	    assignadjust (GetReturnType (CurrentFunc), &lval);
+    	if (!F_HasVoidReturn (CurrentFunc)) {
+       	    assignadjust (F_GetReturnType (CurrentFunc), &lval);
     	}
-    } else if (!HasVoidReturn (CurrentFunc)) {
-    	Error ("Function `%s' must return a value", GetFuncName (CurrentFunc));
+    } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {
+    	Error ("Function `%s' must return a value", F_GetFuncName (CurrentFunc));
     }
 
     /* Cleanup the stack in case we're inside a block with locals */
-    g_space (oursp - GetTopLevelSP (CurrentFunc));
+    g_space (oursp - F_GetTopLevelSP (CurrentFunc));
 
     /* Output a jump to the function exit code */
-    g_jump (GetRetLab (CurrentFunc));
+    g_jump (F_GetRetLab (CurrentFunc));
 }
 
 

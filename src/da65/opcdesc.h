@@ -46,12 +46,14 @@
 
 /* Constants for Flags */
 enum {
-    flNone      = 0x00,                 /* No flags given */
-    flNoLabel	= 0x00,			/* Don't use a label */
-    flGenLabel 	= 0x01,			/* Generate a label */
-    flUseLabel	= 0x02,			/* Use a label if there is one */
-    flLabel    	= flUseLabel|flGenLabel,/* Generate and use a label */
-    flIllegal   = 0x10                  /* Illegal instruction */
+    flNone          = 0x00,                     /* No flags given */
+    flNoLabel	    = 0x00,			/* Don't use a label */
+    flGenLabel 	    = 0x01,			/* Generate a label */
+    flUseLabel	    = 0x02,			/* Use a label if there is one */
+    flLabel    	    = flUseLabel|flGenLabel,    /* Generate and use a label */
+    flIllegal       = 0x10,                     /* Illegal instruction */
+    flAbsOverride   = 0x20,                     /* Need a: override */
+    flFarOverride   = 0x40                      /* Need f: override */
 };
 
 /* Forward/typedef for struct OpcDesc */

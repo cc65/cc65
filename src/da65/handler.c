@@ -90,6 +90,20 @@ static void OneLine (const OpcDesc* D, const char* Arg, ...)
 
 
 
+static const char* GetAbsOverride (unsigned Flags, unsigned Addr)
+/* If the instruction requires an abs override modifier, return the necessary
+ * string, otherwise return the empty string.
+ */
+{
+    if (Flags & flAbsOverride && Addr < 0x100) {
+        return "a:";
+    } else {
+        return "";
+    }
+}
+
+
+
 static const char* GetAddrArg (unsigned Flags, unsigned Addr)
 /* Return an address argument - a label if we have one, or the address itself */
 {
@@ -212,7 +226,7 @@ void OH_Absolute (const OpcDesc* D)
     GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
+    OneLine (D, "%s%s", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -226,7 +240,7 @@ void OH_AbsoluteX (const OpcDesc* D)
     GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%s,x", GetAddrArg (D->Flags, Addr));
+    OneLine (D, "%s%s,x", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -240,7 +254,7 @@ void OH_AbsoluteY (const OpcDesc* D)
     GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%s,y", GetAddrArg (D->Flags, Addr));
+    OneLine (D, "%s%s,y", GetAbsOverride (D->Flags, Addr), GetAddrArg (D->Flags, Addr));
 }
 
 

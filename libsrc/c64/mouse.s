@@ -13,7 +13,7 @@
 
 	.import		_readjoy
        	.import	       	popax, addysp1
-   	.importzp   	ptr1, sp, sreg
+   	.importzp   	ptr1, sp
 
    	.include    	"c64.inc"
 

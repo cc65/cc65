@@ -1,11 +1,40 @@
-/*
- * TEST VERSION - CURRENTLY C64 SPECIFIC!!!
- */
+/*****************************************************************************/
+/*                                                                           */
+/*                                tgi_load.c                                 */
+/*                                                                           */
+/*                       Loader module for TGI drivers                       */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 2002      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
 
 
 
+#include <stdio.h>
 #include <string.h>
-#include <cbm.h>
 #include <modload.h>
 #include <tgi.h>
 #include <tgi/tgi-kernel.h>
@@ -14,7 +43,7 @@
 
 static unsigned char ReadInputBlock (struct mod_ctrl* C, void* Buf, unsigned Size)
 {
-    return (cbm_read (1, Buf, Size) != Size);
+    return (fread (Buf, 1, Size, C->callerdata) != Size);
 }
 
 
@@ -55,14 +84,17 @@ void __fastcall__ tgi_load_driver (const char* name)
     }
 
     /* Now open the file */
-    if (cbm_open (1, 8, 2, name) != 0) {
+    ctrl.callerdata = fopen (name, "r");
+    if (ctrl.callerdata == 0) {
         tgi_error = TGI_ERR_CANNOT_LOAD;
         return;
     }
 
     /* Load the module */
     Res = mod_load (&ctrl);
-    cbm_close (1);
+
+    /* Close the input file */
+    fclose (ctrl.callerdata);
 
     /* Check the return code */
     if (Res == MLOAD_OK) {

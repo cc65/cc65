@@ -52,7 +52,7 @@
 
 
 
-static char ParseChar (StrBuf* B)
+static int ParseChar (StrBuf* B)
 /* Parse a character. Converts \n into EOL, etc. */
 {
     unsigned I;
@@ -61,6 +61,9 @@ static char ParseChar (StrBuf* B)
     /* Check for escape chars */
     if ((C = SB_Get (B)) == '\\') {
 	switch (SB_Get (B)) {
+	    case 'a':
+	       	C = '\a';
+	    	break;
 	    case 'b':
 	       	C = '\b';
 	    	break;
@@ -76,6 +79,9 @@ static char ParseChar (StrBuf* B)
 	    case 't':
 	    	C = '\t';
 	    	break;
+	    case 'v':
+	    	C = '\v';
+	    	break;
 	    case '\"':
 	    	C = '\"';
 	    	break;
@@ -85,14 +91,17 @@ static char ParseChar (StrBuf* B)
 	    case '\\':
 		C = '\\';
 		break;
+	    case '\?':
+		C = '\?';
+		break;
 	    case 'x':
 	    case 'X':
 		/* Hex character constant */
        	       	C = HexVal (SB_Get (B)) << 4;
        	       	C |= HexVal (SB_Get (B));
-		break;
+	   	break;
 	    case '0':
-		/* Octal constant */
+	   	/* Octal constant */
                 C = 0;
                 goto Octal;
 	    case '1':
@@ -101,22 +110,18 @@ static char ParseChar (StrBuf* B)
 Octal:          I = 0;
        	       	while (SB_Peek (B) >= '0' && SB_Peek (B) <= '7' && I++ < 4) {
                     C = (C << 3) | (SB_Get (B) - '0');
-     		}
+     	   	}
      	       	break;
      	    default:
      	    	Error ("Illegal character constant");
-		C = ' ';
-		break;
+	   	C = ' ';
+	   	break;
      	}
     }
 
     /* Return the character */
     return C;
 }
-
-
-
-
 
 
 
@@ -139,7 +144,7 @@ void SB_SkipWhite (StrBuf* B)
 int SB_GetSym (StrBuf* B, char* S)
 /* Get a symbol from the string buffer. S must be able to hold MAX_IDENTLEN
  * characters. Returns 1 if a symbol was found and 0 otherwise.
- */
+ */                               
 {
     if (IsIdent (SB_Peek (B))) {
         unsigned I = 0;

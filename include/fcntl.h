@@ -59,8 +59,8 @@ typedef long int off_t;
 /* Functions */
 int open (const char* name, int flags, ...);	/* May take a mode argument */
 int __fastcall__ close (int fd);
-int write (int fd, const void* buf, unsigned count);
-int read (int fd, void* buf, unsigned count);
+int __fastcall__ write (int fd, const void* buf, unsigned count);
+int __fastcall__ read (int fd, void* buf, unsigned count);
 int mkdir (const char* name, ...);		/* May take a mode argument */
 int rmdir (const char* name);
 off_t __fastcall__ lseek(int fd, off_t offset, int whence);

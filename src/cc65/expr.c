@@ -2631,9 +2631,6 @@ static int hieQuest (ExprDesc *lval)
     type* type2; 	       	/* Type of expression 2 */
     type* type3;	       	/* Type of expression 3 */
     type* rtype;	       	/* Type of result */
-    CodeMark Mark1;		/* Save position in output code */
-    CodeMark Mark2;		/* Save position in output code */
-
 
 
     k = Preprocessing? hieOrPP (lval) : hieOr (lval);
@@ -2692,14 +2689,12 @@ static int hieQuest (ExprDesc *lval)
 	     * the type cast code for expr2.
 	     */
        	    labf = GetLocalLabel (); 	/* Get new label */
-	    Mark1 = GetCodePos ();	/* Remember current position */
 	    g_jump (labf);	    	/* Jump around code */
 
 	    /* The jump for expr2 goes here */
     	    g_defcodelabel (labt);
 
 	    /* Create the typecast code for expr2 */
-	    Mark2 = GetCodePos ();	/* Remember position */
 	    g_typecast (TypeOf (rtype), TypeOf (type2));
 
 	    /* Jump here around the typecase code. */
@@ -2709,7 +2704,7 @@ static int hieQuest (ExprDesc *lval)
 	} else if (IsClassPtr (type2) && IsClassPtr (type3)) {
 	    /* Must point to same type */
 	    if (TypeCmp (Indirect (type2), Indirect (type3)) < TC_EQUAL) {
-		Error ("Incompatible pointer types");
+	    	Error ("Incompatible pointer types");
 	    }
 	    /* Result has the common type */
 	    rtype = lval2.Type;

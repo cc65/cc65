@@ -39,6 +39,7 @@
 #include "xsprintf.h"
 
 /* cc65 */
+#include "asmlabel.h"
 #include "codegen.h"
 #include "datatype.h"
 #include "error.h"
@@ -275,6 +276,31 @@ static void ParseLVarArg (StrBuf* T, unsigned Arg)
 
 
 
+static void ParseLabelArg (StrBuf* T, unsigned Arg attribute ((unused)))
+/* Parse the %g format specifier */
+{
+    /* We expect an identifier separated by a comma */
+    ConsumeComma ();
+    if (CurTok.Tok != TOK_IDENT) {
+
+        Error ("Label name expected");
+
+    } else {
+
+     	/* Add a new label symbol if we don't have one until now */
+       	SymEntry* Entry = AddLabelSym (CurTok.Ident, SC_REF);
+
+     	/* Append the label name to the buffer */
+     	SB_AppendStr (T, LocalLabelName (Entry->V.Label));
+
+        /* Eat the label name */
+        NextToken ();
+
+    }
+}
+
+
+
 static void ParseStrArg (StrBuf* T, unsigned Arg attribute ((unused)))
 /* Parse the %s format specifier */
 {
@@ -340,6 +366,7 @@ static void ParseAsm (void)
      *   %l	- Numerical 32 bit value
      *   %v	- Assembler name of a (global) variable
      *   %o	- Stack offset of a (local) variable
+     *   %g	- Assembler name of a C label
      *   %s     - Any argument converted to a string (almost)
      *   %%	- The % sign
      */
@@ -359,13 +386,14 @@ static void ParseAsm (void)
        	    ++Arg;
             C = SB_Get (&S);
             switch (C) {
-                case '%':   SB_AppendChar (&T, '%');        break;
-                case 'b':   ParseByteArg (&T, Arg);         break;
-                case 'l':   ParseLongArg (&T, Arg);         break;
-                case 'o':   ParseLVarArg (&T, Arg);         break;
-                case 's':   ParseStrArg (&T, Arg);          break;
-                case 'v':   ParseGVarArg (&T, Arg);         break;
-                case 'w':   ParseWordArg (&T, Arg);         break;
+                case '%':   SB_AppendChar (&T, '%');    break;
+                case 'b':   ParseByteArg (&T, Arg);     break;
+		case 'g':   ParseLabelArg (&T, Arg);    break;
+                case 'l':   ParseLongArg (&T, Arg);     break;
+                case 'o':   ParseLVarArg (&T, Arg);     break;
+                case 's':   ParseStrArg (&T, Arg);      break;
+                case 'v':   ParseGVarArg (&T, Arg);     break;
+                case 'w':   ParseWordArg (&T, Arg);     break;
                 default:
                     Error ("Error in __asm__ format specifier %u", Arg);
                     AsmErrorSkip ();

@@ -40,6 +40,7 @@
 #include <ctype.h>
 
 /* common */
+#include "chartype.h"
 #include "xsprintf.h"
 
 /* ld65 */
@@ -177,11 +178,11 @@ Again:
     CfgErrorCol  = InputCol;
 
     /* Identifier? */
-    if (C == '_' || isalpha (C)) {
+    if (C == '_' || IsAlpha (C)) {
 
 	/* Read the identifier */
 	I = 0;
-	while (C == '_' || isalnum (C)) {
+	while (C == '_' || IsAlNum (C)) {
 	    if (I < CFG_MAX_IDENT_LEN) {
 	        CfgSVal [I++] = C;
 	    }
@@ -520,7 +521,7 @@ void CfgOpenInput (void)
 
     /* Initialize variables */
     C         = ' ';
-    InputLine = 1;		
+    InputLine = 1;
     InputCol  = 0;
 
     /* Start the ball rolling ... */

@@ -102,7 +102,7 @@ void FreeStrBuf (StrBuf* B)
 
 
 
-void SB_Realloc (StrBuf* B, unsigned NewSize)
+static void SB_Realloc (StrBuf* B, unsigned NewSize)
 /* Reallocate the string buffer space, make sure at least NewSize bytes are
  * available.
  */
@@ -133,6 +133,18 @@ char SB_At (const StrBuf* B, unsigned Index)
     return B->Buf[Index];
 }
 #endif
+
+
+
+void SB_Drop (StrBuf* B, unsigned Count)
+/* Drop characters from the end of the string. */
+{
+    PRECONDITION (Count <= B->Len);
+    B->Len -= Count;
+    if (B->Index > B->Len) {
+        B->Index = B->Len;
+    }
+}
 
 
 

@@ -90,11 +90,6 @@ StrBuf* NewStrBuf (void);
 void FreeStrBuf (StrBuf* B);
 /* Free a string buffer */
 
-void SB_Realloc (StrBuf* B, unsigned NewSize);
-/* Reallocate the string buffer space, make sure at least NewSize bytes are
- * available. THIS IS NOT A USER CALLABLE FUNCTION!
- */
-
 #if defined(HAVE_INLINE)
 INLINE unsigned SB_GetLen (StrBuf* B)
 /* Return the length of the buffer contents */
@@ -168,13 +163,33 @@ INLINE int SB_IsEmpty (const StrBuf* B)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int SB_NotEmpty (const StrBuf* B)
+/* Return true if the string buffer is not empty */
+{
+    return (B->Len > 0);
+}
+#else
+#  define SB_NotEmpty(B) ((B)->Len > 0)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE void SB_Clear (StrBuf* B)
 /* Clear the string buffer (make it empty) */
 {
-    B->Len = 0;
+    B->Len = B->Index = 0;
 }
 #else
-#  define SB_Clear(B)   ((B)->Len = 0)
+#  define SB_Clear(B)   ((B)->Len = (B)->Index = 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void SB_Reset (StrBuf* B)
+/* Reset the string buffer index to zero */
+{
+    B->Index = 0;
+}
+#else
+#  define SB_Reset(B)   ((B)->Index = 0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -190,7 +205,7 @@ INLINE char SB_Get (StrBuf* B)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE char SB_Peek (StrBuf* B)
+INLINE char SB_Peek (const StrBuf* B)
 /* Look at the next character from the string without incrementing Index.
  * Returns NUL if the end of the string is reached.
  */
@@ -199,6 +214,30 @@ INLINE char SB_Peek (StrBuf* B)
 }
 #else
 #  define SB_Peek(B)     (((B)->Index < (B)->Len)? (B)->Buf[(B)->Index] : '\0')
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE char SB_LookAt (const StrBuf* B, unsigned Index)
+/* Look at a specific character from the string. Returns NUL if the given
+ * index is greater than the size of the string.
+ */
+{
+    return (Index < B->Len)? B->Buf[Index] : '\0';
+}
+#else
+#  define SB_Peek(B,Index)     (((Index) < (B)->Len)? (B)->Buf[(Index)] : '\0')
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE char SB_LookAtLast (const StrBuf* B)
+/* Look at the last character from the string. Returns NUL if the string buffer
+ * is empty.
+ */
+{
+    return (B->Len > 0)? B->Buf[B->Len-1] : '\0';
+}
+#else
+#  define SB_LookAtLast(B)      (((B)->Len > 0)? (B)->Buf[(B)->Len-1] : '\0')
 #endif
 
 #if defined(HAVE_INLINE)
@@ -212,6 +251,9 @@ INLINE void SB_Skip (StrBuf* B)
 #else
 #  define SB_Skip(B)     do { if ((B)->Index < (B)->Len) ++(B)->Index; } while (0)
 #endif
+
+void SB_Drop (StrBuf* B, unsigned Count);
+/* Drop characters from the end of the string. */
 
 void SB_Terminate (StrBuf* B);
 /* Zero terminate the given string buffer. NOTE: The terminating zero is not

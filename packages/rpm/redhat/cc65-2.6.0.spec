@@ -72,6 +72,7 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 %files c64
 %attr(644,root,root)		/usr/lib/cc65/lib/c64.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/c64.o
+%doc src/ld65/cfg/c64.cfg
 
 
 
@@ -92,11 +93,12 @@ programs for the Commodore C128 using the cc65 crosscompiler.
 %files c128
 %attr(644,root,root)		/usr/lib/cc65/lib/c128.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/c128.o
+%doc src/ld65/cfg/c128.cfg
 
 
 
 ###############################################################################
-#	   		       Atari subpackage				      #
+#	   	      	       Atari subpackage				      #
 ###############################################################################
 
 %package atari
@@ -110,13 +112,14 @@ This package contains the header files and libraries needed to write
 programs for the 8 bit Atari machines using the cc65 crosscompiler.
 
 %files atari
-%attr(644,root,root)		/usr/lib/cc65/lib/atari.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/atari.o
+%attr(644,root,root)  		/usr/lib/cc65/lib/atari.lib
+%attr(644,root,root)  		/usr/lib/cc65/lib/atari.o
+%doc src/ld65/cfg/atari.cfg
 
 
 
 ###############################################################################
-#			       Plus/4 subpackage			      #
+#		       	       Plus/4 subpackage			      #
 ###############################################################################
 
 %package plus4
@@ -131,13 +134,14 @@ programs for the Commodore Plus/4 and C16/116 using the cc65
 crosscompiler.
 
 %files plus4
-%attr(644,root,root)		/usr/lib/cc65/lib/plus4.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/plus4.o
+%attr(644,root,root)   		/usr/lib/cc65/lib/plus4.lib
+%attr(644,root,root)   		/usr/lib/cc65/lib/plus4.o
+%doc src/ld65/cfg/plus4.cfg
 
 
 
 ###############################################################################
-#				PET subpackage	       		       	      #
+#		       		PET subpackage	       		       	      #
 ###############################################################################
 
 %package pet
@@ -154,11 +158,12 @@ crosscompiler.
 %files pet
 %attr(644,root,root)		/usr/lib/cc65/lib/pet.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/pet.o
+%doc src/ld65/cfg/pet.cfg
 
 
 
 ###############################################################################
-#			       CBM610 subpackage       			      #
+#		       	       CBM610 subpackage       			      #
 ###############################################################################
 
 %package cbm610
@@ -173,8 +178,9 @@ programs for the Commodore PET-II (CBM600/700) family of computers using
 the cc65 crosscompiler.
 
 %files cbm610
-%attr(644,root,root)		/usr/lib/cc65/lib/cbm610.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/cbm610.o
+%attr(644,root,root)   		/usr/lib/cc65/lib/cbm610.lib
+%attr(644,root,root)   		/usr/lib/cc65/lib/cbm610.o
+%doc src/ld65/cfg/cbm610.cfg
 
 
 
@@ -195,6 +201,7 @@ programs for the Apple ][ using the cc65 crosscompiler.
 %files apple2
 %attr(644,root,root)		/usr/lib/cc65/lib/apple2.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/apple2.o
+%doc src/ld65/cfg/apple2.cfg
 
 
 
@@ -218,11 +225,12 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 %attr(644,root,root)		/usr/lib/cc65/lib/geos.o
 %attr(755,root,root) %dir	/usr/lib/cc65/include/geos
 %attr(644,root,root)   		/usr/lib/cc65/include/geos/*.h
+%doc src/ld65/cfg/geos.cfg
 
 
 
 ###############################################################################
-#				     Build				      #
+#		      		     Build				      #
 ###############################################################################
 
 
@@ -247,7 +255,7 @@ cd ..
 
 
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{lib,include/geos,sample}}
+mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{lib,include/geos}}
 
 # Binaries
 install -s -m 755 src/ar65/ar65 $RPM_BUILD_ROOT/usr/bin

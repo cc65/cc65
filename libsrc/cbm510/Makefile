@@ -1,0 +1,35 @@
+#
+# makefile for CC65 runtime library
+#
+
+.SUFFIXES: .o .s .c
+
+%.o:   	%.c
+	@$(CC) $(CFLAGS) $<
+	@$(AS) -o $@ $(AFLAGS) $(*).s
+
+%.o:	%.s
+	@$(AS) -g -o $@ $(AFLAGS) $<
+
+OBJS =	_scrsize.o	\
+	banking.o	\
+       	break.o		\
+       	cgetc.o		\
+	clrscr.o	\
+       	color.o		\
+       	cputc.o		\
+       	crt0.o 		\
+       	crtc.o 		\
+       	kbhit.o		\
+       	kirq.o 		\
+       	kplot.o		\
+	kscnkey.o	\
+	kudtim.o	\
+	pokesys.o	\
+	rs232.o
+
+all:	$(OBJS)
+
+clean:
+	@rm -f $(OBJS)
+

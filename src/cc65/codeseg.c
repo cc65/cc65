@@ -39,6 +39,7 @@
 /* common */
 #include "chartype.h"
 #include "check.h"
+#include "debugflag.h"
 #include "global.h"
 #include "hashstr.h"
 #include "strutil.h"

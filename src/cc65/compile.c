@@ -37,6 +37,7 @@
 #include <time.h>
 
 /* common */
+#include "debugflag.h"
 #include "version.h"
 #include "xmalloc.h"
 #include "xsprintf.h"

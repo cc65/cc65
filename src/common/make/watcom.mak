@@ -47,6 +47,7 @@ OBJS =	abend.obj	\
 	check.obj	\
 	cmdline.obj	\
 	coll.obj	\
+        debugflag.obj   \
 	exprdefs.obj	\
 	filepos.obj	\
 	fname.obj	\

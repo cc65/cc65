@@ -42,6 +42,7 @@
 #include "abend.h"
 #include "chartype.h"
 #include "cmdline.h"
+#include "debugflag.h"
 #include "fname.h"
 #include "print.h"
 #include "segdefs.h"
@@ -401,10 +402,10 @@ static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptDebug (const char* Opt attribute ((unused)),
-		      const char* Arg attribute ((unused)))
+	       	      const char* Arg attribute ((unused)))
 /* Compiler debug mode */
 {
-    Debug = 1;
+    ++Debug; 
 }
 
 

@@ -54,7 +54,7 @@ void* xmalloc (size_t Size);
 void* xrealloc (void* P, size_t Size);
 /* Reallocate a memory block, check for out of memory */
 
-void xfree (const void* Block);
+void xfree (void* Block);
 /* Free the block, do some debugging */
 
 char* xstrdup (const char* S);

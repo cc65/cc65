@@ -15,6 +15,7 @@ OBJS =	abend.o		\
 	check.o		\
 	cmdline.o	\
 	coll.o		\
+        debugflag.o     \
 	exprdefs.o	\
 	filepos.o	\
 	fname.o		\

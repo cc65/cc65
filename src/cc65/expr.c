@@ -11,6 +11,7 @@
 
 /* common */
 #include "check.h"
+#include "debugflag.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -1628,11 +1629,11 @@ int hie10 (ExprDesc* lval)
             /* If the expression is already a pointer to function, the
              * additional dereferencing operator must be ignored.
              */
-            if (IsTypeFuncPtr (lval->Type)) {               
+            if (IsTypeFuncPtr (lval->Type)) {
                 /* Expression not storable */
                 return 0;
             } else {
-                if (IsClassPtr (lval->Type)) {                
+                if (IsClassPtr (lval->Type)) {
                     lval->Type = Indirect (lval->Type);
                 } else {
                     Error ("Illegal indirection");

@@ -114,7 +114,7 @@ void InsertImport (Import* I)
     unsigned HashVal;
 
     /* As long as the import is not inserted, V.Name is valid */
-    const char* Name = I->V.Name;
+    char* Name = I->V.Name;
 
     /* Create a hash value for the given name */
     HashVal = HashStr (Name) % HASHTAB_SIZE;

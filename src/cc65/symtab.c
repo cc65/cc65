@@ -40,6 +40,7 @@
 
 /* common */
 #include "check.h"
+#include "debugflag.h"
 #include "hashstr.h"
 #include "xmalloc.h"
 

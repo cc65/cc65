@@ -95,7 +95,7 @@ struct InputFile_ {
 /* Struct to handle textual input data */
 typedef struct InputData_ InputData;
 struct InputData_ {
-    const char*	    Data;		/* Pointer to the data */
+    char*	    Data;		/* Pointer to the data */
     const char*     Pos;		/* Pointer to current position */
     int		    Malloced;		/* Memory was malloced */
     enum Token	    Tok;	    	/* Last token */
@@ -370,7 +370,7 @@ void DoneInputFile (void)
 
 
 
-void NewInputData (const char* Data, int Malloced)
+void NewInputData (char* Data, int Malloced)
 /* Add a chunk of input data to the input stream */
 {
     InputData* I;

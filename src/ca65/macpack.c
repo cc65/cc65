@@ -50,7 +50,7 @@
 
 
 /* Predefined packages */
-static const char MacGeneric [] = 	/* Generic macros */
+static char MacGeneric [] = 	        /* Generic macros */
     ".macro  add     Arg1, Arg2\n"
     "        clc\n"
     "        .if .paramcount = 2\n"
@@ -70,7 +70,7 @@ static const char MacGeneric [] = 	/* Generic macros */
 
 
 
-static const char MacLongBranch [] =	/* Long branch macros */
+static char MacLongBranch [] =	        /* Long branch macros */
     ".macro  jeq     Target\n"
     "        .if     .match(Target, 0)\n"
     "        bne     *+5\n"
@@ -163,7 +163,7 @@ static const char MacLongBranch [] =	/* Long branch macros */
 
 
 /* Table with pointers to the different packages */
-static const char* MacPackages [] = {
+static char* MacPackages [] = {
     MacGeneric,
     MacLongBranch,
 };

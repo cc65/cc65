@@ -186,7 +186,7 @@ enum Token {
     TOK_P816,
     TOK_PAGELENGTH,
     TOK_PARAMCOUNT,
-    TOK_PC02,   
+    TOK_PC02,
     TOK_POPSEG,
     TOK_PROC,
     TOK_PUSHSEG,
@@ -240,7 +240,7 @@ void NewInputFile (const char* Name);
 void DoneInputFile (void);
 /* Close the current input file */
 
-void NewInputData (const char* Data, int Malloced);
+void NewInputData (char* Data, int Malloced);
 /* Add a chunk of input data to the input stream */
 
 void LocaseSVal (void);

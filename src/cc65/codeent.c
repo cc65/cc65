@@ -39,6 +39,7 @@
 /* common */
 #include "chartype.h"
 #include "check.h"
+#include "debugflag.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
 

@@ -65,7 +65,7 @@ struct Import {
     FilePos  		Pos;		/* File position of reference */
     union {
 	struct Export*	Exp;		/* Matching export for this import */
-	const char*  	Name;		/* Name if not in table */
+	char*  	        Name;		/* Name if not in table */
     } V;
     unsigned char    	Type;		/* Type of import */
 };

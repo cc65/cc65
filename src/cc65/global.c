@@ -59,7 +59,6 @@ unsigned char StaticLocals	= 0;   	/* Make local variables static */
 unsigned char SignedChars	= 0;	/* Make characters signed by default */
 unsigned char AddSource		= 0; 	/* Add source lines as comments */
 unsigned char DebugInfo		= 0;	/* Add debug info to the obj */
-unsigned char Debug		= 0;	/* Debug mode */
 unsigned char CreateDep		= 0;	/* Create a dependency file */
 unsigned char CheckStack	= 0;	/* Generate stack overflow checks */
 

@@ -37,12 +37,13 @@
 #include <string.h>
 
 #include "abend.h"
+#include "debugflag.h"
 #include "xmalloc.h"
 
 
 
 /*****************************************************************************/
-/*		 		     code				     */
+/*		      		     code				     */
 /*****************************************************************************/
 
 
@@ -81,10 +82,10 @@ void* xrealloc (void* P, size_t Size)
 
 
 
-void xfree (const void* Block)
+void xfree (void* Block)
 /* Free the block, do some debugging */
 {
-    free ((void*) Block);
+    free (Block);
 }
 
 

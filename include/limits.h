@@ -41,7 +41,7 @@
 #define CHAR_BIT	8
 
 #define SCHAR_MIN	((signed char) 0x80)
-#define SCHAR_MAX	127                
+#define SCHAR_MAX	127
 
 #define UCHAR_MAX	255
 
@@ -59,7 +59,7 @@
 #define UINT_MAX	65535U
 
 #define LONG_MAX	2147483647L
-#define LONG_MIN       	((long) 0x8000000)
+#define LONG_MIN       	((long) 0x80000000)
 
 #define ULONG_MAX	4294967295UL
 

@@ -9,7 +9,7 @@
 /* (C) 2000-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -102,10 +102,20 @@ void* CollLast (Collection* C);
 const void* CollConstLast (const Collection* C);
 /* Return the last item in a collection */
 
+int CollIndex (Collection* C, const void* Item);
+/* Return the index of the given item in the collection. Return -1 if the
+ * item was not found in the collection.
+ */
+
 void CollDelete (Collection* C, unsigned Index);
 /* Remove the item with the given index from the collection. This will not
  * free the item itself, just the pointer. All items with higher indices
  * will get moved to a lower position.
+ */
+
+void CollDeleteItem (Collection* C, const void* Item);
+/* Delete the item pointer from the collection. The item must be in the
+ * collection, otherwise FAIL will be called.
  */
 
 void CollDeleteAll (Collection* C);

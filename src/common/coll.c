@@ -9,7 +9,7 @@
 /* (C) 2000-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -195,6 +195,26 @@ const void* CollConstLast (const Collection* C)
 
 
 
+int CollIndex (Collection* C, const void* Item)
+/* Return the index of the given item in the collection. Return -1 if the
+ * item was not found in the collection.
+ */					       
+{
+    /* Linear search */
+    unsigned I;
+    for (I = 0; I < C->Count; ++I) {
+	if (Item == C->Items[I]) {
+	    /* Found */
+	    return (int)I;
+	}
+    }
+
+    /* Not found */
+    return -1;
+}
+
+
+
 void CollDelete (Collection* C, unsigned Index)
 /* Remove the item with the given index from the collection. This will not
  * free the item itself, just the pointer. All items with higher indices
@@ -211,10 +231,26 @@ void CollDelete (Collection* C, unsigned Index)
 
 
 
+void CollDeleteItem (Collection* C, const void* Item)
+/* Delete the item pointer from the collection. The item must be in the
+ * collection, otherwise FAIL will be called.
+ */
+{
+    /* Get the index of the entry */
+    int Index = CollIndex (C, Item);
+    CHECK (Index >= 0);
+
+    /* Delete the item with this index */
+    --C->Count;
+    memmove (C->Items+Index, C->Items+Index+1, (C->Count-Index) * sizeof (void*));
+}
+
+
+
 void CollDeleteAll (Collection* C)
 /* Delete all items from the given collection. This will not free the items
  * itself, it will only remove the pointers.
- */				  
+ */
 {
     /* This one is easy... */
     C->Count = 0;

@@ -1589,7 +1589,6 @@ static void OptLoads (void)
 
 	    /* Delete the remaining lines */
 	    FreeLines (L2 [0], L2 [3]);
-	}
 
 	/* Check for
 	 *
@@ -1616,7 +1615,7 @@ static void OptLoads (void)
       	 * possible to rewrite the library routine to get rid of the additional
       	 * overhead.
       	 */
-      	if (LineMatch (L, "\tldy\t#$")			&&
+       	} else if (LineMatch (L, "\tldy\t#$")  		&&
       	    GetNextCodeLines (L, L2, 6)			&&
       	    LineFullMatch (L2 [0], "\tlda\t(sp),y")	&&
       	    LineFullMatch (L2 [1], "\ttax")		&&
@@ -1637,7 +1636,6 @@ static void OptLoads (void)
 
 	    /* Delete the remaining lines */
 	    FreeLines (L2 [0], L2 [3]);
-	}
 
 	/* Search for:
      	 *
@@ -1648,14 +1646,44 @@ static void OptLoads (void)
 	 *
        	 *     	jsr    	pushaysp
 	 */
-       	if (LineFullMatch (L, "\tlda\t(sp),y")		&&
+       	} else if (LineFullMatch (L, "\tlda\t(sp),y")	&&
       	    GetNextCodeLines (L, L2, 1)	       	       	&&
       	    LineFullMatch (L2 [0], "\tjsr\tpusha")) {
 
 	    /* Found, replace it */
 	    L = ReplaceLine (L, "\tjsr\tpushaysp");
 	    FreeLine (L2 [0]);
+
+	/* Search for:
+	 *
+	 *     	ldx    	xx
+	 *     	lda	yy
+	 *    	sta	zzz
+	 *    	stx	zzz+1
+	 *
+	 * and replace it by:
+	 *
+	 *     	lda    	xx
+	 *    	sta	zzz
+       	 *     	lda	yy
+	 *    	sta	zzz+1
+	 *
+	 * provided that that the X register is not used later. While this is
+	 * no direct optimization, it helps with other optimizations.
+     	 */
+       	} else if (LineMatch (L, "\tldx\t")		&&
+       	    GetNextCodeLines (L, L2, 3)	 		&&
+      	    LineMatch (L2 [0], "\tlda\t")		&&
+	    Is16BitStore (L2[1], L2[2])			&&
+	    !RegXUsed (L2[2])) {
+
+      	    /* Found - replace it */
+	    NewLineAfter (L2[1], "\tlda\t%s", L->Line+5);
+	    L2[2]->Line[3] = 'a';
+	    FreeLine (L);
+	    L = L2[2]; 
 	}
+
 
        	/* All other patterns start with this one: */
 	if (!LineFullMatch (L, "\tldx\t#$00")) {

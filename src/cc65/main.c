@@ -556,15 +556,23 @@ static void OptListOptSteps (const char* Opt attribute ((unused)),
 static void OptMemoryModel (const char* Opt, const char* Arg)
 /* Set the memory model */
 {
+    mmodel_t M;
+
+    /* Check the current memory model */
     if (MemoryModel != MMODEL_UNKNOWN) {
         AbEnd ("Cannot use option `%s' twice", Opt);
     }
-    MemoryModel = FindMemoryModel (Arg);
-    if (MemoryModel == MMODEL_UNKNOWN) {
+
+    /* Translate the memory model name and check it */
+    M = FindMemoryModel (Arg);
+    if (M == MMODEL_UNKNOWN) {
         AbEnd ("Unknown memory model: %s", Arg);
-    } else if (MemoryModel == MMODEL_HUGE) {
+    } else if (M == MMODEL_HUGE) {
         AbEnd ("Unsupported memory model: %s", Arg);
     }
+
+    /* Set the memory model */
+    SetMemoryModel (M);
 }
 
 

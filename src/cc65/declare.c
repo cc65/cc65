@@ -38,6 +38,8 @@
 #include <errno.h>
 
 /* common */
+#include "addrsize.h"
+#include "mmodel.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -843,6 +845,13 @@ static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
      	Sym = Sym->PrevSym;
     }
 
+    /* Add the default address size for the function */
+    if (CodeAddrSize == ADDR_SIZE_FAR) {
+        F->Flags |= FD_FAR;
+    } else {
+        F->Flags |= FD_NEAR;
+    }
+
     /* Leave the lexical level remembering the symbol tables */
     RememberFunctionLevel (F);
 
@@ -903,7 +912,10 @@ static void ApplyFunctionModifiers (type* T, unsigned Flags)
         Flags &= ~FD_FASTCALL;
     }
 
-    /* Add the flags */
+    /* Remove the default function address size modifiers */
+    F->Flags &= ~(FD_NEAR | FD_FAR);
+
+    /* Add the new modifers */
     F->Flags |= Flags;
 }
 

@@ -36,9 +36,12 @@
 #include <stdio.h>
 #include <stddef.h>
 #include <string.h>
+#include <limits.h>
 
+/* common */
 #include "chartype.h"
 #include "check.h"
+#include "inttypes.h"
 #include "xsprintf.h"
 
 
@@ -53,8 +56,8 @@
  * features only the basic format specifiers (especially the floating point
  * stuff is missing), but may be extended if required. Reason for supplying
  * my own implementation is that vsnprintf is standard but not implemented by
- * older compilers, and some that implement it in some way or the other, don't
- * adhere to the standard (for example Microsoft with its _vsnprintf).
+ * older compilers, and some that implement it, don't adhere to the standard
+ * (for example Microsoft with its _vsnprintf).
  */
 
 typedef struct {
@@ -104,13 +107,13 @@ typedef struct {
         lmShort,
         lmInt,
         lmLong,
+        lmIntMax,
         lmSizeT,
         lmPtrDiffT,
         lmLongDouble,
 
         /* Unsupported modifiers */
         lmLongLong = lmLong,
-        lmIntMax = lmLong,
 
         /* Default length is integer */
         lmDefault = lmInt
@@ -140,7 +143,7 @@ static void AddPadding (PrintfCtrl* P, char C, unsigned Count)
 
 
 
-static long NextIVal (PrintfCtrl*P)
+static intmax_t NextIVal (PrintfCtrl*P)
 /* Read the next integer value from the variable argument list */
 {
     switch (P->LengthMod) {
@@ -148,7 +151,8 @@ static long NextIVal (PrintfCtrl*P)
         case lmShort:       return (short) va_arg (P->ap, int);
         case lmInt:         return (int) va_arg (P->ap, int);
         case lmLong:        return (long) va_arg (P->ap, long);
-        case lmSizeT:       return (unsigned long) va_arg (P->ap, size_t);
+        case lmIntMax:      return va_arg (P->ap, intmax_t);
+        case lmSizeT:       return (uintmax_t) va_arg (P->ap, size_t);
         case lmPtrDiffT:    return (long) va_arg (P->ap, ptrdiff_t);
         default:            FAIL ("Invalid type size in NextIVal");
     }
@@ -156,23 +160,24 @@ static long NextIVal (PrintfCtrl*P)
 
 
 
-static unsigned long NextUVal (PrintfCtrl*P)
+static uintmax_t NextUVal (PrintfCtrl*P)
 /* Read the next unsigned integer value from the variable argument list */
 {
     switch (P->LengthMod) {
         case lmChar:        return (unsigned char) va_arg (P->ap, unsigned);
         case lmShort:       return (unsigned short) va_arg (P->ap, unsigned);
         case lmInt:         return (unsigned int) va_arg (P->ap, unsigned int);
-        case lmLong:        return va_arg (P->ap, unsigned long);
-        case lmSizeT:       return (unsigned long) va_arg (P->ap, size_t);
-        case lmPtrDiffT:    return (long) va_arg (P->ap, ptrdiff_t);
+        case lmLong:        return (unsigned long) va_arg (P->ap, unsigned long);
+        case lmIntMax:      return va_arg (P->ap, uintmax_t);
+        case lmSizeT:       return va_arg (P->ap, size_t);
+        case lmPtrDiffT:    return (intmax_t) va_arg (P->ap, ptrdiff_t);
         default:            FAIL ("Invalid type size in NextUVal");
     }
 }
 
 
 
-static void ToStr (PrintfCtrl* P, unsigned long Val)
+static void ToStr (PrintfCtrl* P, uintmax_t Val)
 /* Convert the given value to a (reversed) string */
 {
     char* S = P->ArgBuf;
@@ -185,7 +190,7 @@ static void ToStr (PrintfCtrl* P, unsigned long Val)
 
 
 
-static void FormatInt (PrintfCtrl* P, unsigned long Val)
+static void FormatInt (PrintfCtrl* P, uintmax_t Val)
 /* Convert the integer value */
 {
     char Lead[5];
@@ -199,8 +204,8 @@ static void FormatInt (PrintfCtrl* P, unsigned long Val)
     P->CharTable = (P->Flags & fUpcase)? "0123456789ABCDEF" : "0123456789abcedf";
 
     /* Check if the value is negative */
-    if ((P->Flags & fUnsigned) == 0 && ((long) Val) < 0) {
-        Val = -((long) Val);
+    if ((P->Flags & fUnsigned) == 0 && ((intmax_t) Val) < 0) {
+        Val = -((intmax_t) Val);
         Lead[LeadCount++] = '-';
     } else if ((P->Flags & fPlus) != 0) {
         Lead[LeadCount++] = '+';
@@ -212,7 +217,7 @@ static void FormatInt (PrintfCtrl* P, unsigned long Val)
     ToStr (P, Val);
 
     /* The default precision for all integer conversions is one. This means
-     * that the fPrec flag is always set and does not need to be checked 
+     * that the fPrec flag is always set and does not need to be checked
      * later on.
      */
     if ((P->Flags & fPrec) == 0) {
@@ -332,6 +337,23 @@ static void FormatStr (PrintfCtrl* P, const char* Val)
     /* Output right padding if any */
     if (WidthPadding > 0) {
         AddPadding (P, ' ', WidthPadding);
+    }
+}
+
+
+
+static void StoreOffset (PrintfCtrl* P)
+/* Store the current output offset (%n format spec) */
+{
+    switch (P->LengthMod) {
+        case lmChar:     *va_arg (P->ap, int*)       = P->BufFill;
+        case lmShort:    *va_arg (P->ap, int*)       = P->BufFill;
+        case lmInt:      *va_arg (P->ap, int*)       = P->BufFill;
+        case lmLong:     *va_arg (P->ap, long*)      = P->BufFill;
+        case lmIntMax:   *va_arg (P->ap, intmax_t*)  = P->BufFill;
+        case lmSizeT:    *va_arg (P->ap, size_t*)    = P->BufFill;
+        case lmPtrDiffT: *va_arg (P->ap, ptrdiff_t*) = P->BufFill;
+        default: FAIL ("Invalid size modifier for %n format spec in xvsnprintf");
     }
 }
 
@@ -541,6 +563,18 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
                 SPtr = va_arg (P.ap, const char*);
                 CHECK (SPtr != 0);
                 FormatStr (&P, SPtr);
+                break;
+
+            case 'p':
+                /* Use hex format for pointers */
+                P.Flags |= (fUnsigned | fPrec);
+                P.Prec = ((sizeof (void*) * CHAR_BIT) + 3) / 4;
+                P.Base = 16;
+                FormatInt (&P, (uintptr_t) va_arg (P.ap, void*));
+                break;
+
+            case 'n':
+                StoreOffset (&P);
                 break;
 
             default:

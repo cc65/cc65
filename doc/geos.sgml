@@ -45,8 +45,13 @@ default BSW font, which is has 9 points, might be a bit messy.
 GEOS 2.0 so color functions are disabled. Both 40 and 80 columns modes are supported
 and automatically detected.
 <p>
+<tt/tgi/ - TGI driver for GEOS that supports both 40 and 80 columns modes but mode can not be
+changed between <tt/tgi_init/ and <tt/tgi_done/.
+<p>
+<tt/joy/ - JOY driver for GEOS supports only joystick, not current pointing device.
+<p>
 It is safe to use these standard includes and its contents:
-<tt/assert.h, conio.h, dio.h, errno.h, geos.h, joystick.h, mouse.h, stdlib.h, string.h, time.h/
+<tt/assert.h, conio.h, dio.h, errno.h, em.h, geos.h, joystick.h, modload.h, mouse.h, stdlib.h, string.h, tgi.h, time.h/
 <p>
 It was not tested enough, but functions from these includes might work under GEOS:
 <tt/rs232.h, zlib.h/

@@ -1,0 +1,7 @@
+announce.txt
+doc/BUGS
+doc/CREDITS
+doc/*.html
+doc/*.txt
+doc/*.dvi
+doc/readme.1st

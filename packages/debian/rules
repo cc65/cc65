@@ -1,0 +1,75 @@
+#!/usr/bin/make -f
+# Made with the aid of debmake, by Christoph Lameter,
+# based on the sample debian/rules file for GNU hello by Ian Jackson.
+
+export DH_COMPAT=3
+
+build: build-stamp
+
+build-stamp:
+	dh_testdir
+
+	# Add here commands to compile the package.
+	$(MAKE) -C src -f make/gcc.mak
+	$(MAKE) -C libsrc
+	$(MAKE) -C doc
+
+	touch build-stamp
+
+clean:
+	dh_testdir
+	dh_testroot
+	dh_clean
+	-rm -f build-stamp
+	-$(MAKE) -C src -f make/gcc.mak zap
+	-$(MAKE) -C libsrc zap
+	-$(MAKE) -C doc zap
+	-rm -f `find . -name "*~"`
+
+binary-indep: build
+	dh_testdir -i
+	dh_testroot -i
+	dh_installdirs -i
+	for arch in apple2 atari c128 c64 cbm510 cbm610 geos pet plus4; do \
+	  install -m0644 `pwd`/libsrc/$$arch.lib debian/cc65-$$arch/usr/lib/cc65/lib && \
+	  install -m0644 `pwd`/libsrc/$$arch.o debian/cc65-$$arch/usr/lib/cc65/lib; \
+	done
+	dh_installdocs -i
+	dh_installchangelogs -i
+	dh_compress -i
+	dh_fixperms -i
+	dh_installdeb -i
+	dh_shlibdeps -i
+	dh_gencontrol -i
+	dh_md5sums -i
+	dh_builddeb -i
+
+binary-arch: checkroot build
+	dh_testdir -a
+	dh_testroot -a
+	dh_installdirs -a
+	dh_installmenu -a
+	for bin in ar65 ca65 cc65 cl65 da65 grc ld65 od65 ca65html; do \
+	  install -m0755 `pwd`/src/$$bin/$$bin debian/cc65/usr/bin; \
+	done
+	for info in ar65 ca65 cc65 cl65 ld65 debugging dio geos coding intro library; do \
+	  install -m0755 `pwd`/doc/$$info.info* debian/cc65/usr/share/info; \
+	done
+	install -m0644 `pwd`/include/*.h           debian/cc65/usr/lib/cc65/include
+	install -m0644 `pwd`/include/geos/*.h      debian/cc65/usr/lib/cc65/include/geos
+	dh_installman -a
+	dh_installdocs -a
+	dh_installexamples -a
+	dh_installchangelogs -a
+	dh_compress -a
+	dh_fixperms -a
+	dh_strip
+	dh_installdeb -a
+	dh_shlibdeps -a
+	dh_gencontrol -a
+	dh_md5sums -a
+	dh_builddeb -a
+
+binary: binary-indep binary-arch
+
+.PHONY: binary binary-arch binary-indep clean checkroot

@@ -1,0 +1,84 @@
+Source: cc65
+Section: non-free/devel
+Priority: optional
+Maintainer: Michael Klein <michael.klein@puffin.lb.shuttle.de>
+Build-Depends: debhelper, sgml-tools, perl
+Standards-Version: 3.2.1
+
+Package: cc65
+Recommends: cc65-apple2, cc65-atari, cc65-c128, cc65-c64, cc65-cbm510, cc65-cbm610, cc65-geos, cc65-pet, cc65-plus4
+Architecture: any
+Depends: ${shlibs:Depends}
+Description: Crosscompiler/Crossassembler for 6502 systems
+ A C crosscompiler for 6502 systems, including a macroassembler that
+ supports 6502, 65SC02 and 65816 CPUs, a linker, an archiver and some
+ other tools. To create programs for one of the supported target
+ machines, you have to install at least one of the library packages.
+
+Package: cc65-apple2
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: Apple ][ specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Apple ][ using the cc65 crosscompiler.
+
+Package: cc65-atari
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: Atari specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the 8 bit Atari machines using the cc65 crosscompiler.
+
+Package: cc65-c128
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: C128 specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Commodore C128 using the cc65 crosscompiler.
+
+Package: cc65-c64
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: C64 specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Commodore C64 using the cc65 crosscompiler.
+
+Package: cc65-cbm510
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: CBM 510 specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Commodore CBM 510 (aka P500) using the cc65
+ crosscompiler.
+
+Package: cc65-cbm610
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: CBM 610 specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Commodore PET-II (CBM600/700) family of computers using
+ the cc65 crosscompiler.
+
+Package: cc65-geos
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: GEOS specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ GEOS programs for the C64/C128 using the cc65 crosscompiler.
+
+Package: cc65-pet
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: PET specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Commodore PET family of computers using the cc65
+ crosscompiler
+
+Package: cc65-plus4
+Architecture: all
+Depends: cc65 (= ${Source-Version})
+Description: Plus/4 specific libraries and headers for the cc65 compiler
+ This package contains the header files and libraries needed to write
+ programs for the Commodore Plus/4 and C16/116 using the cc65
+ crosscompiler.
+

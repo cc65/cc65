@@ -1,0 +1,21 @@
+#! /bin/sh
+#
+# This is the prerm script for the Debian GNU/Linux cc65 package
+#
+# Written by Michael Klein <michael.klein@puffin.lb.shuttle.de>   
+
+#DEBHELPER#
+
+if [ "$1" = "remove" -o "$1" = "purge" ]; then
+	install-info --quiet --remove /usr/share/info/ar65.info
+	install-info --quiet --remove /usr/share/info/ca65.info
+	install-info --quiet --remove /usr/share/info/cc65.info
+	install-info --quiet --remove /usr/share/info/cl65.info
+	install-info --quiet --remove /usr/share/info/ld65.info
+	install-info --quiet --remove /usr/share/info/debugging.info
+	install-info --quiet --remove /usr/share/info/dio.info
+	install-info --quiet --remove /usr/share/info/geos.info
+	install-info --quiet --remove /usr/share/info/coding.info
+	install-info --quiet --remove /usr/share/info/intro.info
+	install-info --quiet --remove /usr/share/info/library.info
+fi

@@ -1,0 +1,9 @@
+cc65 (2.8.0-1) unstable; urgency=low
+
+  * Initial release.
+
+ -- Michael Klein <michael.klein@puffin.lb.shuttle.de>  Sun,  1 Sep 2002 15:28:51 +0200
+
+Local variables:
+mode: debian-changelog
+End:

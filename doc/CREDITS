@@ -64,7 +64,12 @@ More special thanks to:
 
     Thanks for the contribution of the plasma.c sample program.
 
+  * Craig Bruce
 
+    ...for his public domain Swiftlink/Turbo232 drivers which are part
+    of the cc65 library in modified form.
+
+	       
 
 Thanks to
 

@@ -67,14 +67,12 @@
 
 static void makechar (void)
 {
-    char *font;
-
     static const unsigned char bittab[8] = {
         0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
     };
-    unsigned char i, ii, b;
-    int  c;
-    int  s,bc;
+    register char *font;
+    register unsigned char i, ii, b, bc;
+    unsigned char c;
 
     gotoxy (0, 1);
 
@@ -87,12 +85,11 @@ static void makechar (void)
 
 
     for (c = 0; c < 0x40; ++c) {
-        s = c;
         bc = 0;
         for (i = 0; i < 8; i++){
             b = 0;
             for (ii = 0; ii < 8; ii++) {
-                bc += s;
+                bc += c;
                 if (bc > 0x3f) {
                     bc = bc - 0x40;
                     b += bittab[(ii + (i & 1)) & 0x7];

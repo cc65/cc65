@@ -28,7 +28,7 @@ int sscanf (const char* str, const char* format, ...)
     /* Initialize the indesc struct. We leave all fields uninitialized that we
      * don't need
      */
-    id.buf  = (char*) str;	
+    id.buf  = (char*) str;
     id.fill = strlen (str);
 
     /* Setup for variable arguments */
@@ -37,7 +37,7 @@ int sscanf (const char* str, const char* format, ...)
     /* Call the internal function. Since we know that va_end won't do anything,
      * we will save the call and return the value directly.
      */
-    return _scanf (&id, (const char*) va_fix (ap, 2), ap);
+    return _scanf (&id, format, ap);
 }
 
 

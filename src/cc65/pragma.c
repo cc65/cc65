@@ -237,7 +237,7 @@ static void FlagPragma (StrBuf* B, IntStack* Stack)
         if (IS_GetCount (Stack) < 2) {
             Error ("Cannot pop, stack is empty");
         } else {
-            (void) IS_Pop (Stack);
+            IS_Drop (Stack); 
         }
         /* No other arguments allowed */
         return;

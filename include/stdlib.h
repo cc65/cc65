@@ -84,8 +84,8 @@ long __fastcall__ labs (long val);
 int __fastcall__ atoi (const char* s);
 long __fastcall__ atol (const char* s);
 int __fastcall__ atexit (void (*exitfunc) (void));
-void* bsearch (const void* key, const void* base, size_t n,
-	       size_t size, int (*cmp) (const void*, const void*));
+void* __fastcall__ bsearch (const void* key, const void* base, size_t n,
+	                    size_t size, int (*cmp) (const void*, const void*));
 div_t __fastcall__ div (int numer, int denom);
 void __fastcall__ exit (int ret);
 char* __fastcall__ getenv (const char* name);

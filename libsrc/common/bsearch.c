@@ -10,8 +10,8 @@
 
 
 
-void* bsearch (const void* key, const void* base, size_t n, size_t size, 
-	       int (*cmp) (const void*, const void*))
+void* __fastcall__ bsearch (const void* key, const void* base, size_t n,
+                            size_t size, int (*cmp) (const void*, const void*))
 {
     int current;
     int result;

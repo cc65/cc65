@@ -130,6 +130,46 @@ static char* GetLabelName (unsigned flags, unsigned long label, unsigned offs)
 
 
 
+const char* NumToStr (long Val)
+/* Convert the given parameter converted to a string in a static buffer */
+{
+    static char Buf [64];
+    sprintf (Buf, "$%04X", (unsigned) (Val & 0xFFFF));
+    return Buf;
+}
+
+
+
+const char* ByteToStr (unsigned Val)
+/* Convert the given byte parameter converted to a string in a static buffer */
+{
+    static char Buf [16];
+    sprintf (Buf, "$%02X", Val & 0xFF);
+    return Buf;
+}
+
+
+
+const char* WordToStr (unsigned Val)
+/* Convert the given word parameter converted to a string in a static buffer */
+{
+    static char Buf [16];
+    sprintf (Buf, "$%04X", Val & 0xFFFF);
+    return Buf;
+}
+
+
+
+const char* DWordToStr (unsigned long Val)
+/* Convert the given dword parameter converted to a string in a static buffer */
+{
+    static char Buf [16];
+    sprintf (Buf, "$%08lX", Val & 0xFFFFFFFF);
+    return Buf;
+}
+
+
+
 /*****************************************************************************/
 /*		    	      Pre- and postamble			     */
 /*****************************************************************************/
@@ -435,7 +475,7 @@ void g_enter (unsigned flags, unsigned argsize)
 	funcargs = argsize;
     } else {
        	funcargs = -1;
-       	AddCodeLine ("jsr enter");
+	AddCode (OPC_ENTER, AM_IMP, 0, 0);
     }
 }
 
@@ -453,29 +493,20 @@ void g_leave (void)
      	/* Drop stackframe if needed */
      	k += funcargs;
        	if (k > 0) {
-	    if (k <= 8) {
-     	    AddCodeLine ("jsr incsp%d", k);
-	    } else {
-		CheckLocalOffs (k);
-		ldyconst (k);
-		AddCodeLine ("jsr addysp");
-	    }
+	    CheckLocalOffs (k);
+	    AddCode (OPC_SPACE, AM_IMM, NumToStr (-k), 0);
      	}
 
     } else {
 
-     	if (k == 0) {
-	    /* Nothing to drop */
-	    AddCodeLine ("jsr leave");
-	} else {
-     	    /* We've a stack frame to drop */
-     	    ldyconst (k);
-     	    AddCodeLine ("jsr leavey");
+	if (k > 0) {
+	    AddCode (OPC_SPACE, AM_IMM, NumToStr (-k), 0);
 	}
+	AddCode (OPC_LEAVE, AM_IMP, 0, 0);
     }
 
     /* Add the final rts */
-    AddCodeLine ("rts");
+    AddCode (OPC_RET, AM_IMP, 0, 0);
 }
 
 
@@ -565,7 +596,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 
 
 /*****************************************************************************/
-/*			     Fetching memory cells	   		     */
+/*		       	     Fetching memory cells	   		     */
 /*****************************************************************************/
 
 
@@ -573,10 +604,6 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 void g_getimmed (unsigned Flags, unsigned long Val, unsigned Offs)
 /* Load a constant into the primary register */
 {
-    unsigned char B1, B2, B3, B4;
-    unsigned      Done;
-
-
     if ((Flags & CF_CONST) != 0) {
 
      	/* Numeric constant */
@@ -584,56 +611,16 @@ void g_getimmed (unsigned Flags, unsigned long Val, unsigned Offs)
 
      	    case CF_CHAR:
      		if ((Flags & CF_FORCECHAR) != 0) {
-     		    ldaconst (Val);
+		    AddCode (OPC_LDA, AM_IMM, ByteToStr (Val), 0);
      		    break;
      		}
      		/* FALL THROUGH */
      	    case CF_INT:
-     		ldxconst ((Val >> 8) & 0xFF);
-     		ldaconst (Val & 0xFF);
+	        AddCode (OPC_LDAX, AM_IMM, WordToStr (Val), 0);
      		break;
 
      	    case CF_LONG:
-	        /* Split the value into 4 bytes */
-	        B1 = (unsigned char) (Val >>  0);
-	        B2 = (unsigned char) (Val >>  8);
-	        B3 = (unsigned char) (Val >> 16);
-	        B4 = (unsigned char) (Val >> 24);
-
-	        /* Remember which bytes are done */
-	        Done = 0;
-
-	        /* Load the value */
-	        AddCodeLine ("ldx #$%02X", B2);
-	        Done |= 0x02;
-	        if (B2 == B3) {
-		    AddCodeLine ("stx sreg");
-		    Done |= 0x04;
-		}
-	        if (B2 == B4) {
-		    AddCodeLine ("stx sreg+1");
-		    Done |= 0x08;
-		}
-	    	if ((Done & 0x04) == 0 && B1 != B3) {
-		    AddCodeLine ("lda #$%02X", B3);
-		    AddCodeLine ("sta sreg");
-		    Done |= 0x04;
-		}
-	        if ((Done & 0x08) == 0 && B1 != B4) {
-		    AddCodeLine ("lda #$%02X", B4);
-		    AddCodeLine ("sta sreg+1");
-		    Done |= 0x08;
-		}
-	        AddCodeLine ("lda #$%02X", B1);
-	        Done |= 0x01;
-	        if ((Done & 0x04) == 0) {
-		    CHECK (B1 == B3);
-		    AddCodeLine ("sta sreg");
-		}
-	        if ((Done & 0x08) == 0) {
-		    CHECK (B1 == B4);
-		    AddCodeLine ("sta sreg+1");
-		}
+	        AddCode (OPC_LDEAX, AM_IMM, DWordToStr (Val), 0);
      		break;
 
      	    default:
@@ -644,12 +631,8 @@ void g_getimmed (unsigned Flags, unsigned long Val, unsigned Offs)
 
     } else {
 
-	/* Some sort of label */
-	const char* Label = GetLabelName (Flags, Val, Offs);
-
-	/* Load the address into the primary */
-	AddCodeLine ("lda #<(%s)", Label);
-	AddCodeLine ("ldx #>(%s)", Label);
+	/* Some sort of label, load it into the primary */
+       	AddCode (OPC_LEA, AM_ABS, GetLabelName (Flags, Val, Offs), 0);
 
     }
 }
@@ -867,33 +850,8 @@ void g_leasp (int offs)
     /* Calculate the offset relative to sp */
     offs -= oursp;
 
-    /* For value 0 we do direct code */
-    if (offs == 0) {
-       	AddCodeLine ("lda sp");
-       	AddCodeLine ("ldx sp+1");
-    } else {
-       	if (CodeSizeFactor < 300) {
-       	    ldaconst (offs);         		/* Load A with offset value */
-       	    AddCodeLine ("jsr leaasp");	/* Load effective address */
-       	} else {
-	    unsigned L = GetLocalLabel ();
-       	    if (CPU == CPU_65C02 && offs == 1) {
-       	     	AddCodeLine ("lda sp");
-       	     	AddCodeLine ("ldx sp+1");
-       	    	AddCodeLine ("ina");
-       	     	AddCodeLine ("bne %s", LocalLabelName (L));
-       	     	AddCodeLine ("inx");
-       	    } else {
-       	     	ldaconst (offs);
-       	     	AddCodeLine ("clc");
-       	     	AddCodeLine ("ldx sp+1");
-       	     	AddCodeLine ("adc sp");
-       	     	AddCodeLine ("bcc %s", LocalLabelName (L));
-       	     	AddCodeLine ("inx");
-       	    }
-	    g_defcodelabel (L);
-       	}
-    }
+    /* Output code */
+    AddCode (OPC_LEA, AM_STACK,	WordToStr (offs), 0);
 }
 
 
@@ -962,21 +920,15 @@ void g_putstatic (unsigned flags, unsigned long label, unsigned offs)
     switch (flags & CF_TYPE) {
 
      	case CF_CHAR:
-    	    AddCodeLine ("sta %s", lbuf);
+	    AddCode (OPC_STA, AM_ABS, lbuf, 0);
      	    break;
 
      	case CF_INT:
-    	    AddCodeLine ("sta %s", lbuf);
-	    AddCodeLine ("stx %s+1", lbuf);
+	    AddCode (OPC_STAX, AM_ABS, lbuf, 0);
      	    break;
 
      	case CF_LONG:
-    	    AddCodeLine ("sta %s", lbuf);
-	    AddCodeLine ("stx %s+1", lbuf);
-	    AddCodeLine ("ldy sreg");
-	    AddCodeLine ("sty %s+2", lbuf);
-	    AddCodeLine ("ldy sreg+1");
-     	    AddCodeLine ("sty %s+3", lbuf);
+	    AddCode (OPC_STEAX, AM_ABS, lbuf, 0);
      	    break;
 
        	default:
@@ -992,78 +944,23 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 {
     Offs -= oursp;
     CheckLocalOffs (Offs);
+			      
+    if (Flags & CF_CONST) {
+	g_getimmed (Flags, Val, Offs);
+    }
+
     switch (Flags & CF_TYPE) {
 
      	case CF_CHAR:
-	    if (Flags & CF_CONST) {
-	     	AddCodeLine ("lda #$%02X", (unsigned char) Val);
-	    }
-     	    if (CPU == CPU_65C02 && Offs == 0) {
-     	     	AddCodeLine ("sta (sp)");
-     	    } else {
-     	     	ldyconst (Offs);
-     	     	AddCodeLine ("sta (sp),y");
-     	    }
+     	    AddCode (OPC_STA, AM_STACK, WordToStr (Offs), 0);
      	    break;
 
      	case CF_INT:
-	    if (Flags & CF_CONST) {
-		ldyconst (Offs+1);
-		AddCodeLine ("lda #$%02X", (unsigned char) (Val >> 8));
-		AddCodeLine ("sta (sp),y");
-		if ((Flags & CF_NOKEEP) == 0) {
-		    /* Place high byte into X */
-		    AddCodeLine ("tax");
-		}
-		if (CPU == CPU_65C02 && Offs == 0) {
-		    AddCodeLine ("lda #$%02X", (unsigned char) Val);
-		    AddCodeLine ("sta (sp)");
-		} else {
-		    if ((Val & 0xFF) == Offs+1) {
-			/* The value we need is already in Y */
-			AddCodeLine ("tya");
-			AddCodeLine ("dey");
-		    } else {
-			AddCodeLine ("dey");
-			AddCodeLine ("lda #$%02X", (unsigned char) Val);
-		    }
-		    AddCodeLine ("sta (sp),y");
-		}
-	    } else {
-		if ((Flags & CF_NOKEEP) == 0 || CodeSizeFactor < 160) {
-		    if (Offs) {
-			ldyconst (Offs);
-			AddCodeLine ("jsr staxysp");
-		    } else {
-			AddCodeLine ("jsr stax0sp");
-		    }
-		} else {
-		    if (CPU == CPU_65C02 && Offs == 0) {
-			AddCodeLine ("sta (sp)");
-		     	ldyconst (1);
-		     	AddCodeLine ("txa");
-		     	AddCodeLine ("sta (sp),y");
-		    } else {
-			ldyconst (Offs);
-			AddCodeLine ("sta (sp),y");
-			AddCodeLine ("iny");
-			AddCodeLine ("txa");
-			AddCodeLine ("sta (sp),y");
-		    }
-		}
-	    }
+	    AddCode (OPC_STAX, AM_STACK, WordToStr (Offs), 0);
      	    break;
 
      	case CF_LONG:
-	    if (Flags & CF_CONST) {
-	     	g_getimmed (Flags, Val, 0);
-	    }
-     	    if (Offs) {
-     	     	ldyconst (Offs);
-     	     	AddCodeLine ("jsr steaxysp");
-     	    } else {
-     	     	AddCodeLine ("jsr steax0sp");
-     	    }
+	    AddCode (OPC_STAEAX, AM_STACK, WordToStr (Offs), 0);
      	    break;
 
        	default:
@@ -1559,28 +1456,6 @@ void g_addstatic (unsigned flags, unsigned long label, unsigned offs)
 	    typeerror (flags);
 
     }
-}
-
-
-
-/*****************************************************************************/
-/*	       Compares of ax with a variable with fixed address	     */
-/*****************************************************************************/
-
-
-
-void g_cmplocal (unsigned flags, int offs)
-/* Compare a local variable to ax */
-{
-    Internal ("g_cmplocal not implemented");
-}
-
-
-
-void g_cmpstatic (unsigned flags, unsigned label, unsigned offs)
-/* Compare a static variable to ax */
-{
-    Internal ("g_cmpstatic not implemented");
 }
 
 

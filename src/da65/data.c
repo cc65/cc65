@@ -302,7 +302,7 @@ unsigned TextTable (void)
 	if (Count > 0) {
 	    unsigned CBytes;
 	    Indent (MIndent);
-	    Output (".text");
+	    Output (".byte");
 	    Indent (AIndent);
 	    Output ("\"");
 	    for (I = 0; I < Count; ++I) {

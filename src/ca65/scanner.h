@@ -201,6 +201,7 @@ enum Token {
     TOK_STRLEN,
     TOK_SUNPLUS,
     TOK_TCOUNT,
+    TOK_TIME,
     TOK_WARNING,
     TOK_WORD,
     TOK_XMATCH,

@@ -228,6 +228,7 @@ struct DotKeyword {
     { ".STRLEN",	TOK_STRLEN	},
     { ".SUNPLUS",  	TOK_SUNPLUS	},
     { ".TCOUNT",	TOK_TCOUNT	},
+    { ".TIME",         	TOK_TIME	},
     { ".WARNING",	TOK_WARNING	},
     { ".WORD", 	  	TOK_WORD	},
     { ".XMATCH",	TOK_XMATCH	},

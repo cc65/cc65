@@ -1,3 +1,4 @@
+
 <!doctype linuxdoc system>
 
 <article>
@@ -406,6 +407,7 @@ Available operators sorted by precedence:
     .DEFINED   	Builtin function	     	     	1
     .MATCH     	Builtin function	     	     	1
     .TCOUNT    	Builtin function	     	     	1
+    .TIME    	Builtin function	     	     	1
     .XMATCH    	Builtin function	     	     	1
     .PARAMCOUNT Builtin pseudo variable	(r/o)	      	1
     .REFERENCED Builtin function	     	       	1
@@ -2139,14 +2141,30 @@ Here's a list of all control commands and a description, what they do:
 
   <tscreen><verb>
     	.macro	ldax	arg
-    		.if (.match (.mid (0, 1, arg), #))
-    		; ldax called with immidiate operand
-		lda	#<(.right (.tcount (arg)-1, arg))
-		ldx	#>(.right (.tcount (arg)-1, arg))
-		.else
-		...
-    		.endif
+    	   	.if (.match (.mid (0, 1, arg), #))
+    	   	; ldax called with immidiate operand
+	   	lda	#<(.right (.tcount (arg)-1, arg))
+	   	ldx	#>(.right (.tcount (arg)-1, arg))
+	   	.else
+	   	...
+    	   	.endif
        	.endmacro
+  </verb></tscreen>
+
+
+<sect1><tt>.TIME</tt><label id=".TIME"><p>
+
+  Reading this pseudo variable will give a constant integer value that
+  represents the current time in POSIX standard (as seconds since the 
+  Epoch).
+
+  It may be used to encode the time of translation somewhere in the created
+  code.
+
+  Example:
+
+  <tscreen><verb>
+        .dword  .time   ; Place time here
   </verb></tscreen>
 
 

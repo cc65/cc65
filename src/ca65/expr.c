@@ -34,6 +34,7 @@
 
 
 #include <string.h>
+#include <time.h>
 
 /* common */
 #include "check.h"
@@ -658,6 +659,11 @@ static ExprNode* Factor (void)
 
 	case TOK_TCOUNT:
 	    N = Function (FuncTCount);
+	    break;
+
+	case TOK_TIME:
+	    N = LiteralExpr (time (0));
+	    NextTok ();
 	    break;
 
 	case TOK_XMATCH:

@@ -99,15 +99,9 @@ _tgi_setup:
         lda     #>tgi_emu_bar
         sta     tgi_bar+2
 
-@L2:    lda	ptr1
-	pha
-	lda	ptr1+1
-	pha
-	jsr     tgi_install             ; Call driver install routine
-        pla                             ; (may update variables)
-	sta	ptr1+1			; (may modify ptr1 so it is preserved)
-	pla
-	sta	ptr1
+@L2:    jsr     tgi_install             ; Call driver install routine, may...
+                                        ; ...update variables
+        jsr     tgi_set_ptr             ; Set ptr1 to tgi_drv
 
 ; Copy variables. Beware: We are using internal knowledge about variable
 ; layout here!

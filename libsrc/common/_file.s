@@ -4,8 +4,9 @@
 ; Data for the stdio file stream.
 ;
 
-	.export	 	__filetab, _stdin, _stdout, _stderr
-
+       	.export	       	__filetab
+                                 
+        .include        "stdio.inc"
         .include        "fcntl.inc"
         .include        "_file.inc"
 

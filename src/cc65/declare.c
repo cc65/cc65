@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -1048,7 +1048,6 @@ type* ParseType (type* Type)
     ParseTypeSpec (&Spec, -1);
 
     /* Parse additional declarators */
-    InitDeclaration (&Decl);
     ParseDecl (&Spec, &Decl, DM_NO_IDENT);
 
     /* Copy the type to the target buffer */

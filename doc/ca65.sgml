@@ -638,10 +638,10 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.ADDR</tt><label id=".ADDR"><p>
 
   Define word sized data. In 6502 mode, this is an alias for <tt/.WORD/ and
-  may be used for better readability if the data words are address values.
-  In 65816 mode, the address is forced to be 16 bit wide to fit into the
-  current segment. See also <tt/.FARADDR/. The command must be followed by a
-  sequence of (not necessarily constant) expressions.
+  may be used for better readability if the data words are address values. In
+  65816 mode, the address is forced to be 16 bit wide to fit into the current
+  segment. See also <tt><ref id=".FARADDR" name=".FARADDR"></tt>. The command
+  must be followed by a sequence of (not necessarily constant) expressions.
 
   Example:
 
@@ -649,8 +649,9 @@ Here's a list of all control commands and a description, what they do:
   	.addr  	$0D00, $AF13, _Clear
   </verb></tscreen>
 
-  See: <tt><ref id=".FARADDR" name=".FARADDR"></tt>
-
+  See: <tt><ref id=".FARADDR" name=".FARADDR"></tt>, <tt><ref id=".WORD"
+       name=".WORD"></tt>
+		   
 
 <sect1><tt>.ALIGN</tt><label id=".ALIGN"><p>
 
@@ -688,7 +689,7 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.AUTOIMPORT</tt><label id=".AUTOIMPORT"><p>
 
-  Is followd by a plus or a minus character. When switched on (using a
+  Is followed by a plus or a minus character. When switched on (using a
   +), undefined symbols are automatically marked as import instead of
   giving errors. When switched off (which is the default so this does not
   make much sense), this does not happen and an error message is

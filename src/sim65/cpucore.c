@@ -88,37 +88,32 @@ int CPUHalted;
 
 
 
-/* Set flags */
-#define SET_CF()	(SR |= CF)
-#define SET_ZF()	(SR |= ZF)
-#define SET_IF()	(SR |= IF)
-#define SET_DF()	(SR |= DF)
-#define SET_BF()	(SR |= BF)
-#define SET_OF()	(SR |= OF)
-#define SET_SF()	(SR |= SF)
+/* Return the flags as a boolean value */
+#define GET_CF()        ((SR & CF) != 0)
+#define GET_ZF()        ((SR & ZF) != 0)
+#define GET_IF()        ((SR & IF) != 0)
+#define GET_DF()        ((SR & DF) != 0)
+#define GET_BF()        ((SR & BF) != 0)
+#define GET_OF()        ((SR & OF) != 0)
+#define GET_SF()        ((SR & SF) != 0)
 
-/* Reset flags */
-#define CLR_CF()	(SR &= ~CF)
-#define CLR_ZF()	(SR &= ~ZF)
-#define CLR_IF()	(SR &= ~IF)
-#define CLR_DF()	(SR &= ~DF)
-#define CLR_BF()	(SR &= ~BF)
-#define CLR_OF()	(SR &= ~OF)
-#define CLR_SF()	(SR &= ~SF)
+/* Set the flags. The parameter is a boolean flag that says if the flag should be
+ * set or reset.
+ */
+#define SET_CF(f)       do { if (f) { SR |= CF; } else { SR &= ~CF; } } while (0)
+#define SET_ZF(f)       do { if (f) { SR |= ZF; } else { SR &= ~ZF; } } while (0)
+#define SET_IF(f)       do { if (f) { SR |= IF; } else { SR &= ~IF; } } while (0)
+#define SET_DF(f)       do { if (f) { SR |= DF; } else { SR &= ~DF; } } while (0)
+#define SET_BF(f)       do { if (f) { SR |= BF; } else { SR &= ~BF; } } while (0)
+#define SET_OF(f)       do { if (f) { SR |= OF; } else { SR &= ~OF; } } while (0)
+#define SET_SF(f)       do { if (f) { SR |= SF; } else { SR &= ~SF; } } while (0)
 
-/* Test for the flags */
-#define CF_IS_SET()     (SR & CF)
-#define ZF_IS_SET()     (SR & ZF)
-#define IF_IS_SET()     (SR & IF)
-#define DF_IS_SET()     (SR & DF)
-#define BF_IS_SET()     (SR & BF)
-#define OF_IS_SET()     (SR & OF)
-#define SF_IS_SET()     (SR & SF)
-
-/* Set the flags according to a given value */
-#define TEST_ZF(v)      do { if ((v) == 0) { SET_ZF(); } else { CLR_ZF(); } } while (0)
-#define TEST_SF(v)      do { if ((v) & 0x80) { SET_SF(); } else { CLR_SF(); } } while (0)
-#define TEST_CF(v)      do { if (v) { SET_CF (); } else { CLR_CF (); } } while (0)
+/* Special test and set macros. The meaning of the parameter depends on the
+ * actual flag that should be set or reset.
+ */
+#define TEST_ZF(v)      SET_ZF (((v) & 0xFF) == 0)
+#define TEST_SF(v)      SET_SF (((v) & 0x80) != 0)
+#define TEST_CF(v)      SET_CF (((v) & 0xFF00) != 0)
 
 /* Program counter halves */
 #define PCL		(PC & 0xFF)
@@ -250,7 +245,7 @@ int CPUHalted;
         unsigned Result = v1 - v2;              \
         TEST_ZF (Result & 0xFF);                \
         TEST_SF (Result);                       \
-        TEST_CF (Result <= 0xFF);               \
+        SET_CF (Result <= 0xFF);                \
     }
 
 
@@ -288,11 +283,11 @@ static void OPC_6502_00 (void)
 {
     Cycles = 7;
     PC += 2;
-    SET_BF ();
+    SET_BF (1);
     PUSH (PCH);
     PUSH (PCL);
     PUSH (SR);
-    SET_IF ();
+    SET_IF (1);
     PC = ReadMemW (0xFFFE);
 }
 
@@ -341,7 +336,16 @@ static void OPC_6502_05 (void)
 static void OPC_6502_06 (void)
 /* Opcode $06: ASL zp */
 {
-    NotImplemented ();
+    unsigned char ZPAddr;
+    unsigned Val;
+    Cycles = 5;
+    ZPAddr = ReadMem (PC+1);
+    Val    = ReadMem (ZPAddr) << 1;
+    WriteMem (ZPAddr, (unsigned char) Val);
+    TEST_ZF (Val & 0xFF);
+    TEST_SF (Val);
+    SET_CF (Val & 0x100);
+    PC += 2;
 }
 
 
@@ -375,7 +379,14 @@ static void OPC_6502_09 (void)
 static void OPC_6502_0A (void)
 /* Opcode $0A: ASL a */
 {
-    NotImplemented ();
+    unsigned Val;
+    Cycles = 2;
+    Val    = AC << 1;
+    AC     = (unsigned char) Val;
+    TEST_ZF (Val & 0xFF);
+    TEST_SF (Val);
+    SET_CF (Val & 0x100);
+    PC += 1;
 }
 
 
@@ -407,7 +418,16 @@ static void OPC_6502_0D (void)
 static void OPC_6502_0E (void)
 /* Opcode $0E: ALS abs */
 {
-    NotImplemented ();
+    unsigned Addr;
+    unsigned Val;
+    Cycles = 6;
+    Addr = ReadMemW (PC+1);
+    Val  = ReadMem (Addr) << 1;
+    WriteMem (Addr, (unsigned char) Val);
+    TEST_ZF (Val & 0xFF);
+    TEST_SF (Val);
+    SET_CF (Val & 0x100);
+    PC += 3;
 }
 
 
@@ -423,7 +443,7 @@ static void OPC_6502_0F (void)
 static void OPC_6502_10 (void)
 /* Opcode $10: BPL */
 {
-    BRANCH (!SF_IS_SET ());
+    BRANCH (!GET_SF ());
 }
 
 
@@ -471,7 +491,16 @@ static void OPC_6502_15 (void)
 static void OPC_6502_16 (void)
 /* Opcode $16: ASL zp,x */
 {
-    NotImplemented ();
+    unsigned char ZPAddr;
+    unsigned Val;
+    Cycles = 6;
+    ZPAddr = ReadMem (PC+1) + XR;
+    Val    = ReadMem (ZPAddr) << 1;
+    WriteMem (ZPAddr, (unsigned char) Val);
+    TEST_ZF (Val & 0xFF);
+    TEST_SF (Val);
+    SET_CF (Val & 0x100);
+    PC += 2;
 }
 
 
@@ -488,7 +517,7 @@ static void OPC_6502_18 (void)
 /* Opcode $18: CLC */
 {
     Cycles = 2;
-    CLR_CF ();
+    SET_CF (0);
     PC += 1;
 }
 
@@ -537,7 +566,16 @@ static void OPC_6502_1D (void)
 static void OPC_6502_1E (void)
 /* Opcode $1E: ASL abs,x */
 {
-    NotImplemented ();
+    unsigned Addr;
+    unsigned Val;
+    Cycles = 7;
+    Addr = ReadMemW (PC+1) + XR;
+    Val  = ReadMem (Addr) << 1;
+    WriteMem (Addr, (unsigned char) Val);
+    TEST_ZF (Val & 0xFF);
+    TEST_SF (Val);
+    SET_CF (Val & 0x100);
+    PC += 3;
 }
 
 
@@ -553,7 +591,13 @@ static void OPC_6502_1F (void)
 static void OPC_6502_20 (void)
 /* Opcode $20: JSR */
 {
-    NotImplemented ();
+    unsigned Addr;
+    Cycles = 6;
+    Addr   = ReadMemW (PC+1);
+    PC += 2;
+    PUSH (PCH);
+    PUSH (PCL);
+    PC = Addr;
 }
 
 
@@ -585,7 +629,15 @@ static void OPC_6502_23 (void)
 static void OPC_6502_24 (void)
 /* Opcode $24: BIT zp */
 {
-    NotImplemented ();
+    unsigned char ZPAddr;
+    unsigned char Val;
+    Cycles = 3;
+    ZPAddr = ReadMem (PC+1);
+    Val    = ReadMem (ZPAddr);
+    SET_SF (Val & 0x80);
+    SET_OF (Val & 0x40);
+    SET_ZF ((Val & AC) == 0);
+    PC += 2;
 }
 
 
@@ -601,7 +653,19 @@ static void OPC_6502_25 (void)
 static void OPC_6502_26 (void)
 /* Opcode $26: ROL zp */
 {
-    NotImplemented ();
+    unsigned char ZPAddr;
+    unsigned Val;
+    Cycles = 5;
+    ZPAddr = ReadMem (PC+1);
+    Val    = ReadMem (ZPAddr) << 1;
+    if (GET_CF ()) {
+        Val |= 0x01;
+    }
+    AC = (unsigned char) Val;
+    TEST_ZF (AC);
+    TEST_SF (AC);
+    TEST_CF (Val);
+    PC += 2;
 }
 
 
@@ -635,7 +699,17 @@ static void OPC_6502_29 (void)
 static void OPC_6502_2A (void)
 /* Opcode $2A: ROL a */
 {
-    NotImplemented ();
+    unsigned Val;
+    Cycles = 2;
+    Val    = AC << 1;
+    if (GET_CF ()) {
+        Val |= 0x01;
+    }
+    AC = (unsigned char) Val;
+    TEST_ZF (AC);
+    TEST_SF (AC);
+    TEST_CF (Val);
+    PC += 1;
 }
 
 
@@ -651,7 +725,15 @@ static void OPC_6502_2B (void)
 static void OPC_6502_2C (void)
 /* Opcode $2C: BIT abs */
 {
-    NotImplemented ();
+    unsigned Addr;
+    unsigned char Val;
+    Cycles = 4;
+    Addr = ReadMem (PC+1);
+    Val  = ReadMem (Addr);
+    SET_SF (Val & 0x80);
+    SET_OF (Val & 0x40);
+    SET_ZF ((Val & AC) == 0);
+    PC += 3;
 }
 
 
@@ -667,7 +749,19 @@ static void OPC_6502_2D (void)
 static void OPC_6502_2E (void)
 /* Opcode $2E: ROL abs */
 {
-    NotImplemented ();
+    unsigned Addr;
+    unsigned Val;
+    Cycles = 6;
+    Addr = ReadMemW (PC+1);
+    Val  = ReadMem (Addr) << 1;
+    if (GET_CF ()) {
+        Val |= 0x01;
+    }
+    AC = (unsigned char) Val;
+    TEST_ZF (AC);
+    TEST_SF (AC);
+    TEST_CF (Val);
+    PC += 3;
 }
 
 
@@ -683,7 +777,7 @@ static void OPC_6502_2F (void)
 static void OPC_6502_30 (void)
 /* Opcode $30: BMI */
 {
-    BRANCH (SF_IS_SET ());
+    BRANCH (GET_SF ());
 }
 
 
@@ -731,7 +825,19 @@ static void OPC_6502_35 (void)
 static void OPC_6502_36 (void)
 /* Opcode $36: ROL zp,x */
 {
-    NotImplemented ();
+    unsigned char ZPAddr;
+    unsigned Val;
+    Cycles = 6;
+    ZPAddr = ReadMem (PC+1) + XR;
+    Val    = ReadMem (ZPAddr) << 1;
+    if (GET_CF ()) {
+        Val |= 0x01;
+    }
+    AC = (unsigned char) Val;
+    TEST_ZF (AC);
+    TEST_SF (AC);
+    TEST_CF (Val);
+    PC += 2;
 }
 
 
@@ -748,7 +854,7 @@ static void OPC_6502_38 (void)
 /* Opcode $38: SEC */
 {
     Cycles = 2;
-    SET_CF ();
+    SET_CF (1);
     PC += 1;
 }
 
@@ -797,7 +903,19 @@ static void OPC_6502_3D (void)
 static void OPC_6502_3E (void)
 /* Opcode $3E: ROL abs,x */
 {
-    NotImplemented ();
+    unsigned Addr;
+    unsigned Val;
+    Cycles = 7;
+    Addr = ReadMemW (PC+1) + XR;
+    Val  = ReadMem (Addr) << 1;
+    if (GET_CF ()) {
+        Val |= 0x01;
+    }
+    AC = (unsigned char) Val;
+    TEST_ZF (AC);
+    TEST_SF (AC);
+    TEST_CF (Val);
+    PC += 2;
 }
 
 
@@ -864,7 +982,17 @@ static void OPC_6502_45 (void)
 static void OPC_6502_46 (void)
 /* Opcode $46: LSR zp */
 {
-    NotImplemented ();
+    unsigned char ZPAddr;
+    unsigned char Val;
+    Cycles = 5;
+    ZPAddr = ReadMem (PC+1);
+    Val    = ReadMem (ZPAddr);
+    SET_CF (Val & 0x01);
+    Val >>= 1;
+    WriteMem (ZPAddr, Val);
+    TEST_ZF (Val);
+    TEST_SF (Val);
+    PC += 2;
 }
 
 
@@ -898,7 +1026,12 @@ static void OPC_6502_49 (void)
 static void OPC_6502_4A (void)
 /* Opcode $4A: LSR a */
 {
-    NotImplemented ();
+    Cycles = 2;
+    SET_CF (AC & 0x01);
+    AC >>= 1;
+    TEST_ZF (AC);
+    TEST_SF (AC);
+    PC += 1;
 }
 
 
@@ -931,7 +1064,17 @@ static void OPC_6502_4D (void)
 static void OPC_6502_4E (void)
 /* Opcode $4E: LSR abs */
 {
-    NotImplemented ();
+    unsigned Addr;
+    unsigned char Val;
+    Cycles = 6;
+    Addr = ReadMemW (PC+1);
+    Val  = ReadMem (Addr);
+    SET_CF (Val & 0x01);
+    Val >>= 1;
+    WriteMem (Addr, Val);
+    TEST_ZF (Val);
+    TEST_SF (Val);
+    PC += 3;
 }
 
 
@@ -947,7 +1090,7 @@ static void OPC_6502_4F (void)
 static void OPC_6502_50 (void)
 /* Opcode $50: BVC */
 {
-    BRANCH (!OF_IS_SET());
+    BRANCH (!GET_OF ());
 }
 
 
@@ -995,7 +1138,17 @@ static void OPC_6502_55 (void)
 static void OPC_6502_56 (void)
 /* Opcode $56: LSR zp,x */
 {
-    NotImplemented ();
+    unsigned char ZPAddr;
+    unsigned char Val;
+    Cycles = 6;
+    ZPAddr = ReadMem (PC+1) + XR;
+    Val    = ReadMem (ZPAddr);
+    SET_CF (Val & 0x01);
+    Val >>= 1;
+    WriteMem (ZPAddr, Val);
+    TEST_ZF (Val);
+    TEST_SF (Val);
+    PC += 2;
 }
 
 
@@ -1012,7 +1165,7 @@ static void OPC_6502_58 (void)
 /* Opcode $58: CLI */
 {
     Cycles = 2;
-    CLR_IF ();
+    SET_IF (0);
     PC += 1;
 }
 
@@ -1061,7 +1214,17 @@ static void OPC_6502_5D (void)
 static void OPC_6502_5E (void)
 /* Opcode $5E: LSR abs,x */
 {
-    NotImplemented ();
+    unsigned Addr;
+    unsigned char Val;
+    Cycles = 7;
+    Addr = ReadMemW (PC+1) + XR;
+    Val  = ReadMem (Addr);
+    SET_CF (Val & 0x01);
+    Val >>= 1;
+    WriteMem (Addr, Val);
+    TEST_ZF (Val);
+    TEST_SF (Val);
+    PC += 3;
 }
 
 
@@ -1224,7 +1387,7 @@ static void OPC_6502_6F (void)
 static void OPC_6502_70 (void)
 /* Opcode $70: BVS */
 {
-    BRANCH (OF_IS_SET ());
+    BRANCH (GET_OF ());
 }
 
 
@@ -1289,7 +1452,7 @@ static void OPC_6502_78 (void)
 /* Opcode $78: SEI */
 {
     Cycles = 2;
-    SET_IF ();
+    SET_IF (1);
     PC += 1;
 }
 
@@ -1514,7 +1677,7 @@ static void OPC_6502_8F (void)
 static void OPC_6502_90 (void)
 /* Opcode $90: BCC */
 {
-    BRANCH (!CF_IS_SET ());
+    BRANCH (!GET_CF ());
 }
 
 
@@ -1866,7 +2029,7 @@ static void OPC_6502_AF (void)
 static void OPC_6502_B0 (void)
 /* Opcode $B0: BCS */
 {
-    BRANCH (CF_IS_SET ());
+    BRANCH (GET_CF ());
 }
 
 
@@ -1960,7 +2123,7 @@ static void OPC_6502_B8 (void)
 /* Opcode $B8: CLV */
 {
     Cycles = 2;
-    CLR_OF ();
+    SET_OF (0);
     PC += 1;
 }
 
@@ -2243,7 +2406,7 @@ static void OPC_6502_CF (void)
 static void OPC_6502_D0 (void)
 /* Opcode $D0: BNE */
 {
-    BRANCH (!ZF_IS_SET ());
+    BRANCH (!GET_ZF ());
 }
 
 
@@ -2328,7 +2491,9 @@ static void OPC_6502_D7 (void)
 static void OPC_6502_D8 (void)
 /* Opcode $D8: CLD */
 {
-    CLR_DF ();
+    Cycles = 2;
+    SET_DF (0);
+    PC += 1;
 }
 
 
@@ -2422,8 +2587,9 @@ static void OPC_6502_E0 (void)
 
 
 static void OPC_6502_E1 (void)
-/* Opcode $E1 */
+/* Opcode $E1: SBC (zp,x) */
 {
+    NotImplemented ();
 }
 
 
@@ -2457,8 +2623,9 @@ static void OPC_6502_E4 (void)
 
 
 static void OPC_6502_E5 (void)
-/* Opcode $E5 */
+/* Opcode $E5: SBC zp */
 {
+    NotImplemented ();
 }
 
 
@@ -2500,8 +2667,9 @@ static void OPC_6502_E8 (void)
 
 
 static void OPC_6502_E9 (void)
-/* Opcode $E9 */
+/* Opcode $E9: SBC #imm */
 {
+    NotImplemented ();
 }
 
 
@@ -2537,8 +2705,9 @@ static void OPC_6502_EC (void)
 
 
 static void OPC_6502_ED (void)
-/* Opcode $ED */
+/* Opcode $ED: SBC abs */
 {
+    NotImplemented ();
 }
 
 
@@ -2570,14 +2739,15 @@ static void OPC_6502_EF (void)
 static void OPC_6502_F0 (void)
 /* Opcode $F0: BEQ */
 {
-    BRANCH (ZF_IS_SET ());
+    BRANCH (GET_ZF ());
 }
 
 
 
 static void OPC_6502_F1 (void)
-/* Opcode $F1 */
+/* Opcode $F1: SBC (zp),y */
 {
+    NotImplemented ();
 }
 
 
@@ -2607,8 +2777,9 @@ static void OPC_6502_F4 (void)
 
 
 static void OPC_6502_F5 (void)
-/* Opcode $F5 */
+/* Opcode $F5: SBC zp,x */
 {
+    NotImplemented ();
 }
 
 
@@ -2640,14 +2811,15 @@ static void OPC_6502_F7 (void)
 static void OPC_6502_F8 (void)
 /* Opcode $F8: SED */
 {
-    SET_DF ();
+    SET_DF (1);
 }
 
 
 
 static void OPC_6502_F9 (void)
-/* Opcode $F9 */
+/* Opcode $F9: SBC abs,y */
 {
+    NotImplemented ();
 }
 
 
@@ -2677,8 +2849,9 @@ static void OPC_6502_FC (void)
 
 
 static void OPC_6502_FD (void)
-/* Opcode $FD */
+/* Opcode $FD: SBC abs,x */
 {
+    NotImplemented ();
 }
 
 
@@ -2992,6 +3165,9 @@ void RunCPU (void)
 
 	/* Execute it */
 	OPCTable[B] ();
+
+        /* Count cycles */
+        TotalCycles += Cycles;
     }
 }
 

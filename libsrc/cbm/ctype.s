@@ -4,9 +4,9 @@
 ; Character specification table.
 ;
 
-; The tables are readonly, put them into the code segment
+; The tables are readonly, put them into the rodata segment
 
-.code
+.rodata
 
 ; Value that must be added to a lower case char to make it an upper case
 ; char (example: for ASCII, this must be $E0).
@@ -51,7 +51,7 @@ __cdiff:
 __ctype:
    	.byte	$10	;   0/00 ___rvs_@___
 	.byte	$10	;   1/01 ___rvs_a___
-	.byte	$10	;   2/02 ___rvs_b___
+       	.byte	$10	;   2/02 ___rvs_b___
 	.byte	$10	;   3/03 ___rvs_c___
 	.byte	$10	;   4/04 ___rvs_d___
 	.byte	$10	;   5/05 ___rvs_e___
@@ -84,7 +84,7 @@ __ctype:
        	.byte  	$A0	;  32/20 ___SPACE___
 	.byte	$00	;  33/21 _____!_____
 	.byte	$00	;  34/22 _____"_____
-	.byte	$00	;  35/23 _____#_____
+       	.byte	$00	;  35/23 _____#_____
 	.byte	$00	;  36/24 _____$_____
 	.byte	$00	;  37/25 _____%_____
 	.byte	$00	;  38/26 _____&_____
@@ -96,7 +96,7 @@ __ctype:
 	.byte	$00	;  44/2c _____,_____
    	.byte	$00	;  45/2d _____-_____
 	.byte	$00	;  46/2e _____._____
-	.byte	$00	;  47/2f _____/_____
+       	.byte	$00	;  47/2f _____/_____
 	.byte	$0C	;  48/30 _____0_____
 	.byte	$0C	;  49/31 _____1_____
 	.byte	$0C	;  50/32 _____2_____
@@ -129,7 +129,7 @@ __ctype:
    	.byte	$01	;  76/4c _____l_____
    	.byte	$01    	;  77/4d _____m_____
    	.byte	$01	;  78/4e _____n_____
-   	.byte	$01	;  79/4f _____o_____
+       	.byte	$01	;  79/4f _____o_____
    	.byte	$01	;  80/50 _____p_____
    	.byte	$01	;  81/51 _____q_____
    	.byte	$01	;  82/52 _____r_____
@@ -141,7 +141,7 @@ __ctype:
    	.byte	$01	;  88/58 _____x_____
    	.byte	$01	;  89/59 _____y_____
 	.byte	$01	;  90/5a _____z_____
-	.byte	$00	;  91/5b _____[_____
+       	.byte	$00	;  91/5b _____[_____
 	.byte	$00	;  92/5c _____\_____
 	.byte	$00	;  93/5d _____]_____
 	.byte	$00	;  94/5e _____^_____
@@ -174,7 +174,7 @@ __ctype:
 	.byte	$00	; 121/79 _U`_grave__
 	.byte	$00	; 122/7a _U'_acute__
 	.byte	$00	; 123/7b _U^_circum_
-	.byte	$00	; 124/7c _U"_dieres_
+       	.byte	$00	; 124/7c _U"_dieres_
 	.byte	$00	; 125/7d _Y'_acute__
 	.byte	$00	; 126/7e _cap_thorn_
 	.byte	$00	; 127/7f _Es-sed_B__
@@ -186,7 +186,7 @@ __ctype:
 	.byte	$00	; 132/84 _tl_corner_
 	.byte	$00	; 133/85 _tr_corner_
 	.byte	$00	; 134/86 _bl_corner_
-	.byte	$00	; 135/87 _br_corner_
+       	.byte	$00	; 135/87 _br_corner_
 	.byte	$00	; 136/88 ___l_tee___
 	.byte	$00	; 137/89 ___r_tee___
 	.byte	$00	; 138/8a ___t_tee___
@@ -219,7 +219,7 @@ __ctype:
 	.byte	$00	; 165/a5 ____yen____
 	.byte	$00	; 166/a6 _|_broken__
 	.byte	$00	; 167/a7 __section__
-	.byte	$00	; 168/a8 __umulaut__
+       	.byte	$00	; 168/a8 __umulaut__
 	.byte	$00	; 169/a9 _copyright_
 	.byte	$00	; 170/aa __fem_ord__
 	.byte	$00	; 171/ab _l_ang_quo_
@@ -231,7 +231,7 @@ __ctype:
 	.byte	$00	; 177/b1 ____+/-____
 	.byte	$00	; 178/b2 _2_supersc_
 	.byte	$00	; 179/b3 _3_supersc_
-	.byte	$00	; 180/b4 ___acute___
+       	.byte	$00	; 180/b4 ___acute___
 	.byte	$00	; 181/b5 ____mu_____
 	.byte	$00	; 182/b6 _paragraph_
 	.byte	$00	; 183/b7 __mid_dot__
@@ -264,7 +264,7 @@ __ctype:
 	.byte	$02	; 209/d1 _____Q_____
 	.byte	$02	; 210/d2 _____R_____
 	.byte	$02	; 211/d3 _____S_____
-	.byte	$02	; 212/d4 _____T_____
+       	.byte	$02	; 212/d4 _____T_____
 	.byte	$02	; 213/d5 _____U_____
 	.byte	$02	; 214/d6 _____V_____
 	.byte	$02	; 215/d7 _____W_____
@@ -276,7 +276,7 @@ __ctype:
 	.byte	$00	; 221/dd _____}_____
 	.byte	$00	; 222/de _____~_____
 	.byte	$00	; 223/df ___HOUSE___
-	.byte	$00	; 224/e0 _a`_grave__
+       	.byte	$00	; 224/e0 _a`_grave__
 	.byte	$00	; 225/e1 _a'_acute__
 	.byte	$00	; 226/e2 _a^_circum_
 	.byte	$00	; 227/e3 _a~_tilde__

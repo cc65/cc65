@@ -6,9 +6,9 @@
 ; adapted to Atari by Christian Groessler, June 2000
 ;
 
-; The tables are readonly, put them into the code segment
+; The tables are readonly, put them into the rodata segment
 
-.code
+.rodata
 
 ; Value that must be added to an upper case char to make it lower case
 ; char (example: for ASCII, this must be $E0).
@@ -242,7 +242,7 @@ __ctype:
 	.byte	$00	; 189/bd ___inv_=_____
 	.byte	$00	; 190/be ___inv_>_____
 	.byte	$00	; 191/bf ___inv_?_____
-				 
+
 	.byte	$00	; 192/c0 ___inv_@_____
        	.byte  	$0A	; 193/c1 ___inv_A_____
        	.byte  	$0A	; 194/c2 ___inv_B_____

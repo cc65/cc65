@@ -4,9 +4,9 @@
 ; Character specification table.
 ;
 
-; The tables are readonly, put them into the code segment
+; The tables are readonly, put them into the rodata segment
 
-.code
+.rodata
 
 ; Value that must be added to an upper case char to make it lower case
 ; char (example: for ASCII, this must be $E0).

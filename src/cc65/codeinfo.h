@@ -82,7 +82,7 @@ struct CodeSeg;
 #define REG_AY          (REG_A | REG_Y)
 #define REG_XY		(REG_X | REG_Y)
 #define REG_AXY		(REG_AX | REG_Y)
-#define REG_EAX         (REG_AX | REG_SREG)    
+#define REG_EAX         (REG_AX | REG_SREG)
 #define REG_EAXY        (REG_EAX | REG_Y)
 #define REG_ZP          0xFFF8U
 #define REG_ALL         0xFFFFU
@@ -130,6 +130,9 @@ int RegXUsed (struct CodeSeg* S, unsigned Index);
 
 int RegYUsed (struct CodeSeg* S, unsigned Index);
 /* Check if the value in Y is used. */
+
+int RegAXUsed (struct CodeSeg* S, unsigned Index);
+/* Check if the value in A or(!) the value in X are used. */
 
 
 

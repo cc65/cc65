@@ -534,5 +534,11 @@ int RegYUsed (struct CodeSeg* S, unsigned Index)
 
 
 
+int RegAXUsed (struct CodeSeg* S, unsigned Index)
+/* Check if the value in A or(!) the value in X are used. */
+{
+    return (GetRegInfo (S, Index, REG_AX) & REG_AX) != 0;
+}
+
 
 

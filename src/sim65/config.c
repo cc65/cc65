@@ -83,42 +83,6 @@ struct Location {
 
 
 
-static CfgData* NewCfgData (void)
-/* Create and intialize a new CfgData struct, then return it. The function
- * uses the current output of the config scanner.
- */
-{
-    /* Get the length of the identifier */
-    unsigned AttrLen = strlen (CfgSVal);
-
-    /* Allocate memory */
-    CfgData* D = xmalloc (sizeof (CfgData) + AttrLen);
-
-    /* Initialize the fields */
-    D->Type = CfgDataInvalid;
-    D->Line = CfgErrorLine;
-    D->Col  = CfgErrorCol;
-    memcpy (D->Attr, CfgSVal, AttrLen+1);
-
-    /* Return the new struct */
-    return D;
-}
-
-
-
-static void FreeCfgData (CfgData* D)
-/* Free a config data structure */
-{
-    if (D->Type == CfgDataString) {
-        /* Free the string value */
-        xfree (D->V.SVal);
-    }
-    /* Free the structure */
-    xfree (D);
-}
-
-
-
 static void CfgDataCheckType (const CfgData* D, unsigned Type)
 /* Check the config data type */
 {

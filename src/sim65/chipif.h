@@ -39,7 +39,6 @@
 
 
 /* sim65 */
-#include "cfgdata.h"
 #include "chipdata.h"
 #include "simdata.h"
 

@@ -38,6 +38,11 @@
 
 
 
+/* common */
+#include "coll.h"
+
+
+
 /*****************************************************************************/
 /*                                     Data                                  */
 /*****************************************************************************/
@@ -50,7 +55,7 @@ struct CfgData {
         CfgDataInvalid,
 	CfgDataId,
 	CfgDataNumber,
-	CfgDataString 
+	CfgDataString
     }		Type;		/* Type of the value */
     union {
 	char*	SVal;		/* String or id value */
@@ -60,6 +65,45 @@ struct CfgData {
     unsigned    Col;            /* Column of attribute definition */
     char       	Attr[1];        /* The attribute name */
 };
+
+
+
+/*****************************************************************************/
+/*                                     Code                                  */
+/*****************************************************************************/
+
+
+
+CfgData* NewCfgData (void);
+/* Create and intialize a new CfgData struct, then return it. The function
+ * uses the current output of the config scanner.
+ */
+
+void FreeCfgData (CfgData* D);
+/* Free a config data structure */
+
+int CfgDataFind (Collection* Attributes, const char* AttrName);
+/* Find the attribute with the given name and return its index. Return -1 if
+ * the attribute was not found.
+ */
+
+int CfgDataGetId (Collection* Attributes, const char* Name, char** Id);
+/* Search CfgInfo for an attribute with the given name and type "id". If
+ * found, remove it from the configuration, copy it into Buf and return
+ * true. If not found, return false.
+ */
+
+int CfgDataGetStr (Collection* Attributes, const char* Name, char** S);
+/* Search CfgInfo for an attribute with the given name and type "string".
+ * If found, remove it from the configuration, copy it into Buf and return
+ * true. If not found, return false.
+ */
+
+int CfgDataGetNum (Collection* Attributes, const char* Name, long* Val);
+/* Search CfgInfo for an attribute with the given name and type "number".
+ * If found, remove it from the configuration, copy it into Val and return
+ * true. If not found, return false.
+ */
 
 
 

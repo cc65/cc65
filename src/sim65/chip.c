@@ -66,9 +66,14 @@ static Collection ChipLibraries = STATIC_COLLECTION_INITIALIZER;
 static const SimData Sim65Data = {
     1, 		    	/* MajorVersion */
     1, 		    	/* MinorVersion */
-    xmalloc,            /* void* (*Malloc) (size_t Size); */
-    Warning,		/* void (*Warning) (const char* Format, ...); */
-    Error		/* void (*Error) (const char* Format, ...); */
+    xmalloc,
+    xfree,
+    Warning,
+    Error,
+    Internal,
+    CfgDataGetId,
+    CfgDataGetStr,
+    CfgDataGetNum
 };
 
 

@@ -51,9 +51,43 @@ struct SimData {
     unsigned	MinorVersion;
 
     /* -- Callback functions -- */
+
     void* (*Malloc) (size_t Size);
+    /* Allocate a memory block of the given size */
+
+    void (*Free) (void* Block);
+    /* Free an allocated memory block */
+
     void (*Warning) (const char* Format, ...);
+    /* Print a warning */
+
     void (*Error) (const char* Format, ...);
+    /* Print an error and terminate the program */
+
+    void (*Internal) (const char* Format, ...);
+    /* Print an internal program error and terminate */
+
+    int (*GetCfgId) (void* CfgInfo, const char* Name, char** Id);
+    /* Search CfgInfo for an attribute with the given name and type "id". If
+     * found, remove it from the configuration, pass a pointer to a dynamically
+     * allocated string containing the value to Id, and return true. If not
+     * found, return false. The memory passed in Id must be free by a call to
+     * Free();
+     */
+
+    int (*GetCfgStr) (void* CfgInfo, const char* Name, char** S);
+    /* Search CfgInfo for an attribute with the given name and type "id". If
+     * found, remove it from the configuration, pass a pointer to a dynamically
+     * allocated string containing the value to Id, and return true. If not
+     * found, return false. The memory passed in S must be free by a call to
+     * Free();
+     */
+
+    int (*GetCfgNum) (void* CfgInfo, const char* Name, long* Val);
+    /* Search CfgInfo for an attribute with the given name and type "number".
+     * If found, remove it from the configuration, copy it into Val and return
+     * true. If not found, return false.
+     */
 };
 
 

@@ -80,27 +80,19 @@ static char GetKeyUpdate (void);
 #endif
 
 /* Screen definitions */
-#ifdef __CBM610__
+#if defined(__CBM610__)
 #  define BIGSCREEN
 #  define MAX_X	   	80
 #  define MAX_Y	   	25
 #  define DUMP_BYTES	16
+#elif defined(__APPLE2__) || defined(__ATARI__)
+#  define MAX_X         40
+#  define MAX_Y         24
+#  define DUMP_BYTES     8
 #else
-#  ifdef __APPLE2__
-#    define MAX_X       40
-#    define MAX_Y       24
-#    define DUMP_BYTES   8
-#  else
-#    ifdef __ATARI__
-#      define MAX_X       40
-#      define MAX_Y       24
-#      define DUMP_BYTES   8
-#    else
-#      define MAX_X	40
-#      define MAX_Y	25
-#      define DUMP_BYTES	8
-#    endif
-#  endif
+#  define MAX_X 	40
+#  define MAX_Y	        25
+#  define DUMP_BYTES	 8
 #endif
 
 

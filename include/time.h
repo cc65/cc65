@@ -61,8 +61,8 @@ struct tm {
 };
 
 #if defined(__CBM__)
-#  if defined(__CBM610__)
-/* The 610 gets its clock from the AC current */
+#  if defined(__CBM510__) || defined(__CBM610__)
+/* The 510/610 gets its clock from the AC current */
 #    define CLK_TCK    	       	50 	/* POSIX */
 #    define CLOCKS_PER_SEC	50	/* ANSI */
 #  else

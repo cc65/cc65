@@ -632,8 +632,13 @@ void PrintSegmentMap (FILE* F)
 	/* Print empty segments only if explicitly requested */
 	if (VerboseMap || S->Size > 0) {
 	    /* Print the segment data */
+	    long End = S->PC + S->Size;
+	    if (S->Size > 0) {
+		/* Point to last element addressed */
+	     	--End;
+	    }
 	    fprintf (F, "%-20s  %06lX  %06lX  %06lX\n",
-		     S->Name, S->PC, S->PC + S->Size, S->Size);
+		     S->Name, S->PC, End, S->Size);
      	}
     }
 

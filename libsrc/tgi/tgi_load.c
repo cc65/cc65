@@ -51,7 +51,7 @@ void __fastcall__ tgi_load (unsigned char mode)
         /* No driver for this mode */
         tgi_error = TGI_ERR_NO_DRIVER;
     } else {
-        /* Laod the driver */
+        /* Load the driver */
         tgi_load_driver (name);
     }
 }

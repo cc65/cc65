@@ -71,7 +71,7 @@ struct LongOpt {
 
 
 
-void InitCmdLine (unsigned* aArgCount, char** aArgVec[], const char* aProgName);
+void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName);
 /* Initialize command line parsing. aArgVec is the argument array terminated by
  * a NULL pointer (as usual), ArgCount is the number of valid arguments in the
  * array. Both arguments are remembered in static storage.
@@ -82,7 +82,7 @@ void UnknownOption (const char* Opt) attribute ((noreturn));
 
 void NeedArg (const char* Opt) attribute ((noreturn));
 /* Print an error about a missing option argument and exit. */
-
+			 
 void InvDef (const char* Def) attribute ((noreturn));
 /* Print an error about an invalid definition and die */
 
@@ -91,7 +91,7 @@ const char* GetArg (int* ArgNum, unsigned Len);
  * option itself or may be separate. Len is the length of the option string.
  */
 
-void LongOption (int* ArgNum, const LongOpt* OptTab, unsigned OptCount);
+void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount);
 /* Handle a long command line option */
 
 

@@ -170,14 +170,14 @@ static void ExpandFile (CmdLine* L, const char* Name)
 
 
 
-void InitCmdLine (unsigned* aArgCount, char** aArgVec[], const char* aProgName)
+void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName)
 /* Initialize command line parsing. aArgVec is the argument array terminated by
  * a NULL pointer (as usual), ArgCount is the number of valid arguments in the
  * array. Both arguments are remembered in static storage.
  */
 {
     CmdLine	L;
-    unsigned    I;
+    int         I;
 
     /* Get the program name from argv[0] but strip a path */
     if (*(aArgVec)[0] == 0) {
@@ -284,7 +284,7 @@ const char* GetArg (int* ArgNum, unsigned Len)
 
 
 
-void LongOption (int* ArgNum, const LongOpt* OptTab, unsigned OptCount)
+void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount)
 /* Handle a long command line option */
 {
     /* Get the option and the argument (which may be zero) */

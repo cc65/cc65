@@ -17,7 +17,7 @@ _wherex:    lda cursor_x
 	    sta tmp1
 	    lda cursor_x+1
 	    sta tmp2
-	    lda #tmp1
+	    ldx #tmp1
 	    ldy #3
 	    jsr DShiftRight
 	    lda tmp1

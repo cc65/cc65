@@ -9,7 +9,6 @@
 	    .export _kbhit
 	    .import return0, return1
 
-	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
 
 _kbhit:

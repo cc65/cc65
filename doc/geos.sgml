@@ -47,8 +47,8 @@ will not always return the same values. In fact <tt/gotoxy/ sets current positio
 you would expect on a normal 40x25 screen, not a position that would regard current font's
 height. Both 40 and 80 columns modes are supported.
 <p>
-It is safe to use these standard includes: <tt/conio.h, dio.h, errno.h, geos.h, joystick.h,
-mouse.h, stdlib.h, string.h/
+It is safe to use these standard includes and its contents:
+<tt/assert.h, conio.h, dio.h, errno.h, geos.h, joystick.h, mouse.h, stdlib.h, string.h/
 <p>
 I am an assembler programmer and GEOSLib was designed in such way that cc65 could emit the best
 available code (well, the best as for machine :). Many of the <tt/void foo (void)/ functions are
@@ -217,7 +217,7 @@ This draws on screen rectangle filled with current pattern.
 <p>
 <tt/void FrameRectangle (char pattern)/
 <p>
-This one draws frame with given line pattern.
+This one draws frame with given bit pattern (not a pattern from GEOS palette).
 
 <sect3>InvertRectangle
 <p>
@@ -273,7 +273,7 @@ number as set in <tt/SetPattern/ but a true bit pattern.
 <tt/void DrawLine (struct window *myWindow)/
 <p>
 <tt/top/ parameters of <tt/struct window/ describe the starting point of the line, while
-<tt/bottom/ are for the ending point. Current pattern is used for drawing.
+<tt/bottom/ are for the ending point. Current pattern from <tt/SetPattern/ is used for drawing.
 
 <sect2>Point Functions
 <p>

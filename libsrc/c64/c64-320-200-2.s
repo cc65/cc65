@@ -23,7 +23,7 @@
 ; capabilities of the driver
 
         .byte   $74, $67, $69           ; "tgi"
-        .byte   $00                     ; TGI version number
+        .byte   TGI_API_VERSION         ; TGI API version number
         .word   320                     ; X resolution
         .word   200                     ; Y resolution
         .byte   2                       ; Number of drawing colors
@@ -66,20 +66,21 @@
 ; Variables mapped to the zero page segment variables. Some of these are
 ; used for passing parameters to the driver.
 
-X1              = ptr1
-Y1              = ptr2
-X2              = ptr3
-Y2              = ptr4
-RADIUS          = tmp1
+X1              := ptr1
+Y1              := ptr2
+X2              := ptr3
+Y2              := ptr4
+RADIUS          := tmp1
 
-ROW             = tmp2          ; Bitmap row...
-COL             = tmp3          ; ...and column, both set by PLOT
-TEMP            = tmp4
-TEMP2           = sreg
-POINT           = regsave
+ROW             := tmp2         ; Bitmap row...
+COL             := tmp3         ; ...and column, both set by PLOT
+TEMP            := tmp4
+TEMP2           := sreg
+POINT           := regsave
+INRANGE         := regsave+2    ; PLOT variable, $00 = coordinates in range
 
-CHUNK           = X2            ; Used in the line routine
-OLDCHUNK        = X2+1          ; Dito
+CHUNK           := X2           ; Used in the line routine
+OLDCHUNK        := X2+1         ; Dito
 
 ; Absolute variables used in the code
 
@@ -92,9 +93,6 @@ BITMASK:        .res    1       ; $00 = clear, $FF = set pixels
 
 ; INIT/DONE
 OLDD018:        .res    1       ; Old register value
-
-; PLOT variables
-INRANGE:        .res    1       ; $00 = coordinates in range
 
 ; Line routine stuff
 DX:             .res    2
@@ -206,7 +204,7 @@ DONE1:  sta     $D011
 ; The graphics kernel will never call DONE when no graphics mode is active,
 ; so there is no need to protect against that.
 ;
-; Must set an error code: YES
+; Must set an error code: NO
 ;
 
 DONE:   lda     $DD02           ; Set the data direction regs
@@ -221,7 +219,8 @@ DONE:   lda     $DD02           ; Set the data direction regs
 
         lda     $D011
         and     #<~$20
-        jmp     DONE1
+        sta     $D011
+        rts
 
 ; ------------------------------------------------------------------------
 ; GETERROR: Return the error code in A and clear it.
@@ -367,15 +366,18 @@ SETPALETTE:
    	sta	$01
   	cli
 
-; Done
+; Done, reset the error code
 
+        lda     #TGI_ERR_OK
+        sta     ERROR
         rts
 
 ; ------------------------------------------------------------------------
-; GETPALETTE: Return the current palette in A/X. Must return NULL and set an
-; error if palettes are not supported.
+; GETPALETTE: Return the current palette in A/X. Even drivers that cannot
+; set the palette should return the default palette here, so there's no
+; way for this function to fail.
 ;
-; Must set an error code: YES
+; Must set an error code: NO
 ;
 
 GETPALETTE:
@@ -384,10 +386,12 @@ GETPALETTE:
         rts
 
 ; ------------------------------------------------------------------------
-; GETDEFPALETTE: Return the default palette for the driver in A/X. Must
-; return NULL and set an error of palettes are not supported.
+; GETDEFPALETTE: Return the default palette for the driver in A/X. All
+; drivers should return something reasonable here, even drivers that don't
+; support palettes, otherwise the caller has no way to determine the colors
+; of the (not changeable) palette.
 ;
-; Must set an error code: YES
+; Must set an error code: NO (all drivers must have a default palette)
 ;
 
 GETDEFPALETTE:
@@ -769,9 +773,7 @@ FIXY:   cpy     #255         ;Y=255 or Y=8
 @CONT1: inc     ROW
         bne     @DONE
         lda     COL
-        bmi     @DONE
-        lda     #00
-        sta     INRANGE
+        bpl     @CLEAR
 @DONE:  rts
 
 @DECPTR:                     ;Okay, subtract 320 then
@@ -790,9 +792,10 @@ FIXY:   cpy     #255         ;Y=255 or Y=8
         bne     @DONE
         lda     COL
         bmi     @DONE
-        lda     #00
+@CLEAR: lda     #00
         sta     INRANGE
         rts
+
 @TOAST: pla                  ;Remove old return address
         pla
         jmp     EXIT         ;Restore interrupts, etc.

@@ -5,23 +5,24 @@
 ; 23.12.2002
 ;
 ; NOTES:
-; For any smart monkey that will try to optimize this: PLEASE do tests on real VDC,
-; not only VICE.
+; For any smart monkey that will try to optimize this: PLEASE do tests on 
+; real VDC, not only VICE.
 ;
-; Only DONE routine contains C128-mode specific stuff, everything else will work in
-; C64-mode of C128 (C64 needs full VDC init then).
+; Only DONE routine contains C128-mode specific stuff, everything else will 
+; work in C64-mode of C128 (C64 needs full VDC init then).
 ;
 ; With special initialization and CALC we can get 320x200 double-pixel mode.
 ;
-; Color translation values for BROWN and GRAY3 are obviously wrong, they could
-; be replaced by equiv. of ORANGE and GRAY2 but this would give only 14 of 16 colors available.
+; Color translation values for BROWN and GRAY3 are obviously wrong, they 
+; could be replaced by equiv. of ORANGE and GRAY2 but this would give only 
+; 14 of 16 colors available.
 ;
-; Register 25 ($19) is said to require different value for VDC v1, but I couldn't find what
-; it should be.
+; Register 25 ($19) is said to require different value for VDC v1, but I 
+; couldn't find what it should be.
 
-	.include 	"zeropage.inc"
+	.include     	"zeropage.inc"
 
-      	.include 	"tgi-kernel.inc"
+      	.include     	"tgi-kernel.inc"
         .include        "tgi-mode.inc"
         .include        "tgi-error.inc"
 
@@ -54,7 +55,7 @@ VDC_DATA	  = 31
 ; capabilities of the driver
 
         .byte   $74, $67, $69           ; "tgi"
-        .byte   $00                     ; TGI version number
+        .byte   TGI_API_VERSION         ; TGI version number
 xres:   .word   640                     ; X resolution
 yres:   .word   480                     ; Y resolution
         .byte   2                       ; Number of drawing colors
@@ -64,10 +65,7 @@ pages:	.byte   0                       ; Number of screens available
         .res    4, $00                  ; Reserved for future extensions
 
 ; Next comes the jump table. Currently all entries must be valid and may point
-; to an RTS for test versions (function not implemented). A future version may
-; allow for emulation: In this case the vector will be zero. Emulation means
-; that the graphics kernel will emulate the function by using lower level
-; primitives - for example ploting a line by using calls to SETPIXEL.
+; to an RTS for test versions (function not implemented).
 
         .word   INSTALL
         .word   UNINSTALL
@@ -280,7 +278,7 @@ UNINSTALL:
 
 ; ------------------------------------------------------------------------
 ; INIT: Changes an already installed device from text mode to graphics
-; mode. 
+; mode.
 ; Note that INIT/DONE may be called multiple times while the driver
 ; is loaded, while INSTALL is only called once, so any code that is needed
 ; to initializes variables and so on must go here. Setting palette and
@@ -331,7 +329,7 @@ INIT:
 ; The graphics kernel will never call DONE when no graphics mode is active,
 ; so there is no need to protect against that.
 ;
-; Must set an error code: YES
+; Must set an error code: NO
 ;
 
 DONE:
@@ -355,8 +353,7 @@ DONE:
 	jsr VDCWriteReg		; restore color (background)
 	lda #$47
 	ldx #VDC_HSCROLL
-	jsr VDCWriteReg		; switch to text screen
-; fall through to GETERROR in order to clear ERROR status
+       	jmp VDCWriteReg		; switch to text screen
 
 ; ------------------------------------------------------------------------
 ; GETERROR: Return the error code in A and clear it.
@@ -463,13 +460,17 @@ SETPALETTE:
 	ora	COLTRANS,y
 
 	ldx	#VDC_COLORS
-	jmp	VDCWriteReg
+       	jsr     VDCWriteReg
+        lda     #TGI_ERR_OK     ; Clear error code
+        sta     ERROR
+        rts
 
 ; ------------------------------------------------------------------------
-; GETPALETTE: Return the current palette in A/X. Must return NULL and set an
-; error if palettes are not supported.
+; GETPALETTE: Return the current palette in A/X. Even drivers that cannot
+; set the palette should return the default palette here, so there's no
+; way for this function to fail.
 ;
-; Must set an error code: YES
+; Must set an error code: NO
 ;
 
 GETPALETTE:
@@ -478,10 +479,12 @@ GETPALETTE:
         rts
 
 ; ------------------------------------------------------------------------
-; GETDEFPALETTE: Return the default palette for the driver in A/X. Must
-; return NULL and set an error of palettes are not supported.
+; GETDEFPALETTE: Return the default palette for the driver in A/X. All
+; drivers should return something reasonable here, even drivers that don't
+; support palettes, otherwise the caller has no way to determine the colors
+; of the (not changeable) palette.
 ;
-; Must set an error code: YES
+; Must set an error code: NO (all drivers must have a default palette)
 ;
 
 GETDEFPALETTE:

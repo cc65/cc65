@@ -6,16 +6,14 @@
 
 ; char IsMseInRegion (struct window *mywindow);
 
-	    .import RectRegs
-	    .import return0, return1
+	    .import _InitDrawWindow
 
 	    .export _IsMseInRegion
 	    
 	    .include "../inc/jumptab.inc"
 
 _IsMseInRegion:
-	    jsr RectRegs
+	    jsr _InitDrawWindow
 	    jsr IsMseInRegion
-	    bne L1
-	    jmp return0
-L1:	    jmp return1
+	    ldx #0
+	    rts

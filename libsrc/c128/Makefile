@@ -17,6 +17,9 @@
 %.emd:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
+%.joy:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
 %.tgi:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
@@ -36,7 +39,6 @@ OBJS =	_scrsize.o	\
         kernal.o        \
 	mouse.o		\
         randomize.o     \
-	readjoy.o	\
         revers.o        \
 	rs232.o		\
 	tgi_mode_table.o
@@ -44,18 +46,20 @@ OBJS =	_scrsize.o	\
 #--------------------------------------------------------------------------
 # Drivers
 
-TGIS =
-
 EMDS =	c128-georam.emd c128-ram.emd c128-reu.emd c128-vdc.emd
+
+JOYS = c128-stdjoy.joy
+
+TGIS =
 
 #--------------------------------------------------------------------------
 # Targets
 
-all:   	$(OBJS) $(EMDS) $(TGIS)
+all:   	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@rm -f $(OBJS)
+	@rm -f $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
 

@@ -339,9 +339,9 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         Label = GetLocalLabel ();
 
         /* Generate memcpy code */
-        if (Arg3.Expr.IVal <= 127) {
+        if (Arg3.Expr.IVal <= 127 && !AllowOneIndex) {
 
-            if (Offs == 0 || AllowOneIndex) {
+            if (Offs == 0) {
                 AddCodeLine ("ldy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal - 1));
                 g_defcodelabel (Label);
                 AddCodeLine ("lda %s,y", ED_GetLabelName (&Arg2.Expr, -Offs));
@@ -413,13 +413,13 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
         Label = GetLocalLabel ();
 
         /* Generate memcpy code */
-        if (Arg3.Expr.IVal <= 127) {
+        if (Arg3.Expr.IVal <= 127 && !AllowOneIndex) {
 
-            if (Offs == 0 || AllowOneIndex) {
-                AddCodeLine ("ldy #$%02X", (unsigned char) (Offs + Arg3.Expr.IVal - 1));
+            if (Offs == 0) {
+                AddCodeLine ("ldy #$%02X", (unsigned char) (Arg3.Expr.IVal - 1));
                 g_defcodelabel (Label);
                 AddCodeLine ("lda (sp),y");
-                AddCodeLine ("sta %s,y", ED_GetLabelName (&Arg1.Expr, -Offs));
+                AddCodeLine ("sta %s,y", ED_GetLabelName (&Arg1.Expr, 0));
                 AddCodeLine ("dey");
                 AddCodeLine ("bpl %s", LocalLabelName (Label));
             } else {

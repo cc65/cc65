@@ -569,7 +569,7 @@ static int IsHint (const Line* L, const char* Hint)
 
 
 
-static int IsCondJump (Line* L)
+static int IsCondJump (const Line* L)
 /* Return true if the line contains a conditional jump */
 {
     return (L->Line [0] == '\t' &&
@@ -581,7 +581,7 @@ static int IsCondJump (Line* L)
 
 
 
-static int IsXAddrMode (Line* L)
+static int IsXAddrMode (const Line* L)
 /* Return true if the given line does use the X register */
 {
     unsigned Len = strlen (L->Line);
@@ -591,7 +591,7 @@ static int IsXAddrMode (Line* L)
 
 
 
-static int NoXAddrMode (Line* L)
+static int NoXAddrMode (const Line* L)
 /* Return true if the given line does use the X register */
 {
     return !IsXAddrMode (L);
@@ -599,11 +599,23 @@ static int NoXAddrMode (Line* L)
 
 
 
-static int IsYAddrMode (Line* L)
+static int IsYAddrMode (const Line* L)
 /* Return true if the given line does use the Y register */
 {
     unsigned Len = strlen (L->Line);
     return (strcmp (L->Line + Len - 2, ",y") == 0);
+}
+
+
+
+static int Is16BitStore (const Line* L1, const Line* L2)
+/* Check if L1 and L2 are a store of ax into a 16 bit location */
+{
+    unsigned Len1 = strlen (L1->Line);
+    return (strncmp (L1->Line, "\tsta\t", 5) == 0   		&&
+	    strncmp (L2->Line, "\tstx\t", 5) == 0   		&&
+	    strncmp (L1->Line+5, L2->Line+5, Len1-5) == 0	&&
+	    strcmp (L2->Line+Len1, "+1") == 0);
 }
 
 
@@ -1810,10 +1822,10 @@ static int OptPtrOps1 (Line** Start)
 
     /* Search for (23B/XXT)
      *
-     *     	lda     _b+0
-     *     	ldx     _b+0+1
-     *     	sta     regsave
-     *     	stx     regsave+1
+     *      	lda     _b+0
+     *      	ldx     _b+0+1
+     *      	sta     regsave
+     *      	stx     regsave+1
      *       	jsr     incax1
      *       	sta     _b+0
      *       	stx     _b+0+1
@@ -1929,41 +1941,41 @@ static int OptPtrOps1 (Line** Start)
 
 	} else if (LineFullMatch (L3[4], "\tjsr\tpushax")) {
 	    if (GetNextCodeLines (L3[4], &L3[5], 2) 	       	&&
-	 	LineMatch      	 (L3[5], "\tlda\t")		&&
-	 	LineFullMatch	 (L3[6], "\tjsr\tstaspp")) {
+	    	LineMatch      	 (L3[5], "\tlda\t")		&&
+	    	LineFullMatch	 (L3[6], "\tjsr\tstaspp")) {
 
-		/* Store to pointer */
-	 	L = ReplaceLine  (L, L3[5]->Line);
+	    	/* Store to pointer */
+	    	L = ReplaceLine  (L, L3[5]->Line);
 	    	L = NewLineAfter (L, "\tldy\t#$00");
-		L = NewLineAfter (L, "\tsta\t(%s),y", Reg);
-		L = NewLineAfter (L, "\tinc\t%s", Reg);
-		L = NewLineAfter (L, "\tbne\t*+4");
-		L = NewLineAfter (L, "\tinc\t%s+1", Reg);
+	    	L = NewLineAfter (L, "\tsta\t(%s),y", Reg);
+	    	L = NewLineAfter (L, "\tinc\t%s", Reg);
+	    	L = NewLineAfter (L, "\tbne\t*+4");
+	    	L = NewLineAfter (L, "\tinc\t%s+1", Reg);
 
-		Done = 1;
-	 	LinesToRemove += 3;
+	    	Done = 1;
+	    	LinesToRemove += 3;
 
 	    } else if (GetNextCodeLines (L3[4], &L3[5], 3) 	&&
-	 	       LineMatch     (L3[5], "\tldy\t#$")      	&&
-	 	       LineFullMatch (L3[6], "\tlda\t(sp),y")	&&
-	 	       LineFullMatch (L3[7], "\tjsr\tstaspp")) {
+	    	       LineMatch     (L3[5], "\tldy\t#$")      	&&
+	    	       LineFullMatch (L3[6], "\tlda\t(sp),y")	&&
+	    	       LineFullMatch (L3[7], "\tjsr\tstaspp")) {
 
-	 	/* Beware: We have to correct the stack offset, since we will
-	 	 * remove the pushax instruction!
-	 	 */
-		Offs = GetHexNum (L3[5]->Line+7) - 2;
+	    	/* Beware: We have to correct the stack offset, since we will
+	    	 * remove the pushax instruction!
+	    	 */
+	    	Offs = GetHexNum (L3[5]->Line+7) - 2;
 
-	 	/* Store to pointer */
-		L = ReplaceLine  (L, "\tldy\t#$%02X", Offs);
-		L = NewLineAfter (L, "\tldx\t#$00");
-		L = NewLineAfter (L, "\tlda\t(sp),y");
-		L = NewLineAfter (L, "\tsta\t(%s,x)", Reg);
-		L = NewLineAfter (L, "\tinc\t%s", Reg);
-		L = NewLineAfter (L, "\tbne\t*+4");
-		L = NewLineAfter (L, "\tinc\t%s+1", Reg);
+	    	/* Store to pointer */
+	    	L = ReplaceLine  (L, "\tldy\t#$%02X", Offs);
+	    	L = NewLineAfter (L, "\tldx\t#$00");
+	    	L = NewLineAfter (L, "\tlda\t(sp),y");
+	    	L = NewLineAfter (L, "\tsta\t(%s,x)", Reg);
+	    	L = NewLineAfter (L, "\tinc\t%s", Reg);
+	    	L = NewLineAfter (L, "\tbne\t*+4");
+	    	L = NewLineAfter (L, "\tinc\t%s+1", Reg);
 
-		Done = 1;
-	 	LinesToRemove += 4;
+	    	Done = 1;
+	    	LinesToRemove += 4;
 	    }
 	}
     }
@@ -1993,18 +2005,18 @@ static int OptPtrOps1 (Line** Start)
     	     	L = NewLineAfter (L, "\tldx\t#$00");
 	     	L = NewLineAfter (L, "\tlda\t(ptr1,x)");
 	     	NeedLoad = 0;
-		++LinesToRemove;
+	    	++LinesToRemove;
 	    } else if (LineFullMatch (L3[4], "\tsta\tptr1")		&&
-		       GetNextCodeLines (L3[4], &L3[5], 3)		&&
-		       LineFullMatch (L3[5], "\tstx\tptr1+1")		&&
-		       LineFullMatch (L3[6], "\tldx\t#$00")		&&
-		       LineFullMatch (L3[7], "\tlda\t(ptr1,x)")) {
+	    	       GetNextCodeLines (L3[4], &L3[5], 3)		&&
+	    	       LineFullMatch (L3[5], "\tstx\tptr1+1")		&&
+	    	       LineFullMatch (L3[6], "\tldx\t#$00")		&&
+	    	       LineFullMatch (L3[7], "\tlda\t(ptr1,x)")) {
 
-		/* Load char indirect, inlined */
-		L = NewLineAfter (L, "\tldx\t#$00");
-		L = NewLineAfter (L, "\tlda\t(ptr1,x)");
-		NeedLoad = 0;
-		LinesToRemove += 4;
+	    	/* Load char indirect, inlined */
+	    	L = NewLineAfter (L, "\tldx\t#$00");
+	    	L = NewLineAfter (L, "\tlda\t(ptr1,x)");
+	    	NeedLoad = 0;
+	    	LinesToRemove += 4;
 
 	    } else if (LineFullMatch (L3[4], "\tjsr\tldaxi")) {
 	     	/* Load word indirect */
@@ -2108,7 +2120,7 @@ static int OptPtrOps2 (Line** Start)
 	    LinesToRemove = 7;
 
 	} else if (GetNextCodeLines (L2[6], &L2[7], 1)		&&
-	   	   LineMatch     (L2[4], "\tldy\t#$")   	&&
+	    	   LineMatch     (L2[4], "\tldy\t#$")   	&&
 	    	   GetHexNum     (L2[4]->Line+7) == Offs  	&&
      	    	   LineFullMatch (L2[5], "\tjsr\tstaxysp")	&&
      	    	   LineFullMatch (L2[6], "\tlda\tregsave")	&&
@@ -2556,18 +2568,18 @@ static void OptPtrOps (void)
 	 *     	adc   	(sp),y
 	 *     	bcc   	*+3
 	 *   	inx
-	 *	sta   	ptr1
+	 *  	sta   	ptr1
 	 *   	stx   	ptr1+1
-	 *	ldx   	#$00
-	 *	lda   	(ptr1,x)
+	 *  	ldx   	#$00
+	 *  	lda   	(ptr1,x)
 	 *
 	 * and replace it by:
 	 *
 	 *  	ldy   	#$..
-	 *	lda   	(sp),y
- 	 *	tay
-	 *	ldx   	#$00
-	 *	lda   	_label+0,y
+	 *  	lda   	(sp),y
+ 	 *  	tay
+	 *  	ldx   	#$00
+	 *  	lda   	_label+0,y
 	 *
 	 * The load of X may be omitted if X is not used below.
 	 */
@@ -2680,10 +2692,10 @@ static void OptPtrOps (void)
       	    	 LineFullMatch (L2 [1], "\ttax")		&&
       	    	 LineFullMatch (L2 [2], "\tdey")		&&
       	    	 LineFullMatch (L2 [3], "\tlda\t(sp),y")	&&
-		 LineFullMatch (L2 [4], "\tsta\tptr1")		&&
-		 LineFullMatch (L2 [5], "\tstx\tptr1+1")	&&
-		 LineFullMatch (L2 [6], "\tldx\t#$00") 		&&
-		 LineFullMatch (L2 [7], "\tlda\t(ptr1,x)")) {
+	    	 LineFullMatch (L2 [4], "\tsta\tptr1")		&&
+	    	 LineFullMatch (L2 [5], "\tstx\tptr1+1")	&&
+	    	 LineFullMatch (L2 [6], "\tldx\t#$00") 		&&
+	    	 LineFullMatch (L2 [7], "\tlda\t(ptr1,x)")) {
 
       	    /* Found - replace it */
       	    if (LineFullMatch (L, "\tldy\t#$01")) {
@@ -2696,6 +2708,47 @@ static void OptPtrOps (void)
 
 	    /* Delete the remaining lines */
 	    FreeLines (L2 [1], L2 [7]);
+	}
+
+	/* Check for
+	 *
+       	 *     	ldy	#$xx
+	 *  	lda	(sp),y
+	 *  	tax
+	 *  	dey
+      	 *  	lda	(sp),y
+      	 *  	sta	yyy
+	 *     	stx	yyy+1
+      	 *
+      	 * and replace it by
+      	 *
+       	 *     	ldy	#$xx
+	 *  	lda	(sp),y
+	 *  	sta	yyy+1
+	 *  	dey
+      	 *  	lda	(sp),y
+      	 *  	sta	yyy
+      	 *
+      	 * Provided that X is not used later.
+      	 */
+       	else if (LineMatch (L, "\tldy\t#$")			&&
+      	    	 GetNextCodeLines (L, L2, 6)   			&&
+      	    	 LineFullMatch (L2 [0], "\tlda\t(sp),y")       	&&
+      	    	 LineFullMatch (L2 [1], "\ttax")      		&&
+      	    	 LineFullMatch (L2 [2], "\tdey")      		&&
+      	    	 LineFullMatch (L2 [3], "\tlda\t(sp),y")	&&
+	       	 Is16BitStore (L2[4], L2[5])			&&
+		 !RegXUsed (L2[5])) {
+
+      	    /* Found - replace it */
+	    L2[1] = ReplaceLine (L2[1], L2[5]->Line);
+	    L2[1]->Line[3] = 'a';
+
+	    /* Delete the remaining lines */
+	    FreeLine (L2[5]);
+
+	    /* Start over at last line */
+	    L = L2[4];
 	}
 
 	/* Next Line */
@@ -2946,7 +2999,7 @@ static void OptDoubleJumps (void)
 	    D = 0;
 	    if (LineMatch (Target, "\tjmp\t")) {
 
-		/* The target is itself a jump. If this is a short branch, get
+	    	/* The target is itself a jump. If this is a short branch, get
 		 * the final target and check if it is in reach. Bail out if
 		 * not.
 		 */
@@ -4110,7 +4163,7 @@ static Line* OptOneBlock (Line* L)
 		    /* If X is zero and we have a 65C02 cpu, replace it by
 		     * an indirect load.
 		     */
-		    if (X == 0 && CPU == CPU_65C02) { 
+		    if (X == 0 && CPU == CPU_65C02) {
 			unsigned Len = strlen (L->Line);
 			L->Line [Len-3] = ')';
 			L->Line [Len-2] = '\0';
@@ -4450,7 +4503,7 @@ void OptDoOpt (void)
 
     /* Ok, now start the real optimizations */
     Flags = 1UL;
-    for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
+    for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I, Flags <<= 1) {
        	if ((OptDisable & Flags) == 0) {
 	    OptFuncs[I] ();
 	} else if (Verbose || Debug) {

@@ -368,5 +368,22 @@ or
 instead will give shorter and faster code.
 
 
+<sect>Access to parameters in variadic functions is expensive<p>
+
+Since cc65 has the "wrong" calling order, the location of the fixed parameters
+in a variadic function (a function with a variable parameter list) depends on
+the number and size of variable arguments passed. Since this number and size
+is unknown at compiler time, the compiler will generate code to calculate the
+location on the stack when needed.
+
+Because of this additional code, accessing the fixed parameters in a variadic
+function is much more expensive than access to parameters in a "normal" 
+function. Unfortunately, this additional code is also invisible to the
+programmer, so it is easy to forget.
+
+As a rule of thumb, if you access such a parameter more than once, you should
+think about copying it into a normal variable and using this variable instead.
+
+
 </article>
 

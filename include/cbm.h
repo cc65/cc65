@@ -127,13 +127,15 @@ unsigned int cbm_load(const char* name, unsigned char device,
 
 unsigned char cbm_save(const char* name, unsigned char device,
                        unsigned char* data, unsigned int size);
-/* Saves "size" bytes starting at "data" to a file. 
+/* Saves "size" bytes starting at "data" to a file.
  * Returns 0 if saving was successful, otherwise an errorcode (see table
  * below).
  */
 
-unsigned char cbm_open(unsigned char lfn, unsigned char device,
-                       unsigned char sec_addr, const char* name);
+unsigned char __fastcall__ cbm_open (unsigned char lfn,
+                                     unsigned char device,
+                                     unsigned char sec_addr,
+                                     const char* name);
 /* Opens a file. Works just like the BASIC command.
  * Returns 0 if opening was successful, otherwise an errorcode (see table
  * below).
@@ -142,7 +144,7 @@ unsigned char cbm_open(unsigned char lfn, unsigned char device,
 void __fastcall__ cbm_close (unsigned char lfn);
 /* Closes a file */
 
-int cbm_read(unsigned char lfn, void* buffer, unsigned int size);
+int __fastcall__ cbm_read (unsigned char lfn, void* buffer, unsigned int size);
 /* Reads up to "size" bytes from a file to "buffer".
  * Returns the number of actually read bytes, 0 if there are no bytes left
  * (EOF) or -1 in case of an error. _oserror contains an errorcode then (see

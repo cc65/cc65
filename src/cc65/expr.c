@@ -938,6 +938,11 @@ static int primary (ExprDesc* lval)
 	   	    lval->Flags = E_MLOCAL | E_TLOFFS;
 	   	    lval->ConstVal = Sym->V.Offs;
 	   	}
+	    } else if ((Sym->Flags & SC_REGISTER) == SC_REGISTER) {
+	    	/* Register variable, zero page based */
+	    	lval->Flags = E_MGLOBAL | E_MCONST | E_TREGISTER;
+	    	lval->Name  = Sym->V.Offs;
+	    	lval->ConstVal = 0;
 	    } else if ((Sym->Flags & SC_STATIC) == SC_STATIC) {
 	    	/* Static variable */
 	   	if (Sym->Flags & (SC_EXTERN | SC_STORAGE)) {
@@ -947,11 +952,6 @@ static int primary (ExprDesc* lval)
 	    	    lval->Flags = E_MGLOBAL | E_MCONST | E_TLLAB;
 	   	    lval->Name = Sym->V.Label;
 	   	}
-	    	lval->ConstVal = 0;
-	    } else if ((Sym->Flags & SC_REGISTER) == SC_REGISTER) {
-	    	/* Register variable, zero page based */
-	    	lval->Flags = E_MGLOBAL | E_MCONST | E_TREGISTER;
-	    	lval->Name  = Sym->V.Offs;
 	    	lval->ConstVal = 0;
        	    } else {
 	    	/* Local static variable */

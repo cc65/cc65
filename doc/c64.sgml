@@ -235,6 +235,22 @@ does not exist).
 
 <sect>Other hints<p>
 
+<sect1>Passing arguments to the program<p>
+
+Command line arguments can be passed to <tt/main()/. Since this is not
+supported by BASIC, the following syntax was choosen:
+
+<tscreen><verb>
+    RUN:REM,ARG1," ARG2", ARG 3,, ARG5, ...
+</verb></tscreen>
+
+<enum>
+<item>Arguments are separated by commas.
+<item>There must be a comma after the first <tt/REM/.
+<item>Leading spaces are ignored; trailing spaces are included unless the
+      argument was quoted.
+<item>The first argument passed to <tt/main/ is the program name.
+</enum>
 
 
 

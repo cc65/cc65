@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,9 +57,10 @@ typedef enum token_t {
     TOK_AUTO,
     TOK_EXTERN,
     TOK_REGISTER,
+    TOK_RESTRICT,
     TOK_STATIC,
     TOK_TYPEDEF,
-    TOK_ENUM,
+    TOK_ENUM,    
     TOK_CONST,
     TOK_VOLATILE,
 

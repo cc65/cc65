@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -112,6 +112,7 @@ static const struct Keyword {
     { "int",   	       	TOK_INT,   	TT_C  	},
     { "long",  	       	TOK_LONG,  	TT_C  	},
     { "register",      	TOK_REGISTER,   TT_C  	},
+    { "restrict",      	TOK_RESTRICT,   TT_C  	},
     { "return",        	TOK_RETURN,	TT_C  	},
     { "short", 	       	TOK_SHORT, 	TT_C  	},
     { "signed",	       	TOK_SIGNED,	TT_C  	},
@@ -375,7 +376,7 @@ static void StringConst (void)
 
 void NextToken (void)
 /* Get next token from input stream */
-{        
+{
     ident token;
 
     /* We have to skip white space here before shifting tokens, since the

@@ -6,7 +6,8 @@
 
 	.include	"atari.inc"
 	.export		_gotoy
+	.import		setcursor
 
 _gotoy:
 	sta	ROWCRS		; Set Y
-	rts
+	jmp	setcursor

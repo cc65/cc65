@@ -6,9 +6,10 @@
 
 	.include	"atari.inc"
 	.export		_gotox
+	.import		setcursor
 
 _gotox:
 	sta	COLCRS		; Set X
 	lda	#0
 	sta	COLCRS+1
-	rts
+	jmp	setcursor

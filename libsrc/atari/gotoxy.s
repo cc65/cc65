@@ -8,6 +8,7 @@
 
 	.export		_gotoxy
 	.import		popa
+	.import		setcursor
 
 _gotoxy:			; Set the cursor position
 	sta	ROWCRS		; Set Y
@@ -15,4 +16,4 @@ _gotoxy:			; Set the cursor position
 	sta	COLCRS		; Set X
 	lda	#0
 	sta	COLCRS+1	;
-	rts		
+	jmp	setcursor

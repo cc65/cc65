@@ -1211,6 +1211,50 @@ static void ClosingCurlyBraces (unsigned BracesExpected)
 
 
 
+static void DefineData (ExprDesc* Expr)
+/* Output a data definition for the given expression */
+{
+    switch (ED_GetLoc (Expr)) {
+
+        case E_LOC_ABS:
+            /* Absolute: numeric address or const */
+       	    g_defdata (TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
+            break;
+
+        case E_LOC_GLOBAL:
+            /* Global variable */
+            g_defdata (CF_EXTERNAL, Expr->Name, Expr->IVal);
+            break;
+
+        case E_LOC_STATIC:
+        case E_LOC_LITERAL:
+            /* Static variable or literal in the literal pool */
+            g_defdata (CF_STATIC, Expr->Name, Expr->IVal);
+            break;
+
+        case E_LOC_REGISTER:
+       	    /* Register variable. Taking the address is usually not
+       	     * allowed.
+       	     */
+       	    if (IS_Get (&AllowRegVarAddr) == 0) {
+       	      	Error ("Cannot take the address of a register variable");
+       	    }
+            g_defdata (CF_REGVAR, Expr->Name, Expr->IVal);
+            break;
+
+        case E_LOC_STACK:
+        case E_LOC_PRIMARY:
+        case E_LOC_EXPR:
+            Error ("Non constant initializer");
+            break;
+
+       	default:
+       	    Internal ("Unknown constant type: 0x%04X", ED_GetLoc (Expr));
+    }
+}
+
+
+
 static unsigned ParseScalarInit (type* T)
 /* Parse initializaton for scalar data types. Return the number of data bytes. */
 {
@@ -1276,10 +1320,24 @@ static unsigned ParseArrayInit (type* T, int AllowFlexibleMembers)
     long ElementCount    = GetElementCount (T);
 
     /* Special handling for a character array initialized by a literal */
-    if (IsTypeChar (ElementType) && CurTok.Tok == TOK_SCONST) {
+    if (IsTypeChar (ElementType) &&
+        (CurTok.Tok == TOK_SCONST ||
+        (CurTok.Tok == TOK_LCURLY && NextTok.Tok == TOK_SCONST))) {
 
         /* Char array initialized by string constant */
-        const char* Str = GetLiteral (CurTok.IVal);
+        int NeedParen;
+        const char* Str;
+
+        /* If we initializer is enclosed in brackets, remember this fact and
+         * skip the opening bracket.
+         */
+        NeedParen = (CurTok.Tok == TOK_LCURLY);
+        if (NeedParen) {
+            NextToken ();
+        }
+
+        /* Get the initializer string and its size */
+        Str = GetLiteral (CurTok.IVal);
         Count = GetLiteralPoolOffs () - CurTok.IVal;
 
         /* Translate into target charset */
@@ -1301,6 +1359,13 @@ static unsigned ParseArrayInit (type* T, int AllowFlexibleMembers)
         /* Remove string from pool */
         ResetLiteralPoolOffs (CurTok.IVal);
         NextToken ();
+
+        /* If the initializer was enclosed in curly braces, we need a closing
+         * one.
+         */
+        if (NeedParen) {
+            ConsumeRCurly ();
+        }
 
     } else {
 

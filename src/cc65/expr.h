@@ -82,9 +82,6 @@ void hie1 (ExprDesc* lval);
 void hie0 (ExprDesc* Expr);
 /* Parse comma operator. */
 
-void DefineData (ExprDesc* lval);
-/* Output a data definition for the given expression */
-
 
 
 /* End of expr.h */

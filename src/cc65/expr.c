@@ -181,44 +181,6 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
 
 
 
-void DefineData (ExprDesc* Expr)
-/* Output a data definition for the given expression */
-{
-    switch (ED_GetLoc (Expr)) {
-
-        case E_LOC_ABS:
-            /* Absolute: numeric address or const */
-	    g_defdata (TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
-            break;
-
-        case E_LOC_GLOBAL:
-            /* Global variable */
-            g_defdata (CF_EXTERNAL, Expr->Name, Expr->IVal);
-            break;
-
-        case E_LOC_STATIC:
-        case E_LOC_LITERAL:
-            /* Static variable or literal in the literal pool */
-            g_defdata (CF_STATIC, Expr->Name, Expr->IVal);
-            break;
-
-        case E_LOC_REGISTER:
-	    /* Register variable. Taking the address is usually not
-	     * allowed.
-	     */
-	    if (IS_Get (&AllowRegVarAddr) == 0) {
-	     	Error ("Cannot take the address of a register variable");
-	    }
-            g_defdata (CF_REGVAR, Expr->Name, Expr->IVal);
-            break;
-
-       	default:
-	    Internal ("Unknown constant type: 0x%04X", ED_GetLoc (Expr));
-    }
-}
-
-
-
 static int kcalc (token_t tok, long val1, long val2)
 /* Calculate an operation with left and right operand constant. */
 {

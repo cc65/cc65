@@ -248,6 +248,13 @@ INLINE void CollReplace (Collection* C, void* Item, unsigned Index)
 	(C)->Items[(Index)] = (Item))
 #endif
 
+void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex);
+/* Move an item from one position in the collection to another. OldIndex
+ * is the current position of the item, NewIndex is the new index after
+ * the function has done it's work. Existing entries with indices NewIndex
+ * and up are moved one position upwards.
+ */
+
 void CollSort (Collection* C,
 	       int (*Compare) (void*, const void*, const void*),
 	       void* Data);

@@ -182,6 +182,29 @@ void CollDeleteItem (Collection* C, const void* Item)
 
 
 
+void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex)
+/* Move an item from one position in the collection to another. OldIndex
+ * is the current position of the item, NewIndex is the new index after
+ * the function has done it's work. Existing entries with indices NewIndex
+ * and up are moved one position upwards.
+ */
+{
+    /* Get the item and remove it from the collection */
+    void* Item = CollAt (C, OldIndex);
+    CollDelete (C, OldIndex);
+
+    /* Correct NewIndex if needed */
+    if (NewIndex >= OldIndex) {
+   	/* Position has changed with removal */
+   	--NewIndex;
+    }
+
+    /* Now insert it at the new position */
+    CollInsert (C, Item, NewIndex);
+}
+
+
+
 static void QuickSort (Collection* C, int Lo, int Hi,
 	               int (*Compare) (void*, const void*, const void*),
 		       void* Data)

@@ -13,16 +13,15 @@
 ;
 
 	.include 	"zeropage.inc"
+	.include 	"extzp.inc"
 
       	.include 	"tgi-kernel.inc"
         .include        "tgi-mode.inc"
         .include        "tgi-error.inc"
 
 	.include        "lynx.inc"
-        .include        "extzp.inc"
 
         .macpack        generic
-
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.
@@ -42,14 +41,17 @@
         .byte   8                       ; System font Y size
         .res    4, $00                  ; Reserved for future extensions
 
-; Next comes the jump table. All entries must be valid and may point to an RTS
-; for test versions (function not implemented).
+; Next comes the jump table. Currently all entries must be valid and may point
+; to an RTS for test versions (function not implemented). A future version may
+; allow for emulation: In this case the vector will be zero. Emulation means
+; that the graphics kernel will emulate the function by using lower level
+; primitives - for example ploting a line by using calls to SETPIXEL.
 
         .addr   INSTALL
         .addr   UNINSTALL
         .addr   INIT
         .addr   DONE
-       	.addr   GETERROR
+        .addr	GETERROR
         .addr   CONTROL
         .addr   CLEAR
         .addr   SETVIEWPAGE
@@ -66,6 +68,7 @@
         .addr   TEXTSTYLE
         .addr   OUTTEXT
         .addr   0                       ; IRQ entry is unused
+
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -323,6 +326,7 @@ CLEAR:  lda     #<cls_sprite
 ; from the new buffer. This is usually noticed by the user.
 
 SETVIEWPAGE:
+	cmp	#1
        	beq     @L1             ; page == maxpages-1
        	ldy     #<$de20         ; page 0
        	ldx     #>$de20
@@ -357,6 +361,7 @@ SETVIEWPAGE:
 ;
 
 SETDRAWPAGE:
+	cmp	#1
        	beq     @L1                 ; page == maxpages-1
        	lda     #<$de20             ; page 0
        	ldx     #>$de20
@@ -487,7 +492,13 @@ GETPIXEL:
        	sta     ptr1+1
 
        	ldx     #0
+	lda	#15
+	sta	MAPCTL
        	lda     (ptr1),y
+	tay
+	lda	#$0c
+	sta	MAPCTL
+	tya
        	plp
        	bcc     @L1
        	and     #$f
@@ -506,8 +517,7 @@ GETPIXEL:
 ; Must set an error code: NO
 ;
 
-	.data
-
+.data
 line_sprite:
 	.byte   0		; Will be replaced by the code
 	.byte	%00110000
@@ -527,6 +537,7 @@ line_tilt:
 line_c:
 	.byte    $e
 
+.code
 LINE:
 	lda	DRAWINDEX
 	sta	line_c
@@ -550,7 +561,7 @@ LINE:
 	lda	Y1
 	ldx	Y2
 	sta	Y2
-	stx	Y1
+     	stx	Y1
 	lda	Y1+1
 	ldx	Y2+1
 	sta	Y2+1
@@ -574,7 +585,7 @@ LINE:
 	lda	#0
 	sbc	Y2+1
 	sta	Y2+1
-	lda	#%00010000	; Vertical flip
+     	lda	#%00010000	; Vertical flip
 	sta	line_sprite
 @L2:
 	lda	X1
@@ -598,7 +609,7 @@ LINE:
 	lda	X2
 	sbc	X1
 	ina
-	sta	MATHF
+     	sta	MATHF
 	stz	MATHE
 @L3:
 	lda	SPRSYS
@@ -658,7 +669,7 @@ BAR:    lda     X1
        	lda     X2
        	sec
        	sbc     X1
-	ina
+     	ina
        	sta     bar_sx+1
        	lda     Y2
        	sec
@@ -684,7 +695,7 @@ BAR:    lda     X1
 ; To do a circle please add this to your C program
 
 ;int sintbl[9] = {
-;	0,     //  0    degrees
+;    	0,     //  0    degrees
 ;	3196,  // 11.25 degrees
 ;	6270,  // 22.5  degrees
 ;	9102,  // 33.75 degrees
@@ -780,7 +791,7 @@ OUTTEXT:
 	lda	Y1+1
 	sta	text_y+1
 
-	ldy	#-1		; Calculate string length
+     	ldy	#-1		; Calculate string length
 @L2:
 	iny
 	lda	(STRPTR),y
@@ -882,25 +893,25 @@ text_c:
 ; The Font
 ; 96 characters from ASCII 32 to 127
 ; 8 pixels wide, 8 pixels high
-; bit value 0 = foreground, bit value 1 = background / transparent
+; bit value 0 = foreground, bit value 1 = background / transparent 
 font:
 ; VERSAIL
-	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF  ;32
-	.byte $FF, $E7, $FF, $FF, $E7, $E7, $E7, $E7  ;33
-	.byte $FF, $FF, $FF, $FF, $FF, $99, $99, $99  ;34
-	.byte $FF, $99, $99, $00, $99, $00, $99, $99  ;35
-	.byte $FF, $E7, $83, $F9, $C3, $9F, $C1, $E7  ;36
-	.byte $FF, $B9, $99, $CF, $E7, $F3, $99, $9D  ;37
-	.byte $FF, $C0, $99, $98, $C7, $C3, $99, $C3  ;38
-	.byte $FF, $FF, $FF, $FF, $FF, $E7, $F3, $F9  ;39
-	.byte $FF, $F3, $E7, $CF, $CF, $CF, $E7, $F3  ;40
-	.byte $FF, $CF, $E7, $F3, $F3, $F3, $E7, $CF  ;41
-	.byte $FF, $FF, $99, $C3, $00, $C3, $99, $FF  ;42
-	.byte $FF, $FF, $E7, $E7, $81, $E7, $E7, $FF  ;43
-	.byte $CF, $E7, $E7, $FF, $FF, $FF, $FF, $FF  ;44
-	.byte $FF, $FF, $FF, $FF, $81, $FF, $FF, $FF  ;45
-	.byte $FF, $E7, $E7, $FF, $FF, $FF, $FF, $FF  ;46
-	.byte $FF, $9F, $CF, $E7, $F3, $F9, $FC, $FF  ;47
+     	.byte $FF, $FF, $FF, $FF, $FF, $FF, $FF, $FF  ;32
+     	.byte $FF, $E7, $FF, $FF, $E7, $E7, $E7, $E7  ;33
+     	.byte $FF, $FF, $FF, $FF, $FF, $99, $99, $99  ;34
+     	.byte $FF, $99, $99, $00, $99, $00, $99, $99  ;35
+     	.byte $FF, $E7, $83, $F9, $C3, $9F, $C1, $E7  ;36
+     	.byte $FF, $B9, $99, $CF, $E7, $F3, $99, $9D  ;37
+     	.byte $FF, $C0, $99, $98, $C7, $C3, $99, $C3  ;38
+     	.byte $FF, $FF, $FF, $FF, $FF, $E7, $F3, $F9  ;39
+     	.byte $FF, $F3, $E7, $CF, $CF, $CF, $E7, $F3  ;40
+     	.byte $FF, $CF, $E7, $F3, $F3, $F3, $E7, $CF  ;41
+     	.byte $FF, $FF, $99, $C3, $00, $C3, $99, $FF  ;42
+     	.byte $FF, $FF, $E7, $E7, $81, $E7, $E7, $FF  ;43
+     	.byte $CF, $E7, $E7, $FF, $FF, $FF, $FF, $FF  ;44
+     	.byte $FF, $FF, $FF, $FF, $81, $FF, $FF, $FF  ;45
+     	.byte $FF, $E7, $E7, $FF, $FF, $FF, $FF, $FF  ;46
+     	.byte $FF, $9F, $CF, $E7, $F3, $F9, $FC, $FF  ;47
 	.byte $FF, $C3, $99, $99, $89, $91, $99, $C3  ;48
 	.byte $FF, $81, $E7, $E7, $E7, $C7, $E7, $E7  ;49
 	.byte $FF, $81, $9F, $CF, $F3, $F9, $99, $C3  ;50
@@ -924,7 +935,7 @@ font:
 	.byte $FF, $83, $99, $99, $83, $99, $99, $83  ;2
 	.byte $FF, $C3, $99, $9F, $9F, $9F, $99, $C3  ;3
 	.byte $FF, $87, $93, $99, $99, $99, $93, $87  ;4
-	.byte $FF, $81, $9F, $9F, $87, $9F, $9F, $81  ;5
+     	.byte $FF, $81, $9F, $9F, $87, $9F, $9F, $81  ;5
 	.byte $FF, $9F, $9F, $9F, $87, $9F, $9F, $81  ;6
 	.byte $FF, $C3, $99, $99, $91, $9F, $99, $C3  ;7
 	.byte $FF, $99, $99, $99, $81, $99, $99, $99  ;8

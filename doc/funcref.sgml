@@ -55,8 +55,8 @@ function.
 <item><ref id="BRK" name="BRK">
 <item><ref id="CLI" name="CLI">
 <item><ref id="SEI" name="SEI">
-<!-- <item><ref id="_sys" name="_sys"> -->
-<!-- <item><ref id="getcpu" name="getcpu"> -->
+<item><ref id="_sys" name="_sys">
+<item><ref id="getcpu" name="getcpu">
 <!-- <item><ref id="reset_brk" name="reset_brk"> -->
 <!-- <item><ref id="set_brk" name="set_brk"> -->
 </itemize>
@@ -139,11 +139,32 @@ function.
 <sect1><tt/stdlib.h/<label id="stdlib.h"><p>
 
 <itemize>
+<!-- <item><ref id="_heapadd" name="_heapadd"> -->
+<!-- <item><ref id="_heapmaxavail" name="_heapmaxavail"> -->
+<!-- <item><ref id="_heapmemavail" name="_heapmemavail"> -->
+<item><ref id="_randomize" name="_randomize">
+<!-- <item><ref id="_swap" name="_swap"> -->
 <item><ref id="abort" name="abort">
 <item><ref id="abs" name="abs">
 <item><ref id="atexit" name="atexit">
+<!-- <item><ref id="atoi" name="atoi"> -->
+<!-- <item><ref id="atol" name="atol"> -->
+<!-- <item><ref id="bsearch" name="bsearch"> -->
+<!-- <item><ref id="calloc" name="calloc"> -->
+<!-- <item><ref id="div" name="div"> -->
 <item><ref id="exit" name="exit">
+<!-- <item><ref id="free" name="free"> -->
+<!-- <item><ref id="getenv" name="getenv"> -->
+<!-- <item><ref id="itoa" name="itoa"> -->
 <item><ref id="labs" name="labs">
+<!-- <item><ref id="ltoa" name="ltoa"> -->
+<!-- <item><ref id="malloc" name="malloc"> -->
+<!-- <item><ref id="qsort" name="qsort"> -->
+<item><ref id="rand" name="rand">
+<!-- <item><ref id="realloc" name="realloc"> -->
+<item><ref id="srand" name="srand">
+<!-- <item><ref id="ultoa" name="ultoa"> -->
+<!-- <item><ref id="utoa" name="utoa"> -->
 </itemize>
 
 
@@ -166,6 +187,52 @@ function.
 
 
 <sect>Alphabetical function reference<p>
+
+<sect1>_randomize<label id="_randomize"><p>
+
+<quote>
+<descrip>
+<tag/Function/Initialize the pseudo random number generator.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void _randomize (void);/
+<tag/Description/The function initializes the random number generator with
+a seed derived from fast changing hardware events, so the seed itself can be
+considered random to a certain degree.
+<tag/Limits/<itemize>
+<item>The randomness of the seed depends on the machine hardware.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="rand" name="rand">,
+<ref id="srand" name="srand">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_sys<label id="_sys"><p>
+
+<quote>
+<descrip>
+<tag/Function/Call a subroutine passing register values.
+<tag/Header/<tt/<ref id="6502.h" name="6502.h">/
+<tag/Declaration/<tt/void __fastcall__ _sys (struct regs* r);/
+<tag/Description/The function will call the subroutine at the address
+specified in the <tt/pc/ member of the passed <tt/regs/ structure. All
+registers and the CPU flags are set to the values given in the <tt/regs/
+structure. On return from the subroutine, the new values of the registers and
+flags are stored back overwriting the old values.
+<tag/Limits/<itemize>
+<item>Bits 4 and 5 of the flags value in the <tt/regs/ structure are ignored
+when calling the subroutine (they are unchanged from their current values).
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/None.
+</descrip>
+</quote>
+
 
 <sect1>BRK<label id="BRK"><p>
 
@@ -835,6 +902,28 @@ evaluated or is ignored.
 </quote>
 
 
+<sect1>getcpu<label id="getcpu"><p>
+
+<quote>
+<descrip>
+<tag/Function/Determine on which CPU the program is running.
+<tag/Header/<tt/<ref id="6502.h" name="6502.h">/
+<tag/Declaration/<tt/unsigned char getcpu (void);/
+<tag/Description/The function checks on which CPU the code is running. It
+returns one of the constants<itemize>
+<item><tt/CPU_6502/
+<item><tt/CPU_65C02/
+<item><tt/CPU_65816/
+</itemize>
+<tag/Limits/<itemize>
+<item>Other, more exotic CPU types are not disinguished.
+</itemize>
+<tag/Availability/cc65
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>gotox<label id="gotox"><p>
 
 <quote>
@@ -1456,6 +1545,30 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>rand<label id="rand"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return a pseudo random number.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/int rand (void);/
+<tag/Description/The function returns a pseudo random number
+between 0 and <tt/RAND_MAX/ (exclusive).
+<tag/Limits/<itemize>
+<item>Without using <tt><ref id="srand" name="srand"></tt>, always the same
+flow of numbers is generated.
+<item>On startup, the function behaves as if <ref id="srand" name="srand">
+had been used with an argument of 1.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="_randomize" name="_randomize">,
+<ref id="srand" name="srand">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>revers<label id="revers"><p>
 
 <quote>
@@ -1499,6 +1612,29 @@ be used in presence of a prototype.
 <ref id="gotoy" name="gotoy">,
 <ref id="wherex" name="wherex">,
 <ref id="wherey" name="wherey">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>srand<label id="srand"><p>
+
+<quote>
+<descrip>
+<tag/Function/Initialize the pseudo random number generator.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void __fastcall__ srand (unsigned seed);/
+<tag/Description/The function initializes the random number generator using
+the given seed. On program startup, the generator behaves as if <tt/srand/ has
+been called with an argument of 1.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="_randomize" name="_randomize">,
+<ref id="rand" name="rand">
 <tag/Example/None.
 </descrip>
 </quote>

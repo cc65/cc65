@@ -2,7 +2,7 @@
   GEOS structs
 
   ported to small C on 25-27.10.1999
-  by Maciej 'YTM/Alliance' Witkowiak
+  by Maciej 'YTM/Elysium' Witkowiak
 */
 
 #ifndef _GSTRUCT_H
@@ -113,7 +113,13 @@ struct icontab {
 	struct icondef tab[];	/* table of size declared by icontab.number */
 };
 
-/* everything below is obsolete and kept for unknown reasons */
+/*
+   structures below might be used to speed up access to own menus
+   e.g. if you have menu defined as TopMenu and you want to change the number of
+   menu items use:
+    ((struct menu*)&TopMenu)->number=newNumber;
+   This will allow cc65 to emit better code.
+*/
 
 struct menuitem {
 	char *name;

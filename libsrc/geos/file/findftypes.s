@@ -1,8 +1,8 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.99, 30.7.2000
 
 ; char FindFTypes  (char *buffer, char fileType, char fileMax, char *Class);
 
@@ -17,6 +17,7 @@ _FindFTypes:
 	stx r10H
 	jsr popa
 	sta r7H
+	sta tmpFileMax
 	jsr popa
 	sta r7L
 	jsr popax
@@ -24,5 +25,10 @@ _FindFTypes:
 	stx r6H
 	jsr FindFTypes
 	stx errno
-	txa
+; return (fileMax - r7H)
+	lda tmpFileMax
+	sec
+	sbc r7H
 	rts
+
+tmpFileMax:	.byte 0

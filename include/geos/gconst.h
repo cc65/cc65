@@ -2,7 +2,7 @@
   GEOS constants, 4-2-99, 18-3-99
 
   small C version: 25-27.10.99
-  reassembled by Maciej 'YTM/Alliance' Witkowiak
+  reassembled by Maciej 'YTM/Elysium' Witkowiak
 */
 
 /* Here are constants which didn't fit into any other cathegory... */
@@ -39,6 +39,11 @@
 /* offset to something */
 #define	OFF_INDEX_PTR	1
 
+/* values for CPU_DATA memory config - C64 */
+#define	IO_IN		0x35
+#define	KRNL_IO_IN	0x36
+#define	KRNL_BAS_IO_IN	0x37
+
 /* values for MMU config - C128 */
 #define	CIOIN		0x7E
 #define	CRAM64K		0x7F
@@ -48,7 +53,7 @@
 /* alarmSetFlag */
 #define	ALARMMASK	4
 
-#define	CLR_SAVE 	0x40
+#define	CLR_SAVE	0x40
 #define	CONSTRAINED	0x40
 #define	UN_CONSTRAINED	0
 #define	FG_SAVE		0x80

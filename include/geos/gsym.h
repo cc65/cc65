@@ -1,8 +1,8 @@
 /*
   GEOS constants reassembled 4-2-99
   ported to small C 26.8.99, 25-26.10.99
-  Maciej 'YTM/Alliance' Witkowiak
-  ytm@friko.onet.pl
+  Maciej 'YTM/Elysium' Witkowiak
+  ytm@elysium.pl
 */
 
 #ifndef _GSYM_H
@@ -46,7 +46,7 @@
 #define	r7L		*(char*)0x10
 #define	r7H		*(char*)0x11
 #define	r8		*(unsigned int*)0x12
-#define	r8L    		*(char*)0x12
+#define	r8L		*(char*)0x12
 #define	r8H		*(char*)0x13
 #define	r9		*(unsigned int*)0x14
 #define	r9L		*(char*)0x14
@@ -66,7 +66,7 @@
 #define	r14		*(unsigned int*)0x1e
 #define	r14L		*(char*)0x1e
 #define	r14H		*(char*)0x1f
-#define	r15    		*(unsigned int*)0x20
+#define	r15		*(unsigned int*)0x20
 #define	r15L		*(char*)0x20
 #define	r15H		*(char*)0x21
 /* WARNING - these are used by C as temporary registers! */
@@ -86,7 +86,7 @@
 #define	a4L		*(char*)0x74
 #define	a4H		*(char*)0x75
 #define	a5		*(unsigned int*)0x76
-#define	a5L    		*(char*)0x76
+#define	a5L		*(char*)0x76
 #define	a5H		*(char*)0x77
 #define	a6		*(unsigned int*)0x78
 #define	a6L		*(char*)0x78
@@ -110,9 +110,6 @@
 #define	RAM_64K		*(char*)0x30
 #define	msePicPtr	*(unsigned int*)0x31
 #define curWindow	(*(struct window*)0x33)
-/*#define	IO_IN		*(char*)0x35
-  #define	KRNL_IO_IN	*(char*)0x36
-  #define	KRNL_BAS_IO_IN	*(char*)0x37*/
 #define	pressFlag	*(char*)0x39
 #define mousePos	(*(struct pixel*)0x3a)
 #define	returnAddress	*(unsigned int*)0x3d
@@ -126,7 +123,7 @@
 #define errno		*(char*)0x91
 
 #define	irqvec		*(unsigned int*)0x0314
-#define	bkvec  		*(unsigned int*)0x0316
+#define	bkvec		*(unsigned int*)0x0316
 #define	nmivec		*(unsigned int*)0x0318
 
 #define	APP_RAM		*(char*)0x0400
@@ -186,7 +183,7 @@
 #define	mouseData	*(char*)0x8505
 #define	inputData	*(char*)0x8506
 #define	mouseSpeed	*(char*)0x8507
-#define	random 		*(char*)0x850a
+#define	random		*(char*)0x850a
 #define	saveFontTab	(*(struct fontdesc*)0x850c)
 
 #define	dblClickCount	*(char*)0x8515
@@ -299,4 +296,3 @@
 #define	vdcdata		*(char*)0xd601
 
 #endif
-	       

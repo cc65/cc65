@@ -1,12 +1,13 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; unsigned char __fastcall__ cbm_k_load (unsigned char flag, unsigned addr);
+; unsigned int __fastcall__ cbm_k_load (unsigned char flag, unsigned addr);
 ;
 
 	.include    	"cbm.inc"
 
        	.export	       	_cbm_k_load
+        .import         __oserror
 	.import		popa
 	.importzp	ptr1
 
@@ -17,7 +18,14 @@ _cbm_k_load:
 	ldx	ptr1
 	ldy	ptr1+1
 	jsr	LOAD
-	bcs	@NotOk
-	lda     #0
-@NotOk:	rts
+	bcc	@Ok
+        sta     __oserror
+        ldx     ptr1
+        ldy     ptr1+1
+@Ok:    txa
+        pha
+        tya
+        tax
+        pla
+        rts
 	

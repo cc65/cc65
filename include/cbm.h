@@ -83,13 +83,19 @@
 #define CH_INS			148
 #define CH_ESC			 95
 
-
+/* constants to use with cbm_open() for opening a file for reading or
+ * writing without the need to append ",r" or ",w" to the filename.
+ *
+ * e.g.: cbm_open(2, 8, CBM_READ, "data,s");
+ */
+#define CBM_READ    0
+#define CBM_WRITE   1
 
 /* Kernel level functions */
 void __fastcall__ cbm_k_setlfs (unsigned char LFN, unsigned char DEV,
                                 unsigned char SA);
 void __fastcall__ cbm_k_setnam (const char* Name);
-unsigned char __fastcall__ cbm_k_load(unsigned char flag, unsigned addr);
+unsigned int __fastcall__ cbm_k_load(unsigned char flag, unsigned addr);
 unsigned char __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
 unsigned char __fastcall__ cbm_k_open (void);
 void __fastcall__ cbm_k_close (unsigned char FN);
@@ -110,17 +116,18 @@ void __fastcall__ cbm_k_clrch (void);
 
 
 
-unsigned char cbm_load(const char* name, unsigned char device,
-                       unsigned int addr);
+unsigned int cbm_load(const char* name, unsigned char device,
+                      const char* data);
 /* Loads file "name" from given device to given address or to the load
- * address of the file if addr is 0 (like load"name",8,1 in BASIC)
- * Returns 0 if loading was successful otherwise an errorcode (see table
- * below).
+ * address of the file if "data" is the null pointer (like load"name",8,1
+ * in BASIC).
+ * Returns number of bytes that where loaded if loading was successful
+ * otherwise 0. "_oserror" contains an errorcode then (see table below).
  */
 
 unsigned char cbm_save(const char* name, unsigned char device,
-                       unsigned int start, unsigned int end);
-/* Saves a memory area from start to end-1 to a file.
+                       unsigned char* data, unsigned int size);
+/* Saves "size" bytes starting at "data" to a file. 
  * Returns 0 if saving was successful, otherwise an errorcode (see table
  * below).
  */

@@ -112,7 +112,6 @@ static const CallDesc CallTable [] = {
     { "tosumodax",  -1,    0,   -1, "tosumoda0"     },
     { "tosumulax",  -1,    0,   -1, "tosumula0"     },
     { "tosxorax",   -1,    0,   -1, "tosxora0"      },
-    { "zzzzzzzz",   -1,   -1,   -1, "zzzzzzzz"      },
 
 #if 0
     "tosadd0ax",         /* tosaddeax, sreg = 0 */
@@ -155,18 +154,16 @@ static const CallDesc* FindCall (const char* Name)
 {
     /* Do a binary search */
     int First = 0;
-    int Last = (sizeof(CallTable) / sizeof(CallTable[0])) - 1;
-    int Current;
-    int Result;
+    int Last = CALL_COUNT - 1;
     int Found = 0;
 
     while (First <= Last) {
 
        	/* Set current to mid of range */
-	Current = (Last + First) / 2;
+	int Current = (Last + First) / 2;
 
        	/* Do a compare */
-       	Result = strcmp (CallTable[Current].LongFunc, Name);
+       	int Result = strcmp (CallTable[Current].LongFunc, Name);
 	if (Result < 0) {
 	    First = Current + 1;
 	} else {
@@ -178,7 +175,6 @@ static const CallDesc* FindCall (const char* Name)
 	       	Found = 1;
 	    }
 	}
-
     }
 
     /* Return the first entry if found, or NULL otherwise */
@@ -210,17 +206,17 @@ unsigned OptSize1 (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
+        const CallDesc* D;
+
       	/* Get next entry */
        	E = CS_GetEntry (S, I);
 
      	/* Check if it's a subroutine call */
-     	if (E->OPC == OP65_JSR) {
+     	if (E->OPC == OP65_JSR && (D = FindCall (E->Arg)) != 0) {
 
      	    /* Check for any of the known functions. */
-            const CallDesc* D = FindCall (E->Arg);
-            while (D && 
-                   D < CallTable + (sizeof (CallTable) / sizeof (CallTable[0])) &&
-                   strcmp (D->LongFunc, E->Arg) == 0) {
+            while (1) {
+
                 /* Check the registers */
                 if ((D->A < 0 || D->A == E->RI->In.RegA) &&
                     (D->X < 0 || D->X == E->RI->In.RegX) &&
@@ -234,7 +230,13 @@ unsigned OptSize1 (CodeSeg* S)
                     /* Remember that we had changes */
                     ++Changes;
                 }
-                ++D;
+
+                /* Next table entry, bail out if next entry not valid */
+                if (++D >= CallTable + CALL_COUNT ||
+                    strcmp (D->LongFunc, E->Arg) != 0) {
+                    /* End of table or entries reached */
+                    break;
+                }
             }
         }
 

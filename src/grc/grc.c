@@ -104,7 +104,12 @@ int blocks,rest;
 			    ++rest;
 			}
 			vlirtabt[j]=blocks+1; vlirtabs[j]=rest;
-			fwrite(buffer,1,(blocks+1)*254,outCVT);
+			/* do not pad the last chain - it doesn't change or break anything
+			   but filesize in bytes of .cvt will be identical to native cvt */
+			if (i==(argc-1))
+				fwrite(buffer,1,bytes,outCVT);
+			else
+				fwrite(buffer,1,(blocks+1)*254,outCVT);
 		}
 		++j;
 		++i;

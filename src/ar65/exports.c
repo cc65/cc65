@@ -36,8 +36,8 @@
 #include <string.h>
 
 #include "../common/hashstr.h"
+#include "../common/xmalloc.h"
 
-#include "mem.h"
 #include "error.h"
 #include "objdata.h"
 #include "exports.h"
@@ -77,7 +77,7 @@ static HashEntry* NewHashEntry (const char* Name, unsigned Module)
     unsigned Len = strlen (Name);
 
     /* Get memory for the struct */
-    HashEntry* H = Xmalloc (sizeof (HashEntry) + Len);
+    HashEntry* H = xmalloc (sizeof (HashEntry) + Len);
 
     /* Initialize the fields and return it */
     H->Next	= 0;
@@ -147,3 +147,4 @@ int ExpFind (const char* Name)
 
 
 
+		    

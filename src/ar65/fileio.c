@@ -35,8 +35,9 @@
 
 #include <string.h>
 
+#include "../common/xmalloc.h"
+
 #include "error.h"
-#include "mem.h"
 #include "fileio.h"
 
 
@@ -139,7 +140,7 @@ char* ReadStr (FILE* F)
     unsigned Len = Read8 (F);
 
     /* Allocate memory and read the string itself */
-    char* S = Xmalloc (Len + 1);
+    char* S = xmalloc (Len + 1);
     ReadData (F, S, Len);
 
     /* Terminate the string and return it */

@@ -35,7 +35,8 @@
 
 #include <string.h>
 
-#include "mem.h"
+#include "../common/xmalloc.h"
+
 #include "error.h"
 #include "objdata.h"
 
@@ -65,7 +66,7 @@ ObjData* NewObjData (void)
 /* Allocate a new structure on the heap, insert it into the list, return it */
 {
     /* Allocate memory */
-    ObjData* O = Xmalloc (sizeof (ObjData));
+    ObjData* O = xmalloc (sizeof (ObjData));
 
     /* Initialize the data */
     O->Next       = 0;
@@ -101,10 +102,10 @@ ObjData* NewObjData (void)
 void FreeObjData (ObjData* O)
 /* Free a complete struct */
 {
-    Xfree (O->Name);
-    Xfree (O->Imports);
-    Xfree (O->Exports);
-    Xfree (O);
+    xfree (O->Name);
+    xfree (O->Imports);
+    xfree (O->Exports);
+    xfree (O);
 }
 
 
@@ -170,7 +171,7 @@ void MakeObjPool (void)
     unsigned Index;
 
     /* Allocate memory for the pool */
-    ObjPool = Xmalloc (ObjCount * sizeof (ObjData*));
+    ObjPool = xmalloc (ObjCount * sizeof (ObjData*));
 
     /* Setup the pointers and index the objects */
     Index = 0;

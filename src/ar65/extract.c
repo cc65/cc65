@@ -35,7 +35,6 @@
 
 #include <stdlib.h>
 
-#include "mem.h"
 #include "error.h"
 #include "objfile.h"
 #include "library.h"

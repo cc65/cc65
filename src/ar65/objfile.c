@@ -45,8 +45,9 @@
 #include <time.h>
 #include <sys/stat.h>
 
+#include "../common/xmalloc.h"
+
 #include "error.h"
-#include "mem.h"
 #include "objdata.h"
 #include "fileio.h"
 #include "library.h"
@@ -59,7 +60,7 @@
 /*****************************************************************************/
 
 
-			     
+
 static const char* GetModule (const char* Name)
 /* Get a module name from the file name */
 {
@@ -170,13 +171,13 @@ void ObjAdd (const char* Name)
     }
 
     /* Initialize the object module data structure */
-    O->Name	  = StrDup (Module);
+    O->Name	  = xstrdup (Module);
     O->Flags	  = OBJ_HAVEDATA;
     O->MTime	  = StatBuf.st_mtime;
     O->ImportSize = H.ImportSize;
-    O->Imports	  = Xmalloc (O->ImportSize);
+    O->Imports	  = xmalloc (O->ImportSize);
     O->ExportSize = H.ExportSize;
-    O->Exports	  = Xmalloc (O->ExportSize);
+    O->Exports	  = xmalloc (O->ExportSize);
 
     /* Read imports and exports */
     fseek (Obj, H.ImportOffs, SEEK_SET);

@@ -16,7 +16,6 @@ OBJS = 	add.o		\
     	library.o	\
     	list.o		\
     	main.o		\
-    	mem.o		\
     	objdata.o	\
     	objfile.o
 

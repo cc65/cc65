@@ -73,7 +73,6 @@ OBJS =	add.obj		\
 	library.obj	\
 	list.obj	\
 	main.obj	\
-	mem.obj		\
 	objdata.obj	\
 	objfile.obj
 

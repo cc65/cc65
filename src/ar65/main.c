@@ -41,8 +41,6 @@
 #include "../common/version.h"
 
 #include "global.h"
-#include "error.h"
-#include "mem.h"
 #include "add.h"
 #include "del.h"
 #include "list.h"

@@ -37,13 +37,13 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../common/libdefs.h"
-#include "../common/symdefs.h"
+#include "../common/bitops.h"
 #include "../common/exprdefs.h"
 #include "../common/filepos.h"
-#include "../common/bitops.h"
+#include "../common/libdefs.h"
+#include "../common/symdefs.h"
+#include "../common/xmalloc.h"
 
-#include "mem.h"
 #include "error.h"
 #include "global.h"
 #include "fileio.h"
@@ -114,12 +114,12 @@ static void ReadIndexEntry (void)
 
     /* Exports */
     O->ExportSize = Read16 (Lib);
-    O->Exports    = Xmalloc (O->ExportSize);
+    O->Exports    = xmalloc (O->ExportSize);
     ReadData (Lib, O->Exports, O->ExportSize);
 
     /* Imports */
     O->ImportSize = Read16 (Lib);
-    O->Imports    = Xmalloc (O->ImportSize);
+    O->Imports    = xmalloc (O->ImportSize);
     ReadData (Lib, O->Imports, O->ImportSize);
 }
 
@@ -223,7 +223,7 @@ void LibOpen (const char* Name, int MustExist, int NeedTemp)
  */
 {
     /* Remember the name */
-    LibName = StrDup (Name);
+    LibName = xstrdup (Name);
 
     /* Open the existing library for reading */
     Lib = fopen (Name, "rb");

@@ -7,7 +7,7 @@
 ;
 
  	.export		_textcolor, _bgcolor, _bordercolor
-	.import	       	return0, _revers
+	.import	       	return0, return1, _revers
 
 	.include	"apple2.inc"
 

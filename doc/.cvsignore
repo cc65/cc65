@@ -3,6 +3,7 @@
 *.dvi
 *.html
 *.info
+*.info-*
 *.log
 *.man
 *.tex

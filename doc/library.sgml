@@ -4,7 +4,7 @@
 
 <title>cc65 Library Overview
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>02.12.2000
+<date>2000-12-02, 2002-11-26
 
 <abstract>
 An overview over the runtime and C libraries that come with the cc65 compiler,
@@ -18,10 +18,13 @@ including a discussion of the differences to the ISO standard.
 
 <sect>Overview<p>
 
-This file contains a description of the library routines available for the
-cc65 C compiler. It is not complete in some areas, so if you miss something,
-have a look into the header files. All functions, that are not defined by the
-ISO C standard have a short comment in the headers, explaining their use.
+This file contains a short overview of the libraries available for the cc65 C
+compiler. Please have a look at the <htmlurl url="funcref.html" name="function
+reference"> for a list function by function. Since the function reference is
+not complete (I'm working on that) it may happen that you don't find a
+specific function. In this case, have a look into the header files. All
+functions, that are not defined by the ISO C standard have a short comment in
+the headers, explaining their use.
 
 
 
@@ -35,66 +38,61 @@ I will not go into detail about the ISO functions. If a function is not
 mentioned here explicitly, expect it to be available and to behave as defined
 in the C standard.
 
-Functions that are NOT available:
+Functions that are <em/not/ available:
 
 <itemize>
-
-  <item>ftell/fseek/fgetpos/fsetpos
-
-  <item>tmpfile/tmpnam
-
-  <item>The scanf family of functions
-
-  <item>time/asctime/ctime/difftime/asctime/gmtime/localtime/mktime/strftime
-
-  <item>system
-
+  <item><tt>tmpfile/tmpnam</tt>
+  <p>
+  <item>The <tt/scanf/ family of functions
+  <p>
+  <item><tt>system</tt>
+  <p>
   <item>All functions that handle floating point numbers in some manner.
-
-  <item>The div and ldiv functions (because cc65 is not able to return
-    structs).
-
+  <p>
+  <item>The <tt/ldiv/ function (cc65 is currently not able to return structs
+  with a size not equal to 1, 2 or 4 bytes by value).
+  <p>
   <item>All functions handling wide character strings.
-
-  <item>Signals and all related functions (having SIGSEGV would be cool:-)
-
-  <item>rename/remove/rewind
-
-  <item>setbuf/setvbuf/ungetc
-
+  <p>
+  <item>Signals and all related functions (having <tt/SIGSEGV/ would be
+  cool:-)
+  <p>
+  <item><tt>setbuf/setvbuf/ungetc</tt>
 </itemize>
+
+Functions not available on all supported systems:
+
+<itemize>
+  <item><tt>fopen/fread/fwrite/fclose/fputs/fgets/fscanf</tt>: The functions
+  are built on open/read/write/close. These latter functions are not available
+  on all systems.
+  <p>
+  <item><tt>ftell/fseek/fgetpos/fsetpos</tt>: Support depends on the
+  capabilities of the target machine.
+  <p>
+  <item><tt>rename/remove/rewind</tt>: Support depends on the capabilities of
+  the target machine.
+  <p>
+  <item><tt>time</tt>: Since many of the supported systems do not have a real
+  time clock, which means that the <tt/time/ function is not available. Please
+  note that the other functions from <tt/time.h/ <em/are/ available.
+</itemize>
+
 
 Functions that are limited in any way:
 
 <itemize>
-
-  <item>fopen/fread/fwrite/fclose/fputs/fgets/fscanf....
-
-  These functions are built on open/read/write/close. Neither of these low
-  level functions is currently available for the supported systems, and so,
-  fopen and friends do not work. However, the functions exist and are tested
-  to some degree under the ACE operating systems (which is no longer
-  supported).
-
-
-  <item>strcspn/strpbrk/strspn
-
-  These functions have a length limitation of 256 for the second string
-  argument. Since this string gives a character set, and there are only 256
-  distinct characters, this shouldn't be a problem.
-
-
-  <item>getenv
-
-  Since there is no such thing as an environment on all supported systems, the
-  getenv function will always return a NULL pointer.
-
-
-  <item>locale
-
-  There is no other locale than the "C" locale. The native locale is identical
-  to the "C" locale.
-
+  <item><tt>strcspn/strpbrk/strspn</tt>: These functions have a length
+  limitation of 256 for the second string argument. Since this string gives a
+  character set, and there are only 256 distinct characters, this shouldn't be
+  a problem.
+  <p>
+  <item><tt>getenv</tt>: Since there is no such thing as an environment on all
+  supported systems, the <tt/getenv/ function will always return a <tt/NULL/
+  pointer.
+  <p>
+  <item><tt>locale</tt>: There is no other locale than the "C" locale. The
+  native locale is identical to the "C" locale.
 </itemize>
 
 
@@ -102,17 +100,15 @@ In addition to these limitations, some more functions are limited if inlined
 versions are requested by using -Os:
 
 <itemize>
-
-  <item>The strlen function only works for strings with a maximum length of
-  255 characters.
-
-  <item>The isxxx character classification functions from <tt/&lt;ctype.h&gt;/
-  will give unpredictable results if the argument is not in character range
-  (0..255). This limitation may be removed by #undef'ing the function name
-  (when using -Os, the functions are actually macros that expand to inline
-  assembler code, but the real functions are still available if the macro
-  definition is removed).
-
+  <item>The <tt/strlen/ function only works for strings with a maximum length
+  of 255 characters.
+  <p>
+  <item>The <tt/isxxx/ character classification functions from
+  <tt/&lt;ctype.h&gt;/ will give unpredictable results if the argument is not
+  in character range (0..255). This limitation may be removed by #undef'ing
+  the function name (when using <tt/-Os/, the functions are actually macros
+  that expand to inline assembler code, but the real functions are still
+  available if the macro definition is removed).
 </itemize>
 
 
@@ -167,15 +163,16 @@ This has some disadvantages, but on the other side it's fast and reasonably
 portable. conio implementations exist for the following targets:
 
   <itemize>
+  <item>apple2
   <item>atari
   <item>c16 (works also for the c116 with up to 32K memory)
   <item>c64
   <item>c128
-  <item>plus4
+  <item>plus4 (or expanded c16/c116)
   <item>cbm510 (40 column video)
   <item>cbm610 (all CBM series-II computers with 80 column video)
   <item>pet (all CBM PET systems except the 2001)
-  <item>apple2
+  <item>vic20
   </itemize>
 
 The conio.h header file does also include the system specific header files
@@ -221,7 +218,7 @@ name="uz@cc65.org">).
 <sect>Copyright<p>
 
 This C runtime library implementation for the cc65 compiler is (C)
-Copyright 1998-2001 Ullrich von Bassewitz. For usage of the binaries
+Copyright 1998-2002 Ullrich von Bassewitz. For usage of the binaries
 and/or sources the following conditions do apply:
 
 This software is provided 'as-is', without any expressed or implied

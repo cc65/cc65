@@ -86,7 +86,7 @@ typedef struct {
 /* TGI kernel variables */
 extern tgi_drv_header*	tgi_drv;       	/* Pointer to driver */
 extern unsigned char  	tgi_error;     	/* Last error code */
-extern unsigned char    tgi_mode;       /* Graphics mode or zero */
+extern unsigned char    tgi_gmode;      /* Flag: Graphics mode active */
 extern int              tgi_curx;       /* Current drawing cursor X */
 extern int              tgi_cury;       /* Current drawing cursor Y */
 extern unsigned char    tgi_color;      /* Current drawing color */
@@ -116,4 +116,4 @@ void __fastcall__ tgi_setup (void);
 
 
 
-                                                             
+

@@ -82,7 +82,7 @@ TGI_TEXT_VERTICAL       = 1
 
 	.global	_tgi_drv      		; Pointer to driver
 	.global	_tgi_error    		; Last error code
-        .global _tgi_mode               ; Graphics mode or zero
+        .global _tgi_gmode              ; Flag: graphics mode active
         .global _tgi_curx               ; Current drawing cursor X
         .global _tgi_cury               ; Current drawing cursor Y
         .global _tgi_color              ; Current drawing color

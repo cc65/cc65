@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -67,8 +67,8 @@ unsigned long	AbsPC	  = 0;		/* PC if in absolute mode */
 
 
 
-typedef struct Segment_ Segment;
-struct Segment_ {
+typedef struct Segment Segment;
+struct Segment {
     Segment*   	    List;      	       	/* List of all segments */
     Fragment*  	    Root;	  	/* Root of fragment list */
     Fragment*  	    Last;	  	/* Pointer to last fragment */

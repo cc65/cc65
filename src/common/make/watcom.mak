@@ -1,34 +1,47 @@
 #
-# CC65 Makefile for the Watcom compiler (using GNU make)
+# CC65 Makefile for the Watcom compiler (using GNU make) and wine
 #
 
 # ------------------------------------------------------------------------------
 # Generic stuff
 
-AR	= WLIB
-LD	= WLINK
+# Environment variables for the watcom compiler
+export WATCOM  = c:\\watcom
+export INCLUDE = $(WATCOM)\\h
+
+# We will use the windows compiler under linux (define as empty for windows)
+WINE = wine --
+
+# Programs
+AR     	= $(WINE) WLIB
+CC      = $(WINE) WCC386
+LD     	= $(WINE) WLINK
 LIB	= common.lib
 
+# Program arguments
+CFLAGS  = -d1 -onatx -zp4 -5 -zq -w2
+
+# Create NT programs by default
+ifndef TARGET
+TARGET = NT
+endif
 
 # --------------------- OS2 ---------------------
 ifeq ($(TARGET),OS2)
 SYSTEM  = os2v2
-CC      = WCC386
-CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+CFLAGS  += -bt=$(TARGET)
 endif
 
 # -------------------- DOS4G --------------------
 ifeq ($(TARGET),DOS32)
 SYSTEM  = dos4g
-CC      = WCC386
-CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+CFLAGS  += -bt=$(TARGET)
 endif
 
 # --------------------- NT ----------------------
 ifeq ($(TARGET),NT)
 SYSTEM  = nt
-CC      = WCC386
-CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+CFLAGS  += -bt=$(TARGET)
 endif
 
 # ------------------------------------------------------------------------------
@@ -65,7 +78,6 @@ OBJS =	abend.obj	\
 	strutil.obj	\
 	target.obj	\
 	tgttrans.obj	\
-	wildargv.obj	\
 	xmalloc.obj	\
 	xsprintf.obj
 
@@ -85,8 +97,6 @@ $(LIB): $(OBJS)
 clean:
 	@if exist *.obj del *.obj
 	@if exist $(LIB) del $(LIB)
-
-
 
 
 

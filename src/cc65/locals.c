@@ -378,7 +378,7 @@ void DeclareLocals (void)
      * the stack checking routine if stack checks are enabled.
      */
     if (CheckStack && InitialStack != oursp) {
-	g_stackcheck ();
+       	g_cstackcheck ();
     }
 }
 

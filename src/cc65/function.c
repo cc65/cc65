@@ -42,6 +42,7 @@
 #include "codegen.h"
 #include "error.h"
 #include "funcdesc.h"
+#include "global.h"
 #include "litpool.h"
 #include "locals.h"
 #include "scanner.h"
@@ -229,6 +230,11 @@ void NewFunc (SymEntry* Func)
     g_usecode ();
     g_defgloblabel (Func->Name);
 
+    /* If stack cehcking code is requested, emit a call to the helper routine */
+    if (CheckStack) {
+	g_stackcheck ();
+    }
+
     /* Generate function entry code if needed */
     g_enter (TypeOf (Func->Type), GetParamSize (CurrentFunc));
 
@@ -254,7 +260,7 @@ void NewFunc (SymEntry* Func)
 	RestoreRegVars (0);
 
 	Flags = HasVoidReturn (CurrentFunc)? CF_NONE : CF_REG;
-        g_leave (Flags, 0);				      
+        g_leave (Flags, 0);
     }
 
     /* Dump literal data created by the function */

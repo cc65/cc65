@@ -2515,6 +2515,14 @@ void g_space (int space)
 
 
 
+void g_cstackcheck (void)
+/* Check for a C stack overflow */
+{
+    AddCodeLine ("\tjsr\tcstkchk");
+}
+
+
+
 void g_stackcheck (void)
 /* Check for a stack overflow */
 {

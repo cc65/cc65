@@ -4,7 +4,7 @@
 
 	   A Macro Crossassembler for the 6502/65C02/65816 CPUs
 
-	      (C) Copyright 1998-1999 Ullrich von Bassewitz
+	      (C) Copyright 1998-2000 Ullrich von Bassewitz
 			    (uz@musoftware.de)
 
 
@@ -95,12 +95,6 @@ development:
     this decision, but I've written several multipass assemblers, and it
     started to get boring. A one pass assembler needs much more elaborated
     data structures, and because of that it's much more fun:-)
-    There is one drawback with this point: It is nearly impossible to
-    generate a listing when reading the source file only once without
-    storing the source file in memory. Consequently, the assembler is not
-    able to produce a listing. This could be added by reading the source
-    file a second time if a listing was requested, but I didn't see an
-    urgent need for a listing, so this was not a disadvantage for me.
 
   * Non-GPLed code that may be used in any project without restrictions or
     fear of "GPL infecting" other code.
@@ -112,81 +106,162 @@ development:
 
 The assembler accepts the following options:
 
-   	-g		Generate debug info
-   	-i		Ignore case of symbols
-        -l              Create a listing if assembly was ok
-   	-o name		Name the output file
-   	-s		Enable smart mode
-   	-v		Increase verbosity
-	-D name[=value]	Define a symbol
-	-U		Mark unresolved symbols as import
-	-V		Print the assembler version
-	-W n		Set warning level n
-        --cpu type      Set cpu type
-	--pagelength n	Set the page length for the listing
-        --smart         Enable smart mode
+---------------------------------------------------------------------------
+Usage: ca65 [options] file
+Short options:
+  -g			Add debug info to object file
+  -h			Help (this text)
+  -i			Ignore case of symbols
+  -l			Create a listing if assembly was ok
+  -o name		Name the output file
+  -s			Enable smart mode
+  -v			Increase verbosity
+  -D name[=value]	Define a symbol
+  -I dir		Set an include directory search path
+  -U			Mark unresolved symbols as import
+  -V			Print the assembler version
+  -W n			Set warning level n
 
-When the -g option (or the equivalent control command .DEBUGINFO) is used,
-the assembler will add a section to the object file that contains all
-symbols (including local ones) together with the symbol values and source
-file positions. The linker will put these additional symbols into the
-VICE label file, so even local symbols can be seen in the VICE monitor.
+Long options:
+  --auto-import		Mark unresolved symbols as import
+  --cpu type		Set cpu type
+  --debug-info		Add debug info to object file
+  --help      		Help (this text)
+  --ignore-case		Ignore case of symbols
+  --include-dir dir	Set an include directory search path
+  --listing  		Create a listing if assembly was ok
+  --pagelength n	Set the page length for the listing
+  --smart    		Enable smart mode
+  --verbose  		Increase verbosity
+  --version   		Print the assembler version
+---------------------------------------------------------------------------
 
-The option -i makes the assembler case insensitive on identifiers and
-labels. This option will override the default, but may itself be overriden
-by the .CASE control command (see section 6).
+Here is a description of all the command line options:
 
-The default output name is the name of the input file with the extension
-replaced by ".o". If you don't like that, you may give another name with
-the -o option. The output file will be placed in the same directory as the
-source file, or, if -o is given, the full path in this name is used.
 
-In smart mode (enabled by -s or the .SMART pseudo instruction) the
-assembler will track usage of the REP and SEP instructions in 65816 mode
-and update the operand sizes accordingly. If the operand of such an
-instruction cannot be evaluated by the assembler (for example, because the
-operand is an imported symbol), a warning is issued. Beware: Since the
-assembler cannot trace the execution flow this may lead to false results
-in some cases. If in doubt, use the .ixx and .axx instructions to tell the
-assembler about the current settings. Smart mode is off by default.
+  --cpu type
 
--v does increase the assembler verbosity and is usually only needed for
-debugging purposes. You may use this option more than one time for even
-more verbose output.
+  Set the default for the CPU type. The option takes a parameter, which
+  may be one of
 
--D allows you to predefine symbols on the command line. Without a value,
-the symbol is defined with the value zero. When giving a value, you may
-use the '$' prefix for hexadecimal symbols. Please note that for some
-operating systems, '$' has a special meaning, so you may have to quote
-the expression.
+ 	6502, 65C02, 65816 and sunplus
 
--U marks symbols that are not defined in the sources as imported symbols.
-This should be used with care since it delays error messages about typos
-and such until the linker is run. The compiler uses the equivalent of
-this switch (.AUTOIMPORT, see control command section below) to enable
-auto imported symbols for the runtime library. However, the compiler is
-supposed to generate code that runs through the assembler without
-problems, something which is not always true for assembler programmers.
+  (the latter is not available in the freeware version).
 
--V prints the version number of the assembler. If you send any suggestions
-or bugfixes, please include your version number.
 
--Wn sets the warning level for the assembler. Using -W2 the assembler will
-even warn about such things like unused imported symbols. The default
-warning level is 1, and it would probably be silly to set it to something
-lower.
+  -g
+  --debug-info
 
---cpu sets the default for the CPU type. The option takes a parameter,
-which may be one of
+  When this option (or the equivalent control command .DEBUGINFO) is used,
+  the assembler will add a section to the object file that contains all
+  symbols (including local ones) together with the symbol values and
+  source file positions. The linker will put these additional symbols into
+  the VICE label file, so even local symbols can be seen in the VICE
+  monitor.
 
-	6502, 65C02, 65816 and sunplus
 
-(the latter is not available in the freeware version).
+  -h
+  --help
 
---pagelength sets the length of a listing page in lines. See the
-.PAGELENGTH directive for more information.
+  Print the short option summary shown above.
 
---smart is identical to -s - see there.
+
+  -i
+  --ignore-case
+
+  This option makes the assembler case insensitive on identifiers and
+  labels. This option will override the default, but may itself be
+  overriden by the .CASE control command (see section 6).
+
+
+  -l
+  --listing
+
+  Generate an assembler listing. The listing file will always have the
+  name of the main input file with the extension replaced by ".lst". This
+  may change in future versions.
+
+
+  -o name
+
+  The default output name is the name of the input file with the extension
+  replaced by ".o". If you don't like that, you may give another name with
+  the -o option. The output file will be placed in the same directory as
+  the source file, or, if -o is given, the full path in this name is used.
+
+
+  --pagelength n
+
+  sets the length of a listing page in lines. See the .PAGELENGTH
+  directive for more information.
+
+
+  -s
+  --smart-mode
+
+  In smart mode (enabled by -s or the .SMART pseudo instruction) the
+  assembler will track usage of the REP and SEP instructions in 65816 mode
+  and update the operand sizes accordingly. If the operand of such an
+  instruction cannot be evaluated by the assembler (for example, because
+  the operand is an imported symbol), a warning is issued.
+
+  Beware: Since the assembler cannot trace the execution flow this may
+  lead to false results in some cases. If in doubt, use the .ixx and .axx
+  instructions to tell the assembler about the current settings. Smart
+  mode is off by default.
+
+
+  -v
+  -verbose
+
+  Increase the assembler verbosity. Usually only needed for debugging
+  purposes. You may use this option more than one time for even more
+  verbose output.
+
+
+  -D
+
+  This option allows you to define symbols on the command line. Without a
+  value, the symbol is defined with the value zero. When giving a value,
+  you may use the '$' prefix for hexadecimal symbols. Please note that for
+  some operating systems, '$' has a special meaning, so you may have to
+  quote the expression.
+
+
+  -I dir
+  --include-dir dir
+
+  Name a directory which is searched for include files. The option may be
+  used more than once to specify more than one directory to search. The
+  current directory is always searched first before considering any
+  additional directores.
+
+
+  -U
+  --auto-import
+
+  Mark symbols that are not defined in the sources as imported symbols.
+  This should be used with care since it delays error messages about typos
+  and such until the linker is run. The compiler uses the equivalent of
+  this switch (.AUTOIMPORT, see control command section below) to enable
+  auto imported symbols for the runtime library. However, the compiler is
+  supposed to generate code that runs through the assembler without
+  problems, something which is not always true for assembler programmers.
+
+
+  -V
+  --version
+
+  Print the version number of the assembler. If you send any suggestions
+  or bugfixes, please include the version number.
+
+
+  -Wn
+
+  Set the warning level for the assembler. Using -W2 the assembler will
+  even warn about such things like unused imported symbols. The default
+  warning level is 1, and it would probably be silly to set it to
+  something lower.
 
 
 
@@ -308,10 +383,13 @@ Available operators sorted by precedence:
     .CONST	Builtin function	     		1
     .CPU	Builtin pseudo variable (r/o)		1
     .DEFINED	Builtin function	     		1
+    .LEFT	Builtin function			1
     .MATCH	Builtin function			1
+    .MID	Builtin function			1
     .XMATCH	Builtin function			1
     .PARAMCOUNT Builtin pseudo variable	(r/o)		1
     .REFERENCED Builtin function			1
+    .RIGHT	Builtin function			1
     .STRING	Builtin function			1
     :: 	    	Global namespace override		1
     +  	    	Unary plus			   	1
@@ -331,7 +409,7 @@ Available operators sorted by precedence:
     << 	    	Shift left operator			2
     .SHL	Shift left operator			2
     >> 	    	Shift right operator			2
-    .SHR	Shift right operator			2
+    .SHR	Shift right operator 			2
 
     +  	    	Binary plus		   		3
     -  	    	Binary minus				3
@@ -1159,6 +1237,36 @@ Here's a list of all control commands and a description, what they do:
    	.include	"subs.inc"
 
 
+.LEFT
+
+  Builtin function. Extracts the left part of a given token list.
+
+  Syntax:
+
+       	.LEFT (<int expr>, <token list>)
+
+  The first integer expression gives the number of tokens to extract from
+  the token list. The second argument is the token list itself.
+
+  Example:
+
+    To check in a macro if the given argument has a '#' as first token
+    (immidiate addressing mode), use something like this:
+
+    	.macro	ldax	arg
+    		...
+    		.if (.match (.left (1, arg), #))
+
+    		; ldax called with immidiate operand
+    		...
+
+    		.endif
+    		...
+       	.endmacro
+
+  See also the .MID and .RIGHT builtin functions.
+
+
 .LINECONT
 
   Switch on or off line continuations using the backslash character
@@ -1325,6 +1433,39 @@ Here's a list of all control commands and a description, what they do:
     be the reserved keyword "A".
 
 
+.MID
+
+  Builtin function. Takes a starting index, a count and a token list as
+  arguments. Will return part of the token list.
+
+  Syntax:
+
+	.MID (<int expr>, <int expr>, <token list>)
+
+  The first integer expression gives the starting token in the list (the
+  first token has index 0). The second integer expression gives the number
+  of tokens to extract from the token list. The third argument is the
+  token list itself.
+
+  Example:
+
+    To check in a macro if the given argument has a '#' as first token
+    (immidiate addressing mode), use something like this:
+
+    	.macro	ldax	arg
+    		...
+    		.if (.match (.mid (0, 1, arg), #))
+
+    		; ldax called with immidiate operand
+    		...
+
+    		.endif
+    		...
+       	.endmacro
+
+  See also the .LEFT and .RIGHT builtin functions.
+
+
 .ORG
 
   Start a section of absolute code. The command is followed by a constant
@@ -1456,12 +1597,26 @@ Here's a list of all control commands and a description, what they do:
   storage should be defined. The second, optional expression must by a
   constant byte value that will be used as value of the data. If there
   is no fill value given, the linker will use the value defined in the
-  linker configuration file (default: zero).
+  linker configuration file (default: zero).	
 
   Example:
 
 	; Reserve 12 bytes of memory with value $AA
   	.res	12, $AA
+
+
+.RIGHT
+
+  Builtin function. Extracts the right part of a given token list.
+
+  Syntax:
+
+       	.RIGHT (<int expr>, <token list>)
+
+  The first integer expression gives the number of tokens to extract from
+  the token list. The second argument is the token list itself.
+
+  See also the .LEFT and .MID builtin functions.
 
 
 .RODATA
@@ -1821,7 +1976,7 @@ Macros with parameters may also be useful:
       	.define DEBUG(message)	.out	message
 
       	DEBUG	"Assembling include file #3"
-
+			       
 Note that, while formal parameters have to be placed in braces, this is
 not true for the actual parameters. Beware: Since the assembler cannot
 detect the end of one parameter, only the first token is used. If you
@@ -1896,9 +2051,9 @@ hear from you. Feel free to contact me by email (uz@musoftware.de).
 10. Copyright
 -------------
 
-ca65 (and all cc65 binutils) are (C) Copyright 1998 Ullrich von Bassewitz.
-For usage of the binaries and/or sources the following conditions do
-apply:
+ca65 (and all cc65 binutils) are (C) Copyright 1998-2000 Ullrich von
+Bassewitz. For usage of the binaries and/or sources the following
+conditions do apply:
 
 This software is provided 'as-is', without any expressed or implied
 warranty.  In no event will the authors be held liable for any damages

@@ -90,7 +90,14 @@ unsigned _clocks_per_sec (void);
 
 
 
-/* Function prototypes */
+time_t _systime (void);
+/* Similar to time(), but:                 
+ *   - Is not ISO C
+ *   - Does not take the additional pointer
+ *   - Does not set errno when returning -1
+ */
+
+/* ISO C function prototypes */
 char* __fastcall__ asctime (const struct tm* timep);
 clock_t clock (void);
 char* __fastcall__ ctime (const time_t* timep);

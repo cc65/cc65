@@ -5,8 +5,8 @@
 <!-- Title information -->
 
 <title>GEOSLib docs
-<author>Maciej Witkowiak, <htmlurl url="mailto:ytm@friko.onet.pl" name="ytm@friko.onet.pl">
-<date>v1.1, 26.12.1999, 16.03.2000, 19-22.03.2000, 11.07.2000
+<author>Maciej Witkowiak, <htmlurl url="mailto:ytm@elysium.pl" name="ytm@elysium.pl">
+<date>v1.1, 26.12.1999, 16.03.2000, 19-22.03.2000, 11,29.07.2000
 <abstract>
 This is the documentation of cc65's GEOSLib, but information contained here may be also
 useful for writting GEOS applications in general.
@@ -80,7 +80,7 @@ Maciej Witkowiak, ul. Slowackiego 6/57, 77-400 ZLOTOW
 <p>
 POLAND
 <p>
-e-mail: <tt/ytm@friko.onet.pl/
+e-mail: <tt/ytm@elysium.pl/
 
 <sect>What have you got and what to do with it?
 <p>
@@ -294,7 +294,7 @@ See <tt/ggraph.h/ for list of tokens that you can also place in the string - lik
 <p>
 This function converts <tt/value/ to its decimal representation and outputs it to the screen.
 Depending on given <tt/parameter/ the string can be filled with zeroes (string always 5 characters
-long) or not, to be left or right justified to given pixel. See <tt/geos/ggraph.h/ for predefined
+long) or not, to be left or right justified to given pixel. See <tt/ggraph.h/ for predefined
 values for <tt/parameter/.
 
 <sect2>Font Handling
@@ -727,7 +727,7 @@ In this example <tt/otherTrSe/ can be replaced by <tt/myTrSe/.
 <p>
 NOTE that you <em/must/ use casting to have correct values.
 <p>
-<tt/SetNextFree/ finds next free sector and allocates it.
+<tt/SetNextFree/ only finds next free sector, it doesn't allocate it.
 
 <sect2>Low-level disk IO
 <p>
@@ -1000,7 +1000,7 @@ is also copied.
 
 <sect2>CmpString
 <p>
-<tt/char CmpString (char *s1, char *s2);/
+<tt/char CmpString (char *s1, char *s2)/
 <p>
 This function compares string <tt/s1/ to <tt/s2/ for equality - this is case sensitive, and both
 strings have to have the same length. It returns either <tt/true/ or <tt/false/.
@@ -1029,14 +1029,16 @@ compatible with standard CRC routines.
 <tt/void ClearRam (char *dest, int length)/
 <p>
 Both functions are filling given memory range. <tt/ClearRam/ fills with <tt/NULLs/, while
-<tt/FillRam/ uses given <tt/value/.
+<tt/FillRam/ uses given <tt/value/. Be warned that these functions destroy <tt/r0, r1 and
+r2L/ registers.
 
 <sect2>MoveData
 <p>
 <tt/void MoveData (char *src, char *dest, int length)/
 <p>
 This functions copies one memory region to another. There are checks for overlap and the
-non-destructive method is chosen.
+non-destructive method is chosen. Be warned that this function destroys contents of
+<tt/r0, r1 and r2/ registers.
 
 <sect2>InitRam
 <p>

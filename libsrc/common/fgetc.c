@@ -20,7 +20,7 @@
 
 
 
-int __fastcall__ fgetc (FILE* f)
+int __fastcall__ fgetc (register FILE* f)
 {
     unsigned char c;
 
@@ -29,7 +29,13 @@ int __fastcall__ fgetc (FILE* f)
     	return EOF;
     }
 
-    /* Read the byte */
+    /* If we have a pushed back character, return it */
+    if (f->f_flags & _FPUSHBACK) {
+        f->f_flags &= ~_FPUSHBACK;
+        return f->f_pushback;
+    }
+
+    /* Read one byte */
     switch (read (f->f_fd, &c, 1)) {
 
         case -1:

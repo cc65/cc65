@@ -166,7 +166,7 @@ size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format,
                     break;
 
                 case 'b':
-                    sprintf (arg, "%.3s", months[tm->tm_mday]);
+                    sprintf (arg, "%.3s", months[tm->tm_mon]);
                     break;
 
                 case 'c':

@@ -82,8 +82,8 @@ static const struct Keyword {
 } Keywords [] = {
     { "_Pragma",        TOK_PRAGMA,     TT_C    },
     { "__AX__",	       	TOK_AX,		TT_C  	},
-    { "__EAX__",       	TOK_EAX,   	TT_C  	},
     { "__A__",	       	TOK_A,	       	TT_C   	},
+    { "__EAX__",       	TOK_EAX,   	TT_C  	},
     { "__X__", 	       	TOK_X,		TT_C  	},
     { "__Y__", 	       	TOK_Y,		TT_C  	},
     { "__asm__",       	TOK_ASM,   	TT_C  	},

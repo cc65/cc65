@@ -1,0 +1,5 @@
+.depend
+da65
+*.map
+*.s
+*.dis

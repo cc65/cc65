@@ -215,7 +215,7 @@ static void LinkFile (const char* Name)
 
 
 
-static void OptConfig (const char* Opt, const char* Arg)
+static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 /* Define the config file */
 {
     if (CfgAvail ()) {
@@ -226,7 +226,7 @@ static void OptConfig (const char* Opt, const char* Arg)
 
 
 
-static void OptDbgFile (const char* Opt, const char* Arg)
+static void OptDbgFile (const char* Opt attribute ((unused)), const char* Arg)
 /* Give the name of the debug file */
 {
     DbgFileName = Arg;
@@ -234,7 +234,8 @@ static void OptDbgFile (const char* Opt, const char* Arg)
 
 
 
-static void OptHelp (const char* Opt, const char* Arg)
+static void OptHelp (const char* Opt attribute ((unused)), 
+		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
     Usage ();
@@ -243,7 +244,7 @@ static void OptHelp (const char* Opt, const char* Arg)
 
 
 
-static void OptMapFile (const char* Opt, const char* Arg)
+static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 /* Give the name of the map file */
 {
     MapFileName = Arg;
@@ -259,7 +260,7 @@ static void OptStartAddr (const char* Opt, const char* Arg)
 
 
 
-static void OptTarget (const char* Opt, const char* Arg)
+static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the target system */
 {
     const TargetDesc* D;
@@ -280,7 +281,8 @@ static void OptTarget (const char* Opt, const char* Arg)
 
 
 
-static void OptVersion (const char* Opt, const char* Arg)
+static void OptVersion (const char* Opt attribute ((unused)), 
+			const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
     fprintf (stderr,
@@ -295,18 +297,18 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-       	{ "--config",  	       	1,     	OptConfig    		},
+       	{ "--config",  	       	1,     	OptConfig    	    	},
 	{ "--dbgfile",          1,      OptDbgFile              },
-	{ "--help",	       	0,     	OptHelp	     		},
-	{ "--mapfile",		1,	OptMapFile		},
-	{ "--start-addr",	1,	OptStartAddr		},
-	{ "--target",		1,	OptTarget    		},
-	{ "--version",	       	0,  	OptVersion   		},
+	{ "--help",	       	0,     	OptHelp	     	    	},
+	{ "--mapfile",		1,	OptMapFile	    	},
+	{ "--start-addr",	1,	OptStartAddr	    	},
+	{ "--target",		1,	OptTarget    	    	},
+	{ "--version",	       	0,  	OptVersion   	    	},
     };
 
     unsigned I;
 
-    /* Initialize the cmdline module */
+    /* Initialize the cmdline module */			    
     InitCmdLine (&argc, &argv, "ld65");
 
     /* Evaluate the CC65_LIB environment variable */

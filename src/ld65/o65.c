@@ -606,7 +606,7 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
 
 
 
-static void O65WriteTextSeg (O65Desc* D, Memory* M)
+static void O65WriteTextSeg (O65Desc* D, Memory* M attribute ((unused)))
 /* Write the code segment to the o65 output file */
 {
     /* Initialize variables */
@@ -621,7 +621,7 @@ static void O65WriteTextSeg (O65Desc* D, Memory* M)
 
 
 
-static void O65WriteDataSeg (O65Desc* D, Memory* M)
+static void O65WriteDataSeg (O65Desc* D, Memory* M attribute ((unused)))
 /* Write the data segment to the o65 output file */
 {
     /* Initialize variables */
@@ -636,7 +636,7 @@ static void O65WriteDataSeg (O65Desc* D, Memory* M)
 
 
 
-static void O65WriteBssSeg (O65Desc* D, Memory* M)
+static void O65WriteBssSeg (O65Desc* D, Memory* M attribute ((unused)))
 /* "Write" the bss segments to the o65 output file. This will only update
  * the relevant header fields.
  */
@@ -653,7 +653,7 @@ static void O65WriteBssSeg (O65Desc* D, Memory* M)
 
 
 
-static void O65WriteZPSeg (O65Desc* D, Memory* M)
+static void O65WriteZPSeg (O65Desc* D, Memory* M attribute ((unused)))
 /* "Write" the zeropage segments to the o65 output file. This will only update
  * the relevant header fields.
  */

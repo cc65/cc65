@@ -43,7 +43,7 @@
 
 
 /*****************************************************************************/
-/*     	       	      	      	     Code			     	     */
+/*     	       	      	       	     Code			     	     */
 /*****************************************************************************/
 
 
@@ -60,7 +60,7 @@ static FileInfo* NewFileInfo (void)
 
 
 
-FileInfo* ReadFileInfo (FILE* F, ObjData* O)
+FileInfo* ReadFileInfo (FILE* F, ObjData* O attribute ((unused))) 
 /* Read a file info from a file and return it */
 {
     /* Allocate a new FileInfo structure */

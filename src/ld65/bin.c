@@ -100,7 +100,8 @@ void FreeBinDesc (BinDesc* D)
 
 
 static unsigned BinWriteExpr (ExprNode* E, int Signed, unsigned Size,
-		  	      unsigned long Offs, void* Data)
+		  	      unsigned long Offs attribute ((unused)),
+			      void* Data)
 /* Called from SegWrite for an expression. Evaluate the expression, check the
  * range and write the expression value to the file.
  */
@@ -216,7 +217,7 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 
 
 
-static int BinUnresolved (const char* Name, void* D)
+static int BinUnresolved (const char* Name attribute ((unused)), void* D)
 /* Called if an unresolved symbol is encountered */
 {
     /* Unresolved symbols are an error in binary format. Bump the counter

@@ -32,6 +32,7 @@ OBJS =	anonname.o	\
 	codeopt.o	\
 	codeseg.o	\
 	compile.o 	\
+	coptind.o	\
 	cpu.o	  	\
 	dataseg.o	\
 	datatype.o	\

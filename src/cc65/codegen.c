@@ -3466,6 +3466,14 @@ void g_lt (unsigned flags, unsigned long val)
      	 	break;
 
      	    case CF_LONG:
+		if ((flags & CF_UNSIGNED) == 0 && val == 0) {
+		    /* If we have a signed compare against zero, we only need to
+		     * test the high byte.
+		     */
+		    AddCodeLine ("lda sreg+1");
+		    AddCodeLine ("jsr boollt");
+		    return;
+		}
      	 	break;
 
      	    default:
@@ -3475,7 +3483,7 @@ void g_lt (unsigned flags, unsigned long val)
 	/* If we go here, we didn't emit code. Push the lhs on stack and fall
 	 * into the normal, non-optimized stuff.
 	 */
-	g_push (flags & ~CF_CONST, 0);
+	g_push (flags & ~CF_CONST, 0);	    
 
     }
 
@@ -3589,27 +3597,27 @@ void g_gt (unsigned flags, unsigned long val)
 		if (flags & CF_UNSIGNED) {
 		    /* If we have a compare > 0, we will replace it by
 		     * != 0 here, since both are identical but the latter
-		     * is easier to optimize.
-		     */
-		    if ((val & 0xFFFF) == 0) {
-			AddCodeLine ("stx tmp1");
-			AddCodeLine ("ora tmp1");
-			AddCodeLine ("jsr boolne");
-		    } else {
+	 	     * is easier to optimize.
+	 	     */
+	 	    if ((val & 0xFFFF) == 0) {
+	 		AddCodeLine ("stx tmp1");
+	 		AddCodeLine ("ora tmp1");
+	 		AddCodeLine ("jsr boolne");
+	 	    } else {
        	       	       	AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
-			AddCodeLine ("bne *+4");
-			AddCodeLine ("cmp #$%02X", (unsigned char)val);
+	 		AddCodeLine ("bne *+4");
+	 		AddCodeLine ("cmp #$%02X", (unsigned char)val);
        	       	       	AddCodeLine ("jsr boolugt");
-		    }
-		    return;
+	 	    }
+	 	    return;
        	       	}
-		break;
+	 	break;
 
 	    case CF_LONG:
-		break;
+	 	break;
 
 	    default:
-		typeerror (flags);
+	 	typeerror (flags);
 	}
 
 	/* If we go here, we didn't emit code. Push the lhs on stack and fall
@@ -3662,20 +3670,37 @@ void g_ge (unsigned flags, unsigned long val)
 		/* FALLTHROUGH */
 
 	    case CF_INT:
+		if ((flags & CF_UNSIGNED) == 0 && val == 0) {
+		    /* If we have a signed compare against zero, we only need to
+		     * test the high byte.
+		     */
+		    AddCodeLine ("txa");
+		    AddCodeLine ("jsr boolge");
+		    return;
+		}
+		/* Direct code only for unsigned data types */
 		if (flags & CF_UNSIGNED) {
        	       	    AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
        	       	    AddCodeLine ("bne *+4");
      		    AddCodeLine ("cmp #$%02X", (unsigned char)val);
 		    AddCodeLine ("jsr booluge");
 		    return;
-		}
+	 	}
 	     	break;
 
 	    case CF_LONG:
-		break;
+		if ((flags & CF_UNSIGNED) == 0 && val == 0) {
+		    /* If we have a signed compare against zero, we only need to
+		     * test the high byte.
+		     */
+		    AddCodeLine ("lda sreg+1");
+		    AddCodeLine ("jsr boolge");
+		    return;
+		}
+	 	break;
 
 	    default:
-		typeerror (flags);
+	 	typeerror (flags);
 	}
 
 	/* If we go here, we didn't emit code. Push the lhs on stack and fall

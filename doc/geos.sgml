@@ -160,6 +160,11 @@ through CPU registers.
 <p>
 Do not try to compile in strict ANSI mode. Library uses cc65 extensions which are not available in
 ANSI.
+<p>
+It is possible to use dynamicaly loaded modules, three such modules are provided:
+GEOS TGI driver, GEOS EMD driver (for VDC extended memory) and GEOS JOY driver.
+Just make sure that their filenames appear UPPERCASE in DeskTop. There are no more special
+recommendations, read cc65 documentation about modules and demo programs source code.
 
 <sect>Library Functions
 <p>

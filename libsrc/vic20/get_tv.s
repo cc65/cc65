@@ -6,10 +6,8 @@
 ; /* Return the video mode the machine is using */
 ;
 
-	.export		_get_tv
-
 	.include	"vic20.inc"
-
+	.include	"get_tv.inc"
 
 ;--------------------------------------------------------------------------
 ; _get_tv
@@ -18,7 +16,7 @@
 
 NTSC_LINES = 261
 	; detect the system
-	lda	#0
+	lda	#TV::NTSC
 	tax
 @L0:	ldy	VIC_HLINE
 	cpy	#1
@@ -27,7 +25,7 @@ NTSC_LINES = 261
 	beq	@L2		; line 0 reached -> NTSC
 	cpy	#NTSC_LINES/2+2
 	bne	@L1
-	lda	#1
+	lda	#TV::PAL
 @L2:	rts			; system detected: 0 for NTSC, 1 for PAL
 
 .endproc

@@ -5,10 +5,8 @@
 ; /* Return the video mode the machine is using */
 ;
 
-        .export         _get_tv
-
         .include        "c64.inc"
-
+	.include	"get_tv.inc"
 
 ;--------------------------------------------------------------------------
 ; _get_tv
@@ -21,4 +19,4 @@
 
 .endproc
 
-           
+

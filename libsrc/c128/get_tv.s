@@ -5,8 +5,7 @@
 ; /* Return the video mode the machine is using */
 ;
 
-        .export         _get_tv
-
+	.include	"get_tv.inc"
         .include        "c128.inc"
 
 
@@ -15,7 +14,7 @@
 
 .proc   _get_tv
 
-        ldx     #$01            ; Assume PAL
+        ldx     #TV::PAL	; Assume PAL
         lda     PALFLAG
         bne     pal
         dex                     ; NTSC

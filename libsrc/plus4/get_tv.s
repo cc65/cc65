@@ -5,9 +5,8 @@
 ; /* Return the video mode the machine is using */
 ;
 
-        .export         _get_tv
-
         .include        "plus4.inc"
+	.include	"get_tv.inc"
 
 
 ;--------------------------------------------------------------------------
@@ -15,7 +14,7 @@
 
 .proc   _get_tv
 
-        ldx     #$01            ; Assume PAL
+        ldx     #TV::PAL	; Assume PAL
         bit     TED_MULTI1      ; Test bit 6
         bvc     pal
         dex                     ; NTSC

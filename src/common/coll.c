@@ -158,6 +158,18 @@ void* CollAt (Collection* C, unsigned Index)
 
 
 
+void* CollLast (Collection* C)
+/* Return the last item in a collection */
+{
+    /* We must have at least one entry */
+    PRECONDITION (C->Count > 0);
+
+    /* Return the element */
+    return C->Items[C->Count-1];
+}
+
+
+
 void CollDelete (Collection* C, unsigned Index)
 /* Remove the item with the given index from the collection. This will not
  * free the item itself, just the pointer. All items with higher indices

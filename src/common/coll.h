@@ -81,7 +81,7 @@ Collection* NewCollection (void);
 void FreeCollection (Collection* C);
 /* Free a collection */
 
-unsigned CollCount (Collection* C) attribute ((const));
+unsigned CollCount (Collection* C);
 /* Return the number of items in the collection */
 
 void CollInsert (Collection* C, void* Item, unsigned Index);
@@ -92,6 +92,9 @@ void CollAppend (Collection* C, void* Item);
 
 void* CollAt (Collection* C, unsigned Index) attribute ((const));
 /* Return the item at the given index */
+
+void* CollLast (Collection* C);
+/* Return the last item in a collection */
 
 void CollDelete (Collection* C, unsigned Index);
 /* Remove the item with the given index from the collection. This will not

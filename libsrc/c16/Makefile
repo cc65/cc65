@@ -40,6 +40,7 @@ OBJS =	_scrsize.o   	\
         get_tv.o        \
 	joy_stddrv.o	\
 	kbhit.o	     	\
+        kclose.o        \
         kernal.o        \
         mainargs.o      \
         randomize.o     \

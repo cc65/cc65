@@ -26,7 +26,6 @@
         .export         SETLFS
         .export         SETNAM
         .export         OPEN
-        .export         CLOSE
         .export         CHKIN
         .export         CKOUT
         .export         CLRCH
@@ -70,7 +69,7 @@ READST		= $FFB7
 SETLFS		= $FFBA
 SETNAM		= $FFBD
 OPEN		= $FFC0
-CLOSE		= $FFC3
+;CLOSE		= $FFC3
 CHKIN		= $FFC6
 CKOUT		= $FFC9
 CLRCH		= $FFCC

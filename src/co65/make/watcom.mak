@@ -17,7 +17,7 @@ WINE = wine
 AR     	= $(WINE) WLIB
 CC      = $(WINE) WCC386
 LD     	= $(WINE) WLINK
-WSTRIP	= $(WINE) WSTRIP
+WSTRIP	= $(WINE) WSTRIP -o
 
 LNKCFG  = ld.tmp
 

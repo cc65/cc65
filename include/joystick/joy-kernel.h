@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2004 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -50,7 +50,7 @@
 typedef struct {
 
     /* Driver header */
-    char                id[3];          /* Contains 0x65, 0x6d, 0x64 ("emd") */
+    char                id[3];          /* Contains 0x6a, 0x6f, 0x79 ("joy") */
     unsigned char       version;        /* Interface version */
 
     /* Bitmasks for the joystick states. See joystick.h for indices */
@@ -66,7 +66,7 @@ typedef struct {
 
 
 
-/* EM kernel variables */
+/* JOY kernel variables */                                                   
 extern joy_drv_header* 	joy_drv;       	/* Pointer to driver */
 
 

@@ -25,7 +25,6 @@ unsigned char getcpu (void);
 #define	BRK()	__asm__ ("\tbrk")
 #define CLI()	__asm__ ("\tcli")
 #define SEI()	__asm__ ("\tsei")
-#define JAM()	__asm__ ("\t.byte\t$02")
 
 
 

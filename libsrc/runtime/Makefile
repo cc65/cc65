@@ -90,6 +90,7 @@ OBJS = 	add.o		\
        	laddeq.o	\
        	laddeqsp.o	\
        	land.o		\
+        lasr.o          \
        	lbneg.o		\
        	lcmp.o		\
        	lcompl.o	\

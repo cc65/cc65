@@ -69,7 +69,7 @@ static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const char* Lin
 {
     unsigned  Len;
     LineInfo* LI;
-    char*     S;
+    char*     T;
 
     /* Skip leading spaces in Line */
     while (IsBlank (*Line)) {
@@ -86,19 +86,24 @@ static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const char* Lin
     LI->RefCount  = 1;
     LI->InputFile = F;
     LI->LineNum   = LineNum;
-    memcpy (LI->Line, Line, Len+1);
 
-    /* Replace tabs by spaces in the given line since tabs will give rather
-     * arbitrary results when used in the output later, and if we do it here,
-     * we won't need another copy.
+    /* Copy the line, replacing tabs by spaces in the given line since tabs
+     * will give rather arbitrary results when used in the output later, and
+     * if we do it here, we won't need another copy later.
      */
-    S = LI->Line;
-    while (*S) {
-	if (*S == '\t') {
-	    *S = ' ';
+    T = LI->Line;
+    while (Len--) {
+       	if (*Line == '\t') {
+	    *T = ' ';
+	} else {
+	    *T = *Line;
 	}
-	++S;
+	++Line;
+	++T;
     }
+
+    /* Add the terminator */
+    *T = '\0';
 
     /* Return the new struct */
     return LI;

@@ -73,12 +73,8 @@ common to all CBM platforms.
 
 <sect1>VIC20 specific functions<p>
 
-The functions listed below are special for the VIC20. See the <htmlurl
-url="funcref.html" name="function reference"> for declaration and usage.
+There are currently no special VIC20 functions.
 
-<itemize>
-<item>get_ostype
-</itemize>
 
 
 <sect1>CBM specific functions<p>

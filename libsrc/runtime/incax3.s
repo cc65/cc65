@@ -8,8 +8,8 @@
 	.import		incaxy
 
 .proc	incax3
-	      
-	lda	#3
+
+	ldy	#3
 	jmp	incaxy
 
 .endproc

@@ -9,7 +9,7 @@
 
 .proc	incax7
 
-	lda   	#7
+	ldy   	#7
 	jmp	incaxy
 
 .endproc

@@ -13,6 +13,7 @@
 #include <ctype.h>
 
 /* common */
+#include "chartype.h"
 #include "tgttrans.h"
 
 /* cc65 */
@@ -170,7 +171,7 @@ void SymName (char* s)
        	    *s++ = CurC;
      	}
        	NextChar ();
-    } while (IsIdent (CurC) || isdigit (CurC));
+    } while (IsIdent (CurC) || IsDigit (CurC));
     *s = '\0';
 }
 
@@ -201,10 +202,10 @@ static void unknown (char C)
 static unsigned hexval (int c)
 /* Convert a hex digit into a value */
 {
-    if (!isxdigit (c)) {
+    if (!IsXDigit (c)) {
 	Error ("Invalid hexadecimal digit: `%c'", c);
     }
-    if (isdigit (c)) {
+    if (IsDigit (c)) {
 	return c - '0';
     } else {
        	return toupper (c) - 'A' + 10;
@@ -389,7 +390,7 @@ void NextToken (void)
     }
 
     /* Determine the next token from the lookahead */
-    if (isdigit (CurC)) {
+    if (IsDigit (CurC)) {
 
      	/* A number */
    	int HaveSuffix;		/* True if we have a type suffix */
@@ -415,9 +416,9 @@ void NextToken (void)
      	    }
      	}
      	while (1) {
-     	    if (isdigit (CurC)) {
+     	    if (IsDigit (CurC)) {
      	     	k = k * base + (CurC - '0');
-     	    } else if (base == 16 && isxdigit (CurC)) {
+     	    } else if (base == 16 && IsXDigit (CurC)) {
      	     	k = (k << 4) + hexval (CurC);
      	    } else {
      	     	break; 	      	/* not digit */

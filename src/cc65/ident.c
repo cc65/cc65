@@ -33,8 +33,10 @@
 
 
 
-#include <ctype.h>
-
+/* common */
+#include "chartype.h"
+		     
+/* cc65 */
 #include "ident.h"
 
 
@@ -48,7 +50,7 @@
 int IsIdent (char c)
 /* Return true if the given char may start an identifier */
 {
-    return (isalpha (c) || c == '_');
+    return (IsAlpha (c) || c == '_');
 }
 
 

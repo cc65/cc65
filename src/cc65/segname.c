@@ -34,9 +34,9 @@
 
 
 #include <string.h>
-#include <ctype.h>
 
 /* common */
+#include "chartype.h"
 #include "check.h"
 #include "xmalloc.h"
 
@@ -46,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*	       	    		     Data		      		     */
+/*	       	     		     Data		      		     */
 /*****************************************************************************/
 
 
@@ -57,7 +57,7 @@ char* SegmentNames[SEG_COUNT];
 
 
 /*****************************************************************************/
-/*	       	    		     Code				     */
+/*	       	     		     Code				     */
 /*****************************************************************************/
 
 
@@ -90,13 +90,13 @@ int ValidSegName (const char* Name)
 /* Return true if the given segment name is valid, return false otherwise */
 {
     /* Must start with '_' or a letter */
-    if ((*Name != '_' && !isalpha(*Name)) || strlen(Name) > 80) {
+    if ((*Name != '_' && !IsAlpha(*Name)) || strlen(Name) > 80) {
      	return 0;
     }
 
     /* Can have letters, digits or the underline */
     while (*++Name) {
-     	if (*Name != '_' && !isalnum(*Name)) {
+     	if (*Name != '_' && !IsAlNum(*Name)) {
      	    return 0;
      	}
     }

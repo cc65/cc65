@@ -42,6 +42,7 @@
 #include <sys/stat.h>
 
 /* common */
+#include "chartype.h"
 #include "check.h"
 #include "fname.h"
 #include "xmalloc.h"
@@ -252,42 +253,10 @@ static void NextChar (void);
 
 
 
-static int IsBlank (int C)
-/* Return true if the character is a blank or tab */
-{
-    return (C == ' ' || C == '\t');
-}
-
-
-
-static int IsDigit (int C)
-/* Return true if the character is a digit */
-{
-    return isdigit (C);
-}
-
-
-
-static int IsXDigit (int C)
-/* Return true if the character is a hexadecimal digit */
-{
-    return isxdigit (C);
-}
-
-
-
-static int IsDDigit (int C)
-/* Return true if the character is a dual digit */
-{
-    return (C == '0' || C == '1');
-}
-
-
-
 static int IsIdChar (int C)
 /* Return true if the character is a valid character for an identifier */
 {
-    return isalnum (C) 			||
+    return IsAlNum (C) 			||
 	   (C == '_')			||
 	   (C == '@' && AtInIdents)	||
 	   (C == '$' && DollarInIdents);
@@ -298,7 +267,7 @@ static int IsIdChar (int C)
 static int IsIdStart (int C)
 /* Return true if the character may start an identifier */
 {
-    return isalpha (C) || C == '_';
+    return IsAlpha (C) || C == '_';
 }
 
 
@@ -692,13 +661,13 @@ Again:
 	NextChar ();
 
 	/* 0 or 1 must follow */
-	if (!IsDDigit (C)) {
+	if (!IsBDigit (C)) {
 	    Error (ERR_01_EXPECTED);
 	}
 
 	/* Read the number */
 	IVal = 0;
-	while (IsDDigit (C)) {
+	while (IsBDigit (C)) {
 	    if (IVal & 0x80000000) {
 	      	Error (ERR_NUM_OVERFLOW);
 	      	IVal = 0;

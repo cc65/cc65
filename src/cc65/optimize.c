@@ -36,10 +36,11 @@
 #include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
-#include <ctype.h>
+//#include <ctype.h>
 
 /* common */
 #include "attrib.h"
+#include "chartype.h"
 #include "check.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -531,7 +532,7 @@ static int LCHasLine (LineColl* LC, Line* L)
 static int IsLocalLabel (const Line* L)
 /* Return true if the line is a local label line */
 {
-    return (L->Line [0] == 'L' && isxdigit (L->Line [1]));
+    return (L->Line [0] == 'L' && IsXDigit (L->Line [1]));
 }
 
 
@@ -547,7 +548,7 @@ static int IsExtLabel (const Line* L)
 static int IsLabel (const Line* L)
 /* Return true if the line is a label line */
 {
-    return (L->Line [0] == 'L' && isxdigit (L->Line [1])) ||
+    return (L->Line [0] == 'L' && IsXDigit (L->Line [1])) ||
 	   (L->Line [0] == '_');;
 }
 
@@ -647,7 +648,7 @@ static unsigned GetHexNum (const char* S)
 {
     unsigned I = 0;
     unsigned Val = 0;
-    while (isxdigit (S [I])) {
+    while (IsXDigit (S [I])) {
      	int C = (unsigned char) (S [I++]);
      	if (C >= 'A') {
      	    C -= 'A' - 10;
@@ -3168,7 +3169,7 @@ static void OptJumpRTS (void)
     Line* L = FirstCode;
     while (L) {
      	/* Is this a jump to a numbered label? */
-	if (LineMatch (L, "\tjmp\t") && L->Line [5] == 'L' && isdigit (L->Line [6])) {
+	if (LineMatch (L, "\tjmp\t") && L->Line [5] == 'L' && IsDigit (L->Line [6])) {
 
 	    /* Yes. Get the target label */
 	    Line* Target = GetTargetLine (L->Line+5);

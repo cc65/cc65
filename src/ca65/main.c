@@ -36,10 +36,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 #include <time.h>
 
 /* common */
+#include "chartype.h"
 #include "cmdline.h"
 #include "target.h"
 #include "tgttrans.h"
@@ -137,14 +137,14 @@ static void DefineSymbol (const char* Def)
     char SymName [MAX_STR_LEN+1];
 
     /* The symbol must start with a character or underline */
-    if (Def [0] != '_' && !isalpha (Def [0])) {
+    if (Def [0] != '_' && !IsAlpha (Def [0])) {
 	InvDef (Def);
     }
     P = Def;
 
     /* Copy the symbol, checking the rest */
     I = 0;
-    while (isalnum (*P) || *P == '_') {
+    while (IsAlNum (*P) || *P == '_') {
 	if (I <= MAX_STR_LEN) {
 	    SymName [I++] = *P;
 	}

@@ -5,10 +5,12 @@
 #include <string.h>
 #include <stdlib.h>
 #include <errno.h>
-#include <ctype.h>
 
-#include "../common/xmalloc.h"
+/* common */
+#include "chartype.h"
+#include "xmalloc.h"
 
+/* cc65 */
 #include "codegen.h"
 #include "error.h"
 #include "expr.h"

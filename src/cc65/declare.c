@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <ctype.h>
 
 /* common */
 #include "xmalloc.h"
@@ -59,7 +58,7 @@ static type OptionalQualifiers (type Q)
 	    case TOK_CONST:
 		if (Q & T_QUAL_CONST) {
 		    Error ("Duplicate qualifier: `const'");
-		}					 
+		}
 		Q |= T_QUAL_CONST;
 		break;
 

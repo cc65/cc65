@@ -35,8 +35,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
-		   
+
 /* cc65 */
 #include "codegen.h"
 #include "error.h"

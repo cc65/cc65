@@ -35,9 +35,9 @@
 
 #include <string.h>
 #include <errno.h>
-#include <ctype.h>
 
 /* common */
+#include "chartype.h"
 #include "check.h"
 #include "segdefs.h"
 #include "xmalloc.h"
@@ -131,11 +131,11 @@ static Segment* NewSegment (const char* Name, unsigned SegType)
 
     /* Check the segment name for invalid names */
     N = Name;
-    if ((*N != '_' && !isalpha (*N)) || strlen (Name) > 80) {
+    if ((*N != '_' && !IsAlpha (*N)) || strlen (Name) > 80) {
      	Error (ERR_ILLEGAL_SEGMENT, Name);
     }
     do {
-     	if (*N != '_' && !isalnum (*N)) {
+     	if (*N != '_' && !IsAlNum (*N)) {
      	    Error (ERR_ILLEGAL_SEGMENT, Name);
      	    break;
      	}

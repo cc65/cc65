@@ -25,14 +25,6 @@
 
 
 
-int IsBlank (char c)
-/* Return true if c is a space, tab or newline */
-{
-    return (c == ' ' || c == '\t' || c == '\n');
-}
-
-
-
 int IsQuoteChar (char c)
 /* Return true if c is a single or double quote */
 {

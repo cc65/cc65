@@ -17,9 +17,6 @@
 
 
 
-int IsBlank (char c);
-/* Return true if c is a space, tab or newline */
-
 int IsQuoteChar (char c);
 /* Return true if c is a single or double quote */
 

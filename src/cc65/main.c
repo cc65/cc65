@@ -36,11 +36,11 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <errno.h>
 
 /* common */
 #include "abend.h"
+#include "chartype.h"
 #include "cmdline.h"
 #include "fname.h"
 #include "target.h"
@@ -215,12 +215,12 @@ static void DefineSym (const char* Def)
     const char* P = Def;
 
     /* The symbol must start with a character or underline */
-    if (Def [0] != '_' && !isalpha (Def [0])) {
+    if (Def [0] != '_' && !IsAlpha (Def [0])) {
 	InvDef (Def);
     }
 
     /* Check the symbol name */
-    while (isalnum (*P) || *P == '_') {
+    while (IsAlNum (*P) || *P == '_') {
 	++P;
     }
 

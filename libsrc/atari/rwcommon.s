@@ -5,7 +5,7 @@
         .include "atari.inc"
 	.include "../common/errno.inc"
         .importzp tmp2,tmp3
-        .import incsp6,ldaxysp
+        .import incsp6,ldax0sp,ldaxysp
 	.import __errno,__oserror
 	.import	fdtoiocb
         
@@ -17,18 +17,12 @@ __rwsetup:
         jsr     ldaxysp         ; get fd
 	jsr	fdtoiocb	; convert to iocb
 	bmi	iocberr
-;	asl	a		; iocb #  -->  iocb index
-;	asl	a
-;	asl	a
-;	asl	a
         sta     tmp3            ; save it
-        ldy     #1
-        jsr     ldaxysp         ; get size
-        php                     ; save cond codes, for zero-ness
+        jsr     ldax0sp         ; get size
         stx     tmp2
         ldx     tmp3            ; iocb
 	cpx	#$80		; iocb must be 0...7
-	bcs	iocberr	
+	bcs	iocberr
         sta     ICBLL,x
         lda     tmp2            ; size hi
         sta     ICBLH,x
@@ -40,11 +34,11 @@ __rwsetup:
         lda     tmp2
         sta     ICBAH,x
 	jsr     incsp6          ; pop args
-        plp
+	lda	ICBLL,x
+	ora	ICBLH,x		; return with Z if length was 0
         rts
 
 iocberr:jsr     incsp6          ; pop args
-	plp			; throw away
 	ldx	#$FF		; indicate error + clear ZF
 	rts
 

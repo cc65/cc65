@@ -17,8 +17,10 @@
 
 
 
-int compound ();
-/* Compound statement.	Allow any number of statements, inside braces. */
+int Statement (void);
+/* Statement parser. Returns 1 if the statement does a return/break, returns
+ * 0 otherwise
+ */
 
 
 

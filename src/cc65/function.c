@@ -64,9 +64,9 @@ struct Function {
     struct SymEntry*   	FuncEntry;	/* Symbol table entry */
     type*   	  	ReturnType;	/* Function return type */
     struct FuncDesc*	Desc;	  	/* Function descriptor */
-    CodeMark 	       	EntryCode;     	/* Backpatch addr for entry code */
     int			Reserved;	/* Reserved local space */
     unsigned	  	RetLab;	    	/* Return code label */
+    int			TopLevelSP;	/* SP at function top level */
 };
 
 /* Pointer to current function */
@@ -90,9 +90,9 @@ static Function* NewFunction (struct SymEntry* Sym)
     F->FuncEntry  = Sym;
     F->ReturnType = Sym->Type + 1 + DECODE_SIZE;
     F->Desc   	  = (FuncDesc*) DecodePtr (Sym->Type + 1);
-    F->EntryCode  = 0;
     F->Reserved	  = 0;
     F->RetLab	  = GetLabel ();
+    F->TopLevelSP = 0;
 
     /* Return the new structure */
     return F;
@@ -156,18 +156,18 @@ int IsVariadic (const Function* F)
 
 
 
-void RememberEntry (Function* F)
-/* Remember the current output position for local space creation later */
-{
-    F->EntryCode = GetCodePos ();
-}
-
-
-
 unsigned GetRetLab (const Function* F)
 /* Return the return jump label */
 {
     return F->RetLab;
+}
+
+
+
+int GetTopLevelSP (const Function* F)
+/* Get the value of the stack pointer on function top level */
+{
+    return F->TopLevelSP;
 }
 
 
@@ -215,7 +215,8 @@ void AllocLocalSpace (Function* F)
 void NewFunc (SymEntry* Func)
 /* Parse argument declarations and function body. */
 {
-    int isbrk;
+    int HadReturn;
+    int IsVoidFunc;
     unsigned Flags;
 
     /* Get the function descriptor from the function entry */
@@ -244,11 +245,6 @@ void NewFunc (SymEntry* Func)
     /* Function body now defined */
     Func->Flags |= SC_DEF;
 
-    /* Need a starting curly brace */
-    if (curtok != TOK_LCURLY) {
-    	Error ("`{' expected");
-    }
-
     /* Setup register variables */
     InitRegVars ();
 
@@ -264,7 +260,7 @@ void NewFunc (SymEntry* Func)
 
 	/* Fastcall functions may never have an ellipsis or the compiler is buggy */
 	CHECK ((D->Flags & FD_VARIADIC) == 0);
-				      
+
 	/* Get a pointer to the last parameter entry */
 	LastParam = D->SymTab->SymTail;
 
@@ -286,30 +282,56 @@ void NewFunc (SymEntry* Func)
     /* Generate function entry code if needed */
     g_enter (TypeOf (Func->Type), GetParamSize (CurrentFunc));
 
-    /* Remember the current code position. This may be used later to create
-     * local variable space once we have created the function body itself.
-     * Currently this is not possible because the stack offsets of all locals
-     * have to be known in advance.
-     */
-    RememberEntry (CurrentFunc);
-
-    /* Parse the function body */
+    /* Setup the stack */
     oursp = 0;
-    isbrk = compound ();
 
-    /* If the function did not end with an return statement, create exit code */
-    if (!isbrk) {
-#if 0
-     	/* If the function has a return type, flag an error */
-     	if (!voidfunc) {
-     	    Error ("Function `%s' must return a value",	Func->Name);
+    /* Need a starting curly brace */
+    ConsumeLCurly ();
+
+    /* Parse local variable declarations if any */
+    DeclareLocals ();
+
+    /* Remember the current stack pointer. All variables allocated elsewhere
+     * must be dropped when doing a return from an inner block.
+     */
+    CurrentFunc->TopLevelSP = oursp;
+
+    /* Now process statements in this block */
+    HadReturn = 0;
+    while (curtok != TOK_RCURLY) {
+     	if (curtok != TOK_CEOF) {
+     	    HadReturn = Statement ();
+     	} else {
+     	    break;
      	}
-#endif
-	RestoreRegVars (0);
-
-	Flags = HasVoidReturn (CurrentFunc)? CF_NONE : CF_REG;
-        g_leave (Flags, 0);
     }
+
+    /* If the function has a return type but no return statement, flag
+     * a warning
+     */
+    IsVoidFunc = HasVoidReturn (CurrentFunc);
+#if 0
+    /* Does not work reliably */
+    if (!IsVoidFunc && !HadReturn) {
+	Warning ("Function `%s' should return a value", Func->Name);
+    }
+#endif
+
+    /* Output the function exit code label */
+    g_defloclabel (GetRetLab (CurrentFunc));
+
+    /* Restore the register variables */
+    RestoreRegVars (!IsVoidFunc);
+
+    /* Generate the exit code */
+    Flags = IsVoidFunc? CF_NONE : CF_REG;
+    g_leave (Flags, 0);
+
+    /* Eat the closing brace */
+    ConsumeRCurly ();
+
+    /* Emit references to imports/exports */
+    EmitExternals ();
 
     /* Dump literal data created by the function */
     DumpLiteralPool ();

@@ -76,11 +76,11 @@ int HasVoidReturn (const Function* F);
 int IsVariadic (const Function* F);
 /* Return true if this is a variadic function */
 
-void RememberEntry (Function* F);
-/* Remember the current output position for local space creation later */
-
 unsigned GetRetLab (const Function* F);
 /* Return the return jump label */
+
+int GetTopLevelSP (const Function* F);
+/* Get the value of the stack pointer on function top level */
 
 int ReserveLocalSpace (Function* F, unsigned Size);
 /* Reserve (but don't allocate) the given local space and return the stack

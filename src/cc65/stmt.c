@@ -51,11 +51,6 @@
 
 
 
-static int statement (void);
-/* Forward decl */
-
-
-
 static int doif (void)
 /* Handle 'if' statement here */
 {
@@ -71,7 +66,7 @@ static int doif (void)
     test (flab1, 0);
 
     /* Parse the if body */
-    gotbreak = statement ();
+    gotbreak = Statement ();
 
     /* Else clause present? */
     if (curtok != TOK_ELSE) {
@@ -99,7 +94,7 @@ static int doif (void)
      	    flab2 = 0;
      	}
      	g_defloclabel (flab1);
-     	gotbreak &= statement ();
+     	gotbreak &= Statement ();
 
      	/* Generate the label for the else clause */
      	if (flab2) {
@@ -142,7 +137,7 @@ static void dowhile (char wtype)
 	    g_truejump (CF_NONE, loop);
 	} else {
 	    /* There is code inside the while loop */
-	    statement ();
+	    Statement ();
 	    g_jump (loop);
 	    g_defloclabel (lab);
      	}
@@ -150,7 +145,7 @@ static void dowhile (char wtype)
     } else {
 
 	/* Do loop */
-       	statement ();
+       	Statement ();
 	Consume (TOK_WHILE, "`while' expected");
     	test (loop, 1);
     	ConsumeSemi ();
@@ -162,36 +157,33 @@ static void dowhile (char wtype)
 
 
 
-static void doreturn (void)
+static void DoReturn (void)
 /* Handle 'return' statement here */
 {
     struct expent lval;
-    unsigned Flags = 0;	       	/* Code generator flags */
-    int HaveVal = 0;		/* Do we have a return value in ax? */
-
 
     NextToken ();
     if (curtok != TOK_SEMI) {
        	if (HasVoidReturn (CurrentFunc)) {
        	    Error ("Returning a value in function with return type void");
        	}
-       	if (evalexpr (CF_NONE, hie0, &lval) == 0) {
-       	    /* Constant value */
-       	    Flags = CF_CONST;
-       	} else {
-    	    /* Value in the primary register */
-    	    HaveVal = 1;
-    	}
+
+	/* Evaluate the return expression. Result will be in primary */
+	expression (&lval);
 
     	/* Convert the return value to the type of the function result */
     	if (!HasVoidReturn (CurrentFunc)) {
-       	    Flags |= (assignadjust (GetReturnType (CurrentFunc), &lval) & ~CF_CONST) | CF_REG;
+       	    assignadjust (GetReturnType (CurrentFunc), &lval);
     	}
     } else if (!HasVoidReturn (CurrentFunc)) {
     	Error ("Function `%s' must return a value", GetFuncName (CurrentFunc));
     }
-    RestoreRegVars (HaveVal);
-    g_leave (Flags, lval.e_const);
+
+    /* Cleanup the stack in case we're inside a block with locals */
+    g_space (oursp - GetTopLevelSP (CurrentFunc));
+
+    /* Output a jump to the function exit code */
+    g_jump (GetRetLab (CurrentFunc));
 }
 
 
@@ -414,7 +406,7 @@ static void cascadeswitch (struct expent* eval)
 
 	/* Parse statements */
 	if (curtok != TOK_RCURLY) {
-       	    HaveBreak = statement ();
+       	    HaveBreak = Statement ();
 	}
     }
 
@@ -503,7 +495,7 @@ static void tableswitch (struct expent* eval)
 	    HaveBreak = 0;
     	}
     	if (curtok != TOK_RCURLY) {
-    	    HaveBreak = statement ();
+    	    HaveBreak = Statement ();
     	}
     }
 
@@ -615,7 +607,7 @@ static void dofor (void)
     ConsumeRParen ();
     g_jump (loop);
     g_defloclabel (lstat);
-    statement ();
+    Statement ();
     g_jump (linc);
     g_defloclabel (lab);
     DelLoop ();
@@ -623,9 +615,58 @@ static void dofor (void)
 
 
 
-static int statement (void)
-/* Statement parser. Called whenever syntax requires a statement.
- * This routine performs that statement and returns 1 if it is a branch,
+static int CompoundStatement (void)
+/* Compound statement. Allow any number of statements inside braces. */
+{
+    int isbrk;
+    int oldsp;
+
+    /* eat LCURLY */
+    NextToken ();
+
+    /* Remember the stack at block entry */
+    oldsp = oursp;
+
+    /* Enter a new lexical level */
+    EnterBlockLevel ();
+
+    /* Parse local variable declarations if any */
+    DeclareLocals ();
+
+    /* Now process statements in this block */
+    isbrk = 0;
+    while (curtok != TOK_RCURLY) {
+     	if (curtok != TOK_CEOF) {
+     	    isbrk = Statement ();
+     	} else {
+     	    break;
+     	}
+    }
+
+    /* Emit references to imports/exports for this block */
+    EmitExternals ();
+
+    /* Clean up the stack. */
+    if (isbrk) {
+	oursp = oldsp;
+    } else {
+	g_space (oursp - oldsp);
+	oursp = oldsp;
+    }
+
+    /* Leave the lexical level */
+    LeaveBlockLevel ();
+
+    /* Eat closing brace */
+    ConsumeRCurly ();
+
+    return isbrk;
+}
+
+
+
+int Statement (void)
+/* Statement parser. Returns 1 if the statement does a return/break, returns
  * 0 otherwise
  */
 {
@@ -642,10 +683,10 @@ static int statement (void)
      	switch (curtok) {
 
      	    case TOK_LCURLY:
-     		return compound ();
+     	    	return CompoundStatement ();
 
      	    case TOK_IF:
-     		return doif ();
+     	    	return doif ();
 
      	    case TOK_WHILE:
      		dowhile ('w');
@@ -660,7 +701,7 @@ static int statement (void)
 		break;
 
 	    case TOK_RETURN:
-		doreturn ();
+		DoReturn ();
 		ConsumeSemi ();
 		return 1;
 
@@ -700,64 +741,6 @@ static int statement (void)
 	}
     }
     return 0;
-}
-
-
-
-int compound (void)
-/* Compound statement. 	Allow any number of statements, inside braces. */
-{
-    static unsigned CurrentLevel = 0;
-
-    int isbrk;
-    int oldsp;
-
-    /* eat LCURLY */
-    NextToken ();
-
-    /* Remember the stack at block entry */
-    oldsp = oursp;
-
-    /* If we're not on function level, enter a new lexical level */
-    if (CurrentLevel++ > 0) {
-	/* A nested block */
-    	EnterBlockLevel ();
-    }
-
-    /* Parse local variable declarations if any */
-    DeclareLocals ();
-
-    /* Now process statements in the function body */
-    isbrk = 0;
-    while (curtok != TOK_RCURLY) {
-     	if (curtok == TOK_CEOF)
-     	    break;
-     	else {
-     	    isbrk = statement ();
-     	}
-    }
-
-    /* Emit references to imports/exports for this block */
-    EmitExternals ();
-
-    /* If this is not the top level compound statement, clean up the stack.
-     * For a top level statement this will be done by the function exit code.
-     */
-    if (--CurrentLevel != 0) {
-     	/* Some sort of nested block */
-	LeaveBlockLevel ();
-     	if (isbrk) {
-     	    oursp = oldsp;
-     	} else {
-     	    g_space (oursp - oldsp);
-     	    oursp = oldsp;
-     	}
-    }
-
-    /* Eat closing brace */
-    ConsumeRCurly ();
-
-    return isbrk;
 }
 
 

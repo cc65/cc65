@@ -26,11 +26,13 @@
 
 ; Table with offsets into struct utsname
 fieldoffs:
-        .byte   utsname_sysname
-        .byte   utsname_nodename
-        .byte   utsname_release
-        .byte   utsname_version
-        .byte   utsname_machine
+        .byte   utsname::sysname
+        .byte   utsname::nodename
+        .byte   utsname::release
+        .byte   utsname::version
+        .byte   utsname::machine
+
+fieldcount = * - fieldoffs
 
 ;--------------------------------------------------------------------------
 
@@ -45,7 +47,7 @@ fieldoffs:
         stx     tmp1            ; Field number
 
 next:   ldy     tmp1
-        cpy     #utsname_fieldcount
+        cpy     #fieldcount
         beq     done
         inc     tmp1            ; Bump field counter
         lda     fieldoffs,y     ; Get next field offset

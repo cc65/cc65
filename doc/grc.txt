@@ -1,0 +1,274 @@
+
+
+
+    grc - GEOS resource compiler
+    
+    Maciej 'YTM/Alliance' Witkowiak
+    <ytm@friko.onet.pl>
+
+    VII 2000
+
+
+
+
+
+1. Overview
+-----------
+
+grc is a part of cc65's GEOS support. This tool is necessary to generate
+required and optional resources. A required resource for every GEOS app is the
+header, that is: icon, some strings and addresses. Optional resources might be
+menu definitions, other headers (e.g. for data files of an app), dialogs
+definitions etc. Without application header GEOS is unable to load and start
+it.
+
+Currently, grc supports only menus and required header definition.
+
+grc generates output in two formats - as C header and ca65 source (.s). This
+is because application header data must be in assembler fromat while menu
+definitions can be easily translated into C. The purpose of C file is to include
+it as header in only one project file. Assembler source should be processed with
+ca65 and linked as first object (read Building process below).
+
+2. Usage
+--------
+
+grc accepts following options:
+    -f 		force writting output files
+    -o name	name C output file
+    -s name	name S output file
+    -h		help
+
+Default output names are made from input name with extension replaced by '.h'
+and '.s'. grc will not overwrite existing files unless forced to do so.
+This is to avoid situation where you have test.c and test.grc files. Both would
+make output into test.s. For this reason you should name your resources files
+differently than sources, e.g. as resource.grc or apphead.grc
+
+
+3. Resource file format
+-----------------------
+
+A resource file has name extension '.grc'. This is not required, but it will
+make easier recognition of file purpose. Also cl65 recognizes these files.
+Parser is very weak at the moment so read the comments carefully and write
+resources exactly as it is written here. Look out for CAPS and small letters.
+Everything after a ';' till the end of line is considered as comment and 
+ignored.
+See included commented example .grc file for better view of the problem.
+
+Currently grc supports only two types of resources - menu and header.
+
+a) menu definition
+
+MENU menuName leftx,topy ORIENTATION
+{
+    "item name 1" MENU_TYPE pointer
+    ...
+    "item name x" MENU_TYPE pointer
+}
+
+The definition starts with keyword MENU, then goes menu name, which will be 
+represented in C as const void. Then are coordinates of top left corner
+of menu box. The position of bottom right corner is estimated basing on length
+of item names and menu orientation. It means that menu box will be always
+as large as it should be. Then there's orientation keyword, it can be either
+HORIZONTAL or VERTICAL.
+Between { and } there's menu content. It consists of item definitions.
+First is item name - it has to be in quotes. Next is menu type bit. It can 
+be MENU_ACTION or SUB_MENU, both can be combined with DYN_SUB_MENU bit
+(see GEOSLib documentation for description of these). You can use C logical
+operators in expressions but you have to do it without spaces, so dynamically
+created submenu will be something like:
+
+    "dynamic" SUB_MENU|DYN_SUB_MENU create_dynamic
+
+The last part of the item definition is a pointer which can be any name which
+is present in source that includes generated header. It can point to a function
+or to another menu definition.
+
+If you are doing sub(sub)menus definitions remember to place the lowest level 
+definition first. This way C compiler won't complain about unknown names.
+
+b) header definition
+
+HEADER GEOS_TYPE "dosname" "classname" "version"
+{
+    author "Joe Schmoe"
+    info   "This is my killer-app!"
+    date   yy mm dd hh ss
+    dostype SEQ
+    mode    any
+}
+
+Header definition describes GEOS header sector which is unique to each file. 
+Currently there's no way to change default grc icon (an empty frame). It will 
+be possible in next versions.
+The definition starts with keyword HEADER, then goes GEOS file type. You can 
+only use APPLICATION here at the moment. Then there are (all in quotes) DOS 
+filename (up to 16 characters), GEOS Class name (up to 12 characters) and 
+version info (up to 4 characters). Version should be written as "Vx.y" where 
+x is the major and y the minor version number. These fields along with both 
+brackets are required. Data between brackets is optional and will be replaced 
+by default and current values.
+Keyword 'author' and value in quotes describes Author field and can be up to
+63 bytes long.
+Info (in the same format) can have up to 95 characters.
+If 'date' field will be ommited then the time of compilation will be placed. 
+Note that if you do specify the date you have to write all 5 numbers.
+Dostype can by SEQ, PRG or USR. USR is by default, GEOS doesn't care.
+Mode can be 'any', '40only', '80only', 'c64only' and describes system 
+requirements. 'any' will work both on GEOS64 and GEOS128 in 40 and 80 column 
+modes. '40only' will work on GEOS128 in 40 column mode only. '80only' will 
+work only on GEOS128 and 'c64only' will work only on GEOS64.
+
+
+4. Building GEOS application
+----------------------------
+
+Before proceeding please read cc65, ca65 and ld65 documentation and find
+appropriate sections about compiling programs in general.
+
+GEOS support in cc65 is based on well-known in GEOS world Convert v2.5 format.
+It means that each file built with cc65 package has to unconverted before
+running.
+
+Each project consists of four parts, two are provided by cc65. These parts are:
+
+a) application header
+b) main object
+c) application objects
+d) system library
+
+b) and d) are with cc65, you have to write application yourself ;)
+
+Application header is defined in HEADER section of .grc file and processed
+into assembler .s file. You have to compile it with ca65 to object .o format.
+
+
+4a. Building GEOS application without cl65
+-----------------------------------------
+
+Assume that there are three input files: test.c (a C source), test.h (a header
+file) and resource.grc (with menu and header definition). Note the fact that I
+DON'T RECOMMEND naming this file test.grc, because you will have to be very
+careful with names (grc will make test.s and test.h out of test.grc by default
+and you don't want that, because test.s is compiled test.c and test.h is
+something completely different).
+
+Important thing - the top of test.c looks like:
+
+--- cut here ---
+
+#include <geos.h>
+#include "resource.h"
+
+--- cut here ---
+
+There are no other includes.
+
+1. First step - compiling resources:
+
+$ grc resource.grc
+
+will produce two output files: resource.h and resource.s
+
+Note that resource.h is included at the top of test.c so resource compiling
+must be the first step.
+
+2. Second step - compiling the code:
+
+$ cc65 -t geos -O test.c
+$ ca65 -t geos test.s
+
+This way you have test.o object file which contains all the executable code.
+
+3. Third step - compiling the application header
+
+$ ca65 -t geos resource.s
+
+And voilá - resource.o is ready
+
+4. Fourth and the last step - linking it together
+
+$ ld -t geos -o test.cvt resource.o geos.o test.o geos.lib
+
+resource.o comes first because it contains the header. Next one is geos.o, a
+required starter code, then actual application code in test.o and the last is
+GEOS system library.
+The resulting file test.cvt is executable in well-known GEOS Convert format.
+Note that it's name (test) isn't important, the real name after unconverting 
+is the DOS name given in header definition.
+
+On each step a '-t geos' was present at the command line. This switch is required
+for correct process of app building.
+
+
+5. Bugs and feedback
+--------------------
+
+This is the first release of grc and it contains bugs for sure. I am aware of 
+them, I know that parser is weak and if you don't strictly follow grammar
+rules then everything will crash. However if you find an interesting bug mail
+me :-) Mail me also for help writting your .grc correctly if you have problems
+with it.
+I would also appreciate comments and help on this file because I am sure that
+it can be written better.
+
+
+6. Legal stuff
+--------------
+
+grc is covered by the same license as whole cc65 package, so see its 
+documentation for more info. Anyway, if you like it and want to ecourage me 
+to work more on it send me a postcard with sight of your neighbourhood, city, 
+region etc or just e-mail with info that you actually used it. See GEOSLib
+documentation for addresses.
+
+
+Appendix A: example.grc
+
+---- cut here ----
+
+;Note that MENU is either MENU and SUBMENU
+;If you want to use any C operators (like '|', '&' etc.) do it WITHOUT spaces
+;between arguments (parser is simple and weak)
+
+MENU subMenu1 15,0 VERTICAL
+; this is a vertical menu placed at (15,0)
+{
+; there are three items, all are calling functions
+; first and third are normal functions, see GEOSLib documentation for
+; information what should second function return (it's a dynamic one)
+    "subitem1" MENU_ACTION smenu1
+    "mubitem2" MENU_ACTION|DYN_SUB_MENU smenu2
+    "subitem3" MENU_ACTION smenu3
+}
+
+; format: MENU "name" left,top ALIGN { "itemname" TYPE pointer ... }
+MENU mainMenu 0,0 HORIZONTAL
+; here we have our main menu placed at (0,0) and it is a horizontal menu
+; since it is a top level menu you would register it in C source using
+; DoMenu(&mainMenu);
+{
+; there are two items - a submenu and an action menu
+; this calls submenu named subMenu1 (see previous definition)
+    "sub menu1" SUB_MENU subMenu1
+; this will work the same as EnterDeskTop() call from C source
+    "quit"     MENU_ACTION EnterDeskTop
+}
+
+; format: HEADER GEOS_TYPE "dosname" "classname" "version"
+HEADER APPLICATION "MyFirstApp" "Class Name" "V1.0"
+; this is a header for APPLICATION which wille be seen in directory as
+; file named MyFirstApp with Class "Class Name V1.0"
+{
+; not all fields are required, default and current values will be used
+    author "Maciej Witkowiak"			; always in quotes!
+    info "Information text"			; always in quotes!
+;    date yy mm dd hh ss			; always 5 fields!
+;    dostype seq				; can be PRG, SEQ, USR (only UPPER or lower case)
+    mode c64only				; can be any, 40only, 80only, c64only
+}
+
+--- cut here ---

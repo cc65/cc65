@@ -82,11 +82,14 @@ loop2:	lda	(ptr4),y
 
 	inc	tmp3		; no, prepend "D:"
 	inc	tmp3		; adjust stack size used
-	ldy	#2
+	ldy	#3
 	jsr	subysp		; adjust stack pointer
-	ldy	#1
+	ldy	#2
 	lda	#':'
 	sta	(sp),y		; insert ':'
+	dey
+	lda	#'0' + DEFAULT_DEVICE 
+	sta	(sp),y		; insert device number
 	dey
 	lda	#'D'
 	sta	(sp),y		; insert 'D'

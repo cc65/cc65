@@ -4,11 +4,10 @@
 
 .SUFFIXES: .o .obj .s .c
 
-# Defines used by the submakes:
-export CC = ../../src/cc65/cc65
-export AS = ../../src/ca65/ca65
-
-# Define used within this makefile
+# Defines for executables. The first two are passed to the submakes and are
+# relative to the subdirectories, the last one is used directly.
+CC = ../../src/cc65/cc65
+AS = ../../src/ca65/ca65
 AR = ../src/ar65/ar65
 
 # List of all targets
@@ -32,9 +31,11 @@ all:
 # Apple ][
 
 apple2lib:
-	export CFLAGS="-Osir -g -t apple2 -I../../include";\
-	export AFLAGS="-t apple2";\
 	for i in apple2 common runtime conio dbg; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -t apple2 -I../../include" \
+	    AFLAGS="-t apple2" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv apple2/crt0.o apple2.o
@@ -46,9 +47,11 @@ apple2lib:
 # Atari
 
 atarilib:
-	export CFLAGS="-Osir -g -t atari -I../../include";\
-       	export AFLAGS="-t atari";\
 	for i in atari common runtime conio dbg; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -t atari -I../../include" \
+	    AFLAGS="-t atari" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv atari/crt0.o atari.o
@@ -60,9 +63,11 @@ atarilib:
 # C64
 
 c64lib:
-	export CFLAGS="-Osir -g -t c64 -I../../include";\
-       	export AFLAGS="-t c64";\
 	for i in c64 cbm common runtime conio dbg; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -t c64 -I../../include" \
+	    AFLAGS="-t c64" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv c64/crt0.o c64.o
@@ -74,9 +79,11 @@ c64lib:
 # C128
 
 c128lib:
-	export CFLAGS="-Osir -g -t c128 -I../../include";\
-       	export AFLAGS="-t c128";\
 	for i in c128 cbm common runtime conio dbg; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -t c128 -I../../include" \
+	    AFLAGS="-t c128" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv c128/crt0.o c128.o
@@ -88,9 +95,11 @@ c128lib:
 # PET-II series
 
 cbm610lib:
-	export CFLAGS="-Osir -g -t cbm610 -I../../include";\
-       	export AFLAGS="-t cbm610";\
 	for i in cbm610 cbm common runtime conio dbg; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -t cbm610 -I../../include" \
+	    AFLAGS="-t cbm610" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv cbm610/crt0.o cbm610.o
@@ -102,9 +111,11 @@ cbm610lib:
 # GEOS on the C64/128
 
 geoslib:
-	export CFLAGS="-Osir -g -t geos -I../../include";\
-       	export AFLAGS="-t geos";\
-       	for i in geos common runtime; do \
+	for i in geos common runtime; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -t geos -I../../include" \
+	    AFLAGS="-t geos" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	for i in common runtime; do \
@@ -115,9 +126,11 @@ geoslib:
 # CBM PET machines
 
 petlib:
-	export CFLAGS="-Osir -g -t pet -I../../include";\
-       	export AFLAGS="-t pet";\
 	for i in pet cbm common runtime conio dbg; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -t pet -I../../include" \
+	    AFLAGS="-t pet" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv pet/crt0.o pet.o
@@ -129,9 +142,11 @@ petlib:
 # Commodore C116, C16 and Plus/4
 
 plus4lib:
-	export CFLAGS="-Osir -g -t plus4 -I../../include";\
-       	export AFLAGS="-t plus4";\
 	for i in plus4 cbm common runtime conio dbg; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -t plus4 -I../../include" \
+	    AFLAGS="-t plus4" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv plus4/crt0.o plus4.o
@@ -155,4 +170,4 @@ zap:	clean
 
 
 
-			       
+

@@ -1405,7 +1405,6 @@ void DbgEntry (void)
     UpdateReg ();		/* Must update this (static later) */
     StackHome ();
     CStackHome ();
-    DumpHome ();
 
     /* Wait for user input */
     done = 0;

@@ -8,7 +8,7 @@
 	    .exportzp cursor_x, cursor_y, cursor_flag
 	    .exportzp cursor_c, cursor_r
 
-.segment "EXTZP", zeropage
+.segment "EXTZP" : zeropage
 
 cursor_x:	.res 2		; Cursor column (0-319/639)
 cursor_y:	.res 1		; Cursor row    (0-199)

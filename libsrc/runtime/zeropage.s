@@ -30,5 +30,5 @@ regbank:      	.res	6      	; 6 byte register bank
 ; segment does not exist (it does not exist in most builtin linker configs
 ; but is used when linking modules).
 
-.segment        "EXTZP", zeropage
+.segment        "EXTZP" : zeropage
 

@@ -12,6 +12,7 @@
 
 .proc   CLOSE
         sta     ENABLE_ROM              ; Enable the ROM
+	clc				; Force C64 compatible behaviour
         jsr     $FFC3                   ; Call the ROM routine
         sta     ENABLE_RAM              ; Switch back to RAM
         rts                             ; Return to caller

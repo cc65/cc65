@@ -51,11 +51,11 @@ chips:
 
 clean:
 	@$(MAKE) -C chips -f make/gcc.mak clean
-	rm -f *~ core *.lst
+	$(RM) *~ core *.lst
 
 zap:  	clean
 	@$(MAKE) -C chips -f make/gcc.mak zap
-	rm -f *.o $(EXECS) .depend
+	$(RM) *.o $(EXECS) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

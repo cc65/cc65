@@ -47,10 +47,10 @@ da65:   $(OBJS) $(LIBS)
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
 
 clean:
-	rm -f *~ core *.map
+	$(RM) *~ core *.map
 
 zap:	clean
-	rm -f *.o $(EXECS) .depend
+	$(RM) *.o $(EXECS) .depend
 
 
 # ------------------------------------------------------------------------------

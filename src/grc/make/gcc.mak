@@ -31,10 +31,10 @@ grc:	$(OBJS) $(LIBS)
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
 
 clean:
-	rm -f *~ core *.lst
+	$(RM) *~ core *.lst
 
 zap:	clean
-	rm -f *.o $(EXECS) .depend
+	$(RM) *.o $(EXECS) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

@@ -93,10 +93,10 @@ ld65:   $(INCS) $(OBJS) $(LIBS)
 inc:	$(INCS)
 
 clean:
-	rm -f *~ core *.map
+	$(RM) *~ core *.map
 
 zap:   	clean
-	rm -f *.o $(INCS) $(EXECS) .depend
+	$(RM) *.o $(INCS) $(EXECS) .depend
 
 
 # ------------------------------------------------------------------------------

@@ -45,10 +45,10 @@ ar65:   $(OBJS) $(LIBS)
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
 
 clean:
-	rm -f *~ core
+	$(RM) *~ core
 
 zap:	clean
-	rm -f *.o $(EXECS) .depend
+	$(RM) *.o $(EXECS) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

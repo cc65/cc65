@@ -55,10 +55,10 @@ $(LIB):	$(OBJS)
 	$(AR) rs $(LIB) $?
 
 clean:
-	rm -f *~ core *.map
+	$(RM) *~ core *.map
 
 zap:	clean
-	rm -f *.o $(LIB) .depend
+	$(RM) *.o $(LIB) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

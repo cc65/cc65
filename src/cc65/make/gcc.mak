@@ -107,10 +107,10 @@ $(EXE):	$(OBJS) $(LIBS)
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:
-	rm -f *~ core *.map
+	$(RM) *~ core *.map
 
 zap:	clean
-	rm -f *.o $(EXE) .depend
+	$(RM) *.o $(EXE) .depend
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

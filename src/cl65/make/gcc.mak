@@ -38,10 +38,10 @@ cl65:	$(OBJS) $(LIBS)
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) cl65 ; fi
 
 clean:
-	rm -f *~ core
+	$(RM) *~ core
 
 zap:	clean
-	rm -f *.o $(EXECS) .depend
+	$(RM) *.o $(EXECS) .depend
 
 
 # ------------------------------------------------------------------------------

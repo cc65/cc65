@@ -89,6 +89,7 @@ OBJS = 	anonname.obj    \
         segment.obj     \
         spool.obj       \
         struct.obj      \
+        studyexpr.obj   \
 	symbol.obj	\
         symentry.obj    \
 	symtab.obj	\

@@ -40,6 +40,7 @@ OBJS =  anonname.o      \
         segment.o       \
         spool.o         \
         struct.o        \
+        studyexpr.o     \
         symentry.o      \
         symbol.o        \
         symtab.o	\

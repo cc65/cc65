@@ -1,0 +1,183 @@
+
+
+				   cl65
+
+		     Compile and link utility for cc65
+
+		 (C) Copyright 1999 Ullrich von Bassewitz
+			    (uz@musoftware.de)
+
+
+
+Contents
+--------
+
+  1. Overview
+
+  2. Basic Usage
+
+  3. More usage
+
+  4. Examples
+
+  5. Bugs/Feedback
+
+  6. Copyright
+
+
+
+1. Overview
+-----------
+
+cl65 is a frontend for cc65, ca65 and ld65. While you may not use the full
+power of the tools when calling them through cl65, most features are
+available, and the use of cl65 is much simpler.
+
+
+
+2. Usage
+--------
+
+The cl65 compile and link utility may be used to compile, assemble and
+link files. While the separate tools do just one step, cl65 knows how to
+build object files from C files (by calling the compiler, then the
+assembler) and other things.
+
+	Usage: cl65 [options] file
+	Options:
+		-A              Strict ANSI mode
+		-C name         Use linker config file
+		-D sym[=defn]   Define a preprocessor symbol
+		-I path         Set an include directory path
+		-Ln name        Create a VICE label file
+		-O              Optimize code
+		-Oi             Optimize code, inline functions
+		-Or             Optimize code, honour the register keyword
+		-Os             Optimize code, inline known C funtions
+		-S              Compile but don't assemble and link
+		-V              Print the version number
+		-W              Suppress warnings
+		-c              Compiler and assemble but don't link
+		-d              Debug mode
+		-g              Add debug info
+		-h              Help (this text)
+		-m name         Create a map file
+		-o name         Name the output file
+		-t system       Set the target system
+		-v              Verbose mode
+		-vm             Verbose map file
+
+Most of the options have the same meaning than the corresponding compiler,
+assembler or linker option. If an option is available for more than one
+of the tools, it is set for all tools, where it is available. One example
+for this is -v: The compiler, the assembler and the linker are all called
+with the -v switch.
+
+There are a few remaining options that control the behaviour of cl65:
+
+The -S option forces cl65 to stop after the assembly step. This means that
+C files are translated into assembler files, but nothing more is done.
+Assembler files, object files and libraries given on the command line are
+ignored.
+
+The -c options forces cl65 to stop after the assembly step. This means
+that C and assembler files given on the command line are translated into
+object files, but there is no link step, and object files and libraries
+given on the command line are ignored.
+
+The -o option is used for the target name in the final step. This causes
+problems, if the linker will not be called, and there are several input
+files on the command line. In this case, the name given with -o will be
+used for all of them, which makes the option pretty useless. You shouldn't
+use -o when more than one output file is created.
+
+The default for the -t option is different from the compiler and linker in
+the case that the option is missing: While the compiler and linker will
+use the "none" system settings by default, cl65 will use the C64 as a
+target system by default. This was choosen since most people seem to use
+cc65 to develop for the C64.
+
+
+
+3. More usage
+-------------
+
+Since cl65 was created to simplify the use of the cc65 development
+package, it tries to be smart about several things.
+
+  - If you don't give a target system on the command line, cl65
+    defaults to the C64.
+
+  - When linking, cl65 will supply the names of the startup file and
+    library for the target system to the linker, so you don't have to do
+    that.
+
+  - If the final step is the linker, and the name of the output file was
+    not explicitly given, cl65 will use the name of the first input file
+    without the extension, provided that the name of this file has an
+    extension. So you don't need to name the executable name in most
+    cases, just give the name of your "main" file as first input file.
+
+
+
+4. Examples
+-----------
+
+The morse trainer software, which consists of one C file (morse.c) and one
+assembler file (irq.s) will need the following separate steps to compile
+into an executable named morse:
+
+	cc65 -g -Oi -t c64 morse.c
+	ca65 -g morse.s
+	ca65 -g irq.s
+	ld65 -t c64 -o morse c64.o morse.o irq.o c64.lib
+
+When using cl65, this is simplified to
+
+	cl65 -g -Oi morse.c irq.s
+
+
+As a general rule, you may use cl65 instead of cc65 at most times,
+especially in makefiles to build object files directly from C files. Use
+
+	.c.o:
+		cl65 -g -Oi $<
+
+to do this.
+
+
+
+5. Bugs/Feedback
+----------------
+
+If you have problems using the utility, if you find any bugs, or if you're
+doing something interesting with it, I would be glad to hear from you.
+Feel free to contact me by email (uz@musoftware.de).
+
+
+
+6. Copyright
+------------
+
+cl65 is (C) Copyright 1998 Ullrich von Bassewitz. For usage of the
+binaries and/or sources the following conditions do apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not
+   be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source
+   distribution.
+
+
+

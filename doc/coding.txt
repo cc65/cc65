@@ -1,0 +1,340 @@
+
+How to generate the most effective code with cc65.
+
+
+1.  Use prototypes.
+
+    This will not only help to find errors between separate modules, it will
+    also generate better code, since the compiler must not assume that a
+    variable sized parameter list is in place and must not pass the argument
+    count to the called function. This will lead to shorter and faster code.
+
+
+
+2.  Don't declare auto variables in nested function blocks.
+
+    Variable declarations in nested blocks are usually a good thing. But with
+    cc65, there are several drawbacks:
+
+     a. The compiler has only one symbol table (there's no true nesting).
+        This means that your variables must not have the same names as
+        variables in the enclosing block.
+
+     b. Since the compiler generates code in one pass, it must create the
+        the variables on the stack each time the block is entered and destroy
+    	them when the block is left. This causes a speed penalty and larger
+        code.
+
+
+
+3.  Remember that the compiler does not optimize.
+
+    The compiler needs hints from you about the code to generate. When
+    accessing indexed data structures, get a pointer to the element and
+    use this pointer instead of calculating the index again and again.
+    If you want to have your loops unrolled, or loop invariant code moved
+    outside the loop, you have to do that yourself.
+
+
+
+4.  Longs are slow!
+
+    While long support is necessary for some things, it's really, really slow
+    on the 6502. Remember that any long variable will use 4 bytes of memory,
+    and any operation works on double the data compared to an int.
+
+
+
+5.  Use unsigned types wherever possible.
+
+    The CPU has no opcodes to handle signed values greater than 8 bit. So
+    sign extension, test of signedness etc. has to be done by hand. The
+    code to handle signed operations is usually a bit slower than the same
+    code for unsigned types.
+
+
+
+6.  Use chars instead of ints if possible.
+
+    While in arithmetic operations, chars are immidiately promoted to ints,
+    they are passed as chars in parameter lists and are accessed as chars
+    in variables. The code generated is usually not much smaller, but it
+    is faster, since accessing chars is faster. For several operations, the
+    generated code may be better if intermediate results that are known not
+    to be larger than 8 bit are casted to chars.
+
+    When doing
+
+	unsigned char a;
+	...
+	if ((a & 0x0F) == 0)
+
+    the result of the & operator is an int because of the int promotion
+    rules of the language. So the compare is also done with 16 bits. When
+    using
+
+	unsigned char a;
+	...
+	if ((unsigned char)(a & 0x0F) == 0)
+
+    the generated code is much shorter, since the operation is done with
+    8 bits instead of 16.
+
+
+
+7.  Make the size of your array elements one of 1, 2, 4, 8.
+
+    When indexing into an array, the compiler has to calculate the byte
+    offset into the array, which is the index multiplied by the size of
+    one element. When doing the multiplication, the compiler will do a
+    strength reduction, that is, replace the multiplication by a shift
+    if possible. For the values 2, 4 and 8, there are even more specialized
+    subroutines available. So, array access is fastest when using one of
+    these sizes.
+
+
+
+8.  Expressions are evaluated from left to right.
+
+    Since cc65 is not building an explicit expression tree when parsing an
+    expression, constant subexpressions may not be detected and optimized
+    properly if you don't help. Look at this example:
+
+      #define OFFS   4
+      int  i;
+      i = i + OFFS + 3;
+
+    The expression is parsed from left to right, that means, the compiler sees
+    'i', and puts it contents into the secondary register. Next is OFFS, which
+    is constant. The compiler emits code to add a constant to the secondary
+    register. Same thing again for the constant 3. So the code produced
+    contains a fetch of 'i', two additions of constants, and a store (into
+    'i'). Unfortunately, the compiler does not see, that "OFFS + 3" is a
+    constant for itself, since it does it's evaluation from left to right.
+    There are some ways to help the compiler to recognize expression like
+    this:
+
+     a. Write "i = OFFS + 3 + i;". Since the first and second operand are
+       	constant, the compiler will evaluate them at compile time reducing the
+       	code to a fetch, one addition (secondary + constant) and one store.
+
+     b. Write "i = i + (OFFS + 3)". When seeing the opening parenthesis, the
+       	compiler will start a new expression evaluation for the stuff in the
+       	braces, and since all operands in the subexpression are constant, it
+       	will detect this and reduce the code to one fetch, one addition and
+       	one store.
+
+
+
+9.  Case labels in a switch statments are checked in source order.
+
+    Labels that appear first in a switch statement are tested first. So,
+    if your switch statement contains labels that are selected most of
+    the time, put them first in your source code. This will speed up the
+    code.
+
+
+
+10. Use the preincrement and predecrement operators.
+
+    The compiler is currently not smart enough to figure out, if the rvalue of
+    an increment is used or not. So it has to save and restore that value when
+    producing code for the postincrement and postdecrement operators, even if
+    this value is never used. To avoid the additional overhead, use the
+    preincrement and predecrement operators if you don't need the resulting
+    value. That means, use
+
+       	...
+       	++i;
+       	...
+
+    instead of
+
+	...
+	i++;
+	...
+
+
+
+11. Use constants to access absolute memory locations.
+
+    The compiler produces optimized code, if the value of a pointer is a
+    constant. So, to access direct memory locations, use
+
+    	#define VDC_DATA   0xD601
+    	*(char*)VDC_STATUS = 0x01;
+
+    That will be translated to
+
+	lda	#$01
+	sta	$D600
+
+    The constant value detection works also for struct pointers and arrays,
+    if the subscript is a constant. So
+
+	#define VDC    	((unsigned char*)0xD600)
+	#define STATUS	0x01
+    	VDC [STATUS] = 0x01;
+
+    will also work.
+
+    If you first load the constant into a variable and use that variable to
+    access an absolute memory location, the generated code will be much
+    slower, since the compiler does not know anything about the contents of
+    the variable.
+
+
+
+12. Use initialized local variables - but use it with care.
+
+    Initialization of local variables when declaring them gives shorter
+    and faster code. So, use
+
+	int i = 1;
+
+    instead of
+
+	int i;
+	i = 1;
+
+    But beware: To maximize your savings, don't mix uninitialized and
+    initialized variables. Create one block of initialized variables and
+    one of uniniitalized ones. The reason for this is, that the compiler
+    will sum up the space needed for uninitialized variables as long as
+    possible, and then allocate the space once for all these variables.
+    If you mix uninitialized and initialized variables, you force the
+    compiler to allocate space for the uninitialized variables each time,
+    it parses an initialized one. So do this:
+
+	int i, j;
+	int a = 3;
+	int b = 0;
+
+    instead of
+
+	int i;
+	int a = 3;
+	int j;
+	int b = 0;
+
+    The latter will work, but will create larger and slower code.
+
+
+
+13. When using the ?: operator, cast values that are not ints.
+
+    The result type of the ?: operator is a long, if one of the second or
+    third operands is a long. If the second operand has been evaluated and
+    it was of type int, and the compiler detects that the third operand is
+    a long, it has to add an additional int->long conversion for the
+    second operand. However, since the code for the second operand has
+    already been emitted, this gives much worse code.
+
+    Look at this:
+
+	long f (long a)
+	{
+	    return (a != 0)? 1 : a;
+	}
+
+    When the compiler sees the literal "1", it does not know, that the
+    result type of the ?: operator is a long, so it will emit code to load
+    a integer constant 1. After parsing "a", which is a long, a int->long
+    conversion has to be applied to the second operand. This creates one
+    additional jump, and an additional code for the conversion.
+
+    A better way would have been to write:
+
+	long f (long a)
+	{
+	    return (a != 0)? 1L : a;
+	}
+
+    By forcing the literal "1" to be of type long, the correct code is
+    created in the first place, and no additional conversion code is
+    needed.
+
+
+
+14. Use the array operator [] even for pointers.
+
+    When addressing an array via a pointer, don't use the plus and
+    dereference operators, but the array operator. This will generate
+    better code in some common cases.
+
+    Don't use
+
+	char* a;
+	char b, c;
+	char b = *(a + c);
+
+    Use
+
+	char* a;
+	char b, c;
+	char b = a[c];
+
+    instead.
+
+
+
+15. Use register variables with care.
+
+    Register variables may give faster and shorter code, but they do also
+    have an overhead. Register variables are actually zero page
+    locations, so using them saves roughly one cycle per access. Since
+    the old values have to be saved and restored, there is an overhead of
+    about 70 cycles per 2 byte variable. It is easy to see, that - apart
+    from the additional code that is needed to save and restore the
+    values - you need to make heavy use of a variable to justify the
+    overhead.
+
+    An exception are pointers, especially char pointers. The optimizer
+    has code to detect and transform the most common pointer operations
+    if the pointer variable is a register variable. Declaring heavily
+    used character pointers as register may give significant gains in
+    speed and size.
+
+    And remember: Register variables must be enabled with -Or.
+
+			     
+
+16. Decimal constants greater than 0x7FFF are actually long ints
+
+    The language rules for constant numeric values specify that decimal
+    constants without a type suffix that are not in integer range must be
+    of type long int or unsigned long int. This means that a simple
+    constant like 40000 is of type long int, and may cause an expression
+    to be evaluated with 32 bits.
+
+    An example is:
+
+	unsigned val;
+	...
+	if (val < 65535) {
+	    ...
+	}
+
+    Here, the compare is evaluated using 32 bit precision. This makes the
+    code larger and a lot slower.
+
+    Using
+
+    	unsigned val;
+    	...
+    	if (val < 0xFFFF) {
+    	    ...
+	}
+
+    or
+
+      	unsigned val;
+      	...
+    	if (val < 65535U) {
+    	    ...
+	}
+
+    instead will give shorter and faster code.
+
+
+

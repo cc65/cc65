@@ -1,0 +1,1903 @@
+
+
+				   ca65
+
+	   A Macro Crossassembler for the 6502/65C02/65816 CPUs
+
+	      (C) Copyright 1998-1999 Ullrich von Bassewitz
+			    (uz@musoftware.de)
+
+
+
+Contents
+--------
+
+  1. Overview
+
+  2. Usage
+
+  3. Input format
+
+  4. Expressions
+
+  5. Symbols and labels
+
+  6. Control commands
+
+  7. Macros
+
+  8. Macro packages
+
+  9. Bugs/Feedback
+
+  10. Copyright
+
+
+
+1. Overview
+-----------
+
+ca65 is a replacement for the ra65 assembler that was part of the cc65 C
+compiler developed by John R. Dunning. I had some problems with ra65 and
+the copyright does not permit some things which I wanted to be possible,
+so I decided to write a completely new assembler/linker/archiver suite for
+the cc65 compiler. ca65 is part of this suite.
+
+Some parts of the assembler (code generation and some routines for symbol
+table handling) are taken from an older crossassembler named a816 written
+by me a long time ago.
+
+Here's a list of the design criteria, that were important for the
+development:
+
+  * The assembler must support macros. Macros are not essential, but they
+    make some things easier, especially when you use the assembler in the
+    backend of a compiler.
+
+  * The assembler must support the newer 65C02 and 65816 CPUs. I have been
+    thinking about a 65816 backend for the C compiler, and even my old
+    a816 assembler had support for these CPUs, so this wasn't really a
+    problem.
+
+  * The assembler must produce relocatable code. This necessary for the
+    compiler support, and it is more convenient.
+
+  * Conditional assembly must be supported. This is a must for bigger
+    projects written in assembler (like Elite128).
+
+  * The assembler must support segments, and it must support more than
+    three segments (this is the count, most other assemblers support).
+    Having more than one code segments helps developing code for systems
+    with a divided ROM area (like the C64).
+
+  * The linker must be able to resolve arbitrary expressions. Years ago I
+    spent half a day to convince Borlands Turbo Assembler to let me use
+    the size of a structure I had created. So I decided that this is a
+    must. The linker should be able to get things like
+
+	.import	S1, S2
+	.export Special
+	Special	       	= 2*S1 + S2/7
+
+    right.
+
+  * True lexical nesting for symbols. This is very convenient for larger
+    assembly projects.
+
+  * "Cheap" local symbols without lexical nesting for those quick, late
+    night hacks.
+
+  * I liked the idea of "options" as Anre Fachats .o65 format has it, so I
+    introduced the concept into the object file format use by the new cc65
+    binutils.
+
+  * The assembler will be a one pass assembler. There was no real need for
+    this decision, but I've written several multipass assemblers, and it
+    started to get boring. A one pass assembler needs much more elaborated
+    data structures, and because of that it's much more fun:-)
+    There is one drawback with this point: It is nearly impossible to
+    generate a listing when reading the source file only once without
+    storing the source file in memory. Consequently, the assembler is not
+    able to produce a listing. This could be added by reading the source
+    file a second time if a listing was requested, but I didn't see an
+    urgent need for a listing, so this was not a disadvantage for me.
+
+  * Non-GPLed code that may be used in any project without restrictions or
+    fear of "GPL infecting" other code.
+
+
+
+2. Usage
+--------
+
+The assembler accepts the following options:
+
+   	-g		Generate debug info
+   	-i		Ignore case of symbols
+        -l              Create a listing if assembly was ok
+   	-o name		Name the output file
+   	-s		Enable smart mode
+   	-v		Increase verbosity
+	-D name[=value]	Define a symbol
+	-U		Mark unresolved symbols as import
+	-V		Print the assembler version
+	-W n		Set warning level n
+        --cpu type      Set cpu type
+	--pagelength n	Set the page length for the listing
+        --smart         Enable smart mode
+
+When the -g option (or the equivalent control command .DEBUGINFO) is used,
+the assembler will add a section to the object file that contains all
+symbols (including local ones) together with the symbol values and source
+file positions. The linker will put these additional symbols into the
+VICE label file, so even local symbols can be seen in the VICE monitor.
+
+The option -i makes the assembler case insensitive on identifiers and
+labels. This option will override the default, but may itself be overriden
+by the .CASE control command (see section 6).
+
+The default output name is the name of the input file with the extension
+replaced by ".o". If you don't like that, you may give another name with
+the -o option. The output file will be placed in the same directory as the
+source file, or, if -o is given, the full path in this name is used.
+
+In smart mode (enabled by -s or the .SMART pseudo instruction) the
+assembler will track usage of the REP and SEP instructions in 65816 mode
+and update the operand sizes accordingly. If the operand of such an
+instruction cannot be evaluated by the assembler (for example, because the
+operand is an imported symbol), a warning is issued. Beware: Since the
+assembler cannot trace the execution flow this may lead to false results
+in some cases. If in doubt, use the .ixx and .axx instructions to tell the
+assembler about the current settings. Smart mode is off by default.
+
+-v does increase the assembler verbosity and is usually only needed for
+debugging purposes. You may use this option more than one time for even
+more verbose output.
+
+-D allows you to predefine symbols on the command line. Without a value,
+the symbol is defined with the value zero. When giving a value, you may
+use the '$' prefix for hexadecimal symbols. Please note that for some
+operating systems, '$' has a special meaning, so you may have to quote
+the expression.
+
+-U marks symbols that are not defined in the sources as imported symbols.
+This should be used with care since it delays error messages about typos
+and such until the linker is run. The compiler uses the equivalent of
+this switch (.AUTOIMPORT, see control command section below) to enable
+auto imported symbols for the runtime library. However, the compiler is
+supposed to generate code that runs through the assembler without
+problems, something which is not always true for assembler programmers.
+
+-V prints the version number of the assembler. If you send any suggestions
+or bugfixes, please include your version number.
+
+-Wn sets the warning level for the assembler. Using -W2 the assembler will
+even warn about such things like unused imported symbols. The default
+warning level is 1, and it would probably be silly to set it to something
+lower.
+
+--cpu sets the default for the CPU type. The option takes a parameter,
+which may be one of
+
+	6502, 65C02, 65816 and sunplus
+
+(the latter is not available in the freeware version).
+
+--pagelength sets the length of a listing page in lines. See the
+.PAGELENGTH directive for more information.
+
+--smart is identical to -s - see there.
+
+
+
+3. Input format
+---------------
+
+The assembler accepts the standard 6502/65816 assembler syntax. One line
+may contain a label (which is identified by a colon), and, in addition to
+the label, an assembler mnemonic, a macro, or a control command (see
+section 6 for supported control commands). Alternatively, the line may
+contain a symbol definition using the '=' token. Everything after a
+semicolon is handled as a comment (that is, it is ignored).
+
+Here are some examples for valid input lines:
+
+ 	Label:				; A label and a comment
+ 	     	lda	#$20		; A 6502 instruction plus comment
+ 	L1:  	ldx    	#$20		; Same with label
+ 	L2:  	.byte	"Hello world"	; Label plus control command
+ 	     	mymac	$20		; Macro expansion
+ 	     	MySym = 3*L1		; Symbol definition
+ 	MaSym 	= Label			; Another symbol
+
+The assembler accepts all valid 6502 mnemonics when in 6502 mode (the
+default). The assembler accepts all valid 65SC02 mnemonics when in 65SC02
+mode (after a .PC02 command is found). The assembler accepts all valid
+65816 mnemonics with a few exceptions after a .P816 command is found.
+These exceptions are listed below.
+
+In 65816 mode several aliases are accepted in addition to the official
+mnemonics:
+
+ 	BGE is an alias for BCS
+ 	BLT is an alias for BCC
+ 	CPA is an alias for CMP
+ 	DEA is an alias for DEC A
+        INA is an alias for INC A
+ 	SWA is an alias for XBA
+ 	TAD is an alias for TCD
+ 	TAS is an alias for TCS
+ 	TDA is an alias for TDC
+ 	TSA is an alias for TSC
+
+
+Evaluation of banked expressions in 65816 mode differs slightly from the
+official syntax:
+
+Instead of accepting a 24 bit address (something that is difficult for
+the assembler to determine and would have required one more special
+.import command), the bank and the absolute address in that bank are
+separated by a dot:
+
+ 	jsl	3.$1234		; Call subroutine at $1234 in bank 3
+
+For literal values, the assembler accepts the widely used number formats:
+A preceeding '$' denotes a hex value, a preceeding '%' denotes a binary
+value, and a bare number is interpeted as a decimal. There are currently
+no octal values and no floats.
+
+
+
+4. Expressions
+--------------
+
+All expressions are evaluated with (at least) 32 bit precision. An
+expression may contain constant values and any combination of internal and
+external symbols. Expressions that cannot be evaluated at assembly time
+are stored inside the object file for evaluation by the linker.
+Expressions referencing imported symbols must always be evaluated by the
+linker.
+
+Sometimes, the assembler must know about the size of the value that is the
+result of an expression. This is usually the case, if a decision has to be
+made, to generate a zero page or an absolute memory references. In this
+case, the assembler has to make some assumptions about the result of an
+expression:
+
+  * If the result of an expression is constant, the actual value is
+    checked to see if it's a byte sized expression or not.
+
+  * If the expression is explicitly casted to a byte sized expression by
+    one of the '>'/'<' operators, it is a byte expression.
+
+  * If this is not the case, and the expression contains a symbol,
+    explicitly declared as zero page symbol (by one of the .importzp or
+    .exportzp instructions), then the whole expression is assumed to be
+    byte sized.
+
+  * If the expression contains symbols that are not defined, and these
+    symbols are local symbols, the enclosing scopes are searched for a
+    symbol with the same name. If one exists and this symbol is defined,
+    it's attributes are used to determine the result size.
+
+  * In all other cases the expression is assumed to be word sized.
+
+Note: If the assembler is not able to evaluate the expression at assembly
+time, the linker will evaluate it and check for range errors as soon as
+the result is known.
+
+
+Boolean expressions:
+
+In the context of a boolean expression, any non zero value is evaluated as
+true, any other value to false. The result of a boolean expression is 1 if
+it's true, and zero if it's false. There are boolean operators with extrem
+low precedence with version 2.x (where x > 0). The .AND and .OR operators
+are shortcut operators. That is, if the result of the expression is
+already known, after evaluating the left hand side, the right hand side is
+not evaluated.
+
+
+Available operators sorted by precedence:
+
+    Op 	        Description			      	Precedence
+  -------------------------------------------------------------------
+    *		Builtin pseudo variable (r/o)	      	1
+    .BLANK	Builtin function	     		1
+    .CONST	Builtin function	     		1
+    .CPU	Builtin pseudo variable (r/o)		1
+    .DEFINED	Builtin function	     		1
+    .MATCH	Builtin function			1
+    .XMATCH	Builtin function			1
+    .PARAMCOUNT Builtin pseudo variable	(r/o)		1
+    .REFERENCED Builtin function			1
+    .STRING	Builtin function			1
+    :: 	    	Global namespace override		1
+    +  	    	Unary plus			   	1
+    -  	    	Unary minus				1
+    ~  	    	Unary bitwise not			1
+    .BITNOT 	Unary bitwise not      	       	       	1
+    <       	Low byte operator			1
+    >       	High byte operator			1
+
+    *  	    	Multiplication				2
+    /  	    	Division				2
+    .MOD	Modulo operation			2
+    &  	    	Bitwise and	 			2
+    .BITAND	Bitwise and  				2
+    ^  	    	Bitwise xor  				2
+    .BITXOR	Bitwise xor				2
+    << 	    	Shift left operator			2
+    .SHL	Shift left operator			2
+    >> 	    	Shift right operator			2
+    .SHR	Shift right operator			2
+
+    +  	    	Binary plus		   		3
+    -  	    	Binary minus				3
+    |  	    	Binary or			      	3
+    .BITOR	Binary or			      	3
+
+    =          	Compare operation (equal)	      	4
+    <> 	    	Compare operation (not equal)	      	4
+    <          	Compare operation (less)  	      	4
+    >          	Compare operation (greater)    	      	4
+    <=          Compare operation (less or equal)     	4
+    >=          Compare operation (greater or equal)    4
+
+    &&		Boolean and			      	5
+    .AND	Boolean and			      	5
+    .XOR	Boolean xor			      	5
+
+    ||		Boolean or			      	6
+    .OR		Boolean or			      	6
+
+    !  	       	Boolean not			      	7
+    .NOT	Boolean not			      	7
+
+
+To force a specific order of evaluation, braces may be used as usual.
+
+Some of the pseudo variables mentioned above need some more explanation:
+
+  *		This symbol is replaced by the value of the program
+		counter at start of the current instruction. Note, that
+		'*' yields a rvalue, that means, you cannot assign to it.
+		Use .ORG to set the program counter in sections with
+		absolute code.
+
+
+
+5. Symbols and labels
+---------------------
+
+The assembler allows you to use symbols instead of naked values to make
+the source more readable. There are a lot of different ways to define and
+use symbols and labels, giving a lot of flexibility.
+
+  - Numeric constants
+
+    Numeric constants are defined using the equal sign. After doing
+
+    	  two = 2
+
+    may use the symbol "two" in every place where a number is expected,
+    and it is evaluated to the value 2 in this context. An example would be
+
+    	  four = two * two
+
+
+  - Standard labels
+
+    A label is defined by writing the name of the label at the start of
+    the line (before any instruction mnemonic, macro or pseudo
+    directive), followed by a colon. This will declare a symbol with the
+    given name and the value of the current program counter.
+
+
+  - Local labels and symbols
+
+    Using the .PROC directive, it is possible to create regions of code
+    where the names of labels and symbols are local to this region. They
+    are not know outside and cannot be accessed from there. Such regions
+    may be nested like PROCEDUREs in Pascal.
+
+    See the description of the .PROC directive for more information.
+
+  - Cheap local labels
+
+    Cheap local labels are defined like standard labels, but the name of
+    the label must begin with a special symbol (usually '@', but this can
+    be changed by the .LOCALCHAR directive).
+
+    Cheap local labels are visible only between two no cheap labels. As
+    soon as a standard symbol is encountered (this may also be a local
+    symbol if inside a region defined with the .PROC directive), the
+    cheap local symbol goes out of scope.
+
+    You may use cheap local labels as an easy way to reuse common label
+    names like "Loop". Here is an example:
+
+	Clear: 	lda	#$00		; Global label
+		ldy	#$20
+       	@Loop:	sta	Mem,y		; Local label
+ 	   	dey
+	       	bne    	@Loop		; Ok
+	   	rts
+	Sub:	...	 		; New global label
+  	   	bne	@Loop		; ERROR: Unknown identifier!
+
+  - Unnamed labels
+
+    If you really want to write messy code, there are also unnamed
+    labels. These labels do not have a name (you guessed that already,
+    didn't you?). A colon is used to mark the absence of the name.
+
+    Unnamed labels may be accessed by using the colon plus several minus
+    or plus characters as a label designator. Using the '-' characters
+    will create a back reference (use the n'th label backwards), using
+    '+' will create a forward reference (use the n'th label in forward
+    direction. An example will help to understand this:
+
+       	:	lda	(ptr1),y	; #1
+    		cmp	(ptr2),y
+    		bne    	:+		; -> #2
+    		tax
+    		beq	:+++		; -> #4
+    		iny
+    		bne	:-		; -> #1
+    		inc	ptr1+1
+    		inc	ptr2+1
+    		bne	:-		; -> #1
+
+       	:	bcs	:+     	       	; #2 -> #3
+    		ldx	#$FF
+    		rts
+
+    	:	ldx	#$01		; #3
+    	:	rts	  		; #4
+
+    As you can see from the example, unnamed labels will make even short
+    sections of code hard to understand, because you have to count labels
+    to find branch targets (this is the reason why I for my part do
+    prefer the "cheap" local labels). Nevertheless, unnamed labels are
+    convenient in some situations, so it's your decision.
+
+  - Using macros to define labels and constants
+
+    While there are drawbacks with this approach, it may be handy in some
+    situations. Using .DEFINE, it is possible to define symbols or
+    constants that may be used elsewhere. Since the macro facility works
+    on a very low level, there is no scoping. On the other side, you may
+    also define string constants this way (this is not possible with the
+    other symbol types).
+
+    Example:
+
+	.DEFINE	two	2
+	.DEFINE version	"SOS V2.3"
+
+	four = two * two       	; Ok
+	.byte	version		; Ok
+
+	.PROC			; Start local scope
+	two = 3			; Will give "2 = 3" - invalid!
+	.ENDPROC
+
+
+If .DEBUGINFO is enabled (or -g is given on the command line), global,
+local and cheap local labels are written to the object file and will be
+available in the symbol file via the linker. Unnamed labels are not
+written to the object file, because they don't have a name which would
+allow to access them.
+
+
+
+6. Control commands
+-------------------
+
+Here's a list of all control commands and a description, what they do:
+
+
+.A16
+
+  Valid only in 65816 mode. Switch the accumulator to 16 bit.
+
+  Note: This command will not emit any code, it will tell the assembler to
+  create 16 bit operands for immediate accumulator adressing mode.
+
+  See also: .SMART
+
+
+.A8
+
+  Valid only in 65816 mode. Switch the accumulator to 8 bit.
+
+  Note: This command will not emit any code, it will tell the assembler to
+  create 8 bit operands for immediate accu adressing mode.
+
+  See also: .SMART
+
+
+.ADDR
+
+  Define word sized data. In 6502 mode, this is an alias for .WORD and
+  may be used for better readability if the data words are address values.
+  In 65816 mode, the address is forced to be 16 bit wide to fit into the
+  current segment. See also .FARADDR. The command must be followed by a
+  sequence of (not necessarily constant) expressions.
+
+  Example:
+
+  	.addr  	$0D00, $AF13, _Clear
+
+
+.ALIGN
+
+  Align data to a given boundary. The command expects a constant integer
+  argument that must be a power of two, plus an optional second argument
+  in byte range. If there is a second argument, it is used as fill value,
+  otherwise the value defined in the linker configuration file is used
+  (the default for this value is zero).
+
+  Since alignment depends on the base address of the module, you must
+  give the same (or a greater) alignment for the segment when linking.
+  The linker will give you a warning, if you don't do that.
+
+  Example:
+
+      	.align	256
+
+
+.ASCIIZ
+
+  Define a string with a trailing zero.
+
+  Example:
+
+  	Msg: 	.asciiz	"Hello world"
+
+  This will put the string "Hello world" followed by a binary zero into
+  the current segment. There may be more strings separated by commas, but
+  the binary zero is only appended once (after the last one).
+
+
+.AUTOIMPORT
+
+  Is followd by a plus or a minus character. When switched on (using a
+  +), undefined symbols are automatically marked as import instead of
+  giving errors. When switched off (which is the default so this does not
+  make much sense), this does not happen and an error message is
+  displayed. The state of the autoimport flag is evaluated when the
+  complete source was translated, before outputing actual code, so it is
+  *not* possible to switch this feature on or off for separate sections of
+  code. The last setting is used for all symbols.
+
+  You should probably not use this switch because it delays error
+  messages about undefined symbols until the link stage. The cc65
+  compiler (which is supposed to produce correct assembler code in all
+  circumstances, something which is not true for most assembler
+  programmers) will insert this command to avoid importing each and every
+  routine from the runtime library.
+
+  Example:
+
+  	.autoimport	+   	; Switch on auto import
+
+
+.BLANK
+
+  Builtin function. The function evaluates its argument in braces and
+  yields "false" if the argument is non blank (there is an argument), and
+  "true" if there is no argument. As an example, the .IFBLANK statement
+  may be replaced by
+
+	.if	.blank(arg)
+
+
+.BSS
+
+  Switch to the BSS segment. The name of the BSS segment is always "BSS",
+  so this is a shortcut for
+
+  	.segment  "BSS"
+
+  See also the .SEGMENT command.
+
+
+.BYTE
+
+  Define byte sized data. Must be followed by a sequence of (byte ranged)
+  expressions or strings.
+
+  Example:
+
+  	.byte	"Hello world", $0D, $00
+
+
+.CASE
+
+  Switch on or off case sensitivity on identifiers. The default is off
+  (that is, identifiers are case sensitive), but may be changed by the
+  -i switch on the command line.
+  The command must be followed by a '+' or '-' character to switch the
+  option on or off respectively.
+
+  Example:
+
+       	.case	-	    	; Identifiers are not case sensitive
+
+
+.CODE
+
+  Switch to the CODE segment. The name of the CODE segment is always
+  "CODE", so this is a shortcut for
+
+       	.segment  "CODE"
+
+  See also the .SEGMENT command.
+
+
+.CONST
+
+  Builtin function. The function evaluates its argument in braces and
+  yields "true" if the argument is a constant expression (that is, an
+  expression that yields a constant value at assembly time) and "false"
+  otherwise. As an example, the .IFCONST statement may be replaced by
+
+      	.if	.const(a + 3)
+
+
+.CPU
+
+  Reading this pseudo variable will give a constant integer value that
+  tells which instruction set is currently enabled. Possible values are:
+
+  	0 -->	6502
+  	1 -->	65SC02
+  	2 -->	65SC816
+  	3 -->	SunPlus SPC
+
+  It may be used to replace the .IFPxx pseudo instructions or to construct
+  even more complex expressions.
+
+  Example:
+
+	.if	(.cpu = 0) .or (.cpu = 1)
+		txa
+ 		pha
+		tya
+		pha
+	.else
+		phx
+		phy
+	.endif
+
+
+.DATA
+
+  Switch to the DATA segment. The name of the DATA segment is always
+  "DATA", so this is a shortcut for
+
+       	.segment  "DATA"
+
+  See also the .SEGMENT command.
+
+
+.DBYT
+
+  Define word sized data with the hi and lo bytes swapped (use .WORD to
+  create word sized data in native 65XX format). Must be followed by a
+  sequence of (word ranged) expressions.
+
+  Example:
+
+	.dbyt	$1234, $4512
+
+  This will emit the bytes
+
+  	$12 $34 $45 $12
+
+  into the current segment in that order.
+
+
+.DEBUGINFO
+
+  Switch on or off debug info generation. The default is off (that is,
+  the object file will not contain debug infos), but may be changed by the
+  -g switch on the command line.
+  The command must be followed by a '+' or '-' character to switch the
+  option on or off respectively.
+
+  Example:
+
+       	.debuginfo	+	; Generate debug info
+
+
+.DEFINE
+
+  Start a define style macro definition. The command is followed by an
+  identifier (the macro name) and optionally by a list of formal arguments
+  in braces.
+  See separate section about macros.
+
+
+.DEF
+.DEFINED
+
+  Builtin function. The function expects an identifier as argument in
+  braces. The argument is evaluated, and the function yields "true" if the
+  identifier is a symbol that is already defined somewhere in the source
+  file up to the current position. Otherwise the function yields false. As
+  an example, the .IFDEF statement may be replaced by
+
+	.if	.defined(a)
+
+
+.DWORD
+
+  Define dword sized data (4 bytes) Must be followed by a sequence of
+  expressions.
+
+  Example:
+
+       	.dword	$12344512, $12FA489
+
+
+.ELSE
+
+  Conditional assembly: Reverse the current condition.
+
+
+.ELSEIF
+
+  Conditional assembly: Reverse current condition and test a new one.
+
+
+.END
+
+  Forced end of assembly. Assembly stops at this point, even if the command
+  is read from an include file.
+
+
+.ENDIF
+
+  Conditional assembly: Close a .IF... or .ELSE branch.
+
+
+.ENDMAC
+.ENDMACRO
+
+  End of macro definition (see separate section).
+
+
+.ENDPROC
+
+  End of local lexical level (see .PROC).
+
+
+.ERROR
+
+  Force an assembly error. The assembler will output an error message
+  preceeded by "User error" and will *not* produce an object file.
+
+  This command may be used to check for initial conditions that must be
+  set before assembling a source file.
+
+  Example:
+
+	.if    	foo = 1
+	...
+	.elseif	bar = 1
+	...
+	.else
+	.error 	"Must define foo or bar!"
+	.endif
+
+
+.EXITMAC
+.EXITMACRO
+
+  Abort a macro expansion immidiately. This command is often useful in
+  recursive macros. See separate chapter about macros.
+
+
+.EXPORT
+
+  Make symbols accessible from other modules. Must be followed by a comma
+  separated list of symbols to export.
+
+  Example:
+
+	.export	foo, bar
+
+
+.EXPORTZP
+
+  Make symbols accessible from other modules. Must be followed by a comma
+  separated list of symbols to export. The exported symbols are explicitly
+  marked as zero page symols.
+
+  Example:
+
+  	.exportzp  foo, bar
+
+
+.FARADDR
+
+  Define far (24 bit) address data. The command must be followed by a
+  sequence of (not necessarily constant) expressions.
+
+  Example:
+
+  	.faraddr	DrawCircle, DrawRectangle, DrawHexagon
+
+
+.FEATURE
+
+  This directive may be used to enable one or more compatibility features
+  of the assembler. While the use of .FEATURE should be avoided when
+  possible, it may be useful when porting sources written for other
+  assemblers. There is no way to switch a feature off, once you have
+  enabled it, so using
+
+       	.FEATURE  	xxx
+
+  will enable the feature until end of assembly is reached.
+
+  The following features are available:
+
+  dollar_is_pc
+
+    The dollar sign may be used as an alias for the star (`*'), which
+    gives the value of the current PC in expressions.
+    Note: Assignment to the pseudo variable is not allowed.
+
+  labels_without_colons
+
+    Allow labels without a trailing colon. These labels are only accepted,
+    if they start at the beginning of a line (no leading white space).
+
+  loose_string_term
+
+    Accept single quotes as well as double quotes as terminators for string
+    constants.
+
+  at_in_identifiers
+
+    Accept the at character (`@') as a valid character in identifiers. The
+    at character is not allowed to start an identifier, even with this
+    feature enabled.
+
+  dollar_in_identifiers
+
+    Accept the dollar sign (`$') as a valid character in identifiers. The
+    at character is not allowed to start an identifier, even with this
+    feature enabled.
+
+
+.FILEOPT
+.FOPT
+
+  Insert an option string into the object file. There are two forms of
+  this command, one specifies the option by a keyword, the second
+  specifies it as a number. Since usage of the second one needs knowledge
+  of the internal encoding, its use is not recommended and I will only
+  describe the first form here.
+
+  The command is followed by one of the keywords
+
+      	author
+      	comment
+      	compiler
+
+  a comma and a string. The option is written into the object file
+  together with the string value. This is currently unidirectional and
+  there is no way to actually use these options once they are in the
+  object file.
+
+  Examples:
+
+	.fileopt	comment, "Code stolen from my brother"
+	.fileopt	compiler, "BASIC 2.0"
+	.fopt		author, "J. R. User"
+
+
+.GLOBAL
+
+  Declare symbols as global. Must be followed by a comma separated list
+  of symbols to declare. Symbols from the list, that are defined somewhere
+  in the source, are exported, all others are imported. An additional
+  explicit .IMPORT or .EXPORT command for the same symbol is allowed.
+
+  Example:
+
+  	.global foo, bar
+
+
+.GLOBALZP
+
+  Declare symbols as global. Must be followed by a comma separated list
+  of symbols to declare. Symbols from the list, that are defined
+  somewhere in the source, are exported, all others are imported. An
+  additional explicit .IMPORT or .EXPORT command for the same symbol is
+  explicitly allowed. The symbols in the list are explicitly marked as
+  zero page symols.
+
+  Example:
+
+       	.globalzp foo, bar
+
+
+.I16
+
+  Valid only in 65816 mode. Switch the index registers to 16 bit.
+
+  Note: This command will not emit any code, it will tell the assembler to
+  create 16 bit operands for immediate operands.
+
+  See also:
+
+	.SMART
+
+
+.I8
+
+  Valid only in 65816 mode. Switch the index registers to 8 bit.
+
+  Note: This command will not emit any code, it will tell the assembler to
+  create 8 bit operands for immediate operands.
+
+  See also:
+
+	.SMART
+
+
+.IF
+
+  Conditional assembly: Evalute an expression and switch assembler output
+  on or off depending on the expression. The expression must be a constant
+  expression, that is, all operands must be defined.
+
+  A expression value of zero evaluates to FALSE, any other value evaluates
+  to TRUE.
+
+
+.IFBLANK
+
+  Conditional assembly: Check if there are any remaining tokens in this
+  line, and evaluate to FALSE if this is the case, and to TRUE otherwise.
+  If the condition is not true, further lines are not assembled until
+  an .ELSE, .ELSEIF or .ENDIF directive.
+
+  This command is often used to check if a macro parameter was given.
+  Since an empty macro parameter will evaluate to nothing, the condition
+  will evaluate to FALSE if an empty parameter was given.
+
+  Example:
+
+   	.macro	   arg1, arg2
+   	.ifblank   arg2
+   		   lda     #arg1
+   	.else
+   	 	   lda	   #arg2
+   	.endif
+   	.endmacro
+
+  See also:
+
+   	.BLANK
+
+
+.IFCONST
+
+  Conditional assembly: Evaluate an expression and switch assembler output
+  on or off depending on the constness of the expression.
+
+  A const expression evaluates to to TRUE, a non const expression (one
+  containing an imported or currently undefined symbol) evaluates to
+  FALSE.
+
+  See also:
+
+   	.CONST
+
+
+.IFDEF
+
+  Conditional assembly: Check if a symbol is defined. Must be followed by
+  a symbol name. The condition is true if the the given symbol is already
+  defined, and false otherwise.
+
+  See also:
+
+   	.DEFINED
+
+
+.IFNBLANK
+
+  Conditional assembly: Check if there are any remaining tokens in this
+  line, and evaluate to TRUE if this is the case, and to FALSE otherwise.
+  If the condition is not true, further lines are not assembled until
+  an .ELSE, .ELSEIF or .ENDIF directive.
+
+  This command is often used to check if a macro parameter was given.
+  Since an empty macro parameter will evaluate to nothing, the condition
+  will evaluate to FALSE if an empty parameter was given.
+
+  Example:
+
+   	.macro	   arg1, arg2
+   		   lda	   #arg1
+   	.ifnblank  arg2
+   		   lda     #arg2
+   	.endif
+   	.endmacro
+
+  See also:
+
+   	.BLANK
+
+
+.IFNDEF
+
+  Conditional assembly: Check if a symbol is defined. Must be followed by
+  a symbol name. The condition is true if the the given symbol is not
+  defined, and false otherwise.
+
+  See also:
+
+   	.DEFINED
+
+
+.IFNREF
+
+  Conditional assembly: Check if a symbol is referenced. Must be followed
+  by a symbol name. The condition is true if if the the given symbol was
+  not referenced before, and false otherwise.
+
+  See also:
+
+   	.REFERENCED
+
+
+.IFP02
+
+  Conditional assembly: Check if the assembler is currently in 6502 mode
+  (see .P02 command).
+
+
+.IFP816
+
+  Conditional assembly: Check if the assembler is currently in 65816 mode
+  (see .P816 command).
+
+
+.IFPC02
+
+  Conditional assembly: Check if the assembler is currently in 65C02 mode
+  (see .PC02 command).
+
+
+.IFREF
+
+  Conditional assembly: Check if a symbol is referenced. Must be followed
+  by a symbol name. The condition is true if if the the given symbol was
+  referenced before, and false otherwise.
+
+  This command may be used to build subroutine libraries in include files
+  (you may use separate object modules for this purpose too).
+
+  Example:
+
+   	.ifdef	ToHex	    		; If someone used this subroutine
+   	ToHex:	tay	    		; Define subroutine
+   		lda	HexTab,y
+   		rts
+   	.endif
+
+  See also:
+
+   	.REFERENCED
+
+
+.IMPORT
+
+  Import a symbol from another module. The command is followed by a comma
+  separated list of symbols to import.
+
+  Example:
+
+   	.import	foo, bar
+
+
+.IMPORTZP
+
+  Import a symbol from another module. The command is followed by a comma
+  separated list of symbols to import. The symbols are explicitly imported
+  as zero page symbols (that is, symbols with values in byte range).
+
+  Example:
+
+   	.includezp  foo, bar
+
+
+.INCBIN
+
+  Include a file as binary data. The command expects a string argument
+  that is the name of a file to include literally in the current segment.
+
+  Example:
+
+   	.incbin		"sprites.dat"
+
+
+.INCLUDE
+
+  Include another file. Include files may be nested up to a depth of 16.
+
+  Example:
+
+   	.include	"subs.inc"
+
+
+.LINECONT
+
+  Switch on or off line continuations using the backslash character
+  before a newline. The option is off by default.
+  Note: Line continuations do not work in a comment. A backslash at the
+  end of a comment is treated as part of the comment and does not trigger
+  line continuation.
+  The command must be followed by a '+' or '-' character to switch the
+  option on or off respectively.
+
+  Example:
+
+       	.linecont      	+		; Allow line continuations
+
+	lda	\
+		#$20			; This is legal now
+
+
+.LIST
+
+  Enable output to the listing. The command must be followed by a boolean
+  switch ("on", "off", "+" or "-") and will enable or disable listing
+  output.
+  The option has no effect if the listing is not enabled by the command line
+  switch -l. If -l is used, an internal counter is set to 1. Lines are output
+  to the listing file, if the counter is greater than zero, and suppressed if
+  the counter is zero. Each use of .LIST will increment or decrement the
+  counter.
+
+  Example:
+
+       	.list	on		; Enable listing output
+
+
+.LISTBYTES
+
+  Set, how many bytes are shown in the listing for one source line. The
+  default is 12, so the listing will show only the first 12 bytes for any
+  source line that generates more than 12 bytes of code or data.
+  The directive needs an argument, which is either "unlimited", or an
+  integer constant in the range 4..255.
+
+  Examples:
+
+       	.listbytes	unlimited	; List all bytes
+	.listbytes	12		; List the first 12 bytes
+	.incbin		"data.bin"	; Include large binary file
+
+
+.LOCAL
+
+  This command may only be used inside a macro definition. It declares a
+  list of identifiers as local to the macro expansion.
+
+  A problem when using macros are labels: Since they don't change their
+  name, you get a "duplicate symbol" error if the macro is expanded the
+  second time. Labels declared with .LOCAL have their name mapped to an
+  internal unique name (___ABCD__) with each macro invocation.
+
+  Some other assemblers start a new lexical block inside a macro
+  expansion. This has some drawbacks however, since that will not allow
+  *any* symbol to be visible outside a macro, a feature that is sometimes
+  useful. The .LOCAL command is in my eyes a better way to address the
+  problem.
+
+  You get an error when using .LOCAL outside a macro.
+
+
+.LOCALCHAR
+
+  Defines the character that start "cheap" local labels. You may use one
+  of '@' and '?' as start character. The default is '@'.
+
+  Cheap local labels are labels that are visible only between two non
+  cheap labels. This way you can reuse identifiers like "loop" without
+  using explicit lexical nesting.
+
+  Example:
+
+       	.localchar	'?'
+
+	Clear: 	lda	#$00		; Global label
+       	?Loop:	sta	Mem,y		; Local label
+ 	   	dey
+	   	bne	?Loop		; Ok
+	   	rts
+	Sub:	...	 		; New global label
+  	   	bne	?Loop		; ERROR: Unknown identifier!
+
+
+.MACPACK
+
+  Insert a predefined macro package. The command is followed by an
+  identifier specifying the macro package to insert. Available macro
+  packages are:
+
+	generic		Defines generic macros like add and sub.
+    	longbranch     	Defines conditional long jump macros.
+
+  Including a macro package twice, or including a macro package that
+  redefines already existing macros will lead to an error.
+
+  Example:
+
+       	.macpack	longbranch	; Include macro package
+
+       		cmp	#$20		; Set condition codes
+       	       	jne	Label		; Jump long on condition
+
+  See separate section about macros packages.
+
+
+.MAC
+.MACRO
+
+  Start a classic macro definition. The command is followed by an identifier
+  (the macro name) and optionally by a comma separated list of identifiers
+  that are macro parameters.
+  See separate section about macros.
+
+
+.MATCH
+
+  Builtin function. Matches two token lists against each other. This is
+  most useful within macros, since macros are not stored as strings, but
+  as lists of tokens.
+
+  The syntax is
+
+       	.MATCH(<token list #1>, <token list #2>)
+
+  Both token list may contain arbitrary tokens with the exception of the
+  terminator token (comma resp. right parenthesis) and
+
+    * end-of-line
+    * end-of-file
+
+  Often a macro parameter is used for any of the token lists.
+
+  Please note that the function does only compare tokens, not token
+  attributes. So any number is equal to any other number, regardless of
+  the actual value. The same is true for strings.
+
+  Example:
+
+    Assume the macro ASR , that will shift right the accumulator by one,
+    while honoring the sign bit. The builtin processor instructions will
+    allow an optional "A" for accu addressing for instructions like ROL
+    and ROR. We will use the .MATCH function to check for this and print
+    and error for invalid calls.
+
+    	.macro	asr	arg
+
+       	       	.if (.not .blank(arg)) .and (.not .match (arg, a))
+    		.error "Syntax error"
+    		.endif
+
+    		cmp 	#$80		; Bit 7 into carry
+    		lsr 	a		; Shit carry into bit 7
+
+    	.endmacro
+
+    The macro will only accept no arguments, or one argument that must
+    be the reserved keyword "A".
+
+
+.ORG
+
+  Start a section of absolute code. The command is followed by a constant
+  expression that gives the new PC counter location for which the code is
+  assembled. Use .RELOC to switch back to relocatable code.
+
+  You may not switch segments while inside a section of absolute code.
+
+  Example:
+
+  	.org	$7FF	     	; Emit code starting at $7FF
+
+
+.OUT
+
+  Output a string to the console without producing an error. This command
+  is similiar to .ERROR, however, it does not force an assembler error
+  that prevents the creation of an object file.
+
+  Example:
+
+  	.out	"This code was written by the codebuster(tm)"
+
+
+.P02
+
+  Enable the 6502 instruction set, disable 65C02 and 65816 instructions.
+  This is the default if not overridden by the --cpu command line option.
+
+
+.P816
+
+  Enable the 65816 instruction set. This is a superset of the 65C02 and
+  6502 instruction sets.
+
+
+.PAGELEN
+.PAGELENGTH
+
+  Set the page length for the listing. Must be followed by an integer
+  constant. The value may be "unlimited", or in the range 32 to 127. The
+  statement has no effect if no listing is generated. The default value
+  is -1 but may be overridden by the --pagelength command line option.
+  Beware: Since the listing is generated after assembly is complete, you
+  cannot use multiple line lengths with one source. Instead, the value
+  set with the last .PAGELENGTH is used.
+
+  Examples:
+
+	.pagelength	66		; Use 66 lines per listing page
+
+	.pagelength	unlimited	; Unlimited page length
+
+
+.PARAMCOUNT
+
+  This builtin pseudo variable is only available in macros. It is replaced
+  by the actual number of parameters that were given in the macro
+  invocation.
+
+  Example:
+
+	.macro	foo	arg1, arg2, arg3
+	.if	.paramcount <> 3
+	.error	"Too few parameters for macro foo"
+	.endif
+	...
+ 	.endmacro
+
+
+.PC02
+
+  Enable the 65C02 instructions set. This instruction set includes all
+  6502 instructions.
+
+
+.PROC
+
+  Start a nested lexical level. All new symbols from now on are in the
+  local lexical level and are not accessible from outside. Symbols defined
+  outside this local level may be accessed as long as their names are not
+  used for new symbols inside the level. Symbols names in other lexical
+  levels do not clash, so you may use the same names for identifiers. The
+  lexical level ends when the .ENDPROC command is read. Lexical levels may
+  be nested up to a depth of 16.
+
+  The command may be followed by an identifier, in this case the
+  identifier is declared in the outer level as a label having the value of
+  the program counter at the start of the lexical level.
+
+  Note: Macro names are always in the global level and in a separate name
+  space. There is no special reason for this, it's just that I've never
+  had any need for local macro definitions.
+
+  Example:
+
+       	.proc 	Clear  	      	; Define Clear subroutine, start new level
+     		lda    	#$00
+     	L1:    	sta    	Mem,y  	; L1 is local and does not cause a
+       		       	      	; duplicate symbol error if used in other
+     		       	      	; places
+     		dey
+     		bne	L1    	; Reference local symbol
+     		rts
+     	.endproc	      	; Leave lexical level
+
+
+.REF
+.REFERENCED
+
+  Builtin function. The function expects an identifier as argument in
+  braces. The argument is evaluated, and the function yields "true" if the
+  identifier is a symbol that has already been referenced somewhere in the
+  source file up to the current position. Otherwise the function yields
+  false. As an example, the .IFREF statement may be replaced by
+
+	.if	.referenced(a)
+
+
+.RELOC
+
+  Switch back to relocatable mode. See the .ORG command.
+
+
+.RES
+
+  Reserve storage. The command is followed by one or two constant
+  expressions. The first one is mandatory and defines, how many bytes of
+  storage should be defined. The second, optional expression must by a
+  constant byte value that will be used as value of the data. If there
+  is no fill value given, the linker will use the value defined in the
+  linker configuration file (default: zero).
+
+  Example:
+
+	; Reserve 12 bytes of memory with value $AA
+  	.res	12, $AA
+
+
+.RODATA
+
+  Switch to the RODATA segment. The name of the RODATA segment is always
+  "RODATA", so this is a shortcut for
+
+       	.segment  "RODATA"
+
+  The RODATA segment is a segment that is used by the compiler for
+  readonly data like string constants. See also the .SEGMENT command.
+
+
+.SEGMENT
+
+  Switch to another segment. Code and data is always emitted into a
+  segment, that is, a named section of data. The default segment is
+  "CODE". There may be up to 254 different segments per object file
+  (and up to 65534 per executable). There are shortcut commands for
+  the most common segments ("CODE", "DATA" and "BSS").
+
+  The command is followed by a string containing the segment name (there
+  are some constraints for the name - as a rule of thumb use only those
+  segment names that would also be valid identifiers). There may also be
+  an optional attribute separated by a comma. Valid attributes are
+
+	zeropage
+  and	absolute
+
+  When specifying a segment for the first time, "absolute" is the
+  default. For all other uses, the attribute specified the first time
+  is the default.
+
+  "absolute" means that this is a segment with absolute addressing. That
+  is, the segment will reside somewhere in core memory outside the zero
+  page. "zeropage" means the opposite: The segment will be placed in the
+  zero page and direct (short) addressing is possible for data in this
+  segment.
+
+  Beware: Only labels in a segment with the zeropage attribute are marked
+  as reachable by short addressing. The `*' (PC counter) operator will
+  work as in other segments and will create absolute variable values.
+
+  Example:
+
+       	.segment "ROM2"			; Switch to ROM2 segment
+	.segment "ZP2", zeropage	; New direct segment
+ 	.segment "ZP2"			; Ok, will use last attribute
+	.segment "ZP2", absolute	; Error, redecl mismatch
+
+
+.SMART
+
+  Switch on or off smart mode. The command must be followed by a '+' or
+  '-' character to switch the option on or off respectively. The default
+  is off (that is, the assembler doesn't try to be smart), but this
+  default may be changed by the -s switch on the command line.
+
+  In smart mode the assembler will track usage of the REP and SEP
+  instructions in 65816 mode and update the operand sizes accordingly. If
+  the operand of such an instruction cannot be evaluated by the assembler
+  (for example, because the operand is an imported symbol), a warning is
+  issued. Beware: Since the assembler cannot trace the execution flow this
+  may lead to false results in some cases. If in doubt, use the .ixx and
+  .axx instructions to tell the assembler about the current settings.
+
+  Example:
+
+	.smart				; Be smart
+	.smart	-			; Stop being smart
+
+
+.STRING
+
+  Builtin function. The function accepts an argument in braces and
+  converts this argument into a string constant. The argument may be an
+  identifier, or a constant numeric value.
+  Since you can use a string in the first place, the use of the function
+  may not be obvious. However, it is useful in macros, or more complex
+  setups.
+
+  Example:
+
+	; Emulate other assemblers:
+	.macro	section	name
+		.segment	.string(name)
+	.endmacro
+
+
+.WORD
+
+  Define word sized data. Must be followed by a sequence of (word ranged,
+  but not necessarily constant) expressions.
+
+  Example:
+
+  	.word  	$0D00, $AF13, _Clear
+
+
+.ZEROPAGE
+
+  Switch to the ZEROPAGE segment and mark it as direct (zeropage) segment.
+  The name of the ZEROPAGE segment is always "ZEROPAGE", so this is a
+  shortcut for
+
+       	.segment  "ZEROPAGE", zeropage
+
+  Because of the "zeropage" attribute, labels declared in this segment are
+  addressed using direct addressing mode if possible. You MUST instruct
+  the linker to place this segment somewhere in the address range 0..$FF
+  otherwise you will get errors.
+
+
+
+7. Macros
+---------
+
+Macros may be thought of as "parametrized super instructions". Macros are
+sequences of tokens that have a name. If that name is used in the source
+file, the macro is "expanded", that is, it is replaced by the tokens that
+were specified when the macro was defined.
+
+In it's simplest form, a macro does not have parameters. Here's an
+example:
+
+       	.macro  asr		; Arithmetic shift right
+  	       	cmp	#$80	; Put bit 7 into carry
+  		ror		; Rotate right with carry
+  	.endmacro
+
+The macro above consists of two real instructions, that are inserted into
+the code, whenever the macro is expanded. Macro expansion is simply done
+by using the name, like this:
+
+  	lda	$2010
+  	asr
+  	sta	$2010
+
+
+When using macro parameters, macros can be even more useful:
+
+  	.macro	inc16	addr
+  		clc
+  		lda	addr
+  		adc	#$01
+  		sta	addr
+  		lda	addr+1
+  		adc	#$00
+  		sta	addr+1
+  	.endmacro
+
+When calling the macro, you may give a parameter, and each occurence of
+the name "addr" in the macro definition will be replaced by the given
+parameter. So
+
+  	inc16	$1000
+
+will be expanded to
+
+  		clc
+  		lda	$1000
+  		adc	#$01
+  		sta	$1000
+  		lda	$1000+1
+  		adc	#$00
+  		sta	$1000+1
+
+A macro may have more than one parameter, in this case, the parameters
+are separated by commas. You are free to give less parameters than the
+macro actually takes in the definition. You may also leave intermediate
+parameters empty. Empty parameters are replaced by empty space (that is,
+they are removed when the macro is exanded). If you have a look at our
+macro definition above, you will see, that replacing the "addr" parameter
+by nothing will lead to wrong code in most lines. To help you, writing
+macros with a variable parameter list, there are some control commands:
+
+.IFBLANK tests the rest of the line and returns true, if there are any
+tokens on the remainder of the line. Since empty parameters are replaced
+by nothing, this may be used to test if a given parameter is empty.
+.IFNBLANK tests the opposite.
+
+Look at this example:
+
+  	.macro	ldaxy  	a, x, y
+  	.ifnblank      	a
+  	     	lda    	#a
+  	.endif
+  	.ifnblank      	x
+  		ldx    	#x
+  	.endif
+  	.ifnblank      	y
+  		ldy    	#y
+  	.endif
+  	.endmacro
+
+This macro may be called as follows:
+
+  	ldaxy	1, 2, 3		; Load all three registers
+
+  	ldaxy	1, , 3 		; Load only a and y
+
+  	ldaxy	, , 3  		; Load y only
+
+There's another helper command for determining, which macro parameters are
+valid: .PARAMCOUNT. This command is replaced by the parameter count given,
+*including* intermediate empty macro parameters:
+
+  	ldaxy	1      		; .PARAMCOUNT = 1
+  	ldaxy	1,,3   		; .PARAMCOUNT = 3
+  	ldaxy	1,2    		; .PARAMCOUNT = 2
+  	ldaxy	1,     		; .PARAMCOUNT = 2
+  	ldaxy	1,2,3  		; .PARAMCOUNT = 3
+
+Macros may be used recursively:
+
+  	.macro	push   	r1, r2, r3
+  	    	lda    	r1
+  	    	pha
+  	.if 	.paramcount > 1
+  	    	push   	r2, r3
+  	.endif
+  	.endmacro
+
+There's also a special macro to help writing recursive macros: .EXITMACRO.
+This command will stop macro expansion immidiately:
+
+  	.macro	push   	r1, r2, r3, r4, r5, r6, r7
+  	.ifblank       	r1
+  		; First parameter is empty
+  		.exitmacro
+  	.else
+  		lda    	r1
+  		pha
+  	.endif
+  		push   	r2, r3, r4, r5, r6, r7
+  	.endmacro
+
+When expanding this macro, the expansion will push all given parameters
+until an empty one is encountered. The macro may be called like this:
+
+  	push	$20, $21, $32		; Push 3 ZP locations
+  	push	$21    			; Push one ZP location
+
+Now, with recursive macros, .IFBLANK and .PARAMCOUNT, what else do you need?
+Have a look at the inc16 macro above. Here is it again:
+
+  	.macro	inc16  	addr
+  		clc
+  		lda    	addr
+  		adc    	#$01
+  		sta    	addr
+  		lda    	addr+1
+  		adc    	#$00
+  		sta    	addr+1
+  	.endmacro
+
+If you have a closer look at the code, you will notice, that it could be
+written more efficiently, like this:
+
+  	.macro	inc16  	addr
+  		clc
+  		lda    	addr
+  		adc    	#$01
+  		sta    	addr
+  	   	bcc    	Skip
+  	   	inc    	addr+1
+  	Skip:
+  	.endmacro
+
+But imagine what happens, if you use this macro twice? Since the label
+"Skip" has the same name both times, you get a "duplicate symbol" error.
+Without a way to circumvent this problem, macros are not as useful, as
+they could be. One solution is, to start a new lexical block inside the
+macro:
+
+  	.macro	inc16  	addr
+  	.proc
+  	     	clc
+  	     	lda    	addr
+  	     	adc    	#$01
+  	     	sta    	addr
+  	     	bcc    	Skip
+  	     	inc    	addr+1
+  	Skip:
+  	.endproc
+  	.endmacro
+
+Now the label is local to the block and not visible outside. However,
+sometimes you want a label inside the macro to be visible outside. To make
+that possible, there's a new command that's only usable inside a macro
+definition: .LOCAL. .LOCAL declares one or more symbols as local to the
+macro expansion. The names of local variables are replaced by a unique
+name in each separate macro expansion. So we could also solve the problem
+above by using .LOCAL:
+
+     	.macro	inc16	addr
+       	    	.local 	Skip 		; Make Skip a local symbol
+  	     	clc
+  	     	lda	addr
+  	     	adc	#$01
+  	     	sta	addr
+  	     	bcc	Skip
+  	     	inc	addr+1
+  	Skip:				; Not visible outside
+  	.endmacro
+
+Starting with version 2.5 of the assembler, there is a second macro type
+available: C style macros using the .DEFINE directive. These macros are
+similar to the classic macro type speified above, but behaviour is
+sometimes different:
+
+  * Macros defined with .DEFINE may not span more than a line. You may
+    use line continuation (.LINECONT) to spread the definition over more
+    than one line for increased readability, but the macro itself does
+    not contain an end-of-line token.
+
+  * Macros defined with .DEFINE share the name space with classic macros,
+    but they are detected and replaced at the scanner level. While classic
+    macros may be used in every place, where a mnemonic or other directive
+    is allowed, .DEFINE style macros are allowed anywhere in a line. So
+    they are more versatile in some situations.
+
+  * .DEFINE style macros may take parameters. While classic macros may
+    have empty parameters, this is not true for .DEFINE style macros. For
+    this macro type, the number of actual parameters must match exactly
+    the number of formal parameters.
+    To make this possible, formal parameters are enclosed in braces when
+    defining the macro. If there are no parameters, the empty braces may
+    be omitted.
+
+  * Since .DEFINE style macros may not contain end-of-line tokens, there
+    are things that cannot be done. They may not contain several processor
+    instructions for example. So, while some things may be done with both
+    macro types, each type has special usages. The types complement each
+    other.
+
+Let's look at a few examples to make the advantages and disadvantages
+clear.
+
+To emulate assemblers that use "EQU" instead of "=" you may use the
+following .DEFINE:
+
+      	.define	EQU	=
+
+      	foo	EQU	$1234	   	; This is accepted now
+
+You may use the directive to define string constants use elsewhere:
+
+      	; Define the version number
+      	.define	VERSION	       	"12.3a"
+
+      	; ... and use it
+      	.asciiz	VERSION
+
+Macros with parameters may also be useful:
+
+      	.define DEBUG(message)	.out	message
+
+      	DEBUG	"Assembling include file #3"
+
+Note that, while formal parameters have to be placed in braces, this is
+not true for the actual parameters. Beware: Since the assembler cannot
+detect the end of one parameter, only the first token is used. If you
+don't like that, use classic macros instead:
+
+	.macro	message
+		.out	message
+	.endmacro
+
+(This is an example where a problem can be solved with both macro types).
+
+
+
+8. Macro packages
+-----------------
+
+Using the .macpack directive, predefined macro packages may be included
+with just one command. Available macro packages are:
+
+  - generic
+
+    This macro package defines macros that are useful in almost any
+    program. Currently, two macros are defined:
+
+	.macro  add     Arg
+	    	clc
+	    	adc     Arg
+	.endmacro
+
+	.macro  sub     Arg
+	    	sec
+	    	sbc     Arg
+	.endmacro
+
+
+  - longbranch
+
+    This macro package defines long conditional jumps. They are named like
+    the short counterpart but with the 'b' replaced by a 'j'. Here is a
+    sample definition for the "jeq" macro, the other macros are built using
+    the same scheme:
+
+    	.macro	jeq	Target
+    	    	.if	.def(Target) .and ((*+2)-(Target) <= 127)
+    	    	beq	Target
+    	    	.else
+    	    	bne	*+5
+    	    	jmp	Target
+    	    	.endif
+    	.endmacro
+
+    All macros expand to a short branch, if the label is already defined
+    (back jump) and is reachable with a short jump. Otherwise the macro
+    expands to a conditional branch with the branch condition inverted,
+    followed by an absolute jump to the actual branch target.
+
+    The package defines the following macros:
+
+ 	jeq, jne, jmi, jpl, jcs, jcc, jvs, jvc
+
+
+
+9. Bugs/Feedback
+----------------
+
+If you have problems using the assembler, if you find any bugs, or if
+you're doing something interesting with the assembler, I would be glad to
+hear from you. Feel free to contact me by email (uz@musoftware.de).
+
+
+
+10. Copyright
+-------------
+
+ca65 (and all cc65 binutils) are (C) Copyright 1998 Ullrich von Bassewitz.
+For usage of the binaries and/or sources the following conditions do
+apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+1. The origin of this software must not be misrepresented; you must not
+   claim that you wrote the original software. If you use this software
+   in a product, an acknowledgment in the product documentation would be
+   appreciated but is not required.
+2. Altered source versions must be plainly marked as such, and must not
+   be misrepresented as being the original software.
+3. This notice may not be removed or altered from any source
+   distribution.
+
+
+
+

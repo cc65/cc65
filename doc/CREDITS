@@ -1,0 +1,62 @@
+
+Many special thanks go to the guy who started it all:
+
+		   	John R.Dunning.
+
+Without his great work, there would not be a single freeware C crosscompiler
+for the 6502 out there. He built the grounds for this cc65 and some other cc65
+implementations and a lot of his code is still in the current compiler.
+
+
+More special thanks to:
+
+  * Keith W. Gerdes <kwg@freebird.ghofn.org>
+
+    Without his outstanding help, the assembler/compiler wouldn't be, what it
+    is now. He helped with suggestions, bug reports and even kicked me here
+    and then, when I started to get too lazy:-)
+
+  * Tennessee Carmel-Veilleux <veilleux@ameth.org>
+
+    Tennessee worked on the NES port.
+
+  * Kevin Ruland <kevin@rodin.wustl.edu>
+
+    Kevin did the Apple 2 port and found at least one serious error in the
+    C library while doing so.
+
+  * Christian Groessler <cpg@aladdin.de>
+
+    Christian sent me several fixes for 64 bit machines.
+
+  * Sidney Cadot <sidney@ch.twi.tudelft.nl>
+
+    Sidney rewrote the random number generator.
+
+  * Maciej Witkowiak <ytm@friko.onet.pl>
+
+    Maciej is responsible for the GEOS support.
+
+
+
+Thanks to
+
+    Mark Nasgowitz <MNasgowitz@NAZdesign.com>
+    da Blondie <db@tvnet.hu>
+    Jari Tuominen <jer64@kolumbus.fi>
+    MagerValp <magervalp@cling.gu.se>
+    Ingo Korb <unseen@gmx.net>
+    Robert R. Wal <rrw@reptile.eu.org>
+    Jesse Beach <agmorion@erols.com>
+    Chris Ward <chris.ward@freenet.co.uk>
+    Eric Au <eric_au@hotmail.com>
+    Tim Vanderhoek <hoek@FreeBSD.org>
+    Bill Craig <craigw@gusun.georgetown.edu>
+
+for bug reports and suggestions.
+
+
+This list is probably incomplete. So, if you think you should be mentioned
+here, but cannot find yourself, please drop me a mail.
+
+

@@ -1,0 +1,77 @@
+;
+; This must be the *second* file on the linker command line
+; (.cvt header must be the *first* one)
+
+; Maciej 'YTM/Alliance' Witkowiak
+; 26.10.99, 10.3.2000
+
+; no __hinit
+
+	.export		_exit
+       	.import	       	pushax
+	.import		_main
+	.import		zerobss, doatexit
+
+; ------------------------------------------------------------------------
+; Define and export the ZP variables for the C64 runtime
+
+	.exportzp	sp, sreg, regsave, regbank
+	.exportzp	ptr1, ptr2, ptr3, ptr4
+	.exportzp	tmp1, tmp2, tmp3, tmp4
+
+sp     	=      	$72  		; stack pointer
+sreg	=  	$74  		; secondary register/high 16 bit for longs
+regsave	=      	$76  		; slot to save/restore (E)AX into
+ptr1	=	$7A  		;
+ptr2	=	$7C
+ptr3	=	$7E
+ptr4	=	$70
+tmp1	=	$fb
+tmp2	=	$fc
+tmp3	=	$fd
+tmp4	=	$fe
+
+regbank =	$a3		; 6 bytes hopefully not used by Kernal
+
+; ------------------------------------------------------------------------
+
+;	.org $0400-508		; $0400 - length of .cvt header
+;	.include "cvthead.s"
+
+	.reloc
+
+; ------------------------------------------------------------------------
+; Actual code
+
+; Clear the BSS data
+
+	jsr	zerobss
+
+; Setup stack
+
+	lda    	#<$7900
+	sta	sp
+	lda	#>$7900
+       	sta	sp+1   		; Set argument stack ptr
+
+; Initialize the heap
+
+;;!	jsr	__hinit
+
+; Pass an empty command line
+
+	lda  	#0
+	tax
+	jsr	pushax 	 	; argc
+	jsr	pushax	 	; argv
+
+	ldy	#4	 	; Argument size
+       	jsr    	_main	 	; call the users code
+	jmp	$c1c3		; jump to GEOS MainLoop
+
+; exit must be called from the code!
+
+_exit:	
+	jsr	doatexit 	; call exit functions
+
+	jmp	$c22c		; EnterDeskTop

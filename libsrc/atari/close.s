@@ -1,0 +1,36 @@
+;
+; Christian Groessler, May-2000
+;
+; int close(int fd);
+;
+
+	.include "atari.inc"
+	.export	_close
+	.import	__do_oserror,popax,__oserror
+	.import	fdtoiocb_down,__inviocb
+
+.proc	_close
+	jsr	popax
+	jsr	fdtoiocb_down		; get iocb index into X and decr. usage count
+	bmi	inverr
+	bne	ok			; not last one -> don't close yet
+;	asl	a
+;	asl	a
+;	asl	a
+;	asl	a
+;	tax
+	lda	#CLOSE
+	sta	ICCOM,x
+	jsr	CIOV
+	bpl	ok
+	jmp	__do_oserror
+
+ok:	ldx	#0
+	stx	__oserror		; clear system specific error code
+	txa
+	rts
+
+inverr:	jmp	__inviocb
+
+.endproc
+

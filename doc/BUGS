@@ -1,0 +1,11 @@
+List of known bugs that will not get fixed in the near future:
+
+  * The compiler does not detect if part of an expression evaluated
+    with && or || is constant. Since the expression evaluation is also
+    used for the preprocessor, this defeats the use of
+
+    	#if defined(x) && defined(y)
+
+  * Initialization of local variables with compound data types is not
+    possible.
+

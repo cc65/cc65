@@ -1,0 +1,159 @@
+
+
+Instructions for compiling cc65 and the ca65 binutils:
+
+
+Linux (and probably most other Unices)
+--------------------------------------
+
+You need the GNU C compiler. Do a
+
+	make -f make/gcc.mak
+
+twice(!) in each of the directories
+
+	cc65
+	binutils
+
+After that, you need to compile the libraries. Do
+
+	cd lib
+	make clean c64lib
+	make clean c128lib
+	make clean plus4lib
+	make clean cbm610lib
+	make clean petlib
+	make clean apple2lib
+
+Be sure to say "clean" each time, since some of the sources have a
+"#ifdef <target_system>".
+
+
+
+DOS using the DJGPP compiler
+----------------------------
+
+Most information in this section was provided by Keith W. Gerdes
+(kwg@freebird.ghofn.org). Thanks a lot!
+
+The tmpfile() function in DJGPP has a bug and will not open the scratch
+file in binary mode. If you have problems with the archiver (which uses
+the tmpfile() function), you have two choices:
+
+  1. Get a fix from http://www.cartsys.com/eldredge/djgpp-patches.html
+     and apply it. This will solve the problem once and forever.
+
+  2. For a temporary solution, in the file binutils/ar65/main.c, add the
+     following lines:
+
+     At top:
+
+   	#include <fcntl.h>
+
+     At start of main:
+
+   	_fmode = O_BINARY;
+
+     This will switch the default mode to binary and will work around the
+     bug.
+
+Keith sent me the following notes how to build the tools on a DOS system
+using DJGPP (add your system type to CFLAGS if needed):
+
+-------------------------------------------------------------------------
+
+Here's my current batch file:
+
+cd cc65
+if exist .depend goto ahead1
+make -f make\gcc.mak
+:ahead1
+make -f make\gcc.mak
+move *.exe ..\binutils
+
+cd ..\cl65
+if exist .depend goto ahead2
+make -f make\gcc.mak
+:ahead2
+make -f make\gcc.mak
+move *.exe ..\binutils
+
+cd ..\binutils\common
+if exist .depend goto ahead3
+make -f make\gcc.mak
+:ahead3
+make -f make\gcc.mak
+
+cd ..\ca65
+if exist .depend goto ahead4
+make -f make\gcc.mak
+:ahead4
+make -f make\gcc.mak
+move *.exe ..
+
+cd ..\ld65
+if exist .depend goto ahead5
+make -f make\gcc.mak
+:ahead5
+make -f make\gcc.mak
+move *.exe ..
+
+cd ..\ar65
+if exist .depend goto ahead6
+make -f make\gcc.mak
+:ahead6
+make -f make\gcc.mak
+move *.exe ..
+
+cd ..\..\lib\common
+make 'CFLAGS=-Oi -I../../include/'
+ar65 a common.lib *.o
+move common.lib ..
+
+cd ..\runtime
+make 'CFLAGS=-Oi -I../../include/'
+ar65 a runtime.lib *.o
+move runtime.lib ..
+
+ --
+
+In djgpp.env I use:
+
++LFN=Y
+
+for the .depend file.
+
+ --
+
+And in autoexec.bat I have:
+
+set CC65_INC=E:\djgpp_v2\cc65\include
+set CC65_LIB=E:\djgpp_v2\cc65\lib
+PATH=E:\djgpp_v2\cc65\binutils;%PATH%
+
+-------------------------------------------------------------------------
+
+
+DOS, Windows, OS/2 using the Watcom Compiler
+--------------------------------------------
+
+This is what I'm using. You need the Borland make in addition to the
+Watcom tools, or you have to change the makefile.
+
+1. Copy %WATCOM%\src\startup\wildargv.c from your Watcom directory into
+   binutils\common.
+
+2. Enter
+
+     	make -f make\watcom.mak
+
+   in each of the directories
+
+     	cc65
+     	binutils
+
+3. Use Linux to build the libraries:-) If you don't have Linux, get it
+   now! More serious: There is no makefile to build the libraries. Use a
+   batch file similar to the one above, or rewrite the makefile.
+
+

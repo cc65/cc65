@@ -1,0 +1,206 @@
+
+
+	     	      How to use the cc65 C compiler
+
+		     Ullrich von Bassewitz, 1998/1999
+
+
+
+Contents
+--------
+
+  1. Overview
+
+  2. The compiler
+
+  3. The assembler
+
+  4. The linker
+
+  5. The easy way (using the cl65 utility)
+
+
+
+1. Overview
+-----------
+
+This is a short intro, how to use the compiler and the binutils. It
+contains a step-by-step example, how to build a complete application from
+one C and one assembler module. This file does *NOT* contain a complete
+reference for the tools used in the process. There are separate files
+describing these tools in detail.
+
+Note: There is a much simpler way to compile this example using the cl65
+compiler and link utility. However, it makes sense to understand how the
+separate steps work. How to do the example with the cl65 utility is
+described in section 5.
+
+To explain the development flow, I will use the following example modules:
+
+
+hello.c:
+
+	#include <stdio.h>
+	#include <stdlib.h>
+
+       	extern const char text[];	/* In text.s */
+
+	int main (void)
+	{
+	    printf ("%s\n", text);
+	    return EXIT_SUCCESS;
+	}
+
+
+text.s:
+
+	.export	_text
+	_text:	.asciiz	"Hello world!"
+
+
+We assume that the target file should be named "hello", and the target
+system is the C64.
+
+
+    +---------+
+    | hello.c |
+    +---------+
+       	 |
+        cc65
+       	 \/
+    +---------+	      +---------+
+    | hello.s |       | text.s  |
+    +---------+	      +---------+
+       	 |     	           |
+        ca65              ca65
+         \/                \/
+    +---------+       +---------+      	+----------+   	   +---------+
+    | hello.o |       | text.o  |       |  c64.o   |       | c64.lib |
+    +---------+       +---------+      	+----------+       +---------+
+	 |   		       \         /   	       	       	|
+	 |   		       	\       /   			|
+	 |   		  	 \     / 			|
+	 +----------------------->ld65<-------------------------+
+	     		  	   \/
+	     		  	  hello
+
+
+c64.o (the startup code) and c64.lib (the c64 version of the runtime and C
+library) are provided in binary form in the cc65 package.
+
+
+
+2. The compiler
+---------------
+
+The compiler translates one C source into one assembler source for each
+invocation. It does *NOT* create object files directly, and it is *NOT*
+able to translate more than one file per run.
+
+In the example above, we would use the following command line, to
+translate hello.c into hello.s:
+
+	cc65 -O -I ../include -t c64 hello.c
+
+The -O switch tells the compiler to do an additional optimizer run, which
+is usually a good idea, since it makes the code smaller. If you don't care
+about the size, but want to have slightly faster code, use -Oi to inline
+some runtime functions.
+
+The -I switch gives a search path for the include files. You may also set
+the environment variable CC65_INC to the search path.
+
+The -t switch is followed by the target system.
+
+If the compiler does not complain about errors in our hello world, we will
+have a file named "hello.s" in our directory that contains the assembler
+source for the hello module.
+
+For more information about the compiler see cc65.txt.
+
+
+
+3. The assembler
+----------------
+
+The assembler translates one assembler source into an object file for each
+invocation. The assembler is *NOT* able to translate more than one source
+file per run.
+
+Let's translate the hello.s and text.s files from our example:
+
+	ca65 hello.s
+	ca65 text.s
+
+If the assembler does not complain, we should now have two object files
+(named hello.o and text.o) in the current directory.
+
+For more information about the assembler see ca65.txt.
+
+
+
+4. The linker
+-------------
+
+The linker combines several object and library file into one output file.
+ld65 is very configurable, but fortunately has a builtin configuration for
+the C64, so we don't need to mess with configuration files here.
+
+The compiler uses small functions to do things that cannot be done inline
+without big impact on code size. These runtime functions, together with
+the C library are in an object file archive named after the system, in
+this case "c64.lib". We have to specify this file on the command line so
+that the linker can resolve these functions.
+
+A second file (this time an object file) needed, is the startup code that
+prepares the grounds for the C program to run. The startup file must be
+executed first, so it must be the first file on the linker command line.
+
+Let's link our files to get the final executable:
+
+       	ld65 -t c64 -o hello c64.o hello.o text.o c64.lib
+
+The argument after -o specifies the name of the output file, the argument
+after -t gives the target system. As discussed, the startup file must be the
+first file on the command line (you may have to add a path here, if c64.o is
+not in your current directory). Since the library resolves imports in hello.o
+and text.o, it must be specified *after* these files.
+
+After a successful linker run, we have a file named "hello", ready for our
+C64!
+
+For more information about the linker see ld65.txt.
+
+
+
+5. The easy way (using the cl65 utility)
+----------------------------------------
+
+The cl65 utility is able to do all of the steps described above in just
+one call, and it has defaults for some options that are very well suited
+for our example.
+
+To compile both files into one executable enter
+
+	cl65 -O -I ../include hello.c test.s
+
+(The -I switch is not needed if you are working under Linux with the
+include files in the default path, or the CC65_INC environment variable is
+set correctly).
+
+The cl65 utility knows, how to translate C files into object files (it
+will call the compiler and then the assembler). It does also know how to
+create object files from assembler files (it will call the assember for
+that). It knows how to build an executable (it will pass all object files
+to the linker). And, finally, it has the C64 as a default target and will
+supply the correct startup file and runtime library names to the linker,
+so you don't have to care about that.
+
+The one-liner above should give you a C64 executable named "hello" in the
+current directory.
+
+For more information about the compile & link utility see cl65.txt.
+
+
+
+			  

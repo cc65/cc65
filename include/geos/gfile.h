@@ -1,0 +1,101 @@
+/*
+  GEOS filesystem functions
+
+  ported to small C on 25.12.1999
+  by Maciej 'YTM/Alliance' Witkowiak
+*/
+
+#ifndef	_GFILE_H
+#define _GFILE_H
+
+#ifndef _GSTRUCT_H
+#include <geos/gstruct.h>
+#endif
+
+struct filehandle *__fastcall__ Get1stDirEntry(void);
+struct filehandle *__fastcall__ GetNxtDirEntry(void);
+
+char __fastcall__ FindFTypes(char *buffer, char ftype, char fmaxnum, char *classtxt);
+
+char __fastcall__ FindFile(char *fname);
+char __fastcall__ ReadFile(struct tr_se *myTrSe, char *buffer, int flength);
+char __fastcall__ SaveFile(struct fileheader *myHeader);
+char __fastcall__ FreeFile(struct tr_se myTable[]);
+char __fastcall__ DeleteFile(char *fname);
+char __fastcall__ RenameFile(char *source, char *target);
+
+char __fastcall__ ReadByte(void);
+
+char __fastcall__ FollowChain(struct tr_se *startTrSe, char *buffer);
+char __fastcall__ GetFHdrInfo(struct filehandle *myFile);
+
+char __fastcall__ OpenRecordFile(char *fname);
+char __fastcall__ CloseRecordFile(void);
+char __fastcall__ NextRecord(void);
+char __fastcall__ PreviousRecord(void);
+char __fastcall__ PointRecord(char);
+char __fastcall__ DeleteRecord(void);
+char __fastcall__ InsertRecord(void);
+char __fastcall__ AppendRecord(void);
+char __fastcall__ ReadRecord(char *buffer, int flength);
+char __fastcall__ WriteRecord(char *buffer, int flength);
+char __fastcall__ UpdateRecordFile(void);
+
+/* GEOS filetypes */
+#define	NOT_GEOS	0
+#define	BASIC		1
+#define	ASSEMBLY	2
+#define	DATA		3
+#define	SYSTEM		4
+#define	DESK_ACC	5
+#define	APPLICATION	6
+#define	APPL_DATA	7
+#define	FONT		8
+#define	PRINTER		9
+#define	INPUT_DEVICE	10
+#define	DISK_DEVICE	11
+#define	SYSTEM_BOOT	12
+#define	TEMPORARY	13
+#define	AUTO_EXEC	14
+#define	INPUT_128	15
+#define	NUMFILETYPES	16
+/* supported structures */
+#define	SEQUENTIAL	0
+#define	VLIR		1
+/* DOS filetypes */
+#define	DEL		0
+#define	SEQ		1
+#define	PRG		2
+#define	USR		3
+#define	REL		4
+#define	CBM		5
+/* directory offsets */
+/* offsets in dir entry */
+#define	FRST_FILE_ENTRY	2
+#define	OFF_CFILE_TYPE	0
+#define	OFF_DE_TR_SC	1
+#define	OFF_FNAME	3
+#define	OFF_GHDR_PTR	19
+#define	OFF_GSTRUC_TYPE	21
+#define	OFF_GFILE_TYPE	22
+#define	OFF_YEAR	23
+#define	OFF_SIZE	28
+#define	OFF_NXT_FILE	32
+/* offsets in file header */
+#define	O_GHIC_WIDTH	2
+#define	O_GHIC_HEIGHT	3
+#define	O_GHIC_PIC	4
+#define	O_GHCMDR_TYPE	68
+#define	O_GHGEOS_TYPE	69
+#define	O_GHSTR_TYPE	70
+#define	O_GHST_ADDR	71
+#define	O_GHEND_ADDR	73
+#define	O_GHST_VEC	75
+#define	O_GHFNAME	77
+#define	O_128_FLAGS	96
+#define	O_GH_AUTHOR	97
+#define	O_GHP_DISK	97
+#define	O_GHP_FNAME	117
+#define	O_GHINFO_TXT	0xa0
+
+#endif

@@ -1,0 +1,34 @@
+
+If you have got the source package, see
+
+	doc/compile.txt
+
+for instructions how to compile the stuff for the different systems.
+
+
+If you have a binary package: Have a look in the doc directory for
+information on how to use the tools. If you are new to cc65, the file
+intro.txt may be of interest to you.
+
+To avoid having to mess with paths, you may want to set the environment
+variables
+
+	       	CC65_LIB
+	and    	CC65_INC
+
+to the directory containing the libraries and the system include files
+respectively. If you have installed cc65 in C:\cc65 (assuming a DOS or
+Windows system), you should use
+
+	       	set CC65_LIB=c:\cc65\lib
+	and    	set CC65_INC=c:\cc65\include
+
+Unix people probably know, how to translate these lines into the
+appropriate Unix commands:-)
+
+Have fun!
+
+
+	Uz
+
+

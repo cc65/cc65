@@ -675,16 +675,16 @@ opc_t GetInverseBranch (opc_t OPC)
 	case OP65_BMI:	return OP65_BPL;
 	case OP65_BNE:	return OP65_BEQ;
 	case OP65_BPL:	return OP65_BMI;
-	case OP65_BVC:  	return OP65_BVS;
+       	case OP65_BVC:  return OP65_BVS;
 	case OP65_BVS:	return OP65_BVC;
-       	case OP65_JCC:  	return OP65_JCS;
-       	case OP65_JCS:  	return OP65_JCC;
-       	case OP65_JEQ:  	return OP65_JNE;
-       	case OP65_JMI:  	return OP65_JPL;
-       	case OP65_JNE:  	return OP65_JEQ;
-       	case OP65_JPL:  	return OP65_JMI;
-       	case OP65_JVC:  	return OP65_JVS;
-       	case OP65_JVS:  	return OP65_JVC;
+       	case OP65_JCC:  return OP65_JCS;
+       	case OP65_JCS:  return OP65_JCC;
+       	case OP65_JEQ:  return OP65_JNE;
+       	case OP65_JMI:  return OP65_JPL;
+       	case OP65_JNE:  return OP65_JEQ;
+       	case OP65_JPL:  return OP65_JMI;
+       	case OP65_JVC:  return OP65_JVS;
+       	case OP65_JVS:  return OP65_JVC;
 	default:
 	    Internal ("GetInverseBranch: Invalid opcode: %d", OPC);
 	    return 0;
@@ -700,21 +700,21 @@ opc_t MakeShortBranch (opc_t OPC)
 {
     switch (OPC) {
        	case OP65_BCC:
-       	case OP65_JCC:  	return OP65_BCC;
+       	case OP65_JCC:  return OP65_BCC;
        	case OP65_BCS:
-       	case OP65_JCS:  	return OP65_BCS;
+       	case OP65_JCS:  return OP65_BCS;
        	case OP65_BEQ:
-       	case OP65_JEQ:  	return OP65_BEQ;
+       	case OP65_JEQ:  return OP65_BEQ;
        	case OP65_BMI:
-       	case OP65_JMI:  	return OP65_BMI;
+       	case OP65_JMI:  return OP65_BMI;
        	case OP65_BNE:
-       	case OP65_JNE:  	return OP65_BNE;
+       	case OP65_JNE:  return OP65_BNE;
        	case OP65_BPL:
-       	case OP65_JPL:  	return OP65_BPL;
+       	case OP65_JPL:  return OP65_BPL;
        	case OP65_BVC:
-       	case OP65_JVC:  	return OP65_BVC;
+       	case OP65_JVC:  return OP65_BVC;
        	case OP65_BVS:
-       	case OP65_JVS:  	return OP65_BVS;
+       	case OP65_JVS:  return OP65_BVS;
        	case OP65_BRA:
 	case OP65_JMP:	return (CPU == CPU_65C02)? OP65_BRA : OP65_JMP;
        	default:
@@ -732,23 +732,23 @@ opc_t MakeLongBranch (opc_t OPC)
 {
     switch (OPC) {
        	case OP65_BCC:
-       	case OP65_JCC:  	return OP65_JCC;
+       	case OP65_JCC:  return OP65_JCC;
        	case OP65_BCS:
-       	case OP65_JCS:  	return OP65_JCS;
+       	case OP65_JCS:  return OP65_JCS;
        	case OP65_BEQ:
-       	case OP65_JEQ:  	return OP65_JEQ;
+       	case OP65_JEQ:  return OP65_JEQ;
        	case OP65_BMI:
-       	case OP65_JMI:  	return OP65_JMI;
+       	case OP65_JMI:  return OP65_JMI;
        	case OP65_BNE:
-       	case OP65_JNE:  	return OP65_JNE;
+       	case OP65_JNE:  return OP65_JNE;
        	case OP65_BPL:
-       	case OP65_JPL:  	return OP65_JPL;
+       	case OP65_JPL:  return OP65_JPL;
        	case OP65_BVC:
-       	case OP65_JVC:  	return OP65_JVC;
+       	case OP65_JVC:  return OP65_JVC;
        	case OP65_BVS:
-       	case OP65_JVS:  	return OP65_JVS;
+       	case OP65_JVS:  return OP65_JVS;
 	case OP65_BRA:
-	case OP65_JMP:	return OP65_JMP;
+	case OP65_JMP: 	return OP65_JMP;
        	default:
 	    Internal ("MakeLongBranch: Invalid opcode: %d", OPC);
 	    return 0;
@@ -761,23 +761,23 @@ bc_t GetBranchCond (opc_t OPC)
 /* Get the condition for the conditional branch in OPC */
 {
     switch (OPC) {
-       	case OP65_BCC:  	return BC_CC;
-       	case OP65_BCS:  	return BC_CS;
-       	case OP65_BEQ:  	return BC_EQ;
-       	case OP65_BMI:  	return BC_MI;
-       	case OP65_BNE:  	return BC_NE;
-       	case OP65_BPL:  	return BC_PL;
-       	case OP65_BVC:  	return BC_VC;
-       	case OP65_BVS:  	return BC_VS;
-       	case OP65_JCC:  	return BC_CC;
-       	case OP65_JCS:  	return BC_CS;
-       	case OP65_JEQ:  	return BC_EQ;
-       	case OP65_JMI:  	return BC_MI;
-       	case OP65_JNE:  	return BC_NE;
-       	case OP65_JPL:  	return BC_PL;
-       	case OP65_JVC:  	return BC_VC;
-       	case OP65_JVS:  	return BC_VS;
-	default:
+       	case OP65_BCC:  return BC_CC;
+       	case OP65_BCS:  return BC_CS;
+       	case OP65_BEQ:  return BC_EQ;
+       	case OP65_BMI:  return BC_MI;
+       	case OP65_BNE:  return BC_NE;
+       	case OP65_BPL:  return BC_PL;
+       	case OP65_BVC:  return BC_VC;
+       	case OP65_BVS:  return BC_VS;
+       	case OP65_JCC:  return BC_CC;
+       	case OP65_JCS:  return BC_CS;
+       	case OP65_JEQ:  return BC_EQ;
+       	case OP65_JMI:  return BC_MI;
+       	case OP65_JNE:  return BC_NE;
+       	case OP65_JPL:  return BC_PL;
+       	case OP65_JVC:  return BC_VC;
+       	case OP65_JVS:  return BC_VS;
+	default:	
 	    Internal ("GetBranchCond: Invalid opcode: %d", OPC);
 	    return 0;
     }
@@ -805,3 +805,4 @@ bc_t GetInverseCond (bc_t BC)
 
 
 
+	    

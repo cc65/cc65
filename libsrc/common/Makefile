@@ -57,7 +57,8 @@ C_OBJS =	_afailed.o	\
                 vsscanf.o
 
 
-S_OBJS = 	_fdesc.o 	\
+S_OBJS = 	_cwd.o          \
+                _fdesc.o 	\
 	 	_file.o  	\
 		_fopen.o	\
 	 	_heap.o	 	\
@@ -86,6 +87,7 @@ S_OBJS = 	_fdesc.o 	\
 		free.o		\
 		fwrite.o	\
 		getcpu.o	\
+                getcwd.o        \
 		isalnum.o	\
 		isalpha.o	\
 		isblank.o	\

@@ -153,11 +153,11 @@ common: sty     tmp1
         sty     REU_C64ADDR+1
 
         ldy     #0
-        sty     REU_COUNT+0
         sty     REU_REUADDR+0
         sta     REU_REUADDR+1
         stx     REU_REUADDR+2
 
+        sty     REU_COUNT+0
         ldy     #1
         sty     REU_COUNT+1             ; Move 256 bytes
         bne     transfer1               ; Transfer 256 bytes into REU

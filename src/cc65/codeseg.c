@@ -829,7 +829,7 @@ void CS_DelLabel (CodeSeg* S, CodeLabel* L)
        	/* Get the insn referencing this label */
        	CodeEntry* E = CollAt (&L->JumpFrom, I);
        	/* Remove the reference */
-       	E->JumpTo = 0;
+       	CE_ClearJumpTo (E);
     }
     CollDeleteAll (&L->JumpFrom);
 
@@ -875,7 +875,10 @@ void CS_MergeLabels (CodeSeg* S)
 	       	for (J = 0; J < CL_GetRefCount (X); ++J) {
 		    /* Get the entry referencing this label */
 		    CodeEntry* E = CL_GetRef (X, J);
-		    /* And remove the reference */
+		    /* And remove the reference. Do NOT call CE_ClearJumpTo
+                     * here, because this will also clear the label name,
+                     * which is not what we want.
+                     */
 		    E->JumpTo = 0;
 	   	}
 
@@ -999,7 +1002,7 @@ void CS_RemoveLabelRef (CodeSeg* S, struct CodeEntry* E)
     CollDeleteItem (&L->JumpFrom, E);
 
     /* The entry jumps no longer to L */
-    E->JumpTo = 0;
+    CE_ClearJumpTo (E);
 
     /* If there are no more references, delete the label */
     if (CollCount (&L->JumpFrom) == 0) {

@@ -115,6 +115,12 @@ int CodeEntriesAreEqual (const CodeEntry* E1, const CodeEntry* E2);
 void CE_AttachLabel (CodeEntry* E, CodeLabel* L);
 /* Attach the label to the entry */
 
+void CE_ClearJumpTo (CodeEntry* E);
+/* Clear the JumpTo entry and the argument (which contained the name of the
+ * label). Note: The function will not clear the backpointer from the label,
+ * so use it with care.
+ */
+
 #if defined(HAVE_INLINE)
 INLINE int CE_HasLabel (const CodeEntry* E)
 /* Check if the given code entry has labels attached */
@@ -157,7 +163,7 @@ INLINE int CE_HasMark (const CodeEntry* E)
 #else
 #  define CE_HasMark(E)	(((E)->Flags & CEF_USERMARK) != 0)
 #endif
-   
+
 #if defined(HAVE_INLINE)
 INLINE void CE_SetMark (CodeEntry* E)
 /* Set the CEF_USERMARK flag for the given entry */

@@ -323,6 +323,22 @@ void CE_AttachLabel (CodeEntry* E, CodeLabel* L)
 
 
 
+void CE_ClearJumpTo (CodeEntry* E)
+/* Clear the JumpTo entry and the argument (which contained the name of the
+ * label). Note: The function will not clear the backpointer from the label,
+ * so use it with care.
+ */
+{
+    /* Clear the JumpTo entry */
+    E->JumpTo = 0;
+
+    /* Clear the argument and assign the empty one */
+    FreeArg (E->Arg);
+    E->Arg = EmptyArg;
+}
+
+
+
 void CE_MoveLabel (CodeLabel* L, CodeEntry* E)
 /* Move the code label L from it's former owner to the code entry E. */
 {
@@ -391,6 +407,33 @@ int CE_UseLoadFlags (const CodeEntry* E)
  * a register (N and Z).
  */
 {
+    /* Follow unconditional branches, but beware of endless loops. After this,
+     * E will point to the first entry that is not a branch.
+     */
+    if (E->Info & OF_UBRA) {
+        Collection C = AUTO_COLLECTION_INITIALIZER;
+
+        /* Follow the chain */
+        while (E->Info & OF_UBRA) {
+
+            /* Remember the entry so we can detect loops */
+            CollAppend (&C, (void*) E);
+
+            /* Check the target */
+            if (E->JumpTo == 0 || CollIndex (&C, E->JumpTo->Owner) >= 0) {
+                /* Unconditional jump to external symbol, or endless loop. */
+                DoneCollection (&C);
+                return 0;       /* Flags not used */
+            }
+
+            /* Follow the chain */
+            E = E->JumpTo->Owner;
+        }
+
+        /* Delete the collection */
+        DoneCollection (&C);
+    }
+
     /* A branch will use the flags */
     if (E->Info & OF_FBRA) {
         return 1;
@@ -429,7 +472,7 @@ void CE_FreeRegInfo (CodeEntry* E)
 /* Free an existing register info struct */
 {
     if (E->RI) {
-	FreeRegInfo (E->RI);
+       	FreeRegInfo (E->RI);
 	E->RI = 0;
     }
 }

@@ -383,11 +383,14 @@ int NextLine (void)
 	/* We got a new line */
 	++Input->Line;
 
-	/* Remove the trailing newline if we have one */
+	/* Remove the trailing cr/lf if we have one. We will ignore both, cr
+	 * and lf on all systems since this enables us to compile DOS/Windows
+	 * stuff also on unix systems (where fgets does not remove the cr).
+	 */
 	Part = strlen (line + Len);
 	Start = Len;
 	Len += Part;
-	while (Len > 0 && line [Len-1] == '\n') {
+	while (Len > 0 && (line[Len-1] == '\n' || line[Len-1] == '\r')) {
 	    --Len;
 	}
       	line [Len] = '\0';

@@ -2,7 +2,7 @@
   GEOS graphic (non icon/menu/sprite) functions
 
   ported to small C on 29.10.1999
-  by Maciej 'YTM/Alliance' Witkowiak
+  by Maciej 'YTM/Elysium' Witkowiak
   10,11.03.2000 - updates
 */
 
@@ -70,6 +70,23 @@ void __fastcall__ GraphicsString(char *myGfxString);
 #define	LTGREEN		13
 #define	LTBLUE		14
 #define	LTGREY		15
+/* once again for cc65 compatibility */
+#define COLOR_BLACK  	       	0x00
+#define COLOR_WHITE  	       	0x01
+#define COLOR_RED    	       	0x02
+#define COLOR_CYAN      	0x03
+#define COLOR_VIOLET 	       	0x04
+#define COLOR_GREEN  	       	0x05
+#define COLOR_BLUE   	       	0x06
+#define COLOR_YELLOW 	       	0x07
+#define COLOR_ORANGE 	       	0x08
+#define COLOR_BROWN  	       	0x09
+#define COLOR_LIGHTRED       	0x0A
+#define COLOR_GRAY1  	       	0x0B
+#define COLOR_GRAY2  	       	0x0C
+#define COLOR_LIGHTGREEN     	0x0D
+#define COLOR_LIGHTBLUE      	0x0E
+#define COLOR_GRAY3  	       	0x0F
 /* VIC memory banks */
 #define	GRBANK0		3
 #define	GRBANK1		2

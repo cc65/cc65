@@ -25,8 +25,9 @@ _cgetc:
 	    sta stringX
 	    stx stringX+1
 	    lda	cursor_y
+	    sec
+	    sbc	curHeight
 	    sta stringY
-	    jsr PosSprite
 	    jsr PromptOn
 
 L0:	    jsr GetNextChar

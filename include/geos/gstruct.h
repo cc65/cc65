@@ -110,7 +110,7 @@ struct icondef {		/* icon definition for DoIcons              */
 struct icontab {
 	char number;		/* number of declared icons                 */
 	struct pixel mousepos;	/* position of mouse after DoIcons          */
-	struct icondef tab[];	/* table of size declared by icontab.number */
+	struct icondef *tab;	/* table of size declared by icontab.number */
 };
 
 /*
@@ -130,13 +130,13 @@ struct menuitem {
 struct menu {
 	struct window size;
 	char number;
-	struct menuitem items[];
+	struct menuitem *items;
 };
 
 struct inittab {		/* use struct inittab mytab[n] for initram              */
 	int ptr;		/* ptr to 1st byte                                      */
 	char number;		/* number of following bytes                            */
-	char values[];		/* warning - in table size of this is same for all!     */
+	char *values;		/* actual string of bytes                               */
 };
 
 #endif

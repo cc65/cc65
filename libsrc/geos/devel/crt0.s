@@ -66,6 +66,7 @@ regbank =	$a3		; 6 bytes hopefully not used by Kernal
 	jsr	pushax 	 	; argc
 	jsr	pushax	 	; argv
 
+	cli
 	ldy	#4	 	; Argument size
        	jsr    	_main	 	; call the users code
 	jmp	$c1c3		; jump to GEOS MainLoop

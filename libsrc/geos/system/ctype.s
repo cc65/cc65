@@ -1,5 +1,6 @@
 ;
 ; Ullrich von Bassewitz, 02.06.1998
+; Maciej Witkowiak, 06.04.2002 
 ;
 ; Character specification table.
 ;
@@ -15,7 +16,7 @@
      	.export		__cdiff
 
 __cdiff:
-	.byte	$80
+	.byte	$e0
 
 
 ; The following 256 byte wide table specifies attributes for the isxxx type
@@ -146,33 +147,34 @@ __ctype:
 	.byte	$00	;  93/5d _____]_____
 	.byte	$00	;  94/5e _____^_____
 	.byte	$00	;  95/5f _UNDERLINE_
+
 	.byte	$00	;  96/60 _A`_grave__
-	.byte	$00	;  97/61 _A'_acute__
-	.byte	$00	;  98/62 _A^_circum_
-	.byte	$00	;  99/63 _A~_tilde__
-	.byte	$00	; 100/64 _A"_dieres_
-	.byte	$00	; 101/65 _A__ring___
-	.byte	$00	; 102/66 _AE________
-	.byte	$00	; 103/67 _C,cedilla_
-	.byte	$00	; 104/68 _E`_grave__
-	.byte	$00	; 105/69 _E'_acute__
-	.byte	$00	; 106/6a _E^_circum_
-	.byte	$00	; 107/6b _E"_dieres_
-	.byte	$00	; 108/6c _I`_grave__
-	.byte	$00	; 109/6d _I'_acute__
-	.byte	$00	; 110/6e _I^_circum_
-	.byte	$00	; 111/6f _I"_dieres_
-	.byte	$00	; 112/70 _D-_Eth_lr_
-	.byte	$00	; 113/71 _N~_tilde__
-	.byte	$00	; 114/72 _O`_grave__
-	.byte	$00	; 115/73 _O'_acute__
-	.byte	$00	; 116/74 _O^_circum_
-	.byte	$00	; 117/75 _O~_tilde__
-	.byte	$00	; 118/76 _O"_dieres_
-	.byte	$00	; 119/77 __multiply_
-	.byte	$00	; 120/78 _O/_slash__
-	.byte	$00	; 121/79 _U`_grave__
-	.byte	$00	; 122/7a _U'_acute__
+	.byte	$0a	;  97/61 _A'_acute__
+	.byte	$0a	;  98/62 _A^_circum_
+	.byte	$0a	;  99/63 _A~_tilde__
+	.byte	$0a	; 100/64 _A"_dieres_
+	.byte	$0a	; 101/65 _A__ring___
+	.byte	$0a	; 102/66 _AE________
+	.byte	$02	; 103/67 _C,cedilla_
+	.byte	$02	; 104/68 _E`_grave__
+	.byte	$02	; 105/69 _E'_acute__
+	.byte	$02	; 106/6a _E^_circum_
+	.byte	$02	; 107/6b _E"_dieres_
+	.byte	$02	; 108/6c _I`_grave__
+	.byte	$02	; 109/6d _I'_acute__
+	.byte	$02	; 110/6e _I^_circum_
+	.byte	$02	; 111/6f _I"_dieres_
+	.byte	$02	; 112/70 _D-_Eth_lr_
+	.byte	$02	; 113/71 _N~_tilde__
+	.byte	$02	; 114/72 _O`_grave__
+	.byte	$02	; 115/73 _O'_acute__
+	.byte	$02	; 116/74 _O^_circum_
+	.byte	$02	; 117/75 _O~_tilde__
+	.byte	$02	; 118/76 _O"_dieres_
+	.byte	$02	; 119/77 __multiply_
+	.byte	$02	; 120/78 _O/_slash__
+	.byte	$02	; 121/79 _U`_grave__
+	.byte	$02	; 122/7a _U'_acute__
 	.byte	$00	; 123/7b _U^_circum_
        	.byte	$00	; 124/7c _U"_dieres_
 	.byte	$00	; 125/7d _Y'_acute__
@@ -198,7 +200,7 @@ __ctype:
 	.byte	$00	; 144/90 _s_circle__
 	.byte	$00	; 145/91 __circle___
 	.byte	$00	; 146/92 ___pound___
-	.byte	$10	; 147/93 _CLS/check_
+	.byte	$00	; 147/93 _CLS/check_
 	.byte	$00	; 148/94 ____pi_____
 	.byte	$00	; 149/95 ____+/-____
 	.byte	$00	; 150/96 __divide___
@@ -245,32 +247,32 @@ __ctype:
 	.byte	$00	; 191/bf _?_invertd_
 
 	.byte	$00	; 192/c0 _____`_____
-	.byte	$0A	; 193/c1 _____A_____
-	.byte	$0A	; 194/c2 _____B_____
-	.byte	$0A	; 195/c3 _____C_____
-	.byte	$0A	; 196/c4 _____D_____
-	.byte	$0A	; 197/c5 _____E_____
-	.byte	$0A	; 198/c6 _____F_____
-	.byte	$02	; 199/c7 _____G_____
-	.byte	$02	; 200/c8 _____H_____
-	.byte	$02	; 201/c9 _____I_____
-	.byte	$02	; 202/ca _____J_____
-	.byte	$02	; 203/cb _____K_____
-	.byte	$02	; 204/cc _____L_____
-	.byte	$02	; 205/cd _____M_____
-	.byte	$02	; 206/ce _____N_____
-	.byte	$02	; 207/cf _____O_____
-	.byte	$02	; 208/d0 _____P_____
-	.byte	$02	; 209/d1 _____Q_____
-	.byte	$02	; 210/d2 _____R_____
-	.byte	$02	; 211/d3 _____S_____
-       	.byte	$02	; 212/d4 _____T_____
-	.byte	$02	; 213/d5 _____U_____
-	.byte	$02	; 214/d6 _____V_____
-	.byte	$02	; 215/d7 _____W_____
-	.byte	$02	; 216/d8 _____X_____
-	.byte	$02	; 217/d9 _____Y_____
-	.byte	$02	; 218/da _____Z_____
+	.byte	$00	; 193/c1 _____A_____
+	.byte	$00	; 194/c2 _____B_____
+	.byte	$00	; 195/c3 _____C_____
+	.byte	$00	; 196/c4 _____D_____
+	.byte	$00	; 197/c5 _____E_____
+	.byte	$00	; 198/c6 _____F_____
+	.byte	$00	; 199/c7 _____G_____
+	.byte	$00	; 200/c8 _____H_____
+	.byte	$00	; 201/c9 _____I_____
+	.byte	$00	; 202/ca _____J_____
+	.byte	$00	; 203/cb _____K_____
+	.byte	$00	; 204/cc _____L_____
+	.byte	$00	; 205/cd _____M_____
+	.byte	$00	; 206/ce _____N_____
+	.byte	$00	; 207/cf _____O_____
+	.byte	$00	; 208/d0 _____P_____
+	.byte	$00	; 209/d1 _____Q_____
+	.byte	$00	; 210/d2 _____R_____
+	.byte	$00	; 211/d3 _____S_____
+       	.byte	$00	; 212/d4 _____T_____
+	.byte	$00	; 213/d5 _____U_____
+	.byte	$00	; 214/d6 _____V_____
+	.byte	$00	; 215/d7 _____W_____
+	.byte	$00	; 216/d8 _____X_____
+	.byte	$00	; 217/d9 _____Y_____
+	.byte	$00	; 218/da _____Z_____
 	.byte	$00	; 219/db _____{_____
 	.byte	$00	; 220/dc _____|_____
 	.byte	$00	; 221/dd _____}_____

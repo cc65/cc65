@@ -8,6 +8,7 @@
 
       	.include 	"em-kernel.inc"
         .include        "em-error.inc"
+	.include	"c128.inc"
 
 
         .macpack        generic
@@ -210,15 +211,14 @@ transfer1:
 transfer:
         sty    	REU_COMMAND     ; Issue command
 
-        ldy 	$01       	; Save the value of the c64 control port...
-        tya          	  	;
-        ora 	#$03      	; Turn on lower 3 bits to bank out ROMs, I/O.
+        ldy    	MMU_CR		; Save the current MMU settings
+	lda	#MMU_CFG_RAM0  	; 
   	sei          	  	;
-        sta 	$01
+        sta	MMU_CR		; Enable RAM in bank #0
         lda     REU_TRIGGER     ; Don't change $FF00
         sta 	REU_TRIGGER     ; Start the transfer...
 
-        sty     $01             ; Restore the old configuration
+        sty     MMU_CR          ; Restore the old configuration
         cli
         rts
 

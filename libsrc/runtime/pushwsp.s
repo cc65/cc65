@@ -10,7 +10,7 @@
 	.macpack	generic
 
 pushw0sp:
-      	ldy	#2
+      	ldy	#3
 pushwysp:
 	lda	sp	       	; 3
        	sub    	#2     	       	; 4
@@ -28,4 +28,4 @@ pushwysp:
 	sta	(sp),y		; 5
 	rts
 
-				   
+

@@ -80,9 +80,9 @@ static void Parse (void)
     /* Parse until end of input */
     while (CurTok.Tok != TOK_CEOF) {
 
-	DeclSpec 	Spec;
+	DeclSpec  	Spec;
 	Declaration 	Decl;
-	int		NeedStorage;
+	int	  	NeedStorage;
 
 	/* Check for empty statements */
 	if (CurTok.Tok == TOK_SEMI) {
@@ -107,11 +107,13 @@ static void Parse (void)
 	ParseDeclSpec (&Spec, SC_EXTERN | SC_STATIC, T_INT);
 
 	/* Don't accept illegal storage classes */
-       	if ((Spec.StorageClass & SC_AUTO) != 0 &&
-            (Spec.StorageClass & SC_REGISTER) != 0) {
-	    Error ("Illegal storage class");
-	    Spec.StorageClass = SC_EXTERN | SC_STATIC;
-	}
+        if ((Spec.StorageClass & SC_TYPE) == 0) {
+            if ((Spec.StorageClass & SC_AUTO) != 0 ||
+                (Spec.StorageClass & SC_REGISTER) != 0) {
+                Error ("Illegal storage class");
+                Spec.StorageClass = SC_EXTERN | SC_STATIC;
+            }
+        }
 
 	/* Check if this is only a type declaration */
 	if (CurTok.Tok == TOK_SEMI) {

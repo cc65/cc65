@@ -9,9 +9,9 @@
 ;  */
 ;
 
-	.export		__systime
+        .export		__systime
 
-        .importzp       sreg
+        .include	"zeropage.inc"
 
 __systime:
         lda     #$FF

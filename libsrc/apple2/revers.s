@@ -1,8 +1,8 @@
-	;;
-	;; Kevin Ruland
-	;;
-	;; unsigned char __fastcall__ revers (unsigned char onoff)
-	;;
+;
+; Kevin Ruland
+;
+; unsigned char __fastcall__ revers (unsigned char onoff)
+;
 
 	.export		_revers
 
@@ -13,13 +13,11 @@ _revers:
 	and	#$FF		; Test for any bit
 	beq	normal		; Nothing set
 	lda	#~$3F		; Not Inverse
-normal:	
-	eor	#$FF		; Xor Normal
+normal:	eor	#$FF		; Xor Normal
 	sta	INVFLG
 	tya			; What was the old value?
 	eor	#$FF		; Normal = $FF, Inverse = $3F
-	beq	L2
+	beq	:+
 	lda	#$01
-L2:	
+:	ldx	#$00
 	rts
-

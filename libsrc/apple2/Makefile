@@ -57,21 +57,20 @@ OBJS=	_scrsize.o	\
         mainargs.o      \
         oserrlist.o     \
         randomize.o     \
-        rbascalc.o      \
         rcout.o         \
-     	read.o		\
+     	read.o          \
      	revers.o	\
         rhome.o         \
         rom.o           \
         rpread.o        \
         rrdkey.o        \
-        rsetwnd.o       \
+        rvtabz.o        \
         systime.o       \
         sysuname.o      \
         tgi_mode_table.o\
      	wherex.o       	\
-       	wherey.o	\
-     	write.o
+       	wherey.o        \
+	write.o
 
 #--------------------------------------------------------------------------
 # Drivers

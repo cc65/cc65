@@ -1,79 +1,104 @@
 ;
 ; Ullrich von Bassewitz, 06.08.1998
 ;
-; void cputcxy (unsigned char x, unsigned char y, char c);
-; void cputc (char c);
+; void __fastcall__ cputcxy (unsigned char x, unsigned char y, char c);
+; void __fastcall__ cputc (char c);
 ;
 
-	.constructor	initconio
-   	.export		_cputcxy, _cputc
-	.export		_gotoxy, cputdirect
-	.export		newline, putchar
+        .ifdef	__APPLE2ENH__
+        .constructor	initconio
+        .endif
+        .export		_cputcxy, _cputc
+        .export		_gotoxy, cputdirect
+        .export		newline, putchar
 
-	.import		popa, SETWND, BASCALC
+        .import		popa, VTABZ
 
-	.include	"apple2.inc"
+        .include	"apple2.inc"
 
-; ------------------------------------------------------------------------
-; Initialization
+        .segment	"INIT"
 
-.segment        "INIT"
-
+        .ifdef	__APPLE2ENH__
 initconio:
-	lda	#$FF		; Normal character display mode
-	sta	INVFLG
-	lda	#$00
-       	jmp	SETWND		; Reset text window to full screen
+        sta	SETALTCHAR	; Switch in alternate charset
+        rts
+        .endif
 
-; ------------------------------------------------------------------------
+        .code
+
 ; Plot a character - also used as internal function
 
-.code
-
 _cputcxy:
-     	pha			; Save C
-     	jsr	popa		; Get Y
-     	jsr	_gotoxy
-     	pla			; Restore C
+        pha			; Save C
+        jsr	popa		; Get Y
+        jsr	_gotoxy
+        pla			; Restore C
 
 _cputc:
-     	cmp	#$0D		; Test for \r = carrage return
-     	beq	left
-     	cmp	#$0A		; Test for \n = line feed
-     	beq	newline
-     	ora	#$80		; Turn on high bit
-     	cmp	#$E0		; Test for lowercase
-     	bcc	cputdirect
-     	and	#$DF		; Convert to uppercase
+        cmp	#$0D		; Test for \r = carrage return
+        beq	left
+        cmp	#$0A		; Test for \n = line feed
+        beq	newline
+        ora	#$80		; Turn on high bit
+        .ifndef	__APPLE2ENH__
+        cmp	#$E0		; Test for lowercase
+        bcc	cputdirect
+        and	#$DF		; Convert to uppercase
+        .endif
 
 cputdirect:
-     	jsr	putchar
-     	inc	CH		; Bump to next column
-     	lda	CH
-     	cmp	#40
-     	bne	done
-left:	lda	#$00		; Goto left edge of screen
-     	sta	CH
-done:	rts
+        jsr	putchar
+        inc	CH		; Bump to next column
+        lda	CH
+        cmp	WNDWDTH
+        bcc	:+
+left:   lda	#$00		; Goto left edge of screen
+        sta	CH
+:       rts
 
 newline:
-     	inc	CV
-     	lda	CV
-     	cmp	#24
-     	bne	:+
-     	lda	#$00
-     	sta	CV
-:      	jmp     BASCALC
-
+        inc	CV		; Bump to next line
+        lda	CV
+        cmp	WNDBTM
+        bcc	:+
+        lda	WNDTOP		; Goto top of screen
+        sta	CV
+:       jmp	VTABZ
+                
 putchar:
-     	and	INVFLG		; Apply normal, inverse, flash
-     	ldy	CH
-     	sta	(BASL),Y
-     	rts
+        .ifdef	__APPLE2ENH__
+        ldy	INVFLG
+        cpy	#$FF		; Normal character display mode?
+        beq	put
+        cmp	#$E0		; Lowercase?
+        bcc	mask
+        and	#$7F		; Inverse lowercase
+        bra	put
+        .endif
+mask:   and	INVFLG		; Apply normal, inverse, flash
+put:    ldy	CH
+        .ifdef	__APPLE2ENH__
+        bit	RD80VID 	; In 80 column mode?
+        bpl	col40		; No, in 40 cols
+        pha
+        tya
+        lsr			; Div by 2
+        tay
+        pla
+        bcs	col40		; Odd cols go in 40 col memory
+        bit	HISCR
+        sta	(BASL),Y
+        bit	LOWSCR
+        rts
+        .endif
+col40:  sta	(BASL),Y
+        rts
 
 _gotoxy:
-     	sta	CV		; Store Y
-     	jsr	BASCALC
-     	jsr	popa		; Get X
-     	sta	CH		; Store X
-     	rts
+        clc
+        adc	WNDTOP
+        sta	CV		; Store Y
+        jsr	VTABZ
+        jsr	popa		; Get X
+        sta	CH		; Store X
+        rts

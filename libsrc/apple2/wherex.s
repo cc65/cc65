@@ -1,13 +1,14 @@
+;
+; Kevin Ruland
+;
+; unsigned char wherex (void);
+;
 
-	;; Keivn Ruland
-	;;
-	;; unsigned char wherex( void );
+        .export	       	_wherex
 
-	.export	       	_wherex
-
-	.include	"apple2.inc"
+        .include	"apple2.inc"
 
 _wherex:
-	lda    	CH
+        lda    	CH
         ldx     #$00
-	rts
+        rts

@@ -1,18 +1,17 @@
-	;;
-	;; Kevin Ruland
-	;;
-	;; int kbhit (void);
-	;;
+;
+; Kevin Ruland
+; Ullrich von Bassewitz, 2005-03-25
+;
+; unsigned char kbhit (void);
+;
 
-	.export	_kbhit
+        .export	_kbhit
 
-	.import	return0, return1
-	
-	.include "apple2.inc"
+        .include "apple2.inc"
 
-_kbhit:
-	bit	KBD		; Reading keyboard checks for keypress
-	bmi	L1		; if KBD > 127 key was pressed
-	jmp	return0
-L1:
-	jmp	return1
+_kbhit: lda     KBD             ; Reading KBD checks for keypress
+        rol                     ; if high bit is set, key was pressed
+        lda     #$00
+        tax
+        rol
+        rts

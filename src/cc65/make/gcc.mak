@@ -12,7 +12,7 @@ EXE  	= cc65
 # Library directories
 COMMON	= ../common
 
-# The compiler library search path. Default is "/usr/lib/cc65/include/" if
+# The compiler include search path. Default is "/usr/lib/cc65/include/" if
 # nothing is defined. You may use CC65_INC=foo on the command line to override it.
 CC65_INC = \"/usr/lib/cc65/include/\"
 

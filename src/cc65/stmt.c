@@ -415,9 +415,9 @@ static void CascadeSwitch (ExprDesc* Expr)
 		    /* Emit a compare */
 		    g_cmp (Flags, Val);
 
-	    	    /* If another case follows after the colon (which is 
+	    	    /* If another case follows after the colon (which is
 		     * currently pending and cannot be skipped since otherwise
-		     * the debug infos will get wrong), we will jump to the 
+		     * the debug infos will get wrong), we will jump to the
 		     * code if the condition is true.
 	    	     */
        	    	    if (NextTok.Tok == TOK_CASE) {
@@ -443,7 +443,7 @@ static void CascadeSwitch (ExprDesc* Expr)
 		    NextToken ();
 
 		    /* Handle the pathologic case: DEFAULT followed by CASE */
-		    if (CurTok.Tok == TOK_CASE) {
+       	       	    if (NextTok.Tok == TOK_CASE) {
 		  	if (CodeLab == 0) {
 		   	    CodeLab = GetLocalLabel ();
 		  	}
@@ -471,7 +471,7 @@ static void CascadeSwitch (ExprDesc* Expr)
 	if (CurTok.Tok != TOK_RCURLY) {
        	    HaveBreak = Statement (0);
 	}
-    }
+    }			    
 
     /* Check if we have any labels */
     if (lcount == 0 && !HaveDefault) {

@@ -1762,7 +1762,7 @@ void HandlePseudo (void)
     /* Safety check */
     if (PSEUDO_COUNT != (TOK_LASTPSEUDO - TOK_FIRSTPSEUDO + 1)) {
 	Internal ("Pseudo mismatch: PSEUDO_COUNT = %u, actual count = %u\n",
-		  PSEUDO_COUNT, TOK_LASTPSEUDO - TOK_FIRSTPSEUDO + 1);
+       	       	  (unsigned) PSEUDO_COUNT, TOK_LASTPSEUDO - TOK_FIRSTPSEUDO + 1);
     }
     CHECK (Index < PSEUDO_COUNT);
 

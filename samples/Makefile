@@ -18,7 +18,7 @@ C1541  	= c1541
 
 .c.o:
 	@echo $<
-	@$(CC) -g -Oirs -t $(SYS) -I../include/ $<
+	@$(CC) -Oirs --codesize 500 -g -t $(SYS) -I../include/ $<
 	@$(AS) $(basename $<).s
 
 .s.o:

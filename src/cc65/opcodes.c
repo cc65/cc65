@@ -63,21 +63,21 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	0,     	       	                        /* size */
        	REG_A, 	       	                        /* use */
        	REG_A, 	       	                        /* chg */
-	OF_SETF			 		/* flags */
+  	OF_SETF			 		/* flags */
     },
     {   OP65_AND,      	                        /* opcode */
        	"and", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_A, 	       	                        /* use */
        	REG_A, 	       	                        /* chg */
-	OF_SETF			 		/* flags */
+  	OF_SETF			 		/* flags */
     },
     {   OP65_ASL,      	                        /* opcode */
        	"asl", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,     	                        /* chg */
-	OF_SETF			 		/* flags */
+       	OF_SETF	| OF_NOIMP                      /* flags */
     },
     {   OP65_BCC,      	                        /* opcode */
        	"bcc", 	       	                        /* mnemonic */
@@ -154,7 +154,7 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	2,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_CBRA			 		/* flags */
+	OF_CBRA		  	 		/* flags */
     },
     {   OP65_CLC,      	                        /* opcode */
        	"clc", 	       	                        /* mnemonic */
@@ -217,7 +217,7 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	0,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,      	                        /* chg */
-       	OF_SETF			 		/* flags */
+       	OF_SETF	| OF_NOIMP	 		/* flags */
     },
     {   OP65_DEX,      	                        /* opcode */
        	"dex", 	       	                        /* mnemonic */
@@ -238,7 +238,7 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	0,     	       	                        /* size */
        	REG_A, 	       	                        /* use */
        	REG_A, 	       	                        /* chg */
-       	OF_SETF			 		/* flags */
+       	OF_SETF		  	 		/* flags */
     },
     {   OP65_INA,      	                        /* opcode */
        	"ina", 	       	                        /* mnemonic */
@@ -252,7 +252,7 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	0,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_SETF			 		/* flags */
+	OF_SETF	| OF_NOIMP                      /* flags */
     },
     {   OP65_INX,      	                        /* opcode */
        	"inx", 	       	                        /* mnemonic */
@@ -329,7 +329,7 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	5,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_CBRA | OF_LBRA	 		/* flags */
+	OF_CBRA | OF_LBRA 	 		/* flags */
     },
     {   OP65_JVS,      	                        /* opcode */
        	"jvs", 	       	                        /* mnemonic */
@@ -364,7 +364,7 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	0,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_SETF	       	       	       	       	/* flags */
+	OF_SETF | OF_NOIMP                      /* flags */
     },
     {   OP65_NOP,      	                        /* opcode */
        	"nop", 	       	                        /* mnemonic */
@@ -420,7 +420,7 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_NONE			 		/* flags */
+  	OF_NONE			 		/* flags */
     },
     {   OP65_PLX,      	                        /* opcode */
        	"plx", 	       	                        /* mnemonic */
@@ -441,14 +441,14 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	0,     	       	                        /* size */
        	REG_NONE,     	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_SETF	 		 		/* flags */
+	OF_SETF	| OF_NOIMP    	       	       	/* flags */
     },
     {   OP65_ROR,      	                        /* opcode */
        	"ror", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_NONE,     	                        /* use */
        	REG_NONE,     	                        /* chg */
-	OF_SETF	 		 		/* flags */
+	OF_SETF	| OF_NOIMP  	 		/* flags */
     },
     /* Mark RTI as "uses all registers but doesn't change them", so the
      * optimizer won't remove preceeding loads.
@@ -458,70 +458,70 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	1,     	       	                        /* size */
        	REG_AXY,      	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_RET 			 		/* flags */
+	OF_RET 		  	 		/* flags */
     },
     {   OP65_RTS,      	                        /* opcode */
        	"rts", 	       	                        /* mnemonic */
        	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_RET 			 		/* flags */
+	OF_RET 		  	 		/* flags */
     },
     {   OP65_SBC,      	                        /* opcode */
        	"sbc", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_A, 	       	                        /* use */
        	REG_A, 	       	                        /* chg */
-	OF_SETF			 		/* flags */
+	OF_SETF		  	 		/* flags */
     },
     {   OP65_SEC,      	                        /* opcode */
        	"sec", 	       	                        /* mnemonic */
        	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_NONE			 		/* flags */
+	OF_NONE		  	 		/* flags */
     },
     {   OP65_SED,      	                        /* opcode */
        	"sed", 	       	                        /* mnemonic */
        	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_NONE			 		/* flags */
+	OF_NONE		  	 		/* flags */
     },
     {   OP65_SEI,      	                        /* opcode */
        	"sei", 	       	                        /* mnemonic */
        	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_NONE			 		/* flags */
+	OF_NONE		  	 		/* flags */
     },
     {   OP65_STA,      	                        /* opcode */
        	"sta", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_A, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_STORE		 		/* flags */
+	OF_STORE	  	 		/* flags */
     },
     {   OP65_STX,      	                        /* opcode */
        	"stx", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_X, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_STORE		 		/* flags */
+	OF_STORE	  	 		/* flags */
     },
     {   OP65_STY,      	                        /* opcode */
        	"sty", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_Y, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_STORE   		 		/* flags */
+	OF_STORE   	  	 		/* flags */
     },
     {   OP65_STZ,      	                        /* opcode */
        	"stz", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_NONE,    	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_STORE   		 		/* flags */
+	OF_STORE   	  	 		/* flags */
     },
     {   OP65_TAX,      	                        /* opcode */
        	"tax", 	       	                        /* mnemonic */
@@ -549,7 +549,7 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	0,     	       	                        /* size */
        	REG_A, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_SETF			 		/* flags */
+	OF_SETF		  	 		/* flags */
     },
     {   OP65_TSX,      	                        /* opcode */
        	"tsx", 	       	                        /* mnemonic */
@@ -570,7 +570,7 @@ const OPCDesc OPCTable[OP65_COUNT] = {
        	1,     	       	                        /* size */
        	REG_X, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_XFR			 		/* flags */
+	OF_XFR		  	 		/* flags */
     },
     {   OP65_TYA,      	                        /* opcode */
        	"tya", 	       	                        /* mnemonic */

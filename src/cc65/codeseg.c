@@ -289,8 +289,12 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
     switch (*L) {
 
 	case '\0':
-	    /* Implicit */
-	    AM = AM65_IMP;
+	    /* Implicit or accu */
+            if (OPC->Info & OF_NOIMP) {
+                AM = AM65_ACC;
+            } else {
+                AM = AM65_IMP;
+            }
 	    break;
 
 	case '#':

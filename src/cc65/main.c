@@ -101,7 +101,7 @@ static void Usage (void)
        	     "  -A\t\t\tStrict ANSI mode\n"
        	     "  -Cl\t\t\tMake local variables static\n"
        	     "  -Dsym[=defn]\t\tDefine a symbol\n"
-       	     "  -I path\t\tSet an include directory search path\n"
+       	     "  -I dir\t\tSet an include directory search path\n"
        	     "  -O\t\t\tOptimize code\n"
        	     "  -Oi\t\t\tOptimize code, inline more code\n"
        	     "  -Or\t\t\tEnable register variables\n"

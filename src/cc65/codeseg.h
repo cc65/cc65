@@ -107,6 +107,11 @@ void DelCodeEntry (CodeSeg* S, unsigned Index);
  * if the reference count drops to zero.
  */
 
+void DelCodeEntries (CodeSeg* S, unsigned Start, unsigned Count);
+/* Delete a range of code entries. This includes removing references to labels,
+ * labels attached to the entries and so on.
+ */
+
 #if defined(HAVE_INLINE)
 INLINE struct CodeEntry* GetCodeEntry (CodeSeg* S, unsigned Index)
 /* Get an entry from the given code segment */
@@ -123,7 +128,7 @@ struct CodeEntry* GetNextCodeEntry (CodeSeg* S, unsigned Index);
  */
 
 int GetCodeEntries (CodeSeg* S, struct CodeEntry** List,
-       		    unsigned Start, unsigned Count);
+       	 	    unsigned Start, unsigned Count);
 /* Get Count code entries into List starting at index start. Return true if
  * we got the lines, return false if not enough lines were available.
  */

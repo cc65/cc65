@@ -181,7 +181,7 @@ static const char* ReadToken (const char* L, const char* Term,
     /* Return the updated line pointer */
     return L;
 }
-	
+
 
 
 static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
@@ -523,6 +523,21 @@ void DelCodeEntry (CodeSeg* S, unsigned Index)
 
     /* Delete the instruction itself */
     FreeCodeEntry (E);
+}
+
+
+
+void DelCodeEntries (CodeSeg* S, unsigned Start, unsigned Count)
+/* Delete a range of code entries. This includes removing references to labels,
+ * labels attached to the entries and so on.
+ */
+{
+    /* Start deleting the entries from the rear, because this involves less
+     * memory moving.
+     */
+    while (Count--) {
+	DelCodeEntry (S, Start + Count);
+    }
 }
 
 

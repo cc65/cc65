@@ -111,7 +111,7 @@ cbm610lib:
 # GEOS on the C64/128
 
 geoslib:
-	CC=$(CC) \
+	CC=../$(CC) \
 	AS=../$(AS) \
 	AR=../$(AR) \
 	CFLAGS="-Osir -g -t geos -I../../include" \

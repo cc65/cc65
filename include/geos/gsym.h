@@ -69,37 +69,6 @@
 #define	r15		*(unsigned int*)0x20
 #define	r15L		*(char*)0x20
 #define	r15H		*(char*)0x21
-/* WARNING - these are used by C as temporary registers! */
-#define	a0		*(unsigned int*)0xfb
-#define	a0L		*(char*)0xfb
-#define	a0H		*(char*)0xfc
-#define	a1		*(unsigned int*)0xfd
-#define	a1L		*(char*)0xfd
-#define	a1H		*(char*)0xfe
-#define	a2		*(unsigned int*)0x70
-#define	a2L		*(char*)0x70
-#define	a2H		*(char*)0x71
-#define	a3		*(unsigned int*)0x72
-#define	a3L		*(char*)0x72
-#define	a3H		*(char*)0x73
-#define	a4		*(unsigned int*)0x74
-#define	a4L		*(char*)0x74
-#define	a4H		*(char*)0x75
-#define	a5		*(unsigned int*)0x76
-#define	a5L		*(char*)0x76
-#define	a5H		*(char*)0x77
-#define	a6		*(unsigned int*)0x78
-#define	a6L		*(char*)0x78
-#define	a6H		*(char*)0x79
-#define	a7		*(unsigned int*)0x7a
-#define	a7L		*(char*)0x7a
-#define	a7H		*(char*)0x7b
-#define	a8		*(unsigned int*)0x7c
-#define	a8L		*(char*)0x7c
-#define	a8H		*(char*)0x7d
-#define	a9		*(unsigned int*)0x7e
-#define	a9L		*(char*)0x7e
-#define	a9H		*(char*)0x7f
 
 #define	curPattern	*(unsigned int*)0x22
 #define	string		*(unsigned int*)0x24
@@ -107,15 +76,12 @@
 #define	currentMode	*(char*)0x2e
 #define	dispBufferOn	*(char*)0x2f
 #define	mouseOn		*(char*)0x30
-#define	RAM_64K		*(char*)0x30
 #define	msePicPtr	*(unsigned int*)0x31
 #define curWindow	(*(struct window*)0x33)
 #define	pressFlag	*(char*)0x39
 #define mousePos	(*(struct pixel*)0x3a)
 #define	returnAddress	*(unsigned int*)0x3d
 #define	graphMode	*(char*)0x3f
-/*#define	TURBO_DD00	*(char*)0x8e
-  #define	TURBO_DD00_CPY	*(char*)0x8f*/
 #define	STATUS		*(char*)0x90
 #define	curDevice	*(char*)0xba
 
@@ -200,9 +166,6 @@
 #define	firstBoot	*(char*)0x88c5
 #define	curType		*(char*)0x88c6
 #define	ramBase		*(char*)0x88c7
-/*Original:
-  #define	inputDevName	*(char*)0x88cb
-  #define	memBase		*(char*)0x88cf*/
 #define inputDevName	((nameBuf)0x88cb)
 #define	DrCCurDkNm	((nameBuf)0x88dc)
 #define	DrDCurDkNm	((nameBuf)0x88ee)

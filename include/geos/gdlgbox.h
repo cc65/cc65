@@ -9,18 +9,18 @@
 #ifndef	_GDLGBOX_H
 #define _GDLGBOX_H
 
-char __fastcall__ DoDlgBox(char *dboxstring);
+char __fastcall__ DoDlgBox(const char *dboxstring);
 char __fastcall__ RstrFrmDialogue(void);
 
 /* These are custom, predefined dialog boxes, I'm sure you'll find them usable
    Most of them show 2 lines of text 						*/
 
-char __fastcall__ DlgBoxYesNo(char *line1, char *line2);
-char __fastcall__ DlgBoxOkCancel(char *line1, char *line2);
-void __fastcall__ DlgBoxOk(char *line1, char *line2);
+char __fastcall__ DlgBoxYesNo(const char *line1, const char *line2);
+char __fastcall__ DlgBoxOkCancel(const char *line1, const char *line2);
+void __fastcall__ DlgBoxOk(const char *line1, const char *line2);
 char __fastcall__ DlgBoxGetString(char *myString, char strLength,
-				  char *line1, char *line2);
-char __fastcall__ DlgBoxFileSelect(char *classtxt, char ftype,
+				  const char *line1, const char *line2);
+char __fastcall__ DlgBoxFileSelect(const char *classtxt, char ftype,
 				   char *fname);
 
 /* Now the command string type */

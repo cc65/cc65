@@ -2,7 +2,7 @@
   GEOS functions from disk driver
 
   ported to small C on 21.12.1999
-  by Maciej 'YTM/Alliance' Witkowiak
+  by Maciej 'YTM/Elysium' Witkowiak
 */
 
 #ifndef	_GDISK_H
@@ -16,10 +16,10 @@ char __fastcall__ ReadBuff(struct tr_se *myTrSe);
 char __fastcall__ WriteBuff(struct tr_se *myTrSe);
 
 char __fastcall__ GetBlock(struct tr_se *myTrSe, char *buffer);
-char __fastcall__ PutBlock(struct tr_se *myTrSe, char *buffer);
+char __fastcall__ PutBlock(struct tr_se *myTrSe, const char *buffer);
 char __fastcall__ ReadBlock(struct tr_se *myTrSe, char *buffer);
-char __fastcall__ WriteBlock(struct tr_se *myTrSe, char *buffer);
-char __fastcall__ VerWriteBlock(struct tr_se *myTrSe, char *buffer);
+char __fastcall__ WriteBlock(struct tr_se *myTrSe, const char *buffer);
+char __fastcall__ VerWriteBlock(struct tr_se *myTrSe, const char *buffer);
 
 int __fastcall__ CalcBlksFree(void);
 char __fastcall__ ChkDkGEOS(void);

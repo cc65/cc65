@@ -2,7 +2,7 @@
   GEOS mouse and sprite functions
 
   ported to small C on 27.10.1999
-  by Maciej 'YTM/Alliance' Witkowiak
+  by Maciej 'YTM/Elysium' Witkowiak
 */
 
 #ifndef	_GSPRITE_H
@@ -14,7 +14,7 @@ void __fastcall__ MouseUp(void);
 void __fastcall__ MouseOff(void);
 char __fastcall__ IsMseInRegion(struct window *region);
 
-void __fastcall__ DrawSprite(char spritenum, char *spritepic);
+void __fastcall__ DrawSprite(char spritenum, const char *spritepic);
 void __fastcall__ PosSprite(char spritenum, struct pixel *position);
 void __fastcall__ EnablSprite(char spritenum);
 void __fastcall__ DisablSprite(char spritenum);

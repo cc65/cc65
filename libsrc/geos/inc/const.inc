@@ -1,6 +1,6 @@
 
 ;GeosConst - various system constans sorted by function
-;reassembled by Maciej 'YTM/Alliance' Witkowiak
+;reassembled by Maciej 'YTM/Elysium' Witkowiak
 ;4-2-99, 18-3-99
 
 NULL			=	0
@@ -306,6 +306,7 @@ O_GHP_FNAME		=	117
 O_GHINFO_TXT		=	$a0
 
 ; values for CPU_DATA - C64 memory config
+RAM_64K 		=	$30     ;64K RAM
 IO_IN			=	$35	;60K RAM, 4K I/O space in
 KRNL_IO_IN		=	$36	;kernal and I/O mapped into memory
 KRNL_BAS_IO_IN		=	$37	;kernal, I/O and basic mapped into memory

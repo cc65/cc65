@@ -1,6 +1,6 @@
 
 ;GEOS variable memory locations sorted by address
-;reassembled by Maciej 'YTM/Alliance' Witkowiak
+;reassembled by Maciej 'YTM/Elysium' Witkowiak
 ;4-2-99
 
 zpage		=	$0000
@@ -101,7 +101,6 @@ cardDataPntr		=	$2c
 currentMode		=	$2e
 dispBufferOn		=	$2f
 mouseOn 		=	$30
-RAM_64K 		=	$30
 msePicPtr		=	$31
 windowTop		=	$33
 windowBottom		=	$34

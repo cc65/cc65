@@ -261,9 +261,9 @@ function.
 <item><ref id="atexit" name="atexit">
 <item><ref id="atoi" name="atoi">
 <item><ref id="atol" name="atol">
-<!-- <item><ref id="bsearch" name="bsearch"> -->
+<item><ref id="bsearch" name="bsearch">
 <item><ref id="calloc" name="calloc">
-<!-- <item><ref id="div" name="div"> -->
+<item><ref id="div" name="div">
 <item><ref id="exit" name="exit">
 <item><ref id="free" name="free">
 <item><ref id="getenv" name="getenv">
@@ -271,7 +271,7 @@ function.
 <item><ref id="labs" name="labs">
 <item><ref id="ltoa" name="ltoa">
 <item><ref id="malloc" name="malloc">
-<!-- <item><ref id="qsort" name="qsort"> -->
+<item><ref id="qsort" name="qsort">
 <item><ref id="rand" name="rand">
 <item><ref id="realloc" name="realloc">
 <item><ref id="srand" name="srand">
@@ -865,6 +865,37 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>bsearch<label id="bsearch"><p>
+
+<quote>
+<descrip>
+<tag/Function/Do a binary search in a sorted array.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void* __fastcall__ bsearch (const void* key,
+const void* base, size_t n, size_t size,
+int (*cmp) (const void*, const void*));/
+<tag/Description/<tt/bsearch/ searches a sorted array for a member that
+matches the one pointed to by <tt/key/. <tt/base/ is the address of the array,
+<tt/n/ is the number of elements, <tt/size/ the size of an element and <tt/cmp/
+the function used to compare the members against the key. The function returns
+a pointer to the member found, or <tt/NULL/ if there was no match.
+<tag/Limits/
+<itemize>
+<item>The contents of the array must be sorted in ascending order according to
+the compare function given.
+<item>If there are multiple members that match the key, the function will
+return one of the members.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="qsort" name="qsort">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>bzero<label id="bzero"><p>
 
 <quote>
@@ -1201,6 +1232,28 @@ used in presence of a prototype.
 <ref id="chline" name="chline">,
 <ref id="chlinexy" name="chlinexy">,
 <ref id="cvline" name="cvline">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>div<label id="div"><p>
+
+<quote>
+<descrip>
+<tag/Function/Divide two ints and return quotient and remainder.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/div_t __fastcall__ div (int numer, int denom);/
+<tag/Description/<tt/div/ divides <tt/numer/ by <tt/denom/ and returns the
+quotient and remainder in a <tt/div_t/ structure.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+ldiv
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2397,6 +2450,33 @@ cc65 allows to pass this argument, it is ignored.
 <tag/See also/
 <ref id="close" name="close">,
 <ref id="creat" name="creat">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>qsort<label id="qsort"><p>
+
+<quote>
+<descrip>
+<tag/Function/Sort an array.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void __fastcall__ qsort (void* base, size_t count,
+size_t size, int (*compare) (const void*, const void*));/
+<tag/Description/<tt/qsort/ sorts an array according to a given compare
+function <tt/compare/. <tt/base/ is the address of the array, <tt/count/
+is the number of elements, <tt/size/ the size of an element and <tt/compare/
+the function used to compare the members.
+<tag/Limits/
+<itemize>
+<item>If there are multiple members with the same key, the order after calling
+the function is undefined.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="bsearch" name="bsearch">
 <tag/Example/None.
 </descrip>
 </quote>

@@ -22,6 +22,7 @@ OBJS =  condasm.o	\
 	incpath.o      	\
         instr.o	       	\
 	istack.o       	\
+	lineinfo.o	\
 	listing.o      	\
 	macpack.o      	\
        	macro.o	       	\

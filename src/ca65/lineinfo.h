@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   filetab.h				     */
+/*				  lineinfo.h                                 */
 /*                                                                           */
-/*			   Input file table for ca65			     */
+/*			Source file line info structure                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
+/* (C) 2001      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,39 +33,58 @@
 
 
 
-#ifndef FILETAB_H
-#define	FILETAB_H
+#ifndef LINEINFO_H
+#define LINEINFO_H
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code			   	     */
+/*				     Data                                    */
 /*****************************************************************************/
 
 
 
-const char* GetFileName (unsigned Name);
-/* Get the name of a file where the name index is known */
+/* The LineInfo structure is shared between several fragments, so we need a
+ * reference counter.
+ */
+typedef struct LineInfo LineInfo;
+struct LineInfo {
+    LineInfo*       Next;                 /* Pointer to next info in list */
+    unsigned   	    Usage;                /* Usage counter */
+    unsigned long   LineNum;              /* Line number */
+    unsigned        FileIndex;            /* Index of input file */
+    unsigned        Index;                /* Index */
+};
 
-unsigned GetFileIndex (const char* Name);
-/* Return the file index for the given file name. */
+/* Linked list of all line infos */
+extern LineInfo* LineInfoRoot;
+extern LineInfo* LineInfoLast;
+extern unsigned  LineInfoCount;	  
+extern unsigned  LineInfoValid;           /* Valid, that is, used entries */
 
-unsigned AddFile (const char* Name, unsigned long Size, unsigned long MTime);
-/* Add a new file to the list of input files. Return the index of the file in
- * the table.
+/* Global pointer to last line info or NULL if not active */
+extern LineInfo* CurLineInfo;
+
+
+
+/*****************************************************************************/
+/*     	       	      	      	     Code			     	     */
+/*****************************************************************************/
+
+
+
+LineInfo* UseLineInfo (LineInfo* LI);
+/* Increase the reference count of the given line info and return it. The
+ * function will gracefully accept NULL pointers and do nothing in this case.
  */
 
-void WriteFiles (void);
-/* Write the list of input files to the object file */
+void GenLineInfo (unsigned FileIndex, unsigned long LineNum);
+/* Generate a new line info */
 
 
 
-
-/* End of filetab.h */
-
+/* End of lineinfo.h */
 #endif
-
-
 
 
 

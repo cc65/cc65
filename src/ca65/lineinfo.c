@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   filetab.h				     */
+/*				  lineinfo.c                                 */
 /*                                                                           */
-/*			   Input file table for ca65			     */
+/*			Source file line info structure                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
+/* (C) 2001      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,39 +33,103 @@
 
 
 
-#ifndef FILETAB_H
-#define	FILETAB_H
+/* common */
+#include "coll.h"
+#include "xmalloc.h"
+
+/* ca65 */
+#include "lineinfo.h"
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code			   	     */
+/*  				     Data                                    */
 /*****************************************************************************/
 
 
 
-const char* GetFileName (unsigned Name);
-/* Get the name of a file where the name index is known */
+/* Linked list of all line infos */
+LineInfo* LineInfoRoot  = 0;
+LineInfo* LineInfoLast  = 0;
+unsigned  LineInfoCount = 0;
+unsigned  LineInfoValid = 0;              /* Valid, that is, used entries */
 
-unsigned GetFileIndex (const char* Name);
-/* Return the file index for the given file name. */
+/* Static pointer to last line info or NULL if not active */
+LineInfo* CurLineInfo   = 0;
 
-unsigned AddFile (const char* Name, unsigned long Size, unsigned long MTime);
-/* Add a new file to the list of input files. Return the index of the file in
- * the table.
+
+
+/*****************************************************************************/
+/*     	       	      	      	     Code			     	     */
+/*****************************************************************************/
+
+
+
+static LineInfo* NewLineInfo (unsigned FileIndex, unsigned long LineNum)
+/* Create and return a new line info. Usage will be zero. */
+{
+    /* Allocate memory */
+    LineInfo* LI = xmalloc (sizeof (LineInfo));
+
+    /* Initialize the fields */
+    LI->Next      = 0;
+    LI->Usage     = 0;
+    LI->LineNum   = LineNum;
+    LI->FileIndex = FileIndex;
+    LI->Index     = 0;           /* Currently invalid */
+
+    /* Insert this structure into the line info list */
+    if (LineInfoLast == 0) {
+	LineInfoRoot = LI;
+    } else {
+	LineInfoLast->Next = LI;
+    }
+    LineInfoLast = LI;
+
+    /* Count the line infos */
+    ++LineInfoCount;
+
+    /* Return the new struct */
+    return LI;
+}
+
+
+
+LineInfo* UseLineInfo (LineInfo* LI)
+/* Increase the reference count of the given line info and return it. The
+ * function will gracefully accept NULL pointers and do nothing in this case.
  */
-
-void WriteFiles (void);
-/* Write the list of input files to the object file */
-
-
-
-
-/* End of filetab.h */
-
-#endif
+{
+    CHECK (LI != 0);
+    ++LI->Usage;
+    return LI;
+}
 
 
+
+void GenLineInfo (unsigned FileIndex, unsigned long LineNum)
+/* Generate a new line info */
+{
+    /* Create a new line info and make it current */
+    CurLineInfo = NewLineInfo (FileIndex, LineNum);
+}
+
+
+
+void MakeLineInfoIndex (void)
+/* Walk over the line info list and make an index of all entries ignoring
+ * those with a usage count of zero.
+ */
+{
+    LineInfo* LI  = LineInfoRoot;
+    LineInfoValid = 0;
+    while (LI) {
+	if (LI->Usage) {
+	    LI->Index = LineInfoValid++;
+	}
+	LI = LI->Next;
+    }
+}
 
 
 

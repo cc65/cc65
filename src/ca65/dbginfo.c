@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*		 		   dbginfo.c				     */
+/*		     		   dbginfo.c				     */
 /*                                                                           */
-/*		 	   Handle the .dbg commands			     */
+/*		     	   Handle the .dbg commands			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,6 +39,7 @@
 #include "error.h"
 #include "expr.h"
 #include "filetab.h"
+#include "lineinfo.h"
 #include "nexttok.h"
 #include "dbginfo.h"
 
@@ -111,8 +112,8 @@ void DbgInfoLine (void)
 	return;
     }
 
-    /* ## Remember the line info */
-
+    /* Remember the line info */
+    GenLineInfo (Index, LineNum);
 }
 
 

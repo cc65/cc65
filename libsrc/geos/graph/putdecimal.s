@@ -1,10 +1,10 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 30.10.99
+; 30.10.99, 17.8.2003
 
-; void PutDecimal         (char style, int value, char y, int x);
+; void PutDecimal         (char style, unsigned value, char y, int x);
 
 	    .import popa, popax
 	    .import getintcharint

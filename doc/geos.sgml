@@ -340,7 +340,7 @@ See <tt/ggraph.h/ for list of tokens that you can also place in the string - lik
 
 <sect3>PutDecimal
 <p>
-<tt/void PutDecimal (char parameter, int value, char y, unsigned x)/
+<tt/void PutDecimal (char parameter, unsigned value, char y, unsigned x)/
 <p>
 This function converts <tt/value/ to its decimal representation and outputs it to the screen.
 The <tt/parameter/ is the field width in pixels (range 1-31) and mode bits. Depending on them

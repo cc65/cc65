@@ -275,7 +275,7 @@ zap:	clean
 	@for i in cbm common conio dbg em joystick runtime tgi $(ALLTARGETS); do\
 	   $(MAKE) -C $$i zap;     	    	       	      	   		\
 	done
-	@rm -f *.o *.emd *.joy *.lib *.tgi
+	@$(RM) *.o *.emd *.joy *.lib *.tgi
 
 
 

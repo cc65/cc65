@@ -83,11 +83,11 @@ samples.d64:	all
 
 .PHONY:	clean
 clean:
-	rm -f *~ *.map *.o *.s *.lbl
+	$(RM) *~ *.map *.o *.s *.lbl
 
 .PHONY:	zap
 zap:	clean
-	rm -f $(EXELIST) samples.d64
+	$(RM) $(EXELIST) samples.d64
 
 
 

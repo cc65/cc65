@@ -10,7 +10,7 @@ all: vlir0.s vlir1.s vlir2.s cvthead.grc
 .PHONY: clean
 
 clean:
-	-rm *.o vlir-head vlir0 vlir1 vlir2 cvthead.s cvthead.cfg out.cvt
+	-$(RM) *.o vlir-head vlir0 vlir1 vlir2 cvthead.s cvthead.cfg out.cvt
 
 love:
 	@echo "Not war, eh?"

@@ -22,6 +22,7 @@ OBJS =	_scrsize.o	\
      	kbhit.o	       	\
 	mouse.o		\
 	readjoy.o	\
+	rs232.o		\
 	write.o
 
 all:   	$(OBJS)

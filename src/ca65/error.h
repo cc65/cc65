@@ -52,7 +52,6 @@
 /* Warning numbers */
 enum Warnings {
     WARN_NONE,	       	    	      	/* No warning */
-    WARN_MASK_ERROR,
     WARN_SYM_NOT_REFERENCED,
     WARN_IMPORT_NOT_REFERENCED,
     WARN_CANNOT_TRACK_STATUS,

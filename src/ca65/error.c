@@ -72,7 +72,6 @@ void WarningMsg (const FilePos* Pos, unsigned WarnNum, va_list ap)
 	unsigned char 	Level;
 	const char*	Msg;
     } Warnings [WARN_COUNT-1] = {
-	{   1,	"Mask error"					},
        	{   2,  "Symbol `%s' is defined but never used" 	},
         {   2,  "Symbol `%s' is imported but never used"	},
 	{   1,  "Cannot track processor status byte"		},

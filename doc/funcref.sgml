@@ -72,7 +72,10 @@ function.
 <sect1><tt/c128.h/<label id="c128.h"><p>
 
 <itemize>
+<item><ref id="c64mode" name="c64mode">
+<item><ref id="fast" name="fast">
 <item><ref id="toggle_videomode" name="toggle_videomode">
+<item><ref id="slow" name="slow">    
 </itemize>
 
 
@@ -441,6 +444,24 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="bgcolor" name="bgcolor">,
 <ref id="textcolor" name="textcolor">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>c64mode<label id="c64mode"><p>
+
+<quote>
+<descrip>
+<tag/Function/Switch the C128 into C64 compatible mode.
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Declaration/<tt/void c64mode (void);/
+<tag/Description/The function will cause the machine to reboot into C64 mode.
+<tag/Limits/<itemize>
+<item>The function is specific to the C128.
+<item>The function will not return to the caller.
+</itemize>
+<tag/Availability/C128
 <tag/Example/None.
 </descrip>
 </quote>
@@ -904,6 +925,28 @@ evaluated or is ignored.
 <tag/See also/
 <ref id="abort" name="abort">,
 <ref id="exit" name="exit">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>fast<label id="fast"><p>
+
+<quote>
+<descrip>
+<tag/Function/Switch the C128 into 2MHz mode.
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Declaration/<tt/void fast (void);/
+<tag/Description/The function will switch the clock of the C128 to 2MHz. This
+will nearly double the speed compared to slow mode.
+<tag/Limits/<itemize>
+<item>The function is specific to the C128.
+<item>2MHz clock will not work in 40 column mode.
+</itemize>
+<tag/Availability/C128
+<tag/See also/
+<ref id="slow" name="slow">,
+<ref id="toggle_videomode" name="toggle_videomode">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1624,6 +1667,27 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>slow<label id="slow"><p>
+
+<quote>
+<descrip>
+<tag/Function/Switch the C128 into 1MHz mode.
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Declaration/<tt/void slow (void);/
+<tag/Description/The function will switch the clock of the C128 to 1MHz. This
+will halve the speed compared to fast mode.
+<tag/Limits/<itemize>
+<item>The function is specific to the C128.
+</itemize>
+<tag/Availability/C128
+<tag/See also/
+<ref id="fast" name="fast">,
+<ref id="toggle_videomode" name="toggle_videomode">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>srand<label id="srand"><p>
 
 <quote>
@@ -1911,6 +1975,9 @@ with the mode.
 <item>The function is specific to the C128.
 </itemize>
 <tag/Availability/C128
+<tag/See also/
+<ref id="fast" name="fast">,
+<ref id="slow" name="slow">
 <tag/Example/None.
 </descrip>
 </quote>

@@ -139,7 +139,7 @@ void __fastcall__ mouse_box (int minx, int miny, int maxx, int maxy);
  * 	- Show the mouse again.
  *
  * NOTE2: When setting the box to something that is larger than the actual
- * screen, the positioning of the mouse cursor will fail. If such margins
+ * screen, the positioning of the mouse cursor can fail. If such margins
  * are really what you want, you have to use your own cursor routines.
  */
 

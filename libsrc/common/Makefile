@@ -138,6 +138,7 @@ S_OBJS = 	_fdesc.o 	\
                 time.o          \
 		tolower.o	\
 		toupper.o	\
+                unlink.o        \
 		vfprintf.o	\
 		vprintf.o       \
 		vsprintf.o	\

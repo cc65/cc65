@@ -48,14 +48,30 @@ C1541  	= c1541
 
 
 # --------------------------------------------------------------------------
-# Rules how to make each one of the binaries
+# List of executables. This list could be made target dependent by checking
+# $(SYS).
 
-EXELIST=ascii fire gunzip65 hello mousedemo nachtm plasma sieve tgidemo
+EXELIST	=	ascii 		\
+		diodemo		\
+		fire 		\
+		gunzip65 	\
+		hello 		\
+		mousedemo 	\
+		nachtm 		\
+		plasma 		\
+		sieve 		\
+		tgidemo
+
+# --------------------------------------------------------------------------
+# Rules how to make each one of the binaries
 
 .PHONY:	all
 all:   	$(EXELIST)
 
 ascii: 	       	$(CRT0) ascii.o $(CLIB)
+	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
+
+diodemo:  	       	$(CRT0) diodemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
 fire:  	       	$(CRT0) fire.o $(CLIB)

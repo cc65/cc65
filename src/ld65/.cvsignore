@@ -4,6 +4,7 @@ ld65
 *.s
 apple2.inc
 atari.inc
+bbc.inc
 c128.inc
 c64.inc
 cbm610.inc

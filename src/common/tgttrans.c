@@ -108,7 +108,7 @@ void TgtTranslateInit (void)
 	case TGT_PLUS4:		Tab = CTPET;	break;
 	case TGT_CBM610:	Tab = CTAtari;	break;
 	case TGT_PET:		Tab = CTAtari;	break;
-	case TGT_NES:				break;
+	case TGT_BBC:				break;
 	case TGT_APPLE2:			break;
 	case TGT_GEOS:				break;
 	default:

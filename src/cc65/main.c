@@ -159,8 +159,8 @@ static void SetSys (const char* Sys)
      	    cbmsys ("__PET__");
      	    break;
 
-     	case TGT_NES:
-     	    AddNumericMacro ("__NES__", 1);
+     	case TGT_BBC:
+     	    AddNumericMacro ("__BBC__", 1);
      	    break;
 
      	case TGT_APPLE2:

@@ -60,7 +60,7 @@ const char* TargetNames [TGT_COUNT] = {
     "plus4",
     "cbm610",
     "pet",
-    "nes",
+    "bbc",
     "apple2",
     "geos",
 };

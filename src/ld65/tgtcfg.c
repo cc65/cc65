@@ -43,13 +43,14 @@
 /*****************************************************************************/
 
 
-				  
+
 /* An empty config */
 static const char CfgEmpty[] = "";
-		     
+
 /* Actual target configurations, converted into C strings by a perl script */
 #include "apple2.inc"
 #include "atari.inc"
+#include "bbc.inc"
 #include "c128.inc"
 #include "c64.inc"
 #include "cbm610.inc"
@@ -57,7 +58,7 @@ static const char CfgEmpty[] = "";
 #include "none.inc"
 #include "pet.inc"
 #include "plus4.inc"
-
+		  
 
 
 /*****************************************************************************/
@@ -72,15 +73,15 @@ const TargetDesc Targets [TGT_COUNT] = {
     {  	BINFMT_BINARY,	CfgAtari	},
     {  	BINFMT_BINARY,	CfgC64 		},
     {  	BINFMT_BINARY,	CfgC128		},
-    {  	BINFMT_BINARY,	CfgEmpty	},	/* Ace */
+    {  	BINFMT_BINARY,	CfgEmpty	},    	/* Ace */
     {  	BINFMT_BINARY,	CfgPlus4	},
     {  	BINFMT_BINARY,  CfgCBM610	},
     {  	BINFMT_BINARY,	CfgPET		},
-    {  	BINFMT_BINARY,	CfgEmpty	},	/* NES */
+    {  	BINFMT_BINARY, 	CfgBBC		},
     {   BINFMT_BINARY,	CfgApple2	},
     {   BINFMT_BINARY,  CfgGeos		},
 };
 
 
 
-					  
+

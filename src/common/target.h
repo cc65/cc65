@@ -55,7 +55,7 @@ typedef enum {
     TGT_PLUS4,
     TGT_CBM610,
     TGT_PET,
-    TGT_NES,
+    TGT_BBC,
     TGT_APPLE2,
     TGT_GEOS,
     TGT_COUNT			/* Number of target systems */

@@ -923,6 +923,50 @@ static unsigned OptCmp5 (CodeSeg* S)
 
 
 
+static unsigned OptCmp6 (CodeSeg* S)
+/* Search for a sequence ldx/txa/branch and remove the txa if A is not
+ * used later.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+       	CodeEntry* L[2];
+
+       	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+       	/* Check for the sequence */
+       	if ((E->OPC == OP65_LDX || E->OPC == OP65_TAX)  &&
+       	    CS_GetEntries (S, L, I+1, 2)                &&
+       	    L[0]->OPC == OP65_TXA                       &&
+       	    !CE_HasLabel (L[0])                         &&
+       	    (L[1]->Info & OF_FBRA) != 0                 &&
+       	    !CE_HasLabel (L[1])                         &&
+	    !RegAUsed (S, I+3)) {
+
+	    /* Remove the txa */
+	    CS_DelEntry (S, I+1);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+  	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 /*****************************************************************************/
 /*	    			Optimize tests                               */
 /*****************************************************************************/
@@ -1428,6 +1472,7 @@ static OptFunc OptFuncs [] = {
     { OptCmp3,              "OptCmp3",                  0       },
     { OptCmp4,              "OptCmp4",                  0       },
     { OptCmp5,              "OptCmp5",                  0       },
+    { OptCmp6,              "OptCmp6",                  0       },
     /* Optimize tests */
     { OptTest1,             "OptTest1",                 0       },
     /* Remove unused loads */

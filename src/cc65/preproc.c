@@ -39,7 +39,7 @@ static int Pass1 (const char* From, char* To);
 
 
 /*****************************************************************************/
-/*  		    		     data				     */
+/*  		    		     Data				     */
 /*****************************************************************************/
 
 
@@ -63,7 +63,74 @@ static int ExpandMacros = 1;
 
 
 /*****************************************************************************/
-/* 		    		     code				     */
+/*		     Low level preprocessor token handling                   */
+/*****************************************************************************/
+
+
+
+/* Types of preprocessor tokens */
+typedef enum {
+    PP_DEFINE,
+    PP_ELSE,
+    PP_ENDIF,
+    PP_ERROR,
+    PP_IF,
+    PP_IFDEF,
+    PP_IFNDEF,
+    PP_INCLUDE,
+    PP_LINE,
+    PP_PRAGMA,
+    PP_UNDEF,
+    PP_ILLEGAL
+} pptoken_t;
+
+
+
+/* Preprocessor keyword to token mapping table */
+static const struct PPToken {
+    const char*	Key;	   	/* Keyword */
+    pptoken_t  	Tok;	   	/* Token */
+} PPTokens[] = {
+    {  	"define",      	PP_DEFINE	},
+    {  	"else",	       	PP_ELSE		},
+    {  	"endif",       	PP_ENDIF	},
+    {  	"error",       	PP_ERROR	},
+    {  	"if",  	       	PP_IF		},
+    {  	"ifdef",       	PP_IFDEF	},
+    {  	"ifndef",      	PP_IFNDEF	},
+    {  	"include",     	PP_INCLUDE	},
+    {   "line",	       	PP_LINE		},
+    {  	"pragma",      	PP_PRAGMA	},
+    {  	"undef",       	PP_UNDEF	},
+};
+
+/* Number of preprocessor tokens */
+#define PPTOKEN_COUNT  	(sizeof(PPTokens) / sizeof(PPTokens[0]))
+
+
+
+static int CmpToken (const void* Key, const void* Elem)
+/* Compare function for bsearch */
+{
+    return strcmp ((const char*) Key, ((const struct PPToken*) Elem)->Key);
+}
+
+
+
+static pptoken_t FindPPToken (const char* Ident)
+/* Find a preprocessor token and return ut. Return PP_ILLEGAL if the identifier
+ * is not a valid preprocessor token.
+ */
+{
+    struct PPToken* P;
+    P = bsearch (Ident, PPTokens, PPTOKEN_COUNT, sizeof (PPTokens[0]), CmpToken);
+    return P? P->Tok : PP_ILLEGAL;
+}
+
+
+
+/*****************************************************************************/
+/* 	      	    		     Code		    		     */
 /*****************************************************************************/
 
 
@@ -166,18 +233,20 @@ static char* CopyQuotedString (char* Target)
 
 
 /*****************************************************************************/
-/*				  Macro stuff				     */
+/*				  Macro stuff		    		     */
 /*****************************************************************************/
 
 
 
 static int MacName (char* Ident)
-/* Get macro symbol name.  If error, print message and clear line. */
+/* Get macro symbol name.  If we have an error, print a diagnostic message
+ * and clear line.
+ */
 {
     if (IsSym (Ident) == 0) {
-	PPError ("Identifier expected");
+ 	PPError ("Identifier expected");
      	ClearLine ();
-	return 0;
+ 	return 0;
     } else {
     	return 1;
     }
@@ -186,7 +255,7 @@ static int MacName (char* Ident)
 
 
 static void ExpandMacroArgs (Macro* M)
-/* Preprocessor pass 2.  Perform macro substitution. */
+/* Expand the arguments of a macro */
 {
     ident	Ident;
     const char* Replacement;
@@ -198,21 +267,21 @@ static void ExpandMacroArgs (Macro* M)
 
     /* Copy the macro replacement checking for parameters to replace */
     while (CurC != '\0') {
-	/* If the next token is an identifier, check for a macro arg */
+ 	/* If the next token is an identifier, check for a macro arg */
      	if (IsIdent (CurC)) {
      	    SymName (Ident);
-	    Replacement = FindMacroArg (M, Ident);
-	    if (Replacement) {
-		/* Macro arg, keep the replacement */
+ 	    Replacement = FindMacroArg (M, Ident);
+ 	    if (Replacement) {
+ 		/* Macro arg, keep the replacement */
      	    	keepstr (Replacement);
      	    } else {
-		/* No macro argument, keep the original identifier */
+ 		/* No macro argument, keep the original identifier */
      	    	keepstr (Ident);
      	    }
      	} else if (CurC == '#' && IsIdent (NextC)) {
        	    NextChar ();
      	    SymName (Ident);
-	    Replacement = FindMacroArg (M, Ident);
+ 	    Replacement = FindMacroArg (M, Ident);
        	    if (Replacement) {
      	    	keepch ('\"');
      	    	keepstr (Replacement);
@@ -225,7 +294,7 @@ static void ExpandMacroArgs (Macro* M)
      	    mptr = CopyQuotedString (mptr);
      	} else {
      	    *mptr++ = CurC;
-	    NextChar ();
+ 	    NextChar ();
      	}
     }
 
@@ -263,68 +332,68 @@ static int MacroCall (Macro* M)
     B 	     = Buf;
     while (1) {
        	if (CurC == '(') {
-	    /* Nested parenthesis */
+ 	    /* Nested parenthesis */
      	    *B++ = CurC;
-	    NextChar ();
+ 	    NextChar ();
      	    ++ParCount;
      	} else if (IsQuote (CurC)) {
     	    B = CopyQuotedString (B);
      	} else if (CurC == ',' || CurC == ')') {
      	    if (ParCount == 0) {
-	    	/* End of actual argument */
+ 	    	/* End of actual argument */
      	       	*B++ = '\0';
-	    	while (IsBlank(*ArgStart)) {
-	    	    ++ArgStart;
-	    	}
+ 	    	while (IsBlank(*ArgStart)) {
+ 	    	    ++ArgStart;
+ 	    	}
     	      	if (ArgCount < M->ArgCount) {
     	      	    M->ActualArgs[ArgCount++] = ArgStart;
        	       	} else if (CurC != ')' || *ArgStart != '\0' || M->ArgCount > 0) {
-	    	    /* Be sure not to count the single empty argument for a
-	    	     * macro that does not have arguments.
-	    	     */
+ 	    	    /* Be sure not to count the single empty argument for a
+ 	    	     * macro that does not have arguments.
+ 	    	     */
     	      	    ++ArgCount;
-	    	}
+ 	    	}
 
-		/* Check for end of macro param list */
-		if (CurC == ')') {
-		    NextChar ();
-		    break;
-		}
+ 		/* Check for end of macro param list */
+ 		if (CurC == ')') {
+ 		    NextChar ();
+ 		    break;
+ 		}
 
        	       	/* Start the next param */
      	       	ArgStart = B;
-		NextChar ();
+ 		NextChar ();
      	    } else {
-	    	/* Comma or right paren inside nested parenthesis */
+ 	    	/* Comma or right paren inside nested parenthesis */
      	       	if (CurC == ')') {
      	       	    --ParCount;
      	       	}
      	       	*B++ = CurC;
-	    	NextChar ();
+ 	    	NextChar ();
      	    }
      	} else if (IsBlank (CurC)) {
-	    /* Squeeze runs of blanks */
+ 	    /* Squeeze runs of blanks */
      	    *B++ = ' ';
      	    SkipBlank ();
      	} else if (CurC == '\0') {
-	    /* End of line inside macro argument list - read next line */
+ 	    /* End of line inside macro argument list - read next line */
      	    if (NextLine () == 0) {
      	       	return 0;
      	    }
      	} else {
-	    /* Just copy the character */
+ 	    /* Just copy the character */
      	    *B++ = CurC;
-	    NextChar ();
+ 	    NextChar ();
      	}
     }
 
     /* Compare formal argument count with actual */
     if (M->ArgCount != ArgCount) {
-	PPError ("Macro argument count mismatch");
-	/* Be sure to make enough empty arguments available */
-	while (ArgCount < M->ArgCount) {
-	    M->ActualArgs [ArgCount++] = "";
-	}
+ 	PPError ("Macro argument count mismatch");
+ 	/* Be sure to make enough empty arguments available */
+ 	while (ArgCount < M->ArgCount) {
+ 	    M->ActualArgs [ArgCount++] = "";
+ 	}
     }
 
     /* Preprocess the line, replacing macro parameters */
@@ -341,20 +410,20 @@ static void ExpandMacro (Macro* M)
 {
     /* Check if this is a function like macro */
     if (M->ArgCount >= 0) {
-	/* Function like macro */
+ 	/* Function like macro */
        	if (MacroCall (M) == 0) {
      	    ClearLine ();
      	}
     } else {
-	/* Just copy the replacement text */
+ 	/* Just copy the replacement text */
      	keepstr (M->Replacement);
     }
 }
 
 
 
-static void addmac (void)
-/* Add a macro to the macro table. */
+static void DefineMacro (void)
+/* Handle a macro definition. */
 {
     char*   	saveptr;
     ident   	Ident;
@@ -381,9 +450,9 @@ static void addmac (void)
     	NextChar ();
 
        	/* Set the marker that this is a function like macro */
-	M->ArgCount = 0;
+ 	M->ArgCount = 0;
 
-	/* Read the formal parameter list */
+ 	/* Read the formal parameter list */
      	while (1) {
      	    SkipBlank ();
      	    if (CurC == ')')
@@ -391,14 +460,14 @@ static void addmac (void)
      	    if (MacName (Ident) == 0) {
      	    	return;
      	    }
-	    AddMacroArg (M, Ident);
+ 	    AddMacroArg (M, Ident);
      	    SkipBlank ();
      	    if (CurC != ',')
      	    	break;
      	    NextChar ();
      	}
 
-	/* Check for a right paren and eat it if we find one */
+ 	/* Check for a right paren and eat it if we find one */
      	if (CurC != ')') {
        	    PPError ("`)' expected");
      	    ClearLine ();
@@ -425,9 +494,9 @@ static void addmac (void)
      * Print a diagnostic if not.
      */
     if (Existing) {
-	if (MacroCmp (M, Existing) != 0) {
-	    PPError ("Macro redefinition is not identical");
-	}
+ 	if (MacroCmp (M, Existing) != 0) {
+ 	    PPError ("Macro redefinition is not identical");
+ 	}
     }
 }
 
@@ -766,51 +835,6 @@ static void doerror (void)
 
 
 
-/* C preprocessor. */
-
-/* stuff used to bum the keyword dispatching stuff */
-enum {
-    PP_DEFINE,
-    PP_ELSE,
-    PP_ENDIF,
-    PP_ERROR,
-    PP_IF,
-    PP_IFDEF,
-    PP_IFNDEF,
-    PP_INCLUDE,
-    PP_LINE,
-    PP_PRAGMA,
-    PP_UNDEF,
-    PP_ILLEGAL
-};
-
-static const struct tok_elt pre_toks[] = {
-    {  	"define",      	PP_DEFINE	},
-    {  	"else",	       	PP_ELSE		},
-    {  	"endif",       	PP_ENDIF	},
-    {  	"error",       	PP_ERROR	},
-    {  	"if",  	       	PP_IF		},
-    {  	"ifdef",       	PP_IFDEF	},
-    {  	"ifndef",      	PP_IFNDEF	},
-    {  	"include",     	PP_INCLUDE	},
-    {   "line",	       	PP_LINE		},
-    {  	"pragma",      	PP_PRAGMA	},
-    {  	"undef",       	PP_UNDEF	},
-    {  	0,     	       	PP_ILLEGAL	}
-};
-
-
-
-static int searchtok (const char *sym, const struct tok_elt *toks)
-/* Search a token in a table */
-{
-    while (toks->toknam && strcmp (toks->toknam, sym))
-	++toks;
-    return (toks->toknbr);
-}
-
-
-
 void Preprocess (void)
 /* Preprocess a line */
 {
@@ -836,11 +860,11 @@ void Preprocess (void)
        	    	PPError ("Preprocessor directive expected");
        	    	ClearLine ();
        	    } else {
-       	       	switch (searchtok (Directive, pre_toks)) {
+       	       	switch (FindPPToken (Directive)) {
 
        	       	    case PP_DEFINE:
        	    	    	if (!Skip) {
-       	    	    	    addmac ();
+       	    	    	    DefineMacro ();
        	    	    	}
        	    	    	break;
 

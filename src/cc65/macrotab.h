@@ -44,21 +44,21 @@
 
 
 
-typedef struct Macro_ Macro;
-struct Macro_ {
-    Macro*	 Next;		/* Next macro with same hash value */
-    int		 ArgCount;	/* Number of parameters, -1 = no parens */
+typedef struct Macro Macro;
+struct Macro {
+    Macro*  	 Next;		/* Next macro with same hash value */
+    int	    	 ArgCount;	/* Number of parameters, -1 = no parens */
     unsigned	 MaxArgs;	/* Size of formal argument list */
     char**     	 FormalArgs;	/* Formal argument list */
     char const** ActualArgs;	/* Actual argument list */
     char*      	 Replacement;   /* Replacement text */
-    char	 Name[1];   	/* Name, dynamically allocated */
+    char    	 Name[1];   	/* Name, dynamically allocated */
 };
 
 
 
 /*****************************************************************************/
-/*	   		   	     code	    			     */
+/*	    		   	     code	    			     */
 /*****************************************************************************/
 
 
@@ -73,11 +73,11 @@ void FreeMacro (Macro* M);
  * table, use UndefineMacro for that.
  */
 
-void AddNumericMacro (const char* Name, long Val);
-/* Add a macro for a numeric constant */
+void DefineNumericMacro (const char* Name, long Val);
+/* Define a macro for a numeric constant */
 
-void AddTextMacro (const char* Name, const char* Val);
-/* Add a macro for a textual constant */
+void DefineTextMacro (const char* Name, const char* Val);
+/* Define a macro for a textual constant */
 
 void InsertMacro (Macro* M);
 /* Insert the given macro into the macro table. This call will also allocate
@@ -119,7 +119,6 @@ void PrintMacroStats (FILE* F);
 
 /* End of macrotab.h */
 #endif
-
 
 
 

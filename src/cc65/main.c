@@ -124,8 +124,8 @@ static void Usage (void)
 static void cbmsys (const char* sys)
 /* Define a CBM system */
 {
-    AddNumericMacro ("__CBM__", 1);
-    AddNumericMacro (sys, 1);
+    DefineNumericMacro ("__CBM__", 1);
+    DefineNumericMacro (sys, 1);
 }
 
 
@@ -139,7 +139,7 @@ static void SetSys (const char* Sys)
 	    break;
 
 	case TGT_ATARI:
-    	    AddNumericMacro ("__ATARI__", 1);
+    	    DefineNumericMacro ("__ATARI__", 1);
 	    break;
 
 	case TGT_C64:
@@ -167,16 +167,16 @@ static void SetSys (const char* Sys)
      	    break;
 
      	case TGT_BBC:
-     	    AddNumericMacro ("__BBC__", 1);
+     	    DefineNumericMacro ("__BBC__", 1);
      	    break;
 
      	case TGT_APPLE2:
-     	    AddNumericMacro ("__APPLE2__", 1);
+     	    DefineNumericMacro ("__APPLE2__", 1);
      	    break;
 
      	case TGT_GEOS:
      	    /* Do not handle as a CBM system */
-     	    AddNumericMacro ("__GEOS__", 1);
+     	    DefineNumericMacro ("__GEOS__", 1);
      	    break;
 
      	default:
@@ -237,8 +237,8 @@ static void DefineSym (const char* Def)
 	    InvDef (Def);
 	}
 	/* No value given. Define the macro with the value 1 */
-     	AddNumericMacro (Def, 1);
-    } else {				     
+     	DefineNumericMacro (Def, 1);
+    } else {
 	/* We have a value, P points to the '=' character. Since the argument
 	 * is const, create a copy and replace the '=' in the copy by a zero
 	 * terminator.
@@ -251,7 +251,7 @@ static void DefineSym (const char* Def)
 	*Q++ = '\0';
 
     	/* Define this as a macro */
-    	AddTextMacro (S, Q);
+    	DefineTextMacro (S, Q);
 
     	/* Release the allocated memory */
     	xfree (S);
@@ -484,10 +484,10 @@ static void OptIncludeDir (const char* Opt, const char* Arg)
 
 static void OptListOptSteps (const char* Opt, const char* Arg)
 /* List all optimizer steps */
-{			  
+{
     /* List the optimizer steps */
-    ListOptSteps (stdout);	  
-    
+    ListOptSteps (stdout);
+
     /* Terminate */
     exit (EXIT_SUCCESS);
 }

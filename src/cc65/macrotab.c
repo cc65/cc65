@@ -114,8 +114,8 @@ void FreeMacro (Macro* M)
 
 
 
-void AddNumericMacro (const char* Name, long Val)
-/* Add a macro for a numeric constant */
+void DefineNumericMacro (const char* Name, long Val)
+/* Define a macro for a numeric constant */
 {
     char Buf[64];
 
@@ -123,13 +123,13 @@ void AddNumericMacro (const char* Name, long Val)
     sprintf (Buf, "%ld", Val);
 
     /* Handle as text macro */
-    AddTextMacro (Name, Buf);
+    DefineTextMacro (Name, Buf);
 }
 
 
 
-void AddTextMacro (const char* Name, const char* Val)
-/* Add a macro for a textual constant */
+void DefineTextMacro (const char* Name, const char* Val)
+/* Define a macro for a textual constant */
 {
     /* Create a new macro */
     Macro* M = NewMacro (Name);
@@ -165,7 +165,7 @@ void InsertMacro (Macro* M)
     /* Increment the number of macros starting with this char */
     MacroFlagTab[(unsigned)(unsigned char)M->Name[0]]++;
 }
-
+    
 
 
 int UndefineMacro (const char* Name)

@@ -17,12 +17,6 @@
 
 
 
-/* Token table entry */
-struct tok_elt {
-    char *toknam;
-    int toknbr;
-};
-
 /* Set when the pp calls expr() recursively */
 extern unsigned char Preprocessing;
 
@@ -41,8 +35,6 @@ void Preprocess (void);
 
 /* End of preproc.h */
 #endif
-
-
 
 
 

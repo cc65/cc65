@@ -271,24 +271,24 @@ void Compile (const char* FileName)
     }
 
     /* Add macros that are always defined */
-    AddNumericMacro ("__CC65__", (VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH);
+    DefineNumericMacro ("__CC65__", (VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH);
 
     /* Strict ANSI macro */
     if (ANSI) {
-	AddNumericMacro ("__STRICT_ANSI__", 1);
+	DefineNumericMacro ("__STRICT_ANSI__", 1);
     }
 
     /* Optimization macros */
     if (Optimize) {
-	AddNumericMacro ("__OPT__", 1);
+	DefineNumericMacro ("__OPT__", 1);
 	if (FavourSize == 0) {
-	    AddNumericMacro ("__OPT_i__", 1);
+	    DefineNumericMacro ("__OPT_i__", 1);
 	}
 	if (EnableRegVars) {
-	    AddNumericMacro ("__OPT_r__", 1);
+	    DefineNumericMacro ("__OPT_r__", 1);
 	}
 	if (InlineStdFuncs) {
-	    AddNumericMacro ("__OPT_s__", 1);
+	    DefineNumericMacro ("__OPT_s__", 1);
 	}
     }
 
@@ -302,7 +302,7 @@ void Compile (const char* FileName)
     g_preamble ();
 
     /* Open the input file */
-    OpenMainFile (FileName); 
+    OpenMainFile (FileName);
 
     /* Ok, start the ball rolling... */
     Parse ();

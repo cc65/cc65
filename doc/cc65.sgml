@@ -194,7 +194,7 @@ Here is a description of all the command line options:
   locations). There is some overhead involved with register variables, since
   the old contents of the registers must be saved and restored. Since register
   variables are of limited use without the optimizer, there is also a combined
-  switch: <tt/-Or/ will enable both, the optmizer and register variables.
+  switch: <tt/-Or/ will enable both, the optimizer and register variables.
 
   For more information about register variables see <ref id="regvars"
   name="register variables">.
@@ -657,7 +657,7 @@ The compiler defines several macros at startup:
   <itemize>
   <item><tt/__CC65_STD_C89__/
   <item><tt/__CC65_STD_C99__/
-  <item><tt/__CC65_STD_CCC65__/
+  <item><tt/__CC65_STD_CC65__/
   </itemize>
 
   <tag><tt>__OPT__</tt></tag>
@@ -1031,7 +1031,7 @@ Or, to access a struct member of a static variable:
 </verb></tscreen>
 <p>
 
-Note: Do not embedd the assembler labels that are used as names of global
+Note: Do not embed the assembler labels that are used as names of global
 variables or functions into your asm statements. Code like this
 
 <tscreen><verb>

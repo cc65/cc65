@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -34,8 +34,8 @@
 
 
 #include <stdio.h>
-#include <assert.h>
 
+#include "check.h"
 #include "xsprintf.h"
 
 
@@ -52,7 +52,7 @@ int xsprintf (char* Buf, size_t BufSize, const char* Format, ...)
     int Res;
     va_list ap;
 
-    va_start (ap, Format);
+    va_start (ap, Format);						     
     Res = xvsprintf (Buf, BufSize, Format, ap);
     va_end (ap);
 
@@ -74,7 +74,7 @@ int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap)
     /* Unsafe version */
     int Res = vsprintf (Buf, Format, ap);
 #endif
-    assert (Res >= 0 && (unsigned) Res < BufSize);
+    CHECK (Res >= 0 && (unsigned) Res < BufSize);
     return Res;
 }
 

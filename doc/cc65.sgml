@@ -367,7 +367,8 @@ and the one defined by the ISO standard:
 	an additional macro needed to access parameters in a variable
 	parameter list in a C function.
 	<p>
-<item>	Functions may not return structs. However, struct assignment *is*
+<item>	Functions may not return structs (or unions), and structs may not be
+	passed as parameters by value. However, struct assignment *is* 
 	possible.
 	<p>
 <item>	Part of the C library is available only with fastcall calling

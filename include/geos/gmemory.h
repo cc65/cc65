@@ -19,9 +19,9 @@ char __fastcall__ CmpFString(char len, char *dest, char *source);
 
 int __fastcall__ CRC(char *buffer, int len);
 void __fastcall__ ClearRam(char *dest, int len);
-void __fastcall__ FillRam(char what, char *dest, int len);
+void __fastcall__ FillRam(char *dest, char what, int len);
 
-void __fastcall__ MoveData(char *source, char *dest, int len);
+void __fastcall__ MoveData(char *dest, char *source, int len);
 
 void __fastcall__ InitRam(char *myInitTab);
 

@@ -1,19 +1,23 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 30.10.99
+; 30.10.99, 15.07.2001
 
-; void FillRam         (char what, char *dest, int length);
+; void FillRam         (char *dest, char what, int length);
 
-	    .import DoublePop, popa
+	    .import popa, popax
 	    .export _FillRam
 
 	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
 
 _FillRam:
-	    jsr DoublePop
+	    sta r0L
+	    stx r0H
 	    jsr popa
 	    sta r2L
+	    jsr popax
+	    sta r1L
+	    stx r1H
 	    jmp FillRam

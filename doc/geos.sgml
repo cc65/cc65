@@ -6,7 +6,7 @@
 
 <title>GEOSLib docs
 <author>Maciej Witkowiak, <htmlurl url="mailto:ytm@elysium.pl" name="ytm@elysium.pl">
-<date>v1.2, 26.12.1999, 16.03.2000, 19-22.03.2000, 11,29.07.2000, 3-4.07.2001
+<date>v1.2, 26.12.1999, 16.03.2000, 19-22.03.2000, 11,29.07.2000, 3-4,15.07.2001
 <abstract>
 This is the documentation of cc65's GEOSLib, but information contained here may be also
 useful for writting GEOS applications in general.
@@ -27,10 +27,16 @@ is easy to use and program.
 Coding GEOS in C? That's something new. It is possible now - with Ulrich von Bassewitz's cc65
 package and my GEOSLib you are able to create GEOS applications in no-time.
 <p>
-GEOSLib supports a subset of standard cc65 libraries. Memory and string functions are included
-but you should consider using native versions of these (e.g. <tt/FillRam/ instead of </ttmemset/)
-at least in this version. <tt/dio/ - direct disk access is available, but you might have
-problems with devices other than 1541, 1571 or 1581. RAM drives emulating these should work.
+GEOSLib supports a subset of standard cc65 libraries. Whenever possible native Kernal functions
+are used (e.g. <tt/memset/ is an alias for <tt/FillRam/), however not all are supported. E.g.
+string functions like <tt/strcmp/, <tt/strcpy/ are doubled with native <tt/CmpString/,
+<tt/CopyString/ because the latter can handle only 256 byte strings. Keep this in mind when
+you will write your program. If you don't need long strings simply use functions from Kernal,
+resulting code will be smaller.
+<p>
+<tt/dio/ - direct disk access is available, but you might have problems with devices other
+than 1541, 1571 or 1581. RAM drives emulating these should work.
+<p>
 It is safe to use these includes: <tt/dio.h, errno.h, geos.h, joystick.h, mouse.h, stdlib.h,
 string.h/
 <p>
@@ -992,8 +998,8 @@ Functions covered in this section are common for whole C world - copying memory 
 strings is one of the main computer tasks. GEOS also has interface to do this. These functions
 are replacement for those like <tt/memset, memcpy, strcpy/ etc. from standard libraries.
 
-However they have slighty different calling convention (order of arguments to be specific), so
-please check their syntax here before direct replacing.
+However some of them have slighty different calling convention (order of arguments to be specific),
+so please check their syntax here before direct replacing.
 
 Please note that the memory described as <em/strings/ are up to 255 characters (without
 counting the terminating <tt/NULL/), and <em/regions/ cover whole 64K of memory.
@@ -1031,21 +1037,21 @@ compatible with standard CRC routines.
 
 <sect2>FillRam and ClearRam
 <p>
-<tt/void FillRam (char value, char *dest, int length)/
+<tt/void FillRam (char *dest, char value, int length)/
 <p>
 <tt/void ClearRam (char *dest, int length)/
 <p>
 Both functions are filling given memory range. <tt/ClearRam/ fills with <tt/NULLs/, while
 <tt/FillRam/ uses given <tt/value/. Be warned that these functions destroy <tt/r0, r1 and
-r2L/ registers.
+r2L/ registers. <tt/FillRam/ is an alias for <tt/memset/.
 
 <sect2>MoveData
 <p>
-<tt/void MoveData (char *src, char *dest, int length)/
+<tt/void MoveData (char *dest, char *src, int length)/
 <p>
 This functions copies one memory region to another. There are checks for overlap and the
 non-destructive method is chosen. Be warned that this function destroys contents of
-<tt/r0, r1 and r2/ registers.
+<tt/r0, r1 and r2/ registers. This is also alias for <tt/memcpy/
 
 <sect2>InitRam
 <p>
@@ -1066,6 +1072,7 @@ This is done with <tt/table/ where everything is defined. See structures chapter
 <tt/ char VerifyRAM (char bank, int length, char *reuAddress, char *cpuAddress)/
 <p>
 These functions are interface to REU - Ram Expansion Unit. I think that they are self-explanatory.
+You can check for REU presence by taking value of <tt/ramExpSize/.
 
 <sect1>Processes and Multitasking
 <p>

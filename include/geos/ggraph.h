@@ -83,7 +83,6 @@ void __fastcall__ GraphicsString(char *myGfxString);
 #define	SCREENBYTEWIDTH		80
 #define	SCREENPIXELWIDTH	640
 /* control characters for use as numbers, not chars */
-#define	EOF		0
 #define	BACKSPACE	8
 #define	FORWARDSPACE	9
 #define	TAB		9

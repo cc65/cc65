@@ -53,6 +53,7 @@ char __fastcall__ ChangeDiskDevice(char newdev);
 #define	OFF_GS_ID	173
 /* disk errors */
 #define	ANY_FAULT	0xf0
+#define G_EOF		0
 #define	NO_BLOCKS	1
 #define	INV_TRACK	2
 #define	INSUFF_SPACE	3

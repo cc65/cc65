@@ -4,7 +4,7 @@
 #
 # Maciej 'YTM/Elysium' Witkowiak
 
-OBJ_DIRS=devel disk dlgbox file graph menuicon memory mousesprite process system
+OBJ_DIRS=common devel disk dlgbox file graph menuicon memory mousesprite process system
 
 all:
 	@for i in $(OBJ_DIRS); do $(MAKE) -C $$i; done

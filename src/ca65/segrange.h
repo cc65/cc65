@@ -70,15 +70,15 @@ SegRange* NewSegRange (struct Segment* Seg);
 /* Create a new segment range. The segment is set to Seg, Start and End are
  * set to the current PC of the segment.
  */
-                                            
+
 #if defined(HAVE_INLINE)
 INLINE unsigned long GetSegRangeSize (const SegRange* R)
 /* Return the segment range size in bytes */
 {
     return (R->End - R->Start);
 }
-#else  
-#  define GetSegRangeSize (R)   ((R)->End - (R)->Start)
+#else
+#  define GetSegRangeSize(R)   ((R)->End - (R)->Start)
 #endif
 
 void AddSegRanges (Collection* Ranges);
@@ -100,3 +100,4 @@ void CloseSegRanges (Collection* Ranges);
 
 
 
+                         

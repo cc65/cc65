@@ -559,6 +559,7 @@ static void Usage (void)
 	     "  --asm-include-dir dir\tSet an assembler include directory\n"
        	     "  --debug\t\tDebug mode\n"
        	     "  --debug-info\t\tAdd debug info\n"
+	     "  --feature name\tSet an emulation feature\n"
        	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet a compiler include directory path\n"
 	     "  --mapfile name\tCreate a map file\n"
@@ -605,6 +606,15 @@ static void OptDebugInfo (const char* Opt, const char* Arg)
 
 
 
+static void OptFeature (const char* Opt, const char* Arg)
+/* Emulation features for the assembler */
+{
+    CmdAddArg (&CA65, "--feature");
+    CmdAddArg (&CA65, Arg);
+}
+
+
+
 static void OptHelp (const char* Opt, const char* Arg)
 /* Print help - cl65 */
 {
@@ -635,7 +645,7 @@ static void OptMapFile (const char* Opt, const char* Arg)
 
 static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
-{			 
+{
     CmdAddArg (&LD65, "-S");
     CmdAddArg (&LD65, Arg);
 }
@@ -682,13 +692,14 @@ int main (int argc, char* argv [])
 	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
 	{ "--debug",		0,	OptDebug		},
 	{ "--debug-info",	0,	OptDebugInfo		},
-	{ "--help",		0,	OptHelp			},
+	{ "--feature",		1,	OptFeature		},
+	{ "--help",	 	0,	OptHelp			},
 	{ "--include-dir",	1,	OptIncludeDir		},
-	{ "--mapfile",		1,	OptMapFile		},
+	{ "--mapfile",	 	1,	OptMapFile		},
 	{ "--start-addr",	1,	OptStartAddr		},
-	{ "--target",		1,	OptTarget		},
-	{ "--verbose",		0,	OptVerbose		},
-	{ "--version",		0,	OptVersion		},
+	{ "--target",	 	1,	OptTarget		},
+	{ "--verbose",	 	0,	OptVerbose		},
+	{ "--version",	 	0,	OptVersion		},
     };
 
     int I;

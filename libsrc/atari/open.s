@@ -5,7 +5,7 @@
 ;
 
 	.include "atari.inc"
-	.include "fmode.inc"
+	.include "fcntl.inc"
 	.include "errno.inc"
 	.export	_open
 	.import	clriocb
@@ -66,7 +66,7 @@ invret:	lda	#<EINVAL	; file name is too long
 	ldx	#>EINVAL
 	jmp	seterr
 .endif
-	
+
 no_app:	pla
 	and	#15
 	cmp	#O_RDONLY

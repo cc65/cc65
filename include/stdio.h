@@ -83,7 +83,7 @@ char* fgets (char* buf, size_t size, FILE* f);
 FILE* __fastcall__ fopen (const char* name, const char* mode);
 int fprintf (FILE* f, const char* format, ...);
 int fputc (int c, FILE* f);
-int fputs (const char* s, FILE* f);
+int __fastcall__ fputs (const char* s, FILE* f);
 size_t __fastcall__ fread (void* buf, size_t size, size_t count, FILE* f);
 FILE* freopen (const char* name, const char* mode, FILE* f);
 size_t __fastcall__ fwrite (const void* buf, size_t size, size_t count, FILE* f);

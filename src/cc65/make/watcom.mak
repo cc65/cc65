@@ -97,6 +97,7 @@ OBJS =	anonname.obj	\
 	symtab.obj	\
 	util.obj
 
+LIBS = ..\common\common.lib
 
 .PRECIOUS $(OBJS:.obj=.c)
 
@@ -112,7 +113,7 @@ cc65:		cc65.exe
 # Other targets
 
 
-cc65.exe:	$(OBJS)
+cc65.exe:	$(OBJS) $(LIBS)
 	$(LD) system $(SYSTEM) @&&|
 DEBUG ALL
 OPTION QUIET
@@ -128,7 +129,6 @@ FILE datatype.obj
 FILE declare.obj
 FILE error.obj
 FILE expr.obj
-FILE funcact.obj
 FILE funcdesc.obj
 FILE function.obj
 FILE global.obj
@@ -151,5 +151,14 @@ FILE stdfunc.obj
 FILE symentry.obj
 FILE symtab.obj
 FILE util.obj
+LIBRARY ..\common\common.lib
 |
+
+clean:
+	@if exist *.obj del *.obj
+       	@if exist cc65.exe del cc65.exe
+
+strip:
+	@-wstrip cc65.exe
+
 

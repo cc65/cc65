@@ -93,3 +93,12 @@ FILE main.obj
 FILE mem.obj
 |
 
+
+clean:
+	@if exist *.obj del *.obj
+       	@if exist cl65.exe del cl65.exe
+
+strip:
+	@-wstrip cl65.exe   
+
+

@@ -34,7 +34,7 @@
 
 
 /* Exports facilities to search files in a list of directories. 8 of these
- * lists are managed, and each list can contain an arbitrary number of 
+ * lists are managed, and each list can contain an arbitrary number of
  * directories. The "Where" argument is actually a bitset, specifying which
  * of the search lists should be used when adding paths or searching files.
  */
@@ -65,6 +65,9 @@
 
 void AddSearchPath (const char* NewPath, unsigned Where);
 /* Add a new search path to the existing one */
+
+void AddSearchPathFromEnv (const char* EnvVar, unsigned Where);
+/* Add a search from an environment variable */
 
 char* SearchFile (const char* Name, unsigned Where);
 /* Search for a file in a list of directories. Return a pointer to a malloced

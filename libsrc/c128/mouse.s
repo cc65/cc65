@@ -14,7 +14,7 @@
 
 	.import		_readjoy
        	.import	       	popax, addysp1
-   	.importzp   	ptr1, sp, sreg
+   	.importzp   	ptr1, sp
 
    	.include    	"c128.inc"
 
@@ -107,8 +107,13 @@ AlreadyInitialized:
        	sta    	Initialized		; Reset the initialized flag
    	lda    	OldInitStatus		; Load the old BASIC int bit
    	and	#$01			; Mask it
+  	sei 				; Disable interrupts
    	ora	INIT_STATUS		; Restore the old state
    	sta	INIT_STATUS
+	lda    	#$FE			; Clear bit for sprite #0
+	and 	VIC_SPR_ENA
+	sta 	VIC_SPR_ENA	     	; Disable sprite
+      	cli 				; Enable interrupts
 @L1: 	rts
 
 .endproc

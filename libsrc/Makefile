@@ -25,7 +25,7 @@ ALLTARGETS =	apple2lib	\
 
 all:
 	for tgt in $(ALLTARGETS); do		\
-       	    $(MAKE) clean $$tgt || exit 1;	\
+	    $(MAKE) clean $$tgt || exit 1;	\
 	done
 
 #-----------------------------------------------------------------------------
@@ -51,7 +51,7 @@ atarilib:
 	for i in atari common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-     	    CFLAGS="-Osir -g -T -t atari -I../../include" \
+	    CFLAGS="-Osir -g -T -t atari -I../../include" \
 	    AFLAGS="-t atari" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -67,7 +67,7 @@ c64lib:
 	for i in c64 cbm common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-       	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
+	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
 	    AFLAGS="-t c64" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -190,12 +190,12 @@ plus4lib:
 .PHONY: clean
 clean:
 	@for i in apple2 atari c128 c64 cbm cbm510 cbm610 common conio dbg geos pet plus4 runtime; do 	\
-       	   $(MAKE) -C $$i clean;     	    		  	   					\
+	   $(MAKE) -C $$i clean;     	    		  	   					\
 	done
 
 .PHONY: zap
 zap:	clean
-	@rm -f *.lib
+	@rm -f *.o *.lib
 
 
 

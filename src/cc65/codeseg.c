@@ -68,7 +68,6 @@ static void MoveLabelsToPool (CodeSeg* S, CodeEntry* E)
     unsigned LabelCount = GetCodeLabelCount (E);
     while (LabelCount--) {
 	CodeLabel* L = GetCodeLabel (E, LabelCount);
-	L->Flags &= ~LF_DEF;
 	L->Owner = 0;
 	CollAppend (&S->Labels, L);
     }

@@ -197,7 +197,7 @@ unsigned GetInsnSize (opc_t OPC, am_t AM)
  	case AM_ZPX_IND:  return 2;
  	case AM_ZP_INDY:  return 2;
  	case AM_ZP_IND:   return 2;
- 	default:	  
+ 	default:
 	    Internal ("Invalid addressing mode");
 	    return 0;
     }
@@ -234,7 +234,7 @@ opc_t GetInverseBranch (opc_t OPC)
 	case OPC_BMI:	return OPC_BPL;
 	case OPC_BNE:	return OPC_BEQ;
 	case OPC_BPL:	return OPC_BMI;
-	case OPC_BVC:	return OPC_BVS;
+	case OPC_BVC:  	return OPC_BVS;
 	case OPC_BVS:	return OPC_BVC;
        	case OPC_JCC:  	return OPC_JCS;
        	case OPC_JCS:  	return OPC_JCC;
@@ -244,7 +244,7 @@ opc_t GetInverseBranch (opc_t OPC)
        	case OPC_JPL:  	return OPC_JMI;
        	case OPC_JVC:  	return OPC_JVS;
        	case OPC_JVS:  	return OPC_JVC;
-	default:       	
+	default:
 	    Internal ("GetInverseBranch: Invalid opcode: %d", OPC);
 	    return 0;
     }
@@ -276,8 +276,8 @@ opc_t MakeShortBranch (opc_t OPC)
        	case OPC_JVS:  	return OPC_BVS;
        	case OPC_BRA:
 	case OPC_JMP:	return (CPU == CPU_65C02)? OPC_BRA : OPC_JMP;
-       	default:       	
-	    Internal ("GetShortBranch: Invalid opcode: %d", OPC);
+       	default:
+	    Internal ("MakeShortBranch: Invalid opcode: %d", OPC);
 	    return 0;
     }
 }
@@ -308,8 +308,8 @@ opc_t MakeLongBranch (opc_t OPC)
        	case OPC_JVS:  	return OPC_JVS;
 	case OPC_BRA:
 	case OPC_JMP:	return OPC_JMP;
-       	default:       	
-	    Internal ("GetShortBranch: Invalid opcode: %d", OPC);
+       	default:
+	    Internal ("MakeLongBranch: Invalid opcode: %d", OPC);
 	    return 0;
     }
 }
@@ -336,7 +336,7 @@ bc_t GetBranchCond (opc_t OPC)
        	case OPC_JPL:  	return BC_PL;
        	case OPC_JVC:  	return BC_VC;
        	case OPC_JVS:  	return BC_VS;
-	default:       	
+	default:
 	    Internal ("GetBranchCond: Invalid opcode: %d", OPC);
 	    return 0;
     }
@@ -356,48 +356,8 @@ bc_t GetInverseCond (bc_t BC)
        	case BC_PL:  	return BC_MI;
        	case BC_VC:  	return BC_VS;
        	case BC_VS:  	return BC_VC;
-	default:       	
+	default:
 	    Internal ("GetInverseCond: Invalid condition: %d", BC);
-	    return 0;
-    }
-}
-
-
-
-opc_t GetLongBranch (bc_t BC)
-/* Return a long branch for the given branch condition */
-{
-    switch (BC) {
-	case BC_CC:  	return OPC_JCC;
-	case BC_CS:  	return OPC_JCS;
-	case BC_EQ:  	return OPC_JEQ;
-	case BC_MI:  	return OPC_JMI;
-	case BC_NE:  	return OPC_JNE;
-	case BC_PL:  	return OPC_JPL;
-	case BC_VC:  	return OPC_JVC;
-	case BC_VS:  	return OPC_JVS;
-       	default:       	
-	    Internal ("GetLongBranch: Invalid condition: %d", BC);
-	    return 0;
-    }
-}
-
-
-
-opc_t GetShortBranch (bc_t BC)
-/* Return a short branch for the given branch condition */
-{
-    switch (BC) {
-       	case BC_CC:    	return OPC_BCC;
-       	case BC_CS:    	return OPC_BCS;
-       	case BC_EQ:    	return OPC_BEQ;
-       	case BC_MI:    	return OPC_BMI;
-       	case BC_NE:    	return OPC_BNE;
-       	case BC_PL:    	return OPC_BPL;
-       	case BC_VC:    	return OPC_BVC;
-       	case BC_VS:    	return OPC_BVS;
-       	default:       	
-	    Internal ("GetShortBranch: Invalid condition: %d", BC);
 	    return 0;
     }
 }

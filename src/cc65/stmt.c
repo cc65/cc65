@@ -625,7 +625,7 @@ static void ForStatement (void)
     /* Label for the test expressions */
     g_defcodelabel (TestLabel);
 
-    /* Parse the text expression */
+    /* Parse the test expression */
     if (CurTok.Tok != TOK_SEMI) {
     	boolexpr (&lval2);
     	g_truejump (CF_NONE, lstat);

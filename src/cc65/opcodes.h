@@ -151,7 +151,6 @@ typedef enum {
     BC_MI,
     BC_NE,
     BC_PL,
-    BC_SR,
     BC_VC,
     BC_VS
 } bc_t;
@@ -243,12 +242,6 @@ bc_t GetBranchCond (opc_t OPC);
 
 bc_t GetInverseCond (bc_t BC);
 /* Return the inverse condition of the given one */
-
-opc_t GetLongBranch (bc_t BC);
-/* Return a long branch for the given branch condition */
-
-opc_t GetShortBranch (bc_t BC);
-/* Return a short branch for the given branch condition */
 
 
 

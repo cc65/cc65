@@ -239,9 +239,6 @@ int CodeEntriesAreEqual (const CodeEntry* E1, const CodeEntry* E2)
 void AttachCodeLabel (CodeEntry* E, CodeLabel* L)
 /* Attach the label to the entry */
 {
-    /* Mark the label as defined */
-    L->Flags |= LF_DEF;
-
     /* Add it to the entries label list */
     CollAppend (&E->Labels, L);
 

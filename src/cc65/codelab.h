@@ -61,16 +61,12 @@ struct CodeEntry;
 
 
 
-/* Label flags, bitmapped */
-#define LF_DEF		0x0001U		/* Label was defined */
-
 /* Label structure */
 typedef struct CodeLabel CodeLabel;
 struct CodeLabel {
     CodeLabel*		Next;		/* Next in hash list */
     char*		Name;		/* Label name */
-    unsigned short	Hash;		/* Hash over the name */
-    unsigned short	Flags;		/* Flag flags */
+    unsigned            Hash;		/* Hash over the name */
     struct CodeEntry*	Owner;		/* Owner entry */
     Collection	    	JumpFrom;	/* Entries that jump here */
 };

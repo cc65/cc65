@@ -59,6 +59,7 @@
 
 /* Mouse button masks */
 #define MOUSE_BTN_LEFT	     0x10
+#define MOUSE_BTN_RIGHT      0x01
 
 /* Structure containing the mouse coordinates */
 struct mouse_pos {
@@ -68,8 +69,7 @@ struct mouse_pos {
 
 /* Structure containing information about the mouse */
 struct mouse_info {
-    int                 xpos;          /* Mouse x position */
-    int                 ypos;          /* Mouse y position */
+    struct mouse_pos    pos;           /* Mouse position */
     unsigned char       buttons;       /* Mouse button mask */
 };
 

@@ -308,8 +308,7 @@ cd ..
 
 
 %install
-mkdir -p
-$RPM_BUILD_ROOT/usr/{bin,lib/cc65/{tgi/{c64},lib,include/{geos,tgi},asminc}}
+mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{tgi/{c64},lib,include/{geos,tgi},asminc}}
 
 # Binaries
 install -s -m 755 src/ar65/ar65 $RPM_BUILD_ROOT/usr/bin

@@ -10,11 +10,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/xmalloc.h"
+/* common */
+#include "check.h"
+#include "xmalloc.h"
 
+/* cc65 */
 #include "asmcode.h"
 #include "asmlabel.h"
-#include "check.h"
 #include "codegen.h"
 #include "datatype.h"
 #include "declare.h"
@@ -202,7 +204,7 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
     rhs->e_tptr = lhst;
 
     /* First, do some type checking */
-    if (IsVoid (lhst) || IsVoid (rhst)) {
+    if (IsTypeVoid (lhst) || IsTypeVoid (rhst)) {
     	/* If one of the sides are of type void, output a more apropriate
     	 * error message.
     	 */
@@ -948,7 +950,7 @@ static int arrayref (int k, struct expent* lval)
 	    /* Done */
     	    goto end_array;
 
-       	} else if ((tptr2 = lval2.e_tptr) [0] & T_POINTER) {
+       	} else if (IsPtr (tptr2 = lval2.e_tptr)) {
     	    /* Subscript is pointer, get element type */
     	    lval2.e_tptr = Indirect (tptr2);
 
@@ -1416,7 +1418,7 @@ static int typecast (struct expent* lval)
     }
 
     /* Do the actual cast. Special handling for void casts */
-    if (!IsVoid (Type)) {
+    if (!IsTypeVoid (Type)) {
 	/* Mark the lhs as const to avoid a manipulation of TOS */
         g_typecast (TypeOf (Type) | CF_CONST, rflags);
     }

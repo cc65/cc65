@@ -33,8 +33,10 @@
 
 
 
-#include "../common/xmalloc.h"
+/* common */
+#include "xmalloc.h"
 
+/* cc65 */
 #include "asmcode.h"
 #include "asmlabel.h"
 #include "codegen.h"
@@ -131,7 +133,7 @@ type* GetReturnType (Function* F)
 int HasVoidReturn (const Function* F)
 /* Return true if the function does not have a return value */
 {
-    return IsVoid (F->ReturnType);
+    return IsTypeVoid (F->ReturnType);
 }
 
 

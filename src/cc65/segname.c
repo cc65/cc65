@@ -34,13 +34,13 @@
 
 
 #include <string.h>
-#include <ctype.h>					      
+#include <ctype.h>
 
 /* common */
+#include "check.h"
 #include "xmalloc.h"
 
 /* cc65 */
-#include "check.h"
 #include "segname.h"
 
 

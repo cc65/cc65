@@ -306,7 +306,7 @@ static void cascadeswitch (struct expent* eval)
 		    val = lval.e_const;
 		    switch (*eval->e_tptr) {
 
-			case T_CHAR:
+			case T_SCHAR:
 			    /* Signed char */
 			    if (val < -128 || val > 127) {
 				Error (ERR_RANGE);

@@ -35,8 +35,11 @@
 
 #include <stdio.h>
 
-#include "asmlabel.h"
+/* common */
 #include "check.h"
+
+/* cc65 */
+#include "asmlabel.h"
 #include "ctrans.h"
 #include "codegen.h"
 #include "error.h"

@@ -33,8 +33,11 @@
 
 
 
-#include "asmline.h"
+/* common */
 #include "check.h"
+
+/* cc65 */
+#include "asmline.h"
 #include "global.h"
 #include "asmcode.h"
 
@@ -67,8 +70,8 @@ void AddCodeHint (const char* Hint)
 
 void AddEmptyLine (void)
 /* Add an empty line for formatting purposes */
-{			  
-    /* Use a somewhat weird construct to avoid that gcc complains about 
+{
+    /* Use a somewhat weird construct to avoid that gcc complains about
      * an empty format string.
      */
     static const char EmptyLine[] = "";

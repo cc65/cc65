@@ -37,10 +37,12 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../common/xmalloc.h"
-
-#include "asmcode.h"
+/* common */
 #include "check.h"
+#include "xmalloc.h"
+
+/* cc65 */
+#include "asmcode.h"
 #include "error.h"
 #include "global.h"
 #include "incpath.h"

@@ -38,12 +38,14 @@
 #include <stdarg.h>
 #include <string.h>
 
-#include "../common/hashstr.h"
-#include "../common/xmalloc.h"
+/* common */
+#include "check.h"
+#include "hashstr.h"
+#include "xmalloc.h"
 
+/* cc65 */
 #include "asmcode.h"
 #include "asmlabel.h"
-#include "check.h"
 #include "codegen.h"
 #include "datatype.h"
 #include "declare.h"

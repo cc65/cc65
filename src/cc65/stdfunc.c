@@ -36,7 +36,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* common */
 #include "check.h"
+
+/* cc65 */
 #include "codegen.h"
 #include "error.h"
 #include "global.h"

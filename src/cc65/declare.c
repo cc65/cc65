@@ -840,7 +840,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     TypeCpy (D->T, Spec->Type);
 
     /* Check the size of the generated type */
-    if (!IsFunc (D->Type) && SizeOf (D->Type) >= 0x10000) {
+    if (!IsFunc (D->Type) && !IsTypeVoid (D->Type) && SizeOf (D->Type) >= 0x10000) {
      	Error (ERR_ILLEGAL_SIZE);
     }
 }
@@ -886,7 +886,7 @@ static void ParseVoidInit (void)
 	constexpr (&lval);
 	switch (lval.e_tptr[0]) {
 
-	    case T_CHAR:
+	    case T_SCHAR:
 	    case T_UCHAR:
 		if ((lval.e_flags & E_MCTYPE) == E_TCONST) {
 		    /* Make it byte sized */
@@ -992,7 +992,7 @@ void ParseInit (type *tptr)
 
     switch (*tptr) {
 
-     	case T_CHAR:
+     	case T_SCHAR:
      	case T_UCHAR:
      	    constexpr (&lval);
 	    if ((lval.e_flags & E_MCTYPE) == E_TCONST) {

@@ -35,8 +35,10 @@
 
 #include <stdlib.h>
 
-#include "../common/version.h"
-
+/* common */
+#include "version.h"
+	  
+/* cc65 */
 #include "asmlabel.h"
 #include "codegen.h"
 #include "declare.h"
@@ -159,7 +161,7 @@ static void Parse (void)
 	     	     * void types in non ANSI mode.
 	     	     */
        	       	    if (Size == 0) {
-	     		if (!IsVoid (Decl.Type)) {
+	     		if (!IsTypeVoid (Decl.Type)) {
 	     		    if (!IsArray (Decl.Type)) {
 	     	   	      	/* Size is unknown and not an array */
 	     		      	Error (ERR_UNKNOWN_SIZE);
@@ -183,7 +185,7 @@ static void Parse (void)
 	     	    ParseInit (Entry->Type);
 	     	} else {
 
-	     	    if (IsVoid (Decl.Type)) {
+	     	    if (IsTypeVoid (Decl.Type)) {
 	     	    	/* We cannot declare variables of type void */
 	     		Error (ERR_ILLEGAL_TYPE);
 	     	    } else if (Size == 0) {

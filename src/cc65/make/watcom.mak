@@ -71,7 +71,6 @@ OBJS =	anonname.obj	\
 	asmcode.obj	\
 	asmlabel.obj	\
 	asmline.obj	\
-	check.obj	\
 	codegen.obj	\
 	compile.obj	\
 	cpu.obj		\
@@ -128,7 +127,6 @@ FILE anonname.obj
 FILE asmcode.obj
 FILE asmlabel.obj
 FILE asmline.obj
-FILE check.obj
 FILE codegen.obj
 FILE compile.obj
 FILE cpu.obj

@@ -37,13 +37,13 @@
 #include <string.h>
 
 /* common */
+#include "check.h"
 #include "version.h"
 #include "xmalloc.h"
 
 /* cc65 */
 #include "asmcode.h"
 #include "asmlabel.h"
-#include "check.h"
 #include "cpu.h"
 #include "error.h"
 #include "global.h"
@@ -53,7 +53,7 @@
 #include "util.h"
 #include "codegen.h"
 
-									     
+
 
 /*****************************************************************************/
 /*	  			     Data				     */

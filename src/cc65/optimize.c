@@ -40,12 +40,12 @@
 
 /* common */
 #include "attrib.h"
+#include "check.h"
 #include "xmalloc.h"
 
 /* cc65 */
 #include "asmlabel.h"
 #include "asmline.h"
-#include "check.h"
 #include "cpu.h"
 #include "error.h"
 #include "global.h"

@@ -16,7 +16,6 @@ OBJS =	anonname.o	\
 	asmcode.o	\
 	asmlabel.o	\
 	asmline.o	\
-	check.o       	\
 	codegen.o	\
 	compile.o	\
 	cpu.o		\

@@ -50,8 +50,8 @@
 
 
 // Basic data types
-enum type_t {
-    T_NONE     	    = 0x0000,
+enum {
+    T_END	    = 0x0000,
 
     // Basic types
     T_TYPE_NONE	    = 0x0000,
@@ -97,58 +97,28 @@ enum type_t {
     T_MASK_QUAL	    = 0x3000,
 
     // Types
-    T_CHAR     	    = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
-    T_SCHAR  	    = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
-    T_UCHAR  	    = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
-    T_SHORT  	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_SHORT,
-    T_USHORT        = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_SHORT,
-    T_INT	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
-    T_UINT	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
-    T_LONG 	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONG,
-    T_ULONG	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONG,
-    T_LONGLONG 	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONGLONG,
-    T_ULONGLONG	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONGLONG,
-    T_ENUM	    = T_TYPE_ENUM     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
-    T_FLOAT	    = T_TYPE_FLOAT    | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
-    T_DOUBLE	    = T_TYPE_DOUBLE   | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
-    T_VOID	    = T_TYPE_VOID     | T_CLASS_NONE   | T_SIGN_NONE     | T_SIZE_NONE,
-    T_STRUCT        = T_TYPE_STRUCT   | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
-    T_UNION         = T_TYPE_UNION    | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
-    T_ARRAY	    = T_TYPE_ARRAY    | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
-    T_PTR	    = T_TYPE_PTR      | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
-    T_FUNC     	    = T_TYPE_FUNC     | T_CLASS_FUNC   | T_SIGN_NONE     | T_SIZE_NONE,
+    T_CHAR     	= T_TYPE_CHAR   | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_SCHAR  	= T_TYPE_CHAR   | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_UCHAR  	= T_TYPE_CHAR   | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_SHORT  	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_SHORT,
+    T_USHORT    = T_TYPE_INT    | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_SHORT,
+    T_INT    	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_UINT   	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_LONG   	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONG,
+    T_ULONG  	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONG,
+    T_LONGLONG 	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONGLONG,
+    T_ULONGLONG	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONGLONG,
+    T_ENUM     	= T_TYPE_ENUM   | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_FLOAT  	= T_TYPE_FLOAT  | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
+    T_DOUBLE 	= T_TYPE_DOUBLE | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
+    T_VOID   	= T_TYPE_VOID   | T_CLASS_NONE   | T_SIGN_NONE     | T_SIZE_NONE,
+    T_STRUCT    = T_TYPE_STRUCT | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
+    T_UNION     = T_TYPE_UNION  | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
+    T_ARRAY  	= T_TYPE_ARRAY  | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
+    T_PTR    	= T_TYPE_PTR    | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
+    T_FUNC     	= T_TYPE_FUNC   | T_CLASS_FUNC   | T_SIGN_NONE     | T_SIZE_NONE,
 
 };
-
-
-
-/* Data types */
-#define	T_END  	       	0x0000
-#define T_CHAR 	       	0x0011
-#define T_INT  	       	0x0012
-#define	T_SHORT	       	0x0013
-#define T_LONG 	       	0x0014
-#define T_ENUM 	       	0x0015
-#define T_UCHAR	       	0x0019
-#define T_UINT 	       	0x001A
-#define T_USHORT       	0x001B
-#define T_ULONG	       	0x001C
-
-#define T_FLOAT	       	0x0025
-#define T_DOUBLE       	0x0026
-
-#define T_VOID 	       	0x0001		/* void parameter list */
-#define T_FUNC 	       	0x0002		/* Function */
-
-#define T_UNSIGNED     	0x0008		/* Class */
-#define T_INTEGER      	0x0010		/* Class */
-#define T_REAL 	       	0x0020		/* Class */
-#define T_POINTER      	0x0040		/* Class */
-#define T_PTR  	       	0x0049
-#define T_ARRAY	       	0x004A
-#define T_STRUCT       	0x0080
-#define T_UNION	       	0x0081
-#define T_SMASK	       	0x003F
 
 
 
@@ -251,7 +221,7 @@ type* Indirect (type* Type);
  * given type points to.
  */
 
-int IsVoid (const type* Type);
+int IsTypeVoid (const type* Type);
 /* Return true if this is a void type */
 
 int IsPtr (const type* Type);

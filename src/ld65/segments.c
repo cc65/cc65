@@ -230,7 +230,7 @@ Section* ReadSection (FILE* F, ObjData* O)
     Type = Read8 (F);
 
     /* Print some data */
-    Print (stdout, 1, "Module `%s': Found segment `%s', size = %lu, align = %u, type = %u\n",
+    Print (stdout, 2, "Module `%s': Found segment `%s', size = %lu, align = %u, type = %u\n",
 	   GetObjFileName (O), Name, Size, Align, Type);
 
     /* Get the segment for this section */

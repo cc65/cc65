@@ -619,20 +619,20 @@ static void ParseSegments (void)
 {
     static const IdentTok Attributes [] = {
        	{   "LOAD",  	CFGTOK_LOAD     },
-	{   "RUN",	CFGTOK_RUN      },
+	{   "RUN",    	CFGTOK_RUN      },
         {   "TYPE",     CFGTOK_TYPE     },
         {   "ALIGN",    CFGTOK_ALIGN    },
         {   "DEFINE",   CFGTOK_DEFINE   },
-	{   "OFFSET",	CFGTOK_OFFSET   },
-	{   "START",	CFGTOK_START    },
+	{   "OFFSET", 	CFGTOK_OFFSET   },
+	{   "START",  	CFGTOK_START    },
     };
     static const IdentTok Types [] = {
-       	{   "RO",   	CFGTOK_RO       },
-       	{   "RW",   	CFGTOK_RW       },
-       	{   "BSS",  	CFGTOK_BSS      },
-	{   "ZP",	CFGTOK_ZP	},
-	{   "WP",	CFGTOK_WPROT	},
-	{   "WPROT",	CFGTOK_WPROT	},
+       	{   "RO",     	CFGTOK_RO       },
+       	{   "RW",     	CFGTOK_RW       },
+       	{   "BSS",    	CFGTOK_BSS      },
+	{   "ZP",     	CFGTOK_ZP	},
+	{   "WP",     	CFGTOK_WPROT	},
+	{   "WPROT",  	CFGTOK_WPROT	},
     };
 
     unsigned Count;
@@ -1138,6 +1138,36 @@ static void ParseFeatures (void)
 
 
 
+static void ParseSymbols (void)
+/* Parse a symbols section */
+{
+    while (CfgTok == CFGTOK_IDENT) {
+
+	long Val;
+
+	/* Remember the name */
+	char Name [sizeof (CfgSVal)];
+	strcpy (Name, CfgSVal);
+	CfgNextTok ();
+
+	/* Allow an optional assignment */
+	CfgOptionalAssign ();
+
+	/* Make sure the next token is an integer, read and skip it */
+	CfgAssureInt ();
+	Val = CfgIVal;
+	CfgNextTok ();
+
+	/* Generate an export with the given value */
+	CreateConstExport (Name, Val);
+
+	/* Skip the semicolon */
+	CfgConsumeSemi ();
+    }
+}
+
+
+
 static void ParseConfig (void)
 /* Parse the config file */
 {
@@ -1147,6 +1177,7 @@ static void ParseConfig (void)
         {   "SEGMENTS", CFGTOK_SEGMENTS },
 	{   "FORMATS", 	CFGTOK_FORMATS  },
 	{   "FEATURES", CFGTOK_FEATURES	},
+	{   "SYMBOLS",	CFGTOK_SYMBOLS 	},
     };
     cfgtok_t BlockTok;
 
@@ -1181,6 +1212,10 @@ static void ParseConfig (void)
 
 	    case CFGTOK_FEATURES:
 		ParseFeatures ();
+		break;
+
+	    case CFGTOK_SYMBOLS:
+		ParseSymbols ();
 		break;
 
 	    default:

@@ -64,6 +64,10 @@ MODCTRL_SIZE            =      20       ; Total size of struct
 ;  */
 .global         _mod_load
 
+; void mod_free (struct mod_ctrl* ctrl);
+; /* Free a loaded module. */
+.global		_mod_free
+
 
 
 ; Errors

@@ -61,26 +61,27 @@ yres:	.word	192			; Y resolution
 ; Next comes the jump table. Currently all entries must be valid and may point
 ; to an RTS for test versions (function not implemented).
 
-	.word	INSTALL
-	.word	UNINSTALL
-	.word	INIT
-	.word	DONE
-	.word	GETERROR
-	.word	CONTROL
-	.word	CLEAR
-	.word	SETVIEWPAGE
-	.word	SETDRAWPAGE
-	.word	SETCOLOR
-	.word	SETPALETTE
-	.word	GETPALETTE
-	.word	GETDEFPALETTE
-	.word	SETPIXEL
-	.word	GETPIXEL
-	.word	LINE
-	.word	BAR
-	.word	CIRCLE
-	.word	TEXTSTYLE
-	.word	OUTTEXT
+       	.addr   INSTALL
+       	.addr   UNINSTALL
+       	.addr   INIT
+       	.addr   DONE
+       	.addr   GETERROR
+       	.addr   CONTROL
+       	.addr   CLEAR
+       	.addr   SETVIEWPAGE
+       	.addr   SETDRAWPAGE
+       	.addr   SETCOLOR
+       	.addr   SETPALETTE
+       	.addr   GETPALETTE
+       	.addr   GETDEFPALETTE
+       	.addr   SETPIXEL
+       	.addr   GETPIXEL
+       	.addr   LINE
+       	.addr   BAR
+       	.addr   CIRCLE
+       	.addr   TEXTSTYLE
+       	.addr   OUTTEXT
+        .addr   0                       ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 ; Data.

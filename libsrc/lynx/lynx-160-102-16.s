@@ -42,32 +42,30 @@
         .byte   8                       ; System font Y size
         .res    4, $00                  ; Reserved for future extensions
 
-; Next comes the jump table. Currently all entries must be valid and may point
-; to an RTS for test versions (function not implemented). A future version may
-; allow for emulation: In this case the vector will be zero. Emulation means
-; that the graphics kernel will emulate the function by using lower level
-; primitives - for example ploting a line by using calls to SETPIXEL.
+; Next comes the jump table. All entries must be valid and may point to an RTS
+; for test versions (function not implemented).
 
-        .word   INSTALL
-        .word   UNINSTALL
-        .word   INIT
-        .word   DONE
-	.word	GETERROR
-        .word   CONTROL
-        .word   CLEAR
-        .word   SETVIEWPAGE
-        .word   SETDRAWPAGE
-        .word   SETCOLOR
-        .word   SETPALETTE
-        .word   GETPALETTE
-        .word   GETDEFPALETTE
-        .word   SETPIXEL
-        .word   GETPIXEL
-        .word   LINE
-        .word   BAR
-        .word   CIRCLE
-        .word   TEXTSTYLE
-        .word   OUTTEXT
+        .addr   INSTALL
+        .addr   UNINSTALL
+        .addr   INIT
+        .addr   DONE
+       	.addr   GETERROR
+        .addr   CONTROL
+        .addr   CLEAR
+        .addr   SETVIEWPAGE
+        .addr   SETDRAWPAGE
+        .addr   SETCOLOR
+        .addr   SETPALETTE
+        .addr   GETPALETTE
+        .addr   GETDEFPALETTE
+        .addr   SETPIXEL
+        .addr   GETPIXEL
+        .addr   LINE
+        .addr   BAR
+        .addr   CIRCLE
+        .addr   TEXTSTYLE
+        .addr   OUTTEXT
+        .addr   0                       ; IRQ entry is unused
 
 ; ------------------------------------------------------------------------
 ; Data.

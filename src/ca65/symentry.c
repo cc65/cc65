@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -160,15 +160,7 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned AddrSize, unsigned Flags)
     }
 
     /* Set the symbol value */
-    if (IsConstExpr (Expr)) {
-       	/* Expression is const, store the value */
-       	S->Flags |= SF_CONST;
-       	S->V.Val = GetExprVal (Expr);
-       	FreeExpr (Expr);
-    } else {
-       	/* Not const, store the expression */
-        S->V.Expr  = Expr;
-    }
+    S->V.Expr  = Expr;
 
     /* If the symbol is marked as global, export it */
     if (S->Flags & SF_GLOBAL) {
@@ -182,7 +174,10 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned AddrSize, unsigned Flags)
 
     /* If the symbol is exported, check the address sizes */
     if (S->Flags & SF_EXPORT) {
-        if (S->AddrSize > S->ExportSize) {
+        if (S->ExportSize == ADDR_SIZE_DEFAULT) {
+            /* Use the real size of the symbol */
+            S->ExportSize = S->AddrSize;
+        } else if (S->AddrSize > S->ExportSize) {
             Warning (1, "Address size mismatch for symbol `%s'", GetSymName (S));
         }
     }
@@ -262,11 +257,6 @@ void SymExport (SymEntry* S, unsigned AddrSize, unsigned Flags)
      	return;
     }
 
-    /* Map a default address size to a real value */
-    if (AddrSize == ADDR_SIZE_DEFAULT) {
-        AddrSize = SymAddrSize (S);
-    }
-
     /* If the symbol was already marked as an export or global, check if
      * this was done specifiying the same address size. In case of a global
      * declaration, silently remove the global flag.
@@ -283,7 +273,10 @@ void SymExport (SymEntry* S, unsigned AddrSize, unsigned Flags)
      * exported size.
      */
     if (S->Flags & SF_DEFINED) {
-        if (S->AddrSize > S->ExportSize) {
+        if (S->ExportSize == ADDR_SIZE_DEFAULT) {
+            /* Use the real size of the symbol */
+            S->ExportSize = S->AddrSize;
+        } else if (S->AddrSize > S->ExportSize) {
             Warning (1, "Address size mismatch for symbol `%s'", GetSymName (S));
         }
     }
@@ -374,6 +367,22 @@ int SymIsImport (const SymEntry* S)
 
 
 
+int SymIsConst (SymEntry* S, long* Val)
+/* Return true if the given symbol has a constant value. If Val is not NULL
+ * and the symbol has a constant value, store it's value there.
+ */
+{
+    /* Resolve trampoline entries */
+    if (S->Flags & SF_TRAMPOLINE) {
+    	S = S->V.Sym;
+    }
+
+    /* Check for constness */
+    return (SymHasExpr (S) && IsConstExpr (S->V.Expr, Val));
+}
+
+
+
 int SymHasExpr (const SymEntry* S)
 /* Return true if the given symbol has an associated expression */
 {
@@ -383,26 +392,7 @@ int SymHasExpr (const SymEntry* S)
     }
 
     /* Check the expression */
-    return ((S->Flags & SF_DEFINED) != 0 &&
-       	    (S->Flags & SF_IMPORT)  == 0 &&
-       	    (S->Flags & SF_CONST)   == 0);
-}
-
-
-
-void SymFinalize (SymEntry* S)
-/* Finalize a symbol expression if there is one */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-       	S = S->V.Sym;
-    }
-
-    /* Check if we have an expression */
-    if ((S->Flags & SF_FINALIZED) == 0 && SymHasExpr (S)) {
-       	S->V.Expr = FinalizeExpr (S->V.Expr);
-        S->Flags |= SF_FINALIZED;
-    }
+    return ((S->Flags & (SF_DEFINED|SF_IMPORT)) == SF_DEFINED);
 }
 
 
@@ -449,20 +439,6 @@ int SymHasUserMark (SymEntry* S)
 
 
 
-long GetSymVal (SymEntry* S)
-/* Return the symbol value */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    PRECONDITION ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_CONST) != 0);
-    return S->V.Val;
-}
-
-
-
 struct ExprNode* GetSymExpr (SymEntry* S)
 /* Get the expression for a non-const symbol */
 {
@@ -471,8 +447,23 @@ struct ExprNode* GetSymExpr (SymEntry* S)
 	S = S->V.Sym;
     }
 
-    PRECONDITION (S != 0 && (S->Flags & SF_CONST) == 0);
+    PRECONDITION (S != 0 && SymHasExpr (S));
     return S->V.Expr;
+}
+
+
+
+const struct ExprNode* SymResolve (const SymEntry* S)
+/* Helper function for DumpExpr. Resolves a symbol into an expression or return
+ * NULL. Do not call in other contexts!
+ */
+{
+    /* Resolve trampoline entries */
+    if (S->Flags & SF_TRAMPOLINE) {
+	S = S->V.Sym;
+    }
+
+    return SymHasExpr (S)? S->V.Expr : 0;
 }
 
 
@@ -496,7 +487,7 @@ unsigned GetSymIndex (SymEntry* S)
     if (S->Flags & SF_TRAMPOLINE) {
 	S = S->V.Sym;
     }
-    PRECONDITION (S != 0 && (S->Flags & SF_INDEXED));
+    PRECONDITION (S != 0 && (S->Flags & SF_INDEXED) != 0);
     return S->Index;
 }
 

@@ -181,8 +181,8 @@ void Internal (const char* Format, ...)
 /* Print a message about an internal compiler error and die. */
 {
     va_list ap;
-    va_start (ap, Format);  
-    fprintf (stderr, "Internal assembler error\n");
+    va_start (ap, Format);
+    fprintf (stderr, "Internal assembler error:\n");
     vfprintf (stderr, Format, ap);
     va_end (ap);
     fprintf (stderr, "\n");

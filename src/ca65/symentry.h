@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -60,9 +60,7 @@
 #define SF_GLOBAL	0x0010	    	/* Global symbol */
 #define SF_LABEL        0x0080          /* Used as a label */
 #define SF_FORCED       0x0100          /* Forced import, SF_IMPORT also set */
-#define SF_FINALIZED    0x0200          /* Symbol is finalized */
 #define SF_INDEXED	0x0800		/* Index is valid */
-#define SF_CONST    	0x1000		/* The symbol has a constant value */
 #define SF_MULTDEF     	0x2000		/* Multiply defined symbol */
 #define	SF_DEFINED  	0x4000 	       	/* Defined */
 #define SF_REFERENCED	0x8000 	       	/* Referenced */
@@ -164,11 +162,13 @@ int SymIsRef (const SymEntry* Sym);
 int SymIsImport (const SymEntry* Sym);
 /* Return true if the given symbol is marked as import */
 
+int SymIsConst (SymEntry* Sym, long* Val);
+/* Return true if the given symbol has a constant value. If Val is not NULL
+ * and the symbol has a constant value, store it's value there.
+ */
+
 int SymHasExpr (const SymEntry* Sym);
 /* Return true if the given symbol has an associated expression */
-
-void SymFinalize (SymEntry* S);
-/* Finalize a symbol expression if there is one */
 
 void SymMarkUser (SymEntry* Sym);
 /* Set a user mark on the specified symbol */
@@ -179,11 +179,13 @@ void SymUnmarkUser (SymEntry* Sym);
 int SymHasUserMark (SymEntry* Sym);
 /* Return the state of the user mark for the specified symbol */
 
-long GetSymVal (SymEntry* Sym);
-/* Return the symbol value */
-
 struct ExprNode* GetSymExpr (SymEntry* Sym);
 /* Get the expression for a non-const symbol */
+
+const struct ExprNode* SymResolve (const SymEntry* Sym);
+/* Helper function for DumpExpr. Resolves a symbol into an expression or return
+ * NULL. Do not call in other contexts!
+ */
 
 const char* GetSymName (SymEntry* Sym);
 /* Return the name of the symbol */

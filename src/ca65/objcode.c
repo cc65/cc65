@@ -144,10 +144,10 @@ void EmitData (const unsigned char* Data, unsigned Size)
 
 void EmitByte (ExprNode* Expr)
 /* Emit one byte */
-{
-    if (IsConstExpr (Expr)) {
+{                  
+    long Val;
+    if (IsConstExpr (Expr, &Val)) {
      	/* Constant expression, emit literal byte */
-     	long Val = GetExprVal (Expr);
 	FreeExpr (Expr);
      	if ((Val & ~0xFF) != 0) {
      	    Error ("Range error");
@@ -167,9 +167,9 @@ void EmitByte (ExprNode* Expr)
 void EmitWord (ExprNode* Expr)
 /* Emit one word */
 {
-    if (IsConstExpr (Expr)) {
+    long Val;
+    if (IsConstExpr (Expr, &Val)) {
      	/* Constant expression, emit literal byte */
-     	long Val = GetExprVal (Expr);
 	FreeExpr (Expr);
        	if ((Val & ~0xFFFF) != 0) {
      	    Error ("Range error");
@@ -190,9 +190,9 @@ void EmitWord (ExprNode* Expr)
 void EmitFarAddr (ExprNode* Expr)
 /* Emit a 24 bit expression */
 {
-    if (IsConstExpr (Expr)) {
+    long Val;
+    if (IsConstExpr (Expr, &Val)) {
      	/* Constant expression, emit literal byte */
-     	long Val = GetExprVal (Expr);
 	FreeExpr (Expr);
        	if ((Val & ~0xFFFFFF) != 0) {
      	    Error ("Range error");
@@ -214,9 +214,9 @@ void EmitFarAddr (ExprNode* Expr)
 void EmitDWord (ExprNode* Expr)
 /* Emit one dword */
 {
-    if (IsConstExpr (Expr)) {
+    long Val;
+    if (IsConstExpr (Expr, &Val)) {
      	/* Constant expression, emit literal byte */
-     	long Val = GetExprVal (Expr);
 	FreeExpr (Expr);
      	Emit0 (Val & 0xFF);
 	Emit0 ((Val >> 8) & 0xFF);

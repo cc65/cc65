@@ -434,30 +434,6 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
 
 
 
-int SymIsConst (SymEntry* S)
-/* Return true if the given symbol has a constant value */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-    	S = S->V.Sym;
-    }
-
-    /* Check for constness */
-    if (S->Flags & SF_CONST) {
-    	return 1;
-    } else if ((S->Flags & SF_DEFINED) && IsConstExpr (S->V.Expr)) {
-    	/* Constant expression, remember the value */
-    	ExprNode* Expr = S->V.Expr;
-       	S->Flags |= SF_CONST;
-    	S->V.Val = GetExprVal (Expr);
-    	FreeExpr (Expr);
-    	return 1;
-    }
-    return 0;
-}
-
-
-
 int SymIsZP (SymEntry* S)
 /* Return true if the symbol is explicitly marked as zeropage symbol */
 {
@@ -705,26 +681,6 @@ void WriteImports (void)
 
 
 
-static unsigned char GetExportExprMask (SymEntry* S)
-/* Return the expression bits for the given symbol table entry */
-{
-    unsigned char ExprMask;
-
-    /* Check if the symbol is const */
-    ExprMask = (SymIsConst (S))? EXP_CONST : EXP_EXPR;
-
-    /* Add zeropage/abs bits */
-    ExprMask |= (S->ExportSize == ADDR_SIZE_ZP)? EXP_ZP : EXP_ABS;
-
-    /* Add the label/equate bits */
-    ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;
-
-    /* Return the mask */
-    return ExprMask;
-}
-
-
-
 void WriteExports (void)
 /* Write the exports list to the object file */
 {
@@ -741,13 +697,13 @@ void WriteExports (void)
     S = SymList;
     while (S) {
        	if ((S->Flags & SF_EXPMASK) == SF_EXPVAL) {
-       	    unsigned char ExprMask;
 
-	    /* Finalize an associated expression if we have one */
-	    SymFinalize (S);
+            long ConstVal;
 
 	    /* Get the expression bits */
-	    ExprMask = GetExportExprMask (S);
+            unsigned char ExprMask = SymIsConst (S, &ConstVal)? EXP_CONST : EXP_EXPR;
+            ExprMask |= (S->ExportSize == ADDR_SIZE_ZP)? EXP_ZP : EXP_ABS;
+            ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;
 
 	    /* Count the number of ConDes types */
 	    for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
@@ -775,7 +731,7 @@ void WriteExports (void)
 	    /* Write the value */
 	    if ((ExprMask & EXP_MASK_VAL) == EXP_CONST) {
 	     	/* Constant value */
-	     	ObjWrite32 (S->V.Val);
+	     	ObjWrite32 (ConstVal);
 	    } else {
 	     	/* Expression involved */
 	        WriteExpr (S->V.Expr);
@@ -789,26 +745,6 @@ void WriteExports (void)
 
     /* Done writing exports */
     ObjEndExports ();
-}
-
-
-
-static unsigned char GetDbgExprMask (SymEntry* S)
-/* Return the expression bits for the given symbol table entry */
-{
-    unsigned char ExprMask;
-
-    /* Check if the symbol is const */
-    ExprMask = (SymIsConst (S))? EXP_CONST : EXP_EXPR;
-
-    /* Add zeropage/abs bits */
-    ExprMask |= (S->AddrSize == ADDR_SIZE_ZP)? EXP_ZP : EXP_ABS;
-
-    /* Add the label/equate bits */
-    ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;
-
-    /* Return the mask */
-    return ExprMask;
 }
 
 
@@ -842,13 +778,13 @@ void WriteDbgSyms (void)
 	S = SymList;
 	while (S) {
 	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL) {
-		unsigned char ExprMask;
 
-		/* Finalize an associated expression if we have one */
-		SymFinalize (S);
+                long ConstVal;
 
 		/* Get the expression bits */
-       	       	ExprMask = GetDbgExprMask (S);
+                unsigned char ExprMask = (SymIsConst (S, &ConstVal))? EXP_CONST : EXP_EXPR;
+                ExprMask |= (S->AddrSize == ADDR_SIZE_ZP)? EXP_ZP : EXP_ABS;
+                ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;
 
 		/* Write the type */
 		ObjWrite8 (ExprMask);
@@ -859,7 +795,7 @@ void WriteDbgSyms (void)
 		/* Write the value */
 		if ((ExprMask & EXP_MASK_VAL) == EXP_CONST) {
 		    /* Constant value */
-		    ObjWrite32 (S->V.Val);
+		    ObjWrite32 (ConstVal);
 		} else {
 		    /* Expression involved */
 		    WriteExpr (S->V.Expr);
@@ -885,3 +821,4 @@ void WriteDbgSyms (void)
 
 
 
+                                 

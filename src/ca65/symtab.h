@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -54,7 +54,7 @@
 
 
 
-/* Symbol table flags */                                        
+/* Symbol table flags */
 #define ST_NONE         0x00            /* No flags */
 #define ST_DEFINED      0x01            /* Scope has been defined */
 
@@ -106,9 +106,6 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio);
 /* Mark the given symbol as a module constructor/destructor. This will also
  * mark the symbol as an export. Initializers may never be zero page symbols.
  */
-
-int SymIsConst (SymEntry* Sym);
-/* Return true if the given symbol has a constant value */
 
 int SymIsZP (SymEntry* Sym);
 /* Return true if the symbol is explicitly marked as zeropage symbol */

@@ -77,10 +77,10 @@ enum Token {
     TOK_LE,	  	/* <= */
     TOK_GE,	  	/* >= */
 
-    TOK_BAND,  	  	/* .and */
-    TOK_BOR,	  	/* .or */
-    TOK_BXOR,  	  	/* .xor */
-    TOK_BNOT,	  	/* .not */
+    TOK_BOOLAND,       	/* .and */
+    TOK_BOOLOR,	  	/* .or */
+    TOK_BOOLXOR,  	/* .xor */
+    TOK_BOOLNOT,	/* .not */
 
     TOK_PLUS,	  	/* + */
     TOK_MINUS,	  	/* - */
@@ -90,6 +90,7 @@ enum Token {
     TOK_MOD,	  	/* ! */
     TOK_OR,	  	/* | */
     TOK_XOR,	  	/* ^ */
+    TOK_BANK = TOK_XOR, /* Alias */
     TOK_AND,	  	/* & */
     TOK_SHL,	  	/* << */
     TOK_SHR,	  	/* >> */
@@ -192,7 +193,7 @@ enum Token {
     TOK_MID,
     TOK_NULL,
     TOK_ORG,
-    TOK_OUT,     
+    TOK_OUT,
     TOK_P02,
     TOK_P816,
     TOK_PAGELENGTH,

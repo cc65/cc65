@@ -295,7 +295,7 @@ void DoConditionals (void)
 		NextTok ();
 		if (IfCond) {
 		    ExprNode* Expr = Expression();
-		    SetIfCond (D, IsConstExpr (Expr));
+		    SetIfCond (D, IsConstExpr (Expr, 0));
 		    FreeExpr (Expr);
 		}
 		IfCond = GetCurrentIfCond ();
@@ -330,7 +330,7 @@ void DoConditionals (void)
 		NextTok ();
 		if (IfCond) {
 		    ExprNode* Expr = Expression();
-		    SetIfCond (D, !IsConstExpr (Expr));
+		    SetIfCond (D, !IsConstExpr (Expr, 0));
 		    FreeExpr (Expr);
 		}
 		IfCond = GetCurrentIfCond ();

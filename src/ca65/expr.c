@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -41,6 +41,7 @@
 #include "cpu.h"
 #include "exprdefs.h"
 #include "print.h"
+#include "shift.h"
 #include "tgttrans.h"
 #include "version.h"
 #include "xmalloc.h"
@@ -73,14 +74,47 @@
  * using the Left link.
  */
 #define	MAX_FREE_NODES	64
-static ExprNode*	FreeExprNodes = 0;
-static unsigned		FreeNodeCount = 0;
+static ExprNode*   	FreeExprNodes = 0;
+static unsigned	   	FreeNodeCount = 0;
+
+/* Structure for parsing expression trees */
+typedef struct ExprDesc ExprDesc;
+struct ExprDesc {
+    long        Val;		/* The offset value */
+    long        Left;           /* Left value for StudyBinaryExpr */
+    int	       	TooComplex;     /* Expression is too complex to evaluate */
+    long        SymCount;       /* Symbol reference count */
+    long        SecCount;       /* Section reference count */
+    SymEntry*   SymRef;         /* Symbol reference if any */
+    unsigned    SecRef;		/* Section reference if any */
+};
+
 
 
 
 /*****************************************************************************/
 /*	    			    Helpers				     */
 /*****************************************************************************/
+
+
+
+static ExprDesc* InitExprDesc (ExprDesc* ED)
+/* Initialize an ExprDesc structure for use with StudyExpr */
+{
+    ED->Val  	   = 0;
+    ED->TooComplex = 0;
+    ED->SymCount   = 0;
+    ED->SecCount   = 0;
+    return ED;
+}
+
+
+
+static int ExprDescIsConst (const ExprDesc* ED)
+/* Return true if the expression is constant */
+{
+    return (ED->TooComplex == 0 && ED->SymCount == 0 && ED->SecCount == 0);
+}
 
 
 
@@ -194,7 +228,7 @@ static int FuncConst (void)
     ExprNode* Expr = Expression ();
 
     /* Check the constness of the expression */
-    int Result = IsConstExpr (Expr);
+    int Result = IsConstExpr (Expr, 0);
 
     /* Free the expression */
     FreeExpr (Expr);
@@ -534,6 +568,12 @@ static ExprNode* Factor (void)
 	    N->Left = Factor ();
 	    break;
 
+        case TOK_BANK:
+            NextTok ();
+            N = NewExprNode (EXPR_BYTE2);
+            N->Left = Factor ();
+            break;
+
 	case TOK_LPAREN:
 	    NextTok ();
 	    N = Expr0 ();
@@ -722,13 +762,13 @@ static ExprNode* Expr2 (void)
     ExprNode* Root = BoolExpr ();
 
     /* Handle booleans */
-    while (Tok == TOK_BAND || Tok == TOK_BXOR) {
+    while (Tok == TOK_BOOLAND || Tok == TOK_BOOLXOR) {
 
 	/* Create the new node */
 	ExprNode* Left = Root;
 	switch (Tok) {
-       	    case TOK_BAND:     	Root = NewExprNode (EXPR_BAND);	break;
-       	    case TOK_BXOR:     	Root = NewExprNode (EXPR_BXOR); break;
+       	    case TOK_BOOLAND:   Root = NewExprNode (EXPR_BOOLAND); break;
+       	    case TOK_BOOLXOR:   Root = NewExprNode (EXPR_BOOLXOR); break;
 	    default:	   	Internal ("Invalid token");
       	}
 	Root->Left = Left;
@@ -754,12 +794,12 @@ static ExprNode* Expr1 (void)
     ExprNode* Root = Expr2 ();
 
     /* Handle booleans */
-    while (Tok == TOK_BOR) {
+    while (Tok == TOK_BOOLOR) {
 
 	/* Create the new node */
 	ExprNode* Left = Root;
 	switch (Tok) {
-       	    case TOK_BOR:      	Root = NewExprNode (EXPR_BOR);  break;
+       	    case TOK_BOOLOR:    Root = NewExprNode (EXPR_BOOLOR);  break;
 	    default:  	   	Internal ("Invalid token");
       	}
 	Root->Left = Left;
@@ -784,10 +824,10 @@ static ExprNode* Expr0 (void)
     ExprNode* Root;
 
     /* Handle booleans */
-    if (Tok == TOK_BNOT) {
+    if (Tok == TOK_BOOLNOT) {
 
 	/* Create the new node */
-        Root = NewExprNode (EXPR_BNOT);
+        Root = NewExprNode (EXPR_BOOLNOT);
 
         /* Skip the operator token */
      	NextTok ();
@@ -808,22 +848,440 @@ static ExprNode* Expr0 (void)
 
 
 
-static ExprNode* SimplifyExpr (ExprNode* Root)
+static void StudyExpr (ExprNode* Expr, ExprDesc* D, int Sign);
+static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
+/* Study a binary expression subtree */
+{
+    StudyExpr (Expr->Left, D, 1);
+    if (ExprDescIsConst (D)) {
+        D->Left = D->Val;
+        D->Val = 0;
+        StudyExpr (Expr->Right, D, 1);
+        if (!ExprDescIsConst (D)) {
+            D->TooComplex = 1;
+        }
+    } else {
+        D->TooComplex = 1;
+    }
+}
+
+
+
+static void StudyExpr (ExprNode* Expr, ExprDesc* D, int Sign)
+/* Study an expression tree and place the contents into D */
+{
+    SymEntry* Sym;
+    unsigned  Sec;
+    ExprDesc  SD;
+    ExprDesc  SD1;
+
+    /* Initialize SD. This is not needed in all cases, but it's rather cheap
+     * and simplifies the code below.
+     */
+    InitExprDesc (&SD);
+
+    /* Study this expression node */
+    switch (Expr->Op) {
+
+    	case EXPR_LITERAL:
+            D->Val += (Sign * Expr->V.Val);
+    	    break;
+
+    	case EXPR_SYMBOL:
+            Sym = Expr->V.Sym;
+            if (SymIsImport (Sym)) {
+                if (D->SymCount == 0) {
+                    D->SymCount += Sign;
+                    D->SymRef = Sym;
+                } else if (D->SymRef == Sym) {
+                    /* Same symbol */
+                    D->SymCount += Sign;
+                } else {
+                    /* More than one import */
+                    D->TooComplex = 1;
+                }
+            } else if (SymHasExpr (Sym)) {
+                if (SymHasUserMark (Sym)) {
+                    if (Verbosity > 0) {
+                        DumpExpr (Expr, SymResolve);
+                    }
+                    PError (GetSymPos (Sym),
+                            "Circular reference in definition of symbol `%s'",
+                            GetSymName (Sym));
+                    D->TooComplex = 1;
+                } else {
+                    SymMarkUser (Sym);
+                    StudyExpr (GetSymExpr (Sym), D, Sign);
+                    SymUnmarkUser (Sym);
+                }
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+    	case EXPR_SECTION:
+            Sec = Expr->V.SegNum;
+            if (D->SecCount == 0) {
+                D->SecCount += Sign;
+                D->SecRef = Sec;
+            } else if (D->SecRef == Sec) {
+                /* Same section */
+                D->SecCount += Sign;
+            } else {
+                /* More than one section */
+                D->TooComplex = 1;
+            }
+    	    break;
+
+	case EXPR_ULABEL:
+            if (ULabCanResolve ()) {
+                /* We can resolve the label */
+                StudyExpr (ULabResolve (Expr->V.Val), D, Sign);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+    	case EXPR_PLUS:
+       	    StudyExpr (Expr->Left, D, Sign);
+       	    StudyExpr (Expr->Right, D, Sign);
+    	    break;
+
+    	case EXPR_MINUS:
+    	    StudyExpr (Expr->Left, D, Sign);
+    	    StudyExpr (Expr->Right, D, -Sign);
+    	    break;
+
+        case EXPR_MUL:
+            InitExprDesc (&SD1);
+            StudyExpr (Expr->Left, &SD, 1);
+            StudyExpr (Expr->Right, &SD1, 1);
+            if (SD.TooComplex == 0 && SD1.TooComplex == 0) {
+                /* First calculate SD = SD*SD1 if possible */
+                if (ExprDescIsConst (&SD)) {
+                    /* Left is a constant */
+                    SD1.Val      *= SD.Val;
+                    SD1.SymCount *= SD.Val;
+                    SD1.SecCount *= SD.Val;
+                    SD = SD1;
+                } else if (ExprDescIsConst (&SD1)) {
+                    /* Right is constant */
+                    SD.Val      *= SD1.Val;
+                    SD.SymCount *= SD1.Val;
+                    SD.SecCount *= SD1.Val;
+                } else {
+                    D->TooComplex = 1;
+                }
+                /* Now calculate D * Sign * SD */
+                if (!D->TooComplex) {
+                    if ((D->SymCount == 0 || SD.SymCount == 0 || D->SymRef == SD.SymRef) &&
+                        (D->SecCount == 0 || SD.SecCount == 0 || D->SecRef == SD.SecRef)) {
+                        D->Val      += (Sign * SD.Val);
+                        if (D->SymCount == 0) {
+                            D->SymRef = SD.SymRef;
+                        }
+                        D->SymCount += (Sign * SD.SymCount);
+                        if (D->SecCount == 0) {
+                            D->SecRef = SD.SecRef;
+                        }
+                        D->SecCount += (Sign * SD.SecCount);
+                    }
+                } else {
+                    D->TooComplex = 1;
+                }
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_DIV:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                if (SD.Val == 0) {
+                    Error ("Division by zero");
+                    D->TooComplex = 1;
+                } else {
+                    D->Val += Sign * (SD.Left / SD.Val);
+                }
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_MOD:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                if (SD.Val == 0) {
+                    Error ("Modulo operation with zero");
+                    D->TooComplex = 1;
+                } else {
+                    D->Val += Sign * (SD.Left % SD.Val);
+                }
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_OR:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += Sign * (SD.Left | SD.Val);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_XOR:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += Sign * (SD.Left ^ SD.Val);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_AND:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += Sign * (SD.Left & SD.Val);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_SHL:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += (Sign * shl_l (SD.Left, (unsigned) SD.Val));
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_SHR:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += (Sign * shr_l (SD.Left, (unsigned) SD.Val));
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_EQ:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += Sign * (SD.Left == SD.Val);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_NE:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += Sign * (SD.Left != SD.Val);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_LT:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += Sign * (SD.Left < SD.Val);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_GT:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += Sign * (SD.Left > SD.Val);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_LE:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += Sign * (SD.Left <= SD.Val);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_GE:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += Sign * (SD.Left >= SD.Val);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_BOOLAND:
+            StudyExpr (Expr->Left, &SD, 1);
+            if (ExprDescIsConst (&SD)) {
+                if (SD.Val != 0) {   /* Shortcut op */
+                    SD.Val = 0;
+                    StudyExpr (Expr->Right, &SD, 1);
+                    if (ExprDescIsConst (&SD)) {
+                        D->Val += Sign * (SD.Val != 0);
+                    } else {
+                        D->TooComplex = 1;
+                    }
+                }
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_BOOLOR:
+            StudyExpr (Expr->Left, &SD, 1);
+            if (ExprDescIsConst (&SD)) {
+                if (SD.Val == 0) {   /* Shortcut op */
+                    StudyExpr (Expr->Right, &SD, 1);
+                    if (ExprDescIsConst (&SD)) {
+                        D->Val += Sign * (SD.Val != 0);
+                    } else {
+                        D->TooComplex = 1;
+                    }
+                } else {
+                    D->Val += Sign;
+                }
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_BOOLXOR:
+            StudyBinaryExpr (Expr, &SD);
+            if (!SD.TooComplex) {
+                D->Val += Sign * ((SD.Left != 0) ^ (SD.Val != 0));
+            }
+            break;
+
+        case EXPR_UNARY_MINUS:
+            StudyExpr (Expr->Left, D, -Sign);
+            break;
+
+        case EXPR_NOT:
+            StudyExpr (Expr->Left, &SD, 1);
+            if (ExprDescIsConst (&SD)) {
+                D->Val += (Sign * ~SD.Val);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_SWAP:
+            StudyExpr (Expr->Left, &SD, 1);
+            if (ExprDescIsConst (&SD)) {
+                D->Val += Sign * (((SD.Val >> 8) & 0x00FF) | ((SD.Val << 8) & 0xFF00));
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_BOOLNOT:
+            StudyExpr (Expr->Left, &SD, 1);
+            if (ExprDescIsConst (&SD)) {
+                D->Val += Sign * (SD.Val != 0);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_FORCEWORD:
+        case EXPR_FORCEFAR:
+            /* Ignore */
+            StudyExpr (Expr->Left, D, Sign);
+            break;
+
+        case EXPR_BYTE0:
+            StudyExpr (Expr->Left, &SD, 1);
+            if (ExprDescIsConst (&SD)) {
+                D->Val += Sign * (SD.Val & 0xFF);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_BYTE1:
+            StudyExpr (Expr->Left, &SD, 1);
+            if (ExprDescIsConst (&SD)) {
+                D->Val += Sign * ((SD.Val >> 8) & 0xFF);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_BYTE2:
+            StudyExpr (Expr->Left, &SD, 1);
+            if (ExprDescIsConst (&SD)) {
+                D->Val += Sign * ((SD.Val >> 16) & 0xFF);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_BYTE3:
+            StudyExpr (Expr->Left, &SD, 1);
+            if (ExprDescIsConst (&SD)) {
+                D->Val += Sign * ((SD.Val >> 24) & 0xFF);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_WORD0:
+            StudyExpr (Expr->Left, &SD, 1);
+            if (ExprDescIsConst (&SD)) {
+                D->Val += Sign * (SD.Val & 0xFFFF);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        case EXPR_WORD1:
+            StudyExpr (Expr->Left, &SD, 1);
+            if (ExprDescIsConst (&SD)) {
+                D->Val += Sign * ((SD.Val >> 16) & 0xFFFF);
+            } else {
+                D->TooComplex = 1;
+            }
+            break;
+
+        default:
+	    Internal ("Unknown Op type: %u", Expr->Op);
+    	    break;
+    }
+}
+
+
+
+static ExprNode* SimplifyExpr (ExprNode* Expr)
 /* Try to simplify the given expression tree */
 {
-    if (Root) {
-       	Root->Left  = SimplifyExpr (Root->Left);
- 	Root->Right = SimplifyExpr (Root->Right);
-	if (IsConstExpr (Root)) {
-	    /* The complete expression is constant */
-	    Root->V.Val = GetExprVal (Root);
-	    Root->Op = EXPR_LITERAL;
-	    FreeExpr (Root->Left);
-	    FreeExpr (Root->Right);
-	    Root->Left = Root->Right = 0;
-       	}
+    if (Expr && Expr->Op != EXPR_LITERAL) {
+
+        /* Create an expression description and initialize it */
+        ExprDesc D;
+        InitExprDesc (&D);
+
+        /* Study the expression */
+        StudyExpr (Expr, &D, 1);
+
+        /* Now check if we can generate a literal value */
+        if (ExprDescIsConst (&D)) {
+            /* No external references */
+            FreeExpr (Expr);
+            Expr = GenLiteralExpr (D.Val);
+        }
     }
-    return Root;
+    return Expr;
 }
 
 
@@ -833,7 +1291,16 @@ ExprNode* Expression (void)
  * a pointer to the root of the tree.
  */
 {
+#if 1
     return SimplifyExpr (Expr0 ());
+#else
+    /* Test code */
+    ExprNode* Expr = Expr0 ();
+    printf ("Before: "); DumpExpr (Expr, SymResolve);
+    Expr = SimplifyExpr (Expr);
+    printf ("After:  "); DumpExpr (Expr, SymResolve);
+    return Expr;
+#endif
 }
 
 
@@ -844,24 +1311,28 @@ long ConstExpression (void)
  * not constant.
  */
 {
-    long Val;
+#if 1
+    /* Read the expression */
+    ExprNode* Expr = Expr0 ();
+#else
+    /* Test code */
+    ExprNode* Expr = Expression ();
+#endif
 
-    /* Read the expression, and call finalize (exception here, since we
-     * expect a const).
-     */
-    ExprNode* Expr = FinalizeExpr (Expression ());
+    /* Study the expression */
+    ExprDesc D;
+    InitExprDesc (&D);
+    StudyExpr (Expr, &D, 1);
 
-    /* Get the value */
-    if (IsConstExpr (Expr)) {
-     	Val = GetExprVal (Expr);
-    } else {
+    /* Check if the expression is constant */
+    if (!ExprDescIsConst (&D)) {
      	Error ("Constant expression expected");
-     	Val = 0;
+     	D.Val = 0;
     }
 
     /* Free the expression tree and return the value */
     FreeExpr (Expr);
-    return Val;
+    return D.Val;
 }
 
 
@@ -951,7 +1422,7 @@ ExprNode* GenBranchExpr (unsigned Offs)
     if (RelocMode) {
 	N = NewExprNode (EXPR_PLUS);
 	N->Left  = GenSectionExpr (GetCurrentSegNum ());
-	N->Right = GenLiteralExpr (GetPC () + Offs);
+    	N->Right = GenLiteralExpr (GetPC () + Offs);
     } else {
 	N = GenLiteralExpr (GetPC () + Offs);
     }
@@ -1020,80 +1491,25 @@ ExprNode* GenNE (ExprNode* Expr, long Val)
 
 
 
-int IsConstExpr (ExprNode* Root)
+int IsConstExpr (ExprNode* Expr, long* Val)
 /* Return true if the given expression is a constant expression, that is, one
- * with no references to external symbols.
+ * with no references to external symbols. If Val is not NULL and the
+ * expression is constant, the constant value is stored here.
  */
 {
-    int Const;
-    SymEntry* Sym;
+    /* Study the expression */
+    ExprDesc D;
+    InitExprDesc (&D);
+    StudyExpr (Expr, &D, 1);
 
-    if (EXPR_IS_LEAF (Root->Op)) {
-	switch (Root->Op) {
-
-	    case EXPR_LITERAL:
-	      	return 1;
-
-	    case EXPR_SYMBOL:
-	 	Sym = Root->V.Sym;
-	       	if (SymHasUserMark (Sym)) {
-		    if (Verbosity > 0) {
-		      	DumpExpr (Root);
-		    }
-		    PError (GetSymPos (Sym), "Circular reference in symbol definition");
-		    Const = 0;                
-		} else {
-		    SymMarkUser (Sym);
-		    Const = SymIsConst (Sym);
-		    SymUnmarkUser (Sym);
-	 	}
-	 	return Const;
-
-	    default:
-	 	return 0;
-
-	}
-    } else if (EXPR_IS_UNARY (Root->Op)) {
-
-    	return IsConstExpr (Root->Left);
-
+    /* Check if the expression is constant */
+    if (ExprDescIsConst (&D)) {
+        if (Val) {
+            *Val = D.Val;
+        }
+        return 1;
     } else {
-
-	/* We must handle shortcut boolean expressions here */
-	switch (Root->Op) {
-
-	    case EXPR_BAND:
-	 	if (IsConstExpr (Root->Left)) {
-	 	    /* lhs is const, if it is zero, don't eval right */
-	 	    if (GetExprVal (Root->Left) == 0) {
-	 		return 1;
-	 	    } else {
-	 		return IsConstExpr (Root->Right);
-	 	    }
-	     	} else {
-	 	    /* lhs not const --> tree not const */
-	 	    return 0;
-	 	}
-	 	break;
-
-	    case EXPR_BOR:
-	 	if (IsConstExpr (Root->Left)) {
-	 	    /* lhs is const, if it is not zero, don't eval right */
-	 	    if (GetExprVal (Root->Left) != 0) {
-	 	    	return 1;
-	 	    } else {
-	 	    	return IsConstExpr (Root->Right);
-	 	    }
-	 	} else {
-	 	    /* lhs not const --> tree not const */
-	 	    return 0;
-		}
-		break;
-
-	    default:
-		/* All others are handled normal */
-		return IsConstExpr (Root->Left) && IsConstExpr (Root->Right);
-	}
+        return 0;
     }
 }
 
@@ -1105,7 +1521,7 @@ static void CheckByteExpr (const ExprNode* N, int* IsByte)
  */
 {
     if (N) {
-	switch (N->Op & EXPR_TYPEMASK) {
+    	switch (N->Op & EXPR_TYPEMASK) {
 
     	    case EXPR_LEAFNODE:
 		switch (N->Op) {
@@ -1149,12 +1565,10 @@ int IsByteExpr (ExprNode* Root)
 /* Return true if this is a byte expression */
 {
     int IsByte;
+    long Val;
 
-    if (IsConstExpr (Root)) {
-    	if (Root->Op != EXPR_LITERAL) {
-    	    SimplifyExpr (Root);
-     	}
-       	return IsByteRange (GetExprVal (Root));
+    if (IsConstExpr (Root, &Val)) {
+       	IsByte = IsByteRange (Val);
     } else if (Root->Op == EXPR_BYTE0 || Root->Op == EXPR_BYTE1 ||
 	       Root->Op == EXPR_BYTE2 || Root->Op == EXPR_BYTE3) {
     	/* Symbol forced to have byte range */
@@ -1170,307 +1584,6 @@ int IsByteExpr (ExprNode* Root)
     	CheckByteExpr (Root, &IsByte);
     }
     return IsByte;
-}
-
-
-
-long GetExprVal (ExprNode* Expr)
-/* Get the value of a constant expression */
-{
-    long Right, Left;
-
-    switch (Expr->Op) {
-
-       	case EXPR_LITERAL:
-    	    return Expr->V.Val;
-
-       	case EXPR_SYMBOL:
-    	    return GetSymVal (Expr->V.Sym);
-
-       	case EXPR_PLUS:
-    	    return GetExprVal (Expr->Left) + GetExprVal (Expr->Right);
-
-       	case EXPR_MINUS:
-	    return GetExprVal (Expr->Left) - GetExprVal (Expr->Right);
-
-       	case EXPR_MUL:
-	    return GetExprVal (Expr->Left) * GetExprVal (Expr->Right);
-
-       	case EXPR_DIV:
-    	    Left  = GetExprVal (Expr->Left);
-	    Right = GetExprVal (Expr->Right);
-	    if (Right == 0) {
-		Error ("Division by zero");
-	    	return 0;
-	    }
-	    return Left / Right;
-
-       	case EXPR_MOD:
-     	    Left  = GetExprVal (Expr->Left);
-	    Right = GetExprVal (Expr->Right);
-	    if (Right == 0) {
-		Error ("Modulo operation with zero");
-	    	return 0;
-	    }
-	    return Left % Right;
-
-       	case EXPR_OR:
-       	    return GetExprVal (Expr->Left) | GetExprVal (Expr->Right);
-
-       	case EXPR_XOR:
-       	    return GetExprVal (Expr->Left) ^ GetExprVal (Expr->Right);
-
-       	case EXPR_AND:
-       	    return GetExprVal (Expr->Left) & GetExprVal (Expr->Right);
-
-       	case EXPR_SHL:
-       	    return GetExprVal (Expr->Left) << GetExprVal (Expr->Right);
-
-       	case EXPR_SHR:
-       	    return GetExprVal (Expr->Left) >> GetExprVal (Expr->Right);
-
-       	case EXPR_EQ:
-       	    return (GetExprVal (Expr->Left) == GetExprVal (Expr->Right));
-
-       	case EXPR_NE:
-       	    return (GetExprVal (Expr->Left) != GetExprVal (Expr->Right));
-
-       	case EXPR_LT:
-    	    return (GetExprVal (Expr->Left) < GetExprVal (Expr->Right));
-
-       	case EXPR_GT:
-    	    return (GetExprVal (Expr->Left) > GetExprVal (Expr->Right));
-
-       	case EXPR_LE:
-    	    return (GetExprVal (Expr->Left) <= GetExprVal (Expr->Right));
-
-       	case EXPR_GE:
-    	    return (GetExprVal (Expr->Left) >= GetExprVal (Expr->Right));
-
-       	case EXPR_UNARY_MINUS:
-	    return -GetExprVal (Expr->Left);
-
-       	case EXPR_NOT:
-	    return ~GetExprVal (Expr->Left);
-
-       	case EXPR_BYTE0:
-	    return GetExprVal (Expr->Left) & 0xFF;
-
-       	case EXPR_BYTE1:
-	    return (GetExprVal (Expr->Left) >> 8) & 0xFF;
-
-       	case EXPR_BYTE2:
-	    return (GetExprVal (Expr->Left) >> 16) & 0xFF;
-
-       	case EXPR_BYTE3:
-	    return (GetExprVal (Expr->Left) >> 24) & 0xFF;
-
-        case EXPR_SWAP:
-	    Left = GetExprVal (Expr->Left);
-	    return ((Left >> 8) & 0x00FF) | ((Left << 8) & 0xFF00);
-
-	case EXPR_BAND:
-	    return GetExprVal (Expr->Left) && GetExprVal (Expr->Right);
-
-	case EXPR_BOR:
-	    return GetExprVal (Expr->Left) || GetExprVal (Expr->Right);
-
-	case EXPR_BXOR:
-	    return (GetExprVal (Expr->Left) != 0) ^ (GetExprVal (Expr->Right) != 0);
-
-	case EXPR_BNOT:
-       	    return !GetExprVal (Expr->Left);
-
-	case EXPR_ULABEL:
-	    Internal ("GetExprVal called for EXPR_ULABEL");
-      	    /* NOTREACHED */
-	    return 0;
-
-        default:
-	    Internal ("Unknown Op type: %u", Expr->Op);
-      	    /* NOTREACHED */
-    	    return 0;
-    }
-}
-
-
-
-static ExprNode* RemoveSyms (ExprNode* Expr, int MustClone)
-/* Remove resolved symbols from the tree by cloning symbol expressions */
-{
-    /* Accept NULL pointers */
-    if (Expr == 0) {
-     	return 0;
-    }
-
-    /* Special node handling */
-    switch (Expr->Op) {
-
- 	case EXPR_SYMBOL:
-	    if (SymHasExpr (Expr->V.Sym)) {
-	     	/* The symbol has an expression tree */
-	     	SymEntry* Sym = Expr->V.Sym;
-	     	if (SymHasUserMark (Sym)) {
-	     	    /* Circular definition */
-	     	    if (Verbosity) {
-	     		DumpExpr (Expr);
-	     	    }
-	     	    PError (GetSymPos (Sym), "Circular reference in symbol definition");
-	     	    return GenLiteralExpr (0);		/* Return a dummy value */
-	     	}
-	     	SymMarkUser (Sym);
-	     	Expr = RemoveSyms (GetSymExpr (Sym), 1);
-	     	SymUnmarkUser (Sym);
-	     	return Expr;
-	    } else if (SymIsConst (Expr->V.Sym)) {
-	     	/* The symbol is a constant */
-	     	return GenLiteralExpr (GetSymVal (Expr->V.Sym));
-	    }
-	    break;
-
-	case EXPR_ULABEL:
-	    if (ULabCanResolve ()) {
-	     	ExprNode* NewExpr = ULabResolve (Expr->V.Val);
-	     	FreeExpr (Expr);
-	     	Expr = NewExpr;
-	    }
-	    break;
-
-    }
-
-    /* Clone the current node if needed */
-    if (MustClone) {
-
-       	ExprNode* Clone;
-
-	/* Clone the expression tree */
-	switch (Expr->Op) {
-
-     	    case EXPR_LITERAL:
-                Clone = GenLiteralExpr (Expr->V.Val);
-                break;
-
-	    case EXPR_ULABEL:
-                Clone = GenULabelExpr (Expr->V.Val);
-                break;
-
-	    case EXPR_SYMBOL:
-                Clone = GenSymExpr (Expr->V.Sym);
-                break;
-
-	    case EXPR_SECTION:
-                Clone = GenSectionExpr (Expr->V.SegNum);
-                break;
-
-            default:
-                Clone = NewExprNode (Expr->Op);
-                Clone->Left  = RemoveSyms (Expr->Left, 1);
-                Clone->Right = RemoveSyms (Expr->Right, 1);
-                break;
-
-      	}
-
-	/* Done */
-	return Clone;
-
-    } else {
-
- 	/* Nothing to clone */
-       	Expr->Left  = RemoveSyms (Expr->Left, 0);
-     	Expr->Right = RemoveSyms (Expr->Right, 0);
-
-     	/* Done */
-     	return Expr;
-    }
-}
-
-
-
-static ExprNode* ConstExtract (ExprNode* Expr, long* Val, int Sign)
-/* Extract and evaluate all constant factors in an subtree that has only
- * additions and subtractions.
- */
-{
-    if (Expr->Op == EXPR_LITERAL) {
-     	if (Sign < 0) {
-     	    *Val -= Expr->V.Val;
-     	} else {
-     	    *Val += Expr->V.Val;
-     	}
-       	FreeExprNode (Expr);
-     	return 0;
-    }
-
-    if (Expr->Op == EXPR_PLUS || Expr->Op == EXPR_MINUS) {
-     	ExprNode* Left;
-     	ExprNode* Right;
-     	Left = ConstExtract (Expr->Left, Val, Sign);
-     	if (Expr->Op == EXPR_MINUS) {
-     	    Sign = -Sign;
-     	}
-     	Right = ConstExtract (Expr->Right, Val, Sign);
-     	if (Left == 0 && Right == 0) {
-     	    FreeExprNode (Expr);
-     	    return 0;
-     	} else if (Left == 0) {
-     	    FreeExprNode (Expr);
-     	    return Right;
-     	} else if (Right == 0) {
-     	    FreeExprNode (Expr);
-     	    return Left;
-     	} else {
-     	    /* Check for SEG - SEG which is now possible */
-     	    if (Left->Op == EXPR_SECTION && Right->Op == EXPR_SECTION &&
-	 	Left->V.SegNum == Right->V.SegNum) {
-     	     	/* SEG - SEG, remove it completely */
-     	       	FreeExprNode (Left);
-     	 	FreeExprNode (Right);
-     	  	FreeExprNode (Expr);
-     	     	return 0;
-     	    } else {
-		Expr->Left  = Left;
-		Expr->Right = Right;
-     	       	return Expr;
-     	    }
-     	}
-    }
-
-    /* Some other sort of node, finalize the terms */
-    if (Expr->Left) {
-	Expr->Left = FinalizeExpr (Expr->Left);
-    }
-    if (Expr->Right) {
-	Expr->Right = FinalizeExpr (Expr->Right);
-    }
-
-    return Expr;
-}
-
-
-
-ExprNode* FinalizeExpr (ExprNode* Expr)
-/* Resolve any symbols by cloning the symbol expression tree instead of the
- * symbol reference, then try to simplify the expression as much as possible.
- * This function must only be called if all symbols are resolved (no undefined
- * symbol errors).
- */
-{
-    long Val = 0;
-    ExprNode* N;
-
-    Expr = RemoveSyms (Expr, 0);
-    Expr = ConstExtract (Expr, &Val, 1);
-    if (Expr == 0) {
-     	/* Reduced to a literal value */
-	Expr = GenLiteralExpr (Val);
-    } else if (Val) {
-     	/* Extracted a value */
-     	N = NewExprNode (EXPR_PLUS);
-     	N->Left = Expr;
-     	N->Right = GenLiteralExpr (Val);
-     	Expr = N;
-    }
-    return Expr;
 }
 
 
@@ -1526,12 +1639,9 @@ void WriteExpr (ExprNode* Expr)
 {
     /* Null expressions are encoded by a type byte of zero */
     if (Expr == 0) {
-	ObjWrite8 (0);
+	ObjWrite8 (EXPR_NULL);
       	return;
     }
-
-    /* Write the expression code */
-    ObjWrite8 (Expr->Op);
 
     /* If the is a leafnode, write the expression attribute, otherwise
      * write the expression operands.
@@ -1539,25 +1649,31 @@ void WriteExpr (ExprNode* Expr)
     switch (Expr->Op) {
 
         case EXPR_LITERAL:
+            ObjWrite8 (EXPR_LITERAL);
 	    ObjWrite32 (Expr->V.Val);
 	    break;
 
         case EXPR_SYMBOL:
-	    /* Maybe we should use a code here? */
-	    CHECK (SymIsImport (Expr->V.Sym));	/* Safety */
-	    ObjWriteVar (GetSymIndex (Expr->V.Sym));
+	    if (SymIsImport (Expr->V.Sym)) {
+                ObjWrite8 (EXPR_SYMBOL);
+                ObjWriteVar (GetSymIndex (Expr->V.Sym));
+            } else {
+                WriteExpr (GetSymExpr (Expr->V.Sym));
+            }
 	    break;
 
         case EXPR_SECTION:
+            ObjWrite8 (EXPR_SECTION);
 	    ObjWrite8 (Expr->V.SegNum);
 	    break;
 
 	case EXPR_ULABEL:
-	    Internal ("WriteExpr: Cannot write EXPR_ULABEL nodes");
+            WriteExpr (ULabResolve (Expr->V.Val));
 	    break;
 
         default:
 	    /* Not a leaf node */
+            ObjWrite8 (Expr->Op);
 	    WriteExpr (Expr->Left);
 	    WriteExpr (Expr->Right);
 	    break;

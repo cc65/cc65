@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -118,9 +118,6 @@ void WriteAssertions (void)
         /* Get the next assertion */
         Assertion* A = CollAtUnchecked (&Assertions, I);
 
-        /* Finalize the expression */
-        A->Expr = FinalizeExpr (A->Expr);
-
         /* Write it to the file */
         WriteExpr (A->Expr);
         ObjWriteVar (A->Action);
@@ -134,4 +131,4 @@ void WriteAssertions (void)
 
 
 
-                 
+

@@ -290,13 +290,12 @@ void SegCheck (void)
      	Fragment* F = S->Root;
      	while (F) {
        	    if (F->Type == FRAG_EXPR || F->Type == FRAG_SEXPR) {
-       	       	F->V.Expr = FinalizeExpr (F->V.Expr);
-       	       	if (IsConstExpr (F->V.Expr)) {
-     	       	    /* We are able to evaluate the expression. Get the value
-     	       	     * and check for range errors.
+                long Val;
+       	       	if (IsConstExpr (F->V.Expr, &Val)) {
+     	       	    /* We are able to evaluate the expression. Check for
+     	       	     * range errors.
      	       	     */
      	       	    unsigned I;
-     	       	    long Val = GetExprVal (F->V.Expr);
      	       	    int Abs = (F->Type != FRAG_SEXPR);
 
      	       	    if (F->Len == 1) {
@@ -317,36 +316,36 @@ void SegCheck (void)
      	     		    if (Val > 65535) {
      	       	       	     	PError (&F->Pos, "Range error");
      	     		    }
-    	     		} else {
-	     		    /* PC relative value */
-	     		    if (Val < -32768 || Val > 32767) {
-	     	       	     	PError (&F->Pos, "Range error");
-	       		    }
-	     		}
-	     	    }
+     	     		} else {
+     	     		    /* PC relative value */
+     	     		    if (Val < -32768 || Val > 32767) {
+     	     	       	     	PError (&F->Pos, "Range error");
+     	       		    }
+     	     		}
+     	     	    }
 
                     /* We don't need the expression tree any longer */
                     FreeExpr (F->V.Expr);
 
-	     	    /* Convert the fragment into a literal fragment */
-	     	    for (I = 0; I < F->Len; ++I) {
-	     	       	F->V.Data [I] = Val & 0xFF;
-	     	       	Val >>= 8;
+     	     	    /* Convert the fragment into a literal fragment */
+     	     	    for (I = 0; I < F->Len; ++I) {
+     	     	       	F->V.Data [I] = Val & 0xFF;
+     	     	       	Val >>= 8;
      	     	    }
-	     	    F->Type = FRAG_LITERAL;
-	     	} else {
-	     	    /* We cannot evaluate the expression now, leave the job for
-	     	     * the linker. However, we are able to check for explicit
-	     	     * byte expressions and we will do so.
-		     */
-	       	    if (F->Type == FRAG_EXPR && F->Len == 1 && !IsByteExpr (F->V.Expr)) {
-	       	        PError (&F->Pos, "Range error");
-	     	    }
-		}
-	    }
-	    F = F->Next;
-	}
-    	S = S->List;
+     	     	    F->Type = FRAG_LITERAL;
+     	     	} else {
+     	     	    /* We cannot evaluate the expression now, leave the job for
+     	     	     * the linker. However, we are able to check for explicit
+     	     	     * byte expressions and we will do so.
+     		     */
+     	       	    if (F->Type == FRAG_EXPR && F->Len == 1 && !IsByteExpr (F->V.Expr)) {
+     	       	        PError (&F->Pos, "Range error");
+     	     	    }
+     		}
+     	    }
+     	    F = F->Next;
+     	}
+     	S = S->List;
     }
 }
 
@@ -378,7 +377,7 @@ void SegDump (void)
      	    } else if (F->Type == FRAG_EXPR || F->Type == FRAG_SEXPR) {
        	       	State = 1;
 	      	printf ("\n  Expression (%u): ", F->Len);
-		DumpExpr (F->V.Expr);
+		DumpExpr (F->V.Expr, SymResolve);
 	    } else if (F->Type == FRAG_FILL) {
 		State = 1;
 		printf ("\n  Fill bytes (%u)", F->Len);

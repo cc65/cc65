@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -92,29 +92,20 @@ ExprNode* GenWordExpr (ExprNode* Expr);
 ExprNode* GenNE (ExprNode* Expr, long Val);
 /* Generate an expression that compares Expr and Val for inequality */
 
-int IsConstExpr (ExprNode* Root);
+int IsConstExpr (ExprNode* Expr, long* Val);
 /* Return true if the given expression is a constant expression, that is, one
- * with no references to external symbols.
+ * with no references to external symbols. If Val is not NULL and the
+ * expression is constant, the constant value is stored here.
  */
 
 int IsByteExpr (ExprNode* Root);
 /* Return true if this is a byte expression */
-
-long GetExprVal (ExprNode* Expr);
-/* Get the value of a constant expression */
 
 int IsByteRange (long Val);
 /* Return true if this is a byte value */
 
 int IsWordRange (long Val);
 /* Return true if this is a word value */
-
-ExprNode* FinalizeExpr (ExprNode* Expr);
-/* Resolve any symbols by cloning the symbol expression tree instead of the
- * symbol reference, then try to simplify the expression as much as possible.
- * This function must only be called if all symbols are resolved (no undefined
- * symbol errors).
- */
 
 ExprNode* CloneExpr (ExprNode* Expr);
 /* Clone the given expression tree. The function will simply clone symbol

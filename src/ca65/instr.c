@@ -673,8 +673,8 @@ static long PutImmed8 (const InsDesc* Ins)
     }
 
     /* If we have an expression and it's const, get it's value */
-    if (A.Expr && IsConstExpr (A.Expr)) {
-      	Val = GetExprVal (A.Expr);
+    if (A.Expr) {
+        (void) IsConstExpr (A.Expr, &Val);
     }
 
     /* Check how many extension bytes are needed and output the instruction */

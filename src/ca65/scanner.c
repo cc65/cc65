@@ -122,7 +122,7 @@ struct DotKeyword {
     { ".A8",   	    	TOK_A8		},
     { ".ADDR", 	    	TOK_ADDR	},
     { ".ALIGN",	       	TOK_ALIGN     	},
-    { ".AND", 	    	TOK_BAND 	},
+    { ".AND", 	    	TOK_BOOLAND 	},
     { ".ASCIIZ",       	TOK_ASCIIZ	},
     { ".ASSERT",        TOK_ASSERT      },
     { ".AUTOIMPORT", 	TOK_AUTOIMPORT	},
@@ -206,9 +206,9 @@ struct DotKeyword {
     { ".MATCH",		TOK_MATCH	},
     { ".MID",   	TOK_MID		},
     { ".MOD", 		TOK_MOD		},
-    { ".NOT", 		TOK_BNOT 	},
+    { ".NOT", 		TOK_BOOLNOT 	},
     { ".NULL",		TOK_NULL	},
-    { ".OR",  		TOK_BOR  	},
+    { ".OR",  		TOK_BOOLOR  	},
     { ".ORG",  		TOK_ORG		},
     { ".OUT",  		TOK_OUT		},
     { ".P02",  		TOK_P02		},
@@ -247,7 +247,7 @@ struct DotKeyword {
     { ".WARNING",	TOK_WARNING	},
     { ".WORD", 	  	TOK_WORD	},
     { ".XMATCH",	TOK_XMATCH	},
-    { ".XOR",  	  	TOK_BXOR  	},
+    { ".XOR",  	       	TOK_BOOLXOR  	},
     { ".ZEROPAGE", 	TOK_ZEROPAGE	},
 };
 
@@ -875,7 +875,7 @@ CharAgain:
    	    NextChar ();
 	    if (C == '&') {
 	    	NextChar ();
-	    	Tok = TOK_BAND;
+	    	Tok = TOK_BOOLAND;
 	    } else {
 	        Tok = TOK_AND;
 	    }
@@ -885,7 +885,7 @@ CharAgain:
 	    NextChar ();
 	    if (C == '|') {
 	    	NextChar ();
-	     	Tok = TOK_BOR;
+	     	Tok = TOK_BOOLOR;
 	    } else {
 	        Tok = TOK_OR;
 	    }
@@ -989,7 +989,7 @@ CharAgain:
 
 	case '!':
 	    NextChar ();
-	    Tok = TOK_BNOT;
+	    Tok = TOK_BOOLNOT;
    	    return;
 
 	case '>':

@@ -45,6 +45,7 @@
         MOUSE_ERR_CANNOT_LOAD           ; Error loading driver
         MOUSE_ERR_INV_DRIVER            ; Invalid driver
         MOUSE_ERR_NO_DEVICE             ; Mouse hardware not found
+        MOUSE_ERR_INV_IOCTL             ; Invalid ioctl code
 .endenum
 
 ;------------------------------------------------------------------------------
@@ -63,6 +64,8 @@
 	    BUTTONS     .addr
 	    POS         .addr
             INFO        .addr
+            IOCTL       .addr
+	    IRQ		.addr
 	.endstruct
 .endstruct
 
@@ -110,7 +113,8 @@ MOUSE_BTN_RIGHT         = $01
         .global _mouse_move
         .global _mouse_buttons
         .global _mouse_pos
-        .global _mouse_info
+        .global _mouse_info   
+        .global _mouse_ioctl
 
 ;------------------------------------------------------------------------------
 ; Driver entry points
@@ -123,6 +127,7 @@ MOUSE_BTN_RIGHT         = $01
         .global mouse_move
         .global mouse_buttons
         .global mouse_pos
-        .global mouse_info
+        .global mouse_info  
+        .global mouse_ioctl
 
 

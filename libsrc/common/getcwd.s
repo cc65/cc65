@@ -37,17 +37,18 @@ loop:   inc     ptr2
         inc     ptr2+1
         beq     overflow
 
-; Copy one character, end the loop if the zero terminator is reached
+; Copy one character, end the loop if the zero terminator is reached. We
+; don't support directories longer than 255 characters for now.
 
 @L1:    lda     __cwd,y
         sta     (ptr1),y
+        beq     done
+        iny
         bne     loop
 
-; Current working dir copied ok, A contains zero
-
-        tax                     ; Return zero in a/x
-        rts
-
+; For some reason the cwd is longer than 255 characters. This should not
+; happen, we handle it as if the passed buffer was too short.
+;
 ; String overflow, return ERANGE
 
 overflow:
@@ -55,8 +56,13 @@ overflow:
         sta     __errno
         lda     #>ERANGE
         sta     __errno+1
-        lda     #$FF
-        tax                     ; Return -1
+        tax                     ; High byte of ERANGE is zero, return zero
+        rts
+ 
+; Success, return buf
+
+done:   lda     ptr1
+        ldx     ptr1+1
         rts
 
 .endproc

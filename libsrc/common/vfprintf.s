@@ -1,5 +1,5 @@
 ;
-; int vprintf (FILE* f, const char* Format, va_list ap);
+; int vfprintf (FILE* f, const char* Format, va_list ap);
 ;
 ; Ullrich von Bassewitz, 1.12.2000
 ;
@@ -56,7 +56,7 @@ out:
   	sta	ptr1+1
   	dey	   		; Offset of D on stack (6)
   	lda	(sp),y
-  	sta	ptr1			       
+  	sta	ptr1
   	dey	   		; Offset of ptr+1 in struct outdesc (5)
   	lda	(ptr1),y
   	tax

@@ -1,6 +1,6 @@
 ;-------------------------------------------------------------------------
-; Atari System Equates -- Version 1.0.0
-; By Freddy Offenga, 4/15/2000
+; Atari System Equates
+; by Freddy Offenga & Christian Groessler
 ;
 ; References:
 ; - Atari 400/800 OS rev.B source code, Atari 1979
@@ -68,6 +68,18 @@ SCREDT	= 'E'		;screen editor
 KBD	= 'K'		;keyboard
 PRINTR	= 'P'		;printer
 DISPLY	= 'S'		;screen display
+
+; SIO Command Code Equates
+
+SIO_FORMAT   = $21	;format disk (default density)
+SIO_FORMATS  = $22	;1050: format medium density
+SIO_CONFIG   = $44	;configure drive
+SIO_CONFIGSF = $4B	;slow/fast configure drive??
+SIO_WRITE    = $50	;write sector
+SIO_READ     = $52	;read sector
+SIO_STAT     = $53	;get status information
+SIO_VERIFY   = $56	;verify sector 
+SIO_WRITEV   = $57	;write sector with verify
 
 ; Character and Key Code Equates
 

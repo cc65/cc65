@@ -58,8 +58,8 @@ typedef void (*__sigfunc) (int);
 #define SIGTERM         5
 
 /* Function declarations */
-__sigfunc signal (int sig, __sigfunc func);
-int raise (int sig);
+__sigfunc __fastcall__ signal (int sig, __sigfunc func);
+int __fastcall__ raise (int sig);
 
 
 

@@ -45,8 +45,8 @@
 
 
 /* off_t is also defined in unistd.h */
-#ifndef __HAVE_off_t
-#define __HAVE_off_t
+#ifndef _HAVE_off_t
+#define _HAVE_off_t
 typedef long int off_t;
 #endif
 

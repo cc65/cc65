@@ -25,6 +25,23 @@ all:
 	make -f make\watcom.mak
 	cd ..
 
+dos:
+   	cd common
+       	make -DTARGET=DOS32 -f make\watcom.mak
+	cd ..\ar65
+       	make -DTARGET=DOS32 -f make\watcom.mak
+	cd ..\ca65
+       	make -DTARGET=DOS32 -f make\watcom.mak
+	cd ..\cc65
+       	make -DTARGET=DOS32 -f make\watcom.mak
+	cd ..\cl65
+       	make -DTARGET=DOS32 -f make\watcom.mak
+	cd ..\grc
+       	make -DTARGET=DOS32 -f make\watcom.mak
+	cd ..\ld65
+       	make -DTARGET=DOS32 -f make\watcom.mak
+	cd ..
+
 clean:
 	cd common
 	make -f make\watcom.mak clean

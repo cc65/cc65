@@ -2779,33 +2779,38 @@ void g_or (unsigned flags, unsigned long val)
       		}
      		/* FALLTHROUGH */
 
-	    case CF_INT:
-		if (val <= 0xFF) {
+     	    case CF_INT:
+     		if (val <= 0xFF) {
                     if ((val & 0xFF) != 0) {
-		        AddCodeLine ("ora #$%02X", (unsigned char)val);
+     		        AddCodeLine ("ora #$%02X", (unsigned char)val);
                     }
-		    return;
      		} else if ((val & 0xFF00) == 0xFF00) {
                     if ((val & 0xFF) != 0) {
-		        AddCodeLine ("ora #$%02X", (unsigned char)val);
+     		        AddCodeLine ("ora #$%02X", (unsigned char)val);
                     }
                     ldxconst (0xFF);
-                    return;
+                } else if (val != 0) {
+                    AddCodeLine ("ora #$%02X", (unsigned char)val);
+                    AddCodeLine ("pha");
+                    AddCodeLine ("txa");
+                    AddCodeLine ("ora #$%02X", (unsigned char)(val >> 8));
+                    AddCodeLine ("tax");
+                    AddCodeLine ("pla");
                 }
-		break;
+     		return;
 
-	    case CF_LONG:
-		if (val <= 0xFF) {
+     	    case CF_LONG:
+     		if (val <= 0xFF) {
                     if ((val & 0xFF) != 0) {
                         AddCodeLine ("ora #$%02X", (unsigned char)val);
                     }
-		    return;
-		}
-		break;
+     		    return;
+     		}
+     		break;
 
-	    default:
-		typeerror (flags);
-	}
+     	    default:
+     		typeerror (flags);
+     	}
 
      	/* If we go here, we didn't emit code. Push the lhs on stack and fall
       	 * into the normal, non-optimized stuff. Note: The standard stuff will
@@ -2853,16 +2858,17 @@ void g_xor (unsigned flags, unsigned long val)
 		    if (val != 0) {
 		     	AddCodeLine ("eor #$%02X", (unsigned char)val);
 		    }
-		    return;
-		} else if ((val & 0xFF) == 0) {
+       	       	} else if (val != 0) {
+                    if ((val & 0xFF) != 0) {
+                        AddCodeLine ("eor #$%02X", (unsigned char)val);
+                    }
 		    AddCodeLine ("pha");
 	     	    AddCodeLine ("txa");
 		    AddCodeLine ("eor #$%02X", (unsigned char)(val >> 8));
 		    AddCodeLine ("tax");
 		    AddCodeLine ("pla");
-		    return;
 		}
-		break;
+		return;
 
 	    case CF_LONG:
 		if (val <= 0xFF) {

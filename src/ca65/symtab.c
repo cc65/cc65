@@ -1121,11 +1121,9 @@ void WriteImports (void)
      */
     S = SymList;
     while (S) {
-        printf ("%s: %04X - ", S->Name, S->Flags);
         if ((S->Flags & (SF_TRAMPOLINE | SF_IMPORT)) == SF_IMPORT &&
             (S->Flags & (SF_REFERENCED | SF_FORCED)) != 0) {
 
-            printf ("imported\n");
      	    if (S->Flags & SF_ZP) {
      		ObjWrite8 (IMP_ZP);
      	    } else {
@@ -1133,9 +1131,7 @@ void WriteImports (void)
      	    }
        	    ObjWriteStr (S->Name);
      	    ObjWritePos (&S->Pos);
-     	} else {
-            printf ("ignored\n");
-        }
+     	}
      	S = S->List;
     }
 

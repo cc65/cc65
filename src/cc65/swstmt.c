@@ -73,7 +73,8 @@ void SwitchStatement (void)
     unsigned ExitLabel;	       	/* Exit label */
     unsigned CaseLabel;         /* Label for case */
     unsigned DefaultLabel;      /* Label for the default branch */
-    long Val;	       		/* Case label value */
+    long     Val;               /* Case label value */
+    int      HaveBreak = 0;     /* True if the last statement had a break */
 
 
     /* Eat the "switch" token */
@@ -200,7 +201,7 @@ void SwitchStatement (void)
 
      	/* Parse statements */
      	if (CurTok.Tok != TOK_RCURLY) {
-       	    Statement (0);
+       	    HaveBreak = Statement (0);
      	}
     }
 
@@ -210,9 +211,22 @@ void SwitchStatement (void)
 	Warning ("No case labels");
 
     } else {
+                                   
+        CodeMark SwitchCodeStart;
+
+        /* If the last statement did not have a break, we may have an open
+         * label (maybe from an if or similar). Emitting code and then moving
+         * this code to the top will also move the label to the top which is
+         * wrong. So if the last statement did not have a break (which would
+         * carry the label), add a jump to the exit. If it is useless, the
+         * optimizer will remove it later.
+         */
+        if (!HaveBreak) {
+            g_jump (ExitLabel);
+        }
 
 	/* Remember the current position */
-	CodeMark SwitchCodeStart = GetCodePos();
+	SwitchCodeStart = GetCodePos();
 
 	/* Generate code */
        	g_switch (Nodes, DefaultLabel? DefaultLabel : ExitLabel, Depth);

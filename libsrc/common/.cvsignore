@@ -14,6 +14,7 @@ fgets.s
 fputc.s
 fputs.s
 freopen.s
+fscanf.s
 fseek.s
 fsetpos.s
 ftell.s
@@ -28,6 +29,7 @@ puts.s
 qsort.s
 realloc.s
 rewind.s
+scanf.s
 sleep.s
 sscanf.s
 strftime.s
@@ -35,4 +37,7 @@ strtok.s
 strxfrm.s
 system.s
 timezone.s
+vfscanf.s
 vsscanf.s
+
+

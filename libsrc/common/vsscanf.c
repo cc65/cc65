@@ -9,7 +9,20 @@
 
 #include <stdio.h>
 #include "_scanf.h"
-		 
+
+
+
+/*****************************************************************************/
+/*     	    	     		     Data				     */
+/*****************************************************************************/
+
+
+
+struct sscanfdata {
+    const char* str;            /* Pointer to input string */
+    unsigned    index;          /* Read index */
+};
+
 
 
 /*****************************************************************************/
@@ -18,15 +31,29 @@
 
 
 
-static char get (struct indesc* d)
+static int __fastcall__ get (struct sscanfdata* d)
 /* Read a character from the input string and return it */
 {
     char C;
-    if (C = d->buf[d->ridx]) {
-	/* Increment index only if end not reached */
-	++d->ridx;
+    if (C = d->str[d->index]) {
+    	/* Increment index only if end not reached */
+       	++d->index;
+        return C;
+    } else {
+        return EOF;
     }
-    return C;
+}
+
+
+
+static int __fastcall__ unget (int c, struct sscanfdata* d)
+/* Push back a character onto the input stream */
+{
+    /* We do assume here that the _scanf routine will not push back anything
+     * not read, so we can ignore c safely and won't check the index.
+     */
+    --d->index;
+    return c;
 }
 
 
@@ -34,17 +61,20 @@ static char get (struct indesc* d)
 int __fastcall__ vsscanf (const char* str, const char* format, va_list ap)
 /* Standard C function */
 {
-    struct indesc id;
+    struct sscanfdata sd;
+    struct scanfdata d;
 
-    /* Initialize the indesc struct. We leave all fields uninitialized that we
-     * don't need
+    /* Initialize the data structs. The sscanfdata struct will be passed back
+     * to the get and unget functions by _scanf.
      */
-    id.fin  = (infunc) get;
-    id.buf  = (char*) str;
-    id.ridx = 0;
+    d.get    = (getfunc) get;
+    d.unget  = (ungetfunc) unget,
+    d.data   = &sd;
+    sd.str   = str;
+    sd.index = 0;
 
     /* Call the internal function and return the result */
-    return _scanf (&id, format, ap);
+    return _scanf (&d, format, ap);
 }
 
 

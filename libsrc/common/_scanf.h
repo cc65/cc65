@@ -12,13 +12,11 @@
 
 
 
-/* Forward */
-struct indesc;
-
 /* Type of the function that is called to input data. The function will
  * return EOF if no more data is available.
  */
-typedef char (*infunc) (struct indesc* desc);
+typedef int __fastcall__ (*getfunc) (void* data);
+typedef int __fastcall__ (*ungetfunc) (int c, void* data);
 
 
 
@@ -26,21 +24,19 @@ typedef char (*infunc) (struct indesc* desc);
  * Beware: The low level functions will access the structure on the assembly
  * level, so check this when altering the structure.
  */
-struct indesc {
-    infunc	    fin;	/* Pointer to input routine */
-    unsigned	    ccount;	/* Number of chars read */
+struct scanfdata {
+    getfunc    	    get;        /* Pointer to input routine */
+    ungetfunc       unget;      /* Pointer to pushback routine */
+    unsigned	    ccount; 	/* Number of chars read */
 
     /* Fields used outside of _scanf */
-    char*      	    buf; 	/* Pointer to input buffer */
-    unsigned	    size;	/* Size of input buffer */
-    unsigned	    fill;	/* Fill mark of input buffer */
-    unsigned	    ridx;	/* Read index of input buffer */
+    void*           data;       /* Caller data */
 };
 
 
 
 /* Internal scanning routine */
-int _scanf (struct indesc* d, const char* format, va_list ap);
+int _scanf (struct scanfdata* d, const char* format, va_list ap);
 
 
 

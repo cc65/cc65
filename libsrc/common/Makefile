@@ -44,6 +44,7 @@ C_OBJS =	_afailed.o	\
 		fputc.o		\
 		fputs.o		\
 		freopen.o	\
+                fscanf.o        \
 		fseek.o		\
 		fsetpos.o	\
 		ftell.o		\
@@ -58,6 +59,7 @@ C_OBJS =	_afailed.o	\
 		qsort.o		\
 		realloc.o	\
 		rewind.o	\
+                scanf.o         \
 		sleep.o		\
 		sscanf.o	\
                 strftime.o      \
@@ -65,6 +67,7 @@ C_OBJS =	_afailed.o	\
 		strtok.o	\
                 system.o        \
                 timezone.o      \
+                vfscanf.o       \
                 vsscanf.o
 
 

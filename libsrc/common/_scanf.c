@@ -39,21 +39,20 @@
 
 
 
-static struct indesc*	D;		/* Copy of function argument */
-static va_list		ap;	 	/* Copy of function argument */
-static jmp_buf 		JumpBuf; 	/* Label that is used in case of EOF */
-static char    		C;     	      	/* Character from input */
-static unsigned		Width;      	/* Maximum field width */
-static long    	  	IntVal;	 	/* Converted int value */
-static unsigned		Conversions;	/* Number of conversions */
+static struct scanfdata*  D;		/* Copy of function argument */
+static va_list		  ap;	 	/* Copy of function argument */
+static jmp_buf 		  JumpBuf; 	/* Label that is used in case of EOF */
+static int                C;           	/* Character from input */
+static unsigned		  Width;      	/* Maximum field width */
+static long    	  	  IntVal;	/* Converted int value */
+static unsigned		  Conversions;	/* Number of conversions */
+static unsigned char      IntBytes;     /* Number of bytes-1 for int conversions */
 
 /* Flags */
-static unsigned char	Positive;  	/* Flag for positive value */
-static unsigned char 	NoAssign;	/* Supppress assigment */
-static unsigned char	IsShort;    	/* Short type */
-static unsigned char	IsLong;     	/* Long type */
-static unsigned char    Invert;         /* Do we need to invert the charset? */
-static unsigned char    CharSet[32];    /* 32 * 8 bits = 256 bits */
+static unsigned char   	  Positive;  	/* Flag for positive value */
+static unsigned char   	  NoAssign;	/* Supppress assigment */
+static unsigned char      Invert;       /* Do we need to invert the charset? */
+static unsigned char      CharSet[32];  /* 32 * 8 bits = 256 bits */
 static const unsigned char Bits[8] = {
     0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
 };
@@ -120,7 +119,7 @@ static void InvertCharSet (void)
 
 
 /*****************************************************************************/
-/*  		       		     Code				     */
+/*  		       	 	     Code				     */
 /*****************************************************************************/
 
 
@@ -128,8 +127,21 @@ static void InvertCharSet (void)
 static void ReadChar (void)
 /* Get an input character, count characters */
 {
-    C = D->fin (D);
-    ++D->ccount;
+    C = D->get (D->data);
+    if (C != EOF) {
+        ++D->ccount;
+    }
+}
+
+
+
+static void ReadCharWithCheck (void)
+/* Get an input char, use longjmp in case of EOF */
+{
+    ReadChar ();
+    if (C == EOF) {
+     	longjmp (JumpBuf, RC_EOF);
+    }
 }
 
 
@@ -171,29 +183,8 @@ static unsigned char HexVal (char C)
     if (isdigit (C)) {
     	return C - '0';
     } else {
-	return C - toupper (C) + ('A' + 10);
+	return toupper (C) - ('A' - 10);
     }
-}
-
-
-
-static void ReadInt (unsigned char Base)
-/* Read an integer and store it into IntVal */
-{
-    /* Value must start with a digit */
-    if (!isdigit (C)) {
-	longjmp (JumpBuf, RC_NOCONV);
-    }
-
-    /* Read the value */
-    IntVal = 0;
-    while (isxdigit (C) && Width-- > 0) {
-       	IntVal = IntVal * Base + HexVal (C);
-	ReadChar ();
-    }
-
-    /* One more conversion */
-    ++Conversions;
 }
 
 
@@ -216,10 +207,7 @@ static void AssignInt (void)
         asm ("stx ptr1+1");
 
         /* Get the number of bytes-1 to copy */
-        asm ("ldy #3");
-        asm ("lda %v", IsLong);
-        asm ("bne L1");
-        asm ("ldy #1");
+        asm ("ldy %v", IntBytes);
 
         /* Assign the integer value */
         asm ("L1: lda %v,y", IntVal);
@@ -232,7 +220,80 @@ static void AssignInt (void)
 
 
 
-int _scanf (struct indesc* D_, register const char* format, va_list ap_)
+static unsigned char ReadInt (unsigned char Base)
+/* Read an integer and store it into IntVal. Returns the number of chars
+ * converted. Does NOT bump Conversions.
+ */
+{
+    unsigned char Val;
+    unsigned char CharCount = 0;
+
+    /* Read the integer value */
+    IntVal = 0;
+    while (isxdigit (C) && Width-- > 0 && (Val = HexVal (C)) < Base) {
+        ++CharCount;
+       	IntVal = IntVal * Base + Val;
+     	ReadChar ();
+    }
+
+    /* If we didn't convert anything, it's an error */
+    if (CharCount == 0) {
+     	longjmp (JumpBuf, RC_NOCONV);
+    }
+
+    /* Return the number of characters converted */
+    return CharCount;
+}
+
+
+
+static void ScanInt (unsigned char Base)
+/* Scan an integer including white space, sign and optional base spec,
+ * and store it into IntVal.
+ */
+{
+    /* Skip whitespace */
+    SkipWhite ();
+
+    /* Read an optional sign */
+    ReadSign ();
+
+    /* If Base is unknown (zero), figure it out */
+    if (Base == 0) {
+        if (C == '0') {
+            ReadChar ();
+            switch (C) {
+                case 'x':
+                case 'X':
+                    Base = 16;
+                    ReadChar ();
+                    break;
+                default:
+                    Base = 8;
+            }
+        } else {
+            Base = 10;
+        }
+    }
+
+    /* Read the integer value */
+    ReadInt (Base);
+
+    /* Apply the sign */
+    if (!Positive) {
+        IntVal = -IntVal;
+    }
+
+    /* Assign the value to the next argument unless suppressed */
+    AssignInt ();
+
+    /* One more conversion */
+    ++Conversions;
+}
+
+
+
+int _scanf (struct scanfdata* D_, register const char* format, va_list ap_)
 /* This is the routine used to do the actual work. It is called from several
  * types of wrappers to implement the actual ISO xxscanf functions.
  */
@@ -240,7 +301,6 @@ int _scanf (struct indesc* D_, register const char* format, va_list ap_)
     char   	  F;   	     	/* Character from format string */
     unsigned char Result;    	/* setjmp result */
     char*	  S;
-    unsigned char Base;	      	/* Integer base in %i */
     unsigned char HaveWidth;	/* True if a width was given */
     char          Start;        /* Start of range */
 
@@ -263,13 +323,13 @@ int _scanf (struct indesc* D_, register const char* format, va_list ap_)
 
 Again:
        	/* Get the next input character */
-	ReadChar ();
+     	ReadChar ();
 
 	/* Walk over the format string */
       	while (F = *format++) {
 
 	    /* Check for a conversion */
-	    if (F != '%' || *format == '%') {
+       	    if (F != '%' || *format == '%') {
 
 	    	/* %% or any char other than % */
 	    	if (F == '%') {
@@ -279,24 +339,24 @@ Again:
 	    	/* Check for a match */
 	    	if (isspace (F)) {
 
-	    	    /* Special white space handling: Any whitespace matches
-	    	     * any amount of whitespace including none(!). So this
-	    	     * match will never fail.
+	    	    /* Special white space handling: Any whitespace in the
+                     * format string matches any amount of whitespace including
+                     * none(!). So this match will never fail.
 	    	     */
 	    	    SkipWhite ();
 	    	    continue;
 
-	    	} else if (F != C) {
+	    	} else if (F == C) {
+
+	    	    /* A match. Read the next input character and start over */
+	    	    goto Again;
+
+    	    	} else {
 
 	    	    /* A mismatch. We will stop scanning the input and return
 	    	     * the number of conversions.
 	    	     */
 	    	    return Conversions;
-
-    	    	} else {
-
-	    	    /* A match. Read the next input character and start over */
-	    	    goto Again;
 
 	    	}
 
@@ -305,97 +365,82 @@ Again:
 	    	/* A conversion. Skip the percent sign. */
 	    	F = *format++;
 
-	        /* Initialize variables */
-	    	NoAssign    = 0;
-	    	IsShort	    = 0;
-	    	IsLong	    = 0;
-	    	Width	    = UINT_MAX;
-		HaveWidth   = 0;
+      	    	/* 1. Assignment suppression */
+                if (F == '*') {
+                    F = *format++;
+                    NoAssign = 1;
+                } else {
+                    NoAssign = 0;
+                }
 
-      	    	/* Check for flags. */
-	    	while (1) {
-	    	    if (isdigit (F)) {
-			HaveWidth = 1;
-	    	 	Width     = 0;
-	    	 	do {
-	    	 	    /* ### Non portable ### */
-	    	   	    Width = Width * 10 + (F & 0x0F);
-    	    		    F = *format++;
-    	    	     	} while (isdigit (F));
-    	    	    } else {
-    	    	     	switch (F) {
-    	    	     	    case '*': 	NoAssign = 1;	break;
-    	    	     	    case 'h':	IsShort = 1;	break;
-    	    	     	    case 'l':
-    	    	     	    case 'L':	IsLong = 1;	break;
-    	    	     	    default:  	goto FlagsDone;
-    	    	     	}
-    	    		F = *format++;
-    	    	    }
-    	    	}
-FlagsDone:
+                /* 2. Maximum field width */
+       	       	Width  	  = UINT_MAX;
+	    	HaveWidth = 0;
+                if (isdigit (F)) {
+                    HaveWidth = 1;
+                    Width     = 0;
+                    do {
+                        /* ### Non portable ### */
+                        Width = Width * 10 + (F & 0x0F);
+                        F = *format++;
+                    } while (isdigit (F));
+                }
 
-    		/* Check for the actual conversion character */
+                /* 3. Length modifier */
+                IntBytes = sizeof(int) - 1;
+                switch (F) {
+                    case 'h':
+                        if (*format == 'h') {
+                            IntBytes = sizeof(char) - 1;
+                            ++format;
+                        }
+                        F = *format++;
+                        break;
+
+                    case 'l':
+                        if (*format == 'l') {
+                            /* Treat long long as long */
+                            ++format;
+                        }
+                        /* FALLTHROUGH */
+                    case 'j':   /* intmax_t */
+                        IntBytes = sizeof(long) - 1;
+                        F = *format++;
+                        break;
+
+                    case 'z':   /* size_t */
+                    case 't':   /* ptrdiff_t */
+                    case 'L':   /* long double - ignore this one */
+                        F = *format++;
+                        break;
+                }
+
+                /* 4. Conversion specifier */
     		switch (F) {
 
-     		    case 'D':
-    		    	IsLong = 1;
-    	      	    case 'd':
-      	      	    	/* Optionally signed decimal integer */
-		  	SkipWhite ();
-      	      	    	ReadSign ();
-      	      	    	ReadInt (10);
-	      	    	if (!Positive) {
-	      	    	    IntVal = -IntVal;
-	      	    	}
-			AssignInt ();
-      	      	  	break;
+                    /* 'd' and 'u' conversions are actually the same, since the
+                     * standard says that evene the 'u' modifier allows an
+                     * optionally signed integer.
+                     */
+    	      	    case 'd':   /* Optionally signed decimal integer */
+                    case 'u':
+      	      	      	ScanInt (10);
+      	      	      	break;
 
       	      	    case 'i':
       	      	   	/* Optionally signed integer with a base */
-			SkipWhite ();
-		   	ReadSign ();
-			if (C == '0') {
-			    ReadChar ();
-			    switch (C) {
-		   	 	case 'x':
-			 	case 'X':
-			 	    Base = 16;
-			    	    ReadChar();
-			    	    break;
-			 	default:
-			 	    Base = 8;
-			    }
-			} else {
-			    Base = 10;
-			}
-			ReadInt (Base);
-			if (!Positive) {
-			    IntVal = -IntVal;
-			}
-			AssignInt ();
+			ScanInt (0);
       	      	  	break;
 
       	      	    case 'o':
-      	      	  	/* Unsigned octal integer */
-    			SkipWhite ();
-      	      	    	ReadInt (8);
-			AssignInt ();
+      	      	  	/* Optionally signed octal integer */
+      	      	      	ScanInt (8);
       	      		break;
-
-      	      	    case 'u':
-    	      		/* Unsigned decimal integer */
-			SkipWhite ();
-      	      	    	ReadInt (10);
-			AssignInt ();
-    	      		break;
 
 	      	    case 'x':
 	      	    case 'X':
-	      		/* Unsigned hexadecimal integer */
-			SkipWhite ();
-      	      	    	ReadInt (16);
-			AssignInt ();
+	      	 	/* Optionally signed hexadecimal integer */
+      	      	    	ScanInt (16);
 	      		break;
 
 	      	    case 'E':
@@ -408,7 +453,7 @@ FlagsDone:
 
 	      	    case 's':
 	      	   	/* Whitespace terminated string */
-			SkipWhite ();
+		      	SkipWhite ();
 			if (!NoAssign) {
 			    S = va_arg (ap, char*);
 		   	}
@@ -416,7 +461,7 @@ FlagsDone:
 			    if (!NoAssign) {
 			       	*S++ = C;
 			    }
-			    ReadChar ();
+	    		    ReadChar ();
 			}
 			/* Terminate the string just read */
 			if (!NoAssign) {
@@ -435,12 +480,12 @@ FlagsDone:
 			    S = va_arg (ap, char*);
                             while (Width--) {
                                 *S++ = C;
-                                ReadChar ();
+                                ReadCharWithCheck ();
                             }
 			} else {
                             /* Just skip as many chars as given */
                             while (Width--) {
-                                ReadChar ();
+                                ReadCharWithCheck ();
                             }
                         }
 			++Conversions;
@@ -516,7 +561,7 @@ FlagsDone:
 		   	break;
 
      		    case 'p':
-     			/* Pointer, format is 0xABCD */
+     	    		/* Pointer, format is 0xABCD */
 		   	SkipWhite ();
 			if (C != '0') {
                             longjmp (JumpBuf, RC_NOCONV);
@@ -526,8 +571,11 @@ FlagsDone:
                             longjmp (JumpBuf, RC_NOCONV);
                         }
                         ReadChar ();
-                        ReadInt (16);
+                        if (ReadInt (16) != 4) { /* 4 chars expected */
+                            longjmp (JumpBuf, RC_NOCONV);
+                        }
 			AssignInt ();
+                        ++Conversions;
      			break;
 
      		    case 'n':
@@ -542,21 +590,24 @@ FlagsDone:
 			break;
 
 		}
-
-		/* Skip the format char */
-		goto Again;
-
 	    }
+        }
 
-     	}
+        /* Push back the last unused character, provided it is not EOF */
+        if (C != EOF) {
+            D->unget (C, D->data);
+        }
 
-    } else if (Result == RC_EOF) {
+    } else {
 
-	/* Jump via JumpBuf means EOF on input */
-	if (D->ccount == 0) {
+	/* Jump via JumpBuf means an error. If this happens at EOF with no
+         * conversions, it is considered an error, otherwise the number
+         * of conversions is returned (the default behaviour).
+         */
+       	if (C == EOF && D->ccount == 0) {
 	    /* Special case: error */
-	    return -1;
-	}
+     	    Conversions = EOF;
+     	}
 
     }
 

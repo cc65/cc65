@@ -34,20 +34,20 @@
 # Object files
 
 OBJS =	crt0.o          \
-        framerate.o     
+        framerate.o
 
 #--------------------------------------------------------------------------
 # Drivers
 
 EMDS =
 
-JOYS =
+JOYS = lynx-stdjoy.joy
 
 MOUS =
 
 SERS =
 
-TGIS =
+TGIS = lynx-160-102-16.tgi
 
 #--------------------------------------------------------------------------
 # Targets

@@ -264,7 +264,9 @@ lynxlib:
 	    $(AR) a lynx.lib $$i/*.o;\
 	done
 	mv lynx/crt0.o lynx.o
-
+	cp lynx/*.joy .
+	cp lynx/*.tgi .
+		       
 #-----------------------------------------------------------------------------
 # NES
 

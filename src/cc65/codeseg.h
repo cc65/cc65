@@ -161,7 +161,7 @@ INLINE struct CodeEntry* CS_GetEntry (CodeSeg* S, unsigned Index)
     return CollAt (&S->Entries, Index);
 }
 #else
-#  define CS_GetEntry(S, Index)	CollAt(&(S)->Entries, (Index))
+#  define CS_GetEntry(S, Index)	((struct CodeEntry*) CollAt(&(S)->Entries, (Index)))
 #endif
 
 struct CodeEntry* CS_GetPrevEntry (CodeSeg* S, unsigned Index);

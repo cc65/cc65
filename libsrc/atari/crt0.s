@@ -9,6 +9,11 @@
 ; This must be the *first* file on the linker command line
 ;
 
+RESERVE_MOUSE_MEMORY	= 1	; for P/M
+
+.ifdef RESERVE_MOUSE_MEMORY
+	.export		mouse_pm0
+.endif
 	.export		_exit
 	.import		getargs, argc, argv
 	.import		__hinit, initconio, zerobss, pushax, doatexit
@@ -208,11 +213,27 @@ L2:	lda	zpsave,x
 	sbc	grmemusage+1,y
 	tax
 	pla
+.ifdef RESERVE_MOUSE_MEMORY
+
+adj_mouse:
+	txa			; get upper byte of address
+	and	#%11111000	; make 2k aligned
+	sec
+	sbc	#%00001000	; reserve 2k
+	tax
+	adc	#3		; add 4 (C = 1)
+	sta	mouse_pm0
+	lda	#0
+.endif
 	rts
 
 ignore:	lda	MEMTOP
 	ldx	MEMTOP+1
+.ifdef RESERVE_MOUSE_MEMORY
+	bne	adj_mouse
+.else
 	rts
+.endif
 
 .endproc
 
@@ -278,6 +299,9 @@ spsave:		.res	1
 appmsav:	.res	1
 old_shflok:	.res	1
 old_lmargin:	.res	1
+.ifdef RESERVE_MOUSE_MEMORY
+mouse_pm0:	.res	1
+.endif
 
 	.segment "AUTOSTRT"
 	.word	$02E0

@@ -379,7 +379,7 @@ void DoConditionals (void)
      		break;
 
      	    default:
-     		// Skip tokens
+     		/* Skip tokens */
      		NextTok ();
 
      	}

@@ -263,7 +263,7 @@ static void DoASCIIZ (void)
 	    ErrorSkip (ERR_STRCON_EXPECTED);
 	    return;
 	}
-	EmitData (SVal, strlen (SVal));
+       	EmitData ((unsigned char*) SVal, strlen (SVal));
 	NextTok ();
 	if (Tok == TOK_COMMA) {
 	    NextTok ();
@@ -298,7 +298,7 @@ static void DoByte (void)
     while (1) {
 	if (Tok == TOK_STRCON) {
 	    /* A string */
-	    EmitData (SVal, strlen (SVal));
+       	    EmitData ((unsigned char*) SVal, strlen (SVal));
 	    NextTok ();
 	} else {
 	    EmitByte (Expression ());

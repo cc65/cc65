@@ -5,6 +5,15 @@
   by Maciej 'YTM/Elysium' Witkowiak
 */
 
+/*
+   apart from initializing data, structures below can be used to
+   speed up access to data and let cc65 to generate better code
+   e.g. if you have menu defined as TopMenu and you want to change the number of
+   menu items use:
+    ((struct menu*)&TopMenu)->number=newNumber;
+   This will translate into single lda/sta pair
+*/
+
 #ifndef _GSTRUCT_H
 #define _GSTRUCT_H
 
@@ -110,33 +119,26 @@ struct icondef {		/* icon definition for DoIcons              */
 struct icontab {
 	char number;		/* number of declared icons                 */
 	struct pixel mousepos;	/* position of mouse after DoIcons          */
-	struct icondef *tab;	/* table of size declared by icontab.number */
+	struct icondef tab[];	/* table of size declared by icontab.number */
 };
 
-/*
-   structures below might be used to speed up access to own menus
-   e.g. if you have menu defined as TopMenu and you want to change the number of
-   menu items use:
-    ((struct menu*)&TopMenu)->number=newNumber;
-   This will allow cc65 to emit better code.
-*/
 
 struct menuitem {
 	char *name;
 	char type;
-	int rest;		/* may be ptr to function, or if submenu ptr to struct menu */
+	void *rest;		/* may be ptr to function, or ptr to struct menu (submenu) */
 };
 
 struct menu {
 	struct window size;
 	char number;
-	struct menuitem *items;
+	struct menuitem items[];
 };
 
 struct inittab {		/* use struct inittab mytab[n] for initram              */
 	int ptr;		/* ptr to 1st byte                                      */
 	char number;		/* number of following bytes                            */
-	char *values;		/* actual string of bytes                               */
+	char values[];		/* actual string of bytes                               */
 };
 
 #endif

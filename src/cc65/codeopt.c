@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -1355,21 +1355,21 @@ struct OptFunc {
 static OptFunc DOpt65C02Ind    	= { Opt65C02Ind,     "Opt65C02Ind",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",        	 60, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",        	200, 0, 0, 0, 0, 0 };
-static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",        	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",        	 40, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
-static OptFunc DOptBranchDist  	= { OptBranchDist,   "OptBranchDist",   100, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp1	       	= { OptCmp1,   	     "OptCmp1",        	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp2	       	= { OptCmp2,   	     "OptCmp2",        	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp3	       	= { OptCmp3,   	     "OptCmp3",        	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptBranchDist  	= { OptBranchDist,   "OptBranchDist",     0, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp1	       	= { OptCmp1,   	     "OptCmp1",        	 85, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp2	       	= { OptCmp2,   	     "OptCmp2",        	 75, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp3	       	= { OptCmp3,   	     "OptCmp3",        	 75, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp4	       	= { OptCmp4,   	     "OptCmp4",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp5	       	= { OptCmp5,   	     "OptCmp5",        	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp6	       	= { OptCmp6,   	     "OptCmp6",        	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp7	       	= { OptCmp7,   	     "OptCmp7",        	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptCondBranches	= { OptCondBranches, "OptCondBranches", 100, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp6	       	= { OptCmp6,   	     "OptCmp6",        	 85, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp7	       	= { OptCmp7,   	     "OptCmp7",        	 50, 0, 0, 0, 0, 0 };
+static OptFunc DOptCondBranches	= { OptCondBranches, "OptCondBranches",  80, 0, 0, 0, 0, 0 };
 static OptFunc DOptDeadCode    	= { OptDeadCode,     "OptDeadCode",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDeadJumps   	= { OptDeadJumps,    "OptDeadJumps",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDecouple     = { OptDecouple,     "OptDecouple",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",     100, 0, 0, 0, 0, 0 };
+static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",       0, 0, 0, 0, 0, 0 };
 static OptFunc DOptJumpCascades	= { OptJumpCascades, "OptJumpCascades", 100, 0, 0, 0, 0, 0 };
 static OptFunc DOptJumpTarget  	= { OptJumpTarget,   "OptJumpTarget",   100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",         	100, 0, 0, 0, 0, 0 };
@@ -1395,13 +1395,13 @@ static OptFunc DOptShift2      	= { OptShift2,       "OptShift2",      	100, 0, 
 /*static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };*/
 static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",    	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",    100, 0, 0, 0, 0, 0 };
+static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",      0, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub1	       	= { OptSub1,   	     "OptSub1",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub2	       	= { OptSub2,   	     "OptSub2",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptTest1       	= { OptTest1,  	     "OptTest1",       	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptTransfers   	= { OptTransfers,    "OptTransfers",    100, 0, 0, 0, 0, 0 };
-static OptFunc DOptUnusedLoads 	= { OptUnusedLoads,  "OptUnusedLoads",  100, 0, 0, 0, 0, 0 };
-static OptFunc DOptUnusedStores	= { OptUnusedStores, "OptUnusedStores", 100, 0, 0, 0, 0, 0 };
+static OptFunc DOptTransfers   	= { OptTransfers,    "OptTransfers",      0, 0, 0, 0, 0, 0 };
+static OptFunc DOptUnusedLoads 	= { OptUnusedLoads,  "OptUnusedLoads",    0, 0, 0, 0, 0, 0 };
+static OptFunc DOptUnusedStores	= { OptUnusedStores, "OptUnusedStores",   0, 0, 0, 0, 0, 0 };
 
 
 /* Table containing all the steps in alphabetical order */
@@ -1799,11 +1799,11 @@ static unsigned RunOptGroup5 (CodeSeg* S)
 /* Run another round of pattern replacements. These are done late, since there
  * may be better replacements before.
  */
-{		
+{
     unsigned Changes = 0;
 
     Changes += RunOptFunc (S, &DOptPush1, 1);
-    
+
     /* Return the number of changes */
     return Changes;
 }

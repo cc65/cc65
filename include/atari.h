@@ -45,7 +45,7 @@
 
 
 /* Character codes */
-#define CH_DEL 	    	0xFE
+#define CH_DELCHR	0xFE   /* delete char under the cursor */
 #define CH_ESC 	    	0x1B
 #define CH_CURS_UP  	28
 #define CH_CURS_DOWN 	29
@@ -56,7 +56,8 @@
 #define CH_EOL          0x9B   /* end-of-line marker */
 #define CH_CLR          0x7D   /* clear screen */
 #define CH_BEL          0xFD   /* bell */
-#define CH_RUBOUT       0x7E   /* back space (rubout) */
+#define CH_DEL          0x7E   /* back space (delete char to the left) */
+#define CH_RUBOUT       0x7E   /* back space (old, deprecated) */
 #define CH_DELLINE      0x9C   /* delete line */
 #define CH_INSLINE      0x9D   /* insert line */
 

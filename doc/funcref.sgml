@@ -69,6 +69,13 @@ function.
 </itemize>
 
 
+<sect1><tt/c128.h/<label id="c128.h"><p>
+
+<itemize>
+<item><ref id="toggle_videomode" name="toggle_videomode">
+</itemize>
+
+
 <sect1><tt/conio.h/<label id="conio.h"><p>
 
 <itemize>
@@ -1885,6 +1892,25 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="bgcolor" name="bgcolor">,
 <ref id="bordercolor" name="bordercolor">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>toggle_videomode<label id="toggle_videomode"><p>
+
+<quote>
+<descrip>
+<tag/Function/Toggle between 40 and 80 column mode.
+<tag/Header/<tt/<ref id="c128.h" name="c128.h">/
+<tag/Declaration/<tt/void toggle_videomode (void);/
+<tag/Description/Toggle between 40 and 80 column mode. The settings for the
+old mode (cursor position, color and so on) are saved and restored together
+with the mode.
+<tag/Limits/<itemize>
+<item>The function is specific to the C128.
+</itemize>
+<tag/Availability/C128
 <tag/Example/None.
 </descrip>
 </quote>

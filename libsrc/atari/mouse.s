@@ -14,7 +14,7 @@
 	.export	_mouse_init, _mouse_done, _mouse_box
 	.export _mouse_show, _mouse_hide, _mouse_move
 	.export _mouse_buttons
-	.constructor	mousemem
+	.constructor	mousemem,26
 
 	.import popa,popax
 

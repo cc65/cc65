@@ -57,101 +57,618 @@
 /* Opcode description table */
 const OPCDesc OPCTable[OPCODE_COUNT] = {
 
+    /* Opcodes for the virtual stack machine */
+    {   OPC_LDA,      	                        /* opcode */
+       	"loada",       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_A, 	       	                        /* chg */
+       	OF_CPU_VM | OF_LOAD   	       	        /* flags */
+    },
+    {   OPC_LDAX,      	                        /* opcode */
+       	"loadax",      	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_AX,	       	                        /* chg */
+       	OF_CPU_VM | OF_LOAD	 		/* flags */
+    },
+    {   OPC_LDEAX,     	                        /* opcode */
+       	"loadeax",     	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_EAX,                                /* chg */
+	OF_CPU_VM | OF_LOAD   	 		/* flags */
+    },
+    {   OPC_PHA,     	                        /* opcode */
+       	"pusha",     	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A,      	                        /* use */
+       	REG_NONE,                               /* chg */
+	OF_CPU_VM 	   	 		/* flags */
+    },
+    {   OPC_PHAX,      	                        /* opcode */
+       	"pushax",     	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_AX,      	                        /* use */
+       	REG_NONE,                               /* chg */
+	OF_CPU_VM 	  	 		/* flags */
+    },
+    {   OPC_PHEAX,     	                        /* opcode */
+       	"pusheax",     	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_EAX,       	                        /* use */
+       	REG_NONE,                               /* chg */
+	OF_CPU_VM 	  	 		/* flags */
+    },
+    {   OPC_STA,     	                        /* opcode */
+       	"storea",     	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A,       	                        /* use */
+       	REG_NONE,                               /* chg */
+	OF_CPU_VM 	  	 		/* flags */
+    },
+    {   OPC_STAX,     	                        /* opcode */
+       	"storeax",     	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_AX,       	                        /* use */
+       	REG_NONE,                               /* chg */
+	OF_CPU_VM 	  	 		/* flags */
+    },
+    {   OPC_STEAX,     	                        /* opcode */
+       	"storeeax",    	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_EAX,       	                        /* use */
+       	REG_NONE,                               /* chg */
+	OF_CPU_VM 	  	 		/* flags */
+    },
+    {   OPC_LEA,     	                        /* opcode */
+       	"lea",    	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_AX,                                 /* chg */
+	OF_CPU_VM 	  	 		/* flags */
+    },
+    {   OPC_JMP,     	                        /* opcode */
+       	"jump",    	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,                               /* chg */
+	OF_CPU_VM | OF_UBRA  	 		/* flags */
+    },
+
     /* 65XX opcodes */
-    { OP65_ADC, "adc", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OP65_AND, "and", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OP65_ASL, "asl", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OP65_BCC, "bcc", 2, REG_NONE, REG_NONE, OF_CBRA			    },
-    { OP65_BCS, "bcs", 2, REG_NONE, REG_NONE, OF_CBRA			    },
-    { OP65_BEQ, "beq", 2, REG_NONE, REG_NONE, OF_CBRA | OF_ZBRA | OF_FBRA    },
-    { OP65_BIT, "bit", 0, REG_A,    REG_NONE, OF_NONE			    },
-    { OP65_BMI, "bmi", 2, REG_NONE, REG_NONE, OF_CBRA | OF_FBRA 	  	    },
-    { OP65_BNE, "bne", 2, REG_NONE, REG_NONE, OF_CBRA | OF_ZBRA | OF_FBRA    },
-    { OP65_BPL, "bpl", 2, REG_NONE, REG_NONE, OF_CBRA | OF_FBRA 	  	    },
-    { OP65_BRA, "bra", 2, REG_NONE, REG_NONE, OF_UBRA			    },
-    { OP65_BRK, "brk", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_BVC, "bvc", 2, REG_NONE, REG_NONE, OF_CBRA			    },
-    { OP65_BVS, "bvs", 2, REG_NONE, REG_NONE, OF_CBRA			    },
-    { OP65_CLC, "clc", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_CLD, "cld", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_CLI, "cli", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_CLV, "clv", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_CMP, "cmp", 0, REG_A,    REG_NONE, OF_NONE			    },
-    { OP65_CPX, "cpx", 0, REG_X,    REG_NONE, OF_NONE			    },
-    { OP65_CPY, "cpy", 0, REG_Y,    REG_NONE, OF_NONE			    },
-    { OP65_DEA, "dea", 1, REG_A,    REG_A,    OF_NONE			    },
-    { OP65_DEC, "dec", 0, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_DEX, "dex", 1, REG_X,    REG_X,    OF_NONE			    },
-    { OP65_DEY, "dey", 1, REG_Y,    REG_Y,    OF_NONE			    },
-    { OP65_EOR, "eor", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OP65_INA, "ina", 1, REG_A,    REG_A,    OF_NONE			    },
-    { OP65_INC, "inc", 0, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_INX, "inx", 1, REG_X,    REG_X,    OF_NONE			    },
-    { OP65_INY, "iny", 1, REG_Y,    REG_Y,    OF_NONE			    },
-    { OP65_JCC, "jcc", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
-    { OP65_JCS, "jcs", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
-    { OP65_JEQ, "jeq", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA },
-    { OP65_JMI, "jmi", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_FBRA    },
-    { OP65_JMP, "jmp", 3, REG_NONE, REG_NONE, OF_UBRA | OF_LBRA  	    },
-    { OP65_JNE, "jne", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA },
-    { OP65_JPL, "jpl", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_FBRA    },
-    { OP65_JSR, "jsr", 3, REG_NONE, REG_NONE, OF_CALL			    },
-    { OP65_JVC, "jvc", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
-    { OP65_JVS, "jvs", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
-    { OP65_LDA, "lda", 0, REG_NONE, REG_A,    OF_LOAD   			    },
-    { OP65_LDX, "ldx", 0, REG_NONE, REG_X,    OF_LOAD			    },
-    { OP65_LDY, "ldy", 0, REG_NONE, REG_Y,    OF_LOAD			    },
-    { OP65_LSR, "lsr", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OP65_NOP, "nop", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_ORA, "ora", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OP65_PHA, "pha", 1, REG_A,    REG_NONE, OF_NONE			    },
-    { OP65_PHP, "php", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_PHX, "phx", 1, REG_X,    REG_NONE, OF_NONE			    },
-    { OP65_PHY, "phy", 1, REG_Y,    REG_NONE, OF_NONE			    },
-    { OP65_PLA, "pla", 1, REG_NONE, REG_A,    OF_NONE			    },
-    { OP65_PLP, "plp", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_PLX, "plx", 1, REG_NONE, REG_X,    OF_NONE			    },
-    { OP65_PLY, "ply", 1, REG_NONE, REG_Y,    OF_NONE			    },
-    { OP65_ROL, "rol", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OP65_ROR, "ror", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OP65_RTI, "rti", 1, REG_NONE, REG_NONE, OF_RET   			    },
-    { OP65_RTS, "rts", 1, REG_NONE, REG_NONE, OF_RET   			    },
-    { OP65_SBC, "sbc", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OP65_SEC, "sec", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_SED, "sed", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_SEI, "sei", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OP65_STA, "sta", 0, REG_A,    REG_NONE, OF_NONE			    },
-    { OP65_STX, "stx", 0, REG_X,    REG_NONE, OF_NONE			    },
-    { OP65_STY, "sty", 0, REG_Y,    REG_NONE, OF_NONE			    },
-    { OP65_TAX, "tax", 1, REG_A,    REG_X,    OF_XFR			    },
-    { OP65_TAY, "tay", 1, REG_A,    REG_Y,    OF_XFR			    },
-    { OP65_TRB, "trb", 0, REG_A,    REG_NONE, OF_NONE			    },
-    { OP65_TSB, "tsb", 0, REG_A,    REG_NONE, OF_NONE			    },
-    { OP65_TSX, "tsx", 1, REG_NONE, REG_X,    OF_XFR			    },
-    { OP65_TXA, "txa", 1, REG_X,    REG_A,    OF_XFR			    },
-    { OP65_TXS, "txs", 1, REG_X,    REG_NONE, OF_XFR			    },
-    { OP65_TYA, "tya", 1, REG_A,    REG_A,    OF_XFR			    },
+    {   OP65_ADC,      	                        /* opcode */
+       	"adc", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_AND,      	                        /* opcode */
+       	"and", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_ASL,      	                        /* opcode */
+       	"asl", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_BCC,      	                        /* opcode */
+       	"bcc", 	       	                        /* mnemonic */
+       	2,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA			 		/* flags */
+    },
+    {   OP65_BCS,      	                        /* opcode */
+       	"bcs", 	       	                        /* mnemonic */
+       	2,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA			 		/* flags */
+    },
+    {   OP65_BEQ,      	                        /* opcode */
+       	"beq", 	       	                        /* mnemonic */
+       	2,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_ZBRA | OF_FBRA		/* flags */
+    },
+    {   OP65_BIT,      	                        /* opcode */
+       	"bit", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_BMI,      	                        /* opcode */
+       	"bmi", 	       	                        /* mnemonic */
+       	2,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_FBRA	 		/* flags */
+    },
+    {   OP65_BNE,      	                        /* opcode */
+       	"bne", 	       	                        /* mnemonic */
+       	2,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_ZBRA | OF_FBRA		/* flags */
+    },
+    {   OP65_BPL,      	                        /* opcode */
+       	"bpl", 	       	                        /* mnemonic */
+       	2,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_FBRA	 		/* flags */
+    },
+    {   OP65_BRA,      	                        /* opcode */
+       	"bra", 	       	                        /* mnemonic */
+       	2,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_UBRA			 		/* flags */
+    },
+    {   OP65_BRK,      	                        /* opcode */
+       	"brk", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_BVC,      	                        /* opcode */
+       	"bvc", 	       	                        /* mnemonic */
+       	2,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA			 		/* flags */
+    },
+    {   OP65_BVS,      	                        /* opcode */
+       	"bvs", 	       	                        /* mnemonic */
+       	2,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA			 		/* flags */
+    },
+    {   OP65_CLC,      	                        /* opcode */
+       	"clc", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_CLD,      	                        /* opcode */
+       	"cld", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_CLI,      	                        /* opcode */
+       	"cli", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_CLV,      	                        /* opcode */
+       	"clv", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_CMP,      	                        /* opcode */
+       	"cmp", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_CPX,      	                        /* opcode */
+       	"cpx", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_X, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_CPY,      	                        /* opcode */
+       	"cpy", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_Y, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_DEA,      	                        /* opcode */
+       	"dea", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_DEC,      	                        /* opcode */
+       	"dec", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_DEX,      	                        /* opcode */
+       	"dex", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_X, 	       	                        /* use */
+       	REG_X, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_DEY,      	                        /* opcode */
+       	"dey", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_Y, 	       	                        /* use */
+       	REG_Y, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_EOR,      	                        /* opcode */
+       	"eor", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_INA,      	                        /* opcode */
+       	"ina", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_INC,      	                        /* opcode */
+       	"inc", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_INX,      	                        /* opcode */
+       	"inx", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_X, 	       	                        /* use */
+       	REG_X, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_INY,      	                        /* opcode */
+       	"iny", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_Y, 	       	                        /* use */
+       	REG_Y, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_JCC,      	                        /* opcode */
+       	"jcc", 	       	                        /* mnemonic */
+       	5,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_LBRA	 		/* flags */
+    },
+    {   OP65_JCS,      	                        /* opcode */
+       	"jcs", 	       	                        /* mnemonic */
+       	5,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_LBRA	 		/* flags */
+    },
+    {   OP65_JEQ,      	                        /* opcode */
+       	"jeq", 	       	                        /* mnemonic */
+       	5,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA	/* flags */
+    },
+    {   OP65_JMI,      	                        /* opcode */
+       	"jmi", 	       	                        /* mnemonic */
+       	5,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_LBRA | OF_FBRA		/* flags */
+    },
+    {   OP65_JMP,      	                        /* opcode */
+       	"jmp", 	       	                        /* mnemonic */
+       	3,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_UBRA | OF_LBRA	 		/* flags */
+    },
+    {   OP65_JNE,      	                        /* opcode */
+       	"jne", 	       	                        /* mnemonic */
+       	5,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA	/* flags */
+    },
+    {   OP65_JPL,      	                        /* opcode */
+       	"jpl", 	       	                        /* mnemonic */
+       	5,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_LBRA | OF_FBRA		/* flags */
+    },
+    {   OP65_JSR,      	                        /* opcode */
+       	"jsr", 	       	                        /* mnemonic */
+       	3,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CALL			 		/* flags */
+    },
+    {   OP65_JVC,      	                        /* opcode */
+       	"jvc", 	       	                        /* mnemonic */
+       	5,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_LBRA	 		/* flags */
+    },
+    {   OP65_JVS,      	                        /* opcode */
+       	"jvs", 	       	                        /* mnemonic */
+       	5,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_CBRA | OF_LBRA	 		/* flags */
+    },
+    {   OP65_LDA,      	                        /* opcode */
+       	"lda", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_LOAD			 		/* flags */
+    },
+    {   OP65_LDX,      	                        /* opcode */
+       	"ldx", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_X, 	       	                        /* chg */
+	OF_LOAD			 		/* flags */
+    },
+    {   OP65_LDY,      	                        /* opcode */
+       	"ldy", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_Y, 	       	                        /* chg */
+	OF_LOAD			 		/* flags */
+    },
+    {   OP65_LSR,      	                        /* opcode */
+       	"lsr", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_NOP,      	                        /* opcode */
+       	"nop", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_ORA,      	                        /* opcode */
+       	"ora", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_PHA,      	                        /* opcode */
+       	"pha", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_PHP,      	                        /* opcode */
+       	"php", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_PHX,      	                        /* opcode */
+       	"phx", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_X, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_PHY,      	                        /* opcode */
+       	"phy", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_Y, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_PLA,      	                        /* opcode */
+       	"pla", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_PLP,      	                        /* opcode */
+       	"plp", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_PLX,      	                        /* opcode */
+       	"plx", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_X, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_PLY,      	                        /* opcode */
+       	"ply", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_Y, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_ROL,      	                        /* opcode */
+       	"rol", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_ROR,      	                        /* opcode */
+       	"ror", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_RTI,      	                        /* opcode */
+       	"rti", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_RET			 		/* flags */
+    },
+    {   OP65_RTS,      	                        /* opcode */
+       	"rts", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_RET			 		/* flags */
+    },
+    {   OP65_SBC,      	                        /* opcode */
+       	"sbc", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_SEC,      	                        /* opcode */
+       	"sec", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_SED,      	                        /* opcode */
+       	"sed", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_SEI,      	                        /* opcode */
+       	"sei", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_STA,      	                        /* opcode */
+       	"sta", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_STX,      	                        /* opcode */
+       	"stx", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_X, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_STY,      	                        /* opcode */
+       	"sty", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_Y, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_TAX,      	                        /* opcode */
+       	"tax", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_X, 	       	                        /* chg */
+	OF_XFR			 		/* flags */
+    },
+    {   OP65_TAY,      	                        /* opcode */
+       	"tay", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_Y, 	       	                        /* chg */
+	OF_XFR			 		/* flags */
+    },
+    {   OP65_TRB,      	                        /* opcode */
+       	"trb", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_TSB,      	                        /* opcode */
+       	"tsb", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_NONE			 		/* flags */
+    },
+    {   OP65_TSX,      	                        /* opcode */
+       	"tsx", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_X, 	       	                        /* chg */
+	OF_XFR			 		/* flags */
+    },
+    {   OP65_TXA,      	                        /* opcode */
+       	"txa", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_X, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_XFR			 		/* flags */
+    },
+    {   OP65_TXS,      	                        /* opcode */
+       	"txs", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_X, 	       	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_XFR			 		/* flags */
+    },
+    {   OP65_TYA,      	                        /* opcode */
+       	"tya", 	       	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_A, 	       	                        /* use */
+       	REG_A, 	       	                        /* chg */
+	OF_XFR	      		 		/* flags */
+    },
 };
 
 
 
 /*****************************************************************************/
-/*     	       	       	  	     Code				     */
+/*     	       	       	   	     Code				     */
 /*****************************************************************************/
 
 
 
-static int Compare (const void* Key, const void* Desc)
-/* Compare function for bsearch */
+static int FindCmp (const void* Key, const void* Desc)
+/* Compare function for FindOpcode */
 {
     return strcmp (Key, ((OPCDesc*)Desc)->Mnemo);
 }
 
 
 
-const OPCDesc* FindOpcode (const char* M)
+const OPCDesc* FindOP65 (const char* M)
 /* Find the given opcode and return the opcode number. If the opcode was not
- * found, return OP65_INVALID.
+ * found, return NULL.
  */
 {
     unsigned I;
@@ -172,7 +689,8 @@ const OPCDesc* FindOpcode (const char* M)
     Mnemo[I] = '\0';
 
     /* Search for the mnemonic in the table and return the result */
-    return bsearch (Mnemo, OPCTable, OPCODE_COUNT, sizeof (OPCTable[0]), Compare);
+    return bsearch (Mnemo, OPCTable+OP65_FIRST, OP65_COUNT,
+		    sizeof (OPCTable[0]), FindCmp );
 }
 
 
@@ -358,9 +876,9 @@ bc_t GetInverseCond (bc_t BC)
        	case BC_PL:  	return BC_MI;
        	case BC_VC:  	return BC_VS;
        	case BC_VS:  	return BC_VC;
-	default:
-	    Internal ("GetInverseCond: Invalid condition: %d", BC);
-	    return 0;
+       	default:
+       	    Internal ("GetInverseCond: Invalid condition: %d", BC);
+       	    return 0;
     }
 }
 

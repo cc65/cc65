@@ -52,6 +52,19 @@
 /* Definitions for the possible opcodes */
 typedef enum {
 
+    /* Opcodes for the virtual stack machine */
+    OPC_LDA,
+    OPC_LDAX,
+    OPC_LDEAX,
+    OPC_PHA,
+    OPC_PHAX,
+    OPC_PHEAX,
+    OPC_STA,
+    OPC_STAX,
+    OPC_STEAX,
+    OPC_LEA,
+    OPC_JMP,
+
     /* 65XX opcodes */
     OP65_ADC,
     OP65_AND,
@@ -126,17 +139,32 @@ typedef enum {
     OP65_TXA,
     OP65_TXS,
     OP65_TYA,
-    OPCODE_COUNT       	       	/* Number of opcodes available */
+
+    /* Number of opcodes available */
+    OPCODE_COUNT,
+
+    /* Several other opcode information constants */
+    OP65_FIRST = OP65_ADC,
+    OP65_LAST  = OP65_TYA,
+    OP65_COUNT = OP65_LAST - OP65_FIRST + 1
 } opc_t;
 
-/* Addressing modes (bitmapped). */
+/* Addressing modes */
 typedef enum {
-    AM65_IMP,      	   	/* implicit */
-    AM65_ACC,      	   	/* accumulator */
-    AM65_IMM,      	   	/* immidiate */
-    AM65_ZP,       	   	/* zeropage */
-    AM65_ZPX,      	   	/* zeropage,X */
-    AM65_ABS,      	   	/* absolute */
+
+    /* Addressing modes of the virtual stack machine */
+    AM_IMP,
+    AM_IMM,
+    AM_STACK,
+    AM_ABS,
+
+    /* 65XX addressing modes */
+    AM65_IMP,       	   	/* implicit */
+    AM65_ACC,       	   	/* accumulator */
+    AM65_IMM,       	   	/* immidiate */
+    AM65_ZP,        	   	/* zeropage */
+    AM65_ZPX,       	   	/* zeropage,X */
+    AM65_ABS,       	   	/* absolute */
     AM65_ABSX,      	   	/* absolute,X */
     AM65_ABSY,      	   	/* absolute,Y */
     AM65_ZPX_IND,      		/* (zeropage,x) */
@@ -149,7 +177,7 @@ typedef enum {
 typedef enum {
     BC_CC,
     BC_CS,
-    BC_EQ,		   
+    BC_EQ,
     BC_MI,
     BC_NE,
     BC_PL,
@@ -158,16 +186,19 @@ typedef enum {
 } bc_t;
 
 /* Opcode info */
-#define OF_NONE	0x0000U	       	    	/* No additional information */
-#define OF_UBRA	0x0001U	       	    	/* Unconditional branch */
-#define OF_CBRA	0x0002U	       	    	/* Conditional branch */
-#define OF_ZBRA 0x0004U	   	    	/* Branch on zero flag condition */
-#define OF_FBRA 0x0008U                 /* Branch on cond set by a load */
-#define OF_LBRA 0x0010U	   	    	/* Jump/branch is long */
-#define OF_RET 	0x0020U	       	    	/* Return from function */
-#define OF_LOAD 0x0040U	   	    	/* Register load */
-#define OF_XFR  0x0080U                 /* Transfer instruction */
-#define OF_CALL 0x0100U                 /* A subroutine call */
+#define OF_NONE	        0x0000U	/* No additional information */
+#define OF_CPU_6502     0x0000U	/* 6502 opcode */
+#define OF_CPU_VM       0x0001U /* Virtual machine opcode */
+#define OF_MASK_CPU     0x0001U /* Mask for the cpu field */
+#define OF_UBRA	        0x0010U	/* Unconditional branch */
+#define OF_CBRA	        0x0020U	/* Conditional branch */
+#define OF_ZBRA         0x0040U	/* Branch on zero flag condition */
+#define OF_FBRA         0x0080U /* Branch on cond set by a load */
+#define OF_LBRA         0x0100U	/* Jump/branch is long */
+#define OF_RET 	        0x0200U	/* Return from function */
+#define OF_LOAD         0x0400U	/* Register load */
+#define OF_XFR          0x0800U /* Transfer instruction */
+#define OF_CALL         0x1000U /* A subroutine call */
 
 /* Combined infos */
 #define OF_BRA 	(OF_UBRA | OF_CBRA)	/* Operation is a jump/branch */
@@ -176,7 +207,7 @@ typedef enum {
 /* Opcode description */
 typedef struct {
     opc_t      	    OPC;       		/* Opcode */
-    char       	    Mnemo[8];  		/* Mnemonic */
+    char       	    Mnemo[9];  		/* Mnemonic */
     unsigned char   Size;      		/* Size, 0 = check addressing mode */
     unsigned char   Use;       		/* Registers used by this insn */
     unsigned char   Chg;       		/* Registers changed by this insn */
@@ -194,7 +225,7 @@ extern const OPCDesc OPCTable[OPCODE_COUNT];
 
 
 
-const OPCDesc* FindOpcode (const char* OPC);
+const OPCDesc* FindOP65 (const char* OPC);
 /* Find the given opcode and return the opcode description. If the opcode was
  * not found, NULL is returned.
  */

@@ -65,8 +65,11 @@ struct CodeSeg;
 #define REG_PTR1_LO	0x40U
 #define REG_PTR1_HI	0x80U
 #define	REG_AX		(REG_A | REG_X)
+#define REG_EAX         (REG_A | REG_X | REG_SREG_LO | REG_SREG_HI)
 #define REG_XY		(REG_X | REG_Y)
 #define REG_AXY		(REG_A | REG_X | REG_Y)
+#define REG_SREG        (REG_SREG_LO | REG_SREG_HI)
+#define REG_PTR1        (REG_PTR1_LO | REG_PTR1_HI)
 
 
 

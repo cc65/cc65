@@ -204,7 +204,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
     L = ReadToken (L, " \t", Mnemo, sizeof (Mnemo));
 
     /* Try to find the opcode description for the mnemonic */
-    OPC = FindOpcode (Mnemo);
+    OPC = FindOP65 (Mnemo);
 
     /* If we didn't find the opcode, print an error and bail out */
     if (OPC == 0) {

@@ -1,4 +1,4 @@
-;                        
+;
 ; Stefan Haubenthal with minor changes from Ullrich von Bassewitz, 2003-05-02
 ;
 ; Character specification table.
@@ -23,7 +23,9 @@
 ;
 ;   * We save some code in the isxxx functions.
 
+
 __ctype:
+        .repeat 2
        	.byte  	CT_CTRL			;   0/00 ___ctrl_@___
 	.byte	CT_CTRL			;   1/01 ___ctrl_A___
 	.byte	CT_CTRL			;   2/02 ___ctrl_B___
@@ -154,10 +156,6 @@ __ctype:
 	.byte	$00			; 125/7d _____}_____
 	.byte	$00			; 126/7e _____~_____
 	.byte	CT_OTHER_WS		; 127/7f ____DEL____
-
-; The upper 128 characters are actually unused on the Apple, we wil encode
-; them as "other printable"
-
-        .res    128, $00
+        .endrepeat
 
 

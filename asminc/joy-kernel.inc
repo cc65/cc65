@@ -48,13 +48,14 @@
 	    UNINSTALL   .word	; UNINSTALL routine
 	    COUNT       .word	; COUNT routine
 	    READ 	.word	; READ routine
+            IRQ         .word   ; IRQ routine
 	.endstruct
 .endstruct
 
 ;------------------------------------------------------------------------------
 ; The JOY API version, stored in JOY_HDR::VERSION
 
-JOY_API_VERSION         = $00
+JOY_API_VERSION         = $01
 
 ;------------------------------------------------------------------------------
 ; Variables

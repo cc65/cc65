@@ -48,14 +48,26 @@
 	adc	#1
 	sta	DUNIT		; unit number (d1,d2,d3,...)
 
-	ldy	#sst_sectsize
+	lda	DAUX2		; high byte sector #
+	bne	_realsz
+	lda	DAUX1
+	cmp	#4		; sectors 1 to 3 are special (always 128 bytes)
+	bcs	_realsz
+
+	lda	#$80
+	sta	DBYTLO
+	asl	a
+	sta	DBYTHI
+	beq	_cont
+
+_realsz:ldy	#sst_sectsize
 	lda	(ptr1),y
 	sta	DBYTLO
 	iny
 	lda	(ptr1),y
 	sta	DBYTHI
 
-	lda	#DISKID		; SIO bus ID of diskette drive
+_cont:	lda	#DISKID		; SIO bus ID of diskette drive
 	sta	DDEVIC
 	lda	#15
 	sta	DTIMLO		; value got from DOS source

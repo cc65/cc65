@@ -276,6 +276,8 @@ static OptFunc OptFuncs [] = {
     { OptBoolTransforms,    "OptBoolTransforms",	0	},
     /* Remove unused loads */
     { OptUnusedLoads,	    "OptUnusedLoads",		0	},
+    /* Optimize branch distance */
+    { OptBranchDist,   	    "OptBranchDist",		0	},
 };
 
 

@@ -73,11 +73,12 @@ struct CodeEntry;
 /* Code segment structure */
 typedef struct CodeSeg CodeSeg;
 struct CodeSeg {
-    char*	SegName;  			/* Segment name */
-    SymEntry*	Func;				/* Owner function */
-    Collection	Entries;			/* List of code entries */
-    Collection	Labels;				/* Labels for next insn */
-    CodeLabel* 	LabelHash [CS_LABEL_HASH_SIZE];	/* Label hash table */
+    char*	    SegName;  	  		/* Segment name */
+    SymEntry*	    Func;	  		/* Owner function */
+    Collection	    Entries;	  		/* List of code entries */
+    Collection	    Labels;	  		/* Labels for next insn */
+    CodeLabel* 	    LabelHash [CS_LABEL_HASH_SIZE]; /* Label hash table */
+    unsigned char   ExitRegs;			/* Register use on exit */
 };
 
 

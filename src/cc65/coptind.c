@@ -321,16 +321,19 @@ unsigned OptRTS (CodeSeg* S)
     I = 0;
     while (I < Count-1) {
 
+	CodeEntry* N;
+
 	/* Get this entry */
 	CodeEntry* E = GetCodeEntry (S, I);
 
 	/* Check if it's a subroutine call and if the following insn is RTS */
-	if (E->OPC == OPC_JSR && GetCodeEntry(S,I+1)->OPC == OPC_RTS) {
+	if (E->OPC == OPC_JSR  			&&
+	    (N = GetNextCodeEntry (S, I)) != 0	&&
+	    N->OPC == OPC_RTS) {
 
 	    /* Change the jsr to a jmp and use the additional info for a jump */
-	    E->OPC  = OPC_JMP;
-	    E->AM   = AM_BRA;
-	    E->Info = GetOPCInfo (OPC_JMP);
+       	    E->AM = AM_BRA;
+	    ReplaceOPC (E, OPC_JMP);
 
        	    /* Remember, we had changes */
 	    ++Changes;
@@ -617,6 +620,90 @@ NextEntry:
     /* Return the number of changes made */
     return Changes;
 }
+
+
+
+/*****************************************************************************/
+/*		       	     Optimize branch types			     */
+/*****************************************************************************/
+
+
+
+unsigned OptBranchDist (CodeSeg* S)
+/* Change branches for the distance needed. */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Get the number of entries, bail out if we have not enough */
+    unsigned Count = GetCodeEntryCount (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < Count) {
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+	/* Check if it's a conditional branch to a local label. */
+       	if ((E->Info & OF_CBRA) != 0) {
+
+	    /* Is this a branch to a local symbol? */
+	    if (E->JumpTo != 0) {
+
+		/* Get the index of the branch target */
+		unsigned TI = GetCodeEntryIndex (S, E->JumpTo->Owner);
+
+		/* Determine the branch distance */
+		int Distance = 0;
+		if (TI >= I) {
+		    /* Forward branch */
+		    unsigned J = I;
+		    while (J < TI) {
+			CodeEntry* N = GetCodeEntry (S, J++);
+			Distance += N->Size;
+		    }
+		} else {
+		    /* Backward branch */
+		    unsigned J = TI;
+		    while (J < I) {
+			CodeEntry* N = GetCodeEntry (S, J++);
+			Distance += N->Size;
+		    }
+		}
+
+		/* Make the branch short/long according to distance */
+		if ((E->Info & OF_LBRA) == 0 && Distance > 120) {
+		    /* Short branch but long distance */
+		    ReplaceOPC (E, MakeLongBranch (E->OPC));
+		    ++Changes;
+		} else if ((E->Info & OF_LBRA) != 0 && Distance < 120) {
+		    /* Long branch but short distance */
+		    ReplaceOPC (E, MakeShortBranch (E->OPC));
+		    ++Changes;
+		}
+
+	    } else if ((E->Info & OF_LBRA) == 0) {
+
+		/* Short branch to external symbol - make it long */
+		ReplaceOPC (E, MakeLongBranch (E->OPC));
+		++Changes;
+
+	    }
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+
 
 
 

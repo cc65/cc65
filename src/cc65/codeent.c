@@ -162,11 +162,14 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* 
     if (E->OPC == OPC_JSR) {
      	/* A subroutine call */
      	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
+    } else if ((E->Info & OF_BRA) != 0 && JumpTo == 0) {
+	/* Jump to external symbol (function exit) */
+     	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
     } else {
      	/* Some other instruction */
      	E->Use |= GetAMUseInfo (E->AM);
     }
-    E->JumpTo	= JumpTo;
+    E->JumpTo = JumpTo;
     InitCollection (&E->Labels);
 
     /* If we have a label given, add this entry to the label */

@@ -48,7 +48,9 @@
 #include "asmlabel.h"
 #include "codeent.h"
 #include "codeinfo.h"
+#include "datatype.h"
 #include "error.h"
+#include "symentry.h"
 #include "codeseg.h"
 
 
@@ -382,7 +384,16 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
 	S->LabelHash[I] = 0;
     }
 
-    /* Return the new struct */
+    /* If we have a function given, get the return type of the function.
+     * Assume ANY return type besides void will use the A and X registers.
+     */
+    if (S->Func && !IsTypeVoid (GetFuncReturn (Func->Type))) {
+	S->ExitRegs = REG_AX;
+    } else {
+	S->ExitRegs = REG_NONE;
+    }
+
+    /* Return the new struct */	     
     return S;
 }
 

@@ -86,6 +86,9 @@ unsigned OptCondBranches (CodeSeg* S);
 unsigned OptUnusedLoads (CodeSeg* S);
 /* Remove loads of registers where the value loaded is not used later. */
 
+unsigned OptBranchDist (CodeSeg* S);
+/* Change branches for the distance needed. */
+
 
 
 /* End of coptind.h */

@@ -176,7 +176,13 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
 	CollAppend (Visited, E);
 
 	/* Evaluate the used registers */
-	if ((R = E->Use) != REG_NONE) {
+	R = E->Use;
+	if (E->OPC == OPC_RTS ||
+	    ((E->Info & OF_BRA) != 0 && E->JumpTo == 0)) {
+	    /* This instruction will leave the function */
+	    R |= S->ExitRegs;
+	}
+       	if (R != REG_NONE) {
 	    /* We are not interested in the use of any register that has been
 	     * used before.
 	     */

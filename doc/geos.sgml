@@ -1174,6 +1174,7 @@ after <tt/InitProcesses/, because it resets all flags and counters and it starts
 <tt/void UnBlockProcess (char processNumber)/
 <p>
 <tt/BlockProcess/ disables the execution of given process, but this does not disable the timers.
+It means that if you call <tt/UnBlockProcess/ before timer runs out, the process will be executed.
 <p>
 <tt/UnBlockProcess/ does the opposite.
 

@@ -510,54 +510,70 @@ void exprhs (unsigned flags, int k, struct expent *lval)
 }
 
 
-static void callfunction (struct expent* lval)
-/* Perform a function call.  Called from hie11, this routine will
- * either call the named function, or if the supplied ptr is zero,
- * will call the contents of P.
+
+static unsigned FunctionParamList (FuncDesc* Func)
+/* Parse a function parameter list and pass the parameters to the called
+ * function. Depending on several criteria this may be done by just pushing
+ * each parameter separately, or creating the parameter frame once and then
+ * storing into this frame.
+ * The function returns the size of the parameters pushed.
  */
 {
-    struct expent lval2;
-    FuncDesc*	  Func;		/* Function descriptor */
-    int		  Ellipsis;	/* True if we have an open param list */
-    SymEntry* 	  Param;       	/* Current formal parameter */
-    unsigned	  ParamCount;	/* Actual parameter count */
-    unsigned	  ParamSize;	/* Number of parameter bytes */
-    unsigned 	  Flags;
-    unsigned 	  CFlags;
-    CodeMark 	  Mark;
+    struct expent lval;
 
+    /* Initialize variables */
+    SymEntry* Param    	  = 0;	/* Keep gcc silent */
+    unsigned  ParamSize   = 0;	/* Size of parameters pushed */
+    unsigned  ParamCount  = 0;	/* Number of parameters pushed */
+    unsigned  FrameSize   = 0;	/* Size of parameter frame */
+    unsigned  FrameParams = 0;	/* Number of params in frame */
+    int       FrameOffs   = 0;	/* Offset into parameter frame */
+    int	      Ellipsis    = 0;	/* Function is variadic */
 
-    /* Get a pointer to the function descriptor from the type string */
-    Func = GetFuncDesc (lval->e_tptr);
-
-    /* Initialize vars to keep gcc silent */
-    Param = 0;
-    Mark  = 0;
-
-    /* Check if this is a function pointer. If so, save it. If not, check for
-     * special known library functions that may be inlined.
+    /* As an optimization, we may allocate the complete parameter frame at
+     * once instead of pushing each parameter as it comes. We may do that,
+     * if...
+     *
+     *  - optimizations that increase code size are enabled (allocating the
+     *    stack frame at once gives usually larger code).
+     *  - we have more than one parameter to push (don't count the last param
+     *    for __fastcall__ functions).
      */
-    if (lval->e_flags & E_MEXPR) {
-       	/* Function pointer is in primary register, save it */
-       	Mark = GetCodePos ();
-       	g_save (CF_PTR);
-    } else if (InlineStdFuncs && IsStdFunc ((const char*) lval->e_name)) {
-       	/* Inline this function */
-       	HandleStdFunc (lval);
-       	return;
+    if (Optimize && !FavourSize) {
+
+	/* Calculate the number and size of the parameters */
+	FrameParams = Func->ParamCount;
+	FrameSize   = Func->ParamSize;
+	if (FrameParams > 0 && (Func->Flags & FD_FASTCALL) != 0) {
+	    /* Last parameter is not pushed */
+	    const SymEntry* LastParam = Func->SymTab->SymTail;
+	    FrameSize -= SizeOf (LastParam->Type);
+	    --FrameParams;
+	}
+
+	/* Do we have more than one parameter in the frame? */
+	if (FrameParams > 1) {
+	    /* Okeydokey, setup the frame */
+	    FrameOffs = oursp;
+	    g_space (FrameSize);
+	    oursp -= FrameSize;
+	} else {
+	    /* Don't use a preallocated frame */
+	    FrameSize = 0;
+	}
     }
 
     /* Parse the actual parameter list */
-    ParamSize  = 0;
-    ParamCount = 0;
-    Ellipsis   = 0;
     while (curtok != TOK_RPAREN) {
+
+    	unsigned CFlags;
+    	unsigned Flags;
 
      	/* Add a hint for the optimizer */
      	AddCodeHint ("param:start");
 
-	/* Count arguments */
-	++ParamCount;
+    	/* Count arguments */
+    	++ParamCount;
 
 	/* Fetch the pointer to the next argument, check for too many args */
 	if (ParamCount <= Func->ParamCount) {
@@ -579,7 +595,7 @@ static void callfunction (struct expent* lval)
 	    }
 	} else if (!Ellipsis) {
 	    /* Too many arguments. Do we have an open param list? */
-	    if ((Func->Flags & FD_ELLIPSIS) == 0) {
+	    if ((Func->Flags & FD_VARIADIC) == 0) {
 	      	/* End of param list reached, no ellipsis */
      	      	Error ("Too many arguments in function call");
 	    }
@@ -596,8 +612,8 @@ static void callfunction (struct expent* lval)
        	if (!Ellipsis && SizeOf (Param->Type) == 1) {
 	    CFlags = CF_FORCECHAR;
       	}
-	Flags = 0;
-       	if (evalexpr (CFlags, hie1, &lval2) == 0) {
+	Flags = CF_NONE;
+       	if (evalexpr (CFlags, hie1, &lval) == 0) {
        	    /* A constant value */
 	    Flags |= CF_CONST;
      	}
@@ -607,14 +623,14 @@ static void callfunction (struct expent* lval)
 	 */
        	if (!Ellipsis) {
 	    /* Promote the argument if needed */
-       	    assignadjust (Param->Type, &lval2);
+       	    assignadjust (Param->Type, &lval);
 
 	    /* If we have a prototype, chars may be pushed as chars */
 	    Flags |= CF_FORCECHAR;
        	}
 
 	/* Use the type of the argument for the push */
-       	Flags |= TypeOf (lval2.e_tptr);
+       	Flags |= TypeOf (lval.e_tptr);
 
 	/* If this is a fastcall function, don't push the last argument */
        	if (ParamCount == Func->ParamCount && (Func->Flags & FD_FASTCALL) != 0) {
@@ -623,12 +639,24 @@ static void callfunction (struct expent* lval)
 	     * the primary.
 	     */
 	    if (Flags & CF_CONST) {
-	    	exprhs (CF_FORCECHAR, 0, &lval2);
+	    	exprhs (CF_FORCECHAR, 0, &lval);
 	    }
       	} else {
-	    /* Push the argument, count the argument size */
-	    g_push (Flags, lval2.e_const);
-     	    ParamSize += sizeofarg (Flags);
+	    unsigned ArgSize = sizeofarg (Flags);
+	    if (FrameSize > 0) {
+		/* We have the space already allocated, store in the frame */
+		CHECK (FrameSize >= ArgSize);
+		FrameSize -= ArgSize;
+		FrameOffs -= ArgSize;
+		/* Store */
+		g_putlocal (Flags | CF_NOKEEP, FrameOffs, lval.e_const);
+	    } else {
+	    	/* Push the argument */
+		g_push (Flags, lval.e_const);
+	    }
+
+	    /* Calculate total parameter size */
+     	    ParamSize += ArgSize;
 	}
 
 	/* Add an optimizer hint */
@@ -641,13 +669,51 @@ static void callfunction (struct expent* lval)
      	NextToken ();
     }
 
-    /* We need the closing bracket here */
-    ConsumeRParen ();
-
     /* Check if we had enough parameters */
     if (ParamCount < Func->ParamCount) {
       	Error ("Too few arguments in function call");
     }
+
+    /* Return the size of all parameters pushed onto the stack */
+    return ParamSize;
+}
+
+
+
+static void CallFunction (struct expent* lval)
+/* Perform a function call.  Called from hie11, this routine will
+ * either call the named function, or the function pointer in a/x.
+ */
+{
+    FuncDesc*	  Func;		/* Function descriptor */
+    unsigned	  ParamSize;	/* Number of parameter bytes */
+    CodeMark 	  Mark;
+
+
+    /* Get a pointer to the function descriptor from the type string */
+    Func = GetFuncDesc (lval->e_tptr);
+
+    /* Initialize vars to keep gcc silent */
+    Mark  = 0;
+
+    /* Check if this is a function pointer. If so, save it. If not, check for
+     * special known library functions that may be inlined.
+     */
+    if (lval->e_flags & E_MEXPR) {
+       	/* Function pointer is in primary register, save it */
+       	Mark = GetCodePos ();
+       	g_save (CF_PTR);
+    } else if (InlineStdFuncs && IsStdFunc ((const char*) lval->e_name)) {
+       	/* Inline this function */
+       	HandleStdFunc (lval);
+       	return;
+    }
+
+    /* Parse the parameter list */
+    ParamSize = FunctionParamList (Func);
+
+    /* We need the closing bracket here */
+    ConsumeRParen ();
 
     /* */
     if (lval->e_flags & E_MEXPR) {
@@ -660,7 +726,7 @@ static void callfunction (struct expent* lval)
 	}
      	g_callind (TypeOf (lval->e_tptr), ParamSize);
     } else {
-       	g_call (TypeOf (lval->e_tptr), (char*) lval->e_name, ParamSize);
+       	g_call (TypeOf (lval->e_tptr), (const char*) lval->e_name, ParamSize);
     }
 }
 
@@ -1205,7 +1271,7 @@ static int hie11 (struct expent *lval)
 	    	    ++lval->e_tptr; 	    	/* Skip T_PTR */
 	    	    lval->e_flags |= E_MEXPR;
      	    	}
-     	    	callfunction (lval);
+     	    	CallFunction (lval);
      	    	lval->e_flags = E_MEXPR;
      	    	lval->e_tptr += DECODE_SIZE + 1;       	/* Set to result */
      	    } else {
@@ -1255,7 +1321,7 @@ static void store (struct expent* lval)
        	g_putstatic (flags, lval->e_name, lval->e_const);
 
     } else if (f & E_MLOCAL) {
-       	g_putlocal (flags, lval->e_const);
+       	g_putlocal (flags, lval->e_const, 0);
     } else if (f == E_MEOFFS) {
     	g_putind (flags, lval->e_const);
     } else if (f != E_MREG) {

@@ -589,7 +589,7 @@ static ExprNode* DoFunctionCall (ExprNode* Left)
 	    }
 	} else if (!Ellipsis) {
 	    /* Too many arguments. Do we have an open param list? */
-	    if ((Func->Flags & FD_ELLIPSIS) == 0) {
+	    if ((Func->Flags & FD_VARIADIC) == 0) {
 	      	/* End of param list reached, no ellipsis */
      	      	Error ("Too many function arguments");
 	    }

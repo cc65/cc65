@@ -173,7 +173,7 @@ type* GetImplicitFuncType (void)
     type* T = TypeAlloc (1 + DECODE_SIZE + 2);
 
     /* Prepare the function descriptor */
-    F->Flags  = FD_IMPLICIT | FD_EMPTY | FD_ELLIPSIS;
+    F->Flags  = FD_IMPLICIT | FD_EMPTY | FD_VARIADIC;
     F->SymTab = &EmptySymTab;
     F->TagTab = &EmptySymTab;
 
@@ -476,7 +476,7 @@ unsigned TypeOf (const type* T)
 
         case T_FUNC:
 	    F = (FuncDesc*) DecodePtr (T+1);
-	    return (F->Flags & FD_ELLIPSIS)? 0 : CF_FIXARGC;
+	    return (F->Flags & FD_VARIADIC)? 0 : CF_FIXARGC;
 
         case T_STRUCT:
         case T_UNION:
@@ -654,7 +654,7 @@ int IsVariadicFunc (const type* T)
     FuncDesc* F;
     CHECK (IsTypeFunc (T));
     F = (FuncDesc*) DecodePtr (T+1);
-    return (F->Flags & FD_ELLIPSIS) != 0;
+    return (F->Flags & FD_VARIADIC) != 0;
 }
 
 

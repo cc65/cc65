@@ -48,7 +48,7 @@
 #define FD_IMPLICIT		0x0001U	/* Implicitly declared function      */
 #define FD_EMPTY      		0x0002U	/* Function with empty param list    */
 #define FD_VOID_PARAM   	0x0004U	/* Function with a void param list   */
-#define FD_ELLIPSIS		0x0008U	/* Function with variable param list */
+#define FD_VARIADIC		0x0008U	/* Function with variable param list */
 #define FD_FASTCALL		0x0010U	/* __fastcall__ function 	     */
 #define FD_OLDSTYLE		0x0020U	/* Old style (K&R) function	     */
 #define FD_UNNAMED_PARAMS	0x0040U	/* Function has unnamed params	     */

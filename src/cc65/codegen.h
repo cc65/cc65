@@ -50,11 +50,13 @@
  */
 #define CF_NONE		0x0000	/* No special flags */
 
-#define CF_TYPE		0x000F	/* Mask for operand type */
+#define CF_TYPE	       	0x0007	/* Mask for operand type */
 #define CF_CHAR	       	0x0003  /* Operation on characters */
 #define CF_INT		0x0001	/* Operation on ints */
 #define CF_PTR		CF_INT	/* Alias for readability */
 #define CF_LONG		0x0000	/* Operation on longs */
+
+#define CF_NOKEEP	0x0008	/* Value may get destroyed when storing */
 
 #define CF_UNSIGNED    	0x0010	/* Value is unsigned */
 #define CF_CONST	0x0020 	/* Constant value available */
@@ -273,7 +275,7 @@ void g_leavariadic (int Offs);
 void g_putstatic (unsigned flags, unsigned long label, unsigned offs);
 /* Store the primary register into the specified static memory cell */
 
-void g_putlocal (unsigned flags, int offs);
+void g_putlocal (unsigned Flags, int Offs, long Val);
 /* Put data into local object. */
 
 void g_putind (unsigned flags, unsigned offs);
@@ -370,10 +372,18 @@ void g_cmp (unsigned flags, unsigned long val);
 void g_test (unsigned flags);
 void g_push (unsigned flags, unsigned long val);
 void g_swap (unsigned flags);
-void g_call (unsigned flags, char *lbl, unsigned argsize);
-void g_callind (unsigned flags, unsigned argsize);
-void g_jump (unsigned label);
-void g_switch (unsigned flags);
+
+void g_call (unsigned Flags, const char* Label, unsigned ArgSize);
+/* Call the specified subroutine name */
+
+void g_callind (unsigned Flags, unsigned ArgSize);
+/* Call subroutine with address in AX */
+
+void g_jump (unsigned Label);
+/* Jump to specified internal label number */
+
+void g_switch (unsigned Flags);
+/* Output switch statement preamble */
 
 void g_case (unsigned flags, unsigned label, unsigned long val);
 /* Create table code for one case selector */

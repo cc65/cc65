@@ -626,7 +626,7 @@ static void ParseAnsiParamList (FuncDesc* F)
       	/* Allow an ellipsis as last parameter */
 	if (curtok == TOK_ELLIPSIS) {
 	    NextToken ();
-	    F->Flags |= FD_ELLIPSIS;
+	    F->Flags |= FD_VARIADIC;
 	    break;
 	}
 
@@ -708,14 +708,14 @@ static FuncDesc* ParseFuncDecl (void)
     /* Check for several special parameter lists */
     if (curtok == TOK_RPAREN) {
      	/* Parameter list is empty */
-     	F->Flags |= (FD_EMPTY | FD_ELLIPSIS);
+     	F->Flags |= (FD_EMPTY | FD_VARIADIC);
     } else if (curtok == TOK_VOID && nxttok == TOK_RPAREN) {
      	/* Parameter list declared as void */
      	NextToken ();
      	F->Flags |= FD_VOID_PARAM;
     } else if (curtok == TOK_IDENT && (nxttok == TOK_COMMA || nxttok == TOK_RPAREN)) {
 	/* Old style (K&R) function. Assume variable param list. */
-       	F->Flags |= (FD_OLDSTYLE | FD_ELLIPSIS);
+       	F->Flags |= (FD_OLDSTYLE | FD_VARIADIC);
     }
 
     /* Parse params */
@@ -730,7 +730,7 @@ static FuncDesc* ParseFuncDecl (void)
     /* Assign offsets. If the function has a variable parameter list,
      * there's one additional byte (the arg size).
      */
-    Offs = (F->Flags & FD_ELLIPSIS)? 1 : 0;
+    Offs = (F->Flags & FD_VARIADIC)? 1 : 0;
     Sym = GetSymTab()->SymTail;
     while (Sym) {
 	unsigned Size = SizeOf (Sym->Type);

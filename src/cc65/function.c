@@ -151,7 +151,7 @@ int HasVoidReturn (const Function* F)
 int IsVariadic (const Function* F)
 /* Return true if this is a variadic function */
 {
-    return (F->Desc->Flags & FD_ELLIPSIS) != 0;
+    return (F->Desc->Flags & FD_VARIADIC) != 0;
 }
 
 
@@ -231,8 +231,8 @@ void NewFunc (SymEntry* Func)
      * The latter is different depending on the type of the function (variadic
      * or not).
      */
-    AddConstSym ("__fixargs__", type_uint, SC_DEF | SC_CONST, D->ParamSize);	 
-    if (D->Flags & FD_ELLIPSIS) {
+    AddConstSym ("__fixargs__", type_uint, SC_DEF | SC_CONST, D->ParamSize);
+    if (D->Flags & FD_VARIADIC) {
 	/* Variadic function. The variable must be const. */
 	static const type T [] = { T_UCHAR | T_QUAL_CONST, T_END };
 	AddLocalSym ("__argsize__", T, SC_DEF | SC_REF | SC_AUTO, 0);
@@ -263,8 +263,8 @@ void NewFunc (SymEntry* Func)
 	unsigned Flags;
 
 	/* Fastcall functions may never have an ellipsis or the compiler is buggy */
-	CHECK ((D->Flags & FD_ELLIPSIS) == 0);
-
+	CHECK ((D->Flags & FD_VARIADIC) == 0);
+				      
 	/* Get a pointer to the last parameter entry */
 	LastParam = D->SymTab->SymTail;
 

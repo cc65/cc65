@@ -652,63 +652,63 @@ void g_getimmed (unsigned flags, unsigned long val, unsigned offs)
 {
     if ((flags & CF_CONST) != 0) {
 
-	/* Numeric constant */
-	switch (flags & CF_TYPE) {
+     	/* Numeric constant */
+     	switch (flags & CF_TYPE) {
 
-	    case CF_CHAR:
-		if ((flags & CF_FORCECHAR) != 0) {
-		    ldaconst (val);
-		    break;
-		}
-		/* FALL THROUGH */
-	    case CF_INT:
-		ldxconst ((val >> 8) & 0xFF);
-		ldaconst (val & 0xFF);
-		break;
+     	    case CF_CHAR:
+     		if ((flags & CF_FORCECHAR) != 0) {
+     		    ldaconst (val);
+     		    break;
+     		}
+     		/* FALL THROUGH */
+     	    case CF_INT:
+     		ldxconst ((val >> 8) & 0xFF);
+     		ldaconst (val & 0xFF);
+     		break;
 
-	    case CF_LONG:
-		if (val < 0x100) {
-		    AddCodeLine ("\tldx\t#$00");
-		    AddCodeLine ("\tstx\tsreg+1");
-		    AddCodeLine ("\tstx\tsreg");
-		    AddCodeLine ("\tlda\t#$%02X", (unsigned char) val);
-		} else if ((val & 0xFFFF00FF) == 0) {
-		    AddCodeLine ("\tlda\t#$00");
-		    AddCodeLine ("\tsta\tsreg+1");
-		    AddCodeLine ("\tsta\tsreg");
-		    AddCodeLine ("\tldx\t#$%02X", (unsigned char) (val >> 8));
-		} else if ((val & 0xFFFF0000) == 0 && FavourSize == 0) {
-		    AddCodeLine ("\tlda\t#$00");
-		    AddCodeLine ("\tsta\tsreg+1");
-		    AddCodeLine ("\tsta\tsreg");
-		    AddCodeLine ("\tlda\t#$%02X", (unsigned char) val);
-		    AddCodeLine ("\tldx\t#$%02X", (unsigned char) (val >> 8));
-		} else if ((val & 0xFFFFFF00) == 0xFFFFFF00) {
-		    AddCodeLine ("\tldx\t#$FF");
-		    AddCodeLine ("\tstx\tsreg+1");
-		    AddCodeLine ("\tstx\tsreg");
-		    if ((val & 0xFF) == 0xFF) {
-			AddCodeLine ("\ttxa");
-		    } else {
-			AddCodeLine ("\tlda\t#$%02X", (unsigned char) val);
-		    }
-		} else if ((val & 0xFFFF00FF) == 0xFFFF00FF) {
-		    AddCodeLine ("\tlda\t#$FF");
-		    AddCodeLine ("\tsta\tsreg+1");
-		    AddCodeLine ("\tsta\tsreg");
-		    AddCodeLine ("\tldx\t#$%02X", (unsigned char) (val >> 8));
-		} else {
-		    /* Call a subroutine that will load following value */
-		    AddCodeLine ("\tjsr\tldeax");
-		    AddCodeLine ("\t.dword\t$%08lX", val & 0xFFFFFFFF);
-		}
-		break;
+     	    case CF_LONG:
+     		if (val < 0x100) {
+     		    AddCodeLine ("\tldx\t#$00");
+     		    AddCodeLine ("\tstx\tsreg+1");
+     		    AddCodeLine ("\tstx\tsreg");
+     		    AddCodeLine ("\tlda\t#$%02X", (unsigned char) val);
+     		} else if ((val & 0xFFFF00FF) == 0) {
+     		    AddCodeLine ("\tlda\t#$00");
+     		    AddCodeLine ("\tsta\tsreg+1");
+     		    AddCodeLine ("\tsta\tsreg");
+     		    AddCodeLine ("\tldx\t#$%02X", (unsigned char) (val >> 8));
+     		} else if ((val & 0xFFFF0000) == 0 && FavourSize == 0) {
+     		    AddCodeLine ("\tlda\t#$00");
+     		    AddCodeLine ("\tsta\tsreg+1");
+     		    AddCodeLine ("\tsta\tsreg");
+     		    AddCodeLine ("\tlda\t#$%02X", (unsigned char) val);
+     		    AddCodeLine ("\tldx\t#$%02X", (unsigned char) (val >> 8));
+     		} else if ((val & 0xFFFFFF00) == 0xFFFFFF00) {
+     		    AddCodeLine ("\tldx\t#$FF");
+     		    AddCodeLine ("\tstx\tsreg+1");
+     		    AddCodeLine ("\tstx\tsreg");
+     		    if ((val & 0xFF) == 0xFF) {
+     			AddCodeLine ("\ttxa");
+     		    } else {
+     			AddCodeLine ("\tlda\t#$%02X", (unsigned char) val);
+     		    }
+     		} else if ((val & 0xFFFF00FF) == 0xFFFF00FF) {
+     		    AddCodeLine ("\tlda\t#$FF");
+     		    AddCodeLine ("\tsta\tsreg+1");
+     		    AddCodeLine ("\tsta\tsreg");
+     		    AddCodeLine ("\tldx\t#$%02X", (unsigned char) (val >> 8));
+     		} else {
+     		    /* Call a subroutine that will load following value */
+     		    AddCodeLine ("\tjsr\tldeax");
+     		    AddCodeLine ("\t.dword\t$%08lX", val & 0xFFFFFFFF);
+     		}
+     		break;
 
-	    default:
-		typeerror (flags);
-		break;
+     	    default:
+     		typeerror (flags);
+     		break;
 
-	}
+     	}
 
     } else {
 
@@ -1084,34 +1084,79 @@ void g_putstatic (unsigned flags, unsigned long label, unsigned offs)
 
 
 
-void g_putlocal (unsigned flags, int offs)
+void g_putlocal (unsigned Flags, int Offs, long Val)
 /* Put data into local object. */
 {
-    offs -= oursp;
-    CheckLocalOffs (offs);
-    switch (flags & CF_TYPE) {
+    Offs -= oursp;
+    CheckLocalOffs (Offs);
+    switch (Flags & CF_TYPE) {
 
      	case CF_CHAR:
-	    if (CPU == CPU_65C02 && offs == 0) {
-		AddCodeLine ("\tsta\t(sp)");
-	    } else {
-		ldyconst (offs);
-		AddCodeLine ("\tsta\t(sp),y");
+	    if (Flags & CF_CONST) {
+	     	AddCodeLine ("\tlda\t#$%02X", (unsigned char) Val);
 	    }
-     	    break;
-
-     	case CF_INT:
-     	    if (offs) {
-     	    	ldyconst (offs);
-     	    	AddCodeLine ("\tjsr\tstaxysp");
+     	    if (CPU == CPU_65C02 && Offs == 0) {
+     	     	AddCodeLine ("\tsta\t(sp)");
      	    } else {
-     	    	AddCodeLine ("\tjsr\tstax0sp");
+     	     	ldyconst (Offs);
+     	     	AddCodeLine ("\tsta\t(sp),y");
      	    }
      	    break;
 
+     	case CF_INT:
+	    if (Flags & CF_CONST) {
+		ldyconst (Offs+1);
+		AddCodeLine ("\tlda\t#$%02X", (unsigned char) (Val >> 8));
+		AddCodeLine ("\tsta\t(sp),y");
+		if ((Flags & CF_NOKEEP) == 0) {
+		    /* Place high byte into X */
+		    AddCodeLine ("\ttax");
+		}
+		if (CPU == CPU_65C02 && Offs == 0) {
+		    AddCodeLine ("\tlda\t#$%02X", (unsigned char) Val);
+		    AddCodeLine ("\tsta\t(sp)");
+		} else {
+		    if ((Val & 0xFF) == Offs+1) {
+			/* The value we need is already in Y */
+			AddCodeLine ("\ttya");
+			AddCodeLine ("\tdey");
+		    } else {
+			AddCodeLine ("\tdey");
+			AddCodeLine ("\tlda\t#$%02X", (unsigned char) Val);
+		    }
+		    AddCodeLine ("\tsta\t(sp),y");
+		}
+	    } else {
+		if ((Flags & CF_NOKEEP) == 0 || FavourSize) {
+		    if (Offs) {
+			ldyconst (Offs);
+			AddCodeLine ("\tjsr\tstaxysp");
+		    } else {
+			AddCodeLine ("\tjsr\tstax0sp");
+		    }
+		} else {
+		    if (CPU == CPU_65C02 && Offs == 0) {
+			AddCodeLine ("\tsta\t(sp)");
+		     	ldyconst (1);
+		     	AddCodeLine ("\ttxa");
+		     	AddCodeLine ("\tsta\t(sp),y");
+		    } else {
+			ldyconst (Offs);
+			AddCodeLine ("\tsta\t(sp),y");
+			AddCodeLine ("\tiny");
+			AddCodeLine ("\ttxa");
+			AddCodeLine ("\tsta\t(sp),y");
+		    }
+		}
+	    }
+     	    break;
+
      	case CF_LONG:
-     	    if (offs) {
-     	     	ldyconst (offs);
+	    if (Flags & CF_CONST) {
+	     	g_getimmed (Flags, Val, 0);
+	    }
+     	    if (Offs) {
+     	     	ldyconst (Offs);
      	     	AddCodeLine ("\tjsr\tsteaxysp");
      	    } else {
      	     	AddCodeLine ("\tjsr\tsteax0sp");
@@ -1119,7 +1164,7 @@ void g_putlocal (unsigned flags, int offs)
      	    break;
 
        	default:
-     	    typeerror (flags);
+     	    typeerror (Flags);
 
     }
 }
@@ -2461,44 +2506,44 @@ void g_swap (unsigned flags)
 
 
 
-void g_call (unsigned flags, char* lbl, unsigned argsize)
+void g_call (unsigned Flags, const char* Label, unsigned ArgSize)
 /* Call the specified subroutine name */
 {
-    if ((flags & CF_FIXARGC) == 0) {
-	/* Pass arg count */
-	ldyconst (argsize);
+    if ((Flags & CF_FIXARGC) == 0) {
+	/* Pass the argument count */
+	ldyconst (ArgSize);
     }
-    AddCodeLine ("\tjsr\t_%s", lbl);
-    oursp += argsize;	    		/* callee pops args */
+    AddCodeLine ("\tjsr\t_%s", Label);
+    oursp += ArgSize;		/* callee pops args */
 }
 
 
 
-void g_callind (unsigned flags, unsigned argsize)
+void g_callind (unsigned Flags, unsigned ArgSize)
 /* Call subroutine with address in AX */
 {
-    if ((flags & CF_FIXARGC) == 0) {
+    if ((Flags & CF_FIXARGC) == 0) {
 	/* Pass arg count */
-	ldyconst (argsize);
+	ldyconst (ArgSize);
     }
     AddCodeLine ("\tjsr\tcallax");	/* do the call */
-    oursp += argsize;	    		/* callee pops args */
+    oursp += ArgSize;			/* callee pops args */
 }
 
 
 
-void g_jump (unsigned label)
+void g_jump (unsigned Label)
 /* Jump to specified internal label number */
 {
-    AddCodeLine ("\tjmp\tL%04X", label);
+    AddCodeLine ("\tjmp\tL%04X", Label);
 }
 
 
 
-void g_switch (unsigned flags)
-/* Output switch statement preample */
+void g_switch (unsigned Flags)
+/* Output switch statement preamble */
 {
-    switch (flags & CF_TYPE) {
+    switch (Flags & CF_TYPE) {
 
      	case CF_CHAR:
      	case CF_INT:
@@ -2510,7 +2555,7 @@ void g_switch (unsigned flags)
      	    break;
 
      	default:
-     	    typeerror (flags);
+     	    typeerror (Flags);
 
     }
 }

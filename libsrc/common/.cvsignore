@@ -35,6 +35,5 @@ strtok.s
 strxfrm.s
 system.s
 timezone.s
-vsscanf.s
 
 

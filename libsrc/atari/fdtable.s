@@ -14,7 +14,7 @@
 	.export	newfd
 	.export	getfd
 
-	.export	_fd_table,_fd_index
+	.export	_fd_table,_fd_index	; for test purposes
 
 	.data
 MAX_FD_INDEX	=	12
@@ -180,14 +180,15 @@ ret:	rts
 ;   ptr4   - 3,4  (backup)
 ;   devnum - 5
 
-;loc_A      = 0
-;loc_X      = 1
-loc_Y      = 0
-loc_ptr4_l = 1
-loc_ptr4_h = 2
-loc_tmp1   = 3
-loc_devnum = 4
-loc_size   = 5
+	.data
+loc_Y:		.res	1
+loc_ptr4_l:	.res	1
+loc_ptr4_h:	.res	1
+loc_tmp1:	.res	1
+loc_devnum:	.res	1
+loc_size:	.res	1
+
+	.code
 
 .proc	newfd
 
@@ -197,33 +198,21 @@ loc_size   = 5
 	tya
 	pha
 
-	ldy	#loc_size
-	jsr	subysp
-	ldy	#loc_devnum
-	lda	#0
-	sta	(sp),y		; loc_devnum
-	dey
+	ldx	#0
+	stx	loc_devnum
 	lda	tmp1
-	sta	(sp),y		; loc_tmp1
-	lda	#0
-	sta	tmp1		; init tmp1
-	sta	tmp2		; init tmp2
-	dey
+	sta	loc_tmp1
+	stx	tmp1		; init tmp1
+	stx	tmp2		; init tmp2
 	lda	ptr4+1
-	sta	(sp),y		; loc_ptr4_h
-	dey
+	sta	loc_ptr4_h
 	lda	ptr4
-	sta	(sp),y		; loc_ptr4_l
-	dey
+	sta	loc_ptr4_l
 	pla
-	sta	(sp),y		; loc_Y
-;	dey
+	sta	loc_Y
 	pla
-;	sta	(sp),y		; loc_X
 	sta	ptr4+1
-;	dey
 	pla
-;	sta	(sp),y		; loc_A
 	sta	ptr4
 
 	; ptr4 points to filename
@@ -284,11 +273,9 @@ l1:	ldy	#0
 l2:	sta	fd_table+ft_dev,x	; set device
 	lda	#1
 	sta	fd_table+ft_usa,x	; set usage counter
-	ldy	#loc_Y
-	lda	(sp),y
+	lda	loc_Y
 	sta	fd_table+ft_iocb,x	; set iocb index
-	ldy	#loc_devnum
-	lda	(sp),y			; get (optional) device number
+	lda	loc_devnum
 	and	#7			; only 3 bits
 	sta	fd_table+ft_flag,x
 	lda	tmp2
@@ -305,8 +292,7 @@ colon2:	dey
 	sec
 	sbc	#'0'
 	and	#7
-	ldy	#loc_devnum
-	sta	(sp),y		; save it
+	sta	loc_devnum
 	sta	tmp2		; save it for speed later here also
 	lda	#4		; max. length if only  device + number ("Xn:")
 	cmp	tmp3
@@ -363,16 +349,12 @@ finish:	lda	ptr4
 	pha
 	lda	ptr4+1
 	pha
-	ldy	#loc_Y
-	lda	(sp),y
+	lda	loc_Y
 	pha
 	lda	tmp1
 	pha
-	ldy	#loc_tmp1
-	lda	(sp),y
+	lda	loc_tmp1
 	sta	tmp1
-	ldy	#loc_size
-	jsr	addysp
 	pla
 	lsr	a			; set C as needed
 

@@ -22,7 +22,8 @@ OBJS = 	addrspace.o     \
         location.o      \
 	main.o          \
         memory.o        \
-        scanner.o
+        scanner.o       \
+        system.o
 
 LIBS = $(COMMON)/common.a
 

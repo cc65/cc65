@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                  chipdata.h                               */
+/*                                 system.c                                  */
 /*                                                                           */
-/*                        Chip description data structure                    */
+/*                    Description of the simulated system                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,50 +33,39 @@
 
 
 
-#ifndef CHIPDATA_H
-#define CHIPDATA_H
+/* common.h */
+#include "xmalloc.h"
+
+/* sim65 */
+#include "addrspace.h"
+#include "system.h"
 
 
 
 /*****************************************************************************/
-/*                                     Data                                  */
+/*     	      	    		     Code		  		     */
 /*****************************************************************************/
 
 
 
-/* Chip type and version information. */
-#define CHIPDATA_TYPE_CHIP      0U
-#define CHIPDATA_TYPE_CPU       1U
-#define CHIPDATA_VER_MAJOR      1U
-#define CHIPDATA_VER_MINOR      0U
+System* NewSystem (struct CPUData* CPU)
+/* Create and initialize a new System struct. The function will read the size
+ * of the address space from the CPU, and also create a new AddressSpace
+ * object. No chips are assigned, however.
+ */
+{
+    /* Allocate memory */
+    System* Sys = xmalloc (sizeof (System));
 
-/* Forwards */
-struct CfgData;
-struct SimData;
+    /* Initialize the fields */
+    Sys->CPU      = CPU;
+    Sys->AS       = 0;    /* ### */
+    Sys->ChipInstances = AUTO_COLLECTION_INITIALIZER;
 
-/* ChipDesc structure */
-typedef struct ChipData ChipData;
-struct ChipData {
-    const char* ChipName;       /* Name of the chip */
-    unsigned    Type;           /* Type of the chip */
-    unsigned    MajorVersion;   /* Version information */
-    unsigned    MinorVersion;
+    /* Return the new system */
+    return Sys;
+}
 
-    /* -- Exported functions -- */
-    int           (*InitChip) (const struct SimData* Data);
-    void*         (*CreateInstance) (unsigned Addr, unsigned Range, void* CfgInfo);
-    void	  (*DestroyInstance) (void* Data);
-    void          (*WriteCtrl) (void* Data, unsigned Offs, unsigned char Val);
-    void          (*Write) (void* Data, unsigned Offs, unsigned char Val);
-    unsigned char (*ReadCtrl) (void* Data, unsigned Offs);
-    unsigned char (*Read) (void* Data, unsigned Offs);
-};
-
-
-
-/* End of chipdata.h */
-
-#endif
 
 
 

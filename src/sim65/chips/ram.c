@@ -50,8 +50,11 @@
 static int InitChip (const struct SimData* Data);
 /* Initialize the chip, return an error code */
 
-static void* InitInstance (unsigned Addr, unsigned Range, void* CfgInfo);
-/* Initialize a new chip instance */
+static void* CreateInstance (unsigned Addr, unsigned Range, void* CfgInfo);
+/* Create a new chip instance */
+
+static void DestroyInstance (void* Data);
+/* Destroy a chip instance */
 
 static void WriteCtrl (void* Data, unsigned Offs, unsigned char Val);
 /* Write control data */
@@ -74,7 +77,7 @@ static unsigned char Read (void* Data, unsigned Offs);
 
 
 /* Control data passed to the main program */
-static const struct ChipData RAMData[1] = {
+static const struct ChipData CData[1] = {
     {
         "RAM",                  /* Name of the chip */
         CHIPDATA_TYPE_CHIP,     /* Type of the chip */
@@ -83,7 +86,8 @@ static const struct ChipData RAMData[1] = {
 
         /* -- Exported functions -- */
         InitChip,
-        InitInstance,
+        CreateInstance,
+	DestroyInstance,
         WriteCtrl,
         Write,
         ReadCtrl,
@@ -118,14 +122,14 @@ struct InstanceData {
 int GetChipData (const ChipData** Data, unsigned* Count)
 {
     /* Pass the control structure to the caller */
-    *Data = RAMData;
-    *Count = sizeof (Data) / sizeof (Data[0]);
+    *Data = CData;
+    *Count = sizeof (CData) / sizeof (CData[0]);
 
     /* Call was successful */
     return 0;
 }
 
-
+                                       
 
 /*****************************************************************************/
 /*                                     Code                                  */
@@ -145,8 +149,8 @@ static int InitChip (const struct SimData* Data)
 
 
 
-static void* InitInstance (unsigned Addr, unsigned Range, void* CfgInfo)
-/* Initialize a new chip instance */
+static void* CreateInstance (unsigned Addr, unsigned Range, void* CfgInfo)
+/* Create a new chip instance */
 {
     long Val;
 
@@ -178,6 +182,22 @@ static void* InitInstance (unsigned Addr, unsigned Range, void* CfgInfo)
 
     /* Done, return the instance data */
     return D;
+}
+
+
+
+static void DestroyInstance (void* Data)
+/* Destroy a chip instance */
+{
+    /* Cast the data pointer */
+    InstanceData* D = (InstanceData*) Data;
+
+    /* Free memory and attributes */
+    Sim->Free (D->Mem);
+    Sim->Free (D->MemAttr);
+
+    /* Free the instance data itself */
+    free (D);
 }
 
 

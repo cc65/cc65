@@ -54,8 +54,11 @@
 static int InitChip (const struct SimData* Data);
 /* Initialize the chip, return an error code */
 
-static void* InitInstance (unsigned Addr, unsigned Range, void* CfgInfo);
-/* Initialize a new chip instance */
+static void* CreateInstance (unsigned Addr, unsigned Range, void* CfgInfo);
+/* Create a new chip instance */
+
+static void DestroyInstance (void* Data);
+/* Destroy a chip instance */
 
 static void Write (void* Data, unsigned Offs, unsigned char Val);
 /* Write user data */
@@ -72,7 +75,7 @@ static unsigned char Read (void* Data, unsigned Offs);
 
 
 /* Control data passed to the main program */
-static const struct ChipData STDIOData[1] = {
+static const struct ChipData CData[1] = {
     {
         "STDIO",                /* Name of the chip */
         CHIPDATA_TYPE_CHIP,     /* Type of the chip */
@@ -81,7 +84,8 @@ static const struct ChipData STDIOData[1] = {
 
         /* -- Exported functions -- */
         InitChip,
-        InitInstance,
+        CreateInstance,
+	DestroyInstance,
         Write,
         Write,
         Read,
@@ -103,8 +107,8 @@ static const SimData* Sim;
 int GetChipData (const ChipData** Data, unsigned* Count)
 {
     /* Pass the control structure to the caller */
-    *Data = STDIOData;
-    *Count = sizeof (Data) / sizeof (Data[0]);
+    *Data = CData;
+    *Count = sizeof (CData) / sizeof (CData[0]);
 
     /* Call was successful */
     return 0;
@@ -130,11 +134,18 @@ static int InitChip (const struct SimData* Data)
 
 
 
-static void* InitInstance (unsigned Addr, unsigned Range, void* CfgInfo)
+static void* CreateInstance (unsigned Addr, unsigned Range, void* CfgInfo)
 /* Initialize a new chip instance */
 {
     /* We don't need any instance data */
     return 0;
+}
+
+
+
+static void DestroyInstance (void* Data)
+/* Destroy a chip instance */
+{
 }
 
 

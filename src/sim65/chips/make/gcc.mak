@@ -11,13 +11,26 @@ CC	= gcc
 EBIND	= emxbind
 LDFLAGS	=
 
-LIBS 	= $(COMMON)/common.a
+#LIBS 	= $(COMMON)/common.a
 
 CHIPS  	=      	ram.so		\
-		rom.so		\
-		stdio.so
+ 		rom.so		\
+ 		stdio.so        \
+                vic2.so
 
 OBJS	= $(CHIPS:.so=.o)
+
+#----------------------------------------------------------------------------
+# Build rules
+
+%.obj:  %.c
+	$(CC) $(CFLAGS) $^
+
+%.so:	%.o
+	$(CC) $(CFLAGS) -shared -o $@ $(LIBS) $^ -L /usr/X11R6/lib -lX11
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
+
+#----------------------------------------------------------------------------
 
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
@@ -28,20 +41,6 @@ all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-
-# Rules to make chips
-
-ram.so:         ram.o
-	$(CC) $(CFLAGS) -shared -o $@ $(LIBS) $^
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
-
-rom.so:         rom.o
-	$(CC) $(CFLAGS) -shared -o $@ $(LIBS) $^
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
-
-stdio.so:	stdio.o
-	$(CC) $(CFLAGS) -shared -o $@ $(LIBS) $^
-	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
 
 # Admin stuff
 

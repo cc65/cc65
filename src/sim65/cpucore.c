@@ -2498,10 +2498,12 @@ void NMI (void)
 void Break (const char* Format, ...)
 /* Stop running and display the given message */
 {
+#if 0
     va_list ap;
     va_start (ap, Format);
     xvsprintf (BreakMsg, sizeof (BreakMsg), Format, ap);
     va_end (ap);
+#endif
 }
 
 
@@ -2509,11 +2511,16 @@ void Break (const char* Format, ...)
 void CPURun (void)
 /* Run the CPU */
 {
+    unsigned long I = 0;
+
+
     while (!CPUHalted) {
 
-	/* Get the next opcode */
-	unsigned char OPC = MemReadByte (PC);
+      	/* Get the next opcode */
+      	unsigned char OPC = MemReadByte (PC);
 
+#if 0
+        if ((++I & 0xFF) == 0)
         printf ("%9lu %06X %02X A=%02X X=%02X Y=%02X %c%c%c%c%c%c%c\n",
                 TotalCycles, PC, OPC, AC, XR, YR,
                 GET_SF()? 'S' : '-',
@@ -2523,17 +2530,18 @@ void CPURun (void)
                 GET_BF()? 'B' : '-',
                 GET_DF()? 'D' : '-',
                 GET_OF()? 'V' : '-');
+#endif
 
-	/* Execute it */
-	OPCTable[OPC] ();
+      	/* Execute it */
+      	OPCTable[OPC] ();
 
         /* Count cycles */
         TotalCycles += Cycles;
 
-	if (BreakMsg[0]) {
-	    printf ("%s\n", BreakMsg);
-	    BreakMsg[0] = '\0';
-	}
+      	if (BreakMsg[0]) {
+      	    printf ("%s\n", BreakMsg);
+      	    BreakMsg[0] = '\0';
+      	}
     }
 }
 

@@ -278,7 +278,7 @@ ChipInstance* NewChipInstance (const char* ChipName, unsigned Addr,
     CI->AS   = 0;
     CI->Addr = Addr;
     CI->Size = Size;
-    CI->Data = C->Data->InitInstance (Addr, Size, Attributes);
+    CI->Data = C->Data->CreateInstance (Addr, Size, Attributes);
 
     /* Assign the chip instance to the chip */
     CollAppend (&C->Instances, CI);

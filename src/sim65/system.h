@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                  chipdata.h                               */
+/*                                 system.h                                  */
 /*                                                                           */
-/*                        Chip description data structure                    */
+/*                    Description of the simulated system                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,8 +33,13 @@
 
 
 
-#ifndef CHIPDATA_H
-#define CHIPDATA_H
+#ifndef SYSTEM_H
+#define SYSTEM_H
+
+
+
+/* common.h */
+#include "coll.h"
 
 
 
@@ -44,37 +49,36 @@
 
 
 
-/* Chip type and version information. */
-#define CHIPDATA_TYPE_CHIP      0U
-#define CHIPDATA_TYPE_CPU       1U
-#define CHIPDATA_VER_MAJOR      1U
-#define CHIPDATA_VER_MINOR      0U
-
 /* Forwards */
-struct CfgData;
-struct SimData;
+struct CPUData;
 
-/* ChipDesc structure */
-typedef struct ChipData ChipData;
-struct ChipData {
-    const char* ChipName;       /* Name of the chip */
-    unsigned    Type;           /* Type of the chip */
-    unsigned    MajorVersion;   /* Version information */
-    unsigned    MinorVersion;
+/* */
+typedef struct System System;
+struct System {
 
-    /* -- Exported functions -- */
-    int           (*InitChip) (const struct SimData* Data);
-    void*         (*CreateInstance) (unsigned Addr, unsigned Range, void* CfgInfo);
-    void	  (*DestroyInstance) (void* Data);
-    void          (*WriteCtrl) (void* Data, unsigned Offs, unsigned char Val);
-    void          (*Write) (void* Data, unsigned Offs, unsigned char Val);
-    unsigned char (*ReadCtrl) (void* Data, unsigned Offs);
-    unsigned char (*Read) (void* Data, unsigned Offs);
+    struct CPUData*       CPU;          /* The CPU in the system */
+    struct AddressSpace*  AS;           /* The CPU address space */
+    Collection            ChipInstances;/* Instances of all the chips */
+
 };
 
 
 
-/* End of chipdata.h */
+/*****************************************************************************/
+/*     	      	    		     Code		  		     */
+/*****************************************************************************/
+
+
+
+System* NewSystem (struct CPUData* CPU);
+/* Create and initialize a new System struct. The function will read the size 
+ * of the address space from the CPU, and also create a new AddressSpace 
+ * object. No chips are assigned, however.
+ */
+
+
+
+/* End of system.h */
 
 #endif
 

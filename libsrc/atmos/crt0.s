@@ -11,6 +11,7 @@
 	.import	     	push0, _main, zerobss
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 
+        .importzp       sp
 
 ; ------------------------------------------------------------------------
 ; Create an empty LOWCODE segment to avoid linker warnings

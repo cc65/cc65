@@ -1,8 +1,35 @@
-/*
- * codegen.c
- *
- * Ullrich von Bassewitz, 08.06.1998
- */
+/*****************************************************************************/
+/*                                                                           */
+/*				   codegen.c				     */
+/*                                                                           */
+/*			      6502 code generator			     */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 1998     Ullrich von Bassewitz                                        */
+/*              Wacholderweg 14                                              */
+/*              D-70597 Stuttgart                                            */
+/* EMail:       uz@musoftware.de                                             */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
 
 
 
@@ -48,6 +75,7 @@ static char* SegmentNames [4];
 static char* SegmentHints [4] = {
     "seg:code", "seg:rodata", "seg:data", "seg:bss"
 };
+
 
 
 /*****************************************************************************/
@@ -892,7 +920,7 @@ void g_getind (unsigned flags, unsigned offs)
 }
 
 
-
+							 
 void g_leasp (int offs)
 /* Fetch the address of the specified symbol into the primary register */
 {
@@ -905,8 +933,8 @@ void g_leasp (int offs)
 	AddCodeLine ("\tldx\tsp+1");
     } else {
 	if (FavourSize) {
-	    ldyconst (offs);       		/* Load Y with offset value */
-	    AddCodeLine ("\tjsr\tleaysp");	/* Load effective address */
+	    ldaconst (offs);         		/* Load A with offset value */
+	    AddCodeLine ("\tjsr\tleaasp");	/* Load effective address */
 	} else {
 	    ldaconst (offs);
 	    AddCodeLine ("\tclc");
@@ -3578,9 +3606,9 @@ void g_ge (unsigned flags, unsigned long val)
 
 
 void g_res (unsigned n)
-/* reserve static storage, n bytes */
+/* Reserve static storage, n bytes */
 {
-    AddCodeLine ("\t.res\t%u", n);
+    AddCodeLine ("\t.res\t%u,$00", n);
 }
 
 
@@ -3625,7 +3653,7 @@ void g_defdata (unsigned flags, unsigned long val, unsigned offs)
 
 
 void g_defbytes (const unsigned char* Bytes, unsigned Count)
-/* output a row of bytes as a constant */
+/* Output a row of bytes as a constant */
 {
     unsigned Chunk;
     char Buf [128];
@@ -3660,7 +3688,7 @@ void g_defbytes (const unsigned char* Bytes, unsigned Count)
 void g_zerobytes (unsigned n)
 /* Output n bytes of data initialized with zero */
 {
-    AddCodeLine ("\t.res\t%u", n);
+    AddCodeLine ("\t.res\t%u,$00", n);
 }
 
 

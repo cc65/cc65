@@ -133,10 +133,10 @@ copycb: lda     (sreg),y
 ; /* Uninstall the currently loaded driver. Returns an error code. */
 
 _mouse_uninstall:
-        jsr     mouse_uninstall         ; Call driver routine
-
 	lda	#$60                    ; RTS opcode
 	sta	mouse_irq               ; Disable IRQ entry point
+
+        jsr     mouse_uninstall         ; Call driver routine
 
 mouse_clear_ptr:                        ; External entry point
         lda     #0

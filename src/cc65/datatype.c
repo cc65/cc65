@@ -244,7 +244,7 @@ void PrintType (FILE* F, const type* Type)
 /* Output translation of type array. */
 {
     type T;
-    unsigned long Size;
+    long Size;
 
     /* Walk over the complete string */
     while ((T = *Type++) != T_END) {
@@ -297,7 +297,7 @@ void PrintType (FILE* F, const type* Type)
 		/* Recursive call */
 		PrintType (F, Type + DECODE_SIZE);
 		Size = Decode (Type);
-		if (Size == 0) {
+		if (Size == UNSPECIFIED) {
 		    fprintf (F, "[]");
 		} else {
 		    fprintf (F, "[%lu]", Size);
@@ -484,7 +484,7 @@ unsigned SizeOf (const type* T)
 
 	case T_ARRAY:
             ElementCount = GetElementCount (T);
-            if (ElementCount < 0) {
+            if (ElementCount == UNSPECIFIED) {
                 /* Array with unspecified size */
                 return 0;
             } else {
@@ -763,7 +763,7 @@ long GetElementCount (const type* T)
  */
 {
     CHECK (IsTypeArray (T));
-    return (unsigned) Decode (T+1);
+    return Decode (T+1);
 }
 
 

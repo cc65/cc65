@@ -71,7 +71,7 @@ samples.d64:	all
 	@for exe in $(EXELIST); do\
 	    $(C1541) -attach $@ -write $$exe > /dev/null;\
 	done;\
-	for tgi in *.tgi; do\
+	for tgi in ../libsrc/$(SYS)*.tgi; do\
 	    $(C1541) -attach $@ -write $$tgi > /dev/null;\
 	done;
 

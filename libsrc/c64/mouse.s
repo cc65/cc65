@@ -8,12 +8,12 @@
    	.export	    	_mouse_init, _mouse_done
    	.export	    	_mouse_hide, _mouse_show
    	.export	    	_mouse_box, _mouse_info
-   	.export		_mouse_x, _mouse_y
-   	.export	    	_mouse_move, _mouse_buttons
-						   
+   	.export	    	_mouse_move, _mouse_pos
+	.export		_mouse_buttons, _mouse_info
+
 	.import		_readjoy
        	.import	       	popa, popsreg, addysp1
-   	.importzp   	sp, sreg
+   	.importzp   	ptr1, sp, sreg
 
    	.include    	"c64.inc"
 
@@ -185,38 +185,57 @@ _mouse_box:
 
 ; --------------------------------------------------------------------------
 ;
-; int __fastcall__ mouse_x (void);
+; void __fastcall__ mouse_pos (struct mouse_pos* pos);
+; /* Return the current mouse position */
 ;
 
-_mouse_x:
+_mouse_pos:
+       	sta	ptr1
+	stx	ptr1+1			; Remember the argument pointer
+
+	ldy	#0			; Structure offset
+
 	php
-	sei
-   	lda	XPos
-	ldx	XPos+1
-	plp
-      	rts
+	sei				; Disable interrupts
 
-; --------------------------------------------------------------------------
-;
-; int __fastcall__ mouse_y (void);
-;
-
-_mouse_y:
-	php
-   	sei
+	lda     XPos			; Transfer the position
+	sta	(ptr1),y
+	lda	XPos+1
+	iny
+	sta	(ptr1),y
 	lda	YPos
-	ldx	YPos+1
-	plp
-      	rts
+	iny
+	sta	(ptr1),y
+	lda	YPos
+	iny
+	sta	(ptr1),y
+
+	plp				; Restore initial interrupt state
+
+	rts				; Done
 
 ; --------------------------------------------------------------------------
 ;
-; void mouse_info (...);
+; void __fastcall__ mouse_info (struct mouse_info* info);
+; /* Return the state of the mouse buttons and the position of the mouse */
 ;
 
 _mouse_info:
-      	rts
 
+; We're cheating here to keep the code smaller: The first fields of the
+; mouse_info struct are identical to the mouse_pos struct, so we will just
+; call _mouse_pos to initialize the struct pointer and fill the position
+; fields.
+
+        jsr	_mouse_pos
+
+; Fill in the button state
+
+	jsr     _mouse_buttons		; Will not touch ptr1
+	ldy	#4
+	sta	(ptr1),y
+
+      	rts
 
 ; --------------------------------------------------------------------------
 ;
@@ -246,7 +265,7 @@ _mouse_move:
 ;
 
 _mouse_buttons:
-	lda	MousePort		; Get the port 
+	lda	MousePort		; Get the port
 	jmp	_readjoy		; Same as joystick
 
 ; --------------------------------------------------------------------------

@@ -241,10 +241,11 @@ would also apply to a real machine.
 
 <sect1>Apple<p>
 
-<bf>AppleWin 1.10.4</bf>: Emulates Apple II+/IIe computer, with sound, video,
-joysticks, serial port, and disk images. Roms and dos disk included. Includes
-monitor. Only for Windows. Unfortunately we were unable to find documentation
-on running programs.  Please help.
+<bf>AppleWin 1.10.4</bf> (available at
+<url url="http://www.jantzer-schmidt.de/applewin/">): Emulates Apple II+/IIe 
+computer, with sound, video, joysticks, serial port, and disk images. Roms and
+dos disk included. Includes monitor. Only for Windows. Unfortunately we were
+unable to find documentation on running programs.  Please help.
 
 <sect1>Atari<p>
 

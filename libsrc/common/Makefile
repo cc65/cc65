@@ -11,13 +11,41 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-C_OBJS = fclose.o fgets.o calloc.o _fopen.o\
-	 fputs.o fread.o fwrite.o gets.o realloc.o bsearch.o strxfrm.o\
-	 _hextab.o fdopen.o strtok.o\
-	 _afailed.o fopen.o fgetc.o fputc.o puts.o gets.o perror.o getchar.o\
-	 vprintf.o abort.o qsort.o putchar.o\
-	 errormsg.o freopen.o locale.o fsetpos.o\
-	 fgetpos.o rewind.o fseek.o ftell.o
+C_OBJS =	_afailed.o	\
+		_fopen.o	\
+		_hextab.o	\
+		abort.o		\
+		bsearch.o	\
+		calloc.o	\
+		errormsg.o	\
+		fclose.o	\
+		fdopen.o	\
+		fgetc.o		\
+		fgetpos.o	\
+		fgets.o		\
+		fopen.o		\
+		fputc.o		\
+		fputs.o		\
+		fread.o		\
+		freopen.o	\
+		fseek.o		\
+		fsetpos.o	\
+		ftell.o		\
+		fwrite.o	\
+		getchar.o	\
+		gets.o		\
+		locale.o	\
+		perror.o	\
+		putchar.o	\
+		puts.o 		\
+		qsort.o		\
+		realloc.o	\
+		rewind.o	\
+		sscanf.o	\
+		strxfrm.o	\
+		strtok.o	\
+		vprintf.o
+
 
 S_OBJS = 	_fdesc.o	\
 	 	_file.o 	\
@@ -25,7 +53,6 @@ S_OBJS = 	_fdesc.o	\
 	 	_heap.o		\
 	 	_oserror.o	\
 		_printf.o	\
-	 	_stksize.o	\
 		_swap.o		\
 	 	_sys.o		\
 		abs.o		\

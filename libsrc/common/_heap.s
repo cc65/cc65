@@ -6,7 +6,7 @@
 
      	.export		__horg, __hptr, __hend, __hfirst, __hlast
        	.constructor	initheap, 24
-       	.import	       	__BSS_RUN__, __BSS_SIZE__, __stksize
+       	.import	       	__BSS_RUN__, __BSS_SIZE__, __STACKSIZE__
 	.importzp	sp
 
 .data
@@ -30,10 +30,10 @@ __hlast:
 initheap:
    	sec
    	lda	sp
-	sbc	__stksize
+	sbc	#<__STACKSIZE__
 	sta	__hend
 	lda	sp+1
-	sbc	__stksize+1
+	sbc	#>__STACKSIZE__
 	sta	__hend+1
 	rts
 

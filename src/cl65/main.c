@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1999-2003 Ullrich von Bassewitz                                       */
+/* (C) 1999-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -644,6 +644,7 @@ static void Usage (void)
        	     "  --include-dir dir\tSet a compiler include directory path\n"
              "  --lib file\t\tLink this library\n"
              "  --lib-path path\tSpecify a library search path\n"
+	     "  --list-targets\tList all available targets\n"
        	     "  --listing\t\tCreate an assembler listing\n"
 	     "  --mapfile name\tCreate a map file\n"
              "  --memory-model model\tSet the memory model\n"
@@ -889,6 +890,23 @@ static void OptListing (const char* Opt attribute ((unused)),
 
 
 
+static void OptListTargets (const char* Opt attribute ((unused)),
+			    const char* Arg attribute ((unused)))
+/* List all targets */
+{
+    unsigned I;
+
+    /* List the targets */
+    for (I = TGT_NONE; I < TGT_COUNT; ++I) {
+	printf ("%s\n", TargetNames[I]);
+    }
+
+    /* Terminate */
+    exit (EXIT_SUCCESS);
+}
+
+
+
 static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 /* Create a map file */
 {
@@ -1088,6 +1106,7 @@ int main (int argc, char* argv [])
 	{ "--include-dir",   	1,	OptIncludeDir		},
        	{ "--lib",     	       	1,     	OptLib                  },
        	{ "--lib-path",	       	1,     	OptLibPath              },
+	{ "--list-targets",	0,	OptListTargets		},
 	{ "--listing",	      	0,	OptListing		},
 	{ "--mapfile",	      	1,	OptMapFile		},
         { "--memory-model",     1,      OptMemoryModel          },

@@ -71,6 +71,7 @@ OBJS = 	_scrsize.o      \
 	dio_cts.o       \
 	dio_stc.o       \
 	diopncls.o      \
+	dioqsize.o      \
 	dioread.o       \
 	diowrite.o      \
 	diowritev.o     \

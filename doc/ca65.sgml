@@ -130,10 +130,10 @@ Here is a description of all the command line options:
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
 
- 	6502, 65C02, 65816 and sunplus
+       	6502, 65SC02, 65C02, 65816 and sunplus
 
-  The latter (sunplus) is not available in the freeware version, because the
-  instruction set of the sunplus CPU is "confidential".
+  The last one (sunplus) is not available in the freeware version, because the
+  instruction set of the sunplus CPU is "proprietary and confidential".
 
 
   <label id="option--feature">
@@ -292,11 +292,20 @@ Here are some examples for valid input lines:
    	MaSym 	= Label	       		; Another symbol
 </verb></tscreen>
 
-The assembler accepts all valid 6502 mnemonics when in 6502 mode (the
-default). The assembler accepts all valid 65SC02 mnemonics when in 65SC02 mode
-(after a <tt><ref id=".PC02" name=".PC02"></tt> command is found). The
-assembler accepts all valid 65816 mnemonics with a few exceptions after a
-.P816 command is found. These exceptions are listed below.
+The assembler accepts
+
+<itemize>
+<item>all valid 6502 mnemonics when in 6502 mode (the default or after the
+      <tt><ref id=".P02" name=".P02"></tt> command was given).
+<item>all valid 65SC02 mnemonics when in 65SC02 mode (after the
+      <tt><ref id=".PSC02" name=".PSC02"></tt> command was given).
+<item>all valid 65C02 mnemonics when in 65C02 mode (after the
+      <tt><ref id=".PC02" name=".PC02"></tt> command was given).
+<item>all valid 65618 mnemonics when in 65816 mode (after the
+      <tt><ref id=".P816" name=".P816"></tt> command was given).
+<item>all valid SunPlus mnemonics when in SunPlus mode (after the
+      <tt><ref id=".SUNPLUS" name=".SUNPLUS"></tt> command was given).
+</itemize>
 
 In 65816 mode several aliases are accepted in addition to the official
 mnemonics:
@@ -425,7 +434,7 @@ Available operators sorted by precedence:
     .BITAND    	Bitwise and  		     	     	2
     ^  	       	Bitwise xor  		     	     	2
     .BITXOR    	Bitwise xor  		     	     	2
-    &lt;&lt;   	      Shift left operator	     	      2
+    &lt;&lt;   	      Shift left operator    	     	      2
     .SHL       	Shift left operator	     	     	2
     &gt;&gt;   	      Shift right operator
     .SHR       	Shift right operator 	     	     	2
@@ -926,8 +935,9 @@ Here's a list of all control commands and a description, what they do:
   <tscreen><verb>
   	0 -->  	6502
   	1 -->	65SC02
-  	2 -->	65SC816
-  	3 -->	SunPlus SPC
+        2 -->   65C02
+  	3 -->	65SC816
+  	4 -->	SunPlus SPC
   </verb></tscreen>
 
   It may be used to replace the .IFPxx pseudo instructions or to construct
@@ -936,14 +946,14 @@ Here's a list of all control commands and a description, what they do:
   Example:
 
   <tscreen><verb>
-	.if	(.cpu = 0) .or (.cpu = 1)
-		txa
- 		pha
-		tya
-		pha
+	.if	(.cpu = 0) .or (.cpu = 1) .or (.cpu = 2)
+	 	txa
+ 	 	pha
+	 	tya
+	 	pha
 	.else
-		phx
-		phy
+	 	phx
+	 	phy
 	.endif
   </verb></tscreen>
 
@@ -1478,6 +1488,12 @@ Here's a list of all control commands and a description, what they do:
   (see <tt><ref id=".PC02" name=".PC02"></tt> command).
 
 
+<sect1><tt>.IFPSC02</tt><label id=".IFPSC02"><p>
+
+  Conditional assembly: Check if the assembler is currently in 65SC02 mode
+  (see <tt><ref id=".PSC02" name=".PSC02"></tt> command).
+
+
 <sect1><tt>.IFREF</tt><label id=".IFREF"><p>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
@@ -1865,21 +1881,21 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.P02</tt><label id=".P02"><p>
 
-  Enable the 6502 instruction set, disable 65C02 and 65816 instructions.
-  This is the default if not overridden by the <tt/--cpu/ command line
-  option.
+  Enable the 6502 instruction set, disable 65SC02, 65C02 and 65816 
+  instructions. This is the default if not overridden by the 
+  <tt/--cpu/ command line option.
 
-  See: <tt><ref id=".PC02" name=".PC02"></tt> and <tt><ref id=".P816"
-  name=".P816"></tt>
+  See: <tt><ref id=".PC02" name=".PC02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
 
 
 <sect1><tt>.P816</tt><label id=".P816"><p>
 
-  Enable the 65816 instruction set. This is a superset of the 65C02 and
+  Enable the 65816 instruction set. This is a superset of the 65SC02 and
   6502 instruction sets.
 
-  See: <tt><ref id=".P02" name=".P02"></tt> and <tt><ref id=".PC02"
-  name=".PC02"></tt>
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt> and <tt><ref id=".PC02" name=".PC02"></tt>
 
 
 <sect1><tt>.PAGELEN, .PAGELENGTH</tt><label id=".PAGELENGTH"><p>
@@ -1923,10 +1939,10 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.PC02</tt><label id=".PC02"><p>
 
   Enable the 65C02 instructions set. This instruction set includes all
-  6502 instructions.
+  6502 and 65SC02 instructions.
 
-  See: <tt><ref id=".P02" name=".P02"></tt> and <tt><ref id=".P816"
-  name=".P816"></tt>
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
 
 
 <sect1><tt>.POPSEG</tt><label id=".POPSEG"><p>
@@ -1972,10 +1988,19 @@ Here's a list of all control commands and a description, what they do:
       		dey
       		bne	L1    	; Reference local symbol
       		rts
-      	.endproc	      	; Leave lexical level
+      	.endproc  	      	; Leave lexical level
   </verb></tscreen>
 
   See: <tt><ref id=".ENDPROC" name=".ENDPROC"></tt>
+
+
+<sect1><tt>.PSC02</tt><label id=".PSC02"><p>
+
+  Enable the 65SC02 instructions set. This instruction set includes all
+  6502 instructions.
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PC02"
+  name=".PC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
 
 
 <sect1><tt>.PUSHSEG</tt><label id=".PUSHSEG"><p>
@@ -2661,7 +2686,7 @@ don't like that, use classic macros instead:
 (This is an example where a problem can be solved with both macro types).
 
 
-<sect1>Characters in macros<p>
+<sect1>Characters in macros<p>               
 
 When using the <ref id="option-t" name="-t"> option, characters are translated
 into the target character set of the specific machine. However, this happens

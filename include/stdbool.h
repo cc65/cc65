@@ -35,7 +35,7 @@
 
 
 #define bool _Bool
-typedef char bool;
+typedef unsigned char _Bool;
 
 /* Standard test-results. */
 #define false 0

@@ -20,13 +20,13 @@ _clrscr:
 	    sta dispBufferOn
 	    lda #0
 	    jsr SetPattern
-	    lda #0
-	    sta r3L
-	    sta r3H
-	    sta r2L
-	    sta cursor_c
-	    lda #1
-	    sta cursor_r
+	    ldx #0
+	    stx r3L
+	    stx r3H
+	    stx r2L
+	    stx cursor_c
+	    inx
+	    stx cursor_r
 	    jsr fixcursor		; home cursor
 	    lda #199
 	    sta r2H

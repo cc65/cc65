@@ -7,27 +7,27 @@
 
  	.export		_stricmp, _strcasecmp
 	.import		popax
-	.import		__ctype, __cdiff
+	.import		__ctype
 	.importzp	ptr1, ptr2, tmp1
 
 
 _stricmp:
 _strcasecmp:
-     	sta	ptr2		; Save s2
+     	sta	ptr2	       	; Save s2
      	stx	ptr2+1
-     	jsr	popax 		; get s1
+     	jsr	popax 	       	; get s1
      	sta	ptr1
      	stx	ptr1+1
      	ldy	#0
 
-loop:  	lda	(ptr2),y	; get char from second string
+loop:  	lda	(ptr2),y       	; get char from second string
 	tax
-	lda	__ctype,x	; get character classification
-	and	#$01		; lower case char?
-	beq	L1		; jump if no
-	txa			; get character back
+	lda	__ctype,x      	; get character classification
+	and	#$01	       	; lower case char?
+	beq	L1	       	; jump if no
+	txa		       	; get character back
 	clc
-	adc	__cdiff		; make upper case char
+	adc	#<('A'-'a')     ; make upper case char
 	tax			;
 L1:	stx    	tmp1   	       	; remember upper case equivalent
 
@@ -38,7 +38,7 @@ L1:	stx    	tmp1   	       	; remember upper case equivalent
        	beq    	L2		; jump if no
 	txa	  		; get character back
 	clc
-	adc	__cdiff		; make upper case char
+       	adc    	#<('A'-'a')     ; make upper case char
 	tax
 
 L2:	cpx	tmp1		; compare characters

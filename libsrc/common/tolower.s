@@ -5,7 +5,7 @@
 ;
 
 	.export		_tolower
-	.import		__ctype, __cdiff
+	.import		__ctype
 
 _tolower:
         cpx     #$00            ; Outside valid range?
@@ -16,6 +16,6 @@ _tolower:
 	lsr	a		; Get bit 1 (upper case char) into carry
 	tya			; Get char back into A
        	bcc    	L9		; Jump if no upper case char
-   	sbc	__cdiff	       	; Make lower case char (carry already set)
+       	sbc    	#<('A'-'a')     ; Make lower case char (carry already set)
 L9:    	rts
 

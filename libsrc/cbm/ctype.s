@@ -8,16 +8,6 @@
 
 .rodata
 
-; Value that must be added to a lower case char to make it an upper case
-; char (example: for ASCII, this must be $E0).
-
-
-     	.export		__cdiff
-
-__cdiff:
-	.byte	$80
-
-
 ; The following 256 byte wide table specifies attributes for the isxxx type
 ; of functions. Doing it by a table means some overhead in space, but it
 ; has major advantages:

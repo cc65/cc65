@@ -9,13 +9,13 @@
 
  	.export		_strupper, _strupr
 	.import		popax
-	.import		__ctype, __cdiff
+	.import		__ctype
 	.importzp	ptr1, ptr2
 
 _strupper:
 _strupr:
 	sta	ptr1		; Save s (working copy)
-	stx	ptr1+1		
+	stx	ptr1+1
 	sta	ptr2
 	sta	ptr2+2		; save function result
 	ldy	#0
@@ -28,7 +28,7 @@ loop:	lda    	(ptr1),y	; get character
 	beq	L1		; jump if no
 	txa			; get character back into accu
 	clc
-	adc	__cdiff		; make upper case char
+       	adc    	#<('A'-'a')     ; make upper case char
 	sta	(ptr1),y	; store back
 L1:	iny	    		; next char
 	bne	loop

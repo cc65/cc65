@@ -5,7 +5,7 @@
 ;
 
 	.export		_toupper
-	.import		__ctype, __cdiff
+	.import		__ctype
 
 _toupper:
         cpx     #$00            ; Outside valid range?
@@ -16,6 +16,6 @@ _toupper:
 	tya			; Get C back into A
        	bcc    	L9		; Jump if not lower char
        	clc
-	adc	__cdiff		; make upper case char
+       	adc    	#<('A'-'a')     ; make upper case char
 L9:	rts	  		; CC are set
 

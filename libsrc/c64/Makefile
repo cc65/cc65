@@ -55,7 +55,7 @@ OBJS = 	_scrsize.o     	 	\
 
 EMDS = c64-georam.emd c64-ram.emd c64-ramcart.emd c64-reu.emd c64-vdc.emd
 
-JOYS = c64-hitjoy.joy c64-ptvjoy.joy c64-stdjoy.joy
+JOYS = c64-hitjoy.joy c64-numpad.joy c64-ptvjoy.joy c64-stdjoy.joy
 
 SERS = c64-swlink.ser
 

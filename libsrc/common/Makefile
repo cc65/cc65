@@ -109,6 +109,7 @@ S_OBJS = 	_cwd.o          \
 		memchr.o    	\
 		memcmp.o    	\
 	 	memcpy.o      	\
+                memmove.o       \
 	 	memset.o      	\
 		modfree.o       \
 		modload.o       \

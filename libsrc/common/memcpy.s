@@ -1,113 +1,70 @@
 ;
-; void* memcpy (void* dest, const void* src, size_t n);
-; void* memmove (void* dest, const void* src, size_t n);
+; Ullrich von Bassewitz, 2003-08-20
 ;
-; Ullrich von Bassewitz, 10.12.1998
+; void* __fastcall__ memcpy (void* dest, const void* src, size_t n);
+;
+; NOTE: This function contains entry points for memmove, which will ressort
+; to memcpy for an upwards copy. Don't change this module without looking
+; at memmove!
 ;
 
-  	.export		_memcpy, _memmove
-	.import		popax
-	.importzp	ptr1, ptr2, ptr3, tmp1, tmp2
+       	.export	    	_memcpy, memcpy_upwards, memcpy_getparams
+       	.import	    	popax
+       	.importzp      	ptr1, ptr2, ptr3, tmp1
 
 ; ----------------------------------------------------------------------
 _memcpy:
-	jsr	getparms	; Get the parameters from stack
+        jsr     memcpy_getparams
 
-; Copy upwards
+memcpy_upwards:
+        ldy     #0
+        ldx     ptr3            ; Get low counter byte
 
-copyup:	ldy   	#0  		; set up to move 256
-	ldx   	tmp2		; hi byte of n
-  	beq   	@L2
+; Copy loop
 
-@L1:	lda   	(ptr1),y	; get a byte
-   	sta   	(ptr2),y	; store it
-   	iny
-       	bne    	@L1
-   	inc   	ptr1+1		; bump ptrs
-   	inc   	ptr2+1
-       	dex
-  	bne   	@L1  		; do another block
+@L1:    inx                     ; Bump low counter byte
+        beq     @L2             ; Jump on overflow
+        lda     (ptr1),y
+        sta     (ptr2),y
+        iny
+        bne     @L1
+       	inc   	ptr1+1		; Bump pointers
+       	inc   	ptr2+1
+        bne     @L1             ; Branch always
+@L2:    inc     ptr3+1          ; Bump high counter byte
+        bne     @L1
 
-@L2:	ldx	tmp1		; get low byte of n
-  	beq    	done		; jump if done
+; Done. The low byte of dest is still in ptr2
 
-@L3:	lda	(ptr1),y	; get a byte
-  	sta	(ptr2),y	; store it
-  	iny
-  	dex
-  	bne	@L3
-
-done:	lda	ptr3
-  	ldx	ptr3+1		; get function result (dest)
+done:  	lda	ptr2
+       	ldx    	tmp1            ; get function result (dest)
        	rts
 
-
 ; ----------------------------------------------------------------------
-_memmove:
-  	jsr	getparms	; Get the parameters from stack
+; Get the parameters from stack as follows:
+;
+;       -(size-1)       --> ptr3
+;       src             --> ptr1
+;       dest            --> ptr2
+;       high(dest)      --> tmp1
+;
+; dest is returned in a/x.
 
-  	cpx	ptr1+1		; dest > src?
-  	bne	@L1
-  	cmp	ptr1
-@L1:	beq	done		; Both pointers are equal - nothing to copy
-  	bcc	copyup		; Copy upwards
+memcpy_getparams:
+        eor     #$FF
+        sta     ptr3
+        txa
+        eor     #$FF
+        sta     ptr3+1          ; Save -(size-1)
 
-; Copy downwards
-
-	clc
-       	lda	ptr1+1
-	adc	tmp2
-	sta	ptr1+1
-
-	clc
-	lda	ptr2+1
-	adc	tmp2
-	sta	ptr2+1
-
-; Copy the incomplete page
-
-    	ldy	tmp1  		; Get low byte of count
-    	beq    	@L3
-
-@L2:	dey
-    	lda	(ptr1),y
-    	sta	(ptr2),y
-    	tya			; Test Y
-    	bne	@L2		; Jump if not zero
-
-; Copy complete pages
-
-@L3:	ldx	tmp2		; Get hi byte of count
-      	beq	done
-
-@L4:  	dec	ptr1+1
-      	dec	ptr2+1
-@L5:  	dey
-      	lda	(ptr1),y
-      	sta	(ptr2),y
-      	tya
-      	bne	@L5
-      	dex
-      	bne	@L4
-
-; Done
-
-	beq	done
-
-; ----------------------------------------------------------------------
-; Get the parameters from stack
-	   
-getparms:
-       	sta	tmp1		; Save n
-       	stx	tmp2
        	jsr	popax		; src
        	sta	ptr1
        	stx	ptr1+1
+
        	jsr	popax		; dest
   	sta	ptr2
-  	stx	ptr2+1		; save work copy
-  	sta	ptr3
-  	stx	ptr3+1		; save function result
-	rts
+  	stx	ptr2+1		; Save work copy
+        stx     tmp1            ; Save for function result
 
+        rts
 

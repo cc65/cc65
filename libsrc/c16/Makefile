@@ -4,12 +4,27 @@
 
 .SUFFIXES: .o .s .c
 
+#--------------------------------------------------------------------------
+# Rules
+
 %.o:   	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
+
+%.emd:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+%.joy:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+%.tgi:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+#--------------------------------------------------------------------------
+# Object files
 
 OBJS =	_scrsize.o	\
 	break.o		\
@@ -23,11 +38,26 @@ OBJS =	_scrsize.o	\
 	kbhit.o		\
         kernal.o        \
         randomize.o     \
-	readjoy.o       \
-        revers.o        
+        revers.o
 
-all:	$(OBJS)
+#--------------------------------------------------------------------------
+# Drivers
+
+EMDS =
+
+JOYS = 
+
+TGIS =
+
+#--------------------------------------------------------------------------
+# Targets
+
+all: 	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
+
+../runtime/zeropage.o:
+	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@rm -f $(OBJS)
+	@rm -f $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
+
 

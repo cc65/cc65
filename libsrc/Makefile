@@ -233,6 +233,7 @@ plus4lib:
 	    $(AR) a plus4.lib $$i/*.o;\
 	done
 	mv plus4/crt0.o plus4.o
+	cp plus4/*.joy .
 
 #-----------------------------------------------------------------------------
 # Dummy targets

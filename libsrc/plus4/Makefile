@@ -4,6 +4,9 @@
 
 .SUFFIXES: .o .s .c
 
+#--------------------------------------------------------------------------
+# Rules
+
 %.o:   	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
@@ -11,18 +14,30 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
+%.emd:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+%.joy:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+%.tgi:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+#--------------------------------------------------------------------------
+# Object files
+
 OBJS =	_scrsize.o	\
 	break.o		\
        	cgetc.o	       	\
-	clrscr.o	\
-	color.o		\
-	conio.o		\
-	cputc.o		\
-	crt0.o		\
+       	clrscr.o	\
+       	color.o		\
+       	conio.o		\
+       	cputc.o		\
+       	crt0.o		\
         get_tv.o        \
         kacptr.o        \
         kbasin.o        \
-	kbhit.o		\
+       	kbhit.o		\
         kbsout.o        \
         kchkin.o        \
         kciout.o        \
@@ -45,12 +60,26 @@ OBJS =	_scrsize.o	\
         kunlsn.o        \
         kuntlk.o        \
         randomize.o     \
-	readjoy.o	\
         revers.o        \
 	tgi_mode_table.o
 
-all:	$(OBJS)
+#--------------------------------------------------------------------------
+# Drivers
+
+EMDS =
+
+JOYS = plus4-stdjoy.joy
+
+TGIS =
+
+#--------------------------------------------------------------------------
+# Targets
+
+all: 	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
+
+../runtime/zeropage.o:
+	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@rm -f $(OBJS)
+	@rm -f $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
 

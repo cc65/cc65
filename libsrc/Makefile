@@ -23,6 +23,7 @@ ALLTARGETS =   	apple2 		\
        	       	cbm510 		\
        	       	cbm610 		\
        	       	geos   		\
+		lynx		\
                 nes     	\
        	       	pet    		\
        	       	plus4   	\
@@ -248,6 +249,21 @@ geoslib:
 	cp geos/devel/*.emd .
 	cp geos/devel/*.joy .
 	cp geos/devel/geos-tgi.tgi geos-tgi.tgi
+
+#-----------------------------------------------------------------------------
+# Lynx
+
+lynxlib:
+	for i in lynx common conio runtime em joystick tgi zlib; do \
+	    AS=$(AS) \
+	    CC=$(CC) \
+	    LD=$(LD) \
+	    AFLAGS="-t lynx -I../../asminc" \
+	    CFLAGS="-Osir -g -T -t lynx --forget-inc-paths -I. -I../../include" \
+	    $(MAKE) -C $$i || exit 1; \
+	    $(AR) a lynx.lib $$i/*.o;\
+	done
+	mv lynx/crt0.o lynx.o
 
 #-----------------------------------------------------------------------------
 # NES

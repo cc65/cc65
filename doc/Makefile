@@ -13,6 +13,7 @@ SGML  =	apple2.sgml	\
         c64.sgml        \
 	ca65.sgml 	\
 	ca65html.sgml	\
+        cbm610.sgml     \
 	cc65.sgml 	\
 	cl65.sgml   	\
         co65.sgml       \

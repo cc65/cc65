@@ -34,6 +34,7 @@ OBJS =	_scrsize.o	\
 	color.o		\
 	conio.o		\
 	cputc.o		\
+	joy_stddrv.o	\
 	kbhit.o		\
         kernal.o        \
         kplot.o         \

@@ -35,6 +35,7 @@ OBJS =	_scrsize.o	\
        	color.o	       	\
      	cputc.o	       	\
         get_tv.o        \
+	joy_stddrv.o	\
      	kbhit.o	       	\
         kernal.o        \
 	mouse.o		\

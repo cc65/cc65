@@ -57,6 +57,7 @@ OBJS =	_scrsize.o   \
 	gotoxy.o     \
 	graphics.o   \
 	graphuse.o   \
+	joy_stddrv.o \
 	kbhit.o      \
 	lseek.o      \
 	mouse.o      \

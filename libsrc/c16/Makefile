@@ -26,16 +26,17 @@
 #--------------------------------------------------------------------------
 # Object files
 
-OBJS =	_scrsize.o	\
-	break.o		\
+OBJS =	_scrsize.o   	\
+	break.o	     	\
        	cgetc.o	       	\
-	clrscr.o	\
-	color.o		\
-	conio.o		\
-	cputc.o		\
-	crt0.o		\
+	clrscr.o     	\
+	color.o	     	\
+	conio.o	     	\
+	cputc.o	     	\
+	crt0.o	     	\
         get_tv.o        \
-	kbhit.o		\
+	joy_stddrv.o	\
+	kbhit.o	     	\
         kernal.o        \
         randomize.o     \
         revers.o

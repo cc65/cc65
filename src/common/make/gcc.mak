@@ -10,7 +10,8 @@ LIB	= common.a
 
 
 OBJS =	bitops.o	\
-	hashstr.o
+	hashstr.o	\
+	xsprintf.o	
 
 
 # ------------------------------------------------------------------------------

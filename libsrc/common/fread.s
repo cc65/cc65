@@ -86,8 +86,7 @@
 
 ; Call read(). This will leave the original 3 params on the stack
 
-@L3:    jsr     pushax
-        jsr     _read
+@L3:    jsr     _read
 
 ; Check for errors in read
 

@@ -158,7 +158,6 @@ ReadByte:
 ReadAndCheckError:
         sta     ReadSize
         stx     ReadSize+1
-        jsr     pushax
         jsr     Read
 
 ; Check the return code and bail out in case of problems

@@ -21,7 +21,6 @@
 
 .proc   rwcommon
 
-        jsr     popax           ; Get count
         eor     #$FF
         sta     ptr1
         txa

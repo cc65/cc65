@@ -86,8 +86,7 @@
 
 ; Call write(). This will leave the original 3 params on the stack
 
-@L3:    jsr     pushax
-        jsr     _write
+@L3:    jsr     _write
 
 ; Check for errors in write
 

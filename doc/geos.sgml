@@ -931,7 +931,6 @@ This does not apply to <tt/DESK_ACC/. If either bit 6 or 7 of <tt/flag/ are set,
 <tt/datadname/ is copied to <tt/dataDiskName/ and 16 bytes from <tt/datafname/ goes to <tt/dataFileName/
 thus becoming parameters for the new application. Pass <tt/NULL/ as any unused parameter.
 
-
 <sect3>ReadFile
 <p>
 <tt/char ReadFile (struct tr_se *myTrSe, char *buffer, unsigned fLength)/
@@ -962,11 +961,11 @@ structure. All you need to do is to place data in proper place and prepare a hea
 contain all information about a file. The <tt/skip/ parameter says how many directory pages you
 want to skip before searching for a free slot for directory entry. In most cases you will put
 <tt/0/ there.
-
+<p>
 You have to declare a <tt/struct fileheader/ and fill it with proper values. There is only one
 difference - the first two bytes which are link to nonexistant next sector are replaced by a
 pointer to the DOS filename of the file.
-
+<p>
 When saving sequential files two most important fields in <tt/struct fileheader/ are <tt/fileheader.load_address/
 and <tt/fileheader.end_address/.
 

@@ -98,6 +98,16 @@ extern void __fastcall__ setcolor     (unsigned char color_reg, unsigned char hu
 extern void __fastcall__ setcolor_low (unsigned char color_reg, unsigned char color_value);
 extern unsigned char  __fastcall__ getcolor (unsigned char color_reg);
 
+/* other screen functions */
+extern void __fastcall__ scroll (signed char numlines);
+                                          /* numlines > 0  scrolls up */
+                                          /* numlines < 0  scrolls down */
+
+/* misc. functions */
+extern void save_vecs(void);   /* save system vectors */
+extern void rest_vecs(void);   /* restore system vectors */
+
+
 /* Define hardware */
 #include <_gtia.h>
 #define GTIA (*(struct __gtia_write*)0xD000)

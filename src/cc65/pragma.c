@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* common */
+#include "segdefs.h"
 #include "tgttrans.h"
 
 /* cc65 */
@@ -47,7 +48,6 @@
 #include "litpool.h"
 #include "scanner.h"
 #include "scanstrbuf.h"
-#include "segments.h"
 #include "symtab.h"
 #include "pragma.h"
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -107,9 +107,6 @@ void InitSegNames (void);
 
 void NewSegName (segment_t Seg, const char* Name);
 /* Set a new name for a segment */
-
-int ValidSegName (const char* Name);
-/* Return true if the given segment name is valid, return false otherwise */
 
 Segments* PushSegments (struct SymEntry* Func);
 /* Make the new segment list current but remember the old one */

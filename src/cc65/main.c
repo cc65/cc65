@@ -44,6 +44,7 @@
 #include "cmdline.h"
 #include "fname.h"
 #include "print.h"
+#include "segdefs.h"
 #include "target.h"
 #include "tgttrans.h"
 #include "version.h"

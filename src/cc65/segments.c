@@ -103,27 +103,6 @@ void NewSegName (segment_t Seg, const char* Name)
 
 
 
-int ValidSegName (const char* Name)
-/* Return true if the given segment name is valid, return false otherwise */
-{
-    /* Must start with '_' or a letter */
-    if ((*Name != '_' && !IsAlpha(*Name)) || strlen(Name) > 80) {
-       	return 0;
-    }
-
-    /* Can have letters, digits or the underline */
-    while (*++Name) {
-       	if (*Name != '_' && !IsAlNum(*Name)) {
-       	    return 0;
-       	}
-    }
-
-    /* Name is ok */
-    return 1;
-}
-
-
-
 static Segments* NewSegments (SymEntry* Func)
 /* Initialize a Segments structure (set all fields to NULL) */
 {

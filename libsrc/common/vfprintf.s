@@ -104,7 +104,7 @@ out:
 
 
 ; ----------------------------------------------------------------------------
-; Callback routine used for the actual output.
+; vfprintf - formatted output
 ;
 ; int vfprintf (FILE* f, const char* format, va_list ap)
 ; {

@@ -22,10 +22,11 @@
 
 ; --------------------------------------------------------------------------
 ;
-; void __fastcall__ mouse_init (unsigned char port, unsigned char sprite);
+; void __fastcall__ mouse_init (unsigned char port, unsigned char sprite, unsigned char type);
 ;
 
 _mouse_init:
+	jsr	popa			; Ignore the type, get sprite param
    	tax				; Save sprite number
    	jsr	popa			; Get the port number
 

@@ -1,8 +1,35 @@
-/*
- * mouse.h
- *
- * Ullrich von Bassewitz, 24.04.1999
- */
+/*****************************************************************************/
+/*                                                                           */
+/*				    mouse.h				     */
+/*                                                                           */
+/*				   Mouse API				     */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 1999-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
 
 
 
@@ -11,7 +38,7 @@
 
 
 
-/* Define __MOUSE__ for systems that support a proportional mouse */
+/* Define __MOUSE__ for systems that support a mouse */
 #ifdef __C64__
 #  define __MOUSE__
 #endif
@@ -21,13 +48,21 @@
 
 
 
-void __fastcall__ mouse_init (unsigned char port, unsigned char sprite);
+/*****************************************************************************/
+/* 	      			   Functions	     			     */
+/*****************************************************************************/
+
+
+
+void __fastcall__ mouse_init (unsigned char port, unsigned char sprite, unsigned char type);
 /* Setup the mouse interrupt handler. If the sprite value is != zero, the
  * mouse routines will manage the sprite with this number. That means, it
  * is moved if the mouse is moved (provided that the mouse cursor is visible),
- * and switch on and off in the show and hide functions.
+ * and switched on and off in the show and hide functions.
  * The port parameter gives the joystick port used for the mouse and is only
  * needed to read the mouse button state.
+ * The type parameter is needed on some systems to determine the type of
+ * the mouse connected to the given port.
  * After calling this function, the mouse is invisble, the cursor is placed
  * at 0/0 (upper left corner), and the bounding box is reset to cover the
  * whole screen. Call mouse_show once to make the mouse cursor visible.

@@ -160,7 +160,8 @@ static void CS_RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
 
 
 
-static CodeLabel* CS_AddLabelInternal (CodeSeg* S, const char* Name, int UserCode)
+static CodeLabel* CS_AddLabelInternal (CodeSeg* S, const char* Name, 
+				       void (*ErrorFunc) (const char*, ...))
 /* Add a code label for the next instruction to follow */
 {
     /* Calculate the hash from the name */
@@ -173,11 +174,7 @@ static CodeLabel* CS_AddLabelInternal (CodeSeg* S, const char* Name, int UserCod
     if (L) {
      	/* We found it - be sure it does not already have an owner */
 	if (L->Owner) {
-	    if (UserCode) {
-	       	Error ("ASM label `%s' is already defined", Name);
-	    } else {
-	       	Internal ("CS_AddLabelInternal: Label `%s' already defined", Name);
-	    }
+	    ErrorFunc ("ASM label `%s' is already defined", Name);
 	}
     } else {
      	/* Not found - create a new one */
@@ -186,11 +183,7 @@ static CodeLabel* CS_AddLabelInternal (CodeSeg* S, const char* Name, int UserCod
 
     /* Safety. This call is quite costly, but safety is better */
     if (CollIndex (&S->Labels, L) >= 0) {
-	if (UserCode) {
-	    Error ("ASM label `%s' is already defined", Name);
-	} else {
-	    Internal ("CS_AddLabelInternal: Label `%s' already defined", Name);
-	}
+	ErrorFunc ("ASM label `%s' is already defined", Name);
     }
 
     /* We do now have a valid label. Remember it for later */
@@ -281,7 +274,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	L = SkipSpace (L+1);
 
 	/* Add the label */
-	CS_AddLabelInternal (S,	Mnemo, 1);
+	CS_AddLabelInternal (S,	Mnemo, Error);
 
 	/* If we have reached end of line, bail out, otherwise a mnemonic
 	 * may follow.
@@ -735,7 +728,7 @@ unsigned CS_GetEntryIndex (CodeSeg* S, struct CodeEntry* E)
 CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
 /* Add a code label for the next instruction to follow */
 {
-    return CS_AddLabelInternal (S, Name, 0);
+    return CS_AddLabelInternal (S, Name, Internal);
 }
 
 

@@ -168,7 +168,8 @@ int _scanf (struct indesc* D_, const char* format, va_list ap_)
     char   	  F;   	     	/* Character from format string */
     unsigned char Result;    	/* setjmp result */
     char*	  S;
-    unsigned char Base;		/* Integer base in %i */
+    unsigned char Base;	      	/* Integer base in %i */
+    unsigned char HaveWidth;	/* True if a width was given */
 
     /* Place copies of the arguments into global variables. This is not very
      * nice, but on a 6502 platform it gives better code, since the values
@@ -198,67 +199,69 @@ Again:
 	    /* Check for a conversion */
 	    if (F != '%' || *format == '%') {
 
-		/* %% or any char other than % */
-		if (F == '%') {
-		    ++format;
-    		}
+	    	/* %% or any char other than % */
+	    	if (F == '%') {
+	    	    ++format;
+    	    	}
 
-		/* Check for a match */
-		if (isspace (F)) {
+	    	/* Check for a match */
+	    	if (isspace (F)) {
 
-		    /* Special white space handling: Any whitespace matches
-		     * any amount of whitespace including none(!). So this
-		     * match will never fail.
-		     */
-		    SkipWhite ();
-		    continue;
+	    	    /* Special white space handling: Any whitespace matches
+	    	     * any amount of whitespace including none(!). So this
+	    	     * match will never fail.
+	    	     */
+	    	    SkipWhite ();
+	    	    continue;
 
-		} else if (F != C) {
+	    	} else if (F != C) {
 
-		    /* A mismatch. We will stop scanning the input and return
-		     * the number of conversions.
-		     */
-		    printf ("F = '%c', C = '%c' --> mismatch\n", F, C);
-		    return Conversions;
+	    	    /* A mismatch. We will stop scanning the input and return
+	    	     * the number of conversions.
+	    	     */
+	    	    printf ("F = '%c', C = '%c' --> mismatch\n", F, C);
+	    	    return Conversions;
 
-		} else {
+	    	} else {
 
-		    /* A match. Read the next input character and start over */
-		    goto Again;
+	    	    /* A match. Read the next input character and start over */
+	    	    goto Again;
 
-		}
+	    	}
 
 	    } else {
 
-		/* A conversion. Skip the percent sign. */
-		F = *format++;
+	    	/* A conversion. Skip the percent sign. */
+	    	F = *format++;
 
 	        /* Initialize variables */
-		NoAssign    = 0;
-		IsShort	    = 0;
-		IsLong	    = 0;
-		Width	    = UINT_MAX;
+	    	NoAssign    = 0;
+	    	IsShort	    = 0;
+	    	IsLong	    = 0;
+	    	Width	    = UINT_MAX;
+		HaveWidth   = 0;
 
-      		/* Check for flags. */
-		while (1) {
-		    if (isdigit (F)) {
-			Width =	0;
-			do {
-			    /* ### Non portable ### */
-		   	    Width = Width * 10 + (F & 0x0F);
-    			    F = *format++;
-    		     	} while (isdigit (F));
-    		    } else {
-    		     	switch (F) {
-    		     	    case '*':	NoAssign = 1;	break;
-    		     	    case 'h':	IsShort = 1;	break;
-    		     	    case 'l':
-    		     	    case 'L':	IsLong = 1;	break;
-    		     	    default: 	goto FlagsDone;
-    		     	}
-    			F = *format++;
-    		    }
-    		}
+      	    	/* Check for flags. */
+	    	while (1) {
+	    	    if (isdigit (F)) {
+			HaveWidth = 1;
+	    	 	Width     = 0;
+	    	 	do {
+	    	 	    /* ### Non portable ### */
+	    	   	    Width = Width * 10 + (F & 0x0F);
+    	    		    F = *format++;
+    	    	     	} while (isdigit (F));
+    	    	    } else {
+    	    	     	switch (F) {
+    	    	     	    case '*':	NoAssign = 1;	break;
+    	    	     	    case 'h':	IsShort = 1;	break;
+    	    	     	    case 'l':
+    	    	     	    case 'L':	IsLong = 1;	break;
+    	    	     	    default: 	goto FlagsDone;
+    	    	     	}
+    	    		F = *format++;
+    	    	    }
+    	    	}
 FlagsDone:
 
     		/* Check for the actual conversion character */
@@ -330,22 +333,43 @@ FlagsDone:
     	      	    case 'f':
 	      	    case 'g':
 	      		/* Optionally signed float */
+			longjmp (JumpBuf, RC_NOCONV);
 	      		break;
 
 	      	    case 's':
 	      		/* Whitespace terminated string */
 			SkipWhite ();
-			S = NoAssign? 0 : va_arg (ap, char*);
-			while (C && !isspace (C) && Width--) {
-			    if (S) {
-			     	*S++ = C;
+			if (!NoAssign) {
+			    S = va_arg (ap, char*);
+			}
+       	       	       	while (!isspace (C) && Width--) {
+			    if (!NoAssign) {
+			       	*S++ = C;
 			    }
 			    ReadChar ();
+			}
+			/* Terminate the string just read */
+			if (!NoAssign) {
+			    *S = '\0';
 			}
 			break;
 
 		    case 'c':
-			/* Fixed length string */
+			/* Fixed length string, NOT zero terminated */
+			if (!HaveWidth) {
+			    /* No width given, default is 1 */
+			    Width = 1;
+			}
+			if (!NoAssign) {
+			    S = va_arg (ap, char*);
+			}
+			while (Width--) {
+			    if (!NoAssign) {
+			     	*S++ = C;
+			    }
+			    ReadChar ();
+			}
+			++Conversions;
 			break;
 
 		    case '[':
@@ -365,6 +389,7 @@ FlagsDone:
 
 		    default:
 			/* Invalid conversion */
+			longjmp (JumpBuf, RC_NOCONV);
 			break;
 
 		}

@@ -35,6 +35,7 @@ PALFLAG		= $2A6		; $01 = PAL, $00 = NTSC
 ; Direct entries
 CLRSCR		= $E544
 KBDREAD		= $E5B4
+NMIEXIT         = $FEBC
 
 ; ---------------------------------------------------------------------------
 ; Vector and other locations

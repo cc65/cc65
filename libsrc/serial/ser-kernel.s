@@ -30,6 +30,7 @@ ser_put:        jmp     return0
 ser_pause:      jmp     return0
 ser_unpause:    jmp     return0
 ser_status:     jmp     return0
+ser_ioctl:      jmp     return0
 
 ; Driver header signature
 .rodata

@@ -48,8 +48,9 @@ SER_HDR_PUT             = SER_HDR_JUMPTAB+8     ; PUT routine
 SER_HDR_PAUSE           = SER_HDR_JUMPTAB+10    ; PAUSE routine
 SER_HDR_UNPAUSE         = SER_HDR_JUMPTAB+12    ; UNPAUSE routine
 SER_HDR_STATUS          = SER_HDR_JUMPTAB+14    ; STATUS routine
+SER_HDR_IOCTL           = SER_HDR_JUMPTAB+16    ; IOCTL routine
 
-SER_HDR_JUMPCOUNT       = 8                     ; Number of jump vectors
+SER_HDR_JUMPCOUNT       = 9                     ; Number of jump vectors
 
 ;------------------------------------------------------------------------------
 ; Offsets into the struct passed to ser_params
@@ -128,7 +129,7 @@ SER_STATUS_DSR 	       	=       $40	; NOT data set ready
         .global ser_pause
         .global ser_unpause
         .global ser_status
-
+        .global ser_ioctl
 
 
 ;------------------------------------------------------------------------------
@@ -143,6 +144,6 @@ SER_STATUS_DSR 	       	=       $40	; NOT data set ready
         .global _ser_pause
         .global _ser_unpause
         .global _ser_status
-
+        .global _ser_ioctl
 
 

@@ -45,6 +45,6 @@ SER_ERR_BAUD_UNAVAIL   	=       $05    	; Baud rate not available
 SER_ERR_NO_DATA	       	=       $06   	; Nothing to read
 SER_ERR_OVERFLOW       	=       $07   	; No room in send buffer
 SER_ERR_INIT_FAILED     =       $08   	; Initialization failed
-
+SER_ERR_INV_IOCTL       =       $09     ; IOCTL not supported
 
 

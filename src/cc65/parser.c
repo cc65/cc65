@@ -396,9 +396,7 @@ static ExprNode* DoArray (ExprNode* Left)
     Right = Expression ();
 
     /* Check the types.	As special "C" feature, accept a reversal of base and
-     * index types:
-     * 	 char C = 3["abcdefg"];
-     * is legal C!
+     * index types: char C = 3["abcdefg"] is legal C!
      */
     if (IsClassPtr (Left->Type)) {
 	/* Right side must be some sort of integer */
@@ -929,7 +927,7 @@ static ExprNode* DoIndirect (void)
     	Error (ERR_ILLEGAL_INDIRECT);
 
     	/* Free the problematic tree */
-    	FreeExprTree (Op);	     
+    	FreeExprTree (Op);
 
     	/* Return something that is safe later ### */
 	return GetIntNode (0);
@@ -1108,8 +1106,6 @@ static ExprNode* DoMul (ExprNode* Left)
 	FreeExprTree (Right);
 	Right = GetIntNode (0);
     }
-
-    /* Do minor optimizations ### */
 
     /* Make the root node */
     Root = AllocExprNode (NT_BOOL_NOT, TargetType, RVALUE);

@@ -620,6 +620,7 @@ static void Usage (void)
 	     "Long options:\n"
        	     "  --add-source\t\tInclude source as comment\n"
        	     "  --ansi\t\tStrict ANSI mode\n"
+       	     "  --asm-define sym[=v]\tDefine an assembler symbol\n"
 	     "  --asm-include-dir dir\tSet an assembler include directory\n"
              "  --bss-label name\tDefine and export a BSS segment label\n"
 	     "  --bss-name seg\tSet the name of the BSS segment\n"
@@ -676,6 +677,14 @@ static void OptAnsi (const char* Opt attribute ((unused)),
 /* Strict ANSI mode (compiler) */
 {
     CmdAddArg (&CC65, "-A");
+}
+
+
+
+static void OptAsmDefine (const char* Opt attribute ((unused)), const char* Arg)
+/* Define an assembler symbol (assembler) */
+{
+    CmdAddArg2 (&CA65, "-D", Arg);
 }
 
 
@@ -1017,6 +1026,7 @@ int main (int argc, char* argv [])
     static const LongOpt OptTab[] = {
 	{ "--add-source",	0,    	OptAddSource 		},
 	{ "--ansi",		0,	OptAnsi			},
+       	{ "--asm-define",      	1,     	OptAsmDefine            },
 	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
        	{ "--bss-label",       	1,     	OptBssLabel             },
 	{ "--bss-name",	 	1, 	OptBssName   		},

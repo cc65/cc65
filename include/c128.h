@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -83,6 +83,9 @@
 
 #include <_sid.h>
 #define	SID	(*(struct __sid*)0xD400)
+
+#include <_vdc.h>
+#define VDC     (*(struct __vdc*)0xD600)
 
 #include <_6526.h>
 #define CIA1	(*(struct __6526*)0xDC00)

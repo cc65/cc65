@@ -71,7 +71,7 @@ InputByte       = Header                ; Byte read from input
 ; Relocation
 RelocVal        = Header + 1            ; Relocation value
 
-.data      
+.data
 Read:   jmp     $FFFF                   ; Jump to read routine
 
 .rodata
@@ -469,7 +469,7 @@ CalcSizes:
 ; Control structure is complete now. Clear the bss segment.
 ; bzero (bss_addr, bss_size)
 
-        lda     Module
+GotMem: lda     Module
         add     TPtr
         pha
         lda     Module+1
@@ -485,7 +485,7 @@ CalcSizes:
 ; code+data segment is still in TPtr.
 ; C->read (C, C->module, H.tlen + H.dlen)
 
-GotMem: jsr     PushCtrl
+        jsr     PushCtrl
         lda     Module
         ldx     Module+1
         jsr     pushax

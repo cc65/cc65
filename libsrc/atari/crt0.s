@@ -10,12 +10,11 @@
 ;
 
 	.export		_exit
-	.constructor	initsp,26
+	.constructor	initsp, 26
 
-	.import		getargs, argc, argv
-	.import		initlib, donelib
+	.import		initlib, donelib, callmain
        	.import	       	zerobss, pushax
-	.import		_main,__filetab,getfd
+	.import		_main, __filetab, getfd
 	.import		__CODE_LOAD__, __BSS_LOAD__
 
         .include        "zeropage.inc"
@@ -105,19 +104,9 @@ L1:	lda	sp,x
 	jsr	getfd
 	sta	__filetab + (2 * _FILE_size)    ; setup stderr
 
-; Pass command line if present
+; Push arguments and call main
 
-	jsr	getargs
-
-	lda	argc
-	ldx	argc+1
-	jsr	pushax 		; argc
-	lda	#<argv
-	ldx	#>argv
-	jsr	pushax 		; argv
-
-	ldy	#4     		; Argument size
-	jsr	_main  		; call the users code
+	jsr	callmain
 
 ; Call module destructors. This is also the _exit entry.
 

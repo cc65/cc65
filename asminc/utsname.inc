@@ -35,11 +35,11 @@
 
 ; Struct utsname offsets and size
 utsname_sysname         = 0
-utsname_nodename        = utsname_sysname + 9
+utsname_nodename        = utsname_sysname + 17
 utsname_release         = utsname_nodename + 9
-utsname_version         = utsname_release + 5
-utsname_machine         = utsname_version + 5
-utsname_size            = utsname_machine + 9
-
+utsname_version         = utsname_release + 9
+utsname_machine         = utsname_version + 9
+utsname_size            = utsname_machine + 25
+utsname_fieldcount      = 5
 
 

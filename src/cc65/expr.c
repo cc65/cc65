@@ -436,7 +436,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
             /* No prototype available. Convert array to "pointer to first
              * element", and function to "pointer to function".
              */
-            Param->Type = PtrConversion (Param->Type)
+            Expr.Type = PtrConversion (Expr.Type);
 
         }
 

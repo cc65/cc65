@@ -39,6 +39,16 @@
 
 
 /*****************************************************************************/
+/*				   Forwards				     */
+/*****************************************************************************/
+
+
+
+struct CodeSeg;
+
+
+
+/*****************************************************************************/
 /*  	       	 	  	     Data				     */
 /*****************************************************************************/
 
@@ -71,6 +81,20 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg);
  * the information already in place. If the function is unknown, assume it
  * will use all registers and load all registers.
  */
+
+unsigned char GetRegInfo (struct CodeSeg* S, unsigned Index);
+/* Determine register usage information for the instructions starting at the
+ * given index.
+ */
+
+int RegAUsed (struct CodeSeg* S, unsigned Index);
+/* Check if the value in A is used. */
+
+int RegXUsed (struct CodeSeg* S, unsigned Index);
+/* Check if the value in X is used. */
+
+int RegYUsed (struct CodeSeg* S, unsigned Index);
+/* Check if the value in Y is used. */
 
 
 

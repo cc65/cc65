@@ -451,6 +451,17 @@ void AddCodeEntry (CodeSeg* S, const char* Format, va_list ap)
 
 
 
+void InsertCodeEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index)
+/* Insert the code entry at the index given. Following code entries will be
+ * moved to slots with higher indices.
+ */
+{
+    /* Insert the entry into the collection */
+    CollInsert (&S->Entries, E, Index);
+}
+
+
+
 void DelCodeEntry (CodeSeg* S, unsigned Index)
 /* Delete an entry from the code segment. This includes moving any associated
  * labels, removing references to labels and even removing the referenced labels
@@ -509,6 +520,22 @@ struct CodeEntry* GetCodeEntry (CodeSeg* S, unsigned Index)
 /* Get an entry from the given code segment */
 {
     return CollAt (&S->Entries, Index);
+}
+
+
+
+struct CodeEntry* GetNextCodeEntry (CodeSeg* S, unsigned Index)
+/* Get the code entry following the one with the index Index. If there is no
+ * following code entry, return NULL.
+ */
+{
+    if (Index >= CollCount (&S->Entries)-1) {
+	/* This is the last entry */
+	return 0;
+    } else {
+	/* Code entries left */
+	return CollAt (&S->Entries, Index+1);
+    }
 }
 
 
@@ -610,7 +637,7 @@ void DelCodeLabel (CodeSeg* S, CodeLabel* L)
      * errors to slip through.
      */
     if (L->Owner) {
-	CollDeleteItem (&L->Owner->Labels, L);
+     	CollDeleteItem (&L->Owner->Labels, L);
     }
 
     /* All references removed, delete the label itself */
@@ -737,7 +764,7 @@ void RemoveCodeLabelRef (CodeSeg* S, struct CodeEntry* E)
 
     /* If there are no more references, delete the label */
     if (CollCount (&L->JumpFrom) == 0) {
-	DelCodeLabel (S, L);
+       	DelCodeLabel (S, L);
     }
 }
 
@@ -790,29 +817,45 @@ void DelCodeSegAfter (CodeSeg* S, unsigned Last)
     /* Get the number of entries in this segment */
     unsigned Count = GetCodeEntryCount (S);
 
-    /* Check if we have to delete anything */
-    if (Last < Count) {
+    /* First pass: Delete all references to labels. If the reference count
+     * for a label drops to zero, delete it.
+     */
+    unsigned C = Count;
+    while (Last < C--) {
 
- 	/* Remove all entries after the given one */
- 	while (Last < Count--) {
+	/* Get the next entry */
+	CodeEntry* E = GetCodeEntry (S, C);
 
-      	    /* Get the next entry */
-      	    CodeEntry* E = GetCodeEntry (S, Count);
+	/* Check if this entry has a label reference */
+	if (E->JumpTo) {
+	    /* Remove the reference to the label */
+	    RemoveCodeLabelRef (S, E);
+	}
 
-      	    /* If the code entry has labels, delete them */
-      	    while (CodeEntryHasLabel (E)) {
+    }
 
-      		/* Get the label */
-      		CodeLabel* L = GetCodeLabel (E, 0);
+    /* Second pass: Delete the instructions. If a label attached to an
+     * instruction still has references, it must be references from outside
+     * the deleted area. Don't delete the label in this case, just make it
+     * ownerless and move it to the label pool.
+     */
+    C = Count;
+    while (Last < C--) {
 
-      		/* Delete it */
-      		DelCodeLabel (S, L);
+    	/* Get the next entry */
+    	CodeEntry* E = GetCodeEntry (S, C);
 
-      	    }
+    	/* Check if this entry has a label attached */
+    	if (CodeEntryHasLabel (E)) {
+	    /* Move the labels to the pool and clear the owner pointer */
+	    MoveLabelsToPool (S, E);
+	}
 
-     	    /* Delete the entry itself */
-     	    DelCodeEntry (S, Count);
-      	}
+	/* Delete the pointer to the entry */
+	CollDelete (&S->Entries, C);
+
+	/* Delete the entry itself */
+	FreeCodeEntry (E);
     }
 }
 
@@ -841,7 +884,18 @@ void OutputCodeSeg (const CodeSeg* S, FILE* F)
 
     /* Output all entries */
     for (I = 0; I < Count; ++I) {
+
+	unsigned char Use;
+
 	OutputCodeEntry (CollConstAt (&S->Entries, I), F);
+
+	/* Print usage info */
+	Use = GetRegInfo ((CodeSeg*) S, I+1);
+	fprintf (F,
+		 "  Use: %c%c%c\n",
+		 (Use & REG_A)? 'A' : '_',
+		 (Use & REG_X)? 'X' : '_',
+		 (Use & REG_Y)? 'Y' : '_');
     }
 
     /* If this is a segment for a function, leave the function */

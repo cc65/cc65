@@ -241,8 +241,47 @@ unsigned OptJumpCascades (CodeSeg* S)
 	     * the second branch will never be taken, and we may jump directly
 	     * to the instruction behind this one.
 	     */
-	    goto NextEntry;
+	    if ((E->Info & OF_CBRA) != 0 && (N->Info & OF_CBRA) != 0) {
 
+		unsigned NI;	/* Index of N */
+		CodeEntry* X;	/* Instruction behind N */
+		CodeLabel* LX;	/* Label attached to X */
+
+		/* Get the branch conditions of both branches */
+		bc_t BC1 = GetBranchCond (E->OPC);
+		bc_t BC2 = GetBranchCond (N->OPC);
+
+		/* Check the branch conditions */
+		if (BC1 != GetInverseCond (BC2)) {
+		    /* Condition not met */
+		    goto NextEntry;
+		}
+
+		/* We may jump behind this conditional branch. This means that
+		 * N may not be the last entry.
+		 */
+		NI = GetCodeEntryIndex (S, N);
+		if (NI >= Count-1) {
+		    /* N is last entry */
+		    goto NextEntry;
+		}
+
+		/* Get the pointer to the next instruction */
+		X = GetCodeEntry (S, NI+1);
+
+		/* Get the label attached to X, create a new one if needed */
+		LX = GenCodeLabel (S, X);
+
+		/* Move the reference from E to the new label */
+		MoveCodeLabelRef (S, E, LX);
+
+	     	/* Remember, we had changes */
+	     	++Changes;
+
+	     	/* Done */
+	      	continue;
+
+	    }
 	}
 
 NextEntry:
@@ -270,7 +309,7 @@ unsigned OptRTS (CodeSeg* S)
  */
 {
     unsigned Changes = 0;
-    unsigned I;	  
+    unsigned I;
 
     /* Get the number of entries, bail out if we have less than 2 entries */
     unsigned Count = GetCodeEntryCount (S);
@@ -405,16 +444,121 @@ NextEntry:
 
 
 /*****************************************************************************/
-/*	      	     Remove conditional jumps never taken		     */
+/*		 	 Optimize conditional branches			     */
 /*****************************************************************************/
 
 
 
-unsigned OptDeadCondBranches (CodeSeg* S)
-/* If an immidiate load of a register is followed by a conditional jump that
- * is never taken because the load of the register sets the flags in such a
- * manner, remove the conditional branch.
+unsigned OptCondBranches (CodeSeg* S)
+/* Performs several optimization steps:
+ *
+ *  - If an immidiate load of a register is followed by a conditional jump that
+ *    is never taken because the load of the register sets the flags in such a
+ *    manner, remove the conditional branch.
+ *  - If the conditional branch is always taken because of the register load,
+ *    replace it by a jmp.
+ *  - If a conditional branch jumps around an unconditional branch, remove the
+ *    conditional branch and make the jump a conditional branch with the
+ *    inverse condition of the first one.
  */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Get the number of entries, bail out if we have not enough */
+    unsigned Count = GetCodeEntryCount (S);
+    if (Count < 2) {
+     	return 0;
+    }
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < Count-1) {
+
+	CodeEntry* N;
+	CodeLabel* L;
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+	/* Check if it's a register load */
+       	if ((E->Info & OF_LOAD) != 0   		&&  /* It's a load instruction */
+	    E->AM == AM_IMM 	       		&&  /* ..with immidiate addressing */
+	    (E->Flags & CEF_NUMARG) != 0	&&  /* ..and a numeric argument. */
+	    (N = GetNextCodeEntry (S, I)) != 0	&&  /* There is a following entry */
+       	    (N->Info & OF_CBRA) != 0		&&  /* ..which is a conditional branch */
+	    !CodeEntryHasLabel (N)) {		    /* ..and does not have a label */
+
+	    /* Get the branch condition */
+	    bc_t BC = GetBranchCond (N->OPC);
+
+	    /* Check the argument against the branch condition */
+       	    if ((BC == BC_EQ && E->Num != 0) 		||
+	       	(BC == BC_NE && E->Num == 0)		||
+	       	(BC == BC_PL && (E->Num & 0x80) != 0)	||
+	    	(BC == BC_MI && (E->Num & 0x80) == 0)) {
+
+	    	/* Remove the conditional branch */
+	    	DelCodeEntry (S, I+1);
+	    	--Count;
+
+	    	/* Remember, we had changes */
+	    	++Changes;
+
+     	    } else if ((BC == BC_EQ && E->Num == 0)		||
+     	    	       (BC == BC_NE && E->Num != 0)		||
+     	    	       (BC == BC_PL && (E->Num & 0x80) == 0)	||
+     	    	       (BC == BC_MI && (E->Num & 0x80) != 0)) {
+
+     		/* The branch is always taken, replace it by a jump */
+     		ReplaceOPC (N, OPC_JMP);
+
+     		/* Remember, we had changes */
+     		++Changes;
+     	    }
+
+	}
+
+      	if ((E->Info & OF_CBRA) != 0	     	&&  /* It's a conditional branch */
+      	    (L = E->JumpTo) != 0	     	&&  /* ..referencing a local label */
+       	    (N = GetNextCodeEntry (S, I)) != 0	&&  /* There is a following entry */
+      	    (N->Info & OF_UBRA) != 0	     	&&  /* ..which is an uncond branch, */
+      	    !CodeEntryHasLabel (N)	     	&&  /* ..has no label attached */
+      	    L->Owner == GetNextCodeEntry (S, I+1)) {/* ..and jump target follows */
+
+      	    /* Replace the jump by a conditional branch with the inverse branch
+      	     * condition than the branch around it.
+      	     */
+      	    ReplaceOPC (N, GetInverseBranch (E->OPC));
+
+      	    /* Remove the conditional branch */
+      	    DelCodeEntry (S, I);
+      	    --Count;
+
+      	    /* Remember, we had changes */
+      	    ++Changes;
+
+      	}
+
+     	/* Next entry */
+     	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*			      Remove unused loads			     */
+/*****************************************************************************/
+
+
+
+unsigned OptUnusedLoads (CodeSeg* S)
+/* Remove loads of registers where the value loaded is not used later. */
 {
     unsigned Changes = 0;
     unsigned I;
@@ -433,32 +577,29 @@ unsigned OptDeadCondBranches (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
 	/* Check if it's a register load */
-       	if ((E->Info & OF_LOAD) != 0 && E->AM == AM_IMM && (E->Flags & CEF_NUMARG) != 0) {
+       	if ((E->Info & OF_LOAD) != 0) {
 
-	    bc_t BC;
+	    unsigned char R;
 
-	    /* Immidiate register load, get next instruction */
+	    /* Get the next instruction, it must not be a conditional branch */
 	    CodeEntry* N = GetCodeEntry (S, I+1);
-
-	    /* Check if the following insn is a conditional branch or if it
-	     * has a label attached.
-	     */
-	    if ((N->Info & OF_CBRA) == 0 || CodeEntryHasLabel (E)) {
-		/* No conditional jump or label attached, bail out */
+	    if ((N->Info & OF_CBRA) != 0) {
 		goto NextEntry;
 	    }
 
-	    /* Get the branch condition */
-	    BC = GetBranchCond (N->OPC);
+	    /* Check which sort of load it is */
+	    switch (E->OPC) {
+		case OPC_LDA:	R = REG_A;	break;
+       	       	case OPC_LDX:  	R = REG_X;	break;
+		case OPC_LDY:	R = REG_Y;	break;
+		default:	goto NextEntry;		/* OOPS */
+	    }
 
-	    /* Check the argument against the branch condition */
-       	    if ((BC == BC_EQ && E->Num != 0) 		||
-		(BC == BC_NE && E->Num == 0)		||
-		(BC == BC_PL && (E->Num & 0x80) != 0)	||
-	 	(BC == BC_MI && (E->Num & 0x80) == 0)) {
+	    /* Get register usage and check if the register value is used later */
+	    if ((GetRegInfo (S, I+1) & R) == 0) {
 
-		/* Remove the conditional branch */
-		DelCodeEntry (S, I+1);
+		/* Register value is not used, remove the load */
+		DelCodeEntry (S, I);
 		--Count;
 
 		/* Remember, we had changes */
@@ -475,7 +616,7 @@ NextEntry:
 
     /* Return the number of changes made */
     return Changes;
-}	 
+}
 
 
 

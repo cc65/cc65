@@ -270,10 +270,12 @@ static OptFunc OptFuncs [] = {
     { OptDeadCode,     	    "OptDeadCode",		0      	},
     /* Optimize jump targets */
     { OptJumpTarget,   	    "OptJumpTarget",		0      	},
-    /* Remove dead conditional branches */
-    { OptDeadCondBranches,  "OptDeadCondBranches",	0    	},
+    /* Optimize conditional branches */
+    { OptCondBranches,	    "OptCondBranches", 		0    	},
     /* Remove calls to the bool transformer subroutines	*/
     { OptBoolTransforms,    "OptBoolTransforms",	0	},
+    /* Remove unused loads */
+    { OptUnusedLoads,	    "OptUnusedLoads",		0	},
 };
 
 
@@ -324,6 +326,11 @@ void RunOpt (CodeSeg* S)
     unsigned I;
     unsigned Pass = 0;
     unsigned OptChanges;
+
+    /* If we shouldn't run the optimizer, bail out */
+    if (!Optimize) {
+	return;
+    }
 
     /* Print the name of the function we are working on */
     if (S->Func) {

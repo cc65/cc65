@@ -94,6 +94,11 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func);
 void AddCodeEntry (CodeSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
 /* Add a line to the given code segment */
 
+void InsertCodeEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index);
+/* Insert the code entry at the index given. Following code entries will be
+ * moved to slots with higher indices.
+ */
+
 void DelCodeEntry (CodeSeg* S, unsigned Index);
 /* Delete an entry from the code segment. This includes moving any associated
  * labels, removing references to labels and even removing the referenced labels
@@ -102,6 +107,11 @@ void DelCodeEntry (CodeSeg* S, unsigned Index);
 
 struct CodeEntry* GetCodeEntry (CodeSeg* S, unsigned Index);
 /* Get an entry from the given code segment */
+
+struct CodeEntry* GetNextCodeEntry (CodeSeg* S, unsigned Index);
+/* Get the code entry following the one with the index Index. If there is no
+ * following code entry, return NULL.
+ */
 
 unsigned GetCodeEntryIndex (CodeSeg* S, struct CodeEntry* E);
 /* Return the index of a code entry */

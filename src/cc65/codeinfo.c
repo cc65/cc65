@@ -40,6 +40,9 @@
 #include "coll.h"
 
 /* cc65 */
+#include "codeent.h"
+#include "codeseg.h"
+#include "error.h"
 #include "codeinfo.h"
 
 
@@ -61,48 +64,51 @@ struct FuncInfo {
 };
 
 static const FuncInfo FuncInfoTable[] = {
-    { "booleq",		REG_NONE,    	REG_AX	},
-    { "boolge",		REG_NONE,	REG_AX	},
-    { "boolgt",		REG_NONE,	REG_AX	},
-    { "boolle",		REG_NONE,	REG_AX	},
-    { "boollt",		REG_NONE,	REG_AX	},
-    { "boolne",		REG_NONE,	REG_AX	},
-    { "booluge",   	REG_NONE,	REG_AX	},
-    { "boolugt",   	REG_NONE,	REG_AX	},
-    { "boolule",   	REG_NONE,	REG_AX	},
-    { "boolult",   	REG_NONE,	REG_AX	},
-    { "decax1",     	REG_AX,		REG_AX  },
-    { "decax2",     	REG_AX,		REG_AX  },
-    { "decax3",     	REG_AX,		REG_AX  },
-    { "decax4",     	REG_AX,		REG_AX  },
-    { "decax5",     	REG_AX,		REG_AX  },
-    { "decax6",     	REG_AX,		REG_AX  },
-    { "decax7",     	REG_AX,		REG_AX  },
-    { "decax8",     	REG_AX,		REG_AX  },
-    { "decaxy",	   	REG_AXY,	REG_AX	},
-    { "decsp2",    	REG_NONE,	REG_A	},
-    { "decsp3",    	REG_NONE,	REG_A	},
-    { "decsp4",    	REG_NONE,	REG_A	},
-    { "decsp5",    	REG_NONE,	REG_A	},
-    { "decsp6",    	REG_NONE,	REG_A	},
-    { "decsp7",    	REG_NONE,	REG_A	},
-    { "decsp8",    	REG_NONE,	REG_A	},
-    { "ldax0sp",   	REG_Y,		REG_AX	},
-    { "ldaxysp",   	REG_Y,		REG_AX 	},
-    { "pusha",	   	REG_A,		REG_Y	},
-    { "pusha0",	       	REG_A,		REG_XY	},
-    { "pushax",	   	REG_AX,		REG_Y	},
-    { "pushw0sp",  	REG_NONE,	REG_AXY	},
-    { "pushwysp",  	REG_Y,		REG_AXY	},
-    { "tosicmp",   	REG_AX,		REG_AXY },
+    { "addysp",	       	REG_Y, 	       	REG_NONE	},
+    { "booleq",		REG_NONE,    	REG_AX		},
+    { "boolge",		REG_NONE,	REG_AX		},
+    { "boolgt",		REG_NONE,	REG_AX		},
+    { "boolle",		REG_NONE,	REG_AX		},
+    { "boollt",		REG_NONE,	REG_AX		},
+    { "boolne",		REG_NONE,	REG_AX		},
+    { "booluge",   	REG_NONE,	REG_AX		},
+    { "boolugt",   	REG_NONE,	REG_AX		},
+    { "boolule",   	REG_NONE,	REG_AX		},
+    { "boolult",   	REG_NONE,	REG_AX		},
+    { "decax1",     	REG_AX,		REG_AX  	},
+    { "decax2",     	REG_AX,		REG_AX  	},
+    { "decax3",     	REG_AX,		REG_AX  	},
+    { "decax4",     	REG_AX,		REG_AX  	},
+    { "decax5",     	REG_AX,		REG_AX  	},
+    { "decax6",     	REG_AX,		REG_AX  	},
+    { "decax7",     	REG_AX,		REG_AX  	},
+    { "decax8",     	REG_AX,		REG_AX  	},
+    { "decaxy",	   	REG_AXY,	REG_AX		},
+    { "decsp2",    	REG_NONE,	REG_A		},
+    { "decsp3",    	REG_NONE,	REG_A		},
+    { "decsp4",    	REG_NONE,	REG_A		},
+    { "decsp5",    	REG_NONE,	REG_A		},
+    { "decsp6",     	REG_NONE,	REG_A		},
+    { "decsp7",    	REG_NONE,	REG_A		},
+    { "decsp8",      	REG_NONE,	REG_A		},
+    { "incsp1",		REG_NONE,	REG_NONE	},
+    { "incsp2",		REG_NONE,	REG_Y		},
+    { "incsp3",		REG_NONE,	REG_Y		},
+    { "incsp4",		REG_NONE,	REG_Y		},
+    { "incsp5",		REG_NONE,	REG_Y		},
+    { "incsp6",		REG_NONE,	REG_Y		},
+    { "incsp7",		REG_NONE,	REG_Y		},
+    { "incsp8",		REG_NONE,	REG_Y		},
+    { "ldax0sp",   	REG_Y,		REG_AX		},
+    { "ldaxysp",   	REG_Y,		REG_AX 		},
+    { "pusha",	   	REG_A,		REG_Y		},
+    { "pusha0",	       	REG_A,		REG_XY		},
+    { "pushax",	   	REG_AX,		REG_Y		},
+    { "pushw0sp",  	REG_NONE,	REG_AXY		},
+    { "pushwysp",  	REG_Y,		REG_AXY		},
+    { "tosicmp",   	REG_AX,		REG_AXY 	},
 };
 #define FuncInfoCount	(sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
-
-/* Structure used to pass information to the RegValUsedInt1 and 2 functions */
-typedef struct RVUInfo RVUInfo;
-struct RVUInfo {
-    Collection	VisitedLines;		/* Lines already visited */
-};
 
 
 
@@ -137,177 +143,159 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
 	*Use |= Info->Use;
 	*Chg |= Info->Chg;
     } else {
+	/* Assume all registers used */
 	*Use |= REG_AXY;
 	*Chg |= REG_AXY;
     }
 }
 
-					
-#if 0
 
-static unsigned RVUInt2 (Line* L,
-    		       	 LineColl* LC, 	    /* To remember visited lines */
-    		   	 unsigned Used,     /* Definitely used registers */
-    		   	 unsigned Unused)   /* Definitely unused registers */
-/* Subfunction for RegValUsed. Will be called recursively in case of branches. */
+
+static unsigned char GetRegInfo2 (CodeSeg* S,
+		    		  CodeEntry* E,
+		    		  int Index,
+		     		  Collection* Visited,
+		     		  unsigned char Used,
+		     		  unsigned char Unused)
+/* Recursively called subfunction for GetRegInfo. */
 {
-    int I;
-
-    /* Check the following instructions. We classifiy them into primary
-     * loads (register value not used), neutral (check next instruction),
-     * and unknown (assume register was used).
-     */
+    /* Follow the instruction flow recording register usage. */
     while (1) {
 
-    	unsigned R;
+	unsigned char R;
 
-    	/* Get the next line and follow jumps */
-    	do {
+	/* Check if we have already visited the current code entry. If so,
+	 * bail out.
+	 */
+	if (CodeEntryHasMark (E)) {
+	    break;
+	}
 
-    	    /* Handle jumps to local labels (continue there) */
-       	    if (LineMatch (L, "\tjmp\tL") || LineMatch (L, "\tbra\tL")) {
-    	     	/* Get the target of the jump */
-    	     	L = GetTargetLine (L->Line+5);
-    	    }
+	/* Mark this entry as already visited */
+	CodeEntrySetMark (E);
+	CollAppend (Visited, E);
 
-    	    /* Get the next line, skip local labels */
-    	    do {
-       	    	L = NextCodeSegLine (L);
-    	    } while (L && (IsLocalLabel (L) || L->Line[0] == '\0'));
+	/* Evaluate the used registers */
+	if ((R = E->Use) != REG_NONE) {
+	    /* We are not interested in the use of any register that has been
+	     * used before.
+	     */
+	    R &= ~Unused;
+	    /* Remember the remaining registers */
+	    Used |= R;
+	}
 
-    	    /* Bail out if we're done */
-    	    if (L == 0 || IsExtLabel (L)) {
-    	    	/* End of function reached */
-    	    	goto ExitPoint;
-    	    }
+	/* Evaluate the changed registers */
+       	if ((R = E->Chg) != REG_NONE) {
+	    /* We are not interested in the use of any register that has been
+	     * used before.
+	     */
+	    R &= ~Used;
+	    /* Remember the remaining registers */
+	    Unused |= R;
+	}
 
-    	    /* Check if we had this line already. If so, bail out, if not,
-    	     * add it to the list of known lines.
-    	     */
-    	    if (LCHasLine (LC, L) || !LCAddLine (LC, L)) {
-    	    	goto ExitPoint;
-    	    }
-
-     	} while (LineMatch (L, "\tjmp\tL") || LineMatch (L, "\tbra\tL"));
-
-    	/* Special handling of code hints */
-       	if (IsHintLine (L)) {
-
-    	    if (IsHint (L, "a:-") && (Used & REG_A) == 0) {
-    		Unused |= REG_A;
-    	    } else if (IsHint (L, "x:-") && (Used & REG_X) == 0) {
-    		Unused |= REG_X;
-    	    } else if (IsHint (L, "y:-") && (Used & REG_Y) == 0) {
-    		Unused |= REG_Y;
-    	    }
-
-    	/* Special handling for branches */
-    	} else if (LineMatchX (L, ShortBranches) >= 0 ||
-    	    LineMatchX (L, LongBranches) >= 0) {
-    	    const char* Target = L->Line+5;
-    	    if (Target[0] == 'L') {
-    	       	/* Jump to local label. Check the register usage starting at
-    	       	 * the branch target and at the code following the branch.
-    	       	 * All registers that are unused in both execution flows are
-    	       	 * returned as unused.
-    	       	 */
-    	       	unsigned U1, U2;
-       	       	U2 = RVUInt1 (GetTargetLine (Target), LC, Used, Unused);
-    	       	U1 = RVUInt1 (L, LC, Used, Unused);
-    	       	return U1 | U2;		/* Used in any of the branches */
-    	    }
-    	} else {
-
-    	    /* Search for the instruction in this line */
-    	    I = FindCmd (L);
-
-    	    /* If we don't find it, assume all other registers are used */
-    	    if (I < 0) {
-    		break;
-    	    }
-
-    	    /* Evaluate the use flags, check for addressing modes */
-    	    R = CmdDesc[I].Use;
-    	    if (IsXAddrMode (L)) {
-    		R |= REG_X;
-    	    } else if (IsYAddrMode (L)) {
-    		R |= REG_Y;
-    	    }
-     	    if (R) {
-    		/* Remove registers that were already new loaded */
-    		R &= ~Unused;
-
-    		/* Remember the remaining registers */
-    		Used |= R;
-    	    }
-
-    	    /* Evaluate the load flags */
-    	    R = CmdDesc[I].Load;
-    	    if (R) {
-    		/* Remove registers that were already used */
-    		R &= ~Used;
-
-    		/* Remember the remaining registers */
-    		Unused |= R;
-    	    }
-
-    	}
-
-       	/* If we know about all registers, bail out */
-       	if ((Used | Unused) == REG_ALL) {
+       	/* If we know about all registers now, bail out */
+       	if ((Used | Unused) == REG_AXY) {
     	    break;
     	}
+
+	/* If the instruction is an RTS or RTI, we're done */
+	if (E->OPC == OPC_RTS || E->OPC == OPC_RTI) {
+	    break;
+	}
+
+	/* If we have an unconditional branch, follow this branch if possible,
+	 * otherwise we're done.
+	 */
+	if ((E->Info & OF_UBRA) != 0) {
+
+	    /* Does this jump have a valid target? */
+	    if (E->JumpTo) {
+
+	       	/* Unconditional jump */
+ 	       	E     = E->JumpTo->Owner;
+		Index = -1;	  	/* Invalidate */
+
+	    } else {
+	       	/* Jump outside means we're done */
+	       	break;
+	    }
+
+       	/* In case of conditional branches, follow the branch if possible and
+	 * follow the normal flow (branch not taken) afterwards. If we cannot
+	 * follow the branch, we're done.
+	 */
+	} else if ((E->Info & OF_CBRA) != 0) {
+
+    	    if (E->JumpTo) {
+
+	       	/* Recursively determine register usage at the branch target */
+		unsigned char U1;
+		unsigned char U2;
+
+		U1 = GetRegInfo2 (S, E->JumpTo->Owner, -1, Visited, Used, Unused);
+		if (U1 == REG_AXY) {
+		    /* All registers used, no need for second call */
+		    return REG_AXY;
+		}
+		if (Index < 0) {
+		    Index = GetCodeEntryIndex (S, E);
+		}
+       	       	if ((E = GetCodeEntry (S, ++Index)) == 0) {
+		    Internal ("GetRegInfo2: No next entry!");
+		}
+		U2 = GetRegInfo2 (S, E, Index, Visited, Used, Unused);
+	   	return U1 | U2;	       	/* Used in any of the branches */
+
+	    } else {
+	   	/* Jump to global symbol */
+	  	break;
+	    }
+
+       	} else {
+
+	    /* Just go to the next instruction */
+	    if (Index < 0) {
+	     	Index = GetCodeEntryIndex (S, E);
+	    }
+	    E = GetCodeEntry (S, ++Index);
+	    if (E == 0) {
+	     	/* No next entry */
+	     	Internal ("GetRegInfo2: No next entry!");
+	    }
+
+	}
+
     }
 
-ExitPoint:
     /* Return to the caller the complement of all unused registers */
-    return ~Unused & REG_ALL;
+    return Used;
 }
 
 
 
-static unsigned RVUInt1 (Line* L,
-    		       	 LineColl* LC, 	    /* To remember visited lines */
-    		       	 unsigned Used,     /* Definitely used registers */
-    		       	 unsigned Unused)   /* Definitely unused registers */
-/* Subfunction for RegValUsed. Will be called recursively in case of branches. */
+static unsigned char GetRegInfo1 (CodeSeg* S,
+		  		  CodeEntry* E,
+		  		  int Index,
+		     		  Collection* Visited,
+		     		  unsigned char Used,
+		     		  unsigned char Unused)
+/* Recursively called subfunction for GetRegInfo. */
 {
     /* Remember the current count of the line collection */
-    unsigned Count = LC->Count;
+    unsigned Count = CollCount (Visited);
 
     /* Call the worker routine */
-    unsigned R = RVUInt2 (L, LC, Used, Unused);
+    unsigned char R = GetRegInfo2 (S, E, Index, Visited, Used, Unused);
 
-    /* Restore the old count */
-    LC->Count = Count;
-
-    /* Return the result */
-    return R;
-}
-
-
-
-static unsigned RegValUsed (Line* Start)
-/* Check the next instructions after the one in L for register usage. If
- * a register is used as an index, or in a store or other instruction, it
- * is assumed to be used. If a register is loaded with a value, before it
- * was used by one of the actions described above, it is assumed unused.
- * If the end of the lookahead is reached, all registers that are uncertain
- * are marked as used.
- * The result of the search is returned.
- */
-{
-    unsigned R;
-
-    /* Create a new line collection and enter the start line */
-    LineColl* LC = NewLineColl (256);
-    LCAddLine (LC, Start);
-
-    /* Call the recursive subfunction */
-    R = RVUInt1 (Start, LC, REG_NONE, REG_NONE);
-
-    /* Delete the line collection */
-    FreeLineColl (LC);
+    /* Restore the old count, unmarking all new entries */
+    unsigned NewCount = CollCount (Visited);
+    while (NewCount-- > Count) {
+	CodeEntry* E = CollAt (Visited, NewCount);
+	CodeEntryResetMark (E);
+	CollDelete (Visited, NewCount);
+    }
 
     /* Return the registers used */
     return R;
@@ -315,28 +303,58 @@ static unsigned RegValUsed (Line* Start)
 
 
 
-static int RegAUsed (Line* Start)
+unsigned char GetRegInfo (struct CodeSeg* S, unsigned Index)
+/* Determine register usage information for the instructions starting at the
+ * given index.
+ */
+{
+    CodeEntry*	    E;
+    Collection	    Visited;	/* Visited entries */
+    unsigned char   R;
+
+    /* Get the code entry for the given index */
+    if (Index >= GetCodeEntryCount (S)) {
+	/* There is no such code entry */
+	return REG_NONE;
+    }
+    E = GetCodeEntry (S, Index);
+
+    /* Initialize the data structure used to collection information */
+    InitCollection (&Visited);
+
+    /* Call the recursive subfunction */
+    R = GetRegInfo1 (S, E, Index, &Visited, REG_NONE, REG_NONE);
+
+    /* Delete the line collection */
+    DoneCollection (&Visited);
+
+    /* Return the registers used */
+    return R;
+}
+
+
+
+int RegAUsed (struct CodeSeg* S, unsigned Index)
 /* Check if the value in A is used. */
 {
-    return (RegValUsed (Start) & REG_A) != 0;
+    return (GetRegInfo (S, Index) & REG_A) != 0;
 }
 
 
 
-static int RegXUsed (Line* Start)
+int RegXUsed (struct CodeSeg* S, unsigned Index)
 /* Check if the value in X is used. */
 {
-    return (RegValUsed (Start) & REG_X) != 0;
+    return (GetRegInfo (S, Index) & REG_X) != 0;
 }
 
 
 
-static int RegYUsed (Line* Start)
+int RegYUsed (struct CodeSeg* S, unsigned Index)
 /* Check if the value in Y is used. */
 {
-    return (RegValUsed (Start) & REG_Y) != 0;
+    return (GetRegInfo (S, Index) & REG_Y) != 0;
 }
 
 
 
-#endif     

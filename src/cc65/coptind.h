@@ -77,11 +77,14 @@ unsigned OptJumpTarget (CodeSeg* S);
  * the branch gets removed.
  */
 
-unsigned OptDeadCondBranches (CodeSeg* S);
+unsigned OptCondBranches (CodeSeg* S);
 /* If an immidiate load of a register is followed by a conditional jump that
  * is never taken because the load of the register sets the flags in such a
  * manner, remove the conditional branch.
  */
+
+unsigned OptUnusedLoads (CodeSeg* S);
+/* Remove loads of registers where the value loaded is not used later. */
 
 
 

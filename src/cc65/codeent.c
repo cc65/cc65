@@ -409,8 +409,6 @@ void OutputCodeEntry (const CodeEntry* E, FILE* F)
        	       	       	  (E->Chg & REG_Y)? 'Y' : '_');
 //    }
 
-    /* Terminate the line */
-    fprintf (F, "\n");
 }
 
 

@@ -37,6 +37,9 @@ CURS_OFF        = $CD9F
 CLRSCR		= $C142
 KBDREAD		= $C006
 
+; Extended jump table
+SETBNK          = $FF68
+
 ; ---------------------------------------------------------------------------
 ; Vectors
 

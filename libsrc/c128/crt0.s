@@ -55,6 +55,11 @@ Head:   .word   @Next
  	lda	#14
  	jsr	BSOUT
 
+; Set the bank for the file name our execution bank 
+
+        ldx     #0
+        jsr     SETBNK
+
 ; Before doing anything else, we have to setup our banking configuration.
 ; Otherwise just the lowest 16K are actually RAM. Writing through the ROM
 ; to the underlying RAM works, but it is bad style.

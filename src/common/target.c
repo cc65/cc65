@@ -52,7 +52,7 @@ target_t Target	= TGT_NONE;
 
 /* Table with target names */
 const char* TargetNames [TGT_COUNT] = {
-    "none",     
+    "none",
     "module",
     "atari",
     "c64",
@@ -65,7 +65,8 @@ const char* TargetNames [TGT_COUNT] = {
     "bbc",
     "apple2",
     "geos",
-    "lunix"
+    "lunix",
+    "atmos"
 };
 
 
@@ -104,4 +105,5 @@ target_t FindTarget (const char* Name)
 
 
 
-             
+
+           

@@ -50,6 +50,7 @@ static const char CfgEmpty[] = "";
 /* Actual target configurations, converted into C strings by a perl script */
 #include "apple2.inc"
 #include "atari.inc"
+#include "atmos.inc"
 #include "bbc.inc"
 #include "c128.inc"
 #include "c64.inc"
@@ -75,6 +76,7 @@ const TargetDesc Targets [TGT_COUNT] = {
     {  	BINFMT_BINARY,  CfgNone         },
     {  	BINFMT_O65,     CfgModule       },
     {  	BINFMT_BINARY,	CfgAtari        },
+    {  	BINFMT_BINARY,	CfgAtmos        },
     {  	BINFMT_BINARY,	CfgC64          },
     {  	BINFMT_BINARY,	CfgC128         },
     {  	BINFMT_BINARY,	CfgEmpty	},    	/* Ace */

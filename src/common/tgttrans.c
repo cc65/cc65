@@ -154,6 +154,7 @@ void TgtTranslateInit (void)
 	case TGT_APPLE2:	memcpy (Tab, CTNone, sizeof (Tab));  	break;
 	case TGT_GEOS:		memcpy (Tab, CTNone, sizeof (Tab));  	break;
 	case TGT_LUNIX:		memcpy (Tab, CTNone, sizeof (Tab));  	break;
+       	case TGT_ATMOS:		memcpy (Tab, CTNone, sizeof (Tab));  	break;
 	default:
 	    AbEnd ("Internal error: Target system unknown (%d)", Target);
     }
@@ -214,4 +215,4 @@ void TgtTranslateSet (unsigned Index, unsigned char C)
 
 
 
-                        
+

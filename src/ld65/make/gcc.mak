@@ -48,6 +48,7 @@ OBJS = 	bin.o		\
 
 INCS =	apple2.inc	\
 	atari.inc	\
+        atmos.inc       \
 	bbc.inc		\
 	c64.inc		\
 	c128.inc	\
@@ -108,6 +109,9 @@ apple2.inc:	cfg/apple2.cfg
 
 atari.inc:     	cfg/atari.cfg
 	@$(CVT) $< $@ CfgAtari
+
+atmos.inc:     	cfg/atmos.cfg
+	@$(CVT) $< $@ CfgAtmos
 
 bbc.inc:     	cfg/bbc.cfg
 	@$(CVT) $< $@ CfgBBC

@@ -61,6 +61,7 @@ typedef enum {
     TGT_APPLE2,
     TGT_GEOS,
     TGT_LUNIX,
+    TGT_ATMOS,
     TGT_COUNT			/* Number of target systems */
 } target_t;
 
@@ -91,4 +92,4 @@ target_t FindTarget (const char* Name);
 
 
 
-                
+

@@ -328,6 +328,26 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 
 
 ###############################################################################
+#                               Lynx subpackage                               #
+###############################################################################
+
+%package lynx
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: Lynx specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description lynx
+This package contains the header files and libraries needed to write
+programs for the Lynx Game Console using the cc65 crosscompiler.
+
+%files lynx
+%attr(644,root,root)		/usr/lib/cc65/lib/lynx.lib
+%attr(644,root,root)		/usr/lib/cc65/lib/lynx.o
+
+
+
+###############################################################################
 #		       		NES subpackage	       		       	      #
 ###############################################################################
 

@@ -21,7 +21,10 @@ CURS_Y 	       	:= $CD  	; Cursor row
 SCREEN_PTR     	:= $C8  	; Pointer to current char in text screen
 CRAM_PTR       	:= $EA  	; Pointer to current char in color RAM
 
-INBUF  	       	:= $25E         ; BASIC Input buffer
+BASIC_BUF      	:= $200		; Location of command-line
+BASIC_BUF_LEN	= 89		; Maximum length of command-line
+
+FNBUF  	       	:= $25E         ; Buffer for filename 
 CHARCOLOR       := $53B
 FKEY_COUNT     	:= $55D	        ; Characters for function key
 FKEY_SPACE     	:= $55F	        ; Function key definitions

@@ -31,19 +31,19 @@
         stx     TMPPTR
         sty     TMPPTR+1                ; Store pointer to name in TMPPTR
 
-; Copy the given name into INBUF.
+; Copy the given name into FNBUF.
 
         ldy     #$00
 @L2:    lda     (TMPPTR),y
-        sta     INBUF,y
+        sta     FNBUF,y
         iny
         cpy     FNAM_LEN
         bne     @L2
 
 ; Load the new parameters for the low memory buffer
 
-        ldx     #<INBUF
-        ldy     #>INBUF
+        ldx     #<FNBUF
+        ldy     #>FNBUF
 
 ; Instead of banking in the ROM, store the values directly into the zeropage
 

@@ -1782,7 +1782,7 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
 
        	case CF_LONG:
        	    AddCodeLine ("jsr pushax");  	/* Push the address */
-	    push (flags);		    	/* Correct the internal sp */
+       	    push (CF_PTR);		    	/* Correct the internal sp */
 	    g_getind (flags, offs);		/* Fetch the value */
 	    g_inc (flags, val);	   		/* Increment value in primary */
 	    g_putind (flags, offs);		/* Store the value back */
@@ -2011,7 +2011,7 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
 
        	case CF_LONG:
        	    AddCodeLine ("jsr pushax");     	/* Push the address */
-	    push (flags);  			/* Correct the internal sp */
+	    push (CF_PTR);  			/* Correct the internal sp */
 	    g_getind (flags, offs);		/* Fetch the value */
 	    g_dec (flags, val);			/* Increment value in primary */
 	    g_putind (flags, offs);		/* Store the value back */

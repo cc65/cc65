@@ -7,7 +7,7 @@
 
 	.include 	"zeropage.inc"
 
-      	.include 	"em-kernel.inc"
+      	.include     	"em-kernel.inc"
         .include        "em-error.inc"
         .include        "cbm510.inc"
 
@@ -280,10 +280,10 @@ setup:  sta     ptr3
         sta     ptr2+1                  ; Get count into ptr2
 
         ldy     #EM_COPY::BUF+1
-        lda     (ptr1),y
+        lda     (ptr3),y
         tax
         dey
-        lda     (ptr1),y                ; Get the buffer pointer into a/x
+        lda     (ptr3),y                ; Get the buffer pointer into a/x
 
         ldy     #RAMBANK
         sty     IndReg

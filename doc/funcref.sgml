@@ -64,11 +64,12 @@ function.
 
 <sect1><tt/apple2.h/<label id="apple2.h"><p>
 
+(incomplete)
 
-<sect1><tt/atari.h/<label id="atari.h"><p>
 
+<sect1><tt/apple2enh.h/<label id="apple2enh.h"><p>
 
-<sect1><tt/atmos.h/<label id="atmos.h"><p>
+(incomplete)
 
 
 <sect1><tt/assert.h/<label id="assert.h"><p>
@@ -76,6 +77,16 @@ function.
 <itemize>
 <item><ref id="assert" name="assert">
 </itemize>
+
+
+<sect1><tt/atari.h/<label id="atari.h"><p>
+
+(incomplete)
+
+
+<sect1><tt/atmos.h/<label id="atmos.h"><p>
+
+(incomplete)
 
 
 <sect1><tt/c128.h/<label id="c128.h"><p>
@@ -90,8 +101,22 @@ function.
 
 <sect1><tt/c16.h/<label id="c16.h"><p>
 
+(incomplete)
+
 
 <sect1><tt/c64.h/<label id="c64.h"><p>
+
+(incomplete)
+
+
+<sect1><tt/cbm510.h/<label id="cbm510.h"><p>
+
+(incomplete)
+
+
+<sect1><tt/cbm610.h/<label id="cbm610.h"><p>
+
+(incomplete)
 
 
 <sect1><tt/conio.h/<label id="conio.h"><p>
@@ -149,8 +174,12 @@ function.
 
 <sect1><tt/dbg.h/<label id="dbg.h"><p>
 
+(incomplete)
+
 
 <sect1><tt/dio.h/<label id="dio.h"><p>
+
+(incomplete)
 
 
 <sect1><tt/em.h/<label id="em.h"><p>
@@ -169,6 +198,8 @@ function.
 
 <sect1><tt/errno.h/<label id="errno.h"><p>
 
+(incomplete)
+
 
 <sect1><tt/fcntl.h/<label id="fcntl.h"><p>
 
@@ -181,8 +212,12 @@ function.
 
 <sect1><tt/geos.h/<label id="geos.h"><p>
 
+(incomplete)
+
 
 <sect1><tt/joystick.h/<label id="joystick.h"><p>
+
+(incomplete)
 
 
 <sect1><tt/locale.h/<label id="locale.h"><p>
@@ -218,11 +253,20 @@ function.
 <!-- <item><ref id="mouse_ioctl" name="mouse_ioctl"> -->
 <!-- </itemize> -->
 
+(incomplete)
+
 
 <sect1><tt/nes.h/<label id="nes.h"><p>
 
+(incomplete)
+
 
 <sect1><tt/o65.h/<label id="o65.h"><p>
+
+The <tt/o65.h/ header file contains structure and constant definitions that
+may be used when dealing with files in <htmlurl 
+url="http://www.6502.org/users/andre/o65/fileformat.html" name="o65 format">.
+It does not declare any functions.
 
 
 <sect1><tt/peekpoke.h/<label id="peekpoke.h"><p>
@@ -237,8 +281,12 @@ function.
 
 <sect1><tt/pet.h/<label id="pet.h"><p>
 
+(incomplete)
+
 
 <sect1><tt/plus4.h/<label id="plus4.h"><p>
+
+(incomplete)
 
 
 <sect1><tt/serial.h/<label id="serial.h"><p>
@@ -257,6 +305,8 @@ function.
 <item><ref id="ser_ioctl" name="ser_ioctl">
 </itemize>
 -->
+
+(incomplete)
 
 
 <sect1><tt/setjmp.h/<label id="setjmp.h"><p>
@@ -277,8 +327,12 @@ function.
 
 <sect1><tt/stdarg.h/<label id="stdarg.h"><p>
 
+(incomplete)
+
 
 <sect1><tt/stdbool.h/<label id="stdbool.h"><p>
+
+(incomplete)
 
 
 <sect1><tt/stddef.h/<label id="stddef.h"><p>
@@ -332,6 +386,8 @@ function.
 <!-- <item><ref id="vsprintf" name="vsprintf"> -->
 <!-- <item><ref id="vsscanf" name="vsscanf"> -->
 </itemize>
+
+(incomplete)
 
 
 <sect1><tt/stdlib.h/<label id="stdlib.h"><p>
@@ -404,8 +460,12 @@ function.
 <item><ref id="strupr" name="strupr">
 </itemize>
 
+(incomplete)
+
 
 <sect1><tt/tgi.h/<label id="tgi.h"><p>
+
+(incomplete)
 
 
 <sect1><tt/time.h/<label id="time.h"><p>
@@ -422,6 +482,8 @@ function.
 <item><ref id="time" name="time">
 </itemize>
 
+(incomplete)
+
 
 <sect1><tt/unistd.h/<label id="unistd.h"><p>
 
@@ -437,13 +499,17 @@ function.
 <!-- <item><ref id="write" name="write"> -->
 </itemize>
 
+(incomplete)
+
 
 <sect1><tt/vic20.h/<label id="vic20.h"><p>
+
+(incomplete)
 
 
 <sect1><tt/zlib.h/<label id="zlib.h"><p>
 
-
+(incomplete)
 
 
 <sect>Alphabetical function reference<p>

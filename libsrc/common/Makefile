@@ -44,13 +44,14 @@ C_OBJS =	_afailed.o	\
 		sscanf.o	\
 		strxfrm.o	\
 		strtok.o	\
-		vprintf.o
+		vprintf.o       \
+                vsscanf.o
 
 
-S_OBJS = 	_fdesc.o	\
-	 	_file.o 	\
-	 	_hadd.o		\
-	 	_heap.o		\
+S_OBJS = 	_fdesc.o 	\
+	 	_file.o  	\
+	 	_hadd.o	 	\
+	 	_heap.o	 	\
 	 	_oserror.o	\
 		_printf.o	\
 		_swap.o		\
@@ -119,7 +120,6 @@ S_OBJS = 	_fdesc.o	\
 		vcprintf.o	\
 		vfprintf.o	\
 		vsprintf.o	\
-                vsscanf.o       \
 		zerobss.o
 
 

@@ -753,7 +753,7 @@ enum {
     PP_LINE,
     PP_PRAGMA,
     PP_UNDEF,
-    PP_ILLEGAL,
+    PP_ILLEGAL
 };
 
 static const struct tok_elt pre_toks[] = {

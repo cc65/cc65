@@ -167,7 +167,7 @@ const char* GetLiteral (unsigned Offs)
 /* Get a pointer to the literal with the given offset in the pool */
 {
     CHECK (Offs < LiteralOffs);
-    return &LiteralPool[Offs];
+    return (const char*) &LiteralPool[Offs];
 }
 
 

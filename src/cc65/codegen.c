@@ -2491,7 +2491,7 @@ void g_add (unsigned flags, unsigned long val)
     };
 
     if (flags & CF_CONST) {
-    	flags &= ~CF_FORCECHAR;	// Handle chars as ints
+    	flags &= ~CF_FORCECHAR;	/* Handle chars as ints */
      	g_push (flags & ~CF_CONST, 0);
     }
     oper (flags, val, ops);
@@ -2510,7 +2510,7 @@ void g_sub (unsigned flags, unsigned long val)
     };
 
     if (flags & CF_CONST) {
-    	flags &= ~CF_FORCECHAR;	// Handle chars as ints
+    	flags &= ~CF_FORCECHAR;	/* Handle chars as ints */
      	g_push (flags & ~CF_CONST, 0);
     }
     oper (flags, val, ops);
@@ -2552,7 +2552,7 @@ void g_mul (unsigned flags, unsigned long val)
     }
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.
+     * in the primary register.				  
      */
     if (flags & CF_CONST) {
 
@@ -2603,7 +2603,7 @@ void g_mul (unsigned flags, unsigned long val)
 	/* If we go here, we didn't emit code. Push the lhs on stack and fall
 	 * into the normal, non-optimized stuff.
 	 */
-    	flags &= ~CF_FORCECHAR;	// Handle chars as ints
+    	flags &= ~CF_FORCECHAR;	/* Handle chars as ints */
      	g_push (flags & ~CF_CONST, 0);
 
     }
@@ -2633,7 +2633,7 @@ void g_div (unsigned flags, unsigned long val)
 	/* Generate a division */
 	if (flags & CF_CONST) {
 	    /* lhs is not on stack */
-    	    flags &= ~CF_FORCECHAR;	// Handle chars as ints
+    	    flags &= ~CF_FORCECHAR;	/* Handle chars as ints */
 	    g_push (flags & ~CF_CONST, 0);
      	}
 	oper (flags, val, ops);
@@ -2661,7 +2661,7 @@ void g_mod (unsigned flags, unsigned long val)
       	/* Do it the hard way... */
      	if (flags & CF_CONST) {
      	    /* lhs is not on stack */
-    	    flags &= ~CF_FORCECHAR;	// Handle chars as ints
+    	    flags &= ~CF_FORCECHAR;	/* Handle chars as ints */
      	    g_push (flags & ~CF_CONST, 0);
      	}
       	oper (flags, val, ops);

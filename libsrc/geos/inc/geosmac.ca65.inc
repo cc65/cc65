@@ -165,14 +165,14 @@ Skip:
 	.macro		rmb bitNumber, dest
 	pha
 	lda #(1 << bitNumber) ^ $ff 
-	ora dest
+	and dest
 	sta dest
 	pla
 	.endmacro
 
 	.macro		rmbf bitNumber, dest
 	lda #(1 << bitNumber) ^ $ff
-	ora dest
+	and dest
 	sta dest
 	.endmacro
 

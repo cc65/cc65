@@ -1135,6 +1135,7 @@ static char* RegInfoDesc (unsigned U, char* Buf)
     strcat (Buf, U & REG_PTR1?    "1" : "_");
     strcat (Buf, U & REG_PTR2?    "2" : "_");
     strcat (Buf, U & REG_SAVE?    "V"  : "_");
+    strcat (Buf, U & REG_SP?      "S" : "_");
 
     return Buf;
 }

@@ -53,6 +53,11 @@ machines, you have to install at least one of the library packages.
 %attr(755,root,root) %dir	/usr/lib/cc65/tgi
 %attr(755,root,root) %dir	/usr/lib/cc65/include
 %attr(644,root,root)   		/usr/lib/cc65/include/*.h
+%attr(755,root,root) %dir	/usr/lib/cc65/include/em
+%attr(644,root,root)   		/usr/lib/cc65/include/em/*.h
+%attr(755,root,root) %dir	/usr/lib/cc65/include/joystick
+%attr(644,root,root)   		/usr/lib/cc65/include/joystick/*.h
+%attr(755,root,root) %dir	/usr/lib/cc65/include/sys
 %attr(644,root,root)   		/usr/lib/cc65/include/sys/*.h
 %attr(755,root,root) %dir	/usr/lib/cc65/include/tgi
 %attr(644,root,root)   		/usr/lib/cc65/include/tgi/*.h
@@ -233,6 +238,8 @@ crosscompiler.
 %files cbm510
 %attr(644,root,root)   		/usr/lib/cc65/lib/cbm510.lib
 %attr(644,root,root)   		/usr/lib/cc65/lib/cbm510.o
+%attr(644,root,root) 		/usr/lib/cc65/emd/cbm510-*.emd
+%attr(644,root,root) 		/usr/lib/cc65/joy/cbm510-*.joy
 
 
 
@@ -254,6 +261,7 @@ the cc65 crosscompiler.
 %files cbm610
 %attr(644,root,root)   		/usr/lib/cc65/lib/cbm610.lib
 %attr(644,root,root)   		/usr/lib/cc65/lib/cbm610.o
+%attr(644,root,root) 		/usr/lib/cc65/emd/cbm610-*.emd
 
 
 
@@ -277,7 +285,10 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 %attr(644,root,root)		/usr/lib/cc65/lib/geos.o
 %attr(755,root,root) %dir	/usr/lib/cc65/include/geos
 %attr(644,root,root)   		/usr/lib/cc65/include/geos/*.h
-
+%attr(644,root,root) 		/usr/lib/cc65/emd/geos-*.emd
+%attr(644,root,root) 		/usr/lib/cc65/joy/geos-*.joy
+%attr(644,root,root) 		/usr/lib/cc65/tgi/geos-*.tgi
+						      
 
 
 ###############################################################################
@@ -440,6 +451,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Nov 02 2003 Ullrich von Bassewitz <uz@cc65.org>
+- Added missing files after upgrade to rpm 4.2
+
 * Sun Oct 19 2003 Ullrich von Bassewitz <uz@cc65.org>
 - Move documentation into a separate doc package.
 

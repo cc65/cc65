@@ -50,8 +50,11 @@
 #include "chippath.h"
 #include "cpucore.h"
 #include "cputype.h"
+#include "error.h"
 #include "global.h"
 #include "memory.h"
+#include "scanner.h"
+
 
 
 /*****************************************************************************/
@@ -65,18 +68,30 @@ static void Usage (void)
     fprintf (stderr,
 	     "Usage: %s [options] file\n"
 	     "Short options:\n"
+       	     "  -C name\t\tUse simulator config file\n"
+             "  -L dir\t\tSet a chip directory search path\n"
        	     "  -V\t\t\tPrint the simulator version number\n"
        	     "  -d\t\t\tDebug mode\n"
        	     "  -h\t\t\tHelp (this text)\n"
        	     "  -v\t\t\tIncrease verbosity\n"
-	     "\n"
-	     "Long options:\n"
+  	     "\n"
+  	     "Long options:\n"
+             "  --chipdir dir\t\tSet a chip directory search path\n"
+       	     "  --config name\t\tUse simulator config file\n"
        	     "  --cpu type\t\tSet cpu type\n"
        	     "  --debug\t\tDebug mode\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --verbose\t\tIncrease verbosity\n"
        	     "  --version\t\tPrint the simulator version number\n",
 	     ProgName);
+}
+
+
+
+static void OptChipDir (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --chipdir option */
+{
+    AddChipPath (Arg);
 }
 
 
@@ -95,8 +110,19 @@ static void OptCPU (const char* Opt, const char* Arg)
 
 
 
+static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
+/* Define the config file */
+{
+    if (CfgAvail ()) {
+	Error ("Cannot use -C twice");
+    }
+    CfgSetName (Arg);
+}
+
+
+
 static void OptDebug (const char* Opt attribute ((unused)),
-		      const char* Arg attribute ((unused)))
+	   	      const char* Arg attribute ((unused)))
 /* Simulator debug mode */
 {
     Debug = 1;
@@ -128,7 +154,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the assembler version */
 {
     fprintf (stderr,
-       	     "cc65 V%u.%u.%u\n",
+       	     "sim65 V%u.%u.%u\n", 
        	     VER_MAJOR, VER_MINOR, VER_PATCH);
 }
 
@@ -138,9 +164,11 @@ int main (int argc, char* argv[])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
+       	{ "--chipdir", 	       	1,     	OptChipDir    	    	},
+       	{ "--config",  	       	1,     	OptConfig    	    	},
         { "--cpu",     	       	1, 	OptCPU 	     		},
        	{ "--debug",           	0,     	OptDebug     		},
-	{ "--help",	 	0, 	OptHelp	     		},
+	{ "--help", 	 	0, 	OptHelp	     		},
 	{ "--verbose",	       	0, 	OptVerbose   	       	},
 	{ "--version",	       	0,	OptVersion   	       	},
     };
@@ -173,13 +201,21 @@ int main (int argc, char* argv[])
 		    OptDebug (Arg, 0);
 		    break;
 
-		case 'h':
+  		case 'h':
 		case '?':
 	       	    OptHelp (Arg, 0);
 		    break;
 
 		case 'v':
 		    OptVerbose (Arg, 0);
+		    break;
+
+		case 'C':
+		    OptConfig (Arg, GetArg (&I, 2));
+		    break;
+
+		case 'L':
+		    OptChipDir (Arg, GetArg (&I, 2));
 		    break;
 
        	       	case 'V':
@@ -201,6 +237,14 @@ int main (int argc, char* argv[])
 	/* Next argument */
 	++I;
     }
+
+    /* Check if we have a valid configuration */
+    if (!CfgAvail ()) {
+       	Error ("Simulator configuration missing");
+    }
+
+    /* Read the config file */
+//    CfgRead ();
 
     /* Initialize modules */
     AddChipPath ("chips");

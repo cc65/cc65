@@ -91,6 +91,7 @@ static void Usage (void)
        	     "  -h\t\t\tHelp (this text)\n"
        	     "  -j\t\t\tDefault characters are signed\n"
        	     "  -o name\t\tName the output file\n"
+             "  -r\t\t\tEnable register variables\n"
        	     "  -t sys\t\tSet the target system\n"
        	     "  -v\t\t\tIncrease verbosity\n"
 	     "\n"
@@ -112,6 +113,7 @@ static void Usage (void)
 	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
 	     "  --list-opt-steps\tList all optimizer steps and exit\n"
+             "  --register-vars\tEnable register variables\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
        	     "  --signed-chars\tDefault characters are signed\n"
        	     "  --static-locals\tMake local variables static\n"
@@ -528,6 +530,15 @@ static void OptListOptSteps (const char* Opt attribute ((unused)),
 
 
 
+static void OptRegisterVars (const char* Opt attribute ((unused)), 
+                             const char* Arg attribute ((unused)))
+/* Handle the --register-vars option */
+{
+    EnableRegVars = 1;
+}
+
+
+
 static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --rodata-name option */
 {
@@ -607,10 +618,11 @@ int main (int argc, char* argv[])
 	{ "--help",	 	0, 	OptHelp	     		},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
 	{ "--list-opt-steps",   0,      OptListOptSteps         },
+        { "--register-vars",    0,      OptRegisterVars         },
 	{ "--rodata-name",	1, 	OptRodataName		},
 	{ "--signed-chars",	0, 	OptSignedChars	       	},
        	{ "--static-locals",   	0, 	OptStaticLocals	       	},
-	{ "--target",	 	1,  	OptTarget    	       	},
+	{ "--target",	  	1,  	OptTarget    	       	},
 	{ "--verbose",	       	0, 	OptVerbose   	       	},
 	{ "--version",	       	0,	OptVersion   	       	},
     };
@@ -666,6 +678,10 @@ int main (int argc, char* argv[])
 		    OutputFile = GetArg (&I, 2);
 		    break;
 
+                case 'r':
+                    OptRegisterVars (Arg, 0);
+                    break;
+
 		case 't':
 		    OptTarget (Arg, GetArg (&I, 2));
 		    break;
@@ -690,8 +706,8 @@ int main (int argc, char* argv[])
 		    	     	OptStaticLocals (Arg, 0);
 		    	     	break;
 		  	    default:
-		  		UnknownOption (Arg);
-		  		break;
+		  	  	UnknownOption (Arg);
+		  	  	break;
 		    	}
 		    }
 		    break;

@@ -40,6 +40,9 @@
 
 #include <stdio.h>
 
+/* common */
+#include "inline.h"
+
 /* cc65 */
 #include "datatype.h"
 
@@ -81,7 +84,7 @@ struct Segments;
 
 #define SC_TYPE	       	0x4000U	/* This is a type, struct, typedef, etc. */
 #define SC_STRUCT      	0x4001U	/* Struct or union */
-#define SC_SFLD	       	0x4002U	/* Struct or union field */
+#define SC_STRUCTFIELD  0x4002U	/* Struct or union field */
 #define SC_TYPEDEF     	0x4003U	/* A typedef */
 
 #define SC_ZEROPAGE  	0x8000U	/* Symbol marked as zeropage */
@@ -103,13 +106,21 @@ struct SymEntry {
     /* Data that differs for the different symbol types */
     union {
 
-	/* Offset for locals or struct members */
-	int    			Offs;
+       	/* Offset for locals or struct members */
+       	int    			Offs;
 
-	/* Label name for static symbols */
-	unsigned		Label;
+       	/* Label name for static symbols */
+       	unsigned		Label;
 
-	/* Value for constants (including enums) */
+        /* Register bank offset and offset of the saved copy on stack for
+         * register variables.
+         */
+        struct {
+            int                 RegOffs;
+            int                 SaveOffs;
+        } R;
+
+       	/* Value for constants (including enums) */
        	long			ConstVal;
 
 	/* Data for structs/unions */
@@ -145,8 +156,35 @@ void FreeSymEntry (SymEntry* E);
 void DumpSymEntry (FILE* F, const SymEntry* E);
 /* Dump the given symbol table entry to the file in readable form */
 
-int IsTypeDef (const SymEntry* E);
+#if defined(HAVE_INLINE)
+INLINE int SymIsTypeDef (const SymEntry* Sym)
 /* Return true if the given entry is a typedef entry */
+{
+    return ((Sym->Flags & SC_TYPEDEF) == SC_TYPEDEF);
+}
+#else
+#  define SymIsTypeDef(Sym)     (((Sym)->Flags & SC_TYPEDEF) == SC_TYPEDEF)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int SymIsDef (const SymEntry* Sym)
+/* Return true if the given entry is defined */
+{
+    return ((Sym->Flags & SC_DEF) == SC_DEF);
+}
+#else
+#  define SymIsDef(Sym)     (((Sym)->Flags & SC_DEF) == SC_DEF)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int SymIsRef (const SymEntry* Sym)
+/* Return true if the given entry is referenced */
+{
+    return ((Sym->Flags & SC_REF) == SC_REF);
+}
+#else
+#  define SymIsRef(Sym)     (((Sym)->Flags & SC_REF) == SC_REF)
+#endif
 
 void ChangeSymType (SymEntry* Entry, type* Type);
 /* Change the type of the given symbol */

@@ -297,8 +297,11 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 	    Declaration Decl;
 	    ParseDecl (&Spec, &Decl, 0);
 
+            /* Get the offset of this field */
+            Offs = (StructType == T_STRUCT)? Size : 0;
+
 	    /* Add a field entry to the table */
-	    AddLocalSym (Decl.Ident, Decl.Type, SC_SFLD, (StructType == T_STRUCT)? Size : 0);
+	    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, Offs);
 
 	    /* Calculate offset of next field/size of the union */
     	    Offs = CheckedSizeOf (Decl.Type);
@@ -516,7 +519,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 
         case TOK_IDENT:
 	    Entry = FindSym (CurTok.Ident);
-	    if (Entry && IsTypeDef (Entry)) {
+	    if (Entry && SymIsTypeDef (Entry)) {
        	       	/* It's a typedef */
     	      	NextToken ();
 		TypeCpy (D->Type, Entry->Type);
@@ -746,7 +749,7 @@ static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
 	 * if it's some other identifier, it's an old style parameter list.
 	 */
 	Sym = FindSym (CurTok.Ident);
-	if (Sym == 0 || !IsTypeDef (Sym)) {
+	if (Sym == 0 || !SymIsTypeDef (Sym)) {
 	    /* Old style (K&R) function. Assume variable param list. */
 	    F->Flags |= (FD_OLDSTYLE | FD_VARIADIC);
 

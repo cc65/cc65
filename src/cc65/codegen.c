@@ -134,7 +134,7 @@ static const char* GetLabelName (unsigned Flags, unsigned long Label, long Offs)
 	default:
 	    Internal ("Invalid address flags");
     }
-
+                   
     /* Return a pointer to the static buffer */
     return Buf;
 }
@@ -3977,6 +3977,21 @@ void g_zerobytes (unsigned n)
 /* Output n bytes of data initialized with zero */
 {
     AddDataLine ("\t.res\t%u,$00", n);
+}
+
+
+
+void g_initregister (unsigned Label, unsigned Reg, unsigned Size)
+/* Initialize a register variable from static initialization data */
+{
+    /* Register variables do always have less than 128 bytes */
+    unsigned CodeLabel = GetLocalLabel ();
+    ldxconst (Size-1);
+    g_defcodelabel (CodeLabel);
+    AddCodeLine ("lda %s,x", GetLabelName (CF_STATIC, Label, 0));
+    AddCodeLine ("sta %s,x", GetLabelName (CF_REGVAR, Reg, 0));
+    AddCodeLine ("dex");
+    AddCodeLine ("bpl %s", LocalLabelName (CodeLabel));
 }
 
 

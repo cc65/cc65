@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -97,6 +97,25 @@ unsigned OptAdd2 (CodeSeg* S);
  */
 
 unsigned OptAdd3 (CodeSeg* S);
+/* Search for the sequence
+ *
+ *  	jsr     pushax
+ *      lda     xxx
+ *  	ldy     yyy
+ *      jsr     tosaddax
+ *
+ * and replace it by
+ *
+ *      clc
+ *      adc     xxx
+ *      pha
+ *      txa
+ *      adc     yyy
+ *      tax
+ *      pla
+ */                           
+
+unsigned OptAdd4 (CodeSeg* S);
 /* Search for the sequence
  *
  *  	adc     ...

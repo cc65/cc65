@@ -94,22 +94,22 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     	unsigned       	    Val;
     } Flags [] = {
 	/* Beware: Order is important! */
-      	{ "SC_TYPEDEF",	    SC_TYPEDEF	},
-      	{ "SC_SFLD",   	    SC_SFLD	},
-      	{ "SC_STRUCT", 	    SC_STRUCT	},
-    	{ "SC_AUTO",   	    SC_AUTO	},
-    	{ "SC_REGISTER",    SC_REGISTER	},
-    	{ "SC_STATIC",      SC_STATIC	},
-    	{ "SC_EXTERN", 	    SC_EXTERN	},
-    	{ "SC_ENUM",   	    SC_ENUM	},
-	{ "SC_CONST",  	    SC_CONST	},
-    	{ "SC_LABEL",	    SC_LABEL	},
-    	{ "SC_PARAM",	    SC_PARAM	},
-	{ "SC_FUNC",	    SC_FUNC	},
-    	{ "SC_STORAGE",	    SC_STORAGE 	},
-    	{ "SC_DEF",	    SC_DEF	},
-    	{ "SC_REF",	    SC_REF	},
-      	{ "SC_ZEROPAGE",    SC_ZEROPAGE	},
+      	{ "SC_TYPEDEF",	    SC_TYPEDEF	        },
+       	{ "SC_STRUCTFIELD", SC_STRUCTFIELD	},
+      	{ "SC_STRUCT", 	    SC_STRUCT	        },
+    	{ "SC_AUTO",   	    SC_AUTO	        },
+    	{ "SC_REGISTER",    SC_REGISTER	        },
+    	{ "SC_STATIC",      SC_STATIC	        },
+    	{ "SC_EXTERN", 	    SC_EXTERN	        },
+    	{ "SC_ENUM",   	    SC_ENUM	        },
+	{ "SC_CONST",  	    SC_CONST	        },
+    	{ "SC_LABEL",	    SC_LABEL	        },
+    	{ "SC_PARAM",	    SC_PARAM	        },
+	{ "SC_FUNC",	    SC_FUNC	        },
+    	{ "SC_STORAGE",	    SC_STORAGE 	        },
+    	{ "SC_DEF",	    SC_DEF	        },
+    	{ "SC_REF",	    SC_REF	        },
+      	{ "SC_ZEROPAGE",    SC_ZEROPAGE	        },
     };
 
     unsigned I;
@@ -145,14 +145,6 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
      	fprintf (F, "(none)");
     }
     fprintf (F, "\n");
-}
-
-
-
-int IsTypeDef (const SymEntry* E)
-/* Return true if the given entry is a typedef entry */
-{
-    return ((E->Flags & SC_TYPEDEF) == SC_TYPEDEF);
 }
 
 

@@ -42,6 +42,7 @@
 
 /* common */
 #include "attrib.h"
+#include "inline.h"
 
 /* cc65 */
 #include "funcdesc.h"

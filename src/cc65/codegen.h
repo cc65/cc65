@@ -432,6 +432,9 @@ void g_defbytes (const void* bytes, unsigned count);
 void g_zerobytes (unsigned n);
 /* Output n bytes of data initialized with zero */
 
+void g_initregister (unsigned Label, unsigned Reg, unsigned Size);
+/* Initialize a register variable from static initialization data */
+
 void g_initauto (unsigned Label, unsigned Size);
 /* Initialize a local variable at stack offset zero from static data */
 

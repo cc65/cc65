@@ -163,7 +163,7 @@ static void CheckSymTable (SymTable* Tab)
 	     * defined but not used.
 	     */
 	    if (((Flags & SC_AUTO) || (Flags & SC_STATIC)) && (Flags & SC_EXTERN) == 0) {
-		if ((Flags & SC_DEF) && !(Flags & SC_REF)) {
+		if (SymIsDef (Entry) && !SymIsRef (Entry)) {
 		    if (Flags & SC_PARAM) {
 			Warning ("Parameter `%s' is never used", Entry->Name);
 		    } else {
@@ -174,10 +174,10 @@ static void CheckSymTable (SymTable* Tab)
 
 	    /* If the entry is a label, check if it was defined in the function */
 	    if (Flags & SC_LABEL) {
-		if ((Flags & SC_DEF) == 0) {
+		if (!SymIsDef (Entry)) {
 		    /* Undefined label */
 		    Error ("Undefined label: `%s'", Entry->Name);
-		} else if ((Flags & SC_REF) == 0) {
+		} else if (!SymIsRef (Entry)) {
 		    /* Defined but not used */
 		    Warning ("`%s' is defined but never used", Entry->Name);
 		}
@@ -614,7 +614,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
     SymEntry* Entry = FindSymInTable (LabelTab, Name, HashStr (Name));
     if (Entry) {
 
-     	if ((Entry->Flags & SC_DEF) != 0 && (Flags & SC_DEF) != 0) {
+     	if (SymIsDef (Entry) && (Flags & SC_DEF) != 0) {
      	    /* Trying to define the label more than once */
        	    Error ("Label `%s' is defined more than once", Name);
      	}
@@ -656,7 +656,18 @@ SymEntry* AddLocalSym (const char* Name, const type* Type, unsigned Flags, int O
 
      	/* Set the symbol attributes */
      	Entry->Type   = TypeDup (Type);
-	Entry->V.Offs = Offs;
+        if ((Flags & SC_AUTO) == SC_AUTO) {
+            Entry->V.Offs = Offs;
+        } else if ((Flags & SC_REGISTER) == SC_REGISTER) {
+            Entry->V.R.RegOffs  = Offs;
+            Entry->V.R.SaveOffs = oursp;        /* ### Cleaner! */
+        } else if ((Flags & SC_STATIC) == SC_STATIC) {
+            Entry->V.Label = Offs;
+        } else if ((Flags & SC_STRUCTFIELD) == SC_STRUCTFIELD) {
+            Entry->V.Offs = Offs;
+        } else {
+            Internal ("Invalid flags in AddLocalSym: %04X", Flags);
+        }
 
      	/* Add the entry to the symbol table */
      	AddSymEntry (SymTab, Entry);
@@ -856,10 +867,10 @@ void EmitExternals (void)
 	unsigned Flags = Entry->Flags;
        	if (Flags & SC_EXTERN) {
      	    /* Only defined or referenced externs */
-     	    if ((Flags & SC_REF) != 0 && (Flags & SC_DEF) == 0) {
+     	    if (SymIsRef (Entry) && !SymIsDef (Entry)) {
      		/* An import */
      		g_defimport (Entry->Name, Flags & SC_ZEROPAGE);
-     	    } else if (Flags & SC_DEF) {
+     	    } else if (SymIsDef (Entry)) {
      		/* An export */
      		g_defexport (Entry->Name, Flags & SC_ZEROPAGE);
      	    }

@@ -183,7 +183,7 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
     }
     flags = g_typeadjust (ltype, rtype);
 
-    /* Set the type of the result */
+    /* Set the type of the result */            
     lhs->Type = promoteint (lhst, rhst);
 
     /* Return the code generator flags */
@@ -437,7 +437,7 @@ static int istypeexpr (void)
 	   (NextTok.Tok == TOK_CONST)                           	 ||
        	   (NextTok.Tok  == TOK_IDENT 			      	         &&
 	   (Entry = FindSym (NextTok.Ident)) != 0  		         &&
-	   IsTypeDef (Entry)));
+	   SymIsTypeDef (Entry)));
 }
 
 
@@ -941,7 +941,7 @@ static int primary (ExprDesc* lval)
 	    } else if ((Sym->Flags & SC_REGISTER) == SC_REGISTER) {
 	    	/* Register variable, zero page based */
 	    	lval->Flags = E_MGLOBAL | E_MCONST | E_TREGISTER;
-	    	lval->Name  = Sym->V.Offs;
+	    	lval->Name  = Sym->V.R.RegOffs;
 	    	lval->ConstVal = 0;
 	    } else if ((Sym->Flags & SC_STATIC) == SC_STATIC) {
 	    	/* Static variable */

@@ -72,7 +72,7 @@ void MoveCode (CodeMark Start, CodeMark End, CodeMark Target)
 /* Move the code between Start (inclusive) and End (exclusive) to
  * (before) Target.
  */
-{					
+{
     CS_MoveEntries (CS->Code, Start, End - Start, Target);
 }
 
@@ -93,7 +93,7 @@ void WriteOutput (FILE* F)
     Entry  = SymTab->SymHead;
     while (Entry) {
        	if (IsTypeFunc (Entry->Type) 	  	&&
-       	    (Entry->Flags & SC_DEF) != 0  	&&
+       	    SymIsDef (Entry)   	                &&
        	    (Entry->Flags & (SC_REF | SC_EXTERN)) != 0) {
        	    /* Function which is defined and referenced or extern */
        	    CS_MergeLabels (Entry->V.F.Seg->Code);

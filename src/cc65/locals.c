@@ -101,34 +101,121 @@ void DoneRegVars (void)
 
 
 
-static int AllocRegVar (const SymEntry* Sym, const type* tarray)
-/* Allocate a register variable with the given amount of storage. If the
- * allocation was successful, return the offset of the register variable in
- * the register bank (zero page storage). If there is no register space left,
- * return -1.
+static int AllocRegVar (const type* Type)
+/* Allocate a register variable for the given variable type. If the allocation
+ * was successful, return the offset of the register variable in the register
+ * bank (zero page storage). If there is no register space left, return -1.
  */
 {
     /* Maybe register variables are disabled... */
     if (EnableRegVars) {
 
 	/* Get the size of the variable */
-	unsigned Size = CheckedSizeOf (tarray);
+	unsigned Size = CheckedSizeOf (Type);
 
 	/* Do we have space left? */
 	if (RegOffs >= Size) {
-
 	    /* Space left. We allocate the variables from high to low addresses,
 	     * so the adressing is compatible with the saved values on stack.
 	     * This allows shorter code when saving/restoring the variables.
 	     */
 	    RegOffs -= Size;
-	    RegSyms [RegSymCount++] = Sym;
 	    return RegOffs;
 	}
     }
 
     /* No space left or no allocation */
     return -1;
+}
+
+
+
+static void RememberRegVar (const SymEntry* Sym)
+/* Remember the given register variable */
+{
+    RegSyms[RegSymCount++] = Sym;
+}
+
+
+
+static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
+/* Parse the declaration of a register variable. The function returns the
+ * symbol data, which is the offset of the variable in the register bank.
+ */
+{
+    unsigned Flags;
+    unsigned InitLabel;
+
+    /* Determine if this is a compound variable */
+    int IsCompound = IsClassStruct (Decl->Type) || IsTypeArray (Decl->Type);
+
+    /* Get the size of the variable */
+    unsigned Size = SizeOf (Decl->Type);
+
+    /* Save the current contents of the register variable on stack */
+    F_AllocLocalSpace (CurrentFunc);
+    g_save_regvars (Reg, Size);
+
+    /* Check for an optional initialization */
+    if (CurTok.Tok == TOK_ASSIGN) {
+
+        ExprDesc lval;
+
+        /* Skip the '=' */
+        NextToken ();
+
+        /* Special handling for compound types */
+        if (IsCompound) {
+
+            /* Switch to read only data */
+            g_userodata ();
+
+            /* Define a label for the initialization data */
+            InitLabel = GetLocalLabel ();
+            g_defdatalabel (InitLabel);
+
+            /* Parse the initialization generating a memory image of the
+             * data in the RODATA segment.
+             */
+            ParseInit (Decl->Type);
+
+            /* Generate code to copy this data into the variable space */
+            g_initregister (InitLabel, Reg, Size);
+
+        } else {
+
+            /* Setup the type flags for the assignment */
+            Flags = CF_REGVAR;
+            if (Size == SIZEOF_CHAR) {
+                Flags |= CF_FORCECHAR;
+            }
+
+            /* Get the expression into the primary */
+            if (evalexpr (Flags, hie1, &lval) == 0) {
+                /* Constant expression. Adjust the types */
+                assignadjust (Decl->Type, &lval);
+                Flags |= CF_CONST;
+            } else {
+                /* Expression is not constant and in the primary */
+                assignadjust (Decl->Type, &lval);
+            }
+
+            /* Store the value into the variable */
+            g_putstatic (Flags | TypeOf (Decl->Type), Reg, 0);
+
+        }
+
+        /* Mark the variable as referenced */
+        *SC |= SC_REF;
+    }
+
+    /* Cannot allocate a variable of zero size */
+    if (Size == 0) {
+        Error ("Variable `%s' has unknown size", Decl->Ident);
+    }
+
+    /* Return the symbol data */
+    return Reg;
 }
 
 
@@ -152,8 +239,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
     /* Check if this is a variable on the stack or in static memory */
     if (StaticLocals == 0) {
 
-        /* Change SC in case it was register */
-        *SC = (*SC & ~SC_REGISTER) | SC_AUTO;
+        /* Check for an optional initialization */
         if (CurTok.Tok == TOK_ASSIGN) {
 
             ExprDesc lval;
@@ -226,7 +312,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
     } else {
 
         /* Static local variables. */
-        *SC = (*SC & ~(SC_REGISTER | SC_AUTO)) | SC_STATIC;
+        *SC = (*SC & ~SC_AUTO) | SC_STATIC;
 
         /* Put them into the BSS */
         g_usebss ();
@@ -369,7 +455,9 @@ static void ParseOneDecl (const DeclSpec* Spec)
 {
     unsigned    SC;      	/* Storage class for symbol */
     unsigned    SymData = 0;    /* Symbol data (offset, label name, ...) */
-    Declaration Decl;		/* Declaration data structure */
+    Declaration Decl;	       	/* Declaration data structure */
+    SymEntry*   Sym;            /* Symbol declared */
+
 
     /* Remember the storage class for the new symbol */
     SC = Spec->StorageClass;
@@ -391,33 +479,48 @@ static void ParseOneDecl (const DeclSpec* Spec)
      * To avoid problems later, use an anonymous name here.
      */
     if (Decl.Ident[0] == '\0') {
-	AnonName (Decl.Ident, "param");
+       	AnonName (Decl.Ident, "param");
     }
 
     /* Handle anything that needs storage (no functions, no typdefs) */
     if ((SC & SC_FUNC) != SC_FUNC && (SC & SC_TYPEDEF) != SC_TYPEDEF) {
 
-        /* */
-       	if (SC & (SC_AUTO | SC_REGISTER)) {
+        /* If we have a register variable, try to allocate a register and
+         * convert the declaration to "auto" if this is not possible.
+         */
+        int Reg = 0;    /* Initialize to avoid gcc complains */
+        if ((SC & SC_REGISTER) != 0 && (Reg = AllocRegVar (Decl.Type)) < 0) {
+            /* No space for this register variable, convert to auto */
+            SC = (SC & ~SC_REGISTER) | SC_AUTO;
+        }
 
+        /* Check the variable type */
+        if (SC & SC_REGISTER) {
+            /* Register variable */
+            SymData = ParseRegisterDecl (&Decl, &SC, Reg);
+       	} else if (SC & SC_AUTO) {
             /* Auto variable */
             SymData = ParseAutoDecl (&Decl, &SC);
-
-	} else if ((SC & SC_STATIC) == SC_STATIC) {
-
+       	} else if (SC & SC_STATIC) {
             /* Static variable */
             SymData = ParseStaticDecl (&Decl, &SC);
-
-       	}
+       	} else {
+            Internal ("Invalid storage class in ParseOneDecl: %04X", SC);
+        }
     }
 
-    /* If the symbol is not marked as external, it will be defined */
+    /* If the symbol is not marked as external, it will be defined now */
     if ((SC & SC_EXTERN) == 0) {
-    	SC |= SC_DEF;
+       	SC |= SC_DEF;
     }
 
     /* Add the symbol to the symbol table */
-    AddLocalSym (Decl.Ident, Decl.Type, SC, SymData);
+    Sym = AddLocalSym (Decl.Ident, Decl.Type, SC, SymData);
+
+    /* If we had declared a register variable, remember it now */
+    if (SC & SC_REGISTER) {
+        RememberRegVar (Sym);
+    }
 }
 
 
@@ -510,8 +613,8 @@ void RestoreRegVars (int HaveResult)
     while (I < RegSymCount) {
 
 	/* Check for more than one variable */
-       	const SymEntry* Sym = RegSyms[I];
-	Offs  = Sym->V.Offs;
+       	const SymEntry* Sym = RegSyms[I];    
+	Offs  = Sym->V.R.SaveOffs;
 	Bytes = CheckedSizeOf (Sym->Type);
 	J = I+1;
 
@@ -524,7 +627,7 @@ void RestoreRegVars (int HaveResult)
 	    int Size = CheckedSizeOf (NextSym->Type);
 
 	    /* Adjacent variable? */
-	    if (NextSym->V.Offs + Size != Offs) {
+	    if (NextSym->V.R.SaveOffs + Size != Offs) {
 	      	/* No */
 	      	break;
 	    }
@@ -537,7 +640,7 @@ void RestoreRegVars (int HaveResult)
 	}
 
 	/* Restore the memory range */
-       	g_restore_regvars (Offs, Sym->V.Offs, Bytes);
+       	g_restore_regvars (Offs, Sym->V.R.RegOffs, Bytes);
 
 	/* Next round */
 	I = J;

@@ -286,6 +286,95 @@ unsigned OptAdd2 (CodeSeg* S)
 unsigned OptAdd3 (CodeSeg* S)
 /* Search for the sequence
  *
+ *  	jsr     pushax
+ *      lda     xxx
+ *  	ldy     yyy
+ *      jsr     tosaddax
+ *
+ * and replace it by
+ *
+ *      clc
+ *      adc     xxx
+ *      pha
+ *      txa
+ *      adc     yyy
+ *      tax
+ *      pla
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[4];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+        if (CE_IsCallTo (L[0], "pushax")                        &&
+       	    CS_GetEntries (S, L+1, I+1, 3)                      &&
+            !CS_RangeHasLabel (S, I+1, 3)                       &&
+            L[1]->OPC == OP65_LDA                               &&
+            (L[1]->AM == AM65_ABS || L[1]->AM == AM65_ZP)       &&
+            L[2]->OPC == OP65_LDX                               &&
+            (L[2]->AM == AM65_ABS || L[2]->AM == AM65_ZP)       &&
+            CE_IsCallTo (L[3], "tosaddax")) {
+
+            CodeEntry* X;
+
+            /* Insert new code behind the sequence */
+	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+4);
+
+            /* adc xxx */
+	    X = NewCodeEntry (OP65_ADC, L[1]->AM, L[1]->Arg, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+5);
+
+            /* pha */
+	    X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+6);
+
+            /* txa */
+	    X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+7);
+
+            /* adc yyy */
+	    X = NewCodeEntry (OP65_ADC, L[2]->AM, L[2]->Arg, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+8);
+
+            /* tax */
+	    X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+9);
+
+            /* pla */
+	    X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+10);
+
+	    /* Delete the old code */
+	    CS_DelEntries (S, I, 4);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptAdd4 (CodeSeg* S)
+/* Search for the sequence
+ *
  *  	adc     ...
  *      bcc     L
  *  	inx
@@ -306,7 +395,7 @@ unsigned OptAdd3 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OP65_ADC 	  	     	             &&
+       	if (E->OPC == OP65_ADC 	      	     	             &&
 	    CS_GetEntries (S, L, I+1, 3)   	             &&
        	    (L[0]->OPC == OP65_BCC || L[0]->OPC == OP65_JCC) &&
 	    L[0]->JumpTo != 0                                &&
@@ -332,7 +421,6 @@ unsigned OptAdd3 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
 
 
 

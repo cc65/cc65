@@ -231,16 +231,16 @@ static void Parse (void)
 
 	    /* Function */
 	    if (!comma) {
-
 	     	if (CurTok.Tok == TOK_SEMI) {
-
 	     	    /* Prototype only */
 	     	    NextToken ();
-
-	     	} else {
-	     	    if (Entry) {
-	     	        NewFunc (Entry);
-	     	    }
+	     	} else if (Entry) {
+                    /* Function body definition */
+                    if (SymIsDef (Entry)) {
+                        Error ("Body for function `%s' has already been defined",
+                               Entry->Name);
+                    }
+                    NewFunc (Entry);
 	     	}
 	    }
 

@@ -14,7 +14,7 @@
 	ldy  	#1
    	lda	(sp),y		; get hi byte
        	tax	     		; into x
-.ifpc02	
+.ifpc02
 	lda	(sp)		; get lo byte
 .else
    	dey
@@ -27,18 +27,15 @@
 
 .proc	incsp2
 
-	ldy	sp		; 3
-       	iny			; 2
-       	beq    	@L1		; 2
-       	iny			; 2
-       	beq	@L2		; 2
-       	sty	sp		; 3
-       	rts
+        inc     sp              ; 5
+        beq     @L1             ; 2
+        inc     sp              ; 5
+        beq     @L2             ; 2
+        rts
 
-@L1:   	iny			; 2
-@L2:   	sty	sp		; 3
-       	inc	sp+1		; 5
-       	rts
+@L1:    inc     sp              ; 5
+@L2:    inc     sp+1            ; 5
+        rts
 
 .endproc
 

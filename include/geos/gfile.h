@@ -2,7 +2,7 @@
   GEOS filesystem functions
 
   ported to small C on 25.12.1999
-  by Maciej 'YTM/Alliance' Witkowiak
+  by Maciej 'YTM/Elysium' Witkowiak
 */
 
 #ifndef	_GFILE_H
@@ -17,6 +17,7 @@ struct filehandle *__fastcall__ GetNxtDirEntry(void);
 
 char __fastcall__ FindFTypes(char *buffer, char ftype, char fmaxnum, const char *classtxt);
 
+char __fastcall__ GetFile(char flag, const char *fname, const char *loadaddr, const char *datadname, char *datafname);
 char __fastcall__ FindFile(const char *fname);
 char __fastcall__ ReadFile(struct tr_se *myTrSe, char *buffer, int flength);
 char __fastcall__ SaveFile(struct fileheader *myHeader);

@@ -885,6 +885,20 @@ you can pass address of <tt/dirEntryBuf/.
 Functions described here are common for SEQ and VLIR structures because arguments passed are
 starting track and sector which may point either to start of a chain for VLIR or data for SEQ.
 
+<sect3>GetFile
+<p>
+<tt/char __fastcall__ GetFile(char flag, const char *fname, const char *loadaddr, const char *datadname, char *datafname)/
+<p>
+This rougine loads and runs a given file <tt/fname/. The file must be one of following types:
+<tt/SYSTEM, DESK_ACC, APPLICATION, APPL_DATA, PRINTER,/ or <tt/INPUT_DEVICE/. The execution
+address is taken from file header. It is zero, then file is only loaded. Only the first chain
+from VLIR files is loaded. If <tt/flag/ has bit 0 set then load address is taken from <tt/loadaddr/
+and not from file header. In this case <tt/APPLICATION/ files will be only loaded, not executed.
+This does not apply to <tt/DESK_ACC/. If either bit 6 or 7 of <tt/flag/ are set, then 16 bytes from
+<tt/datadname/ is copied to <tt/dataDiskName/ and 16 bytes from <tt/datafname/ goes to <tt/dataFileName/
+in system case. If you don't use it it is safe to pass <tt/NULL/ to this function.
+
+
 <sect3>ReadFile
 <p>
 <tt/char ReadFile (struct tr_se *myTrSe, char *buffer, int fLength)/

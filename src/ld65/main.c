@@ -53,6 +53,7 @@
 #include "binfmt.h"
 #include "condes.h"
 #include "config.h"
+#include "dbgfile.h"
 #include "error.h"
 #include "exports.h"
 #include "fileio.h"

@@ -23,6 +23,7 @@ OBJS = 	asserts.o       \
 	binfmt.o	\
 	condes.o	\
 	config.o	\
+        dbgfile.o       \
 	dbginfo.o	\
 	dbgsyms.o	\
 	error.o		\

@@ -99,6 +99,7 @@ static Segment* NewSegment (unsigned Name, unsigned char Type)
     S->Align       = 0;
     S->FillVal	   = 0;
     S->Type        = Type;
+    S->ReadOnly    = 0;
     S->Relocatable = 0;
     S->Dumped      = 0;
 
@@ -331,7 +332,7 @@ int IsBSSType (Segment* S)
 		unsigned long Count = F->Size;
 		while (Count--) {
 		    if (*Data++ != 0) {
-			return 0;
+		   	return 0;
 		    }
 		}
 	    } else if (F->Type == FRAG_EXPR || F->Type == FRAG_SEXPR) {
@@ -602,21 +603,47 @@ void PrintSegmentMap (FILE* F)
      	/* Get a pointer to the segment */
      	S = SegPool [I];
 
-	/* Print empty segments only if explicitly requested */
-	if (VerboseMap || S->Size > 0) {
-	    /* Print the segment data */
-	    long End = S->PC + S->Size;
-	    if (S->Size > 0) {
-		/* Point to last element addressed */
-	     	--End;
-	    }
-	    fprintf (F, "%-20s  %06lX  %06lX  %06lX\n",
+     	/* Print empty segments only if explicitly requested */
+     	if (VerboseMap || S->Size > 0) {
+     	    /* Print the segment data */
+     	    long End = S->PC + S->Size;
+     	    if (S->Size > 0) {
+     		/* Point to last element addressed */
+     	     	--End;
+     	    }
+     	    fprintf (F, "%-20s  %06lX  %06lX  %06lX\n",
        	       	     GetString (S->Name), S->PC, End, S->Size);
      	}
     }
 
     /* Free the segment pool */
     xfree (SegPool);
+}
+
+
+
+void PrintDbgSegments (FILE* F)
+/* Output the segments to the debug file */
+{
+    Segment* S;
+
+    /* Walk over all segments */
+    S = SegRoot;
+    while (S) {
+
+     	/* Ignore empty segments */
+        if (S->Size > 0) {
+
+     	    /* Print the segment data */
+       	    fprintf (F, "segment\t\"%s\", 0x%06lX, 0x%04lX, %s, %s\n",
+       	       	     GetString (S->Name), S->PC, S->Size,
+                     SegTypeToStr (S->Type),
+                     S->ReadOnly? "ro" : "rw");
+     	}
+
+     	/* Follow the linked list */
+     	S = S->List;
+    }
 }
 
 
@@ -628,7 +655,7 @@ void CheckSegments (void)
 {
     Segment* S = SegRoot;
     while (S) {
-	if (S->Size > 0 && S->Dumped == 0) {
+     	if (S->Size > 0 && S->Dumped == 0) {
        	    Error ("Missing memory area assignment for segment `%s'",
                    GetString (S->Name));
 	}

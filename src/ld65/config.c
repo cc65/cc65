@@ -612,8 +612,7 @@ static void ParseSegments (void)
        	{   "RW",      	CFGTOK_RW       },
        	{   "BSS",     	CFGTOK_BSS      },
 	{   "ZP",      	CFGTOK_ZP	},
-	{   "WP",      	CFGTOK_WPROT	},
-	{   "WPROT",   	CFGTOK_WPROT	},
+        {   "WPROT",    CFGTOK_RO       },      /* ### OBSOLETE */
     };
 
     unsigned Count;
@@ -706,7 +705,6 @@ static void ParseSegments (void)
 	    		case CFGTOK_RW:	   /* Default */		    break;
 	    	     	case CFGTOK_BSS:   S->Flags |= SF_BSS;              break;
 	    	     	case CFGTOK_ZP:	   S->Flags |= (SF_BSS | SF_ZP);    break;
-	    	     	case CFGTOK_WPROT: S->Flags |= (SF_RO | SF_WPROT);  break;
 	    	     	default:	   Internal ("Unexpected token: %d", CfgTok);
 	    	    }
 	    	    break;
@@ -1473,11 +1471,13 @@ void CfgAssignSegments (void)
      	   	Addr = NewAddr;
      	    }
 
-       	    /* If this is the run area, set the start address of this segment
-             * and remember if the segment is in a relocatable file or not.
+       	    /* If this is the run area, set the start address of this segment,
+             * set the readonly flag in the segment and and remember if the 
+             * segment is in a relocatable file or not.
              */
      	    if (S->Run == M) {
      	        S->Seg->PC = Addr;
+                S->Seg->ReadOnly = (S->Flags & SF_RO) != 0;
                 S->Seg->Relocatable = M->Relocatable;
      	    }
 

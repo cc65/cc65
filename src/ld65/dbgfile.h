@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   mapfile.h				     */
+/*				   dbgfile.h				     */
 /*                                                                           */
-/*		     Map file creation for the ld65 linker		     */
+/*                  Debug file creation for the ld65 linker                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,26 +33,23 @@
 
 
 
-#ifndef MAPFILE_H
-#define MAPFILE_H
+#ifndef DBGFILE_H
+#define DBGFILE_H
 
 
 
 /*****************************************************************************/
-/*  		 		     Code				     */
+/*  	     	 		     Code				     */
 /*****************************************************************************/
 
 
 
-void CreateMapFile (void);
-/* Create a map file */
-
-void CreateLabelFile (void);
-/* Create a label file */
+void CreateDbgFile (void);
+/* Create a debug info file */
 
 
 
-/* End of mapfile.h */
+/* End of dbgfile.h */
 
 #endif
 

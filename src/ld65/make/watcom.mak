@@ -48,6 +48,7 @@ OBJS =	asserts.obj     \
 	binfmt.obj	\
 	condes.obj	\
 	config.obj	\
+        dbgfile.obj     \
 	dbginfo.obj	\
 	dbgsyms.obj	\
 	error.obj	\

@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -65,6 +65,7 @@ struct Segment {
     unsigned char     	Align;		/* Alignment needed */
     unsigned char     	FillVal;	/* Value to use for fill bytes */
     unsigned char     	Type;		/* Type of segment */
+    unsigned char       ReadOnly;       /* True for readonly segments (config) */
     unsigned char       Relocatable;    /* True if the segment is relocatable */
     unsigned char      	Dumped;		/* Did we dump this segment? */
 };
@@ -144,6 +145,9 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data);
 
 void PrintSegmentMap (FILE* F);
 /* Print a segment map to the given file */
+
+void PrintDbgSegments (FILE* F);
+/* Output the segments to the debug file */
 
 void CheckSegments (void);
 /* Walk through the segment list and check if there are segments that were

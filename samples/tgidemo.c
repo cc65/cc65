@@ -71,6 +71,7 @@ static void CheckError (const char* S)
 }
 
 
+
 static void DoWarning (void)
 /* Warn the user that the TGI driver is needed for this program */
 {

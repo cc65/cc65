@@ -9,10 +9,7 @@
 
 
 
-/* Place the following data into the readonly data segment */
-#pragma dataseg ("RODATA")
-
-const char* _sys_errlist[] = {
+const char* const _sys_errlist[] = {
     "Unknown error",                /*  0 */
     "No such file or directory",    /*  1 */
     "Out of memory",                /*  2 */

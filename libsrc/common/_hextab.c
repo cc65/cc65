@@ -7,9 +7,6 @@
 
 
 
-/* Data in this module is read-only, put it into the RODATA segment */
-#pragma dataseg ("RODATA")
-
 const unsigned char _hextab [16] = {
     '0', '1', '2', '3', '4', '5', '6', '7',
     '8', '9', 'A', 'B', 'C', 'D', 'E', 'F'

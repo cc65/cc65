@@ -17,13 +17,10 @@
 
 
 
-/* Data in this module is read-only, put it into the RODATA segment */
-#pragma dataseg ("RODATA");
-
 /* For memory efficiency use a separate empty string */
 static const char EmptyString [] = "";
 
-static struct lconv lc = {
+static const struct lconv lc = {
     EmptyString,   	/* currency_symbol */
     ".",		/* decimal_point */
     EmptyString,   	/* grouping */
@@ -43,9 +40,6 @@ static struct lconv lc = {
     CHAR_MAX,		/* p_sep_by_space */
     CHAR_MAX,		/* p_sign_posn */
 };
-
-/* Restore the old data segment name */
-#pragma dataseg ("DATA");
 
 
 
@@ -75,4 +69,4 @@ char* setlocale (int, const char* locale)
 
 
 
-		  
+

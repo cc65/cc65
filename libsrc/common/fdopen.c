@@ -20,7 +20,7 @@ FILE* fdopen (int handle, char* /*mode*/)
     /* Find a free file slot */
     if (!(f = _fdesc ())) {
        	/* No slots */
-       	errno = EMFILE;    	      	/* Too many files */
+       	_errno = EMFILE;    	      	/* Too many files */
        	return 0;
     }
 

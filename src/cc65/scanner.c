@@ -251,6 +251,12 @@ static int ParseChar (void)
     if (CurC == '\\') {
 	NextChar ();
 	switch (CurC) {
+	    case '?':
+	       	C = '\?';
+	      	break;
+	    case 'a':
+	       	C = '\a';
+	      	break;
 	    case 'b':
 	       	C = '\b';
 	      	break;

@@ -13,155 +13,139 @@ CC = ../../src/cc65/cc65
 LD = ../../src/ld65/ld65
 
 # List of all targets
-ALLTARGETS =	apple2lib	\
-		atarilib 	\
-		atmoslib	\
-		vic20lib	\
-                c16lib          \
-		c64lib	 	\
-		c128lib	 	\
-		cbm510lib	\
-		cbm610lib	\
-		geoslib	 	\
-		petlib	 	\
-		plus4lib
+ALLTARGETS =   	apple2	\
+		atari 	\
+		atmos	\
+		vic20	\
+                c16  	\
+		c64  	\
+		c128 	\
+		cbm510	\
+		cbm610	\
+		geos 	\
+		pet  	\
+		plus4
 
 #-----------------------------------------------------------------------------
 
 all:
 	for tgt in $(ALLTARGETS); do		\
-	    $(MAKE) clean $$tgt || exit 1;	\
+	    $(MAKE) clean "$$tgt"lib || exit 1;	\
 	done
 
 #-----------------------------------------------------------------------------
 # Apple ][
 
 apple2lib:
-	for i in apple2 common runtime conio dbg; do \
+	for i in apple2 common runtime conio dbg em tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t apple2 -I../../include" \
 	    AFLAGS="-t apple2 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
-	done
-	mv apple2/crt0.o apple2.o
-	for i in apple2 common runtime conio dbg; do \
 	    $(AR) a apple2.lib $$i/*.o;\
 	done
+	mv apple2/crt0.o apple2.o
 
 #-----------------------------------------------------------------------------
 # Atari
 
 atarilib:
-	for i in atari common runtime conio dbg; do \
+	for i in atari common runtime conio dbg em tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t atari -I../../include" \
 	    AFLAGS="-t atari -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
-	done
-	mv atari/crt0.o atari.o
-	for i in atari common runtime conio dbg; do \
 	    $(AR) a atari.lib $$i/*.o;\
 	done
+	mv atari/crt0.o atari.o
 
 #-----------------------------------------------------------------------------
 # Oric Atmos
 
 atmoslib:
-	for i in atmos common runtime; do \
+	for i in atmos common runtime em tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t atmos -I../../include" \
 	    AFLAGS="-t atmos -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
-	done
-	mv atmos/crt0.o atmos.o
-	for i in common runtime; do \
 	    $(AR) a atmos.lib $$i/*.o;\
 	done
+	mv atmos/crt0.o atmos.o
 
 #-----------------------------------------------------------------------------
 # Vic20
 
 vic20lib:
-	for i in vic20 cbm common runtime conio dbg; do \
+	for i in vic20 cbm common runtime conio dbg em tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    AFLAGS="-t vic20 -I../../asminc" \
 	    CFLAGS="-Osir -g -T -t vic20 -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
-	done
-	mv vic20/crt0.o vic20.o
-	for i in vic20 cbm common runtime conio dbg; do \
 	    $(AR) a vic20.lib $$i/*.o;\
 	done
+	mv vic20/crt0.o vic20.o
 
 #-----------------------------------------------------------------------------
 # C16, C116
 
 c16lib:
-	for i in c16 cbm common runtime conio dbg tgi; do \
+	for i in c16 cbm common runtime conio dbg em tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t c16 -I../../include" \
 	    AFLAGS="-t c16 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
-	done
-	mv c16/crt0.o c16.o
-	for i in c16 cbm common runtime conio dbg tgi; do \
 	    $(AR) a c16.lib $$i/*.o;\
 	done
+	mv c16/crt0.o c16.o
 
 #-----------------------------------------------------------------------------
 # C64
 
 c64lib:
-	for i in c64 cbm common runtime conio dbg tgi; do \
+	for i in c64 cbm common runtime conio dbg em tgi; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
 	    AFLAGS="-t c64 -I../../asminc" \
 	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
+	    $(AR) a c64.lib $$i/*.o;\
 	done
 	mv c64/crt0.o c64.o
 	cp c64/c64-320-200-2.tgi c64-hi.tgi
-	for i in c64 cbm common runtime conio dbg tgi; do \
-	    $(AR) a c64.lib $$i/*.o;\
-	done
 
 #-----------------------------------------------------------------------------
 # C128
 
 c128lib:
-	for i in c128 cbm common runtime conio dbg tgi; do \
+	for i in c128 cbm common runtime conio dbg em tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t c128 -I../../include" \
 	    AFLAGS="-t c128 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
-	done
-	mv c128/crt0.o c128.o
-	for i in c128 cbm common runtime conio dbg tgi; do \
 	    $(AR) a c128.lib $$i/*.o;\
 	done
+	mv c128/crt0.o c128.o
 
 #-----------------------------------------------------------------------------
 # Commdore P500 / CBM 5x0
 
 cbm510lib:
-	for i in cbm510 cbm common runtime conio dbg tgi; do \
+	for i in cbm510 cbm common runtime conio dbg em tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t cbm510 -I../../include" \
 	    AFLAGS="-t cbm510 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
-	done
-	mv cbm510/crt0.o cbm510.o
-	for i in cbm510 cbm common runtime conio dbg tgi; do \
 	    $(AR) a cbm510.lib $$i/*.o;\
 	done
+	mv cbm510/crt0.o cbm510.o
 
 #-----------------------------------------------------------------------------
 # PET-II series
@@ -173,11 +157,9 @@ cbm610lib:
 	    CFLAGS="-Osir -g -T -t cbm610 -I../../include" \
 	    AFLAGS="-t cbm610 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
-	done
-	mv cbm610/crt0.o cbm610.o
-	for i in cbm610 cbm common runtime conio dbg; do \
 	    $(AR) a cbm610.lib $$i/*.o;\
 	done
+	mv cbm610/crt0.o cbm610.o
 
 #-----------------------------------------------------------------------------
 # GEOS on the C64/128
@@ -196,8 +178,6 @@ geoslib:
 	    CFLAGS="-Osir -g -T -t geos -I../../include" \
 	    AFLAGS="-t geos -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
-	done
-	for i in common runtime; do \
 	    for objfile in $$i/*.o; do \
 	        if [ -f geos/$$objfile ]; then \
 		    $(AR) a geos.lib geos/$$objfile; \
@@ -211,40 +191,36 @@ geoslib:
 # CBM PET machines
 
 petlib:
-	for i in pet cbm common runtime conio dbg; do \
+	for i in pet cbm common runtime conio dbg em tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t pet -I../../include" \
 	    AFLAGS="-t pet -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
-	done
-	mv pet/crt0.o pet.o
-	for i in pet cbm common runtime conio dbg; do \
 	    $(AR) a pet.lib $$i/*.o;\
 	done
+	mv pet/crt0.o pet.o
 
 #-----------------------------------------------------------------------------
 # Commodore Plus/4
 
 plus4lib:
-	for i in plus4 cbm common runtime conio dbg tgi; do \
+	for i in plus4 cbm common runtime conio dbg em tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t plus4 -I../../include" \
 	    AFLAGS="-t plus4 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
-	done
-	mv plus4/crt0.o plus4.o
-	for i in plus4 cbm common runtime conio dbg tgi; do \
 	    $(AR) a plus4.lib $$i/*.o;\
 	done
+	mv plus4/crt0.o plus4.o
 
 #-----------------------------------------------------------------------------
 # Dummy targets
 
 .PHONY: clean
 clean:
-	@for i in apple2 atari c128 c64 cbm cbm510 cbm610 common conio dbg geos pet plus4 runtime tgi; do 	\
+	@for i in common conio dbg em runtime tgi $(ALLTARGETS); do 	\
 	   $(MAKE) -C $$i clean;     	    	       	  	   					\
 	done
 

@@ -7,7 +7,7 @@
 
 <abstract>
 cc65 is a C compiler for 6502 based systems. This function reference describes
-the available C functions supplied by the library.
+the C functions available in the standard library.
 </abstract>
 
 <!-- Table of contents -->
@@ -146,6 +146,15 @@ function.
 </itemize>
 
 
+<sect1><tt/fcntl.h/<label id="fcntl.h"><p>
+
+<itemize>
+<item><ref id="close" name="close">
+<item><ref id="creat" name="creat">
+<item><ref id="open" name="open">
+</itemize>
+
+
 <sect1><tt/signal.h/<label id="signal.h"><p>
 
 <itemize>
@@ -161,28 +170,28 @@ function.
 <item><ref id="_heapmaxavail" name="_heapmaxavail">
 <item><ref id="_heapmemavail" name="_heapmemavail">
 <item><ref id="_randomize" name="_randomize">
-<!-- <item><ref id="_swap" name="_swap"> -->
+<item><ref id="_swap" name="_swap">
 <item><ref id="abort" name="abort">
 <item><ref id="abs" name="abs">
 <item><ref id="atexit" name="atexit">
-<!-- <item><ref id="atoi" name="atoi"> -->
-<!-- <item><ref id="atol" name="atol"> -->
+<item><ref id="atoi" name="atoi">
+<item><ref id="atol" name="atol">
 <!-- <item><ref id="bsearch" name="bsearch"> -->
 <item><ref id="calloc" name="calloc">
 <!-- <item><ref id="div" name="div"> -->
 <item><ref id="exit" name="exit">
 <item><ref id="free" name="free">
-<!-- <item><ref id="getenv" name="getenv"> -->
-<!-- <item><ref id="itoa" name="itoa"> -->
+<item><ref id="getenv" name="getenv">
+<item><ref id="itoa" name="itoa">
 <item><ref id="labs" name="labs">
-<!-- <item><ref id="ltoa" name="ltoa"> -->
+<item><ref id="ltoa" name="ltoa">
 <item><ref id="malloc" name="malloc">
 <!-- <item><ref id="qsort" name="qsort"> -->
 <item><ref id="rand" name="rand">
 <item><ref id="realloc" name="realloc">
 <item><ref id="srand" name="srand">
-<!-- <item><ref id="ultoa" name="ultoa"> -->
-<!-- <item><ref id="utoa" name="utoa"> -->
+<item><ref id="ultoa" name="ultoa">
+<item><ref id="utoa" name="utoa">
 </itemize>
 
 
@@ -190,11 +199,11 @@ function.
 
 <itemize>
 <!-- <item><ref id="_stroserror" name="_stroserror"> -->
-<!-- <item><ref id="bzero" name="bzero"> -->
+<item><ref id="bzero" name="bzero">
 <!-- <item><ref id="memchr" name="memchr"> -->
-<!-- <item><ref id="memcpy" name="memcpy"> -->
-<!-- <item><ref id="memmove" name="memmove"> -->
-<!-- <item><ref id="memset" name="memset"> -->
+<item><ref id="memcpy" name="memcpy">
+<item><ref id="memmove" name="memmove">
+<item><ref id="memset" name="memset">
 <!-- <item><ref id="strcasecmp" name="strcasecmp"> -->
 <item><ref id="strcat" name="strcat">
 <item><ref id="strchr" name="strchr">
@@ -218,6 +227,21 @@ function.
 <!-- <item><ref id="strxfrm" name="strxfrm"> -->
 <item><ref id="strupper" name="strupper">
 <item><ref id="strupr" name="strupr">
+</itemize>
+
+
+<sect1><tt/unistd.h/<label id="unistd.h"><p>
+
+<itemize>
+<!-- <item><ref id="chdir" name="chdir"> -->
+<!-- <item><ref id="getcwd" name="getcwd"> -->
+<!-- <item><ref id="lseek" name="lseek"> -->
+<!-- <item><ref id="mkdir" name="mkdir"> -->
+<!-- <item><ref id="read" name="read"> -->
+<!-- <item><ref id="rmdir" name="rmdir"> -->
+<item><ref id="sleep" name="sleep">
+<!-- <item><ref id="unlink" name="unlink"> -->
+<!-- <item><ref id="write" name="write"> -->
 </itemize>
 
 
@@ -319,6 +343,30 @@ considered random to a certain degree.
 <tag/See also/
 <ref id="rand" name="rand">,
 <ref id="srand" name="srand">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_swap<label id="_swap"><p>
+
+<quote>
+<descrip>
+<tag/Function/Swap the contents of memory areas.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void __fastcall__ _swap (void* p, void* q, size_t size);/
+<tag/Description/<tt/_swap/ will swap (exchange) the contents of the two memory
+areas pointed to by <tt/p/ and <tt/q/. Both memory areas are assumed to be
+<tt/size/ bytes in size.
+<tag/Limits/<itemize>
+<item>The memory areas may not overlap, otherwise the results are undefined.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="memcpy" name="memcpy">,
+<ref id="memmove" name="memmove">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -506,6 +554,60 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>atoi<label id="atoi"><p>
+
+<quote>
+<descrip>
+<tag/Function/Convert a string to an integer.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/int __fastcall__ atoi (const char* s);/
+<tag/Description/<tt/atoi/ converts the given string into an integer.
+Conversion stops as soon as any invalid character is encountered.
+<tag/Limits/<itemize>
+<item>There is no way to detect any conversion errors.
+<item>The function does not check for an numerical overflow when converting.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="atol" name="atol">,
+<ref id="itoa" name="itoa">,
+<ref id="ltoa" name="ltoa">,
+<ref id="ultoa" name="ultoa">,
+<ref id="utoa" name="utoa">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>atol<label id="atol"><p>
+
+<quote>
+<descrip>
+<tag/Function/Convert a string to a long integer.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/long __fastcall__ atol (const char* s);/
+<tag/Description/<tt/atol/ converts the given string into a long integer.
+Conversion stops as soon as any invalid character is encountered.
+<tag/Limits/<itemize>
+<item>There is no way to detect any conversion errors.
+<item>The function does not check for an numerical overflow when converting.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="atoi" name="atoi">,
+<ref id="itoa" name="itoa">,
+<ref id="ltoa" name="ltoa">,
+<ref id="ultoa" name="ultoa">,
+<ref id="utoa" name="utoa">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>bgcolor<label id="bgcolor"><p>
 
 <quote>
@@ -549,6 +651,33 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="bgcolor" name="bgcolor">,
 <ref id="textcolor" name="textcolor">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>bzero<label id="bzero"><p>
+
+<quote>
+<descrip>
+<tag/Function/Fill a memory area with zeroes.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/void __fastcall__ bzero (void* p, size_t count);/
+<tag/Description/<tt/bzero/ fills the memory area pointed to by <tt/p/ with
+zero.
+<tag/Limits/
+<itemize>
+<item>The function is non standard and therefore only available in non ANSI
+mode. You should use <tt/<ref id="memset" name="memset">/ instead.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="_swap" name="_swap">,
+<ref id="memcpy" name="memcpy">,
+<ref id="memmove" name="memmove">,
+<ref id="memset" name="memset">,
 <tag/Example/None.
 </descrip>
 </quote>
@@ -740,6 +869,54 @@ the upper left corner.
 <tag/See also/
 <ref id="cclear" name="cclear">,
 <ref id="cclearxy" name="cclearxy">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>close<label id="close"><p>
+
+<quote>
+<descrip>
+<tag/Function/Close a file descriptor.
+<tag/Header/<tt/<ref id="fcntl.h" name="fcntl.h">/
+<tag/Declaration/<tt/int __fastcall__ close (int fd);/
+<tag/Description/The function closes the given file descriptor. It returns zero
+on success and -1 on error. If an error occurs, the cause can be determined by
+reading the <tt/errno/ variable.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX
+<tag/See also/
+<ref id="creat" name="creat">,
+<ref id="open" name="open">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>creat<label id="creat"><p>
+
+<quote>
+<descrip>
+<tag/Function/Create a file.
+<tag/Header/<tt/<ref id="fcntl.h" name="fcntl.h">/
+<tag/Declaration/<tt/int __fastcall__ creat (const char* name, unsigned mode);/
+<tag/Description/<tt/creat/ creates a new file and returns the file descriptor
+associated with it. On error, -1 is returned and an error code is stored in
+<tt/errno/.
+<tag/Limits/<itemize>
+<item><tt/creat/ is identical to calling <tt/<ref id="open" name="open">/ with
+<tt/flags/ equal to <tt/O_WRONLY | O_CREAT | O_TRUNC/.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX
+<tag/See also/
+<ref id="close" name="close">,
+<ref id="open" name="open">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1116,6 +1293,29 @@ be used in presence of a prototype.
 <ref id="calloc" name="calloc">,
 <ref id="malloc" name="malloc">,
 <ref id="realloc" name="realloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>getenv<label id="getenv"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return a value from the environment.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/char* __fastcall__ getenv (const char* name);/
+<tag/Description/The function searches the environment for an entry that
+matches <tt/name/ and returns its value. The environment consists of a list
+of strings in the form <tt/name=value/. If there is no match, <tt/getenv/
+returns <tt/NULL/.
+<tag/Limits/<itemize>
+<item>What exactly is stored in the environment depends on the machine the
+program is running on.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1720,6 +1920,35 @@ fastcall function, so it may only be used in presence of a prototype.
 </quote>
 
 
+<sect1>itoa<label id="itoa"><p>
+
+<quote>
+<descrip>
+<tag/Function/Convert an integer into a string.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/char* __fastcall__ itoa (int val, char* buf, int radix);/
+<tag/Description/<tt/itoa/ converts the integer <tt/val/ into a string using
+<tt/radix/ as the base.
+<tag/Limits/<itemize>
+<item>There are no provisions to prevent a buffer overflow.
+<item>If <tt/val/ contains <tt/INT_MIN/, the behaviour is undefined.
+<item>The function is non standard, so it is not available in strict ANSI mode.
+You should probably use <tt/sprintf/ instead.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atoi" name="atoi">,
+<ref id="atol" name="atol">,
+<ref id="ltoa" name="ltoa">,
+<ref id="ultoa" name="ultoa">,
+<ref id="utoa" name="utoa">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>kbhit<label id="kbhit"><p>
 
 <quote>
@@ -1764,6 +1993,35 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>ltoa<label id="ltoa"><p>
+
+<quote>
+<descrip>
+<tag/Function/Convert a long integer into a string.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/char* __fastcall__ ltoa (long val, char* buf, int radix);/
+<tag/Description/<tt/itoa/ converts the long integer <tt/val/ into a string
+using <tt/radix/ as the base.
+<tag/Limits/<itemize>
+<item>There are no provisions to prevent a buffer overflow.
+<item>If <tt/val/ contains <tt/LONG_MIN/, the behaviour is undefined.
+<item>The function is non standard, so it is not available in strict ANSI mode.
+You should probably use <tt/sprintf/ instead.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atoi" name="atoi">,
+<ref id="atol" name="atol">,
+<ref id="itoa" name="itoa">,
+<ref id="ultoa" name="ultoa">,
+<ref id="utoa" name="utoa">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>malloc<label id="malloc"><p>
 
 <quote>
@@ -1787,6 +2045,111 @@ be used in presence of a prototype.
 <ref id="calloc" name="calloc">,
 <ref id="free" name="free">,
 <ref id="realloc" name="realloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>memcpy<label id="memcpy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Copy a memory area.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/void* __fastcall__ memcpy (void* dest, const void* src, size_t count);/
+<tag/Description/<tt/memcpy/ copies <tt/count/ bytes from the memory area
+pointed to by <tt/src/ into the memory area pointed to by <tt/dest/. It returns
+<tt/dest/.
+<tag/Limits/
+<itemize>
+<item>The result is undefined if the memory areas do overlap. Use
+<tt/<ref id="memmove" name="memmove">/ to copy overlapping memory areas.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="_swap" name="_swap">,
+<ref id="memmove" name="memmove">,
+<ref id="memset" name="memset">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>memmove<label id="memmove"><p>
+
+<quote>
+<descrip>
+<tag/Function/Copy a memory area.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/void* __fastcall__ memmove (void* dest, const void* src, size_t count);/
+<tag/Description/<tt/memmove/ copies <tt/count/ bytes from the memory area
+pointed to by <tt/src/ into the memory area pointed to by <tt/dest/. It returns
+<tt/dest/.
+<tag/Limits/
+<itemize>
+<item>While <tt/memmove/ allows the memory areas to overlap, it has some
+additional overhead compared to <tt/<ref id="memcpy" name="memcpy">/.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="_swap" name="_swap">,
+<ref id="memcpy" name="memcpy">,
+<ref id="memset" name="memset">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>memset<label id="memset"><p>
+
+<quote>
+<descrip>
+<tag/Function/Fill a memory area.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/void* __fastcall__ memset (void* p, int val, size_t count);/
+<tag/Description/<tt/memset/ fills the memory area pointed to by <tt/p/ with
+the value <tt/val/. The function returns <tt/p/.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="_swap" name="_swap">,
+<ref id="bzero" name="bzero">,
+<ref id="memcpy" name="memcpy">,
+<ref id="memmove" name="memmove">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>open<label id="open"><p>
+
+<quote>
+<descrip>
+<tag/Function/Open and possibly create a file.
+<tag/Header/<tt/<ref id="fcntl.h" name="fcntl.h">/
+<tag/Declaration/<tt/int __fastcall__ open (const char* name, int flags, ...);/
+<tag/Description/<tt/open/ opens a file and returns the file descriptor
+associated with it. On error, -1 is returned and an error code is stored in
+<tt/errno/. Several flags may be passed to <tt/open/ that change the behaviour.
+<tag/Limits/<itemize>
+<item>POSIX specifies an additional <tt/mode/ argument that may be passed to
+open, which is used as the permission mask when a new file is created. While
+cc65 allows to pass this argument, it is ignored.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX
+<tag/See also/
+<ref id="close" name="close">,
+<ref id="creat" name="creat">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1947,6 +2310,25 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="abort" name="abort">,
 <ref id="raise" name="raise">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>sleep<label id="sleep"><p>
+
+<quote>
+<descrip>
+<tag/Function/Sleep for a specified amount of time.
+<tag/Header/<tt/<ref id="unistd.h" name="unistd.h">/
+<tag/Declaration/<tt/void __fastcall__ sleep (unsigned seconds);/
+<tag/Description/The function will return after the specified number of
+seconds have elapsed.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2309,6 +2691,62 @@ only be used in presence of a prototype.
 <ref id="islower" name="islower">,
 <ref id="isupper" name="isupper">,
 <ref id="tolower" name="tolower">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>ultoa<label id="ultoa"><p>
+
+<quote>
+<descrip>
+<tag/Function/Convert an unsigned long integer into a string.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/char* __fastcall__ ultoa (unsigned long val, char* buf, int radix);/
+<tag/Description/<tt/itoa/ converts the unsigned long integer <tt/val/ into a
+string using <tt/radix/ as the base.
+<tag/Limits/<itemize>
+<item>There are no provisions to prevent a buffer overflow.
+<item>The function is non standard, so it is not available in strict ANSI mode.
+You should probably use <tt/sprintf/ instead.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atoi" name="atoi">,
+<ref id="atol" name="atol">,
+<ref id="itoa" name="itoa">,
+<ref id="ltoa" name="ltoa">,
+<ref id="utoa" name="utoa">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>utoa<label id="utoa"><p>
+
+<quote>
+<descrip>
+<tag/Function/Convert an unsigned integer into a string.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/char* __fastcall__ utoa (unsigned val, char* buf, int radix);/
+<tag/Description/<tt/itoa/ converts the unsigned integer <tt/val/ into a string
+using <tt/radix/ as the base.
+<tag/Limits/<itemize>
+<item>There are no provisions to prevent a buffer overflow.
+<item>The function is non standard, so it is not available in strict ANSI mode.
+You should probably use <tt/sprintf/ instead.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="atoi" name="atoi">,
+<ref id="atol" name="atol">,
+<ref id="itoa" name="itoa">,
+<ref id="ltoa" name="ltoa">,
+<ref id="ultoa" name="ultoa">
 <tag/Example/None.
 </descrip>
 </quote>

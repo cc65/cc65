@@ -172,10 +172,8 @@ OBJS = 	add.o		\
 	staspidx.o	\
        	staxsp.o	\
 	staxspi.o	\
-	staxspp.o	\
        	steaxsp.o	\
 	steaxspi.o	\
-	steaxspp.o	\
 	stkchk.o	\
        	sub.o		\
        	subeqsp.o	\

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -104,6 +104,14 @@ int sprintf (char* buf, const char* format, ...);
 int __fastcall__ vfprintf (FILE* f, const char* format, va_list ap);
 int vprintf (const char* format, va_list ap);
 int __fastcall__ vsprintf (char* buf, const char* format, va_list ap);
+
+/* Not available or testing: */
+int scanf (const char* format, ...);
+int fscanf (FILE* f, const char* format, ...);
+int sscanf (const char* s, const char* format, ...);
+int vscanf (const char* format, va_list ap);
+int vsscanf (const char* s, const char* format, va_list ap);
+int vfscanf (FILE* f, const char* format, va_list ap);
 
 #ifndef __STRICT_ANSI__
 FILE* fdopen (int fd, const char* mode); 	/* Unix */

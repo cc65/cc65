@@ -150,7 +150,7 @@ INLINE int ED_IsLocPrimary (const ExprDesc* Expr)
     return (Expr->Flags & E_MASK_LOC) == E_LOC_PRIMARY;
 }
 #else
-#  define ED_IsLocExpr(Expr)     (((Expr)->Flags & E_MASK_LOC) == E_LOC_PRIMARY)
+#  define ED_IsLocPrimary(Expr)  (((Expr)->Flags & E_MASK_LOC) == E_LOC_PRIMARY)
 #endif
 
 #if defined(HAVE_INLINE)

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -62,6 +62,7 @@ long          InputSize       = -1L;    /* Number of bytes to read from input */
 
 /* Stuff needed by many routines */
 unsigned      Pass	      = 0;	/* Disassembler pass */
+char          Now[128];                 /* Current time as string */
 
 /* Comments */
 unsigned      Comments        = 0;      /* Add which comments to the output? */

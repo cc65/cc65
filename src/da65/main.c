@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -379,17 +379,18 @@ int main (int argc, char* argv [])
         { "--comments",         1,      OptComments             },
         { "--cpu",     	       	1,	OptCPU 			},
        	{ "--debug-info",      	0,     	OptDebugInfo            },
-	{ "--formfeeds",  	0,	OptFormFeeds		},
+    	{ "--formfeeds",  	0,	OptFormFeeds		},
       	{ "--help",    	  	0,	OptHelp			},
        	{ "--hexoffs", 	  	0,     	OptHexOffs              },
        	{ "--info",    	       	1,     	OptInfo                 },
       	{ "--pagelength",      	1,	OptPageLength		},
-	{ "--start-addr", 	1,	OptStartAddr		},
+    	{ "--start-addr", 	1,	OptStartAddr		},
       	{ "--verbose", 	       	0,	OptVerbose		},
       	{ "--version", 	       	0,	OptVersion		},
     };
 
     unsigned I;
+    time_t T;
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "da65");
@@ -469,6 +470,12 @@ int main (int argc, char* argv [])
     if (CPU == CPU_UNKNOWN) {
         CPU = CPU_6502;
     }
+
+    /* Get the current time and convert it to string so it can be used in
+     * the output page headers.
+     */
+    T = time (0);
+    strftime (Now, sizeof (Now), "%Y-%m-%d %H:%M:%S", localtime (&T));
 
     /* Load the input file */
     LoadCode ();

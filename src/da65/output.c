@@ -74,10 +74,12 @@ static void PageHeader (void)
 /* Print a page header */
 {
     fprintf (F,
-       	     "; da65 V%u.%u.%u - (C) Copyright 2000-2005 Ullrich von Bassewitz\n"
+       	     "; da65 V%u.%u.%u - (C) Copyright 2000-2005,  Ullrich von Bassewitz\n"
+             "; Created:    %s\n"
      	     "; Input file: %s\n"
      	     "; Page:       %u\n\n",
        	     VER_MAJOR, VER_MINOR, VER_PATCH,
+             Now,
      	     InFile,
      	     Page);
 }
@@ -99,7 +101,7 @@ void OpenOutput (const char* Name)
 
     /* Output the header and initialize stuff */
     PageHeader ();
-    Line = 4;
+    Line = 5;
     Col  = 1;
 }
 
@@ -152,7 +154,7 @@ void LineFeed (void)
 	    }
 	    ++Page;
 	    PageHeader ();
-	    Line = 4;
+	    Line = 5;
  	}
  	Col = 1;
     }

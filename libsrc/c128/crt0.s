@@ -24,15 +24,10 @@ IRQInd		= $2FD	; JMP $0000 - used as indirect IRQ vector
 
 ; ------------------------------------------------------------------------
 ; Place the startup code in a special segment to cope with the quirks of
-; c128 banking. Do also create an empty segment named "NMI" to avoid
-; warnings if the rs232 routines are not used.
-
-.segment        "NMI"
-; empty
+; c128 banking.
 
 .segment       	"STARTUP"
 
-; ------------------------------------------------------------------------
 ; BASIC header with a SYS call
 
 	.org	$1BFF
@@ -172,13 +167,12 @@ L2:	lda	zpsave,x
 ; above will change this setting so that we have RAM from $0000-$BFFF. This
 ; works quite well with the exception of interrupts: The interrupt handler
 ; is in ROM, and the ROM switches back to the ROM configuration, which means
-; that parts of our program may not be accessible. Since the crt0 module is
-; the first module in the program, it will always be below $4000 and always
-; in RAM. So we place several short stubs here that switch back our ROM
-; config before calling our user defined handlers. These stubs are only
-; used if any other code uses the interrupt or break vectors. They are dead
-; code otherwise, but since there is no other way to keep them in low memory,
-; they have to go here.
+; that parts of our program may not be accessible. To solve this, we place
+; the following code into a special segment called "LOWCODE" which will be
+; placed just above the startup code, so it goes into a RAM area that is
+; not banked.
+
+.segment        "LOWCODE"
 
 IRQStub:
 	cld    	       		   	; Just to be sure
@@ -192,7 +186,7 @@ IRQStub:
 	jsr	condes 		   	; Call the functions
 	pla    	       			; Get old register value
 	sta    	MMU_CR
-       	jmp    	IRQInd			; Jump to the save IRQ vector
+       	jmp    	IRQInd			; Jump to the saved IRQ vector
 
 
 BRKStub:

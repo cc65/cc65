@@ -535,17 +535,17 @@ _rs232_status:
 ; Because of the C128 banking, the NMI handler must go into the non banked
 ; memory, since the ROM NMI entry point will switch to a configuration where
 ; only the lowest 16K of RAM are visible. We will place the NMI handler into
-; it's own segment and map this segment into the lower 16K in the linker
+; the LOWCODE segment and map this segment into the lower 16K in the linker
 ; config.
 
-.segment 	"NMI"
+.segment       	"LOWCODE"
 
 NmiHandler:
 	lda	#CC65_MMU_CFG		;(2)
-     	sta	MMU_CR			;(4)
+     	sta	MMU_CR 			;(4)
        	lda    	ACIA+RegStatus       	;(4) ;status ;check for byte received
      	and 	#$08           		;(2)
-     	beq 	@L9			;(2*)
+     	beq 	@L9    			;(2*)
        	lda    	ACIA+RegStatus       	;(4) opt ;status ;check for receive errors
     	and 	#$07           		;(2) opt
        	beq    	@L1            		;(3*)opt
@@ -553,7 +553,7 @@ NmiHandler:
 @L1:	lda 	ACIA+RegData		;(4) ;data  ;get byte and put into receive buffer
     	ldy 	RecvTail 		;(4)
     	ldx 	RecvFreeCnt  	       	;(4)
-      	beq 	@L3  			;(2*)
+      	beq 	@L3    			;(2*)
     	sta 	RecvBuf,y 		;(5)
     	inc 	RecvTail             	;(6)
     	dec 	RecvFreeCnt          	;(6)
@@ -588,15 +588,15 @@ NmiHandler:
 ; Try to send a byte. Internal routine. A = TryHard
 
 TryToSend:
-   	sta 	tmp1	       	; Remember tryHard flag
+   	sta 	tmp1   	       	; Remember tryHard flag
 @L0:   	lda 	SendFreeCnt
     	cmp 	#$ff
-    	beq 	@L3	       	; Bail out
+    	beq 	@L3    	       	; Bail out
 
 ; Check for flow stopped
 
 @L1:	lda 	Stopped
-       	bne    	@L3	       	; Bail out
+       	bne    	@L3    	       	; Bail out
 
 ;** check that swiftlink is ready to send
 

@@ -90,8 +90,8 @@ struct SymTable {
 };
 
 /* Symbol tables */
-SymTable*      	CurrentScope;   /* Pointer to current symbol table */
-SymTable*	RootScope;      /* Root symbol table */
+extern SymTable*        CurrentScope;   /* Pointer to current symbol table */
+extern SymTable*	RootScope;      /* Root symbol table */
 
 
 

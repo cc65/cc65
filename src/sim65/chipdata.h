@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   chipif.h				     */
+/*                                  chipdata.h                               */
 /*                                                                           */
-/*	      Interface header file for plugins - unused by sim65	     */
+/*                        Chip description data structure                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,18 +33,42 @@
 
 
 
-#ifndef CHIPIF_H
-#define CHIPIF_H
+#ifndef CHIPDATA_H
+#define CHIPDATA_H
 
 
 
-/* sim65 */
-#include "chipdata.h"
-#include "simdata.h"
+/*****************************************************************************/
+/*                                     Data                                  */
+/*****************************************************************************/
 
 
 
-/* End of chipif.h */
+/* Version information. */
+#define CHIPDATA_VER_MAJOR      1U
+#define CHIPDATA_VER_MINOR      0U 
+
+/* Forwards */
+struct SimData;
+
+/* ChipDesc structure */
+typedef struct ChipData ChipData;
+struct ChipData {
+    const char* ChipName;       /* Name of the chip */
+    unsigned    MajorVersion;   /* Version information */
+    unsigned    MinorVersion;
+
+    /* -- Exported functions -- */
+    void*         (*Init) (const struct SimData* Data, unsigned Addr, unsigned Range);
+    void          (*WriteCtrl) (void* Data, unsigned Addr, unsigned char Val);
+    void          (*Write) (void* Data, unsigned Addr, unsigned char Val);
+    unsigned char (*ReadCtrl) (void* Data, unsigned Addr);
+    unsigned char (*Read) (void* Data, unsigned Addr);
+};
+
+
+
+/* End of chipdata.h */
 
 #endif
 

@@ -50,15 +50,10 @@
 
 
 
-const char* GetName (void)
+int GetChipData (const ChipData** Data, unsigned* Count)
 {
-    return "RAM";
-}
-
-
-
-unsigned GetVersion (void)
-{
+    *Data = 0;
+    *Count = 0;
     return 1;
 }
 

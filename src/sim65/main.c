@@ -44,8 +44,9 @@
 #include "print.h"
 #include "version.h"
 
-/* sim65 */	     
+/* sim65 */
 #include "chip.h"
+#include "chiplib.h"
 #include "chippath.h"
 #include "cpucore.h"
 #include "cputype.h"
@@ -203,7 +204,8 @@ int main (int argc, char* argv[])
 
     /* Initialize modules */
     AddChipPath ("chips");
-    LoadChip ("ram.so");
+    LoadChipLibrary ("ram.so");
+    LoadChips ();
     MemInit ();
     MemLoad ("uz.bin", 0x200, 0);
     CPUInit ();

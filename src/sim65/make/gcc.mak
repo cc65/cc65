@@ -11,13 +11,14 @@ EBIND	= emxbind
 LDFLAGS	=
 
 OBJS = 	chip.o          \
+        chiplib.o       \
         chippath.o      \
-        cpucore.o	\
-	cputype.o	\
+        cpucore.o     	\
+	cputype.o     	\
         error.o         \
-	global.o	\
+	global.o      	\
 	main.o          \
-        memory.o	\
+        memory.o      	\
         simdata.o
 
 LIBS = $(COMMON)/common.a
@@ -26,7 +27,7 @@ EXECS = sim65
 
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
-all : $(EXECS)
+all:	$(EXECS) chips
 include .depend
 else
 all:	depend
@@ -34,15 +35,19 @@ all:	depend
 endif
 
 
-
 sim65:	$(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS) -ldl
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
 
+.PHONY:	chips
+chips:
+	@$(MAKE) -C chips -f make/gcc.mak
+
+
 clean:
 	rm -f *~ core *.lst
 
-zap:	clean
+zap:  	clean
 	rm -f *.o $(EXECS) .depend
 
 # ------------------------------------------------------------------------------

@@ -38,32 +38,38 @@
 
 
 
+/* common.h */
+#include "coll.h"
+
+/* sim65 */
+#include "chipdata.h"
+#include "simdata.h"
+
+
+
 /*****************************************************************************/
 /*                                     Data                                  */
 /*****************************************************************************/
 
 
 
-/* Forward */
-struct SimData;
+#if 0
+typedef struct ChipInstance ChipInstance;
+struct ChipInstance {
+    Chip*       C;                      /* Pointer to corresponding chip */
+    unsigned    Addr;                   /* Start address of range */
+    unsigned    Size;                   /* Size of range */
+};
+#endif
+
+
 
 /* Chip structure */
 typedef struct Chip Chip;
 struct Chip {
-    char*       Name;                   /* Name - must be unique */
-    char*       LibName;                /* Name of the associated library */
-    void*       Handle;                 /* Library handle or pointer to it */
-
-    /* -- Exported functions -- */
-    unsigned        (*InitChip) (const struct SimData* Data);
-    const char*     (*GetName) (void);
-    unsigned        (*GetVersion) (void);
-
-    void            (*WriteCtrl) (unsigned Addr, unsigned char Val);
-    void            (*Write) (unsigned Addr, unsigned char Val);
-
-    unsigned char   (*ReadCtrl) (unsigned Addr);
-    unsigned char   (*Read) (unsigned Addr);
+    struct ChipLibrary* Library;        /* Pointer to library data structure */
+    const ChipData*     Data;           /* Chip data as given by the library */
+    Collection          Instances;      /* Pointer to chip instances */
 };
 
 
@@ -74,13 +80,8 @@ struct Chip {
 
 
 
-void LoadChip (const char* LibName);
-/* Load a chip. This includes loading the shared libary, allocating and
- * initializing the data structure.
- */
-
-void InitChips (void);
-/* Initialize the chips. Must be called *after* all chips are loaded */
+void LoadChips (void);
+/* Load all chips from all libraries */
 
 const Chip* FindChip (const char* Name);
 /* Find a chip by name. Returns the Chip data structure or NULL if the chip

@@ -44,8 +44,6 @@
 
 
 
-extern const char*	ProgName;	/* Program name */
-
 extern int 	     	Verbose;    	/* Verbose operation flag */
 
 

@@ -106,7 +106,6 @@ FILE global.obj
 FILE library.obj
 FILE list.obj
 FILE main.obj
-FILE mem.obj
 FILE objdata.obj
 FILE objfile.obj
 LIBRARY ..\common\common.lib

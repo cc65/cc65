@@ -43,8 +43,6 @@
 
 
 
-const char* ProgName   	    = "ar65";	/* Program name */
-
 int Verbose    	       	    = 0;       	/* Verbose operation flag */
 
 

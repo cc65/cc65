@@ -60,20 +60,13 @@
 ;
 
 	.importzp     	ptr1, ptr2, ptr3, ptr4
-	.import		__hptr, __hfirst, __hlast, __hend
 	.export		_free, heapadd
+
+        .include        "_heap.inc"
 
 	.macpack	generic
 
-; Offsets into struct freeblock and other constant stuff
-
-size		= 0
-next		= 2
-prev		= 4
-admin_space	= 2
-min_size	= 6
-
-
+;-----------------------------------------------------------------------------
 ; Code
 
 _free: 	sta    	ptr2
@@ -89,11 +82,11 @@ _free: 	sta    	ptr2
 ; Remember the block size in ptr1.
 
 	lda	ptr2
-	sub	#admin_space
+	sub	#HEAP_ADMIN_SPACE
 	sta	ptr2
     	bcs	@L1
     	dec	ptr2+1
-@L1:	ldy	#size+1
+@L1:	ldy	#freeblock_size+1
 	lda	(ptr2),y       	      	; High byte of size
 	sta	ptr1+1 	       	      	; Save it
 	dey
@@ -106,66 +99,66 @@ _free: 	sta    	ptr2
 	tay
 	lda	ptr2+1
 	adc	ptr1+1
-	cpy	__hptr
-	bne	heapadd			; Add to free list
-	cmp	__hptr+1
+	cpy	__heapptr
+	bne	heapadd	   		; Add to free list
+	cmp	__heapptr+1
        	bne    	heapadd
 
 ; The pointer is located at the heap top. Lower the heap top pointer to
 ; release the block.
 
 @L3:	lda	ptr2
-	sta	__hptr
+	sta	__heapptr
 	lda	ptr2+1
-	sta	__hptr+1
+	sta	__heapptr+1
 
 ; Check if the last block in the freelist is now at heap top. If so, remove
 ; this block from the freelist.
 
-	lda	__hlast
+	lda	__heaplast
 	sta	ptr1
-	ora	__hlast+1
+	ora	__heaplast+1
        	beq	@L9   	     		; Jump if free list empty
-	lda	__hlast+1
+	lda	__heaplast+1
 	sta	ptr1+1 	     		; Pointer to last block now in ptr1
 
-	ldy	#size
+	ldy	#freeblock_size
        	lda    	(ptr1),y     		; Low byte of block size
        	add	ptr1
 	tax
-	iny	    	    		; High byte of block size
+	iny	      	    		; High byte of block size
 	lda	(ptr1),y
 	adc	ptr1+1
 
-	cmp	__hptr+1
+	cmp	__heapptr+1
        	bne	@L9    	     		; Jump if last block not on top of heap
-	cpx	__hptr
+	cpx	__heapptr
 	bne	@L9    	     		; Jump if last block not on top of heap
 
 ; Remove the last block
 
 	lda	ptr1
-	sta	__hptr
+	sta	__heapptr
 	lda	ptr1+1
-	sta	__hptr+1
+	sta	__heapptr+1
 
 ; Correct the next pointer of the now last block
 
-	ldy    	#prev+1	     		; Offset of ->prev field
+	ldy    	#freeblock_prev+1	; Offset of ->prev field
        	lda    	(ptr1),y
-	sta    	ptr2+1	    		; Remember f->prev in ptr2
-	sta	__hlast+1
+	sta    	ptr2+1	    	 	; Remember f->prev in ptr2
+	sta	__heaplast+1
 	dey
 	lda	(ptr1),y
 	sta	ptr2  	    		; Remember f->prev in ptr2
-	sta	__hlast
-    	ora	__hlast+1   		; -> prev == 0?
+	sta	__heaplast
+    	ora	__heaplast+1   		; -> prev == 0?
        	bne    	@L8    	    		; Jump if free list not empty
 
 ; Free list is now empty (A = 0)
 
-	sta	__hfirst
-	sta	__hfirst+1
+	sta	__heapfirst
+	sta	__heapfirst+1
 
 ; Done
 
@@ -176,9 +169,9 @@ _free: 	sta    	ptr2
 @L8:	lda	#$00
     	dey	      	    	      	; Points to high byte of ->next
        	sta    	(ptr2),y
-    	dey	     	    	      	; Low byte of f->prev->next
+    	dey	      	    	      	; Low byte of f->prev->next
     	sta	(ptr2),y
-    	rts		    	      	; Done
+    	rts	      	    	      	; Done
 
 ; The block is not on top of the heap. Add it to the free list. This was
 ; formerly a separate function called __hadd that was implemented in C as
@@ -235,10 +228,10 @@ _free: 	sta    	ptr2
 ;     		    /* Merge with the right block */
 ;     		    f->size += right->size;
 ;     		    if (f->next = right->next) {
-;        			f->next->prev = f;
+;        	      		f->next->prev = f;
 ;     		    } else {
-;     			/* This is now the last block */
-;     			_hlast = f;
+;     		      	/* This is now the last block */
+;     		      	_hlast = f;
 ;     		    }
 ;     		} else {
 ;     		    /* No merge, just set the link */
@@ -256,10 +249,10 @@ _free: 	sta    	ptr2
 ;     		    /* Merge with the left block */
 ;     		    left->size += f->size;
 ;     		    if (left->next = f->next) {
-;     			left->next->prev = left;
+;     		      	left->next->prev = left;
 ;     		    } else {
-;     			/* This is now the last block */
-;     			_hlast = left;
+;     		      	/* This is now the last block */
+;     		      	_hlast = left;
 ;     		    }
 ;     		} else {
 ;     		    /* No merge, just set the link */
@@ -279,9 +272,9 @@ _free: 	sta    	ptr2
 ; Check if the free list is empty, storing _hfirst into ptr3 for later
 
 heapadd:
-	lda    	__hfirst
+	lda    	__heapfirst
 	sta	ptr3
-	lda    	__hfirst+1
+	lda    	__heapfirst+1
   	sta	ptr3+1
 	ora	ptr3
    	bne	SearchFreeList
@@ -289,49 +282,49 @@ heapadd:
 ; The free list is empty, so this is the first and only block. A contains
 ; zero if we come here.
 
-	ldy	#next-1
-@L2:	iny   	       		; f->next = f->prev = 0;
+	ldy	#freeblock_next-1
+@L2:	iny   	       		        ; f->next = f->prev = 0;
     	sta   	(ptr2),y
-    	cpy   	#prev+1		; Done?
+    	cpy   	#freeblock_prev+1        ; Done?
     	bne   	@L2
 
   	lda   	ptr2
   	ldx   	ptr2+1
-  	sta   	__hfirst
-  	stx   	__hfirst+1	; _hfirst = f;
-  	sta   	__hlast
-  	stx   	__hlast+1	; _hlast = f;
+  	sta   	__heapfirst
+  	stx   	__heapfirst+1  	        ; _heapfirst = f;
+  	sta   	__heaplast
+  	stx   	__heaplast+1   	        ; _heaplast = f;
 
-  	rts   	    		; Done
+  	rts   	    		        ; Done
 
 ; We have to search the free list. As we are doing so, check if it is possible
 ; to combine this block with another, already existing block. Beware: The
 ; block may be the "missing link" between two blocks.
 ; ptr3 contains _hfirst (the start value of the search) when execution reaches
-; this point, Y contains size+1. We do also know that _hfirst (and therefore
+; this point, Y contains size+1. We do also know that _heapfirst (and therefore
 ; ptr3) is not zero on entry.
 
 SearchFreeList:
   	lda	#0
   	sta	ptr4
-  	sta	ptr4+1		; left = 0;
-  	ldy	#next+1
+  	sta	ptr4+1	   	        ; left = 0;
+  	ldy	#freeblock_next+1
        	ldx	ptr3
 
-@Loop:	lda	ptr3+1		; High byte of right
+@Loop:	lda	ptr3+1		        ; High byte of right
 	cmp	ptr2+1
 	bne	@L1
 	cpx	ptr2
 	beq	@L2
 @L1:	bcs	CheckRightMerge
 
-@L2:	stx	ptr4   		; left = right;
+@L2:	stx	ptr4   		        ; left = right;
        	sta	ptr4+1
 
-       	dey	       	 	; Points to next
-       	lda	(ptr3),y	; right = right->next;
+       	dey	       	 	        ; Points to next
+       	lda	(ptr3),y	        ; right = right->next;
   	tax
-  	iny			; Points to next+1
+  	iny			        ; Points to next+1
   	lda	(ptr3),y
   	stx	ptr3
   	sta	ptr3+1
@@ -342,14 +335,14 @@ SearchFreeList:
 ; a merge. The new block is the new freelist end.
 ; A is zero when we come here, Y points to next+1
 
-	sta	(ptr2),y	; Clear high byte of f->next
+	sta	(ptr2),y	        ; Clear high byte of f->next
 	dey
-	sta	(ptr2),y	; Clear low byte of f->next
+	sta	(ptr2),y	        ; Clear low byte of f->next
 
-	lda	ptr2		; _hlast = f;
-	sta	__hlast
+	lda	ptr2		        ; _heaplast = f;
+	sta	__heaplast
 	lda	ptr2+1
-	sta	__hlast+1
+	sta	__heaplast+1
 
 ; Since we have checked the case that the freelist is empty before, if the
 ; right pointer is NULL, the left *cannot* be NULL here. So skip the
@@ -362,7 +355,7 @@ SearchFreeList:
 
 CheckRightMerge:
 	lda	ptr2
-	add	ptr1		; f + size
+	add	ptr1  		        ; f + size
 	tax
 	lda	ptr2+1
 	adc	ptr1+1
@@ -374,11 +367,11 @@ CheckRightMerge:
 
 ; Merge with the right block. Do f->size += right->size;
 
-  	ldy	#size
+  	ldy	#freeblock_size
   	lda    	ptr1
        	add    	(ptr3),y
   	sta	(ptr2),y
-  	iny	      		; Points to size+1
+  	iny	      	   	        ; Points to size+1
   	lda	ptr1+1
   	adc	(ptr3),y
   	sta	(ptr2),y
@@ -386,153 +379,154 @@ CheckRightMerge:
 ; Set f->next = right->next and remember f->next in ptr1 (we don't need the
 ; size stored there any longer)
 
-  	iny	     	       	; Points to next
-  	lda	(ptr3),y       	; Low byte of right->next
-  	sta	(ptr2),y       	; Store to low byte of f->next
+  	iny	     	       	        ; Points to next
+  	lda	(ptr3),y       	        ; Low byte of right->next
+  	sta	(ptr2),y       	        ; Store to low byte of f->next
   	sta	ptr1
-  	iny	     	       	; Points to next+1
-  	lda	(ptr3),y       	; High byte of right->next
-  	sta	(ptr2),y       	; Store to high byte of f->next
+  	iny	     	       	        ; Points to next+1
+  	lda	(ptr3),y       	        ; High byte of right->next
+  	sta	(ptr2),y       	        ; Store to high byte of f->next
   	sta	ptr1+1
   	ora	ptr1
-       	beq	@L1  	       	; Jump if f->next zero
+       	beq	@L1  	       	        ; Jump if f->next zero
 
 ; f->next->prev = f;
 
-  	iny	     		; Points to prev
-  	lda	ptr2 		; Low byte of f
-  	sta	(ptr1),y	; Low byte of f->next->prev
-  	iny	     		; Points to prev+1
-  	lda	ptr2+1		; High byte of f
-  	sta	(ptr1),y	; High byte of f->next->prev
-  	jmp	CheckLeftMerge	; Done
+  	iny	     	   	        ; Points to prev
+  	lda	ptr2 	   	        ; Low byte of f
+  	sta	(ptr1),y   	        ; Low byte of f->next->prev
+  	iny	     	   	        ; Points to prev+1
+  	lda	ptr2+1	   	        ; High byte of f
+  	sta	(ptr1),y   	        ; High byte of f->next->prev
+  	jmp	CheckLeftMerge	        ; Done
 
 ; f->next is zero, this is now the last block
 
-@L1:	lda	ptr2 		; _hlast = f;
-  	sta	__hlast
+@L1:	lda	ptr2 	       	        ; _heaplast = f;
+  	sta	__heaplast
   	lda	ptr2+1
-  	sta	__hlast+1
+  	sta	__heaplast+1
   	jmp	CheckLeftMerge
 
 ; No right merge, just set the link.
 
 NoRightMerge:
-  	ldy	#next	       	; f->next = right;
+  	ldy	#freeblock_next        	; f->next = right;
   	lda	ptr3
   	sta	(ptr2),y
-  	iny	     		; Points to next+1
+  	iny	      		        ; Points to next+1
    	lda	ptr3+1
   	sta	(ptr2),y
 
-  	iny	      		; Points to prev
-  	lda	ptr2 		; right->prev = f;
+  	iny	      		        ; Points to prev
+  	lda	ptr2 		        ; right->prev = f;
   	sta	(ptr3),y
-  	iny	     		; Points to prev+1
+  	iny	     		        ; Points to prev+1
   	lda	ptr2+1
   	sta	(ptr3),y
 
 ; Check if the left pointer is zero
 
 CheckLeftMerge:
-  	lda	ptr4  		; left == NULL?
+  	lda	ptr4  		        ; left == NULL?
   	ora	ptr4+1
-       	bne 	CheckLeftMerge2	; Jump if there is a left block
+       	bne 	CheckLeftMerge2	        ; Jump if there is a left block
 
 ; We don't have a left block, so f is actually the new freelist start
 
-  	ldy	#prev
-  	sta	(ptr2),y	; f->prev = 0;
+  	ldy	#freeblock_prev
+  	sta	(ptr2),y       	        ; f->prev = 0;
    	iny
   	sta	(ptr2),y
 
-  	lda	ptr2  		; _hfirst = f;
-  	sta	__hfirst
+  	lda	ptr2  	       	        ; _heapfirst = f;
+  	sta	__heapfirst
   	lda	ptr2+1
-  	sta	__hfirst+1
+  	sta	__heapfirst+1
 
-  	rts	     		; Done
+  	rts	       	       	        ; Done
 
 ; Check if the left block is adjacent to the following one
 
 CheckLeftMerge2:
-	ldy	#size		; Calculate left + left->size
-	lda	(ptr4),y	; Low byte of left->size
+	ldy	#freeblock_size		; Calculate left + left->size
+	lda	(ptr4),y       	        ; Low byte of left->size
 	add	ptr4
 	tax
-	iny	     	       	; Points to size+1
-	lda	(ptr4),y	; High byte of left->size
+	iny	     	       	        ; Points to size+1
+	lda	(ptr4),y	        ; High byte of left->size
 	adc	ptr4+1
 
    	cpx	ptr2
        	bne	NoLeftMerge
 	cmp	ptr2+1
-	bne	NoLeftMerge	; Jump if blocks not adjacent
+	bne	NoLeftMerge    	        ; Jump if blocks not adjacent
 
 ; Merge with the left block. Do left->size += f->size;
 
-	dey	     		; Points to size
+	dey	     		        ; Points to size
 	lda	(ptr4),y
 	add    	(ptr2),y
 	sta	(ptr4),y
-	iny	     		; Points to size+1
+	iny	     		        ; Points to size+1
 	lda	(ptr4),y
 	adc	(ptr2),y
 	sta	(ptr4),y
 
 ; Set left->next = f->next and remember left->next in ptr1.
 
-	iny	     		; Points to next
-	lda	(ptr2),y	; Low byte of f->next
+	iny	     		        ; Points to next
+	lda	(ptr2),y	        ; Low byte of f->next
    	sta	(ptr4),y
 	sta	ptr1
-	iny	     		; Points to next+1
-	lda	(ptr2),y	; High byte of f->next
+	iny	     		        ; Points to next+1
+	lda	(ptr2),y	        ; High byte of f->next
 	sta	(ptr4),y
 	sta	ptr1+1
-	ora	ptr1 		; left->next == NULL?
+	ora	ptr1 		        ; left->next == NULL?
 	beq	@L1
 
 ; Do left->next->prev = left
 
-	iny			; Points to prev
-	lda	ptr4		; Low byte of left
+	iny			        ; Points to prev
+	lda	ptr4		        ; Low byte of left
 	sta	(ptr1),y
 	iny
-	lda	ptr4+1		; High byte of left
+	lda	ptr4+1	       	        ; High byte of left
 	sta	(ptr1),y
-	rts			; Done
+	rts			        ; Done
 
-; This is now the last block, do _hlast = left
+; This is now the last block, do _heaplast = left
 
 @L1:	lda	ptr4
-	sta	__hlast
+	sta	__heaplast
 	lda	ptr4+1
-	sta	__hlast+1
-	rts			; Done
+	sta	__heaplast+1
+	rts	       	       	        ; Done
 
 ; No merge of the left block, just set the link. Y points to size+1 if
 ; we come here. Do left->next = f.
 
 NoLeftMerge:
-	iny			; Points to next
-	lda	ptr2		; Low byte of left
+	iny			        ; Points to next
+	lda	ptr2		        ; Low byte of left
 	sta	(ptr4),y
 	iny
-	lda	ptr2+1		; High byte of left
+	lda	ptr2+1		        ; High byte of left
 	sta	(ptr4),y
 
 ; Do f->prev = left
 
-	iny	   		; Points to prev
+	iny	   		        ; Points to prev
 	lda	ptr4
 	sta	(ptr2),y
 	iny
 	lda	ptr4+1
 	sta	(ptr2),y
-	rts			; Done
+	rts			        ; Done
 
 
 
 
 
+                                        

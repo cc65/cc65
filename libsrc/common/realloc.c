@@ -35,7 +35,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include "_heap.h"
+#include <_heap.h>
 
 
 
@@ -73,13 +73,13 @@ void* __fastcall__ realloc (void* block, size_t size)
     diff = size - oldsize;
 
     /* Is the block at the current heap top? */
-    if (((int) b) + oldsize == ((int) _hptr)) {
+    if (((int) b) + oldsize == ((int) _heapptr)) {
     	/* Check if we've enough memory at the heap top */
     	int newhptr;
-    	newhptr = ((int) _hptr) + diff;
-    	if (newhptr <= ((int) _hend)) {
+    	newhptr = ((int) _heapptr) + diff;
+    	if (newhptr <= ((int) _heapend)) {
     	    /* Ok, there's space enough */
-       	    _hptr = (unsigned*) newhptr;
+       	    _heapptr = (unsigned*) newhptr;
     	    *b = size;
     	    return block;
     	}
@@ -109,3 +109,4 @@ void* __fastcall__ realloc (void* block, size_t size)
 
 
 
+                 

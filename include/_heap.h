@@ -15,7 +15,7 @@
 /* Space needed for administering used blocks */
 #define HEAP_ADMIN_SPACE        sizeof (unsigned)
 
-/* The data type used to implement the free list. 
+/* The data type used to implement the free list.
  * Beware: Field order is significant!
  */
 struct freeblock {
@@ -27,11 +27,11 @@ struct freeblock {
 
 
 /* Variables that describe the heap */
-extern unsigned*       	  _horg;       	/* Bottom of heap */
-extern unsigned*  	  _hptr;	/* Current top */
-extern unsigned*  	  _hend;	/* Upper limit */
-extern struct freeblock*  _hfirst;	/* First free block in list */
-extern struct freeblock*  _hlast;	/* Last free block in list */
+extern unsigned*       	  _heaporg;     /* Bottom of heap */
+extern unsigned*  	  _heapptr;	/* Current top */
+extern unsigned*  	  _heapend;	/* Upper limit */
+extern struct freeblock*  _heapfirst;	/* First free block in list */
+extern struct freeblock*  _heaplast;	/* Last free block in list */
 
 
 

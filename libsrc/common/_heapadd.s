@@ -10,22 +10,16 @@
 	.importzp    	ptr1, ptr2
 	.import	       	popax
 	.import		heapadd
-       	.export	     	_heapadd
+       	.export	     	__heapadd
+
+        .include        "_heap.inc"
 
        	.macpack	generic
 
-; Offsets into struct freeblock and other constant stuff
-
-size		= 0
-next		= 2
-prev		= 4
-admin_space	= 2
-min_size	= 6
-
-
+;-----------------------------------------------------------------------------
 ; Code
 
-_heapadd:
+__heapadd:
 	sta	ptr1	    	; Store size in ptr1
 	stx	ptr1+1
 	jsr	popax		; Get the block pointer
@@ -39,14 +33,14 @@ _heapadd:
 	lda	ptr1		; Load low byte
 	ldx	ptr1+1		; Load/check high byte
 	bne	@L1
-	cmp	#min_size
+	cmp	#HEAP_MIN_BLOCKSIZE
 	bcs   	@L1
 
 	rts	    		; Block not large enough
 
 ; The block is large enough. Set the size field in the block.
 
-@L1:	ldy	#size
+@L1:	ldy	#freeblock_size
     	sta	(ptr2),y
 	iny
 	txa
@@ -55,6 +49,4 @@ _heapadd:
 ; Call the internal function since variables are now setup correctly
 
 	jmp	heapadd
-
-
 

@@ -4,23 +4,25 @@
 ; Heap variables and initialization.
 ;
 
-     	.export		__horg, __hptr, __hend, __hfirst, __hlast
        	.constructor	initheap, 24
        	.import	       	__BSS_RUN__, __BSS_SIZE__, __STACKSIZE__
 	.importzp	sp
 
+        .include        "_heap.inc"
+
+
 .data
 
-__horg:
+__heaporg:
        	.word  	__BSS_RUN__+__BSS_SIZE__	; Linker calculates this symbol
-__hptr:
-   	.word	__BSS_RUN__+__BSS_SIZE__	; Dito
-__hend:
+__heapptr:
+      	.word	__BSS_RUN__+__BSS_SIZE__	; Dito
+__heapend:
        	.word	__BSS_RUN__+__BSS_SIZE__
-__hfirst:
-   	.word	0
-__hlast:
-   	.word	0
+__heapfirst:
+      	.word	0
+__heaplast:
+      	.word	0
 
 
 ; Initialization. Will be called from startup!
@@ -28,12 +30,12 @@ __hlast:
 .code
 
 initheap:
-   	sec
-   	lda	sp
-	sbc	#<__STACKSIZE__
-	sta	__hend
-	lda	sp+1
+      	sec
+      	lda	sp
+      	sbc	#<__STACKSIZE__
+      	sta	__heapend
+      	lda	sp+1
 	sbc	#>__STACKSIZE__
-	sta	__hend+1
+	sta	__heapend+1
 	rts
 

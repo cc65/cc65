@@ -57,8 +57,17 @@ void* __fastcall__ malloc (size_t size);
 void* __fastcall__ calloc (size_t count, size_t size);
 void* __fastcall__ realloc (void* block, size_t size);
 void __fastcall__ free (void* block);
-/* Non standard functions */
-void __fastcall__ _heapadd (void* mem, size_t size);	
+
+/* Non standard memory management functions */
+
+void __fastcall__ _heapadd (void* mem, size_t size);
+/* Add a block to the heap */
+
+size_t __fastcall__ _heapmemavail (void);
+/* Return the total free heap space */
+
+size_t __fastcall__ _heapmaxavail (void);
+/* Return the size of the largest free block on the heap */
 
 /* Random numbers */
 #define	RAND_MAX   	0x7FFF

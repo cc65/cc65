@@ -54,6 +54,8 @@ S_OBJS = 	_fdesc.o 	\
 		_fopen.o	\
 	 	_heap.o	 	\
        	       	_heapadd.o 	\
+                _heapmaxavail.o \
+                _heapmemavail.o \
 	 	_oserror.o	\
 		_printf.o	\
 		_swap.o		\

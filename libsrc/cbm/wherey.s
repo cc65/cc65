@@ -5,13 +5,11 @@
 ;
 
  	.export		_wherey
-        .import         PLOT
+        .import         CURS_Y: zp
 
 
 .proc   _wherey
-	sec
-	jsr	PLOT		; Get cursor position
-	txa
+        lda     CURS_Y
         ldx     #$00
 	rts
 .endproc

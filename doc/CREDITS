@@ -1,7 +1,7 @@
 
 Many special thanks go to the guy who started it all:
 
-		   	John R.Dunning.
+		   	John R. Dunning
 
 Without his great work, there would not be a single freeware C crosscompiler
 for the 6502 out there. He built the grounds for this cc65 and some other cc65
@@ -19,7 +19,9 @@ More special thanks to:
 
   * Tennessee Carmel-Veilleux <veilleux@ameth.org>
 
-    Tennessee worked on the NES port.
+    Tennessee worked on the NES port (which is unfinished and was removed
+    because having an unfinished port it was confusing and people started 
+    mailing me about it).
 
   * Kevin Ruland <kevin@rodin.wustl.edu>
 
@@ -27,8 +29,12 @@ More special thanks to:
     C library while doing so.
 
   * Christian Groessler <cpg@aladdin.de>
+    Mark Keates <markk@dendrite.co.uk>
+    Freddy Offenga <F.Offenga@student.kun.nl>
+    David Lloyd <dmlloyd@atari-central.com>
 
-    Christian sent me several fixes for 64 bit machines.
+    The team that added support for the Atari 8 bit machines.
+    Christian Groessler also sent me several fixes for 64 bit machines.
 
   * Sidney Cadot <sidney@ch.twi.tudelft.nl>
 
@@ -36,7 +42,12 @@ More special thanks to:
 
   * Maciej Witkowiak <ytm@friko.onet.pl>
 
-    Maciej is responsible for the GEOS support.
+    Maciej wrote the GEOS support libraries for cc65.
+
+  * Eric Au <eric_au@hotmail.com>
+
+    Eric is one of the most active testers, and supplied me with dozens of 
+    bug reports.
 
   * MicroSystems Development Technologies Inc. located in San Jose,
     California payed me for the addition of several assembler features,
@@ -57,7 +68,6 @@ Thanks to
     Robert R. Wal <rrw@reptile.eu.org>
     Jesse Beach <agmorion@erols.com>
     Chris Ward <chris.ward@freenet.co.uk>
-    Eric Au <eric_au@hotmail.com>
     Tim Vanderhoek <hoek@FreeBSD.org>
     Bill Craig <craigw@gusun.georgetown.edu>
 

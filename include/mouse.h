@@ -45,6 +45,21 @@
 #ifdef __C128__
 #  define __MOUSE__
 #endif
+#ifdef __ATARI__
+#  define __MOUSE__
+#endif
+
+
+/*****************************************************************************/
+/* 	      			  Definitions	     			     */
+/*****************************************************************************/
+
+
+/* the different mouse types */
+#define MOUSE_TRAKBALL 0
+#define MOUSE_ST       1
+#define MOUSE_AMIGA    2
+#define MOUSE_C64      3      /* 1351 mouse */
 
 
 
@@ -110,14 +125,15 @@ void __fastcall__ mouse_move (int x, int y);
  * inside the bounding box.
  */
 
+unsigned char mouse_down(void);
+/* Get mouse button state (0 - up, 1 - dowm)
+ */
+
 void mouse_info (void);
 /* Hmmm...
  */
 
 
-
 /* End of mouse.h */
 #endif
-
-
 

@@ -37,7 +37,7 @@
 #include "check.h"
 #include "filepos.h"
 #include "xmalloc.h"
-	  
+
 /* ca65 */
 #include "error.h"
 #include "expr.h"
@@ -53,8 +53,8 @@
 
 
 /* Struct that describes an unnamed label */
-typedef struct ULabel_ ULabel;
-struct ULabel_ {
+typedef struct ULabel ULabel;
+struct ULabel {
     ULabel*    	Prev;         		/* Pointer to previous node in list */
     ULabel*    	Next;  	       		/* Pointer to next node in list */
     FilePos	Pos;			/* Position of the label in the source */
@@ -145,14 +145,11 @@ ExprNode* ULabRef (int Which)
     } else {
       	/* Forward reference. Create labels as needed */
 	unsigned LabelNum = ULabDefCount + Which - 1;
-      	while (Which > 0) {
-      	    if (L->Next == 0) {
-      	      	NewULabel (0);
-      	    }
-      	    L = L->Next;
-      	    --Which;
-      	}
-      	/* Return an unnamed label expression */
+	while (LabelNum < ULabCount) {
+       	    NewULabel (0);
+	}
+
+	/* Return an unnamed label expression */
        	return ULabelExpr (LabelNum);
     }
 }

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -287,11 +287,11 @@ static void AddOpLow (StackOpData* D, opc_t OPC)
     InsertEntry (D, X, D->IP++);
 }
 
-            
+
 
 static void AddOpHigh (StackOpData* D, opc_t OPC)
 /* Add an op for the high byte of an operator. Special cases (constant values
- * or similar have to be checked separately, the function covers only the
+ * or similar) have to be checked separately, the function covers only the
  * generic case. Code is inserted at the insertion point.
  */
 {
@@ -321,9 +321,10 @@ static void RemovePushAndOp (StackOpData* D)
 
 
 
-static const char* IsRegVar (const StackOpData* D)
-/* If the value pushed is that of a register variable, return the name of the
- * entry in the register bank. Otherwise return NULL.
+static int IsRegVar (StackOpData* D)
+/* If the value pushed is that of a register variable, replace ZPLo and ZPHi
+ * in the given StackOpData struct by the register variables and return true.
+ * Otherwise leave D untouched and return false.
  */
 {
     CodeEntry* P;
@@ -340,7 +341,9 @@ static const char* IsRegVar (const StackOpData* D)
         strncmp (P->Arg, "regbank+", 7) == 0             &&
         isdigit (P->Arg[8])) {
         /* Ok, it loads the register variable */
-        return P->Arg;
+        D->ZPHi = D->PrevEntry->Arg;
+        D->ZPLo = P->Arg;
+        return 1;
     } else {
         return 0;
     }
@@ -354,24 +357,103 @@ static const char* IsRegVar (const StackOpData* D)
 
 
 
+static unsigned Opt___bzero (StackOpData* D)
+/* Optimize the __bzero sequence if possible */
+{
+    CodeEntry*  X;
+    const char* Arg;
+    CodeLabel*  L;
+
+    /* Check if we're using a register variable */
+    if (!IsRegVar (D)) {
+        /* Store the value into the zeropage instead of pushing it */
+        ReplacePushByStore (D);
+    }
+
+    /* If the return value of __bzero is used, we have to add code to reload
+     * a/x from the pointer variable.
+     */
+    if (RegAXUsed (D->Code, D->OpIndex+1)) {
+        X = NewCodeEntry (OP65_LDA, AM65_ZP, D->ZPLo, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->OpIndex+1);
+        X = NewCodeEntry (OP65_LDX, AM65_ZP, D->ZPHi, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->OpIndex+2);
+    }
+
+    /* X is always zero, A contains the size of the data area to zero.
+     * Note: A may be zero, in which case the operation is null op.
+     */
+    if (D->OpEntry->RI->In.RegA != 0) {
+
+        /* The value of A is known */
+        if (D->OpEntry->RI->In.RegA <= 0x81) {
+
+            /* Loop using the sign bit */
+            X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex+1);
+
+	    Arg = MakeHexArg (D->OpEntry->RI->In.RegA - 1);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex+2);
+
+            X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex+3);
+            L = CS_GenLabel (D->Code, X);
+
+            X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex+4);
+
+            X = NewCodeEntry (OP65_BPL, AM65_BRA, L->Name, L, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex+5);
+
+        } else {
+
+            /* Loop using an explicit compare */
+            X = NewCodeEntry (OP65_LDA, AM65_IMM, "$00", 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex+1);
+
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, "$00", 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex+2);
+
+            X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex+3);
+            L = CS_GenLabel (D->Code, X);
+
+            X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex+4);
+
+	    Arg = MakeHexArg (D->OpEntry->RI->In.RegA);
+            X = NewCodeEntry (OP65_CPY, AM65_IMM, Arg, 0, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex+5);
+
+            X = NewCodeEntry (OP65_BPL, AM65_BRA, L->Name, L, D->OpEntry->LI);
+            InsertEntry (D, X, D->OpIndex+6);
+        }
+
+    }
+
+    /* Remove the push and the call to the __bzero function */
+    RemovePushAndOp (D);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
 static unsigned Opt_staspidx (StackOpData* D)
 /* Optimize the staspidx sequence if possible */
 {
     CodeEntry* X;
-    const char* ZPLo;
 
     /* Check if we're using a register variable */
-    if ((ZPLo = IsRegVar (D)) == 0) {
-
+    if (!IsRegVar (D)) {
         /* Store the value into the zeropage instead of pushing it */
         ReplacePushByStore (D);
-
-        /* Use the given zero page loc */
-        ZPLo = D->ZPLo;
     }
 
     /* Replace the store subroutine call by a direct op */
-    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLo, 0, D->OpEntry->LI);
+    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+1);
 
     /* Remove the push and the call to the staspidx function */
@@ -387,20 +469,15 @@ static unsigned Opt_staxspidx (StackOpData* D)
 /* Optimize the staxspidx sequence if possible */
 {
     CodeEntry* X;
-    const char* ZPLo;
 
     /* Check if we're using a register variable */
-    if ((ZPLo = IsRegVar (D)) == 0) {
-
+    if (!IsRegVar (D)) {
         /* Store the value into the zeropage instead of pushing it */
         ReplacePushByStore (D);
-
-        /* Use the given zero page loc */
-        ZPLo = D->ZPLo;
     }
 
     /* Inline the store */
-    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLo, 0, D->OpEntry->LI);
+    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+1);
     X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+2);
@@ -413,7 +490,7 @@ static unsigned Opt_staxspidx (StackOpData* D)
      	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, D->OpEntry->LI);
     }
     InsertEntry (D, X, D->OpIndex+3);
-    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLo, 0, D->OpEntry->LI);
+    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, D->ZPLo, 0, D->OpEntry->LI);
     InsertEntry (D, X, D->OpIndex+4);
 
     /* Remove the push and the call to the staspidx function */
@@ -618,8 +695,10 @@ static unsigned Opt_tosxorax (StackOpData* D)
 
 /* Flags for the functions */
 typedef enum {
-    STOP_NONE,	     	    /* Nothing special */
-    STOP_A_UNUSED           /* Call only if a unused later */
+    STOP_NONE       = 0x00,     /* Nothing special */
+    STOP_A_UNUSED   = 0x01,     /* Call only if a unused later */
+    STOP_A_KNOWN    = 0x02,     /* Call only if A is known */
+    STOP_X_ZERO     = 0x04      /* Call only if X is zero */
 } STOP_FLAGS;
 
 
@@ -632,12 +711,13 @@ struct OptFuncDesc {
 };
 
 static const OptFuncDesc FuncTable[] = {
-    { "staspidx",   Opt_staspidx,  STOP_NONE },
+    { "__bzero",    Opt___bzero,   STOP_NONE     },
+    { "staspidx",   Opt_staspidx,  STOP_NONE     },
     { "staxspidx",  Opt_staxspidx, STOP_A_UNUSED },
-    { "tosaddax",   Opt_tosaddax,  STOP_NONE },
-    { "tosandax",   Opt_tosandax,  STOP_NONE },
-    { "tosorax",    Opt_tosorax,   STOP_NONE },
-    { "tosxorax",   Opt_tosxorax,  STOP_NONE },
+    { "tosaddax",   Opt_tosaddax,  STOP_NONE     },
+    { "tosandax",   Opt_tosandax,  STOP_NONE     },
+    { "tosorax",    Opt_tosorax,   STOP_NONE     },
+    { "tosxorax",   Opt_tosxorax,  STOP_NONE     },
 };
 #define FUNC_COUNT (sizeof(FuncTable) / sizeof(FuncTable[0]))
 
@@ -757,13 +837,16 @@ unsigned OptStackOps (CodeSeg* S)
 		    int PreCondOk = 1;
 
 		    /* Check the flags */
-		    if (F->Flags & STOP_A_UNUSED) {
-			/* a must be unused later */
-			if (RegAUsed (S, I+1)) {
-			    /* Cannot optimize */
-			    PreCondOk = 0;
-			}
-		    }
+		    if ((F->Flags & STOP_A_UNUSED) != 0 && RegAUsed (S, I+1)) {
+                        /* Cannot optimize */
+			PreCondOk = 0;
+		    } else if ((F->Flags & STOP_A_KNOWN) != 0 && RegValIsUnknown (E->RI->In.RegA)) {
+                        /* Cannot optimize */
+                        PreCondOk = 0;
+                    } else if ((F->Flags & STOP_X_ZERO) != 0 && E->RI->In.RegX != 0) {
+                        /* Cannot optimize */
+                        PreCondOk = 0;
+                    }
 
 	    	    /* Determine the zero page locations to use */
 		    if (PreCondOk) {

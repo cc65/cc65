@@ -38,6 +38,11 @@
 
 
 
+/* common */
+#include "attrib.h"
+
+
+
 /*****************************************************************************/
 /*	  		   	     Data		     		     */
 /*****************************************************************************/
@@ -57,13 +62,13 @@ extern const char _MsgFail [];
 
 
 
-void Warning (const char* Format, ...);
+void Warning (const char* Format, ...) attribute((format(printf,1,2)));
 /* Print a warning message */
 
-void Error (const char* Format, ...);
+void Error (const char* Format, ...) attribute((format(printf,1,2)));
 /* Print an error message and die */
 
-void Internal (const char* Format, ...);
+void Internal (const char* Format, ...) attribute((format(printf,1,2)));
 /* Print an internal error message and die */
 
 #define CHECK(c)     							\

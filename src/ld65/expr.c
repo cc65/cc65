@@ -33,9 +33,11 @@
 
 
 
-#include "../common/exprdefs.h"
-#include "../common/xmalloc.h"
-
+/* common */
+#include "exprdefs.h"
+#include "xmalloc.h"
+	  
+/* ld65 */
 #include "global.h"
 #include "error.h"
 #include "fileio.h"
@@ -253,7 +255,7 @@ int IsConstExpr (ExprNode* Root)
 		 * which in turn means, that we have a circular reference.
 		 */
 		if (ExportHasMark (E)) {
-		    Error ("Circular reference for symbol `%s', %s(%u)",
+		    Error ("Circular reference for symbol `%s', %s(%lu)",
 			   E->Name, E->Obj->Files [E->Pos.Name], E->Pos.Line);
 		    Const = 0;
 		} else {

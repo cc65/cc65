@@ -13,14 +13,13 @@
 
 char* gets (char* s)
 {
-    int i, c;
+    int c;
+    int i = 0;
 
-    i = 0;
     do {
 
        	/* Get next character */
-       	c = fgetc (stdin);
-       	if (c == EOF) {
+       	if ((c = fgetc (stdin)) == EOF) {
        	    /* Error or EOF */
        	    s [i] = 0;
        	    if (stdin->f_flags & _FERROR) {

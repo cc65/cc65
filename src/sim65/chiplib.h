@@ -64,7 +64,7 @@ struct ChipLibrary {
 };
 
 /* A collection containing all libraries */
-Collection ChipLibraries;
+extern Collection ChipLibraries;
 
 
 

@@ -63,13 +63,13 @@ struct __vic2 {
     unsigned char	strobe_y;	/* Light pen, Y position */
     unsigned char	spr_ena;	/* Enable sprites */
     unsigned char	ctrl2;		/* Control register 2 */
-    unsigned char	spr_exp_x;	/* Expand sprites in X dir */
-    unsigned char	addr;		/* Address of chargen and video ram */
+    unsigned char	spr_exp_y;	/* Expand sprites in Y dir */
+    unsigned char      	addr;  		/* Address of chargen and video ram */
     unsigned char	irr;		/* Interrupt request register */
     unsigned char	imr;		/* Interrupt mask register */
     unsigned char	spr_bg_prio;	/* Priority to background */
     unsigned char	spr_mcolor;	/* Sprite multicolor bits */
-    unsigned char	spr_exp_y;	/* Expand sprites in Y dir */
+    unsigned char	spr_exp_x;     	/* Expand sprites in X dir */
     unsigned char	spr_coll;	/* Sprite/sprite collision reg */
     unsigned char	spr_bg_coll;	/* Sprite/background collision reg */
     unsigned char      	bordercolor;	/* Border color */

@@ -75,11 +75,21 @@ void xfree (const void* Block)
 char* xstrdup (const char* S)
 /* Duplicate a string on the heap. The function checks for out of memory */
 {
-    /* Get the length of the string */
-    unsigned Len = strlen (S) + 1;
+    /* Allow dup'ing of NULL strings */
+    if (S) {
 
-    /* Allocate memory and return a copy */
-    return memcpy (xmalloc (Len), S, Len);
+	/* Get the length of the string */
+	unsigned Len = strlen (S) + 1;
+
+	/* Allocate memory and return a copy */
+	return memcpy (xmalloc (Len), S, Len);
+
+    } else {
+
+	/* Return a NULL pointer */
+	return 0;
+
+    }
 }
 
 

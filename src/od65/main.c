@@ -77,7 +77,7 @@ static void Usage (void)
        	     "  -V\t\t\tPrint the version number and exit\n"
 	     "\n"
 	     "Long options:\n"
-	     "  --dump-all\t\tDump all object file information\n" 
+	     "  --dump-all\t\tDump all object file information\n"
 	     "  --dump-dbgsyms\tDump debug symbols\n"
        	     "  --dump-exports\tDump exported symbols\n"
 	     "  --dump-files\t\tDump the source files\n"
@@ -104,7 +104,7 @@ static void OptDumpDbgSyms (const char* Opt, const char* Arg)
 /* Dump debug symbols contained in the object file */
 {
     What |= D_DBGSYMS;
-}		     
+}
 
 
 
@@ -255,14 +255,14 @@ int main (int argc, char* argv [])
     int I;
 
     /* Initialize the cmdline module */
-    InitCmdLine (argc, argv, "od65");
+    InitCmdLine (&argc, &argv, "od65");
 
     /* Check the parameters */
     I = 1;
-    while (I < argc) {
+    while (I < ArgCount) {
 
        	/* Get the argument */
-       	const char* Arg = argv [I];
+       	const char* Arg = ArgVec[I];
 
        	/* Check for an option */
        	if (Arg [0] == '-') {

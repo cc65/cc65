@@ -455,19 +455,19 @@ int main (int argc, char* argv[])
     const char* InputFile  = 0;
 
     /* Initialize the cmdline module */
-    InitCmdLine (argc, argv, "cc65");
+    InitCmdLine (&argc, &argv, "cc65");
 
     /* Initialize the default segment names */
     InitSegNames ();
 
     /* Parse the command line */
     I = 1;
-    while (I < argc) {
+    while (I < ArgCount) {
 
 	const char* P;
 
        	/* Get the argument */
-       	const char* Arg = argv [I];
+       	const char* Arg = ArgVec[I];
 
        	/* Check for an option */
        	if (Arg [0] == '-') {

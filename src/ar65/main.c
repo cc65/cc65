@@ -6,20 +6,20 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998	Ullrich von Bassewitz					     */
-/*		Wacholderweg 14						     */
-/*		D-70597 Stuttgart					     */
-/* EMail:	uz@musoftware.de					     */
-/*									     */
-/*									     */
+/* (C) 1998-2001 Ullrich von Bassewitz					     */
+/*	    	 Wacholderweg 14					     */
+/*	    	 D-70597 Stuttgart					     */
+/* EMail:   	 uz@musoftware.de					     */
+/*	    								     */
+/*	    								     */
 /* This software is provided 'as-is', without any expressed or implied	     */
 /* warranty.  In no event will the authors be held liable for any damages    */
 /* arising from the use of this software.				     */
-/*									     */
+/*	    								     */
 /* Permission is granted to anyone to use this software for any purpose,     */
 /* including commercial applications, and to alter it and redistribute it    */
 /* freely, subject to the following restrictions:			     */
-/*									     */
+/*	    								     */
 /* 1. The origin of this software must not be misrepresented; you must not   */
 /*    claim that you wrote the original software. If you use this software   */
 /*    in a product, an acknowledgment in the product documentation would be  */
@@ -28,7 +28,7 @@
 /*    be misrepresented as being the original software.			     */
 /* 3. This notice may not be removed or altered from any source		     */
 /*    distribution.							     */
-/*									     */
+/*	    								     */
 /*****************************************************************************/
 
 
@@ -38,8 +38,9 @@
 #include <string.h>
 #include <time.h>
 
-#include "../common/cmdline.h"
-#include "../common/version.h"
+/* common */
+#include "cmdline.h"
+#include "version.h"
 
 #include "global.h"
 #include "add.h"
@@ -78,19 +79,19 @@ int main (int argc, char* argv [])
     int I;
 
     /* Initialize the cmdline module */
-    InitCmdLine (argc, argv, "ar65");
+    InitCmdLine (&argc, &argv, "ar65");	 
 
     /* We must have a file name */
-    if (argc < 2) {
+    if (ArgCount < 2) {
 	Usage ();
     }
 
     /* Check the parameters */
     I = 1;
-    while (I < argc) {
+    while (I < ArgCount) {
 
 	/* Get the argument */
-	const char* Arg = argv [I];
+	const char* Arg = ArgVec [I];
 
 	/* Check for an option */
 	if (strlen (Arg) != 1) {
@@ -99,15 +100,15 @@ int main (int argc, char* argv [])
 	switch (Arg [0]) {
 
 	    case 'a':
-		AddObjFiles (argc - I - 1, &argv [I+1]);
+		AddObjFiles (ArgCount - I - 1, &ArgVec[I+1]);
 		break;
 
 	    case 'd':
-		DelObjFiles (argc - I - 1, &argv [I+1]);
+		DelObjFiles (ArgCount - I - 1, &ArgVec [I+1]);
 		break;
 
 	    case 'l':
-		ListObjFiles (argc - I - 1, &argv [I+1]);
+		ListObjFiles (ArgCount - I - 1, &ArgVec [I+1]);
 		break;
 
 	    case 'v':
@@ -115,7 +116,7 @@ int main (int argc, char* argv [])
 		break;
 
 	    case 'x':
-		ExtractObjFiles (argc - I - 1, &argv [I+1]);
+		ExtractObjFiles (ArgCount - I - 1, &ArgVec [I+1]);
 		break;
 
 	    case 'V':

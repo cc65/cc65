@@ -508,7 +508,7 @@ int main (int argc, char* argv [])
     int I;
 
     /* Initialize the cmdline module */
-    InitCmdLine (argc, argv, "ca65");
+    InitCmdLine (&argc, &argv, "ca65");
 
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
@@ -517,10 +517,10 @@ int main (int argc, char* argv [])
 
     /* Check the parameters */
     I = 1;
-    while (I < argc) {
+    while (I < ArgCount) {
 
        	/* Get the argument */
-       	const char* Arg = argv [I];
+       	const char* Arg = ArgVec [I];
 
        	/* Check for an option */
        	if (Arg [0] == '-') {

@@ -67,6 +67,9 @@ int IsAscii (char C);
 int IsBlank (char C);
 /* Check for a space or tab */
 
+int IsSpace (char C);
+/* Check for any white space characters */
+
 int IsDigit (char C);
 /* Check for a digit */
 

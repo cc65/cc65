@@ -51,6 +51,10 @@
 /* Program name - is set after call to InitCmdLine */
 extern const char* ProgName;
 
+/* The program argument vector */
+extern char** ArgVec;
+extern unsigned ArgCount;
+
 /* Structure defining a long option */
 typedef struct LongOpt	LongOpt;
 struct LongOpt {
@@ -67,7 +71,7 @@ struct LongOpt {
 
 
 
-void InitCmdLine (unsigned aArgCount, char* aArgVec[], const char* aProgName);
+void InitCmdLine (unsigned* aArgCount, char** aArgVec[], const char* aProgName);
 /* Initialize command line parsing. aArgVec is the argument array terminated by
  * a NULL pointer (as usual), ArgCount is the number of valid arguments in the
  * array. Both arguments are remembered in static storage.
@@ -95,6 +99,6 @@ void LongOption (int* ArgNum, const LongOpt* OptTab, unsigned OptCount);
 /* End of cmdline.h */
 
 #endif
-						    
+
 
 

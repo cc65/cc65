@@ -86,6 +86,14 @@ int IsBlank (char C)
 
 
 
+int IsSpace (char C)
+/* Check for any white space characters */
+{
+    return (C == ' ' || C == '\n' || C == '\r' || C == '\t' || C == '\v' || C == '\f');
+}
+
+
+
 int IsDigit (char C)
 /* Check for a digit */
 {

@@ -733,7 +733,7 @@ int main (int argc, char* argv [])
     int I;
 
     /* Initialize the cmdline module */
-    InitCmdLine (argc, argv, "cl65");
+    InitCmdLine (&argc, &argv, "cl65");
 
     /* Initialize the command descriptors */
     CmdInit (&CC65, "cc65");
@@ -743,13 +743,13 @@ int main (int argc, char* argv [])
 
     /* Our default target is the C64 instead of "none" */
     Target = TGT_C64;
-
+				
     /* Check the parameters */
     I = 1;
-    while (I < argc) {
+    while (I < ArgCount) {
 
 	/* Get the argument */
-	const char* Arg = argv [I];
+	const char* Arg = ArgVec[I];
 
 	/* Check for an option */
 	if (Arg [0] == '-') {

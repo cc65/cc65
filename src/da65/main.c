@@ -314,10 +314,10 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--cpu",     	       	1,	OptCPU 			},
-	{ "--formfeeds",	0,	OptFormFeeds		},
-      	{ "--help",    		0,	OptHelp			},
+	{ "--formfeeds",  	0,	OptFormFeeds		},
+      	{ "--help",    	  	0,	OptHelp			},
       	{ "--pagelength",      	1,	OptPageLength		},
-	{ "--start-addr",	1,	OptStartAddr		},
+	{ "--start-addr", 	1,	OptStartAddr		},
       	{ "--verbose", 	       	0,	OptVerbose		},
       	{ "--version", 	       	0,	OptVersion		},
     };
@@ -325,14 +325,14 @@ int main (int argc, char* argv [])
     int I;
 
     /* Initialize the cmdline module */
-    InitCmdLine (argc, argv, "da65");
+    InitCmdLine (&argc, &argv, "da65");
 
     /* Check the parameters */
     I = 1;
-    while (I < argc) {
+    while (I < ArgCount) {
 
        	/* Get the argument */
-       	const char* Arg = argv [I];
+       	const char* Arg = ArgVec[I];
 
        	/* Check for an option */
        	if (Arg [0] == '-') {

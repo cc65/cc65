@@ -297,7 +297,7 @@ int main (int argc, char* argv [])
     int I;
 
     /* Initialize the cmdline module */
-    InitCmdLine (argc, argv, "ld65");
+    InitCmdLine (&argc, &argv, "ld65");
 
     /* Evaluate the CC65_LIB environment variable */
     LibPath = getenv ("CC65_LIB");
@@ -313,10 +313,10 @@ int main (int argc, char* argv [])
 
     /* Check the parameters */
     I = 1;
-    while (I < argc) {
+    while (I < ArgCount) {
 
 	/* Get the argument */
-	const char* Arg = argv [I];
+	const char* Arg = ArgVec[I];
 
 	/* Check for an option */
 	if (Arg [0] == '-') {

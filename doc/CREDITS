@@ -62,7 +62,7 @@ More special thanks to:
 
   * Groepaz <groepaz@gmx.net>
 
-    Thanks for the contribution of the plasma.c sample program.
+    Thanks for several nice samples programs and a lot of other code.
 
   * Craig Bruce
 
@@ -102,6 +102,10 @@ More special thanks to:
 
     for his GRLIB code which is the base of the C64 320x200 TGI driver.
 
+  * Stefan A. Haubenthal <polluks@web.de>
+
+    Stefan contributed several code snippets for the C64 and Apple ][.
+
 
 
 Thanks to
@@ -130,7 +134,6 @@ Thanks to
     Robert R. Wal <rrw@reptile.eu.org>
     Shawn Jefferson <sjefferson@sd62.bc.ca>
     Stefan Andree <sandree@physik.tu-berlin.de>
-    Stefan A. Haubenthal <polluks@web.de>
     Stephan Lesch <slesch@studcs.uni-sb.de>
     Tim Vanderhoek <hoek@FreeBSD.org>
     Todd Elliott <eyeth@videocam.net.au>

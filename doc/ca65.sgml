@@ -1776,7 +1776,7 @@ Here's a list of all control commands and a description, what they do:
   See the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
   id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
   name=".INTERRUPTOR"></tt>commands and the separate section <ref id="condes"
-  name="Module constructors/destructors"> explaining the feature in more 
+  name="Module constructors/destructors"> explaining the feature in more
   detail.
 
 
@@ -2537,7 +2537,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.INTERRUPTOR</tt><label id=".INTERRUPTOR"><p>
 
   Export a symbol and mark it as an interruptor. This may be used together
-  with the linker to build a table of interruptor subroutines that are called 
+  with the linker to build a table of interruptor subroutines that are called
   in an interrupt.
 
   Note: The linker has a feature to build a table of marked routines, but it
@@ -2559,7 +2559,7 @@ Here's a list of all control commands and a description, what they do:
 	.interruptor    Handler, 16
   </verb></tscreen>
 
-  See the <tt><ref id=".CONDES" name=".CONDES"></tt> command and the separate 
+  See the <tt><ref id=".CONDES" name=".CONDES"></tt> command and the separate
   section <ref id="condes" name="Module constructors/destructors"> explaining
   the feature in more detail.
 
@@ -3320,7 +3320,7 @@ functions will allow you to do exactly this:
                 .else
                     ; assume absolute or zero page
                     lda     arg
-                    ldx     1+({arg})
+                    ldx     1+(arg)
                 .endif
         .endmacro
 </verb></tscreen>
@@ -3813,11 +3813,11 @@ When using these special symbols, please take care of the following:
 
 <itemize>
 
-<item> 
+<item>
 The linker will only generate function tables, it will not generate code to
 call these functions. If you're using the feature in some other than the
 existing C environments, you have to write code to call all functions in a
-linker generated table yourself. See the <tt>/condes/ and <tt/callirq/ modules
+linker generated table yourself. See the <tt/condes/ and <tt/callirq/ modules
 in the C runtime for an example on how to do this.
 
 <item>

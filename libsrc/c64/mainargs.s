@@ -26,11 +26,9 @@
 
 	.include	"c64.inc"
 
-; Maximum number of arguments allowed in the argument table.
-; (An argument contains a comma, at least.)
-;
-MAXARGS	 = BASIC_BUF_LEN - 2	; (don't count REM and terminating '\0')
 
+
+MAXARGS	 = 10                   ; Maximum number of arguments allowed
 REM	 = $8f			; BASIC token-code
 NAME_LEN = 16			; maximum length of command-name
 
@@ -51,68 +49,73 @@ L0:	lda	(FNAM),y
 	sta	name,y
 L1:	dey
 	bpl	L0
-	lda	#<name
-	ldx	#>name
-	sta	argv
-	stx	argv + 1
-	inc	__argc		; argc always is equal to, at least, 1
+	inc	__argc	   	; argc always is equal to, at least, 1
 
 ; Find the "rem" token.
 ;
 	ldx	#0
 L2:	lda	BASIC_BUF,x
-	beq	done		; no "rem," no args.
+       	beq    	done   	       	; no "rem," no args.
 	inx
 	cmp	#REM
 	bne	L2
 	ldy	#1 * 2
 
-; Find the next argument.
-;
-next:	lda	BASIC_BUF,x
-	beq	done
-	inx
-	cmp	#','		; look for argument-list separator
-	bne	next
-	lda	#$00
-	sta	BASIC_BUF-1,x	; make the previous arg. be a legal C string
-	inc	__argc		; found another arg.
+; Find the next argument
 
-L4:	lda	BASIC_BUF,x
-	beq	point		; zero-length argument
-	inx
-	cmp	#' '
-	beq	L4		; skip leading spaces
+next:   lda     BASIC_BUF,x
+        beq     done            ; End of line reached
+        inx
+        cmp     #' '            ; Skip leading spaces
+        beq     next            ;
 
-	cmp	#'"'		; is argument quoted?
-	beq	L5
-	dex			; no, don't skip over character
-	clc			; (quotation-mark sets flag)
-L5:	ror	quoted		; save it
+; Found start of next argument. We've incremented the pointer in X already, so
+; it points to the second character of the argument. This is useful since we
+; will check now for a quoted argument, in which case we will have to skip this
+; first character.
 
-; BASIC's input-buffer starts at the beginning of a RAM page.
-; So, we don't need to add the offset -- just store it.
-;
-point:	txa
+found:  cmp     #'"'            ; Is the argument quoted?
+        beq     setterm         ; Jump if so
+        dex                     ; Reset pointer to first argument character
+        lda     #' '            ; A space ends the argument
+setterm:sta     term            ; Set end of argument marker
+
+; Now store a pointer to the argument into the next slot. Since the BASIC
+; input buffer is located at the start of a RAM page, no calculations are
+; necessary.
+
+        txa                     ; Get low byte
 	sta	argv,y		; argv[y]= &arg
 	iny
 	lda	#>BASIC_BUF
 	sta	argv,y
 	iny
+        inc     __argc          ; Found another arg
 
-	asl	quoted		; is argument a string-literal?
-	bcc	next		; no, don't look for ending quotation-mark
-L7:	lda	BASIC_BUF,x
-	beq	done
-	inx
-	cmp	#'"'
-	bne	L7
-	lda	#$00
-	sta	BASIC_BUF-1,x	; make this arg. be a legal C string
-	beq	next		;(bra)
+; Search for the end of the argument
+
+argloop:lda     BASIC_BUF,x
+        beq     done
+        inx
+        cmp     term
+        bne     argloop
+
+; We've found the end of the argument. X points one character behind it, and
+; A contains the terminating character. To make the argument a valid C string,
+; replace the terminating character by a zero.
+
+        lda     #0
+        sta     BASIC_BUF-1,x
+
+; Check if the maximum number of command line arguments is reached. If not,
+; parse the next one.
+
+        lda     __argc          ; Get low byte of argument count
+        cmp     #MAXARGS        ; Maximum number of arguments reached?
+        bcc     next            ; Parse next one if not
 
 ; (The last vector in argv[] already is NULL.)
-;
+
 done:	lda	#<argv
 	ldx	#>argv
 	sta	__argv
@@ -123,7 +126,11 @@ done:	lda	#<argv
 ; char	name[16+1];
 ; char* argv[MAXARGS+1]={name};
 ;
-	.bss
-quoted:	.res	1, %00000000
+.bss
+term:	.res	1
 name:	.res	NAME_LEN + 1
-argv:	.res	(MAXARGS + 1) * 2
+
+.data
+argv:   .addr   name
+        .res   	MAXARGS * 2
+                 

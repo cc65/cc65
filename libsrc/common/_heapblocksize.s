@@ -11,6 +11,9 @@
 
         .include        "_heap.inc"
 
+        .macpack        generic
+        .macpack        cpu
+
 ;-----------------------------------------------------------------------------
 ; Code
 
@@ -18,8 +21,7 @@ __heapblocksize:
 
 ; Decrement the block pointer so it points to the admin data
 
-        sec
-        sbc     #HEAP_ADMIN_SPACE       ; Assume it's less than 256
+        sub     #HEAP_ADMIN_SPACE       ; Assume it's less than 256
         bcs     L1
         dex
 L1:     sta     ptr1
@@ -30,10 +32,20 @@ L1:     sta     ptr1
         ldy     #1
         lda     (ptr1),y
         tax
+.if (.cpu .bitand CPU_ISET_65SC02)
+        lda     (ptr1)
+.else
         dey
         lda     (ptr1),y
+.endif
+
+; Adjust it to the user visible size
+
+        sub     #HEAP_ADMIN_SPACE
+        bcs     L9
+        dex
 
 ; Done
 
-        rts
+L9:     rts
 

@@ -40,6 +40,9 @@
 
 #include <stdio.h>
 
+/* common */
+#include "attrib.h"
+
 
 
 /*****************************************************************************/
@@ -59,7 +62,7 @@ typedef struct Line_* CodeMark;
 
 
 
-void AddCodeLine (const char* Format, ...);
+void AddCodeLine (const char* Format, ...) attribute ((format(printf,1,2)));
 /* Add a new line of code to the output */
 
 void AddCodeHint (const char* Hint);
@@ -81,6 +84,7 @@ void WriteOutput (FILE* F);
 
 /* End of asmcode.h */
 #endif
+
 
 
 

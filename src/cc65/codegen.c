@@ -1546,7 +1546,7 @@ void g_addeqstatic (unsigned flags, unsigned long label, unsigned offs,
      	    	   	AddCodeLine ("\tinc\t%s", lbuf);
      	     	   	AddCodeLine ("\tlda\t%s", lbuf);
      	     	    } else {
-       	       	       	AddCodeLine ("\tlda\t#$%02X", val & 0xFF);
+       	       	       	AddCodeLine ("\tlda\t#$%02X", (int)(val & 0xFF));
      	     	   	AddCodeLine ("\tclc");
      	     	   	AddCodeLine ("\tadc\t%s", lbuf);
      	     		AddCodeLine ("\tsta\t%s", lbuf);
@@ -1570,24 +1570,24 @@ void g_addeqstatic (unsigned flags, unsigned long label, unsigned offs,
      		if (val == 1) {
      		    label = GetLabel ();
      		    AddCodeLine ("\tinc\t%s", lbuf);
-     		    AddCodeLine ("\tbne\tL%04X", label);
+     		    AddCodeLine ("\tbne\tL%04X", (int)label);
      		    AddCodeLine ("\tinc\t%s+1", lbuf);
      		    g_defloclabel (label);
-     		    AddCodeLine ("\tlda\t%s", lbuf);		/* Hmmm... */
+     		    AddCodeLine ("\tlda\t%s", lbuf);  		/* Hmmm... */
      		    AddCodeLine ("\tldx\t%s+1", lbuf);
      		} else {
-       	       	    AddCodeLine ("\tlda\t#$%02X", val & 0xFF);
+       	       	    AddCodeLine ("\tlda\t#$%02X", (int)(val & 0xFF));
      		    AddCodeLine ("\tclc");
      		    AddCodeLine ("\tadc\t%s", lbuf);
      		    AddCodeLine ("\tsta\t%s", lbuf);
      		    if (val < 0x100) {
      		       	label = GetLabel ();
-     		       	AddCodeLine ("\tbcc\tL%04X", label);
+     		       	AddCodeLine ("\tbcc\tL%04X", (int)label);
      		       	AddCodeLine ("\tinc\t%s+1", lbuf);
        		       	g_defloclabel (label);
      		       	AddCodeLine ("\tldx\t%s+1", lbuf);
      		    } else {
-       	       	       	AddCodeLine ("\tlda\t#$%02X", (val >> 8) & 0xFF);
+       	       	       	AddCodeLine ("\tlda\t#$%02X", (unsigned char)(val >> 8));
      		       	AddCodeLine ("\tadc\t%s+1", lbuf);
      		       	AddCodeLine ("\tsta\t%s+1", lbuf);
      		       	AddCodeLine ("\ttax");
@@ -1615,7 +1615,7 @@ void g_addeqstatic (unsigned flags, unsigned long label, unsigned offs,
 		    if (val == 1) {
 			AddCodeLine ("\tjsr\tladdeq1");
 		    } else {
-			AddCodeLine ("\tlda\t#$%02X", val & 0xFF);
+			AddCodeLine ("\tlda\t#$%02X", (int)(val & 0xFF));
 		     	AddCodeLine ("\tjsr\tladdeqa");
 		    }
 		} else {
@@ -1654,7 +1654,7 @@ void g_addeqlocal (unsigned flags, int offs, unsigned long val)
        	     	    AddCodeLine ("\tldx\t#$00");
        	     	    if (flags & CF_CONST) {
        	     	       	AddCodeLine ("\tclc");
-       	       	       	AddCodeLine ("\tlda\t#$%02X", val & 0xFF);
+       	       	       	AddCodeLine ("\tlda\t#$%02X", (int)(val & 0xFF));
        	     	       	AddCodeLine ("\tadc\t(sp,x)");
        	     	       	AddCodeLine ("\tsta\t(sp,x)");
        	     	    } else {
@@ -1667,7 +1667,7 @@ void g_addeqlocal (unsigned flags, int offs, unsigned long val)
      	     	    AddCodeLine ("\tldx\t#$00");
      	     	    if (flags & CF_CONST) {
      	     	       	AddCodeLine ("\tclc");
-       	       	       	AddCodeLine ("\tlda\t#$%02X", val & 0xFF);
+       	       	       	AddCodeLine ("\tlda\t#$%02X", (int)(val & 0xFF));
      	     		AddCodeLine ("\tadc\t(sp),y");
      	     		AddCodeLine ("\tsta\t(sp),y");
      	     	    } else {
@@ -1733,14 +1733,14 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
 	    AddCodeLine ("\tstx\tptr1+1");
 	    if (offs == 0) {
 		AddCodeLine ("\tldx\t#$00");
-		AddCodeLine ("\tlda\t#$%02X", val & 0xFF);
+		AddCodeLine ("\tlda\t#$%02X", (int)(val & 0xFF));
 		AddCodeLine ("\tclc");
 		AddCodeLine ("\tadc\t(ptr1,x)");
 		AddCodeLine ("\tsta\t(ptr1,x)");
 	    } else {
 		AddCodeLine ("\tldy\t#$%02X", offs);
        	       	AddCodeLine ("\tldx\t#$00");
-       	       	AddCodeLine ("\tlda\t#$%02X", val & 0xFF);
+       	       	AddCodeLine ("\tlda\t#$%02X", (int)(val & 0xFF));
        	       	AddCodeLine ("\tclc");
        	       	AddCodeLine ("\tadc\t(ptr1),y");
        	       	AddCodeLine ("\tsta\t(ptr1),y");
@@ -1753,13 +1753,13 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
        	       	AddCodeLine ("\tsta\tptr1");
 		AddCodeLine ("\tstx\tptr1+1");
 		AddCodeLine ("\tldy\t#$%02X", offs);
-		AddCodeLine ("\tlda\t#$%02X", val & 0xFF);
+		AddCodeLine ("\tlda\t#$%02X", (int)(val & 0xFF));
 		AddCodeLine ("\tclc");
 		AddCodeLine ("\tadc\t(ptr1),y");
 		AddCodeLine ("\tsta\t(ptr1),y");
 		AddCodeLine ("\tpha");
 		AddCodeLine ("\tiny");
-		AddCodeLine ("\tlda\t#$%02X", (val >> 8) & 0xFF);
+		AddCodeLine ("\tlda\t#$%02X", (unsigned char)(val >> 8));
 		AddCodeLine ("\tadc\t(ptr1),y");
 		AddCodeLine ("\tsta\t(ptr1),y");
 		AddCodeLine ("\ttax");
@@ -1803,7 +1803,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, unsigned offs,
        		    } else {
        		       	AddCodeLine ("\tsec");
        		     	AddCodeLine ("\tlda\t%s", lbuf);
-       		     	AddCodeLine ("\tsbc\t#$%02X", val & 0xFF);
+       		     	AddCodeLine ("\tsbc\t#$%02X", (int)(val & 0xFF));
        		     	AddCodeLine ("\tsta\t%s", lbuf);
        		    }
        	  	} else {
@@ -1826,17 +1826,17 @@ void g_subeqstatic (unsigned flags, unsigned long label, unsigned offs,
 	    AddCodeLine ("\tsec");
 	    if (flags & CF_CONST) {
 	       	AddCodeLine ("\tlda\t%s", lbuf);
-	  	AddCodeLine ("\tsbc\t#$%02X", val & 0xFF);
+	  	AddCodeLine ("\tsbc\t#$%02X", (unsigned char)val);
 	  	AddCodeLine ("\tsta\t%s", lbuf);
 	   	if (val < 0x100) {
 	  	    label = GetLabel ();
-	  	    AddCodeLine ("\tbcs\tL%04X", label);
+	  	    AddCodeLine ("\tbcs\tL%04X", (unsigned)label);
 		    AddCodeLine ("\tdec\t%s+1", lbuf);
 		    g_defloclabel (label);
 		    AddCodeLine ("\tldx\t%s+1", lbuf);
 		} else {
 		    AddCodeLine ("\tlda\t%s+1", lbuf);
-		    AddCodeLine ("\tsbc\t#$%02X", (val >> 8) & 0xFF);
+		    AddCodeLine ("\tsbc\t#$%02X", (unsigned char)(val >> 8));
 		    AddCodeLine ("\tsta\t%s+1", lbuf);
 		    AddCodeLine ("\ttax");
 		    AddCodeLine ("\tlda\t%s", lbuf);
@@ -1864,7 +1864,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, unsigned offs,
 		    if (val == 1) {
 	     		AddCodeLine ("\tjsr\tlsubeq1");
 		    } else {
-			AddCodeLine ("\tlda\t#$%02X", val & 0xFF);
+			AddCodeLine ("\tlda\t#$%02X", (unsigned char)val);
 			AddCodeLine ("\tjsr\tlsubeqa");
 		    }
 		} else {
@@ -1904,7 +1904,7 @@ void g_subeqlocal (unsigned flags, int offs, unsigned long val)
        	 	AddCodeLine ("\tsec");
 		if (flags & CF_CONST) {
 		    AddCodeLine ("\tlda\t(sp),y");
-		    AddCodeLine ("\tsbc\t#$%02X", val & 0xFF);
+		    AddCodeLine ("\tsbc\t#$%02X", (unsigned char)val);
 		} else {
 		    AddCodeLine ("\tsta\ttmp1");
 	     	    AddCodeLine ("\tlda\t(sp),y");
@@ -1970,14 +1970,14 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
 	 	AddCodeLine ("\tldx\t#$00");
 	       	AddCodeLine ("\tlda\t(ptr1,x)");
        	       	AddCodeLine ("\tsec");
-	 	AddCodeLine ("\tsbc\t#$%02X", val & 0xFF);
+	 	AddCodeLine ("\tsbc\t#$%02X", (unsigned char)val);
 	 	AddCodeLine ("\tsta\t(ptr1,x)");
 	    } else {
        	       	AddCodeLine ("\tldy\t#$%02X", offs);
 	 	AddCodeLine ("\tldx\t#$00");
 	 	AddCodeLine ("\tlda\t(ptr1),y");
 	 	AddCodeLine ("\tsec");
-	 	AddCodeLine ("\tsbc\t#$%02X", val & 0xFF);
+	 	AddCodeLine ("\tsbc\t#$%02X", (unsigned char)val);
 		AddCodeLine ("\tsta\t(ptr1),y");
 	    }
      	    break;
@@ -1990,12 +1990,12 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
 		AddCodeLine ("\tldy\t#$%02X", offs);
 		AddCodeLine ("\tlda\t(ptr1),y");
 		AddCodeLine ("\tsec");
-		AddCodeLine ("\tsbc\t#$%02X", val & 0xFF);
+		AddCodeLine ("\tsbc\t#$%02X", (unsigned char)val);
 		AddCodeLine ("\tsta\t(ptr1),y");
 		AddCodeLine ("\tpha");
 		AddCodeLine ("\tiny");
 		AddCodeLine ("\tlda\t(ptr1),y");
-		AddCodeLine ("\tsbc\t#$%02X", (val >> 8) & 0xFF);
+		AddCodeLine ("\tsbc\t#$%02X", (unsigned char)(val >> 8));
 		AddCodeLine ("\tsta\t(ptr1),y");
 	     	AddCodeLine ("\ttax");
 		AddCodeLine ("\tpla");
@@ -2143,15 +2143,15 @@ void g_cmp (unsigned flags, unsigned long val)
 
       	case CF_CHAR:
      	    if (flags & CF_FORCECHAR) {
-	       	AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+	       	AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
      	    	break;
      	    }
      	    /* FALLTHROUGH */
 
      	case CF_INT:
-	    AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+	    AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
        	    AddCodeLine ("\tbne\t*+4");
-	    AddCodeLine ("\tcpx\t#$%02X", (val >> 8) & 0xFF);
+	    AddCodeLine ("\tcpx\t#$%02X", (unsigned char)(val >> 8));
      	    break;
 
         case CF_LONG:
@@ -2415,11 +2415,13 @@ void g_case (unsigned flags, unsigned label, unsigned long val)
 
      	case CF_CHAR:
     	case CF_INT:
-    	    AddCodeLine ("\t.word\t$%04X, L%04X", val & 0xFFFF, label & 0xFFFF);
+    	    AddCodeLine ("\t.word\t$%04X, L%04X",
+			 (unsigned)(val & 0xFFFF),
+			 (unsigned)(label & 0xFFFF));
        	    break;
 
     	case CF_LONG:
-	    AddCodeLine ("\t.dword\t$%08X", val);
+	    AddCodeLine ("\t.dword\t$%08lX", val);
 	    AddCodeLine ("\t.word\tL%04X", label & 0xFFFF);
     	    break;
 
@@ -2552,7 +2554,7 @@ void g_mul (unsigned flags, unsigned long val)
     }
 
     /* If the right hand side is const, the lhs is not on stack but still
-     * in the primary register.				  
+     * in the primary register.
      */
     if (flags & CF_CONST) {
 
@@ -2690,7 +2692,7 @@ void g_or (unsigned flags, unsigned long val)
       	    case CF_CHAR:
       		if (flags & CF_FORCECHAR) {
      		    if ((val & 0xFF) != 0xFF) {
-       	       	        AddCodeLine ("\tora\t#$%02X", val & 0xFF);
+       	       	        AddCodeLine ("\tora\t#$%02X", (unsigned char)val);
      		    }
       		    return;
       		}
@@ -2698,14 +2700,14 @@ void g_or (unsigned flags, unsigned long val)
 
 	    case CF_INT:
 		if (val <= 0xFF) {
-		    AddCodeLine ("\tora\t#$%02X", val & 0xFF);
+		    AddCodeLine ("\tora\t#$%02X", (unsigned char)val);
 		    return;
      		}
 		break;
 
 	    case CF_LONG:
 		if (val <= 0xFF) {
-		    AddCodeLine ("\tora\t#$%02X", val & 0xFF);
+		    AddCodeLine ("\tora\t#$%02X", (unsigned char)val);
 		    return;
 		}
 		break;
@@ -2748,7 +2750,7 @@ void g_xor (unsigned flags, unsigned long val)
       	    case CF_CHAR:
       		if (flags & CF_FORCECHAR) {
      		    if ((val & 0xFF) != 0) {
-       	       	    	AddCodeLine ("\teor\t#$%02X", val & 0xFF);
+       	       	    	AddCodeLine ("\teor\t#$%02X", (unsigned char)val);
      		    }
       		    return;
       		}
@@ -2757,13 +2759,13 @@ void g_xor (unsigned flags, unsigned long val)
 	    case CF_INT:
 		if (val <= 0xFF) {
 		    if (val != 0) {
-		     	AddCodeLine ("\teor\t#$%02X", val);
+		     	AddCodeLine ("\teor\t#$%02X", (unsigned char)val);
 		    }
 		    return;
 		} else if ((val & 0xFF) == 0) {
 		    AddCodeLine ("\tpha");
 	     	    AddCodeLine ("\ttxa");
-		    AddCodeLine ("\teor\t#$%02X", (val >> 8) & 0xFF);
+		    AddCodeLine ("\teor\t#$%02X", (unsigned char)(val >> 8));
 		    AddCodeLine ("\ttax");
 		    AddCodeLine ("\tpla");
 		    return;
@@ -2773,7 +2775,7 @@ void g_xor (unsigned flags, unsigned long val)
 	    case CF_LONG:
 		if (val <= 0xFF) {
 		    if (val != 0) {
-       	       	       	AddCodeLine ("\teor\t#$%02X", val & 0xFF);
+       	       	       	AddCodeLine ("\teor\t#$%02X", (unsigned char)val);
 		    }
 		    return;
 		}
@@ -2815,7 +2817,7 @@ void g_and (unsigned flags, unsigned long val)
 
      	    case CF_CHAR:
      		if (flags & CF_FORCECHAR) {
-     		    AddCodeLine ("\tand\t#$%02X", val & 0xFF);
+     		    AddCodeLine ("\tand\t#$%02X", (unsigned char)val);
      		    return;
      		}
      		/* FALLTHROUGH */
@@ -2826,23 +2828,23 @@ void g_and (unsigned flags, unsigned long val)
 		    	if (val == 0) {
 		    	    ldaconst (0);
 		    	} else if (val != 0xFF) {
-		       	    AddCodeLine ("\tand\t#$%02X", val & 0xFF);
+		       	    AddCodeLine ("\tand\t#$%02X", (unsigned char)val);
 		    	}
 		    } else if ((val & 0xFF00) == 0xFF00) {
-		    	AddCodeLine ("\tand\t#$%02X", val & 0xFF);
+		    	AddCodeLine ("\tand\t#$%02X", (unsigned char)val);
 		    } else if ((val & 0x00FF) == 0x0000) {
 			AddCodeLine ("\ttxa");
-			AddCodeLine ("\tand\t#$%02X", (val >> 8) & 0xFF);
+			AddCodeLine ("\tand\t#$%02X", (unsigned char)(val >> 8));
 			AddCodeLine ("\ttax");
 			ldaconst (0);
 		    } else {
 			AddCodeLine ("\ttay");
 			AddCodeLine ("\ttxa");
-			AddCodeLine ("\tand\t#$%02X", (val >> 8) & 0xFF);
+			AddCodeLine ("\tand\t#$%02X", (unsigned char)(val >> 8));
 			AddCodeLine ("\ttax");
 			AddCodeLine ("\ttya");
 			if ((val & 0x00FF) != 0x00FF) {
-			    AddCodeLine ("\tand\t#$%02X", val & 0xFF);
+			    AddCodeLine ("\tand\t#$%02X", (unsigned char)val);
 			}
 		    }
 		}
@@ -2854,7 +2856,7 @@ void g_and (unsigned flags, unsigned long val)
 		    AddCodeLine ("\tstx\tsreg+1");
 	     	    AddCodeLine ("\tstx\tsreg");
 		    if ((val & 0xFF) != 0xFF) {
-		     	 AddCodeLine ("\tand\t#$%02X", val & 0xFF);
+		     	 AddCodeLine ("\tand\t#$%02X", (unsigned char)val);
 		    }
 		    return;
 		} else if (val == 0xFF00) {
@@ -3124,7 +3126,7 @@ void g_inc (unsigned flags, unsigned long val)
 		    }
 	     	} else {
 		    AddCodeLine ("\tclc");
-		    AddCodeLine ("\tadc\t#$%02X", val & 0xFF);
+		    AddCodeLine ("\tadc\t#$%02X", (unsigned char)val);
 		}
      		break;
      	    }
@@ -3140,7 +3142,7 @@ void g_inc (unsigned flags, unsigned long val)
      	    } else if (FavourSize) {
      		/* Use jsr calls */
      		if (val <= 8) {
-     		    AddCodeLine ("\tjsr\tincax%u", val);
+     		    AddCodeLine ("\tjsr\tincax%lu", val);
      		} else if (val <= 255) {
      		    ldyconst (val);
      		    AddCodeLine ("\tjsr\tincaxy");
@@ -3212,7 +3214,7 @@ void g_dec (unsigned flags, unsigned long val)
 		    }
 		} else {
 		    AddCodeLine ("\tsec");
-	     	    AddCodeLine ("\tsbc\t#$%02X", val & 0xFF);
+	     	    AddCodeLine ("\tsbc\t#$%02X", (unsigned char)val);
 		}
 		break;
      	    }
@@ -3273,16 +3275,16 @@ void g_eq (unsigned flags, unsigned long val)
 
       	    case CF_CHAR:
 		if (flags & CF_FORCECHAR) {
-		    AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+		    AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
 		    AddCodeLine ("\tjsr\tbooleq");
 		    return;
 		}
      		/* FALLTHROUGH */
 
       	    case CF_INT:
-     		AddCodeLine ("\tcpx\t#$%02X", (val >> 8) & 0xFF);
+     		AddCodeLine ("\tcpx\t#$%02X", (unsigned char)(val >> 8));
        	       	AddCodeLine ("\tbne\t*+4");
-     		AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+     		AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
      		AddCodeLine ("\tjsr\tbooleq");
      		return;
 
@@ -3326,16 +3328,16 @@ void g_ne (unsigned flags, unsigned long val)
 
       	    case CF_CHAR:
      		if (flags & CF_FORCECHAR) {
-     		    AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+     		    AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
      		    AddCodeLine ("\tjsr\tboolne");
      		    return;
      		}
      		/* FALLTHROUGH */
 
       	    case CF_INT:
-     		AddCodeLine ("\tcpx\t#$%02X", (val >> 8) & 0xFF);
+     		AddCodeLine ("\tcpx\t#$%02X", (unsigned char)(val >> 8));
      		AddCodeLine ("\tbne\t*+4");
-     		AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+     		AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
      		AddCodeLine ("\tjsr\tboolne");
      		return;
 
@@ -3384,7 +3386,7 @@ void g_lt (unsigned flags, unsigned long val)
 
      	    case CF_CHAR:
      		if (flags & CF_FORCECHAR) {
-     		    AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+     		    AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
      		    if (flags & CF_UNSIGNED) {
      			AddCodeLine ("\tjsr\tboolult");
      		    } else {
@@ -3405,9 +3407,9 @@ void g_lt (unsigned flags, unsigned long val)
 		}
 		/* Direct code only for unsigned data types */
 		if (flags & CF_UNSIGNED) {
-		    AddCodeLine ("\tcpx\t#$%02X", (val >> 8) & 0xFF);
+		    AddCodeLine ("\tcpx\t#$%02X", (unsigned char)(val >> 8));
        	       	    AddCodeLine ("\tbne\t*+4");
-     	 	    AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+     	 	    AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
 	 	    AddCodeLine ("\tjsr\tboolult");
 	 	    return;
      	 	}
@@ -3454,7 +3456,7 @@ void g_le (unsigned flags, unsigned long val)
 
 	    case CF_CHAR:
 		if (flags & CF_FORCECHAR) {
-		    AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+		    AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
 		    if (flags & CF_UNSIGNED) {
 		     	AddCodeLine ("\tjsr\tboolule");
 		    } else {
@@ -3466,9 +3468,9 @@ void g_le (unsigned flags, unsigned long val)
 
 	    case CF_INT:
 		if (flags & CF_UNSIGNED) {
-		    AddCodeLine ("\tcpx\t#$%02X", (val >> 8) & 0xFF);
+		    AddCodeLine ("\tcpx\t#$%02X", (unsigned char)(val >> 8));
        	       	    AddCodeLine ("\tbne\t*+4");
-     		    AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+     		    AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
 		    AddCodeLine ("\tjsr\tboolule");
 		    return;
 		}
@@ -3515,7 +3517,7 @@ void g_gt (unsigned flags, unsigned long val)
 
 	    case CF_CHAR:
 		if (flags & CF_FORCECHAR) {
-		    AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+		    AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
 		    if (flags & CF_UNSIGNED) {
 		      	/* If we have a compare > 0, we will replace it by
 		      	 * != 0 here, since both are identical but the latter
@@ -3544,9 +3546,9 @@ void g_gt (unsigned flags, unsigned long val)
 			AddCodeLine ("\tora\ttmp1");
 			AddCodeLine ("\tjsr\tboolne");
 		    } else {
-       	       	       	AddCodeLine ("\tcpx\t#$%02X", (val >> 8) & 0xFF);
+       	       	       	AddCodeLine ("\tcpx\t#$%02X", (unsigned char)(val >> 8));
 			AddCodeLine ("\tbne\t*+4");
-			AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+			AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
        	       	       	AddCodeLine ("\tjsr\tboolugt");
 		    }
 		    return;
@@ -3599,7 +3601,7 @@ void g_ge (unsigned flags, unsigned long val)
 
 	    case CF_CHAR:
 		if (flags & CF_FORCECHAR) {
-		    AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+		    AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
 		    if (flags & CF_UNSIGNED) {
 			AddCodeLine ("\tjsr\tbooluge");
 		    } else {
@@ -3611,9 +3613,9 @@ void g_ge (unsigned flags, unsigned long val)
 
 	    case CF_INT:
 		if (flags & CF_UNSIGNED) {
-       	       	    AddCodeLine ("\tcpx\t#$%02X", (val >> 8) & 0xFF);
+       	       	    AddCodeLine ("\tcpx\t#$%02X", (unsigned char)(val >> 8));
        	       	    AddCodeLine ("\tbne\t*+4");
-     		    AddCodeLine ("\tcmp\t#$%02X", val & 0xFF);
+     		    AddCodeLine ("\tcmp\t#$%02X", (unsigned char)val);
 		    AddCodeLine ("\tjsr\tbooluge");
 		    return;
 		}
@@ -3640,7 +3642,7 @@ void g_ge (unsigned flags, unsigned long val)
 
 
 /*****************************************************************************/
-/*   			   Allocating static storage	     		     */
+/*   			   Allocating static storage	     	 	     */
 /*****************************************************************************/
 
 

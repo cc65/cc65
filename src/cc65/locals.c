@@ -182,6 +182,9 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		    /* Allocate previously reserved local space */
 		    AllocLocalSpace (CurrentFunc);
 
+		    /* Switch to the code segment. */
+		    g_usecode ();
+
 		    /* Skip the '=' */
 		    NextToken ();
 

@@ -48,6 +48,80 @@
 
 
 
+
+// Basic data types
+enum type_t {
+    T_NONE     	    = 0x0000,
+
+    // Basic types
+    T_TYPE_NONE	    = 0x0000,
+    T_TYPE_CHAR	    = 0x0001,
+    T_TYPE_INT 	    = 0x0002,
+    T_TYPE_ENUM	    = 0x0003,
+    T_TYPE_FLOAT    = 0x0004,
+    T_TYPE_DOUBLE   = 0x0005,
+    T_TYPE_VOID     = 0x0006,
+    T_TYPE_STRUCT   = 0x0007,
+    T_TYPE_UNION    = 0x0008,
+    T_TYPE_ARRAY    = 0x0009,
+    T_TYPE_PTR      = 0x000A,
+    T_TYPE_FUNC     = 0x000B,
+    T_MASK_TYPE	    = 0x001F,
+
+    // Type classes
+    T_CLASS_NONE    = 0x0000,
+    T_CLASS_INT	    = 0x0020,
+    T_CLASS_FLOAT   = 0x0040,
+    T_CLASS_PTR	    = 0x0060,
+    T_CLASS_STRUCT  = 0x0080,
+    T_CLASS_FUNC    = 0x00A0,
+    T_MASK_CLASS    = 0x00E0,
+
+    // Type signedness
+    T_SIGN_NONE	    = 0x0000,
+    T_SIGN_UNSIGNED = 0x0100,
+    T_SIGN_SIGNED   = 0x0200,
+    T_MASK_SIGN     = 0x0300,
+
+    // Type size modifiers
+    T_SIZE_NONE	    = 0x0000,
+    T_SIZE_SHORT    = 0x0400,
+    T_SIZE_LONG     = 0x0800,
+    T_SIZE_LONGLONG = 0x0C00,
+    T_MASK_SIZE	    = 0x0C00,
+
+    // Type qualifiers
+    T_QUAL_NONE     = 0x0000,
+    T_QUAL_CONST    = 0x1000,
+    T_QUAL_VOLATILE = 0x2000,
+    T_MASK_QUAL	    = 0x3000,
+
+    // Types
+    T_CHAR     	    = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_SCHAR  	    = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_UCHAR  	    = T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_SHORT  	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_SHORT,
+    T_USHORT        = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_SHORT,
+    T_INT	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_UINT	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_LONG 	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONG,
+    T_ULONG	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONG,
+    T_LONGLONG 	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONGLONG,
+    T_ULONGLONG	    = T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONGLONG,
+    T_ENUM	    = T_TYPE_ENUM     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_FLOAT	    = T_TYPE_FLOAT    | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
+    T_DOUBLE	    = T_TYPE_DOUBLE   | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
+    T_VOID	    = T_TYPE_VOID     | T_CLASS_NONE   | T_SIGN_NONE     | T_SIZE_NONE,
+    T_STRUCT        = T_TYPE_STRUCT   | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
+    T_UNION         = T_TYPE_UNION    | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
+    T_ARRAY	    = T_TYPE_ARRAY    | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
+    T_PTR	    = T_TYPE_PTR      | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
+    T_FUNC     	    = T_TYPE_FUNC     | T_CLASS_FUNC   | T_SIGN_NONE     | T_SIZE_NONE,
+
+};
+
+
+
 /* Data types */
 #define	T_END  	       	0x0000
 #define T_CHAR 	       	0x0011
@@ -159,7 +233,7 @@ void* DecodePtr (const type* Type);
 
 int HasEncode (const type* Type);
 /* Return true if the given type has encoded data */
-    
+
 void CopyEncode (const type* Source, type* Target);
 /* Copy encoded data from Source to Target */
 

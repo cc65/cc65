@@ -282,7 +282,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     SymEntry* 	Entry;
     type 	StructType;
 
-    /* Assume have an explicit type */
+    /* Assume we have an explicit type */
     D->Flags &= ~DS_DEF_TYPE;
 
     /* Skip const or volatile modifiers if needed */

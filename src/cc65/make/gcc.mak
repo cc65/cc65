@@ -5,7 +5,7 @@
 
 # Default for the compiler lib search path as compiler define
 CDEFS=-DCC65_INC=\"/usr/lib/cc65/include/\"
-CFLAGS = -O2 -g -Wall $(CDEFS)
+CFLAGS = -O2 -g -Wall -I../common $(CDEFS)
 CC=gcc
 LDFLAGS=
 

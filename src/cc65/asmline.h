@@ -40,6 +40,9 @@
 
 #include <stdarg.h>
 
+/* common */
+#include "attrib.h"
+
 
 
 /*****************************************************************************/
@@ -72,10 +75,10 @@ extern Line*   		LastLine;	/* Pointer to last line */
 
 
 
-Line* NewCodeLine (const char* Format, va_list ap);
+Line* NewCodeLine (const char* Format, va_list ap) attribute((format(printf,1,0)));
 /* Create a new code line and return it */
 
-Line* NewCodeLineAfter (Line* LineBefore, const char* Format, va_list ap);
+Line* NewCodeLineAfter (Line* LineBefore, const char* Format, va_list ap) attribute((format(printf,2,0)));
 /* Create a new line, insert it after L and return it. */
 
 void FreeCodeLine (Line* L);

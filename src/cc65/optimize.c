@@ -38,8 +38,11 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "../common/xmalloc.h"
+/* common */
+#include "attrib.h"
+#include "xmalloc.h"
 
+/* cc65 */
 #include "asmlabel.h"
 #include "asmline.h"
 #include "check.h"
@@ -126,7 +129,7 @@ static const struct {
     { "\tcpx\t",       	  0,   	REG_X, 	    REG_NONE	  },
     { "\tcpy\t",       	  0,   	REG_Y, 	    REG_NONE	  },
     { "\tdea",		  1,	REG_A,	    REG_NONE	  },
-    { "\tdec\ta",	  1,	REG_A,	    REG_NONE	  },
+    { "\tdec\ta",  	  1,	REG_A,	    REG_NONE	  },
     { "\tdec\t",       	  0,   	REG_NONE,   REG_NONE	  },
     { "\tdex", 	       	  1,   	REG_X, 	    REG_NONE	  },
     { "\tdey", 	       	  1,   	REG_Y, 	    REG_NONE	  },
@@ -226,7 +229,7 @@ static const char* LongBranches [] = {
 
 
 /*****************************************************************************/
-/*     				   Forwards				     */
+/*     		   		   Forwards				     */
 /*****************************************************************************/
 
 
@@ -243,10 +246,19 @@ static unsigned GetLabelNum (const char* L);
 static unsigned RVUInt1 (Line* L, LineColl* LC, unsigned Used, unsigned Unused);
 /* Subfunction for RegValUsed. Will be called recursively in case of branches. */
 
+static Line* NewLineAfter (Line* LineBefore, const char* Format, ...) attribute ((format(printf,2,3)));
+/* Create a new line, insert it after L and return it. The new line is marked
+ * as code line.
+ */
+
+static Line* ReplaceLine (Line* L, const char* Format, ...)
+	attribute ((format(printf,2,3)));
+/* Replace one line by another */
+
 
 
 /*****************************************************************************/
-/*     		 	     	  List stuff				     */
+/*     		   	     	  List stuff				     */
 /*****************************************************************************/
 
 
@@ -2265,7 +2277,7 @@ static void OptPtrOps (void)
     Line* L = FirstCode;
     while (L) {
 
-       	if (OptPtrOps1 (&L)) {		       
+       	if (OptPtrOps1 (&L)) {
 	    continue;
 	} else if (OptPtrOps2 (&L)) {
 	    continue;

@@ -67,8 +67,12 @@ void AddCodeHint (const char* Hint)
 
 void AddEmptyLine (void)
 /* Add an empty line for formatting purposes */
-{
-    AddCodeLine ("");
+{			  
+    /* Use a somewhat weird construct to avoid that gcc complains about 
+     * an empty format string.
+     */
+    static const char EmptyLine[] = "";
+    AddCodeLine (EmptyLine);
 }
 
 

@@ -398,7 +398,6 @@ int CE_UseLoadFlags (const CodeEntry* E)
             case CMP_LE:
             case CMP_UGT:
             case CMP_ULE:
-            case CMP_INV:
                 /* Will use the N or Z flags */
                 return 1;
 

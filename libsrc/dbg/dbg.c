@@ -44,6 +44,8 @@ static char GetKeyUpdate (void);
 /*	       			     Data				     */
 /*****************************************************************************/
 
+
+
 /* Color definitions */
 #if defined(__PLUS4__) || defined(__C16__)
 #  define COLOR_BORDER		(BCOLOR_DARKBLUE | CATTR_LUMA6)
@@ -53,7 +55,7 @@ static char GetKeyUpdate (void);
 #  define COLOR_FRAMEHIGH	COLOR_BLACK
 #  define COLOR_FRAMELOW 	COLOR_GRAY2
 #else
-#  ifdef COLOR_GRAY3
+#  if defined(COLOR_GRAY3)
 #    define COLOR_BORDER	COLOR_BLACK
 #    define COLOR_BACKGROUND	COLOR_BLACK
 #    define COLOR_TEXTHIGH	COLOR_WHITE
@@ -61,7 +63,7 @@ static char GetKeyUpdate (void);
 #    define COLOR_FRAMEHIGH	COLOR_WHITE
 #    define COLOR_FRAMELOW	COLOR_GRAY3
 #  else
-#    ifdef __APPLE2__
+#    if defined(__APPLE2__) || defined(__APPLE2ENH__)
 #      define COLOR_BORDER     	COLOR_BLACK
 #      define COLOR_BACKGROUND  COLOR_BLACK
 #      define COLOR_TEXTHIGH	COLOR_BLACK
@@ -85,7 +87,7 @@ static char GetKeyUpdate (void);
 #  define MAX_X	   	80
 #  define MAX_Y	   	25
 #  define DUMP_BYTES	16
-#elif defined(__APPLE2__) || defined(__ATARI__)
+#elif defined(__APPLE2__) || defined(__APPLE2ENH__) || defined(__ATARI__)
 #  define MAX_X         40
 #  define MAX_Y         24
 #  define DUMP_BYTES     8
@@ -95,7 +97,10 @@ static char GetKeyUpdate (void);
 #  define DUMP_BYTES	 8
 #endif
 
-
+/* Replacement key definitions */
+#if defined(__APPLE2__) || defined(__APPLE2ENH__)
+#  define CH_DEL        ('H' - 'A' + 1)         /* Ctrl+H */
+#endif
 
 /* Defines for opcodes */
 #define	OPC_BRK		0x00
@@ -168,13 +173,14 @@ static TextDesc HelpText [] = {
     { 1,  7, "+         Page down"     		        },
     { 1,  8, "-         Page up"	     		},
     { 1,  9, "Cursor    Move up/down"  		        },
-    { 1, 10, "c         Continue"	     		},
-    { 1, 11, "f         Follow instruction"		},
-    { 1, 12, "o         Goto origin"   		        },
-    { 1, 13, "p         Use as new PC value"		},
-    { 1, 14, "q         Quit"	     			},
-    { 1, 15, "r         Redraw screen" 		        },
-    { 1, 16, "s         Skip next instruction"		},
+    { 1, 10, "a/z       Move up/down"                   },
+    { 1, 11, "c         Continue"	     		},
+    { 1, 12, "f         Follow instruction"		},
+    { 1, 13, "o         Goto origin"   		        },
+    { 1, 14, "p         Use as new PC value"		},
+    { 1, 15, "q         Quit"	     			},
+    { 1, 16, "r         Redraw screen" 		        },
+    { 1, 17, "s         Skip next instruction"		},
 };
 
 
@@ -473,7 +479,7 @@ static char IsAbortKey (char C)
         return 1;
     }
 #endif
-#if defined(CH_STOP) 
+#if defined(CH_STOP)
     if (C == CH_STOP) {
         return 1;
     }
@@ -514,7 +520,7 @@ static char Input (char* Prompt, char* Buf, unsigned char Count)
 	    Buf [i] = c;
 	    cputcxy (x1 + i, MAX_Y-1, c);
        	    ++i;
-	} else if (i > 0 && c == CH_DEL) {
+       	} else if (i > 0 && c == CH_DEL) {
        	    --i;
 	    cputcxy (x1 + i, MAX_Y-1, ' ');
 	    gotoxy (x1 + i, MAX_Y-1);
@@ -522,7 +528,7 @@ static char Input (char* Prompt, char* Buf, unsigned char Count)
 	    Buf [i] = '\0';
 	    done = 1;
 	} else if (IsAbortKey (c)) {
-	    /* Abort */          
+	    /* Abort */
 	    done = 2;
 	}
     } while (!done);
@@ -884,11 +890,17 @@ static char AsmHandler (void)
       		brk_pc = AsmAddr;
       		break;
 
+            case 'a':
+#ifdef CH_CURS_UP
       	    case CH_CURS_UP:
+#endif
       	       	AsmAddr = AsmBack (AsmAddr, 1);
       	       	break;
 
+            case 'z':
+#ifdef CH_CURS_DOWN
       	    case CH_CURS_DOWN:
+#endif
       	       	AsmAddr += DbgDisAsmLen (AsmAddr);
       	       	break;
 
@@ -1012,20 +1024,26 @@ static char StackHandler (void)
     	    	StackHome ();
     	    	break;
 
+            case 'a':
+#ifdef CH_CURS_UP:
     	    case CH_CURS_UP:
-    		--StackAddr;
-    		break;
+#endif
+      		--StackAddr;
+      		break;
 
-    	    case CH_CURS_DOWN:
-    	       	++StackAddr;
-    	     	break;
+            case 'z':
+#ifdef CH_CURS_DOWN
+      	    case CH_CURS_DOWN:
+#endif
+      	       	++StackAddr;
+      	     	break;
 
-    	    default:
-    	     	return c;
+      	    default:
+      	     	return c;
 
-    	}
+      	}
 
-    	/* Update the window contents */
+      	/* Update the window contents */
        	UpdateStack ();
     }
 }
@@ -1046,9 +1064,9 @@ static unsigned UpdateCStack (void)
     unsigned char y;
 
     for (y = CStackFrame.fd_y2-1; y > CStackFrame.fd_y1; --y) {
-    	gotoxy (x, y);
-    	cputhex16 (* (unsigned*)mem);
-    	mem += 2;
+      	gotoxy (x, y);
+      	cputhex16 (* (unsigned*)mem);
+      	mem += 2;
     }
     cputsxy (CStackFrame.fd_x1+1, CStackFrame.fd_y2-1, "->");
     return mem;
@@ -1081,35 +1099,41 @@ static char CStackHandler (void)
 
     while (1) {
 
-    	/* Read and handle input */
-    	switch (c = GetKeyUpdate ()) {
+      	/* Read and handle input */
+      	switch (c = GetKeyUpdate ()) {
 
-    	    case  '+':
+      	    case  '+':
        	        CStackAddr += BytesPerPage;
-    		break;
+      		break;
 
-    	    case '-':
-    	       	CStackAddr -= BytesPerPage;
-    		break;
+      	    case '-':
+      	       	CStackAddr -= BytesPerPage;
+      		break;
 
-    	    case 'o':
-    		CStackHome ();
-    		break;
+      	    case 'o':
+      		CStackHome ();
+      		break;
 
-    	    case CH_CURS_UP:
-    		CStackAddr -= 2;
-    		break;
+            case 'a':
+#ifdef CH_CURS_UP
+      	    case CH_CURS_UP:
+#endif
+      		CStackAddr -= 2;
+      		break;
 
-    	    case CH_CURS_DOWN:
-    	     	CStackAddr += 2;
-    	     	break;
+            case 'z':
+#ifdef CH_CURS_DOWN
+      	    case CH_CURS_DOWN:
+#endif
+      	     	CStackAddr += 2;
+      	     	break;
 
-    	    default:
-    	     	return c;
+      	    default:
+      	     	return c;
 
-    	}
+      	}
 
-    	/* Update the window contents */
+      	/* Update the window contents */
        	UpdateCStack ();
     }
 }
@@ -1175,11 +1199,17 @@ static char DumpHandler (void)
     		DumpHome ();
     	     	break;
 
+            case 'a':
+#ifdef CH_CURS_UP
     	    case CH_CURS_UP:
-    		DumpAddr -= 8;
-    		break;
+#endif
+      		DumpAddr -= 8;
+      		break;
 
-    	    case CH_CURS_DOWN:
+            case 'z':
+#ifdef CH_CURS_DOWN
+      	    case CH_CURS_DOWN:
+#endif
     		DumpAddr += 8;
     		break;
 

@@ -75,6 +75,9 @@ int main (void)
     struct mouse_info info;
     unsigned char Invisible;
     unsigned char Done;
+#if defined(__ATARI__)
+    unsigned char type;
+#endif
 
     /* Initialize the debugger */
     DbgInit (0);
@@ -85,11 +88,6 @@ int main (void)
     textcolor (COLOR_GRAY3);
     cursor (0);
     clrscr ();
-
-    /* Print a help line */
-    revers (1);
-    cputsxy (0, 0, "d: debug   h: hide   q: quit   s: show  ");
-    revers (0);
 
 #if defined(__C64__) || defined(__C128__) || defined(__CBM510__)
     /* Copy the sprite data */
@@ -110,10 +108,28 @@ int main (void)
 
 #elif defined(__ATARI__)
 
+    do {
+        cputs("\r\n");
+        cputs("0 = trak-ball\r\n");
+        cputs("1 = ST mouse\r\n");
+        cputs("2 = Amiga mouse\r\n");
+        cputs("Enter type (0-2): ");
+        type = cgetc();
+        cputc(type);
+    } while (type < '0' || type > '2');
+    type -= '0';
+
     /* Initialize the mouse */
-    mouse_init (MOUSE_TRAKBALL);
+    mouse_init (type);
+    *(unsigned char *)0x2c0 = 15;  /* set mouse cursor color (PM0) */
+    clrscr ();
 
 #endif
+
+    /* Print a help line */
+    revers (1);
+    cputsxy (0, 0, "d: debug   h: hide   q: quit   s: show  ");
+    revers (0);
 
     /* Test loop */
     Done = 0;

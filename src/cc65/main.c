@@ -109,7 +109,7 @@ static void Usage (void)
        	     "  --enable-opt name\tEnable an optimization step\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
-	     "  --list-opt-steps\tList all optimizer steps\n"
+	     "  --list-opt-steps\tList all optimizer steps and exit\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
        	     "  --signed-chars\tDefault characters are signed\n"
        	     "  --static-locals\tMake local variables static\n"
@@ -238,7 +238,7 @@ static void DefineSym (const char* Def)
 	}
 	/* No value given. Define the macro with the value 1 */
      	AddNumericMacro (Def, 1);
-    } else {
+    } else {				     
 	/* We have a value, P points to the '=' character. Since the argument
 	 * is const, create a copy and replace the '=' in the copy by a zero
 	 * terminator.
@@ -484,8 +484,12 @@ static void OptIncludeDir (const char* Opt, const char* Arg)
 
 static void OptListOptSteps (const char* Opt, const char* Arg)
 /* List all optimizer steps */
-{
-    ListOptSteps (stdout);
+{			  
+    /* List the optimizer steps */
+    ListOptSteps (stdout);	  
+    
+    /* Terminate */
+    exit (EXIT_SUCCESS);
 }
 
 

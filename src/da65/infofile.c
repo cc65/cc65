@@ -44,6 +44,7 @@
 #endif
 
 /* common */
+#include "cpu.h"
 #include "xmalloc.h"
 
 /* da65 */
@@ -51,6 +52,7 @@
 #include "error.h"
 #include "global.h"
 #include "infofile.h"
+#include "opctable.h"
 #include "scanner.h"
 
 
@@ -65,6 +67,7 @@ static void GlobalSection (void)
 /* Parse a global section */
 {
     static const IdentTok GlobalDefs[] = {
+       	{   "CPU",     	        INFOTOK_CPU     	},
        	{   "INPUTNAME",  	INFOTOK_INPUTNAME	},
 	{   "OUTPUTNAME",      	INFOTOK_OUTPUTNAME	},
 	{   "PAGELENGTH",      	INFOTOK_PAGELENGTH	},
@@ -85,6 +88,17 @@ static void GlobalSection (void)
 
 	/* Look at the token */
 	switch (InfoTok) {
+
+            case INFOTOK_CPU:
+                InfoNextTok ();
+                InfoAssureStr ();
+                if (CPU != CPU_UNKNOWN) {
+                    InfoError ("CPU already specified");
+                }
+                CPU = FindCPU (InfoSVal);
+                SetOpcTable (CPU);
+                InfoNextTok ();
+                break;
 
 	    case INFOTOK_INPUTNAME:
 	        InfoNextTok ();

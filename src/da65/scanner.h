@@ -65,6 +65,7 @@ typedef enum token_t {
     INFOTOK_LABEL,
 
     /* Global section */
+    INFOTOK_CPU,
     INFOTOK_INPUTNAME,
     INFOTOK_OUTPUTNAME,
     INFOTOK_PAGELENGTH,

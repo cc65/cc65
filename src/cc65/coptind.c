@@ -105,7 +105,7 @@ static short RegVal (unsigned short Use, const RegContents* RC)
     } else if ((Use & REG_SREG_HI) != 0) {
 	return RC->SRegHi;
     } else {
-	return REG_NONE;
+	return UNKNOWN_REGVAL;
     }
 }
 
@@ -961,7 +961,7 @@ unsigned OptDupLoads (CodeSeg* S)
 	    CS_DelEntry (S, I);
 
 	    /* Remember, we had changes */
-	    ++Changes;                      
+	    ++Changes;
 
 	} else {
 

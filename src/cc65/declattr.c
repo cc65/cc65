@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  declattr.c				     */
+/*			   	  declattr.c				     */
 /*                                                                           */
 /*			    Declaration attributes			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -50,9 +50,23 @@
 
 
 
-/* Attribute names */
-static const char* const AttrNames [atCount] = {
-    "alias",
+/* Forwards for attribute handlers */
+static void AliasAttr (const Declaration* D, DeclAttr* A);
+static void UnusedAttr (const Declaration* D, DeclAttr* A);
+static void ZeroPageAttr (const Declaration* D, DeclAttr* A);
+
+
+
+/* Attribute table */
+typedef struct AttrDesc AttrDesc;
+struct AttrDesc {
+    const char	Name[12];
+    void	(*Handler) (const Declaration*, DeclAttr*);
+};
+static const AttrDesc AttrTable [atCount] = {
+    { "alias",	       	AliasAttr	},
+    { "unused",	       	UnusedAttr	},
+    { "zeropage",      	ZeroPageAttr	},
 };
 
 
@@ -63,28 +77,28 @@ static const char* const AttrNames [atCount] = {
 
 
 
-static attrib_t FindAttribute (const char* Attr)
-/* Search the attribute and return the corresponding attribute constant.
- * Return atNone if the attribute name is not known.
+static const AttrDesc* FindAttribute (const char* Attr)
+/* Search the attribute and return the corresponding attribute descriptor.
+ * Return NULL if the attribute name is not known.
  */
 {
-    int A;
+    unsigned A;
 
     /* For now do a linear search */
     for (A = 0; A < atCount; ++A) {
-	if (strcmp (Attr, AttrNames[A]) == 0) {
+       	if (strcmp (Attr, AttrTable[A].Name) == 0) {
 	    /* Found */
-       	    return (attrib_t) A;
+       	    return AttrTable + A;
 	}
     }
 
     /* Not found */
-    return atNone;
+    return 0;
 }
 
 
 
-static void AliasAttrib (const Declaration* D, DeclAttr* A)
+static void AliasAttr (const Declaration* D, DeclAttr* A)
 /* Handle the "alias" attribute */
 {
     SymEntry* Sym;
@@ -123,11 +137,29 @@ static void AliasAttrib (const Declaration* D, DeclAttr* A)
 
 
 
+static void UnusedAttr (const Declaration* D attribute ((unused)), DeclAttr* A)
+/* Handle the "unused" attribute */
+{
+    /* No parameters */
+    A->AttrType = atUnused;
+}
+
+
+
+static void ZeroPageAttr (const Declaration* D attribute ((unused)), DeclAttr* A)
+/* Handle the "zeropage" attribute */
+{
+    /* No parameters */
+    A->AttrType = atZeroPage;
+}
+
+
+
 void ParseAttribute (const Declaration* D, DeclAttr* A)
 /* Parse an additional __attribute__ modifier */
 {
-    ident    AttrName;
-    attrib_t AttrType;
+    ident    	    AttrName;
+    const AttrDesc* Attr;
 
     /* Initialize the attribute description with "no attribute" */
     A->AttrType = atNone;
@@ -154,25 +186,36 @@ void ParseAttribute (const Declaration* D, DeclAttr* A)
 
     /* Map the attribute name to its id, then skip the identifier */
     strcpy (AttrName, CurTok.Ident);
-    AttrType = FindAttribute (AttrName);
+    Attr = FindAttribute (AttrName);
     NextToken ();
 
-    /* Handle possible attributes */
-    switch (AttrType) {
+    /* Did we find a valid attribute? */
+    if (Attr) {
 
-	case atAlias:
-	    AliasAttrib (D, A);
-	    break;
+	/* Call the handler */
+	Attr->Handler (D, A);
 
-	default:
-	    /* Attribute not known, maybe typo */
-	    Error ("Illegal attribute: `%s'", AttrName);
-	    break;
+	/* Read the two closing braces */
+	ConsumeRParen ();
+	ConsumeRParen ();
+
+    } else {
+	/* List of tokens to skip */
+	static const token_t SkipList[] = { TOK_LPAREN, TOK_SEMI };
+
+	/* Attribute not known, maybe typo */
+	Error ("Illegal attribute: `%s'", AttrName);
+
+	/* Skip until closing brace or semicolon */
+	SkipTokens (SkipList, sizeof (SkipList) / sizeof (SkipList[0]));
+
+	/* If we have a closing brace, read it, otherwise bail out */
+	if (CurTok.Tok == TOK_LPAREN) {
+	    /* Read the two closing braces */
+	    ConsumeRParen ();
+	    ConsumeRParen ();
+	}
     }
-
-    /* Read the two closing braces */
-    ConsumeRParen ();
-    ConsumeRParen ();
 }
 
 

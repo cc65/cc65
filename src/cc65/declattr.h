@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -52,6 +52,8 @@
 typedef enum {
     atNone	= -1,	   	/* No attribute */
     atAlias,  	    	   	/* Alias declaration */
+    atUnused,			/* Variable is unused */
+    atZeroPage,			/* Zero page symbol */
 
     atCount	    	   	/* Number of attributes */
 } attrib_t;

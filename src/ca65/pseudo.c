@@ -7,9 +7,9 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -45,6 +45,7 @@
 #include "coll.h"
 #include "symdefs.h"
 #include "tgttrans.h"
+#include "xmalloc.h"
 
 /* ca65 */
 #include "condasm.h"
@@ -53,6 +54,7 @@
 #include "expr.h"
 #include "feature.h"
 #include "global.h"
+#include "incpath.h"
 #include "instr.h"
 #include "listing.h"
 #include "macpack.h"
@@ -880,8 +882,21 @@ static void DoIncBin (void)
     /* Try to open the file */
     F = fopen (Name, "rb");
     if (F == 0) {
-       	ErrorSkip (ERR_CANNOT_OPEN_INCLUDE, Name, strerror (errno));
-    	return;
+
+       	/* Search for the file in the include directories. */
+     	char* PathName = FindInclude (Name);
+       	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
+     	    /* Not found or cannot open, print an error and bail out */
+       	    ErrorSkip (ERR_CANNOT_OPEN_INCLUDE, Name, strerror (errno));
+     	}
+
+     	/* Free the allocated memory */
+     	xfree (PathName);
+
+        /* If we had an error before, bail out now */
+        if (F == 0) {
+            return;
+        }
     }
 
     /* Get the size of the file */

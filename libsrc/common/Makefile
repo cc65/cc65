@@ -116,6 +116,7 @@ S_OBJS = 	_cwd.o          \
 		printf.o      	\
 	 	rand.o	      	\
                 raise.o         \
+                remove.o        \
                 rename.o        \
 	 	setjmp.o      	\
                 signal.o        \

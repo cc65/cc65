@@ -111,7 +111,8 @@ INLINE void CollAppend (Collection* C, void* Item)
     CollInsert (C, Item, C->Count);
 }
 #else
-#  define CollAppend(C, Item)  	CollInsert (C, Item, (C)->Count)
+void CollAppend (Collection* C, void* Item);
+/* Append an item to the end of the collection */
 #endif
 
 #if defined(HAVE_INLINE)
@@ -125,9 +126,8 @@ INLINE void* CollAt (Collection* C, unsigned Index)
     return C->Items[Index];
 }
 #else
-#  define CollAt(C, Index)	      		\
-	(PRECONDITION ((Index) < (C)->Count),	\
-	(C)->Items[(Index)])
+void* CollAt (Collection* C, unsigned Index);
+/* Return the item at the given index */
 #endif
 
 #if defined(HAVE_INLINE)
@@ -152,9 +152,8 @@ INLINE const void* CollConstAt (const Collection* C, unsigned Index)
     return C->Items[Index];
 }
 #else
-#  define CollConstAt(C, Index)			\
-	(PRECONDITION ((Index) < (C)->Count),	\
-	(C)->Items[(Index)])
+const void* CollConstAt (const Collection* C, unsigned Index);
+/* Return the item at the given index */
 #endif
 
 #if defined(HAVE_INLINE)
@@ -168,9 +167,8 @@ INLINE void* CollLast (Collection* C)
     return C->Items[C->Count-1];
 }
 #else
-#  define CollLast(C)	  			\
-      	(PRECONDITION ((C)->Count > 0),		\
-      	(C)->Items[(C)->Count-1])
+void* CollLast (Collection* C);
+/* Return the last item in a collection */
 #endif
 
 #if defined(HAVE_INLINE)
@@ -184,9 +182,8 @@ INLINE const void* CollConstLast (const Collection* C)
     return C->Items[C->Count-1];
 }
 #else
-#  define CollConstLast(C)			\
-       	(PRECONDITION ((C)->Count > 0),		\
-       	(C)->Items[(C)->Count-1])
+const void* CollConstLast (const Collection* C);
+/* Return the last item in a collection */
 #endif
 
 #if defined(HAVE_INLINE)
@@ -202,9 +199,10 @@ INLINE void* CollPop (Collection* C)
     return C->Items[--C->Count];
 }
 #else
-#  define CollPop(C)				\
-	(PRECONDITION ((C)->Count > 0),		\
-	(C)->Items[--(C)->Count])
+void* CollPop (Collection* C);
+/* Remove the last segment from the stack and return it. Calls FAIL if the
+ * collection is empty.
+ */
 #endif
 
 int CollIndex (Collection* C, const void* Item);
@@ -239,7 +237,7 @@ INLINE void CollDeleteAll (Collection* C)
 #if defined(HAVE_INLINE)
 INLINE void CollReplace (Collection* C, void* Item, unsigned Index)
 /* Replace the item at the given position. The old item will not be freed,
- * just the pointer will et replaced.
+ * just the pointer will get replaced.
  */
 {
     /* Check the index */
@@ -249,9 +247,10 @@ INLINE void CollReplace (Collection* C, void* Item, unsigned Index)
     C->Items[Index] = Item;
 }
 #else
-#  define CollReplace(C, Item, Index)		\
-	(PRECONDITION ((Index) < (C)->Count),	\
-	(C)->Items[(Index)] = (Item))
+void CollReplace (Collection* C, void* Item, unsigned Index);
+/* Replace the item at the given position. The old item will not be freed,
+ * just the pointer will get replaced.
+ */
 #endif
 
 void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex);
@@ -280,10 +279,10 @@ void CollSort (Collection* C,
 
 
 
-/* End of exprlist.h */
+/* End of coll.h */
 
 #endif
 
 
 
-
+	      

@@ -132,9 +132,8 @@ INLINE char SB_At (const StrBuf* B, unsigned Index)
     return B->Buf[Index];
 }
 #else
-#  define SB_At(B, Index)        	       	\
-      	(PRECONDITION ((Index) < (B)->Len),     \
-        (B)->Buf[Index])
+char SB_At (const StrBuf* B, unsigned Index);
+/* Get a character from the buffer */
 #endif
 
 #if defined(HAVE_INLINE)
@@ -182,7 +181,8 @@ INLINE void SB_CopyStr (StrBuf* Target, const char* S)
     SB_CopyBuf (Target, S, strlen (S));
 }
 #else
-#  define SB_CopyStr(Target, S) SB_CopyBuf (Target, S, strlen (S))
+void SB_CopyStr (StrBuf* Target, const char* S);
+/* Copy S to Target, discarding the old contents of Target */
 #endif
 
 #if defined(HAVE_INLINE)
@@ -192,7 +192,8 @@ INLINE void SB_Copy (StrBuf* Target, const StrBuf* Source)
     SB_CopyBuf (Target, Source->Buf, Source->Len);
 }
 #else
-#  define SB_Copy(Target, Source)       SB_CopyBuf (Target, (Source)->Buf, (Source)->Len)
+void SB_Copy (StrBuf* Target, const StrBuf* Source);
+/* Copy Source to Target, discarding the old contents of Target */
 #endif
 
 void SB_AppendChar (StrBuf* B, char C);
@@ -208,7 +209,8 @@ INLINE void SB_AppendStr (StrBuf* B, const char* S)
     SB_AppendBuf (B, S, strlen (S));
 }
 #else
-#  define SB_AppendStr(B, S)    SB_AppendBuf (B, S, strlen (S))
+void SB_AppendStr (StrBuf* B, const char* S);
+/* Append a string to the end of the string buffer */
 #endif
 
 #if defined(HAVE_INLINE)
@@ -218,7 +220,8 @@ INLINE void SB_Append (StrBuf* Target, const StrBuf* Source)
     SB_AppendBuf (Target, Source->Buf, Source->Len);
 }
 #else
-#  define SB_Append(Target, Source)     SB_AppendBuf (Target, (Source)->Buf, (Source)->Len)
+void SB_Append (StrBuf* Target, const StrBuf* Source);
+/* Append the contents of Source to Target */
 #endif
 
 #if defined(HAVE_INLINE)
@@ -232,7 +235,10 @@ INLINE void SB_Cut (StrBuf* B, unsigned Len)
     }
 }
 #else
-#  define SB_Cut(B, L)        if ((L) < (B)->Len) { (B)->Len = (L); }
+void SB_Cut (StrBuf* B, unsigned Len);
+/* Cut the contents of B at the given length. If the current length of the
+ * buffer is smaller than Len, nothing will happen.
+ */
 #endif
 
 void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Len);

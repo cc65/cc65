@@ -124,6 +124,17 @@ void SB_Realloc (StrBuf* B, unsigned NewSize)
 
 
 
+#if !defined(HAVE_INLINE)
+char SB_At (const StrBuf* B, unsigned Index)
+/* Get a character from the buffer */
+{
+    PRECONDITION (Index < B->Len);
+    return B->Buf[Index];
+}
+#endif
+
+
+
 void SB_Terminate (StrBuf* B)
 /* Zero terminate the given string buffer. NOTE: The terminating zero is not
  * accounted for in B->Len, if you want that, you have to use AppendChar!
@@ -150,6 +161,26 @@ void SB_CopyBuf (StrBuf* Target, const char* Buf, unsigned Size)
 
 
 
+#if !defined(HAVE_INLINE)
+void SB_CopyStr (StrBuf* Target, const char* S)
+/* Copy S to Target, discarding the old contents of Target */
+{
+    SB_CopyBuf (Target, S, strlen (S));
+}
+#endif
+
+
+
+#if !defined(HAVE_INLINE)
+void SB_Copy (StrBuf* Target, const StrBuf* Source)
+/* Copy Source to Target, discarding the old contents of Target */
+{
+    SB_CopyBuf (Target, Source->Buf, Source->Len);
+}
+#endif
+
+
+
 void SB_AppendChar (StrBuf* B, char C)
 /* Append a character to a string buffer */
 {
@@ -173,6 +204,40 @@ void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
     memcpy (B->Buf + B->Len, S, Size);
     B->Len = NewLen;
 }
+
+
+
+#if !defined(HAVE_INLINE)
+void SB_AppendStr (StrBuf* B, const char* S)
+/* Append a string to the end of the string buffer */
+{
+    SB_AppendBuf (B, S, strlen (S));
+}
+#endif
+
+
+
+#if !defined(HAVE_INLINE)
+void SB_Append (StrBuf* Target, const StrBuf* Source)
+/* Append the contents of Source to Target */
+{
+    SB_AppendBuf (Target, Source->Buf, Source->Len);
+}
+#endif
+
+
+
+#if !defined(HAVE_INLINE)
+void SB_Cut (StrBuf* B, unsigned Len)
+/* Cut the contents of B at the given length. If the current length of the
+ * buffer is smaller than Len, nothing will happen.
+ */
+{
+    if (Len < B->Len) {
+       	B->Len = Len;
+    }
+}
+#endif
 
 
 

@@ -6,12 +6,11 @@
 
   	.export	  	__printf
 
-	.import	  	popax, pushax, pusheax, push1, axlong, axulong
+	.import	  	popax, pushax, pusheax, decsp6, push1, axlong, axulong
 	.import		__ctype
 	.import		_ltoa, _ultoa
 	.import		_strlower, _strlen
-	.import		jmpvec
-	.importzp	sp, ptr1, tmp1, regbank, sreg
+	.importzp	sp, ptr1, ptr2, tmp1, regbank, sreg
 
 	.macpack	generic
 
@@ -21,13 +20,14 @@
 
 ArgList	       	= regbank+0		; Argument list pointer
 Format 	       	= regbank+2 		; Format string
-OutData		= regbank+4 		; Function parameters
+OutData	     	= regbank+4 		; Function parameters
 
 ; ----------------------------------------------------------------------------
 ; Other zero page cells
 
-Base		= ptr1
-
+Base	     	= ptr1
+FSave	     	= ptr1
+FCount		= ptr2
 
 .code
 
@@ -59,7 +59,8 @@ Output1:
 	lda	#<CharArg
 	ldx	#>CharArg
 	jsr	pushax
-	jsr	push1
+	jsr  	push1
+CallOutFunc:
 	jmp	(OutFunc)     	; fout (OutData, &CharArg, 1)
 
 ; ----------------------------------------------------------------------------
@@ -145,7 +146,7 @@ ReadInt:
      	adc	ptr1+1
      	sta	ptr1+1	      		; * 5
      	asl	ptr1
-     	rol	ptr1+1	      		; * 10, assume carry clear
+     	rol  	ptr1+1	      		; * 10, assume carry clear
      	pla
        	adc	ptr1 	      		; Add digit value
      	sta	ptr1
@@ -231,7 +232,7 @@ ultoa: 	sty    	Base			; Save base
 	jsr	pusheax	   		; Push value
     	jsr	PushBufPtr 		; Push the buffer pointer...
        	lda	Base			; Restore base
-    	jmp	_ultoa 	   		; ultoa (l, s, base);
+    	jmp  	_ultoa 	   		; ultoa (l, s, base);
 
 
 ; ----------------------------------------------------------------------------
@@ -274,7 +275,7 @@ Save:	lda	regbank,y
 
 	iny
 	lda	(OutData),y
-	sta	OutFunc
+	sta  	OutFunc
 	iny
 	lda  	(OutData),y
 	sta  	OutFunc+1
@@ -282,16 +283,77 @@ Save:	lda	regbank,y
 ; Start parsing the format string
 
 MainLoop:
-	jsr  	GetFormatChar		; Get one char, zero in Y
-	tax  				; End of format string reached?
-       	bne	NotDone		      	; Continue of end not reached
+	lda	Format			; Remember current format pointer
+	sta	FSave
+	lda	Format+1
+	sta	FSave+1
+
+	ldy	#0  			; Index
+@L1:	lda	(Format),y		; Get next char
+       	beq 	@L2			; Jump on end of string
+	cmp	#'%'			; Format spec?
+	beq	@L2
+   	iny	    			; Bump pointer
+       	bne    	@L1
+	inc	Format+1		; Bump high byte of pointer
+	bne	@L1 			; Branch always
+
+; Found a '%' character or end of string. Update the Format pointer so it is
+; current (points to this character).
+
+@L2:	tya	    		     	; Low byte of offset
+	add	Format
+	sta	Format
+	bcc	@L3
+    	inc	Format+1
+
+; Calculate, how many characters must be output. Beware: This number may
+; be zero. A still contains the low byte of the pointer.
+
+@L3:	sub	FSave
+	sta	FCount
+	lda	Format+1
+	sbc	FSave+1
+	sta	FCount+1
+	ora	FCount 		     	; Is the result zero?
+       	beq	@L4		     	; Jump if yes
+
+; Output the characters that we have until now. To make the call to out
+; faster, build the stack frame by hand (don't use pushax)
+
+	jsr	decsp6		     	; 3 args
+	ldy	#5
+	lda	OutData+1
+	sta	(sp),y
+	dey
+	lda	OutData
+	sta	(sp),y
+	dey
+	lda	FSave+1
+	sta	(sp),y
+	dey
+	lda	FSave
+	sta	(sp),y
+	dey
+	lda	FCount+1
+	sta	(sp),y
+	dey
+	lda	FCount
+	sta	(sp),y
+	jsr	CallOutFunc	     	; Call the output function
+
+; We're back from out(), or we didn't call it. Check for end of string.
+
+@L4:  	jsr  	GetFormatChar	     	; Get one char, zero in Y
+    	tax  	      		     	; End of format string reached?
+       	bne    	NotDone		     	; End not reached
 
 ; End of format string reached. Restore the zeropage registers and return.
 
-	ldx    	#5
+  	ldx    	#5
 Rest:	lda	RegSave,x
-	sta	regbank,x
-	dex
+  	sta	regbank,x
+  	dex
 	bpl	Rest
 	rts
 
@@ -301,12 +363,12 @@ Rest:	lda	RegSave,x
 NotDone:
 	cmp	#'%'
     	bne	@L1
-      	lda	(Format),y		; Check for "%%"
+      	lda	(Format),y	     	; Check for "%%"
 	cmp	#'%'
-	bne	FormatSpec		; Jump if really a format specifier
-	jsr	IncFormatPtr		; Skip the second '%'
-@L1:	jsr	Output1			; Output the character...
-	jmp	MainLoop		; ...and continue
+	bne	FormatSpec	     	; Jump if really a format specifier
+	jsr	IncFormatPtr	     	; Skip the second '%'
+@L1:	jsr	Output1		     	; Output the character...
+	jmp	MainLoop	     	; ...and continue
 
 ; We have a real format specifier
 ; Format is: %[flags][width][.precision][mod]type

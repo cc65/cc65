@@ -1466,7 +1466,7 @@ Here's a list of all control commands and a description, what they do:
   Example:
 
   <tscreen><verb>
-   	.includezp  foo, bar
+   	.importzp       foo, bar
   </verb></tscreen>
 
   See: <tt><ref id=".IMPORT" name=".IMPORT"></tt>

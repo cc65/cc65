@@ -282,8 +282,19 @@ static void CmdSetTarget (CmdDesc* Cmd, target_t Target)
 
 
 
+static void CmdPrint (CmdDesc* Cmd, FILE* F)
+/* Output the command line encoded in the command desc */
+{
+    unsigned I;
+    for (I = 0; I < Cmd->ArgCount && Cmd->Args[I] != 0; ++I) {
+	fprintf (F, "%s ", Cmd->Args[I]);
+    }
+}
+
+
+
 /*****************************************************************************/
-/*	   			Target handling				     */
+/*   	   		     	Target handling				     */
 /*****************************************************************************/
 
 
@@ -322,8 +333,17 @@ static void SetTargetFiles (void)
 static void ExecProgram (CmdDesc* Cmd)
 /* Execute a subprocess with the given name/parameters. Exit on errors. */
 {
+    int Status;
+
+    /* If in debug mode, output the command line we will execute */
+    if (Debug) {
+	printf ("Executing: ");
+       	CmdPrint (Cmd, stdout);
+	printf ("\n");
+    }
+
     /* Call the program */
-    int Status = spawnvp (P_WAIT, Cmd->Name, Cmd->Args);
+    Status = spawnvp (P_WAIT, Cmd->Name, Cmd->Args);
 
     /* Check the result code */
     if (Status < 0) {
@@ -366,15 +386,13 @@ static void Link (void)
      */
     if (OutputName) {
 
-    	CmdAddArg (&LD65, "-o");
-    	CmdAddArg (&LD65, OutputName);
+    	CmdSetOutput (&LD65, OutputName);
 
     } else if (FirstInput && FindExt (FirstInput)) {  /* Only if ext present! */
 
         const char* Extension = Module? MODULE_EXT : "";
     	char* Output = MakeFilename (FirstInput, Extension);
-    	CmdAddArg (&LD65, "-o");
-    	CmdAddArg (&LD65, Output);
+    	CmdSetOutput (&LD65, Output);
     	xfree (Output);
 
     }
@@ -699,10 +717,11 @@ static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptDebug (const char* Opt attribute ((unused)),
-		      const char* Arg attribute ((unused)))
-/* Debug mode (compiler) */
+	    	      const char* Arg attribute ((unused)))
+/* Debug mode (compiler and cl65 utility) */
 {
     CmdAddArg (&CC65, "-d");
+    Debug = 1;
 }
 
 

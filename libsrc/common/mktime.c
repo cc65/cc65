@@ -67,7 +67,7 @@ static const unsigned MonthDays [] = {
 
 
 
-static unsigned char IsLeapYear (int Year)
+static unsigned char __fastcall__ IsLeapYear (unsigned Year)
 /* Returns 1 if the given year is a leap year */
 {
     return (((Year % 4) == 0) && ((Year % 100) != 0 || (Year % 400) == 0));
@@ -75,13 +75,13 @@ static unsigned char IsLeapYear (int Year)
 
 
 
-time_t __fastcall__ mktime (struct tm* TM)
+time_t __fastcall__ mktime (register struct tm* TM)
 /* Make a time in seconds since 1/1/1970 from the broken down time in TM.
  * A call to mktime does also correct the time in TM to contain correct
  * values.
  */
 {
-    div_t D;
+    register div_t D;
     int Max;
     unsigned DayCount;
 
@@ -167,7 +167,7 @@ time_t __fastcall__ mktime (struct tm* TM)
      * (and the last leap year before 1970 was 1968)
      */
     DayCount = ((unsigned) (TM->tm_year-70)) * 365U +
-               (((unsigned) (TM->tm_year-68-1)) / 4) +
+               (((unsigned) (TM->tm_year-(68+1))) / 4) +
                TM->tm_yday;
 
     /* Calculate the weekday */

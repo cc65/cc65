@@ -320,7 +320,7 @@ struct menuitem *curItem, *newItem;
 		};
 	} else {
 	/* menu is VERTICAL, ysize=item*15, count largest xsize of all items +~8? */
-	    myMenu.bot=myMenu.top+(14*item)-1;
+	    myMenu.bot=myMenu.top+(14*item);
 	    for (a=0;a!=item;a++) {
 		tmpsize=getNameSize(curItem->name);
 		size = (size > tmpsize) ? size : tmpsize;

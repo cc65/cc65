@@ -85,7 +85,7 @@ SymEntry* NewSymEntry (const char* Name, unsigned Flags)
     S->SymTab	  = 0;
     S->Pos	  = CurPos;
     S->Flags	  = Flags;
-    S->V.Expr	  = 0;
+    S->Expr       = 0;
     S->ExprRefs   = AUTO_COLLECTION_INITIALIZER;
     S->ExportSize = ADDR_SIZE_DEFAULT;
     S->AddrSize   = ADDR_SIZE_DEFAULT;
@@ -200,7 +200,7 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
     }
 
     /* Set the symbol value */
-    S->V.Expr = Expr;
+    S->Expr = Expr;
 
     /* If the symbol is marked as global, export it. Address size is checked
      * below.
@@ -480,7 +480,7 @@ int SymIsConst (SymEntry* S, long* Val)
  */
 {
     /* Check for constness */
-    return (SymHasExpr (S) && IsConstExpr (S->V.Expr, Val));
+    return (SymHasExpr (S) && IsConstExpr (S->Expr, Val));
 }
 
 
@@ -499,7 +499,7 @@ struct ExprNode* GetSymExpr (SymEntry* S)
 /* Get the expression for a non-const symbol */
 {
     PRECONDITION (S != 0 && SymHasExpr (S));
-    return S->V.Expr;
+    return S->Expr;
 }
 
 
@@ -509,7 +509,7 @@ const struct ExprNode* SymResolve (const SymEntry* S)
  * NULL. Do not call in other contexts!
  */
 {
-    return SymHasExpr (S)? S->V.Expr : 0;
+    return SymHasExpr (S)? S->Expr : 0;
 }
 
 

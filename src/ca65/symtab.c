@@ -52,6 +52,7 @@
 #include "segment.h"
 #include "sizeof.h"
 #include "spool.h"
+#include "studyexpr.h"
 #include "symtab.h"
 
 
@@ -384,15 +385,16 @@ SymEntry* SymFindAny (SymTable* Scope, const char* Name)
 	Sym = SymFind (Scope, Name, SYM_FIND_EXISTING);
        	if (Sym) {
 	    /* Found, return it */
-	    return Sym;
-	} else {
-	    /* Not found, search in the parent scope, if we have one */
-	    Scope = Scope->Parent;
+	    break;
 	}
+
+        /* Not found, search in the parent scope, if we have one */
+	Scope = Scope->Parent;
+
     } while (Sym == 0 && Scope != 0);
 
-    /* Not found */
-    return 0;
+    /* Return the result */
+    return Sym;
 }
 
 
@@ -420,26 +422,17 @@ static void SymCheckUndefined (SymEntry* S)
      *     AutoImport flag is not set, it's an error.
      */
     SymEntry* Sym = 0;
-    if (S->SymTab) {
-	/* It's a global symbol, get the higher level table */
-	SymTable* Tab = S->SymTab->Parent;
-	while (Tab) {
-	    Sym = SymFindAny (Tab, GetString (S->Name));
-	    if (Sym) {
-	       	if (Sym->Flags & (SF_DEFINED | SF_IMPORT)) {
-	       	    /* We've found a symbol in a higher level that is
-	       	     * either defined in the source, or an import.
-	       	     */
-	       	     break;
-	       	} else {
-	       	    /* The symbol found is undefined itself. Look further */
-	       	    Tab = Sym->SymTab->Parent;
-	       	}
-	    } else {
-	       	/* No symbol found */
-	       	break;
-	    }
-	}
+    SymTable* Tab = GetSymParentScope (S);
+    while (Tab) {
+        Sym = SymFind (Tab, GetString (S->Name), SYM_FIND_EXISTING);
+        if (Sym && (Sym->Flags & (SF_DEFINED | SF_IMPORT)) != 0) {
+            /* We've found a symbol in a higher level that is
+             * either defined in the source, or an import.
+             */
+             break;
+        }
+        /* No matching symbol found in this level. Look further */
+        Tab = Tab->Parent;
     }
 
     if (Sym) {
@@ -529,9 +522,9 @@ void SymCheck (void)
 	if (S->Flags & SF_GLOBAL) {
 	    S->Flags &= ~SF_GLOBAL;
 	    if (S->Flags & SF_DEFINED) {
-	    	S->Flags |= SF_EXPORT;
+	     	S->Flags |= SF_EXPORT;
 	    } else {
-	    	S->Flags |= SF_IMPORT;
+	     	S->Flags |= SF_IMPORT;
 	    }
 	}
 
@@ -545,20 +538,24 @@ void SymCheck (void)
 	S = S->List;
     }
 
-    /* Second pass: Walk again through the symbols. Ignore undefined's, since
-     * we handled them in the last pass, and ignore unused symbols, since
-     * we handled them in the last pass, too.
+    /* Second pass: Walk again through the symbols. Count exports and imports
+     * and set address sizes where this has not happened before. Ignore
+     * undefined's, since we handled them in the last pass, and ignore unused
+     * symbols, since we handled them in the last pass, too.
      */
     S = SymList;
     while (S) {
 	if ((S->Flags & SF_UNUSED) == 0 &&
 	    (S->Flags & SF_UNDEFMASK) != SF_UNDEFVAL) {
+
+            /* Check for defined symbols that were never referenced */
 	    if ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_REFERENCED) == 0) {
-	    	/* Symbol was defined but never referenced */
 	    	PWarning (&S->Pos, 2,
                           "Symbol `%s' is defined but never used",
                           GetString (S->Name));
 	    }
+
+            /* Assign an index to all imports */
 	    if (S->Flags & SF_IMPORT) {
 	    	if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
 	    	    /* Imported symbol is not referenced */
@@ -571,11 +568,24 @@ void SymCheck (void)
 	    	    S->Flags |= SF_INDEXED;
 	    	}
 	    }
+
+            /* Assign an index to all exports */
 	    if (S->Flags & SF_EXPORT) {
 	    	/* Give the export an index, count exports */
 	    	S->Index = ExportCount++;
 	    	S->Flags |= SF_INDEXED;
 	    }
+
+            /* If the symbol is defined but has an unknown address size,
+             * recalculate it.
+             */
+            if (SymHasExpr (S) && S->AddrSize == ADDR_SIZE_DEFAULT) {
+                ExprDesc ED;
+                ED_Init (&ED);
+                StudyExpr (S->Expr, &ED);
+                S->AddrSize = ED.AddrSize;
+                ED_Done (&ED);
+            }
 	}
 
 	/* Next symbol */
@@ -696,7 +706,7 @@ void WriteExports (void)
     	     	ObjWrite32 (ConstVal);
 	    } else {
 	     	/* Expression involved */
-	        WriteExpr (S->V.Expr);
+	        WriteExpr (S->Expr);
             }
 
 	    /* Write the source file position */
@@ -762,7 +772,7 @@ void WriteDbgSyms (void)
 		    ObjWrite32 (ConstVal);
 		} else {
 		    /* Expression involved */
-		    WriteExpr (S->V.Expr);
+		    WriteExpr (S->Expr);
 		}
 
 		/* Write the source file position */

@@ -85,10 +85,7 @@ struct SymEntry {
     FilePos    	       	    Pos;  	/* File position for this symbol */
     unsigned                Flags;	/* Symbol flags */
     unsigned	    	    Index;	/* Index of import/export entries */
-    union {
-        struct ExprNode*    Expr;      	/* Symbol expression */
-	SymEntry*  	    Sym;	/* Symbol (if trampoline entry) */
-    } V;
+    struct ExprNode*        Expr;      	/* Symbol expression */
     Collection              ExprRefs;   /* Expressions using this symbol */
     unsigned char           ExportSize; /* Export address size */
     unsigned char           AddrSize;   /* Address size of label */
@@ -247,7 +244,7 @@ INLINE int SymHasUserMark (SymEntry* S)
 #else
 #  define SymHasUserMark(S) (((S)->Flags & SF_USER) != 0)
 #endif
-       
+
 struct SymTable* GetSymParentScope (SymEntry* S);
 /* Get the parent scope of the symbol (not the one it is defined in). Return
  * NULL if the symbol is a cheap local, or defined on global level.

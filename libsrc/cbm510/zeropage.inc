@@ -93,13 +93,13 @@ ScreenRight    	= $DF
 ModKey 	       	= $E0
 NorKey 	       	= $E1
 BitTable       	= $E2
-BlinkOn		= $E6
-BlinkCounter	= $E7
+CURS_FLAG	= $E6		; 1 = no cursor
+CURS_BLINK	= $E7		; cursor blink counter
 CRAM_PTR	= $E8
 TempColor	= $EA
-BlinkSwitch	= $EB
+CURS_STATE	= $EB		; Cursor blink state
 CHARCOLOR	= $EC
-CursBackColor	= $ED		; Color behind cursor
+CURS_COLOR	= $ED		; Color behind cursor
 OutCharTmp	= $EE
 ScreenSeq	= $EF		; Segment of video RAM
 

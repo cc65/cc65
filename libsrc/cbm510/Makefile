@@ -21,6 +21,7 @@ OBJS =	_scrsize.o	\
 	cputc.o		\
        	crt0.o 	 	\
        	kbhit.o	 	\
+	kblncur.o	\
        	kirq.o 	 	\
        	kplot.o	 	\
 	kscnkey.o	\

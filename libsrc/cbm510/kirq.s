@@ -5,7 +5,7 @@
 ;
 
  	.export	  	irq, nmi, k_irq, k_nmi
- 	.import		k_scnkey, k_udtim, k_rs232
+ 	.import		k_blncur, k_scnkey, k_udtim, k_rs232
  	.importzp     	tpi1
 
  	.include      	"zeropage.inc"
@@ -72,6 +72,7 @@ k_irq:
 
 	cmp	#%00000001		; ticker irq?
 	bne	irq1
+	jsr	k_blncur		; Blink the cursor
 	jsr     k_scnkey		; Poll the keyboard
         jsr	k_udtim			; Bump the time
 

@@ -1323,6 +1323,31 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
+<tag><tt><idx>.INITIALIZER</idx></tt></tag>
+
+  Export a symbol and mark it as an initializer. This may be used together
+  with the linker to build a table of initializer subroutines that are called
+  by the startup code. 
+
+  Note: The linker has a feature to build a table of initializer routines, but
+  it is your code that must call these routines, so just declaring a symbol
+  as initializer does nothing by itself.
+
+  An initializer is always exported as an absolute (16 bit) symbol. It may
+  have an optional initializer priority that is separated by a comma. If no
+  priority is given, the default priority of 24 is used. Priority values 1-15
+  are reserved for the runtime and C libraries of the cc65 C compiler.
+
+  Example:
+
+  <tscreen><verb>
+   	.initializer	ModuleInit
+	.initializer	ModInit, 16
+  </verb></tscreen>
+
+  See the C runtime libraries for more examples how to use initializers.
+
+
 <tag><tt><idx>.LEFT</idx></tt></tag>
 
   Builtin function. Extracts the left part of a given token list.

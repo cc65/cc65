@@ -48,7 +48,7 @@ OBJS = 	_scrsize.o     	 	\
 #--------------------------------------------------------------------------
 # Drivers
 
-EMDS = c64-georam.emd c64-ram.emd c64-reu.emd c64-vdc.emd
+EMDS = c64-georam.emd c64-ram.emd c64-ramcart.emd c64-reu.emd c64-vdc.emd
 
 JOYS = c64-stdjoy.joy
 

@@ -50,8 +50,8 @@ apple2lib:
 	    $(AR) a apple2.lib $$i/*.o;\
 	done
 	mv apple2/crt0.o apple2.o
-	cp apple2/apple2-280-192-6.tgi apple2.hi.tgi
-	cp apple2/apple2-40-40-16.tgi apple2.lo.tgi
+	cp apple2/apple2-280-192-6.tgi a2-hi.tgi
+	cp apple2/apple2-40-40-16.tgi a2-lo.tgi
 	cp apple2/apple2-stdjoy.joy a2-stdjoy.joy
 
 #-----------------------------------------------------------------------------

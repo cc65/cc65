@@ -17,7 +17,7 @@
 .rodata
 
 _tgi_mode_table:
-	.byte   TGI_MODE_280_192_6, "APPLE2.HI.TGI", 0
-	.byte   TGI_MODE_40_40_16,  "APPLE2.LO.TGI", 0
-;	.byte   TGI_MODE_560_192_2, "APPLE2.DHI.TGI", 0
+	.byte   TGI_MODE_280_192_6, "A2-HI.TGI", 0
+	.byte   TGI_MODE_40_40_16,  "A2-LO.TGI", 0
+;	.byte   TGI_MODE_560_192_2, "A2-DHI.TGI", 0
 	.byte   0       ; End marker

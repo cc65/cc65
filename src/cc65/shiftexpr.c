@@ -173,13 +173,13 @@ void ShiftExpr (struct ExprDesc* Expr)
                 goto Next;
             }
 
-            /* If we're shifting an integer or unsigned to the left, the
+            /* If we're shifting an integer or unsigned to the right, the
              * lhs has a const address, and the shift count is larger than 8,
              * we can load just the high byte as a char with the correct
              * signedness, and reduce the shift count by 8. If the remaining
              * shift count is zero, we're done.
              */
-            if (Tok == TOK_SHL &&
+            if (Tok == TOK_SHR &&
                 IsTypeInt (Expr->Type) &&
                 ED_IsLVal (Expr) &&
                 (ED_IsLocConst (Expr) || ED_IsLocStack (Expr)) &&
@@ -204,7 +204,7 @@ void ShiftExpr (struct ExprDesc* Expr)
                 /* Remove the generated load code */
                 RemoveCode (&Mark1);
 
-                /* Generate again code for the load */
+                /* Generate again code for the load, this time with the new type */
                 LoadExpr (CF_NONE, Expr);
 
                 /* Reset the type */
@@ -216,7 +216,7 @@ void ShiftExpr (struct ExprDesc* Expr)
                     goto MakeRVal;
                 }
             }
-        
+
         }
 
         /* Generate code */

@@ -87,6 +87,7 @@ static void Usage (void)
        	     "  --debug-info\t\tAdd debug info to object file\n"
 	     "  --formfeeds\t\tAdd formfeeds to the output\n"
 	     "  --help\t\tHelp (this text)\n"
+             "  --hexoffs\t\tUse hexadecimal label offsets\n"
              "  --info name\t\tSpecify an info file\n"
        	     "  --pagelength n\tSet the page length for the listing\n"
        	     "  --start-addr addr\tSet the start/load address\n"
@@ -177,6 +178,15 @@ static void OptHelp (const char* Opt attribute ((unused)),
 {
     Usage ();
     exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptHexOffs (const char* Opt attribute ((unused)),
+		        const char* Arg attribute ((unused)))
+/* Handle the --hexoffs option */
+{
+    UseHexOffs = 1;
 }
 
 
@@ -364,6 +374,7 @@ int main (int argc, char* argv [])
        	{ "--debug-info",      	0,     	OptDebugInfo            },
 	{ "--formfeeds",  	0,	OptFormFeeds		},
       	{ "--help",    	  	0,	OptHelp			},
+       	{ "--hexoffs", 	  	0,     	OptHexOffs              },
        	{ "--info",    	       	1,     	OptInfo                 },
       	{ "--pagelength",      	1,	OptPageLength		},
 	{ "--start-addr", 	1,	OptStartAddr		},

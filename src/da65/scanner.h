@@ -67,6 +67,7 @@ typedef enum token_t {
     /* Global section */
     INFOTOK_COMMENTS,
     INFOTOK_CPU,
+    INFOTOK_HEXOFFS,
     INFOTOK_INPUTNAME,
     INFOTOK_INPUTOFFS,
     INFOTOK_INPUTSIZE,

@@ -54,6 +54,7 @@ const char CfgExt[]    	      = ".cfg";	/* Config file extension */
 /* Flags and other command line stuff */
 unsigned char DebugInfo       = 0;      /* Add debug info to the object file */
 unsigned char FormFeeds	      = 0;  	/* Add form feeds to the output? */
+unsigned char UseHexOffs      = 0;      /* Use hexadecimal label offsets */
 unsigned char PassCount	      = 2;  	/* How many passed do we do? */
 long 	      StartAddr	      = -1L; 	/* Start/load address of the program */
 long          InputOffs       = -1L;    /* Offset into input file */

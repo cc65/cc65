@@ -81,6 +81,7 @@ static void GlobalSection (void)
     static const IdentTok GlobalDefs[] = {
         {   "COMMENTS",         INFOTOK_COMMENTS        },
        	{   "CPU",     	        INFOTOK_CPU     	},
+        {   "HEXOFFS",          INFOTOK_HEXOFFS         },
        	{   "INPUTNAME",  	INFOTOK_INPUTNAME	},
         {   "INPUTOFFS",        INFOTOK_INPUTOFFS       },
         {   "INPUTSIZE",        INFOTOK_INPUTSIZE       },
@@ -120,6 +121,16 @@ static void GlobalSection (void)
                 }
                 CPU = FindCPU (InfoSVal);
                 SetOpcTable (CPU);
+                InfoNextTok ();
+                break;
+
+            case INFOTOK_HEXOFFS:
+                InfoNextTok ();
+                InfoBoolToken ();
+                switch (InfoTok) {
+                    case INFOTOK_FALSE: UseHexOffs = 0; break;
+                    case INFOTOK_TRUE:  UseHexOffs = 1; break;
+                }
                 InfoNextTok ();
                 break;
 

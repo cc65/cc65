@@ -157,6 +157,9 @@ void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count)
     if (Count > 1) {
 	unsigned Offs;
 
+        /* Setup the format string */
+        const char* Format = UseHexOffs? "$%02X" : "%u";
+
 	/* Allocate memory for the dependent label names */
 	unsigned NameLen = strlen (Name);
 	char* 	 DepName = xmalloc (NameLen + 7);
@@ -168,7 +171,7 @@ void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count)
 
 	/* Define the labels */
 	for (Offs = 1; Offs < Count; ++Offs) {
-	    sprintf (DepOffs, "%u", Offs);
+	    sprintf (DepOffs, Format, Offs);
 	    AddLabel (Addr + Offs, atDepLabel, DepName);
 	}
 

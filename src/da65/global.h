@@ -55,6 +55,7 @@ extern const char 	CfgExt[];	/* Config file extension */
 /* Flags and other command line stuff */
 extern unsigned char    DebugInfo;      /* Add debug info to the object file */
 extern unsigned char	FormFeeds;	/* Add form feeds to the output? */
+extern unsigned char    UseHexOffs;     /* Use hexadecimal label offsets */
 extern unsigned char	PassCount;	/* How many passed do we do? */
 extern long    		StartAddr;	/* Start/load address of the program */
 extern long             InputOffs;      /* Offset into input file */

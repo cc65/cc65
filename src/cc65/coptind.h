@@ -92,6 +92,9 @@ unsigned OptUnusedLoads (CodeSeg* S);
 unsigned OptDuplicateLoads (CodeSeg* S);
 /* Remove loads of registers where the value loaded is already in the register. */
 
+unsigned OptStoreLoad (CodeSeg* S);
+/* Remove a store followed by a load from the same location. */
+
 unsigned OptBranchDist (CodeSeg* S);
 /* Change branches for the distance needed. */
 

@@ -682,7 +682,7 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 
 	unsigned char Use, Chg;
 	CodeEntry* N;
-				     
+
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
@@ -797,7 +797,7 @@ unsigned OptDuplicateLoads (CodeSeg* S)
        	       	       	RegA ^= (int) E->Num;
 		    } else {
 			RegA = -1;
-	    	    }
+	       	    }
 		}
 	        break;
 
@@ -994,10 +994,16 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	        /* If the value in the Y register is known and the same as
 		 * that in the A register, replace the store by a STA. The
 		 * optimizer will then remove the load instruction for Y
-		 * later.
+		 * later. If replacement by A is not possible try a
+		 * replacement by X, but check for invalid addressing modes
+		 * in this case.
 		 */
-       	        if (RegY >= 0 && RegY == RegA) {
-		    CE_ReplaceOPC (E, OP65_STA);
+       	        if (RegY >= 0) {
+		    if (RegY == RegA) {
+			CE_ReplaceOPC (E, OP65_STA);
+		    } else if (RegY == RegX && E->AM != AM65_ABSX && E->AM != AM65_ZPX) {
+			CE_ReplaceOPC (E, OP65_STX);
+		    }
 		}
 	        break;
 
@@ -1012,7 +1018,7 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_TAY:
-		N = CS_GetNextEntry (S, I);
+	       	N = CS_GetNextEntry (S, I);
        	       	if (RegA >= 0 && RegA == RegY && N && (N->Info & OF_FBRA) == 0) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
@@ -1074,6 +1080,50 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	    ++I;
 
 	}
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptStoreLoad (CodeSeg* S)
+/* Remove a store followed by a load from the same location. */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* N;
+	CodeEntry* X;
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if it is a store instruction followed by a load from the
+	 * same address which is itself not followed by a conditional branch.
+	 */
+	if ((E->Info & OF_STORE) != 0                 &&
+	    (N = CS_GetNextEntry (S, I)) != 0  	      &&
+       	    (N->Info & OF_LOAD) != 0                  &&
+	    strcmp (E->Arg, N->Arg) == 0              &&
+	    (X = CS_GetNextEntry (S, I+1)) != 0       &&
+       	    (X->Info & OF_FBRA) == 0) {
+
+	    /* Register value is not used, remove the load */
+	    CS_DelEntry (S, I+1);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
 
     }
 

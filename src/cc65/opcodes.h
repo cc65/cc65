@@ -203,8 +203,9 @@ typedef enum {
 #define OF_LBRA         0x0100U	/* Jump/branch is long */
 #define OF_RET 	        0x0200U	/* Return from function */
 #define OF_LOAD         0x0400U	/* Register load */
-#define OF_XFR          0x0800U /* Transfer instruction */
-#define OF_CALL         0x1000U /* A subroutine call */
+#define OF_STORE        0x0800U /* Register store */
+#define OF_XFR          0x1000U /* Transfer instruction */
+#define OF_CALL         0x2000U /* A subroutine call */
 
 /* Combined infos */
 #define OF_BRA 	(OF_UBRA | OF_CBRA)	/* Operation is a jump/branch */

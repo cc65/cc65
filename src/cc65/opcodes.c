@@ -611,21 +611,21 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
        	0,     	       	                        /* size */
        	REG_A, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_NONE			 		/* flags */
+	OF_STORE		 		/* flags */
     },
     {   OP65_STX,      	                        /* opcode */
        	"stx", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_X, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_NONE			 		/* flags */
+	OF_STORE		 		/* flags */
     },
     {   OP65_STY,      	                        /* opcode */
        	"sty", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_Y, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_NONE			 		/* flags */
+	OF_STORE   		 		/* flags */
     },
     {   OP65_TAX,      	                        /* opcode */
        	"tax", 	       	                        /* mnemonic */

@@ -195,8 +195,16 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
     /* Map a default address size to a real value */
     if (AddrSize == ADDR_SIZE_DEFAULT) {
         long Val;
-        if (IsConstExpr (Expr, &Val) && IsByteRange (Val)) {
-            AddrSize = ADDR_SIZE_ZP;
+        if (IsConstExpr (Expr, &Val)) {
+            if (IsByteRange (Val)) {
+                AddrSize = ADDR_SIZE_ZP;
+            } else if (IsWordRange (Val)) {
+                AddrSize = ADDR_SIZE_ABS;
+            } else if (IsFarRange (Val)) {
+                AddrSize = ADDR_SIZE_FAR;
+            } else {
+                AddrSize = ADDR_SIZE_LONG;
+            }
         } else {
             AddrSize = SymAddrSize (S);
         }

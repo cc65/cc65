@@ -1152,6 +1152,7 @@ unsigned char ParseAddrSize (void)
         "DIRECT", "ZEROPAGE", "ZP",
         "ABSOLUTE", "ABS", "NEAR",
         "FAR",
+        "LONG", "DWORD",
     };
 
     /* Check for an identifier */
@@ -1169,6 +1170,8 @@ unsigned char ParseAddrSize (void)
         case 4:
         case 5: return ADDR_SIZE_ABS;
         case 6: return ADDR_SIZE_FAR;
+        case 7:
+        case 8: return ADDR_SIZE_LONG;
         default:
             Error ("Address size specifier expected");
             return ADDR_SIZE_DEFAULT;

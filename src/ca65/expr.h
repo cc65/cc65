@@ -66,7 +66,7 @@ void FreeExpr (ExprNode* Root);
 ExprNode* SimplifyExpr (ExprNode* Expr);
 /* Try to simplify the given expression tree */
 
-ExprNode* GenLiteralExpr (long Val);                   
+ExprNode* GenLiteralExpr (long Val);
 /* Return an expression tree that encodes the given literal value */
 
 ExprNode* GenSymExpr (struct SymEntry* Sym);
@@ -112,6 +112,9 @@ int IsByteRange (long Val);
 
 int IsWordRange (long Val);
 /* Return true if this is a word value */
+
+int IsFarRange (long Val);
+/* Return true if this is a far (24 bit) value */
 
 ExprNode* CloneExpr (ExprNode* Expr);
 /* Clone the given expression tree. The function will simply clone symbol

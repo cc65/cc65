@@ -196,7 +196,15 @@ int IsByteRange (long Val)
 int IsWordRange (long Val)
 /* Return true if this is a word value */
 {
-    return (Val & ~0xFFFF) == 0;
+    return (Val & ~0xFFFFL) == 0;
+}
+
+
+
+int IsFarRange (long Val)
+/* Return true if this is a far (24 bit) value */
+{
+    return (Val & ~0xFFFFFFL) == 0;
 }
 
 
@@ -276,7 +284,7 @@ static ExprNode* FuncConst (void)
 
     /* Done */
     return Result;
-}                                                             
+}
 
 
 
@@ -403,7 +411,7 @@ static ExprNode* FuncReferenced (void)
 
 static ExprNode* FuncSizeOf (void)
 /* Handle the .SIZEOF function */
-{                                                          
+{
     long Size;
 
     /* Get the struct for the scoped struct name */

@@ -667,11 +667,148 @@ because they don't have a name which would allow to access them.
 
 
 
-<sect>Scopes<label id="scopes">
+<sect>Scopes<label id="scopes"><p>
 
-<p>
+ca65 implements several sorts of scopes for symbols.
+
+<sect1>Global scope<p>
+
+All (non cheap local) symbols that are declared outside of any nested scopes
+are in global scope.
 
 
+<sect1>A special scope: cheap locals<p>
+
+A special scope is the scope for cheap local symbols. It lasts from one non
+local symbol to the next one, without any provisions made by the programmer.
+All other scopes differ in usage but use the same concept internally.
+
+
+<sect1>Generic nested scopes<p>
+
+A nested scoped for generic use is started with <tt/<ref id=".SCOPE"
+name=".SCOPE">/ and closed with <tt/<ref id=".ENDSCOPE" name=".ENDSCOPE">/.
+The scope can have a name, in which case it is accessible from the outside by
+using <ref id="scopesyntax" name="explicit scopes">. If the scope does not
+have a name, all symbols created within the scope are local to the scope, and
+aren't accessible from the outside.
+
+A nested scope can access symbols from the local or from enclosing scopes by
+name without using explicit scope names. In some cases there may be
+ambiguities, for example if there is a reference to a local symbol that is not
+yet defined, but a symbol with the same name exists in outer scopes:
+
+<tscreen><verb>
+        .scope  outer
+                foo     = 2
+                .scope  inner
+                        lda     #foo
+                        foo     = 3
+                .endscope
+        .endscope
+</verb></tscreen>
+
+In the example above, the <tt/lda/ instruction will load the value 3 into the
+accumulator, because <tt/foo/ is redefined in the scope. However:
+
+<tscreen><verb>
+        .scope  outer
+                foo     = $1234
+                .scope  inner
+                        lda     foo,x
+                        foo     = $12
+                .endscope
+        .endscope
+</verb></tscreen>
+
+Here, <tt/lda/ will still load from <tt/$12,x/, but since it is unknown to the
+assembler that <tt/foo/ is a zeropage symbol when translating the instruction,
+absolute mode is used instead. In fact, the assembler will not use absolute
+mode by default, but it will search through the enclosing scopes for a symbol
+with the given name. If one is found, the address size of this symbol is used.
+This may lead to errors:
+
+<tscreen><verb>
+        .scope  outer
+                foo     = $12
+                .scope  inner
+                        lda     foo,x
+                        foo     = $1234
+                .endscope
+        .endscope
+</verb></tscreen>
+
+In this case, when the assembler sees the symbol <tt/foo/ in the <tt/lda/
+instruction, it will search for an already defined symbol <tt/foo/. It will
+find <tt/foo/ in scope <tt/outer/, and a close look reveals that it is a
+zeropage symbol. So the assembler will use zeropage addressing mode. If
+<tt/foo/ is redefined later in scope <tt/inner/, the assembler tries to change
+the address in the <tt/lda/ instruction already translated, but since the new
+value needs absolute addressing mode, this fails, and an error message "Range
+error" is output.
+
+Of course the most simple solution for the problem is to move the definition
+of <tt/foo/ in scope <tt/inner/ upwards, so it preceeds its use. There may be
+rare cases when this cannot be done. In these cases, you can use one of the
+address size override operators:
+
+<tscreen><verb>
+        .scope  outer
+                foo     = $12
+                .scope  inner
+                        lda     a:foo,x
+                        foo     = $1234
+                .endscope
+        .endscope
+</verb></tscreen>
+
+This will cause the <tt/lda/ instruction to be translated using absolute
+addressing mode, which means changing the symbol reference later does not
+cause any errors.
+
+
+<sect1>Nested procedures<p>
+
+A nested procedure is created by use of <tt/<ref id=".PROC" name=".PROC">/. It
+differs from a <tt/<ref id=".SCOPE" name=".SCOPE">/ in that it must have a
+name, and a it will introduce a symbol with this name in the enclosing scope.
+So
+
+<tscreen><verb>
+        .proc   foo
+                ...
+        .endscope
+</verb></tscreen>
+
+is actually the same as
+
+<tscreen><verb>
+        foo:
+        .scope  foo
+                ...
+        .endscope
+</verb></tscreen>
+
+This is the reason why a procedure must have a name. If you want a scope
+without a name, use <tt/<ref id=".SCOPE" name=".SCOPE">/.
+
+<bf/Note:/ As you can see from the example above, scopes and symbols live in
+different namespaces. There can be a symbol named <tt/foo/ and a scope named
+<tt/foo/ without any conflicts (but see the section titled <ref
+id="scopesearch" name="&quot;Scope search order&quot;">).
+
+
+<sect1>Structs, unions and enums<p>
+
+
+
+
+
+
+<sect1>Explicit scope specification<label id="scopesyntax"><p>
+
+
+<sect1>Scope search order<label id="scopesearch"><p>
 
 
 
@@ -1173,6 +1310,11 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.ENDREP, .ENDREPEAT</tt><label id=".ENDREPEAT"><p>
 
   End a <tt><ref id=".REPEAT" name=".REPEAT"></tt> block.
+
+
+<sect1><tt>.ENDSCOPE</tt><label id=".ENDSCOPE"><p>
+
+  End of local lexical level (see <tt/<ref id=".SCOPE" name=".SCOPE">/).
 
 
 <sect1><tt>.ENDSTRUCT</tt><label id=".ENDSTRUCT"><p>
@@ -2098,17 +2240,16 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.PROC</tt><label id=".PROC"><p>
 
-  Start a nested lexical level. All new symbols from now on are in the local
-  lexical level and are not accessible from outside. Symbols defined outside
-  this local level may be accessed as long as their names are not used for new
-  symbols inside the level. Symbols names in other lexical levels do not
-  clash, so you may use the same names for identifiers. The lexical level ends
-  when the <tt><ref id=".ENDPROC" name=".ENDPROC"></tt> command is read.
-  Lexical levels may be nested up to a depth of 16.
-
-  The command may be followed by an identifier, in this case the
-  identifier is declared in the outer level as a label having the value of
-  the program counter at the start of the lexical level.
+  Start a nested lexical level with the given name and adds a symbol with this
+  name to the enclosing scope. All new symbols from now on are in the local
+  lexical level and are accessible from outside only via <ref id="scopesyntax"
+  name="explicit scope specification">. Symbols defined outside this local
+  level may be accessed as long as their names are not used for new symbols
+  inside the level. Symbols names in other lexical levels do not clash, so you
+  may use the same names for identifiers. The lexical level ends when the
+  <tt><ref id=".ENDPROC" name=".ENDPROC"></tt> command is read. Lexical levels
+  may be nested up to a depth of 16 (this is an artificial limit to protect
+  against errors in the source).
 
   Note: Macro names are always in the global level and in a separate name
   space. There is no special reason for this, it's just that I've never
@@ -2128,7 +2269,8 @@ Here's a list of all control commands and a description, what they do:
       	.endproc  	      	; Leave lexical level
   </verb></tscreen>
 
-  See: <tt><ref id=".ENDPROC" name=".ENDPROC"></tt>
+  See: <tt/<ref id=".ENDPROC" name=".ENDPROC">/ and <tt/<ref id=".SCOPE"
+  name=".SCOPE">/
 
 
 <sect1><tt>.PSC02</tt><label id=".PSC02"><p>
@@ -2220,7 +2362,7 @@ Here's a list of all control commands and a description, what they do:
 
   <tscreen><verb>
 	; Reserve 12 bytes of memory with value $AA
-  	.res	12, $AA
+     	.res	12, $AA
   </verb></tscreen>
 
 
@@ -2254,6 +2396,39 @@ Here's a list of all control commands and a description, what they do:
   readonly data like string constants.
 
   See also the <tt><ref id=".SEGMENT" name=".SEGMENT"></tt> command.
+
+
+<sect1><tt>.SCOPE</tt><label id=".SCOPE"><p>
+
+  Start a nested lexical level with the given name. All new symbols from now
+  on are in the local lexical level and are accessible from outside only via
+  <ref id="scopesyntax" name="explicit scope specification">. Symbols defined
+  outside this local level may be accessed as long as their names are not used
+  for new symbols inside the level. Symbols names in other lexical levels do
+  not clash, so you may use the same names for identifiers. The lexical level
+  ends when the <tt><ref id=".ENDSCOPE" name=".ENDSCOPE"></tt> command is
+  read. Lexical levels may be nested up to a depth of 16 (this is an
+  artificial limit to protect against errors in the source).
+
+  Note: Macro names are always in the global level and in a separate name
+  space. There is no special reason for this, it's just that I've never
+  had any need for local macro definitions.
+
+  Example:
+
+  <tscreen><verb>
+       	.scope  Error                   ; Start new scope named Error
+                None = 0                ; No error
+                File = 1                ; File error
+                Parse = 2               ; Parse error
+      	.endproc  	      	        ; Close lexical level
+
+                ...
+                lda #Error::File        ; Use symbol from scope Error
+  </verb></tscreen>
+
+  See: <tt/<ref id=".ENDSCOPE" name=".ENDSCOPE">/ and <tt/<ref id=".PROC"
+  name=".PROC">/
 
 
 <sect1><tt>.SEGMENT</tt><label id=".SEGMENT"><p>

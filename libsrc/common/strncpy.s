@@ -35,14 +35,14 @@ L1:     inx
 
 L2:     lda     (ptr1),y        ; Copy one character
         sta     (ptr2),y
-        beq     L3              ; Bail out if terminator reached
+        beq     L5              ; Bail out if terminator reached (A = 0)
         iny
         bne     L1
         inc     ptr1+1
         inc     ptr2+1          ; Bump high bytes
         bne     L1              ; Branch always
 
-; Fill the remaining bytes. A is zero if we come here
+; Fill the remaining bytes. 
 
 L3:     inx
         bne     L4
@@ -50,7 +50,7 @@ L3:     inx
         beq     L9
 
 L4:     sta     (ptr2),y
-        iny
+L5:     iny
         bne     L3
         inc     ptr2+1          ; Bump high byte
         bne     L3              ; Branch always

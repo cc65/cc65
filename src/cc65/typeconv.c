@@ -55,20 +55,6 @@
 
 
 
-static void DoPtrConversions (ExprDesc* Expr)
-/* If the expression is a function, convert it to pointer to function.
- * If the expression is an array, convert it to pointer to first element.
- */
-{
-    if (IsTypeFunc (Expr->Type)) {
-    	Expr->Type = PointerTo (Expr->Type);
-    } else if (IsTypeArray (Expr->Type)) {
-        Expr->Type = ArrayToPtr (Expr->Type);
-    }
-}
-
-
-
 static void DoConversion (ExprDesc* Expr, const type* NewType)
 /* Emit code to convert the given expression to a new type. */
 {
@@ -185,7 +171,7 @@ void TypeConversion (ExprDesc* Expr, type* NewType)
     /* Get the type of the right hand side. Treat function types as
      * pointer-to-function
      */
-    DoPtrConversions (Expr);
+    Expr->Type = PtrConversion (Expr->Type);
 
     /* First, do some type checking */
     if (IsTypeVoid (NewType) || IsTypeVoid (Expr->Type)) {
@@ -293,7 +279,7 @@ void TypeCast (ExprDesc* Expr)
     hie10 (Expr);
 
     /* Convert functions and arrays to "pointer to" object */
-    DoPtrConversions (Expr);
+    Expr->Type = PtrConversion (Expr->Type);
 
     /* Convert the value. */
     DoConversion (Expr, NewType);

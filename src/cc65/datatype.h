@@ -496,6 +496,12 @@ type* IntPromotion (type* T);
  * string may be T if there is no need to change it.
  */
 
+type* PtrConversion (type* T);
+/* If the type is a function, convert it to pointer to function. If the
+ * expression is an array, convert it to pointer to first element. Otherwise
+ * return T.
+ */
+
 
 
 /* End of datatype.h */

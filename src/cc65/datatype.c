@@ -797,3 +797,20 @@ type* IntPromotion (type* T)
 
 
 
+type* PtrConversion (type* T)
+/* If the type is a function, convert it to pointer to function. If the
+ * expression is an array, convert it to pointer to first element. Otherwise
+ * return T.
+ */                          
+{
+    if (IsTypeFunc (T)) {
+       	return PointerTo (T);
+    } else if (IsTypeArray (T)) {
+        return ArrayToPtr (T);
+    } else {
+        return T;
+    }
+}
+
+
+

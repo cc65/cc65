@@ -92,4 +92,6 @@ maptable:
 	.byte	EUNKNOWN	; 175 - haven't found documentation
 	.byte	EUNKNOWN	; 176 - [DOS 3] incompatible file system
 
+	.byte	EINVAL		; 177 - dummy (used by cc65 rtl)
+
 MAX_OSERR_VAL = (* - maptable)

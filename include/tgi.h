@@ -48,6 +48,18 @@
 
 
 /*****************************************************************************/
+/*                                  Definitions                              */
+/*****************************************************************************/
+
+
+
+/* Constants used for tgi_textstyle */
+#define TGI_TEXT_HORIZONTAL     0
+#define TGI_TEXT_VERTICAL       1
+
+
+
+/*****************************************************************************/
 /* 	      	  		   Functions	     			     */
 /*****************************************************************************/
 
@@ -162,6 +174,30 @@ void __fastcall__ tgi_outtext (int x, int y, const char* text);
 
 void __fastcall__ tgi_bar (int x1, int y1, int x2, int y2);
 /* Draw a bar (a filled rectangle) using the current color. */
+
+void __fastcall__ tgi_textstyle (unsigned char magx, unsigned char magy,
+                                 unsigned char dir);
+/* Set the style for text output. */
+
+unsigned __fastcall__ tgi_textwidth (const char* s);
+/* Calculate the width of the text in pixels according to the current text
+ * style.
+ */
+
+unsigned __fastcall__ tgi_textheight (const char* s);
+/* Calculate the height of the text in pixels according to the current text
+ * style.
+ */
+
+void __fastcall__ tgi_outtext (const char* s);
+/* Output text at the current graphics cursor position. The graphics cursor
+ * is moved to the end of the text.
+ */
+
+void __fastcall__ tgi_outtextxy (int x, int y, const char* s);
+/* Output text at the given cursor position. The graphics cursor is moved to
+ * the end of the text.
+ */
 
 
 

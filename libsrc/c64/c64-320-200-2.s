@@ -28,7 +28,9 @@
         .word   200                     ; Y resolution
         .byte   2                       ; Number of drawing colors
         .byte   1                       ; Number of screens available
-        .res    6, $00                  ; Reserved for future extensions
+        .byte   8                       ; System font X size
+        .byte   8                       ; System font Y size
+        .res    4, $00                  ; Reserved for future extensions
 
 ; Next comes the jump table. Currently all entries must be valid and may point
 ; to an RTS for test versions (function not implemented). A future version may
@@ -55,7 +57,8 @@
         .word   LINE
         .word   0               ; BAR
         .word   CIRCLE
-
+        .word   TEXTSTYLE
+        .word   OUTTEXT
 
 ; ------------------------------------------------------------------------
 ; Data.
@@ -108,6 +111,11 @@ CHUNK1:         .res    1
 OLDCH1:         .res    1
 CHUNK2:         .res    1
 OLDCH2:         .res    1
+
+; Text output stuff
+TEXTMAGX:       .res    1
+TEXTMAGY:       .res    1
+TEXTDIR:        .res    1
 
 ; Constants and tables
 
@@ -450,7 +458,7 @@ GETPIXEL:
         rts
 
 ; ------------------------------------------------------------------------
-; HORLINE: Draw a horizontal line from X1/Y to X2/Y, where X1 = ptr1, 
+; HORLINE: Draw a horizontal line from X1/Y to X2/Y, where X1 = ptr1,
 ; Y = ptr2 and X2 = ptr3, using the current drawing color.
 ;
 ; This is a special line drawing entry used when the line is know to be
@@ -686,7 +694,7 @@ XFIXC:  sta     TEMP
         bmi     @C1          ;Skip if column is negative
         cmp     #39          ;End if move past end of screen
         bcs     EXIT
-@C1:	lda     POINT
+@C1:  	lda     POINT
         adc     #8
         sta     POINT
         bcc     @CONT
@@ -1138,6 +1146,31 @@ PCHUNK2:
         eor     (X2),y
         sta     (X2),y
 EXIT3:  rts
+
+; ------------------------------------------------------------------------
+; TEXTSTYLE: Set the style used when calling OUTTEXT. Text scaling in X and Y
+; direction is passend in X/Y, the text direction is passed in A.
+;
+; Must set an error code: NO
+;
+
+TEXTSTYLE:
+        stx     TEXTMAGX
+        sty     TEXTMAGY
+        sta     TEXTDIR
+        rts
+
+
+; ------------------------------------------------------------------------
+; OUTTEXT: Output text at X/Y = ptr1/ptr2 using the current color and the
+; current text style. The text to output is given as a zero terminated
+; string with address in ptr3.
+;
+; Must set an error code: NO
+;
+
+OUTTEXT:
+        rts
 
 ; ------------------------------------------------------------------------
 ; Calculate all variables to plot the pixel at X1/Y1. If the point is out

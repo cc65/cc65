@@ -77,20 +77,10 @@ typedef struct {
 static void NewCmdLine (CmdLine* L)
 /* Initialize a CmdLine struct */
 {
-    unsigned I;
-
     /* Initialize the struct */
     L->Size    = 8;
     L->Count   = 0;
     L->Vec     = xmalloc (L->Size * sizeof (L->Vec[0]));
-
-    /* Copy the arguments. We have to allocate them on free store, otherwise
-     * we would have to keep track which one is on free store and which not,
-     * which is a lot more overhead.
-     */
-    for (I = 0; I < L->Count; ++I) {
-    	L->Vec[I] = xstrdup (ArgVec[I]);
-    }
 }
 
 
@@ -112,7 +102,7 @@ static void AddArg (CmdLine* L, char* Arg)
     L->Vec[L->Count++] = Arg;
 }
 
-
+    
 
 static void ExpandFile (CmdLine* L, const char* Name)
 /* Add the contents of a file to the command line. Each line is a separate
@@ -133,7 +123,7 @@ static void ExpandFile (CmdLine* L, const char* Name)
 	/* Get a pointer to the buffer */
 	const char* B = Buf;
 
-	/* Skip trailing whitespace (this will also kill the newline that is
+    	/* Skip trailing whitespace (this will also kill the newline that is
 	 * appended by fgets().
 	 */
 	unsigned Len = strlen (Buf);
@@ -202,21 +192,21 @@ void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName)
      */
     for (I = 0; I < *aArgCount; ++I) {
 
-	/* Get the next argument */
-	char* Arg = (*aArgVec)[I];
+    	/* Get the next argument */
+    	char* Arg = (*aArgVec)[I];
 
-	/* Is this a file argument? */
-	if (Arg && Arg[0] == '@') {
+    	/* Is this a file argument? */
+    	if (Arg && Arg[0] == '@') {
 
-	    /* Expand the file */
-	    ExpandFile (&L, Arg+1);
+    	    /* Expand the file */
+    	    ExpandFile (&L, Arg+1);
 
-	} else {
+    	} else {
 
-	    /* No file, just add a copy */
-	    AddArg (&L, Arg);
+    	    /* No file, just add a copy */
+    	    AddArg (&L, Arg);
 
-	}
+    	}
     }
 
     /* Store the new argument list in a safe place... */

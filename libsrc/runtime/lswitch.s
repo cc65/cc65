@@ -4,10 +4,10 @@
 ; CC65 runtime: switch statement with long selector
 ;
 
-; Subroutine to handle a switch statement with an int selector. The table
+; Subroutine to handle a switch statement with an long selector. The table
 ; is located at the return address from the function. It contains the negative
 ; of the case label count as first word, followed by three words for each case
-; label, the first two being the value, and the second one the label to jump
+; label, the first two being the value, and the last one the label to jump
 ; to in case of a match. The default case is located at the end of the table.
 
 	.export		lswitch
@@ -31,7 +31,6 @@ lswitch:
 	lda	(ptr2),y
 	sta	ptr3+1	   	; Remember the count of labels
 
-	ldy	#0
 	clc	  	   	; Skip the label count
 	lda	ptr2
 	adc	#2
@@ -42,7 +41,8 @@ lswitch:
 
 ; Search for the label
 
-L0: 	lda	(ptr2),y
+L0:	ldy	#0
+	lda	(ptr2),y
    	cmp	ptr1
        	bne    	L1
    	iny

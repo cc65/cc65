@@ -60,6 +60,7 @@ OBJS =	abend.obj	\
         segdefs.obj     \
         segnames.obj    \
 	strbuf.obj	\
+        strpool.obj     \
 	strutil.obj	\
 	target.obj	\
 	tgttrans.obj	\

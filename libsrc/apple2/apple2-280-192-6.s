@@ -103,7 +103,6 @@ TEXTDIR		= $F9
 .rodata
 
 DEFPALETTE:	.byte	$00, $05, $04, $01, $00, $08, $06, $01; 6 unique colors
-PALETTESIZE	= * - DEFPALETTE
 
 SHAPE:  .byte   $64,$01,$d0,$00,$d5,$00,$da,$00,$e0,$00,$ef,$00,$fe,$00,$0c,$01
         .byte   $19,$01,$1d,$01,$25,$01,$2d,$01,$3d,$01,$46,$01,$4b,$01,$52,$01
@@ -303,8 +302,11 @@ SETVIEWPAGE:
 SETDRAWPAGE:
 	tax
 	beq	@L1
-	jmp	HGR2
-@L1:	jmp	HGR
+	lda	#>$4000			; Page 2
+	.byte	$2C
+@L1:	lda	#>$2000			; Page 1
+	sta	$E6
+	rts
 
 ; ------------------------------------------------------------------------
 ; SETCOLOR: Set the drawing color (in A). The new color is already checked

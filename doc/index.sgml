@@ -55,7 +55,7 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="internal.txt" name="internal.txt"></tag>
   internal.doc	- A somewhat older text describing several cc65 internals.
 
-  <tag><htmlurl url="intro.txt" name="intro.txt"></tag>
+  <tag><htmlurl url="intro.html" name="intro.html"></tag>
   Describes the use of the tools by a short "hello world" example.
 
   <tag><htmlurl url="ld65.html" name="ld65.html"></tag>

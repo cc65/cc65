@@ -13,6 +13,7 @@ SGML  =	ar65.sgml	\
 	dio.sgml    	\
 	geos.sgml   	\
 	index.sgml  	\
+	intro.sgml	\
 	ld65.sgml   	\
 	library.sgml
 

@@ -56,13 +56,15 @@
 #define SER_BAUD_1200          	0x08
 #define SER_BAUD_1800           0x09
 #define SER_BAUD_2400          	0x0A
-#define SER_BAUD_4800          	0x0B
-#define SER_BAUD_9600          	0x0C
-#define SER_BAUD_19200         	0x0D
-#define SER_BAUD_38400         	0x0E
-#define SER_BAUD_57600         	0x0F
-#define SER_BAUD_115200        	0x10
-#define SER_BAUD_230400        	0x11
+#define SER_BAUD_3600           0x0B
+#define SER_BAUD_4800          	0x0C
+#define SER_BAUD_7200           0x0D
+#define SER_BAUD_9600          	0x0E
+#define SER_BAUD_19200         	0x0F
+#define SER_BAUD_38400         	0x10
+#define SER_BAUD_57600         	0x11
+#define SER_BAUD_115200        	0x12
+#define SER_BAUD_230400        	0x13
 
 /* Data bit settings */
 #define SER_BITS_5             	0x00
@@ -86,7 +88,9 @@
 #define SER_HS_HW               0x01    /* Hardware (RTS/CTS) handshake */
 #define SER_HS_SW               0x02    /* Software handshake */
 
-/* Bit masks to mask out things from the status returned by rs232_status */
+/* Bit masks to mask out things from the status returned by ser_status.
+ * These are 6551 specific and must be mapped by drivers for other chips.
+ */
 #define SER_STATUS_PE          	0x01	/* Parity error */
 #define SER_STATUS_FE  	       	0x02	/* Framing error */
 #define SER_STATUS_OE           0x04	/* Overrun error */

@@ -76,14 +76,16 @@ SER_BAUD_600           	=       $07
 SER_BAUD_1200          	=       $08
 SER_BAUD_1800           =       $09
 SER_BAUD_2400          	=       $0A
-SER_BAUD_4800          	=       $0B
-SER_BAUD_9600          	=       $0C
-SER_BAUD_19200         	=       $0D
-SER_BAUD_38400         	=       $0E
-SER_BAUD_57600         	=       $0F
-SER_BAUD_115200        	=       $10
-SER_BAUD_230400        	=       $11
-
+SER_BAUD_3600           =       $0B
+SER_BAUD_4800          	=       $0C
+SER_BAUD_7200           =       $0D
+SER_BAUD_9600          	=       $0E
+SER_BAUD_19200         	=       $0F
+SER_BAUD_38400         	=       $10
+SER_BAUD_57600         	=       $11
+SER_BAUD_115200        	=       $12
+SER_BAUD_230400        	=       $13
+                                   
 ; Data bit settings
 SER_BITS_5             	=       $00
 SER_BITS_6             	=       $01

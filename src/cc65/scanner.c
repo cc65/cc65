@@ -250,9 +250,8 @@ static void SetTok (int tok)
 static int ParseChar (void)
 /* Parse a character. Converts escape chars into character codes. */
 {
-    int I;
-    unsigned Val;
     int C;
+    int HadError;
 
     /* Check for escape chars */
     if (CurC == '\\') {
@@ -294,20 +293,23 @@ static int ParseChar (void)
 	    case 'x':
 	    case 'X':
 	      	/* Hex character constant */
-	      	NextChar ();
-                if (!IsXDigit (CurC)) {
+                if (!IsXDigit (NextC)) {
                     Error ("\\x used with no following hex digits");
                     C = ' ';
-                }
-                I = 0;
-                C = 0;
-                while (IsXDigit (CurC)) {
-                    if (++I <= 2) {
-                        C = (C << 4) | HexVal (CurC);
-                    } else if (I == 3) {
-                        Error ("Too many digits in hex character constant");
+                } else {
+                    HadError = 0;
+                    C = 0;
+                    while (IsXDigit (NextC)) {
+                        if ((C << 4) >= 256) {
+                            if (!HadError) {
+                                Error ("Hex character constant out of range");
+                                HadError = 1;
+                            }
+                        } else {
+                            C = (C << 4) | HexVal (NextC);
+                        }
+                        NextChar ();
                     }
-                    NextChar ();
                 }
 	      	break;
 	    case '0':
@@ -318,22 +320,24 @@ static int ParseChar (void)
 	    case '5':
 	    case '6':
 	    case '7':
-		/* Octal constant ### FIXME: Eat all available octal chars! */
-		I = 0;
-       	       	Val = CurC - '0';
-       	       	while (IsODigit (NextC) && ++I <= 3) {
-     	 	    NextChar ();
-     	       	    Val = (Val << 3) | (CurC - '0');
-     		}
-                C = (int) Val;
-                if (Val >= 256) {
-                    Error ("Character constant out of range: %u", Val);
-                    C = ' ';
-                }
-     		break;
+	   	/* Octal constant */
+                HadError = 0;
+       	       	C = HexVal (CurC);
+       	       	while (IsODigit (NextC)) {
+                    if ((C << 3) >= 256) {
+                        if (!HadError) {
+                            Error ("Octal character constant out of range");
+                            HadError = 1;
+                        }
+                    } else {
+                        C = (C << 3) | HexVal (NextC);
+                    }
+     	   	    NextChar ();
+     	   	}
+     	   	break;
      	    default:
      	       	Error ("Illegal character constant");
-		C = ' ';
+	   	C = ' ';
                 /* Try to do error recovery, otherwise the compiler will spit
                  * out thousands of errors in this place and abort.
                  */

@@ -21,13 +21,12 @@ typedef int __fastcall__ (*ungetfunc) (int c, void* data);
 
 
 /* Control structure passed to the low level worker function.
- * Beware: The low level functions will access the structure on the assembly
- * level, so check this when altering the structure.
+ * Beware: This structure is mirrored in the _scanf.inc assembler include
+ * file, so check this when altering the structure.                     
  */
 struct scanfdata {
     getfunc    	    get;        /* Pointer to input routine */
     ungetfunc       unget;      /* Pointer to pushback routine */
-    unsigned	    ccount; 	/* Number of chars read */
 
     /* Fields used outside of _scanf */
     void*           data;       /* Caller data */
@@ -36,7 +35,7 @@ struct scanfdata {
 
 
 /* Internal scanning routine */
-int _scanf (struct scanfdata* d, const char* format, va_list ap);
+int __fastcall__ _scanf (struct scanfdata* d, const char* format, va_list ap);
 
 
 

@@ -12,6 +12,7 @@
 
 #include <stdio.h>
 #include <stdarg.h>
+#include <stddef.h>
 #include <string.h>
 #include <setjmp.h>
 #include <ctype.h>
@@ -39,9 +40,10 @@
 
 
 
-static struct scanfdata*  D;		/* Copy of function argument */
-static va_list		  ap;	 	/* Copy of function argument */
+static struct scanfdata*  D_;		/* Copy of function argument */
+static va_list 	       	  ap;	 	/* Copy of function argument */
 static jmp_buf 		  JumpBuf; 	/* Label that is used in case of EOF */
+static unsigned           CharCount;    /* Characters read so far */
 static int                C;           	/* Character from input */
 static unsigned		  Width;      	/* Maximum field width */
 static long    	  	  IntVal;	/* Converted int value */
@@ -56,6 +58,15 @@ static unsigned char      CharSet[32];  /* 32 * 8 bits = 256 bits */
 static const unsigned char Bits[8] = {
     0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
 };
+
+/* We need C to be 16 bits since we cannot check for EOF otherwise.
+ * Unfortunately, this causes the code to be quite larger, even if for most
+ * purposes, checking the low byte would be enough, since if C is EOF, the
+ * low byte will not match any useful character anyway (at least for the
+ * supported platforms - I know that this is not portable). So the following
+ * macro is used to access just the low byte of C.
+ */
+#define CHAR(c)         (*((unsigned char*)&(c)))
 
 
 
@@ -124,13 +135,57 @@ static void InvertCharSet (void)
 
 
 
+static void __fastcall__ Error (unsigned char Code)
+/* Does a longjmp using the given code */
+{
+    longjmp (JumpBuf, Code);
+}
+
+
+
 static void ReadChar (void)
 /* Get an input character, count characters */
 {
-    C = D->get (D->data);
-    if (C != EOF) {
-        ++D->ccount;
-    }
+    /* Move D to ptr1 */
+    asm ("lda %v", D_);
+    asm ("ldx %v+1", D_);
+    asm ("sta ptr1");
+    asm ("stx ptr1+1");
+
+    /* Copy the get vector to jmpvec */
+    asm ("ldy #%b", offsetof (struct scanfdata, get));
+    asm ("lda (ptr1),y");
+    asm ("sta jmpvec+1");
+    asm ("iny");
+    asm ("lda (ptr1),y");
+    asm ("sta jmpvec+2");
+
+    /* Load D->data into __AX__ */
+    asm ("ldy #%b", offsetof (struct scanfdata, data)+1);
+    asm ("lda (ptr1),y");
+    asm ("tax");
+    asm ("dey");
+    asm ("lda (ptr1),y");
+
+    /* Call the get routine */
+    asm ("jsr jmpvec");
+
+    /* Assign the result to C */
+    asm ("sta %v", C);
+    asm ("stx %v+1", C);
+
+    /* If C is not EOF, bump the character counter. */
+    asm ("inx");
+    asm ("bne %g", Done);
+    asm ("cmp #$FF");
+    asm ("bne %g", Done);
+
+    /* Must bump CharCount. */
+    asm ("inc %v", CharCount);
+    asm ("bne %g", Done);
+    asm ("inc %v+1", CharCount);
+
+Done:
 }
 
 
@@ -140,7 +195,7 @@ static void ReadCharWithCheck (void)
 {
     ReadChar ();
     if (C == EOF) {
-     	longjmp (JumpBuf, RC_EOF);
+     	Error (RC_EOF);
     }
 }
 
@@ -161,17 +216,27 @@ static void ReadSign (void)
  * positive, store 0 otherwise.
  */
 {
-    switch (C) {
-      	case '-':
-       	    ReadChar ();
-      	    Positive = 0;
-            break;
-      	case '+':
-      	    ReadChar ();
-      	    /* FALLTHROUGH */
-      	default:
-      	    Positive = 1;
-    }
+    /* We can ignore the high byte of C here, since if it is EOF, the lower
+     * byte won't match anyway.
+     */
+    asm ("lda %v", C);
+    asm ("cmp #'-'");
+    asm ("bne %g", NotNeg);
+
+    /* Negative value */
+    asm ("jsr %v", ReadChar);
+    asm ("lda #$00");           /* Flag as negative */
+    asm ("beq %g", Store);
+
+    /* Positive value */
+NotNeg:
+    asm ("cmp #'+'");
+    asm ("bne %g", Pos);
+    asm ("jsr %v", ReadChar);   /* Skip the + sign */
+Pos:
+    asm ("lda #$01");           /* Flag as positive */
+Store:
+    asm ("sta %v", Positive);
 }
 
 
@@ -210,10 +275,10 @@ static void AssignInt (void)
         asm ("ldy %v", IntBytes);
 
         /* Assign the integer value */
-        asm ("L1: lda %v,y", IntVal);
+Loop:   asm ("lda %v,y", IntVal);
         asm ("sta (ptr1),y");
         asm ("dey");
-        asm ("bpl L1");
+        asm ("bpl %g", Loop);
 
     }
 }
@@ -238,7 +303,7 @@ static unsigned char ReadInt (unsigned char Base)
 
     /* If we didn't convert anything, it's an error */
     if (CharCount == 0) {
-     	longjmp (JumpBuf, RC_NOCONV);
+     	Error (RC_NOCONV);
     }
 
     /* Return the number of characters converted */
@@ -247,7 +312,7 @@ static unsigned char ReadInt (unsigned char Base)
 
 
 
-static void ScanInt (unsigned char Base)
+static void __fastcall__ ScanInt (unsigned char Base)
 /* Scan an integer including white space, sign and optional base spec,
  * and store it into IntVal.
  */
@@ -260,9 +325,9 @@ static void ScanInt (unsigned char Base)
 
     /* If Base is unknown (zero), figure it out */
     if (Base == 0) {
-        if (C == '0') {
+        if (CHAR (C) == '0') {
             ReadChar ();
-            switch (C) {
+            switch (CHAR (C)) {
                 case 'x':
                 case 'X':
                     Base = 16;
@@ -293,14 +358,15 @@ static void ScanInt (unsigned char Base)
 
 
 
-int _scanf (struct scanfdata* D_, register const char* format, va_list ap_)
+int __fastcall__ _scanf (register struct scanfdata* D,
+                         register const char* format, va_list ap_)
 /* This is the routine used to do the actual work. It is called from several
  * types of wrappers to implement the actual ISO xxscanf functions.
  */
 {
-    char   	  F;   	     	/* Character from format string */
+    register char F;   	     	/* Character from format string */
     unsigned char Result;    	/* setjmp result */
-    char*	  S;
+    char*  	  S;
     unsigned char HaveWidth;	/* True if a width was given */
     char          Start;        /* Start of range */
 
@@ -308,12 +374,12 @@ int _scanf (struct scanfdata* D_, register const char* format, va_list ap_)
      * nice, but on a 6502 platform it gives better code, since the values
      * do not have to be passed as parameters.
      */
-    D 	= D_;
+    D_ 	= D;
     ap	= ap_;
 
     /* Initialize variables */
     Conversions = 0;
-    D->ccount   = 0;
+    CharCount   = 0;
 
     /* Set up the jump label. The get() routine will use this label when EOF
      * is reached.
@@ -429,7 +495,7 @@ Again:
 
       	      	    case 'i':
       	      	   	/* Optionally signed integer with a base */
-			ScanInt (0);
+	 		ScanInt (0);
       	      	  	break;
 
       	      	    case 'o':
@@ -448,13 +514,13 @@ Again:
     	      	    case 'f':
 	      	    case 'g':
 	      		/* Optionally signed float */
-			longjmp (JumpBuf, RC_NOCONV);
+		  	Error (RC_NOCONV);
 	      		break;
 
 	      	    case 's':
 	      	   	/* Whitespace terminated string */
 		      	SkipWhite ();
-			if (!NoAssign) {
+	    		if (!NoAssign) {
 			    S = va_arg (ap, char*);
 		   	}
        	       	       	while (!isspace (C) && Width--) {
@@ -465,34 +531,34 @@ Again:
 			}
 			/* Terminate the string just read */
 			if (!NoAssign) {
-			    *S = '\0';
-    			}
+		  	    *S = '\0';
+    		  	}
                         ++Conversions;
-    			break;
+    		  	break;
 
 		    case 'c':
-			/* Fixed length string, NOT zero terminated */
-			if (!HaveWidth) {
-			    /* No width given, default is 1 */
-			    Width = 1;
-			}
-			if (!NoAssign) {
-			    S = va_arg (ap, char*);
+		  	/* Fixed length string, NOT zero terminated */
+		  	if (!HaveWidth) {
+		  	    /* No width given, default is 1 */
+		  	    Width = 1;
+		  	}
+		  	if (!NoAssign) {
+		  	    S = va_arg (ap, char*);
                             while (Width--) {
                                 *S++ = C;
                                 ReadCharWithCheck ();
                             }
-			} else {
+		  	} else {
                             /* Just skip as many chars as given */
                             while (Width--) {
                                 ReadCharWithCheck ();
                             }
                         }
-			++Conversions;
+		  	++Conversions;
 		   	break;
 
 		    case '[':
-			/* String using characters from a set */
+		  	/* String using characters from a set */
                         Invert = 0;
                         /* Clear the set */
                         memset (CharSet, 0, sizeof (CharSet));
@@ -563,16 +629,16 @@ Again:
      		    case 'p':
      	    		/* Pointer, format is 0xABCD */
 		   	SkipWhite ();
-			if (C != '0') {
-                            longjmp (JumpBuf, RC_NOCONV);
+			if (CHAR (C) != '0') {
+                            Error (RC_NOCONV);
                         }
 			ReadChar ();
-                        if (C != 'x' && C != 'X') {
-                            longjmp (JumpBuf, RC_NOCONV);
+                        if (CHAR (C) != 'x' && CHAR (C) != 'X') {
+                            Error (RC_NOCONV);
                         }
                         ReadChar ();
                         if (ReadInt (16) != 4) { /* 4 chars expected */
-                            longjmp (JumpBuf, RC_NOCONV);
+                            Error (RC_NOCONV);
                         }
 			AssignInt ();
                         ++Conversions;
@@ -580,13 +646,13 @@ Again:
 
      		    case 'n':
      			/* Store characters consumed so far */
-			IntVal = D->ccount;
+			IntVal = CharCount;
 			AssignInt ();
 			break;
 
 		    default:
 			/* Invalid conversion */
-			longjmp (JumpBuf, RC_NOCONV);
+			Error (RC_NOCONV);
 			break;
 
 		}
@@ -604,7 +670,7 @@ Again:
          * conversions, it is considered an error, otherwise the number
          * of conversions is returned (the default behaviour).
          */
-       	if (C == EOF && D->ccount == 0) {
+       	if (C == EOF && CharCount == 0) {
 	    /* Special case: error */
      	    Conversions = EOF;
      	}
@@ -614,6 +680,7 @@ Again:
     /* Return the number of conversions */
     return Conversions;
 }
+
 
 
 

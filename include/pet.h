@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -44,6 +44,9 @@
 #endif
 
 
+
+/* Additional key defines */
+#define CH_ESC                  27
 
 /* Color defines */
 #define COLOR_BLACK  	       	0x00

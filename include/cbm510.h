@@ -46,6 +46,7 @@
 
 
 /* Additional key defines */
+#define CH_ESC                  27
 #define CH_F1			224
 #define CH_F2			225
 #define CH_F3			226

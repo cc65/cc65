@@ -465,6 +465,24 @@ static void AnyKeyPrompt (void)
 
 
 
+static char IsAbortKey (char C)
+/* Return true if C is an abort key */
+{
+#if defined(CH_ESC)
+    if (C == CH_ESC) {
+        return 1;
+    }
+#endif
+#if defined(CH_STOP) 
+    if (C == CH_STOP) {
+        return 1;
+    }
+#endif
+    return 0;
+}
+
+
+
 static char Input (char* Prompt, char* Buf, unsigned char Count)
 /* Read input from the user, return 1 on success, 0 if aborted */
 {
@@ -503,8 +521,8 @@ static char Input (char* Prompt, char* Buf, unsigned char Count)
 	} else if (c == '\n') {
 	    Buf [i] = '\0';
 	    done = 1;
-	} else if (c == CH_ESC) {
-	    /* Abort */
+	} else if (IsAbortKey (c)) {
+	    /* Abort */          
 	    done = 2;
 	}
     } while (!done);
@@ -1500,4 +1518,4 @@ void DbgEntry (void)
 }
 
 
-    
+

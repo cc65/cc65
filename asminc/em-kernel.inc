@@ -6,10 +6,10 @@
 ;/*                                                                           */
 ;/*                                                                           */
 ;/*                                                                           */
-;/* (C) 2002      Ullrich von Bassewitz                                       */
-;/*               Wacholderweg 14                                             */
-;/*               D-70597 Stuttgart                                           */
-;/* EMail:        uz@musoftware.de                                            */
+;/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+;/*               Römerstrasse 52                                             */
+;/*               D-70794 Filderstadt                                         */
+;/* EMail:        uz@cc65.org                                                 */
 ;/*                                                                           */
 ;/*                                                                           */
 ;/* This software is provided 'as-is', without any expressed or implied       */
@@ -41,7 +41,7 @@ EMD_HDR_VERSION         = 3                     ; Interface version
 
 EMD_HDR_JUMPTAB         = 4
 EMD_HDR_INSTALL         = EMD_HDR_JUMPTAB+0     ; INSTALL routine
-EMD_HDR_DEINSTALL       = EMD_HDR_JUMPTAB+2     ; DEINSTALL routine
+EMD_HDR_UNINSTALL       = EMD_HDR_JUMPTAB+2     ; UNINSTALL routine
 EMD_HDR_PAGECOUNT       = EMD_HDR_JUMPTAB+4     ; PAGECOUNT routine
 EMD_HDR_MAP             = EMD_HDR_JUMPTAB+6     ; MAP routine
 EMD_HDR_USE             = EMD_HDR_JUMPTAB+8     ; USE routine
@@ -68,9 +68,9 @@ EM_COPY_COUNT           = 5
 ; Driver entry points
 
         .global emd_install
-        .global emd_deinstall
+        .global emd_uninstall
         .global emd_pagecount
-        .global emd_map    
+        .global emd_map
         .global emd_use
         .global emd_commit
 	.global	emd_copyfrom
@@ -80,7 +80,7 @@ EM_COPY_COUNT           = 5
 ; ASM functions
 
 	.global	_em_install
-	.global _em_deinstall
+	.global _em_uninstall
 	.global	_em_pagecount
 	.global	_em_map
         .global _em_use

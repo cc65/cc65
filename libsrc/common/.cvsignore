@@ -26,7 +26,6 @@ getchar.s
 gets.s
 locale.s
 perror.s
-printf.s
 putchar.s
 puts.s
 qsort.s

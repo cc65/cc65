@@ -236,6 +236,7 @@ struct DotKeyword {
     { ".SETCPU",  	TOK_SETCPU    	},
     { ".SHL", 	  	TOK_SHL		},
     { ".SHR", 	  	TOK_SHR		},
+    { ".SIZEOF",        TOK_SIZEOF      },
     { ".SMART",	  	TOK_SMART	},
     { ".STRAT",		TOK_STRAT	},
     { ".STRING",	TOK_STRING	},

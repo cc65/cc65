@@ -54,6 +54,7 @@
 #include "nexttok.h"
 #include "objfile.h"
 #include "segment.h"
+#include "struct.h"
 #include "symbol.h"
 #include "symtab.h"
 #include "toklist.h"
@@ -229,17 +230,16 @@ static int IsEasyConst (const ExprNode* E, long* Val)
 
 
 
-static int FuncBlank (void)
+static ExprNode* FuncBlank (void)
 /* Handle the .BLANK builtin function */
 {
+    int Result = 1;
+
     /* Assume no tokens if the closing brace follows (this is not correct in
      * all cases, since the token may be the closing brace, but this will
      * give a syntax error anyway and may not be handled by .BLANK.
      */
-    if (Tok == TOK_RPAREN) {
-	/* No tokens */
-	return 1;
-    } else {
+    if (Tok != TOK_RPAREN) {
 	/* Skip any tokens */
 	int Braces = 0;
 	while (!TokIsSep (Tok)) {
@@ -257,41 +257,42 @@ static int FuncBlank (void)
      	}
 	return 0;
     }
+    return GenLiteralExpr (Result);
 }
 
 
 
-static int FuncConst (void)
+static ExprNode* FuncConst (void)
 /* Handle the .CONST builtin function */
 {
     /* Read an expression */
     ExprNode* Expr = Expression ();
 
     /* Check the constness of the expression */
-    int Result = IsConstExpr (Expr, 0);
+    ExprNode* Result = GenLiteralExpr (IsConstExpr (Expr, 0));
 
     /* Free the expression */
     FreeExpr (Expr);
 
     /* Done */
     return Result;
-}
+}                                                             
 
 
 
-static int FuncDefined (void)
+static ExprNode* FuncDefined (void)
 /* Handle the .DEFINED builtin function */
 {
     /* Parse the symbol name and search for the symbol */
     SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
 
     /* Check if the symbol is defined */
-    return (Sym != 0 && SymIsDef (Sym));
+    return GenLiteralExpr (Sym != 0 && SymIsDef (Sym));
 }
 
 
 
-static int DoMatch (enum TC EqualityLevel)
+static ExprNode* DoMatch (enum TC EqualityLevel)
 /* Handle the .MATCH and .XMATCH builtin functions */
 {
     int Result;
@@ -342,7 +343,7 @@ static int DoMatch (enum TC EqualityLevel)
     	    return 0;
     	}
 
-	/* Compare the tokens if the result is not already known */
+       	/* Compare the tokens if the result is not already known */
 	if (Result != 0) {
 	    if (Node == 0) {
 		/* The second list is larger than the first one */
@@ -375,12 +376,12 @@ static int DoMatch (enum TC EqualityLevel)
     }
 
     /* Done, return the result */
-    return Result;
+    return GenLiteralExpr (Result);
 }
 
 
 
-static int FuncMatch (void)
+static ExprNode* FuncMatch (void)
 /* Handle the .MATCH function */
 {
     return DoMatch (tcSameToken);
@@ -388,23 +389,46 @@ static int FuncMatch (void)
 
 
 
-static int FuncReferenced (void)
+static ExprNode* FuncReferenced (void)
 /* Handle the .REFERENCED builtin function */
 {
     /* Parse the symbol name and search for the symbol */
     SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
 
     /* Check if the symbol is referenced */
-    return (Sym != 0 && SymIsRef (Sym));
+    return GenLiteralExpr (Sym != 0 && SymIsRef (Sym));
 }
 
 
 
-static int FuncStrAt (void)
+static ExprNode* FuncSizeOf (void)
+/* Handle the .SIZEOF function */
+{                                                          
+    long Size;
+
+    /* Get the struct for the scoped struct name */
+    SymTable* Struct = ParseScopedSymTable (SYM_FIND_EXISTING);
+
+    /* Check if the given symbol is really a struct */
+    if (GetSymTabType (Struct) != ST_STRUCT) {
+        Error ("Argument to .SIZEOF is not a struct");
+        Size = 1;
+    } else {
+        Size = GetStructSize (Struct);
+    }
+
+    /* Return the size */
+    return GenLiteralExpr (Size);
+}
+
+
+
+static ExprNode* FuncStrAt (void)
 /* Handle the .STRAT function */
 {
     char Str [sizeof(SVal)];
     long Index;
+    unsigned char C;
 
     /* String constant expected */
     if (Tok != TOK_STRCON) {
@@ -430,17 +454,22 @@ static int FuncStrAt (void)
 	return 0;
     }
 
-    /* Return the char, handle as unsigned. Be sure to translate it into
+    /* Get the char, handle as unsigned. Be sure to translate it into
      * the target character set.
      */
-    return (unsigned char) TgtTranslateChar (Str [(size_t)Index]);
+    C = TgtTranslateChar (Str [(size_t)Index]);
+
+    /* Return the char expression */
+    return GenLiteralExpr (C);
 }
 
 
 
-static int FuncStrLen (void)
+static ExprNode* FuncStrLen (void)
 /* Handle the .STRLEN function */
 {
+    int Len;
+
     /* String constant expected */
     if (Tok != TOK_STRCON) {
 
@@ -449,25 +478,24 @@ static int FuncStrLen (void)
      	if (Tok != TOK_RPAREN) {
      	    NextTok ();
      	}
-       	return 0;
+       	Len = 0;
 
     } else {
 
         /* Get the length of the string */
-     	int Len = strlen (SVal);
+     	Len = strlen (SVal);
 
 	/* Skip the string */
 	NextTok ();
-
-	/* Return the length */
-	return Len;
-
     }
+
+    /* Return the length */
+    return GenLiteralExpr (Len);
 }
 
 
 
-static int FuncTCount (void)
+static ExprNode* FuncTCount (void)
 /* Handle the .TCOUNT function */
 {
     /* We have a list of tokens that ends with the closing paren. Skip
@@ -500,12 +528,12 @@ static int FuncTCount (void)
     }
 
     /* Return the number of tokens */
-    return Count;
+    return GenLiteralExpr (Count);
 }
 
 
 
-static int FuncXMatch (void)
+static ExprNode* FuncXMatch (void)
 /* Handle the .XMATCH function */
 {
     return DoMatch (tcIdentical);
@@ -513,10 +541,10 @@ static int FuncXMatch (void)
 
 
 
-static ExprNode* Function (int (*F) (void))
+static ExprNode* Function (ExprNode* (*F) (void))
 /* Handle builtin functions */
 {
-    long Result;
+    ExprNode* E;
 
     /* Skip the keyword */
     NextTok ();
@@ -530,13 +558,13 @@ static ExprNode* Function (int (*F) (void))
     NextTok ();
 
     /* Call the function itself */
-    Result = F ();
+    E = F ();
 
     /* Closing brace must follow */
     ConsumeRParen ();
 
-    /* Return an expression node with the boolean code */
-    return GenLiteralExpr (Result);
+    /* Return the result of the actual function */
+    return E;
 }
 
 
@@ -681,6 +709,10 @@ static ExprNode* Factor (void)
         case TOK_REFERENCED:
 	    N = Function (FuncReferenced);
 	    break;
+
+        case TOK_SIZEOF:
+            N = Function (FuncSizeOf);
+            break;
 
 	case TOK_STRAT:
 	    N = Function (FuncStrAt);

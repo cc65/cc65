@@ -39,7 +39,7 @@ OBJS =	anonname.o	\
 	funcdesc.o	\
 	function.o     	\
 	global.o 	\
-	goto.o		\
+	goto.o	   	\
 	ident.o		\
 	incpath.o      	\
 	input.o		\
@@ -60,7 +60,7 @@ OBJS =	anonname.o	\
 	util.o
 
 LIBS =	$(B6502)/b6502.a	\
-	$(COMMON)/common.a	
+	$(COMMON)/common.a
 
 
 # ------------------------------------------------------------------------------
@@ -76,9 +76,15 @@ all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-$(EXE):	$(OBJS) $(LIBS)
+$(EXE):	$(OBJS) $(LIBS) subs
 	$(CC) $(LDFLAGS) -o $(EXE) $(CFLAGS) $(OBJS) $(LIBS)
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
+
+.PHONY:	subs
+subs:
+	@for dir in $(COMMON) $(B6502); do   	     	\
+	    $(MAKE) -C $$dir -f make/gcc.mak || exit 1;	\
+	done						
 
 clean:
 	rm -f *~ core *.map

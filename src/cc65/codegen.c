@@ -391,7 +391,7 @@ void g_defloclabel (unsigned label)
 /* Define a local label */
 {
     if (CurSeg == SEG_CODE) {
-     	AddCodeSegLabel (CS, LocalLabelName (label));
+     	AddLocCodeLabel (CS, LocalLabelName (label));
     } else {
      	AddDataSegLine (DS, "%s:", LocalLabelName (label));
     }
@@ -412,7 +412,7 @@ void g_defgloblabel (const char* Name)
 	/* ##### */
 	char Buf[64];
 	xsprintf (Buf, sizeof (Buf), "_%s", Name);
-     	AddCodeSegLabel (CS, Buf);
+       	AddExtCodeLabel (CS, Buf);
     } else {
        	AddDataSegLine (DS, "_%s:", Name);
     }

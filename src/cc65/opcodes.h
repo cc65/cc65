@@ -76,8 +76,16 @@ typedef enum {
     OPC_INC,
     OPC_INX,
     OPC_INY,
+    OPC_JCC,
+    OPC_JCS,
+    OPC_JEQ,
+    OPC_JMI,
     OPC_JMP,
+    OPC_JNE,
+    OPC_JPL,
     OPC_JSR,
+    OPC_JVC,
+    OPC_JVS,
     OPC_LDA,
     OPC_LDX,
     OPC_LDY,
@@ -134,6 +142,7 @@ typedef enum {
 typedef struct {
     char    	Mnemo[4];	/* Mnemonic */
     opc_t   	OPC;   		/* Opcode */
+    unsigned	Size;		/* Size, 0 means "check addressing mode" */
     unsigned   	Info;		/* Usage flags */
 } OPCDesc;
 
@@ -155,7 +164,7 @@ unsigned GetInsnSize (opc_t OPC, am_t AM);
 
 const OPCDesc* GetOPCDesc (opc_t OPC);
 /* Get an opcode description */
-		    
+
 
 
 /* End of opcodes.h */

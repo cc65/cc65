@@ -57,6 +57,7 @@ CodeLabel* NewCodeLabel (const char* Name, unsigned Hash)
     L->Next  = 0;
     L->Name  = xstrdup (Name);
     L->Hash  = Hash;
+    L->Flags = 0;
     L->Owner = 0;
     InitCollection (&L->JumpFrom);
 

@@ -84,14 +84,17 @@ void FreeCodeSeg (CodeSeg* S);
 void AddCodeSegLine (CodeSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
 /* Add a line to the given code segment */
 
-void AddCodeSegLabel (CodeSeg* S, const char* Name);
-/* Add a label for the next instruction to follow */
+void AddExtCodeLabel (CodeSeg* S, const char* Name);
+/* Add an external code label for the next instruction to follow */
+
+void AddLocCodeLabel (CodeSeg* S, const char* Name);
+/* Add a local code label for the next instruction to follow */
 
 void AddCodeSegHint (CodeSeg* S, unsigned Hint);
 /* Add a hint for the preceeding instruction */
 
 void DelCodeSegAfter (CodeSeg* S, unsigned Last);
-/* Delete all entries after the given one */
+/* Delete all entries including the given one */
 
 void OutputCodeSeg (FILE* F, const CodeSeg* S);
 /* Output the code segment data to a file */
@@ -106,7 +109,7 @@ void MergeCodeLabels (CodeSeg* S);
 
 unsigned GetCodeSegEntries (const CodeSeg* S);
 /* Return the number of entries for the given code segment */
-
+				
 
 
 /* End of codeseg.h */

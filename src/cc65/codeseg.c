@@ -233,7 +233,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 		/* Indexed */
 		L = SkipSpace (L+1);
 		if (*L == '\0') {
-		    Error ("ASM code error: syntax error");
+      		    Error ("ASM code error: syntax error");
 		    return 0;
 		} else {
 	      	    Reg = toupper (*L);
@@ -390,23 +390,30 @@ void AddCodeSegLine (CodeSeg* S, const char* Format, ...)
     if (E) {
 
 	/* Transfer the labels if we have any */
-	unsigned LabelCount = CollCount (&S->Labels);
 	unsigned I;
+	unsigned LabelCount = CollCount (&S->Labels);
 	for (I = 0; I < LabelCount; ++I) {
-	    CollAppend (&E->Labels, CollAt (&S->Labels, I));
+	    /* Get the label */
+	    CodeLabel* L = CollAt (&S->Labels, I);
+	    /* Mark it as defined */
+	    L->Flags |= LF_DEF;
+	    /* Move it to the code entry */
+	    CollAppend (&E->Labels, L);
 	}
+
+	/* Delete the transfered labels */
 	CollDeleteAll (&S->Labels);
 
 	/* Add the entry to the list of code entries in this segment */
-	CollAppend (&S->Entries, E);
+      	CollAppend (&S->Entries, E);
 
     }
 }
 
 
 
-void AddCodeSegLabel (CodeSeg* S, const char* Name)
-/* Add a label for the next instruction to follow */
+CodeLabel* AddCodeLabel (CodeSeg* S, const char* Name)
+/* Add a code label for the next instruction to follow */
 {
     /* Calculate the hash from the name */
     unsigned Hash = HashStr (Name) % CS_LABEL_HASH_SIZE;
@@ -425,6 +432,30 @@ void AddCodeSegLabel (CodeSeg* S, const char* Name)
 
     /* We do now have a valid label. Remember it for later */
     CollAppend (&S->Labels, L);
+
+    /* Return the label */
+    return L;
+}
+
+
+
+void AddExtCodeLabel (CodeSeg* S, const char* Name)
+/* Add an external code label for the next instruction to follow */
+{
+    /* Add the code label */
+    CodeLabel* L = AddCodeLabel (S, Name);
+
+    /* Mark it as external label */
+    L->Flags |= LF_EXT;
+}
+
+
+
+void AddLocCodeLabel (CodeSeg* S, const char* Name)
+/* Add a local code label for the next instruction to follow */
+{
+    /* Add the code label */
+    AddCodeLabel (S, Name);
 }
 
 
@@ -450,23 +481,34 @@ void AddCodeSegHint (CodeSeg* S, unsigned Hint)
 
 
 void DelCodeSegAfter (CodeSeg* S, unsigned Last)
-/* Delete all entries after the given one */
+/* Delete all entries including the given one */
 {
-    unsigned I;
-
     /* Get the number of entries in this segment */
     unsigned Count = CollCount (&S->Entries);
 
-    /* ### We need some more cleanup here wrt labels */
+    /* Must not be called with count zero */
+    CHECK (Count > 0 && Count >= Last);
 
     /* Remove all entries after the given one */
-    for (I = Count-1; I > Last; --I) {
-	FreeCodeEntry (CollAt (&S->Entries, I));
-	CollDelete (&S->Entries, I);
-    }
+    while (Last < Count) {
 
-    /* Delete all waiting labels */
-    CollDeleteAll (&S->Labels);
+	/* Get the next entry */
+	CodeEntry* E = CollAt (&S->Entries, Count-1);
+
+	/* We have to transfer all labels to the code segment label pool */
+	unsigned LabelCount = CollCount (&E->Labels);
+	while (LabelCount--) {
+	    CodeLabel* L = CollAt (&E->Labels, LabelCount);
+	    L->Flags &= ~LF_DEF;
+	    CollAppend (&S->Labels, L);
+	}
+	CollDeleteAll (&E->Labels);
+
+	/* Remove the code entry */
+      	FreeCodeEntry (CollAt (&S->Entries, Count-1));
+      	CollDelete (&S->Entries, Count-1);
+      	--Count;
+    }
 }
 
 
@@ -501,7 +543,7 @@ CodeLabel* FindCodeLabel (CodeSeg* S, const char* Name, unsigned Hash)
 	if (strcmp (Name, L->Name) == 0) {
 	    /* Found */
 	    break;
-	}
+      	}
 	L = L->Next;
     }
     return L;
@@ -526,63 +568,68 @@ void MergeCodeLabels (CodeSeg* S)
 	/* Get a pointer to the next entry */
 	CodeEntry* E = CollAt (&S->Entries, I);
 
-	/* If this entry has zero labels, continue with the next one */
-	unsigned LabelCount = CollCount (&E->Labels);
-	if (LabelCount == 0) {
-	    continue;
-	}
+    	/* If this entry has zero labels, continue with the next one */
+    	unsigned LabelCount = CollCount (&E->Labels);
+    	if (LabelCount == 0) {
+    	    continue;
+    	}
 
-	/* We have at least one label. Use the first one as reference label.
-	 * We don't have a notification for global labels for now, and using
-	 * the first one will also keep the global function labels, since these
-	 * are inserted at position 0.
-	 */
-	RefLab = CollAt (&E->Labels, 0);
+    	/* We have at least one label. Use the first one as reference label.
+    	 * We don't have a notification for global labels for now, and using
+    	 * the first one will also keep the global function labels, since these
+    	 * are inserted at position 0.
+    	 */
+    	RefLab = CollAt (&E->Labels, 0);
 
-	/* Walk through the remaining labels and change references to these
-	 * labels to a reference to the one and only label. Delete the labels
-	 * that are no longer used. To increase performance, walk backwards
-	 * through the list.
-	 */
-	for (J = LabelCount-1; J >= 1; --J) {
+    	/* Walk through the remaining labels and change references to these
+    	 * labels to a reference to the one and only label. Delete the labels
+    	 * that are no longer used. To increase performance, walk backwards
+    	 * through the list.
+    	 */
+      	for (J = LabelCount-1; J >= 1; --J) {
 
-	    unsigned K;
+    	    unsigned K;
 
-	    /* Get the next label */
-	    CodeLabel* L = CollAt (&E->Labels, J);
+    	    /* Get the next label */
+    	    CodeLabel* L = CollAt (&E->Labels, J);
 
-	    /* Walk through all instructions referencing this label */
-	    unsigned RefCount = CollCount (&L->JumpFrom);
-	    for (K = 0; K < RefCount; ++K) {
+    	    /* Walk through all instructions referencing this label */
+    	    unsigned RefCount = CollCount (&L->JumpFrom);
+    	    for (K = 0; K < RefCount; ++K) {
 
-	 	/* Get the next instrcuction that references this label */
-	 	CodeEntry* E = CollAt (&L->JumpFrom, K);
+    	 	/* Get the next instrcuction that references this label */
+    	 	CodeEntry* E = CollAt (&L->JumpFrom, K);
 
-	 	/* Change the reference */
-	 	CHECK (E->JumpTo == L);
-	 	E->JumpTo = RefLab;
-	 	CollAppend (&RefLab->JumpFrom, E);
+    	 	/* Change the reference */
+    	 	CHECK (E->JumpTo == L);
+    	 	E->JumpTo = RefLab;
+    	 	CollAppend (&RefLab->JumpFrom, E);
 
-	    }
+    	    }
 
-	    /* Delete the label */
-	    FreeCodeLabel (L);
-
-	    /* Remove it from the list */
-	    CollDelete (&E->Labels, J);
-
+    	    /* If the label is not an external label, we may remove the
+	     * label completely.
+	     */
+#if 0
+     	    if ((L->Flags & LF_EXT) == 0) {
+     		FreeCodeLabel (L);
+     		CollDelete (&E->Labels, J);
+     	    }
+#endif
      	}
 
-	/* The reference label is the only remaining label. Check if there
-	 * are any references to this label, and delete it if this is not
-	 * the case.
+    	/* The reference label is the only remaining label. If it is not an
+	 * external label, check if there are any references to this label,
+	 * and delete it if this is not the case.
 	 */
-	if (CollCount (&RefLab->JumpFrom) == 0) {
-	    /* Delete the label */
-	    FreeCodeLabel (RefLab);
-	    /* Remove it from the list */
-	    CollDelete (&E->Labels, 0);
-	}
+#if 0
+     	if ((RefLab->Flags & LF_EXT) == 0 && CollCount (&RefLab->JumpFrom) == 0) {
+     	    /* Delete the label */
+     	    FreeCodeLabel (RefLab);
+     	    /* Remove it from the list */
+     	    CollDelete (&E->Labels, 0);
+     	}
+#endif
     }
 }
 

@@ -70,27 +70,31 @@ Head:   .word   @Next
 ; ------------------------------------------------------------------------
 ; Actual code
 
-       	ldx	#zpspace-1
-L1:	lda    	sp,x
-   	sta	zpsave,x       	; save the zero page locations we need
- 	dex
-       	bpl	L1
-
 ; Close open files
 
  	jsr	CLRCH
 
-; Switch to second charset
+; Switch to the second charset
 
  	lda	#14
  	jsr	BSOUT
 
-; Get the current MMU setting and save it. Set new memory config.
+; Before doing anything else, we have to setup our banking configuration.
+; Otherwise just the lowest 16K are actually RAM. Writing through the ROM
+; to the underlying RAM works, but it is bad style.
 
 	lda	MMU_CR	 	; Get current memory configuration...
        	pha		 	; ...and save it for later
        	lda    	#CC65_MMU_CFG	; Bank0 with kernal ROM
     	sta	MMU_CR
+
+; Save the zero page locations we need
+
+       	ldx	#zpspace-1
+L1:	lda    	sp,x
+   	sta	zpsave,x
+ 	dex
+       	bpl	L1
 
 ; Clear the BSS data
 
@@ -102,7 +106,7 @@ L1:	lda    	sp,x
 	sta	mmusave
 
        	tsx
-       	stx    	spsave	 	; save system stk ptr
+       	stx    	spsave	 	; Save the system stack pointer
 
 	lda    	#<(__RAM_START__ + __RAM_SIZE__)
 	sta	sp
@@ -159,12 +163,10 @@ NoIRQ2: jsr    	donelib
 
  	jsr	doneconio
 
-; Reset stack and the MMU
+; Reset the stack
 
 	ldx    	spsave
  	txs
-       	lda    	mmusave
-	sta	MMU_CR
 
 ; Copy back the zero page stuff
 
@@ -174,7 +176,12 @@ L2:	lda	zpsave,x
      	dex
      	bpl	L2
 
-; Done
+; Reset the memory configuration
+
+       	lda    	mmusave
+	sta	MMU_CR
+
+; Done, restore kernal vectors in an attempt to cleanup
 
      	jmp	RESTOR
 
@@ -192,10 +199,10 @@ L2:	lda	zpsave,x
 ; they have to go here.
 
 IRQStub:
-	cld    	       			; Just to be sure
-	lda     MMU_CR 			; Get old register value
-	pha    	       			; And save on stack
-	lda     #CC65_MMU_CFG		; Bank 0 with kernal ROM
+	cld    	       		   	; Just to be sure
+	lda     MMU_CR 		   	; Get old register value
+	pha    	       		   	; And save on stack
+	lda     #CC65_MMU_CFG	   	; Bank 0 with kernal ROM
 	sta    	MMU_CR
 	ldy 	#<(__IRQFUNC_COUNT__*2)
        	lda    	#<__IRQFUNC_TABLE__

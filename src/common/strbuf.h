@@ -191,7 +191,7 @@ INLINE char SB_Get (StrBuf* B)
 
 #if defined(HAVE_INLINE)
 INLINE char SB_Peek (StrBuf* B)
-/* Look at the next character from the string without incrementing Index. 
+/* Look at the next character from the string without incrementing Index.
  * Returns NUL if the end of the string is reached.
  */
 {
@@ -199,6 +199,18 @@ INLINE char SB_Peek (StrBuf* B)
 }
 #else
 #  define SB_Peek(B)     (((B)->Index < (B)->Len)? (B)->Buf[(B)->Index] : '\0')
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void SB_Skip (StrBuf* B)
+/* Skip the next character in the string buffer if this is possible. */
+{
+    if (B->Index < B->Len) {
+        ++B->Index;
+    }
+}
+#else
+#  define SB_Skip(B)     do { if ((B)->Index < (B)->Len) ++(B)->Index; } while (0)
 #endif
 
 void SB_Terminate (StrBuf* B);

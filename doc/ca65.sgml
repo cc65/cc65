@@ -736,7 +736,7 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt><ref id=".SEGMENT" name=".SEGMENT"></tt> command.
 
 
-<sect1><tt>.BYTE</tt><label id=".BYTE"><p>
+<sect1><tt>.BYT, .BYTE</tt><label id=".BYTE"><p>
 
   Define byte sized data. Must be followed by a sequence of (byte ranged)
   expressions or strings.
@@ -744,7 +744,8 @@ Here's a list of all control commands and a description, what they do:
   Example:
 
   <tscreen><verb>
-  	.byte	"Hello world", $0D, $00
+  	.byte	"Hello "
+	.byt	"world", $0D, $00
   </verb></tscreen>
 
 
@@ -1179,6 +1180,15 @@ Here's a list of all control commands and a description, what they do:
     Accept the dollar sign (`&dollar;') as a valid character in identifiers. The
     at character is not allowed to start an identifier, even with this
     feature enabled.
+
+  <tag><tt>leading_dot_in_identifiers</tt></tag>
+
+    Accept the dot (`.') as the first character of an identifier. This may be
+    used for example to create macro names that start with a dot emulating
+    control directives of other assemblers. Note however, that none of the
+    reserved keywords built into the assembler, that starts with a dot, may be
+    overridden. When using this feature, you may also get into trouble if
+    later versions of the assembler define new keywords starting with a dot.
 
   <tag><tt>pc_assignment</tt></tag>
 

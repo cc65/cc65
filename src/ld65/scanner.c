@@ -39,8 +39,10 @@
 #include <errno.h>
 #include <ctype.h>
 
-#include "../common/xsprintf.h"
+/* common */
+#include "xsprintf.h"
 
+/* ld65 */
 #include "global.h"
 #include "error.h"
 #include "scanner.h"
@@ -75,7 +77,7 @@ static FILE*   	       	InputFile    	= 0;
 
 
 /*****************************************************************************/
-/*		    	       	Error handling				     */
+/*	  	    	       	Error handling				     */
 /*****************************************************************************/
 
 
@@ -84,7 +86,7 @@ void CfgWarning (const char* Format, ...)
 /* Print a warning message adding file name and line number of the config file */
 {
     char Buf [512];
-    va_list ap;	
+    va_list ap;
 
     va_start (ap, Format);
     xvsprintf (Buf, sizeof (Buf), Format, ap);

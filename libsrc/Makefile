@@ -4,10 +4,11 @@
 
 .SUFFIXES: .o .obj .s .c
 
-# Defines for executables. The first two are passed to the submakes and are
-# relative to the subdirectories, the last one is used directly.
-AS = ../../src/ca65/ca65
+# Defines for executables. AR is used within this makefile, the others are
+# passed to the submakes and contain paths relative to the subdirectories
+# handled by the make subprocesses.
 AR = ../src/ar65/ar65
+AS = ../../src/ca65/ca65
 CC = ../../src/cc65/cc65
 LD = ../../src/ld65/ld65
 
@@ -33,7 +34,7 @@ all:
 
 #-----------------------------------------------------------------------------
 # Apple ][
-
+				 
 apple2lib:
 	for i in apple2 common runtime conio dbg; do \
 	    CC=$(CC) \
@@ -86,8 +87,8 @@ vic20lib:
 	for i in vic20 cbm common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
+	    AFLAGS="-t vic20 -I../../asminc" \
 	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
-	    AFLAGS="-t c64" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv vic20/crt0.o vic20.o
@@ -107,7 +108,7 @@ c64lib:
 	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
-	cp c64/crt0.o c64.o
+	mv c64/crt0.o c64.o
 	cp c64/*.tgi .
 	for i in c64 cbm common runtime conio dbg tgi; do \
 	    $(AR) a c64.lib $$i/*.o;\

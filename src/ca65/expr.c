@@ -1132,6 +1132,8 @@ long ConstExpression (void)
  * not constant.
  */
 {
+    long Val;
+
 #if 1
     /* Read the expression */
     ExprNode* Expr = Expr0 ();
@@ -1142,18 +1144,23 @@ long ConstExpression (void)
 
     /* Study the expression */
     ExprDesc D;
-    InitExprDesc (&D);
-    StudyExpr (Expr, &D, 1);
+    ED_Init (&D);
+    StudyExpr (Expr, &D);
 
     /* Check if the expression is constant */
-    if (!ExprDescIsConst (&D)) {
+    if (ED_IsConst (&D)) {
+        Val = D.Val;
+    } else {
      	Error ("Constant expression expected");
-     	D.Val = 0;
+     	Val = 0;
     }
 
-    /* Free the expression tree and return the value */
+    /* Free the expression tree and allocated memory for D */
     FreeExpr (Expr);
-    return D.Val;
+    ED_Done (&D);
+
+    /* Return the value */
+    return Val;
 }
 
 
@@ -1177,17 +1184,20 @@ ExprNode* SimplifyExpr (ExprNode* Expr)
 
         /* Create an expression description and initialize it */
         ExprDesc D;
-        InitExprDesc (&D);
+        ED_Init (&D);
 
         /* Study the expression */
-        StudyExpr (Expr, &D, 1);
+        StudyExpr (Expr, &D);
 
         /* Now check if we can generate a literal value */
-        if (ExprDescIsConst (&D)) {
+        if (ED_IsConst (&D)) {
             /* No external references */
             FreeExpr (Expr);
             Expr = GenLiteralExpr (D.Val);
         }
+
+        /* Free allocated memory */
+        ED_Done (&D);
     }
     return Expr;
 }
@@ -1381,20 +1391,22 @@ int IsConstExpr (ExprNode* Expr, long* Val)
  * expression is constant, the constant value is stored here.
  */
 {
+    int IsConst;
+
     /* Study the expression */
     ExprDesc D;
-    InitExprDesc (&D);
-    StudyExpr (Expr, &D, 1);
+    ED_Init (&D);
+    StudyExpr (Expr, &D);
 
     /* Check if the expression is constant */
-    if (ExprDescIsConst (&D)) {
-        if (Val) {
-            *Val = D.Val;
-        }
-        return 1;
-    } else {
-        return 0;
+    IsConst = ED_IsConst (&D);
+    if (IsConst && Val != 0) {
+        *Val = D.Val;
     }
+
+    /* Delete allocated memory and return the result */
+    ED_Done (&D);
+    return IsConst;
 }
 
 
@@ -1452,14 +1464,8 @@ static void CheckAddrSize (const ExprNode* N, unsigned char* AddrSize)
 
                     case EXPR_WORD0:
                     case EXPR_WORD1:
-                    case EXPR_FORCEWORD:
                         /* No need to look at the expression */
                         *AddrSize = ADDR_SIZE_ABS;
-                        break;
-
-                    case EXPR_FORCEFAR:
-                        /* No need to look at the expression */
-                        *AddrSize = ADDR_SIZE_FAR;
                         break;
 
                     default:

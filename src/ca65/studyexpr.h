@@ -49,18 +49,59 @@
 
 
 
+/* Flags */
+#define ED_OK           0x00            /* Nothing special */
+#define ED_TOO_COMPLEX  0x01            /* Expression is too complex */
+
+/* Symbol reference */
+typedef struct ED_SymRef ED_SymRef;
+struct ED_SymRef {
+    long                Count;          /* Number of references */
+    struct SymEntry*    Ref;            /* Actual reference */
+};
+
+/* Section reference */
+typedef struct ED_SecRef ED_SecRef;
+struct ED_SecRef {
+    long                Count;          /* Number of references */
+    unsigned            Ref;            /* Actual reference */
+};
+
 /* Structure for parsing expression trees */
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
+    unsigned short      Flags;          /* See ED_xxx */
+    unsigned char       AddrSize;       /* Address size of the expression */
     long                Val;		/* The offset value */
-    long                Left;           /* Left value for StudyBinaryExpr */
-    int	       	        TooComplex;     /* Expression is too complex to evaluate */
-    long                SymCount;       /* Symbol reference count */
-    long                SecCount;       /* Section reference count */
-    struct SymEntry*    SymRef;         /* Symbol reference if any */
-    unsigned            SecRef;		/* Section reference if any */
+    long                Right;          /* Right value for StudyBinaryExpr */
+
+    /* Symbol reference management */
+    unsigned            SymCount;       /* Number of symbols referenced */
+    unsigned            SymLimit;       /* Memory allocated */
+    ED_SymRef*          SymRef;         /* Symbol references */
+
+    /* Section reference management */
+    unsigned            SecCount;       /* Number of sections referenced */
+    unsigned            SecLimit;       /* Memory allocated */
+    ED_SecRef*          SecRef;         /* Section references */
 };
 
+
+
+/*****************************************************************************/
+/*                              struct ExprDesc                              */
+/*****************************************************************************/
+
+
+
+ExprDesc* ED_Init (ExprDesc* ED);
+/* Initialize an ExprDesc structure for use with StudyExpr */
+
+void ED_Done (ExprDesc* ED);
+/* Delete allocated memory for an ExprDesc. */
+
+int ED_IsConst (const ExprDesc* ED);
+/* Return true if the expression is constant */
 
 
 
@@ -70,13 +111,7 @@ struct ExprDesc {
 
 
 
-ExprDesc* InitExprDesc (ExprDesc* ED);
-/* Initialize an ExprDesc structure for use with StudyExpr */
-
-int ExprDescIsConst (const ExprDesc* ED);
-/* Return true if the expression is constant */
-
-void StudyExpr (ExprNode* Expr, ExprDesc* D, int Sign);
+void StudyExpr (ExprNode* Expr, ExprDesc* D);
 /* Study an expression tree and place the contents into D */
 
 

@@ -256,7 +256,7 @@ const OpcDesc OpcTable_6502[256] = {
     {   "dec",  3,  flUseLabel, OH_Absolute              }, /* $ce */
     {   "",     1,  flIllegal,  OH_Illegal,              }, /* $cf */
     {   "bne",  2,  flLabel,    OH_Relative              }, /* $d0 */
-    {   "cmp",  2,  flUseLabel, OH_DirectXIndirect       }, /* $d1 */
+    {   "cmp",  2,  flUseLabel, OH_DirectIndirectY       }, /* $d1 */
     {   "",     1,  flIllegal,  OH_Illegal,              }, /* $d2 */
     {   "",     1,  flIllegal,  OH_Illegal,              }, /* $d3 */
     {   "pei",  2,  flUseLabel, OH_Direct                }, /* $d4 */

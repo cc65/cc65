@@ -256,7 +256,7 @@ const OpcDesc OpcTable_65C02[256] = {
     {   "dec",  3,  flUseLabel, OH_Absolute              }, /* $ce */
     {   "bbs4", 3,  flUseLabel, OH_BitBranch             }, /* $cf */
     {   "bne",  2,  flLabel,    OH_Relative              }, /* $d0 */
-    {   "cmp",  2,  flUseLabel, OH_DirectXIndirect       }, /* $d1 */
+    {   "cmp",  2,  flUseLabel, OH_DirectIndirectY       }, /* $d1 */
     {   "cmp",  2,  flUseLabel, OH_DirectIndirect        }, /* $d2 */
     {   "",     1,  flIllegal,  OH_Illegal,              }, /* $d3 */
     {   "pei",  2,  flUseLabel, OH_Direct                }, /* $d4 */

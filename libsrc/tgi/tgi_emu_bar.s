@@ -32,7 +32,7 @@ tgi_emu_bar:
         lda     ptr1+1
         sta     X1+1
 
-@L1:    jsr     tgi_line
+@L1:    jsr     tgi_horline
 
         lda     Y1
         cmp     Y2
@@ -47,10 +47,8 @@ tgi_emu_bar:
 
 @L3:    lda     Y1
         sta     ptr2
-        sta     ptr4
         lda     Y1+1
         sta     ptr2+1
-        sta     ptr4+1
 
         lda     X1
         sta     ptr1

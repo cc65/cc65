@@ -47,6 +47,7 @@ tgi_getpalette:     jmp     $0000
 tgi_getdefpalette:  jmp     $0000
 tgi_setpixel:       jmp     $0000
 tgi_getpixel:       jmp     $0000
+tgi_horline:        jmp     $0000
 tgi_line:           jmp     $0000
 tgi_bar:            jmp     $0000
 tgi_circle:         jmp     $0000

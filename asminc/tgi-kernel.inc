@@ -42,8 +42,7 @@ TGI_HDR_XRES            = 4             ; X resolution
 TGI_HDR_YRES            = 6             ; Y resolution
 TGI_HDR_COLORCOUNT      = 8             ; Number of available colors
 TGI_HDR_PAGECOUNT       = 9             ; Number of screens available
-TGI_HDR_ERROR		= 10		; Error code
-TGI_HDR_RES             = 11            ; Reserved for extensions
+TGI_HDR_RES             = 10            ; Reserved for extensions
 
 TGI_HDR_JUMPTAB         = 16
 TGI_HDR_INSTALL         = TGI_HDR_JUMPTAB+0     ; INSTALL routine
@@ -61,11 +60,12 @@ TGI_HDR_GETPALETTE      = TGI_HDR_JUMPTAB+22    ; GETPALETTE routine
 TGI_HDR_GETDEFPALETTE   = TGI_HDR_JUMPTAB+24    ; GETDEFPALETTE routine
 TGI_HDR_SETPIXEL        = TGI_HDR_JUMPTAB+26    ; SETPIXEL routine
 TGI_HDR_GETPIXEL        = TGI_HDR_JUMPTAB+28    ; GETPIXEL routine
-TGI_HDR_LINE            = TGI_HDR_JUMPTAB+30    ; LINE routine
-TGI_HDR_BAR             = TGI_HDR_JUMPTAB+32    ; BAR routine
-TGI_HDR_CIRCLE          = TGI_HDR_JUMPTAB+34    ; CIRCLE routine
+TGI_HDR_HORLINE         = TGI_HDR_JUMPTAB+30    ; HORLINE routine
+TGI_HDR_LINE            = TGI_HDR_JUMPTAB+32    ; LINE routine
+TGI_HDR_BAR             = TGI_HDR_JUMPTAB+34    ; BAR routine
+TGI_HDR_CIRCLE          = TGI_HDR_JUMPTAB+36    ; CIRCLE routine
 
-TGI_HDR_JUMPCOUNT       = 18            ; Number of jump vectors
+TGI_HDR_JUMPCOUNT       = 19            ; Number of jump vectors
 
 ;------------------------------------------------------------------------------
 ; Variables
@@ -99,6 +99,7 @@ TGI_HDR_JUMPCOUNT       = 18            ; Number of jump vectors
         .global tgi_getdefpalette
         .global tgi_setpixel
         .global tgi_getpixel
+        .global tgi_horline
         .global tgi_line
         .global tgi_bar
         .global tgi_circle
@@ -113,3 +114,4 @@ TGI_HDR_JUMPCOUNT       = 18            ; Number of jump vectors
         .global tgi_linepop
         .global tgi_set_ptr
 
+                           

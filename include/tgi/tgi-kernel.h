@@ -56,8 +56,7 @@ typedef struct {
     unsigned            yres;           /* Y resolution */
     unsigned char       colorcount;     /* Number of available colors */
     unsigned char       pagecount;      /* Number of screens available */
-    unsigned char	error;	       	/* Error code */
-    unsigned char       res[5];         /* Reserved for extensions */
+    unsigned char       res[6];         /* Reserved for extensions */
 
     /* Jump vectors. Note that these are not C callable */
     void*               install;        /* INSTALL routine */
@@ -75,6 +74,7 @@ typedef struct {
     void*               getdefpalette;  /* GETDEFPALETTE routine */
     void*               setpixel;       /* SETPIXEL routine */
     void*               getpixel;       /* GETPIXEL routine */
+    void*               horline;        /* HORLINE routine */
     void*               line;           /* LINE routine */
     void*               bar;            /* BAR routine */
     void*               circle;         /* CIRCLE routine */
@@ -116,4 +116,4 @@ void __fastcall__ tgi_setup (void);
 
 
 
-
+                                                             

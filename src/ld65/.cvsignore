@@ -2,4 +2,12 @@
 ld65
 *.map
 *.s
-     
+apple2.inc
+atari.inc
+c128.inc
+c64.inc
+cbm610.inc
+geos.inc
+none.inc
+pet.inc
+plus4.inc

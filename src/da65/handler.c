@@ -177,7 +177,7 @@ void OH_DirectX (const OpcDesc* D)
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D, "%s,y", GetAddrArg (D, Addr));
+    OneLine (D, "%s,x", GetAddrArg (D, Addr));
 }
 
 

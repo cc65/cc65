@@ -34,6 +34,7 @@
 typedef unsigned char _driveid_t;
 typedef unsigned int  _sectnum_t;
 typedef unsigned int  _sectsize_t;
+typedef void *_dhandle_t;
 
 
 #ifdef __ATARI__
@@ -42,25 +43,26 @@ typedef unsigned int  _sectsize_t;
 #define _dio_query_sectsize(x) ((_sectsize_t)256)
 #endif
 
-extern unsigned char __fastcall__ _dio_open  (_driveid_t drive_id);
-extern unsigned char __fastcall__ _dio_close (_driveid_t drive_id);
-extern unsigned char __fastcall__ _dio_format(_driveid_t drive_id,
+extern _dhandle_t    __fastcall__ _dio_open  (_driveid_t drive_id);
+extern unsigned char __fastcall__ _dio_close (_dhandle_t handle);
+extern unsigned char __fastcall__ _dio_format(_dhandle_t handle,
                                               unsigned int format);
-extern unsigned char __fastcall__ _dio_read(_driveid_t drive_id,
+extern unsigned char __fastcall__ _dio_read(_dhandle_t handle,
                                             _sectnum_t sect_num,
                                             void *buffer);
-extern unsigned char __fastcall__ _dio_write(_driveid_t drive_id,
+extern unsigned char __fastcall__ _dio_write(_dhandle_t handle,
                                              _sectnum_t sect_num,
                                              const void *buffer);
-extern unsigned char __fastcall__ _dio_write_verify(_driveid_t drive_id,
+extern unsigned char __fastcall__ _dio_write_verify(_dhandle_t handle,
                                                     _sectnum_t sect_num,
                                                     const void *buffer);
 
-
-extern _sectnum_t __fastcall__ _dio_chs_to_snum(unsigned int cyl,
+extern _sectnum_t __fastcall__ _dio_chs_to_snum(_dhandle_t handle,
+                                                unsigned int cyl,
                                                 unsigned int head,
                                                 unsigned int sector);
-extern void       __fastcall__ _dio_snum_to_chs(_sectnum_t sect_num,
+extern void       __fastcall__ _dio_snum_to_chs(_dhandle_t handle,
+                                                _sectnum_t sect_num,
                                                 unsigned int *cyl,
                                                 unsigned int *head,
                                                 unsigned int *sector);

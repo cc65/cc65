@@ -37,8 +37,8 @@
 
 /* common */
 #include "check.h"
+#include "strbuf.h"
 #include "tgttrans.h"
-#include "xmalloc.h"
 
 /* cc65 */
 #include "asmlabel.h"
@@ -50,15 +50,13 @@
 
 
 /*****************************************************************************/
-/*  		    	 	     Data		     		     */
+/*  		    	  	     Data		     		     */
 /*****************************************************************************/
 
 
 
-static unsigned char* LiteralPoolBuf 	= 0;	/* Pointer to buffer */
-static unsigned       LiteralPoolSize	= 0;	/* Size of pool */
-static unsigned	      LiteralPoolOffs	= 0;	/* Current offset into pool */
 unsigned 	      LiteralPoolLabel 	= 0;	/* Pool asm label */
+static StrBuf         LiteralPool       = STATIC_STRBUF_INITIALIZER;
 
 
 
@@ -82,7 +80,7 @@ void TranslateLiteralPool (unsigned Offs)
  * charset.
  */
 {
-    TgtTranslateBuf (LiteralPoolBuf + Offs, LiteralPoolOffs - Offs);
+    TgtTranslateBuf (SB_GetBuf (&LiteralPool) + Offs, SB_GetLen (&LiteralPool) - Offs);
 }
 
 
@@ -91,7 +89,7 @@ void DumpLiteralPool (void)
 /* Dump the literal pool */
 {
     /* If nothing there, exit... */
-    if (LiteralPoolOffs == 0) {
+    if (SB_GetLen (&LiteralPool) == 0) {
 	return;
     }
 
@@ -109,7 +107,7 @@ void DumpLiteralPool (void)
     TranslateLiteralPool (0);
 
     /* Output the buffer data */
-    g_defbytes (LiteralPoolBuf, LiteralPoolOffs);
+    g_defbytes (SB_GetConstBuf (&LiteralPool), SB_GetLen (&LiteralPool));
 }
 
 
@@ -117,7 +115,7 @@ void DumpLiteralPool (void)
 unsigned GetLiteralPoolOffs (void)
 /* Return the current offset into the literal pool */
 {
-    return LiteralPoolOffs;
+    return SB_GetLen (&LiteralPool);
 }
 
 
@@ -127,8 +125,8 @@ void ResetLiteralPoolOffs (unsigned Offs)
  * removing values from the pool.
  */
 {
-    CHECK (Offs <= LiteralPoolOffs);
-    LiteralPoolOffs = Offs;
+    CHECK (Offs <= SB_GetLen (&LiteralPool));
+    SB_Cut (&LiteralPool, Offs);
 }
 
 
@@ -136,19 +134,7 @@ void ResetLiteralPoolOffs (unsigned Offs)
 void AddLiteralChar (char C)
 /* Add one character to the literal pool */
 {
-    /* Grow the buffer if needed */
-    if (LiteralPoolOffs >= LiteralPoolSize) {
-	if (LiteralPoolSize == 0) {
-	    /* First call */
-	    LiteralPoolSize = 256;
-	} else {
-	    LiteralPoolSize *= 2;
-	}
-       	LiteralPoolBuf = xrealloc (LiteralPoolBuf, LiteralPoolSize);
-    }
-
-    /* Store the character */
-    LiteralPoolBuf[LiteralPoolOffs++] = C;
+    SB_AppendChar (&LiteralPool, C);
 }
 
 
@@ -159,12 +145,10 @@ unsigned AddLiteral (const char* S)
  */
 {
     /* Remember the starting offset */
-    unsigned Start = LiteralPoolOffs;
+    unsigned Start = SB_GetLen (&LiteralPool);
 
     /* Copy the string including the terminator growing the buffer if needed */
-    do {
-	AddLiteralChar (*S);
-    } while (*S++);
+    SB_AppendBuf (&LiteralPool, S, strlen (S) + 1);
 
     /* Return the starting offset */
     return Start;
@@ -175,8 +159,8 @@ unsigned AddLiteral (const char* S)
 const char* GetLiteral (unsigned Offs)
 /* Get a pointer to the literal with the given offset in the pool */
 {
-    CHECK (Offs < LiteralPoolOffs);
-    return (const char*) &LiteralPoolBuf[Offs];
+    CHECK (Offs < SB_GetLen (&LiteralPool));
+    return SB_GetConstBuf (&LiteralPool) + Offs;
 }
 
 
@@ -184,7 +168,7 @@ const char* GetLiteral (unsigned Offs)
 void PrintLiteralPoolStats (FILE* F)
 /* Print statistics about the literal space used */
 {
-    fprintf (F, "Literal space used: %u bytes\n", LiteralPoolOffs);
+    fprintf (F, "Literal space used: %u bytes\n", SB_GetLen (&LiteralPool));
 }
 
 

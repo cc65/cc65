@@ -2990,8 +2990,8 @@ void g_asr (unsigned flags, unsigned long val)
 /* Primary = TOS >> Primary */
 {
     static char* ops [12] = {
-      	0,	       	"tosasra0",	"tosasrax",
-      	0,	       	"tosshra0",	"tosshrax",
+      	0,	       	0,	        "tosasrax",
+      	0,	       	0,     	        "tosshrax",
       	0,	       	0,		"tosasreax",
       	0,	       	0,		"tosshreax",
     };
@@ -3080,8 +3080,8 @@ void g_asl (unsigned flags, unsigned long val)
 /* Primary = TOS << Primary */
 {
     static char* ops [12] = {
-	0,	       	"tosasla0",    	"tosaslax",
-	0,	       	"tosshla0",    	"tosshlax",
+       	0,     	       	0,     	        "tosaslax",
+	0,	       	0,    	        "tosshlax",
 	0,	       	0,     	       	"tosasleax",
 	0,	       	0,     	       	"tosshleax",
     };
@@ -3090,7 +3090,7 @@ void g_asl (unsigned flags, unsigned long val)
     /* If the right hand side is const, the lhs is not on stack but still
      * in the primary register.
      */
-    if (flags & CF_CONST) {
+    if (flags & CF_CONST) {             
 
       	switch (flags & CF_TYPE) {
 

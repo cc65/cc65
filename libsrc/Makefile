@@ -15,6 +15,7 @@ ALLTARGETS =	apple2lib	\
 		atarilib	\
 		c64lib		\
 		c128lib		\
+		cbm510lib	\
 		cbm610lib	\
 		geoslib		\
 		petlib		\
@@ -107,6 +108,22 @@ cbm610lib:
 	    $(AR) a cbm610.lib $$i/*.o;\
 	done
 
+#-----------------------------------------------------------------------------
+# Commdore P500 / CBM 5x0
+
+cbm510lib:
+	for i in cbm510 cbm common runtime conio dbg; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -t cbm510 -I../../include" \
+	    AFLAGS="-t cbm510" \
+	    $(MAKE) -C $$i || exit 1; \
+	done
+	mv cbm510/crt0.o cbm510.o
+	for i in cbm510 cbm common runtime conio dbg; do \
+	    $(AR) a cbm510.lib $$i/*.o;\
+	done
+  
 #-----------------------------------------------------------------------------
 # GEOS on the C64/128
 

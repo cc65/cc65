@@ -15,18 +15,14 @@ OBJS =	_scrsize.o	\
 	banking.o	\
        	break.o		\
        	cgetc.o		\
-	clrscr.o	\
-       	color.o		\
-       	cputc.o		\
-       	crt0.o 		\
-       	crtc.o 		\
-       	kbhit.o		\
-       	kirq.o 		\
-       	kplot.o		\
+       	color.o	 	\
+       	crt0.o 	 	\
+       	kbhit.o	 	\
+       	kirq.o 	 	\
+       	kplot.o	 	\
 	kscnkey.o	\
-	kudtim.o	\
-	pokesys.o	\
-	rs232.o
+	kudtim.o 	\
+	pokesys.o
 
 all:	$(OBJS)
 

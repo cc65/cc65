@@ -865,6 +865,7 @@ static void ParseO65 (void)
        	{   "LUNIX",   	CFGTOK_LUNIX     	},
        	{   "OSA65",   	CFGTOK_OSA65    	},
         {   "CC65",     CFGTOK_CC65             },
+        {   "OPENCBM",  CFGTOK_OPENCBM          },
     };
 
     /* Bitmask to remember the attributes we got already */
@@ -976,10 +977,11 @@ static void ParseO65 (void)
 		} else {
                     CfgSpecialToken (OperatingSystems, ENTRY_COUNT (OperatingSystems), "OS type");
                     switch (CfgTok) {
-                        case CFGTOK_LUNIX:  OS = O65OS_LUNIX;       break;
-                        case CFGTOK_OSA65:  OS = O65OS_OSA65;       break;
-                        case CFGTOK_CC65:   OS = O65OS_CC65;        break;
-                        default:            CfgError ("Unexpected OS token");
+                        case CFGTOK_LUNIX:    OS = O65OS_LUNIX;     break;
+                        case CFGTOK_OSA65:    OS = O65OS_OSA65;     break;
+                        case CFGTOK_CC65:     OS = O65OS_CC65;      break;
+                        case CFGTOK_OPENCBM:  OS = O65OS_OPENCBM;   break;
+                        default:              CfgError ("Unexpected OS token");
                     }
                 }
 	     	break;

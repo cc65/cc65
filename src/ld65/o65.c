@@ -1155,11 +1155,6 @@ void O65SetOS (O65Desc* D, unsigned OS, unsigned Version, unsigned Id)
 
     /* Write the correct option length */
     switch (OS) {
-	case O65OS_OSA65:
-    	case O65OS_LUNIX:
-            /* No id for these two */
-       	    O65SetOption (D, O65OPT_OS, Opt, 2);
-	    break;
 
     	case O65OS_CC65:
             /* Set the 16 bit id */
@@ -1169,7 +1164,10 @@ void O65SetOS (O65Desc* D, unsigned OS, unsigned Version, unsigned Id)
 	    break;
 
 	default:
-	    Internal ("Trying to set invalid O65 operating system: %u", OS);
+            /* No id for OS/A65, Lunix, and unknown OSes */
+       	    O65SetOption (D, O65OPT_OS, Opt, 2);
+	    break;
+
     }
 }
 

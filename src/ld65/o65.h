@@ -66,6 +66,7 @@ typedef struct O65Desc O65Desc;
 #define O65OS_OSA65		1
 #define O65OS_LUNIX		2
 #define O65OS_CC65              3
+#define O65OS_OPENCBM           4
 #define O65OS_MAX               255
 
 

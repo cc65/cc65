@@ -13,9 +13,9 @@
 #endif
 
 void __fastcall__ CopyString(char *dest, char *source);
-void __fastcall__ CmpString(char *dest, char *source);
+char __fastcall__ CmpString(char *dest, char *source);
 void __fastcall__ CopyFString(char len, char *dest, char *source);
-void __fastcall__ CmpFString(char len, char *dest, char *source);
+char __fastcall__ CmpFString(char len, char *dest, char *source); 
 
 int __fastcall__ CRC(char *buffer, int len);
 void __fastcall__ ClearRam(char *dest, int len);

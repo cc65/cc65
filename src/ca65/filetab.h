@@ -47,6 +47,9 @@
 const char* GetFileName (unsigned Name);
 /* Get the name of a file where the name index is known */
 
+unsigned GetFileIndex (const char* Name);
+/* Return the file index for the given file name. */
+
 unsigned AddFile (const char* Name, unsigned long Size, unsigned long MTime);
 /* Add a new file to the list of input files. Return the index of the file in
  * the table.

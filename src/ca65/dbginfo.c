@@ -86,7 +86,33 @@ void DbgInfoFile (void)
 void DbgInfoLine (void)
 /* Parse and handle LINE subcommand of the .dbg pseudo instruction */
 {
-    ErrorSkip (ERR_NOT_IMPLEMENTED);
+    unsigned Index;
+    long LineNum;
+
+    /* The name of the file follows */
+    if (Tok != TOK_STRCON) {
+     	ErrorSkip (ERR_STRCON_EXPECTED);
+     	return;
+    }
+
+    /* Get the index in the file table for the name */
+    Index = GetFileIndex (SVal);
+
+    /* Skip the name */
+    NextTok ();
+
+    /* Comma expected */
+    ConsumeComma ();
+
+    /* Line number */
+    LineNum = ConstExpression ();
+    if (LineNum < 0) {
+	ErrorSkip (ERR_RANGE);
+	return;
+    }
+
+    /* ## Remember the line info */
+
 }
 
 

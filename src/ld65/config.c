@@ -615,7 +615,7 @@ static void ParseFiles (void)
 
     /* Remember we had this section */
     SectionsEncountered |= SE_FILES;
-}                                     
+}
 
 
 
@@ -1481,9 +1481,15 @@ static void CreateLoadDefines (SegDesc* S, unsigned long SegAddr)
 
 
 
-void CfgAssignSegments (void)
-/* Assign segments, define linker symbols where requested */
+unsigned CfgAssignSegments (void)
+/* Assign segments, define linker symbols where requested. The function will
+ * return the number of memory area overflows (so zero means anything went ok).
+ * In case of overflows, a short mapfile can be generated later, to ease the
+ * task of rearranging segments for the user.
+ */
 {
+    unsigned Overflows = 0;
+
     /* Walk through each of the memory sections. Add up the sizes and check
      * for an overflow of the section. Assign the start addresses of the
      * segments while doing this.
@@ -1563,10 +1569,12 @@ void CfgAssignSegments (void)
      	     * overflow.
      	     */
      	    M->FillLevel = Addr + S->Seg->Size - M->Start;
-     	    if (M->FillLevel > M->Size) {
-     	     	Error ("Memory area overflow in `%s', segment `%s' (%lu bytes)",
-     	 	       GetString (M->Name), GetString (S->Name),
-                       M->FillLevel - M->Size);
+       	    if (M->FillLevel > M->Size && (M->Flags & MF_OVERFLOW) == 0) {
+                ++Overflows;
+                M->Flags |= MF_OVERFLOW;
+                Warning ("Memory area overflow in `%s', segment `%s' (%lu bytes)",
+                         GetString (M->Name), GetString (S->Name),
+                         M->FillLevel - M->Size);
      	    }
 
      	    /* If requested, define symbols for the start and size of the
@@ -1602,6 +1610,9 @@ void CfgAssignSegments (void)
 	/* Next memory area */
 	M = M->Next;
     }
+
+    /* Return the number of memory area overflows */
+    return Overflows;
 }
 
 

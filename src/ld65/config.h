@@ -79,7 +79,7 @@ struct Memory {
     unsigned long      	Size; 	  	/* Length of memory section */
     unsigned long      	FillLevel;	/* Actual fill level of segment */
     unsigned char   	FillVal;  	/* Value used to fill rest of seg */
-    unsigned char       Relocatable;    /* Memory are is relocatable */
+    unsigned char       Relocatable;    /* Memory area is relocatable */
     MemListNode* 	SegList;  	/* List of segments for this section */
     MemListNode* 	SegLast;  	/* Last segment in this section */
     File*    	    	F;    	  	/* File that contains the entry */
@@ -108,6 +108,7 @@ extern unsigned	       	SegDescCount;	/* Number of entries in list */
 #define MF_DEFINE      	0x0001	  	/* Define start and size */
 #define MF_FILL	       	0x0002	  	/* Fill segment */
 #define MF_RO	       	0x0004	  	/* Read only memory area */
+#define MF_OVERFLOW     0x0008          /* Memory area overflow */
 
 /* Segment flags */
 #define SF_RO  	      	0x0001	  	/* Read only segment */
@@ -133,8 +134,12 @@ extern unsigned	       	SegDescCount;	/* Number of entries in list */
 void CfgRead (void);
 /* Read the configuration */
 
-void CfgAssignSegments (void);
-/* Assign segments, define linker symbols where requested */
+unsigned CfgAssignSegments (void);
+/* Assign segments, define linker symbols where requested. The function will
+ * return the number of memory area overflows (so zero means anything went ok).
+ * In case of overflows, a short mapfile can be generated later, to ease the
+ * task of rearranging segments for the user.
+ */
 
 void CfgWriteTarget (void);
 /* Write the target file(s) */

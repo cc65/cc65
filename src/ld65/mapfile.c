@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -56,8 +56,10 @@
 
 
 
-void CreateMapFile (void)
-/* Create a map file */
+void CreateMapFile (int ShortMap)
+/* Create a map file. If ShortMap is true, only the segment lists are
+ * generated, not the import/export lists.
+ */
 {
     unsigned I;
 
@@ -102,17 +104,21 @@ void CreateMapFile (void)
      		"-------------\n");
     PrintSegmentMap (F);
 
-    /* Write the exports list */
-    fprintf (F, "\n\n"
-		"Exports list:\n"
-		"-------------\n");
-    PrintExportMap (F);
+    /* The remainder is not written for short map files */
+    if (!ShortMap) {
 
-    /* Write the imports list */
-    fprintf (F, "\n\n"
-		"Imports list:\n"
-		"-------------\n");
-    PrintImportMap (F);
+        /* Write the exports list */
+        fprintf (F, "\n\n"
+                    "Exports list:\n"
+                    "-------------\n");
+        PrintExportMap (F);
+
+        /* Write the imports list */
+        fprintf (F, "\n\n"
+                    "Imports list:\n"
+                    "-------------\n");
+        PrintImportMap (F);
+    }
 
     /* Close the file */
     if (fclose (F) != 0) {

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -39,13 +39,29 @@
 
 
 /*****************************************************************************/
-/*  		 		     Code				     */
+/*  		 		     Data				     */
 /*****************************************************************************/
 
 
 
-void CreateMapFile (void);
-/* Create a map file */
+/* Constants that may be used as arguments for CreateMapFile */
+enum {
+    LONG_MAPFILE,
+    SHORT_MAPFILE
+};
+
+
+
+/*****************************************************************************/
+/*  		 		     Code      				     */
+/*****************************************************************************/
+
+
+
+void CreateMapFile (int ShortMap);
+/* Create a map file. If ShortMap is true, only the segment lists are
+ * generated, not the import/export lists.
+ */
 
 void CreateLabelFile (void);
 /* Create a label file */

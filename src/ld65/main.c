@@ -399,6 +399,7 @@ int main (int argc, char* argv [])
     };
 
     unsigned I;
+    unsigned MemoryAreaOverflows;
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "ld65");
@@ -448,7 +449,7 @@ int main (int argc, char* argv [])
 
 	       	case 'v':
 	       	    switch (Arg [2]) {
-	       	      	case 'm':   VerboseMap = 1; 	break;
+	       	       	case 'm':   VerboseMap = 1; 	break;
     		      	case '\0':  ++Verbosity;    	break;
 		      	default:    UnknownOption (Arg);
 		    }
@@ -458,7 +459,7 @@ int main (int argc, char* argv [])
 		    OptConfig (Arg, GetArg (&I, 2));
 		    break;
 
-		case 'L':
+    		case 'L':
 		    switch (Arg [2]) {
                         /* ## The first one is obsolete and will go */
 		      	case 'n': LabelFileName = GetArg (&I, 3);   break;
@@ -506,14 +507,29 @@ int main (int argc, char* argv [])
     /* Create the condes tables if requested */
     ConDesCreate ();
 
-    /* Assign start addresses for the segments, define linker symbols */
-    CfgAssignSegments ();
+    /* Assign start addresses for the segments, define linker symbols. The
+     * function will return the number of memory area overflows (zero on
+     * success).
+     */
+    MemoryAreaOverflows = CfgAssignSegments ();
 
     /* Check module assertions */
     CheckAssertions ();
 
     /* Check for import/export mismatches */
     CheckExports ();
+
+    /* If we had a memory area overflow before, we cannot generate the output
+     * file. However, we will generate a short map file if requested, since
+     * this will help the user to rearrange segments and fix the overflow.
+     */
+    if (MemoryAreaOverflows) {
+        if (MapFileName) {
+            CreateMapFile (SHORT_MAPFILE);
+        }
+        Error ("Cannot generate output due to memory area overflow%s",
+               (MemoryAreaOverflows > 1)? "s" : "");
+    }                                             
 
     /* Create the output file */
     CfgWriteTarget ();
@@ -523,7 +539,7 @@ int main (int argc, char* argv [])
 
     /* If requested, create a map file and a label file for VICE */
     if (MapFileName) {
-	CreateMapFile ();
+	CreateMapFile (LONG_MAPFILE);
     }
     if (LabelFileName) {
 	CreateLabelFile ();

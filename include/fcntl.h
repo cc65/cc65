@@ -38,6 +38,11 @@
 
 
 
+/* Predefined file handles */
+#define STDIN_FILENO	0
+#define STDOUT_FILENO	1
+#define STDERR_FILENO	2
+
 /* Flag values for the open() call */
 #define O_RDONLY        0x01
 #define O_WRONLY        0x02

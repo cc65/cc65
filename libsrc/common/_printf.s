@@ -241,16 +241,17 @@ __printf:
 
 ; Save the register bank variables into the save area
 
-	ldx	#5
-Save:	lda	regbank,x
-     	sta	RegSave,x
-     	dex
+ 	pha				; Save low byte of ap
+       	ldy	#5
+Save:	lda	regbank,y
+     	sta	RegSave,y
+     	dey
        	bpl	Save
 
 ; Get the parameters from the stack
 
-	jsr	popax	       		; Argument list pointer
-	sta	ArgList
+	pla				; Restore low byte of ap
+	sta	ArgList			; Argument list pointer
 	stx	ArgList+1
 
 	jsr	popax	       		; Format string

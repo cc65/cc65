@@ -60,15 +60,15 @@ _printf:
 	lda	(ptr1),y
 	jsr	pushax
 
-; Push the va_list
+; Push va_list (last parameter to vfprintf)
 
-	lda	ptr1
-	ldx	ptr1+1
+	lda    	ptr1
+	ldx    	ptr1+1
 	jsr	pushax
 
 ; Call vfprintf
 
-	jsr	_vfprintf	
+	jsr	_vfprintf
 
 ; Cleanup the stack. We will return what we got from vfprintf
 

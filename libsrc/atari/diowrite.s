@@ -3,8 +3,8 @@
 ;
 ; this file provides the _dio_write function
 ;
-; unsigned char __fastcall__ _dio_write(_driveid_t drive_id, _sectnum_t sect_num, void *buffer);
-; _driveid_t - 8bit
+; unsigned char __fastcall__ _dio_write(_dhandle_t handle,_sectnum_t sect_num,const void *buffer);
+; _dhandle_t - 16bit (ptr)
 ; _sectnum_t - 16bit
 ;
 

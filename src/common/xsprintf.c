@@ -66,7 +66,7 @@ int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap)
 {
 #if defined(__WATCOMC__)
     int Res = _vbprintf (Buf, BufSize, Format, ap);
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) && !defined(__GO32__)
     int Res = vsnprintf (Buf, BufSize, Format, ap);
 #elif defined(_MSC_VER)
     int Res = _vsnprintf (Buf, BufSize, Format, ap);

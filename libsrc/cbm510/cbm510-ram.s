@@ -2,12 +2,12 @@
 ; Extended memory driver for the CBM510 additional RAM banks. Driver works
 ; without problems when linked statically.
 ;
-; Ullrich von Bassewitz, 2002-12-09        !!! UNTESTED !!!
+; Ullrich von Bassewitz, 2002-12-09, 2003-12-27
 ;
 
 	.include 	"zeropage.inc"
 
-      	.include     	"em-kernel.inc"
+      	.include 	"em-kernel.inc"
         .include        "em-error.inc"
         .include        "cbm510.inc"
 
@@ -38,7 +38,7 @@
 ; ------------------------------------------------------------------------
 ; Constants
 
-RAMBANK = 2
+RAMBANK = 1
 OFFS    = 2
 
 ; ------------------------------------------------------------------------
@@ -63,15 +63,20 @@ pagecount:	.res	1               ; Number of available pages
 INSTALL:
        	lda	#$FF
         sta     curpage                 ; Invalidate the current page
+        sta     pagecount               ; Assume all memory available
 
-	ldx	UsrMemTop+2
-	cpx    	#RAMBANK                ; Top of memory in bank 2?
+        sec
+        jsr     $FF99                   ; MEMTOP
+
+       	cmp     #RAMBANK                ; Top of memory in bank 2?
         bne     @L1                     ; No: We can use all the memory
-        clc
-        adc     UsrMemTop+1
-@L1:    sta     pagecount
+        txa
+        sub     #OFFS
+        tya
+        sbc     #$00
+        sta     pagecount
 
-        lda     #<EM_ERR_OK
+@L1:    lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
 ;       rts				; Run into UNINSTALL instead
 
@@ -112,12 +117,11 @@ MAP:    sta     curpage	   		; Remember the new page
         sta     IndReg
 
         ldy     #$00
-@L1:    lda     (ptr1),y
-        sta     window,y
-        iny
+@L1:    .repeat 2
         lda     (ptr1),y
         sta     window,y
         iny
+        .endrepeat
         bne     @L1
 
         stx     IndReg
@@ -154,12 +158,11 @@ COMMIT: lda     curpage			; Get the current page
         sta     IndReg
 
         ldy     #$00
-@L1:    lda     window,y
-        sta     (ptr1),y
-        iny
+@L1:    .repeat 2
         lda     window,y
         sta     (ptr1),y
         iny
+        .endrepeat
         bne     @L1
 
         stx     IndReg

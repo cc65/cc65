@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -453,12 +453,15 @@ void DeclareLocals (void)
 	/* Check variable declarations. We need to distinguish between a
     	 * default int type and the end of variable declarations. So we
 	 * will do the following: If there is no explicit storage class
-	 * specifier *and* no explicit type given, it is assume that we
-       	 * have reached the end of declarations.
+	 * specifier *and* no explicit type given, *and* no type qualifiers 
+         * have been read, it is assumed that we have reached the end of 
+         * declarations.
 	 */
 	DeclSpec Spec;
 	ParseDeclSpec (&Spec, SC_AUTO, T_INT);
-       	if ((Spec.Flags & DS_DEF_STORAGE) != 0 && (Spec.Flags & DS_DEF_TYPE) != 0) {
+       	if ((Spec.Flags & DS_DEF_STORAGE) != 0 &&       /* No storage spec */
+            (Spec.Flags & DS_DEF_TYPE) != 0    &&       /* No type given */
+            GetQualifier (Spec.Type) == T_QUAL_NONE) {  /* No type qualifier */
 	    break;
 	}
 

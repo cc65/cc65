@@ -54,11 +54,15 @@
 #define CH_CROSS	        0x10
 #define CH_RTEE                 0x17
 #define CH_LTEE                 0x0f
-#define CH_ULCORNER	        0x10
-#define CH_URCORNER	        0x10
-#define CH_LLCORNER	        0x10
-#define CH_LRCORNER	        0x10
-
+#define CH_TTEE                 0x16
+#define CH_BTEE                 0x15
+#define CH_HLINE                0x0b
+#define CH_VLINE                0x0e
+#define CH_ULCORNER             0x14
+#define CH_URCORNER             0x12
+#define CH_LLCORNER             0x11
+#define CH_LRCORNER             0x08
+#define CH_PI                   0x05
 
 
 /* Color defines */

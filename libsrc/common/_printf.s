@@ -11,7 +11,7 @@
 	.import		_ltoa, _ultoa
 	.import		_strlower, _strlen
 	.import		jmpvec
-	.importzp	sp, ptr1, ptr2, tmp1, regbank, sreg
+	.importzp	sp, ptr1, tmp1, regbank, sreg
 
 	.macpack	generic
 
@@ -19,9 +19,14 @@
 ; We will store variables into the register bank in the zeropage. Define
 ; equates for these variables.
 
-ArgList		= regbank+0		; Argument list pointer
-Format		= regbank+2		; Format string
-OutData		= regbank+4		; Function parameters
+ArgList	       	= regbank+0		; Argument list pointer
+Format 	       	= regbank+2 		; Format string
+OutData		= regbank+4 		; Function parameters
+
+; ----------------------------------------------------------------------------
+; Other zero page cells
+
+Base		= ptr1
 
 
 .code
@@ -55,7 +60,7 @@ Output1:
 	ldx	#>CharArg
 	jsr	pushax
 	jsr	push1
-	jmp	(OutFunc)	; fout (OutData, &CharArg, 1)
+	jmp	(OutFunc)     	; fout (OutData, &CharArg, 1)
 
 ; ----------------------------------------------------------------------------
 ; Decrement the argument list pointer by 2
@@ -109,51 +114,51 @@ GetIntArg:
 	rts
 
 ; ----------------------------------------------------------------------------
-; Add the a new digit in X to the value in ptr1. Does leave Y alone.
-
-AddDigit:
-	txa				; Move digit into A
-	sub	#'0'			; Make number from ascii digit
-	pha
-	lda	ptr1
-	ldx	ptr1+1
-	asl	ptr1
-	rol	ptr1+1			; * 2
-	asl	ptr1
-	rol	ptr1+1			; * 4
-	add	ptr1
-	sta	ptr1
-	txa
-	adc	ptr1+1
-	sta	ptr1+1			; * 5
-	asl	ptr1
-	rol	ptr1+1			; * 10
-	pla
-	add	ptr1			; Add digit value
-	sta	ptr1
-	bcc	@L1
-	inc	ptr1+1
-@L1:	rts
-
-; ----------------------------------------------------------------------------
 ; Read an integer from the format string. Will return zero in Y.
 
 ReadInt:
-	ldy	#0
-	sty	ptr1
-	sty	ptr1+1	       		; Start with zero
-@L1:	lda	(Format),y		; Get format string character
-    	tax	    	       		; Format character --> X
-    	lda	__ctype,x      		; Get character classification
-    	and	#$04	  		; Digit?
-       	beq	@L9	  		; Jump if done
-    	jsr	AddDigit  		; Add the digit to ptr1
-    	jsr	IncFormatPtr		; Skip the character
-    	jmp	@L1
+    	ldy	#0
+    	sty	ptr1
+    	sty	ptr1+1	       		; Start with zero
+@Loop:	lda	(Format),y    		; Get format string character
+	sub	#'0'			; Make number from ascii digit
+	bcc	@L9			; Jump if done
+	cmp	#9+1
+	bcs	@L9			; Jump if done
+
+; Skip the digit character
+
+	jsr	IncFormatPtr
+
+; Add the digit to the value we have in ptr1
+
+     	pha				; Save digit value
+     	lda	ptr1
+     	ldx	ptr1+1
+     	asl	ptr1
+     	rol	ptr1+1	      		; * 2
+     	asl	ptr1
+     	rol	ptr1+1	      		; * 4, assume carry clear
+       	adc	ptr1
+     	sta	ptr1
+     	txa
+     	adc	ptr1+1
+     	sta	ptr1+1	      		; * 5
+     	asl	ptr1
+     	rol	ptr1+1	      		; * 10, assume carry clear
+     	pla
+       	adc	ptr1 	      		; Add digit value
+     	sta	ptr1
+     	bcc	@Loop
+     	inc	ptr1+1
+	bcs	@Loop			; Branch always
+
+; We're done converting
 
 @L9:	lda	ptr1
-	ldx	ptr1+1	  		; Load result
+	ldx	ptr1+1 	  		; Load result
 	rts
+
 
 ; ----------------------------------------------------------------------------
 ; Put a character into the argument buffer and increment the buffer index
@@ -164,15 +169,15 @@ PutBuf:	ldy	BufIdx
 	rts
 
 ; ----------------------------------------------------------------------------
-; Get a pointer to the current buffer end
+; Get a pointer to the current buffer end and push it onto the stack
 
-GetBufPtr:
-	lda	#<Buf
-	ldx	#>Buf
-	add	BufIdx
-	bcc	@L1
-	inx
-@L1:	rts
+PushBufPtr:
+    	lda	#<Buf
+    	ldx	#>Buf
+    	add	BufIdx
+    	bcc	@L1
+    	inx
+@L1:	jmp	pushax
 
 ; ----------------------------------------------------------------------------
 ; Push OutData onto the software stack
@@ -208,6 +213,26 @@ OutputArg:
 	ldx	ArgLen+1
 	jsr	pushax
 	jmp	(OutFunc)
+
+; ----------------------------------------------------------------------------
+; ltoa: Wrapper for _ltoa that pushes all arguments
+
+ltoa:	sty	Base			; Save base
+	jsr	pusheax			; Push value
+    	jsr	PushBufPtr		; Push the buffer pointer...
+       	lda	Base			; Restore base
+    	jmp	_ltoa 			; ultoa (l, s, base);
+
+
+; ----------------------------------------------------------------------------
+; ultoa: Wrapper for _ultoa that pushes all arguments
+
+ultoa: 	sty    	Base			; Save base
+	jsr	pusheax	   		; Push value
+    	jsr	PushBufPtr 		; Push the buffer pointer...
+       	lda	Base			; Restore base
+    	jmp	_ultoa 	   		; ultoa (l, s, base);
+
 
 ; ----------------------------------------------------------------------------
 ;
@@ -296,9 +321,8 @@ FormatSpec:
     	dex
 	bpl	@L1
 
-; Start with reading the flags if there are any
-
-  	ldx	#$FF  			; "true" flag
+; Start with reading the flags if there are any. X is $FF which is used
+; for "true"
 
 ReadFlags:
   	lda	(Format),y	        ; Get next char...
@@ -414,9 +438,9 @@ DoFormat:
 ; It is a character
 
 	jsr	GetIntArg		; Get the argument (promoted to int)
-	jsr	PutBuf
-	lda	#0  			; Place it as zero terminated string...
-	jsr	PutBuf		       	; ...into the buffer
+	sta	Buf			; Place it as zero terminated string...
+	lda	#0
+	sta	Buf+1			; ...into the buffer
 	jmp	HaveArg			; Done
 
 ; Is it an integer?
@@ -448,11 +472,8 @@ CheckInt:
    	sty	Buf
    	inc	BufIdx
 
-@Int1:	jsr	pusheax
-    	jsr	GetBufPtr
-    	jsr	pushax
-    	lda	#10
-    	jsr	_ltoa 			; ltoa (va_arg (ap, long), s, 10);
+@Int1:	ldy    	#10			; Base
+	jsr	ltoa			; Push arguments, call _ltoa
     	jmp	HaveArg
 
 ; Is it a count pseudo format?
@@ -485,7 +506,7 @@ CheckOctal:
 	jsr	GetSignedArg		; Get argument as a long
        	ldy	AltForm			; Alternative form?
 	beq	@Oct1  			; Jump if no
-	tay	       			; Save low byte of value
+	pha    	       			; Save low byte of value
 	stx	tmp1
 	ora	tmp1
 	ora	sreg
@@ -494,15 +515,11 @@ CheckOctal:
 	ora	Prec+1 			; Check if value or Prec != 0
 	beq	@Oct1
 	lda	#'0'
-	sta	Buf
-	inc	BufIdx
-	tya	       			; Restore low byte
+	jsr	PutBuf
+	pla	       			; Restore low byte
 
-@Oct1:	jsr	pusheax			; Push value
-    	jsr	GetBufPtr		; Get buffer pointer...
-    	jsr	pushax 			; ...and push it
-    	lda	#8     			; Load base
-    	jsr	_ltoa  			; ltoa (l, s, 8);
+@Oct1:	ldy    	#8     			; Load base
+	jsr	ltoa			; Push arguments, call _ltoa
     	jmp	HaveArg
 
 ; Check for a string specifier (%s)
@@ -527,11 +544,8 @@ CheckUnsigned:
 ; It's an unsigned integer
 
 	jsr	GetUnsignedArg		; Get argument as unsigned long
-	jsr	pusheax
-    	jsr	GetBufPtr		; Get buffer pointer...
-    	jsr	pushax 			; ...and push it
-       	lda    	#10    			; Load base
-    	jsr	_ultoa 			; ultoa (l, s, 10);
+       	ldy    	#10    			; Load base
+       	jsr    	ultoa			; Push arguments, call _ultoa
     	jmp	HaveArg
 
 ; Check for a hexadecimal integer (%x)
@@ -552,12 +566,9 @@ CheckHex:
 	lda	#'X'
 	jsr	PutBuf
 
-@L1:	jsr	GetUnsignedArg		; Get argument as an unsigned long
-	jsr	pusheax
-    	jsr	GetBufPtr		; Get buffer pointer...
-    	jsr	pushax 			; ...and push it
-       	lda    	#16    			; Load base
-    	jsr	_ultoa 			; ultoa (l, s, 16);
+@L1: 	jsr	GetUnsignedArg		; Get argument as an unsigned long
+       	ldy    	#16    			; Load base
+       	jsr    	ultoa			; Push arguments, call _ultoa
 
 	pla	       			; Get the format spec
 	cmp	#'x'   			; Lower case?
@@ -664,7 +675,6 @@ HaveArg:
 RegSave:	.res  	6
 
 ; Stuff from OutData. Is used as a vector and must be aligned
-.align	2
 OutFunc:	.word 	0
 
 ; One character argument for OutFunc

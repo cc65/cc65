@@ -37,7 +37,7 @@
 #define CODEGEN_H
 
 
-		    
+
 /* ##### */
 #include "dataseg.h"
 #include "codeseg.h"
@@ -100,9 +100,6 @@ extern CodeSeg* CS;
 
 void g_preamble (void);
 /* Generate the assembler code preamble */
-
-void g_postamble (void);
-/* Generate assembler code postamble */
 
 
 
@@ -447,6 +444,19 @@ void g_defbytes (const void* bytes, unsigned count);
 
 void g_zerobytes (unsigned n);
 /* Output n bytes of data initialized with zero */
+
+
+
+/*****************************************************************************/
+/*			 User supplied assembler code			     */
+/*****************************************************************************/
+
+
+
+void g_asmcode (const char* Line, int Len);
+/* Output one line of assembler code. If Len is greater than zero, it is used
+ * as the maximum number of characters to use from Line.
+ */
 
 
 

@@ -744,11 +744,7 @@ void doasm (void)
  * looks like the one defined for C++ (C has no ASM directive), that is,
  * a string literal in parenthesis.
  */
-{				    
-    /* ########## */
-    Error ("Currently unavailable");
-		    
-#if 0
+{
     /* Skip the ASM */
     NextToken ();
 
@@ -759,8 +755,25 @@ void doasm (void)
     if (curtok != TOK_SCONST) {
      	Error ("String literal expected");
     } else {
-     	/* Write the string directly into the output, followed by a newline */
-       	AddCodeLine (GetLiteral (curval));
+
+	/* The string literal may consist of more than one line of assembler
+	 * code. Separate the single lines and output the code.
+	 */
+	const char* S = GetLiteral (curval);
+	while (*S) {
+
+	    /* Allow lines up to 256 bytes */
+	    const char* E = strchr (S, '\n');
+	    if (E) {
+		/* Found a newline */
+		g_asmcode (S, E-S);
+		S = E+1;
+	    } else {
+		int Len = strlen (S);
+		g_asmcode (S, Len);
+		S += Len;
+	    }
+	}
 
      	/* Reset the string pointer, effectivly clearing the string from the
      	 * string table. Since we're working with one token lookahead, this
@@ -775,7 +788,6 @@ void doasm (void)
 
     /* Closing paren needed */
     ConsumeRParen ();
-#endif
 }
 
 

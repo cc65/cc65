@@ -486,9 +486,6 @@ void DelCodeSegAfter (CodeSeg* S, unsigned Last)
     /* Get the number of entries in this segment */
     unsigned Count = CollCount (&S->Entries);
 
-    /* Must not be called with count zero */
-    CHECK (Count > 0 && Count >= Last);
-
     /* Remove all entries after the given one */
     while (Last < Count) {
 

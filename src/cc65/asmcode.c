@@ -64,12 +64,7 @@ void AddCodeHint (const char* Hint)
 CodeMark GetCodePos (void)
 /* Get a marker pointing to the current output position */
 {
-    unsigned EntryCount = GetCodeSegEntries (CS);
-
-    /* This function should never be called without any code output */
-    CHECK (EntryCount > 0);
-
-    return EntryCount;
+    return GetCodeSegEntries (CS);
 }
 
 

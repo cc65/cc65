@@ -49,8 +49,6 @@
 #include "cpu.h"
 #include "error.h"
 #include "global.h"
-#include "litpool.h"
-/* ### #include "optimize.h" */
 #include "segname.h"
 #include "util.h"
 #include "codegen.h"
@@ -191,18 +189,6 @@ void g_preamble (void)
 
     /* Define long branch macros */
     AddCodeLine (".macpack\tlongbranch");
-
-    /* Tell the optimizer that this is the end of the preamble */
-    AddCodeHint ("end_of_preamble");
-}
-
-
-
-void g_postamble (void)
-/* Generate assembler code postamble */
-{
-    /* Tell the optimizer that this is the start of the postamble */
-    AddCodeHint ("start_of_postamble");
 }
 
 
@@ -3934,6 +3920,26 @@ void g_zerobytes (unsigned n)
 /* Output n bytes of data initialized with zero */
 {
     AddCodeLine ("\t.res\t%u,$00", n);
+}
+
+
+
+/*****************************************************************************/
+/*			 User supplied assembler code			     */
+/*****************************************************************************/
+
+
+
+void g_asmcode (const char* Line, int Len)
+/* Output one line of assembler code. If Len is greater than zero, it is used
+ * as the maximum number of characters to use from Line.
+ */
+{
+    if (Len >= 0) {
+	AddCodeSegLine (CS, "%.*s", Len, Line);
+    } else {
+	AddCodeSegLine (CS, "%s", Line);
+    }
 }
 
 

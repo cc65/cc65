@@ -2,8 +2,11 @@
 ; Ullrich von Bassewitz, 16.05.2000
 ;
 
-; Error codes, must match the values in the C headers
+; errno variable
 
+        .global         __errno
+
+; Error codes, must match the values in the C headers
 ENOENT		=	1	; No such file or directory
 ENOMEM		=	2	; Out of memory
 EACCES		=	3	; Permission denied

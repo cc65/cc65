@@ -1,0 +1,36 @@
+#
+# Makefile for the mouse driver library
+#
+
+.SUFFIXES: .o .s .c
+
+#--------------------------------------------------------------------------
+# Rules
+
+%.o:   	%.c
+	@$(CC) $(CFLAGS) $<
+	@$(AS) -g -o $@ $(AFLAGS) $(*).s
+
+%.o:	%.s
+	@$(AS) -g -o $@ $(AFLAGS) $<
+
+#--------------------------------------------------------------------------
+# Object files
+
+C_OBJS =        mouse_load.o
+
+S_OBJS =        mouse-kernel.o  
+
+
+#--------------------------------------------------------------------------
+# Targets
+
+.PHONY:	all clean zap
+
+all:  	$(C_OBJS) $(S_OBJS)
+
+clean:
+	@$(RM) *~ $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS)
+
+zap:	clean
+

@@ -58,7 +58,7 @@ void _hadd (void* mem, size_t size)
     	     */
     	    if (right) {
     		/* Check if we must merge the block with the right one */
-    		if (((int) f) + size == (int) right) {
+       	       	if (((unsigned) f) + size == (unsigned) right) {
     		    /* Merge with the right block */
     		    f->size += right->size;
     		    if (f->next = right->next) {
@@ -79,7 +79,7 @@ void _hadd (void* mem, size_t size)
     	    }
     	    if (left) {
     		/* Check if we must merge the block with the left one */
-    		if ((int) f == ((int) left) + left->size) {
+    		if ((unsigned) f == ((unsigned) left) + left->size) {
     		    /* Merge with the left block */
     		    left->size += f->size;
     		    if (left->next = f->next) {
@@ -104,3 +104,4 @@ void _hadd (void* mem, size_t size)
 
 
 
+					      

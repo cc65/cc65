@@ -28,7 +28,7 @@ S_OBJS = isalpha.o isdigit.o _file.o fmisc.o strlower.o strchr.o tolower.o\
 	 longjmp.o rand.o atexit.o memset.o memcpy.o memchr.o memcmp.o\
 	 ltoa.o strcspn.o strncat.o strpbrk.o strspn.o abs.o labs.o jmpvec.o\
 	 _fdesc.o stkcheck.o zerobss.o copydata.o _swap.o strstr.o strcoll.o\
-	 _sys.o getcpu.o _oserror.o strerror.o
+	 _sys.o getcpu.o _oserror.o strerror.o iscntrl.o
 
 all:  	$(C_OBJS) $(S_OBJS)
 

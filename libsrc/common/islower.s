@@ -8,8 +8,14 @@
 	.import		__ctype
 
 _islower:
+	cpx	#$00		; Char range ok?
+	bne	@L1		; Jump if no
 	tay
 	lda	__ctype,y	; Get character classification
 	and    	#$01		; Mask lower char bit
+	rts
+
+@L1:	lda	#$00		; Return false
+	tax
 	rts
 

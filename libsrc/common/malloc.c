@@ -69,34 +69,19 @@ void* malloc (size_t size)
 
         } else {
 
-            /* We must slice the block found */
-            struct freeblock* newblock;
-       	    newblock = (struct freeblock*) ((unsigned) f) + size;
+            /* We must slice the block found. Cut off space from the upper
+	     * end, so we can leave the actual free block chain intact.
+	     */
 
-            /* Insert the new block (the remaining space) instead of the
-             * old one.
-             */
-            newblock->size = f->size - size;         /* Remaining size */
-            newblock->next = f->next;
-            newblock->prev = f->prev;
-            if (f->prev) {
-                /* We have a previous block */
-                f->prev->next = newblock;
-            } else {
-                /* This is the first block, correct the freelist pointer */
-                _hfirst = newblock;
-            }
-            if (f->next) {
-                /* We have a next block */
-                f->next->prev = newblock;
-            } else {
-                /* This is the last block, correct the freelist pointer */
-                _hlast = newblock;
-            }
+	    /* Decrement the size of the block */
+	    f->size -= size;
+
+	    /* Set f to the now unused space above the current block */
+	    f = (struct freeblock*) (((unsigned) f) + f->size);
 
         }
 
-        /* Setup the pointer for the bock */
+        /* Setup the pointer for the block */
         p = (unsigned*) f;
 
     } else {

@@ -140,7 +140,7 @@ Here is a description of all the command line options:
   name="--formfeeds"></tt> is also given, a formfeed is inserted before
   generating the page header.
 
-  A value of -1 for the page length will disable paging of the output.
+  A value of zero for the page length will disable paging of the output.
 
 
   <label id="option--start-addr">

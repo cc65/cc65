@@ -27,8 +27,7 @@ OBJS = 	_scrsize.o     	 	\
         randomize.o             \
        	readjoy.o      	 	\
        	rs232.o	       	 	\
-        tgi_mode_table.o 	\
-	write.o
+        tgi_mode_table.o
 
 TGIS =	c64-320-200-2.tgi
 
@@ -44,4 +43,4 @@ all:	$(OBJS) $(TGIS)
 
 clean:
 	@rm -f $(OBJS) $(TGIS:.tgi=.o)
-                                 
+

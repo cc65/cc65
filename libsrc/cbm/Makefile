@@ -41,17 +41,27 @@ S_OBJS =	c_acptr.o	\
 		cclear.o 	\
 		chline.o 	\
 	 	clock.o 	\
+                close.o         \
 		ctype.o 	\
 		cvline.o 	\
+                diskerror.o     \
+                filedes.o       \
+                filename.o      \
+                filevars.o      \
 		getenv.o 	\
 		gotox.o 	\
 		gotoxy.o 	\
 		gotoy.o 	\
+                open.o          \
                 oserrlist.o     \
 		oserror.o	\
+                read.o          \
 		revers.o	\
+                scratch.o       \
+                sysremove.o     \
                 systime.o       \
-		where.o
+		where.o         \
+                write.o
 
 all:	$(C_OBJS) $(S_OBJS)
 

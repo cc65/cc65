@@ -80,6 +80,7 @@ __sys_oserrlist:
        	sys_oserr_entry         71, "Directory error"
        	sys_oserr_entry         72, "Disk full"
        	sys_oserr_entry         73, "DOS version mismatch"
+        sys_oserr_entry         74, "Drive not ready"
         sys_oserr_sentinel      "Unknown error"
 
 

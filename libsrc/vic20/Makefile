@@ -21,8 +21,7 @@ OBJS =	_scrsize.o	\
 	cputc.o		\
 	kbhit.o		\
         randomize.o     \
-	readjoy.o      	\
-	write.o
+	readjoy.o      	
 
 all:	$(OBJS)
 

@@ -1,7 +1,11 @@
 ;
-; Subroutines available in the CBM jump table
+; Include file for the Commdore 6502 machines
 ;
 
+
+;-----------------------------------------------------------------------------
+; Subroutines available in the CBM jump table
+;
 
 CINT		= $FF81
 IOINIT		= $FF84
@@ -44,3 +48,11 @@ PLOT		= $FFF0
 IOBASE		= $FFF3
 
 
+;-----------------------------------------------------------------------------
+; Device numbers
+;
+                
+CBMDEV_KBD      = 0
+CBMDEV_DATASETTE= 1
+CBMDEV_RS232    = 2
+CBMDEV_SCREEN   = 3

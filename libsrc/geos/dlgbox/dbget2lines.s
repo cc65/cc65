@@ -16,9 +16,9 @@ DB_get2lines:
 	    jsr popax
 	    sta ptr3		; fetch line 1
 	    stx ptr3+1
-	    ldx ptr3
+	    ldx #ptr3
 	    jsr checknull
-	    ldx ptr4
+	    ldx #ptr4
 	    jmp checknull
 
 checknull:

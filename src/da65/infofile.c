@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -239,6 +239,8 @@ static void RangeSection (void)
     unsigned End	= 0;
     unsigned char Type	= 0;
     char* Name          = 0;
+    unsigned MemberSize = 0;
+
 
     /* Skip the token */
     InfoNextTok ();
@@ -290,15 +292,15 @@ static void RangeSection (void)
 	     	InfoNextTok ();
 		InfoSpecialToken (TypeDefs, ENTRY_COUNT (TypeDefs), "TYPE");
 		switch (InfoTok) {
-		    case INFOTOK_ADDRTAB:	Type = atAddrTab;	break;
-		    case INFOTOK_BYTETAB:	Type = atByteTab;	break;
-		    case INFOTOK_CODE:		Type = atCode;		break;
-                    case INFOTOK_DBYTETAB:      Type = atDByteTab;      break;
-		    case INFOTOK_DWORDTAB:	Type = atDWordTab;	break;
-       		    case INFOTOK_RTSTAB:       	Type = atRtsTab;	break;
-                    case INFOTOK_SKIP:          Type = atSkip;          break;
-		    case INFOTOK_TEXTTAB:       Type = atTextTab;       break;
-		    case INFOTOK_WORDTAB:	Type = atWordTab;	break;
+		    case INFOTOK_ADDRTAB:  Type = atAddrTab;  MemberSize = 2; break;
+		    case INFOTOK_BYTETAB:  Type = atByteTab;  MemberSize = 1; break;
+		    case INFOTOK_CODE:	   Type = atCode;     MemberSize = 1; break;
+                    case INFOTOK_DBYTETAB: Type = atDByteTab; MemberSize = 2; break;
+		    case INFOTOK_DWORDTAB: Type = atDWordTab; MemberSize = 4; break;
+       		    case INFOTOK_RTSTAB:   Type = atRtsTab;   MemberSize = 2; break;
+                    case INFOTOK_SKIP:     Type = atSkip;     MemberSize = 1; break;
+		    case INFOTOK_TEXTTAB:  Type = atTextTab;  MemberSize = 1; break;
+		    case INFOTOK_WORDTAB:  Type = atWordTab;  MemberSize = 2; break;
 		}
 		InfoNextTok ();
 		break;
@@ -317,6 +319,11 @@ static void RangeSection (void)
     /* Start must be less than end */
     if (Start > End) {
 	InfoError ("Start value must not be greater than end value");
+    }
+
+    /* Check the granularity */
+    if (((End - Start + 1) % MemberSize) != 0) {
+	InfoError ("Type of range needs a granularity of %u", MemberSize);
     }
 
     /* Set the range */

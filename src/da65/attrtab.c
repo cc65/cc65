@@ -79,6 +79,30 @@ static void AddrCheck (unsigned Addr)
 
 
 
+unsigned GetGranularity (attr_t Style)
+/* Get the granularity for the given style */
+{
+    switch (Style) {
+	case atDefault:	 return 1;
+	case atCode:	 return 1;
+	case atIllegal:	 return 1;
+	case atByteTab:	 return 1;
+	case atDByteTab: return 2;
+	case atWordTab:	 return 2;
+	case atDWordTab: return 4;
+	case atAddrTab:  return 2;
+	case atRtsTab:   return 2;
+	case atTextTab:  return 1;
+
+	case atSkip:
+	default:
+	    Internal ("GetGraularity called for style = %d", Style);
+	    return 0;
+    }
+}
+
+
+
 void MarkRange (unsigned Start, unsigned End, attr_t Attr)
 /* Mark a range with the given attribute */
 {
@@ -129,11 +153,11 @@ void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
 
     /* Must not have two symbols for one address */
     if (ExistingAttr != atNoLabel) {
-	/* Allow redefinition if identical */
+    	/* Allow redefinition if identical */
        	if (ExistingAttr == Attr && strcmp (SymTab[Addr], Name) == 0) {
-	    return;
-	}
-	Error ("Duplicate label for address %04X: %s/%s", Addr, SymTab[Addr], Name);
+    	    return;
+    	}
+    	Error ("Duplicate label for address $%04X: %s/%s", Addr, SymTab[Addr], Name);
     }
 
     /* Create a new label */
@@ -145,39 +169,86 @@ void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
 
 
 
+void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Offs)
+/* Add a dependent label at the given address using "base name+Offs" as the new
+ * name.
+ */
+{
+    /* Allocate memory for the dependent label name */
+    unsigned NameLen = strlen (BaseName);
+    char*    DepName = xmalloc (NameLen + 7);	/* "+$ABCD" */
+
+    /* Create the new name in the buffer */
+    if (UseHexOffs) {
+	sprintf (DepName, "%s+$%02X", BaseName, Offs);
+    } else {
+	sprintf (DepName, "%s+%u", BaseName, Offs);
+    }
+
+    /* Define the labels */
+    AddLabel (Addr, Attr | atDepLabel, DepName);
+
+    /* Free the name buffer */
+    xfree (DepName);
+}
+
+
+
+static void AddLabelRange (unsigned Addr, attr_t Attr, const char* Name, unsigned Count)
+/* Add a label for a range. The first entry gets the label "Name" while the
+ * others get "Name+offs".
+ */
+{
+    /* Define the label */
+    AddLabel (Addr, Attr, Name);
+
+    /* Define dependent labels if necessary */
+    if (Count > 1) {
+    	unsigned Offs;
+
+        /* Setup the format string */
+        const char* Format = UseHexOffs? "$%02X" : "%u";
+
+    	/* Allocate memory for the dependent label names */
+    	unsigned NameLen = strlen (Name);
+    	char* 	 DepName = xmalloc (NameLen + 7);	/* "+$ABCD" */
+    	char* 	 DepOffs = DepName + NameLen + 1;
+
+    	/* Copy the original name into the buffer */
+    	memcpy (DepName, Name, NameLen);
+    	DepName[NameLen] = '+';
+
+    	/* Define the labels */
+       	for (Offs = 1; Offs < Count; ++Offs) {
+    	    sprintf (DepOffs, Format, Offs);
+    	    AddLabel (Addr + Offs, Attr | atDepLabel, DepName);
+    	}
+
+    	/* Free the name buffer */
+    	xfree (DepName);
+    }
+}
+
+
+
+void AddIntLabelRange (unsigned Addr, const char* Name, unsigned Count)
+/* Add an internal label for a range. The first entry gets the label "Name"
+ * while the others get "Name+offs".
+ */
+{
+    /* Define the label range */
+    AddLabelRange (Addr, atIntLabel, Name, Count);
+}
+
+
+
 void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count)
 /* Add an external label for a range. The first entry gets the label "Name"
  * while the others get "Name+offs".
  */
 {
-    /* Define the label */
-    AddLabel (Addr, atExtLabel, Name);
-
-    /* Define dependent labels if necessary */
-    if (Count > 1) {
-	unsigned Offs;
-
-        /* Setup the format string */
-        const char* Format = UseHexOffs? "$%02X" : "%u";
-
-	/* Allocate memory for the dependent label names */
-	unsigned NameLen = strlen (Name);
-	char* 	 DepName = xmalloc (NameLen + 7);
-	char* 	 DepOffs = DepName + NameLen + 1;
-
-	/* Copy the original name into the buffer */
-	memcpy (DepName, Name, NameLen);
-	DepName[NameLen] = '+';
-
-	/* Define the labels */
-	for (Offs = 1; Offs < Count; ++Offs) {
-	    sprintf (DepOffs, Format, Offs);
-	    AddLabel (Addr + Offs, atDepLabel, DepName);
-	}
-
-	/* Free the name buffer */
-	xfree (DepName);
-    }
+    /* Define the label range */
+    AddLabelRange (Addr, atExtLabel, Name, Count);
 }
 
 
@@ -267,7 +338,7 @@ void DefOutOfRangeLabels (void)
     while (Addr < CodeStart) {
 	if (MustDefLabel (Addr)) {
 	    DefineConst (Addr);
-	}
+    	}
         ++Addr;
     }
 

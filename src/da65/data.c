@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -189,7 +189,7 @@ unsigned AddrTable (void)
 	    const char* Label = GetLabel (Addr);
 	    if (Label == 0) {
 	 	/* OOPS! Should not happen */
-	 	Internal ("OOPS - Label for address %04X disappeard!", Addr);
+	 	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
 	    }
 	    Indent (MIndent);
 	    Output (".addr");
@@ -249,7 +249,7 @@ unsigned RtsTable (void)
 	    const char* Label = GetLabel (Addr);
 	    if (Label == 0) {
 	 	/* OOPS! Should not happen */
-	 	Internal ("OOPS - Label for address %04X disappeard!", Addr);
+	 	Internal ("OOPS - Label for address 0x%06X disappeard!", Addr);
 	    }
 	    Indent (MIndent);
 	    Output (".word");

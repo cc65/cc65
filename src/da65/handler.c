@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -129,10 +129,57 @@ static const char* GetAddrArg (unsigned Flags, unsigned Addr)
 static void GenerateLabel (unsigned Flags, unsigned Addr)
 /* Generate a label in pass one if requested */
 {
-    if (Pass == 1 && !HaveLabel (Addr)) {
-       	if ((Flags & flGenLabel) != 0 ||
-       	    ((Flags & flUseLabel) != 0 && Addr >= CodeStart && Addr <= CodeEnd)) {
+    /* Generate labels in pass #1, and only if we don't have a label already */
+    if (Pass == 1 && !HaveLabel (Addr) &&
+	/* Check if we must create a label */
+       	((Flags & flGenLabel) != 0 ||
+       	 ((Flags & flUseLabel) != 0 && Addr >= CodeStart && Addr <= CodeEnd))) {
+
+	/* As a special case, handle ranges with tables or similar. Within
+	 * such a range with a granularity > 1, do only generate dependent
+	 * labels for all addresses but the first one. Be sure to generate
+	 * a label for the start of the range, however.
+	 */
+	attr_t Style         = GetStyleAttr (Addr);
+	unsigned Granularity = GetGranularity (Style);
+
+	if (Granularity == 1) {
+	    /* Just add the label */
 	    AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
+	} else {
+	    /* Search for the start of the range or the last non dependent
+	     * label in the range.
+	     */
+	    unsigned Offs;
+	    attr_t LabelAttr;
+	    unsigned LabelAddr = Addr;
+	    while (LabelAddr > CodeStart) {
+
+		if (Style != GetStyleAttr (LabelAddr-1)) {
+		    /* End of range reached */
+		    break;
+		}
+		--LabelAddr;
+		LabelAttr = GetLabelAttr (LabelAddr);
+		if ((LabelAttr & (atIntLabel|atExtLabel)) != 0 &&
+		    (LabelAttr & atDepLabel) == 0) {
+		    /* The address has an internal or external label */
+		    break;
+		}
+	    }
+
+	    /* If the proposed label address doesn't have a label, define one */
+	    if ((GetLabelAttr (LabelAddr) & (atIntLabel|atExtLabel)) == 0) {
+		AddLabel (LabelAddr, atIntLabel, MakeLabelName (LabelAddr));
+	    }
+
+	    /* Create the label */
+	    Offs = Addr - LabelAddr;
+	    if (Offs == 0) {
+		AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
+	    } else {
+	     	AddDepLabel (Addr, atIntLabel, GetLabel (LabelAddr), Offs);
+	    }
 	}
     }
 }

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -63,10 +63,10 @@ typedef enum attr_t {
     atNoLabel	= 0x00,		/* No label for this address */
     atExtLabel	= 0x10,		/* External label */
     atIntLabel  = 0x20,		/* Internally generated label */
-    atDepLabel	= 0x30,		/* Dependent label (always extern) */
+    atDepLabel 	= 0x40,		/* Dependent label */
 
     atStyleMask = 0x0F,		/* Output style */
-    atLabelMask = 0x30		/* Label information */
+    atLabelMask = 0x70		/* Label information */
 } attr_t;
 
 
@@ -76,6 +76,9 @@ typedef enum attr_t {
 /*****************************************************************************/
 
 
+
+unsigned GetGranularity (attr_t Style);
+/* Get the granularity for the given style */
 
 void MarkRange (unsigned Start, unsigned End, attr_t Attr);
 /* Mark a range with the given attribute */
@@ -90,6 +93,16 @@ const char* MakeLabelName (unsigned Addr);
 
 void AddLabel (unsigned Addr, attr_t Attr, const char* Name);
 /* Add a label */
+
+void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Offs);
+/* Add a dependent label at the given address using "base name+Offs" as the new
+ * name.
+ */
+
+void AddIntLabelRange (unsigned Addr, const char* Name, unsigned Count);
+/* Add an internal label for a range. The first entry gets the label "Name"
+ * while the others get "Name+offs".
+ */
 
 void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count);
 /* Add an external label for a range. The first entry gets the label "Name"

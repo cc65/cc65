@@ -598,6 +598,18 @@ type* Indirect (type* T)
 
 
 
+type* ArrayToPtr (const type* T)
+/* Convert an array to a pointer to it's first element */
+{
+    /* Function must only be called for an array */
+    CHECK ((T[0] & T_MASK_TYPE) == T_TYPE_ARRAY);
+
+    /* Return pointer to first element */
+    return PointerTo (T + DECODE_SIZE + 1);
+}
+
+
+
 int IsClassInt (const type* T)
 /* Return true if this is an integer type */
 {

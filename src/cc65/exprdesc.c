@@ -59,16 +59,18 @@ void MakeConstIntExpr (ExprDesc* Expr, long Value)
 void PrintExprDesc (FILE* F, ExprDesc* E)
 /* Print an ExprDesc */
 {
-    fprintf (F, "Symbol: %s\n", E->Sym? E->Sym->Name : "(none)");
-    fprintf (F, "Type:   ");
+    fprintf (F, "Symbol:   %s\n", E->Sym? E->Sym->Name : "(none)");
     if (E->Type) {
+        fprintf (F, "Type:     ");
         PrintType (F, E->Type);
+        fprintf (F, "\nRaw type: ");
+        PrintRawType (F, E->Type);
     } else {
-        fprintf (F, "(unknown)");
+        fprintf (F, "Type:     (unknown)\n"
+                    "Raw type: (unknown)\n");
     }
-    fprintf (F, "\n");
-    fprintf (F, "Value:  0x%08lX\n", E->ConstVal);
-    fprintf (F, "Flags:  ");
+    fprintf (F, "Value:    0x%08lX\n", E->ConstVal);
+    fprintf (F, "Flags:    ");
     switch (E->Flags & E_MCTYPE) {
         case E_TCONST:    fprintf (F, "E_TCONST ");                    break;
         case E_TGLAB:     fprintf (F, "E_TGLAB ");                     break;
@@ -94,18 +96,16 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
     if ((E->Flags & E_MCONST) == E_MCONST) {
         fprintf (F, "E_MCONST ");
     }
-    fprintf (F, "\n");
 
-    fprintf (F, "Test:    ");
+    fprintf (F, "\nTest:     ");
     if (E->Test & E_CC) {
         fprintf (F, "E_CC ");
     }
     if (E->Test & E_FORCETEST) {
         fprintf (F, "E_FORCETEST ");
     }
-    fprintf (F, "\n");
 
-    fprintf (F, "Name:   0x%08lX\n", E->Name);
+    fprintf (F, "\nName:     0x%08lX\n", E->Name);
 }
 
 

@@ -270,6 +270,9 @@ type* Indirect (type* Type);
  * given type points to.
  */
 
+type* ArrayToPtr (const type* Type);
+/* Convert an array to a pointer to it's first element */
+
 #if defined(HAVE_INLINE)
 INLINE int IsTypeChar (const type* T)
 /* Return true if this is a character type */

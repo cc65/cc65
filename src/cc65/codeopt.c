@@ -1248,7 +1248,7 @@ static unsigned OptNegAX2 (CodeSeg* S)
 	    CS_GetEntries (S, L, I+1, 5)	&&
 	    L[0]->OPC == OP65_TAX    		&&
 	    L[1]->OPC == OP65_DEY    		&&
-	    L[2]->OPC == OP65_LDA    		&&
+      	    L[2]->OPC == OP65_LDA    		&&
 	    L[2]->AM == AM65_ZP_INDY  		&&
 	    strcmp (L[2]->Arg, E->Arg) == 0	&&
 	    !CE_HasLabel (L[2])		        &&
@@ -1263,7 +1263,7 @@ static unsigned OptNegAX2 (CodeSeg* S)
   	    /* Invert the branch */
 	    CE_ReplaceOPC (L[4], GetInverseBranch (L[4]->OPC));
 
-	    /* Delete the entries no longer needed. Beware: Deleting entries
+      	    /* Delete the entries no longer needed. Beware: Deleting entries
 	     * will change the indices.
 	     */
        	    CS_DelEntry (S, I+4);	    	/* jsr bnegax */
@@ -1291,7 +1291,7 @@ static unsigned OptNegAX3 (CodeSeg* S)
  *  	lda	xx
  *  	ldx	yy
  *  	jsr	bnegax
- *  	jne/jeq	...
+ *    	jne/jeq	...
  *
  * and replace it by
  *
@@ -1306,7 +1306,7 @@ static unsigned OptNegAX3 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[3];
+      	CodeEntry* L[3];
 
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
@@ -1349,7 +1349,7 @@ static unsigned OptNegAX3 (CodeSeg* S)
 static unsigned OptNegAX4 (CodeSeg* S)
 /* Search for the sequence:
  *
- *  	jsr   	xxx
+ *    	jsr   	xxx
  *  	jsr   	bnega(x)
  *  	jeq/jne	...
  *
@@ -1392,7 +1392,7 @@ static unsigned OptNegAX4 (CodeSeg* S)
 	    } else {
 		/* Test words */
 		X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, L[0]->LI);
-		CS_InsertEntry (S, X, I+2);
+      		CS_InsertEntry (S, X, I+2);
 		X = NewCodeEntry (OP65_ORA, AM65_ZP, "tmp1", 0, L[0]->LI);
 		CS_InsertEntry (S, X, I+3);
 	    }
@@ -1402,6 +1402,243 @@ static unsigned OptNegAX4 (CodeSeg* S)
 
 	    /* Invert the branch */
        	    CE_ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*		       Optimize stores through pointers                      */
+/*****************************************************************************/
+
+
+
+static unsigned OptPtrStore1 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *    	jsr   	pushax
+ *      lda     xxx
+ *      ldy     yyy
+ *  	jsr   	staspidx
+ *
+ * and replace it by:
+ *
+ *      sta     ptr1
+ *      stx     ptr1+1
+ *      lda     xxx
+ *      ldy     yyy
+ *      sta     (ptr1),y
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[4];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_JSR  	      	&&
+	    strcmp (L[0]->Arg, "pushax") == 0   &&
+       	    CS_GetEntries (S, L+1, I+1, 3)   	&&
+       	    L[1]->OPC == OP65_LDA              	&&
+	    !CE_HasLabel (L[1])    	       	&&
+	    L[2]->OPC == OP65_LDY               &&
+	    !CE_HasLabel (L[2])                 &&
+	    L[3]->OPC == OP65_JSR               &&
+	    strcmp (L[3]->Arg, "staspidx") == 0 &&
+	    !CE_HasLabel (L[3])) {
+
+	    CodeEntry* X;
+
+	    /* Create and insert the stores */
+       	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I);
+
+	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+1);
+
+	    /* Delete the call to pushax */
+	    CS_DelEntry (S, I+2);
+
+	    /* Insert the store through ptr1 */
+	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "ptr1", 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+4);
+
+	    /* Delete the call to staspidx */
+	    CS_DelEntry (S, I+5);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*			Optimize loads through pointers                      */
+/*****************************************************************************/
+
+
+
+static unsigned OptPtrLoad1 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *      tax
+ *      dey
+ *      lda     (sp),y             # May be any destination
+ *      ldy     ...
+ *  	jsr    	ldauidx
+ *
+ * and replace it by:
+ *
+ *      sta     ptr1+1
+ *      dey
+ *      lda     (sp),y
+ *      sta     ptr1
+ *      ldy     ...
+ *      ldx     #$00
+ *      lda     (ptr1),y
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[5];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_TAX      	       	&&
+       	    CS_GetEntries (S, L+1, I+1, 4)     	&&
+       	    L[1]->OPC == OP65_DEY              	&&
+	    !CE_HasLabel (L[1])        	       	&&
+	    L[2]->OPC == OP65_LDA               &&
+	    !CE_HasLabel (L[2])                 &&
+	    L[3]->OPC == OP65_LDY               &&
+	    !CE_HasLabel (L[3])                 &&
+	    L[4]->OPC == OP65_JSR               &&
+       	    strcmp (L[4]->Arg, "ldauidx") == 0  &&
+	    !CE_HasLabel (L[4])) {
+
+	    CodeEntry* X;
+
+       	    /* Store the high byte and remove the TAX instead */
+	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I);
+	    CS_DelEntry (S, I+1);
+
+	    /* Store the low byte */
+	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[2]->LI);
+	    CS_InsertEntry (S, X, I+3);
+
+	    /* Delete the call to ldauidx */
+	    CS_DelEntry (S, I+5);
+
+	    /* Load high and low byte */
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+5);
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+6);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptPtrLoad2 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *      ldy     ...
+ *      jsr     ldauidx
+ *
+ * and replace it by:
+ *
+ *      stx     ptr1+1
+ *      sta     ptr1
+ *      ldy     ...
+ *      ldx     #$00
+ *      lda     (ptr1),y
+ *
+ * This step must be execute *after* OptPtrLoad1!
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[2];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_LDY      	       	&&
+       	    CS_GetEntries (S, L+1, I+1, 1)     	&&
+       	    L[1]->OPC == OP65_JSR               &&
+       	    strcmp (L[1]->Arg, "ldauidx") == 0  &&
+	    !CE_HasLabel (L[1])) {
+
+	    CodeEntry* X;
+
+       	    /* Store the high byte */
+	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I);
+
+	    /* Store the low byte */
+       	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+1);
+
+	    /* Delete the call to ldauidx */
+	    CS_DelEntry (S, I+3);
+
+	    /* Load the high and low byte */
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+3);
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+4);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -1437,6 +1674,11 @@ struct OptFunc {
 
 /* Table with optimizer steps -  are called in this order */
 static OptFunc OptFuncs [] = {
+    /* Optimizes stores through pointers */
+    { OptPtrStore1,         "OptPtrStore1",             0       },
+    /* Optimize loads through pointers */
+    { OptPtrLoad1,          "OptPtrLoad1",              0       },
+    { OptPtrLoad2,          "OptPtrLoad2",              0       },
     /* Optimize subtractions */
     { OptSub1, 	            "OptSub1", 	       	        0      	},
     { OptSub2, 	            "OptSub2", 	       	        0      	},

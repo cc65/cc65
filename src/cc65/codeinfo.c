@@ -108,7 +108,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "incsp6",		REG_NONE,	REG_Y 	    	},
     { "incsp7",		REG_NONE,	REG_Y 	    	},
     { "incsp8",		REG_NONE,	REG_Y 	    	},
-    { "ldaui",          REG_AX,         REG_AXY         },
+    { "ldaidx",         REG_AXY,        REG_AX          },
     { "ldauidx",        REG_AXY,        REG_AX          },
     { "ldax0sp",   	REG_Y,		REG_AX	    	},
     { "ldaxi",          REG_AX,         REG_AXY         },

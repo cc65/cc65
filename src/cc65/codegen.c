@@ -799,33 +799,18 @@ void g_getind (unsigned flags, unsigned offs)
 
      	case CF_CHAR:
        	    /* Character sized */
-     	    if (offs) {
-     		ldyconst (offs);
-     	        if (flags & CF_UNSIGNED) {
-     	     	    AddCodeLine ("jsr ldauidx");
-       	     	} else {
-     	     	    AddCodeLine ("jsr ldaidx");
-     	     	}
-     	    } else {
-     	        if (flags & CF_UNSIGNED) {
-     		    if (CodeSizeFactor > 330) {
-     			AddCodeLine ("sta ptr1");
-     			AddCodeLine ("stx ptr1+1");
-			AddCodeLine ("ldy #$00");
-     		     	AddCodeLine ("ldx #$00");
-     			AddCodeLine ("lda (ptr1),y");
-     		    } else {
-     	     	        AddCodeLine ("jsr ldaui");
-     		    }
-     	     	} else {
-       	     	    AddCodeLine ("jsr ldai");
-     	     	}
-       	    }
+	    if (flags & CF_UNSIGNED) {
+		ldyconst (offs);
+		AddCodeLine ("jsr ldauidx");
+	    } else {
+		ldyconst (offs);
+		AddCodeLine ("jsr ldaidx");
+	    }
      	    break;
 
      	case CF_INT:
      	    if (flags & CF_TEST) {
-     		ldyconst (offs);
+     	     	ldyconst (offs);
      		AddCodeLine ("sta ptr1");
      		AddCodeLine ("stx ptr1+1");
      		AddCodeLine ("lda (ptr1),y");
@@ -1121,12 +1106,8 @@ void g_putind (unsigned Flags, unsigned Offs)
     switch (Flags & CF_TYPE) {
 
      	case CF_CHAR:
-     	    if (Offs) {
-     	        ldyconst (Offs);
-     	       	AddCodeLine ("jsr staspidx");
-     	    } else {
-     	     	AddCodeLine ("jsr staspp");
-     	    }
+	    ldyconst (Offs);
+    	    AddCodeLine ("jsr staspidx");
      	    break;
 
      	case CF_INT:

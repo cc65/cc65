@@ -75,19 +75,16 @@ _free: 	sta    	ptr2
 ; Is the argument NULL? If so, bail out.
 
 	ora 	ptr2+1 	       	      	; Is the argument NULL?
-       	bne     @L0 	       		; Jump if no
+       	bne     @L1 	       		; Jump if no
         rts                             ; Bail out if yes
 
 ; There's a pointer below the user space that points to the real start of the
-; raw block. The first word of the raw block is the total size of the block.
-; Remember the block size in ptr1.
+; raw block. We will decrement the high pointer byte and use an offset of 254
+; to save some code. The first word of the raw block is the total size of the
+; block. Remember the block size in ptr1.
 
-@L0:    lda	ptr2
-	sub	#2
-	sta	ptr2
-    	bcs	@L1
-    	dec	ptr2+1
-@L1:   	ldy    	#1
+@L1:    dec     ptr2+1                  ; Decrement high pointer byte
+   	ldy    	#$FF
         lda     (ptr2),y                ; High byte of real block address
         tax
         dey

@@ -9,7 +9,10 @@
 	.import	       	popax, return0, _DbgEntry, _set_brk, _end_brk
 	.import	       	_DbgBreaks
 	.import	       	_brk_pc
-	.importzp      	sp, sreg, ptr1, tmp1, zpspace
+        .import         __ZP_START__            ; Linker generated
+
+        .include        "zeropage.inc"
+
 
 ; C callable function, will install the debugger
 
@@ -60,7 +63,7 @@ DbgStack:
 CTemp:
 _DbgCS:	.res	2	  	; sp
 _DbgHI:	.res	2 	  	; sreg
-	.res	22     	  	; Other stuff
+	.res	(zpspace-4) 	; Other stuff
 _DbgSP:	.res	1
 retsav:	.res	2	  	; Save buffer for return address
 
@@ -71,7 +74,7 @@ retsav:	.res	2	  	; Save buffer for return address
 DbgSwapZP:
  	ldy	#zpspace-1
 Swap1: 	ldx	CTemp,y
-       	lda    	sp,y	      	; ######
+       	lda    	<__ZP_START__,y
        	sta	CTemp,y
        	txa
        	sta	sp,y

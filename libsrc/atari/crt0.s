@@ -18,38 +18,9 @@
 	.import		_main,__filetab,getfd
 	.import		__CODE_LOAD__, __BSS_LOAD__
 
+        .include        "zeropage.inc"
 	.include	"atari.inc"
         .include        "_file.inc"
-
-; ------------------------------------------------------------------------
-; Define and export the ZP variables for the runtime
-
-	.exportzp	sp, sreg, regsave
-	.exportzp	ptr1, ptr2, ptr3, ptr4
-	.exportzp	tmp1, tmp2, tmp3, tmp4
-	.exportzp	fntemp, regbank, zpspace
-
-
-.zeropage
-
-zpstart	= *
-sp:	      	.res   	2 	; Stack pointer
-sreg:	      	.res	2	; Secondary register/high 16 bit for longs
-regsave:      	.res	2	; slot to save/restore (E)AX into
-ptr1:	      	.res	2
-ptr2:	      	.res	2
-ptr3:	      	.res	2
-ptr4:	      	.res	2
-tmp1:	      	.res	1
-tmp2:	      	.res	1
-tmp3:	      	.res	1
-tmp4:	      	.res	1
-fntemp:		.res	2	; Pointer to file name
-regbank:      	.res	6	; 6 byte register bank
-
-zpspace	= * - zpstart		; Zero page space allocated
-
-.code
 
 ; ------------------------------------------------------------------------
 ; EXE header
@@ -58,11 +29,11 @@ zpspace	= * - zpstart		; Zero page space allocated
 	.word	$FFFF
 	.word	__CODE_LOAD__
 	.word	__BSS_LOAD__ - 1
-	.code
-	.reloc
 
 ; ------------------------------------------------------------------------
 ; Actual code
+
+.code
 
 	rts	; fix for SpartaDOS / OS/A+
 		; they first call the entry point from AUTOSTRT and

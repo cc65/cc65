@@ -58,6 +58,7 @@ const char* TargetNames [TGT_COUNT] = {
     "c128",
     "ace",
     "plus4",
+    "cbm510",
     "cbm610",
     "pet",
     "bbc",
@@ -100,4 +101,4 @@ target_t FindTarget (const char* Name)
 }
 
 
-
+	     

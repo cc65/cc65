@@ -158,6 +158,10 @@ static void SetSys (const char* Sys)
 	    cbmsys ("__PLUS4__");
 	    break;
 
+	case TGT_CBM510:
+	    cbmsys ("__CBM510__");
+	    break;
+
 	case TGT_CBM610:
 	    cbmsys ("__CBM610__");
 	    break;
@@ -289,7 +293,7 @@ static void OptAnsi (const char* Opt, const char* Arg)
 
 static void OptBssName (const char* Opt, const char* Arg)
 /* Handle the --bss-name option */
-{
+{			   
     /* Check for a valid name */
     CheckSegName (Arg);
 

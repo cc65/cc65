@@ -54,11 +54,15 @@
 #define EM_ERR_INV_DRIVER       3       /* Invalid driver */
 #define EM_ERR_NO_DEVICE        4       /* Device (hardware) not found */
 
-/* Parameters for the em_copy_... functions */
+/* Parameters for the em_copy_... functions. NOTE: The first seven bytes
+ * have the same order and alignment as needed for the Commodore REU, so
+ * don't change the order without changing the assembler file that defines
+ * the struct offsets and the code in the REU driver.
+ */
 struct em_copy {
-    unsigned        page;       /* Starting page to copy from or to */
-    unsigned char   offs;       /* Offset into page */
     void*           buf;        /* Memory buffer to copy from or to */
+    unsigned char   offs;       /* Offset into page */
+    unsigned        page;       /* Starting page to copy from or to */
     unsigned        count;      /* Number of bytes to copy */
     unsigned char   unused;     /* Make the size 8 bytes */
 };
@@ -82,16 +86,16 @@ unsigned em_pagecount (void);
 
 void* __fastcall__ em_map (unsigned page);
 /* Unmap the current page from memory and map a new one. The function returns
- * a pointer to the location of the page in memory.
+ * a pointer to the location of the page in memory. Note: Without calling 
+ * em_commit, the old contents of the memory window may be lost!
  */
 
-void* __fastcall__ em_mapclean (unsigned page);
-/* Unmap the current page from memory and map a new one. The function returns
- * a pointer to the location of the page in memory. This function differs from
- * em_map_page() in that it will discard the contents of the currently mapped
- * page, assuming that the page has not been modified or that the modifications
- * are no longer needed, if this leads to better performance. NOTE: This does
- * NOT mean that the contents of currently mapped page are always discarded!
+void __fastcall__ em_commit (void);
+/* Commit changes in the memory window to extended storage. If the contents
+ * of the memory window have been changed, these changes may be lost if
+ * em_map, em_copyfrom or em_copyto are called without calling em_commit 
+ * first. Note: Not calling em_commit does not mean that the changes are
+ * discarded, it does just mean that some drivers will discard the changes.
  */
 
 void __fastcall__ em_copyfrom (const struct em_copy* copy_data);

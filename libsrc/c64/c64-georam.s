@@ -29,7 +29,7 @@
         .word   DEINSTALL
         .word   PAGECOUNT
         .word   MAP
-        .word   MAPCLEAN
+        .word   COMMIT
 	.word	COPYFROM
         .word   COPYTO
 
@@ -81,8 +81,8 @@ PAGECOUNT:
 
 ; ------------------------------------------------------------------------
 ; MAP: Map the page in a/x into memory and return a pointer to the page in
-; a/x. The contents of the currently mapped page (if any) are assumed to be
-; dirty and must be saved into secondary storage if this is necessary.
+; a/x. The contents of the currently mapped page (if any) may be discarded
+; by the driver.
 ;
 
 MAP:    sta     tmp1
@@ -100,16 +100,13 @@ MAP:    sta     tmp1
 
         lda     #<GR_WINDOW
         ldx     #>GR_WINDOW
-        rts
+
+; Use the RTS from COMMIT below to save a precious byte of storage
 
 ; ------------------------------------------------------------------------
-; MAPCLEAN: Map the page in a/x into memory and return a pointer to the page
-; in a/x. The contents of the currently mapped page (if any) are assumed to
-; be clean, so if this is an advantage for the driver, the current contents
-; may be discarded.
+; COMMIT: Commit changes in the memory window to extended storage.
 
-MAPCLEAN        = MAP           ; Identical for GEORAM
-
+COMMIT: rts
 
 ; ------------------------------------------------------------------------
 ; COPYFROM: Copy from extended into linear memory. A pointer to a structure

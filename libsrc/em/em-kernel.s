@@ -27,7 +27,7 @@ emd_install:   	jmp     $0000
 emd_deinstall: 	jmp     $0000
 emd_pagecount:  jmp     $0000
 emd_map:        jmp     $0000
-emd_mapclean:   jmp     $0000
+emd_commit:     jmp     $0000
 emd_copyfrom:	jmp     $0000
 emd_copyto:     jmp     $0000
 

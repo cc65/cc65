@@ -14,10 +14,10 @@
 C_OBJS =        em_load.o
 
 S_OBJS =       	em-kernel.o	\
+                em_commit.o     \
 		em_copyto.o	\
 		em_copyfrom.o	\
 		em_map.o	\
-		em_mapclean.o 	\
 		em_pagecount.o	\
 		em_unload.o	\
 

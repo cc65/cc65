@@ -53,9 +53,9 @@ EMD_HDR_JUMPCOUNT       = 7                     ; Number of jump vectors
 ;------------------------------------------------------------------------------
 ; Offsets into the em_copy structure
 
-EM_COPY_PAGE            = 0
+EM_COPY_BUF             = 0
 EM_COPY_OFFS            = 2
-EM_COPY_BUF             = 3
+EM_COPY_PAGE            = 3
 EM_COPY_COUNT           = 5
 
 ;------------------------------------------------------------------------------
@@ -70,7 +70,7 @@ EM_COPY_COUNT           = 5
         .global emd_deinstall
         .global emd_pagecount
         .global emd_map
-        .global emd_mapclean
+        .global emd_commit
 	.global	emd_copyfrom
         .global emd_copyto
 
@@ -81,7 +81,7 @@ EM_COPY_COUNT           = 5
 	.global _em_deinstall
 	.global	_em_pagecount
 	.global	_em_map
-	.global	_em_mapclean
+	.global	_em_commit
 	.global _em_copyfrom
 	.global	_em_copyto
 

@@ -16,6 +16,7 @@ C_OBJS =	_afailed.o	\
 		_hextab.o	\
 		_scanf.o	\
 		abort.o		\
+                asctime.o       \
 		bsearch.o	\
 		errormsg.o	\
 		fclose.o	\
@@ -34,7 +35,10 @@ C_OBJS =	_afailed.o	\
 		fwrite.o	\
 		getchar.o	\
 		gets.o		\
+                gmtime.o        \
 		locale.o	\
+                localtime.o     \
+                mktime.o        \
 		perror.o	\
 		putchar.o	\
 		puts.o 		\
@@ -44,6 +48,7 @@ C_OBJS =	_afailed.o	\
 		sscanf.o	\
 		strxfrm.o	\
 		strtok.o	\
+                timezone.o      \
 		vprintf.o       \
                 vsscanf.o
 
@@ -62,6 +67,7 @@ S_OBJS = 	_fdesc.o 	\
 		calloc.o	\
 		copydata.o	\
 		cprintf.o	\
+                ctime.o         \
                 divt.o          \
 		errno.o		\
 		fmisc.o 	\

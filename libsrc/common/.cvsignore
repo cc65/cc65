@@ -4,6 +4,7 @@ _fopen.s
 _hextab.s
 _scanf.s
 abort.s
+asctime.s
 bsearch.s
 errormsg.s
 fclose.s
@@ -22,7 +23,10 @@ ftell.s
 fwrite.s
 getchar.s
 gets.s
+gmtime.s
 locale.s
+localtime.s
+mktime.s
 perror.s
 putchar.s
 puts.s
@@ -30,7 +34,9 @@ qsort.s
 realloc.s
 rewind.s
 sscanf.s
+strftime.s
 strtok.s
 strxfrm.s
+timezone.s
 vprintf.s
 vsscanf.s

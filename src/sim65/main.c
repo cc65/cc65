@@ -48,6 +48,7 @@
 #include "chip.h"
 #include "chiplib.h"
 #include "chippath.h"
+#include "config.h"
 #include "cpucore.h"
 #include "cputype.h"
 #include "error.h"
@@ -154,7 +155,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the assembler version */
 {
     fprintf (stderr,
-       	     "sim65 V%u.%u.%u\n", 
+       	     "sim65 V%u.%u.%u\n",
        	     VER_MAJOR, VER_MINOR, VER_PATCH);
 }
 
@@ -244,7 +245,7 @@ int main (int argc, char* argv[])
     }
 
     /* Read the config file */
-//    CfgRead ();
+    CfgRead ();
 
     /* Initialize modules */
     AddChipPath ("chips");

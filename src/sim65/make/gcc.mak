@@ -13,6 +13,7 @@ LDFLAGS	=
 OBJS = 	chip.o          \
         chiplib.o       \
         chippath.o      \
+        config.o        \
         cpucore.o     	\
 	cputype.o     	\
         error.o         \

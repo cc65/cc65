@@ -65,6 +65,14 @@ struct SymEntry;
 
 /* Node types */
 typedef enum {
+
+    /* Bits encoding the type of the objects stored in List for this
+     * particular node.
+     */
+    NT_LIST_NODE    = 0x0000,	/* Items are expression nodes */
+    NT_LIST_SYM	    = 0x0100,	/* Items are symbol table entries */
+    NT_LIST_STRING  = 0x0200,	/* List item are character strings */
+
     NT_NONE,   	       	       	/* None (invalid) op */
 
     NT_SYM,     	       	/* Symbol */
@@ -147,10 +155,9 @@ struct ExprNode {
     type*  	    		Type;	/* Resulting type */
     int	   			LValue;	/* True if this is an lvalue */
 
-    union {
-       	long	    		I;	/* Constant int value if any */
-       	double	    		F;	/* Constant float value if any */
-    } V;
+    /* Attributes */
+    long       	       	       	IVal;	/* Constant int value if any */
+    double	    		FVal;  	/* Constant float value if any */
 };
 
 

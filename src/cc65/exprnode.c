@@ -52,6 +52,8 @@ ExprNode* InitExprNode (ExprNode* E, nodetype_t NT, type* Type,
     E->NT 	   = NT;
     E->Type	   = Type;
     E->LValue	   = LValue;
+    E->IVal	   = 0;
+    E->FVal	   = 0.0;
 
     /* Initialize the expression list in the node */
     InitCollection (&E->List);

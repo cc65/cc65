@@ -96,6 +96,27 @@ static int IsTypeExpr (void)
 
 
 
+static int GetBoolRep (const ExprNode* N)
+/* Get the boolean representation of a constant expression node */
+{
+    if (IsClassInt (N->Type)) {
+	/* An integer constant */
+	return (N->IVal != 0);
+    } else if (IsClassFloat (N->Type)) {
+	/* A float constant */
+	return (N->FVal != 0.0);
+    } else if (IsTypeArray (N->Type) && IsTypeChar (Indirect (N->Type))) {
+	/* A string constant - useless but allowed */
+	return 1;
+    } else {
+	Internal ("GetBoolRep: Unknown type");
+	/* NOTREACHED */
+	return 0;
+    }
+}
+
+
+
 /*****************************************************************************/
 /*		       Expression node helper functions			     */
 /*****************************************************************************/
@@ -109,7 +130,7 @@ static ExprNode* GetIntNode (int Value)
  */
 {
     ExprNode* N = AllocExprNode (NT_CONST, type_int, RVALUE);
-    N->V.I = Value;
+    N->IVal = Value;
     return N;
 }
 
@@ -151,14 +172,14 @@ ExprNode* DoAsm (void)
     } else {
 
 	/* Insert a copy of the string into the expression node */
-	AppendItem (N, xstrdup (GetLiteral (curval)));
+	AppendItem (N, xstrdup (GetLiteral (CurTok.IVal)));
 
      	/* Reset the string pointer, effectivly clearing the string from the
      	 * string table. Since we're working with one token lookahead, this
      	 * will fail if the next token is also a string token, but that's a
      	 * syntax error anyway, because we expect a right paren.
      	 */
-     	ResetLiteralOffs (curval);
+     	ResetLiteralOffs (CurTok.IVal);
     }
 
     /* Skip the string token */
@@ -193,7 +214,7 @@ static ExprNode* Primary (void)
 
 	/* Create the new node */
 	N = AllocExprNode (NT_CONST, CurTok.Type, RVALUE);
-       	N->V.I = CurTok.IVal;
+       	N->IVal = CurTok.IVal;
 
 	/* Skip the token and return the result */
     	NextToken ();
@@ -205,7 +226,7 @@ static ExprNode* Primary (void)
 
 	/* Create the new node */
 	N = AllocExprNode (NT_CONST, CurTok.Type, RVALUE);
-       	N->V.F = CurTok.FVal;
+       	N->FVal = CurTok.FVal;
 
 	/* Skip the token and return the result */
     	NextToken ();
@@ -313,8 +334,8 @@ static ExprNode* Primary (void)
     } else if (CurTok.Tok == TOK_SCONST) {
 
 	/* String literal */
-	N = AllocExprNode (NT_CONST, GetCharArrayType (strlen (GetLiteral (curval))), RVALUE);
-       	N->V.I = curval;
+	N = AllocExprNode (NT_CONST, GetCharArrayType (strlen (GetLiteral (CurTok.IVal))), RVALUE);
+       	N->IVal = CurTok.IVal;
 
     } else if (CurTok.Tok == TOK_ASM) {
 
@@ -759,10 +780,10 @@ static ExprNode* DoUnaryPlusMinus (void)
 	/* The value is constant, change it according to the insn */
 	if (IsClassInt (Op->Type)) {
 	    /* Integer */
-	    Op->V.I = -Op->V.I;
+	    Op->IVal = -Op->IVal;
 	} else {
 	    /* Float */
-	    Op->V.F = -Op->V.F;
+	    Op->FVal = -Op->FVal;
 	}
 
 	/* Return the operand itself */
@@ -811,7 +832,7 @@ static ExprNode* DoComplement (void)
     if (Op->NT == NT_CONST) {
 
 	/* Change the value and return the operand node */
-	Op->V.I = ~Op->V.I;
+	Op->IVal = ~Op->IVal;
 	return Op;
 
     } else {
@@ -878,7 +899,6 @@ static ExprNode* DoAddress (void)
 
     	/* Return something that is safe later */
     	Root = AllocExprNode (NT_CONST, PointerTo (type_void), 0);
-    	Root->V.I = 0;
     	return Root;
 
     }
@@ -966,7 +986,7 @@ static ExprNode* DoSizeOf (void)
 
     /* Create a constant node with type size_t and return it */
     N = AllocExprNode (NT_CONST, type_size_t, RVALUE);
-    N->V.I = Size;
+    N->IVal = Size;
     return N;
 }
 
@@ -1226,15 +1246,52 @@ static ExprNode* AndExpr (void)
     /* Check if this is for us */
     while (CurTok.Tok == TOK_AND) {
 
-     	switch (CurTok.Tok) {
+	ExprNode* Left = Root;
+	ExprNode* Right;
 
-     	    case TOK_AND:
-		break;
+	/* Skip the token */
+	NextToken ();
 
-     	    default:
-     		Internal ("Unexpected token");
-     	}
+	/* Get the right operand */
+	Right = EqualityExpr ();
 
+	/* Type check */
+	if (!IsClassInt (Left->Type) || !IsClassInt (Right->Type)) {
+
+	    /* Print a diagnostic */
+	    Error (ERR_OP_NOT_ALLOWED);
+
+	    /* Remove the unneeded nodes */
+	    FreeExprNode (Right);
+	    FreeExprNode (Left);
+
+	    /* Create something safe */
+	    Root = GetIntNode (0);
+
+	} else {
+
+	    /* Check if both operands are constant */
+	    if (Left->NT == NT_CONST && Right->NT == NT_CONST) {
+
+		/* Get the constant result */
+		int Result = GetBoolRep (Left) & GetBoolRep (Right);
+
+		/* Remove the unneeded nodes */
+		FreeExprNode (Right);
+		FreeExprNode (Left);
+
+		/* Create a constant result */
+		Root = GetIntNode (Result);
+
+	    } else {
+
+		/* Make an operator node */
+	 	Root = AllocExprNode (NT_AND, type_int, RVALUE);
+	 	SetRightNode (Root, Right);
+	 	SetLeftNode (Root, Left);
+
+	    }
+	}
     }
 
     /* Return the resulting expression */
@@ -1252,15 +1309,52 @@ static ExprNode* XorExpr (void)
     /* Check if this is for us */
     while (CurTok.Tok == TOK_XOR) {
 
-     	switch (CurTok.Tok) {
+	ExprNode* Left = Root;
+	ExprNode* Right;
 
-     	    case TOK_XOR:
-		break;
+	/* Skip the token */
+	NextToken ();
 
-     	    default:
-     		Internal ("Unexpected token");
-     	}
+	/* Get the right operand */
+	Right = AndExpr ();
 
+	/* Type check */
+	if (!IsClassInt (Left->Type) || !IsClassInt (Right->Type)) {
+
+	    /* Print a diagnostic */
+	    Error (ERR_OP_NOT_ALLOWED);
+
+	    /* Remove the unneeded nodes */
+	    FreeExprNode (Right);
+	    FreeExprNode (Left);
+
+	    /* Create something safe */
+	    Root = GetIntNode (0);
+
+	} else {
+
+	    /* Check if both operands are constant */
+	    if (Left->NT == NT_CONST && Right->NT == NT_CONST) {
+
+		/* Get the constant result */
+		int Result = GetBoolRep (Left) ^ GetBoolRep (Right);
+
+		/* Remove the unneeded nodes */
+		FreeExprNode (Right);
+		FreeExprNode (Left);
+
+		/* Create a constant result */
+		Root = GetIntNode (Result);
+
+	    } else {
+
+		/* Make an operator node */
+	 	Root = AllocExprNode (NT_XOR, type_int, RVALUE);
+	 	SetRightNode (Root, Right);
+	 	SetLeftNode (Root, Left);
+
+	    }
+	}
     }
 
     /* Return the resulting expression */
@@ -1278,15 +1372,52 @@ static ExprNode* OrExpr (void)
     /* Check if this is for us */
     while (CurTok.Tok == TOK_OR) {
 
-     	switch (CurTok.Tok) {
+	ExprNode* Left = Root;
+	ExprNode* Right;
 
-     	    case TOK_OR:
-		break;
+	/* Skip the token */
+	NextToken ();
 
-     	    default:
-     		Internal ("Unexpected token");
-     	}
+	/* Get the right operand */
+	Right = XorExpr ();
 
+	/* Type check */
+	if (!IsClassInt (Left->Type) || !IsClassInt (Right->Type)) {
+
+	    /* Print a diagnostic */
+	    Error (ERR_OP_NOT_ALLOWED);
+
+	    /* Remove the unneeded nodes */
+	    FreeExprNode (Right);
+	    FreeExprNode (Left);
+
+	    /* Create something safe */
+	    Root = GetIntNode (0);
+
+	} else {
+
+	    /* Check if both operands are constant */
+	    if (Left->NT == NT_CONST && Right->NT == NT_CONST) {
+
+		/* Get the constant result */
+		int Result = GetBoolRep (Left) | GetBoolRep (Right);
+
+		/* Remove the unneeded nodes */
+		FreeExprNode (Right);
+		FreeExprNode (Left);
+
+		/* Create a constant result */
+		Root = GetIntNode (Result);
+
+	    } else {
+
+		/* Make an operator node */
+	 	Root = AllocExprNode (NT_OR, type_int, RVALUE);
+	 	SetRightNode (Root, Right);
+	 	SetLeftNode (Root, Left);
+
+	    }
+	}
     }
 
     /* Return the resulting expression */
@@ -1304,14 +1435,36 @@ static ExprNode* BoolAndExpr (void)
     /* Check if this is for us */
     while (CurTok.Tok == TOK_BOOL_AND) {
 
-     	switch (CurTok.Tok) {
+	ExprNode* Left = Root;
+	ExprNode* Right;
 
-     	    case TOK_BOOL_AND:
-		break;
+	/* Skip the token */
+	NextToken ();
 
-     	    default:
-     		Internal ("Unexpected token");
-     	}
+	/* Get the right operand */
+	Right = OrExpr ();
+
+	/* Check if both operands are constant */
+	if (Left->NT == NT_CONST && Right->NT == NT_CONST) {
+
+	    /* Get the constant result */
+	    int Result = GetBoolRep (Left) && GetBoolRep (Right);
+
+	    /* Remove the unneeded nodes */
+	    FreeExprNode (Right);
+	    FreeExprNode (Left);
+
+	    /* Create a constant result */
+	    Root = GetIntNode (Result);
+
+	} else {
+
+	    /* Make an operator node */
+	    Root = AllocExprNode (NT_BOOL_AND, type_int, RVALUE);
+	    SetRightNode (Root, Right);
+	    SetLeftNode (Root, Left);
+
+	}
 
     }
 
@@ -1330,14 +1483,36 @@ static ExprNode* BoolOrExpr (void)
     /* Check if this is for us */
     while (CurTok.Tok == TOK_BOOL_OR) {
 
-     	switch (CurTok.Tok) {
+	ExprNode* Left = Root;
+	ExprNode* Right;
 
-     	    case TOK_BOOL_OR:
-		break;
+	/* Skip the token */
+	NextToken ();
 
-     	    default:
-     		Internal ("Unexpected token");
-     	}
+	/* Get the right operand */
+	Right = BoolAndExpr ();
+
+	/* Check if both operands are constant */
+	if (Left->NT == NT_CONST && Right->NT == NT_CONST) {
+
+	    /* Get the constant result */
+	    int Result = GetBoolRep (Left) && GetBoolRep (Right);
+
+	    /* Remove the unneeded nodes */
+	    FreeExprNode (Right);
+	    FreeExprNode (Left);
+
+	    /* Create a constant result */
+	    Root = GetIntNode (Result);
+
+	} else {
+
+	    /* Make an operator node */
+	    Root = AllocExprNode (NT_BOOL_OR, type_int, RVALUE);
+	    SetRightNode (Root, Right);
+	    SetLeftNode (Root, Left);
+
+	}
 
     }
 
@@ -1382,7 +1557,7 @@ static ExprNode* ConditionalExpr (void)
 	AppendItem (Root, Cond);
 	AppendItem (Root, Expr1);
 	AppendItem (Root, Expr2);
-				 
+
 	/* Return the result */
 	return Root;
 

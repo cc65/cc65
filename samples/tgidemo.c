@@ -159,6 +159,24 @@ static void DoDiagram (void)
 }
 
 
+static void DoLines (void)
+{
+    static const unsigned char Palette[2] = { COLOR_WHITE, COLOR_BLACK };
+    unsigned X;
+
+    tgi_setpalette (Palette);
+    tgi_setcolor (1);
+    
+    for	(X = 0; X < 200; X+=10) {
+	tgi_line(0, 0, 200, X);
+	tgi_line(0, 0, X, 200);
+	tgi_line(200, 200, 0, 200-X);
+	tgi_line(200, 200, 200-X, 0);
+    }
+    
+    cgetc ();
+    tgi_clear ();
+}
 
 int main (void)
 {
@@ -184,6 +202,7 @@ int main (void)
     DoCircles ();
     DoCheckerboard ();
     DoDiagram ();
+    DoLines ();
 
     /* Unload the driver */
     tgi_unload ();

@@ -14,6 +14,7 @@
 
 OBJS = 	add.o		\
        	addeqsp.o	\
+	addysp.o	\
        	and.o		\
        	aslax1.o	\
        	aslax2.o	\
@@ -33,6 +34,14 @@ OBJS = 	add.o		\
        	call.o		\
        	compl.o		\
        	dec.o		\
+	decsp1.o	\
+       	decsp2.o	\
+	decsp3.o	\
+	decsp4.o	\
+	decsp5.o	\
+	decsp6.o	\
+	decsp7.o	\
+	decsp8.o	\
        	div.o		\
        	enter.o		\
        	eq.o		\
@@ -40,6 +49,14 @@ OBJS = 	add.o		\
        	gt.o		\
        	icmp.o		\
        	inc.o		\
+	incsp1.o	\
+       	incsp2.o	\
+	incsp3.o	\
+	incsp4.o	\
+	incsp5.o	\
+	incsp6.o	\
+	incsp7.o	\
+	incsp8.o	\
        	ladd.o		\
        	laddeq.o	\
        	laddeqsp.o	\
@@ -84,7 +101,7 @@ OBJS = 	add.o		\
        	lsubeqsp.o	\
        	lswap.o		\
        	lswitch.o	\
-       	lt.o		\
+       	lt.o  		\
        	ltest.o		\
        	ludiv.o		\
        	luge.o		\
@@ -96,15 +113,18 @@ OBJS = 	add.o		\
        	makebool.o	\
        	mod.o		\
        	mul.o		\
-       	ne.o		\
-       	neg.o		\
-       	or.o		\
+       	ne.o  		\
+       	neg.o 		\
+       	or.o  		\
+	popa.o		\
        	popsreg.o	\
        	push.o		\
        	pushb.o		\
        	pushbsp.o	\
        	pushw.o		\
        	pushwsp.o	\
+	return0.o	\
+	return1.o	\
        	rsub.o		\
        	runtime.o	\
        	shelp.o		\
@@ -116,10 +136,13 @@ OBJS = 	add.o		\
        	shreax1.o	\
        	shreax2.o	\
        	shreax3.o	\
+	staspp.o	\
        	staxsp.o	\
+	staxspp.o	\
        	steaxsp.o	\
        	sub.o		\
        	subeqsp.o	\
+	subysp.o	\
        	swap.o		\
        	switch.o	\
        	test.o		\
@@ -136,6 +159,6 @@ OBJS = 	add.o		\
 all:   	$(OBJS)
 
 clean:
-	@rm -f *~ $(COBJS:.o=.s) $(OBJS) $(LOBJS)
+	@rm -f *~ $(COBJS:.o=.s) $(OBJS)
 
 

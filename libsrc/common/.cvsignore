@@ -29,7 +29,6 @@ puts.s
 qsort.s
 realloc.s
 rewind.s
-scanf.s
 sleep.s
 strftime.s
 strtok.s

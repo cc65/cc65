@@ -1,14 +1,19 @@
 ;
 ; int __fastcall__ vfscanf (FILE* f, const char* format, va_list ap);
 ;
-; Ullrich von Bassewitz, 2004-11-27
+; 2004-11-27, Ullrich von Bassewitz
+; 2004-12-21, Greg King
 ;
 
   	.export	      	_vfscanf
-        .import         _fgetc, _ungetc
+        .import         _fgetc, _ungetc, _ferror
 
         .include        "zeropage.inc"
         .include        "_scanf.inc"
+        .include        "stdio.inc"
+
+
+count   :=      ptr3            ; Result of scan
 
 
 ; ----------------------------------------------------------------------------
@@ -25,23 +30,27 @@ d:      .addr   _fgetc          ; GET
 ; int __fastcall__ vfscanf (FILE* f, const char* format, va_list ap)
 ; /* Standard C function */
 ; {
-;     struct scanfdata d;
-;
 ;     /* Initialize the data struct. We do only need the given file as user data,
-;      * since the get and ungetc are crafted so they match the standard fgetc
-;      * and ungetc functions.
+;      * because the (getfunc) and (ungetfunc) functions are crafted so that they
+;      * match the standard-I/O fgetc() and ungetc().
 ;      */
-;     d.get    = (getfunc) fgetc,
-;     d.unget  = (ungetfunc) ungetc,
-;     d.data   = f;
+;     static struct scanfdata d = {
+;         (  getfunc)  fgetc,
+;         (ungetfunc) ungetc
+;     };
+;     static int count;
 ;
-;     /* Call the internal function and return the result */
-;     return _scanf (&d, format, ap);
+;     d.data = (void*) f;
+;
+;     /* Call the internal function */
+;     count = _scanf (&d, format, ap);
+;
+;     /* And, return the result */
+;     return ferror (f) ? EOF : count;
 ; }
 ;
-; Since _scanf has the same parameter stack as vfscanf, with f replaced by &d,
-; we will do exactly that. _scanf will then clean up the stack, so we can jump
-; directly there, no need to return.
+; Because _scanf() has the same parameter stack as vfscanf(), with f replaced
+; by &d, we will do exactly that.  _scanf() then will clean up the stack.
 ; Beware: Since ap is a fastcall parameter, we must not destroy a/x.
 ;
 
@@ -63,8 +72,27 @@ _vfscanf:
         lda     #>d
         sta     (sp),y
 
-; Restore the low byte of ap and jump to the _scanf function
+; Restore the low byte of ap, and call the _scanf function
 
         pla
-        jmp     __scanf
+        jsr     __scanf
+        sta     count
+        stx     count+1
+
+; Return -1 if there was a read error during the scan
+
+        lda     d + SCANFDATA::DATA     ; Get f
+        ldx     d + SCANFDATA::DATA+1
+        jsr     _ferror
+        tay
+        beq     L1
+        lda     #<EOF
+        tax
+        rts
+
+; Or, return the result of the scan
+
+L1:     lda     count
+        ldx     count+1
+        rts
 

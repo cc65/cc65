@@ -1,24 +1,37 @@
 /*
  * _scanf.c
  *
- * (C) Copyright 2001-2002 Ullrich von Bassewitz (uz@cc65.org)
+ * (c) Copyright 2001-2005, Ullrich von Bassewitz <uz@cc65.org>
+ * 2005-01-24, Greg King <gngking@erols.com>
  *
- * This is the basic layer for all scanf type functions. It should get
- * rewritten in assembler at some time in the future, so most of the code
+ * This is the basic layer for all scanf-type functions.  It should be
+ * rewritten in assembly, at some time in the future.  So, some of the code
  * is not as elegant as it could be.
  */
 
 
 
-#include <stdio.h>
-#include <stdarg.h>
 #include <stddef.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <stdio.h>
 #include <string.h>
 #include <setjmp.h>
-#include <ctype.h>
 #include <limits.h>
+#include <errno.h>
+
+#include <ctype.h>
+/* _scanf() can give EOF to these functions.  But, the macroes can't
+** understand it; so, they are removed.
+*/
+#undef isspace
+#undef isxdigit
 
 #include "_scanf.h"
+
+extern void __fastcall__ _seterrno (unsigned char code);
+
+#pragma staticlocals(on)
 
 
 
@@ -28,9 +41,11 @@
 
 
 
-#define RC_OK	      	0	     	/* Regular call */
-#define RC_EOF	      	1	 	/* EOF reached */
-#define RC_NOCONV     	2	 	/* No conversion possible */
+enum {
+    RC_OK,				/* setjmp() call */
+    RC_NOCONV,				/* No conversion possible */
+    RC_EOF				/* EOF reached */
+};
 
 
 
@@ -40,22 +55,25 @@
 
 
 
-static struct scanfdata*  D_;		/* Copy of function argument */
-static va_list 	       	  ap;	 	/* Copy of function argument */
-static jmp_buf 		  JumpBuf; 	/* Label that is used in case of EOF */
-static unsigned           CharCount;    /* Characters read so far */
-static int                C;           	/* Character from input */
-static unsigned		  Width;      	/* Maximum field width */
-static long    	  	  IntVal;	/* Converted int value */
-static unsigned		  Conversions;	/* Number of conversions */
-static unsigned char      IntBytes;     /* Number of bytes-1 for int conversions */
+static const char*    format;		/* Copy of function argument */
+static const struct scanfdata* D_;	/* Copy of function argument */
+static va_list	      ap;	 	/* Copy of function argument */
+static jmp_buf 	      JumpBuf;		/* "Label" that is used for failures */
+static char	      F;  	     	/* Character from format string */
+static unsigned       CharCount;	/* Characters read so far */
+static int    	      C;  	      	/* Character from input */
+static unsigned	      Width;      	/* Maximum field width */
+static long    	      IntVal;		/* Converted int value */
+static int	      Assignments;	/* Number of assignments */
+static unsigned char  IntBytes;		/* Number of bytes-1 for int conversions */
 
 /* Flags */
-static unsigned char   	  Positive;  	/* Flag for positive value */
-static unsigned char   	  NoAssign;	/* Supppress assigment */
-static unsigned char      Invert;       /* Do we need to invert the charset? */
-static unsigned char      CharSet[32];  /* 32 * 8 bits = 256 bits */
-static const unsigned char Bits[8] = {
+static bool	      Converted;	/* Some object was converted */
+static bool	      Positive;		/* Flag for positive value */
+static bool	      NoAssign;		/* Suppress assignment */
+static bool	      Invert;		/* Do we need to invert the charset? */
+static unsigned char  CharSet[(1+UCHAR_MAX)/CHAR_BIT];
+static const unsigned char Bits[CHAR_BIT] = {
     0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
 };
 
@@ -76,42 +94,61 @@ static const unsigned char Bits[8] = {
 
 
 
-static void __fastcall__ AddCharToSet (unsigned char C)
+/* We don't want the optimizer to ruin our "perfect" ;-)
+ * assembly code!
+ */
+#pragma optimize (push, off)
+
+static unsigned FindBit (void)
+/* Locate the character's bit in the charset array.
+ * < .A - Argument character
+ * > .X - Offset of the byte in the character-set mask
+ * > .A - Bit-mask
+ */
+{
+    asm ("pha");
+    asm ("lsr a");		/* Divide by CHAR_BIT */
+    asm ("lsr a");
+    asm ("lsr a");
+    asm ("tax");		/* Byte's offset */
+    asm ("pla");
+    asm ("and #%b", CHAR_BIT-1);
+    asm ("tay");		/* Bit's offset */
+    asm ("lda %v,y", Bits);
+    return (unsigned) __AX__;
+}
+
+#pragma optimize (pop)
+
+
+static void __fastcall__ AddCharToSet (unsigned char /* C */)
 /* Set the given bit in the character set */
 {
-    asm ("ldy #%o", C);
-    asm ("lda (sp),y");
-    asm ("lsr a");
-    asm ("lsr a");
-    asm ("lsr a");
-    asm ("tax");
-    asm ("lda (sp),y");
-    asm ("and #$07");
-    asm ("tay");
-    asm ("lda %v,y", Bits);
+    FindBit();
     asm ("ora %v,x", CharSet);
     asm ("sta %v,x", CharSet);
 }
 
 
 
-static unsigned char __fastcall__ IsCharInSet (unsigned char C)
-/* Check if the given char is part of the character set */
+#pragma optimize (push, off)
+
+static unsigned char IsCharInSet (void)
+/* Check if the char. is part of the character set. */
 {
-    asm ("ldy #%o", C);
-    asm ("lda (sp),y");
-    asm ("lsr a");
-    asm ("lsr a");
-    asm ("lsr a");
-    asm ("tax");
-    asm ("lda (sp),y");
-    asm ("and #$07");
-    asm ("tay");
-    asm ("lda %v,y", Bits);
+    /* Get the character from C. */
+    asm ("lda #$00");
+    asm ("ldx %v+1", C);
+    asm ("bne L1");	   		/* EOF never is in the set */
+    asm ("lda %v", C);
+    FindBit();
     asm ("and %v,x", CharSet);
+    asm ("L1:");
     asm ("ldx #$00");
-    return __AX__;
+    return (unsigned char) __AX__;
 }
+
+#pragma optimize (pop)
 
 
 
@@ -135,10 +172,49 @@ static void InvertCharSet (void)
 
 
 
-static void __fastcall__ Error (unsigned char Code)
-/* Does a longjmp using the given code */
+static void PushBack (void)
+/* Push back the last (unused) character, provided it is not EOF. */
 {
-    longjmp (JumpBuf, Code);
+    /* Get the character from C. */
+    /* Only the high-byte needs to be checked for EOF. */
+    asm ("ldx %v+1", C);
+    asm ("bne %g", Done);
+    asm ("lda %v", C);
+
+    /* Put unget()'s first argument on the stack. */
+    asm ("jsr pushax");
+
+    /* Copy D into the zero-page. */
+    (const struct scanfdata*) __AX__ = D_;
+    asm ("sta ptr1");
+    asm ("stx ptr1+1");
+
+    /* Copy the unget vector to jmpvec. */
+    asm ("ldy #%b", offsetof (struct scanfdata, unget));
+    asm ("lda (ptr1),y");
+    asm ("sta jmpvec+1");
+    asm ("iny");
+    asm ("lda (ptr1),y");
+    asm ("sta jmpvec+2");
+
+    /* Load D->data into __AX__. */
+    asm ("ldy #%b", offsetof (struct scanfdata, data) + 1);
+    asm ("lda (ptr1),y");
+    asm ("tax");
+    asm ("dey");
+    asm ("lda (ptr1),y");
+
+    /* Call the unget routine. */
+    asm ("jsr jmpvec");
+
+    /* Take back that character's count. */
+    asm ("lda %v", CharCount);
+    asm ("bne %g", Yank);
+    asm ("dec %v+1", CharCount);
+Yank:
+    asm ("dec %v", CharCount);
+
+Done:
 }
 
 
@@ -161,7 +237,7 @@ static void ReadChar (void)
     asm ("sta jmpvec+2");
 
     /* Load D->data into __AX__ */
-    asm ("ldy #%b", offsetof (struct scanfdata, data)+1);
+    asm ("ldy #%b", offsetof (struct scanfdata, data) + 1);
     asm ("lda (ptr1),y");
     asm ("tax");
     asm ("dey");
@@ -174,11 +250,11 @@ static void ReadChar (void)
     asm ("sta %v", C);
     asm ("stx %v+1", C);
 
-    /* If C is not EOF, bump the character counter. */
+    /* If C is EOF, don't bump the character counter.
+     * Only the high-byte needs to be checked.
+     */
     asm ("inx");
-    asm ("bne %g", Done);
-    asm ("cmp #$FF");
-    asm ("bne %g", Done);
+    asm ("beq %g", Done);
 
     /* Must bump CharCount. */
     asm ("inc %v", CharCount);
@@ -190,13 +266,32 @@ Done:
 
 
 
-static void ReadCharWithCheck (void)
-/* Get an input char, use longjmp in case of EOF */
+#pragma optimize (push, off)
+
+static void __fastcall__ Error (unsigned char /* Code */)
+/* Does a longjmp using the given code */
 {
-    ReadChar ();
-    if (C == EOF) {
-     	Error (RC_EOF);
-    }
+    asm ("pha");
+    (char*) __AX__ = JumpBuf;
+    asm ("jsr pushax");
+    asm ("pla");
+    asm ("ldx #>0");
+    asm ("jmp %v", longjmp);
+}
+
+#pragma optimize (pop)
+
+
+
+static void CheckEnd (void)
+/* Stop a scan if it prematurely reaches the end of a string or a file. */
+{
+    /* Only the high-byte needs to be checked for EOF. */
+    asm ("ldx %v+1", C);
+    asm ("beq %g", Done);
+
+	Error (RC_EOF);
+Done:
 }
 
 
@@ -204,12 +299,14 @@ static void ReadCharWithCheck (void)
 static void SkipWhite (void)
 /* Skip white space in the input and return the first non white character */
 {
-    while (isspace (C)) {
+    while ((bool) isspace (C)) {
 	ReadChar ();
     }
 }
 
 
+
+#pragma optimize (push, off)
 
 static void ReadSign (void)
 /* Read an optional sign and skip it. Store 1 in Positive if the value is
@@ -224,6 +321,7 @@ static void ReadSign (void)
     asm ("bne %g", NotNeg);
 
     /* Negative value */
+    asm ("sta %v", Converted);
     asm ("jsr %v", ReadChar);
     asm ("lda #$00");           /* Flag as negative */
     asm ("beq %g", Store);
@@ -232,6 +330,7 @@ static void ReadSign (void)
 NotNeg:
     asm ("cmp #'+'");
     asm ("bne %g", Pos);
+    asm ("sta %v", Converted);
     asm ("jsr %v", ReadChar);   /* Skip the + sign */
 Pos:
     asm ("lda #$01");           /* Flag as positive */
@@ -239,35 +338,59 @@ Store:
     asm ("sta %v", Positive);
 }
 
+#pragma optimize (pop)
 
 
-static unsigned char HexVal (char C)
+
+static unsigned char __fastcall__ HexVal (char C)
 /* Convert a digit to a value */
 {
+    return (bool) isdigit (C) ?
+	C - '0' :
+	(char) tolower ((int) C) - ('a' - 10);
+}
 
-    if (isdigit (C)) {
-    	return C - '0';
-    } else {
-	return toupper (C) - ('A' - 10);
+
+
+static void __fastcall__ ReadInt (unsigned char Base)
+/* Read an integer, and store it into IntVal. */
+{
+    unsigned char Val, CharCount = 0;
+
+    /* Read the integer value */
+    IntVal = 0L;
+    while ((bool) isxdigit (C) && ++Width != 0
+	   && (Val = HexVal ((char) C)) < Base) {
+	++CharCount;
+	IntVal = IntVal * (long) Base + (long) Val;
+	ReadChar ();
     }
+
+    /* If we didn't convert anything, it's a failure. */
+    if (CharCount == 0) {
+	Error (RC_NOCONV);
+    }
+
+    /* Another conversion */
+    Converted = true;
 }
 
 
 
 static void AssignInt (void)
 /* Assign the integer value in Val to the next argument. The function makes
- * several non portable assumptions to reduce code size:
- *   - int and unsigned types have the same representation
+ * several non-portable assumptions, to reduce code size:
+ *   - signed and unsigned types have the same representation.
  *   - short and int have the same representation.
  *   - all pointer types have the same representation.
  */
 {
-    if (!NoAssign) {
+    if (NoAssign == false) {
 
         /* Get the next argument pointer */
-        __AX__ = (unsigned) va_arg (ap, void*);
+        (void*) __AX__ = va_arg (ap, void*);
 
-        /* Store the argument pointer into ptr1 */
+        /* Put the argument pointer into the zero-page. */
         asm ("sta ptr1");
         asm ("stx ptr1+1");
 
@@ -280,34 +403,12 @@ Loop:   asm ("lda %v,y", IntVal);
         asm ("dey");
         asm ("bpl %g", Loop);
 
+	/* Another assignment */
+	asm ("inc %v", Assignments);
+	asm ("bne %g", Done);
+	asm ("inc %v+1", Assignments);
+Done:
     }
-}
-
-
-
-static unsigned char ReadInt (unsigned char Base)
-/* Read an integer and store it into IntVal. Returns the number of chars
- * converted. Does NOT bump Conversions.
- */
-{
-    unsigned char Val;
-    unsigned char CharCount = 0;
-
-    /* Read the integer value */
-    IntVal = 0;
-    while (isxdigit (C) && Width-- > 0 && (Val = HexVal (C)) < Base) {
-        ++CharCount;
-       	IntVal = IntVal * Base + Val;
-     	ReadChar ();
-    }
-
-    /* If we didn't convert anything, it's an error */
-    if (CharCount == 0) {
-     	Error (RC_NOCONV);
-    }
-
-    /* Return the number of characters converted */
-    return CharCount;
 }
 
 
@@ -331,10 +432,17 @@ static void __fastcall__ ScanInt (unsigned char Base)
                 case 'x':
                 case 'X':
                     Base = 16;
+	    	    Converted = true;
                     ReadChar ();
                     break;
                 default:
                     Base = 8;
+
+		    /* Restart at the beginning of the number because it might
+		     * be only a single zero digit (which already was read).
+		     */
+		    PushBack ();
+		    C = '0';
             }
         } else {
             Base = 10;
@@ -345,65 +453,73 @@ static void __fastcall__ ScanInt (unsigned char Base)
     ReadInt (Base);
 
     /* Apply the sign */
-    if (!Positive) {
+    if (Positive == false) {
         IntVal = -IntVal;
     }
 
     /* Assign the value to the next argument unless suppressed */
     AssignInt ();
-
-    /* One more conversion */
-    ++Conversions;
 }
 
 
 
-int __fastcall__ _scanf (register struct scanfdata* D,
-                         register const char* format, va_list ap_)
+static char GetFormat (void)
+/* Pick up the next character from the format string. */
+{
+/*  return (F = *format++); */
+    (const char*) __AX__ = format;
+    asm ("sta regsave");
+    asm ("stx regsave+1");
+    ++format;
+    asm ("ldy #0");
+    asm ("lda (regsave),y");
+    asm ("ldx #>0");
+    return (F = (char) __AX__);
+}
+
+
+
+int __fastcall__ _scanf (const struct scanfdata* D,
+	    		 const char* format_, va_list ap_)
 /* This is the routine used to do the actual work. It is called from several
  * types of wrappers to implement the actual ISO xxscanf functions.
  */
 {
-    register char F;   	     	/* Character from format string */
-    unsigned char Result;    	/* setjmp result */
-    char*  	  S;
-    unsigned char HaveWidth;	/* True if a width was given */
-    char          Start;        /* Start of range */
+    register char* S;
+             bool  HaveWidth;   /* True if a width was given */
+             bool  Match;      	/* True if a character-set has any matches */
+             char  Start;       /* Walks over a range */
 
     /* Place copies of the arguments into global variables. This is not very
      * nice, but on a 6502 platform it gives better code, since the values
      * do not have to be passed as parameters.
      */
-    D_ 	= D;
-    ap	= ap_;
+    D_	   = D;
+    format = format_;
+    ap	   = ap_;
 
     /* Initialize variables */
-    Conversions = 0;
+    Converted   = false;
+    Assignments = 0;
     CharCount   = 0;
 
-    /* Set up the jump label. The get() routine will use this label when EOF
-     * is reached.
+    /* Set up the jump "label".  CheckEnd() will use that label when EOF
+     * is reached.  ReadInt() will use it when number-conversion fails.
      */
-    Result = setjmp (JumpBuf);
-    if (Result == RC_OK) {
-
+    if ((unsigned char) setjmp (JumpBuf) == RC_OK) {
 Again:
+
        	/* Get the next input character */
      	ReadChar ();
 
 	/* Walk over the format string */
-      	while (F = *format++) {
+      	while (GetFormat ()) {
 
 	    /* Check for a conversion */
-       	    if (F != '%' || *format == '%') {
-
-	    	/* %% or any char other than % */
-	    	if (F == '%') {
-	    	    ++format;
-    	    	}
+	    if (F != '%') {
 
 	    	/* Check for a match */
-	    	if (isspace (F)) {
+	    	if ((bool) isspace ((int) F)) {
 
 	    	    /* Special white space handling: Any whitespace in the
                      * format string matches any amount of whitespace including
@@ -411,46 +527,63 @@ Again:
 	    	     */
 	    	    SkipWhite ();
 	    	    continue;
-
-	    	} else if (F == C) {
-
-	    	    /* A match. Read the next input character and start over */
-	    	    goto Again;
-
-    	    	} else {
-
-	    	    /* A mismatch. We will stop scanning the input and return
-	    	     * the number of conversions.
-	    	     */
-	    	    return Conversions;
-
 	    	}
+
+Percent:
+		/* ### Note:  The opposite test (C == F)
+		** would be optimized into buggy code!
+		*/
+		if (C != (int) F) {
+
+		    /* A mismatch -- we will stop scanning the input,
+		     * and return the number of assigned conversions.
+		     */
+		    goto NoConv;
+    	    	}
+
+		/* A match -- get the next input character, and continue. */
+		goto Again;
 
 	    } else {
 
 	    	/* A conversion. Skip the percent sign. */
-	    	F = *format++;
+	    	/* 0. Check for %% */
+	    	if (GetFormat () == '%') {
+	    	    goto Percent;
+    	    	}
 
       	    	/* 1. Assignment suppression */
-                if (F == '*') {
-                    F = *format++;
-                    NoAssign = 1;
-                } else {
-                    NoAssign = 0;
+		NoAssign = (F == '*');
+		if (NoAssign) {
+		    GetFormat ();
                 }
 
                 /* 2. Maximum field width */
        	       	Width  	  = UINT_MAX;
-	    	HaveWidth = 0;
-                if (isdigit (F)) {
-                    HaveWidth = 1;
-                    Width     = 0;
+		HaveWidth = (bool) isdigit (F);
+		if (HaveWidth) {
+		    Width = 0;
                     do {
                         /* ### Non portable ### */
                         Width = Width * 10 + (F & 0x0F);
-                        F = *format++;
-                    } while (isdigit (F));
+		    } while ((bool) isdigit (GetFormat ()));
                 }
+		if (Width == 0) {
+		    /* Invalid specification */
+		    /* Note:  This method of leaving the function might seem
+		     * to be crude, but it optimizes very well because
+		     * the four exits can share this code.
+		     */
+		    _seterrno (EINVAL);
+		    Assignments = EOF;
+		    PushBack ();
+		    return Assignments;
+		}
+		/* Increment-and-test makes better code than test-and-decrement
+		 * does.  So, change the width into a form that can be used in
+		 * that way.
+		 */
+		Width = ~Width;
 
                 /* 3. Length modifier */
                 IntBytes = sizeof(int) - 1;
@@ -460,7 +593,7 @@ Again:
                             IntBytes = sizeof(char) - 1;
                             ++format;
                         }
-                        F = *format++;
+		   	GetFormat ();
                         break;
 
                     case 'l':
@@ -471,21 +604,20 @@ Again:
                         /* FALLTHROUGH */
                     case 'j':   /* intmax_t */
                         IntBytes = sizeof(long) - 1;
-                        F = *format++;
-                        break;
+		   	/* FALLTHROUGH */
 
                     case 'z':   /* size_t */
                     case 't':   /* ptrdiff_t */
+		   	/* Same size as int */
+
                     case 'L':   /* long double - ignore this one */
-                        F = *format++;
-                        break;
+		   	GetFormat ();
                 }
 
                 /* 4. Conversion specifier */
     		switch (F) {
-
                     /* 'd' and 'u' conversions are actually the same, since the
-                     * standard says that evene the 'u' modifier allows an
+                     * standard says that even the 'u' modifier allows an
                      * optionally signed integer.
                      */
     	      	    case 'd':   /* Optionally signed decimal integer */
@@ -507,100 +639,115 @@ Again:
 	      	    case 'X':
 	      	 	/* Optionally signed hexadecimal integer */
       	      	    	ScanInt (16);
-	      		break;
-
-	      	    case 'E':
-	      	    case 'e':
-    	      	    case 'f':
-	      	    case 'g':
-	      		/* Optionally signed float */
-		  	Error (RC_NOCONV);
-	      		break;
+	      	   	break;
 
 	      	    case 's':
-	      	   	/* Whitespace terminated string */
+	      	   	/* Whitespace-terminated string */
 		      	SkipWhite ();
-	    		if (!NoAssign) {
-			    S = va_arg (ap, char*);
+		   	CheckEnd ();	   /* Is it an input failure? */
+                        Converted = true;  /* No, conversion will succeed */
+		   	if (NoAssign == false) {
+		   	    S = va_arg (ap, char*);
 		   	}
-       	       	       	while (!isspace (C) && Width--) {
-			    if (!NoAssign) {
-			       	*S++ = C;
-			    }
-	    		    ReadChar ();
-			}
-			/* Terminate the string just read */
-			if (!NoAssign) {
-		  	    *S = '\0';
-    		  	}
-                        ++Conversions;
-    		  	break;
+       	       	       	while (C != EOF
+		   	       && (bool) isspace (C) == false
+		   	       && ++Width) {
+		   	    if (NoAssign == false) {
+		   	       	*S++ = C;
+		   	    }
+	    	   	    ReadChar ();
+		   	}
+		   	/* Terminate the string just read */
+		   	if (NoAssign == false) {
+		   	    *S = '\0';
+		   	    ++Assignments;
+    		   	}
+    		   	break;
 
 		    case 'c':
-		  	/* Fixed length string, NOT zero terminated */
-		  	if (!HaveWidth) {
-		  	    /* No width given, default is 1 */
-		  	    Width = 1;
-		  	}
-		  	if (!NoAssign) {
-		  	    S = va_arg (ap, char*);
-                            while (Width--) {
+		   	/* Fixed-length string, NOT zero-terminated */
+		   	if (HaveWidth == false) {
+		   	    /* No width given, default is 1 */
+		   	    Width = ~1u;
+		   	}
+		   	CheckEnd ();	   /* Is it an input failure? */
+		   	Converted = true;  /* No, at least 1 char. available */
+		   	if (NoAssign == false) {
+		   	    S = va_arg (ap, char*);
+		   	    /* ## This loop is convenient for us, but it isn't
+		   	     * standard C.  The standard implies that a failure
+		   	     * shouldn't put anything into the array argument.
+		   	     */
+                            while (++Width) {
+		   		CheckEnd ();  /* Is it a matching failure? */
                                 *S++ = C;
-                                ReadCharWithCheck ();
+                                ReadChar ();
                             }
-		  	} else {
+		   	    ++Assignments;
+		   	} else {
                             /* Just skip as many chars as given */
-                            while (Width--) {
-                                ReadCharWithCheck ();
+                            while (++Width) {
+		   		CheckEnd ();  /* Is it a matching failure? */
+                                ReadChar ();
                             }
                         }
-		  	++Conversions;
 		   	break;
 
 		    case '[':
-		  	/* String using characters from a set */
-                        Invert = 0;
+		   	/* String using characters from a set */
                         /* Clear the set */
                         memset (CharSet, 0, sizeof (CharSet));
-                        F = *format++;
-                        if (F == '^') {
-                            Invert = 1;
-                            F = *format++;
+		   	/* Skip the left-bracket, and test for inversion. */
+		   	Invert = (GetFormat () == '^');
+                        if (Invert) {
+                            GetFormat ();
                         }
                         if (F == ']') {
-                            AddCharToSet (']');
-                            F = *format++;
+		   	    /* Empty sets aren't allowed; so, a right-bracket
+		   	     * at the beginning must be a member of the set.
+		   	     */
+                            AddCharToSet (F);
+                            GetFormat ();
                         }
                         /* Read the characters that are part of the set */
-                        while (F != ']' && F != '\0') {
-                            if (*format == '-') {
+                        while (F != '\0' && F != ']') {
+                            if (*format == '-') {  /* Look ahead at next char. */
                                 /* A range. Get start and end, skip the '-' */
                                 Start = F;
-                                F = *++format;
                                 ++format;
-                                if (F == ']') {
-                                    /* '-' as last char means: include '-' */
-                                    AddCharToSet (Start);
-                                    AddCharToSet ('-');
-                                } else if (F != '\0') {
-                                    /* Include all chars in the range */
-                                    while (1) {
+                                switch (GetFormat ()) {
+				    case '\0':
+				    case ']':
+                                        /* '-' as last char means:  include '-' */
                                         AddCharToSet (Start);
-                                        if (Start == F) {
-                                            break;
+                                        AddCharToSet ('-');
+					break;
+				    default:
+                                        /* Include all characters
+					 * that are in the range.
+					 */
+                                        while (1) {
+                                            AddCharToSet (Start);
+                                            if (Start == F) {
+                                                break;
+                                            }
+                                            ++Start;
                                         }
-                                        ++Start;
-                                    }
-                                    /* Get next char after range */
-                                    F = *format++;
+                                        /* Get next char after range */
+                                        GetFormat ();
                                 }
                             } else {
                                 /* Just a character */
                                 AddCharToSet (F);
                                 /* Get next char */
-                                F = *format++;
+                                GetFormat ();
                             }
                         }
+			/* Don't go beyond the end of the format string. */
+			/* (Maybe, this should mean an invalid specification.) */
+			if (F == '\0') {
+			    --format;
+			}
 
                         /* Invert the set if requested */
                         if (Invert) {
@@ -611,76 +758,110 @@ Again:
                          * store them into a string while they are part of
                          * the set.
                          */
-			if (!NoAssign) {
-			    S = va_arg (ap, char*);
-                            while (IsCharInSet (C) && Width--) {
+			Match = false;
+			if (NoAssign == false) {
+		   	    S = va_arg (ap, char*);
+			}
+                        while (IsCharInSet () && ++Width) {
+		   	    if (NoAssign == false) {
                                 *S++ = C;
-                                ReadChar ();
-                            }
-                            *S = '\0';
-                        } else {
-                            while (IsCharInSet (C) && Width--) {
-                                ReadChar ();
-                            }
+			    }
+			    Match = Converted = true;
+			    ReadChar ();
                         }
-                        ++Conversions;
+			/* At least one character must match the set. */
+			if (Match == false) {
+			    goto NoConv;
+			}
+			if (NoAssign == false) {
+                            *S = '\0';
+			    ++Assignments;
+			}
 		   	break;
 
      		    case 'p':
-     	    		/* Pointer, format is 0xABCD */
+     	    		/* Pointer, general format is 0xABCD.
+			 * %hhp --> zero-page pointer
+			 * %hp --> near pointer
+			 * %lp --> far pointer
+		   	 */
 		   	SkipWhite ();
 			if (CHAR (C) != '0') {
-                            Error (RC_NOCONV);
+		   	    goto NoConv;
                         }
+			Converted = true;
 			ReadChar ();
-                        if (CHAR (C) != 'x' && CHAR (C) != 'X') {
-                            Error (RC_NOCONV);
-                        }
+			switch (CHAR (C)) {
+			    case 'x':
+			    case 'X':
+				break;
+			    default:
+				goto NoConv;
+			}
                         ReadChar ();
-                        if (ReadInt (16) != 4) { /* 4 chars expected */
-                            Error (RC_NOCONV);
-                        }
+                        ReadInt (16);
 			AssignInt ();
-                        ++Conversions;
      			break;
 
      		    case 'n':
-     			/* Store characters consumed so far */
-			IntVal = CharCount;
-			AssignInt ();
+     			/* Store the number of characters consumed so far
+			 * (the read-ahead character hasn't been consumed).
+			 */
+			IntVal = (long) (CharCount - (C == EOF ? 0u : 1u));
+		   	AssignInt ();
+			/* Don't count it. */
+			if (NoAssign == false) {
+		   	    --Assignments;
+			}
 			break;
+
+	      	    case 'S':
+	      	    case 'C':
+			/* Wide characters */
+
+	      	    case 'a':
+	      	    case 'A':
+	      	    case 'e':
+	      	    case 'E':
+    	      	    case 'f':
+	      	    case 'F':
+	      	    case 'g':
+	      	    case 'G':
+	      		/* Optionally signed float */
+
+			/* Those 2 groups aren't implemented. */
+			_seterrno (ENOSYS);
+			Assignments = EOF;
+		   	PushBack ();
+		   	return Assignments;
 
 		    default:
-			/* Invalid conversion */
-			Error (RC_NOCONV);
-			break;
-
+			/* Invalid specification */
+			_seterrno (EINVAL);
+			Assignments = EOF;
+			PushBack ();
+			return Assignments;
 		}
 	    }
-        }
-
-        /* Push back the last unused character, provided it is not EOF */
-        if (C != EOF) {
-            D->unget (C, D->data);
-        }
-
-    } else {
-
-	/* Jump via JumpBuf means an error. If this happens at EOF with no
-         * conversions, it is considered an error, otherwise the number
-         * of conversions is returned (the default behaviour).
-         */
-       	if (C == EOF && CharCount == 0) {
-	    /* Special case: error */
-     	    Conversions = EOF;
      	}
+    } else {
+NoConv:
 
+	/* Coming here means a failure. If that happens at EOF, with no
+         * conversion attempts, then it is considered an error; otherwise,
+	 * the number of assignments is returned (the default behaviour).
+         */
+	if (C == EOF && Converted == false) {
+	    Assignments = EOF;	/* Special case:  error */
+	}
     }
 
-    /* Return the number of conversions */
-    return Conversions;
-}
+    /* Put the read-ahead character back into the input stream. */
+    PushBack ();
 
+    /* Return the number of conversion-and-assignments. */
+    return Assignments;
+}
 
 
 

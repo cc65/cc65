@@ -2,10 +2,12 @@
 ; int __fastcall__ vsscanf (const char* str, const char* format, va_list ap);
 ; /* Standard C function */
 ;
-; Ullrich von Bassewitz, 2004-11-28
+; 2004-11-28, Ullrich von Bassewitz
+; 2004-12-21, Greg King
 ;
 
 	.export	      	_vsscanf
+
 	.import		popax, __scanf
 	.importzp	sp, ptr1, ptr2
 
@@ -25,14 +27,13 @@
 ; static int __fastcall__ get (struct sscanfdata* d)
 ; /* Read a character from the input string and return it */
 ; {
-;     char C;
-;     if (C = d->str[d->index]) {
-;     	/* Increment index only if end not reached */
-;        	++d->index;
-;         return C;
-;     } else {
+;     char C = d->str[d->index];
+;     if (C == '\0') {
 ;         return EOF;
 ;     }
+;     /* Increment index only if end not reached */
+;     ++d->index;
+;     return C;
 ; }
 ;
 
@@ -73,17 +74,17 @@
 L1:     tax                             ; Save return value
         tya                             ; Low byte of index
         ldy     #SSCANFDATA::INDEX
-        add     #1
+        add     #<1
         sta     (ptr1),y
         iny
         lda     (ptr1),y
-        adc     #$00
+        adc     #>1
         sta     (ptr1),y
 
 ; Return the char just read
 
         txa
-        ldx     #$00
+        ldx     #>0
         rts
 
 .endproc
@@ -110,11 +111,11 @@ L1:     tax                             ; Save return value
 
         ldy     #SSCANFDATA::INDEX
         lda     (ptr1),y
-        sub     #1
+        sub     #<1
         sta     (ptr1),y
         iny
         lda     (ptr1),y
-        sbc     #0
+        sbc     #>1
         sta     (ptr1),y
 
 ; Return c
@@ -127,15 +128,16 @@ L1:     tax                             ; Save return value
 ; int __fastcall__ vsscanf (const char* str, const char* format, va_list ap)
 ; /* Standard C function */
 ; {
-;     struct sscanfdata sd;
-;     struct scanfdata d;
-;
 ;     /* Initialize the data structs. The sscanfdata struct will be passed back
-;      * to the get and unget functions by _scanf.
+;      * to the get and unget functions by _scanf().
 ;      */
-;     d.get    = (getfunc) get;
-;     d.unget  = (ungetfunc) unget,
-;     d.data   = &sd;
+;     static       struct sscanfdata sd;
+;     static const struct  scanfdata  d = {
+;         (  getfunc)   get,
+;         (ungetfunc) unget,
+;         (void*) &sd
+;     };
+;
 ;     sd.str   = str;
 ;     sd.index = 0;
 ;
@@ -144,10 +146,10 @@ L1:     tax                             ; Save return value
 ; }
 ;
 
-.data
-
+.bss
 sd:     .tag    SSCANFDATA
 
+.rodata
 d:      .addr   get
         .addr   unget
         .addr   sd
@@ -177,11 +179,10 @@ d:      .addr   get
         sta     sd + SSCANFDATA::INDEX
         sta     sd + SSCANFDATA::INDEX+1
 
-; Restore the low byte of ap and jump to _scanf which will cleanup the stacl
+; Restore the low byte of ap, and jump to _scanf() which will clean up the stack
 
         pla
         jmp     __scanf
 
 .endproc
-
 

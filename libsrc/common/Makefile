@@ -1,5 +1,6 @@
+# -*- makefile -*-
 #
-# makefile for CC65 runtime library
+# makefile for CC65's common library
 #
 
 .SUFFIXES: .o .s .c
@@ -27,8 +28,18 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
 #--------------------------------------------------------------------------
+# Rules to help us see what code the compiler and assembler make.
+
+%.s :	%.c
+	@$(CC) $(CFLAGS) -S $<
+
+%.lst :	%.s
+	@$(AS) $(AFLAGS) -l -o /dev/null $<
+
+#--------------------------------------------------------------------------
 # Object files
 
+# From C source-files
 C_OBJS =	_afailed.o	        \
                 _aligned_malloc.o       \
 		_hextab.o	        \
@@ -59,7 +70,6 @@ C_OBJS =	_afailed.o	        \
 		qsort.o		        \
 		realloc.o	        \
 		rewind.o	        \
-                scanf.o                 \
 		sleep.o		        \
                 strftime.o              \
 		strxfrm.o	        \
@@ -67,7 +77,7 @@ C_OBJS =	_afailed.o	        \
                 system.o                \
                 timezone.o
 
-
+# From assembly source-files
 S_OBJS = 	_cwd.o          \
                 _fdesc.o 	\
 	 	_file.o  	\
@@ -134,6 +144,7 @@ S_OBJS = 	_cwd.o          \
                 raise.o         \
                 remove.o        \
                 rename.o        \
+                scanf.o         \
 	 	setjmp.o      	\
                 signal.o        \
                 sigtable.o      \
@@ -183,10 +194,10 @@ S_OBJS = 	_cwd.o          \
 all:  	$(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f *~
-	@rm -f $(C_OBJS:.o=.s)
-	@rm -f $(C_OBJS)
-	@rm -f $(S_OBJS)
+	@$(RM) *~ *.lst
+	@$(RM) $(C_OBJS:.o=.s)
+	@$(RM) $(C_OBJS)
+	@$(RM) $(S_OBJS)
 
 zap:	clean
 

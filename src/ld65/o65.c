@@ -130,7 +130,7 @@ struct O65RelocTab {
 
 /* Structure describing the format */
 struct O65Desc {
-    O65Header 	    Header; 		/* File header */
+    O65Header 	    Header; 	 	/* File header */
     O65Option*	    Options;		/* List of file options */
     ExtSymTab*	    Exports;		/* Table with exported symbols */
     ExtSymTab*	    Imports;		/* Table with imported symbols */
@@ -168,18 +168,31 @@ struct ExprDesc {
 
 
 /*****************************************************************************/
-/*  	       	    	       Helper functions				     */
+/*  	       	    	       Helper functions	     			     */
 /*****************************************************************************/
+
+
+
+static ExprDesc* InitExprDesc (ExprDesc* ED, O65Desc* D)
+/* Initialize an ExprDesc structure for use with O65ParseExpr */
+{
+    ED->D    	   = D;
+    ED->Val  	   = 0;
+    ED->TooComplex = 0;
+    ED->SegRef     = 0;
+    ED->ExtRef     = 0;
+    return ED;
+}
 
 
 
 static void WriteSize (const O65Desc* D, unsigned long Val)
 /* Write a "size" word to the file */
 {
-    if (D->Header.Mode & MF_SIZE_32BIT) {
-    	Write32 (D->F, Val);
-    } else {
-    	Write16 (D->F, (unsigned) Val);
+    switch (D->Header.Mode & MF_SIZE_MASK) {
+	case MF_SIZE_16BIT:     Write16 (D->F, (unsigned) Val); break;
+	case MF_SIZE_32BIT:     Write32 (D->F, Val);            break;
+    	default:                Internal ("Invalid size in header: %04X", D->Header.Mode);
     }
 }
 
@@ -297,7 +310,7 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
     		}
     	    } else {
     		MarkExport (E);
-    	    	O65ParseExpr (E->Expr, D, Sign);
+    	      	O65ParseExpr (E->Expr, D, Sign);
     		UnmarkExport (E);
     	    }
     	    break;
@@ -437,7 +450,7 @@ static void FreeO65Option (O65Option* O)
 
 
 /*****************************************************************************/
-/*	       	       Subroutines to write o65 sections		     */
+/*	       	       Subroutines to write o65 sections	       	     */
 /*****************************************************************************/
 
 
@@ -529,15 +542,8 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
        	Expr = E->Left;
     }
 
-    /* Initialize the descriptor for expression parsing */
-    ED.D    	  = D;
-    ED.Val  	  = 0;
-    ED.TooComplex = 0;
-    ED.SegRef     = 0;
-    ED.ExtRef     = 0;
-
     /* Recursively collect information about this expression */
-    O65ParseExpr (Expr, &ED, 1);
+    O65ParseExpr (Expr, InitExprDesc (&ED, D), 1);
 
     /* We cannot handle both, an imported symbol and a segment ref */
     if (ED.SegRef != 0 && ED.ExtRef != 0) {
@@ -749,20 +755,20 @@ static void O65WriteZPSeg (O65Desc* D, Memory* M attribute ((unused)))
 static void O65WriteImports (O65Desc* D)
 /* Write the list of imported symbols to the O65 file */
 {
-    const ExtSym* E;
+    const ExtSym* S;
 
-    /* Write the number of external symbols */
+    /* Write the number of imports */
     WriteSize (D, ExtSymCount (D->Imports));
 
     /* Write out the symbol names, zero terminated */
-    E = ExtSymList (D->Imports);
-    while (E) {
-	/* Get the name */
-	const char* Name = ExtSymName (E);
-	/* And write it to the output file */
-	WriteData (D->F, Name, strlen (Name) + 1);
-	/* Next symbol */
-	E = ExtSymNext (E);
+    S = ExtSymList (D->Imports);
+    while (S) {
+     	/* Get the name */
+     	const char* Name = ExtSymName (S);
+     	/* And write it to the output file */
+     	WriteData (D->F, Name, strlen (Name) + 1);
+     	/* Next symbol */
+     	S = ExtSymNext (S);
     }
 }
 
@@ -787,10 +793,75 @@ static void O65WriteDataReloc (O65Desc* D)
 static void O65WriteExports (O65Desc* D)
 /* Write the list of exports */
 {
-    /* Since ld65 creates exectutables, not object files, we do not have
-     * exports. This may change if we support writing shared libraries...
-     */
-    WriteSize (D, 0);
+    const ExtSym* S;
+
+    /* Write the number of exports */
+    WriteSize (D, ExtSymCount (D->Exports));
+
+    /* Write out the symbol information */
+    S = ExtSymList (D->Exports);
+    while (S) {
+
+	ExprNode* Expr;
+	unsigned char SegmentID;
+	ExprDesc ED;
+
+	/* Get the name */
+	const char* Name = ExtSymName (S);
+
+	/* Get the export for this symbol. We've checked before that this
+	 * export does really exist, so if it is unresolved, or if we don't
+	 * find it, there is an error in the linker code.
+	 */
+	Export*	E = FindExport (Name);
+	if (E == 0 || IsUnresolvedExport (E)) {
+	    Internal ("Unresolved export `%s' found in O65WriteExports", Name);
+	}
+
+	/* Get the expression for the symbol */
+	Expr = E->Expr;
+
+	/* Recursively collect information about this expression */
+	O65ParseExpr (Expr, InitExprDesc (&ED, D), 1);
+
+       	/* We cannot handle expressions with imported symbols here */
+	if (ED.ExtRef != 0) {
+	    ED.TooComplex = 1;
+	}
+
+	/* Bail out if we cannot handle the expression */
+	if (ED.TooComplex) {
+	    Error ("Expression for symbol `%s' is too complex", Name);
+	}
+
+	/* Determine the segment id for the expression */
+	if (ED.SegRef == 0) {
+	    /* Absolute value */
+	    SegmentID = O65SEG_ABS;
+	} else {
+	    /* Segment reference. Search for the segment and map it to it's
+	     * o65 segmentID
+	     */
+	    const SegDesc* Seg = O65FindSeg (D, ED.SegRef->Seg);
+	    if (Seg == 0) {
+		/* For some reason, we didn't find this segment in the list of
+		 * segments written to the o65 file.
+		 */
+		Error ("Segment for symbol `%s' is undefined", Name);
+	    }
+	    SegmentID = O65SegType (Seg);
+	}
+
+	/* Write the name to the output file */
+	WriteData (D->F, Name, strlen (Name) + 1);
+
+	/* Output the segment id followed by the literal value */
+       	Write8 (D->F, SegmentID);
+	WriteSize (D, ED.Val);
+
+	/* Next symbol */
+	S = ExtSymNext (S);
+    }
 }
 
 
@@ -992,6 +1063,14 @@ ExtSym* O65GetExport (O65Desc* D, const char* Ident)
 void O65SetExport (O65Desc* D, const char* Ident)
 /* Set an exported identifier */
 {
+    /* Get the export for this symbol and check if it does exist and is
+     * a resolved symbol.
+     */
+    Export* E = FindExport (Ident);
+    if (E == 0 || IsUnresolvedExport (E)) {
+	Error ("Unresolved export: `%s'", Ident);
+    }
+
     /* Insert the entry into the table */
     NewExtSym (D->Exports, Ident);
 }

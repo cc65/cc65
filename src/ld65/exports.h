@@ -126,10 +126,18 @@ Export* CreateMemExport (const char* Name, Memory* Mem, unsigned long Offs);
 Export* CreateSegExport (const char* Name, Section* S, unsigned long Offs);
 /* Create a relative export to a segment (section) */
 
+Export* FindExport (const char* Name);
+/* Check for an identifier in the list. Return 0 if not found, otherwise
+ * return a pointer to the export.
+ */
+
 int IsUnresolved (const char* Name);
 /* Check if this symbol is an unresolved export */
 
-int IsConstExport (const Export* E);
+int IsUnresolvedExport (const Export* E);
+/* Return true if the given export is unresolved */
+
+int IsConstExport (const Export* E);  
 /* Return true if the expression associated with this export is const */
 
 long GetExportVal (const Export* E);

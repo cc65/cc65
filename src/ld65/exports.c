@@ -400,9 +400,9 @@ Export* CreateSegExport (const char* Name, Section* Sec, unsigned long Offs)
 
 
 
-static Export* FindExport (const char* Name)
+Export* FindExport (const char* Name)
 /* Check for an identifier in the list. Return 0 if not found, otherwise
- * return a pointer to the export.			 
+ * return a pointer to the export.
  */
 {
     /* Get a pointer to the list with the symbols hash value */
@@ -426,8 +426,14 @@ int IsUnresolved (const char* Name)
 /* Check if this symbol is an unresolved export */
 {
     /* Find the export */
-    Export* E = FindExport (Name);
+    return IsUnresolvedExport (FindExport (Name));
+}
 
+
+
+int IsUnresolvedExport (const Export* E)
+/* Return true if the given export is unresolved */
+{
     /* Check if it's unresolved */
     return E != 0 && E->Expr == 0;
 }

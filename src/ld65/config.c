@@ -833,6 +833,10 @@ static void ParseO65 (void)
 	    case CFGTOK_EXPORT:
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
+	        /* Check if the export symbol is also defined as an import. */
+	       	if (O65GetImport (O65FmtDesc, CfgSVal) != 0) {
+		    CfgError ("Exported symbol `%s' cannot be an import", CfgSVal);
+		}
       		/* Check if we have this symbol defined already. The entry
       		 * routine will check this also, but we get a more verbose
       		 * error message when checking it here.
@@ -847,15 +851,19 @@ static void ParseO65 (void)
 	    case CFGTOK_IMPORT:
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
-      		/* Check if we have this symbol defined already. The entry
-      		 * routine will check this also, but we get a more verbose
-      		 * error message when checking it here.
-      		 */
-      	 	if (O65GetImport (O65FmtDesc, CfgSVal) != 0) {
-      	 	    CfgError ("Duplicate imported symbol: `%s'", CfgSVal);
-      	 	}
-		/* Insert the symbol into the table */
-		O65SetImport (O65FmtDesc, CfgSVal);
+	        /* Check if the imported symbol is also defined as an export. */
+	       	if (O65GetExport (O65FmtDesc, CfgSVal) != 0) {
+		    CfgError ("Imported symbol `%s' cannot be an export", CfgSVal);
+		}
+      	    	/* Check if we have this symbol defined already. The entry
+      	    	 * routine will check this also, but we get a more verbose
+      	    	 * error message when checking it here.
+      	    	 */
+      	    	if (O65GetImport (O65FmtDesc, CfgSVal) != 0) {
+      	    	    CfgError ("Duplicate imported symbol: `%s'", CfgSVal);
+      	    	}
+	    	/* Insert the symbol into the table */
+	    	O65SetImport (O65FmtDesc, CfgSVal);
 	    	break;
 
 	    case CFGTOK_TYPE:

@@ -1114,9 +1114,6 @@ static unsigned ParseArrayInit (type* T, int AllowFlexibleMembers)
     /* Special handling for a character array initialized by a literal */
     if (IsTypeChar (ElementType) && CurTok.Tok == TOK_SCONST) {
 
-        /* Optional curly braces */
-        unsigned BraceCount = OpeningCurlyBraces (0);
-
         /* Char array initialized by string constant */
         const char* Str = GetLiteral (CurTok.IVal);
         Count = GetLiteralPoolOffs () - CurTok.IVal;
@@ -1129,13 +1126,10 @@ static unsigned ParseArrayInit (type* T, int AllowFlexibleMembers)
         ResetLiteralPoolOffs (CurTok.IVal);
         NextToken ();
 
-        /* Closing curly braces (if we had any opening ones) */
-        ClosingCurlyBraces (BraceCount);
-
     } else {
 
-        /* Optional curly braces */
-        unsigned BraceCount = OpeningCurlyBraces (1);
+        /* Curly brace */
+        ConsumeLCurly ();
 
         /* Initialize the array members */
         Count = 0;
@@ -1151,8 +1145,8 @@ static unsigned ParseArrayInit (type* T, int AllowFlexibleMembers)
             NextToken ();
         }
 
-        /* Closing curly braces (if we had any opening ones) */
-        ClosingCurlyBraces (BraceCount);
+        /* Closing curly braces */
+        ConsumeRCurly ();
     }
 
 
@@ -1185,7 +1179,7 @@ static unsigned ParseStructInit (type* Type, int AllowFlexibleMembers)
 
 
     /* Consume the opening curly brace */
-    unsigned BraceCount = OpeningCurlyBraces (1);
+    ConsumeLCurly ();
 
     /* Get a pointer to the struct entry from the type */
     Entry = DecodePtr (Type + 1);
@@ -1200,7 +1194,7 @@ static unsigned ParseStructInit (type* Type, int AllowFlexibleMembers)
     if (Tab == 0) {
      	Error ("Cannot initialize variables with incomplete type");
         /* Try error recovery */
-        SkipInitializer (BraceCount);
+        SkipInitializer (1);
     	/* Nothing initialized */
     	return 0;
     }
@@ -1213,7 +1207,7 @@ static unsigned ParseStructInit (type* Type, int AllowFlexibleMembers)
     while (CurTok.Tok != TOK_RCURLY) {
     	if (Entry == 0) {
     	    Error ("Too many initializers");
-            SkipInitializer (BraceCount);
+            SkipInitializer (1);
     	    return Size;
     	}
         /* Parse initialization of one field. Flexible array members may
@@ -1228,7 +1222,7 @@ static unsigned ParseStructInit (type* Type, int AllowFlexibleMembers)
     }
 
     /* Consume the closing curly brace */
-    ClosingCurlyBraces (BraceCount);
+    ConsumeRCurly ();
 
     /* If there are struct fields left, reserve additional storage */
     if (Size < StructSize) {
@@ -1254,7 +1248,7 @@ static unsigned ParseVoidInit (void)
     unsigned Size;
 
     /* Opening brace */
-    unsigned BraceCount = OpeningCurlyBraces (1);
+    ConsumeLCurly ();
 
     /* Allow an arbitrary list of values */
     Size = 0;
@@ -1306,7 +1300,7 @@ static unsigned ParseVoidInit (void)
     } while (CurTok.Tok != TOK_RCURLY);
 
     /* Closing brace */
-    ClosingCurlyBraces (BraceCount);
+    ConsumeRCurly ();
 
     /* Return the number of bytes initialized */
     return Size;
@@ -1350,7 +1344,7 @@ static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers)
 
     }
 }
-
+                     
 
 
 unsigned ParseInit (type* T)

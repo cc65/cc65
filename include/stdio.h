@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -62,13 +62,21 @@ extern FILE* stderr;
 #define _IONBF		2
 #define BUFSIZ		256
 #define EOF 	      	-1
-#define FILENAME_MAX	16
 #define FOPEN_MAX	8
-#define L_tmpnam	(FILENAME_MAX + 1)
 #define SEEK_CUR	0
 #define SEEK_END	1
 #define SEEK_SET	2
 #define TMP_MAX		256
+
+/* Standard defines that are platform dependent */
+#if defined(__ATARI__)
+#  define FILENAME_MAX	12
+#elif defined(__LUNIX__)
+#  define FILENAME_MAX  80
+#else
+#  define FILENAME_MAX  16
+#endif
+#define L_tmpnam	(FILENAME_MAX + 1)
 
 
 
@@ -143,4 +151,4 @@ void __fastcall__ _poserror (const char* msg);  	/* cc65 */
 
 
 
-							
+

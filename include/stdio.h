@@ -115,6 +115,7 @@ int __fastcall__ puts (const char* s);
 int __fastcall__ remove (const char* name);
 int __fastcall__ rename (const char* oldname, const char* newname);
 int sprintf (char* buf, const char* format, ...);
+int __fastcall__ ungetc (int c, FILE* f);
 int __fastcall__ vfprintf (FILE* f, const char* format, va_list ap);
 int __fastcall__ vprintf (const char* format, va_list ap);
 int __fastcall__ vsprintf (char* buf, const char* format, va_list ap);

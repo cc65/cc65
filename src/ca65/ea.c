@@ -40,7 +40,7 @@
 #include "nexttok.h"
 #include "ea.h"
 
-               
+
 
 /*****************************************************************************/
 /*     	      	    	      	     Code				     */
@@ -51,12 +51,36 @@
 void GetEA (EffAddr* A)
 /* Parse an effective address, return the result in A */
 {
+    unsigned long Restrictions;
+
     /* Clear the output struct */
     A->AddrModeSet = 0;
     A->Bank = 0;
     A->Expr = 0;
 
+    /* Handle an addressing size override */
+    switch (Tok) {
+        case TOK_OVERRIDE_ZP:
+            Restrictions = AM_DIR | AM_DIR_X | AM_DIR_Y;
+            NextTok ();
+            break;
 
+        case TOK_OVERRIDE_ABS:
+            Restrictions = AM_ABS | AM_ABS_X | AM_ABS_Y;
+            NextTok ();
+            break;
+
+        case TOK_OVERRIDE_FAR:
+            Restrictions = AM_ABS_LONG | AM_ABS_LONG_X;
+            NextTok ();
+            break;
+
+        default:
+            Restrictions = ~0UL;        /* None */
+            break;
+    }
+
+    /* Parse the effective address */
     if (TokIsSep (Tok)) {
 
 	A->AddrModeSet = AM_IMPLICIT;
@@ -167,7 +191,7 @@ void GetEA (EffAddr* A)
 	 	switch (Tok) {
 
 	 	    case TOK_X:
-       	       	       	A->AddrModeSet = AM_ABS_X | AM_DIR_X;
+       	       	       	A->AddrModeSet = AM_ABS_LONG_X | AM_ABS_X | AM_DIR_X;
 	 		NextTok ();
 	 		break;
 
@@ -188,11 +212,14 @@ void GetEA (EffAddr* A)
 
 	    } else {
 
-	 	A->AddrModeSet = AM_ABS | AM_DIR;
+	 	A->AddrModeSet = AM_ABS_LONG | AM_ABS | AM_DIR;
 
 	    }
 	}
     }
+
+    /* Apply addressing mode overrides */
+    A->AddrModeSet &= Restrictions;
 }
 
 

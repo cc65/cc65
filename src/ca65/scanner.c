@@ -767,12 +767,30 @@ Again:
     	ReadIdent (0);
 
        	/* Check for special names */
-        if (SVal [1] == '\0') {
+        if (SVal[1] == '\0') {
     	    switch (toupper (SVal [0])) {
 
     	    	case 'A':
-    	    	    Tok = TOK_A;
+                    if (C == ':') {
+                        NextChar ();
+                        Tok = TOK_OVERRIDE_ABS;
+                    } else {
+    	    	        Tok = TOK_A;
+                    }
     	            return;
+
+                case 'F':
+                    if (C == ':') {
+                        NextChar ();
+                        Tok = TOK_OVERRIDE_FAR;
+                    } else {
+                        Tok = TOK_IDENT;
+                    }
+                    return;
+
+	        case 'S':
+	    	    Tok = TOK_S;
+	    	    return;
 
     	     	case 'X':
     	    	    Tok = TOK_X;
@@ -782,9 +800,14 @@ Again:
 	    	    Tok = TOK_Y;
 	    	    return;
 
-	        case 'S':
-	    	    Tok = TOK_S;
-	    	    return;
+                case 'Z':
+                    if (C == ':') {
+                        NextChar ();
+                        Tok = TOK_OVERRIDE_ZP;
+                    } else {
+                        Tok = TOK_IDENT;
+                    }
+                    return;
 
 	      	default:
 	    	    Tok = TOK_IDENT;

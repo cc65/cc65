@@ -66,9 +66,21 @@
 #define MF_CPU_6502     0x0000          /* Executable is for the 6502 */
 #define MF_CPU_MASK     0x8000          /* Mask to extract CPU type */
 
+#define MF_RELOC_PAGE   0x4000          /* Page wise relocation */
+#define MF_RELOC_BYTE   0x0000          /* Byte wise relocation */
+#define MF_RELOC_MASK   0x4000          /* Mask to extract relocation type */
+
 #define MF_SIZE_32BIT	0x2000		/* All size words are 32bit */
 #define MF_SIZE_16BIT   0x0000          /* All size words are 16bit */
 #define MF_SIZE_MASK    0x2000          /* Mask to extract size */
+
+#define MF_FTYPE_OBJ    0x1000          /* Object file */
+#define MF_FTYPE_EXE    0x0000          /* Executable file */
+#define MF_FTYPE_MASK   0x1000          /* Mask to extract type */
+
+#define MF_ADDR_SIMPLE  0x0800          /* Simple addressing */
+#define MF_ADDR_DEFAULT 0x0000          /* Default addressing */
+#define MF_ADDR_MASK    0x0800          /* Mask to extract addressing */
 
 #define MF_ALIGN_1      0x0000          /* Bytewise alignment */
 #define MF_ALIGN_2      0x0001          /* Align words */
@@ -114,40 +126,40 @@ struct O65Header {
 typedef struct O65Option O65Option;
 struct O65Option {
     O65Option*	    Next;		/* Next in option list */
-    unsigned char   Type;		/* Type of option */
-    unsigned char   Len;		/* Data length */
-    unsigned char   Data [1];		/* Data, dynamically allocated */
+    unsigned char   Type;	       	/* Type of option */
+    unsigned char   Len;	       	/* Data length */
+    unsigned char   Data [1];	       	/* Data, dynamically allocated */
 };
 
 /* A o65 relocation table */
 #define RELOC_BLOCKSIZE	4096
 typedef struct O65RelocTab O65RelocTab;
 struct O65RelocTab {
-    unsigned 	    Size;   		/* Size of the table */
-    unsigned	    Fill;   		/* Amount used */
-    unsigned char*  Buf; 		/* Buffer, dynamically allocated */
+    unsigned 	    Size;   	       	/* Size of the table */
+    unsigned	    Fill;   	       	/* Amount used */
+    unsigned char*  Buf; 	       	/* Buffer, dynamically allocated */
 };
 
 /* Structure describing the format */
 struct O65Desc {
-    O65Header 	    Header; 	 	/* File header */
-    O65Option*	    Options;		/* List of file options */
-    ExtSymTab*	    Exports;		/* Table with exported symbols */
-    ExtSymTab*	    Imports;		/* Table with imported symbols */
-    unsigned   	    Undef;		/* Count of undefined symbols */
-    FILE*     	    F;			/* The file we're writing to */
-    char*     	    Filename;		/* Name of the output file */
-    O65RelocTab*    TextReloc;		/* Relocation table for text segment */
-    O65RelocTab*    DataReloc;		/* Relocation table for data segment */
+    O65Header 	    Header; 	       	/* File header */
+    O65Option*	    Options;	       	/* List of file options */
+    ExtSymTab*	    Exports;	       	/* Table with exported symbols */
+    ExtSymTab*	    Imports;	       	/* Table with imported symbols */
+    unsigned   	    Undef;	       	/* Count of undefined symbols */
+    FILE*     	    F;		       	/* The file we're writing to */
+    char*     	    Filename;	       	/* Name of the output file */
+    O65RelocTab*    TextReloc;	       	/* Relocation table for text segment */
+    O65RelocTab*    DataReloc;	       	/* Relocation table for data segment */
 
-    unsigned  	    TextCount;		/* Number of segments assigned to .text */
-    SegDesc** 	    TextSeg;		/* Array of text segments */
-    unsigned  	    DataCount;		/* Number of segments assigned to .data */
-    SegDesc** 	    DataSeg;	    	/* Array of data segments */
-    unsigned  	    BssCount;	    	/* Number of segments assigned to .bss */
-    SegDesc** 	    BssSeg;    	    	/* Array of bss segments */
-    unsigned  	    ZPCount;		/* Number of segments assigned to .zp */
-    SegDesc** 	    ZPSeg;		/* Array of zp segments */
+    unsigned  	    TextCount;	       	/* Number of segments assigned to .text */
+    SegDesc** 	    TextSeg;	       	/* Array of text segments */
+    unsigned  	    DataCount;	       	/* Number of segments assigned to .data */
+    SegDesc** 	    DataSeg;	       	/* Array of data segments */
+    unsigned  	    BssCount;	       	/* Number of segments assigned to .bss */
+    SegDesc** 	    BssSeg;    	       	/* Array of bss segments */
+    unsigned  	    ZPCount;	       	/* Number of segments assigned to .zp */
+    SegDesc** 	    ZPSeg;	       	/* Array of zp segments */
 
     /* Temporary data for writing segments */
     unsigned long   SegSize;
@@ -265,7 +277,7 @@ static const SegDesc* O65FindSeg (const O65Desc* D, const Segment* S)
 
 
 /*****************************************************************************/
-/*  	 	     	      Expression handling			     */
+/*  	 	      	      Expression handling			     */
 /*****************************************************************************/
 
 
@@ -277,6 +289,7 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
  */
 {
     Export* E;
+    unsigned long Val;
 
     switch (Expr->Op) {
 
@@ -322,6 +335,13 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
     	    } else {
     	 	/* Remember the segment reference */
     		D->SegRef = GetExprSection (Expr);
+                /* Add the offset of the section to the constant value */
+                Val = D->SegRef->Offs + D->SegRef->Seg->PC;
+                if (Sign < 0) {
+                    D->Val -= Val;
+                } else {
+                    D->Val += Val;
+                }
     	    }
     	    break;
 
@@ -463,7 +483,6 @@ static void O65WriteHeader (O65Desc* D)
     };
 
     O65Option* O;
-
 
     /* Write the fixed header */
     WriteData (D->F, Trailer, sizeof (Trailer));
@@ -633,7 +652,7 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
 	    case O65RELOC_SEG:
 	        O65RelocPutWord (D->CurReloc, ED.Val & 0xFFFF);
 	        break;
-	}
+    	}
     }
 
     /* Success */
@@ -1141,6 +1160,7 @@ static void O65SetupSegments (O65Desc* D, Memory* M)
 	/* Next segment node */
 	N = N->Next;
     }
+
 }
 
 
@@ -1156,6 +1176,38 @@ static int O65Unresolved (const char* Name, void* D)
 	/* This is actually an unresolved external. Bump the counter */
 	((O65Desc*) D)->Undef++;
 	return 0;
+    }
+}
+
+
+
+static void O65SetupHeader (O65Desc* D)
+/* Set additional stuff in the header */
+{
+    /* Set the base addresses of the segments */
+    if (D->TextCount > 0) {
+        SegDesc* FirstSeg  = D->TextSeg [0];
+        D->Header.TextBase = FirstSeg->Seg->PC;
+    }
+    if (D->DataCount > 0) {
+        SegDesc* FirstSeg  = D->DataSeg [0];
+        D->Header.DataBase = FirstSeg->Seg->PC;
+    }
+    if (D->BssCount > 0) {
+        SegDesc* FirstSeg  = D->BssSeg [0];
+        D->Header.BssBase = FirstSeg->Seg->PC;
+    }
+    if (D->ZPCount > 0) {
+        SegDesc* FirstSeg = D->ZPSeg [0];
+        D->Header.ZPBase  = FirstSeg->Seg->PC;
+    }
+
+    /* If we have byte wise relocation and an alignment of 1, we can set
+     * the "simple addressing" bit in the header.
+     */
+    if ((D->Header.Mode & MF_RELOC_MASK) == MF_RELOC_BYTE &&
+        (D->Header.Mode & MF_ALIGN_MASK) == MF_ALIGN_1) {
+        D->Header.Mode = (D->Header.Mode & ~MF_ADDR_MASK) | MF_ADDR_SIMPLE;
     }
 }
 
@@ -1189,6 +1241,9 @@ void O65WriteTarget (O65Desc* D, File* F)
 
     /* Setup the segment arrays */
     O65SetupSegments (D, M);
+
+    /* Setup additional stuff in the header */
+    O65SetupHeader (D);
 
     /* Open the file */
     D->F = fopen (F->Name, "wb");

@@ -18,12 +18,13 @@
 
 /* Definition of struct _FILE */
 struct _FILE {
-    char	f_fd;
-    char	f_flags;
+    char	    f_fd;
+    char	    f_flags;
+    unsigned char   f_pushback;
 };
 
 /* File table. Beware: FOPEN_MAX is hardcoded in the ASM files! */
-extern FILE _filetab [FOPEN_MAX];
+extern FILE _filetab[FOPEN_MAX];
 
 /* Flags field */
 #define _FCLOSED	0x00

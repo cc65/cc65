@@ -68,7 +68,7 @@ _ferror:
 _fileno:
  	jsr	getf
 ; 	bcs	err
- 	dey
+	ldy	#_FILE::f_fd
  	lda	(ptr1),y
  	ldx	#0
  	rts

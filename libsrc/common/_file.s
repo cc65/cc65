@@ -16,11 +16,11 @@
 .data
 
 __filetab:
-        .byte   0, _FOPEN       ; stdin
-        .byte   1, _FOPEN       ; stdout
-        .byte   2, _FOPEN       ; stderr
+        .byte   0, _FOPEN, 0    ; stdin
+        .byte   1, _FOPEN, 0    ; stdout
+        .byte   2, _FOPEN, 0    ; stderr
 .repeat FOPEN_MAX - 3
-        .byte   0, _FCLOSED     ; free slot
+        .byte   0, _FCLOSED, 0  ; free slot
 .endrepeat
 
 

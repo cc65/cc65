@@ -52,14 +52,6 @@
 
 
 
-void AddCodeHint (const char* Hint)
-/* Add an optimizer hint */
-{
-    /* ### AddCodeLine ("+%s", Hint); */
-}
-
-
-
 CodeMark GetCodePos (void)
 /* Get a marker pointing to the current output position */
 {

@@ -148,9 +148,10 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
      	if (E && E->Owner->PrevTab == 0 && IsTypeFunc (E->Type)) {
 
      	    /* A function may use the A or A/X registers if it is a fastcall
-     	     * function. Otherwise it does not use any registers passed by
-     	     * the caller. However, we assume that any function will destroy
-     	     * all registers.
+     	     * function. If it is not a fastcall function but a variadic one,
+	     * it will use the Y register (the parameter size is passed here).
+	     * In all other cases, no registers are used. However, we assume 
+	     * that any function will destroy all registers.
      	     */
      	    FuncDesc* D = E->V.F.Func;
      	    if ((D->Flags & FD_FASTCALL) != 0 && D->ParamCount > 0) {
@@ -161,7 +162,9 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
      		} else {
      		    *Use = REG_AX;
      		}
-     	    } else {
+	    } else if ((D->Flags & FD_VARIADIC) != 0) {
+		*Use = REG_Y;
+     	    } else {			      
      		/* Will not use any registers */
      		*Use = REG_NONE;
      	    }

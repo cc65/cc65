@@ -523,7 +523,6 @@ static void tableswitch (struct expent* eval)
     g_defdata (CF_INT | CF_CONST, -((int)lcount)-1, 0);
 
     /* Create the case selector table */
-    AddCodeHint ("casetable");
     p = swtab;
     while (lcount) {
        	g_case (Flags, p->sw_lab, p->sw_const);	/* Create one label */
@@ -734,9 +733,7 @@ int Statement (void)
 		break;
 
 	    default:
-    		AddCodeHint ("stmt:start");
 		expression (&lval);
-		AddCodeHint ("stmt:end");
 		ConsumeSemi ();
 	}
     }

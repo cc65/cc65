@@ -502,7 +502,6 @@ void exprhs (unsigned flags, int k, struct expent *lval)
     }
     if (lval->e_test & E_FORCETEST) {	/* we testing this value? */
      	/* debug... */
-     	AddCodeHint ("forcetest");
      	flags |= TypeOf (lval->e_tptr);
        	g_test (flags);	       	       	/* yes, force a test */
        	lval->e_test &= ~E_FORCETEST;
@@ -568,9 +567,6 @@ static unsigned FunctionParamList (FuncDesc* Func)
 
     	unsigned CFlags;
     	unsigned Flags;
-
-     	/* Add a hint for the optimizer */
-     	AddCodeHint ("param:start");
 
     	/* Count arguments */
     	++ParamCount;
@@ -658,9 +654,6 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	    /* Calculate total parameter size */
      	    ParamSize += ArgSize;
 	}
-
-	/* Add an optimizer hint */
-	AddCodeHint ("param:end");
 
 	/* Check for end of argument list */
      	if (curtok != TOK_COMMA) {

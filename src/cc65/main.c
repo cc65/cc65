@@ -646,9 +646,6 @@ int main (int argc, char* argv[])
 	OutputFile = MakeFilename (InputFile, ".s");
     }
 
-
-
-
     /* Go! */
     Compile ();
 

@@ -62,9 +62,6 @@ typedef unsigned CodeMark;
 
 
 
-void AddCodeHint (const char* Hint);
-/* Add an optimizer hint */
-
 CodeMark GetCodePos (void);
 /* Get a marker pointing to the current output position */
 

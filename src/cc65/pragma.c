@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* cc65 */
+#include "codegen.h"
 #include "error.h"
 #include "expr.h"
 #include "global.h"
@@ -49,7 +50,7 @@
 
 
 /*****************************************************************************/
-/*		     		     data				     */
+/*		      		     data				     */
 /*****************************************************************************/
 
 
@@ -150,7 +151,7 @@ static void SegNamePragma (segment_t Seg)
 	if (ValidSegName (Name)) {
 
        	    /* Set the new name */
-	    NewSegName (Seg, Name);
+	    g_segname (Seg, Name);
 
 	} else {
 
@@ -196,19 +197,21 @@ void DoPragma (void)
 	return;
     }
 
-    /* Do we know this pragma? */
+    /* Search for the name, then skip the identifier */
     Pragma = FindPragma (CurTok.Ident);
+    NextToken ();
+
+    /* Do we know this pragma? */
     if (Pragma == PR_ILLEGAL) {
-	/* According to the ANSI standard, we're not allowed to generate errors
-	 * for unknown pragmas, however, we're allowed to warn - and we will
-	 * do so. Otherwise one typo may give you hours of bug hunting...
-	 */
-    	Warning ("Unknown #pragma `%s'", CurTok.Ident);
-     	return;
+       	/* According to the ANSI standard, we're not allowed to generate errors
+       	 * for unknown pragmas, however, we're allowed to warn - and we will
+       	 * do so. Otherwise one typo may give you hours of bug hunting...
+       	 */
+       	Warning ("Unknown #pragma `%s'", CurTok.Ident);
+       	return;
     }
 
-    /* Skip the identifier and check for an open paren */
-    NextToken ();
+    /* Check for an open paren */
     ConsumeLParen ();
 
     /* Switch for the different pragmas */

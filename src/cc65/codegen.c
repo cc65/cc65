@@ -203,8 +203,41 @@ void g_usebss (void)
 
 
 
+static void OutputDataLine (DataSeg* S, const char* Format, ...)
+/* Add a line to the current data segment */
+{
+    va_list ap;
+    va_start (ap, Format);
+    AddDataEntry (S, Format, ap);
+    va_end (ap);
+}
+
+
+
+void g_segname (segment_t Seg, const char* Name)
+/* Set the name of a segment */
+{
+    DataSeg* S;
+
+    /* Remember the new name */
+    NewSegName (Seg, Name);
+
+    /* Emit a segment directive for the data style segments */
+    switch (Seg) {
+     	case SEG_RODATA: S = CS->ROData; break;
+     	case SEG_DATA:   S = CS->Data;   break;
+     	case SEG_BSS:    S = CS->BSS;    break;
+	default:         S = 0;          break;
+    }
+    if (S) {
+       	OutputDataLine (S, ".segment\t\"%s\"", Name);
+    }
+}
+
+
+
 /*****************************************************************************/
-/*  	       		 	     Code				     */
+/*     	       		 	     Code				     */
 /*****************************************************************************/
 
 
@@ -3207,8 +3240,6 @@ void g_inc (unsigned flags, unsigned long val)
 		    AddCodeLine ("clc");
 		    if ((val & 0xFF) != 0) {
 	     	       	AddCodeLine ("adc #$%02X", (unsigned char) val);
-		       	/* Tell the optimizer that the X register may be invalid */
-		       	AddCodeHint ("x:!");
 		    }
      		    AddCodeLine ("pha");
      		    AddCodeLine ("txa");
@@ -3294,8 +3325,6 @@ void g_dec (unsigned flags, unsigned long val)
 		    AddCodeLine ("sec");
 		    if ((val & 0xFF) != 0) {
 	     	       	AddCodeLine ("sbc #$%02X", (unsigned char) val);
-		       	/* Tell the optimizer that the X register may be invalid */
-		       	AddCodeHint ("x:!");
 		    }
      		    AddCodeLine ("pha");
      		    AddCodeLine ("txa");

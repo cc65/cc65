@@ -112,10 +112,13 @@ void g_usedata (void);
 void g_usebss (void);
 /* Switch to the bss segment */
 
+void g_segname (segment_t Seg, const char* Name);
+/* Set the name of a segment */
+
 
 
 /*****************************************************************************/
-/*  			Functions handling local labels			     */
+/*   			Functions handling local labels			     */
 /*****************************************************************************/
 
 

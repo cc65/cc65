@@ -1,4 +1,8 @@
 usr/bin
 usr/lib/cc65/lib
 usr/lib/cc65/include/geos
+usr/lib/cc65/include/tgi
+usr/lib/cc65/asminc
+usr/lib/cc65/emd
+usr/lib/cc65/tgi
 usr/share/info

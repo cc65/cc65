@@ -1,3 +1,10 @@
+cc65 (2.9.0-1) stable; urgency=low
+
+  * New upstream version
+  * we're working in stable here
+
+ -- Michael Klein <michael.klein@puffin.lb.shuttle.de>  Sun, 19 Jan 2003 17:19:00 +0100
+
 cc65 (2.8.0-2) unstable; urgency=low
 
   * debian/control: Suggest target packages, don't recommend them

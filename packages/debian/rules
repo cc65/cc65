@@ -12,7 +12,7 @@ build-stamp:
 	# Add here commands to compile the package.
 	$(MAKE) -C src -f make/gcc.mak
 	$(MAKE) -C libsrc
-	$(MAKE) -C doc
+	$(MAKE) -C doc all
 
 	touch build-stamp
 
@@ -30,11 +30,24 @@ binary-indep: build
 	dh_testdir -i
 	dh_testroot -i
 	dh_installdirs -i
-	for arch in apple2 atari c128 c64 cbm510 cbm610 geos pet plus4; do \
-	  install -m0644 `pwd`/libsrc/$$arch.lib debian/cc65-$$arch/usr/lib/cc65/lib && \
-	  install -m0644 `pwd`/libsrc/$$arch.o debian/cc65-$$arch/usr/lib/cc65/lib; \
+	for arch in apple2 atari c128 c64 cbm510 cbm610 geos pet plus4 c16 vic20; do \
+	  install -m0755 -d debian/cc65-$$arch/usr/lib/cc65/lib; \
+	  install -m0644 `pwd`/libsrc/$$arch.lib debian/cc65-$$arch/usr/lib/cc65/lib/; \
+	  install -m0644 `pwd`/libsrc/$$arch.o debian/cc65-$$arch/usr/lib/cc65/lib/; \
+	  for f in `pwd`/libsrc/$$arch-*.emd; do \
+	    if [ -f $$f ]; then \
+	      install -m0755 -d debian/cc65-$$arch/usr/lib/cc65/emd; \
+	      install -m0644 $$f debian/cc65-$$arch/usr/lib/cc65/emd/;  \
+	    fi; \
+	  done; \
+	  for f in `pwd`/libsrc/$$arch-*.tgi; do \
+	    if [ -f $$f ]; then \
+	      install -m0755 -d debian/cc65-$$arch/usr/lib/cc65/tgi; \
+	      install -m0644 $$f debian/cc65-$$arch/usr/lib/cc65/tgi/;  \
+	    fi; \
+	  done; \
+	  dh_installdocs -p cc65-$$arch src/ld65/cfg/$$arch.cfg; \
 	done
-	dh_installdocs -i
 	dh_installchangelogs -i
 	dh_compress -i
 	dh_fixperms -i
@@ -57,6 +70,8 @@ binary-arch: checkroot build
 	done
 	install -m0644 `pwd`/include/*.h           debian/cc65/usr/lib/cc65/include
 	install -m0644 `pwd`/include/geos/*.h      debian/cc65/usr/lib/cc65/include/geos
+	install -m0644 `pwd`/include/tgi/*.h       debian/cc65/usr/lib/cc65/include/tgi
+	install -m0644 `pwd`/asminc/*.inc          debian/cc65/usr/lib/cc65/asminc
 	dh_installman -a
 	dh_installdocs -a
 	dh_installexamples -a

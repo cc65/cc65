@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -428,6 +428,12 @@ void g_defbytes (const void* bytes, unsigned count);
 
 void g_zerobytes (unsigned n);
 /* Output n bytes of data initialized with zero */
+
+void g_initauto (unsigned Label, unsigned Size);
+/* Initialize a local variable at stack offset zero from static data */
+
+void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size);
+/* Initialize a static local variable from static initialization data */
 
 
 

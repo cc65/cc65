@@ -450,7 +450,7 @@ void g_leave (void)
 {
     /* How many bytes of locals do we have to drop? */
     int k = -oursp;
-
+                                  
     /* If we didn't have a variable argument list, don't call leave */
     if (funcargs >= 0) {
 
@@ -598,25 +598,25 @@ void g_getimmed (unsigned Flags, unsigned long Val, long Offs)
      		break;
 
      	    case CF_LONG:
-	        /* Split the value into 4 bytes */
-	        B1 = (unsigned char) (Val >>  0);
-	        B2 = (unsigned char) (Val >>  8);
-	        B3 = (unsigned char) (Val >> 16);
-	        B4 = (unsigned char) (Val >> 24);
+     	        /* Split the value into 4 bytes */
+     	        B1 = (unsigned char) (Val >>  0);
+     	        B2 = (unsigned char) (Val >>  8);
+     	        B3 = (unsigned char) (Val >> 16);
+     	        B4 = (unsigned char) (Val >> 24);
 
-	        /* Remember which bytes are done */
-	        Done = 0;
+     	        /* Remember which bytes are done */
+     	        Done = 0;
 
-	        /* Load the value */
-	        AddCodeLine ("ldx #$%02X", B2);
-	        Done |= 0x02;
-	        if (B2 == B3) {
-		    AddCodeLine ("stx sreg");
-		    Done |= 0x04;
-		}
-	        if (B2 == B4) {
-		    AddCodeLine ("stx sreg+1");
-		    Done |= 0x08;
+     	        /* Load the value */
+     	        AddCodeLine ("ldx #$%02X", B2);
+     	        Done |= 0x02;
+     	        if (B2 == B3) {
+     		    AddCodeLine ("stx sreg");
+     		    Done |= 0x04;
+     		}
+     	        if (B2 == B4) {
+     		    AddCodeLine ("stx sreg+1");
+     		    Done |= 0x08;
      		}
 	    	if ((Done & 0x04) == 0 && B1 != B3) {
 		    AddCodeLine ("lda #$%02X", B3);
@@ -3909,6 +3909,65 @@ void g_zerobytes (unsigned n)
 /* Output n bytes of data initialized with zero */
 {
     AddDataLine ("\t.res\t%u,$00", n);
+}
+
+
+
+void g_initauto (unsigned Label, unsigned Size)
+/* Initialize a local variable at stack offset zero from static data */
+{
+    unsigned CodeLabel = GetLocalLabel ();
+
+    CheckLocalOffs (Size);
+    if (Size <= 128) {
+        ldyconst (Size-1);
+     	g_defcodelabel (CodeLabel);
+        AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, Label, 0));
+        AddCodeLine ("sta (sp),y");
+        AddCodeLine ("dey");
+        AddCodeLine ("bpl %s", LocalLabelName (CodeLabel));
+    } else if (Size <= 256) {
+        ldyconst (0);
+     	g_defcodelabel (CodeLabel);
+        AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, Label, 0));
+        AddCodeLine ("sta (sp),y");
+        AddCodeLine ("iny");
+        AddCodeLine ("cpy #$%02X", (unsigned char) Size);
+        AddCodeLine ("bne %s", LocalLabelName (CodeLabel));
+    }
+}
+
+
+
+void g_initstatic (unsigned InitLabel, unsigned VarLabel, unsigned Size)
+/* Initialize a static local variable from static initialization data */
+{
+    if (Size <= 128) {
+        unsigned CodeLabel = GetLocalLabel ();
+        ldyconst (Size-1);
+        g_defcodelabel (CodeLabel);
+        AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, InitLabel, 0));
+        AddCodeLine ("sta %s,y", GetLabelName (CF_STATIC, VarLabel, 0));
+        AddCodeLine ("dey");
+        AddCodeLine ("bpl %s", LocalLabelName (CodeLabel));
+    } else if (Size <= 256) {
+        unsigned CodeLabel = GetLocalLabel ();
+        ldyconst (0);
+     	g_defcodelabel (CodeLabel);
+        AddCodeLine ("lda %s,y", GetLabelName (CF_STATIC, InitLabel, 0));
+        AddCodeLine ("sta %s,y", GetLabelName (CF_STATIC, VarLabel, 0));
+        AddCodeLine ("iny");
+        AddCodeLine ("cpy #$%02X", (unsigned char) Size);
+        AddCodeLine ("bne %s", LocalLabelName (CodeLabel));
+    } else {
+        /* Use the easy way here: memcpy */
+        g_getimmed (CF_STATIC, VarLabel, 0);
+        AddCodeLine ("jsr pushax");
+        g_getimmed (CF_STATIC, InitLabel, 0);
+        AddCodeLine ("jsr pushax");
+        g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, Size, 0);
+        AddCodeLine ("jsr %s", GetLabelName (CF_EXTERNAL, (unsigned long) "memcpy", 0));
+    }
 }
 
 

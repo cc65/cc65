@@ -141,6 +141,10 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned Size, unsigned* SC)
 {
     unsigned Flags;
     unsigned SymData;
+    unsigned InitLabel;
+
+    /* Determine if this is a compound variable */
+    int IsCompound = IsClassStruct (Decl->Type) || IsTypeArray (Decl->Type);
 
     /* Check if this is a variable on the stack or in static memory */
     if (StaticLocals == 0) {
@@ -151,27 +155,57 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned Size, unsigned* SC)
 
             ExprDesc lval;
 
-            /* Allocate previously reserved local space */
-            F_AllocLocalSpace (CurrentFunc);
-
             /* Skip the '=' */
             NextToken ();
 
-            /* Setup the type flags for the assignment */
-            Flags = (Size == 1)? CF_FORCECHAR : CF_NONE;
+            /* Special handling for compound types */
+            if (IsCompound) {
 
-            /* Get the expression into the primary */
-            if (evalexpr (Flags, hie1, &lval) == 0) {
-                /* Constant expression. Adjust the types */
-                assignadjust (Decl->Type, &lval);
-                Flags |= CF_CONST;
+                /* First reserve space for the variable */
+                SymData = F_ReserveLocalSpace (CurrentFunc, Size);
+
+                /* Next, allocate the space on the stack. This means that the
+                 * variable is now located at offset 0 from the current sp.
+                 */
+                F_AllocLocalSpace (CurrentFunc);
+
+                /* Switch to read only data */
+                g_userodata ();
+
+                /* Define a label for the initialization data */
+                InitLabel = GetLocalLabel ();
+                g_defdatalabel (InitLabel);
+
+                /* Parse the initialization generating a memory image of the
+                 * data in the RODATA segment.
+                 */
+                ParseInit (Decl->Type);
+
+                /* Generate code to copy this data into the variable space */
+                g_initauto (InitLabel, Size);
+
             } else {
-                /* Expression is not constant and in the primary */
-                assignadjust (Decl->Type, &lval);
-            }
 
-            /* Push the value */
-            g_push (Flags | TypeOf (Decl->Type), lval.ConstVal);
+                /* Allocate previously reserved local space */
+                F_AllocLocalSpace (CurrentFunc);
+
+                /* Setup the type flags for the assignment */
+                Flags = (Size == 1)? CF_FORCECHAR : CF_NONE;
+
+                /* Get the expression into the primary */
+                if (evalexpr (Flags, hie1, &lval) == 0) {
+                    /* Constant expression. Adjust the types */
+                    assignadjust (Decl->Type, &lval);
+                    Flags |= CF_CONST;
+                } else {
+                    /* Expression is not constant and in the primary */
+                    assignadjust (Decl->Type, &lval);
+                }
+
+                /* Push the value */
+                g_push (Flags | TypeOf (Decl->Type), lval.ConstVal);
+
+            }
 
             /* Mark the variable as referenced */
             *SC |= SC_REF;
@@ -209,23 +243,44 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned Size, unsigned* SC)
             /* Skip the '=' */
             NextToken ();
 
-            /* Setup the type flags for the assignment */
-            Flags = (Size == 1)? CF_FORCECHAR : CF_NONE;
+            if (IsCompound) {
 
-            /* Get the expression into the primary */
-            if (evalexpr (Flags, hie1, &lval) == 0) {
-                /* Constant expression. Adjust the types */
-                assignadjust (Decl->Type, &lval);
-                Flags |= CF_CONST;
-                /* Load it into the primary */
-                exprhs (Flags, 0, &lval);
+                /* Switch to read only data */
+                g_userodata ();
+
+                /* Define a label for the initialization data */
+                InitLabel = GetLocalLabel ();
+                g_defdatalabel (InitLabel);
+
+                /* Parse the initialization generating a memory image of the
+                 * data in the RODATA segment.
+                 */
+                ParseInit (Decl->Type);
+
+                /* Generate code to copy this data into the variable space */
+                g_initstatic (InitLabel, SymData, Size);
+
             } else {
-                /* Expression is not constant and in the primary */
-                assignadjust (Decl->Type, &lval);
-            }
 
-            /* Store the value into the variable */
-            g_putstatic (Flags | TypeOf (Decl->Type), SymData, 0);
+                /* Setup the type flags for the assignment */
+                Flags = (Size == 1)? CF_FORCECHAR : CF_NONE;
+
+                /* Get the expression into the primary */
+                if (evalexpr (Flags, hie1, &lval) == 0) {
+                    /* Constant expression. Adjust the types */
+                    assignadjust (Decl->Type, &lval);
+                    Flags |= CF_CONST;
+                    /* Load it into the primary */
+                    exprhs (Flags, 0, &lval);
+                } else {
+                    /* Expression is not constant and in the primary */
+                    assignadjust (Decl->Type, &lval);
+                }
+
+                /* Store the value into the variable */
+                g_putstatic (Flags | TypeOf (Decl->Type), SymData, 0);
+
+            }
 
             /* Mark the variable as referenced */
             *SC |= SC_REF;

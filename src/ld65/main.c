@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2000 Ullrich von Bassewitz					     */
+/* (C) 1998-2001 Ullrich von Bassewitz					     */
 /*		 Wacholderweg 14					     */
 /*		 D-70597 Stuttgart					     */
 /* EMail:	 uz@musoftware.de					     */
@@ -89,17 +89,17 @@ static void Usage (void)
     fprintf (stderr,
 	     "Usage: %s [options] module ...\n"
     	     "Short options:\n"
+       	     "  -C name\t\tUse linker config file\n"
+       	     "  -Ln name\t\tCreate a VICE label file\n"
+       	     "  -Lp\t\t\tMark write protected segments as such (VICE)\n"
+       	     "  -S addr\t\tSet the default start address\n"
+       	     "  -V\t\t\tPrint the linker version\n"
        	     "  -h\t\t\tHelp (this text)\n"
        	     "  -m name\t\tCreate a map file\n"
        	     "  -o name\t\tName the default output file\n"
        	     "  -t sys\t\tSet the target system\n"
        	     "  -v\t\t\tVerbose mode\n"
        	     "  -vm\t\t\tVerbose map file\n"
-       	     "  -C name\t\tUse linker config file\n"
-       	     "  -Ln name\t\tCreate a VICE label file\n"
-       	     "  -Lp\t\t\tMark write protected segments as such (VICE)\n"
-       	     "  -S addr\t\tSet the default start address\n"
-       	     "  -V\t\t\tPrint the linker version\n"
 	     "\n"
 	     "Long options:\n"
 	     "  --help\t\tHelp (this text)\n"
@@ -234,7 +234,7 @@ static void OptDbgFile (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptHelp (const char* Opt attribute ((unused)), 
+static void OptHelp (const char* Opt attribute ((unused)),
 		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
 {
@@ -281,7 +281,7 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptVersion (const char* Opt attribute ((unused)), 
+static void OptVersion (const char* Opt attribute ((unused)),
 			const char* Arg attribute ((unused)))
 /* Print the assembler version */
 {
@@ -308,7 +308,7 @@ int main (int argc, char* argv [])
 
     unsigned I;
 
-    /* Initialize the cmdline module */			    
+    /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "ld65");
 
     /* Evaluate the CC65_LIB environment variable */

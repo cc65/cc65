@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -82,6 +82,11 @@ static void Usage (void)
     fprintf (stderr,
     	     "Usage: %s [options] file\n"
     	     "Short options:\n"
+       	     "  -D name[=value]\tDefine a symbol\n"
+       	     "  -I dir\t\tSet an include directory search path\n"
+       	     "  -U\t\t\tMark unresolved symbols as import\n"
+       	     "  -V\t\t\tPrint the assembler version\n"
+       	     "  -W n\t\t\tSet warning level n\n"
        	     "  -g\t\t\tAdd debug info to object file\n"
        	     "  -h\t\t\tHelp (this text)\n"
        	     "  -i\t\t\tIgnore case of symbols\n"
@@ -90,11 +95,6 @@ static void Usage (void)
        	     "  -s\t\t\tEnable smart mode\n"
        	     "  -t sys\t\tSet the target system\n"
        	     "  -v\t\t\tIncrease verbosity\n"
-       	     "  -D name[=value]\tDefine a symbol\n"
-       	     "  -I dir\t\tSet an include directory search path\n"
-       	     "  -U\t\t\tMark unresolved symbols as import\n"
-       	     "  -V\t\t\tPrint the assembler version\n"
-       	     "  -W n\t\t\tSet warning level n\n"
 	     "\n"
 	     "Long options:\n"
        	     "  --auto-import\t\tMark unresolved symbols as import\n"

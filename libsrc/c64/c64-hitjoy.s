@@ -30,16 +30,17 @@
         .byte   $04                     ; JOY_LEFT
         .byte   $08                     ; JOY_RIGHT
         .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; Future expansion
+        .byte   $00                     ; JOY_FIRE2 unavailable
         .byte   $00                     ; Future expansion
         .byte   $00                     ; Future expansion
 
 ; Jump table.
 
-        .word   INSTALL
-        .word   DEINSTALL
-        .word   COUNT
-        .word   READ
+        .addr   INSTALL
+        .addr   UNINSTALL
+        .addr   COUNT
+        .addr   READ
+        .addr   IRQ
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -64,124 +65,104 @@ temp4:	.byte 0
 ;
 
 INSTALL:
-        sei
-        lda $0314
-        sta irqjmp+1
-        lda $0315
-        sta irqjmp+2
-        lda #<pollirq
-        sta $0314
-        lda #>pollirq
-        sta $0315
-        cli
-
         lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
 
-        rts
+;       rts             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
-        sei
-        lda irqjmp+1
-        sta $0314
-        lda irqjmp+2
-        sta $0315
-        cli
+UNINSTALL:
         rts
 
 ; ------------------------------------------------------------------------
-; we must use an irq here since we need timers
-; which otherwhise would conflict with system-irq
-pollirq:
-         ; cia 2 setup
+; IRQ entry point. Is called from the C layer as a subroutine in the 
+; interrupt.
 
-         ldy #$00  ; port b direction
-         sty $dd03 ; => input
+IRQ:    ; cia 2 setup
 
-         sty $dd05 ; cia2 timer a highbyte
-         sty $dc05 ; cia1 timer a highbyte
-         iny
-         sty $dd04 ; cia2 timer a lowbyte
-         sty $dc04 ; cia1 timer a lowbyte
+        ldy     #$00            ; port b direction
+        sty     $dd03           ; => input
 
-         lda #%00010001
-         sta $dd0e ; control register a
-                   ; timer: start
-                   ;        continous
-                   ;        forced load
-                   ; serial port: input
+        sty     $dd05           ; cia2 timer a highbyte
+        sty     $dc05           ; cia1 timer a highbyte
+        iny
+        sty     $dd04           ; cia2 timer a lowbyte
+        sty     $dc04           ; cia1 timer a lowbyte
 
-         ; cia 1 setup
-         lda #%01010001
-         sta $dc0e ; control register a
-                   ; timer: start
-                   ;        continous
-                   ;        forced load
-                   ; serial port: output
+        lda     #%00010001
+        sta     $dd0e           ; control register a
+                                ; timer: start
+                                ;        continous
+                                ;        forced load
+                                ; serial port: input
 
+        ; cia 1 setup
+        lda     #%01010001
+        sta     $dc0e           ; control register a
+                                ; timer: start
+                                ;        continous
+                                ;        forced load
+                                ; serial port: output
 
-         ; read directions 3
-         lda $dd01 ;read cia 2 port b
-         and #$0f
-         sta temp3
+        ; read directions 3
+        lda     $dd01           ;read cia 2 port b
+        and     #$0f
+        sta     temp3
 
-         ; read button 3
-         lda $dd02      ;cia 2 port a
-         and #%11111011 ;data direction
-         sta $dd02      ;=> bit 2 input
+        ; read button 3
+        lda     $dd02           ;cia 2 port a
+        and     #%11111011      ;data direction
+        sta     $dd02           ;=> bit 2 input
 
-         lda $dd00      ;read cia 2 p.A
-         and #%00000100 ;check bit 2
-         asl a
-         asl a
-         ora temp3
-         sta temp3
+        lda     $dd00           ;read cia 2 p.A
+        and     #%00000100      ;check bit 2
+        asl     a
+        asl     a
+        ora     temp3
+        sta     temp3
 
-         ; read directions 4
-         lda $dd01 ;read cia 2 port b
-         lsr a
-         lsr a
-         lsr a
-         lsr a
-         sta temp4
+        ; read directions 4
+        lda     $dd01           ;read cia 2 port b
+        lsr     a
+        lsr     a
+        lsr     a
+        lsr     a
+        sta     temp4
 
-         ; read button 4
-         ldx #$ff ;serial data register
-         stx $dc0c;=> writing $ff causes
-                  ;cia to output some
-                  ;count signals at cnt1
+        ; read button 4
+        ldx     #$ff            ;serial data register
+        stx     $dc0c           ;=> writing $ff causes
+                                ;cia to output some
+                                ;count signals at cnt1
 
-         ldx $dd0c ;read cia 2 serial in
-         beq fire  ;button press if zero
+        ldx     $dd0c           ;read cia 2 serial in
+        beq     fire            ;button press if zero
 
-         lda temp4
-         ora #%00010000
-         sta temp4
+        lda     temp4
+        ora     #%00010000
+        sta     temp4
 
 fire:
+        ; Default Value: $40/64 on PAL
+        ;                    $42/66 on NTSC
+        lda     #$41
+        sta     $dc05
+        ; Default Value: $25/37 on PAL
+        ;                    $95/149 on NTSC
+        lda     #0
+        sta     $dc04
 
-         ; Default Value: $40/64 on PAL
-         ;                $42/66 on NTSC
-         lda #$41
-         sta $dc05
-         ; Default Value: $25/37 on PAL
-         ;                $95/149 on NTSC
-         lda #0
-         sta $dc04
-
-irqjmp:  jmp $dead
+        rts
 
 ; ------------------------------------------------------------------------
 ; COUNT: Return the total number of available joysticks in a/x.
 ;
 
-COUNT:
-        lda     #<JOY_COUNT
+COUNT:  lda     #<JOY_COUNT
         ldx     #>JOY_COUNT
         rts
 
@@ -189,13 +170,12 @@ COUNT:
 ; READ: Read a particular joystick passed in A.
 ;
 
-READ:
-        tax            ; Joystick number into X
+READ:   tax            ; Joystick number into X
         bne joy2
 
-         ; Read joystick 1
-joy1:
-        lda #$7F
+; Read joystick 1
+
+joy1:   lda #$7F
         sei
         sta CIA1_PRA
         lda CIA1_PRB
@@ -204,9 +184,9 @@ joy1:
         eor #$1F
         rts
 
-        ; Read joystick 2
-joy2:
-        dex
+; Read joystick 2
+
+joy2:   dex
         bne joy3
 
         ; ldx	#0
@@ -223,20 +203,17 @@ joy2:
 
         ; Read joystick 3
 
-joy3:
-        dex
-        bne joy4
+joy3:   dex
+        bne     joy4
 
-        lda temp3
+        lda     temp3
         eor	#$1F
-        ldx #0
         rts
 
         ; Read joystick 4
 
-joy4:
-        lda temp4
+joy4:   lda     temp4
         eor	#$1F
-        ldx #0
+        ldx     #0
         rts
 

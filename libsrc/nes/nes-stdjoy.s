@@ -36,10 +36,11 @@
 
 ; Jump table.
 
-	.word	INSTALL
-	.word	UNINSTALL
-	.word	COUNT
-	.word	READJOY
+       	.addr   INSTALL
+       	.addr   UNINSTALL
+       	.addr   COUNT
+       	.addr   READJOY
+        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants

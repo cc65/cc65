@@ -12,7 +12,7 @@
         .include        "joy-error.inc"
         .include        "cbm510.inc"
         .include        "extzp.inc"
-                                   
+
         .macpack        generic
 
 
@@ -33,16 +33,17 @@
         .byte   $04                     ; JOY_LEFT
         .byte   $08                     ; JOY_RIGHT
         .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; Future expansion
+        .byte   $00                     ; JOY_FIRE2 unavailable
         .byte   $00                     ; Future expansion
         .byte   $00                     ; Future expansion
 
 ; Jump table.
 
-        .word   INSTALL
-        .word   UNINSTALL
-        .word   COUNT
-        .word   READ
+        .addr   INSTALL
+        .addr   UNINSTALL
+        .addr   COUNT
+        .addr   READ
+        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants

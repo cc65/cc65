@@ -32,16 +32,17 @@
 	.byte	$20			; JOY_LEFT	"4"
 	.byte	$08			; JOY_RIGHT	"6"
 	.byte	$04			; JOY_FIRE	"5" ENTER
-	.byte	$00			; Future expansion
+	.byte	$00			; JOY_FIRE2 unavailable
 	.byte	$00			; Future expansion
 	.byte	$00			; Future expansion
 
 ; Jump table.
 
-	.word	INSTALL
-	.word	UNINSTALL
-	.word	COUNT
-	.word	READ
+       	.addr   INSTALL
+       	.addr   UNINSTALL
+       	.addr   COUNT
+       	.addr   READ
+        .addr   0                       ; IRQ entry unused
 
 ; ------------------------------------------------------------------------
 ; Constants
@@ -63,13 +64,12 @@ JOY_COUNT	= 1		; Number of joysticks we support
 ;
 
 INSTALL:
-	lda	VIC_CLK_128
-	cmp	#$FF
-	bne	@C128
-	lda	#JOY_ERR_NO_DEVICE
-	.byte	$2C
-@C128:	lda	#JOY_ERR_OK
-	ldx	#0
+        lda     #JOY_ERR_OK             ; Assume we have a joystick
+        ldx     VIC_CLK_128             ; Test for a C128
+        cpx     #$FF
+        bne     @C128                   ; Jump if we have one
+        lda     #JOY_ERR_NO_DEVICE      ; No C128 -> no numpad
+@C128:  ldx     #0                      ; Set high byte
 
 ;	rts			; Run into UNINSTALL instead
 

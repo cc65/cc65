@@ -226,7 +226,7 @@ static ED_SymRef* ED_AllocSymRef (ExprDesc* ED, SymEntry* Sym)
     SymRef = ED->SymRef + ED->SymCount++;
 
     /* Initialize the new struct and return it */
-    SymRef->Count = 1;
+    SymRef->Count = 0;
     SymRef->Ref   = Sym;
     return SymRef;
 }
@@ -335,11 +335,38 @@ static void ED_MergeRefs (ExprDesc* ED, const ExprDesc* New)
 
 
 
+static void ED_NegRefs (ExprDesc* D)
+/* Negate the references in ED */
+{
+    unsigned I;
+    for (I = 0; I < D->SymCount; ++I) {
+        D->SymRef[I].Count = -D->SymRef[I].Count;
+    }
+    for (I = 0; I < D->SecCount; ++I) {
+        D->SecRef[I].Count = -D->SecRef[I].Count;
+    }
+}
+
+
+
 static void ED_Add (ExprDesc* ED, const ExprDesc* Right)
 /* Calculate ED = ED + Right, update address size in ED */
 {
     ED->Val += Right->Val;
     ED_MergeRefs (ED, Right);
+    ED_MergeAddrSize (ED, Right);
+}
+
+
+
+static void ED_Sub (ExprDesc* ED, const ExprDesc* Right)
+/* Calculate ED = ED - Right, update address size in ED */
+{
+    ExprDesc D = *Right;        /* Temporary */
+    ED_NegRefs (&D);
+
+    ED->Val -= Right->Val;
+    ED_MergeRefs (ED, &D);      /* Merge negatives */
     ED_MergeAddrSize (ED, Right);
 }
 
@@ -365,15 +392,8 @@ static void ED_Mul (ExprDesc* ED, const ExprDesc* Right)
 static void ED_Neg (ExprDesc* D)
 /* Negate an expression */
 {
-    unsigned I;
-
     D->Val = -D->Val;
-    for (I = 0; I < D->SymCount; ++I) {
-        D->SymRef[I].Count = -D->SymRef[I].Count;
-    }
-    for (I = 0; I < D->SecCount; ++I) {
-        D->SecRef[I].Count = -D->SecRef[I].Count;
-    }
+    ED_NegRefs (D);
 }
 
 
@@ -403,6 +423,22 @@ static void ED_Move (ExprDesc* From, ExprDesc* To)
 
 static void StudyExprInternal (ExprNode* Expr, ExprDesc* D);
 /* Study an expression tree and place the contents into D */
+
+
+
+static unsigned char GetConstAddrSize (long Val)
+/* Get the address size of a constant */
+{
+    if ((Val & ~0xFFL) == 0) {
+        return ADDR_SIZE_ZP;
+    } else if ((Val & ~0xFFFFL) == 0) {
+        return ADDR_SIZE_ABS;
+    } else if ((Val & ~0xFFFFFFL) == 0) {
+        return ADDR_SIZE_FAR;
+    } else {
+        return ADDR_SIZE_LONG;
+    }
+}
 
 
 
@@ -450,9 +486,9 @@ static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
 static void StudyLiteral (ExprNode* Expr, ExprDesc* D)
 /* Study a literal expression node */
 {
-
     /* This one is easy */
-    D->Val = Expr->V.Val;
+    D->Val      = Expr->V.Val;
+    D->AddrSize = GetConstAddrSize (D->Val);
 }
 
 
@@ -621,8 +657,7 @@ static void StudyMinus (ExprNode* Expr, ExprDesc* D)
     if (ED_IsValid (D) || ED_IsValid (&Right)) {
 
         /* Subtract both */
-        ED_Neg (&Right);
-        ED_Add (D, &Right);
+        ED_Sub (D, &Right);
 
     } else {
 
@@ -1295,13 +1330,13 @@ static void StudyExprInternal (ExprNode* Expr, ExprDesc* D)
 void StudyExpr (ExprNode* Expr, ExprDesc* D)
 /* Study an expression tree and place the contents into D */
 {
-    unsigned I;
+    unsigned I, J;
 
     /* Call the internal function */
     StudyExprInternal (Expr, D);
 
     /* Remove symbol references with count zero */
-    I = 0;
+    I = J = 0;
     while (I < D->SymCount) {
         if (D->SymRef[I].Count == 0) {
             /* Delete the entry */
@@ -1328,32 +1363,68 @@ void StudyExpr (ExprNode* Expr, ExprDesc* D)
         }
     }
 
-    /* If we don't have an address size, assign one of the expression is a
+    /* If we don't have an address size, assign one if the expression is a
      * constant.
      */
-    if (D->AddrSize == ADDR_SIZE_DEFAULT) {
-        if (ED_IsConst (D)) {
-            if ((D->Val & ~0xFFL) == 0) {
-                D->AddrSize = ADDR_SIZE_ZP;
-            } else if ((D->Val & ~0xFFFFL) == 0) {
-                D->AddrSize = ADDR_SIZE_ABS;
-            } else if ((D->Val & 0xFFFFFFL) == 0) {
-                D->AddrSize = ADDR_SIZE_FAR;
+    if (D->AddrSize == ADDR_SIZE_DEFAULT && ED_IsConst (D)) {
+        D->AddrSize = GetConstAddrSize (D->Val);
+    }
+
+    /* If the expression is valid, throw away the address size and recalculate
+     * it using the data we have. This is more exact than the on-the-fly
+     * calculation done when evaluating the tree, because symbols may have
+     * been removed from the expression, and the final numeric value is now
+     * known.
+     */
+    if (ED_IsValid (D)) {
+        unsigned char AddrSize;
+        if (D->SymCount == 1 && D->SecCount == 0) {
+            /* Exactly one symbol. Assume that the expression has the size of
+             * the symbol, provided that this size is known.
+             */
+            const SymEntry* Sym = D->SymRef[0].Ref;
+            AddrSize = GetSymAddrSize (Sym);
+            if (AddrSize != ADDR_SIZE_DEFAULT) {
+                D->AddrSize = AddrSize;
             } else {
-                D->AddrSize = ADDR_SIZE_LONG;
+                AddrSize = GetConstAddrSize (D->Val);
+                if (AddrSize > D->AddrSize) {
+                    D->AddrSize = AddrSize;
+                }
+            }
+        } else if (D->SymCount == 0 && D->SecCount == 1) {
+            /* Exactly one segment reference (segment+offset). In this case,
+             * the expression has the address size of the segment.
+             */
+            unsigned SegNum = D->SecRef[0].Ref;
+            AddrSize = GetSegAddrSize (SegNum);
+            if (AddrSize != ADDR_SIZE_DEFAULT) {
+                D->AddrSize = AddrSize;
+            } else {
+                AddrSize = GetConstAddrSize (D->Val);
+                if (AddrSize > D->AddrSize) {
+                    D->AddrSize = AddrSize;
+                }
+            }
+        } else {
+            AddrSize = GetConstAddrSize (D->Val);
+            if (AddrSize > D->AddrSize) {
+                D->AddrSize = AddrSize;
             }
         }
     }
 
 #if 0
+    /* Debug code */
     printf ("StudyExpr: "); DumpExpr (Expr, SymResolve);
+    printf ("Value: %08lX\n", D->Val);
     if (!ED_IsValid (D)) {
         printf ("Invalid: %s\n", AddrSizeToStr (D->AddrSize));
     } else {
         printf ("Valid:   %s\n", AddrSizeToStr (D->AddrSize));
-        printf ("%u symbols:\n", D->SymCount);
-        printf ("%u sections:\n", D->SecCount);
     }
+    printf ("%u symbols:\n", D->SymCount);
+    printf ("%u sections:\n", D->SecCount);
 #endif
 }
 

@@ -741,8 +741,14 @@ static FuncDesc* ParseFuncDecl (void)
      	NextToken ();
      	F->Flags |= FD_VOID_PARAM;
     } else if (curtok == TOK_IDENT && (nxttok == TOK_COMMA || nxttok == TOK_RPAREN)) {
-	/* Old style (K&R) function. Assume variable param list. */
-       	F->Flags |= (FD_OLDSTYLE | FD_VARIADIC);
+	/* If the identifier is a typedef, we have a new style parameter list,
+	 * if it's some other identifier, it's an old style parameter list.
+	 */
+	Sym = FindSym (CurTok.Ident);
+	if (Sym == 0 || !IsTypeDef (Sym)) {
+	    /* Old style (K&R) function. Assume variable param list. */
+	    F->Flags |= (FD_OLDSTYLE | FD_VARIADIC);
+	}
     }
 
     /* Parse params */

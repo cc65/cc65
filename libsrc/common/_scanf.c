@@ -36,42 +36,42 @@ extern void __fastcall__ _seterrno (unsigned char code);
 
 
 /*****************************************************************************/
-/*                             SetJmp return codes              */
+/*                    	      SetJmp return codes			     */
 /*****************************************************************************/
 
 
 
 enum {
-    RC_OK,                  /* setjmp() call */
-    RC_NOCONV,                  /* No conversion possible */
-    RC_EOF                  /* EOF reached */
+    RC_OK,                              /* setjmp() call */
+    RC_NOCONV,                          /* No conversion possible */
+    RC_EOF                              /* EOF reached */
 };
 
 
 
 /*****************************************************************************/
-/*                           Data                           */
+/*                    		     Data				     */
 /*****************************************************************************/
 
 
 
-static const char*    format;     /* Copy of function argument */
+static const char*    format;           /* Copy of function argument */
 static const struct scanfdata* D_;      /* Copy of function argument */
-static va_list        ap;               /* Copy of function argument */
-static jmp_buf        JumpBuf;   /* "Label" that is used for failures */
-static char           F;             /* Character from format string */
+static va_list        ap;	 	/* Copy of function argument */
+static jmp_buf        JumpBuf;		/* "Label" that is used for failures */
+static char           F;  	     	/* Character from format string */
 static unsigned       CharCount;        /* Characters read so far */
-static int            C;                       /* Character from input */
-static unsigned       Width;            /* Maximum field width */
-static long           IntVal;     /* Converted int value */
-static int            Assignments;   /* Number of assignments */
+static int            C;  	      	/* Character from input */
+static unsigned       Width;      	/* Maximum field width */
+static long           IntVal;		/* Converted int value */
+static int            Assignments;	/* Number of assignments */
 static unsigned char  IntBytes;         /* Number of bytes-1 for int conversions */
 
 /* Flags */
-static bool           Converted;    /* Some object was converted */
-static bool           Positive;         /* Flag for positive value */
-static bool           NoAssign;         /* Suppress assignment */
-static bool           Invert;             /* Do we need to invert the charset? */
+static bool           Converted;	/* Some object was converted */
+static bool           Positive;		/* Flag for positive value */
+static bool           NoAssign;		/* Suppress assignment */
+static bool           Invert;		/* Do we need to invert the charset? */
 static unsigned char  CharSet[(1+UCHAR_MAX)/CHAR_BIT];
 static const unsigned char Bits[CHAR_BIT] = {
     0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80
@@ -89,7 +89,7 @@ static const unsigned char Bits[CHAR_BIT] = {
 
 
 /*****************************************************************************/
-/*                           Character sets                       */
+/*       	       	    	Character sets				     */
 /*****************************************************************************/
 
 
@@ -107,13 +107,13 @@ static unsigned FindBit (void)
  */
 {
     asm ("pha");
-    asm ("lsr a");           /* Divide by CHAR_BIT */
+    asm ("lsr a");              /* Divide by CHAR_BIT */
     asm ("lsr a");
     asm ("lsr a");
-    asm ("tax");               /* Byte's offset */
+    asm ("tax");                /* Byte's offset */
     asm ("pla");
     asm ("and #%b", CHAR_BIT-1);
-    asm ("tay");               /* Bit's offset */
+    asm ("tay");                /* Bit's offset */
     asm ("lda %v,y", Bits);
     return (unsigned) __AX__;
 }
@@ -139,7 +139,7 @@ static unsigned char IsCharInSet (void)
     /* Get the character from C. */
     asm ("lda #$00");
     asm ("ldx %v+1", C);
-    asm ("bne L1");                 /* EOF never is in the set */
+    asm ("bne L1");        		/* EOF never is in the set */
     asm ("lda %v", C);
     FindBit();
     asm ("and %v,x", CharSet);
@@ -167,7 +167,7 @@ static void InvertCharSet (void)
 
 
 /*****************************************************************************/
-/*                          Code                           */
+/*                     	 	     Code				     */
 /*****************************************************************************/
 
 
@@ -432,17 +432,17 @@ static void __fastcall__ ScanInt (unsigned char Base)
                 case 'x':
                 case 'X':
                     Base = 16;
-                   Converted = true;
+            	    Converted = true;
                     ReadChar ();
                     break;
                 default:
                     Base = 8;
 
-                   /* Restart at the beginning of the number because it might
-                    * be only a single zero digit (which already was read).
-                    */
-                   PushBack ();
-                   C = '0';
+                    /* Restart at the beginning of the number because it might
+                     * be only a single zero digit (which already was read).
+                     */
+                    PushBack ();
+                    C = '0';
             }
         } else {
             Base = 10;
@@ -480,7 +480,7 @@ static char GetFormat (void)
 
 
 int __fastcall__ _scanf (const struct scanfdata* D,
-                  const char* format_, va_list ap_)
+            		 const char* format_, va_list ap_)
 /* This is the routine used to do the actual work. It is called from several
  * types of wrappers to implement the actual ISO xxscanf functions.
  */
@@ -518,72 +518,72 @@ Again:
             /* Check for a conversion */
             if (F != '%') {
 
-               /* Check for a match */
-               if ((bool) isspace ((int) F)) {
+            	/* Check for a match */
+            	if ((bool) isspace ((int) F)) {
 
-                   /* Special white space handling: Any whitespace in the
+            	    /* Special white space handling: Any whitespace in the
                      * format string matches any amount of whitespace including
                      * none(!). So this match will never fail.
-                    */
-                   SkipWhite ();
-                   continue;
-               }
+            	     */
+            	    SkipWhite ();
+            	    continue;
+            	}
 
 Percent:
-               /* ### Note:  The opposite test (C == F)
-               ** would be optimized into buggy code!
-               */
-               if (C != (int) F) {
+                /* ### Note:  The opposite test (C == F)
+                ** would be optimized into buggy code!
+                */
+                if (C != (int) F) {
 
-                   /* A mismatch -- we will stop scanning the input,
-                    * and return the number of assigned conversions.
-                    */
-                   goto NoConv;
-                   }
+                    /* A mismatch -- we will stop scanning the input,
+                     * and return the number of assigned conversions.
+                     */
+                    goto NoConv;
+            	}
 
-               /* A match -- get the next input character, and continue. */
-               goto Again;
+                /* A match -- get the next input character, and continue. */
+                goto Again;
 
             } else {
 
-               /* A conversion. Skip the percent sign. */
-               /* 0. Check for %% */
-               if (GetFormat () == '%') {
-                   goto Percent;
-                   }
+            	/* A conversion. Skip the percent sign. */
+            	/* 0. Check for %% */
+            	if (GetFormat () == '%') {
+            	    goto Percent;
+            	}
 
-                 /* 1. Assignment suppression */
-               NoAssign = (F == '*');
-               if (NoAssign) {
-                   GetFormat ();
+            	/* 1. Assignment suppression */
+                NoAssign = (F == '*');
+                if (NoAssign) {
+                    GetFormat ();
                 }
 
                 /* 2. Maximum field width */
-                Width     = UINT_MAX;
-               HaveWidth = (bool) isdigit (F);
-               if (HaveWidth) {
-                   Width = 0;
+               	Width  	  = UINT_MAX;
+                HaveWidth = (bool) isdigit (F);
+                if (HaveWidth) {
+                    Width = 0;
                     do {
                         /* ### Non portable ### */
                         Width = Width * 10 + (F & 0x0F);
-                   } while ((bool) isdigit (GetFormat ()));
+                    } while ((bool) isdigit (GetFormat ()));
                 }
-               if (Width == 0) {
-                   /* Invalid specification */
-                   /* Note:  This method of leaving the function might seem
-                    * to be crude, but it optimizes very well because
-                    * the four exits can share this code.
-                    */
-                   _seterrno (EINVAL);
-                   Assignments = EOF;
-                   PushBack ();
-                   return Assignments;
-               }
-               /* Increment-and-test makes better code than test-and-decrement
-                * does.  So, change the width into a form that can be used in
-                * that way.
-                */
-               Width = ~Width;
+                if (Width == 0) {
+                    /* Invalid specification */
+                    /* Note:  This method of leaving the function might seem
+                     * to be crude, but it optimizes very well because
+                     * the four exits can share this code.
+                     */
+                    _seterrno (EINVAL);
+                    Assignments = EOF;
+                    PushBack ();
+                    return Assignments;
+                }
+                /* Increment-and-test makes better code than test-and-decrement
+                 * does.  So, change the width into a form that can be used in
+                 * that way.
+                 */
+                Width = ~Width;
 
                 /* 3. Length modifier */
                 IntBytes = sizeof(int) - 1;
@@ -593,7 +593,7 @@ Percent:
                             IntBytes = sizeof(char) - 1;
                             ++format;
                         }
-                     GetFormat ();
+                   	GetFormat ();
                         break;
 
                     case 'l':
@@ -604,108 +604,108 @@ Percent:
                         /* FALLTHROUGH */
                     case 'j':   /* intmax_t */
                         IntBytes = sizeof(long) - 1;
-                     /* FALLTHROUGH */
+                   	/* FALLTHROUGH */
 
                     case 'z':   /* size_t */
                     case 't':   /* ptrdiff_t */
-                     /* Same size as int */
+                   	/* Same size as int */
 
                     case 'L':   /* long double - ignore this one */
-                     GetFormat ();
+                   	GetFormat ();
                 }
 
                 /* 4. Conversion specifier */
-           switch (F) {
+                switch (F) {
                     /* 'd' and 'u' conversions are actually the same, since the
                      * standard says that even the 'u' modifier allows an
                      * optionally signed integer.
                      */
-                       case 'd':   /* Optionally signed decimal integer */
+              	    case 'd':   /* Optionally signed decimal integer */
                     case 'u':
-                           ScanInt (10);
-                           break;
+              	      	ScanInt (10);
+              	      	break;
 
-                     case 'i':
-                           /* Optionally signed integer with a base */
-                    ScanInt (0);
-                           break;
+              	    case 'i':
+              	   	/* Optionally signed integer with a base */
+         		ScanInt (0);
+              	  	break;
 
-                     case 'o':
-                           /* Optionally signed octal integer */
-                           ScanInt (8);
-                   break;
+              	    case 'o':
+              	  	/* Optionally signed octal integer */
+              	      	ScanInt (8);
+              		break;
 
-                   case 'x':
-                   case 'X':
-                       /* Optionally signed hexadecimal integer */
-                           ScanInt (16);
-                       break;
+              	    case 'x':
+              	    case 'X':
+              	 	/* Optionally signed hexadecimal integer */
+              	    	ScanInt (16);
+              	   	break;
 
-                   case 's':
-                       /* Whitespace-terminated string */
-                             SkipWhite ();
-                     CheckEnd ();         /* Is it an input failure? */
+              	    case 's':
+              	   	/* Whitespace-terminated string */
+                      	SkipWhite ();
+                   	CheckEnd ();	   /* Is it an input failure? */
                         Converted = true;  /* No, conversion will succeed */
-                     if (NoAssign == false) {
-                         S = va_arg (ap, char*);
-                     }
-                        while (C != EOF
-                            && (bool) isspace (C) == false
-                            && ++Width) {
-                         if (NoAssign == false) {
-                               *S++ = C;
-                         }
-                             ReadChar ();
-                     }
-                     /* Terminate the string just read */
-                     if (NoAssign == false) {
-                         *S = '\0';
-                         ++Assignments;
-                     }
-                     break;
+                   	if (NoAssign == false) {
+                   	    S = va_arg (ap, char*);
+                   	}
+               	       	while (C != EOF
+                   	       && (bool) isspace (C) == false
+                   	       && ++Width) {
+                   	    if (NoAssign == false) {
+                   	       	*S++ = C;
+                   	    }
+            	   	    ReadChar ();
+                   	}
+                   	/* Terminate the string just read */
+                   	if (NoAssign == false) {
+                   	    *S = '\0';
+                   	    ++Assignments;
+                   	}
+                   	break;
 
-                   case 'c':
-                     /* Fixed-length string, NOT zero-terminated */
-                     if (HaveWidth == false) {
-                         /* No width given, default is 1 */
-                         Width = ~1u;
-                     }
-                     CheckEnd ();         /* Is it an input failure? */
-                     Converted = true;  /* No, at least 1 char. available */
-                     if (NoAssign == false) {
-                         S = va_arg (ap, char*);
-                         /* ## This loop is convenient for us, but it isn't
-                          * standard C.  The standard implies that a failure
-                          * shouldn't put anything into the array argument.
-                          */
+                    case 'c':
+                   	/* Fixed-length string, NOT zero-terminated */
+                   	if (HaveWidth == false) {
+                   	    /* No width given, default is 1 */
+                   	    Width = ~1u;
+                   	}
+                   	CheckEnd ();	   /* Is it an input failure? */
+                   	Converted = true;  /* No, at least 1 char. available */
+                   	if (NoAssign == false) {
+                   	    S = va_arg (ap, char*);
+                   	    /* ## This loop is convenient for us, but it isn't
+                   	     * standard C.  The standard implies that a failure
+                   	     * shouldn't put anything into the array argument.
+                   	     */
                             while (++Width) {
-                       CheckEnd ();  /* Is it a matching failure? */
+                   		CheckEnd ();  /* Is it a matching failure? */
                                 *S++ = C;
                                 ReadChar ();
                             }
-                         ++Assignments;
-                     } else {
+                   	    ++Assignments;
+                   	} else {
                             /* Just skip as many chars as given */
                             while (++Width) {
-                       CheckEnd ();  /* Is it a matching failure? */
+                   		CheckEnd ();  /* Is it a matching failure? */
                                 ReadChar ();
                             }
                         }
-                     break;
+                   	break;
 
-                   case '[':
-                     /* String using characters from a set */
+                    case '[':
+                   	/* String using characters from a set */
                         /* Clear the set */
                         memset (CharSet, 0, sizeof (CharSet));
-                     /* Skip the left-bracket, and test for inversion. */
-                     Invert = (GetFormat () == '^');
+                   	/* Skip the left-bracket, and test for inversion. */
+                   	Invert = (GetFormat () == '^');
                         if (Invert) {
                             GetFormat ();
                         }
                         if (F == ']') {
-                         /* Empty sets aren't allowed; so, a right-bracket
-                          * at the beginning must be a member of the set.
-                          */
+                   	    /* Empty sets aren't allowed; so, a right-bracket
+                   	     * at the beginning must be a member of the set.
+                   	     */
                             AddCharToSet (F);
                             GetFormat ();
                         }
@@ -716,16 +716,16 @@ Percent:
                                 Start = F;
                                 ++format;
                                 switch (GetFormat ()) {
-                              case '\0':
-                              case ']':
+                                    case '\0':
+                                    case ']':
                                         /* '-' as last char means:  include '-' */
                                         AddCharToSet (Start);
                                         AddCharToSet ('-');
-                              break;
-                              default:
+                                        break;
+                                    default:
                                         /* Include all characters
-                               * that are in the range.
-                               */
+                                         * that are in the range.
+                                         */
                                         while (1) {
                                             AddCharToSet (Start);
                                             if (Start == F) {
@@ -743,11 +743,11 @@ Percent:
                                 GetFormat ();
                             }
                         }
-                     /* Don't go beyond the end of the format string. */
-                     /* (Maybe, this should mean an invalid specification.) */
-                     if (F == '\0') {
-                         --format;
-                     }
+                        /* Don't go beyond the end of the format string. */
+                        /* (Maybe, this should mean an invalid specification.) */
+                        if (F == '\0') {
+                            --format;
+                        }
 
                         /* Invert the set if requested */
                         if (Invert) {
@@ -758,90 +758,90 @@ Percent:
                          * store them into a string while they are part of
                          * the set.
                          */
-                     Match = false;
-                     if (NoAssign == false) {
-                         S = va_arg (ap, char*);
-                     }
+                        Match = false;
+                        if (NoAssign == false) {
+                   	    S = va_arg (ap, char*);
+                        }
                         while (IsCharInSet () && ++Width) {
-                         if (NoAssign == false) {
+                   	    if (NoAssign == false) {
                                 *S++ = C;
-                         }
-                         Match = Converted = true;
-                         ReadChar ();
+                            }
+                            Match = Converted = true;
+                            ReadChar ();
                         }
-                     /* At least one character must match the set. */
-                     if (Match == false) {
-                         goto NoConv;
-                     }
-                     if (NoAssign == false) {
+                        /* At least one character must match the set. */
+                        if (Match == false) {
+                            goto NoConv;
+                        }
+                        if (NoAssign == false) {
                             *S = '\0';
-                         ++Assignments;
-                     }
-                     break;
-
-              case 'p':
-                       /* Pointer, general format is 0xABCD.
-                      * %hhp --> zero-page pointer
-                      * %hp --> near pointer
-                      * %lp --> far pointer
-                      */
-                     SkipWhite ();
-                     if (CHAR (C) != '0') {
-                         goto NoConv;
+                            ++Assignments;
                         }
-                     Converted = true;
-                     ReadChar ();
-                     switch (CHAR (C)) {
-                         case 'x':
-                         case 'X':
-                          break;
-                         default:
-                          goto NoConv;
-                     }
+                   	break;
+
+                    case 'p':
+            		/* Pointer, general format is 0xABCD.
+                         * %hhp --> zero-page pointer
+                         * %hp --> near pointer
+                         * %lp --> far pointer
+                   	 */
+                   	SkipWhite ();
+                        if (CHAR (C) != '0') {
+                   	    goto NoConv;
+                        }
+                        Converted = true;
+                        ReadChar ();
+                        switch (CHAR (C)) {
+                            case 'x':
+                            case 'X':
+                                break;
+                            default:
+                                goto NoConv;
+                        }
                         ReadChar ();
                         ReadInt (16);
-                     AssignInt ();
-           break;
+                        AssignInt ();
+                        break;
 
-              case 'n':
-           /* Store the number of characters consumed so far
-                      * (the read-ahead character hasn't been consumed).
-                      */
-                     IntVal = (long) (CharCount - (C == EOF ? 0u : 1u));
-                     AssignInt ();
-                     /* Don't count it. */
-                     if (NoAssign == false) {
-                         --Assignments;
-                     }
-                     break;
+                    case 'n':
+                        /* Store the number of characters consumed so far
+                         * (the read-ahead character hasn't been consumed).
+                         */
+                        IntVal = (long) (CharCount - (C == EOF ? 0u : 1u));
+                   	AssignInt ();
+                        /* Don't count it. */
+                        if (NoAssign == false) {
+                   	    --Assignments;
+                        }
+                        break;
 
-                   case 'S':
-                   case 'C':
-                     /* Wide characters */
+              	    case 'S':
+              	    case 'C':
+                        /* Wide characters */
 
-                   case 'a':
-                   case 'A':
-                   case 'e':
-                   case 'E':
-                       case 'f':
-                   case 'F':
-                   case 'g':
-                   case 'G':
-                       /* Optionally signed float */
+              	    case 'a':
+              	    case 'A':
+              	    case 'e':
+              	    case 'E':
+              	    case 'f':
+              	    case 'F':
+              	    case 'g':
+              	    case 'G':
+              		/* Optionally signed float */
 
-                     /* Those 2 groups aren't implemented. */
-                     _seterrno (ENOSYS);
-                     Assignments = EOF;
-                     PushBack ();
-                     return Assignments;
+                        /* Those 2 groups aren't implemented. */
+                        _seterrno (ENOSYS);
+                        Assignments = EOF;
+                   	PushBack ();
+                   	return Assignments;
 
-                   default:
-                     /* Invalid specification */
-                     _seterrno (EINVAL);
-                     Assignments = EOF;
-                     PushBack ();
-                     return Assignments;
-               }
+                    default:
+                        /* Invalid specification */
+                        _seterrno (EINVAL);
+                        Assignments = EOF;
+                        PushBack ();
+                        return Assignments;
+                }
             }
         }
     } else {
@@ -852,7 +852,7 @@ NoConv:
          * the number of assignments is returned (the default behaviour).
          */
         if (C == EOF && Converted == false) {
-            Assignments = EOF; /* Special case:  error */
+            Assignments = EOF;	/* Special case:  error */
         }
     }
 

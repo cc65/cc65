@@ -39,18 +39,18 @@ static const struct {
         const char *input, *format;
         int rvalue;
         enum TYPE {
-               INT,
-               CHAR
-               } type1;
+                INT,
+                CHAR
+                } type1;
         union {
-               int nvalue;
-               const char *svalue;
-               } v1;
+                int nvalue;
+                const char *svalue;
+                } v1;
         enum TYPE type2;
         union {
-               int nvalue;
-               const char *svalue;
-               } v2;
+                int nvalue;
+                const char *svalue;
+                } v2;
         } test_data[] = {
 /* Input sequences for character specifiers must be less than 80 characters
 ** long.  These format strings are allowwed a maximum of two assignment
@@ -177,8 +177,8 @@ int main(void) {
         */
         sscanf("%  \r\n\f\v\t  0", "%%%i", &n1);
         if (n1 != 0)
-               PRINTF("sscanf()'s \"%%%%%%i\" couldn't scan either a \"%%\" "
-                      "or a single zero digit.\r\n\n");
+                PRINTF("sscanf()'s \"%%%%%%i\" couldn't scan either a \"%%\" "
+                       "or a single zero digit.\r\n\n");
 
         /* Test scanf()'s return-value:  EOF if input ends before the first
         ** conversion-attempt begins; an assignment-count, otherwise.
@@ -188,60 +188,60 @@ int main(void) {
         PRINTF("Testing scanf()'s return-value,\r\nconversions, and assignments...\r\n");
         for (t = 0; t < ARRAYSIZE(test_data); ++t) {
 
-               /* Prefill the arguments with zeroes. */
-               n1 = n2 = 0;
-               memset(s1, '\0', sizeof s1);
-               memset(s2, '\0', sizeof s2);
+                /* Prefill the arguments with zeroes. */
+                n1 = n2 = 0;
+                memset(s1, '\0', sizeof s1);
+                memset(s2, '\0', sizeof s2);
 
-               c=sscanf(test_data[t].input, test_data[t].format,
-                      /* Avoid warning messages about different
-                      ** pointer-types, by casting them to void-pointers.
-                      */
-                      test_data[t].type1 == INT ? (void *)&n1 : (void *)s1,
-                      test_data[t].type2 == INT ? (void *)&n2 : (void *)s2);
-               if (c != test_data[t].rvalue)
-                     PRINTF("Test #%u returned %d instead of %d.\r\n",
-                            t + 1, c, test_data[t].rvalue);
+                c=sscanf(test_data[t].input, test_data[t].format,
+                         /* Avoid warning messages about different
+                         ** pointer-types, by casting them to void-pointers.
+                         */
+                         test_data[t].type1 == INT ? (void *)&n1 : (void *)s1,
+                         test_data[t].type2 == INT ? (void *)&n2 : (void *)s2);
+                if (c != test_data[t].rvalue)
+                        PRINTF("Test #%u returned %d instead of %d.\r\n",
+                               t + 1, c, test_data[t].rvalue);
 
-               if (test_data[t].type1 == INT) {
-                     if (test_data[t].v1.nvalue != n1)
-                          PRINTF("Test #%u assigned %i, instead of %i,\r\n"
-                                 "\tto the first argument.\r\n\n",
-                                 t + 1, n1, test_data[t].v1.nvalue);
-                     }
-               else {               /* test_data[t].type1 == CHAR */
-                     if (strcmp(test_data[t].v1.svalue, s1))
-                          PRINTF("Test #%u assigned\r\n\"%s\",\r\n"
-                                 "\tinstead of\r\n\"%s\",\r\n"
-                                 "\tto the first argument.\r\n\n",
-                                 t + 1, s1, test_data[t].v1.svalue);
-                     }
+                if (test_data[t].type1 == INT) {
+                        if (test_data[t].v1.nvalue != n1)
+                                PRINTF("Test #%u assigned %i, instead of %i,\r\n"
+                                       "\tto the first argument.\r\n\n",
+                                       t + 1, n1, test_data[t].v1.nvalue);
+                        }
+                else {		/* test_data[t].type1 == CHAR */
+                        if (strcmp(test_data[t].v1.svalue, s1))
+                                PRINTF("Test #%u assigned\r\n\"%s\",\r\n"
+                                       "\tinstead of\r\n\"%s\",\r\n"
+                                       "\tto the first argument.\r\n\n",
+                                       t + 1, s1, test_data[t].v1.svalue);
+                        }
 
-               if (test_data[t].type2 == INT) {
-                     if (test_data[t].v2.nvalue != n2)
-                          PRINTF("Test #%u assigned %i, instead of %i,\r\n"
-                                 "\tto the second argument.\r\n\n",
-                                 t + 1, n2, test_data[t].v2.nvalue);
-                     }
-               else {               /* test_data[t].type2 == CHAR */
-                     if (strcmp(test_data[t].v2.svalue, s2))
-                          PRINTF("Test #%u assigned\r\n\"%s\",\r\n"
-                                 "\tinstead of\r\n\"%s\",\r\n"
-                                 "\tto the second argument.\r\n\n",
-                                 t + 1, s2, test_data[t].v2.svalue);
-                     }
-               }
+                if (test_data[t].type2 == INT) {
+                        if (test_data[t].v2.nvalue != n2)
+                                PRINTF("Test #%u assigned %i, instead of %i,\r\n"
+                                       "\tto the second argument.\r\n\n",
+                                       t + 1, n2, test_data[t].v2.nvalue);
+                        }
+                else {		/* test_data[t].type2 == CHAR */
+                        if (strcmp(test_data[t].v2.svalue, s2))
+                                PRINTF("Test #%u assigned\r\n\"%s\",\r\n"
+                                       "\tinstead of\r\n\"%s\",\r\n"
+                                       "\tto the second argument.\r\n\n",
+                                       t + 1, s2, test_data[t].v2.svalue);
+                        }
+                }
         Pause();
 
         /* Test the char, short, and long specification-modifiers. */
         PRINTF("Testing scanf()'s type-modifiers...\r\n");
         for (t = 0; t < ARRAYSIZE(type_data); ++t) {
-               n0 = 0L;
-               sscanf(type_data[t].input, type_data[t].format, &n0);
-               if (type_data[t].value != n0)
-                     PRINTF("Test #%u assigned %li instead of %li.\r\n",
-                            t + 1, n0, type_data[t].value);
-               }
+                n0 = 0L;
+                sscanf(type_data[t].input, type_data[t].format, &n0);
+                if (type_data[t].value != n0)
+                        PRINTF("Test #%u assigned %li instead of %li.\r\n",
+                               t + 1, n0, type_data[t].value);
+                }
         Pause();
 
         /* Test that the pointer specification
@@ -249,34 +249,34 @@ int main(void) {
         */
         PRINTF("Testing \"%%p\"...\r\n");
         sprintf(s1, "%p %p %p %p", NULL, NULL,
-               Pause,                     /* static (program) storage */
-               &c);           /* automatic (stack) storage */
+                Pause,			/* static (program) storage */
+                &c);			/* automatic (stack) storage */
         sscanf(s1, "%p%p%p %p", &p1, &p2, &p3, &p4);
         if (p1 != NULL || p2 != NULL ||
             p3 != (void *)Pause || p4 != (void *)&c)
-               PRINTF("p1 is %p, p2 is %p; they should be %p.\r\n"
-                      "scanf() assigned %p to p3, instead of %p.\r\n"
-                      "scanf() assigned %p to p4, instead of %p.\r\n",
-                      p1, p2, NULL,
-                      p3, Pause,
-                      p4, &c);
+                PRINTF("p1 is %p, p2 is %p; they should be %p.\r\n"
+                       "scanf() assigned %p to p3, instead of %p.\r\n"
+                       "scanf() assigned %p to p4, instead of %p.\r\n",
+                       p1, p2, NULL,
+                       p3, Pause,
+                       p4, &c);
 
         /* Test that scanf() can scan typed input.
         ** Retest that "%i" can decode radix prefixxes.
         */
         do {
-               Pause();
-               PRINTF("Type 3 signed numbers,\r\n"
-                      "separated by white-space:\r\n"
-                      "octal decimal hexadecimal\r\n"
-                      "? ");
-               c = SCANF("%i %i %i", &n1, &n2, &n3);
-               PRINTF("\r\n\nscanf() returned %i.\r\n"
-                      "The numbers are:\r\n"
-                      " %+o octal,\r\n"
-                      " %+d decimal,\r\n"
-                      " %+#X hexadecimal.\r\n",
-                      c, n1, n2, n3);
-               } while (c > 0);
+                Pause();
+                PRINTF("Type 3 signed numbers,\r\n"
+                       "separated by white-space:\r\n"
+                       "octal decimal hexadecimal\r\n"
+                       "? ");
+                c = SCANF("%i %i %i", &n1, &n2, &n3);
+                PRINTF("\r\n\nscanf() returned %i.\r\n"
+                       "The numbers are:\r\n"
+                       " %+o octal,\r\n"
+                       " %+d decimal,\r\n"
+                       " %+#X hexadecimal.\r\n",
+                       c, n1, n2, n3);
+                } while (c > 0);
         return 0;
         }

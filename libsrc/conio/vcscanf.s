@@ -4,20 +4,20 @@
 ; 2005-01-02, Greg King
 ;
 
-        .export               _vcscanf
+        .export		_vcscanf
 
-        .import               _cgetc, _cputc
-        .import               popax, pushax, swapstk
+        .import		_cgetc, _cputc
+        .import		popax, pushax, swapstk
 
-        .include       "../common/_scanf.inc"
+        .include	"../common/_scanf.inc"
 
 
 ; static bool pushed;
 ; static char back;
 ;
         .bss
-pushed: .res    1
-back:   .res      1
+pushed: .res	1
+back:   .res	1
 
         .code
 ; /* Call-back functions:
@@ -39,26 +39,26 @@ back:   .res      1
 ;     return (int)C;
 ;     }
 ;
-get:    ldx        pushed
-        beq    L1
+get:    ldx	pushed
+        beq	L1
 
 ; Return the old, pushed-back character (instead of getting a new one).
 ;
-        dex         ; ldx #>0
-        stx    pushed
-        lda    back
+        dex			; ldx #>0
+        stx	pushed
+        lda	back
         rts
 
 ; Directly read the keyboard.
 ;
-L1:     jsr _cgetc
+L1:     jsr	_cgetc
 
 ; Echo the character to the screen.
 ;
         pha
-        jsr    _cputc
+        jsr	_cputc
         pla
-        ldx    #>0
+        ldx	#>0
         rts
 
 
@@ -68,10 +68,10 @@ L1:     jsr _cgetc
 ;     return back = c;
 ;     }
 ;
-unget:  ldx      #1
-        stx    pushed
-        jsr    popax           ; get the first argument
-        sta    back
+unget:  ldx	#1
+        stx	pushed
+        jsr	popax		; get the first argument
+        sta	back
         rts
 
 
@@ -96,35 +96,35 @@ unget:  ldx      #1
 ;
 ; Beware:  Because ap is a fastcall parameter, we must not destroy .XA.
 ;
-        .proc  _vcscanf
+        .proc	_vcscanf
 
 ; ----------------------------------------------------------------------------
 ; Static, constant scanfdata structure for the _vcscanf routine.
 ;
         .rodata
-d:      .addr        get       ; SCANFDATA::GET
-        .addr  unget       ; SCANFDATA::UNGET
-;       .addr 0             ; SCANFDATA::DATA (not used)
+d:      .addr	get		; SCANFDATA::GET
+        .addr	unget		; SCANFDATA::UNGET
+;       .addr	0		; SCANFDATA::DATA (not used)
 
         .code
-        pha         ; Save low byte of ap
+        pha			; Save low byte of ap
         txa
-        pha         ; Save high byte of ap
-        ldx    #0
-        stx    pushed
+        pha			; Save high byte of ap
+        ldx	#0
+        stx	pushed
 
 ; Put &d on the stack in front of the format pointer.
 
         lda     #<d
         ldx     #>d
         jsr     swapstk         ; Swap .XA with top-of-stack
-        jsr    pushax         ; Put format pointer back on stack
+        jsr	pushax		; Put format pointer back on stack
 
 ; Restore ap, and jump to _scanf which will clean up the stack.
 
         pla
         tax
         pla
-        jmp    __scanf
+        jmp	__scanf
         .endproc
 

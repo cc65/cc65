@@ -1318,6 +1318,15 @@ unsigned OptPrecalc (CodeSeg* S)
         /* Handle the different instructions */
         switch (E->OPC) {
 
+            case OP65_LDA:
+            case OP65_LDX:
+            case OP65_LDY:
+                if (E->AM == AM65_IMM) {
+                    /* If we do already have an immediate load, bail out */
+                    break;
+                }
+                /* FALLTHROUGH */
+
             case OP65_ADC:
             case OP65_AND:
             case OP65_ASL:

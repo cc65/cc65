@@ -114,6 +114,9 @@ static const char* FirstInput = 0;
 /* Remember if we should link a module */
 static int Module = 0;
 
+/* Extension used for a module */
+#define MODULE_EXT      ".o65"
+
 /* Name of the crt0 object file and the runtime library */
 static char* TargetCRT0 = 0;
 static char* TargetLib	= 0;
@@ -121,7 +124,7 @@ static char* TargetLib	= 0;
 
 
 /*****************************************************************************/
-/*			     Determine a file type			     */
+/*	    		     Determine a file type			     */
 /*****************************************************************************/
 
 
@@ -363,26 +366,29 @@ static void Link (void)
      */
     if (OutputName) {
 
-	CmdAddArg (&LD65, "-o");
-	CmdAddArg (&LD65, OutputName);
+    	CmdAddArg (&LD65, "-o");
+    	CmdAddArg (&LD65, OutputName);
 
     } else if (FirstInput && FindExt (FirstInput)) {  /* Only if ext present! */
-
-	char* Output = MakeFilename (FirstInput, "");
-	CmdAddArg (&LD65, "-o");
-	CmdAddArg (&LD65, Output);
-	xfree (Output);
+                                                         
+        const char* Extension = Module? MODULE_EXT : "";
+    	char* Output = MakeFilename (FirstInput, Extension);
+    	CmdAddArg (&LD65, "-o");
+    	CmdAddArg (&LD65, Output);
+    	xfree (Output);
 
     }
 
-    /* If we have a startup file, add its name as a parameter */
-    if (TargetCRT0) {
-	CmdAddArg (&LD65, TargetCRT0);
+    /* If we have a startup file and if we are not linking a module, add its
+     * name as a parameter
+     */
+    if (TargetCRT0 && !Module) {
+    	CmdAddArg (&LD65, TargetCRT0);
     }
 
     /* Add all object files as parameters */
     for (I = 0; I < LD65.FileCount; ++I) {
-	CmdAddArg (&LD65, LD65.Files [I]);
+    	CmdAddArg (&LD65, LD65.Files [I]);
     }
 
     /* Add the system runtime library */
@@ -816,15 +822,11 @@ static void OptStaticLocals (const char* Opt attribute ((unused)),
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the target system */
 {
-    if (Target != TGT_NONE) {
-        Error ("Cannot specify -t twice");
-    } else {
-        Target = FindTarget (Arg);
-        if (Target == TGT_UNKNOWN) {
-            Error ("No such target system: `%s'", Arg);
-        } else if (Target == TGT_MODULE) {
-            Error ("Cannot use `module' as target, use --module instead");
-        }
+    Target = FindTarget (Arg);
+    if (Target == TGT_UNKNOWN) {
+        Error ("No such target system: `%s'", Arg);
+    } else if (Target == TGT_MODULE) {
+        Error ("Cannot use `module' as target, use --module instead");
     }
 }
 

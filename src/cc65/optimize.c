@@ -4106,10 +4106,18 @@ static Line* OptOneBlock (Line* L)
 	     	Delete = 1;
 	    } else if (LineMatch (L, "\tlda\t(")) {
 	     	if (IsXAddrMode (L)) {
-	     	    /* lda (zp,x) - if Y and X are both zero, replace by
-		     * load indirect y and save one cycle in some cases.
+	     	    /* lda (zp,x). */
+		    /* If X is zero and we have a 65C02 cpu, replace it by
+		     * an indirect load.
 		     */
-	    	    if (X == 0 && Y == 0) {
+		    if (X == 0 && CPU == CPU_65C02) { 
+			unsigned Len = strlen (L->Line);
+			L->Line [Len-3] = ')';
+			L->Line [Len-2] = '\0';
+       	       	    /* If Y and X are both zero, replace by load indirect
+		     * y and save one cycle in some cases.
+		     */
+	    	    } else if (X == 0 && Y == 0) {
 		    	char Buf [256];
 		    	const char* S = L->Line + 6;
 		    	char* T = Buf + 6;
@@ -4122,6 +4130,15 @@ static Line* OptOneBlock (Line* L)
 		    	*T++ = 'y';
 	    	    	*T   = '\0';
 		    	L = ReplaceLine (L, Buf);
+		    }
+		} else if (IsYAddrMode (L)) {
+		    /* lda (zp),y. If Y is zero and we have a 65C02 CPU,
+		     * replace it by an indirect load.
+		     */
+		    if (Y == 0 && CPU == CPU_65C02) {
+			unsigned Len = strlen (L->Line);
+			L->Line [Len-3] = ')';
+			L->Line [Len-2] = '\0';
 		    }
 		}
 		/* In any case invalidate A */

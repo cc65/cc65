@@ -76,7 +76,7 @@
 #define EXP_INIT	0x04   	   	/* Mask bit for initializer export */
 #define EXP_MASK_INIT	0x04		/* Value mask */
 
-#define IS_EXP_INIT	(((x) & EXP_MASK_INIT) == EXP_INIT)
+#define IS_EXP_INIT(x)	(((x) & EXP_MASK_INIT) == EXP_INIT)
 
 
 

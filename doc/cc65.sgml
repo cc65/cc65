@@ -424,15 +424,15 @@ This cc65 version has some extensions to the ISO C standard.
      	assembler. The syntax for a function declaration using fastcall is
 
 	<tscreen><verb>
-	<tt/&lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)/
+	&lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)
      	</verb></tscreen>
      	or
 	<tscreen><verb>
-	<tt/&lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)/
+       	&lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)
      	</verb></tscreen>
 	An example would be
 	<tscreen><verb>
-       	<tt/void __fastcall__ f (unsigned char c)/
+       	void __fastcall__ f (unsigned char c)
      	</verb></tscreen>
 	The first form of the fastcall keyword is in the user namespace and is
 	therefore disabled in strict ANSI mode.
@@ -452,7 +452,7 @@ This cc65 version has some extensions to the ISO C standard.
 	sequences of assembler code. For example, the macro
 
 	<tscreen><verb>
-	#define hi(x) (__AX__=(x),asm("\ttxa\n\tldx\t#$00",__AX__)
+       	#define hi(x) (__AX__=(x),asm("\ttxa\n\tldx\t#$00",__AX__)
 	</verb></tscreen>
 
 	will give the high byte of any unsigned value.

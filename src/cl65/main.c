@@ -336,16 +336,18 @@ static void Link (void)
 {
     unsigned I;
 
-    /* If we have a linker config file given, set the linker config file.
-     * Otherwise set the target system.
+    /* If we have a linker config file given, add it to the command line. 
+     * Otherwise pass the target to the linker if we have one.
      */
     if (LinkerConfig) {
        	CmdAddArg (&LD65, "-C");
 	CmdAddArg (&LD65, LinkerConfig);
-    } else {
+    } else if (Target != TGT_NONE) {
 	CmdSetTarget (&LD65, Target);
-	SetTargetFiles ();
     }
+
+    /* Determine which target libraries are needed */
+    SetTargetFiles ();
 
     /* Since linking is always the final step, if we have an output file name
      * given, set it here. If we don't have an explicit output name given,

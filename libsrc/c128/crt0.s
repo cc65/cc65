@@ -5,7 +5,6 @@
 ;
 
     	.export	     	_exit
-    	.export	     	BRKStub, BRKOld, BRKInd
     	.import	     	condes, initlib, donelib
     	.import	     	initconio, doneconio, zerobss
     	.import		push0, _main
@@ -189,23 +188,11 @@ IRQStub:
        	jmp    	IRQInd			; Jump to the saved IRQ vector
 
 
-BRKStub:
-	pla    				; Get original MMU_CR value
-	sta    	MMU_CR			; And set it
-       	jmp    	BRKInd 	       	       	; Jump indirect to break
-
-
 ; ------------------------------------------------------------------------
 ; Data
 
 .data
 zpsave:	.res	zpspace
-
-; Old break vector preceeded by a jump opcode
-BRKOld: jmp     $0000
-
-; Indirect vectors preceeded by a jump opcode
-BRKInd: jmp     $0000
 
 .bss
 spsave:	.res	1

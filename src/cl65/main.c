@@ -78,6 +78,7 @@ struct CmdDesc_ {
 static CmdDesc CC65 = { 0, 0, 0, 0, 0, 0, 0 };
 static CmdDesc CA65 = { 0, 0, 0, 0, 0, 0, 0 };
 static CmdDesc LD65 = { 0, 0, 0, 0, 0, 0, 0 };
+static CmdDesc GRC  = { 0, 0, 0, 0, 0, 0, 0 };
 
 /* File types */
 enum {
@@ -85,7 +86,8 @@ enum {
     FILETYPE_C,
     FILETYPE_ASM,
     FILETYPE_OBJ,
-    FILETYPE_LIB
+    FILETYPE_LIB,
+    FILETYPE_GR,  		/* GEOS resource file */
 };
 
 /* Default file type, used if type unknown */
@@ -161,11 +163,13 @@ static unsigned GetFileType (const char* File)
     } FileTypes [] = {
 	{   ".c",	FILETYPE_C	},
 	{   ".s",	FILETYPE_ASM	},
+       	{   ".ss",	FILETYPE_ASM	},
 	{   ".asm",	FILETYPE_ASM	},
 	{   ".o",	FILETYPE_OBJ	},
 	{   ".obj",	FILETYPE_OBJ	},
 	{   ".a",	FILETYPE_LIB	},
 	{   ".lib",	FILETYPE_LIB	},
+	{   ".grc",	FILETYPE_GR	},
     };
 
     unsigned I;
@@ -532,8 +536,50 @@ static void Compile (const char* File)
 
 
 
+static void CompileRes (const char* File)
+/* Compile the given geos resource file */
+{
+    char* AsmName = 0;
+
+    /* Remember the current assembler argument count */
+    unsigned ArgCount = GRC.ArgCount;
+
+    /* The assembler file name will be the name of the source file
+     * with .grc replaced by ".ss".
+     */
+    AsmName = MakeFilename (File, ".ss");
+
+    /* Add the file as argument for the resource compiler */
+    CmdAddArg (&GRC, File);
+
+    /* Add a NULL pointer to terminate the argument list */
+    CmdAddArg (&GRC, 0);
+
+    /* Run the compiler */
+    ExecProgram (&GRC);
+
+    /* Remove the excess arguments */
+    CmdDelArgs (&GRC, ArgCount);
+
+    /* If this is not the final step, assemble the generated file, then
+     * remove it
+     */
+    if (!DontAssemble) {
+	Assemble (AsmName);
+	if (remove (AsmName) < 0) {
+	    Warning ("Cannot remove temporary file `%s': %s",
+		     AsmName, strerror (errno));
+	}
+    }
+
+    /* Free the assembler file name which was allocated from the heap */
+    xfree (AsmName);
+}
+
+
+
 /*****************************************************************************/
-/*			       	     Code				     */
+/*		    	       	     Code				     */
 /*****************************************************************************/
 
 
@@ -696,6 +742,7 @@ int main (int argc, char* argv [])
     CmdInit (&CC65, "cc65");
     CmdInit (&CA65, "ca65");
     CmdInit (&LD65, "ld65");
+    CmdInit (&GRC,  "grc");
 
     /* Check the parameters */
     I = 1;
@@ -853,6 +900,11 @@ int main (int argc, char* argv [])
 	     	    /* Add to the linker files */
 	     	    CmdAddFile (&LD65, Arg);
 	     	    break;
+
+		case FILETYPE_GR:
+		    /* Add to the resource compiler files */
+		    CompileRes (Arg);
+		    break;
 
 	     	default:
 	     	    Error ("Don't know what to do with `%s'", Arg);

@@ -152,7 +152,12 @@ void LongOption (int* ArgNum, const LongOpt* OptTab, unsigned OptCount)
 	if (strcmp (Opt, OptTab->Option) == 0) {
 	    /* Found, call the function */
 	    if (OptTab->ArgCount > 0) {
-	   	OptTab->Func (Opt, ArgVec[++(*ArgNum)]);
+		/* We need an argument, check if we have one */
+		const char* Arg = ArgVec[++(*ArgNum)];
+		if (Arg == 0) {
+		    NeedArg (Opt);
+		}
+	   	OptTab->Func (Opt, Arg);
 	    } else {
 	   	OptTab->Func (Opt, 0);
 	    }

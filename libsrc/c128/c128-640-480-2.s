@@ -3,6 +3,7 @@
 ; (values for this mode based on Fred Bowen's document)
 ; Maciej 'YTM/Elysium' Witkowiak <ytm@elysium.pl>
 ; 23.12.2002
+; 2004-04-04, Greg King
 ;
 ; NOTES:
 ; For any smart monkey that will try to optimize this: PLEASE do tests on
@@ -292,7 +293,7 @@ UNINSTALL:
 INIT:
 	lda	pages			; is there enough memory?
 	bne	@L11			; Jump if there is one screen
-	lda	#TGI_ERR_INV_MODE	; ## Error
+	lda	#TGI_ERR_INV_MODE	; Error
 	bne	@L9
 
 ; Initialize variables
@@ -610,7 +611,6 @@ LINE:
 	ldy	X1+1
 	jsr	icmp
 	bcc	@L0243
-	beq	@L0243
 	; dx = 1;
 	lda	#1
 	bne	@L0244
@@ -624,7 +624,6 @@ LINE:
 	ldy	Y1+1
 	jsr	icmp
 	bcc	@L024A
-	beq	@L024A
 	; dy = 1;
 	lda	#1
 	bne	@L024B

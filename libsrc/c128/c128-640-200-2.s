@@ -2,6 +2,7 @@
 ; Graphics driver for the 640x200x2 mode on the C128 VDC
 ; Maciej 'YTM/Elysium' Witkowiak <ytm@elysium.pl>
 ; 23.12.2002
+; 2004-04-04, Greg King
 ;
 ; NOTES:
 ; For any smart monkey that will try to optimize this: PLEASE do tests on
@@ -612,7 +613,6 @@ LINE:
 	ldy	X1+1
 	jsr	icmp
 	bcc	@L0243
-	beq	@L0243
 	; dx = 1;
 	lda	#1
 	bne	@L0244
@@ -626,7 +626,6 @@ LINE:
 	ldy	Y1+1
 	jsr	icmp
 	bcc	@L024A
-	beq	@L024A
 	; dy = 1;
 	lda	#1
 	bne	@L024B

@@ -10,8 +10,8 @@
 %.o:	%.s
 	@$(AS) -o $@ $(AFLAGS) $<
 
-C_OBJS	= _afailed.o abort.o perror.o
-S_OBJS	= copydata.o memcpy.o memset.o zerobss.o
+C_OBJS	=
+S_OBJS	= call.o
 
 all: $(C_OBJS) $(S_OBJS)
 

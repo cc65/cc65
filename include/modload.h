@@ -61,7 +61,7 @@ struct mod_ctrl {
      * NOTE: read() is designed so that the POSIX read() routine can be used
      * for this vector, if you're loading from disk.
      */
-    int               (*read) (int callerdata, void* buffer, unsigned count);
+    int __fastcall__  (*read) (int callerdata, void* buffer, unsigned count);
     int               callerdata;
 
     /* Parameters set by the loader routine */

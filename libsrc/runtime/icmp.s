@@ -1,5 +1,6 @@
 ;
-; Ullrich von Bassewitz, 10.12.1998
+; Piotr Fusik, 15.04.2002
+; originally by Ullrich von Bassewitz
 ;
 ; Integer compare function - used by the compare operators
 ;
@@ -9,35 +10,35 @@
 
 
 tosicmp:
-  	sta	sreg
-	stx	sreg+1	   	; Save ax
+	sta	sreg
+	stx	sreg+1		; Save ax
 
-	ldy    	#$01
-       	lda    	(sp),y 	       	; Get high byte
+	ldy	#$00
+	lda	(sp),y		; Get low byte
 	tax
-    	dey
-    	lda	(sp),y	   	; Get low byte
-
-; Inline incsp2 for better performance
-
-    	inc	sp	   	; 5
-       	bne	@L1	   	; 3
-    	inc	sp+1	   	; (5)
-@L1:	inc	sp	   	; 5
-    	bne	@L2	   	; 3
-    	inc	sp+1	   	; (5)
+	inc	sp		; 5
+	bne	@L1		; 3
+	inc	sp+1		; (5)
+@L1:
+	lda	(sp),y		; Get high byte
+	inc	sp		; 5
+	bne	@L2		; 3
+	inc	sp+1		; (5)
 
 ; Do the compare.
 
-@L2:	cpx	sreg+1	   	; Compare high byte
-    	bne    	@L3
-    	cmp	sreg  	   	; Compare low byte
-       	beq	@L3
-       	bcs    	@L4
-       	lda	#$FF		; Set the N flag
-@L3: 	rts
+@L2:	sec
+	sbc	sreg+1		; Compare high byte
+	bne	@L4
+	cpx	sreg		; Compare low byte
+	beq	@L3
+	adc	#$FF		; If the C flag is set then clear the N flag
+	ora	#$01		; else set the N flag
+@L3:	rts
 
-@L4:   	lda    	#$01		; Clear the N flag
+@L4:	bvc	@L3
+	eor	#$FF		; Fix the N flag if overflow
+	ora	#$01		; Clear the Z flag
 	rts
 
 

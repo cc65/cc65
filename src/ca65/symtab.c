@@ -66,30 +66,11 @@
 #define SF_DBGINFOMASK	(SF_TRAMPOLINE | SF_DEFINED | SF_EXPORT | SF_IMPORT)
 #define SF_DBGINFOVAL 	(SF_DEFINED)
 
-/* Definitions for the hash table */
-#define MAIN_HASHTAB_SIZE    	213
-#define SUB_HASHTAB_SIZE     	53
-typedef struct SymTable SymTable;
-struct SymTable {
-    SymTable*           Left;           /* Pointer to smaller entry */
-    SymTable*           Right;          /* Pointer to greater entry */
-    SymTable*          	Parent;   	/* Link to enclosing scope if any */
-    SymTable*           Childs;         /* Pointer to child scopes */
-    unsigned            Level;          /* Lexical level */
-    unsigned   	     	TableSlots;	/* Number of hash table slots */
-    unsigned   	    	TableEntries;	/* Number of entries in the table */
-    unsigned            Name;           /* Name of the scope */
-    SymEntry*  	    	Table [1];  	/* Dynamic allocation */
-};
-
-/* Arguments for SymFind */
-#define SF_FIND_EXISTING 	0
-#define SF_ALLOC_NEW		1
+/* Symbol tables */
+SymTable*      	CurrentScope = 0;       /* Pointer to current symbol table */
+SymTable*	RootScope    = 0;       /* Root symbol table */
 
 /* Symbol table variables */
-static SymEntry*    	SymLast = 0;   	/* Pointer to last defined symbol */
-static SymTable*    	SymTab  = 0; 	/* Pointer to current symbol table */
-static SymTable*	RootTab = 0;	/* Root symbol table */
 static unsigned        	ImportCount = 0;/* Counter for import symbols */
 static unsigned     	ExportCount = 0;/* Counter for export symbols */
 
@@ -98,22 +79,6 @@ static unsigned     	ExportCount = 0;/* Counter for export symbols */
 /*****************************************************************************/
 /*     	       	       	   Internally used functions		 	     */
 /*****************************************************************************/
-
-
-
-static int IsLocalName (const char* Name)
-/* Return true if Name is the name of a local symbol */
-{
-    return (*Name == LocalStart);
-}
-
-
-
-static int IsLocalNameId (unsigned Name)
-/* Return true if Name is the name of a local symbol */
-{
-    return (*GetString (Name) == LocalStart);
-}
 
 
 
@@ -129,7 +94,7 @@ static unsigned SymTableSize (unsigned Level)
 
 
 
-static SymTable* NewSymTable (SymTable* Parent, unsigned Name)
+static SymTable* NewSymTable (SymTable* Parent, const char* Name)
 /* Allocate a symbol table on the heap and return it */
 {
     /* Determine the lexical level and the number of table slots */
@@ -147,7 +112,7 @@ static SymTable* NewSymTable (SymTable* Parent, unsigned Name)
     S->TableSlots   = Slots;
     S->TableEntries = 0;
     S->Parent       = Parent;
-    S->Name         = Name;
+    S->Name         = GetStringId (Name);
     while (Slots--) {
        	S->Table[Slots] = 0;
     }
@@ -161,14 +126,15 @@ static SymTable* NewSymTable (SymTable* Parent, unsigned Name)
         } else {
             while (1) {
                 /* Choose next entry */
-                if (S->Name < T->Name) {
+                int Cmp = strcmp (Name, GetString (T->Name));
+                if (Cmp < 0) {
                     if (T->Left) {
                         T = T->Left;
                     } else {
                         T->Left = S;
                         break;
                     }
-                } else if (S->Name > T->Name) {
+                } else if (Cmp > 0) {
                     if (T->Right) {
                         T = T->Right;
                     } else {
@@ -177,13 +143,13 @@ static SymTable* NewSymTable (SymTable* Parent, unsigned Name)
                     }
                 } else {
                     /* Duplicate scope name */
-                    Internal ("Duplicate scope name: `%s'", GetString (S->Name));
+                    Internal ("Duplicate scope name: `%s'", Name);
                 }
             }
         }
     } else {
         /* This is the root table */
-        RootTab = S;
+        RootScope = S;
     }
 
     /* Return the prepared struct */
@@ -192,7 +158,7 @@ static SymTable* NewSymTable (SymTable* Parent, unsigned Name)
 
 
 
-static int SearchSymTree (SymEntry* T, unsigned Name, SymEntry** E)
+static int SearchSymTree (SymEntry* T, const char* Name, SymEntry** E)
 /* Search in the given tree for a name. If we find the symbol, the function
  * will return 0 and put the entry pointer into E. If we did not find the
  * symbol, and the tree is empty, E is set to NULL. If the tree is not empty,
@@ -201,8 +167,6 @@ static int SearchSymTree (SymEntry* T, unsigned Name, SymEntry** E)
  * inserted on the right side.
  */
 {
-    int Cmp;
-
     /* Is there a tree? */
     if (T == 0) {
       	*E = 0;
@@ -211,17 +175,15 @@ static int SearchSymTree (SymEntry* T, unsigned Name, SymEntry** E)
 
     /* We have a table, search it */
     while (1) {
+
+        /* Get the symbol name */
+        const char* SymName = GetString (T->Name);
+
       	/* Choose next entry */
-        if (Name < T->Name) {
-            Cmp = -1;
-        } else if (Name > T->Name) {
-            Cmp = +1;
-        } else {
-            Cmp = 0;
-        }
-      	if (Name < T->Name && T->Left) {
+        int Cmp = strcmp (Name, SymName);
+       	if (Cmp < 0 && T->Left) {
 	    T = T->Left;
-	} else if (Name > T->Name && T->Right) {
+	} else if (Cmp > 0&& T->Right) {
 	    T = T->Right;
 	} else {
      	    /* Found or end of search, return the result */
@@ -234,12 +196,58 @@ static int SearchSymTree (SymEntry* T, unsigned Name, SymEntry** E)
 
 
 /*****************************************************************************/
-/*     	       		   	     Code			   	     */
+/*     	       	   	   	     Code			   	     */
 /*****************************************************************************/
 
 
 
-static SymEntry* SymFind (SymTable* Tab, unsigned Name, int AllocNew)
+void SymEnterLevel (const char* ScopeName)
+/* Enter a new lexical level */
+{
+    /* ### Check existing scope */
+
+    /* Create the new table */
+    CurrentScope = NewSymTable (CurrentScope, ScopeName);
+}
+
+
+
+void SymLeaveLevel (void)
+/* Leave the current lexical level */
+{
+    CurrentScope = CurrentScope->Parent;
+}
+
+
+
+SymTable* SymFindScope (SymTable* Parent, const char* Name, unsigned Flags)
+/* Find a scope in the given enclosing scope */
+{
+    SymTable** T = &Parent->Childs;
+    while (*T) {
+        int Cmp = strcmp (Name, GetString ((*T)->Name));
+        if (Cmp < 0) {
+            T = &(*T)->Left;
+        } else if (Cmp > 0) {
+            T = &(*T)->Right;
+        } else {
+            /* Found the scope */
+            return *T;
+        }
+    }
+
+    /* Create a new scope if requested and we didn't find one */
+    if (*T == 0 && Flags == SYM_ALLOC_NEW) {
+        *T = NewSymTable (Parent, Name);
+    }
+
+    /* Return the scope */
+    return *T;
+}
+
+
+
+SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
 /* Find a new symbol table entry in the given table. If AllocNew is given and
  * the entry is not found, create a new one. Return the entry found, or the
  * new entry created, or - in case AllocNew is zero - return 0.
@@ -247,18 +255,17 @@ static SymEntry* SymFind (SymTable* Tab, unsigned Name, int AllocNew)
 {
     SymEntry* S;
     int Cmp;
-    unsigned Hash;
 
-    if (IsLocalNameId (Name)) {
+    if (IsLocalName (Name)) {
 
     	/* Local symbol, get the table */
     	if (!SymLast) {
     	    /* No last global, so there's no local table */
     	    Error (ERR_ILLEGAL_LOCAL_USE);
     	    if (AllocNew) {
-    		return NewSymEntry (Name);
+    	      	return NewSymEntry (Name);
     	    } else {
-    	     	return 0;
+    	      	return 0;
     	    }
        	}
 
@@ -287,10 +294,10 @@ static SymEntry* SymFind (SymTable* Tab, unsigned Name, int AllocNew)
     } else {
 
     	/* Global symbol: Get the hash value for the name */
-       	Hash = Name % Tab->TableSlots;
+       	unsigned Hash = HashStr (Name) % Scope->TableSlots;
 
 	/* Search for the entry */
-	Cmp = SearchSymTree (Tab->Table[Hash], Name, &S);
+	Cmp = SearchSymTree (Scope->Table[Hash], Name, &S);
 
 	/* If we found an entry, return it */
 	if (Cmp == 0) {
@@ -308,14 +315,14 @@ static SymEntry* SymFind (SymTable* Tab, unsigned Name, int AllocNew)
 	    /* Otherwise create a new entry, insert and return it */
 	    SymEntry* N = NewSymEntry (Name);
 	    if (S == 0) {
-	     	Tab->Table[Hash] = N;
+	     	Scope->Table[Hash] = N;
 	    } else if (Cmp < 0) {
 	     	S->Left = N;
 	    } else {
 	     	S->Right = N;
 	    }
-       	    N->SymTab = Tab;
-	    ++Tab->TableEntries;
+       	    N->SymTab = Scope;
+	    ++Scope->TableEntries;
 	    return N;
 
 	}
@@ -327,132 +334,27 @@ static SymEntry* SymFind (SymTable* Tab, unsigned Name, int AllocNew)
 
 
 
-static SymEntry* SymFindAny (SymTable* Tab, unsigned Name)
-/* Find a symbol in any table */
+static SymEntry* SymFindAny (SymTable* Scope, const char* Name)
+/* Find a symbol in the given or any of its parent scopes. The function will
+ * never create a new symbol, since this can only be done in one specific
+ * scope.
+ */
 {
     SymEntry* Sym;
     do {
 	/* Search in the current table */
-	Sym = SymFind (Tab, Name, SF_FIND_EXISTING);
+	Sym = SymFind (Scope, Name, SYM_FIND_EXISTING);
 	if (Sym) {
 	    /* Found, return it */
 	    return Sym;
 	} else {
 	    /* Not found, search in the parent scope, if we have one */
-	    Tab = Tab->Parent;
+	    Scope = Scope->Parent;
 	}
-    } while (Sym == 0 && Tab != 0);
+    } while (Sym == 0 && Scope != 0);
 
     /* Not found */
     return 0;
-}
-
-
-
-void SymEnterLevel (const char* ScopeName)
-/* Enter a new lexical level */
-{
-    /* Accept NULL pointers for the scope name */
-    if (ScopeName == 0) {
-        ScopeName = "";
-    }
-
-    /* Create the new table */
-    SymTab = NewSymTable (SymTab, GetStringId (ScopeName));
-}
-
-
-
-void SymLeaveLevel (void)
-/* Leave the current lexical level */
-{
-    SymTab = SymTab->Parent;
-}
-
-
-
-int SymIsLocalLevel (void)
-/* Return true if we are on a local symbol table level. */
-{
-    return (SymTab != RootTab);
-}
-
-
-
-void SymDef (const char* Name, ExprNode* Expr, unsigned Flags)
-/* Define a new symbol */
-{
-    /* Do we have such a symbol? */
-    SymEntry* S = SymFind (SymTab, GetStringId (Name), SF_ALLOC_NEW);
-    if (S->Flags & SF_IMPORT) {
-       	/* Defined symbol is marked as imported external symbol */
-       	Error (ERR_SYM_ALREADY_IMPORT, Name);
-       	return;
-    }
-    if (S->Flags & SF_DEFINED) {
-       	/* Multiple definition */
-       	Error (ERR_SYM_ALREADY_DEFINED, Name);
-       	S->Flags |= SF_MULTDEF;
-       	return;
-    }
-
-    /* Set the symbol data */
-    if (IsConstExpr (Expr)) {
-       	/* Expression is const, store the value */
-       	S->Flags |= SF_CONST;
-       	S->V.Val = GetExprVal (Expr);
-       	FreeExpr (Expr);
-    } else {
-       	/* Not const, store the expression */
-        S->V.Expr  = Expr;
-    }
-    S->Flags |= SF_DEFINED;
-    if (Flags & SYM_ZP) {
-	S->Flags |= SF_ZP;
-    }
-    if (Flags & SYM_LABEL) {
-	S->Flags |= SF_LABEL;
-    }
-
-    /* If the symbol is a ZP symbol, check if the value is in correct range */
-    if (S->Flags & SF_ZP) {
-     	/* Already marked as ZP symbol by some means */
-     	if (!IsByteExpr (Expr)) {
-     	    Error (ERR_RANGE);
-     	}
-    }
-
-    /* If this is not a local symbol, remember it as the last global one */
-    if (!IsLocalName (Name)) {
-       	SymLast = S;
-    }
-}
-
-
-
-SymEntry* SymRef (const char* Name, int Scope)
-/* Search for the symbol and return it */
-{
-    SymEntry* S;
-    unsigned NameId = GetStringId (Name);
-
-    switch (Scope) {
-        case SCOPE_GLOBAL:  S = SymFind (RootTab, NameId, SF_ALLOC_NEW);  break;
-        case SCOPE_LOCAL:   S = SymFind (SymTab, NameId, SF_ALLOC_NEW);   break;
-
-        /* Others are not allowed */
-        case SCOPE_ANY:
-        default:
-            Internal ("Invalid scope in SymRef: %d", Scope);
-            /* NOTREACHED */
-            S = 0;
-    }
-
-    /* Mark the symbol as referenced */
-    S->Flags |= SF_REFERENCED;
-
-    /* Return it */
-    return S;
 }
 
 
@@ -469,7 +371,7 @@ static void SymImportInternal (const char* Name, unsigned Flags)
     }
 
     /* Do we have such a symbol? */
-    S = SymFind (SymTab, GetStringId (Name), SF_ALLOC_NEW);
+    S = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
     if (S->Flags & SF_DEFINED) {
      	Error (ERR_SYM_ALREADY_DEFINED, Name);
      	S->Flags |= SF_MULTDEF;
@@ -533,7 +435,7 @@ static void SymExportInternal (const char* Name, unsigned Flags)
     }
 
     /* Do we have such a symbol? */
-    S = SymFind (SymTab, GetStringId (Name), SF_ALLOC_NEW);
+    S = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
     if (S->Flags & SF_IMPORT) {
      	/* The symbol is already marked as imported external symbol */
      	Error (ERR_SYM_ALREADY_IMPORT, Name);
@@ -586,7 +488,7 @@ static void SymGlobalInternal (const char* Name, unsigned Flags)
     }
 
     /* Search for this symbol, create a new entry if needed */
-    S = SymFind (SymTab, GetStringId (Name), SF_ALLOC_NEW);
+    S = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
 
     /* If the symbol is already marked as import or export, check the
      * size of the definition, then bail out. */
@@ -645,7 +547,7 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
     }
 
     /* Do we have such a symbol? */
-    S = SymFind (SymTab, GetStringId (Name), SF_ALLOC_NEW);
+    S = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
     if (S->Flags & SF_IMPORT) {
      	/* The symbol is already marked as imported external symbol */
      	Error (ERR_SYM_ALREADY_IMPORT, Name);
@@ -674,50 +576,6 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
 
     /* Set the symbol data */
     S->Flags |= SF_EXPORT | SF_REFERENCED;
-}
-
-
-
-int SymIsDef (const char* Name, int Scope)
-/* Return true if the given symbol is already defined */
-{
-    SymEntry* S = 0;
-
-    /* Get the string pool index for the name */
-    unsigned NameId = GetStringId (Name);
-
-    /* Search for the symbol */
-    switch (Scope) {
-        case SCOPE_ANY:    S = SymFindAny (SymTab, NameId);                 break;
-        case SCOPE_GLOBAL: S = SymFind (RootTab, NameId, SF_FIND_EXISTING); break;
-        case SCOPE_LOCAL:  S = SymFind (SymTab, NameId, SF_FIND_EXISTING);  break;
-        default:           Internal ("Invalid scope in SymIsDef: %d", Scope);
-    }
-
-    /* Check if it's defined */
-    return S != 0 && (S->Flags & SF_DEFINED) != 0;
-}
-
-
-
-int SymIsRef (const char* Name, int Scope)
-/* Return true if the given symbol has been referenced */
-{
-    SymEntry* S = 0;
-
-    /* Get the string pool index for the name */
-    unsigned NameId = GetStringId (Name);
-
-    /* Search for the symbol */
-    switch (Scope) {
-        case SCOPE_ANY:    S = SymFindAny (SymTab, NameId);                 break;
-        case SCOPE_GLOBAL: S = SymFind (RootTab, NameId, SF_FIND_EXISTING); break;
-        case SCOPE_LOCAL:  S = SymFind (SymTab, NameId, SF_FIND_EXISTING);  break;
-        default:           Internal ("Invalid scope in SymIsRef: %d", Scope);
-    }
-
-    /* Check if it's defined */
-    return S != 0 && (S->Flags & SF_REFERENCED) != 0;
 }
 
 
@@ -763,7 +621,7 @@ int SymIsZP (SymEntry* S)
 	S->SymTab->Parent != 0) {
 
 	/* Try to find a symbol with the same name in the enclosing scope */
-	SymEntry* E = SymFindAny (S->SymTab->Parent, S->Name);
+	SymEntry* E = SymFindAny (S->SymTab->Parent, GetString (S->Name));
 
 	/* If we found one, use the ZP flag */
 	if (E && (E->Flags & SF_ZP) != 0) {
@@ -773,161 +631,6 @@ int SymIsZP (SymEntry* S)
 
     /* Check the ZP flag */
     return (S->Flags & SF_ZP) != 0;
-}
-
-
-
-int SymIsImport (SymEntry* S)
-/* Return true if the given symbol is marked as import */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    /* Check the import flag */
-    return (S->Flags & SF_IMPORT) != 0;
-}
-
-
-
-int SymHasExpr (SymEntry* S)
-/* Return true if the given symbol has an associated expression */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    /* Check the expression */
-    return ((S->Flags & SF_DEFINED) != 0 &&
-	    (S->Flags & SF_IMPORT)  == 0 &&
-	    (S->Flags & SF_CONST)   == 0);
-}
-
-
-
-void SymFinalize (SymEntry* S)
-/* Finalize a symbol expression if there is one */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-     	S = S->V.Sym;
-    }
-
-    /* Check if we have an expression */
-    if ((S->Flags & SF_FINALIZED) == 0 && SymHasExpr (S)) {
-	S->V.Expr = FinalizeExpr (S->V.Expr);
-        S->Flags |= SF_FINALIZED;
-    }
-}
-
-
-
-void SymMarkUser (SymEntry* S)
-/* Set a user mark on the specified symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    /* Set the bit */
-    S->Flags |= SF_USER;
-}
-
-
-
-void SymUnmarkUser (SymEntry* S)
-/* Remove a user mark from the specified symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    /* Reset the bit */
-    S->Flags &= ~SF_USER;
-}
-
-
-
-int SymHasUserMark (SymEntry* S)
-/* Return the state of the user mark for the specified symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    /* Check the bit */
-    return (S->Flags & SF_USER) != 0;
-}
-
-
-
-long GetSymVal (SymEntry* S)
-/* Return the symbol value */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    PRECONDITION ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_CONST) != 0);
-    return S->V.Val;
-}
-
-
-
-ExprNode* GetSymExpr (SymEntry* S)
-/* Get the expression for a non-const symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    PRECONDITION (S != 0 && (S->Flags & SF_CONST) == 0);
-    return S->V.Expr;
-}
-
-
-
-const char* GetSymName (SymEntry* S)
-/* Return the name of the symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-    return GetString (S->Name);
-}
-
-
-
-unsigned GetSymIndex (SymEntry* S)
-/* Return the symbol index for the given symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-    PRECONDITION (S != 0 && (S->Flags & SF_INDEXED));
-    return S->Index;
-}
-
-
-
-const FilePos* GetSymPos (SymEntry* S)
-/* Return the position of first occurence in the source for the given symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-    PRECONDITION (S != 0);
-    return &S->Pos;
 }
 
 
@@ -950,7 +653,7 @@ static void SymCheckUndefined (SymEntry* S)
 	/* It's a global symbol, get the higher level table */
 	SymTable* Tab = S->SymTab->Parent;
 	while (Tab) {
-	    Sym = SymFindAny (Tab, S->Name);
+	    Sym = SymFindAny (Tab, GetString (S->Name));
 	    if (Sym) {
 	       	if (Sym->Flags & (SF_DEFINED | SF_IMPORT)) {
 	       	    /* We've found a symbol in a higher level that is
@@ -1014,7 +717,7 @@ void SymCheck (void)
     SymEntry* S;
 
     /* Check for open lexical levels */
-    if (SymTab->Parent != 0) {
+    if (CurrentScope->Parent != 0) {
 	Error (ERR_OPEN_PROC);
     }
 

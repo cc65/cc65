@@ -663,11 +663,11 @@ static void DoEnd (void)
 static void DoEndProc (void)
 /* Leave a lexical level */
 {
-    if (!SymIsLocalLevel ()) {
+    if (CurrentScope != RootScope) {
+        SymLeaveLevel ();
+    } else {
         /* No local scope */
         ErrorSkip (ERR_NO_OPEN_PROC);
-    } else {
-        SymLeaveLevel ();
     }
 }
 
@@ -1245,11 +1245,12 @@ static void DoProc (void)
 {
     if (Tok == TOK_IDENT) {
 	/* The new scope has a name */
+	SymEntry* Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
         unsigned Flags = SYM_LABEL;
         if (IsZPSeg ()) {
             Flags |= SYM_ZP;
         }
-    	SymDef (SVal, GenCurrentPC (), Flags);
+    	SymDef (Sym, GenCurrentPC (), Flags);
         SymEnterLevel (SVal);
     	NextTok ();
     } else {

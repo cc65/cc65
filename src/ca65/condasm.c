@@ -38,6 +38,7 @@
 #include "expr.h"
 #include "instr.h"
 #include "nexttok.h"
+#include "symbol.h"
 #include "symtab.h"
 #include "condasm.h"
 
@@ -304,12 +305,8 @@ void DoConditionals (void)
 	        D = AllocIf (".IFDEF", 1);
 		NextTok ();
 		if (IfCond) {
-		    if (Tok != TOK_IDENT) {
-	       	  	ErrorSkip (ERR_IDENT_EXPECTED);
-		    } else {
-		  	SetIfCond (D, SymIsDef (SVal, SCOPE_ANY));
-		  	NextTok ();
-		    }
+		    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
+		    SetIfCond (D, Sym != 0 && SymIsDef (Sym));
 		}
 	        IfCond = GetCurrentIfCond ();
 		break;
@@ -343,12 +340,8 @@ void DoConditionals (void)
 	        D = AllocIf (".IFNDEF", 1);
 		NextTok ();
 		if (IfCond) {
-		    if (Tok != TOK_IDENT) {
-		  	ErrorSkip (ERR_IDENT_EXPECTED);
-		    } else {
-		  	SetIfCond (D, !SymIsDef (SVal, SCOPE_ANY));
-		  	NextTok ();
-		    }
+		    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
+		    SetIfCond (D, Sym == 0 || !SymIsDef (Sym));
 		}
 	        IfCond = GetCurrentIfCond ();
     	     	break;
@@ -357,12 +350,8 @@ void DoConditionals (void)
 	        D = AllocIf (".IFNREF", 1);
 		NextTok ();
 		if (IfCond) {
-		    if (Tok != TOK_IDENT) {
-		  	ErrorSkip (ERR_IDENT_EXPECTED);
-		    } else {
-		  	SetIfCond (D, !SymIsRef (SVal, SCOPE_ANY));
-		  	NextTok ();
-		    }
+		    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
+		    SetIfCond (D, Sym == 0 || !SymIsRef (Sym));
 	     	}
 	        IfCond = GetCurrentIfCond ();
 		break;
@@ -407,12 +396,8 @@ void DoConditionals (void)
 	        D = AllocIf (".IFREF", 1);
      		NextTok ();
      		if (IfCond) {
-     		    if (Tok != TOK_IDENT) {
-     		     	ErrorSkip (ERR_IDENT_EXPECTED);
-     		    } else {
-     		     	SetIfCond (D, SymIsRef (SVal, SCOPE_ANY));
-     		  	NextTok ();
-     		    }
+		    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
+		    SetIfCond (D, Sym != 0 && SymIsRef (Sym));
      		}
      	        IfCond = GetCurrentIfCond ();
      		break;

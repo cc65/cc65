@@ -51,9 +51,9 @@
 #include "global.h"
 #include "instr.h"
 #include "nexttok.h"
-/* #include "objcode.h" */
 #include "objfile.h"
 #include "segment.h"
+#include "symbol.h"
 #include "symtab.h"
 #include "toklist.h"
 #include "ulabel.h"
@@ -113,7 +113,7 @@ static void FreeExprNode (ExprNode* E)
     if (E) {
         if (E->Op == EXPR_SYMBOL) {
             /* Remove the symbol reference */
-            SymDelRef (E->V.Sym, E);
+            SymDelExprRef (E->V.Sym, E);
         }
         /* Place the symbol into the free nodes list if possible */
 	if (FreeNodeCount < MAX_FREE_NODES) {
@@ -208,71 +208,11 @@ static int FuncConst (void)
 static int FuncDefined (void)
 /* Handle the .DEFINED builtin function */
 {
-    static const char* Keys[] = {
-       	"ANY",
-	"GLOBAL",
-        "LOCAL",
-    };
+    /* Parse the symbol name and search for the symbol */
+    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
 
-    char Name [sizeof (SVal)];
-    int Result = 0;
-    int Scope;
-
-    /* First argument is a symbol name */
-    if (Tok != TOK_IDENT) {
-	Error (ERR_IDENT_EXPECTED);
-	if (Tok != TOK_RPAREN) {
-	    NextTok ();
-	}
-        return 0;
-    }
-
-    /* Remember the name, then skip it */
-    strcpy (Name, SVal);
-    NextTok ();
-
-    /* Comma and scope spec may follow */
-    if (Tok == TOK_COMMA) {
-
-        /* Skip the comma */
-        NextTok ();
-
-        /* An identifier must follow */
-        if (Tok != TOK_IDENT) {
-            Error (ERR_IDENT_EXPECTED);
-            return 0;
-        }
-
-        /* Get the scope, then skip it */
-        Scope = GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]));
-        NextTok ();
-
-        /* Check if we got a valid keyword */
-        if (Scope < 0) {
-            Error (ERR_ILLEGAL_SCOPE);
-            return 0;
-        }
-
-        /* Map the scope */
-        switch (Scope) {
-            case 0:     Scope = SCOPE_ANY;    break;
-            case 1:     Scope = SCOPE_GLOBAL; break;
-            case 2:     Scope = SCOPE_LOCAL;  break;
-            default:    Internal ("Invalid scope: %d", Scope);
-        }
-
-    } else {
-
-        /* Any scope */
-        Scope = SCOPE_ANY;
-
-    }
-
-    /* Search for the symbol */
-    Result = SymIsDef (SVal, Scope);
-
-    /* Done */
-    return Result;
+    /* Check if the symbol is defined */
+    return (Sym != 0 && SymIsDef (Sym));
 }
 
 
@@ -377,20 +317,11 @@ static int FuncMatch (void)
 static int FuncReferenced (void)
 /* Handle the .REFERENCED builtin function */
 {
-    int Result = 0;
+    /* Parse the symbol name and search for the symbol */
+    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
 
-    if (Tok != TOK_IDENT) {
-	Error (ERR_IDENT_EXPECTED);
-	if (Tok != TOK_RPAREN) {
-	    NextTok ();
-	}
-    } else {
-	Result = SymIsRef (SVal, SCOPE_ANY);
-	NextTok ();
-    }
-
-    /* Done */
-    return Result;
+    /* Check if the symbol is referenced */
+    return (Sym != 0 && SymIsRef (Sym));
 }
 
 
@@ -553,34 +484,19 @@ static ExprNode* Factor (void)
        	    NextTok ();
 	    break;
 
-        case TOK_NAMESPACE:
-	    NextTok ();
-	    if (Tok != TOK_IDENT) {
-	     	Error (ERR_IDENT_EXPECTED);
-		N = GenLiteralExpr (0);	/* Dummy */
+	case TOK_NAMESPACE:
+	case TOK_IDENT:
+	    /* Search for the symbol */
+	    S = ParseScopedSymName (SYM_ALLOC_NEW);
+	    if (S == 0) {
+		/* Some weird error happened before */
+		N = GenLiteralExpr (0);
 	    } else {
-		S = SymRef (SVal, SCOPE_GLOBAL);
-		if (SymIsConst (S)) {
-		    /* Use the literal value instead */
-		    N = GenLiteralExpr (GetSymVal (S));
-		} else {
-	    	    /* Create symbol node */
-		    N = GenSymExpr (S);
-		}
-		NextTok ();
+		/* Mark the symbol as referenced */
+		SymRef (S);
+		/* Create symbol node */
+		N = GenSymExpr (S);
 	    }
-	    break;
-
-        case TOK_IDENT:
-	    S = SymRef (SVal, SCOPE_LOCAL);
-	    if (SymIsConst (S)) {
-	     	/* Use the literal value instead */
-	     	N = GenLiteralExpr (GetSymVal (S));
-	    } else {
-	     	/* Create symbol node */
-	     	N = GenSymExpr (S);
-	    }
-	    NextTok ();
 	    break;
 
 	case TOK_ULABEL:
@@ -977,7 +893,7 @@ ExprNode* GenSymExpr (SymEntry* Sym)
 {
     ExprNode* Expr = NewExprNode (EXPR_SYMBOL);
     Expr->V.Sym = Sym;
-    SymAddRef (Sym, Expr);
+    SymAddExprRef (Sym, Expr);
     return Expr;
 }
 

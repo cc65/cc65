@@ -69,6 +69,15 @@
 #define	SF_DEFINED  	0x4000 	       	/* Defined */
 #define SF_REFERENCED	0x8000 	       	/* Referenced */
 
+/* Flags used in SymDef */
+#define SYM_DEFAULT     0x00
+#define SYM_ZP          0x01
+#define SYM_LABEL       0x02
+
+/* Arguments for SymFind... */
+#define SYM_FIND_EXISTING 	0
+#define SYM_ALLOC_NEW		1
+
 /* Structure of a symbol table entry */
 typedef struct SymEntry SymEntry;
 struct SymEntry {
@@ -94,36 +103,91 @@ struct SymEntry {
 /* List of all symbol table entries */
 extern SymEntry* SymList;
 
+/* Pointer to last defined symbol */
+extern SymEntry* SymLast;
+
 
 
 /*****************************************************************************/
-/*     	       	   	  	     Code	  		   	     */
+/*     	       	   	    	     Code	  		   	     */
 /*****************************************************************************/
 
 
 
-SymEntry* NewSymEntry (unsigned Name);
+int IsLocalName (const char* Name);
+/* Return true if Name is the name of a local symbol */
+
+int IsLocalNameId (unsigned Name);
+/* Return true if Name is the name of a local symbol */
+
+SymEntry* NewSymEntry (const char* Name);
 /* Allocate a symbol table entry, initialize and return it */
 
 #if defined(HAVE_INLINE)
-INLINE void SymAddRef (SymEntry* Sym, struct ExprNode* Expr)
-/* Add a reference to this symbol */
+INLINE void SymAddExprRef (SymEntry* Sym, struct ExprNode* Expr)
+/* Add an expression reference to this symbol */
 {
     CollAppend (&Sym->ExprRefs, Expr);
 }
 #else
-#define SymAddRef(Sym,Expr)     CollAppend (&(Sym)->ExprRefs, Expr)
+#define SymAddExprRef(Sym,Expr)     CollAppend (&(Sym)->ExprRefs, Expr)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE void SymDelRef (SymEntry* Sym, struct ExprNode* Expr)
-/* Delete a reference to this symbol */
+INLINE void SymDelExprRef (SymEntry* Sym, struct ExprNode* Expr)
+/* Delete an expression reference to this symbol */
 {
     CollDeleteItem (&Sym->ExprRefs, Expr);
 }
 #else
-#define SymDelRef(Sym,Expr)     CollDeleteItem (&(Sym)->ExprRefs, Expr)
+#define SymDelExprRef(Sym,Expr)     CollDeleteItem (&(Sym)->ExprRefs, Expr)
 #endif
+
+void SymDef (SymEntry* Sym, ExprNode* Expr, unsigned Flags);
+/* Mark a symbol as defined */
+
+void SymRef (SymEntry* Sym);
+/* Mark the given symbol as referenced */
+
+int SymIsDef (const SymEntry* Sym);
+/* Return true if the given symbol is already defined */
+
+int SymIsRef (const SymEntry* Sym);
+/* Return true if the given symbol has been referenced */
+
+int SymIsImport (const SymEntry* Sym);
+/* Return true if the given symbol is marked as import */
+
+int SymHasExpr (const SymEntry* Sym);
+/* Return true if the given symbol has an associated expression */
+
+void SymFinalize (SymEntry* S);
+/* Finalize a symbol expression if there is one */
+
+void SymMarkUser (SymEntry* Sym);
+/* Set a user mark on the specified symbol */
+
+void SymUnmarkUser (SymEntry* Sym);
+/* Remove a user mark from the specified symbol */
+
+int SymHasUserMark (SymEntry* Sym);
+/* Return the state of the user mark for the specified symbol */
+
+long GetSymVal (SymEntry* Sym);
+/* Return the symbol value */
+
+struct ExprNode* GetSymExpr (SymEntry* Sym);
+/* Get the expression for a non-const symbol */
+
+const char* GetSymName (SymEntry* Sym);
+/* Return the name of the symbol */
+
+unsigned GetSymIndex (SymEntry* Sym);
+/* Return the symbol index for the given symbol */
+
+const FilePos* GetSymPos (SymEntry* Sym);
+/* Return the position of first occurence in the source for the given symbol */
+
 
 
 

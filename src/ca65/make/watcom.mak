@@ -87,6 +87,7 @@ OBJS = 	anonname.obj    \
 	scanner.obj	\
         segment.obj     \
         spool.obj       \
+	symbol.obj	\
         symentry.obj    \
 	symtab.obj	\
 	toklist.obj	\

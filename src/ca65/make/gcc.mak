@@ -39,6 +39,7 @@ OBJS =  anonname.o      \
         segment.o       \
         spool.o         \
         symentry.o      \
+        symbol.o        \
         symtab.o	\
        	toklist.o      	\
 	ulabel.o

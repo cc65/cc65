@@ -139,6 +139,8 @@ static void DefineSymbol (const char* Def)
     unsigned I;
     long Val;
     char SymName [MAX_STR_LEN+1];
+    SymEntry* Sym;
+
 
     /* The symbol must start with a character or underline */
     if (Def [0] != '_' && !IsAlpha (Def [0])) {
@@ -177,13 +179,16 @@ static void DefineSymbol (const char* Def)
        	}
     }
 
+    /* Search for the symbol, allocate a new one if it doesn't exist */
+    Sym = SymFind (CurrentScope, SymName, SYM_ALLOC_NEW);
+
     /* Check if have already a symbol with this name */
-    if (SymIsDef (SymName, SCOPE_ANY)) {
+    if (SymIsDef (Sym)) {
 	AbEnd ("`%s' is already defined", SymName);
     }
 
-    /* Define the symbol */
-    SymDef (SymName, GenLiteralExpr (Val), SYM_DEFAULT);
+    /* Mark the symbol as defined */
+    SymDef (Sym, GenLiteralExpr (Val), SYM_DEFAULT);
 }
 
 
@@ -337,7 +342,6 @@ static void DoPCAssign (void)
 static void OneLine (void)
 /* Assemble one line */
 {
-    char Ident [MAX_STR_LEN+1];
     int Done = 0;
 
     /* Initialize the new listing line if we are actually reading from file
@@ -366,8 +370,10 @@ static void OneLine (void)
      	} else {
 
      	    /* No, label. Remember the identifier, then skip it */
-     	    int HadWS = WS;	/* Did we have whitespace before the ident? */
-     	    strcpy (Ident, SVal);
+     	    int HadWS = WS;   	/* Did we have whitespace before the ident? */
+
+	    /* Generate the symbol table entry, then skip the name */
+	    SymEntry* Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
      	    NextTok ();
 
      	    /* If a colon follows, this is a label definition. If there
@@ -379,14 +385,14 @@ static void OneLine (void)
      	    	/* Skip the '=' */
      	    	NextTok ();
      	    	/* Define the symbol with the expression following the '=' */
-     	    	SymDef (Ident, Expression(), Flags);
+     	    	SymDef (Sym, Expression(), Flags);
      	    	/* Don't allow anything after a symbol definition */
      	    	Done = 1;
      	    } else {
                 /* Define the symbol flags */
                 unsigned Flags = IsZPSeg ()? SYM_ZP | SYM_LABEL : SYM_LABEL;
      	    	/* Define a label */
-     	    	SymDef (Ident, GenCurrentPC (), Flags);
+     	    	SymDef (Sym, GenCurrentPC (), Flags);
      	    	/* Skip the colon. If NoColonLabels is enabled, allow labels
      	    	 * without a colon if there is no whitespace before the
      	    	 * identifier.
@@ -519,7 +525,7 @@ int main (int argc, char* argv [])
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
      */
-    SymEnterLevel (0);
+    SymEnterLevel ("");
 
     /* Check the parameters */
     I = 1;

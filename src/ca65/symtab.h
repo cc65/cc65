@@ -59,10 +59,23 @@
 #define SCOPE_GLOBAL    1
 #define SCOPE_LOCAL     2
 
-/* Flags used in SymDef */
-#define SYM_DEFAULT     0x00
-#define SYM_ZP          0x01
-#define SYM_LABEL       0x02
+/* A symbol table */
+typedef struct SymTable SymTable;
+struct SymTable {
+    SymTable*           Left;           /* Pointer to smaller entry */
+    SymTable*           Right;          /* Pointer to greater entry */
+    SymTable*          	Parent;   	/* Link to enclosing scope if any */
+    SymTable*           Childs;         /* Pointer to child scopes */
+    unsigned            Level;          /* Lexical level */
+    unsigned   	     	TableSlots;	/* Number of hash table slots */
+    unsigned   	    	TableEntries;	/* Number of entries in the table */
+    unsigned            Name;           /* Name of the scope */
+    SymEntry*  	       	Table[1];   	/* Dynamic allocation */
+};
+
+/* Symbol tables */
+SymTable*      	CurrentScope;   /* Pointer to current symbol table */
+SymTable*	RootScope;      /* Root symbol table */
 
 
 
@@ -78,20 +91,14 @@ void SymEnterLevel (const char* ScopeName);
 void SymLeaveLevel (void);
 /* Leave the current lexical level */
 
-int SymIsLocalLevel (void);
-/* Return true if we are on a local symbol table level. */
+SymTable* SymFindScope (SymTable* Parent, const char* Name, unsigned Flags);
+/* Find a scope in the given enclosing scope */
 
-void SymDef (const char* Name, ExprNode* Expr, unsigned Flags);
-/* Define a new symbol */
-
-SymEntry* SymRef (const char* Name, int Scope);
-/* Search for the symbol and return it */
-
-int SymIsDef (const char* Name, int Scope);
-/* Return true if the given symbol is already defined */
-
-int SymIsRef (const char* Name, int Scope);
-/* Return true if the given symbol has been referenced */
+SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew);
+/* Find a new symbol table entry in the given table. If AllocNew is given and
+ * the entry is not found, create a new one. Return the entry found, or the
+ * new entry created, or - in case AllocNew is zero - return 0.
+ */
 
 void SymImport (const char* Name);
 /* Mark the given symbol as an imported symbol */
@@ -128,36 +135,6 @@ int SymIsConst (SymEntry* Sym);
 
 int SymIsZP (SymEntry* Sym);
 /* Return true if the symbol is explicitly marked as zeropage symbol */
-
-int SymIsImport (SymEntry* Sym);
-/* Return true if the given symbol is marked as import */
-
-int SymHasExpr (SymEntry* Sym);
-/* Return true if the given symbol has an associated expression */
-
-void SymMarkUser (SymEntry* Sym);
-/* Set a user mark on the specified symbol */
-
-void SymUnmarkUser (SymEntry* Sym);
-/* Remove a user mark from the specified symbol */
-
-int SymHasUserMark (SymEntry* Sym);
-/* Return the state of the user mark for the specified symbol */
-
-long GetSymVal (SymEntry* Sym);
-/* Return the symbol value */
-
-ExprNode* GetSymExpr (SymEntry* Sym);
-/* Get the expression for a non-const symbol */
-
-const char* GetSymName (SymEntry* Sym);
-/* Return the name of the symbol */
-
-unsigned GetSymIndex (SymEntry* Sym);
-/* Return the symbol index for the given symbol */
-
-const FilePos* GetSymPos (SymEntry* Sym);
-/* Return the position of first occurence in the source for the given symbol */
 
 void SymCheck (void);
 /* Run through all symbols and check for anomalies and errors */

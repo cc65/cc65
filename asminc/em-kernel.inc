@@ -79,11 +79,12 @@ EM_COPY_COUNT           = 5
 ;------------------------------------------------------------------------------
 ; ASM functions
 
+	.global	_em_unload
 	.global	_em_install
 	.global _em_uninstall
 	.global	_em_pagecount
 	.global	_em_map
-        .global _em_use
+        .global _em_use	  
 	.global	_em_commit
 	.global _em_copyfrom
 	.global	_em_copyto

@@ -61,7 +61,7 @@ machines, you have to install at least one of the library packages.
 %attr(644,root,root)   		/usr/lib/cc65/include/mouse/*.h
 %attr(755,root,root) %dir	/usr/lib/cc65/include/sys
 %attr(644,root,root)   		/usr/lib/cc65/include/sys/*.h
-%attr(755,root,root) %dir	/usr/lib/cc65/include/tgi  
+%attr(755,root,root) %dir	/usr/lib/cc65/include/tgi
 %attr(644,root,root)   		/usr/lib/cc65/include/tgi/*.h
 %attr(755,root,root) %dir	/usr/lib/cc65/asminc
 %attr(644,root,root)   		/usr/lib/cc65/asminc/*.inc
@@ -114,6 +114,29 @@ programs for the Apple ][ using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/emd/a2.*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/a2.*.joy
 %attr(644,root,root) 		/usr/lib/cc65/tgi/a2.*.tgi
+
+
+
+###############################################################################
+#                            Apple //e subpackage                             #
+###############################################################################
+
+%package apple2enh
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: Apple //e specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description apple2enh
+This package contains the header files and libraries needed to write
+programs for the Apple //e using the cc65 crosscompiler.
+
+%files apple2enh
+%attr(644,root,root) 		/usr/lib/cc65/lib/apple2enh.lib
+%attr(644,root,root) 		/usr/lib/cc65/lib/apple2enh.o
+%attr(644,root,root) 		/usr/lib/cc65/emd/a2e.*.emd
+%attr(644,root,root) 		/usr/lib/cc65/joy/a2e.*.joy
+%attr(644,root,root) 		/usr/lib/cc65/tgi/a2e.*.tgi
 
 
 

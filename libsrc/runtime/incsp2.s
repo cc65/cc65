@@ -14,8 +14,12 @@
 	ldy  	#1
    	lda	(sp),y		; get hi byte
        	tax	     		; into x
+.ifpc02	
+	lda	(sp)		; get lo byte
+.else
    	dey
    	lda	(sp),y		; get lo byte
+.endif
 
 .endproc
 

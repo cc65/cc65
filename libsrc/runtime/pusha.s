@@ -13,19 +13,19 @@ pusha0sp:
 	ldy	#$00
 pushaysp:
 	lda	(sp),y
-pusha:	ldy	sp
-       	beq	@L1
- 	dec	sp
+pusha:	ldy	sp              ; (3)
+       	beq	@L1             ; (6)
+ 	dec	sp              ; (11)
 .ifpc02
 	sta	(sp)
 .else
-    	ldy	#0
-    	sta	(sp),y
+    	ldy	#0              ; (13)
+    	sta	(sp),y          ; (19)
 .endif
-    	rts
+    	rts                     ; (25)
 
-@L1:	dec	sp+1
-    	dec	sp
-    	sta	(sp),y
-    	rts
+@L1:	dec	sp+1            ; (11)
+    	dec	sp              ; (16)
+    	sta	(sp),y          ; (22)
+    	rts                     ; (28)
 

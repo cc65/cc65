@@ -12,12 +12,12 @@
 .ifpc02
 	lda	(sp)
 .else
-	ldy 	#0
- 	lda	(sp),y		; Read byte
+	ldy 	#0              ; (2)
+ 	lda	(sp),y		; (7) Read byte
 .endif
-      	inc	sp
-       	beq	@L1
-	rts
+      	inc	sp              ; (12)
+       	beq	@L1             ; (14)
+	rts                     ; (20)
 
 @L1:	inc	sp+1
 	rts

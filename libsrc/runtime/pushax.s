@@ -17,19 +17,19 @@ pusha0:	ldx	#0
 
 .proc	pushax
 
-	pha
-	lda	sp
-	sec
-	sbc	#2
+	pha                     ; (3)
+	lda	sp              ; (6)
+	sec                     ; (8)
+	sbc	#2              ; (10)
 	sta	sp		; (13)
-	bcs	@L1
-	dec	sp+1
-@L1:	ldy	#1
-	txa			; (20)
-	sta	(sp),y
-	pla
-	dey
+	bcs	@L1             ; (17)
+	dec	sp+1            ; (+5)
+@L1:	ldy	#1              ; (19)
+	txa			; (21)
+	sta	(sp),y          ; (27)
+	pla                     ; (31)
+	dey                     ; (33)
 	sta	(sp),y		; (38)
-	rts
+	rts                     ; (44)     
 
 .endproc

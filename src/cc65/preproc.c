@@ -147,7 +147,7 @@ static void keepch (char c)
 {
     *mptr++ = c;
 }
-
+	    
 
 
 static void keepstr (const char* S)
@@ -160,8 +160,8 @@ static void keepstr (const char* S)
 
 
 
-static void Comment (void)
-/* Remove a C comment from line. */
+static void OldStyleComment (void)
+/* Remove an old style C comment from line. */
 {
     /* Remember the current line number, so we can output better error
      * messages if the comment is not terminated in the current file.
@@ -176,13 +176,13 @@ static void Comment (void)
     while (CurC != '*' || NextC != '/') {
     	if (CurC == '\0') {
     	    if (NextLine () == 0) {
-    		PPError ("End-of-file reached in comment starting at line %u",
-			 StartingLine);
+    	    	PPError ("End-of-file reached in comment starting at line %u",
+	    		 StartingLine);
     	    	return;
     	    }
 	} else {
 	    if (CurC == '/' && NextC == '*') {
-		PPWarning ("`/*' found inside a comment");
+	    	PPWarning ("`/*' found inside a comment");
 	    }
 	    NextChar ();
 	}
@@ -191,6 +191,24 @@ static void Comment (void)
     /* Skip the end of comment chars */
     NextChar ();
     NextChar ();
+}
+
+
+
+static void NewStyleComment (void)
+/* Remove a new style C comment from line. */
+{
+    /* Beware: Because line continuation chars are handled when reading
+     * lines, we may only skip til the end of the source line, which
+     * may not be the same as the end of the input line. The end of the
+     * source line is denoted by a lf (\n) character.
+     */
+    do {
+    	NextChar ();
+    } while (CurC != '\n' && CurC != '\0');
+    if (CurC == '\n') {
+    	NextChar ();
+    }
 }
 
 
@@ -361,15 +379,15 @@ static int MacroCall (Macro* M)
     	      	    ++ArgCount;
  	    	}
 
- 		/* Check for end of macro param list */
- 	   	if (CurC == ')') {
- 		    NextChar ();
- 		    break;
- 		}
+ 	    	/* Check for end of macro param list */
+    	    	if (CurC == ')') {
+ 	    	    NextChar ();
+ 	    	    break;
+    	    	}
 
        	       	/* Start the next param */
      	       	ArgStart = B;
- 		NextChar ();
+ 	    	NextChar ();
      	    } else {
  	    	/* Comma or right paren inside nested parenthesis */
      	       	if (CurC == ')') {
@@ -382,25 +400,31 @@ static int MacroCall (Macro* M)
  	    /* Squeeze runs of blanks */
      	    *B++ = ' ';
      	    SkipBlank ();
+	} else if (CurC == '/' && NextC == '*') {
+	    *B++ = ' ';
+     	    OldStyleComment ();
+     	} else if (ANSI == 0 && CurC == '/' && NextC == '/') {
+     	    *B++ = ' ';
+	    NewStyleComment ();
      	} else if (CurC == '\0') {
- 	    /* End of line inside macro argument list - read next line */
+    	    /* End of line inside macro argument list - read next line */
      	    if (NextLine () == 0) {
      	       	return 0;
      	    }
      	} else {
- 	    /* Just copy the character */
+    	    /* Just copy the character */
      	    *B++ = CurC;
- 	    NextChar ();
+    	    NextChar ();
      	}
     }
 
     /* Compare formal argument count with actual */
     if (M->ArgCount != ArgCount) {
- 	PPError ("Macro argument count mismatch");
- 	/* Be sure to make enough empty arguments available */
- 	while (ArgCount < M->ArgCount) {
- 	    M->ActualArgs [ArgCount++] = "";
- 	}
+    	PPError ("Macro argument count mismatch");
+    	/* Be sure to make enough empty arguments available */
+    	while (ArgCount < M->ArgCount) {
+    	    M->ActualArgs [ArgCount++] = "";
+    	}
     }
 
     /* Preprocess the line, replacing macro parameters */
@@ -570,20 +594,10 @@ static int Pass1 (const char* From, char* To)
 	    mptr = CopyQuotedString (mptr);
 	} else if (CurC == '/' && NextC == '*') {
 	    keepch (' ');
-     	    Comment ();
+     	    OldStyleComment ();
      	} else if (ANSI == 0 && CurC == '/' && NextC == '/') {
      	    keepch (' ');
-	    /* Beware: Because line continuation chars are handled when reading
-	     * lines, we may only skip til the end of the source line, which
-	     * may not be the same as the end of the input line. The end of the
-	     * source line is denoted by a lf (\n) character.
-	     */
-	    do {
-	       	NextChar ();
-	    } while (CurC != '\n' && CurC != '\0');
-	    if (CurC == '\n') {
-	    	NextChar ();
-	    }
+	    NewStyleComment ();
      	} else {
      	    *mptr++ = CurC;
 	    NextChar ();
@@ -906,7 +920,7 @@ void Preprocess (void)
 
        	       	    case PP_ELSE:
        	    	    	if (IfIndex >= 0) {
-		    	    if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
+	    	    	    if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
 		    	     	if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
 		    	     	    Skip = !Skip;
 		    	     	}

@@ -3,8 +3,13 @@
 ;
 ; int open (const char* name, int flags, ...);	/* May take a mode argument */
 ;
+; Be sure to keep the value priority of closeallfiles lower than that of
+; closeallstreams (which is the high level C file I/O counterpart and must be
+; called before closeallfiles).
+
 
         .export         _open
+        .destructor     closeallfiles, 17
 
         .import         SETLFS, OPEN, CLOSE
         .import         addysp, popax
@@ -12,6 +17,7 @@
         .import         opencmdchannel, closecmdchannel, readdiskerror
         .import         __oserror
         .import         fnunit
+        .import         _close
         .importzp       sp, tmp2, tmp3
 
         .include        "errno.inc"
@@ -20,7 +26,34 @@
 
 
 ;--------------------------------------------------------------------------
-; initstdout: Open the stdout and stderr file descriptors for the screen.
+; closeallfiles: Close all open files.
+
+.proc   closeallfiles
+
+        ldx     #MAX_FDS
+loop:   lda     fdtab-1,x
+        beq     next            ; Skip unused entries
+
+; Close this file
+
+        txa
+        pha                     ; Save current value of X
+        ldx     #0
+        jsr     _close
+        pla
+        tax
+
+; Next file
+
+next:   dex
+        bne     loop
+
+        rts
+
+.endproc
+
+;--------------------------------------------------------------------------
+; _open
 
 .proc   _open
 

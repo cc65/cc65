@@ -61,6 +61,7 @@ JOY_API_VERSION         = $01
 ; Variables
 
        	.global	_joy_drv                        ; Pointer to driver
+        .global _joy_masks
 
 ;------------------------------------------------------------------------------
 ; Driver entry points
@@ -71,7 +72,7 @@ JOY_API_VERSION         = $01
         .global joy_read
 
 ;------------------------------------------------------------------------------
-; ASM functions
+; C callable functions
 
         .global _joy_unload
        	.global	_joy_install

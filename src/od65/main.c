@@ -71,13 +71,14 @@ static void Usage (void)
 /* Print usage information and exit */
 {
     fprintf (stderr,
-    	     "Usage: %s [options] file\n"
+    	     "Usage: %s [options] file [options] [file]\n"
     	     "Short options:\n"
        	     "  -h\t\t\tHelp (this text)\n"
        	     "  -V\t\t\tPrint the version number and exit\n"
 	     "\n"
 	     "Long options:\n"
-	     "  --dump-exports\tDump exported symbols\n"
+	     "  --dump-all\t\tDump all object file information\n"
+       	     "  --dump-exports\tDump exported symbols\n"
 	     "  --dump-files\t\tDump the source files\n"
 	     "  --dump-header\t\tDump the object file header\n"
 	     "  --dump-imports\tDump imported symbols\n"
@@ -86,6 +87,14 @@ static void Usage (void)
 	     "  --help\t\tHelp (this text)\n"
        	     "  --version\t\tPrint the version number and exit\n",
     	     ProgName);
+}
+
+
+
+static void OptDumpAll (const char* Opt, const char* Arg)
+/* Dump all object file information */
+{
+    What |= D_ALL;
 }
 
 
@@ -206,7 +215,7 @@ static void DumpFile (const char* Name)
 	if (What & D_EXPORTS) {
 	    DumpObjExports (F, 0);
 	}
-    }			  
+    }
 
     /* Close the file */
     fclose (F);
@@ -219,6 +228,7 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
+       	{ "--dump-all",		0,     	OptDumpAll		},
 	{ "--dump-exports",	0,	OptDumpExports		},
 	{ "--dump-files",	0,	OptDumpFiles		},
 	{ "--dump-header",	0,	OptDumpHeader		},

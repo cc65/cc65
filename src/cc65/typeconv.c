@@ -207,11 +207,10 @@ int TypeConversion (ExprDesc* Expr, int k, type* NewType)
      	    Warning ("Converting pointer to integer without a cast");
        	} else if (!IsClassInt (Expr->Type)) {
      	    Error ("Incompatible types");
-	} else {
-   	    /* Convert the rhs to the type of the lhs. */
-	    k = DoConversion (Expr, k, NewType);
-        }
-	return k;
+       	}
+
+        /* Do a conversion regardless of errors and return the result. */
+        return DoConversion (Expr, k, NewType);
     }
 
     /* Handle conversions to pointer type */
@@ -228,11 +227,11 @@ int TypeConversion (ExprDesc* Expr, int k, type* NewType)
 
 	 	    case TC_INCOMPATIBLE:
 	 		Error ("Incompatible pointer types");
-	 		return k;
+	 		break;
 
 	 	    case TC_QUAL_DIFF:
 	 		Error ("Pointer types differ in type qualifiers");
-	 		return k;
+	 		break;
 
 	 	    default:
 	 		/* Ok */
@@ -250,21 +249,19 @@ int TypeConversion (ExprDesc* Expr, int k, type* NewType)
 	     */
 	    if (TypeCmp (Indirect (NewType), Expr->Type) < TC_EQUAL) {
 	 	Error ("Incompatible types");
-		return k;
 	    }
      	} else {
 	    Error ("Incompatible types");
-	    return k;
 	}
 
-	/* If we come here, the conversion is ok, convert and return the result */
+       	/* Do the conversion even in case of errors */
 	return DoConversion (Expr, k, NewType);
 
     }
 
     /* Invalid automatic conversion */
     Error ("Incompatible types");
-    return k;
+    return DoConversion (Expr, k, NewType);
 }
 
 

@@ -589,9 +589,17 @@ static unsigned FunctionParamList (FuncDesc* Func)
       	} else {
 	    unsigned ArgSize = sizeofarg (Flags);
 	    if (FrameSize > 0) {
-	    	/* We have the space already allocated, store in the frame */
-	    	CHECK (FrameSize >= ArgSize);
-	    	FrameSize -= ArgSize;
+	    	/* We have the space already allocated, store in the frame.
+                 * Because of invalid type conversions (that have produced an
+                 * error before), we can end up here with a non aligned stack
+                 * frame. Since no output will be generated anyway, handle 
+                 * these cases gracefully instead of doing a CHECK.
+                 */
+                if (FrameSize >= ArgSize) {
+                    FrameSize -= ArgSize;
+                } else {
+                    FrameSize = 0;
+                }
 	    	FrameOffs -= ArgSize;
 	    	/* Store */
 	    	g_putlocal (Flags | CF_NOKEEP, FrameOffs, lval.ConstVal);

@@ -5,9 +5,9 @@
 ;
 
    	.export	     	_exit
-     	.import		_clrscr, initlib, donelib
+     	.import	   	_clrscr, initlib, donelib
      	.import	     	push0, _main
-	.import		__VIDRAM_START__
+	.import	   	__CHARRAM_START__, __CHARRAM_SIZE__, __VIDRAM_START__
 	.import	       	__BSS_RUN__, __BSS_SIZE__
      	.import		irq, nmi
        	.import	       	k_irq, k_nmi, k_plot, k_udtim, k_scnkey
@@ -237,54 +237,88 @@ Z4:
 ; This code is in page 2, so we may now start calling subroutines safely,
 ; since the code we execute is no longer in the stack page.
 
+; Copy the character rom from the system bank into the execution bank
+
+        lda     #<$C000
+	sta	ptr1
+	lda	#>$C000
+	sta	ptr1+1
+        lda	#<__CHARRAM_START__
+	sta	ptr2
+	lda	#>__CHARRAM_START__
+	sta	ptr2+1
+       	lda    	#>__CHARRAM_SIZE__     	; 16 * 256 bytes to copy
+	sta	tmp1
+	ldy	#$00
+ccopy:	lda	#$0F
+     	sta	IndReg			; Access the system bank
+ccopy1:	lda	(ptr1),y
+       	sta	__VIDRAM_START__,y
+       	iny
+       	bne	ccopy1
+       	lda	ExecReg
+       	sta	IndReg
+ccopy2:	lda	__VIDRAM_START__,y
+       	sta	(ptr2),y
+       	iny
+       	bne	ccopy2
+       	inc	ptr1+1
+       	inc	ptr2+1			; Bump high pointer bytes
+       	dec	tmp1
+       	bne	ccopy
+
 ; Clear the video memory. We will do this before switching the video to bank 0
 ; to avoid garbage when doing so.
 
         jsr     _clrscr
 
-; Reprogram the VIC so that the text screen is at $F800 in the execution bank
-; This is done in three steps:
+; Reprogram the VIC so that the text screen and the character ROM is in the
+; execution bank. This is done in three steps:
 
         lda     #$0F  	      		; We need access to the system bank
-	sta	IndReg
+       	sta	IndReg
 
 ; Place the VIC video RAM into bank 0
-; CA (STATVID) = 0
+; CA (STATVID)   = 0
+; CB (VICDOTSEL) = 0
 
-  	ldy	#tpiCtrlReg
-  	lda	(tpi1),y
-	sta	vidsave+0
-  	and	#$CF
-  	ora	#$20
-  	sta	(tpi1),y
+       	ldy	#tpiCtrlReg
+       	lda	(tpi1),y
+       	sta	vidsave+0
+       	and	#%00001111
+       	ora	#%10100000
+       	sta	(tpi1),y
 
 ; Set bit 14/15 of the VIC address range to the high bits of __VIDRAM_START__
 ; PC6/PC7 (VICBANKSEL 0/1) = 11
 
-	ldy    	#tpiPortC
-	lda	(tpi2),y
-	sta	vidsave+1
-	and	#$3F
+       	ldy    	#tpiPortC
+       	lda	(tpi2),y
+       	sta	vidsave+1
+       	and	#$3F
        	ora    	#<((>__VIDRAM_START__) & $C0)
-	sta	(tpi2),y
+       	sta	(tpi2),y
 
-; Set bits 10-13 of the VIC address range to address F800
+; Set the VIC base address register to the addresses of the video and
+; character RAM.
 
         ldy	#VIC_VIDEO_ADR
-	lda	(vic),y
-	sta	vidsave+2
-	and	#$0F
-       	ora    	#<(((>__VIDRAM_START__) << 2) & $F0)
-	sta	(vic),y
+       	lda	(vic),y
+       	sta	vidsave+2
+	and	#$01
+       	ora    	#<(((__VIDRAM_START__ >> 6) & $F0) | ((__CHARRAM_START__ >> 10) & $0E) | $02)
+;      	and	#$0F
+;      	ora    	#<(((>__VIDRAM_START__) << 2) & $F0)
+       	sta	(vic),y
 
 ; Switch back to the execution bank
 
         lda     ExecReg
-	sta	IndReg
+       	sta	IndReg
 
 ; Call module constructors
 
-	jsr	initlib
+       	jsr	initlib
 
 ; Create the (empty) command line for the program
 

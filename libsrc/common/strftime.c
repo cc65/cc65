@@ -67,7 +67,6 @@ size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format,
     char        c;
     char        arg[40];
     const char* argptr;
-    unsigned    week;
 
     /* Copy until we reach the end of the format string or a format specifier */
     count = 0;
@@ -132,20 +131,12 @@ size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format,
                     break;
 
                 case 'U':
-                    week = tm->tm_yday / 7;
-                    if (tm->tm_mday % 7 > tm->tm_wday) {
-                        ++week;
-                    }
-                    sprintf (arg, "%02u", week);
+                    sprintf (arg, "%02d", (tm->tm_yday + 7 - tm->tm_wday) / 7);
                     break;
 
                 case 'W':
-                    /* ### This one is buggy */
-                    week = tm->tm_yday / 7;
-                    if (tm->tm_mday % 7 > tm->tm_wday) {
-                        ++week;
-                    }
-                    sprintf (arg, "%2u", week);
+                    sprintf (arg, "%02d", 
+                             (tm->tm_yday + 7 - (tm->tm_wday? tm->tm_wday - 1 : 6)) / 7);
                     break;
 
                 case 'X':

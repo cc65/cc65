@@ -2625,7 +2625,7 @@ Here's a list of all control commands and a description, what they do:
   of a name represents both, a scope and a symbol, the scope is choosen over the
   symbol.
 
-  Usage examples:
+  After the following code:
 
   <tscreen><verb>
         .struct Point                   ; Struct size = 4
@@ -2634,25 +2634,54 @@ Here's a list of all control commands and a description, what they do:
         .endstruct
 
         P:      .tag    Point           ; Declare a point
+        @P:     .tag    Point           ; Declare another point
 
         .code
-        .proc   Code                    ; 3 bytes
+        .proc   Code
                 nop
-                nop
+                .proc   Inner
+                        nop
+                .endproc
                 nop
         .endproc
 
-        .proc   Data                    ; 4 bytes
+        .proc   Data
         .data                           ; Segment switch!!!
                 .res    4
         .endproc
-
-                lda     #.sizeof(Point)         ; Loads 4
-                lda     #.sizeof(Point::xcoord) ; Loads 2
-                lda     #.sizeof(P)             ; Loads 4
-                lda     #.sizeof(Code)          ; Loads 3
-                lda     #.sizeof(Data)          ; Loads 0
   </verb></tscreen>
+
+  <descrip>
+    <tag><tt/.sizeof(Point)/</tag>
+    will have the value 4, because this is the size of struct <tt/Point/.
+
+    <tag><tt/.sizeof(Point::xcoord)/</tag>
+    will have the value 2, because this is the size of the member <tt/xcoord/
+    in struct <tt/Point/.
+
+    <tag><tt/.sizeof(P)/</tag>
+    will have the value 4, this is the size of the data declared on the same
+    source line as the label <tt/P/, which is in the same segment that <tt/P/
+    is relative to.
+
+    <tag><tt/.sizeof(@P)/</tag>
+    will have the value 4, see above. The example demonstrates that <tt/.SIZEOF/
+    does also work for cheap local symbols.
+
+    <tag><tt/.sizeof(Code)/</tag>
+    will have the value 3, since this is amount of data emitted into the code
+    segment, the segment that was active when <tt/Code/ was entered. Note that
+    this value includes the amount of data emitted in child scopes (in this
+    case <tt/Code::Inner/).
+
+    <tag><tt/.sizeof(Code::Inner)/</tag>
+    will have the value 1 as expected.
+
+    <tag><tt/.sizeof(Data)/</tag>
+    will have the value 0. Data is emitted within the scope <tt/Data/, but since
+    the segment is switched after entry, this data is emitted into another
+    segment.
+  </descrip>
 
 
 <sect1><tt>.SMART</tt><label id=".SMART"><p>

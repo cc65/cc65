@@ -427,19 +427,6 @@ void CE_FreeRegInfo (CodeEntry* E)
 
 
 
-#if 0   /* Used for debugging */
-static void DumpRegInfo (const char* Desc, const RegInfo* RI)
-{
-    fprintf (stdout, "%s:\n", Desc);
-    fprintf (stdout, "In:  ");
-    RC_Dump (stdout, &RI->In);
-    fprintf (stdout, "Out: ");
-    RC_Dump (stdout, &RI->Out);
-}
-#endif
-
-
-
 void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 /* Generate register info for this instruction. If an old info exists, it is
  * overwritten.
@@ -510,7 +497,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_ASL:
-	    if (E->AM == AM65_ACC && In->RegA >= 0) {
+	    if (E->AM == AM65_ACC && RegValIsKnown (In->RegA)) {
 		Out->RegA = (In->RegA << 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
 		switch (GetKnownReg (E->Chg & REG_ZP, In)) {
@@ -597,7 +584,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_DEC:
-	    if (E->AM == AM65_ACC && In->RegA >= 0) {
+	    if (E->AM == AM65_ACC && RegValIsKnown (In->RegA)) {
 	    	Out->RegA = (In->RegA - 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
 		switch (GetKnownReg (E->Chg & REG_ZP, In)) {
@@ -673,7 +660,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_INC:
-	    if (E->AM == AM65_ACC && In->RegA >= 0) {
+	    if (E->AM == AM65_ACC && RegValIsKnown (In->RegA)) {
 	     	Out->RegA = (In->RegA + 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
 	     	switch (GetKnownReg (E->Chg & REG_ZP, In)) {
@@ -876,7 +863,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_LSR:
-	    if (E->AM == AM65_ACC && In->RegA >= 0) {
+	    if (E->AM == AM65_ACC && RegValIsKnown (In->RegA)) {
 		Out->RegA = (In->RegA >> 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
 		switch (GetKnownReg (E->Chg & REG_ZP, In)) {
@@ -1153,7 +1140,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	     	/* Invalidates all ZP registers */
 	    	RC_InvalidateZP (Out);
 	    } else if (E->AM == AM65_ZP) {
-	    	if (In->RegA >= 0) {
+	    	if (RegValIsKnown (In->RegA)) {
 		    switch (GetKnownReg (E->Chg & REG_ZP, In)) {
 			case REG_TMP1:
 			    Out->Tmp1 &= ~In->RegA;
@@ -1198,7 +1185,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	     	/* Invalidates all ZP registers */
 	    	RC_InvalidateZP (Out);
 	    } else if (E->AM == AM65_ZP) {
-	    	if (In->RegA >= 0) {
+	    	if (RegValIsKnown (In->RegA)) {
 		    switch (GetKnownReg (E->Chg & REG_ZP, In)) {
 			case REG_TMP1:
 			    Out->Tmp1 |= In->RegA;

@@ -1320,6 +1320,7 @@ unsigned OptPrecalc (CodeSeg* S)
 
             case OP65_AND:
             case OP65_EOR:
+            case OP65_LSR:
             case OP65_ORA:
                 if (RegValIsKnown (Out->RegA)) {
                     /* Accu AND zp with known contents */

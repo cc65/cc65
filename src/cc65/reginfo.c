@@ -136,3 +136,15 @@ void FreeRegInfo (RegInfo* RI)
 
 
 
+void DumpRegInfo (const char* Desc, const RegInfo* RI)
+/* Dump the register info for debugging */
+{
+    fprintf (stdout, "%s:\n", Desc);
+    fprintf (stdout, "In:  ");
+    RC_Dump (stdout, &RI->In);
+    fprintf (stdout, "Out: ");
+    RC_Dump (stdout, &RI->Out);
+}
+
+
+

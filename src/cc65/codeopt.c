@@ -138,8 +138,7 @@ static unsigned OptShift1 (CodeSeg* S)
 
 static unsigned OptShift2 (CodeSeg* S)
 /* A call to the shraxN routine may get replaced by one or more lsr insns
- * if the value of X is not used later, or if the value of X is known and
- * zero.
+ * if the value of X is zero.
  */
 {
     unsigned Changes = 0;
@@ -160,7 +159,7 @@ static unsigned OptShift2 (CodeSeg* S)
        	    strncmp (E->Arg, "shrax", 5) == 0        &&
 	    strlen (E->Arg) == 6                     &&
 	    IsDigit (E->Arg[5])                      &&
-       	    (E->RI->In.RegX == 0 || !RegXUsed (S, I+1))) {
+       	    E->RI->In.RegX == 0) {
 
 	    /* Insert shift insns */
 	    unsigned Count = E->Arg[5] - '0';
@@ -1907,13 +1906,13 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptAdd1, 1);
     Changes += RunOptFunc (S, &DOptAdd2, 1);
     Changes += RunOptFunc (S, &DOptAdd3, 1);
+    Changes += RunOptFunc (S, &DOptStore4, 1);
     Changes += RunOptFunc (S, &DOptShift1, 1);
     Changes += RunOptFunc (S, &DOptShift2, 1);
     Changes += RunOptFunc (S, &DOptShift3, 1);
     Changes += RunOptFunc (S, &DOptStore1, 1);
     Changes += RunOptFunc (S, &DOptStore2, 5);
     Changes += RunOptFunc (S, &DOptStore3, 5);
-    Changes += RunOptFunc (S, &DOptStore4, 1);
 
     /* Return the number of changes */
     return Changes;

@@ -121,6 +121,9 @@ RegInfo* NewRegInfo (const RegContents* RC);
 void FreeRegInfo (RegInfo* RI);
 /* Free a RegInfo struct */
 
+void DumpRegInfo (const char* Desc, const RegInfo* RI);
+/* Dump the register info for debugging */
+
 
 
 /* End of reginfo.h */

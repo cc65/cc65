@@ -24,7 +24,7 @@ OBJS =	_scrsize.o   \
 	clrscr.o     \
 	color.o      \
 	cputc.o      \
-     	crt0.o 	     \
+	crt0.o 	     \
 	ctype.o      \
 	cvline.o     \
 	dio_cts.o    \
@@ -50,7 +50,9 @@ OBJS =	_scrsize.o   \
 	ostype.o     \
 	read.o 	     \
 	readjoy.o    \
+	remove.o     \
 	revers.o     \
+	rs232.o	     \
 	rwcommon.o   \
 	savevec.o    \
 	scroll.o     \

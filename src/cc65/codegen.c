@@ -1339,9 +1339,9 @@ void g_scale (unsigned flags, long val)
     } else if (val > 0) {
 
      	/* Scale up */
-     	if ((p2 = powerof2 (val)) > 0 && p2 <= 3) {
+     	if ((p2 = powerof2 (val)) > 0 && p2 <= 4) {
 
-     	    /* Factor is 2, 4 or 8, use special function */
+       	    /* Factor is 2, 4, 8 and 16, use special function */
      	    switch (flags & CF_TYPE) {
 
      		case CF_CHAR:
@@ -1354,11 +1354,11 @@ void g_scale (unsigned flags, long val)
      	     	    /* FALLTHROUGH */
 
      	     	case CF_INT:
-		    if (CodeSizeFactor >= (p2+1)*130U) {
+     		    if (CodeSizeFactor >= (p2+1)*130U) {
      	     		AddCodeLine ("stx tmp1");
      	     	  	while (p2--) {
      	     		    AddCodeLine ("asl a");
-	     		    AddCodeLine ("rol tmp1");
+     	     		    AddCodeLine ("rol tmp1");
      	     		}
      	     		AddCodeLine ("ldx tmp1");
      	     	    } else {
@@ -1394,9 +1394,9 @@ void g_scale (unsigned flags, long val)
 
      	/* Scale down */
      	val = -val;
-     	if ((p2 = powerof2 (val)) > 0 && p2 <= 3) {
+     	if ((p2 = powerof2 (val)) > 0 && p2 <= 4) {
 
-     	    /* Factor is 2, 4 or 8, use special function */
+     	    /* Factor is 2, 4, 8 and 16 use special function */
      	    switch (flags & CF_TYPE) {
 
      		case CF_CHAR:
@@ -2959,7 +2959,7 @@ void g_asr (unsigned flags, unsigned long val)
 
       	    case CF_CHAR:
       	    case CF_INT:
-		if (val >= 1 && val <= 3) {
+		if (val >= 1 && val <= 4) {
 		    if (flags & CF_UNSIGNED) {
 		       	AddCodeLine ("jsr shrax%ld", val);
 		    } else {
@@ -2974,7 +2974,7 @@ void g_asr (unsigned flags, unsigned long val)
 		break;
 
 	    case CF_LONG:
-		if (val >= 1 && val <= 3) {
+		if (val >= 1 && val <= 4) {
 		    if (flags & CF_UNSIGNED) {
 		       	AddCodeLine ("jsr shreax%ld", val);
 		    } else {
@@ -3042,7 +3042,7 @@ void g_asl (unsigned flags, unsigned long val)
 
       	    case CF_CHAR:
       	    case CF_INT:
-		if (val >= 1 && val <= 3) {
+		if (val >= 1 && val <= 4) {
 		    if (flags & CF_UNSIGNED) {
 		       	AddCodeLine ("jsr shlax%ld", val);
 		    } else {
@@ -3057,7 +3057,7 @@ void g_asl (unsigned flags, unsigned long val)
      		break;
 
 	    case CF_LONG:
-		if (val >= 1 && val <= 3) {
+		if (val >= 1 && val <= 4) {
 		    if (flags & CF_UNSIGNED) {
 		       	AddCodeLine ("jsr shleax%ld", val);
 		    } else {
@@ -3559,16 +3559,31 @@ void g_le (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
+	/* <= is not very effective on the 6502, so try to convert
+	 * it into < if the value is in a valid range.
+	 */
+
      	/* Look at the type */
      	switch (flags & CF_TYPE) {
 
 	    case CF_CHAR:
 		if (flags & CF_FORCECHAR) {
-		    AddCodeLine ("cmp #$%02X", (unsigned char)val);
 		    if (flags & CF_UNSIGNED) {
-		     	AddCodeLine ("jsr boolule");
+			if (val < 255) {
+			    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
+			    AddCodeLine ("jsr boolult");
+			} else {
+			    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+			    AddCodeLine ("jsr boolule");
+			}
 		    } else {
-		        AddCodeLine ("jsr boolle");
+			if (val < 127) {
+			    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
+			    AddCodeLine ("jsr boollt");
+			} else {
+			    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+			    AddCodeLine ("jsr boolle");
+			}
 		    }
 		    return;
 		}
@@ -3577,11 +3592,16 @@ void g_le (unsigned flags, unsigned long val)
 	    case CF_INT:
 		if (flags & CF_UNSIGNED) {
 		    unsigned L = GetLocalLabel();
+		    const char* Name = "boolule";
+		    if (val < 65535) {
+		     	++val;
+			Name = "boolult";
+		    }
 		    AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
-       	       	    AddCodeLine ("bne %s", LocalLabelName (L));
-     		    AddCodeLine ("cmp #$%02X", (unsigned char)val);
-	            g_defcodelabel (L);
-		    AddCodeLine ("jsr boolule");
+		    AddCodeLine ("bne %s", LocalLabelName (L));
+		    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+		    g_defcodelabel (L);
+		    AddCodeLine ("jsr %s", Name);
 		    return;
 		}
 	  	break;

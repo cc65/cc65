@@ -181,8 +181,8 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 	     * @L: ...
 	     */
 	    if ((N = CS_GetNextEntry (S, I)) == 0) {
-		/* No such entry */
-		Internal ("Invalid program flow");
+	    	/* No such entry */
+	    	Internal ("Invalid program flow");
 	    }
 	    L = CS_GenLabel (S, N);
 	    N = NewCodeEntry (OP65_BEQ, AM65_BRA, L->Name, L, E->LI);
@@ -249,14 +249,6 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 
     }
 
-}
-
-
-
-static int IsBitOp (const CodeEntry* E)
-/* Check if E is one of the bit operations (and, or, eor) */
-{
-    return (E->OPC == OP65_AND || E->OPC == OP65_ORA || E->OPC == OP65_EOR);
 }
 
 
@@ -523,7 +515,7 @@ static unsigned OptSub2 (CodeSeg* S)
 	     */
 	    if (CE_HasLabel (E)) {
 		CS_MoveLabels (S, E, L[0]);
-	    }
+  	    }
 
 	    /* Remember, we had changes */
        	    ++Changes;
@@ -683,7 +675,17 @@ static unsigned OptCmp2 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if ((E->OPC == OP65_LDA || IsBitOp (E))	  &&
+       	if ((E->OPC == OP65_ADC ||
+	     E->OPC == OP65_AND ||
+	     E->OPC == OP65_DEA ||
+	     E->OPC == OP65_EOR ||
+	     E->OPC == OP65_INA ||
+       	     E->OPC == OP65_LDA ||
+	     E->OPC == OP65_ORA	||
+	     E->OPC == OP65_PLA ||
+	     E->OPC == OP65_SBC ||
+	     E->OPC == OP65_TXA ||
+	     E->OPC == OP65_TYA)                  &&
 	    CS_GetEntries (S, L, I+1, 2)   	  &&
        	    IsCmpToZero (L[0])                    &&
 	    !CE_HasLabel (L[0])                   &&
@@ -760,7 +762,7 @@ static unsigned OptCmp3 (CodeSeg* S)
 		CS_MoveEntry (S, I, I+4);
 
 		/* We will replace the ldx/cpx by lda/cmp */
-		CE_ReplaceOPC (L[0], OP65_LDA);
+	    	CE_ReplaceOPC (L[0], OP65_LDA);
 		CE_ReplaceOPC (L[1], OP65_CMP);
 
 		/* Beware: If the first LDA instruction had a label, we have
@@ -796,7 +798,7 @@ static unsigned OptCmp4 (CodeSeg* S)
  *      lda     (sp),y
  *      cpx     #a
  *      bne     L1
- *   	cmp	#b
+ *   	cmp 	#b
  *      jne/jeq L2
  */
 {
@@ -817,7 +819,7 @@ static unsigned OptCmp4 (CodeSeg* S)
 		 *      ldy     #o
 		 *      lda     (sp),y
 		 *      dey
-		 *      ora    	(sp),y
+	    	 *      ora    	(sp),y
 		 *      jne/jeq ...
 		 */
 		CE_ReplaceOPC (L[4], OP65_ORA);
@@ -910,7 +912,7 @@ static unsigned OptCmp5 (CodeSeg* S)
 
 	}
 
-	/* Next entry */
+  	/* Next entry */
 	++I;
 
     }
@@ -918,6 +920,82 @@ static unsigned OptCmp5 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
+
+
+
+/*****************************************************************************/
+/*	    			Optimize tests                               */
+/*****************************************************************************/
+
+
+
+static unsigned OptTest1 (CodeSeg* S)
+/* On a sequence
+ *
+ *     stx     xxx
+ *     ora     xxx
+ *     beq/bne ...
+ *
+ * if X is zero, the sequence may be changed
+ *
+ *     cmp     #$00
+ *     beq/bne ...
+ *
+ * which may be optimized further by another step.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[3];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+	/* Check if it's the sequence we're searching for */
+	if (L[0]->OPC == OP65_STX              &&
+	    L[0]->RI->In.RegX == 0             &&
+	    CS_GetEntries (S, L+1, I+1, 2)     &&
+	    !CE_HasLabel (L[1])                &&
+	    L[1]->OPC == OP65_ORA              &&
+	    strcmp (L[0]->Arg, L[1]->Arg) == 0 &&
+	    !CE_HasLabel (L[2])                &&
+	    (L[2]->Info & OF_ZBRA) != 0) {
+
+	    /* Insert the compare */
+       	    CodeEntry* N = NewCodeEntry (OP65_CMP, AM65_IMM, "$00", 0, L[0]->LI);
+	    CS_InsertEntry (S, N, I);
+
+	    /* Remove the two other insns */
+	    CS_DelEntry (S, I+2);
+	    CS_DelEntry (S, I+1);
+
+	    /* We had changes */
+	    ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+
 
 
 
@@ -930,7 +1008,7 @@ static unsigned OptCmp5 (CodeSeg* S)
 static unsigned OptNegA1 (CodeSeg* S)
 /* Check for
  *
- *	ldx	#$00
+ *	ldx 	#$00
  *	lda	..
  * 	jsr	bnega
  *
@@ -953,7 +1031,7 @@ static unsigned OptNegA1 (CodeSeg* S)
 	    E->AM == AM65_IMM	    		&&
 	    (E->Flags & CEF_NUMARG) != 0	&&
 	    E->Num == 0	   			&&
-	    CS_GetEntries (S, L, I+1, 2)	&&
+  	    CS_GetEntries (S, L, I+1, 2)	&&
 	    L[0]->OPC == OP65_LDA		&&
 	    (L[0]->Use & REG_X) == 0	    	&&
 	    L[1]->OPC == OP65_JSR	    	&&
@@ -1000,11 +1078,21 @@ static unsigned OptNegA2 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OP65_LDA  	  	&&
+	if ((E->OPC == OP65_ADC ||
+	     E->OPC == OP65_AND ||
+	     E->OPC == OP65_DEA ||
+	     E->OPC == OP65_EOR ||
+	     E->OPC == OP65_INA ||
+       	     E->OPC == OP65_LDA ||
+	     E->OPC == OP65_ORA	||
+	     E->OPC == OP65_PLA ||
+	     E->OPC == OP65_SBC ||
+	     E->OPC == OP65_TXA ||
+	     E->OPC == OP65_TYA)                &&
 	    CS_GetEntries (S, L, I+1, 2)	&&
        	    L[0]->OPC == OP65_JSR  	    	&&
 	    strcmp (L[0]->Arg, "bnega") == 0	&&
-	    !CE_HasLabel (L[0])		        &&
+	    !CE_HasLabel (L[0])	  	        &&
 	    (L[1]->Info & OF_ZBRA) != 0) {
 
 	    /* Invert the branch */
@@ -1036,6 +1124,52 @@ static unsigned OptNegA2 (CodeSeg* S)
 
 
 static unsigned OptNegAX1 (CodeSeg* S)
+/* On a call to bnegax, if X is zero, the result depends only on the value in
+ * A, so change the call to a call to bnega. This will get further optimized
+ * later if possible.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if this is a call to bnegax, and if X is known and zero */
+	if (E->OPC == OP65_JSR              &&
+	    E->RI->In.RegX == 0             &&
+	    strcmp (E->Arg, "bnegax") == 0) {
+
+	    /* We're cheating somewhat here ... */
+	    E->Arg[5] = '\0';
+	    E->Use &= ~REG_X;
+
+	    /* We had changes */
+	    ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptNegAX2 (CodeSeg* S)
 /* Search for the sequence:
  *
  *  	lda	(xx),y
@@ -1082,7 +1216,7 @@ static unsigned OptNegAX1 (CodeSeg* S)
 	    /* lda --> ora */
 	    CE_ReplaceOPC (L[2], OP65_ORA);
 
-	    /* Invert the branch */
+  	    /* Invert the branch */
 	    CE_ReplaceOPC (L[4], GetInverseBranch (L[4]->OPC));
 
 	    /* Delete the entries no longer needed. Beware: Deleting entries
@@ -1107,7 +1241,7 @@ static unsigned OptNegAX1 (CodeSeg* S)
 
 
 
-static unsigned OptNegAX2 (CodeSeg* S)
+static unsigned OptNegAX3 (CodeSeg* S)
 /* Search for the sequence:
  *
  *  	lda	xx
@@ -1168,16 +1302,16 @@ static unsigned OptNegAX2 (CodeSeg* S)
 
 
 
-static unsigned OptNegAX3 (CodeSeg* S)
+static unsigned OptNegAX4 (CodeSeg* S)
 /* Search for the sequence:
  *
- *  	jsr   	_xxx
+ *  	jsr   	xxx
  *  	jsr   	bnega(x)
  *  	jeq/jne	...
  *
  * and replace it by:
  *
- *      jsr	_xxx
+ *      jsr	xxx
  *  	<boolean test>
  *  	jne/jeq	...
  */
@@ -1195,7 +1329,6 @@ static unsigned OptNegAX3 (CodeSeg* S)
 
      	/* Check for the sequence */
        	if (E->OPC == OP65_JSR  	      	&&
-	    E->Arg[0] == '_'	       	       	&&
        	    CS_GetEntries (S, L, I+1, 2)   	&&
        	    L[0]->OPC == OP65_JSR              	&&
 	    strncmp (L[0]->Arg,"bnega",5) == 0 	&&
@@ -1211,7 +1344,7 @@ static unsigned OptNegAX3 (CodeSeg* S)
 	    if (ByteSized) {
 		/* Test bytes */
 		X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
-		CS_InsertEntry (S, X, I+2);
+  		CS_InsertEntry (S, X, I+2);
 	    } else {
 		/* Test words */
 		X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, L[0]->LI);
@@ -1288,12 +1421,15 @@ static OptFunc OptFuncs [] = {
     { OptNegAX1,       	    "OptNegAX1",		0	},
     { OptNegAX2,       	    "OptNegAX2",       	       	0      	},
     { OptNegAX3,       	    "OptNegAX3",       	       	0      	},
+    { OptNegAX4,       	    "OptNegAX4",       	       	0      	},
     /* Optimize compares */
     { OptCmp1,              "OptCmp1",                  0       },
     { OptCmp2,              "OptCmp2",                  0       },
     { OptCmp3,              "OptCmp3",                  0       },
     { OptCmp4,              "OptCmp4",                  0       },
     { OptCmp5,              "OptCmp5",                  0       },
+    /* Optimize tests */
+    { OptTest1,             "OptTest1",                 0       },
     /* Remove unused loads */
     { OptUnusedLoads,	    "OptUnusedLoads",		0	},
     { OptDuplicateLoads,    "OptDuplicateLoads",        0       },

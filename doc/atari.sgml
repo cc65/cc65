@@ -185,6 +185,15 @@ platform. There is a static driver you can use.
 <sect>Limitations<p>
 
 
+<sect>DIO implementation<label id="dio"><p>
+
+The Atari supports disk drives with either 128 or 256 byte sectors.
+The first three sectors of any disk are always 128 bytes long though. This is
+because the system can only boot from 128 bytes sectors.
+
+Therefore the DIO read and write functions transfer only 128 bytes
+for sectors 1 to 3, regardless of the type of diskette.
+
 
 <sect>Other hints<p>
 
@@ -192,7 +201,7 @@ platform. There is a static driver you can use.
 
 These are defined to be Atari + number key.
 
-<sect1>Reserving a memory area inside the program<label id="memhole"><p>
+<sect1>Reserving a memory area inside a program<label id="memhole"><p>
 
 The Atari 130XE maps its additional memory into CPU memory in 16K
 chunks at address &dollar;4000 to &dollar;7FFF. One might want to
@@ -226,10 +235,10 @@ header must be discarded. It will be replaced by a user created
 one.
 <p>
 The user needs to create a customized linker config file which adds
-new memory areas and segments to hold the new EXE header and added
-load chunk header data. Also an assembly source file needs to be
-created which defines the contents of the new EXE header and the
-second load chunk header.
+new memory areas and segments to hold the new EXE header and the
+header data for the second load chunk. Also an assembly source file
+needs to be created which defines the contents of the new EXE header
+and the second load chunk header.
 <p>
 <p>
 This is a modified cc65 Atari linker configuration file (split.cfg):

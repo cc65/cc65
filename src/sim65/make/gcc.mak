@@ -12,6 +12,7 @@ LDFLAGS	=
 
 OBJS = 	cpucore.o	\
 	cputype.o	\
+        error.o         \
 	global.o	\
 	main.o          \
         memory.o

@@ -45,6 +45,7 @@
 #include "version.h"
 
 /* sim65 */
+#include "cpucore.h"
 #include "cputype.h"
 #include "global.h"
 #include "memory.h"
@@ -205,7 +206,7 @@ int main (int argc, char* argv[])
 
     /* Initialize modules */
     MemInit ();
-
+    CPUInit ();
 
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;

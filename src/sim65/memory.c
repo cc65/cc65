@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   memory.h				     */
+/*		       		   memory.h				     */
 /*                                                                           */
 /*		    Memory subsystem for the 6502 simulator		     */
 /*                                                                           */
@@ -36,7 +36,8 @@
 /* common */
 #include "coll.h"
 
-/* sim65 */
+/* sim65 */            
+#include "error.h"
 #include "memory.h"
 
 
@@ -95,7 +96,7 @@ static void MemWrite (unsigned Addr, unsigned char Val)
 /* Write one byte to the memory cell */
 {
     if (MemAttr[Addr] & RA_WPROT) {
-        /* ### */
+        Warning ("Writing to write protected memory at $%04X", Addr);
     }
     Mem[Addr] = Val;
     MemAttr[Addr] |= RA_INITIALIZED;
@@ -108,7 +109,7 @@ static unsigned char MemRead (unsigned Addr)
 {
     if ((MemAttr[Addr] & RA_INITIALIZED) == 0) {
         /* We're reading a memory cell that was never written */
-        /* ### */
+        Warning ("Reading from uninitialized memory at $%04X", Addr);
     }
     return Mem[Addr];
 }
@@ -116,7 +117,7 @@ static unsigned char MemRead (unsigned Addr)
 
 
 /*****************************************************************************/
-/*   				     Code				     */
+/*   		  		     Code				     */
 /*****************************************************************************/
 
 

@@ -1,5 +1,6 @@
 ;--------------------------------------------------------------------
 ; Atari 8-bit mouse routines -- 05/07/2000 Freddy Offenga
+; Some changes by Christian Groessler
 ;
 ; The following devices are supported:
 ; - Atari trak-ball
@@ -12,9 +13,9 @@
 
 	.export	_mouse_init, _mouse_done, _mouse_box
 	.export _mouse_show, _mouse_hide, _mouse_move
-	.export _mouse_down
+	.export _mouse_buttons
 
-	.import popa
+	.import popa,popax
 
 	.include "atari.inc"
 
@@ -23,13 +24,13 @@ ST_MOUSE	= 1	; device ST mouse
 AMIGA_MOUSE	= 2	; device Amiga mouse
 MAX_TYPE	= 3	; first illegal device type
 
+; the default values force the mouse cursor inside the test screen (no access to border)
 defxmin = 48            ; default x minimum
 defymin = 32            ; default y minimum
-
 defxmax = 204           ; default x maximum
 defymax = 211           ; default y maximum
 
-pmsize  = 16            ; size pm shape
+pmsize  = 16            ; y size pm shape
 
 xinit   = 100            ; init. x pos.
 yinit   = 100            ; init. y pos.
@@ -39,19 +40,16 @@ pm0	= pmb+$400	; pm 0 memory
 
 ;--------------------------------------------------------------------
 ; Initialize mouse routines
-; int mouse_init(unsigned char type, unsigned char port)
+; void __fastcall__ mouse_init (unsigned char port, unsigned char sprite, unsigned char type);
 
 _mouse_init:
-	ldy	#0
-	sta	(SAVMSC),y
-	sta	port_nr
+	pha			; remember mouse type
+	jsr	popa		; ignore sprite / pm for now
 	jsr	popa
-	ldy	#1
-	sta	(SAVMSC),y
-	sta	mouse_type
+	sta	port_nr
+	pla			; get mouse type again
 
-	ldx	mouse_type
-	cpx	#MAX_TYPE
+	cmp	#MAX_TYPE+1
 	bcc	setup
 
 ifail:
@@ -60,25 +58,11 @@ ifail:
 	rts
 
 setup:
+	tax
 	lda	lvectab,x
 	sta	mouse_vec+1
 	lda	hvectab,x
 	sta	mouse_vec+2
-
-        lda     #defxmin
-        sta     xmin
-        lda     #defymin
-        sta     ymin
-
-	lda	#defxmax
-	sta	xmax
-	lda	#defymax
-	sta	ymax
-
-	lda	#xinit
-	sta	mousex
-	lda	#yinit
-	sta	mousey
 
 	jsr	pminit
 
@@ -160,25 +144,25 @@ _mouse_done:
 
 ;--------------------------------------------------------------------
 ; Set mouse limits
-; void mouse_box(char xmin, char ymin, char xmax, char ymax)
+; void __fastcall__ mouse_box(int xmin, int ymin, int xmax, int ymax)
 
 _mouse_box:
 	sta	ymax
-        jsr     popa
+        jsr     popax		; always ignore high byte
 	sta	xmax
-	jsr	popa
+	jsr	popax
 	sta	ymin
-        jsr     popa
+        jsr     popax
 	sta	xmin
 	rts
 
 ;--------------------------------------------------------------------
 ; Set mouse position
-; void mouse_move(char xpos, char ypos)
+; void __fastcall__ mouse_move(int xpos, int ypos)
 
 _mouse_move:
-	sta	mousey
-	jsr	popa
+	sta	mousey		; always ignore high byte
+	jsr	popax
 	sta	mousex
 	rts
 
@@ -202,14 +186,14 @@ _mouse_hide:
 
 ;--------------------------------------------------------------------
 ; Ask mouse button
-; int mouse_down(void)
+; unsigned char mouse_buttons(void)
 
-_mouse_down:
+_mouse_buttons:
 	ldx	port_nr
 	lda	STRIG0,x
 	bne	nobut
-	lda	#14
-	sta	COLOR1
+;	lda	#14
+;???	sta	COLOR1
 	ldx	#0
 	lda	#1
 	rts
@@ -341,17 +325,19 @@ t1_vec: tya
 	txa
 	pha
 
+.ifdef DEBUG
 	lda	RANDOM
 	sta	COLBK		; debug
+.endif
 
 	lda	port_nr
 	lsr			; even number 0/2
 	tay
 	lda	PORTA,y
 	ldy	port_nr
-	cpy	#1
+	cpy	#0
 	beq	oddp
-	cpy	#3
+	cpy	#2
 	beq	oddp
 
         lsr
@@ -361,7 +347,7 @@ t1_vec: tya
 oddp:	tay
 
 mouse_vec:
-        jsr     st_check        ; will be modified
+        jsr     st_check        ; will be modified; won't be ROMmable
 
 	pla
 	tax
@@ -413,7 +399,7 @@ mon:    jsr     drwpm
 moff:	sta	GRACTL
 
 vbi_jmp:
-        jmp     SYSVBV          ; will be modified
+        jmp     SYSVBV          ; will be modified; won't be ROMmable
 
 ;--------------------------------------------------------------------
 ; initialize mouse pm
@@ -459,21 +445,20 @@ fmp2:	lda	mskpm,y
 ;--------------------------------------------------------------------
 ; clear old mouse pm
 
-clrpm:	lda omy
+clrpm:	lda	omy
         tax
 
-	ldy #0
+	ldy	#0
 	tya
-fmp1:	sta pm0,x
+fmp1:	sta	pm0,x
 	inx
 	iny
-	cpy #pmsize
-	bne fmp1
+	cpy	#pmsize
+	bne	fmp1
 	rts
 
 ;--------------------------------------------------------------------
-
-        .data
+        .rodata
 
 ; mouse arrow - pm shape
 
@@ -518,30 +503,28 @@ lvectab:
 hvectab:
 	.byte >trak_check, >st_check, >amiga_check
 
+; default values
+
+xmin:   .byte	defxmin
+ymin:   .byte	defymin
+xmax:	.byte	defxmax
+ymax:	.byte	defymax
+
+mousex:	.byte	xinit
+mousey:	.byte	yinit
+
+;--------------------------------------------------------------------
+	.bss
+
 ; Misc. vars
 
-old_t1: .res 2
-
+old_t1: .res 2		; old timer interrupt vector
+oldval: .res 1		; used by trakball routines
 dumx:	.res 1
 dumy:	.res 1
-oldval: .res 1
-
-omy:	.res 1
-
-mousex: .res 1
-mousey: .res 1
-
-xmin:   .res 1
-ymin:   .res 1
-
-xmax:	.res 1
-ymax:	.res 1
+omy:	.res 1		; old y pos
 
 mouse_on:
 	.res 1
-
-mouse_type:
-	.res 1
-
 port_nr:
 	.res 1

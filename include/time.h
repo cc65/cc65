@@ -49,16 +49,26 @@ typedef unsigned long clock_t;
 
 /* Structure for broken down time */
 struct tm {
-    int	tm_sec;
-    int tm_min;
-    int tm_hour;
-    int tm_mday;
-    int tm_mon;
-    int tm_year;
-    int tm_wday;
-    int tm_yday;
-    int tm_isdst;
+    int	    tm_sec;
+    int     tm_min;
+    int     tm_hour;
+    int     tm_mday;
+    int     tm_mon;
+    int     tm_year;
+    int     tm_wday;
+    int     tm_yday;
+    int     tm_isdst;
 };
+
+/* Timezone representation, default is UTC */
+extern struct _timezone {
+    char    daylight;   /* True if daylight savings time active */
+    long    timezone;   /* Number of seconds behind UTC */
+    char    tzname[5];  /* Name of timezone, e.g. CET */
+    char    dstname[5]; /* Name when daylight true, e.g. CEST */
+} _tz;
+
+
 
 #if defined(__CBM__)
 #  if defined(__CBM510__) || defined(__CBM610__)
@@ -81,7 +91,12 @@ unsigned _clocks_per_sec (void);
 
 
 /* Function prototypes */
+char* __fastcall__ asctime (const struct tm* timep);
 clock_t clock (void);
+char* __fastcall__ ctime (const time_t* timep);
+struct tm* __fastcall__ gmtime (const time_t* timep);
+struct tm* __fastcall__ localtime (const time_t* timep);
+time_t __fastcall__ mktime (struct tm* timep);
 time_t __fastcall__ time (time_t* t);
 
 

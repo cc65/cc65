@@ -34,9 +34,9 @@
 
 
 ; Standard signal handling functions
-SIG_IGN         = $0000
 SIG_ERR         = $FFFF
-SIG_DFL         = $FFFE
+SIG_IGN         = $0000
+SIG_DFL         = $0001
 
 ; Signal numbers
 SIGABRT         = 0
@@ -45,6 +45,15 @@ SIGILL          = 2
 SIGINT          = 3
 SIGSEGV         = 4
 SIGTERM         = 5
+SIGCOUNT        = 6             ; Number of signals (maximum: 8)
+
+; Signal masks
+SIGMASK_ABRT    = (1 .SHL SIGABRT)
+SIGMASK_FPE     = (1 .SHL SIGFPE)
+SIGMASK_ILL     = (1 .SHL SIGILL)
+SIGMASK_INT     = (1 .SHL SIGINT)
+SIGMASK_SEGV    = (1 .SHL SIGSEGV)
+SIGMASK_TERM    = (1 .SHL SIGTERM)
 
 ; Function declarations
 .global         _signal

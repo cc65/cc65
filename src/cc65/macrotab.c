@@ -165,7 +165,7 @@ void InsertMacro (Macro* M)
     /* Increment the number of macros starting with this char */
     MacroFlagTab[(unsigned)(unsigned char)M->Name[0]]++;
 }
-    
+
 
 
 int UndefineMacro (const char* Name)
@@ -239,8 +239,8 @@ Macro* FindMacro (const char* Name)
 int IsMacro (const char* Name)
 /* Return true if the given name is the name of a macro, return false otherwise */
 {
-    return FindMacro(Name) != 0;
-}
+    return MaybeMacro(Name[0]) && FindMacro(Name) != 0;
+}	       
 
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -66,8 +66,8 @@ void __fastcall__ srand (unsigned seed);
 void abort (void);
 int __fastcall__ abs (int val);
 long __fastcall__ labs (long val);
-int __fastcall__ atoi (char* s);
-long __fastcall__ atol (char* s);
+int __fastcall__ atoi (const char* s);
+long __fastcall__ atol (const char* s);
 int __fastcall__ atexit (void (*exitfunc) (void));
 void* bsearch (const void* key, const void* base, size_t n,
 	       size_t size, int (*cmp) (const void*, const void*));

@@ -28,6 +28,7 @@ OBJS = 	bin.o		\
 	fileio.o	\
 	fragment.o	\
 	global.o        \
+	initfunc.o	\
 	library.o	\
 	main.o	       	\
 	mapfile.o	\

@@ -48,6 +48,7 @@
 #include "global.h"
 #include "error.h"
 #include "fileio.h"
+#include "initfunc.h"
 #include "objdata.h"
 #include "expr.h"
 #include "exports.h"
@@ -75,13 +76,10 @@ static Export**	       	ExpPool  = 0;	  	/* Exports array */
 /* Defines for the flags in Export */
 #define EXP_USERMARK   	0x0001
 
-/* List of all exports that are also initializers */
-static Collection	Initializers = STATIC_COLLECTION_INITIALIZER;
-
 
 
 /*****************************************************************************/
-/*				Import handling				     */
+/*	       			Import handling				     */
 /*****************************************************************************/
 
 
@@ -233,7 +231,7 @@ void InsertExport (Export* E)
 
     /* If this is an initializer, insert it into the initializer list */
     if (IS_EXP_INIT (E->Type)) {
-	CollAppend (&Initializers, E);
+	AddInitFunc (E);
     }
 
     /* Create a hash value for the given name */
@@ -265,7 +263,7 @@ void InsertExport (Export* E)
        	       	    ImpOpen -= E->ImpCount;	/* Decrease open imports now */
       	   	    xfree (L);
       	   	    /* We must run through the import list and change the
-      	   	     * export pointer now.
+      	       	     * export pointer now.
       	   	     */
       	   	    Imp = E->ImpList;
       	   	    while (Imp) {

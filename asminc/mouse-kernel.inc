@@ -33,7 +33,7 @@
 ;/*                                                                           */
 ;/*****************************************************************************/
 
-                                                                        
+
 
 
 ;------------------------------------------------------------------------------
@@ -129,6 +129,7 @@ MOUSE_BTN_RIGHT         = $01
         .global _mouse_unload
         .global _mouse_install
         .global _mouse_uninstall
+        .global _mouse_geterrormsg
         .global _mouse_hide
         .global _mouse_show
         .global _mouse_box

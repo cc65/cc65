@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,6 +41,7 @@
 /* ld65 */
 #include "error.h"
 #include "fileio.h"
+#include "spool.h"
 
 
 
@@ -253,19 +254,43 @@ unsigned long ReadVar (FILE* F)
 
 
 
-char* ReadStr (FILE* F)
-/* Read a string from the file (the memory will be malloc'ed) */
+unsigned ReadStr (FILE* F)
+/* Read a string from the file, place it into the global string pool, and
+ * return its string id.
+ */
 {
+    unsigned    Id;
+    char*       B;
+    char        Buf[256];
+
     /* Read the length */
     unsigned Len = ReadVar (F);
 
-    /* Allocate memory and read the string itself */
-    char* S = xmalloc (Len + 1);
-    ReadData (F, S, Len);
+    /* If the string is short enough, use our buffer on the stack, otherwise
+     * allocate space on the heap.
+     */
+    if (Len < sizeof (Buf)) {
+        B = Buf;
+    } else {
+        B = xmalloc (Len + 1);
+    }
 
-    /* Terminate the string and return it */
-    S [Len] = '\0';
-    return S;
+    /* Read the string */
+    ReadData (F, B, Len);
+
+    /* Terminate the string */
+    B[Len] = '\0';
+
+    /* Insert it into the string pool and remember the id */
+    Id = GetStringId (B);
+
+    /* If we had allocated memory before, free it now */
+    if (B != Buf) {
+        xfree (B);
+    }
+
+    /* Return the string id */
+    return Id;
 }
 
 
@@ -284,7 +309,7 @@ FilePos* ReadFilePos (FILE* F, FilePos* Pos)
 
 void* ReadData (FILE* F, void* Data, unsigned Size)
 /* Read data from the file */
-{     
+{
     /* Explicitly allow reading zero bytes */
     if (Size > 0) {
 	if (fread (Data, 1, Size, F) != Size) {

@@ -110,7 +110,7 @@ void FreeObjData (ObjData* O)
         FreeImport (O->Imports[--O->ImportCount]);
     }
     xfree (O->Imports);
-    FreeObjStrings (O);
+    xfree (O->Strings);
     xfree (O);
 }
 
@@ -121,9 +121,6 @@ void FreeObjStrings (ObjData* O)
  * when all strings are converted to global strings.
  */
 {
-    while (O->StringCount) {
-        xfree (O->Strings[--O->StringCount]);
-    }
     xfree (O->Strings);
     O->Strings = 0;
 }
@@ -138,20 +135,6 @@ void InsertObjData (ObjData* O)
 
 
 
-const char* GetObjString (const ObjData* O, unsigned Index)
-/* Get a string from the object file string table. Abort if the string index
- * is invalid.
- */
-{
-    if (Index >= O->StringCount) {
-       	Error ("Invalid string index (%u) in module `%s'",
-	       Index, GetObjFileName (O));
-    }
-    return O->Strings[Index];
-}
-
-
-
 unsigned MakeGlobalStringId (const ObjData* O, unsigned Index)
 /* Convert a local string id into a global one and return it. */
 {
@@ -159,7 +142,7 @@ unsigned MakeGlobalStringId (const ObjData* O, unsigned Index)
        	Error ("Invalid string index (%u) in module `%s'",
 	       Index, GetObjFileName (O));
     }
-    return GetStringId (O->Strings[Index]);
+    return O->Strings[Index];
 }
 
 

@@ -76,7 +76,7 @@ struct ObjData {
     unsigned            LineInfoCount;  /* Count of additional line infos */
     struct LineInfo**   LineInfos;      /* List of additional line infos */
     unsigned            StringCount;    /* Count of strings */
-    char**              Strings;        /* List of strings used */
+    unsigned*           Strings;        /* List of global string indices */
 };
 
 
@@ -108,11 +108,6 @@ void FreeObjStrings (ObjData* O);
 
 void InsertObjData (ObjData* O);
 /* Insert the ObjData object into the collection of used ObjData objects. */
-
-const char* GetObjString (const ObjData* O, unsigned Index);
-/* Get a string from the object file string table. Abort if the string index
- * is invalid.
- */
 
 unsigned MakeGlobalStringId (const ObjData* O, unsigned Index);
 /* Convert a local string id into a global one and return it. */

@@ -118,13 +118,11 @@ static ObjData* ReadIndexEntry (void)
     ObjData* O	= NewObjData ();
 
     /* Module name */
-    char* Name = ReadStr (Lib);
-    O->Name = GetStringId (Name);
-    xfree (Name);
+    O->Name = ReadStr (Lib);
 
     /* Module flags/MTime/Start/Size */
     O->Flags	= Read16 (Lib);
-    O->MTime    = Read32 (Lib);      
+    O->MTime    = Read32 (Lib);
     O->Start	= Read32 (Lib);
     Read32 (Lib);			/* Skip Size */
 

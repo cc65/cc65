@@ -7,8 +7,8 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -151,7 +151,7 @@ static void AddCodeRange (LineInfo* LI, unsigned long Offs, unsigned long Size)
 
 
 
-void RelocLineInfo (struct Segment* S)
+void RelocLineInfo (Segment* S)
 /* Relocate the line info for a segment. */
 {
     unsigned long Offs = 0;

@@ -238,7 +238,6 @@ Section* ReadSection (FILE* F, ObjData* O)
     	unsigned char Type = Read8 (F);
 
         /* Extract the check mask from the type */
-        unsigned char Check = Type & FRAG_CHECKMASK;
         unsigned char Bytes = Type & FRAG_BYTEMASK;
         Type &= FRAG_TYPEMASK;
 
@@ -267,18 +266,6 @@ Section* ReadSection (FILE* F, ObjData* O)
 	  	/* NOTREACHED */
 	 	return 0;
        	}
-
-        /* A list of check expressions may follow */
-        if (Check) {
-
-            /* Read the number of expressions that follow */
-            unsigned Count = ReadVar (F);
-
-            /* Read the expressions */
-            while (Count--) {
-                /* ### */
-            }
-        }
 
 	/* Read the file position of the fragment */
 	ReadFilePos (F, &Frag->Pos);

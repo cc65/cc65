@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -96,8 +96,10 @@ long Read32Signed (FILE* F);
 unsigned long ReadVar (FILE* F);
 /* Read a variable size value from the file */
 
-char* ReadStr (FILE* F);
-/* Read a string from the file into a malloced area */
+unsigned ReadStr (FILE* F);
+/* Read a string from the file, place it into the global string pool, and
+ * return its string id.
+ */
 
 FilePos* ReadFilePos (FILE* F, FilePos* Pos);
 /* Read a file position from the file */

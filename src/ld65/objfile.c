@@ -111,7 +111,7 @@ void ObjReadFiles (FILE* F, ObjData* O)
     unsigned I;
 
     O->FileCount  = ReadVar (F);
-    O->Files      = xmalloc (O->FileCount * sizeof (FileInfo*));
+    O->Files      = xmalloc (O->FileCount * sizeof (O->Files[0]));
     for (I = 0; I < O->FileCount; ++I) {
        	O->Files[I] = ReadFileInfo (F, O);
     }
@@ -125,7 +125,7 @@ void ObjReadImports (FILE* F, ObjData* O)
     unsigned I;
 
     O->ImportCount = ReadVar (F);
-    O->Imports     = xmalloc (O->ImportCount * sizeof (Import*));
+    O->Imports     = xmalloc (O->ImportCount * sizeof (O->Imports[0]));
     for (I = 0; I < O->ImportCount; ++I) {
    	O->Imports [I] = ReadImport (F, O);
 	InsertImport (O->Imports [I]);
@@ -140,7 +140,7 @@ void ObjReadExports (FILE* F, ObjData* O)
     unsigned I;
 
     O->ExportCount = ReadVar (F);
-    O->Exports     = xmalloc (O->ExportCount * sizeof (Export*));
+    O->Exports     = xmalloc (O->ExportCount * sizeof (O->Exports[0]));
     for (I = 0; I < O->ExportCount; ++I) {
 	O->Exports [I] = ReadExport (F, O);
 	InsertExport (O->Exports [I]);
@@ -155,7 +155,7 @@ void ObjReadDbgSyms (FILE* F, ObjData* O)
     unsigned I;
 
     O->DbgSymCount = ReadVar (F);
-    O->DbgSyms	   = xmalloc (O->DbgSymCount * sizeof (DbgSym*));
+    O->DbgSyms	   = xmalloc (O->DbgSymCount * sizeof (O->DbgSyms[0]));
     for (I = 0; I < O->DbgSymCount; ++I) {
 	O->DbgSyms [I] = ReadDbgSym (F, O);
     }
@@ -169,7 +169,7 @@ void ObjReadLineInfos (FILE* F, ObjData* O)
     unsigned I;
 
     O->LineInfoCount = ReadVar (F);
-    O->LineInfos     = xmalloc (O->LineInfoCount * sizeof (LineInfo*));
+    O->LineInfos     = xmalloc (O->LineInfoCount * sizeof (O->LineInfos[0]));
     for (I = 0; I < O->LineInfoCount; ++I) {
        	O->LineInfos[I] = ReadLineInfo (F, O);
     }
@@ -181,8 +181,9 @@ void ObjReadStrPool (FILE* F, ObjData* O)
 /* Read the string pool from a file at the current position */
 {
     unsigned I;
+
     O->StringCount = ReadVar (F);
-    O->Strings     = xmalloc (O->StringCount * sizeof (char*));
+    O->Strings     = xmalloc (O->StringCount * sizeof (O->Strings[0]));
     for (I = 0; I < O->StringCount; ++I) {
         O->Strings[I] = ReadStr (F);
     }
@@ -196,7 +197,7 @@ void ObjReadSections (FILE* F, ObjData* O)
     unsigned I;
 
     O->SectionCount = ReadVar (F);
-    O->Sections     = xmalloc (O->SectionCount * sizeof (Section*));
+    O->Sections     = xmalloc (O->SectionCount * sizeof (O->Sections[0]));
     for (I = 0; I < O->SectionCount; ++I) {
 	O->Sections [I] = ReadSection (F, O);
     }

@@ -79,8 +79,8 @@ unsigned Test (unsigned Label, int Invert)
         Result = TESTEXPR_UNKNOWN;
 
         /* If the expr hasn't set condition codes, set the force-test flag */
-        if ((Expr.Test & E_CC) == 0) {
-            Expr.Test |= E_FORCETEST;
+        if (!ED_IsTested (&Expr)) {
+            ED_MarkForTest (&Expr);
         }
 
         /* Load the value into the primary register */

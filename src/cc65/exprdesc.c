@@ -48,7 +48,7 @@
 
 
 /*****************************************************************************/
-/*				     Code                                    */
+/*		   		     Code                                    */
 /*****************************************************************************/
 
 
@@ -60,7 +60,6 @@ ExprDesc* ED_Init (ExprDesc* Expr)
     Expr->Type  = 0;
     Expr->Val   = 0;
     Expr->Flags = 0;
-    Expr->Test  = 0;
     Expr->Name  = 0;
     return Expr;
 }
@@ -145,7 +144,6 @@ ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, type* Type)
     Expr->Type  = Type;
     Expr->Val   = Value;
     Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL;
-    Expr->Test  = 0;
     Expr->Name  = 0;
     return Expr;
 }
@@ -159,7 +157,6 @@ ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
     Expr->Type  = type_int;
     Expr->Val   = Value;
     Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL;
-    Expr->Test  = 0;
     Expr->Name  = 0;
     return Expr;
 }
@@ -173,8 +170,8 @@ ExprDesc* ED_MakeRValExpr (ExprDesc* Expr)
 {
     Expr->Sym   = 0;
     Expr->Val   = 0;    /* No offset */
-    Expr->Flags = (Expr->Flags & ~(E_MASK_LOC|E_MASK_RTYPE)) | (E_LOC_EXPR|E_RTYPE_RVAL);
-    Expr->Test  = 0;
+    Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_NEED_TEST | E_CC_SET);
+    Expr->Flags |= (E_LOC_EXPR | E_RTYPE_RVAL);
     Expr->Name  = 0;
     return Expr;
 }
@@ -188,8 +185,8 @@ ExprDesc* ED_MakeLValExpr (ExprDesc* Expr)
 {
     Expr->Sym   = 0;
     Expr->Val   = 0;    /* No offset */
-    Expr->Flags = (Expr->Flags & ~(E_MASK_LOC|E_MASK_RTYPE)) | (E_LOC_EXPR|E_RTYPE_LVAL);
-    Expr->Test  = 0;
+    Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_NEED_TEST | E_CC_SET);
+    Expr->Flags |= (E_LOC_EXPR | E_RTYPE_LVAL);
     Expr->Name  = 0;
     return Expr;
 }
@@ -315,6 +312,16 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
         Flags &= ~E_RTYPE_LVAL;
         Sep = ',';
     }
+    if (Flags & E_NEED_TEST) {
+        fprintf (F, "%cE_NEED_TEST", Sep);
+        Flags &= ~E_NEED_TEST;
+        Sep = ',';
+    }
+    if (Flags & E_CC_SET) {
+        fprintf (F, "%cE_CC_SET", Sep);
+        Flags &= ~E_CC_SET;
+        Sep = ',';
+    }
     if (Flags) {
         fprintf (F, "%c,0x%04X", Sep, Flags);
         Sep = ',';
@@ -322,16 +329,6 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
     if (Sep != '(') {
         fputc (')', F);
     }
-    fputc ('\n', F);
-
-    fprintf (F, "\nTest:     ");
-    if (E->Test & E_CC) {
-        fprintf (F, "E_CC ");
-    }
-    if (E->Test & E_FORCETEST) {
-        fprintf (F, "E_FORCETEST ");
-    }
-
     fprintf (F, "\nName:     0x%08lX\n", E->Name);
 }
 

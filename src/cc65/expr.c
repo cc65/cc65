@@ -384,9 +384,8 @@ void ExprLoad (unsigned Flags, ExprDesc* Expr)
 
        	/* Dereferenced lvalue */
        	Flags |= TypeOf (Expr->Type);
-     	if (Expr->Test & E_FORCETEST) {
+     	if (ED_NeedsTest (Expr)) {
      	    Flags |= CF_TEST;
-     	    Expr->Test &= ~E_FORCETEST;
      	}
 
         switch (ED_GetLoc (Expr)) {
@@ -433,6 +432,9 @@ void ExprLoad (unsigned Flags, ExprDesc* Expr)
                 Internal ("Invalid location in ExprLoad: 0x%04X", ED_GetLoc (Expr));
         }
 
+        /* Expression was tested */
+        ED_TestDone (Expr);
+
     } else {
      	/* An rvalue */
        	if (ED_IsLocExpr (Expr)) {
@@ -449,11 +451,11 @@ void ExprLoad (unsigned Flags, ExprDesc* Expr)
      	}
 
         /* Are we testing this value? */
-        if (Expr->Test & E_FORCETEST) {
+        if (ED_NeedsTest (Expr)) {
             /* Yes, force a test */
             Flags |= TypeOf (Expr->Type);
             g_test (Flags);
-            Expr->Test &= ~E_FORCETEST;
+            ED_TestDone (Expr);
         }
     }
 }
@@ -1354,10 +1356,6 @@ void Store (ExprDesc* Expr, const type* StoreType)
 
     /* Prepare the code generator flags */
     Flags = TypeOf (StoreType);
-    if (Expr->Test) {
-        /* Testing the value */
-        Flags |= CF_TEST;
-    }
 
     /* Do the store depending on the location */
     switch (ED_GetLoc (Expr)) {
@@ -1403,7 +1401,7 @@ void Store (ExprDesc* Expr, const type* StoreType)
     }
 
     /* Assume that each one of the stores will invalidate CC */
-    Expr->Test &= ~E_CC;
+    ED_MarkAsUntested (Expr);
 }
 
 
@@ -1670,7 +1668,7 @@ void hie10 (ExprDesc* Expr)
     	    } else {
     	       	g_bneg (TypeOf (Expr->Type));
                 ED_MakeRValExpr (Expr);
-    	       	Expr->Test |= E_CC;		/* bneg will set cc */
+    	       	ED_TestDone (Expr);		/* bneg will set cc */
     	    }
      	    break;
 
@@ -1733,7 +1731,7 @@ void hie10 (ExprDesc* Expr)
     	       	RemoveCode (Mark);
      	    }
             ED_MakeConstAbs (Expr, Size, type_size_t);
-	    Expr->Test &= ~E_CC;
+	    ED_MarkAsUntested (Expr);
        	    break;
 
      	default:
@@ -1983,7 +1981,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
        	Expr->Type = type_int;
 
 	/* Condition codes are set */
-	Expr->Test |= E_CC;
+	ED_TestDone (Expr);
     }
 }
 
@@ -2225,7 +2223,7 @@ static void parseadd (ExprDesc* Expr)
     }
 
     /* Condition codes not set */
-    Expr->Test &= ~E_CC;
+    ED_MarkAsUntested (Expr);
 
 }
 
@@ -2298,7 +2296,7 @@ static void parsesub (ExprDesc* Expr)
     	    }
 
     	    /* Result is constant, condition codes not set */
-    	    Expr->Test &= ~E_CC;
+    	    ED_MarkAsUntested (Expr);
 
     	} else {
 
@@ -2341,7 +2339,7 @@ static void parsesub (ExprDesc* Expr)
 
  	    /* Result is a rvalue in the primary register */
  	    ED_MakeRValExpr (Expr);
- 	    Expr->Test &= ~E_CC;
+ 	    ED_MarkAsUntested (Expr);
 
  	}
 
@@ -2391,7 +2389,7 @@ static void parsesub (ExprDesc* Expr)
 
 	/* Result is a rvalue in the primary register */
 	ED_MakeRValExpr (Expr);
-	Expr->Test &= ~E_CC;
+	ED_MarkAsUntested (Expr);
     }
 }
 
@@ -2559,8 +2557,8 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
        	lab = GetLocalLabel ();
 
        	/* If the expr hasn't set condition codes, set the force-test flag */
-       	if ((Expr->Test & E_CC) == 0) {
-       	    Expr->Test |= E_FORCETEST;
+       	if (!ED_IsTested (Expr)) {
+       	    ED_MarkForTest (Expr);
        	}
 
        	/* Load the value */
@@ -2577,8 +2575,8 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
 
     	    /* Get rhs */
     	    hie2 (&Expr2);
-    	    if ((Expr2.Test & E_CC) == 0) {
-    		Expr2.Test |= E_FORCETEST;
+    	    if (!ED_IsTested (&Expr2)) {
+    		ED_MarkForTest (&Expr2);
     	    }
     	    ExprLoad (CF_FORCECHAR, &Expr2);
 
@@ -2596,7 +2594,7 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
 
        	/* The result is an rvalue in primary */
        	ED_MakeRValExpr (Expr);
-       	Expr->Test |= E_CC;	/* Condition codes are set */
+       	ED_TestDone (Expr);    	/* Condition codes are set */
     }
 }
 
@@ -2621,8 +2619,8 @@ static void hieOr (ExprDesc *Expr)
     if (CurTok.Tok == TOK_BOOL_OR) {
 
     	/* If the expr hasn't set condition codes, set the force-test flag */
-       	if ((Expr->Test & E_CC) == 0) {
-    	    Expr->Test |= E_FORCETEST;
+       	if (!ED_IsTested (Expr)) {
+    	    ED_MarkForTest (Expr);
     	}
 
     	/* Get first expr */
@@ -2647,8 +2645,8 @@ static void hieOr (ExprDesc *Expr)
        	    /* Get a subexpr */
     	    AndOp = 0;
     	    hieAnd (&Expr2, TrueLab, &AndOp);
-       	    if ((Expr2.Test & E_CC) == 0) {
-    	    	Expr2.Test |= E_FORCETEST;
+       	    if (!ED_IsTested (&Expr2)) {
+    	    	ED_MarkForTest (&Expr2);
     	    }
     	    ExprLoad (CF_FORCECHAR, &Expr2);
 
@@ -2659,7 +2657,7 @@ static void hieOr (ExprDesc *Expr)
 
        	/* The result is an rvalue in primary */
     	ED_MakeRValExpr (Expr);
-    	Expr->Test |= E_CC;	     	       	/* Condition codes are set */
+    	ED_TestDone (Expr);	     	       	/* Condition codes are set */
     }
 
     /* If we really had boolean ops, generate the end sequence */
@@ -2697,9 +2695,9 @@ static void hieQuest (ExprDesc* Expr)
     /* Check if it's a ternary expression */
     if (CurTok.Tok == TOK_QUEST) {
     	NextToken ();
-    	if ((Expr->Test & E_CC) == 0) {
-    	    /* Condition codes not set, force a test */
-    	    Expr->Test |= E_FORCETEST;
+    	if (!ED_IsTested (Expr)) {
+    	    /* Condition codes not set, request a test */
+    	    ED_MarkForTest (Expr);
     	}
     	ExprLoad (CF_NONE, Expr);
     	labf = GetLocalLabel ();

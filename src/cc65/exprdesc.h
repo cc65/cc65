@@ -72,14 +72,14 @@ enum {
                           E_LOC_REGISTER | E_LOC_LITERAL,
 
     /* Reference? */
-    E_MASK_RTYPE        = 0x8000,
+    E_MASK_RTYPE        = 0x0100,
     E_RTYPE_RVAL        = 0x0000,
-    E_RTYPE_LVAL        = 0x8000
-};
+    E_RTYPE_LVAL        = 0x0100,
 
-/* Defines for the test field of the expression descriptor */
-#define E_CC   	       	0x0001U	        /* Condition codes are set */
-#define E_FORCETEST    	0x0002U         /* Force test to set condition codes */
+    /* Test */
+    E_NEED_TEST         = 0x0200,       /* Expression needs a test to set cc */
+    E_CC_SET            = 0x0400        /* Condition codes are set */
+};
 
 /* Describe the result of an expression */
 typedef struct ExprDesc ExprDesc;
@@ -88,14 +88,13 @@ struct ExprDesc {
     type*	       	Type;   /* Type array of expression */
     long       	       	Val;    /* Value if expression constant */
     unsigned short     	Flags;
-    unsigned short  	Test;	/* */
     unsigned long 	Name;	/* Name or label number */
 };
 
 
 
 /*****************************************************************************/
-/*		   		     Code                                    */
+/*    		   		     Code                                    */
 /*****************************************************************************/
 
 
@@ -210,7 +209,7 @@ INLINE void ED_MakeLVal (ExprDesc* Expr)
     Expr->Flags |= E_RTYPE_LVAL;
 }
 #else
-#  define ED_MakeLVal(Expr)       do { (Expr)->Flags |= E_RTYPE_LVAL; } while (0)
+#  define ED_MakeLVal(Expr)     do { (Expr)->Flags |= E_RTYPE_LVAL; } while (0)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -220,7 +219,58 @@ INLINE void ED_MakeRVal (ExprDesc* Expr)
     Expr->Flags &= ~E_RTYPE_LVAL;
 }
 #else
-#  define ED_MakeRVal(Expr)       do { (Expr)->Flags &= ~E_RTYPE_LVAL; } while (0)
+#  define ED_MakeRVal(Expr)     do { (Expr)->Flags &= ~E_RTYPE_LVAL; } while (0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void ED_MarkForTest (ExprDesc* Expr)
+/* Mark the expression for a test. */
+{
+    Expr->Flags |= E_NEED_TEST;
+}
+#else
+#  define ED_MarkForTest(Expr)  do { (Expr)->Flags |= E_NEED_TEST; } while (0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_NeedsTest (const ExprDesc* Expr)
+/* Check if the expression needs a test. */
+{
+    return (Expr->Flags & E_NEED_TEST) != 0;
+}
+#else
+#  define ED_NeedsTest(Expr)    (((Expr)->Flags & E_NEED_TEST) != 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void ED_TestDone (ExprDesc* Expr)
+/* Mark the expression as tested and condition codes set. */
+{
+    Expr->Flags = (Expr->Flags & ~E_NEED_TEST) | E_CC_SET;
+}
+#else
+#  define ED_TestDone(Expr)     \
+    do { (Expr)->Flags = ((Expr)->Flags & ~E_NEED_TEST) | E_CC_SET; } while (0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_IsTested (const ExprDesc* Expr)
+/* Check if the expression has set the condition codes. */
+{
+    return (Expr->Flags & E_CC_SET) != 0;
+}
+#else
+#  define ED_IsTested(Expr)   (((Expr)->Flags & E_CC_SET) != 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void ED_MarkAsUntested (ExprDesc* Expr)
+/* Mark the expression as not tested (condition codes not set). */
+{
+    Expr->Flags &= ~E_CC_SET;
+}
+#else
+#  define ED_MarkAsUntested(Expr)   do { (Expr)->Flags &= ~E_CC_SET; } while (0)
 #endif
 
 const char* ED_GetLabelName (const ExprDesc* Expr, long Offs);

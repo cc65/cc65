@@ -2546,12 +2546,9 @@ of a <tt><ref id=".BYTE" name=".BYTE"></tt> or <tt><ref id=".ASCIIZ"
 name=".ASCIIZ"></tt> command. Characters are translated as soon as they are
 used as part of an expression.
 
-This behaviour is very intuitive - outside of macros. With macros, it will
-lead sometimes to problems, since the exact time of translation depends on the
-exact use.
-
-
-
+This behaviour is very intuitive outside of macros but may be confusing when
+doing more complex macros. If you compare characters against numeric values,
+be sure to take the translation into account.
 
 
 

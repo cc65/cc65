@@ -638,7 +638,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 
     } else if (ED_IsConstAbsInt (&Arg3.Expr) && Arg3.Expr.IVal <= 256 &&
                ED_IsConstAbsInt (&Arg2.Expr) &&
-               (Arg2.Expr.IVal != 0 || CodeSizeFactor > 200)) {
+               (Arg2.Expr.IVal != 0 || IS_Get (&CodeSizeFactor) > 200)) {
 
         /* Remove all of the generated code but the load of the first
          * argument.
@@ -1015,7 +1015,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
      * requested on the command line, and the code size factor is more than
      * 400 (code is 13 bytes vs. 3 for a jsr call).
      */
-    } else if (CodeSizeFactor > 400 && IS_Get (&InlineStdFuncs)) {
+    } else if (IS_Get (&CodeSizeFactor) > 400 && IS_Get (&InlineStdFuncs)) {
 
         /* Load the expression into the primary */
         LoadExpr (CF_NONE, &Arg);

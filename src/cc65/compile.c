@@ -295,10 +295,11 @@ void Compile (const char* FileName)
      * IS_Get functions access the values in effect now, regardless of any
      * changes using #pragma later.
      */
-    if (Optimize) {
+    if (IS_Get (&Optimize)) {  
+        long CodeSize = IS_Get (&CodeSizeFactor);
 	DefineNumericMacro ("__OPT__", 1);
-	if (FavourSize == 0) {
-	    DefineNumericMacro ("__OPT_i__", 1);
+       	if (CodeSize > 100) {
+	    DefineNumericMacro ("__OPT_i__", CodeSize);
 	}
 	if (IS_Get (&EnableRegVars)) {
 	    DefineNumericMacro ("__OPT_r__", 1);

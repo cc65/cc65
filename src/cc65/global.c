@@ -48,10 +48,7 @@ unsigned char DebugInfo		= 0;	/* Add debug info to the obj */
 unsigned char CreateDep		= 0;	/* Create a dependency file */
 unsigned char ANSI   	       	= 0;	/* Strict ANSI flag */
 unsigned char NoWarn		= 0;   	/* Suppress warnings */
-unsigned char Optimize		= 0;   	/* Optimize flag */
 unsigned long OptDisable	= 0;	/* Optimizer passes to disable */
-unsigned char FavourSize	= 1;   	/* Favour size over speed */
-unsigned      CodeSizeFactor	= 100;	/* Size factor for generated code */
 unsigned      RegisterSpace     = 6;    /* Space available for register vars */
 
 /* Stackable options */
@@ -63,6 +60,8 @@ IntStack RegVarsToCallStack = INTSTACK(0);  /* Save reg variables on call stack 
 IntStack StaticLocals       = INTSTACK(0);  /* Make local variables static */
 IntStack SignedChars        = INTSTACK(0);  /* Make characters signed by default */
 IntStack CheckStack         = INTSTACK(0);  /* Generate stack overflow checks */
+IntStack Optimize      	    = INTSTACK(0);  /* Optimize flag */
+IntStack CodeSizeFactor	    = INTSTACK(100);/* Size factor for generated code */
 
 
 

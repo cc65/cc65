@@ -374,12 +374,15 @@ static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
 static void OptCodeSize (const char* Opt, const char* Arg)
 /* Handle the --codesize option */
 {
+    unsigned Factor;
+    char     BoundsCheck;
+
     /* Numeric argument expected */
-    if (sscanf (Arg, "%u", &CodeSizeFactor) != 1 ||
-	CodeSizeFactor < 100 ||
-       	CodeSizeFactor > 1000) {
+    if (sscanf (Arg, "%u%c", &Factor, &BoundsCheck) != 1 ||
+        Factor < 10 || Factor > 1000) {
 	AbEnd ("Argument for %s is invalid", Opt);
     }
+    IS_Set (&CodeSizeFactor, Factor);
 }
 
 
@@ -801,7 +804,7 @@ int main (int argc, char* argv[])
 		    break;
 
 		case 'O':
-		    Optimize = 1;
+		    IS_Set (&Optimize, 1);
 	    	    P = Arg + 2;
 		    while (*P) {
 		    	switch (*P++) {
@@ -809,8 +812,7 @@ int main (int argc, char* argv[])
      		    	     	sscanf (P, "%lx", (long*) &OptDisable);
 		    	     	break;
 	       	    	    case 'i':
-	       	    	     	FavourSize = 0;
-			        CodeSizeFactor = 200;
+			        IS_Set (&CodeSizeFactor, 200);
     	       	    	     	break;
 	       	    	    case 'r':
 	       	    	  	IS_Set (&EnableRegVars, 1);

@@ -48,16 +48,13 @@
 /*****************************************************************************/
 
 
-
+                        
 extern unsigned char	AddSource;		/* Add source lines as comments */
 extern unsigned char	DebugInfo;		/* Add debug info to the obj */
 extern unsigned char	CreateDep;		/* Create a dependency file */
 extern unsigned char	ANSI;			/* Strict ANSI flag */
 extern unsigned char	NoWarn;			/* Suppress warnings */
-extern unsigned char	Optimize;		/* Optimize flag */
 extern unsigned long	OptDisable;		/* Optimizer passes to disable */
-extern unsigned char	FavourSize;		/* Favour size over speed */
-extern unsigned	       	CodeSizeFactor;		/* Size factor for generated code */
 extern unsigned         RegisterSpace;          /* Space available for register vars */
 
 /* Stackable options */
@@ -69,6 +66,8 @@ extern IntStack         RegVarsToCallStack;	/* Save reg variables on call stack 
 extern IntStack         StaticLocals;		/* Make local variables static */
 extern IntStack         SignedChars;		/* Make characters signed by default */
 extern IntStack         CheckStack;		/* Generate stack overflow checks */
+extern IntStack         Optimize;		/* Optimize flag */
+extern IntStack         CodeSizeFactor;		/* Size factor for generated code */
 
 
 

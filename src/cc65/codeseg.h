@@ -79,8 +79,12 @@ struct CodeSeg {
     SymEntry*	    Func;	  		/* Owner function */
     Collection	    Entries;	  		/* List of code entries */
     Collection	    Labels;	  		/* Labels for next insn */
-    CodeLabel* 	    LabelHash [CS_LABEL_HASH_SIZE]; /* Label hash table */
+    CodeLabel* 	    LabelHash[CS_LABEL_HASH_SIZE]; /* Label hash table */
     unsigned short  ExitRegs;			/* Register use on exit */
+
+    /* Optimization settings for this segment */
+    unsigned char   Optimize;                   /* On/off switch */
+    unsigned        CodeSizeFactor;
 };
 
 
@@ -287,7 +291,7 @@ void CS_GenRegInfo (CodeSeg* S);
 
 
 /* End of codeseg.h */
-#endif
+#endif                                          
 
 
 

@@ -1908,7 +1908,7 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
     /* Don't run the function if it is disabled or if it is prohibited by the
      * code size factor
      */
-    if (F->Disabled || F->CodeSizeFactor > CodeSizeFactor) {
+    if (F->Disabled || F->CodeSizeFactor > S->CodeSizeFactor) {
     	return 0;
     }
 
@@ -2093,7 +2093,7 @@ static unsigned RunOptGroup6 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned C;
 
-    if (CodeSizeFactor <= 100) {
+    if (S->CodeSizeFactor <= 100) {
         /* Optimize for size, that is replace operations by shorter ones, even
          * if this does hinder further optimizations (no problem since we're
          * done soon).
@@ -2142,7 +2142,7 @@ void RunOpt (CodeSeg* S)
     const char* StatFileName;
 
     /* If we shouldn't run the optimizer, bail out */
-    if (!Optimize) {
+    if (!S->Optimize) {
       	return;
     }
 

@@ -511,7 +511,7 @@ void g_swap_regvars (int StackOffs, int RegOffs, unsigned Bytes)
     /* Generate code */
     if (Bytes == 1) {
 
-        if (CodeSizeFactor < 165) {
+        if (IS_Get (&CodeSizeFactor) < 165) {
             ldyconst (StackOffs);
             ldxconst (RegOffs);
             AddCodeLine ("jsr regswap1");
@@ -601,7 +601,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
        	AddCodeLine ("lda (sp),y");
        	AddCodeLine ("sta regbank%+d", RegOffs+1);
 
-    } else if (Bytes == 3 && CodeSizeFactor >= 133) {
+    } else if (Bytes == 3 && IS_Get (&CodeSizeFactor) >= 133) {
 
        	ldyconst (StackOffs);
        	AddCodeLine ("lda (sp),y");
@@ -915,7 +915,7 @@ void g_leasp (int offs)
        	AddCodeLine ("lda sp");
        	AddCodeLine ("ldx sp+1");
     } else {
-       	if (CodeSizeFactor < 300) {
+       	if (IS_Get (&CodeSizeFactor) < 300) {
        	    ldaconst (offs);         		/* Load A with offset value */
        	    AddCodeLine ("jsr leaasp");	/* Load effective address */
        	} else {
@@ -963,7 +963,7 @@ void g_leavariadic (int Offs)
     AddCodeLine ("lda (sp),y");
 
     /* Add the value of the stackpointer */
-    if (CodeSizeFactor > 250) {
+    if (IS_Get (&CodeSizeFactor) > 250) {
 	unsigned L = GetLocalLabel();
        	AddCodeLine ("ldx sp+1");
        	AddCodeLine ("clc");
@@ -1060,7 +1060,7 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 		}
 		AddCodeLine ("sta (sp),y");
 	    } else {
-		if ((Flags & CF_NOKEEP) == 0 || CodeSizeFactor < 160) {
+		if ((Flags & CF_NOKEEP) == 0 || IS_Get (&CodeSizeFactor) < 160) {
 		    ldyconst (Offs);
 		    AddCodeLine ("jsr staxysp");
 		} else {
@@ -1258,7 +1258,7 @@ void g_reglong (unsigned Flags)
             if (Flags & CF_FORCECHAR) {
                 /* Conversion is from char */
                 if (Flags & CF_UNSIGNED) {
-                    if (CodeSizeFactor >= 200) {
+                    if (IS_Get (&CodeSizeFactor) >= 200) {
                         AddCodeLine ("ldx #$00");
                         AddCodeLine ("stx sreg");
                         AddCodeLine ("stx sreg+1");
@@ -1266,7 +1266,7 @@ void g_reglong (unsigned Flags)
                         AddCodeLine ("jsr aulong");
                     }
                 } else {
-                    if (CodeSizeFactor >= 366) {
+                    if (IS_Get (&CodeSizeFactor) >= 366) {
                         L = GetLocalLabel();
                         AddCodeLine ("ldx #$00");
                         AddCodeLine ("cmp #$80");
@@ -1284,7 +1284,7 @@ void g_reglong (unsigned Flags)
 
 	case CF_INT:
 	    if (Flags & CF_UNSIGNED) {
-	    	if (CodeSizeFactor >= 200) {
+	    	if (IS_Get (&CodeSizeFactor) >= 200) {
 	    	    ldyconst (0);
 	    	    AddCodeLine ("sty sreg");
 	  	    AddCodeLine ("sty sreg+1");
@@ -1425,7 +1425,7 @@ void g_scale (unsigned flags, long val)
      	     	    /* FALLTHROUGH */
 
      	     	case CF_INT:
-     		    if (CodeSizeFactor >= (p2+1)*130U) {
+     		    if (IS_Get (&CodeSizeFactor) >= (p2+1)*130) {
      	     		AddCodeLine ("stx tmp1");
      	     	  	while (p2--) {
      	     		    AddCodeLine ("asl a");
@@ -1487,7 +1487,7 @@ void g_scale (unsigned flags, long val)
 
      		case CF_INT:
      		    if (flags & CF_UNSIGNED) {
-			if (CodeSizeFactor >= (p2+1)*130U) {
+			if (IS_Get (&CodeSizeFactor) >= (p2+1)*130) {
 			    AddCodeLine ("stx tmp1");
 			    while (p2--) {
 	     		    	AddCodeLine ("lsr tmp1");
@@ -1498,7 +1498,7 @@ void g_scale (unsigned flags, long val)
      			    AddCodeLine ("jsr lsrax%d", p2);
 			}
      		    } else {
-			if (CodeSizeFactor >= (p2+1)*150U) {
+			if (IS_Get (&CodeSizeFactor) >= (p2+1)*150) {
 			    AddCodeLine ("stx tmp1");
 			    while (p2--) {
 			    	AddCodeLine ("cpx #$80");
@@ -1788,7 +1788,7 @@ void g_addeqlocal (unsigned flags, int offs, unsigned long val)
        	case CF_INT:
 	    ldyconst (offs);
      	    if (flags & CF_CONST) {
-		if (CodeSizeFactor >= 400) {
+		if (IS_Get (&CodeSizeFactor) >= 400) {
 		    AddCodeLine ("clc");
 		    AddCodeLine ("lda #$%02X", (int)(val & 0xFF));
 		    AddCodeLine ("adc (sp),y");
@@ -1848,7 +1848,7 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
      	    break;
 
        	case CF_INT:
-	    if (CodeSizeFactor >= 200) {
+	    if (IS_Get (&CodeSizeFactor) >= 200) {
 		/* Lots of code, use only if size is not important */
        	       	AddCodeLine ("sta ptr1");
 		AddCodeLine ("stx ptr1+1");
@@ -2062,7 +2062,7 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
      	    break;
 
        	case CF_INT:
-	    if (CodeSizeFactor >= 200) {
+	    if (IS_Get (&CodeSizeFactor) >= 200) {
 		/* Lots of code, use only if size is not important */
 		AddCodeLine ("sta ptr1");
        	       	AddCodeLine ("stx ptr1+1");
@@ -3272,7 +3272,7 @@ void g_inc (unsigned flags, unsigned long val)
 		AddCodeLine ("bne %s", LocalLabelName (L));
 		AddCodeLine ("inx");
 		g_defcodelabel (L);
-     	    } else if (CodeSizeFactor < 200) {
+     	    } else if (IS_Get (&CodeSizeFactor) < 200) {
      		/* Use jsr calls */
      		if (val <= 8) {
      		    AddCodeLine ("jsr incax%lu", val);
@@ -3360,7 +3360,7 @@ void g_dec (unsigned flags, unsigned long val)
 	    /* FALLTHROUGH */
 
      	case CF_INT:
-	    if (CodeSizeFactor < 200) {
+	    if (IS_Get (&CodeSizeFactor) < 200) {
 		/* Use subroutines */
 		if (val <= 8) {
 		    AddCodeLine ("jsr decax%d", (int) val);

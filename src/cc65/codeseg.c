@@ -50,11 +50,12 @@
 #include "asmlabel.h"
 #include "codeent.h"
 #include "codeinfo.h"
+#include "codeseg.h"
 #include "datatype.h"
 #include "error.h"
+#include "global.h"
 #include "ident.h"
 #include "symentry.h"
-#include "codeseg.h"
 
 
 
@@ -470,6 +471,10 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
     } else {
 	S->ExitRegs = REG_NONE;
     }
+
+    /* Copy the global optimization settings */
+    S->Optimize       = (unsigned char) IS_Get (&Optimize);
+    S->CodeSizeFactor = (unsigned) IS_Get (&CodeSizeFactor);
 
     /* Return the new struct */
     return S;

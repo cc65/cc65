@@ -367,7 +367,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
      * (instead of pushing) is enabled.
      *
      */
-    if (CodeSizeFactor >= 200) {
+    if (IS_Get (&CodeSizeFactor) >= 200) {
 
 	/* Calculate the number and size of the parameters */
 	FrameParams = Func->ParamCount;

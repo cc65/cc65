@@ -53,7 +53,6 @@ C_OBJS =	_afailed.o	\
 		strtok.o	\
                 system.o        \
                 timezone.o      \
-		vprintf.o       \
                 vsscanf.o
 
 
@@ -139,6 +138,7 @@ S_OBJS = 	_fdesc.o 	\
 		tolower.o	\
 		toupper.o	\
 		vfprintf.o	\
+		vprintf.o       \
 		vsprintf.o	\
 		zerobss.o
 

@@ -33,6 +33,6 @@ sscanf.s
 strftime.s
 strtok.s
 strxfrm.s
+system.s
 timezone.s
-vprintf.s
 vsscanf.s

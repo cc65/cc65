@@ -102,7 +102,7 @@ int remove (const char* name);
 int rename (const char* old, const char* new);
 int sprintf (char* buf, const char* format, ...);
 int __fastcall__ vfprintf (FILE* f, const char* format, va_list ap);
-int vprintf (const char* format, va_list ap);
+int __fastcall__ vprintf (const char* format, va_list ap);
 int __fastcall__ vsprintf (char* buf, const char* format, va_list ap);
 
 /* Not available or testing: */

@@ -39,7 +39,8 @@
 #include <ctype.h>
 #include <errno.h>
 
-/* common */
+/* common */     
+#include "assertdefs.h"
 #include "bitops.h"
 #include "cddefs.h"
 #include "coll.h"
@@ -48,6 +49,7 @@
 #include "xmalloc.h"
 
 /* ca65 */
+#include "asserts.h"
 #include "condasm.h"
 #include "dbginfo.h"
 #include "error.h"
@@ -56,7 +58,6 @@
 #include "global.h"
 #include "incpath.h"
 #include "instr.h"
-#include "ldassert.h"
 #include "listing.h"
 #include "macpack.h"
 #include "macro.h"
@@ -354,10 +355,12 @@ static void DoAssert (void)
         case 0:
         case 1:
             /* Warning */
+            Action = ASSERT_ACT_WARN;
             break;
 
         case 2:
             /* Error */
+            Action = ASSERT_ACT_ERROR;
             break;
 
         default:

@@ -7,9 +7,9 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -951,6 +951,18 @@ long ConstExpression (void)
 
 
 
+void FreeExpr (ExprNode* Root)
+/* Free the expression, Root is pointing to. */
+{
+    if (Root) {
+     	FreeExpr (Root->Left);
+    	FreeExpr (Root->Right);
+    	FreeExprNode (Root);
+    }
+}
+
+
+
 ExprNode* LiteralExpr (long Val)
 /* Return an expression tree that encodes the given literal value */
 {
@@ -1050,14 +1062,16 @@ ExprNode* ULabelExpr (unsigned Num)
 
 
 
-void FreeExpr (ExprNode* Root)
-/* Free the expression, Root is pointing to. */
+ExprNode* ForceByteExpr (ExprNode* Expr)
+/* Force the given expression into a byte and return the result */
 {
-    if (Root) {
-     	FreeExpr (Root->Left);
-    	FreeExpr (Root->Right);
-    	FreeExprNode (Root);
-    }
+    /* Use the low byte operator to force the expression into byte size */
+    ExprNode* Root = NewExprNode ();
+    Root->Left  = Expr;
+    Root->Op    = EXPR_BYTE0;
+
+    /* Return the result */
+    return Root;
 }
 
 
@@ -1065,11 +1079,26 @@ void FreeExpr (ExprNode* Root)
 ExprNode* ForceWordExpr (ExprNode* Expr)
 /* Force the given expression into a word and return the result. */
 {
-    /* And the expression by $FFFF to force it into word size */
+    /* AND the expression by $FFFF to force it into word size */
     ExprNode* Root = NewExprNode ();
     Root->Left  = Expr;
     Root->Op    = EXPR_AND;
     Root->Right	= LiteralExpr (0xFFFF);
+
+    /* Return the result */
+    return Root;
+}
+
+
+
+ExprNode* CompareExpr (ExprNode* Expr, long Val)
+/* Generate an expression that compares Expr and Val for equality */
+{
+    /* Generate a compare node */
+    ExprNode* Root = NewExprNode ();
+    Root->Left  = Expr;
+    Root->Op    = EXPR_EQ;
+    Root->Right	= LiteralExpr (Val);
 
     /* Return the result */
     return Root;

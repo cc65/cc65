@@ -10,7 +10,8 @@ CC	= gcc
 EBIND	= emxbind
 LDFLAGS	=
 
-OBJS =  condasm.o	\
+OBJS =  asserts.o       \
+        condasm.o	\
 	dbginfo.o	\
 	ea.o	      	\
         error.o	      	\
@@ -22,7 +23,6 @@ OBJS =  condasm.o	\
 	incpath.o      	\
         instr.o	       	\
 	istack.o       	\
-        ldassert.o      \
 	lineinfo.o	\
 	listing.o      	\
 	macpack.o      	\

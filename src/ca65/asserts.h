@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*	  			     ea.h				     */
+/*                                 asserts.h                                 */
 /*                                                                           */
-/*	     Effective address parsing for the ca65 macroassembler	     */
+/*               Linker assertions for the ca65 crossassembler               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,45 +33,37 @@
 
 
 
-#ifndef EA_H
-#define EA_H
+#ifndef ASSERTS_H
+#define ASSERTS_H
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Data			    	     */
+/*     	     	    		     Data     				     */
 /*****************************************************************************/
 
 
 
-/* GetEA result struct */
-typedef struct EffAddr EffAddr;
-struct EffAddr {
-    /* First three fields get filled when calling GetEA */
-    unsigned long       AddrModeSet;    /* Possible addressing modes */
-    struct ExprNode*    Expr;           /* Expression if any (NULL otherwise) */
-    struct ExprNode*    Bank;           /* Bank expression if any */
-
-    /* The following fields are used inside instr.c */
-    unsigned            AddrMode;       /* Actual addressing mode used */
-    unsigned long       AddrModeBit;    /* Addressing mode as bit mask */
-    unsigned char       Opcode;         /* Opcode */
-};
+/* Forwards */
+struct ExprNode;
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Code	    			     */
+/*     	     	    		     Code     				     */
 /*****************************************************************************/
 
 
 
-void GetEA (EffAddr* A);
-/* Parse an effective address, return the result in A */
+void AddAssertion (struct ExprNode* Expr, unsigned Action, unsigned Msg);
+/* Add an assertion to the assertion table */
+
+void WriteAssertions (void);
+/* Write the assertion table to the object file */
 
 
 
-/* End of ea.h */
+/* End of asserts.h */
 
 #endif
 

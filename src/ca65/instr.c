@@ -38,18 +38,21 @@
 #include <ctype.h>
 
 /* common */
+#include "assertdefs.h"
 #include "bitops.h"
 #include "check.h"
 
 /* ca65 */
+#include "asserts.h"
 #include "ea.h"
 #include "error.h"
 #include "expr.h"
 #include "global.h"
+#include "instr.h"
 #include "nexttok.h"
 #include "objcode.h"
+#include "spool.h"
 #include "symtab.h"
-#include "instr.h"
 
 
 
@@ -65,6 +68,7 @@ static void PutPCRel16 (const InsDesc* Ins);
 static void PutBlockMove (const InsDesc* Ins);
 static void PutREP (const InsDesc* Ins);
 static void PutSEP (const InsDesc* Ins);
+static void PutJmp (const InsDesc* Ins);
 static void PutAll (const InsDesc* Ins);
 
 
@@ -89,7 +93,7 @@ static const struct {
 	{ "BPL", 0x0020000, 0x10, 0, PutPCRel8 },
 	{ "BRK", 0x0000001, 0x00, 0, PutAll },
 	{ "BVC", 0x0020000, 0x50, 0, PutPCRel8 },
-	{ "BVS", 0x0020000, 0x70, 0, PutPCRel8 },
+      	{ "BVS", 0x0020000, 0x70, 0, PutPCRel8 },
 	{ "CLC", 0x0000001, 0x18, 0, PutAll },
 	{ "CLD", 0x0000001, 0xd8, 0, PutAll },
 	{ "CLI", 0x0000001, 0x58, 0, PutAll },
@@ -104,7 +108,7 @@ static const struct {
 	{ "INC", 0x000006c, 0x00, 4, PutAll },
 	{ "INX", 0x0000001, 0xe8, 0, PutAll },
 	{ "INY", 0x0000001, 0xc8, 0, PutAll },
-	{ "JMP", 0x0000808, 0x4c, 6, PutAll },
+	{ "JMP", 0x0000808, 0x4c, 6, PutJmp },
 	{ "JSR", 0x0000008, 0x20, 7, PutAll },
 	{ "LDA", 0x080A26C, 0xa0, 0, PutAll },
 	{ "LDX", 0x080030C, 0xa2, 1, PutAll },
@@ -132,7 +136,7 @@ static const struct {
 	{ "TSX", 0x0000001, 0xba, 0, PutAll },
 	{ "TXA", 0x0000001, 0x8a, 0, PutAll },
 	{ "TXS", 0x0000001, 0x9a, 0, PutAll },
-	{ "TYA", 0x0000001, 0x98, 0, PutAll }
+      	{ "TYA", 0x0000001, 0x98, 0, PutAll }
     }
 };
 
@@ -175,7 +179,7 @@ static const struct {
 	{ "INX", 0x0000001, 0xe8, 0, PutAll },
 	{ "INY", 0x0000001, 0xc8, 0, PutAll },
 	{ "JMP", 0x0010808, 0x4c, 6, PutAll },
-	{ "JSR", 0x0000008, 0x20, 7, PutAll },
+      	{ "JSR", 0x0000008, 0x20, 7, PutAll },
 	{ "LDA", 0x080A66C, 0xa0, 0, PutAll },
 	{ "LDX", 0x080030C, 0xa2, 1, PutAll },
 	{ "LDY", 0x080006C, 0xa0, 1, PutAll },
@@ -261,7 +265,7 @@ static const struct {
 	{ "JSL", 0x0000010, 0x20, 7, PutAll },
 	{ "JSR", 0x0010018, 0x20, 7, PutAll },
 	{ "LDA", 0x0b8f6fc, 0xa0, 0, PutAll },
-	{ "LDX", 0x0c0030c, 0xa2, 1, PutAll },
+      	{ "LDX", 0x0c0030c, 0xa2, 1, PutAll },
 	{ "LDY", 0x0c0006c, 0xa0, 1, PutAll },
 	{ "LSR", 0x000006F, 0x42, 1, PutAll },
 	{ "MVN", 0x1000000, 0x54, 0, PutBlockMove },
@@ -304,7 +308,7 @@ static const struct {
 	{ "TAD", 0x0000001, 0x5b, 0, PutAll },   /* == TCD */
 	{ "TAS", 0x0000001, 0x1b, 0, PutAll },   /* == TCS */
 	{ "TAX", 0x0000001, 0xaa, 0, PutAll },
-	{ "TAY", 0x0000001, 0xa8, 0, PutAll },
+      	{ "TAY", 0x0000001, 0xa8, 0, PutAll },
 	{ "TCD", 0x0000001, 0x5b, 0, PutAll },
 	{ "TCS", 0x0000001, 0x1b, 0, PutAll },
 	{ "TDA", 0x0000001, 0x7b, 0, PutAll },   /* == TDC */
@@ -437,8 +441,111 @@ unsigned char ExtBytes [AMI_COUNT] = {
 
 
 /*****************************************************************************/
-/*  			       Handler functions		    	     */
+/*    	       	 	       Handler functions		    	     */
 /*****************************************************************************/
+
+
+
+static int EvalEA (const InsDesc* Ins, EffAddr* A)
+/* Evaluate the effective address. All fields in A will be valid after calling
+ * this function. The function returns true on success and false on errors.
+ */
+{
+    /* Get the set of possible addressing modes */
+    GetEA (A);
+
+    /* From the possible addressing modes, remove the ones that are invalid
+     * for this instruction or CPU.
+     */
+    A->AddrModeSet &= Ins->AddrMode;
+
+    /* If we have possible zero page addressing modes, and the expression
+     * involved (if any) is not in byte range, remove the zero page addressing
+     * modes.
+     */
+    if (A->Expr && (A->AddrModeSet & AM_ZP) && !IsByteExpr (A->Expr)) {
+       	A->AddrModeSet &= ~AM_ZP;
+    }
+
+    /* Check if we have any adressing modes left */
+    if (A->AddrModeSet == 0) {
+       	Error (ERR_ILLEGAL_ADDR_MODE);
+       	return 0;
+    }
+    A->AddrMode    = BitFind (A->AddrModeSet);
+    A->AddrModeBit = (0x01UL << A->AddrMode);
+
+    /* If the instruction has a one byte operand and immediate addressing is
+     * allowed but not used, check for an operand expression in the form
+     * <label or >label, where label is a far or absolute label. If found,
+     * emit a warning. This warning protects against a typo, where the '#'
+     * for the immediate operand is omitted.
+     */
+    if (A->Expr && (Ins->AddrMode & AM_IMM)                &&
+        (A->AddrModeSet & (AM_DIR | AM_ABS | AM_ABS_LONG)) &&
+        ExtBytes[A->AddrMode] == 1) {
+
+        /* Found, check the expression */
+        ExprNode* Left = A->Expr->Left;
+        if ((A->Expr->Op == EXPR_BYTE0 || A->Expr->Op == EXPR_BYTE1) &&
+            Left->Op == EXPR_SYMBOL                                &&
+            !SymIsZP (Left->V.Sym)) {
+
+            /* Output a warning */
+            Warning (WARN_SUSPICIOUS_ADDREXPR);
+        }
+    }
+
+    /* Build the opcode */
+    A->Opcode = Ins->BaseCode | EATab[Ins->ExtCode][A->AddrMode];
+
+    /* Success */
+    return 1;
+}
+
+
+
+static void EmitCode (EffAddr* A)
+/* Output code for the data in A */
+{
+    /* Check how many extension bytes are needed and output the instruction */
+    switch (ExtBytes[A->AddrMode]) {
+
+        case 0:
+      	    Emit0 (A->Opcode);
+      	    break;
+
+      	case 1:
+      	    Emit1 (A->Opcode, A->Expr);
+      	    break;
+
+      	case 2:
+	    if (CPU == CPU_65816 && (A->AddrModeBit & (AM_ABS | AM_ABS_X | AM_ABS_Y))) {
+	      	/* This is a 16 bit mode that uses an address. If in 65816,
+	      	 * mode, force this address into 16 bit range to allow
+	      	 * addressing inside a 64K segment.
+	      	 */
+       	      	Emit2 (A->Opcode, ForceWordExpr (A->Expr));
+	    } else {
+	      	Emit2 (A->Opcode, A->Expr);
+	    }
+	    break;
+
+	case 3:
+	    if (A->Bank) {
+	      	/* Separate bank given */
+	       	Emit3b (A->Opcode, A->Expr, A->Bank);
+	    } else {
+	      	/* One far argument */
+	      	Emit3 (A->Opcode, A->Expr);
+	    }
+	    break;
+
+	default:
+	    Internal ("Invalid operand byte count: %u", ExtBytes[A->AddrMode]);
+
+    }
+}
 
 
 
@@ -447,52 +554,29 @@ static long PutImmed8 (const InsDesc* Ins)
  * operand if it's available and const.
  */
 {
-    ExprNode* Expr;
-    ExprNode* Bank;
-    unsigned long AddrMode;
-    unsigned char OpCode;
+    EffAddr A;
     long Val = -1;
 
-    /* Get the addressing mode used */
-    GetEA (&AddrMode, &Expr, &Bank);
-
-    /* From the possible addressing modes, remove the ones that are invalid
-     * for this instruction or CPU.
-     */
-    AddrMode &= Ins->AddrMode;
-
-    /* If we have possible zero page addressing modes, and the expression
-     * involved (if any) is not in byte range, remove the zero page addressing
-     * modes.
-     */
-    if (Expr && (AddrMode & AM_ZP) && !IsByteExpr (Expr)) {
-    	AddrMode &= ~AM_ZP;
+    /* Evaluate the addressing mode */
+    if (EvalEA (Ins, &A) == 0) {
+        /* An error occurred */
+        return -1L;
     }
-
-    /* Check if we have any adressing modes left */
-    if (AddrMode == 0) {
-    	Error (ERR_ILLEGAL_ADDR_MODE);
-    	return -1;
-    }
-    AddrMode = BitFind (AddrMode);
-
-    /* Build the opcode */
-    OpCode = Ins->BaseCode | EATab [Ins->ExtCode][AddrMode];
 
     /* If we have an expression and it's const, get it's value */
-    if (Expr && IsConstExpr (Expr)) {
-	Val = GetExprVal (Expr);
+    if (A.Expr && IsConstExpr (A.Expr)) {
+      	Val = GetExprVal (A.Expr);
     }
 
     /* Check how many extension bytes are needed and output the instruction */
-    switch (ExtBytes [AddrMode]) {
+    switch (ExtBytes[A.AddrMode]) {
 
-     	case 1:
-     	    Emit1 (OpCode, Expr);
+      	case 1:
+      	    Emit1 (A.Opcode, A.Expr);
      	    break;
 
      	default:
-     	    Internal ("Invalid operand byte count: %u", ExtBytes [AddrMode]);
+     	    Internal ("Invalid operand byte count: %u", ExtBytes[A.AddrMode]);
     }
 
     /* Return the expression value */
@@ -543,12 +627,12 @@ static void PutREP (const InsDesc* Ins)
 	    Warning (WARN_CANNOT_TRACK_STATUS);
 	} else {
 	    if (Val & 0x10) {
-		/* Index registers to 16 bit */
-		ExtBytes [AMI_IMM_INDEX] = 2;
+	       	/* Index registers to 16 bit */
+	       	ExtBytes[AMI_IMM_INDEX] = 2;
      	    }
      	    if (Val & 0x20) {
-     		/* Accu to 16 bit */
-		ExtBytes [AMI_IMM_ACCU] = 2;
+     	       	/* Accu to 16 bit */
+	       	ExtBytes[AMI_IMM_ACCU] = 2;
      	    }
      	}
     }
@@ -584,100 +668,50 @@ static void PutSEP (const InsDesc* Ins)
 
 
 
+static void PutJmp (const InsDesc* Ins)
+/* Handle the jump instruction for the 6502. Problem is that these chips have
+ * a bug: If the address crosses a page, the upper byte gets not corrected and
+ * the instruction will fail. The PutJmp function will add a linker assertion
+ * to check for this case and is otherwise identical to PutAll.
+ */
+{
+    EffAddr A;
+
+    /* Evaluate the addressing mode used */
+    if (EvalEA (Ins, &A)) {
+
+        /* Check for indirect addressing */
+        if (A.AddrModeBit & AM_ABS_IND) {
+
+            /* Compare the low byte of the expression to 0xFF to check for
+             * a page cross. Be sure to use a copy of the expression otherwise
+             * things will go weird later.
+             */
+            ExprNode* E = CompareExpr (ForceByteExpr (CloneExpr (A.Expr)), 0xFF);
+
+            /* Generate the message */
+            unsigned Msg = GetStringId ("\"jmp (abs)\" across page border");
+
+            /* Generate the assertion */
+            AddAssertion (E, ASSERT_ACT_WARN, Msg);
+        }
+
+        /* No error, output code */
+        EmitCode (&A);
+    }
+}
+
+
+
 static void PutAll (const InsDesc* Ins)
 /* Handle all other instructions */
 {
-    ExprNode* Expr;
-    ExprNode* Bank;
-    unsigned long AddrModeSet;
-    unsigned char OpCode;
-    unsigned AddrMode;
-    unsigned long AddrModeBit;
+    EffAddr A;
 
-    /* Get the addressing mode used */
-    GetEA (&AddrModeSet, &Expr, &Bank);
-
-    /* From the possible addressing modes, remove the ones that are invalid
-     * for this instruction or CPU.
-     */
-    AddrModeSet &= Ins->AddrMode;
-
-    /* If we have possible zero page addressing modes, and the expression
-     * involved (if any) is not in byte range, remove the zero page addressing
-     * modes.
-     */
-    if (Expr && (AddrModeSet & AM_ZP) && !IsByteExpr (Expr)) {
-       	AddrModeSet &= ~AM_ZP;
-    }
-
-    /* Check if we have any adressing modes left */
-    if (AddrModeSet == 0) {
-       	Error (ERR_ILLEGAL_ADDR_MODE);
-       	return;
-    }
-    AddrMode = BitFind (AddrModeSet);
-
-    /* If the instruction has a one byte operand and immediate addressing is
-     * allowed but not used, check for an operand expression in the form
-     * <label or >label, where label is a far or absolute label. If found,
-     * emit a warning. This warning protects against a typo, where the '#'
-     * for the immediate operand is omitted.
-     */
-    if (Expr && (Ins->AddrMode & AM_IMM)                &&
-        (AddrModeSet & (AM_DIR | AM_ABS | AM_ABS_LONG)) &&
-        ExtBytes[AddrMode] == 1) {
-
-        /* Found, check the expression */
-        ExprNode* Left = Expr->Left;
-        if ((Expr->Op == EXPR_BYTE0 || Expr->Op == EXPR_BYTE1) &&
-            Left->Op == EXPR_SYMBOL                            &&
-            !SymIsZP (Left->V.Sym)) {
-
-            /* Output a warning */
-            Warning (WARN_SUSPICIOUS_ADDREXPR);
-        }
-    }
-
-    /* Build the opcode */
-    OpCode = Ins->BaseCode | EATab [Ins->ExtCode][AddrMode];
-
-    /* Check how many extension bytes are needed and output the instruction */
-    switch (ExtBytes[AddrMode]) {
-
-        case 0:
-    	    Emit0 (OpCode);
-    	    break;
-
-    	case 1:
-    	    Emit1 (OpCode, Expr);
-    	    break;
-
-    	case 2:
-	    AddrModeBit = (1L << AddrMode);
-	    if (CPU == CPU_65816 && (AddrModeBit & (AM_ABS | AM_ABS_X | AM_ABS_Y))) {
-		/* This is a 16 bit mode that uses an address. If in 65816,
-		 * mode, force this address into 16 bit range to allow
-	 	 * addressing inside a 64K segment.
-	 	 */
-       		Emit2 (OpCode, ForceWordExpr (Expr));
-	    } else {
-	    	Emit2 (OpCode, Expr);
-	    }
-	    break;
-
-	case 3:
-	    if (Bank) {
-		/* Separate bank given */
-	       	Emit3b (OpCode, Expr, Bank);
-	    } else {
-		/* One far argument */
-	     	Emit3 (OpCode, Expr);
-	    }
-	    break;
-
-	default:
-	    Internal ("Invalid operand byte count: %u", ExtBytes [AddrMode]);
-
+    /* Evaluate the addressing mode used */
+    if (EvalEA (Ins, &A)) {
+        /* No error, output code */
+        EmitCode (&A);
     }
 }
 

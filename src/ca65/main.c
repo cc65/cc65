@@ -48,6 +48,7 @@
 
 /* ca65 */
 #include "abend.h"
+#include "asserts.h"
 #include "error.h"
 #include "expr.h"
 #include "feature.h"
@@ -56,7 +57,6 @@
 #include "incpath.h"
 #include "instr.h"
 #include "istack.h"
-#include "ldassert.h"
 #include "lineinfo.h"
 #include "listing.h"
 #include "macro.h"

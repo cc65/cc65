@@ -7,9 +7,9 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,80 +33,81 @@
 
 
 
+/* ld65 */
 #include "error.h"
 #include "expr.h"
 #include "instr.h"
 #include "nexttok.h"
 #include "ea.h"
 
-
+               
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*     	      	    	      	     Code				     */
 /*****************************************************************************/
 
 
 
-void GetEA (unsigned long* AddrMode, ExprNode** Expr, ExprNode** Bank)
-/* Parse an effective address, return the possible modes in AddrMode, and the
- * expression involved (if any) in Expr.
- */
+void GetEA (EffAddr* A)
+/* Parse an effective address, return the result in A */
 {
-    /* Clear the expressions */
-    *Bank = *Expr = 0;
+    /* Clear the output struct */
+    A->AddrModeSet = 0;
+    A->Bank = 0;
+    A->Expr = 0;
 
 
     if (TokIsSep (Tok)) {
 
-	*AddrMode = AM_IMPLICIT;
+	A->AddrModeSet = AM_IMPLICIT;
 
     } else if (Tok == TOK_HASH) {
 
 	/* #val */
 	NextTok ();
-	*Expr = Expression ();
-	*AddrMode = AM_IMM;
+	A->Expr  = Expression ();
+	A->AddrModeSet = AM_IMM;
 
     } else if (Tok == TOK_A) {
 
 	NextTok ();
-	*AddrMode = AM_ACCU;
+	A->AddrModeSet = AM_ACCU;
 
     } else if (Tok == TOK_LBRACK) {
 
 	/* [dir] or [dir],y */
 	NextTok ();
-	*Expr = Expression ();
+	A->Expr = Expression ();
 	Consume (TOK_RBRACK, ERR_RBRACK_EXPECTED);
 	if (Tok == TOK_COMMA) {
 	    /* [dir],y */
 	    NextTok ();
 	    Consume (TOK_Y, ERR_Y_EXPECTED);
-	    *AddrMode = AM_DIR_IND_LONG_Y;
+	    A->AddrModeSet = AM_DIR_IND_LONG_Y;
 	} else {
 	    /* [dir] */
-	    *AddrMode = AM_DIR_IND_LONG;
+	    A->AddrModeSet = AM_DIR_IND_LONG;
 	}
 
     } else if (Tok == TOK_LPAREN) {
 
     	/* One of the indirect modes */
     	NextTok ();
-    	*Expr = Expression ();
+    	A->Expr = Expression ();
 
     	if (Tok == TOK_COMMA) {
 
     	    /* (expr,X) or (rel,S),y */
     	    NextTok ();
     	    if (Tok == TOK_X) {
-		/* (adr,x) */
-    	 	NextTok ();
-       	       	*AddrMode = AM_ABS_X_IND | AM_DIR_X_IND;
-    	 	ConsumeRParen ();
+	   	/* (adr,x) */
+    	   	NextTok ();
+       	       	A->AddrModeSet = AM_ABS_X_IND | AM_DIR_X_IND;
+    	       	ConsumeRParen ();
     	    } else if (Tok == TOK_S) {
-		/* (rel,s),y */
+	   	/* (rel,s),y */
     	 	NextTok ();
-    	 	*AddrMode = AM_STACK_REL_IND_Y;
+    	 	A->AddrModeSet = AM_STACK_REL_IND_Y;
     	 	ConsumeRParen ();
     	 	ConsumeComma ();
     	 	Consume (TOK_Y, ERR_Y_EXPECTED);
@@ -122,10 +123,10 @@ void GetEA (unsigned long* AddrMode, ExprNode** Expr, ExprNode** Bank)
 		/* (adr),y */
     	 	NextTok ();
     	 	Consume (TOK_Y, ERR_Y_EXPECTED);
-    	 	*AddrMode = AM_DIR_IND_Y;
+    	 	A->AddrModeSet = AM_DIR_IND_Y;
     	    } else {
 		/* (adr) */
-    	 	*AddrMode = AM_ABS_IND | AM_DIR_IND;
+    	 	A->AddrModeSet = AM_ABS_IND | AM_DIR_IND;
     	    }
     	}
 
@@ -140,22 +141,22 @@ void GetEA (unsigned long* AddrMode, ExprNode** Expr, ExprNode** Bank)
 	 * adr,y
 	 * adr,s
 	 */
-       	*Expr = Expression ();
+       	A->Expr = Expression ();
 
        	if (Tok == TOK_DOT) {
 
        	    /* Expr was a bank specification: bank.adr or bank.adr,x */
-       	    *Bank = *Expr;
+       	    A->Bank = A->Expr;
        	    NextTok ();
-       	    *Expr = Expression ();
+       	    A->Expr = Expression ();
        	    if (Tok == TOK_COMMA) {
-       	     	/* bank.adr,x */
-       	     	NextTok ();
-       	     	Consume (TOK_X, ERR_X_EXPECTED);
-       	     	*AddrMode = AM_ABS_LONG_X;
+       	       	/* bank.adr,x */
+       	       	NextTok ();
+       	       	Consume (TOK_X, ERR_X_EXPECTED);
+       	       	A->AddrModeSet = AM_ABS_LONG_X;
        	    } else {
        	     	/* bank.adr */
-       	     	*AddrMode = AM_ABS_LONG;
+       	     	A->AddrModeSet = AM_ABS_LONG;
        	    }
 
 	} else {
@@ -166,17 +167,17 @@ void GetEA (unsigned long* AddrMode, ExprNode** Expr, ExprNode** Bank)
 	 	switch (Tok) {
 
 	 	    case TOK_X:
-       	       	       	*AddrMode = AM_ABS_X | AM_DIR_X;
+       	       	       	A->AddrModeSet = AM_ABS_X | AM_DIR_X;
 	 		NextTok ();
 	 		break;
 
 	 	    case TOK_Y:
-	 		*AddrMode = AM_ABS_Y | AM_DIR_Y;
+	 		A->AddrModeSet = AM_ABS_Y | AM_DIR_Y;
 	 		NextTok ();
 	 		break;
 
 	 	    case TOK_S:
-	 		*AddrMode = AM_STACK_REL;
+	 		A->AddrModeSet = AM_STACK_REL;
 	 		NextTok ();
 	 		break;
 
@@ -185,9 +186,9 @@ void GetEA (unsigned long* AddrMode, ExprNode** Expr, ExprNode** Bank)
 
 	 	}
 
-	    } else {  
+	    } else {
 
-	 	*AddrMode = AM_ABS | AM_DIR;
+	 	A->AddrModeSet = AM_ABS | AM_DIR;
 
 	    }
 	}

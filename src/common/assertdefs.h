@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*	  			     ea.h				     */
+/*				  assertdefs.h  	       	       	     */
 /*                                                                           */
-/*	     Effective address parsing for the ca65 macroassembler	     */
+/*                     Definitions for linker assertions                     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,45 +33,24 @@
 
 
 
-#ifndef EA_H
-#define EA_H
+#ifndef ASSERTDEFS_H
+#define ASSERTDEFS_H
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Data			    	     */
+/*     	       	    	    	     Data				     */
 /*****************************************************************************/
 
 
 
-/* GetEA result struct */
-typedef struct EffAddr EffAddr;
-struct EffAddr {
-    /* First three fields get filled when calling GetEA */
-    unsigned long       AddrModeSet;    /* Possible addressing modes */
-    struct ExprNode*    Expr;           /* Expression if any (NULL otherwise) */
-    struct ExprNode*    Bank;           /* Bank expression if any */
-
-    /* The following fields are used inside instr.c */
-    unsigned            AddrMode;       /* Actual addressing mode used */
-    unsigned long       AddrModeBit;    /* Addressing mode as bit mask */
-    unsigned char       Opcode;         /* Opcode */
-};
+/* Assertion actions */
+#define ASSERT_ACT_WARN         0x00    /* Print a warning */
+#define ASSERT_ACT_ERROR        0x01    /* Print an error (no output) */
 
 
 
-/*****************************************************************************/
-/*     	      	    		     Code	    			     */
-/*****************************************************************************/
-
-
-
-void GetEA (EffAddr* A);
-/* Parse an effective address, return the result in A */
-
-
-
-/* End of ea.h */
+/* End of assertdefs.h */
 
 #endif
 

@@ -43,7 +43,8 @@ CFLAGS  += -i=..\common
 # ------------------------------------------------------------------------------
 # All library OBJ files
 
-OBJS = 	condasm.obj	\
+OBJS = 	asserts.obj     \
+        condasm.obj	\
 	dbginfo.obj	\
 	ea.obj		\
 	error.obj	\
@@ -55,7 +56,6 @@ OBJS = 	condasm.obj	\
 	incpath.obj	\
        	instr.obj	\
 	istack.obj	\
-        ldassert.obj    \
 	lineinfo.obj	\
 	listing.obj	\
 	macpack.obj	\

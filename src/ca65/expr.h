@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -80,8 +80,14 @@ ExprNode* BranchExpr (unsigned Offs);
 ExprNode* ULabelExpr (unsigned Num);
 /* Return an expression for an unnamed label with the given index */
 
+ExprNode* ForceByteExpr (ExprNode* Expr);
+/* Force the given expression into a byte and return the result */
+
 ExprNode* ForceWordExpr (ExprNode* Expr);
 /* Force the given expression into a word and return the result. */
+
+ExprNode* CompareExpr (ExprNode* Expr, long Val);
+/* Generate an expression that compares Expr and Val for equality */
 
 int IsConstExpr (ExprNode* Root);
 /* Return true if the given expression is a constant expression, that is, one

@@ -6,8 +6,8 @@
 
 ; Runtime support for longs.
 
-	.import		popax, pusheax, staspic
-	.importzp	sp, sreg, tmp2, ptr1
+	.import	    	popax, pusheax
+	.importzp   	sp, sreg, tmp1, tmp2, tmp3, ptr1
 
 ;
 ; leax    (sp),y
@@ -53,7 +53,7 @@ pushlysp:
 ;
 ; eax --> ((sp)); pop
 ;
-	.export		steaxspp
+	.export	    	steaxspp
 
 steaxspp:
 	pha
@@ -80,11 +80,18 @@ steaxspp:
 ;
 ; eax --> ((sp)),y
 ;
-	.export		steaxspidx
+	.export	    	steaxspidx
 
 steaxspidx:
-	jsr	staspic		; Get pointer, store a
-	pha
+   	sta	tmp1
+   	stx	tmp2
+   	sty	tmp3
+   	jsr	popax	   	; get the pointer
+   	sta	ptr1
+   	stx	ptr1+1
+   	ldy	tmp3
+   	lda	tmp1
+   	sta	(ptr1),y
 	iny
 	lda	tmp2
 	sta	(ptr1),y
@@ -95,6 +102,6 @@ steaxspidx:
 	iny
 	lda	sreg+1
 	sta	(ptr1),y
-	pla
+	lda	tmp1
 	rts
 

@@ -48,7 +48,7 @@
 
 
 /* Maximum count of nested .ifs */
-#define MAX_IFS		32
+#define MAX_IFS		256
 
 /* Set of bitmapped flags for the if descriptor */
 enum {

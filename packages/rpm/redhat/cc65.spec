@@ -11,7 +11,7 @@
 Summary: Crosscompiler/Crossassembler for 6502 systems
 %define name cc65
 Name: %{name}
-%define version 2.9.0
+%define version 2.9.5
 Version: %{version}
 Release: 1
 Copyright: Freeware with exceptions - see docs
@@ -36,13 +36,7 @@ machines, you have to install at least one of the library packages.
 %doc announce.txt
 %doc doc/BUGS
 %doc doc/CREDITS
-%doc doc/*.html
-%doc doc/compile.txt
-%doc doc/grc.txt
-%doc doc/internal.txt
-%doc doc/newvers.txt
 %doc doc/readme.1st
-%doc samples
 %attr(755,root,root)   		/usr/bin/ar65
 %attr(755,root,root)   		/usr/bin/ca65
 %attr(755,root,root) 		/usr/bin/ca65html
@@ -68,6 +62,32 @@ machines, you have to install at least one of the library packages.
 
 
 ###############################################################################
+#                          Documentation subpackage                           #
+###############################################################################
+
+%package doc
+
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: Documentation for the cc65 C compiler
+Group: Development/Languages
+
+%description doc
+This package contains the documentation for the cc65 C compiler, mostly
+in HTML format. Other formats can be generated from the sources.
+
+%files doc
+%doc doc/*.html
+%doc doc/compile.txt
+%doc doc/grc.txt
+%doc doc/internal.txt
+%doc doc/newvers.txt
+%doc samples
+%doc src/ld65/cfg/*.cfg
+
+
+
+###############################################################################
 #		     	      Apple ][ subpackage     			      #
 ###############################################################################
 
@@ -82,10 +102,9 @@ This package contains the header files and libraries needed to write
 programs for the Apple ][ using the cc65 crosscompiler.
 
 %files apple2
-%attr(644,root,root)		/usr/lib/cc65/lib/apple2.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/apple2.o
+%attr(644,root,root) 		/usr/lib/cc65/lib/apple2.lib
+%attr(644,root,root) 		/usr/lib/cc65/lib/apple2.o
 %attr(644,root,root) 		/usr/lib/cc65/joy/a2-*.joy
-%doc src/ld65/cfg/apple2.cfg
 
 
 
@@ -106,7 +125,6 @@ programs for the 8 bit Atari machines using the cc65 crosscompiler.
 %files atari
 %attr(644,root,root)  		/usr/lib/cc65/lib/atari.lib
 %attr(644,root,root)  		/usr/lib/cc65/lib/atari.o
-%doc src/ld65/cfg/atari.cfg
 
 
 
@@ -127,7 +145,6 @@ programs for the Oric Atmos using the cc65 crosscompiler.
 %files atmos
 %attr(644,root,root)		/usr/lib/cc65/lib/atmos.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/atmos.o
-%doc src/ld65/cfg/atmos.cfg
 
 
 
@@ -151,7 +168,6 @@ programs for the Commodore C128 using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/emd/c128-*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/c128-*.joy
 %attr(644,root,root) 		/usr/lib/cc65/tgi/c128-*.tgi
-%doc src/ld65/cfg/c128.cfg
 
 
 
@@ -173,7 +189,6 @@ programs for the Commodore C16/116 using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/lib/c16.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/c16.o
 %attr(644,root,root) 		/usr/lib/cc65/joy/c16-*.joy
-%doc src/ld65/cfg/c16.cfg
 
 
 
@@ -197,7 +212,6 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/emd/c64-*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/c64-*.joy
 %attr(644,root,root) 		/usr/lib/cc65/tgi/c64-*.tgi
-%doc src/ld65/cfg/c64.cfg
 
 
 
@@ -219,7 +233,6 @@ crosscompiler.
 %files cbm510
 %attr(644,root,root)   		/usr/lib/cc65/lib/cbm510.lib
 %attr(644,root,root)   		/usr/lib/cc65/lib/cbm510.o
-%doc src/ld65/cfg/cbm510.cfg
 
 
 
@@ -241,7 +254,6 @@ the cc65 crosscompiler.
 %files cbm610
 %attr(644,root,root)   		/usr/lib/cc65/lib/cbm610.lib
 %attr(644,root,root)   		/usr/lib/cc65/lib/cbm610.o
-%doc src/ld65/cfg/cbm610.cfg
 
 
 
@@ -265,7 +277,6 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 %attr(644,root,root)		/usr/lib/cc65/lib/geos.o
 %attr(755,root,root) %dir	/usr/lib/cc65/include/geos
 %attr(644,root,root)   		/usr/lib/cc65/include/geos/*.h
-%doc src/ld65/cfg/geos.cfg
 
 
 
@@ -287,7 +298,6 @@ crosscompiler.
 %files nes
 %attr(644,root,root)		/usr/lib/cc65/lib/nes.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/nes.o
-%doc src/ld65/cfg/nes.cfg
 
 
 
@@ -309,7 +319,6 @@ crosscompiler.
 %files pet
 %attr(644,root,root)		/usr/lib/cc65/lib/pet.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/pet.o
-%doc src/ld65/cfg/pet.cfg
 
 
 
@@ -332,7 +341,6 @@ crosscompiler.
 %attr(644,root,root)   		/usr/lib/cc65/lib/plus4.lib
 %attr(644,root,root)   		/usr/lib/cc65/lib/plus4.o
 %attr(644,root,root) 		/usr/lib/cc65/joy/plus4-*.joy
-%doc src/ld65/cfg/plus4.cfg
 
 
 
@@ -353,7 +361,6 @@ programs for the Supervision Game console using the cc65 crosscompiler.
 %files supervision
 %attr(644,root,root)		/usr/lib/cc65/lib/supervision.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/supervision.o
-%doc src/ld65/cfg/supervision.cfg
 
 
 
@@ -375,7 +382,6 @@ programs for the Commodore VIC20 using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/lib/vic20.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/vic20.o
 %attr(644,root,root) 		/usr/lib/cc65/joy/vic20-*.joy
-%doc src/ld65/cfg/vic20.cfg
 
 
 
@@ -391,11 +397,11 @@ programs for the Commodore VIC20 using the cc65 crosscompiler.
 
 %build
 # Binaries
-cd src; make -f make/gcc.mak; cd ..
+make -C src -f make/gcc.mak
 # Libraries
-cd libsrc; make -s zap all; cd ..
+make -C libsrc -s zap all
 # Documentation
-cd doc; make html; cd ..
+make -C doc html
 
 
 %install
@@ -434,6 +440,9 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Sun Oct 19 2003 Ullrich von Bassewitz <uz@cc65.org>
+- Move documentation into a separate doc package.
+
 * Fri Oct 10 2003 Ullrich von Bassewitz <uz@cc65.org>
 - Added the Supervision subpackage.
 
@@ -450,7 +459,6 @@ rm -rf $RPM_BUILD_ROOT
 * Mon Apr 14 2003 Ullrich von Bassewitz <uz@cc65.org>
 Added a subpackage for the Oric Atmos.
 
-%changelog
 * Mon Feb 10 2003 Ullrich von Bassewitz <uz@cc65.org>
 Added the object file conversion utility co65.
 

@@ -909,12 +909,15 @@ unsigned OptStoreLoad (CodeSeg* S)
 	/* Check if it is a store instruction followed by a load from the
 	 * same address which is itself not followed by a conditional branch.
 	 */
-	if ((E->Info & OF_STORE) != 0                 &&
-	    (N = CS_GetNextEntry (S, I)) != 0  	      &&
-	    !CE_HasLabel (N)                          &&
-       	    (N->Info & OF_LOAD) != 0                  &&
-	    strcmp (E->Arg, N->Arg) == 0              &&
-	    (X = CS_GetNextEntry (S, I+1)) != 0       &&
+	if ((E->Info & OF_STORE) != 0                       &&
+	    (N = CS_GetNextEntry (S, I)) != 0  	            &&
+	    !CE_HasLabel (N)                                &&
+       	    (N->Info & OF_LOAD) != 0                        &&
+       	    ((E->OPC == OP65_STA && N->OPC == OP65_LDA) ||
+	     (E->OPC == OP65_STX && N->OPC == OP65_LDX) ||
+	     (E->OPC == OP65_STY && N->OPC == OP65_LDY))    &&
+	    strcmp (E->Arg, N->Arg) == 0                    &&
+	    (X = CS_GetNextEntry (S, I+1)) != 0             &&
        	    (X->Info & OF_FBRA) == 0) {
 
 	    /* Register value is not used, remove the load */

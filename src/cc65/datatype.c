@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
@@ -368,7 +368,7 @@ void PrintRawType (FILE* F, const type* Type)
 
 
 void Encode (type* Type, unsigned long Val)
-/* Encode p[0] and p[1] so that neither p[0] nore p[1] is zero */
+/* Encode Val into the given type string */
 {
     int I;
     for (I = 0; I < DECODE_SIZE; ++I) {
@@ -429,6 +429,7 @@ unsigned SizeOf (const type* T)
 /* Compute size of object represented by type array. */
 {
     SymEntry* Entry;
+    long      ElementCount;
 
     switch (UnqualifiedType (T[0])) {
 
@@ -470,11 +471,17 @@ unsigned SizeOf (const type* T)
 
 	case T_STRUCT:
 	case T_UNION:
-       	    Entry = (SymEntry*) DecodePtr (T+1);
+       	    Entry = DecodePtr (T+1);
        	    return Entry->V.S.Size;
 
 	case T_ARRAY:
-	    return (Decode (T+ 1) * SizeOf (T + DECODE_SIZE + 1));
+            ElementCount = GetElementCount (T);
+            if (ElementCount < 0) {
+                /* Array with unspecified size */
+                return 0;
+            } else {
+	        return ElementCount * SizeOf (T + DECODE_SIZE + 1);
+            }
 
     	default:
 	    Internal ("Unknown type in SizeOf: %04X", *T);
@@ -564,7 +571,7 @@ unsigned TypeOf (const type* T)
        	    return CF_LONG | CF_UNSIGNED;
 
         case T_FUNC:
-	    F = (FuncDesc*) DecodePtr (T+1);
+	    F = DecodePtr (T+1);
 	    return (F->Flags & FD_VARIADIC)? 0 : CF_FIXARGC;
 
         case T_STRUCT:
@@ -714,7 +721,7 @@ FuncDesc* GetFuncDesc (const type* T)
     CHECK (T[0] == T_FUNC);
 
     /* Decode the function descriptor and return it */
-    return (FuncDesc*) DecodePtr (T+1);
+    return DecodePtr (T+1);
 }
 
 
@@ -733,6 +740,17 @@ type* GetFuncReturn (type* T)
     /* Return a pointer to the return type */
     return T + 1 + DECODE_SIZE;
 
+}
+
+
+
+long GetElementCount (const type* T)
+/* Get the element count of the array specified in T (which must be of
+ * array type).
+ */
+{
+    CHECK (IsTypeArray (T));
+    return (unsigned) Decode (T+1);
 }
 
 

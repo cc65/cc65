@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -107,7 +107,7 @@ static int EqualSymTables (SymTable* Tab1, SymTable* Tab2)
                 return 0;
             }
         }
-                                
+
         /* Compare the types of this field */
        	if (TypeCmp (Sym1->Type, Sym2->Type) < TC_EQUAL) {
 	    /* Field types not equal */
@@ -149,7 +149,7 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
        	type LeftType, RightType;
 	type LeftSign, RightSign;
 	type LeftQual, RightQual;
-	unsigned LeftCount, RightCount;
+	long LeftCount, RightCount;
 
        	/* Check if the end of the type string is reached */
        	if (*rhs == T_END) {
@@ -274,9 +274,11 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
 
     	    case T_TYPE_ARRAY:
     	       	/* Check member count */
-    	       	LeftCount  = Decode (lhs+1);
-    	       	RightCount = Decode (rhs+1);
-    	       	if (LeftCount != 0 && RightCount != 0 && LeftCount != RightCount) {
+    	       	LeftCount  = GetElementCount (lhs);
+    	       	RightCount = GetElementCount (rhs);
+       	       	if (LeftCount  != UNSPECIFIED &&
+                    RightCount != UNSPECIFIED &&
+                    LeftCount  != RightCount) {
     	       	    /* Member count given but different */
 		    SetResult (Result, TC_INCOMPATIBLE);
     	       	    return;

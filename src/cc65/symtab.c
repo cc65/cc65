@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -717,17 +717,17 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
     	if (IsTypeArray (Type) && IsTypeArray (EType)) {
 
     	    /* Get the array sizes */
-    	    unsigned Size  = Decode (Type + 1);
-    	    unsigned ESize = Decode (EType + 1);
+    	    long Size  = GetElementCount (Type);
+    	    long ESize = GetElementCount (EType);
 
-    	    if ((Size != 0 && ESize != 0 && Size != ESize) ||
+       	    if ((Size != UNSPECIFIED && ESize != UNSPECIFIED && Size != ESize) ||
     	  	TypeCmp (Type+DECODE_SIZE+1, EType+DECODE_SIZE+1) < TC_EQUAL) {
     	  	/* Types not identical: Conflicting types */
     	  	Error ("Conflicting types for `%s'", Name);
 		return Entry;
     	    } else {
     	  	/* Check if we have a size in the existing definition */
-    	  	if (ESize == 0) {
+    	  	if (ESize == UNSPECIFIED) {                           
     	  	    /* Existing, size not given, use size from new def */
     	  	    Encode (EType + 1, Size);
     	  	}

@@ -144,6 +144,9 @@ typedef unsigned short type;
 /* Type elements needed for Encode/Decode */
 #define DECODE_SIZE    	5
 
+/* Unspecified size for the element count of an array */
+#define UNSPECIFIED     -1L
+
 /* Sizes */
 #define SIZEOF_CHAR     1
 #define SIZEOF_SHORT    2
@@ -218,7 +221,7 @@ void PrintFuncSig (FILE* F, const char* Name, type* Type);
 /* Print a function signature. */
 
 void Encode (type* Type, unsigned long Val);
-/* Encode an unsigned long into a type array */
+/* Encode Val into the given type string */
 
 void EncodePtr (type* Type, void* P);
 /* Encode a pointer into a type array */
@@ -473,6 +476,11 @@ FuncDesc* GetFuncDesc (const type* T) attribute ((const));
 
 type* GetFuncReturn (type* T) attribute ((const));
 /* Return a pointer to the return type of a function or pointer-to-function type */
+
+long GetElementCount (const type* T);
+/* Get the element count of the array specified in T (which must be of
+ * array type).
+ */
 
 
 

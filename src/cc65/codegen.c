@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -4013,10 +4013,12 @@ void g_defbytes (const void* Bytes, unsigned Count)
 
 
 
-void g_zerobytes (unsigned n)
-/* Output n bytes of data initialized with zero */
+void g_zerobytes (unsigned Count)
+/* Output Count bytes of data initialized with zero */
 {
-    AddDataLine ("\t.res\t%u,$00", n);
+    if (Count > 0) {
+        AddDataLine ("\t.res\t%u,$00", Count);
+    }
 }
 
 

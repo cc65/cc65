@@ -1,11 +1,11 @@
-;							
+;
 ; int vsprintf (char* Buf, const char* Format, va_list ap);
 ;
 ; Ullrich von Bassewitz, 1.12.2000
 ;
 
    	.export	      	_vsprintf
-	.import	      	pushax, popax, push1
+	.import	      	pushax, popax
 	.import	      	_memcpy, __printf
 	.importzp     	sp, ptr1
 

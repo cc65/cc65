@@ -534,11 +534,31 @@ static ExprNode* Function (ExprNode* (*F) (void))
 
 
 
+static ExprNode* Symbol (SymEntry* S)
+/* Reference a symbol and return an expression for it */
+{
+    if (S == 0) {
+        /* Some weird error happened before */
+        return GenLiteralExpr (0);
+    } else {
+        /* Mark the symbol as referenced */
+        SymRef (S);
+        /* Remove the symbol if possible */
+        if (SymHasExpr (S)) {
+            return CloneExpr (GetSymExpr (S));
+        } else {
+            /* Create symbol node */
+            return GenSymExpr (S);
+        }
+    }
+}
+
+
+
 static ExprNode* Factor (void)
 {
     ExprNode* L;
     ExprNode* N;
-    SymEntry* S;
     long      Val;
 
     switch (Tok) {
@@ -555,23 +575,13 @@ static ExprNode* Factor (void)
 
 	case TOK_NAMESPACE:
 	case TOK_IDENT:
-	    /* Search for the symbol */
-	    S = ParseScopedSymName (SYM_ALLOC_NEW);
-	    if (S == 0) {
-		/* Some weird error happened before */
-		N = GenLiteralExpr (0);
-	    } else {
-		/* Mark the symbol as referenced */
-		SymRef (S);
-                /* Remove the symbol if possible */
-                if (SymHasExpr (S)) {
-                    N = CloneExpr (GetSymExpr (S));
-                } else {
-                    /* Create symbol node */
-                    N = GenSymExpr (S);
-                }
-	    }
+            N = Symbol (ParseScopedSymName (SYM_ALLOC_NEW));
 	    break;
+
+        case TOK_LOCAL_IDENT:
+            N = Symbol (SymFindLocal (SVal, SYM_ALLOC_NEW));
+            NextTok ();
+            break;
 
 	case TOK_ULABEL:
 	    N = ULabRef (IVal);

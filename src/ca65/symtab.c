@@ -64,9 +64,7 @@
 /* Combined symbol entry flags used within this module */
 #define SF_UNDEFMASK	(SF_REFERENCED | SF_DEFINED | SF_IMPORT)
 #define SF_UNDEFVAL	(SF_REFERENCED)
-#define SF_EXPMASK	(SF_TRAMPOLINE | SF_EXPORT)
-#define SF_EXPVAL	(SF_EXPORT)
-#define SF_DBGINFOMASK	(SF_TRAMPOLINE | SF_DEFINED | SF_EXPORT | SF_IMPORT)
+#define SF_DBGINFOMASK 	(SF_UNUSED | SF_DEFINED | SF_EXPORT | SF_IMPORT)
 #define SF_DBGINFOVAL 	(SF_DEFINED)
 
 /* Symbol tables */
@@ -74,8 +72,8 @@ SymTable*      	CurrentScope = 0;       /* Pointer to current symbol table */
 SymTable*	RootScope    = 0;       /* Root symbol table */
 
 /* Symbol table variables */
-static unsigned        	ImportCount = 0;/* Counter for import symbols */
-static unsigned     	ExportCount = 0;/* Counter for export symbols */
+static unsigned ImportCount = 0;        /* Counter for import symbols */
+static unsigned ExportCount = 0;        /* Counter for export symbols */
 
 
 
@@ -257,6 +255,54 @@ SymTable* SymFindAnyScope (SymTable* Parent, const char* Name)
 
 
 
+SymEntry* SymFindLocal (const char* Name, int AllocNew)
+/* Find a cheap local symbol. If AllocNew is given and the entry is not
+ * found, create a new one. Return the entry found, or the new entry created,
+ * or - in case AllocNew is zero - return 0.
+ */
+{
+    SymEntry* S;
+    int Cmp;
+
+    /* Local symbol, get the table */
+    if (!SymLast) {
+        /* No last global, so there's no local table */
+        Error ("No preceeding global symbol");
+        if (AllocNew) {
+            return NewSymEntry (Name);
+        } else {
+            return 0;
+        }
+    }
+
+    /* Search for the symbol if we have a table */
+    Cmp = SymSearchTree (SymLast->Locals, Name, &S);
+
+    /* If we found an entry, return it */
+    if (Cmp == 0) {
+        return S;
+    }
+
+    if (AllocNew) {
+
+        /* Otherwise create a new entry, insert and return it */
+        SymEntry* N = NewSymEntry (Name);
+        if (S == 0) {
+            SymLast->Locals = N;
+        } else if (Cmp < 0) {
+            S->Left = N;
+        } else {
+            S->Right = N;
+        }
+        return N;
+    }
+
+    /* We did not find the entry and AllocNew is false. */
+    return 0;
+}
+
+
+
 SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
 /* Find a new symbol table entry in the given table. If AllocNew is given and
  * the entry is not found, create a new one. Return the entry found, or the
@@ -264,78 +310,33 @@ SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
  */
 {
     SymEntry* S;
-    int Cmp;
 
-    if (IsLocalName (Name)) {
+    /* Global symbol: Get the hash value for the name */
+    unsigned Hash = HashStr (Name) % Scope->TableSlots;
 
-    	/* Local symbol, get the table */
-    	if (!SymLast) {
-    	    /* No last global, so there's no local table */
-    	    Error ("No preceeding global symbol");
-    	    if (AllocNew) {
-    	      	return NewSymEntry (Name);
-    	    } else {
-    	      	return 0;
-    	    }
-       	}
+    /* Search for the entry */
+    int Cmp = SymSearchTree (Scope->Table[Hash], Name, &S);
 
-    	/* Search for the symbol if we have a table */
-        Cmp = SymSearchTree (SymLast->Locals, Name, &S);
+    /* If we found an entry, return it */
+    if (Cmp == 0) {
+        return S;
+    }
 
-    	/* If we found an entry, return it */
-    	if (Cmp == 0) {
-    	    return S;
-    	}
+    if (AllocNew) {
 
-    	if (AllocNew) {
+        /* Otherwise create a new entry, insert and return it */
+        SymEntry* N = NewSymEntry (Name);
+        if (S == 0) {
+            Scope->Table[Hash] = N;
+        } else if (Cmp < 0) {
+            S->Left = N;
+        } else {
+            S->Right = N;
+        }
+        N->SymTab = Scope;
+        ++Scope->TableEntries;
+        return N;
 
-    	    /* Otherwise create a new entry, insert and return it */
-    	    SymEntry* N = NewSymEntry (Name);
-    	    if (S == 0) {
-    	 	SymLast->Locals = N;
-    	    } else if (Cmp < 0) {
-    	 	S->Left = N;
-    	    } else {
-    	 	S->Right = N;
-    	    }
-    	    return N;
-    	}
-
-    } else {
-
-    	/* Global symbol: Get the hash value for the name */
-       	unsigned Hash = HashStr (Name) % Scope->TableSlots;
-
-	/* Search for the entry */
-	Cmp = SymSearchTree (Scope->Table[Hash], Name, &S);
-
-	/* If we found an entry, return it */
-	if (Cmp == 0) {
-	    /* Check for a trampoline entry, in this case return the real
-	     * symbol.
-	     */
-	    while (S->Flags & SF_TRAMPOLINE) {
-	     	S = S->V.Sym;
-	    }
-            return S;
-	}
-
-	if (AllocNew) {
-
-	    /* Otherwise create a new entry, insert and return it */
-	    SymEntry* N = NewSymEntry (Name);
-	    if (S == 0) {
-	     	Scope->Table[Hash] = N;
-	    } else if (Cmp < 0) {
-	     	S->Left = N;
-	    } else {
-	     	S->Right = N;
-	    }
-       	    N->SymTab = Scope;
-	    ++Scope->TableEntries;
-	    return N;
-
-	}
     }
 
     /* We did not find the entry and AllocNew is false. */
@@ -372,11 +373,6 @@ static SymEntry* SymFindAny (SymTable* Scope, const char* Name)
 int SymIsZP (SymEntry* S)
 /* Return true if the symbol is explicitly marked as zeropage symbol */
 {
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
     /* If the symbol is not a global symbol, was not defined before, check the
      * enclosing scope for a symbol with the same name, and return the ZP
      * attribute of this symbol if we find one.
@@ -443,28 +439,50 @@ static void SymCheckUndefined (SymEntry* S)
 	    }
 	}
     }
+
     if (Sym) {
-	/* We found the symbol in a higher level. Make S a trampoline
-	 * symbol. Beware: We have to transfer the symbol attributes to
-	 * the real symbol and check for any conflicts.
-	 */
-	S->Flags |= SF_TRAMPOLINE;
-	S->V.Sym = Sym;
 
-	/* Transfer the flags. Note: S may not be imported, since in that
-	 * case it wouldn't be undefined.
-	 */
-       	if (S->Flags & SF_EXPORT) {
+        /* We found the symbol in a higher level. Transfer the flags and
+         * address size from the local symbol to that in the higher level
+         * and check for problems.
+         */
+        if (S->Flags & SF_EXPORT) {
 	    if (Sym->Flags & SF_IMPORT) {
-	       	/* The symbol is already marked as imported external symbol */
-	       	PError (&S->Pos, "Symbol `%s' is already an import", GetString (S->Name));
+	       	/* The symbol is already marked as import */
+	       	PError (&S->Pos, "Symbol `%s' is already an import",
+                        GetString (Sym->Name));
 	    }
-	    Sym->Flags |= (S->Flags & SF_EXPORT);
-            Sym->ExportSize = S->ExportSize;
-	}
+            if (Sym->Flags & SF_EXPORT) {
+                /* The symbol is already marked as an export. */
+                if (Sym->AddrSize > S->ExportSize) {
+                    /* We're exporting a symbol smaller than it actually is */
+                    PWarning (&S->Pos, 1, "Symbol `%s' is %s but exported %s",
+                              GetSymName (Sym), AddrSizeToStr (Sym->AddrSize),
+                              AddrSizeToStr (S->ExportSize));
+                }
+            } else {
+                /* Mark the symbol as an export */
+                Sym->Flags |= SF_EXPORT;
+                Sym->ExportSize = S->ExportSize;
+                if (Sym->ExportSize == ADDR_SIZE_DEFAULT) {
+                    /* Use the actual size of the symbol */
+                    Sym->ExportSize = Sym->AddrSize;
+                }
+                if (Sym->AddrSize > Sym->ExportSize) {
+                    /* We're exporting a symbol smaller than it actually is */
+                    PWarning (&S->Pos, 1, "Symbol `%s' is %s but exported %s",
+                              GetSymName (Sym), AddrSizeToStr (Sym->AddrSize),
+                              AddrSizeToStr (Sym->ExportSize));
+                }
+            }
+        }
+        Sym->Flags |= (S->Flags & SF_REFERENCED);
 
-	/* Transfer the referenced flag */
-	Sym->Flags |= (S->Flags & SF_REFERENCED);
+        /* Transfer all expression references */
+        SymTransferExprRefs (S, Sym);
+
+        /* Mark the symbol as unused removing all other flags */
+        S->Flags = SF_UNUSED;
 
     } else {
 	/* The symbol is definitely undefined */
@@ -474,12 +492,12 @@ static void SymCheckUndefined (SymEntry* S)
                     GetString (S->Name));
 	} else {
 	    if (AutoImport) {
-		/* Mark as import, will be indexed later */
-		S->Flags |= SF_IMPORT;
+	    	/* Mark as import, will be indexed later */
+	    	S->Flags |= SF_IMPORT;
                 /* Use the address size for code */
                 S->AddrSize = CodeAddrSize;
 	    } else {
-		/* Error */
+	    	/* Error */
 	        PError (&S->Pos, "Symbol `%s' is undefined", GetString (S->Name));
 	    }
 	}
@@ -509,9 +527,9 @@ void SymCheck (void)
 	if (S->Flags & SF_GLOBAL) {
 	    S->Flags &= ~SF_GLOBAL;
 	    if (S->Flags & SF_DEFINED) {
-		S->Flags |= SF_EXPORT;
+	    	S->Flags |= SF_EXPORT;
 	    } else {
-		S->Flags |= SF_IMPORT;
+	    	S->Flags |= SF_IMPORT;
 	    }
 	}
 
@@ -526,35 +544,35 @@ void SymCheck (void)
     }
 
     /* Second pass: Walk again through the symbols. Ignore undefined's, since
-     * we handled them in the last pass, and ignore trampoline symbols, since
+     * we handled them in the last pass, and ignore unused symbols, since
      * we handled them in the last pass, too.
      */
     S = SymList;
     while (S) {
-	if ((S->Flags & SF_TRAMPOLINE) == 0 &&
+	if ((S->Flags & SF_UNUSED) == 0 &&
 	    (S->Flags & SF_UNDEFMASK) != SF_UNDEFVAL) {
 	    if ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_REFERENCED) == 0) {
-		/* Symbol was defined but never referenced */
-		PWarning (&S->Pos, 2,
+	    	/* Symbol was defined but never referenced */
+	    	PWarning (&S->Pos, 2,
                           "Symbol `%s' is defined but never used",
                           GetString (S->Name));
 	    }
 	    if (S->Flags & SF_IMPORT) {
-		if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
-		    /* Imported symbol is not referenced */
-		    PWarning (&S->Pos, 2,
+	    	if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
+	    	    /* Imported symbol is not referenced */
+	    	    PWarning (&S->Pos, 2,
                               "Symbol `%s' is imported but never used",
                               GetString (S->Name));
-		} else {
-		    /* Give the import an index, count imports */
-		    S->Index = ImportCount++;
-		    S->Flags |= SF_INDEXED;
-		}
+	    	} else {
+	    	    /* Give the import an index, count imports */
+	    	    S->Index = ImportCount++;
+	    	    S->Flags |= SF_INDEXED;
+	    	}
 	    }
 	    if (S->Flags & SF_EXPORT) {
-		/* Give the export an index, count exports */
-		S->Index = ExportCount++;
-		S->Flags |= SF_INDEXED;
+	    	/* Give the export an index, count exports */
+	    	S->Index = ExportCount++;
+	    	S->Flags |= SF_INDEXED;
 	    }
 	}
 
@@ -571,8 +589,8 @@ void SymDump (FILE* F)
     SymEntry* S = SymList;
 
     while (S) {
-	/* Ignore trampoline symbols */
-	if ((S->Flags & SF_TRAMPOLINE) != 0) {
+	/* Ignore unused symbols */
+	if ((S->Flags & SF_UNUSED) != 0) {
 	    fprintf (F,
 		     "%-24s %s %s %s %s %s\n",
 		     GetString (S->Name),
@@ -607,7 +625,7 @@ void WriteImports (void)
      */
     S = SymList;
     while (S) {
-        if ((S->Flags & (SF_TRAMPOLINE | SF_IMPORT)) == SF_IMPORT &&
+        if ((S->Flags & (SF_UNUSED | SF_IMPORT)) == SF_IMPORT &&
             (S->Flags & (SF_REFERENCED | SF_FORCED)) != 0) {
 
             ObjWrite8 (S->AddrSize);
@@ -638,7 +656,7 @@ void WriteExports (void)
     /* Walk throught list and write all exports to the file */
     S = SymList;
     while (S) {
-       	if ((S->Flags & SF_EXPMASK) == SF_EXPVAL) {
+       	if ((S->Flags & (SF_UNUSED | SF_EXPORT)) == SF_EXPORT) {
 
             long ConstVal;
 

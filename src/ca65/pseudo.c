@@ -1736,14 +1736,6 @@ static CtrlDesc CtrlCmdTab [] = {
 
 
 
-int TokIsPseudo (unsigned Tok)
-/* Return true if the given token is a pseudo instruction token */
-{
-    return (Tok >= TOK_FIRSTPSEUDO && Tok <= TOK_LASTPSEUDO);
-}
-
-
-
 void HandlePseudo (void)
 /* Handle a pseudo instruction */
 {

@@ -390,63 +390,58 @@ static void OneLine (void)
     }
 
     /* Assemble the line */
-    if (Tok == TOK_IDENT) {
+    if (Tok == TOK_LOCAL_IDENT || (Tok == TOK_IDENT && !IsMacro (SVal))) {
 
-     	/* Is it a macro? */
-     	if (IsMacro (SVal)) {
+        /* Did we have whitespace before the ident? */
+        int HadWS = WS;
 
-     	    /* Yes, start a macro expansion */
-     	    MacExpandStart ();
-     	    Done = 1;
+        /* Generate the symbol table entry, then skip the name */
+        SymEntry* Sym;
+        if (Tok == TOK_IDENT) {
+            Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
+        } else {
+            Sym = SymFindLocal (SVal, SYM_ALLOC_NEW);
+        }
+        NextTok ();
 
-     	} else {
-
-     	    /* No, label. Remember the identifier, then skip it */
-     	    int HadWS = WS;   	/* Did we have whitespace before the ident? */
-
-	    /* Generate the symbol table entry, then skip the name */
-	    SymEntry* Sym = SymFind (CurrentScope, SVal, SYM_ALLOC_NEW);
-     	    NextTok ();
-
-     	    /* If a colon follows, this is a label definition. If there
-     	     * is no colon, it's an assignment.
-     	     */
-       	    if (Tok == TOK_EQ || Tok == TOK_ASSIGN) {
-                /* If it's an assign token, we have a label */
-                unsigned Flags = (Tok == TOK_ASSIGN)? SF_LABEL : SF_NONE;
-     	    	/* Skip the '=' */
-     	    	NextTok ();
-     	    	/* Define the symbol with the expression following the '=' */
-     	    	SymDef (Sym, Expression(), ADDR_SIZE_DEFAULT, Flags);
-     	    	/* Don't allow anything after a symbol definition */
-     	    	Done = 1;
-     	    } else {
-     	    	/* Define a label */
-       	       	SymDef (Sym, GenCurrentPC (), ADDR_SIZE_DEFAULT, SF_LABEL);
-     	    	/* Skip the colon. If NoColonLabels is enabled, allow labels
-     	    	 * without a colon if there is no whitespace before the
-     	    	 * identifier.
-     	    	 */
-     	    	if (Tok != TOK_COLON) {
-     	    	    if (HadWS || !NoColonLabels) {
-     	    	     	Error ("`:' expected");
-     	    	    }
-     	    	    if (Tok == TOK_NAMESPACE) {
-     	    	       	/* Smart :: handling */
-     	    	       	NextTok ();
-     	    	    }
-     	    	} else {
-     	     	    /* Skip the colon */
-     	    	    NextTok ();
-     	    	}
-     	    }
-     	}
+        /* If a colon follows, this is a label definition. If there
+         * is no colon, it's an assignment.
+         */
+        if (Tok == TOK_EQ || Tok == TOK_ASSIGN) {
+            /* If it's an assign token, we have a label */
+            unsigned Flags = (Tok == TOK_ASSIGN)? SF_LABEL : SF_NONE;
+            /* Skip the '=' */
+            NextTok ();
+            /* Define the symbol with the expression following the '=' */
+            SymDef (Sym, Expression(), ADDR_SIZE_DEFAULT, Flags);
+            /* Don't allow anything after a symbol definition */
+            Done = 1;
+        } else {
+            /* Define a label */
+            SymDef (Sym, GenCurrentPC (), ADDR_SIZE_DEFAULT, SF_LABEL);
+            /* Skip the colon. If NoColonLabels is enabled, allow labels
+             * without a colon if there is no whitespace before the
+             * identifier.
+             */
+            if (Tok != TOK_COLON) {
+                if (HadWS || !NoColonLabels) {
+                    Error ("`:' expected");
+                    /* Try some smart error recovery */
+                    if (Tok == TOK_NAMESPACE) {
+                        NextTok ();
+                    }
+                }
+            } else {
+                /* Skip the colon */
+                NextTok ();
+            }
+        }
     }
 
     if (!Done) {
 
-     	if (TokIsPseudo (Tok)) {
-     	    /* A control command, IVal is index into table */
+     	if (Tok >= TOK_FIRSTPSEUDO && Tok <= TOK_LASTPSEUDO) {
+     	    /* A control command */
      	    HandlePseudo ();
      	} else if (Tok == TOK_MNEMO) {
      	    /* A mnemonic - assemble one instruction */
@@ -670,7 +665,7 @@ int main (int argc, char* argv [])
 
     /* If no memory model was given, use the default */
     if (MemoryModel == MMODEL_UNKNOWN) {
-        MemoryModel = MMODEL_NEAR;
+        SetMemoryModel (MMODEL_NEAR);
     }
 
     /* Intialize the target translation tables */

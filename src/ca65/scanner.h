@@ -56,6 +56,7 @@ enum Token {
     TOK_EOF,           	/* End of input file */
     TOK_SEP, 	 	/* Separator (usually newline) */
     TOK_IDENT,	 	/* An identifier */
+    TOK_LOCAL_IDENT,    /* A cheap local identifier */
     TOK_MNEMO, 	 	/* A mnemonic */
 
     TOK_INTCON,  	/* Integer constant */
@@ -214,7 +215,7 @@ enum Token {
     TOK_RODATA,
     TOK_SCOPE,
     TOK_SEGMENT,
-    TOK_SETCPU, 
+    TOK_SETCPU,
     TOK_SIZEOF,
     TOK_SMART,
     TOK_STRAT,

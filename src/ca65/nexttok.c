@@ -339,7 +339,7 @@ static void FuncString (void)
     ConsumeLParen ();
 
     /* Accept identifiers or numeric expressions */
-    if (Tok == TOK_IDENT) {
+    if (Tok == TOK_IDENT || Tok == TOK_LOCAL_IDENT) {
      	/* Save the identifier, then skip it */
      	strcpy (Buf, SVal);
      	NextTok ();

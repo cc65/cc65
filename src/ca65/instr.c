@@ -38,7 +38,9 @@
 #include <ctype.h>
 
 /* common */
+#include "addrsize.h"
 #include "assertdefs.h"
+#include "attrib.h"
 #include "bitops.h"
 #include "check.h"
 
@@ -69,7 +71,8 @@ static void PutBlockMove (const InsDesc* Ins);
 static void PutBitBranch (const InsDesc* Ins);
 static void PutREP (const InsDesc* Ins);
 static void PutSEP (const InsDesc* Ins);
-static void PutJmp (const InsDesc* Ins);
+static void PutJMP (const InsDesc* Ins);
+static void PutRTS (const InsDesc* Ins);
 static void PutAll (const InsDesc* Ins);
 
 
@@ -109,7 +112,7 @@ static const struct {
        	{ "INC",  0x000006c, 0x00, 4, PutAll },
        	{ "INX",  0x0000001, 0xe8, 0, PutAll },
        	{ "INY",  0x0000001, 0xc8, 0, PutAll },
-       	{ "JMP",  0x0000808, 0x4c, 6, PutJmp },
+       	{ "JMP",  0x0000808, 0x4c, 6, PutJMP },
        	{ "JSR",  0x0000008, 0x20, 7, PutAll },
        	{ "LDA",  0x080A26C, 0xa0, 0, PutAll },
        	{ "LDX",  0x080030C, 0xa2, 1, PutAll },
@@ -403,7 +406,7 @@ static const struct {
        	{ "ROR",  0x000006F, 0x62, 1, PutAll },
        	{ "RTI",  0x0000001, 0x40, 0, PutAll },
        	{ "RTL",  0x0000001, 0x6b, 0, PutAll },
-       	{ "RTS",  0x0000001, 0x60, 0, PutAll },
+       	{ "RTS",  0x0000001, 0x60, 0, PutRTS },
        	{ "SBC",  0x0b8f6fc, 0xe0, 0, PutAll },
        	{ "SEC",  0x0000001, 0x38, 0, PutAll },
        	{ "SED",  0x0000001, 0xf8, 0, PutAll },
@@ -788,7 +791,7 @@ static void PutSEP (const InsDesc* Ins)
 
 
 
-static void PutJmp (const InsDesc* Ins)
+static void PutJMP (const InsDesc* Ins)
 /* Handle the jump instruction for the 6502. Problem is that these chips have
  * a bug: If the address crosses a page, the upper byte gets not corrected and
  * the instruction will fail. The PutJmp function will add a linker assertion
@@ -818,6 +821,20 @@ static void PutJmp (const InsDesc* Ins)
 
         /* No error, output code */
         EmitCode (&A);
+    }
+}
+
+
+
+static void PutRTS (const InsDesc* Ins attribute ((unused)))
+/* Handle the RTS instruction for the 816. In smart mode emit a RTL opcode if
+ * the enclosing scope is FAR.
+ */
+{
+    if (SmartMode && CurrentScope->AddrSize == ADDR_SIZE_FAR) {
+        Emit0 (0x6B);       /* RTL */
+    } else {
+        Emit0 (0x60);       /* RTS */
     }
 }
 

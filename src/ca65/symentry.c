@@ -177,6 +177,32 @@ void SymRef (SymEntry* S)
 
 
 
+void SymTransferExprRefs (SymEntry* From, SymEntry* To)
+/* Transfer all expression references from one symbol to another. */
+{
+    unsigned I;
+
+    for (I = 0; I < CollCount (&From->ExprRefs); ++I) {
+
+        /* Get the expression node */
+        ExprNode* E = CollAtUnchecked (&From->ExprRefs, I);
+
+        /* Safety */
+        CHECK (E->Op == EXPR_SYMBOL && E->V.Sym == From);
+
+        /* Replace the symbol reference */
+        E->V.Sym = To;
+
+        /* Add the expression reference */
+        SymAddExprRef (To, E);
+    }
+
+    /* Remove all symbol references from the old symbol */
+    CollDeleteAll (&From->ExprRefs);
+}
+
+
+
 void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags)
 /* Define a new symbol */
 {
@@ -248,12 +274,6 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
 void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 /* Mark the given symbol as an imported symbol */
 {
-    /* Don't accept local symbols */
-    if (IsLocalNameId (S->Name)) {
-     	Error ("Illegal use of a local symbol");
-     	return;
-    }
-
     if (S->Flags & SF_DEFINED) {
      	Error ("Symbol `%s' is already defined", GetSymName (S));
      	S->Flags |= SF_MULTDEF;
@@ -300,12 +320,6 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
 /* Mark the given symbol as an exported symbol */
 {
-    /* Don't accept local symbols */
-    if (IsLocalNameId (S->Name)) {
-     	Error ("Illegal use of a local symbol");
-     	return;
-    }
-
     /* Check if it's ok to export the symbol */
     if (S->Flags & SF_IMPORT) {
      	/* The symbol is already marked as imported external symbol */
@@ -359,12 +373,6 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
  * either imported or exported.
  */
 {
-    /* Don't accept local symbols */
-    if (IsLocalNameId (S->Name)) {
-     	Error ("Illegal use of a local symbol");
-     	return;
-    }
-
     /* If the symbol is already marked as import, the address size must match.
      * Apart from that, ignore the global declaration.
      */
@@ -456,12 +464,6 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
 #endif
     CHECK (Prio >= CD_PRIO_MIN && Prio <= CD_PRIO_MAX);
 
-    /* Don't accept local symbols */
-    if (IsLocalNameId (S->Name)) {
-       	Error ("Illegal use of a local symbol");
-       	return;
-    }
-
     /* Check for errors */
     if (S->Flags & SF_IMPORT) {
        	/* The symbol is already marked as imported external symbol */
@@ -509,104 +511,13 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
 
 
 
-int SymIsDef (const SymEntry* S)
-/* Return true if the given symbol is already defined */
-{
-    return (S->Flags & SF_DEFINED) != 0;
-}
-
-
-
-int SymIsRef (const SymEntry* S)
-/* Return true if the given symbol has been referenced */
-{
-    return (S->Flags & SF_REFERENCED) != 0;
-}
-
-
-
-int SymIsImport (const SymEntry* S)
-/* Return true if the given symbol is marked as import */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    /* Check the import flag */
-    return (S->Flags & SF_IMPORT) != 0;
-}
-
-
-
 int SymIsConst (SymEntry* S, long* Val)
 /* Return true if the given symbol has a constant value. If Val is not NULL
  * and the symbol has a constant value, store it's value there.
  */
 {
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-    	S = S->V.Sym;
-    }
-
     /* Check for constness */
     return (SymHasExpr (S) && IsConstExpr (S->V.Expr, Val));
-}
-
-
-
-int SymHasExpr (const SymEntry* S)
-/* Return true if the given symbol has an associated expression */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    /* Check the expression */
-    return ((S->Flags & (SF_DEFINED|SF_IMPORT)) == SF_DEFINED);
-}
-
-
-
-void SymMarkUser (SymEntry* S)
-/* Set a user mark on the specified symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-       	S = S->V.Sym;
-    }
-
-    /* Set the bit */
-    S->Flags |= SF_USER;
-}
-
-
-
-void SymUnmarkUser (SymEntry* S)
-/* Remove a user mark from the specified symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    /* Reset the bit */
-    S->Flags &= ~SF_USER;
-}
-
-
-
-int SymHasUserMark (SymEntry* S)
-/* Return the state of the user mark for the specified symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
-    /* Check the bit */
-    return (S->Flags & SF_USER) != 0;
 }
 
 
@@ -614,11 +525,6 @@ int SymHasUserMark (SymEntry* S)
 struct ExprNode* GetSymExpr (SymEntry* S)
 /* Get the expression for a non-const symbol */
 {
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
     PRECONDITION (S != 0 && SymHasExpr (S));
     return S->V.Expr;
 }
@@ -630,37 +536,7 @@ const struct ExprNode* SymResolve (const SymEntry* S)
  * NULL. Do not call in other contexts!
  */
 {
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-
     return SymHasExpr (S)? S->V.Expr : 0;
-}
-
-
-
-const char* GetSymName (const SymEntry* S)
-/* Return the name of the symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-    return GetString (S->Name);
-}
-
-
-
-unsigned char GetSymAddrSize (const SymEntry* S)
-/* Return the address size of the symbol. Beware: This function will just
- * return the AddrSize member, it will not look at the expression!
- */
-{
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-    return S->AddrSize;
 }
 
 
@@ -680,27 +556,9 @@ long GetSymVal (SymEntry* S)
 unsigned GetSymIndex (const SymEntry* S)
 /* Return the symbol index for the given symbol */
 {
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
     PRECONDITION (S != 0 && (S->Flags & SF_INDEXED) != 0);
     return S->Index;
 }
-
-
-
-const FilePos* GetSymPos (const SymEntry* S)
-/* Return the position of first occurence in the source for the given symbol */
-{
-    /* Resolve trampoline entries */
-    if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
-    }
-    PRECONDITION (S != 0);
-    return &S->Pos;
-}
-
 
 
 

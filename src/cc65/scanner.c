@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -226,7 +226,7 @@ static void UnknownChar (char C)
 
 
 
-static unsigned hexval (int c)
+static unsigned HexVal (int c)
 /* Convert a hex digit into a value */
 {
     if (!IsXDigit (c)) {
@@ -301,9 +301,9 @@ static int ParseChar (void)
 	    case 'X':
 		/* Hex character constant */
 		NextChar ();
-		val = hexval (CurC) << 4;
+		val = HexVal (CurC) << 4;
 		NextChar ();
-       	       	C = val | hexval (CurC); 	/* Do not translate */
+       	       	C = val | HexVal (CurC); 	/* Do not translate */
 		break;
 	    case '0':
 	    case '1':
@@ -456,7 +456,7 @@ void NextToken (void)
      	    if (IsDigit (CurC)) {
      	     	k = k * base + (CurC - '0');
      	    } else if (base == 16 && IsXDigit (CurC)) {
-     	     	k = (k << 4) + hexval (CurC);
+     	     	k = (k << 4) + HexVal (CurC);
      	    } else {
      	     	break; 	      	/* not digit */
      	    }
@@ -535,7 +535,7 @@ void NextToken (void)
      	/* No reserved word, check for special symbols */
      	if (token [0] == '_') {
      	    /* Special symbols */
-     	    if (strcmp (token, "__FILE__") == 0) {
+            if (strcmp (token, "__FILE__") == 0) {
 	       	NextTok.IVal = AddLiteral (GetCurrentFile());
 	       	NextTok.Tok  = TOK_SCONST;
 	       	return;

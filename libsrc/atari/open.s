@@ -1,5 +1,5 @@
 ;
-; Christian Groessler, May-2000
+; Christian Groessler, May-2002
 ;
 ; int open(const char *name,int flags,...);
 ;
@@ -42,13 +42,33 @@ seterr:	jsr	__seterrno
 	rts			; return -1
 
 	; process the mode argument
-	; @@@TODO: append not handled yet!
 
 iocbok:	stx	tmp4
 	jsr	clriocb		; init with zero
 	ldy	#1
 	jsr	ldaxysp		; get mode
+	;brk
 	ldx	tmp4
+	pha
+	and	#O_APPEND
+	beq	no_app
+	pla
+	and	#15
+	cmp	#O_RDONLY	; DOS supports append with write-only only
+	beq	invret
+	cmp	#O_RDWR
+	beq	invret
+	lda	#OPNOT|APPEND
+	bne	set
+
+.ifndef	UCASE_FILENAME
+invret:	lda	#<EINVAL	; file name is too long
+	ldx	#>EINVAL
+	jmp	seterr
+.endif
+	
+no_app:	pla
+	and	#15
 	cmp	#O_RDONLY
 	bne	l1
 	lda	#OPNIN
@@ -73,7 +93,7 @@ cont:	ldy	#3
 
 	jsr	ucase_fn
 	bcc	ucok1
-	lda	#<EINVAL	; file name is too long
+invret:	lda	#<EINVAL	; file name is too long
 	ldx	#>EINVAL
 	jmp	seterr
 ucok1:

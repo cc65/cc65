@@ -540,7 +540,7 @@ irq:    pha
 
        	ldy    	irqcount
         beq     irqskip
-       	jsr    	callirq_q               ; Call the functions
+       	jsr    	callirq_y               ; Call the functions
 
 ; Done with chained IRQ handlers, check the TPI for IRQs and handle them
 

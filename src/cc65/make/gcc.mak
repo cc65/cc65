@@ -56,7 +56,6 @@ OBJS =	anonname.o	\
 	error.o	  	\
 	expr.o	 	\
         exprdesc.o      \
-	exprheap.o     	\
 	exprnode.o	\
 	funcdesc.o	\
 	function.o     	\

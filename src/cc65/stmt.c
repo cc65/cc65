@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -201,7 +201,7 @@ static void DoStatement (void)
     NextToken ();
 
     /* Add the loop to the loop stack */
-    AddLoop (oursp, BreakLabel, ContinueLabel);
+    AddLoop (StackPtr, BreakLabel, ContinueLabel);
 
     /* Define the loop label */
     g_defcodelabel (LoopLabel);
@@ -241,7 +241,7 @@ static void WhileStatement (void)
     /* Add the loop to the loop stack. In case of a while loop, the loop head
      * label is used for continue statements.
      */
-    AddLoop (oursp, BreakLabel, LoopLabel);
+    AddLoop (StackPtr, BreakLabel, LoopLabel);
 
     /* Define the head label */
     g_defcodelabel (LoopLabel);
@@ -283,7 +283,7 @@ static void ReturnStatement (void)
        	}
 
 	/* Evaluate the return expression */
-	hie0 (InitExprDesc (&Expr));
+	hie0 (&Expr);
 
 	/* Ignore the return expression if the function returns void */
     	if (!F_HasVoidReturn (CurrentFunc)) {
@@ -300,7 +300,7 @@ static void ReturnStatement (void)
     }
 
     /* Cleanup the stack in case we're inside a block with locals */
-    g_space (oursp - F_GetTopLevelSP (CurrentFunc));
+    g_space (StackPtr - F_GetTopLevelSP (CurrentFunc));
 
     /* Output a jump to the function exit code */
     g_jump (F_GetRetLab (CurrentFunc));
@@ -327,7 +327,7 @@ static void BreakStatement (void)
     }
 
     /* Correct the stack pointer if needed */
-    g_space (oursp - L->StackPtr);
+    g_space (StackPtr - L->StackPtr);
 
     /* Jump to the exit label of the loop */
     g_jump (L->BreakLabel);
@@ -362,7 +362,7 @@ static void ContinueStatement (void)
     }
 
     /* Correct the stackpointer if needed */
-    g_space (oursp - L->StackPtr);
+    g_space (StackPtr - L->StackPtr);
 
     /* Jump to next loop iteration */
     g_jump (L->ContinueLabel);
@@ -392,14 +392,14 @@ static void ForStatement (void)
     /* Add the loop to the loop stack. A continue jumps to the start of the
      * the increment condition.
      */
-    AddLoop (oursp, BreakLabel, IncLabel);
+    AddLoop (StackPtr, BreakLabel, IncLabel);
 
     /* Skip the opening paren */
     ConsumeLParen ();
 
     /* Parse the initializer expression */
     if (CurTok.Tok != TOK_SEMI) {
-    	expression0 (&lval1);
+    	Expression0 (&lval1);
     }
     ConsumeSemi ();
 
@@ -424,7 +424,7 @@ static void ForStatement (void)
     /* Parse the increment expression */
     HaveIncExpr = (CurTok.Tok != TOK_RPAREN);
     if (HaveIncExpr) {
-    	expression0 (&lval3);
+    	Expression0 (&lval3);
     }
 
     /* Jump to the test */
@@ -471,7 +471,7 @@ static int CompoundStatement (void)
     int GotBreak;
 
     /* Remember the stack at block entry */
-    int OldStack = oursp;
+    int OldStack = StackPtr;
 
     /* Enter a new lexical level */
     EnterBlockLevel ();
@@ -491,9 +491,9 @@ static int CompoundStatement (void)
 
     /* Clean up the stack. */
     if (!GotBreak) {
-	g_space (oursp - OldStack);
+	g_space (StackPtr - OldStack);
     }
-    oursp = OldStack;
+    StackPtr = OldStack;
 
     /* Emit references to imports/exports for this block */
     EmitExternals ();
@@ -590,7 +590,7 @@ int Statement (int* PendingToken)
 
 	    default:
 	        /* Actual statement */
-		expression0 (&lval);
+		Expression0 (&lval);
 	    	CheckSemi (PendingToken);
 	}
     }

@@ -78,7 +78,7 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
     /* Check for an optional initialization */
     if (CurTok.Tok == TOK_ASSIGN) {
 
-        ExprDesc lval;
+        ExprDesc Expr;
 
         /* Skip the '=' */
         NextToken ();
@@ -111,13 +111,13 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
         } else {
 
             /* Parse the expression */
-            hie1 (InitExprDesc (&lval));
+            hie1 (&Expr);
 
             /* Convert it to the target type */
-            TypeConversion (&lval, Decl->Type);
+            TypeConversion (&Expr, Decl->Type);
 
             /* Load the value into the primary */
-            ExprLoad (CF_NONE, &lval);
+            ExprLoad (CF_NONE, &Expr);
 
             /* Store the value into the variable */
             g_putstatic (CF_REGVAR | TypeOf (Decl->Type), Reg, 0);
@@ -161,7 +161,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
         /* Check for an optional initialization */
         if (CurTok.Tok == TOK_ASSIGN) {
 
-            ExprDesc lval;
+            ExprDesc Expr;
 
             /* Skip the '=' */
             NextToken ();
@@ -207,23 +207,23 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
                 Flags = (Size == SIZEOF_CHAR)? CF_FORCECHAR : CF_NONE;
 
                 /* Parse the expression */
-                hie1 (InitExprDesc (&lval));
+                hie1 (&Expr);
 
                 /* Convert it to the target type */
-                TypeConversion (&lval, Decl->Type);
+                TypeConversion (&Expr, Decl->Type);
 
                 /* If the value is not const, load it into the primary.
                  * Otherwise pass the information to the code generator.
-                 */
-                if (ED_IsLVal (&lval) || lval.Flags != E_MCONST) {
-                    ExprLoad (CF_NONE, &lval);
-                    ED_MakeRVal (&lval);
-                } else {
+                 */ 
+                if (ED_IsConstAbsInt (&Expr)) {
                     Flags |= CF_CONST;
+                } else {
+                    ExprLoad (CF_NONE, &Expr);
+                    ED_MakeRVal (&Expr);
                 }
 
                 /* Push the value */
-                g_push (Flags | TypeOf (Decl->Type), lval.ConstVal);
+                g_push (Flags | TypeOf (Decl->Type), Expr.Val);
 
             }
 
@@ -231,7 +231,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
             *SC |= SC_REF;
 
             /* Variable is located at the current SP */
-            SymData = oursp;
+            SymData = StackPtr;
 
         } else {
             /* Non-initialized local variable. Just keep track of
@@ -258,7 +258,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
         /* Allow assignments */
         if (CurTok.Tok == TOK_ASSIGN) {
 
-            ExprDesc lval;
+            ExprDesc Expr;
 
             /* Skip the '=' */
             NextToken ();
@@ -283,13 +283,13 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
             } else {
 
                 /* Parse the expression */
-                hie1 (InitExprDesc (&lval));
+                hie1 (&Expr);
 
                 /* Convert it to the target type */
-                TypeConversion (&lval, Decl->Type);
+                TypeConversion (&Expr, Decl->Type);
 
                 /* Load the value into the primary */
-                ExprLoad (CF_NONE, &lval);
+                ExprLoad (CF_NONE, &Expr);
 
                 /* Store the value into the variable */
                 g_putstatic (TypeOf (Decl->Type), SymData, 0);
@@ -447,7 +447,7 @@ void DeclareLocals (void)
 /* Declare local variables and types. */
 {
     /* Remember the current stack pointer */
-    int InitialStack = oursp;
+    int InitialStack = StackPtr;
 
     /* Loop until we don't find any more variables */
     while (1) {
@@ -501,7 +501,7 @@ void DeclareLocals (void)
     /* In case we've allocated local variables in this block, emit a call to
      * the stack checking routine if stack checks are enabled.
      */
-    if (IS_Get (&CheckStack) && InitialStack != oursp) {
+    if (IS_Get (&CheckStack) && InitialStack != StackPtr) {
        	g_cstackcheck ();
     }
 }

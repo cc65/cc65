@@ -269,8 +269,8 @@ static void ParseEnumDecl (void)
    	if (CurTok.Tok == TOK_ASSIGN) {
     	    ExprDesc lval;
    	    NextToken ();
-   	    ConstExpr (&lval);
-   	    EnumVal = lval.ConstVal;
+   	    ConstAbsIntExpr (hie1, &lval);
+   	    EnumVal = lval.Val;
     	}
 
 	/* Add an entry to the symbol table */
@@ -1046,16 +1046,16 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 	    /* Read the size if it is given */
        	    if (CurTok.Tok != TOK_RBRACK) {
     	     	ExprDesc lval;
-       	       	ConstExpr (&lval);
-                if (lval.ConstVal <= 0) {
+       	       	ConstAbsIntExpr (hie1, &lval);
+                if (lval.Val <= 0) {
                     if (D->Ident[0] != '\0') {
                         Error ("Size of array `%s' is invalid", D->Ident);
                     } else {
                         Error ("Size of array is invalid");
                     }
-                    lval.ConstVal = 1;
+                    lval.Val = 1;
                 }
-       	       	Size = lval.ConstVal;
+       	       	Size = lval.Val;
        	    }
        	    ConsumeRBrack ();
 
@@ -1222,7 +1222,7 @@ static unsigned ParseScalarInit (type* T)
     }
 
     /* Get the expression and convert it to the target type */
-    ConstExpr (&ED);
+    ConstExpr (hie1, &ED);
     TypeConversion (&ED, T);
 
     /* Output the data */
@@ -1245,11 +1245,7 @@ static unsigned ParsePointerInit (type* T)
 
     /* Expression */
     ExprDesc ED;
-    ConstExpr (&ED);
-    if ((ED.Flags & E_MCTYPE) == E_TCONST) {
-        /* Make the const value the correct size */
-        ED.ConstVal &= 0xFFFF;
-    }
+    ConstExpr (hie1, &ED);
     TypeConversion (&ED, T);
 
     /* Output the data */
@@ -1419,7 +1415,7 @@ static unsigned ParseVoidInit (void)
  * Return the number of bytes initialized.
  */
 {
-    ExprDesc lval;
+    ExprDesc Expr;
     unsigned Size;
 
     /* Opening brace */
@@ -1428,16 +1424,16 @@ static unsigned ParseVoidInit (void)
     /* Allow an arbitrary list of values */
     Size = 0;
     do {
-	ConstExpr (&lval);
-	switch (UnqualifiedType (lval.Type[0])) {
+	ConstExpr (hie1, &Expr);
+	switch (UnqualifiedType (Expr.Type[0])) {
 
 	    case T_SCHAR:
 	    case T_UCHAR:
-		if ((lval.Flags & E_MCTYPE) == E_TCONST) {
+		if (ED_IsConstAbsInt (&Expr)) {
 		    /* Make it byte sized */
-		    lval.ConstVal &= 0xFF;
+		    Expr.Val &= 0xFF;
 		}
-		DefineData (&lval);
+		DefineData (&Expr);
                 Size += SIZEOF_CHAR;
                 break;
 
@@ -1447,17 +1443,21 @@ static unsigned ParseVoidInit (void)
 	    case T_UINT:
 	    case T_PTR:
 	    case T_ARRAY:
-	   	if ((lval.Flags & E_MCTYPE) == E_TCONST) {
+	   	if (ED_IsConstAbsInt (&Expr)) {
     	      	    /* Make it word sized */
-	   	    lval.ConstVal &= 0xFFFF;
+	   	    Expr.Val &= 0xFFFF;
 	   	}
-	   	DefineData (&lval);
+	   	DefineData (&Expr);
 	   	Size += SIZEOF_INT;
                 break;
 
 	    case T_LONG:
 	    case T_ULONG:
-	   	DefineData (&lval);
+	   	if (ED_IsConstAbsInt (&Expr)) {
+    	      	    /* Make it dword sized */
+	   	    Expr.Val &= 0xFFFFFFFF;
+	   	}
+	   	DefineData (&Expr);
 	   	Size += SIZEOF_LONG;
                 break;
 
@@ -1527,7 +1527,7 @@ static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers)
 unsigned ParseInit (type* T)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
-    /* Parse the initialization */
+    /* Parse the initialization */    
     unsigned Size = ParseInitInternal (T, !ANSI);
 
     /* The initialization may not generate code on global level, because code

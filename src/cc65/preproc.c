@@ -804,7 +804,7 @@ static int DoIf (int Skip)
     NextToken ();
 
     /* Call the expression parser */
-    ConstExpr (&lval);
+    ConstExpr (hie1, &lval);
 
     /* End preprocessing mode */
     Preprocessing = 0;
@@ -814,7 +814,7 @@ static int DoIf (int Skip)
     NextTok = sv2;
 
     /* Set the #if condition according to the expression result */
-    return PushIf (Skip, 1, lval.ConstVal != 0);
+    return PushIf (Skip, 1, lval.Val != 0);
 }
 
 

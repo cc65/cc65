@@ -118,13 +118,13 @@ static void DoConversion (ExprDesc* Expr, type* NewType)
             g_typecast (TypeOf (NewType), TypeOf (OldType));
 
             /* Value is now in primary and an rvalue */
-            Expr->Flags = E_MEXPR | E_RVAL;
+            ED_MakeRValExpr (Expr);
         }
 
     } else {
 
         /* We have an rvalue. Check for a constant. */
-        if (Expr->Flags == E_MCONST) {
+        if (ED_IsLocAbs (Expr)) {
 
             /* A cast of a constant to an integer. Be sure to handle sign
              * extension correctly.
@@ -141,13 +141,13 @@ static void DoConversion (ExprDesc* Expr, type* NewType)
             if (NewBits <= OldBits) {
 
                 /* Cut the value to the new size */
-                Expr->ConstVal &= (0xFFFFFFFFUL >> (32 - NewBits));
+                Expr->Val &= (0xFFFFFFFFUL >> (32 - NewBits));
 
                 /* If the new type is signed, sign extend the value */
                 if (!IsSignUnsigned (NewType)) {
-                    if (Expr->ConstVal & (0x01UL << (NewBits-1))) {
+                    if (Expr->Val & (0x01UL << (NewBits-1))) {
                         /* Beware: Use the safe shift routine here. */
-                        Expr->ConstVal |= shl_l (~0UL, NewBits);
+                        Expr->Val |= shl_l (~0UL, NewBits);
                     }
                 }
             }
@@ -166,8 +166,8 @@ static void DoConversion (ExprDesc* Expr, type* NewType)
                 /* Emit typecast code. */
                 g_typecast (TypeOf (NewType) | CF_FORCECHAR, TypeOf (OldType));
 
-                /* Value is now a rvalie in the primary */
-                Expr->Flags = E_MEXPR | E_RVAL;
+                /* Value is now a rvalue in the primary */
+                ED_MakeRValExpr (Expr);
             }
         }
     }
@@ -237,7 +237,7 @@ void TypeConversion (ExprDesc* Expr, type* NewType)
 	    }
      	} else if (IsClassInt (Expr->Type)) {
      	    /* Int to pointer assignment is valid only for constant zero */
-     	    if (Expr->Flags != E_MCONST || Expr->ConstVal != 0) {
+     	    if (!ED_IsConstAbsInt (Expr) || Expr->Val != 0) {
      	       	Warning ("Converting integer to pointer without a cast");
      	    }
 	} else if (IsTypeFuncPtr (NewType) && IsTypeFunc(Expr->Type)) {

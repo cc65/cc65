@@ -55,37 +55,41 @@
 
 
 /* Defines for the flags field of the expression descriptor */
-#define E_MREG 	       	0x0110U	/* Special: Expression is primary register */
-#define E_MGLOBAL      	0x0080U	/* Reference to static variable */
-#define E_MLOCAL    	0x0040U	/* Reference to local variable (stack offset) */
-#define E_MCONST    	0x0020U	/* Constant value */
-#define E_MEXPR	    	0x0010U	/* Result is in primary register */
-#define E_MEOFFS       	0x0011U	/* Base is in primary register, const offset */
+enum {
+    /* Location: Where is the value we're talking about? */
+    E_MASK_LOC          = 0x00FF,
+    E_LOC_ABS           = 0x0001,       /* Absolute: numeric address or const */
+    E_LOC_GLOBAL        = 0x0002,       /* Global variable */
+    E_LOC_STATIC        = 0x0004,       /* Static variable */
+    E_LOC_REGISTER      = 0x0008,       /* Register variable */
+    E_LOC_STACK         = 0x0010,       /* Value on the stack */
+    E_LOC_PRIMARY       = 0x0020,       /* The primary register */
+    E_LOC_EXPR          = 0x0040,       /* An expression in the primary register */
+    E_LOC_LITERAL       = 0x0080,       /* Literal in the literal pool */
 
-#define E_MCTYPE       	0x0007U /* Type of a constant */
-#define E_TCONST       	0x0000U /* Constant */
-#define E_TGLAB	       	0x0001U /* Global label */
-#define E_TLIT 	       	0x0002U /* Literal of some kind */
-#define E_TLOFFS       	0x0003U /* Constant stack offset */
-#define E_TLLAB	       	0x0004U /* Local label */
-#define E_TREGISTER    	0x0005U	/* Register variable */
+    /* Constant location of some sort (only if rval) */
+    E_LOC_CONST         = E_LOC_ABS | E_LOC_GLOBAL | E_LOC_STATIC |
+                          E_LOC_REGISTER | E_LOC_LITERAL,
 
-#define E_RVAL          0x0000U /* Expression node is a value */
-#define E_LVAL          0x1000U /* Expression node is a reference */
+    /* Reference? */
+    E_MASK_RTYPE        = 0x8000,
+    E_RTYPE_RVAL        = 0x0000,
+    E_RTYPE_LVAL        = 0x8000
+};
 
 /* Defines for the test field of the expression descriptor */
-#define E_CC   	       	0x0001U	/* expr has set cond codes apropos result value */
-#define E_FORCETEST    	0x0002U /* if expr has NOT set CC, force a test */
+#define E_CC   	       	0x0001U	        /* Condition codes are set */
+#define E_FORCETEST    	0x0002U         /* Force test to set condition codes */
 
 /* Describe the result of an expression */
 typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
-    struct SymEntry*	Sym;	 /* Symbol table entry if known */
-    type*	       	Type;    /* Type array of expression */
-    long       	       	ConstVal;/* Value if expression constant */
+    struct SymEntry*	Sym;	/* Symbol table entry if known */
+    type*	       	Type;   /* Type array of expression */
+    long       	       	Val;    /* Value if expression constant */
     unsigned short     	Flags;
-    unsigned short  	Test;	 /* */
-    unsigned long 	Name;	 /* Name or label number */
+    unsigned short  	Test;	/* */
+    unsigned long 	Name;	/* Name or label number */
 };
 
 
@@ -96,72 +100,136 @@ struct ExprDesc {
 
 
 
-#if defined(HAVE_INLINE)
-INLINE ExprDesc* InitExprDesc (ExprDesc* Expr)
+ExprDesc* ED_Init (ExprDesc* Expr);
 /* Initialize an ExprDesc */
+
+#if defined(HAVE_INLINE)
+INLINE int ED_GetLoc (const ExprDesc* Expr)
+/* Return the location flags from the expression */
 {
-    return memset (Expr, 0, sizeof (*Expr));
+    return (Expr->Flags & E_MASK_LOC);
 }
 #else
-#  define InitExprDesc(E)       memset ((E), 0, sizeof (*(E)))
+#  define ED_GetLoc(Expr)       ((Expr)->Flags & E_MASK_LOC)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_IsLocAbs (const ExprDesc* Expr)
+/* Return true if the expression is an absolute value */
+{
+    return (Expr->Flags & E_MASK_LOC) == E_LOC_ABS;
+}
+#else
+#  define ED_IsLocAbs(Expr)     (((Expr)->Flags & E_MASK_LOC) == E_LOC_ABS)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_IsLocStack (const ExprDesc* Expr)
+/* Return true if the expression is located on the stack */
+{
+    return (Expr->Flags & E_MASK_LOC) == E_LOC_STACK;
+}
+#else
+#  define ED_IsLocStack(Expr)     (((Expr)->Flags & E_MASK_LOC) == E_LOC_STACK)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_IsLocExpr (const ExprDesc* Expr)
+/* Return true if the expression is an expression in the primary */
+{
+    return (Expr->Flags & E_MASK_LOC) == E_LOC_EXPR;
+}
+#else
+#  define ED_IsLocExpr(Expr)     (((Expr)->Flags & E_MASK_LOC) == E_LOC_EXPR)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_IsLocConst (const ExprDesc* Expr)
+/* Return true if the expression is a constant location of some sort */
+{
+    return (Expr->Flags & E_LOC_CONST) != 0;
+}
+#else
+#  define ED_IsLocConst(Expr)  (((Expr)->Flags & E_LOC_CONST) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsLVal (const ExprDesc* Expr)
 /* Return true if the expression is a reference */
 {
-    return (Expr->Flags & E_LVAL) != 0;
+    return (Expr->Flags & E_MASK_RTYPE) == E_RTYPE_LVAL;
 }
 #else
-#  define ED_IsLVal(Expr)       (((Expr)->Flags & E_LVAL) != 0)
+#  define ED_IsLVal(Expr)       (((Expr)->Flags & E_MASK_RTYPE) == E_RTYPE_LVAL)
 #endif
 
 #if defined(HAVE_INLINE)
 INLINE int ED_IsRVal (const ExprDesc* Expr)
 /* Return true if the expression is a rvalue */
 {
-    return (Expr->Flags & E_LVAL) == 0;
+    return (Expr->Flags & E_MASK_RTYPE) == E_RTYPE_RVAL;
 }
 #else
-#  define ED_IsRVal(Expr)       (((Expr)->Flags & E_LVAL) == 0)
+#  define ED_IsRVal(Expr)       (((Expr)->Flags & E_MASK_RTYPE) == E_RTYPE_RVAL)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int ED_SetValType (ExprDesc* Expr, int Ref)
-/* Set the reference flag for an expression and return it (the flag) */
+INLINE void ED_MakeLVal (ExprDesc* Expr)
+/* Make the expression a lvalue. */
 {
-    Expr->Flags = Ref? (Expr->Flags | E_LVAL) : (Expr->Flags & ~E_LVAL);
-    return Ref;
+    Expr->Flags |= E_RTYPE_LVAL;
 }
 #else
-/* Beware: Just one occurance of R below, since it may have side effects! */
-#  define ED_SetValType(E, R)                                                   \
-        (((E)->Flags = (R)? ((E)->Flags | E_LVAL) : ((E)->Flags & ~E_LVAL)),    \
-        ED_IsLVal (E))
+#  define ED_MakeLVal(Expr)       do { (Expr)->Flags |= R_RTYPE_LVAL; } while (0)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE int ED_MakeLVal (ExprDesc* Expr)
-/* Make the expression a lvalue and return true */
+INLINE void ED_MakeRVal (ExprDesc* Expr)
+/* Make the expression a rvalue. */
 {
-    return ED_SetValType (Expr, 1);
+    Expr->Flags &= ~E_RTYPE_LVAL;
 }
 #else
-#  define ED_MakeLVal(Expr)       ED_SetValType (Expr, 1)
+#  define ED_MakeRVal(Expr)       do { (Expr)->Flags &= ~E_RTYPE_LVAL; } while (0)
 #endif
 
-#if defined(HAVE_INLINE)
-INLINE int ED_MakeRVal (ExprDesc* Expr)
-/* Make the expression a rvalue and return false */
-{
-    return ED_SetValType (Expr, 0);
-}
-#else
-#  define ED_MakeRVal(Expr)       ED_SetValType (Expr, 0)
-#endif
+ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, type* Type);
+/* Make Expr an absolute const with the given value and type. */
 
-ExprDesc* ED_MakeConstInt (ExprDesc* Expr, long Value);
+ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value);
 /* Make Expr a constant integer expression with the given value */
+
+ExprDesc* ED_MakeRValExpr (ExprDesc* Expr);
+/* Convert Expr into a rvalue which is in the primary register without an
+ * offset.
+ */
+
+ExprDesc* ED_MakeLValExpr (ExprDesc* Expr);
+/* Convert Expr into a lvalue which is in the primary register without an
+ * offset.
+ */
+
+int ED_IsConst (const ExprDesc* Expr);
+/* Return true if the expression denotes a constant of some sort. This can be a
+ * numeric constant, the address of a global variable (maybe with offset) or
+ * similar.
+ */
+
+int ED_IsConstAbs (const ExprDesc* Expr);
+/* Return true if the expression denotes a constant absolute value. This can be
+ * a numeric constant, cast to any type.
+ */
+
+int ED_IsConstAbsInt (const ExprDesc* Expr);
+/* Return true if the expression is a constant (numeric) integer. */
+
+int ED_IsNullPtr (const ExprDesc* Expr);
+/* Return true if the given expression is a NULL pointer constant */
+
+int ED_IsBool (const ExprDesc* Expr);
+/* Return true of the expression can be treated as a boolean, that is, it can
+ * be an operand to a compare operation.
+ */
 
 void PrintExprDesc (FILE* F, ExprDesc* Expr);
 /* Print an ExprDesc */

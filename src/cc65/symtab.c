@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -672,7 +672,7 @@ SymEntry* AddLocalSym (const char* Name, const type* Type, unsigned Flags, int O
             Entry->V.Offs = Offs;
         } else if ((Flags & SC_REGISTER) == SC_REGISTER) {
             Entry->V.R.RegOffs  = Offs;
-            Entry->V.R.SaveOffs = oursp;        /* ### Cleaner! */
+            Entry->V.R.SaveOffs = StackPtr;        /* ### Cleaner! */
         } else if ((Flags & SC_STATIC) == SC_STATIC) {
             /* Generate the assembler name from the label number */
             Entry->V.Label = Offs;

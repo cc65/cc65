@@ -52,15 +52,15 @@
 
 
 
-void Assignment (ExprDesc* lval)
+void Assignment (ExprDesc* Expr)
 /* Parse an assignment */
 {
     ExprDesc lval2;
-    type* ltype = lval->Type;
+    type* ltype = Expr->Type;
 
 
     /* We must have an lvalue for an assignment */
-    if (ED_IsRVal (lval)) {
+    if (ED_IsRVal (Expr)) {
         Error ("Invalid lvalue in assignment");
     }
 
@@ -94,9 +94,9 @@ void Assignment (ExprDesc* lval)
             default:            stype = ltype; UseReg = 0;      break;
         }
         if (UseReg) {
-            PushAddr (lval);
+            PushAddr (Expr);
         } else {
-    	    ExprLoad (CF_NONE, lval);
+    	    ExprLoad (CF_NONE, Expr);
             g_push (CF_PTR | CF_UNSIGNED, 0);
         }
 
@@ -119,7 +119,7 @@ void Assignment (ExprDesc* lval)
                 ExprLoad (CF_FORCECHAR, &lval2);
 
                 /* Store it into the new location */
-                Store (lval, stype);
+                Store (Expr, stype);
 
             } else {
 
@@ -146,7 +146,7 @@ void Assignment (ExprDesc* lval)
              */
             if (UseReg) {
                 /* Do the store */
-                Store (lval, stype);
+                Store (Expr, stype);
             } else {
                 /* Print a diagnostic */
                 Error ("Structs of this size are not supported");
@@ -159,7 +159,7 @@ void Assignment (ExprDesc* lval)
     } else {
 
      	/* Get the address on stack if needed */
-     	PushAddr (lval);
+     	PushAddr (Expr);
 
      	/* Read the expression on the right side of the '=' */
      	hie1 (&lval2);
@@ -171,12 +171,12 @@ void Assignment (ExprDesc* lval)
      	ExprLoad (CF_NONE, &lval2);
 
      	/* Generate a store instruction */
-     	Store (lval, 0);
+     	Store (Expr, 0);
 
     }
 
     /* Value is still in primary and not an lvalue */
-    lval->Flags = E_MEXPR | E_RVAL;
+    ED_MakeRValExpr (Expr);
 }
 
 

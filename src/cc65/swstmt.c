@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -81,9 +81,17 @@ void SwitchStatement (void)
     /* Eat the "switch" token */
     NextToken ();
 
-    /* Read the switch expression */
+    /* Read the switch expression and load it into the primary. It must have
+     * integer type.
+     */
     ConsumeLParen ();
-    intexpr (&SwitchExpr);
+    Expression0 (&SwitchExpr);
+    if (!IsClassInt (SwitchExpr.Type))  {
+        Error ("Switch quantity is not an integer");
+     	/* To avoid any compiler errors, make the expression a valid int */
+     	ED_MakeConstAbsInt (&SwitchExpr, 1);
+    }
+    /* Load the expression into the primary register */
     ConsumeRParen ();
 
     /* Add a jump to the switch code. This jump is usually unnecessary,
@@ -117,7 +125,7 @@ void SwitchStatement (void)
     ExitLabel = GetLocalLabel ();
 
     /* Create a loop so we may use break. */
-    AddLoop (oursp, ExitLabel, 0);
+    AddLoop (StackPtr, ExitLabel, 0);
 
     /* Create the collection for the case node tree */
     Nodes = NewCollection ();
@@ -137,13 +145,10 @@ void SwitchStatement (void)
 		NextToken ();
 
 		/* Read the selector expression */
-		ConstExpr (&CaseExpr);
-		if (!IsClassInt (CaseExpr.Type)) {
-       		    Error ("Switch quantity not an integer");
-		}
+		ConstAbsIntExpr (hie1, &CaseExpr);
 
 		/* Check the range of the expression */
-		Val = CaseExpr.ConstVal;
+		Val = CaseExpr.Val;
 		switch (SwitchExprType) {
 
 		    case T_SCHAR:

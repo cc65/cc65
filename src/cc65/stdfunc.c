@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -117,23 +117,21 @@ static unsigned ParseArg (type* Type, ExprDesc* Arg)
     unsigned Flags = CF_FORCECHAR;
 
     /* Read the expression we're going to pass to the function */
-    hie1 (InitExprDesc (Arg));
+    hie1 (Arg);
 
     /* Convert this expression to the expected type */
     TypeConversion (Arg, Type);
 
-    /* If the value is not a constant, load it into the primary */
-    if (ED_IsLVal (Arg) || Arg->Flags != E_MCONST) {
-
+    /* If the value is a constant, set the flag, otherwise load it into the
+     * primary register.
+     */
+    if (ED_IsConstAbsInt (Arg)) {
+        /* Remember that we have a constant value */
+        Flags |= CF_CONST;
+    } else {
         /* Load into the primary */
         ExprLoad (CF_NONE, Arg);
         ED_MakeRVal (Arg);
-
-    } else {
-
-        /* Remember that we have a constant value */
-        Flags |= CF_CONST;
-
     }
 
     /* Use the type of the argument for the push */
@@ -164,7 +162,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)),
 
     /* Argument #1 */
     Flags = ParseArg (Arg1Type, &Arg);
-    g_push (Flags, Arg.ConstVal);
+    g_push (Flags, Arg.Val);
     ParamSize += SizeOf (Arg1Type);
     ConsumeComma ();
 
@@ -172,12 +170,12 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)),
      * function if it is a constant zero.
      */
     Flags = ParseArg (Arg2Type, &Arg);
-    if ((Flags & CF_CONST) != 0 && Arg.ConstVal == 0) {
+    if ((Flags & CF_CONST) != 0 && Arg.Val == 0) {
         /* Don't call memset, call bzero instead */
         MemSet = 0;
     } else {
         /* Push the argument */
-        g_push (Flags, Arg.ConstVal);
+        g_push (Flags, Arg.Val);
         ParamSize += SizeOf (Arg2Type);
     }
     ConsumeComma ();
@@ -189,7 +187,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)),
      */
     Flags = ParseArg (Arg3Type, &Arg);
     if (Flags & CF_CONST) {
-	if (Arg.ConstVal == 0) {
+	if (Arg.Val == 0) {
 	    Warning ("Call to memset has no effect");
 	}
         ExprLoad (CF_FORCECHAR, &Arg);
@@ -217,7 +215,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
     ParamType[1] = GetDefaultChar () | T_QUAL_CONST;
 
     /* Fetch the parameter and convert it to the type needed */
-    hie1 (InitExprDesc (&Param));
+    hie1 (&Param);
     TypeConversion (&Param, ParamType);
 
     /* Check if the parameter is a constant array of some type, or a numeric
@@ -225,33 +223,33 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
      */
     CodeFlags = 0;
     ParamName = Param.Name;
-    if ((IsTypeArray (Param.Type) && (Param.Flags & E_MCONST) != 0) ||
-        (IsTypePtr (Param.Type) && Param.Flags == (E_MCONST | E_TCONST))) {
+    if ((ED_IsLocConst (&Param) && IsTypeArray (Param.Type)) ||
+        (ED_IsLocAbs (&Param) && IsTypePtr (Param.Type))) {
 
         /* Check which type of constant it is */
-        switch (Param.Flags & E_MCTYPE) {
+        switch (ED_GetLoc (&Param)) {
 
-            case E_TCONST:
+            case E_LOC_ABS:
                 /* Numerical address */
                 CodeFlags |= CF_CONST | CF_ABSOLUTE;
                 break;
 
-            case E_TREGISTER:
-                /* Register variable */
-                CodeFlags |= CF_CONST | CF_REGVAR;
-                break;
-
-            case E_TGLAB:
+            case E_LOC_GLOBAL:
                 /* Global label */
                 CodeFlags |= CF_CONST | CF_EXTERNAL;
                 break;
 
-            case E_TLLAB:
+            case E_LOC_STATIC:
                 /* Local symbol */
                 CodeFlags |= CF_CONST | CF_STATIC;
                 break;
 
-            case E_TLIT:
+            case E_LOC_REGISTER:
+                /* Register variable */
+                CodeFlags |= CF_CONST | CF_REGVAR;
+                break;
+
+            case E_LOC_LITERAL:
                 /* A literal of some kind. If string literals are read only,
                  * we can calculate the length of the string and remove it
                  * from the literal pool. Otherwise we have to calculate the
@@ -260,8 +258,8 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
                 if (!WriteableStrings) {
                     /* String literals are const */
                     ExprDesc Length;
-                    ED_MakeConstInt (&Length, strlen (GetLiteral (Param.ConstVal)));
-                    ResetLiteralPoolOffs (Param.ConstVal);
+                    ED_MakeConstAbsInt (&Length, strlen (GetLiteral (Param.Val)));
+                    ResetLiteralPoolOffs (Param.Val);
                     ExprLoad (CF_NONE, &Length);
                     goto ExitPoint;
                 } else {
@@ -282,7 +280,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
     }
 
     /* Generate the strlen code */
-    g_strlen (CodeFlags, ParamName, Param.ConstVal);
+    g_strlen (CodeFlags, ParamName, Param.Val);
 
 ExitPoint:
     /* We expect the closing brace */

@@ -197,7 +197,7 @@ int F_ReserveLocalSpace (Function* F, unsigned Size)
  */
 {
     F->Reserved += Size;
-    return oursp - F->Reserved;
+    return StackPtr - F->Reserved;
 }
 
 
@@ -213,7 +213,7 @@ void F_AllocLocalSpace (Function* F)
        	g_space (F->Reserved);
 
        	/* Correct the stack pointer */
-       	oursp -= F->Reserved;
+       	StackPtr -= F->Reserved;
 
        	/* Nothing more reserved */
        	F->Reserved = 0;
@@ -408,7 +408,7 @@ void NewFunc (SymEntry* Func)
     }
 
     /* Setup the stack */
-    oursp = 0;
+    StackPtr = 0;
 
     /* Walk through the parameter list and allocate register variable space
      * for parameters declared as register. Generate code to swap the contents
@@ -450,7 +450,7 @@ void NewFunc (SymEntry* Func)
     /* Remember the current stack pointer. All variables allocated elsewhere
      * must be dropped when doing a return from an inner block.
      */
-    CurrentFunc->TopLevelSP = oursp;
+    CurrentFunc->TopLevelSP = StackPtr;
 
     /* Now process statements in this block */
     HadReturn = 0;

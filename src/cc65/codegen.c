@@ -67,7 +67,7 @@
 
 
 /* Compiler relative stack pointer */
-int oursp 	= 0;
+int StackPtr 	= 0;
 
 
 
@@ -291,7 +291,7 @@ unsigned sizeofarg (unsigned flags)
 int pop (unsigned flags)
 /* Pop an argument of the given size */
 {
-    return oursp += sizeofarg (flags);
+    return StackPtr += sizeofarg (flags);
 }
 
 
@@ -299,7 +299,7 @@ int pop (unsigned flags)
 int push (unsigned flags)
 /* Push an argument of the given size */
 {
-    return oursp -= sizeofarg (flags);
+    return StackPtr -= sizeofarg (flags);
 }
 
 
@@ -464,7 +464,7 @@ void g_leave (void)
 /* Function epilogue */
 {
     /* How many bytes of locals do we have to drop? */
-    int k = -oursp;
+    int k = -StackPtr;
 
     /* If we didn't have a variable argument list, don't call leave */
     if (funcargs >= 0) {
@@ -509,7 +509,7 @@ void g_swap_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 /* Swap a register variable with a location on the stack */
 {
     /* Calculate the actual stack offset and check it */
-    StackOffs -= oursp;
+    StackOffs -= StackPtr;
     CheckLocalOffs (StackOffs);
 
     /* Generate code */
@@ -577,7 +577,7 @@ void g_save_regvars (int RegOffs, unsigned Bytes)
     }
 
     /* We pushed stuff, correct the stack pointer */
-    oursp -= Bytes;
+    StackPtr -= Bytes;
 }
 
 
@@ -586,7 +586,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 /* Restore register variables */
 {
     /* Calculate the actual stack offset and check it */
-    StackOffs -= oursp;
+    StackOffs -= StackPtr;
     CheckLocalOffs (StackOffs);
 
     /* Don't loop for up to two bytes */
@@ -807,7 +807,7 @@ void g_getstatic (unsigned flags, unsigned long label, long offs)
 void g_getlocal (unsigned flags, int offs)
 /* Fetch specified local object (local var). */
 {
-    offs -= oursp;
+    offs -= StackPtr;
     CheckLocalOffs (offs);
     switch (flags & CF_TYPE) {
 
@@ -912,7 +912,7 @@ void g_leasp (int offs)
 /* Fetch the address of the specified symbol into the primary register */
 {
     /* Calculate the offset relative to sp */
-    offs -= oursp;
+    offs -= StackPtr;
 
     /* For value 0 we do direct code */
     if (offs == 0) {
@@ -953,13 +953,13 @@ void g_leavariadic (int Offs)
     unsigned ArgSizeOffs;
 
     /* Calculate the offset relative to sp */
-    Offs -= oursp;
+    Offs -= StackPtr;
 
     /* Get the offset of the parameter which is stored at sp+0 on function
      * entry and check if this offset is reachable with a byte offset.
      */
-    CHECK (oursp <= 0);
-    ArgSizeOffs = -oursp;
+    CHECK (StackPtr <= 0);
+    ArgSizeOffs = -StackPtr;
     CheckLocalOffs (ArgSizeOffs);
 
     /* Get the size of all parameters. */
@@ -1033,7 +1033,7 @@ void g_putstatic (unsigned flags, unsigned long label, long offs)
 void g_putlocal (unsigned Flags, int Offs, long Val)
 /* Put data into local object. */
 {
-    Offs -= oursp;
+    Offs -= StackPtr;
     CheckLocalOffs (Offs);
     switch (Flags & CF_TYPE) {
 
@@ -1552,7 +1552,7 @@ void g_addlocal (unsigned flags, int offs)
     unsigned L;
 
     /* Correct the offset and check it */
-    offs -= oursp;
+    offs -= StackPtr;
     CheckLocalOffs (offs);
 
     switch (flags & CF_TYPE) {
@@ -1759,7 +1759,7 @@ void g_addeqlocal (unsigned flags, int offs, unsigned long val)
 /* Emit += for a local variable */
 {
     /* Calculate the true offset, check it, load it into Y */
-    offs -= oursp;
+    offs -= StackPtr;
     CheckLocalOffs (offs);
 
     /* Check the size and determine operation */
@@ -1990,7 +1990,7 @@ void g_subeqlocal (unsigned flags, int offs, unsigned long val)
 /* Emit -= for a local variable */
 {
     /* Calculate the true offset, check it, load it into Y */
-    offs -= oursp;
+    offs -= StackPtr;
     CheckLocalOffs (offs);
 
     /* Check the size and determine operation */
@@ -2113,7 +2113,7 @@ void g_addaddr_local (unsigned flags attribute ((unused)), int offs)
     unsigned L = 0;
 
     /* Add the offset */
-    offs -= oursp;
+    offs -= StackPtr;
     if (offs != 0) {
 	/* We cannot address more then 256 bytes of locals anyway */
 	L = GetLocalLabel();
@@ -2438,7 +2438,7 @@ void g_call (unsigned Flags, const char* Label, unsigned ArgSize)
 	ldyconst (ArgSize);
     }
     AddCodeLine ("jsr _%s", Label);
-    oursp += ArgSize;		/* callee pops args */
+    StackPtr += ArgSize;		/* callee pops args */
 }
 
 
@@ -2455,7 +2455,7 @@ void g_callind (unsigned Flags, unsigned ArgSize, int Offs)
 	AddCodeLine ("jsr callax");
     } else {
 	/* The address is on stack, offset is on Val */
-	Offs -= oursp;
+	Offs -= StackPtr;
 	CheckLocalOffs (Offs);
 	AddCodeLine ("pha");
 	AddCodeLine ("ldy #$%02X", Offs);
@@ -2469,7 +2469,7 @@ void g_callind (unsigned Flags, unsigned ArgSize, int Offs)
     }
 
     /* Callee pops args */
-    oursp += ArgSize;
+    StackPtr += ArgSize;
 }
 
 

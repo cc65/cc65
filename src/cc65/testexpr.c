@@ -53,26 +53,23 @@ unsigned Test (unsigned Label, int Invert)
  * defined above. If the jump is always true, a warning is output.
  */
 {
-    ExprDesc lval;
+    ExprDesc Expr;
     unsigned Result;
 
-    /* Evaluate the expression */
-    expr (hie0, InitExprDesc (&lval));
-
-    /* Check for a boolean expression */
-    CheckBoolExpr (&lval);
+    /* Read a boolean expression */
+    BoolExpr (hie0, &Expr);
 
     /* Check for a constant expression */
-    if (ED_IsRVal (&lval) && lval.Flags == E_MCONST) {
+    if (ED_IsConstAbs (&Expr)) {
 
         /* Result is constant, so we know the outcome */
-        Result = (lval.ConstVal != 0);
+        Result = (Expr.Val != 0);
 
       	/* Constant rvalue */
-       	if (!Invert && lval.ConstVal == 0) {
+       	if (!Invert && Expr.Val == 0) {
       	    g_jump (Label);
      	    Warning ("Unreachable code");
-     	} else if (Invert && lval.ConstVal != 0) {
+     	} else if (Invert && Expr.Val != 0) {
  	    g_jump (Label);
       	}
 
@@ -82,12 +79,12 @@ unsigned Test (unsigned Label, int Invert)
         Result = TESTEXPR_UNKNOWN;
 
         /* If the expr hasn't set condition codes, set the force-test flag */
-        if ((lval.Test & E_CC) == 0) {
-            lval.Test |= E_FORCETEST;
+        if ((Expr.Test & E_CC) == 0) {
+            Expr.Test |= E_FORCETEST;
         }
 
         /* Load the value into the primary register */
-        ExprLoad (CF_FORCECHAR, &lval);
+        ExprLoad (CF_FORCECHAR, &Expr);
 
         /* Generate the jump */
         if (Invert) {

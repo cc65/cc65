@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@musoftware.de                                            */
@@ -132,23 +132,23 @@ static void ParseByteArg (StrBuf* T, unsigned Arg)
     ConsumeComma ();
 
     /* Evaluate the expression */
-    ConstSubExpr (hie1, &Expr);
+    ConstAbsIntExpr (hie1, &Expr);
 
     /* Check the range but allow negative values if the type is signed */
     if (IsSignUnsigned (Expr.Type)) {
-    	if (Expr.ConstVal < 0 || Expr.ConstVal > 0xFF) {
+    	if (Expr.Val < 0 || Expr.Val > 0xFF) {
     	    AsmRangeError (Arg);
-	    Expr.ConstVal = 0;
+	    Expr.Val = 0;
 	}
     } else {
-	if (Expr.ConstVal < -128 || Expr.ConstVal > 127) {
+	if (Expr.Val < -128 || Expr.Val > 127) {
     	    AsmRangeError (Arg);
-	    Expr.ConstVal = 0;
+	    Expr.Val = 0;
 	}
     }
 
     /* Convert into a hex number */
-    xsprintf (Buf, sizeof (Buf), "$%02lX", Expr.ConstVal & 0xFF);
+    xsprintf (Buf, sizeof (Buf), "$%02lX", Expr.Val & 0xFF);
 
     /* Add the number to the target buffer */
     SB_AppendStr (T, Buf);
@@ -166,23 +166,23 @@ static void ParseWordArg (StrBuf* T, unsigned Arg)
     ConsumeComma ();
 
     /* Evaluate the expression */
-    ConstSubExpr (hie1, &Expr);
+    ConstAbsIntExpr (hie1, &Expr);
 
     /* Check the range but allow negative values if the type is signed */
     if (IsSignUnsigned (Expr.Type)) {
-    	if (Expr.ConstVal < 0 || Expr.ConstVal > 0xFFFF) {
+    	if (Expr.Val < 0 || Expr.Val > 0xFFFF) {
     	    AsmRangeError (Arg);
-	    Expr.ConstVal = 0;
+	    Expr.Val = 0;
 	}
     } else {
-	if (Expr.ConstVal < -32768 || Expr.ConstVal > 32767) {
+	if (Expr.Val < -32768 || Expr.Val > 32767) {
     	    AsmRangeError (Arg);
-	    Expr.ConstVal = 0;
+	    Expr.Val = 0;
 	}
     }
 
     /* Convert into a hex number */
-    xsprintf (Buf, sizeof (Buf), "$%04lX", Expr.ConstVal & 0xFFFF);
+    xsprintf (Buf, sizeof (Buf), "$%04lX", Expr.Val & 0xFFFF);
 
     /* Add the number to the target buffer */
     SB_AppendStr (T, Buf);
@@ -200,10 +200,10 @@ static void ParseLongArg (StrBuf* T, unsigned Arg attribute ((unused)))
     ConsumeComma ();
 
     /* Evaluate the expression */
-    ConstSubExpr (hie1, &Expr);
+    ConstAbsIntExpr (hie1, &Expr);
 
     /* Convert into a hex number */
-    xsprintf (Buf, sizeof (Buf), "$%08lX", Expr.ConstVal & 0xFFFFFFFF);
+    xsprintf (Buf, sizeof (Buf), "$%08lX", Expr.Val & 0xFFFFFFFF);
 
     /* Add the number to the target buffer */
     SB_AppendStr (T, Buf);
@@ -265,7 +265,7 @@ static void ParseLVarArg (StrBuf* T, unsigned Arg)
     }
 
     /* Calculate the current offset from SP */
-    Offs = Sym->V.Offs - oursp;
+    Offs = Sym->V.Offs - StackPtr;
 
     /* Output the offset */
     xsprintf (Buf, sizeof (Buf), (Offs > 0xFF)? "$%04X" : "$%02X", Offs);
@@ -300,8 +300,8 @@ static void ParseStrArg (StrBuf* T, unsigned Arg attribute ((unused)))
             break;
 
         default:
-            ConstSubExpr (hie1, InitExprDesc (&Expr));
-            xsprintf (Buf, sizeof (Buf), "%ld", Expr.ConstVal);
+            ConstAbsIntExpr (hie1, &Expr);
+            xsprintf (Buf, sizeof (Buf), "%ld", Expr.Val);
             SB_AppendStr (T, Buf);
             break;
     }

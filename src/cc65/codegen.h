@@ -86,7 +86,7 @@
 
 
 /* Compiler relative stackpointer */
-extern int oursp;
+extern int StackPtr;
 
 /* Forward */
 struct StrBuf;

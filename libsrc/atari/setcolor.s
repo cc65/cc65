@@ -1,19 +1,19 @@
 ;
-; Christian Groessler, June 2000
+; Christian Groessler, June 2004
 ;
-; this file provides a setcolor() function similar to BASIC SETCOLOR
+; this file provides a color functions similar to BASIC
 ;
-; void __fastcall__ setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
-; void __fastcall__ setcolor_low (unsigned char color_reg, unsigned char color_value);
-; unsigned char __fastcall__ getcolor (unsigned char color_reg);
+; void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
+; void __fastcall__ _setcolor_low (unsigned char color_reg, unsigned char color_value);
+; unsigned char __fastcall__ _getcolor (unsigned char color_reg);
 ;
 
 
- 	.export		_setcolor, _setcolor_low, _getcolor
+ 	.export		__setcolor, __setcolor_low, __getcolor
 	.import		popa
 	.include	"atari.inc"
 
-.proc	_getcolor
+.proc	__getcolor
 
 	tax
 	lda	COLOR0,x	; get current value
@@ -22,7 +22,7 @@
 
 .endproc
 
-.proc	_setcolor
+.proc	__setcolor
 
 ;	asl	a		; not -> BASIC compatible
 	sta	lum		; remember luminance
@@ -32,11 +32,11 @@
 	asl	a
 	asl	a
 	ora	lum
-;	jmp	_setcolor_low
+;	jmp	__setcolor_low
 
 .endproc
 
-.proc	_setcolor_low
+.proc	__setcolor_low
 
 	pha
 	jsr	popa

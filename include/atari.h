@@ -131,25 +131,39 @@
 #define COLOR_GRAY3  	       	_gtia_mkcolor(HUE_GREY,5)
 
 /* color register functions */
-extern void __fastcall__ setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
-extern void __fastcall__ setcolor_low (unsigned char color_reg, unsigned char color_value);
-extern unsigned char __fastcall__ getcolor (unsigned char color_reg);
+extern void __fastcall__ _setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
+extern void __fastcall__ _setcolor_low (unsigned char color_reg, unsigned char color_value);
+extern unsigned char __fastcall__ _getcolor (unsigned char color_reg);
 
 /* other screen functions */
-extern int  __fastcall__ graphics(unsigned char mode); /* mode value same as in BASIC */
-extern void __fastcall__ scroll (signed char numlines);
+extern int  __fastcall__ _graphics (unsigned char mode); /* mode value same as in BASIC */
+extern void __fastcall__ _scroll (signed char numlines);
                                           /* numlines > 0  scrolls up */
                                           /* numlines < 0  scrolls down */
 
 /* misc. functions */
-extern void save_vecs(void);           /* save system vectors */
-extern void rest_vecs(void);           /* restore system vectors */
-extern unsigned char get_ostype(void); /* get ROM version */
-extern unsigned char get_tv(void);     /* get TV system */
-extern char *getdefdev(void);          /* get default floppy device */
+extern void _save_vecs(void);           /* save system vectors */
+extern void _rest_vecs(void);           /* restore system vectors */
+extern unsigned char _get_ostype(void); /* get ROM version */
+extern unsigned char _get_tv(void);     /* get TV system */
+extern char *_getdefdev(void);          /* get default floppy device */
 
 /* global variables */
 extern unsigned char _dos_type;        /* the DOS flavour */
+
+/* provide old names for backwards compatibility */
+#ifdef ATARI_COMPAT_PRE_2_10
+#define setcolor     _setcolor
+#define setcolor_low _setcolor_low
+#define getcolor     _getcolor
+#define graphics     _graphics
+#define scroll       _scroll
+#define save_vecs    _save_vecs
+#define rest_vecs    _rest_vecs
+#define get_ostype   _get_ostype
+#define get_tv       _get_tv
+#define getdefdev    _getdefdev
+#endif  /* #ifdef ATARI_COMPAT_PRE_2_10 */
 
 /* get_ostype return value defines (for explanation, see ostype.s) */
 /* masks */

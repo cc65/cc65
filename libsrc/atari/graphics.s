@@ -1,13 +1,13 @@
 ;
-; Christian Groessler, October 2001
+; Christian Groessler, June 2004
 ;
 ; this file provides an equivalent to the BASIC GRAPHICS function
 ;
-; int __fastcall__ graphics(unsigned char mode);
+; int __fastcall__ _graphics(unsigned char mode);
 ;
 ;
 
-	.export	_graphics
+	.export	__graphics
 	.constructor	initscrmem,28
 
 	.import	findfreeiocb
@@ -29,7 +29,7 @@
 ; returns handle or -1 on error
 ; uses tmp1, tmp2, tmp3, tmp4 (in subroutines)
 
-.proc	_graphics
+.proc	__graphics
 
 ;	tax
 ;	and	#15		; get required graphics mode
@@ -103,7 +103,7 @@ doopen:	txa
 cioerr:	jsr	fddecusage	; decrement usage counter of fd as open failed
 	jmp	__do_oserror
 
-.endproc	; _graphics
+.endproc	; __graphics
 
 
 ; calc. upper memory limit to use

@@ -1,7 +1,7 @@
 ;
-; Christian Groessler, June 2000
+; Christian Groessler, June 2004
 ;
-; void __fastcall__ scroll (signed char numlines);
+; void __fastcall__ _scroll (signed char numlines);
 ; numlines > 0  scrolls up
 ; numlines < 0  scrolls down
 ;
@@ -9,9 +9,9 @@
 	.include	"atari.inc"
 	.importzp	tmp1,tmp4,ptr1,ptr2
 	.import		mul40,_clrscr
-	.export		_scroll
+	.export		__scroll
 
-.proc	_scroll
+.proc	__scroll
 
 	cmp	#0
 	beq	jmpfin

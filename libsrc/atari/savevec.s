@@ -2,11 +2,11 @@
 ; save and restore system vectors
 ; originally by Mark Keates
 ;
-; void save_vecs(void);
-; void rest_vecs(void);
+; void _save_vecs(void);
+; void _rest_vecs(void);
 ;
 
-	.export	_save_vecs,_rest_vecs
+	.export	__save_vecs,__rest_vecs
 .include	"atari.inc"
 
 	.bss
@@ -24,7 +24,7 @@ old_rmargin: .res 1	; lmargin saved in startup code
 
 	.code
 
-.proc	_save_vecs
+.proc	__save_vecs
 
 	lda    	VDSLST
 	sta	old_dli
@@ -63,7 +63,7 @@ SETUP1:
 
 .endproc
 
-.proc	_rest_vecs
+.proc	__rest_vecs
 
 	lda	#6
 	ldx	old_vbi+1

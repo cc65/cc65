@@ -1,7 +1,7 @@
 ;
-; Freddy Offenga & Christian Groessler, August 2003
+; Freddy Offenga & Christian Groessler, June 2004
 ;
-; function to get default device: char *getdefdev(void);
+; function to get default device: char *_getdefdev(void);
 ;
 ; SpartaDOS:
 ; the ZCRNAME routine is only used to get the default drive because
@@ -16,11 +16,11 @@
 
 	.include	"atari.inc"
 	.import		__dos_type
-	.export		_getdefdev		; get default device (e.g. "D1:")
+	.export		__getdefdev		; get default device (e.g. "D1:")
 
 ; Get default device (LBUF will be destroyed!!)
 
-_getdefdev:
+__getdefdev:
 
 	lda	__dos_type	; which DOS?
 	cmp	#ATARIDOS

@@ -89,7 +89,7 @@ url="funcref.html" name="function reference"> for declaration and usage.
 
 <itemize>
 <item>peekbsys
-<item>peewsys
+<item>peekwsys
 <item>pokebsys
 <item>pokewsys
 </itemize>
@@ -137,7 +137,7 @@ structures, accessing the struct fields will access the chip registers.
 
 <bf>Note:</bf> All I/O chips are located in the system bank (bank 15) and can
 therefore not be accessed like on other platforms. Please use one of the
-<tt/peekbsys/, <tt/peewsys/, <tt/pokebsys/ and <tt/pokewsys/ functions to
+<tt/peekbsys/, <tt/peekwsys/, <tt/pokebsys/ and <tt/pokewsys/ functions to
 access the I/O chips. Direct reads and writes to the structures named below
 will <em>not</em> work!
 

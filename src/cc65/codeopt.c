@@ -203,8 +203,76 @@ static int IsCmpToZero (const CodeEntry* E)
 
 
 
+static int IsSpLoad (const CodeEntry* E)
+/* Return true if this is the load of A from the stack */
+{
+    return E->OPC == OPC_LDA && E->AM == AM_ZP_INDY && strcmp (E->Arg, "sp") == 0;
+}
+
+
+
+static int IsLocalLoad16 (CodeSeg* S, unsigned Index,
+		     	  CodeEntry** L, unsigned Count)
+/* Check if a 16 bit load of a local variable follows:
+ *
+ *      ldy     #$xx
+ *      lda     (sp),y
+ *      tax
+ *      dey
+ *      lda     (sp),y
+ *
+ * If so, read Count entries following the first ldy into L and return true
+ * if this is possible. Otherwise return false.
+ */
+{
+    /* Be sure we read enough entries for the check */
+    CHECK (Count >= 5);
+
+    /* Read the first entry */
+    L[0] = GetCodeEntry (S, Index);
+
+    /* Check for the sequence */
+    return (L[0]->OPC == OPC_LDY                      &&
+	    L[0]->AM == AM_IMM                        &&
+	    (L[0]->Flags & CEF_NUMARG) != 0           &&
+       	    GetCodeEntries (S, L+1, Index+1, Count-1) &&
+       	    IsSpLoad (L[1])                           &&
+	    !CodeEntryHasLabel (L[1])                 &&
+	    L[2]->OPC == OPC_TAX                      &&
+	    !CodeEntryHasLabel (L[2])                 &&
+	    L[3]->OPC == OPC_DEY                      &&
+	    !CodeEntryHasLabel (L[3])                 &&
+	    IsSpLoad (L[4])                           &&
+	    !CodeEntryHasLabel (L[4]));		      
+}
+
+
+
+static int IsImmCmp16 (CodeSeg* S, CodeEntry** L)
+/* Check if the instructions at L are an immidiate compare of a/x:
+ *
+ *
+ */
+{
+    return (L[0]->OPC == OPC_CPX                                             &&
+	    L[0]->AM == AM_IMM                                               &&
+	    (L[0]->Flags & CEF_NUMARG) != 0                                  &&
+	    !CodeEntryHasLabel (L[0])                                        &&
+	    (L[1]->OPC == OPC_JNE || L[1]->OPC == OPC_BNE)                   &&
+       	    L[1]->JumpTo != 0                                                &&
+	    !CodeEntryHasLabel (L[1])                                        &&
+       	    L[2]->OPC == OPC_CMP                                             &&
+	    L[2]->AM == AM_IMM                                               &&
+	    (L[2]->Flags & CEF_NUMARG) != 0                                  &&
+	    (L[3]->Info & OF_ZBRA) != 0                                      &&
+	    L[3]->JumpTo != 0                                                &&
+	    (L[1]->JumpTo->Owner == L[3] || L[1]->JumpTo == L[3]->JumpTo));
+}
+
+
+
 /*****************************************************************************/
-/*	       Remove calls to the bool transformer subroutines		     */
+/*  	       Remove calls to the bool transformer subroutines		     */
 /*****************************************************************************/
 
 
@@ -499,40 +567,96 @@ static unsigned OptCmp3 (CodeSeg* S)
 	    GetCodeEntries (S, L, I+1, 5)      	                             &&
 	    L[0]->OPC == OPC_LDX                                             &&
 	    !CodeEntryHasLabel (L[0])                                        &&
-	    L[1]->OPC == OPC_CPX                                             &&
-	    L[1]->AM == AM_IMM                                               &&
-       	    (L[1]->Flags & CEF_NUMARG) != 0                                  &&
-	    !CodeEntryHasLabel (L[1])                                        &&
-	    (L[2]->OPC == OPC_JNE || L[2]->OPC == OPC_BNE)                   &&
-	    L[2]->JumpTo != 0                                                &&
-	    !CodeEntryHasLabel (L[2])                                        &&
-       	    L[3]->OPC == OPC_CMP                                             &&
-	    L[3]->AM == AM_IMM                                               &&
-	    (L[3]->Flags & CEF_NUMARG) != 0                                  &&
-	    (L[4]->Info & OF_ZBRA) != 0                                      &&
-	    L[4]->JumpTo != 0                                                &&
-	    (L[2]->JumpTo->Owner == L[4] || L[2]->JumpTo == L[4]->JumpTo)) {
+	    IsImmCmp16 (S, L+1)) {
 
-	    /* Get the compare value */
-	    unsigned Val = ((L[1]->Num & 0xFF) << 8) | (L[3]->Num & 0xFF);
-
-	    if (Val == 0) {
+	    if (L[1]->Num == 0 && L[3]->Num == 0) {
 		/* The value is zero, we may use the simple code version. */
 		ReplaceOPC (L[0], OPC_ORA);
 		DelCodeEntries (S, I+2, 3);
        	    } else {
-		/* Move the lda instruction after the first branch */
-		CodeEntry* N = RetrieveCodeEntry (S, I);
-		InsertCodeEntry (S, N, I+3);
+		/* Move the lda instruction after the first branch. This will
+		 * improve speed, since the load is delayed after the first
+		 * test.
+		 */
+		MoveCodeEntry (S, I, I+4);
 
-		/* Replace the ldx/cpx by lda/cmp */
+		/* We will replace the ldx/cpx by lda/cmp */
 		ReplaceOPC (L[0], OPC_LDA);
 		ReplaceOPC (L[1], OPC_CMP);
 
-		/* The high byte is zero, remove the CMP */
-		if ((Val & 0xFF00) == 0) {
-	     	    DelCodeEntry (S, I+1);
-	     	}
+	    }
+
+	    ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptCmp4 (CodeSeg* S)
+/* Optimize compares of local variables:
+ *
+ *      ldy     #o
+ *      lda     (sp),y
+ *      tax
+ *      dey
+ *      lda     (sp),y
+ *      cpx     #a
+ *      bne     L1
+ *   	cmp	#b
+ *      jne/jeq L2
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[9];
+
+     	/* Check for the sequence */
+       	if (IsLocalLoad16 (S, I, L, 9) && IsImmCmp16 (S, L+5)) {
+
+       	    if (L[5]->Num == 0 && L[7]->Num == 0) {
+
+		/* The value is zero, we may use the simple code version:
+		 *      ldy     #o
+		 *      lda     (sp),y
+		 *      dey
+		 *      ora    	(sp),y
+		 *      jne/jeq ...
+		 */
+		ReplaceOPC (L[4], OPC_ORA);
+		DelCodeEntries (S, I+5, 3);   /* cpx/bne/cmp */
+		DelCodeEntry (S, I+2);        /* tax */
+
+       	    } else {
+
+		/* Change the code to just use the A register. Move the load
+		 * of the low byte after the first branch if possible:
+		 *
+		 *      ldy     #o
+		 *      lda     (sp),y
+		 *      cmp     #a
+		 *      bne     L1
+		 *      dey
+		 *      lda     (sp),y
+		 *   	cmp	#b
+		 *      jne/jeq ...
+		 */
+       	       	DelCodeEntry (S, I+2);         /* tax */
+		ReplaceOPC (L[5], OPC_CMP);    /* cpx -> cmp */
+		MoveCodeEntry (S, I+4, I+2);   /* cmp */
+		MoveCodeEntry (S, I+5, I+3);   /* bne */
+
 	    }
 
 	    ++Changes;
@@ -915,6 +1039,8 @@ static OptFunc OptFuncs [] = {
     { OptCmp2,              "OptCmp2",                  0       },
     /* Optimize compares */
     { OptCmp3,              "OptCmp3",                  0       },
+    /* Optimize compares */
+    { OptCmp4,              "OptCmp4",                  0       },
     /* Remove unused loads */
     { OptUnusedLoads,	    "OptUnusedLoads",		0	},
     /* Optimize branch distance */

@@ -112,10 +112,9 @@ void DelCodeEntries (CodeSeg* S, unsigned Start, unsigned Count);
  * labels attached to the entries and so on.
  */
 
-struct CodeEntry* RetrieveCodeEntry (CodeSeg* S, unsigned Index);
-/* Retrieve a code entry. This means, the code entry is removed from the
- * entry collection, but not deleted and returned instead. The entry may
- * then be inserted again at another position.
+void MoveCodeEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos);
+/* Move an entry from one position to another. OldPos is the current position
+ * of the entry, NewPos is the new position of the entry.
  */
 
 #if defined(HAVE_INLINE)

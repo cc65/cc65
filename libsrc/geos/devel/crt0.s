@@ -7,9 +7,8 @@
 
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 	.import		initlib, donelib
-       	.import	       	pushax
 	.import		callmain
-	.import		_MainLoop, _EnterDeskTop
+	.import		_EnterDeskTop
 	.import		zerobss
 	.importzp	sp
 	.export		_exit
@@ -44,8 +43,7 @@
 	cli
        	jsr    	callmain
 
-; Call module destructors. This is also the _exit entry which must be called
-; explicitly by the code.
+; Call module destructors.
 
 _exit:	jsr	donelib	 	; Run module destructors
 

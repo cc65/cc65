@@ -5,7 +5,8 @@
 
 # Default for the compiler lib search path as compiler define
 
-SGML  =	ar65.sgml 	\
+SGML  =	apple2.sgml	\
+	ar65.sgml 	\
         atari.sgml      \
         c128.sgml       \
         c16.sgml        \
@@ -51,9 +52,6 @@ TEX   = $(SGML:.sgml=.tex)
 %.tex:	%.sgml
       	sgml2latex --output=tex $<
 
-funcref.html:	funcref.sgml
-	sgml2html --split=2 $<
-
 # ------------------------------------------------------------------------------
 # Targets
 
@@ -84,6 +82,15 @@ clean:
 
 zap:	clean
 	rm -f $(TXT) $(HTML) $(INFO) $(DVI) $(TEX) *.html *.info-* *.man
+
+# ------------------------------------------------------------------------------
+# Special target rules
+
+coding.html:	coding.sgml
+	sgml2html --split=0 $<
+
+funcref.html:	funcref.sgml
+	sgml2html --split=2 $<
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

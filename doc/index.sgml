@@ -84,6 +84,9 @@ Main documentation page, contains links to other available stuff.
 
 <descrip>
 
+  <tag><htmlurl url="apple2.html" name="apple2.html"></tag>
+  Topics specific to the Apple2&nbsp;][.
+
   <tag><htmlurl url="atari.html" name="atari.html"></tag>
   Topics specific to the Atari 8 bit machines.
 

@@ -240,21 +240,21 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
 	     *   - the lhs pointer is a void pointer.
      	     */
 	    if (!IsTypeVoid (Indirect (lhst)) && !IsTypeVoid (Indirect (rhst))) {
-		/* Compare the types */
-		switch (TypeCmp (lhst, rhst)) {
+	 	/* Compare the types */
+	 	switch (TypeCmp (lhst, rhst)) {
 
-		    case TC_INCOMPATIBLE:
-			Error ("Incompatible pointer types");
-			break;
+	 	    case TC_INCOMPATIBLE:
+	 		Error ("Incompatible pointer types");
+	 		break;
 
-		    case TC_QUAL_DIFF:
-			Error ("Pointer types differ in type qualifiers");
-			break;
+	 	    case TC_QUAL_DIFF:
+	 		Error ("Pointer types differ in type qualifiers");
+	 		break;
 
-		    default:
-			/* Ok */
-			break;
-		}
+	 	    default:
+	 		/* Ok */
+	 		break;
+	 	}
 	    }
      	} else if (IsClassInt (rhst)) {
      	    /* Int to pointer assignment is valid only for constant zero */
@@ -279,7 +279,7 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
     return CF_INT;
 }
 
-
+	 
 
 void DefineData (ExprDesc* Expr)
 /* Output a data definition for the given expression */
@@ -2947,8 +2947,10 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *lval, int k)
     lflags |= TypeOf (lval->Type) | CF_FORCECHAR;
     rflags |= TypeOf (lval2.Type);
 
-    /* Adjust the rhs to the lhs */
-    g_typeadjust (lflags, rflags);
+    /* Adjust the rhs to the lhs. To avoid manipulation of the TOS, mark
+     * the lhs as const.
+     */
+    g_typeadjust (lflags | CF_CONST, rflags);
 
     /* Output apropriate code */
     if (lval->Flags & E_MGLOBAL) {

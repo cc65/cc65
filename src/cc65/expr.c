@@ -223,14 +223,12 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
        	} else if (!IsClassInt (rhst)) {
      	    Error ("Incompatible types");
      	} else {
-   	    /* Adjust the int types. To avoid manipulation of TOS mark lhs
-   	     * as const.
-   	     */
+   	    /* Convert the rhs to the type of the lhs. */
    	    unsigned flags = TypeOf (rhst);
        	    if (rhs->Flags == E_MCONST) {
    	 	flags |= CF_CONST;
    	    }
-   	    return g_typeadjust (TypeOf (lhst) | CF_CONST, flags);
+       	    return g_typecast (TypeOf (lhst), flags);
         }
     } else if (IsClassPtr (lhst)) {
      	if (IsClassPtr (rhst)) {
@@ -246,7 +244,7 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
 	 	    case TC_INCOMPATIBLE:
 	 		Error ("Incompatible pointer types");
 	 		break;
-
+	 
 	 	    case TC_QUAL_DIFF:
 	 		Error ("Pointer types differ in type qualifiers");
 	 		break;
@@ -279,7 +277,7 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
     return CF_INT;
 }
 
-	 
+
 
 void DefineData (ExprDesc* Expr)
 /* Output a data definition for the given expression */
@@ -2947,10 +2945,8 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *lval, int k)
     lflags |= TypeOf (lval->Type) | CF_FORCECHAR;
     rflags |= TypeOf (lval2.Type);
 
-    /* Adjust the rhs to the lhs. To avoid manipulation of the TOS, mark
-     * the lhs as const.
-     */
-    g_typeadjust (lflags | CF_CONST, rflags);
+    /* Cast the rhs to the type of the lhs */
+    g_typecast (lflags, rflags);
 
     /* Output apropriate code */
     if (lval->Flags & E_MGLOBAL) {

@@ -504,7 +504,7 @@ unsigned OptJumpTarget (CodeSeg* S)
 	 * is not attached to the jump itself
 	 */
        	if (E2 != 0 			&&
-	    (E2->Info & OF_UBRA) != 0 	&& 
+	    (E2->Info & OF_UBRA) != 0 	&&
 	    E2->JumpTo			&&
 	    E2->JumpTo->Owner != E2) {
 
@@ -875,7 +875,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 */
 	        if (In->RegY >= 0                     && /* Value of Y is known */
 		    E->AM == AM65_ZP                  && /* Store into zp */
-		    In->RegX == RegVal (E->Chg, In)) { 	 /* Value identical */
+       	       	    In->RegY == RegVal (E->Chg, In)) { 	 /* Value identical */
 
 		    Delete = 1;
 

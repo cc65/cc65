@@ -1,28 +1,20 @@
 ;
 ; Ullrich von Bassewitz, 21.08.1998
 ;
-; CC65 runtime: Load effective address with offset in Y relative to SP
+; CC65 runtime: Load effective address with offset in A relative to SP
 ;
 
-    	.export		leaasp, pleaasp
-     	.import		pushax
+    	.export		leaasp
      	.importzp	sp
 
-leaasp:	ldx	sp+1		; Get high byte
+.proc	leaasp
+
+	ldx	sp+1	      	; Get high byte
      	clc
      	adc	sp
-     	bcc	@L1
+     	bcc	@L9
      	inx
-@L1: 	rts
+@L9: 	rts
 
-
-pleaasp:
-  	ldx	sp+1		; Get high byte
-  	clc
-  	adc	sp
-   	bcc	L9
-   	inx
-L9:	jmp	pushax
-
-
+.endproc
 

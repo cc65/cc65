@@ -24,14 +24,14 @@
 extern int getsp(void);  /* is provided in getsp.s */
 
 #ifdef __ATARI__  /* Atari's fd indirection table */
-extern char fd_index[];
+extern char __fd_index[];
 struct fd_t {
   char usage;
   char iocb;
   char dev;
   char flag;
 };
-extern struct fd_t fd_table[];
+extern struct fd_t __fd_table[];
 #endif /* #ifdef __ATARI__ */
 
 int main(int argc,char **argv)
@@ -74,13 +74,13 @@ int main(int argc,char **argv)
     printf("open success -- handle = $%x, sp = %d\n",fd,csp);
 #ifdef __ATARI__
     printf("fd_index:\n ");
-    for (i=0; i<12; i++) printf("%02X ",fd_index[i]);
+    for (i=0; i<12; i++) printf("%02X ",__fd_index[i]);
     printf("\nfd_table:\n");
     for (i=0; i<8; i++) {
         printf(" usa: %d, iocb: %02X, dev: %02X\n",
-               fd_table[i].usage,
-               fd_table[i].iocb,
-               fd_table[i].dev);
+               __fd_table[i].usage,
+               __fd_table[i].iocb,
+               __fd_table[i].dev);
     }
 #endif /* #ifdef __ATARI__ */
     lr = read(fd,buf,16);  /* read first 16 bytes */

@@ -14,15 +14,15 @@
 	.export	newfd
 	.export	getfd
 
-	.export	_fd_table,_fd_index	; for test purposes
+	.export	___fd_table,___fd_index	; for test(debug purposes only
 
 	.data
 MAX_FD_INDEX	=	12
-_fd_index:
+___fd_index:
 fd_index:	; fd number is index into this table, entry's value specifies the fd_table entry
 	.res	MAX_FD_INDEX,$ff
 
-_fd_table:
+___fd_table:
 fd_table:	; each entry represents an open iocb
 	.byte	0,0,'E',0	; system console, app starts with opened iocb #0 for E:
 	.byte	0,$ff,0,0

@@ -146,7 +146,7 @@ programs for the Commodore C128 using the cc65 crosscompiler.
 %files c128
 %attr(644,root,root) 		/usr/lib/cc65/lib/c128.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/c128.o
-%attr(644,root,root) 		/usr/lib/cc65/tgi/c128-*.emd
+%attr(644,root,root) 		/usr/lib/cc65/emd/c128-*.emd
 %doc src/ld65/cfg/c128.cfg
 
 

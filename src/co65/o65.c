@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2002-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -88,8 +88,8 @@ static unsigned long ReadO65Size (FILE* F, const O65Header* H)
 {
     unsigned long Size = 0;     /* Initialize to avoid warnings */
     switch (H->mode & O65_SIZE_MASK) {
-        case O65_SIZE_32BIT:    Size = Read32 (F);
-        case O65_SIZE_16BIT:    Size = Read16 (F);
+        case O65_SIZE_32BIT:    Size = Read32 (F);      break;
+        case O65_SIZE_16BIT:    Size = Read16 (F);      break;
         default:                Internal ("Invalid size field value in o65 header");
     }
     return Size;

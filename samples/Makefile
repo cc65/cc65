@@ -7,12 +7,30 @@
 # Enter the target system here
 SYS	= c64
 
-CRT0   	= ../libsrc/$(SYS).o
-CLIB	= ../libsrc/$(SYS).lib
-CC	= ../src/cc65/cc65
-CL	= ../src/cl65/cl65
-AS	= ../src/ca65/ca65
-LD	= ../src/ld65/ld65
+# Determine the path to the executables and libraries. If the samples
+# directory is part of a complete source tree, use the stuff from this
+# source tree, otherwise use the "official" directories.
+ifeq "$(wildcard ../src)" ""
+# No source tree
+CRT0 = $(SYS).o
+CLIB = $(SYS).lib
+CL   = cl65
+CC   = cc65
+AS   = as65
+LD   = ld65
+
+else
+# Samples is part of a complete source tree
+CRT0 = ../libsrc/$(SYS).o
+CLIB = ../libsrc/$(SYS).lib
+CL   = ../src/cl65/cl65
+CC   = ../src/cc65/cc65
+AS   = ../src/ca65/ca65
+LD   = ../src/ld65/ld65
+export CC65_INC = ../include
+endif
+
+# This one comes with VICE
 C1541  	= c1541
 
 

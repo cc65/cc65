@@ -40,7 +40,7 @@
 /* common */
 #include "check.h"
 
-/* cc65 */
+/* b6502 */
 #include "codeinfo.h"
 #include "opcodes.h"
 

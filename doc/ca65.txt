@@ -212,7 +212,7 @@ Here is a description of all the command line options:
 
 
   -v
-  -verbose
+  --verbose
 
   Increase the assembler verbosity. Usually only needed for debugging
   purposes. You may use this option more than one time for even more

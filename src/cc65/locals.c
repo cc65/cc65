@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
+/*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -453,8 +453,8 @@ void DeclareLocals (void)
 	/* Check variable declarations. We need to distinguish between a
     	 * default int type and the end of variable declarations. So we
 	 * will do the following: If there is no explicit storage class
-	 * specifier *and* no explicit type given, *and* no type qualifiers 
-         * have been read, it is assumed that we have reached the end of 
+	 * specifier *and* no explicit type given, *and* no type qualifiers
+         * have been read, it is assumed that we have reached the end of
          * declarations.
 	 */
 	DeclSpec Spec;

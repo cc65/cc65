@@ -20,7 +20,7 @@
 /*****************************************************************************/
 
 
-#if defined(__C64__)
+#if defined(__C64__) || defined(__C128__)
 
 /* Baudrate settings */
 #define RS_BAUD_50     	       		0x00
@@ -153,7 +153,7 @@ unsigned char __fastcall__ rs232_pause (void);
 unsigned char __fastcall__ rs232_unpause (void);
 /* Re-enable interrupts and release flow control */
 
-unsigned char __fastcall__ rs232_status (unsigned char* status, 
+unsigned char __fastcall__ rs232_status (unsigned char* status,
 					 unsigned char* errors);
 /* Return the serial port status. */
 

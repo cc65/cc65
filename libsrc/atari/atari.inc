@@ -672,7 +672,10 @@ ICBLL	= $0348		;1-byte low buffer length
 ICBLH	= $0349		;1-byte high buffer length
 ICAX1	= $034A		;1-byte first auxiliary information
 ICAX2	= $034B		;1-byte second auxiliary information
-ICSPR	= $034C		;FOUR SPARE BYTES
+ICAX3	= $034C		;1-byte third auxiliary information
+ICAX4	= $034D		;1-byte fourth auxiliary information
+ICAX5	= $034E		;1-byte fifth auxiliary information
+ICSPR	= $034F		;SPARE BYTE
 
 PRNBUF	= $03C0		;PRINTER BUFFER
 SUPERF	= $03E8		;##1200xl## 1-byte editor super function flag

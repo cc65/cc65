@@ -70,6 +70,7 @@ iocbok:	txa
 	ldx	#0
 	lda	tmp2		; get fd used
 	jsr	fdtoiocb
+	tax
 
 doopen:	txa
 	;brk

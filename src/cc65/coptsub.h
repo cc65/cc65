@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   coptind.h				     */
+/*				   coptsub.h                                 */
 /*                                                                           */
-/*		Environment independent low level optimizations		     */
+/*			Optimize subtraction sequences                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef COPTIND_H
-#define COPTIND_H
+#ifndef COPTSUB_H
+#define COPTSUB_H
 
 
 
@@ -44,70 +44,44 @@
 
 
 /*****************************************************************************/
-/*	  	    		     Code				     */
+/*			     Optimize subtractions                           */
 /*****************************************************************************/
 
 
 
-unsigned OptRTSJumps (CodeSeg* S);
-/* Replace jumps to RTS by RTS */
-
-unsigned OptDeadJumps (CodeSeg* S);
-/* Remove dead jumps (jumps to the next instruction) */
-
-unsigned OptDeadCode (CodeSeg* S);
-/* Remove dead code (code that follows an unconditional jump or an rts/rti
- * and has no label)
+unsigned OptSub1 (CodeSeg* S);
+/* Search for the sequence
+ *
+ *  	sbc     ...
+ *      bcs     L
+ *  	dex
+ * L:
+ *
+ * and remove the handling of the high byte if X is not used later.
  */
 
-unsigned OptJumpCascades (CodeSeg* S);
-/* Optimize jump cascades (jumps to jumps). In such a case, the jump is
- * replaced by a jump to the final location. This will in some cases produce
- * worse code, because some jump targets are no longer reachable by short
- * branches, but this is quite rare, so there are more advantages than
- * disadvantages.
+unsigned OptSub2 (CodeSeg* S);
+/* Search for the sequence
+ *
+ *  	lda     xx
+ *      sec
+ *  	sta     tmp1
+ *      lda     yy
+ *      sbc     tmp1
+ *      sta     yy
+ *
+ * and replace it by
+ *
+ *      sec
+ *      lda     yy
+ *     	sbc     xx
+ *      sta     yy
  */
 
-unsigned OptRTS (CodeSeg* S);
-/* Optimize subroutine calls followed by an RTS. The subroutine call will get
- * replaced by a jump. Don't bother to delete the RTS if it does not have a
- * label, the dead code elimination should take care of it.
- */
-
-unsigned OptJumpTarget (CodeSeg* S);
-/* If the instruction preceeding an unconditional branch is the same as the
- * instruction preceeding the jump target, the jump target may be moved
- * one entry back. This is a size optimization, since the instruction before
- * the branch gets removed.
- */
-
-unsigned OptCondBranches (CodeSeg* S);
-/* If an immidiate load of a register is followed by a conditional jump that
- * is never taken because the load of the register sets the flags in such a
- * manner, remove the conditional branch.
- */
-
-unsigned OptUnusedLoads (CodeSeg* S);
-/* Remove loads of registers where the value loaded is not used later. */
-
-unsigned OptUnusedStores (CodeSeg* S);
-/* Remove stores into zero page registers that aren't used later */
-
-unsigned OptDupLoads (CodeSeg* S);
-/* Remove loads of registers where the value loaded is already in the register. */
-
-unsigned OptStoreLoad (CodeSeg* S);
-/* Remove a store followed by a load from the same location. */
-
-unsigned OptTransfers (CodeSeg* S);
-/* Remove transfers from one register to another and back */
-
-unsigned OptBranchDist (CodeSeg* S);
-/* Change branches for the distance needed. */
 
 
+/* End of coptsub.h */
 
-/* End of coptind.h */
 #endif
 
 

@@ -78,8 +78,11 @@ OBJS =	anonname.obj	\
 	codeopt.obj	\
 	codeseg.obj	\
 	compile.obj	\
+	coptadd.obj	\
+	coptcmp.obj	\
 	coptind.obj	\
 	coptstop.obj	\
+	coptsub.obj	\
 	cpu.obj		\
 	dataseg.obj	\
 	datatype.obj	\
@@ -148,8 +151,11 @@ FILE codeinfo.obj
 FILE codeopt.obj
 FILE codeseg.obj
 FILE compile.obj
+FILE coptadd.obj
+FILE coptcmp.obj
 FILE coptind.obj
 FILE coptstop.obj
+FILE coptsub.obj
 FILE cpu.obj
 FILE dataseg.obj
 FILE datatype.obj

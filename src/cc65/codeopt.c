@@ -46,8 +46,11 @@
 #include "asmlabel.h"
 #include "codeent.h"
 #include "codeinfo.h"
+#include "coptadd.h"
+#include "coptcmp.h"
 #include "coptind.h"
 #include "coptstop.h"
+#include "coptsub.h"
 #include "error.h"
 #include "global.h"
 #include "codeopt.h"
@@ -55,778 +58,8 @@
 
 
 /*****************************************************************************/
-/*  	       	  	  	     Data				     */
-/*****************************************************************************/
-
-
-
-/* Defines for the conditions in a compare */
-typedef enum {
-    CMP_INV = -1,
-    CMP_EQ,
-    CMP_NE,
-    CMP_GT,
-    CMP_GE,
-    CMP_LT,
-    CMP_LE,
-    CMP_UGT,
-    CMP_UGE,
-    CMP_ULT,
-    CMP_ULE
-} cmp_t;
-
-/* Table with the compare suffixes */
-static const char CmpSuffixTab [][4] = {
-    "eq", "ne", "gt", "ge", "lt", "le", "ugt", "uge", "ult", "ule"
-};
-
-/* Table used to invert a condition, indexed by condition */
-static const unsigned char CmpInvertTab [] = {
-    CMP_NE, CMP_EQ,
-    CMP_LE, CMP_LT, CMP_GE, CMP_GT,
-    CMP_ULE, CMP_ULT, CMP_UGE, CMP_UGT
-};
-
-/* Table to show which compares are signed (use the N flag) */
-static const char CmpSignedTab [] = {
-    0, 0, 1, 1, 1, 1, 0, 0, 0, 0
-};
-
-
-
-/*****************************************************************************/
 /*  	     	   	       Helper functions	    			     */
 /*****************************************************************************/
-
-
-
-static cmp_t FindCmpCond (const char* Code, unsigned CodeLen)
-/* Search for a compare condition by the given code using the given length */
-{
-    unsigned I;
-
-    /* Linear search */
-    for (I = 0; I < sizeof (CmpSuffixTab) / sizeof (CmpSuffixTab [0]); ++I) {
-	if (strncmp (Code, CmpSuffixTab [I], CodeLen) == 0) {
-	    /* Found */
-	    return I;
-	}
-    }
-
-    /* Not found */
-    return CMP_INV;
-}
-
-
-
-static cmp_t FindBoolCmpCond (const char* Name)
-/* Map a condition suffix to a code. Return the code or CMP_INV on failure */
-{
-    /* Check for the correct subroutine name */
-    if (strncmp (Name, "bool", 4) == 0) {
-	/* Name is ok, search for the code in the table */
-	return FindCmpCond (Name+4, strlen(Name)-4);
-    } else {
-	/* Not found */
-	return CMP_INV;
-    }
-}
-
-
-
-static cmp_t FindTosCmpCond (const char* Name)
-/* Check if this is a call to one of the TOS compare functions (tosgtax).
- * Return the condition code or CMP_INV on failure.
- */
-{
-    unsigned Len = strlen (Name);
-
-    /* Check for the correct subroutine name */
-    if (strncmp (Name, "tos", 3) == 0 && strcmp (Name+Len-2, "ax") == 0) {
-	/* Name is ok, search for the code in the table */
-	return FindCmpCond (Name+3, Len-3-2);
-    } else {
-	/* Not found */
-	return CMP_INV;
-    }
-}
-
-
-
-static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
-/* Helper function for the replacement of routines that return a boolean
- * followed by a conditional jump. Instead of the boolean value, the condition
- * codes are evaluated directly.
- * I is the index of the conditional branch, the sequence is already checked
- * to be correct.
- */
-{
-    CodeEntry* N;
-    CodeLabel* L;
-
-    /* Get the entry */
-    CodeEntry* E = CS_GetEntry (S, I);
-
-    /* Replace the conditional branch */
-    switch (Cond) {
-
-	case CMP_EQ:
-	    CE_ReplaceOPC (E, OP65_JEQ);
-	    break;
-
-	case CMP_NE:
-	    CE_ReplaceOPC (E, OP65_JNE);
-	    break;
-
-	case CMP_GT:
-	    /* Replace by
-	     *     beq @L
-	     *     jpl Target
-	     * @L: ...
-	     */
-	    if ((N = CS_GetNextEntry (S, I)) == 0) {
-	    	/* No such entry */
-	    	Internal ("Invalid program flow");
-	    }
-	    L = CS_GenLabel (S, N);
-	    N = NewCodeEntry (OP65_BEQ, AM65_BRA, L->Name, L, E->LI);
-	    CS_InsertEntry (S, N, I);
-	    CE_ReplaceOPC (E, OP65_JPL);
-	    break;
-
-	case CMP_GE:
-	    CE_ReplaceOPC (E, OP65_JPL);
-	    break;
-
-	case CMP_LT:
-	    CE_ReplaceOPC (E, OP65_JMI);
-	    break;
-
-	case CMP_LE:
-	    /* Replace by
-	     * 	   jmi Target
-	     *     jeq Target
-	     */
-	    CE_ReplaceOPC (E, OP65_JMI);
-	    L = E->JumpTo;
-	    N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
-	    CS_InsertEntry (S, N, I+1);
-	    break;
-
-	case CMP_UGT:
-	    /* Replace by
-	     *     beq @L
-	     *     jcs Target
-	     * @L: ...
-	     */
-	    if ((N = CS_GetNextEntry (S, I)) == 0) {
-	       	/* No such entry */
-	       	Internal ("Invalid program flow");
-	    }
-	    L = CS_GenLabel (S, N);
-	    N = NewCodeEntry (OP65_BEQ, AM65_BRA, L->Name, L, E->LI);
-	    CS_InsertEntry (S, N, I);
-	    CE_ReplaceOPC (E, OP65_JCS);
-	    break;
-
-	case CMP_UGE:
-	    CE_ReplaceOPC (E, OP65_JCS);
-	    break;
-
-	case CMP_ULT:
-	    CE_ReplaceOPC (E, OP65_JCC);
-	    break;
-
-	case CMP_ULE:
-	    /* Replace by
-	     * 	   jcc Target
-	     *     jeq Target
-	     */
-	    CE_ReplaceOPC (E, OP65_JCC);
-	    L = E->JumpTo;
-	    N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
-	    CS_InsertEntry (S, N, I+1);
-	    break;
-
-	default:
-	    Internal ("Unknown jump condition: %d", Cond);
-
-    }
-
-}
-
-
-
-static int GetCmpRegVal (const CodeEntry* E)
-/* Return the register value for an immediate compare */
-{
-    switch (E->OPC) {
-	case OP65_CMP: return E->RI->In.RegA;
-	case OP65_CPX: return E->RI->In.RegX;
-	case OP65_CPY: return E->RI->In.RegY;
-	default:       Internal ("Invalid opcode in GetCmpRegVal");
-	               return 0;  /* Not reached */
-    }
-}
-
-
-
-static int IsCmpToZero (const CodeEntry* E)
-/* Check if the given instrcuction is a compare to zero instruction */
-{
-    return (E->OPC == OP65_CMP            &&
-	    E->AM  == AM65_IMM            &&
-	    (E->Flags & CEF_NUMARG) != 0  &&
-	    E->Num == 0);
-}
-
-
-
-static int IsSpLoad (const CodeEntry* E)
-/* Return true if this is the load of A from the stack */
-{
-    return E->OPC == OP65_LDA && E->AM == AM65_ZP_INDY && strcmp (E->Arg, "sp") == 0;
-}
-
-
-
-static int IsLocalLoad16 (CodeSeg* S, unsigned Index,
-	       	     	  CodeEntry** L, unsigned Count)
-/* Check if a 16 bit load of a local variable follows:
- *
- *      ldy     #$xx
- *      lda     (sp),y
- *      tax
- *      dey
- *      lda     (sp),y
- *
- * If so, read Count entries following the first ldy into L and return true
- * if this is possible. Otherwise return false.
- */
-{
-    /* Be sure we read enough entries for the check */
-    CHECK (Count >= 5);
-
-    /* Read the first entry */
-    L[0] = CS_GetEntry (S, Index);
-
-    /* Check for the sequence */
-    return (L[0]->OPC == OP65_LDY                        &&
-	    L[0]->AM == AM65_IMM                         &&
-	    (L[0]->Flags & CEF_NUMARG) != 0              &&
-       	    CS_GetEntries (S, L+1, Index+1, Count-1)     &&
-       	    IsSpLoad (L[1])                              &&
-	    !CE_HasLabel (L[1])                          &&
-	    L[2]->OPC == OP65_TAX                        &&
-	    !CE_HasLabel (L[2])                          &&
-	    L[3]->OPC == OP65_DEY                        &&
-	    !CE_HasLabel (L[3])                          &&
-	    IsSpLoad (L[4])                              &&
-	    !CE_HasLabel (L[4]));
-}
-
-
-
-static int IsImmCmp16 (CodeSeg* S, CodeEntry** L)
-/* Check if the instructions at L are an immidiate compare of a/x:
- *
- *
- */
-{
-    return (L[0]->OPC == OP65_CPX                              &&
-	    L[0]->AM == AM65_IMM                               &&
-	    (L[0]->Flags & CEF_NUMARG) != 0                    &&
-	    !CE_HasLabel (L[0])                                &&
-	    (L[1]->OPC == OP65_JNE || L[1]->OPC == OP65_BNE)   &&
-       	    L[1]->JumpTo != 0                                  &&
-	    !CE_HasLabel (L[1])                                &&
-       	    L[2]->OPC == OP65_CMP                              &&
-	    L[2]->AM == AM65_IMM                               &&
-	    (L[2]->Flags & CEF_NUMARG) != 0                    &&
-	    (L[3]->Info & OF_ZBRA) != 0                        &&
-	    L[3]->JumpTo != 0                                  &&
-	    (L[1]->JumpTo->Owner == L[3] || L[1]->JumpTo == L[3]->JumpTo));
-}
-
-
-
-/*****************************************************************************/
-/*  	       Remove calls to the bool transformer subroutines		     */
-/*****************************************************************************/
-
-
-
-static unsigned OptBoolTransforms (CodeSeg* S)
-/* Try to remove the call to boolean transformer routines where the call is
- * not really needed.
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* N;
-	cmp_t Cond;
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-	/* Check for a boolean transformer */
-	if (E->OPC == OP65_JSR                           &&
-	    (Cond = FindBoolCmpCond (E->Arg)) != CMP_INV &&
-	    (N = CS_GetNextEntry (S, I)) != 0        &&
-	    (N->Info & OF_ZBRA) != 0) {
-
-	    /* Make the boolean transformer unnecessary by changing the
-	     * the conditional jump to evaluate the condition flags that
-	     * are set after the compare directly. Note: jeq jumps if
-	     * the condition is not met, jne jumps if the condition is met.
-     	     * Invert the code if we jump on condition not met.
-	     */
-       	    if (GetBranchCond (N->OPC) == BC_EQ) {
-	       	/* Jumps if condition false, invert condition */
-	       	Cond = CmpInvertTab [Cond];
-  	    }
-
-	    /* Check if we can replace the code by something better */
-	    ReplaceCmp (S, I+1, Cond);
-
-	    /* Remove the call to the bool transformer */
-	    CS_DelEntry (S, I);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-/*****************************************************************************/
-/*			     Optimize subtractions                           */
-/*****************************************************************************/
-
-
-
-static unsigned OptSub1 (CodeSeg* S)
-/* Search for the sequence
- *
- *  	sbc     ...
- *      bcs     L
- *  	dex
- * L:
- *
- * and remove the handling of the high byte if X is not used later.
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[3];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_SBC 	  		             &&
-	    CS_GetEntries (S, L, I+1, 3) 	             &&
-       	    (L[0]->OPC == OP65_BCS || L[0]->OPC == OP65_JCS) &&
-	    L[0]->JumpTo != 0                                &&
-	    !CE_HasLabel (L[0])                              &&
-	    L[1]->OPC == OP65_DEX       	       	     &&
-	    !CE_HasLabel (L[1])                              &&
-	    L[0]->JumpTo->Owner == L[2]                      &&
-	    !RegXUsed (S, I+3)) {
-
-	    /* Remove the bcs/dex */
-	    CS_DelEntries (S, I+1, 2);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptSub2 (CodeSeg* S)
-/* Search for the sequence
- *
- *  	lda     xx
- *      sec
- *  	sta     tmp1
- *      lda     yy
- *      sbc     tmp1
- *      sta     yy
- *
- * and replace it by
- *
- *      sec
- *      lda     yy
- *     	sbc     xx
- *      sta     yy
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[5];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_LDA 	      		           &&
-	    CS_GetEntries (S, L, I+1, 5) 	           &&
-       	    L[0]->OPC == OP65_SEC                          &&
-	    !CE_HasLabel (L[0])                            &&
-       	    L[1]->OPC == OP65_STA       	       	   &&
-	    strcmp (L[1]->Arg, "tmp1") == 0                &&
-	    !CE_HasLabel (L[1])                            &&
-	    L[2]->OPC == OP65_LDA                          &&
-       	    !CE_HasLabel (L[2])                            &&
-	    L[3]->OPC == OP65_SBC                          &&
-	    strcmp (L[3]->Arg, "tmp1") == 0                &&
-       	    !CE_HasLabel (L[3])                            &&
-	    L[4]->OPC == OP65_STA                          &&
-	    strcmp (L[4]->Arg, L[2]->Arg) == 0             &&
-       	    !CE_HasLabel (L[4])) {
-
-	    /* Remove the store to tmp1 */
-	    CS_DelEntry (S, I+2);
-
-	    /* Remove the subtraction */
-	    CS_DelEntry (S, I+3);
-
-	    /* Move the lda to the position of the subtraction and change the
-	     * op to SBC.
-	     */
-	    CS_MoveEntry (S, I, I+3);
-	    CE_ReplaceOPC (E, OP65_SBC);
-
-	    /* If the sequence head had a label, move this label back to the
-	     * head.
-	     */
-	    if (CE_HasLabel (E)) {
-		CS_MoveLabels (S, E, L[0]);
-  	    }
-
-	    /* Remember, we had changes */
-       	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-/*****************************************************************************/
-/*			      Optimize additions                             */
-/*****************************************************************************/
-
-
-
-static unsigned OptAdd1 (CodeSeg* S)
-/* Search for the sequence
- *
- *     	jsr     pushax
- *      ldy     xxx
- *  	ldx     #$00
- *      lda     (sp),y
- *      jsr     tosaddax
- *
- * and replace it by:
- *
- *      ldy     xxx-2
- *      clc
- *      adc     (sp),y
- *      bcc     L
- *      inx
- * L:
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-     	CodeEntry* L[5];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-	if (E->OPC == OP65_JSR                               &&
-	    strcmp (E->Arg, "pushax") == 0                   &&
-       	    CS_GetEntries (S, L, I+1, 5)   	             &&
-       	    L[0]->OPC == OP65_LDY                            &&
-	    CE_KnownImm (L[0])                               &&
-	    !CE_HasLabel (L[0])                              &&
-	    L[1]->OPC == OP65_LDX                            &&
-	    CE_KnownImm (L[1])                               &&
-	    L[1]->Num == 0                                   &&
-	    !CE_HasLabel (L[1])                              &&
-	    L[2]->OPC == OP65_LDA                            &&
-	    !CE_HasLabel (L[2])                              &&
-	    L[3]->OPC == OP65_JSR                            &&
-	    strcmp (L[3]->Arg, "tosaddax") == 0              &&
-	    !CE_HasLabel (L[3])) {
-
-	    CodeEntry* X;
-	    CodeLabel* Label;
-
-	    /* Remove the call to pushax */
-	    CS_DelEntry (S, I);
-
-	    /* Correct the stack offset (needed since pushax was removed) */
-	    CE_SetNumArg (L[0], L[0]->Num - 2);
-
-	    /* Add the clc . */
-	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+1);
-
-	    /* Remove the load */
-	    CS_DelEntry (S, I+3);      /* lda */
-	    CS_DelEntry (S, I+2);      /* ldx */
-
-	    /* Add the adc */
-	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+2);
-
-	    /* Generate the branch label and the branch */
-	    Label = CS_GenLabel (S, L[4]);
-	    X = NewCodeEntry (OP65_BCC, AM65_BRA, Label->Name, Label, L[3]->LI);
-	    CS_InsertEntry (S, X, I+3);
-
-	    /* Generate the increment of the high byte */
-	    X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+4);
-
-	    /* Delete the call to tosaddax */
-	    CS_DelEntry (S, I+5);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptAdd2 (CodeSeg* S)
-/* Search for the sequence
- *
- *     	ldy     #xx
- *      lda     (sp),y
- *  	tax
- *      dey
- *      lda     (sp),y
- *      ldy     #$yy
- *      jsr     addeqysp
- *
- * and replace it by:
- *
- *      ldy     #xx-1
- *      lda     (sp),y
- *      ldy     #yy
- *      clc
- *      adc     (sp),y
- *      sta     (sp),y
- *      ldy     #xx
- *      lda     (sp),y
- *      ldy     #yy+1
- *      adc     (sp),y
- *      sta     (sp),y
- *
- * provided that a/x is not used later.
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-     	CodeEntry* L[7];
-
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-	if (L[0]->OPC == OP65_LDY               &&
-	    CE_KnownImm (L[0])                  &&
-       	    CS_GetEntries (S, L+1, I+1, 6)   	&&
-	    L[1]->OPC == OP65_LDA               &&
-	    L[1]->AM == AM65_ZP_INDY            &&
-	    !CE_HasLabel (L[1])                 &&
-	    L[2]->OPC == OP65_TAX               &&
-	    !CE_HasLabel (L[2])                 &&
-	    L[3]->OPC == OP65_DEY               &&
-       	    !CE_HasLabel (L[3])                 &&
-	    L[4]->OPC == OP65_LDA               &&
-	    L[4]->AM == AM65_ZP_INDY            &&
-	    !CE_HasLabel (L[4])                 &&
-	    L[5]->OPC == OP65_LDY               &&
-	    CE_KnownImm (L[5])                  &&
-	    !CE_HasLabel (L[5])                 &&
-	    L[6]->OPC == OP65_JSR               &&
-       	    strcmp (L[6]->Arg, "addeqysp") == 0 &&
-	    !CE_HasLabel (L[6])                 &&
-	    (GetRegInfo (S, I+7, REG_AX) & REG_AX) == 0) {
-
-	    char Buf [20];
-	    CodeEntry* X;
-	    int Offs;
-
-
-	    /* Create a replacement for the first LDY */
-	    Offs = (int) (L[0]->Num - 1);
-	    xsprintf (Buf, sizeof (Buf), "$%02X", Offs);
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+1);
-	    CS_DelEntry (S, I);
-
-	    /* Load Y with the low offset of the target variable */
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[5]->Arg, 0, L[1]->LI);
-	    CS_InsertEntry (S, X, I+2);
-
-	    /* Add the CLC */
-	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[1]->LI);
-	    CS_InsertEntry (S, X, I+3);
-
-	    /* Remove the TAX/DEY sequence */
-	    CS_DelEntry (S, I+5);      /* dey */
-	    CS_DelEntry (S, I+4);      /* tax */
-
-	    /* Addition of the low byte */
-	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[4]->LI);
-	    CS_InsertEntry (S, X, I+4);
-	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[4]->LI);
-	    CS_InsertEntry (S, X, I+5);
-
-	    /* LDY */
-	    xsprintf (Buf, sizeof (Buf), "$%02X", (Offs+1));
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[4]->LI);
-	    CS_InsertEntry (S, X, I+6);
-
-	    /* Addition of the high byte */
-	    xsprintf (Buf, sizeof (Buf), "$%02X", (int)(L[5]->Num+1));
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[5]->LI);
-	    CS_InsertEntry (S, X, I+8);
-	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[6]->LI);
-	    CS_InsertEntry (S, X, I+9);
-	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[6]->LI);
-	    CS_InsertEntry (S, X, I+10);
-
-	    /* Delete the remaining stuff */
-	    CS_DelEntry (S, I+12);
-	    CS_DelEntry (S, I+11);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptAdd3 (CodeSeg* S)
-/* Search for the sequence
- *
- *  	adc     ...
- *      bcc     L
- *  	inx
- * L:
- *
- * and remove the handling of the high byte if X is not used later.
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[3];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_ADC 	  	     	             &&
-	    CS_GetEntries (S, L, I+1, 3)   	             &&
-       	    (L[0]->OPC == OP65_BCC || L[0]->OPC == OP65_JCC) &&
-	    L[0]->JumpTo != 0                                &&
-	    !CE_HasLabel (L[0])                              &&
-	    L[1]->OPC == OP65_INX            	       	     &&
-	    !CE_HasLabel (L[1])                              &&
-	    L[0]->JumpTo->Owner == L[2]                      &&
-	    !RegXUsed (S, I+3)) {
-
-	    /* Remove the bcs/dex */
-	    CS_DelEntries (S, I+1, 2);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
 
 
 
@@ -877,503 +110,6 @@ static unsigned OptShift1 (CodeSeg* S)
 	++I;
 
     }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-/*****************************************************************************/
-/*		  	  Optimizations for compares                         */
-/*****************************************************************************/
-
-
-
-static unsigned OptCmp1 (CodeSeg* S)
-/* Search for the sequence
- *
- *  	stx	xx
- *  	stx	tmp1
- *  	ora	tmp1
- *
- * and replace it by
- *
- *  	stx	xx
- *  	ora	xx
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[2];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_STX 	  		&&
-	    CS_GetEntries (S, L, I+1, 2)	&&
-       	    L[0]->OPC == OP65_STX		&&
-	    strcmp (L[0]->Arg, "tmp1") == 0     &&
-	    !CE_HasLabel (L[0])                 &&
-	    L[1]->OPC == OP65_ORA	    	&&
-	    strcmp (L[1]->Arg, "tmp1") == 0     &&
-	    !CE_HasLabel (L[1])) {
-
-	    /* Remove the remaining instructions */
-	    CS_DelEntries (S, I+1, 2);
-
-	    /* Insert the ora instead */
-	    CS_InsertEntry (S, NewCodeEntry (OP65_ORA, E->AM, E->Arg, 0, E->LI), I+1);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptCmp2 (CodeSeg* S)
-/* Search for
- *
- *     	lda/and/ora/eor	...
- *  	cmp #$00
- *  	jeq/jne
- * or
- *     	lda/and/ora/eor	...
- *  	cmp #$00
- *  	jsr boolxx
- *
- * and remove the cmp.
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[2];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if ((E->OPC == OP65_ADC ||
-	     E->OPC == OP65_AND ||
-	     E->OPC == OP65_DEA ||
-	     E->OPC == OP65_EOR ||
-	     E->OPC == OP65_INA ||
-       	     E->OPC == OP65_LDA ||
-	     E->OPC == OP65_ORA	||
-	     E->OPC == OP65_PLA ||
-	     E->OPC == OP65_SBC ||
-	     E->OPC == OP65_TXA ||
-	     E->OPC == OP65_TYA)                       &&
-	    CS_GetEntries (S, L, I+1, 2)   	       &&
-       	    IsCmpToZero (L[0])                         &&
-	    !CE_HasLabel (L[0])                        &&
-       	    ((L[1]->Info & OF_FBRA) != 0         ||
-	     (L[1]->OPC == OP65_JSR        &&
-	      FindBoolCmpCond (L[1]->Arg) != CMP_INV)) &&
-	    !CE_HasLabel (L[1])) {
-
-	    /* Remove the compare */
-	    CS_DelEntry (S, I+1);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptCmp3 (CodeSeg* S)
-/* Search for
- *
- *  	lda	x
- *  	ldx	y
- *  	cpx 	#a
- *  	bne 	L1
- *  	cmp 	#b
- *     	jne/jeq	L2
- *
- * If a is zero, we may remove the compare. If a and b are both zero, we may
- * replace it by the sequence
- *
- *  	lda 	x
- *  	ora 	x+1
- *  	jne/jeq ...
- *
- * L1 may be either the label at the branch instruction, or the target label
- * of this instruction.
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[5];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_LDA               &&
-	    CS_GetEntries (S, L, I+1, 5) &&
-	    L[0]->OPC == OP65_LDX            &&
-	    !CE_HasLabel (L[0])              &&
-	    IsImmCmp16 (S, L+1)) {
-
-	    if (L[1]->Num == 0 && L[3]->Num == 0) {
-		/* The value is zero, we may use the simple code version. */
-		CE_ReplaceOPC (L[0], OP65_ORA);
-		CS_DelEntries (S, I+2, 3);
-       	    } else {
-		/* Move the lda instruction after the first branch. This will
-		 * improve speed, since the load is delayed after the first
-		 * test.
-		 */
-		CS_MoveEntry (S, I, I+4);
-
-		/* We will replace the ldx/cpx by lda/cmp */
-	    	CE_ReplaceOPC (L[0], OP65_LDA);
-		CE_ReplaceOPC (L[1], OP65_CMP);
-
-		/* Beware: If the first LDA instruction had a label, we have
-	     	 * to move this label to the top of the sequence again.
-		 */
-		if (CE_HasLabel (E)) {
-		    CS_MoveLabels (S, E, L[0]);
-		}
-
-	    }
-
-	    ++Changes;
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptCmp4 (CodeSeg* S)
-/* Optimize compares of local variables:
- *
- *      ldy     #o
- *      lda     (sp),y
- *      tax
- *      dey
- *      lda     (sp),y
- *      cpx     #a
- *      bne     L1
- *   	cmp 	#b
- *      jne/jeq L2
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[9];
-
-     	/* Check for the sequence */
-       	if (IsLocalLoad16 (S, I, L, 9) && IsImmCmp16 (S, L+5)) {
-
-       	    if (L[5]->Num == 0 && L[7]->Num == 0) {
-
-		/* The value is zero, we may use the simple code version:
-		 *      ldy     #o
-		 *      lda     (sp),y
-		 *      dey
-	    	 *      ora    	(sp),y
-		 *      jne/jeq ...
-		 */
-		CE_ReplaceOPC (L[4], OP65_ORA);
-		CS_DelEntries (S, I+5, 3);   /* cpx/bne/cmp */
-		CS_DelEntry (S, I+2);        /* tax */
-
-       	    } else {
-
-		/* Change the code to just use the A register. Move the load
-		 * of the low byte after the first branch if possible:
-		 *
-		 *      ldy     #o
-		 *      lda     (sp),y
-		 *      cmp     #a
-		 *      bne     L1
-		 *      dey
-		 *      lda     (sp),y
-		 *   	cmp	#b
-		 *      jne/jeq ...
-		 */
-       	       	CS_DelEntry (S, I+2);             /* tax */
-		CE_ReplaceOPC (L[5], OP65_CMP);   /* cpx -> cmp */
-		CS_MoveEntry (S, I+4, I+2);       /* cmp */
-		CS_MoveEntry (S, I+5, I+3);       /* bne */
-
-	    }
-
-	    ++Changes;
-	}
-
-    	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptCmp5 (CodeSeg* S)
-/* Search for calls to compare subroutines followed by a conditional branch
- * and replace them by cheaper versions, since the branch means that the
- * boolean value returned by these routines is not needed (we may also check
- * that explicitly, but for the current code generator it is always true).
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* N;
-	cmp_t Cond;
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_JSR 	  		        &&
-	    (Cond = FindTosCmpCond (E->Arg)) != CMP_INV	&&
-	    (N = CS_GetNextEntry (S, I)) != 0           &&
-	    (N->Info & OF_ZBRA) != 0                    &&
-       	    !CE_HasLabel (N)) {
-
-       	    /* The tos... functions will return a boolean value in a/x and
-	     * the Z flag says if this value is zero or not. We will call
-	     * a cheaper subroutine instead, one that does not return a
-	     * boolean value but only valid flags. Note: jeq jumps if
-	     * the condition is not met, jne jumps if the condition is met.
-     	     * Invert the code if we jump on condition not met.
-    	     */
-       	    if (GetBranchCond (N->OPC) == BC_EQ) {
-	       	/* Jumps if condition false, invert condition */
-	       	Cond = CmpInvertTab [Cond];
-  	    }
-
-	    /* Replace the subroutine call. */
-	    E = NewCodeEntry (OP65_JSR, AM65_ABS, "tosicmp", 0, E->LI);
-	    CS_InsertEntry (S, E, I+1);
-	    CS_DelEntry (S, I);
-
-	    /* Replace the conditional branch */
-	    ReplaceCmp (S, I+1, Cond);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-  	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptCmp6 (CodeSeg* S)
-/* Search for a sequence ldx/txa/branch and remove the txa if A is not
- * used later.
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-       	CodeEntry* L[2];
-
-       	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-       	/* Check for the sequence */
-       	if ((E->OPC == OP65_LDX)                        &&
-       	    CS_GetEntries (S, L, I+1, 2)                &&
-       	    L[0]->OPC == OP65_TXA                       &&
-       	    !CE_HasLabel (L[0])                         &&
-       	    (L[1]->Info & OF_FBRA) != 0                 &&
-       	    !CE_HasLabel (L[1])                         &&
-	    !RegAUsed (S, I+3)) {
-
-	    /* Remove the txa */
-	    CS_DelEntry (S, I+1);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-  	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptCmp7 (CodeSeg* S)
-/* Check for register compares where the contents of the register and therefore
- * the result of the compare is known.
- */
-{
-    unsigned Changes = 0;
-    unsigned I;
-
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
-
-    /* Walk over the entries */
-    I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	int RegVal;
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for a compare against an immediate value */
-       	if ((E->Info & OF_CMP) != 0           &&
-	    (RegVal = GetCmpRegVal (E)) >= 0  &&
-	    CE_KnownImm (E)) {
-
-	    /* We are able to evaluate the compare at compile time. Check if
-	     * one or more branches are ahead.
-	     */
-	    unsigned JumpsChanged = 0;
-	    CodeEntry* N;
-	    while ((N = CS_GetNextEntry (S, I)) != 0 &&   /* Followed by something.. */
-	       	   (N->Info & OF_CBRA) != 0          &&   /* ..that is a cond branch.. */
-	       	   !CE_HasLabel (N)) {                    /* ..and has no label */
-
-	       	/* Evaluate the branch condition */
-	       	int Cond;
-     		switch (GetBranchCond (N->OPC)) {
-     	       	    case BC_CC:
-     	       	        Cond = ((unsigned char)RegVal) < ((unsigned char)E->Num);
-     	       	        break;
-
-     	       	    case BC_CS:
-     	       	        Cond = ((unsigned char)RegVal) >= ((unsigned char)E->Num);
-     	       	        break;
-
-     	       	    case BC_EQ:
-     	       	        Cond = ((unsigned char)RegVal) == ((unsigned char)E->Num);
-     	       	        break;
-
-     	       	    case BC_MI:
-       	       	        Cond = ((signed char)RegVal) < ((signed char)E->Num);
-     	       	        break;
-
-     	       	    case BC_NE:
-     	       	        Cond = ((unsigned char)RegVal) != ((unsigned char)E->Num);
-	       	        break;
-
-	       	    case BC_PL:
-       	       	        Cond = ((signed char)RegVal) >= ((signed char)E->Num);
-	       	        break;
-
-	       	    case BC_VC:
-	       	    case BC_VS:
-		        /* Not set by the compare operation, bail out (Note:
-			 * Just skipping anything here is rather stupid, but
-			 * the sequence is never generated by the compiler,
-			 * so it's quite safe to skip).
-			 */
-		        goto NextEntry;
-
-		    default:
-		        Internal ("Unknown branch condition");
-
-		}
-
-	       	/* If the condition is false, we may remove the jump. Otherwise
-	       	 * the branch will always be taken, so we may replace it by a
-	       	 * jump (and bail out).
-	       	 */
-		if (!Cond) {
-		    CS_DelEntry (S, I+1);
-		} else {
-		    CodeLabel* L = N->JumpTo;
-		    CodeEntry* X = NewCodeEntry (OP65_JMP, AM65_BRA, L->Name, L, N->LI);
-		    CS_InsertEntry (S, X, I+2);
-		    CS_DelEntry (S, I+1);
-		}
-
-	     	/* Remember, we had changes */
-	    	++JumpsChanged;
-	     	++Changes;
-	    }
-
-	    /* If we have made changes above, we may also remove the compare */
-	    if (JumpsChanged) {
-		CS_DelEntry (S, I);
-	    }
-
-	}
-
-NextEntry:
-     	/* Next entry */
-	++I;
-
-    }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -2475,7 +1211,7 @@ static unsigned OptPtrLoad5 (CodeSeg* S)
  */
 {
     unsigned Changes = 0;
-				     
+
     /* Walk over the entries */
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
@@ -2634,98 +1370,144 @@ static unsigned OptPtrLoad6 (CodeSeg* S)
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code	   			     */
+/*  				struct OptFunc                               */
 /*****************************************************************************/
 
 
 
-/* Types of optimization steps */
-enum {
-    optPre,			/* Repeated once */
-    optPreMain,                 /* Repeated more than once */
-    optMain,                    /* dito */
-    optPostMain,                /* dito */
-    optPost                     /* Repeated once */
-};
-
-/* Table with all the optimization functions */
 typedef struct OptFunc OptFunc;
 struct OptFunc {
-    unsigned        (*Func) (CodeSeg*); /* Optimizer function */
-    const char*	    Name;  	        /* Name of optimizer step */
-    unsigned char   Type;  		/* Type of this step */
-    char	    Disabled;  	        /* True if pass disabled */
+    unsigned     (*Func) (CodeSeg*);    /* Optimizer function */
+    const char*  Name;                  /* Name of the function/group */
+    char         Disabled;              /* True if function disabled */
 };
 
-/* Macro that builds a table entry */
-#define OptEntry(func,type)     { func, #func, type, 0 }
 
-/* Table with optimizer steps */
-static OptFunc OptFuncs [] = {
-    /* Optimizes stores through pointers */
-    OptEntry (OptPtrStore1, optPre),
-    OptEntry (OptPtrStore2, optPre),
-    /* Optimize loads through pointers */
-    OptEntry (OptPtrLoad1, optPre),
-    OptEntry (OptPtrLoad2, optPre),
-    OptEntry (OptPtrLoad3, optPre),
-    OptEntry (OptPtrLoad4, optPre),
-    OptEntry (OptPtrLoad5, optPre),
-    OptEntry (OptPtrLoad6, optMain),
-    /* Optimize calls to nega */
-    OptEntry (OptNegA1, optMain),
-    OptEntry (OptNegA2, optMain),
-    /* Optimize calls to negax */
-    OptEntry (OptNegAX1, optPre),
-    OptEntry (OptNegAX2, optPre),
-    OptEntry (OptNegAX3, optPre),
-    OptEntry (OptNegAX4, optPre),
-    /* Optimize subtractions */
-    OptEntry (OptSub1, optMain),
-    OptEntry (OptSub2, optMain),
-    /* Optimize additions */
-    OptEntry (OptAdd1, optPre),
-    OptEntry (OptAdd2, optPre),
-    OptEntry (OptAdd3, optMain),
-    /* Optimize shifts */
-    OptEntry (OptShift1, optPre),
-    /* Optimize jump cascades */
-    OptEntry (OptJumpCascades, optMain),
-    /* Remove dead jumps */
-    OptEntry (OptDeadJumps, optMain),
-    /* Change jsr/rts to jmp */
-    OptEntry (OptRTS, optMain),
-    /* Remove dead code */
-    OptEntry (OptDeadCode, optMain),
-    /* Optimize jump targets */
-    OptEntry (OptJumpTarget, optMain),
-    /* Optimize conditional branches */
-    OptEntry (OptCondBranches, optMain),
-    /* Replace jumps to RTS by RTS */
-    OptEntry (OptRTSJumps, optMain),
-    /* Remove calls to the bool transformer subroutines	*/
-    OptEntry (OptBoolTransforms, optMain),
-    /* Optimize compares */
-    OptEntry (OptCmp1, optMain),
-    OptEntry (OptCmp2, optMain),
-    OptEntry (OptCmp3, optMain),
-    OptEntry (OptCmp4, optMain),
-    OptEntry (OptCmp5, optMain),
-    OptEntry (OptCmp6, optMain),
-    OptEntry (OptCmp7, optMain),
-    /* Optimize tests */
-    OptEntry (OptTest1, optMain),
-    /* Remove unused loads */
-    OptEntry (OptUnusedLoads, optMain),
-    OptEntry (OptUnusedStores, optMain),
-    OptEntry (OptDuplicateLoads, optMain),
-    OptEntry (OptStoreLoad, optMain),
-    OptEntry (OptTransfers, optMain),
-    /* Optimize operations that use the stack to pass operands */
-    OptEntry (OptStackOps, optMain),
-    /* Optimize branch distance */
-    OptEntry (OptBranchDist, optPost),
+
+/*****************************************************************************/
+/*     	       	      	     	     Code	   	  		     */
+/*****************************************************************************/
+
+
+
+/* Macro that builds a function description */
+#define OptFuncEntry(func) static OptFuncDesc D##func = { func, #func, 0 }
+
+/* A list of all the function descriptions */
+static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    0 };
+static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    0 };
+static OptFunc DOptPtrLoad1    	= { OptPtrLoad1,     "OptPtrLoad1",  	0 };
+static OptFunc DOptPtrLoad2    	= { OptPtrLoad2,     "OptPtrLoad2",  	0 };
+static OptFunc DOptPtrLoad3    	= { OptPtrLoad3,     "OptPtrLoad3",  	0 };
+static OptFunc DOptPtrLoad4    	= { OptPtrLoad4,     "OptPtrLoad4",  	0 };
+static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",  	0 };
+static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",  	0 };
+static OptFunc DOptNegA1       	= { OptNegA1,  	     "OptNegA1",     	0 };
+static OptFunc DOptNegA2       	= { OptNegA2,  	     "OptNegA2",     	0 };
+static OptFunc DOptNegAX1      	= { OptNegAX1,       "OptNegAX1",    	0 };
+static OptFunc DOptNegAX2      	= { OptNegAX2,       "OptNegAX2",    	0 };
+static OptFunc DOptNegAX3      	= { OptNegAX3,       "OptNegAX3",    	0 };
+static OptFunc DOptNegAX4      	= { OptNegAX4,       "OptNegAX4",    	0 };
+static OptFunc DOptSub1	       	= { OptSub1,   	     "OptSub1",      	0 };
+static OptFunc DOptSub2	       	= { OptSub2,   	     "OptSub2",      	0 };
+static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",      	0 };
+static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",      	0 };
+static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",      	0 };
+static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",    	0 };
+static OptFunc DOptJumpCascades	= { OptJumpCascades, "OptJumpCascades", 0 };
+static OptFunc DOptDeadJumps   	= { OptDeadJumps,    "OptDeadJumps",    0 };
+static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",       	0 };
+static OptFunc DOptDeadCode    	= { OptDeadCode,     "OptDeadCode",  	0 };
+static OptFunc DOptJumpTarget  	= { OptJumpTarget,   "OptJumpTarget",   0 };
+static OptFunc DOptCondBranches	= { OptCondBranches, "OptCondBranches", 0 };
+static OptFunc DOptRTSJumps    	= { OptRTSJumps,     "OptRTSJumps",  	0 };
+static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    0 };
+static OptFunc DOptCmp1	       	= { OptCmp1,   	     "OptCmp1",      	0 };
+static OptFunc DOptCmp2	       	= { OptCmp2,   	     "OptCmp2",      	0 };
+static OptFunc DOptCmp3	       	= { OptCmp3,   	     "OptCmp3",      	0 };
+static OptFunc DOptCmp4	       	= { OptCmp4,   	     "OptCmp4",      	0 };
+static OptFunc DOptCmp5	       	= { OptCmp5,   	     "OptCmp5",      	0 };
+static OptFunc DOptCmp6	       	= { OptCmp6,   	     "OptCmp6",      	0 };
+static OptFunc DOptCmp7	       	= { OptCmp7,   	     "OptCmp7",      	0 };
+static OptFunc DOptTest1       	= { OptTest1,  	     "OptTest1",     	0 };
+static OptFunc DOptUnusedLoads 	= { OptUnusedLoads,  "OptUnusedLoads",  0 };
+static OptFunc DOptUnusedStores	= { OptUnusedStores, "OptUnusedStores", 0 };
+static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",     0 };
+static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",    0 };
+static OptFunc DOptTransfers   	= { OptTransfers,    "OptTransfers",    0 };
+static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",  	0 };
+static OptFunc DOptBranchDist  	= { OptBranchDist,   "OptBranchDist",   0 };
+
+/* Table containing all the steps in alphabetical order */
+static OptFunc* OptFuncs[] = {
+    &DOptAdd1,
+    &DOptAdd2,
+    &DOptAdd3,
+    &DOptBoolTrans,
+    &DOptBranchDist,
+    &DOptCmp1,
+    &DOptCmp2,
+    &DOptCmp3,
+    &DOptCmp4,
+    &DOptCmp5,
+    &DOptCmp6,
+    &DOptCmp7,
+    &DOptCondBranches,
+    &DOptDeadCode,
+    &DOptDeadJumps,
+    &DOptDupLoads,
+    &DOptJumpCascades,
+    &DOptJumpTarget,
+    &DOptNegA1,
+    &DOptNegA2,
+    &DOptNegAX1,
+    &DOptNegAX2,
+    &DOptNegAX3,
+    &DOptNegAX4,
+    &DOptPtrStore1,
+    &DOptPtrStore2,
+    &DOptPtrLoad1,
+    &DOptPtrLoad2,
+    &DOptPtrLoad3,
+    &DOptPtrLoad4,
+    &DOptPtrLoad5,
+    &DOptPtrLoad6,
+    &DOptRTS,
+    &DOptRTSJumps,
+    &DOptSub1,
+    &DOptSub2,
+    &DOptShift1,
+    &DOptStackOps,
+    &DOptStoreLoad,
+    &DOptTest1,
+    &DOptTransfers,
+    &DOptUnusedLoads,
+    &DOptUnusedStores,
 };
+#define OPTFUNC_COUNT  (sizeof(OptFuncs) / sizeof(OptFuncs[0]))
+
+
+
+static unsigned RunOptStep (CodeSeg* S, OptFunc* O, unsigned Max)
+/* Run one optimizer function Max times or until there are no more changes */
+{
+    unsigned Changes, C;
+
+    /* Don't run the function if it is disabled */
+    if (O->Disabled) {
+    	return 0;
+    }
+
+    /* Run this until there are no more changes */
+    Changes = 0;
+    do {
+    	C = O->Func (S);
+	Changes += C;
+    } while (--Max && C > 0);
+
+    /* Return the number of changes */
+    return Changes;
+}
 
 
 
@@ -2737,10 +1519,10 @@ static OptFunc* FindOptStep (const char* Name)
     unsigned I;
 
     /* Run all optimization steps */
-    for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
-    	if (strcmp (OptFuncs[I].Name, Name) == 0) {
+    for (I = 0; I < OPTFUNC_COUNT; ++I) {
+       	if (strcmp (OptFuncs[I]->Name, Name) == 0) {
     	    /* Found */
-    	    return OptFuncs+I;
+    	    return OptFuncs[I];
     	}
     }
 
@@ -2756,8 +1538,8 @@ void DisableOpt (const char* Name)
 {
     if (strcmp (Name, "any") == 0) {
 	unsigned I;
-       	for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
-       	    OptFuncs[I].Disabled = 1;
+       	for (I = 0; I < OPTFUNC_COUNT; ++I) {
+       	    OptFuncs[I]->Disabled = 1;
     	}
     } else {
      	OptFunc* F = FindOptStep (Name);
@@ -2772,8 +1554,8 @@ void EnableOpt (const char* Name)
 {
     if (strcmp (Name, "any") == 0) {
 	unsigned I;
-       	for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
-       	    OptFuncs[I].Disabled = 0;
+       	for (I = 0; I < OPTFUNC_COUNT; ++I) {
+       	    OptFuncs[I]->Disabled = 0;
 	}
     } else {
      	OptFunc* F = FindOptStep (Name);
@@ -2787,54 +1569,88 @@ void ListOptSteps (FILE* F)
 /* List all optimization steps */
 {
     unsigned I;
-    for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
-	fprintf (F, "%s\n", OptFuncs[I].Name);
+    for (I = 0; I < OPTFUNC_COUNT; ++I) {
+    	fprintf (F, "%s\n", OptFuncs[I]->Name);
     }
 }
 
 
 
-static void RepeatOptStep (CodeSeg* S, unsigned char Type, unsigned Max)
-/* Repeat the optimizer step of type Type at may Max times */
+static void RunOptGroup1 (CodeSeg* S)
+/* Run the first group of optimization steps. These steps translate known
+ * patterns emitted by the code generator into more optimal patterns. Order
+ * of the steps is important, because some of the steps done earlier cover
+ * the same patterns as later steps as subpatterns.
+ */
 {
-    unsigned I;
-    unsigned Pass = 0;
-    unsigned OptChanges;
+    RunOptStep (S, &DOptPtrStore1, 1);
+    RunOptStep (S, &DOptPtrStore2, 1);
+    RunOptStep (S, &DOptPtrLoad1, 1);
+    RunOptStep (S, &DOptPtrLoad2, 1);
+    RunOptStep (S, &DOptPtrLoad3, 1);
+    RunOptStep (S, &DOptPtrLoad4, 1);
+    RunOptStep (S, &DOptPtrLoad5, 1);
+    RunOptStep (S, &DOptNegAX1, 1);
+    RunOptStep (S, &DOptNegAX2, 1);
+    RunOptStep (S, &DOptNegAX3, 1);
+    RunOptStep (S, &DOptNegAX4, 1);
+    RunOptStep (S, &DOptAdd1, 1);
+    RunOptStep (S, &DOptAdd2, 1);
+    RunOptStep (S, &DOptShift1, 1);
+}
 
-    /* Repeat max times of until there are no more changes */
+
+
+static void RunOptGroup2 (CodeSeg* S)
+/* Run one group of optimization steps. These steps depend on each other,
+ * that means that one step may allow another step to do additional work,
+ * so we will repeat the steps as long as we see any changes.
+ */
+{
+    unsigned Changes;
+
     do {
-     	/* Reset the number of changes */
-     	OptChanges = 0;
+	Changes = 0;
 
-    	/* Keep the user hapy */
-    	Print (stdout, 1, "  Optimizer pass %u:\n", ++Pass);
+	Changes += RunOptStep (S, &DOptPtrLoad6, 1);
+	Changes += RunOptStep (S, &DOptNegA1, 1);
+	Changes += RunOptStep (S, &DOptNegA2, 1);
+	Changes += RunOptStep (S, &DOptSub1, 1);
+	Changes += RunOptStep (S, &DOptSub2, 1);
+	Changes += RunOptStep (S, &DOptAdd3, 1);
+	Changes += RunOptStep (S, &DOptJumpCascades, 1);
+	Changes += RunOptStep (S, &DOptDeadJumps, 1);
+	Changes += RunOptStep (S, &DOptRTS, 1);
+	Changes += RunOptStep (S, &DOptDeadCode, 1);
+	Changes += RunOptStep (S, &DOptJumpTarget, 1);
+	Changes += RunOptStep (S, &DOptCondBranches, 1);
+	Changes += RunOptStep (S, &DOptRTSJumps, 1);
+	Changes += RunOptStep (S, &DOptBoolTrans, 1);
+	Changes += RunOptStep (S, &DOptCmp1, 1);
+	Changes += RunOptStep (S, &DOptCmp2, 1);
+	Changes += RunOptStep (S, &DOptCmp3, 1);
+	Changes += RunOptStep (S, &DOptCmp4, 1);
+	Changes += RunOptStep (S, &DOptCmp5, 1);
+	Changes += RunOptStep (S, &DOptCmp6, 1);
+	Changes += RunOptStep (S, &DOptCmp7, 1);
+	Changes += RunOptStep (S, &DOptTest1, 1);
+	Changes += RunOptStep (S, &DOptUnusedLoads, 1);
+	Changes += RunOptStep (S, &DOptUnusedStores, 1);
+	Changes += RunOptStep (S, &DOptDupLoads, 1);
+	Changes += RunOptStep (S, &DOptStoreLoad, 1);
+	Changes += RunOptStep (S, &DOptTransfers, 1);
+	Changes += RunOptStep (S, &DOptStackOps, 1);
 
-       	/* Run all optimization steps */
-       	for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
+    } while (Changes);
+}
 
-	    /* Get the table entry */
-	    const OptFunc* F = OptFuncs + I;
 
-	    /* Check if the type matches */
-	    if (F->Type != Type) {
-		/* Skip it */
-		continue;
-	    }
 
-    	    /* Print the name of the following optimizer step */
-    	    Print (stdout, 1, "    %s:%*s", F->Name, (int) (30-strlen(F->Name)), "");
-
-    	    /* Check if the step is disabled */
-       	    if (F->Disabled) {
-    	       	Print (stdout, 1, "Disabled\n");
-    	    } else {
-    	       	unsigned Changes = F->Func (S);
-    		OptChanges += Changes;
-    		Print (stdout, 1, "%u Changes\n", Changes);
-    	    }
-    	}
-
-    } while (--Max > 0 && OptChanges > 0);
+static void RunOptGroup3 (CodeSeg* S)
+/* The last group of optimization steps. Adjust branches.
+ */
+{
+    RunOptStep (S, &DOptBranchDist, 3);
 }
 
 
@@ -2845,7 +1661,7 @@ void RunOpt (CodeSeg* S)
 
     /* If we shouldn't run the optimizer, bail out */
     if (!Optimize) {
-	return;
+    	return;
     }
 
     /* Print the name of the function we are working on */
@@ -2855,12 +1671,10 @@ void RunOpt (CodeSeg* S)
      	Print (stdout, 1, "Running optimizer for global code segment\n");
     }
 
-    /* Repeat all steps until there are no more changes */
-    RepeatOptStep (S, optPre, 1);
-    RepeatOptStep (S, optPreMain, 0xFFFF);
-    RepeatOptStep (S, optMain, 0xFFFF);
-    RepeatOptStep (S, optPostMain, 0xFFFF);
-    RepeatOptStep (S, optPost, 1);
+    /* Run groups of optimizations */
+    RunOptGroup1 (S);
+    RunOptGroup2 (S);
+    RunOptGroup3 (S);
 }
 
 

@@ -33,8 +33,11 @@ OBJS =	anonname.o	\
 	codeopt.o	\
 	codeseg.o	\
 	compile.o 	\
+	coptadd.o	\
+	coptcmp.o	\
 	coptind.o	\
 	coptstop.o	\
+	coptsub.o	\
 	cpu.o	  	\
 	dataseg.o	\
 	datatype.o	\
@@ -106,4 +109,4 @@ depend dep:	$(OBJS:.o=.c)
 	$(CC) -I$(COMMON) -MM $^ > .depend
 
 
-			 
+

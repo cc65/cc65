@@ -691,7 +691,7 @@ unsigned OptUnusedStores (CodeSeg* S)
 
 
 
-unsigned OptDuplicateLoads (CodeSeg* S)
+unsigned OptDupLoads (CodeSeg* S)
 /* Remove loads of registers where the value loaded is already in the register. */
 {
     unsigned Changes = 0;

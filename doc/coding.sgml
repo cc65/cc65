@@ -234,7 +234,7 @@ The latter will work, but will create larger and slower code.
 
 
 
-<sect>When using the <tt/?:/ operator, cast values that are not ints<p>
+<sect>When using the ternary operator, cast values that are not ints<p>
 
 The result type of the <tt/?:/ operator is a long, if one of the second or
 third operands is a long. If the second operand has been evaluated and it was

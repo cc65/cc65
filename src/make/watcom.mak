@@ -2,13 +2,20 @@
 # Watcom Makefile for the cc65 binutils
 #
 
-SUBDIRS =		\
-	common		\
-	ar65		\
-	ca65		\
-	ld65
+SUBDIRS =	  	\
+	common	  	\
+	ar65	  	\
+	ca65	  	\
+	cc65	  	\
+	cl65	  	\
+	grc	  	\
+	ld65		\
+	od65
 
-all:
+all:	nt
+
+
+nt:
 	cd common
 	make -f make\watcom.mak
 	cd ..\ar65
@@ -44,6 +51,25 @@ dos:
        	make -DTARGET=DOS32 -f make\watcom.mak
 	cd ..\od65
        	make -DTARGET=DOS32 -f make\watcom.mak
+	cd ..
+
+os2:
+   	cd common
+       	make -DTARGET=OS2 -f make\watcom.mak
+	cd ..\ar65
+       	make -DTARGET=OS2 -f make\watcom.mak
+	cd ..\ca65
+       	make -DTARGET=OS2 -f make\watcom.mak
+	cd ..\cc65
+       	make -DTARGET=OS2 -f make\watcom.mak
+	cd ..\cl65
+       	make -DTARGET=OS2 -f make\watcom.mak
+	cd ..\grc
+       	make -DTARGET=OS2 -f make\watcom.mak
+	cd ..\ld65
+       	make -DTARGET=OS2 -f make\watcom.mak
+	cd ..\od65
+       	make -DTARGET=OS2 -f make\watcom.mak
 	cd ..
 
 clean:

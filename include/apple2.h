@@ -37,15 +37,8 @@
 
 
 /* Check for errors */
-#if !defined(__APPLE2__)
+#if !defined(__APPLE2__) && !defined(__APPLE2ENH__)
 #  error This module may only be used when compiling for the Apple ][!
-#endif
-
-
-
-/* Load the system specific files here, if needed */
-#if defined(__APPLE2ENH__) && !defined(_APPLEENH_H)
-#  include <apple2enh.h>
 #endif
 
 

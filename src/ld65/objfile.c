@@ -38,13 +38,14 @@
 #include <time.h>
 #include <sys/stat.h>
 
-#include "error.h"
-#include "mem.h"
-#include "objdata.h"
-#include "fileio.h"
-#include "segments.h"
-#include "exports.h"
+#include "../common/xmalloc.h"
+
 #include "dbgsyms.h"
+#include "error.h"
+#include "exports.h"
+#include "fileio.h"
+#include "objdata.h"
+#include "segments.h"
 #include "objfile.h"
 
 
@@ -105,7 +106,7 @@ void ObjReadFiles (FILE* F, ObjData* O)
     unsigned I;
 
     O->FileCount  = Read8 (F);
-    O->Files      = Xmalloc (O->FileCount * sizeof (char*));
+    O->Files      = xmalloc (O->FileCount * sizeof (char*));
     for (I = 0; I < O->FileCount; ++I) {
        	/* Skip MTime and size */
        	Read32 (F);
@@ -123,7 +124,7 @@ void ObjReadImports (FILE* F, ObjData* O)
     unsigned I;
 
     O->ImportCount = Read16 (F);
-    O->Imports     = Xmalloc (O->ImportCount * sizeof (Import*));
+    O->Imports     = xmalloc (O->ImportCount * sizeof (Import*));
     for (I = 0; I < O->ImportCount; ++I) {
    	O->Imports [I] = ReadImport (F, O);
 	InsertImport (O->Imports [I]);
@@ -138,7 +139,7 @@ void ObjReadExports (FILE* F, ObjData* O)
     unsigned I;
 
     O->ExportCount = Read16 (F);
-    O->Exports     = Xmalloc (O->ExportCount * sizeof (Export*));
+    O->Exports     = xmalloc (O->ExportCount * sizeof (Export*));
     for (I = 0; I < O->ExportCount; ++I) {
 	O->Exports [I] = ReadExport (F, O);
 	InsertExport (O->Exports [I]);
@@ -153,7 +154,7 @@ void ObjReadDbgSyms (FILE* F, ObjData* O)
     unsigned I;
 
     O->DbgSymCount = Read16 (F);
-    O->DbgSyms	   = Xmalloc (O->DbgSymCount * sizeof (DbgSym*));
+    O->DbgSyms	   = xmalloc (O->DbgSymCount * sizeof (DbgSym*));
     for (I = 0; I < O->DbgSymCount; ++I) {
 	O->DbgSyms [I] = ReadDbgSym (F, O);
     }
@@ -167,7 +168,7 @@ void ObjReadSections (FILE* F, ObjData* O)
     unsigned I;
 
     O->SectionCount = Read8 (F);
-    O->Sections     = Xmalloc (O->SectionCount * sizeof (Section*));
+    O->Sections     = xmalloc (O->SectionCount * sizeof (Section*));
     for (I = 0; I < O->SectionCount; ++I) {
 	O->Sections [I] = ReadSection (F, O);
     }
@@ -188,7 +189,7 @@ void ObjAdd (FILE* Obj, const char* Name)
     ObjReadHeader (Obj, &O->Header, Name);
 
     /* Initialize the object module data structure */
-    O->Name    	  = StrDup (GetModule (Name));
+    O->Name    	  = xstrdup (GetModule (Name));
     O->Flags   	  = OBJ_HAVEDATA;
 
     /* Read the files list from the object file */

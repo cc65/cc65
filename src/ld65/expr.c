@@ -34,10 +34,10 @@
 
 
 #include "../common/exprdefs.h"
+#include "../common/xmalloc.h"
 
 #include "global.h"
 #include "error.h"
-#include "mem.h"
 #include "fileio.h"
 #include "segments.h"
 #include "expr.h"
@@ -54,7 +54,7 @@ static ExprNode* NewExprNode (ObjData* O)
 /* Create a new expression node */
 {
     /* Allocate fresh memory */
-    ExprNode* N = Xmalloc (sizeof (ExprNode));
+    ExprNode* N = xmalloc (sizeof (ExprNode));
     N->Op 	= EXPR_NULL;
     N->Left 	= 0;
     N->Right 	= 0;
@@ -70,7 +70,7 @@ static void FreeExprNode (ExprNode* E)
 /* Free a node */
 {
     /* Free the memory */
-    Xfree (E);
+    xfree (E);
 }
 
 

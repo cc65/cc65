@@ -38,13 +38,14 @@
 #include <string.h>
 #include <errno.h>
 
+#include "../common/cmdline.h"
 #include "../common/libdefs.h"
 #include "../common/objdefs.h"
 #include "../common/version.h"
+#include "../common/xmalloc.h"
 
 #include "global.h"
 #include "error.h"
-#include "mem.h"
 #include "target.h"
 #include "fileio.h"
 #include "scanner.h"
@@ -81,37 +82,23 @@ static void Usage (void)
 {
     fprintf (stderr,
 	     "Usage: %s [options] module ...\n"
-	     "Options are:\n"
-	     "\t-m name\t\tCreate a map file\n"
-	     "\t-o name\t\tName the default output file\n"
-	     "\t-t type\t\tType of target system\n"
-	     "\t-v\t\tVerbose mode\n"
-	     "\t-vm\t\tVerbose map file\n"
-	     "\t-C name\t\tUse linker config file\n"
-       	     "\t-Ln name\tCreate a VICE label file\n"
-	     "\t-Lp\t\tMark write protected segments as such (VICE)\n"
-	     "\t-S addr\t\tSet the default start address\n"
-	     "\t-V\t\tPrint linker version\n",
+    	     "Short options:\n"
+       	     "  -h\t\t\tHelp (this text)\n"
+       	     "  -m name\t\tCreate a map file\n"
+       	     "  -o name\t\tName the default output file\n"
+       	     "  -t type\t\tType of target system\n"
+       	     "  -v\t\t\tVerbose mode\n"
+       	     "  -vm\t\t\tVerbose map file\n"
+       	     "  -C name\t\tUse linker config file\n"
+       	     "  -Ln name\t\tCreate a VICE label file\n"
+       	     "  -Lp\t\t\tMark write protected segments as such (VICE)\n"
+       	     "  -S addr\t\tSet the default start address\n"
+       	     "  -V\t\t\tPrint the linker version\n"
+	     "\n"
+	     "Long options:\n"
+	     "  --help\t\tHelp (this text)\n"
+       	     "  --version\t\tPrint the linker version\n",
 	     ProgName);
-    exit (EXIT_FAILURE);
-}
-
-
-
-static void UnknownOption (const char* Arg)
-/* Print an error about an unknown option. Print usage information and exit */
-{
-    fprintf (stderr, "Unknown option: %s\n", Arg);
-    Usage ();
-}
-
-
-
-static void InvNumber (const char* Arg)
-/* Print an error about an unknown option. Print usage information and exit */
-{
-    fprintf (stderr, "Invalid number given in argument: %s\n", Arg);
-    Usage ();
 }
 
 
@@ -122,52 +109,24 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
  */
 {
     unsigned long Val;
+    int 	  Converted;
 
     /* Convert */
     if (*Number == '$') {
 	++Number;
-	if (sscanf (Number, "%lx", &Val) != 1) {
-	    InvNumber (Arg);
-	}
+	Converted = sscanf (Number, "%lx", &Val);
     } else {
-	if (sscanf (Number, "%li", (long*)&Val) != 1) {
-	    InvNumber (Arg);
-	}
+	Converted = sscanf (Number, "%li", (long*)&Val);
+    }
+
+    /* Check if we do really have a number */
+    if (Converted != 1) {
+	fprintf (stderr, "Invalid number given in argument: %s\n", Arg);
+	exit (EXIT_FAILURE);
     }
 
     /* Return the result */
     return Val;
-}
-
-
-
-static const char* GetArg (int* ArgNum, char* argv [], unsigned Len)
-/* Get an option argument */
-{
-    const char* Arg = argv [*ArgNum];
-    if (Arg [Len] != '\0') {
-	/* Argument appended */
-	return Arg + Len;
-    } else {
-	/* Separate argument */
-	Arg = argv [*ArgNum + 1];
-	if (Arg == 0) {
-	    /* End of arguments */
-	    fprintf (stderr, "Option requires an argument: %s\n", argv [*ArgNum]);
-	    exit (EXIT_FAILURE);
-	}
-	++(*ArgNum);
-	return Arg;
-    }
-}
-
-
-
-static void LongOption (int* Arg, char* argv [])
-/* Handle a long command line option */
-{
-    /* For now ... */
-    UnknownOption (argv [*Arg]);
 }
 
 
@@ -199,7 +158,7 @@ static void LinkFile (const char* Name)
 	     * path separator character eventually needed.
 	     */
 	    Len = LibPathLen;
-	    NewName = Xmalloc (strlen (Name) + Len + 2);
+	    NewName = xmalloc (strlen (Name) + Len + 2);
 	    /* Build the new name */
 	    memcpy (NewName, LibPath, Len);
 	    if (NewName [Len-1] != '/' && NewName [Len-1] != '\\') {
@@ -243,7 +202,26 @@ static void LinkFile (const char* Name)
      * be freed if we run into an error, but that's no problem. Adding more
      * code to work around it will use more memory than the chunk that's lost.
      */
-    Xfree (NewName);
+    xfree (NewName);
+}
+
+
+
+static void OptHelp (const char* Opt, const char* Arg)
+/* Print usage information and exit */
+{
+    Usage ();
+    exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptVersion (const char* Opt, const char* Arg)
+/* Print the assembler version */
+{
+    fprintf (stderr,
+       	     "ld65 V%u.%u.%u - (C) Copyright 1998-2000 Ullrich von Bassewitz\n",
+	     VER_MAJOR, VER_MINOR, VER_PATCH);
 }
 
 
@@ -251,7 +229,16 @@ static void LinkFile (const char* Name)
 int main (int argc, char* argv [])
 /* Assembler main program */
 {
+    /* Program long options */
+    static const LongOpt OptTab[] = {
+       	{ "--help",	       	0,     	OptHelp			},
+	{ "--version",	       	0,	OptVersion		},
+    };
+
     int I;
+
+    /* Initialize the cmdline module */
+    InitCmdLine (argc, argv, "ld65");
 
     /* Evaluate the CC65_LIB environment variable */
     LibPath = getenv ("CC65_LIB");
@@ -260,7 +247,7 @@ int main (int argc, char* argv [])
 #ifdef CC65_LIB
 	LibPath = CC65_LIB;
 #else
-	LibPath = "/usr/lib/cc65/lib/";
+     	LibPath = "/usr/lib/cc65/lib/";
 #endif
     }
     LibPathLen = strlen (LibPath);
@@ -268,7 +255,7 @@ int main (int argc, char* argv [])
     /* Check the parameters */
     I = 1;
     while (I < argc) {
-
+     
 	/* Get the argument */
 	const char* Arg = argv [I];
 
@@ -279,22 +266,22 @@ int main (int argc, char* argv [])
 	    switch (Arg [1]) {
 
 		case '-':
-		    LongOption (&I, argv);
+		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
 		    break;
 
 		case 'm':
-		    MapFileName = GetArg (&I, argv, 2);
+		    MapFileName = GetArg (&I, 2);
 		    break;
 
 		case 'o':
-		    OutputName = GetArg (&I, argv, 2);
+		    OutputName = GetArg (&I, 2);
 		    break;
 
 		case 't':
 		    if (CfgAvail ()) {
 			Error ("Cannot use -C/-t twice");
 		    }
-		    TgtSet (GetArg (&I, argv, 2));
+		    TgtSet (GetArg (&I, 2));
 		    break;
 
 		case 'v':
@@ -309,25 +296,23 @@ int main (int argc, char* argv [])
 		    if (CfgAvail ()) {
 		      	Error ("Cannot use -C/-t twice");
 		    }
-		    CfgSetName (GetArg (&I, argv, 2));
+		    CfgSetName (GetArg (&I, 2));
 		    break;
 
 		case 'L':
 		    switch (Arg [2]) {
-		      	case 'n': LabelFileName = GetArg (&I, argv, 3); break;
-		      	case 'p': WProtSegs = 1;			break;
-		      	default:  UnknownOption (Arg);
+		      	case 'n': LabelFileName = GetArg (&I, 3); break;
+		      	case 'p': WProtSegs = 1;	      	  break;
+		      	default:  UnknownOption (Arg);		  break;
 		    }
 		    break;
 
 		case 'S':
-		    StartAddr = CvtNumber (Arg, GetArg (&I, argv, 2));
+		    StartAddr = CvtNumber (Arg, GetArg (&I, 2));
 		    break;
 
 		case 'V':
-		    fprintf (stderr,
-			     "ld65 V%u.%u.%u - (C) Copyright 1998-2000 Ullrich von Bassewitz\n",
-			     VER_MAJOR, VER_MINOR, VER_PATCH);
+		    OptVersion (Arg, 0);
 		    break;
 
 		default:
@@ -349,13 +334,13 @@ int main (int argc, char* argv [])
     /* Check if we had any object files */
     if (ObjFiles == 0) {
 	fprintf (stderr, "No object files to link\n");
-	Usage ();
+	exit (EXIT_FAILURE);
     }
 
     /* Check if we have a valid configuration */
     if (!CfgAvail ()) {
 	fprintf (stderr, "Memory configuration missing\n");
-	Usage ();
+	exit (EXIT_FAILURE);
     }
 
     /* Read the config file */
@@ -386,6 +371,7 @@ int main (int argc, char* argv [])
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;
 }
+
 
 
 

@@ -44,8 +44,6 @@
 
 
 
-extern const char*	ProgName;	/* Program name */
-
 extern const char*	OutputName;	/* Name of output file */
 
 extern unsigned long 	StartAddr;	/* Start address */

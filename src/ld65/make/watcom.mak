@@ -76,7 +76,6 @@ OBJS =	bin.obj		\
 	library.obj	\
 	main.obj	\
 	mapfile.obj	\
-	mem.obj		\
 	o65.obj		\
 	objdata.obj	\
 	objfile.obj	\
@@ -117,7 +116,6 @@ FILE global.obj
 FILE library.obj
 FILE main.obj
 FILE mapfile.obj
-FILE mem.obj
 FILE o65.obj
 FILE objdata.obj
 FILE objfile.obj

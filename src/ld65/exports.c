@@ -39,9 +39,9 @@
 
 #include "../common/symdefs.h"
 #include "../common/hashstr.h"
+#include "../common/xmalloc.h"
 
 #include "global.h"
-#include "mem.h"
 #include "error.h"
 #include "fileio.h"
 #include "objdata.h"
@@ -88,7 +88,7 @@ static Import* NewImport (unsigned char Type, ObjData* Obj)
 /* Create a new import and initialize it */
 {
     /* Allocate memory */
-    Import* I = Xmalloc (sizeof (Import));
+    Import* I = xmalloc (sizeof (Import));
 
     /* Initialize the fields */
     I->Next	= 0;
@@ -152,7 +152,7 @@ void InsertImport (Import* I)
     }
 
     /* Now free the name since it's no longer needed */
-    Xfree (Name);
+    xfree (Name);
 }
 
 
@@ -196,7 +196,7 @@ static Export* NewExport (unsigned char Type, const char* Name, ObjData* Obj)
     unsigned Len = strlen (Name);
 
     /* Allocate memory */
-    Export* E = Xmalloc (sizeof (Export) + Len);
+    Export* E = xmalloc (sizeof (Export) + Len);
 
     /* Initialize the fields */
     E->Next     = 0;
@@ -250,7 +250,7 @@ void InsertExport (Export* E)
       	   	       	HashTab [HashVal] = E;
       	   	    }
        	       	    ImpOpen -= E->ImpCount;	/* Decrease open imports now */
-      	   	    Xfree (L);
+      	   	    xfree (L);
       	   	    /* We must run through the import list and change the
       	   	     * export pointer now.
       	   	     */
@@ -493,9 +493,9 @@ static void CreateExportPool (void)
 
     /* Allocate memory */
     if (ExpPool) {
-	Xfree (ExpPool);
+	xfree (ExpPool);
     }
-    ExpPool = Xmalloc (ExpCount * sizeof (Export*));
+    ExpPool = xmalloc (ExpCount * sizeof (Export*));
 
     /* Walk through the list and insert the exports */
     for (I = 0, J = 0; I < sizeof (HashTab) / sizeof (HashTab [0]); ++I) {

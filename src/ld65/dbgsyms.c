@@ -36,9 +36,9 @@
 #include <string.h>
 
 #include "../common/symdefs.h"
+#include "../common/xmalloc.h"
 
 #include "global.h"
-#include "mem.h"
 #include "error.h"
 #include "fileio.h"
 #include "objdata.h"
@@ -73,7 +73,7 @@ static DbgSym* NewDbgSym (unsigned char Type, const char* Name, ObjData* O)
     unsigned Len = strlen (Name);
 
     /* Allocate memory */
-    DbgSym* D = Xmalloc (sizeof (DbgSym) + Len);
+    DbgSym* D = xmalloc (sizeof (DbgSym) + Len);
 
     /* Initialize the fields */
     D->Next     = 0;

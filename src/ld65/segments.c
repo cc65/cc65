@@ -37,15 +37,15 @@
 #include <string.h>
 
 #include "../common/exprdefs.h"
-#include "../common/symdefs.h"
-#include "../common/segdefs.h"
 #include "../common/hashstr.h"
+#include "../common/segdefs.h"
+#include "../common/symdefs.h"
+#include "../common/xmalloc.h"
 
-#include "mem.h"
-#include "global.h"
 #include "error.h"
-#include "fileio.h"
 #include "expr.h"
+#include "fileio.h"
+#include "global.h"
 #include "segments.h"
 
 
@@ -89,7 +89,7 @@ static Fragment* NewFragment (unsigned char Type, unsigned long Size, Section* S
 /* Create a new fragment and insert it into the segment S */
 {
     /* Allocate memory */
-    Fragment* F = Xmalloc (sizeof (Fragment) - 1 + Size);  	/* Portable? */
+    Fragment* F = xmalloc (sizeof (Fragment) - 1 + Size);  	/* Portable? */
 
     /* Initialize the data */
     F->Next = 0;
@@ -121,7 +121,7 @@ static Segment* NewSegment (const char* Name, unsigned char Type)
     unsigned Len = strlen (Name);
 
     /* Allocate memory */
-    Segment* S = Xmalloc (sizeof (Segment) + Len);
+    Segment* S = xmalloc (sizeof (Segment) + Len);
 
     /* Initialize the fields */
     S->Next	= 0;
@@ -155,7 +155,7 @@ static Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Typ
 
 
     /* Allocate memory */
-    Section* S = Xmalloc (sizeof (Segment));
+    Section* S = xmalloc (sizeof (Segment));
 
     /* Initialize the data */
     S->Next	= 0;
@@ -600,7 +600,7 @@ void PrintSegmentMap (FILE* F)
     Segment** SegPool;
 
     /* Allocate memory for the segment pool */
-    SegPool = Xmalloc (SegCount * sizeof (Segment*));
+    SegPool = xmalloc (SegCount * sizeof (Segment*));
 
     /* Collect pointers to the segments */
     I = 0;
@@ -643,7 +643,7 @@ void PrintSegmentMap (FILE* F)
     }
 
     /* Free the segment pool */
-    Xfree (SegPool);
+    xfree (SegPool);
 }
 
 

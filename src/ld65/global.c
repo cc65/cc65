@@ -43,8 +43,6 @@
 
 
 
-const char* ProgName   	    = "ld65";	/* Program name */
-
 const char* OutputName	    = "a.out"; 	/* Name of output file */
 
 unsigned long StartAddr	    = 0x200;	/* Start address */

@@ -39,9 +39,9 @@
 #include <errno.h>
 
 #include "../common/bitops.h"
+#include "../common/xmalloc.h"
 
 #include "error.h"
-#include "mem.h"
 #include "global.h"
 #include "bin.h"
 #include "o65.h"
@@ -125,7 +125,7 @@ static File* NewFile (const char* Name)
     unsigned Len = strlen (Name);
 
     /* Allocate memory */
-    File* F = Xmalloc (sizeof (File) + Len);
+    File* F = xmalloc (sizeof (File) + Len);
 
     /* Initialize the fields */
     F->Flags   = 0;
@@ -163,7 +163,7 @@ static Memory* NewMemory (const char* Name)
     }
 
     /* Allocate memory */
-    M = Xmalloc (sizeof (Memory) + Len);
+    M = xmalloc (sizeof (Memory) + Len);
 
     /* Initialize the fields */
     M->Next	 = 0;
@@ -221,7 +221,7 @@ static SegDesc* NewSegDesc (const char* Name)
     }
 
     /* Allocate memory */
-    S = Xmalloc (sizeof (SegDesc) + Len);
+    S = xmalloc (sizeof (SegDesc) + Len);
 
     /* Initialize the fields */
     S->Next    = 0;
@@ -241,7 +241,7 @@ static SegDesc* NewSegDesc (const char* Name)
 static void FreeSegDesc (SegDesc* S)
 /* Free a segment descriptor */
 {
-    Xfree (S);
+    xfree (S);
 }
 
 
@@ -567,7 +567,7 @@ static void MemoryInsert (Memory* M, SegDesc* S)
 /* Insert the segment descriptor into the memory area list */
 {
     /* Create a new node for the entry */
-    MemListNode* N = Xmalloc (sizeof (MemListNode));
+    MemListNode* N = xmalloc (sizeof (MemListNode));
     N->Seg  = S;
     N->Next = 0;
 

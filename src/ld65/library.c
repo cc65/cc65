@@ -37,18 +37,18 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../common/objdefs.h"
-#include "../common/libdefs.h"
-#include "../common/symdefs.h"
 #include "../common/exprdefs.h"
 #include "../common/filepos.h"
+#include "../common/libdefs.h"
+#include "../common/objdefs.h"
+#include "../common/symdefs.h"
+#include "../common/xmalloc.h"
 
-#include "mem.h"
 #include "error.h"
+#include "exports.h"
 #include "fileio.h"
 #include "objdata.h"
 #include "objfile.h"
-#include "exports.h"
 #include "library.h"
 
 
@@ -97,7 +97,7 @@ static void LibReadObjHeader (ObjData* O)
     O->Header.ExportOffs = Read32 (Lib);
     O->Header.ExportSize = Read32 (Lib);
     O->Header.DbgSymOffs = Read32 (Lib);
-    O->Header.DbgSymSize = Read32 (Lib);					
+    O->Header.DbgSymSize = Read32 (Lib);
 }
 
 
@@ -120,7 +120,7 @@ static ObjData* ReadIndexEntry (void)
     /* Skip the export size, then read the exports */
     Read16 (Lib);
     O->ExportCount = Read16 (Lib);
-    O->Exports = Xmalloc (O->ExportCount * sizeof (Export*));
+    O->Exports = xmalloc (O->ExportCount * sizeof (Export*));
     for (I = 0; I < O->ExportCount; ++I) {
 	O->Exports [I] = ReadExport (Lib, O);
     }
@@ -128,7 +128,7 @@ static ObjData* ReadIndexEntry (void)
     /* Skip the import size, then read the imports */
     Read16 (Lib);
     O->ImportCount = Read16 (Lib);
-    O->Imports = Xmalloc (O->ImportCount * sizeof (Import*));
+    O->Imports = xmalloc (O->ImportCount * sizeof (Import*));
     for (I = 0; I < O->ImportCount; ++I) {
 	O->Imports [I] = ReadImport (Lib, O);
     }
@@ -146,7 +146,7 @@ static void ReadIndex (void)
 
     /* Read the object file count and allocate memory */
     ModuleCount = Read16 (Lib);
-    Index = Xmalloc (ModuleCount * sizeof (ObjData*));
+    Index = xmalloc (ModuleCount * sizeof (ObjData*));
 
     /* Read all entries in the index */
     for (I = 0; I < ModuleCount; ++I) {
@@ -204,7 +204,7 @@ void LibAdd (FILE* F, const char* Name)
 
     /* Store the parameters, so they're visible for other routines */
     Lib     = F;
-    LibName = StrDup (Name);
+    LibName = xstrdup (Name);
 
     /* Read the remaining header fields (magic is already read) */
     Header.Magic   = LIB_MAGIC;
@@ -270,7 +270,7 @@ void LibAdd (FILE* F, const char* Name)
 
     /* Done. Close the file, release allocated memory */
     fclose (F);
-    Xfree (Index);
+    xfree (Index);
     Lib		= 0;
     LibName	= 0;
     ModuleCount = 0;

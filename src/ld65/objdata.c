@@ -35,7 +35,8 @@
 
 #include <string.h>
 
-#include "mem.h"
+#include "../common/xmalloc.h"
+
 #include "error.h"
 #include "objdata.h"
 
@@ -65,7 +66,7 @@ ObjData* NewObjData (void)
 /* Allocate a new structure on the heap, insert it into the list, return it */
 {
     /* Allocate memory */
-    ObjData* O = Xmalloc (sizeof (ObjData));
+    ObjData* O = xmalloc (sizeof (ObjData));
 
     /* Initialize the data */
     O->Next        	= 0;
@@ -82,11 +83,11 @@ ObjData* NewObjData (void)
 
     /* Link it into the list */
     if (ObjLast) {
-	ObjLast->Next = O;
-	ObjLast       = O;
+     	ObjLast->Next = O;
+     	ObjLast       = O;
     } else {
-	/* First entry */
-	ObjRoot = ObjLast = O;
+     	/* First entry */
+     	ObjRoot = ObjLast = O;
     }
 
     /* One object file more now */
@@ -101,11 +102,11 @@ ObjData* NewObjData (void)
 void FreeObjData (ObjData* O)
 /* Free a complete struct */
 {
-    Xfree (O->Name);
-    Xfree (O->Imports);
-    Xfree (O->Exports);
-    Xfree (O->DbgSyms);
-    Xfree (O);
+    xfree (O->Name);
+    xfree (O->Imports);
+    xfree (O->Exports);
+    xfree (O->DbgSyms);
+    xfree (O);
 }
 
 

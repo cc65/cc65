@@ -37,9 +37,10 @@
 #include <string.h>
 #include <errno.h>
 
+#include "../common/xmalloc.h"
+
 #include "global.h"
 #include "error.h"
-#include "mem.h"
 #include "fileio.h"
 #include "segments.h"
 #include "exports.h"
@@ -73,7 +74,7 @@ BinDesc* NewBinDesc (void)
 /* Create a new binary format descriptor */
 {
     /* Allocate memory for a new BinDesc struct */
-    BinDesc* D = Xmalloc (sizeof (BinDesc));
+    BinDesc* D = xmalloc (sizeof (BinDesc));
 
     /* Initialize the fields */
     D->Undef	= 0;
@@ -89,8 +90,8 @@ BinDesc* NewBinDesc (void)
 void FreeBinDesc (BinDesc* D)
 /* Free a binary format descriptor */
 {
-    Xfree (D);
-}
+    xfree (D);
+}    
 
 
 

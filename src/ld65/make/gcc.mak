@@ -21,7 +21,6 @@ OBJS = 	bin.o		\
 	library.o	\
 	main.o	       	\
 	mapfile.o	\
-        mem.o		\
 	o65.o		\
 	objdata.o	\
 	objfile.o	\
@@ -54,7 +53,7 @@ clean:
 zap:	clean
 	rm -f *.o $(EXECS) .depend
 
-	
+
 # ------------------------------------------------------------------------------
 # Make the dependencies
 

@@ -36,8 +36,8 @@
 #include <string.h>
 
 #include "../common/hashstr.h"
+#include "../common/xmalloc.h"
 
-#include "mem.h"
 #include "error.h"
 #include "extsyms.h"
 
@@ -88,11 +88,11 @@ ExtSym* NewExtSym (ExtSymTab* Tab, const char* Name)
     ExtSym* E =	GetExtSym (Tab, Name);	/* Don't care about duplicate hash here... */
     if (E != 0) {
 	/* We do already have a symbol with this name */
-	Error ("Duplicate external symbol `%s'", Name);
+     	Error ("Duplicate external symbol `%s'", Name);
     }
 
     /* Allocate memory for the structure */
-    E = Xmalloc (sizeof (ExtSym) + Len);
+    E = xmalloc (sizeof (ExtSym) + Len);
 
     /* Initialize the structure */
     E->List  = 0;
@@ -102,10 +102,10 @@ ExtSym* NewExtSym (ExtSymTab* Tab, const char* Name)
 
     /* Insert the entry into the list of all symbols */
     if (Tab->Last == 0) {
-	/* List is empty */
-	Tab->Root = E;
+     	/* List is empty */
+     	Tab->Root = E;
     } else {
-	/* List not empty */
+     	/* List not empty */
        	Tab->Last->List = E;
     }
     Tab->Last = E;
@@ -120,13 +120,13 @@ ExtSym* NewExtSym (ExtSymTab* Tab, const char* Name)
 }
 
 
-
+	 
 static void FreeExtSym (ExtSym* E)
 /* Free an external symbol structure. Will not unlink the entry, so internal
  * use only.
  */
 {
-    Xfree (E);
+    xfree (E);
 }
 
 
@@ -137,14 +137,14 @@ ExtSymTab* NewExtSymTab (void)
     unsigned I;
 
     /* Allocate memory */
-    ExtSymTab* Tab = Xmalloc (sizeof (ExtSymTab));
+    ExtSymTab* Tab = xmalloc (sizeof (ExtSymTab));
 
     /* Initialize the fields */
     Tab->Root	= 0;
     Tab->Last   = 0;
     Tab->Count  = 0;
     for (I = 0; I < HASHTAB_SIZE; ++I) {
-	Tab->HashTab [I] = 0;
+     	Tab->HashTab [I] = 0;
     }
 
     /* Done, return the hash table */
@@ -158,13 +158,13 @@ void FreeExtSymTab (ExtSymTab* Tab)
 {
     /* Free all entries */
     while (Tab->Root) {
-	ExtSym* E = Tab->Root;
-	Tab->Root = E->Next;
-	FreeExtSym (E);
+     	ExtSym* E = Tab->Root;
+     	Tab->Root = E->Next;
+     	FreeExtSym (E);
     }
 
     /* Free the struct itself */
-    Xfree (Tab);
+    xfree (Tab);
 }
 
 

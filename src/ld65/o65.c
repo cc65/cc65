@@ -39,13 +39,13 @@
 #include <time.h>
 
 #include "../common/version.h"
+#include "../common/xmalloc.h"
 
-#include "global.h"
 #include "error.h"
-#include "mem.h"
-#include "fileio.h"
 #include "exports.h"
 #include "expr.h"
+#include "fileio.h"
+#include "global.h"
 #include "o65.h"
 
 
@@ -281,12 +281,12 @@ static O65RelocTab* NewO65RelocTab (void)
 /* Create a new relocation table */
 {
     /* Allocate a new structure */
-    O65RelocTab* R = Xmalloc (sizeof (O65RelocTab));
+    O65RelocTab* R = xmalloc (sizeof (O65RelocTab));
 
     /* Initialize the data */
     R->Size = RELOC_BLOCKSIZE;
     R->Fill = 0;
-    R->Buf  = Xmalloc (RELOC_BLOCKSIZE);
+    R->Buf  = xmalloc (RELOC_BLOCKSIZE);
 
     /* Return the created struct */
     return R;
@@ -297,8 +297,8 @@ static O65RelocTab* NewO65RelocTab (void)
 static void FreeO65RelocTab (O65RelocTab* R)
 /* Free a relocation table */
 {
-    Xfree (R->Buf);
-    Xfree (R);
+    xfree (R->Buf);
+    xfree (R);
 }
 
 
@@ -309,9 +309,9 @@ static void O65RelocPutByte (O65RelocTab* R, unsigned B)
     /* Do we have enough space in the buffer? */
     if (R->Fill == R->Size) {
     	/* We need to grow the buffer */
-       	unsigned char* NewBuf = Xmalloc (R->Size + RELOC_BLOCKSIZE);
+       	unsigned char* NewBuf = xmalloc (R->Size + RELOC_BLOCKSIZE);
     	memcpy (NewBuf, R->Buf, R->Size);
-    	Xfree (R->Buf);
+    	xfree (R->Buf);
     	R->Buf = NewBuf;
     }
 
@@ -353,7 +353,7 @@ static O65Option* NewO65Option (unsigned Type, const void* Data, unsigned DataLe
     CHECK (DataLen <= 253);
 
     /* Allocate memory */
-    O = Xmalloc (sizeof (O65Option) - 1 + DataLen);
+    O = xmalloc (sizeof (O65Option) - 1 + DataLen);
 
     /* Initialize the structure */
     O->Next    	= 0;
@@ -370,7 +370,7 @@ static O65Option* NewO65Option (unsigned Type, const void* Data, unsigned DataLe
 static void FreeO65Option (O65Option* O)
 /* Free	an O65Option struct */
 {
-    Xfree (O);
+    xfree (O);
 }
 
 
@@ -718,7 +718,7 @@ O65Desc* NewO65Desc (void)
 /* Create, initialize and return a new O65 descriptor struct */
 {
     /* Allocate a new structure */
-    O65Desc* D = Xmalloc (sizeof (O65Desc));
+    O65Desc* D = xmalloc (sizeof (O65Desc));
 
     /* Initialize the header */
     D->Header.Version	= 0;
@@ -761,10 +761,10 @@ void FreeO65Desc (O65Desc* D)
 /* Delete the descriptor struct with cleanup */
 {
     /* Free the segment arrays */
-    Xfree (D->ZPSeg);
-    Xfree (D->BssSeg);
-    Xfree (D->DataSeg);
-    Xfree (D->TextSeg);
+    xfree (D->ZPSeg);
+    xfree (D->BssSeg);
+    xfree (D->DataSeg);
+    xfree (D->TextSeg);
 
     /* Free the relocation tables */
     FreeO65RelocTab (D->DataReloc);
@@ -782,7 +782,7 @@ void FreeO65Desc (O65Desc* D)
     FreeExtSymTab (D->Imports);
 
     /* Free the struct itself */
-    Xfree (D);
+    xfree (D);
 }
 
 
@@ -929,10 +929,10 @@ static void O65SetupSegments (O65Desc* D, Memory* M)
     }
 
     /* Allocate memory according to the numbers */
-    D->TextSeg = Xmalloc (D->TextCount * sizeof (SegDesc*));
-    D->DataSeg = Xmalloc (D->DataCount * sizeof (SegDesc*));
-    D->BssSeg  = Xmalloc (D->BssCount  * sizeof (SegDesc*));
-    D->ZPSeg   = Xmalloc (D->ZPCount   * sizeof (SegDesc*));
+    D->TextSeg = xmalloc (D->TextCount * sizeof (SegDesc*));
+    D->DataSeg = xmalloc (D->DataCount * sizeof (SegDesc*));
+    D->BssSeg  = xmalloc (D->BssCount  * sizeof (SegDesc*));
+    D->ZPSeg   = xmalloc (D->ZPCount   * sizeof (SegDesc*));
 
     /* Walk again through the list and setup the segment arrays */
     TextIdx = DataIdx = BssIdx = ZPIdx = 0;

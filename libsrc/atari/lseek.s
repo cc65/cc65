@@ -11,7 +11,7 @@
 	.import		incsp6,__errno,__oserror
 	.importzp	sreg
 	.include	"atari.inc"
-	.include	"../common/errno.inc"
+	.include	"errno.inc"
 
 .proc	_lseek
 

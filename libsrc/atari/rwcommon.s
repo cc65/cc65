@@ -3,16 +3,16 @@
 ; expects parameters (int fd,void *buf,int count)
 ;
         .include "atari.inc"
-	.include "../common/errno.inc"
+       	.include "errno.inc"
         .importzp tmp2,tmp3
         .import incsp6,ldax0sp,ldaxysp
 	.import __errno,__oserror
 	.import	fdtoiocb
-        
+
         .export __rwsetup
 
 __rwsetup:
-	
+
         ldy     #5
         jsr     ldaxysp         ; get fd
 	jsr	fdtoiocb	; convert to iocb
@@ -42,7 +42,7 @@ iocberr:jsr     incsp6          ; pop args
 	ldx	#$FF		; indicate error + clear ZF
 	rts
 
-	
+
 ;
 ; this routine updates errno.  do a JMP here right after calling
 ; CIOV.  we expect status in Y.
@@ -50,7 +50,7 @@ iocberr:jsr     incsp6          ; pop args
         .export __do_oserror,__seterrno,__inviocb
 __do_oserror:
 	sty	__oserror	; save os dependent error code
-retminus:	
+retminus:
 	lda	#$FF
 	tax			; return -1
 	rts

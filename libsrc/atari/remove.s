@@ -5,7 +5,7 @@
 ;
 
 	.include "atari.inc"
-	.include "../common/errno.inc"
+	.include "errno.inc"
 	.import	findfreeiocb,incsp2,__do_oserror
 	.import	popax,__oserror,__seterrno
 	.importzp tmp1

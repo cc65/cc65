@@ -5,8 +5,8 @@
 ;
 
 	.include "atari.inc"
-	.include "../common/fmode.inc"
-	.include "../common/errno.inc"
+	.include "fmode.inc"
+	.include "errno.inc"
 	.export	_open
 	.import	clriocb
 	.import	fddecusage,newfd

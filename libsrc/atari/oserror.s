@@ -5,7 +5,7 @@
 ; int __fastcall__ _osmaperrno (unsigned char oserror);
 ;
 
-	.include "../common/errno.inc"
+	.include "errno.inc"
 	.export	__osmaperrno
 
 .proc	__osmaperrno
@@ -33,7 +33,7 @@ inverr:	lda	#<EUNKNOWN
 .endproc
 
 .rodata
-	
+
 maptable:
 	.byte	EINTR	;BRKABT	= 128		;($80) BREAK key abort
 	.byte	EBUSY	;PRVOPN	= 129		;($81) IOCB already open error

@@ -28,7 +28,7 @@
 	.export	      	_rs232_put, _rs232_pause, _rs232_unpause, _rs232_status
 
 	.include	"c64.inc"
-        .include        "../common/rs232.inc"
+        .include        "rs232.inc"
 
 
 NmiExit = $febc     ;exit address for nmi

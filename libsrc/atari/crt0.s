@@ -19,7 +19,7 @@
 	.import		__CODE_LOAD__, __BSS_LOAD__
 
 	.include	"atari.inc"
-        .include        "../common/_file.inc"
+        .include        "_file.inc"
 
 ; ------------------------------------------------------------------------
 ; Define and export the ZP variables for the runtime

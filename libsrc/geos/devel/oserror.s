@@ -8,7 +8,7 @@
 ;
 
 	.export		__osmaperrno
-	.include	"../../common/errno.inc"
+	.include	"errno.inc"
 	.include	"../inc/const.inc"
 
 .code

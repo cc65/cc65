@@ -6,7 +6,7 @@
 ;
 
 	.export		__osmaperrno
-	.include	"../common/errno.inc"
+	.include	"errno.inc"
 
 .code
 

@@ -20,7 +20,7 @@
 	.importzp tmp1,tmp2,tmp3
 
 	.include	"atari.inc"
-	.include	"../common/errno.inc"
+	.include	"errno.inc"
 
 	.code
 

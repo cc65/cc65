@@ -28,8 +28,8 @@
 	.export	      	_rs232_put, _rs232_pause, _rs232_unpause, _rs232_status
 
 	.include	"atari.inc"
-	.include	"../common/errno.inc"
-        .include        "../common/rs232.inc"
+	.include	"errno.inc"
+        .include        "rs232.inc"
 
 	.rodata
 

@@ -36,7 +36,7 @@ apple2lib:
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t apple2 -I../../include" \
-	    AFLAGS="-t apple2" \
+	    AFLAGS="-t apple2 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv apple2/crt0.o apple2.o
@@ -52,7 +52,7 @@ atarilib:
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t atari -I../../include" \
-	    AFLAGS="-t atari" \
+	    AFLAGS="-t atari -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv atari/crt0.o atari.o
@@ -68,7 +68,7 @@ c64lib:
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
-	    AFLAGS="-t c64" \
+	    AFLAGS="-t c64 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv c64/crt0.o c64.o
@@ -84,7 +84,7 @@ c128lib:
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t c128 -I../../include" \
-	    AFLAGS="-t c128" \
+	    AFLAGS="-t c128 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv c128/crt0.o c128.o
@@ -100,7 +100,7 @@ cbm510lib:
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t cbm510 -I../../include" \
-	    AFLAGS="-t cbm510" \
+	    AFLAGS="-t cbm510 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv cbm510/crt0.o cbm510.o
@@ -116,7 +116,7 @@ cbm610lib:
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t cbm610 -I../../include" \
-	    AFLAGS="-t cbm610" \
+	    AFLAGS="-t cbm610 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv cbm610/crt0.o cbm610.o
@@ -132,14 +132,14 @@ geoslib:
 	AS=../$(AS) \
 	AR=../$(AR) \
 	CFLAGS="-Osir -g -T -t geos -I../../../include" \
-	AFLAGS="-t geos" \
+	AFLAGS="-t geos -I../../../asminc" \
 	$(MAKE) -C geos || exit 1
 	for i in common runtime; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    AR=$(AR) \
 	    CFLAGS="-Osir -g -T -t geos -I../../include" \
-	    AFLAGS="-t geos" \
+	    AFLAGS="-t geos -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	for i in common runtime; do \
@@ -160,7 +160,7 @@ petlib:
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t pet -I../../include" \
-	    AFLAGS="-t pet" \
+	    AFLAGS="-t pet -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv pet/crt0.o pet.o
@@ -176,7 +176,7 @@ plus4lib:
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t plus4 -I../../include" \
-	    AFLAGS="-t plus4" \
+	    AFLAGS="-t plus4 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv plus4/crt0.o plus4.o
@@ -196,6 +196,7 @@ clean:
 .PHONY: zap
 zap:	clean
 	@rm -f *.o *.lib
+
 
 
 

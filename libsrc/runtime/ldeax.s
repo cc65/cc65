@@ -7,6 +7,7 @@
 	.export		ldeax
 	.importzp	sreg, ptr4
 
+	.macpack	generic
 
 ldeax:	pla			; Low byte of return address
 	sta	ptr4
@@ -24,15 +25,13 @@ ldeax:	pla			; Low byte of return address
 	dey
 	lda	(ptr4),y
 	tay			; Save low byte
-	clc
-	lda	#4
-	adc	ptr4
-	sta	ptr4
-	lda	ptr4+1
-	adc	#$00
-	pha			; High byte of new return address
-	lda	ptr4
-	pha			; Low byte of new return address
-	tya			; Low byte of fetched value
-	rts
 
+; Calculate the return address (remember: RTS address is one low) and 
+; jump to it
+
+	lda	ptr4
+	add	#5
+	sta	ptr4
+	bcc	@L9
+	inc	ptr4+1
+@L9:	jmp	(ptr4)

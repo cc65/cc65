@@ -102,9 +102,17 @@ static unsigned BinWriteExpr (ExprNode* E, int Signed, unsigned Size,
 /* Called from SegWrite for an expression. Evaluate the expression, check the
  * range and write the expression value to the file.
  */
-{	      
+{
     /* There's a predefined function to handle constant expressions */
     return SegWriteConstExpr (((BinDesc*)Data)->F, E, Signed, Size);
+}
+
+
+
+static void PrintBoolVal (const char* Name, int B)
+/* Print a boolean value for debugging */
+{
+    printf ("      %s = %s\n", Name, B? "true" : "false");
 }
 
 
@@ -133,6 +141,14 @@ static void BinWriteMem (BinDesc* D, Memory* M)
        	DoWrite = (S->Flags & SF_BSS) == 0 	&& 	/* No BSS segment */
 		   S->Load == M 		&&	/* LOAD segment */
 		   S->Seg->Dumped == 0;			/* Not already written */
+
+	/* Output the DoWrite flag for debugging */
+	if (Verbose > 1) {
+       	    PrintBoolVal ("bss", S->Flags & SF_BSS);
+	    PrintBoolVal ("LoadArea", S->Load == M);
+       	    PrintBoolVal ("Dumped", S->Seg->Dumped);
+	    PrintBoolVal ("DoWrite", DoWrite);
+	}
 
 	/* Check if we would need an alignment */
 	if (S->Seg->Align > S->Align) {
@@ -175,7 +191,11 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 	} else if (M->Flags & MF_FILL) {
 	    WriteMult (D->F, M->FillVal, S->Seg->Size);
 	}
-	S->Seg->Dumped = 1;
+
+	/* If this was the load memory area, mark the segment as dumped */
+	if (S->Load == M) {
+  	    S->Seg->Dumped = 1;
+       	}
 
 	/* Calculate the new address */
 	Addr += S->Seg->Size;

@@ -1367,48 +1367,58 @@ void CfgWriteTarget (void)
     /* Walk through the files list */
     File* F = FileList;
     while (F) {
-	/* We don't need to look at files with no memory areas */
-	if (F->MemList) {
+  	/* We don't need to look at files with no memory areas */
+  	if (F->MemList) {
 
-	    /* Is there an output file? */
-	    if (strlen (F->Name) > 0) {
+  	    /* Is there an output file? */
+  	    if (strlen (F->Name) > 0) {
 
-		/* Assign a proper binary format */
-		if (F->Format == BINFMT_DEFAULT) {
-	    	    F->Format = DefaultBinFmt;
+  		/* Assign a proper binary format */
+  		if (F->Format == BINFMT_DEFAULT) {
+  	    	    F->Format = DefaultBinFmt;
      		}
 
      		/* Call the apropriate routine for the binary format */
-		switch (F->Format) {
+  		switch (F->Format) {
 
-		    case BINFMT_BINARY:
-			BinWriteTarget (BinFmtDesc, F);
-			break;
+  		    case BINFMT_BINARY:
+  		      	BinWriteTarget (BinFmtDesc, F);
+  		      	break;
 
-		    case BINFMT_O65:
-			O65WriteTarget (O65FmtDesc, F);
-			break;
+  		    case BINFMT_O65:
+  		      	O65WriteTarget (O65FmtDesc, F);
+  		      	break;
 
-		    default:
-		        Internal ("Invalid binary format: %u", F->Format);
+  		    default:
+  		        Internal ("Invalid binary format: %u", F->Format);
 
-		}
+  		}
 
-	    } else {
+  	    } else {
 
-		/* No output file. Walk through the list and mark all segments
-		 * assigned to the memory areas in this file as dumped.
-		 */
-		M = F->MemList;
-		while (M) {
-		    /* Walk throught the segments */
-		    MemListNode* N = M->SegList;
-		    while (N) {
-			/* Mark the segment as dumped */
-       	       	       	N->Seg->Seg->Dumped = 1;
+  		/* No output file. Walk through the list and mark all segments
+       	       	 * loading into these memory areas in this file as dumped.
+  		 */
+  		M = F->MemList;
+  		while (M) {
 
-			/* Next segment node */
-			N = N->Next;
+		    MemListNode* N;
+
+		    /* Debugging */
+		    if (Verbose > 1) {
+			printf ("Skipping `%s'...\n", M->Name);
+		    }
+
+  		    /* Walk throught the segments */
+  		    N = M->SegList;
+  		    while (N) {
+		      	if (N->Seg->Load == M) {
+  		      	    /* Load area - mark the segment as dumped */
+  		      	    N->Seg->Seg->Dumped = 1;
+  		      	}
+
+		      	/* Next segment node */
+		      	N = N->Next;
 		    }
 		    /* Next memory area */
 		    M = M->FNext;

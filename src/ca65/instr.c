@@ -887,7 +887,14 @@ int FindInstruction (const char* Ident)
 
     /* Make a copy, and uppercase that copy */
     I = 0;
-    while (Ident[I]) {
+    while (Ident[I] != '\0') {
+        /* If the identifier is longer than the longest mnemonic, it cannot
+         * be one.
+         */
+        if (I >= sizeof (Key) - 1) {
+            /* Not found, no need for further action */
+            return -1;
+        }
         Key[I] = toupper ((unsigned char)Ident[I]);
         ++I;
     }

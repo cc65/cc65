@@ -97,7 +97,7 @@
 /* Description for one instruction */
 typedef struct InsDesc InsDesc;
 struct InsDesc {
-    char       	      	Mnemonic [8];
+    char       	      	Mnemonic[5];
     unsigned long      	AddrMode;	    	/* Valid adressing modes */
     unsigned char     	BaseCode;  	    	/* Base opcode */
     unsigned char     	ExtCode;   	 	/* Number of ext code table */

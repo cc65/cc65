@@ -255,6 +255,14 @@ void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex);
  * and up are moved one position upwards.
  */
 
+void CollMoveMultiple (Collection* C, unsigned Start, unsigned Count, unsigned Target);
+/* Move a range of items from one position to another. Start is the index
+ * of the first item to move, Count is the number of items and Target is
+ * the index of the target item. The item with the index Start will later
+ * have the index Target. All items with indices Target and above are moved
+ * to higher indices.
+ */
+
 void CollSort (Collection* C,
 	       int (*Compare) (void*, const void*, const void*),
 	       void* Data);

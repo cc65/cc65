@@ -205,9 +205,72 @@ void CollMove (Collection* C, unsigned OldIndex, unsigned NewIndex)
 
 
 
+void CollMoveMultiple (Collection* C, unsigned Start, unsigned Count, unsigned Target)
+/* Move a range of items from one position to another. Start is the index
+ * of the first item to move, Count is the number of items and Target is
+ * the index of the target item. The item with the index Start will later
+ * have the index Target. All items with indices Target and above are moved
+ * to higher indices.
+ */
+{
+    void** TmpItems;
+    unsigned Bytes;
+
+    /* Check the range */
+    PRECONDITION (Start < C->Count && Start + Count <= C->Count && Target <= C->Count);
+
+    /* Check for trivial parameters */
+    if (Count == 0 || Start == Target) {
+    	return;
+    }
+
+    /* Calculate the raw memory space used by the items to move */
+    Bytes = Count * sizeof (void*);
+
+    /* Allocate temporary storage for the items */
+    TmpItems = xmalloc (Bytes);
+
+    /* Copy the items we have to move to the temporary storage */
+    memcpy (TmpItems, C->Items + Start, Bytes);
+
+    /* Check if the range has to be moved upwards or downwards. Move the
+     * existing items to their final location, so that the space needed
+     * for the items now in temporary storage is unoccupied.
+     */
+    if (Target < Start) {
+
+     	/* Move downwards */
+	unsigned BytesToMove = (Start - Target) * sizeof (void*);
+       	memmove (C->Items+Target+Count, C->Items+Target, BytesToMove);
+
+    } else if (Target < Start + Count) {
+
+	/* Target is inside range */
+	FAIL ("Not supported");
+
+    } else {
+
+     	/* Move upwards */
+	unsigned ItemsToMove = (Target - Start - Count);
+       	unsigned BytesToMove = ItemsToMove * sizeof (void*);
+     	memmove (C->Items+Start, C->Items+Target-ItemsToMove, BytesToMove);
+
+	/* Adjust the target index */
+	Target -= Count;
+    }
+
+    /* Move the old items to their final location */
+    memcpy (C->Items + Target, TmpItems, Bytes);
+
+    /* Delete the temporary item space */
+    xfree (TmpItems);
+}
+
+
+
 static void QuickSort (Collection* C, int Lo, int Hi,
-	               int (*Compare) (void*, const void*, const void*),
-		       void* Data)
+   	               int (*Compare) (void*, const void*, const void*),
+   		       void* Data)
 /* Internal recursive sort function. */
 {
     /* Get a pointer to the items */

@@ -4,7 +4,7 @@
 ; CC65 runtime: Load effective address with offset in Y relative to SP
 ;
 
-    	.export		leaasp, pleaysp
+    	.export		leaasp, pleaasp
      	.import		pushax
      	.importzp	sp
 

@@ -173,6 +173,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
 	"Exported symbol `%s' is undefined",
 	"Exported values must be constant",
 	".IF nesting too deep",
+	"Unexpected end of file",
 	"Unexpected end of line",
 	"Unexpected `%s'",
 	"Division by zero",

@@ -13,11 +13,11 @@ EXE  	= cc65
 COMMON	= ../common
 
 # The compiler library search path. Default is "/usr/lib/cc65/include/" if
-# nothing is defined
-#CDEFS=-DCC65_INC=\"/usr/lib/cc65/include/\"
+# nothing is defined. You may use CC65_INC=foo on the command line to override it.
+CC65_INC = \"/usr/lib/cc65/include/\"
 
 #
-CFLAGS = -O2 -g -Wall -W -I$(COMMON) $(CDEFS)
+CFLAGS = -O2 -g -Wall -W -I$(COMMON) -DCC65_INC=$(CC65_INC)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=-lm

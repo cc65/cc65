@@ -52,6 +52,10 @@ CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
 !else
 !error
 !endif
+	       
+# Add the include dir
+CCCFG	= $(CCCFG) -i=..\common
+
 
 # ------------------------------------------------------------------------------
 # Implicit rules

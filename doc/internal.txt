@@ -114,6 +114,15 @@ Supported systems at this time are: C64, C128, Plus/4, CBM 500, CBM 600/700,
 the newer PET machines (not 2001), Atari 8bit, and the Apple ][ (thanks to
 Kevin Ruland, who did the port).
 
+C16:    Works with unexpanded or memory expanded C16 and C116 machines.
+        However, a maximum of 32KB from the total memory is used. The Plus/4
+        target supports up to 64K of memory, but has a small code overhead
+        because of the banking routines involved. Apart from this additional
+        overhead, the Plus/4 target and the C16 target are the same. 16K
+        machines (unexpanded C16) have 12K of memory for C programs available,
+        machines with 32K or more have 28K available. The actual amount of
+        memory is auto detected.
+
 C64:  	The program runs in a memory configuration, where only the kernal ROM
       	is enabled. The text screen is expected at the usual place ($400), so
        	50K of memory are available to the program.
@@ -128,8 +137,8 @@ Plus/4:	Unfortunately, the Plus/4 is not able to disable only part of it's
       	free memory is reduced to 12K).
 
 CBM 500:
-    	The C program runs in bank #0 and has a total of 48K memory available. 
-	This is less than what is available on its bigger brothers (CBM 
+    	The C program runs in bank #0 and has a total of 48K memory available.
+	This is less than what is available on its bigger brothers (CBM
 	600/700) because the character data and video RAM is placed in the
 	execution bank (#0) to allow the use of sprites.
 
@@ -179,10 +188,7 @@ assembler file.
 
 Example, insert a break instruction into the code:
 
-       	asm ("\t.byte\t$00")
-
-Note: The \t in the string is replaced by the tab character, as in all other
-strings.
+       	asm ("brk")
 
 Beware: Be careful when inserting inline code since this may collide with
 the work of the optimizer.
@@ -201,7 +207,9 @@ functions results and pass parameters.
 This feature is useful with inline assembly and macros. For example, a macro
 that reads a CRTC register may be written like this:
 
-#define wr(idx) (__AX__=(idx),					\
-       	       	asm("\tsta\t$2000\n\tlda\t$2000\n\tldx\t#$00"),	\
+#define wr(idx) (__AX__=(idx), 	       	\
+       	       	asm ("sta $2000"),      \
+                asm ("lda $2000"),      \
+                asm ("ldx #$00"),	\
 		__AX__)
 

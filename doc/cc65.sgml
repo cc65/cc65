@@ -200,14 +200,16 @@ Here is a description of all the command line options:
 
   <itemize>
   <item>none
+  <item>apple2
   <item>atari
+  <item>atmos
+  <item>c16 (works also for the c116 with memory up to 32K)
   <item>c64
   <item>c128
   <item>plus4
   <item>cbm510 (CBM-II series with 40 column video)
   <item>cbm610 (all CBM-II II computers with 80 column video)
   <item>pet (all CBM PET systems except the 2001)
-  <item>apple2
   <item>geos
   </itemize>
 
@@ -515,6 +517,10 @@ The compiler defines several macros at startup:
   <tag><tt>__CBM__</tt></tag>
 
   This macro is defined if the target system is one of the CBM targets.
+
+  <tag><tt>__C16__</tt></tag>
+
+  This macro is defined if the target is the c16 (-t c16).
 
   <tag><tt>__C64__</tt></tag>
 

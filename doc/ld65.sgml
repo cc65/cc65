@@ -118,14 +118,16 @@ Here is a description of all the command line options:
 
   <itemize>
   <item>none
+  <item>apple2
   <item>atari
+  <item>atmos
+  <item>c16 (works also for the c116 with memory up to 32K)
   <item>c64
   <item>c128
   <item>plus4
   <item>cbm510 (CBM-II series with 40 column video)
   <item>cbm610 (all CBM series-II computers with 80 column video)
   <item>pet (all CBM PET systems except the 2001)
-  <item>apple2
   <item>geos
   </itemize>
 
@@ -785,6 +787,62 @@ types:
 	}
 </verb></tscreen>
 
+<tag><tt>atmos</tt></tag>
+<tscreen><verb>
+        MEMORY {
+            ZP: start = $02, size = $1A, type = rw, define = yes;
+            RAM: start = $0600, size = $9200, define = yes, file = %O;
+        }
+        SEGMENTS {
+            CODE: load = RAM, type = wprot;
+            RODATA: load = RAM, type = wprot;
+            DATA: load = RAM, type = rw;
+            BSS: load = RAM, type = bss, define = yes;
+            ZEROPAGE: load = ZP, type = zp;
+        }
+        FEATURES {
+            CONDES: segment = RODATA,
+                    type = constructor,
+                    label = __CONSTRUCTOR_TABLE__,
+                    count = __CONSTRUCTOR_COUNT__;
+            CONDES: segment = RODATA,
+                    type = destructor,
+                    label = __DESTRUCTOR_TABLE__,
+                    count = __DESTRUCTOR_COUNT__;
+        }
+        SYMBOLS {
+            __STACKSIZE__ = $800;	# 2K stack
+        }
+</verb></tscreen>
+
+<tag><tt>c16</tt></tag>
+<tscreen><verb>
+	MEMORY {
+	    ZP: start = $02, size = $1A, type = rw;
+	    RAM: start = $0fff, size = $7001, file = %O;
+	}
+	SEGMENTS {
+	    CODE: load = RAM, type = wprot;
+	    RODATA: load = RAM, type = wprot;
+	    DATA: load = RAM, type = rw;
+	    BSS: load = RAM, type = bss, define = yes;
+	    ZEROPAGE: load = ZP, type = zp;
+	}
+	FEATURES {
+	    CONDES: segment = RODATA,
+	    	    type = constructor,
+	    	    label = __CONSTRUCTOR_TABLE__,
+	    	    count = __CONSTRUCTOR_COUNT__;
+	    CONDES: segment = RODATA,
+	    	    type = destructor,
+	    	    label = __DESTRUCTOR_TABLE__,
+	    	    count = __DESTRUCTOR_COUNT__;
+	}
+	SYMBOLS {
+	    __STACKSIZE__ = $800;	# 2K stack
+	}
+</verb></tscreen>
+
 <tag><tt>c64</tt></tag>
 <tscreen><verb>
 	MEMORY {
@@ -802,7 +860,7 @@ types:
 	    CONDES: segment = RODATA,
 		    type = constructor,
 		    label = __CONSTRUCTOR_TABLE__,
-		    count = __CONSTRUCTOR_COUNT__;
+	 	    count = __CONSTRUCTOR_COUNT__;
 	    CONDES: segment = RODATA,
 		    type = destructor,
 		    label = __DESTRUCTOR_TABLE__,
@@ -829,7 +887,7 @@ types:
 	FEATURES {
 	    CONDES: segment = RODATA,
 		    type = constructor,
-		    label = __CONSTRUCTOR_TABLE__,
+	    	    label = __CONSTRUCTOR_TABLE__,
 		    count = __CONSTRUCTOR_COUNT__;
 	    CONDES: segment = RODATA,
 		    type = destructor,

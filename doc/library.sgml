@@ -168,6 +168,7 @@ portable. conio implementations exist for the following targets:
 
   <itemize>
   <item>atari
+  <item>c16 (works also for the c116 with up to 32K memory)
   <item>c64
   <item>c128
   <item>plus4

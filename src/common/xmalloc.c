@@ -6,10 +6,10 @@
 /*					    				     */
 /*					    				     */
 /*					    				     */
-/* (C) 2000	Ullrich von Bassewitz	    				     */
-/*	   	Wacholderweg 14						     */
-/*	   	D-70597 Stuttgart					     */
-/* EMail:  	uz@musoftware.de					     */
+/* (C) 2000-2001 Ullrich von Bassewitz	    				     */
+/*	   	 Wacholderweg 14					     */
+/*	   	 D-70597 Stuttgart					     */
+/* EMail:  	 uz@musoftware.de					     */
 /*	   								     */
 /*	   								     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -60,6 +60,23 @@ void* xmalloc (size_t Size)
 
     /* Return a pointer to the block */
     return P;
+}
+
+
+
+void* xrealloc (void* P, size_t Size)
+/* Reallocate a memory block, check for out of memory */
+{
+    /* Reallocate the block */
+    void* N = realloc (P, Size);
+
+    /* Check for errors */
+    if (N == 0 && Size != 0) {
+       	AbEnd ("Out of memory in realloc - requested block size = %lu", (unsigned long) Size);
+    }
+
+    /* Return the pointer to the new block */
+    return N;
 }
 
 

@@ -3589,15 +3589,15 @@ static void OptBitOps (void)
 
 	/* Search for
 	 *
-	 *  	lda	xxx
-	 *  	and	#$yy	; adc/eor/ora
-	 *  	sta	xxx
+	 *     	lda	xxx
+	 *     	and	#$yy	; adc/eor/ora
+	 *     	sta	xxx
 	 *
 	 * and replace it by
 	 *
-	 *  	lda	#$yy
-	 *  	and	xxx
-	 *  	sta	xxx
+	 *     	lda	#$yy
+	 *     	and	xxx
+	 *     	sta	xxx
 	 *
 	 * While this saves nothing here, it transforms the code to contain an
 	 * explicit register load that may be removed by the basic block
@@ -3613,70 +3613,68 @@ static void OptBitOps (void)
 
 	    if (LineMatch (L2[0], "\tand\t#$")) {
 
-	    	unsigned Val = GetHexNum (L2[0]->Line+7);
-		if (Val == 0x00) {
+	       	unsigned Val = GetHexNum (L2[0]->Line+7);
+	       	if (Val == 0x00) {
 
        	       	    /* AND with 0x00, remove the mem access */
-		    FreeLine (L);
-		    FreeLine (L2[1]);
+	       	    FreeLine (L);
+	       	    FreeLine (L2[1]);
 
-		    /* Replace the AND by a load */
-	    	    L = ReplaceLine (L2[0], "\tlda\t#$%02X", Val);
+	       	    /* Replace the AND by a load */
+	       	    L = ReplaceLine (L2[0], "\tlda\t#$%02X", Val);
 
-	    	} else if (Val == 0xFF) {
+	       	} else if (Val == 0xFF) {
 
-	    	    /* AND with 0xFF, just load the value from memory */
-	    	    FreeLines (L2[0], L2[1]);
+	       	    /* AND with 0xFF, just load the value from memory */
+	       	    FreeLines (L2[0], L2[1]);
 
-	    	} else if (CPU == CPU_65C02 	&&
-	    		   !IsXAddrMode (L)	&&
-	    		   !IsYAddrMode (L)	&&
-	    		   !RegAUsed (L2[1])) {
+	       	} else if (CPU == CPU_65C02 	&&
+	       		   !IsXAddrMode (L)	&&
+	       		   !IsYAddrMode (L)	&&
+	       		   !RegAUsed (L2[1])) {
 
-	    	    /* Replace by trb */
-	    	    ReplaceLine (L, 	"\tlda\t#$%02X", (~Val) & 0xFF);
-	    	    ReplaceLine (L2[0], "\ttrb\t%s", L2[1]->Line+5);
-	    	    FreeLine (L2[1]);
-	    	    L = L2[0];
+	       	    /* Replace by trb */
+	       	    ReplaceLine (L, 	"\tlda\t#$%02X", (~Val) & 0xFF);
+	       	    L = ReplaceLine (L2[0], "\ttrb\t%s", L2[1]->Line+5);
+	       	    FreeLine (L2[1]);
 
-	    	} else {
+	       	} else {
 
-	    	    /* Just reorder */
-	    	    L = ReplaceLine (L, "\tlda\t#$%02X", Val);
-	    	    ReplaceLine (L2[0], "\tand\t%s", L2[1]->Line+5);
-	    	    L = L2[1];
+	       	    /* Just reorder */
+	       	    ReplaceLine (L, "\tlda\t#$%02X", Val);
+	       	    ReplaceLine (L2[0], "\tand\t%s", L2[1]->Line+5);
+	       	    L = L2[1];
 
-	    	}
+	       	}
 
 	    } else if (LineMatch (L2[0], "\tora\t#$")) {
 
-	    	unsigned Val = GetHexNum (L2[0]->Line+7);
-		if (Val == 0x00) {
+	       	unsigned Val = GetHexNum (L2[0]->Line+7);
+	       	if (Val == 0x00) {
 
-		    /* ORA with 0x00, just load the value from memory */
-		    FreeLines (L2[0], L2[1]);
+	       	    /* ORA with 0x00, just load the value from memory */
+	       	    FreeLines (L2[0], L2[1]);
 
-		} else if (Val == 0xFF) {
+	       	} else if (Val == 0xFF) {
 
        	       	    /* ORA with 0xFF, replace by a store of $FF */
-		    FreeLine (L);
-		    ReplaceLine (L2[0], "\tlda\t#$FF");
+	       	    FreeLine (L);
+	       	    L = ReplaceLine (L2[0], "\tlda\t#$FF");
 
-		} else if (CPU == CPU_65C02 	&&
-			   !IsXAddrMode (L)	&&
-			   !IsYAddrMode (L)	&&
-			   !RegAUsed (L2[1])) {
+	       	} else if (CPU == CPU_65C02 	&&
+	       		   !IsXAddrMode (L)	&&
+	       		   !IsYAddrMode (L)	&&
+	       		   !RegAUsed (L2[1])) {
 
 		    /* Replace by trb */
 		    ReplaceLine (L, 	"\tlda\t#$%02X", Val);
-		    ReplaceLine (L2[0], "\ttsb\t%s", L2[1]->Line+5);
+		    L = ReplaceLine (L2[0], "\ttsb\t%s", L2[1]->Line+5);
 		    FreeLine (L2[1]);
-		    L = L2[0];
 
 		} else {
 
 		    /* Just reorder */
-		    L = ReplaceLine (L, "\tlda\t#$%02X", Val);
+		    ReplaceLine (L, "\tlda\t#$%02X", Val);
 		    ReplaceLine (L2[0], "\tora\t%s", L2[1]->Line+5);
 		    L = L2[1];
 

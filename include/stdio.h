@@ -101,9 +101,9 @@ int puts (const char* s);
 int remove (const char* name);
 int rename (const char* old, const char* new);
 int sprintf (char* buf, const char* format, ...);
-int vfprintf (FILE* f, const char* format, va_list ap);
+int __fastcall__ vfprintf (FILE* f, const char* format, va_list ap);
 int vprintf (const char* format, va_list ap);
-int vsprintf (char* buf, const char* format, va_list ap);
+int __fastcall__ vsprintf (char* buf, const char* format, va_list ap);
 
 #ifndef __STRICT_ANSI__
 FILE* fdopen (int fd, const char* mode); 	/* Unix */

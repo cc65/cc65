@@ -2,9 +2,12 @@
 # gcc Makefile for ld65
 #
 
+# Library dir
+COMMON	= ../common
+
 # Default for the compiler lib search path as compiler define
 CDEFS=-DCC65_LIB=\"/usr/lib/cc65/lib/\"
-CFLAGS = -g -O2 -Wall -I../common $(CDEFS)
+CFLAGS = -g -O2 -Wall -I$(COMMON) $(CDEFS)
 CC=gcc
 LDFLAGS=
 
@@ -28,7 +31,7 @@ OBJS = 	bin.o		\
 	segments.o	\
 	target.o
 
-LIBS = ../common/common.a
+LIBS = $(COMMON)/common.a
 
 
 EXECS = ld65
@@ -60,6 +63,6 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -MM $^ > .depend
+	$(CC) -I$(COMMON) -MM $^ > .depend
 
 

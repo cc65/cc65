@@ -2,7 +2,10 @@
 # gcc Makefile for ca65
 #
 
-CFLAGS 	= -g -O2 -Wall -I../common
+# Library dir
+COMMON	= ../common
+
+CFLAGS 	= -g -O2 -Wall -I$(COMMON)
 CC	= gcc
 LDFLAGS	=
 
@@ -30,7 +33,7 @@ OBJS =  condasm.o	\
        	toklist.o      	\
 	ulabel.o
 
-LIBS = ../common/common.a
+LIBS = $(COMMON)/common.a
 
 EXECS = ca65
 
@@ -60,6 +63,6 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -MM $^ > .depend
+	$(CC) -I$(COMMON) -MM $^ > .depend
 
 

@@ -2,8 +2,11 @@
 # Makefile for the cl65 compile&link utility
 #
 
+# Library dir
+COMMON	= ../common
+
 CC=gcc
-CFLAGS = -O2 -g -Wall
+CFLAGS = -O2 -g -Wall -I$(COMMON)
 LDFLAGS=
 
 OBJS =	error.o	 	\
@@ -11,7 +14,7 @@ OBJS =	error.o	 	\
 	main.o		\
 	spawn.o
 
-LIBS = ../common/common.a
+LIBS = $(COMMON)/common.a
 
 EXECS = cl65
 
@@ -42,7 +45,7 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -MM $^ > .depend
+	$(CC) -I$(COMMON) -MM $^ > .depend
 
 
 

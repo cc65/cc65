@@ -3,9 +3,12 @@
 #
 
 
+# Library dir
+COMMON	= ../common
+
 # Default for the compiler lib search path as compiler define
 CDEFS=-DCC65_INC=\"/usr/lib/cc65/include/\"
-CFLAGS = -O2 -g -Wall -I../common $(CDEFS)
+CFLAGS = -O2 -g -Wall -I$(COMMON) $(CDEFS)
 CC=gcc
 LDFLAGS=
 
@@ -45,7 +48,7 @@ OBJS =	anonname.o	\
 	symtab.o       	\
 	util.o
 
-LIBS = ../common/common.a
+LIBS = $(COMMON)/common.a
 
 EXECS = cc65
 
@@ -75,6 +78,6 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -MM $^ > .depend
+	$(CC) -I$(COMMON) -MM $^ > .depend
 
 

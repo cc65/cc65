@@ -2,7 +2,10 @@
 # gcc Makefile for ar65
 #
 
-CFLAGS 	= -g -O2 -Wall -I../common
+# Library dir
+COMMON	= ../common
+
+CFLAGS 	= -g -O2 -Wall -I$(COMMON)
 CC	= gcc
 LDFLAGS	=
 
@@ -19,7 +22,7 @@ OBJS = 	add.o		\
     	objdata.o	\
     	objfile.o
 
-LIBS = ../common/common.a
+LIBS = $(COMMON)/common.a
 
 
 EXECS = ar65
@@ -50,6 +53,6 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -MM $^ > .depend
+	$(CC) -I$(COMMON) -MM $^ > .depend
 
 

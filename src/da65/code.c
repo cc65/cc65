@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,8 +41,9 @@
 #include "check.h"
 
 /* da65 */
-#include "error.h"
 #include "code.h"
+#include "error.h"
+#include "global.h"
 
 
 
@@ -65,53 +66,65 @@ unsigned long PC;			/* Current PC */
 
 
 
-void LoadCode (const char* Name, unsigned long StartAddress)
+void LoadCode (void)
 /* Load the code from the given file */
 {
     long Count, MaxCount, Size;
     FILE* F;
 
 
-    PRECONDITION (StartAddress < 0x10000);
-
-    /* Calculate the maximum code size */
-    MaxCount = 0x10000 - StartAddress;
+    PRECONDITION (StartAddr < 0x10000);
 
     /* Open the file */
-    F = fopen (Name, "rb");
+    F = fopen (InFile, "rb");
     if (F == 0) {
-     	Error ("Cannot open `%s': %s", Name, strerror (errno));
+     	Error ("Cannot open `%s': %s", InFile, strerror (errno));
     }
 
     /* Seek to the end to get the size of the file */
     if (fseek (F, 0, SEEK_END) != 0) {
-	Error ("Cannot seek on file `%s': %s", Name, strerror (errno));
+	Error ("Cannot seek on file `%s': %s", InFile, strerror (errno));
     }
     Size = ftell (F);
     rewind (F);
 
+    /* If the start address was not given, set it so that the code loads to
+     * 0x10000 - Size. This is a reasonable default assuming that the file
+     * is a ROM that contains the hardware vectors at $FFFA.
+     */
+    if (StartAddr < 0) {
+	if (Size > 0x10000) {
+	    StartAddr = 0;
+	} else {
+	    StartAddr = 0x10000 - Size;
+	}
+    }
+
+    /* Calculate the maximum code size */
+    MaxCount = 0x10000 - StartAddr;
+
     /* Check if the size is larger than what we can read */
     if (Size == 0) {
-     	Error ("File `%s' contains no data", Name);
+       	Error ("File `%s' contains no data", InFile);
     }
     if (Size > MaxCount) {
-	Warning ("File `%s' is too large, ignoring %ld bytes",
-		 Name, Size - MaxCount);
+       	Warning ("File `%s' is too large, ignoring %ld bytes",
+       		 InFile, Size - MaxCount);
     } else if (MaxCount > Size) {
-	MaxCount = (unsigned) Size;
+       	MaxCount = (unsigned) Size;
     }
 
     /* Read from the file and remember the number of bytes read */
-    Count = fread (CodeBuf + StartAddress, 1, MaxCount, F);
+    Count = fread (CodeBuf + StartAddr, 1, MaxCount, F);
     if (ferror (F) || Count != MaxCount) {
-     	Error ("Error reading from `%s': %s", Name, strerror (errno));
+     	Error ("Error reading from `%s': %s", InFile, strerror (errno));
     }
 
     /* Close the file */
     fclose (F);
 
     /* Set the buffer variables */
-    CodeStart = PC = StartAddress;
+    CodeStart = PC = StartAddr;
     CodeEnd = CodeStart + Count - 1;	/* CodeEnd is inclusive */
 }
 

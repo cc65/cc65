@@ -424,7 +424,7 @@ int main (int argc, char* argv [])
     }
 
     /* Load the input file */
-    LoadCode (InFile, StartAddr);
+    LoadCode ();
 
     /* Open the output file */
     OpenOutput (OutFile);

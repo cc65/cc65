@@ -55,7 +55,7 @@ const char CfgExt[]    	      = ".cfg";	/* Config file extension */
 unsigned char DebugInfo       = 0;      /* Add debug info to the object file */
 unsigned char FormFeeds	      = 0;	/* Add form feeds to the output? */
 unsigned char PassCount	      = 2;	/* How many passed do we do? */
-unsigned long StartAddr	      = 0xC000;	/* Start/load address of the program */
+long 	      StartAddr	      = -1;	/* Start/load address of the program */
 
 /* Stuff needed by many routines */
 unsigned char Pass	      = 0;	/* Disassembler pass */

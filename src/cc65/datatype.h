@@ -52,11 +52,11 @@
 
 
 
-// Basic data types
+/* Basic data types */
 enum {
     T_END	    = 0x0000,
 
-    // Basic types
+    /* Basic types */
     T_TYPE_NONE	    = 0x0000,
     T_TYPE_CHAR	    = 0x0001,
     T_TYPE_SHORT    = 0x0002,
@@ -74,7 +74,7 @@ enum {
     T_TYPE_FUNC     = 0x000E,
     T_MASK_TYPE	    = 0x001F,
 
-    // Type classes
+    /* Type classes */
     T_CLASS_NONE    = 0x0000,
     T_CLASS_INT	    = 0x0020,
     T_CLASS_FLOAT   = 0x0040,
@@ -83,26 +83,26 @@ enum {
     T_CLASS_FUNC    = 0x00A0,
     T_MASK_CLASS    = 0x00E0,
 
-    // Type signedness
+    /* Type signedness */
     T_SIGN_NONE	    = 0x0000,
     T_SIGN_UNSIGNED = 0x0100,
     T_SIGN_SIGNED   = 0x0200,
     T_MASK_SIGN     = 0x0300,
 
-    // Type size modifiers
+    /* Type size modifiers */
     T_SIZE_NONE	    = 0x0000,
     T_SIZE_SHORT    = 0x0400,
     T_SIZE_LONG     = 0x0800,
     T_SIZE_LONGLONG = 0x0C00,
     T_MASK_SIZE	    = 0x0C00,
 
-    // Type qualifiers
+    /* Type qualifiers */
     T_QUAL_NONE     = 0x0000,
     T_QUAL_CONST    = 0x1000,
     T_QUAL_VOLATILE = 0x2000,
     T_MASK_QUAL	    = 0x3000,
 
-    // Types
+    /* Types */
     T_CHAR     	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
     T_SCHAR    	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
     T_UCHAR    	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
@@ -137,7 +137,7 @@ typedef unsigned short type;
 /* Maximum length of a type string */
 #define MAXTYPELEN   	30
 
-/* type elements needed for Encode/Decode */
+/* Type elements needed for Encode/Decode */
 #define DECODE_SIZE    	5
 
 /* Predefined type strings */

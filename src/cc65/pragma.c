@@ -224,14 +224,9 @@ static void FlagPragma (StrBuf* B, unsigned char* Flag)
 /* Handle a pragma that expects a boolean paramater */
 {
     ident Ident;
+    long  Val;
 
-    if (SB_Peek (B) == '0') {
-        SB_Skip (B);
-        *Flag = 0;
-    } else if (SB_Peek (B) == '1') {
-        SB_Skip (B);
-        *Flag = 1;
-    } else if (SB_GetSym (B, Ident)) {
+    if (SB_GetSym (B, Ident)) {
         if (strcmp (Ident, "true") == 0 || strcmp (Ident, "on") == 0) {
             *Flag = 1;
         } else if (strcmp (Ident, "false") == 0 || strcmp (Ident, "off") == 0) {
@@ -239,6 +234,8 @@ static void FlagPragma (StrBuf* B, unsigned char* Flag)
         } else {
             Error ("Pragma argument must be one of `on', `off', `true' or `false'");
         }
+    } else if (SB_GetNumber (B, &Val)) {
+	*Flag = (Val != 0);
     } else {
         Error ("Invalid pragma argument");
     }

@@ -208,8 +208,12 @@ static void CheckDirectOp (StackOpData* D)
         if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS) {
             /* These insns are all ok and replaceable */
             D->Flags |= OP_DIRECT;
-        } else if (E->AM == AM65_ZP_INDY && RegValIsKnown (E->RI->In.RegY)) {
-            /* Load indirect with known offset is also ok */
+        } else if (E->AM == AM65_ZP_INDY && RegValIsKnown (E->RI->In.RegY) &&
+                   strcmp (E->Arg, D->ZPLo) != 0 && strcmp (E->Arg, D->ZPHi) != 0) {
+            /* Load indirect with known offset is also ok, provided that
+             * the zeropage location used is not the same as the one we're
+             * using for the temp storage.
+             */
             D->Flags |= (OP_DIRECT | OP_RELOAD_Y);
         }
     }

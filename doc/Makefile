@@ -9,6 +9,7 @@ SGML  =	ar65.sgml	\
 	ca65.sgml	\
 	cc65.sgml	\
 	cl65.sgml   	\
+        co65.sgml       \
 	coding.sgml	\
 	debugging.sgml	\
 	dio.sgml    	\

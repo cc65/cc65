@@ -70,9 +70,7 @@ int __fastcall__ ispunct (int c);
 int __fastcall__ isspace (int c);
 int __fastcall__ isupper (int c);
 int __fastcall__ isxdigit (int c);
-#ifndef __STRICT_ANSI__
-int __fastcall__ isblank (int c); 	/* cc65 (and GNU) extension */
-#endif
+int __fastcall__ isblank (int c);      	/* New in C99 */
 
 int __fastcall__ toupper (int c);	/* Always external */
 int __fastcall__ tolower (int c);	/* Always external */
@@ -100,13 +98,11 @@ int __fastcall__ tolower (int c);	/* Always external */
  	       	    __asm__ ("and #%b", _CT_ALPHA),     \
                     __AX__)
 
-#ifndef STRICT_ANSI
 #define isblank(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
  	       	    __asm__ ("lda %v,y", _ctype),       \
  	       	    __asm__ ("and #%b", _CT_SPACE_TAB), \
                     __AX__)
-#endif
 
 #define iscntrl(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \

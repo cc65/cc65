@@ -1250,6 +1250,24 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
+<sect1><tt>.FORCEIMPORT</tt><label id=".FORCEIMPORT"><p>
+
+  Import an absolute symbol from another module. The command is followed by a
+  comma separated list of symbols to import. The command is similar to <tt>
+  <ref id=".IMPORT" name=".IMPORT"></tt>, but the import reference is always
+  written to the generated object file, even if the symbol is never referenced
+  (<tt><ref id=".IMPORT" name=".IMPORT"></tt> will not generate import
+  references for unused symbols).
+
+  Example:
+
+  <tscreen><verb>
+   	.forceimport   	needthisone, needthistoo
+  </verb></tscreen>
+
+  See: <tt><ref id=".IMPORT" name=".IMPORT"></tt>
+
+
 <sect1><tt>.GLOBAL</tt><label id=".GLOBAL"><p>
 
   Declare symbols as global. Must be followed by a comma separated list of

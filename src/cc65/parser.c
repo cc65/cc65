@@ -275,10 +275,11 @@ static ExprNode* Primary (void)
 	   	return GetIntNode (0);
 	    }
 
-	    /* Handle enum values as constant integers */
-       	    if ((Sym->Flags & SC_ENUM) == SC_ENUM) {
+	    /* Handle constants including enum values */
+       	    if ((Sym->Flags & SC_CONST) == SC_CONST) {
 
-		N = GetIntNode (Sym->V.EnumVal);
+		N = AllocExprNode (NT_CONST, Sym->Type, RVALUE);
+		N->IVal = Sym->V.ConstVal;
 
 	    } else {
 

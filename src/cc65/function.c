@@ -231,14 +231,14 @@ void NewFunc (SymEntry* Func)
      * The latter is different depending on the type of the function (variadic
      * or not).
      */
-    AddLocalSym ("__fixargs__", type_uint, SC_DEF | SC_CONST, D->ParamSize);
+    AddConstSym ("__fixargs__", type_uint, SC_DEF | SC_CONST, D->ParamSize);	 
     if (D->Flags & FD_ELLIPSIS) {
 	/* Variadic function. The variable must be const. */
 	static const type T [] = { T_UCHAR | T_QUAL_CONST, T_END };
 	AddLocalSym ("__argsize__", T, SC_DEF | SC_REF | SC_AUTO, 0);
     } else {
 	/* Non variadic */
-	AddLocalSym ("__argsize__", type_uchar, SC_DEF | SC_CONST, D->ParamSize);
+       	AddConstSym ("__argsize__", type_uchar, SC_DEF | SC_CONST, D->ParamSize);
     }
 
     /* Function body now defined */

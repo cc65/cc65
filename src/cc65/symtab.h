@@ -137,8 +137,8 @@ SymEntry* FindStructField (const type* TypeArray, const char* Name);
 SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab);
 /* Add a struct/union entry and return it */
 
-SymEntry* AddEnumSym (const char* Name, int Val);
-/* Add an enum symbol to the symbol table and return it */
+SymEntry* AddConstSym (const char* Name, const type* Type, unsigned Flags, long Val);
+/* Add an constant symbol to the symbol table and return it */
 
 SymEntry* AddLabelSym (const char* Name, unsigned Flags);
 /* Add a goto label to the symbol table */

@@ -208,7 +208,7 @@ static void ParseEnumDecl (void)
     	}
 
 	/* Add an entry to the symbol table */
-	AddEnumSym (Ident, EnumVal++);
+	AddConstSym (Ident, type_int, SC_ENUM, EnumVal++);
 
 	/* Check for end of definition */
     	if (curtok != TOK_COMMA)

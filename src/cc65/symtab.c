@@ -567,13 +567,13 @@ SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab)
 
 
 
-SymEntry* AddEnumSym (const char* Name, int Val)
-/* Add an enum symbol to the symbol table and return it */
+SymEntry* AddConstSym (const char* Name, const type* Type, unsigned Flags, long Val)
+/* Add an constant symbol to the symbol table and return it */
 {
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (SymTab, Name, HashStr (Name));
     if (Entry) {
-	if (Entry->Flags != SC_ENUM) {
+	if ((Entry->Flags & SC_CONST) != SC_CONST) {
 	    Error ("Symbol `%s' is already different kind", Name);
 	} else {
      	    Error ("Multiple definition for `%s'", Name);
@@ -582,13 +582,13 @@ SymEntry* AddEnumSym (const char* Name, int Val)
     }
 
     /* Create a new entry */
-    Entry = NewSymEntry (Name, SC_ENUM);
+    Entry = NewSymEntry (Name, Flags);
 
     /* Enum values are ints */
-    Entry->Type	= TypeDup (type_int);
+    Entry->Type	= TypeDup (Type);
 
     /* Set the enum data */
-    Entry->V.EnumVal = Val;
+    Entry->V.ConstVal = Val;
 
     /* Add the entry to the symbol table */
     AddSymEntry (SymTab, Entry);
@@ -729,7 +729,7 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
 	/* Create a new entry */
      	Entry = NewSymEntry (Name, Flags);
 
-     	/* Set the symbol attributes */		
+     	/* Set the symbol attributes */
      	Entry->Type = TypeDup (Type);
 
      	/* Add the entry to the symbol table */

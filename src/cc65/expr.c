@@ -775,7 +775,7 @@ static int primary (struct expent* lval)
        	    if ((Sym->Flags & SC_CONST) == SC_CONST) {
 		/* Enum or some other numeric constant */
 	       	lval->e_flags = E_MCONST;
-	    	lval->e_const = Sym->V.EnumVal;
+	    	lval->e_const = Sym->V.ConstVal;
 	       	return 0;
 	    } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
 	   	/* Function */

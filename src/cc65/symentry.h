@@ -56,7 +56,7 @@
 #define SC_STATIC    	0x0004U
 #define SC_EXTERN    	0x0008U
 
-#define SC_ENUM	     	0x0030U	/* An enum (numeric constant) */    
+#define SC_ENUM	     	0x0030U	/* An enum (numeric constant) */
 #define SC_CONST	0x0020U	/* A numeric constant with a type */
 #define SC_LABEL       	0x0040U	/* A goto label */
 #define SC_PARAM       	0x0080U	/* This is a function parameter */
@@ -97,8 +97,8 @@ struct SymEntry {
 	/* Label name for static symbols */
 	unsigned		Label;
 
-	/* Value for enums */
-	int    			EnumVal;
+	/* Value for constants (including enums) */
+       	long			ConstVal;
 
 	/* Data for structs/unions */
 	struct {

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -39,7 +39,7 @@
 
 
 /* NULL pointer */
-#ifdef _HAVE_NULL   
+#ifndef _HAVE_NULL
 #define NULL	0
 #define _HAVE_NULL
 #endif
@@ -54,7 +54,7 @@ typedef unsigned long time_t;
 typedef unsigned long clock_t;
 
 /* Structure for broken down time */
-struct tm {
+struct tm {     
     int	    tm_sec;
     int     tm_min;
     int     tm_hour;

@@ -40,7 +40,8 @@ OBJS =	_scrsize.o   	\
         kernal.o        \
         mainargs.o      \
         randomize.o     \
-        revers.o
+        revers.o        \
+        sysuname.o
 
 #--------------------------------------------------------------------------
 # Drivers

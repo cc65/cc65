@@ -63,6 +63,7 @@ OBJS =	_scrsize.o	\
         mainargs.o      \
         randomize.o     \
         revers.o        \
+        sysuname.o      \
 	tgi_mode_table.o
 
 #--------------------------------------------------------------------------

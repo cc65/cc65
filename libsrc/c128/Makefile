@@ -46,6 +46,7 @@ OBJS =	_scrsize.o		\
         revers.o        	\
 	rs232.o			\
 	slow.o			\
+        sysuname.o              \
 	tgi_mode_table.o	\
 	toggle_videomode.o
 

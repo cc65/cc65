@@ -45,6 +45,7 @@ OBJS=	_scrsize.o	\
 	read.o		\
 	revers.o	\
         systime.o       \
+        sysuname.o      \
 	where.o		\
 	write.o
 

@@ -38,6 +38,7 @@ S_OBJS  =       _scrsize.o      \
                 mainargs.o      \
                 revers.o        \
                 systime.o       \
+                sysuname.o      \
                 wherex.o        \
                 wherey.o        \
                 write.o

@@ -22,7 +22,8 @@ S_OBJS  =       ctype.o                 \
                 mainloop.o              \
                 panic.o                 \
                 tobasic.o               \
-                setdevice.o
+                setdevice.o             \
+                sysuname.o
 
 C_OBJS	=	systime.o
 

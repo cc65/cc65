@@ -44,6 +44,7 @@ OBJS = 	_scrsize.o     	 	\
         randomize.o             \
         revers.o                \
        	rs232.o	       	 	\
+        sysuname.o              \
         tgi_mode_table.o
 
 #--------------------------------------------------------------------------

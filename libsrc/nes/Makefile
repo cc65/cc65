@@ -39,6 +39,7 @@ S_OBJS  =       _scrsize.o      \
                 randomize.o     \
                 revers.o        \
                 setcursor.o     \
+                sysuname.o      \
                 waitvblank.o    \
                 wherex.o        \
                 wherey.o

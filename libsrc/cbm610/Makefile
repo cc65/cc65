@@ -42,7 +42,8 @@ OBJS =	_scrsize.o	\
 	pokesys.o	\
         randomize.o     \
 	revers.o	\
-	rs232.o
+	rs232.o         \
+        sysuname.o
 
 #--------------------------------------------------------------------------
 # Drivers

@@ -1,5 +1,5 @@
 ;
-; Ullrich von Bassewitz, 06.08.1998
+; Christian Groessler, 19-Feb-2000
 ;
 ; int kbhit (void);
 ;
@@ -10,12 +10,8 @@
 	.include	"atari.inc"
 
 _kbhit:
-	lda	CH	; Get number of characters
-	cmp	#$FF
-	bne   	L1
-	jmp	return1
-L1:	jmp	return0
-
-
-
-
+	ldx	CH		; last pressed key
+	inx			; 255 means "no key"
+	bne	L1
+	jmp	return0
+L1:	jmp	return1

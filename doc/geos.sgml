@@ -37,18 +37,19 @@ resulting code will be smaller.
 <tt/dio/ - direct disk access is available, but you might have problems with devices other
 than 1541, 1571 or 1581. RAM drives emulating these should work.
 <p>
-<tt/conio/ - simple console input-output is available for command line applications. Note that
-unlikely other platforms this implementation does not provide fullscreen capabilities, e.g.
-you are on your own with checking last row and scrolling screen up etc. Color, line drawing and
-clearing functions are disabled because color is not supported and line drawing art can be
-easily done with graphics functions. Please note that a variable width font (to be specific:
-current font, so you can load any font you like) is used so <tt/wherex, gotox/ family functions
-will not always return the same values. In fact <tt/gotoxy/ sets current position to the place
-you would expect on a normal 40x25 screen, not a position that would regard current font's
-height. Both 40 and 80 columns modes are supported.
+<tt/conio/ - simple console input-output is available for command line applications.
+This implementation assumes that one character will fit in 8x8 cell, so output with
+default BSW font, which is has 9 points, might be a bit messy.
+<tt/cputs/ will output characters with fixed width, for proportional spacing use
+<tt/cpputs/ but this function does not update cursor. There is no color support in
+GEOS 2.0 so color functions are disabled. Both 40 and 80 columns modes are supported
+and automatically detected.
 <p>
 It is safe to use these standard includes and its contents:
 <tt/assert.h, conio.h, dio.h, errno.h, geos.h, joystick.h, mouse.h, stdlib.h, string.h/
+<p>
+It was not tested enough, but functions from these includes might work under GEOS:
+<tt/rs232.h, zlib.h/
 <p>
 I am an assembler programmer and GEOSLib was designed in such way that cc65 could emit the best
 available code (well, the best as for machine :). Many of the <tt/void foo (void)/ functions are
@@ -150,8 +151,7 @@ doesn't mean end of program. GEOS is event-driven environment where applications
 events, main loop is in kernal. <tt/main/ function should setup the screen, menus etc. and return.
 Real end of the program should be called from event call, e.g. from menu item. You can force end of
 program and return to DeskTop either by standard <tt/exit (0)/ function or by <tt/EnterDeskTop()/.
-Currently they are almost the same (last minute note: don't use <tt/exit/ ever, it's broken right
-now :-).
+Currently they are almost the same.
 <p>
 Whenever possible use definitions from <tt/gsym.h/. The resulting code is translated by cc65 into
 series of <tt/lda/ and <tt/sta/, so you can't do it better :-).
@@ -293,6 +293,16 @@ Draws single point on the screen, no matter what the current pattern is.
 This function tests if given pixel is set and returns true or false.
 
 <sect2>Character and string output
+
+<sect3>cpputs
+<p>
+<tt/cpputsxy (char x, char y, char *myString)/
+<p>
+<tt/cpputs (char *myString)/
+<p>
+Actually this is a part of <tt/conio/, but this function is non-standard. It is
+a variety of <tt/cputs/ that will output string with proportional spacing, not
+fixed like <tt/cputs/.
 
 <sect3>PutChar
 <p>

@@ -272,6 +272,9 @@ unsigned sizeofarg (unsigned flags)
 	case CF_LONG:
 	    return 4;
 
+        case CF_FLOAT:
+            return 4;
+
 	default:
 	    typeerror (flags);
 	    /* NOTREACHED */
@@ -3385,19 +3388,19 @@ void g_eq (unsigned flags, unsigned long val)
       	switch (flags & CF_TYPE) {
 
       	    case CF_CHAR:
-		if (flags & CF_FORCECHAR) {
-		    AddCodeLine ("cmp #$%02X", (unsigned char)val);
-		    AddCodeLine ("jsr booleq");
-		    return;
-		}
+     		if (flags & CF_FORCECHAR) {
+     		    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+     		    AddCodeLine ("jsr booleq");
+     		    return;
+     		}
      		/* FALLTHROUGH */
 
       	    case CF_INT:
-		L = GetLocalLabel();
+     		L = GetLocalLabel();
      		AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
        	       	AddCodeLine ("bne %s", LocalLabelName (L));
      		AddCodeLine ("cmp #$%02X", (unsigned char)val);
-		g_defcodelabel (L);
+     		g_defcodelabel (L);
      		AddCodeLine ("jsr booleq");
      		return;
 
@@ -3409,10 +3412,11 @@ void g_eq (unsigned flags, unsigned long val)
      	}
 
      	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-      	 * into the normal, non-optimized stuff.
+      	 * into the normal, non-optimized stuff. Note: The standard stuff will
+         * always work with ints.
      	 */
-     	g_push (flags & ~CF_CONST, 0);
-
+        flags &= ~CF_FORCECHAR;
+       	g_push (flags & ~CF_CONST, 0);
     }
 
     /* Use long way over the stack */
@@ -3465,10 +3469,11 @@ void g_ne (unsigned flags, unsigned long val)
      	}
 
      	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-      	 * into the normal, non-optimized stuff.
+      	 * into the normal, non-optimized stuff. Note: The standard stuff will
+         * always work with ints.
      	 */
-     	g_push (flags & ~CF_CONST, 0);
-
+        flags &= ~CF_FORCECHAR;
+       	g_push (flags & ~CF_CONST, 0);
     }
 
     /* Use long way over the stack */
@@ -3545,11 +3550,12 @@ void g_lt (unsigned flags, unsigned long val)
 
         }
 
-	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-	 * into the normal, non-optimized stuff.
-	 */
-	g_push (flags & ~CF_CONST, 0);
-
+     	/* If we go here, we didn't emit code. Push the lhs on stack and fall
+      	 * into the normal, non-optimized stuff. Note: The standard stuff will
+         * always work with ints.
+     	 */
+        flags &= ~CF_FORCECHAR;
+       	g_push (flags & ~CF_CONST, 0);
     }
 
     /* Use long way over the stack */
@@ -3663,10 +3669,11 @@ void g_le (unsigned flags, unsigned long val)
      	}
 
      	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-     	 * into the normal, non-optimized stuff.
+      	 * into the normal, non-optimized stuff. Note: The standard stuff will
+         * always work with ints.
      	 */
-     	g_push (flags & ~CF_CONST, 0);
-
+        flags &= ~CF_FORCECHAR;
+       	g_push (flags & ~CF_CONST, 0);
     }
 
     /* Use long way over the stack */
@@ -3796,10 +3803,11 @@ void g_gt (unsigned flags, unsigned long val)
      	}
 
      	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-     	 * into the normal, non-optimized stuff.
+      	 * into the normal, non-optimized stuff. Note: The standard stuff will
+         * always work with ints.
      	 */
-     	g_push (flags & ~CF_CONST, 0);
-
+        flags &= ~CF_FORCECHAR;
+       	g_push (flags & ~CF_CONST, 0);
     }
 
     /* Use long way over the stack */
@@ -3877,11 +3885,12 @@ void g_ge (unsigned flags, unsigned long val)
 
         }
 
-	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-	 * into the normal, non-optimized stuff.
-	 */
-	g_push (flags & ~CF_CONST, 0);
-
+     	/* If we go here, we didn't emit code. Push the lhs on stack and fall
+      	 * into the normal, non-optimized stuff. Note: The standard stuff will
+         * always work with ints.
+     	 */
+        flags &= ~CF_FORCECHAR;
+       	g_push (flags & ~CF_CONST, 0);
     }
 
     /* Use long way over the stack */

@@ -3,7 +3,7 @@
 <article>
 <title>ca65 Users Guide
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>19.07.2000, 29.11.2000
+<date>19.07.2000, 29.11.2000, 02.10.2001
 
 <abstract>
 ca65 is a powerful macro assembler for the 6502, 65C02 and 65816 CPUs. It is
@@ -87,33 +87,33 @@ The assembler accepts the following options:
 ---------------------------------------------------------------------------
 Usage: ca65 [options] file
 Short options:
-  -g	 		Add debug info to object file
-  -h	 		Help (this text)
-  -i	 		Ignore case of symbols
-  -l	 		Create a listing if assembly was ok
-  -o name		Name the output file
-  -s	 		Enable smart mode
-  -t sys                Set the target system
-  -v	 		Increase verbosity
   -D name[=value]	Define a symbol
-  -I dir 		Set an include directory search path
-  -U	 		Mark unresolved symbols as import
-  -V	 		Print the assembler version
-  -W n	 		Set warning level n
+  -I dir      		Set an include directory search path
+  -U	      		Mark unresolved symbols as import
+  -V	      		Print the assembler version
+  -W n	      		Set warning level n
+  -g	      		Add debug info to object file
+  -h	      		Help (this text)
+  -i	      		Ignore case of symbols
+  -l	      		Create a listing if assembly was ok
+  -o name     		Name the output file
+  -s	      		Enable smart mode
+  -t sys                Set the target system
+  -v	      		Increase verbosity
 
 Long options:
   --auto-import		Mark unresolved symbols as import
-  --cpu type		Set cpu type
+  --cpu type  		Set cpu type
   --debug-info		Add debug info to object file
   --feature name        Set an emulation feature
   --help      		Help (this text)
   --ignore-case		Ignore case of symbols
   --include-dir dir	Set an include directory search path
-  --listing  		Create a listing if assembly was ok
+  --listing   		Create a listing if assembly was ok
   --pagelength n	Set the page length for the listing
-  --smart    		Enable smart mode
+  --smart     		Enable smart mode
   --target sys          Set the target system
-  --verbose  		Increase verbosity
+  --verbose   		Increase verbosity
   --version   		Print the assembler version
 ---------------------------------------------------------------------------
 </verb></tscreen>
@@ -1478,7 +1478,7 @@ Here's a list of all control commands and a description, what they do:
 
 	; Include file starting at offset 256
 	.incbin		"music.dat", $100
-					     
+
 	; Read 100 bytes starting at offset 200
 	.incbin		"graphics.dat", 200, 100
   </verb></tscreen>

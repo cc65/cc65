@@ -54,24 +54,6 @@ The compiler may be called as follows:
 ---------------------------------------------------------------------------
 Usage: cc65 [options] file
 Short options:
-  -A                    Strict ANSI mode
-  -Cl                   Make local variables static
-  -Dsym[=defn]          Define a symbol
-  -I dir                Set an include directory search path
-  -O                    Optimize code
-  -Oi                   Optimize code, inline more code
-  -Or                   Enable register variables
-  -Os                   Inline some known functions
-  -T                    Include source as comment
-  -V                    Print the compiler version number
-  -W                    Suppress warnings
-  -d                    Debug mode
-  -g                    Add debug info to object file
-  -h                    Help (this text)
-  -j                    Default characters are signed
-  -o name               Name the output file
-  -t sys                Set the target system
-  -v                    Increase verbosity
 
 Long options:
   --add-source          Include source as comment

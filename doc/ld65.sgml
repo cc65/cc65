@@ -3,7 +3,7 @@
 <article>
 <title>ld65 Users Guide
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>02.12.2000
+<date>02.12.2000, 02.10.2001
 
 <abstract>
 The ld65 linker combines object files into an executable file. ld65 is highly
@@ -55,21 +55,22 @@ The linker is called as follows:
 ---------------------------------------------------------------------------
 Usage: ld65 [options] module ...
 Short options:
+  -C name		Use linker config file
+  -Ln name		Create a VICE label file
+  -Lp			Mark write protected segments as such (VICE)
+  -S addr		Set the default start address
+  -V			Print the linker version
   -h	   		Help (this text)
   -m name  		Create a map file
   -o name  	   	Name the default output file
   -t sys		Set the target system
   -v			Verbose mode
   -vm			Verbose map file
-  -C name		Use linker config file
-  -Ln name		Create a VICE label file
-  -Lp			Mark write protected segments as such (VICE)
-  -S addr		Set the default start address
-  -V			Print the linker version
 
 Long options:
   --help		Help (this text)
   --mapfile name	Create a map file
+  --start-addr addr     Set the default start address
   --target sys		Set the target system
   --version   		Print the linker version
 ---------------------------------------------------------------------------

@@ -3,7 +3,7 @@
 <article>
 <title>cl65 Users Guide
 <author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>01.08.2000, 27.11.2000
+<date>01.08.2000, 27.11.2000, 02.10.2001
 
 <abstract>
 cl65 is the compile &amp; link utility for cc65, the 6502 C compiler. It was
@@ -34,6 +34,16 @@ assembler) and other things.
 ---------------------------------------------------------------------------
 Usage: cl65 [options] file
 Short options:
+  -c                    Compiler and assemble but don't link
+  -d                    Debug mode
+  -g                    Add debug info
+  -h                    Help (this text)
+  -l                    Create an assembler listing
+  -m name               Create a map file
+  -o name               Name the output file
+  -t sys                Set the target system
+  -v                    Verbose mode
+  -vm                   Verbose map file
   -A                    Strict ANSI mode
   -C name               Use linker config file
   -Cl                   Make local variables static
@@ -48,16 +58,6 @@ Short options:
   -T                    Include source as comment
   -V                    Print the version number
   -W                    Suppress warnings
-  -c                    Compiler and assemble but don't link
-  -d                    Debug mode
-  -g                    Add debug info
-  -h                    Help (this text)
-  -l                    Create an assembler listing
-  -m name               Create a map file
-  -o name               Name the output file
-  -t sys                Set the target system
-  -v                    Verbose mode
-  -vm                   Verbose map file
 
 Long options:
   --add-source          Include source as comment

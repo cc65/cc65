@@ -65,6 +65,9 @@ int mkdir (const char* name, ...);		/* May take a mode argument */
 int rmdir (const char* name);
 off_t __fastcall__ lseek(int fd, off_t offset, int whence);
 
+/* Macros */
+#define creat(name, mode)       open (name, O_WRONLY | O_CREAT | O_TRUNC, mode)
+
 
 
 /* End of fcntl.h */

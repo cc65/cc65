@@ -120,7 +120,6 @@ int __fastcall__ vfprintf (FILE* f, const char* format, va_list ap);
 int __fastcall__ vprintf (const char* format, va_list ap);
 int __fastcall__ vsprintf (char* buf, const char* format, va_list ap);
 
-/* Not available or testing: */
 int scanf (const char* format, ...);
 int fscanf (FILE* f, const char* format, ...);
 int sscanf (const char* s, const char* format, ...);

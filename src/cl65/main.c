@@ -163,7 +163,6 @@ static unsigned GetFileType (const char* File)
     } FileTypes [] = {
 	{   ".c",	FILETYPE_C	},
 	{   ".s",	FILETYPE_ASM	},
-       	{   ".ss",	FILETYPE_ASM	},
 	{   ".asm",	FILETYPE_ASM	},
 	{   ".o",	FILETYPE_OBJ	},
 	{   ".obj",	FILETYPE_OBJ	},
@@ -561,9 +560,9 @@ static void CompileRes (const char* File)
     unsigned ArgCount = GRC.ArgCount;
 
     /* The assembler file name will be the name of the source file
-     * with .grc replaced by ".ss".
+     * with .grc replaced by ".s".
      */
-    AsmName = MakeFilename (File, ".ss");
+    AsmName = MakeFilename (File, ".s");
 
     /* Add the file as argument for the resource compiler */
     CmdAddArg (&GRC, File);
@@ -949,3 +948,4 @@ int main (int argc, char* argv [])
 
 
 
+				

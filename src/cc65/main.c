@@ -40,6 +40,7 @@
 #include <errno.h>
 
 #include "../common/cmdline.h"
+#include "../common/fname.h"
 #include "../common/version.h"
 
 #include "asmcode.h"
@@ -88,7 +89,7 @@ static const char* TargetNames [] = {
 static void Usage (void)
 {
     fprintf (stderr,
-	     "Usage: cc65 [options] file\n"
+	     "Usage: %s [options] file\n"
 	     "Short options:\n"
        	     "  -d\t\t\tDebug mode\n"
        	     "  -g\t\t\tAdd debug info to object file\n"
@@ -118,7 +119,8 @@ static void Usage (void)
        	     "  --signed-chars\tDefault characters are signed\n"
        	     "  --target sys\t\tSet the target system\n"
        	     "  --verbose\t\tIncrease verbosity\n"
-       	     "  --version\t\tPrint the compiler version number\n");
+       	     "  --version\t\tPrint the compiler version number\n",
+	     ProgName);
 }
 
 
@@ -365,15 +367,14 @@ int main (int argc, char* argv[])
     };
 
     int I;
-    char out_name [256];
 
     /* Initialize the output file name */
-    out_name [0] = '\0';
+    const char* OutputFile = 0;
 
     fin = NULL;
 
     /* Initialize the cmdline module */
-    InitCmdLine (argc, argv);
+    InitCmdLine (argc, argv, "cc65");
 
     /* Parse the command line */
     I = 1;
@@ -411,7 +412,7 @@ int main (int argc, char* argv[])
 		    break;
 
     		case 'o':
-		    strcpy (out_name, GetArg (&I, 2));
+		    OutputFile = GetArg (&I, 2);
 		    break;
 
 		case 't':
@@ -504,19 +505,9 @@ int main (int argc, char* argv[])
 	exit (EXIT_FAILURE);
     }
 
-    /* Create the output file name. We should really have
-     * some checks for string overflow, but I'll drop this because of the
-     * additional code size it would need (as in other places). Sigh.
-     * #### To be removed
-     */
-    if (out_name [0] == '\0') {
-	char* p;
-	/* No output name given, create default */
-     	strcpy (out_name, fin);
-     	if ((p = strrchr (out_name, '.'))) {
-     	    *p = '\0';
-     	}
-     	strcat (out_name, ".s");
+    /* Create the output file name if it was not explicitly given */
+    if (OutputFile == 0) {
+	OutputFile = MakeFilename (fin, ".s");
     }
 
     /* Go! */
@@ -533,7 +524,7 @@ int main (int argc, char* argv[])
 	}
 
 	/* Open the file */
-	F = fopen (out_name, "w");
+	F = fopen (OutputFile, "w");
 	if (F == 0) {
 	    Fatal (FAT_CANNOT_OPEN_OUTPUT, strerror (errno));
 	}
@@ -543,7 +534,7 @@ int main (int argc, char* argv[])
 
 	/* Close the file, check for errors */
 	if (fclose (F) != 0) {
-	    remove (out_name);
+	    remove (OutputFile);
 	    Fatal (FAT_CANNOT_WRITE_OUTPUT);
 	}
     }

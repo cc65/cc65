@@ -18,6 +18,9 @@
 
 	.include	"atari.inc"
 
+.ifdef	DEFAULT_DEVICE
+	.importzp tmp2
+.endif
 	.importzp tmp3,ptr4,sp
 	.import	_strupr,subysp
 	.export	ucase_fn
@@ -32,6 +35,19 @@
 	; save the original pointer
 	sta	ptr4
 	stx	ptr4+1
+
+.ifdef	DEFAULT_DEVICE
+	ldy	#1
+	sty	tmp2		; initialize flag: device present in passed string
+	lda	#':'
+	cmp	(ptr4),y
+	beq	hasdev
+	iny
+	cmp	(ptr4),y
+	beq	hasdev
+	sta	tmp2		; set flag: no device is passed string
+hasdev:
+.endif
 
 	; now we need the length of the name
 	ldy	#0
@@ -59,6 +75,23 @@ loop2:	lda	(ptr4),y
 	dey
 	bpl	loop2		; bpl: this way we only support a max. length of 127
 
+.ifdef	DEFAULT_DEVICE
+	lda	tmp2
+	cmp	#1		; was device present in passed string?
+	beq	hasdev2		; yes, don't prepend something
+
+	inc	tmp3		; no, prepend "D:"
+	inc	tmp3		; adjust stack size used
+	ldy	#2
+	jsr	subysp		; adjust stack pointer
+	ldy	#1
+	lda	#':'
+	sta	(sp),y		; insert ':'
+	dey
+	lda	#'D'
+	sta	(sp),y		; insert 'D'
+hasdev2:
+.endif
 	; uppercase the temp. filename
 	ldx	sp+1
 	lda	sp

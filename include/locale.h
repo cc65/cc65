@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   locale.h				     */
+/*		   		   locale.h				     */
 /*                                                                           */
-/*			    Localization <locale.h>			     */
+/*		   	    Localization <locale.h>			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -76,7 +76,7 @@ struct lconv {
 
 /* Function prototypes */
 struct lconv* localeconv (void);
-char* setlocale (int category, const char* locale);
+char* __fastcall__ setlocale (int category, const char* locale);
 
 
 

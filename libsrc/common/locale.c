@@ -56,7 +56,7 @@ struct lconv* localeconv (void)
 
 
 
-char* setlocale (int, const char* locale)
+char* __fastcall__ setlocale (int, const char* locale)
 {
     if (locale == 0 || (locale [0] == 'C' && locale [1] == '\0') || locale [0] == '\0') {
 	/* No change, or value already set, our locale is the "C" locale */

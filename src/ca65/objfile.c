@@ -64,7 +64,8 @@ static FILE* F = 0;
 /* Header structure */
 static ObjHeader Header = {
     OBJ_MAGIC,
-    OBJ_VERSION
+    OBJ_VERSION,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 };
 
 
@@ -243,7 +244,7 @@ void ObjWriteStr (const char* S)
      */
     ObjWriteVar (Len);
     ObjWriteData (S, Len);
-}			       
+}
 
 
 

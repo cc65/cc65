@@ -59,6 +59,8 @@ EMDS =
 
 JOYS = apple2-stdjoy.joy
 
+SERS = apple2-lc.emd
+
 TGIS = apple2-40-40-16.tgi apple2-280-192-6.tgi
 
 #--------------------------------------------------------------------------
@@ -66,14 +68,14 @@ TGIS = apple2-40-40-16.tgi apple2-280-192-6.tgi
 
 .PHONY:	all clean zap
 
-all: 	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
+all: 	$(OBJS) $(EMDS) $(JOYS) $(SERS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
 zap:	clean
-	@$(RM) $(EMDS) $(JOYS) $(TGIS)
+	@$(RM) $(EMDS) $(JOYS) $(SERS) $(TGIS)
 

@@ -4,6 +4,10 @@
 ; Apple ProDOS 8 MLI
 ;
 
+READ_BLOCK_CALL = $80
+WRITE_BLOCK_CALL= $81
+RW_BLOCK_COUNT  = 3
+
 CREATE_CALL     = $C0
 CREATE_COUNT    = 7
 
@@ -30,6 +34,12 @@ EOF_COUNT       = 2
 
         .struct MLI
                 .union
+                        .struct RW_BLOCK
+                                PARAM_COUNT	.byte
+                                UNIT_NUM	.byte
+                                DATA_BUFFER	.addr
+                                BLOCK_NUM	.word
+                        .endstruct
                         .struct CREATE
                                 PARAM_COUNT	.byte
                                 PATHNAME	.addr

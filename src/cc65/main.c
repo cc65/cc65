@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -45,6 +45,7 @@
 #include "cpu.h"
 #include "debugflag.h"
 #include "fname.h"
+#include "mmodel.h"
 #include "print.h"
 #include "segnames.h"
 #include "target.h"
@@ -73,6 +74,7 @@
 
 
 static void Usage (void)
+/* Print usage information to stderr */
 {
     fprintf (stderr,
 	     "Usage: %s [options] file\n"
@@ -92,6 +94,7 @@ static void Usage (void)
        	     "  -g\t\t\tAdd debug info to object file\n"
        	     "  -h\t\t\tHelp (this text)\n"
        	     "  -j\t\t\tDefault characters are signed\n"
+             "  -mm model\t\tSet the memory model\n"
        	     "  -o name\t\tName the output file\n"
              "  -r\t\t\tEnable register variables\n"
        	     "  -t sys\t\tSet the target system\n"
@@ -116,6 +119,7 @@ static void Usage (void)
 	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
 	     "  --list-opt-steps\tList all optimizer steps and exit\n"
+             "  --memory-model model\tSet the memory model\n"
              "  --register-space b\tSet space available for register variables\n"
              "  --register-vars\tEnable register variables\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
@@ -219,7 +223,7 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__SUPERVISION__", 1);
             break;
 
-     	default:    
+     	default:
        	    AbEnd ("Unknown target system type %d", Target);
     }
 
@@ -549,6 +553,22 @@ static void OptListOptSteps (const char* Opt attribute ((unused)),
 
 
 
+static void OptMemoryModel (const char* Opt, const char* Arg)
+/* Set the memory model */
+{
+    if (MemoryModel != MMODEL_UNKNOWN) {
+        AbEnd ("Cannot use option `%s' twice", Opt);
+    }
+    MemoryModel = FindMemoryModel (Arg);
+    if (MemoryModel == MMODEL_UNKNOWN) {
+        AbEnd ("Unknown memory model: %s", Arg);
+    } else if (MemoryModel == MMODEL_HUGE) {
+        AbEnd ("Unsupported memory model: %s", Arg);
+    }
+}
+
+
+
 static void OptRegisterSpace (const char* Opt, const char* Arg)
 /* Handle the --register-space option */
 {
@@ -649,6 +669,7 @@ int main (int argc, char* argv[])
 	{ "--help",	 	0, 	OptHelp	     		},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
 	{ "--list-opt-steps",   0,      OptListOptSteps         },
+        { "--memory-model",     1,      OptMemoryModel          },
         { "--register-space",   1,      OptRegisterSpace        },
         { "--register-vars",    0,      OptRegisterVars         },
 	{ "--rodata-name",	1, 	OptRodataName		},

@@ -11,7 +11,7 @@
 
 
 
-int fprintf (FILE* /*F*/, char* format, ...)
+int fprintf (FILE* /*F*/, const char* format, ...)
 {
     va_list ap;
     va_start (ap, format);

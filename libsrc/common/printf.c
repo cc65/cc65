@@ -1,6 +1,6 @@
 /*
  * printf.c
- * 
+ *
  * Ullrich von Bassewitz, 11.08.1998
  */
 
@@ -11,7 +11,7 @@
 
 
 
-int printf (char* format, ...)
+int printf (const char* format, ...)
 {
     va_list ap;
     va_start (ap, format);

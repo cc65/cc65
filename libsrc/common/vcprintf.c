@@ -26,7 +26,7 @@ static void out (struct outdesc* d, char* buf, unsigned count)
 
 
 
-int vcprintf (char* format, va_list ap)
+int vcprintf (const char* format, va_list ap)
 {
     struct outdesc d;
 

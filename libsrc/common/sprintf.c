@@ -11,7 +11,7 @@
 
 
 
-int sprintf (char* /*buf*/, char* format, ...)
+int sprintf (char* /*buf*/, const char* format, ...)
 {
     va_list ap;
     va_start (ap, format);

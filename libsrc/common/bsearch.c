@@ -10,9 +10,10 @@
 
 
 
-void* bsearch (void* key, void* base, size_t n, size_t size, int (*cmp) (void*, void*))
+void* bsearch (const void* key, const void* base, size_t n, size_t size, 
+	       int (*cmp) (const void*, const void*))
 {
-    int current;		
+    int current;
     int result;
     int found = 0;
     int first = 0;

@@ -25,7 +25,7 @@ static void out (struct outdesc* d, char* buf, unsigned count)
 
 
 
-int vfprintf (FILE* f, char* format, va_list ap)
+int vfprintf (FILE* f, const char* format, va_list ap)
 {
     struct outdesc d;
 
@@ -42,3 +42,4 @@ int vfprintf (FILE* f, char* format, va_list ap)
 
 
 
+			     

@@ -13,7 +13,7 @@
 
 
 
-FILE* fdopen (int handle, char* /*mode*/)
+FILE* fdopen (int handle, const char* /*mode*/)
 {
     FILE* f;
 

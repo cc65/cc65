@@ -158,7 +158,7 @@ DEINSTALL:
 
 ; ------------------------------------------------------------------------
 ; INIT: Changes an already installed device from text mode to graphics
-; mode. The number of the graphics mode is passed to the function in A.
+; mode.
 ; Note that INIT/DONE may be called multiple times while the driver
 ; is loaded, while INSTALL is only called once, so any code that is needed
 ; to initializes variables and so on must go here. Setting palette and
@@ -185,7 +185,7 @@ INIT:
         lda     $DD00
         and     #$FC            ; Switch to bank 3
         sta     $DD00
-
+        
         lda     $D018
         sta     OLDD018
         lda     #$48         	; Set color map to $D000, screen to $E000

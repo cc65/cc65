@@ -53,7 +53,7 @@ install:	all
 	    echo "";						      \
 	    false;						      \
 	fi
-       	@$(MKDIR) -p $(BINDIR) $(CC65DOC) $(CC65LIB)/{asminc,emd,include/{em,geos,joystick,mouse,sys,tgi},joy,lib,mou,ser,tgi}
+       	@$(MKDIR) -p $(BINDIR) $(CC65DOC) $(CC65DATA)/{asminc,emd,include/{em,geos,joystick,mouse,sys,tgi},joy,lib,mou,ser,tgi}
 	@$(INSTALL) -s -m 755 src/ar65/ar65 $(BINDIR)
 	@$(INSTALL) -s -m 755 src/ca65/ca65 $(BINDIR)
 	@$(INSTALL)    -m 755 src/ca65html/ca65html $(BINDIR)

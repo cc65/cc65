@@ -3,7 +3,9 @@
 <article>
 
 <title>Atari specific information for cc65
-<author>Shawn Jefferson, <htmlurl url="mailto:shawnjefferson@24fightingchickens.com" name="shawnjefferson@24fightingchickens.com">
+<author>Shawn Jefferson, <htmlurl
+url="mailto:shawnjefferson@24fightingchickens.com"
+name="shawnjefferson@24fightingchickens.com"> and 
 Christian Groessler, <htmlurl url="mailto:cpg@aladdin.de" name="cpg@aladdin.de">
 <date>14-Sep-2004
 

@@ -38,6 +38,7 @@
 
 /* common */
 #include "check.h"
+#include "cpu.h"
 #include "exprdefs.h"
 #include "print.h"
 #include "tgttrans.h"
@@ -634,7 +635,7 @@ static ExprNode* Factor (void)
 	    break;
 
 	case TOK_CPU:
-	    N = GenLiteralExpr (GetCPU());
+	    N = GenLiteralExpr (CPUIsets[CPU]);
 	    NextTok ();
 	    break;
 

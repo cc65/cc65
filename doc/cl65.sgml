@@ -7,8 +7,8 @@
 
 <abstract>
 cl65 is the compile &amp; link utility for cc65, the 6502 C compiler. It was
-designed as a smart frontend for the C compiler (cc65), the assembler (ca65)
-and the linker (ld65).
+designed as a smart frontend for the C compiler (cc65), the assembler (ca65),
+the object file converter (co65), and the linker (ld65).
 </abstract>
 
 <!-- Table of contents -->
@@ -18,75 +18,83 @@ and the linker (ld65).
 
 <sect>Overview<p>
 
-cl65 is a frontend for cc65, ca65 and ld65. While you may not use the full
-power of the tools when calling them through cl65, most features are
+cl65 is a frontend for cc65, ca65, co65 and ld65. While you may not use the
+full power of the tools when calling them through cl65, most features are
 available, and the use of cl65 is much simpler.
 
 
 <sect>Basic Usage<p>
 
-The cl65 compile and link utility may be used to compile, assemble and
-link files. While the separate tools do just one step, cl65 knows how to
-build object files from C files (by calling the compiler, then the
-assembler) and other things.
+The cl65 compile and link utility may be used to convert, compile, assemble
+and link files. While the separate tools do just one step, cl65 knows how to
+build object files from C files (by calling the compiler, then the assembler)
+and other things.
 
 <tscreen><verb>
 ---------------------------------------------------------------------------
-Usage: cl65 [options] file
+Usage: cl65 [options] file [...]
 Short options:
-  -c                    Compiler and assemble but don't link
-  -d                    Debug mode
-  -g                    Add debug info
-  -h                    Help (this text)
-  -l                    Create an assembler listing
-  -m name               Create a map file
-  -o name               Name the output file
-  -r                    Enable register variables
-  -t sys                Set the target system
-  -v                    Verbose mode
-  -vm                   Verbose map file
-  -A                    Strict ANSI mode
-  -C name               Use linker config file
-  -Cl                   Make local variables static
-  -D sym[=defn]         Define a preprocessor symbol
-  -I dir                Set a compiler include directory path
-  -Ln name              Create a VICE label file
-  -O                    Optimize code
-  -Oi                   Optimize code, inline functions
-  -Or                   Optimize code, honour the register keyword
-  -Os                   Optimize code, inline known C funtions
-  -S                    Compile but don't assemble and link
-  -T                    Include source as comment
-  -V                    Print the version number
-  -W                    Suppress warnings
+  -c			Compile and assemble but don't link
+  -d			Debug mode
+  -g			Add debug info
+  -h			Help (this text)
+  -l			Create an assembler listing
+  -m name		Create a map file
+  -o name		Name the output file
+  -r			Enable register variables
+  -t sys		Set the target system
+  -v			Verbose mode
+  -vm			Verbose map file
+  -A			Strict ANSI mode
+  -C name		Use linker config file
+  -Cl			Make local variables static
+  -D sym[=defn]		Define a preprocessor symbol
+  -I dir		Set a compiler include directory path
+  -Ln name		Create a VICE label file
+  -O			Optimize code
+  -Oi			Optimize code, inline functions
+  -Or			Optimize code, honour the register keyword
+  -Os			Optimize code, inline known C funtions
+  -S			Compile but don't assemble and link
+  -T			Include source as comment
+  -V			Print the version number
+  -W			Suppress warnings
 
 Long options:
-  --add-source          Include source as comment
-  --ansi                Strict ANSI mode
-  --asm-include-dir dir Set an assembler include directory
-  --bss-name seg        Set the name of the BSS segment
-  --check-stack         Generate stack overflow checks
-  --code-name seg       Set the name of the CODE segment
-  --codesize x          Accept larger code by factor x
-  --cpu type            Set cpu type
-  --create-dep          Create a make dependency file
-  --data-name seg       Set the name of the DATA segment
-  --debug               Debug mode
-  --debug-info          Add debug info
-  --feature name        Set an emulation feature
-  --help                Help (this text)
-  --include-dir dir     Set a compiler include directory path
-  --listing             Create an assembler listing
-  --mapfile name        Create a map file
-  --register-space b    Set space available for register variables
-  --register-vars       Enable register variables
-  --rodata-name seg     Set the name of the RODATA segment
-  --signed-chars        Default characters are signed
-  --start-addr addr     Set the default start address
-  --static-locals       Make local variables static
-  --target sys          Set the target system
-  --version             Print the version number
-  --verbose             Verbose mode
+  --add-source		Include source as comment
+  --ansi		Strict ANSI mode
+  --asm-include-dir dir	Set an assembler include directory
+  --bss-label name	Define and export a BSS segment label
+  --bss-name seg	Set the name of the BSS segment
+  --check-stack		Generate stack overflow checks
+  --code-label name	Define and export a CODE segment label
+  --code-name seg	Set the name of the CODE segment
+  --codesize x		Accept larger code by factor x
+  --cpu type		Set cpu type
+  --create-dep		Create a make dependency file
+  --data-label name	Define and export a DATA segment label
+  --data-name seg	Set the name of the DATA segment
+  --debug		Debug mode
+  --debug-info		Add debug info
+  --feature name	Set an emulation feature
+  --help		Help (this text)
+  --include-dir dir	Set a compiler include directory path
+  --listing		Create an assembler listing
+  --mapfile name	Create a map file
+  --module		Link as a module
+  --module-id id	Specify a module id for the linker
+  --o65-model model	Override the o65 model
+  --register-space b	Set space available for register variables
+  --register-vars	Enable register variables
+  --rodata-name seg	Set the name of the RODATA segment
+  --signed-chars	Default characters are signed
+  --start-addr addr	Set the default start address
+  --static-locals	Make local variables static
+  --target sys		Set the target system
+  --version		Print the version number
+  --verbose		Verbose mode
+  --zeropage-label name	Define and export a ZEROPAGE segment label
+  --zeropage-name seg	Set the name of the ZEROPAGE segment
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -158,6 +166,20 @@ package, it tries to be smart about several things.
 	extension. So you don't need to name the executable name in most
 	cases, just give the name of your "main" file as first input file.
 </itemize>
+                                  
+The type of an input file is derived from its extension:
+
+<itemize>
+<item>C files: <tt/.c/
+<item>Assembler files: <tt/.s/, <tt/.asm/, <tt/.a65/
+<item>Object files: <tt/.o/ <tt/.obj/
+<item>Libraries: <tt/.a/, <tt/.lib/
+<item>GEOS resource files: <tt/.grc/
+<item>o65 files: <tt/.o65/, <tt/.emd/, <tt/.joy/, <tt/.tgi/
+</itemize>
+
+Please note that the program cannot handle input files with unknown file
+extensions.                                                             
 
 
 <sect>Examples<p>

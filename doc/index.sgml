@@ -9,15 +9,9 @@
 Main documentation page, contains links to other available stuff.
 </abstract>
 
-<sect>Documentation overview<p>
+<sect>Program documentation<p>
 
 <descrip>
-
-  <tag><htmlurl url="BUGS" name="BUGS"></tag>
-  Known compiler bugs.
-
-  <tag><htmlurl url="CREDITS" name="CREDITS"></tag>
-  Who helped with the compiler and tools?
 
   <tag><htmlurl url="ar65.html" name="ar65.html"></tag>
   Describes the ar65 archiver.
@@ -25,11 +19,33 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="ca65.html" name="ca65.html"></tag>
   Describes the ca65 macro assembler.
 
+  <tag><htmlurl url="ca65html.html" name="ca65html.html"></tag>
+  Describes the ca65html assembler source to HTML converter.
+
   <tag><htmlurl url="cc65.html" name="cc65.html"></tag>
   Describes the cc65 C compiler.
 
   <tag><htmlurl url="cl65.html" name="cl65.html"></tag>
   Describes the cl65 compile & link utility.
+
+  <tag><htmlurl url="da65.html" name="da65.html"></tag>
+  Describes the da65 6502/65C02 disassembler.
+
+  <tag><htmlurl url="grc.txt" name="grc.txt"></tag>
+  Describes the GEOS resource compiler (grc).
+
+  <tag><htmlurl url="ld65.html" name="ld65.html"></tag>
+  Describes the ld65 linker.
+
+</descrip>
+
+
+<sect>Usage<p>
+
+<descrip>
+
+  <tag><htmlurl url="intro.html" name="intro.html"></tag>
+  Describes the use of the tools by a short "hello world" example.
 
   <tag><htmlurl url="coding.html" name="coding.html"></tag>
   Containes hints on creating the most effective code with cc65.
@@ -37,42 +53,59 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="compile.txt" name="compile.txt"></tag>
   How to compile cc65 and the support tools.
 
-  <tag><htmlurl url="da65.html" name="da65.html"></tag>
-  Describes the da65 6502/65C02 disassembler.
-
   <tag><htmlurl url="debugging.html" name="debugging.html"></tag>
   Debug programs using the VICE emulator.
 
-  <tag><htmlurl url="dio.html" name="dio.html"></tag>
-  Low level disk I/O API.
+</descrip>
+
+<sect>Library information and other references<p>
+
+<descrip>
 
   <tag><htmlurl url="funcref.html" name="funcref.html"></tag>
   A (currently incomplete) function reference.
 
+  <tag><htmlurl url="dio.html" name="dio.html"></tag>
+  Low level disk I/O API.
+
   <tag><htmlurl url="geos.html" name="geos.html"></tag>
-  GEOSLib manual in several formats.
-
-  <tag><htmlurl url="grc.txt" name="grc.txt"></tag>
-  Describes the GEOS resource compiler (grc).
-
-  <tag><htmlurl url="index.html" name="index.html"></tag>
-  This file.
+  The GEOSLib manual.
 
   <tag><htmlurl url="internal.txt" name="internal.txt"></tag>
   A somewhat older text describing several cc65 internals.
 
-  <tag><htmlurl url="intro.html" name="intro.html"></tag>
-  Describes the use of the tools by a short "hello world" example.
-
-  <tag><htmlurl url="ld65.html" name="ld65.html"></tag>
-  Describes the ld65 linker.
-
   <tag><htmlurl url="library.html" name="library.html"></tag>
   Describes the cc65 runtime and C libraries.
+
+</descrip>
+
+
+<sect>Platform specific information<p>
+
+<descrip>
+
+  <tag><htmlurl url="atari.html" name="atari.html"></tag>
+  Topics specific to the Atari 8 bit machines.
+
+  <tag><htmlurl url="c64.html" name="c64.html"></tag>
+  Topics specific to the Commodore 64.
+
+</descrip>
+
+
+<sect>Miscellaneous<p>
+
+<descrip>
 
   <tag><htmlurl url="newvers.txt" name="newvers.txt"></tag>
   Somewhat outdated. Lists the differences between the current cc65 release
   and the original atari version created by J.R Dunning.
+
+  <tag><htmlurl url="BUGS" name="BUGS"></tag>
+  Known compiler bugs.
+
+  <tag><htmlurl url="CREDITS" name="CREDITS"></tag>
+  Who helped with the compiler and tools?
 
 </descrip>
 

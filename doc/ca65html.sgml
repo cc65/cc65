@@ -1,0 +1,298 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>ca65html Users Guide
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
+<date>2003-10-16
+
+<abstract>
+ca65html is an assembler source to HTML converter. It is very useful if you
+want to publish your assembler sources in the web.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+ca65html converts assembler source files written for use with the <tt/<htmlurl
+url="ca65.html" name="ca65">/ crossassembler into HTML. It is a standalone
+tool written in Perl, and as such it does not understand the structure of
+assembler sources in the same depth as ca65 does, so it may fail in very rare
+cases. In all other cases it generates very nice output.
+
+
+<sect>Usage<p>
+
+
+<sect1>Command line option overview<p>
+
+The HTML converter accepts the following options:
+
+<tscreen><verb>
+---------------------------------------------------------------------------
+Usage: ca65html [options] file ...
+Options:
+  --bgcolor c        Use background color c instead of #FFFFFF
+  --colorize         Colorize the output (generates non standard HTML)
+  --commentcolor c   Use color c for comments instead of #B22222
+  --crefs            Generate references to the C source file(s)
+  --ctrlcolor c      Use color c for directives instead of #228B22
+  --cvttabs          Convert tabs to spaces in the output
+  --help             This text
+  --htmldir dir      Specify directory for HTML files
+  --indexcols n      Use n columns on index page (default 6)
+  --indexname file   Use file for the index file instead of index.html
+  --indexpage        Create an index page
+  --indextitle title Use title as the index title instead of Index
+  --keywordcolor c   Use color c for keywords instead of #A020F0
+  --linelabels       Generate a linexxx HTML label for each line
+  --linenumbers      Add line numbers to the output
+  --linkstyle style  Use the given link style
+  --replaceext       Replace source extension instead of appending .html
+  --textcolor c      Use text color c instead of #000000
+  --verbose          Be more verbose
+---------------------------------------------------------------------------
+</verb></tscreen>
+
+
+<sect1>Command line options in detail<p>
+
+Here is a description of all the command line options:
+
+<descrip>
+
+  <tag><tt>--bgcolor c</tt></tag>
+
+  Set the background color. The argument c must be a valid HTML color, usually
+  given as RGB triplet in the form <tt/#rrggbb/, where r, g and b are the
+  respective red, green and blue parts as two digit hex values. The default is
+  <tt/#FFFFFF/ (white). This color is used in the <tt/&lt;body&gt;/ tag of the
+  generated HTML output.
+
+
+  <tag><tt>--colorize</tt></tag>
+
+  Colorize the output. The converter outputs processor instructions, assembler
+  control commands and comments in different colors.
+
+  While this make the output look very nice, it generates invalid HTML,
+  because using colors in a <tt/&lt;pre&gt;/ environment is not allowed.
+  However, most browsers display it well, and it is used by several other
+  tools, so it's up to you.
+
+
+  <tag><tt>--commentcolor c</tt></tag>
+
+  Set the color used for comments. The argument c must be a valid HTML color,
+  usually given as RGB triplet in the form <tt/#rrggbb/, where r, g and b are
+  the respective red, green and blue parts as two digit hex values. The
+  default is <tt/#B22222/ (red).
+
+  Note that this option has no effect if <tt/--colorize/ is not also given.
+
+
+  <tag><tt>--crefs</tt></tag>
+
+  Generate references to the C file, when a <tt/.dbg/ command is found with a
+  file name. The converter assumes that the C source was also converted into
+  HTML (for example by use of <tt/c2html/), has the name <tt/file.c.html/, and
+  lives in the same directory as the assembler file. If the <tt/.dbg/
+  directive specifies a line, a link to the correct line in the C file is
+  generated, using a label in the form <tt/linexxx>/, as it is created by
+  <tt/c2html/ by use of the <tt/-n/ option.
+
+
+  <tag><tt>--commentcolor c</tt></tag>
+
+  Set the color used for assembler control commands. The argument c must be a
+  valid HTML color, usually given as RGB triplet in the form <tt/#rrggbb/,
+  where r, g and b are the respective red, green and blue parts as two digit
+  hex values. The default is <tt/#228B22/ (green).
+
+  Note that this option has no effect if <tt/--colorize/ is not also given.
+
+
+  <tag><tt>--cvttabs</tt></tag>
+
+  Convert tabs in the input into spaces in the output, assuming the standard
+  tab width of 8. This is useful if the <tt/--linenumbers/ option is used to
+  retain the indentation.
+
+
+  <tag><tt>--help</tt></tag>
+
+  Print the command line option summary shown above.
+
+
+  <tag><tt>--htmldir dir</tt></tag>
+
+  Specify an output directory for the generated HTML files.
+
+
+  <tag><tt>--indexcols n</tt></tag>
+
+  Use n columns on the index page. This option has no effect if used without
+  <tt/--indexpage/.
+
+
+  <tag><tt>--indexname name</tt></tag>
+
+  Use another index file name instead of <tt/index.html/. This option has no
+  effect if used without <tt/--indexpage/.
+
+
+  <tag><tt>--indexpage</tt></tag>
+
+  Causes the converter to generate an index page listing all label names and
+  exports found in the converted files.
+
+
+  <tag><tt>--indextitle title</tt></tag>
+
+  Use "title" as the title of the index page. This option has no effect if
+  used without <tt/--indexpage/.
+
+
+  <tag><tt>--keywordcolor c</tt></tag>
+
+  Set the color used for processor instructions. The argument c must be a
+  valid HTML color, usually given as RGB triplet in the form <tt/#rrggbb/,
+  where r, g and b are the respective red, green and blue parts as two digit
+  hex values. The default is <tt/#A020F0/ (purple).
+
+  Note that this option has no effect if <tt/--colorize/ is not also given.
+
+  <tag><tt>--linelabels</tt></tag>
+
+  Generate a label for each line using the name <tt/linexxx/ where xxx is the
+  number of the line.
+
+  Note: The converter will not make use of this label. Use this option if you
+  have other HTML pages referencing the converted assembler file.
+
+
+  <tag><tt>--linenumbers</tt></tag>
+
+  Generate line numbers on the left side of the output.
+
+
+  <tag><tt>--linkstyle n</tt></tag>
+
+  Influences the style used when generating links for imports. If n is zero
+  (the default), the converter creates a link to the actual symbol if it is
+  defined somewhere in the input files. If not, it creates a link to the
+  <tt/.import/ statement. If n is one, the converter will always generate a
+  HTML link to <tt/.import/ statement.
+
+
+  <tag><tt>--replaceext</tt></tag>
+
+  Replace the file extension of the input file instead of appending <tt/.html/
+  when generating the output file name.
+
+
+  <tag><tt>--textcolor c</tt></tag>
+
+  Set the color for normal text. The argument c must be a valid HTML color,
+  usually given as RGB triplet in the form <tt/#rrggbb/, where r, g and b are
+  the respective red, green and blue parts as two digit hex values. The
+  default is <tt/#000000/ (black). This color is used in the <tt/&lt;body&gt;/
+  tag of the generated HTML output.
+
+
+  <tag><tt>--verbose</tt></tag>
+
+  Increase the converter verbosity. Without this option, ca65html is quiet
+  when working. If you have a slow machine and lots of files to convert, you
+  may like a little bit more progress information.
+
+</descrip>
+<p>
+
+
+<sect>Peculiarities<p>
+
+<sect1>Cross links<p>
+
+Since <tt/ca65html/ is able to generate links between modules, the best way to
+use it is to supply all modules to it in one run, instead of running each file
+separately through it.
+
+
+<sect1>Include files<p>
+
+For now, <tt/ca65html/ will not read files included with <tt/.include/.
+Specifying the include files as normal input files on the command line works
+in many cases.
+
+
+<sect1>Conversion errors<p>
+
+Since <tt/ca65html/ does not really parse the input, but does most of its work
+applying text patterns, it doesn't know anything about scoping and advanced
+features of the assembler. This means that it may miss a label may choose the
+wrong color for an item in rare cases. Since it's just a tool for displaying
+sources in a nice form, I think that's ok. Anyway, if you find a conversion
+problem, you can send me a short piece of example input code. If possible, I
+will fix it.
+
+
+<sect1>Colorization<p>
+
+While having colors in the output looks really nice, it has two drawbacks:
+
+<enum>
+
+<item>The output is not standard compliant HTML, because <tt/&lt;font&gt;/
+tags are use in a <tt/&lt;pre&gt;/ environment. This works with all browsers
+I've tested, but it may not work with the one you're using.
+
+<item>Since lots of <tt/&lt;font&gt;/ tags are created in the output, the size
+of the output file will literally explode. This seems to be the price, you
+have to pay for color...
+
+</enum>
+
+
+<sect>Bugs/Feedback<p>
+
+If you have problems using the converter, if you find any bugs, or if you're
+doing something interesting with the assembler, I would be glad to hear from
+you. Feel free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
+name="uz@cc65.org">).
+
+
+
+<sect>Copyright<p>
+
+ca65html is (C) Copyright 2000-2003 Ullrich von Bassewitz. For its use the
+following conditions apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item> 	The origin of this software must not be misrepresented; you must not
+       	claim that you wrote the original software. If you use this software
+       	in a product, an acknowledgment in the product documentation would be
+	appreciated but is not required.
+<item>	Altered source versions must be plainly marked as such, and must not
+	be misrepresented as being the original software.
+<item>	This notice may not be removed or altered from any source
+	distribution.
+</enum>
+
+
+
+</article>
+
+
+

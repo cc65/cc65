@@ -90,11 +90,11 @@ unsigned char __fastcall__ joy_unload (void);
 /* Uninstall, then unload the currently loaded driver. */
 
 unsigned char __fastcall__ joy_install (void* driver);
-/* Install an already loaded driver. */
+/* Install an already loaded driver. Return an error code. */
 
 unsigned char __fastcall__ joy_uninstall (void);
-/* Uninstall the currently loaded driver. Note: This call does not free
- * allocated memory.
+/* Uninstall the currently loaded driver and return an error code.
+ * Note: This call does not free allocated memory.
  */
 
 unsigned char __fastcall__ joy_count (void);

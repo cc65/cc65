@@ -141,7 +141,7 @@ Here is a description of all the command line options:
   disassembled. The given address is interpreted as an octal value if
   preceeded with a '0' digit, as a hexadecimal value if preceeded with '0x',
   '0X', or '$', and as a decimal value in all other cases. If no start address
-  is specified, 0xC000 is used - which is often not what you want.
+  is specified, $10000 minus the size of the input file is used.
 
 
   <tag><tt>-v, --verbose</tt></tag>
@@ -253,7 +253,7 @@ following attributes are recognized:
 
   This attribute may be used instead of the <tt><ref id="option--pagelength"
   name="--pagelength"></tt> option on the command line. It takes a numerical
-  parameter. Using zero as page length (which is the default) means that no 
+  parameter. Using zero as page length (which is the default) means that no
   pages are generated.
 
 
@@ -261,7 +261,9 @@ following attributes are recognized:
 
   This attribute may be used instead of the <tt><ref id="option--start-addr"
   name="--start-addr"></tt> option on the command line. It takes a numerical
-  parameter.
+  parameter. The default for the start address is $10000 minus the size of
+  the input file (this assumes that the input file is a ROM that contains the
+  reset and irq vectors).
 
 
   <tag><tt>CPU</tt></tag>

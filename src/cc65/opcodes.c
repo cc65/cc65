@@ -449,11 +449,14 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
        	REG_NONE,     	                        /* use */
        	REG_NONE,     	                        /* chg */
 	OF_SETF	 		 		/* flags */
-    },
+    },         
+    /* Mark RTI as "uses all registers but doesn't change them", so the
+     * optimizer won't remove preceeding loads.
+     */
     {   OP65_RTI,      	                        /* opcode */
        	"rti", 	       	                        /* mnemonic */
        	1,     	       	                        /* size */
-       	REG_NONE,      	                        /* use */
+       	REG_AXY,      	                        /* use */
        	REG_NONE,      	                        /* chg */
 	OF_RET 			 		/* flags */
     },

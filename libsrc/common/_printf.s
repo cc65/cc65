@@ -460,19 +460,21 @@ ReadPrec:
 
 ReadMod:
 	lda 	(Format),y
-      	cmp 	#'F'
-      	beq 	@L1			; Read and ignore this one
-      	cmp 	#'N'
-      	beq 	@L1			; Read and ignore this one
-      	cmp 	#'h'
-      	beq 	@L1			; Read and ignore this one
-      	cmp 	#'L'
-      	beq 	@L1	 		; Read and ignore this one
-      	cmp 	#'l'
+      	cmp 	#'z'                    ; size_t - same as unsigned
+      	beq 	@L2
+      	cmp 	#'h'                    ; short - same as int
+      	beq 	@L2
+        cmp     #'t'                    ; ptrdiff_t - same as int
+        beq     @L2
+        cmp     #'j'                    ; intmax_t/uintmax_t - same as long
+        beq     @L1
+      	cmp 	#'L'                    ; long double
+      	beq 	@L1
+      	cmp 	#'l'                    ; long int
       	bne 	DoFormat
-      	lda 	#$FF
+@L1:    lda 	#$FF
       	sta 	IsLong
-@L1:  	jsr 	IncFormatPtr
+@L2:  	jsr 	IncFormatPtr
       	jmp	ReadMod
 
 ; Initialize the argument buffer pointers. We use a static buffer (ArgBuf) to

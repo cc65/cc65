@@ -1748,11 +1748,10 @@ void g_subeqstatic (unsigned flags, unsigned long label, long offs,
        		     	AddCodeLine ("sbc #$%02X", (int)(val & 0xFF));
        		     	AddCodeLine ("sta %s", lbuf);
        		    }
-       	  	} else {
+       	  	} else {	      
+		    AddCodeLine ("eor #$FF");
        		    AddCodeLine ("sec");
-       		    AddCodeLine ("sta tmp1");
-       	  	    AddCodeLine ("lda %s", lbuf);
-       	       	    AddCodeLine ("sbc tmp1");
+       	       	    AddCodeLine ("adc %s", lbuf);
        		    AddCodeLine ("sta %s", lbuf);
        	  	}
        		if ((flags & CF_UNSIGNED) == 0) {
@@ -1784,14 +1783,13 @@ void g_subeqstatic (unsigned flags, unsigned long label, long offs,
 		    AddCodeLine ("tax");
 		    AddCodeLine ("lda %s", lbuf);
 		}
-	    } else {
-		AddCodeLine ("sta tmp1");
-		AddCodeLine ("lda %s", lbuf);
-	        AddCodeLine ("sbc tmp1");
+	    } else {	      
+		AddCodeLine ("eor #$FF");
+       	       	AddCodeLine ("adc %s", lbuf);
 		AddCodeLine ("sta %s", lbuf);
-       	       	AddCodeLine ("stx tmp1");
-		AddCodeLine ("lda %s+1", lbuf);
-		AddCodeLine ("sbc tmp1");
+		AddCodeLine ("txa");
+		AddCodeLine ("eor #$FF");
+       	       	AddCodeLine ("adc %s+1", lbuf);
 		AddCodeLine ("sta %s+1", lbuf);
 		AddCodeLine ("tax");
 		AddCodeLine ("lda %s", lbuf);
@@ -1845,18 +1843,17 @@ void g_subeqlocal (unsigned flags, int offs, unsigned long val)
 		    AddCodeLine ("lda (sp),y");
 		    AddCodeLine ("sbc #$%02X", (unsigned char)val);
 		} else {
-		    AddCodeLine ("sta tmp1");
-	     	    AddCodeLine ("lda (sp),y");
-		    AddCodeLine ("sbc tmp1");
+		    AddCodeLine ("eor #$FF");
+	     	    AddCodeLine ("adc (sp),y");
 		}
        	 	AddCodeLine ("sta (sp),y");
 		if ((flags & CF_UNSIGNED) == 0) {
-		    unsigned L = GetLocalLabel();
+	    	    unsigned L = GetLocalLabel();
 	       	    AddCodeLine ("bpl %s", LocalLabelName (L));
-		    AddCodeLine ("dex");
-		    g_defcodelabel (L);
-		}
-       	 	break;
+	    	    AddCodeLine ("dex");
+	    	    g_defcodelabel (L);
+	    	}
+       	    	break;
        	    }
        	    /* FALLTHROUGH */
 

@@ -1443,14 +1443,14 @@ static int typecast (struct expent* lval)
 	     	/* Cut the value to the new size */
 	     	lval->e_const &= (0xFFFFFFFFUL >> (32 - NewBits));
 
-		/* If the new value is signed, sign extend the value */
-		if (!IsSignUnsigned (Type)) {
-		    lval->e_const |= ((~0L) << NewBits);
-		}
+	   	/* If the new value is signed, sign extend the value */
+	   	if (!IsSignUnsigned (Type)) {
+	   	    lval->e_const |= ((~0L) << NewBits);
+	   	}
 
 	    } else if (NewSize > OldSize) {
 
-		/* Sign extend the value if needed */
+	   	/* Sign extend the value if needed */
 	     	if (!IsSignUnsigned (Type) && !IsSignUnsigned (lval->e_tptr)) {
 	     	    if (lval->e_const & (0x01UL << (OldBits-1))) {
 	     		lval->e_const |= ((~0L) << OldBits);
@@ -1466,18 +1466,18 @@ static int typecast (struct expent* lval)
 
 	    /* If the size does not change, leave the value alone. Otherwise,
 	     * we have to load the value into the primary and generate code to
-	     * cast teh value in the primary register.
+	     * cast the value in the primary register.
 	     */
 	    if (SizeOf (Type) != SizeOf (lval->e_tptr)) {
 
-		/* Load the value into the primary */
-		exprhs (CF_NONE, k, lval);
+	   	/* Load the value into the primary */
+	   	exprhs (CF_NONE, k, lval);
 
-		/* Mark the lhs as const to avoid a manipulation of TOS */
-		g_typecast (TypeOf (Type) | CF_CONST, TypeOf (lval->e_tptr));
+	   	/* Mark the lhs as const to avoid a manipulation of TOS */
+	   	g_typecast (TypeOf (Type) | CF_CONST, TypeOf (lval->e_tptr));
 
-		/* Value is now in primary */
-		lval->e_flags = E_MEXPR;
+	   	/* Value is now in primary */
+	   	lval->e_flags = E_MEXPR;
        	       	k = 0;
 	    }
 	}

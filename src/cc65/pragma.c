@@ -136,12 +136,16 @@ static void StringPragma (StrBuf* B, void (*Func) (const char*))
 {
     StrBuf S;
 
+    /* We expect a string here */
     if (SB_GetString (B, &S)) {
        	/* Call the given function with the string argument */
 	Func (SB_GetConstBuf (&S));
     } else {
 	Error ("String literal expected");
     }
+
+    /* Call the string buf destructor */
+    DoneStrBuf (&S);
 }
 
 
@@ -171,7 +175,10 @@ static void SegNamePragma (StrBuf* B, segment_t Seg)
 
     } else {
 	Error ("String literal expected");
-    }
+    }             
+
+    /* Call the string buf destructor */
+    DoneStrBuf (&S);
 }
 
 
@@ -345,6 +352,9 @@ static void ParsePragma (void)
     if (SB_Peek (&B) != '\0') {
         Error ("Unexpected input following pragma directive");
     }
+
+    /* Release the StrBuf */
+    DoneStrBuf (&B);
 }
 
 

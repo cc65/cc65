@@ -148,7 +148,7 @@ structures, accessing the struct fields will access the chip registers.
   <tag><tt/CIA1, CIA2/</tag>
   Access to the two CIA (complex interface adapter) chips is available via
   the <tt/CIA1/ and <tt/CIA2/ variables. The structure behind these variables
-  is explained in <tt/_cia.h/.
+  is explained in <tt/_6526.h/.
 
   <tag><tt/COLOR_RAM/</tag>
   A character array that mirrors the color RAM of the C64 at &dollar;D800.

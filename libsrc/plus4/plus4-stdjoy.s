@@ -1,5 +1,6 @@
 ;
-; Standard joystick driver for the Plus/4
+; Standard joystick driver for the Plus/4. May be used multiple times when linked
+; to the statically application.
 ;
 ; Ullrich von Bassewitz, 2002-12-21
 ;
@@ -37,12 +38,12 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   COUNT
         .word   READ
 
 ; ------------------------------------------------------------------------
-; Constants
+; Constants                     
 
 JOY_COUNT       = 2             ; Number of joysticks we support
 
@@ -67,11 +68,11 @@ INSTALL:
 ;	rts                     ; Run into DEINSTALL instead
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 

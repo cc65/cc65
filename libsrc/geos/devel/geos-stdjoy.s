@@ -1,5 +1,6 @@
 ;
-; Standard joystick driver for the C64
+; Standard joystick driver for the C64. May be used multiple times when linked
+; to the statically application.
 ;
 ; Ullrich von Bassewitz, 2002-12-20
 ;
@@ -37,7 +38,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   COUNT
         .word   READ
 
@@ -67,11 +68,11 @@ INSTALL:
 ;	rts                     ; Run into DEINSTALL instead
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 
@@ -89,18 +90,18 @@ COUNT:
 ;
 
 READ:	php
-     	sei			; disable IRQ
+     	sei	  		; disable IRQ
 	lda	$01
 	pha
 	lda	#$35
 	sta	$01		; enable I/O
 
-	tax			; Joystick number into X
+	tax	  		; Joystick number into X
 	bne    	joy2
 
 ; Read joystick 1
 
-joy1:	
+joy1:
 	lda	#$7F
      	sta	cia1base
      	lda	cia1base+1

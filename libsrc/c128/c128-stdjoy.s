@@ -1,5 +1,7 @@
 ;
-; Standard joystick driver for the C128
+; Standard joystick driver for the C128. May be used multiple times when linked
+; to the statically application.
+
 ;
 ; Ullrich von Bassewitz, 2002-12-21
 ;
@@ -8,7 +10,7 @@
 
       	.include 	"joy-kernel.inc"
         .include        "joy-error.inc"
-        .include        "c128.inc"  
+        .include        "c128.inc"
 
         .macpack        generic
 
@@ -37,7 +39,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   COUNT
         .word   READ
 
@@ -67,11 +69,11 @@ INSTALL:
 ;	rts                     ; Run into DEINSTALL instead
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 

@@ -1,5 +1,6 @@
 ;
-; Standard joystick driver for the VIC20
+; Standard joystick driver for the VIC20. May be used multiple times when linked
+; to the statically application.
 ;
 ; Ullrich von Bassewitz, 2002-12-20
 ; Using code from Steve Schmidtke
@@ -38,7 +39,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   COUNT
         .word   READ
 
@@ -68,11 +69,11 @@ INSTALL:
 ;	rts                     ; Run into DEINSTALL instead
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 

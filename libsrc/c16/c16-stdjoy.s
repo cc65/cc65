@@ -1,5 +1,6 @@
 ;
-; Standard joystick driver for the Plus/4
+; Standard joystick driver for the C16. May be used multiple times when linked
+; to the statically application.
 ;
 ; Ullrich von Bassewitz, 2002-12-21
 ;

@@ -1431,7 +1431,142 @@ static unsigned OptNegAX4 (CodeSeg* S)
 
 
 
+static unsigned OptPtrStore1Sub (CodeSeg* S, unsigned I, CodeEntry** const L)
+/* Check if this is one of the allowed suboperation for OptPtrStore1 */
+{
+    /* Check for a label attached to the entry */
+    if (CE_HasLabel (L[0])) {
+	return 0;
+    }
+
+    /* Check for single insn sub ops */
+    if (L[0]->OPC == OP65_AND                                           ||
+    	L[0]->OPC == OP65_EOR                                           ||
+    	L[0]->OPC == OP65_ORA                                           ||
+    	(L[0]->OPC == OP65_JSR && strncmp (L[0]->Arg, "shlax", 5) == 0) ||
+       	(L[0]->OPC == OP65_JSR && strncmp (L[0]->Arg, "shrax", 5) == 0)) {
+
+    	/* One insn */
+    	return 1;
+
+    } else if (L[0]->OPC == OP65_CLC                      &&
+       	       (L[1] = CS_GetNextEntry (S, I)) != 0       &&
+	       L[1]->OPC == OP65_ADC                      &&
+	       !CE_HasLabel (L[1])) {
+	return 2;
+    } else if (L[0]->OPC == OP65_SEC                      &&
+	       (L[1] = CS_GetNextEntry (S, I)) != 0       &&
+	       L[1]->OPC == OP65_SBC                      &&
+	       !CE_HasLabel (L[1])) {
+	return 2;
+    }
+
+
+
+    /* Not found */
+    return 0;
+}
+
+
+
 static unsigned OptPtrStore1 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *    	jsr   	pushax
+ *      ldy     xxx
+ *      jsr     ldauidx
+ *      subop
+ *      ldy     yyy
+ *  	jsr   	staspidx
+ *
+ * and replace it by:
+ *
+ *      sta     ptr1
+ *      stx     ptr1+1
+ *      ldy     xxx
+ *      ldx     #$00
+ *      lda     (ptr1),y
+ *	subop
+ *      ldy     yyy
+ *      sta     (ptr1),y
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	unsigned K;
+     	CodeEntry* L[10];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_JSR    	      	    &&
+     	    strcmp (L[0]->Arg, "pushax") == 0       &&
+       	    CS_GetEntries (S, L+1, I+1, 3)     	    &&
+       	    L[1]->OPC == OP65_LDY              	    &&
+     	    CE_KnownImm (L[1])                      &&
+     	    !CE_HasLabel (L[1])      	       	    &&
+     	    L[2]->OPC == OP65_JSR                   &&
+     	    strcmp (L[2]->Arg, "ldauidx") == 0      &&
+     	    !CE_HasLabel (L[2])                     &&
+       	    (K = OptPtrStore1Sub (S, I+3, L+3)) > 0 &&
+	    CS_GetEntries (S, L+3+K, I+3+K, 2)      &&
+       	    L[3+K]->OPC == OP65_LDY                 &&
+     	    CE_KnownImm (L[3+K])                    &&
+	    !CE_HasLabel (L[3+K])                   &&
+	    L[4+K]->OPC == OP65_JSR                 &&
+	    strcmp (L[4+K]->Arg, "staspidx") == 0   &&
+	    !CE_HasLabel (L[4+K])) {
+
+	    CodeEntry* X;
+
+	    /* Create and insert the stores */
+       	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+1);
+
+	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+2);
+
+	    /* Delete the call to pushax */
+	    CS_DelEntry (S, I);
+
+	    /* Delete the call to ldauidx */
+	    CS_DelEntry (S, I+3);
+
+	    /* Insert the load from ptr1 */
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+3);
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[2]->LI);
+	    CS_InsertEntry (S, X, I+4);
+
+	    /* Insert the store through ptr1 */
+	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "ptr1", 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+6+K);
+
+	    /* Delete the call to staspidx */
+	    CS_DelEntry (S, I+7+K);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptPtrStore2 (CodeSeg* S)
 /* Search for the sequence:
  *
  *    	jsr   	pushax
@@ -1693,12 +1828,13 @@ struct OptFunc {
 static OptFunc OptFuncs [] = {
     /* Optimizes stores through pointers */
     OptEntry (OptPtrStore1, optPre),
+    OptEntry (OptPtrStore2, optPre),
     /* Optimize loads through pointers */
     OptEntry (OptPtrLoad1, optMain),
     OptEntry (OptPtrLoad2, optMain),
     /* Optimize calls to nega */
-    OptEntry (OptNegA1, optPre),
-    OptEntry (OptNegA2, optPre),
+    OptEntry (OptNegA1, optMain),
+    OptEntry (OptNegA2, optMain),
     /* Optimize calls to negax */
     OptEntry (OptNegAX1, optPre),
     OptEntry (OptNegAX2, optPre),

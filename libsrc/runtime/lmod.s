@@ -15,8 +15,9 @@ tosmodeax:
        	jsr    	poplsargs	; Get arguments from stack, adjust sign
       	jsr	udiv32		; Do the division, remainder is in (ptr2:tmp3:tmp4)
 
-; Load the result with the exception of the low byte
+; Load the result
 
+        lda     ptr2
   	ldx	ptr2+1
   	ldy    	tmp3
   	sty	sreg
@@ -25,16 +26,14 @@ tosmodeax:
 
 ; Check the sign of the result. It is the sign of the left operand.
 
-        lda     tmp1            ; Check sign of left operand
+        bit     tmp1            ; Check sign of left operand
         bpl     Pos             ; Jump if result is positive
 
 ; Result is negative
 
-        lda     ptr2            ; Load byte 0 of result
         jmp     negeax          ; Negate result
 
 ; Result is positive
 
-Pos:    lda     ptr2            ; Load byte 0 of result
-        rts                     ; Done
+Pos:    rts                     ; Done
 

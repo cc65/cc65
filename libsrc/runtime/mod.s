@@ -16,6 +16,7 @@ tosmoda0:
 tosmodax:
 	jsr	popsargs	; Get arguments from stack, adjust sign
       	jsr	udiv16		; Do the division
+        lda     ptr1            ; Load low byte of result
       	ldx	ptr1+1          ; Load high byte of result
 
 ; Adjust the sign of the result. tmp1 contains the high byte of the left
@@ -23,16 +24,14 @@ tosmodax:
 ; the result of the modulo operation is the same as that of the left
 ; operand
 
-        lda     tmp1
+        bit     tmp1
         bpl     Pos             ; Jump if sign of result positive
 
 ; Result is negative
 
-        lda     ptr1            ; Load low byte of result
         jmp     negax           ; Adjust the sign
 
 ; Result is positive
 
-Pos:    lda     ptr1
-        rts
+Pos:    rts
 

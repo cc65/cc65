@@ -19,6 +19,8 @@ all:
 	make -f make\watcom.mak
 	cd ..\cl65
 	make -f make\watcom.mak
+	cd ..\grc
+	make -f make\watcom.mak
 	cd ..\ld65
 	make -f make\watcom.mak
 	cd ..
@@ -34,6 +36,8 @@ clean:
 	make -f make\watcom.mak clean
 	cd ..\cl65
 	make -f make\watcom.mak clean
+	cd ..\grc
+	make -f make\watcom.mak clean
 	cd ..\ld65
 	make -f make\watcom.mak clean
 	cd ..
@@ -46,6 +50,8 @@ strip:
        	@cd ..\cc65
 	@-make -f make\watcom.mak strip
 	@cd ..\cl65
+	@-make -f make\watcom.mak strip
+	@cd ..\grc
 	@-make -f make\watcom.mak strip
 	@cd ..\ld65
 	@-make -f make\watcom.mak strip

@@ -1630,6 +1630,7 @@ static void RunOptGroup3 (CodeSeg* S)
        	Changes += RunOptFunc (S, &DOptSub1, 1);
        	Changes += RunOptFunc (S, &DOptSub2, 1);
        	Changes += RunOptFunc (S, &DOptAdd3, 1);
+	Changes += RunOptFunc (S, &DOptStackOps, 1);
        	Changes += RunOptFunc (S, &DOptJumpCascades, 1);
        	Changes += RunOptFunc (S, &DOptDeadJumps, 1);
        	Changes += RunOptFunc (S, &DOptRTS, 1);
@@ -1651,7 +1652,6 @@ static void RunOptGroup3 (CodeSeg* S)
 	Changes += RunOptFunc (S, &DOptDupLoads, 1);
 	Changes += RunOptFunc (S, &DOptStoreLoad, 1);
 	Changes += RunOptFunc (S, &DOptTransfers, 1);
-	Changes += RunOptFunc (S, &DOptStackOps, 1);
 
     } while (Changes);
 }

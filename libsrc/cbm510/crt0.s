@@ -95,10 +95,10 @@ cia:   		.word  	$dc00
 acia:  		.word  	$dd00
 tpi1:		.word  	$de00
 tpi2:  		.word  	$df00
-ktab1:		.word  	$ea29
-ktab2:	       	.word  	$ea89
-ktab3:		.word	$eae9
-ktab4:		.word  	$eb49
+ktab1:		.word  	$eab1
+ktab2:	       	.word  	$eb11
+ktab3:		.word	$eb71
+ktab4:		.word  	$ebd1
 time:		.dword 	$0000
 RecvBuf:	.word	$0100		; RS232 received buffer
 SendBuf:	.word	$0200		; RS232 send buffer
@@ -244,7 +244,7 @@ Z4:
        	jsr    	push0 	       	; argc
        	jsr	push0	       	; argv
 
-; Execute the program code 
+; Execute the program code
 
 	jmp	Start
 

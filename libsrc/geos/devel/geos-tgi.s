@@ -42,7 +42,7 @@ VDC_DATA	  = 31
 ; capabilities of the driver
 
         .byte   $74, $67, $69           ; "tgi"
-        .byte   $00                     ; TGI version number
+        .byte   TGI_API_VERSION         ; TGI API version number
 xres:   .word   320                     ; X resolution
 yres:   .word   200                     ; Y resolution
         .byte   2                       ; Number of drawing colors
@@ -52,10 +52,7 @@ pages:	.byte   1                       ; Number of screens available
         .res    4, $00                  ; Reserved for future extensions
 
 ; Next comes the jump table. Currently all entries must be valid and may point
-; to an RTS for test versions (function not implemented). A future version may
-; allow for emulation: In this case the vector will be zero. Emulation means
-; that the graphics kernel will emulate the function by using lower level
-; primitives - for example ploting a line by using calls to SETPIXEL.
+; to an RTS for test versions (function not implemented).
 
         .word   INSTALL
         .word   UNINSTALL
@@ -298,12 +295,10 @@ INIT:
 ; The graphics kernel will never call DONE when no graphics mode is active,
 ; so there is no need to protect against that.
 ;
-; Must set an error code: YES
+; Must set an error code: NO
 ;
 
 DONE:
-	jsr GETERROR		; clear error (if any)
-
 	lda #0
 	jsr SETVIEWPAGE		; switch into viewpage 0
 
@@ -477,10 +472,11 @@ SETPALETTE:
 	jmp	VDCWriteReg
 
 ; ------------------------------------------------------------------------
-; GETPALETTE: Return the current palette in A/X. Must return NULL and set an
-; error if palettes are not supported.
+; GETPALETTE: Return the current palette in A/X. Even drivers that cannot
+; set the palette should return the default palette here, so there's no
+; way for this function to fail.
 ;
-; Must set an error code: YES
+; Must set an error code: NO
 ;
 
 GETPALETTE:
@@ -489,10 +485,12 @@ GETPALETTE:
         rts
 
 ; ------------------------------------------------------------------------
-; GETDEFPALETTE: Return the default palette for the driver in A/X. Must
-; return NULL and set an error of palettes are not supported.
+; GETDEFPALETTE: Return the default palette for the driver in A/X. All
+; drivers should return something reasonable here, even drivers that don't
+; support palettes, otherwise the caller has no way to determine the colors
+; of the (not changeable) palette.
 ;
-; Must set an error code: YES
+; Must set an error code: NO (all drivers must have a default palette)
 ;
 
 GETDEFPALETTE:

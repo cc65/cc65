@@ -942,7 +942,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 * location does already contain the value to be stored,
 		 * remove the store.
 		 */
-       	        if (CPU >= CPU_65C02 && E->AM == AM65_ZP) {
+       	        if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 && E->AM == AM65_ZP) {
 		    if (ZPRegVal (E->Chg, In) == 0) {
                         Delete = 1;
                     }

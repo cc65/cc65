@@ -60,8 +60,8 @@ struct Function {
     type*   	  	ReturnType;	/* Function return type */
     struct FuncDesc*	Desc;	  	/* Function descriptor */
     CodeMark 	       	EntryCode;     	/* Backpatch addr for entry code */
-    unsigned	  	LocalMax; 	/* Total space for locals */
-    unsigned   	       	LocalSize;	/* Current space for locals */
+    int			LocalMax; 	/* Total space for locals */
+    int			LocalSize;	/* Current space for locals */
     unsigned	  	RetLab;		/* Return code label */
 };
 
@@ -156,17 +156,14 @@ unsigned GetRetLab (const Function* F)
 int AllocLocalSpace (Function* F, unsigned Size)
 /* Allocate space for the function locals, return stack offset */
 {
-    /* Remember the current offset */
-    unsigned Offs = F->LocalSize;
-
     /* Add the size */
-    F->LocalSize += Size;
+    F->LocalSize += Size;			
     if (F->LocalSize > F->LocalMax) {
       	F->LocalMax = F->LocalSize;
     }
 
     /* Return the offset, it is below the initial stack pointer */
-    return -(int)Offs;
+    return -F->LocalSize;;
 }
 
 
@@ -230,10 +227,12 @@ void NewFunc (SymEntry* Func)
     /* Generate function entry code if needed */
     g_enter (TypeOf (Func->Type), GetParamSize (CurrentFunc));
 
-    /* Remember the current code position to create local variable space once
-     * we have created the function body itself.
+    /* Remember the current code position. This may be used later to create
+     * local variable space once we have created the function body itself.
+     * Currently this is not possible because the stack offsets of all locals
+     * have to be known in advance.
      */
-    RememberEntry (Func);
+    RememberEntry (CurrentFunc);
 
     /* Parse the function body */
     oursp = 0;
@@ -264,6 +263,7 @@ void NewFunc (SymEntry* Func)
     FreeFunction (CurrentFunc);
     CurrentFunc = 0;
 }
+
 
 
 

@@ -1175,6 +1175,12 @@ Here's a list of all control commands and a description, what they do:
   End a <tt><ref id=".REPEAT" name=".REPEAT"></tt> block.
 
 
+<sect1><tt>.ENDSTRUCT</tt><label id=".ENDSTRUCT"><p>
+
+  Ends a struct definition. See the section named <ref id="structs"
+  name="Structs and unions">.
+
+
 <sect1><tt>.ENUM</tt><label id=".ENUM"><p>
 
   Start an enumeration. This directive is very similar to the C <tt/enum/
@@ -2389,6 +2395,12 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
+<sect1><tt>.STRUCT</tt><label id=".STRUCT"><p>
+
+  Starts a struct definition. See the section named <ref id="structs"
+  name="Structs and unions">.
+
+
 <sect1><tt>.SUNPLUS</tt><label id=".SUNPLUS"><p>
 
   Enable the SunPlus instructions set. This command will not work in the
@@ -2398,6 +2410,23 @@ Here's a list of all control commands and a description, what they do:
   See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
   name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>, and
   <tt><ref id=".P816" name=".P816"></tt>
+
+
+<sect1><tt>.TAG</tt><label id=".TAG"><p>
+
+  Allocate space for a struct or union.
+
+  Example:
+
+  <tscreen><verb>
+        .struct Point
+                xcoord  .word
+                ycoord  .word
+        .endstruct
+
+        .bss
+                .tag    Point           ; Allocate 4 bytes
+  </verb></tscreen>
 
 
 <sect1><tt>.TCOUNT</tt><label id=".TCOUNT"><p>
@@ -3029,6 +3058,63 @@ it is possible to determine if the
 
 instruction is supported, which is the case for the 65SC02, 65C02 and 65816
 CPUs (the latter two are upwards compatible to the 65SC02).
+
+
+
+<sect>Structs and unions<label id="structs"><p>
+
+Structs and unions are special forms of <ref id="scopes" name="scopes">.  They
+are to some degree comparable to their C counterparts. Both have a list of
+members. Each member allocates storage and may optionally have a name, which,
+in case of a struct, is the offset from the beginning and, in case of a union
+is always zero.
+
+Here is an example for a very simple struct with two members and a total size
+of 4 bytes:
+
+<tscreen><verb>
+      .struct Point
+              xcoord  .word
+              ycoord  .word
+      .endstruct
+</verb></tscreen>
+
+A union shares the total space between all its members, its size is the same
+as that of the largest member.
+
+A struct or union must not necessarily have a name. If it is anonymous, no
+local scope is opened, the identifiers used to name the members are placed
+into the current scope instead.
+
+A struct may contain unnamed members and definitions of local structs. The
+storage allocators may contain a multiplier, as in the example below:
+
+<tscreen><verb>
+      .struct Circle
+              .struct Point
+                      .word   2         ; Allocate two words
+              .endstruct
+              Radius  .word
+      .endstruct
+</verb></tscreen>
+
+Using the <ref id=".TAG" name=".TAG"> keyword, it is possible to embedd
+already defined structs or unions in structs:
+
+<tscreen><verb>
+      .struct Point
+              xcoord  .word
+              ycoord  .word
+      .endstruct
+
+      .struct Circle
+              Origin  .tag    Point
+              Radius  .word
+      .endstruct
+</verb></tscreen>
+
+Space for a struct or union may be allocated using the <ref id=".TAG"
+name=".TAG"> directive.
 
 
 

@@ -59,7 +59,8 @@ The software needed:
 		name="http://www.von-bassewitz.de/uz/cc65/">
     <item><em/VICE/ This is portable C64, C128 and few other Commodore computers emulator, you
 		can obtain it from: <htmlurl url="http://www.cs.cmu.edu/~dsladic/vice/vice.html"
-		name="http://www.cs.cmu.edu/~dsladic/vice/vice.html">
+		name="http://www.cs.cmu.edu/~dsladic/vice/vice.html">. VICE package contains
+		c1541 program that is able to convert/unconvert GEOS files to disk images.
     <item><em/Star Commander/ This tool is only for DOS. You will need it for transferring
 		object files from PC to 1541. There's also one important ability of this
 		tool - it automatically un-converts .cvt files into GEOS native format on

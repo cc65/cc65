@@ -2,8 +2,8 @@
 ; This must be the *second* file on the linker command line
 ; (.cvt header must be the *first* one)
 
-; Maciej 'YTM/Alliance' Witkowiak
-; 26.10.99, 10.3.2000
+; Maciej 'YTM/Elysium' Witkowiak
+; 26.10.99, 10.3.2000, 15.8.2001
 
 ; no __hinit
 
@@ -50,9 +50,9 @@ regbank =	$a3		; 6 bytes hopefully not used by Kernal
 
 ; Setup stack
 
-	lda    	#<$7900
+	lda    	#<$6000
 	sta	sp
-	lda	#>$7900
+	lda	#>$6000
        	sta	sp+1   		; Set argument stack ptr
 
 ; Call module constructors

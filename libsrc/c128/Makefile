@@ -47,7 +47,6 @@ OBJS =	_scrsize.o		\
 	mouse.o			\
         randomize.o     	\
         revers.o        	\
-	rs232.o			\
 	slow.o			\
         sysuname.o              \
 	tgi_mode_table.o	\
@@ -81,4 +80,4 @@ clean:
 zap:	clean
 	@$(RM) $(EMDS) $(JOYS) $(SERS) $(TGIS)
 
-				       
+

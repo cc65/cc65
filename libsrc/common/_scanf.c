@@ -153,6 +153,7 @@ static void ReadSign (void)
       	case '-':
        	    ReadChar ();
       	    Positive = 0;
+            break;
       	case '+':
       	    ReadChar ();
       	    /* FALLTHROUGH */

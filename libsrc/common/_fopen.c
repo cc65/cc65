@@ -15,14 +15,11 @@
 static unsigned char amode_to_bmode (const char* mode)
 /* Convert ASCII mode (like for fopen) to binary mode (for open) */
 {
-    char	  c;
-    char 	  flag = 0;
-    unsigned char binmode = 0;
+    unsigned char binmode;
 
-    c = *mode++;
-    switch(c) {
+    switch (*mode++) {
         case 'w':
-            binmode = O_WRONLY;
+            binmode = O_WRONLY | O_CREAT | O_TRUNC;
             break;
         case 'r':
             binmode = O_RDONLY;
@@ -34,19 +31,23 @@ static unsigned char amode_to_bmode (const char* mode)
             return 0;  /* invalid char */
     }
 
-    while (c = *mode++) {
-        switch(c) {
+    while (1) {
+        switch (*mode++) {
             case '+':
-                binmode = (binmode & ~15) | O_RDWR;
+                /* always to r/w in addition to anything already set */
+                binmode |= O_RDWR;
                 break;
             case 'b':
                 /* currently ignored */
                 break;
+            case '\0':
+                /* end of mode string reached */
+                return binmode;
             default:
-                return 0;  /* invalid char */
+                /* invalid char in mode string */
+                return 0;
         }
     }
-    return binmode;
 }
 
 

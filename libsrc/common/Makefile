@@ -17,7 +17,6 @@ C_OBJS =	_afailed.o	\
 		_scanf.o	\
 		abort.o		\
 		bsearch.o	\
-		calloc.o	\
 		errormsg.o	\
 		fclose.o	\
 		fdopen.o	\
@@ -59,6 +58,7 @@ S_OBJS = 	_fdesc.o	\
 		abs.o		\
 		atexit.o	\
 		atoi.o		\
+		calloc.o	\
 		copydata.o	\
 		cprintf.o	\
 		errno.o		\

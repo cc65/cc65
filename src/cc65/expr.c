@@ -2280,7 +2280,7 @@ static void parsesub (int k, ExprDesc* lval)
     	    	/* Operate on pointers, result type is a pointer */
     	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is pointer, right is pointer, must scale result */
-    	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_EQUAL) {
+    	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
     	    	    Error ("Incompatible pointer types");
     	    	} else {
     	    	    lval->ConstVal = (lval->ConstVal - lval2.ConstVal) / PSizeOf (lhst);
@@ -2315,7 +2315,7 @@ static void parsesub (int k, ExprDesc* lval)
     	    	flags = CF_PTR;
     	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is pointer, right is pointer, must scale result */
-    	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_EQUAL) {
+    	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
     	    	    Error ("Incompatible pointer types");
     	    	} else {
     	    	    rscale = PSizeOf (lhst);
@@ -2358,7 +2358,7 @@ static void parsesub (int k, ExprDesc* lval)
  	    flags = CF_PTR;
  	} else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
  	    /* Left is pointer, right is pointer, must scale result */
- 	    if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_EQUAL) {
+ 	    if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
  	       	Error ("Incompatible pointer types");
  	    } else {
  	    	rscale = PSizeOf (lhst);
@@ -3025,7 +3025,7 @@ static void Assignment (ExprDesc* lval)
 	g_push (CF_PTR | CF_UNSIGNED, 0);
 
 	/* Check for equality of the structs */
-	if (TypeCmp (ltype, lval2.Type) < TC_EQUAL) {
+	if (TypeCmp (ltype, lval2.Type) < TC_STRICT_COMPATIBLE) {
      	    Error ("Incompatible types");
 	}
 

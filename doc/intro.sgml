@@ -25,10 +25,11 @@ detail.
 
 You are assumed to have downloaded and extracted the executables and the
 target specific files. For example, for Windows users targeting C64, you need
-cc65-win32-2.8.0.zip and cc65-c64-2.8.0.zip extracted to the same directory.
-If you received the files as a bzip2 archive (extension *.bz2), you will need
-to get the <htmlurl url="http://sources.redhat.com/bzip2/#bzip2-latest"
-name="bzip2 package"> to decompress it.
+cc65-win32-2.8.0.zip and cc65-c64-2.8.0.zip (or whatever the current cc65
+version is) extracted to the same directory. If you received the files as a
+bzip2 archive (extension *.bz2), you will need to get the <htmlurl
+url="http://sources.redhat.com/bzip2/#bzip2-latest" name="bzip2 package"> to
+decompress it.
 
 <bf>Note</bf>: There is a much simpler way to compile this example using the
 cl65 compiler and link utility. However, it makes sense to understand how the
@@ -242,10 +243,44 @@ would also apply to a real machine.
 <sect1>Apple<p>
 
 <bf>AppleWin 1.10.4</bf> (available at
-<url url="http://www.jantzer-schmidt.de/applewin/">): Emulates Apple II+/IIe 
+<url url="http://www.jantzer-schmidt.de/applewin/">): Emulates Apple II+/IIe
 computer, with sound, video, joysticks, serial port, and disk images. Roms and
-dos disk included. Includes monitor. Only for Windows. Unfortunately we were
-unable to find documentation on running programs.  Please help.
+dos disk included. Includes monitor. Only for Windows. The package comes with
+roms and dos3.3 disk (called master.dsk), however you will need a2tools
+(available at <url url="http://hotel04.ausys.se/pausch/apple2/#a2tools">) and
+applehdr (included in the Apple package at util/apple/)
+
+Compile the tutorial with
+
+<tscreen><verb>
+cl65 -O -t apple2 hello.c text.s
+</verb></tscreen>
+
+Then insert the file into an Apple disk image for use with an emulator.  Copy
+the master.dsk which comes with Applewin and rename it to cc65.dsk, then use
+a2tools:
+
+<tscreen><verb>
+a2tools in -r b cc65.dsk TEST hello
+</verb></tscreen>
+
+Note that a convention in the Apple world is that hello is the file which is
+automatically run upon booting a DOS disk, sort of like the Autoexec.bat of
+the PC world.  We've avoided this in the example however.  Also, the TEST
+parameter must be in caps, and is the name of the program as it will appear on
+the Apple disk.
+
+Start the emulator, click on the Disk 1 icon, and point to cc65.dsk, then
+click the big Apple logo to boot the system.  Then type this on the Apple:
+
+<tscreen><verb>
+BRUN TEST
+</verb></tscreen>
+
+You will see the "Hello, World!" appear on the same line.  We suggest you
+clear the screen first in your programs. Thanks to Oliver Schmidt, <htmlurl
+url="mailto:oliver@jantzer-schmidt.de" name="oliver@jantzer-schmidt.de"> for
+his help in completing this section.
 
 <sect1>Atari<p>
 
@@ -253,8 +288,8 @@ unable to find documentation on running programs.  Please help.
 <url url="http://www.a800win.atari-area.prv.pl">): Emulates Atari
 400/800/65XE/130XE/800XL/1200XL/5200, with stereo sound, disk images, scanline
 exact NTSC/PAL video, joysticks, mouse, cartridges and ram expansions.
-Includes monitor. Unfortunately only for Windows. You will need the emulator
-only.  Optionally you will need atarixl.rom and/or atariosb.rom/ataribas.rom
+Includes monitor. Unfortunately only for Windows. You will need the emulator,
+atarixl.rom or atariosb.rom/ataribas.rom
 and dos25.xfd files (not supplied).
 
 Compile the tutorial with

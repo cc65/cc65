@@ -142,6 +142,9 @@ lunix.inc:	cfg/lunix.cfg
 module.inc:	cfg/module.cfg
 	@$(CVT) $< $@ CfgModule
 
+nes.inc:	cfg/nes.cfg
+	@$(CVT) $< $@ CfgNES
+
 none.inc:	cfg/none.cfg
 	@$(CVT) $< $@ CfgNone
 

@@ -64,6 +64,7 @@ static const char CfgEmpty[] = "";
 #include "geos.inc"
 #include "lunix.inc"
 #include "module.inc"
+#include "nes.inc"
 #include "none.inc"
 #include "pet.inc"
 #include "plus4.inc"
@@ -96,6 +97,7 @@ const TargetDesc Targets [TGT_COUNT] = {
     {   BINFMT_BINARY,  CfgGeos         },
     {   BINFMT_O65,     CfgLunix        },
     {  	BINFMT_BINARY,	CfgAtmos        },
+    {  	BINFMT_BINARY, 	CfgNES          },
 };
 
 
@@ -118,3 +120,4 @@ void DumpBuiltinConfig (FILE* F, target_t T)
 
 
 
+                                

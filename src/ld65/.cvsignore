@@ -15,6 +15,7 @@ cbm610.inc
 geos.inc
 lunix.inc
 module.inc
+nes.inc
 none.inc
 pet.inc
 plus4.inc

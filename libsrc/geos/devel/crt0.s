@@ -7,7 +7,7 @@
 
 ; no __hinit
 
-	.export		_exit  
+	.export		_exit
 	.import		initlib, donelib
        	.import	       	pushax
 	.import		_main
@@ -42,7 +42,14 @@ regbank =	$a3		; 6 bytes hopefully not used by Kernal
 	.reloc
 
 ; ------------------------------------------------------------------------
-; Actual code
+; Create an empty LOWCODE segment to avoid linker warnings
+
+.segment        "LOWCODE"
+
+; ------------------------------------------------------------------------
+; Place the startup code in a special segment.
+
+.segment       	"STARTUP"
 
 ; Clear the BSS data
 
@@ -77,4 +84,4 @@ regbank =	$a3		; 6 bytes hopefully not used by Kernal
 _exit:	jsr	donelib	 	; Run module destructors
 
 	jmp	$c22c	 	; EnterDeskTop
-			 
+

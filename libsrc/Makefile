@@ -190,7 +190,7 @@ geoslib:
 	AFLAGS="-t geos -I../../../asminc" \
 	CFLAGS="-Osir -g -T -t geos -I../../../include" \
 	$(MAKE) -C geos || exit 1
-	for i in common runtime; do \
+	for i in em common runtime; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \
@@ -206,6 +206,7 @@ geoslib:
 	      	fi; \
 	    done \
 	done
+	cp geos/devel/*.emd .
 
 #-----------------------------------------------------------------------------
 # CBM PET machines

@@ -5,9 +5,9 @@
 ;
 
 	.export	      	_vfprintf
-	.import	      	pushax, popax, push1
-	.import	      	_fwrite, __printf
-	.importzp     	sp, ptr1, ptr2
+	.import	       	pushax, popax, push1, pushwysp, ldaxysp, ldaxidx, incsp6
+	.import	       	_fwrite, __printf
+	.importzp      	sp, ptr1, ptr2
 
 	.macpack      	generic
 
@@ -45,39 +45,36 @@ out:
 
 ; About to call
 ;
-; 	fwrite (buf, count, 1, (FILE*) d->ptr);
+;      	fwrite (buf, 1, count, (FILE*) d->ptr);
 ;
 ; Since Buf and Count are already in place, we will just push the last
 ; two parameters. The fwrite function will remove Buf and Count on exit.
 
-  	jsr	push1
-  	ldy    	#7     	       	; Offset of D+1 on stack
-  	lda	(sp),y
-  	sta	ptr1+1
-  	dey	   		; Offset of D on stack (6)
-  	lda	(sp),y
-  	sta	ptr1
-  	dey	   		; Offset of ptr+1 in struct outdesc (5)
-  	lda	(ptr1),y
-  	tax
-  	dey
-  	lda	(ptr1),y        ; Load D->ptr
+        ldy     #5
+        jsr     pushwysp        ; Push buf
+        jsr     push1           ; Push #1
+        ldy     #7
+        jsr     pushwysp        ; Push count
+        ldy     #11             ; Current offset of D
+        jsr     ldaxysp         ; Load D
+        ldy     #5              ; Offset of ptr1+1 in struct outdesc
+        jsr     ldaxidx         ; Load
   	jsr	_fwrite
-       	sta	ptr2		; Save function result
+       	sta	ptr2 		; Save function result
 	stx	ptr2+1
 
-; Pop the last parameter from stack and store it in ptr1. This means that
-; the stack is clean now.
+; Get D and store it in ptr1
 
-	jsr	popax
-	sta	ptr1
-	stx	ptr1+1
+        ldy     #5
+        jsr     ldaxysp
+        sta     ptr1
+        stx     ptr1+1
 
 ; Load the offset of ccount in struct outdesc
 
 	ldy	#$00
 
-; Check the return code. Checking the hig byte against $FF is ok here.
+; Check the return code. Checking the high byte against $FF is ok here.
 
        	lda	ptr2+1
  	cmp	#$FF
@@ -86,20 +83,19 @@ out:
 ; We had an error. Store -1 into d->ccount
 
 	sta	(ptr1),y
-	iny
-	sta	(ptr1),y
-	rts
+        iny
+        bne     @Done           ; Branch always
 
 ; Result was ok, count bytes written
 
 @Ok:	lda	(ptr1),y
-	add	ptr1
+	add	ptr2
 	sta	(ptr1),y
-	iny
+        iny
 	lda	(ptr1),y
-	adc	ptr1+1
-	sta	(ptr1),y
-	rts
+	adc	ptr2+1
+@Done:  sta	(ptr1),y
+	jmp     incsp6          ; Drop stackframe
 
 
 ; ----------------------------------------------------------------------------

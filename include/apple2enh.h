@@ -44,7 +44,7 @@
 
 /* If not already done, include the apple2.h header file */
 #if !defined(_APPLE2_H)
-#  include <apple2enh.h>
+#  include <apple2.h>
 #endif
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -61,6 +61,8 @@
 /* Include the correct machine specific file */
 #if defined(__APPLE2__) && !defined(_APPLE2_H)
 #  include <apple2.h>
+#elif defined(__APPLE2ENH__) && !defined(_APPLE2ENH_H)
+#  include <apple2enh.h>
 #elif defined(__ATARI__) && !defined(_ATARI_H)
 #  include <atari.h>
 #elif defined(__ATMOS__) && !defined(_ATMOS_H)
@@ -69,6 +71,8 @@
 #  include <cbm.h>
 #elif defined(__NES__) && !defined(_NES_H)
 #  include <nes.h>
+#else
+#  error "Unknown platform in conio.h"
 #endif
 
 

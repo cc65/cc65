@@ -29,7 +29,7 @@ all:
 	for tgt in $(ALLTARGETS); do		\
 	    $(MAKE) clean $$tgt || exit 1;	\
 	done
-			
+
 #-----------------------------------------------------------------------------
 # Apple ][
 
@@ -90,7 +90,8 @@ c64lib:
 	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
-	mv c64/crt0.o c64.o
+	cp c64/crt0.o c64.o
+	cp c64/*.tgi .
 	for i in c64 cbm common runtime conio dbg tgi; do \
 	    $(AR) a c64.lib $$i/*.o;\
 	done

@@ -266,6 +266,7 @@ the cc65 crosscompiler.
 %attr(644,root,root)   		/usr/lib/cc65/lib/cbm610.lib
 %attr(644,root,root)   		/usr/lib/cc65/lib/cbm610.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/cbm610-*.emd
+%attr(644,root,root) 		/usr/lib/cc65/ser/cbm610-*.ser
 
 
 

@@ -48,6 +48,7 @@
 #include "litpool.h"
 #include "scanner.h"
 #include "stdfunc.h"
+#include "stdnames.h"
 #include "typeconv.h"
 
 

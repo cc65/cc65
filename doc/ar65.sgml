@@ -15,18 +15,18 @@ from existing archives.
 
 <!-- Begin the document -->
 
-<sect>Overview
+<sect>Overview<p>
 
-<p>
+
 ar65 is a replacement for the libr65 archiver that was part of the cc65 C
 compiler suite developed by John R. Dunning. libr65 had some problems and
 the copyright does not permit some things which I wanted to be possible,
 so I decided to write a completely new assembler/linker/archiver suite
 for the cc65 compiler. ar65 is part of this suite.
 
-<sect>Usage
+<sect>Usage<p>
 
-<p>
+
 The archiver is called as follows:
 
 <tscreen><verb>
@@ -115,18 +115,16 @@ operation does update the library. This is only a warning, the linker
 will ignore one of the duplicate symbols (which one is unspecified).
 
 
-<sect>Bugs/Feedback
+<sect>Bugs/Feedback<p>
 
-<p>
-If you have problems using the archiver, if you find any bugs, or if
-you're doing something interesting with it, I would be glad to hear from
-you. Feel free to contact me by email (uz@musoftware.de).
-
+If you have problems using the archiver, if you find any bugs, or if you're
+doing something interesting with it, I would be glad to hear from you. Feel
+free to contact me by email (<htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">).
 
 
-<sect>Copyright
 
-<p>
+<sect>Copyright<p>
+
 ar65 (and all cc65 binutils) are (C) Copyright 1998 Ullrich von Bassewitz.
 For usage of the binaries and/or sources the following conditions do
 apply:

@@ -6,7 +6,8 @@
 # Default for the compiler lib search path as compiler define
 
 SGML  =	ar65.sgml	\
-	ca65.sgml
+	ca65.sgml	\
+	cl65.sgml
 
 TXT   =	$(SGML:.sgml=.txt)
 HTML  = $(SGML:.sgml=.html)
@@ -20,7 +21,7 @@ DVI   = $(SGML:.sgml=.dvi)
 	sgml2txt $<
 
 %.html:	%.sgml
-	sgml2html $<
+	sgml2html --split=0 $<
 
 %.info:	%.sgml
 	sgml2info $<

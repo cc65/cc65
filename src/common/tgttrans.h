@@ -44,6 +44,9 @@
 
 
 
+void TgtTranslateInit (void);
+/* Initialize the translation tables */
+
 int TgtTranslateChar (int C);
 /* Translate one character from the source character set into the target
  * system character set.

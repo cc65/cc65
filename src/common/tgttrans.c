@@ -96,8 +96,8 @@ static const unsigned char* Tab = 0;
 
 
 
-void InitTarget (void)
-/* Initialize the target and the translation tables */
+void TgtTranslateInit (void)
+/* Initialize the translation tables */
 {
     switch (Target) {
 	case TGT_NONE:				break;

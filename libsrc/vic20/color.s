@@ -9,12 +9,11 @@
 
 
  	.export		_textcolor, _bgcolor, _bordercolor
+	.importzp	tmp1
 
 	.include	"vic20.inc"
 
-.bss
 
-clr_tmp:	.res	1	; tempory storage for bitfield ops
 
 .code
 
@@ -30,12 +29,12 @@ _bgcolor:
 	asl
 	asl
 	asl
-	sei	; don't want anything messing around while we update
-	sta	clr_tmp
+	sta	tmp1
+	sei	    		; don't want anything messing around while we update
 	lda	VIC_COLOR	; get old value
 	and	#$0F
 	tax
-	ora	clr_tmp	
+	ora	tmp1
 	sta	VIC_COLOR	; set new value
 	cli
 	txa
@@ -48,12 +47,12 @@ _bgcolor:
 
 _bordercolor:
 	and	#$07
-	sei	; don't want anything messing around while we update
-	sta	clr_tmp
-       	lda    	VIC_COLOR   ; get old value
+	sta	tmp1
+	sei	    		; don't want anything messing around while we update
+       	lda    	VIC_COLOR   	; get old value
 	and	#$F8
 	tax
-	ora	clr_tmp
+	ora	tmp1
 	sta	VIC_COLOR	; set new value
 	cli
 	txa

@@ -1,5 +1,6 @@
 ;
-; Graphics driver for the 640x200x2 mode on the C128 VDC
+; Graphics driver for the 640x480x2 mode on the C128 VDC
+; (values for this mode based on Fred Bowen's document)
 ; Maciej 'YTM/Elysium' Witkowiak <ytm@elysium.pl>
 ; 23.12.2002
 ;
@@ -58,9 +59,9 @@ VDC_DATA	  = 31
         .byte   $74, $67, $69           ; "tgi"
         .byte   $00                     ; TGI version number
 xres:   .word   640                     ; X resolution
-yres:   .word   200                     ; Y resolution
+yres:   .word   480                     ; Y resolution
         .byte   2                       ; Number of drawing colors
-pages:	.byte   1                       ; Number of screens available
+pages:	.byte   0                       ; Number of screens available
         .byte   8                       ; System font X size
         .byte   8                       ; System font Y size
         .res    4, $00                  ; Reserved for future extensions
@@ -127,8 +128,6 @@ YS		= regsave+2	; (2)	CIRCLE
 
 .bss
 
-SCRBASE:	.res	1	; High byte of screen base
-
 ERROR:  	.res	1     	; Error code
 PALETTE:        .res    2       ; The current palette
 
@@ -177,6 +176,14 @@ InitVDCTab:
 		.byte VDC_DSP_HI, 0		; viewpage 0 as default
 		.byte VDC_DSP_LO, 0
 		.byte VDC_HSCROLL, $87
+		.byte 2, $66
+		.byte 4, $4c
+		.byte 5, $06
+		.byte 6, $4c
+		.byte 7, $47
+		.byte 8, $03
+		.byte 9, $06
+		.byte 27, $00
 		.byte $ff
 
 SCN80CLR:	.byte 27,88,147,27,88,0
@@ -230,11 +237,9 @@ INSTALL:
 	jmp	@endok		; and leave default values for 16k
 
 @have64k:
-	lda	#4
+	lda	#1
 	sta	pages
 @endok:
-	lda     #0
-	sta	SCRBASE		; draw page 0 as default
         rts
 
 test64k:
@@ -290,14 +295,19 @@ DEINSTALL:
 ; Must set an error code: YES
 ;
 
-INIT:   cmp     #TGI_MODE_640_200_2     ; Correct mode?
+INIT:   cmp     #TGI_MODE_640_480_2     ; Correct mode?
         beq     @L1                     ; Jump if yes
         lda     #TGI_ERR_INV_MODE       ; ## Error
         bne     @L9
 
+@L1:	lda	pages			; is there enough memory?
+	bne	@L11			; Jump if there is one screen
+	lda	#TGI_ERR_INV_MODE	; ## Error
+	bne	@L9
+
 ; Initialize variables
 
-@L1:    ldx     #$FF
+@L11:   ldx     #$FF
         stx     BITMASK
 
 ; Switch into graphics mode (set view page 0)
@@ -333,7 +343,8 @@ INIT:   cmp     #TGI_MODE_640_200_2     ; Correct mode?
 
 DONE:
 	; This part is C128-mode specific
-	jsr $ce0c		; reload character set
+	jsr $e179		; reload character set
+	jsr $ff62
 	lda $d7			; in 80-columns?
 	bne @L01
 @L0:	lda SCN80CLR,y
@@ -381,21 +392,20 @@ CONTROL:
 
 CLEAR:  
 	lda	#0
-	ldy	SCRBASE
+	tay
 	jsr	VDCSetSourceAddr
 	lda	#0
 	ldx	#VDC_VSCROLL
 	jsr	VDCWriteReg			; set fill mode
 	lda	#0
 	jsr	VDCWriteByte			; put 1rst byte (fill value)
-	ldy	#62				; 62 times
+	ldy	#159				; 159 times
 	lda	#0				; 256 bytes
 	ldx	#VDC_COUNT
 @L1:	jsr	VDCWriteReg
 	dey
 	bne	@L1
-	lda	#127
-	jmp	VDCWriteReg			; 1+62*256+127=16000=(640*256)/8
+	rts
 
 ; ------------------------------------------------------------------------
 ; SETVIEWPAGE: Set the visible page. Called with the new page in A (0..n).
@@ -405,12 +415,7 @@ CLEAR:
 ;
 
 SETVIEWPAGE:
-	clc
-	ror
-	ror
-	ror
-	ldx	#VDC_DSP_HI
-	jmp	VDCWriteReg
+	rts
 
 ; ------------------------------------------------------------------------
 ; SETDRAWPAGE: Set the drawable page. Called with the new page in A (0..n).
@@ -420,11 +425,6 @@ SETVIEWPAGE:
 ;
 
 SETDRAWPAGE:
-	clc
-	ror
-	ror
-	ror
-	sta	SCRBASE
 	rts
 
 ; ------------------------------------------------------------------------
@@ -1145,7 +1145,13 @@ OUTTEXT:
 ;> ADDR - address of card
 ;> X - bit number (X1 & 7)
 CALC:
+	lda	Y1
+	pha
 	lda	Y1+1
+	pha
+	lsr
+	ror	Y1		; Y=Y/2
+	sta	Y1+1
 	sta	ADDR+1
 	lda	Y1
 	asl
@@ -1183,10 +1189,20 @@ CALC:
 	lda	ADDR+1		; ADDR = Y*80+x/8
 	adc	TEMP
 	sta	ADDR+1
+	pla
+	sta	Y1+1
+	pla
+	sta	Y1
+	and	#1
+	beq	@even		; even line - no offset
+	lda	ADDR
+	clc
+	adc	#<21360
+	sta	ADDR
 	lda	ADDR+1
-	adc	SCRBASE
-	sta	ADDR+1
-	lda	X1
+	adc	#>21360
+	sta	ADDR+1		; odd lines are 21360 bytes farther
+@even:	lda	X1
 	and	#7
 	tax
 	rts
@@ -1247,8 +1263,6 @@ VDCSetSourceAddr:
 	sta	VDC_DATA_REG
 	dex
 	tya
-@L1:	bit	VDC_ADDR_REG
-	bpl	@L1
 	stx	VDC_ADDR_REG
 	sta	VDC_DATA_REG
 	rts

@@ -51,7 +51,7 @@ EMDS =	c128-georam.emd c128-ram.emd c128-ramcart.emd c128-reu.emd c128-vdc.emd
 
 JOYS = c128-stdjoy.joy
 
-TGIS = c128-640-200-2.tgi
+TGIS = c128-640-200-2.tgi c128-640-480-2.tgi
 
 #--------------------------------------------------------------------------
 # Targets

@@ -295,14 +295,14 @@ static void OptZeropageName (const char* Opt attribute ((unused)), const char* A
 
 
 
-static void ConvertOneFile (const char* InputFile, const char* OutputFile)
+static void DoConversion (void)
 /* Do file conversion */
 {
     /* Read the o65 file into memory */
-    O65Data* D = ReadO65File (InputFile);
+    O65Data* D = ReadO65File (InputName);
 
     /* Do the conversion */
-    Convert (D, OutputFile);
+    Convert (D);
 
     /* Free the o65 module data */
     /* ### */
@@ -410,7 +410,7 @@ int main (int argc, char* argv [])
     }
 
     /* Do the conversion */
-    ConvertOneFile (InputName, OutputName);
+    DoConversion ();
 
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;

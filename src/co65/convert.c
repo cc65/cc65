@@ -352,7 +352,7 @@ static void ConvertZeropageSeg (FILE* F, const O65Data* D)
 
 
 
-void Convert (const O65Data* D, const char* OutputFile)
+void Convert (const O65Data* D)
 /* Convert the o65 file in D using the given output file. */
 {
     FILE*       F;
@@ -435,10 +435,10 @@ void Convert (const O65Data* D, const char* OutputFile)
         return;
     }
 
-    /* Open the output file */                                                    
-    F = fopen (OutputFile, "wb");
+    /* Open the output file */
+    F = fopen (OutputName, "wb");
     if (F == 0) {
-        Error ("Cannot open `%s': %s", OutputFile, strerror (errno));
+        Error ("Cannot open `%s': %s", OutputName, strerror (errno));
     }
 
     /* Create a header */

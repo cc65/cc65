@@ -18,12 +18,6 @@
 ; ------------------------------------------------------------------------
 ; Constants
 
-JOY_UP          = $01
-JOY_DOWN        = $02
-JOY_LEFT        = $04
-JOY_RIGHT       = $08
-JOY_FIRE        = $10
-
 OFFS            = 10
 
 ; ------------------------------------------------------------------------
@@ -38,11 +32,11 @@ OFFS            = 10
 
 ; Button state masks (8 values)
 
-        .byte   JOY_UP
-        .byte   JOY_DOWN
-        .byte   JOY_LEFT
-        .byte   JOY_RIGHT
-        .byte   JOY_FIRE
+        .byte   $40
+        .byte   $80
+        .byte   $10
+        .byte   $20
+        .byte   $08
         .byte   $00                     ; Future expansion
         .byte   $00                     ; Future expansion
         .byte   $00                     ; Future expansion
@@ -108,38 +102,28 @@ READJOY:
 
 ; Read joystick
 
-        lda     #$00            ; Clear result
-        ldy     OPEN_APPLE,x    ; Check fire button
-        bpl     @nofire
-        ora     #JOY_FIRE       ; Fire button pressed
+        lda     OPEN_APPLE,x    ; Check fire button
+        and     #$80            ; BTN 0 0 0 0 0 0 0
 
-@nofire:
         pha
         jsr     PREAD           ; Read first paddle value
         pla
         cpy     #127-OFFS
-        bcc     @left
+        ror     a               ; /LEFT BTN 0 0 0 0 0 0
         cpy     #127+OFFS
-        bcc     @nextpaddle
-        ora     #JOY_RIGHT
-        .byte   $2c
-@left:  ora     #JOY_LEFT
+        ror     a               ; RIGHT /LEFT BTN 0 0 0 0 0
 
-@nextpaddle:
         inx
         pha
-        jsr     PREAD
+        jsr     PREAD           ; Read second paddle
         pla
         cpy     #127-OFFS
-        bcc     @up
+        ror     a               ; /UP RIGHT /LEFT BTN 0 0 0 0
         cpy     #127+OFFS
-        bcc     @done
-        ora     #JOY_DOWN
-        .byte   $2c
-@up:    ora     #JOY_UP
+        ror     a               ; DOWN /UP RIGHT /LEFT BTN 0 0 0
+        eor     #%01010000      ; DOWN UP RIGHT LEFT BTN 0 0 0
 
-@done:  ldx     #0              ; fix X
+        ldx     #0              ; fix X
         rts
 
 
-                                               

@@ -48,7 +48,7 @@ apple2lib:
 	    $(AR) a apple2.lib $$i/*.o;\
 	done
 	mv apple2/crt0.o apple2.o
-	cp apple2/*.joy .
+	cp apple2/apple2-stdjoy.joy a2-stdjoy.joy
 
 #-----------------------------------------------------------------------------
 # Atari

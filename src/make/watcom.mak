@@ -14,14 +14,14 @@ SUBDIRS =	  	\
 	ld65		\
 	od65
 
-all:	nt
+all:	win32
 
 
-nt:								  
-	for i in $(SUBDIRS); do $(MAKE) TARGET=NT -C $${i} -f make/watcom.mak; done
+win32:
+     	for i in $(SUBDIRS); do $(MAKE) TARGET=NT -C $${i} -f make/watcom.mak; done
 
 
-dos:
+dos32:
 	for i in $(SUBDIRS); do $(MAKE) TARGET=DOS32 -C $${i} -f make/watcom.mak; done
 
 os2:

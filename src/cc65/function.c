@@ -296,7 +296,7 @@ void NewFunc (SymEntry* Func)
     HadReturn = 0;
     while (CurTok.Tok != TOK_RCURLY) {
      	if (CurTok.Tok != TOK_CEOF) {
-     	    HadReturn = Statement ();
+     	    HadReturn = Statement (0);
      	} else {
      	    break;
      	}

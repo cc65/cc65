@@ -46,8 +46,45 @@
 
 
 /*****************************************************************************/
-/*				   Forwards                                  */
+/*			       Helper functions                              */
 /*****************************************************************************/
+
+
+
+static void CheckTok (token_t Tok, const char* Msg, int* PendingToken)
+/* Helper function for Statement. Will check for Tok and print Msg if not
+ * found. If PendingToken is NULL, it will the skip the token, otherwise
+ * it will store one to PendingToken.
+ */
+{
+    if (CurTok.Tok != Tok) {
+	Error (Msg);
+    } else if (PendingToken) {
+	*PendingToken = 1;
+    } else {
+	NextToken ();
+    }
+}
+
+
+
+static void CheckSemi (int* PendingToken)
+/* Helper function for Statement. Will call CheckTok with the parameters
+ * for a semicolon.
+ */
+{
+    CheckTok (TOK_SEMI, "`;' expected", PendingToken);
+}
+
+
+
+static void SkipPending (int PendingToken)
+/* Skip the pending token if we have one */
+{
+    if (PendingToken) {    
+	NextToken ();
+    }
+}
 
 
 
@@ -71,12 +108,13 @@ static int IfStatement (void)
     test (Label1, 0);
 
     /* Parse the if body */
-    GotBreak = Statement ();
+    GotBreak = Statement (0);
 
     /* Else clause present? */
     if (CurTok.Tok != TOK_ELSE) {
 
       	g_defcodelabel (Label1);
+
      	/* Since there's no else clause, we're not sure, if the a break
      	 * statement is really executed.
      	 */
@@ -95,7 +133,7 @@ static int IfStatement (void)
 	g_defcodelabel (Label1);
 
 	/* Total break only if both branches had a break. */
-     	GotBreak &= Statement ();
+     	GotBreak &= Statement (0);
 
      	/* Generate the label for the else clause */
 	g_defcodelabel (Label2);
@@ -124,7 +162,7 @@ static void DoStatement (void)
     g_defcodelabel (loop);
 
     /* Parse the loop body */
-    Statement ();
+    Statement (0);
 
     /* Parse the end condition */
     Consume (TOK_WHILE, "`while' expected");
@@ -143,6 +181,8 @@ static void DoStatement (void)
 static void WhileStatement (void)
 /* Handle the 'while' statement */
 {
+    int PendingToken;
+
     /* Get the loop control labels */
     unsigned loop = GetLocalLabel ();
     unsigned lab = GetLocalLabel ();
@@ -172,9 +212,10 @@ static void WhileStatement (void)
     	NextToken ();
     } else {
     	/* There is code inside the while loop, parse the body */
-    	Statement ();
+    	Statement (&PendingToken);
     	g_jump (loop);
     	g_defcodelabel (lab);
+	SkipPending (PendingToken);
     }
 
     /* Remove the loop from the loop stack */
@@ -432,7 +473,7 @@ static void CascadeSwitch (struct expent* eval)
 
 	/* Parse statements */
 	if (CurTok.Tok != TOK_RCURLY) {
-       	    HaveBreak = Statement ();
+       	    HaveBreak = Statement (0);
 	}
     }
 
@@ -521,7 +562,7 @@ static void TableSwitch (struct expent* eval)
 	    HaveBreak = 0;
     	}
     	if (CurTok.Tok != TOK_RCURLY) {
-    	    HaveBreak = Statement ();
+    	    HaveBreak = Statement (0);
     	}
     }
 
@@ -600,6 +641,7 @@ static void ForStatement (void)
     struct expent lval1;
     struct expent lval2;
     struct expent lval3;
+    int PendingToken;
 
     /* Get several local labels needed later */
     unsigned TestLabel = GetLocalLabel ();
@@ -651,10 +693,13 @@ static void ForStatement (void)
 
     /* Loop body */
     g_defcodelabel (lstat);
-    Statement ();
+    Statement (&PendingToken);
 
     /* Jump back to the increment expression */
     g_jump (IncLabel);
+			    
+    /* Skip a pending token if we have one */
+    SkipPending (PendingToken);
 
     /* Declare the break label */
     g_defcodelabel (lab);
@@ -678,9 +723,6 @@ static int CompoundStatement (void)
     /* Enter a new lexical level */
     EnterBlockLevel ();
 
-    /* Skip the rcurly */
-    NextToken ();
-
     /* Parse local variable declarations if any */
     DeclareLocals ();
 
@@ -688,7 +730,7 @@ static int CompoundStatement (void)
     GotBreak = 0;
     while (CurTok.Tok != TOK_RCURLY) {
      	if (CurTok.Tok != TOK_CEOF) {
-     	    GotBreak = Statement ();
+     	    GotBreak = Statement (0);
      	} else {
      	    break;
      	}
@@ -699,9 +741,6 @@ static int CompoundStatement (void)
 	g_space (oursp - OldStack);
     }
     oursp = OldStack;
-
-    /* Skip the closing brace */
-    ConsumeRCurly ();
 
     /* Emit references to imports/exports for this block */
     EmitExternals ();
@@ -714,12 +753,23 @@ static int CompoundStatement (void)
 
 
 
-int Statement (void)
+int Statement (int* PendingToken)
 /* Statement parser. Returns 1 if the statement does a return/break, returns
- * 0 otherwise
+ * 0 otherwise. If the PendingToken pointer is not NULL, the function will
+ * not skip the terminating token of the statement (closing brace or
+ * semicolon), but store true if there is a pending token, and false if there
+ * is none. The token is always checked, so there is no need for the caller to
+ * check this token, it must be skipped, however. If the argument pointer is
+ * NULL, the function will skip the token.
  */
 {
     struct expent lval;
+    int GotBreak;
+
+    /* Assume no pending token */
+    if (PendingToken) {
+	*PendingToken = 0;
+    }
 
     /* Check for a label */
     if (CurTok.Tok == TOK_IDENT && NextTok.Tok == TOK_COLON) {
@@ -732,7 +782,10 @@ int Statement (void)
      	switch (CurTok.Tok) {
 
      	    case TOK_LCURLY:
-	        return CompoundStatement ();
+	        NextToken ();
+		GotBreak = CompoundStatement ();
+	        CheckTok (TOK_RCURLY, "`{' expected", PendingToken);
+	        return GotBreak;
 
      	    case TOK_IF:
      	    	return IfStatement ();
@@ -751,17 +804,17 @@ int Statement (void)
 
 	    case TOK_RETURN:
 	    	ReturnStatement ();
-	    	ConsumeSemi ();
+	    	CheckSemi (PendingToken);
 	    	return 1;
 
 	    case TOK_BREAK:
 		BreakStatement ();
-		ConsumeSemi ();
+	    	CheckSemi (PendingToken);
 		return 1;
 
 	    case TOK_CONTINUE:
 		ContinueStatement ();
-		ConsumeSemi ();
+	    	CheckSemi (PendingToken);
 		return 1;
 
 	    case TOK_FOR:
@@ -770,7 +823,7 @@ int Statement (void)
 
 	    case TOK_GOTO:
 		GotoStatement ();
-		ConsumeSemi ();
+	    	CheckSemi (PendingToken);
 		return 1;
 
 	    case TOK_SEMI:
@@ -785,7 +838,7 @@ int Statement (void)
 	    default:
 	        /* Actual statement */
 		expression (&lval);
-		ConsumeSemi ();
+	    	CheckSemi (PendingToken);
 	}
     }
     return 0;

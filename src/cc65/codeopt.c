@@ -499,7 +499,7 @@ static unsigned OptSub2 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_LDA 	  		           &&
+       	if (E->OPC == OPC_LDA 	      		           &&
 	    GetCodeEntries (S, L, I+1, 5) 	           &&
        	    L[0]->OPC == OPC_SEC                           &&
 	    !CodeEntryHasLabel (L[0])                      &&
@@ -527,8 +527,15 @@ static unsigned OptSub2 (CodeSeg* S)
 	    MoveCodeEntry (S, I, I+3);
 	    ReplaceOPC (E, OPC_SBC);
 
+	    /* If the sequence head had a label, move this label back to the
+	     * head.
+	     */
+	    if (CodeEntryHasLabel (E)) {
+		MoveCodeLabels (S, E, L[0]);
+	    }
+
 	    /* Remember, we had changes */
-	    ++Changes;
+       	    ++Changes;
 
 	}
 
@@ -764,6 +771,13 @@ static unsigned OptCmp3 (CodeSeg* S)
 		/* We will replace the ldx/cpx by lda/cmp */
 		ReplaceOPC (L[0], OPC_LDA);
 		ReplaceOPC (L[1], OPC_CMP);
+
+		/* Beware: If the first LDA instruction had a label, we have
+		 * to move this label to the top of the sequence again.
+		 */
+		if (CodeEntryHasLabel (E)) {
+		    MoveCodeLabels (S, E, L[0]);
+		}
 
 	    }
 

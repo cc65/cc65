@@ -457,8 +457,35 @@ static void PushAddr (ExprDesc* lval)
 
 
 
+static void MakeConstIntExpr (ExprDesc* Expr, long Value)
+/* Make Expr a constant integer expression with the given value */
+{
+    Expr->Flags = E_MCONST;
+    Expr->Type = type_int;
+    Expr->ConstVal = 1;
+}
+
+
+
+static void ConstSubExpr (int (*F) (ExprDesc*), ExprDesc* Expr)
+/* Will evaluate an expression via the given function. If the result is not
+ * a constant, a diagnostic will be printed, and the value is replaced by
+ * a constant one to make sure there are no internal errors that result
+ * from this input error.
+ */
+{
+    memset (Expr, 0, sizeof (*Expr));
+    if (F (Expr) != 0 || Expr->Flags != E_MCONST) {
+       	Error ("Constant expression expected");
+       	/* To avoid any compiler errors, make the expression a valid const */
+	MakeConstIntExpr (Expr, 1);
+    }
+}
+
+
+
 /*****************************************************************************/
-/*   	     			     code				     */
+/*   	     	     		     code				     */
 /*****************************************************************************/
 
 
@@ -818,8 +845,7 @@ static int primary (ExprDesc* lval)
     if (Preprocessing) {
        	/* Illegal expression in PP mode */
 	Error ("Preprocessor expression expected");
-	lval->Flags = E_MCONST;
-	lval->Type = type_int;
+	MakeConstIntExpr (lval, 1);
 	return 0;
     }
 
@@ -970,8 +996,7 @@ static int primary (ExprDesc* lval)
 
     /* Illegal primary. */
     Error ("Expression expected");
-    lval->Flags = E_MCONST;
-    lval->Type = type_int;
+    MakeConstIntExpr (lval, 1);
     return 0;
 }
 
@@ -2392,6 +2417,82 @@ static int hie2 (ExprDesc *lval)
 
 
 
+static int hieAndPP (ExprDesc* lval)
+/* Process "exp && exp" in preprocessor mode (that is, when the parser is
+ * called recursively from the preprocessor.
+ */
+{
+    ExprDesc lval2;
+
+    ConstSubExpr (hie2, lval);
+    while (CurTok.Tok == TOK_BOOL_AND) {
+
+	/* Left hand side must be an int */
+	if (!IsClassInt (lval->Type)) {
+	    Error ("Left hand side must be of integer type");
+	    MakeConstIntExpr (lval, 1);
+	}
+
+	/* Skip the && */
+	NextToken ();
+
+	/* Get rhs */
+	ConstSubExpr (hie2, &lval2);
+
+	/* Since we are in PP mode, all we know about is integers */
+	if (!IsClassInt (lval2.Type)) {
+	    Error ("Right hand side must be of integer type");
+	    MakeConstIntExpr (&lval2, 1);
+	}
+
+	/* Combine the two */
+	lval->ConstVal = (lval->ConstVal && lval2.ConstVal);
+    }
+
+    /* Always a rvalue */
+    return 0;
+}
+
+
+
+static int hieOrPP (ExprDesc *lval)
+/* Process "exp || exp" in preprocessor mode (that is, when the parser is
+ * called recursively from the preprocessor.
+ */
+{
+    ExprDesc lval2;
+
+    ConstSubExpr (hieAndPP, lval);
+    while (CurTok.Tok == TOK_BOOL_OR) {
+
+	/* Left hand side must be an int */
+	if (!IsClassInt (lval->Type)) {
+	    Error ("Left hand side must be of integer type");
+	    MakeConstIntExpr (lval, 1);
+	}
+
+	/* Skip the && */
+	NextToken ();
+
+	/* Get rhs */
+	ConstSubExpr (hieAndPP, &lval2);
+
+	/* Since we are in PP mode, all we know about is integers */
+	if (!IsClassInt (lval2.Type)) {
+	    Error ("Right hand side must be of integer type");
+	    MakeConstIntExpr (&lval2, 1);
+	}
+
+	/* Combine the two */
+	lval->ConstVal = (lval->ConstVal || lval2.ConstVal);
+    }
+
+    /* Always a rvalue */
+    return 0;
+}
+
+
+
 static int hieAnd (ExprDesc* lval, unsigned TrueLab, int* BoolOp)
 /* Process "exp && exp" */
 {
@@ -2505,19 +2606,10 @@ static int hieOr (ExprDesc *lval)
     	    }
     	    exprhs (CF_FORCECHAR, k, &lval2);
 
-       	    /* If there is more to come, add shortcut boolean eval.
-    	     * Beware: If we had && operators, the jump is already
-    	     * in place!
-    	     */
-#if 	0
-/* Seems this sometimes generates wrong code */
-    	    if (CurTok.Tok == TOK_BOOL_OR && !AndOp) {
-    	      	g_truejump (CF_NONE, TrueLab);
-       	    }
-#else
+       	    /* If there is more to come, add shortcut boolean eval. */
     	    g_truejump (CF_NONE, TrueLab);
-#endif
-    	}
+
+	}
     	lval->Flags = E_MEXPR;
     	lval->Test |= E_CC;		       	/* Condition codes are set */
     	k = 0;
@@ -2553,7 +2645,7 @@ static int hieQuest (ExprDesc *lval)
 
 
 
-    k = hieOr (lval);
+    k = Preprocessing? hieOrPP (lval) : hieOr (lval);
     if (CurTok.Tok == TOK_QUEST) {
     	NextToken ();
     	if ((lval->Test & E_CC) == 0) {
@@ -3051,9 +3143,7 @@ void constexpr (ExprDesc* lval)
     if (expr (hie1, lval) != 0 || (lval->Flags & E_MCONST) == 0) {
      	Error ("Constant expression expected");
      	/* To avoid any compiler errors, make the expression a valid const */
-     	lval->Flags = E_MCONST;
-     	lval->Type = type_int;
-     	lval->ConstVal = 0;
+	MakeConstIntExpr (lval, 1);
     }
 }
 
@@ -3066,9 +3156,7 @@ void intexpr (ExprDesc* lval)
     if (!IsClassInt (lval->Type)) {
      	Error ("Integer expression expected");
      	/* To avoid any compiler errors, make the expression a valid int */
-     	lval->Flags = E_MCONST;
-     	lval->Type = type_int;
-     	lval->ConstVal = 0;
+	MakeConstIntExpr (lval, 1);
     }
 }
 
@@ -3086,9 +3174,7 @@ void boolexpr (ExprDesc* lval)
     if (!IsClassInt (lval->Type) && !IsClassPtr (lval->Type)) {
  	Error ("Boolean expression expected");
  	/* To avoid any compiler errors, make the expression a valid int */
- 	lval->Flags = E_MCONST;
- 	lval->Type    = type_int;
- 	lval->ConstVal = 0;
+	MakeConstIntExpr (lval, 1);
     }
 }
 

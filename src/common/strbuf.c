@@ -37,6 +37,7 @@
 
 /* common */
 #include "strbuf.h"
+#include "va_copy.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
 

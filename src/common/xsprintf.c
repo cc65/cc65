@@ -42,6 +42,7 @@
 #include "chartype.h"
 #include "check.h"
 #include "inttypes.h"
+#include "va_copy.h"
 #include "xsprintf.h"
 
 
@@ -154,7 +155,9 @@ static intmax_t NextIVal (PrintfCtrl*P)
         case lmIntMax:      return va_arg (P->ap, intmax_t);
         case lmSizeT:       return (uintmax_t) va_arg (P->ap, size_t);
         case lmPtrDiffT:    return (long) va_arg (P->ap, ptrdiff_t);
-        default:            FAIL ("Invalid type size in NextIVal");
+        default:
+            FAIL ("Invalid type size in NextIVal");
+            return 0;
     }
 }
 
@@ -171,7 +174,9 @@ static uintmax_t NextUVal (PrintfCtrl*P)
         case lmIntMax:      return va_arg (P->ap, uintmax_t);
         case lmSizeT:       return va_arg (P->ap, size_t);
         case lmPtrDiffT:    return (intmax_t) va_arg (P->ap, ptrdiff_t);
-        default:            FAIL ("Invalid type size in NextUVal");
+        default:
+            FAIL ("Invalid type size in NextUVal");
+            return 0;
     }
 }
 
@@ -372,7 +377,7 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
 
 
     /* Initialize the control structure */
-    P.ap        = ap;
+    va_copy (P.ap, ap);
     P.Buf       = Buf;
     P.BufSize   = Size;
     P.BufFill   = 0;
@@ -583,6 +588,9 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
 
         }
     }
+
+    /* We don't need P.ap any longer */
+    va_end (P.ap);
 
     /* Terminate the output string and return the number of chars that had
      * been written if the buffer was large enough.

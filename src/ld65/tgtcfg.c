@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -57,6 +57,7 @@ static const char CfgEmpty[] = "";
 #include "cbm610.inc"
 #include "geos.inc"
 #include "lunix.inc"
+#include "module.inc"
 #include "none.inc"
 #include "pet.inc"
 #include "plus4.inc"
@@ -64,28 +65,28 @@ static const char CfgEmpty[] = "";
 
 
 /*****************************************************************************/
-/*     	      	    	       	     Data     	 			     */
+/*     	      	     	       	     Data     	 			     */
 /*****************************************************************************/
 
 
 
 /* Target configurations for all systems */
 const TargetDesc Targets [TGT_COUNT] = {
-    {  	BINFMT_BINARY,  CfgNone 	},
-    {  	BINFMT_BINARY,	CfgAtari	},
-    {  	BINFMT_BINARY,	CfgC64 		},
-    {  	BINFMT_BINARY,	CfgC128		},
+    {  	BINFMT_BINARY,  CfgNone         },
+    {  	BINFMT_O65,     CfgModule       },
+    {  	BINFMT_BINARY,	CfgAtari        },
+    {  	BINFMT_BINARY,	CfgC64          },
+    {  	BINFMT_BINARY,	CfgC128         },
     {  	BINFMT_BINARY,	CfgEmpty	},    	/* Ace */
-    {  	BINFMT_BINARY,	CfgPlus4	},
-    {  	BINFMT_BINARY,  CfgCBM510	},
-    {  	BINFMT_BINARY,  CfgCBM610	},
-    {  	BINFMT_BINARY,	CfgPET		},
-    {  	BINFMT_BINARY, 	CfgBBC		},
-    {   BINFMT_BINARY,	CfgApple2	},
-    {   BINFMT_BINARY,  CfgGeos		},
+    {  	BINFMT_BINARY,	CfgPlus4        },
+    {  	BINFMT_BINARY,  CfgCBM510       },
+    {  	BINFMT_BINARY,  CfgCBM610       },
+    {  	BINFMT_BINARY,	CfgPET          },
+    {  	BINFMT_BINARY, 	CfgBBC          },
+    {   BINFMT_BINARY,	CfgApple2       },
+    {   BINFMT_BINARY,  CfgGeos         },
     {   BINFMT_O65,     CfgLunix        },
 };
-
 
 
 

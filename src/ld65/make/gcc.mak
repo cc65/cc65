@@ -55,6 +55,7 @@ INCS =	apple2.inc	\
 	cbm610.inc	\
 	geos.inc	\
 	lunix.inc	\
+        module.inc      \
 	none.inc	\
 	pet.inc		\
 	plus4.inc
@@ -128,6 +129,9 @@ geos.inc:	cfg/geos.cfg
 
 lunix.inc:	cfg/lunix.cfg
 	@$(CVT) $< $@ CfgLunix
+
+module.inc:	cfg/module.cfg
+	@$(CVT) $< $@ CfgModule
 
 none.inc:	cfg/none.cfg
 	@$(CVT) $< $@ CfgNone

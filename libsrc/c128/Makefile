@@ -26,23 +26,24 @@
 #--------------------------------------------------------------------------
 # Object files
 
-OBJS =	_scrsize.o	\
-	break.o	       	\
-     	cgetc.o	       	\
-       	clrscr.o       	\
-      	conio.o	       	\
-     	crt0.o	       	\
-       	color.o	       	\
-     	cputc.o	       	\
-        get_tv.o        \
-	joy_stddrv.o	\
-     	kbhit.o	       	\
-        kernal.o        \
-	mouse.o		\
-        randomize.o     \
-        revers.o        \
-	rs232.o		\
-	tgi_mode_table.o
+OBJS =	_scrsize.o		\
+	break.o	       		\
+     	cgetc.o	       		\
+       	clrscr.o       		\
+      	conio.o	       		\
+     	crt0.o	       		\
+       	color.o	       		\
+     	cputc.o	       		\
+        get_tv.o        	\
+	joy_stddrv.o		\
+     	kbhit.o	       		\
+        kernal.o        	\
+	mouse.o			\
+        randomize.o     	\
+        revers.o        	\
+	rs232.o			\
+	tgi_mode_table.o	\
+	toggle_videomode.o
 
 #--------------------------------------------------------------------------
 # Drivers

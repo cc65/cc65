@@ -95,6 +95,11 @@
 
 
 
+void toggle_videomode (void);
+/* Toggle the video mode between 40 and 80 chars (calls SWAPPER) */
+
+
+
 /* End of c128.h */
 #endif
 

@@ -48,6 +48,7 @@ NEWLINE		= $C363
 PRINT		= $C322
 
 ; Extended jump table
+SWAPPER		= $FF5F
 SETBNK          = $FF68
 
 ; ---------------------------------------------------------------------------

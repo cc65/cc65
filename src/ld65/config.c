@@ -104,17 +104,6 @@ unsigned	       	SegDescCount;	/* Number of entries in list */
 static BinDesc*	BinFmtDesc	= 0;
 static O65Desc* O65FmtDesc	= 0;
 
-/* Attributes for the o65 format */
-static unsigned O65Attr	= 0;
-#define OA_OS		0x0001
-#define OA_TYPE		0x0002
-#define OA_VERSION	0x0004
-#define OA_OSVERSION	0x0008
-#define OA_TEXT		0x0010
-#define OA_DATA		0x0020
-#define OA_BSS		0x0040
-#define OA_ZP		0x0080
-
 
 
 /*****************************************************************************/
@@ -806,6 +795,8 @@ static void ParseO65 (void)
 	{   "IMPORT",	CFGTOK_IMPORT		},
         {   "TYPE",     CFGTOK_TYPE     	},
        	{   "OS",      	CFGTOK_OS       	},
+       	{   "ID",      	CFGTOK_ID       	},
+       	{   "VERSION",  CFGTOK_VERSION          },
     };
     static const IdentTok Types [] = {
        	{   "SMALL",   	CFGTOK_SMALL    	},
@@ -817,6 +808,25 @@ static void ParseO65 (void)
         {   "CC65",     CFGTOK_CC65             },
     };
 
+    /* Bitmask to remember the attributes we got already */
+    enum {
+       	atNone		= 0x0000,
+	atOS            = 0x0001,
+        atOSVersion     = 0x0002,
+	atType	       	= 0x0004,
+	atImport        = 0x0008,
+	atExport    	= 0x0010,
+        atID            = 0x0020,
+        atVersion       = 0x0040
+    };
+    unsigned AttrFlags = atNone;
+
+    /* Remember the attributes read */
+    unsigned OS = 0;            /* Initialize to keep gcc happy */
+    unsigned ID = 0;            /* Dito */
+    unsigned Version = 0;
+
+    /* Read the attributes */
     while (CfgTok == CFGTOK_IDENT) {
 
 	/* Map the identifier to a token */
@@ -832,6 +842,8 @@ static void ParseO65 (void)
 	switch (AttrTok) {
 
 	    case CFGTOK_EXPORT:
+                /* Remember we had this token (maybe more than once) */
+                AttrFlags |= atExport;
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
 	        /* Check if the export symbol is also defined as an import. */
@@ -843,13 +855,15 @@ static void ParseO65 (void)
       		 * error message when checking it here.
       		 */
       	 	if (O65GetExport (O65FmtDesc, CfgSVal) != 0) {
-      	 	    CfgError ("Duplicate exported symbol: `%s'", CfgSVal);
+      	  	    CfgError ("Duplicate exported symbol: `%s'", CfgSVal);
       	 	}
 		/* Insert the symbol into the table */
-		O65SetExport (O65FmtDesc, CfgSVal);
+	  	O65SetExport (O65FmtDesc, CfgSVal);
 	    	break;
 
 	    case CFGTOK_IMPORT:
+                /* Remember we had this token (maybe more than once) */
+                AttrFlags |= atImport;
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
 	        /* Check if the imported symbol is also defined as an export. */
@@ -869,7 +883,7 @@ static void ParseO65 (void)
 
 	    case CFGTOK_TYPE:
 		/* Cannot have this attribute twice */
-		FlagAttr (&O65Attr, OA_TYPE, "TYPE");
+		FlagAttr (&AttrFlags, atType, "TYPE");
 		/* Get the type of the executable */
 		CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
 		switch (CfgTok) {
@@ -889,27 +903,34 @@ static void ParseO65 (void)
 
 	    case CFGTOK_OS:
 		/* Cannot use this attribute twice */
-		FlagAttr (&O65Attr, OA_OS, "OS");
+	  	FlagAttr (&AttrFlags, atOS, "OS");
 		/* Get the operating system */
 	    	CfgSpecialToken (OperatingSystems, ENTRY_COUNT (OperatingSystems), "OS type");
 		switch (CfgTok) {
-
-		    case CFGTOK_LUNIX:
-		    	O65SetOS (O65FmtDesc, O65OS_LUNIX);
-		    	break;
-
-		    case CFGTOK_OSA65:
-		    	O65SetOS (O65FmtDesc, O65OS_OSA65);
-		    	break;
-
-		    case CFGTOK_CC65:
-		    	O65SetOS (O65FmtDesc, O65OS_CC65);
-		    	break;
-
-		    default:
-			CfgError ("Unexpected OS token");
+		    case CFGTOK_LUNIX:  OS = O65OS_LUNIX;       break;
+		    case CFGTOK_OSA65:  OS = O65OS_OSA65;       break;
+		    case CFGTOK_CC65:   OS = O65OS_CC65;        break;
+		    default:            CfgError ("Unexpected OS token");
 		}
 		break;
+
+            case CFGTOK_ID:
+                /* Cannot have this attribute twice */
+                FlagAttr (&AttrFlags, atID, "ID");
+                /* We're expecting a number in the 0..$FFFF range*/
+                CfgAssureInt ();
+                CfgRangeCheck (0, 0xFFFF);
+                ID = (unsigned) CfgIVal;
+                break;
+
+            case CFGTOK_VERSION:
+                /* Cannot have this attribute twice */
+                FlagAttr (&AttrFlags, atVersion, "VERSION");
+                /* We're expecting a number in byte range */
+                CfgAssureInt ();
+                CfgRangeCheck (0, 0xFF);
+                Version = (unsigned) CfgIVal;
+                break;
 
 	    default:
 		FAIL ("Unexpected attribute token");
@@ -920,6 +941,23 @@ static void ParseO65 (void)
 	CfgNextTok ();
 	CfgOptionalComma ();
     }
+
+    /* Check if we have all mandatory attributes */
+    AttrCheck (AttrFlags, atOS, "OS");
+
+    /* Check for attributes that may not be combined */
+    if (OS == O65OS_CC65) {
+        if ((AttrFlags & (atImport | atExport)) != 0) {
+            CfgError ("OS type CC65 may not have imports or exports");
+        }
+    } else {
+        if (AttrFlags & atID) {
+            CfgError ("Operating system does not support the ID attribute");
+        }
+    }
+
+    /* Set the O65 operating system to use */
+    O65SetOS (O65FmtDesc, OS, Version, ID);
 }
 
 
@@ -970,11 +1008,11 @@ static void ParseConDes (void)
 /* Parse the CONDES feature */
 {
     static const IdentTok Attributes [] = {
-       	{   "SEGMENT",		CFGTOK_SEGMENT		},
-	{   "LABEL",  		CFGTOK_LABEL  		},
-	{   "COUNT",		CFGTOK_COUNT		},
-	{   "TYPE",		CFGTOK_TYPE   		},
-	{   "ORDER",		CFGTOK_ORDER		},
+       	{   "SEGMENT",	   	CFGTOK_SEGMENT		},
+	{   "LABEL",  	   	CFGTOK_LABEL  		},
+	{   "COUNT",	   	CFGTOK_COUNT		},
+	{   "TYPE",	   	CFGTOK_TYPE   		},
+	{   "ORDER",	   	CFGTOK_ORDER		},
     };
 
     static const IdentTok Types [] = {

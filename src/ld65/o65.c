@@ -1008,31 +1008,31 @@ void O65SetOption (O65Desc* D, unsigned Type, const void* Data, unsigned DataLen
 
 
 
-void O65SetOS (O65Desc* D, unsigned OS)
+void O65SetOS (O65Desc* D, unsigned OS, unsigned Version, unsigned Id)
 /* Set an option describing the target operating system */
 {
-    static const unsigned char OSA65 [2] = { O65OS_OSA65, 0 };
-    static const unsigned char Lunix [2] = { O65OS_LUNIX, 0 };
-    static const unsigned char CC65 [4]  = { O65OS_CC65, 0, 0, 0 };
+    /* Setup the option data */
+    unsigned char Opt[4];
+    Opt[0] = OS;
+    Opt[1] = Version;
 
-    /* Write the correct option */
+    /* Write the correct option length */
     switch (OS) {
-
 	case O65OS_OSA65:
-	    O65SetOption (D, O65OPT_OS, OSA65, sizeof (OSA65));
-	    break;
-
     	case O65OS_LUNIX:
-	    O65SetOption (D, O65OPT_OS, Lunix, sizeof (Lunix));
+            /* No id for these two */
+       	    O65SetOption (D, O65OPT_OS, Opt, 2);
 	    break;
 
     	case O65OS_CC65:
-	    O65SetOption (D, O65OPT_OS, CC65, sizeof (CC65));
+            /* Set the 16 bit id */
+            Opt[2] = (unsigned char) Id;
+            Opt[3] = (unsigned char) (Id >> 8);
+	    O65SetOption (D, O65OPT_OS, Opt, 4);
 	    break;
 
 	default:
 	    Internal ("Trying to set invalid O65 operating system: %u", OS);
-
     }
 }
 

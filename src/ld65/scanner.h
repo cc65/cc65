@@ -77,6 +77,8 @@ typedef enum {
     CFGTOK_EXPORT,
     CFGTOK_IMPORT,
     CFGTOK_OS,
+    CFGTOK_ID,
+    CFGTOK_VERSION,
     CFGTOK_FORMAT,
 
     CFGTOK_LOAD,

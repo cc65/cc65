@@ -98,7 +98,7 @@ void O65SetAlignment (O65Desc* D, unsigned Align);
 void O65SetOption (O65Desc* D, unsigned Type, const void* Data, unsigned DataLen);
 /* Set an o65 header option */
 
-void O65SetOS (O65Desc* D, unsigned OS);
+void O65SetOS (O65Desc* D, unsigned OS, unsigned Version, unsigned Id);
 /* Set an option describing the target operating system */
 
 ExtSym* O65GetImport (O65Desc* D, const char* Ident);

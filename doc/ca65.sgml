@@ -125,6 +125,7 @@ Here is a description of all the command line options:
 
 <descrip>
 
+  <label id="option--cpu">
   <tag><tt>--cpu type</tt></tag>
 
   Set the default for the CPU type. The option takes a parameter, which
@@ -1881,9 +1882,9 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.P02</tt><label id=".P02"><p>
 
-  Enable the 6502 instruction set, disable 65SC02, 65C02 and 65816 
-  instructions. This is the default if not overridden by the 
-  <tt/--cpu/ command line option.
+  Enable the 6502 instruction set, disable 65SC02, 65C02 and 65816
+  instructions. This is the default if not overridden by the
+  <tt><ref id="option--cpu" name="--cpu"></tt> command line option.
 
   See: <tt><ref id=".PC02" name=".PC02"></tt>, <tt><ref id=".PSC02"
   name=".PSC02"></tt> and <tt><ref id=".P816" name=".P816"></tt>
@@ -2161,6 +2162,26 @@ Here's a list of all control commands and a description, what they do:
   id=".RODATA" name=".RODATA"></tt>
 
 
+<sect1><tt>.SETCPU</tt><label id=".SETCPU"><p>
+
+  Switch the CPU instruction set. The command is followed by a string that
+  specifies the CPU. Possible values are those that can also be supplied to
+  the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
+  namely: 6502, 65SC02, 65C02, 65816 and sunplus. Please note that support
+  for the sunplus CPU is not available in the freeware version, because the
+  instruction set of the sunplus CPU is "proprietary and confidential".
+
+  See: <tt><ref id=".CPU" name=".CPU"></tt>,
+       <tt><ref id=".IFP02" name=".IFP02"></tt>,
+       <tt><ref id=".IFP816" name=".IFP816"></tt>,
+       <tt><ref id=".IFPC02" name=".IFPC02"></tt>,
+       <tt><ref id=".IFPSC02" name=".IFPSC02"></tt>,
+       <tt><ref id=".P02" name=".P02"></tt>,
+       <tt><ref id=".P816" name=".P816"></tt>,
+       <tt><ref id=".PC02" name=".PC02"></tt>,
+       <tt><ref id=".PSC02" name=".PSC02"></tt>
+
+
 <sect1><tt>.SMART</tt><label id=".SMART"><p>
 
   Switch on or off smart mode. The command must be followed by a '+' or
@@ -2236,6 +2257,17 @@ Here's a list of all control commands and a description, what they do:
 		.byte	.strlen(Arg), Arg
        	.endmacro
   </verb></tscreen>
+
+
+<sect1><tt>.SUNPLUS</tt><label id=".SUNPLUS"><p>
+
+  Enable the SunPlus instructions set. This command will not work in the
+  freeware version of the assembler, because the instruction set is
+  "proprietary and confidential".
+
+  See: <tt><ref id=".P02" name=".P02"></tt>, <tt><ref id=".PSC02"
+  name=".PSC02"></tt>, <tt><ref id=".PC02" name=".PC02"></tt>, and 
+  <tt><ref id=".P816" name=".P816"></tt>
 
 
 <sect1><tt>.TCOUNT</tt><label id=".TCOUNT"><p>
@@ -2686,7 +2718,7 @@ don't like that, use classic macros instead:
 (This is an example where a problem can be solved with both macro types).
 
 
-<sect1>Characters in macros<p>               
+<sect1>Characters in macros<p>
 
 When using the <ref id="option-t" name="-t"> option, characters are translated
 into the target character set of the specific machine. However, this happens

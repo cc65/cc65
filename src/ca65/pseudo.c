@@ -456,7 +456,7 @@ static void DoByte (void)
 	} else {
 	    EmitByte (Expression ());
 	}
-	if (Tok != TOK_COMMA) {
+    	if (Tok != TOK_COMMA) {
 	    break;
 	} else {
 	    NextTok ();
@@ -488,7 +488,7 @@ static void DoCharMap (void)
 
     /* Read the index as numerical value */
     Index = ConstExpression ();
-    if (Index < 1 || Index > 255) {
+    if (Index < 0 || Index > 255) {
       	/* Value out of range */
        	ErrorSkip ("Range error");
       	return;
@@ -499,10 +499,10 @@ static void DoCharMap (void)
 
     /* Read the character code */
     Code = ConstExpression ();
-    if (Code < 1 || Code > 255) {
-	/* Value out of range */
+    if (Code < 0 || Code > 255) {
+    	/* Value out of range */
        	ErrorSkip ("Range error");
-	return;
+    	return;
     }
 
     /* Set the character translation */

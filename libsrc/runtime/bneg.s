@@ -9,10 +9,9 @@
 
 bnegax:	cpx	#0
   	bne	L0
-bnega:	cmp	#0
+bnega: 	tax
   	bne	L0
-L1:	ldx	#0
-   	lda	#1
+L1:	lda	#1		; Zero already in X
    	rts
 
 L0:	ldx	#0

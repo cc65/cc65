@@ -65,8 +65,8 @@ struct HashNode {
 typedef struct HashFunctions HashFunctions;
 struct HashFunctions {
 
-    unsigned (*GenHash) (const void* Index);
-    /* Generate the hash over an index. */
+    unsigned (*GenHash) (const void* Key);
+    /* Generate the hash over a key. */
 
     const void* (*GetIndex) (void* Entry);
     /* Given a pointer to the user entry data, return a pointer to the index */
@@ -74,8 +74,8 @@ struct HashFunctions {
     HashNode* (*GetHashNode) (void* Entry);
     /* Given a pointer to the user entry data, return a pointer to the hash node */
 
-    int (*Compare) (const void* Index1, const void* Index2);
-    /* Compare two indices for equality */
+    int (*Compare) (const void* Key1, const void* Key2);
+    /* Compare two keys for equality */
 };
 
 /* Hash table */
@@ -169,11 +169,11 @@ INLINE HashTable* NewHashTable (unsigned Slots, const HashFunctions* Func)
 void FreeHashTable (HashTable* T);
 /* Free a hash table. Note: This will not free the entries in the table! */
 
-HashNode* HT_Find (const HashTable* T, const void* Index);
-/* Find the node with the given index */
+HashNode* HT_Find (const HashTable* T, const void* Key);
+/* Find the node with the given key*/
 
-void* HT_FindEntry (const HashTable* T, const void* Index);
-/* Find the node with the given index and return the corresponding entry */
+void* HT_FindEntry (const HashTable* T, const void* Key);
+/* Find the node with the given key and return the corresponding entry */
 
 void HT_Insert (HashTable* T, HashNode* N);
 /* Insert a node into the given hash table */

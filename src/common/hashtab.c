@@ -74,7 +74,7 @@ static void HT_Alloc (HashTable* T)
 
 
 
-HashNode* HT_Find (const HashTable* T, const void* Index)
+HashNode* HT_Find (const HashTable* T, const void* Key)
 /* Find the node with the given index */
 {
     unsigned  Hash;
@@ -86,7 +86,7 @@ HashNode* HT_Find (const HashTable* T, const void* Index)
     }
 
     /* Generate the hash over the index */
-    Hash = T->Func->GenHash (Index);
+    Hash = T->Func->GenHash (Key);
 
     /* Search for the entry in the given chain */
     N = T->Table[Hash % T->Slots];
@@ -96,7 +96,7 @@ HashNode* HT_Find (const HashTable* T, const void* Index)
          * if it is not really necessary.
          */
         if (N->Hash == Hash &&
-            T->Func->Compare (Index, T->Func->GetIndex (N->Entry))) {
+            T->Func->Compare (Key, T->Func->GetIndex (N->Entry))) {
             /* Found */
             break;
         }
@@ -111,11 +111,11 @@ HashNode* HT_Find (const HashTable* T, const void* Index)
 
 
 
-void* HT_FindEntry (const HashTable* T, const void* Index)
+void* HT_FindEntry (const HashTable* T, const void* Key)
 /* Find the node with the given index and return the corresponding entry */
 {
     /* First, search for the hash node */
-    HashNode* N = HT_Find (T, Index);
+    HashNode* N = HT_Find (T, Key);
 
     /* Convert the node into an entry if necessary */
     return N? N->Entry : 0;

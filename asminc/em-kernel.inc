@@ -35,7 +35,7 @@
 
 ;------------------------------------------------------------------------------
 ; The driver header
-		   
+
 .struct	EMD_HDR
 	ID	.byte	3	; Contains 0x65, 0x6d, 0x64 ("emd")
 	VERSION .byte	1	; Interface version
@@ -52,7 +52,7 @@
 .endstruct
 
 ;------------------------------------------------------------------------------
-; The AMD API version, stored in EMD_HDR::VERSION
+; The EMD API version, stored in EMD_HDR::VERSION
 
 EMD_API_VERSION         = $00
 
@@ -64,7 +64,7 @@ EMD_API_VERSION         = $00
 	OFFS	.byte		; Offset into page
 	PAGE	.word		; Starting page to copy from or to
 	COUNT	.word		; Number of bytes to copy
-	UNUSED	.byte		; Make the size 8 bytes 
+	UNUSED	.byte		; Make the size 8 bytes
 .endstruct
 
 ;------------------------------------------------------------------------------

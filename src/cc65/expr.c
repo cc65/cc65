@@ -1105,9 +1105,10 @@ static int arrayref (int k, ExprDesc* lval)
 	    RemoveCode (Mark1);
 
     	    /* Handle constant base array on stack. Be sure NOT to
-    	     * handle pointers the same way, this won't work.
+    	     * handle pointers the same way, and check for character literals
+             * (both won't work).
     	     */
-    	    if (IsTypeArray (tptr1) &&
+    	    if (IsTypeArray (tptr1) && lval->Flags != (E_MCONST | E_TLIT) &&
     	       	((lval->Flags & ~E_MCTYPE) == E_MCONST ||
     	   	(lval->Flags & ~E_MCTYPE) == E_MLOCAL ||
     	   	(lval->Flags & E_MGLOBAL) != 0 ||

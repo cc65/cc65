@@ -523,6 +523,27 @@ This cc65 version has some extensions to the ISO C standard.
 	how to use this feature.
 	<p>
 
+<item>  cc65 implements flexible array struct members as defined in the C99 ISO
+        standard. As an extension, in non ANSI mode, these fields may be
+        initialized. There are several exceptions, however (which is probably
+        the reason why the standard does not define this feature, because it is
+        highly unorthogonal). Flexible array members cannot be initialized...
+
+        <itemize>
+        <item>  ...when defining an array of structs with flexible members.
+        <item>  ...if such a struct is a member field of another struct which
+                is not the last field.
+        <item>  If the struct which contains a flexible array member is
+                declared as <tt/register/ and the size and compiler settings
+                do allow the compiler to actually place the struct into the
+                register bank in the zero page.
+        </itemize>
+
+        Please note that - as defined in the ISO C standard - the <tt/sizeof/
+        operator returns the struct size with the flexible array member having
+        size zero, even if it is initialized.
+        <p>
+
 </itemize>
 <p>
 

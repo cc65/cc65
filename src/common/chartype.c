@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   target.c				     */
+/*				  chartype.c				     */
 /*                                                                           */
-/*			     Target specification			     */
+/*		      Character classification functions		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000     Ullrich von Bassewitz                                        */
+/*              Wacholderweg 14                                              */
+/*              D-70597 Stuttgart                                            */
+/* EMail:       uz@musoftware.de                                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,70 +33,95 @@
 
 
 
-#include <stdlib.h>
-#include <string.h>
-
 #include "chartype.h"
-#include "target.h"
 
 
 
-/*****************************************************************************/
-/*     	      	    		     Data			    	     */
-/*****************************************************************************/
-
-
-
-/* Target system */
-target_t Target	= TGT_NONE;
-
-/* Table with target names */
-const char* TargetNames [TGT_COUNT] = {
-    "none",
-    "atari",
-    "c64",
-    "c128",
-    "ace",
-    "plus4",
-    "cbm610",
-    "pet",
-    "bbc",
-    "apple2",
-    "geos",
-};
-
-
-
-/*****************************************************************************/
-/*     	      	    		     Code			    	     */
-/*****************************************************************************/
-
-
-
-target_t FindTarget (const char* Name)
-/* Find a target by name and return the target id. TGT_UNKNOWN is returned if
- * the given name is no valid target.
+/* This module contains replacements for functions in ctype.h besides other
+ * functions. There is a problem with using ctype.h directly:
+ * The parameter must have a value of "unsigned char" or EOF.
+ * So on platforms where a char is signed, this may give problems or at
+ * least warnings. The wrapper functions below will have an "char" parameter
+ * but handle it correctly. They will NOT work for EOF, but this is not a
+ * problem, since EOF is always handled separately.
  */
+
+
+
+/*****************************************************************************/
+/*     	       	       	       	     Code				     */
+/*****************************************************************************/
+
+
+
+int IsAlpha (char C)
+/* Check for a letter */
 {
-    unsigned I;
+    return (C >= 'a' && C <= 'z') || (C >= 'A' && C <= 'Z');
+}
 
-    /* Check for a numeric target */
-    if (IsDigit (*Name)) {
-       	int Target = atoi (Name);
-	if (Target >= 0 && Target < TGT_COUNT) {
-	    return (target_t)Target;
-	}
-    }
 
-    /* Check for a target string */
-    for (I = 0; I < TGT_COUNT; ++I) {
-	if (strcmp (TargetNames [I], Name) == 0) {
-	    return (target_t)I;
-	}
-    }
 
-    /* Not found */
-    return TGT_UNKNOWN;
+int IsAlNum (char C)
+/* Check for letter or digit */
+{
+    return (C >= 'a' && C <= 'z') || (C >= 'A' && C <= 'Z') || (C >= '0' && C <= '9');
+}
+
+
+
+int IsAscii (char C)
+/* Check for an ASCII character */
+{
+    return (C & ~0x7F) == 0;
+}
+
+
+
+int IsBlank (char C)
+/* Check for a space, tab or newline */
+{
+    return (C == ' ' || C == '\t' || C == '\n');
+}
+
+
+
+int IsDigit (char C)
+/* Check for a digit */
+{
+    return (C >= '0' && C <= '9');
+}
+
+
+
+int IsLower (char C)
+/* Check for a lower case char */
+{
+    return (C >= 'a' && C <= 'z');
+}
+
+
+
+int IsUpper (char C)
+/* Check for upper case characters */
+{
+    return (C >= 'A' && C <= 'Z');
+}
+
+
+
+int IsXDigit (char C)
+/* Check for hexadecimal digits */
+{
+    return (C >= 'a' && C <= 'f') || (C >= 'A' && C <= 'F') || (C >= '0' && C <= '9');
+}
+
+
+
+int IsQuote (char C)
+/* Check for a single or double quote */
+{
+    return (C == '"' || C == '\'');
 }
 
 

@@ -61,12 +61,13 @@ CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
 .c.obj:
   $(CC) $(CCCFG) $<
 
-
+			 
 # ------------------------------------------------------------------------------
 # All library OBJ files
-			 
+
 OBJS =	abend.obj	\
 	bitops.obj	\
+	chartype.obj	\
 	check.obj	\
 	cmdline.obj	\
 	coll.obj	\

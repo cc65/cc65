@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   target.c				     */
+/*				  chartype.h				     */
 /*                                                                           */
-/*			     Target specification			     */
+/*		      Character classification functions		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000     Ullrich von Bassewitz                                        */
+/*              Wacholderweg 14                                              */
+/*              D-70597 Stuttgart                                            */
+/* EMail:       uz@musoftware.de                                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,71 +33,63 @@
 
 
 
-#include <stdlib.h>
-#include <string.h>
-
-#include "chartype.h"
-#include "target.h"
+#ifndef CHARTYPE_H
+#define CHARTYPE_H
 
 
 
-/*****************************************************************************/
-/*     	      	    		     Data			    	     */
-/*****************************************************************************/
-
-
-
-/* Target system */
-target_t Target	= TGT_NONE;
-
-/* Table with target names */
-const char* TargetNames [TGT_COUNT] = {
-    "none",
-    "atari",
-    "c64",
-    "c128",
-    "ace",
-    "plus4",
-    "cbm610",
-    "pet",
-    "bbc",
-    "apple2",
-    "geos",
-};
-
-
-
-/*****************************************************************************/
-/*     	      	    		     Code			    	     */
-/*****************************************************************************/
-
-
-
-target_t FindTarget (const char* Name)
-/* Find a target by name and return the target id. TGT_UNKNOWN is returned if
- * the given name is no valid target.
+/* This module contains replacements for functions in ctype.h besides other
+ * functions. There is a problem with using ctype.h directly:
+ * The parameter must have a value of "unsigned char" or EOF.
+ * So on platforms where a char is signed, this may give problems or at
+ * least warnings. The wrapper functions below will have an "char" parameter
+ * but handle it correctly. They will NOT work for EOF, but this is not a
+ * problem, since EOF is always handled separately.
  */
-{
-    unsigned I;
 
-    /* Check for a numeric target */
-    if (IsDigit (*Name)) {
-       	int Target = atoi (Name);
-	if (Target >= 0 && Target < TGT_COUNT) {
-	    return (target_t)Target;
-	}
-    }
 
-    /* Check for a target string */
-    for (I = 0; I < TGT_COUNT; ++I) {
-	if (strcmp (TargetNames [I], Name) == 0) {
-	    return (target_t)I;
-	}
-    }
 
-    /* Not found */
-    return TGT_UNKNOWN;
-}
+/*****************************************************************************/
+/*     	       	       	       	     Code				     */
+/*****************************************************************************/
+
+
+
+int IsAlpha (char C);
+/* Check for a letter */
+
+int IsAlNum (char C);
+/* Check for letter or digit */
+
+int IsAscii (char C);
+/* Check for an ASCII character */
+
+int IsBlank (char C);
+/* Check for a space, tab or newline */
+
+int IsDigit (char C);
+/* Check for a digit */
+
+int IsLower (char C);
+/* Check for a lower case char */
+
+int IsSpace (char C);
+/* Check for white space characters */
+
+int IsUpper (char C);
+/* Check for upper case characters */
+
+int IsXDigit (char C);
+/* Check for hexadecimal digits */
+
+int IsQuote (char C);
+/* Check for a single or double quote */
+
+
+
+/* End of chartype.h */
+
+#endif
 
 
 

@@ -38,7 +38,7 @@ FILE *outCVT, *input;
 unsigned char buffer[BLOODY_BIG_BUFFER];
 unsigned char vlirtabt[127];
 unsigned char vlirtabs[127];
-int i,j;
+int i,j,lastarg;
 int bytes;
 int blocks,rest;
 
@@ -77,6 +77,15 @@ int blocks,rest;
 		vlirtabs[j]=0;
 	}
 
+	/* scan arguments for the last one that is not blank or nonexistant */
+	j=argc;
+	lastarg=argc-1;
+	while (j!=3) {
+		--j;
+		if ((strcmp(argv[j],"blank")==0)||(strcmp(argv[j],"noexist")==0))
+			--lastarg;
+	}
+
 	/* now read all VLIR chains, align to 254 bytes */
 
 	++i;
@@ -106,7 +115,7 @@ int blocks,rest;
 			vlirtabt[j]=blocks+1; vlirtabs[j]=rest;
 			/* do not pad the last chain - it doesn't change or break anything
 			   but filesize in bytes of .cvt will be identical to native cvt */
-			if (i==(argc-1))
+			if (i==lastarg)
 				fwrite(buffer,1,bytes,outCVT);
 			else
 				fwrite(buffer,1,(blocks+1)*254,outCVT);

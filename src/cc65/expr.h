@@ -22,24 +22,24 @@
 
 
 /* Defines for the flags field of the expression descriptor */
-#define E_MREG		0x0110	/* Special: Expression is primary register */
-#define E_MGLOBAL      	0x0080	/* Reference to static variable */
-#define E_MLOCAL    	0x0040	/* Reference to local variable (stack offset) */
-#define E_MCONST    	0x0020	/* Constant value */
-#define E_MEXPR	    	0x0010	/* Result is in primary register */
-#define E_MEOFFS       	0x0011 	/* Base is in primary register, const offset */
+#define E_MREG 	       	0x0110U	/* Special: Expression is primary register */
+#define E_MGLOBAL      	0x0080U	/* Reference to static variable */
+#define E_MLOCAL    	0x0040U	/* Reference to local variable (stack offset) */
+#define E_MCONST    	0x0020U	/* Constant value */
+#define E_MEXPR	    	0x0010U	/* Result is in primary register */
+#define E_MEOFFS       	0x0011U	/* Base is in primary register, const offset */
 
-#define E_MCTYPE    	0x0007	/* Type of a constant */
-#define E_TCONST    	0x0000  /* Constant */
-#define E_TGLAB	    	0x0001  /* Global label */
-#define E_TLIT	    	0x0002  /* Literal of some kind */
-#define E_TLOFFS    	0x0003  /* Constant stack offset */
-#define E_TLLAB		0x0004  /* Local label */
-#define E_TREGISTER	0x0005 	/* Register variable */
+#define E_MCTYPE       	0x0007U /* Type of a constant */
+#define E_TCONST       	0x0000U /* Constant */
+#define E_TGLAB	       	0x0001U /* Global label */
+#define E_TLIT 	       	0x0002U /* Literal of some kind */
+#define E_TLOFFS       	0x0003U /* Constant stack offset */
+#define E_TLLAB	       	0x0004U /* Local label */
+#define E_TREGISTER    	0x0005U	/* Register variable */
 
 /* Defines for the test field of the expression descriptor */
-#define E_CC  		0x0001 	/* expr has set cond codes apropos result value */
-#define E_FORCETEST    	0x0002  /* if expr has NOT set CC, force a test */
+#define E_CC   	       	0x0001U	/* expr has set cond codes apropos result value */
+#define E_FORCETEST    	0x0002U /* if expr has NOT set CC, force a test */
 
 /* Describe the result of an expression */
 typedef struct ExprDesc ExprDesc;

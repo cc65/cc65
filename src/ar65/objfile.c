@@ -35,7 +35,7 @@
 
 #include <string.h>
 #include <errno.h>
-#if defined(__WATCOMC__) || defined(_MSC_VER)
+#if defined(__WATCOMC__) || defined(_MSC_VER) || defined(__MINGW32__)
 /* The Windows compilers have the file in the wrong directory */
 #  include <sys/utime.h>
 #else
@@ -45,8 +45,10 @@
 #include <time.h>
 #include <sys/stat.h>
 
-#include "../common/xmalloc.h"
+/* common */
+#include "xmalloc.h"
 
+/* ar65 */
 #include "error.h"
 #include "objdata.h"
 #include "fileio.h"

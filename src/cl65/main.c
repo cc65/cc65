@@ -38,7 +38,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#if defined(__WATCOMC__) || defined(_MSC_VER)
+#if defined(__WATCOMC__) || defined(_MSC_VER) || defined(__MINGW32__)
 #  include <process.h>		/* DOS, OS/2 and Windows */
 #else
 #  include "spawn.h"		/* All others */
@@ -336,7 +336,7 @@ static void Link (void)
 {
     unsigned I;
 
-    /* If we have a linker config file given, add it to the command line. 
+    /* If we have a linker config file given, add it to the command line.
      * Otherwise pass the target to the linker if we have one.
      */
     if (LinkerConfig) {

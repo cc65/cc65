@@ -49,6 +49,7 @@
 #include "loadexpr.h"
 #include "locals.h"
 #include "stackptr.h"
+#include "standard.h"
 #include "symtab.h"
 #include "typeconv.h"
 
@@ -379,7 +380,7 @@ static unsigned ParseStaticDecl (Declaration* Decl, unsigned* SC)
 static void ParseOneDecl (const DeclSpec* Spec)
 /* Parse one variable declaration */
 {
-    unsigned    SC;      	/* Storage class for symbol */
+    unsigned    SC;       	/* Storage class for symbol */
     unsigned    SymData = 0;    /* Symbol data (offset, label name, ...) */
     Declaration Decl;	       	/* Declaration data structure */
 
@@ -431,6 +432,13 @@ static void ParseOneDecl (const DeclSpec* Spec)
             SymData = ParseStaticDecl (&Decl, &SC);
        	} else {
             Internal ("Invalid storage class in ParseOneDecl: %04X", SC);
+        }
+
+        /* If the standard was not set explicitly to C89, print a warning
+         * for variables with implicit int type.
+         */
+        if ((Spec->Flags & DS_DEF_TYPE) != 0 && IS_Get (&Standard) >= STD_C99) {
+            Warning ("Implicit `int' is an obsolete feature");
         }
     }
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -843,7 +843,12 @@ static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
     if ((Spec->Flags & DS_DEF_TYPE) != 0 &&
         Spec->Type[0] == T_INT 	         &&
         Spec->Type[1] == T_END) {
-        /* Function has an implicit int return */
+        /* Function has an implicit int return. Output a warning if we don't
+         * have the C89 standard enabled explicitly.
+         */
+        if (IS_Get (&Standard) >= STD_C99) {
+            Warning ("Implicit `int' return type is an obsolete feature");
+        }
         F->Flags |= FD_OLDSTYLE_INTRET;
     }
 
@@ -906,9 +911,9 @@ static unsigned FunctionModifierFlags (void)
         /* Get the flag bit for the next token */
         unsigned F = FD_NONE;
         switch (CurTok.Tok) {
-            case TOK_FASTCALL:  F = FD_FASTCALL; 	break;
-            case TOK_NEAR:	    F = FD_NEAR;     	break;
-            case TOK_FAR:	    F = FD_FAR;	     	break;
+            case TOK_FASTCALL:  F = FD_FASTCALL; break;
+            case TOK_NEAR:     	F = FD_NEAR;     break;
+            case TOK_FAR:	F = FD_FAR;	 break;
             default:            Internal ("Unexpected token: %d", CurTok.Tok);
         }
 

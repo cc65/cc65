@@ -151,7 +151,10 @@ static void Parse (void)
 	    SymFlags = Spec.StorageClass;
 	    if (IsTypeFunc (Decl.Type)) {
 		SymFlags |= SC_FUNC;
-	    } else {
+	    } else if ((SymFlags & SC_TYPEDEF) == 0) {
+                if ((Spec.Flags & DS_DEF_TYPE) != 0 && IS_Get (&Standard) >= STD_C99) {
+                    Warning ("Implicit `int' is an obsolete feature");
+                }
 	    	if (NeedStorage) {
 		    /* We will allocate storage, variable is defined */
 		    SymFlags |= SC_STORAGE | SC_DEF;

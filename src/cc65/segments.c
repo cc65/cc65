@@ -41,6 +41,7 @@
 #include "check.h"
 #include "coll.h"
 #include "scanner.h"
+#include "segnames.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -85,10 +86,10 @@ static Collection SegmentStack = STATIC_COLLECTION_INITIALIZER;
 void InitSegNames (void)
 /* Initialize the segment names */
 {
-    SegmentNames [SEG_BSS]	= xstrdup ("BSS");
-    SegmentNames [SEG_CODE] 	= xstrdup ("CODE");
-    SegmentNames [SEG_DATA]	= xstrdup ("DATA");
-    SegmentNames [SEG_RODATA]	= xstrdup ("RODATA");
+    SegmentNames [SEG_BSS]	= xstrdup (SEGNAME_BSS);
+    SegmentNames [SEG_CODE] 	= xstrdup (SEGNAME_CODE);
+    SegmentNames [SEG_DATA]	= xstrdup (SEGNAME_DATA);
+    SegmentNames [SEG_RODATA]	= xstrdup (SEGNAME_RODATA);
 }
 
 

@@ -40,6 +40,7 @@
 #include "chartype.h"
 #include "check.h"
 #include "segdefs.h"
+#include "segnames.h"
 #include "xmalloc.h"
 
 /* cc65 */

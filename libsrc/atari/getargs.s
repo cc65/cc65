@@ -35,10 +35,15 @@ getargs:
 	jsr	detect
 	bcs	argdos		; carry set = DOS supports arguments
 	rts
- 
+
+; Initialize ourcl buffer
+
+argdos:	lda	#ATEOL
+	sta	ourcl+CL_SIZE
+	 
 ; Move SpartaDOS command line to our own buffer
 
-argdos:	lda	DOSVEC
+	lda	DOSVEC
 	clc
 	adc	#<LBUF
 	sta	ptr1
@@ -67,10 +72,10 @@ movdon:	lda	#0
 ; Store dummy argument
 
 	ldy	#LBUF
-	lda	dumpar1
+	lda	#'X'
 	sta	(DOSVEC),y
 	iny
-	lda	dumpar2
+	lda	#ATEOL
 	sta	(DOSVEC),y
 
 ; One extra store to avoid the buggy sequence from OS/A+ DOS:
@@ -197,18 +202,6 @@ _getdefdev:
 
 	.data
 
-; Dummy argument to get default device
-
-dumpar1:
-	.byte	"X"
-dumpar2:
-	.byte	ATEOL
-
-; Buffer for command line / argv strings
-
-ourcl:	.res	CL_SIZE
-	.byte	ATEOL
-
 ; Default device
 
 defdev:
@@ -218,3 +211,7 @@ defdev:
 
 argc:	.res	2
 argv:	.res	(1 + MAXARGS) * 2
+
+; Buffer for command line / argv strings
+
+ourcl:	.res	CL_SIZE+1

@@ -1651,7 +1651,7 @@ kernal (like <tt/DoMenu/, <tt/DoIcons/, etc.) - right before passing control to 
 Be warned that vectors are most likely to be changed by GEOS kernal also by other functions (like
 <tt/GotoFirstMenu/, <tt/DoDlgBox/ and its derivatives etc.). It depends on what kernal functions
 you use and which vectors you altered. Unfortunately there is no exact list for GEOS 2.0, a complete
-list for GEOS 1.x can be found in A. Boyce's Programmers' Referenece Guide mentioned before. Most of
+list for GEOS 1.x can be found in A. Boyce's Programmers' Reference Guide mentioned before. Most of
 information contained there should be still valid for GEOS 2.0. When calling a function that restores
 the vector you should add a <tt/hook_into_system()/ call right after it.
 <p>

@@ -46,14 +46,14 @@
 
 
 
-static void InternalDumpExpr (const ExprNode* Expr)
+static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym) (const struct SymEntry*))
 /* Dump an expression in RPN to stdout */
 {
     if (Expr == 0) {
 	return;
     }
-    InternalDumpExpr (Expr->Left);
-    InternalDumpExpr (Expr->Right);
+    InternalDumpExpr (Expr->Left, ResolveSym);
+    InternalDumpExpr (Expr->Right, ResolveSym);
 
     switch (Expr->Op) {
 
@@ -63,7 +63,13 @@ static void InternalDumpExpr (const ExprNode* Expr)
 	    break;
 
 	case EXPR_SYMBOL:
-       	    printf (" SYM");
+            if (ResolveSym && (Expr = ResolveSym (Expr->V.Sym)) != 0) {
+       	        printf (" SYM (");
+                InternalDumpExpr (Expr, ResolveSym);
+                printf (") ");
+            } else {
+                printf ("SYM ");
+            }
 	    break;
 
 	case EXPR_SECTION:
@@ -206,10 +212,10 @@ static void InternalDumpExpr (const ExprNode* Expr)
 
 
 
-void DumpExpr (const ExprNode* Expr)
+void DumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym) (const struct SymEntry*))
 /* Dump an expression tree to stdout */
 {
-    InternalDumpExpr (Expr);
+    InternalDumpExpr (Expr, ResolveSym);
     printf ("\n");
 }
 

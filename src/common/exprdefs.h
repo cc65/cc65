@@ -132,7 +132,7 @@ struct ExprNode {
 
 
 
-void DumpExpr (const ExprNode* Expr);
+void DumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym) (const struct SymEntry*));
 /* Dump an expression tree to stdout */
 
 

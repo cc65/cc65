@@ -224,7 +224,7 @@ const char* MakeHexArg (unsigned Num)
  */
 {
     static char Buf[16];
-    xsprintf (Buf, sizeof (Buf), "$%02X", (char) Num);
+    xsprintf (Buf, sizeof (Buf), "$%02X", (unsigned char) Num);
     return Buf;
 }
 
@@ -372,6 +372,46 @@ int CE_KnownImm (const CodeEntry* E)
 /* Return true if the argument of E is a known immediate value */
 {
     return (E->AM == AM65_IMM && (E->Flags & CEF_NUMARG) != 0);
+}
+
+
+
+int CE_UseLoadFlags (const CodeEntry* E)
+/* Return true if the instruction uses any flags that are set by a load of
+ * a register (N and Z).
+ */
+{
+    /* A branch will use the flags */
+    if (E->Info & OF_FBRA) {
+        return 1;
+    }
+
+    /* Call of a boolean transformer routine will also use the flags */
+    if (E->OPC == OP65_JSR) {
+        /* Get the condition that is evaluated and check it */
+        switch (FindBoolCmpCond (E->Arg)) {
+            case CMP_EQ:
+            case CMP_NE:
+            case CMP_GT:
+            case CMP_GE:
+            case CMP_LT:
+            case CMP_LE:
+            case CMP_UGT:
+            case CMP_ULE:
+            case CMP_INV:
+                /* Will use the N or Z flags */
+                return 1;
+
+
+            case CMP_UGE:       /* Uses only carry */
+            case CMP_ULT:       /* Dito */
+            default:            /* No bool transformer subroutine */
+                return 0;
+        }
+    }
+
+    /* Anything else */
+    return 0;
 }
 
 

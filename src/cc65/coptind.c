@@ -655,7 +655,7 @@ unsigned OptCondBranches (CodeSeg* S)
 
 
 /*****************************************************************************/
-/*			Remove unused loads and stores                       */
+/*	 		Remove unused loads and stores                       */
 /*****************************************************************************/
 
 
@@ -675,24 +675,24 @@ unsigned OptUnusedLoads (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if it's a register load or transfer insn */
-	if ((E->Info & (OF_LOAD | OF_XFR | OF_REG_INCDEC)) != 0  &&
-	    (N = CS_GetNextEntry (S, I)) != 0                    &&
-	    (N->Info & OF_FBRA) == 0) {
+	if ((E->Info & (OF_LOAD | OF_XFR | OF_REG_INCDEC)) != 0         &&
+	    (N = CS_GetNextEntry (S, I)) != 0                           &&
+	    !CE_UseLoadFlags (N)) {
 
 	    /* Check which sort of load or transfer it is */
 	    unsigned R;
 	    switch (E->OPC) {
-		case OP65_DEA:
-		case OP65_INA:
-		case OP65_LDA:
+	 	case OP65_DEA:
+	 	case OP65_INA:
+	 	case OP65_LDA:
 	    	case OP65_TXA:
 	    	case OP65_TYA: 	R = REG_A;	break;
-		case OP65_DEX:
-		case OP65_INX:
-		case OP65_LDX:
+	 	case OP65_DEX:
+	 	case OP65_INX:
+	 	case OP65_LDX:
 	    	case OP65_TAX: 	R = REG_X;     	break;
-		case OP65_DEY:
-		case OP65_INY:
+	 	case OP65_DEY:
+	 	case OP65_INY:
        	       	case OP65_LDY:
 	    	case OP65_TAY: 	R = REG_Y;	break;
 	    	default:     	goto NextEntry;	      	/* OOPS */
@@ -799,7 +799,7 @@ unsigned OptDupLoads (CodeSeg* S)
        		    CE_KnownImm (E)                   && /* Value to be loaded is known */
        	       	    In->RegA == (long) E->Num         && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
-		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
+		    !CE_UseLoadFlags (N)) {    	       	 /* Which does not use the flags */
 		    Delete = 1;
 		}
 	        break;
@@ -809,7 +809,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		    CE_KnownImm (E)                   && /* Value to be loaded is known */
 		    In->RegX == (long) E->Num         && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
-		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
+		    !CE_UseLoadFlags (N)) {    	       	 /* Which does not use the flags */
 		    Delete = 1;
 		}
 	        break;
@@ -819,7 +819,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		    CE_KnownImm (E)                   && /* Value to be loaded is known */
 		    In->RegY == (long) E->Num         && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
-		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
+		    !CE_UseLoadFlags (N)) {    	       	 /* Which does not use the flags */
 		    Delete = 1;
 		}
 	        break;
@@ -908,37 +908,37 @@ unsigned OptDupLoads (CodeSeg* S)
                 if (In->RegA >= 0                     &&
 		    In->RegA == In->RegX              &&
 		    (N = CS_GetNextEntry (S, I)) != 0 &&
-		    (N->Info & OF_FBRA) == 0) {
+       	       	    !CE_UseLoadFlags (N)) {    	   
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
 		}
 	        break;
 
 	    case OP65_TAY:
-                if (In->RegA >= 0                 &&
-		    In->RegA == In->RegY    &&
+                if (In->RegA >= 0                       &&
+		    In->RegA == In->RegY                &&
 		    (N = CS_GetNextEntry (S, I)) != 0   &&
-		    (N->Info & OF_FBRA) == 0) {
+       	       	    !CE_UseLoadFlags (N)) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
 		}
 	        break;
 
        	    case OP65_TXA:
-                if (In->RegX >= 0                 &&
-		    In->RegX == In->RegA    &&
+                if (In->RegX >= 0                       &&
+		    In->RegX == In->RegA                &&
 		    (N = CS_GetNextEntry (S, I)) != 0   &&
-		    (N->Info & OF_FBRA) == 0) {
+       	       	    !CE_UseLoadFlags (N)) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
 		}
 	        break;
 
 	    case OP65_TYA:
-                if (In->RegY >= 0                 &&
-		    In->RegY == In->RegA    &&
+                if (In->RegY >= 0                       &&
+		    In->RegY == In->RegA                &&
 		    (N = CS_GetNextEntry (S, I)) != 0   &&
-		    (N->Info & OF_FBRA) == 0) {
+       	       	    !CE_UseLoadFlags (N)) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
 		}
@@ -967,7 +967,7 @@ unsigned OptDupLoads (CodeSeg* S)
 
     }
 
-    /* Free register info */
+    /* Free register info */                            
     CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
@@ -1003,7 +1003,7 @@ unsigned OptStoreLoad (CodeSeg* S)
 	     (E->OPC == OP65_STY && N->OPC == OP65_LDY))    &&
 	    strcmp (E->Arg, N->Arg) == 0                    &&
 	    (X = CS_GetNextEntry (S, I+1)) != 0             &&
-       	    (X->Info & OF_FBRA) == 0) {
+            !CE_UseLoadFlags (X)) {
 
        	    /* Register has already the correct value, remove the load */
 	    CS_DelEntry (S, I+1);
@@ -1060,8 +1060,8 @@ unsigned OptTransfers (CodeSeg* S)
 		 */
 		if ((X = CS_GetNextEntry (S, I+1)) == 0) {
 		    goto NextEntry;
-		}
-		if ((X->Info & OF_FBRA) != 0) {
+		}              
+                if (CE_UseLoadFlags (X)) {
 	 	    if (I == 0) {
 			/* No preceeding entry */
 			goto NextEntry;

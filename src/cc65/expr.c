@@ -281,16 +281,16 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
 
 
 
-void DefineData (ExprDesc* lval)
+void DefineData (ExprDesc* Expr)
 /* Output a data definition for the given expression */
 {
-    unsigned flags = lval->Flags;
+    unsigned Flags = Expr->Flags;
 
-    switch (flags & E_MCTYPE) {
+    switch (Flags & E_MCTYPE) {
 
        	case E_TCONST:
 	    /* Number */
-	    g_defdata (TypeOf (lval->Type) | CF_CONST, lval->ConstVal, 0);
+	    g_defdata (TypeOf (Expr->Type) | CF_CONST, Expr->ConstVal, 0);
        	    break;
 
 	case E_TREGISTER:
@@ -305,33 +305,33 @@ void DefineData (ExprDesc* lval)
        	case E_TGLAB:
         case E_TLLAB:
        	    /* Local or global symbol */
-	    g_defdata (GlobalModeFlags (flags), lval->Name, lval->ConstVal);
+	    g_defdata (GlobalModeFlags (Flags), Expr->Name, Expr->ConstVal);
 	    break;
 
        	case E_TLIT:
 	    /* a literal of some kind */
-       	    g_defdata (CF_STATIC, LiteralPoolLabel, lval->ConstVal);
+       	    g_defdata (CF_STATIC, LiteralPoolLabel, Expr->ConstVal);
        	    break;
 
        	default:
-	    Internal ("Unknown constant type: %04X", flags);
+	    Internal ("Unknown constant type: %04X", Flags);
     }
 }
 
 
 
-static void lconst (unsigned flags, ExprDesc* lval)
-/* Load primary reg with some constant value. */
+static void lconst (unsigned Flags, ExprDesc* Expr)
+/* Load the primary register with some constant value. */
 {
-    switch (lval->Flags & E_MCTYPE) {
+    switch (Expr->Flags & E_MCTYPE) {
 
     	case E_TLOFFS:
-       	    g_leasp (lval->ConstVal);
+       	    g_leasp (Expr->ConstVal);
 	    break;
 
        	case E_TCONST:
 	    /* Number constant */
-       	    g_getimmed (flags | TypeOf (lval->Type) | CF_CONST, lval->ConstVal, 0);
+       	    g_getimmed (Flags | TypeOf (Expr->Type) | CF_CONST, Expr->ConstVal, 0);
        	    break;
 
 	case E_TREGISTER:
@@ -346,18 +346,18 @@ static void lconst (unsigned flags, ExprDesc* lval)
        	case E_TGLAB:
         case E_TLLAB:
        	    /* Local or global symbol, load address */
-	    flags |= GlobalModeFlags (lval->Flags);
-	    flags &= ~CF_CONST;
-	    g_getimmed (flags, lval->Name, lval->ConstVal);
+	    Flags |= GlobalModeFlags (Expr->Flags);
+	    Flags &= ~CF_CONST;
+	    g_getimmed (Flags, Expr->Name, Expr->ConstVal);
        	    break;
 
        	case E_TLIT:
 	    /* Literal string */
-	    g_getimmed (CF_STATIC, LiteralPoolLabel, lval->ConstVal);
+	    g_getimmed (CF_STATIC, LiteralPoolLabel, Expr->ConstVal);
        	    break;
 
        	default:
-	    Internal ("Unknown constant type: %04X", lval->Flags);
+	    Internal ("Unknown constant type: %04X", Expr->Flags);
     }
 }
 
@@ -411,9 +411,10 @@ static int kcalc (int tok, long val1, long val2)
 
 
 
-static GenDesc* FindGen (token_t Tok, GenDesc** Table)
+static const GenDesc* FindGen (token_t Tok, const GenDesc** Table)
+/* Find a token in a generator table */
 {
-    GenDesc* G;
+    const GenDesc* G;
     while ((G = *Table) != 0) {
 	if (G->Tok == Tok) {
 	    return G;
@@ -1760,7 +1761,7 @@ static int hie10 (ExprDesc* lval)
 
 
 
-static int hie_internal (GenDesc** ops,		/* List of generators */
+static int hie_internal (const GenDesc** ops,  	/* List of generators */
        	                 ExprDesc* lval,	/* parent expr's lval */
        	                 int (*hienext) (ExprDesc*),
 	     	       	 int* UsedGen) 		/* next higher level */
@@ -1770,7 +1771,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
     ExprDesc lval2;
     CodeMark Mark1;
     CodeMark Mark2;
-    GenDesc* Gen;
+    const GenDesc* Gen;
     token_t tok;       			/* The operator token */
     unsigned ltype, type;
     int rconst;	       	       	       	/* Operand is a constant */
@@ -1870,8 +1871,8 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 
 
 
-static int hie_compare (GenDesc** ops,		/* List of generators */
-       	                ExprDesc* lval,	/* parent expr's lval */
+static int hie_compare (const GenDesc** ops,	/* List of generators */
+       	                ExprDesc* lval,		/* parent expr's lval */
        	                int (*hienext) (ExprDesc*))
 /* Helper function for the compare operators */
 {
@@ -1879,7 +1880,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
     ExprDesc lval2;
     CodeMark Mark1;
     CodeMark Mark2;
-    GenDesc* Gen;
+    const GenDesc* Gen;
     token_t tok;			/* The operator token */
     unsigned ltype;
     int rconst;	       	       	       	/* Operand is a constant */
@@ -1997,7 +1998,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 static int hie9 (ExprDesc *lval)
 /* Process * and / operators. */
 {
-    static GenDesc* hie9_ops [] = {
+    static const GenDesc* hie9_ops [] = {
 	&GenMUL, &GenDIV, &GenMOD, 0
     };
     int UsedGen;
@@ -2421,7 +2422,7 @@ static int hie8 (ExprDesc* lval)
 static int hie7 (ExprDesc *lval)
 /* Parse << and >>. */
 {
-    static GenDesc* hie7_ops [] = {
+    static const GenDesc* hie7_ops [] = {
        	&GenASL, &GenASR, 0
     };
     int UsedGen;
@@ -2434,7 +2435,7 @@ static int hie7 (ExprDesc *lval)
 static int hie6 (ExprDesc *lval)
 /* process greater-than type comparators */
 {
-    static GenDesc* hie6_ops [] = {
+    static const GenDesc* hie6_ops [] = {
 	&GenLT, &GenLE, &GenGE, &GenGT, 0
     };
     return hie_compare (hie6_ops, lval, hie7);
@@ -2444,7 +2445,7 @@ static int hie6 (ExprDesc *lval)
 
 static int hie5 (ExprDesc *lval)
 {
-    static GenDesc* hie5_ops[] = {
+    static const GenDesc* hie5_ops[] = {
        	&GenEQ, &GenNE, 0
     };
     return hie_compare (hie5_ops, lval, hie6);
@@ -2455,7 +2456,7 @@ static int hie5 (ExprDesc *lval)
 static int hie4 (ExprDesc* lval)
 /* Handle & (bitwise and) */
 {
-    static GenDesc* hie4_ops [] = {
+    static const GenDesc* hie4_ops [] = {
        	&GenAND, 0
     };
     int UsedGen;
@@ -2468,7 +2469,7 @@ static int hie4 (ExprDesc* lval)
 static int hie3 (ExprDesc *lval)
 /* Handle ^ (bitwise exclusive or) */
 {
-    static GenDesc* hie3_ops [] = {
+    static const GenDesc* hie3_ops [] = {
        	&GenXOR, 0
     };
     int UsedGen;
@@ -2481,7 +2482,7 @@ static int hie3 (ExprDesc *lval)
 static int hie2 (ExprDesc *lval)
 /* Handle | (bitwise or) */
 {
-    static GenDesc* hie2_ops [] = {
+    static const GenDesc* hie2_ops [] = {
        	&GenOR, 0
     };
     int UsedGen;
@@ -2810,7 +2811,7 @@ static int hieQuest (ExprDesc *lval)
 
 
 
-static void opeq (GenDesc* Gen, ExprDesc *lval, int k)
+static void opeq (const GenDesc* Gen, ExprDesc *lval, int k)
 /* Process "op=" operators. */
 {
     ExprDesc lval2;
@@ -2891,7 +2892,7 @@ static void opeq (GenDesc* Gen, ExprDesc *lval, int k)
 
 
 
-static void addsubeq (GenDesc* Gen, ExprDesc *lval, int k)
+static void addsubeq (const GenDesc* Gen, ExprDesc *lval, int k)
 /* Process the += and -= operators */
 {
     ExprDesc lval2;

@@ -196,6 +196,11 @@ INLINE int CE_IsCall (const CodeEntry* E, const char* Name)
 #  define CE_IsCall(E, Name) ((E)->OPC == OP65_JSR && strcmp ((E)->Arg, (Name)) == 0)
 #endif
 
+int CE_UseLoadFlags (const CodeEntry* E);
+/* Return true if the instruction uses any flags that are set by a load of
+ * a register (N and Z).
+ */
+
 void CE_FreeRegInfo (CodeEntry* E);
 /* Free an existing register info struct */
 

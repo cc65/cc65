@@ -49,26 +49,6 @@
 
 
 
-/* Defines for the conditions in a compare */
-typedef enum {
-    CMP_INV = -1,
-    CMP_EQ,
-    CMP_NE,
-    CMP_GT,
-    CMP_GE,
-    CMP_LT,
-    CMP_LE,
-    CMP_UGT,
-    CMP_UGE,
-    CMP_ULT,
-    CMP_ULE
-} cmp_t;
-
-/* Table with the compare suffixes */
-static const char CmpSuffixTab [][4] = {
-    "eq", "ne", "gt", "ge", "lt", "le", "ugt", "uge", "ult", "ule"
-};
-
 /* Table used to invert a condition, indexed by condition */
 static const unsigned char CmpInvertTab [] = {
     CMP_NE, CMP_EQ,
@@ -86,59 +66,6 @@ static const char CmpSignedTab [] = {
 /*****************************************************************************/
 /*		  	       Helper functions                              */
 /*****************************************************************************/
-
-
-
-static cmp_t FindCmpCond (const char* Code, unsigned CodeLen)
-/* Search for a compare condition by the given code using the given length */
-{
-    unsigned I;
-
-    /* Linear search */
-    for (I = 0; I < sizeof (CmpSuffixTab) / sizeof (CmpSuffixTab [0]); ++I) {
-	if (strncmp (Code, CmpSuffixTab [I], CodeLen) == 0) {
-	    /* Found */
-	    return I;
-	}
-    }
-
-    /* Not found */
-    return CMP_INV;
-}
-
-
-
-static cmp_t FindBoolCmpCond (const char* Name)
-/* Map a condition suffix to a code. Return the code or CMP_INV on failure */
-{
-    /* Check for the correct subroutine name */
-    if (strncmp (Name, "bool", 4) == 0) {
-	/* Name is ok, search for the code in the table */
-	return FindCmpCond (Name+4, strlen(Name)-4);
-    } else {
-	/* Not found */
-	return CMP_INV;
-    }
-}
-
-
-
-static cmp_t FindTosCmpCond (const char* Name)
-/* Check if this is a call to one of the TOS compare functions (tosgtax).
- * Return the condition code or CMP_INV on failure.
- */
-{
-    unsigned Len = strlen (Name);
-
-    /* Check for the correct subroutine name */
-    if (strncmp (Name, "tos", 3) == 0 && strcmp (Name+Len-2, "ax") == 0) {
-	/* Name is ok, search for the code in the table */
-	return FindCmpCond (Name+3, Len-3-2);
-    } else {
-	/* Not found */
-	return CMP_INV;
-    }
-}
 
 
 

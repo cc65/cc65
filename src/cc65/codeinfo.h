@@ -103,6 +103,23 @@ struct ZPInfo {
 
 
 
+/* Defines for the conditions in a compare */
+typedef enum {
+    CMP_INV = -1,
+    CMP_EQ,
+    CMP_NE,
+    CMP_GT,
+    CMP_GE,
+    CMP_LT,
+    CMP_LE,
+    CMP_UGT,
+    CMP_UGE,
+    CMP_ULT,
+    CMP_ULE
+} cmp_t;
+
+
+
 /*****************************************************************************/
 /*     	       	      	  	     Code			       	     */
 /*****************************************************************************/
@@ -141,6 +158,17 @@ unsigned GetKnownReg (unsigned Use, const struct RegContents* RC);
 /* Return the register or zero page location from the set in Use, thats
  * contents are known. If Use does not contain any register, or if the
  * register in question does not have a known value, return REG_NONE.
+ */
+
+cmp_t FindBoolCmpCond (const char* Name);
+/* Check if the given string is the name of one of the boolean transformer
+ * subroutine, and if so, return the condition that is evaluated by this
+ * routine. Return CMP_INV if the condition is not recognised.
+ */
+
+cmp_t FindTosCmpCond (const char* Name);
+/* Check if this is a call to one of the TOS compare functions (tosgtax).
+ * Return the condition code or CMP_INV on failure.
  */
 
 

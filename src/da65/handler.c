@@ -467,7 +467,14 @@ void OH_BlockMove (const OpcDesc* D attribute ((unused)))
 
 void OH_AbsoluteXIndirect (const OpcDesc* D attribute ((unused)))
 {
-    Error ("Not implemented");
+    /* Get the operand */
+    unsigned Addr = GetCodeWord (PC+1);
+
+    /* Generate a label in pass 1 */
+    GenerateLabel (D->Flags, Addr);
+
+    /* Output the line */
+    OneLine (D, "(%s,x)", GetAddrArg (D->Flags, Addr));
 }
 
 

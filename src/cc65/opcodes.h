@@ -143,6 +143,10 @@ typedef struct {
     char    	Mnemo[4];	/* Mnemonic */
     opc_t   	OPC;   		/* Opcode */
     unsigned	Size;		/* Size, 0 means "check addressing mode" */
+####
+    unsigned char Use;
+    unsigned char Load;
+
     unsigned   	Info;		/* Usage flags */
 } OPCDesc;
 
@@ -169,6 +173,9 @@ unsigned GetAMUseInfo (am_t AM);
 /* Get usage info for the given addressing mode (addressing modes that use
  * index registers return CI_USE... info for these registers).
  */
+
+opc_t GetInverseBranch (opc_t OPC);
+/* Return a brahcn that reverse the condition of the branch given in OPC */
 
 
 

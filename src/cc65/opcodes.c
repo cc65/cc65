@@ -40,6 +40,9 @@
 /* common */
 #include "check.h"
 
+/* cc65 */
+#include "error.h"
+
 /* b6502 */
 #include "codeinfo.h"
 #include "opcodes.h"
@@ -216,7 +219,7 @@ const OPCDesc* GetOPCDesc (opc_t OPC)
 unsigned GetAMUseInfo (am_t AM)
 /* Get usage info for the given addressing mode (addressing modes that use
  * index registers return CI_USE... info for these registers).
- */			       
+ */
 {
     /* Check the addressing mode. */
     switch (AM) {
@@ -227,6 +230,32 @@ unsigned GetAMUseInfo (am_t AM)
 	case AM_ZPX_IND:  return CI_USE_X;
 	case AM_ZP_INDY:  return CI_USE_Y;
 	default:	  return CI_USE_NONE;
+    }
+}
+
+
+
+opc_t GetInverseBranch (opc_t OPC)
+/* Return a brahcn that reverse the condition of the branch given in OPC */
+{
+    switch (OPC) {
+	case OPC_BCC:	return OPC_BCS;
+	case OPC_BCS:	return OPC_BCC;
+	case OPC_BEQ:	return OPC_BNE;
+	case OPC_BMI:	return OPC_BPL;
+	case OPC_BNE:	return OPC_BEQ;
+	case OPC_BPL:	return OPC_BMI;
+	case OPC_BVC:	return OPC_BVS;
+	case OPC_BVS:	return OPC_BVC;
+       	case OPC_JCC:  	return OPC_JCS;
+       	case OPC_JCS:  	return OPC_JCC;
+       	case OPC_JEQ:  	return OPC_JNE;
+       	case OPC_JMI:  	return OPC_JPL;
+       	case OPC_JNE:  	return OPC_JEQ;
+       	case OPC_JPL:  	return OPC_JMI;
+       	case OPC_JVC:  	return OPC_JVS;
+       	case OPC_JVS:  	return OPC_JVC;
+	default:	Internal ("GetInverseBranch: Invalid opcode: %d", OPC);
     }
 }
 

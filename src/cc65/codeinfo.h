@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2001      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -55,16 +55,18 @@
 #define CI_USE_A	0x0001U		/* Use the A register */
 #define CI_USE_X	0x0002U		/* Use the X register */
 #define CI_USE_Y	0x0004U		/* Use the Y register */
+#define CI_USE_ALL	0x0007U		/* Use all registers */
 #define CI_MASK_USE    	0x000FU		/* Extract usage info */
 
 #define CI_CHG_NONE	0x0000U		/* Change nothing */
 #define CI_CHG_A	0x0010U		/* Change the A register */
 #define CI_CHG_X	0x0020U		/* Change the X register */
 #define CI_CHG_Y	0x0040U		/* Change the Y register */
+#define CI_CHG_ALL	0x0070U		/* Change all registers */
 #define CI_MASK_CHG	0x00F0U		/* Extract change info */
-			     
+
 #define CI_BRA		0x0100U		/* Instruction is a branch */
-#define CI_MASK_BRA	0x0100U		/* Extract branch info */	
+#define CI_MASK_BRA	0x0100U		/* Extract branch info */
 
 #define CI_NONE		0x0000U		/* Nothing used/changed */
 

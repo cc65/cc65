@@ -82,7 +82,7 @@ struct CodeEntry {
 
 
 
-CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, CodeLabel* JumpTo);
+CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* JumpTo);
 /* Create a new code entry, initialize and return it */
 
 void FreeCodeEntry (CodeEntry* E);

@@ -43,6 +43,7 @@
 
 /* b6502 */
 #include "codeinfo.h"
+#include "funcinfo.h"
 #include "label.h"
 #include "opcodes.h"
 #include "codeent.h"
@@ -61,21 +62,28 @@
 
 
 
-CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, CodeLabel* JumpTo)
+CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* JumpTo)
 /* Create a new code entry, initialize and return it */
 {
     /* Allocate memory */
     CodeEntry* E = xmalloc (sizeof (CodeEntry));
 
     /* Initialize the fields */
-    E->OPC	= D->OPC;
-    E->AM	= AM;
-    E->Size	= GetInsnSize (E->OPC, E->AM);
+    E->OPC  	= D->OPC;
+    E->AM   	= AM;
+    E->Size 	= GetInsnSize (E->OPC, E->AM);
     E->Hints	= 0;
-    E->Arg	= 0;
-    E->Num	= 0;
+    E->Arg  	= (Arg && Arg[0] != '\0')? xstrdup (Arg) : 0;
+    E->Num  	= 0;
     E->Flags	= 0;
-    E->Info	= D->Info | GetAMUseInfo (AM);
+    E->Info    	= D->Info;
+    if (E->OPC == OPC_JSR && E->Arg) {
+	/* A subroutine call */
+     	E->Info |= GetFuncInfo (E->Arg);
+    } else {
+	/* Some other instruction */
+     	E->Info |= GetAMUseInfo (AM);
+    }
     E->JumpTo	= JumpTo;
     InitCollection (&E->Labels);
 

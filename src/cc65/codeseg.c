@@ -297,11 +297,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
     /* We do now have the addressing mode in AM. Allocate a new CodeEntry
      * structure and initialize it.
      */
-    E = NewCodeEntry (OPC, AM, Label);
-    if (Arg[0] != '\0') {
-	/* We have an additional expression */
-	E->Arg = xstrdup (Arg);
-    }
+    E = NewCodeEntry (OPC, AM, Arg, Label);
 
     /* Return the new code entry */
     return E;

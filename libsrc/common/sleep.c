@@ -12,7 +12,7 @@
 
 
 
-unsigned sleep (unsigned wait)
+unsigned __fastcall__ sleep (unsigned wait)
 {
     clock_t goal = clock () + ((clock_t) wait) * CLOCKS_PER_SEC;
     while ((long) (goal - clock ()) > 0) ;

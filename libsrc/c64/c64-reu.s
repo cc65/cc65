@@ -123,8 +123,8 @@ PAGECOUNT:
 
 ; ------------------------------------------------------------------------
 ; MAP: Map the page in a/x into memory and return a pointer to the page in
-; a/x. The contents of the currently mapped page (if any) are assumed to be
-; dirty and must be saved into secondary storage if this is necessary.
+; a/x.  The contents of the currently mapped page (if any) may be discarded
+; by the driver.
 ;
 
 MAP:    sta     curpage
@@ -212,7 +212,7 @@ transfer:
 
         ldy 	$01       	; Save the value of the c64 control port...
         tya          	  	;
-        ora 	#$03      	; Turn on lower 3 bits to bank out ROMs, I/O.
+        and     #$F8            ; Disable ROMs and I/O.
   	sei          	  	;
         sta 	$01
         lda     REU_TRIGGER     ; Don't change $FF00

@@ -42,7 +42,7 @@
 /* common */
 #include "bitops.h"
 #include "cddefs.h"
-#include "check.h"
+#include "coll.h"
 #include "symdefs.h"
 #include "tgttrans.h"
 
@@ -74,6 +74,10 @@
 
 /* Keyword we're about to handle */
 static char Keyword [sizeof (SVal)+1] = ".";
+
+/* Segment stack */
+#define MAX_PUSHED_SEGMENTS     16
+static Collection SegStack = STATIC_COLLECTION_INITIALIZER;
 
 
 
@@ -331,7 +335,7 @@ static void DoAutoImport (void)
 static void DoBss (void)
 /* Switch to the BSS segment */
 {
-    UseBssSeg ();
+    UseSeg (&BssSegDef);
 }
 
 
@@ -407,7 +411,7 @@ static void DoCharMap (void)
 static void DoCode (void)
 /* Switch to the code segment */
 {
-    UseCodeSeg ();
+    UseSeg (&CodeSegDef);
 }
 
 
@@ -485,7 +489,7 @@ static void DoConstructor (void)
 static void DoData (void)
 /* Switch to the data segment */
 {
-    UseDataSeg ();
+    UseSeg (&DataSegDef);
 }
 
 
@@ -1059,7 +1063,7 @@ static void DoMacro (void)
 static void DoNull (void)
 /* Switch to the NULL segment */
 {
-    UseNullSeg ();
+    UseSeg (&NullSegDef);
 }
 
 
@@ -1126,6 +1130,29 @@ static void DoPageLength (void)
 
 
 
+static void DoPopSeg (void)
+/* Pop an old segment from the segment stack */
+{
+    SegDef* Def;
+
+    /* Must have a segment on the stack */
+    if (CollCount (&SegStack) == 0) {
+        ErrorSkip (ERR_SEGSTACK_EMPTY);
+        return;
+    }
+
+    /* Pop the last element */
+    Def = CollPop (&SegStack);
+
+    /* Restore this segment */
+    UseSeg (Def);
+
+    /* Delete the segment definition */
+    FreeSegDef (Def);
+}
+
+
+
 static void DoProc (void)
 /* Start a new lexical scope */
 {
@@ -1135,6 +1162,21 @@ static void DoProc (void)
 	NextTok ();
     }
     SymEnterLevel ();
+}
+
+
+
+static void DoPushSeg (void)
+/* Push the current segment onto the segment stack */
+{
+    /* Can only push a limited size of segments */
+    if (CollCount (&SegStack) >= MAX_PUSHED_SEGMENTS) {
+        ErrorSkip (ERR_SEGSTACK_OVERFLOW);
+        return;
+    }
+
+    /* Get the current segment and push it */
+    CollAppend (&SegStack, DupSegDef (GetCurrentSeg ()));
 }
 
 
@@ -1191,7 +1233,7 @@ static void DoRes (void)
 static void DoROData (void)
 /* Switch to the r/o data segment */
 {
-    UseRODataSeg ();
+    UseSeg (&RODataSegDef);
 }
 
 
@@ -1205,7 +1247,7 @@ static void DoSegment (void)
 	"FAR", "LONG"
     };
     char Name [sizeof (SVal)];
-    int SegType;
+    SegDef Def = { Name, SEGTYPE_DEFAULT };
 
     if (Tok != TOK_STRCON) {
 	ErrorSkip (ERR_STRCON_EXPECTED);
@@ -1216,7 +1258,6 @@ static void DoSegment (void)
 	NextTok ();
 
 	/* Check for an optional segment attribute */
-	SegType = SEGTYPE_DEFAULT;
 	if (Tok == TOK_COMMA) {
 	    NextTok ();
 	    if (Tok != TOK_IDENT) {
@@ -1228,18 +1269,18 @@ static void DoSegment (void)
 		    case 0:
 		    case 1:
 			/* Zeropage */
-		    	SegType = SEGTYPE_ZP;
+		    	Def.Type = SEGTYPE_ZP;
 			break;
 
 		    case 2:
 			/* Absolute */
-		    	SegType = SEGTYPE_ABS;
+		    	Def.Type = SEGTYPE_ABS;
 			break;
 
     		    case 3:
 		    case 4:
 			/* Far */
-    		    	SegType = SEGTYPE_FAR;
+    		    	Def.Type = SEGTYPE_FAR;
 			break;
 
 		    default:
@@ -1250,7 +1291,7 @@ static void DoSegment (void)
 	}
 
 	/* Set the segment */
-     	UseSeg (Name, SegType);
+     	UseSeg (&Def);
     }
 }
 
@@ -1312,7 +1353,7 @@ static void DoWord (void)
 static void DoZeropage (void)
 /* Switch to the zeropage segment */
 {
-    UseZeropageSeg ();
+    UseSeg (&ZeropageSegDef);
 }
 
 
@@ -1416,7 +1457,9 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,  	       	DoPageLength	},
     { ccNone,       	DoUnexpected   	},	/* .PARAMCOUNT */
     { ccNone,		DoPC02		},
+    { ccNone,           DoPopSeg        },
     { ccNone,		DoProc		},
+    { ccNone,           DoPushSeg       },
     { ccNone,    	DoUnexpected   	},	/* .REFERENCED */
     { ccNone,		DoReloc		},
     { ccNone,		DoRepeat	},
@@ -1440,7 +1483,7 @@ static CtrlDesc CtrlCmdTab [] = {
 
 
 /*****************************************************************************/
-/*     	       	    		     Code				     */
+/*     	       	    		     Code 				     */
 /*****************************************************************************/
 
 
@@ -1479,6 +1522,16 @@ void HandlePseudo (void)
 
     /* Call the handler */
     D->Handler ();
+}
+
+
+
+void SegStackCheck (void)
+/* Check if the segment stack is empty at end of assembly */
+{
+    if (CollCount (&SegStack) != 0) {
+        Error (ERR_SEGSTACK_NOT_EMPTY);
+    }
 }
 
 

@@ -55,6 +55,14 @@
 /* Are we in absolute mode or in relocatable mode? */
 extern int 	RelocMode;
 
+/* Definitions for predefined segments */
+SegDef NullSegDef;
+SegDef ZeropageSegDef;
+SegDef DataSegDef;
+SegDef BssSegDef;
+SegDef RODataSegDef;
+SegDef CodeSegDef;
+
 
 
 /*****************************************************************************/
@@ -63,26 +71,11 @@ extern int 	RelocMode;
 
 
 
-void UseCodeSeg (void);
-/* Use the code segment */
+void UseSeg (const SegDef* D);
+/* Use the given segment */
 
-void UseRODataSeg (void);
-/* Use the r/o data segment */
-
-void UseDataSeg (void);
-/* Use the data segment */
-
-void UseBssSeg (void);
-/* Use the BSS segment */
-
-void UseZeropageSeg (void);
-/* Use the zero page segment */
-
-void UseNullSeg (void);
-/* Use the null segment */
-
-void UseSeg (const char* Name, unsigned SegType);
-/* Use the segment with the given name */
+const SegDef* GetCurrentSeg (void);
+/* Get a pointer to the segment defininition of the current segment */
 
 unsigned GetSegNum (void);
 /* Get the number of the current segment */

@@ -70,36 +70,33 @@ unsigned long	AbsPC	  = 0;		/* PC if in absolute mode */
 typedef struct Segment Segment;
 struct Segment {
     Segment*   	    List;      	       	/* List of all segments */
-    Fragment*  	    Root;	  	/* Root of fragment list */
-    Fragment*  	    Last;	  	/* Pointer to last fragment */
-    unsigned char   Align;		/* Segment alignment */
-    unsigned char   SegType;   	       	/* True if zero page segment */
+    Fragment*  	    Root;  	  	/* Root of fragment list */
+    Fragment*  	    Last;  	  	/* Pointer to last fragment */
+    unsigned        Num;   		/* Segment number */
+    unsigned        Align; 		/* Segment alignment */
     unsigned long   PC;
-    unsigned   	    Num;  		/* Segment number */
-    char*      	    Name;		/* Segment name */
+    SegDef*         Def;                /* Segment definition (name and type) */
 };
 
 
+#define SEG(segdef, num, prev)      \
+    { prev, 0, 0, num, 0, 0, segdef }
+
+/* Definitions for predefined segments */
+SegDef NullSegDef     = STATIC_SEGDEF_INITIALIZER ("NULL",     SEGTYPE_ABS);
+SegDef ZeropageSegDef = STATIC_SEGDEF_INITIALIZER ("ZEROPAGE", SEGTYPE_ZP);
+SegDef DataSegDef     = STATIC_SEGDEF_INITIALIZER ("DATA",     SEGTYPE_ABS);
+SegDef BssSegDef      = STATIC_SEGDEF_INITIALIZER ("BSS",      SEGTYPE_ABS);
+SegDef RODataSegDef   = STATIC_SEGDEF_INITIALIZER ("RODATA",   SEGTYPE_ABS);
+SegDef CodeSegDef     = STATIC_SEGDEF_INITIALIZER ("CODE",     SEGTYPE_ABS);
 
 /* Predefined segments */
-static Segment NullSeg = {
-    0, 0, 0, 0, SEGTYPE_ABS, 0, 5, "NULL"
-};
-static Segment ZeropageSeg = {
-    &NullSeg, 0, 0, 0, SEGTYPE_ZP, 0, 4, "ZEROPAGE"
-};
-static Segment DataSeg = {
-    &ZeropageSeg, 0, 0, 0, SEGTYPE_ABS, 0, 3, "DATA"
-};
-static Segment BssSeg = {
-    &DataSeg, 0, 0, 0, SEGTYPE_ABS, 0, 2, "BSS"
-};
-static Segment RODataSeg = {
-    &BssSeg, 0, 0, 0, SEGTYPE_ABS, 0, 1, "RODATA"
-};
-static Segment CodeSeg = {
-    &RODataSeg, 0, 0, 0, SEGTYPE_ABS, 0, 0, "CODE"
-};
+static Segment NullSeg     = SEG (&NullSegDef,     5, NULL);
+static Segment ZeropageSeg = SEG (&ZeropageSegDef, 4, &NullSeg);
+static Segment DataSeg     = SEG (&DataSegDef,     3, &ZeropageSeg);
+static Segment BssSeg      = SEG (&BssSegDef,      2, &DataSeg);
+static Segment RODataSeg   = SEG (&RODataSegDef,   1, &BssSeg);
+static Segment CodeSeg     = SEG (&CodeSegDef,     0, &RODataSeg);
 
 /* Number of segments */
 static unsigned SegmentCount = 6;
@@ -123,7 +120,6 @@ static Segment* NewSegment (const char* Name, unsigned SegType)
 /* Create a new segment, insert it into the global list and return it */
 {
     Segment* S;
-    const char* N;
 
     /* Check for too many segments */
     if (SegmentCount >= 256) {
@@ -131,30 +127,21 @@ static Segment* NewSegment (const char* Name, unsigned SegType)
     }
 
     /* Check the segment name for invalid names */
-    N = Name;
-    if ((*N != '_' && !IsAlpha (*N)) || strlen (Name) > 80) {
+    if (!ValidSegName (Name)) {
      	Error (ERR_ILLEGAL_SEGMENT, Name);
     }
-    do {
-     	if (*N != '_' && !IsAlNum (*N)) {
-     	    Error (ERR_ILLEGAL_SEGMENT, Name);
-     	    break;
-     	}
-     	++N;
-    } while (*N);
 
     /* Create a new segment */
     S = xmalloc (sizeof (*S));
 
     /* Initialize it */
-    S->List    = 0;
-    S->Root    = 0;
-    S->Last    = 0;
-    S->Align   = 0;
-    S->SegType = SegType;
-    S->PC      = 0;
-    S->Num     = SegmentCount++;
-    S->Name    = xstrdup (Name);
+    S->List   = 0;
+    S->Root   = 0;
+    S->Last   = 0;
+    S->Num    = SegmentCount++;
+    S->Align  = 0;
+    S->PC     = 0;
+    S->Def    = NewSegDef (Name, SegType);
 
     /* Insert it into the segment list */
     SegmentLast->List = S;
@@ -166,65 +153,17 @@ static Segment* NewSegment (const char* Name, unsigned SegType)
 
 
 
-void UseCodeSeg (void)
-/* Use the code segment */
-{
-    ActiveSeg = &CodeSeg;
-}
-
-
-
-void UseRODataSeg (void)
-/* Use the r/o data segment */
-{
-    ActiveSeg = &RODataSeg;
-}
-
-
-
-void UseDataSeg (void)
-/* Use the data segment */
-{
-    ActiveSeg = &DataSeg;
-}
-
-
-
-void UseBssSeg (void)
-/* Use the BSS segment */
-{
-    ActiveSeg = &BssSeg;
-}
-
-
-
-void UseZeropageSeg (void)
-/* Use the zero page segment */
-{
-    ActiveSeg = &ZeropageSeg;
-}
-
-
-
-void UseNullSeg (void)
-/* Use the null segment */
-{
-    ActiveSeg = &NullSeg;
-}
-
-
-
-void UseSeg (const char* Name, unsigned SegType)
+void UseSeg (const SegDef* D)
 /* Use the segment with the given name */
 {
     Segment* Seg = SegmentList;
     while (Seg) {
-     	if (strcmp (Seg->Name, Name) == 0) {
+       	if (strcmp (Seg->Def->Name, D->Name) == 0) {
      	    /* We found this segment. Check if the type is identical */
-	    if (SegType != SEGTYPE_DEFAULT && Seg->SegType != SegType) {
+	    if (D->Type != SEGTYPE_DEFAULT && Seg->Def->Type != D->Type) {
 		Error (ERR_SEG_ATTR_MISMATCH);
 		/* Use the new attribute to avoid errors */
-	        Seg->SegType = SegType;
+	        Seg->Def->Type = D->Type;
        	    }
        	    ActiveSeg = Seg;
      	    return;
@@ -234,10 +173,11 @@ void UseSeg (const char* Name, unsigned SegType)
     }
 
     /* Segment is not in list, create a new one */
-    if (SegType == SEGTYPE_DEFAULT) {
-     	SegType = SEGTYPE_ABS;
+    if (D->Type == SEGTYPE_DEFAULT) {
+        Seg = NewSegment (D->Name, SEGTYPE_ABS);
+    } else {
+        Seg = NewSegment (D->Name, D->Type);
     }
-    Seg = NewSegment (Name, SegType);
     ActiveSeg = Seg;
 }
 
@@ -256,6 +196,14 @@ void SetAbsPC (unsigned long PC)
 {
     RelocMode = 0;
     AbsPC = PC;
+}
+
+
+
+const SegDef* GetCurrentSeg (void)
+/* Get a pointer to the segment defininition of the current segment */
+{
+    return ActiveSeg->Def;
 }
 
 
@@ -307,7 +255,7 @@ void SegAlign (unsigned Power, int Val)
 int IsZPSeg (void)
 /* Return true if the current segment is a zeropage segment */
 {
-    return (ActiveSeg->SegType == SEGTYPE_ZP);
+    return (ActiveSeg->Def->Type == SEGTYPE_ZP);
 }
 
 
@@ -315,7 +263,7 @@ int IsZPSeg (void)
 int IsFarSeg (void)
 /* Return true if the current segment is a far segment */
 {
-    return (ActiveSeg->SegType == SEGTYPE_FAR);
+    return (ActiveSeg->Def->Type == SEGTYPE_FAR);
 }
 
 
@@ -336,7 +284,7 @@ unsigned GetSegType (unsigned SegNum)
     }
 
     /* Return the segment type */
-    return S->SegType;
+    return S->Def->Type;
 }
 
 
@@ -418,7 +366,7 @@ void SegDump (void)
 	unsigned I;
 	Fragment* F;
 	int State = -1;
-       	printf ("New segment: %s", S->Name);
+       	printf ("New segment: %s", S->Def->Name);
 	F = S->Root;
 	while (F) {
     	    if (F->Type == FRAG_LITERAL) {
@@ -461,10 +409,10 @@ static void WriteOneSeg (Segment* Seg)
     unsigned LineInfoIndex;
 
     /* Write the segment name followed by the byte count in this segment */
-    ObjWriteStr (Seg->Name);
+    ObjWriteStr (Seg->Def->Name);
     ObjWrite32 (Seg->PC);
     ObjWrite8 (Seg->Align);
-    ObjWrite8 (Seg->SegType);
+    ObjWrite8 (Seg->Def->Type);
 
     /* Now walk through the fragment list for this segment and write the
      * fragments.

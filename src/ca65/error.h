@@ -44,14 +44,14 @@
 
 
 /*****************************************************************************/
-/*	  		   	     Data		     		     */
+/*	  	       	   	     Data		     		     */
 /*****************************************************************************/
 
 
 
 /* Warning numbers */
 enum Warnings {
-    WARN_NONE,	      	    	      	/* No warning */
+    WARN_NONE,	       	    	      	/* No warning */
     WARN_MASK_ERROR,
     WARN_SYM_NOT_REFERENCED,
     WARN_IMPORT_NOT_REFERENCED,
@@ -125,6 +125,9 @@ enum Errors {
     ERR_OPEN_IF,
     ERR_OPEN_PROC,
     ERR_SEG_ATTR_MISMATCH,
+    ERR_SEGSTACK_OVERFLOW,
+    ERR_SEGSTACK_EMPTY,
+    ERR_SEGSTACK_NOT_EMPTY,
     ERR_CPU_NOT_SUPPORTED,
     ERR_COUNTER_UNDERFLOW,
     ERR_UNDEFINED_LABEL,

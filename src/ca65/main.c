@@ -621,6 +621,11 @@ int main (int argc, char* argv [])
     /* Assemble the input */
     Assemble ();
 
+    /* If we didn't have any errors, check the segment stack */
+    if (ErrorCount == 0) {
+        SegStackCheck ();
+    }
+
     /* If we didn't have any errors, check the unnamed labels */
     if (ErrorCount == 0) {
         ULabCheck ();

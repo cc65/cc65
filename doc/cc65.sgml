@@ -437,7 +437,7 @@ and the one defined by the ISO standard:
 	conventions (see below). This means, that you may not mix pointers to
 	those functions with pointers to user written functions.
 	<p>
-</itemize>     
+</itemize>
 
 There may be some more minor differences, I'm currently not aware off. The
 biggest problem is the missing float data type. With this limitation in
@@ -552,9 +552,9 @@ This cc65 version has some extensions to the ISO C standard.
 	<p>
 
 <item>  cc65 implements flexible array struct members as defined in the C99 ISO
-        standard. As an extension, these fields may be initialized. There are 
-        several exceptions, however (which is probably the reason why the 
-        standard does not define this feature, because it is highly 
+        standard. As an extension, these fields may be initialized. There are
+        several exceptions, however (which is probably the reason why the
+        standard does not define this feature, because it is highly
         unorthogonal). Flexible array members cannot be initialized...
 
         <itemize>
@@ -652,7 +652,7 @@ The compiler defines several macros at startup:
 
   <tag><tt>__CC65_STD__</tt></tag>
 
-  This macro is defined to one of the following depending on the <tt><ref 
+  This macro is defined to one of the following depending on the <tt><ref
   id="option--standard" name="--standard"></tt> command line option:
   <itemize>
   <item><tt/__CC65_STD_C89__/
@@ -1037,14 +1037,20 @@ variables or functions into your asm statements. Code like this
 <tscreen><verb>
         int foo;
         int bar () { return 1; }
-       	__asm__ ("lda _foo");   /* DON'T DO THAT! */
+       	__asm__ ("lda _foo");           /* DON'T DO THAT! */
         ...
-        __asm__ ("jsr _bar");   /* DON'T DO THAT EITHER! */
+        __asm__ ("jsr _bar");           /* DON'T DO THAT EITHER! */
 </verb></tscreen>
 <p>
 
 may stop working if the way, the compiler generates these names is changed in
-a future version. Instead use the format specifiers from the table above.
+a future version. Instead use the format specifiers from the table above:
+
+<tscreen><verb>
+       	__asm__ ("lda %v", foo);        /* OK */
+        ...
+        __asm__ ("jsr %v", bar);        /* OK */
+</verb></tscreen>
 <p>
 
 

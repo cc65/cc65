@@ -5,8 +5,7 @@
 
 unsigned char x,y;
 
-void (*oldMouseVector)();
-void (*oldKeyVector)();
+void_func oldMouseVector, oldKeyVector;
 
 void foo1 (void) {
     // do something on mouse press/release
@@ -28,15 +27,15 @@ void foo2 (void) {
 
 void hook_into_system(void) {
     // hook into system vectors - preserve old value
-    oldMouseVector = (void (*)())mouseVector;
-    mouseVector = (int)foo1;
-    oldKeyVector = (void (*)())keyVector;
-    keyVector = (int)foo2;
+    oldMouseVector = mouseVector;
+    mouseVector = foo1;
+    oldKeyVector = keyVector;
+    keyVector = foo2;
 }
 
 void remove_hooks(void) {
-    mouseVector = (int)oldMouseVector;
-    keyVector = (int)oldKeyVector;
+    mouseVector = oldMouseVector;
+    keyVector = oldKeyVector;
 }
 
 int main(void) {

@@ -1607,7 +1607,7 @@ void example = &lcub;
 <p>
 It is possible to intercept and hook in the GEOS Kernal using vectors. Here is a little example:
 <tscreen><verb>
-void (&ast;oldVector)(void);
+void_func oldVector;
 
 void NewVectorHandler(void) &lcub;
 	// do something and at the end call the old vector routine

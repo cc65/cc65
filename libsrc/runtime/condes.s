@@ -15,7 +15,6 @@
 
        	.export	initlib, donelib, condes
 
-        .import callax
        	.import	__CONSTRUCTOR_TABLE__, __CONSTRUCTOR_COUNT__
 	.import	__DESTRUCTOR_TABLE__, __DESTRUCTOR_COUNT__
 
@@ -52,7 +51,8 @@
 
 
 ; --------------------------------------------------------------------------
-; Generic table call handler
+; Generic table call handler. We cannot use callax here, since condes is also
+; used for interrupt handlers, and callax clobbers ptr1.
 
 .proc	condes
 
@@ -64,11 +64,12 @@ loop:	ldy	index
      	beq	done
 	dey
 	jsr	getbyt
-        tax
+        sta     jmpvec+1
 	dey
-	jsr	getbyt
+	jsr	getbyt  
+        sta     jmpvec+2
 	sty	index
-	jsr	callax
+	jsr	jmpvec
 .if (.cpu .bitand ::CPU_ISET_65SC02)
 	bra	loop
 .else
@@ -81,8 +82,8 @@ done:	rts
 
 
 ; --------------------------------------------------------------------------
-; Data. The getbyte routine is placed in the data segment cause it's patched
-; at runtime.
+; Data. The getbyte and jmpvec routines are placed in the data segment
+; cause they're patched at runtime.
 
 .bss
 
@@ -93,4 +94,4 @@ index:	.byte	0
 getbyt:	lda	$FFFF,y
 	rts
 
-
+jmpvec: jmp     $0000

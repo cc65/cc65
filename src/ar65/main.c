@@ -38,6 +38,7 @@
 #include <string.h>
 #include <time.h>
 
+#include "../common/cmdline.h"
 #include "../common/version.h"
 
 #include "global.h"
@@ -75,6 +76,9 @@ int main (int argc, char* argv [])
 /* Assembler main program */
 {
     int I;
+
+    /* Initialize the cmdline module */
+    InitCmdLine (argc, argv, "ar65");
 
     /* We must have a file name */
     if (argc < 2) {

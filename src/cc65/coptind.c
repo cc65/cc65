@@ -500,8 +500,13 @@ unsigned OptJumpTarget (CodeSeg* S)
       	/* Get next entry */
        	E2 = CS_GetNextEntry (S, I);
 
-	/* Check if we have a jump or branch, and a matching label */
-       	if (E2 && (E2->Info & OF_UBRA) != 0 && E2->JumpTo) {
+	/* Check if we have a jump or branch, and a matching label, which
+	 * is not attached to the jump itself
+	 */
+       	if (E2 != 0 			&&
+	    (E2->Info & OF_UBRA) != 0 	&& 
+	    E2->JumpTo			&&
+	    E2->JumpTo->Owner != E2) {
 
 	    /* Get the entry preceeding the branch target */
 	    T1 = CS_GetPrevEntry (S, CS_GetEntryIndex (S, E2->JumpTo->Owner));
@@ -908,7 +913,7 @@ unsigned OptDupLoads (CodeSeg* S)
                 if (In->RegA >= 0                     &&
 		    In->RegA == In->RegX              &&
 		    (N = CS_GetNextEntry (S, I)) != 0 &&
-       	       	    !CE_UseLoadFlags (N)) {    	   
+       	       	    !CE_UseLoadFlags (N)) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
 		}
@@ -967,7 +972,7 @@ unsigned OptDupLoads (CodeSeg* S)
 
     }
 
-    /* Free register info */                            
+    /* Free register info */
     CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
@@ -1060,7 +1065,7 @@ unsigned OptTransfers (CodeSeg* S)
 		 */
 		if ((X = CS_GetNextEntry (S, I+1)) == 0) {
 		    goto NextEntry;
-		}              
+		}
                 if (CE_UseLoadFlags (X)) {
 	 	    if (I == 0) {
 			/* No preceeding entry */

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2001-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -1322,13 +1322,25 @@ unsigned OptPrecalc (CodeSeg* S)
         switch (E->OPC) {
 
             case OP65_LDA:
-            case OP65_LDX:
-            case OP65_LDY:
-                if (E->AM == AM65_IMM) {
-                    /* If we do already have an immediate load, bail out */
-                    break;
+                if (E->AM != AM65_IMM && RegValIsKnown (Out->RegA)) {
+                    /* Result of load is known */
+                    Arg = MakeHexArg (Out->RegA);
                 }
-                /* FALLTHROUGH */
+                break;
+
+            case OP65_LDX:
+                if (E->AM != AM65_IMM && RegValIsKnown (Out->RegX)) {
+                    /* Result of load is known */
+                    Arg = MakeHexArg (Out->RegX);
+                }
+                break;
+
+            case OP65_LDY:
+                if (E->AM != AM65_IMM && RegValIsKnown (Out->RegY)) {
+                    /* Result of load is known */
+                    Arg = MakeHexArg (Out->RegY);
+                }
+                break;
 
             case OP65_ADC:
             case OP65_ASL:
@@ -1336,7 +1348,7 @@ unsigned OptPrecalc (CodeSeg* S)
             case OP65_LSR:
             case OP65_SBC:
                 if (RegValIsKnown (Out->RegA)) {
-                    /* Accu AND zp with known contents */
+                    /* Accu op zp with known contents */
                     Arg = MakeHexArg (Out->RegA);
                 }
                 break;

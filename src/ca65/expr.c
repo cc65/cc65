@@ -1641,6 +1641,17 @@ static ExprNode* GenSectionExpr (unsigned SegNum)
 
 
 
+ExprNode* GenAddExpr (ExprNode* Left, ExprNode* Right)
+/* Generate an addition from the two operands */
+{
+    ExprNode* Root = NewExprNode (EXPR_PLUS);
+    Root->Left = Left;
+    Root->Right = Right;
+    return Root;
+}
+
+
+
 ExprNode* GenCurrentPC (void)
 /* Return the current program counter as expression */
 {
@@ -1648,9 +1659,8 @@ ExprNode* GenCurrentPC (void)
 
     if (RelocMode) {
 	/* Create SegmentBase + Offset */
-	Root = NewExprNode (EXPR_PLUS);
-	Root->Left  = GenSectionExpr (GetCurrentSegNum ());
-	Root->Right = GenLiteralExpr (GetPC ());
+       	Root = GenAddExpr (GenSectionExpr (GetCurrentSegNum ()),
+                           GenLiteralExpr (GetPC ()));
     } else {
      	/* Absolute mode, just return PC value */
 	Root = GenLiteralExpr (GetPC ());

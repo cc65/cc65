@@ -69,6 +69,9 @@ ExprNode* GenLiteralExpr (long Val);
 ExprNode* GenSymExpr (struct SymEntry* Sym);
 /* Return an expression node that encodes the given symbol */
 
+ExprNode* GenAddExpr (ExprNode* Left, ExprNode* Right);
+/* Generate an addition from the two operands */
+
 ExprNode* GenCurrentPC (void);
 /* Return the current program counter as expression */
 

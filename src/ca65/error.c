@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -183,6 +183,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
      	"Duplicate `.ELSE'",
        	"Conditional assembly branch was never closed",
 	"Lexical level was not terminated correctly",
+        "No open lexical level",
 	"Segment attribute mismatch",
         "Segment stack overflow",
         "Segment stack is empty",
@@ -190,7 +191,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
     	"CPU not supported",
 	"Counter underflow",
 	"Undefined label",
-	"Open `%s´",
+       	"Open `%s'",
 	"File name `%s' not found in file table",
     };
 

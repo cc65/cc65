@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -124,6 +124,7 @@ enum Errors {
     ERR_DUPLICATE_ELSE,
     ERR_OPEN_IF,
     ERR_OPEN_PROC,
+    ERR_NO_OPEN_PROC,
     ERR_SEG_ATTR_MISMATCH,
     ERR_SEGSTACK_OVERFLOW,
     ERR_SEGSTACK_EMPTY,

@@ -605,8 +605,13 @@ static void DoEnd (void)
 
 static void DoEndProc (void)
 /* Leave a lexical level */
-{
-    SymLeaveLevel ();
+{           
+    if (!SymIsLocalLevel ()) {
+        /* No local symbol table level open */
+        ErrorSkip (ERR_NO_OPEN_PROC);
+    } else {
+        SymLeaveLevel ();
+    }
 }
 
 

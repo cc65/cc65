@@ -379,8 +379,16 @@ void SymEnterLevel (void)
 
 void SymLeaveLevel (void)
 /* Leave the current lexical level */
-{
+{                          
     SymTab = SymTab->BackLink;
+}
+
+
+
+int SymIsLocalLevel (void)
+/* Return true if we ae on a local symbol table level. */
+{
+    return (SymTab != RootTab);
 }
 
 

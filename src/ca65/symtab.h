@@ -73,6 +73,9 @@ void SymEnterLevel (void);
 void SymLeaveLevel (void);
 /* Leave the current lexical level */
 
+int SymIsLocalLevel (void);
+/* Return true if we ae on a local symbol table level. */
+
 void SymDef (const char* Name, ExprNode* Expr, int ZP, int Label);
 /* Define a new symbol */
 
@@ -104,7 +107,7 @@ void SymGlobal (const char* Name);
 /* Mark the given symbol as a global symbol, that is, as a symbol that is
  * either imported or exported.
  */
-                                
+
 void SymGlobalZP (const char* Name);
 /* Mark the given symbol as a global zeropage symbol, that is, as a symbol
  * that is either imported or exported.

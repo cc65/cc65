@@ -42,18 +42,20 @@ L2:     lda     (ptr1),y        ; Copy one character
         inc     ptr2+1          ; Bump high bytes
         bne     L1              ; Branch always
 
-; Fill the remaining bytes. 
+; Fill the remaining bytes.
 
-L3:     inx
-        bne     L4
-        inc     tmp2
-        beq     L9
-
-L4:     sta     (ptr2),y
-L5:     iny
+L3:     inx                     ; Counter low byte
+        beq     L6              ; Branch on overflow
+L4:     sta     (ptr2),y        ; Clear one byte
+L5:     iny                     ; Bump pointer
         bne     L3
         inc     ptr2+1          ; Bump high byte
         bne     L3              ; Branch always
+
+; Bump the counter high byte
+
+L6:     inc     tmp2
+        bne     L4
 
 ; Done, return dest
 

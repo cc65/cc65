@@ -152,7 +152,7 @@ int F_HasVoidReturn (const Function* F)
 int F_IsVariadic (const Function* F)
 /* Return true if this is a variadic function */
 {
-    return (F->Desc->Flags & FD_OLDSTYLE) != 0;
+    return (F->Desc->Flags & FD_VARIADIC) != 0;
 }
 
 

@@ -70,7 +70,7 @@ enum {
 
 /* One .IF descriptor */
 typedef struct IfDesc IfDesc;
-struct IfDesc {     
+struct IfDesc {
     unsigned   	Flags; 	       	/* Bitmapped flags, see above */
     FilePos    	Pos;		/* File position of the .IF */
     const char* Name;	      	/* Name of the directive */
@@ -89,7 +89,7 @@ static IfDesc* AllocIf (const char* Directive, int NeedTerm)
 
     /* Check for stack overflow */
     if (IfCount >= MAX_IFS) {
-       	Error (ERR_IF_NESTING);
+       	Fatal (FAT_IF_NESTING);
     }
 
     /* Alloc one element */

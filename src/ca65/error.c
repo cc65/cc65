@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -168,7 +168,6 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
         "Symbol `%s' is already marked as export",
 	"Exported symbol `%s' is undefined",
 	"Exported values must be constant",
-	".IF nesting too deep",
 	"Unexpected end of file",
 	"Unexpected end of line",
 	"Unexpected `%s'",
@@ -257,6 +256,7 @@ void Fatal (unsigned FatNum, ...)
 	"Cannot write to listing file: %s",
 	"Cannot read from listing file: %s",
 	"Too many nested constructs",
+	".IF nesting too deep",
 	"Too many symbols",
     };
     va_list ap;

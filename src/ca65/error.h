@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -109,7 +109,6 @@ enum Errors {
     ERR_SYM_ALREADY_EXPORT,
     ERR_EXPORT_UNDEFINED,
     ERR_EXPORT_MUST_BE_CONST,
-    ERR_IF_NESTING,
     ERR_UNEXPECTED_EOF,
     ERR_UNEXPECTED_EOL,
     ERR_UNEXPECTED,
@@ -148,6 +147,7 @@ enum Fatals {
     FAT_CANNOT_WRITE_LISTING,
     FAT_CANNOT_READ_LISTING,
     FAT_NESTING,
+    FAT_IF_NESTING,
     FAT_TOO_MANY_SYMBOLS,
     FAT_COUNT	    	  	      	/* Fatal error count */
 };

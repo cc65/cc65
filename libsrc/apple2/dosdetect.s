@@ -20,10 +20,10 @@
 ; ProDOS 8 2.0.3 - $23
 ;
 
-        .constructor	initdostype
-        .export		__dos_type
+        .constructor    initdostype, 25
+        .export         __dos_type
 
-        .include	"mli.inc"
+        .include        "mli.inc"
 
 ; Identify DOS version according to:
 ; - "Beneath Apple ProDOS", chapter 6-63
@@ -33,16 +33,16 @@
         .segment        "INIT"
 
 initdostype:
-        lda	ENTRY
-        cmp	#$4C		; Is MLI present? (JMP opcode)
-        bne	done
-        lda	KVERSION	; ProDOS 8 kernel version
-        cmp	#$10
-        bcs	:+
-        ora	#$10		; Make high nibble match major version
-:       sta	__dos_type
+        lda     ENTRY
+        cmp     #$4C		; Is MLI present? (JMP opcode)
+        bne     done
+        lda     KVERSION	; ProDOS 8 kernel version
+        cmp     #$10
+        bcs     :+
+        ora     #$10		; Make high nibble match major version
+:       sta     __dos_type
 done:   rts
 
         .bss
 
-__dos_type:     .res	1
+__dos_type:     .res    1

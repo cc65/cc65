@@ -1,5 +1,5 @@
 ;
-; Startup code for cc65 (Plus/4 version)
+; Startup code for cc65 (CBM 600/700 version)
 ;
 ; This must be the *first* file on the linker command line
 ;
@@ -415,3 +415,4 @@ k_settim:
 spsave:	.res	1
 
 
+				     

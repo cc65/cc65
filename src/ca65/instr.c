@@ -48,6 +48,7 @@
 #include "global.h"
 #include "nexttok.h"
 #include "objcode.h"
+#include "symtab.h"
 #include "instr.h"
 
 
@@ -606,21 +607,42 @@ static void PutAll (const InsDesc* Ins)
      * modes.
      */
     if (Expr && (AddrModeSet & AM_ZP) && !IsByteExpr (Expr)) {
-  	AddrModeSet &= ~AM_ZP;
+       	AddrModeSet &= ~AM_ZP;
     }
 
     /* Check if we have any adressing modes left */
     if (AddrModeSet == 0) {
-    	Error (ERR_ILLEGAL_ADDR_MODE);
-    	return;
+       	Error (ERR_ILLEGAL_ADDR_MODE);
+       	return;
     }
     AddrMode = BitFind (AddrModeSet);
+
+    /* If the instruction has a one byte operand and immediate addressing is
+     * allowed but not used, check for an operand expression in the form
+     * <label or >label, where label is a far or absolute label. If found,
+     * emit a warning. This warning protects against a typo, where the '#'
+     * for the immediate operand is omitted.
+     */
+    if (Expr && (Ins->AddrMode & AM_IMM)                &&
+        (AddrModeSet & (AM_DIR | AM_ABS | AM_ABS_LONG)) &&
+        ExtBytes[AddrMode] == 1) {
+
+        /* Found, check the expression */
+        ExprNode* Left = Expr->Left;
+        if ((Expr->Op == EXPR_BYTE0 || Expr->Op == EXPR_BYTE1) &&
+            Left->Op == EXPR_SYMBOL                            &&
+            !SymIsZP (Left->V.Sym)) {
+
+            /* Output a warning */
+            Warning (WARN_SUSPICIOUS_ADDREXPR);
+        }
+    }
 
     /* Build the opcode */
     OpCode = Ins->BaseCode | EATab [Ins->ExtCode][AddrMode];
 
     /* Check how many extension bytes are needed and output the instruction */
-    switch (ExtBytes [AddrMode]) {
+    switch (ExtBytes[AddrMode]) {
 
         case 0:
     	    Emit0 (OpCode);
@@ -637,7 +659,7 @@ static void PutAll (const InsDesc* Ins)
 		 * mode, force this address into 16 bit range to allow
 	 	 * addressing inside a 64K segment.
 	 	 */
-		Emit2 (OpCode, ForceWordExpr (Expr));
+       		Emit2 (OpCode, ForceWordExpr (Expr));
 	    } else {
 	    	Emit2 (OpCode, Expr);
 	    }

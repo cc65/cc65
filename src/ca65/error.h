@@ -55,6 +55,7 @@ enum Warnings {
     WARN_SYM_NOT_REFERENCED,
     WARN_IMPORT_NOT_REFERENCED,
     WARN_CANNOT_TRACK_STATUS,
+    WARN_SUSPICIOUS_ADDREXPR,
     WARN_USER,
     WARN_COUNT	     	    	      	/* Warning count */
 };

@@ -95,19 +95,19 @@
 
 
 /* Description for one instruction */
-typedef struct InsDesc_ InsDesc;
-struct InsDesc_ {
-    char  	  	Mnemonic [4];
+typedef struct InsDesc InsDesc;
+struct InsDesc {
+    char       	      	Mnemonic [4];
     unsigned long      	AddrMode;		/* Valid adressing modes */
-    unsigned char	BaseCode;  	 	/* Base opcode */
-    unsigned char	ExtCode;   	 	/* Number of ext code table */
+    unsigned char     	BaseCode;  	 	/* Base opcode */
+    unsigned char     	ExtCode;   	 	/* Number of ext code table */
     void       	       	(*Emit) (const InsDesc*);/* Handler function */
 };
 
 /* An instruction table */
-typedef struct InsTable_ InsTable;
-struct InsTable_ {
-    unsigned		Count;		      	/* Number of intstructions */
+typedef struct InsTable InsTable;
+struct InsTable {
+    unsigned   	       	Count;		      	/* Number of intstructions */
     InsDesc    	       	Ins[1];		      	/* Varying length */
 };
 
@@ -125,7 +125,7 @@ extern unsigned char ExtBytes [AMI_COUNT];
 
 
 /*****************************************************************************/
-/*     	     	    		     Code   				     */
+/*     	       	    		     Code   				     */
 /*****************************************************************************/
 
 

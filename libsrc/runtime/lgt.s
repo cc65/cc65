@@ -5,10 +5,10 @@
 ;
 
  	.export		tosgteax
- 	.import		lcmp, boolgt
+ 	.import		toslcmp, boolgt
 
 tosgteax:
-       	jsr    	lcmp		; Set the flags
+       	jsr    	toslcmp	   	; Set the flags
 	jmp	boolgt		; Convert to boolean
 
 

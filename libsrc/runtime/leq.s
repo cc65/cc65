@@ -5,11 +5,11 @@
 ;
 
 	.export		toseqeax
-	.import		lcmp, booleq
+	.import		toslcmp, booleq
 
-toseqeax:
-     	jsr	lcmp  		; Set flags
+toseqeax:			
+     	jsr	toslcmp		; Set flags
      	jmp	booleq 	       	; Convert to boolean
 
 
-     
+

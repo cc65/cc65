@@ -5,9 +5,9 @@
 ;
 
 	.export		tosugeeax
-       	.import	       	lcmp, booluge
+       	.import	       	toslcmp, booluge
 
-tosugeeax:		    
-       	jsr    	lcmp		; Set the flags
+tosugeeax:
+       	jsr    	toslcmp	   	; Set the flags
        	jmp    	booluge		; Convert to boolean
 

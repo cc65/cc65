@@ -5,10 +5,10 @@
 ;
 
 	.export		tosneeax
-	.import		lcmp, boolne
+	.import		toslcmp, boolne
 
 tosneeax:
-	jsr	lcmp		; Set flags
+	jsr	toslcmp	   	; Set flags
 	jmp	boolne		; Convert to boolean
 
 

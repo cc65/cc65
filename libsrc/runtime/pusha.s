@@ -4,11 +4,13 @@
 ; CC65 runtime: Push value in a onto the stack
 ;
 
-       	.export	  	pushaysp, pusha
+       	.export	  	pusha0sp, pushaysp, pusha
 	.importzp	sp
 
 ; Beware: The optimizer knows about this function!
 
+pusha0sp:
+	ldy	#$00
 pushaysp:
 	lda	(sp),y
 pusha:	ldy	sp

@@ -4,12 +4,13 @@
 ; Long int compare function - used by the compare operators
 ;
 
- 	.export		lcmp
+ 	.export		toslcmp
  	.import		incsp4
  	.importzp	sp, sreg, ptr1
 
 
-lcmp:  	sta    	ptr1
+toslcmp:
+  	sta    	ptr1
   	stx	ptr1+1 	  	; EAX now in sreg:ptr1
 
   	ldy    	#$03
@@ -47,4 +48,4 @@ L4:	php	  		; Save flags
 	plp	  		; Restore flags
   	rts
 
-		  
+

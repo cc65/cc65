@@ -236,6 +236,15 @@ static void CmdAddArg (CmdDesc* Cmd, const char* Arg)
 
 
 
+static void CmdAddArg2 (CmdDesc* Cmd, const char* Arg1, const char* Arg2)
+/* Add a new argument pair to the command */
+{
+    CmdAddArg (Cmd, Arg1);
+    CmdAddArg (Cmd, Arg2);
+}
+
+
+
 static void CmdDelArgs (CmdDesc* Cmd, unsigned LastValid)
 /* Remove all arguments with an index greater than LastValid */
 {
@@ -302,8 +311,7 @@ static void CmdInit (CmdDesc* Cmd, const char* Path)
 static void CmdSetOutput (CmdDesc* Cmd, const char* File)
 /* Set the output file in a command desc */
 {
-    CmdAddArg (Cmd, "-o");
-    CmdAddArg (Cmd, File);
+    CmdAddArg2 (Cmd, "-o", File);
 }
 
 
@@ -311,8 +319,7 @@ static void CmdSetOutput (CmdDesc* Cmd, const char* File)
 static void CmdSetTarget (CmdDesc* Cmd, target_t Target)
 /* Set the output file in a command desc */
 {
-    CmdAddArg (Cmd, "-t");
-    CmdAddArg (Cmd, TargetNames[Target]);
+    CmdAddArg2 (Cmd, "-t", TargetNames[Target]);
 }
 
 
@@ -404,8 +411,7 @@ static void Link (void)
         if (Module) {
             Error ("Cannot use -C and --module together");
         }
-       	CmdAddArg (&LD65, "-C");
-	CmdAddArg (&LD65, LinkerConfig);
+       	CmdAddArg2 (&LD65, "-C", LinkerConfig);
     } else if (Module) {
         CmdSetTarget (&LD65, TGT_MODULE);
     } else if (Target != TGT_NONE) {
@@ -680,12 +686,15 @@ static void Usage (void)
        	     "  --add-source\t\tInclude source as comment\n"
        	     "  --ansi\t\tStrict ANSI mode\n"
 	     "  --asm-include-dir dir\tSet an assembler include directory\n"
+             "  --bss-label name\tDefine and export a BSS segment label\n"
 	     "  --bss-name seg\tSet the name of the BSS segment\n"
        	     "  --check-stack\t\tGenerate stack overflow checks\n"
+             "  --code-label name\tDefine and export a CODE segment label\n"
        	     "  --code-name seg\tSet the name of the CODE segment\n"
 	     "  --codesize x\t\tAccept larger code by factor x\n"
        	     "  --cpu type\t\tSet cpu type\n"
 	     "  --create-dep\t\tCreate a make dependency file\n"
+             "  --data-label name\tDefine and export a DATA segment label\n"
        	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug\t\tDebug mode\n"
        	     "  --debug-info\t\tAdd debug info\n"
@@ -696,6 +705,7 @@ static void Usage (void)
 	     "  --mapfile name\tCreate a map file\n"
              "  --module\t\tLink as a module\n"
              "  --module-id id\tSpecify a module id for the linker\n"
+             "  --o65-model model\tOverride the o65 model\n"
              "  --register-space b\tSet space available for register variables\n"
              "  --register-vars\tEnable register variables\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
@@ -704,7 +714,9 @@ static void Usage (void)
        	     "  --static-locals\tMake local variables static\n"
        	     "  --target sys\t\tSet the target system\n"
        	     "  --version\t\tPrint the version number\n"
-       	     "  --verbose\t\tVerbose mode\n",
+       	     "  --verbose\t\tVerbose mode\n"
+             "  --zeropage-label name\tDefine and export a ZEROPAGE segment label\n"
+       	     "  --zeropage-name seg\tSet the name of the ZEROPAGE segment\n",
     	     ProgName);
 }
 
@@ -731,8 +743,15 @@ static void OptAnsi (const char* Opt attribute ((unused)),
 static void OptAsmIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Include directory (assembler) */
 {
-    CmdAddArg (&CA65, "-I");
-    CmdAddArg (&CA65, Arg);
+    CmdAddArg2 (&CA65, "-I", Arg);
+}
+
+
+
+static void OptBssLabel (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --bss-label option */
+{
+    CmdAddArg2 (&CO65, "--bss-label", Arg);
 }
 
 
@@ -740,14 +759,14 @@ static void OptAsmIncludeDir (const char* Opt attribute ((unused)), const char* 
 static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --bss-name option */
 {
-    CmdAddArg (&CC65, "--bss-name");
-    CmdAddArg (&CC65, Arg);
+    CmdAddArg2 (&CC65, "--bss-name", Arg);
+    CmdAddArg2 (&CO65, "--bss-name", Arg);
 }
 
 
 
 static void OptCheckStack (const char* Opt attribute ((unused)),
-			   const char* Arg attribute ((unused)))
+		  	   const char* Arg attribute ((unused)))
 /* Handle the --check-stack option */
 {
     CmdAddArg (&CC65, "--check-stack");
@@ -755,11 +774,19 @@ static void OptCheckStack (const char* Opt attribute ((unused)),
 
 
 
+static void OptCodeLabel (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --code-label option */
+{
+    CmdAddArg2 (&CO65, "--code-label", Arg);
+}
+
+
+
 static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --code-name option */
 {
-    CmdAddArg (&CC65, "--code-name");
-    CmdAddArg (&CC65, Arg);
+    CmdAddArg2 (&CC65, "--code-name", Arg);
+    CmdAddArg2 (&CO65, "--code-name", Arg);
 }
 
 
@@ -767,8 +794,7 @@ static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
 static void OptCodeSize (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --codesize option */
 {
-    CmdAddArg (&CC65, "--codesize");
-    CmdAddArg (&CC65, Arg);
+    CmdAddArg2 (&CC65, "--codesize", Arg);
 }
 
 
@@ -777,10 +803,8 @@ static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --cpu option */
 {
     /* Add the cpu type to the assembler and compiler */
-    CmdAddArg (&CA65, "--cpu");
-    CmdAddArg (&CA65, Arg);
-    CmdAddArg (&CC65, "--cpu");
-    CmdAddArg (&CC65, Arg);
+    CmdAddArg2 (&CA65, "--cpu", Arg);
+    CmdAddArg2 (&CC65, "--cpu", Arg);
 }
 
 
@@ -794,11 +818,19 @@ static void OptCreateDep (const char* Opt attribute ((unused)),
 
 
 
+static void OptDataLabel (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --data-label option */
+{
+    CmdAddArg2 (&CO65, "--data-label", Arg);
+}
+
+
+
 static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --data-name option */
 {
-    CmdAddArg (&CC65, "--data-name");
-    CmdAddArg (&CC65, Arg);
+    CmdAddArg2 (&CC65, "--data-name", Arg);
+    CmdAddArg2 (&CO65, "--data-name", Arg);
 }
 
 
@@ -808,6 +840,7 @@ static void OptDebug (const char* Opt attribute ((unused)),
 /* Debug mode (compiler and cl65 utility) */
 {
     CmdAddArg (&CC65, "-d");
+    CmdAddArg (&CO65, "-d");
     Debug = 1;
 }
 
@@ -819,6 +852,7 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
 {
     CmdAddArg (&CC65, "-g");
     CmdAddArg (&CA65, "-g");
+    CmdAddArg (&CO65, "-g");
 }
 
 
@@ -826,8 +860,7 @@ static void OptDebugInfo (const char* Opt attribute ((unused)),
 static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 /* Emulation features for the assembler */
 {
-    CmdAddArg (&CA65, "--feature");
-    CmdAddArg (&CA65, Arg);
+    CmdAddArg2 (&CA65, "--feature", Arg);
 }
 
 
@@ -845,8 +878,7 @@ static void OptHelp (const char* Opt attribute ((unused)),
 static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg)
 /* Include directory (compiler) */
 {
-    CmdAddArg (&CC65, "-I");
-    CmdAddArg (&CC65, Arg);
+    CmdAddArg2 (&CC65, "-I", Arg);
 }
 
 
@@ -864,8 +896,7 @@ static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 /* Create a map file */
 {
     /* Create a map file (linker) */
-    CmdAddArg (&LD65, "-m");
-    CmdAddArg (&LD65, Arg);
+    CmdAddArg2 (&LD65, "-m", Arg);
 }
 
 
@@ -883,8 +914,15 @@ static void OptModuleId (const char* Opt attribute ((unused)), const char* Arg)
 /* Specify a module if for the linker */
 {
     /* Pass it straight to the linker */
-    CmdAddArg (&LD65, "--module-id");
-    CmdAddArg (&LD65, Arg);
+    CmdAddArg2 (&LD65, "--module-id", Arg);
+}
+
+
+
+static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --o65-model option */
+{
+    CmdAddArg2 (&CO65, "-m", Arg);
 }
 
 
@@ -892,8 +930,7 @@ static void OptModuleId (const char* Opt attribute ((unused)), const char* Arg)
 static void OptRegisterSpace (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --register-space option */
 {
-    CmdAddArg (&CC65, "--register-space");
-    CmdAddArg (&CC65, Arg);
+    CmdAddArg2 (&CC65, "--register-space", Arg);
 }
 
 
@@ -910,8 +947,7 @@ static void OptRegisterVars (const char* Opt attribute ((unused)),
 static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --rodata-name option */
 {
-    CmdAddArg (&CC65, "--rodata-name");
-    CmdAddArg (&CC65, Arg);
+    CmdAddArg2 (&CC65, "--rodata-name", Arg);
 }
 
 
@@ -928,8 +964,7 @@ static void OptSignedChars (const char* Opt attribute ((unused)),
 static void OptStartAddr (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the default start address */
 {
-    CmdAddArg (&LD65, "-S");
-    CmdAddArg (&LD65, Arg);
+    CmdAddArg2 (&LD65, "-S", Arg);
 }
 
 
@@ -962,18 +997,35 @@ static void OptVerbose (const char* Opt attribute ((unused)),
 {
     CmdAddArg (&CC65, "-v");
     CmdAddArg (&CA65, "-v");
+    CmdAddArg (&CO65, "-v");
     CmdAddArg (&LD65, "-v");
 }
 
 
 
 static void OptVersion (const char* Opt attribute ((unused)),
-			const char* Arg attribute ((unused)))
+		    	const char* Arg attribute ((unused)))
 /* Print version number */
 {
     fprintf (stderr,
  	     "cl65 V%u.%u.%u - (C) Copyright 1998-2003 Ullrich von Bassewitz\n",
  	     VER_MAJOR, VER_MINOR, VER_PATCH);
+}
+
+
+
+static void OptZeropageLabel (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --zeropage-label option */
+{
+    CmdAddArg2 (&CO65, "--zeropage-label", Arg);
+}
+
+
+
+static void OptZeropageName (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --zeropage-name option */
+{
+    CmdAddArg2 (&CO65, "--zeropage-name", Arg);
 }
 
 
@@ -986,12 +1038,15 @@ int main (int argc, char* argv [])
 	{ "--add-source",	0,    	OptAddSource 		},
 	{ "--ansi",		0,	OptAnsi			},
 	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
+       	{ "--bss-label",       	1,     	OptBssLabel             },
 	{ "--bss-name",	 	1, 	OptBssName   		},
        	{ "--check-stack",	0,     	OptCheckStack		},
+       	{ "--code-label",      	1,     	OptCodeLabel            },
 	{ "--code-name", 	1, 	OptCodeName  		},
 	{ "--codesize",	 	1,	OptCodeSize		},
         { "--cpu",     	       	1, 	OptCPU 			},
 	{ "--create-dep",    	0,	OptCreateDep 		},
+       	{ "--data-label",      	1,     	OptDataLabel            },
 	{ "--data-name",     	1, 	OptDataName  		},
 	{ "--debug",	     	0,	OptDebug		},
 	{ "--debug-info",    	0,	OptDebugInfo		},
@@ -1002,6 +1057,7 @@ int main (int argc, char* argv [])
 	{ "--mapfile",	      	1,	OptMapFile		},
         { "--module",           0,      OptModule               },
         { "--module-id",        1,      OptModuleId             },
+        { "--o65-model",        1,      OptO65Model             },
         { "--register-space",   1,      OptRegisterSpace        },
         { "--register-vars",    0,      OptRegisterVars         },
 	{ "--rodata-name",    	1, 	OptRodataName		},
@@ -1011,6 +1067,8 @@ int main (int argc, char* argv [])
 	{ "--target",	      	1,	OptTarget		},
 	{ "--verbose",	      	0,	OptVerbose		},
 	{ "--version",	      	0,	OptVersion		},
+       	{ "--zeropage-label",   1,     	OptZeropageLabel        },
+	{ "--zeropage-name",    1, 	OptZeropageName         },
     };
 
     unsigned I;
@@ -1061,8 +1119,7 @@ int main (int argc, char* argv [])
 
 		case 'D':
 		    /* Define a preprocessor symbol (compiler) */
-		    CmdAddArg (&CC65, "-D");
-		    CmdAddArg (&CC65, GetArg (&I, 2));
+		    CmdAddArg2 (&CC65, "-D", GetArg (&I, 2));
 		    break;
 
 		case 'I':
@@ -1073,8 +1130,7 @@ int main (int argc, char* argv [])
 	   	case 'L':
 		    if (Arg[2] == 'n') {
 		      	/* VICE label file (linker) */
-		      	CmdAddArg (&LD65, "-Ln");
-		      	CmdAddArg (&LD65, GetArg (&I, 3));
+		      	CmdAddArg2 (&LD65, "-Ln", GetArg (&I, 3));
 		    } else {
 	    	      	UnknownOption (Arg);
 		    }
@@ -1103,8 +1159,7 @@ int main (int argc, char* argv [])
 	   	case 'W':
 	   	    /* Suppress warnings - compiler and assembler */
 	   	    CmdAddArg (&CC65, "-W");
-	     	    CmdAddArg (&CA65, "-W");
-	   	    CmdAddArg (&CA65, "0");
+	     	    CmdAddArg2 (&CA65, "-W", "0");
 	   	    break;
 
 	   	case 'c':
@@ -1233,7 +1288,6 @@ int main (int argc, char* argv [])
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;
 }
-
 
 
 

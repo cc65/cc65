@@ -77,11 +77,20 @@ static void Usage (void)
        	     "  -V\t\t\tPrint the version number and exit\n"
 	     "\n"
 	     "Long options:\n"
-	     "  --dump-header\t\tDump the object file header\n"	  
+	     "  --dump-files\t\tDump the source files\n"
+	     "  --dump-header\t\tDump the object file header\n"
 	     "  --dump-options\t\tDump object file options\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --version\t\tPrint the version number and exit\n",
     	     ProgName);
+}
+
+
+
+static void OptDumpFiles (const char* Opt, const char* Arg)
+/* Dump the source files */
+{
+    What |= D_FILES;
 }
 
 
@@ -158,6 +167,9 @@ static void DumpFile (const char* Name)
 	if (What & D_OPTIONS) {
 	    DumpObjOptions (F, 0);
 	}
+	if (What & D_FILES) {
+	    DumpObjFiles (F, 0);
+	}
     }
 
     /* Close the file */
@@ -171,6 +183,7 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
+	{ "--dump-files",	0,	OptDumpFiles		},
 	{ "--dump-header",	0,	OptDumpHeader		},
 	{ "--dump-options",	0,	OptDumpOptions		},
 	{ "--help",		0,	OptHelp			},

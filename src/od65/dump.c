@@ -65,6 +65,25 @@ static void DumpObjHeaderSection (const char* Name,
 
 
 
+static char* TimeToStr (unsigned long Time)
+/* Convert the time into a string and return it */
+{
+    /* Get the time and convert to string */
+    time_t T = (time_t) Time;
+    char*  S = asctime (localtime (&T));
+
+    /* Remove the trailing newline */
+    unsigned Len = strlen (S);
+    if (Len > 0 && S[Len-1] == '\n') {
+	S[Len-1 ] = '\0';
+    }
+
+    /* Return the time string */
+    return S;
+}
+
+
+
 void DumpObjHeader (FILE* F, unsigned long Offset)
 /* Dump the header of the given object file */
 {
@@ -119,7 +138,6 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 /* Dump the file options */
 {
     ObjHeader H;
-    long     Size;
     unsigned Count;
     unsigned I;
 
@@ -137,7 +155,7 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 
     /* Read the number of options and print it */
     Count = Read16 (F);
-    printf ("    Count:                      %5u\n", Count);
+    printf ("    Count:%27u\n", Count);
 
     /* Read and print all options */
     for (I = 0; I < Count; ++I) {
@@ -175,7 +193,6 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 	     	ArgStr = ReadMallocedStr (F);
 	    	ArgLen = strlen (ArgStr);
 	     	printf ("      Data:%*s\"%s\"\n", 24-ArgLen, "", ArgStr);
-	     	Size -= 1 + ArgLen + 1;
 	     	xfree (ArgStr);
 	     	break;
 
@@ -184,11 +201,9 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 	     	printf ("      Data:%26lu", ArgNum);
 		if (Type == OPT_DATETIME) {
 		    /* Print the time as a string */
-		    time_t T = (time_t) ArgNum;
-   		    printf (" (%.24s)", asctime (localtime (&T)));
+   		    printf (" (%s)", TimeToStr (ArgNum));
 		}
 		printf ("\n");
-	     	Size -= 1 + 4;
 	     	break;
 
 	    default:
@@ -198,6 +213,53 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 	     	Error ("Unknown option type: 0x%02X", Type);
 	     	break;
 	}
+    }
+}
+
+
+
+void DumpObjFiles (FILE* F, unsigned long Offset)
+/* Dump the source files */
+{
+    ObjHeader H;
+    unsigned Count;
+    unsigned I;
+
+    /* Seek to the header position */
+    FileSeek (F, Offset);
+
+    /* Read the header */
+    ReadObjHeader (F, &H);
+
+    /* Seek to the start of the options */
+    FileSeek (F, Offset + H.FileOffs);
+
+    /* Output a header */
+    printf ("  Files:\n");
+
+    /* Read the number of files and print it */
+    Count = Read8 (F);
+    printf ("    Count:%27u\n", Count);
+
+    /* Read and print all options */
+    for (I = 0; I < Count; ++I) {
+
+	/* Read the data for one file */
+	unsigned long MTime = Read32 (F);
+	unsigned long Size  = Read32 (F);
+	char*	      Name  = ReadMallocedStr (F);
+	unsigned      Len   = strlen (Name);
+
+	/* Print the header */
+	printf ("    File %u:\n", I);
+
+	/* Print the data */
+	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name); 
+       	printf ("      Size:%26lu\n", Size);
+	printf ("      Modification time:%13lu (%s)\n", MTime, TimeToStr (MTime));
+
+	/* Free the Name */
+	xfree (Name);
     }
 }
 

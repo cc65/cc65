@@ -50,9 +50,12 @@
 
 void DumpObjHeader (FILE* F, unsigned long Offset);
 /* Dump the header of the given object file */
-	    
+
 void DumpObjOptions (FILE* F, unsigned long Offset);
 /* Dump the file options */
+
+void DumpObjFiles (FILE* F, unsigned long Offset);
+/* Dump the source files */
 
 
 

@@ -146,7 +146,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
 	"Character constant expected",
 	"Constant expression expected",
 	"Identifier expected",
-	"`.endmacro' expected",
+	"`.ENDMACRO' expected",
 	"Option key expected",
 	"`=' expected",
 	"Command is only valid in 65816 mode",

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -44,31 +44,32 @@
 
 
 /* File names */
-const char* InFile     	      = 0;      /* Name of input file */
-const char* OutFile    	      = 0;      /* Name of output file */
-const char* ListFile   	      = 0;     	/* Name of listing file */
+const char* InFile     	         = 0;   /* Name of input file */
+const char* OutFile    	         = 0;   /* Name of output file */
+const char* ListFile   	         = 0;   /* Name of listing file */
 
 /* Default extensions */
-const char ObjExt[]    	      = ".o";  	/* Default object extension */
-const char ListExt[]   	      = ".lst"; /* Default listing extension */
+const char ObjExt[]    	         = ".o";/* Default object extension */
+const char ListExt[]   	         = ".lst"; /* Default listing extension */
 
-char LocalStart	              = '@';  	/* This char starts local symbols */
+char LocalStart	                 = '@'; /* This char starts local symbols */
 
-unsigned char IgnoreCase      = 0;    	/* Ignore case on identifiers? */
-unsigned char AutoImport      = 0;    	/* Mark unresolveds as import */
-unsigned char SmartMode	      = 0;    	/* Smart mode */
-unsigned char DbgSyms	      = 0;    	/* Add debug symbols */
-unsigned char Listing  	      = 0;    	/* Create listing file */
-unsigned char LineCont	      = 0;    	/* Allow line continuation */
+unsigned char IgnoreCase         = 0;   /* Ignore case on identifiers? */
+unsigned char AutoImport         = 0;   /* Mark unresolveds as import */
+unsigned char SmartMode	         = 0;   /* Smart mode */
+unsigned char DbgSyms	         = 0;   /* Add debug symbols */
+unsigned char Listing  	         = 0;   /* Create listing file */
+unsigned char LineCont	         = 0;   /* Allow line continuation */
 
 /* Emulation features */
-unsigned char DollarIsPC      = 0;      /* Allow the $ symbol as current PC */
-unsigned char NoColonLabels   = 0;     	/* Allow labels without a colon */
-unsigned char LooseStringTerm = 0;	/* Allow ' as string terminator */
-unsigned char LooseCharTerm   = 0;	/* Allow " for char constants */
-unsigned char AtInIdents      = 0;	/* Allow '@' in identifiers */
-unsigned char DollarInIdents  = 0;  	/* Allow '$' in identifiers */
-unsigned char PCAssignment    = 0;	/* Allow "* = $XXX" or "$ = $XXX" */
+unsigned char DollarIsPC         = 0;   /* Allow the $ symbol as current PC */
+unsigned char NoColonLabels      = 0;   /* Allow labels without a colon */
+unsigned char LooseStringTerm    = 0;	/* Allow ' as string terminator */
+unsigned char LooseCharTerm      = 0;	/* Allow " for char constants */
+unsigned char AtInIdents         = 0;	/* Allow '@' in identifiers */
+unsigned char DollarInIdents     = 0;   /* Allow '$' in identifiers */
+unsigned char LeadingDotInIdents = 0;   /* Allow '.' to start an identifier */
+unsigned char PCAssignment       = 0;	/* Allow "* = $XXX" or "$ = $XXX" */
 
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -39,37 +39,38 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data			    	     */
+/*     	      	    		     Data   			    	     */
 /*****************************************************************************/
 
 
 
 /* File names */
-extern const char*	InFile;		/* Name of input file */
-extern const char*	OutFile;	/* Name of output file */
-extern const char*	ListFile;	/* Name of listing file */
+extern const char*     	InFile;	       	    /* Name of input file */
+extern const char*     	OutFile;       	    /* Name of output file */
+extern const char*     	ListFile;      	    /* Name of listing file */
 
 /* Default extensions */
-extern const char      	ObjExt[];      	/* Default object extension */
-extern const char	ListExt[]; 	/* Default listing extension */
+extern const char      	ObjExt[];      	    /* Default object extension */
+extern const char      	ListExt[];     	    /* Default listing extension */
 
-extern char		LocalStart;	/* This char starts local symbols */
+extern char    	       	LocalStart;    	    /* This char starts local symbols */
 
-extern unsigned char	IgnoreCase;	/* Ignore case on identifiers? */
-extern unsigned char	AutoImport;	/* Mark unresolveds as import */
-extern unsigned char	SmartMode;	/* Smart mode */
-extern unsigned char   	DbgSyms;	/* Add debug symbols */
-extern unsigned char	Listing;        /* Create listing file */
-extern unsigned char	LineCont;	/* Allow line continuation */
+extern unsigned char   	IgnoreCase;    	    /* Ignore case on identifiers? */
+extern unsigned char   	AutoImport;    	    /* Mark unresolveds as import */
+extern unsigned char   	SmartMode;     	    /* Smart mode */
+extern unsigned char   	DbgSyms;       	    /* Add debug symbols */
+extern unsigned char   	Listing;            /* Create listing file */
+extern unsigned char   	LineCont;      	    /* Allow line continuation */
 
 /* Emulation features */
-extern unsigned char   	DollarIsPC;	/* Allow the $ symbol as current PC */
-extern unsigned char	NoColonLabels;	/* Allow labels without a colon */
-extern unsigned char	LooseStringTerm;/* Allow ' as string terminator */
-extern unsigned char	LooseCharTerm;	/* Allow " for char constants */
-extern unsigned char    AtInIdents;	/* Allow '@' in identifiers */
-extern unsigned char	DollarInIdents;	/* Allow '$' in identifiers */
-extern unsigned char	PCAssignment;	/* Allow "* = $XXX" or "$ = $XXX" */
+extern unsigned char   	DollarIsPC;    	    /* Allow the $ symbol as current PC */
+extern unsigned char   	NoColonLabels; 	    /* Allow labels without a colon */
+extern unsigned char   	LooseStringTerm;    /* Allow ' as string terminator */
+extern unsigned char   	LooseCharTerm; 	    /* Allow " for char constants */
+extern unsigned char    AtInIdents;    	    /* Allow '@' in identifiers */
+extern unsigned char   	DollarInIdents;	    /* Allow '$' in identifiers */
+extern unsigned char    LeadingDotInIdents; /* Allow '.' to start an identifier */
+extern unsigned char   	PCAssignment;  	    /* Allow "* = $XXX" or "$ = $XXX" */
 
 
 

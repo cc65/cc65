@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -55,6 +55,7 @@ static const char* FeatureKeys[FEAT_COUNT] = {
     "loose_char_term",
     "at_in_identifiers",
     "dollar_in_identifiers",
+    "leading_dot_in_identifiers",
     "pc_assignment",
 };
 
@@ -98,15 +99,16 @@ feature_t SetFeature (const char* Key)
 
     /* Set the flags */
     switch (Feature) {
-     	case FEAT_DOLLAR_IS_PC:		 DollarIsPC	= 1;	break;
-     	case FEAT_LABELS_WITHOUT_COLONS: NoColonLabels	= 1;	break;
-     	case FEAT_LOOSE_STRING_TERM:	 LooseStringTerm= 1;	break;
-	case FEAT_LOOSE_CHAR_TERM:	 LooseCharTerm	= 1;	break;
-     	case FEAT_AT_IN_IDENTIFIERS:	 AtInIdents	= 1;	break;
-     	case FEAT_DOLLAR_IN_IDENTIFIERS: DollarInIdents	= 1;	break;
-     	case FEAT_PC_ASSIGNMENT:	 PCAssignment	= 1;	break;
-       	default:     			 /* Keep gcc silent */	break;
-    }								      
+     	case FEAT_DOLLAR_IS_PC:		      DollarIsPC	= 1;	break;
+     	case FEAT_LABELS_WITHOUT_COLONS:      NoColonLabels	= 1;	break;
+     	case FEAT_LOOSE_STRING_TERM:	      LooseStringTerm   = 1;	break;
+	case FEAT_LOOSE_CHAR_TERM:	      LooseCharTerm	= 1;	break;
+     	case FEAT_AT_IN_IDENTIFIERS:	      AtInIdents	= 1;	break;
+     	case FEAT_DOLLAR_IN_IDENTIFIERS:      DollarInIdents	= 1;	break;
+       	case FEAT_LEADING_DOT_IN_IDENTIFIERS: LeadingDotInIdents= 1;    break;
+     	case FEAT_PC_ASSIGNMENT:	      PCAssignment	= 1;	break;
+	default:     			 /* Keep gcc silent */	        break;
+    }
 
     /* Return the value found */
     return Feature;

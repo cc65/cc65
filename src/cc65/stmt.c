@@ -415,16 +415,18 @@ static void CascadeSwitch (ExprDesc* Expr)
 		    /* Emit a compare */
 		    g_cmp (Flags, Val);
 
-		    /* If another case follows, we will jump to the code if
-		     * the condition is true.
-		     */
-		    if (CurTok.Tok == TOK_CASE) {
+	    	    /* If another case follows after the colon (which is 
+		     * currently pending and cannot be skipped since otherwise
+		     * the debug infos will get wrong), we will jump to the 
+		     * code if the condition is true.
+	    	     */
+       	    	    if (NextTok.Tok == TOK_CASE) {
 		     	/* Create a code label if needed */
 		     	if (CodeLab == 0) {
 		     	    CodeLab = GetLocalLabel ();
 		     	}
 		     	g_falsejump (CF_NONE, CodeLab);
-		    } else if (CurTok.Tok != TOK_DEFAULT) {
+		    } else if (NextTok.Tok != TOK_DEFAULT) {
 		  	/* No case follows, jump to next selector */
 		  	if (NextLab == 0) {
 		  	    NextLab = GetLocalLabel ();

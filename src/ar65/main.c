@@ -122,7 +122,7 @@ int main (int argc, char* argv [])
 
 	    case 'V':
 		fprintf (stderr,
-			 "ar65 V%u.%u.%u - (C) Copyright 1998-1999 Ullrich von Bassewitz\n",
+			 "ar65 V%u.%u.%u - (C) Copyright 1998-2001 Ullrich von Bassewitz\n",
 			 VER_MAJOR, VER_MINOR, VER_PATCH);
 		break;
 

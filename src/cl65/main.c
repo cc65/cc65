@@ -867,7 +867,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print version number */
 {
     fprintf (stderr,
- 	     "cl65 V%u.%u.%u - (C) Copyright 1998-2000 Ullrich von Bassewitz\n",
+ 	     "cl65 V%u.%u.%u - (C) Copyright 1998-2002 Ullrich von Bassewitz\n",
  	     VER_MAJOR, VER_MINOR, VER_PATCH);
 }
 

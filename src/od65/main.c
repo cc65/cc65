@@ -201,7 +201,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the assembler version */
 {
     fprintf (stderr,
-       	     "%s V%u.%u.%u - (C) Copyright 2000 Ullrich von Bassewitz\n",
+       	     "%s V%u.%u.%u - (C) Copyright 2000-2002 Ullrich von Bassewitz\n",
        	     ProgName, VER_MAJOR, VER_MINOR, VER_PATCH);
 }
 

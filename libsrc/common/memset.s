@@ -21,19 +21,17 @@ _bzero:
 __bzero:
         sta     ptr3
         stx     ptr3+1          ; Save n
-        lda     #0
-        sta     tmp1            ; fill with zeros
+        lda     #0		; Fill with zeros
         beq     common
-
+	
 _memset:
  	sta	ptr3		; Save n
  	stx	ptr3+1
  	jsr	popax  	 	; Get c
-       	sta	tmp1		; Save c
 
 ; Common stuff for memset and bzero from here
 
-common:
+common:	sta	tmp1		; Save the fill value
         ldy     #1
         lda     (sp),y
         tax
@@ -49,10 +47,10 @@ common:
 
 ; Set 256 byte blocks
 
-L1:	sta	(ptr1),y	; Set one byte
+L1:    	.repeat 2		; Unroll this a bit to make it faster
+	sta	(ptr1),y	; Set one byte
   	iny
-	sta	(ptr1),y	; Unroll this a bit to make it faster
-	iny
+	.endrepeat
   	bne	L1
 	inc	ptr1+1
        	dex			; Next 256 byte block

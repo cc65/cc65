@@ -45,11 +45,10 @@
 
 
 
-/* The C16 is actually the Plus/4 with less memory, so use the Plus/4 
- * include file.
+/* Include the base header file for the 264 series. include file.
  */
-#ifndef _PLUS4_H
-#include <plus4.h>
+#ifndef _CBM264_H
+#include <cbm264.h>
 #endif
 
 

@@ -77,18 +77,12 @@ Functions that are limited in any way:
   supported).
 
 
-  <item>The va_... family of macros
-
-  The macros do not work completely as defined by the standard. Since cc65 has
-  the wrong calling order, the (non-standard) va_fix macro must be used to
-  access fixed parameters in functions with a variable parameter size. See
-  newvers.txt for a discussion of the problem.
-
   <item>strcspn/strpbrk/strspn
 
   These functions have a length limitation of 256 for the second string
   argument. Since this string gives a character set, and there are only 256
   distinct characters, this shouldn't be a problem.
+
 
   <item>getenv
 

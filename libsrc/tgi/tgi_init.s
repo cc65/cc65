@@ -25,10 +25,13 @@
 
         jsr     tgi_getdefpalette       ; Get the default palette into A/X
         sta     ptr1
-        stx     ptr1+1
-        ora     ptr1+1                  ; Do we have a default palette?
-        beq     @L1                     ; Jump if no
-        jsr     tgi_setpalette          ; Set the default palette
+        stx     ptr1+1                  ; Save it
+        jsr     tgi_geterror            ; Check for errors in getdefpalette
+        cmp     #TGI_ERR_OK
+        beq     @L1                     ; Jump if there is no default palette
+        jsr     tgi_setpalette          ; Set the default palette. Since we're
+                                        ; setting the default palette, we don't
+                                        ; expect errors here.
 
 ; Set the drawing color to the maximum color
 

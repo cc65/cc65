@@ -143,10 +143,6 @@ typedef struct {
     char    	Mnemo[4];	/* Mnemonic */
     opc_t   	OPC;   		/* Opcode */
     unsigned	Size;		/* Size, 0 means "check addressing mode" */
-####
-    unsigned char Use;
-    unsigned char Load;
-
     unsigned   	Info;		/* Usage flags */
 } OPCDesc;
 

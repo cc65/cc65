@@ -37,11 +37,9 @@
 #include "print.h"
 
 /* cc65 */
-#include "global.h"
-
-/* b6502 */
 #include "codeent.h"
 #include "codeinfo.h"
+#include "global.h"
 #include "codeopt.h"
 
 
@@ -117,7 +115,7 @@ static void OptDeadJumps (CodeSeg* S)
 
 static void OptDeadCode (CodeSeg* S)
 /* Remove dead code (code that follows an unconditional jump or an rts/rti
- * and has no label) 
+ * and has no label)
  */
 {
     unsigned I;

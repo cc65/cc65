@@ -41,10 +41,8 @@
 #include "check.h"
 
 /* cc65 */
-#include "error.h"
-
-/* b6502 */
 #include "codeinfo.h"
+#include "error.h"
 #include "opcodes.h"
 
 

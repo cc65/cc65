@@ -38,13 +38,11 @@
 #include "xmalloc.h"
 
 /* cc65 */
-#include "error.h"
-#include "global.h"
-
-/* b6502 */
 #include "codeinfo.h"
+#include "error.h"
 #include "funcinfo.h"
-#include "label.h"
+#include "global.h"
+#include "codelab.h"
 #include "opcodes.h"
 #include "codeent.h"
 

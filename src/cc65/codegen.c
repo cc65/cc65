@@ -43,14 +43,12 @@
 #include "xmalloc.h"
 #include "xsprintf.h"
 
-/* b6502 */
-#include "codeseg.h"
-#include "dataseg.h"
-
 /* cc65 */
 #include "asmcode.h"
-#include "asmlabel.h"
+#include "asmlabel.h"			      
+#include "codeseg.h"
 #include "cpu.h"
+#include "dataseg.h"
 #include "error.h"
 #include "global.h"
 #include "segname.h"
@@ -60,7 +58,7 @@
 
 
 /*****************************************************************************/
-/*	  			     Data				     */
+/*	  			     Data     				     */
 /*****************************************************************************/
 
 
@@ -74,7 +72,7 @@ segment_t CurSeg = SEG_INV;
 
 
 /*****************************************************************************/
-/*				    Helpers				     */
+/*				    Helpers   				     */
 /*****************************************************************************/
 
 

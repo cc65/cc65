@@ -45,11 +45,9 @@
 #include "xsprintf.h"
 
 /* cc65 */
-#include "error.h"
-
-/* b6502 */
 #include "codeent.h"
 #include "codeinfo.h"
+#include "error.h"
 #include "codeseg.h"
 
 

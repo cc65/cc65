@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    label.c				     */
+/*				   codelab.c				     */
 /*                                                                           */
 /*			     Code label structure			     */
 /*                                                                           */
@@ -36,9 +36,9 @@
 /* common */
 #include "xmalloc.h"
 
-/* b6502 */
-#include "codeent.h"	 
-#include "label.h"
+/* cc65 */	 
+#include "codeent.h"
+#include "codelab.h"
 
 
 

@@ -36,12 +36,10 @@
 /* common */
 #include "check.h"
 
-/* b6502 */
+/* cc65 */
 #include "codeopt.h"
 #include "codeseg.h"
 #include "dataseg.h"
-
-/* cc65 */
 #include "symtab.h"
 #include "asmcode.h"
 

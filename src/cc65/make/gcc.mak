@@ -11,11 +11,10 @@ EXE  	= cc65
 
 # Library directories
 COMMON	= ../common
-B6502	= b6502
 
 # Default for the compiler lib search path as compiler define
 CDEFS=-DCC65_INC=\"/usr/lib/cc65/include/\"
-CFLAGS = -O2 -g -Wall -I$(COMMON) -I$(B6502) $(CDEFS)
+CFLAGS = -O2 -g -Wall -I$(COMMON) $(CDEFS)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=
@@ -26,9 +25,14 @@ LDFLAGS=
 OBJS =	anonname.o	\
      	asmcode.o 	\
 	asmlabel.o	\
+	codeent.o	\
 	codegen.o 	\
+	codelab.o	\
+	codeopt.o	\
+	codeseg.o	\
 	compile.o 	\
 	cpu.o	  	\
+	dataseg.o	\
 	datatype.o	\
 	declare.o      	\
 	declattr.o	\
@@ -37,6 +41,7 @@ OBJS =	anonname.o	\
 	exprheap.o     	\
 	exprnode.o	\
 	funcdesc.o	\
+	funcinfo.o	\
 	function.o     	\
 	global.o 	\
 	goto.o	   	\
@@ -48,6 +53,7 @@ OBJS =	anonname.o	\
 	loop.o		\
 	macrotab.o	\
 	main.o		\
+	opcodes.o	\
 	preproc.o      	\
 	pragma.o       	\
 	scanner.o      	\
@@ -59,8 +65,7 @@ OBJS =	anonname.o	\
 	typecmp.o	\
 	util.o
 
-LIBS =	$(B6502)/b6502.a	\
-	$(COMMON)/common.a
+LIBS =	$(COMMON)/common.a
 
 
 # ------------------------------------------------------------------------------
@@ -76,15 +81,9 @@ all:	depend
 	@$(MAKE) -f make/gcc.mak all
 endif
 
-$(EXE):	$(OBJS) $(LIBS) subs
+$(EXE):	$(OBJS) $(LIBS)
 	$(CC) $(LDFLAGS) -o $(EXE) $(CFLAGS) $(OBJS) $(LIBS)
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
-
-.PHONY:	subs
-subs:
-	@for dir in $(COMMON) $(B6502); do   	     	\
-	    $(MAKE) -C $$dir -f make/gcc.mak || exit 1;	\
-	done						
 
 clean:
 	rm -f *~ core *.map
@@ -98,6 +97,6 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -I$(COMMON) -I$(B6502) -MM $^ > .depend
+	$(CC) -I$(COMMON) -MM $^ > .depend
 
 

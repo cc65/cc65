@@ -43,8 +43,8 @@
 /* common */
 #include "coll.h"
 
-/* b6502 */
-#include "label.h"
+/* cc65 */
+#include "codelab.h"
 #include "opcodes.h"
 
 

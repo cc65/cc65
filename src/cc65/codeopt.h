@@ -38,7 +38,7 @@
 
 
 
-/* b6502 */
+/* cc65 */
 #include "codeseg.h"
 
 

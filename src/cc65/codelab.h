@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    label.h				     */
+/*				   codelab.h				     */
 /*                                                                           */
 /*			     Code label structure			     */
 /*                                                                           */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef LABEL_H
-#define LABEL_H
+#ifndef CODELAB_H
+#define CODELAB_H
 
 
 
@@ -100,7 +100,7 @@ void OutputCodeLabel (FILE* F, const CodeLabel* L);
 
 
 
-/* End of label.h */
+/* End of codelab.h */
 #endif
 
 

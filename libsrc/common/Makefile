@@ -29,41 +29,42 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-C_OBJS =	_afailed.o	\
-		_hextab.o	\
-                _poserror.o     \
-		_scanf.o	\
-		abort.o		\
-                asctime.o       \
-		bsearch.o	\
-		errormsg.o	\
-		fdopen.o	\
-		fgetc.o		\
-		fgetpos.o	\
-		fgets.o		\
-		fputc.o		\
-		fputs.o		\
-		freopen.o	\
-		fseek.o		\
-		fsetpos.o	\
-		ftell.o		\
-		getchar.o	\
-		gets.o		\
-                gmtime.o        \
-		locale.o	\
-                localtime.o     \
-                mktime.o        \
-		perror.o	\
-		puts.o 		\
-		qsort.o		\
-		realloc.o	\
-		rewind.o	\
-                scanf.o         \
-		sleep.o		\
-                strftime.o      \
-		strxfrm.o	\
-		strtok.o	\
-                system.o        \
+C_OBJS =	_afailed.o	        \
+                _aligned_malloc.o       \
+		_hextab.o	        \
+                _poserror.o             \
+		_scanf.o	        \
+		abort.o		        \
+                asctime.o               \
+		bsearch.o	        \
+		errormsg.o	        \
+		fdopen.o	        \
+		fgetc.o		        \
+		fgetpos.o	        \
+		fgets.o		        \
+		fputc.o		        \
+		fputs.o		        \
+		freopen.o	        \
+		fseek.o		        \
+		fsetpos.o	        \
+		ftell.o		        \
+		getchar.o	        \
+		gets.o		        \
+                gmtime.o                \
+		locale.o	        \
+                localtime.o             \
+                mktime.o                \
+		perror.o	        \
+		puts.o 		        \
+		qsort.o		        \
+		realloc.o	        \
+		rewind.o	        \
+                scanf.o                 \
+		sleep.o		        \
+                strftime.o              \
+		strxfrm.o	        \
+		strtok.o	        \
+                system.o                \
                 timezone.o
 
 

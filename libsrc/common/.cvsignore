@@ -1,5 +1,6 @@
 *.lst
 _afailed.s
+_aligned_malloc.s
 _hextab.s
 _poserror.s
 _scanf.s

@@ -1667,7 +1667,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   Macro packages are explained in more detail in section <ref
-  id="macropackages" name="Macro packages">).
+  id="macropackages" name="Macro packages">.
 
 
 <sect1><tt>.MAC, .MACRO</tt><label id=".MAC"><p>
@@ -2155,7 +2155,7 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.TIME</tt><label id=".TIME"><p>
 
   Reading this pseudo variable will give a constant integer value that
-  represents the current time in POSIX standard (as seconds since the 
+  represents the current time in POSIX standard (as seconds since the
   Epoch).
 
   It may be used to encode the time of translation somewhere in the created

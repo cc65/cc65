@@ -134,6 +134,7 @@ static unsigned GetFileType (const char* File)
 	{   ".c",	FILETYPE_C	},
 	{   ".s",	FILETYPE_ASM	},
 	{   ".asm",	FILETYPE_ASM	},
+	{   ".a65",	FILETYPE_ASM	},
 	{   ".o",	FILETYPE_OBJ	},
 	{   ".obj",	FILETYPE_OBJ	},
 	{   ".a",	FILETYPE_LIB	},

@@ -144,6 +144,7 @@ S_OBJS = 	_cwd.o          \
                 time.o          \
 		tolower.o	\
 		toupper.o	\
+                uname.o         \
                 unlink.o        \
 		vfprintf.o	\
 		vprintf.o       \

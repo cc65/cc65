@@ -8,10 +8,10 @@
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 	.import		initlib, donelib
 	.import		callmain
-	.import		_EnterDeskTop
 	.import		zerobss
 	.importzp	sp
 	.export		_exit
+	.include	"../inc/jumptab.inc"
 
 ; ------------------------------------------------------------------------
 ; Create an empty LOWCODE segment to avoid linker warnings
@@ -47,4 +47,4 @@
 
 _exit:	jsr	donelib	 	; Run module destructors
 
-	jmp	_EnterDeskTop	; return control to the system
+	jmp	EnterDeskTop	; return control to the system

@@ -60,7 +60,7 @@ char* line = LineBuf;
 char* lptr = LineBuf;
 
 /* Maximum count of nested includes */
-#define MAX_INC_NESTING 	16
+#define MAX_INC_NESTING 	20
 
 /* Struct that describes an input file */
 typedef struct IFile IFile;

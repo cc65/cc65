@@ -21,12 +21,21 @@ __sys:	sta	ptr1
 	lda	(ptr1),y
 	sta	jmpvec+1
 
-; Get the flags, mask unnecessary bits and push them. Push a
+; Remember the flags so we can restore them to a known state after calling the
+; routine
 
-	dey
-	lda	(ptr1),y
-	and	#%11001111      ; Mask out break and unused flag
-	pha
+        php
+
+; Get the flags, keep the state of bit 4 and 5 using the other flags from
+; the flags value pased by the caller. Push the new flags and push A.
+
+ 	dey
+        php
+        pla                     ; Current flags -> A
+        eor     (ptr1),y
+        and     #%00110000
+        eor     (ptr1),y
+	pha                     ; Push new flags value
 	ldy	#0
 	lda	(ptr1),y
 	pha
@@ -46,7 +55,7 @@ __sys:	sta	ptr1
 	plp
 	jsr	jmpvec
 
-; Back from the routine. Save the flags and a
+; Back from the routine. Save the flags and A.
 
 	php
 	pha
@@ -65,6 +74,10 @@ __sys:	sta	ptr1
 	ldy	#3
 	pla
 	sta	(ptr1),y
+
+; Restore the old flags value
+
+        plp
 
 ; Done
 

@@ -397,6 +397,7 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
 /* Create a new code segment, initialize and return it */
 {
     unsigned I;
+    const type* RetType;
 
     /* Allocate memory */
     CodeSeg* S = xmalloc (sizeof (CodeSeg));
@@ -413,8 +414,13 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
     /* If we have a function given, get the return type of the function.
      * Assume ANY return type besides void will use the A and X registers.
      */
-    if (S->Func && !IsTypeVoid (GetFuncReturn (Func->Type))) {
-	S->ExitRegs = REG_AX;
+    RetType = GetFuncReturn (Func->Type);
+    if (S->Func && !IsTypeVoid (RetType)) {
+	if (SizeOf (RetType) == SizeOf (type_long)) {
+	    S->ExitRegs = REG_EAX;
+	} else {
+	    S->ExitRegs = REG_AX;
+	}
     } else {
 	S->ExitRegs = REG_NONE;
     }

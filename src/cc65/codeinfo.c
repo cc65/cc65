@@ -66,91 +66,94 @@ struct FuncInfo {
 };
 
 static const FuncInfo FuncInfoTable[] = {
-    { "addysp",	       	REG_Y, 	       	REG_NONE	                   },
-    { "aslax1",         REG_AX,	       	REG_AX | REG_TMP1		   },
-    { "aslax2",         REG_AX,		REG_AX | REG_TMP1		   },
-    { "aslax3",         REG_AX,		REG_AX | REG_TMP1		   },
-    { "aslax4",         REG_AX,		REG_AX | REG_TMP1		   },
-    { "bnega",          REG_A,          REG_AX				   },
-    { "bnegax",         REG_AX,         REG_AX				   },
-    { "bnegeax",        REG_EAX,        REG_EAX				   },
-    { "booleq",		REG_NONE,    	REG_AX				   },
-    { "boolge",		REG_NONE,	REG_AX				   },
-    { "boolgt",		REG_NONE,	REG_AX				   },
-    { "boolle",		REG_NONE,	REG_AX				   },
-    { "boollt",		REG_NONE,	REG_AX				   },
-    { "boolne",		REG_NONE,	REG_AX				   },
-    { "booluge",   	REG_NONE,	REG_AX				   },
-    { "boolugt",   	REG_NONE,	REG_AX				   },
-    { "boolule",   	REG_NONE,	REG_AX				   },
-    { "boolult",   	REG_NONE,	REG_AX				   },
-    { "complax",        REG_AX,         REG_AX				   },
-    { "decax1",     	REG_AX,		REG_AX				   },
-    { "decax2",     	REG_AX,		REG_AX				   },
-    { "decax3",     	REG_AX,		REG_AX				   },
-    { "decax4",     	REG_AX,		REG_AX				   },
-    { "decax5",     	REG_AX,		REG_AX				   },
-    { "decax6",     	REG_AX,		REG_AX				   },
-    { "decax7",     	REG_AX,		REG_AX				   },
-    { "decax8",     	REG_AX,		REG_AX				   },
-    { "decaxy",	   	REG_AXY,	REG_AX | REG_TMP1		   },
-    { "decsp1",        	REG_NONE,      	REG_Y				   },
-    { "decsp2",    	REG_NONE,	REG_A				   },
-    { "decsp3",    	REG_NONE,	REG_A				   },
-    { "decsp4",    	REG_NONE,	REG_A				   },
-    { "decsp5",    	REG_NONE,	REG_A				   },
-    { "decsp6",     	REG_NONE,	REG_A				   },
-    { "decsp7",    	REG_NONE,	REG_A				   },
-    { "decsp8",      	REG_NONE,	REG_A				   },
-    { "incax1",         REG_AX,         REG_AX				   },
-    { "incax2",         REG_AX,         REG_AX				   },
-    { "incsp1",		REG_NONE,	REG_NONE			   },
-    { "incsp2",	    	REG_NONE,	REG_Y				   },
-    { "incsp3",		REG_NONE,	REG_Y				   },
-    { "incsp4",		REG_NONE,	REG_Y				   },
-    { "incsp5",		REG_NONE,	REG_Y				   },
-    { "incsp6",		REG_NONE,	REG_Y				   },
-    { "incsp7",		REG_NONE,	REG_Y				   },
-    { "incsp8",	    	REG_NONE,	REG_Y				   },
-    { "ldaidx",         REG_AXY,        REG_AX | REG_PTR1		   },
-    { "ldauidx",        REG_AXY,        REG_AX | REG_PTR1		   },
-    { "ldax0sp",   	REG_Y,		REG_AX				   },
-    { "ldaxi",          REG_AX,         REG_AXY | REG_PTR1		   },
-    { "ldaxidx",        REG_AXY,        REG_AX | REG_PTR1		   },
-    { "ldaxysp",   	REG_Y,		REG_AX				   },
-    { "leaasp",         REG_A,          REG_AX				   },
-    { "negax",          REG_AX,         REG_AX				   },
-    { "pusha",	   	REG_A,		REG_Y				   },
-    { "pusha0",	       	REG_A,		REG_XY				   },
-    { "pushax",	   	REG_AX,		REG_Y				   },
-    { "pusheax",        REG_EAX,        REG_Y				   },
-    { "pushw0sp",  	REG_NONE,	REG_AXY				   },
-    { "pushwysp",  	REG_Y,		REG_AXY				   },
-    { "shlax1",         REG_AX,		REG_AX | REG_TMP1		   },
-    { "shlax2",         REG_AX,		REG_AX | REG_TMP1		   },
-    { "shlax3",         REG_AX,		REG_AX | REG_TMP1		   },
-    { "shlax4",         REG_AX,		REG_AX | REG_TMP1		   },
-    { "shrax1",         REG_AX,         REG_AX | REG_TMP1		   },
-    { "shrax2",         REG_AX,         REG_AX | REG_TMP1		   },
-    { "shrax3",         REG_AX,         REG_AX | REG_TMP1		   },
-    { "shrax4",         REG_AX,         REG_AX | REG_TMP1		   },
-    { "shreax1",        REG_EAX,        REG_AX | REG_TMP1		   },
-    { "shreax2",        REG_EAX,        REG_AX | REG_TMP1		   },
-    { "shreax3",        REG_EAX,        REG_AX | REG_TMP1		   },
-    { "shreax4",        REG_EAX,        REG_AX | REG_TMP1		   },
-    { "staspidx",       REG_A | REG_Y,  REG_Y | REG_TMP1 | REG_PTR1	   },
-    { "stax0sp",        REG_AX,         REG_Y				   },
-    { "tosicmp",       	REG_AX,	       	REG_AXY | REG_SREG		   },
-    { "tosdiva0",       REG_AX,	       	REG_ALL				   },
-    { "tosdivax",       REG_AX,	       	REG_ALL				   },
-    { "tosdiveax",      REG_EAX,       	REG_ALL				   },
-    { "tosmula0",       REG_AX,	       	REG_ALL				   },
-    { "tosmulax",       REG_AX,	       	REG_ALL				   },
-    { "tosmuleax",      REG_EAX,       	REG_ALL				   },
-    { "tosshreax",      REG_EAX,       	REG_EAXY | REG_PTR1 | REG_PTR2	   },
-    { "tosumula0",      REG_AX,	       	REG_ALL				   },
-    { "tosumulax",      REG_AX,	       	REG_ALL				   },
-    { "tosumuleax",     REG_EAX,       	REG_ALL				   },
+    { "addysp",	       	REG_Y, 	       	      REG_NONE	                     },
+    { "aslax1",         REG_AX,	       	      REG_AX | REG_TMP1		     },
+    { "aslax2",         REG_AX,	       	      REG_AX | REG_TMP1		     },
+    { "aslax3",         REG_AX,	       	      REG_AX | REG_TMP1		     },
+    { "aslax4",         REG_AX,	       	      REG_AX | REG_TMP1		     },
+    { "bnega",          REG_A,                REG_AX			     },
+    { "bnegax",         REG_AX,               REG_AX			     },
+    { "bnegeax",        REG_EAX,              REG_EAX			     },
+    { "booleq",	       	REG_NONE,      	      REG_AX			     },
+    { "boolge",	       	REG_NONE,      	      REG_AX			     },
+    { "boolgt",	       	REG_NONE,      	      REG_AX			     },
+    { "boolle",	       	REG_NONE,      	      REG_AX			     },
+    { "boollt",	       	REG_NONE,      	      REG_AX			     },
+    { "boolne",	       	REG_NONE,      	      REG_AX			     },
+    { "booluge",       	REG_NONE,      	      REG_AX			     },
+    { "boolugt",       	REG_NONE,      	      REG_AX			     },
+    { "boolule",       	REG_NONE,      	      REG_AX			     },
+    { "boolult",       	REG_NONE,      	      REG_AX			     },
+    { "complax",        REG_AX,               REG_AX			     },
+    { "decax1",        	REG_AX,	       	      REG_AX			     },
+    { "decax2",        	REG_AX,	       	      REG_AX			     },
+    { "decax3",        	REG_AX,	       	      REG_AX			     },
+    { "decax4",        	REG_AX,	       	      REG_AX			     },
+    { "decax5",        	REG_AX,	       	      REG_AX			     },
+    { "decax6",        	REG_AX,	       	      REG_AX			     },
+    { "decax7",        	REG_AX,	       	      REG_AX			     },
+    { "decax8",        	REG_AX,	       	      REG_AX			     },
+    { "decaxy",	       	REG_AXY,       	      REG_AX | REG_TMP1		     },
+    { "decsp1",        	REG_NONE,      	      REG_Y			     },
+    { "decsp2",        	REG_NONE,      	      REG_A			     },
+    { "decsp3",        	REG_NONE,      	      REG_A			     },
+    { "decsp4",        	REG_NONE,      	      REG_A			     },
+    { "decsp5",        	REG_NONE,      	      REG_A			     },
+    { "decsp6",        	REG_NONE,      	      REG_A			     },
+    { "decsp7",        	REG_NONE,      	      REG_A			     },
+    { "decsp8",        	REG_NONE,      	      REG_A			     },
+    { "incax1",         REG_AX,               REG_AX			     },
+    { "incax2",         REG_AX,               REG_AX			     },
+    { "incsp1",	       	REG_NONE,      	      REG_NONE			     },
+    { "incsp2",	       	REG_NONE,      	      REG_Y			     },
+    { "incsp3",	       	REG_NONE,      	      REG_Y			     },
+    { "incsp4",	       	REG_NONE,      	      REG_Y			     },
+    { "incsp5",	       	REG_NONE,      	      REG_Y			     },
+    { "incsp6",	       	REG_NONE,      	      REG_Y			     },
+    { "incsp7",	       	REG_NONE,      	      REG_Y			     },
+    { "incsp8",	       	REG_NONE,      	      REG_Y			     },
+    { "laddeq",		REG_EAXY | REG_PTR1,  REG_EAXY                       },
+    { "laddeq1",       	REG_Y | REG_PTR1,     REG_EAXY                       },
+    { "laddeqa",        REG_AY | REG_PTR1,    REG_EAXY                       },
+    { "ldaidx",         REG_AXY,              REG_AX | REG_PTR1		     },
+    { "ldauidx",        REG_AXY,              REG_AX | REG_PTR1		     },
+    { "ldax0sp",       	REG_Y, 	       	      REG_AX			     },
+    { "ldaxi",          REG_AX,               REG_AXY | REG_PTR1	     },
+    { "ldaxidx",        REG_AXY,              REG_AX | REG_PTR1		     },
+    { "ldaxysp",       	REG_Y, 	       	      REG_AX			     },
+    { "leaasp",         REG_A,                REG_AX			     },
+    { "negax",          REG_AX,               REG_AX			     },
+    { "pusha", 	       	REG_A, 	       	      REG_Y			     },
+    { "pusha0",	       	REG_A, 	       	      REG_XY			     },
+    { "pushax",	       	REG_AX,	       	      REG_Y			     },
+    { "pusheax",        REG_EAX,              REG_Y			     },
+    { "pushw0sp",      	REG_NONE,      	      REG_AXY			     },
+    { "pushwysp",      	REG_Y, 	       	      REG_AXY			     },
+    { "shlax1",         REG_AX,	       	      REG_AX | REG_TMP1		     },
+    { "shlax2",         REG_AX,	       	      REG_AX | REG_TMP1		     },
+    { "shlax3",         REG_AX,	       	      REG_AX | REG_TMP1		     },
+    { "shlax4",         REG_AX,	       	      REG_AX | REG_TMP1		     },
+    { "shrax1",         REG_AX,               REG_AX | REG_TMP1		     },
+    { "shrax2",         REG_AX,               REG_AX | REG_TMP1		     },
+    { "shrax3",         REG_AX,               REG_AX | REG_TMP1		     },
+    { "shrax4",         REG_AX,               REG_AX | REG_TMP1		     },
+    { "shreax1",        REG_EAX,              REG_AX | REG_TMP1		     },
+    { "shreax2",        REG_EAX,              REG_AX | REG_TMP1		     },
+    { "shreax3",        REG_EAX,              REG_AX | REG_TMP1		     },
+    { "shreax4",        REG_EAX,              REG_AX | REG_TMP1		     },
+    { "staspidx",       REG_A | REG_Y,        REG_Y | REG_TMP1 | REG_PTR1    },
+    { "stax0sp",        REG_AX,               REG_Y			     },
+    { "tosicmp",       	REG_AX,	       	      REG_AXY | REG_SREG	     },
+    { "tosdiva0",       REG_AX,	       	      REG_ALL			     },
+    { "tosdivax",       REG_AX,	       	      REG_ALL			     },
+    { "tosdiveax",      REG_EAX,       	      REG_ALL			     },
+    { "tosmula0",       REG_AX,	       	      REG_ALL			     },
+    { "tosmulax",       REG_AX,	       	      REG_ALL			     },
+    { "tosmuleax",      REG_EAX,       	      REG_ALL			     },
+    { "tosshreax",      REG_EAX,       	      REG_EAXY | REG_PTR1 | REG_PTR2 },
+    { "tosumula0",      REG_AX,	       	      REG_ALL			     },
+    { "tosumulax",      REG_AX,	       	      REG_ALL			     },
+    { "tosumuleax",     REG_EAX,       	      REG_ALL			     },
 };
 #define FuncInfoCount	(sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
@@ -166,13 +169,14 @@ static const ZPInfo ZPInfoTable[] = {
     {  	4,     	"ptr2",         REG_PTR2        },
     {  	4,     	"ptr3",         REG_PTR3        },
     {  	4,     	"ptr4",         REG_PTR4        },
-    {   7,      "regbank",      REG_NONE        },
-    {   7,      "regsave",      REG_NONE        },
-    {   2,      "sp",           REG_NONE        },
+    {   7,      "regbank",      REG_BANK        },
+    {   7,      "regsave",      REG_SAVE        },
+    {   2,      "sp",           REG_SP          },
     {   4,      "sreg",         REG_SREG        },
     {   4,      "tmp1",         REG_TMP1        },
     {   4,      "tmp2",         REG_TMP2        },
     {   4,      "tmp3",         REG_TMP3        },
+    {   4,      "tmp4",         REG_TMP4        },
 };
 #define ZPInfoCount    	(sizeof(ZPInfoTable) / sizeof(ZPInfoTable[0]))
 
@@ -263,39 +267,57 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
 
 
 
+static int CompareZPInfo (const void* Name, const void* Info)
+/* Compare function for bsearch */
+{
+    /* Cast the pointers to the correct data type */
+    const char* N   = (const char*) Name;
+    const ZPInfo* E = (const ZPInfo*) Info;
+
+    /* Do the compare. Be careful because of the length (Info may contain
+     * more than just the zeropage name).
+     */
+    int Res = strncmp (N, E->Name, E->Len);
+    if (Res == 0 && (N[E->Len] != '\0' && N[E->Len] != '+')) {
+	/* Name is actually longer than Info->Name */
+	Res = -1;
+    }
+    return Res;
+}
+
+
+
 int IsZPName (const char* Name, unsigned short* RegInfo)
 /* Return true if the given name is a zero page symbol. If the RegInfo
  * pointer is not NULL, it is filled with the register info for the
  * zero page location found.
  */
 {
-    unsigned I;
-    const ZPInfo* Info;
+    /* Search for the zp location in the list */
+    const ZPInfo* Info = bsearch (Name, ZPInfoTable, ZPInfoCount,
+				  sizeof(ZPInfo), CompareZPInfo);
 
-    /* Because of the low number of symbols, we do a linear search here */
-    for (I = 0, Info = ZPInfoTable; I < ZPInfoCount; ++I, ++Info) {
-       	if (strncmp (Name, Info->Name, Info->Len) == 0 &&
- 	    (Name[Info->Len] == '\0' || Name[Info->Len] == '+')) {
- 	    /* Found */
-	    if (RegInfo) {
-		*RegInfo = Info->RegInfo;
-	    }
- 	    return 1;
- 	}
+    /* Did we find it? */
+    if (Info) {
+     	/* Found, store register info if requested. */
+     	if (RegInfo) {
+     	    *RegInfo = Info->RegInfo;
+     	}
+     	return 1;
+    } else {
+     	/* Not found */
+     	return 0;
     }
-
-    /* Not found */
-    return 0;
 }
 
 
 
 static unsigned GetRegInfo1 (CodeSeg* S,
- 		      	     CodeEntry* E,
- 		   	     int Index,
- 		     	     Collection* Visited,
-		     	     unsigned Used,
-		     	     unsigned Unused);
+       		      	     CodeEntry* E,
+       		   	     int Index,
+       		     	     Collection* Visited,
+       		     	     unsigned Used,
+       		     	     unsigned Unused);
 /* Recursively called subfunction for GetRegInfo. */
 
 

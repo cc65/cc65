@@ -80,7 +80,7 @@ struct CodeSeg {
     Collection	    Entries;	  		/* List of code entries */
     Collection	    Labels;	  		/* Labels for next insn */
     CodeLabel* 	    LabelHash [CS_LABEL_HASH_SIZE]; /* Label hash table */
-    unsigned char   ExitRegs;			/* Register use on exit */
+    unsigned short  ExitRegs;			/* Register use on exit */
 };
 
 

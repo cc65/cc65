@@ -163,12 +163,18 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 	    case AM65_ABSX:
 	    case AM65_ABSY:
 	        if (IsZPName (E->Arg, &Use) && Use != REG_NONE) {
-		    if (E->OPC == OP65_INC || E->OPC == OP65_DEC) {
+		    if (E->OPC == OP65_ASL || E->OPC == OP65_DEC ||
+			E->OPC == OP65_INC || E->OPC == OP65_LSR ||
+			E->OPC == OP65_ROL || E->OPC == OP65_ROR ||
+			E->OPC == OP65_TRB || E->OPC == OP65_TSB) {
+			/* The zp loc is both, input and output */
 			E->Chg |= Use;
 			E->Use |= Use;
 		    } else if ((E->Info & OF_STORE) != 0) {
+			/* Just output */
 			E->Chg |= Use;
 		    } else {
+			/* Input only */
 			E->Use |= Use;
 		    }
 		}
@@ -182,7 +188,7 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 		    E->Use |= Use;
 		}
 	        break;
-	    
+
 	    default:
 	        /* Keep gcc silent */
 	        break;
@@ -718,39 +724,23 @@ static char* RegInfoDesc (unsigned U, char* Buf)
 /* Return a string containing register info */
 {
     Buf[0] = '\0';
-    if (U & REG_SREG) {
-    	strcat (Buf, "E");
-    }
-    if (U & REG_A) {
-	strcat (Buf, "A");
-    }
-    if (U & REG_X) {
-    	strcat (Buf, "X");
-    }
-    if (U & REG_Y) {
-    	strcat (Buf, "Y");
-    }
-    if (U & REG_TMP1) {
-    	strcat (Buf, "T1");
-    }
-    if (U & REG_TMP2) {
-    	strcat (Buf, "T2");
-    }
-    if (U & REG_TMP3) {
-    	strcat (Buf, "T3");
-    }
-    if (U & REG_PTR1) {
-    	strcat (Buf, "P1");
-    }
-    if (U & REG_PTR2) {
-    	strcat (Buf, "P2");
-    }
-    if (U & REG_PTR3) {
-    	strcat (Buf, "P3");
-    }
-    if (U & REG_PTR4) {
-    	strcat (Buf, "P4");
-    }
+
+    strcat (Buf, U & REG_SREG? "E" : "_");
+    strcat (Buf, U & REG_A?    "A" : "_");
+    strcat (Buf, U & REG_X?    "X" : "_");
+    strcat (Buf, U & REG_Y?    "Y" : "_");
+    strcat (Buf, U & REG_SP?   "S" : "_");
+    strcat (Buf, U & REG_TMP1? "T1" : "__");
+    strcat (Buf, U & REG_TMP2? "T2" : "__");
+    strcat (Buf, U & REG_TMP3? "T3" : "__");
+    strcat (Buf, U & REG_TMP4? "T4" : "__");
+    strcat (Buf, U & REG_PTR1? "1" : "_");
+    strcat (Buf, U & REG_PTR2? "2" : "_");
+    strcat (Buf, U & REG_PTR3? "3" : "_");
+    strcat (Buf, U & REG_PTR4? "4" : "_");
+    strcat (Buf, U & REG_SAVE? "V"  : "_");
+    strcat (Buf, U & REG_BANK? "B" : "_");
+
     return Buf;
 }
 
@@ -844,7 +834,7 @@ void CE_Output (const CodeEntry* E, FILE* F)
 	char Use [128];
 	char Chg [128];
        	fprintf (F,
-       	       	 "%*s; USE: %-18s CHG: %-18s SIZE: %u\n",
+       	       	 "%*s; USE: %-19s CHG: %-19s SIZE: %u\n",
        	       	 30-Chars, "",
 		 RegInfoDesc (E->Use, Use),
 		 RegInfoDesc (E->Chg, Chg),

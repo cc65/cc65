@@ -62,7 +62,8 @@ More special thanks to:
 
   * Groepaz <groepaz@gmx.net>
 
-    Thanks for several nice samples programs and a lot of other code.
+    Thanks for several nice samples programs, the NES port, and a lot of other
+    code.
 
   * Craig Bruce
 
@@ -83,12 +84,12 @@ More special thanks to:
 
   * Greg King <gngking@erols.com>
 
-    reported lots of bugs and contributed several code snippets.
+    reported quite some bugs and helped with lots of code and suggestions.
 
   * MagerValp <magervalp@cling.gu.se>
 
-    for sample code regarding the Plus/4 banking and the base for the new
-    C128 conio library supporting 80 column mode.
+    for sample code regarding the Plus/4 banking, the base for the new C128
+    conio library supporting 80 column mode and much more.
 
   * Piotr Fusik <P.Fusik@elka.pw.edu.pl>
 
@@ -110,6 +111,10 @@ More special thanks to:
   * Peter Trauner <peter.trauner@utanet.at>
 
     Peter added minimal Supervision support.
+
+  * The Lynx guys: Bastian Schick, who contributed the code from his own,
+    lynx-only version of cc65, and Karri Kaksonen <karri@sipo.fi> and Shawn
+    Jefferson <jefferson_shawn_a8bit@yahoo.com> who built on this foundation.
 
 
 

@@ -698,8 +698,8 @@ static void PreprocessLine (void)
     int Done = Pass1 (line, mline);
 
     /* Repeatedly expand macros in the line */
-    for (I = 0; I < 5; ++I) {
-	/* Swap mline and line */
+    for (I = 0; I < 256; ++I) {
+     	/* Swap mline and line */
         SwapLineBuffers ();
       	if (Done) {
       	    break;

@@ -243,8 +243,28 @@ function.
 
 <sect1><tt/serial.h/<label id="serial.h"><p>
 
+<!--
+<itemize>
+<item><ref id="ser_load_driver" name="ser_load_driver">
+<item><ref id="ser_unload" name="ser_unload">
+<item><ref id="ser_install" name="ser_install">
+<item><ref id="ser_uninstall" name="ser_uninstall">
+<item><ref id="ser_open" name="ser_open">
+<item><ref id="ser_close" name="ser_close">
+<item><ref id="ser_get" name="ser_get">
+<item><ref id="ser_put" name="ser_put">
+<item><ref id="ser_status" name="ser_status">
+<item><ref id="ser_ioctl" name="ser_ioctl">
+</itemize>
+-->
+
 
 <sect1><tt/setjmp.h/<label id="setjmp.h"><p>
+
+<itemize>
+<item><ref id="setjmp" name="setjmp">
+<item><ref id="longjmp" name="longjmp">
+</itemize>
 
 
 <sect1><tt/signal.h/<label id="signal.h"><p>
@@ -2693,6 +2713,33 @@ always be the same.
 </quote>
 
 
+<sect1>longjmp<label id="longjmp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Non local goto.
+<tag/Header/<tt/<ref id="setjmp.h" name="setjmp.h">/
+<tag/Declaration/<tt/void __fastcall__ longjmp (jmp_buf buf, int retval);/
+<tag/Description/The <tt/longjmp/ function restores a program context from the
+data in <tt/buf/, which must have been set by a preceeding call to
+<tt/<ref id="setjmp" name="setjmp">/. Program execution continues as if the
+call to <tt/<ref id="setjmp" name="setjmp">/ has just returned the value
+<tt/retval/.
+<tag/Limits/
+<itemize>
+<item>If the parameter <tt/retval/ is zero, the function will behave as if it
+was called with a value of one.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="setjmp" name="setjmp">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>malloc<label id="malloc"><p>
 
 <quote>
@@ -3195,6 +3242,31 @@ the program terminates.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="reset_brk" name="reset_brk">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>setjmp<label id="setjmp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Save the context for use with <tt/longjmp/.
+<tag/Header/<tt/<ref id="setjmp.h" name="setjmp.h">/
+<tag/Declaration/<tt/int __fastcall__ setjmp (jmp_buf buf);/
+<tag/Description/The <tt/setjmp/ function saves the current context in <tt/buf/
+for subsequent use by the <tt/<ref id="longjmp" name="longjmp">/ function and
+returns zero.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item><tt/setjmp/ is actually a macro as required by the ISO standard.
+<item><tt/setjmp/ will not save the signal context.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="longjmp" name="longjmp">
 <tag/Example/None.
 </descrip>
 </quote>

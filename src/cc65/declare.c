@@ -659,7 +659,7 @@ static void ParseAnsiParamList (FuncDesc* F)
     	    Spec.StorageClass &= ~SC_DEF;
     	}
 
-	/* Parse an attribute */
+	/* Parse an attribute ### */
 	ParseAttribute (&Decl, &Attr);
 
 	/* Create a symbol table entry */

@@ -1010,7 +1010,7 @@ static int arrayref (int k, struct expent* lval)
        	     * if necessary and the second one is a pointer).
 	     * Note: If ConstBaseAddr is true, we don't have a value on
 	     * stack, so to "swap" both, just push the subscript.
-	     */
+    	     */
 	    if (ConstBaseAddr) {
 	    	g_push (CF_INT, 0);
 	    	exprhs (CF_NONE, k, lval);
@@ -1047,7 +1047,7 @@ static int arrayref (int k, struct expent* lval)
 	    rflags = lval2.e_flags & ~E_MCTYPE;
 	    ConstSubAddr = (rflags == E_MCONST)       || /* Constant numeric address */
        	       	       	    (rflags & E_MGLOBAL) != 0 || /* Static array, or ... */
-	    		    rflags == E_MLOCAL;      	 /* Local array */
+	    	    	    rflags == E_MLOCAL;      	 /* Local array */
 
        	    if (ConstSubAddr && SizeOf (lval->e_tptr) == 1) {
 
@@ -1055,7 +1055,7 @@ static int arrayref (int k, struct expent* lval)
 
 	    	/* Reverse the order of evaluation */
 	    	unsigned flags = (SizeOf (lval2.e_tptr) == 1)? CF_CHAR : CF_INT;
-	     	RemoveCode (Mark2);
+    	     	RemoveCode (Mark2);
 
 	    	/* Get a pointer to the array into the primary. We have changed
 	    	 * e_tptr above but we need the original type to load the
@@ -1411,7 +1411,6 @@ static int typecast (struct expent* lval)
 {
     int k;
     type Type[MAXTYPELEN];
-    unsigned rflags;
 
     /* Skip the left paren */
     NextToken ();
@@ -1425,19 +1424,69 @@ static int typecast (struct expent* lval)
     /* Read the expression we have to cast */
     k = hie10 (lval);
 
-    /* Get the type of the expression and honor constant values */
-    rflags = TypeOf (lval->e_tptr);
-    if (lval->e_flags & E_MCONST) {
-	rflags |= CF_CONST;
+    /* Check for a const expression */
+    if (k == 0 && lval->e_flags == E_MCONST) {
+
+	/* A cast of a constant to something else. If the new type is an int,
+	 * be sure to handle the size extension correctly. If the new type is
+	 * not an int, the cast is implementation specific anyway, so leave
+	 * the value alone.
+	 */
+	if (IsClassInt (Type)) {
+
+	    /* Get the current and new size of the value */
+	    unsigned OldSize = SizeOf (lval->e_tptr);
+	    unsigned NewSize = SizeOf (Type);
+	    unsigned OldBits = OldSize * 8;
+	    unsigned NewBits = NewSize * 8;
+
+	    /* Check if the new datatype will have a smaller range */
+	    if (NewSize < OldSize) {
+
+	     	/* Cut the value to the new size */
+	     	lval->e_const &= (0xFFFFFFFFUL >> (32 - NewBits));
+
+		/* If the new value is signed, sign extend the value */
+		if (!IsSignUnsigned (Type)) {
+		    lval->e_const |= ((~0L) << NewBits);
+		}
+
+	    } else if (NewSize > OldSize) {
+
+		/* Sign extend the value if needed */
+	     	if (!IsSignUnsigned (Type) && !IsSignUnsigned (lval->e_tptr)) {
+	     	    if (lval->e_const & (0x01UL << (OldBits-1))) {
+	     		lval->e_const |= ((~0L) << OldBits);
+	     	    }
+	     	}
+	    }
+	}
+
+    } else {
+
+	/* Not a constant. Be sure to ignore casts to void */
+	if (!IsTypeVoid (Type)) {
+
+	    /* If the size does not change, leave the value alone. Otherwise,
+	     * we have to load the value into the primary and generate code to
+	     * cast teh value in the primary register.
+	     */
+	    if (SizeOf (Type) != SizeOf (lval->e_tptr)) {
+
+		/* Load the value into the primary */
+		exprhs (CF_NONE, k, lval);
+
+		/* Mark the lhs as const to avoid a manipulation of TOS */
+		g_typecast (TypeOf (Type) | CF_CONST, TypeOf (lval->e_tptr));
+
+		/* Value is now in primary */
+		lval->e_flags = E_MEXPR;
+       	       	k = 0;
+	    }
+	}
     }
 
-    /* Do the actual cast. Special handling for void casts */
-    if (!IsTypeVoid (Type)) {
-	/* Mark the lhs as const to avoid a manipulation of TOS */
-        g_typecast (TypeOf (Type) | CF_CONST, rflags);
-    }
-
-    /* Use the new type */
+    /* In any case, use the new type */
     lval->e_tptr = TypeDup (Type);
 
     /* Done */
@@ -2816,7 +2865,7 @@ int hie0 (struct expent *lval)
     k = hie1 (lval);
     while (curtok == TOK_COMMA) {
     	NextToken ();
-    	k = hie1 (lval);
+     	k = hie1 (lval);
     }
     return k;
 }
@@ -2835,10 +2884,10 @@ int evalexpr (unsigned flags, int (*f) (struct expent*), struct expent* lval)
     /* Evaluate */
     k = f (lval);
     if (k == 0 && lval->e_flags == E_MCONST) {
-    	/* Constant expression */
-    	return 0;
+     	/* Constant expression */
+     	return 0;
     } else {
-    	/* Not constant, load into the primary */
+     	/* Not constant, load into the primary */
         exprhs (flags, k, lval);
      	return 1;
     }

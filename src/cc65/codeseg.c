@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -183,41 +183,6 @@ static void CS_RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
 
 
 
-static CodeLabel* CS_AddLabelInternal (CodeSeg* S, const char* Name,
-		  		       void (*ErrorFunc) (const char*, ...))
-/* Add a code label for the next instruction to follow */
-{
-    /* Calculate the hash from the name */
-    unsigned Hash = HashStr (Name) % CS_LABEL_HASH_SIZE;
-
-    /* Try to find the code label if it does already exist */
-    CodeLabel* L = CS_FindLabel (S, Name, Hash);
-
-    /* Did we find it? */
-    if (L) {
-     	/* We found it - be sure it does not already have an owner */
-	if (L->Owner) {
-	    ErrorFunc ("ASM label `%s' is already defined", Name);
-	}
-    } else {
-     	/* Not found - create a new one */
-     	L = CS_NewCodeLabel (S, Name, Hash);
-    }
-
-    /* Safety. This call is quite costly, but safety is better */
-    if (CollIndex (&S->Labels, L) >= 0) {
-	ErrorFunc ("ASM label `%s' is already defined", Name);
-    }
-
-    /* We do now have a valid label. Remember it for later */
-    CollAppend (&S->Labels, L);
-
-    /* Return the label */
-    return L;
-}
-
-
-
 /*****************************************************************************/
 /*		      Functions for parsing instructions		     */
 /*****************************************************************************/
@@ -297,7 +262,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	L = SkipSpace (L+1);
 
 	/* Add the label */
-	CS_AddLabelInternal (S,	Mnemo, Error);
+	CS_AddLabel (S,	Mnemo);
 
 	/* If we have reached end of line, bail out, otherwise a mnemonic
 	 * may follow.
@@ -422,7 +387,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 			    AM = AM65_ZPX;
 			} else {
 			    AM = AM65_ABSX;
-			}
+	    		}
 		    } else if (Reg == 'Y') {
    		     	AM = AM65_ABSY;
 		    } else {
@@ -783,7 +748,35 @@ int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count)
 CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
 /* Add a code label for the next instruction to follow */
 {
-    return CS_AddLabelInternal (S, Name, Internal);
+    /* Calculate the hash from the name */
+    unsigned Hash = HashStr (Name) % CS_LABEL_HASH_SIZE;
+
+    /* Try to find the code label if it does already exist */
+    CodeLabel* L = CS_FindLabel (S, Name, Hash);
+
+    /* Did we find it? */
+    if (L) {
+     	/* We found it - be sure it does not already have an owner */
+    	if (L->Owner) {
+       	    Error ("ASM label `%s' is already defined", Name);
+            return L;
+    	}
+    } else {
+     	/* Not found - create a new one */
+     	L = CS_NewCodeLabel (S, Name, Hash);
+    }
+
+    /* Safety. This call is quite costly, but safety is better */
+    if (CollIndex (&S->Labels, L) >= 0) {
+       	Error ("ASM label `%s' is already defined", Name);
+        return L;
+    }
+
+    /* We do now have a valid label. Remember it for later */
+    CollAppend (&S->Labels, L);
+
+    /* Return the label */
+    return L;
 }
 
 

@@ -1160,7 +1160,7 @@ unsigned ParseAddrSize (void)
     switch (GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]))) {
         case 0:
         case 1:
-        case 2: return ADDR_SIZE_FAR;
+        case 2: return ADDR_SIZE_ZP;
         case 3:
         case 4:
         case 5: return ADDR_SIZE_ABS;

@@ -39,13 +39,15 @@
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/* 				     Data				     */
 /*****************************************************************************/
 
 
 
 typedef enum attr_t attr_t;
 enum attr_t {
+
+    /* Styles */
     atDefault	= 0x00,		/* Default style */
     atCode	= 0x01,
     atIllegal	= 0x02,
@@ -55,13 +57,20 @@ enum attr_t {
     atAddrTab	= 0x06,
     atRtsTab	= 0x07,
 
-    atStyleMask = 0x0F		/* Output style */
+    /* Label flags */
+    atNoLabel	= 0x00,		/* No label for this address */
+    atExtLabel	= 0x10,		/* External label */
+    atIntLabel  = 0x20,		/* Internally generated label */
+    atDepLabel	= 0x30,		/* Dependent label (always extern) */
+
+    atStyleMask = 0x0F,		/* Output style */
+    atLabelMask = 0x30		/* Label information */
 };
 
 
 
 /*****************************************************************************/
-/*				     Code	   			     */
+/* 				     Code	   			     */
 /*****************************************************************************/
 
 
@@ -77,17 +86,25 @@ const char* MakeLabelName (unsigned Addr);
  * static buffer.
  */
 
-void AddLabel (unsigned Addr, const char* Name);
+void AddLabel (unsigned Addr, attr_t Attr, const char* Name);
 /* Add a label */
 
 int HaveLabel (unsigned Addr);
 /* Check if there is a label for the given address */
 
-const char* GetLabel (unsigned Addr);
-/* Return the label for an address */
+int MustDefLabel (unsigned Addr);
+/* Return true if we must define a label for this address, that is, if there
+ * is a label at this address, and it is an external or internal label.
+ */
 
-unsigned char GetStyle (unsigned Addr);
+const char* GetLabel (unsigned Addr);
+/* Return the label for an address or NULL if there is none */
+
+unsigned char GetStyleAttr (unsigned Addr);
 /* Return the style attribute for the given address */
+
+unsigned char GetLabelAttr (unsigned Addr);
+/* Return the label attribute for the given address */
 
 void DefOutOfRangeLabels (void);
 /* Output any labels that are out of the loaded code range */

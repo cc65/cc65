@@ -78,6 +78,7 @@ void OH_AbsoluteXIndirect (const OpcDesc*);
 /* Handlers for special instructions */
 void OH_Rts (const OpcDesc*);
 void OH_JmpAbsolute (const OpcDesc*);
+void OH_JmpAbsoluteIndirect (const OpcDesc* D);
 
 
 

@@ -121,16 +121,16 @@ const char* MakeLabelName (unsigned Addr)
 
 
 
-void AddLabel (unsigned Addr, const char* Name)
+void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
 /* Add a label */
 {
-    /* Check the given address */
-    AddrCheck (Addr);
+    /* Get an existing label attribute */
+    attr_t ExistingAttr = GetLabelAttr (Addr);
 
     /* Must not have two symbols for one address */
-    if (SymTab[Addr] != 0) {
-	if (strcmp (SymTab[Addr], Name) == 0) {
-	    /* Allow label if it has the same name */
+    if (ExistingAttr != atNoLabel) {
+	/* Allow redefinition if identical */
+       	if (ExistingAttr == Attr && strcmp (SymTab[Addr], Name) == 0) {
 	    return;
 	}
 	Error ("Duplicate label for address %04X: %s/%s", Addr, SymTab[Addr], Name);
@@ -138,6 +138,9 @@ void AddLabel (unsigned Addr, const char* Name)
 
     /* Create a new label */
     SymTab[Addr] = xstrdup (Name);
+
+    /* Remember the attribute */
+    AttrTab[Addr] |= Attr;
 }
 
 
@@ -154,6 +157,20 @@ int HaveLabel (unsigned Addr)
 
 
 
+int MustDefLabel (unsigned Addr)
+/* Return true if we must define a label for this address, that is, if there
+ * is a label at this address, and it is an external or internal label.
+ */
+{
+    /* Get the label attribute */
+    attr_t A = GetLabelAttr (Addr);
+
+    /* Check for an internal or external label */
+    return (A == atExtLabel || A == atIntLabel);
+}
+
+
+
 const char* GetLabel (unsigned Addr)
 /* Return the label for an address */
 {
@@ -166,7 +183,7 @@ const char* GetLabel (unsigned Addr)
 
 
 
-unsigned char GetStyle (unsigned Addr)
+unsigned char GetStyleAttr (unsigned Addr)
 /* Return the style attribute for the given address */
 {
     /* Check the given address */
@@ -174,6 +191,18 @@ unsigned char GetStyle (unsigned Addr)
 
     /* Return the attribute */
     return (AttrTab[Addr] & atStyleMask);
+}
+
+
+
+unsigned char GetLabelAttr (unsigned Addr)
+/* Return the label attribute for the given address */
+{
+    /* Check the given address */
+    AddrCheck (Addr);
+
+    /* Return the attribute */
+    return (AttrTab[Addr] & atLabelMask);
 }
 
 
@@ -198,14 +227,14 @@ void DefOutOfRangeLabels (void)
 
     /* Low range */
     for (Addr = 0; Addr < CodeStart; ++Addr) {
-	if (SymTab [Addr]) {
+	if (MustDefLabel (Addr)) {
 	    DefineConst (Addr);
 	}
     }
 
     /* High range */
     for (Addr = CodeEnd+1; Addr < 0x10000; ++Addr) {
-	if (SymTab [Addr]) {
+	if (MustDefLabel (Addr)) {
 	    DefineConst (Addr);
 	}
     }

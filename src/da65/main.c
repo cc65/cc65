@@ -174,9 +174,8 @@ static void OneOpcode (unsigned RemainingBytes)
     const OpcDesc* D = &OpcTable[OPC];
 
     /* If we have a label at this address, output the label */
-    const char* Label = GetLabel (PC);
-    if (Label) {
-    	DefLabel (Label);
+    if (MustDefLabel (PC)) {
+	DefLabel (GetLabel (PC));
     }
 
     /* Check...
@@ -185,7 +184,7 @@ static void OneOpcode (unsigned RemainingBytes)
      *   - ...if there is no label somewhere between the instruction bytes.
      * If any of these conditions is true, switch to data mode.
      */
-    if (GetStyle (PC) == atDefault) {
+    if (GetStyleAttr (PC) == atDefault) {
 	if (D->Size > RemainingBytes) {
 	    MarkAddr (PC, atIllegal);
        	} else if ((D->CPU & CPU) != CPU) {
@@ -202,7 +201,7 @@ static void OneOpcode (unsigned RemainingBytes)
     }
 
     /* Disassemble the line */
-    switch (GetStyle (PC)) {
+    switch (GetStyleAttr (PC)) {
 
 	case atDefault:
 	case atCode:
@@ -224,6 +223,10 @@ static void OneOpcode (unsigned RemainingBytes)
 
 	case atAddrTab:
 	    AddrTable ();
+	    break;
+
+	case atRtsTab:
+	    RtsTable ();
 	    break;
 
 	default:

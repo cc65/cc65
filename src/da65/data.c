@@ -61,7 +61,7 @@ static unsigned GetSpan (attr_t Style)
      */
     unsigned Count = 1;
     while (Count < RemainingBytes) {
-	if (HaveLabel(PC+Count) || GetStyle (PC+Count) != Style) {
+	if (MustDefLabel(PC+Count) || GetStyleAttr (PC+Count) != Style) {
 	    break;
      	}
 	++Count;
@@ -80,6 +80,15 @@ static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (u
 
     /* Count how many bytes may be output. */
     unsigned Count = GetSpan (Style);
+
+    /* If the count is less than the member size, print a row of Count data
+     * bytes. We assume here that there is no member with a size that is less
+     * than BytesPerLine.
+     */
+    if (Count < MemberSize) {
+	DataByteLine (Count);
+	return Count;
+    }
 
     /* Make Count an even number of multiples of MemberSize */
     Count &= ~(MemberSize-1);
@@ -100,7 +109,7 @@ static unsigned DoTable (attr_t Style, unsigned MemberSize, void (*TableFunc) (u
     }
 
     /* If the next line is not the same style, add a separator */
-    if (CodeLeft() && GetStyle (PC) != Style) {
+    if (CodeLeft() && GetStyleAttr (PC) != Style) {
 	SeparatorLine ();
     }
 
@@ -145,12 +154,14 @@ unsigned AddrTable (void)
     /* Count how many bytes may be output. */
     unsigned Count = GetSpan (atAddrTab);
 
+    /* Need to handle Count == 1 here!!! ### */
+
     /* Make the given number even */
     Count &= ~1U;
 
     /* Output as many data bytes lines as needed. For addresses, each line
      * will hold just one address.
-     */		       
+     */
     BytesLeft = Count;
     while (BytesLeft > 0) {
 
@@ -160,7 +171,7 @@ unsigned AddrTable (void)
 	/* In pass 1, define a label, in pass 2 output the line */
 	if (Pass == 1) {
 	    if (!HaveLabel (Addr)) {
-	   	AddLabel (Addr, MakeLabelName (Addr));
+	   	AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
 	    }
 	} else {
 	    const char* Label = GetLabel (Addr);
@@ -182,9 +193,66 @@ unsigned AddrTable (void)
     }
 
     /* If the next line is not a byte table line, add a separator */
-    if (CodeLeft() && GetStyle (PC) != atAddrTab) {
+    if (CodeLeft() && GetStyleAttr (PC) != atAddrTab) {
 	SeparatorLine ();
-    }		  
+    }
+
+    /* Return the number of bytes output */
+    return Count;
+}
+
+
+
+unsigned RtsTable (void)
+/* Output a table of RTS addresses (address - 1) */
+{
+    unsigned BytesLeft;
+
+    /* Count how many bytes may be output. */
+    unsigned Count = GetSpan (atRtsTab);
+
+    /* Need to handle Count == 1 here!!! ### */
+
+    /* Make the given number even */
+    Count &= ~1U;
+
+    /* Output as many data bytes lines as needed. For addresses, each line
+     * will hold just one address.
+     */
+    BytesLeft = Count;
+    while (BytesLeft > 0) {
+
+	/* Get the address */
+	unsigned Addr = GetCodeWord (PC) + 1;
+
+	/* In pass 1, define a label, in pass 2 output the line */
+	if (Pass == 1) {
+	    if (!HaveLabel (Addr)) {
+	   	AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
+	    }
+	} else {
+	    const char* Label = GetLabel (Addr);
+	    if (Label == 0) {
+	 	/* OOPS! Should not happen */
+	 	Internal ("OOPS - Label for address %04X disappeard!", Addr);
+	    }
+	    Indent (MIndent);
+	    Output (".word");
+	    Indent (AIndent);
+	    Output ("%s-1", Label);
+	    LineComment (PC, 2);
+	    LineFeed ();
+	}
+
+	/* Next line */
+	PC        += 2;
+       	BytesLeft -= 2;
+    }
+
+    /* If the next line is not a byte table line, add a separator */
+    if (CodeLeft() && GetStyleAttr (PC) != atRtsTab) {
+	SeparatorLine ();
+    }
 
     /* Return the number of bytes output */
     return Count;

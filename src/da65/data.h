@@ -56,6 +56,9 @@ unsigned DWordTable (void);
 unsigned AddrTable (void);
 /* Output a table of addresses */
 
+unsigned RtsTable (void);
+/* Output a table of RTS addresses (address - 1) */
+	 
 
 
 /* End of data.h */

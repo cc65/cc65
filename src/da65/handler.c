@@ -118,7 +118,7 @@ static void GenerateLabel (const OpcDesc* D, unsigned Addr)
     if (Pass == 1 && !HaveLabel (Addr)) {
 	if ((D->LabelFlag & lfGenLabel) != 0 ||
        	    ((D->LabelFlag & lfUseLabel) != 0 && Addr >= CodeStart && Addr <= CodeEnd)) {
-	    AddLabel (Addr, MakeLabelName (Addr));
+	    AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
 	}
     }
 }
@@ -392,6 +392,14 @@ void OH_Rts (const OpcDesc* D)
 void OH_JmpAbsolute (const OpcDesc* D)
 {
     OH_Absolute (D);
+    SeparatorLine ();
+}
+
+
+
+void OH_JmpAbsoluteIndirect (const OpcDesc* D)
+{
+    OH_AbsoluteIndirect (D);
     SeparatorLine ();
 }
 

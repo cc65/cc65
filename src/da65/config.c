@@ -33,6 +33,7 @@
 
 
 
+#include <stdio.h>
 #if defined(_MSC_VER)
 /* Microsoft compiler */
 #  include <io.h>
@@ -200,7 +201,7 @@ static void RangeSection (void)
 		    case CFGTOK_WORDTAB:	Type = atWordTab;	break;
 		    case CFGTOK_DWORDTAB:	Type = atDWordTab;	break;
 		    case CFGTOK_ADDRTAB:	Type = atAddrTab;	break;
-		    case CFGTOK_RTSTAB:		Type = atRtsTab;	break;
+       		    case CFGTOK_RTSTAB:		Type = atRtsTab;	break;
 		}
 		Needed |= tType;
 		CfgNextTok ();
@@ -214,12 +215,12 @@ static void RangeSection (void)
 
     /* Did we get all required values? */
     if (Needed != tAll) {
-    	Error ("Required values missing from this section");
+    	CfgError ("Required values missing from this section");
     }
 
     /* Start must be less than end */
     if (Start > End) {
-	Error ("Start value must not be greater than end value");
+	CfgError ("Start value must not be greater than end value");
     }
 
     /* Set the range */
@@ -234,11 +235,16 @@ static void RangeSection (void)
 static void LabelSection (void)
 /* Parse a label section */
 {
-    static const IdentTok Globals[] = {
-       	{   "INPUTNAMEL",	CFGTOK_INPUTNAME	},
-	{   "OUTPUTNAME",      	CFGTOK_OUTPUTNAME	},
-	{   "PAGELENGTH",      	CFGTOK_PAGELENGTH	},
+    static const IdentTok LabelDefs[] = {
+       	{   "NAME",	CFGTOK_NAME	},
+	{   "ADDR",	CFGTOK_ADDR	},
+       	{   "SIZE",    	CFGTOK_SIZE	},
     };
+
+    /* Locals - initialize to avoid gcc warnings */
+    char* Name = 0;
+    long Value = -1;
+    long Size  = -1;
 
     /* Skip the token */
     CfgNextTok ();
@@ -249,8 +255,96 @@ static void LabelSection (void)
     /* Look for section tokens */
     while (CfgTok != CFGTOK_RCURLY) {
 
+	/* Convert to special token */
+       	CfgSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Label directive");
 
+	/* Look at the token */
+	switch (CfgTok) {
+
+	    case CFGTOK_NAME:
+	        CfgNextTok ();
+	       	if (Name) {
+	       	    CfgError ("Name already given");
+	       	}
+	       	CfgAssureStr ();
+		if (CfgSVal[0] == '\0') {
+		    CfgError ("Name may not be empty");
+		}
+	       	Name = xstrdup (CfgSVal);
+	       	CfgNextTok ();
+	       	break;
+
+	    case CFGTOK_ADDR:
+	       	CfgNextTok ();
+	       	if (Value >= 0) {
+	       	    CfgError ("Value already given");
+	       	}
+	       	CfgAssureInt ();
+		CfgRangeCheck (0, 0xFFFF);
+	       	Value = CfgIVal;
+	       	CfgNextTok ();
+	       	break;
+
+	    case CFGTOK_SIZE:
+	       	CfgNextTok ();
+	       	if (Size >= 0) {
+	       	    CfgError ("Size already given");
+	       	}
+	       	CfgAssureInt ();
+		CfgRangeCheck (1, 0x800);
+	       	Size = CfgIVal;
+	       	CfgNextTok ();
+	       	break;
+
+	}
+
+	/* Directive is followed by a semicolon */
+	CfgConsumeSemi ();
     }
+
+    /* Did we get the necessary data */
+    if (Name == 0) {
+	CfgError ("Label name is missing");
+    }
+    if (Value < 0) {
+	CfgError ("Label value is missing");
+    }
+    if (Size < 0) {
+	/* Use default */
+	Size = 1;
+    }
+    if (HaveLabel ((unsigned) Value)) {
+	CfgError ("Label for address $%04lX already defined", Value);
+    }
+
+    /* Define the label */
+    AddLabel ((unsigned) Value, atExtLabel, Name);
+
+    /* Define dependent labels if necessary */
+    if (Size > 1) {
+	unsigned Offs;
+
+	/* Allocate memory for the dependent label names */
+	unsigned NameLen = strlen (Name);
+	char*	 DepName = xmalloc (NameLen + 7);
+	char*	 DepOffs = DepName + NameLen + 1;
+
+	/* Copy the original name into the buffer */
+	memcpy (DepName, Name, NameLen);
+	DepName[NameLen] = '+';
+
+	/* Define the labels */
+	for (Offs = 1; Offs < (unsigned) Size; ++Offs) {
+	    sprintf (DepOffs, "%u", Offs);
+	    AddLabel ((unsigned) Value+Offs, atDepLabel, DepName);
+	}
+
+	/* Free the name buffer */
+	xfree (DepName);
+    }
+
+    /* Delete the dynamically allocated memory for Name */
+    xfree (Name);
 
     /* Consume the closing brace */
     CfgConsumeRCurly ();
@@ -262,8 +356,8 @@ static void CfgParse (void)
 /* Parse the config file */
 {
     static const IdentTok Globals[] = {
-	{   "GLOBAL", 	CFGTOK_GLOBAL	},
-	{   "RANGE",	CFGTOK_RANGE	},
+     	{   "GLOBAL", 	CFGTOK_GLOBAL	},
+     	{   "RANGE",	CFGTOK_RANGE	},
 	{   "LABEL",	CFGTOK_LABEL	},
     };
 

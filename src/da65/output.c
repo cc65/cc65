@@ -146,8 +146,8 @@ void LineFeed (void)
 	    ++Page;
 	    PageHeader ();
 	    Line = 4;
-	}
-	Col = 1;
+ 	}
+ 	Col = 1;
     }
 }
 
@@ -158,7 +158,7 @@ void DefLabel (const char* Name)
 {
     Output ("%s:", Name);
     /* Don't start a new line if the label is fully in the left column */
-    if (Col >= MIndent-1) {
+    if (Col > MIndent) {
      	LineFeed ();
     }
 }
@@ -174,11 +174,11 @@ void DataByteLine (unsigned ByteCount)
     Output (".byte");
     Indent (AIndent);
     for (I = 0; I < ByteCount; ++I) {
-	if (I > 0) {
-	    Output (",$%02X", CodeBuf[PC+I]);
-	} else {
-	    Output ("$%02X", CodeBuf[PC+I]);
-	}
+ 	if (I > 0) {
+ 	    Output (",$%02X", CodeBuf[PC+I]);
+ 	} else {
+ 	    Output ("$%02X", CodeBuf[PC+I]);
+ 	}
     }
     LineComment (PC, ByteCount);
     LineFeed ();

@@ -500,7 +500,7 @@ const OpcDesc OpcTable[256] = {
 	1,
 	0,
 	CPU_ALL,
-	OH_Implicit
+	OH_Rts
     },
     {  /* $41 */
 	"eor",
@@ -808,7 +808,7 @@ const OpcDesc OpcTable[256] = {
 	3,
 	lfLabel,
 	CPU_ALL,
-	OH_AbsoluteIndirect
+	OH_JmpAbsoluteIndirect
     },
     {  /* $6d */
 	"adc",

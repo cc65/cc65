@@ -15,20 +15,73 @@
 
 C_OBJS = fclose.o fgets.o fprintf.o strdup.o calloc.o _fopen.o\
       	 fputs.o fread.o fwrite.o gets.o realloc.o bsearch.o strxfrm.o\
-      	 printf.o _hextab.o malloc.o free.o vfprintf.o fdopen.o strtok.o\
+      	 printf.o _hextab.o malloc.o vfprintf.o fdopen.o strtok.o\
     	 _afailed.o fopen.o fgetc.o fputc.o puts.o gets.o perror.o getchar.o\
     	 _printf.o vprintf.o vsprintf.o sprintf.o abort.o qsort.o putchar.o\
     	 errormsg.o _hadd.o cprintf.o vcprintf.o freopen.o locale.o
 
-S_OBJS = isalpha.o isdigit.o _file.o fmisc.o strlower.o strchr.o tolower.o\
-	 toupper.o errno.o strcpy.o strlen.o strcat.o strcmp.o itoa.o\
-	 strupper.o isalpha.o isalnum.o isgraph.o islower.o isupper.o\
-       	 isprint.o ispunct.o isspace.o isxdigit.o isblank.o strrchr.o\
-	 _stksize.o _heap.o stricmp.o strncmp.o strncpy.o atoi.o setjmp.o\
-	 longjmp.o rand.o atexit.o memset.o memcpy.o memchr.o memcmp.o\
-	 ltoa.o strcspn.o strncat.o strpbrk.o strspn.o abs.o labs.o jmpvec.o\
-	 _fdesc.o stkcheck.o zerobss.o copydata.o _swap.o strstr.o strcoll.o\
-	 _sys.o getcpu.o _oserror.o strerror.o iscntrl.o maperrno.o
+S_OBJS =	_fdesc.o	\
+		_file.o 	\
+		_heap.o		\
+		_oserror.o	\
+		_stksize.o	\
+		_swap.o		\
+	 	_sys.o		\
+		abs.o		\
+		atexit.o	\
+		atoi.o		\
+		copydata.o	\
+		errno.o		\
+		fmisc.o 	\
+		free.o		\
+		getcpu.o	\
+		isalnum.o	\
+		isalpha.o	\
+		isblank.o	\
+		iscntrl.o	\
+		isdigit.o 	\
+		isgraph.o	\
+		islower.o	\
+       	 	isprint.o	\
+		ispunct.o	\
+		isspace.o	\
+		isupper.o	\
+		isxdigit.o	\
+		itoa.o		\
+		jmpvec.o	\
+		labs.o		\
+	 	longjmp.o	\
+	 	ltoa.o		\
+		maperrno.o	\
+		memchr.o	\
+		memcmp.o	\
+		memcpy.o	\
+		memset.o	\
+		rand.o		\
+		setjmp.o	\
+		stkcheck.o	\
+		strcat.o	\
+		strchr.o	\
+		strcmp.o	\
+		strcoll.o	\
+		strcpy.o	\
+		strcspn.o	\
+		strerror.o	\
+		stricmp.o	\
+		strlen.o	\
+		strlower.o	\
+		strncat.o	\
+		strncmp.o	\
+		strncpy.o	\
+		strpbrk.o	\
+		strrchr.o	\
+		strspn.o	\
+		strstr.o	\
+		strupper.o	\
+		tolower.o	\
+		toupper.o	\
+		zerobss.o
+
 
 all:  	$(C_OBJS) $(S_OBJS)
 

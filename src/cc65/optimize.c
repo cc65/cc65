@@ -331,7 +331,7 @@ static Line* ReplaceLine (Line* L, const char* Format, ...)
     /* Format the new line */
     va_list ap;
     va_start (ap, Format);
-    vsprintf (S, Format, ap);
+    xvsprintf (S, sizeof (S), Format, ap);
     va_end (ap);
 
     /* Get the length of the new line */

@@ -75,13 +75,6 @@ static void Usage (void)
     fprintf (stderr,
 	     "Usage: %s [options] file\n"
 	     "Short options:\n"
-       	     "  -d\t\t\tDebug mode\n"
-       	     "  -g\t\t\tAdd debug info to object file\n"
-       	     "  -h\t\t\tHelp (this text)\n"
-       	     "  -j\t\t\tDefault characters are signed\n"
-       	     "  -o name\t\tName the output file\n"
-       	     "  -t sys\t\tSet the target system\n"
-       	     "  -v\t\t\tIncrease verbosity\n"
        	     "  -A\t\t\tStrict ANSI mode\n"
        	     "  -Cl\t\t\tMake local variables static\n"
        	     "  -Dsym[=defn]\t\tDefine a symbol\n"
@@ -93,14 +86,23 @@ static void Usage (void)
        	     "  -T\t\t\tInclude source as comment\n"
        	     "  -V\t\t\tPrint the compiler version number\n"
        	     "  -W\t\t\tSuppress warnings\n"
+       	     "  -d\t\t\tDebug mode\n"
+       	     "  -g\t\t\tAdd debug info to object file\n"
+       	     "  -h\t\t\tHelp (this text)\n"
+       	     "  -j\t\t\tDefault characters are signed\n"
+       	     "  -o name\t\tName the output file\n"
+       	     "  -t sys\t\tSet the target system\n"
+       	     "  -v\t\t\tIncrease verbosity\n"
 	     "\n"
 	     "Long options:\n"
+       	     "  --add-source\t\tInclude source as comment\n"
        	     "  --ansi\t\tStrict ANSI mode\n"
 	     "  --bss-name seg\tSet the name of the BSS segment\n"
        	     "  --check-stack\t\tGenerate stack overflow checks\n"
        	     "  --code-name seg\tSet the name of the CODE segment\n"
 	     "  --codesize x\t\tAccept larger code by factor x\n"
        	     "  --cpu type\t\tSet cpu type\n"
+	     "  --create-dep\t\tCreate a make dependency file\n"
        	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug\t\tDebug mode\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
@@ -293,7 +295,7 @@ static void OptAnsi (const char* Opt, const char* Arg)
 
 static void OptBssName (const char* Opt, const char* Arg)
 /* Handle the --bss-name option */
-{			   
+{
     /* Check for a valid name */
     CheckSegName (Arg);
 
@@ -359,7 +361,7 @@ static void OptCPU (const char* Opt, const char* Arg)
 
 
 static void OptDataName (const char* Opt, const char* Arg)
-/* Handle the --code-name option */
+/* Handle the --data-name option */
 {
     /* Check for a valid name */
     CheckSegName (Arg);
@@ -562,8 +564,8 @@ int main (int argc, char* argv[])
        	{ "--check-stack",	0,     	OptCheckStack		},
 	{ "--code-name",	1, 	OptCodeName  		},
 	{ "--codesize",		1,	OptCodeSize		},
-	{ "--create-dep",	0,	OptCreateDep 		},
         { "--cpu",     	       	1, 	OptCPU 	     		},
+	{ "--create-dep",	0,	OptCreateDep 		},
 	{ "--data-name",	1, 	OptDataName  		},
        	{ "--debug",           	0,     	OptDebug     		},
 	{ "--debug-info",      	0, 	OptDebugInfo 		},

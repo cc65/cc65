@@ -110,6 +110,8 @@
 #define HUE_YELLOWRED   15					  
 
 /* Color defines, similar to c64 colors (untested) */
+/* Note that the conio color implementation is monochrome (bgcolor and textcolor are only placeholders) */
+/* Use the defines with the setcolor() or _atari_xxxcolor() functions */
 #define COLOR_BLACK  	       	_gtia_mkcolor(HUE_GREY,0)
 #define COLOR_WHITE  	       	_gtia_mkcolor(HUE_GREY,7)
 #define COLOR_RED    	       	_gtia_mkcolor(HUE_REDORANGE,1)
@@ -131,6 +133,12 @@
 extern void __fastcall__ setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
 extern void __fastcall__ setcolor_low (unsigned char color_reg, unsigned char color_value);
 extern unsigned char __fastcall__ getcolor (unsigned char color_reg);
+
+/* function similar to conio color functions; please note that _atari_textcolor only sets the */
+/* luminance of the text in standard text mode */
+extern unsigned char __fastcall__ _atari_textcolor (unsigned char color);
+extern unsigned char __fastcall__ _atari_bgcolor (unsigned char color);
+extern unsigned char __fastcall__ _atari_bordercolor (unsigned char color);
 
 /* other screen functions */
 extern int  __fastcall__ graphics(unsigned char mode); /* mode value same as in BASIC */

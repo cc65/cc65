@@ -25,6 +25,7 @@ S_OBJS=	_scrsize.o	\
 	ctype.o		\
 	cvline.o	\
 	kbhit.o		\
+        randomize.o     \
 	read.o		\
 	revers.o	\
 	where.o		\

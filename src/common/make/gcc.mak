@@ -22,6 +22,7 @@ OBJS =	abend.o		\
         filetype.o      \
 	fname.o		\
 	hashstr.o	\
+        hashtab.o       \
         matchpat.o      \
 	print.o		\
         searchpath.o    \

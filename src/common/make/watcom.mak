@@ -54,6 +54,7 @@ OBJS =	abend.obj	\
         filetype.obj    \
 	fname.obj	\
 	hashstr.obj	\
+        hashtab.obj     \
         matchpat.obj    \
 	print.obj	\
         searchpath.obj  \

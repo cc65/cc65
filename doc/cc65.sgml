@@ -910,6 +910,7 @@ the format specifier before passing the assembly code line to the backend.
   <item><tt/%l/ - Numerical 32 bit value
   <item><tt/%v/ - Assembler name of a (global) variable or function
   <item><tt/%o/ - Stack offset of a (local) variable
+  <item><tt/%s/ - The argument is converted to a string
   <item><tt/%%/ - The % sign itself
 </itemize><p>
 
@@ -949,7 +950,7 @@ variables or functions into your asm statements. Code like this
 <p>
 
 may stop working if the way, the compiler generates these names is changed in
-a future version.
+a future version. Instead use the format specifiers from the table above.
 <p>
 
 

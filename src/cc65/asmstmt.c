@@ -7,8 +7,8 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2001-2003 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
@@ -274,6 +274,41 @@ static void ParseLVarArg (StrBuf* T, unsigned Arg)
 
 
 
+static void ParseStrArg (StrBuf* T, unsigned Arg attribute ((unused)))
+/* Parse the %s format specifier */
+{
+    ExprDesc Expr;
+    char Buf [64];
+
+    /* We expect an argument separated by a comma */
+    ConsumeComma ();
+
+    /* Check what comes */
+    switch (CurTok.Tok) {
+
+        case TOK_IDENT:
+            /* Identifier */
+            SB_AppendStr (T, CurTok.Ident);
+            NextToken ();
+            break;
+
+        case TOK_SCONST:
+            /* String constant */
+            SB_AppendStr (T, GetLiteral (CurTok.IVal));
+            ResetLiteralPoolOffs (CurTok.IVal);
+            NextToken ();
+            break;
+
+        default:
+            ConstSubExpr (hie1, InitExprDesc (&Expr));
+            xsprintf (Buf, sizeof (Buf), "%ld", Expr.ConstVal);
+            SB_AppendStr (T, Buf);
+            break;
+    }
+}
+
+
+
 static void ParseAsm (void)
 /* Parse the contents of the ASM statement */
 {
@@ -304,6 +339,7 @@ static void ParseAsm (void)
      *   %l	- Numerical 32 bit value
      *   %v	- Assembler name of a (global) variable
      *   %o	- Stack offset of a (local) variable
+     *   %s     - Any argument converted to a string (almost)
      *   %%	- The % sign
      */
     Arg = 0;
@@ -322,12 +358,13 @@ static void ParseAsm (void)
        	    ++Arg;
             C = SB_Get (&S);
             switch (C) {
-                case 'b':   ParseByteArg (&T, Arg);         break;
-                case 'w':   ParseWordArg (&T, Arg);         break;
-                case 'l':   ParseLongArg (&T, Arg);         break;
-                case 'v':   ParseGVarArg (&T, Arg);         break;
-                case 'o':   ParseLVarArg (&T, Arg);         break;
                 case '%':   SB_AppendChar (&T, '%');        break;
+                case 'b':   ParseByteArg (&T, Arg);         break;
+                case 'l':   ParseLongArg (&T, Arg);         break;
+                case 'o':   ParseLVarArg (&T, Arg);         break;
+                case 's':   ParseStrArg (&T, Arg);          break;
+                case 'v':   ParseGVarArg (&T, Arg);         break;
+                case 'w':   ParseWordArg (&T, Arg);         break;
                 default:
                     Error ("Error in __asm__ format specifier %u", Arg);
                     AsmErrorSkip ();

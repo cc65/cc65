@@ -152,10 +152,13 @@ _vsprintf:
 	tya
 	sta	(ptr1),y
 
-; Return the number of bytes written.
+; Return the number of bytes written. The carry is clear here because of the
+; last addition which will never overflow for sane code.
 
-    	lda	outdesc		; ccount
-    	ldx	outdesc+1
-	rts
-
+        lda     outdesc         ; ccount
+        ldx     outdesc+1
+        adc     #1              ; Account for terminator
+        bcc     @L9
+        inx
+@L9:    rts
 

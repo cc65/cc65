@@ -7,14 +7,14 @@
 ; unsigned char get_ostype (void);
 ; unsigned char get_tv (void);
 
-	    .export get_ostype
-	    .export get_tv
+	    .export _get_ostype
+	    .export _get_tv
 	    .import tmp1
 
 	    .include "../inc/geossym.inc"
 	    .include "../inc/geossym2.inc"
 
-get_ostype:
+_get_ostype:
 	    ldx #0
 	    lda version
 	    and #%11110000
@@ -27,7 +27,7 @@ geos10:
 	    lda version
 	    rts
 
-get_tv:
+_get_tv:
 	    jsr get_ostype
 	    bpl only40			; C64 with 40 columns only
 	    lda graphMode

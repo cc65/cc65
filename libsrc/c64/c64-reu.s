@@ -29,6 +29,7 @@
         .word   DEINSTALL
         .word   PAGECOUNT
         .word   MAP
+        .word   USE
         .word   COMMIT
 	.word	COPYFROM
         .word   COPYTO
@@ -136,6 +137,15 @@ MAP:    sta     curpage
         lda     #<window
         ldx     #>window                ; Return the window address
 done:   rts
+
+; ------------------------------------------------------------------------
+; USE: Tell the driver that the window is now associated with a given page.
+
+USE:    sta     curpage
+        stx     curpage+1               ; Remember the page
+        lda     #<window
+        ldx     #>window                ; Return the window
+        rts
 
 ; ------------------------------------------------------------------------
 ; COMMIT: Commit changes in the memory window to extended storage.

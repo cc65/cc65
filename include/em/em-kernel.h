@@ -58,6 +58,7 @@ typedef struct {
     void*               deinstall;      /* DEINSTALL routine */
     void*               pagecount;      /* PAGECOUNT routine */
     void*               map;            /* MAP routine */
+    void*               use;            /* USE routine */
     void*               mapclean;       /* MAPCLEAN routine */
     void*		copyfrom; 	/* COPYFROM routine */
     void*               copyto;         /* COPYTO routine */

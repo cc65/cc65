@@ -29,6 +29,7 @@
         .word   DEINSTALL
         .word   PAGECOUNT
         .word   MAP
+        .word   USE
         .word   COMMIT
 	.word	COPYFROM
         .word   COPYTO
@@ -107,6 +108,14 @@ MAP:    sta     curpage			; Remember the new page
 
         lda     #<window
         ldx     #>window                ; Return the window address
+        rts
+
+; ------------------------------------------------------------------------
+; USE: Tell the driver that the window is now associated with a given page.
+
+USE:    sta     curpage                 ; Remember the page
+        lda     #<window
+        ldx     #>window                ; Return the window
         rts
 
 ; ------------------------------------------------------------------------
@@ -249,7 +258,7 @@ common: ldy     #EM_COPY_COUNT+1
 
 ; Done
 
-@L4:    rts          
+@L4:    rts
 
 ; ------------------------------------------------------------------------
 ; COPYTO: Copy from linear into extended memory. A pointer to a structure

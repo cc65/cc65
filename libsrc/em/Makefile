@@ -20,6 +20,7 @@ S_OBJS =       	em-kernel.o	\
 		em_map.o	\
 		em_pagecount.o	\
 		em_unload.o	\
+                em_use.o        
 
 
 all:  	$(C_OBJS) $(S_OBJS)

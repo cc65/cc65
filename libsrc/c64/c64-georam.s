@@ -29,6 +29,7 @@
         .word   DEINSTALL
         .word   PAGECOUNT
         .word   MAP
+        .word   USE
         .word   COMMIT
 	.word	COPYFROM
         .word   COPYTO
@@ -78,6 +79,13 @@ PAGECOUNT:
         lda     pagecount
         ldx     pagecount+1
         rts
+
+; ------------------------------------------------------------------------
+; USE: Tell the driver that the window is now associated with a given page.
+; The GeoRAM cartridge does not copy but actually map the window, so USE is
+; identical to MAP.
+
+USE     = MAP
 
 ; ------------------------------------------------------------------------
 ; MAP: Map the page in a/x into memory and return a pointer to the page in

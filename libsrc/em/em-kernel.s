@@ -23,13 +23,14 @@ _em_drv:        .res    2      		; Pointer to driver
 ; Jump table for the driver functions.
 .data
 emd_vectors:
-emd_install:   	jmp     $0000
-emd_deinstall: 	jmp     $0000
-emd_pagecount:  jmp     $0000
-emd_map:        jmp     $0000
-emd_commit:     jmp     $0000
-emd_copyfrom:	jmp     $0000
-emd_copyto:     jmp     $0000
+emd_install:   	jmp     return0
+emd_deinstall: 	jmp     return0
+emd_pagecount:  jmp     return0
+emd_map:        jmp     return0
+emd_use:        jmp     return0
+emd_commit:     jmp     return0
+emd_copyfrom:  	jmp     return0
+emd_copyto:     jmp     return0
 
 ; Driver header signature
 .rodata

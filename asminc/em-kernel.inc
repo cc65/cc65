@@ -44,11 +44,12 @@ EMD_HDR_INSTALL         = EMD_HDR_JUMPTAB+0     ; INSTALL routine
 EMD_HDR_DEINSTALL       = EMD_HDR_JUMPTAB+2     ; DEINSTALL routine
 EMD_HDR_PAGECOUNT       = EMD_HDR_JUMPTAB+4     ; PAGECOUNT routine
 EMD_HDR_MAP             = EMD_HDR_JUMPTAB+6     ; MAP routine
-EMD_HDR_MAPCLEAN        = EMD_HDR_JUMPTAB+8     ; MAPCLEAN routine
-EMD_HDR_COPYFROM        = EMD_HDR_JUMPTAB+10    ; COPYFROM routine
-EMD_HDR_COPYTO          = EMD_HDR_JUMPTAB+12    ; COPYTO routine
+EMD_HDR_USE             = EMD_HDR_JUMPTAB+8     ; USE routine
+EMD_HDR_MAPCLEAN        = EMD_HDR_JUMPTAB+10    ; MAPCLEAN routine
+EMD_HDR_COPYFROM        = EMD_HDR_JUMPTAB+12    ; COPYFROM routine
+EMD_HDR_COPYTO          = EMD_HDR_JUMPTAB+14    ; COPYTO routine
 
-EMD_HDR_JUMPCOUNT       = 7                     ; Number of jump vectors
+EMD_HDR_JUMPCOUNT       = 8                     ; Number of jump vectors
 
 ;------------------------------------------------------------------------------
 ; Offsets into the em_copy structure
@@ -69,7 +70,8 @@ EM_COPY_COUNT           = 5
         .global emd_install
         .global emd_deinstall
         .global emd_pagecount
-        .global emd_map
+        .global emd_map    
+        .global emd_use
         .global emd_commit
 	.global	emd_copyfrom
         .global emd_copyto
@@ -81,6 +83,7 @@ EM_COPY_COUNT           = 5
 	.global _em_deinstall
 	.global	_em_pagecount
 	.global	_em_map
+        .global _em_use
 	.global	_em_commit
 	.global _em_copyfrom
 	.global	_em_copyto

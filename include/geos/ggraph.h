@@ -30,7 +30,7 @@ void __fastcall__ InvertRectangle(void);
 void __fastcall__ ImprintRectangle(void);
 void __fastcall__ RecoverRectangle(void);
 
-void __fastcall__ DrawLine(struct window *topBotCoords);
+void __fastcall__ DrawLine(char mode, struct window *topBotCoords);
 
 void __fastcall__ DrawPoint(struct pixel *myPixel);
 char __fastcall__ TestPoint(struct pixel *myPixel);
@@ -166,10 +166,14 @@ void __fastcall__ GraphicsString(char *myGfxString);
 /* justification */
 #define	SET_RIGHTJUST	0
 #define	SET_LEFTJUST	0x80
-/* C128 x flags */
+/* C128 x-extension flags */
 #define	ADD1_W		0x2000
 #define	DOUBLE_B	0x80
 #define	DOUBLE_W	0x8000
+/* DrawLine mode values */
+#define DRAW_ERASE	0x00
+#define DRAW_DRAW	0x40
+#define DRAW_COPY	0x80
 
 typedef void graphicStr;
 

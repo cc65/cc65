@@ -278,10 +278,13 @@ number as set in <tt/SetPattern/ but a true bit pattern.
 
 <sect3>DrawLine
 <p>
-<tt/void DrawLine (struct window *myWindow)/
+<tt/void DrawLine (char mode, struct window *myWindow)/
 <p>
 <tt/top/ parameters of <tt/struct window/ describe the starting point of the line, while
-<tt/bottom/ are for the ending point. Current pattern from <tt/SetPattern/ is used for drawing.
+<tt/bottom/ are for the ending point. If <tt/mode/ is <tt/DRAW_DRAW/ then current pattern from
+<tt/SetPattern/ is used for drawing. If <tt/mode/ is <tt/DRAW_ERASE/ then line is erased from the
+screen. If <tt/mode/ is <tt/DRAW_COPY/ then line is copied from/to back/frontbuffer, according to
+<tt/dispBufferOn/ setting.
 
 <sect2>Point Functions
 <p>

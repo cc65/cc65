@@ -8,12 +8,12 @@ List of known bugs that will not get fixed before any new major release:
 
   * Initialization of local variables with compound data types is not
     possible.
-								      
+
 Introduced with version 2.5:
 
   * Use of "goto" to jump into or out of blocks that declare local variables
     will create programs that crash, since the stack is not corrected. The old
-    stack correction code was removed because of the restructuring of the 
+    stack correction code was removed because of the restructuring of the
     symbol table stuff and was not reintroduced because it was ugly anyway,
     did not work with the new symbol table code, and should be unnecessary as
     soon as local variables are allocated in one chunk on function entry.
@@ -21,4 +21,8 @@ Introduced with version 2.5:
   * Register variables are not currently unavailable. The command line
     switches and the "register" keyword is still accepted, so this should not
     harm existing programs.
+
+  * In the assembler listing, data bytes for are macros are output in the
+    wrong line.
+
 

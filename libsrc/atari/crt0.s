@@ -12,7 +12,7 @@
 	.export		_exit
 	.import		getargs, argc, argv
 	.import		__hinit, initconio, zerobss, pushax, doatexit
-	.import		_main,__filetab
+	.import		_main,__filetab,getfd
 	.import		__CODE_LOAD__, __BSS_LOAD__
 
 	.include	"atari.inc"
@@ -115,14 +115,17 @@ L1:	lda	sp,y
 	lda	#$FF
 	sta	CH
 
-; ugly hack for now: set stdio stream handles
-; all to iocb #0
-; until we know where to go with fd<->iocb relation
-; this won't stay here!
+; set stdio stream handles
 
 	lda	#0
-	sta	__filetab + 2
-	sta	__filetab + 4
+	jsr	getfd
+	sta	__filetab		; setup stdin
+	lda	#0
+	jsr	getfd
+	sta	__filetab + 2		; setup stdout
+	lda	#0
+	jsr	getfd
+	sta	__filetab + 4		; setup stderr
 
 ; Pass command line if present
 

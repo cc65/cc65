@@ -1719,8 +1719,42 @@ static void OptLoads (void)
 
 	    /* Remove the remaining lines */
 	    FreeLines (L2[1], L2[2]);
-	}
 
+	/* Search for:
+	 *
+	 *     	ldx    	xx
+	 *     	lda	yy
+	 *    	jsr	stax0sp
+	 *
+	 * and replace it by:
+	 *
+	 *     	lda    	xx
+	 *	ldy	#$01
+	 *    	sta	(sp),y
+       	 *     	dey
+	 *	lda	yy
+	 *    	sta	(sp),y
+	 *
+	 * provided that that the X register is not used later. This code
+	 * sequence is four bytes longer, but a lot faster and it does not
+	 * use the X register, so other loads may get removed later.
+     	 */
+       	} else if (LineMatch (L, "\tldx\t")	  	&&
+       	    GetNextCodeLines (L, L2, 2)	 	  	&&
+      	    LineMatch (L2 [0], "\tlda\t")	  	&&
+       	    LineFullMatch (L2 [1], "\tjsr\tstax0sp")	&&
+	    !RegXUsed (L2[1])) {
+
+      	    /* Found - replace it */
+	    L->Line[3] = 'a';
+	    L = NewLineAfter (L, "\tldy\t#$01");
+	    L = NewLineAfter (L, "\tsta\t(sp),y");
+	    L = NewLineAfter (L, "\tdey");
+	    L = NewLineAfter (L2[0], "\tsta\t(sp),y");
+
+	    /* Remove the remaining line */
+	    FreeLine (L2[1]);
+	}
 
        	/* All other patterns start with this one: */
 	if (!LineFullMatch (L, "\tldx\t#$00")) {

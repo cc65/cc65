@@ -304,7 +304,7 @@ static void ParseMemory (void)
         CollDelete (&L->Attributes, Index);
 
         /* Create the chip instance for the address range */
-        Range = L->End - L->Start;
+        Range = L->End - L->Start + 1;
         CI = NewChipInstance (D->V.SVal, L->Start, Range, &L->Attributes);
 
         /* Delete the "name" attribute */

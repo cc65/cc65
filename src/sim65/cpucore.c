@@ -33,12 +33,15 @@
 
 
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <stdarg.h>
 
 /* common */
 #include "abend.h"
 #include "attrib.h"
 #include "print.h"
+#include "xsprintf.h"
 
 /* sim65 */
 #include "cputype.h"
@@ -81,6 +84,9 @@ static unsigned StackPage = 0x100;
 
 /* */
 int CPUHalted;
+
+/* Break message */
+static char BreakMsg[1024];
 
 
 
@@ -2489,6 +2495,17 @@ void NMI (void)
 
 
 
+void Break (const char* Format, ...)
+/* Stop running and display the given message */
+{
+    va_list ap;
+    va_start (ap, Format);
+    xvsprintf (BreakMsg, sizeof (BreakMsg), Format, ap);
+    va_end (ap);
+}
+
+
+
 void CPURun (void)
 /* Run the CPU */
 {
@@ -2497,7 +2514,7 @@ void CPURun (void)
 	/* Get the next opcode */
 	unsigned char OPC = MemReadByte (PC);
 
-        printf ("%6lu %04X %02X A=%02X X=%02X Y=%02X %c%c%c%c%c%c%c\n",
+        printf ("%9lu %06X %02X A=%02X X=%02X Y=%02X %c%c%c%c%c%c%c\n",
                 TotalCycles, PC, OPC, AC, XR, YR,
                 GET_SF()? 'S' : '-',
                 GET_ZF()? 'Z' : '-',
@@ -2512,6 +2529,11 @@ void CPURun (void)
 
         /* Count cycles */
         TotalCycles += Cycles;
+
+	if (BreakMsg[0]) {
+	    printf ("%s\n", BreakMsg);
+	    BreakMsg[0] = '\0';
+	}
     }
 }
 

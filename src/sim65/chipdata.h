@@ -44,7 +44,9 @@
 
 
 
-/* Version information. */
+/* Chip type and version information. */
+#define CHIPDATA_TYPE_CHIP      0U
+#define CHIPDATA_TYPE_CPU       1U
 #define CHIPDATA_VER_MAJOR      1U
 #define CHIPDATA_VER_MINOR      0U
 
@@ -56,6 +58,7 @@ struct SimData;
 typedef struct ChipData ChipData;
 struct ChipData {
     const char* ChipName;       /* Name of the chip */
+    unsigned    Type;           /* Type of the chip */
     unsigned    MajorVersion;   /* Version information */
     unsigned    MinorVersion;
 

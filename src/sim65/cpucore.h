@@ -81,6 +81,9 @@ void IRQ (void);
 void NMI (void);
 /* Generate an NMI */
 
+void Break (const char* Format, ...);
+/* Stop running and display the given message */
+
 void CPURun (void);
 /* Run the CPU */
 

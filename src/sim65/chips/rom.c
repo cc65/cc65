@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     ram.c				     */
+/*				     rom.c				     */
 /*                                                                           */
-/*		    RAM plugin for the sim65 6502 simulator		     */
+/*		    ROM plugin for the sim65 6502 simulator		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,8 +33,10 @@
 
 
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <errno.h>
 
 /* sim65 */
 #include "chipif.h"
@@ -74,9 +76,9 @@ static unsigned char Read (void* Data, unsigned Offs);
 
 
 /* Control data passed to the main program */
-static const struct ChipData RAMData[1] = {
+static const struct ChipData ROMData[1] = {
     {
-        "RAM",                  /* Name of the chip */
+        "ROM",                  /* Name of the chip */
         CHIPDATA_TYPE_CHIP,     /* Type of the chip */
         CHIPDATA_VER_MAJOR,     /* Version information */
         CHIPDATA_VER_MINOR,
@@ -94,16 +96,11 @@ static const struct ChipData RAMData[1] = {
 /* The SimData pointer we get when InitChip is called */
 static const SimData* Sim;
 
-/* Possible RAM attributes */
-#define ATTR_INITIALIZED        0x01    /* RAM cell is intialized */
-#define ATTR_WPROT		0x02	/* RAM cell is write protected */
-
-/* Data for one RAM instance */
+/* Data for one ROM instance */
 typedef struct InstanceData InstanceData;
 struct InstanceData {
     unsigned            BaseAddr;       /* Base address */
     unsigned            Range;          /* Memory range */
-    unsigned char*      MemAttr;        /* Memory attributes */
     unsigned char*      Mem;            /* The memory itself */
 };
 
@@ -118,7 +115,7 @@ struct InstanceData {
 int GetChipData (const ChipData** Data, unsigned* Count)
 {
     /* Pass the control structure to the caller */
-    *Data = RAMData;
+    *Data = ROMData;
     *Count = sizeof (Data) / sizeof (Data[0]);
 
     /* Call was successful */
@@ -148,18 +145,39 @@ static int InitChip (const struct SimData* Data)
 static void* InitInstance (unsigned Addr, unsigned Range, void* CfgInfo)
 /* Initialize a new chip instance */
 {
+    char* Name;
+    FILE* F;
+
     /* Allocate a new instance structure */
     InstanceData* D = Sim->Malloc (sizeof (InstanceData));
 
     /* Initialize the structure, allocate RAM and attribute memory */
     D->BaseAddr = Addr;
     D->Range    = Range;
-    D->MemAttr  = Sim->Malloc (Range * sizeof (D->MemAttr[0]));
-    D->Mem      = Sim->Malloc (Range * sizeof (D->Mem[0]));
+    D->Mem      = Sim->Malloc (Range);
 
-    /* Clear the RAM and attribute memory */
-    memset (D->MemAttr, 0, Range * sizeof (D->MemAttr[0]));
-    memset (D->Mem, 0, Range * sizeof (D->Mem[0]));
+    /* We must have a "file" attribute. Get it. */
+    if (Sim->GetCfgStr (CfgInfo, "file", &Name) == 0) {
+        /* Attribute not found */
+        Sim->Error ("Attribute `file' missing");        /* ### */
+    }
+
+    /* Open the file with the given name */
+    F = fopen (Name, "rb");
+    if (F == 0) {
+        Sim->Error ("Cannot open `%s': %s", Name, strerror (errno));
+    }
+
+    /* Read the file into the memory */
+    if (fread (D->Mem, 1, D->Range, F) != D->Range) {
+        Sim->Warning ("Cannot read %u bytes from file `%s'", D->Range, Name);
+    }
+
+    /* Close the file */
+    fclose (F);
+
+    /* Free the file name */
+    Sim->Free (Name);
 
     /* Done, return the instance data */
     return D;
@@ -173,9 +191,8 @@ static void WriteCtrl (void* Data, unsigned Offs, unsigned char Val)
     /* Cast the data pointer */
     InstanceData* D = (InstanceData*) Data;
 
-    /* Do the write and remember the cell as initialized */
+    /* Do the write */
     D->Mem[Offs] = Val;
-    D->MemAttr[Offs] |= ATTR_INITIALIZED;
 }
 
 
@@ -186,14 +203,9 @@ static void Write (void* Data, unsigned Offs, unsigned char Val)
     /* Cast the data pointer */
     InstanceData* D = (InstanceData*) Data;
 
-    /* Check for a write to a write protected cell */
-    if (D->MemAttr[Offs] & ATTR_WPROT) {
-        Sim->Break ("Writing to write protected memory at $%04X", D->BaseAddr+Offs);
-    }
-
-    /* Do the write and remember the cell as initialized */
-    D->Mem[Offs] = Val;
-    D->MemAttr[Offs] |= ATTR_INITIALIZED;
+    /* Print a warning */
+    Sim->Break ("Writing to write protected memory at $%04X (value = $%02X)",
+		D->BaseAddr+Offs, Val);
 }
 
 
@@ -216,16 +228,9 @@ static unsigned char Read (void* Data, unsigned Offs)
     /* Cast the data pointer */
     InstanceData* D = (InstanceData*) Data;
 
-    /* Check for a read from an uninitialized cell */
-    if ((D->MemAttr[Offs] & ATTR_INITIALIZED) == 0) {
-        /* We're reading a memory cell that was never written to */
-        Sim->Break ("Reading from uninitialized memory at $%04X", D->BaseAddr+Offs);
-    }
-
     /* Read the cell and return the value */
     return D->Mem[Offs];
 }
-
 
 
 

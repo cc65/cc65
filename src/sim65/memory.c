@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -162,7 +162,7 @@ void MemInit (void)
         default:
             Internal ("Unexpected CPU type: %d", CPU);
     }
-    MemData = xmalloc (MemSize);
+    MemData = xmalloc (MemSize * sizeof (ChipInstance*));
 
     /* Clear the memory */
     for (I = 0; I < MemSize; ++I) {

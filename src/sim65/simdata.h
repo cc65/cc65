@@ -67,6 +67,9 @@ struct SimData {
     void (*Internal) (const char* Format, ...);
     /* Print an internal program error and terminate */
 
+    void (*Break) (const char* Format, ...);
+    /* Stop the CPU and display the given message */
+
     int (*GetCfgId) (void* CfgInfo, const char* Name, char** Id);
     /* Search CfgInfo for an attribute with the given name and type "id". If
      * found, remove it from the configuration, pass a pointer to a dynamically
@@ -76,11 +79,11 @@ struct SimData {
      */
 
     int (*GetCfgStr) (void* CfgInfo, const char* Name, char** S);
-    /* Search CfgInfo for an attribute with the given name and type "id". If
-     * found, remove it from the configuration, pass a pointer to a dynamically
-     * allocated string containing the value to Id, and return true. If not
-     * found, return false. The memory passed in S must be free by a call to
-     * Free();
+    /* Search CfgInfo for an attribute with the given name and type "string".
+     * If found, remove it from the configuration, pass a pointer to a
+     * dynamically allocated string containing the value to S, and return
+     * true. If not found, return false. The memory passed in S must be free
+     * by a call to Free();
      */
 
     int (*GetCfgNum) (void* CfgInfo, const char* Name, long* Val);

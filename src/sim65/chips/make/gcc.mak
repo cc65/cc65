@@ -14,6 +14,7 @@ LDFLAGS	=
 LIBS 	= $(COMMON)/common.a
 
 CHIPS  	=      	ram.so		\
+		rom.so		\
 		stdio.so
 
 OBJS	= $(CHIPS:.so=.o)
@@ -31,6 +32,10 @@ endif
 # Rules to make chips
 
 ram.so:         ram.o
+	$(CC) $(CFLAGS) -shared -o $@ $(LIBS) $^
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
+
+rom.so:         rom.o
 	$(CC) $(CFLAGS) -shared -o $@ $(LIBS) $^
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
 

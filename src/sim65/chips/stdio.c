@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,7 +51,7 @@
 
 
 
-int InitChip (const struct SimData* Data);
+static int InitChip (const struct SimData* Data);
 /* Initialize the chip, return an error code */
 
 static void* InitInstance (unsigned Addr, unsigned Range, void* CfgInfo);
@@ -72,9 +72,10 @@ static unsigned char Read (void* Data, unsigned Offs);
 
 
 /* Control data passed to the main program */
-static const struct ChipData RAMData[1] = {
+static const struct ChipData STDIOData[1] = {
     {
         "STDIO",                /* Name of the chip */
+        CHIPDATA_TYPE_CHIP,     /* Type of the chip */
         CHIPDATA_VER_MAJOR,     /* Version information */
         CHIPDATA_VER_MINOR,
 
@@ -102,7 +103,7 @@ static const SimData* Sim;
 int GetChipData (const ChipData** Data, unsigned* Count)
 {
     /* Pass the control structure to the caller */
-    *Data = RAMData;
+    *Data = STDIOData;
     *Count = sizeof (Data) / sizeof (Data[0]);
 
     /* Call was successful */
@@ -117,7 +118,7 @@ int GetChipData (const ChipData** Data, unsigned* Count)
 
 
 
-int InitChip (const struct SimData* Data)
+static int InitChip (const struct SimData* Data)
 /* Initialize the chip, return an error code */
 {
     /* Remember the pointer */

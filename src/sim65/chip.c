@@ -45,8 +45,39 @@
 /* sim65 */
 #include "cfgdata.h"
 #include "chipdata.h"
+#include "cpucore.h"
 #include "error.h"
 #include "chip.h"
+
+
+
+/*****************************************************************************/
+/*                                 Forwards                                  */
+/*****************************************************************************/
+
+
+
+static int GetCfgId (void* CfgInfo, const char* Name, char** Id);
+/* Search CfgInfo for an attribute with the given name and type "id". If
+ * found, remove it from the configuration, pass a pointer to a dynamically
+ * allocated string containing the value to Id, and return true. If not
+ * found, return false. The memory passed in Id must be free by a call to
+ * Free();
+ */
+
+static int GetCfgStr (void* CfgInfo, const char* Name, char** S);
+/* Search CfgInfo for an attribute with the given name and type "id". If
+ * found, remove it from the configuration, pass a pointer to a dynamically
+ * allocated string containing the value to Id, and return true. If not
+ * found, return false. The memory passed in S must be free by a call to
+ * Free();
+ */
+
+static int GetCfgNum (void* CfgInfo, const char* Name, long* Val);
+/* Search CfgInfo for an attribute with the given name and type "number".
+ * If found, remove it from the configuration, copy it into Val and return
+ * true. If not found, return false.
+ */
 
 
 
@@ -71,9 +102,10 @@ static const SimData Sim65Data = {
     Warning,
     Error,
     Internal,
-    CfgDataGetId,
-    CfgDataGetStr,
-    CfgDataGetNum
+    Break,
+    GetCfgId,
+    GetCfgStr,
+    GetCfgNum
 };
 
 
@@ -81,6 +113,43 @@ static const SimData Sim65Data = {
 /*****************************************************************************/
 /*                               Helper functions                            */
 /*****************************************************************************/
+
+
+
+static int GetCfgId (void* CfgInfo, const char* Name, char** Id)
+/* Search CfgInfo for an attribute with the given name and type "id". If
+ * found, remove it from the configuration, pass a pointer to a dynamically
+ * allocated string containing the value to Id, and return true. If not
+ * found, return false. The memory passed in Id must be free by a call to
+ * Free();
+ */
+{
+    return CfgDataGetId (CfgInfo, Name, Id);
+}
+
+
+
+static int GetCfgStr (void* CfgInfo, const char* Name, char** S)
+/* Search CfgInfo for an attribute with the given name and type "id". If
+ * found, remove it from the configuration, pass a pointer to a dynamically
+ * allocated string containing the value to Id, and return true. If not
+ * found, return false. The memory passed in S must be free by a call to
+ * Free();
+ */
+{
+    return CfgDataGetStr (CfgInfo, Name, S);
+}
+
+
+
+static int GetCfgNum (void* CfgInfo, const char* Name, long* Val)
+/* Search CfgInfo for an attribute with the given name and type "number".
+ * If found, remove it from the configuration, copy it into Val and return
+ * true. If not found, return false.
+ */
+{
+    return CfgDataGetNum (CfgInfo, Name, Val);
+}
 
 
 
@@ -312,13 +381,16 @@ void LoadChipLibrary (const char* LibName)
         const ChipData* D = Data + I;
 
         /* Check if the chip data has the correct version */
-        if (Data->MajorVersion != CHIPDATA_VER_MAJOR) {
+        if (D->MajorVersion != CHIPDATA_VER_MAJOR) {
             Warning ("Version mismatch for `%s' (%s), expected %u, got %u",
                      D->ChipName, L->LibName,
                      CHIPDATA_VER_MAJOR, D->MajorVersion);
             /* Ignore this chip */
             continue;
         }
+
+	/* Initialize the chip passing the simulator data */
+	D->InitChip (&Sim65Data);
 
         /* Generate a new chip */
         C = NewChip (L, D);
@@ -328,10 +400,11 @@ void LoadChipLibrary (const char* LibName)
 
         /* Output chip name and version to keep the user happy */
         Print (stdout, 1,
-               "  Found `%s', version %u.%u in library `%s'\n",
-               Data->ChipName,
-               Data->MajorVersion,
-               Data->MinorVersion,
+               "  Found %s `%s', version %u.%u in library `%s'\n",
+	       (D->Type == CHIPDATA_TYPE_CHIP)? "chip" : "cpu",
+               D->ChipName,
+               D->MajorVersion,
+               D->MinorVersion,
                L->LibName);
     }
 }

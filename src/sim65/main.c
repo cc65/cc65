@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -110,10 +110,20 @@ static void OptChipDir (const char* Opt attribute ((unused)), const char* Arg)
     /* Read in all files and treat them as libraries */
     while ((E = readdir (D)) != 0) {
 
+	char*  Name;
         struct stat S;
 
+	/* ### Ignore anything buy *.so files */
+	unsigned NameLen = strlen (E->d_name);
+	if (NameLen <= 3) {
+	    continue;
+	}
+	if (strcmp (E->d_name + NameLen - 3, ".so") != 0) {
+	    continue;
+	}
+
         /* Create the full file name */
-        char* Name = xmalloc (DirLen + 1 + strlen (E->d_name) + 1);
+        Name = xmalloc (DirLen + 1 + NameLen + 1);
         strcpy (Name, Arg);
         strcpy (Name + DirLen, "/");
         strcpy (Name + DirLen + 1, E->d_name);
@@ -298,7 +308,7 @@ int main (int argc, char* argv[])
     CfgRead ();
 
     CPUInit ();
-#if 0
+#if 1
     CPURun ();
 #endif
 

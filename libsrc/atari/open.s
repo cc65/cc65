@@ -10,7 +10,9 @@ UCASE_FILENAME	= 1		; comment it out if filename shouldn't be uppercased
 	.include "../common/fmode.inc"
 	.include "../common/errno.inc"
 	.export	_open
+	.import	clriocb
 	.import	fddecusage,newfd
+	.import	findfreeiocb
 	.import	__do_oserror,__seterrno,incsp4
 	.import	ldaxysp,addysp,subysp
 	.import	_strupr,__oserror
@@ -162,49 +164,6 @@ finish:	php
 ok:	lda	tmp2		; get fd
 	ldx	#0
 	stx	__oserror
-	rts
-
-.endproc
-
-
-; find a free iocb
-; no entry parameters
-; return ZF = 0/1 for not found/found
-;        index in X if found
-; all registers destroyed
-
-.proc	findfreeiocb
-
-	ldx	#0
-	ldy	#$FF
-loop:	tya
-	cmp	ICHID,x
-	beq	found
-	txa
-	clc
-	adc	#$10
-	tax
-	cmp	#$80
-	bcc	loop
-	inx			; return ZF cleared
-found:	rts
-
-.endproc
-
-
-; clear iocb except for ICHID field
-; expects X to be index to IOCB (0,$10,$20,etc.)
-; all registers destroyed
-
-.proc	clriocb
-
-	inx			; don't clear ICHID
-	ldy	#15
-	lda	#0
-loop:	sta	ICHID,x
-	inx
-	dey
-	bne	loop
 	rts
 
 .endproc

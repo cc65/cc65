@@ -9,8 +9,10 @@
 	.importzp tmp1,tmp2,tmp3,ptr4,sp
 	.import fd_table,fd_index
 	.import fdt_to_fdi
+	.export	clriocb
 	.export	fdtoiocb
 	.export	fdtoiocb_down
+	.export	findfreeiocb
 	.export	fddecusage
 	.export	newfd
 
@@ -61,10 +63,28 @@ ok_notlast:
 	lda	#1			; clears Z
 	jmp	retiocb
 
-.endproc
+.endproc	; fdtoiocb_down
 
 inval:	ldx	#$ff			; sets N
 	rts
+
+
+; clear iocb except for ICHID field
+; expects X to be index to IOCB (0,$10,$20,etc.)
+; all registers destroyed
+
+.proc	clriocb
+
+	inx			; don't clear ICHID
+	ldy	#15
+	lda	#0
+loop:	sta	ICHID,x
+	inx
+	dey
+	bne	loop
+	rts
+
+.endproc
 
 
 ; gets fd in ax
@@ -90,7 +110,31 @@ inval:	ldx	#$ff			; sets N
 	lda	fd_table+ft_iocb,x	; get iocb
 	rts
 
-.endproc
+.endproc	; fdtoiocb
+
+; find a free iocb
+; no entry parameters
+; return ZF = 0/1 for not found/found
+;        index in X if found
+; all registers destroyed
+
+.proc	findfreeiocb
+
+	ldx	#0
+	ldy	#$FF
+loop:	tya
+	cmp	ICHID,x
+	beq	found
+	txa
+	clc
+	adc	#$10
+	tax
+	cmp	#$80
+	bcc	loop
+	inx			; return ZF cleared
+found:	rts
+
+.endproc	; findfreeiocb
 
 ; decrements usage counter for fd
 ; if 0 reached, it's marked as unused
@@ -123,7 +167,7 @@ inval:	ldx	#$ff			; sets N
 	sta	fd_table+ft_iocb,x	; clear table entry
 ret:	rts
 
-.endproc
+.endproc	; fddecusage
 
 ; newfd
 ;
@@ -334,5 +378,5 @@ finish:	lda	ptr4
 	pla
 	rts
 
-.endproc
+.endproc	; newfd
 

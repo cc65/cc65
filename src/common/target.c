@@ -95,7 +95,7 @@ const cpu_t DefaultCPU[TGT_COUNT] = {
     CPU_6502,           /* lunix */
     CPU_6502,           /* atmos */
     CPU_6502,           /* nes */
-    CPU_65C02,          /* supervision */
+    CPU_65SC02,         /* supervision */
 };
 
 

@@ -1318,10 +1318,13 @@ unsigned OptPrecalc (CodeSeg* S)
         /* Handle the different instructions */
         switch (E->OPC) {
 
+            case OP65_ADC:
             case OP65_AND:
+            case OP65_ASL:
             case OP65_EOR:
             case OP65_LSR:
             case OP65_ORA:
+            case OP65_SBC:
                 if (RegValIsKnown (Out->RegA)) {
                     /* Accu AND zp with known contents */
                     const char* Arg = MakeHexArg (Out->RegA);

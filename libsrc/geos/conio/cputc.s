@@ -33,7 +33,7 @@ _cputc:
 	cmp	#$20
 	bcs	L1
 	cmp	#CR
-	beq	echo_crlf
+	beq	do_cr
 	cmp	#LF
 	beq	do_lf
 	cmp	#$1d
@@ -72,16 +72,15 @@ L2:	php
 
 	inc	cursor_c
 	lda	cursor_c
-	cmp	xsize
+	cmp	xsize			; hit right margin?
 	bne	update_cursor
-echo_crlf:
-	lda	#0
+	lda	#0			; yes - do cr+lf
 	sta	cursor_c
 do_lf:	inc	cursor_r
 	lda	cursor_r
-	cmp	ysize
+	cmp	ysize			; hit bottom margin?
 	bne	update_cursor
-	dec	cursor_r
+	dec	cursor_r		; yes - stay in the last line
 
 update_cursor:
 	jsr 	fixcursor
@@ -96,3 +95,8 @@ update_cursor:
 	lda	#1		; update cursor prompt position
 	sta	r3L
 	jmp	PosSprite
+
+do_cr:	lda	#0
+	sta	cursor_c
+	beq	update_cursor
+

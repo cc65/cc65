@@ -599,6 +599,7 @@ static void DoEnd (void)
 /* End of assembly */
 {
     ForcedEnd = 1;
+    NextTok ();
 }
 
 
@@ -1436,7 +1437,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoDWord		},
     { ccKeepToken,	DoConditionals	},	/* .ELSE */
     { ccKeepToken,	DoConditionals	},	/* .ELSEIF */
-    { ccNone,		DoEnd	  	},
+    { ccKeepToken,     	DoEnd	  	},
     { ccKeepToken,    	DoConditionals	},	/* .ENDIF */
     { ccNone,     	DoUnexpected	},	/* .ENDMACRO */
     { ccNone,		DoEndProc	},

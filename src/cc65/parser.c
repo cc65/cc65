@@ -79,9 +79,7 @@ ExprNode* Expression (void);
 
 
 static int IsTypeExpr (void)
-/* Return true if some sort of variable or type is waiting (helper for cast
- * and sizeof() in hie10).
- */
+/* Return true if some sort of variable or type is waiting */
 {
     SymEntry* Entry;
 
@@ -137,7 +135,7 @@ static ExprNode* GetIntNode (int Value)
 
 
 /*****************************************************************************/
-/*   	     			     Code				     */
+/*   	     			     Code		     		     */
 /*****************************************************************************/
 
 
@@ -661,6 +659,7 @@ static ExprNode* DoPostIncDec (ExprNode* Left)
 
 
 static ExprNode* PostfixExpr (void)
+/* Handle a postfix expression */
 {
     /* Get the lower level expression */
     ExprNode* Root = Primary ();
@@ -909,7 +908,7 @@ static ExprNode* DoAddress (void)
 
 
 static ExprNode* DoIndirect (void)
-/* Handle the indirection operaror * */
+/* Handle the indirection operator * */
 {
     ExprNode* Op;
     type*     ResultType;
@@ -1021,7 +1020,7 @@ static ExprNode* DoTypeCast (void)
     } else {
 
     	/* Must be casted. Setup the expression tree and return the new node */
-    	Root = AllocExprNode (NT_BOOL_NOT, TargetType, RVALUE);
+    	Root = AllocExprNode (NT_TYPECAST, TargetType, RVALUE);
 	SetLeftNode (Root, Op);
 	return Root;
 
@@ -1605,7 +1604,6 @@ static ExprNode* ConditionalExpr (void)
 
     }
 }
-
 
 
 

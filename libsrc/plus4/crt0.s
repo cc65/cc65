@@ -5,13 +5,20 @@
 ;
 
 	.export		_exit
-	.import		initlib, donelib
+        .export         brk_jmp
+
+	.import		condes, initlib, donelib
 	.import	     	push0, _main, zerobss
 	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
 
         .include        "zeropage.inc"
 	.include	"plus4.inc"
 
+
+; ------------------------------------------------------------------------
+; Constants
+
+IRQInd 	       	= $500	; JMP $0000 - used as indirect IRQ vector
 
 ; ------------------------------------------------------------------------
 ; Place the startup code in a special segment to cope with the quirks of
@@ -77,17 +84,44 @@ L1:	lda	sp,x
 
 	jsr	initlib
 
+; If we have IRQ functions, chain our stub into the IRQ vector
+
+        lda     #<__IRQFUNC_COUNT__
+      	beq	NoIRQ1
+      	lda	IRQVec
+       	ldx	IRQVec+1
+      	sta	IRQInd+1
+      	stx	IRQInd+2
+      	lda	#<IRQStub
+      	ldx	#>IRQStub
+      	sei
+      	sta	IRQVec
+      	stx	IRQVec+1
+      	cli
+
 ; Pass an empty command line
 
-       	jsr    	push0		; argc
+NoIRQ1: jsr    	push0		; argc
 	jsr	push0		; argv
 
 	ldy	#4    		; Argument size
        	jsr    	_main 		; call the users code
 
-; Call module destructors. This is also the _exit entry.
+; Back from main (this is also the _exit entry). Reset the IRQ vector if
+; we chained it.
 
-_exit:	jsr	donelib		; Run module destructors
+_exit:  lda     #<__IRQFUNC_COUNT__
+	beq	NoIRQ2
+	lda	IRQInd+1
+	ldx	IRQInd+2
+	sei
+	sta	IRQVec
+	stx	IRQVec+1
+	cli
+
+; Run module destructors.
+
+NoIRQ2:	jsr	donelib	 	; Run module destructors
 
 ; Restore system stuff
 
@@ -118,29 +152,65 @@ IRQ:    pha
         pha
         tsx                     ; Get the stack pointer
         lda     $0103,x         ; Get the saved status register
-        tax
-        lda     #>irqret        ; Push new return address
+        tax                     ; Save for later
+        and     #$10            ; Test for BRK bit
+        bne     dobreak
+        lda     #>irq_ret       ; Push new return address
         pha
-        lda     #<irqret
+        lda     #<irq_ret
         pha
         txa
         pha
         sta     ENABLE_ROM      ; Switch to ROM
         jmp     ($FFFE)         ; Jump to kernal irq handler
 
-irqret: sta     ENABLE_RAM      ; Switch back to RAM
+irq_ret:
+        sta     ENABLE_RAM      ; Switch back to RAM
         pla
         tax
         pla
         rti
 
+dobreak:
+        lda     brk_jmp+2       ; Check high byte of address
+        beq     nohandler
+        jmp     brk_jmp         ; Jump to the handler
+
+; No break handler installed, jump to ROM
+
+nohandler:
+        tya
+        pha                     ; ROM handler expects Y on stack
+        sta     ENABLE_ROM
+        jmp     (BRKVec)        ; Jump indirect to the break vector
+
+; ------------------------------------------------------------------------
+; Stub for the IRQ chain. Is used only if there are IRQs defined. Needed in
+; low memory because of the banking.
+
+.segment        "LOWCODE"
+
+IRQStub:
+        cld                     ; Just to be sure
+        sta     ENABLE_RAM      ; Switch to RAM
+	ldy 	#<(__IRQFUNC_COUNT__*2)
+       	lda    	#<__IRQFUNC_TABLE__
+	ldx 	#>__IRQFUNC_TABLE__
+	jsr	condes 		   	; Call the IRQ functions
+	sta    	ENABLE_ROM
+       	jmp    	IRQInd			; Jump to the saved IRQ vector
+
 ; ------------------------------------------------------------------------
 ; Data
 
 .data
-zpsave:	.res	zpspace
+zpsave:	        .res	zpspace
+
+; BRK handling
+brk_jmp:        jmp     $0000
 
 .bss
-spsave:	.res	1
+spsave:	        .res	1
+
 
 

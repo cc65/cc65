@@ -70,7 +70,7 @@ TED_RAMSEL	= $FF3F
 ; ---------------------------------------------------------------------------
 ; RAM/ROM selection addresses
 
-ENABLE_ROM      = $FF3E
-ENABLE_RAM      = $FF3F
+ENABLE_ROM      = TED_ROMSEL
+ENABLE_RAM      = TED_RAMSEL
 
 

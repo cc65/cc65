@@ -6,11 +6,11 @@
 ; generic (e.g. transfer size is fixed), it's used
 ; to save space with _dio_read and _dio_write functions.
 ;
-; unsigned char __fastcall__ _sio_call(_driveid_t drive_id,
+; unsigned char __fastcall__ _sio_call(_dhandle_t handle,
 ;				       _sectnum_t sect_num,
 ;				       void *buffer,
 ;				       unsigned int sio_val);
-; _driveid_t - 8bit
+; _dhandle_t - 16bit (ptr)
 ; _sectnum_t - 16bit
 ; sio_val is (sio_command | sio_direction << 8)
 ;
@@ -18,7 +18,8 @@
 	.export		__sio_call
 	.include	"atari.inc"
 	.import		popa,popax
-	.import		sectsizetab
+	.import		sectsizetab,__oserror
+	.importzp	ptr1
 
 .proc	__sio_call
 
@@ -30,18 +31,30 @@
 	jsr	popax
 	sta	DAUX1		; set sector #
 	stx	DAUX2
-	jsr	popa
-	cmp	#NUMDRVS
-	bcs	_inv_dev	; invalid device #
+
+	jsr	popax
+	sta	ptr1
+	stx	ptr1+1
+
+	ldy	#sst_flag
+	lda	(ptr1),y
+	and	#128
+	beq	_inv_hand	; handle not open or invalid
+
+	ldy	#sst_driveno
+	lda	(ptr1),y
+
+	clc
 	adc	#1
 	sta	DUNIT		; unit number (d1,d2,d3,...)
-	sbc	#0
-	asl	a
-	tax
-	lda	sectsizetab,x
-	sta	DBYTLO		; low byte of bytes to transfer
-	lda	sectsizetab+1,x
-	sta	DBYTHI		; high byte of bytes to transfer
+
+	ldy	#sst_sectsize
+	lda	(ptr1),y
+	sta	DBYTLO
+	iny
+	lda	(ptr1),y
+	sta	DBYTHI
+
 	lda	#$31		; D1 (drive_id == 0) has id $31
 	sta	DDEVIC
 	lda	#15
@@ -54,11 +67,12 @@
 	bmi	_req_err	; error occurred
 	txa			; no error occurred
 _req_err:
+	sta	__oserror
 	rts
 
-_inv_dev:
+_inv_hand:
 	ldx	#0
-	lda	#NONDEV		; non-existent device error
-	rts
+	lda	#BADIOC
+	bne	_req_err
 
 .endproc

@@ -212,12 +212,12 @@ void SymEnterLevel (const char* ScopeName, unsigned AddrSize)
         AddrSize = GetCurrentSegAddrSize ();
     }
 
-    /* If we have a current scope, search for the given name and create a 
+    /* If we have a current scope, search for the given name and create a
      * new one if it doesn't exist. If this is the root scope, just create it.
      */
     if (CurrentScope) {
         CurrentScope = SymFindScope (CurrentScope, ScopeName, SYM_ALLOC_NEW);
-    
+
         /* Check if the scope has been defined before */
         if (CurrentScope->Flags & ST_DEFINED) {
             Error ("Duplicate scope `%s'", ScopeName);
@@ -705,7 +705,7 @@ void WriteImports (void)
 
 
 
-static unsigned char GetExprMask (SymEntry* S)
+static unsigned char GetExportExprMask (SymEntry* S)
 /* Return the expression bits for the given symbol table entry */
 {
     unsigned char ExprMask;
@@ -714,7 +714,7 @@ static unsigned char GetExprMask (SymEntry* S)
     ExprMask = (SymIsConst (S))? EXP_CONST : EXP_EXPR;
 
     /* Add zeropage/abs bits */
-    ExprMask |= (S->AddrSize == ADDR_SIZE_ZP)? EXP_ZP : EXP_ABS;
+    ExprMask |= (S->ExportSize == ADDR_SIZE_ZP)? EXP_ZP : EXP_ABS;
 
     /* Add the label/equate bits */
     ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;
@@ -747,7 +747,7 @@ void WriteExports (void)
 	    SymFinalize (S);
 
 	    /* Get the expression bits */
-	    ExprMask = GetExprMask (S);
+	    ExprMask = GetExportExprMask (S);
 
 	    /* Count the number of ConDes types */
 	    for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
@@ -793,6 +793,26 @@ void WriteExports (void)
 
 
 
+static unsigned char GetDbgExprMask (SymEntry* S)
+/* Return the expression bits for the given symbol table entry */
+{
+    unsigned char ExprMask;
+
+    /* Check if the symbol is const */
+    ExprMask = (SymIsConst (S))? EXP_CONST : EXP_EXPR;
+
+    /* Add zeropage/abs bits */
+    ExprMask |= (S->AddrSize == ADDR_SIZE_ZP)? EXP_ZP : EXP_ABS;
+
+    /* Add the label/equate bits */
+    ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;
+
+    /* Return the mask */
+    return ExprMask;
+}
+
+
+
 void WriteDbgSyms (void)
 /* Write a list of all symbols to the object file */
 {
@@ -828,7 +848,7 @@ void WriteDbgSyms (void)
 		SymFinalize (S);
 
 		/* Get the expression bits */
-       	       	ExprMask = GetExprMask (S);
+       	       	ExprMask = GetDbgExprMask (S);
 
 		/* Write the type */
 		ObjWrite8 (ExprMask);

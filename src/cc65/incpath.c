@@ -33,8 +33,6 @@
 
 
 
-#include <stdlib.h>
-
 /* common */
 #include "searchpath.h"
 
@@ -70,20 +68,15 @@ char* FindInclude (const char* Name, unsigned Where)
 void InitIncludePaths (void)
 /* Initialize the include path search list */
 {
-    const char* Path;
-
     /* Add some standard paths to the include search path */
-    AddIncludePath ("", INC_USER);		/* Current directory */
-    AddIncludePath ("include", INC_SYS);
+    AddSearchPath ("", INC_USER);		/* Current directory */
+    AddSearchPath ("include", INC_SYS);
 #ifdef CC65_INC
-    AddIncludePath (CC65_INC, INC_SYS);
+    AddSearchPath (CC65_INC, INC_SYS);
 #else
-    AddIncludePath ("/usr/lib/cc65/include", INC_SYS);
+    AddSearchPath ("/usr/lib/cc65/include", INC_SYS);
 #endif
-    Path = getenv ("CC65_INC");
-    if (Path) {
-	AddIncludePath (Path, INC_SYS | INC_USER);
-    }
+    AddSearchPathFromEnv ("CC65_INC", INC_SYS | INC_USER);
 }
 
 

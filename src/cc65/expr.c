@@ -799,7 +799,7 @@ static void Primary (ExprDesc* E)
 
 
 static void ArrayRef (ExprDesc* Expr)
-/* Handle an array reference */
+/* Handle an array reference. This function needs a rewrite. */
 {
     int         ConstBaseAddr;
     ExprDesc    SubScript;
@@ -909,7 +909,7 @@ static void ArrayRef (ExprDesc* Expr)
                 /* It's a pointer, so we do have to load it into the primary
                  * first (if it's not already there).
                  */
-                if (ConstBaseAddr) {
+                if (ConstBaseAddr || ED_IsLVal (Expr)) {
                     LoadExpr (CF_NONE, Expr);
                     ED_MakeRValExpr (Expr);
                 }

@@ -29,7 +29,7 @@
         .word   DEINSTALL
         .word   PAGECOUNT
         .word   MAP
-        .word   MAPCLEAN
+        .word   COMMIT
 	.word	COPYFROM
         .word   COPYTO
 
@@ -43,6 +43,7 @@ REU_REUADDR     = $DF04                 ; REU base address register
 REU_COUNT       = $DF07                 ; Transfer count register
 REU_IRQMASK     = $DF09                 ; IRQ mask register
 REU_CONTROL     = $DF0A                 ; Control register
+REU_TRIGGER     = $FF00                 ; REU command trigger
 
 OP_COPYFROM     = $ED
 OP_COPYTO       = $EC
@@ -64,8 +65,6 @@ reu_params:     .word 	$0000  		; Host address, lo, hi
        	       	.word  	$0000  		; # bytes to move, lo, hi
        		.byte 	$00    		; Interrupt mask reg.
        		.byte 	$00    		; Adress control reg.
-
-
 
 .code
 
@@ -128,40 +127,25 @@ PAGECOUNT:
 ; dirty and must be saved into secondary storage if this is necessary.
 ;
 
-MAP:    ldy     curpage+1               ; Do we have a page mapped?
-        bmi     MAPCLEAN                ; Jump if no page mapped
+MAP:    sta     curpage
+        stx     curpage+1               ; Remember the new page
 
-        ldy     #<window
-        sty     REU_C64ADDR
-        ldy     #>window
-        sty     REU_C64ADDR+1
+        ldy     #OP_COPYFROM
+        jsr     common                  ; Copy the window
 
-        ldy     #0
-        sty     REU_COUNT+0
-        sty     REU_REUADDR+0
-        ldy     curpage
-        sty     REU_REUADDR+1
-        ldy     curpage+1
-        sty     REU_REUADDR+2
-
-        ldy     #1
-        sty     REU_COUNT+1             ; Move 256 bytes
-        ldy     #OP_COPYTO
-        pha
-        jsr     Transfer                ; Transfer 256 bytes into REU
-        pla
-
-; Run straight into MAPCLEAN
+        lda     #<window
+        ldx     #>window                ; Return the window address
+done:   rts
 
 ; ------------------------------------------------------------------------
-; MAPCLEAN: Map the page in a/x into memory and return a pointer to the page
-; in a/x. The contents of the currently mapped page (if any) are assumed to
-; be clean, so if this is an advantage for the driver, the current contents
-; may be discarded.
+; COMMIT: Commit changes in the memory window to extended storage.
 
-MAPCLEAN:
-        sta     curpage
-        stx     curpage+1               ; Remember the new page
+COMMIT: lda     curpage
+        ldx     curpage+1               ; Do we have a page mapped?
+        bmi     done                    ; Jump if no page mapped
+
+        ldy     #OP_COPYTO
+common: sty     tmp1
 
         ldy     #<window
         sty     REU_C64ADDR
@@ -176,12 +160,7 @@ MAPCLEAN:
 
         ldy     #1
         sty     REU_COUNT+1             ; Move 256 bytes
-        ldy     #OP_COPYFROM
-        jsr     Transfer                ; Transfer 256 bytes into REU
-
-        lda     #<window
-        ldx     #>window                ; Return the window address
-        rts
+        bne     transfer1               ; Transfer 256 bytes into REU
 
 ; ------------------------------------------------------------------------
 ; COPYFROM: Copy from extended into linear memory. A pointer to a structure
@@ -190,7 +169,8 @@ MAPCLEAN:
 ;
 
 COPYFROM:
-
+        ldy     #OP_COPYFROM
+        .byte   $2C
 
 ; ------------------------------------------------------------------------
 ; COPYTO: Copy from linear into extended memory. A pointer to a structure
@@ -199,24 +179,46 @@ COPYFROM:
 ;
 
 COPYTO:
-        lda     #0
-        tax
-        rts
+        ldy     #OP_COPYTO
+        sty     tmp1
 
-; ---------------------------------------------------------------------------
+; Remember the passed pointer
+
+        sta     ptr1
+        stx     ptr1+1          ; Save the pointer
+
+; The structure passed to the functions has the same layout as the registers
+; of the Commodore REU, so register programming is easy.
+
+        ldy     #7-1
+@L1:    lda     (ptr1),y
+        sta     REU_C64ADDR,y
+        dey
+        bpl     @L1
+
+; Invalidate the page in the memory window
+
+        sty     curpage+1       ; Y = $FF
+
+; Reload the REU command and start the transfer
+
+transfer1:
+        ldy     tmp1
+
 ; Transfer subroutine for the REU. Expects command in Y.
 
-Transfer:
-        sty 	$df01  		; Issue command
+transfer:
+        sty    	REU_COMMAND     ; Issue command
 
-  	sei          		; Save the value of the
-        ldy 	$01      	; the c64 control port
-        tya          		; and turn on lower 3 bits
-        ora 	#$03     	; to bank out ROMs, I/O.
+        ldy 	$01       	; Save the value of the c64 control port...
+        tya          	  	;
+        ora 	#$03      	; Turn on lower 3 bits to bank out ROMs, I/O.
+  	sei          	  	;
         sta 	$01
-        lda     $ff00
-        sta 	$ff00    	;  Now start transfer...
+        lda     REU_TRIGGER     ; Don't change $FF00
+        sta 	REU_TRIGGER     ; Start the transfer...
 
-        sty     $01             ;  Restore the old configuration
+        sty     $01             ; Restore the old configuration
         cli
         rts
+

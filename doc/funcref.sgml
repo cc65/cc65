@@ -319,7 +319,7 @@ function.
 
 
 <sect1><tt/time.h/<label id="time.h"><p>
-                           
+
 <!--
 <itemize>
 <item><ref id="_systime" name="_systime">
@@ -332,7 +332,7 @@ function.
 <item><ref id="strftime" name="strftime">
 <item><ref id="time" name="time">
 </itemize>
--->    
+-->
 
 
 <sect1><tt/unistd.h/<label id="unistd.h"><p>
@@ -1754,7 +1754,7 @@ fastcall function, so it may only be used in presence of a prototype.
 <tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
 <tag/Declaration/<tt/int __fastcall__ isblank (int c);/
 <tag/Description/The function returns a value of zero if the given argument
-is a blank or space character. The return value is non zero if the character
+is a space or tab character. The return value is non zero if the character
 is anything else.
 <tag/Limits/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The

@@ -48,10 +48,18 @@
 #define IMP_ABS      	0x00   	       	/* Import as normal value */
 #define IMP_ZP 		0x01		/* Import as zero page symbol */
 
+/* Size */
 #define EXP_ABS		0x00		/* Export as normal value */
 #define EXP_ZP 		0x01		/* Export as zero page value */
-#define EXP_CONST	0x00		/* Mask bit for const values */
+#define EXP_MASK_SIZE	0x01		/* Size mask */
+						       
+/* Type of value */
+#define EXP_CONST  	0x00		/* Mask bit for const values */
 #define EXP_EXPR   	0x02   	 	/* Mask bit for expr values */
+#define EXP_MASK_VAL	0x02		/* Value mask */
+
+/* Initializer bit */
+#define EXP_INITIALIZER	0x04		/* Mask bit for initializer export */
 
 
 

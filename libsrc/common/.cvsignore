@@ -33,4 +33,3 @@ strtok.s
 strxfrm.s
 vcprintf.s
 vprintf.s
-vsprintf.s

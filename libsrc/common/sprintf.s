@@ -54,13 +54,12 @@ _sprintf:
 	dey
 	bpl	@L2
 
-; Push va_list (last parameter to vsprintf)
+; Load va_list (last and __fastcall__ parameter to vsprintf)
 
-	lda    	ptr1
-	ldx    	ptr1+1
-	jsr	pushax
+ 	lda    	ptr1
+ 	ldx    	ptr1+1
 
-; Call vfprintf
+; Call vsprintf
 
 	jsr	_vsprintf
 

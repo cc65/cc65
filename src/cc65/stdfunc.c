@@ -1016,6 +1016,9 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
      */
     } else if (CodeSizeFactor > 400 && IS_Get (&InlineStdFuncs)) {
 
+        /* Load the expression into the primary */
+        ExprLoad (CF_NONE, &Arg);
+
         /* Inline the function */
         L = GetLocalLabel ();
         AddCodeLine ("sta ptr1");

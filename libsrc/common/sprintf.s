@@ -28,7 +28,7 @@ _sprintf:
 
 ; We have to push buf and format, both in the order they already have on stack.
 ; To make this somewhat more efficient, we will create space on the stack and
-; the do a copy of the complete block instead of pushing each parameter
+; then do a copy of the complete block instead of pushing each parameter
 ; separately. Since the size of the arguments passed is the same as the size
 ; of the fixed arguments, this will allow us to calculate the pointer to the
 ; fixed size arguments easier (they're just ParamSize bytes away).

@@ -33,7 +33,7 @@ outdesc:		 	; Static outdesc structure
 ; static void out (struct outdesc* d, const char* buf, unsigned count)
 ; /* Routine used for writing */
 ; {
-;     /* String - be shure to check the size */
+;     /* String - be sure to check the size */
 ;     while (count-- && d->ccount < d->uns) {
 ;  	  ((char*) d->ptr) [d->ccount] = *buf;
 ;  	  ++buf;

@@ -11,7 +11,7 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-C_OBJS = fclose.o fgets.o fprintf.o calloc.o _fopen.o\
+C_OBJS = fclose.o fgets.o calloc.o _fopen.o\
 	 fputs.o fread.o fwrite.o gets.o realloc.o bsearch.o strxfrm.o\
 	 _hextab.o fdopen.o strtok.o\
 	 _afailed.o fopen.o fgetc.o fputc.o puts.o gets.o perror.o getchar.o\
@@ -35,6 +35,7 @@ S_OBJS = 	_fdesc.o	\
 		cprintf.o	\
 		errno.o		\
 		fmisc.o 	\
+		fprintf.o	\
 		free.o		\
 		getcpu.o	\
 		isalnum.o	\

@@ -12,7 +12,6 @@ fgetc.s
 fgetpos.s
 fgets.s
 fopen.s
-fprintf.s
 fputc.s
 fputs.s
 fread.s

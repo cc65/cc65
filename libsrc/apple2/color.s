@@ -11,7 +11,7 @@
 
 	.include	"apple2.inc"
 
-_textcolor	= return0
+_textcolor	= return1
 
 _bgcolor	= return0
 

@@ -479,12 +479,12 @@ static void O65RelocPutByte (O65RelocTab* R, unsigned B)
     /* Do we have enough space in the buffer? */
     if (R->Fill == R->Size) {
     	/* We need to grow the buffer */
-        unsigned NewSize = (R->Size == 0)? 1024 : R->Size * 2;
-       	unsigned char* NewBuf = xmalloc (NewSize);
-    	memcpy (NewBuf, R->Buf, R->Size);
-    	xfree (R->Buf);
-        R->Size = NewSize;
-    	R->Buf  = NewBuf;
+        if (R->Size) {
+            R->Size *= 2;
+        } else {
+            R->Size = 1024;     /* Initial size */
+        }
+        R->Buf = xrealloc (R->Buf, R->Size);
     }
 
     /* Put the byte into the buffer */

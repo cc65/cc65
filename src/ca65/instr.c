@@ -273,7 +273,7 @@ static const struct {
 	{ "NOP", 0x0000001, 0xea, 0, PutAll },
 	{ "ORA", 0x0b8f6fc, 0x00, 0, PutAll },
 	{ "PEA", 0x0000008, 0xf4, 6, PutAll },
-	{ "PEI", 0x0800000, 0xd4, 0, PutAll },
+	{ "PEI", 0x0000400, 0xd4, 1, PutAll },
 	{ "PER", 0x0040000, 0x62, 0, PutPCRel16 },
 	{ "PHA", 0x0000001, 0x48, 0, PutAll },
 	{ "PHB", 0x0000001, 0x8b, 0, PutAll },

@@ -1,18 +1,15 @@
 ;
-; Graphics driver for the 640x480x2 mode on the C128 VDC
+; Graphics driver for the 640x480x2 mode on the C128 VDC 64k
 ; (values for this mode based on Fred Bowen's document)
 ; Maciej 'YTM/Elysium' Witkowiak <ytm@elysium.pl>
 ; 23.12.2002
 ;
 ; NOTES:
-; On the real machine there are some additional pixels appearing (probably bad reads)
-; VICE emulator does not show them. Needs further investigation.
+; For any smart monkey that will try to optimize this: PLEASE do tests on real VDC,
+; not only VICE.
 ;
 ; Only DONE routine contains C128-mode specific stuff, everything else will work in
 ; C64-mode of C128 (C64 needs full VDC init then).
-;
-; X-axis resolution can be changed by manipulating xres header field so
-; any resolution 8..708 is possible only with gfx-mode initialization and CALC changed.
 ;
 ; With special initialization and CALC we can get 320x200 double-pixel mode.
 ;
@@ -310,6 +307,11 @@ INIT:   cmp     #TGI_MODE_640_480_2     ; Correct mode?
 @L11:   ldx     #$FF
         stx     BITMASK
 
+; Remeber current color value
+	ldx	#VDC_COLORS
+	jsr	VDCReadReg
+	sta	OLDCOLOR
+
 ; Switch into graphics mode (set view page 0)
 
 	ldy	#0
@@ -321,11 +323,6 @@ INIT:   cmp     #TGI_MODE_640_480_2     ; Correct mode?
 	iny
 	bne	@L2
 @L3:
-
-; Remeber current color value
-	ldx	#VDC_COLORS
-	jsr	VDCReadReg
-	sta	OLDCOLOR
 
 ; Done, reset the error code
 
@@ -343,7 +340,7 @@ INIT:   cmp     #TGI_MODE_640_480_2     ; Correct mode?
 
 DONE:
 	; This part is C128-mode specific
-	jsr $e179		; reload character set
+	jsr $e179		; reload character set and setup VDC
 	jsr $ff62
 	lda $d7			; in 80-columns?
 	bne @L01
@@ -1256,16 +1253,13 @@ icmp:
 ; VDC helpers
 
 VDCSetSourceAddr:
-	ldx	#VDC_DATA_LO
-	stx	VDC_ADDR_REG
-@L0:	bit	VDC_ADDR_REG
-	bpl	@L0
-	sta	VDC_DATA_REG
-	dex
+	pha
 	tya
-	stx	VDC_ADDR_REG
-	sta	VDC_DATA_REG
-	rts
+	ldx	#VDC_DATA_HI
+	jsr	VDCWriteReg
+	pla
+	ldx	#VDC_DATA_LO
+	bne	VDCWriteReg
 
 VDCReadByte:
 	ldx	#VDC_DATA

@@ -501,7 +501,7 @@ void CheckBoolExpr (ExprDesc* lval)
 
 
 
-void exprhs (unsigned flags, int k, ExprDesc *lval)
+void exprhs (unsigned flags, int k, ExprDesc* lval)
 /* Put the result of an expression into the primary register */
 {
     int f;
@@ -554,7 +554,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
  * each parameter separately, or creating the parameter frame once and then
  * storing into this frame.
  * The function returns the size of the parameters pushed.
- */
+ */      
 {
     ExprDesc lval;
 
@@ -2034,53 +2034,53 @@ static void parseadd (int k, ExprDesc* lval)
     	    	g_scale (CF_INT, CheckedPSizeOf (lhst));
     	    	/* Operate on pointers, result type is a pointer */
       	    	flags |= CF_PTR;
-		/* Generate the code for the add */
-		if (lval->Flags == E_MCONST) {
-		    /* Numeric constant */
-		    g_inc (flags, lval->ConstVal);
-		} else {
-		    /* Constant address */
-		    g_addaddr_static (flags, lval->Name, lval->ConstVal);
-		}
+	    	/* Generate the code for the add */
+	    	if (lval->Flags == E_MCONST) {
+	    	    /* Numeric constant */
+	    	    g_inc (flags, lval->ConstVal);
+	    	} else {
+	    	    /* Constant address */
+	    	    g_addaddr_static (flags, lval->Name, lval->ConstVal);
+	    	}
     	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
 
     	      	/* Left is int, right is pointer, must scale lhs. */
-		unsigned ScaleFactor = CheckedPSizeOf (rhst);
+	    	unsigned ScaleFactor = CheckedPSizeOf (rhst);
 
        	       	/* Operate on pointers, result type is a pointer */
-		flags |= CF_PTR;
-		lval->Type = lval2.Type;
+	    	flags |= CF_PTR;
+	    	lval->Type = lval2.Type;
 
-		/* Since we do already have rhs in the primary, if lhs is
-		 * not a numeric constant, and the scale factor is not one
-		 * (no scaling), we must take the long way over the stack.
-		 */
-		if (lval->Flags == E_MCONST) {
-		    /* Numeric constant, scale lhs */
-		    lval->ConstVal *= ScaleFactor;
-		    /* Generate the code for the add */
-		    g_inc (flags, lval->ConstVal);
-		} else if (ScaleFactor == 1) {
-		    /* Constant address but no need to scale */
-		    g_addaddr_static (flags, lval->Name, lval->ConstVal);
-		} else {
-		    /* Constant address that must be scaled */
+	    	/* Since we do already have rhs in the primary, if lhs is
+	    	 * not a numeric constant, and the scale factor is not one
+	    	 * (no scaling), we must take the long way over the stack.
+	    	 */
+	    	if (lval->Flags == E_MCONST) {
+	    	    /* Numeric constant, scale lhs */
+	    	    lval->ConstVal *= ScaleFactor;
+	    	    /* Generate the code for the add */
+	    	    g_inc (flags, lval->ConstVal);
+	    	} else if (ScaleFactor == 1) {
+	    	    /* Constant address but no need to scale */
+	    	    g_addaddr_static (flags, lval->Name, lval->ConstVal);
+	    	} else {
+	    	    /* Constant address that must be scaled */
        	       	    g_push (TypeOf (lval2.Type), 0);   	/* rhs --> stack */
-		    g_getimmed (flags, lval->Name, lval->ConstVal);
-		    g_scale (CF_PTR, ScaleFactor);
-		    g_add (CF_PTR, 0);
-		}
+	    	    g_getimmed (flags, lval->Name, lval->ConstVal);
+	    	    g_scale (CF_PTR, ScaleFactor);
+	    	    g_add (CF_PTR, 0);
+	    	}
        	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	      	/* Integer addition */
        	       	flags |= typeadjust (lval, &lval2, 1);
-		/* Generate the code for the add */
-		if (lval->Flags == E_MCONST) {
-		    /* Numeric constant */
-		    g_inc (flags, lval->ConstVal);
-		} else {
-		    /* Constant address */
-		    g_addaddr_static (flags, lval->Name, lval->ConstVal);
-		}
+	    	/* Generate the code for the add */
+	    	if (lval->Flags == E_MCONST) {
+	    	    /* Numeric constant */
+	    	    g_inc (flags, lval->ConstVal);
+	    	} else {
+	    	    /* Constant address */
+	    	    g_addaddr_static (flags, lval->Name, lval->ConstVal);
+	    	}
     	    } else {
        	       	/* OOPS */
     	    	Error ("Invalid operands for binary operator `+'");
@@ -2156,8 +2156,16 @@ static void parseadd (int k, ExprDesc* lval)
     	      	flags = CF_PTR;
     	      	lval->Type = lval2.Type;
        	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
-    	      	/* Integer addition */
-       	       	flags = typeadjust (lval, &lval2, 0);
+    	      	/* Integer addition. Note: Result is never constant.
+                 * Problem here is that typeadjust does not know if the
+                 * variable is an rvalue or lvalue, so if both operands
+                 * are dereferenced constant numeric addresses, typeadjust
+                 * thinks the operation works on constants. Removing
+                 * CF_CONST here means handling the symptoms, however, the
+                 * whole parser is such a mess that I fear to break anything
+                 * when trying to apply another solution.
+                 */
+       	       	flags = typeadjust (lval, &lval2, 0) & ~CF_CONST;
     	    } else {
        	       	/* OOPS */
     	    	Error ("Invalid operands for binary operator `+'");

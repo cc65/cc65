@@ -82,6 +82,9 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg);
  * load all registers.
  */
 
+int IsZPName (const char* Name);
+/* Return true if the given name is a zero page symbol */
+
 unsigned char GetRegInfo (struct CodeSeg* S, unsigned Index);
 /* Determine register usage information for the instructions starting at the
  * given index.

@@ -130,7 +130,7 @@ static cmp_t FindBoolCmpCond (const char* Name)
 
 
 
-static int FindTosCmpCond (const char* Name)
+static cmp_t FindTosCmpCond (const char* Name)
 /* Check if this is a call to one of the TOS compare functions (tosgtax).
  * Return the condition code or CMP_INV on failure.
  */
@@ -149,37 +149,115 @@ static int FindTosCmpCond (const char* Name)
 
 
 
+static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
+/* Helper function for the replacement of routines that return a boolean
+ * followed by a conditional jump. Instead of the boolean value, the condition
+ * codes are evaluated directly.
+ * I is the index of the conditional branch, the sequence is already checked
+ * to be correct.
+ */
+{
+    CodeEntry* N;
+    CodeLabel* L;
+
+    /* Get the entry */
+    CodeEntry* E = GetCodeEntry (S, I);
+
+    /* Replace the conditional branch */
+    switch (Cond) {
+
+	case CMP_EQ:
+	    ReplaceOPC (E, OPC_JEQ);
+	    break;
+
+	case CMP_NE:
+	    ReplaceOPC (E, OPC_JNE);
+	    break;
+
+	case CMP_GT:
+	    /* Replace by
+	     *     beq @L
+	     *     jpl Target
+	     * @L: ...
+	     */
+	    if ((N = GetNextCodeEntry (S, I)) == 0) {
+		/* No such entry */
+		Internal ("Invalid program flow");
+	    }
+	    L = GenCodeLabel (S, N);
+	    N = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L);
+	    InsertCodeEntry (S, N, I);
+	    ReplaceOPC (E, OPC_JPL);
+	    break;
+
+	case CMP_GE:
+	    ReplaceOPC (E, OPC_JPL);
+	    break;
+
+	case CMP_LT:
+	    ReplaceOPC (E, OPC_JMI);
+	    break;
+
+	case CMP_LE:
+	    /* Replace by
+	     *	   jmi Target
+	     *     jeq Target
+	     */
+	    ReplaceOPC (E, OPC_JMI);
+	    L = E->JumpTo;
+	    N = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L);
+	    InsertCodeEntry (S, N, I+1);
+	    break;
+
+	case CMP_UGT:
+	    /* Replace by
+	     *     beq @L
+	     *     jcs Target
+	     * @L: ...
+	     */
+	    if ((N = GetNextCodeEntry (S, I)) == 0) {
+		/* No such entry */
+		Internal ("Invalid program flow");
+	    }
+	    L = GenCodeLabel (S, N);
+	    N = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L);
+	    InsertCodeEntry (S, N, I);
+	    ReplaceOPC (E, OPC_JCS);
+	    break;
+
+	case CMP_UGE:
+	    ReplaceOPC (E, OPC_JCS);
+	    break;
+
+	case CMP_ULT:
+	    ReplaceOPC (E, OPC_JCC);
+	    break;
+
+	case CMP_ULE:
+	    /* Replace by
+	     *	   jcc Target
+	     *     jeq Target
+	     */
+	    ReplaceOPC (E, OPC_JCC);
+	    L = E->JumpTo;
+	    N = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L);
+	    InsertCodeEntry (S, N, I+1);
+	    break;
+
+	default:
+	    Internal ("Unknown jump condition: %d", Cond);
+
+    }
+
+}
+
+
+
 static int IsUnsignedCmp (int Code)
 /* Check if this is an unsigned compare */
 {
     CHECK (Code >= 0);
     return CmpSignedTab [Code] == 0;
-}
-
-
-
-static const char* MakeBoolCmp (cmp_t Cond)
-/* Create the name of a bool transformer subroutine for the given code. The
- * result is placed into a static buffer, so beware!
- */
-{
-    static char Buffer[20];
-    CHECK (Cond != CMP_INV);
-    sprintf (Buffer, "bool%s", CmpSuffixTab[Cond]);
-    return Buffer;
-}
-
-
-
-static const char* MakeTosCmp (cmp_t Cond)
-/* Create the name of a tos compare subroutine for the given code. The
- * result is placed into a static buffer, so beware!
- */
-{
-    static char Buffer[20];
-    CHECK (Cond != CMP_INV);
-    sprintf (Buffer, "tos%sax", CmpSuffixTab[Cond]);
-    return Buffer;
 }
 
 
@@ -300,9 +378,6 @@ static unsigned OptBoolTransforms (CodeSeg* S)
 	    (N = GetNextCodeEntry (S, I)) != 0           &&
 	    (N->Info & OF_ZBRA) != 0) {
 
-	    CodeEntry* X;
-	    CodeLabel* L;
-
 	    /* Make the boolean transformer unnecessary by changing the
 	     * the conditional jump to evaluate the condition flags that
 	     * are set after the compare directly. Note: jeq jumps if
@@ -315,90 +390,7 @@ static unsigned OptBoolTransforms (CodeSeg* S)
   	    }
 
 	    /* Check if we can replace the code by something better */
- 	    switch (Cond) {
-
-	       	case CMP_EQ:
-	       	    ReplaceOPC (N, OPC_JEQ);
-	      	    break;
-
-	      	case CMP_NE:
-	      	    ReplaceOPC (N, OPC_JNE);
-	      	    break;
-
-	       	case CMP_GT:
-		    /* Replace by
-		     *     beq @L
-		     *     jpl Target
-		     * @L: ...
-		     */
-		    if ((X = GetNextCodeEntry (S, I+1)) == 0) {
-		    	/* No such entry */
-		    	goto NextEntry;
-		    }
-		    L = GenCodeLabel (S, X);
-		    X = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L);
-		    InsertCodeEntry (S, X, I+1);
-       	       	    ReplaceOPC (N, OPC_JPL);
-		    break;
-
-	      	case CMP_GE:
-	      	    ReplaceOPC (N, OPC_JPL);
-	      	    break;
-
-	      	case CMP_LT:
-	      	    ReplaceOPC (N, OPC_JMI);
-	      	    break;
-
-	      	case CMP_LE:
-		    /* Replace by
-		     *	   jmi Target
-		     *     jeq Target
-		     */
-		    ReplaceOPC (N, OPC_JMI);
-		    L = N->JumpTo;
-       	       	    X = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L);
-		    InsertCodeEntry (S, X, I+2);
-		    break;
-
-     	      	case CMP_UGT:
-		    /* Replace by
-		     *     beq @L
-		     *     jcs Target
-		     * @L: ...
-		     */
-		    if ((X = GetNextCodeEntry (S, I+1)) == 0) {
-		    	/* No such entry */
-		    	goto NextEntry;
-		    }
-		    L = GenCodeLabel (S, X);
-		    X = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L);
-		    InsertCodeEntry (S, X, I+1);
-       	       	    ReplaceOPC (N, OPC_JCS);
-		    break;
-
-	     	case CMP_UGE:
-       	       	    ReplaceOPC (N, OPC_JCS);
-	     	    break;
-
-	     	case CMP_ULT:
-	     	    ReplaceOPC (N, OPC_JCC);
-	     	    break;
-
-	     	case CMP_ULE:
-		    /* Replace by
-		     *	   jcc Target
-		     *     jeq Target
-		     */
-		    ReplaceOPC (N, OPC_JCC);
-		    L = N->JumpTo;
-       	       	    X = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L);
-		    InsertCodeEntry (S, X, I+2);
-		    break;
-
-     	    	default:
-	    	    Internal ("Unknown jump condition: %d", Cond);
-
-	    }
+	    ReplaceCmp (S, I+1, Cond);
 
 	    /* Remove the call to the bool transformer */
 	    DelCodeEntry (S, I);
@@ -408,7 +400,6 @@ static unsigned OptBoolTransforms (CodeSeg* S)
 
 	}
 
-NextEntry:
 	/* Next entry */
 	++I;
 
@@ -863,6 +854,68 @@ static unsigned OptCmp4 (CodeSeg* S)
 
 
 
+static unsigned OptCmp5 (CodeSeg* S)
+/* Search for calls to compare subroutines followed by a conditional branch
+ * and replace them by cheaper versions, since the branch means that the
+ * boolean value returned by these routines is not needed (we may also check
+ * that explicitly, but for the current code generator it is always true).
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* N;
+	cmp_t Cond;
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (E->OPC == OPC_JSR 	  		        &&
+	    (Cond = FindTosCmpCond (E->Arg)) != CMP_INV	&&
+	    (N = GetNextCodeEntry (S, I)) != 0	        &&
+	    (N->Info & OF_ZBRA) != 0                    &&
+       	    !CodeEntryHasLabel (N)) {
+
+       	    /* The tos... functions will return a boolean value in a/x and
+	     * the Z flag says if this value is zero or not. We will call
+	     * a cheaper subroutine instead, one that does not return a
+	     * boolean value but only valid flags. Note: jeq jumps if
+	     * the condition is not met, jne jumps if the condition is met.
+     	     * Invert the code if we jump on condition not met.
+	     */
+       	    if (GetBranchCond (N->OPC) == BC_EQ) {
+	       	/* Jumps if condition false, invert condition */
+	       	Cond = CmpInvertTab [Cond];
+  	    }
+
+	    /* Replace the subroutine call. */
+	    DelCodeEntry (S, I);
+	    E = NewCodeEntry (OPC_JSR, AM_ABS, "tosicmp", 0);
+	    InsertCodeEntry (S, E, I);
+
+	    /* Replace the conditional branch */
+	    ReplaceCmp (S, I+1, Cond);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 /*****************************************************************************/
 /*		  	      nega optimizations			     */
 /*****************************************************************************/
@@ -1136,12 +1189,12 @@ static unsigned OptNegAX3 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_JSR  	      		&&
-	    E->Arg[0] == '_'	      		&&
-       	    GetCodeEntries (S, L, I+1, 2)	&&
+       	if (E->OPC == OPC_JSR  	      	       	&&
+	    E->Arg[0] == '_'	      	       	&&
+       	    GetCodeEntries (S, L, I+1, 2)      	&&
        	    L[0]->OPC == OPC_JSR       	       	&&
-	    strncmp (L[0]->Arg,"bnega",5) == 0	&&
-	    !CodeEntryHasLabel (L[0]) 		&&
+	    strncmp (L[0]->Arg,"bnega",5) == 0 	&&
+	    !CodeEntryHasLabel (L[0]) 	       	&&
        	    (L[1]->Info & OF_ZBRA) != 0) {
 
 	    /* Check if we're calling bnega or bnegax */
@@ -1230,6 +1283,7 @@ static OptFunc OptFuncs [] = {
     { OptCmp2,              "OptCmp2",                  0       },
     { OptCmp3,              "OptCmp3",                  0       },
     { OptCmp4,              "OptCmp4",                  0       },
+    { OptCmp5,              "OptCmp5",                  0       },
     /* Remove unused loads */
     { OptUnusedLoads,	    "OptUnusedLoads",		0	},
     /* Optimize branch distance */
@@ -1263,8 +1317,15 @@ static OptFunc* FindOptStep (const char* Name)
 void DisableOpt (const char* Name)
 /* Disable the optimization with the given name */
 {
-    OptFunc* F  = FindOptStep (Name);
-    F->Disabled = 1;
+    if (strcmp (Name, "any") == 0) {
+	unsigned I;
+       	for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
+       	    OptFuncs[I].Disabled = 1;
+	}
+    } else {
+     	OptFunc* F = FindOptStep (Name);
+     	F->Disabled = 1;
+    }
 }
 
 
@@ -1272,8 +1333,15 @@ void DisableOpt (const char* Name)
 void EnableOpt (const char* Name)
 /* Enable the optimization with the given name */
 {
-    OptFunc* F  = FindOptStep (Name);
-    F->Disabled = 0;
+    if (strcmp (Name, "any") == 0) {
+	unsigned I;
+       	for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
+       	    OptFuncs[I].Disabled = 0;
+	}
+    } else {
+     	OptFunc* F = FindOptStep (Name);
+     	F->Disabled = 0;
+    }
 }
 
 

@@ -296,8 +296,15 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 	    /* Absolute, maybe indexed */
 	    L = ReadToken (L, ",", Arg, sizeof (Arg));
 	    if (*L == '\0') {
-	     	/* Assume absolute */
-		AM = AM_ABS;
+	     	/* Absolute, zeropage or branch */
+		if ((OPC->Info & OF_BRA) != 0) {
+		    /* Branch */
+		    AM = AM_BRA;
+		} else if (IsZPName (Arg)) {
+		    AM = AM_ZP;
+		} else {
+		    AM = AM_ABS;
+		}
 	    } else if (*L == ',') {
 		/* Indexed */
 		L = SkipSpace (L+1);
@@ -308,7 +315,11 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 	      	    Reg = toupper (*L);
 		    L = SkipSpace (L+1);
 		    if (Reg == 'X') {
-		     	AM = AM_ABSX;
+			if (IsZPName (Arg)) {
+			    AM = AM_ZPX;
+			} else {
+			    AM = AM_ABSX;
+			}
 		    } else if (Reg == 'Y') {
 		     	AM = AM_ABSY;
 		    } else {
@@ -329,18 +340,10 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
      * if it does not exist. Ignore anything but local labels here.
      */
     Label = 0;
-    if ((OPC->Info & OF_BRA) != 0 && Arg[0] == 'L') {
-
-	unsigned Hash;
-
-	/* Addressing mode must be alsobute or something is really wrong */
-	CHECK (AM == AM_ABS);
-
-	/* Addressing mode is a branch/jump */
-	AM = AM_BRA;
+    if (AM == AM_BRA && Arg[0] == 'L') {
 
 	/* Generate the hash over the label, then search for the label */
-	Hash = HashStr (Arg) % CS_LABEL_HASH_SIZE;
+	unsigned Hash = HashStr (Arg) % CS_LABEL_HASH_SIZE;
 	Label = FindCodeLabel (S, Arg, Hash);
 
 	/* If we don't have the label, it's a forward ref - create it */
@@ -959,14 +962,18 @@ void OutputCodeSeg (const CodeSeg* S, FILE* F)
 	unsigned char Use;
 
 	OutputCodeEntry (CollConstAt (&S->Entries, I), F);
-
-	/* Print usage info */
-	Use = GetRegInfo ((CodeSeg*) S, I+1);
-	fprintf (F,
-		 "  Use: %c%c%c\n",
-		 (Use & REG_A)? 'A' : '_',
-		 (Use & REG_X)? 'X' : '_',
-		 (Use & REG_Y)? 'Y' : '_');
+			      
+#if 0
+     	/* Print usage info */
+     	Use = GetRegInfo ((CodeSeg*) S, I+1);
+     	fprintf (F,
+     		 "  Use: %c%c%c\n",
+     		 (Use & REG_A)? 'A' : '_',
+     		 (Use & REG_X)? 'X' : '_',
+      		 (Use & REG_Y)? 'Y' : '_');
+#else
+	fprintf (F, "\n");
+#endif
     }
 
     /* If this is a segment for a function, leave the function */

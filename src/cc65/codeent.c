@@ -359,14 +359,15 @@ void OutputCodeEntry (const CodeEntry* E, FILE* F)
     /* Print usage info if requested by the debugging flag */
 //    if (Debug) {
   	Chars += fprintf (F,
-  			  "%*s; USE: %c%c%c CHG: %c%c%c",
+  			  "%*s; USE: %c%c%c CHG: %c%c%c SIZE: %u",
   			  30-Chars, "",
        	       	       	  (E->Use & REG_A)? 'A' : '_',
        	       	       	  (E->Use & REG_X)? 'X' : '_',
        	       	       	  (E->Use & REG_Y)? 'Y' : '_',
        	       	       	  (E->Chg & REG_A)? 'A' : '_',
        	       	       	  (E->Chg & REG_X)? 'X' : '_',
-       	       	       	  (E->Chg & REG_Y)? 'Y' : '_');
+       	       	       	  (E->Chg & REG_Y)? 'Y' : '_',
+			  E->Size);
 //    }
 
 }

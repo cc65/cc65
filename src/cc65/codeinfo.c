@@ -112,6 +112,11 @@ static const FuncInfo FuncInfoTable[] = {
 };
 #define FuncInfoCount	(sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
+/* Table with names of zero page locations used by the compiler */
+static const char* ZPNameTable[] = {
+    "ptr1", "regbank", "regsave", "sp", "sreg", "tmp1"
+};
+#define ZPNameCount	(sizeof(ZPNameTable) / sizeof(ZPNameTable[0]))
 
 
 /*****************************************************************************/
@@ -150,7 +155,7 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
      	    /* A function may use the A or A/X registers if it is a fastcall
      	     * function. If it is not a fastcall function but a variadic one,
 	     * it will use the Y register (the parameter size is passed here).
-	     * In all other cases, no registers are used. However, we assume 
+	     * In all other cases, no registers are used. However, we assume
 	     * that any function will destroy all registers.
      	     */
      	    FuncDesc* D = E->V.F.Func;
@@ -164,7 +169,7 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
      		}
 	    } else if ((D->Flags & FD_VARIADIC) != 0) {
 		*Use = REG_Y;
-     	    } else {			      
+     	    } else {
      		/* Will not use any registers */
      		*Use = REG_NONE;
      	    }
@@ -194,6 +199,25 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
     /* Function not found - assume all registers used */
     *Use = REG_AXY;
     *Chg = REG_AXY;
+}
+
+
+
+int IsZPName (const char* Name)
+/* Return true if the given name is a zero page symbol */
+{
+    unsigned I;
+
+    /* Because of the low number of symbols, we do a linear search here */
+    for (I = 0; I < ZPNameCount; ++I) {
+	if (strcmp (Name, ZPNameTable[I]) == 0) {
+	    /* Found */
+	    return 1;
+	}
+    }
+
+    /* Not found */
+    return 0;
 }
 
 

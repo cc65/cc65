@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -49,10 +49,8 @@
 
 
 
-/* Definitions for the possible opcodes */
+/* 65XX opcodes */
 typedef enum {
-
-    /* 65XX opcodes */
     OP65_ADC,
     OP65_AND,
     OP65_ASL,
@@ -129,24 +127,11 @@ typedef enum {
     OP65_TYA,
 
     /* Number of opcodes available */
-    OPCODE_COUNT,
-
-    /* Several other opcode information constants */
-    OP65_FIRST = OP65_ADC,
-    OP65_LAST  = OP65_TYA,
-    OP65_COUNT = OP65_LAST - OP65_FIRST + 1
+    OP65_COUNT
 } opc_t;
 
-/* Addressing modes */
+/* 65XX addressing modes */
 typedef enum {
-
-    /* Addressing modes of the virtual stack machine */
-    AM_IMP,
-    AM_IMM,
-    AM_STACK,
-    AM_ABS,
-
-    /* 65XX addressing modes */
     AM65_IMP,       	   	/* implicit */
     AM65_ACC,       	   	/* accumulator */
     AM65_IMM,       	   	/* immidiate */
@@ -205,7 +190,7 @@ typedef struct {
 } OPCDesc;
 
 /* Opcode description table */
-extern const OPCDesc OPCTable[OPCODE_COUNT];
+extern const OPCDesc OPCTable[OP65_COUNT];
 
 
 

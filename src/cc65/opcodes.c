@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -55,7 +55,7 @@
 
 
 /* Opcode description table */
-const OPCDesc OPCTable[OPCODE_COUNT] = {
+const OPCDesc OPCTable[OP65_COUNT] = {
 
     /* 65XX opcodes */
     {   OP65_ADC,      	                        /* opcode */
@@ -620,7 +620,7 @@ const OPCDesc* FindOP65 (const char* M)
     Mnemo[I] = '\0';
 
     /* Search for the mnemonic in the table and return the result */
-    return bsearch (Mnemo, OPCTable+OP65_FIRST, OP65_COUNT,
+    return bsearch (Mnemo, OPCTable, OP65_COUNT,
 		    sizeof (OPCTable[0]), FindCmp );
 }
 

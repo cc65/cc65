@@ -1373,7 +1373,6 @@ void CE_Output (const CodeEntry* E, FILE* F)
     /* Print the operand */
     switch (E->AM) {
 
-	case AM_IMP:
     	case AM65_IMP:
     	    /* implicit */
     	    break;
@@ -1383,13 +1382,11 @@ void CE_Output (const CodeEntry* E, FILE* F)
     	    Chars += fprintf (F, "%*sa", 9-Chars, "");
     	    break;
 
-	case AM_IMM:
 	case AM65_IMM:
     	    /* immidiate */
     	    Chars += fprintf (F, "%*s#%s", 9-Chars, "", E->Arg);
     	    break;
 
-	case AM_ABS:
     	case AM65_ZP:
     	case AM65_ABS:
 	    /* zeropage and absolute */

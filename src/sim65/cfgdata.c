@@ -87,7 +87,7 @@ void FreeCfgData (CfgData* D)
 
 
 
-int CfgDataFind (Collection* Attributes, const char* AttrName)
+int CfgDataFind (const Collection* Attributes, const char* AttrName)
 /* Find the attribute with the given name and return its index. Return -1 if
  * the attribute was not found.
  */
@@ -108,7 +108,7 @@ int CfgDataFind (Collection* Attributes, const char* AttrName)
     }
 
     /* Not found */
-    return -1;
+    return -1;         
 }
 
 

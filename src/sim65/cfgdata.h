@@ -82,7 +82,7 @@ CfgData* NewCfgData (void);
 void FreeCfgData (CfgData* D);
 /* Free a config data structure */
 
-int CfgDataFind (Collection* Attributes, const char* AttrName);
+int CfgDataFind (const Collection* Attributes, const char* AttrName);
 /* Find the attribute with the given name and return its index. Return -1 if
  * the attribute was not found.
  */

@@ -139,38 +139,12 @@ static int CmpLocations (void* Data attribute ((unused)),
 
 
 
-static int LocationFindAttr (const Location* L, const char* AttrName)
-/* Find the attribute with the given name and return its index. Return -1 if
- * the attribute was not found.
- */
-{
-    unsigned I;
-
-    /* Walk through the attributes checking for a "mirror" attribute */
-    for (I = 0; I < CollCount (&L->Attributes); ++I) {
-
-        /* Get the next attribute */
-        const CfgData* D = CollConstAt (&L->Attributes, I);
-
-        /* Compare the name */
-        if (StrCaseCmp (D->Attr, AttrName) == 0) {
-            /* Found */
-            return I;
-        }
-    }
-
-    /* Not found */
-    return -1;
-}
-
-
-
 static int LocationGetAttr (const Location* L, const char* AttrName)
 /* Find the attribute with the given name and return it. Call Error() if the
  * attribute was not found.
  */
 {
-    int I = LocationFindAttr (L, AttrName);
+    int I = CfgDataFind (&L->Attributes, AttrName);
     if (I < 0) {
         Error ("%s(%u): Attribute `%s' missing", CfgGetName(), L->Line, AttrName);
     }
@@ -183,7 +157,7 @@ static int LocationIsMirror (const Location* L)
 /* Return true if the given location is a mirror of another one. */
 {
     /* Find the "mirror" attribute */
-    return (LocationFindAttr (L, "mirror") >= 0);
+    return (CfgDataFind (&L->Attributes, "mirror") >= 0);
 }
 
 

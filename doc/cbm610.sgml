@@ -82,11 +82,6 @@ Programs containing CBM 610 specific code may use the <tt/cbm610.h/ or
 for more than one CBM platform, since it includes <tt/cbm610.h/ and declares
 several functions common to all CBM platforms.
 
-Please note that because of <ref id="limitations" name="current limitations">
-of the runtime library for the platform, several standard C and CBM functions
-are not available.
-
-
 <sect1>CBM 610 specific functions<p>
 
 The functions listed below are special for the CBM 610. See the <htmlurl
@@ -105,6 +100,33 @@ url="funcref.html" name="function reference"> for declaration and usage.
 Some functions are available for all (or at least most) of the Commodore
 machines. See the <htmlurl url="funcref.html" name="function reference"> for
 declaration and usage.
+
+
+<itemize>
+<item>cbm_close
+<item>cbm_closedir
+<item>cbm_k_setlfs
+<item>cbm_k_setnam
+<item>cbm_k_load
+<item>cbm_k_save
+<item>cbm_k_open
+<item>cbm_k_close
+<item>cbm_k_readst
+<item>cbm_k_chkin
+<item>cbm_k_ckout
+<item>cbm_k_basin
+<item>cbm_k_bsout
+<item>cbm_k_clrch
+<item>cbm_load
+<item>cbm_open
+<item>cbm_opendir
+<item>cbm_read
+<item>cbm_readdir
+<item>cbm_save
+<item>cbm_write
+<item>get_tv
+</itemize>
+
 
 
 <sect1>Hardware access<p>
@@ -151,20 +173,6 @@ will <em>not</em> work!
 
 <sect>Loadable drivers<p>
 
-<bf>Note:</bf> Since the CBM 610 doesn't have working disk I/O (see <ref
-id="limitations" name="section &quot;Limitations&quot;">), the available
-drivers cannot be loaded at runtime (so the term "loadable drivers" is
-somewhat misleading). Instead, the drivers have to be converted using the
-<htmlurl url="co65.html" name="co65 utility"> and statically linked. While
-this may seem overhead, it has two advantages:
-
-<enum>
-<item>The interface is identical to the one used for other platforms
-      and to the one for the CBM 610 once it has disk I/O.
-<item>Once disk I/O is available, existing code can be changed to load drivers
-      at runtime with almost no effort.
-</enum>
-
 
 <sect1>Graphics drivers<p>
 
@@ -178,7 +186,7 @@ really good:-).
 <descrip>
   <tag><tt/cbm610-ram.emd/</tag>
   A driver for the RAM in bank 2. Supports up to 255 pages with 256 bytes
-  each. Untested!
+  each.
 </descrip><p>
 
 
@@ -197,42 +205,31 @@ does not exist).
 
 <sect1>RS232 device drivers<p>
 
-Currently no RS232 drivers exist for the Commodore 610.
+<descrip>
 
+  <tag><tt/cbm610-std.ser/</tag>
+  Driver for the 6551 ACIA chip built into the Commodore 610. Supports up to
+  19200 baud, hardware flow control (RTS/CTS) and interrupt driven receives.
+  Note that because of the peculiarities of the 6551 chip transmits are not
+  interrupt driven, and the transceiver blocks if the receiver asserts flow
+  control because of a full buffer.
+
+</descrip><p>
 
 
 <sect>Limitations<label id="limitations"><p>
 
 
-<sect1>Disk I/O<p>
-
-The existing library for the CBM 610 doesn't implement C file I/O. Please note
-that this includes <tt/printf/! You may use the conio functions for screen I/O.
-
-To be more concrete, this limitation means that you cannot use any of the
-following functions (and a few others):
-
-<itemize>
-<item>fclose
-<item>fgets
-<item>fopen
-<item>fread
-<item>fprintf
-<item>fputc
-<item>fscanf
-<item>fwrite
-<item>gets
-<item>printf
-<item>...
-</itemize>
-
-
 <sect1>Kernal and hardware access<p>
 
 Since the program runs in bank 1, and the kernal and all I/O chips are located
-in bank 15, calling ROM routines or accessing hardware needs special code.
+in bank 15, calling ROM routines or accessing hardware needs special code. The
+cc65 runtime implements wrappers for all functions in the kernal jump table.
+While this simplifies things, it should be noted that the wrappers do have
+quite an impact on performance: A cross bank call has an extra 50-100us
+penalty added by the wrapper.
 
-
+                            
 
 <sect>Other hints<p>
 

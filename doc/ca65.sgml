@@ -43,7 +43,7 @@ development:
 	thinking about a 65816 backend for the C compiler, and even my old
 	a816 assembler had support for these CPUs, so this wasn't really a
 	problem.
-<item>	The assembler must produce relocatable code. This necessary for the
+<item>	The assembler must produce relocatable code. This is necessary for the
 	compiler support, and it is more convenient.
 <item>	Conditional assembly must be supported. This is a must for bigger
 	projects written in assembler (like Elite128).
@@ -258,6 +258,7 @@ Here is a description of all the command line options:
   or bugfixes, please include the version number.
 
 
+  <label id="option-W">
   <tag><tt>-Wn</tt></tag>
 
   Set the warning level for the assembler. Using -W2 the assembler will
@@ -500,9 +501,9 @@ current program counter.
 
 <sect1>Local labels and symbols<p>
 
-Using the <tt><ref id=".PROC" name=".PROC"></tt> directive, it is possible
-to create regions of code where the names of labels and symbols are local
-to this region. They are not know outside and cannot be accessed from
+Using the <tt><ref id=".PROC" name=".PROC"></tt> directive, it is possible to
+create regions of code where the names of labels and symbols are local to this
+region. They are not known outside of this region and cannot be accessed from
 there. Such regions may be nested like PROCEDUREs in Pascal.
 
 See the description of the <tt><ref id=".PROC" name=".PROC"></tt>
@@ -516,10 +517,10 @@ label must begin with a special symbol (usually '@', but this can be
 changed by the <tt><ref id=".LOCALCHAR" name=".LOCALCHAR"></tt>
 directive).
 
-Cheap local labels are visible only between two no cheap labels. As soon
-as a standard symbol is encountered (this may also be a local symbol if
-inside a region defined with the <tt><ref id=".PROC" name=".PROC"></tt>
-directive), the cheap local symbol goes out of scope.
+Cheap local labels are visible only between two non cheap labels. As soon as a
+standard symbol is encountered (this may also be a local symbol if inside a
+region defined with the <tt><ref id=".PROC" name=".PROC"></tt> directive), the
+cheap local symbol goes out of scope.
 
 You may use cheap local labels as an easy way to reuse common label
 names like "Loop". Here is an example:
@@ -1624,8 +1625,10 @@ Here's a list of all control commands and a description, what they do:
   identifier specifying the macro package to insert. Available macro
   packages are:
 
+  <tscreen><verb>
 	generic		Defines generic macros like add and sub.
     	longbranch     	Defines conditional long jump macros.
+  </verb></tscreen>
 
   Including a macro package twice, or including a macro package that
   redefines already existing macros will lead to an error.
@@ -1639,7 +1642,8 @@ Here's a list of all control commands and a description, what they do:
        		jne    	Label		; Jump long on condition
   </verb></tscreen>
 
-  See section <ref id="macros" name="Macros">).
+  Macro packages are explained in more detail in section <ref
+  id="macropackages" name="Macro packages">).
 
 
 <sect1><tt>.MAC, .MACRO</tt><label id=".MAC"><p>
@@ -1803,11 +1807,11 @@ Here's a list of all control commands and a description, what they do:
 
   Set the page length for the listing. Must be followed by an integer
   constant. The value may be "unlimited", or in the range 32 to 127. The
-  statement has no effect if no listing is generated. The default value
-  is -1 but may be overridden by the <tt/--pagelength/ command line option.
-  Beware: Since the listing is generated after assembly is complete, you
-  cannot use multiple line lengths with one source. Instead, the value
-  set with the last <tt/.PAGELENGTH/ is used.
+  statement has no effect if no listing is generated. The default value is -1
+  (unlimited) but may be overridden by the <tt/--pagelength/ command line
+  option. Beware: Since ca65 is a one pass assembler, the listing is generated
+  after assembly is complete, you cannot use multiple line lengths with one
+  source. Instead, the value set with the last <tt/.PAGELENGTH/ is used.
 
   Examples:
 
@@ -1834,7 +1838,7 @@ Here's a list of all control commands and a description, what they do:
  	.endmacro
   </verb></tscreen>
 
-  See section <ref id="macros" name="Macros">).
+  See section <ref id="macros" name="Macros">.
 
 
 <sect1><tt>.PC02</tt><label id=".PC02"><p>
@@ -1917,8 +1921,8 @@ Here's a list of all control commands and a description, what they do:
 
   <tscreen><verb>
 	.macro	Crypt  	Arg
-		.repeat	strlen(Arg), I
-		.byte  	strat(Arg, I) .xor $55
+		.repeat	.strlen(Arg), I
+		.byte  	.strat(Arg, I) .xor $55
 		.endrep
 	.endmacro
   </verb></tscreen>
@@ -2127,8 +2131,9 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.WARNING</tt><label id=".WARNING"><p>
 
   Force an assembly warning. The assembler will output a warning message
-  preceeded by "User warning". This warning will always be output, even
-  if other warnings are disabled with the <tt/-W0/ command line option.
+  preceeded by "User warning". This warning will always be output, even if
+  other warnings are disabled with the <tt><ref id="option-W" name="-W0"></tt>
+  command line option.
 
   This command may be used to output possible problems when assembling
   the source file.
@@ -2254,7 +2259,7 @@ When using macro parameters, macros can be even more useful:
 <tscreen><verb>
   	.macro 	inc16	addr
   		clc
-  		lda	addr
+  		lda    	addr
   		adc	#$01
   		sta	addr
   		lda	addr+1
@@ -2466,7 +2471,7 @@ different:
 	span more than a line. You may use line continuation (see <tt><ref
 	id=".LINECONT" name=".LINECONT"></tt>) to spread the definition over
 	more than one line for increased readability, but the macro itself
-	does not contain an end-of-line token.
+	may not contain an end-of-line token.
 
 <item>	Macros defined with <tt><ref id=".DEFINE" name=".DEFINE"></tt> share
 	the name space with classic macros, but they are detected and replaced
@@ -2553,7 +2558,7 @@ be sure to take the translation into account.
 
 
 
-<sect>Macro packages<p>
+<sect>Macro packages<label id="macropackages"><p>
 
 Using the <tt><ref id=".MACPACK" name=".MACPACK"></tt> directive, predefined
 macro packages may be included with just one command. Available macro packages

@@ -11,9 +11,8 @@
 
 
 _tgi_getyres:
-        lda     _tgi_drv
-        ldx     _tgi_drv+1
-        ldy     #TGI_HDR_YRES+1
-        jmp     ldaxidx
+        lda     _tgi_yres
+        ldx     _tgi_yres+1
+        rts
 
 

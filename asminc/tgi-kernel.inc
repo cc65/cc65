@@ -66,6 +66,8 @@ TGI_HDR_JUMPCOUNT       = 12            ; Number of jump vectors
 	.global	_tgi_drv      		; Pointer to driver
 	.global	_tgi_error    		; Last error code
         .global _tgi_mode               ; Graphics mode or zero
+        .global _tgi_xres               ; X resolution of the current mode
+        .global _tgi_yres               ; Y resolution of the current mode 
 
 ;------------------------------------------------------------------------------
 ; Driver entry points

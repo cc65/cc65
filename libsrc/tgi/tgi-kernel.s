@@ -18,7 +18,9 @@
 _tgi_drv:	.res	2		; Pointer to driver
 _tgi_error:	.res	1		; Last error code
 _tgi_mode:      .res    1               ; Graphics mode or zero
-
+_tgi_xres:      .res    2               ; X resolution of the current mode
+_tgi_yres:      .res    2               ; Y resolution of the current mode
+        
 
 .data
 
@@ -51,16 +53,32 @@ copy:   lda     (ptr1),y
 
 
 _tgi_setup:
- 	jsr     tgi_set_ptr
+ 	jsr     tgi_set_ptr             ; load _tgi_drv into ptr1
+
+; Copy the jump vectors
 
         ldy     #TGI_HDR_JUMPTAB
         ldx     #0
-
 @L1:    inx                             ; Skip JMP opcode
         jsr     copy                    ; Copy one byte
         jsr     copy                    ; Copy one byte
         cpx     #(TGI_HDR_JUMPCOUNT*3)
         bne     @L1
+
+; Copy the screen dimensions
+
+        ldy     #TGI_HDR_XRES
+        lda     (ptr1),y
+        sta     _tgi_xres
+        iny
+        lda     (ptr1),y
+        sta     _tgi_xres+1
+        ldy     #TGI_HDR_YRES
+        lda     (ptr1),y
+        sta     _tgi_yres
+        iny
+        lda     (ptr1),y
+        sta     _tgi_yres+1
 
 ; Initialize variables
 

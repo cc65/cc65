@@ -80,6 +80,8 @@ typedef struct {
 extern tgi_drv_header*	tgi_drv;	/* Pointer to driver */
 extern unsigned char  	tgi_error;	/* Last error code */
 extern unsigned char    tgi_mode;       /* Graphics mode or zero */
+extern unsigned         tgi_xres;       /* X resolution of the current mode */
+extern unsigned         tgi_yres;       /* Y resolution of the current mode */
 
 
 
@@ -91,7 +93,7 @@ extern unsigned char    tgi_mode;       /* Graphics mode or zero */
 
 const char* __fastcall__ tgi_map_mode (unsigned char mode);
 /* Map a tgi mode to a driver name. Returns NULL if no driver available. */
-                      
+
 void __fastcall__ tgi_setup (void);
 /* Setup the driver and graphics kernel once the driver is loaded */
 

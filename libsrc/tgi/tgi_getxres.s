@@ -7,13 +7,11 @@
 
         .include        "tgi-kernel.inc"
         .export         _tgi_getxres
-        .import         ldaxidx
 
 
 _tgi_getxres:
-        lda     _tgi_drv
-        ldx     _tgi_drv+1
-        ldy     #TGI_HDR_XRES+1
-        jmp     ldaxidx
+        lda     _tgi_xres
+        ldx     _tgi_xres+1
+        rts
 
 

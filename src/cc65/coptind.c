@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -850,12 +850,12 @@ unsigned OptDupLoads (CodeSeg* S)
 		 * location does already contain the value to be stored,
 		 * remove the store.
 		 */
-	        if (In->RegX >= 0                     && /* Value of A is known */
+	        if (In->RegY >= 0                     && /* Value of Y is known */
 		    E->AM == AM65_ZP                  && /* Store into zp */
 		    (((E->Chg & REG_SREG_LO) != 0 &&     /* Store into sreg */
-		      In->RegX == In->SRegLo)       ||   /* Value identical */
+		      In->RegY == In->SRegLo)       ||   /* Value identical */
        	       	     ((E->Chg & REG_SREG_HI) != 0 &&     /* Store into sreg+1 */
-       	       	      In->RegX == In->SRegHi))) {        /* Value identical */
+       	       	      In->RegY == In->SRegHi))) {        /* Value identical */
 		    Delete = 1;
 	        /* If the value in the Y register is known and the same as
 		 * that in the A register, replace the store by a STA. The
@@ -866,12 +866,25 @@ unsigned OptDupLoads (CodeSeg* S)
 		 */
        	        } else if (In->RegY >= 0) {
 		    if (In->RegY == In->RegA) {
-		    	CE_ReplaceOPC (E, OP65_STA);
+		     	CE_ReplaceOPC (E, OP65_STA);
 		    } else if (In->RegY == In->RegX   &&
-			       E->AM != AM65_ABSX     &&
-			       E->AM != AM65_ZPX) {
+		     	       E->AM != AM65_ABSX     &&
+		     	       E->AM != AM65_ZPX) {
 		    	CE_ReplaceOPC (E, OP65_STX);
 		    }
+		}
+	        break;
+
+	    case OP65_STZ:
+	        /* If we store into a known zero page location, and this
+		 * location does already contain the value to be stored,
+		 * remove the store.
+		 */
+       	        if (CPU >= CPU_65C02 && E->AM == AM65_ZP) {
+                    if (((E->Chg & REG_SREG_LO) != 0 && In->SRegLo == 0) ||
+                        ((E->Chg & REG_SREG_HI) != 0 && In->SRegHi == 0)) {
+                        Delete = 1;
+                    }
 		}
 	        break;
 

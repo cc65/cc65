@@ -1278,7 +1278,7 @@ static unsigned OptSize2 (CodeSeg* S)
 			X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
 		    } else if (Val == E->RI->In.RegA) {
 			X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
-		    }
+                    }
 		}
 	        break;
 
@@ -1351,6 +1351,7 @@ struct OptFunc {
 /* A list of all the function descriptions */
 static OptFunc DOpt65C02BitOps  = { Opt65C02BitOps,  "Opt65C02BitOps",   66, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Ind    	= { Opt65C02Ind,     "Opt65C02Ind",     100, 0, 0, 0, 0, 0 };
+static OptFunc DOpt65C02Stores  = { Opt65C02Stores,  "Opt65C02Stores",  100, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",        	 60, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",        	200, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",        	 40, 0, 0, 0, 0, 0 };
@@ -1406,6 +1407,7 @@ static OptFunc DOptUnusedStores	= { OptUnusedStores, "OptUnusedStores",   0, 0, 
 static OptFunc* OptFuncs[] = {
     &DOpt65C02BitOps,
     &DOpt65C02Ind,
+    &DOpt65C02Stores,
     &DOptAdd1,
     &DOptAdd2,
     &DOptAdd3,
@@ -1775,17 +1777,17 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 static unsigned RunOptGroup4 (CodeSeg* S)
 /* 65C02 specific optimizations. */
 {
-    unsigned C;
     unsigned Changes = 0;
 
     if (CPU >= CPU_65C02) {
         Changes += RunOptFunc (S, &DOpt65C02BitOps, 1);
-    	/* Replace (zp),y by (zp) if Y is zero. If we have changes, run register
-    	 * load optimization again, since loads of Y may have become unnecessary.
-    	 */
-    	C = RunOptFunc (S, &DOpt65C02Ind, 1);
-    	Changes += C;
-    	if (C) {
+    	Changes += RunOptFunc (S, &DOpt65C02Ind, 1);
+        Changes += RunOptFunc (S, &DOpt65C02Stores, 1);
+       	if (Changes) {
+            /* The 65C02 replacement codes do often make the use of a register
+             * value unnecessary, so if we have changes, run another load
+             * removal pass.
+             */
     	    Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
     	}
     }

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2001-2002  Ullrich von Bassewitz                                      */
+/*                Wacholderweg 14                                            */
+/*                D-70597 Stuttgart                                          */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -77,6 +77,9 @@ struct RegInfo {
 
 void RC_Invalidate (RegContents* C);
 /* Invalidate all registers */
+
+void RC_InvalidateZP (RegContents* C);
+/* Invalidate all ZP registers */
 
 RegInfo* NewRegInfo (const RegContents* RC);
 /* Allocate a new register info, initialize and return it. If RC is not

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -53,6 +53,15 @@ void RC_Invalidate (RegContents* C)
     C->RegA   = -1;
     C->RegX   = -1;
     C->RegY   = -1;
+    C->SRegLo = -1;
+    C->SRegHi = -1;
+}
+
+
+
+void RC_InvalidateZP (RegContents* C)
+/* Invalidate all ZP registers */    
+{
     C->SRegLo = -1;
     C->SRegHi = -1;
 }

@@ -146,26 +146,73 @@ unsigned Opt65C02BitOps (CodeSeg* S)
                 /* LDA #XX */
                 sprintf (Buf, "$%02X", (int) ((~L[1]->Num) & 0xFF));
                 X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, L[1]->LI);
-                CS_InsertEntry (S, X, I);
+                CS_InsertEntry (S, X, I+3);
 
                 /* TRB */
                 X = NewCodeEntry (OP65_TRB, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
-                CS_InsertEntry (S, X, I+1);
+                CS_InsertEntry (S, X, I+4);
 
             } else {
 
                 /* LDA #XX */
                 sprintf (Buf, "$%02X", (int) L[1]->Num);
                 X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, L[1]->LI);
-                CS_InsertEntry (S, X, I);
+                CS_InsertEntry (S, X, I+3);
 
-                /* TRB */
+                /* TSB */
                 X = NewCodeEntry (OP65_TSB, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
-                CS_InsertEntry (S, X, I+1);
+                CS_InsertEntry (S, X, I+4);
             }
 
             /* Delete the old stuff */
-            CS_DelEntries (S, I+2, 3);
+            CS_DelEntries (S, I, 3);
+
+	    /* We had changes */
+	    ++Changes;
+	}
+
+     	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned Opt65C02Stores (CodeSeg* S)
+/* Use STZ where possible */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check for the sequence */
+	if (E->OPC == OP65_STA      	       	        &&
+            (E->AM == AM65_ZP  || E->AM == AM65_ABS ||
+             E->AM == AM65_ZPX || E->AM == AM65_ABSX )  &&
+            E->RI->In.RegA == 0) {
+
+            /* Replace by STZ */
+            CodeEntry* X = NewCodeEntry (OP65_STZ, E->AM, E->Arg, 0, E->LI);
+            CS_InsertEntry (S, X, I+1);
+
+            /* Delete the old stuff */
+            CS_DelEntry (S, I);
 
 	    /* We had changes */
 	    ++Changes;

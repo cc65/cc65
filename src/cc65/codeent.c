@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -420,6 +420,9 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		} else if ((E->Chg & REG_SREG_HI) != 0 && In->SRegHi >= 0) {
 		    Out->SRegHi = (In->SRegHi << 1) & 0xFF;
 		}
+	    } else if (E->AM == AM65_ZPX) {
+                /* Invalidates all ZP registers */
+                RC_InvalidateZP (Out);
 	    }
 	    break;
 
@@ -492,6 +495,9 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		} else if ((E->Chg & REG_SREG_HI) != 0 && In->SRegHi >= 0) {
 		    Out->SRegHi = (In->SRegHi - 1) & 0xFF;
 		}
+	    } else if (E->AM == AM65_ZPX) {
+                /* Invalidates all ZP registers */
+                RC_InvalidateZP (Out);
 	    }
 	    break;
 
@@ -532,6 +538,9 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		} else if ((E->Chg & REG_SREG_HI) != 0 && In->SRegHi >= 0) {
 		    Out->SRegHi = (In->SRegHi + 1) & 0xFF;
 		}
+	    } else if (E->AM == AM65_ZPX) {
+                /* Invalidates all ZP registers */
+                RC_InvalidateZP (Out);
 	    }
 	    break;
 
@@ -654,6 +663,9 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		} else if (E->Chg & REG_SREG_HI) {
 		    Out->SRegHi = (In->SRegHi >> 1) & 0xFF;
 		}
+	    } else if (E->AM == AM65_ZPX) {
+                /* Invalidates all ZP registers */
+                RC_InvalidateZP (Out);
 	    }
 	    break;
 
@@ -707,6 +719,9 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
     		} else if (E->Chg & REG_SREG_HI) {
     		    Out->SRegHi = -1;
     		}
+	    } else if (E->AM == AM65_ZPX) {
+                /* Invalidates all ZP registers */
+                RC_InvalidateZP (Out);
     	    }
     	    break;
 
@@ -719,6 +734,9 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
     		} else if (E->Chg & REG_SREG_HI) {
     		    Out->SRegHi = -1;
     		}
+	    } else if (E->AM == AM65_ZPX) {
+                /* Invalidates all ZP registers */
+                RC_InvalidateZP (Out);
     	    }
     	    break;
 
@@ -749,27 +767,49 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		} else if (E->Chg & REG_SREG_HI) {
 		    Out->SRegHi = In->RegA;
 		}
+	    } else if (E->AM == AM65_ZPX) {
+                /* Invalidates all ZP registers */
+                RC_InvalidateZP (Out);
 	    }
 	    break;
 
 	case OP65_STX:
 	    if (E->AM == AM65_ZP) {
-		if (E->Chg & REG_SREG_LO) {
-		    Out->SRegLo = In->RegX;
-		} else if (E->Chg & REG_SREG_HI) {
-		    Out->SRegHi = In->RegX;
-		}
+	     	if (E->Chg & REG_SREG_LO) {
+	     	    Out->SRegLo = In->RegX;
+	     	} else if (E->Chg & REG_SREG_HI) {
+	     	    Out->SRegHi = In->RegX;
+	     	}
+	    } else if (E->AM == AM65_ZPX) {
+                /* Invalidates all ZP registers */
+                RC_InvalidateZP (Out);
 	    }
 	    break;
 
 	case OP65_STY:
 	    if (E->AM == AM65_ZP) {
-		if (E->Chg & REG_SREG_LO) {
-		    Out->SRegLo = In->RegY;
-		} else if (E->Chg & REG_SREG_HI) {
-		    Out->SRegHi = In->RegY;
-		}
-	    }
+	     	if (E->Chg & REG_SREG_LO) {
+	     	    Out->SRegLo = In->RegY;
+	     	} else if (E->Chg & REG_SREG_HI) {
+	     	    Out->SRegHi = In->RegY;
+	     	}
+	    } else if (E->AM == AM65_ZPX) {
+                /* Invalidates all ZP registers */
+                RC_InvalidateZP (Out);
+            }
+	    break;
+
+	case OP65_STZ:
+	    if (E->AM == AM65_ZP) {
+	     	if (E->Chg & REG_SREG_LO) {
+	     	    Out->SRegLo = 0;
+	     	} else if (E->Chg & REG_SREG_HI) {
+	     	    Out->SRegHi = 0;
+	     	}
+	    } else if (E->AM == AM65_ZPX) {
+                /* Invalidates all ZP registers */
+                RC_InvalidateZP (Out);
+            }
 	    break;
 
 	case OP65_TAX:

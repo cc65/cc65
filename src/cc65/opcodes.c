@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -513,6 +513,13 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
        	REG_NONE,      	                        /* chg */
 	OF_STORE   		 		/* flags */
     },
+    {   OP65_STZ,      	                        /* opcode */
+       	"stz", 	       	                        /* mnemonic */
+       	0,     	       	                        /* size */
+       	REG_NONE,    	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_STORE   		 		/* flags */
+    },
     {   OP65_TAX,      	                        /* opcode */
        	"tax", 	       	                        /* mnemonic */
        	1,     	       	                        /* size */
@@ -777,7 +784,7 @@ bc_t GetBranchCond (opc_t OPC)
        	case OP65_JPL:  return BC_PL;
        	case OP65_JVC:  return BC_VC;
        	case OP65_JVS:  return BC_VS;
-	default:	
+	default:
 	    Internal ("GetBranchCond: Invalid opcode: %d", OPC);
 	    return 0;
     }
@@ -805,4 +812,4 @@ bc_t GetInverseCond (bc_t BC)
 
 
 
-	    
+

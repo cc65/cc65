@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -118,6 +118,7 @@ typedef enum {
     OP65_STA,
     OP65_STX,
     OP65_STY,
+    OP65_STZ,
     OP65_TAX,
     OP65_TAY,
     OP65_TRB,

@@ -195,10 +195,24 @@ const void* CollConstLast (const Collection* C)
 
 
 
+void* CollPop (Collection* C)
+/* Remove the last segment from the stack and return it. Calls FAIL if the
+ * collection is empty.
+ */
+{
+    /* We must have at least one entry */
+    PRECONDITION (C->Count > 0);
+
+    /* Return the element */
+    return C->Items[--C->Count];
+}
+
+
+
 int CollIndex (Collection* C, const void* Item)
 /* Return the index of the given item in the collection. Return -1 if the
  * item was not found in the collection.
- */					       
+ */
 {
     /* Linear search */
     unsigned I;

@@ -252,6 +252,7 @@ function.
 
 <itemize>
 <item><ref id="_heapadd" name="_heapadd">
+<item><ref id="_heapblocksize" name="_heapblocksize">
 <item><ref id="_heapmaxavail" name="_heapmaxavail">
 <item><ref id="_heapmemavail" name="_heapmemavail">
 <item><ref id="_poserror" name="_poserror">
@@ -418,6 +419,36 @@ ignore blocks with smaller sizes.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
+<ref id="_heapblocksize" name="_heapblocksize">,
+<ref id="_heapmaxavail" name="_heapmaxavail">,
+<ref id="_heapmemavail" name="_heapmemavail">,
+<ref id="calloc" name="calloc">,
+<ref id="free" name="free">,
+<ref id="malloc" name="malloc">,
+<ref id="realloc" name="realloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_heapblocksize<label id="_heapblocksize"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the size of an allocated block.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/size_t __fastcall__ _heapblocksize (const void* block);/
+<tag/Description/The function returns the size of a block that must have
+previously been allocated by <tt/<ref id="malloc" name="malloc">/, <tt/<ref
+id="calloc" name="calloc">/ or <tt/<ref id="realloc" name="realloc">/.
+<tag/Limits/
+<itemize>
+<item>Passing a pointer to a block that was is not the result of one of the 
+allocation functions, or that has been free'd will give unpredicable results.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="_heapadd" name="_heapadd">,
 <ref id="_heapmaxavail" name="_heapmaxavail">,
 <ref id="_heapmemavail" name="_heapmemavail">,
 <ref id="calloc" name="calloc">,
@@ -441,6 +472,7 @@ be allocated from the heap using <tt/<ref id="malloc" name="malloc">/.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="_heapadd" name="_heapadd">,
+<ref id="_heapblocksize" name="_heapblocksize">,
 <ref id="_heapmemavail" name="_heapmemavail">,
 <ref id="calloc" name="calloc">,
 <ref id="free" name="free">,
@@ -470,6 +502,7 @@ id="malloc" name="malloc"> may still return <tt/NULL/.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="_heapadd" name="_heapadd">,
+<ref id="_heapblocksize" name="_heapblocksize">,
 <ref id="_heapmaxavail" name="_heapmaxavail">,
 <ref id="calloc" name="calloc">,
 <ref id="free" name="free">,
@@ -1061,6 +1094,7 @@ be used in presence of a prototype.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="_heapadd" name="_heapadd">,
+<ref id="_heapblocksize" name="_heapblocksize">,
 <ref id="_heapmaxavail" name="_heapmaxavail">,
 <ref id="_heapmemavail" name="_heapmemavail">,
 <ref id="free" name="free">,
@@ -1782,6 +1816,7 @@ be used in presence of a prototype.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="_heapadd" name="_heapadd">,
+<ref id="_heapblocksize" name="_heapblocksize">,
 <ref id="_heapmaxavail" name="_heapmaxavail">,
 <ref id="_heapmemavail" name="_heapmemavail">,
 <ref id="calloc" name="calloc">,
@@ -2556,6 +2591,7 @@ be used in presence of a prototype.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="_heapadd" name="_heapadd">,
+<ref id="_heapblocksize" name="_heapblocksize">,
 <ref id="_heapmaxavail" name="_heapmaxavail">,
 <ref id="_heapmemavail" name="_heapmemavail">,
 <ref id="calloc" name="calloc">,
@@ -2841,6 +2877,7 @@ be used in presence of a prototype.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="_heapadd" name="_heapadd">,
+<ref id="_heapblocksize" name="_heapblocksize">,
 <ref id="_heapmaxavail" name="_heapmaxavail">,
 <ref id="_heapmemavail" name="_heapmemavail">,
 <ref id="calloc" name="calloc">,
@@ -3695,7 +3732,7 @@ be used in presence of a prototype.
 <tag/Availability/POSIX
 <tag/See also/
 <ref id="remove" name="remove">
-<tag/Example/            
+<tag/Example/
 #include &lt;stdio.h&gt;
 #include &lt;unistd.h&gt;
 

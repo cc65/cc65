@@ -1,7 +1,7 @@
 
 /*
     GEOS resource compiler
-    
+
     by Maciej 'YTM/Alliance' Witkowiak
 
     Error function by Uz
@@ -10,7 +10,7 @@
 
 */
 
-/* 
+/*
  - make it work, then do it better
  - more or less comments? it was hard to code, should be even harder to
    understand =D
@@ -65,7 +65,7 @@ void openCFile (void) {
 	if ((outputCFile = fopen (outputCName,"r"))!=0)
 	    Error("file %s already exists, no forcing, aborting\n", outputCName);
 	}
-    if ((outputCFile = fopen (outputCName,outputCMode))==0) 
+    if ((outputCFile = fopen (outputCName,outputCMode))==0)
 	Error("can't open file %s for writting: %s\n",outputCName,strerror (errno));
     if (CFnum==0) { outputCMode[0]='a'; printCHeader(); CFnum++; }
 }
@@ -76,7 +76,7 @@ void openSFile (void) {
 	if ((outputSFile = fopen (outputSName,"r"))!=0)
 	    Error("file %s already exists, no forcing, aborting\n", outputSName);
 	}
-    if ((outputSFile = fopen (outputSName,outputSMode))==0) 
+    if ((outputSFile = fopen (outputSName,outputSMode))==0)
 	Error("can't open file %s for writting: %s\n",outputSName,strerror (errno));
     if (SFnum==0) { outputSMode[0]='a'; printSHeader(); SFnum++; }
 }
@@ -163,7 +163,7 @@ struct menuitem *curItem, *newItem;
     myMenu.top=atoi(nextWord());
     myMenu.type=nextWord();
 
-    if (strcmp(nextWord(),"{")!=0) { 
+    if (strcmp(nextWord(),"{")!=0) {
 	Error ("menu %s description has no opening bracket!\n", myMenu.name);
 	};
     curItem=malloc(sizeof(struct menuitem));
@@ -239,7 +239,7 @@ struct menuitem *curItem, *newItem;
 
     fprintf(outputCFile, "\t};\n\n");
 
-    if (fclose (outputCFile)!=0) 
+    if (fclose (outputCFile)!=0)
 	Error("error closing %s: %s\n",outputCName,strerror (errno));
 }
 
@@ -256,7 +256,7 @@ int a, b;
     openSFile();
 
     token = nextWord();
-    
+
     a = findToken (hdrFTypes, token);
 
     if (a>1)
@@ -288,7 +288,7 @@ int a, b;
     myHead.hour = my_tm->tm_hour;
     myHead.min = my_tm->tm_min;
 
-    if (strcmp(nextWord(),"{")!=0) { 
+    if (strcmp(nextWord(),"{")!=0) {
 	Error ("header %s has no opening bracket!\n", myHead.dosname);
 	};
 
@@ -335,7 +335,7 @@ int a, b;
 		    }
 		    break;
         }
-    
+
     } while (strcmp(token, "}")!=0);
 
     /* OK, all information is gathered, do flushout */
@@ -364,21 +364,21 @@ int a, b;
     fillOut(myHead.classname,12,"$20");
 
     fillOut(myHead.version,4,"0");
-    
+
     fprintf(outputSFile,
 	    ".byte 0, 0, 0\n\t\t.byte %i\n\n\t\t", myHead.mode);
 
     setLen(myHead.author,62);
     fprintf(outputSFile,
 	    ".byte \"%s\"\n\t\t.byte 0\n\t\t.res (63-%i)\n\n\t\t",
-	    myHead.author, strlen(myHead.author)+1);
+	    myHead.author, (int) (strlen(myHead.author)+1));
 
     setLen(myHead.info, 95);
     fprintf(outputSFile,
 	    ".byte \"%s\"\n\t\t.byte 0\n\t\t.res (96-%i)\n\n",
-	    myHead.info, strlen(myHead.info)+1);
+	    myHead.info, (int) (strlen(myHead.info)+1));
 
-    if (fclose (outputSFile)!=0) 
+    if (fclose (outputSFile)!=0)
 	Error("error closing %s: %s\n",outputSName,strerror (errno));
 
 
@@ -421,7 +421,7 @@ char *token;
 
 int head=0;
 
-    if ((F = fopen (filename,"r"))==0) 
+    if ((F = fopen (filename,"r"))==0)
 	Error("can't open file %s for reading: %s\n",filename,strerror (errno));
 
     str=filterInput(F, malloc(BLOODY_BIG_BUFFER));
@@ -431,14 +431,14 @@ int head=0;
     do {
         if (str!=NULL) {
 	    switch (findToken (mainToken, token)) {
-	    
+
 	    case 0: DoMenu(); break;
-	    case 1: 
+	    case 1:
 		if (++head!=1) {
 			Error ("more than one HEADER section, aborting.\n");
 		    } else {
 			DoHeader();
-		    } 
+		    }
 		break;
 	    case 2: break;
 	    case 3: break;

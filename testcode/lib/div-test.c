@@ -13,7 +13,7 @@
 static bool test(int dividend, int divisor) {
 	div_t result;
 
-	(long)result = (long)div(dividend, divisor);
+       	result = div(dividend, divisor);
 	printf("%+d/%+d= %+d, %+d%%%+d= %+d, div()= %+d, %+d\n",
 		dividend, divisor, dividend / divisor,
 		dividend, divisor, dividend % divisor,

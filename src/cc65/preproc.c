@@ -8,6 +8,7 @@
 
 /* common */
 #include "chartype.h"
+#include "check.h"
 #include "print.h"
 #include "xmalloc.h"
 
@@ -44,13 +45,17 @@ static int Pass1 (const char* From, char* To);
 
 
 
-/* Set when the pp calls expr() recursively */
+/* Set when the preprocessor calls expr() recursively */
 unsigned char Preprocessing = 0;
 
 /* Management data for #if */
-#define N_IFDEF	    	16
-static int i_ifdef = -1;
-static char s_ifdef[N_IFDEF];
+#define MAX_IFS         64
+#define IFCOND_NONE     0x00U
+#define IFCOND_SKIP     0x01U
+#define IFCOND_ELSE     0x02U
+#define IFCOND_NEEDTERM 0x04U
+static unsigned char IfStack[MAX_IFS];
+static int           IfIndex = -1;
 
 /* Buffer for macro expansion */
 static char mlinebuf [LINESIZE];
@@ -71,6 +76,7 @@ static int ExpandMacros = 1;
 /* Types of preprocessor tokens */
 typedef enum {
     PP_DEFINE,
+    PP_ELIF,
     PP_ELSE,
     PP_ENDIF,
     PP_ERROR,
@@ -92,6 +98,7 @@ static const struct PPToken {
     pptoken_t  	Tok;	   	/* Token */
 } PPTokens[] = {
     {  	"define",      	PP_DEFINE	},
+    {   "elif",         PP_ELIF         },
     {  	"else",	       	PP_ELSE		},
     {  	"endif",       	PP_ENDIF	},
     {  	"error",       	PP_ERROR	},
@@ -135,10 +142,10 @@ static pptoken_t FindPPToken (const char* Ident)
 
 
 
-static int keepch (char c)
+static void keepch (char c)
 /* Put character c into translation buffer. */
 {
-    return (*mptr++ = c);
+    *mptr++ = c;
 }
 
 
@@ -146,9 +153,9 @@ static int keepch (char c)
 static void keepstr (const char* S)
 /* Put string str into translation buffer. */
 {
-    while (*S) {
-	keepch (*S++);
-    }
+    unsigned Len = strlen (S);
+    memcpy (mptr, S, Len);
+    mptr += Len;
 }
 
 
@@ -239,8 +246,8 @@ static char* CopyQuotedString (char* Target)
 
 
 static int MacName (char* Ident)
-/* Get macro symbol name.  If we have an error, print a diagnostic message
- * and clear line.
+/* Get a macro symbol name into Ident.  If we have an error, print a
+ * diagnostic message and clear the line.
  */
 {
     if (IsSym (Ident) == 0) {
@@ -355,7 +362,7 @@ static int MacroCall (Macro* M)
  	    	}
 
  		/* Check for end of macro param list */
- 		if (CurC == ')') {
+ 	   	if (CurC == ')') {
  		    NextChar ();
  		    break;
  		}
@@ -503,7 +510,7 @@ static void DefineMacro (void)
 
 
 /*****************************************************************************/
-
+/*				 Preprocessing                               */
 /*****************************************************************************/
 
 
@@ -655,8 +662,8 @@ static void xlateline (void)
 
 
 
-static void doundef (void)
-/* Process #undef directive */
+static void DoUndef (void)
+/* Process the #undef directive */
 {
     ident Ident;
 
@@ -668,21 +675,29 @@ static void doundef (void)
 
 
 
-static int setmflag (int skip, int flag, int cond)
-/* setmflag( skip, flag, cond ) */
+static int PushIf (int Skip, int Invert, int Cond)
+/* Push a new if level onto the if stack */
 {
-    if (skip) {
-     	s_ifdef[++i_ifdef] = 3;
-     	return (1);
+    /* Check for an overflow of the if stack */
+    if (IfIndex >= MAX_IFS-1) {
+	PPError ("Too many nested #if clauses");
+	return 1;
+    }
+
+    /* Push the #if condition */
+    ++IfIndex;
+    if (Skip) {
+     	IfStack[IfIndex] = IFCOND_SKIP | IFCOND_NEEDTERM;
+     	return 1;
     } else {
-     	s_ifdef[++i_ifdef] = 6;
-     	return (flag ^ cond);
+     	IfStack[IfIndex] = IFCOND_NONE | IFCOND_NEEDTERM;
+     	return (Invert ^ Cond);
     }
 }
 
 
 
-static int doiff (int skip)
+static int DoIf (int Skip)
 /* Process #if directive */
 {
     ExprDesc lval;
@@ -739,12 +754,12 @@ static int doiff (int skip)
     NextTok = sv2;
 
     /* Set the #if condition according to the expression result */
-    return (setmflag (skip, 1, lval.ConstVal != 0));
+    return PushIf (Skip, 1, lval.ConstVal != 0);
 }
 
 
 
-static int doifdef (int skip, int flag)
+static int DoIfDef (int skip, int flag)
 /* Process #ifdef if flag == 1, or #ifndef if flag == 0. */
 {
     ident Ident;
@@ -753,13 +768,13 @@ static int doifdef (int skip, int flag)
     if (MacName (Ident) == 0) {
        	return 0;
     } else {
-	return setmflag (skip, flag, IsMacro(Ident));
+	return PushIf (skip, flag, IsMacro(Ident));
     }
 }
 
 
 
-static void doinclude (void)
+static void DoInclude (void)
 /* Open an include file. */
 {
     char    	RTerm;
@@ -819,7 +834,7 @@ Done:
 
 
 
-static void doerror (void)
+static void DoError (void)
 /* Print an error */
 {
     SkipBlank ();
@@ -829,7 +844,7 @@ static void doerror (void)
         PPError ("#error: %s", lptr);
     }
 
-    /* clear rest of line */
+    /* Clear the rest of line */
     ClearLine ();
 }
 
@@ -868,20 +883,56 @@ void Preprocess (void)
        	    	    	}
        	    	    	break;
 
+		    case PP_ELIF:
+		        if (IfIndex >= 0) {
+		    	    if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
+
+				/* Handle as #else/#if combination */
+		    	     	if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
+		    	     	    Skip = !Skip;
+		    	     	}
+		    	     	IfStack[IfIndex] |= IFCOND_ELSE;
+				Skip = DoIf (Skip);
+
+				/* #elif doesn't need a terminator */
+				IfStack[IfIndex] &= ~IFCOND_NEEDTERM;
+			    } else {
+		    	  	PPError ("Duplicate #else/#elif");
+		    	    }
+		    	} else {
+		    	    PPError ("Unexpected #elif");
+		    	}
+		        break;
+
        	       	    case PP_ELSE:
-       	    	    	if (s_ifdef[i_ifdef] & 2) {
-       	    	    	    if (s_ifdef[i_ifdef] & 4) {
-       	    	    	     	Skip = !Skip;
-       	    	    	    }
-       	    	    	    s_ifdef[i_ifdef] ^= 2;
+       	    	    	if (IfIndex >= 0) {
+		    	    if ((IfStack[IfIndex] & IFCOND_ELSE) == 0) {
+		    	     	if ((IfStack[IfIndex] & IFCOND_SKIP) == 0) {
+		    	     	    Skip = !Skip;
+		    	     	}
+		    	     	IfStack[IfIndex] |= IFCOND_ELSE;
+		    	    } else {
+		    	     	PPError ("Duplicate #else");
+		    	    }
        	    	    	} else {
        	    	    	    PPError ("Unexpected `#else'");
        	    	    	}
        	    	    	break;
 
        	       	    case PP_ENDIF:
-       	    	    	if (i_ifdef >= 0) {
-       	    	     	    Skip = s_ifdef[i_ifdef--] & 1;
+       	    	    	if (IfIndex >= 0) {
+			    /* Remove any clauses on top of stack that do not
+			     * need a terminating #endif.
+			     */
+			    while (IfIndex >= 0 && (IfStack[IfIndex] & IFCOND_NEEDTERM) == 0) {
+			       	--IfIndex;
+			    }
+
+			    /* Stack may not be empty here or something is wrong */
+			    CHECK (IfIndex >= 0);
+
+			    /* Remove the clause that needs a terminator */
+			    Skip = (IfStack[IfIndex--] & IFCOND_SKIP) != 0;
        	    	    	} else {
        	    	    	    PPError ("Unexpected `#endif'");
        	    	    	}
@@ -889,34 +940,34 @@ void Preprocess (void)
 
        	       	    case PP_ERROR:
        	    	    	if (!Skip) {
-       	    	    	    doerror ();
+       	    	    	    DoError ();
 	    	    	}
     	    	    	break;
 
        	       	    case PP_IF:
-    	    	    	Skip = doiff (Skip);
+    	    	    	Skip = DoIf (Skip);
     	    	    	break;
 
        	       	    case PP_IFDEF:
-    	    	    	Skip = doifdef (Skip, 1);
+    	    	    	Skip = DoIfDef (Skip, 1);
     	    	    	break;
 
        	       	    case PP_IFNDEF:
-    	    	    	Skip = doifdef (Skip, 0);
+    	    	    	Skip = DoIfDef (Skip, 0);
     	    	    	break;
 
        	       	    case PP_INCLUDE:
     	    	    	if (!Skip) {
-    	    	    	    doinclude ();
+    	    	    	    DoInclude ();
     	    	    	}
     	    	    	break;
 
        	       	    case PP_LINE:
-	    	    	/* Not allowed in strict ANSI mode */
-	    	    	if (ANSI) {
-	    	    	    PPError ("Preprocessor directive expected");
-	    	    	    ClearLine ();
-	    	    	}
+			/* Not allowed in strict ANSI mode */
+			if (!Skip && ANSI) {
+			    PPError ("Preprocessor directive expected");
+			    ClearLine ();
+			}
 	    	    	break;
 
        	       	    case PP_PRAGMA:
@@ -930,7 +981,7 @@ void Preprocess (void)
 
        	       	    case PP_UNDEF:
     	    	    	if (!Skip) {
-    	    	    	    doundef ();
+    	    	    	    DoUndef ();
     	    	    	}
     	    	    	break;
 
@@ -942,7 +993,7 @@ void Preprocess (void)
 
     	}
     	if (NextLine () == 0) {
-    	    if (i_ifdef >= 0) {
+    	    if (IfIndex >= 0) {
     	    	PPError ("`#endif' expected");
     	    }
     	    return;

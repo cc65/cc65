@@ -62,6 +62,15 @@ function.
 </itemize>
 
 
+<sect1><tt/apple2.h/<label id="apple2.h"><p>
+
+
+<sect1><tt/atari.h/<label id="atari.h"><p>
+
+
+<sect1><tt/atmos.h/<label id="atmos.h"><p>
+
+
 <sect1><tt/assert.h/<label id="assert.h"><p>
 
 <itemize>
@@ -77,6 +86,12 @@ function.
 <item><ref id="toggle_videomode" name="toggle_videomode">
 <item><ref id="slow" name="slow">
 </itemize>
+
+
+<sect1><tt/c16.h/<label id="c16.h"><p>
+
+
+<sect1><tt/c64.h/<label id="c64.h"><p>
 
 
 <sect1><tt/conio.h/<label id="conio.h"><p>
@@ -132,6 +147,12 @@ function.
 </itemize>
 
 
+<sect1><tt/dbg.h/<label id="dbg.h"><p>
+
+
+<sect1><tt/dio.h/<label id="dio.h"><p>
+
+
 <sect1><tt/em.h/<label id="em.h"><p>
 
 <itemize>
@@ -146,6 +167,9 @@ function.
 </itemize>
 
 
+<sect1><tt/errno.h/<label id="errno.h"><p>
+
+
 <sect1><tt/fcntl.h/<label id="fcntl.h"><p>
 
 <itemize>
@@ -153,6 +177,24 @@ function.
 <item><ref id="creat" name="creat">
 <item><ref id="open" name="open">
 </itemize>
+
+
+<sect1><tt/geos.h/<label id="geos.h"><p>
+
+
+<sect1><tt/joystick.h/<label id="joystick.h"><p>
+
+
+<sect1><tt/locale.h/<label id="locale.h"><p>
+
+
+<sect1><tt/modload.h/<label id="modload.h"><p>
+
+
+<sect1><tt/nes.h/<label id="nes.h"><p>
+
+
+<sect1><tt/o65.h/<label id="o65.h"><p>
 
 
 <sect1><tt/peekpoke.h/<label id="peekpoke.h"><p>
@@ -165,12 +207,40 @@ function.
 </itemize>
 
 
+<sect1><tt/pet.h/<label id="pet.h"><p>
+
+
+<sect1><tt/plus4.h/<label id="plus4.h"><p>
+
+
+<sect1><tt/serial.h/<label id="serial.h"><p>
+
+
+<sect1><tt/setjmp.h/<label id="setjmp.h"><p>
+
+
 <sect1><tt/signal.h/<label id="signal.h"><p>
 
 <itemize>
 <item><ref id="raise" name="raise">
 <item><ref id="signal" name="signal">
 </itemize>
+
+
+<sect1><tt/stdarg.h/<label id="stdarg.h"><p>
+
+
+<sect1><tt/stdbool.h/<label id="stdbool.h"><p>
+
+
+<sect1><tt/stddef.h/<label id="stddef.h"><p>
+
+<itemize>
+<item><ref id="offsetof" name="offsetof">
+</itemize>
+
+
+<sect1><tt/stdio.h/<label id="stdio.h"><p>
 
 
 <sect1><tt/stdlib.h/<label id="stdlib.h"><p>
@@ -240,6 +310,12 @@ function.
 </itemize>
 
 
+<sect1><tt/tgi.h/<label id="tgi.h"><p>
+
+
+<sect1><tt/time.h/<label id="time.h"><p>
+
+
 <sect1><tt/unistd.h/<label id="unistd.h"><p>
 
 <itemize>
@@ -253,6 +329,12 @@ function.
 <!-- <item><ref id="unlink" name="unlink"> -->
 <!-- <item><ref id="write" name="write"> -->
 </itemize>
+
+
+<sect1><tt/vic20.h/<label id="vic20.h"><p>
+
+
+<sect1><tt/zlib.h/<label id="zlib.h"><p>
 
 
 
@@ -2232,6 +2314,24 @@ be used in presence of a prototype.
 <ref id="bzero" name="bzero">,
 <ref id="memcpy" name="memcpy">,
 <ref id="memmove" name="memmove">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>offsetof<label id="offsetof"><p>
+
+<quote>
+<descrip>
+<tag/Function/Calculate the offset of a struct or union member.
+<tag/Header/<tt/<ref id="stddef.h" name="stddef.h">/
+<tag/Declaration/<tt/size_t offsetof (type, member);/
+<tag/Description/<tt/offsetof/ calculates the address offset of a <tt/struct/
+or <tt/union/ member.
+<tag/Limits/<itemize>
+<item>The function is actually a macro.
+</itemize>
+<tag/Availability/ISO 9899
 <tag/Example/None.
 </descrip>
 </quote>

@@ -41,6 +41,7 @@
 
 /* common */
 #include "chartype.h"
+#include "strbuf.h"
 #include "xsprintf.h"
 
 /* ld65 */
@@ -86,14 +87,15 @@ static FILE*   	       	InputFile    	= 0;
 void CfgWarning (const char* Format, ...)
 /* Print a warning message adding file name and line number of the config file */
 {
-    char Buf [512];
+    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
     va_list ap;
 
     va_start (ap, Format);
-    xvsprintf (Buf, sizeof (Buf), Format, ap);
+    SB_VPrintf (&Buf, Format, ap);
     va_end (ap);
 
-    Warning ("%s(%u): %s", CfgGetName(), CfgErrorLine, Buf);
+    Warning ("%s(%u): %s", CfgGetName(), CfgErrorLine, SB_GetConstBuf (&Buf));
+    DoneStrBuf (&Buf);
 }
 
 
@@ -101,14 +103,15 @@ void CfgWarning (const char* Format, ...)
 void CfgError (const char* Format, ...)
 /* Print an error message adding file name and line number of the config file */
 {
-    char Buf [512];
+    StrBuf Buf = STATIC_STRBUF_INITIALIZER;
     va_list ap;
 
     va_start (ap, Format);
-    xvsprintf (Buf, sizeof (Buf), Format, ap);
+    SB_VPrintf (&Buf, Format, ap);
     va_end (ap);
 
-    Error ("%s(%u): %s", CfgGetName(), CfgErrorLine, Buf);
+    Error ("%s(%u): %s", CfgGetName(), CfgErrorLine, SB_GetConstBuf (&Buf));
+    DoneStrBuf (&Buf);
 }
 
 
@@ -197,7 +200,7 @@ Again:
     if (C == '$') {
 	NextChar ();
 	if (!isxdigit (C)) {
-	    Error ("%s(%u): Hex digit expected", CfgGetName(), InputLine);
+	    CfgError ("Hex digit expected");
 	}
 	CfgIVal = 0;
 	while (isxdigit (C)) {
@@ -262,7 +265,7 @@ Again:
 	    I = 0;
 	    while (C != '\"') {
 		if (C == EOF || C == '\n') {
-		    Error ("%s(%u): Unterminated string", CfgName, InputLine);
+		    CfgError ("Unterminated string");
 		}
 	       	if (I < CFG_MAX_IDENT_LEN) {
 		    CfgSVal [I++] = C;
@@ -316,7 +319,7 @@ Again:
 	    break;
 
 	default:
-	    Error ("%s(%u): Invalid character `%c'", CfgGetName(), InputLine, C);
+	    CfgError ("Invalid character `%c'", C);
 
     }
 }
@@ -436,7 +439,7 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
     }
 
     /* Not found or no identifier */
-    Error ("%s(%u): %s expected", CfgGetName(), InputLine, Name);
+    CfgError ("%s expected", Name);
 }
 
 

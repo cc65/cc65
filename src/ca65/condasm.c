@@ -69,8 +69,8 @@ enum {
 
 
 /* One .IF descriptor */
-typedef struct IfDesc_ IfDesc;
-struct IfDesc_ {
+typedef struct IfDesc IfDesc;
+struct IfDesc {     
     unsigned   	Flags; 	       	/* Bitmapped flags, see above */
     FilePos    	Pos;		/* File position of the .IF */
     const char* Name;	      	/* Name of the directive */

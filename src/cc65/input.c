@@ -106,7 +106,7 @@ static IFile* NewIFile (const char* Name)
     unsigned Len = strlen (Name);
 
     /* Allocate a IFile structure */
-    IFile* IF = xmalloc (sizeof (IFile) + Len);
+    IFile* IF = (IFile*) xmalloc (sizeof (IFile) + Len);
 
     /* Initialize the fields */
     IF->Index = CollCount (&IFiles) + 1;
@@ -132,7 +132,7 @@ static AFile* NewAFile (IFile* IF, FILE* F)
 /* Create and return a new AFile */
 {
     /* Allocate a AFile structure */
-    AFile* AF = xmalloc (sizeof (AFile));
+    AFile* AF = (AFile*) xmalloc (sizeof (AFile));
 
     /* Initialize the fields */
     AF->Line  = 0;
@@ -174,7 +174,7 @@ static IFile* FindFile (const char* Name)
     unsigned I;
     for (I = 0; I < CollCount (&IFiles); ++I) {
 	/* Get the file struct */
-	IFile* IF = CollAt (&IFiles, I);
+	IFile* IF = (IFile*) CollAt (&IFiles, I);
 	/* Check the name */
 	if (strcmp (Name, IF->Name) == 0) {
 	    /* Found, return the struct */
@@ -266,7 +266,7 @@ static void CloseIncludeFile (void)
     PRECONDITION (AFileCount > 0);
 
     /* Get the current active input file */
-    Input = CollLast (&AFiles);
+    Input = (AFile*) CollLast (&AFiles);
 
     /* Close the current input file (we're just reading so no error check) */
     fclose (Input->F);
@@ -342,7 +342,7 @@ int NextLine (void)
     if (CollCount (&AFiles) == 0) {
 	return 0;
     }
-    Input = CollLast (&AFiles);
+    Input = (AFile*) CollLast (&AFiles);
 
     /* Read lines until we get one with real contents */
     Len = 0;
@@ -363,7 +363,7 @@ int NextLine (void)
 	    if (CollCount (&AFiles) == 0) {
 		return 0;
 	    }
-	    Input = CollLast (&AFiles);
+	    Input = (AFile*) CollLast (&AFiles);
 
        	}
 
@@ -410,13 +410,13 @@ const char* GetCurrentFile (void)
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
-	const AFile* AF = CollAt (&AFiles, AFileCount-1);
+	const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
 	return AF->Name;
     } else {
 	/* No open file. Use the main file if we have one. */
 	unsigned IFileCount = CollCount (&IFiles);
 	if (IFileCount > 0) {
-	    const IFile* IF = CollAt (&IFiles, 0);
+	    const IFile* IF = (const IFile*) CollAt (&IFiles, 0);
 	    return IF->Name;
 	} else {
       	    return "(outside file scope)";
@@ -431,7 +431,7 @@ unsigned GetCurrentLine (void)
 {
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
-	const AFile* AF = CollAt (&AFiles, AFileCount-1);
+	const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
 	return AF->Line;
     } else {
 	/* No open file */
@@ -455,7 +455,7 @@ void WriteDependencies (FILE* F, const char* OutputFile)
     /* Loop over all files */
     for (I = 0; I < IFileCount; ++I) {
 	/* Get the next input file */
-	const IFile* IF = CollAt (&IFiles, I);
+	const IFile* IF = (const IFile*) CollAt (&IFiles, I);
 	/* If this is not the first file, add a space */
 	const char* Format = (I == 0)? "%s" : " %s";
 	/* Print the dependency */

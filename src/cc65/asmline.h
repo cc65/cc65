@@ -52,8 +52,8 @@
 
 
 /* Structure that contains one line */
-typedef struct Line_ Line;
-struct Line_ {
+typedef struct Line Line;
+struct Line {
     Line*	 	Next;		/* Next line on double linked list */
     Line* 		Prev;		/* Revious line in list */
     unsigned   	 	Flags;		/* Flags for this line */

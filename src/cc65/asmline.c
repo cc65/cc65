@@ -35,11 +35,11 @@
 
 #include <stdio.h>
 #include <string.h>
-	  
+
 /* common */
 #include "xmalloc.h"
 #include "xsprintf.h"
-	  
+
 /* cc65 */
 #include "error.h"
 #include "asmline.h"
@@ -82,7 +82,7 @@ static Line* NewLine (const char* Format, va_list ap)
     Len = strlen (Buf);
 
     /* Allocate memory */
-    L = xmalloc (sizeof (Line) + Len);
+    L = (Line*) xmalloc (sizeof (Line) + Len);
 
     /* Partially initialize the struct (the remaining fields are initialized
      * by the caller).

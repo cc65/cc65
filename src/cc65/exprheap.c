@@ -83,7 +83,7 @@ static ExprNodeBlock* NewExprNodeBlock (unsigned Count)
     unsigned Size = sizeof (ExprNodeBlock) + (Count-1) * sizeof (ExprNode);
 
     /* Allocate memory */
-    ExprNodeBlock* B = xmalloc (Size);
+    ExprNodeBlock* B = (ExprNodeBlock*) xmalloc (Size);
 
     /* Initialize the fields */
     B->Next  = 0;
@@ -106,7 +106,7 @@ static ExprHeap* NewExprHeap (void)
 /* Create and return a new expression tree */
 {
     /* Allocate memory */
-    ExprHeap* H = xmalloc (sizeof (ExprHeap));
+    ExprHeap* H = (ExprHeap*) xmalloc (sizeof (ExprHeap));
 
     /* Allocate the first node block */
     H->BlockRoot = NewExprNodeBlock (64);
@@ -214,7 +214,7 @@ void FreeExprTree (ExprNode* N)
      	    unsigned I;
      	    unsigned Count = CollCount (&N->List);
      	    for (I = 0; I < Count; ++I) {
-     	 	FreeExprNode (CollAt (&N->List, I));
+     	 	FreeExprNode ((ExprNode*) CollAt (&N->List, I));
      	    }
      	}
     }

@@ -43,6 +43,9 @@
 /* common */
 #include "attrib.h"
 
+/* cc65 */
+#include "funcdesc.h"
+
 
 
 /*****************************************************************************/
@@ -283,7 +286,7 @@ int IsQualVolatile (const type* T) attribute ((const));
 int IsFastCallFunc (const type* T) attribute ((const));
 /* Return true if this is a function type with __fastcall__ calling conventions */
 
-int IsEllipsisFunc (const type* T) attribute ((const));
+int IsVariadicFunc (const type* T) attribute ((const));
 /* Return true if this is a function type with variable parameter list */
 
 int IsTypeFuncPtr (const type* T) attribute ((const));
@@ -304,7 +307,7 @@ type GetSizeModifier (const type* T) attribute ((const));
 type GetQualifier (const type* T) attribute ((const));
 /* Get the qualifier from the given type string */
 
-struct FuncDesc* GetFuncDesc (const type* T) attribute ((const));
+FuncDesc* GetFuncDesc (const type* T) attribute ((const));
 /* Get the FuncDesc pointer from a function or pointer-to-function type */
 
 

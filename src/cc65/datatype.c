@@ -112,7 +112,7 @@ type* TypeDup (const type* T)
 /* Create a copy of the given type on the heap */
 {
     unsigned Len = (TypeLen (T) + 1) * sizeof (type);
-    return memcpy (xmalloc (Len), T, Len);
+    return (type*) memcpy (xmalloc (Len), T, Len);
 }
 
 
@@ -122,7 +122,7 @@ type* TypeAlloc (unsigned Len)
  * trailing T_END.
  */
 {
-    return xmalloc (Len * sizeof (type));
+    return (type*) xmalloc (Len * sizeof (type));
 }
 
 
@@ -413,7 +413,7 @@ unsigned SizeOf (const type* T)
 
 	case T_STRUCT:
 	case T_UNION:
-       	    Entry = DecodePtr (T+1);
+       	    Entry = (SymEntry*) DecodePtr (T+1);
        	    return Entry->V.S.Size;
 
 	case T_ARRAY:
@@ -475,7 +475,7 @@ unsigned TypeOf (const type* T)
        	    return CF_LONG | CF_UNSIGNED;
 
         case T_FUNC:
-	    F = DecodePtr (T+1);
+	    F = (FuncDesc*) DecodePtr (T+1);
 	    return (F->Flags & FD_ELLIPSIS)? 0 : CF_FIXARGC;
 
         case T_STRUCT:
@@ -642,18 +642,18 @@ int IsFastCallFunc (const type* T)
 {
     FuncDesc* F;
     CHECK (IsTypeFunc (T));
-    F = DecodePtr (T+1);
+    F = (FuncDesc*) DecodePtr (T+1);
     return (F->Flags & FD_FASTCALL) != 0;
 }
 
 
 
-int IsEllipsisFunc (const type* T)
+int IsVariadicFunc (const type* T)
 /* Return true if this is a function type with variable parameter list */
 {
     FuncDesc* F;
     CHECK (IsTypeFunc (T));
-    F = DecodePtr (T+1);
+    F = (FuncDesc*) DecodePtr (T+1);
     return (F->Flags & FD_ELLIPSIS) != 0;
 }
 
@@ -668,7 +668,7 @@ int IsTypeFuncPtr (const type* T)
 
 
 type GetType (const type* T)
-/* Get the raw type */		  
+/* Get the raw type */
 {
     PRECONDITION (T[0] != T_END);
     return (T[0] & T_MASK_TYPE);
@@ -717,7 +717,7 @@ type GetQualifier (const type* T)
 
 
 
-struct FuncDesc* GetFuncDesc (const type* T)
+FuncDesc* GetFuncDesc (const type* T)
 /* Get the FuncDesc pointer from a function or pointer-to-function type */
 {
     if (T[0] == T_PTR) {
@@ -729,7 +729,7 @@ struct FuncDesc* GetFuncDesc (const type* T)
     CHECK (T[0] == T_FUNC);
 
     /* Decode the function descriptor and return it */
-    return DecodePtr (T+1);
+    return (FuncDesc*) DecodePtr (T+1);
 }
 
 

@@ -240,11 +240,27 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes);
 
 
 
-void g_getimmed (unsigned flags, unsigned long val, unsigned offs);
-void g_getstatic (unsigned flags, unsigned long label, unsigned offs);
-void g_getlocal (unsigned flags, int offs);
-void g_getind (unsigned flags, unsigned offs);
-void g_leasp (int offs);
+void g_getimmed (unsigned Flags, unsigned long Val, unsigned Offs);
+/* Load a constant into the primary register */
+
+void g_getstatic (unsigned Flags, unsigned long Label, unsigned Offs);
+/* Fetch an static memory cell into the primary register */
+
+void g_getlocal (unsigned Flags, int Offs);
+/* Fetch specified local object (local var). */
+
+void g_getind (unsigned Flags, unsigned Offs);
+/* Fetch the specified object type indirect through the primary register
+ * into the primary register
+ */
+
+void g_leasp (int Offs);
+/* Fetch the address of the specified symbol into the primary register */
+
+void g_leavariadic (int Offs);
+/* Fetch the address of a parameter in a variadic function into the primary
+ * register
+ */
 
 
 
@@ -406,7 +422,7 @@ void g_res (unsigned n);
 void g_defdata (unsigned flags, unsigned long val, unsigned offs);
 /* Define data with the size given in flags */
 
-void g_defbytes (const unsigned char *bytes, unsigned count);
+void g_defbytes (const void* bytes, unsigned count);
 /* Output a row of bytes as a constant */
 
 void g_zerobytes (unsigned n);

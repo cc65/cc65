@@ -206,7 +206,7 @@ static void UseSeg (int NewSeg)
 /* Switch to a specific segment */
 {
     if (CurSeg != NewSeg) {
-  	CurSeg = NewSeg;
+  	CurSeg = (segment_t) NewSeg;
   	AddCodeLine (".segment\t\"%s\"", SegmentNames [CurSeg]);
 	AddCodeHint (SegmentHints [CurSeg]);
     }
@@ -846,7 +846,7 @@ void g_getlocal (unsigned flags, int offs)
     	    }
 	    break;
 
-    	default:
+       	default:
     	    typeerror (flags);
     }
 }
@@ -889,7 +889,7 @@ void g_getind (unsigned flags, unsigned offs)
      	     	} else {
      	     	    AddCodeLine ("\tjsr\tldai");
      	     	}
-     	    }
+       	    }
      	    break;
 
      	case CF_INT:
@@ -938,31 +938,107 @@ void g_leasp (int offs)
 
     /* For value 0 we do direct code */
     if (offs == 0) {
-	AddCodeLine ("\tlda\tsp");
-	AddCodeLine ("\tldx\tsp+1");
+     	AddCodeLine ("\tlda\tsp");
+     	AddCodeLine ("\tldx\tsp+1");
     } else {
-	if (FavourSize) {
-	    ldaconst (offs);         		/* Load A with offset value */
-	    AddCodeLine ("\tjsr\tleaasp");	/* Load effective address */
-	} else {
-	    if (CPU == CPU_65C02 && offs == 1) {
-	     	AddCodeLine ("\tlda\tsp");
-	     	AddCodeLine ("\tldx\tsp+1");
-		AddCodeLine ("\tina");
-	     	AddCodeLine ("\tbne\t*+3");
-	     	AddCodeLine ("\tinx");
-	     	AddCodeHint ("x:!");		/* Invalidate X */
-	    } else {
-	     	ldaconst (offs);
-	     	AddCodeLine ("\tclc");
-	     	AddCodeLine ("\tldx\tsp+1");
-	     	AddCodeLine ("\tadc\tsp");
-	     	AddCodeLine ("\tbcc\t*+3");
-	     	AddCodeLine ("\tinx");
-	     	AddCodeHint ("x:!");		/* Invalidate X */
-	    }
-	}
+     	if (FavourSize) {
+     	    ldaconst (offs);         		/* Load A with offset value */
+     	    AddCodeLine ("\tjsr\tleaasp");	/* Load effective address */
+     	} else {
+     	    if (CPU == CPU_65C02 && offs == 1) {
+     	     	AddCodeLine ("\tlda\tsp");
+     	     	AddCodeLine ("\tldx\tsp+1");
+     		AddCodeLine ("\tina");
+     	     	AddCodeLine ("\tbne\t*+3");
+     	     	AddCodeLine ("\tinx");
+     	     	AddCodeHint ("x:!");		/* Invalidate X */
+     	    } else {
+     	     	ldaconst (offs);
+     	     	AddCodeLine ("\tclc");
+     	     	AddCodeLine ("\tldx\tsp+1");
+     	     	AddCodeLine ("\tadc\tsp");
+     	     	AddCodeLine ("\tbcc\t*+3");
+     	     	AddCodeLine ("\tinx");
+     	     	AddCodeHint ("x:!");		/* Invalidate X */
+     	    }
+     	}
     }
+}
+
+
+
+void g_leavariadic (int Offs)
+/* Fetch the address of a parameter in a variadic function into the primary
+ * register
+ */
+{
+    unsigned ArgSizeOffs;
+
+    /* Calculate the offset relative to sp */
+    Offs -= oursp;
+
+    /* Get the offset of the parameter which is stored at sp+0 on function
+     * entry and check if this offset is reachable with a byte offset.
+     */
+    CHECK (oursp <= 0);
+    ArgSizeOffs = -oursp;
+    CheckLocalOffs (ArgSizeOffs);
+
+    /* Get the stack pointer plus offset. Clear the carry as the result of
+     * this sequence.
+     */
+    if (Offs > 0) {
+     	AddCodeLine ("\tclc");
+     	AddCodeLine ("\tlda\tsp");
+     	AddCodeLine ("\tadc\t#$%02X", Offs & 0xFF);
+     	if (Offs >= 256) {
+     	    AddCodeLine ("\tpha");
+     	    AddCodeLine ("\tlda\tsp+1");
+     	    AddCodeLine ("\tadc\t#$%02X", (Offs >> 8) & 0xFF);
+     	    AddCodeLine ("\ttax");
+     	    AddCodeLine ("\tpla");
+	    AddCodeLine ("\tclc");
+ 	} else {
+     	    AddCodeLine ("\tldx\tsp+1");
+     	    AddCodeLine ("\tbcc\t*+4");	/* Jump over the clc */
+     	    AddCodeLine ("\tinx");
+     	    AddCodeHint ("x:!");	/* Invalidate X */
+	    AddCodeLine ("\tclc");
+     	}
+    } else if (Offs < 0) {
+     	Offs = -Offs;
+     	AddCodeLine ("\tsec");
+     	AddCodeLine ("\tlda\tsp");
+     	AddCodeLine ("\tsbc\t#$%02X", Offs & 0xFF);
+     	if (Offs >= 256) {
+     	    AddCodeLine ("\tpha");
+     	    AddCodeLine ("\tlda\tsp+1");
+     	    AddCodeLine ("\tsbc\t#$%02X", (Offs >> 8) & 0xFF);
+     	    AddCodeLine ("\ttax");
+     	    AddCodeLine ("\tpla");
+     	} else {
+     	    AddCodeLine ("\tldx\tsp+1");
+     	    AddCodeLine ("\tbcs\t*+3");
+     	    AddCodeLine ("\tdex");
+     	    AddCodeHint ("x:!");	/* Invalidate X */
+     	}
+	AddCodeLine ("\tclc");
+    } else {
+     	AddCodeLine ("\tlda\tsp");
+     	AddCodeLine ("\tldx\tsp+1");
+	AddCodeLine ("\tclc");
+    }
+
+    /* Add the size of all parameters. Carry is clear on entry. */
+    if (ArgSizeOffs == 0 && CPU == CPU_65C02) {
+     	AddCodeLine ("\tadc\t(sp)");
+    } else {
+     	ldyconst (ArgSizeOffs);
+     	AddCodeLine ("\tadc\t(sp),y");
+    }
+    AddCodeLine ("\tbcc\t*+3");
+    AddCodeLine ("\tinx");
+    AddCodeHint ("x:!");       		/* Invalidate X */
 }
 
 
@@ -997,7 +1073,7 @@ void g_putstatic (unsigned flags, unsigned long label, unsigned offs)
 	    AddCodeLine ("\tldy\tsreg");
 	    AddCodeLine ("\tsty\t%s+2", lbuf);
 	    AddCodeLine ("\tldy\tsreg+1");
-	    AddCodeLine ("\tsty\t%s+3", lbuf);
+     	    AddCodeLine ("\tsty\t%s+3", lbuf);
      	    break;
 
        	default:
@@ -1083,7 +1159,7 @@ void g_putind (unsigned Flags, unsigned Offs)
 	/* We can just add the high byte */
 	AddCodeLine ("\tldy\t#$01");
 	AddCodeLine ("\tclc");
-	AddCodeLine ("\tpha");
+     	AddCodeLine ("\tpha");
 	AddCodeLine ("\tlda\t#$%02X", (Offs >> 8) & 0xFF);
 	AddCodeLine ("\tadc\t(sp),y");
 	AddCodeLine ("\tsta\t(sp),y");
@@ -1642,7 +1718,7 @@ void g_addeqstatic (unsigned flags, unsigned long label, unsigned offs,
        	case CF_LONG:
 	    if (flags & CF_CONST) {
 		if (val < 0x100) {
-		    AddCodeLine ("\tldy\t#<(%s)", lbuf);
+     		    AddCodeLine ("\tldy\t#<(%s)", lbuf);
 		    AddCodeLine ("\tsty\tptr1");
 		    AddCodeLine ("\tldy\t#>(%s+1)", lbuf);
 		    if (val == 1) {
@@ -1771,7 +1847,7 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
 		AddCodeLine ("\tadc\t(ptr1,x)");
 		AddCodeLine ("\tsta\t(ptr1,x)");
 	    } else {
-		AddCodeLine ("\tldy\t#$%02X", offs);
+     		AddCodeLine ("\tldy\t#$%02X", offs);
        	       	AddCodeLine ("\tldx\t#$00");
        	       	AddCodeLine ("\tlda\t#$%02X", (int)(val & 0xFF));
        	       	AddCodeLine ("\tclc");
@@ -1857,7 +1933,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, unsigned offs,
 
        	case CF_INT:
 	    AddCodeLine ("\tsec");
-	    if (flags & CF_CONST) {
+     	    if (flags & CF_CONST) {
 	       	AddCodeLine ("\tlda\t%s", lbuf);
 	  	AddCodeLine ("\tsbc\t#$%02X", (unsigned char)val);
 	  	AddCodeLine ("\tsta\t%s", lbuf);
@@ -1900,7 +1976,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, unsigned offs,
 			AddCodeLine ("\tlda\t#$%02X", (unsigned char)val);
 			AddCodeLine ("\tjsr\tlsubeqa");
 		    }
-		} else {
+     		} else {
 		    g_getstatic (flags, label, offs);
 		    g_dec (flags, val);
 		    g_putstatic (flags, label, offs);
@@ -2029,7 +2105,7 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
 		AddCodeLine ("\tiny");
 		AddCodeLine ("\tlda\t(ptr1),y");
 		AddCodeLine ("\tsbc\t#$%02X", (unsigned char)(val >> 8));
-		AddCodeLine ("\tsta\t(ptr1),y");
+     		AddCodeLine ("\tsta\t(ptr1),y");
 	     	AddCodeLine ("\ttax");
 		AddCodeLine ("\tpla");
 		break;
@@ -2115,7 +2191,7 @@ void g_save (unsigned flags)
     switch (flags & CF_TYPE) {
 
 	case CF_CHAR:
-	    if (flags & CF_FORCECHAR) {
+     	    if (flags & CF_FORCECHAR) {
 	     	AddCodeLine ("\tpha");
 		break;
 	    }
@@ -2201,7 +2277,7 @@ void g_cmp (unsigned flags, unsigned long val)
 static void oper (unsigned flags, unsigned long val, char** subs)
 /* Encode a binary operation. subs is a pointer to four groups of three
  * strings:
- *	0-2	--> Operate on ints
+ *   	0-2	--> Operate on ints
  *	3-5	--> Operate on unsigneds
  *	6-8	--> Operate on longs
  *	9-11	--> Operate on unsigned longs
@@ -2244,7 +2320,7 @@ static void oper (unsigned flags, unsigned long val, char** subs)
  	    AddCodeLine ("\tjsr\t%s", subs [offs+2]);
  	}
     } else {
- 	/* Value not constant (is already in (e)ax) */
+     	/* Value not constant (is already in (e)ax) */
  	AddCodeLine ("\tjsr\t%s", subs [offs+2]);
     }
 
@@ -3748,12 +3824,15 @@ void g_defdata (unsigned flags, unsigned long val, unsigned offs)
 
 
 
-void g_defbytes (const unsigned char* Bytes, unsigned Count)
+void g_defbytes (const void* Bytes, unsigned Count)
 /* Output a row of bytes as a constant */
 {
     unsigned Chunk;
     char Buf [128];
     char* B;
+
+    /* Cast the buffer pointer */
+    const unsigned char* Data = (const unsigned char*) Bytes;
 
     /* Output the stuff */
     while (Count) {
@@ -3768,7 +3847,7 @@ void g_defbytes (const unsigned char* Bytes, unsigned Count)
 	strcpy (Buf, "\t.byte\t");
        	B = Buf + 7;
      	do {
-	    B += sprintf (B, "$%02X", *Bytes++ & 0xFF);
+	    B += sprintf (B, "$%02X", *Data++);
      	    if (--Chunk) {
 		*B++ = ',';
      	    }

@@ -46,6 +46,9 @@ type* GetReturnType (Function* F);
 int HasVoidReturn (const Function* F);
 /* Return true if the function does not have a return value */
 
+int IsVariadic (const Function* F);
+/* Return true if this is a variadic function */
+
 void RememberEntry (Function* F);
 /* Remember the current output position for local space creation later */
 

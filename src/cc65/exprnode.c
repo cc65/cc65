@@ -148,7 +148,7 @@ void SetRightNode (ExprNode* Root, ExprNode* Right)
 struct SymEntry* GetNodeSym (ExprNode* N)
 /* Get the symbol entry for a NT_SYM node */
 {
-    return GetItem (N, IDX_SYM);
+    return (struct SymEntry*) GetItem (N, IDX_SYM);
 }
 
 
@@ -247,7 +247,7 @@ void DumpExpr (FILE* F, const ExprNode* E)
 	    case NT_LIST_EXPR:
 		Count = CollCount (&E->List);
 		for (I = 0; I < Count; ++I) {
-		    DumpExpr (F, CollConstAt (&E->List, I));
+		    DumpExpr (F, (const ExprNode*) CollConstAt (&E->List, I));
 		}
 		break;
 

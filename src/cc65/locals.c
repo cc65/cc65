@@ -84,7 +84,7 @@ void InitRegVars (void)
      * will usually waste some space but we don't need to dynamically
      * grow the array.
      */
-    RegSyms = xmalloc (MaxRegSpace * sizeof (RegSyms[0]));
+    RegSyms = (const SymEntry**) xmalloc (MaxRegSpace * sizeof (RegSyms[0]));
     RegOffs = MaxRegSpace;
 }
 

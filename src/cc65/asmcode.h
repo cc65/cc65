@@ -52,7 +52,7 @@
 
 
 /* Marker for an assembler code position */
-typedef struct Line_* CodeMark;
+typedef struct Line* CodeMark;
 
 
 

@@ -45,7 +45,7 @@
 
 /* common */
 #include "xmalloc.h"
-	  
+
 /* cc65 */
 #include "incpath.h"
 
@@ -86,7 +86,7 @@ static char* Add (char* Orig, const char* New)
     }
 
     /* Allocate memory for the new string */
-    NewPath = xmalloc (OrigLen + NewLen + 2);
+    NewPath = (char*) xmalloc (OrigLen + NewLen + 2);
 
     /* Copy the strings */
     memcpy (NewPath, Orig, OrigLen);

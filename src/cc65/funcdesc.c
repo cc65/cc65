@@ -49,7 +49,7 @@ FuncDesc* NewFuncDesc (void)
 /* Create a new symbol table with the given name */
 {
     /* Create a new function descriptor */
-    FuncDesc* F = xmalloc (sizeof (FuncDesc));
+    FuncDesc* F = (FuncDesc*) xmalloc (sizeof (FuncDesc));
 
     /* Nullify the fields */
     F->Flags	  = 0;

@@ -783,9 +783,20 @@ static int primary (struct expent* lval)
 	   	lval->e_name = (unsigned long) Sym->Name;
 	    	lval->e_const = 0;
 	    } else if ((Sym->Flags & SC_AUTO) == SC_AUTO) {
-	    	/* Local variable */
-  	     	lval->e_flags = E_MLOCAL | E_TLOFFS;
-	    	lval->e_const = Sym->V.Offs;
+	    	/* Local variable. If this is a parameter for a variadic
+		 * function, we have to add some address calculations, and the
+		 * address is not const.
+		 */
+       	       	if ((Sym->Flags & SC_PARAM) == SC_PARAM && IsVariadic (CurrentFunc)) {
+		    /* Variadic parameter */
+		    g_leavariadic (Sym->V.Offs - GetParamSize (CurrentFunc));
+		    lval->e_flags = E_MEXPR;
+		    lval->e_const = 0;
+		} else {
+		    /* Normal parameter */
+		    lval->e_flags = E_MLOCAL | E_TLOFFS;
+		    lval->e_const = Sym->V.Offs;
+		}
 	    } else if ((Sym->Flags & SC_STATIC) == SC_STATIC) {
 	    	/* Static variable */
 	   	if (Sym->Flags & (SC_EXTERN | SC_STORAGE)) {
@@ -2915,7 +2926,7 @@ int evalexpr (unsigned flags, int (*f) (struct expent*), struct expent* lval)
 
 
 
-int expr (int (*func) (), struct expent *lval)
+int expr (int (*func) (struct expent*), struct expent *lval)
 /* Expression parser; func is either hie0 or hie1. */
 {
     int k;

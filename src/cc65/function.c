@@ -84,12 +84,12 @@ static Function* NewFunction (struct SymEntry* Sym)
 /* Create a new function activation structure and return it */
 {
     /* Allocate a new structure */
-    Function* F = xmalloc (sizeof (Function));
+    Function* F = (Function*) xmalloc (sizeof (Function));
 
     /* Initialize the fields */
     F->FuncEntry  = Sym;
     F->ReturnType = Sym->Type + 1 + DECODE_SIZE;
-    F->Desc   	  = DecodePtr (Sym->Type + 1);
+    F->Desc   	  = (FuncDesc*) DecodePtr (Sym->Type + 1);
     F->EntryCode  = 0;
     F->Reserved	  = 0;
     F->RetLab	  = GetLabel ();
@@ -144,6 +144,14 @@ int HasVoidReturn (const Function* F)
 /* Return true if the function does not have a return value */
 {
     return IsTypeVoid (F->ReturnType);
+}
+
+
+
+int IsVariadic (const Function* F)
+/* Return true if this is a variadic function */
+{
+    return (F->Desc->Flags & FD_ELLIPSIS) != 0;
 }
 
 
@@ -211,7 +219,7 @@ void NewFunc (SymEntry* Func)
     unsigned Flags;
 
     /* Get the function descriptor from the function entry */
-    FuncDesc* D = DecodePtr (Func->Type+1);
+    FuncDesc* D = (FuncDesc*) DecodePtr (Func->Type+1);
 
     /* Allocate the function activation record for the function */
     CurrentFunc = NewFunction (Func);

@@ -67,9 +67,9 @@ static void StdFunc_strlen (struct expent*);
 /* Table with all known functions and their handlers. Must be sorted
  * alphabetically!
  */
-static struct FuncDesc {
-    const char*		Name;
-    void 		(*Handler) (struct expent*);
+static struct StdFuncDesc {
+    const char*	 	Name;
+    void 	 	(*Handler) (struct expent*);
 } StdFuncs [] = {
     {  	"strlen",	StdFunc_strlen	  	},
 
@@ -86,12 +86,12 @@ static struct FuncDesc {
 static int CmpFunc (const void* Key, const void* Elem)
 /* Compare function for bsearch */
 {
-    return strcmp ((const char*) Key, ((const struct FuncDesc*) Elem)->Name);
+    return strcmp ((const char*) Key, ((const struct StdFuncDesc*) Elem)->Name);
 }
 
 
 
-static struct FuncDesc* FindFunc (const char* Name)
+static struct StdFuncDesc* FindFunc (const char* Name)
 /* Find a function with the given name. Return a pointer to the descriptor if
  * found, return NULL otherwise.
  */
@@ -102,7 +102,7 @@ static struct FuncDesc* FindFunc (const char* Name)
 
 
 /*****************************************************************************/
-/*			    Handle known functions  			     */
+/*		 	    Handle known functions  			     */
 /*****************************************************************************/
 
 
@@ -173,7 +173,7 @@ void HandleStdFunc (struct expent* lval)
 /* Generate code for a known standard function. */
 {
     /* Get a pointer to the table entry */
-    struct FuncDesc* F = FindFunc ((const char*) lval->e_name);
+    struct StdFuncDesc* F = FindFunc ((const char*) lval->e_name);
     CHECK (F != 0);
 
     /* Call the handler function */

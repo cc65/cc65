@@ -775,10 +775,10 @@ static void Decl (Declaration* D, unsigned Mode)
 	/* Set the fastcall flag */
 	if (!IsTypeFunc (T)) {
 	    Error ("__fastcall__ modifier applied to non function");
-	} else if (IsEllipsisFunc (T)) {
+	} else if (IsVariadicFunc (T)) {
 	    Error ("Cannot apply __fastcall__ to functions with variable parameter list");
-	} else {    
-	    FuncDesc* F = DecodePtr (T+1);
+	} else {
+	    FuncDesc* F = (FuncDesc*) DecodePtr (T+1);
        	    F->Flags |= FD_FASTCALL;
 	}
 	return;

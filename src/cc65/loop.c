@@ -63,10 +63,8 @@ LoopDesc* AddLoop (unsigned sp, unsigned loop, unsigned label,
 	     	   unsigned linc, unsigned lstat)
 /* Create and add a new loop descriptor */
 {
-    LoopDesc* L;
-
     /* Allocate a new struct */
-    L = xmalloc (sizeof (LoopDesc));
+    LoopDesc* L = (LoopDesc*) xmalloc (sizeof (LoopDesc));
 
     /* Fill in the data */
     L->StackPtr	= sp;

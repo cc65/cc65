@@ -79,7 +79,7 @@ Macro* NewMacro (const char* Name)
     unsigned Len = strlen(Name);
 
     /* Allocate the structure */
-    Macro* M = xmalloc (sizeof(Macro) + Len);
+    Macro* M = (Macro*) xmalloc (sizeof(Macro) + Len);
 
     /* Initialize the data */
     M->Next   	   = 0;
@@ -152,7 +152,7 @@ void InsertMacro (Macro* M)
 
     /* Allocate the ActualArgs parameter array */
     if (M->ArgCount > 0) {
-    	M->ActualArgs = xmalloc (M->ArgCount * sizeof(char*));
+    	M->ActualArgs = (char const**) xmalloc (M->ArgCount * sizeof(char*));
     }
 
     /* Get the hash value of the macro name */
@@ -291,11 +291,11 @@ void AddMacroArg (Macro* M, const char* Arg)
     /* Check if we have enough room available, otherwise expand the array
      * that holds the formal argument list.
      */
-    if (M->ArgCount >= M->MaxArgs) {
+    if (M->ArgCount >= (int) M->MaxArgs) {
 	/* We must expand the array */
 	char** OldArgs = M->FormalArgs;
 	M->MaxArgs += 10;
-	M->FormalArgs = xmalloc (M->MaxArgs * sizeof(char*));
+	M->FormalArgs = (char**) xmalloc (M->MaxArgs * sizeof(char*));
 	memcpy (M->FormalArgs, OldArgs, M->ArgCount * sizeof (char*));
 	xfree (OldArgs);
     }

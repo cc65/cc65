@@ -68,13 +68,13 @@ static attrib_t FindAttribute (const char* Attr)
  * Return atNone if the attribute name is not known.
  */
 {
-    attrib_t A;
+    int A;
 
     /* For now do a linear search */
     for (A = 0; A < atCount; ++A) {
 	if (strcmp (Attr, AttrNames[A]) == 0) {
 	    /* Found */
-       	    return A;
+       	    return (attrib_t) A;
 	}
     }
 

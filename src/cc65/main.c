@@ -240,7 +240,7 @@ static void DefineSym (const char* Def)
        	 */
 	char* Q;
 	unsigned Len = strlen (Def)+1;
-	char* S = xmalloc (Len);
+	char* S = (char*) xmalloc (Len);
 	memcpy (S, Def, Len);
 	Q = S + (P - Def);
 	*Q++ = '\0';
@@ -473,7 +473,7 @@ int main (int argc, char* argv[])
 
     /* Parse the command line */
     I = 1;
-    while (I < ArgCount) {
+    while (I < (int)ArgCount) {
 
 	const char* P;
 

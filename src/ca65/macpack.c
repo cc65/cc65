@@ -191,13 +191,15 @@ static char MacCPU[] =
     "CPU_ISET_65C02     = $08\n"
     "CPU_ISET_65816     = $10\n"
     "CPU_ISET_SUNPLUS   = $20\n"
+    "CPU_ISET_SWEET16   = $40\n"
     "CPU_6502           = CPU_ISET_6502\n"
     "CPU_6502X          = CPU_ISET_6502|CPU_ISET_6502X\n"
     "CPU_65SC02         = CPU_ISET_6502|CPU_ISET_65SC02\n"
     "CPU_65C02          = CPU_ISET_6502|CPU_ISET_65SC02|CPU_ISET_65C02\n"
     "CPU_65816          = CPU_ISET_6502|CPU_ISET_65SC02|CPU_ISET_65816\n"
-    "CPU_SUNPLUS        = CPU_ISET_SUNPLUS\n";
-
+    "CPU_SUNPLUS        = CPU_ISET_SUNPLUS\n"
+    "CPU_SWEET16        = CPU_ISET_SWEET16\n";
+                                             
 
 
 /* Table with pointers to the different packages */

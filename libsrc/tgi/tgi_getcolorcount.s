@@ -9,7 +9,7 @@
 
 
 _tgi_getcolorcount:
-        lda     _tgi_colors
+        lda     _tgi_colorcount
         ldx     #0
         rts
 

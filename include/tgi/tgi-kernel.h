@@ -64,11 +64,15 @@ typedef struct {
     void*               deinstall;      /* DEINSTALL routine */
     void*               init;           /* INIT routine */
     void*               done;           /* DONE routine */
+    void*		geterror;	/* GETERROR routine */
     void*               control;        /* CONTROL routine */
     void*               clear;          /* CLEAR routine */
     void*               setviewpage;    /* SETVIEWPAGE routine */
     void*               setdrawpage;    /* SETDRAWPAGE routine */
     void*               setcolor;       /* SETCOLOR routine */
+    void*               setpalette;     /* SETPALETTE routine */
+    void*               getpalette;     /* GETPALETTE routine */
+    void*               getdefpalette;  /* GETDEFPALETTE routine */
     void*               setpixel;       /* SETPIXEL routine */
     void*               getpixel;       /* GETPIXEL routine */
     void*               line;           /* LINE routine */

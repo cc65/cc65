@@ -1,0 +1,16 @@
+;
+; Ullrich von Bassewitz, 23.06.2002
+;
+; void __fastcall__ tgi_getpagecount (void);
+; /* Returns the number of screen pages available. */
+;
+
+        .include        "tgi-kernel.inc"
+        .export         _tgi_getpagecount
+
+
+_tgi_getpagecount:
+        lda     _tgi_pagecount
+        ldx     #0
+        rts
+

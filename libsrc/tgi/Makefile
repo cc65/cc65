@@ -21,10 +21,13 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_emu_bar.o           \
                 tgi_getcolor.o          \
                 tgi_getcolorcount.o     \
+                tgi_getdefpalette.o     \
                 tgi_geterror.o          \
                 tgi_getmaxcolor.o       \
                 tgi_getmaxx.o           \
                 tgi_getmaxy.o           \
+                tgi_getpagecount.o      \
+                tgi_getpalette.o        \
                 tgi_getpixel.o          \
                 tgi_getset.o            \
                 tgi_getxres.o           \
@@ -37,6 +40,7 @@ S_OBJS =       	tgi-kernel.o   	        \
        	       	tgi_map_mode.o          \
                 tgi_setcolor.o          \
                 tgi_setdrawpage.o       \
+                tgi_setpalette.o        \
                 tgi_setpixel.o          \
                 tgi_setdrawpage.o       \
                 tgi_unload.o

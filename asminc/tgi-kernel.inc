@@ -50,18 +50,22 @@ TGI_HDR_INSTALL         = TGI_HDR_JUMPTAB+0     ; INSTALL routine
 TGI_HDR_DEINSTALL       = TGI_HDR_JUMPTAB+2     ; DEINSTALL routine
 TGI_HDR_INIT            = TGI_HDR_JUMPTAB+4     ; INIT routine
 TGI_HDR_DONE            = TGI_HDR_JUMPTAB+6     ; DONE routine
-TGI_HDR_CONTROL         = TGI_HDR_JUMPTAB+8     ; CONTROL routine
-TGI_HDR_CLEAR           = TGI_HDR_JUMPTAB+10    ; CLEAR routine
-TGI_HDR_SETVIEWPAGE     = TGI_HDR_JUMPTAB+12    ; SETVIEWPAGE routine
-TGI_HDR_SETDRAWPAGE     = TGI_HDR_JUMPTAB+14    ; SETDRAWPAGE routine
-TGI_HDR_SETCOLOR        = TGI_HDR_JUMPTAB+16    ; SETCOLOR routine
-TGI_HDR_SETPIXEL        = TGI_HDR_JUMPTAB+18    ; SETPIXEL routine
-TGI_HDR_GETPIXEL        = TGI_HDR_JUMPTAB+20    ; GETPIXEL routine
-TGI_HDR_LINE            = TGI_HDR_JUMPTAB+22    ; LINE routine
-TGI_HDR_BAR             = TGI_HDR_JUMPTAB+24    ; BAR routine
-TGI_HDR_CIRCLE          = TGI_HDR_JUMPTAB+26    ; CIRCLE routine
+TGI_HDR_GETERROR	= TGI_HDR_JUMPTAB+8 	; GETERROR routine
+TGI_HDR_CONTROL         = TGI_HDR_JUMPTAB+10    ; CONTROL routine
+TGI_HDR_CLEAR           = TGI_HDR_JUMPTAB+12    ; CLEAR routine
+TGI_HDR_SETVIEWPAGE     = TGI_HDR_JUMPTAB+14    ; SETVIEWPAGE routine
+TGI_HDR_SETDRAWPAGE     = TGI_HDR_JUMPTAB+16    ; SETDRAWPAGE routine
+TGI_HDR_SETCOLOR        = TGI_HDR_JUMPTAB+18    ; SETCOLOR routine
+TGI_HDR_SETPALETTE      = TGI_HDR_JUMPTAB+20    ; SETPALETTE routine
+TGI_HDR_GETPALETTE      = TGI_HDR_JUMPTAB+22    ; GETPALETTE routine
+TGI_HDR_GETDEFPALETTE   = TGI_HDR_JUMPTAB+24    ; GETDEFPALETTE routine
+TGI_HDR_SETPIXEL        = TGI_HDR_JUMPTAB+26    ; SETPIXEL routine
+TGI_HDR_GETPIXEL        = TGI_HDR_JUMPTAB+28    ; GETPIXEL routine
+TGI_HDR_LINE            = TGI_HDR_JUMPTAB+30    ; LINE routine
+TGI_HDR_BAR             = TGI_HDR_JUMPTAB+32    ; BAR routine
+TGI_HDR_CIRCLE          = TGI_HDR_JUMPTAB+34    ; CIRCLE routine
 
-TGI_HDR_JUMPCOUNT       = 14            ; Number of jump vectors
+TGI_HDR_JUMPCOUNT       = 18            ; Number of jump vectors
 
 ;------------------------------------------------------------------------------
 ; Variables
@@ -84,11 +88,15 @@ TGI_HDR_JUMPCOUNT       = 14            ; Number of jump vectors
         .global tgi_deinstall
         .global tgi_init
         .global tgi_done
+	.global	tgi_geterror
         .global tgi_control
         .global tgi_clear
         .global tgi_setviewpage
         .global tgi_setdrawpage
         .global tgi_setcolor
+        .global tgi_setpalette
+        .global tgi_getpalette
+        .global tgi_getdefpalette
         .global tgi_setpixel
         .global tgi_getpixel
         .global tgi_line
@@ -100,7 +108,6 @@ TGI_HDR_JUMPCOUNT       = 14            ; Number of jump vectors
 ; ASM functions
 
         .global tgi_emu_bar
-        .global tgi_fetch_error
         .global tgi_getset
         .global tgi_inv_arg
         .global tgi_linepop

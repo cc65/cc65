@@ -16,36 +16,40 @@
 
 .bss
 
-_tgi_drv:	.res	2		; Pointer to driver
-_tgi_error:	.res	1		; Last error code
-_tgi_mode:      .res    1               ; Graphics mode or zero
-_tgi_curx:      .res    2               ; Current drawing cursor X
-_tgi_cury:      .res    2               ; Current drawing cursor Y
-_tgi_color:     .res    1               ; Current drawing color
-_tgi_xres:      .res    2               ; X resolution of the current mode
-_tgi_yres:      .res    2               ; Y resolution of the current mode
-_tgi_colorcount:.res    1               ; Number of available colors
-_tgi_pagecount: .res    1               ; Number of available screen pages
+_tgi_drv:      	    .res    2		; Pointer to driver
+_tgi_error:    	    .res    1		; Last error code
+_tgi_mode:          .res    1           ; Graphics mode or zero
+_tgi_curx:          .res    2           ; Current drawing cursor X
+_tgi_cury:          .res    2           ; Current drawing cursor Y
+_tgi_color:         .res    1           ; Current drawing color
+_tgi_xres:          .res    2           ; X resolution of the current mode
+_tgi_yres:          .res    2           ; Y resolution of the current mode
+_tgi_colorcount:    .res    1           ; Number of available colors
+_tgi_pagecount:     .res    1           ; Number of available screen pages
 
 
 .data
 
 ; Jump table for the driver functions.
 
-tgi_install:	jmp	$0000
-tgi_deinstall:	jmp	$0000
-tgi_init:       jmp	$0000
-tgi_done:       jmp	$0000
-tgi_control:    jmp	$0000
-tgi_clear:      jmp     $0000
-tgi_setviewpage:jmp     $0000
-tgi_setdrawpage:jmp     $0000
-tgi_setcolor:   jmp     $0000
-tgi_setpixel:   jmp     $0000
-tgi_getpixel:   jmp     $0000
-tgi_line:       jmp     $0000
-tgi_bar:        jmp     $0000
-tgi_circle:     jmp     $0000
+tgi_install:   	    jmp     $0000
+tgi_deinstall: 	    jmp     $0000
+tgi_init:           jmp     $0000
+tgi_done:           jmp     $0000
+tgi_geterror:	    jmp	    $0000
+tgi_control:        jmp     $0000
+tgi_clear:          jmp     $0000
+tgi_setviewpage:    jmp     $0000
+tgi_setdrawpage:    jmp     $0000
+tgi_setcolor:       jmp     $0000
+tgi_setpalette:     jmp     $0000
+tgi_getpalette:     jmp     $0000
+tgi_getdefpalette:  jmp     $0000
+tgi_setpixel:       jmp     $0000
+tgi_getpixel:       jmp     $0000
+tgi_line:           jmp     $0000
+tgi_bar:            jmp     $0000
+tgi_circle:         jmp     $0000
 
 
 ;----------------------------------------------------------------------------
@@ -103,27 +107,13 @@ _tgi_setup:
         dex
         bpl     @L4
 
-        jsr     tgi_install             ; Call driver install routine
-
-;       jmp     tgi_fetch_error
-
-;----------------------------------------------------------------------------
-; Fetch the error code from the driver and place it into the global error
-; variable. The function will also return the error in A and the flags from
-; loading the error code are set.
-
-tgi_fetch_error:
-        jsr     tgi_set_ptr
-  	ldy	#TGI_HDR_ERROR
-  	lda	(ptr1),y
-  	sta	_tgi_error
-  	rts
+        jmp     tgi_install             ; Call driver install routine
 
 ;----------------------------------------------------------------------------
 ; Load the pointer to the tgi driver into ptr1.
 
 tgi_set_ptr:
-  	lda	_tgi_drv
+       	lda	_tgi_drv
   	sta	ptr1
   	lda	_tgi_drv+1
   	sta	ptr1+1

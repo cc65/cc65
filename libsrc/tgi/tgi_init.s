@@ -8,6 +8,7 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
 
+        .importzp       ptr1
         .import         _tgi_done
         .import         _tgi_setcolor
         .export         _tgi_init
@@ -18,14 +19,34 @@ _tgi_init:
         pla
         sta     _tgi_mode               ; Remember the mode
         jsr     tgi_init                ; Go into graphics mode
-        jsr     tgi_fetch_error         ; Get the error code
-        bne     @L1                     ; Jump on error
-        ldx     _tgi_colorcount
+        jsr     tgi_geterror            ; Get the error code
+        sta     _tgi_error              ; Save for later reference
+        cmp     #TGI_ERR_OK
+        bne     @L9                     ; Jump on error
+
+; Do driver initialization. First set the default palette.
+
+        jsr     tgi_getdefpalette       ; Get the default palette into A/X
+        sta     ptr1
+        stx     ptr1+1
+        ora     ptr1+1                  ; Do we have a default palette?
+        beq     @L1                     ; Jump if no
+        jsr     tgi_setpalette          ; Set the default palette
+
+; Set the drawing color to the maximum color
+
+@L1:    ldx     _tgi_colorcount
         dex
         txa
-        jmp     _tgi_setcolor           ; tgi_setcolor (tgi_getmaxcolor ());
+        jsr     _tgi_setcolor           ; tgi_setcolor (tgi_getmaxcolor ());
 
-@L1:    lda     #$00
+; Clear the screen
+
+        jmp     tgi_clear
+
+; Error exit
+
+@L9:    lda     #$00
         sta     _tgi_mode               ; Clear the mode if init was not successful
         rts
 

@@ -50,6 +50,7 @@
 #define TGI_ERR_INV_DRIVER      3       /* Invalid driver */
 #define TGI_ERR_INV_MODE        4       /* Mode not supported by driver */
 #define TGI_ERR_INV_ARG         5       /* Invalid function argument */
+#define TGI_ERR_INV_FUNC	6	/* Function not supported */
 
 
 

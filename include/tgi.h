@@ -48,20 +48,6 @@
 
 
 /*****************************************************************************/
-/*				     Data                                    */
-/*****************************************************************************/
-
-
-
-struct palettetype {
-    unsigned char   r;          /* Red component */
-    unsigned char   g;          /* Green component */
-    unsigned char   b;          /* Blue component */
-};
-
-
-
-/*****************************************************************************/
 /* 	      	  		   Functions	     			     */
 /*****************************************************************************/
 
@@ -79,7 +65,7 @@ void __fastcall__ tgi_load_driver (const char* name);
  */
 
 void __fastcall__ tgi_unload (void);
-/* Unload the currently loaded driver. */
+/* Unload the currently loaded driver. Will call tgi_done if necessary. */
 
 void __fastcall__ tgi_init (unsigned char mode);
 /* Initialize the given graphics mode. */
@@ -93,49 +79,67 @@ unsigned char __fastcall__ tgi_geterror (void);
  */
 
 void __fastcall__ tgi_clear (void);
-/* Clear the screen */
+/* Clear the screen. */
+
+void __fastcall__ tgi_getpagecount (void);
+/* Returns the number of screen pages available. */
 
 void __fastcall__ tgi_setviewpage (unsigned char page);
-/* Set the visible page. */
+/* Set the visible page. Will set an error if the page is not available. */
 
 void __fastcall__ tgi_setdrawpage (unsigned char page);
-/* Set the drawable page */
+/* Set the drawable page. Will set an error if the page is not available. */
+
+unsigned char __fastcall__ tgi_getcolorcount (void);
+/* Get the number of available colors. */
 
 unsigned char __fastcall__ tgi_getmaxcolor (void);
 /* Return the maximum supported color number (the number of colors would
  * then be getmaxcolor()+1).
  */
 
+void __fastcall__ tgi_setcolor (unsigned char color);
+/* Set the current drawing color. */
+
+unsigned char __fastcall__ tgi_getcolor (void);
+/* Return the current drawing color. */
+
+void __fastcall__ tgi_setpalette (const unsigned char* palette);
+/* Set the palette (not available with all drivers/hardware). palette is
+ * a pointer to as many entries as there are colors.
+ */
+
+const unsigned char* __fastcall__ tgi_getpalette (void);
+/* Return the current palette. Will return NULL for drivers that do not
+ * support palettes.
+ */
+
+const unsigned char* __fastcall__ tgi_getdefpalette (void);
+/* Return the default palette. Will return NULL for drivers that do not
+ * support palettes.
+ */
+
+unsigned __fastcall__ tgi_getxres (void);
+/* Return the resolution in X direction. */
+
 unsigned __fastcall__ tgi_getmaxx (void);
 /* Return the maximum x coordinate. The resolution in x direction is
  * getmaxx() + 1
  */
+
+unsigned __fastcall__ tgi_getyres (void);
+/* Return the resolution in Y direction. */
 
 unsigned __fastcall__ tgi_getmaxy (void);
 /* Return the maximum y coordinate. The resolution in y direction is
  * getmaxy() + 1
  */
 
-unsigned char __fastcall__ tgi_getcolorcount (void);
-/* Get the number of available colors */
-
-unsigned __fastcall__ tgi_getxres (void);
-/* Return the resolution in X direction */
-
-unsigned __fastcall__ tgi_getyres (void);
-/* Return the resolution in Y direction */
-
-void __fastcall__ tgi_setcolor (unsigned char color);
-/* Set the current drawing color */
-
-unsigned char __fastcall__ tgi_getcolor (void);
-/* Return the current drawing color */
-
 unsigned char __fastcall__ tgi_getpixel (int x, int y);
-/* Get the color value of a pixel */
+/* Get the color value of a pixel. */
 
 void __fastcall__ tgi_setpixel (int x, int y);
-/* Plot a point in the current drawing color */
+/* Plot a pixel in the current drawing color. */
 
 void __fastcall__ tgi_gotoxy (int x, int y);
 /* Set the graphics cursor to the given position. */

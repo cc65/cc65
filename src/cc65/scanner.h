@@ -60,13 +60,13 @@ typedef enum token_t {
     TOK_RESTRICT,
     TOK_STATIC,
     TOK_TYPEDEF,
-    TOK_ENUM,    
     TOK_CONST,
     TOK_VOLATILE,
 
     /* Tokens denoting types */
     TOK_FIRSTTYPE,
-    TOK_CHAR		= TOK_FIRSTTYPE,
+    TOK_ENUM		= TOK_FIRSTTYPE,
+    TOK_CHAR,
     TOK_INT,
     TOK_DOUBLE,
     TOK_FLOAT,

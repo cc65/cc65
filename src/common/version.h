@@ -48,6 +48,8 @@
 #define VER_MINOR	9U
 #define VER_PATCH	5U
 
+#define VERSION         ((VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH)
+
 
 
 /* End of version.h */

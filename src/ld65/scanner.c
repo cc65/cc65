@@ -197,7 +197,7 @@ Again:
     if (C == '$') {
 	NextChar ();
 	if (!isxdigit (C)) {
-	    Error ("%s(%u): Hex digit expected", CfgName, InputLine);
+	    Error ("%s(%u): Hex digit expected", CfgGetName(), InputLine);
 	}
 	CfgIVal = 0;
 	while (isxdigit (C)) {
@@ -316,7 +316,7 @@ Again:
 	    break;
 
 	default:
-	    Error ("%s(%u): Invalid character `%c'", CfgName, InputLine, C);
+	    Error ("%s(%u): Invalid character `%c'", CfgGetName(), InputLine, C);
 
     }
 }
@@ -436,7 +436,7 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
     }
 
     /* Not found or no identifier */
-    Error ("%s(%u): %s expected", CfgName, InputLine, Name);
+    Error ("%s(%u): %s expected", CfgGetName(), InputLine, Name);
 }
 
 

@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -188,6 +188,18 @@ int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count);
  * attached. If the code segment does not span the given range, check the
  * possible span instead.
  */
+
+#if defined(HAVE_INLINE)
+INLINE int CS_HavePendingLabel (const CodeSeg* S)
+/* Return true if there are open labels that will get attached to the next
+ * instruction that is added.
+ */
+{
+    return (CollCount (&S->Labels) > 0);
+}
+#else
+#  define CS_HavePendingLabel(S)        (CollCount (&(S)->Labels) > 0)
+#endif
 
 CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name);
 /* Add a code label for the next instruction to follow */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -73,6 +73,7 @@ void SwitchStatement (void)
     unsigned ExitLabel;	       	/* Exit label */
     unsigned CaseLabel;         /* Label for case */
     unsigned DefaultLabel;      /* Label for the default branch */
+    unsigned SwitchCodeLabel;   /* Label for the switch code */
     long     Val;               /* Case label value */
     int      HaveBreak = 0;     /* True if the last statement had a break */
 
@@ -85,11 +86,25 @@ void SwitchStatement (void)
     intexpr (&SwitchExpr);
     ConsumeRParen ();
 
+    /* Add a jump to the switch code. This jump is usually unnecessary,
+     * because the switch code will moved up just behind the switch
+     * expression. However, in rare cases, there's a label at the end of
+     * the switch expression. This label will not get moved, so the code
+     * jumps around the switch code, and after moving the switch code,
+     * things look really weird. If we add a jump here, we will never have
+     * a label attached to the current code position, and the jump itself
+     * will get removed by the optimizer if it is unnecessary.
+     */
+    SwitchCodeLabel = GetLocalLabel ();
+    g_jump (SwitchCodeLabel);
+
+    /* Remember the current code position. We will move the switch code
+     * to this position later.
+     */
+    CaseCodeStart = GetCodePos();
+
     /* Opening curly brace */
     ConsumeLCurly ();
-
-    /* Remember the current code position */
-    CaseCodeStart = GetCodePos();
 
     /* Get the unqualified type of the switch expression */
     SwitchExprType = UnqualifiedType (SwitchExpr.Type[0]);
@@ -124,7 +139,7 @@ void SwitchStatement (void)
 		/* Read the selector expression */
 		ConstExpr (&CaseExpr);
 		if (!IsClassInt (CaseExpr.Type)) {
-		    Error ("Switch quantity not an integer");
+       		    Error ("Switch quantity not an integer");
 		}
 
 		/* Check the range of the expression */
@@ -167,7 +182,7 @@ void SwitchStatement (void)
 		}
 
 		/* Insert the case selector into the selector table */
-		CaseLabel = InsertCaseValue (Nodes, Val, Depth);
+       		CaseLabel = InsertCaseValue (Nodes, Val, Depth);
 
 		/* Define this label */
 		g_defcodelabel (CaseLabel);
@@ -211,7 +226,7 @@ void SwitchStatement (void)
 	Warning ("No case labels");
 
     } else {
-                                   
+
         CodeMark SwitchCodeStart;
 
         /* If the last statement did not have a break, we may have an open
@@ -227,6 +242,9 @@ void SwitchStatement (void)
 
 	/* Remember the current position */
 	SwitchCodeStart = GetCodePos();
+
+        /* Output the switch code label */
+        g_defcodelabel (SwitchCodeLabel);
 
 	/* Generate code */
        	g_switch (Nodes, DefaultLabel? DefaultLabel : ExitLabel, Depth);

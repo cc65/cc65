@@ -224,15 +224,15 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
        	if (IsClassPtr (rhst)) {
      	    /* Pointer -> int conversion */
      	    Warning ("Converting pointer to integer without a cast");
-       	} else if (!IsClassInt (rhst)) {
-     	    Error ("Incompatible types");
-     	} else {
+       	} else if (IsClassInt (rhst)) {
    	    /* Convert the rhs to the type of the lhs. */
    	    unsigned flags = TypeOf (rhst);
        	    if (rhs->Flags == E_MCONST) {
    	 	flags |= CF_CONST;
    	    }
        	    return g_typecast (TypeOf (lhst), flags);
+     	} else {
+     	    Error ("Incompatible types");
         }
     } else if (IsClassPtr (lhst)) {
      	if (IsClassPtr (rhst)) {

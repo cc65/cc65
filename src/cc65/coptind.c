@@ -579,7 +579,7 @@ unsigned OptCondBranches (CodeSeg* S)
 
 
 /*****************************************************************************/
-/*			      Remove unused loads     			     */
+/*			Remove unused loads and stores                       */
 /*****************************************************************************/
 
 
@@ -623,7 +623,7 @@ unsigned OptUnusedLoads (CodeSeg* S)
 	    }
 
 	    /* Get register usage and check if the register value is used later */
-	    if ((GetRegInfo (S, I+1) & R) == 0) {
+	    if ((GetRegInfo (S, I+1, R) & R) == 0) {
 
 	    	/* Register value is not used, remove the load */
 		CS_DelEntry (S, I);
@@ -635,6 +635,51 @@ unsigned OptUnusedLoads (CodeSeg* S)
 	}
 
 NextEntry:
+      	/* Next entry */
+      	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptUnusedStores (CodeSeg* S)
+/* Remove stores into zero page registers that aren't used later */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if it's a register load or transfer insn */
+       	if ((E->Info & OF_STORE) != 0    &&
+	    E->AM == AM65_ZP             &&
+	    (E->Chg & REG_ZP) != 0) {
+
+	    /* Check for the zero page location. We know that there cannot be
+	     * more than one zero page location involved in the store.
+	     */
+	    unsigned R = E->Chg & REG_ZP;
+
+	    /* Get register usage and check if the register value is used later */
+	    if ((GetRegInfo (S, I+1, R) & R) == 0) {
+
+	    	/* Register value is not used, remove the load */
+		CS_DelEntry (S, I);
+
+		/* Remember, we had changes */
+		++Changes;
+
+	    }
+	}
+
       	/* Next entry */
       	++I;
 
@@ -667,13 +712,16 @@ unsigned OptDuplicateLoads (CodeSeg* S)
     	/* Assume we won't delete the entry */
     	int Delete = 0;
 
+       	/* Get a pointer to the input registers of the insn */
+	const RegContents* In  = &E->RI->In;
+
 	/* Handle the different instructions */
 	switch (E->OPC) {
 
 	    case OP65_LDA:
-	        if (E->RI->In.RegA >= 0               && /* Value of A is known */
+       	        if (In->RegA >= 0                     && /* Value of A is known */
        		    CE_KnownImm (E)                   && /* Value to be loaded is known */
-       	       	    E->RI->In.RegA == (long) E->Num   && /* Both are equal */
+       	       	    In->RegA == (long) E->Num         && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
 		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
 		    Delete = 1;
@@ -681,9 +729,9 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_LDX:
-       	        if (E->RI->In.RegX >= 0               && /* Value of X is known */
+       	        if (In->RegX >= 0                     && /* Value of X is known */
 		    CE_KnownImm (E)                   && /* Value to be loaded is known */
-		    E->RI->In.RegX == (long) E->Num   && /* Both are equal */
+		    In->RegX == (long) E->Num         && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
 		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
 		    Delete = 1;
@@ -691,32 +739,70 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_LDY:
-       	        if (E->RI->In.RegY >= 0               && /* Value of Y is known */
+       	        if (In->RegY >= 0                     && /* Value of Y is known */
 		    CE_KnownImm (E)                   && /* Value to be loaded is known */
-		    E->RI->In.RegY == (long) E->Num   && /* Both are equal */
+		    In->RegY == (long) E->Num         && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
 		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
 		    Delete = 1;
 		}
 	        break;
 
+	    case OP65_STA:
+	        /* If we store into a known zero page location, and this
+		 * location does already contain the value to be stored,
+		 * remove the store.
+		 */
+	        if (In->RegA >= 0                     && /* Value of A is known */
+		    E->AM == AM65_ZP                  && /* Store into zp */
+		    (((E->Chg & REG_SREG_LO) != 0 &&     /* Store into sreg */
+		      In->RegA == In->SRegLo)       ||   /* Value identical */
+       	       	     ((E->Chg & REG_SREG_HI) != 0 &&     /* Store into sreg+1 */
+       	       	      In->RegA == In->SRegHi))) {        /* Value identical */
+		    Delete = 1;
+		}
+	        break;
+
 	    case OP65_STX:
-	        /* If the value in the X register is known and the same as
+	        /* If we store into a known zero page location, and this
+		 * location does already contain the value to be stored,
+		 * remove the store.
+		 */
+	        if (In->RegX >= 0                     && /* Value of A is known */
+		    E->AM == AM65_ZP                  && /* Store into zp */
+		    (((E->Chg & REG_SREG_LO) != 0 &&     /* Store into sreg */
+		      In->RegX == In->SRegLo)       ||   /* Value identical */
+       	       	     ((E->Chg & REG_SREG_HI) != 0 &&     /* Store into sreg+1 */
+       	       	      In->RegX == In->SRegHi))) {        /* Value identical */
+		    Delete = 1;
+
+		/* If the value in the X register is known and the same as
 		 * that in the A register, replace the store by a STA. The
 		 * optimizer will then remove the load instruction for X
 		 * later. STX does support the zeropage,y addressing mode,
 		 * so be sure to check for that.
 		 */
-       	        if (E->RI->In.RegX >= 0               &&
-		    E->RI->In.RegX == E->RI->In.RegA  &&
-		    E->AM != AM65_ABSY                &&
-		    E->AM != AM65_ZPY) {
+       	        } else if (In->RegX >= 0              &&
+		    	   In->RegX == In->RegA       &&
+		    	   E->AM != AM65_ABSY         &&
+		    	   E->AM != AM65_ZPY) {
 		    /* Use the A register instead */
        		    CE_ReplaceOPC (E, OP65_STA);
 		}
 	        break;
 
 	    case OP65_STY:
+	        /* If we store into a known zero page location, and this
+		 * location does already contain the value to be stored,
+		 * remove the store.
+		 */
+	        if (In->RegX >= 0                     && /* Value of A is known */
+		    E->AM == AM65_ZP                  && /* Store into zp */
+		    (((E->Chg & REG_SREG_LO) != 0 &&     /* Store into sreg */
+		      In->RegX == In->SRegLo)       ||   /* Value identical */
+       	       	     ((E->Chg & REG_SREG_HI) != 0 &&     /* Store into sreg+1 */
+       	       	      In->RegX == In->SRegHi))) {        /* Value identical */
+		    Delete = 1;
 	        /* If the value in the Y register is known and the same as
 		 * that in the A register, replace the store by a STA. The
 		 * optimizer will then remove the load instruction for Y
@@ -724,11 +810,11 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 		 * replacement by X, but check for invalid addressing modes
 		 * in this case.
 		 */
-       	        if (E->RI->In.RegY >= 0) {
-		    if (E->RI->In.RegY == E->RI->In.RegA) {
+       	        } else if (In->RegY >= 0) {
+		    if (In->RegY == In->RegA) {
 		    	CE_ReplaceOPC (E, OP65_STA);
-		    } else if (E->RI->In.RegY == E->RI->In.RegX &&
-			       E->AM != AM65_ABSX               &&
+		    } else if (In->RegY == In->RegX   &&
+			       E->AM != AM65_ABSX     &&
 			       E->AM != AM65_ZPX) {
 		    	CE_ReplaceOPC (E, OP65_STX);
 		    }
@@ -736,9 +822,9 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_TAX:
-                if (E->RI->In.RegA >= 0                 &&
-		    E->RI->In.RegA == E->RI->In.RegX    &&
-		    (N = CS_GetNextEntry (S, I)) != 0   &&
+                if (In->RegA >= 0                     &&
+		    In->RegA == In->RegX              &&
+		    (N = CS_GetNextEntry (S, I)) != 0 &&
 		    (N->Info & OF_FBRA) == 0) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
@@ -746,8 +832,8 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_TAY:
-                if (E->RI->In.RegA >= 0                 &&
-		    E->RI->In.RegA == E->RI->In.RegY    &&
+                if (In->RegA >= 0                 &&
+		    In->RegA == In->RegY    &&
 		    (N = CS_GetNextEntry (S, I)) != 0   &&
 		    (N->Info & OF_FBRA) == 0) {
 		    /* Value is identical and not followed by a branch */
@@ -756,8 +842,8 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	        break;
 
        	    case OP65_TXA:
-                if (E->RI->In.RegX >= 0                 &&
-		    E->RI->In.RegX == E->RI->In.RegA    &&
+                if (In->RegX >= 0                 &&
+		    In->RegX == In->RegA    &&
 		    (N = CS_GetNextEntry (S, I)) != 0   &&
 		    (N->Info & OF_FBRA) == 0) {
 		    /* Value is identical and not followed by a branch */
@@ -766,8 +852,8 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	        break;
 
 	    case OP65_TYA:
-                if (E->RI->In.RegY >= 0                 &&
-		    E->RI->In.RegY == E->RI->In.RegA    &&
+                if (In->RegY >= 0                 &&
+		    In->RegY == In->RegA    &&
 		    (N = CS_GetNextEntry (S, I)) != 0   &&
 		    (N->Info & OF_FBRA) == 0) {
 		    /* Value is identical and not followed by a branch */

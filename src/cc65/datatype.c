@@ -682,22 +682,22 @@ int IsQualVolatile (const type* T)
 
 
 int IsFastCallFunc (const type* T)
-/* Return true if this is a function type with __fastcall__ calling conventions */
+/* Return true if this is a function type or pointer to function with
+ * __fastcall__ calling conventions
+ */
 {
-    FuncDesc* F;
-    CHECK (IsTypeFunc (T));
-    F = (FuncDesc*) DecodePtr (T+1);
+    FuncDesc* F	= GetFuncDesc (T);
     return (F->Flags & FD_FASTCALL) != 0;
 }
 
 
 
 int IsVariadicFunc (const type* T)
-/* Return true if this is a function type with variable parameter list */
+/* Return true if this is a function type or pointer to function type with
+ * variable parameter list
+ */
 {
-    FuncDesc* F;
-    CHECK (IsTypeFunc (T));
-    F = (FuncDesc*) DecodePtr (T+1);
+    FuncDesc* F = GetFuncDesc (T);
     return (F->Flags & FD_VARIADIC) != 0;
 }
 

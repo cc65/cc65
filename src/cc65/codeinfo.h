@@ -59,20 +59,22 @@ struct CodeSeg;
 #define REG_A  	       	0x0001U
 #define REG_X  	       	0x0002U
 #define REG_Y  	       	0x0004U
-#define REG_TMP1       	0x0010U
-#define REG_TMP2        0x0020U
-#define REG_TMP3        0x0040U
-#define REG_TMP4        0x0080U
-#define REG_PTR1       	0x0100U
-#define REG_PTR2    	0x0200U
-#define REG_PTR3    	0x0400U
-#define REG_PTR4    	0x0800U
-#define REG_SREG      	0x1000U
+#define REG_TMP1       	0x0008U
+#define REG_TMP2        0x0010U
+#define REG_TMP3        0x0020U
+#define REG_TMP4        0x0040U
+#define REG_PTR1       	0x0080U
+#define REG_PTR2    	0x0100U
+#define REG_PTR3    	0x0200U
+#define REG_PTR4    	0x0400U
+#define REG_SREG_LO    	0x0800U
+#define REG_SREG_HI     0x1000U
 #define REG_SP          0x2000U
 #define REG_SAVE        0x4000U
 #define REG_BANK        0x8000U
 
 /* Combined register defines */
+#define REG_SREG        (REG_SREG_LO | REG_SREG_HI)
 #define	REG_AX		(REG_A | REG_X)
 #define REG_AY          (REG_A | REG_Y)
 #define REG_XY		(REG_X | REG_Y)
@@ -102,7 +104,7 @@ int IsZPName (const char* Name, unsigned short* RegInfo);
  * zero page location found.
  */
 
-unsigned GetRegInfo (struct CodeSeg* S, unsigned Index);
+unsigned GetRegInfo (struct CodeSeg* S, unsigned Index, unsigned Wanted);
 /* Determine register usage information for the instructions starting at the
  * given index.
  */

@@ -412,6 +412,12 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	case OP65_ASL:
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
 		Out->RegA = (In->RegA << 1) & 0xFF;
+	    } else if (E->AM == AM65_ZP) {
+		if ((E->Chg & REG_SREG_LO) != 0 && In->SRegLo >= 0) {
+		    Out->SRegLo = (In->SRegLo << 1) & 0xFF;
+		} else if ((E->Chg & REG_SREG_HI) != 0 && In->SRegHi >= 0) {
+		    Out->SRegHi = (In->SRegHi << 1) & 0xFF;
+		}
 	    }
 	    break;
 
@@ -471,25 +477,31 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_DEA:
 	    if (In->RegA >= 0) {
-	    	Out->RegA = In->RegA - 1;
+	    	Out->RegA = (In->RegA - 1) & 0xFF;
 	    }
 	    break;
 
 	case OP65_DEC:
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
-	    	Out->RegA = In->RegA - 1;
+	    	Out->RegA = (In->RegA - 1) & 0xFF;
+	    } else if (E->AM == AM65_ZP) {
+		if ((E->Chg & REG_SREG_LO) != 0 && In->SRegLo >= 0) {
+		    Out->SRegLo = (In->SRegLo - 1) & 0xFF;
+		} else if ((E->Chg & REG_SREG_HI) != 0 && In->SRegHi >= 0) {
+		    Out->SRegHi = (In->SRegHi - 1) & 0xFF;
+		}
 	    }
 	    break;
 
 	case OP65_DEX:
        	    if (In->RegX >= 0) {
-	    	Out->RegX = In->RegX - 1;
+	    	Out->RegX = (In->RegX - 1) & 0xFF;
 	    }
 	    break;
 
 	case OP65_DEY:
        	    if (In->RegY >= 0) {
-	    	Out->RegY = In->RegY - 1;
+	    	Out->RegY = (In->RegY - 1) & 0xFF;
 	    }
 	    break;
 
@@ -505,25 +517,31 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_INA:
 	    if (In->RegA >= 0) {
-		Out->RegA = In->RegA + 1;
+		Out->RegA = (In->RegA + 1) & 0xFF;
 	    }
 	    break;
 
 	case OP65_INC:
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
-		Out->RegA = In->RegA + 1;
+		Out->RegA = (In->RegA + 1) & 0xFF;
+	    } else if (E->AM == AM65_ZP) {
+		if ((E->Chg & REG_SREG_LO) != 0 && In->SRegLo >= 0) {
+		    Out->SRegLo = (In->SRegLo + 1) & 0xFF;
+		} else if ((E->Chg & REG_SREG_HI) != 0 && In->SRegHi >= 0) {
+		    Out->SRegHi = (In->SRegHi + 1) & 0xFF;
+		}
 	    }
 	    break;
 
 	case OP65_INX:
 	    if (In->RegX >= 0) {
-		Out->RegX = In->RegX + 1;
+		Out->RegX = (In->RegX + 1) & 0xFF;
 	    }
 	    break;
 
 	case OP65_INY:
 	    if (In->RegY >= 0) {
-		Out->RegY = In->RegY + 1;
+		Out->RegY = (In->RegY + 1) & 0xFF;
 	    }
 	    break;
 
@@ -560,6 +578,12 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (Chg & REG_Y) {
 		Out->RegY = -1;
 	    }
+            if (Chg & REG_SREG_LO) {
+		Out->SRegLo = -1;
+	    }
+	    if (Chg & REG_SREG_HI) {
+		Out->SRegHi = -1;
+	    }
 	    break;
 
 	case OP65_JVC:
@@ -570,25 +594,49 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_LDA:
 	    if (CE_KnownImm (E)) {
-		Out->RegA = (unsigned char) E->Num;
+	     	Out->RegA = (unsigned char) E->Num;
+	    } else if (E->AM == AM65_ZP) {
+		if (E->Use & REG_SREG_LO) {
+		    Out->RegA = In->SRegLo;
+		} else if (E->Use & REG_SREG_HI) {
+		    Out->RegA = In->SRegHi;
+		} else {
+		    Out->RegA = -1;
+		}
 	    } else {
-		/* A is now unknown */
-		Out->RegA = -1;
+	     	/* A is now unknown */
+	     	Out->RegA = -1;
 	    }
 	    break;
 
 	case OP65_LDX:
 	    if (CE_KnownImm (E)) {
-		Out->RegX = (unsigned char) E->Num;
+	     	Out->RegX = (unsigned char) E->Num;
+	    } else if (E->AM == AM65_ZP) {
+		if (E->Use & REG_SREG_LO) {
+		    Out->RegX = In->SRegLo;
+		} else if (E->Use & REG_SREG_HI) {
+		    Out->RegX = In->SRegHi;
+		} else {
+		    Out->RegX = -1;
+		}
 	    } else {
-		/* X is now unknown */
-		Out->RegX = -1;
+	     	/* X is now unknown */
+	     	Out->RegX = -1;
 	    }
 	    break;
 
 	case OP65_LDY:
 	    if (CE_KnownImm (E)) {
-		Out->RegY = (unsigned char) E->Num;
+	     	Out->RegY = (unsigned char) E->Num;
+	    } else if (E->AM == AM65_ZP) {
+		if (E->Use & REG_SREG_LO) {
+		    Out->RegY = In->SRegLo;
+		} else if (E->Use & REG_SREG_HI) {
+		    Out->RegY = In->SRegHi;
+		} else {
+		    Out->RegY = -1;
+		}
 	    } else {
 		/* Y is now unknown */
 		Out->RegY = -1;
@@ -598,6 +646,12 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	case OP65_LSR:
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
 		Out->RegA = (In->RegA >> 1) & 0xFF;
+	    } else if (E->AM == AM65_ZP) {
+		if ((E->Chg & REG_SREG_LO) != 0 && In->SRegLo >= 0) {
+		    Out->SRegLo = (In->SRegLo >> 1) & 0xFF;
+		} else if (E->Chg & REG_SREG_HI) {
+		    Out->SRegHi = (In->SRegHi >> 1) & 0xFF;
+		}
 	    }
 	    break;
 
@@ -634,56 +688,93 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	case OP65_PLP:
 	    break;
 
-	case OP65_PLX:
-	    Out->RegX = -1;
-	    break;
+    	case OP65_PLX:
+    	    Out->RegX = -1;
+    	    break;
 
-	case OP65_PLY:
-	    Out->RegY = -1;
-	    break;
+    	case OP65_PLY:
+    	    Out->RegY = -1;
+    	    break;
 
-	case OP65_ROL:
-	    Out->RegA = -1;
-	    break;
+    	case OP65_ROL:
+    	    if (E->AM == AM65_ACC) {
+    		Out->RegA = -1;
+    	    } else if (E->AM == AM65_ZP) {
+    		if (E->Chg & REG_SREG_LO) {
+    		    Out->SRegLo = -1;
+    		} else if (E->Chg & REG_SREG_HI) {
+    		    Out->SRegHi = -1;
+    		}
+    	    }
+    	    break;
 
-	case OP65_ROR:
-	    Out->RegA = -1;
-	    break;
+    	case OP65_ROR:
+    	    if (E->AM == AM65_ACC) {
+    		Out->RegA = -1;
+    	    } else if (E->AM == AM65_ZP) {
+    		if (E->Chg & REG_SREG_LO) {
+    		    Out->SRegLo = -1;
+    		} else if (E->Chg & REG_SREG_HI) {
+    		    Out->SRegHi = -1;
+    		}
+    	    }
+    	    break;
 
-	case OP65_RTI:
-	    break;
+    	case OP65_RTI:
+    	    break;
 
-	case OP65_RTS:
-	    break;
+    	case OP65_RTS:
+    	    break;
 
-	case OP65_SBC:
-	    /* We don't know the value of the carry bit */
-	    Out->RegA = -1;
-	    break;
+    	case OP65_SBC:
+    	    /* We don't know the value of the carry bit */
+    	    Out->RegA = -1;
+    	    break;
 
-	case OP65_SEC:
-	    break;
+    	case OP65_SEC:
+    	    break;
 
-	case OP65_SED:
-	    break;
+    	case OP65_SED:
+    	    break;
 
-	case OP65_SEI:
-	    break;
+    	case OP65_SEI:
+    	    break;
 
-	case OP65_STA:
+    	case OP65_STA:
+	    if (E->AM == AM65_ZP) {
+		if (E->Chg & REG_SREG_LO) {
+		    Out->SRegLo = In->RegA;
+		} else if (E->Chg & REG_SREG_HI) {
+		    Out->SRegHi = In->RegA;
+		}
+	    }
 	    break;
 
 	case OP65_STX:
+	    if (E->AM == AM65_ZP) {
+		if (E->Chg & REG_SREG_LO) {
+		    Out->SRegLo = In->RegX;
+		} else if (E->Chg & REG_SREG_HI) {
+		    Out->SRegHi = In->RegX;
+		}
+	    }
 	    break;
 
 	case OP65_STY:
+	    if (E->AM == AM65_ZP) {
+		if (E->Chg & REG_SREG_LO) {
+		    Out->SRegLo = In->RegY;
+		} else if (E->Chg & REG_SREG_HI) {
+		    Out->SRegHi = In->RegY;
+		}
+	    }
 	    break;
 
 	case OP65_TAX:
 	    Out->RegX = In->RegA;
 	    break;
 
-	case OP65_TAY:
+	case OP65_TAY:	     
 	    Out->RegY = In->RegA;
 	    break;
 
@@ -725,21 +816,22 @@ static char* RegInfoDesc (unsigned U, char* Buf)
 {
     Buf[0] = '\0';
 
-    strcat (Buf, U & REG_SREG? "E" : "_");
-    strcat (Buf, U & REG_A?    "A" : "_");
-    strcat (Buf, U & REG_X?    "X" : "_");
-    strcat (Buf, U & REG_Y?    "Y" : "_");
-    strcat (Buf, U & REG_SP?   "S" : "_");
-    strcat (Buf, U & REG_TMP1? "T1" : "__");
-    strcat (Buf, U & REG_TMP2? "T2" : "__");
-    strcat (Buf, U & REG_TMP3? "T3" : "__");
-    strcat (Buf, U & REG_TMP4? "T4" : "__");
-    strcat (Buf, U & REG_PTR1? "1" : "_");
-    strcat (Buf, U & REG_PTR2? "2" : "_");
-    strcat (Buf, U & REG_PTR3? "3" : "_");
-    strcat (Buf, U & REG_PTR4? "4" : "_");
-    strcat (Buf, U & REG_SAVE? "V"  : "_");
-    strcat (Buf, U & REG_BANK? "B" : "_");
+    strcat (Buf, U & REG_SREG_HI? "H" : "_");
+    strcat (Buf, U & REG_SREG_LO? "L" : "_");
+    strcat (Buf, U & REG_A?       "A" : "_");
+    strcat (Buf, U & REG_X?       "X" : "_");
+    strcat (Buf, U & REG_Y?       "Y" : "_");
+    strcat (Buf, U & REG_SP?      "S" : "_");
+    strcat (Buf, U & REG_TMP1?    "T1" : "__");
+    strcat (Buf, U & REG_TMP2?    "T2" : "__");
+    strcat (Buf, U & REG_TMP3?    "T3" : "__");
+    strcat (Buf, U & REG_TMP4?    "T4" : "__");
+    strcat (Buf, U & REG_PTR1?    "1" : "_");
+    strcat (Buf, U & REG_PTR2?    "2" : "_");
+    strcat (Buf, U & REG_PTR3?    "3" : "_");
+    strcat (Buf, U & REG_PTR4?    "4" : "_");
+    strcat (Buf, U & REG_SAVE?    "V"  : "_");
+    strcat (Buf, U & REG_BANK?    "B" : "_");
 
     return Buf;
 }
@@ -834,7 +926,7 @@ void CE_Output (const CodeEntry* E, FILE* F)
 	char Use [128];
 	char Chg [128];
        	fprintf (F,
-       	       	 "%*s; USE: %-19s CHG: %-19s SIZE: %u\n",
+       	       	 "%*s; USE: %-20s CHG: %-20s SIZE: %u\n",
        	       	 30-Chars, "",
 		 RegInfoDesc (E->Use, Use),
 		 RegInfoDesc (E->Chg, Chg),

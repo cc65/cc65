@@ -697,7 +697,7 @@ static unsigned OptAdd2 (CodeSeg* S)
 	    L[6]->OPC == OP65_JSR               &&
        	    strcmp (L[6]->Arg, "addeqysp") == 0 &&
 	    !CE_HasLabel (L[6])                 &&
-	    (GetRegInfo (S, I+7) & REG_AX) == 0) {
+	    (GetRegInfo (S, I+7, REG_AX) & REG_AX) == 0) {
 
 	    char Buf [20];
 	    CodeEntry* X;
@@ -2580,6 +2580,7 @@ static OptFunc OptFuncs [] = {
     OptEntry (OptTest1, optMain),
     /* Remove unused loads */
     OptEntry (OptUnusedLoads, optMain),
+    OptEntry (OptUnusedStores, optMain),
     OptEntry (OptDuplicateLoads, optMain),
     OptEntry (OptStoreLoad, optMain),
     OptEntry (OptTransfers, optMain),

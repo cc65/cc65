@@ -172,7 +172,8 @@ static const ZPInfo ZPInfoTable[] = {
     {   7,      "regbank",      REG_BANK        },
     {   7,      "regsave",      REG_SAVE        },
     {   2,      "sp",           REG_SP          },
-    {   4,      "sreg",         REG_SREG        },
+    {   0,      "sreg",         REG_SREG_LO     },
+    {	0,      "sreg+1",       REG_SREG_HI     },
     {   4,      "tmp1",         REG_TMP1        },
     {   4,      "tmp2",         REG_TMP2        },
     {   4,      "tmp3",         REG_TMP3        },
@@ -245,7 +246,7 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
 
     } else {
 
-	/* Search for the function in the list of builtin functions */
+     	/* Search for the function in the list of builtin functions */
 	const FuncInfo* Info = bsearch (Name, FuncInfoTable, FuncInfoCount,
 					sizeof(FuncInfo), CompareFuncInfo);
 
@@ -277,12 +278,18 @@ static int CompareZPInfo (const void* Name, const void* Info)
     /* Do the compare. Be careful because of the length (Info may contain
      * more than just the zeropage name).
      */
-    int Res = strncmp (N, E->Name, E->Len);
-    if (Res == 0 && (N[E->Len] != '\0' && N[E->Len] != '+')) {
-	/* Name is actually longer than Info->Name */
-	Res = -1;
+    if (E->Len == 0) {
+	/* Do a full compare */
+	return strcmp (N, E->Name);
+    } else {
+	/* Only compare the first part */
+	int Res = strncmp (N, E->Name, E->Len);
+	if (Res == 0 && (N[E->Len] != '\0' && N[E->Len] != '+')) {
+	    /* Name is actually longer than Info->Name */
+	    Res = -1;
+	}
+	return Res;
     }
-    return Res;
 }
 
 
@@ -312,22 +319,13 @@ int IsZPName (const char* Name, unsigned short* RegInfo)
 
 
 
-static unsigned GetRegInfo1 (CodeSeg* S,
-       		      	     CodeEntry* E,
-       		   	     int Index,
-       		     	     Collection* Visited,
-       		     	     unsigned Used,
-       		     	     unsigned Unused);
-/* Recursively called subfunction for GetRegInfo. */
-
-
-
 static unsigned GetRegInfo2 (CodeSeg* S,
 		      	     CodeEntry* E,
 		    	     int Index,
 		     	     Collection* Visited,
 		     	     unsigned Used,
-		     	     unsigned Unused)
+		     	     unsigned Unused,
+			     unsigned Wanted)
 /* Recursively called subfunction for GetRegInfo. */
 {
     /* Follow the instruction flow recording register usage. */
@@ -373,7 +371,7 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 	}
 
        	/* If we know about all registers now, bail out */
-       	if ((Used | Unused) == REG_AXY) {
+       	if (((Used | Unused) & Wanted) == Wanted) {
     	    break;
     	}
 
@@ -392,7 +390,7 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 
 	       	/* Unconditional jump */
  	       	E     = E->JumpTo->Owner;
-		Index = -1;	  	/* Invalidate */
+		Index = -1;	     	/* Invalidate */
 
 	    } else {
 	       	/* Jump outside means we're done */
@@ -411,7 +409,7 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 		unsigned U1;
 		unsigned U2;
 
-		U1 = GetRegInfo1 (S, E->JumpTo->Owner, -1, Visited, Used, Unused);
+		U1 = GetRegInfo2 (S, E->JumpTo->Owner, -1, Visited, Used, Unused, Wanted);
 		if (U1 == REG_AXY) {
 		    /* All registers used, no need for second call */
 		    return REG_AXY;
@@ -422,7 +420,7 @@ static unsigned GetRegInfo2 (CodeSeg* S,
        	       	if ((E = CS_GetEntry (S, ++Index)) == 0) {
 		    Internal ("GetRegInfo2: No next entry!");
 		}
-		U2 = GetRegInfo1 (S, E, Index, Visited, Used, Unused);
+       	       	U2 = GetRegInfo2 (S, E, Index, Visited, Used, Unused, Wanted);
 	   	return U1 | U2;	       	/* Used in any of the branches */
 
 	    } else {
@@ -457,14 +455,15 @@ static unsigned GetRegInfo1 (CodeSeg* S,
 		   	     int Index,
 		     	     Collection* Visited,
 		     	     unsigned Used,
-		     	     unsigned Unused)
+		     	     unsigned Unused,
+			     unsigned Wanted)
 /* Recursively called subfunction for GetRegInfo. */
 {
     /* Remember the current count of the line collection */
     unsigned Count = CollCount (Visited);
 
     /* Call the worker routine */
-    unsigned R = GetRegInfo2 (S, E, Index, Visited, Used, Unused);
+    unsigned R = GetRegInfo2 (S, E, Index, Visited, Used, Unused, Wanted);
 
     /* Restore the old count, unmarking all new entries */
     unsigned NewCount = CollCount (Visited);
@@ -480,7 +479,7 @@ static unsigned GetRegInfo1 (CodeSeg* S,
 
 
 
-unsigned GetRegInfo (struct CodeSeg* S, unsigned Index)
+unsigned GetRegInfo (struct CodeSeg* S, unsigned Index, unsigned Wanted)
 /* Determine register usage information for the instructions starting at the
  * given index.
  */
@@ -500,7 +499,7 @@ unsigned GetRegInfo (struct CodeSeg* S, unsigned Index)
     InitCollection (&Visited);
 
     /* Call the recursive subfunction */
-    R = GetRegInfo1 (S, E, Index, &Visited, REG_NONE, REG_NONE);
+    R = GetRegInfo1 (S, E, Index, &Visited, REG_NONE, REG_NONE, Wanted);
 
     /* Delete the line collection */
     DoneCollection (&Visited);
@@ -514,7 +513,7 @@ unsigned GetRegInfo (struct CodeSeg* S, unsigned Index)
 int RegAUsed (struct CodeSeg* S, unsigned Index)
 /* Check if the value in A is used. */
 {
-    return (GetRegInfo (S, Index) & REG_A) != 0;
+    return (GetRegInfo (S, Index, REG_A) & REG_A) != 0;
 }
 
 
@@ -522,7 +521,7 @@ int RegAUsed (struct CodeSeg* S, unsigned Index)
 int RegXUsed (struct CodeSeg* S, unsigned Index)
 /* Check if the value in X is used. */
 {
-    return (GetRegInfo (S, Index) & REG_X) != 0;
+    return (GetRegInfo (S, Index, REG_X) & REG_X) != 0;
 }
 
 
@@ -530,7 +529,7 @@ int RegXUsed (struct CodeSeg* S, unsigned Index)
 int RegYUsed (struct CodeSeg* S, unsigned Index)
 /* Check if the value in Y is used. */
 {
-    return (GetRegInfo (S, Index) & REG_Y) != 0;
+    return (GetRegInfo (S, Index, REG_Y) & REG_Y) != 0;
 }
 
 

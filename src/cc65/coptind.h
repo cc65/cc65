@@ -89,6 +89,9 @@ unsigned OptCondBranches (CodeSeg* S);
 unsigned OptUnusedLoads (CodeSeg* S);
 /* Remove loads of registers where the value loaded is not used later. */
 
+unsigned OptUnusedStores (CodeSeg* S);
+/* Remove stores into zero page registers that aren't used later */
+
 unsigned OptDuplicateLoads (CodeSeg* S);
 /* Remove loads of registers where the value loaded is already in the register. */
 

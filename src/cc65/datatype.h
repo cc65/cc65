@@ -287,10 +287,14 @@ int IsQualVolatile (const type* T) attribute ((const));
 /* Return true if the given type has a volatile type qualifier */
 
 int IsFastCallFunc (const type* T) attribute ((const));
-/* Return true if this is a function type with __fastcall__ calling conventions */
+/* Return true if this is a function type or pointer to function with
+ * __fastcall__ calling conventions
+ */
 
 int IsVariadicFunc (const type* T) attribute ((const));
-/* Return true if this is a function type with variable parameter list */
+/* Return true if this is a function type or pointer to function type with
+ * variable parameter list
+ */
 
 int IsTypeFuncPtr (const type* T) attribute ((const));
 /* Return true if this is a function pointer */

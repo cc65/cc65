@@ -707,53 +707,122 @@ static unsigned FunctionParamList (FuncDesc* Func)
 
 
 
-static void FunctionCall (ExprDesc* lval)
-/* Perform a function call.  Called from hie11, this routine will
- * either call the named function, or the function pointer in a/x.
- */
+static void FunctionCall (int k, ExprDesc* lval)
+/* Perform a function call. */
 {
-    FuncDesc*	  Func;		/* Function descriptor */
-    unsigned	  ParamSize;	/* Number of parameter bytes */
-    CodeMark 	  Mark;
-
+    FuncDesc*	  Func;	       	  /* Function descriptor */
+    int           IsFuncPtr;      /* Flag */
+    unsigned 	  ParamSize;	  /* Number of parameter bytes */
+    CodeMark 	  Mark = 0;       /* Initialize to keep gcc silent */
+    int           PtrOffs = 0;    /* Offset of function pointer on stack */
+    int           IsFastCall = 0; /* True if it's a fast call function */
+    int           PtrOnStack = 0; /* True if a pointer copy is on stack */
 
     /* Get a pointer to the function descriptor from the type string */
     Func = GetFuncDesc (lval->Type);
 
-    /* Initialize vars to keep gcc silent */
-    Mark  = 0;
+    /* Handle function pointers transparently */
+    IsFuncPtr = IsTypeFuncPtr (lval->Type);
+    if (IsFuncPtr) {
 
-    /* Check if this is a function pointer. If so, save it. If not, check for
-     * special known library functions that may be inlined.
-     */
-    if (lval->Flags & E_MEXPR) {
-       	/* Function pointer is in primary register, save it */
-       	Mark = GetCodePos ();
-       	g_save (CF_PTR);
+	/* Check wether it's a fastcall function */
+	IsFastCall = IsFastCallFunc (lval->Type + 1);
+
+	/* Things may be difficult, depending on where the function pointer
+	 * resides. If the function pointer is an expression of some sort
+	 * (not a local or global variable), we have to evaluate this
+	 * expression now and save the result for later. Since calls to
+	 * function pointers may be nested, we must save it onto the stack.
+	 * For fastcall functions we do also need to place a copy of the
+	 * pointer on stack, since we cannot use a/x.
+	 */
+	PtrOnStack = IsFastCall || ((lval->Flags & (E_MGLOBAL | E_MLOCAL)) == 0);
+	if (PtrOnStack) {
+
+	    /* Not a global or local variable, or a fastcall function. Load
+	     * the pointer into the primary and mark it as an expression.
+	     */
+	    exprhs (CF_NONE, k, lval);
+	    lval->Flags |= E_MEXPR;
+
+	    /* Remember the code position */
+	    Mark = GetCodePos ();
+
+	    /* Push the pointer onto the stack and remember the offset */
+	    g_push (CF_PTR, 0);
+	    PtrOffs = oursp;
+	}
+
+    /* Check for known standard functions and inline them if requested */
     } else if (InlineStdFuncs && IsStdFunc ((const char*) lval->Name)) {
-       	/* Inline this function */
+
+	/* Inline this function */
        	HandleStdFunc (lval);
        	return;
+
     }
 
     /* Parse the parameter list */
     ParamSize = FunctionParamList (Func);
 
-    /* We need the closing bracket here */
+    /* We need the closing paren here */
     ConsumeRParen ();
 
-    /* */
-    if (lval->Flags & E_MEXPR) {
- 	/* Function called via pointer: Restore it and call function */
-	if (ParamSize != 0) {
-     	    g_restore (CF_PTR);
-	} else {
-	    /* We had no parameters - remove save code */
-       	    RemoveCode (Mark);
+    /* Special handling for function pointers */
+    if (IsFuncPtr) {
+
+	/* If the function is not a fastcall function, load the pointer to
+	 * the function into the primary.
+	 */
+	if (!IsFastCallFunc (lval->Type)) {
+
+	    /* Not a fastcall function - we may use the primary */
+       	    if (PtrOnStack) {
+		/* If we have no parameters, the pointer is still in the
+		 * primary. Remove the code to push it and correct the
+		 * stack pointer.
+		 */
+		if (ParamSize == 0) {
+		    RemoveCode (Mark);
+		    pop (CF_PTR);
+		    PtrOnStack = 0;
+		} else {
+		    /* Load from the saved copy */
+		    g_getlocal (CF_PTR, PtrOffs);
+		}
+	    } else {
+	     	/* Load from original location */
+	     	exprhs (CF_NONE, k, lval);
+	    }
+
+	    /* Call the function */
+	    g_callind (TypeOf (lval->Type), ParamSize);
+
+	    /* If we have a pointer on stack, remove it */
+	    if (PtrOnStack) {
+	     	g_space (- (int) sizeofarg (CF_PTR));
+	     	pop (CF_PTR);
+	    }
+
+     	} else {
+
+	    /* Fastcall function. We cannot use the primary for the function
+	     * pointer and must therefore use an offset to the stack location.
+	     * Since fastcall functions may never be variadic, we can use the
+	     * index register for this purpose.
+	     */
+	    Error ("Not implemented");
+	    pop (CF_PTR);
 	}
-     	g_callind (TypeOf (lval->Type), ParamSize);
+
+	/* Skip T_PTR */	    
+    	++lval->Type;
+
     } else {
+
+	/* Normal function */
        	g_call (TypeOf (lval->Type), (const char*) lval->Name, ParamSize);
+
     }
 }
 
@@ -829,7 +898,7 @@ static int primary (ExprDesc* lval)
 
 	    /* Check for legal symbol types */
        	    if ((Sym->Flags & SC_CONST) == SC_CONST) {
-		/* Enum or some other numeric constant */
+	   	/* Enum or some other numeric constant */
 	       	lval->Flags = E_MCONST;
 	    	lval->ConstVal = Sym->V.ConstVal;
 	       	return 0;
@@ -840,19 +909,19 @@ static int primary (ExprDesc* lval)
 	    	lval->ConstVal = 0;
 	    } else if ((Sym->Flags & SC_AUTO) == SC_AUTO) {
 	    	/* Local variable. If this is a parameter for a variadic
-		 * function, we have to add some address calculations, and the
-		 * address is not const.
-		 */
+	   	 * function, we have to add some address calculations, and the
+	   	 * address is not const.
+	   	 */
        	       	if ((Sym->Flags & SC_PARAM) == SC_PARAM && IsVariadic (CurrentFunc)) {
-		    /* Variadic parameter */
-		    g_leavariadic (Sym->V.Offs - GetParamSize (CurrentFunc));
-		    lval->Flags = E_MEXPR;
-		    lval->ConstVal = 0;
-		} else {
-		    /* Normal parameter */
-		    lval->Flags = E_MLOCAL | E_TLOFFS;
-		    lval->ConstVal = Sym->V.Offs;
-		}
+	   	    /* Variadic parameter */
+	   	    g_leavariadic (Sym->V.Offs - GetParamSize (CurrentFunc));
+	   	    lval->Flags = E_MEXPR;
+	   	    lval->ConstVal = 0;
+	   	} else {
+	   	    /* Normal parameter */
+	   	    lval->Flags = E_MLOCAL | E_TLOFFS;
+	   	    lval->ConstVal = Sym->V.Offs;
+	   	}
 	    } else if ((Sym->Flags & SC_STATIC) == SC_STATIC) {
 	    	/* Static variable */
 	   	if (Sym->Flags & (SC_EXTERN | SC_STORAGE)) {
@@ -1253,16 +1322,17 @@ static int hie11 (ExprDesc *lval)
 	    /* Function call. Skip the opening parenthesis */
 	    NextToken ();
 	    tptr = lval->Type;
-	    if (IsTypeFunc (tptr) || IsTypeFuncPtr (tptr)) {
-	    	if (IsTypeFuncPtr (tptr)) {
-	    	    /* Pointer to function. Handle transparently */
-    	    	    exprhs (CF_NONE, k, lval);  /* Function pointer to A/X */
-	    	    ++lval->Type; 	    	/* Skip T_PTR */
-	    	    lval->Flags |= E_MEXPR;
-     	    	}
-     	    	FunctionCall (lval);
+	    if (IsTypeFunc (lval->Type) || IsTypeFuncPtr (lval->Type)) {
+
+		/* Call the function */
+		FunctionCall (k, lval);
+
+		/* Result is in the primary register */
      	    	lval->Flags = E_MEXPR;
-     	    	lval->Type += DECODE_SIZE + 1;       	/* Set to result */
+
+		/* Set to result */
+     	    	lval->Type = GetFuncReturn (lval->Type);
+
      	    } else {
      	    	Error ("Illegal function call");
      	    }

@@ -414,8 +414,7 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
     /* If we have a function given, get the return type of the function.
      * Assume ANY return type besides void will use the A and X registers.
      */
-    RetType = GetFuncReturn (Func->Type);
-    if (S->Func && !IsTypeVoid (RetType)) {
+    if (S->Func && !IsTypeVoid ((RetType = GetFuncReturn (Func->Type)))) {
 	if (SizeOf (RetType) == SizeOf (type_long)) {
 	    S->ExitRegs = REG_EAX;
 	} else {
@@ -1059,7 +1058,7 @@ void CS_GenRegInfo (CodeSeg* S)
     RC_Invalidate (&Regs);
     CurrentRegs = &Regs;
 
-    /* First pass. Walk over all insns an note just the changes from one
+    /* First pass. Walk over all insns and note just the changes from one
      * insn to the next one.
      */
     WasJump = 0;
@@ -1114,6 +1113,12 @@ void CS_GenRegInfo (CodeSeg* S)
 		}
 		if (J->RI->Out2.RegY != Regs.RegY) {
 		    Regs.RegY = -1;
+		}
+		if (J->RI->Out2.SRegLo != Regs.SRegLo) {
+		    Regs.SRegLo = -1;
+		}
+		if (J->RI->Out2.SRegHi != Regs.SRegHi) {
+		    Regs.SRegHi = -1;
 		}
 		++Entry;
 	    }

@@ -1011,12 +1011,8 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 		}
 	    } else {
 		if ((Flags & CF_NOKEEP) == 0 || CodeSizeFactor < 160) {
-		    if (Offs) {
-			ldyconst (Offs);
-			AddCodeLine ("jsr staxysp");
-		    } else {
-			AddCodeLine ("jsr stax0sp");
-		    }
+		    ldyconst (Offs);
+		    AddCodeLine ("jsr staxysp");
 		} else {
 		    if (CPU == CPU_65C02 && Offs == 0) {
 			AddCodeLine ("sta (sp)");

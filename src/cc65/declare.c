@@ -807,12 +807,12 @@ static void Decl (Declaration* D, unsigned Mode)
 	/* Parse the function */
 	Decl (D, Mode);
 	/* Set the fastcall flag */
-	if (!IsTypeFunc (T)) {
+	if (!IsTypeFunc (T) && !IsTypeFuncPtr (T)) {
 	    Error ("__fastcall__ modifier applied to non function");
 	} else if (IsVariadicFunc (T)) {
 	    Error ("Cannot apply __fastcall__ to functions with variable parameter list");
 	} else {
-	    FuncDesc* F = (FuncDesc*) DecodePtr (T+1);
+	    FuncDesc* F = GetFuncDesc (T);
        	    F->Flags |= FD_FASTCALL;
 	}
 	return;

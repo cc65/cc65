@@ -102,6 +102,7 @@ static void Usage (void)
 	     "Long options:\n"
 	     "  --help\t\tHelp (this text)\n"
 	     "  --mapfile name\tCreate a map file\n"
+       	     "  --start-addr addr\tSet the default start address\n"
        	     "  --target sys\t\tSet the target system\n"
        	     "  --version\t\tPrint the linker version\n",
 	     ProgName);
@@ -127,8 +128,7 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
 
     /* Check if we do really have a number */
     if (Converted != 1) {
-	fprintf (stderr, "Invalid number given in argument: %s\n", Arg);
-	exit (EXIT_FAILURE);
+       	Error ("Invalid number given in argument: %s\n", Arg);
     }
 
     /* Return the result */
@@ -241,6 +241,14 @@ static void OptMapFile (const char* Opt, const char* Arg)
 
 
 
+static void OptStartAddr (const char* Opt, const char* Arg)
+/* Set the default start address */
+{
+    StartAddr = CvtNumber (Opt, Arg);
+}
+
+
+
 static void OptTarget (const char* Opt, const char* Arg)
 /* Set the target system */
 {
@@ -280,6 +288,7 @@ int main (int argc, char* argv [])
        	{ "--config",  	       	1,     	OptConfig    		},
        	{ "--help",	       	0,     	OptHelp	     		},
 	{ "--mapfile",		1,	OptMapFile		},
+	{ "--start-addr",	1,	OptStartAddr		},
 	{ "--target",		1,	OptTarget    		},
 	{ "--version",	       	0,  	OptVersion   		},
     };
@@ -335,8 +344,8 @@ int main (int argc, char* argv [])
 
 	       	case 'v':
 	       	    switch (Arg [2]) {
-	       	      	case 'm':   VerboseMap = 1;	break;
-    		      	case '\0':  ++Verbose;		break;
+	       	      	case 'm':   VerboseMap = 1; 	break;
+    		      	case '\0':  ++Verbose;	    	break;
 		      	default:    UnknownOption (Arg);
 		    }
 		    break;
@@ -348,13 +357,13 @@ int main (int argc, char* argv [])
 		case 'L':
 		    switch (Arg [2]) {
 		      	case 'n': LabelFileName = GetArg (&I, 3); break;
-		      	case 'p': WProtSegs = 1;	      	  break;
+		      	case 'p': WProtSegs = 1;    	      	  break;
 		      	default:  UnknownOption (Arg);		  break;
 		    }
 		    break;
 
 		case 'S':
-		    StartAddr = CvtNumber (Arg, GetArg (&I, 2));
+		    OptStartAddr (Arg, GetArg (&I, 2));
 		    break;
 
 		case 'V':

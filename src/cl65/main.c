@@ -562,6 +562,7 @@ static void Usage (void)
        	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet a compiler include directory path\n"
 	     "  --mapfile name\tCreate a map file\n"
+       	     "  --start-addr addr\tSet the default start address\n"
        	     "  --target sys\t\tSet the target system\n"
        	     "  --version\t\tPrint the version number\n"
        	     "  --verbose\t\tVerbose mode\n",
@@ -632,6 +633,15 @@ static void OptMapFile (const char* Opt, const char* Arg)
 
 
 
+static void OptStartAddr (const char* Opt, const char* Arg)
+/* Set the default start address */
+{			 
+    CmdAddArg (&LD65, "-S");
+    CmdAddArg (&LD65, Arg);
+}
+
+
+
 static void OptTarget (const char* Opt, const char* Arg)
 /* Set the target system */
 {
@@ -675,6 +685,7 @@ int main (int argc, char* argv [])
 	{ "--help",		0,	OptHelp			},
 	{ "--include-dir",	1,	OptIncludeDir		},
 	{ "--mapfile",		1,	OptMapFile		},
+	{ "--start-addr",	1,	OptStartAddr		},
 	{ "--target",		1,	OptTarget		},
 	{ "--verbose",		0,	OptVerbose		},
 	{ "--version",		0,	OptVersion		},

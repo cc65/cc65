@@ -100,6 +100,9 @@ clean:
 zap:	clean
 	@rm -f *.obj $(LIB)
 
+strip:
+	@true
+
 
 
 

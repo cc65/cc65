@@ -69,6 +69,8 @@
 
 
 /* Special routines to write bytes and words in the system bank */
+unsigned char __fastcall__ peekbsys (unsigned addr);
+unsigned __fastcall__ peekwsys (unsigned addr);
 void __fastcall__ pokebsys (unsigned addr, unsigned char val);
 void __fastcall__ pokewsys (unsigned addr, unsigned val);
 

@@ -3010,7 +3010,6 @@ void test (unsigned label, int cond)
 
     /* Prepare the expression, setup labels */
     memset (&lval, 0, sizeof (lval));
-    lval.e_test = E_TEST;
 
     /* Generate code to eval the expr */
     k = expr (hie0, &lval);

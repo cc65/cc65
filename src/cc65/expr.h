@@ -40,9 +40,6 @@
 /* Defines for the test field of the expression descriptor */
 #define E_CC  		0x0001 	/* expr has set cond codes apropos result value */
 #define E_FORCETEST    	0x0002  /* if expr has NOT set CC, force a test */
-#define E_LOGL		0x0004  /* expr has left a logical value (1 or 0) in AX */
-#define E_XINV		0x0008  /* flip this bit to invert sense of test */
-#define E_TEST		0x0010	/* We're evaluating a test */
 
 /* Describe the result of an expression */
 struct expent {

@@ -790,7 +790,7 @@ Or, to access a struct member of a static variable:
       	    unsigned char color;
       	} pixel_t;
       	static pixel_t pixel;
-       	__asm__ ("ldy #%b", offsetof(pixel, color));
+       	__asm__ ("ldy #%b", offsetof(pixel_t, color));
       	__asm__ ("lda %v,y", pixel);
 </verb></tscreen>
 <p>

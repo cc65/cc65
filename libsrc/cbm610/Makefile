@@ -14,10 +14,13 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-%.emd:	%.o ../runtime/zeropage.o
+%.emd:	%.o ../runtime/zeropage.o extzp.o
 	@$(LD) -t module -o $@ $^
 
-%.tgi:	%.o ../runtime/zeropage.o
+%.ser:	%.o ../runtime/zeropage.o extzp.o
+	@$(LD) -t module -o $@ $^
+
+%.tgi:	%.o ../runtime/zeropage.o extzp.o
 	@$(LD) -t module -o $@ $^
 
 #--------------------------------------------------------------------------
@@ -32,48 +35,47 @@ OBJS =	_scrsize.o	\
        	cputc.o		\
        	crt0.o 		\
        	crtc.o 		\
+        extzp.o         \
        	kbhit.o		\
-        kiec.o          \
+        kernal.o        \
         kiobase.o       \
-       	kirq.o 		\
-       	kplot.o		\
+        kopen.o         \
         krdtim.o        \
         kreadst.o       \
-	kscnkey.o	\
         kscreen.o       \
-        ksetlfs.o       \
         ksetnam.o       \
         ksettim.o       \
-	kudtim.o	\
-        kupdst.o        \
         mainargs.o      \
 	peeksys.o	\
 	pokesys.o	\
         randomize.o     \
 	revers.o	\
-	rs232.o         \
         sysuname.o
 
 #--------------------------------------------------------------------------
 # Drivers
 
-TGIS =
-
 EMDS =	cbm610-ram.emd
+
+JOYS =
+
+SERS = cbm610-stdser.ser
+
+TGIS =
 
 #--------------------------------------------------------------------------
 # Targets
 
 .PHONY:	all clean zap
 
-all:	$(OBJS) $(EMDS) $(TGIS)
+all: 	$(OBJS) $(EMDS) $(JOYS) $(SERS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
 zap:	clean
-	@$(RM) $(EMDS) $(TGIS)
+	@$(RM) $(EMDS) $(JOYS) $(SERS) $(TGIS)
 

@@ -6,13 +6,20 @@
 
         .export         READST
 
+        .import         sys_bank, restore_bank
+        .import         sysp0: zp, ktmp: zp
+
         .include        "cbm610.inc"
 
 
 .proc   READST
 
-        lda     ST                      ; Load status
-        rts                             ; Return to caller
+        jsr     sys_bank
+        sty     ktmp                    ; Save Y register
+        ldy     #ST
+        lda     (sysp0),y               ; Load ST from system bank
+        ldy     ktmp
+        jmp     restore_bank            ; Will set condition codes on A
 
 .endproc
 

@@ -5,16 +5,16 @@
 ;
 
  	.export		set_bank, sys_bank, restore_bank
-	.importzp     	ptr1
+	.importzp      	ptr1, segsave
 
-	.include      	"cbm610.inc"
+	.include       	"cbm610.inc"
 
 .code
 
 .proc	sys_bank
 	pha
 	lda  	IndReg
-	sta  	IndSegSave
+	sta  	segsave
 	lda  	#$0F
 	sta  	IndReg
 	pla
@@ -24,7 +24,7 @@
 .proc	set_bank
 	pha
 	lda  	IndReg
-	sta  	IndSegSave
+	sta  	segsave
 	pla
 	sta  	IndReg
 	rts
@@ -32,7 +32,7 @@
 
 .proc	restore_bank
 	pha
-	lda	IndSegSave
+	lda	segsave
 	sta	IndReg
 	pla
 	rts

@@ -6,6 +6,7 @@
 
 	.export		_clrscr
 	.import		plot
+        .import         CURS_X: zp, CURS_Y: zp, CharPtr: zp
 
 	.include	"cbm610.inc"
 

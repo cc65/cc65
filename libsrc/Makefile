@@ -144,7 +144,7 @@ c128lib:
 # Commdore P500 / CBM 5x0
 
 cbm510lib:
-	for i in cbm510 cbm common runtime conio dbg em joystick tgi zlib; do \
+	for i in cbm510 cbm common runtime conio dbg em joystick serial tgi zlib; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \
@@ -161,7 +161,7 @@ cbm510lib:
 # PET-II series
 
 cbm610lib:
-	for i in cbm610 cbm common runtime conio dbg em joystick tgi zlib; do \
+	for i in cbm610 cbm common runtime conio dbg em joystick serial tgi zlib; do \
      	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \
@@ -172,6 +172,7 @@ cbm610lib:
 	done
 	mv cbm610/crt0.o cbm610.o
 	cp cbm610/*.emd .
+	cp cbm610/*.ser .
 
 #-----------------------------------------------------------------------------
 # GEOS on the C64/128

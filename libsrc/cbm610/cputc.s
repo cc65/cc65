@@ -5,13 +5,13 @@
 ; void cputc (char c);
 ;
 
-    	.export	     	_cputcxy, _cputc, cputdirect, putchar
-	.export	     	newline, plot
-	.exportzp	CURS_X, CURS_Y
+    	.export	      	_cputcxy, _cputc, cputdirect, putchar
+	.export	      	newline, plot
 
-        .import         PLOT
-	.import		_gotoxy
-	.import	     	popa
+	.import	      	_gotoxy
+	.import	      	popa
+
+        .import         ktmp: zp, crtc: zp, CURS_X: zp, CURS_Y: zp, CharPtr: zp
 
 	.include     	"cbm610.inc"
 
@@ -79,13 +79,6 @@ L10:	and	#$7F
 L11:	ora	#$40
 	bne	cputdirect	; Branch always
 
-; Set cursor position, calculate RAM pointers
-
-plot:	ldy	CURS_X
-	ldx	CURS_Y
-	clc
-	jmp	PLOT
-
 ; Write one character to the screen without doing anything else, return X
 ; position in Y
 
@@ -99,4 +92,61 @@ putchar:
 	stx	IndReg
 	rts
 
+; Set cursor position, calculate RAM pointers
+
+plot:   ldx     CURS_Y
+        lda	LineLSBTab,x
+	sta	CharPtr
+	lda	LineMSBTab,x
+	sta	CharPtr+1
+
+	lda	IndReg
+	pha
+	lda	#$0F
+	sta	IndReg
+
+	ldy	#$00
+	clc
+	sei
+	sta	(crtc),y
+	lda	CharPtr
+	adc	CURS_X
+	iny
+	sta	(crtc),y
+	dey
+	lda	#$0E
+	sta	(crtc),y
+	iny
+	lda	(crtc),y
+	and	#$F8
+	sta	ktmp
+	lda	CharPtr+1
+	adc	#$00
+	and	#$07
+	ora	ktmp
+	sta	(crtc),y
+	cli
+
+	pla
+	sta	IndReg
+	rts
+
+; -------------------------------------------------------------------------
+; Low bytes of the start address of the screen lines
+
+.rodata
+
+LineLSBTab:
+        .byte   $00,$50,$A0,$F0,$40,$90,$E0,$30
+        .byte   $80,$D0,$20,$70,$C0,$10,$60,$B0
+        .byte   $00,$50,$A0,$F0,$40,$90,$E0,$30
+        .byte   $80
+; -------------------------------------------------------------------------
+; High bytes of the start address of the screen lines
+
+LineMSBTab:
+        .byte   $D0,$D0,$D0,$D0,$D1,$D1,$D1,$D2
+        .byte   $D2,$D2,$D3,$D3,$D3,$D4,$D4,$D4
+        .byte   $D5,$D5,$D5,$D5,$D6,$D6,$D6,$D7
+        .byte   $D7
 

@@ -4,17 +4,16 @@
 ; This must be the *first* file on the linker command line
 ;
 
-	.export	     	_exit
-	.exportzp       crtc, sid, IPCcia, cia, acia, tpi1, tpi2, ktab1
-	.exportzp       ktab2, ktab3, ktab4, time, RecvBuf, SendBuf
+	.export	     	_exit, BRKVec, UDTIM
 
-	.import		initlib, donelib
+	.import		condes, initlib, donelib
 	.import	     	push0, callmain
-	.import	       	__BSS_RUN__, __BSS_SIZE__
-	.import		irq, nmi
-       	.import	       	k_irq, k_nmi
+	.import	       	__BSS_RUN__, __BSS_SIZE__, __EXTZP_RUN__
+	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
+	.import		SCNKEY
 
 	.include     	"zeropage.inc"
+        .include        "extzp.inc"
 	.include    	"cbm610.inc"
 
 
@@ -47,51 +46,31 @@
 ; that is overwritten later.
 ;
 
-.code
+.segment        "BASICHDR"
 
-; To make things more simple, make the code of this module absolute.
-
-   	.org	$0001
-Head:	.byte	$03,$00,$11,$00,$0a,$00,$81,$20,$49,$b2,$30,$20,$a4,$20,$34,$00
+        .byte	$03,$00,$11,$00,$0a,$00,$81,$20,$49,$b2,$30,$20,$a4,$20,$34,$00
    	.byte	$19,$00,$14,$00,$87,$20,$4a,$00,$27,$00,$1e,$00,$97,$20,$32,$35
    	.byte	$36,$aa,$49,$2c,$4a,$00,$2f,$00,$28,$00,$82,$20,$49,$00,$39,$00
    	.byte	$32,$00,$9e,$20,$32,$35,$36,$00,$4f,$00,$3c,$00,$83,$20,$31,$32
    	.byte	$30,$2c,$31,$36,$39,$2c,$31,$2c,$31,$33,$33,$2c,$30,$00,$00,$00
 
-; Since we need some vectors to access stuff in the system bank for our own,
-; we will include them here, starting from $60:
-
-      	.res	$60-*
-
-crtc:  		.word  	$d800
-sid:		.word  	$da00
-IPCcia:		.word  	$db00
-cia:   		.word  	$dc00
-acia:  		.word  	$dd00
-tpi1:		.word  	$de00
-tpi2:  		.word  	$df00
-ktab1:		.word  	$ea29
-ktab2:	       	.word  	$ea89
-ktab3:		.word	$eae9
-ktab4:		.word  	$eb49
-time:		.dword 	$0000
-RecvBuf:	.word	$0100		; RS232 received buffer
-SendBuf:	.word	$0200		; RS232 send buffer
-
-
+;------------------------------------------------------------------------------
 ; The code in the target bank when switching back will be put at the bottom
 ; of the stack. We will jump here to switch segments. The range $F2..$FF is
 ; not used by any kernal routine.
 
-      	.res	$F8-*
-Back:	ldx	spsave
+.segment        "STARTUP"
+
+Back:	sei
+        ldx	spsave
    	txs
    	lda    	IndReg
    	sta	ExecReg
 
-; The following code is a copy of the code that is poked in the system bank
-; memory by the basic header program, it's only for documentation and not
-; actually used here:
+;------------------------------------------------------------------------------
+; We are at $100 now. The following snippet is a copy of the code that is poked
+; in the system bank memory by the basic header program, it's only for
+; documentation and not actually used here:
 
      	sei
      	lda	#$01
@@ -99,57 +78,132 @@ Back:	ldx	spsave
 
 ; This is the actual starting point of our code after switching banks for
 ; startup. Beware: The following code will get overwritten as soon as we
-; use the stack (since it's in page 1)!
+; use the stack (since it's in page 1)! We jump to another location, since
+; we need some space for subroutines that aren't used later.
 
-      	tsx
-       	stx	spsave 	 	; Save the system stackpointer
- 	ldx	#$FF
- 	txs	       	 	; Set up our own stack
+        jmp     Origin
+
+; Hardware vectors, copied to $FFFA
+
+.proc   vectors
+        sta     ExecReg
+        rts
+        nop
+       	.word	nmi             ; NMI vector
+       	.word	0     	      	; Reset - not used
+       	.word	irq             ; IRQ vector
+.endproc
+
+; Initializers for the extended zeropage. See extzp.s
+
+.proc   extzp
+        .word   $0100           ; sysp1
+        .word   $0300           ; sysp3
+        .word  	$d800           ; crtc
+        .word  	$da00           ; sid
+        .word  	$db00           ; ipccia
+        .word  	$dc00           ; cia
+        .word  	$dd00           ; acia
+        .word  	$de00           ; tpi1
+        .word  	$df00           ; tpi2
+        .word  	$ea29           ; ktab1
+        .word  	$ea89           ; ktab2
+        .word	$eae9           ; ktab3
+        .word  	$eb49           ; ktab4
+.endproc
+
+; The following code is part of the kernal call subroutine. It is copied
+; to $FFAE
+
+.proc   callsysbank_15
+        php
+        pha
+        lda     #$0F                    ; Bank 15
+        sta     IndReg
+        sei
+.endproc
+
+; Save the old stack pointer from the system bank and setup our hw sp
+
+Origin: tsx
+       	stx	spsave 	       	; Save the system stackpointer
+ 	ldx	#$FE            ; Leave $1FF untouched for cross bank calls
+ 	txs	       	       	; Set up our own stack
+
+; Initialize the extended zeropage
+
+        ldx     #.sizeof(extzp)-1
+L1:     lda     extzp,x
+        sta     <__EXTZP_RUN__,x
+        dex
+        bpl     L1
 
 ; Set the interrupt, NMI and other vectors
 
-      	ldy	#vectors_size-1
-L0:    	lda    	vectors,y
-      	sta	$10000 - vectors_size,y
+      	ldy	#.sizeof(vectors)-1
+L2:    	lda    	vectors,y
+      	sta	$10000 - .sizeof(vectors),y
       	dey
-       	bpl     L0
+       	bpl     L2
 
 ; Switch the indirect segment to the system bank
 
       	lda	#$0F
       	sta	IndReg
 
-; Copy the kernal zero page ($90-$F2) from the system bank
+; Setup the C stack
 
-   	lda  	#$90
-   	sta	ptr1
- 	lda	#$00
-   	sta	ptr1+1
-   	ldy	#$62-1
-L1:	lda	(ptr1),y
-   	sta	$90,y
-   	dey
-   	bpl 	L1
+	lda    	#.lobyte($FEB5 - .sizeof(callsysbank_15))
+	sta	sp
+	lda   	#.hibyte($FEB5 - .sizeof(callsysbank_15))
+	sta	sp+1
 
-; Copy the page 3 vectors in place
+; Setup the subroutine and jump vector table that redirects kernal calls to
+; the system bank. Copy the bank switch routines starting at $FEB5 from the
+; system bank into the current bank.
 
- 	ldy	#$00
-L2:	lda	p3vectors,y
-  	sta	$300,y
-   	iny
-  	cpy	#p3vectors_size
-       	bne	L2
 
-; Copy the rest of page 3 from the system bank
+        ldy     #.sizeof(callsysbank_15)-1      ; Copy the modified part
+@L1:    lda     callsysbank_15,y
+        sta     $FEB5 - .sizeof(callsysbank_15),y
+        dey
+        bpl     @L1
 
-      	lda	#$00
-      	sta	ptr1
- 	lda	#$03
- 	sta	ptr1+1
-L3:	lda	(ptr1),y
-   	sta	$300,y
-   	iny
-   	bne	L3
+        lda     #.lobyte($FEB5)                 ; Copy the ROM part
+        sta     ptr1
+        lda     #.hibyte($FEB5)
+        sta     ptr1+1
+        ldy     #$00
+@L2:    lda     (ptr1),y
+        sta     $FEB5,y
+        iny
+        cpy     #<($FF6F-$FEB5)
+        bne     @L2
+
+; Setup the jump vector table
+
+        ldy     #$00
+        ldx     #45-1                   ; Number of vectors
+@L3:    lda     #$20                    ; JSR opcode
+        sta     $FF6F,y
+        iny
+        lda     #.lobyte($FEB5 - .sizeof(callsysbank_15))
+        sta     $FF6F,y
+        iny
+        lda     #.hibyte($FEB5 - .sizeof(callsysbank_15))
+        sta     $FF6F,y
+        iny
+        dex
+        bpl     @L3
+
+; Copy the stack from the system bank into page 3
+
+        ldy     #$FF
+L4:     lda     (sysp1),y
+        sta     $300,y
+        dey
+        cpy     spsave
+        bne     L4
 
 ; Set the indirect segment to bank we're executing in
 
@@ -186,64 +240,19 @@ Z3:	sta	(ptr1),y
    	iny
    	dex
    	bne	Z3
-Z4:
-
-; Setup the C stack
-
-	lda   	#<$FF81
-	sta	sp
-       	lda	#>$FF81
-	sta	sp+1
-
-; We expect to be in page 2 now
-
-.if 	(* < $1FD)
-	jmp	$200
-   	.res	$200-*
-.endif
-.if	(* < $200)
-     	.res	$200-*,$EA
-.endif
-.if    	(* >= $2F0)
-.error	"Code range invalid"
-.endif
-
-; This code is in page 2, so we may now start calling subroutines safely,
-; since the code we execute is no longer in the stack page.
-; Call module constructors
-
-	jsr	initlib
-
-; Execute the program code
-
-	jmp	Start
+Z4:     jmp     Init
 
 ; ------------------------------------------------------------------------
-; Additional data that we need for initialization and that's overwritten
-; later
+; We are at $200 now. We may now start calling subroutines safely, since
+; the code we execute is no longer in the stack page.
 
-vectors:
-       	sta	ExecReg
-       	rts
-       	.byte  	$01 	      	; Filler
-       	.word	nmi
-       	.word	0     	      	; Reset - not used
-       	.word	irq
-vectors_size   = * - vectors
+.segment        "PAGE2"
 
-p3vectors:
- 	.word	k_irq		; IRQ user vector
- 	.word	k_brk		; BRK user vector
- 	.word	k_nmi		; NMI user vector
-p3vectors_size = * - p3vectors
+; Call module constructors, enable chained IRQs afterwards.
 
-
-; ------------------------------------------------------------------------
-; This is the program code after setup. It starts at $400
-
-   	.res	$400-*
-
-Start:
+Init:  	jsr	initlib
+        lda     #.lobyte(__IRQFUNC_COUNT__*2)
+        sta     irqcount
 
 ; Enable interrupts
 
@@ -253,51 +262,140 @@ Start:
 
        	jsr    	callmain
 
-; Call module destructors. This is also the _exit entry.
+; Disable Call module destructors. This is also the _exit entry and the default entry
+; point for the break vector.
 
-_exit:	jsr	donelib		; Run module destructors
+_exit:  lda     #$00
+        sta     irqcount        ; Disable custom irq handlers
+        jsr	donelib	     	; Run module destructors
 
-; Clear the start of the zero page, since it will be interpreted as a
-; (garbage) BASIC program otherwise. This is also the default entry for
-; the break vector.
+; Adress the system bank
 
-k_brk:	sei
-      	lda	#$00
-      	ldx	#$3E
-Clear:	sta	$02,x
-      	dex
-      	bne	Clear
+        lda     #$0F
+        sta     IndReg
 
-; Setup the welcome code at the stack bottom in the system bank. Use
-; the F4/F5 vector to access the system bank
+; Copy back the old system bank stack contents
 
-      	lda	#$0F
-      	sta	IndReg
-      	ldy    	#$00
-       	sty	$F4
-      	iny
-      	sty	$F5
-   	ldy	#reset_size-1
-@L1:	lda	reset,y
-   	sta	($F4),y
-   	dey
-   	bne	@L1
-   	jmp	Back
+        ldy     #$FF
+@L1:    lda     $300,y
+        sta     (sysp1),y
+        dey
+        cpy     spsave
+        bne     @L1
 
-; ------------------------------------------------------------------------
-; Code that is copied into the system bank at $100 when switching back
+; Setup the welcome code at the stack bottom in the system bank.
 
-reset:	cli
-	jmp	$8000		    	; BASIC cold start
-reset_size = * - reset
+        ldy     #$00
+        lda     #$58            ; CLI opcode
+        sta     (sysp1),y
+        iny
+        lda     #$60            ; RTS opcode
+        sta     (sysp1),y
+        jmp     Back
 
 ; -------------------------------------------------------------------------
-; Data area - switch back to relocatable mode
+; The IRQ handler goes into PAGE2. For performance reasons, and to allow
+; easier chaining, we do handle the IRQs in the execution bank (instead of
+; passing them to the system bank).
 
-	.reloc
+; This is the mapping of the active irq register of the	6525 (tpi1):
+;
+; Bit   7       6       5       4       3       2       1       0
+;                               |       |       |       |       ^ 50 Hz
+;                               |       |       |       ^ SRQ IEEE 488
+;                               |       |       ^ cia
+;                               |       ^ IRQB ext. Port
+;                               ^ acia
+
+irq:    pha
+        txa
+        pha
+        tya
+        pha
+        lda     IndReg
+        pha
+        lda     ExecReg
+        sta     IndReg                  ; Be sure to address our segment
+	tsx
+       	lda    	$105,x	    		; Get the flags from the stack
+	and	#$10	    		; Test break flag
+       	bne     dobrk
+
+; It's an IRQ
+
+        cld
+
+; Call chained IRQ handlers
+
+       	ldy    	irqcount
+        beq     irqskip
+       	lda    	#<__IRQFUNC_TABLE__
+	ldx 	#>__IRQFUNC_TABLE__
+	jsr	condes 		   	; Call the functions
+
+; Done with chained IRQ handlers, check the TPI for IRQs and handle them
+
+irqskip:lda	#$0F
+	sta	IndReg
+	ldy	#TPI::AIR
+	lda	(tpi1),y		; Interrupt Register 6525
+	beq	noirq
+
+; 50/60Hz interrupt
+
+	cmp	#%00000001		; ticker irq?
+	bne	irqend
+	jsr     SCNKEY                  ; Poll the keyboard
+        jsr	UDTIM                   ; Bump the time
+
+; Done
+
+irqend:	ldy	#TPI::AIR
+       	sta	(tpi1),y    		; Clear interrupt
+
+noirq:	pla
+        sta     IndReg
+        pla
+        tay
+        pla
+        tax
+        pla
+nmi:	rti
+
+dobrk:  jmp	(BRKVec)
+
+; -------------------------------------------------------------------------
+; udtim routine for the 610. We will not check for the stop key here, since
+; C programs will not use it.
+;
+
+.proc	UDTIM
+
+	inc	time
+	bne	L9
+	inc	time+1
+	bne	L9
+	inc	time+2
+	bne	L9
+	inc	time+3
+L9:	rts
+
+.endproc
+
+; -------------------------------------------------------------------------
+; Page 3
+
+.segment        "PAGE3"
+
+BRKVec: .addr   _exit           ; BRK indirect vector
+
+
+; -------------------------------------------------------------------------
+; Data area.
 
 .data
 spsave:	.res	1
 
-
+.bss
+irqcount:       .byte   0
 

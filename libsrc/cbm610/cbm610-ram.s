@@ -63,15 +63,20 @@ pagecount:	.res	1               ; Number of available pages
 INSTALL:
        	lda	#$FF
         sta     curpage                 ; Invalidate the current page
+        sta     pagecount               ; Assume all memory available
 
-	ldx	UsrMemTop+2
-	cpx    	#RAMBANK                ; Top of memory in bank 2?
+        sec
+        jsr     $FF99                   ; MEMTOP
+
+       	cmp     #RAMBANK                ; Top of memory in bank 2?
         bne     @L1                     ; No: We can use all the memory
-        clc
-        adc     UsrMemTop+1
-@L1:    sta     pagecount
+        txa
+        sub     #OFFS
+        tya
+        sbc     #$00
+        sta     pagecount
 
-        lda     #<EM_ERR_OK
+@L1:    lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
 ;       rts				; Run into UNINSTALL instead
 

@@ -5,15 +5,8 @@
 ;
 
 	.export	  	screensize
-
-        .include        "cbm610.inc"
-
-.proc   screensize
-
-        ldx     #XSIZE
-        ldy     #YSIZE
-        rts
-
-.endproc
+        .import         SCREEN
+                              
+        screensize      = SCREEN
 
 

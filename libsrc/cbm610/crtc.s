@@ -5,7 +5,7 @@
 ;
 
  	.export	       	write_crtc, read_crtc
-	.importzp	crtc
+	.importzp	crtc, ktmp
 
 	.include      	"cbm610.inc"
 
@@ -13,7 +13,7 @@
 ; Write a value to the CRTC. The index is in Y, the value in A
 
 .proc	write_crtc
-	sta	sedt1
+	sta	ktmp
 	lda	IndReg
 	pha
 	lda	#$0F
@@ -23,23 +23,23 @@
 	sei
 	sta	(crtc),y
 	iny
-	lda	sedt1
+	lda	ktmp
 	sta	(crtc),y
 	cli
 	pla
 	sta	IndReg
-	lda	sedt1
+	lda	ktmp
 	rts
 .endproc
 
 
 .proc	read_crtc
-	sty    	sedt1
+	sty    	ktmp
 	lda	IndReg
 	pha
 	lda	#$0F
 	sta	IndReg
-	lda    	sedt1
+	lda    	ktmp
 	ldy	#$00
 	sei
 	sta	(crtc),y
@@ -50,7 +50,7 @@
 	pla
 	sta	IndReg
 	tya
-	ldy    	sedt1
+	ldy    	ktmp
 	rts
 .endproc
 

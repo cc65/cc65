@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000 Christian Groessler <cpg@aladdin.de>                             */
+/* (C) 2005 Christian Groessler <cpg@aladdin.de>                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,7 +44,7 @@ typedef struct {
 
 
 #ifdef __ATARI__
-#define dio_query_sectsize(x) ((sectsize_t)128)
+extern sectsize_t __fastcall__ dio_query_sectsize(dhandle_t handle);
 #else
 #define dio_query_sectsize(x) ((sectsize_t)256)
 #endif

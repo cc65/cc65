@@ -62,6 +62,7 @@ S_OBJS = 	_fdesc.o 	\
 		calloc.o	\
 		copydata.o	\
 		cprintf.o	\
+                divt.o          \
 		errno.o		\
 		fmisc.o 	\
 		fprintf.o	\

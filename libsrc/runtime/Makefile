@@ -54,7 +54,6 @@ OBJS = 	add.o		\
 	decsp7.o	\
 	decsp8.o	\
        	div.o		\
-        divt.o          \
        	enter.o		\
        	eq.o		\
        	ge.o		\

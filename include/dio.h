@@ -64,10 +64,10 @@ extern unsigned char __fastcall__ _dio_write_verify(_dhandle_t handle,
                                                     const void *buffer);
 
 extern unsigned char __fastcall__ _dio_phys_to_log(_dhandle_t handle,
-                                                   _dio_phys_pos *physpos,   /* input */
-                                                   _sectnum_t *sectnum);     /* output */
+                                                   const _dio_phys_pos *physpos, /* input */
+                                                   _sectnum_t *sectnum);         /* output */
 extern unsigned char __fastcall__ _dio_log_to_phys(_dhandle_t handle,
-                                                   _dio_phys_pos *physpos,   /* output */
-                                                   _sectnum_t *sectnum);     /* input */
+                                                   _dio_phys_pos *physpos,       /* output */
+                                                   const _sectnum_t *sectnum);   /* input */
 
 #endif /* #ifndef _DIO_H */

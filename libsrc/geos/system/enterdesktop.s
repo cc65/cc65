@@ -1,8 +1,8 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 30.10.99
+; 30.10.99, 17.04.2003
 
 ; void EnterDeskTop (void);
 
@@ -10,4 +10,4 @@
 
 	    .include "../inc/jumptab.inc"
 
-_EnterDeskTop = EnterDeskTop
+_EnterDeskTop = _exit

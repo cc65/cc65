@@ -112,7 +112,7 @@ compiling them into assembler.  Therefore if you have a C function named
 Systems:
 --------
 
-Supported systems at this time are: C64, C128, Plus/4, CBM 600/700, the newer 
+Supported systems at this time are: C64, C128, Plus/4, CBM 600/700, the newer
 PET machines (not 2001), and the Apple ][ (thanks to Kevin Ruland, who did the
 port).
 
@@ -141,6 +141,7 @@ PET:  	The startup code will adjust the upper memory limit to the installed
 APPLE2:	The program starts at $800, and of RAM is $8E00, so 33.5K of memory
 	(including stack) are available.
 
+
 Note: The above numbers do not mean that the remaining memory is unusable.
 However, it is not linear memory and must be accessed by other, nonportable
 methods. I'm thinking about a library extension that allows access to the
@@ -162,6 +163,9 @@ Example, insert a break instruction into the code:
 Note: The \t in the string is replaced by the tab character, as in all other
 strings.
 
+Beware: Be careful when inserting inline code since this may collide with
+the work of the optimizer.
+
 
 
 Pseudo variables:
@@ -176,10 +180,7 @@ functions results and pass parameters.
 This feature is useful with inline assembly and macros. For example, a macro
 that reads a CRTC register may be written like this:
 
-#define wr(idx) (__AX__=(idx),asm("\tsta\t$2000\n\tlda\t$2000\n\tldx\t#$00"),__AX__)
-
-An obvious problem here is that macro definitions may not use more than one
-line.
-
-
+#define wr(idx) (__AX__=(idx),					\
+		asm("\tsta\t$2000\n\tlda\t$2000\n\tldx\t#$00"),	\
+		__AX__)
 

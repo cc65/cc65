@@ -168,7 +168,7 @@ The header files contain
 
 
 5. Direct console I/O - conio.h
--------------------------------
+-------------------------------					    
 
 The conio header file contains a large set of functions that do screen and
 keyboard I/O. The functions will write directly to the screen or poll the
@@ -183,6 +183,7 @@ targets:
 	cbm610		(that is, the complete 600/700 series)
 	pet		(all PETs except the 2001)
 	apple 2
+	atari
 
 The conio.h header file does also include the system specific header files
 which define constants for special characters and keys.

@@ -2,9 +2,11 @@
 Documentation overview:
 
 
-  ar65.txt	- Describes the ar65 archiver.
+  BUGS		- Known compiler bugs
 
-  debugging.txt	- Debug programs using the VICE emulator.
+  CREDITS	- Who helped with the compiler and tools?
+
+  ar65.txt	- Describes the ar65 archiver.
 
   ca65.txt	- Describes the ca65 macro assembler.
 
@@ -14,6 +16,12 @@ Documentation overview:
 
   coding.txt	- Containes hints on creating the most effective code
 		  with cc65.
+
+  compile.txt	- How to compile cc65 and the support tools.
+
+  debugging.txt	- Debug programs using the VICE emulator.
+
+  internal.doc	- A somewhat older text describing several cc65 internals.
 
   intro.txt	- Describes the use of the tools by a short "hello world"
 	  	  example.

@@ -58,6 +58,10 @@ text.s:
 	_text:	.asciiz	"Hello world!"
 
 
+(The example is rather stupid, since the text in text.s does not use the
+correct character set for the target machine - conversion is usually done
+by the compiler. However, we will ignore that here.)
+
 We assume that the target file should be named "hello", and the target
 system is the C64.
 
@@ -203,4 +207,4 @@ For more information about the compile & link utility see cl65.txt.
 
 
 
-			  
+

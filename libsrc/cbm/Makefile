@@ -11,7 +11,8 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-C_OBJS =  	cbm_load.o	\
+C_OBJS =  	cbm_dir.o       \
+                cbm_load.o	\
 		cbm_save.o
 
 S_OBJS =	c_acptr.o	\

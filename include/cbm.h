@@ -111,6 +111,36 @@ extern unsigned char _filetype;         /* Default 'u' */
 
 
 /*****************************************************************************/
+/*                Definitions for directory reading functions                */
+/*****************************************************************************/
+
+
+
+/* CBM FILE TYPES */
+#define CBM_T_DEL   0
+#define CBM_T_SEQ   1
+#define CBM_T_PRG   2
+#define CBM_T_USR   3
+#define CBM_T_REL   4
+#define CBM_T_CBM   5           /* 1581 sub-partition */
+#define CBM_T_DIR   6           /* IDE64 and CMD sub-directory */
+#define CBM_T_VRP   8           /* Vorpal fast-loadable format */
+#define CBM_T_OTHER 5           /* Other file-types not yet defined */
+
+/* CBM FILE ACCESS */
+#define CBM_A_RO    1           /* Read only   */
+#define CBM_A_RW    3           /* Read, Write */
+
+struct cbm_dirent {     
+    char          name[17];     /* File name in PETSCII, limited to 16 chars */
+    unsigned int  size;         /* Size in 256B blocks */
+    unsigned char type;
+    unsigned char access;
+};
+
+
+
+/*****************************************************************************/
 /*                               Machine info                                */
 /*****************************************************************************/
 
@@ -219,9 +249,23 @@ int __fastcall__ cbm_read (unsigned char lfn, void* buffer, unsigned int size);
 int __fastcall__ cbm_write (unsigned char lfn, void* buffer, unsigned int size);
 /* Writes up to "size" bytes from "buffer" to a file.
  * Returns the number of actually written bytes or -1 in case of an error.
- * _oserror contains an errorcode then (see table below).
+ * _oserror contains an errorcode then (see above table).
  */
 
+unsigned char __fastcall__ cbm_opendir (unsigned char lfn, unsigned char device);
+/* Opens directory listing.
+ * Returns 0 if opening directory was successful,
+ * othervise errorcode corresponding to cbm_open()
+ */
+
+unsigned char __fastcall__ cbm_readdir (unsigned char lfn, struct cbm_dirent* l_dirent);
+/* Reads one directory line into cbm_dirent structure.
+ * Returns 0 if reading directory line was successful.
+ * Returns 'true' if reading directory failed or no more files to read.
+ */
+
+void __fastcall__ cbm_closedir (unsigned char lfn);
+/* Closes directory by cbm_close (unsigned char lfn) */
 
 
 

@@ -1,3 +1,4 @@
+*.lst
 _afailed.s
 _fopen.s
 _hextab.s

@@ -48,6 +48,8 @@
 /* Load the system specific files here, if needed */
 #if defined(__C64__) && !defined(_C64_H)
 #  include <c64.h>
+#elif defined(__VIC20__) && !defined(_VIC20_H)
+#  include <vic20.h>
 #elif defined(__C128__) && !defined(_C128_H)
 #  include <c128.h>
 #elif defined(__PLUS4__) && !defined(_PLUS4_H)

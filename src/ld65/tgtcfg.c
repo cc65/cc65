@@ -62,6 +62,7 @@ static const char CfgEmpty[] = "";
 #include "none.inc"
 #include "pet.inc"
 #include "plus4.inc"
+#include "vic20.inc"
 
 
 
@@ -76,6 +77,7 @@ const TargetDesc Targets [TGT_COUNT] = {
     {  	BINFMT_BINARY,  CfgNone         },
     {  	BINFMT_O65,     CfgModule       },
     {  	BINFMT_BINARY,	CfgAtari        },
+    {	BINFMT_BINARY,	CfgVic20	},
     {  	BINFMT_BINARY,	CfgC64          },
     {  	BINFMT_BINARY,	CfgC128         },
     {  	BINFMT_BINARY,	CfgEmpty	},    	/* Ace */

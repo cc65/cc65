@@ -15,6 +15,7 @@ LD = ../../src/ld65/ld65
 ALLTARGETS =	apple2lib	\
 		atarilib 	\
 		atmoslib	\
+		vic20lib	\
 		c64lib	 	\
 		c128lib	 	\
 		cbm510lib	\
@@ -76,6 +77,22 @@ atmoslib:
 	mv atmos/crt0.o atmos.o
 	for i in atmos common runtime; do \
 	    $(AR) a atmos.lib $$i/*.o;\
+	done
+
+#-----------------------------------------------------------------------------
+# Vic20
+
+vic20lib:
+	for i in vic20 cbm common runtime conio dbg; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
+	    AFLAGS="-t c64" \
+	    $(MAKE) -C $$i || exit 1; \
+	done
+	mv vic20/crt0.o vic20.o
+	for i in vic20 cbm common runtime conio dbg; do \
+	    $(AR) a vic20.lib $$i/*.o;\
 	done
 
 #-----------------------------------------------------------------------------

@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   target.c				     */
+/*				     vic20.h			       	     */
 /*                                                                           */
-/*			     Target specification			     */
+/*		        vic20 system specific definitions		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -33,78 +33,57 @@
 
 
 
-#include <stdlib.h>
-#include <string.h>
-
-#include "chartype.h"
-#include "target.h"
+#ifndef _VIC20_H
+#define _VIC20_H
 
 
 
-/*****************************************************************************/
-/*     	      	    		     Data			    	     */
-/*****************************************************************************/
+/* Check for errors */
+#if !defined(__VIC20__)
+#  error This module may only be used when compiling for the Vic20!
+#endif
 
 
 
-/* Target system */
-target_t Target	= TGT_NONE;
-
-/* Table with target names */
-const char* TargetNames [TGT_COUNT] = {
-    "none",
-    "module",
-    "atari",
-    "vic20",
-    "c64",
-    "c128",
-    "ace",
-    "plus4",
-    "cbm510",
-    "cbm610",
-    "pet",
-    "bbc",
-    "apple2",
-    "geos",
-    "lunix",
-    "atmos"
-};
+/* Additional key defines */
+#define CH_F1			133
+#define CH_F2			137
+#define CH_F3			134
+#define CH_F4			138
+#define CH_F5			135
+#define CH_F6			139
+#define CH_F7			136
+#define CH_F8			140
 
 
 
-/*****************************************************************************/
-/*     	      	    		     Code			    	     */
-/*****************************************************************************/
+/* Color defines */
+#define COLOR_BLACK  	       	0x00
+#define COLOR_WHITE  	       	0x01
+#define COLOR_RED    	       	0x02
+#define COLOR_CYAN      	0x03
+#define COLOR_VIOLET 	       	0x04
+#define COLOR_GREEN  	       	0x05
+#define COLOR_BLUE   	       	0x06
+#define COLOR_YELLOW 	       	0x07
+#define COLOR_ORANGE 	       	0x08
+#define COLOR_BROWN  	       	0x09
+#define COLOR_LIGHTRED       	0x0A
+#define COLOR_GRAY1  	       	0x0B
+#define COLOR_GRAY2  	       	0x0C
+#define COLOR_LIGHTGREEN     	0x0D
+#define COLOR_LIGHTBLUE      	0x0E
+#define COLOR_GRAY3  	       	0x0F
 
 
 
-target_t FindTarget (const char* Name)
-/* Find a target by name and return the target id. TGT_UNKNOWN is returned if
- * the given name is no valid target.
- */
-{
-    unsigned I;
-
-    /* Check for a numeric target */
-    if (IsDigit (*Name)) {
-       	int Target = atoi (Name);
-	if (Target >= 0 && Target < TGT_COUNT) {
-	    return (target_t)Target;
-	}
-    }
-
-    /* Check for a target string */
-    for (I = 0; I < TGT_COUNT; ++I) {
-	if (strcmp (TargetNames [I], Name) == 0) {
-	    return (target_t)I;
-	}
-    }
-
-    /* Not found */
-    return TGT_UNKNOWN;
-}
+/* Define special memory areas */
+#define COLOR_RAM	((unsigned char*)0x9600)
 
 
+
+/* End of vic20.h */
+#endif
 
 
 

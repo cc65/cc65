@@ -152,6 +152,10 @@ static void SetSys (const char* Sys)
 	    cbmsys ("__C64__");
 	    break;
 
+	case TGT_VIC20:
+	    cbmsys ("__VIC20__");
+	    break;
+
 	case TGT_C128:
 	    cbmsys ("__C128__");
 	    break;

@@ -50,6 +50,7 @@ typedef enum {
     TGT_NONE,
     TGT_MODULE,
     TGT_ATARI,
+    TGT_VIC20,
     TGT_C64,
     TGT_C128,
     TGT_ACE,

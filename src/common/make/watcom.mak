@@ -10,6 +10,7 @@ export WATCOM  = c:\\watcom
 export INCLUDE = $(WATCOM)\\h
 
 # We will use the windows compiler under linux (define as empty for windows)
+export WINEDEBUG=fixme-all
 WINE    = wine
 
 # Programs

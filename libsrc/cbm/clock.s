@@ -16,7 +16,7 @@
        	sta    	sreg+1
 	jsr	RDTIM
 	sty	sreg
-	rts	  		; Don't set CC, this has no meaning here
+       	rts    	       	       	
 
 .endproc
 

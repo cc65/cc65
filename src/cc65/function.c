@@ -215,6 +215,7 @@ void NewFunc (SymEntry* Func)
 {
     int HadReturn;
     int IsVoidFunc;
+    SymEntry* LastParam;
 
     /* Get the function descriptor from the function entry */
     FuncDesc* D = Func->V.F.Func;
@@ -225,17 +226,20 @@ void NewFunc (SymEntry* Func)
     /* Reenter the lexical level */
     ReenterFunctionLevel (D);
 
+    /* Before adding more symbols, remember the last parameter for later */
+    LastParam = D->SymTab->SymTail;
+
     /* Declare two special functions symbols: __fixargs__ and __argsize__.
      * The latter is different depending on the type of the function (variadic
      * or not).
      */
     AddConstSym ("__fixargs__", type_uint, SC_DEF | SC_CONST, D->ParamSize);
     if (D->Flags & FD_VARIADIC) {
-	/* Variadic function. The variable must be const. */
-	static const type T [] = { T_UCHAR | T_QUAL_CONST, T_END };
-	AddLocalSym ("__argsize__", T, SC_DEF | SC_REF | SC_AUTO, 0);
+     	/* Variadic function. The variable must be const. */
+     	static const type T [] = { T_UCHAR | T_QUAL_CONST, T_END };
+     	AddLocalSym ("__argsize__", T, SC_DEF | SC_REF | SC_AUTO, 0);
     } else {
-	/* Non variadic */
+     	/* Non variadic */
        	AddConstSym ("__argsize__", type_uchar, SC_DEF | SC_CONST, D->ParamSize);
     }
 
@@ -251,17 +255,13 @@ void NewFunc (SymEntry* Func)
     /* If this is a fastcall function, push the last parameter onto the stack */
     if (IsFastCallFunc (Func->Type) && D->ParamCount > 0) {
 
-	SymEntry* LastParam;
-	unsigned Flags;
+     	unsigned Flags;
 
-	/* Fastcall functions may never have an ellipsis or the compiler is buggy */
-	CHECK ((D->Flags & FD_VARIADIC) == 0);
+     	/* Fastcall functions may never have an ellipsis or the compiler is buggy */
+     	CHECK ((D->Flags & FD_VARIADIC) == 0);
 
-	/* Get a pointer to the last parameter entry */
-	LastParam = D->SymTab->SymTail;
-
-	/* Generate the push */
-	if (IsTypeFunc (LastParam->Type)) {
+     	/* Generate the push */
+     	if (IsTypeFunc (LastParam->Type)) {
 	    /* Pointer to function */
 	    Flags = CF_PTR;
 	} else {

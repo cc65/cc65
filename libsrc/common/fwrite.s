@@ -103,7 +103,7 @@
         sta     ptr1
         lda     f+1
         sta     ptr1+1
-        ldy     #_FILE_f_fd
+        ldy     #_FILE_f_flags
         lda     (ptr1),y
         ora     #_FERROR
         sta     (ptr1),y

@@ -8,7 +8,7 @@
 
 <abstract>
 An overview over the Apple&nbsp;&rsqb;&lsqb; runtime system as it is
-implemented for the cc65 C compiler.   
+implemented for the cc65 C compiler.
 </abstract>
 
 <!-- Table of contents -->
@@ -126,18 +126,20 @@ how to use it.
 <descrip>
 
   <tag><tt/a2-lo.tgi/</tag>
-  This driver features a resolution of 40x40 with 16 colors. At the bottom of
-  the screen, 4 additional text lines are available.
+  This driver was written by Stefan Haubenthal. It features a resolution of
+  40x40 with 16 colors. At the bottom of the screen, 4 additional text lines
+  are available.
 
   <tag><tt/a2-hi.tgi/</tag>
-  This driver features a resolution of 280x192 with 6 colors.
+  This driver was written by Stefan Haubenthal. It features a resolution of
+  280x192 with 6 colors.
 
 </descrip><p>
 
 
 <sect1>Extended memory drivers<p>
 
-No extended memory drivers are currently available for the 
+No extended memory drivers are currently available for the
 Apple&nbsp;&rsqb;&lsqb;.
 
 

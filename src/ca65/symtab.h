@@ -74,7 +74,7 @@ void SymLeaveLevel (void);
 /* Leave the current lexical level */
 
 int SymIsLocalLevel (void);
-/* Return true if we ae on a local symbol table level. */
+/* Return true if we are on a local symbol table level. */
 
 void SymDef (const char* Name, ExprNode* Expr, int ZP, int Label);
 /* Define a new symbol */

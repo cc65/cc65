@@ -157,7 +157,7 @@ INLINE int CE_HasMark (const CodeEntry* E)
 #else
 #  define CE_HasMark(E)	(((E)->Flags & CEF_USERMARK) != 0)
 #endif
-
+   
 #if defined(HAVE_INLINE)
 INLINE void CE_SetMark (CodeEntry* E)
 /* Set the CEF_USERMARK flag for the given entry */
@@ -177,6 +177,9 @@ INLINE void CE_ResetMark (CodeEntry* E)
 #else
 #  define CE_ResetMark(E)	((E)->Flags &= ~CEF_USERMARK)
 #endif
+
+void CE_SetArg (CodeEntry* E, const char* Arg);
+/* Replace the argument by the new one. */
 
 void CE_SetNumArg (CodeEntry* E, long Num);
 /* Set a new numeric argument for the given code entry that must already

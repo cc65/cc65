@@ -89,6 +89,9 @@ void CL_AddRef (CodeLabel* L, struct CodeEntry* E)
     /* The insn at E jumps to this label */
     E->JumpTo = L;
 
+    /* Replace the code entry argument with the name of the new label */
+    CE_SetArg (E, L->Name);
+
     /* Remember that in the label */
     CollAppend (&L->JumpFrom, E);
 }

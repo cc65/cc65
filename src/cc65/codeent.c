@@ -306,7 +306,7 @@ void CE_ReplaceOPC (CodeEntry* E, opc_t OPC)
 int CodeEntriesAreEqual (const CodeEntry* E1, const CodeEntry* E2)
 /* Check if both code entries are equal */
 {
-    return E1->OPC == E2->OPC && E1->AM == E2->AM && strcmp (E1->Arg, E2->Arg) == 0;
+    return (E1->OPC == E2->OPC && E1->AM == E2->AM && strcmp (E1->Arg, E2->Arg) == 0);
 }
 
 
@@ -336,6 +336,18 @@ void CE_MoveLabel (CodeLabel* L, CodeEntry* E)
 
 
 
+void CE_SetArg (CodeEntry* E, const char* Arg)
+/* Replace the argument by the new one. */
+{
+    /* Free the old argument */
+    FreeArg (E->Arg);
+
+    /* Assign the new one */
+    E->Arg = GetArgCopy (Arg);
+}
+
+
+
 void CE_SetNumArg (CodeEntry* E, long Num)
 /* Set a new numeric argument for the given code entry that must already
  * have a numeric argument.
@@ -357,11 +369,8 @@ void CE_SetNumArg (CodeEntry* E, long Num)
     	Internal ("Invalid instruction size in CE_SetNumArg");
     }
 
-    /* Free the old argument */
-    FreeArg (E->Arg);
-
-    /* Assign the new one */
-    E->Arg = GetArgCopy (Buf);
+    /* Replace the argument by the new one */
+    CE_SetArg (E, Buf);
 
     /* Use the new numerical value */
     E->Num = Num;

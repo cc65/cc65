@@ -30,8 +30,8 @@
 
 .proc   closeallfiles
 
-        ldx     #MAX_FDS
-loop:   lda     fdtab-1,x
+        ldx     #MAX_FDS-1
+loop:   lda     fdtab,x
         beq     next            ; Skip unused entries
 
 ; Close this file
@@ -46,7 +46,7 @@ loop:   lda     fdtab-1,x
 ; Next file
 
 next:   dex
-        bne     loop
+        bpl     loop
 
         rts
 

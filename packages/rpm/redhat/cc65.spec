@@ -444,6 +444,7 @@ install -m 644 asminc/*.inc $RPM_BUILD_ROOT/usr/lib/cc65/asminc
 # Drivers
 install -m 644 libsrc/*.emd $RPM_BUILD_ROOT/usr/lib/cc65/emd
 install -m 644 libsrc/*.joy $RPM_BUILD_ROOT/usr/lib/cc65/joy
+install -m 644 libsrc/*.ser $RPM_BUILD_ROOT/usr/lib/cc65/ser
 install -m 644 libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi
 
 

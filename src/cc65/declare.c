@@ -375,7 +375,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 
        		case TOK_CHAR:
     		    NextToken ();
-		    D->Type[0] = T_CHAR;
+		    D->Type[0] = T_SCHAR;
 		    D->Type[1] = T_END;
     		    break;
 

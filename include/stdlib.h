@@ -28,7 +28,7 @@ void* calloc (size_t count, size_t size);
 void* realloc (void* block, size_t size);
 void __fastcall__ free (void* block);
 #ifndef __STRICT_ANSI__
-void _hadd (void* mem, size_t size);		/* Non-standard */
+void __fastcall__ _hadd (void* mem, size_t size);	/* Non-standard */
 #endif
 
 /* Random numbers */

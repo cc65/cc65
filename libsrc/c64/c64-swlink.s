@@ -41,11 +41,10 @@
 
         .word   INSTALL
         .word   UNINSTALL
-        .word   PARAMS
+        .word   OPEN
+        .word   CLOSE
         .word   GET
         .word   PUT
-        .word   PAUSE
-	.word	UNPAUSE
         .word   STATUS
         .word   IOCTL
 
@@ -64,16 +63,18 @@ ACIA_CLOCK      = ACIA+7        ; Turbo232 external baud-rate generator
 ; Global variables
 ;
 
+; We reuse the RS232 zero page variables for the driver, since the ROM 
+; routines cannot be used together with this driver.
+RecvHead        = $B5           ; Head of receive buffer
+RecvTail        = $BD           ; Tail of receive buffer
+RecvFreeCnt     = $F7           ; Number of bytes in receive buffer
+SendHead        = $F8           ; Head of send buffer
+SendTail        = $F9           ; Tail of send buffer
+SendFreeCnt     = $FA           ; Number of bytes free in send buffer
+
 .bss
 Stopped:     	.res   	1      	; Flow-stopped flag
 RtsOff:		.res	1      	;
-RecvHead:    	.res	1      	; Head of receive buffer
-RecvTail:	.res	1      	; Tail of receive buffer
-RecvFreeCnt:	.res	1      	; Number of bytes in receive buffer
-SendHead:    	.res   	1      	; Head of send buffer
-SendTail:    	.res   	1      	; Tail of send buffer
-SendFreeCnt: 	.res   	1      	; Number of bytes free in send buffer
-BaudCode:    	.res   	1      	; Current baud in effect
 
 ; Send and receive buffers: 256 bytes each
 RecvBuf:	.res	256
@@ -126,31 +127,6 @@ ParityTable:
         .byte   $A0             ; SER_PAR_MARK
         .byte   $E0             ; SER_PAR_SPACE
 
-; Delay times: 32 byte-receive times in milliseconds, or 100 max.
-; Formula = 320,000 / baud. Invalid values do contain $FF.
-PauseTimes:
-        .byte   $FF             ; SER_BAUD_45_5
-        .byte   $FF             ; SER_BAUD_50
-        .byte   $FF             ; SER_BAUD_75
-        .byte   $FF             ; SER_BAUD_110
-        .byte   $FF             ; SER_BAUD_134_5
-        .byte   $FF             ; SER_BAUD_150
-        .byte   100             ; SER_BAUD_300
-        .byte   100             ; SER_BAUD_600
-        .byte   100             ; SER_BAUD_1200
-        .byte   $FF             ; SER_BAUD_1800
-        .byte   100             ; SER_BAUD_2400
-        .byte   $FF             ; SER_BAUD_3600
-        .byte   67              ; SER_BAUD_4800
-        .byte   $FF             ; SER_BAUD_7200
-        .byte   34              ; SER_BAUD_9600
-        .byte   17              ; SER_BAUD_19200
-        .byte   9               ; SER_BAUD_38400
-        .byte   $FF             ; SER_BAUD_57600
-        .byte   $FF             ; SER_BAUD_115200
-        .byte   $FF             ; SER_BAUD_230400
-
-
 .code
 
 ;----------------------------------------------------------------------------
@@ -165,19 +141,7 @@ INSTALL:
       	lda     #%00001010
        	sta    	ACIA_CMD
 
-; Initialize buffers & control
-
-@L4:   	ldx 	#0
-   	stx 	RecvHead
-      	stx 	SendHead
-   	stx 	RecvTail
-   	stx 	SendTail
-   	stx 	Stopped
-   	dex                     ; X = 255
-       	stx    	RecvFreeCnt
-      	stx 	SendFreeCnt
-
-; Set up nmi's
+; Set up the nmi vector
 
    	lda 	NMIVec
    	ldy 	NMIVec+1
@@ -215,14 +179,18 @@ UNINSTALL:
 ; PARAMS routine. A pointer to a ser_params structure is passed in ptr1.
 ; Must return an SER_ERR_xx code in a/x.
 
-PARAMS:
+OPEN:
 
-; First, check if the handshake setting is valid
+; Check if the handshake setting is valid
 
         ldy	#SER_PARAMS_HANDSHAKE	; Handshake
         lda     (ptr1),y
         cmp	#SER_HS_HW		; This is all we support
         bne	InvParam
+
+; Initialize buffers
+
+        jsr     InitBuffers
 
 ; Set the value for the control register, which contains stop bits, word
 ; length and the baud rate.
@@ -233,7 +201,6 @@ PARAMS:
         lda     BaudTable,y             ; Get 6551 value
         bmi     InvBaud	   		; Branch if rate not supported
         sta     tmp1
-	sty    	BaudCode   		; Remember baud rate index
 
         ldy	#SER_PARAMS_DATABITS	; Databits
         lda     (ptr1),y
@@ -283,16 +250,34 @@ InvBaud:
         rts
 
 ;----------------------------------------------------------------------------
+; CLOSE: Close the port, disable interrupts and flush the buffer. Called
+; without parameters. Must return an error code in a/x.
+;
+
+CLOSE:
+
+; Stop interrupts, drop DTR
+
+      	lda     #%00001010
+       	sta    	ACIA_CMD
+
+; Initalize buffers. Returns zero in a
+
+        jsr     InitBuffers
+
+; Return OK
+
+        lda     #<SER_ERR_OK
+        tax                             ; A is zero
+       	rts
+
+;----------------------------------------------------------------------------
 ; GET: Will fetch a character from the receive buffer and store it into the
 ; variable pointer to by ptr1. If no data is available, SER_ERR_NO_DATA is
 ; return.
 ;
 
-GET:
-
-; Check for bytes to send
-
-	ldx 	SendFreeCnt
+GET:    ldx 	SendFreeCnt             ; Send data if necessary
        	inx                             ; X == $FF?
    	beq 	@L1
    	lda 	#$00
@@ -365,68 +350,14 @@ PUT:
        	rts
 
 ;----------------------------------------------------------------------------
-; PAUSE: Assert flow control and disable interrupts.
-; Must return an error code in a/x.
-;
-
-PAUSE:
-
-; Assert flow control
-
-  	lda 	RtsOff
-   	sta 	Stopped
-   	sta	ACIA_CMD
-
-; Delay for flow stop to be received
-
-   	ldx 	BaudCode
-   	ldy 	PauseTimes,x
-   	jsr 	DelayMs
-
-; Stop rx interrupts
-
-   	lda 	RtsOff
-   	ora 	#%00000010		; Disable interrupts
-   	sta	ACIA_CMD
-   	lda	#<SER_ERR_OK
-   	tax
-   	rts
-
-
-;----------------------------------------------------------------------------
-; UNPAUSE: Re-enable interrupts and release flow control.
-; Must return an error code in a/x.
-;
-
-UNPAUSE:
-
-; Re-enable rx interrupts & release flow control
-
-@L1:   	lda 	#$00
-       	sta 	Stopped
-       	lda 	RtsOff
-       	ora 	#%00001000
-       	sta	ACIA_CMD
-
-; Poll for stalled char & exit
-
-       	jsr 	PollReceive
-       	lda	#<SER_ERR_OK
-   	tax
-   	rts
-
-;----------------------------------------------------------------------------
 ; STATUS: Return the status in the variable pointed to by ptr1.
 ; Must return an error code in a/x.
 ;
 
-STATUS:
-        lda    	ACIA_STATUS
- 	ldy    	#0
- 	sta    	(ptr1),y
-    	jsr    	PollReceive  	   	; bug-recovery hack
- 	tya                             ; SER_ERR_OK
- 	tax
+STATUS: lda    	ACIA_STATUS
+       	ldx    	#0
+ 	sta    	(ptr1,x)
+ 	txa                             ; SER_ERR_OK
         rts
 
 ;----------------------------------------------------------------------------
@@ -435,8 +366,7 @@ STATUS:
 ; Must return an error code in a/x.
 ;
 
-IOCTL:
-        lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
+IOCTL:  lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
         ldx     #>SER_ERR_INV_IOCTL
         rts
 
@@ -519,57 +449,19 @@ NmiHandler:
 
 .endproc
 
-;----------------------------------------------------------------------------
-;
-; PollReceive - poll for rx char
-;   This function is useful in odd cases where the 6551 has a character in
-;   it but it fails to raise an NMI.  It might be edge-triggering conditions?
-;   Actually, I'm not entirely sure that this condition can still arrise, but
-;   calling this function does no harm.
-;
-
-.proc   PollReceive
-
-      	lda 	#$08
-      	and    	ACIA_STATUS
-      	beq 	@L9
-       	and    	ACIA_STATUS
-      	beq 	@L9
-       	lda    	ACIA_DATA
-      	ldx 	RecvFreeCnt
-      	beq 	@L9
-      	ldx 	RecvTail
-      	sta 	RecvBuf,x
-      	inc 	RecvTail
-      	dec 	RecvFreeCnt
-@L9:  	rts
-
-.endproc
 
 ;----------------------------------------------------------------------------
-;
-;  DelayMs : delay for given number of milliseconds
-;    This implementation isn't very rigerous; it merely delays for the
-;    approximate number of clock cycles for the processor speed.
-;    Algorithm:
-;       repeat for number of milliseconds:
-;         delay for 1017 clock cycles
-;
+; Initialize buffers
 
-
-.proc   DelayMs                 ;( .A=milliseconds )
-
-@L1:   	ldx 	#203   		;(2)
-@L2:   	dex 	       		;(2)
-       	bne    	@L2		;(3) // 1017 cycles
-      	dey
-      	bne 	@L1
-      	rts
-
-.endproc
-
-
-.end
-
-
+InitBuffers:
+        ldx 	#0
+        stx     Stopped
+       	stx 	RecvHead
+    	stx 	RecvTail
+      	stx 	SendHead
+    	stx 	SendTail
+        dex                             ; X = 255
+       	stx    	RecvFreeCnt
+      	stx 	SendFreeCnt
+        rts
 

@@ -1,8 +1,8 @@
 #
-# gcc Makefile for a65, link65 & libr65
+# gcc Makefile for ca65
 #
 
-CFLAGS 	= -g -O2 -Wall
+CFLAGS 	= -g -O2 -Wall -I../common
 CC	= gcc
 LDFLAGS	=
 
@@ -12,18 +12,19 @@ OBJS =  condasm.o	\
         expr.o	      	\
 	fragment.o	\
         global.o       	\
-	incpath.o	\
-        instr.o	      	\
-	istack.o	\
-	listing.o	\
-	macpack.o     	\
-       	macro.o	      	\
-        main.o 	      	\
-	nexttok.o	\
-        objcode.o     	\
-        objfile.o	\
-       	options.o	\
-        pseudo.o	\
+	incpath.o      	\
+        instr.o	       	\
+	istack.o       	\
+	listing.o      	\
+	macpack.o      	\
+       	macro.o	       	\
+        main.o 	       	\
+	nexttok.o      	\
+        objcode.o      	\
+        objfile.o      	\
+       	options.o      	\
+        pseudo.o       	\
+	repeat.o	\
         scanner.o	\
         symtab.o	\
        	toklist.o      	\

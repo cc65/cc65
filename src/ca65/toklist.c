@@ -34,9 +34,11 @@
 
 
 #include <string.h>
-
-#include "../common/xmalloc.h"
-
+		      
+/* common */
+#include "xmalloc.h"
+	  
+/* ca65 */
 #include "error.h"
 #include "istack.h"
 #include "scanner.h"
@@ -62,7 +64,7 @@ TokNode* NewTokNode (void)
     /* Initialize the token contents */
     T->Next   	= 0;
     T->Tok	= Tok;
-    T->WS	= WS;
+    T->WS 	= WS;
     T->IVal	= IVal;
     memcpy (T->SVal, SVal, Len);
     T->SVal [Len] = '\0';
@@ -125,8 +127,11 @@ void InitTokList (TokList* T)
     T->Next	= 0;
     T->Root	= 0;
     T->Last	= 0;
-    T->Repeat	= 1;
+    T->RepCount	= 0;
+    T->RepMax	= 1;
     T->Count 	= 0;
+    T->Check	= 0;
+    T->Data	= 0;
 }
 
 
@@ -155,6 +160,11 @@ void FreeTokList (TokList* List)
 	TokNode* Tmp = T;
 	T = T->Next;
 	FreeTokNode (Tmp);
+    }
+
+    /* If we have associated data, free it */
+    if (List->Data) {
+	xfree (List->Data);
     }
 
     /* Free the list structure itself */
@@ -198,6 +208,13 @@ static int ReplayTokList (void* List)
     /* Set the next token from the list */
     TokSet (L->Last);
 
+    /* If a check function is defined, call it, so it may look at the token
+     * just set and changed it as apropriate.
+     */
+    if (L->Check) {
+	L->Check (L);
+    }
+
     /* Set the pointer to the next token */
     L->Last = L->Last->Next;
 
@@ -205,7 +222,7 @@ static int ReplayTokList (void* List)
      * zero, delete the list and remove the function from the stack.
      */
     if (L->Last == 0) {
-	if (--L->Repeat == 0) {
+	if (++L->RepCount >= L->RepMax) {
 	    /* Done with this list */
 	    FreeTokList (L);
 	    PopInput ();

@@ -39,9 +39,11 @@
 #include <ctype.h>
 #include <time.h>
 
-#include "../common/cmdline.h"
-#include "../common/version.h"
-
+/* common */
+#include "cmdline.h"
+#include "version.h"
+	  
+/* ca65 */
 #include "error.h"
 #include "expr.h"
 #include "global.h"
@@ -301,11 +303,11 @@ static void OneLine (void)
     int Done = 0;
 
     /* Initialize the new listing line if we are actually reading from file
-     * and not from internally pushed input.				    
+     * and not from internally pushed input.
      */
     if (!HavePushedInput ()) {
 	InitListingLine ();
-    }
+    }	  
 
     if (Tok == TOK_COLON) {
 	/* An unnamed label */

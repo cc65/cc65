@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*			       	   toklist.h				     */
+/*				   repeat.h				     */
 /*                                                                           */
-/*		    Token list for the ca65 macroassembler		     */
+/*		     Handle the .REPEAT pseudo instruction		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,48 +33,8 @@
 
 
 
-#ifndef TOKLIST_H
-#define TOKLIST_H
-
-
-
-/*****************************************************************************/
-/*     	       	    		     Data				     */
-/*****************************************************************************/
-
-
-
-/* Struct holding a token */
-typedef struct TokNode TokNode;
-struct TokNode {
-    TokNode*	Next;  	      		/* For single linked list */
-    enum Token	Tok;	      		/* Token value */
-    int	       	WS;    	      		/* Whitespace before token? */
-    long       	IVal;	      		/* Integer token attribute */
-    char       	SVal [1];     		/* String attribute, dyn. allocated */
-};
-
-/* Struct holding a token list */
-typedef struct TokList TokList;
-struct TokList {
-    TokList*	Next;	      		/* Single linked list (for replay) */
-    TokNode*	Root;	      		/* First node in list */
-    TokNode*	Last;	      		/* Last node in list or replay */
-    unsigned   	RepCount;      		/* Repeat counter (used for replay) */
-    unsigned	RepMax;			/* Maximum repeat count for replay */
-    unsigned	Count;	      		/* Token count */
-    void	(*Check)(TokList*);	/* Token check function */
-    void*      	Data;			/* Additional data for check */
-};
-
-
-
-/* Return codes for TokCmp - higher numeric code means better match */
-enum TC {
-    tcDifferent, 			/* Different tokents */
-    tcSameToken, 			/* Same token, different attribute */
-    tcIdentical	 			/* Identical (token + attribute) */
-};
+#ifndef REPEAT_H
+#define REPEAT_H
 
 
 
@@ -84,39 +44,12 @@ enum TC {
 
 
 
-TokNode* NewTokNode (void);
-/* Create and return a token node with the current token value */
-
-void FreeTokNode (TokNode* T);
-/* Free the given token node */
-
-void TokSet (TokNode* T);
-/* Set the scanner token from the given token node */
-
-enum TC TokCmp (const TokNode* T);
-/* Compare the token given as parameter against the current token */
-
-void InitTokList (TokList* T);
-/* Initialize a token list structure for later use */
-
-TokList* NewTokList (void);
-/* Create a new, empty token list */
-
-void FreeTokList (TokList* T);
-/* Delete the token list including all token nodes */
-
-void AddCurTok (TokList* T);
-/* Add the current token to the token list */
-
-void PushTokList (TokList* List, const char* Desc);
-/* Push a token list to be used as input for InputFromStack. This includes
- * several initializations needed in the token list structure, so don't use
- * PushInput directly.
- */
+void ParseRepeat (void);
+/* Parse and handle the .REPEAT statement */
 
 
 
-/* End of toklist.h */
+/* End of repeat.h */
 
 #endif
 

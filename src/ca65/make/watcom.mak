@@ -81,6 +81,7 @@ OBJS = 	condasm.obj	\
 	objfile.obj	\
 	options.obj	\
 	pseudo.obj	\
+	repeat.obj	\
 	scanner.obj	\
 	symtab.obj	\
 	toklist.obj	\
@@ -124,6 +125,7 @@ FILE objcode.obj
 FILE objfile.obj
 FILE options.obj
 FILE pseudo.obj
+FILE repeat.obj
 FILE scanner.obj
 FILE symtab.obj
 FILE toklist.obj

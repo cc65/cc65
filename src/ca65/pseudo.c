@@ -39,8 +39,10 @@
 #include <ctype.h>
 #include <errno.h>
 
-#include "../common/bitops.h"
+/* common */
+#include "bitops.h"
 
+/* ca65 */
 #include "condasm.h"
 #include "error.h"
 #include "expr.h"
@@ -52,6 +54,7 @@
 #include "nexttok.h"
 #include "objcode.h"
 #include "options.h"
+#include "repeat.h"
 #include "symtab.h"
 #include "pseudo.h"
 
@@ -906,7 +909,7 @@ static void DoReloc (void)
 static void DoRepeat (void)
 /* Repeat some instruction block */
 {
-    ErrorSkip (ERR_NOT_IMPLEMENTED);
+    ParseRepeat ();
 }
 
 
@@ -1043,7 +1046,7 @@ static void DoWarning (void)
     if (Tok != TOK_STRCON) {
  	ErrorSkip (ERR_STRCON_EXPECTED);
     } else {
-       	Error (WARN_USER, SVal);
+       	Warning (WARN_USER, SVal);
 	SkipUntilSep ();
     }
 }

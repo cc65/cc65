@@ -37,11 +37,13 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../common/fname.h"
-#include "../common/segdefs.h"
-#include "../common/version.h"
-#include "../common/xmalloc.h"
+/* common */
+#include "fname.h"
+#include "segdefs.h"
+#include "version.h"
+#include "xmalloc.h"
 
+/* ca65 */
 #include "error.h"
 #include "global.h"
 #include "objcode.h"
@@ -50,7 +52,7 @@
 
 
 /*****************************************************************************/
-/*	 	   	  	     Data				     */
+/*	  	   	  	     Data				     */
 /*****************************************************************************/
 
 
@@ -167,13 +169,28 @@ void InitListingLine (void)
 {
     if (Listing) {
 	/* Make the last loaded line the current line */
-	LineCur = LineLast;
+	/* ###### This code is a hack! We really need to do it right
+	 * as soon as we know, how:-(
+	 */
+       	if (LineCur && LineCur->Next && LineCur->Next != LineLast) {
+	    ListLine* L = LineCur;
+	    do {
+		L = L->Next;
+		/* Set the values for this line */
+		CHECK (L != 0);
+		L->PC    	 = GetPC ();
+		L->Reloc	 = RelocMode;
+		L->Output  	 = (ListingEnabled > 0);
+		L->ListBytes = (unsigned char) ListBytes;
+	    } while (L->Next != LineLast);
+	}
+      	LineCur = LineLast;
 
-	/* Set the values for this line */
-	CHECK (LineCur != 0);
-	LineCur->PC    	    = GetPC ();
-	LineCur->Reloc	    = RelocMode;
-	LineCur->Output	    = (ListingEnabled > 0);
+      	/* Set the values for this line */
+      	CHECK (LineCur != 0);
+      	LineCur->PC    	    = GetPC ();
+      	LineCur->Reloc	    = RelocMode;
+      	LineCur->Output	    = (ListingEnabled > 0);
        	LineCur->ListBytes  = (unsigned char) ListBytes;
     }
 }
@@ -345,7 +362,7 @@ void CreateListing (void)
      	 	    break;
 
       	 	case FRAG_EXPR:
-      	 	case FRAG_SEXPR:
+      	  	case FRAG_SEXPR:
       	 	    B = AddMult (B, 'r', Frag->Len*2);
       	 	    break;
 

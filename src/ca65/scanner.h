@@ -38,7 +38,8 @@
 
 
 
-#include "../common/filepos.h"
+/* common */
+#include "filepos.h"
 
 
 

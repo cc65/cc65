@@ -19,22 +19,32 @@ static unsigned char amode_to_bmode (const char* mode)
     char 	  flag = 0;
     unsigned char binmode = 0;
 
+    c = *mode++;
+    switch(c) {
+        case 'w':
+            binmode = O_WRONLY;
+            break;
+        case 'r':
+            binmode = O_RDONLY;
+            break;
+        case 'a':
+            binmode = O_WRONLY | O_APPEND;
+            break;
+       default:
+            return 0;  /* invalid char */
+    }
+
     while (c = *mode++) {
         switch(c) {
-            case 'w':
-                binmode = O_WRONLY;
-                break;
-            case 'r':
-                binmode = O_RDONLY;
-                break;
             case '+':
-                binmode = O_RDWR;
+                binmode = (binmode & ~15) | O_RDWR;
                 break;
-            /* a,b missing */
+            case 'b':
+                /* currently ignored */
+                break;
+            default:
+                return 0;  /* invalid char */
         }
-    }
-    if (binmode == 0) {
-    	_errno = EINVAL;
     }
     return binmode;
 }
@@ -50,7 +60,8 @@ FILE* _fopen (const char* name, const char* mode, FILE* f)
 
     /* Convert ASCII mode to binary mode */
     if ((binmode = amode_to_bmode (mode)) == 0) {
-	/* Invalid mode, _errno already set */
+	/* Invalid mode */
+    	_errno = EINVAL;
         return 0;
     }
 

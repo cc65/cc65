@@ -2,7 +2,6 @@
 ; Christian Groessler, May-2000
 ;
 ; int open(const char *name,int flags,...);
-; returns fd
 ;
 
 UCASE_FILENAME	= 1		; comment it out if filename shouldn't be uppercased
@@ -11,10 +10,11 @@ UCASE_FILENAME	= 1		; comment it out if filename shouldn't be uppercased
 	.include "../common/fmode.inc"
 	.include "../common/errno.inc"
 	.export	_open
+	.import	fddecusage,newfd
 	.import	__do_oserror,__seterrno,incsp4
 	.import	ldaxysp,addysp,subysp
 	.import	_strupr,__oserror
-	.importzp tmp4,sp
+	.importzp tmp4,tmp2,sp
 .ifdef	UCASE_FILENAME
 	.importzp tmp3,ptr4
 .endif
@@ -118,10 +118,15 @@ loop2:	lda	(ptr4),y
 
 	ldy	tmp4
 
+	;AX - points to filename
+	;Y  - iocb to use, if open needed
 	jsr	newfd		; maybe we don't need to open and can reuse an iocb
-	bcc	noopen
+				; returns fd num to use in tmp2, all regs unchanged
+	bcs	doopen		; C set: open needed
+	lda	#0		; clears N flag
+	beq	finish
 
-	sta	ICBAL,y
+doopen:	sta	ICBAL,y
 	txa
 	sta	ICBAH,y
 	ldx	tmp4
@@ -131,7 +136,7 @@ loop2:	lda	(ptr4),y
 
 	; clean up the stack
 
-	php
+finish:	php
 	txa
 	pha
 	tya
@@ -151,13 +156,10 @@ loop2:	lda	(ptr4),y
 	plp
 
 	bpl	ok
+	jsr	fddecusage	; decrement usage counter of fd as open failed
 	jmp	__do_oserror
 
-ok:	txa
-	lsr	a
-	lsr	a
-	lsr	a
-	lsr	a
+ok:	lda	tmp2		; get fd
 	ldx	#0
 	stx	__oserror
 	rts

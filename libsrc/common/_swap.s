@@ -1,62 +1,55 @@
 ;
-; Ullrich von Bassewitz, 09.12.1998
+; Ullrich von Bassewitz, 1998-12-09, 2004-11-30
 ;
 ; void __fastcall__ _swap (void* p, void* q, size_t size);
 ;
 
-	.export	       	__swap
-	.import		popax
-	.importzp	ptr1, ptr2, ptr3
+      	.export	       	__swap
+      	.import		popax
+      	.importzp	ptr1, ptr2, ptr3
 
 
-__swap:	sta	ptr3		; Save size
-	stx	ptr3+1
+__swap:	eor     #$FF
+        sta	ptr3
+        txa
+        eor     #$FF
+       	sta	ptr3+1          ; Save -(size+1) into ptr3
 
-	jsr	popax		; Get q
-	sta	ptr2
-	stx	ptr2+1
+      	jsr	popax		; Get q
+      	sta	ptr2
+      	stx	ptr2+1
 
-	jsr	popax		; Get p
-	sta	ptr1
-	stx	ptr1+1
+      	jsr	popax		; Get p
+      	sta	ptr1
+      	stx	ptr1+1
 
 ; Prepare for swap
 
-	ldy	#$00
+      	ldy	#$00
 
-; Swap 256 byte blocks
+; Swap loop
 
-	ldx	ptr3+1
-	beq	@L2
+@L1:    inc     ptr3            ; Bump counter low byte
+        beq     @L3             ; Branch on overflow
 
-@L1:	lda	(ptr1),y
-    	tax
-    	lda	(ptr2),y
-    	sta	(ptr1),y
-    	txa
-    	sta	(ptr2),y
-    	iny
-    	bne	@L1
-	dec	ptr3+1
-	bne	@L1
+@L2:    lda	(ptr1),y
+      	tax
+      	lda	(ptr2),y
+      	sta	(ptr1),y
+      	txa
+      	sta	(ptr2),y
+      	iny
+      	bne	@L1
+        inc     ptr1+1
+        inc     ptr2+1
+        bne     @L1             ; Branch always (hopefully)
 
-; Swap remaining bytes (Y is zero)
+; Bump the high counter byte
 
-@L2:	ldx	ptr3
-	beq	@L9
-
-@L3:   	lda	(ptr1),y
-    	tax
-    	lda	(ptr2),y
-    	sta	(ptr1),y
-    	txa
-    	sta	(ptr2),y
-	iny
-    	dec	ptr3
-    	bne	@L3
+@L3:    inc     ptr3+1
+        bne     @L2
 
 ; Done
 
-@L9:	rts
-
+        rts
 

@@ -45,7 +45,7 @@
 #include "debugflag.h"
 #include "fname.h"
 #include "print.h"
-#include "segdefs.h"
+#include "segnames.h"
 #include "target.h"
 #include "tgttrans.h"
 #include "version.h"
@@ -405,7 +405,7 @@ static void OptDebug (const char* Opt attribute ((unused)),
 	       	      const char* Arg attribute ((unused)))
 /* Compiler debug mode */
 {
-    ++Debug; 
+    ++Debug;
 }
 
 

@@ -37,7 +37,7 @@
 #include <string.h>
 
 /* common */
-#include "segdefs.h"
+#include "segnames.h"
 #include "tgttrans.h"
 
 /* cc65 */

@@ -8,6 +8,8 @@
 	.import		__ctype, __cdiff
 
 _toupper:
+        cpx     #$00            ; Outside valid range?
+        bne     L9              ; If so, return the argument unchanged
 	tay			; Get c into Y
 	lda	__ctype,y	; Get character classification
 	lsr	a		; Get bit 0 (lower char) into carry

@@ -1,7 +1,7 @@
 ;
 ; Christian Groessler, Apr-2000
 ;
-; int read(int fd,void *buf,int count)
+; int __fastcall__ read(int fd,void *buf,int count)
 ;
 
 	.include "atari.inc"

@@ -1,5 +1,5 @@
 ;
-; write(iocb, buf, nbytes)->nbytes written
+; int __fastcall__ write (int fd, const void* buf, unsigned count);
 ;
 	.include "atari.inc"
 	.import __rwsetup,__do_oserror,__inviocb,__oserror

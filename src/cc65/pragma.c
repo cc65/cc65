@@ -106,7 +106,7 @@ static void FlagPragma (unsigned char* Flag)
     constexpr (&val);
 
     /* Store the value into the flag parameter */
-    *Flag = val.e_const;
+    *Flag = (val.e_const != 0);
 }
 
 
@@ -116,14 +116,14 @@ void DoPragma (void)
 {
     static const struct tok_elt Pragmas [] = {
       	{ 	"bssseg",       PR_BSSSEG	},
-       	{       "codeseg",  	PR_CODESEG	},
-      	{       "dataseg",  	PR_DATASEG	},
-       	{       "regvaraddr",	PR_REGVARADDR	},
-      	{       "rodataseg",	PR_RODATASEG	},
+       	{       "codeseg",    	PR_CODESEG	},
+      	{       "dataseg",    	PR_DATASEG	},
+       	{       "regvaraddr", 	PR_REGVARADDR	},
+      	{       "rodataseg",  	PR_RODATASEG	},
 	{	"signedchars",	PR_SIGNEDCHARS	},
 	{	"staticlocals",	PR_STATICLOCALS	},
       	{       "zpsym",       	PR_ZPSYM  	},
-      	{       0,     	   	PR_ILLEGAL	},
+      	{       0,     	      	PR_ILLEGAL	},
     };
 
     int Pragma;

@@ -26,7 +26,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <ctype.h>
-#ifdef __WATCOMC__
+#if defined(__WATCOMC__) || defined(_MSC_VER)
 #  include <malloc.h>
 #endif
 

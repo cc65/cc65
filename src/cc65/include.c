@@ -73,7 +73,6 @@ static char* Find (const char* Path, const char* File)
  */
 {
     const char* P;
-    unsigned Count;
     int Max;
     char PathName [FILENAME_MAX];
 
@@ -92,7 +91,7 @@ static char* Find (const char* Path, const char* File)
     /* Start the search */
     while (*P) {
         /* Copy the next path element into the buffer */
-     	Count = 0;
+     	int Count = 0;
      	while (*P != '\0' && *P != ';' && Count < Max) {
      	    PathName [Count++] = *P++;
      	}

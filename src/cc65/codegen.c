@@ -35,7 +35,13 @@
 int oursp	= 0;
 
 /* Current segment */
-static enum { SEG_CODE, SEG_RODATA, SEG_DATA, SEG_BSS } CurSeg = SEG_CODE;
+static enum {
+    SEG_INV = -1,	/* Invalid segment */
+    SEG_CODE,
+    SEG_RODATA,
+    SEG_DATA,
+    SEG_BSS
+} CurSeg = SEG_CODE;
 
 /* Segment names */
 static char* SegmentNames [4];
@@ -173,7 +179,7 @@ void g_postamble (void)
 
 
 
-static void UseSeg (unsigned NewSeg)
+static void UseSeg (int NewSeg)
 /* Switch to a specific segment */
 {
     if (CurSeg != NewSeg) {
@@ -217,7 +223,7 @@ void g_usebss (void)
 
 
 
-void SegName (unsigned Seg, const char* Name)
+static void SegName (int Seg, const char* Name)
 /* Set the name of a segment */
 {
     /* Free the old name and set a new one */
@@ -228,7 +234,7 @@ void SegName (unsigned Seg, const char* Name)
      * with the new name.
      */
     if (Seg == CurSeg) {
-    	CurSeg = -1;	/* Invalidate */
+       	CurSeg = SEG_INV;	/* Invalidate */
 	UseSeg (Seg);
     }
 }
@@ -438,7 +444,7 @@ static int funcargs;
 
 
 void g_enter (unsigned flags, unsigned argsize)
-/* Function prologue */	      
+/* Function prologue */
 {
     if ((flags & CF_FIXARGC) != 0) {
 	/* Just remember the argument size for the leave */
@@ -2219,9 +2225,9 @@ void g_push (unsigned flags, unsigned long val)
      	} else {
 
      	    /* Handle as 16 bit value */
-     	    hi = val >> 8;
+     	    hi = (unsigned char) (val >> 8);
      	    if (val <= 7) {
-		AddCodeLine ("\tjsr\tpush%u", val);
+		AddCodeLine ("\tjsr\tpush%u", (unsigned) val);
      	    } else if (hi == 0 || hi == 0xFF) {
      	    	/* Use special function */
      	    	ldaconst (val);

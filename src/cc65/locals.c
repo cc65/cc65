@@ -54,7 +54,7 @@
 
 /* Register variable management */
 unsigned MaxRegSpace 	      	= 6; 	/* Maximum space available */
-static int RegOffs     	       	= 0;	/* Offset into register space */
+static unsigned RegOffs 	= 0;	/* Offset into register space */
 static const SymEntry** RegSyms	= 0;    /* The register variables */
 static unsigned RegSymCount 	= 0;    /* Number of register variables */
 
@@ -407,7 +407,8 @@ void RestoreRegVars (int HaveResult)
  * the accumulator must be saved across the restore.
  */
 {
-    int I, J, Bytes, Offs;
+    unsigned I, J;
+    int Bytes, Offs;
 
     /* If we don't have register variables in this function, bail out early */
     if (RegSymCount == 0) {
@@ -465,5 +466,5 @@ void RestoreRegVars (int HaveResult)
     }
 }
 
-
+	
 

@@ -28,10 +28,10 @@
 
 
 
-void AddIncludePath (char* NewPath, unsigned Where);
+void AddIncludePath (const char* NewPath, unsigned Where);
 /* Add a new include path to the existing one */
 
-char* FindInclude (char* Name, unsigned Where);
+char* FindInclude (const char* Name, unsigned Where);
 /* Find an include file. Return a pointer to a malloced area that contains
  * the complete path, if found, return 0 otherwise.
  */

@@ -445,8 +445,7 @@ static void Compile (void)
     AddIncludePath ("", INC_USER);		/* Current directory */
     AddIncludePath ("include", INC_SYS);
 #ifdef CC65_INC
-    /* Allow modifications of the given string by dup'ing it */
-    AddIncludePath (xstrdup (CC65_INC), INC_SYS);
+    AddIncludePath (CC65_INC, INC_SYS);
 #else
     AddIncludePath ("/usr/lib/cc65/include", INC_SYS);
 #endif

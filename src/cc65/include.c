@@ -32,36 +32,31 @@ static char* UserIncludePath = 0;
 
 
 
-static char* Add (char* Orig, char* New)
+static char* Add (char* Orig, const char* New)
 /* Create a new path from Orig and New, delete Orig, return the result */
 {
-    unsigned Len, NewLen;
+    unsigned OrigLen, NewLen;
     char* NewPath;
 
-    /* Check for a trailing path separator and remove it */
-    NewLen = strlen (New);
-    if (NewLen > 0 && (New [NewLen-1] == '\\' || New [NewLen-1] == '/')) {
-    	New [--NewLen] = '\0';
-    }
+    /* Get the length of the original string */
+    OrigLen = Orig? strlen (Orig) : 0;
 
-    /* Calculate the length of the combined paths */
-    if (Orig) {
-       	Len = strlen (Orig) + NewLen;
-    } else {
-	Len = NewLen;
+    /* Get the length of the new path */
+    NewLen = strlen (New);
+
+    /* Check for a trailing path separator and remove it */
+    if (NewLen > 0 && (New [NewLen-1] == '\\' || New [NewLen-1] == '/')) {
+    	--NewLen;
     }
 
     /* Allocate memory for the new string */
-    NewPath = xmalloc (Len + 2);
+    NewPath = xmalloc (OrigLen + NewLen + 2);
 
     /* Copy the strings */
-    if (Orig) {
-	strcpy (NewPath, Orig);
-    } else {
-	NewPath [0] = '\0';
-    }
-    strcat (NewPath, New);
-    strcat (NewPath, ";");
+    memcpy (NewPath, Orig, OrigLen);
+    memcpy (NewPath+OrigLen, New, NewLen);
+    NewPath [OrigLen+NewLen+0] = ';';
+    NewPath [OrigLen+NewLen+1] = '\0';
 
     /* Delete the original path */
     xfree (Orig);
@@ -72,12 +67,12 @@ static char* Add (char* Orig, char* New)
 
 
 
-static char* Find (char* Path, char* File)
+static char* Find (const char* Path, const char* File)
 /* Search for a file in a list of directories. If found, return the complete
  * name including the path in a malloced data area, if not found, return 0.
  */
 {
-    char* P;
+    const char* P;
     unsigned Count;
     int Max;
     char PathName [FILENAME_MAX];
@@ -126,7 +121,7 @@ static char* Find (char* Path, char* File)
 
 
 
-void AddIncludePath (char* NewPath, unsigned Where)
+void AddIncludePath (const char* NewPath, unsigned Where)
 /* Add a new include path to the existing one */
 {
     /* Allow a NULL path */
@@ -142,7 +137,7 @@ void AddIncludePath (char* NewPath, unsigned Where)
 
 
 
-char* FindInclude (char* Name, unsigned Where)
+char* FindInclude (const char* Name, unsigned Where)
 /* Find an include file. Return a pointer to a malloced area that contains
  * the complete path, if found, return 0 otherwise.
  */
@@ -157,6 +152,7 @@ char* FindInclude (char* Name, unsigned Where)
     }
     return 0;
 }
+
 
 
 

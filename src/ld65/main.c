@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -511,6 +511,9 @@ int main (int argc, char* argv [])
 
     /* Check module assertions */
     CheckAssertions ();
+
+    /* Check for import/export mismatches */
+    CheckExports ();
 
     /* Create the output file */
     CfgWriteTarget ();

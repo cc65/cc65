@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2003 Ullrich von Bassewitz                                       */
+/* (C) 1999-2005 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -1356,7 +1356,7 @@ void O65WriteTarget (O65Desc* D, File* F)
      * if we get an unresolved symbol.
      */
     D->Undef = 0;		/* Reset the counter */
-    CheckExports (O65Unresolved, D);
+    CheckUnresolvedImports (O65Unresolved, D);
     if (D->Undef > 0) {
      	/* We had unresolved symbols, cannot create output file */
        	Error ("%u unresolved external(s) found - cannot create output file", D->Undef);

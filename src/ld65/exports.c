@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -576,7 +576,7 @@ static void CheckSymType (const Export* E)
 		Warning ("Address size mismatch for `%s': Symbol is `%s'"
                          ", but imported from %s, %s(%lu) as `%s'",
 			 GetString (E->Name),
-                         ExpAddrSize,             
+                         ExpAddrSize,
                          ImpObjName,
                          GetSourceFileName (Imp->Obj, Imp->Pos.Name),
 			 Imp->Pos.Line,
@@ -669,9 +669,9 @@ static void CreateExportPool (void)
 
 
 
-void CheckExports (ExpCheckFunc F, void* Data)
-/* Check if there are any unresolved symbols. On unresolved symbols, F is
- * called (see the comments on ExpCheckFunc in the data section).
+void CheckExports (void)
+/* Setup the list of all exports and check for export/import symbol type
+ * mismatches.
  */
 {
     /* Create an export pool */
@@ -679,8 +679,16 @@ void CheckExports (ExpCheckFunc F, void* Data)
 
     /* Check for symbol type mismatches */
     CheckSymTypes ();
+}
 
-    /* Check for unresolved externals (check here for special bin formats) */
+
+
+void CheckUnresolvedImports (ExpCheckFunc F, void* Data)
+/* Check if there are any unresolved imports. On unresolved imports, F is
+ * called (see the comments on ExpCheckFunc in the data section).
+ */
+{
+    /* Check for unresolved externals */
     if (ImpOpen != 0) {
        	/* Print all open imports */
 	PrintUnresolved (F, Data);

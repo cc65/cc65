@@ -158,8 +158,13 @@ int IsConstExport (const Export* E);
 long GetExportVal (const Export* E);
 /* Get the value of this export */
 
-void CheckExports (ExpCheckFunc F, void* Data);
-/* Check if there are any unresolved symbols. On unresolved symbols, F is
+void CheckExports (void);
+/* Setup the list of all exports and check for export/import symbol type
+ * mismatches.
+ */
+
+void CheckUnresolvedImports (ExpCheckFunc F, void* Data);
+/* Check if there are any unresolved imports. On unresolved imports, F is
  * called (see the comments on ExpCheckFunc in the data section).
  */
 
@@ -189,7 +194,7 @@ void CircularRefError (const Export* E);
 /* End of exports.h */
 
 #endif
-                                    
+
 
 
 

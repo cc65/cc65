@@ -262,7 +262,7 @@ void BinWriteTarget (BinDesc* D, struct File* F)
      * if we get an unresolved symbol.
      */
     D->Undef = 0;   		/* Reset the counter */
-    CheckExports (BinUnresolved, D);
+    CheckUnresolvedImports (BinUnresolved, D);
     if (D->Undef > 0) {
 	/* We had unresolved symbols, cannot create output file */
        	Error ("%u unresolved external(s) found - cannot create output file", D->Undef);

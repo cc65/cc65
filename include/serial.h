@@ -139,8 +139,11 @@ unsigned char __fastcall__ ser_uninstall (void);
  * Note: This call does not free allocated memory.
  */
 
-unsigned char __fastcall__ ser_params (const struct ser_params* params);
-/* Set the port parameters. This will also enable the port. */
+unsigned char __fastcall__ ser_open (const struct ser_params* params);
+/* "Open" the port by setting the port parameters and enable interrupts. */
+
+unsigned char __fastcall__ ser_close (void);
+/* "Close" the port. Clear buffers and and disable interrupts. */
 
 unsigned char __fastcall__ ser_get (char* b);
 /* Get a character from the serial port. If no characters are available, the
@@ -152,12 +155,6 @@ unsigned char __fastcall__ ser_put (char b);
  * transmitting is not done via interrupt. The function returns
  * SER_ERR_OVERFLOW if there is no space left in the transmit buffer.
  */
-
-unsigned char __fastcall__ ser_pause (void);
-/* Assert flow control and disable interrupts. */
-
-unsigned char __fastcall__ ser_unpause (void);
-/* Re-enable interrupts and release flow control */
 
 unsigned char __fastcall__ ser_status (unsigned char* status);
 /* Return the serial port status. */

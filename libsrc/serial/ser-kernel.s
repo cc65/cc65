@@ -24,11 +24,10 @@ _ser_drv:       .res    2      		; Pointer to driver
 ser_vectors:
 ser_install:   	jmp     return0
 ser_uninstall: 	jmp     return0
-ser_params:     jmp     return0
+ser_open:       jmp     return0
+ser_close:      jmp     return0
 ser_get:        jmp     return0
 ser_put:        jmp     return0
-ser_pause:      jmp     return0
-ser_unpause:    jmp     return0
 ser_status:     jmp     return0
 ser_ioctl:      jmp     return0
 

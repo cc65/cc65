@@ -42,15 +42,14 @@ SER_HDR_VERSION         = 3             ; Interface version
 SER_HDR_JUMPTAB         = 4
 SER_HDR_INSTALL         = SER_HDR_JUMPTAB+0     ; INSTALL routine
 SER_HDR_UNINSTALL       = SER_HDR_JUMPTAB+2     ; UNINSTALL routine
-SER_HDR_PARAMS          = SER_HDR_JUMPTAB+4     ; PARAMS routine
-SER_HDR_GET             = SER_HDR_JUMPTAB+6     ; GET routine
-SER_HDR_PUT             = SER_HDR_JUMPTAB+8     ; PUT routine
-SER_HDR_PAUSE           = SER_HDR_JUMPTAB+10    ; PAUSE routine
-SER_HDR_UNPAUSE         = SER_HDR_JUMPTAB+12    ; UNPAUSE routine
-SER_HDR_STATUS          = SER_HDR_JUMPTAB+14    ; STATUS routine
-SER_HDR_IOCTL           = SER_HDR_JUMPTAB+16    ; IOCTL routine
+SER_HDR_OPEN            = SER_HDR_JUMPTAB+4     ; OPEN routine
+SER_HDR_CLOSE           = SER_HDR_JUMPTAB+6     ; CLOSE routine
+SER_HDR_GET             = SER_HDR_JUMPTAB+8     ; GET routine
+SER_HDR_PUT             = SER_HDR_JUMPTAB+10     ; PUT routine
+SER_HDR_STATUS          = SER_HDR_JUMPTAB+12    ; STATUS routine
+SER_HDR_IOCTL           = SER_HDR_JUMPTAB+14    ; IOCTL routine
 
-SER_HDR_JUMPCOUNT       = 9                     ; Number of jump vectors
+SER_HDR_JUMPCOUNT       = 8                     ; Number of jump vectors
 
 ;------------------------------------------------------------------------------
 ; Offsets into the struct passed to ser_params
@@ -85,7 +84,7 @@ SER_BAUD_38400         	=       $10
 SER_BAUD_57600         	=       $11
 SER_BAUD_115200        	=       $12
 SER_BAUD_230400        	=       $13
-                                   
+
 ; Data bit settings
 SER_BITS_5             	=       $00
 SER_BITS_6             	=       $01
@@ -125,11 +124,10 @@ SER_STATUS_DSR 	       	=       $40	; NOT data set ready
 
         .global ser_install
         .global ser_uninstall
-        .global ser_params
+        .global ser_open
+        .global ser_close
         .global ser_get
         .global ser_put
-        .global ser_pause
-        .global ser_unpause
         .global ser_status
         .global ser_ioctl
 
@@ -140,11 +138,10 @@ SER_STATUS_DSR 	       	=       $40	; NOT data set ready
         .global _ser_unload
         .global _ser_install
         .global _ser_uninstall
-        .global _ser_params
+        .global _ser_open
+        .global _ser_close
         .global _ser_get
         .global _ser_put
-        .global _ser_pause
-        .global _ser_unpause
         .global _ser_status
         .global _ser_ioctl
 

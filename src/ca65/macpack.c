@@ -47,14 +47,22 @@
 
 /* Predefined packages */
 static const char MacGeneric [] = 	/* Generic macros */
-    ".macro  add     Arg\n"
+    ".macro  add     Arg1, Arg2\n"
     "        clc\n"
-    "        adc     Arg\n"
-    ".endmacro\n\n"
-    ".macro  sub     Arg\n"
+    "        .if .paramcount = 2\n"
+    "        adc     Arg1, Arg2\n"
+    "        .else\n"
+    "        adc     Arg1\n"
+    "        .endif\n"
+    ".endmacro\n"
+    ".macro  sub     Arg1, Arg2\n"
     "        sec\n"
-    "        sbc     Arg\n"
-    ".endmacro\n\n";
+    "        .if .paramcount = 2\n"
+    "        sbc     Arg1, Arg2\n"
+    "        .else\n"
+    "        sbc     Arg1\n"
+    "        .endif\n"
+    ".endmacro\n";
 
 
 
@@ -66,7 +74,7 @@ static const char MacLongBranch [] =	/* Long branch macros */
     "        bne     *+5\n"
     "        jmp     Target\n"
     "        .endif\n"
-    ".endmacro\n\n"
+    ".endmacro\n"
     ".macro  jne     Target\n"
     "        .if     .def(Target) .and ((*+2)-(Target) <= 127)\n"
     "        bne     Target\n"
@@ -74,7 +82,7 @@ static const char MacLongBranch [] =	/* Long branch macros */
     "        beq     *+5\n"
     "        jmp     Target\n"
     "        .endif\n"
-    ".endmacro\n\n"
+    ".endmacro\n"
     ".macro  jmi     Target\n"
     "        .if     .def(Target) .and ((*+2)-(Target) <= 127)\n"
     "        bmi     Target\n"
@@ -82,7 +90,7 @@ static const char MacLongBranch [] =	/* Long branch macros */
     "        bpl     *+5\n"
     "        jmp     Target\n"
     "        .endif\n"
-    ".endmacro\n\n"
+    ".endmacro\n"
     ".macro  jpl     Target\n"
     "        .if     .def(Target) .and ((*+2)-(Target) <= 127)\n"
     "        bpl     Target\n"
@@ -90,7 +98,7 @@ static const char MacLongBranch [] =	/* Long branch macros */
     "        bmi     *+5\n"
     "        jmp     Target\n"
     "        .endif\n"
-    ".endmacro\n\n"
+    ".endmacro\n"
     ".macro  jcs     Target\n"
     "        .if     .def(Target) .and ((*+2)-(Target) <= 127)\n"
     "        bcs     Target\n"
@@ -98,7 +106,7 @@ static const char MacLongBranch [] =	/* Long branch macros */
     "        bcc     *+5\n"
     "        jmp     Target\n"
     "        .endif\n"
-    ".endmacro\n\n"
+    ".endmacro\n"
     ".macro  jcc     Target\n"
     "        .if     .def(Target) .and ((*+2)-(Target) <= 127)\n"
     "        bcc     Target\n"
@@ -106,7 +114,7 @@ static const char MacLongBranch [] =	/* Long branch macros */
     "        bcs     *+5\n"
     "        jmp     Target\n"
     "        .endif\n"
-    ".endmacro\n\n"
+    ".endmacro\n"
     ".macro  jvs     Target\n"
     "        .if     .def(Target) .and ((*+2)-(Target) <= 127)\n"
     "        bvs     Target\n"
@@ -114,7 +122,7 @@ static const char MacLongBranch [] =	/* Long branch macros */
     "        bvc     *+5\n"
     "        jmp     Target\n"
     "        .endif\n"
-    ".endmacro\n\n"
+    ".endmacro\n"
     ".macro  jvc     Target\n"
     "        .if     .def(Target) .and ((*+2)-(Target) <= 127)\n"
     "        bvc     Target\n"
@@ -122,7 +130,7 @@ static const char MacLongBranch [] =	/* Long branch macros */
     "        bvs     *+5\n"
     "        jmp     Target\n"
     "        .endif\n"
-    ".endmacro\n\n";
+    ".endmacro\n";
 
 
 

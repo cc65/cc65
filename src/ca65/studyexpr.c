@@ -441,6 +441,7 @@ static void StudySymbol (ExprNode* Expr, ExprDesc* D)
             SymMarkUser (Sym);
             StudyExprInternal (GetSymExpr (Sym), D);
             SymUnmarkUser (Sym);
+            ED_UpdateAddrSize (D, GetSymAddrSize (Sym));
         }
     } else {
         /* The symbol is either undefined or an import. In both cases, track

@@ -44,6 +44,16 @@
 
 
 /*****************************************************************************/
+/*                                 Forwards                                  */
+/*****************************************************************************/
+
+
+
+struct ExprDesc;
+
+
+
+/*****************************************************************************/
 /*     	      	     		     Code	       	     		     */
 /*****************************************************************************/
 
@@ -63,7 +73,7 @@ long ConstExpression (void);
 void FreeExpr (ExprNode* Root);
 /* Free the expression tree, Root is pointing to. */
 
-ExprNode* SimplifyExpr (ExprNode* Expr);
+ExprNode* SimplifyExpr (ExprNode* Expr, const struct ExprDesc* D);
 /* Try to simplify the given expression tree */
 
 ExprNode* GenLiteralExpr (long Val);

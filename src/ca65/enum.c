@@ -58,7 +58,8 @@ void DoEnum (void)
 /* Handle the .ENUM command */
 {
     /* Start at zero */
-    ExprNode* NextExpr = GenLiteralExpr (0);
+    long      Offs     = 0;
+    ExprNode* BaseExpr = GenLiteralExpr (0);
 
     /* Check for a name */
     int Anon = (Tok != TOK_IDENT);
@@ -104,24 +105,26 @@ void DoEnum (void)
             /* Skip the equal sign */
             NextTok ();
 
-            /* Delete the old next expression */
-            FreeExpr (NextExpr);
-
-            /* Read the new one */
+            /* Read the new expression */
             EnumExpr = Expression ();
+
+            /* Reset the base expression and the offset */
+            FreeExpr (BaseExpr);
+            BaseExpr = CloneExpr (EnumExpr);
+            Offs     = 0;
 
         } else {
 
-            EnumExpr = NextExpr;
+            /* No assignment, use last value + 1 */
+            EnumExpr = GenAddExpr (CloneExpr (BaseExpr), GenLiteralExpr (Offs));
 
         }
 
-        /* Generate the next expression from the current one */
-        NextExpr = GenAddExpr (CloneExpr (EnumExpr), GenLiteralExpr (1));
-        NextExpr = SimplifyExpr (NextExpr);
-
         /* Assign the value to the enum member */
         SymDef (Sym, EnumExpr, ADDR_SIZE_DEFAULT, SF_NONE);
+
+        /* Increment the offset for the next member */
+        ++Offs;
 
         /* Expect end of line */
         ConsumeSep ();
@@ -136,8 +139,8 @@ void DoEnum (void)
     /* End of enum definition */
     Consume (TOK_ENDENUM, "`.ENDENUM' expected");
 
-    /* Free the last (unused) enum expression */
-    FreeExpr (NextExpr);
+    /* Free the base expression */
+    FreeExpr (BaseExpr);
 }
 
 

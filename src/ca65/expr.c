@@ -204,13 +204,8 @@ static ExprNode* Symbol (SymEntry* S)
     } else {
         /* Mark the symbol as referenced */
         SymRef (S);
-        /* Remove the symbol if possible */
-        if (SymHasExpr (S)) {
-            return CloneExpr (GetSymExpr (S));
-        } else {
-            /* Create symbol node */
-            return GenSymExpr (S);
-        }
+        /* Create symbol node */
+        return GenSymExpr (S);
     }
 }
 
@@ -1117,16 +1112,7 @@ ExprNode* Expression (void)
  * a pointer to the root of the tree.
  */
 {
-#if 1
-    return SimplifyExpr (Expr0 ());
-#else
-    /* Test code */
-    ExprNode* Expr = Expr0 ();
-    printf ("Before: "); DumpExpr (Expr, SymResolve);
-    Expr = SimplifyExpr (Expr);
-    printf ("After:  "); DumpExpr (Expr, SymResolve);
-    return Expr;
-#endif
+    return Expr0 ();
 }
 
 
@@ -1139,13 +1125,8 @@ long ConstExpression (void)
 {
     long Val;
 
-#if 1
     /* Read the expression */
-    ExprNode* Expr = Expr0 ();
-#else
-    /* Test code */
     ExprNode* Expr = Expression ();
-#endif
 
     /* Study the expression */
     ExprDesc D;
@@ -1182,27 +1163,13 @@ void FreeExpr (ExprNode* Root)
 
 
 
-ExprNode* SimplifyExpr (ExprNode* Expr)
+ExprNode* SimplifyExpr (ExprNode* Expr, const ExprDesc* D)
 /* Try to simplify the given expression tree */
 {
-    if (Expr && Expr->Op != EXPR_LITERAL) {
-
-        /* Create an expression description and initialize it */
-        ExprDesc D;
-        ED_Init (&D);
-
-        /* Study the expression */
-        StudyExpr (Expr, &D);
-
-        /* Now check if we can generate a literal value */
-        if (ED_IsConst (&D)) {
-            /* No external references */
-            FreeExpr (Expr);
-            Expr = GenLiteralExpr (D.Val);
-        }
-
-        /* Free allocated memory */
-        ED_Done (&D);
+    if (Expr->Op != EXPR_LITERAL && ED_IsConst (D)) {
+        /* No external references */
+        FreeExpr (Expr);
+        Expr = GenLiteralExpr (D->Val);
     }
     return Expr;
 }
@@ -1243,10 +1210,19 @@ static ExprNode* GenSectionExpr (unsigned SegNum)
 ExprNode* GenAddExpr (ExprNode* Left, ExprNode* Right)
 /* Generate an addition from the two operands */
 {
-    ExprNode* Root = NewExprNode (EXPR_PLUS);
-    Root->Left = Left;
-    Root->Right = Right;
-    return Root;
+    long Val;
+    if (IsEasyConst (Left, &Val) && Val == 0) {
+        FreeExpr (Left);
+        return Right;
+    } else if (IsEasyConst (Right, &Val) && Val == 0) {
+        FreeExpr (Right);
+        return Left;
+    } else {
+        ExprNode* Root = NewExprNode (EXPR_PLUS);
+        Root->Left = Left;
+        Root->Right = Right;
+        return Root;
+    }
 }
 
 

@@ -144,22 +144,12 @@ void EmitData (const unsigned char* Data, unsigned Size)
 
 void EmitByte (ExprNode* Expr)
 /* Emit one byte */
-{                  
-    long Val;
-    if (IsConstExpr (Expr, &Val)) {
-     	/* Constant expression, emit literal byte */
-	FreeExpr (Expr);
-     	if ((Val & ~0xFF) != 0) {
-     	    Error ("Range error");
-     	}
-     	Emit0 (Val & 0xFF);
-    } else {
-     	/* Create a new fragment */
-     	Fragment* F = GenFragment (FRAG_EXPR, 1);
+{
+    /* Create a new fragment */
+    Fragment* F = GenFragment (FRAG_EXPR, 1);
 
-     	/* Set the data */
-     	F->V.Expr = Expr;
-    }
+    /* Set the data */
+    F->V.Expr = Expr;
 }
 
 
@@ -167,22 +157,11 @@ void EmitByte (ExprNode* Expr)
 void EmitWord (ExprNode* Expr)
 /* Emit one word */
 {
-    long Val;
-    if (IsConstExpr (Expr, &Val)) {
-     	/* Constant expression, emit literal byte */
-	FreeExpr (Expr);
-       	if ((Val & ~0xFFFF) != 0) {
-     	    Error ("Range error");
-     	}
-     	Emit0 (Val & 0xFF);
-	Emit0 ((Val >> 8) & 0xFF);
-    } else {
-     	/* Create a new fragment */
-     	Fragment* F = GenFragment (FRAG_EXPR, 2);
+    /* Create a new fragment */
+    Fragment* F = GenFragment (FRAG_EXPR, 2);
 
-     	/* Set the data */
-     	F->V.Expr = Expr;
-    }
+    /* Set the data */
+    F->V.Expr = Expr;
 }
 
 
@@ -190,23 +169,11 @@ void EmitWord (ExprNode* Expr)
 void EmitFarAddr (ExprNode* Expr)
 /* Emit a 24 bit expression */
 {
-    long Val;
-    if (IsConstExpr (Expr, &Val)) {
-     	/* Constant expression, emit literal byte */
-	FreeExpr (Expr);
-       	if ((Val & ~0xFFFFFF) != 0) {
-     	    Error ("Range error");
-     	}
-     	Emit0 (Val & 0xFF);
-	Emit0 ((Val >> 8) & 0xFF);
-	Emit0 ((Val >> 16) & 0xFF);
-    } else {
-     	/* Create a new fragment */
-     	Fragment* F = GenFragment (FRAG_EXPR, 3);
+    /* Create a new fragment */
+    Fragment* F = GenFragment (FRAG_EXPR, 3);
 
-     	/* Set the data */
-     	F->V.Expr = Expr;
-    }
+    /* Set the data */
+    F->V.Expr = Expr;
 }
 
 
@@ -214,21 +181,11 @@ void EmitFarAddr (ExprNode* Expr)
 void EmitDWord (ExprNode* Expr)
 /* Emit one dword */
 {
-    long Val;
-    if (IsConstExpr (Expr, &Val)) {
-     	/* Constant expression, emit literal byte */
-	FreeExpr (Expr);
-     	Emit0 (Val & 0xFF);
-	Emit0 ((Val >> 8) & 0xFF);
-       	Emit0 ((Val >> 16) & 0xFF);
-	Emit0 ((Val >> 24) & 0xFF);
-    } else {
-     	/* Create a new fragment */
-     	Fragment* F = GenFragment (FRAG_EXPR, 4);
+    /* Create a new fragment */
+    Fragment* F = GenFragment (FRAG_EXPR, 4);
 
-     	/* Set the data */
-     	F->V.Expr = Expr;
-    }
+    /* Set the data */
+    F->V.Expr = Expr;
 }
 
 

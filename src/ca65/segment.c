@@ -37,6 +37,7 @@
 #include <errno.h>
 
 /* common */
+#include "addrsize.h"
 #include "mmodel.h"
 #include "segnames.h"
 #include "xmalloc.h"
@@ -51,6 +52,7 @@
 #include "objfile.h"
 #include "segment.h"
 #include "spool.h"
+#include "studyexpr.h"
 #include "symtab.h"
 
 
@@ -291,35 +293,44 @@ void SegCheck (void)
      	Fragment* F = S->Root;
      	while (F) {
        	    if (F->Type == FRAG_EXPR || F->Type == FRAG_SEXPR) {
-                long Val;
-       	       	if (IsConstExpr (F->V.Expr, &Val)) {
-     	       	    /* We are able to evaluate the expression. Check for
-     	       	     * range errors.
-     	       	     */
-     	       	    unsigned I;
+
+                /* We have an expression, study it */
+                ExprDesc ED;
+                ED_Init (&ED);
+                StudyExpr (F->V.Expr, &ED);
+
+                /* Try to simplify it before looking further */
+                F->V.Expr = SimplifyExpr (F->V.Expr, &ED);
+
+                /* Check if the expression is constant */
+                if (ED_IsConst (&ED)) {
+
+       	       	    /* The expression is constant. Check for range errors. */
      	       	    int Abs = (F->Type != FRAG_SEXPR);
+                    long Val = ED.Val;
+     	       	    unsigned I;
 
      	       	    if (F->Len == 1) {
-     	       		if (Abs) {
-     	       		    /* Absolute value */
-     	       		    if (Val > 255) {
+     	       	   	if (Abs) {
+     	       	   	    /* Absolute value */
+     	       	   	    if (Val > 255) {
      	       	       	     	PError (&F->Pos, "Range error");
-     	       		    }
-     	       		} else {
-     	     	 	    /* PC relative value */
-     	     		    if (Val < -128 || Val > 127) {
+     	       	   	    }
+     	       	   	} else {
+     	     	   	    /* PC relative value */
+     	     	   	    if (Val < -128 || Val > 127) {
      	     	       	     	PError (&F->Pos, "Range error");
-     	     		    }
-     	     		}
+     	     	   	    }
+     	     	   	}
      	       	    } else if (F->Len == 2) {
      	     	    	if (Abs) {
-     	     		    /* Absolute value */
-     	     		    if (Val > 65535) {
+     	     	   	    /* Absolute value */
+     	     	   	    if (Val > 65535) {
      	       	       	     	PError (&F->Pos, "Range error");
-     	     		    }
-     	     		} else {
-     	     		    /* PC relative value */
-     	     		    if (Val < -32768 || Val > 32767) {
+     	     	   	    }
+     	     	   	} else {
+     	     	   	    /* PC relative value */
+     	     	   	    if (Val < -32768 || Val > 32767) {
      	     	       	     	PError (&F->Pos, "Range error");
      	       		    }
      	     		}
@@ -334,15 +345,22 @@ void SegCheck (void)
      	     	       	Val >>= 8;
      	     	    }
      	     	    F->Type = FRAG_LITERAL;
-     	     	} else {
+
+     	     	} else if (ED.AddrSize != ADDR_SIZE_DEFAULT) {
+
      	     	    /* We cannot evaluate the expression now, leave the job for
-     	     	     * the linker. However, we are able to check for explicit
-     	     	     * byte expressions and we will do so.
+     	     	     * the linker. However, we can check if the address size
+                     * matches the fragment size, and we will do so.
      		     */
-     	       	    if (F->Type == FRAG_EXPR && F->Len == 1 && !IsByteExpr (F->V.Expr)) {
+                    if ((F->Len == 1 && ED.AddrSize > ADDR_SIZE_ZP)  ||
+                        (F->Len == 2 && ED.AddrSize > ADDR_SIZE_ABS) ||
+                        (F->Len == 3 && ED.AddrSize > ADDR_SIZE_FAR)) {
      	       	        PError (&F->Pos, "Range error");
      	     	    }
      		}
+
+                /* Release memory allocated for the expression decriptor */
+                ED_Done (&ED);
      	    }
      	    F = F->Next;
      	}
@@ -495,7 +513,7 @@ void InitSegments (void)
     /* Initialize segment sizes. The segment definitions do already contain
      * the correct values for the default case (near), so we must only change
      * things that should be different.
-     */                    
+     */
     switch (MemoryModel) {
 
         case MMODEL_NEAR:

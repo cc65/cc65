@@ -546,7 +546,7 @@ static void Usage (void)
 /* Print usage information and exit */
 {
     fprintf (stderr,
-	     "Usage: %s [options] file\n"
+	     "Usage: %s [options] file [...]\n"
        	     "Short options:\n"
        	     "  -c\t\t\tCompile and assemble but don't link\n"
        	     "  -d\t\t\tDebug mode\n"

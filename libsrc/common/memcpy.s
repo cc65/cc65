@@ -23,16 +23,16 @@ memcpy_upwards:
 ; Copy loop
 
 @L1:    inx                     ; Bump low counter byte
-        beq     @L2             ; Jump on overflow
-        lda     (ptr1),y
+        beq     @L3             ; Jump on overflow
+@L2:    lda     (ptr1),y
         sta     (ptr2),y
         iny
         bne     @L1
        	inc   	ptr1+1		; Bump pointers
        	inc   	ptr2+1
         bne     @L1             ; Branch always
-@L2:    inc     ptr3+1          ; Bump high counter byte
-        bne     @L1
+@L3:    inc     ptr3+1          ; Bump high counter byte
+        bne     @L2
 
 ; Done. The low byte of dest is still in ptr2
 

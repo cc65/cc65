@@ -57,7 +57,7 @@ static const char CfgNone [] =
 
 static const char CfgAtari [] =
     "MEMORY {"
-       	"ZP: start = $D2, size = $1A, type = rw;"
+       	"ZP: start = $D2, size = $1C, type = rw;"
         "HEADER: start = $0000, size = $6, file = %O;"
         "RAM: start = $1F00, size = $9D1F, file = %O;"   /* 9D1F: matches upper bound BC1F */
     "}"

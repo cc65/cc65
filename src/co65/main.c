@@ -507,8 +507,8 @@ static void Convert (void)
     } else {
         /* If this is a cc65 module, override the name for the zeropage segment */
         if (cc65) {
-            ZeropageLabel = "__ZP_RUN__";
-            fprintf (F, "\t.import\t\t__ZP_RUN__\t; Linker generated symbol\n");
+            ZeropageLabel = "__ZP_START__";
+            fprintf (F, "\t.import\t\t__ZP_START__\t; Linker generated symbol\n");
         } else {
             ZeropageLabel = xstrdup ("__ZEROPAGE__");
         }

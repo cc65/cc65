@@ -1,8 +1,8 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 30.10.99
+; 30.10.1999, 10.01.2003
 
 ; void MainLoop (void);
 
@@ -10,4 +10,5 @@
 
 	    .include "../inc/jumptab.inc"
 
-_MainLoop = MainLoop
+_MainLoop:
+	    jmp MainLoop

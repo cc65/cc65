@@ -54,7 +54,6 @@
 	cli
 	ldy	#4	 	; Argument size
        	jsr    	_main	 	; call the users code
-	jmp	_MainLoop	; jump to GEOS MainLoop
 
 ; Call module destructors. This is also the _exit entry which must be called
 ; explicitly by the code.

@@ -111,29 +111,19 @@ e-mail: <tt/ytm@elysium.pl/
 <p>
 This chapter describes some rules you ought to obey, and how to use GEOSLib.
 
-<sect1>General rules
-<p>
-Think twice before you use standard C library function. In current implementation almost always
-you will get better code using only <tt/geos.h/. This is constantly changing as standard
-functions are becoming wrappers to native GEOS Kernal with the new releases.
+<sect1>Usage
 <p>
 Apart from this file, which merely describes only standard GEOS library functions, you should read
 <tt/grc/ (GEOS resource compiler) documentation. There are informations about necessary resource
 files (each GEOS application neeeds at least one) and the building process - what should be done
-and in which order.
-
-<sect1>Usage
+and in what order. Please also read cc65's documentation on how to compile C, assembler and link
+everything together.
 <p>
 All in all, you just need to place
 <tscreen><verb>
 &num;include &lt;geos.h&gt
 </verb></tscreen>
 on top of your source.
-<p>
-Please read cc65's documentation on how to compile C, assembler and link everything together.
-<p>
-GEOSLib building process isn't yet defined stable. Detailed information how to link everything
-together is in separated file together with resource compiler documentation.
 <p>
 As a general rule read the sources of example programs and read the headers. These are the most
 reliable sources of knowledge ;). You will also find there many C macros representing various
@@ -146,12 +136,17 @@ Screen coordinates are given in pixels unless stated differently.
 
 <sect1>Notes on style
 <p>
-All programs start their execution on <tt/main/ function. Unlike plain C exiting from this function
-doesn't mean end of program. GEOS is event-driven environment where applications are only executing
-events, main loop is in kernal. <tt/main/ function should setup the screen, menus etc. and return.
-Real end of the program should be called from event call, e.g. from menu item. You can force end of
-program and return to DeskTop either by standard <tt/exit (0)/ function or by <tt/EnterDeskTop()/.
-Currently they are almost the same.
+Contrary to typical GEOS assembly program which has a main function called after loading that
+setups the screen, menus, icons etc. exiting from <tt/main/ function in C is equivalent to
+calling <tt/exit()/. These two are the only safe methods of terminating applications. DO NOT
+USE <tt/EnterDeskTop/! Your data may be lost as library destructors and functions registered
+with <tt/atexit/ will not be called.
+<p>
+For GEOS GUI applications the recommended program structure is to have everything initialized
+in <tt/main/ function and at the end of it a call to <tt/MainLoop()/ function. WARNING! This
+function never returns, any code between <tt/MainLoop();/ and the end of <tt/main/ will not
+be executed. You have to call <tt/exit()/ explicitly somewhere in your code (e.g. in a menu
+handler or via DialogBox action).
 <p>
 Whenever possible use definitions from <tt/gsym.h/. The resulting code is translated by cc65 into
 series of <tt/lda/ and <tt/sta/, so you can't do it better :-).
@@ -163,7 +158,7 @@ You might wonder why I have chosen sometimes weird order of arguments in functio
 I wanted to avoid unnecessary pushing and popping arguments from stack. cc65 can pass single <tt/int/
 through CPU registers.
 <p>
-Do not try to compile in strict ANSI mode. I'm using some cc65 extensions which are not available in
+Do not try to compile in strict ANSI mode. Library uses cc65 extensions which are not available in
 ANSI.
 
 <sect>Library Functions
@@ -1191,16 +1186,19 @@ do something with IO registers or call one of Kernal's routines.
 <p>
 <tt/void MainLoop (void)/
 <p>
-Your programs exits to MainLoop upon exiting from <tt/main/, but you might need this function in
-menu and icon code. When in <tt/MainLoop/ systems waits for your action - using icons, keyboard
-or menus to force some specific action from program.
+Returns control to the system. Any code between call to <tt/MainLoop/ and the end of current
+function will never be executed. When in <tt/MainLoop/ systems waits for your action - using
+icons, keyboard or menus to force some specific action from program. You have to define
+proper handlers before that.
 
 <sect2>EnterDeskTop
 <p>
 <tt/void EnterDeskTop (void)/
 <p>
-This is default exit code of your application. It is finish of <tt/exit()/, but you may need it
-in other places of application.
+Calling this function will instantly terminate your program and bring you back to DeskTop.
+WARNING! It is not an equivalent of <tt/exit()/, library destructors code and functions
+registered with <tt/atexit()/ will not be called. In fact, you should always use
+<tt/exit()/ instead.
 
 <sect2>ToBASIC
 <p>
@@ -1208,6 +1206,7 @@ in other places of application.
 <p>
 This one is another way of finishing application - forcing GEOS to shutdown and exit to BASIC.
 I was considering whether to include it or not, but maybe someone will need it. Which is I doubt.
+It has the same dangerous features as <tt/EnterDeskTop/.
 
 <sect2>Panic
 <p>
@@ -1220,7 +1219,8 @@ System error at:xxxx
 where <tt/xxxx/ is last known execution address (caller). By default this is bound to <tt/BRK/
 instruction, but it might be usable in debugging as kind of <tt/assert/.
 <p>
-System is halted after call to <tt/Panic/.
+System is halted after call to <tt/Panic/ which means that library destructors will not be
+called and some data may be lost (no wonder you're panicking).
 
 <sect2>CallRoutine
 <p>
@@ -1228,14 +1228,15 @@ System is halted after call to <tt/Panic/.
 <p>
 This is system caller routine. You need to provide pointer to a function and it will be immediately
 called, unless the pointer is equal to <tt/NULL/. This is the main functionality of this function -
-you need not to worry if the pointer is valid.
+you don't need to check if the pointer is valid.
 
 <sect2>GetSerialNumber
 <p>
 <tt/int GetSerialNumber (void)/
 <p>
-This function returns the serial number of system. It might be used for copy-protection, but you
-shouldn't do this. Please remember that the Free Software is a true power.
+This function returns the serial number of system. It might be used for copy-protection.
+However, please remember that the Free Software is a true power and you are using it
+right now.
 
 <sect2>GetRandom
 <p>

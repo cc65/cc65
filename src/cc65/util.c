@@ -25,14 +25,6 @@
 
 
 
-int IsQuoteChar (char c)
-/* Return true if c is a single or double quote */
-{
-    return (c == '"' || c == '\'');
-}
-
-
-
 int powerof2 (unsigned long val)
 /* Return the exponent if val is a power of two. Return -1 if val is not a
  * power of two.

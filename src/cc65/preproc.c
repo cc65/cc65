@@ -219,7 +219,7 @@ static void ExpandMacroArgs (Macro* M)
      	    	keepch ('#');
      	    	keepstr (Ident);
      	    }
-     	} else if (IsQuoteChar (CurC)) {
+     	} else if (IsQuote (CurC)) {
      	    mptr = CopyQuotedString (mptr);
      	} else {
      	    *mptr++ = CurC;
@@ -265,7 +265,7 @@ static int MacroCall (Macro* M)
      	    *B++ = CurC;
 	    NextChar ();
      	    ++ParCount;
-     	} else if (IsQuoteChar (CurC)) {
+     	} else if (IsQuote (CurC)) {
     	    B = CopyQuotedString (B);
      	} else if (CurC == ',' || CurC == ')') {
      	    if (ParCount == 0) {
@@ -488,7 +488,7 @@ static int Pass1 (const char* From, char* To)
 	    	}
 	    	keepstr (Ident);
 	    }
-	} else if (IsQuoteChar (CurC)) {
+	} else if (IsQuote (CurC)) {
 	    mptr = CopyQuotedString (mptr);
 	} else if (CurC == '/' && NextC == '*') {
 	    keepch (' ');
@@ -543,7 +543,7 @@ static int Pass2 (const char* From, char* To)
 	    } else {
 	    	keepstr (Ident);
 	    }
-     	} else if (IsQuoteChar(CurC)) {
+     	} else if (IsQuote (CurC)) {
      	    mptr = CopyQuotedString (mptr);
      	} else {
      	    *mptr++ = CurC;

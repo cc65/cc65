@@ -33,7 +33,7 @@
 ;/*                                                                           */
 ;/*****************************************************************************/
 
-
+                                                                        
 
 
 ;------------------------------------------------------------------------------
@@ -46,6 +46,8 @@
         MOUSE_ERR_INV_DRIVER            ; Invalid driver
         MOUSE_ERR_NO_DEVICE             ; Mouse hardware not found
         MOUSE_ERR_INV_IOCTL             ; Invalid ioctl code
+
+        MOUSE_ERR_COUNT                 ; Special: Number of error codes
 .endenum
 
 ;------------------------------------------------------------------------------

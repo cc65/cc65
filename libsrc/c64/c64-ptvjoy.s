@@ -1,0 +1,158 @@
+;
+; PTV-4 Player joystick driver for the C64
+;
+; Groepaz/Hitmen, 2002-12-23
+; obviously based on Ullrichs driver :)
+;
+
+        .include "zeropage.inc"
+
+        .include "joy-kernel.inc"
+        .include "joy-error.inc"
+        .include "c64.inc"
+
+        .macpack generic
+
+; ------------------------------------------------------------------------
+; Header. Includes jump table
+
+        .segment "JUMPTABLE"
+
+; Driver signature
+
+        .byte   $6A, $6F, $79   ; "joy"
+        .byte   $00             ; Driver API version number
+
+; Button state masks (8 values)
+
+        .byte   $01                     ; JOY_UP
+        .byte   $02                     ; JOY_DOWN
+        .byte   $04                     ; JOY_LEFT
+        .byte   $08                     ; JOY_RIGHT
+        .byte   $10                     ; JOY_FIRE
+        .byte   $00                     ; Future expansion
+        .byte   $00                     ; Future expansion
+        .byte   $00                     ; Future expansion
+
+; Jump table.
+
+        .word   INSTALL
+        .word   DEINSTALL
+        .word   COUNT
+        .word   READ
+
+; ------------------------------------------------------------------------
+; Constants
+
+JOY_COUNT       = 4             ; Number of joysticks we support
+
+
+.code
+
+; ------------------------------------------------------------------------
+; INSTALL routine. Is called after the driver is loaded into memory. If
+; possible, check if the hardware is present and determine the amount of
+; memory available.
+; Must return an JOY_ERR_xx code in a/x.
+;
+
+INSTALL:
+        lda     #<JOY_ERR_OK
+        ldx     #>JOY_ERR_OK
+
+;	rts                     ; Run into DEINSTALL instead
+
+; ------------------------------------------------------------------------
+; DEINSTALL routine. Is called before the driver is removed from memory.
+; Can do cleanup or whatever. Must not return anything.
+;
+
+DEINSTALL:
+        rts
+
+
+; ------------------------------------------------------------------------
+; COUNT: Return the total number of available joysticks in a/x.
+;
+
+COUNT:
+        lda     #<JOY_COUNT
+        ldx     #>JOY_COUNT
+        rts
+
+; ------------------------------------------------------------------------
+; READ: Read a particular joystick passed in A.
+;
+
+READ:
+        tax	    ; Joystick number into X
+        bne joy2
+
+        ; Read joystick 1
+
+joy1:
+        lda	#$7F
+        sei
+        sta	CIA1_PRA
+        lda	CIA1_PRB
+        cli
+        and	#$1F
+        eor	#$1F
+        rts
+
+        ; Read joystick 2
+
+joy2:
+        dex
+        bne joy3
+
+        ; ldx	#0
+        lda	#$E0
+        ldy	#$FF
+        sei
+        sta	CIA1_DDRA
+        lda	CIA1_PRA
+        sty	CIA1_DDRA
+        cli
+        and	#$1F
+        eor	#$1F
+        rts
+
+        ; Read joystick 3
+
+joy3:
+        dex
+        bne joy4
+
+        lda #%10000000  ; cia 2 port B Data-Direction
+        sta $dd03       ; bit 7: out    bit 6-0: in
+
+        lda #$80        ; cia 2 port B read/write
+        sta $dd01       ; (output one at PB7)
+
+        lda $dd01       ; cia 2 port B read/write
+        and #$1f        ; get bit 4-0 (PB4-PB0)
+        ; ldx #0
+        rts
+
+        ; Read joystick 4
+
+joy4:
+        lda #%10000000  ; cia 2 port B Data-Direction
+        sta $dd03       ; bit 7: out    bit 6-0: in
+
+        lda #$00        ; cia 2 port B read/write
+        sta $dd01       ; (output zero at PB7)
+
+        lda $dd01       ; cia 2 port B read/write
+        and #$0f        ; get bit 3-0 (PB3-PB0)
+        sta tmp1        ; joy 4 directions
+
+        lda $dd01       ; cia 2 port B read/write
+        and #%00100000  ; get bit 5 (PB5)
+        lsr
+        ora tmp1
+
+        ldx #0
+        rts
+

@@ -24,7 +24,8 @@ CRAM_PTR       	:= $EA  	; Pointer to current char in color RAM
 BASIC_BUF      	:= $200		; Location of command-line
 BASIC_BUF_LEN	= 89		; Maximum length of command-line
 
-FNBUF  	       	:= $25E         ; Buffer for filename 
+FNBUF  	       	:= $25E         ; Buffer for filename
+FETCH           := $494         ; lda (zp),y from RAM
 CHARCOLOR       := $53B
 FKEY_COUNT     	:= $55D	        ; Characters for function key
 FKEY_SPACE     	:= $55F	        ; Function key definitions

@@ -97,7 +97,7 @@ static void Usage (void)
 	     "Long options:\n"
        	     "  --ansi\t\tStrict ANSI mode\n"
 	     "  --bss-name seg\tSet the name of the BSS segment\n"
-       	     "  --check-stack\tGenerate stack overflow checks\n"
+       	     "  --check-stack\t\tGenerate stack overflow checks\n"
        	     "  --code-name seg\tSet the name of the CODE segment\n"
        	     "  --cpu type\t\tSet cpu type\n"
        	     "  --data-name seg\tSet the name of the DATA segment\n"

@@ -2,7 +2,7 @@
 Documentation overview:
 
 
-  BUGS		- Known compiler bugs
+  BUGS		- Known compiler bugs.
 
   CREDITS	- Who helped with the compiler and tools?
 
@@ -20,6 +20,10 @@ Documentation overview:
   compile.txt	- How to compile cc65 and the support tools.
 
   debugging.txt	- Debug programs using the VICE emulator.
+
+  geos.*	- GEOSLib manual in several formats.
+
+  grc.txt	- Describes the GEOS resource compiler (grc).
 
   internal.doc	- A somewhat older text describing several cc65 internals.
 

@@ -284,7 +284,7 @@ void Compile (const char* FileName)
     };
 
     /* Add macros that are always defined */
-    DefineNumericMacro ("__CC65__", (VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH);
+    DefineNumericMacro ("__CC65__", VERSION);
 
     /* Strict ANSI macro */
     if (ANSI) {
@@ -346,6 +346,7 @@ void Compile (const char* FileName)
     /* Print an error report */
     ErrorReport ();
 }
+
 
 
 

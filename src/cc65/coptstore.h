@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -44,21 +44,45 @@
 
 
 /*****************************************************************************/
-/*		 		     Code                                    */
+/*		  		     Code                                    */
 /*****************************************************************************/
 
 
 
 unsigned OptStore1 (CodeSeg* S);
+/* Search for the sequence
+ *
+ *      ldy     #n
+ *      jsr     staxysp
+ *      ldy     #n+1
+ *      jsr     ldaxysp
+ *
+ * and remove the useless load, provided that the next insn doesn't use flags
+ * from the load.
+ */
+
+unsigned OptStore2 (CodeSeg* S);
 /* Search for a call to staxysp. If the ax register is not used later, and
  * the value is constant, just use the A register and store directly into the
  * stack.
  */
 
-unsigned OptStore2 (CodeSeg* S);               
+unsigned OptStore3 (CodeSeg* S);
 /* Search for a call to steaxysp. If the eax register is not used later, and
  * the value is constant, just use the A register and store directly into the
  * stack.
+ */
+
+unsigned OptStore4 (CodeSeg* S);
+/* Search for the sequence
+ *
+ *      sta     xx
+ *      stx     yy
+ *      lda     xx
+ *      ldx     yy
+ *
+ * and remove the useless load, provided that the next insn doesn't use flags
+ * from the load.
  */
 
 

@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -41,7 +41,7 @@
 
 
 /*****************************************************************************/
-/*				     Code                                    */
+/*			     	     Code                                    */
 /*****************************************************************************/
 
 
@@ -55,6 +55,61 @@ static void InsertStore (CodeSeg* S, unsigned* IP, LineInfo* LI)
 
 
 unsigned OptStore1 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *      ldy     #n
+ *      jsr     staxysp
+ *      ldy     #n+1
+ *      jsr     ldaxysp
+ *
+ * and remove the useless load, provided that the next insn doesn't use flags
+ * from the load.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[5];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+        /* Check for the sequence */
+        if (L[0]->OPC == OP65_LDY                           &&
+	    CE_KnownImm (L[0])                              &&
+            L[0]->Num < 0xFF                                &&
+	    !CS_RangeHasLabel (S, I+1, 3)                   &&
+       	    CS_GetEntries (S, L+1, I+1, 4)                  &&
+            CE_IsCallTo (L[1], "staxysp")                   &&
+            L[2]->OPC == OP65_LDY                           &&
+            CE_KnownImm (L[2])                              &&
+            L[2]->Num == L[0]->Num + 1                      &&
+            CE_IsCallTo (L[3], "ldaxysp")                   &&
+            !CE_UseLoadFlags (L[4])) {
+
+       	    /* Register has already the correct value, remove the loads */
+	    CS_DelEntries (S, I+2, 2);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptStore2 (CodeSeg* S)
 /* Search for a call to staxysp. If the ax register is not used later, and
  * the value is constant, just use the A register and store directly into the
  * stack.
@@ -130,7 +185,7 @@ unsigned OptStore1 (CodeSeg* S)
 
 
 
-unsigned OptStore2 (CodeSeg* S)
+unsigned OptStore3 (CodeSeg* S)
 /* Search for a call to steaxysp. If the eax register is not used later, and
  * the value is constant, just use the A register and store directly into the
  * stack.
@@ -268,6 +323,63 @@ unsigned OptStore2 (CodeSeg* S)
 
     /* Free the register info */
     CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptStore4 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *      sta     xx
+ *      stx     yy
+ *      lda     xx
+ *      ldx     yy
+ *
+ * and remove the useless load, provided that the next insn doesn't use flags
+ * from the load.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[5];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+        /* Check for the sequence */
+        if (L[0]->OPC == OP65_STA                           &&
+            (L[0]->AM == AM65_ABS || L[0]->AM == AM65_ZP)   &&
+	    !CS_RangeHasLabel (S, I+1, 3)                   &&
+       	    CS_GetEntries (S, L+1, I+1, 4)                  &&
+            L[1]->OPC == OP65_STX                           &&
+            L[1]->AM == L[0]->AM                            &&
+            L[2]->OPC == OP65_LDA                           &&
+            L[2]->AM == L[0]->AM                            &&
+            L[3]->OPC == OP65_LDX                           &&
+            L[3]->AM == L[1]->AM                            &&
+            strcmp (L[0]->Arg, L[2]->Arg) == 0              &&
+            strcmp (L[1]->Arg, L[3]->Arg) == 0              &&
+            !CE_UseLoadFlags (L[4])) {
+
+       	    /* Register has already the correct value, remove the loads */
+	    CS_DelEntries (S, I+2, 2);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
 
     /* Return the number of changes made */
     return Changes;

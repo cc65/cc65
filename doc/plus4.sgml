@@ -201,7 +201,23 @@ does not exist).
 
 <sect1>Passing arguments to the program<p>
 
-Command line argument passing is currently not supported for the Plus/4.
+Command line arguments can be passed to <tt/main()/. Since this is not
+supported by BASIC, the following syntax was choosen:
+
+<tscreen><verb>
+    RUN:REM ARG1 " ARG2 IS QUOTED" ARG3 "" ARG5
+</verb></tscreen>
+
+<enum>
+<item>Arguments are separated by spaces.
+<item>Arguments may be quoted.
+<item>Leading and trailing spaces around an argument are ignored. Spaces within
+      a quoted argument are allowed.
+<item>The first argument passed to <tt/main/ is the program name.
+<item>A maximum number of 10 arguments (including the program name) are
+      supported.
+</enum>
+
 
 
 <sect1>Program return code<p>

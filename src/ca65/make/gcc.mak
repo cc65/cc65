@@ -15,11 +15,13 @@ OBJS =  condasm.o	\
         global.o       	\
 	incpath.o	\
         instr.o	      	\
+	istack.o	\
 	listing.o	\
 	macpack.o     	\
        	macro.o	      	\
-        main.o	      	\
-        mem.o	      	\
+        main.o 	      	\
+        mem.o  	      	\
+	nexttok.o	\
         objcode.o     	\
         objfile.o	\
        	options.o	\
@@ -27,7 +29,7 @@ OBJS =  condasm.o	\
         scanner.o	\
 	strexpr.o	\
         symtab.o	\
-       	toknode.o	\
+       	toklist.o      	\
 	ulabel.o
 
 LIBS = ../common/common.a
@@ -61,4 +63,5 @@ zap:	clean
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
 	$(CC) -MM $^ > .depend
+
 

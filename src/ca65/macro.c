@@ -38,11 +38,13 @@
 
 #include "../common/hashstr.h"
 
-#include "mem.h"
+#include "condasm.h"
 #include "error.h"
-#include "scanner.h"
-#include "toknode.h"
+#include "istack.h"
+#include "mem.h"
+#include "nexttok.h"
 #include "pseudo.h"
+#include "toklist.h"
 #include "macro.h"
 
 
@@ -90,6 +92,7 @@ typedef struct MacExp_ MacExp;
 struct MacExp_ {
     MacExp*	Next;		/* Pointer to next expansion */
     Macro* 	M; 	  	/* Which macro do we expand? */
+    unsigned	IfSP;		/* .IF stack pointer at start of expansion */
     TokNode*   	Exp;		/* Pointer to current token */
     TokNode*	Final;		/* Pointer to final token */
     unsigned    LocalStart;	/* Start of counter for local symbol names */
@@ -98,11 +101,14 @@ struct MacExp_ {
     TokNode*	ParamExp;	/* Node for expanding parameters */
 };
 
-/* Data for macro expansions */
-#define	MAX_MACRO_EXPANSIONS	255
-static unsigned	MacroNesting	= 0;
-static MacExp*  CurMac	  	= 0;
-static unsigned LocalName	= 0;
+/* Number of active macro expansions */
+static unsigned MacExpansions = 0;
+
+/* Flag if a macro expansion should get aborted */
+static int DoMacAbort = 0;
+
+/* Counter to create local names for symbols */
+static unsigned LocalName = 0;
 
 
 
@@ -172,6 +178,7 @@ static MacExp* NewMacExp (Macro* M)
 
     /* Initialize the data */
     E->M       	  = M;
+    E->IfSP	  = GetIfStack ();
     E->Exp     	  = M->TokRoot;
     E->Final	  = 0;
     E->LocalStart = LocalName;
@@ -183,43 +190,33 @@ static MacExp* NewMacExp (Macro* M)
 	E->Params [I] = 0;
     }
 
-    /* And return it... */
+    /* One macro expansion more */
+    ++MacExpansions;
+
+    /* Return the new macro expansion */
     return E;
 }
 
 
 
-static void MacInsertExp (MacExp* E)
-/* Insert a macro expansion into the list */
-{
-    E->Next = CurMac;
-    CurMac  = E;
-    ++MacroNesting;
-}
-
-
-
-static void FreeMacExp (void)
+static void FreeMacExp (MacExp* E)
 /* Remove and free the current macro expansion */
 {
     unsigned I;
-    MacExp* E;
+
+    /* One macro expansion less */
+    --MacExpansions;
 
     /* Free the parameter list */
-    for (I = 0; I < CurMac->ParamCount; ++I) {
-      	Xfree (CurMac->Params [I]);
+    for (I = 0; I < E->ParamCount; ++I) {
+      	Xfree (E->Params [I]);
     }
-    Xfree (CurMac->Params);
+    Xfree (E->Params);
 
     /* Free the final token if we have one */
-    if (CurMac->Final) {
-	FreeTokNode (CurMac->Final);
+    if (E->Final) {
+      	FreeTokNode (E->Final);
     }
-
-    /* Reset the list pointer */
-    E = CurMac;
-    CurMac = E->Next;
-    --MacroNesting;
 
     /* Free the structure itself */
     Xfree (E);
@@ -390,7 +387,7 @@ void MacDef (unsigned Style)
 
      	    	IdDesc* I;
 
-     		/* Skip .local or comma */
+     	  	/* Skip .local or comma */
        		NextTok ();
 
      		/* Need an identifer */
@@ -461,6 +458,123 @@ void MacDef (unsigned Style)
 
 
 
+static int MacExpand (void* Data)
+/* If we're currently expanding a macro, set the the scanner token and
+ * attribute to the next value and return true. If we are not expanding
+ * a macro, return false.
+ */
+{
+    /* Cast the Data pointer to the actual data structure */
+    MacExp* Mac = (MacExp*) Data;
+
+    /* Check if we should abort this macro */
+    if (DoMacAbort) {
+
+	/* Reset the flag */
+	DoMacAbort = 0;
+
+	/* Abort any open .IF statements in this macro expansion */
+	CleanupIfStack (Mac->IfSP);
+
+	/* Terminate macro expansion */
+	goto MacEnd;
+    }
+
+    /* We're expanding a macro. Check if we are expanding one of the
+     * macro parameters.
+     */
+    if (Mac->ParamExp) {
+
+       	/* Ok, use token from parameter list */
+       	TokSet (Mac->ParamExp);
+
+       	/* Set pointer to next token */
+       	Mac->ParamExp = Mac->ParamExp->Next;
+
+       	/* Done */
+       	return 1;
+
+    }
+
+    /* We're not expanding macro parameters. Check if we have tokens left from
+     * the macro itself.
+     */
+    if (Mac->Exp) {
+
+       	/* Use next macro token */
+       	TokSet (Mac->Exp);
+
+       	/* Set pointer to next token */
+       	Mac->Exp = Mac->Exp->Next;
+
+       	/* Is it a request for actual parameter count? */
+       	if (Tok == TOK_PARAMCOUNT) {
+       	    Tok  = TOK_INTCON;
+       	    IVal = Mac->ParamCount;
+       	    return 1;
+       	}
+
+       	/* Is it the name of a macro parameter? */
+       	if (Tok == TOK_MACPARAM) {
+
+       	    /* Start to expand the parameter token list */
+       	    Mac->ParamExp = Mac->Params [IVal];
+
+       	    /* Recursive call to expand the parameter */
+       	    return MacExpand (Mac);
+       	}
+
+       	/* If it's an identifier, it may in fact be a local symbol */
+       	if (Tok == TOK_IDENT && Mac->M->LocalCount) {
+       	    /* Search for the local symbol in the list */
+       	    unsigned Index = 0;
+       	    IdDesc* I = Mac->M->Locals;
+       	    while (I) {
+       	       	if (strcmp (SVal, I->Id) == 0) {
+       	       	    /* This is in fact a local symbol, change the name */
+       	       	    sprintf (SVal, "___%04X__", Mac->LocalStart + Index);
+       	       	    break;
+       	       	}
+       	       	/* Next symbol */
+       	       	++Index;
+       	       	I = I->Next;
+       	    }
+
+       	    /* Done */
+       	    return 1;
+       	}
+
+       	/* The token was successfully set */
+       	return 1;
+
+    }
+
+    /* No more macro tokens. Do we have a final token? */
+    if (Mac->Final) {
+
+      	/* Set the final token and remove it */
+      	TokSet (Mac->Final);
+      	FreeTokNode (Mac->Final);
+      	Mac->Final = 0;
+
+       	/* The token was successfully set */
+       	return 1;
+
+    }
+
+MacEnd:
+    /* End of macro expansion */
+    FreeMacExp (Mac);
+
+    /* Pop the input function */
+    PopInput ();
+
+    /* No token available */
+    return 0;
+}
+
+
+
 static void StartExpClassic (Macro* M)
 /* Start expanding the classic macro M */
 {
@@ -522,8 +636,8 @@ static void StartExpClassic (Macro* M)
 	}
     }
 
-    /* Insert the newly created structure into the expansion list */
-    MacInsertExp (E);
+    /* Insert a new token input function */
+    PushInput (MacExpand, E, ".MACRO");
 }
 
 
@@ -596,8 +710,8 @@ static void StartExpDefine (Macro* M)
      */
     E->Final = NewTokNode ();
 
-    /* Insert the newly created structure into the expansion list */
-    MacInsertExp (E);
+    /* Insert a new token input function */
+    PushInput (MacExpand, E, ".DEFINE");
 }
 
 
@@ -605,123 +719,15 @@ static void StartExpDefine (Macro* M)
 void MacExpandStart (void)
 /* Start expanding the macro in SVal */
 {
-    Macro* M;
-
-    /* Beware of runoff macros */
-    if (MacroNesting ==	MAX_MACRO_EXPANSIONS) {
-     	Fatal (FAT_MACRO_NESTING);
-    }
-
     /* Search for the macro */
-    M = MacFind (SVal, HashStr (SVal) % HASHTAB_SIZE);
+    Macro* M = MacFind (SVal, HashStr (SVal) % HASHTAB_SIZE);
     CHECK (M != 0);
 
     /* Call the apropriate subroutine */
     switch (M->Style) {
     	case MAC_STYLE_CLASSIC:	StartExpClassic (M);	break;
 	case MAC_STYLE_DEFINE:	StartExpDefine (M);	break;
-	default:   		Internal ("Invalid macro style: %d", M->Style);
-    }
-}
-
-
-
-int MacExpand (void)
-/* If we're currently expanding a macro, set the the scanner token and
- * attribute to the next value and return true. If we are not expanding
- * a macro, return false.
- */
-{
-    if (MacroNesting == 0) {
-       	/* Not expanding a macro */
-        return 0;
-    }
-
-    /* We're expanding a macro. Check if we are expanding one of the
-     * macro parameters.
-     */
-    if (CurMac->ParamExp) {
-
-       	/* Ok, use token from parameter list */
-       	TokSet (CurMac->ParamExp);
-
-       	/* Set pointer to next token */
-       	CurMac->ParamExp = CurMac->ParamExp->Next;
-
-       	/* Done */
-       	return 1;
-
-    } else if (CurMac->Exp) {
-
-       	/* We're not expanding a parameter, use next macro token */
-       	TokSet (CurMac->Exp);
-
-       	/* Set pointer to next token */
-       	CurMac->Exp = CurMac->Exp->Next;
-
-       	/* Is it a request for actual parameter count? */
-       	if (Tok == TOK_PARAMCOUNT) {
-       	    Tok  = TOK_INTCON;
-       	    IVal = CurMac->ParamCount;
-       	    return 1;
-       	}
-
-       	/* Is it an .exitmacro command? */
-       	if (Tok == TOK_EXITMACRO) {
-       	    /* Forced exit from macro expansion */
-       	    FreeMacExp ();
-       	    return MacExpand ();
-       	}
-
-       	/* Is it the name of a macro parameter? */
-       	if (Tok == TOK_MACPARAM) {
-
-       	    /* Start to expand the parameter token list */
-       	    CurMac->ParamExp = CurMac->Params [IVal];
-
-       	    /* Recursive call to expand the parameter */
-       	    return MacExpand ();
-       	}
-
-       	/* If it's an identifier, it may in fact be a local symbol */
-       	if (Tok == TOK_IDENT && CurMac->M->LocalCount) {
-       	    /* Search for the local symbol in the list */
-       	    unsigned Index = 0;
-       	    IdDesc* I = CurMac->M->Locals;
-       	    while (I) {
-       	       	if (strcmp (SVal, I->Id) == 0) {
-       	       	    /* This is in fact a local symbol, change the name */
-       	       	    sprintf (SVal, "___%04X__", CurMac->LocalStart + Index);
-       	       	    break;
-       	       	}
-       	       	/* Next symbol */
-       	       	++Index;
-       	       	I = I->Next;
-       	    }
-
-       	    /* Done */
-       	    return 1;
-       	}
-
-       	/* The token was successfully set */
-       	return 1;
-
-    } else if (CurMac->Final) {
-
-	/* Set the final token and remove it */
-	TokSet (CurMac->Final);
-	FreeTokNode (CurMac->Final);
-	CurMac->Final = 0;
-
-       	/* The token was successfully set */
-       	return 1;
-
-    } else {
-
-       	/* End of macro expansion */
-       	FreeMacExp ();
-       	return MacExpand ();
-
+	default:   	      	Internal ("Invalid macro style: %d", M->Style);
     }
 }
 
@@ -731,10 +737,10 @@ void MacAbort (void)
 /* Abort the current macro expansion */
 {
     /* Must have an expansion */
-    CHECK (CurMac != 0);
+    CHECK (MacExpansions > 0);
 
-    /* Free current structure */
-    FreeMacExp ();
+    /* Set a flag so macro expansion will terminate on the next call */
+    DoMacAbort = 1;
 }
 
 
@@ -759,7 +765,7 @@ int IsDefine (const char* Name)
 int InMacExpansion (void)
 /* Return true if we're currently expanding a macro */
 {
-    return MacroNesting != 0;
+    return (MacExpansions > 0);
 }
 
 

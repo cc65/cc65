@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "scanner.h"
+#include "nexttok.h"
 #include "error.h"
 
 
@@ -190,6 +190,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
 	"CPU not supported",
 	"Counter underflow",
 	"Undefined label",
+	"Open `%s´",
     };
 
     fprintf (stderr, "%s(%lu): Error #%u: ",
@@ -257,7 +258,7 @@ void Fatal (unsigned FatNum, ...)
 	"Cannot open listing file: %s",
 	"Cannot write to listing file: %s",
 	"Cannot read from listing file: %s",
-	"Macro nesting too deep",
+	"Too many nested constructs",
 	"Too many symbols",
     };
     va_list ap;

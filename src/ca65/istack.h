@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*			       	   toknode.c				     */
+/*				   istack.h				     */
 /*                                                                           */
-/*		  Token list node for the ca65 macroassembler		     */
+/*			  Input stack for the scanner			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
+/* (C) 2000     Ullrich von Bassewitz                                        */
 /*              Wacholderweg 14                                              */
 /*              D-70597 Stuttgart                                            */
 /* EMail:       uz@musoftware.de                                             */
@@ -33,85 +33,39 @@
 
 
 
-#include <string.h>
-
-#include "mem.h"
-#include "scanner.h"
-#include "toknode.h"
+#ifndef ISTACK_H
+#define ISTACK_H
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code	       			     */
+/*     	       	    		     Code			   	     */
 /*****************************************************************************/
 
 
 
-TokNode* NewTokNode (void)
-/* Create and return a token node with the current token value */
-{
-    TokNode* T;
+void PushInput (int (*Func) (void*), void* Data, const char* Desc);
+/* Push an input function onto the input stack */
 
-    /* Allocate memory */
-    unsigned Len = TokHasSVal (Tok)? strlen (SVal) : 0;
-    T = Xmalloc (sizeof (TokNode) + Len);
+void PopInput (void);
+/* Pop the current input function from the input stack */
 
-    /* Initialize the token contents */
-    T->Next   	= 0;
-    T->Tok	= Tok;
-    T->WS	= WS;
-    T->IVal	= IVal;
-    memcpy (T->SVal, SVal, Len);
-    T->SVal [Len] = '\0';
+int InputFromStack (void);
+/* Try to get input from the input stack. Return true if we had such input,
+ * return false otherwise.
+ */			  
 
-    /* Return the node */
-    return T;
-}
+void CheckInputStack (void);
+/* Called from the scanner before closing an input file. Will check for any
+ * stuff on the input stack.
+ */
 
 
 
-void FreeTokNode (TokNode* T)
-/* Free the given token node */
-{
-    Xfree (T);
-}
+/* End of istack.h */
 
+#endif
 
-
-void TokSet (TokNode* T)
-/* Set the scanner token from the given token node */
-{
-    /* Set the values */
-    Tok  = T->Tok;
-    WS   = T->WS;
-    IVal = T->IVal;
-    strcpy (SVal, T->SVal);
-}
-
-
-
-enum TC TokCmp (const TokNode* T)
-/* Compare the token given as parameter against the current token */
-{
-    if (T->Tok != Tok) {
-	/* Different token */
-	return tcDifferent;
-    }
-     
-    /* If the token has string attribute, check it */
-    if (TokHasSVal (T->Tok)) {
-	if (strcmp  (T->SVal, SVal) != 0) {
-     	    return tcSameToken;
-	}
-    } else if (TokHasIVal (T->Tok)) {
-	if (T->IVal != IVal) {
-     	    return tcSameToken;
-	}
-    }
-	 
-    /* Tokens are identical */
-    return tcIdentical;
-}
 
 
 

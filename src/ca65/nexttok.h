@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   condasm.h				     */
+/*			 	   nexttok.h				     */
 /*                                                                           */
-/*		     Conditional assembly support for ca65		     */
+/*		Get next token and handle token level functions		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000     Ullrich von Bassewitz                                        */
+/*              Wacholderweg 14                                              */
+/*              D-70597 Stuttgart                                            */
+/* EMail:       uz@musoftware.de                                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,36 +33,48 @@
 
 
 
-#ifndef CONDASM_H
-#define CONDASM_H
+#ifndef NEXTTOK_H
+#define NEXTTOK_H
+
+
+
+#include "scanner.h"
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code				     */
+/*     	       	    		     Code			   	     */
 /*****************************************************************************/
 
 
 
-void DoConditionals (void);
-/* Catch all for conditional directives */
+void NextTok (void);
+/* Get next token and handle token level functions */
 
-void CheckOpenIfs (void);
-/* Called from the scanner before closing an input file. Will check for any
- * open .ifs in this file.
- */
+void Consume (enum Token Expected, unsigned ErrMsg);
+/* Consume Token, print an error if we don't find it */
 
-unsigned GetIfStack (void);
-/* Get the current .IF stack pointer */
+void ConsumeSep (void);
+/* Consume a separator token */
 
-void CleanupIfStack (unsigned SP);
-/* Cleanup the .IF stack, remove anything above the given stack pointer */
+void ConsumeLParen (void);
+/* Consume a left paren */
+
+void ConsumeRParen (void);
+/* Consume a right paren */
+
+void ConsumeComma (void);
+/* Consume a comma */
+
+void SkipUntilSep (void);
+/* Skip tokens until we reach a line separator */
 
 
 
-/* End of condasm.h */
+/* End of nexttok.h */
 
 #endif
+
 
 
 

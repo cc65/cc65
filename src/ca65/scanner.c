@@ -46,10 +46,12 @@
 #include "global.h"
 #include "incpath.h"
 #include "instr.h"
+#include "istack.h"
 #include "listing.h"
 #include "macro.h"
 #include "mem.h"
 #include "objfile.h"
+#include "toklist.h"
 #include "scanner.h"
 
 
@@ -104,10 +106,10 @@ static struct {
 static unsigned    FileCount = 0;
 
 /* Current input variables */
-static InputFile* IFile = 0;
-static InputData* IData = 0;
-static unsigned	  ICount = 0;		/* Count of input files */
-static int	  C = 0;
+static InputFile* IFile        	= 0;	/* Current input file */
+static InputData* IData        	= 0;	/* Current input memory data */
+static unsigned	  ICount 	= 0;  	/* Count of input files */
+static int	  C 		= 0;	/* Current input character */
 
 /* Force end of assembly */
 int 		  ForcedEnd = 0;
@@ -121,7 +123,7 @@ struct DotKeyword {
     { "A8",   	    	TOK_A8		},
     { "ADDR",	    	TOK_ADDR	},
     { "ALIGN",	       	TOK_ALIGN     	},
-    { "AND",	    	TOK_BAND 	},
+    { "AND", 	    	TOK_BAND 	},
     { "ASCIIZ",	    	TOK_ASCIIZ	},
     { "AUTOIMPORT", 	TOK_AUTOIMPORT	},
     { "BITAND",	    	TOK_AND		},
@@ -131,15 +133,15 @@ struct DotKeyword {
     { "BLANK",	    	TOK_BLANK	},
     { "BSS",  	    	TOK_BSS		},
     { "BYTE", 	    	TOK_BYTE	},
-    { "CASE", 	    	TOK_CASE	},
+    { "CASE",  	    	TOK_CASE	},
     { "CODE", 	    	TOK_CODE    	},
     { "CONST", 	    	TOK_CONST	},
-    { "CPU",		TOK_CPU		},
+    { "CPU", 		TOK_CPU		},
     { "DATA",  		TOK_DATA	},
     { "DBYT",  		TOK_DBYT	},
     { "DEBUGINFO",	TOK_DEBUGINFO	},
     { "DEF",   		TOK_DEFINED	},
-    { "DEFINE",		TOK_DEFINE	},
+    { "DEFINE",	    	TOK_DEFINE	},
     { "DEFINED",	TOK_DEFINED	},
     { "DWORD", 		TOK_DWORD	},
     { "ELSE",  		TOK_ELSE	},
@@ -189,10 +191,11 @@ struct DotKeyword {
     { "MACPACK",	TOK_MACPACK	},
     { "MACRO",		TOK_MACRO	},
     { "MATCH",		TOK_MATCH	},
-    { "MOD",		TOK_MOD		},
-    { "NOT",		TOK_BNOT 	},
+    { "MID",   	       	TOK_MID		},
+    { "MOD", 		TOK_MOD		},
+    { "NOT", 		TOK_BNOT 	},
     { "NULL",		TOK_NULL	},
-    { "OR",		TOK_BOR  	},
+    { "OR",  		TOK_BOR  	},
     { "ORG",  		TOK_ORG		},
     { "OUT",  		TOK_OUT		},
     { "P02",  		TOK_P02		},
@@ -202,15 +205,15 @@ struct DotKeyword {
     { "PARAMCOUNT", 	TOK_PARAMCOUNT  },
     { "PC02", 		TOK_PC02	},
     { "PROC", 		TOK_PROC	},
-    { "REF",		TOK_REFERENCED  },
+    { "REF", 		TOK_REFERENCED  },
     { "REFERENCED",	TOK_REFERENCED  },
     { "RELOC",		TOK_RELOC	},
     { "REPEAT",		TOK_REPEAT	},
     { "RES",  		TOK_RES		},
     { "RODATA",		TOK_RODATA	},
     { "SEGMENT",	TOK_SEGMENT	},
-    { "SHL",		TOK_SHL		},
-    { "SHR",		TOK_SHR		},
+    { "SHL", 		TOK_SHL		},
+    { "SHR", 		TOK_SHR		},
     { "SMART",		TOK_SMART	},
     { "STRING",		TOK_STRING	},
     { "SUNPLUS",	TOK_SUNPLUS	},
@@ -489,7 +492,7 @@ static void NextChar (void)
       	       	/* End of file. Add an empty line to the listing. This is a
       		 * small hack needed to keep the PC output in sync.
       		 */
-      		NewListingLine ("", IFile->Pos.Name, ICount);
+      	     	NewListingLine ("", IFile->Pos.Name, ICount);
       	       	C = EOF;
       	       	return;
       	    }
@@ -627,7 +630,7 @@ static unsigned ReadStringConst (int StringTerm)
 
 
 
-void NextTok (void)
+void NextRawTok (void)
 /* Read the next raw token from the input stream */
 {
     /* If we've a forced end of assembly, don't read further */
@@ -636,8 +639,9 @@ void NextTok (void)
      	return;
     }
 
-    /* If we're expanding a macro, the tokens come from the macro expansion */
-    if (MacExpand ()) {
+Restart:
+    /* Check if we have tokens from another input source */
+    if (InputFromStack ()) {
      	return;
     }
 
@@ -813,9 +817,7 @@ Again:
        	} else if (IsDefine (SVal)) {
 	    /* This is a define style macro - expand it */
 	    MacExpandStart ();
-	    if (!MacExpand ()) {
-	    	goto Again;
-	    }
+	    goto Restart;
 	} else {
 	    /* An identifier */
 	    Tok = TOK_IDENT;
@@ -894,8 +896,8 @@ CharAgain:
 		    IVal = 0;
 		    do {
 		     	++IVal;
-		     	NextChar ();
-		    } while (C == '+');
+	     	     	NextChar ();
+	       	    } while (C == '+');
 		    Tok = TOK_ULABEL;
 		    break;
 
@@ -1029,8 +1031,8 @@ CharAgain:
 		    /* Handle as white space */
 		    NextChar ();
 		    C = ' ';
- 		    goto Again;
-	     	}
+ 	     	    goto Again;
+	       	}
 	    }
 	    break;
 
@@ -1042,6 +1044,8 @@ CharAgain:
         case EOF:
 	    /* Check if we have any open .IFs in this file */
 	    CheckOpenIfs ();
+	    /* Check if we have any open token lists in this file */
+	    CheckInputStack ();
 
 	    /* If this was an include file, then close it and handle like a
 	     * separator. Do not close the main file, but return EOF.
@@ -1061,68 +1065,6 @@ CharAgain:
     Error (ERR_INVALID_CHAR, C & 0xFF);
     NextChar ();
     goto Again;
-}
-
-
-
-void Consume (enum Token Expected, unsigned ErrMsg)
-/* Consume Expected, print an error if we don't find it */
-{
-    if (Tok == Expected) {
-	NextTok ();
-    } else {
-	Error (ErrMsg);
-    }
-}
-
-
-
-void ConsumeSep (void)
-/* Consume a separator token */
-{
-    /* Accept an EOF as separator */
-    if (Tok != TOK_EOF) {
-     	if (Tok != TOK_SEP) {
-     	    Error (ERR_TOO_MANY_CHARS);
-     	    SkipUntilSep ();
-     	} else {
-     	    NextTok ();
-     	}
-    }
-}
-
-
-
-void ConsumeLParen (void)
-/* Consume a left paren */
-{
-    Consume (TOK_LPAREN, ERR_LPAREN_EXPECTED);
-}
-
-
-
-void ConsumeRParen (void)
-/* Consume a right paren */
-{
-    Consume (TOK_RPAREN, ERR_RPAREN_EXPECTED);
-}
-
-
-
-void ConsumeComma (void)
-/* Consume a comma */
-{
-    Consume (TOK_COMMA, ERR_COMMA_EXPECTED);
-}
-
-
-
-void SkipUntilSep (void)
-/* Skip tokens until we reach a line separator */
-{
-    while (Tok != TOK_SEP && Tok != TOK_EOF) {
-     	NextTok ();
-    }
 }
 
 

@@ -123,6 +123,7 @@ enum Errors {
     ERR_CPU_NOT_SUPPORTED,
     ERR_COUNTER_UNDERFLOW,
     ERR_UNDEFINED_LABEL,
+    ERR_OPEN_STMT,
     ERR_COUNT  	      	       	      	/* Error count */
 };
 
@@ -140,7 +141,7 @@ enum Fatals {
     FAT_CANNOT_OPEN_LISTING,
     FAT_CANNOT_WRITE_LISTING,
     FAT_CANNOT_READ_LISTING,
-    FAT_MACRO_NESTING,
+    FAT_NESTING,
     FAT_TOO_MANY_SYMBOLS,
     FAT_COUNT	    	  	      	/* Fatal error count */
 };

@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    macro.h				     */
+/*			       	   toklist.h				     */
 /*                                                                           */
-/*		      Macros for the ca65 macroassembler		     */
+/*		    Token list for the ca65 macroassembler		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000     Ullrich von Bassewitz                                        */
+/*              Wacholderweg 14                                              */
+/*              D-70597 Stuttgart                                            */
+/* EMail:       uz@musoftware.de                                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,52 +33,84 @@
 
 
 
-#ifndef MACRO_H
-#define MACRO_H
+#ifndef TOKLIST_H
+#define TOKLIST_H
 
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*     	       	    		     Data				     */
 /*****************************************************************************/
 
 
 
-/* Macro styles */
-#define MAC_STYLE_CLASSIC	0
-#define MAC_STYLE_DEFINE	1
+/* Struct holding a token */
+typedef struct TokNode TokNode;
+struct TokNode {
+    TokNode*   	 	Next;		/* For single linked list */
+    enum Token	 	Tok;		/* Token value */
+    int	       	       	WS;    		/* Whitespace before token? */
+    long       	 	IVal;		/* Integer token attribute */
+    char       	 	SVal [1];	/* String attribute, dyn. allocated */
+};
+
+/* Struct holding a token list */
+typedef struct TokList TokList;
+struct TokList {
+    TokList*		Next;		/* Single linked list (for replay) */
+    TokNode*		Root;		/* First node in list */
+    TokNode*		Last;		/* Last node in list or replay */
+    unsigned		Repeat;		/* Repeat counter (used for replay) */
+    unsigned		Count;		/* Token count */
+};
+
+
+
+/* Return codes for TokCmp - higher numeric code means better match */
+enum TC {
+    tcDifferent, 			/* Different tokents */
+    tcSameToken, 			/* Same token, different attribute */
+    tcIdentical	 			/* Identical (token + attribute) */
+};
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code				     */
+/*     	       	    		     Code			   	     */
 /*****************************************************************************/
 
 
 
-void MacDef (unsigned Style);
-/* Parse a macro definition */
+TokNode* NewTokNode (void);
+/* Create and return a token node with the current token value */
 
-void MacExpandStart (void);
-/* Start expanding the macro in SVal */
+void FreeTokNode (TokNode* T);
+/* Free the given token node */
 
-void MacAbort (void);
-/* Abort the current macro expansion */
+void TokSet (TokNode* T);
+/* Set the scanner token from the given token node */
 
-int IsMacro (const char* Name);
-/* Return true if the given name is the name of a macro */
+enum TC TokCmp (const TokNode* T);
+/* Compare the token given as parameter against the current token */
 
-int IsDefine (const char* Name);
-/* Return true if the given name is the name of a define style macro */
+void InitTokList (TokList* T);
+/* Initialize a token list structure for later use */
 
-int InMacExpansion (void);
-/* Return true if we're currently expanding a macro */
+TokList* NewTokList (void);
+/* Create a new, empty token list */
+
+void FreeTokList (TokList* T);
+/* Delete the token list including all token nodes */
+
+void AddCurTok (TokList* T);
+/* Add the current token to the token list */
 
 
 
-/* End of macro.h */
+/* End of toklist.h */
 
 #endif
+
 
 
 

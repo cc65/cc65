@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*			       	   toknode.h				     */
+/*				   istack.c				     */
 /*                                                                           */
-/*		  Token list node for the ca65 macroassembler		     */
+/*			  Input stack for the scanner			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
+/* (C) 2000     Ullrich von Bassewitz                                        */
 /*              Wacholderweg 14                                              */
 /*              D-70597 Stuttgart                                            */
 /* EMail:       uz@musoftware.de                                             */
@@ -33,62 +33,117 @@
 
 
 
-#ifndef TOKNODE_H
-#define TOKNODE_H
+#include "error.h"
+#include "mem.h"
+#include "istack.h"
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Data				     */
+/*     	       	    		     Data			   	     */
 /*****************************************************************************/
 
 
 
-/* Struct holding a token */
-typedef struct TokNode_ TokNode;
-struct TokNode_ {
-    TokNode*   		Next;		/* For single linked list */
-    enum Token		Tok;		/* Token value */
-    int	       	       	WS;    		/* Whitespace before token? */
-    long       		IVal;		/* Integer token attribute */
-    char       		SVal [1];	/* String attribute, dyn. allocated */
+/* Size of the stack (== maximum nested macro or repeat count) */
+#define ISTACK_MAX  	256
+
+/* Structure holding a stack element */
+typedef struct IElement IElement;
+struct IElement {
+    IElement*  	Next;		/* Next stack element */
+    int	       	(*Func)(void*);	/* Function called for input */
+    void*      	Data;	  	/* User data given as argument */
+    const char* Desc;		/* Description */
 };
 
-
-
-/* Return codes for TokCmp - higher numeric code means better match */
-enum TC {
-    tcDifferent,			/* Different tokents */
-    tcSameToken,			/* Same token, different attribute */
-    tcIdentical				/* Identical (token + attribute) */
-};
+/* The stack */
+static IElement* IStack = 0;	/* Input stack pointer */
+static unsigned  ICount	= 0;	/* Number of items on the stack */
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code			   	     */
+/*     	       	    		     Code	 		   	     */
 /*****************************************************************************/
 
 
 
-TokNode* NewTokNode (void);
-/* Create and return a token node with the current token value */
+void PushInput (int (*Func) (void*), void* Data, const char* Desc)
+/* Push an input function onto the input stack */
+{
+    IElement* E;
 
-void FreeTokNode (TokNode* T);
-/* Free the given token node */
+    /* Check for a stack overflow */
+    if (ICount > ISTACK_MAX) {
+    	Fatal (FAT_NESTING);
+    }
 
-void TokSet (TokNode* T);
-/* Set the scanner token from the given token node */
+    /* Create a new stack element */
+    E = Xmalloc (sizeof (*E));
 
-enum TC TokCmp (const TokNode* T);
-/* Compare the token given as parameter against the current token */
+    /* Initialize it */
+    E->Func = Func;
+    E->Data = Data;
+    E->Desc = Desc;
+
+    /* Push it */
+    E->Next = IStack;
+    IStack  = E;
+}
 
 
 
-/* End of toknode.h */
+void PopInput (void)
+/* Pop the current input function from the input stack */
+{
+    IElement* E;
 
-#endif
+    /* We cannot pop from an empty stack */
+    PRECONDITION (IStack != 0);
 
+    /* Remember the last element */
+    E = IStack;
+
+    /* Pop it */
+    IStack = IStack->Next;
+
+    /* And delete it */
+    Xfree (E);
+}
+
+
+
+int InputFromStack (void)
+/* Try to get input from the input stack. Return true if we had such input,
+ * return false otherwise.
+ */
+{
+    /* Repeatedly call the TOS routine until we have a token or if run out of
+     * routines.
+     */
+    while (IStack) {
+	if (IStack->Func (IStack->Data) != 0) {
+	    /* We have a token */
+	    return 1;
+	}
+    }
+
+    /* Nothing is on the stack */
+    return 0;
+}
+
+
+
+void CheckInputStack (void)
+/* Called from the scanner before closing an input file. Will check for any
+ * stuff on the input stack.
+ */
+{
+    if (IStack) {
+	Error (ERR_OPEN_STMT, IStack->Desc);
+    }
+}
 
 
 

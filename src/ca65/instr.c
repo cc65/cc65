@@ -43,8 +43,8 @@
 #include "error.h"
 #include "expr.h"
 #include "global.h"
+#include "nexttok.h"
 #include "objcode.h"
-#include "scanner.h"
 #include "instr.h"
 
 

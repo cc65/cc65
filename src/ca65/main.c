@@ -49,6 +49,7 @@
 #include "listing.h"
 #include "macro.h"
 #include "mem.h"
+#include "nexttok.h"
 #include "objcode.h"
 #include "objfile.h"
 #include "options.h"
@@ -543,7 +544,7 @@ int main (int argc, char* argv [])
        		    OptIgnoreCase (Arg);
        		    break;
 
-       		case 'l':     
+       		case 'l':
 		    OptListing (Arg);
        		    break;
 

@@ -49,9 +49,9 @@
 #include "listing.h"
 #include "macpack.h"
 #include "macro.h"
+#include "nexttok.h"
 #include "objcode.h"
 #include "options.h"
-#include "scanner.h"
 #include "strexpr.h"
 #include "symtab.h"
 #include "pseudo.h"
@@ -789,6 +789,16 @@ static void DoMacro (void)
 
 
 
+static void DoMid (void)
+/* Handle .MID - this should never happen, since the keyword is actually
+ * handled on a much lower level of the expression hierarchy.
+ */
+{
+    Internal ("Unexpected token: .MID");
+}
+
+
+
 static void DoNull (void)
 /* Switch to the NULL segment */
 {
@@ -1119,6 +1129,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoMacPack	},
     { ccNone,		DoMacro		},
     { ccNone,  	       	DoUnexpected	},	/* .MATCH */
+    { ccNone,  	       	DoMid		},
     { ccNone,		DoNull		},
     { ccNone,		DoOrg		},
     { ccNone,		DoOut		},

@@ -35,7 +35,7 @@
 
 #include "error.h"
 #include "expr.h"
-#include "scanner.h"
+#include "nexttok.h"
 #include "symtab.h"
 #include "condasm.h"
 
@@ -124,6 +124,7 @@ static void FreeIf (void)
        	IfDesc* D = GetCurrentIf();
        	if (D == 0) {
        	    Error (ERR_UNEXPECTED, ".ENDIF");
+	    Done = 1;
        	} else {
        	    Done = (D->Flags & ifNeedTerm) != 0;
             --IfCount;
@@ -402,7 +403,7 @@ void CheckOpenIfs (void)
 	    /* There are no open .IFs */
 	    break;
 	}
-	  
+
 	if (D->Pos.Name != CurPos.Name) {
 	    /* The .if is from another file, bail out */
 	    break;
@@ -410,6 +411,24 @@ void CheckOpenIfs (void)
 
        	/* Start of .if is in the file we're about to leave */
 	PError (&D->Pos, ERR_OPEN_IF);
+	FreeIf ();
+    }
+}
+
+
+
+unsigned GetIfStack (void)
+/* Get the current .IF stack pointer */
+{
+    return IfCount;
+}
+
+
+
+void CleanupIfStack (unsigned SP)
+/* Cleanup the .IF stack, remove anything above the given stack pointer */
+{
+    while (IfCount > SP) {
 	FreeIf ();
     }
 }

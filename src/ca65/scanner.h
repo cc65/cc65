@@ -168,6 +168,7 @@ enum Token {
     TOK_MACPACK,
     TOK_MACRO,
     TOK_MATCH,
+    TOK_MID,
     TOK_NULL,
     TOK_ORG,
     TOK_OUT,
@@ -230,26 +231,8 @@ void NewInputData (const char* Data, int Malloced);
 void UpcaseSVal (void);
 /* Make SVal upper case */
 
-void NextTok (void);
-/* Read the next token from the input stream */
-
-void Consume (enum Token Expected, unsigned ErrMsg);
-/* Consume Token, print an error if we don't find it */
-
-void ConsumeSep (void);
-/* Consume a separator token */
-
-void ConsumeLParen (void);
-/* Consume a left paren */
-
-void ConsumeRParen (void);
-/* Consume a right paren */
-
-void ConsumeComma (void);
-/* Consume a comma */
-
-void SkipUntilSep (void);
-/* Skip tokens until we reach a line separator */
+void NextRawTok (void);
+/* Read the next raw token from the input stream */
 
 int TokHasSVal (enum Token Tok);
 /* Return true if the given token has an attached SVal */

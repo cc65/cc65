@@ -39,11 +39,11 @@
 #include "global.h"
 #include "instr.h"
 #include "mem.h"
+#include "nexttok.h"
 #include "objcode.h"
 #include "objfile.h"
-#include "scanner.h"
 #include "symtab.h"
-#include "toknode.h"
+#include "toklist.h"
 #include "ulabel.h"
 #include "expr.h"
 

@@ -72,11 +72,13 @@ OBJS = 	condasm.obj	\
 	global.obj	\
 	incpath.obj	\
        	instr.obj	\
+	istack.obj	\
 	listing.obj	\
 	macpack.obj	\
 	macro.obj	\
 	main.obj	\
 	mem.obj		\
+	nexttok.obj	\
 	objcode.obj	\
 	objfile.obj	\
 	options.obj	\
@@ -84,7 +86,7 @@ OBJS = 	condasm.obj	\
 	scanner.obj	\
 	strexpr.obj	\
 	symtab.obj	\
-	toknode.obj	\
+	toklist.obj	\
 	ulabel.obj
 
 LIBS = ..\common\common.lib
@@ -116,11 +118,13 @@ FILE fragment.obj
 FILE global.obj
 FILE incpath.obj
 FILE instr.obj
+FILE istack.obj
 FILE listing.obj
 FILE macpack.obj
 FILE macro.obj
 FILE main.obj
 FILE mem.obj
+FILE nexttok.obj
 FILE objcode.obj
 FILE objfile.obj
 FILE options.obj
@@ -128,7 +132,7 @@ FILE pseudo.obj
 FILE scanner.obj
 FILE strexpr.obj
 FILE symtab.obj
-FILE toknode.obj
+FILE toklist.obj
 FILE ulabel.obj
 LIBRARY ..\common\common.lib
 |

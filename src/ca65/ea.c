@@ -36,7 +36,7 @@
 #include "error.h"
 #include "expr.h"
 #include "instr.h"
-#include "scanner.h"
+#include "nexttok.h"
 #include "ea.h"
 
 

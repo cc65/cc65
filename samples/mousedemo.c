@@ -1,6 +1,6 @@
 /*
  * Demo program for mouse usage. Will work for the C64/C128/Atari
- * 
+ *
  * Ullrich von Bassewitz, 13.09.2001
  *
  */
@@ -15,15 +15,18 @@
 
 
 
-#if defined(__C64__) || defined(__C128__)
+#if defined(__C64__) || defined(__C128__) || defined(__CBM510__)
 
-/* Address of data for sprite 1 */
+/* Address of data for sprite 0 */
 #if defined(__C64__)
-#  define SPRITE0_DATA    0x340
-#  define SPRITE0_PTR  	  0x7F8
+#  define SPRITE0_DATA    0x0340
+#  define SPRITE0_PTR  	  0x07F8
 #elif defined(__C128__)
-#  define SPRITE0_DATA    0xE00
-#  define SPRITE0_PTR     0x7F8
+#  define SPRITE0_DATA    0x0E00
+#  define SPRITE0_PTR     0x07F8
+#elif defined(__CBM510__)
+#  define SPRITE0_DATA    0xF800
+#  define SPRITE0_PTR     0xF7F8
 #endif
 
 /* The mouse sprite (an arrow) */
@@ -88,7 +91,7 @@ int main (void)
     cputsxy (0, 0, "d: debug   h: hide   q: quit   s: show  ");
     revers (0);
 
-#if defined(__C64__) || defined(__C128__)
+#if defined(__C64__) || defined(__C128__) || defined(__CBM510__)
     /* Copy the sprite data */
     memcpy ((void*) SPRITE0_DATA, MouseSprite, sizeof (MouseSprite));
 

@@ -866,7 +866,7 @@ static int Voice3 [] = {
 
 
 
-#ifdef __C64__
+#if defined(__C64__) || defined(__CBM510__)
 static unsigned long FreqTab [12] = {
 #ifndef NTSC
     /* PAL */
@@ -878,16 +878,12 @@ static unsigned long FreqTab [12] = {
     0x00BDAD, 0x00C8F4, 0x00D4E6, 0x00E18F, 0x00EEF9, 0x00FD2F,
 #endif
 };
-#endif
-
-#ifdef __C128__
+#elif defined(__C128__)
 static unsigned long FreqTab [12] = {
     0x00892B, 0x009153, 0x0099F7, 0x00A31E, 0x00ACD2, 0x00B718,
     0x00C1FD, 0x00CD85, 0x00D9BD, 0x00E6B0, 0x00F467, 0x0102F0,
 };
-#endif
-
-#ifdef __CBM610__
+#elif defined(__CBM610__)
 static unsigned long FreqTab [12] = {
     0x004495, 0x0048AA, 0x004CFB, 0x00518F, 0x005669, 0x005B8C,
     0x0060FE, 0x0066C3, 0x006CDE, 0x007358, 0x007A34, 0x008178,
@@ -1045,10 +1041,10 @@ static void DisplayTime (void)
 
 
 
-/* On the 610, the SID is in another bank (the system bank), so we cannot
+/* On the 510/610, the SID is in another bank (the system bank), so we cannot
  * just write to the memory space.
  */
-#ifdef __CBM610__
+#if defined(__CBM510__) || defined(__CBM610__)
 #  define outb(addr,val)	pokebsys ((unsigned)(addr), val)
 #  define outw(addr,val)	pokewsys ((unsigned)(addr), val)
 #else

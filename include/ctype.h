@@ -1,9 +1,35 @@
-/*
- * ctype.h
- *
- * Ullrich von Bassewitz, 03.06.1998
- *
- */
+/*****************************************************************************/
+/*                                                                           */
+/*				    ctype.h				     */
+/*                                                                           */
+/*			      Character handling			     */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
 
 
 
@@ -52,11 +78,8 @@ extern unsigned char _ctype[256];
 #define isspace(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$60"), __AX__)
 #define isupper(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$02"), __AX__)
 #define isxdigit(c) (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$08"), __AX__)
-
-#ifndef __STRICT_ANSI__
-/* cc65 and GNU extension */
 #define isblank(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$80"), __AX__)
-#endif
+
 
 
 #endif

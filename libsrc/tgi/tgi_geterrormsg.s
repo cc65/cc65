@@ -12,7 +12,7 @@
 .proc   _tgi_geterrormsg
 
         cmp     #TGI_ERR_COUNT
-        bcs     L1
+        bcc     L1
         lda     #TGI_ERR_COUNT          ; "Unknown error"
 L1:     tay
         ldx     #>msgtab

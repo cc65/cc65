@@ -18,7 +18,7 @@
 
 
 
-int _printf (struct outdesc* d, char* f, va_list ap)
+int _printf (struct outdesc* d, const char* f, va_list ap)
 {
     outfunc fout;    		/* Output function */
     unsigned char type;	      	/* variable argument type */
@@ -39,7 +39,7 @@ int _printf (struct outdesc* d, char* f, va_list ap)
     register char* s;          	/* work pointer to argument string */
 
     /* Remember the format string in a register variable for shorter code */
-    register char* format = f;
+    register const char* format = f;
 
     /* Remember the output function in a local variable for speed and size */
     fout = d->fout;

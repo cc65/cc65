@@ -30,7 +30,7 @@ struct outdesc {
 
 
 /* Internal formatting routine */
-int _printf (struct outdesc* d, char* format, va_list ap);
+int _printf (struct outdesc* d, const char* format, va_list ap);
 
 
 

@@ -7,7 +7,6 @@
 	.include "atari.inc"
 	.include "fd.inc"
 	.importzp tmp1,tmp2,tmp3,ptr4,sp
-	.import	subysp,addysp
 	.import fd_table,fd_index
 	.import fdt_to_fdi
 	.export	fdtoiocb

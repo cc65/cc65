@@ -1112,14 +1112,14 @@ static unsigned OptDecouple (CodeSeg* S)
 /*****************************************************************************/
 
 
-
+		
+#if 0
 static unsigned OptSize1 (CodeSeg* S)
 /* Do size optimization by calling special subroutines that preload registers.
  * This routine does not work standalone, it needs a following register load
  * removal pass.
  */
 {
-#if 0
     static const char* Func = {
 	"stax0sp",           /* staxysp, y = 0 */
 	"addeq0sp",
@@ -1194,7 +1194,6 @@ static unsigned OptSize1 (CodeSeg* S)
        	"tosumoda0",         /* tosumodax, x = 0 */
        	"tosxora0",          /* tosxorax, x = 0 */
     };
-#endif
 
     unsigned Changes = 0;
     unsigned I;
@@ -1221,6 +1220,7 @@ static unsigned OptSize1 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
+#endif
 
 
 
@@ -1386,7 +1386,7 @@ static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    0, 0, 0,
 static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    0, 0, 0, 0, 0 };
 static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",    	0, 0, 0, 0, 0 };
 static OptFunc DOptShift2      	= { OptShift2,       "OptShift2",    	0, 0, 0, 0, 0 };
-static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        0, 0, 0, 0, 0 };
+/*static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        0, 0, 0, 0, 0 };*/
 static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        0, 0, 0, 0, 0 };
 static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",  	0, 0, 0, 0, 0 };
 static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",    0, 0, 0, 0, 0 };
@@ -1437,7 +1437,7 @@ static OptFunc* OptFuncs[] = {
     &DOptRTSJumps,
     &DOptShift1,
     &DOptShift2,
-    &DOptSize1,
+    /*&DOptSize1,*/
     &DOptSize2,
     &DOptStackOps,
     &DOptStoreLoad,

@@ -6,17 +6,18 @@
 
  	.export		bnegeax
 	.import		return0, return1
-	.importzp	sreg
+	.importzp	sreg, tmp1
 
 bnegeax:
-	cmp	#0
-	bne	L1
-	cpx	#0
-	bne	L1
-       	lda 	sreg
-	bne	L1
-       	lda	sreg+1
-	bne	L1
-	jmp	return1
-L1:	jmp	return0
+	stx	tmp1
+	ldx	#0		; High byte of result
+	ora	tmp1
+	ora	sreg
+	ora	sreg+1
+	bne	@L0
+	lda	#1
+	rts
+
+@L0:	txa			; X is zero
+	rts
 

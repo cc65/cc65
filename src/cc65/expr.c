@@ -492,7 +492,6 @@ static void FunctionCall (ExprDesc* Expr)
 {
     FuncDesc*	  Func;	       	  /* Function descriptor */
     int           IsFuncPtr;      /* Flag */
-    int           StdFunc;        /* Standard function index */
     unsigned 	  ParamSize;	  /* Number of parameter bytes */
     CodeMark   	  Mark;
     int           PtrOffs = 0;    /* Offset of function pointer on stack */
@@ -538,12 +537,13 @@ static void FunctionCall (ExprDesc* Expr)
 	}
 
     /* Check for known standard functions and inline them */
-    } else if ((StdFunc = FindStdFunc ((const char*) Expr->Name)) >= 0) {
-
-	/* Inline this function */
-       	HandleStdFunc (StdFunc, Func, Expr);
-       	return;
-
+    } else if (Expr->Name != 0) {
+        int StdFunc = FindStdFunc ((const char*) Expr->Name);
+        if (StdFunc >= 0) {
+            /* Inline this function */
+            HandleStdFunc (StdFunc, Func, Expr);
+            return;
+        }
     }
 
     /* Parse the parameter list */

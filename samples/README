@@ -21,9 +21,9 @@ List of supplied sample programs:
 -----------------------------------------------------------------------------
 Name:           ascii
 Description:	Shows the ASCII (or ATASCII, PETSCII) codes of typed
-		characters. Written and contributed by Greg King 
+		characters. Written and contributed by Greg King
 		<gngking@erols.com>.
-Platforms:     	All platforms with conio or stdio (compile time 
+Platforms:     	All platforms with conio or stdio (compile time
 		configurable).
 
 -----------------------------------------------------------------------------
@@ -31,6 +31,13 @@ Name:           fire
 Description:	Another graphics demo written by groepaz/hitmen.
 Platforms:     	The program is currently only running on the C64, but should
 		be portable to the C128 and CBM510 (and maybe more machines).
+
+-----------------------------------------------------------------------------
+Name:           gunzip65
+Description:	A gunzip utility for 6502 based machines written by Piotr
+                Fusik <fox@scene.pl>.
+Platforms:     	Runs on all platforms with file I/O (currently the Atari and
+                most Commodore machines).
 
 -----------------------------------------------------------------------------
 Name:	        hello

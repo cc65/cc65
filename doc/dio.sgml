@@ -1,0 +1,110 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>Diskette Sector I/O Routines
+<author>Christian Groessler, <htmlurl url="mailto:cpg@aladdin.de" name="cpg@aladdin.de">
+<date>21.11.2000
+
+<abstract>
+The cc65 library provides functions to read and write raw disk sectors.
+Include the dio.h header file to get the necessary definitions.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Opening the disk for low level I/O<p>
+
+Prior to using these functions a handle to the drive has to be obtained. This
+is done with the <tt>dio_open</tt> function. After use, the handle should be
+released with the <tt>dio_close</tt> function.
+
+<tscreen><verb>
+    dhandle_t __fastcall__ dio_open (driveid_t drive_id);
+</verb></tscreen>
+
+The <tt>drive_id</tt> specifies the drive to access, with 0 being the first
+disk drive, 1 the second, and so on.
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_close (dhandle_t handle);
+</verb></tscreen>
+
+Closes a handle obtained by <tt>dio_open</tt>. Returns status code.
+<p>
+
+<sect>Reading and writing sectors<p>
+
+The read and write functions are:
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_read (dhandle_t handle,
+    					 sectnum_t sect_num,
+                                         void *buffer);
+</verb></tscreen>
+
+This function will read the sector specified by sect_num into the memory
+location at buffer.
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_write (dhandle_t handle,
+    					  sectnum_t sect_num,
+                                          const void *buffer);
+</verb></tscreen>
+
+This function will write the memory contents at buffer to the sector specified
+by <tt>sect_num</tt>. No verify is performed.
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_write_verify (dhandle_t handle,
+    						 sectnum_t sect_num,
+                                             	 const void *buffer);
+</verb></tscreen>
+
+This function will write the memory contents at buffer to the sector specified
+by <tt>sect_num</tt>. A verification is performed.
+<p>
+
+All these functions will return 0 for success and an OS specific error code in
+case of failure.
+<p>
+
+
+<sect>Converting sector numbers<p>
+
+Since the read and write functions expect a sector number, for systems where
+the sectors aren't addressed by a logical sector number (e.g. CBM drives),
+there are 2 conversion functions. One of them converts a logical sector number
+to a head/track/sector triple. The other conversion function works the other
+way round.
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_phys_to_log (dhandle_t handle,
+                                                const dio_phys_pos *physpos,
+                                                sectnum_t *sectnum);
+</verb></tscreen>
+
+This function converts track/head/sector to logical sector number.
+
+<tscreen><verb>
+    unsigned char __fastcall__ dio_log_to_phys(_dhandle_t handle,
+                                                const _sectnum_t *sectnum,
+                                                dio_phys_pos *physpos);
+</verb></tscreen>
+
+This function converts a logical sector number to track/head/sector notation.
+<p>
+
+Note, that on systems which natively use logical sector numbers (e.g. Atari),
+the conversion functions are dummies. They ignore head/track
+(<tt>dio_phys_to_log</tt>) or return them as zero (<tt>dio_log_to_phys</tt>).
+The logical sector number is returned as physical sector and vice versa.
+<p>
+
+
+</article>
+
+
+								       

@@ -85,6 +85,7 @@ _mouse_install:
         sty     tmp1
 
 @L2:    jsr     copycb
+        ldy     tmp1
         jsr     copycb
         dec     tmp2                    ; Skip opcode byte
         ldy     tmp1

@@ -1037,6 +1037,19 @@ static void DoUnexpected (void)
 
 
 
+static void DoWarning (void)
+/* User warning */
+{
+    if (Tok != TOK_STRCON) {
+ 	ErrorSkip (ERR_STRCON_EXPECTED);
+    } else {
+       	Error (WARN_USER, SVal);
+	SkipUntilSep ();
+    }
+}
+
+
+
 static void DoWord (void)
 /* Define words */
 {
@@ -1167,6 +1180,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoUnexpected	},	/* .STRLEN */
     { ccNone,		DoSunPlus	},
     { ccNone,		DoUnexpected	},	/* .TCOUNT */
+    { ccNone,		DoWarning	},
     { ccNone,       	DoWord		},
     { ccNone,  	       	DoUnexpected	},	/* .XMATCH */
     { ccNone,       	DoZeropage	},

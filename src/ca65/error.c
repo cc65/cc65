@@ -83,6 +83,7 @@ void WarningMsg (const FilePos* Pos, unsigned WarnNum, va_list ap)
        	{   2,  "Symbol `%s' is defined but never used" 	},
         {   2,  "Symbol `%s' is imported but never used"	},
 	{   1,  "Cannot track processor status byte"		},
+       	{   0,	"User warning: %s"				},
     };
 
     if (Warnings [WarnNum-1].Level <= WarnLevel) {

@@ -60,6 +60,7 @@
 
 /* Tokens for the #pragmas */
 typedef enum {
+    PR_ILLEGAL = -1,
     PR_BSSSEG,
     PR_CHARMAP,
     PR_CHECKSTACK,
@@ -69,15 +70,15 @@ typedef enum {
     PR_RODATASEG,
     PR_SIGNEDCHARS,
     PR_STATICLOCALS,
-    PR_ZPSYM,
-    PR_ILLEGAL
+    PR_ZPSYM,	    
+    PR_COUNT
 } pragma_t;
 
 /* Pragma table */
 static const struct Pragma {
     const char*	Key;		/* Keyword */
     pragma_t   	Tok;		/* Token */
-} Pragmas[] = {
+} Pragmas[PR_COUNT] = {
     { 	"bssseg",       PR_BSSSEG	},
     {   "charmap",      PR_CHARMAP      },
     {	"checkstack",	PR_CHECKSTACK	},
@@ -89,9 +90,6 @@ static const struct Pragma {
     {	"staticlocals",	PR_STATICLOCALS	},
     {   "zpsym",       	PR_ZPSYM  	},
 };
-
-/* Number of pragmas */
-#define PRAGMA_COUNT	(sizeof(Pragmas) / sizeof(Pragmas[0]))
 
 
 
@@ -115,7 +113,7 @@ static pragma_t FindPragma (const char* Key)
  */
 {
     struct Pragma* P;
-    P = bsearch (Key, Pragmas, PRAGMA_COUNT, sizeof (Pragmas[0]), CmpKey);
+    P = bsearch (Key, Pragmas, PR_COUNT, sizeof (Pragmas[0]), CmpKey);
     return P? P->Tok : PR_ILLEGAL;
 }
 

@@ -1282,9 +1282,21 @@ void CS_Output (const CodeSeg* S, FILE* F)
 	    /* Line info has changed, remember the new line info */
 	    LI = E->LI;
 
-	    /* Add the source line as a comment */
+	    /* Add the source line as a comment. Beware: When line continuation
+             * was used, the line may contain newlines.
+             */
 	    if (AddSource) {
-	       	fprintf (F, ";\n; %s\n;\n", LI->Line);
+                const char* L = LI->Line;
+                fputs (";\n; ", F);
+                while (*L) {
+                    if (*L == '\n') {
+                        fputs ("\n; ", F);
+                    } else {
+                        fputc (*L, F);
+                    }
+                    ++L;
+                }
+                fputs ("\n;\n", F);
 	    }
 
 	    /* Add line debug info */

@@ -158,37 +158,11 @@ transfer:
         sei
         sta     ENABLE_RAM
 
+	.repeat	8
         lda	(ptr1),y
         sta	(ptr2),y
         iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
+	.endrepeat
 
         sta     ENABLE_ROM
         cli

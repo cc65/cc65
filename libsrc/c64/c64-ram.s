@@ -147,37 +147,11 @@ transfer:
 
 ; Unroll the following loop
 
-loop:   lda	(ptr1),y
+loop:	.repeat	8
+	lda	(ptr1),y
         sta	(ptr2),y
         iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
-
-        lda	(ptr1),y
-        sta	(ptr2),y
-        iny
+	.endrepeat
 
         bne     loop
 

@@ -80,7 +80,7 @@ development:
 
 
 <sect1>Command line option overview<p>
-
+ 
 The assembler accepts the following options:
 
 <tscreen><verb>
@@ -924,7 +924,7 @@ Possible address sizes are:
 <item>Absolute (16 bits)
 <item>Far (24 bits)
 <item>Long (32 bits)
-<itemize>
+</itemize>
 
 Since the assembler uses default address sizes for the segments and symbols,
 it is usually not necessary to override the default behaviour. In cases, where
@@ -935,7 +935,7 @@ it is necessary, the following keywords may be used to specify address sizes:
 <item>ABSOLUTE, ABS or NEAR for absolute addressing (16 bits).
 <item>FAR for far addressing (24 bits).
 <item>LONG or DWORD for long addressing (32 bits).
-<itemize>
+</itemize>
 
 
 <sect1>Address sizes of segments<p>

@@ -47,7 +47,7 @@
 #define O_APPEND        0x40
 
 
-/* types */
+/* Types */
 typedef long int off_t;
 
 

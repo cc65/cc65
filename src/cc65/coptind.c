@@ -96,6 +96,10 @@ static short ZPRegVal (unsigned short Use, const RegContents* RC)
 {
     if ((Use & REG_TMP1) != 0) {
     	return RC->Tmp1;
+    } else if ((Use & REG_PTR1_LO) != 0) {
+    	return RC->Ptr1Lo;
+    } else if ((Use & REG_PTR1_HI) != 0) {
+    	return RC->Ptr1Hi;
     } else if ((Use & REG_SREG_LO) != 0) {
     	return RC->SRegLo;
     } else if ((Use & REG_SREG_HI) != 0) {
@@ -1102,7 +1106,7 @@ unsigned OptTransfers1 (CodeSeg* S)
 		}
                 if (CE_UseLoadFlags (X)) {
 	 	    if (I == 0) {
-			/* No preceeding entry */
+		   	/* No preceeding entry */
 			goto NextEntry;
 		    }
 		    P = CS_GetEntry (S, I-1);
@@ -1308,66 +1312,28 @@ unsigned OptPrecalc (CodeSeg* S)
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
-       	/* Get a pointer to the input registers of the insn */
-	const RegContents* In  = &E->RI->In;
+       	/* Get a pointer to the output registers of the insn */
+       	const RegContents* Out = &E->RI->Out;
 
-        /* Maybe we can handle it better if the contents of A are known */
-        if (RegValIsKnown (In->RegA)) {
+        /* Handle the different instructions */
+        switch (E->OPC) {
 
-            const char* Arg = 0;
+            case OP65_AND:
+            case OP65_EOR:
+            case OP65_ORA:
+                if (RegValIsKnown (Out->RegA)) {
+                    /* Accu AND zp with known contents */
+                    const char* Arg = MakeHexArg (Out->RegA);
+                    CodeEntry* X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+                    CS_InsertEntry (S, X, I+1);
+                    CS_DelEntry (S, I);
+                    ++Changes;
+                }
+                break;
 
-            /* Handle the different instructions */
-            switch (E->OPC) {
+            default:
+                break;
 
-                case OP65_AND:
-                    if (CE_KnownImm (E)) {
-                        /* Accu AND immediate */
-                        Arg = MakeHexArg (In->RegA & E->Num);
-                    } else if (E->AM == AM65_ZP) {
-                        int R = ZPRegVal (E->Use, In);
-                        if (RegValIsKnown (R)) {
-                            /* Accu AND zp with known contents */
-                            Arg = MakeHexArg (In->RegA & R);
-                        }
-                    }
-                    break;
-
-                case OP65_EOR:
-                    if (CE_KnownImm (E)) {
-                        Arg = MakeHexArg (In->RegA ^ E->Num);
-                    } else if (E->AM == AM65_ZP) {
-                        int R = ZPRegVal (E->Use, In);
-                        if (RegValIsKnown (R)) {
-                            /* Accu EOR zp with known contents */
-                            Arg = MakeHexArg (In->RegA ^ R);
-                        }
-                    }
-                    break;
-
-                case OP65_ORA:
-                    if (CE_KnownImm (E)) {
-                        Arg = MakeHexArg (In->RegA | E->Num);
-                    } else if (E->AM == AM65_ZP) {
-                        int R = ZPRegVal (E->Use, In);
-                        if (RegValIsKnown (R)) {
-                            /* Accu ORA zp with known contents */
-                            Arg = MakeHexArg (In->RegA | R);
-                        }
-                    }
-                    break;
-
-                default:
-                    break;
-
-            }
-
-            /* If we have a new entry, replace the old one */
-            if (Arg) {
-                CodeEntry* X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
-                CS_InsertEntry (S, X, I+1);
-                CS_DelEntry (S, I);
-                ++Changes;
-            }
         }
 
 	/* Next entry */

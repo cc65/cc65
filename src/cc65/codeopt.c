@@ -1308,39 +1308,63 @@ static unsigned OptDecouple (CodeSeg* S)
 	/* Check the instruction */
 	switch (E->OPC) {
 
+	    case OP65_DEA:
+	        if (RegValIsKnown (In->RegA)) {
+	      	    Arg = MakeHexArg ((In->RegA - 1) & 0xFF);
+	      	    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+	    	}
+	        break;
+
 	    case OP65_DEX:
-	        if (E->RI->In.RegX >= 0) {
-	      	    Arg = MakeHexArg ((E->RI->In.RegX - 1) & 0xFF);
+	        if (RegValIsKnown (In->RegX)) {
+	      	    Arg = MakeHexArg ((In->RegX - 1) & 0xFF);
 	      	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
 	    case OP65_DEY:
-	        if (E->RI->In.RegY >= 0) {
-	      	    Arg = MakeHexArg ((E->RI->In.RegY - 1) & 0xFF);
+	        if (RegValIsKnown (In->RegY)) {
+	      	    Arg = MakeHexArg ((In->RegY - 1) & 0xFF);
 	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
+	    case OP65_INA:
+	        if (RegValIsKnown (In->RegA)) {
+	      	    Arg = MakeHexArg ((In->RegA + 1) & 0xFF);
+	      	    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+	    	}
+	        break;
+
 	    case OP65_INX:
-	        if (E->RI->In.RegX >= 0) {
-	      	    Arg = MakeHexArg ((E->RI->In.RegX + 1) & 0xFF);
+	        if (RegValIsKnown (In->RegX)) {
+	      	    Arg = MakeHexArg ((In->RegX + 1) & 0xFF);
 	      	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
 	    case OP65_INY:
-	        if (E->RI->In.RegY >= 0) {
-	      	    Arg = MakeHexArg ((E->RI->In.RegY + 1) & 0xFF);
+	        if (RegValIsKnown (In->RegY)) {
+	      	    Arg = MakeHexArg ((In->RegY + 1) & 0xFF);
 	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
 	    case OP65_LDA:
 	        if (E->AM == AM65_ZP) {
-		    switch (GetKnownReg (E->Use, In)) {
+		    switch (GetKnownReg (E->Use & REG_ZP, In)) {
 			case REG_TMP1:
 			    Arg = MakeHexArg (In->Tmp1);
+			    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_PTR1_LO:
+			    Arg = MakeHexArg (In->Ptr1Lo);
+			    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_PTR1_HI:
+			    Arg = MakeHexArg (In->Ptr1Hi);
 			    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
 			    break;
 
@@ -1359,9 +1383,19 @@ static unsigned OptDecouple (CodeSeg* S)
 
 	    case OP65_LDX:
 	        if (E->AM == AM65_ZP) {
-		    switch (GetKnownReg (E->Use, In)) {
+		    switch (GetKnownReg (E->Use & REG_ZP, In)) {
 			case REG_TMP1:
 			    Arg = MakeHexArg (In->Tmp1);
+			    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_PTR1_LO:
+			    Arg = MakeHexArg (In->Ptr1Lo);
+			    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_PTR1_HI:
+			    Arg = MakeHexArg (In->Ptr1Hi);
 			    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, E->LI);
 			    break;
 
@@ -1383,6 +1417,16 @@ static unsigned OptDecouple (CodeSeg* S)
 		    switch (GetKnownReg (E->Use, In)) {
 			case REG_TMP1:
 			    Arg = MakeHexArg (In->Tmp1);
+			    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_PTR1_LO:
+			    Arg = MakeHexArg (In->Ptr1Lo);
+			    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_PTR1_HI:
+			    Arg = MakeHexArg (In->Ptr1Hi);
 			    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
 			    break;
 
@@ -1784,7 +1828,7 @@ static void WriteOptStats (const char* Name)
     /* Write a header */
     fprintf (F,
 	     "; Optimizer               Total      Last       Total      Last\n"
-       	     ";   Step                  Runs       Runs        Chg       Chg\n");        
+       	     ";   Step                  Runs       Runs        Chg       Chg\n");
 
 
     /* Write the data */
@@ -1850,7 +1894,6 @@ static unsigned RunOptGroup1 (CodeSeg* S)
 
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
     Changes += RunOptFunc (S, &DOptPtrStore2, 1);
-    Changes += RunOptFunc (S, &DOptPrecalc, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad1, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad2, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad3, 1);
@@ -1938,6 +1981,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptStoreLoad, 1);
        	C += RunOptFunc (S, &DOptTransfers1, 1);
         C += RunOptFunc (S, &DOptPushPop, 1);
+        C += RunOptFunc (S, &DOptPrecalc, 1);
 
 	Changes += C;
 

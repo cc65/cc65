@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -55,6 +55,8 @@ void RC_Invalidate (RegContents* C)
     C->RegY   = UNKNOWN_REGVAL;
     C->SRegLo = UNKNOWN_REGVAL;
     C->SRegHi = UNKNOWN_REGVAL;
+    C->Ptr1Lo = UNKNOWN_REGVAL;
+    C->Ptr1Hi = UNKNOWN_REGVAL;
     C->Tmp1   = UNKNOWN_REGVAL;
 }
 
@@ -65,7 +67,37 @@ void RC_InvalidateZP (RegContents* C)
 {
     C->SRegLo = UNKNOWN_REGVAL;
     C->SRegHi = UNKNOWN_REGVAL;
+    C->Ptr1Lo = UNKNOWN_REGVAL;
+    C->Ptr1Hi = UNKNOWN_REGVAL;
     C->Tmp1   = UNKNOWN_REGVAL;
+}
+
+
+
+static void RC_Dump1 (FILE* F, const char* Desc, short Val)
+/* Dump one register value */
+{
+    if (RegValIsKnown (Val)) {
+        fprintf (F, "%s=$%02X ", Desc, Val);
+    } else {
+        fprintf (F, "%s=$XX ", Desc);
+    }
+}
+
+
+
+void RC_Dump (FILE* F, const RegContents* RC)
+/* Dump the contents of the given RegContents struct */
+{
+    RC_Dump1 (F, "A", RC->RegA);
+    RC_Dump1 (F, "X", RC->RegX);
+    RC_Dump1 (F, "Y", RC->RegY);
+    RC_Dump1 (F, "SREG", RC->SRegLo);
+    RC_Dump1 (F, "SREG+1", RC->SRegHi);
+    RC_Dump1 (F, "PTR1", RC->Ptr1Lo);
+    RC_Dump1 (F, "PTR1+1", RC->Ptr1Hi);
+    RC_Dump1 (F, "TMP1", RC->Tmp1);
+    fprintf (F, "\n");
 }
 
 
@@ -101,7 +133,6 @@ void FreeRegInfo (RegInfo* RI)
 {
     xfree (RI);
 }
-
 
 
 

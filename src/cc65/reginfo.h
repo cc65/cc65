@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   reginfo.h                                 */
+/*		       		   reginfo.h                                 */
 /*                                                                           */
-/*			  6502 register tracking info                        */
+/*		       	  6502 register tracking info                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002  Ullrich von Bassewitz                                      */
-/*                Wacholderweg 14                                            */
-/*                D-70597 Stuttgart                                          */
-/* EMail:         uz@cc65.org                                                */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,6 +38,8 @@
 
 
 
+#include <stdio.h>      /* ### */
+
 /* common */
 #include "inline.h"
 
@@ -60,6 +62,8 @@ struct RegContents {
     short       RegY;
     short       SRegLo;
     short       SRegHi;
+    short       Ptr1Lo;
+    short       Ptr1Hi;
     short	Tmp1;
 };
 
@@ -84,6 +88,9 @@ void RC_Invalidate (RegContents* C);
 
 void RC_InvalidateZP (RegContents* C);
 /* Invalidate all ZP registers */
+
+void RC_Dump (FILE* F, const RegContents* RC);
+/* Dump the contents of the given RegContents struct */
 
 #if defined(HAVE_INLINE)
 INLINE int RegValIsKnown (short Val)
@@ -113,8 +120,6 @@ RegInfo* NewRegInfo (const RegContents* RC);
 
 void FreeRegInfo (RegInfo* RI);
 /* Free a RegInfo struct */
-
-
 
 
 

@@ -616,6 +616,10 @@ unsigned GetKnownReg (unsigned Use, const RegContents* RC)
 	return (RC == 0 || RC->RegY >= 0)? REG_Y : REG_NONE;
     } else if ((Use & REG_TMP1) != 0) {
 	return (RC == 0 || RC->Tmp1 >= 0)? REG_TMP1 : REG_NONE;
+    } else if ((Use & REG_PTR1_LO) != 0) {
+	return (RC == 0 || RC->Ptr1Lo >= 0)? REG_PTR1_LO : REG_NONE;
+    } else if ((Use & REG_PTR1_HI) != 0) {
+	return (RC == 0 || RC->Ptr1Hi >= 0)? REG_PTR1_HI : REG_NONE;
     } else if ((Use & REG_SREG_LO) != 0) {
 	return (RC == 0 || RC->SRegLo >= 0)? REG_SREG_LO : REG_NONE;
     } else if ((Use & REG_SREG_HI) != 0) {
@@ -625,7 +629,7 @@ unsigned GetKnownReg (unsigned Use, const RegContents* RC)
     }
 }
 
-
+                              
 
 static cmp_t FindCmpCond (const char* Code, unsigned CodeLen)
 /* Search for a compare condition by the given code using the given length */

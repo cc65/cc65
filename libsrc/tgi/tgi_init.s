@@ -1,8 +1,8 @@
 ;
 ; Ullrich von Bassewitz, 21.06.2002
 ;
-; void __fastcall__ tgi_init (unsigned char mode);
-; /* Initialize the given graphics mode. */
+; void __fastcall__ tgi_init (void);
+; /* Initialize the already loaded graphics driver */
 
 
         .include        "tgi-kernel.inc"
@@ -14,15 +14,14 @@
         .export         _tgi_init
 
 _tgi_init:
-        pha                             ; Save mode
         jsr     _tgi_done               ; Switch off graphics if needed
-        pla
-        sta     _tgi_mode               ; Remember the mode
         jsr     tgi_init                ; Go into graphics mode
         jsr     tgi_geterror            ; Get the error code
         sta     _tgi_error              ; Save for later reference
         cmp     #TGI_ERR_OK
         bne     @L9                     ; Jump on error
+
+        inc     _tgi_gmode              ; Remember that graph mode is active
 
 ; Do driver initialization. First set the default palette.
 
@@ -56,7 +55,5 @@ _tgi_init:
 
 ; Error exit
 
-@L9:    lda     #$00
-        sta     _tgi_mode               ; Clear the mode if init was not successful
-        rts
+@L9:    rts
 

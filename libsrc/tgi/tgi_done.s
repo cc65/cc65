@@ -10,14 +10,14 @@
         .export         _tgi_done
 
 _tgi_done:
-        lda     _tgi_mode               ; Is a graphics mode active?
+        lda     _tgi_gmode              ; Is a graphics mode active?
         beq     @L1                     ; Jump if not
         jsr     tgi_done                ; Call the driver routine
         jsr     tgi_geterror            ; Get the error code
         sta     _tgi_error              ; Save it for reference
         cmp     #TGI_ERR_OK
         bne     @L1                     ; Jump if we had an error
-        sta     _tgi_mode               ; Reset the current mode (A = 0)
+        sta     _tgi_gmode              ; Reset the graph mode flag (A = 0)
 @L1:    rts
 
 

@@ -18,7 +18,7 @@
 
 _tgi_drv:      	    .res    2		; Pointer to driver
 _tgi_error:    	    .res    1		; Last error code
-_tgi_mode:          .res    1           ; Graphics mode or zero
+_tgi_gmode:         .res    1           ; Flag: Graphics mode active
 _tgi_curx:          .res    2           ; Current drawing cursor X
 _tgi_cury:          .res    2           ; Current drawing cursor Y
 _tgi_color:         .res    1           ; Current drawing color

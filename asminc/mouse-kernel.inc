@@ -52,10 +52,10 @@
 ; The driver header
 
 .struct	MOUSE_HDR
-	ID   	.byte	3	; Contains 0x6D, 0x6F, 0x75 ("mou")
-	VERSION .byte	1	; Interface version
-	JUMPTAB .struct
-	    INSTALL	.addr
+	ID   	        .byte  	3       ; Contains 0x6D, 0x6F, 0x75 ("mou")
+	VERSION         .byte  	1      	; Interface version
+	JUMPTAB         .struct
+	    INSTALL  	.addr
 	    UNINSTALL	.addr
        	    HIDE        .addr
 	    SHOW        .addr
@@ -65,8 +65,18 @@
 	    POS         .addr
             INFO        .addr
             IOCTL       .addr
-	    IRQ		.addr
+	    IRQ	     	.addr
 	.endstruct
+        XPOS            .word           ; Mouse X position
+        YPOS            .word           ; Mouse Y position
+        CALLBACKS .struct               ; Jump instructions
+                        .byte           ; JMP opcode
+            CHIDE       .addr           ; Jump address
+                        .byte
+            CSHOW       .addr
+                        .byte
+            CMOVE       .addr
+        .endstruct
 .endstruct
 
 ;------------------------------------------------------------------------------
@@ -97,7 +107,8 @@ MOUSE_BTN_RIGHT         = $01
 ;------------------------------------------------------------------------------
 ; Variables
 
-       	.global	_mouse_drv                      ; Pointer to driver
+       	.global	_mouse_drv              ; Pointer to driver
+        .global _mouse_hidden           ; Counter, 0 = mouse is visible
 
 ;------------------------------------------------------------------------------
 ; C callable functions
@@ -113,7 +124,7 @@ MOUSE_BTN_RIGHT         = $01
         .global _mouse_move
         .global _mouse_buttons
         .global _mouse_pos
-        .global _mouse_info   
+        .global _mouse_info
         .global _mouse_ioctl
 
 ;------------------------------------------------------------------------------
@@ -127,7 +138,7 @@ MOUSE_BTN_RIGHT         = $01
         .global mouse_move
         .global mouse_buttons
         .global mouse_pos
-        .global mouse_info  
+        .global mouse_info
         .global mouse_ioctl
 
 

@@ -34,6 +34,7 @@
 
 
 #include <string.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <modload.h>
 #include <em.h>

@@ -20,7 +20,7 @@ size_t fread (void* buf, size_t size, size_t count, FILE* f)
     /* Is the file open? */
     if ((f->f_flags & _FOPEN) == 0) {
        	_errno = EINVAL;     	    	/* File not open */
-     	return (size_t) -1;
+     	return 0;
     }
 
     /* Did we have an error or EOF? */
@@ -33,21 +33,26 @@ size_t fread (void* buf, size_t size, size_t count, FILE* f)
     bytes = size * count;
 
     if (bytes) {
+
 	/* Read the data. */
 	bytes = read (f->f_fd, buf, bytes);
-	if (bytes == -1) {
-	    /* Read error */
-	    f->f_flags |= _FERROR;
-	    return (size_t) -1;
-	}
-	if (bytes == 0) {
-	    /* End of file */
-	    f->f_flags |= _FEOF;
-	    return (size_t) -1;
-	}
 
-        /* Unfortunately, we cannot avoid the divide here... */
-        return bytes / size;
+        switch (bytes) {
+
+            case -1:
+                /* Read error */
+                f->f_flags |= _FERROR;
+                return 0;
+
+            case 0:
+                /* End of file */
+                f->f_flags |= _FEOF;
+                /* FALLTHROUGH */
+
+            default:
+                /* Unfortunately, we cannot avoid the divide here... */
+                return bytes / size;
+        }
 
     } else {
 

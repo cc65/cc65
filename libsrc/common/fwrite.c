@@ -20,7 +20,7 @@ size_t fwrite (const void* buf, size_t size, size_t count, FILE* f)
     /* Is the file open? */
     if ((f->f_flags & _FOPEN) == 0) {
        	_errno = EINVAL;	   	/* File not open */
-    	return -1;
+    	return 0;
     }
 
     /* Did we have an error */
@@ -37,7 +37,7 @@ size_t fwrite (const void* buf, size_t size, size_t count, FILE* f)
        	if (write (f->f_fd, buf, bytes) == -1) {
 	    /* Write error */
 	    f->f_flags |= _FERROR;
-	    return -1;
+	    return 0;
 	}
     }
 

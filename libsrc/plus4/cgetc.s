@@ -11,7 +11,7 @@
 
 ; --------------------------------------------------------------------------
 
-.segment        "LOWMEM"        ; Accesses the ROM - must go into low mem
+.segment        "LOWCODE"       ; Accesses the ROM - must go into low mem
 
 _cgetc:	lda	KEY_COUNT 	; Get number of characters
        	ora	FKEY_COUNT	; Or with number of function key chars
@@ -73,7 +73,7 @@ L2:    	sta     ENABLE_ROM      ; Bank in the ROM
 .endproc
 
 
-.segment        "LOWMEM"        ; Accesses the ROM - must go into low mem
+.segment        "LOWCODE"       ; Accesses the ROM - must go into low mem
 
 .proc	donekbd
 

@@ -33,12 +33,13 @@ OBJS =	_scrsize.o	\
         klisten.o       \
         kload.o         \
         kopen.o         \
+        kplot.o         \
         krdtim.o        \
         kreadst.o       \
         ksave.o         \
         ksetlfs.o       \
         ksetnam.o       \
-        ksettim.s       \
+        ksettim.o       \
         ktalk.o         \
         kunlsn.o        \
         kuntlk.o        \

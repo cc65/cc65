@@ -5,21 +5,10 @@
 ;
 
 	.export		xsize, ysize
-        .import         SCREEN
-	.constructor	initscrsize
 
+.data             
 
-.code
-
-initscrsize:
-   	jsr	SCREEN
-   	stx	xsize
-   	sty	ysize
-	rts
-
-.bss
-
-xsize: 	.res	1
-ysize:	.res	1
+xsize: 	.byte   40
+ysize:	.byte   25
 
 

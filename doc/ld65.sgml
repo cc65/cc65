@@ -344,6 +344,7 @@ specify a segment attribute. There are five possible segment attributes:
 	rw   	means read/write
 	bss  	means that this is an uninitialized segment
 	empty	will not go in any output file
+	zp	a zeropage segment
 </verb></tscreen>
 
 So, because we specified that the segment with the name BSS is of type bss,

@@ -309,7 +309,22 @@ static void ExpandMacroArgs (Macro* M)
  	    Replacement = FindMacroArg (M, Ident);
        	    if (Replacement) {
      	    	keepch ('\"');
-     	    	keepstr (Replacement);
+                /* We have to escape any characters inside replacement that
+                 * may not be part of a string unescaped.
+                 */
+                while (*Replacement) {
+                    switch (*Replacement) {
+                        case '\"':
+                        case '\\':
+                        case '\'':
+                            keepch ('\\');
+                        /* FALLTHROUGH */
+                        default:
+                            keepch (*Replacement);
+                            break;
+                    }
+                    ++Replacement;
+                }
      	    	keepch ('\"');
      	    } else {
      	    	keepch ('#');

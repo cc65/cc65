@@ -110,8 +110,8 @@ compiling them into assembler.  Therefore if you have a C function named
 Systems:
 --------
 
-Supported systems at this time are: C64, C128, Plus/4, CBM 500, CBM 600/700, 
-the newer PET machines (not 2001), Atari 8bit, and the Apple ][ (thanks to 
+Supported systems at this time are: C64, C128, Plus/4, CBM 500, CBM 600/700,
+the newer PET machines (not 2001), Atari 8bit, and the Apple ][ (thanks to
 Kevin Ruland, who did the port).
 
 C64:  	The program runs in a memory configuration, where only the kernal ROM
@@ -128,10 +128,10 @@ Plus/4:	Unfortunately, the Plus/4 is not able to disable only part of it's
       	free memory is reduced to 12K).
 
 CBM 500:
-    	The C program runs in bank #0 and has about 61K memory available. The
-	memory available on the CBM5x0 is slightly less than that available
-	on its bigger brothers (CBM 600/700) because the video ram is also
-	placed into bank #0 to allow sprites.
+    	The C program runs in bank #0 and has a total of 48K memory available. 
+	This is less than what is available on its bigger brothers (CBM 
+	600/700) because the character data and video RAM is placed in the
+	execution bank (#0) to allow the use of sprites.
 
 CBM 600/700:
       	The C program runs in a separate segment and has almost full 64K of

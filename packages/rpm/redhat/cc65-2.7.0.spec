@@ -19,6 +19,7 @@ Source: ftp://ftp.musoftware.de/uz/cc65/cc65-sources-%{version}.tar.gz
 Vendor: MU Softwareentwicklung
 Packager: Ullrich von Bassewitz <uz@musoftware.de>
 %ifos linux
+BuildRequires: perl
 BuildRequires: sgml-tools
 %endif
 BuildRoot: /var/tmp/%{name}-%{version}
@@ -174,7 +175,7 @@ Group: Development/Languages
 
 %description cbm510
 This package contains the header files and libraries needed to write
-programs for the Commodore CBM 510 (aka P500) using the cc65 
+programs for the Commodore CBM 510 (aka P500) using the cc65
 crosscompiler.
 
 %files cbm510

@@ -33,13 +33,17 @@
 
 
 
+#include <string.h>
+
 /* common */
+#include "abend.h"
 #include "print.h"
 
 /* cc65 */
 #include "asmlabel.h"
 #include "codeent.h"
 #include "codeinfo.h"
+#include "error.h"
 #include "global.h"
 #include "codeopt.h"
 
@@ -56,10 +60,67 @@
  */
 static unsigned OptChanges;
 
+/* Defines for the conditions in a compare */
+typedef enum {
+    CMP_INV = -1,
+    CMP_EQ,
+    CMP_NE,
+    CMP_GT,
+    CMP_GE,
+    CMP_LT,
+    CMP_LE,
+    CMP_UGT,
+    CMP_UGE,
+    CMP_ULT,
+    CMP_ULE
+} cmp_t;
+
+/* Table with the compare suffixes */
+static const char CmpSuffixTab [][4] = {
+    "eq", "ne", "gt", "ge", "lt", "le", "ugt", "uge", "ult", "ule"
+};
+
+/* Table used to invert a condition, indexed by condition */
+static const unsigned char CmpInvertTab [] = {
+    CMP_NE, CMP_EQ,
+    CMP_LE, CMP_LT, CMP_GE, CMP_GT,
+    CMP_ULE, CMP_ULT, CMP_UGE, CMP_UGT
+};
+
+/* Table to show which compares are signed (use the N flag) */
+static const char CmpSignedTab [] = {
+    0, 0, 1, 1, 1, 1, 0, 0, 0, 0
+};
+
 
 
 /*****************************************************************************/
-/*		  	       Remove dead jumps			     */
+/*	     	 	       Helper functions				     */
+/*****************************************************************************/
+
+
+
+static cmp_t FindCmpCond (const char* Suffix)
+/* Map a condition suffix to a code. Return the code or CMP_INV on failure */
+{
+    int I;
+
+    /* Linear search */
+    for (I = 0; I < sizeof (CmpSuffixTab) / sizeof (CmpSuffixTab [0]); ++I) {
+       	if (strcmp (Suffix, CmpSuffixTab [I]) == 0) {
+	    /* Found */
+     	    return I;
+     	}
+    }
+
+    /* Not found */
+    return CMP_INV;
+}
+
+
+
+/*****************************************************************************/
+/*		  	       Remove dead jumps		      	     */
 /*****************************************************************************/
 
 
@@ -109,7 +170,7 @@ static void OptDeadJumps (CodeSeg* S)
 
 
 /*****************************************************************************/
-/*			       Remove dead code				     */
+/*			       Remove dead code			      	     */
 /*****************************************************************************/
 
 
@@ -237,7 +298,7 @@ static void OptJumpCascades (CodeSeg* S)
 	     	++OptChanges;
 
 	     	/* Done */
-	      	goto NextEntry;
+	      	continue;
 
 	    }
 
@@ -260,7 +321,7 @@ NextEntry:
 
 
 /*****************************************************************************/
-/*	     	    	       Optimize jsr/rts				     */
+/*	     	    	       Optimize jsr/rts			      	     */
 /*****************************************************************************/
 
 
@@ -377,7 +438,7 @@ static void OptJumpTarget (CodeSeg* S)
 	     * move references to this label to the new label.
 	     */
 	    if (CodeEntryHasLabel (E1)) {
-		MoveCodeLabels (S, E1, T1);
+	    	MoveCodeLabels (S, E1, T1);
 	    }
 
 	    /* Remove the entry preceeding the jump */
@@ -399,43 +460,314 @@ NextEntry:
 
 
 /*****************************************************************************/
+/*	    	     Remove conditional jumps never taken		     */
+/*****************************************************************************/
+
+
+
+static void OptDeadCondBranches (CodeSeg* S)
+/* If an immidiate load of a register is followed by a conditional jump that
+ * is never taken because the load of the register sets the flags in such a
+ * manner, remove the conditional branch.
+ */
+{
+    unsigned I;
+
+    /* Get the number of entries, bail out if we have not enough */
+    unsigned Count = GetCodeEntryCount (S);
+    if (Count < 2) {
+     	return;
+    }
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < Count-1) {
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+	/* Check if it's a register load */
+       	if ((E->Info & OF_LOAD) != 0 && E->AM == AM_IMM && (E->Flags & CEF_NUMARG) != 0) {
+
+	    bc_t BC;
+
+	    /* Immidiate register load, get next instruction */
+	    CodeEntry* N = GetCodeEntry (S, I+1);
+
+	    /* Check if the following insn is a conditional branch or if it
+	     * has a label attached.
+	     */
+	    if ((N->Info & OF_CBRA) == 0 || CodeEntryHasLabel (E)) {
+		/* No conditional jump or label attached, bail out */
+		goto NextEntry;
+	    }
+
+	    /* Get the branch condition */
+	    BC = GetBranchCond (N->OPC);
+
+	    /* Check the argument against the branch condition */
+       	    if ((BC == BC_EQ && E->Num != 0) 		||
+		(BC == BC_NE && E->Num == 0)		||
+		(BC == BC_PL && (E->Num & 0x80) != 0)	||
+		(BC == BC_MI && (E->Num & 0x80) == 0)) {
+
+		/* Remove the conditional branch */
+		DelCodeEntry (S, I+1);
+		--Count;
+
+		/* Remember, we had changes */
+		++OptChanges;
+
+	    }
+	}
+
+NextEntry:
+	/* Next entry */
+	++I;
+
+    }
+}
+
+
+
+/*****************************************************************************/
+/*	       Remove calls to the bool transformer subroutines		     */
+/*****************************************************************************/
+
+
+
+static void OptBoolTransforms (CodeSeg* S)
+/* Try to remove the call to boolean transformer routines where the call is
+ * not really needed.
+ */
+{
+    unsigned I;
+
+    /* Get the number of entries, bail out if we have not enough */
+    unsigned Count = GetCodeEntryCount (S);
+    if (Count < 2) {
+     	return;
+    }
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < Count-1) {
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+	/* Check for a boolean transformer */
+	if (E->OPC == OPC_JSR && strncmp (E->Arg, "bool", 4) == 0) {
+
+	    cmp_t Cond;
+
+	    /* Get the next entry */
+	    CodeEntry* N = GetCodeEntry (S, I+1);
+
+	    /* Check if this is a conditional branch */
+	    if ((N->Info & OF_CBRA) == 0) {
+		/* No conditional branch, bail out */
+		goto NextEntry;
+	    }
+
+	    /* Make the boolean transformer unnecessary by changing the
+	     * the conditional jump to evaluate the condition flags that
+	     * are set after the compare directly. Note: jeq jumps if
+	     * the condition is not met, jne jumps if the condition is met.
+	     */
+	    Cond = FindCmpCond (E->Arg + 4);
+	    if (Cond == CMP_INV) {
+		/* Unknown function */
+		goto NextEntry;
+	    }
+
+     	    /* Invert the code if we jump on condition not met. */
+       	    if (GetBranchCond (N->OPC) == BC_EQ) {
+	     	/* Jumps if condition false, invert condition */
+	     	Cond = CmpInvertTab [Cond];
+  	    }
+
+	    /* Check if we can replace the code by something better */
+ 	    switch (Cond) {
+
+	    	case CMP_EQ:
+		    ReplaceOPC (N, OPC_JEQ);
+	    	    break;
+
+	    	case CMP_NE:
+		    ReplaceOPC (N, OPC_JNE);
+	    	    break;
+
+	       	case CMP_GT:
+		    /* Not now ### */
+		    goto NextEntry;
+
+	    	case CMP_GE:
+		    ReplaceOPC (N, OPC_JPL);
+	    	    break;
+
+	    	case CMP_LT:
+		    ReplaceOPC (N, OPC_JMI);
+	    	    break;
+
+	    	case CMP_LE:
+		    /* Not now ### */
+	    	    goto NextEntry;
+
+     	    	case CMP_UGT:
+		    /* Not now ### */
+		    goto NextEntry;
+
+	    	case CMP_UGE:
+       	       	    ReplaceOPC (N, OPC_JCS);
+	    	    break;
+
+	    	case CMP_ULT:
+		    ReplaceOPC (N, OPC_JCC);
+	    	    break;
+
+	    	case CMP_ULE:
+		    /* Not now ### */
+	    	    goto NextEntry;
+
+     	    	default:
+	    	    Internal ("Unknown jump condition: %d", Cond);
+
+	    }
+
+	    /* Remove the call to the bool transformer */
+	    DelCodeEntry (S, I);
+	    --Count;
+
+	    /* Remember, we had changes */
+	    ++OptChanges;
+
+	}
+
+NextEntry:
+	/* Next entry */
+	++I;
+
+    }
+}
+
+
+
+/*****************************************************************************/
 /*     	       	      	  	     Code	   			     */
 /*****************************************************************************/
+
+
+
+/* Table with all the optimization functions */
+typedef struct OptFunc OptFunc;
+struct OptFunc {
+    void (*Func) (CodeSeg*);	/* Optimizer function */
+    const char*	Name;		/* Name of optimizer step */
+    char	Disabled;	/* True if pass disabled */
+};
+
+
+
+/* Table with optimizer steps -  are called in this order */
+static OptFunc OptFuncs [] = {
+    /* Optimize jump cascades */
+    { OptJumpCascades, 	    "OptJumpCascades",		0      	},
+    /* Remove dead jumps */
+    { OptDeadJumps,    	    "OptDeadJumps",		0      	},
+    /* Change jsr/rts to jmp */
+    { OptRTS,  	       	    "OptRTS",			0      	},
+    /* Remove dead code */
+    { OptDeadCode,     	    "OptDeadCode",		0      	},
+    /* Optimize jump targets */
+    { OptJumpTarget,   	    "OptJumpTarget",		0      	},
+    /* Remove dead conditional branches */
+    { OptDeadCondBranches,  "OptDeadCondBranches",	0    	},
+    /* Remove calls to the bool transformer subroutines	*/
+    { OptBoolTransforms,    "OptBoolTransforms",	0	},
+};
+
+
+
+static OptFunc* FindOptStep (const char* Name)
+/* Find an optimizer step by name in the table and return a pointer. Print an
+ * error and cann AbEnd if not found.
+ */
+{
+    unsigned I;
+
+    /* Run all optimization steps */
+    for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
+    	if (strcmp (OptFuncs[I].Name, Name) == 0) {
+    	    /* Found */
+    	    return OptFuncs+I;
+    	}
+    }
+
+    /* Not found */
+    AbEnd ("Optimization step `%s' not found", Name);
+    return 0;
+}
+
+
+
+void DisableOpt (const char* Name)
+/* Disable the optimization with the given name */
+{
+    OptFunc* F  = FindOptStep (Name);
+    F->Disabled = 1;
+}
+
+
+
+void EnableOpt (const char* Name)
+/* Enable the optimization with the given name */
+{
+    OptFunc* F  = FindOptStep (Name);
+    F->Disabled = 0;
+}
 
 
 
 void RunOpt (CodeSeg* S)
 /* Run the optimizer */
 {
-    typedef void (*OptFunc) (CodeSeg*);
+    unsigned Pass = 0;
 
-    /* Table with optimizer steps -  are called in this order */
-    static const OptFunc OptFuncs [] = {
-	OptJumpCascades, 	/* Optimize jump cascades */
-       	OptDeadJumps,  	 	/* Remove dead jumps */
-	OptDeadCode,	 	/* Remove dead code */
-	OptRTS,			/* Change jsr/rts to jmp */
-	OptJumpTarget,		/* Optimize jump targets */
-    };
+    /* Print the name of the function we are working on */
+    if (S->Func) {
+     	Print (stdout, 1, "Running optimizer for function `%s'\n", S->Func->Name);
+    } else {
+     	Print (stdout, 1, "Running optimizer for global code segment\n");
+    }
 
     /* Repeat all steps until there are no more changes */
     do {
 
-	unsigned long Flags;
-	unsigned      I;
+       	unsigned I;
 
      	/* Reset the number of changes */
      	OptChanges = 0;
 
+	/* Keep the user hapy */
+	Print (stdout, 1, "  Optimizer pass %u:\n", ++Pass);
+
        	/* Run all optimization steps */
-	Flags = 1UL;
        	for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
-	    if ((OptDisable & Flags) == 0) {
-	    	OptFuncs[I] (S);
-	    } else if (Verbosity > 0 || Debug) {
-	    	printf ("Optimizer pass %u skipped\n", I);
+
+	    /* Print the name of the following optimizer step */
+	    Print (stdout, 1, "    %s:%*s", OptFuncs[I].Name,
+	       	   (int) (30-strlen(OptFuncs[I].Name)), "");
+
+	    /* Check if the step is disabled */
+       	    if (OptFuncs[I].Disabled) {
+	       	Print (stdout, 1, "Disabled\n");
+	    } else {
+	       	unsigned Changes = OptChanges;
+	       	OptFuncs[I].Func (S);
+		Changes = OptChanges - Changes;
+		Print (stdout, 1, "%u Changes\n", Changes);
 	    }
-	    Flags <<= 1;
 	}
 
     } while (OptChanges > 0);

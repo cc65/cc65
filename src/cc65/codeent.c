@@ -33,9 +33,11 @@
 
 
 
+#include <stdlib.h>
 #include <string.h>
 
 /* common */
+#include "chartype.h"
 #include "check.h"
 #include "xmalloc.h"
 
@@ -90,6 +92,47 @@ static char* GetArgCopy (const char* Arg)
 
 
 
+static int NumArg (const char* Arg, unsigned long* Num)
+/* If the given argument is numerical, convert it and return true. Otherwise
+ * set Num to zero and return false.
+ */
+{
+    char* End;
+    unsigned long Val;
+
+    /* Determine the base */
+    int Base = 10;
+    if (*Arg == '$') {
+    	++Arg;
+    	Base = 16;
+    } else if (*Arg == '%') {
+    	++Arg;
+    	Base = 2;
+    }
+
+    /* Convert the value. strtol is not exactly what we want here, but it's
+     * cheap and may be replaced by something fancier later.
+     */
+    Val = strtoul (Arg, &End, Base);
+
+    /* Check if the conversion was successful */
+    if (*End != '\0') {
+
+	/* Could not convert */
+	*Num = 0;
+	return 0;
+
+    } else {
+
+	/* Conversion ok */
+	*Num = Val;
+	return 1;
+
+    }
+}
+
+
+
 /*****************************************************************************/
 /*     	       	      	   	     Code				     */
 /*****************************************************************************/
@@ -108,8 +151,11 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* 
     E->Size 	= GetInsnSize (E->OPC, E->AM);
     E->Hints	= 0;
     E->Arg     	= GetArgCopy (Arg);
-    E->Num  	= 0;
-    E->Flags	= 0;
+    if (NumArg (E->Arg, &E->Num)) {
+	E-> Flags = CEF_NUMARG;
+    } else {
+       	E->Flags  = 0;
+    }
     E->Info	= D->Info;
     E->Use	= D->Use;
     E->Chg	= D->Chg;
@@ -118,7 +164,7 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* 
      	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
     } else {
      	/* Some other instruction */
-     	E->Use |= GetAMUseInfo (AM);
+     	E->Use |= GetAMUseInfo (E->AM);
     }
     E->JumpTo	= JumpTo;
     InitCollection (&E->Labels);
@@ -145,6 +191,31 @@ void FreeCodeEntry (CodeEntry* E)
 
     /* Free the entry */
     xfree (E);
+}
+
+
+
+void ReplaceOPC (CodeEntry* E, opc_t OPC)
+/* Replace the opcode of the instruction. This will also replace related info,
+ * Size, Use and Chg, but it will NOT update any arguments or labels.
+ */
+{
+    /* Get the opcode descriptor */
+    const OPCDesc* D = GetOPCDesc (OPC);
+
+    /* Replace the opcode */
+    E->OPC	= OPC;
+    E->Size 	= GetInsnSize (E->OPC, E->AM);
+    E->Info	= D->Info;
+    E->Use	= D->Use;
+    E->Chg	= D->Chg;
+    if (E->OPC == OPC_JSR) {
+     	/* A subroutine call */
+     	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
+    } else {
+     	/* Some other instruction */
+     	E->Use |= GetAMUseInfo (E->AM);
+    }
 }
 
 

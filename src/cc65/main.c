@@ -52,6 +52,7 @@
 /* cc65 */
 #include "asmcode.h"
 #include "compile.h"
+#include "codeopt.h"
 #include "cpu.h"
 #include "error.h"
 #include "global.h"
@@ -103,6 +104,8 @@ static void Usage (void)
        	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug\t\tDebug mode\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
+	     "  --disable-opt name\tDisable an optimization step\n"
+       	     "  --enable-opt name\tEnable an optimization step\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
@@ -377,6 +380,22 @@ static void OptDebugInfo (const char* Opt, const char* Arg)
 
 
 
+static void OptDisableOpt (const char* Opt, const char* Arg)
+/* Disable an optimization step */
+{
+    DisableOpt (Arg);
+}
+
+
+
+static void OptEnableOpt (const char* Opt, const char* Arg)
+/* Enable an optimization step */
+{
+    EnableOpt (Arg);
+}
+
+
+
 static void OptHelp (const char* Opt, const char* Arg)
 /* Print usage information and exit */
 {
@@ -463,6 +482,8 @@ int main (int argc, char* argv[])
 	{ "--data-name",	1, 	OptDataName  		},
        	{ "--debug",           	0,     	OptDebug     		},
 	{ "--debug-info",      	0, 	OptDebugInfo 		},
+	{ "--disable-opt",	1,	OptDisableOpt		},
+	{ "--enable-opt",	1,	OptEnableOpt,		},
 	{ "--help",	 	0, 	OptHelp	     		},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
 	{ "--rodata-name",	1, 	OptRodataName		},

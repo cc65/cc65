@@ -55,6 +55,12 @@
 
 
 
+void DisableOpt (const char* Name);
+/* Disable the optimization with the given name */
+
+void EnableOpt (const char* Name);
+/* Enable the optimization with the given name */
+
 void RunOpt (CodeSeg* S);
 /* Run the optimizer */
 

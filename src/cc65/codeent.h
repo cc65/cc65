@@ -67,7 +67,7 @@ struct CodeEntry {
     unsigned char   	Size;		/* Estimated size */
     unsigned char   	Hints;		/* Hints for this entry */
     char*      	       	Arg;   	       	/* Argument as string */
-    unsigned    	Num;		/* Numeric argument */
+    unsigned long   	Num;		/* Numeric argument */
     unsigned short  	Flags;		/* Flags */
     unsigned char	Info;		/* Additional code info */
     unsigned char	Use;		/* Registers used */
@@ -89,6 +89,11 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* 
 
 void FreeCodeEntry (CodeEntry* E);
 /* Free the given code entry */
+
+void ReplaceOPC (CodeEntry* E, opc_t OPC);
+/* Replace the opcode of the instruction. This will also replace related info,
+ * Size, Use and Chg, but it will NOT update any arguments or labels.
+ */
 
 int CodeEntriesAreEqual (const CodeEntry* E1, const CodeEntry* E2);
 /* Check if both code entries are equal */

@@ -417,6 +417,7 @@ Available operators sorted by precedence:
     .MATCH     	Builtin function	     	     	1
     .TCOUNT    	Builtin function	     	     	1
     .TIME    	Builtin function	     	     	1
+    .VERSION    Builtin function                        1
     .XMATCH    	Builtin function	     	     	1
     .PARAMCOUNT Builtin pseudo variable	(r/o)	      	1
     .REFERENCED Builtin function	     	       	1
@@ -2310,6 +2311,22 @@ Here's a list of all control commands and a description, what they do:
   <tscreen><verb>
         .dword  .time   ; Place time here
   </verb></tscreen>
+
+
+<sect1><tt>.VERSION</tt><label id=".VERSION"><p>
+
+  Reading this pseudo variable will give the assembler version according to 
+  the following formula:
+
+        VER_MAJOR*$100 + VER_MINOR*$10 + VER_PATCH
+
+  It may be used to encode the assembler version or check the assembler for
+  special features not available with older versions.
+
+  Example:
+
+  Version 2.11.1 of the assembler will return $2B1 as numerical constant when
+  reading the pseudo variable <tt/.VERSION/.
 
 
 <sect1><tt>.WARNING</tt><label id=".WARNING"><p>

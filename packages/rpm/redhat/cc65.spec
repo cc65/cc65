@@ -59,6 +59,7 @@ machines, you have to install at least one of the library packages.
 %attr(755,root,root) %dir	/usr/lib/cc65/tgi
 %attr(755,root,root) %dir	/usr/lib/cc65/include
 %attr(644,root,root)   		/usr/lib/cc65/include/*.h
+%attr(644,root,root)   		/usr/lib/cc65/include/sys/*.h
 %attr(755,root,root) %dir	/usr/lib/cc65/include/tgi
 %attr(644,root,root)   		/usr/lib/cc65/include/tgi/*.h
 %attr(755,root,root) %dir	/usr/lib/cc65/asminc
@@ -383,7 +384,7 @@ cd ..
 
 
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,emd,include/{geos,tgi},joy,lib,tgi}}
+mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,emd,include/{em,geos,joystick,sys,tgi},joy,lib,tgi}}
 
 # Binaries
 install -s -m 755 src/ar65/ar65 $RPM_BUILD_ROOT/usr/bin
@@ -400,6 +401,9 @@ install -s -m 755 src/od65/od65 $RPM_BUILD_ROOT/usr/bin
 install -m 644 libsrc/*.lib libsrc/*.o $RPM_BUILD_ROOT/usr/lib/cc65/lib
 install -m 644 include/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include
 install -m 644 include/geos/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/geos
+install -m 644 include/em/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/em
+install -m 644 include/joystick/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/joystick
+install -m 644 include/sys/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/sys
 install -m 644 include/tgi/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/tgi
 install -m 644 asminc/*.inc $RPM_BUILD_ROOT/usr/lib/cc65/asminc
 
@@ -411,6 +415,9 @@ install -m 644 libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi
 
 
 %changelog
+* Thu Jun 12 2003 Ullrich von Bassewitz <uz@cc65.org>
+- Added subdirectories of include/
+
 * Fri May 02 2003 Ullrich von Bassewitz <uz@cc65.org>
 - The Apple ][ has a joystick driver.
 - Added the NES subpackage.

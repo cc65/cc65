@@ -62,12 +62,35 @@
 
 
 
+static void CS_MoveLabelsToEntry (CodeSeg* S, CodeEntry* E)
+/* Move all labels from the label pool to the given entry and remove them 
+ * from the pool.
+ */
+{
+    /* Transfer the labels if we have any */
+    unsigned I;
+    unsigned LabelCount = CollCount (&S->Labels);
+    for (I = 0; I < LabelCount; ++I) {
+
+   	/* Get the label */
+   	CodeLabel* L = CollAt (&S->Labels, I);
+
+   	/* Attach it to the entry */
+   	CE_AttachLabel (E, L);
+    }
+
+    /* Delete the transfered labels */
+    CollDeleteAll (&S->Labels);
+}
+
+
+
 static void CS_MoveLabelsToPool (CodeSeg* S, CodeEntry* E)
 /* Move the labels of the code entry E to the label pool of the code segment */
 {
     unsigned LabelCount = CE_GetLabelCount (E);
     while (LabelCount--) {
-	CodeLabel* L = CE_GetLabel (E, LabelCount);
+   	CodeLabel* L = CE_GetLabel (E, LabelCount);
 	L->Owner = 0;
 	CollAppend (&S->Labels, L);
     }
@@ -406,19 +429,7 @@ void CS_AddEntry (CodeSeg* S, struct CodeEntry* E)
 /* Add an entry to the given code segment */
 {
     /* Transfer the labels if we have any */
-    unsigned I;
-    unsigned LabelCount = CollCount (&S->Labels);
-    for (I = 0; I < LabelCount; ++I) {
-
-	/* Get the label */
-	CodeLabel* L = CollAt (&S->Labels, I);
-
-	/* Attach it to the entry */
-	CE_AttachLabel (E, L);
-    }
-
-    /* Delete the transfered labels */
-    CollDeleteAll (&S->Labels);
+    CS_MoveLabelsToEntry (S, E);
 
     /* Add the entry to the list of code entries in this segment */
     CollAppend (&S->Entries, E);
@@ -534,7 +545,7 @@ void CS_DelEntry (CodeSeg* S, unsigned Index)
     FreeCodeEntry (E);
 }
 
-
+		   
 
 void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count)
 /* Delete a range of code entries. This includes removing references to labels,
@@ -547,6 +558,30 @@ void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count)
     while (Count--) {
    	CS_DelEntry (S, Start + Count);
     }
+}
+
+
+
+void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos)
+/* Move a range of entries from one position to another. Start is the index
+ * of the first entry to move, Count is the number of entries and NewPos is
+ * the index of the target entry. The entry with the index Start will later
+ * have the index NewPos. All entries with indices NewPos and above are
+ * moved to higher indices. If the code block is moved to the end of the
+ * current code, and if pending labels exist, these labels will get attached
+ * to the first instruction of the moved block (the first one after the
+ * current code end)
+ */
+{
+    /* If NewPos is at the end of the code segment, move any labels from the
+     * label pool to the first instruction of the moved range.
+     */
+    if (NewPos == CS_GetEntryCount (S)) {
+	CS_MoveLabelsToEntry (S, CS_GetEntry (S, Start));
+    }
+
+    /* Move the code block to the destination */
+    CollMoveMultiple (&S->Entries, Start, Count, NewPos);
 }
 
 

@@ -116,6 +116,17 @@ void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count);
  * labels attached to the entries and so on.
  */
 
+void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos);
+/* Move a range of entries from one position to another. Start is the index
+ * of the first entry to move, Count is the number of entries and NewPos is
+ * the index of the target entry. The entry with the index Start will later
+ * have the index NewPos. All entries with indices NewPos and above are
+ * moved to higher indices. If the code block is moved to the end of the
+ * current code, and if pending labels exist, these labels will get attached
+ * to the first instruction of the moved block (the first one after the
+ * current code end)
+ */
+
 #if defined(HAVE_INLINE)
 INLINE void CS_MoveEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos)
 /* Move an entry from one position to another. OldPos is the current position
@@ -126,21 +137,6 @@ INLINE void CS_MoveEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos)
 }
 #else
 #  define CS_MoveEntry(S, OldPos, NewPos)       CollMove (&(S)->Entries, OldPos, NewPos)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos)
-/* Move a range of entries from one position to another. Start is the index
- * of the first entry to move, Count is the number of entries and NewPos is
- * the index of the target entry. The entry with the index Start will later
- * have the index NewPos. All entries with indices NewPos and above are
- * moved to higher indices.
- */
-{
-    CollMoveMultiple (&S->Entries, Start, Count, NewPos);
-}
-#else
-#  define CS_MoveEntries(S, Start, Count, NewPos) CollMoveMultiple (&(S)->Entries, Start, Count, NewPos)
 #endif
 
 #if defined(HAVE_INLINE)

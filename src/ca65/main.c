@@ -200,18 +200,11 @@ static void OptAutoImport (const char* Opt attribute ((unused)),
 static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --cpu option */
 {
-    if (strcmp (Arg, "6502") == 0) {
-	SetCPU (CPU_6502);
-    } else if (strcmp (Arg, "65C02") == 0) {
-	SetCPU (CPU_65C02);
-    } else if (strcmp (Arg, "65816") == 0) {
-	SetCPU (CPU_65816);
-#ifdef SUNPLUS
-    } else if (strcmp (Arg, "sunplus") == 0) {
-	SetCPU (CPU_SUNPLUS);
-#endif
-    } else {
+    cpu_t CPU = FindCPU (Arg);
+    if (CPU == CPU_UNKNOWN) {
 	AbEnd ("Invalid CPU: `%s'", Arg);
+    } else {
+	SetCPU (CPU);
     }
 }
 

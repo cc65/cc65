@@ -19,7 +19,7 @@ CL_SIZE = 64		; command line buffer size
 SPACE	= 32		; SPACE char.
 
         .include "atari.inc"
-	.export getargs, argc, argv
+	.export getargs, argc, argv, __dos_type
 	.export _getdefdev		; get default device (e.g. "D1:")
 	.importzp ptr1
 
@@ -170,6 +170,9 @@ finargs:
 ; DOS type detection
 
 detect:
+	lda	#ATARIDOS
+	sta	__dos_type	; set default
+
 	lda	DOS
 	cmp	#$53		; "S" (SpartaDOS)
 	beq	spdos
@@ -186,8 +189,13 @@ detect:
 	ldy	#6		; OS/A+ has a jmp here
 	cmp	(DOSVEC),y
 	beq	nordos
+	lda	#OSADOS
+	sta	__dos_type
+	bne	spdos1
 
-spdos:	sec			; SpartaDOS, OS/A+ or DOS XL
+spdos:	lda	#SPARTADOS
+	sta	__dos_type
+spdos1:	sec			; SpartaDOS, OS/A+ or DOS XL
 	rts
 
 nordos:	clc			; normal DOS (no args) detected
@@ -211,6 +219,8 @@ defdev:
 
 argc:	.res	2
 argv:	.res	(1 + MAXARGS) * 2
+
+__dos_type:	.res	1
 
 ; Buffer for command line / argv strings
 

@@ -33,9 +33,6 @@ PALFLAG		= $2A6		; $01 = PAL, $00 = NTSC
 ; Direct entries
 CLRSCR		= $E544
 KBDREAD		= $E5B4
-NAMED_OPEN	= $F3D5
-NAMED_CLOSE	= $F642
-PLOTCHAR	= $EA1C		; Char in A, color in X
 
 ; ---------------------------------------------------------------------------
 ; Vector and other locations

@@ -35,13 +35,20 @@ BASIC_BUF_LEN = 239
 FNAM_LEN = $280
 FNAM = $281
 
-	.assert		MAXARGS <= (BASIC_BUF_LEN - 2)/2, error, "Too many arguments"
 MAXARGS	 = 10			; Maximum number of arguments allowed
 REM	 = $B2			; BASIC token-code
 NAME_LEN = 15			; maximum length of command-name
+        
+; Validate sizes
+.if     MAXARGS > (BASIC_BUF_LEN - 2)/2
+.error  "Too many arguments"
+.endif
 
-; Get possible command-line arguments.
-;
+; Get possible command-line arguments. Goes into the special INIT segment,
+; which may be reused after the startup code is run
+
+.segment        "INIT"
+
 initmainargs:
 
 ; Assume that the program was loaded, a moment ago, by the traditional LOAD

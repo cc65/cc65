@@ -10,6 +10,11 @@
 ; Identify machine according to:
 ; "Apple II Miscellaneous TechNote #7: Apple II Family Identification"
 
+; ------------------------------------------------------------------------
+; Initialization
+
+.segment        "INIT"
+
 initostype:
 	sec
 	jsr	$FE1F
@@ -30,13 +35,17 @@ next:	inx
 	bne	:-
 	beq	next		; Branch always
 
+; ------------------------------------------------------------------------
+
+.code
+
 _get_ostype:
 	lda	ostype
 	ldx	#$00
 	rts
 
 
-	.rodata
+.rodata
 
 index:	.byte	$B3, $00		; Apple ][
 	.byte	$B3, $1E, $00		; Apple ][+
@@ -65,6 +74,6 @@ value:	.byte	$38, $10		; Apple ][
 	.byte	$00
 
 
-	.bss
+.bss
 
 ostype:	.res	1

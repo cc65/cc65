@@ -29,6 +29,8 @@
 ; - "Apple II ProDOS 8 TechNote #023: ProDOS 8 Changes and Minutia"
 ; - ProDOS TechRefMan, chapter 5.2.4
 
+.segment        "INIT"
+
 initdostype:
 	lda	MLI
 	cmp	#$4C		; Is MLI present? (JMP opcode)
@@ -40,6 +42,6 @@ initdostype:
 :	sta	__dos_type
 done:	rts
 
-	.bss
+.bss
 
 __dos_type:	.res	1

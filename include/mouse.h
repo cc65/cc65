@@ -50,16 +50,21 @@
 #endif
 
 
+
 /*****************************************************************************/
 /* 	      			  Definitions	     			     */
 /*****************************************************************************/
 
 
-/* the different mouse types */
-#define MOUSE_TRAKBALL 0
-#define MOUSE_ST       1
-#define MOUSE_AMIGA    2
-#define MOUSE_C64      3      /* 1351 mouse */
+
+/* The different mouse types */
+#define MOUSE_TRAKBALL 		0
+#define MOUSE_ST		1
+#define MOUSE_AMIGA		2
+#define MOUSE_C64		3      /* 1351 mouse */
+
+/* Mouse button masks */
+#define MOUSE_BTN_LEFT	     0x10
 
 
 
@@ -69,7 +74,9 @@
 
 
 
-void __fastcall__ mouse_init (unsigned char port, unsigned char sprite, unsigned char type);
+unsigned char __fastcall__ mouse_init (unsigned char port, 
+				       unsigned char sprite, 
+				       unsigned char type);
 /* Setup the mouse interrupt handler. If the sprite value is != zero, the
  * mouse routines will manage the sprite with this number. That means, it
  * is moved if the mouse is moved (provided that the mouse cursor is visible),
@@ -81,6 +88,9 @@ void __fastcall__ mouse_init (unsigned char port, unsigned char sprite, unsigned
  * After calling this function, the mouse is invisble, the cursor is placed
  * at 0/0 (upper left corner), and the bounding box is reset to cover the
  * whole screen. Call mouse_show once to make the mouse cursor visible.
+ * The function will return zero if a mouse was not found and a non zero
+ * value if the mouse was found and initialized (or if there is no way to
+ * detect a mouse reliably).
  */
 
 void mouse_done (void);
@@ -125,8 +135,9 @@ void __fastcall__ mouse_move (int x, int y);
  * inside the bounding box.
  */
 
-unsigned char mouse_down(void);
-/* Get mouse button state (0 - up, 1 - dowm)
+unsigned char mouse_buttons (void);
+/* Return a bit mask encoding the states of the mouse buttons. Use the
+ * MOUSE_BTN_XXX flags to decode a specific button.
  */
 
 void mouse_info (void);

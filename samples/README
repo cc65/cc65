@@ -1,4 +1,4 @@
-
+                                      
 This directory contains sample programs for the cc65 compiler.
 
 Below is a short description for each of the programs together with a list of
@@ -19,18 +19,24 @@ Please note:
 List of supplied sample programs:
 
 -----------------------------------------------------------------------------
+Name:           fire
+Description:	Another graphics demo written by groepaz/hitmen.
+Platforms:     	The program is currently only running on the C64, but should
+		be portable to the C128 and CBM510 (and maybe more machines).
+
+-----------------------------------------------------------------------------
 Name:	        hello
 Description:	A nice "Hello world" type program that uses the conio
 		console I/O library for output.
 Platforms:	Runs on all platforms that support conio, which means:
-		Apple ][, Atari, C64, C128, CBM510, CBM610, PET, Plus/4
+		Apple ][, Atari, C16, C64, C128, CBM510, CBM610, PET, Plus/4
 
 -----------------------------------------------------------------------------
 Name:           mousedemo
 Description:	Shows how to use the mouse.
 Platforms:	All systems with mouse and conio support:
 		Atari (untested), C64, C128 and CBM510
-                                 
+
 -----------------------------------------------------------------------------
 Name:           nachtm
 Description:	Plays "Eine kleine Nachtmusik" by Wolfgang Amadeus Mozart
@@ -50,7 +56,7 @@ Description:	Implements the "Sieve of Eratosthenes" as a way to find all
 		prime numbers in a specific number interval. Often used as
 		a benchmark program.
 Platforms:	All systems with conio and clock support:
-		Atari, C64, C128, CBM510, CBM610, PET, Plus/4
+		Atari, C16, C64, C128, CBM510, CBM610, PET, Plus/4
 -----------------------------------------------------------------------------
 Name:           tgidemo
 Description:	Shows some of the graphics capabilities of the "tiny graphics

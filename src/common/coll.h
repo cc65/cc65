@@ -59,8 +59,14 @@ struct Collection {
     void**	    	Items;		/* Array with dynamic size */
 };
 
+/* An empty collection */
+extern const Collection EmptyCollection;
+
 /* Initializer for static collections */
 #define STATIC_COLLECTION_INITIALIZER	{ 0, 0, 0 }
+
+/* Initializer for auto collections */
+#define AUTO_COLLECTION_INITIALIZER     EmptyCollection;
 
 
 

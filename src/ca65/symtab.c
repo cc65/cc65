@@ -71,9 +71,14 @@
 #define SUB_HASHTAB_SIZE     	53
 typedef struct SymTable SymTable;
 struct SymTable {
+    SymTable*           Left;           /* Pointer to smaller entry */
+    SymTable*           Right;          /* Pointer to greater entry */
+    SymTable*          	Parent;   	/* Link to enclosing scope if any */
+    SymTable*           Childs;         /* Pointer to child scopes */
+    unsigned            Level;          /* Lexical level */
     unsigned   	     	TableSlots;	/* Number of hash table slots */
     unsigned   	    	TableEntries;	/* Number of entries in the table */
-    SymTable*       	BackLink;   	/* Link to enclosing scope if any */
+    unsigned            Name;           /* Name of the scope */
     SymEntry*  	    	Table [1];  	/* Dynamic allocation */
 };
 
@@ -96,7 +101,7 @@ static unsigned     	ExportCount = 0;/* Counter for export symbols */
 
 
 
-static int IsLocal (const char* Name)
+static int IsLocalName (const char* Name)
 /* Return true if Name is the name of a local symbol */
 {
     return (*Name == LocalStart);
@@ -104,20 +109,81 @@ static int IsLocal (const char* Name)
 
 
 
-static SymTable* NewSymTable (unsigned Size)
+static int IsLocalNameId (unsigned Name)
+/* Return true if Name is the name of a local symbol */
+{
+    return (*GetString (Name) == LocalStart);
+}
+
+
+
+static unsigned SymTableSize (unsigned Level)
+/* Get the size of a table for the given lexical level */
+{
+    switch (Level) {
+        case 0:         return 213;
+        case 1:         return  53;
+        default:        return  29;
+    }
+}
+
+
+
+static SymTable* NewSymTable (SymTable* Parent, unsigned Name)
 /* Allocate a symbol table on the heap and return it */
 {
-    SymTable* S;
+    /* Determine the lexical level and the number of table slots */
+    unsigned Level = Parent? Parent->Level + 1 : 0;
+    unsigned Slots = SymTableSize (Level);
 
     /* Allocate memory */
-    S = xmalloc (sizeof (SymTable) + (Size-1) * sizeof (SymEntry*));
+    SymTable* S = xmalloc (sizeof (SymTable) + (Slots-1) * sizeof (SymEntry*));
 
     /* Set variables and clear hash table entries */
-    S->TableSlots   = Size;
+    S->Left         = 0;
+    S->Right        = 0;
+    S->Childs       = 0;
+    S->Level        = Level;
+    S->TableSlots   = Slots;
     S->TableEntries = 0;
-    S->BackLink     = 0;
-    while (Size--) {
-    	S->Table [Size] = 0;
+    S->Parent       = Parent;
+    S->Name         = Name;
+    while (Slots--) {
+       	S->Table[Slots] = 0;
+    }
+
+    /* Insert the symbol table into the child tree of the parent */
+    if (Parent) {
+        SymTable* T = Parent->Childs;
+        if (T == 0) {
+            /* First entry */
+            Parent->Childs = S;
+        } else {
+            while (1) {
+                /* Choose next entry */
+                if (S->Name < T->Name) {
+                    if (T->Left) {
+                        T = T->Left;
+                    } else {
+                        T->Left = S;
+                        break;
+                    }
+                } else if (S->Name > T->Name) {
+                    if (T->Right) {
+                        T = T->Right;
+                    } else {
+                        T->Right = S;
+                        break;
+                    }
+                } else {
+                    /* Duplicate scope name */
+                    Internal ("Duplicate scope name: `%s'", GetString (S->Name));
+                }
+            }
+        }
+    } else {
+        /* This is the root table */
+        RootTab = S;
     }
 
     /* Return the prepared struct */
@@ -126,53 +192,54 @@ static SymTable* NewSymTable (unsigned Size)
 
 
 
-static int SearchSymTab (SymEntry* T, const char* Name, SymEntry** E)
-/* Search in the given table for a name (Hash is the hash value of Name and
- * is given as parameter so that it will not get calculated twice if we search
- * in more than one table). If we find the symbol, the function will return 0
- * and put the entry pointer into E. If we did not find the symbol, and the
- * tree is empty, E is set to NULL. If the tree is not empty, E will be set to
- * the last entry, and the result of the function is <0 if the entry should
- * be inserted on the left side, and >0 if it should get inserted on the right
- * side.
+static int SearchSymTree (SymEntry* T, unsigned Name, SymEntry** E)
+/* Search in the given tree for a name. If we find the symbol, the function
+ * will return 0 and put the entry pointer into E. If we did not find the
+ * symbol, and the tree is empty, E is set to NULL. If the tree is not empty,
+ * E will be set to the last entry, and the result of the function is <0 if
+ * the entry should be inserted on the left side, and >0 if it should get
+ * inserted on the right side.
  */
 {
     int Cmp;
 
     /* Is there a tree? */
     if (T == 0) {
-	*E = 0;
-	return 1;
+      	*E = 0;
+      	return 1;
     }
 
     /* We have a table, search it */
     while (1) {
-	/* Choose next entry */
-	Cmp = strcmp (Name, T->Name);
-	if (Cmp < 0 && T->Left) {
+      	/* Choose next entry */
+        if (Name < T->Name) {
+            Cmp = -1;
+        } else if (Name > T->Name) {
+            Cmp = +1;
+        } else {
+            Cmp = 0;
+        }
+      	if (Name < T->Name && T->Left) {
 	    T = T->Left;
-	} else if (Cmp > 0 && T->Right) {
+	} else if (Name > T->Name && T->Right) {
 	    T = T->Right;
 	} else {
-     	    /* Found or end of search */
-	    break;
+     	    /* Found or end of search, return the result */
+            *E = T;
+            return Cmp;
        	}
     }
-
-    /* Return the search result */
-    *E = T;
-    return Cmp;
 }
 
 
 
 /*****************************************************************************/
-/*     	       		  	     Code			   	     */
+/*     	       		   	     Code			   	     */
 /*****************************************************************************/
 
 
 
-static SymEntry* SymFind (SymTable* Tab, const char* Name, int AllocNew)
+static SymEntry* SymFind (SymTable* Tab, unsigned Name, int AllocNew)
 /* Find a new symbol table entry in the given table. If AllocNew is given and
  * the entry is not found, create a new one. Return the entry found, or the
  * new entry created, or - in case AllocNew is zero - return 0.
@@ -182,7 +249,7 @@ static SymEntry* SymFind (SymTable* Tab, const char* Name, int AllocNew)
     int Cmp;
     unsigned Hash;
 
-    if (IsLocal (Name)) {
+    if (IsLocalNameId (Name)) {
 
     	/* Local symbol, get the table */
     	if (!SymLast) {
@@ -196,7 +263,7 @@ static SymEntry* SymFind (SymTable* Tab, const char* Name, int AllocNew)
        	}
 
     	/* Search for the symbol if we have a table */
-        Cmp = SearchSymTab (SymLast->Locals, Name, &S);
+        Cmp = SearchSymTree (SymLast->Locals, Name, &S);
 
     	/* If we found an entry, return it */
     	if (Cmp == 0) {
@@ -220,21 +287,20 @@ static SymEntry* SymFind (SymTable* Tab, const char* Name, int AllocNew)
     } else {
 
     	/* Global symbol: Get the hash value for the name */
-    	Hash = HashStr (Name) % Tab->TableSlots;
+       	Hash = Name % Tab->TableSlots;
 
 	/* Search for the entry */
-	Cmp = SearchSymTab (Tab->Table [Hash], Name, &S);
+	Cmp = SearchSymTree (Tab->Table[Hash], Name, &S);
 
 	/* If we found an entry, return it */
 	if (Cmp == 0) {
 	    /* Check for a trampoline entry, in this case return the real
 	     * symbol.
 	     */
-	    if (S->Flags & SF_TRAMPOLINE) {
-	     	return S->V.Sym;
-	    } else {
-	        return S;
+	    while (S->Flags & SF_TRAMPOLINE) {
+	     	S = S->V.Sym;
 	    }
+            return S;
 	}
 
 	if (AllocNew) {
@@ -242,7 +308,7 @@ static SymEntry* SymFind (SymTable* Tab, const char* Name, int AllocNew)
 	    /* Otherwise create a new entry, insert and return it */
 	    SymEntry* N = NewSymEntry (Name);
 	    if (S == 0) {
-	     	Tab->Table [Hash] = N;
+	     	Tab->Table[Hash] = N;
 	    } else if (Cmp < 0) {
 	     	S->Left = N;
 	    } else {
@@ -261,7 +327,7 @@ static SymEntry* SymFind (SymTable* Tab, const char* Name, int AllocNew)
 
 
 
-static SymEntry* SymFindAny (SymTable* Tab, const char* Name)
+static SymEntry* SymFindAny (SymTable* Tab, unsigned Name)
 /* Find a symbol in any table */
 {
     SymEntry* Sym;
@@ -272,8 +338,8 @@ static SymEntry* SymFindAny (SymTable* Tab, const char* Name)
 	    /* Found, return it */
 	    return Sym;
 	} else {
-	    /* Not found, search in the backlink, if we have one */
-	    Tab = Tab->BackLink;
+	    /* Not found, search in the parent scope, if we have one */
+	    Tab = Tab->Parent;
 	}
     } while (Sym == 0 && Tab != 0);
 
@@ -283,18 +349,16 @@ static SymEntry* SymFindAny (SymTable* Tab, const char* Name)
 
 
 
-void SymEnterLevel (void)
+void SymEnterLevel (const char* ScopeName)
 /* Enter a new lexical level */
 {
-    if (RootTab == 0) {
-       	/* Create the main symbol table */
-       	RootTab = SymTab = NewSymTable (MAIN_HASHTAB_SIZE);
-    } else {
-       	/* Create a local symbol table */
-       	SymTable* LocalSyms = NewSymTable (SUB_HASHTAB_SIZE);
-	LocalSyms->BackLink = SymTab;
-       	SymTab = LocalSyms;
+    /* Accept NULL pointers for the scope name */
+    if (ScopeName == 0) {
+        ScopeName = "";
     }
+
+    /* Create the new table */
+    SymTab = NewSymTable (SymTab, GetStringId (ScopeName));
 }
 
 
@@ -302,7 +366,7 @@ void SymEnterLevel (void)
 void SymLeaveLevel (void)
 /* Leave the current lexical level */
 {
-    SymTab = SymTab->BackLink;
+    SymTab = SymTab->Parent;
 }
 
 
@@ -319,7 +383,7 @@ void SymDef (const char* Name, ExprNode* Expr, unsigned Flags)
 /* Define a new symbol */
 {
     /* Do we have such a symbol? */
-    SymEntry* S = SymFind (SymTab, Name, SF_ALLOC_NEW);
+    SymEntry* S = SymFind (SymTab, GetStringId (Name), SF_ALLOC_NEW);
     if (S->Flags & SF_IMPORT) {
        	/* Defined symbol is marked as imported external symbol */
        	Error (ERR_SYM_ALREADY_IMPORT, Name);
@@ -359,7 +423,7 @@ void SymDef (const char* Name, ExprNode* Expr, unsigned Flags)
     }
 
     /* If this is not a local symbol, remember it as the last global one */
-    if (!IsLocal (Name)) {
+    if (!IsLocalName (Name)) {
        	SymLast = S;
     }
 }
@@ -370,10 +434,11 @@ SymEntry* SymRef (const char* Name, int Scope)
 /* Search for the symbol and return it */
 {
     SymEntry* S;
+    unsigned NameId = GetStringId (Name);
 
     switch (Scope) {
-        case SCOPE_GLOBAL:  S = SymFind (RootTab, Name, SF_ALLOC_NEW);  break;
-        case SCOPE_LOCAL:   S = SymFind (SymTab, Name, SF_ALLOC_NEW);   break;
+        case SCOPE_GLOBAL:  S = SymFind (RootTab, NameId, SF_ALLOC_NEW);  break;
+        case SCOPE_LOCAL:   S = SymFind (SymTab, NameId, SF_ALLOC_NEW);   break;
 
         /* Others are not allowed */
         case SCOPE_ANY:
@@ -398,13 +463,13 @@ static void SymImportInternal (const char* Name, unsigned Flags)
     SymEntry* S;
 
     /* Don't accept local symbols */
-    if (IsLocal (Name)) {
+    if (IsLocalName (Name)) {
      	Error (ERR_ILLEGAL_LOCAL_USE);
      	return;
     }
 
     /* Do we have such a symbol? */
-    S = SymFind (SymTab, Name, SF_ALLOC_NEW);
+    S = SymFind (SymTab, GetStringId (Name), SF_ALLOC_NEW);
     if (S->Flags & SF_DEFINED) {
      	Error (ERR_SYM_ALREADY_DEFINED, Name);
      	S->Flags |= SF_MULTDEF;
@@ -462,13 +527,13 @@ static void SymExportInternal (const char* Name, unsigned Flags)
     SymEntry* S;
 
     /* Don't accept local symbols */
-    if (IsLocal (Name)) {
+    if (IsLocalName (Name)) {
      	Error (ERR_ILLEGAL_LOCAL_USE);
      	return;
     }
 
     /* Do we have such a symbol? */
-    S = SymFind (SymTab, Name, SF_ALLOC_NEW);
+    S = SymFind (SymTab, GetStringId (Name), SF_ALLOC_NEW);
     if (S->Flags & SF_IMPORT) {
      	/* The symbol is already marked as imported external symbol */
      	Error (ERR_SYM_ALREADY_IMPORT, Name);
@@ -515,13 +580,13 @@ static void SymGlobalInternal (const char* Name, unsigned Flags)
     SymEntry* S;
 
     /* Don't accept local symbols */
-    if (IsLocal (Name)) {
+    if (IsLocalName (Name)) {
      	Error (ERR_ILLEGAL_LOCAL_USE);
      	return;
     }
 
     /* Search for this symbol, create a new entry if needed */
-    S = SymFind (SymTab, Name, SF_ALLOC_NEW);
+    S = SymFind (SymTab, GetStringId (Name), SF_ALLOC_NEW);
 
     /* If the symbol is already marked as import or export, check the
      * size of the definition, then bail out. */
@@ -574,13 +639,13 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
     CHECK (Prio >= CD_PRIO_MIN && Prio <= CD_PRIO_MAX);
 
     /* Don't accept local symbols */
-    if (IsLocal (Name)) {
+    if (IsLocalName (Name)) {
      	Error (ERR_ILLEGAL_LOCAL_USE);
      	return;
     }
 
     /* Do we have such a symbol? */
-    S = SymFind (SymTab, Name, SF_ALLOC_NEW);
+    S = SymFind (SymTab, GetStringId (Name), SF_ALLOC_NEW);
     if (S->Flags & SF_IMPORT) {
      	/* The symbol is already marked as imported external symbol */
      	Error (ERR_SYM_ALREADY_IMPORT, Name);
@@ -618,11 +683,14 @@ int SymIsDef (const char* Name, int Scope)
 {
     SymEntry* S = 0;
 
+    /* Get the string pool index for the name */
+    unsigned NameId = GetStringId (Name);
+
     /* Search for the symbol */
     switch (Scope) {
-        case SCOPE_ANY:    S = SymFindAny (SymTab, Name);                 break;
-        case SCOPE_GLOBAL: S = SymFind (RootTab, Name, SF_FIND_EXISTING); break;
-        case SCOPE_LOCAL:  S = SymFind (SymTab, Name, SF_FIND_EXISTING);  break;
+        case SCOPE_ANY:    S = SymFindAny (SymTab, NameId);                 break;
+        case SCOPE_GLOBAL: S = SymFind (RootTab, NameId, SF_FIND_EXISTING); break;
+        case SCOPE_LOCAL:  S = SymFind (SymTab, NameId, SF_FIND_EXISTING);  break;
         default:           Internal ("Invalid scope in SymIsDef: %d", Scope);
     }
 
@@ -637,11 +705,14 @@ int SymIsRef (const char* Name, int Scope)
 {
     SymEntry* S = 0;
 
+    /* Get the string pool index for the name */
+    unsigned NameId = GetStringId (Name);
+
     /* Search for the symbol */
     switch (Scope) {
-        case SCOPE_ANY:    S = SymFindAny (SymTab, Name);                 break;
-        case SCOPE_GLOBAL: S = SymFind (RootTab, Name, SF_FIND_EXISTING); break;
-        case SCOPE_LOCAL:  S = SymFind (SymTab, Name, SF_FIND_EXISTING);  break;
+        case SCOPE_ANY:    S = SymFindAny (SymTab, NameId);                 break;
+        case SCOPE_GLOBAL: S = SymFind (RootTab, NameId, SF_FIND_EXISTING); break;
+        case SCOPE_LOCAL:  S = SymFind (SymTab, NameId, SF_FIND_EXISTING);  break;
         default:           Internal ("Invalid scope in SymIsRef: %d", Scope);
     }
 
@@ -687,12 +758,12 @@ int SymIsZP (SymEntry* S)
      * enclosing scope for a symbol with the same name, and return the ZP
      * attribute of this symbol if we find one.
      */
-    if (!IsLocal (S->Name)  	      					&&
+    if (!IsLocalNameId (S->Name)                                        &&
 	(S->Flags & (SF_ZP | SF_ABS | SF_DEFINED | SF_IMPORT)) == 0     &&
-	S->SymTab->BackLink != 0) {
+	S->SymTab->Parent != 0) {
 
 	/* Try to find a symbol with the same name in the enclosing scope */
-	SymEntry* E = SymFindAny (S->SymTab->BackLink, S->Name);
+	SymEntry* E = SymFindAny (S->SymTab->Parent, S->Name);
 
 	/* If we found one, use the ZP flag */
 	if (E && (E->Flags & SF_ZP) != 0) {
@@ -830,7 +901,7 @@ const char* GetSymName (SymEntry* S)
     if (S->Flags & SF_TRAMPOLINE) {
 	S = S->V.Sym;
     }
-    return S->Name;
+    return GetString (S->Name);
 }
 
 
@@ -877,7 +948,7 @@ static void SymCheckUndefined (SymEntry* S)
     SymEntry* Sym = 0;
     if (S->SymTab) {
 	/* It's a global symbol, get the higher level table */
-	SymTable* Tab = S->SymTab->BackLink;
+	SymTable* Tab = S->SymTab->Parent;
 	while (Tab) {
 	    Sym = SymFindAny (Tab, S->Name);
 	    if (Sym) {
@@ -888,7 +959,7 @@ static void SymCheckUndefined (SymEntry* S)
 	       	     break;
 	       	} else {
 	       	    /* The symbol found is undefined itself. Look further */
-	       	    Tab = Sym->SymTab->BackLink;
+	       	    Tab = Sym->SymTab->Parent;
 	       	}
 	    } else {
 	       	/* No symbol found */
@@ -910,7 +981,7 @@ static void SymCheckUndefined (SymEntry* S)
        	if (S->Flags & SF_EXPORT) {
 	    if (Sym->Flags & SF_IMPORT) {
 	       	/* The symbol is already marked as imported external symbol */
-	       	PError (&S->Pos, ERR_SYM_ALREADY_IMPORT, S->Name);
+	       	PError (&S->Pos, ERR_SYM_ALREADY_IMPORT, GetString (S->Name));
 	    }
 	    Sym->Flags |= S->Flags & (SF_EXPORT | SF_ZP);
 	}
@@ -922,14 +993,14 @@ static void SymCheckUndefined (SymEntry* S)
 	/* The symbol is definitely undefined */
 	if (S->Flags & SF_EXPORT) {
 	    /* We will not auto-import an export */
-	    PError (&S->Pos, ERR_EXPORT_UNDEFINED, S->Name);
+	    PError (&S->Pos, ERR_EXPORT_UNDEFINED, GetString (S->Name));
 	} else {
 	    if (AutoImport) {
 		/* Mark as import, will be indexed later */
 		S->Flags |= SF_IMPORT;
 	    } else {
 		/* Error */
-	        PError (&S->Pos, ERR_SYM_UNDEFINED, S->Name);
+	        PError (&S->Pos, ERR_SYM_UNDEFINED, GetString (S->Name));
 	    }
 	}
     }
@@ -943,7 +1014,7 @@ void SymCheck (void)
     SymEntry* S;
 
     /* Check for open lexical levels */
-    if (SymTab->BackLink != 0) {
+    if (SymTab->Parent != 0) {
 	Error (ERR_OPEN_PROC);
     }
 
@@ -984,12 +1055,12 @@ void SymCheck (void)
 	    (S->Flags & SF_UNDEFMASK) != SF_UNDEFVAL) {
 	    if ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_REFERENCED) == 0) {
 		/* Symbol was defined but never referenced */
-		PWarning (&S->Pos, WARN_SYM_NOT_REFERENCED, S->Name);
+		PWarning (&S->Pos, WARN_SYM_NOT_REFERENCED, GetString (S->Name));
 	    }
 	    if (S->Flags & SF_IMPORT) {
 		if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
 		    /* Imported symbol is not referenced */
-		    PWarning (&S->Pos, WARN_IMPORT_NOT_REFERENCED, S->Name);
+		    PWarning (&S->Pos, WARN_IMPORT_NOT_REFERENCED, GetString (S->Name));
 		} else {
 		    /* Give the import an index, count imports */
 		    S->Index = ImportCount++;
@@ -1020,7 +1091,7 @@ void SymDump (FILE* F)
 	if ((S->Flags & SF_TRAMPOLINE) != 0) {
 	    fprintf (F,
 		     "%-24s %s %s %s %s %s\n",
-		     S->Name,
+		     GetString (S->Name),
 		     (S->Flags & SF_DEFINED)? "DEF" : "---",
 		     (S->Flags & SF_REFERENCED)? "REF" : "---",
 		     (S->Flags & SF_IMPORT)? "IMP" : "---",
@@ -1060,7 +1131,7 @@ void WriteImports (void)
      	    } else {
      		ObjWrite8 (IMP_ABS);
      	    }
-       	    ObjWriteVar (GetStringId (S->Name));
+       	    ObjWriteVar (S->Name);
      	    ObjWritePos (&S->Pos);
      	}
      	S = S->List;
@@ -1137,7 +1208,7 @@ void WriteExports (void)
 	    }
 
 	    /* Write the name */
-       	    ObjWriteVar (GetStringId (S->Name));
+       	    ObjWriteVar (S->Name);
 
 	    /* Write the value */
 	    if ((ExprMask & EXP_MASK_VAL) == EXP_CONST) {
@@ -1201,7 +1272,7 @@ void WriteDbgSyms (void)
 		ObjWrite8 (ExprMask);
 
 		/* Write the name */
-       	       	ObjWriteVar (GetStringId (S->Name));
+       	       	ObjWriteVar (S->Name);
 
 		/* Write the value */
 		if ((ExprMask & EXP_MASK_VAL) == EXP_CONST) {
@@ -1228,6 +1299,7 @@ void WriteDbgSyms (void)
     /* Done writing debug symbols */
     ObjEndDbgSyms ();
 }
+
 
 
 

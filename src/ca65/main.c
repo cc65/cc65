@@ -519,7 +519,7 @@ int main (int argc, char* argv [])
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
      */
-    SymEnterLevel ();
+    SymEnterLevel (0);
 
     /* Check the parameters */
     I = 1;

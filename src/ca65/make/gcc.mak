@@ -10,7 +10,8 @@ CC	= gcc
 EBIND	= emxbind
 LDFLAGS	=
 
-OBJS =  asserts.o       \
+OBJS =  anonname.o      \
+        asserts.o       \
         condasm.o	\
 	dbginfo.o	\
 	ea.o	      	\

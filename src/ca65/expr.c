@@ -84,7 +84,7 @@ static unsigned		FreeNodeCount = 0;
 
 
 
-static ExprNode* NewExprNode (void)
+static ExprNode* NewExprNode (unsigned Op)
 /* Create a new expression node */
 {
     ExprNode* N;
@@ -98,7 +98,7 @@ static ExprNode* NewExprNode (void)
 	/* Allocate fresh memory */
         N = xmalloc (sizeof (ExprNode));
     }
-    N->Op = EXPR_NULL;
+    N->Op = Op;
     N->Left = N->Right = 0;
     N->Obj = 0;
 
@@ -560,9 +560,7 @@ static ExprNode* Factor (void)
 		    N = GenLiteralExpr (GetSymVal (S));
 		} else {
 	    	    /* Create symbol node */
-		    N = NewExprNode ();
-		    N->Op    = EXPR_SYMBOL;
-	   	    N->V.Sym = S;
+		    N = GenSymExpr (S);
 		}
 		NextTok ();
 	    }
@@ -575,9 +573,7 @@ static ExprNode* Factor (void)
 	     	N = GenLiteralExpr (GetSymVal (S));
 	    } else {
 	     	/* Create symbol node */
-	     	N = NewExprNode ();
-	     	N->Op    = EXPR_SYMBOL;
-	     	N->V.Sym = S;
+	     	N = GenSymExpr (S);
 	    }
 	    NextTok ();
 	    break;
@@ -589,16 +585,14 @@ static ExprNode* Factor (void)
 
 	case TOK_MINUS:
 	    NextTok ();
-	    N = NewExprNode ();
+	    N = NewExprNode (EXPR_UNARY_MINUS);
        	    N->Left = Factor ();
-       	    N->Op   = EXPR_UNARY_MINUS;
      	    break;
 
      	case TOK_NOT:
      	    NextTok ();
-     	    N = NewExprNode ();
+     	    N = NewExprNode (EXPR_NOT);
      	    N->Left = Factor ();
-     	    N->Op   = EXPR_NOT;
      	    break;
 
      	case TOK_STAR:
@@ -609,16 +603,14 @@ static ExprNode* Factor (void)
 
 	case TOK_LT:
 	    NextTok ();
-	    N = NewExprNode ();
+	    N = NewExprNode (EXPR_BYTE0);
 	    N->Left = Factor ();
-	    N->Op   = EXPR_BYTE0;
 	    break;
 
 	case TOK_GT:
 	    NextTok ();
-	    N = NewExprNode ();
+	    N = NewExprNode (EXPR_BYTE1);
 	    N->Left = Factor ();
-	    N->Op   = EXPR_BYTE1;
 	    break;
 
 	case TOK_LPAREN:
@@ -697,32 +689,29 @@ static ExprNode* Factor (void)
 
 static ExprNode* Term (void)
 {
-    ExprNode* Root;
-
     /* Read left hand side */
-    Root = Factor ();
+    ExprNode* Root = Factor ();
 
     /* Handle multiplicative operations */
     while (Tok == TOK_MUL || Tok == TOK_DIV || Tok == TOK_MOD ||
 	   Tok == TOK_AND || Tok == TOK_XOR || Tok == TOK_SHL ||
 	   Tok == TOK_SHR) {
 
-	/* Create a new node and insert the left expression */
+	/* Create the new node */
 	ExprNode* Left = Root;
-	Root = NewExprNode ();
-	Root->Left = Left;
-
-	/* Determine the operator token */
 	switch (Tok) {
-       	    case TOK_MUL:      	Root->Op = EXPR_MUL;	break;
-	    case TOK_DIV:    	Root->Op = EXPR_DIV;   	break;
-	    case TOK_MOD:      	Root->Op = EXPR_MOD;  	break;
-       	    case TOK_AND:      	Root->Op = EXPR_AND;  	break;
-       	    case TOK_XOR:      	Root->Op = EXPR_XOR;  	break;
-       	    case TOK_SHL:      	Root->Op = EXPR_SHL;  	break;
-       	    case TOK_SHR:      	Root->Op = EXPR_SHR;  	break;
+       	    case TOK_MUL:      	Root = NewExprNode (EXPR_MUL);	break;
+       	    case TOK_DIV:      	Root = NewExprNode (EXPR_DIV);  break;
+       	    case TOK_MOD:      	Root = NewExprNode (EXPR_MOD);  break;
+       	    case TOK_AND:      	Root = NewExprNode (EXPR_AND);  break;
+       	    case TOK_XOR:      	Root = NewExprNode (EXPR_XOR);  break;
+       	    case TOK_SHL:      	Root = NewExprNode (EXPR_SHL);  break;
+       	    case TOK_SHR:      	Root = NewExprNode (EXPR_SHR);  break;
 	    default:   	    	Internal ("Invalid token");
       	}
+	Root->Left = Left;
+
+        /* Skip the operator token */
 	NextTok ();
 
 	/* Parse the right hand side */
@@ -738,26 +727,23 @@ static ExprNode* Term (void)
 
 static ExprNode* SimpleExpr (void)
 {
-    ExprNode* Root;
-
     /* Read left hand side */
-    Root = Term ();
+    ExprNode* Root = Term ();
 
     /* Handle additive operations */
     while (Tok == TOK_PLUS || Tok == TOK_MINUS || Tok == TOK_OR) {
 
-	/* Create a new node and insert the left expression */
+	/* Create the new node */
 	ExprNode* Left = Root;
-	Root = NewExprNode ();
-	Root->Left = Left;
-
-	/* Determine the operator token */
 	switch (Tok) {
-       	    case TOK_PLUS:     	Root->Op = EXPR_PLUS;	break;
-	    case TOK_MINUS:  	Root->Op = EXPR_MINUS; 	break;
-	    case TOK_OR:  	Root->Op = EXPR_OR;  	break;
+       	    case TOK_PLUS:     	Root = NewExprNode (EXPR_PLUS);	        break;
+       	    case TOK_MINUS:    	Root = NewExprNode (EXPR_MINUS); 	break;
+       	    case TOK_OR:       	Root = NewExprNode (EXPR_OR);  	        break;
 	    default:   	  	Internal ("Invalid token");
       	}
+	Root->Left = Left;
+
+        /* Skip the operator token */
 	NextTok ();
 
 	/* Parse the right hand side */
@@ -781,21 +767,20 @@ static ExprNode* BoolExpr (void)
     while (Tok == TOK_EQ || Tok == TOK_NE || Tok == TOK_LT ||
 	   Tok == TOK_GT || Tok == TOK_LE || Tok == TOK_GE) {
 
-	/* Create a new node and insert the left expression */
+	/* Create the new node */
 	ExprNode* Left = Root;
-	Root = NewExprNode ();
-	Root->Left = Left;
-
-	/* Determine the operator token */
 	switch (Tok) {
-	    case TOK_EQ:   	Root->Op = EXPR_EQ;	break;
-	    case TOK_NE:       	Root->Op = EXPR_NE;	break;
-	    case TOK_LT:   	Root->Op = EXPR_LT;	break;
-	    case TOK_GT:   	Root->Op = EXPR_GT;	break;
-	    case TOK_LE:   	Root->Op = EXPR_LE;	break;
-	    case TOK_GE:   	Root->Op = EXPR_GE;	break;
+       	    case TOK_EQ:       	Root = NewExprNode (EXPR_EQ);	break;
+       	    case TOK_NE:       	Root = NewExprNode (EXPR_NE);	break;
+       	    case TOK_LT:       	Root = NewExprNode (EXPR_LT);	break;
+       	    case TOK_GT:       	Root = NewExprNode (EXPR_GT);	break;
+       	    case TOK_LE:       	Root = NewExprNode (EXPR_LE);	break;
+       	    case TOK_GE:       	Root = NewExprNode (EXPR_GE);	break;
 	    default:	   	Internal ("Invalid token");
       	}
+	Root->Left = Left;
+
+        /* Skip the operator token */
 	NextTok ();
 
 	/* Parse the right hand side */
@@ -818,17 +803,16 @@ static ExprNode* Expr2 (void)
     /* Handle booleans */
     while (Tok == TOK_BAND || Tok == TOK_BXOR) {
 
-	/* Create a new node and insert the left expression */
+	/* Create the new node */
 	ExprNode* Left = Root;
-	Root = NewExprNode ();
-	Root->Left = Left;
-
-	/* Determine the operator token */
 	switch (Tok) {
-	    case TOK_BAND:	Root->Op = EXPR_BAND;	break;
-	    case TOK_BXOR:	Root->Op = EXPR_BXOR; 	break;
+       	    case TOK_BAND:     	Root = NewExprNode (EXPR_BAND);	break;
+       	    case TOK_BXOR:     	Root = NewExprNode (EXPR_BXOR); break;
 	    default:	   	Internal ("Invalid token");
       	}
+	Root->Left = Left;
+
+        /* Skip the operator token */
 	NextTok ();
 
 	/* Parse the right hand side */
@@ -851,16 +835,15 @@ static ExprNode* Expr1 (void)
     /* Handle booleans */
     while (Tok == TOK_BOR) {
 
-	/* Create a new node and insert the left expression */
+	/* Create the new node */
 	ExprNode* Left = Root;
-	Root = NewExprNode ();
-	Root->Left = Left;
-
-	/* Determine the operator token */
 	switch (Tok) {
-	    case TOK_BOR: 	Root->Op = EXPR_BOR;  	break;
+       	    case TOK_BOR:      	Root = NewExprNode (EXPR_BOR);  break;
 	    default:  	   	Internal ("Invalid token");
       	}
+	Root->Left = Left;
+
+        /* Skip the operator token */
 	NextTok ();
 
 	/* Parse the right hand side */
@@ -882,14 +865,10 @@ static ExprNode* Expr0 (void)
     /* Handle booleans */
     if (Tok == TOK_BNOT) {
 
-       	/* Create a new node */
-     	Root = NewExprNode ();
+	/* Create the new node */
+        Root = NewExprNode (EXPR_BNOT);
 
-     	/* Determine the operator token */
-     	switch (Tok) {
-     	    case TOK_BNOT: 	Root->Op = EXPR_BNOT;	break;
-     	    default:  	   	Internal ("Invalid token");
-      	}
+        /* Skip the operator token */
      	NextTok ();
 
      	/* Parse the left hand side, allow more BNOTs */
@@ -912,8 +891,8 @@ static ExprNode* SimplifyExpr (ExprNode* Root)
 /* Try to simplify the given expression tree */
 {
     if (Root) {
- 	SimplifyExpr (Root->Left);
- 	SimplifyExpr (Root->Right);
+       	Root->Left  = SimplifyExpr (Root->Left);
+ 	Root->Right = SimplifyExpr (Root->Right);
 	if (IsConstExpr (Root)) {
 	    /* The complete expression is constant */
 	    Root->V.Val = GetExprVal (Root);
@@ -966,6 +945,10 @@ void FreeExpr (ExprNode* Root)
     if (Root) {
      	FreeExpr (Root->Left);
     	FreeExpr (Root->Right);
+        if (Root->Op == EXPR_SYMBOL) {
+            /* Remove the symbol reference */
+            SymDelRef (Root->V.Sym, Root);
+        }
     	FreeExprNode (Root);
     }
 }
@@ -975,9 +958,29 @@ void FreeExpr (ExprNode* Root)
 ExprNode* GenLiteralExpr (long Val)
 /* Return an expression tree that encodes the given literal value */
 {
-    ExprNode* Expr = NewExprNode ();
-    Expr->Op = EXPR_LITERAL;
+    ExprNode* Expr = NewExprNode (EXPR_LITERAL);
     Expr->V.Val = Val;
+    return Expr;
+}
+
+
+
+ExprNode* GenSymExpr (SymEntry* Sym)
+/* Return an expression node that encodes the given symbol */
+{
+    ExprNode* Expr = NewExprNode (EXPR_SYMBOL);
+    Expr->V.Sym = Sym;
+    SymAddRef (Sym, Expr);
+    return Expr;
+}
+
+
+
+static ExprNode* GenSectionExpr (unsigned SegNum)
+/* Return an expression node for the given section */
+{
+    ExprNode* Expr = NewExprNode (EXPR_SECTION);
+    Expr->V.SegNum = SegNum;
     return Expr;
 }
 
@@ -986,19 +989,13 @@ ExprNode* GenLiteralExpr (long Val)
 ExprNode* GenCurrentPC (void)
 /* Return the current program counter as expression */
 {
-    ExprNode* Left;
     ExprNode* Root;
 
     if (RelocMode) {
 	/* Create SegmentBase + Offset */
-	Left = NewExprNode ();
-	Left->Op = EXPR_SECTION;
-	Left->V.SegNum = GetSegNum ();
-
-	Root = NewExprNode ();
-	Root->Left  = Left;
+	Root = NewExprNode (EXPR_PLUS);
+	Root->Left  = GenSectionExpr (GetSegNum ());
 	Root->Right = GenLiteralExpr (GetPC ());
-	Root->Op = EXPR_PLUS;
     } else {
      	/* Absolute mode, just return PC value */
 	Root = GenLiteralExpr (GetPC ());
@@ -1012,8 +1009,7 @@ ExprNode* GenCurrentPC (void)
 ExprNode* GenSwapExpr (ExprNode* Expr)
 /* Return an extended expression with lo and hi bytes swapped */
 {
-    ExprNode* N = NewExprNode ();
-    N->Op = EXPR_SWAP;
+    ExprNode* N = NewExprNode (EXPR_SWAP);
     N->Left = Expr;
     return N;
 }
@@ -1027,27 +1023,20 @@ ExprNode* GenBranchExpr (unsigned Offs)
 {
     ExprNode* N;
     ExprNode* Root;
-    ExprNode* Left;
 
     /* Create *+Offs */
     if (RelocMode) {
-	Left = NewExprNode ();
-	Left->Op = EXPR_SECTION;
-	Left->V.SegNum = GetSegNum ();
-
-	N = NewExprNode ();
-	N->Left  = Left;
+	N = NewExprNode (EXPR_PLUS);
+	N->Left  = GenSectionExpr (GetSegNum ());
 	N->Right = GenLiteralExpr (GetPC () + Offs);
-	N->Op = EXPR_PLUS;
     } else {
 	N = GenLiteralExpr (GetPC () + Offs);
     }
 
     /* Create the root node */
-    Root = NewExprNode ();
+    Root = NewExprNode (EXPR_MINUS);
     Root->Left = Expression ();
     Root->Right = N;
-    Root->Op = EXPR_MINUS;
 
     /* Return the result */
     return SimplifyExpr (Root);
@@ -1058,11 +1047,7 @@ ExprNode* GenBranchExpr (unsigned Offs)
 ExprNode* GenULabelExpr (unsigned Num)
 /* Return an expression for an unnamed label with the given index */
 {
-    /* Get an expression node */
-    ExprNode* Node = NewExprNode ();
-
-    /* Set the values */
-    Node->Op 	= EXPR_ULABEL;
+    ExprNode* Node = NewExprNode (EXPR_ULABEL);
     Node->V.Val	= Num;
 
     /* Return the new node */
@@ -1075,9 +1060,8 @@ ExprNode* GenByteExpr (ExprNode* Expr)
 /* Force the given expression into a byte and return the result */
 {
     /* Use the low byte operator to force the expression into byte size */
-    ExprNode* Root = NewExprNode ();
+    ExprNode* Root = NewExprNode (EXPR_BYTE0);
     Root->Left  = Expr;
-    Root->Op    = EXPR_BYTE0;
 
     /* Return the result */
     return Root;
@@ -1089,9 +1073,8 @@ ExprNode* GenWordExpr (ExprNode* Expr)
 /* Force the given expression into a word and return the result. */
 {
     /* AND the expression by $FFFF to force it into word size */
-    ExprNode* Root = NewExprNode ();
+    ExprNode* Root = NewExprNode (EXPR_AND);
     Root->Left  = Expr;
-    Root->Op    = EXPR_AND;
     Root->Right	= GenLiteralExpr (0xFFFF);
 
     /* Return the result */
@@ -1104,9 +1087,8 @@ ExprNode* GenNE (ExprNode* Expr, long Val)
 /* Generate an expression that compares Expr and Val for inequality */
 {
     /* Generate a compare node */
-    ExprNode* Root = NewExprNode ();
+    ExprNode* Root = NewExprNode (EXPR_NE);
     Root->Left  = Expr;
-    Root->Op    = EXPR_NE;
     Root->Right	= GenLiteralExpr (Val);
 
     /* Return the result */
@@ -1165,7 +1147,7 @@ int IsConstExpr (ExprNode* Root)
 	 	    } else {
 	 		return IsConstExpr (Root->Right);
 	 	    }
-	 	} else {
+	     	} else {
 	 	    /* lhs not const --> tree not const */
 	 	    return 0;
 	 	}
@@ -1208,7 +1190,7 @@ static void CheckByteExpr (const ExprNode* N, int* IsByte)
     		    case EXPR_SYMBOL:
     			if (SymIsZP (N->V.Sym)) {
     			    *IsByte = 1;
-    		       	} else if (SymHasExpr (N->V.Sym)) {
+    	     	       	} else if (SymHasExpr (N->V.Sym)) {
 			    /* Check if this expression is a byte expression */
 			    *IsByte = IsByteExpr (GetSymExpr (N->V.Sym));
 			}
@@ -1403,31 +1385,31 @@ static ExprNode* RemoveSyms (ExprNode* Expr, int MustClone)
 
  	case EXPR_SYMBOL:
 	    if (SymHasExpr (Expr->V.Sym)) {
-		/* The symbol has an expression tree */
-		SymEntry* Sym = Expr->V.Sym;
-		if (SymHasUserMark (Sym)) {
-		    /* Circular definition */
-		    if (Verbosity) {
-			DumpExpr (Expr);
-		    }
-		    PError (GetSymPos (Sym), ERR_CIRCULAR_REFERENCE);
-		    return GenLiteralExpr (0);		/* Return a dummy value */
-		}
-		SymMarkUser (Sym);
-		Expr = RemoveSyms (GetSymExpr (Sym), 1);
-		SymUnmarkUser (Sym);
-		return Expr;
+	     	/* The symbol has an expression tree */
+	     	SymEntry* Sym = Expr->V.Sym;
+	     	if (SymHasUserMark (Sym)) {
+	     	    /* Circular definition */
+	     	    if (Verbosity) {
+	     		DumpExpr (Expr);
+	     	    }
+	     	    PError (GetSymPos (Sym), ERR_CIRCULAR_REFERENCE);
+	     	    return GenLiteralExpr (0);		/* Return a dummy value */
+	     	}
+	     	SymMarkUser (Sym);
+	     	Expr = RemoveSyms (GetSymExpr (Sym), 1);
+	     	SymUnmarkUser (Sym);
+	     	return Expr;
 	    } else if (SymIsConst (Expr->V.Sym)) {
-		/* The symbol is a constant */
-		return GenLiteralExpr (GetSymVal (Expr->V.Sym));
+	     	/* The symbol is a constant */
+	     	return GenLiteralExpr (GetSymVal (Expr->V.Sym));
 	    }
 	    break;
 
 	case EXPR_ULABEL:
 	    if (ULabCanResolve ()) {
-		ExprNode* NewExpr = ULabResolve (Expr->V.Val);
-		FreeExpr (Expr);
-		Expr = NewExpr;
+	     	ExprNode* NewExpr = ULabResolve (Expr->V.Val);
+	     	FreeExpr (Expr);
+	     	Expr = NewExpr;
 	    }
 	    break;
 
@@ -1436,33 +1418,34 @@ static ExprNode* RemoveSyms (ExprNode* Expr, int MustClone)
     /* Clone the current node if needed */
     if (MustClone) {
 
-     	/* Create a new node */
-       	ExprNode* Clone = NewExprNode ();
+       	ExprNode* Clone;
 
-     	/* Clone the operation */
-     	Clone->Op = Expr->Op;
-
-	/* Clone the attribute if needed */
+	/* Clone the expression tree */
 	switch (Expr->Op) {
 
      	    case EXPR_LITERAL:
+                Clone = GenLiteralExpr (Expr->V.Val);
+                break;
+
 	    case EXPR_ULABEL:
-	   	Clone->V.Val = Expr->V.Val;
-	   	break;
+                Clone = GenULabelExpr (Expr->V.Val);
+                break;
 
 	    case EXPR_SYMBOL:
-     	   	Clone->V.Sym = Expr->V.Sym;
-	   	break;
+                Clone = GenSymExpr (Expr->V.Sym);
+                break;
 
 	    case EXPR_SECTION:
-	   	Clone->V.SegNum = Expr->V.SegNum;
-	   	break;
+                Clone = GenSectionExpr (Expr->V.SegNum);
+                break;
+
+            default:
+                Clone = NewExprNode (Expr->Op);
+                Clone->Left  = RemoveSyms (Expr->Left, 1);
+                Clone->Right = RemoveSyms (Expr->Right, 1);
+                break;
 
       	}
-
-	/* Clone the tree nodes */
-       	Clone->Left = RemoveSyms (Expr->Left, MustClone);
-	Clone->Right = RemoveSyms (Expr->Right, MustClone);
 
 	/* Done */
 	return Clone;
@@ -1470,12 +1453,11 @@ static ExprNode* RemoveSyms (ExprNode* Expr, int MustClone)
     } else {
 
  	/* Nothing to clone */
-     	Expr->Left = RemoveSyms (Expr->Left, MustClone);
-     	Expr->Right = RemoveSyms (Expr->Right, MustClone);
+       	Expr->Left  = RemoveSyms (Expr->Left, 0);
+     	Expr->Right = RemoveSyms (Expr->Right, 0);
 
      	/* Done */
      	return Expr;
-
     }
 }
 
@@ -1560,8 +1542,7 @@ ExprNode* FinalizeExpr (ExprNode* Expr)
 	Expr = GenLiteralExpr (Val);
     } else if (Val) {
      	/* Extracted a value */
-     	N = NewExprNode ();
-     	N->Op = EXPR_PLUS;
+     	N = NewExprNode (EXPR_PLUS);
      	N->Left = Expr;
      	N->Right = GenLiteralExpr (Val);
      	Expr = N;
@@ -1583,33 +1564,33 @@ ExprNode* CloneExpr (ExprNode* Expr)
         return 0;
     }
 
-    /* Get a new node */
-    Clone = NewExprNode ();
-
-    /* Clone the operation */
-    Clone->Op = Expr->Op;
-
-    /* Clone the attribute if needed */
+    /* Clone the node */
     switch (Expr->Op) {
 
 	case EXPR_LITERAL:
+            Clone = GenLiteralExpr (Expr->V.Val);
+            break;
+
 	case EXPR_ULABEL:
-	    Clone->V.Val = Expr->V.Val;
+	    Clone = GenULabelExpr (Expr->V.Val);
 	    break;
 
 	case EXPR_SYMBOL:
-	    Clone->V.Sym = Expr->V.Sym;
+	    Clone = GenSymExpr (Expr->V.Sym);
 	    break;
 
 	case EXPR_SECTION:
-	    Clone->V.SegNum = Expr->V.SegNum;
+	    Clone = GenSectionExpr (Expr->V.SegNum);
 	    break;
 
+        default:
+            /* Generate a new node */
+            Clone = NewExprNode (Expr->Op);
+            /* Clone the tree nodes */
+            Clone->Left = CloneExpr (Expr->Left);
+            Clone->Right = CloneExpr (Expr->Right);
+            break;
     }
-
-    /* Clone the tree nodes */
-    Clone->Left = CloneExpr (Expr->Left);
-    Clone->Right = CloneExpr (Expr->Right);
 
     /* Done */
     return Clone;
@@ -1663,3 +1644,4 @@ void WriteExpr (ExprNode* Expr)
 
 
 
+                  

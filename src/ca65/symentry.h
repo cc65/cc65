@@ -40,6 +40,7 @@
 
 /* common */
 #include "cddefs.h"
+#include "coll.h"
 #include "filepos.h"
 
 
@@ -52,12 +53,12 @@
 
 /* Bits for the Flags value in SymEntry */
 #define SF_NONE         0x0000          /* Empty flag set */
-#define SF_USER		0x0001		/* User bit */
-#define SF_TRAMPOLINE  	0x0002		/* Trampoline entry */
-#define SF_EXPORT      	0x0004		/* Export this symbol */
-#define SF_IMPORT   	0x0008		/* Import this symbol */
-#define SF_GLOBAL	0x0010		/* Global symbol */
-#define SF_ZP  	       	0x0020		/* Declared as zeropage symbol */
+#define SF_USER		0x0001	    	/* User bit */
+#define SF_TRAMPOLINE  	0x0002	    	/* Trampoline entry */
+#define SF_EXPORT      	0x0004	    	/* Export this symbol */
+#define SF_IMPORT   	0x0008	    	/* Import this symbol */
+#define SF_GLOBAL	0x0010	    	/* Global symbol */
+#define SF_ZP  	       	0x0020	    	/* Declared as zeropage symbol */
 #define SF_ABS		0x0040 		/* Declared as absolute symbol */
 #define SF_LABEL        0x0080          /* Used as a label */
 #define SF_FORCED       0x0100          /* Forced import, SF_IMPORT also set */
@@ -84,9 +85,10 @@ struct SymEntry {
 	long	    	    Val;  	/* Value (if CONST set) */
 	SymEntry*  	    Sym;	/* Symbol (if trampoline entry) */
     } V;
+    Collection              ExprRefs;   /* Expressions using this symbol */
     unsigned char      	    ConDesPrio[CD_TYPE_COUNT];	/* ConDes priorities... */
 					/* ...actually value+1 (used as flag) */
-    char       	       	    Name [1];	/* Dynamic allocation */
+    unsigned                Name;      	/* Name index in global string pool */
 };
 
 /* List of all symbol table entries */
@@ -95,13 +97,33 @@ extern SymEntry* SymList;
 
 
 /*****************************************************************************/
-/*     	       	   	  	     Code			   	     */
+/*     	       	   	  	     Code	  		   	     */
 /*****************************************************************************/
 
 
 
-SymEntry* NewSymEntry (const char* Name);
+SymEntry* NewSymEntry (unsigned Name);
 /* Allocate a symbol table entry, initialize and return it */
+
+#if defined(HAVE_INLINE)
+INLINE void SymAddRef (SymEntry* Sym, struct ExprNode* Expr)
+/* Add a reference to this symbol */
+{
+    CollAppend (&Sym->ExprRefs, Expr);
+}
+#else
+#define SymAddRef(Sym,Expr)     CollAppend (&(Sym)->ExprRefs, Expr)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void SymDelRef (SymEntry* Sym, struct ExprNode* Expr)
+/* Delete a reference to this symbol */
+{
+    CollDeleteItem (&Sym->ExprRefs, Expr);
+}
+#else
+#define SymDelRef(Sym,Expr)     CollDeleteItem (&(Sym)->ExprRefs, Expr)
+#endif
 
 
 

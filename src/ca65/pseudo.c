@@ -49,6 +49,7 @@
 #include "xmalloc.h"
 
 /* ca65 */
+#include "anonname.h"
 #include "asserts.h"
 #include "condasm.h"
 #include "dbginfo.h"
@@ -1248,10 +1249,13 @@ static void DoProc (void)
         if (IsZPSeg ()) {
             Flags |= SYM_ZP;
         }
-	SymDef (SVal, GenCurrentPC (), Flags);
-	NextTok ();
+    	SymDef (SVal, GenCurrentPC (), Flags);
+        SymEnterLevel (SVal);
+    	NextTok ();
+    } else {
+        char Buf[sizeof (SVal)];
+        SymEnterLevel (AnonName (Buf, sizeof (Buf), "Scope"));
     }
-    SymEnterLevel ();
 }
 
 

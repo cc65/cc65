@@ -72,7 +72,7 @@
 
 
 
-void SymEnterLevel (void);
+void SymEnterLevel (const char* ScopeName);
 /* Enter a new lexical level */
 
 void SymLeaveLevel (void);

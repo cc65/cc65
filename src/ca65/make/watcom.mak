@@ -43,7 +43,8 @@ CFLAGS  += -i=..\common
 # ------------------------------------------------------------------------------
 # All library OBJ files
 
-OBJS = 	asserts.obj     \
+OBJS = 	anonname.obj    \
+        asserts.obj     \
         condasm.obj	\
 	dbginfo.obj	\
 	ea.obj		\

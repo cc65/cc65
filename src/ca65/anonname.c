@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  symentry.c				     */
+/*				  anonname.c				     */
 /*                                                                           */
-/*	    Symbol table entry forward for the ca65 macroassembler	     */
+/*             Create names for anonymous scopes/variables/types             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,58 +33,51 @@
 
 
 
+#include <stdio.h>
 #include <string.h>
 
 /* common */
-#include "xmalloc.h"
+#include "xsprintf.h"
 
 /* ca65 */
-#include "scanner.h"
-#include "symentry.h"
+#include "anonname.h"
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/* 		     		     Data				     */
 /*****************************************************************************/
 
 
 
-SymEntry* SymList = 0;  	/* List of all symbol table entries */
+static const char AnonTag[] = "$anon";
 
 
 
 /*****************************************************************************/
-/*     	       		  	     Code			   	     */
+/* 		      		     Code				     */
 /*****************************************************************************/
 
 
 
-SymEntry* NewSymEntry (unsigned Name)
-/* Allocate a symbol table entry, initialize and return it */
+char* AnonName (char* Buf, unsigned Size, const char* Spec)
+/* Get a name for an anonymous scope, variable or type. Size is the size of
+ * the buffer passed to the function, Spec will be used as part of the
+ * identifier if given. A pointer to the buffer is returned.
+ */
 {
-    /* Allocate memory */
-    SymEntry* S = xmalloc (sizeof (SymEntry));
-
-    /* Initialize the entry */
-    S->Left	= 0;
-    S->Right	= 0;
-    S->Locals	= 0;
-    S->SymTab	= 0;
-    S->Pos	= CurPos;
-    S->Flags	= 0;
-    S->V.Expr	= 0;
-    S->ExprRefs = AUTO_COLLECTION_INITIALIZER;
-    memset (S->ConDesPrio, 0, sizeof (S->ConDesPrio));
-    S->Name     = Name;
-
-    /* Insert it into the list of all entries */
-    S->List = SymList;
-    SymList = S;
-
-    /* Return the initialized entry */
-    return S;
+    static unsigned ACount = 0;
+    xsprintf (Buf, Size, "%s-%s-%04X", AnonTag, Spec, ++ACount);
+    return Buf;
 }
 
 
-                   
+
+int IsAnonName (const char* Name)
+/* Check if the given symbol name is that of an anonymous symbol */
+{
+    return (strncmp (Name, AnonTag, sizeof (AnonTag) - 1) == 0);
+}
+
+
+

@@ -66,6 +66,9 @@ void FreeExpr (ExprNode* Root);
 ExprNode* GenLiteralExpr (long Val);
 /* Return an expression tree that encodes the given literal value */
 
+ExprNode* GenSymExpr (struct SymEntry* Sym);
+/* Return an expression node that encodes the given symbol */
+
 ExprNode* GenCurrentPC (void);
 /* Return the current program counter as expression */
 

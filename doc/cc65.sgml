@@ -54,32 +54,34 @@ The compiler may be called as follows:
 ---------------------------------------------------------------------------
 Usage: cc65 [options] file
 Short options:
-  -d			Debug mode
-  -g			Add debug info to object file
-  -h			Help (this text)
-  -j			Default characters are signed
-  -o name		Name the output file
-  -t sys		Set the target system
-  -v			Increase verbosity
-  -A			Strict ANSI mode
-  -Cl			Make local variables static
-  -Dsym[=defn]		Define a symbol
-  -I dir		Set an include directory search path
-  -O			Optimize code
-  -Oi			Optimize code, inline more code
-  -Or			Enable register variables
-  -Os	    		Inline some known functions
-  -T			Include source as comment
-  -V			Print the compiler version number
-  -W			Suppress warnings
+  -A                    Strict ANSI mode
+  -Cl                   Make local variables static
+  -Dsym[=defn]          Define a symbol
+  -I dir                Set an include directory search path
+  -O                    Optimize code
+  -Oi                   Optimize code, inline more code
+  -Or                   Enable register variables
+  -Os                   Inline some known functions
+  -T                    Include source as comment
+  -V                    Print the compiler version number
+  -W                    Suppress warnings
+  -d                    Debug mode
+  -g                    Add debug info to object file
+  -h                    Help (this text)
+  -j                    Default characters are signed
+  -o name               Name the output file
+  -t sys                Set the target system
+  -v                    Increase verbosity
 
 Long options:
+  --add-source          Include source as comment
   --ansi                Strict ANSI mode
   --bss-name seg        Set the name of the BSS segment
   --check-stack         Generate stack overflow checks
   --code-name seg       Set the name of the CODE segment
   --codesize x          Accept larger code by factor x
   --cpu type            Set cpu type
+  --create-dep          Create a make dependency file
   --data-name seg       Set the name of the DATA segment
   --debug               Debug mode
   --debug-info          Add debug info to object file
@@ -142,6 +144,13 @@ Here is a description of all the command line options:
   Don't expect too much from this option: It is still new (and may have
   bugs), and the additional instructions for the 65C02 are not that
   overwhelming.
+
+
+  <tag><tt>--create-dep</tt></tag>
+
+  Tells the compiler to generate a file containing the dependency list for
+  the compiled module in makefile syntax. The file is named as the C input
+  file with the extension replaced by <tt/.u/.
 
 
   <tag><tt>-d, --debug</tt></tag>
@@ -293,7 +302,7 @@ Here is a description of all the command line options:
   <tt/-Ors/.
 
 
-  <tag><tt>-T</tt></tag>
+  <tag><tt>-T, --add-source</tt></tag>
 
   This include the source code as comments in the generated code. This is
   normally not needed.

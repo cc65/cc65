@@ -34,42 +34,56 @@ assembler) and other things.
 ---------------------------------------------------------------------------
 Usage: cl65 [options] file
 Short options:
-  -A	       	       	Strict ANSI mode
-  -C name      	       	Use linker config file
-  -Cl	       	       	Make local variables static
-  -D sym[=defn]	       	Define a preprocessor symbol
-  -I dir       	       	Set a compiler include directory path
-  -Ln name     	       	Create a VICE label file
-  -O	       	       	Optimize code
-  -Oi	       		Optimize code, inline functions
-  -Or	       		Optimize code, honour the register keyword
-  -Os	       		Optimize code, inline known C funtions
-  -S	       		Compile but don't assemble and link
-  -V	       		Print the version number
-  -W	       		Suppress warnings
-  -c	       		Compiler and assemble but don't link
-  -d	       		Debug mode
-  -g	       		Add debug info
-  -h	       		Help (this text)
-  -m name      		Create a map file
-  -o name      		Name the output file
-  -t sys       		Set the target system
-  -v	       		Verbose mode
-  -vm	       		Verbose map file
+  -A                    Strict ANSI mode
+  -C name               Use linker config file
+  -Cl                   Make local variables static
+  -D sym[=defn]         Define a preprocessor symbol
+  -I dir                Set a compiler include directory path
+  -Ln name              Create a VICE label file
+  -O                    Optimize code
+  -Oi                   Optimize code, inline functions
+  -Or                   Optimize code, honour the register keyword
+  -Os                   Optimize code, inline known C funtions
+  -S                    Compile but don't assemble and link
+  -T                    Include source as comment
+  -V                    Print the version number
+  -W                    Suppress warnings
+  -c                    Compiler and assemble but don't link
+  -d                    Debug mode
+  -g                    Add debug info
+  -h                    Help (this text)
+  -l                    Create an assembler listing
+  -m name               Create a map file
+  -o name               Name the output file
+  -t sys                Set the target system
+  -v                    Verbose mode
+  -vm                   Verbose map file
 
 Long options:
-  --ansi       		Strict ANSI mode
-  --asm-include-dir dir	Set an assembler include directory
-  --cpu type		Set cpu type
-  --debug      		Debug mode
-  --debug-info 	      	Add debug info
+  --add-source          Include source as comment
+  --ansi                Strict ANSI mode
+  --asm-include-dir dir Set an assembler include directory
+  --bss-name seg        Set the name of the BSS segment
+  --check-stack         Generate stack overflow checks
+  --code-name seg       Set the name of the CODE segment
+  --codesize x          Accept larger code by factor x
+  --cpu type            Set cpu type
+  --create-dep          Create a make dependency file
+  --data-name seg       Set the name of the DATA segment
+  --debug               Debug mode
+  --debug-info          Add debug info
   --feature name        Set an emulation feature
-  --help       		Help (this text)
-  --include-dir dir	Set a compiler include directory path
-  --mapfile name	Create a map file
-  --target sys 		Set the target system
-  --version    		Print the version number
-  --verbose    		Verbose mode
+  --help                Help (this text)
+  --include-dir dir     Set a compiler include directory path
+  --listing             Create an assembler listing
+  --mapfile name        Create a map file
+  --rodata-name seg     Set the name of the RODATA segment
+  --signed-chars        Default characters are signed
+  --start-addr addr     Set the default start address
+  --static-locals       Make local variables static
+  --target sys          Set the target system
+  --version             Print the version number
+  --verbose             Verbose mode
 ---------------------------------------------------------------------------
 </verb></tscreen>
 

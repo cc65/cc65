@@ -13,6 +13,7 @@
 OBJS = 	add.o		\
        	addeqsp.o	\
 	addysp.o	\
+        along.o         \
        	and.o		\
        	aslax1.o	\
        	aslax2.o	\

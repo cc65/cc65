@@ -7,7 +7,7 @@
 	.include "atari.inc"
 	.include "errno.inc"
 	.import	findfreeiocb
-	.importzp tmp2
+	.importzp tmp4
 .ifdef	UCASE_FILENAME
 	.importzp tmp3
 	.import	addysp
@@ -30,7 +30,7 @@
 	lda	#TMOF		; too many open files
 	rts
 
-iocbok:	stx	tmp2		; remember IOCB index
+iocbok:	stx	tmp4		; remember IOCB index
 	pla
 	tax
 	pla			; get argument again
@@ -46,7 +46,7 @@ ucok1:
 
 .endif	; defined UCASE_FILENAME
 
-	ldy	tmp2		; IOCB index
+	ldy	tmp4		; IOCB index
 	sta	ICBAL,y		; store pointer to filename
 	txa
 	sta	ICBAH,y

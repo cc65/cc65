@@ -1,13 +1,15 @@
 ;
-; Piotr Fusik, 11.11.2001
+; Piotr Fusik, 18.11.2001
 ;
-; void* inflatemem (void* dest, void* src);
+; unsigned __fastcall__ inflatemem (char* dest, const char* source);
 ;
 
 	.export		_inflatemem
 
-	.import		popax
-	.importzp	sreg, ptr1, ptr2, ptr3, ptr4, tmp1, tmp2, tmp3, tmp4
+	.import		incsp2
+	.importzp	sp, sreg
+	.importzp	ptr1, ptr2, ptr3, ptr4
+	.importzp	tmp1, tmp2, tmp3, tmp4
 
 ; --------------------------------------------------------------------------
 ;
@@ -51,18 +53,21 @@ dest          =	ptr4	; 2 bytes
 
 _inflatemem:
 
-; Get inputPointer and outputPointer from stack
-	jsr	popax
+; inputPointer = source
 	sta	inputPointer
 	stx	inputPointer+1
-	jsr	popax
+; outputPointer = dest
+	ldy	#0
+	lda	(sp),y
 	sta	outputPointer
-	stx	outputPointer+1
+	iny
+	lda	(sp),y
+	sta	outputPointer+1
 
-	ldy	#1
+;	ldy	#1
 	sty	getBitHold
-; Get a bit of EOF and two bits of block type
 inflatemem_1:
+; Get a bit of EOF and two bits of block type
 	ldx	#3
 	lda	#0
 	jsr	getBits
@@ -75,9 +80,20 @@ inflatemem_1:
 	jsr	callExtr
 	plp
 	bcc	inflatemem_1
+; C flag is set!
+
+; return outputPointer - dest;
 	lda	outputPointer
-	ldx	outputPointer+1
-	rts
+	ldy	#0
+	sbc	(sp),y	; C flag is set
+	pha
+	iny
+	lda	outputPointer+1
+	sbc	(sp),y
+	tax
+	pla
+; pop dest
+	jmp	incsp2
 
 ; --------------------------------------------------------------------------
 ; Go to the routine decompressing block type X
@@ -347,30 +363,31 @@ inflateCodes_2:
 
 buildHuffmanTree:
 	lda	#<literalCodeLength
-	sta	buildHuffmanTree_3+1
-	sta	buildHuffmanTree_9+1
+	sta	ptr
+	sta	src
 	lda	#>literalCodeLength
-	sta	buildHuffmanTree_3+2
-	sta	buildHuffmanTree_9+2
+	sta	ptr+1
+	sta	src+1
 ; Clear counts
-	ldx	#TREES_SIZE-1
+	ldy	#TREES_SIZE
 	lda	#0
 buildHuffmanTree_1:
-	sta	bitsCount,x
-	dex
-	bpl	buildHuffmanTree_1
-	bmi	buildHuffmanTree_3	; branch always
+	sta	bitsCount-1,y
+	dey
+	bne	buildHuffmanTree_1
+	beq	buildHuffmanTree_3	; branch always
 ; Count number of codes of each length
 buildHuffmanTree_2:
+	tax
 	inc	bitsCount,x
-	inc	buildHuffmanTree_3+1
+	iny
 	bne	buildHuffmanTree_3
-	inc	buildHuffmanTree_3+2
+	inc	ptr+1
 buildHuffmanTree_3:
-	ldx	$ffff	; patched at runtime
+	lda	(ptr),y
 	bpl	buildHuffmanTree_2
 ; Calculate pointer for each length
-	tax		; ldx #0
+	ldx	#0
 	stx	bitsCount
 	lda	#<sortedCodes
 	ldy	#>sortedCodes
@@ -391,10 +408,16 @@ buildHuffmanTree_6:
 	inx
 	cpx	#TREES_SIZE
 	bcc	buildHuffmanTree_4
+.ifpc02
+	ldy	#1
+.else
+	ldy	#0
+.endif
 	bcs	buildHuffmanTree_9	; branch always
 ; Put codes into their place in sorted table
 buildHuffmanTree_7:
 	beq	buildHuffmanTree_8
+	tax
 	lda	bitsPointer_l,x
 	sta	ptr
 	clc
@@ -404,24 +427,31 @@ buildHuffmanTree_7:
 	sta	ptr+1
 	adc	#0
 	sta	bitsPointer_h,x
-	lda	buildHuffmanTree_9+1
+	lda	src
 	sbc	#<(endCodeLength-1)	; C flag is zero
-	ldy	#1
+.ifpc02
+.else
+	iny				; ldy #1
+.endif
 	sta	(ptr),y
-	lda	buildHuffmanTree_9+2
+	lda	src+1
 	sbc	#>(endCodeLength-1)
 .ifpc02
 	sta	(ptr)
 .else
-	dey
+	dey				; ldy #0
 	sta	(ptr),y
 .endif
 buildHuffmanTree_8:
-	inc	buildHuffmanTree_9+1
+	inc	src
 	bne	buildHuffmanTree_9
-	inc	buildHuffmanTree_9+2
+	inc	src+1
 buildHuffmanTree_9:
-	ldx	$ffff	; patched at runtime
+.ifpc02
+	lda	(src)
+.else
+	lda	(src),y
+.endif
 	bpl	buildHuffmanTree_7
 	rts
 
@@ -533,6 +563,12 @@ getBit_1:
 getBit_ret:
 	rts
 
+; --------------------------------------------------------------------------
+;
+; Constant data
+;
+
+	.rodata
 ; --------------------------------------------------------------------------
 ; Addresses of functions extracting different blocks
 extr_l:

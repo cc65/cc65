@@ -251,15 +251,17 @@ Command line arguments can be passed to <tt/main()/. Since this is not
 supported by BASIC, the following syntax was choosen:
 
 <tscreen><verb>
-    RUN:REM,ARG1," ARG2", ARG 3,, ARG5, ...
+    RUN:REM ARG1 " ARG2 IS QUOTED" ARG3 "" ARG5
 </verb></tscreen>
 
 <enum>
-<item>Arguments are separated by commas.
-<item>There must be a comma after the first <tt/REM/.
-<item>Leading spaces are ignored; trailing spaces are included unless the
-      argument was quoted.
+<item>Arguments are separated by spaces.
+<item>Arguments may be quoted.
+<item>Leading and trailing spaces around an argument are ignored. Spaces within
+      a quoted argument are allowed.
 <item>The first argument passed to <tt/main/ is the program name.
+<item>A maximum number of 10 arguments (including the program name) are
+      supported.
 </enum>
 
 
@@ -276,7 +278,7 @@ interrupt handlers. Such routines must be written as simple machine language
 subroutines and will be called automatically by the interrupt handler code
 when they are linked into a program. See the discussion of the <tt/.CONDES/
 feature in the <htmlurl url="ca65.html" name="assembler manual">.
-                       
+
 
 
 <sect>Bugs/Feedback<p>

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -35,6 +35,7 @@
 
 /* common */
 #include "check.h"
+#include "coll.h"
 #include "filepos.h"
 #include "xmalloc.h"
 
@@ -47,7 +48,7 @@
 
 
 /*****************************************************************************/
-/*  		    	      	     Data				     */
+/*  	    	       	      	     Data				     */
 /*****************************************************************************/
 
 
@@ -55,19 +56,14 @@
 /* Struct that describes an unnamed label */
 typedef struct ULabel ULabel;
 struct ULabel {
-    ULabel*    	Prev;         		/* Pointer to previous node in list */
-    ULabel*    	Next;  	       		/* Pointer to next node in list */
-    FilePos	Pos;			/* Position of the label in the source */
+    FilePos 	Pos;   			/* Position of the label in the source */
     ExprNode*	Val;          	       	/* The label value - may be NULL */
+    unsigned    Ref;                    /* Number of references */
 };
 
 /* List management */
-static ULabel*  ULabRoot       	= 0;	/* Root of the list */
-static ULabel*  ULabLast	= 0;    /* Last ULabel */
-static ULabel*  ULabLastDef	= 0;    /* Last defined ULabel */
-static unsigned	ULabCount	= 0; 	/* Number of labels */
+static Collection ULabList	= STATIC_COLLECTION_INITIALIZER;
 static unsigned ULabDefCount	= 0;	/* Number of defined labels */
-static ULabel** ULabList	= 0;	/* Array with pointers to all labels */
 
 
 
@@ -78,8 +74,8 @@ static ULabel** ULabList	= 0;	/* Array with pointers to all labels */
 
 
 static ULabel* NewULabel (ExprNode* Val)
-/* Create a new ULabel and insert it into the list. The function will move
- * ULabLast, but not ULabLastDef. The created label structure is returned.
+/* Create a new ULabel and insert it into the collection. The created label
+ * structure is returned.
  */
 {
     /* Allocate memory for the ULabel structure */
@@ -88,21 +84,10 @@ static ULabel* NewULabel (ExprNode* Val)
     /* Initialize the fields */
     L->Pos = CurPos;
     L->Val = Val;
+    L->Ref = 0;
 
-    /* Insert the label into the list */
-    L->Next = 0;
-    if (ULabRoot == 0) {
-	/* First label */
-	L->Prev = 0;
-	ULabRoot = L;
-    } else {
-    	ULabLast->Next = L;
-    	L->Prev = ULabLast;
-    }
-    ULabLast = L;
-
-    /* One label more */
-    ++ULabCount;
+    /* Insert the label into the collection */
+    CollAppend (&ULabList, L);
 
     /* Return the created label */
     return L;
@@ -118,39 +103,39 @@ ExprNode* ULabRef (int Which)
  * must be resolved later.
  */
 {
+    int	    Index;
     ULabel* L;
 
     /* Which can never be 0 */
     PRECONDITION (Which != 0);
 
-    /* Which is never really big (usually -3..+3), so a linear search is
-     * the best we can do here.
-     */
-    L = ULabLastDef;
-    if (Which < 0) {
-      	/* Backward reference */
-      	while (Which < -1 && L != 0) {
-      	    L = L->Prev;
-      	    ++Which;
-      	}
-      	if (L == 0) {
-      	    /* Label does not exist */
-      	    Error ("Undefined label");
-      	    /* We must return something valid */
-      	    return GenCurrentPC();
-      	} else {
-      	    /* Return a copy of the label value */
-      	    return CloneExpr (L->Val);
-      	}
-    } else {
-      	/* Forward reference. Create labels as needed */
-	unsigned LabelNum = ULabDefCount + Which - 1;
-	while (LabelNum < ULabCount) {
-       	    NewULabel (0);
-	}
+    /* Get the index of the referenced label */
+    if (Which > 0) {
+     	--Which;
+    }
+    Index = (int) CollCount (&ULabList) + Which;
 
-	/* Return an unnamed label expression */
-       	return GenULabelExpr (LabelNum);
+    /* We cannot have negative label indices */
+    if (Index < 0) {
+	/* Label does not exist */
+	Error ("Undefined label");
+	/* We must return something valid */
+	return GenCurrentPC();
+    }
+
+    /* If the label does already exist, return it's value, otherwise create
+     * enough forward references, and return a label reference.
+     */
+    if (Index < (int) CollCount (&ULabList)) {
+	L = CollAtUnchecked (&ULabList, Index);
+        ++L->Ref;
+	return CloneExpr (L->Val);
+    } else {
+	while (Index >= (int) CollCount (&ULabList)) {
+            L = NewULabel (0);
+	}
+        ++L->Ref;
+	return GenULabelExpr (Index);
     }
 }
 
@@ -159,16 +144,21 @@ ExprNode* ULabRef (int Which)
 void ULabDef (void)
 /* Define an unnamed label at the current PC */
 {
-    /* Create a new label if needed, or use an existing one */
-    if (ULabLastDef == 0 || ULabLastDef->Next == 0) {
-      	/* The last label is also the last defined label, we need a new one */
-      	ULabLastDef = NewULabel (GenCurrentPC ());
+    if (ULabDefCount < CollCount (&ULabList)) {
+	/* We did already have a forward reference to this label, so has
+	 * already been generated, but doesn't have a value. Use the current
+	 * PC for the label value.
+	 */
+	ULabel* L = CollAtUnchecked (&ULabList, ULabDefCount);
+	CHECK (L->Val == 0);
+	L->Val = GenCurrentPC ();
+	L->Pos = CurPos;
     } else {
-      	/* We do already have the label, but it's undefined until now */
-      	ULabLastDef = ULabLastDef->Next;
-      	ULabLastDef->Val = GenCurrentPC ();
-      	ULabLastDef->Pos = CurPos;
+	/* There is no such label, create it */
+       	NewULabel (GenCurrentPC ());
     }
+
+    /* We have one more defined label */
     ++ULabDefCount;
 }
 
@@ -177,8 +167,8 @@ void ULabDef (void)
 int ULabCanResolve (void)
 /* Return true if we can resolve arbitrary ULabels. */
 {
-    /* We can resolve labels if we have built the necessary access array */
-    return (ULabList != 0);
+    /* We can resolve labels if we don't have any undefineds */
+    return (ULabDefCount == CollCount (&ULabList));
 }
 
 
@@ -189,20 +179,12 @@ ExprNode* ULabResolve (unsigned Index)
  * if a label is still undefined in this phase.
  */
 {
-    ULabel* L;
+    /* Get the label and check that it is defined */
+    ULabel* L = CollAt (&ULabList, Index);
+    CHECK (L->Val != 0);
 
-    /* Must be in resolve phase and the index must be valid */
-    CHECK (ULabList != 0 && Index < ULabCount);
-
-    /* Get the label */
-    L = ULabList [Index];
-
-    /* If the label is open (not defined), return some valid value */
-    if (L->Val == 0) {
-	return GenLiteralExpr (0);
-    } else {
-	return CloneExpr (L->Val);
-    }
+    /* Return the label value */
+    return CloneExpr (L->Val);
 }
 
 
@@ -210,31 +192,22 @@ ExprNode* ULabResolve (unsigned Index)
 void ULabCheck (void)
 /* Run through all unnamed labels and check for anomalies and errors */
 {
-    ULabel* L;
-
     /* Check if there are undefined labels */
-    if (ULabLastDef) {
-	L = ULabLastDef->Next;
-	while (L) {
-	    PError (&L->Pos, "Undefined label");
-	    L = L->Next;
-	}
+    unsigned I = ULabDefCount;
+    while (I < CollCount (&ULabList)) {
+	ULabel* L = CollAtUnchecked (&ULabList, I);
+	PError (&L->Pos, "Undefined label");
+	++I;
     }
 
-    /* Create an array that holds pointers to all labels. This allows us to
-     * access the labels quickly by index in the resolver phase at the end of
-     * the assembly.
+    /* Walk over all labels and emit a warning if any unreferenced ones
+     * are found.
      */
-    if (ULabCount) {
-	unsigned I = 0;
-	ULabList = xmalloc (ULabCount * sizeof (ULabel*));
-	L = ULabRoot;
-	while (L) {
-	    ULabList[I] = L;
-	    ++I;
-	    L = L->Next;
-	}
-	CHECK (I == ULabCount);
+    for (I = 0; I < CollCount (&ULabList); ++I) {
+        ULabel* L = CollAtUnchecked (&ULabList, I);
+        if (L->Ref == 0) {
+            PWarning (&L->Pos, 1, "No reference to unnamed label");
+        }
     }
 }
 

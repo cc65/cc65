@@ -442,30 +442,36 @@ unsigned SizeOf (const type* T)
 
 	case T_SCHAR:
 	case T_UCHAR:
-	    return 1;
+	    return SIZEOF_CHAR;
 
        	case T_SHORT:
     	case T_USHORT:
+            return SIZEOF_SHORT;
+
     	case T_INT:
 	case T_UINT:
+            return SIZEOF_INT;
+
 	case T_PTR:
 	case T_FUNC:	/* Maybe pointer to function */
-	    return 2;
+	    return SIZEOF_PTR;
 
         case T_LONG:
     	case T_ULONG:
-	    return 4;
+	    return SIZEOF_LONG;
 
 	case T_LONGLONG:
 	case T_ULONGLONG:
-	    return 8;
+	    return SIZEOF_LONGLONG;
 
         case T_ENUM:
-	    return 2;
+	    return SIZEOF_INT;
 
 	case T_FLOAT:
+            return SIZEOF_FLOAT;
+
 	case T_DOUBLE:
-	    return 4;
+	    return SIZEOF_DOUBLE;
 
 	case T_STRUCT:
 	case T_UNION:
@@ -509,7 +515,7 @@ unsigned CheckedSizeOf (const type* T)
     unsigned Size = SizeOf (T);
     if (Size == 0) {
         Error ("Size of data type is unknown");
-        Size = 1;
+        Size = SIZEOF_CHAR;     /* Don't return zero */
     }
     return Size;
 }
@@ -525,7 +531,7 @@ unsigned CheckedPSizeOf (const type* T)
     unsigned Size = PSizeOf (T);
     if (Size == 0) {
         Error ("Size of data type is unknown");
-        Size = 1;
+        Size = SIZEOF_CHAR;     /* Don't return zero */
     }
     return Size;
 }

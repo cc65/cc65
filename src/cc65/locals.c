@@ -193,7 +193,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
                 F_AllocLocalSpace (CurrentFunc);
 
                 /* Setup the type flags for the assignment */
-                Flags = (Size == 1)? CF_FORCECHAR : CF_NONE;
+                Flags = (Size == SIZEOF_CHAR)? CF_FORCECHAR : CF_NONE;
 
                 /* Get the expression into the primary */
                 if (evalexpr (Flags, hie1, &lval) == 0) {
@@ -266,7 +266,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
             } else {
 
                 /* Setup the type flags for the assignment */
-                Flags = (Size == 1)? CF_FORCECHAR : CF_NONE;
+                Flags = (Size == SIZEOF_CHAR)? CF_FORCECHAR : CF_NONE;
 
                 /* Get the expression into the primary */
                 if (evalexpr (Flags, hie1, &lval) == 0) {

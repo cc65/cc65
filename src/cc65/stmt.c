@@ -242,6 +242,8 @@ static void ReturnStatement (void)
 
     NextToken ();
     if (CurTok.Tok != TOK_SEMI) {
+
+        /* Check if the function has a return value declared */
        	if (F_HasVoidReturn (CurrentFunc)) {
        	    Error ("Returning a value in function with return type void");
        	}
@@ -253,6 +255,7 @@ static void ReturnStatement (void)
     	if (!F_HasVoidReturn (CurrentFunc)) {
        	    assignadjust (F_GetReturnType (CurrentFunc), &lval);
     	}
+
     } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {
     	Error ("Function `%s' must return a value", F_GetFuncName (CurrentFunc));
     }

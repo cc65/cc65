@@ -145,8 +145,13 @@ typedef unsigned short type;
 
 /* Sizes */
 #define SIZEOF_CHAR     1
+#define SIZEOF_SHORT    2
 #define SIZEOF_INT      2
 #define SIZEOF_LONG     4
+#define SIZEOF_LONGLONG 8
+#define SIZEOF_FLOAT    4
+#define SIZEOF_DOUBLE   4
+#define SIZEOF_PTR      2
 
 /* Predefined type strings */
 extern type type_uchar [];

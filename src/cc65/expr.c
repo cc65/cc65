@@ -1194,12 +1194,12 @@ static int arrayref (int k, ExprDesc* lval)
        	       	       	    (rflags & E_MGLOBAL) != 0 || /* Static array, or ... */
 	    	    	    rflags == E_MLOCAL;      	 /* Local array */
 
-       	    if (ConstSubAddr && CheckedSizeOf (lval->Type) == 1) {
+       	    if (ConstSubAddr && CheckedSizeOf (lval->Type) == SIZEOF_CHAR) {
 
 	    	type* SavedType;
 
 	    	/* Reverse the order of evaluation */
-	    	unsigned flags = (CheckedSizeOf (lval2.Type) == 1)? CF_CHAR : CF_INT;
+	    	unsigned flags = (CheckedSizeOf (lval2.Type) == SIZEOF_CHAR)? CF_CHAR : CF_INT;
     	     	RemoveCode (Mark2);
 
 	    	/* Get a pointer to the array into the primary. We have changed
@@ -2788,7 +2788,7 @@ static void opeq (const GenDesc* Gen, ExprDesc *lval, int k)
 	/* If the lhs is character sized, the operation may be later done
 	 * with characters.
 	 */
-	if (CheckedSizeOf (lval->Type) == 1) {
+	if (CheckedSizeOf (lval->Type) == SIZEOF_CHAR) {
 	    flags |= CF_FORCECHAR;
 	}
 
@@ -2810,7 +2810,7 @@ static void opeq (const GenDesc* Gen, ExprDesc *lval, int k)
 	/* If the lhs is character sized, the operation may be later done
 	 * with characters.
 	 */
-	if (CheckedSizeOf (lval->Type) == 1) {
+	if (CheckedSizeOf (lval->Type) == SIZEOF_CHAR) {
 	    flags |= CF_FORCECHAR;
 	}
 

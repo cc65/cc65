@@ -129,7 +129,7 @@ inval:	ldx	#$ff			; sets N
 	sta	fd_table+ft_usa,x
 	bne	ret			; not 0
 	lda	#$ff			; 0, table entry unused now
-	sta	fd_table+ft_iocb,y	; clear table entry
+	sta	fd_table+ft_iocb,x	; clear table entry
 ret:	rts
 
 .endproc

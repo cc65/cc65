@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -749,8 +749,9 @@ unsigned OptUnusedLoads (CodeSeg* S)
 	    	/* Register value is not used, remove the load */
 		CS_DelEntry (S, I);
 
-		/* Remember, we had changes */
+		/* Remember, we had changes. Account the deleted entry in I. */
 		++Changes;
+		--I;
 
 	    }
 	}

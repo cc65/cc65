@@ -104,15 +104,15 @@ c16lib:
 	for i in c16 cbm common runtime conio dbg tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-	    CFLAGS="-Osir -g -T -t plus4 -I../../include" \
-	    AFLAGS="-t plus4 -I../../asminc" \
+	    CFLAGS="-Osir -g -T -t c16 -I../../include" \
+	    AFLAGS="-t c16 -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv c16/crt0.o c16.o
 	for i in c16 cbm common runtime conio dbg tgi; do \
 	    $(AR) a c16.lib $$i/*.o;\
 	done
-  
+
 #-----------------------------------------------------------------------------
 # C64
 

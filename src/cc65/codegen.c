@@ -96,31 +96,39 @@ static void CheckLocalOffs (unsigned Offs)
 
 
 
-static char* GetLabelName (unsigned flags, unsigned long label, long offs)
+static const char* GetLabelName (unsigned Flags, unsigned long Label, long Offs)
 {
-    static char lbuf [256];		/* Label name */
+    static char Buf [256];		/* Label name */
 
     /* Create the correct label name */
-    switch (flags & CF_ADDRMASK) {
+    switch (Flags & CF_ADDRMASK) {
 
 	case CF_STATIC:
        	    /* Static memory cell */
-	    xsprintf (lbuf, sizeof (lbuf), "%s%+ld", LocalLabelName (label), offs);
+	    if (Offs) {
+		xsprintf (Buf, sizeof (Buf), "%s%+ld", LocalLabelName (Label), Offs);
+	    } else {
+       	       	xsprintf (Buf, sizeof (Buf), "%s", LocalLabelName (Label));
+	    }
 	    break;
 
 	case CF_EXTERNAL:
 	    /* External label */
-	    xsprintf (lbuf, sizeof (lbuf), "_%s%+ld", (char*) label, offs);
+	    if (Offs) {
+	    	xsprintf (Buf, sizeof (Buf), "_%s%+ld", (char*) Label, Offs);
+	    } else {
+	    	xsprintf (Buf, sizeof (Buf), "_%s", (char*) Label);
+	    }
 	    break;
 
 	case CF_ABSOLUTE:
 	    /* Absolute address */
-	    xsprintf (lbuf, sizeof (lbuf), "$%04X", (unsigned)((label+offs) & 0xFFFF));
+	    xsprintf (Buf, sizeof (Buf), "$%04X", (int)((Label+Offs) & 0xFFFF));
 	    break;
 
 	case CF_REGVAR:
 	    /* Variable in register bank */
-	    xsprintf (lbuf, sizeof (lbuf), "regbank+%u", (unsigned)((label+offs) & 0xFFFF));
+	    xsprintf (Buf, sizeof (Buf), "regbank+%u", (unsigned)((Label+Offs) & 0xFFFF));
 	    break;
 
 	default:
@@ -128,13 +136,13 @@ static char* GetLabelName (unsigned flags, unsigned long label, long offs)
     }
 
     /* Return a pointer to the static buffer */
-    return lbuf;
+    return Buf;
 }
 
 
 
 /*****************************************************************************/
-/*		    	      Pre- and postamble			     */
+/*	    	    	      Pre- and postamble			     */
 /*****************************************************************************/
 
 
@@ -656,7 +664,7 @@ void g_getstatic (unsigned flags, unsigned long label, long offs)
 /* Fetch an static memory cell into the primary register */
 {
     /* Create the correct label name */
-    char* lbuf = GetLabelName (flags, label, offs);
+    const char* lbuf = GetLabelName (flags, label, offs);
 
     /* Check the size and generate the correct load operation */
     switch (flags & CF_TYPE) {
@@ -905,7 +913,7 @@ void g_putstatic (unsigned flags, unsigned long label, long offs)
 /* Store the primary register into the specified static memory cell */
 {
     /* Create the correct label name */
-    char* lbuf = GetLabelName (flags, label, offs);
+    const char* lbuf = GetLabelName (flags, label, offs);
 
     /* Check the size and generate the correct store operation */
     switch (flags & CF_TYPE) {
@@ -1438,7 +1446,7 @@ void g_addstatic (unsigned flags, unsigned long label, long offs)
     unsigned L;
 
     /* Create the correct label name */
-    char* lbuf = GetLabelName (flags, label, offs);
+    const char* lbuf = GetLabelName (flags, label, offs);
 
     switch (flags & CF_TYPE) {
 
@@ -1487,7 +1495,7 @@ void g_addeqstatic (unsigned flags, unsigned long label, long offs,
 /* Emit += for a static variable */
 {
     /* Create the correct label name */
-    char* lbuf = GetLabelName (flags, label, offs);
+    const char* lbuf = GetLabelName (flags, label, offs);
 
     /* Check the size and determine operation */
     switch (flags & CF_TYPE) {
@@ -1730,7 +1738,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, long offs,
 /* Emit -= for a static variable */
 {
     /* Create the correct label name */
-    char* lbuf = GetLabelName (flags, label, offs);
+    const char* lbuf = GetLabelName (flags, label, offs);
 
     /* Check the size and determine operation */
     switch (flags & CF_TYPE) {
@@ -1983,7 +1991,7 @@ void g_addaddr_static (unsigned flags, unsigned long label, long offs)
 /* Add the address of a static variable to ax */
 {
     /* Create the correct label name */
-    char* lbuf = GetLabelName (flags, label, offs);
+    const char* lbuf = GetLabelName (flags, label, offs);
 
     /* Add the address to the current ax value */
     AddCodeLine ("clc");
@@ -4013,7 +4021,7 @@ void g_strlen (unsigned flags, unsigned long val, long offs)
     if (flags & CF_CONST) {
 
 	/* The address of the string is constant. Create the correct label name */
-    	char* lbuf = GetLabelName (flags, val, offs);
+    	const char* lbuf = GetLabelName (flags, val, offs);
 
 	/* Generate the strlen code */
 	AddCodeLine ("ldy #$FF");

@@ -32,7 +32,7 @@
 /*****************************************************************************/
 
 
-		   
+
 #include "binfmt.h"
 #include "tgtcfg.h"
 
@@ -57,6 +57,7 @@ static const char CfgNone [] =
 
 static const char CfgAtari [] =
     "MEMORY {"
+       	"ZP: start = $D2, size = $1A, type = rw;"
         "HEADER: start = $0000, size = $6, file = %O;"
         "RAM: start = $1F00, size = $9D1F, file = %O;"   /* 9D1F: matches upper bound BC1F */
     "}"
@@ -66,11 +67,13 @@ static const char CfgAtari [] =
         "RODATA: load = RAM, type = wprot;"
         "DATA: load = RAM, type = rw;"
         "BSS: load = RAM, type = bss, define = yes;"
+	"ZEROPAGE: load = ZP, type = zp;"
         "AUTOSTRT: load = RAM, type = wprot;"
     "}";
 
 static const char CfgC64 [] =
     "MEMORY {"
+	"ZP: start = $02, size = $1A, type = rw;"
 	"RAM: start = $7FF, size = $c801, file = %O;"
     "}"
     "SEGMENTS {"
@@ -78,10 +81,12 @@ static const char CfgC64 [] =
 	"RODATA: load = RAM, type = wprot;"
 	"DATA: load = RAM, type = rw;"
 	"BSS: load = RAM, type = bss, define = yes;"
+	"ZEROPAGE: load = ZP, type = zp;"
     "}";
 
 static const char CfgC128 [] =
     "MEMORY {"
+	"ZP: start = $02, size = $1A, type = rw;"
 	"RAM: start = $1bff, size = $a401, file = %O;"
     "}"
     "SEGMENTS {"
@@ -89,6 +94,7 @@ static const char CfgC128 [] =
 	"RODATA: load = RAM, type = wprot;"
 	"DATA: load = RAM, type = rw;"
 	"BSS: load = RAM, type = bss, define = yes;"
+	"ZEROPAGE: load = ZP, type = zp;"
     "}";
 
 static const char CfgAce [] =
@@ -96,6 +102,7 @@ static const char CfgAce [] =
 
 static const char CfgPlus4 [] =
     "MEMORY {"
+	"ZP: start = $02, size = $1A, type = rw;"
 	"RAM: start = $0fff, size = $7001, file = %O;"
     "}"
     "SEGMENTS {"
@@ -103,10 +110,12 @@ static const char CfgPlus4 [] =
 	"RODATA: load = RAM, type = wprot;"
 	"DATA: load = RAM, type = rw;"
 	"BSS: load = RAM, type = bss, define = yes;"
+	"ZEROPAGE: load = ZP, type = zp;"
     "}";
 
 static const char CfgCBM610 [] =
     "MEMORY {"
+	"ZP: start = $02, size = $1A, type = rw;"
 	"RAM: start = $0001, size = $FFF0, file = %O;"
     "}"
     "SEGMENTS {"
@@ -114,10 +123,12 @@ static const char CfgCBM610 [] =
 	"RODATA: load = RAM, type = wprot;"
     	"DATA: load = RAM, type = rw;"
 	"BSS: load = RAM, type = bss, define = yes;"
+	"ZEROPAGE: load = ZP, type = zp;"
     "}";
 
 static const char CfgPET [] =
     "MEMORY {"
+	"ZP: start = $02, size = $1A, type = rw;"
 	"RAM: start = $03FF, size = $7BFF, file = %O;"
     "}"
     "SEGMENTS {"
@@ -125,6 +136,7 @@ static const char CfgPET [] =
 	"RODATA: load = RAM, type = wprot;"
 	"DATA: load = RAM, type = rw;"
 	"BSS: load = RAM, type = bss, define = yes;"
+	"ZEROPAGE: load = ZP, type = zp;"
     "}";
 
 static const char CfgNES [] =
@@ -182,6 +194,7 @@ static const char CfgOSA65 [] =
 
 static const char CfgApple2 [] =
     "MEMORY {"
+       	"ZP: start = $00, size = $1A, type = rw;"
 	"RAM: start = $800, size = $8E00, file = %O;"
     "}"
     "SEGMENTS { "
@@ -189,6 +202,7 @@ static const char CfgApple2 [] =
         "RODATA: load = RAM, type = ro;"
         "DATA: load = RAM, type = rw;"
         "BSS: load = RAM, type = bss, define = yes;"
+	"ZEROPAGE: load = ZP, type = zp;"
     "}";
 
 static const char CfgGeos [] =
@@ -223,8 +237,10 @@ const TargetDesc Targets [TGT_COUNT] = {
     {  	BINFMT_BINARY,  CfgCBM610	},
     {  	BINFMT_BINARY,	CfgPET		},
     {  	BINFMT_BINARY,	CfgNES 	       	},
+#if 0
     {   BINFMT_O65,     CfgLunix	},
     {   BINFMT_O65,	CfgOSA65	},
+#endif
     {   BINFMT_BINARY,	CfgApple2	},
     {   BINFMT_BINARY,  CfgGeos		},
 };

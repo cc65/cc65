@@ -55,7 +55,7 @@
         .word   GETPIXEL
         .word   HORLINE
         .word   LINE
-        .word   0               ; BAR
+        .word   BAR
         .word   CIRCLE
         .word   TEXTSTYLE
         .word   OUTTEXT
@@ -98,13 +98,17 @@ OLDD018:        .res    1       ; Old register value
 DX:             .res    2
 DY:             .res    2
 
-; Circle routine stuff
+; Circle routine stuff, overlaid by BAR variables
+X1SAVE:
 CURX:           .res    1
 CURY:           .res    1
+Y1SAVE:
 BROW:           .res    1       ; Bottom row
 TROW:           .res    1       ; Top row
+X2SAVE:
 LCOL:           .res    1       ; Left column
 RCOL:           .res    1       ; Right column
+Y2SAVE:
 CHUNK1:         .res    1
 OLDCH1:         .res    1
 CHUNK2:         .res    1
@@ -816,7 +820,57 @@ FIXY:   cpy     #255         ;Y=255 or Y=8
 ; Must set an error code: NO
 ;
 
-BAR:    rts
+BAR:	lda     Y2
+        sta     Y2SAVE
+        lda     Y2+1
+        sta     Y2SAVE+1
+
+        lda     X2
+        sta     X2SAVE
+        lda     X2+1
+        sta     X2SAVE+1
+
+        lda     Y1
+        sta     Y1SAVE
+        lda     Y1+1
+        sta     Y1SAVE+1
+
+        lda     X1
+        sta     X1SAVE
+        lda     X1+1
+        sta     X1SAVE+1
+
+@L1:    jsr     HORLINE
+
+        lda     Y1SAVE
+        cmp     Y2SAVE
+        bne     @L2
+        lda     Y1SAVE
+        cmp     Y2SAVE
+        beq     @L4
+
+@L2:    inc     Y1SAVE
+        bne     @L3
+        inc     Y1SAVE+1
+
+@L3:    lda     Y1SAVE
+        sta     Y1
+        lda     Y1SAVE+1
+        sta     Y1+1
+
+        lda     X1SAVE
+        sta     X1
+        lda     X1SAVE+1
+        sta     X1+1
+
+        lda     X2SAVE
+        sta     X2
+        lda     X2SAVE+1
+        sta     X2+1
+        jmp     @L1
+
+@L4:    rts
+
 
 ; ------------------------------------------------------------------------
 ; CIRCLE: Draw a circle around the center X1/Y1 (= ptr1/ptr2) with the

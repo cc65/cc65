@@ -25,7 +25,6 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_clear.o             \
                 tgi_curtoxy.o           \
                 tgi_done.o              \
-                tgi_emu_bar.o           \
                 tgi_getcolor.o          \
                 tgi_getcolorcount.o     \
                 tgi_getdefpalette.o     \

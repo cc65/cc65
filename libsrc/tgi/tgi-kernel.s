@@ -99,17 +99,9 @@ _tgi_install:
         cpx     #(TGI_HDR_JUMPCOUNT*3)
         bne     @L1
 
-; Check for emulation vectors needed
+; Call the driver install routine
 
-        lda     tgi_bar+1
-        ora     tgi_bar+2               ; Do we have a BAR vector?
-        bne     @L2                     ; Jump if yes
-        lda     #<tgi_emu_bar           ; Use emulation if no
-        sta     tgi_bar+1
-        lda     #>tgi_emu_bar
-        sta     tgi_bar+2
-
-@L2:    jsr     tgi_install             ; Call driver install routine, may...
+        jsr     tgi_install             ; Call driver install routine, may...
                                         ; ...update variables
         jsr     tgi_set_ptr             ; Set ptr1 to tgi_drv
 

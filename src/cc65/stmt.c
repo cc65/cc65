@@ -329,6 +329,9 @@ static void CascadeSwitch (ExprDesc* Expr)
     long Val;	       		/* Case label value */
 
 
+    /* Get the unqualified type of the switch expression */
+    type ExprType = UnqualifiedType (Expr->Type[0]);
+
     /* Create a loop so we may break out, init labels */
     ExitLab = GetLocalLabel ();
     AddLoop (oursp, 0, ExitLab, 0, 0);
@@ -353,24 +356,24 @@ static void CascadeSwitch (ExprDesc* Expr)
 		if (CodeLab == 0) {
 		    CodeLab = GetLocalLabel ();
 		}
-		g_jump (CodeLab);
+	     	g_jump (CodeLab);
 	    }
 
 	    /* If we have a cascade label, emit it */
 	    if (NextLab) {
-		g_defcodelabel (NextLab);
-		NextLab = 0;
+	     	g_defcodelabel (NextLab);
+	     	NextLab = 0;
 	    }
 
 	    while (CurTok.Tok == TOK_CASE || CurTok.Tok == TOK_DEFAULT) {
 
-		/* Parse the selector */
-		if (CurTok.Tok == TOK_CASE) {
+	     	/* Parse the selector */
+	     	if (CurTok.Tok == TOK_CASE) {
 
-		    /* Count labels */
-		    ++lcount;
+	     	    /* Count labels */
+	     	    ++lcount;
 
-		    /* Skip the "case" token */
+	     	    /* Skip the "case" token */
 		    NextToken ();
 
 		    /* Read the selector expression */
@@ -381,7 +384,7 @@ static void CascadeSwitch (ExprDesc* Expr)
 
 		    /* Check the range of the expression */
 		    Val = lval.ConstVal;
-		    switch (*Expr->Type) {
+		    switch (ExprType) {
 
 			case T_SCHAR:
 			    /* Signed char */
@@ -409,11 +412,11 @@ static void CascadeSwitch (ExprDesc* Expr)
 		     	    break;
 
 		     	default:
-		     	    Internal ("Invalid type: %02X", *Expr->Type & 0xFF);
+		     	    Internal ("Invalid type: %04X", ExprType);
 		    }
 
 		    /* Emit a compare */
-		    g_cmp (Flags, Val);
+	     	    g_cmp (Flags, Val);
 
 	    	    /* If another case follows after the colon (which is
 		     * currently pending and cannot be skipped since otherwise
@@ -471,7 +474,7 @@ static void CascadeSwitch (ExprDesc* Expr)
 	if (CurTok.Tok != TOK_RCURLY) {
        	    HaveBreak = Statement (0);
 	}
-    }			    
+    }
 
     /* Check if we have any labels */
     if (lcount == 0 && !HaveDefault) {

@@ -304,6 +304,7 @@ Available operators sorted by precedence:
   -------------------------------------------------------------------
     *		Builtin pseudo variable (r/o)	      	1
     .BLANK	Builtin function	     		1
+    .CONCAT	Builtin function			1
     .CONST	Builtin function	     		1
     .CPU	Builtin pseudo variable (r/o)		1
     .DEFINED	Builtin function	     		1
@@ -635,6 +636,24 @@ Here's a list of all control commands and a description, what they do:
        	.segment  "CODE"
 
   See also the .SEGMENT command.
+
+
+.CONCAT
+
+  Builtin function. The function allows to concatenate a list of string
+  constants separated by commas. The result is a string constant that
+  is the concatentation of all arguments. This function is most useful
+  in macros and when used together with the .STRING builtin function.
+  The function may be used in any case where a string constant is
+  expected.
+
+  Example:
+
+	.include	.concat ("myheader", ".", "inc)
+
+  This is the same as the command
+
+	.include	"myheader.inc"
 
 
 .CONST

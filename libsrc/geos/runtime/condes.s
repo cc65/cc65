@@ -90,4 +90,3 @@ index:	.byte	0
 
 getbyt:	lda	$FFFF,y		; may not change X!
 	rts
-	rts		;!!! this byte will be lost (od65 can't even dump this .o)

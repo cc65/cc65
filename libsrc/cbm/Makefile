@@ -23,5 +23,5 @@ S_OBJS = ctype.o getenv.o gotoxy.o gotox.o gotoy.o where.o\
 all:	$(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f *~ $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS)
+	@rm -f *~ *.bck $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS)
 

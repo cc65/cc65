@@ -130,8 +130,12 @@ void __fastcall__ cbm_close (unsigned char lfn);
 /* Closes a file */
 
 int cbm_read(unsigned char lfn, void* buffer, unsigned int size);
+/* Reads up to "size" bytes from a file to "buffer".
+ * Returns the number of actually read bytes, 0 if there are no bytes left (EOF)
+ * or -1 in case of an error. _oserror contains an errorcode then (see table below).
+ */
 
-/* Errorcodes of load, save, open functions:
+/* Errorcodes of cbm_* I/O functions:
  *
  * errorcode	BASIC error
  *	1   =	too many files

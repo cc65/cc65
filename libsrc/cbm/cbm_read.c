@@ -1,3 +1,8 @@
+/*
+ * Marc 'BlackJack' Rintsch, 19.03.2001
+ *
+ * int cbm_read(unsigned char lfn, void* buffer, unsigned int size);
+ */
 
 #include <cbm.h>
 
@@ -12,9 +17,9 @@ int cbm_read(unsigned char lfn, void* buffer, unsigned int size)
     
     bytesread = 0;
     
-    while (bytesread<size) {
+    while (bytesread<size && !cbm_k_readst()) {
         tmp = cbm_k_basin();
-        if (cbm_k_readst()) break;
+        if (cbm_k_readst() & 0xBF) break;
         ((unsigned char*)buffer)[bytesread++] = tmp;
     }
     

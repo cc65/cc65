@@ -156,6 +156,15 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 	/* Check for special zero page registers used */
 	switch (E->AM) {
 
+	    case AM65_ACC:
+		if (E->OPC == OP65_ASL || E->OPC == OP65_DEC ||
+		    E->OPC == OP65_INC || E->OPC == OP65_LSR ||
+		    E->OPC == OP65_ROL || E->OPC == OP65_ROR) {
+		    /* A is changed by these insns */
+		    E->Chg |= REG_A;
+		}
+                break;
+
 	    case AM65_ZP:
 	    case AM65_ABS:
 	    /* Be conservative: */
@@ -661,6 +670,22 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (Chg & REG_SREG_HI) {
 	     	Out->SRegHi = -1;
 	    }
+	    /* Quick hack for some known functions: */
+	    if (strcmp (E->Arg, "tosandax") == 0) {
+		if (In->RegA == 0) {
+		    Out->RegA = 0;
+		}
+		if (In->RegX == 0) {
+		    Out->RegX = 0;
+		}
+	    } else if (strcmp (E->Arg, "tosorax") == 0) {
+		if (In->RegA == 0xFF) {
+		    Out->RegA = 0xFF;
+		}
+		if (In->RegX == 0xFF) {
+                    Out->RegX = 0xFF;
+                }
+            }
 	    break;
 
 	case OP65_JVC:

@@ -75,8 +75,8 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
     {   OP65_ASL,      	                        /* opcode */
        	"asl", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
-       	REG_A, 	       	                        /* use */
-       	REG_A, 	       	                        /* chg */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,     	                        /* chg */
 	OF_SETF			 		/* flags */
     },
     {   OP65_BCC,      	                        /* opcode */
@@ -362,8 +362,8 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
     {   OP65_LSR,      	                        /* opcode */
        	"lsr", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
-       	REG_A, 	       	                        /* use */
-       	REG_A, 	       	                        /* chg */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,      	                        /* chg */
 	OF_SETF	       	       	       	       	/* flags */
     },
     {   OP65_NOP,      	                        /* opcode */
@@ -406,7 +406,7 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
        	1,     	       	                        /* size */
        	REG_Y, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_NONE			 		/* flags */
+	OF_NONE	 		 		/* flags */
     },
     {   OP65_PLA,      	                        /* opcode */
        	"pla", 	       	                        /* mnemonic */
@@ -439,16 +439,16 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
     {   OP65_ROL,      	                        /* opcode */
        	"rol", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
-       	REG_A, 	       	                        /* use */
-       	REG_A, 	       	                        /* chg */
-	OF_SETF			 		/* flags */
+       	REG_NONE,     	                        /* use */
+       	REG_NONE,      	                        /* chg */
+	OF_SETF	 		 		/* flags */
     },
     {   OP65_ROR,      	                        /* opcode */
        	"ror", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
-       	REG_A, 	       	                        /* use */
-       	REG_A, 	       	                        /* chg */
-	OF_SETF			 		/* flags */
+       	REG_NONE,     	                        /* use */
+       	REG_NONE,     	                        /* chg */
+	OF_SETF	 		 		/* flags */
     },
     {   OP65_RTI,      	                        /* opcode */
        	"rti", 	       	                        /* mnemonic */

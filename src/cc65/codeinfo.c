@@ -566,17 +566,17 @@ unsigned GetKnownReg (unsigned Use, const RegContents* RC)
  */
 {
     if ((Use & REG_A) != 0) {
-	return (RC && RC->RegA >= 0)? REG_A : REG_NONE;
+	return (RC == 0 || RC->RegA >= 0)? REG_A : REG_NONE;
     } else if ((Use & REG_X) != 0) {
-	return (RC && RC->RegX >= 0)? REG_X : REG_NONE;
+	return (RC == 0 || RC->RegX >= 0)? REG_X : REG_NONE;
     } else if ((Use & REG_Y) != 0) {
-	return (RC && RC->RegY >= 0)? REG_Y : REG_NONE;
+	return (RC == 0 || RC->RegY >= 0)? REG_Y : REG_NONE;
     } else if ((Use & REG_TMP1) != 0) {
-	return (RC && RC->Tmp1 >= 0)? REG_TMP1 : REG_NONE;
+	return (RC == 0 || RC->Tmp1 >= 0)? REG_TMP1 : REG_NONE;
     } else if ((Use & REG_SREG_LO) != 0) {
-	return (RC && RC->SRegLo >= 0)? REG_SREG_LO : REG_NONE;
+	return (RC == 0 || RC->SRegLo >= 0)? REG_SREG_LO : REG_NONE;
     } else if ((Use & REG_SREG_HI) != 0) {
-	return (RC && RC->SRegHi >= 0)? REG_SREG_HI : REG_NONE;
+	return (RC == 0 || RC->SRegHi >= 0)? REG_SREG_HI : REG_NONE;
     } else {
 	return REG_NONE;
     }

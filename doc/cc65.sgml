@@ -172,7 +172,7 @@ Here is a description of all the command line options:
 
   <tag><tt>--forget-inc-paths</tt></tag>
 
-  Forget the builtin include paths. This is most useful when building 
+  Forget the builtin include paths. This is most useful when building
   customized C or runtime libraries, in which case the standard header
   files should be ignored.
 
@@ -497,7 +497,11 @@ This cc65 version has some extensions to the ISO C standard.
 	sequences of assembler code. For example, the macro
 
 	<tscreen><verb>
-       	#define hi(x) (__AX__=(x),asm("\ttxa\n\tldx\t#$00",__AX__)
+       	#define hi(x)           \
+            (__AX__ = (x),      \
+             asm ("txa"),       \
+             asm ("ldx #$00"),  \
+             __AX__)
 	</verb></tscreen>
 
 	will give the high byte of any unsigned value.

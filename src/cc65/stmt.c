@@ -275,7 +275,7 @@ static void ReturnStatement (void)
     	if (!F_HasVoidReturn (CurrentFunc)) {
 
 	    /* Convert the return value to the type of the function result */
-	    TypeConversion (&Expr, k, F_GetReturnType (CurrentFunc));
+	    k = TypeConversion (&Expr, k, F_GetReturnType (CurrentFunc));
 
 	    /* Load the value into the primary */
 	    ExprLoad (CF_NONE, k, &Expr);

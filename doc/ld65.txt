@@ -4,7 +4,7 @@
 
        		     A Linker for ca65 Object modules
 
-	      (C) Copyright 1998-1999 Ullrich von Bassewitz
+	      (C) Copyright 1998-2000 Ullrich von Bassewitz
        			    (uz@musoftware.de)
 
 
@@ -32,27 +32,21 @@ Contents
 1. Overview
 -----------
 
-ld65 is a replacement for the link65 linker that was part of the cc65 C
-compiler suite developed by John R. Dunning. link65 had some problems and
-the copyright does not permit some things which I wanted to be possible,
-so I decided to write a completely new assembler/linker/archiver suite
-for the cc65 compiler. ld65 is part of this suite.
-
-The ld65 linker combines several object modules, producing an executable
-file. The object modules may be read from a library created by the ar65
-archiver (this is somewhat faster and more convenient). The linker was
-designed to be as flexible as possible. It complements the features that
-are built into the ca65 macroassembler:
+The ld65 linker combines several object modules created by the ca65
+assembler, producing an executable file. The object modules may be read
+from a library created by the ar65 archiver (this is somewhat faster and
+more convenient). The linker was designed to be as flexible as possible.
+It complements the features that are built into the ca65 macroassembler:
 
   * Accept any number of segments to form an executable module.
 
   * Resolve arbitrary expressions stored in the object files.
 
-  * In case of errors, use the meta information stored in the object
-    files to produce helpful error messages. In case of undefined
-    symbols, expression range errors, or symbol type mismatches, ld65 is
-    able to tell you the exact location in the source, where the symbol
-    was referenced.
+  * In case of errors, use the meta information stored in the object files
+    to produce helpful error messages. In case of undefined symbols,
+    expression range errors, or symbol type mismatches, ld65 is able to
+    tell you the exact location in the original assembler source, where
+    the symbol was referenced.
 
   * Flexible output. The output of ld65 is highly configurable by a
     config file. More common platforms are supported by builtin
@@ -67,69 +61,122 @@ are built into the ca65 macroassembler:
 
 The linker is called as follows:
 
-	Usage: ld65 [options] module ...
-	Options are:
-       	       	-m name	    Create a map file
-       	       	-o name	    Name the default output file
-       	       	-t type	    Type of target system
-       	       	-v     	    Verbose mode
-       	       	-vm    	    Verbose map file
-       	       	-C name	    Use linker config file
-       	       	-Ln name    Create a VICE label file
-       	       	-Lp    	    Mark write protected segments as such (VICE)
-       	       	-S addr	    Set the default start address
-       	       	-V     	    Print linker version
+---------------------------------------------------------------------------
+Usage: ld65 [options] module ...
+Short options:
+  -h			Help (this text)
+  -m name		Create a map file
+  -o name	   	Name the default output file
+  -t type		Type of target system
+  -v			Verbose mode
+  -vm			Verbose map file
+  -C name		Use linker config file
+  -Ln name		Create a VICE label file
+  -Lp			Mark write protected segments as such (VICE)
+  -S addr		Set the default start address
+  -V			Print the linker version
 
-The -m switch (which needs an argument that will used as a filename for
-the generated map file) will cause the linker to generate a map file. The
-map file does contain a detailed overview over the modules used, the
-sizes for the different segments, and a table containing exported
-symbols.
+Long options:
+  --help		Help (this text)
+  --version		Print the linker version
+---------------------------------------------------------------------------
 
-The -o switch is used to give the name of the default output file.
-Depending on your output configuration, this name may NOT be used as name
-for the output file. However, for the builtin configurations, this name
-is used for the output file name.
 
-The argument for the -t switch is the name of the target system. Since
-this switch will activate a builtin configuration, it may not be used
-together with the -C option.
-The following target systems are defined (* = currently unsupported):
+  -h
+  --help
 
-	none
-	atari
-	c64
-	c128
-	ace
-	plus4
- 	cbm610
-	pet
-	nes
-	apple2
+  Print the short option summary shown above.
 
-See section 4.3 for more information about the builtin configurations.
 
-Using the -v option, you may enable more output that may help you to
-locate problems. If an undefined symbol is encountered, -v causes the
-linker to print a detailed list of the references (that is, source file
-and line) for this symbol.
+  -m name	   
 
--C gives the name of an output config file to use. See section 4 for more
-information about config files. -C may not be used together with -t.
+  This option (which needs an argument that will used as a filename for
+  the generated map file) will cause the linker to generate a map file.
+  The map file does contain a detailed overview over the modules used, the
+  sizes for the different segments, and a table containing exported
+  symbols.
 
--L allows you to create a file that contains all global labels and may be
-loaded into VICE emulator using the pb (playback) command. You may use
-this to debug your code with VICE. Note: The label feature is very new in
-VICE and has some bugs. If you have problems, please get the latest VICE
-version.
 
-Using -S you may define the default starting address. If and how this
-address is used depends on the config file in use. For the builtin
-configurations, only the "none" system honors an explicit start address,
-all other builtin config provide their own.
+  -o name
 
--V prints the version number of the linker. If you send any suggestions or
-bugfixes, please include this number.
+  The -o switch is used to give the name of the default output file.
+  Depending on your output configuration, this name may NOT be used as
+  name for the output file. However, for the builtin configurations, this
+  name is used for the output file name.
+
+  -t target
+
+  The argument for the -t switch is the name of the target system. Since
+  this switch will activate a builtin configuration, it may not be used
+  together with the -C option. The following target systems are currently
+  supported:
+
+  	none
+  	atari
+  	c64
+  	c128
+  	plus4
+  	cbm610
+  	pet
+  	apple2
+	geos
+
+  There are a few more targets defined but neither of them is actually
+  supported. See section 4.3 for more information about the builtin
+  configurations.
+
+
+  -v
+  --verbose
+
+  Using the -v option, you may enable more output that may help you to
+  locate problems. If an undefined symbol is encountered, -v causes the
+  linker to print a detailed list of the references (that is, source file
+  and line) for this symbol.
+
+
+  -vm
+
+  Must be used in conjunction with -m (generate map file). Normally the
+  map file will not include empty segments and sections, or unreferenced
+  symbols. Using this option, you can force the linker to include all
+  this information into the map file.
+
+
+  -C
+
+  This gives the name of an output config file to use. See section 4 for
+  more information about config files. -C may not be used together with
+  -t.
+
+
+  -Ln
+
+  This option allows you to create a file that contains all global labels
+  and may be loaded into VICE emulator using the pb (playback) command.
+  You may use this to debug your code with VICE. Note: The label feature
+  is very new in VICE and has some bugs. If you have problems, please get
+  the latest VICE version.
+
+
+  -Lp
+
+  Deprecated option.
+
+
+  -S addr
+
+  Using -S you may define the default starting address. If and how this
+  address is used depends on the config file in use. For the builtin
+  configurations, only the "none" system honors an explicit start address,
+  all other builtin config provide their own.
+  
+
+  -V
+  --version
+
+  This option print the version number of the linker. If you send any
+  suggestions or bugfixes, please include this number.
 
 
 If one of the modules is not found in the current directory, and the
@@ -527,7 +574,18 @@ none:
      	}
 
 atari:
-	(non-existent)
+	MEMORY {
+	    HEADER: start = $0000, size = $6, file = %O;
+	    RAM: start = $1F00, size = $6100, file = %O;
+	}
+	SEGMENTS {
+	    EXEHDR: load = HEADER, type = wprot;
+	    CODE: load = RAM, type = wprot, define = yes;
+	    RODATA: load = RAM, type = wprot;
+	    DATA: load = RAM, type = rw;
+	    BSS: load = RAM, type = bss, define = yes;
+	    AUTOSTRT: load = RAM, type = wprot;
+	}
 
 c64:
      	MEMORY {
@@ -587,19 +645,6 @@ pet:
 	    BSS:    load = RAM, type = bss, define = yes;
 	}
 
-nes:
-	MEMORY {
-	    RAM: start = $0200, size = $0600, file = "";
-	    ROM: start = $8000, size = $8000, file = %O;
-	}
-	SEGMENTS {
-	    CODE:    load = ROM, type = ro;
-	    RODATA:  load = ROM, type = ro;
-	    DATA:    load = ROM, run = RAM, type = rw, define = yes;
-	    BSS:     load = RAM, type = bss, define = yes;
-	    VECTORS: load = ROM, type = ro, start = $FFFA;
-	}
-
 apple2:
 	MEMORY {
 	    RAM: start = $800, size = $8E00, file = %O;
@@ -609,6 +654,19 @@ apple2:
             RODATA: load = RAM, type = ro;
             DATA: load = RAM, type = rw;
             BSS: load = RAM, type = bss, define = yes;
+	}
+
+geos:
+	MEMORY {
+	    HEADER: start = $204, size = 508, file = %O;
+	    RAM: start = $400, size = $7C00, file = %O;
+	}
+	SEGMENTS {
+	    HEADER: load = HEADER, type = ro;
+	    CODE: load = RAM, type = ro;
+	    RODATA: load = RAM, type = ro;
+	    DATA: load = RAM, type = rw;
+	    BSS: load = RAM, type = bss, define = yes;
 	}
 
 The "start" attribute for the RAM memory area of the CBM systems is two
@@ -629,9 +687,9 @@ Feel free to contact me by email (uz@musoftware.de).
 6. Copyright
 ------------
 
-ld65 (and all cc65 binutils) are (C) Copyright 1998 Ullrich von Bassewitz.
-For usage of the binaries and/or sources the following conditions do
-apply:
+ld65 (and all cc65 binutils) are (C) Copyright 1998-2000 Ullrich von
+Bassewitz. For usage of the binaries and/or sources the following
+conditions do apply:
 
 This software is provided 'as-is', without any expressed or implied
 warranty.  In no event will the authors be held liable for any damages

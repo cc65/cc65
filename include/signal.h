@@ -42,12 +42,16 @@
 typedef unsigned char sig_atomic_t;
 
 /* Type of a signal handler */
-typedef void (*__sigfunc) (int);
+typedef void __fastcall__ (*__sigfunc) (int);
+
+/* Functions that implement SIG_IGN and SIG_DFL */
+void _sig_ign (int);
+void _sig_dfl (int);
 
 /* Standard signal handling functions */
-#define SIG_IGN         ((__sigfunc) 0x0000)
-#define SIG_ERR         ((__sigfunc) 0xFFFF)
-#define SIG_DFL         ((__sigfunc) 0xFFFE)
+#define SIG_DFL         _sig_dfl
+#define SIG_IGN         _sig_ign
+#define SIG_ERR         ((__sigfunc) 0x0000)
 
 /* Signal numbers */
 #define SIGABRT         0

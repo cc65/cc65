@@ -63,7 +63,7 @@ struct DbgSym {
     ObjData*   		Obj;	    	/* Object file that exports the name */
     FilePos    		Pos;		/* File position of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
-    const char*        	Name;  	       	/* Name */
+    unsigned            Name;  	       	/* Name */
     unsigned char	Type;		/* Type of symbol */
 };
 
@@ -89,8 +89,6 @@ void PrintDbgSymLabels (ObjData* O, FILE* F);
 /* End of dbgsyms.h */
 
 #endif
-
-
 
 
 

@@ -39,6 +39,7 @@
 /* common */
 #include "check.h"
 #include "exprdefs.h"
+#include "fragdefs.h"
 #include "hashstr.h"
 #include "print.h"
 #include "segdefs.h"
@@ -53,6 +54,7 @@
 #include "global.h"
 #include "lineinfo.h"
 #include "segments.h"
+#include "spool.h"
 
 
 
@@ -63,7 +65,8 @@
 
 
 /* Hash table */
-#define HASHTAB_SIZE 	253
+#define HASHTAB_MASK    0x3FU
+#define HASHTAB_SIZE 	(HASHTAB_MASK + 1)
 static Segment*        	HashTab [HASHTAB_SIZE];
 
 static unsigned	       	SegCount = 0; 	/* Segment count */
@@ -77,35 +80,16 @@ static Segment*	     	SegRoot = 0;	/* List of all segments */
 
 
 
-static Segment* SegFindInternal (const char* Name, unsigned HashVal)
-/* Try to find the segment with the given name, return a pointer to the
- * segment structure, or 0 if not found.
- */
-{
-    Segment* S = HashTab [HashVal];
-    while (S) {
-	if (strcmp (Name, S->Name) == 0) {
-	    /* Found */
-	    break;
-	}
-	S = S->Next;
-    }
-    /* Not found */
-    return S;
-}
-
-
-
-static Segment* NewSegment (const char* Name, unsigned HashVal, unsigned char Type)
+static Segment* NewSegment (unsigned Name, unsigned char Type)
 /* Create a new segment and initialize it */
 {
-    /* Get the length of the symbol name */
-    unsigned Len = strlen (Name);
+    unsigned Hash;
 
     /* Allocate memory */
-    Segment* S = xmalloc (sizeof (Segment) + Len);
+    Segment* S = xmalloc (sizeof (Segment));
 
     /* Initialize the fields */
+    S->Name     = Name;
     S->Next	= 0;
     S->SecRoot	= 0;
     S->SecLast	= 0;
@@ -116,8 +100,6 @@ static Segment* NewSegment (const char* Name, unsigned HashVal, unsigned char Ty
     S->FillVal	= 0;
     S->Type     = Type;
     S->Dumped   = 0;
-    memcpy (S->Name, Name, Len);
-    S->Name [Len] = '\0';
 
     /* Insert the segment into the segment list */
     S->List = SegRoot;
@@ -125,8 +107,9 @@ static Segment* NewSegment (const char* Name, unsigned HashVal, unsigned char Ty
     ++SegCount;
 
     /* Insert the segment into the segment hash list */
-    S->Next = HashTab [HashVal];
-    HashTab [HashVal] = S;
+    Hash = (S->Name & HASHTAB_MASK);
+    S->Next = HashTab[Hash];
+    HashTab[Hash] = S;
 
     /* Return the new entry */
     return S;
@@ -134,22 +117,21 @@ static Segment* NewSegment (const char* Name, unsigned HashVal, unsigned char Ty
 
 
 
-Segment* GetSegment (const char* Name, unsigned char Type, const char* ObjName)
+Segment* GetSegment (unsigned Name, unsigned char Type, const char* ObjName)
 /* Search for a segment and return an existing one. If the segment does not
  * exist, create a new one and return that. ObjName is only used for the error
  * message and may be NULL if the segment is linker generated.
  */
 {
-    /* Create a hash over the name and try to locate the segment in the table */
-    unsigned HashVal = HashStr (Name) % HASHTAB_SIZE;
-    Segment* S = SegFindInternal (Name, HashVal);
+    /* Try to locate the segment in the table */
+    Segment* S = SegFind (Name);
 
     /* If we don't have that segment already, allocate it using the type of
      * the first section.
      */
     if (S == 0) {
       	/* Create a new segment */
-      	S = NewSegment (Name, HashVal, Type);
+      	S = NewSegment (Name, Type);
     } else {
        	/* Check if the existing segment has the requested type */
        	if (S->Type != Type) {
@@ -157,7 +139,8 @@ Segment* GetSegment (const char* Name, unsigned char Type, const char* ObjName)
 	    if (ObjName == 0) {
 		ObjName = "[linker generated]";
 	    }
-	    Error ("Module `%s': Type mismatch for segment `%s'", ObjName, Name);
+	    Error ("Module `%s': Type mismatch for segment `%s'", ObjName,
+                   GetString (Name));
      	}
     }
 
@@ -174,7 +157,7 @@ Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Type)
 
 
     /* Allocate memory */
-    Section* S = xmalloc (sizeof (Segment));
+    Section* S = xmalloc (sizeof (Section));
 
     /* Initialize the data */
     S->Next	= 0;
@@ -211,7 +194,7 @@ Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Type)
 Section* ReadSection (FILE* F, ObjData* O)
 /* Read a section from a file */
 {
-    char*         Name;
+    unsigned      Name;
     unsigned      Size;
     unsigned char Align;
     unsigned char Type;
@@ -221,7 +204,7 @@ Section* ReadSection (FILE* F, ObjData* O)
 
     /* Read the segment data */
     (void) Read32 (F);            /* File size of data */
-    Name      = ReadStr (F);      /* Segment name */
+    Name      = MakeGlobalStringId (O, ReadVar (F));    /* Segment name */
     Size      = Read32 (F);       /* Size of data */
     Align     = Read8 (F);        /* Alignment */
     Type      = Read8 (F);        /* Segment type */
@@ -230,13 +213,10 @@ Section* ReadSection (FILE* F, ObjData* O)
 
     /* Print some data */
     Print (stdout, 2, "Module `%s': Found segment `%s', size = %u, align = %u, type = %u\n",
-	   GetObjFileName (O), Name, Size, Align, Type);
+	   GetObjFileName (O), GetString (Name), Size, Align, Type);
 
     /* Get the segment for this section */
     S = GetSegment (Name, Type, GetObjFileName (O));
-
-    /* We have the segment and don't need the name any longer */
-    xfree (Name);
 
     /* Allocate the section we will return later */
     Sec = NewSection (S, Align, Type);
@@ -283,7 +263,7 @@ Section* ReadSection (FILE* F, ObjData* O)
 
 	    default:
 	  	Error ("Unknown fragment type in module `%s', segment `%s': %02X",
-	  	       GetObjFileName (O), S->Name, Type);
+	  	       GetObjFileName (O), GetString (S->Name), Type);
 	  	/* NOTREACHED */
 	 	return 0;
        	}
@@ -295,7 +275,6 @@ Section* ReadSection (FILE* F, ObjData* O)
             unsigned Count = ReadVar (F);
 
             /* Read the expressions */
-            CheckExpr* Last = 0;
             while (Count--) {
                 /* ### */
             }
@@ -331,10 +310,19 @@ Section* ReadSection (FILE* F, ObjData* O)
 
 
 
-Segment* SegFind (const char* Name)
+Segment* SegFind (unsigned Name)
 /* Return the given segment or NULL if not found. */
 {
-    return SegFindInternal (Name, HashStr (Name) % HASHTAB_SIZE);
+    Segment* S = HashTab[Name & HASHTAB_MASK];
+    while (S) {
+       	if (Name == S->Name) {
+	    /* Found */
+	    break;
+	}
+	S = S->Next;
+    }
+    /* Not found */
+    return S;
 }
 
 
@@ -382,7 +370,7 @@ void SegDump (void)
     Segment* Seg = SegRoot;
     while (Seg) {
 	Section* S = Seg->SecRoot;
-       	printf ("Segment: %s (%lu)\n", Seg->Name, Seg->Size);
+       	printf ("Segment: %s (%lu)\n", GetString (Seg->Name), Seg->Size);
 	while (S) {
 	    Fragment* F = S->FragRoot;
 	    printf ("  Section:\n");
@@ -420,7 +408,7 @@ void SegDump (void)
 		    case FRAG_FILL:
 			printf ("    Empty space (%u bytes)\n", F->Size);
 		     	break;
-                                                   
+
 		    default:
 			Internal ("Invalid fragment type: %02X", F->Type);
 		}
@@ -578,7 +566,7 @@ static int CmpSegStart (const void* K1, const void* K2)
 	return -1;
     } else {
 	/* Sort segments with equal starts by name */
-     	return strcmp (S1->Name, S2->Name);
+     	return strcmp (GetString (S1->Name), GetString (S2->Name));
     }
 }
 
@@ -635,7 +623,7 @@ void PrintSegmentMap (FILE* F)
 	     	--End;
 	    }
 	    fprintf (F, "%-20s  %06lX  %06lX  %06lX\n",
-		     S->Name, S->PC, End, S->Size);
+       	       	     GetString (S->Name), S->PC, End, S->Size);
      	}
     }
 
@@ -653,7 +641,8 @@ void CheckSegments (void)
     Segment* S = SegRoot;
     while (S) {
 	if (S->Size > 0 && S->Dumped == 0) {
-       	    Error ("Missing memory area assignment for segment `%s'", S->Name);
+       	    Error ("Missing memory area assignment for segment `%s'",
+                   GetString (S->Name));
 	}
 	S = S->List;
     }

@@ -35,18 +35,19 @@
 
 #include <string.h>
 
-/* common */
+/* common */                                                      
 #include "check.h"
 #include "symdefs.h"
 #include "xmalloc.h"
 
 /* ld65 */
-#include "global.h"
-#include "error.h"
-#include "fileio.h"
-#include "objdata.h"
-#include "expr.h"
 #include "dbgsyms.h"
+#include "error.h"
+#include "expr.h"
+#include "fileio.h"
+#include "global.h"
+#include "objdata.h"
+#include "spool.h"
 
 
 
@@ -101,10 +102,10 @@ static DbgSym* GetDbgSym (DbgSym* D, long Val)
 		    ((Val >>  0) & 0xFF);
 
     /* Check for this symbol */
-    DbgSym* Sym = DbgSymPool [Hash];
+    DbgSym* Sym = DbgSymPool[Hash];
     while (Sym) {
 	/* Is this symbol identical? */
-	if (strcmp (Sym->Name, D->Name) == 0 && EqualExpr (Sym->Expr, D->Expr)) {
+	if (Sym->Name == D->Name && EqualExpr (Sym->Expr, D->Expr)) {
 	    /* Found */
 	    return Sym;
 	}
@@ -148,7 +149,7 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
     D = NewDbgSym (Type, O);
 
     /* Read and assign the name */
-    D->Name = GetObjString (O, ReadVar (F));
+    D->Name = MakeGlobalStringId (O, ReadVar (F));
 
     /* Read the value */
     if (IS_EXP_EXPR (Type)) {
@@ -196,7 +197,7 @@ void PrintDbgSymLabels (ObjData* O, FILE* F)
        	if (GetDbgSym (D, Val) == 0) {
 
 	    /* Emit the VICE label line */
-       	    fprintf (F, "al %06lX .%s\n", Val, D->Name);
+       	    fprintf (F, "al %06lX .%s\n", Val, GetString (D->Name));
 
 	    /* Insert the symbol into the table */
 	    InsertDbgSym (D, Val);

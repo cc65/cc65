@@ -42,15 +42,16 @@
 #include "xmalloc.h"
 
 /* ld65 */
-#include "global.h"
+#include "bin.h"
+#include "config.h"
+#include "exports.h"
+#include "expr.h"
 #include "error.h"
+#include "global.h"
 #include "fileio.h"
 #include "lineinfo.h"
 #include "segments.h"
-#include "exports.h"
-#include "config.h"
-#include "expr.h"
-#include "bin.h"
+#include "spool.h"
 
 
 
@@ -136,7 +137,7 @@ static void BinWriteMem (BinDesc* D, Memory* M)
     	SegDesc* S = N->Seg;
 
 	/* Keep the user happy */
-       	Print (stdout, 1, "    Writing `%s'\n", S->Name);
+       	Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
 
 	/* Writes do only occur in the load area and not for BSS segments */
        	DoWrite = (S->Flags & SF_BSS) == 0 	&& 	/* No BSS segment */
@@ -157,7 +158,7 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 	     * in the linker.
 	     */
 	    Warning ("Segment `%s' in module `%s' requires larger alignment",
-	     	     S->Name, GetObjFileName (S->Seg->AlignObj));
+	     	     GetString (S->Name), GetObjFileName (S->Seg->AlignObj));
 	}
 
 	/* Handle ALIGN and OFFSET/START */
@@ -217,7 +218,7 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 
 
 
-static int BinUnresolved (const char* Name attribute ((unused)), void* D)
+static int BinUnresolved (unsigned Name attribute ((unused)), void* D)
 /* Called if an unresolved symbol is encountered */
 {
     /* Unresolved symbols are an error in binary format. Bump the counter
@@ -228,7 +229,7 @@ static int BinUnresolved (const char* Name attribute ((unused)), void* D)
     return 0;
 }
 
-
+                                   
 
 void BinWriteTarget (BinDesc* D, struct File* F)
 /* Write a binary output file */
@@ -236,7 +237,7 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     Memory* M;
 
     /* Place the filename in the control structure */
-    D->Filename = F->Name;
+    D->Filename = GetString (F->Name);
 
     /* Check for unresolved symbols. The function BinUnresolved is called
      * if we get an unresolved symbol.
@@ -249,31 +250,32 @@ void BinWriteTarget (BinDesc* D, struct File* F)
     }
 
     /* Open the file */
-    D->F = fopen (F->Name, "wb");
+    D->F = fopen (D->Filename, "wb");
     if (D->F == 0) {
-	Error ("Cannot open `%s': %s", F->Name, strerror (errno));
+	Error ("Cannot open `%s': %s", D->Filename, strerror (errno));
     }
 
     /* Keep the user happy */
-    Print (stdout, 1, "Opened `%s'...\n", F->Name);
+    Print (stdout, 1, "Opened `%s'...\n", D->Filename);
 
     /* Dump all memory areas */
     M = F->MemList;
     while (M) {
-	Print (stdout, 1, "  Dumping `%s'\n", M->Name);
+	Print (stdout, 1, "  Dumping `%s'\n", GetString (M->Name));
 	BinWriteMem (D, M);
 	M = M->FNext;
     }
 
     /* Close the file */
     if (fclose (D->F) != 0) {
-	Error ("Cannot write to `%s': %s", F->Name, strerror (errno));
+	Error ("Cannot write to `%s': %s", D->Filename, strerror (errno));
     }
 
     /* Reset the file and filename */
     D->F        = 0;
     D->Filename = 0;
 }
+
 
 
 

@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -37,15 +37,17 @@
 #include <string.h>
 #include <errno.h>
 
-#include "global.h"
-#include "error.h"
-#include "objdata.h"
-#include "segments.h"
+/* ld65 */
+#include "config.h"
 #include "dbginfo.h"
 #include "dbgsyms.h"
 #include "exports.h"
-#include "config.h"
+#include "global.h"
+#include "error.h"
 #include "mapfile.h"
+#include "objdata.h"
+#include "segments.h"
+#include "spool.h"
 
 
 
@@ -87,7 +89,7 @@ void CreateMapFile (void)
      		 */
      		if (VerboseMap || S->Size > 0) {
        	       	    fprintf (F, "    %-15s   Offs = %06lX   Size = %06lX\n",
-     			     S->Seg->Name, S->Offs, S->Size);
+     			     GetString (S->Seg->Name), S->Offs, S->Size);
      		}
      	    }
      	}

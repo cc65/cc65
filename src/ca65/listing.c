@@ -40,7 +40,7 @@
 /* common */
 #include "check.h"
 #include "fname.h"
-#include "segdefs.h"
+#include "fragdefs.h"
 #include "version.h"
 #include "xmalloc.h"
 

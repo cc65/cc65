@@ -62,6 +62,7 @@
 #include "objfile.h"
 #include "scanner.h"
 #include "segments.h"
+#include "spool.h"
 #include "tgtcfg.h"
 
 
@@ -403,6 +404,9 @@ int main (int argc, char* argv [])
 
     /* Initialize the input file search paths */
     InitSearchPaths ();
+
+    /* Initialize the string pool */
+    InitStrPool ();
 
     /* Check the parameters */
     I = 1;

@@ -50,33 +50,6 @@
 #define SEGTYPE_ZP     	        2
 #define SEGTYPE_FAR    	        3
 
-/* Fragment types in the object file */
-#define FRAG_TYPEMASK  	        0x38   	/* Mask the type of the fragment */
-#define FRAG_BYTEMASK           0x07   	/* Mask for byte count */
-#define FRAG_CHECKMASK          0x40    /* Mask for check expressions */
-
-/* Fragment types */
-#define FRAG_LITERAL   	        0x00   	/* Literal data */
-
-#define FRAG_EXPR      	        0x08   	/* Expression */
-#define FRAG_EXPR8     	        0x09   	/* 8 bit expression */
-#define FRAG_EXPR16    	        0x0A   	/* 16 bit expression */
-#define FRAG_EXPR24    	        0x0B   	/* 24 bit expression */
-#define FRAG_EXPR32    	        0x0C   	/* 32 bit expression */
-
-#define FRAG_SEXPR     	        0x10   	/* Signed expression */
-#define FRAG_SEXPR8    	        0x11   	/* 8 bit signed expression */
-#define FRAG_SEXPR16   	        0x12   	/* 16 bit signed expression */
-#define FRAG_SEXPR24   	        0x13   	/* 24 bit signed expression */
-#define FRAG_SEXPR32   	        0x14   	/* 32 bit signed expression */
-
-#define FRAG_FILL      	        0x20   	/* Fill bytes */
-
-/* Fragment checks */
-#define FRAG_CHECK              0x40    /* Check expressions exist */
-
-
-
 /* Segment definition */
 typedef struct SegDef SegDef;
 struct SegDef {

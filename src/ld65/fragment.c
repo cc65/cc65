@@ -34,18 +34,72 @@
 
 
 /* common */
-#include "segdefs.h"
+#include "fragdefs.h"
 #include "xmalloc.h"
 
 /* ld65 */
-#include "segments.h"
+#include "error.h"
+#include "expr.h"
 #include "fragment.h"
+#include "fileio.h"
+#include "segments.h"
+#include "spool.h"
 
 
 
 /*****************************************************************************/
 /*     	      	     	   	     Code  	      	  	  	     */
 /*****************************************************************************/
+
+
+
+static FragCheck* NewFragCheck (unsigned Action)
+/* Allocate a new FragCheck struct and return it */
+{
+    /* Allocate memory */
+    FragCheck* FC = xmalloc (sizeof (FragCheck));
+
+    /* Initialize the fields */
+    FC->Next    = 0;
+    FC->Expr    = 0;
+    FC->Action  = Action;
+    FC->Message = INVALID_STRING_ID;
+
+    /* Return the new struct */
+    return FC;
+}
+
+
+
+FragCheck* ReadFragCheck (FILE* F, Fragment* Frag)
+/* Read a fragment check expression from the given file */
+{
+    /* Get the object file pointer from the fragment */
+    ObjData* O = Frag->Obj;
+
+    /* Read the action and create a new struct */
+    FragCheck* FC = NewFragCheck (ReadVar (F));
+
+    /* Determine the remaining data from the action */
+    switch (FC->Action) {
+
+        case FRAG_ACT_WARN:
+        case FRAG_ACT_ERROR:
+            FC->Expr = ReadExpr (F, O);
+            FC->Message = MakeGlobalStringId (O, ReadVar (F));
+            break;
+
+        default:
+            Internal ("In module `%s', file `%s', line %lu: Invalid fragment "
+                      "check action: %u",
+                      GetObjFileName (O),
+                      GetSourceFileName (O, Frag->Pos.Name),
+                      Frag->Pos.Line, FC->Action);
+    }
+
+    /* Return the new fragment check */
+    return FC;
+}
 
 
 

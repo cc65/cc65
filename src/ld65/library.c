@@ -278,8 +278,12 @@ void LibAdd (FILE* F, const char* Name)
 
 	    /* We have the data now */
  	    O->Flags |= OBJ_HAVEDATA;
-
  	}
+
+        /* All references to strings are now resolved, so we can delete
+         * the module string pool.
+         */
+        FreeObjStrings (O);
 
  	/* Add a pointer to the library name */
  	O->LibName = LibName;

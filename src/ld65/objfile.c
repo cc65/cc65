@@ -255,6 +255,11 @@ void ObjAdd (FILE* Obj, const char* Name)
 
     /* Done, close the file (we read it only, so no error check) */
     fclose (Obj);
+
+    /* All references to strings are now resolved, so we can delete the module
+     * string pool.
+     */
+    FreeObjStrings (O);
 }
 
 

@@ -98,10 +98,18 @@ extern ObjData*		ObjLast;	/* Last entry in list */
 ObjData* NewObjData (void);
 /* Allocate a new structure on the heap, insert it into the list, return it */
 
-const char* GetObjString (const ObjData* O, unsigned long Index);
+void FreeObjStrings (ObjData* O);
+/* Free the module string data. Used once the object file is loaded completely
+ * when all strings are converted to global strings.
+ */
+
+const char* GetObjString (const ObjData* O, unsigned Index);
 /* Get a string from the object file string table. Abort if the string index
  * is invalid.
  */
+
+unsigned MakeGlobalStringId (const ObjData* O, unsigned Index);
+/* Convert a local string id into a global one and return it. */
 
 const char* GetObjFileName (const ObjData* O);
 /* Get the name of the object file. Return "[linker generated]" if the object

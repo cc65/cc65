@@ -49,6 +49,10 @@
 
 
 
+/* An invalid message index */
+#define INVALID_STRING_ID       0U
+
+/* The string pool we're using */
 extern StringPool StrPool;
 
 
@@ -68,6 +72,19 @@ INLINE unsigned GetStringId (const char* S)
 #else
 #  define GetStringId(S)        SP_Add (&StrPool, (S))
 #endif
+
+#if defined(HAVE_INLINE)
+INLINE const char* GetString (unsigned Index)
+/* Convert a string index into a string */
+{
+    return SP_Get (&StrPool, Index);
+}
+#else
+#  define GetString(Index)      SP_Get (&StrPool, (Index))
+#endif
+
+void InitStrPool (void);
+/* Initialize the string pool */
 
 
 

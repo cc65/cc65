@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -71,13 +71,13 @@ typedef enum {
 void ConDesAddExport (struct Export* E);
 /* Add the given export to the list of constructors/destructor */
 
-void ConDesSetSegName (unsigned Type, const char* SegName);
+void ConDesSetSegName (unsigned Type, unsigned SegName);
 /* Set the segment name where the table should go */
 
-void ConDesSetLabel (unsigned Type, const char* Name);
+void ConDesSetLabel (unsigned Type, unsigned Name);
 /* Set the label for the given ConDes type */
 
-void ConDesSetCountSym (unsigned Type, const char* Name);
+void ConDesSetCountSym (unsigned Type, unsigned Name);
 /* Set the name for the given ConDes count symbol */
 
 void ConDesSetOrder (unsigned Type, ConDesOrder Order);
@@ -100,7 +100,6 @@ void ConDesDump (void);
 /* End of condes.h */
 
 #endif
-
 
 
 

@@ -47,11 +47,12 @@
 /* ld65 */
 #include "condes.h"
 #include "error.h"
+#include "exports.h"
+#include "expr.h"
 #include "fileio.h"
 #include "global.h"
 #include "objdata.h"
-#include "expr.h"
-#include "exports.h"
+#include "spool.h"
 
 
 
@@ -62,8 +63,9 @@
 
 
 /* Hash table */
-#define HASHTAB_SIZE   	4081
-static Export* 	       	HashTab [HASHTAB_SIZE];
+#define HASHTAB_MASK    0x0FFFU
+#define HASHTAB_SIZE   	(HASHTAB_MASK + 1)
+static Export* 	       	HashTab[HASHTAB_SIZE];
 
 /* Import management variables */
 static unsigned	       	ImpCount = 0;	   	/* Import count */
@@ -84,7 +86,7 @@ static Export**	       	ExpPool  = 0;	  	/* Exports array */
 
 
 
-static Export* NewExport (unsigned char Type, const char* Name, ObjData* Obj);
+static Export* NewExport (unsigned char Type, unsigned Name, ObjData* Obj);
 /* Create a new export and initialize it */
 
 
@@ -98,7 +100,8 @@ static Import* NewImport (unsigned char Type, ObjData* Obj)
     /* Initialize the fields */
     I->Next	= 0;
     I->Obj	= Obj;
-    I->V.Name	= 0;
+    I->Exp      = 0;
+    I->Name     = INVALID_STRING_ID;
     I->Type	= Type;
 
     /* Return the new structure */
@@ -111,25 +114,24 @@ void InsertImport (Import* I)
 /* Insert an import into the table */
 {
     Export* E;
-    unsigned HashVal;
 
     /* As long as the import is not inserted, V.Name is valid */
-    const char* Name = I->V.Name;
+    unsigned Name = I->Name;
 
     /* Create a hash value for the given name */
-    HashVal = HashStr (Name) % HASHTAB_SIZE;
+    unsigned Hash = (Name & HASHTAB_MASK);
 
     /* Search through the list in that slot and print matching duplicates */
-    if (HashTab [HashVal] == 0) {
+    if (HashTab[Hash] == 0) {
     	/* The slot is empty, we need to insert a dummy export */
-    	E = HashTab [HashVal] = NewExport (0, Name, 0);
+    	E = HashTab[Hash] = NewExport (0, Name, 0);
 	++ExpCount;
     } else {
-    	E = HashTab [HashVal];
+    	E = HashTab [Hash];
     	while (1) {
-    	    if (strcmp (E->Name, Name) == 0) {
+    	    if (E->Name == Name) {
     	  	/* We have an entry, L points to it */
-       	  	break;
+       	       	break;
     	    }
     	    if (E->Next == 0) {
     	  	/* End of list an entry not found, insert a dummy */
@@ -146,7 +148,7 @@ void InsertImport (Import* I)
     /* Ok, E now points to a valid exports entry for the given import. Insert
      * the import into the imports list and update the counters.
      */
-    I->V.Exp   = E;
+    I->Exp     = E;
     I->Next    = E->ImpList;
     E->ImpList = I;
     E->ImpCount++;
@@ -175,7 +177,7 @@ Import* ReadImport (FILE* F, ObjData* Obj)
     I = NewImport (Type, Obj);
 
     /* Read the name */
-    I->V.Name = GetObjString (Obj, ReadVar (F));
+    I->Name = MakeGlobalStringId (Obj, ReadVar (F));
 
     /* Read the file position */
     ReadFilePos (F, &I->Pos);
@@ -192,13 +194,14 @@ Import* ReadImport (FILE* F, ObjData* Obj)
 
 
 
-static Export* NewExport (unsigned char Type, const char* Name, ObjData* Obj)
+static Export* NewExport (unsigned char Type, unsigned Name, ObjData* Obj)
 /* Create a new export and initialize it */
 {
     /* Allocate memory */
     Export* E = xmalloc (sizeof (Export));
 
     /* Initialize the fields */
+    E->Name     = Name;
     E->Next     = 0;
     E->Flags   	= 0;
     E->Obj      = Obj;
@@ -207,12 +210,6 @@ static Export* NewExport (unsigned char Type, const char* Name, ObjData* Obj)
     E->Expr    	= 0;
     E->Type    	= Type;
     memset (E->ConDes, 0, sizeof (E->ConDes));
-    if (Name) {
-        E->Name = xstrdup (Name);
-    } else {
-       	/* Name will get added later */
-       	E->Name = 0;
-    }
 
     /* Return the new entry */
     return E;
@@ -226,7 +223,7 @@ void InsertExport (Export* E)
     Export* L;
     Export* Last;
     Import* Imp;
-    unsigned HashVal;
+    unsigned Hash;
 
     /* Insert the export into any condes tables if needed */
     if (IS_EXP_CONDES (E->Type)) {
@@ -234,30 +231,30 @@ void InsertExport (Export* E)
     }
 
     /* Create a hash value for the given name */
-    HashVal = HashStr (E->Name) % HASHTAB_SIZE;
+    Hash = (E->Name & HASHTAB_MASK);
 
     /* Search through the list in that slot */
-    if (HashTab [HashVal] == 0) {
+    if (HashTab[Hash] == 0) {
       	/* The slot is empty */
-      	HashTab [HashVal] = E;
+      	HashTab[Hash] = E;
 	++ExpCount;
     } else {
 
       	Last = 0;
-      	L = HashTab [HashVal];
+      	L = HashTab[Hash];
       	do {
-      	    if (strcmp (L->Name, E->Name) == 0) {
-      	   	/* This may be an unresolved external */
-      	      	if (L->Expr == 0) {
+      	    if (L->Name == E->Name) {
+      	       	/* This may be an unresolved external */
+      	       	if (L->Expr == 0) {
 
-      	   	    /* This *is* an unresolved external */
-      	   	    E->Next     = L->Next;
-      	   	    E->ImpCount = L->ImpCount;
-      	   	    E->ImpList  = L->ImpList;
+      	       	    /* This *is* an unresolved external */
+      	       	    E->Next     = L->Next;
+      	       	    E->ImpCount = L->ImpCount;
+      	       	    E->ImpList  = L->ImpList;
       	   	    if (Last) {
       	   	       	Last->Next = E;
       	   	    } else {
-      	      	       	HashTab [HashVal] = E;
+      	      	       	HashTab[Hash] = E;
       	   	    }
        	       	    ImpOpen -= E->ImpCount;	/* Decrease open imports now */
       	   	    xfree (L);
@@ -266,12 +263,13 @@ void InsertExport (Export* E)
       	   	     */
       	   	    Imp = E->ImpList;
       	   	    while (Imp) {
-      	   	   	Imp->V.Exp = E;
+      	   	   	Imp->Exp = E;
       	   	   	Imp = Imp->Next;
       	   	    }
       	   	} else {
       	   	    /* Duplicate entry, ignore it */
-       	   	    Warning ("Duplicate external identifier: `%s'", L->Name);
+       	   	    Warning ("Duplicate external identifier: `%s'", 
+                             GetString (L->Name));
       		}
       		return;
       	    }
@@ -299,7 +297,7 @@ Export* ReadExport (FILE* F, ObjData* O)
     Type = Read8 (F);
 
     /* Create a new export without a name */
-    E = NewExport (Type, 0, O);
+    E = NewExport (Type, INVALID_STRING_ID, O);
 
     /* Read the constructor/destructor decls if we have any */
     ConDesCount = GET_EXP_CONDES_COUNT (Type);
@@ -325,7 +323,7 @@ Export* ReadExport (FILE* F, ObjData* O)
     }
 
     /* Read the name */
-    E->Name = GetObjString (O, ReadVar (F));
+    E->Name = MakeGlobalStringId (O, ReadVar (F));
 
     /* Read the value */
     if (IS_EXP_EXPR (Type)) {
@@ -343,7 +341,7 @@ Export* ReadExport (FILE* F, ObjData* O)
 
 
 
-Export* CreateConstExport (const char* Name, long Value)
+Export* CreateConstExport (unsigned Name, long Value)
 /* Create an export for a literal date */
 {
     /* Create a new export */
@@ -361,7 +359,7 @@ Export* CreateConstExport (const char* Name, long Value)
 
 
 
-Export* CreateMemoryExport (const char* Name, Memory* Mem, unsigned long Offs)
+Export* CreateMemoryExport (unsigned Name, Memory* Mem, unsigned long Offs)
 /* Create an relative export for a memory area offset */
 {
     /* Create a new export */
@@ -379,7 +377,7 @@ Export* CreateMemoryExport (const char* Name, Memory* Mem, unsigned long Offs)
 
 
 
-Export* CreateSegmentExport (const char* Name, Segment* Seg, unsigned long Offs)
+Export* CreateSegmentExport (unsigned Name, Segment* Seg, unsigned long Offs)
 /* Create a relative export to a segment */
 {
     /* Create a new export */
@@ -397,7 +395,7 @@ Export* CreateSegmentExport (const char* Name, Segment* Seg, unsigned long Offs)
 
 
 
-Export* CreateSectionExport (const char* Name, Section* Sec, unsigned long Offs)
+Export* CreateSectionExport (unsigned Name, Section* Sec, unsigned long Offs)
 /* Create a relative export to a section */
 {
     /* Create a new export */
@@ -415,16 +413,16 @@ Export* CreateSectionExport (const char* Name, Section* Sec, unsigned long Offs)
 
 
 
-Export* FindExport (const char* Name)
+Export* FindExport (unsigned Name)
 /* Check for an identifier in the list. Return 0 if not found, otherwise
  * return a pointer to the export.
  */
 {
     /* Get a pointer to the list with the symbols hash value */
-    Export* L = HashTab [HashStr (Name) % HASHTAB_SIZE];
+    Export* L = HashTab[Name & HASHTAB_MASK];
     while (L) {
         /* Search through the list in that slot */
-	if (strcmp (L->Name, Name) == 0) {
+       	if (L->Name == Name) {
 	    /* Entry found */
 	    return L;
 	}
@@ -437,7 +435,7 @@ Export* FindExport (const char* Name)
 
 
 
-int IsUnresolved (const char* Name)
+int IsUnresolved (unsigned Name)
 /* Check if this symbol is an unresolved export */
 {
     /* Find the export */
@@ -473,7 +471,7 @@ long GetExportVal (const Export* E)
 {
     if (E->Expr == 0) {
      	/* OOPS */
-       	Internal ("`%s' is an undefined external", E->Name);
+       	Internal ("`%s' is an undefined external", GetString (E->Name));
     }
     return GetExprVal (E->Expr);
 }
@@ -493,13 +491,16 @@ static void CheckSymType (const Export* E)
 	      	/* User defined export */
 	      	Warning ("Type mismatch for `%s', export in "
 			 "%s(%lu), import in %s(%lu)",
-			 E->Name, GetSourceFileName (E->Obj, Imp->Pos.Name),
-    			 E->Pos.Line, GetSourceFileName (Imp->Obj, Imp->Pos.Name),
+			 GetString (E->Name), 
+                         GetSourceFileName (E->Obj, Imp->Pos.Name),
+    			 E->Pos.Line, 
+                         GetSourceFileName (Imp->Obj, Imp->Pos.Name),
 		   	 Imp->Pos.Line);
 	    } else {
 		/* Export created by the linker */
 		Warning ("Type mismatch for `%s', imported from %s(%lu)",
-			 E->Name, GetSourceFileName (Imp->Obj, Imp->Pos.Name),
+			 GetString (E->Name), 
+                         GetSourceFileName (Imp->Obj, Imp->Pos.Name),
 			 Imp->Pos.Line);
 	    }
 	}
@@ -541,7 +542,7 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
 	    Import* Imp = E->ImpList;
 	    fprintf (stderr,
 		     "Unresolved external `%s' referenced in:\n",
-		     E->Name);
+		     GetString (E->Name));
 	    while (Imp) {
 		const char* Name = GetSourceFileName (Imp->Obj, Imp->Pos.Name);
 		fprintf (stderr, "  %s(%lu)\n", Name, Imp->Pos.Line);
@@ -556,7 +557,8 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
 static int CmpExpName (const void* K1, const void* K2)
 /* Compare function for qsort */
 {
-    return strcmp ((*(Export**)K1)->Name, (*(Export**)K2)->Name);
+    return strcmp (GetString ((*(Export**)K1)->Name), 
+                   GetString ((*(Export**)K2)->Name));
 }
 
 
@@ -574,10 +576,10 @@ static void CreateExportPool (void)
 
     /* Walk through the list and insert the exports */
     for (I = 0, J = 0; I < sizeof (HashTab) / sizeof (HashTab [0]); ++I) {
-	Export* E = HashTab [I];
+	Export* E = HashTab[I];
 	while (E) {
 	    CHECK (J < ExpCount);
-	    ExpPool [J++] = E;
+       	    ExpPool[J++] = E;
 	    E = E->Next;
 	}
     }
@@ -623,7 +625,7 @@ void PrintExportMap (FILE* F)
 	if (VerboseMap || E->ImpCount > 0 || IS_EXP_CONDES (E->Type)) {
 	    fprintf (F,
 	      	     "%-25s %06lX %c%c%c%c   ",
-	      	     E->Name,
+	      	     GetString (E->Name),
 	      	     GetExportVal (E),
 	      	     E->ImpCount? 'R' : ' ',
 		     IS_EXP_LABEL (E->Type)? 'L' : 'E',
@@ -660,7 +662,7 @@ void PrintImportMap (FILE* F)
 	    /* Print the export */
 	    fprintf (F,
 	      	     "%s (%s):\n",
-	      	     Exp->Name,
+	      	     GetString (Exp->Name),
 	      	     GetObjFileName (Exp->Obj));
 
 	    /* Print all imports for this symbol */
@@ -692,7 +694,7 @@ void PrintExportLabels (FILE* F)
     /* Print all exports */
     for (I = 0; I < ExpCount; ++I) {
  	const Export* E = ExpPool [I];
-       	fprintf (F, "al %06lX .%s\n", GetExportVal (E), E->Name);
+       	fprintf (F, "al %06lX .%s\n", GetExportVal (E), GetString (E->Name));
     }
 }
 
@@ -726,8 +728,11 @@ void CircularRefError (const Export* E)
 /* Print an error about a circular reference using to define the given export */
 {
     Error ("Circular reference for symbol `%s', %s(%lu)",
-	   E->Name, GetSourceFileName (E->Obj, E->Pos.Name), E->Pos.Line);
+	   GetString (E->Name), 
+           GetSourceFileName (E->Obj, E->Pos.Name),
+           E->Pos.Line);
 }
 
 
 
+           

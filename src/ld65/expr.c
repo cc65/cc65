@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -118,9 +118,7 @@ int IsConstExpr (ExprNode* Root)
 		 * which in turn means, that we have a circular reference.
 		 */
 		if (ExportHasMark (E)) {
-		    Error ("Circular reference for symbol `%s', %s(%lu)",
-			   E->Name, GetSourceFileName (E->Obj, E->Pos.Name),
-			   E->Pos.Line);
+                    CircularRefError (E);
 		    Const = 0;
 		} else {
 		    MarkExport (E);
@@ -198,7 +196,7 @@ Export* GetExprExport (ExprNode* Expr)
     PRECONDITION (Expr->Op == EXPR_SYMBOL);
 
     /* Return the export */
-    return Expr->Obj->Imports [Expr->V.ImpNum]->V.Exp;
+    return Expr->Obj->Imports [Expr->V.ImpNum]->Exp;
 }
 
 
@@ -485,7 +483,7 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 
     	/* Not a leaf node */
     	Expr->Left = ReadExpr (F, O);
-	Expr->Right = ReadExpr (F, O);  
+	Expr->Right = ReadExpr (F, O);
 
     }
 

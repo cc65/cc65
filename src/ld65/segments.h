@@ -54,6 +54,7 @@
 /* Segment structure */
 typedef struct Segment Segment;
 struct Segment {
+    unsigned            Name;           /* Name index of the segment */
     Segment*	      	Next;		/* Hash list */
     Segment*  	      	List;		/* List of all segments */
     struct Section*	SecRoot;	/* Section list */
@@ -65,7 +66,6 @@ struct Segment {
     unsigned char     	FillVal;	/* Value to use for fill bytes */
     unsigned char     	Type;		/* Type of segment */
     char      	      	Dumped;		/* Did we dump this segment? */
-    char       	       	Name [1];  	/* Name, dynamically allocated */
 };
 
 
@@ -108,7 +108,7 @@ typedef unsigned (*SegWriteFunc) (ExprNode* E, 	      /* The expression to write
 
 
 
-Segment* GetSegment (const char* Name, unsigned char Type, const char* ObjName);
+Segment* GetSegment (unsigned Name, unsigned char Type, const char* ObjName);
 /* Search for a segment and return an existing one. If the segment does not
  * exist, create a new one and return that. ObjName is only used for the error
  * message and may be NULL if the segment is linker generated.
@@ -120,7 +120,7 @@ Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Type);
 Section* ReadSection (FILE* F, struct ObjData* O);
 /* Read a section from a file */
 
-Segment* SegFind (const char* Name);
+Segment* SegFind (unsigned Name);
 /* Return the given segment or NULL if not found. */
 
 int IsBSSType (Segment* S);
@@ -156,5 +156,5 @@ void CheckSegments (void);
 #endif
 
 
-
+                           
 

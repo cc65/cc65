@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -53,6 +53,7 @@
 #include "global.h"
 #include "lineinfo.h"
 #include "o65.h"
+#include "spool.h"
 
 
 
@@ -149,7 +150,7 @@ struct O65Desc {
     ExtSymTab*	    Imports;	       	/* Table with imported symbols */
     unsigned   	    Undef;	       	/* Count of undefined symbols */
     FILE*     	    F;		       	/* The file we're writing to */
-    char*     	    Filename;	       	/* Name of the output file */
+    const char*     Filename;	       	/* Name of the output file */
     O65RelocTab*    TextReloc;	       	/* Relocation table for text segment */
     O65RelocTab*    DataReloc;	       	/* Relocation table for data segment */
 
@@ -315,7 +316,7 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
     		CircularRefError (E);
     	    } else if (E->Expr == 0) {
     		/* Dummy export, must be an o65 imported symbol */
-    		ExtSym* S = O65GetImport (D->D, E->Name);
+    		ExtSym* S = O65GetImport (D->D, GetString (E->Name));
     		CHECK (S != 0);
     		if (D->ExtRef) {
     		    /* We cannot have more than one external reference in o65 */
@@ -714,7 +715,7 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
        	S = Seg [I];
 
 	/* Keep the user happy */
-	Print (stdout, 1, "    Writing `%s'\n", S->Name);
+	Print (stdout, 1, "    Writing `%s'\n", GetString (S->Name));
 
 	/* Write this segment */
        	if (DoWrite) {
@@ -868,7 +869,7 @@ static void O65WriteExports (O65Desc* D)
 	 * export does really exist, so if it is unresolved, or if we don't
 	 * find it, there is an error in the linker code.
 	 */
-	Export*	E = FindExport (Name);
+	Export*	E = FindExport (GetStringId (Name));
 	if (E == 0 || IsUnresolvedExport (E)) {
 	    Internal ("Unresolved export `%s' found in O65WriteExports", Name);
 	}
@@ -1137,7 +1138,7 @@ void O65SetExport (O65Desc* D, const char* Ident)
     /* Get the export for this symbol and check if it does exist and is
      * a resolved symbol.
      */
-    Export* E = FindExport (Ident);
+    Export* E = FindExport (GetStringId (Ident));
     if (E == 0 || IsUnresolvedExport (E)) {
 	Error ("Unresolved export: `%s'", Ident);
     }
@@ -1224,11 +1225,11 @@ static void O65SetupSegments (O65Desc* D, File* F)
 
 
 
-static int O65Unresolved (const char* Name, void* D)
+static int O65Unresolved (unsigned Name, void* D)
 /* Called if an unresolved symbol is encountered */
 {
     /* Check if the symbol is an imported o65 symbol */
-    if (O65GetImport (D, Name) != 0) {
+    if (O65GetImport (D, GetString (Name)) != 0) {
 	/* This is an external symbol, relax... */
 	return 1;
     } else {
@@ -1280,7 +1281,7 @@ void O65WriteTarget (O65Desc* D, File* F)
     time_t      T;
 
     /* Place the filename in the control structure */
-    D->Filename = F->Name;
+    D->Filename = GetString (F->Name);
 
     /* Check for unresolved symbols. The function O65Unresolved is called
      * if we get an unresolved symbol.
@@ -1299,13 +1300,13 @@ void O65WriteTarget (O65Desc* D, File* F)
     O65SetupHeader (D);
 
     /* Open the file */
-    D->F = fopen (F->Name, "wb");
+    D->F = fopen (D->Filename, "wb");
     if (D->F == 0) {
-     	Error ("Cannot open `%s': %s", F->Name, strerror (errno));
+     	Error ("Cannot open `%s': %s", D->Filename, strerror (errno));
     }
 
     /* Keep the user happy */
-    Print (stdout, 1, "Opened `%s'...\n", F->Name);
+    Print (stdout, 1, "Opened `%s'...\n", D->Filename);
 
     /* Define some more options: A timestamp and the linker version */
     T = time (0);
@@ -1352,13 +1353,14 @@ void O65WriteTarget (O65Desc* D, File* F)
 
     /* Close the file */
     if (fclose (D->F) != 0) {
-	Error ("Cannot write to `%s': %s", F->Name, strerror (errno));
+	Error ("Cannot write to `%s': %s", D->Filename, strerror (errno));
     }
 
     /* Reset the file and filename */
     D->F        = 0;
     D->Filename = 0;
 }
+
 
 
 

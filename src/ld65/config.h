@@ -51,12 +51,12 @@
 /* File list entry */
 typedef struct File File;
 struct File {
+    unsigned            Name;           /* Name index of the file */
     File*     		Next;	  	/* Pointer to next entry in list */
     unsigned		Flags;
     unsigned		Format;		/* Output format */
     struct Memory*	MemList;  	/* List of memory areas in this file */
     struct Memory* 	MemLast;  	/* Last memory area in this file */
-    char	 	Name [1]; 	/* Name of file */
 };
 
 /* Segment list node. Needed because there are two lists (RUN & LOAD) */
@@ -69,6 +69,7 @@ struct MemListNode {
 /* Memory list entry */
 typedef struct Memory Memory;
 struct Memory {
+    unsigned            Name;           /* Name index of the memory section */
     Memory*  	    	Next;	  	/* Pointer to next entry in list */
     Memory*    	       	FNext;	  	/* Next in file list */
     unsigned   	       	Attr;	  	/* Which values are valid? */
@@ -80,21 +81,20 @@ struct Memory {
     MemListNode* 	SegList;  	/* List of segments for this section */
     MemListNode* 	SegLast;  	/* Last segment in this section */
     File*    	    	F;    	  	/* File that contains the entry */
-    char     	    	Name [1]; 	/* Name of the memory section */
 };
 
 /* Segment descriptor entry */
 typedef struct SegDesc SegDesc;
 struct SegDesc {
+    unsigned            Name;           /* Index of the name */
     SegDesc*   	      	Next;	  	/* Pointer to next entry in list */
-    Segment*	      	Seg; 	  	/* Pointer to segment structure */
-    unsigned	      	Attr;	  	/* Attributes for segment */
-    unsigned	      	Flags;	  	/* Set of bitmapped flags */
+    Segment*   	      	Seg; 	  	/* Pointer to segment structure */
+    unsigned   	      	Attr;	  	/* Attributes for segment */
+    unsigned   	      	Flags;	  	/* Set of bitmapped flags */
     Memory*           	Load;  	       	/* Load memory section */
-    Memory*	      	Run;	  	/* Run memory section */
+    Memory*    	      	Run;	  	/* Run memory section */
     unsigned long      	Addr; 		/* Start address or offset into segment */
     unsigned char     	Align;	  	/* Alignment if given */
-    char	      	Name [1]; 	/* Copy of name */
 };
 
 /* Segment list */

@@ -39,6 +39,7 @@
 /* common */
 #include "chartype.h"
 #include "check.h"
+#include "fragdefs.h"
 #include "segdefs.h"
 #include "segnames.h"
 #include "xmalloc.h"
@@ -49,10 +50,11 @@
 #include "global.h"
 #include "lineinfo.h"
 #include "listing.h"
+#include "objcode.h"
 #include "objfile.h"
 #include "scanner.h"
+#include "spool.h"
 #include "symtab.h"
-#include "objcode.h"
 
 
 
@@ -420,11 +422,11 @@ static void WriteOneSeg (Segment* Seg)
     ObjWrite32 (0);
 
     /* Write the segment data */
-    ObjWriteStr (Seg->Def->Name);       /* Name of the segment */
-    ObjWrite32 (Seg->PC);               /* Size */
-    ObjWrite8 (Seg->Align);             /* Segment alignment */
-    ObjWrite8 (Seg->Def->Type);         /* Type of the segment */
-    ObjWriteVar (Seg->FragCount);       /* Number of fragments that follow */
+    ObjWriteVar (GetStringId (Seg->Def->Name)); /* Name of the segment */
+    ObjWrite32 (Seg->PC);                       /* Size */
+    ObjWrite8 (Seg->Align);                     /* Segment alignment */
+    ObjWrite8 (Seg->Def->Type);                 /* Type of the segment */
+    ObjWriteVar (Seg->FragCount);               /* Number of fragments */
 
     /* Now walk through the fragment list for this segment and write the
      * fragments.

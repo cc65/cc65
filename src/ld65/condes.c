@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,19 +38,21 @@
 /* common */
 #include "check.h"
 #include "coll.h"
+#include "fragdefs.h"
 #include "segdefs.h"
 #include "xmalloc.h"
 
 /* ld65 */
+#include "condes.h"
 #include "exports.h"
 #include "fragment.h"
 #include "segments.h"
-#include "condes.h"
+#include "spool.h"
 
 
 
 /*****************************************************************************/
-/*     		 		     Data    				     */
+/*     		    		     Data    				     */
 /*****************************************************************************/
 
 
@@ -58,22 +60,22 @@
 /* Struct describing one condes type */
 typedef struct ConDesDesc ConDesDesc;
 struct ConDesDesc {
-    Collection		ExpList;	/* List of exported symbols */
-    char*     		SegName;	/* Name of segment the table is in */
-    char*     		Label;		/* Name of table label */
-    char*		CountSym;	/* Name of symbol for entry count */
-    unsigned char	Order;		/* Table order (increasing/decreasing) */
+    Collection	    	ExpList;	/* List of exported symbols */
+    unsigned            SegName;	/* Name of segment the table is in */
+    unsigned            Label;		/* Name of table label */
+    unsigned            CountSym;	/* Name of symbol for entry count */
+    unsigned char   	Order;		/* Table order (increasing/decreasing) */
 };
 
 /* Array for all types */
 static ConDesDesc ConDes[CD_TYPE_COUNT] = {
-    { STATIC_COLLECTION_INITIALIZER, 0, 0, 0, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, 0, 0, 0, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, 0, 0, 0, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, 0, 0, 0, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, 0, 0, 0, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, 0, 0, 0, cdIncreasing },
-    { STATIC_COLLECTION_INITIALIZER, 0, 0, 0, cdIncreasing },
+    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
+    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
+    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
+    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
+    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
+    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
+    { STATIC_COLLECTION_INITIALIZER, INVALID_STRING_ID, INVALID_STRING_ID, INVALID_STRING_ID, cdIncreasing },
 };
 
 
@@ -109,7 +111,7 @@ static int ConDesCompare (void* Data, const void* E1, const void* E2)
     	Cmp = 1;
     } else {
     	/* Use the name in this case */
-       	Cmp = strcmp (Exp1->Name, Exp2->Name);
+       	Cmp = strcmp (GetString (Exp1->Name), GetString (Exp2->Name));
     }
 
     /* Reverse the result for decreasing order */
@@ -133,7 +135,7 @@ static void ConDesCreateOne (ConDesDesc* CD)
     /* Check if this table has a segment and table label defined. If not,
      * creation was not requested in the config file - ignore it.
      */
-    if (CD->SegName == 0 || CD->Label == 0) {
+    if (CD->SegName == INVALID_STRING_ID || CD->Label == INVALID_STRING_ID) {
      	return;
     }
 
@@ -175,7 +177,7 @@ static void ConDesCreateOne (ConDesDesc* CD)
     /* Define the table start as an export, offset into section is zero
      * (the section only contains the table).
      */
-    CreateSectionExport (CD->Label,	Sec, 0);
+    CreateSectionExport (CD->Label, Sec, 0);
 
     /* If we have a CountSym name given AND if it is referenced, define it
      * with the number of elements in the table.
@@ -209,47 +211,47 @@ void ConDesAddExport (struct Export* E)
 
 
 
-void ConDesSetSegName (unsigned Type, const char* SegName)
+void ConDesSetSegName (unsigned Type, unsigned SegName)
 /* Set the segment name where the table should go */
 {
     /* Check the parameters */
     PRECONDITION (Type <= CD_TYPE_MAX && SegName != 0);
 
     /* Setting the segment name twice is bad */
-    CHECK (ConDes[Type].SegName == 0);
+    CHECK (ConDes[Type].SegName == INVALID_STRING_ID);
 
     /* Set the name */
-    ConDes[Type].SegName = xstrdup (SegName);
+    ConDes[Type].SegName = SegName;
 }
 
 
 
-void ConDesSetLabel (unsigned Type, const char* Name)
+void ConDesSetLabel (unsigned Type, unsigned Name)
 /* Set the label for the given ConDes type */
 {
     /* Check the parameters */
     PRECONDITION (Type <= CD_TYPE_MAX && Name != 0);
 
     /* Setting the label twice is bad */
-    CHECK (ConDes[Type].Label == 0);
+    CHECK (ConDes[Type].Label == INVALID_STRING_ID);
 
     /* Set the name */
-    ConDes[Type].Label = xstrdup (Name);
+    ConDes[Type].Label = Name;
 }
 
 
 
-void ConDesSetCountSym (unsigned Type, const char* Name)
+void ConDesSetCountSym (unsigned Type, unsigned Name)
 /* Set the name for the given ConDes count symbol */
 {
     /* Check the parameters */
     PRECONDITION (Type <= CD_TYPE_MAX && Name != 0);
 
     /* Setting the symbol twice is bad */
-    CHECK (ConDes[Type].CountSym == 0);
+    CHECK (ConDes[Type].CountSym == INVALID_STRING_ID);
 
     /* Set the name */
-    ConDes[Type].CountSym = xstrdup (Name);
+    ConDes[Type].CountSym = Name;
 }
 
 
@@ -272,7 +274,7 @@ int ConDesHasSegName (unsigned Type)
     /* Check the parameters */
     PRECONDITION (Type <= CD_TYPE_MAX);
 
-    return (ConDes[Type].SegName != 0);
+    return (ConDes[Type].SegName != INVALID_STRING_ID);
 }
 
 
@@ -283,7 +285,7 @@ int ConDesHasLabel (unsigned Type)
     /* Check the parameters */
     PRECONDITION (Type <= CD_TYPE_MAX);
 
-    return (ConDes[Type].Label != 0);
+    return (ConDes[Type].Label != INVALID_STRING_ID);
 }
 
 
@@ -310,8 +312,6 @@ void ConDesDump (void)
 	printf ("CONDES(%u): %u symbols\n", Type, CollCount (ExpList));
     }
 }
-
-
 
 
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  fragment.h				     */
+/*				   fragdefs.h  	       	       	       	     */
 /*                                                                           */
-/*			  Code/data fragment routines			     */
+/*              Fragment definitions for the bin65 binary utils              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,77 +33,51 @@
 
 
 
-#ifndef FRAGMENT_H
-#define FRAGMENT_H
-
-
-
-/* common */
-#include "filepos.h"
+#ifndef FRAGDEFS_H
+#define FRAGDEFS_H
 
 
 
 /*****************************************************************************/
-/*				   Forwards                                  */
+/*     	       	    	    	     Data				     */
 /*****************************************************************************/
 
 
 
-struct LineInfo;
-struct ObjData;
-struct Section;
+/* Masks for the fragment type byte */
+#define FRAG_TYPEMASK   0x38   	        /* Mask the type of the fragment */
+#define FRAG_BYTEMASK   0x07   	        /* Mask for byte count */
+#define FRAG_CHECKMASK  0x40            /* Mask for check expressions */
+
+/* Fragment types */
+#define FRAG_LITERAL   	0x00   	        /* Literal data */
+
+#define FRAG_EXPR      	0x08   	        /* Expression */
+#define FRAG_EXPR8     	(FRAG_EXPR | 1) /* 8 bit expression */
+#define FRAG_EXPR16    	(FRAG_EXPR | 2) /* 16 bit expression */
+#define FRAG_EXPR24    	(FRAG_EXPR | 3) /* 24 bit expression */
+#define FRAG_EXPR32    	(FRAG_EXPR | 4) /* 32 bit expression */
+
+#define FRAG_SEXPR     	0x10   	        /* Signed expression */
+#define FRAG_SEXPR8    	(FRAG_SEXPR | 1)/* 8 bit signed expression */
+#define FRAG_SEXPR16   	(FRAG_SEXPR | 2)/* 16 bit signed expression */
+#define FRAG_SEXPR24   	(FRAG_SEXPR | 3)/* 24 bit signed expression */
+#define FRAG_SEXPR32   	(FRAG_SEXPR | 4)/* 32 bit signed expression */
+
+#define FRAG_FILL      	0x20   	        /* Fill bytes */
+
+/* Fragment checks */
+#define FRAG_CHECK      0x40            /* Check expressions exist */
+
+/* Fragment check actions */
+#define FRAG_ACT_WARN   0x00U           /* Print a warning */
+#define FRAG_ACT_ERROR  0x01U           /* Exit with an error */
 
 
 
-/*****************************************************************************/
-/*     	       	     		     Data  				     */
-/*****************************************************************************/
-
-
-
-/* Fragment check expression */
-typedef struct FragCheck FragCheck;
-struct FragCheck {
-    struct FragCheck*   Next;           /* Next check expression */
-    struct ExprNode*    Expr;           /* The expression itself */
-    unsigned            Action;         /* Action to take if the check fails */
-    unsigned            Message;        /* Message number */
-};
-
-/* Fragment structure */
-typedef struct Fragment Fragment;
-struct Fragment {
-    Fragment*	   	Next;  		/* Next fragment in list */
-    struct ObjData*	Obj;		/* Source of fragment */
-    unsigned            Size;  		/* Size of data/expression */
-    struct ExprNode*	Expr;		/* Expression if FRAG_EXPR */
-    FilePos  	 	Pos;		/* File position in source */
-    struct LineInfo*    LI;             /* Additional line info */
-    FragCheck*          Check;          /* Single linked list of checks */
-    unsigned char    	Type;  		/* Type of fragment */
-    unsigned char      	LitBuf [1]; 	/* Dynamically alloc'ed literal buffer */
-};
-
-
-
-/*****************************************************************************/
-/*     	      	     	   	     Code  	      	  	  	     */
-/*****************************************************************************/
-
-
-
-FragCheck* ReadFragCheck (FILE* F, Fragment* Frag);
-/* Read a fragment check expression from the given file */
-
-Fragment* NewFragment (unsigned char Type, unsigned Size, struct Section* S);
-/* Create a new fragment and insert it into the section S */
-
-
-
-/* End of fragment.h */
+/* End of fragdefs.h */
 
 #endif
-
 
 
 

@@ -49,12 +49,13 @@
 #include "bin.h"
 #include "binfmt.h"
 #include "condes.h"
+#include "config.h"
 #include "error.h"
 #include "exports.h"
 #include "global.h"
 #include "o65.h"
 #include "scanner.h"
-#include "config.h"
+#include "spool.h"
 
 
 
@@ -114,7 +115,7 @@ static O65Desc* O65FmtDesc	= 0;
 
 
 
-static File* NewFile (const char* Name);
+static File* NewFile (unsigned Name);
 /* Create a new file descriptor and insert it into the list */
 
 
@@ -125,12 +126,12 @@ static File* NewFile (const char* Name);
 
 
 
-static File* FindFile (const char* Name)
+static File* FindFile (unsigned Name)
 /* Find a file with a given name. */
 {
     File* F = FileList;
     while (F) {
- 	if (strcmp (F->Name, Name) == 0) {
+ 	if (F->Name == Name) {
  	    return F;
  	}
  	F = F->Next;
@@ -140,7 +141,7 @@ static File* FindFile (const char* Name)
 
 
 
-static File* GetFile (const char* Name)
+static File* GetFile (unsigned Name)
 /* Get a file entry with the given name. Create a new one if needed. */
 {
     File* F = FindFile (Name);
@@ -168,12 +169,12 @@ static void FileInsert (File* F, Memory* M)
 
 
 
-static Memory* CfgFindMemory (const char* Name)
+static Memory* CfgFindMemory (unsigned Name)
 /* Find the memory are with the given name. Return NULL if not found */
 {
     Memory* M = MemoryList;
     while (M) {
-       	if (strcmp (M->Name, Name) == 0) {
+       	if (M->Name == Name) {
        	    return M;
        	}
        	M = M->Next;
@@ -183,24 +184,24 @@ static Memory* CfgFindMemory (const char* Name)
 
 
 
-static Memory* CfgGetMemory (const char* Name)
+static Memory* CfgGetMemory (unsigned Name)
 /* Find the memory are with the given name. Print an error on an invalid name */
 {
     Memory* M = CfgFindMemory (Name);
     if (M == 0) {
- 	CfgError ("Invalid memory area `%s'", Name);
+ 	CfgError ("Invalid memory area `%s'", GetString (Name));
     }
     return M;
 }
 
 
 
-static SegDesc* CfgFindSegDesc (const char* Name)
+static SegDesc* CfgFindSegDesc (unsigned Name)
 /* Find the segment descriptor with the given name, return NULL if not found. */
 {
     SegDesc* S = SegDescList;
     while (S) {
-     	if (strcmp (S->Name, Name) == 0) {
+       	if (S->Name == Name) {
     	    /* Found */
     	    return S;
        	}
@@ -249,22 +250,18 @@ static void MemoryInsert (Memory* M, SegDesc* S)
 
 
 
-static File* NewFile (const char* Name)
+static File* NewFile (unsigned Name)
 /* Create a new file descriptor and insert it into the list */
 {
-    /* Get the length of the name */
-    unsigned Len = strlen (Name);
-
     /* Allocate memory */
-    File* F = xmalloc (sizeof (File) + Len);
+    File* F = xmalloc (sizeof (File));
 
     /* Initialize the fields */
+    F->Name    = Name;
     F->Flags   = 0;
     F->Format  = BINFMT_DEFAULT;
     F->MemList = 0;
     F->MemLast = 0;
-    memcpy (F->Name, Name, Len);
-    F->Name [Len] = '\0';
 
     /* Insert the struct into the list */
     F->Next  = FileList;
@@ -277,22 +274,20 @@ static File* NewFile (const char* Name)
 
 
 
-static Memory* NewMemory (const char* Name)
+static Memory* NewMemory (unsigned Name)
 /* Create a new memory section and insert it into the list */
 {
-    /* Get the length of the name */
-    unsigned Len = strlen (Name);
-
     /* Check for duplicate names */
     Memory* M =	CfgFindMemory (Name);
     if (M) {
-	CfgError ("Memory area `%s' defined twice", Name);
+	CfgError ("Memory area `%s' defined twice", GetString (Name));
     }
 
     /* Allocate memory */
-    M = xmalloc (sizeof (Memory) + Len);
+    M = xmalloc (sizeof (Memory));
 
     /* Initialize the fields */
+    M->Name      = Name;
     M->Next	 = 0;
     M->FNext     = 0;
     M->Attr      = 0;
@@ -304,8 +299,6 @@ static Memory* NewMemory (const char* Name)
     M->SegList   = 0;
     M->SegLast   = 0;
     M->F         = 0;
-    memcpy (M->Name, Name, Len);
-    M->Name [Len] = '\0';
 
     /* Insert the struct into the list */
     if (MemoryLast == 0) {
@@ -323,18 +316,15 @@ static Memory* NewMemory (const char* Name)
 
 
 
-static SegDesc* NewSegDesc (const char* Name)
+static SegDesc* NewSegDesc (unsigned Name)
 /* Create a segment descriptor */
 {
     Segment* Seg;
 
-    /* Get the length of the name */
-    unsigned Len = strlen (Name);
-
     /* Check for duplicate names */
     SegDesc* S = CfgFindSegDesc (Name);
     if (S) {
-	CfgError ("Segment `%s' defined twice", Name);
+	CfgError ("Segment `%s' defined twice", GetString (Name));
     }
 
     /* Search for the actual segment in the input files. The function may
@@ -343,16 +333,15 @@ static SegDesc* NewSegDesc (const char* Name)
     Seg = SegFind (Name);
 
     /* Allocate memory */
-    S = xmalloc (sizeof (SegDesc) + Len);
+    S = xmalloc (sizeof (SegDesc));
 
     /* Initialize the fields */
+    S->Name    = Name;
     S->Next    = 0;
     S->Seg     = Seg;
     S->Attr    = 0;
     S->Flags   = 0;
     S->Align   = 0;
-    memcpy (S->Name, Name, Len);
-    S->Name [Len] = '\0';
 
     /* ...and return it */
     return S;
@@ -417,7 +406,7 @@ static void ParseMemory (void)
     while (CfgTok == CFGTOK_IDENT) {
 
 	/* Create a new entry on the heap */
-       	Memory* M = NewMemory (CfgSVal);
+       	Memory* M = NewMemory (GetStringId (CfgSVal));
 
 	/* Skip the name and the following colon */
 	CfgNextTok ();
@@ -462,7 +451,7 @@ static void ParseMemory (void)
 		    FlagAttr (&M->Attr, MA_FILE, "FILE");
 		    CfgAssureStr ();
        	       	    /* Get the file entry and insert the memory area */
-	    	    FileInsert (GetFile (CfgSVal), M);
+	    	    FileInsert (GetFile (GetStringId (CfgSVal)), M);
 		    break;
 
 	        case CFGTOK_DEFINE:
@@ -511,7 +500,7 @@ static void ParseMemory (void)
 	 * file name.
 	 */
 	if ((M->Attr & MA_FILE) == 0) {
-	    FileInsert (GetFile (OutputName), M);
+	    FileInsert (GetFile (GetStringId (OutputName)), M);
 	}
     }
 }
@@ -540,7 +529,7 @@ static void ParseFiles (void)
 	CfgAssureStr ();
 
 	/* Search for the file, it must exist */
-       	F = FindFile (CfgSVal);
+       	F = FindFile (GetStringId (CfgSVal));
 	if (F == 0) {
 	    CfgError ("No such file: `%s'", CfgSVal);
 	}
@@ -633,7 +622,7 @@ static void ParseSegments (void)
 	SegDesc* S;
 
 	/* Create a new entry on the heap */
-       	S = NewSegDesc (CfgSVal);
+       	S = NewSegDesc (GetStringId (CfgSVal));
 
 	/* Skip the name and the following colon */
 	CfgNextTok ();
@@ -676,7 +665,7 @@ static void ParseSegments (void)
 
 	    	case CFGTOK_LOAD:
 	      	    FlagAttr (&S->Attr, SA_LOAD, "LOAD");
-	    	    S->Load = CfgGetMemory (CfgSVal);
+	    	    S->Load = CfgGetMemory (GetStringId (CfgSVal));
 	    	    break;
 
 	        case CFGTOK_OFFSET:
@@ -697,7 +686,7 @@ static void ParseSegments (void)
 
 	    	case CFGTOK_RUN:
       	    	    FlagAttr (&S->Attr, SA_RUN, "RUN");
- 	    	    S->Run = CfgGetMemory (CfgSVal);
+ 	    	    S->Run = CfgGetMemory (GetStringId (CfgSVal));
 	    	    break;
 
 	        case CFGTOK_START:
@@ -768,7 +757,7 @@ static void ParseSegments (void)
       	if ((S->Flags & SF_RO) == 0) {
        	    if (S->Run->Flags & MF_RO) {
       	    	CfgError ("Cannot put r/w segment `%s' in r/o memory area `%s'",
-      	    	     	  S->Name, S->Run->Name);
+      	    	     	  GetString (S->Name), GetString (S->Run->Name));
       	    }
       	}
 
@@ -797,7 +786,7 @@ static void ParseSegments (void)
       	} else {
             /* Print a warning if the segment is not optional */
             if ((S->Flags & SF_OPTIONAL) == 0) {
-                CfgWarning ("Segment `%s' does not exist", S->Name);
+                CfgWarning ("Segment `%s' does not exist", GetString (S->Name));
             }
       	    /* Discard the descriptor */
       	    FreeSegDesc (S);
@@ -1048,21 +1037,21 @@ static void ParseConDes (void)
     };
 
     /* Attribute values. */
-    char SegName[sizeof (CfgSVal)];
-    char Label[sizeof (CfgSVal)];
-    char Count[sizeof (CfgSVal)];
+    unsigned SegName = INVALID_STRING_ID;
+    unsigned Label   = INVALID_STRING_ID;
+    unsigned Count   = INVALID_STRING_ID;
     /* Initialize to avoid gcc warnings: */
     int Type = -1;
     ConDesOrder Order = cdIncreasing;
 
     /* Bitmask to remember the attributes we got already */
     enum {
-	atNone		= 0x0000,
-	atSegName	= 0x0001,
-	atLabel		= 0x0002,
-	atCount		= 0x0004,
-	atType		= 0x0008,
-	atOrder		= 0x0010
+	atNone	   	= 0x0000,
+	atSegName  	= 0x0001,
+	atLabel	   	= 0x0002,
+	atCount	   	= 0x0004,
+	atType	   	= 0x0008,
+	atOrder	   	= 0x0010
     };
     unsigned AttrFlags = atNone;
 
@@ -1087,7 +1076,7 @@ static void ParseConDes (void)
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
 		/* Remember the value for later */
-		strcpy (SegName, CfgSVal);
+		SegName = GetStringId (CfgSVal);
 	    	break;
 
 	    case CFGTOK_LABEL:
@@ -1096,7 +1085,7 @@ static void ParseConDes (void)
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
 		/* Remember the value for later */
-		strcpy (Label, CfgSVal);
+		Label = GetStringId (CfgSVal);
 		break;
 
 	    case CFGTOK_COUNT:
@@ -1105,7 +1094,7 @@ static void ParseConDes (void)
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
 		/* Remember the value for later */
-		strcpy (Count, CfgSVal);
+		Count = GetStringId (CfgSVal);
 		break;
 
 	    case CFGTOK_TYPE:
@@ -1120,7 +1109,7 @@ static void ParseConDes (void)
 		    switch (CfgTok) {
 		     	case CFGTOK_CONSTRUCTOR: Type = CD_TYPE_CON;	break;
 		     	case CFGTOK_DESTRUCTOR:	 Type = CD_TYPE_DES;	break;
-		     	default: FAIL ("Unexpected type token");
+	     	     	default: FAIL ("Unexpected type token");
 		    }
 		}
 		break;
@@ -1297,8 +1286,7 @@ static void ParseSymbols (void)
 	long Val;
 
 	/* Remember the name */
-	char Name [sizeof (CfgSVal)];
-	strcpy (Name, CfgSVal);
+	unsigned Name = GetStringId (CfgSVal);
 	CfgNextTok ();
 
 	/* Allow an optional assignment */
@@ -1408,10 +1396,10 @@ static void CreateRunDefines (SegDesc* S)
 {
     char Buf [256];
 
-    xsprintf (Buf, sizeof (Buf), "__%s_RUN__", S->Name);
-    CreateSegmentExport (Buf, S->Seg, 0);
-    xsprintf (Buf, sizeof (Buf), "__%s_SIZE__", S->Name);
-    CreateConstExport (Buf, S->Seg->Size);
+    xsprintf (Buf, sizeof (Buf), "__%s_RUN__", GetString (S->Name));
+    CreateSegmentExport (GetStringId (Buf), S->Seg, 0);
+    xsprintf (Buf, sizeof (Buf), "__%s_SIZE__", GetString (S->Name));
+    CreateConstExport (GetStringId (Buf), S->Seg->Size);
     S->Flags |= SF_RUN_DEF;
 }
 
@@ -1422,8 +1410,8 @@ static void CreateLoadDefines (Memory* M, SegDesc* S)
 {
     char Buf [256];
 
-    xsprintf (Buf, sizeof (Buf), "__%s_LOAD__", S->Name);
-    CreateMemoryExport (Buf, M, S->Seg->PC - M->Start);
+    xsprintf (Buf, sizeof (Buf), "__%s_LOAD__", GetString (S->Name));
+    CreateMemoryExport (GetStringId (Buf), M, S->Seg->PC - M->Start);
     S->Flags |= SF_LOAD_DEF;
 }
 
@@ -1465,10 +1453,10 @@ void CfgAssignSegments (void)
      		    /* Offset already too large */
      		    if (S->Flags & SF_OFFSET) {
      		        Error ("Offset too small in `%s', segment `%s'",
-     		     	       M->Name, S->Name);
+     		     	       GetString (M->Name), GetString (S->Name));
      		    } else {
      		     	Error ("Start address too low in `%s', segment `%s'",
-     		     	       M->Name, S->Name);
+     		     	       GetString (M->Name), GetString (S->Name));
      		    }
      		}
      		Addr = NewAddr;
@@ -1485,7 +1473,8 @@ void CfgAssignSegments (void)
      	    M->FillLevel = Addr + S->Seg->Size - M->Start;
      	    if (M->FillLevel > M->Size) {
      	     	Error ("Memory area overflow in `%s', segment `%s' (%lu bytes)",
-     	 	       M->Name, S->Name, M->FillLevel - M->Size);
+     	 	       GetString (M->Name), GetString (S->Name),
+                       M->FillLevel - M->Size);
      	    }
 
      	    /* If requested, define symbols for the start and size of the
@@ -1500,12 +1489,12 @@ void CfgAssignSegments (void)
 		     * relevant symbols on each walk.
 		     */
 		    if (S->Load == M) {
-		 	if ((S->Flags & SF_LOAD_DEF) == 0) {
-			    CreateLoadDefines (M, S);
-		 	} else {
-		 	    CHECK ((S->Flags & SF_RUN_DEF) == 0);
-		 	    CreateRunDefines (S);
-			}
+		       	if ((S->Flags & SF_LOAD_DEF) == 0) {
+		       	    CreateLoadDefines (M, S);
+		       	} else {
+		       	    CHECK ((S->Flags & SF_RUN_DEF) == 0);
+		       	    CreateRunDefines (S);
+		       	}
 		    }
 		} else {
 		    /* RUN and LOAD in different memory areas, or RUN not
@@ -1513,10 +1502,10 @@ void CfgAssignSegments (void)
 		     * have only one copy of the segment in the area.
 		     */
 		    if (S->Run == M) {
-			CreateRunDefines (S);
+		       	CreateRunDefines (S);
 		    }
 		    if (S->Load == M) {
-			CreateLoadDefines (M, S);
+		       	CreateLoadDefines (M, S);
 		    }
 		}
      	    }
@@ -1531,12 +1520,12 @@ void CfgAssignSegments (void)
 	/* If requested, define symbols for start and size of the memory area */
 	if (M->Flags & MF_DEFINE) {
 	    char Buf [256];
-	    sprintf (Buf, "__%s_START__", M->Name);
-	    CreateMemoryExport (Buf, M, 0);
-	    sprintf (Buf, "__%s_SIZE__", M->Name);
-	    CreateConstExport (Buf, M->Size);
-	    sprintf (Buf, "__%s_LAST__", M->Name);
-	    CreateConstExport (Buf, M->FillLevel);
+	    sprintf (Buf, "__%s_START__", GetString (M->Name));
+	    CreateMemoryExport (GetStringId (Buf), M, 0);
+	    sprintf (Buf, "__%s_SIZE__", GetString (M->Name));
+	    CreateConstExport (GetStringId (Buf), M->Size);
+	    sprintf (Buf, "__%s_LAST__", GetString (M->Name));
+	    CreateConstExport (GetStringId (Buf), M->FillLevel);
 	}
 
 	/* Next memory area */
@@ -1558,7 +1547,7 @@ void CfgWriteTarget (void)
   	if (F->MemList) {
 
   	    /* Is there an output file? */
-  	    if (strlen (F->Name) > 0) {
+  	    if (strlen (GetString (F->Name)) > 0) {
 
   		/* Assign a proper binary format */
   		if (F->Format == BINFMT_DEFAULT) {
@@ -1569,12 +1558,12 @@ void CfgWriteTarget (void)
   		switch (F->Format) {
 
   		    case BINFMT_BINARY:
-  		      	BinWriteTarget (BinFmtDesc, F);
-  		      	break;
+  		       	BinWriteTarget (BinFmtDesc, F);
+  		       	break;
 
   		    case BINFMT_O65:
-  		      	O65WriteTarget (O65FmtDesc, F);
-  		      	break;
+  		       	O65WriteTarget (O65FmtDesc, F);
+  		       	break;
 
   		    default:
   		        Internal ("Invalid binary format: %u", F->Format);
@@ -1592,18 +1581,18 @@ void CfgWriteTarget (void)
 		    MemListNode* N;
 
 		    /* Debugging */
-       	       	    Print (stdout, 2, "Skipping `%s'...\n", M->Name);
+       	       	    Print (stdout, 2, "Skipping `%s'...\n", GetString (M->Name));
 
   		    /* Walk throught the segments */
   		    N = M->SegList;
   		    while (N) {
-		      	if (N->Seg->Load == M) {
-  		      	    /* Load area - mark the segment as dumped */
-  		      	    N->Seg->Seg->Dumped = 1;
-  		      	}
+		       	if (N->Seg->Load == M) {
+  		       	    /* Load area - mark the segment as dumped */
+  		       	    N->Seg->Seg->Dumped = 1;
+  		       	}
 
-		      	/* Next segment node */
-		      	N = N->Next;
+		       	/* Next segment node */
+		       	N = N->Next;
 		    }
 		    /* Next memory area */
 		    M = M->FNext;

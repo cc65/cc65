@@ -63,10 +63,8 @@ struct Import {
     Import*  		Next;		/* Single linked list */
     ObjData* 		Obj;		/* Object file that imports the name */
     FilePos  		Pos;		/* File position of reference */
-    union {
-	struct Export*	Exp;		/* Matching export for this import */
-       	const char*    	Name;		/* Name if not in table */
-    } V;
+    struct Export*	Exp;		/* Matching export for this import */
+    unsigned            Name;		/* Name if not in table */
     unsigned char    	Type;		/* Type of import */
 };
 
@@ -75,6 +73,7 @@ struct Import {
 /* Export symbol structure */
 typedef struct Export Export;
 struct Export {
+    unsigned            Name;  	       	/* Name */
     Export*    	       	Next;  		/* Hash table link */
     unsigned 		Flags;		/* Generic flags */
     ObjData* 		Obj;		/* Object file that exports the name */
@@ -84,7 +83,6 @@ struct Export {
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned char	Type;		/* Type of export */
     unsigned char	ConDes[CD_TYPE_COUNT];	/* Constructor/destructor decls */
-    const char*        	Name;  	       	/* Name */
 };
 
 
@@ -95,7 +93,7 @@ struct Export {
  * resolved, or a value != zero if the symbol could be resolved. The
  * CheckExports routine will print out the missing symbol in the first case.
  */
-typedef int (*ExpCheckFunc) (const char* Name, void* Data);
+typedef int (*ExpCheckFunc) (unsigned Name, void* Data);
 
 
 
@@ -117,24 +115,24 @@ Export* ReadExport (FILE* F, ObjData* Obj);
 void InsertExport (Export* E);
 /* Insert an exported identifier and check if it's already in the list */
 
-Export* CreateConstExport (const char* Name, long Value);
+Export* CreateConstExport (unsigned Name, long Value);
 /* Create an export for a literal date */
 
-Export* CreateMemoryExport (const char* Name, Memory* Mem, unsigned long Offs);
+Export* CreateMemoryExport (unsigned Name, Memory* Mem, unsigned long Offs);
 /* Create an relative export for a memory area offset */
 
-Export* CreateSegmentExport (const char* Name, Segment* Seg, unsigned long Offs);
+Export* CreateSegmentExport (unsigned Name, Segment* Seg, unsigned long Offs);
 /* Create a relative export to a segment */
 
-Export* CreateSectionExport (const char* Name, Section* S, unsigned long Offs);
+Export* CreateSectionExport (unsigned Name, Section* S, unsigned long Offs);
 /* Create a relative export to a section */
 
-Export* FindExport (const char* Name);
+Export* FindExport (unsigned Name);
 /* Check for an identifier in the list. Return 0 if not found, otherwise
  * return a pointer to the export.
  */
 
-int IsUnresolved (const char* Name);
+int IsUnresolved (unsigned Name);
 /* Check if this symbol is an unresolved export */
 
 int IsUnresolvedExport (const Export* E);
@@ -177,6 +175,7 @@ void CircularRefError (const Export* E);
 /* End of exports.h */
 
 #endif
+
 
 
 

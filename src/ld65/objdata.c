@@ -43,6 +43,7 @@
 #include "error.h"
 #include "fileinfo.h"
 #include "objdata.h"
+#include "spool.h"
 
 
 
@@ -107,16 +108,42 @@ ObjData* NewObjData (void)
 
 
 
-const char* GetObjString (const ObjData* O, unsigned long Index)
+void FreeObjStrings (ObjData* O)
+/* Free the module string data. Used once the object file is loaded completely
+ * when all strings are converted to global strings.
+ */
+{
+    while (O->StringCount) {
+        xfree (O->Strings[--O->StringCount]);
+    }
+    xfree (O->Strings);
+    O->Strings = 0;
+}
+
+
+
+const char* GetObjString (const ObjData* O, unsigned Index)
 /* Get a string from the object file string table. Abort if the string index
  * is invalid.
  */
 {
     if (Index >= O->StringCount) {
-       	Error ("Invalid string index (%lu) in module `%s'",
+       	Error ("Invalid string index (%u) in module `%s'",
 	       Index, GetObjFileName (O));
     }
     return O->Strings[Index];
+}
+
+
+
+unsigned MakeGlobalStringId (const ObjData* O, unsigned Index)
+/* Convert a local string id into a global one and return it. */
+{
+    if (Index >= O->StringCount) {
+       	Error ("Invalid string index (%u) in module `%s'",
+	       Index, GetObjFileName (O));
+    }
+    return GetStringId (O->Strings[Index]);
 }
 
 

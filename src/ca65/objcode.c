@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,6 +46,7 @@
 #include "error.h"
 #include "fragment.h"
 #include "global.h"
+#include "lineinfo.h"
 #include "listing.h"
 #include "objfile.h"
 #include "scanner.h"
@@ -598,6 +599,7 @@ static Fragment* NewFragment (unsigned char Type, unsigned short Len)
     F->Next 	= 0;
     F->LineList = 0;
     F->Pos  	= CurPos;
+    F->LI       = UseLineInfo (CurLineInfo);
     F->Len  	= Len;
     F->Type 	= Type;
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -266,7 +266,7 @@ void ObjWritePos (const FilePos* Pos)
  	ObjWriteVar (0);
     } else {
         ObjWriteVar (Pos->Name - 1);
-    }		   
+    }
 }
 
 
@@ -363,6 +363,20 @@ void ObjEndDbgSyms (void)
 /* Mark the end of the debug symbol section */
 {
     Header.DbgSymSize = ftell (F) - Header.DbgSymOffs;
+}
+
+
+
+void ObjStartLineInfos (void)
+/* Mark the start of the line info section */
+{
+}
+
+
+
+void ObjEndLineInfos (void)
+/* Mark the end of the line info section */
+{
 }
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -66,7 +66,7 @@ void ObjWrite24 (unsigned long V);
 
 void ObjWrite32 (unsigned long V);
 /* Write a 32 bit value to the file */
-	  
+
 void ObjWriteVar (unsigned long V);
 /* Write a variable sized value to the file in special encoding */
 
@@ -114,6 +114,12 @@ void ObjStartDbgSyms (void);
 
 void ObjEndDbgSyms (void);
 /* Mark the end of the debug symbol section */
+
+void ObjStartLineInfos (void);
+/* Mark the start of the line info section */
+
+void ObjEndLineInfos (void);
+/* Mark the end of the line info section */
 
 
 

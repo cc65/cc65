@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -45,17 +45,28 @@
 
 
 /*****************************************************************************/
-/*	  			struct Fragment				     */
+/*				   Forwards                                  */
 /*****************************************************************************/
 
 
 
-typedef struct Fragment_ Fragment;
-struct Fragment_ {
+struct LineInfo;
+
+
+
+/*****************************************************************************/
+/*	       			struct Fragment				     */
+/*****************************************************************************/
+
+
+
+typedef struct Fragment Fragment;
+struct Fragment {
     Fragment*		List;		/* List of all fragments */
     Fragment*  	       	Next;		/* Fragment list in one segment */
     Fragment*		LineList;	/* List of fragments for one src line */
     FilePos    	    	Pos;		/* File position for this fragment */
+    struct LineInfo*    LI;             /* Extra line info */
     unsigned short 	Len;		/* Length for this fragment */
     unsigned char   	Type;		/* Fragment type */
     union {
@@ -77,4 +88,4 @@ extern Fragment* FragLast;
 
 
 
-	  
+

@@ -254,6 +254,7 @@ function.
 <item><ref id="_heapadd" name="_heapadd">
 <item><ref id="_heapmaxavail" name="_heapmaxavail">
 <item><ref id="_heapmemavail" name="_heapmemavail">
+<item><ref id="_poserror" name="_poserror">
 <item><ref id="_randomize" name="_randomize">
 <item><ref id="_swap" name="_swap">
 <item><ref id="abort" name="abort">
@@ -263,20 +264,62 @@ function.
 <item><ref id="atol" name="atol">
 <item><ref id="bsearch" name="bsearch">
 <item><ref id="calloc" name="calloc">
+<!-- <item><ref id="clearerr" name="clearerr"> -->
 <item><ref id="div" name="div">
 <item><ref id="exit" name="exit">
+<!-- <item><ref id="fclose" name="fclose"> -->
+<!-- <item><ref id="fdopen" name="fdopen"> -->
+<!-- <item><ref id="feof" name="feof"> -->
+<!-- <item><ref id="ferror" name="ferror"> -->
+<!-- <item><ref id="fflush" name="fflush"> -->
+<!-- <item><ref id="fgetc" name="fgetc"> -->
+<!-- <item><ref id="fgetpos" name="fgetpos"> -->
+<!-- <item><ref id="fgets" name="fgets"> -->
+<!-- <item><ref id="fileno" name="fileno"> -->
+<!-- <item><ref id="flushall" name="flushall"> -->
+<!-- <item><ref id="fopen" name="fopen"> -->
+<!-- <item><ref id="fprintf" name="fprintf"> -->
+<!-- <item><ref id="fputc" name="fputc"> -->
+<!-- <item><ref id="fputs" name="fputs"> -->
+<!-- <item><ref id="fread" name="fread"> -->
 <item><ref id="free" name="free">
+<!-- <item><ref id="freopen" name="freopen"> -->
+<!-- <item><ref id="fscanf" name="fscanf"> -->
+<!-- <item><ref id="fseek" name="fseek"> -->
+<!-- <item><ref id="fsetpos" name="fsetpos"> -->
+<!-- <item><ref id="ftell" name="ftell"> -->
+<!-- <item><ref id="fwrite" name="fwrite"> -->
+<!-- <item><ref id="getc" name="getc"> -->
+<!-- <item><ref id="getchar" name="getchar"> -->
+<!-- <item><ref id="gets" name="gets"> -->
 <item><ref id="getenv" name="getenv">
 <item><ref id="itoa" name="itoa">
 <item><ref id="labs" name="labs">
 <item><ref id="ltoa" name="ltoa">
 <item><ref id="malloc" name="malloc">
+<item><ref id="perror" name="perror">
+<!-- <item><ref id="printf" name="printf"> -->
+<!-- <item><ref id="putc" name="putc"> -->
+<!-- <item><ref id="putchar" name="putchar"> -->
+<!-- <item><ref id="puts" name="puts"> -->
 <item><ref id="qsort" name="qsort">
 <item><ref id="rand" name="rand">
 <item><ref id="realloc" name="realloc">
+<item><ref id="remove" name="remove">
+<!-- <item><ref id="rename" name="rename"> -->
+<!-- <item><ref id="rewind" name="rewind"> -->
+<!-- <item><ref id="scanf" name="scanf"> -->
+<!-- <item><ref id="sprintf" name="sprintf"> -->
 <item><ref id="srand" name="srand">
+<!-- <item><ref id="sscanf" name="sscanf"> -->
 <item><ref id="ultoa" name="ultoa">
 <item><ref id="utoa" name="utoa">
+<!-- <item><ref id="vfprintf" name="vfprintf"> -->
+<!-- <item><ref id="vfscanf" name="vfscanf"> -->
+<!-- <item><ref id="vprintf" name="vprintf"> -->
+<!-- <item><ref id="vscanf" name="vscanf"> -->
+<!-- <item><ref id="vsprintf" name="vsprintf"> -->
+<!-- <item><ref id="vsscanf" name="vsscanf"> -->
 </itemize>
 
 
@@ -285,7 +328,7 @@ function.
 <itemize>
 <item><ref id="_stroserror" name="_stroserror">
 <item><ref id="bzero" name="bzero">
-<!-- <item><ref id="memchr" name="memchr"> -->
+<item><ref id="memchr" name="memchr">
 <item><ref id="memcpy" name="memcpy">
 <item><ref id="memmove" name="memmove">
 <item><ref id="memset" name="memset">
@@ -295,7 +338,7 @@ function.
 <item><ref id="strcmp" name="strcmp">
 <item><ref id="strcoll" name="strcoll">
 <item><ref id="strcpy" name="strcpy">
-<!-- <item><ref id="strcspn" name="strcspn"> -->
+<item><ref id="strcspn" name="strcspn">
 <item><ref id="strdup" name="strdup">
 <item><ref id="strerror" name="strerror">
 <item><ref id="stricmp" name="stricmp">
@@ -306,8 +349,8 @@ function.
 <!-- <item><ref id="strncmp" name="strncmp"> -->
 <item><ref id="strncpy" name="strncpy">
 <item><ref id="strrchr" name="strrchr">
-<!-- <item><ref id="strspn" name="strspn"> -->
-<!-- <item><ref id="strstr" name="strstr"> -->
+<item><ref id="strspn" name="strspn">
+<item><ref id="strstr" name="strstr">
 <!-- <item><ref id="strtok" name="strtok"> -->
 <!-- <item><ref id="strxfrm" name="strxfrm"> -->
 <item><ref id="strupper" name="strupper">
@@ -345,7 +388,7 @@ function.
 <!-- <item><ref id="read" name="read"> -->
 <!-- <item><ref id="rmdir" name="rmdir"> -->
 <item><ref id="sleep" name="sleep">
-<!-- <item><ref id="unlink" name="unlink"> -->
+<item><ref id="unlink" name="unlink">
 <!-- <item><ref id="write" name="write"> -->
 </itemize>
 
@@ -432,6 +475,36 @@ id="malloc" name="malloc"> may still return <tt/NULL/.
 <ref id="free" name="free">,
 <ref id="malloc" name="malloc">,
 <ref id="realloc" name="realloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_poserror<label id="_poserror"><p>
+
+<quote>
+<descrip>
+<tag/Function/Print an error message for the error in <tt/_oserrno/.
+<tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
+<tag/Declaration/<tt/void __fastcall__ _poserror (const char* msg);/
+<tag/Description/<tt/_poserror/ prints an error message to <tt/stderr/. If
+<tt/msg/ is not <tt/NULL/ and not an empty string, it is printed followed by
+a colon and a blank. Then the error message for the current contents of
+<tt/_oserrno/ are printed followed by a newline. The message output is the
+same as returned by <tt/<ref id="_stroserror" name="_stroserror">/ with an
+argument of <tt/_oserrno/.
+<tag/Limits/
+<itemize>
+<item>Since operating system specific error code are - you guessed it -
+operating system specific, the value in <tt/_oserror/ and the message that is
+printed depend on the cc65 target.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="_stroserror" name="_stroserror">,
+<ref id="perror" name="perror">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2494,6 +2567,29 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>memchr<label id="memchr"><p>
+
+<quote>
+<descrip>
+<tag/Function/Search for a character in a block of raw memory.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/void* __fastcall__ strchr (const void* mem, int c, size_t count);/
+<tag/Description/The <tt/memchr/ function locates the first occurrence of <tt/c/
+(converted to a char) in the block of raw memory string pointed to by <tt/mem/
+that is of size <tt/count/. Upon completion, the function returns a pointer to
+the character found, or a null pointer if the character was not found.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strchr" name="strchr">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>memcpy<label id="memcpy"><p>
 
 <quote>
@@ -2615,6 +2711,32 @@ cc65 allows to pass this argument, it is ignored.
 </quote>
 
 
+<sect1>perror<label id="perror"><p>
+
+<quote>
+<descrip>
+<tag/Function/Print an error message for the error in <tt/errno/.
+<tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
+<tag/Declaration/<tt/void __fastcall__ perror (const char* s);/
+<tag/Description/<tt/perror/ prints an error message to <tt/stderr/. If <tt/s/
+is not <tt/NULL/ and not an empty string, it is printed followed by a colon and
+a blank. Then the error message for the current contents of <tt/errno/ is
+printed followed by a newline. The message output is the same as returned by
+<tt/<ref id="strerror" name="strerror">/ with an argument of <tt/errno/.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="_poserror" name="_poserror">,
+<ref id="strerror" name="strerror">,
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>qsort<label id="qsort"><p>
 
 <quote>
@@ -2725,6 +2847,40 @@ be used in presence of a prototype.
 <ref id="free" name="free">,
 <ref id="realloc" name="realloc">
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>remove<label id="remove"><p>
+
+<quote>
+<descrip>
+<tag/Function/Delete a file.
+<tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
+<tag/Declaration/<tt/int __fastcall__ remove (const char* name);/
+<tag/Description/<tt/remove/ deletes the file with the given name. On success,
+zero is returned. On error, -1 is returned and <tt/errno/ is set to an error
+code describing the reason for the failure.
+<tag/Limits/
+<itemize>
+<item>This function is not available on all cc65 targets (depends on the
+availability of file I/O).
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="unlink" name="unlink">
+<tag/Example/
+#include &lt;stdio.h&gt;
+
+#define FILENAME "helloworld"
+
+if (remove (FILENAME) == 0) {
+    printf ("We deleted %s successfully\n", FILENAME);
+} else {
+    printf ("There was a problem deleting %s\n", FILENAME);
+}
 </descrip>
 </quote>
 
@@ -3016,6 +3172,7 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
+<ref id="memchr" name="memchr">,
 <ref id="strrchr" name="strrchr">
 <tag/Example/None.
 </descrip>
@@ -3102,6 +3259,29 @@ static char hello[14];
 
 strcpy (hello, "Hello world!\n");
 </verb>
+</descrip>
+</quote>
+
+
+<sect1>strcspn<label id="strcspn"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compute the length of a substring.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/size_t __fastcall__ strcspn (const char* s, const char* set);/
+<tag/Description/The <tt/strcspn/ function computes and returns the length of
+the substring pointed to by <tt/s/ which does <em>not</em> consist of
+characters contained in the string <tt/set/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strspn" name="strspn">,
+<ref id="strstr" name="strstr">
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -3295,6 +3475,52 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>strspn<label id="strspn"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compute the length of a substring.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/size_t __fastcall__ strspn (const char* s, const char* set);/
+<tag/Description/The <tt/strspn/ function computes and returns the length of
+the substring pointed to by <tt/s/ which does consist only of characters
+contained in the string <tt/set/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcspn" name="strcspn">,
+<ref id="strstr" name="strstr">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strstr<label id="strstr"><p>
+
+<quote>
+<descrip>
+<tag/Function/Find a substring.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strstr (const char* str, const char* substr);/
+<tag/Description/<tt/strstr/ searches for the first occurance of the string
+<tt/substr/ within <tt/str/. If found, it returns a pointer to the copy,
+otherwise it returns <tt/NULL/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcspn" name="strcspn">,
+<ref id="strspn" name="strspn">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>strupper<label id="strupper"><p>
 
 <quote>
@@ -3443,6 +3669,43 @@ used in presence of a prototype.
 <ref id="ltoa" name="ltoa">,
 <ref id="utoa" name="utoa">
 <tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>unlink<label id="unlink"><p>
+
+<quote>
+<descrip>
+<tag/Function/Delete a file.
+<tag/Header/<tt/<ref id="unistd.h" name="unistd.h">/
+<tag/Declaration/<tt/int __fastcall__ unlink (const char* name);/
+<tag/Description/<tt/unlink/ deletes the file with the given name. On success,
+zero is returned. On error, -1 is returned and <tt/errno/ is set to an error
+code describing the reason for the failure.
+<tag/Limits/
+<itemize>
+<item>The use of this function is discouraged. Please use <tt/<ref id="remove"
+name="remove">/ instead, which is a native ANSI C function and does the same.
+<item>This function is not available on all cc65 targets (depends on the
+availability of file I/O).
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/POSIX
+<tag/See also/
+<ref id="remove" name="remove">
+<tag/Example/            
+#include &lt;stdio.h&gt;
+#include &lt;unistd.h&gt;
+
+#define FILENAME "helloworld"
+
+if (unlink (FILENAME) == 0) {
+    printf ("We deleted %s successfully\n", FILENAME);
+} else {
+    printf ("There was a problem deleting %s\n", FILENAME);
+}
 </descrip>
 </quote>
 

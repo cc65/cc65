@@ -91,23 +91,33 @@ static int IsShortDist (int Distance)
 
 
 
+static short ZPRegVal (unsigned short Use, const RegContents* RC)
+/* Return the contents of the given zeropage register */
+{
+    if ((Use & REG_TMP1) != 0) {
+    	return RC->Tmp1;
+    } else if ((Use & REG_SREG_LO) != 0) {
+    	return RC->SRegLo;
+    } else if ((Use & REG_SREG_HI) != 0) {
+    	return RC->SRegHi;
+    } else {
+    	return UNKNOWN_REGVAL;
+    }
+}
+
+
+
 static short RegVal (unsigned short Use, const RegContents* RC)
 /* Return the contents of the given register */
 {
     if ((Use & REG_A) != 0) {
        	return RC->RegA;
     } else if ((Use & REG_X) != 0) {
-	return RC->RegX;
+    	return RC->RegX;
     } else if ((Use & REG_Y) != 0) {
-	return RC->RegY;
-    } else if ((Use & REG_TMP1) != 0) {
-	return RC->Tmp1;
-    } else if ((Use & REG_SREG_LO) != 0) {
-	return RC->SRegLo;
-    } else if ((Use & REG_SREG_HI) != 0) {
-	return RC->SRegHi;
+    	return RC->RegY;
     } else {
-	return UNKNOWN_REGVAL;
+        return ZPRegVal (Use, RC);
     }
 }
 
@@ -862,7 +872,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 */
 	        if (RegValIsKnown (In->RegA)          && /* Value of A is known */
 		    E->AM == AM65_ZP                  && /* Store into zp */
-		    In->RegA == RegVal (E->Chg, In)) { 	 /* Value identical */
+		    In->RegA == ZPRegVal (E->Chg, In)) { /* Value identical */
 
 		    Delete = 1;
 		}
@@ -875,7 +885,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 */
 	        if (RegValIsKnown (In->RegX)          && /* Value of A is known */
 		    E->AM == AM65_ZP                  && /* Store into zp */
-       	       	    In->RegX == RegVal (E->Chg, In)) { 	 /* Value identical */
+       	       	    In->RegX == ZPRegVal (E->Chg, In)) { /* Value identical */
 
 		    Delete = 1;
 
@@ -901,7 +911,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 */
 	        if (RegValIsKnown (In->RegY)          && /* Value of Y is known */
 		    E->AM == AM65_ZP                  && /* Store into zp */
-       	       	    In->RegY == RegVal (E->Chg, In)) { 	 /* Value identical */
+       	       	    In->RegY == ZPRegVal (E->Chg, In)) { /* Value identical */
 
 		    Delete = 1;
 
@@ -929,7 +939,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 * remove the store.
 		 */
        	        if (CPU >= CPU_65C02 && E->AM == AM65_ZP) {
-		    if (RegVal (E->Chg, In) == 0) {
+		    if (ZPRegVal (E->Chg, In) == 0) {
                         Delete = 1;
                     }
 		}
@@ -1227,28 +1237,53 @@ unsigned OptPrecalc (CodeSeg* S)
        	/* Get a pointer to the input registers of the insn */
 	const RegContents* In  = &E->RI->In;
 
-        /* Check for a known register value and known operand */
-        if (RegValIsKnown (In->RegA) && CE_KnownImm (E)) {
+        /* Maybe we can handle it better if the contents of A are known */
+        if (RegValIsKnown (In->RegA)) {
 
-            const char* Arg;
+            const char* Arg = 0;
 
             /* Handle the different instructions */
             switch (E->OPC) {
 
                 case OP65_AND:
-                    Arg = MakeHexArg (In->RegA & E->Num);
+                    if (CE_KnownImm (E)) {
+                        /* Accu AND immediate */
+                        Arg = MakeHexArg (In->RegA & E->Num);
+                    } else if (E->AM == AM65_ZP) {
+                        int R = ZPRegVal (E->Use, In);
+                        if (RegValIsKnown (R)) {
+                            /* Accu AND zp with known contents */
+                            Arg = MakeHexArg (In->RegA & R);
+                        }
+                    }
                     break;
 
                 case OP65_EOR:
-                    Arg = MakeHexArg (In->RegA ^ E->Num);
+                    if (CE_KnownImm (E)) {
+                        Arg = MakeHexArg (In->RegA ^ E->Num);
+                    } else if (E->AM == AM65_ZP) {
+                        int R = ZPRegVal (E->Use, In);
+                        if (RegValIsKnown (R)) {
+                            printf ("A: %02X  tmp1: %02X\n", In->RegA, R);
+                            /* Accu EOR zp with known contents */
+                            Arg = MakeHexArg (In->RegA ^ R);
+                        }
+                    }
                     break;
 
                 case OP65_ORA:
-                    Arg = MakeHexArg (In->RegA | E->Num);
+                    if (CE_KnownImm (E)) {
+                        Arg = MakeHexArg (In->RegA | E->Num);
+                    } else if (E->AM == AM65_ZP) {
+                        int R = ZPRegVal (E->Use, In);
+                        if (RegValIsKnown (R)) {
+                            /* Accu ORA zp with known contents */
+                            Arg = MakeHexArg (In->RegA | R);
+                        }
+                    }
                     break;
 
                 default:
-                    Arg = 0;
                     break;
 
             }

@@ -54,7 +54,6 @@ The compiler may be called as follows:
 ---------------------------------------------------------------------------
 Usage: cc65 [options] file
 Short options:
-  -A                    Strict ANSI mode
   -Cl                   Make local variables static
   -Dsym[=defn]          Define a symbol
   -I dir                Set an include directory search path
@@ -76,7 +75,6 @@ Short options:
 
 Long options:
   --add-source          Include source as comment
-  --ansi                Strict ANSI mode
   --bss-name seg        Set the name of the BSS segment
   --check-stack         Generate stack overflow checks
   --code-name seg       Set the name of the CODE segment
@@ -93,6 +91,7 @@ Long options:
   --register-vars       Enable register variables
   --rodata-name seg     Set the name of the RODATA segment
   --signed-chars        Default characters are signed
+  --standard std        Language standard (c89, c99, cc65)
   --static-locals       Make local variables static
   --target sys          Set the target system
   --verbose             Increase verbosity
@@ -107,14 +106,6 @@ Long options:
 Here is a description of all the command line options:
 
 <descrip>
-
-  <label id="option-A">
-  <tag><tt>-A, --ansi</tt></tag>
-
-  This option disables any compiler exensions. Have a look at section 5
-  for a discussion of compiler extensions. In addition, the macro
-  <tt/__STRICT_ANSI__/ is defined, when using one of these options.
-
 
   <tag><tt>--bss-name seg</tt></tag>
 
@@ -240,6 +231,18 @@ Here is a description of all the command line options:
   signedchars"></tt> for better control of this option.
 
 
+  <label id="option--standard">
+  <tag><tt>--standard std</tt></tag>
+
+  This option allows to set the language standard supported. The argument is
+  one of
+  <itemize>
+  <item>c89
+  <item>c99
+  <item>cc65
+  </itemize>
+
+
   <tag><tt>-t target, --target target</tt></tag>
 
   This option is used to set the target system. The target system
@@ -249,16 +252,20 @@ Here is a description of all the command line options:
   <itemize>
   <item>none
   <item>apple2
+  <item>apple2enh
   <item>atari
   <item>atmos
   <item>c16 (works also for the c116 with memory up to 32K)
   <item>c64
   <item>c128
-  <item>plus4
   <item>cbm510 (CBM-II series with 40 column video)
   <item>cbm610 (all CBM-II II computers with 80 column video)
-  <item>pet (all CBM PET systems except the 2001)
   <item>geos
+  <item>lunix
+  <item>nes
+  <item>pet (all CBM PET systems except the 2001)
+  <item>plus4
+  <item>supervision
   </itemize>
 
   <tag><tt>-v, --verbose</tt></tag>
@@ -396,12 +403,10 @@ and the one defined by the ISO standard:
 
 <itemize>
 
-<item>	The compiler allows single line comments that start with //. This
-      	feature is disabled in strict ANSI mode.
-      	<p>
 <item>	The compiler allows unnamed parameters in parameter lists. The
       	compiler will not issue warnings about unused parameters that don't
-      	have a name. This feature is disabled in strict ANSI mode.
+      	have a name. This feature can be disabled with the <tt><ref
+        id="option--standard" name="--standard"></tt> command line option.
       	<p>
 <item>	The compiler has some additional keywords:
       	<p>
@@ -416,7 +421,9 @@ and the one defined by the ISO standard:
       	<item><tt/__attribute__/
       	</itemize>
       	<p>
-      	The keywords without the underlines are disabled in strict ANSI mode.
+      	The keywords without the underlines can be disabled with the
+        <tt><ref id="option--standard" name="--standard"></tt> command line
+        option.
       	<p>
 <item>	The datatypes "float" and "double" are not available.
       	<p>
@@ -430,7 +437,7 @@ and the one defined by the ISO standard:
 	conventions (see below). This means, that you may not mix pointers to
 	those functions with pointers to user written functions.
 	<p>
-</itemize>
+</itemize>     
 
 There may be some more minor differences, I'm currently not aware off. The
 biggest problem is the missing float data type. With this limitation in
@@ -443,11 +450,6 @@ mind, you should be able to write fairly portable code.
 This cc65 version has some extensions to the ISO C standard.
 
 <itemize>
-
-<item>	The compiler allows // comments (like in C++ and in the proposed C9x
-     	standard). This feature is disabled by <tt><ref id="option-A"
-	name="-A"></tt>.
-	<p>
 
 <item>	The compiler allows to insert assembler statements into the output
      	file. The syntax is
@@ -482,8 +484,9 @@ This cc65 version has some extensions to the ISO C standard.
 	<tscreen><verb>
        	void __fastcall__ f (unsigned char c)
      	</verb></tscreen>
-	The first form of the fastcall keyword is in the user namespace and is
-	therefore disabled in strict ANSI mode.
+	The first form of the fastcall keyword is in the user namespace and can
+	therefore be disabled with the <tt><ref id="option--standard"
+        name="--standard"></tt> command line option.
 
 	For functions declared as <tt/fastcall/, the rightmost parameter is not
 	pushed on the stack but left in the primary register when the function
@@ -549,10 +552,10 @@ This cc65 version has some extensions to the ISO C standard.
 	<p>
 
 <item>  cc65 implements flexible array struct members as defined in the C99 ISO
-        standard. As an extension, in non ANSI mode, these fields may be
-        initialized. There are several exceptions, however (which is probably
-        the reason why the standard does not define this feature, because it is
-        highly unorthogonal). Flexible array members cannot be initialized...
+        standard. As an extension, these fields may be initialized. There are 
+        several exceptions, however (which is probably the reason why the 
+        standard does not define this feature, because it is highly 
+        unorthogonal). Flexible array members cannot be initialized...
 
         <itemize>
         <item>  ...when defining an array of structs with flexible members.
@@ -647,10 +650,15 @@ The compiler defines several macros at startup:
 
   This macro expands to the current line number.
 
-  <tag><tt>__STRICT_ANSI__</tt></tag>
+  <tag><tt>__CC65_STD__</tt></tag>
 
-  This macro is defined to 1 if the <tt/-A/ compiler option was given, and
-  undefined otherwise.
+  This macro is defined to one of the following depending on the <tt><ref 
+  id="option--standard" name="--standard"></tt> command line option:
+  <itemize>
+  <item><tt/__CC65_STD_C89__/
+  <item><tt/__CC65_STD_C99__/
+  <item><tt/__CC65_STD_CCC65__/
+  </itemize>
 
   <tag><tt>__OPT__</tt></tag>
 
@@ -964,7 +972,7 @@ or
 <p>
 
 The first form is in the user namespace and is disabled by <tt><ref
-id="option-A" name="-A"></tt>.
+id="option--standard" name="--standard"></tt> if the argument is not <tt/cc65/.
 
 The asm statement may be used inside a function and on global file level. An
 inline assembler statement is a primary expression, so it may also be used as
@@ -1090,14 +1098,28 @@ This is the original compiler copyright:
 --------------------------------------------------------------------------
 </verb></tscreen>
 
-In acknowledgment of this copyright, I will place my own changes to the
-compiler under the same copyright. Please note however, that the library
-and all binutils are covered by another copyright, and that I'm planning
-to do a complete rewrite of the compiler, after which the compiler
-copyright will also change.
+Small parts of the compiler (parts of the preprocessor and main parser) are
+still covered by this copyright. The main portion is covered by the usual
+cc65 license, which reads:
 
-For the list of changes requested by this copyright see newvers.txt.
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
 
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item> 	The origin of this software must not be misrepresented; you must not
+       	claim that you wrote the original software. If you use this software
+       	in a product, an acknowledgment in the product documentation would be
+	appreciated but is not required.
+<item>	Altered source versions must be plainly marked as such, and must not
+	be misrepresented as being the original software.
+<item>	This notice may not be removed or altered from any source
+	distribution.
+</enum>
 
 </article>
 

@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.h				     */
+/*                                standard.c                                 */
 /*                                                                           */
-/*		   Global variables for the cc65 C compiler		     */
+/*                       Language standard definitions                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 2004      Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,48 +33,52 @@
 
 
 
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#include <string.h>
 
-
-
-/* common */
-#include "intstack.h"
+/* cc65 */
+#include "standard.h"
 
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*	      	  		     Data				     */
 /*****************************************************************************/
 
 
 
-/* Options */
-extern unsigned char	AddSource;		/* Add source lines as comments */
-extern unsigned char	DebugInfo;		/* Add debug info to the obj */
-extern unsigned char	CreateDep;		/* Create a dependency file */
-extern unsigned char	ANSI;			/* Strict ANSI flag */
-extern unsigned         RegisterSpace;          /* Space available for register vars */
+/* Current language standard, will be set to STD_DEFAULT on startup */
+IntStack Standard           = INTSTACK(STD_UNKNOWN);
 
-/* Stackable options */
-extern IntStack         WarnDisable;            /* Suppress warnings */
-extern IntStack         WritableStrings;	/* Literal strings are r/w */
-extern IntStack         InlineStdFuncs;	       	/* Inline some known functions */
-extern IntStack         EnableRegVars;		/* Enable register variables */
-extern IntStack         AllowRegVarAddr;	/* Allow taking addresses of register vars */
-extern IntStack         RegVarsToCallStack;	/* Save reg variables on call stack */
-extern IntStack         StaticLocals;		/* Make local variables static */
-extern IntStack         SignedChars;		/* Make characters signed by default */
-extern IntStack         CheckStack;		/* Generate stack overflow checks */
-extern IntStack         Optimize;		/* Optimize flag */
-extern IntStack         CodeSizeFactor;		/* Size factor for generated code */
+/* Table mapping names to standards, sorted by standard. */
+static const char* StdNames[STD_COUNT] = {
+    "c89", "c99", "cc65"
+};
 
 
 
-/* End of global.h */
+/*****************************************************************************/
+/*	      	  		     Code				     */
+/*****************************************************************************/
 
-#endif
 
+
+standard_t FindStandard (const char* Name)
+/* Find a standard by name. Returns one of the constants defined above.
+ * STD_UNKNOWN is returned if Name doesn't match a standard.
+ */
+{
+    unsigned I;
+
+    /* Check for a standard string */
+    for (I = 0; I < STD_COUNT; ++I) {
+	if (strcmp (StdNames [I], Name) == 0) {
+	    return (standard_t)I;
+	}
+    }
+
+    /* Not found */
+    return STD_UNKNOWN;
+}
 
 
 

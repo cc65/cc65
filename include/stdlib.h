@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -95,7 +95,7 @@ int system (const char* s);
 
 /* Non-ANSI functions */
 void __fastcall__ _swap (void* p, void* q, size_t size);
-#ifndef __STRICT_ANSI__
+#if __CC65_STD__ == __CC65_STD_CC65__
 char* __fastcall__ itoa (int val, char* buf, int radix);
 char* __fastcall__ utoa (unsigned val, char* buf, int radix);
 char* __fastcall__ ltoa (long val, char* buf, int radix);

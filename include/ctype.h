@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -70,10 +70,12 @@ int __fastcall__ ispunct (int c);
 int __fastcall__ isspace (int c);
 int __fastcall__ isupper (int c);
 int __fastcall__ isxdigit (int c);
+#if __CC65_STD__ >= __CC65_STD_C99__
 int __fastcall__ isblank (int c);      	/* New in C99 */
+#endif
 
-int __fastcall__ toupper (int c);	/* Always external */
-int __fastcall__ tolower (int c);	/* Always external */
+int __fastcall__ toupper (int c); 	/* Always external */
+int __fastcall__ tolower (int c); 	/* Always external */
 
 
 
@@ -88,32 +90,34 @@ int __fastcall__ tolower (int c);	/* Always external */
 
 #define isalnum(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
- 	       	    __asm__ ("lda %v,y", _ctype),       \
- 	       	    __asm__ ("and #%b", _CT_ALNUM),     \
+      	       	    __asm__ ("lda %v,y", _ctype),       \
+      	       	    __asm__ ("and #%b", _CT_ALNUM),     \
                     __AX__)
 
 #define isalpha(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
- 	       	    __asm__ ("lda %v,y", _ctype),       \
- 	       	    __asm__ ("and #%b", _CT_ALPHA),     \
+      	       	    __asm__ ("lda %v,y", _ctype),       \
+      	       	    __asm__ ("and #%b", _CT_ALPHA),     \
                     __AX__)
 
+#if __CC65_STD__ >= __CC65_STD_C99__
 #define isblank(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
- 	       	    __asm__ ("lda %v,y", _ctype),       \
- 	       	    __asm__ ("and #%b", _CT_SPACE_TAB), \
+      	       	    __asm__ ("lda %v,y", _ctype),       \
+      	       	    __asm__ ("and #%b", _CT_SPACE_TAB), \
                     __AX__)
+#endif
 
 #define iscntrl(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
- 	       	    __asm__ ("lda %v,y", _ctype),       \
- 	       	    __asm__ ("and #%b", _CT_CNTRL),     \
+      	       	    __asm__ ("lda %v,y", _ctype),       \
+      	       	    __asm__ ("and #%b", _CT_CNTRL),     \
                     __AX__)
 
 #define isdigit(c)  (__AX__ = (c),                      \
                     __asm__ ("tay"),                    \
- 	       	    __asm__ ("lda %v,y", _ctype),       \
- 	       	    __asm__ ("and #%b", _CT_DIGIT),     \
+      	       	    __asm__ ("lda %v,y", _ctype),       \
+      	       	    __asm__ ("and #%b", _CT_DIGIT),     \
                     __AX__)
 
 #define isgraph(c)  (__AX__ = (c),                      \

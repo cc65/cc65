@@ -45,7 +45,6 @@ Short options:
   -t sys		Set the target system
   -v			Verbose mode
   -vm			Verbose map file
-  -A			Strict ANSI mode
   -C name		Use linker config file
   -Cl			Make local variables static
   -D sym[=defn]		Define a preprocessor symbol
@@ -63,7 +62,6 @@ Short options:
 
 Long options:
   --add-source		Include source as comment
-  --ansi		Strict ANSI mode
   --asm-include-dir dir	Set an assembler include directory
   --bss-label name	Define and export a BSS segment label
   --bss-name seg	Set the name of the BSS segment
@@ -94,6 +92,7 @@ Long options:
   --register-vars	Enable register variables
   --rodata-name seg	Set the name of the RODATA segment
   --signed-chars	Default characters are signed
+  --standard std        Language standard (c89, c99, cc65)
   --start-addr addr	Set the default start address
   --static-locals	Make local variables static
   --target sys		Set the target system
@@ -229,7 +228,7 @@ free to contact me by email (<htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org
 
 <sect>Copyright<p>
 
-cl65 (and all cc65 binutils) are (C) Copyright 1998-2000 Ullrich von
+cl65 (and all cc65 binutils) are (C) Copyright 1998-2004 Ullrich von
 Bassewitz. For usage of the binaries and/or sources the following
 conditions do apply:
 

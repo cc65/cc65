@@ -23,9 +23,10 @@
 #include "input.h"
 #include "lineinfo.h"
 #include "macrotab.h"
-#include "scanner.h"
-#include "util.h"
 #include "preproc.h"
+#include "scanner.h"
+#include "standard.h"
+#include "util.h"
 
 
 
@@ -445,7 +446,7 @@ static int MacroCall (Macro* M)
     	} else if (CurC == '/' && NextC == '*') {
     	    *B++ = ' ';
      	    OldStyleComment ();
-     	} else if (ANSI == 0 && CurC == '/' && NextC == '/') {
+     	} else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
      	    *B++ = ' ';
     	    NewStyleComment ();
      	} else if (CurC == '\0') {
@@ -637,7 +638,7 @@ static int Pass1 (const char* From, char* To)
 	} else if (CurC == '/' && NextC == '*') {
 	    KeepChar (' ');
      	    OldStyleComment ();
-     	} else if (ANSI == 0 && CurC == '/' && NextC == '/') {
+     	} else if (IS_Get (&Standard) >= STD_C99 && CurC == '/' && NextC == '/') {
      	    KeepChar (' ');
 	    NewStyleComment ();
      	} else {
@@ -755,7 +756,7 @@ static int PushIf (int Skip, int Invert, int Cond)
 
 static int DoIf (int Skip)
 /* Process #if directive */
-{                                    
+{
     ExprDesc Expr;
     char* S;
 
@@ -1047,9 +1048,8 @@ void Preprocess (void)
     	    	    	break;
 
        	       	    case PP_LINE:
-	   		/* Not allowed in strict ANSI mode */
-			if (!Skip && ANSI) {
-			    PPError ("Preprocessor directive expected");
+	   		/* Should do something in C99 at least, but we ignore it */
+			if (!Skip) {
 			    ClearLine ();
     			}
     	    	    	break;

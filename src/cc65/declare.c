@@ -56,6 +56,7 @@
 #include "litpool.h"
 #include "pragma.h"
 #include "scanner.h"
+#include "standard.h"
 #include "symtab.h"
 #include "typeconv.h"
 
@@ -794,10 +795,11 @@ static void ParseAnsiParamList (FuncDesc* F)
 
     /* Check if this is a function definition */
     if (CurTok.Tok == TOK_LCURLY) {
-     	/* Print an error if in strict ANSI mode and we have unnamed
-     	 * parameters.
+     	/* Print an error if we have unnamed parameters and cc65 extensions
+         * are disabled.
      	 */
-       	if (ANSI && (F->Flags & FD_UNNAMED_PARAMS) != 0) {
+       	if (IS_Get (&Standard) != STD_CC65 &&
+            (F->Flags & FD_UNNAMED_PARAMS) != 0) {
      	    Error ("Parameter name omitted");
      	}
     }
@@ -1512,7 +1514,7 @@ static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers)
 	    return ParseStructInit (T, AllowFlexibleMembers);
 
 	case T_VOID:
-	    if (!ANSI) {
+	    if (IS_Get (&Standard) == STD_CC65) {
 	    	/* Special cc65 extension in non ANSI mode */
 	      	return ParseVoidInit ();
 	    }
@@ -1530,8 +1532,10 @@ static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers)
 unsigned ParseInit (type* T)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
-    /* Parse the initialization */
-    unsigned Size = ParseInitInternal (T, !ANSI);
+    /* Parse the initialization. Flexible array members can only be initialized
+     * in cc65 mode.
+     */
+    unsigned Size = ParseInitInternal (T, IS_Get (&Standard) == STD_CC65);
 
     /* The initialization may not generate code on global level, because code
      * outside function scope will never get executed.

@@ -63,6 +63,7 @@
 #include "input.h"
 #include "macrotab.h"
 #include "scanner.h"
+#include "standard.h"
 #include "segments.h"
 
 
@@ -79,7 +80,6 @@ static void Usage (void)
     fprintf (stderr,
 	     "Usage: %s [options] file\n"
 	     "Short options:\n"
-       	     "  -A\t\t\tStrict ANSI mode\n"
        	     "  -Cl\t\t\tMake local variables static\n"
        	     "  -Dsym[=defn]\t\tDefine a symbol\n"
        	     "  -I dir\t\tSet an include directory search path\n"
@@ -102,7 +102,6 @@ static void Usage (void)
 	     "\n"
 	     "Long options:\n"
        	     "  --add-source\t\tInclude source as comment\n"
-       	     "  --ansi\t\tStrict ANSI mode\n"
 	     "  --bss-name seg\tSet the name of the BSS segment\n"
        	     "  --check-stack\t\tGenerate stack overflow checks\n"
        	     "  --code-name seg\tSet the name of the CODE segment\n"
@@ -124,6 +123,7 @@ static void Usage (void)
              "  --register-vars\tEnable register variables\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
        	     "  --signed-chars\tDefault characters are signed\n"
+             "  --standard std\tLanguage standard (c89, c99, cc65)\n"
        	     "  --static-locals\tMake local variables static\n"
        	     "  --target sys\t\tSet the target system\n"
        	     "  --verbose\t\tIncrease verbosity\n"
@@ -325,15 +325,6 @@ static void OptAddSource (const char* Opt attribute ((unused)),
 /* Add source lines as comments in generated assembler file */
 {
     AddSource = 1;
-}
-
-
-
-static void OptAnsi (const char* Opt attribute ((unused)),
-		     const char* Arg attribute ((unused)))
-/* Compile in strict ANSI mode */
-{
-    ANSI = 1;
 }
 
 
@@ -627,6 +618,22 @@ static void OptSignedChars (const char* Opt attribute ((unused)),
 
 
 
+static void OptStandard (const char* Opt, const char* Arg)
+/* Handle the --standard option */
+{
+    /* Find the standard from the given name */
+    standard_t Std = FindStandard (Arg);
+    if (Std == STD_UNKNOWN) {
+       	AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
+    } else if (IS_Get (&Standard) != STD_UNKNOWN) {
+        AbEnd ("Option %s given more than once", Opt);
+    } else {
+        IS_Set (&Standard, Std);
+    }
+}
+
+
+
 static void OptStaticLocals (const char* Opt attribute ((unused)),
 	       		     const char* Arg attribute ((unused)))
 /* Place local variables in static storage */
@@ -678,7 +685,6 @@ int main (int argc, char* argv[])
     /* Program long options */
     static const LongOpt OptTab[] = {
 	{ "--add-source",	0,    	OptAddSource 		},
-	{ "--ansi",   	 	0,	OptAnsi	     		},
 	{ "--bss-name",		1, 	OptBssName   		},
        	{ "--check-stack",	0,     	OptCheckStack		},
 	{ "--code-name",	1, 	OptCodeName  		},
@@ -700,6 +706,7 @@ int main (int argc, char* argv[])
         { "--register-vars",    0,      OptRegisterVars         },
 	{ "--rodata-name",	1, 	OptRodataName		},
 	{ "--signed-chars",	0, 	OptSignedChars	       	},
+        { "--standard",         1,      OptStandard             },
        	{ "--static-locals",   	0, 	OptStaticLocals	       	},
 	{ "--target",	  	1,  	OptTarget    	       	},
 	{ "--verbose",	       	0, 	OptVerbose   	       	},
@@ -775,10 +782,6 @@ int main (int argc, char* argv[])
 
 		case 'v':
 		    OptVerbose (Arg, 0);
-		    break;
-
-		case 'A':
-		    OptAnsi (Arg, 0);
 		    break;
 
 		case 'C':
@@ -871,6 +874,11 @@ int main (int argc, char* argv[])
     /* If no memory model was given, use the default */
     if (MemoryModel == MMODEL_UNKNOWN) {
         SetMemoryModel (MMODEL_NEAR);
+    }
+
+    /* If no language standard was given, use the default one */
+    if (IS_Get (&Standard) == STD_UNKNOWN) {
+        IS_Set (&Standard, STD_DEFAULT);
     }
 
     /* Go! */

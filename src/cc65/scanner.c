@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -54,9 +54,10 @@
 #include "input.h"
 #include "litpool.h"
 #include "preproc.h"
+#include "scanner.h"
+#include "standard.h"
 #include "symtab.h"
 #include "util.h"
-#include "scanner.h"
 
 
 
@@ -72,63 +73,66 @@ Token NextTok;		/* The next token */
 
 
 /* Token types */
-#define TT_C 	0		/* ANSI C token */
-#define TT_EXT	1 		/* cc65 extension */
+enum {
+    TT_C89      = 0x01 << STD_C89,      /* Token valid in C89 */
+    TT_C99      = 0x01 << STD_C99,      /* Token valid in C99 */
+    TT_CC65     = 0x01 << STD_CC65      /* Token valid in cc65 */
+};
 
 /* Token table */
 static const struct Keyword {
     char*    	    Key;    	/* Keyword name */
     unsigned char   Tok;    	/* The token */
-    unsigned char   Type;      	/* Token type */
+    unsigned char   Std;        /* Token supported in which standards? */
 } Keywords [] = {
-    { "_Pragma",        TOK_PRAGMA,     TT_C    },
-    { "__AX__",	       	TOK_AX,		TT_C  	},
-    { "__A__",	       	TOK_A,	       	TT_C   	},
-    { "__EAX__",       	TOK_EAX,   	TT_C  	},
-    { "__X__", 	       	TOK_X,		TT_C  	},
-    { "__Y__", 	       	TOK_Y,		TT_C  	},
-    { "__asm__",       	TOK_ASM,   	TT_C  	},
-    { "__attribute__",	TOK_ATTRIBUTE,	TT_C  	},
-    { "__far__",	TOK_FAR,	TT_C  	},
-    { "__fastcall__",  	TOK_FASTCALL,   TT_C  	},
-    { "__near__",      	TOK_NEAR,	TT_C  	},
-    { "asm",   	       	TOK_ASM,   	TT_EXT 	},
-    { "auto",  	       	TOK_AUTO,  	TT_C  	},
-    { "break", 	       	TOK_BREAK, 	TT_C  	},
-    { "case",  	       	TOK_CASE,  	TT_C  	},
-    { "char",  	       	TOK_CHAR,  	TT_C  	},
-    { "const", 	       	TOK_CONST, 	TT_C  	},
-    { "continue",      	TOK_CONTINUE,   TT_C  	},
-    { "default",       	TOK_DEFAULT,    TT_C  	},
-    { "do",    	       	TOK_DO,    	TT_C  	},
-    { "double",        	TOK_DOUBLE,	TT_C   	},
-    { "else",  	       	TOK_ELSE,  	TT_C  	},
-    { "enum",  	       	TOK_ENUM,  	TT_C  	},
-    { "extern",        	TOK_EXTERN,	TT_C   	},
-    { "far",		TOK_FAR,	TT_EXT	},
-    { "fastcall",      	TOK_FASTCALL,	TT_EXT 	},
-    { "float", 	       	TOK_FLOAT, 	TT_C  	},
-    { "for",   	       	TOK_FOR,   	TT_C  	},
-    { "goto",  	       	TOK_GOTO,  	TT_C  	},
-    { "if",    	       	TOK_IF,    	TT_C  	},
-    { "int",   	       	TOK_INT,   	TT_C  	},
-    { "long",  	       	TOK_LONG,  	TT_C  	},
-    { "near",          	TOK_NEAR,       TT_EXT 	},
-    { "register",      	TOK_REGISTER,   TT_C  	},
-    { "restrict",      	TOK_RESTRICT,   TT_C  	},
-    { "return",        	TOK_RETURN,	TT_C  	},
-    { "short", 	       	TOK_SHORT, 	TT_C  	},
-    { "signed",	       	TOK_SIGNED,	TT_C  	},
-    { "sizeof",        	TOK_SIZEOF,	TT_C  	},
-    { "static",        	TOK_STATIC,	TT_C  	},
-    { "struct",        	TOK_STRUCT,	TT_C  	},
-    { "switch",        	TOK_SWITCH,	TT_C	},
-    { "typedef",       	TOK_TYPEDEF,    TT_C	},
-    { "union", 	       	TOK_UNION, 	TT_C	},
-    { "unsigned",      	TOK_UNSIGNED,   TT_C	},
-    { "void",  	       	TOK_VOID,  	TT_C	},
-    { "volatile",      	TOK_VOLATILE,   TT_C	},
-    { "while", 	       	TOK_WHILE, 	TT_C	},
+    { "_Pragma",        TOK_PRAGMA,              TT_C99 | TT_CC65  },
+    { "__AX__",	       	TOK_AX,	       	TT_C89 | TT_C99 | TT_CC65  },
+    { "__A__", 	       	TOK_A, 	       	TT_C89 | TT_C99 | TT_CC65  },
+    { "__EAX__",       	TOK_EAX,       	TT_C89 | TT_C99 | TT_CC65  },
+    { "__X__", 	       	TOK_X, 	       	TT_C89 | TT_C99 | TT_CC65  },
+    { "__Y__", 	       	TOK_Y, 	       	TT_C89 | TT_C99 | TT_CC65  },
+    { "__asm__",       	TOK_ASM,       	TT_C89 | TT_C99 | TT_CC65  },
+    { "__attribute__", 	TOK_ATTRIBUTE, 	TT_C89 | TT_C99 | TT_CC65  },
+    { "__far__",       	TOK_FAR,       	TT_C89 | TT_C99 | TT_CC65  },
+    { "__fastcall__",  	TOK_FASTCALL,   TT_C89 | TT_C99 | TT_CC65  },
+    { "__near__",      	TOK_NEAR,      	TT_C89 | TT_C99 | TT_CC65  },
+    { "asm",   	       	TOK_ASM,   	                  TT_CC65  },
+    { "auto",  	       	TOK_AUTO,      	TT_C89 | TT_C99 | TT_CC65  },
+    { "break", 	       	TOK_BREAK,     	TT_C89 | TT_C99 | TT_CC65  },
+    { "case",  	       	TOK_CASE,      	TT_C89 | TT_C99 | TT_CC65  },
+    { "char",  	       	TOK_CHAR,      	TT_C89 | TT_C99 | TT_CC65  },
+    { "const", 	       	TOK_CONST,     	TT_C89 | TT_C99 | TT_CC65  },
+    { "continue",      	TOK_CONTINUE,   TT_C89 | TT_C99 | TT_CC65  },
+    { "default",       	TOK_DEFAULT,    TT_C89 | TT_C99 | TT_CC65  },
+    { "do",    	       	TOK_DO,        	TT_C89 | TT_C99 | TT_CC65  },
+    { "double",        	TOK_DOUBLE,    	TT_C89 | TT_C99 | TT_CC65  },
+    { "else",  	       	TOK_ELSE,      	TT_C89 | TT_C99 | TT_CC65  },
+    { "enum",  	       	TOK_ENUM,      	TT_C89 | TT_C99 | TT_CC65  },
+    { "extern",        	TOK_EXTERN,    	TT_C89 | TT_C99 | TT_CC65  },
+    { "far",		TOK_FAR,	                  TT_CC65  },
+    { "fastcall",      	TOK_FASTCALL,	                  TT_CC65  },
+    { "float", 	       	TOK_FLOAT,     	TT_C89 | TT_C99 | TT_CC65  },
+    { "for",   	       	TOK_FOR,       	TT_C89 | TT_C99 | TT_CC65  },
+    { "goto",  	       	TOK_GOTO,      	TT_C89 | TT_C99 | TT_CC65  },
+    { "if",    	       	TOK_IF,        	TT_C89 | TT_C99 | TT_CC65  },
+    { "int",   	       	TOK_INT,       	TT_C89 | TT_C99 | TT_CC65  },
+    { "long",  	       	TOK_LONG,      	TT_C89 | TT_C99 | TT_CC65  },
+    { "near",          	TOK_NEAR,                         TT_CC65  },
+    { "register",      	TOK_REGISTER,   TT_C89 | TT_C99 | TT_CC65  },
+    { "restrict",      	TOK_RESTRICT,            TT_C99 | TT_CC65  },
+    { "return",        	TOK_RETURN,    	TT_C89 | TT_C99 | TT_CC65  },
+    { "short", 	       	TOK_SHORT,     	TT_C89 | TT_C99 | TT_CC65  },
+    { "signed",	       	TOK_SIGNED,    	TT_C89 | TT_C99 | TT_CC65  },
+    { "sizeof",        	TOK_SIZEOF,    	TT_C89 | TT_C99 | TT_CC65  },
+    { "static",        	TOK_STATIC,    	TT_C89 | TT_C99 | TT_CC65  },
+    { "struct",        	TOK_STRUCT,    	TT_C89 | TT_C99 | TT_CC65  },
+    { "switch",        	TOK_SWITCH,	TT_C89 | TT_C99 | TT_CC65  },
+    { "typedef",       	TOK_TYPEDEF,    TT_C89 | TT_C99 | TT_CC65  },
+    { "union", 	       	TOK_UNION, 	TT_C89 | TT_C99 | TT_CC65  },
+    { "unsigned",      	TOK_UNSIGNED,   TT_C89 | TT_C99 | TT_CC65  },
+    { "void",  	       	TOK_VOID,  	TT_C89 | TT_C99 | TT_CC65  },
+    { "volatile",      	TOK_VOLATILE,   TT_C89 | TT_C99 | TT_CC65  },
+    { "while", 	       	TOK_WHILE, 	TT_C89 | TT_C99 | TT_CC65  },
 };
 #define KEY_COUNT	(sizeof (Keywords) / sizeof (Keywords [0]))
 
@@ -143,7 +147,7 @@ static const struct Keyword {
 
 
 /*****************************************************************************/
-/*		 		     code 				     */
+/*		 		     code 			   	     */
 /*****************************************************************************/
 
 
@@ -156,14 +160,14 @@ static int CmpKey (const void* Key, const void* Elem)
 
 
 
-static int FindKey (const char* Key)
+static token_t FindKey (const char* Key)
 /* Find a keyword and return the token. Return IDENT if the token is not a
  * keyword.
  */
 {
     struct Keyword* K;
     K = bsearch (Key, Keywords, KEY_COUNT, sizeof (Keywords [0]), CmpKey);
-    if (K && (K->Type != TT_EXT || ANSI == 0)) {
+    if (K && (K->Std & (0x01 << IS_Get (&Standard))) != 0) {
 	return K->Tok;
     } else {
 	return TOK_IDENT;
@@ -262,7 +266,7 @@ static int ParseChar (void)
 	       	C = '\b';
 	      	break;
      	    case 'f':
-	      	C = '\f';
+	       	C = '\f';
 	      	break;
 	    case 'r':
 	      	C = '\r';
@@ -315,7 +319,7 @@ static int ParseChar (void)
                 }
      		break;
      	    default:
-     		Error ("Illegal character constant");
+     	       	Error ("Illegal character constant");
 		C = ' ';
                 /* Try to do error recovery, otherwise the compiler will spit
                  * out thousands of errors in this place and abort.
@@ -446,11 +450,12 @@ static void NumericConst (void)
     SB_Terminate (&S);
 
     /* The following character tells us if we have an integer or floating
-     * point constant.
+     * point constant. Note: Hexadecimal floating point constants aren't
+     * supported in C89.
      */
     IsFloat = (CurC == '.' ||
                (Base == 10 && toupper (CurC) == 'E') ||
-               (Base == 16 && toupper (CurC) == 'P'));
+               (Base == 16 && toupper (CurC) == 'P' && IS_Get (&Standard) >= STD_C99));
 
     /* If we don't have a floating point type, an octal prefix results in an
      * octal base.
@@ -702,18 +707,18 @@ void NextToken (void)
      	    return;
      	}
      	/* No reserved word, check for special symbols */
-     	if (token [0] == '_') {
+     	if (token[0] == '_' && token[1] == '_') {
      	    /* Special symbols */
-            if (strcmp (token, "__FILE__") == 0) {
+            if (strcmp (token+2, "FILE__") == 0) {
 	       	NextTok.IVal = AddLiteral (GetCurrentFile());
 	       	NextTok.Tok  = TOK_SCONST;
 	       	return;
-	    } else if (strcmp (token, "__LINE__") == 0) {
+	    } else if (strcmp (token+2, "LINE__") == 0) {
 	       	NextTok.Tok  = TOK_ICONST;
     	       	NextTok.IVal = GetCurrentLine();
     	       	NextTok.Type = type_int;
     	       	return;
-    	    } else if (strcmp (token, "__func__") == 0) {
+       	    } else if (strcmp (token+2, "func__") == 0) {
 	       	/* __func__ is only defined in functions */
 	       	if (CurrentFunc) {
 	       	    NextTok.IVal = AddLiteral (F_GetFuncName (CurrentFunc));

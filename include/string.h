@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -70,7 +70,7 @@ void* __fastcall__ memset (void* s, int c, size_t count);
 void* __fastcall__ _bzero (void* ptr, size_t n);
 
 /* Non standard: */
-#ifndef __STRICT_ANSI__
+#if __CC65_STD__ == __CC65_STD_CC65__
 void __fastcall__ bzero (void* ptr, size_t n);                /* BSD */
 char* __fastcall__ strdup (const char* s);		      /* SYSV/BSD */
 int __fastcall__ stricmp (const char* s1, const char* s2);    /* DOS/Windows */

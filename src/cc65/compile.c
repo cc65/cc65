@@ -46,6 +46,7 @@
 #include "asmlabel.h"
 #include "asmstmt.h"
 #include "codegen.h"
+#include "compile.h"
 #include "declare.h"
 #include "error.h"
 #include "expr.h"
@@ -55,8 +56,8 @@
 #include "litpool.h"
 #include "macrotab.h"
 #include "pragma.h"
+#include "standard.h"
 #include "symtab.h"
-#include "compile.h"
 
 
 
@@ -286,16 +287,17 @@ void Compile (const char* FileName)
     /* Add macros that are always defined */
     DefineNumericMacro ("__CC65__", VERSION);
 
-    /* Strict ANSI macro */
-    if (ANSI) {
-	DefineNumericMacro ("__STRICT_ANSI__", 1);
-    }
+    /* Language standard that is supported */
+    DefineNumericMacro ("__CC65_STD_C89__", STD_C89);
+    DefineNumericMacro ("__CC65_STD_C99__", STD_C99);
+    DefineNumericMacro ("__CC65_STD_CC65__", STD_CC65);
+    DefineNumericMacro ("__CC65_STD__", IS_Get (&Standard));
 
     /* Optimization macros. Since no source code has been parsed for now, the
      * IS_Get functions access the values in effect now, regardless of any
      * changes using #pragma later.
      */
-    if (IS_Get (&Optimize)) {  
+    if (IS_Get (&Optimize)) {
         long CodeSize = IS_Get (&CodeSizeFactor);
 	DefineNumericMacro ("__OPT__", 1);
        	if (CodeSize > 100) {

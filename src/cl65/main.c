@@ -603,7 +603,6 @@ static void Usage (void)
        	     "  -t sys\t\tSet the target system\n"
        	     "  -v\t\t\tVerbose mode\n"
        	     "  -vm\t\t\tVerbose map file\n"
-       	     "  -A\t\t\tStrict ANSI mode\n"
        	     "  -C name\t\tUse linker config file\n"
        	     "  -Cl\t\t\tMake local variables static\n"
        	     "  -D sym[=defn]\t\tDefine a preprocessor symbol\n"
@@ -621,7 +620,6 @@ static void Usage (void)
 	     "\n"
 	     "Long options:\n"
        	     "  --add-source\t\tInclude source as comment\n"
-       	     "  --ansi\t\tStrict ANSI mode\n"
        	     "  --asm-define sym[=v]\tDefine an assembler symbol\n"
 	     "  --asm-include-dir dir\tSet an assembler include directory\n"
              "  --bss-label name\tDefine and export a BSS segment label\n"
@@ -658,6 +656,7 @@ static void Usage (void)
              "  --register-vars\tEnable register variables\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
        	     "  --signed-chars\tDefault characters are signed\n"
+             "  --standard std\tLanguage standard (c89, c99, cc65)\n"
        	     "  --start-addr addr\tSet the default start address\n"
        	     "  --static-locals\tMake local variables static\n"
        	     "  --target sys\t\tSet the target system\n"
@@ -675,15 +674,6 @@ static void OptAddSource (const char* Opt attribute ((unused)),
 /* Strict source code as comments to the generated asm code */
 {
     CmdAddArg (&CC65, "-T");
-}
-
-
-
-static void OptAnsi (const char* Opt attribute ((unused)),
-		     const char* Arg attribute ((unused)))
-/* Strict ANSI mode (compiler) */
-{
-    CmdAddArg (&CC65, "-A");
 }
 
 
@@ -1017,6 +1007,14 @@ static void OptSignedChars (const char* Opt attribute ((unused)),
 
 
 
+static void OptStandard (const char* Opt attribute ((unused)), const char* Arg)
+/* Set the language standard */
+{
+    CmdAddArg2 (&CC65, "--standard", Arg);
+}
+
+
+
 static void OptStartAddr (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the default start address */
 {
@@ -1092,7 +1090,6 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
 	{ "--add-source",	0,    	OptAddSource 		},
-	{ "--ansi",		0,	OptAnsi			},
        	{ "--asm-define",      	1,     	OptAsmDefine            },
 	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
        	{ "--bss-label",       	1,     	OptBssLabel             },
@@ -1129,6 +1126,7 @@ int main (int argc, char* argv [])
         { "--register-vars",    0,      OptRegisterVars         },
 	{ "--rodata-name",    	1, 	OptRodataName		},
 	{ "--signed-chars",   	0, 	OptSignedChars	       	},
+        { "--standard",         1,      OptStandard             },
 	{ "--start-addr",     	1,	OptStartAddr		},
        	{ "--static-locals",   	0, 	OptStaticLocals	       	},
 	{ "--target",	      	1,	OptTarget		},
@@ -1167,11 +1165,6 @@ int main (int argc, char* argv [])
 
 		case '-':
 		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-		    break;
-
-		case 'A':
-		    /* Strict ANSI mode (compiler) */
-		    OptAnsi (Arg, 0);
 		    break;
 
 		case 'C':

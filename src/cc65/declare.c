@@ -834,8 +834,8 @@ static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
      	 */
      	Sym = FindSym (CurTok.Ident);
      	if (Sym == 0 || !SymIsTypeDef (Sym)) {
-     	    /* Old style (K&R) function. Assume variable param list. */
-     	    F->Flags |= (FD_OLDSTYLE | FD_VARIADIC);
+     	    /* Old style (K&R) function. */
+     	    F->Flags |= FD_OLDSTYLE;
      	}
     }
 

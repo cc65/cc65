@@ -19,9 +19,27 @@
 
 C_OBJS =
 
-S_OBJS  =       crt0.o          \
+S_OBJS  =       _scrsize.o      \
+                cclear.o        \
+                cgetc.o         \
+                chline.o        \
+                clock.o         \
+                clrscr.o        \
+                color.o         \
+                cputc.o         \
+                crt0.o          \
+                ctype.o         \
+                cvline.o        \
+                gotox.o         \
+                gotoxy.o        \
+                gotoy.o         \
+                kbhit.o         \
                 mainargs.o      \
-                systime.o
+                revers.o        \
+                systime.o       \
+                wherex.o        \
+                wherey.o        \
+                write.o         
 
 #--------------------------------------------------------------------------
 # Targets

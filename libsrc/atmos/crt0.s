@@ -8,10 +8,12 @@
 
 	.export		_exit
 	.import		initlib, donelib
-	.import	     	push0, callmain, zerobss
-	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
+	.import	     	callmain, zerobss
+       	.import	       	__RAM_START__, __RAM_SIZE__, __RAM_LAST__
 
-        .importzp       sp
+        .include        "zeropage.inc"
+        .include        "atmos.inc"
+
 
 ; ------------------------------------------------------------------------
 ; Create an empty LOWCODE segment to avoid linker warnings
@@ -19,13 +21,45 @@
 .segment        "LOWCODE"
 
 ; ------------------------------------------------------------------------
+; Oric tape header
+
+.segment        "TAPEHDR"
+
+        .byte   $16, $16, $16   ; Sync bytes
+        .byte   $24             ; End of header marker
+
+        .byte   $00                             ; $2B0
+        .byte   $00                             ; $2AF
+        .byte   $80                             ; $2AE Machine code flag
+        .byte   $C7                             ; $2AD Autoload flag
+        .dbyt   __RAM_START__ + __RAM_LAST__    ; $2AB
+        .dbyt   __RAM_START__                   ; $2A9
+        .byte   $00                             ; $2A8
+        .byte   $00                             ; Zero terminated name
+
+; ------------------------------------------------------------------------
 ; Place the startup code in a special segment.
 
 .segment       	"STARTUP"
 
+; Save the zero page area we're about to use
+
+	ldx    	#zpspace-1
+L1:	lda	sp,x
+   	sta	zpsave,x	; Save the zero page locations we need
+	dex
+       	bpl	L1
+
 ; Clear the BSS data
 
 	jsr	zerobss
+
+; Unprotect columns 0 and 1
+
+        lda     STATUS
+        sta     stsave
+        and     #%11011111
+        sta     STATUS
 
 ; Save system stuff and setup the stack
 
@@ -53,6 +87,16 @@ _exit:	jsr	donelib		; Run module destructors
 
 	ldx	spsave
 	txs
+        lda     stsave
+        sta     STATUS
+
+; Copy back the zero page stuff
+
+       	ldx	#zpspace-1
+L2:	lda	zpsave,x
+	sta	sp,x
+	dex
+       	bpl	L2
 
 ; Back to BASIC
 
@@ -61,7 +105,12 @@ _exit:	jsr	donelib		; Run module destructors
 ; ------------------------------------------------------------------------
 ; Data
 
+.data
+
+zpsave:	.res	zpspace
+
 .bss
 spsave:	.res	1
+stsave: .res    1
 
 

@@ -802,18 +802,19 @@ static void ParseO65 (void)
 /* Parse the o65 format section */
 {
     static const IdentTok Attributes [] = {
-       	{   "EXPORT",  	 CFGTOK_EXPORT   	},
-	{   "IMPORT",	 CFGTOK_IMPORT		},
-        {   "TYPE",      CFGTOK_TYPE     	},
-       	{   "OS",      	 CFGTOK_OS       	},
+       	{   "EXPORT",   CFGTOK_EXPORT   	},
+	{   "IMPORT",	CFGTOK_IMPORT		},
+        {   "TYPE",     CFGTOK_TYPE     	},
+       	{   "OS",      	CFGTOK_OS       	},
     };
     static const IdentTok Types [] = {
-       	{   "SMALL",   	 CFGTOK_SMALL    	},
-       	{   "LARGE",   	 CFGTOK_LARGE    	},
+       	{   "SMALL",   	CFGTOK_SMALL    	},
+       	{   "LARGE",   	CFGTOK_LARGE    	},
     };
     static const IdentTok OperatingSystems [] = {
-       	{   "LUNIX",   	 CFGTOK_LUNIX     	},
-       	{   "OSA65",   	 CFGTOK_OSA65    	},
+       	{   "LUNIX",   	CFGTOK_LUNIX     	},
+       	{   "OSA65",   	CFGTOK_OSA65    	},
+        {   "CC65",     CFGTOK_CC65             },
     };
 
     while (CfgTok == CFGTOK_IDENT) {
@@ -878,7 +879,7 @@ static void ParseO65 (void)
 		     	break;
 
 		    case CFGTOK_LARGE:
-		 	O65SetLargeModel (O65FmtDesc);
+		    	O65SetLargeModel (O65FmtDesc);
 	    	     	break;
 
 	    	    default:
@@ -894,12 +895,16 @@ static void ParseO65 (void)
 		switch (CfgTok) {
 
 		    case CFGTOK_LUNIX:
-			O65SetOS (O65FmtDesc, O65OS_LUNIX);
-			break;
+		    	O65SetOS (O65FmtDesc, O65OS_LUNIX);
+		    	break;
 
 		    case CFGTOK_OSA65:
-			O65SetOS (O65FmtDesc, O65OS_OSA65);
-			break;
+		    	O65SetOS (O65FmtDesc, O65OS_OSA65);
+		    	break;
+
+		    case CFGTOK_CC65:
+		    	O65SetOS (O65FmtDesc, O65OS_CC65);
+		    	break;
 
 		    default:
 			CfgError ("Unexpected OS token");

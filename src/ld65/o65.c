@@ -90,9 +90,9 @@
 #define O65RELOC_WORD	0x80
 #define O65RELOC_HIGH	0x40
 #define O65RELOC_LOW	0x20
-#define O65RELOC_SEGADR	0xc0
-#define O65RELOC_SEG	0xa0
-#define O65RELOC_MASK   0xc0
+#define O65RELOC_SEGADR	0xC0
+#define O65RELOC_SEG	0xA0
+#define O65RELOC_MASK   0xE0
 
 /* O65 executable file header */
 typedef struct O65Header O65Header;
@@ -1013,6 +1013,7 @@ void O65SetOS (O65Desc* D, unsigned OS)
 {
     static const unsigned char OSA65 [2] = { O65OS_OSA65, 0 };
     static const unsigned char Lunix [2] = { O65OS_LUNIX, 0 };
+    static const unsigned char CC65 [4]  = { O65OS_CC65, 0, 0, 0 };
 
     /* Write the correct option */
     switch (OS) {
@@ -1023,6 +1024,10 @@ void O65SetOS (O65Desc* D, unsigned OS)
 
     	case O65OS_LUNIX:
 	    O65SetOption (D, O65OPT_OS, Lunix, sizeof (Lunix));
+	    break;
+
+    	case O65OS_CC65:
+	    O65SetOption (D, O65OPT_OS, CC65, sizeof (CC65));
 	    break;
 
 	default:

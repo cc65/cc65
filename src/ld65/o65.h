@@ -64,6 +64,7 @@ typedef struct O65Desc O65Desc;
 /* Operating system codes for O65OPT_OS */
 #define O65OS_OSA65		1
 #define O65OS_LUNIX		2
+#define O65OS_CC65              3
 
 
 
@@ -82,7 +83,7 @@ void FreeO65Desc (O65Desc* D);
 void O65Set6502 (O65Desc* D);
 /* Enable 6502 mode */
 
-void O65Set65816 (O65Desc* D);	   
+void O65Set65816 (O65Desc* D);
 /* Enable 816 mode */
 
 void O65SetSmallModel (O65Desc* D);

@@ -101,6 +101,7 @@ typedef enum {
 
     CFGTOK_LUNIX,
     CFGTOK_OSA65,
+    CFGTOK_CC65,
 
     CFGTOK_CONDES,
     CFGTOK_SEGMENT,

@@ -833,6 +833,7 @@ unsigned OptStoreLoad (CodeSeg* S)
 	 */
 	if ((E->Info & OF_STORE) != 0                 &&
 	    (N = CS_GetNextEntry (S, I)) != 0  	      &&
+	    !CE_HasLabel (N)                          &&
        	    (N->Info & OF_LOAD) != 0                  &&
 	    strcmp (E->Arg, N->Arg) == 0              &&
 	    (X = CS_GetNextEntry (S, I+1)) != 0       &&

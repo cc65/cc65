@@ -4,7 +4,10 @@
 
 
 
+#include <stdlib.h>
 #include <stdio.h>
+#include <ctype.h>
+#include <time.h>
 #include <conio.h>
 
 
@@ -30,10 +33,16 @@ static unsigned char Sieve[COUNT];
 
 int main (void)
 {
+    /* Clock variable */
+    clock_t Ticks;
+
     /* This is an example where register variables make sense */
     register unsigned char* S;
     register unsigned 	    I;
     register unsigned 	    J;
+
+    /* Read the clock */
+    Ticks = clock();
 
     /* Execute the sieve */
     I = 2;
@@ -50,17 +59,27 @@ int main (void)
 	++I;
     }
 
+    /* Calculate the time used */
+    Ticks = clock() - Ticks;
+
+    /* Print the time used and wait for a key */
+    printf ("Time used: %lu ticks\n", Ticks);
+    printf ("Press Q to quit, any other key for list\n");
+    if (toupper (cgetc()) == 'Q') {
+	exit (EXIT_SUCCESS);
+    }
+
     /* Print the result */
     for (I = 2; I < COUNT; ++I) {
 	if (Sieve[I] == 0) {
 	    printf ("%4d\n", I);
 	}
-	if (kbhit() && cgetc() == 'q') {
+	if (kbhit() && toupper (cgetc()) == 'q') {
 	    break;
 	}
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }
 
 

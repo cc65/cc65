@@ -64,7 +64,11 @@
      	sta	jmpvec+1
    	sty	exitfunc_index
  	jsr	jmpvec			; Call the function
+.ifpc02
+	bra	doatexit
+.else
  	jmp	doatexit     		; Next one
+.endif
 
 @L9:	rts
 

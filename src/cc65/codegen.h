@@ -370,8 +370,8 @@ void g_swap (unsigned flags);
 void g_call (unsigned Flags, const char* Label, unsigned ArgSize);
 /* Call the specified subroutine name */
 
-void g_callind (unsigned Flags, unsigned ArgSize);
-/* Call subroutine with address in AX */
+void g_callind (unsigned Flags, unsigned ArgSize, int Offs);
+/* Call subroutine indirect */
 
 void g_jump (unsigned Label);
 /* Jump to specified internal label number */

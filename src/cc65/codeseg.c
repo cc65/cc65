@@ -323,7 +323,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	      	if ((OPC->Info & OF_BRA) != 0) {
 		    /* Branch */
 		    AM = AM65_BRA;
-		} else if (IsZPName (Arg, 0)) {
+		} else if (GetZPInfo(Arg) != 0) {
 		    AM = AM65_ZP;
 		} else {
 		    AM = AM65_ABS;
@@ -338,7 +338,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	      	    Reg = toupper (*L);
 		    L = SkipSpace (L+1);
 		    if (Reg == 'X') {
-			if (IsZPName (Arg, 0)) {
+			if (GetZPInfo(Arg) != 0) {
 			    AM = AM65_ZPX;
 			} else {
 			    AM = AM65_ABSX;

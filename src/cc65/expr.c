@@ -774,35 +774,29 @@ static void FunctionCall (int k, ExprDesc* lval)
 	/* If the function is not a fastcall function, load the pointer to
 	 * the function into the primary.
 	 */
-	if (!IsFastCallFunc (lval->Type)) {
+	if (!IsFastCall) {
 
 	    /* Not a fastcall function - we may use the primary */
        	    if (PtrOnStack) {
-		/* If we have no parameters, the pointer is still in the
-		 * primary. Remove the code to push it and correct the
-		 * stack pointer.
-		 */
-		if (ParamSize == 0) {
-		    RemoveCode (Mark);
-		    pop (CF_PTR);
-		    PtrOnStack = 0;
-		} else {
-		    /* Load from the saved copy */
-		    g_getlocal (CF_PTR, PtrOffs);
-		}
+	    	/* If we have no parameters, the pointer is still in the
+	    	 * primary. Remove the code to push it and correct the
+	    	 * stack pointer.
+	    	 */
+	    	if (ParamSize == 0) {
+	    	    RemoveCode (Mark);
+	    	    pop (CF_PTR);
+	    	    PtrOnStack = 0;
+	    	} else {
+	    	    /* Load from the saved copy */
+	    	    g_getlocal (CF_PTR, PtrOffs);
+	    	}
 	    } else {
 	     	/* Load from original location */
 	     	exprhs (CF_NONE, k, lval);
 	    }
 
 	    /* Call the function */
-	    g_callind (TypeOf (lval->Type), ParamSize);
-
-	    /* If we have a pointer on stack, remove it */
-	    if (PtrOnStack) {
-	     	g_space (- (int) sizeofarg (CF_PTR));
-	     	pop (CF_PTR);
-	    }
+	    g_callind (TypeOf (lval->Type), ParamSize, PtrOffs);
 
      	} else {
 
@@ -811,11 +805,16 @@ static void FunctionCall (int k, ExprDesc* lval)
 	     * Since fastcall functions may never be variadic, we can use the
 	     * index register for this purpose.
 	     */
-	    Error ("Not implemented");
-	    pop (CF_PTR);
+	    g_callind (CF_LOCAL, ParamSize, PtrOffs);
 	}
 
-	/* Skip T_PTR */	    
+	/* If we have a pointer on stack, remove it */
+	if (PtrOnStack) {
+	    g_space (- (int) sizeofarg (CF_PTR));
+	    pop (CF_PTR);
+	}
+							      
+	/* Skip T_PTR */
     	++lval->Type;
 
     } else {

@@ -137,7 +137,7 @@ static int NumArg (const char* Arg, unsigned long* Num)
 static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 /* Set the Use and Chg in E */
 {
-    unsigned short Use;
+    const ZPInfo* Info;
 
     /* If this is a subroutine call, or a jump to an external function,
      * lookup the information about this function and use it. The jump itself
@@ -162,20 +162,21 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 	    case AM65_ZPX:
 	    case AM65_ABSX:
 	    case AM65_ABSY:
-	        if (IsZPName (E->Arg, &Use) && Use != REG_NONE) {
+	        Info = GetZPInfo (E->Arg);
+	        if (Info && Info->ByteUse != REG_NONE) {
 		    if (E->OPC == OP65_ASL || E->OPC == OP65_DEC ||
-			E->OPC == OP65_INC || E->OPC == OP65_LSR ||
-			E->OPC == OP65_ROL || E->OPC == OP65_ROR ||
-			E->OPC == OP65_TRB || E->OPC == OP65_TSB) {
-			/* The zp loc is both, input and output */
-			E->Chg |= Use;
-			E->Use |= Use;
+		       	E->OPC == OP65_INC || E->OPC == OP65_LSR ||
+		       	E->OPC == OP65_ROL || E->OPC == OP65_ROR ||
+		       	E->OPC == OP65_TRB || E->OPC == OP65_TSB) {
+		       	/* The zp loc is both, input and output */
+		       	E->Chg |= Info->ByteUse;
+		       	E->Use |= Info->ByteUse;
 		    } else if ((E->Info & OF_STORE) != 0) {
-			/* Just output */
-			E->Chg |= Use;
+		       	/* Just output */
+		       	E->Chg |= Info->ByteUse;
 		    } else {
-			/* Input only */
-			E->Use |= Use;
+		       	/* Input only */
+		       	E->Use |= Info->ByteUse;
 		    }
 		}
 	        break;
@@ -183,9 +184,10 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 	    case AM65_ZPX_IND:
 	    case AM65_ZP_INDY:
 	    case AM65_ZP_IND:
-	        if (IsZPName (E->Arg, &Use) && Use != REG_NONE) {
+	        Info = GetZPInfo (E->Arg);
+	        if (Info && Info->ByteUse != REG_NONE) {
 		    /* These addressing modes will never change the zp loc */
-		    E->Use |= Use;
+		    E->Use |= Info->WordUse;
 		}
 	        break;
 
@@ -774,7 +776,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    Out->RegX = In->RegA;
 	    break;
 
-	case OP65_TAY:	     
+	case OP65_TAY:
 	    Out->RegY = In->RegA;
 	    break;
 
@@ -821,17 +823,10 @@ static char* RegInfoDesc (unsigned U, char* Buf)
     strcat (Buf, U & REG_A?       "A" : "_");
     strcat (Buf, U & REG_X?       "X" : "_");
     strcat (Buf, U & REG_Y?       "Y" : "_");
-    strcat (Buf, U & REG_SP?      "S" : "_");
     strcat (Buf, U & REG_TMP1?    "T1" : "__");
-    strcat (Buf, U & REG_TMP2?    "T2" : "__");
-    strcat (Buf, U & REG_TMP3?    "T3" : "__");
-    strcat (Buf, U & REG_TMP4?    "T4" : "__");
     strcat (Buf, U & REG_PTR1?    "1" : "_");
     strcat (Buf, U & REG_PTR2?    "2" : "_");
-    strcat (Buf, U & REG_PTR3?    "3" : "_");
-    strcat (Buf, U & REG_PTR4?    "4" : "_");
     strcat (Buf, U & REG_SAVE?    "V"  : "_");
-    strcat (Buf, U & REG_BANK?    "B" : "_");
 
     return Buf;
 }

@@ -2373,15 +2373,33 @@ void g_call (unsigned Flags, const char* Label, unsigned ArgSize)
 
 
 
-void g_callind (unsigned Flags, unsigned ArgSize)
-/* Call subroutine with address in AX */
+void g_callind (unsigned Flags, unsigned ArgSize, int Offs)
+/* Call subroutine indirect */
 {
-    if ((Flags & CF_FIXARGC) == 0) {
-	/* Pass arg count */
-	ldyconst (ArgSize);
+    if ((Flags & CF_LOCAL) == 0) {
+	/* Address is in a/x */
+	if ((Flags & CF_FIXARGC) == 0) {
+	    /* Pass arg count */
+	    ldyconst (ArgSize);
+	}
+	AddCodeLine ("jsr callax");
+    } else {
+	/* The address is on stack, offset is on Val */
+	Offs -= oursp;
+	CheckLocalOffs (Offs);
+	AddCodeLine ("pha");
+	AddCodeLine ("ldy #$%02X", Offs);
+	AddCodeLine ("lda (sp),y");
+	AddCodeLine ("sta jmpvec+1");
+	AddCodeLine ("iny");
+	AddCodeLine ("lda (sp),y");
+	AddCodeLine ("sta jmpvec+2");
+	AddCodeLine ("pla");
+	AddCodeLine ("jsr jmpvec");
     }
-    AddCodeLine ("jsr callax");	/* do the call */
-    oursp += ArgSize;			/* callee pops args */
+
+    /* Callee pops args */
+    oursp += ArgSize;
 }
 
 

@@ -112,9 +112,9 @@ static const FuncInfo FuncInfoTable[] = {
     { "incsp6",	       	REG_NONE,      	      REG_Y			     },
     { "incsp7",	       	REG_NONE,      	      REG_Y			     },
     { "incsp8",	       	REG_NONE,      	      REG_Y			     },
-    { "laddeq",		REG_EAXY | REG_PTR1,  REG_EAXY                       },
-    { "laddeq1",       	REG_Y | REG_PTR1,     REG_EAXY                       },
-    { "laddeqa",        REG_AY | REG_PTR1,    REG_EAXY                       },
+    { "laddeq",		REG_EAXY|REG_PTR1_LO, REG_EAXY | REG_PTR1_HI         },
+    { "laddeq1",       	REG_Y | REG_PTR1_LO,  REG_EAXY | REG_PTR1_HI         },
+    { "laddeqa",        REG_AY | REG_PTR1_LO, REG_EAXY | REG_PTR1_HI         },
     { "ldaidx",         REG_AXY,              REG_AX | REG_PTR1		     },
     { "ldauidx",        REG_AXY,              REG_AX | REG_PTR1		     },
     { "ldax0sp",       	REG_Y, 	       	      REG_AX			     },
@@ -143,6 +143,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "shreax4",        REG_EAX,              REG_AX | REG_TMP1		     },
     { "staspidx",       REG_A | REG_Y,        REG_Y | REG_TMP1 | REG_PTR1    },
     { "stax0sp",        REG_AX,               REG_Y			     },
+    { "staxysp",        REG_AXY,              REG_Y			     },
     { "tosicmp",       	REG_AX,	       	      REG_AXY | REG_SREG	     },
     { "tosdiva0",       REG_AX,	       	      REG_ALL			     },
     { "tosdivax",       REG_AX,	       	      REG_ALL			     },
@@ -158,26 +159,23 @@ static const FuncInfo FuncInfoTable[] = {
 #define FuncInfoCount	(sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
 /* Table with names of zero page locations used by the compiler */
-typedef struct ZPInfo ZPInfo;
-struct ZPInfo {
-    unsigned char  Len;		/* Length of the following string */
-    char           Name[11];    /* Name of zero page symbol */
-    unsigned short RegInfo;     /* Register info for this symbol */
-};
 static const ZPInfo ZPInfoTable[] = {
-    {  	4,     	"ptr1",         REG_PTR1        },
-    {  	4,     	"ptr2",         REG_PTR2        },
-    {  	4,     	"ptr3",         REG_PTR3        },
-    {  	4,     	"ptr4",         REG_PTR4        },
-    {   7,      "regbank",      REG_BANK        },
-    {   7,      "regsave",      REG_SAVE        },
-    {   2,      "sp",           REG_SP          },
-    {   0,      "sreg",         REG_SREG_LO     },
-    {	0,      "sreg+1",       REG_SREG_HI     },
-    {   4,      "tmp1",         REG_TMP1        },
-    {   4,      "tmp2",         REG_TMP2        },
-    {   4,      "tmp3",         REG_TMP3        },
-    {   4,      "tmp4",         REG_TMP4        },
+    {  	0, "ptr1",      REG_PTR1_LO, 	REG_PTR1        },
+    {   0, "ptr1+1",    REG_PTR1_HI, 	REG_PTR1        },
+    {  	0, "ptr2",      REG_PTR2_LO, 	REG_PTR2        },
+    {   0, "ptr2+1",    REG_PTR2_HI, 	REG_PTR2        },
+    {  	4, "ptr3",      REG_NONE, 	REG_NONE        },
+    {  	4, "ptr4",      REG_NONE, 	REG_NONE        },
+    {   7, "regbank",   REG_NONE, 	REG_NONE        },
+    {   0, "regsave",   REG_SAVE_LO, 	REG_SAVE        },
+    {   0, "regsave+1", REG_SAVE_HI, 	REG_SAVE        },
+    {   2, "sp",        REG_NONE, 	REG_NONE        },
+    {   0, "sreg",      REG_SREG_LO, 	REG_SREG        },
+    {	0, "sreg+1",    REG_SREG_HI, 	REG_SREG        },
+    {   0, "tmp1",      REG_TMP1, 	REG_TMP1        },
+    {   0, "tmp2",      REG_NONE, 	REG_NONE        },
+    {   0, "tmp3",      REG_NONE, 	REG_NONE        },
+    {   0, "tmp4",      REG_NONE, 	REG_NONE        },
 };
 #define ZPInfoCount    	(sizeof(ZPInfoTable) / sizeof(ZPInfoTable[0]))
 
@@ -259,10 +257,10 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
 	}
     }
 
-    /* Function not found - assume all CPU registers are input, and all
+    /* Function not found - assume that the primary register is input, and all
      * registers are changed
      */
-    *Use = REG_AXY;
+    *Use = REG_EAXY;
     *Chg = REG_ALL;
 }
 
@@ -294,27 +292,14 @@ static int CompareZPInfo (const void* Name, const void* Info)
 
 
 
-int IsZPName (const char* Name, unsigned short* RegInfo)
-/* Return true if the given name is a zero page symbol. If the RegInfo
- * pointer is not NULL, it is filled with the register info for the
- * zero page location found.
+const ZPInfo* GetZPInfo (const char* Name)
+/* If the given name is a zero page symbol, return a pointer to the info
+ * struct for this symbol, otherwise return NULL.
  */
 {
     /* Search for the zp location in the list */
-    const ZPInfo* Info = bsearch (Name, ZPInfoTable, ZPInfoCount,
-				  sizeof(ZPInfo), CompareZPInfo);
-
-    /* Did we find it? */
-    if (Info) {
-     	/* Found, store register info if requested. */
-     	if (RegInfo) {
-     	    *RegInfo = Info->RegInfo;
-     	}
-     	return 1;
-    } else {
-     	/* Not found */
-     	return 0;
-    }
+    return bsearch (Name, ZPInfoTable, ZPInfoCount,
+	       	    sizeof(ZPInfo), CompareZPInfo);
 }
 
 

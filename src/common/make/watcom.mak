@@ -51,6 +51,7 @@ OBJS =	abend.obj	\
         debugflag.obj   \
 	exprdefs.obj	\
 	filepos.obj	\
+        filetype.obj    \
 	fname.obj	\
 	hashstr.obj	\
         matchpat.obj    \

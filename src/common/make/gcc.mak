@@ -19,6 +19,7 @@ OBJS =	abend.o		\
         debugflag.o     \
 	exprdefs.o	\
 	filepos.o	\
+        filetype.o      \
 	fname.o		\
 	hashstr.o	\
         matchpat.o      \

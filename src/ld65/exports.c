@@ -364,14 +364,14 @@ Export* CreateConstExport (const char* Name, long Value)
 
 
 
-Export* CreateMemExport (const char* Name, Memory* Mem, unsigned long Offs)
+Export* CreateMemoryExport (const char* Name, Memory* Mem, unsigned long Offs)
 /* Create an relative export for a memory area offset */
 {
     /* Create a new export */
     Export* E = NewExport (EXP_ABS | EXP_EXPR | EXP_LABEL, Name, 0);
 
     /* Assign the value */
-    E->Expr = MemExpr (Mem, Offs, 0);
+    E->Expr = MemoryExpr (Mem, Offs, 0);
 
     /* Insert the export */
     InsertExport (E);
@@ -382,14 +382,32 @@ Export* CreateMemExport (const char* Name, Memory* Mem, unsigned long Offs)
 
 
 
-Export* CreateSegExport (const char* Name, Section* Sec, unsigned long Offs)
-/* Create a relative export to a segment (section) */
+Export* CreateSegmentExport (const char* Name, Segment* Seg, unsigned long Offs)
+/* Create a relative export to a segment */
 {
     /* Create a new export */
     Export* E = NewExport (EXP_ABS | EXP_EXPR | EXP_LABEL, Name, 0);
 
     /* Assign the value */
-    E->Expr = SegExpr (Sec, Offs, 0);
+    E->Expr = SegmentExpr (Seg, Offs, 0);
+
+    /* Insert the export */
+    InsertExport (E);
+
+    /* Return the new export */
+    return E;
+}
+
+
+
+Export* CreateSectionExport (const char* Name, Section* Sec, unsigned long Offs)
+/* Create a relative export to a section */
+{
+    /* Create a new export */
+    Export* E = NewExport (EXP_ABS | EXP_EXPR | EXP_LABEL, Name, 0);
+
+    /* Assign the value */
+    E->Expr = SectionExpr (Sec, Offs, 0);
 
     /* Insert the export */
     InsertExport (E);

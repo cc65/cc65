@@ -173,7 +173,8 @@ struct ExprDesc {
     O65Desc*   	    D;			/* File format descriptor */
     long       	    Val;		/* The offset value */
     int	       	    TooComplex;	       	/* Expression too complex */
-    Section*   	    SegRef;		/* Section referenced if any */
+    Segment*        SegRef;             /* Segment reference if any */
+    Section*   	    SecRef;		/* Section reference if any */
     ExtSym*    	    ExtRef;		/* External reference if any */
 };
 
@@ -192,6 +193,7 @@ static ExprDesc* InitExprDesc (ExprDesc* ED, O65Desc* D)
     ED->Val  	   = 0;
     ED->TooComplex = 0;
     ED->SegRef     = 0;
+    ED->SecRef     = 0;
     ED->ExtRef     = 0;
     return ED;
 }
@@ -277,7 +279,7 @@ static const SegDesc* O65FindSeg (const O65Desc* D, const Segment* S)
 
 
 /*****************************************************************************/
-/*  	 	      	      Expression handling			     */
+/*  	 	       	      Expression handling			     */
 /*****************************************************************************/
 
 
@@ -328,15 +330,32 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
     	    }
     	    break;
 
-    	case EXPR_SEGMENT:
+    	case EXPR_SECTION:
+    	    if (D->SecRef) {
+    	        /* We cannot handle more than one segment reference in o65 */
+    		D->TooComplex = 1;
+    	    } else {
+    	 	/* Remember the segment reference */
+    		D->SecRef = GetExprSection (Expr);
+                /* Add the offset of the section to the constant value */
+                Val = D->SecRef->Offs + D->SecRef->Seg->PC;
+                if (Sign < 0) {
+                    D->Val -= Val;
+                } else {
+                    D->Val += Val;
+                }
+    	    }
+    	    break;
+
+        case EXPR_SEGMENT:
     	    if (D->SegRef) {
     	        /* We cannot handle more than one segment reference in o65 */
     		D->TooComplex = 1;
     	    } else {
     	 	/* Remember the segment reference */
-    		D->SegRef = GetExprSection (Expr);
-                /* Add the offset of the section to the constant value */
-                Val = D->SegRef->Offs + D->SegRef->Seg->PC;
+       	       	D->SegRef = Expr->V.Seg;
+                /* Add the offset of the segment to the constant value */
+                Val = D->SegRef->PC;
                 if (Sign < 0) {
                     D->Val -= Val;
                 } else {
@@ -522,10 +541,11 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
  * table.
  */
 {
-    long Diff;
-    long BinVal;
-    ExprNode* Expr;
-    ExprDesc ED;
+    long          Diff;
+    unsigned      RefCount;
+    long          BinVal;
+    ExprNode*     Expr;
+    ExprDesc      ED;
     unsigned char RelocType;
 
     /* Cast the Data pointer to its real type, an O65Desc */
@@ -564,8 +584,9 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     /* Recursively collect information about this expression */
     O65ParseExpr (Expr, InitExprDesc (&ED, D), 1);
 
-    /* We cannot handle both, an imported symbol and a segment ref */
-    if (ED.SegRef != 0 && ED.ExtRef != 0) {
+    /* We cannot handle more than one external reference */
+    RefCount = (ED.SegRef != 0) + (ED.SecRef != 0) + (ED.ExtRef != 0);
+    if (RefCount > 1) {                  
        	ED.TooComplex = 1;
     }
 
@@ -574,8 +595,8 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
        	return SEG_EXPR_TOO_COMPLEX;
     }
 
-    /* Safety: Check that we are really referencing a symbol or a segment */
-    CHECK (ED.SegRef != 0 || ED.ExtRef != 0);
+    /* Safety: Check that we have exactly one reference */
+    CHECK (RefCount == 1);
 
     /* Write out the offset that goes into the segment. */
     BinVal = ED.Val;
@@ -602,57 +623,71 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
        	switch (Size) {
 
        	    case 1:
-       		RelocType = O65RELOC_LOW;
-       		break;
+       	   	RelocType = O65RELOC_LOW;
+       	   	break;
 
        	    case 2:
        	       	RelocType = O65RELOC_WORD;
-       		break;
+       	   	break;
 
        	    case 3:
-       		RelocType = O65RELOC_SEGADR;
-       		break;
+       	   	RelocType = O65RELOC_SEGADR;
+       	   	break;
 
        	    case 4:
-       		/* 4 byte expression not supported by o65 */
-       		return SEG_EXPR_TOO_COMPLEX;
+       	   	/* 4 byte expression not supported by o65 */
+       	   	return SEG_EXPR_TOO_COMPLEX;
 
        	    default:
-       	 	Internal ("O65WriteExpr: Invalid expression size: %u", Size);
-       		RelocType = 0;	  	/* Avoid gcc warnings */
+       	   	Internal ("O65WriteExpr: Invalid expression size: %u", Size);
+       	   	RelocType = 0;	  	/* Avoid gcc warnings */
        	}
     }
 
     /* Determine which segment we're referencing */
-    if (ED.ExtRef) {
+    if (ED.SegRef || ED.SecRef) {
+
+        const SegDesc* Seg;
+
+        /* Segment or section reference. */
+        if (ED.SecRef) {
+            /* Get segment from section */
+            ED.SegRef = ED.SecRef->Seg;
+        }
+
+       	/* Search for the segment and map it to it's o65 segmentID */
+       	Seg = O65FindSeg (D, ED.SegRef);
+    	if (Seg == 0) {
+    	    /* For some reason, we didn't find this segment in the list of
+    	     * segments written to the o65 file.
+    	     */
+    	    return SEG_EXPR_INVALID;
+    	}
+    	RelocType |= O65SegType (Seg);
+    	O65RelocPutByte (D->CurReloc, RelocType);
+
+    	/* Output additional data if needed */
+    	switch (RelocType & O65RELOC_MASK) {
+    	    case O65RELOC_HIGH:
+    	        O65RelocPutByte (D->CurReloc, ED.Val & 0xFF);
+    	        break;
+    	    case O65RELOC_SEG:
+    	        O65RelocPutWord (D->CurReloc, ED.Val & 0xFFFF);
+    	        break;
+    	}
+
+    } else if (ED.ExtRef) {
        	/* Imported symbol */
        	RelocType |= O65SEG_UNDEF;
        	O65RelocPutByte (D->CurReloc, RelocType);
        	/* Put the number of the imported symbol into the table */
        	O65RelocPutWord (D->CurReloc, ExtSymNum (ED.ExtRef));
-    } else {
-       	/* Segment reference. Search for the segment and map it to it's
-	 * o65 segmentID
-	 */
-       	const SegDesc* Seg = O65FindSeg (D, ED.SegRef->Seg);
-	if (Seg == 0) {
-	    /* For some reason, we didn't find this segment in the list of
-	     * segments written to the o65 file.
-	     */
-	    return SEG_EXPR_INVALID;
-	}
-	RelocType |= O65SegType (Seg);
-	O65RelocPutByte (D->CurReloc, RelocType);
 
-	/* Output additional data if needed */
-	switch (RelocType & O65RELOC_MASK) {
-	    case O65RELOC_HIGH:
-	        O65RelocPutByte (D->CurReloc, ED.Val & 0xFF);
-	        break;
-	    case O65RELOC_SEG:
-	        O65RelocPutWord (D->CurReloc, ED.Val & 0xFFFF);
-	        break;
-    	}
+    } else {
+
+        /* OOPS - something bad happened */
+        Internal ("External reference not handled");
+
     }
 
     /* Success */
@@ -843,8 +878,10 @@ static void O65WriteExports (O65Desc* D)
 	/* Recursively collect information about this expression */
 	O65ParseExpr (Expr, InitExprDesc (&ED, D), 1);
 
-       	/* We cannot handle expressions with imported symbols here */
-	if (ED.ExtRef != 0) {
+       	/* We cannot handle expressions with imported symbols, or expressions
+         * with more than one segment reference here 
+         */
+	if (ED.ExtRef != 0 || (ED.SegRef != 0 && ED.SecRef != 0)) {
 	    ED.TooComplex = 1;
 	}
 
@@ -854,14 +891,17 @@ static void O65WriteExports (O65Desc* D)
 	}
 
 	/* Determine the segment id for the expression */
-	if (ED.SegRef == 0) {
-	    /* Absolute value */
-	    SegmentID = O65SEG_ABS;
-	} else {
-	    /* Segment reference. Search for the segment and map it to it's
-	     * o65 segmentID
-	     */
-	    const SegDesc* Seg = O65FindSeg (D, ED.SegRef->Seg);
+        if (ED.SegRef != 0 || ED.SecRef != 0) {
+            
+            const SegDesc* Seg;
+
+            /* Segment or section reference */
+            if (ED.SecRef != 0) {
+                ED.SegRef = ED.SecRef->Seg;     /* Get segment from section */
+            }
+
+       	    /* Search for the segment and map it to it's o65 segmentID */
+	    Seg = O65FindSeg (D, ED.SegRef);
 	    if (Seg == 0) {
 		/* For some reason, we didn't find this segment in the list of
 		 * segments written to the o65 file.
@@ -869,6 +909,12 @@ static void O65WriteExports (O65Desc* D)
 		Error ("Segment for symbol `%s' is undefined", Name);
 	    }
 	    SegmentID = O65SegType (Seg);
+
+        } else {
+
+	    /* Absolute value */
+	    SegmentID = O65SEG_ABS;
+
 	}
 
 	/* Write the name to the output file */

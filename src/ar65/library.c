@@ -352,7 +352,7 @@ static void SkipExpr (unsigned char** Buf)
       	    *Buf += 2;
       	    return;
 
-        case EXPR_SEGMENT:
+        case EXPR_SECTION:
       	    /* 8 bit segment number */
       	    *Buf += 1;
       	    return;

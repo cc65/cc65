@@ -56,9 +56,10 @@
 /* Leaf node codes */
 #define EXPR_LITERAL           	(EXPR_LEAFNODE | 0x01)
 #define EXPR_SYMBOL            	(EXPR_LEAFNODE | 0x02)
-#define EXPR_SEGMENT           	(EXPR_LEAFNODE | 0x03)
-#define EXPR_MEMAREA		(EXPR_LEAFNODE | 0x04)	/* Linker only */
-#define EXPR_ULABEL		(EXPR_LEAFNODE | 0x05) 	/* Assembler only */
+#define EXPR_SECTION            (EXPR_LEAFNODE | 0x03)
+#define EXPR_SEGMENT   	       	(EXPR_LEAFNODE | 0x04)	/* Linker only */
+#define EXPR_MEMAREA   	       	(EXPR_LEAFNODE | 0x05) 	/* Linker only */
+#define EXPR_ULABEL		(EXPR_LEAFNODE | 0x06) 	/* Assembler only */
 
 /* Binary operations, left and right hand sides are valid */
 #define EXPR_PLUS      	       	(EXPR_BINARYNODE | 0x01)
@@ -100,18 +101,19 @@
 
 /* The expression node itself */
 typedef struct ExprNode ExprNode;
-struct ExprNode {
+struct ExprNode {                                    
     unsigned char    	    Op;	    	/* Operand/Type */
     ExprNode*  	     	    Left;      	/* Left leaf */
     ExprNode*  	     	    Right;     	/* Right leaf */
-    struct ObjData*	    Obj;	/* Object file reference (linker) */
+    struct ObjData* 	    Obj;	/* Object file reference (linker) */
     union {
        	long         	    Val;	/* If this is a value */
        	struct SymEntry*    Sym;	/* If this is a symbol */
 	unsigned       	    SegNum;  	/* If this is a segment */
-	unsigned	    ImpNum;	/* If this is an import */
-	struct Memory*	    MemArea;	/* If this is a memory area */
-	struct Section*	    Sec;	/* If segment and Obj is NULL */
+	unsigned    	    ImpNum;	/* If this is an import */
+        struct Memory*      Mem;        /* If this is a memory area */
+	struct Segment*	    Seg;	/* If this is a segment */
+	struct Section*	    Sec;	/* If section and Obj is NULL */
     } V;
 };
 

@@ -204,10 +204,10 @@ Export* GetExprExport (ExprNode* Expr)
 
 
 Section* GetExprSection (ExprNode* Expr)
-/* Get the segment for a segment expression node */
+/* Get the segment for a section expression node */
 {
-    /* Check that this is really a segment node */
-    PRECONDITION (Expr->Op == EXPR_SEGMENT);
+    /* Check that this is really a section node */
+    PRECONDITION (Expr->Op == EXPR_SECTION);
 
     /* If we have an object file, get the section from it, otherwise
      * (internally generated expressions), get the section from the
@@ -243,21 +243,24 @@ long GetExprVal (ExprNode* Expr)
 	     * which in turn means, that we have a circular reference.
 	     */
 	    if (ExportHasMark (E)) {
-		CircularRefError (E);
-		Val = 0;
+	  	CircularRefError (E);
+	  	Val = 0;
 	    } else {
-		MarkExport (E);
+	  	MarkExport (E);
 	    	Val = GetExportVal (E);
-		UnmarkExport (E);
+	  	UnmarkExport (E);
 	    }
 	    return Val;
 
-        case EXPR_SEGMENT:
+        case EXPR_SECTION:
        	    S = GetExprSection (Expr);
 	    return S->Offs + S->Seg->PC;
 
-	case EXPR_MEMAREA:
-       	    return Expr->V.MemArea->Start;
+	case EXPR_SEGMENT:
+       	    return Expr->V.Seg->PC;
+
+        case EXPR_MEMAREA:
+            return Expr->V.Mem->Start;
 
        	case EXPR_PLUS:
     	    return GetExprVal (Expr->Left) + GetExprVal (Expr->Right);
@@ -371,38 +374,69 @@ ExprNode* LiteralExpr (long Val, ObjData* O)
 
 
 
-ExprNode* MemExpr (Memory* Mem, long Offs, ObjData* O)
-/* Return an expression tree that encodes an offset into the memory area */
+ExprNode* MemoryExpr (Memory* Mem, long Offs, ObjData* O)
+/* Return an expression tree that encodes an offset into a memory area */
 {
     ExprNode* Root;
 
     ExprNode* Expr = NewExprNode (O);
     Expr->Op = EXPR_MEMAREA;
-    Expr->V.MemArea = Mem;
+    Expr->V.Mem = Mem;
 
-    Root = NewExprNode (O);
-    Root->Op = EXPR_PLUS;
-    Root->Left = Expr;
-    Root->Right = LiteralExpr (Offs, O);
+    if (Offs != 0) {
+        Root = NewExprNode (O);
+        Root->Op = EXPR_PLUS;
+        Root->Left = Expr;
+        Root->Right = LiteralExpr (Offs, O);
+    } else {
+        Root = Expr;
+    }
 
     return Root;
 }
 
 
 
-ExprNode* SegExpr (Section* Sec, long Offs, ObjData* O)
+ExprNode* SegmentExpr (Segment* Seg, long Offs, ObjData* O)
 /* Return an expression tree that encodes an offset into a segment */
 {
     ExprNode* Root;
 
     ExprNode* Expr = NewExprNode (O);
     Expr->Op = EXPR_SEGMENT;
+    Expr->V.Seg = Seg;
+
+    if (Offs != 0) {
+        Root = NewExprNode (O);
+        Root->Op = EXPR_PLUS;
+        Root->Left = Expr;
+        Root->Right = LiteralExpr (Offs, O);
+    } else {
+        Root = Expr;
+    }
+
+    return Root;
+}
+
+
+
+ExprNode* SectionExpr (Section* Sec, long Offs, ObjData* O)
+/* Return an expression tree that encodes an offset into a section */
+{
+    ExprNode* Root;
+
+    ExprNode* Expr = NewExprNode (O);
+    Expr->Op = EXPR_SECTION;
     Expr->V.Sec = Sec;
 
-    Root = NewExprNode (O);
-    Root->Op = EXPR_PLUS;
-    Root->Left = Expr;
-    Root->Right = LiteralExpr (Offs, O);
+    if (Offs != 0) {
+        Root = NewExprNode (O);
+        Root->Op = EXPR_PLUS;
+        Root->Left = Expr;
+        Root->Right = LiteralExpr (Offs, O);
+    } else {
+        Root = Expr;
+    }
 
     return Root;
 }
@@ -437,7 +471,7 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 	   	Expr->V.ImpNum = Read16 (F);
 	   	break;
 
-	    case EXPR_SEGMENT:
+	    case EXPR_SECTION:
 	   	/* Read the segment number */
 	   	Expr->V.SegNum = Read8 (F);
 	   	break;
@@ -488,13 +522,17 @@ int EqualExpr (ExprNode* E1, ExprNode* E2)
 	    /* Import number must be identical */
 	    return (E1->V.ImpNum == E2->V.ImpNum);
 
-	case EXPR_SEGMENT:
+	case EXPR_SECTION:
        	    /* Section must be identical */
        	    return (GetExprSection (E1) == GetExprSection (E2));
 
+	case EXPR_SEGMENT:
+       	    /* Segment must be identical */
+       	    return (E1->V.Seg == E2->V.Seg);
+
 	case EXPR_MEMAREA:
        	    /* Memory area must be identical */
-       	    return (E1->V.MemArea == E2->V.MemArea);
+       	    return (E1->V.Mem == E2->V.Mem );
 
 	default:
 	    /* Not a leaf node */

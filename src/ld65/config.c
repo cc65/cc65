@@ -43,6 +43,7 @@
 #include "bitops.h"
 #include "print.h"
 #include "xmalloc.h"
+#include "xsprintf.h"
 
 /* ld65 */
 #include "bin.h"
@@ -444,7 +445,7 @@ static void ParseMemory (void)
 		    break;
 
 	      	case CFGTOK_SIZE:
-		    FlagAttr (&M->Attr, MA_SIZE, "SIZE");
+	     	    FlagAttr (&M->Attr, MA_SIZE, "SIZE");
 		    CfgAssureInt ();
 	      	    M->Size = CfgIVal;
 		    break;
@@ -484,7 +485,7 @@ static void ParseMemory (void)
 
 	      	case CFGTOK_FILLVAL:
 		    FlagAttr (&M->Attr, MA_FILLVAL, "FILLVAL");
-		    CfgAssureInt ();
+	     	    CfgAssureInt ();
 		    CfgRangeCheck (0, 0xFF);
 	      	    M->FillVal = (unsigned char) CfgIVal;
 		    break;
@@ -1388,27 +1389,27 @@ void CfgRead (void)
 
 
 
-static void CreateRunDefines (Memory* M, SegDesc* S, unsigned long Addr)
+static void CreateRunDefines (SegDesc* S)
 /* Create the defines for a RUN segment */
 {
     char Buf [256];
 
-    sprintf (Buf, "__%s_RUN__", S->Name);
-    CreateMemExport (Buf, M, Addr - M->Start);
-    sprintf (Buf, "__%s_SIZE__", S->Name);
+    xsprintf (Buf, sizeof (Buf), "__%s_RUN__", S->Name);
+    CreateSegmentExport (Buf, S->Seg, 0);
+    xsprintf (Buf, sizeof (Buf), "__%s_SIZE__", S->Name);
     CreateConstExport (Buf, S->Seg->Size);
     S->Flags |= SF_RUN_DEF;
 }
 
 
 
-static void CreateLoadDefines (Memory* M, SegDesc* S, unsigned long Addr)
+static void CreateLoadDefines (Memory* M, SegDesc* S)
 /* Create the defines for a LOAD segment */
 {
     char Buf [256];
 
-    sprintf (Buf, "__%s_LOAD__", S->Name);
-    CreateMemExport (Buf, M, Addr - M->Start);
+    xsprintf (Buf, sizeof (Buf), "__%s_LOAD__", S->Name);
+    CreateMemoryExport (Buf, M, S->Seg->PC - M->Start);
     S->Flags |= SF_LOAD_DEF;
 }
 
@@ -1486,22 +1487,22 @@ void CfgAssignSegments (void)
 		     */
 		    if (S->Load == M) {
 		 	if ((S->Flags & SF_LOAD_DEF) == 0) {
-			    CreateLoadDefines (M, S, Addr);
+			    CreateLoadDefines (M, S);
 		 	} else {
 		 	    CHECK ((S->Flags & SF_RUN_DEF) == 0);
-		 	    CreateRunDefines (M, S, Addr);
+		 	    CreateRunDefines (S);
 			}
 		    }
 		} else {
 		    /* RUN and LOAD in different memory areas, or RUN not
-		     * given, so RUN defaults to LOAD. In the latter case, we
+     		     * given, so RUN defaults to LOAD. In the latter case, we
 		     * have only one copy of the segment in the area.
 		     */
 		    if (S->Run == M) {
-			CreateRunDefines (M, S, Addr);
+			CreateRunDefines (S);
 		    }
 		    if (S->Load == M) {
-			CreateLoadDefines (M, S, Addr);
+			CreateLoadDefines (M, S);
 		    }
 		}
      	    }
@@ -1517,7 +1518,7 @@ void CfgAssignSegments (void)
 	if (M->Flags & MF_DEFINE) {
 	    char Buf [256];
 	    sprintf (Buf, "__%s_START__", M->Name);
-	    CreateMemExport (Buf, M, 0);
+	    CreateMemoryExport (Buf, M, 0);
 	    sprintf (Buf, "__%s_SIZE__", M->Name);
 	    CreateConstExport (Buf, M->Size);
 	    sprintf (Buf, "__%s_LAST__", M->Name);

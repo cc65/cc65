@@ -120,11 +120,14 @@ void InsertExport (Export* E);
 Export* CreateConstExport (const char* Name, long Value);
 /* Create an export for a literal date */
 
-Export* CreateMemExport (const char* Name, Memory* Mem, unsigned long Offs);
+Export* CreateMemoryExport (const char* Name, Memory* Mem, unsigned long Offs);
 /* Create an relative export for a memory area offset */
 
-Export* CreateSegExport (const char* Name, Section* S, unsigned long Offs);
-/* Create a relative export to a segment (section) */
+Export* CreateSegmentExport (const char* Name, Segment* Seg, unsigned long Offs);
+/* Create a relative export to a segment */
+
+Export* CreateSectionExport (const char* Name, Section* S, unsigned long Offs);
+/* Create a relative export to a section */
 
 Export* FindExport (const char* Name);
 /* Check for an identifier in the list. Return 0 if not found, otherwise
@@ -137,7 +140,7 @@ int IsUnresolved (const char* Name);
 int IsUnresolvedExport (const Export* E);
 /* Return true if the given export is unresolved */
 
-int IsConstExport (const Export* E);  
+int IsConstExport (const Export* E);
 /* Return true if the expression associated with this export is const */
 
 long GetExportVal (const Export* E);

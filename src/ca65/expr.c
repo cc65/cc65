@@ -971,7 +971,7 @@ ExprNode* CurrentPC (void)
     if (RelocMode) {
 	/* Create SegmentBase + Offset */
 	Left = NewExprNode ();
-	Left->Op = EXPR_SEGMENT;
+	Left->Op = EXPR_SECTION;
 	Left->V.SegNum = GetSegNum ();
 
 	Root = NewExprNode ();
@@ -1011,7 +1011,7 @@ ExprNode* BranchExpr (unsigned Offs)
     /* Create *+Offs */
     if (RelocMode) {
 	Left = NewExprNode ();
-	Left->Op = EXPR_SEGMENT;
+	Left->Op = EXPR_SECTION;
 	Left->V.SegNum = GetSegNum ();
 
 	N = NewExprNode ();
@@ -1176,7 +1176,7 @@ static void CheckByteExpr (const ExprNode* N, int* IsByte)
 			}
 			break;
 
-		    case EXPR_SEGMENT:
+		    case EXPR_SECTION:
 			if (GetSegType (N->V.SegNum) == SEGTYPE_ZP) {
 			    *IsByte = 1;
 			}
@@ -1416,7 +1416,7 @@ static ExprNode* RemoveSyms (ExprNode* Expr, int MustClone)
      	   	Clone->V.Sym = Expr->V.Sym;
 	   	break;
 
-	    case EXPR_SEGMENT:
+	    case EXPR_SECTION:
 	   	Clone->V.SegNum = Expr->V.SegNum;
 	   	break;
 
@@ -1477,7 +1477,7 @@ static ExprNode* ConstExtract (ExprNode* Expr, long* Val, int Sign)
      	    return Left;
      	} else {
      	    /* Check for SEG - SEG which is now possible */
-     	    if (Left->Op == EXPR_SEGMENT && Right->Op == EXPR_SEGMENT &&
+     	    if (Left->Op == EXPR_SECTION && Right->Op == EXPR_SECTION &&
 	 	Left->V.SegNum == Right->V.SegNum) {
      	     	/* SEG - SEG, remove it completely */
      	       	FreeExprNode (Left);
@@ -1563,7 +1563,7 @@ ExprNode* CloneExpr (ExprNode* Expr)
 	    Clone->V.Sym = Expr->V.Sym;
 	    break;
 
-	case EXPR_SEGMENT:
+	case EXPR_SECTION:
 	    Clone->V.SegNum = Expr->V.SegNum;
 	    break;
 
@@ -1606,7 +1606,7 @@ void WriteExpr (ExprNode* Expr)
 	    ObjWrite16 (GetSymIndex (Expr->V.Sym));
 	    break;
 
-        case EXPR_SEGMENT:
+        case EXPR_SECTION:
 	    ObjWrite8 (Expr->V.SegNum);
 	    break;
 

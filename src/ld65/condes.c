@@ -175,7 +175,7 @@ static void ConDesCreateOne (ConDesDesc* CD)
     /* Define the table start as an export, offset into section is zero
      * (the section only contains the table).
      */
-    CreateSegExport (CD->Label,	Sec, 0);
+    CreateSectionExport (CD->Label,	Sec, 0);
 
     /* If we have a CountSym name given AND if it is referenced, define it
      * with the number of elements in the table.

@@ -69,7 +69,7 @@ Export* GetExprExport (ExprNode* Expr);
 /* Get the exported symbol for a symbol expression node */
 
 Section* GetExprSection (ExprNode* Expr);
-/* Get the segment for a segment expression node */
+/* Get the segment for a section expression node */
 
 long GetExprVal (ExprNode* Expr);
 /* Get the value of a constant expression */
@@ -77,11 +77,14 @@ long GetExprVal (ExprNode* Expr);
 ExprNode* LiteralExpr (long Val, ObjData* O);
 /* Return an expression tree that encodes the given literal value */
 
-ExprNode* MemExpr (Memory* Mem, long Offs, ObjData* O);
+ExprNode* MemoryExpr (Memory* Mem, long Offs, ObjData* O);
 /* Return an expression tree that encodes an offset into the memory area */
 
-ExprNode* SegExpr (Section* Sec, long Offs, ObjData* O);
+ExprNode* SegmentExpr (Segment* Seg, long Offs, ObjData* O);
 /* Return an expression tree that encodes an offset into a segment */
+
+ExprNode* SectionExpr (Section* Sec, long Offs, ObjData* O);
+/* Return an expression tree that encodes an offset into a section */
 
 void DumpExpr (const ExprNode* Expr);
 /* Dump an expression tree to stdout */

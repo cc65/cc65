@@ -985,26 +985,21 @@ static void MakeNiceScreen (void)
     cputcxy (0, 0, CH_ULCORNER);
     chline (XSize - 2);
     cputc (CH_URCORNER);
-    cgetc ();
 
     /* Left line */
     cvlinexy (0, 1, 23);
-    cgetc ();
 
     /* Bottom line */
     cputc (CH_LLCORNER);
     chline (XSize - 2);
     cputc (CH_LRCORNER);
-    cgetc ();
 
     /* Right line */
     cvlinexy (XSize - 1, 1, 23);
-    cgetc ();
 
     /* Several divider lines */
     MakeTeeLine (7);
     MakeTeeLine (22);
-    cgetc ();
 
     /* Write something into the frame */
     for (I = 0, T = Text; I < sizeof (Text) / sizeof (Text [0]); ++I) {

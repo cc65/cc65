@@ -64,13 +64,14 @@ CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
 
 # ------------------------------------------------------------------------------
 # All library OBJ files
-
+			 
 OBJS =	abend.obj	\
 	bitops.obj	\
 	check.obj	\
 	cmdline.obj	\
 	coll.obj	\
 	exprdefs.obj	\
+	filepos.obj	\
 	fname.obj	\
 	hashstr.obj	\
 	wildargv.obj	\
@@ -81,7 +82,7 @@ OBJS =	abend.obj	\
 
 
 .PRECIOUS $(OBJS:.obj=.cc) $(LIB)
-			 
+
 # ------------------------------------------------------------------------------
 # Main targets
 

@@ -15,6 +15,7 @@ OBJS =	abend.o		\
 	cmdline.o	\
 	coll.o		\
 	exprdefs.o	\
+	filepos.o	\
 	fname.o		\
 	hashstr.o	\
 	target.o	\

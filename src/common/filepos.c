@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   filepos.h				     */
+/*				   filepos.c				     */
 /*                                                                           */
 /*			 File position data structure			     */
 /*                                                                           */
@@ -33,24 +33,8 @@
 
 
 
-#ifndef FILEPOS_H
-#define FILEPOS_H
-
-
-
-/*****************************************************************************/
-/*     	       	    		     Data				     */
-/*****************************************************************************/
-
-
-
-/* Type of a file position */
-typedef struct FilePos_ FilePos;
-struct FilePos_ {
-    unsigned long   Line;    	       	/* Line */
-    unsigned 	    Col;		/* Column */
-    unsigned 	    Name;		/* File */
-};
+/* common */
+#include "filepos.h"
 
 
 
@@ -60,14 +44,13 @@ struct FilePos_ {
 
 
 
-void InitFilePos (FilePos* P);
+void InitFilePos (FilePos* P)
 /* Initialize the file position (set all fields to zero) */
-
-
-
-/* End of filepos.h */
-
-#endif
+{
+    P->Line = 0;
+    P->Col  = 0;
+    P->Name = 0;
+}
 
 
 

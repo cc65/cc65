@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h> 
+#include <time.h>
 
 
 /* From _heap.h */
@@ -29,9 +29,10 @@ static char* Alloc (void)
      * also allow us to retrieve it later.
      */
     if (P) {
- 	memset (P, Size, Size);
+    	memset (P, Size, Size);
     } else {
- 	printf ("Could not allocate %u bytes\n", Size);
+    	printf ("Could not allocate %u bytes\n", Size);
+    	exit (EXIT_FAILURE);
     }
     return P;
 }
@@ -48,9 +49,10 @@ static void Free (unsigned char* P)
 
     /* Scan the block */
     for (I = 1; I < Size; ++I) {
-	if (P[I] != Size) {
-	    printf ("Scan failed - expected %02X, got %02X\n",
-	    	    Size, P[I]);
+    	if (P[I] != Size) {
+    	    printf ("Scan failed - expected %02X, got %02X\n",
+    	    	    Size, P[I]);
+    	    exit (EXIT_FAILURE);
        	}
     }
 
@@ -65,8 +67,8 @@ static void FillArray (void)
 {
     unsigned char I = 0;
     do {
- 	V[I] = Alloc ();
- 	++I;
+    	V[I] = Alloc ();
+    	++I;
     } while (I != 0);
 }
 
@@ -75,14 +77,30 @@ static void FillArray (void)
 static void ShowInfo (void)
 /* Show heap info */
 {
-    printf ("%04X  %04X  %04X  %04X  %04X\n",
-	    _horg, _hptr, _hend, _hfirst, _hlast);
+    /* Count free blocks */
+    unsigned Count = 0;
+    unsigned** P = (unsigned**) _hfirst;
+    while (P) {
+	++Count;
+	P = P[1];
+    }
+    printf ("%04X  %04X  %04X  %04X  %04X %u\n",
+      	    _horg, _hptr, _hend, _hfirst, _hlast, Count);
+
+    if (Count) {
+	P = (unsigned**) _hfirst;
+	while (P) {
+	    printf ("%04X  %04X  %04X %04X(%u)\n",
+		    (unsigned) P, P[2], P[1], P[0], P[0]);
+	    P = P[1];
+	}
+	getchar ();
+    }
 }
 
 
 
 static void Test1 (void)
-/* First test */
 {
     unsigned char I;
     FillArray ();
@@ -96,51 +114,12 @@ static void Test1 (void)
 
 
 static void Test2 (void)
-/* Second test */
 {
     unsigned char I;
     FillArray ();
     I = 0;
     do {
-	Free (V[I]);
-	I += 2;
-    } while (I != 0);
-    I = 1;
-    do {
-	Free (V[I]);
-	I += 2;
-    } while (I != 1);
-    ShowInfo ();
-}
-
-
-
-static void Test3 (void)
-/* Third test */
-{
-    unsigned char I;
-    FillArray ();
-    I = 0;
-    do {
-	Free (V[I]);
-	I += 2;
-    } while (I != 0);
-    do {
-       	V[I] = Alloc ();
-	I += 2;
-    } while (I != 0);
-    I = 1;
-    do {
-	Free (V[I]);
-	I += 2;
-    } while (I != 1);
-    do {
-       	V[I] = Alloc ();
-	I += 2;
-    } while (I != 1);
-    I = 0;
-    do {
-	Free (V[I]);
+       	Free (V[I]);
 	++I;
     } while (I != 0);
     ShowInfo ();
@@ -148,8 +127,72 @@ static void Test3 (void)
 
 
 
+static void Test3 (void)
+{
+    unsigned char I;
+    FillArray ();
+    I = 0;
+    do {
+     	--I;
+     	Free (V[I]);
+    } while (I != 0);
+    ShowInfo ();
+}
+
+
+
 static void Test4 (void)
-/* Fourth test */
+{
+    unsigned char I;
+    FillArray ();
+    I = 0;
+    do {
+	Free (V[I]);
+	I += 2;
+    } while (I != 0);
+    I = 1;
+    do {
+	Free (V[I]);
+	I += 2;
+    } while (I != 1);
+    ShowInfo ();
+}
+
+
+
+static void Test5 (void)
+{
+    unsigned char I;
+    FillArray ();
+    I = 0;
+    do {
+	Free (V[I]);
+	I += 2;
+    } while (I != 0);
+    do {
+       	V[I] = Alloc ();
+	I += 2;
+    } while (I != 0);
+    I = 1;
+    do {
+	Free (V[I]);
+	I += 2;
+    } while (I != 1);
+    do {
+       	V[I] = Alloc ();
+	I += 2;
+    } while (I != 1);
+    I = 0;
+    do {
+      	Free (V[I]);
+	++I;
+    } while (I != 0);
+    ShowInfo ();
+}
+
+
+
+static void Test6 (void)
 {
     unsigned char I, J;
     FillArray ();
@@ -186,6 +229,8 @@ int main (void)
     Test2 ();
     Test3 ();
     Test4 ();
+    Test5 ();
+    Test6 ();
 
     /* Calculate the time and print it */
     T = clock () - T;

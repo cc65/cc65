@@ -385,7 +385,7 @@ expression:
 <item> 	If the result of an expression is constant, the actual value is
        	checked to see if it's a byte sized expression or not.
 <item> 	If the expression is explicitly casted to a byte sized expression by
-       	one of the '&gt;'/'&lt;' operators, it is a byte expression.
+       	one of the '&gt;', '&lt;' or '^' operators, it is a byte expression.
 <item> 	If this is not the case, and the expression contains a symbol,
        	explicitly declared as zero page symbol (by one of the .importzp or
        	.exportzp instructions), then the whole expression is assumed to be
@@ -458,7 +458,6 @@ Available operators sorted by precedence:
     .XMATCH    	Builtin function	     	     	1
     .PARAMCOUNT Builtin pseudo variable	(r/o)	      	1
     .REFERENCED Builtin function	     	       	1
-    :: 	       	Global namespace override    	     	1
     +  	       	Unary plus   		     	     	1
     -  	       	Unary minus  		     	     	1
     ~  	       	Unary bitwise not	     	     	1
@@ -511,7 +510,7 @@ Some of the pseudo variables mentioned above need some more explanation:
   *	       	This symbol is replaced by the value of the program
 	       	counter at start of the current instruction. Note, that
 	       	'*' yields a rvalue, that means, you cannot assign to it.
-   	       	Use <tt/.ORG/ to set the program counter in sections with
+       	       	Use .ORG to set the program counter in sections with
 	       	absolute code.
 </verb></tscreen>
 <p>

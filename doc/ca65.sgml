@@ -109,6 +109,7 @@ Long options:
   --help      		Help (this text)
   --ignore-case		Ignore case of symbols
   --include-dir dir	Set an include directory search path
+  --list-bytes n        Maximum number of bytes per listing line
   --listing   		Create a listing if assembly was ok
   --pagelength n	Set the page length for the listing
   --smart     		Enable smart mode
@@ -177,6 +178,14 @@ Here is a description of all the command line options:
   Generate an assembler listing. The listing file will always have the
   name of the main input file with the extension replaced by ".lst". This
   may change in future versions.
+
+
+  <tag><tt>--list-bytes n</tt></tag>
+
+  Set the maximum number of bytes printed in the listing for one line of
+  input. See the <tt><ref id=".LISTBYTES" name=".LISTBYTES"></tt> directive
+  for more information. The value zero can be used to encode an unlimited
+  number of printed bytes.
 
 
   <tag><tt>-o name</tt></tag>

@@ -52,11 +52,19 @@
 /* Result codes of the function. The actual code is a bitwise or
  * of one or more of the following values.
  */
-#define JOY_UP       	0x01
-#define JOY_DOWN	0x02
-#define JOY_LEFT	0x04
-#define JOY_RIGHT	0x08
-#define JOY_FIRE	0x10
+#if defined(__VIC20__)
+#  define JOY_UP        0x04
+#  define JOY_DOWN      0x08
+#  define JOY_LEFT      0x10
+#  define JOY_RIGHT     0x80
+#  define JOY_FIRE      0x20
+#else
+#  define JOY_UP       	0x01
+#  define JOY_DOWN	0x02
+#  define JOY_LEFT	0x04
+#  define JOY_RIGHT	0x08
+#  define JOY_FIRE	0x10
+#endif
 
 
 

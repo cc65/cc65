@@ -68,6 +68,7 @@ Short options:
   -vm			Verbose map file
 
 Long options:
+  --config name		Use linker config file
   --help		Help (this text)
   --mapfile name	Create a map file
   --start-addr addr     Set the default start address

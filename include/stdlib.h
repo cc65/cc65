@@ -46,7 +46,11 @@
 #define EXIT_SUCCESS	0
 #define EXIT_FAILURE	1
 
-
+/* Return type of the div function */
+typedef struct {
+    int rem;
+    int quot;
+} div_t;
 
 /* Memory management */
 void* __fastcall__ malloc (size_t size);
@@ -71,6 +75,7 @@ long __fastcall__ atol (const char* s);
 int __fastcall__ atexit (void (*exitfunc) (void));
 void* bsearch (const void* key, const void* base, size_t n,
 	       size_t size, int (*cmp) (const void*, const void*));
+div_t __fastcall__ div (int numer, int denom);
 void exit (int ret);
 char* __fastcall__ getenv (const char* name);
 void qsort (void* base, size_t count, size_t size,

@@ -7,7 +7,10 @@
 
        	.export	   	_set_brk, _reset_brk
 	.destructor	_reset_brk
-       	.export	       	_brk_a, _brk_x, _brk_y, _brk_sr, _brk_pc
+
+        ; Be sure to export the following variables absolute
+       	.export	       	_brk_a: abs, _brk_x: abs, _brk_y: abs
+        .export         _brk_sr: abs, _brk_pc: abs
 
 	.include   	"apple2.inc"
 

@@ -174,9 +174,9 @@ static CodeLabel* CS_AddLabelInternal (CodeSeg* S, const char* Name, int UserCod
      	/* We found it - be sure it does not already have an owner */
 	if (L->Owner) {
 	    if (UserCode) {
-		Error ("ASM label `%s' is already defined", Name);
+	       	Error ("ASM label `%s' is already defined", Name);
 	    } else {
-		Internal ("CS_AddLabelInternal: Label `%s' already defined", Name);
+	       	Internal ("CS_AddLabelInternal: Label `%s' already defined", Name);
 	    }
 	}
     } else {
@@ -220,7 +220,7 @@ static const char* SkipSpace (const char* S)
 
 
 static const char* ReadToken (const char* L, const char* Term,
-		     	      char* Buf, unsigned BufSize)
+		      	      char* Buf, unsigned BufSize)
 /* Read the next token into Buf, return the updated line pointer. The
  * token is terminated by one of the characters given in term.
  */
@@ -230,8 +230,14 @@ static const char* ReadToken (const char* L, const char* Term,
     unsigned ParenCount = 0;
     while (*L && (ParenCount > 0 || strchr (Term, *L) == 0)) {
 	if (I < BufSize-1) {
-	    Buf[I++] = *L;
+	    Buf[I] = *L;
+	} else if (I == BufSize-1) {
+	    /* Cannot store this character, this is an input error (maybe
+	     * identifier too long or similar).
+	     */
+	    Error ("ASM code error: syntax error");
 	}
+	++I;
 	if (*L == ')') {
 	    --ParenCount;
 	} else if (*L == '(') {
@@ -257,11 +263,11 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
  * white space, for example.
  */
 {
-    char       		Mnemo[16];
+    char       		Mnemo[64];
     const OPCDesc*	OPC;
     am_t      		AM = 0;		/* Initialize to keep gcc silent */
     char      		Arg[64];
-    char      	   	Reg;
+    char      	      	Reg;
     CodeEntry*	     	E;
     CodeLabel*		Label;
 
@@ -347,7 +353,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	     	    L = SkipSpace (L+1);
 	     	    if (toupper (*L) != 'Y') {
 	     		Error ("ASM code error: `Y' expected");
-	     		return 0;
+	     	      	return 0;
 	     	    }
 	     	    L = SkipSpace (L+1);
 	     	    if (*L != '\0') {
@@ -418,10 +424,12 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
     }
 
     /* If the instruction is a branch, check for the label and generate it
-     * if it does not exist. Ignore anything but local labels here.
+     * if it does not exist. This may lead to unused labels (if the label
+     * is actually an external one) which are removed by the CS_MergeLabels
+     * function later.
      */
     Label = 0;
-    if (AM == AM65_BRA && Arg[0] == 'L') {
+    if (AM == AM65_BRA) {
 
 	/* Generate the hash over the label, then search for the label */
 	unsigned Hash = HashStr (Arg) % CS_LABEL_HASH_SIZE;
@@ -806,45 +814,69 @@ void CS_MergeLabels (CodeSeg* S)
 {
     unsigned I;
 
+    /* First, remove all labels from the label symbol table that don't have an
+     * owner (this means that they are actually external labels but we didn't
+     * know that previously since they may have also been forward references).
+     */
+    for (I = 0; I < CS_LABEL_HASH_SIZE; ++I) {
+
+      	/* Get the first label in this hash chain */
+      	CodeLabel** L = &S->LabelHash[I];
+      	while (*L) {
+      	    if ((*L)->Owner == 0) {
+      	 	/* The label does not have an owner, remove it from the chain */
+      	 	CodeLabel* X = *L;
+       	       	*L = X->Next;
+      		if (Debug) {
+      		    printf ("Removing unused global label `%s'", X->Name);
+      		}
+      	 	FreeCodeLabel (X);
+      	    } else {
+      	 	/* Label is owned, point to next code label pointer */
+      	       	L = &((*L)->Next);
+      	    }
+      	}
+    }
+
     /* Walk over all code entries */
     for (I = 0; I < CS_GetEntryCount (S); ++I) {
 
        	CodeLabel* RefLab;
        	unsigned   J;
 
-	/* Get a pointer to the next entry */
-	CodeEntry* E = CS_GetEntry (S, I);
+     	/* Get a pointer to the next entry */
+     	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* If this entry has zero labels, continue with the next one */
-    	unsigned LabelCount = CE_GetLabelCount (E);
-    	if (LabelCount == 0) {
-    	    continue;
-    	}
+     	unsigned LabelCount = CE_GetLabelCount (E);
+     	if (LabelCount == 0) {
+     	    continue;
+     	}
 
-    	/* We have at least one label. Use the first one as reference label. */
-    	RefLab = CE_GetLabel (E, 0);
+     	/* We have at least one label. Use the first one as reference label. */
+     	RefLab = CE_GetLabel (E, 0);
 
-    	/* Walk through the remaining labels and change references to these
-    	 * labels to a reference to the one and only label. Delete the labels
-    	 * that are no longer used. To increase performance, walk backwards
-    	 * through the list.
-    	 */
+     	/* Walk through the remaining labels and change references to these
+     	 * labels to a reference to the one and only label. Delete the labels
+     	 * that are no longer used. To increase performance, walk backwards
+     	 * through the list.
+     	 */
       	for (J = LabelCount-1; J >= 1; --J) {
 
-    	    /* Get the next label */
-    	    CodeLabel* L = CE_GetLabel (E, J);
+     	    /* Get the next label */
+     	    CodeLabel* L = CE_GetLabel (E, J);
 
-	    /* Move all references from this label to the reference label */
+     	    /* Move all references from this label to the reference label */
      	    CL_MoveRefs (L, RefLab);
 
        	    /* Remove the label completely. */
        	    CS_DelLabel (S, L);
      	}
 
-    	/* The reference label is the only remaining label. Check if there
-	 * are any references to this label, and delete it if this is not
-	 * the case.
-	 */
+     	/* The reference label is the only remaining label. Check if there
+     	 * are any references to this label, and delete it if this is not
+     	 * the case.
+     	 */
        	if (CollCount (&RefLab->JumpFrom) == 0) {
      	    /* Delete the label */
        	    CS_DelLabel (S, RefLab);

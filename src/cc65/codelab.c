@@ -123,8 +123,12 @@ void CL_Output (const CodeLabel* L, FILE* F)
 /* Output the code label to a file */
 {
     fprintf (F, "%s:", L->Name);
+    if (strlen (L->Name) > 6) {
+	/* Label is too long, add a linefeed */
+     	fputc ('\n', F);
+    }
 }
 
 
 
-			
+

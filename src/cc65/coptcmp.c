@@ -867,7 +867,8 @@ unsigned OptCmp7 (CodeSeg* S)
 		    CS_DelEntry (S, I+1);
 		} else {
 		    CodeLabel* L = N->JumpTo;
-		    CodeEntry* X = NewCodeEntry (OP65_JMP, AM65_BRA, L->Name, L, N->LI);
+		    const char* LabelName = L? L->Name : N->Arg;
+		    CodeEntry* X = NewCodeEntry (OP65_JMP, AM65_BRA, LabelName, L, N->LI);
 		    CS_InsertEntry (S, X, I+2);
 		    CS_DelEntry (S, I+1);
 		}

@@ -13,7 +13,7 @@
 	.condes		MouseIRQ, 2
 
 	.import		_readjoy
-       	.import	       	popa, popax, addysp1
+       	.import	       	popax, addysp1
    	.importzp   	ptr1, sp, sreg
 
    	.include    	"c128.inc"
@@ -36,14 +36,10 @@ XCORR		= SPRITE_WIDTH
 
 ; --------------------------------------------------------------------------
 ;
-; unsigned char __fastcall__ mouse_init (unsigned char port,
-;					 unsigned char type);
+; unsigned char __fastcall__ mouse_init (unsigned char type);
 ;
 
 .proc	_mouse_init
-
-	jsr	popa			; Ignore type and port
-
        	lda    	Initialized		; Already initialized?
        	bne    	AlreadyInitialized	; Jump if yes
 
@@ -155,7 +151,7 @@ AlreadyInitialized:
        	lda    	VIC_SPR_ENA		; Get sprite enable register
 	ora	#$01			; Enable sprite #0
 	sta 	VIC_SPR_ENA		; Write back
-	cli 				; Enable interrupts
+	cli 	   			; Enable interrupts
 
 @L1:	rts
 
@@ -320,7 +316,7 @@ AlreadyInitialized:
 ; --------------------------------------------------------------------------
 ;
 ; Mouse interrupt handler
-;	 
+;
 
 IRQDone:rts
 

@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1999-2005 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -141,8 +141,8 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 
 	/* Writes do only occur in the load area and not for BSS segments */
        	DoWrite = (S->Flags & SF_BSS) == 0 	&& 	/* No BSS segment */
-		   S->Load == M 		&&	/* LOAD segment */
-		   S->Seg->Dumped == 0;			/* Not already written */
+	       	   S->Load == M 		&&	/* LOAD segment */
+	       	   S->Seg->Dumped == 0;			/* Not already written */
 
 	/* Output the DoWrite flag for debugging */
 	if (Verbosity > 1) {
@@ -158,38 +158,59 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 	     * in the linker.
 	     */
 	    Warning ("Segment `%s' in module `%s' requires larger alignment",
-	     	     GetString (S->Name), GetObjFileName (S->Seg->AlignObj));
+	       	     GetString (S->Name), GetObjFileName (S->Seg->AlignObj));
 	}
 
-	/* Handle ALIGN and OFFSET/START */
-	if (S->Flags & SF_ALIGN) {
-	    /* Align the address */
-	    unsigned long Val, NewAddr;
-	    Val = (0x01UL << S->Align) - 1;
-	    NewAddr = (Addr + Val) & ~Val;
-	    if (DoWrite) {
-		WriteMult (D->F, M->FillVal, NewAddr-Addr);
-	    }
-	    Addr = NewAddr;
-	    /* Remember the fill value for the segment */
-       	    S->Seg->FillVal = M->FillVal;
-	} else if (S->Flags & (SF_OFFSET | SF_START)) {
-	    unsigned long NewAddr = S->Addr;
-	    if (S->Flags & SF_OFFSET) {
-		/* It's an offset, not a fixed address, make an address */
-		NewAddr += M->Start;
-	    }
-	    if (DoWrite) {
-		WriteMult (D->F, M->FillVal, NewAddr-Addr);
-	    }
-	    Addr = NewAddr;
-	}
+        /* If this is the run memory area, we must apply run alignment. If
+         * this is not the run memory area but the load memory area (which
+         * means that both are different), we must apply load alignment.
+         * Beware: DoWrite may be true even if this is the run memory area,
+         * because it may be also the load memory area.
+         */
+        if (S->Run == M) {
+
+            /* Handle ALIGN and OFFSET/START */
+            if (S->Flags & SF_ALIGN) {
+                /* Align the address */
+                unsigned long Val = (0x01UL << S->Align) - 1;
+                unsigned long NewAddr = (Addr + Val) & ~Val;
+                if (DoWrite) {
+                    WriteMult (D->F, M->FillVal, NewAddr-Addr);
+                }
+                Addr = NewAddr;
+            } else if (S->Flags & (SF_OFFSET | SF_START)) {
+                unsigned long NewAddr = S->Addr;
+                if (S->Flags & SF_OFFSET) {
+                    /* It's an offset, not a fixed address, make an address */
+                    NewAddr += M->Start;
+                }
+                if (DoWrite) {
+                    WriteMult (D->F, M->FillVal, NewAddr-Addr);
+                }
+                Addr = NewAddr;
+            }
+
+        } else if (S->Load == M) {
+
+            /* Handle ALIGN_LOAD */
+            if (S->Flags & SF_ALIGN_LOAD) {
+                /* Align the address */
+                unsigned long Val = (0x01UL << S->AlignLoad) - 1;
+                unsigned long NewAddr = (Addr + Val) & ~Val;
+                if (DoWrite) {
+                    WriteMult (D->F, M->FillVal, NewAddr-Addr);
+                }
+                Addr = NewAddr;
+            }
+
+        }
 
 	/* Now write the segment to disk if it is not a BSS type segment and
 	 * if the memory area is the load area.
 	 */
        	if (DoWrite) {
 	    RelocLineInfo (S->Seg);
+            S->Seg->FillVal = M->FillVal;
 	    SegWrite (D->F, S->Seg, BinWriteExpr, D);
 	} else if (M->Flags & MF_FILL) {
 	    WriteMult (D->F, M->FillVal, S->Seg->Size);
@@ -208,11 +229,9 @@ static void BinWriteMem (BinDesc* D, Memory* M)
     }
 
     /* If a fill was requested, fill the remaining space */
-    if (M->Flags & MF_FILL) {
-	while (M->FillLevel < M->Size) {
-	    Write8 (D->F, M->FillVal);
-	    ++M->FillLevel;
-	}
+    if ((M->Flags & MF_FILL) != 0 && M->FillLevel < M->Size) {
+        WriteMult (D->F, M->FillVal, M->Size - M->FillLevel);
+        M->FillLevel = M->Size;
     }
 }
 
@@ -229,7 +248,7 @@ static int BinUnresolved (unsigned Name attribute ((unused)), void* D)
     return 0;
 }
 
-                                   
+
 
 void BinWriteTarget (BinDesc* D, struct File* F)
 /* Write a binary output file */

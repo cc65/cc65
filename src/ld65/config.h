@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -96,7 +96,8 @@ struct SegDesc {
     Memory*           	Load;  	       	/* Load memory section */
     Memory*    	      	Run;	  	/* Run memory section */
     unsigned long      	Addr; 		/* Start address or offset into segment */
-    unsigned char     	Align;	  	/* Alignment if given */
+    unsigned char     	Align;	  	/* Run area alignment if given */
+    unsigned char       AlignLoad;      /* Load area alignment if given */
 };
 
 /* Segment list */
@@ -113,13 +114,13 @@ extern unsigned	       	SegDescCount;	/* Number of entries in list */
 #define SF_BSS 	      	0x0002	  	/* Segment is BSS style segment */
 #define SF_ZP  	      	0x0004		/* Zeropage segment (o65 only) */
 #define SF_DEFINE      	0x0008	  	/* Define start and size */
-#define SF_ALIGN      	0x0010	  	/* Align the segment */
-#define SF_OFFSET     	0x0020		/* Segment has offset in memory */
-#define SF_START      	0x0040	  	/* Segment has fixed start address */
-#define SF_OPTIONAL     0x0080          /* Segment is optional (must not exist) */
-#define SF_LOAD_AND_RUN	0x1000 	       	/* LOAD and RUN given */
-#define SF_RUN_DEF     	0x2000		/* RUN symbols already defined */
-#define SF_LOAD_DEF   	0x4000		/* LOAD symbols already defined */
+#define SF_ALIGN      	0x0010	  	/* Align segment in run area */
+#define SF_ALIGN_LOAD   0x0020          /* Align segment in load area */
+#define SF_OFFSET      	0x0040		/* Segment has offset in memory */
+#define SF_START      	0x0080	  	/* Segment has fixed start address */
+#define SF_OPTIONAL     0x0100          /* Segment is optional (must not exist) */
+#define SF_RUN_DEF     	0x0200		/* RUN symbols already defined */
+#define SF_LOAD_DEF   	0x0400		/* LOAD symbols already defined */
 
 
 

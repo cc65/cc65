@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -96,10 +96,11 @@ unsigned	       	SegDescCount;	/* Number of entries in list */
 #define SA_LOAD		0x0002
 #define SA_RUN		0x0004
 #define SA_ALIGN	0x0008
-#define SA_DEFINE	0x0010
-#define SA_OFFSET	0x0020
-#define SA_START	0x0040
-#define SA_OPTIONAL     0x0080
+#define SA_ALIGN_LOAD   0x0010
+#define SA_DEFINE	0x0020
+#define SA_OFFSET	0x0040
+#define SA_START	0x0080
+#define SA_OPTIONAL     0x0100
 
 
 
@@ -598,21 +599,21 @@ static void ParseSegments (void)
 /* Parse a SEGMENTS section */
 {
     static const IdentTok Attributes [] = {
-        {   "ALIGN",    CFGTOK_ALIGN    },
-        {   "DEFINE",   CFGTOK_DEFINE   },
-       	{   "LOAD",    	CFGTOK_LOAD     },
-	{   "OFFSET",  	CFGTOK_OFFSET   },
-        {   "OPTIONAL", CFGTOK_OPTIONAL },
-	{   "RUN",     	CFGTOK_RUN      },
-	{   "START",   	CFGTOK_START    },
-        {   "TYPE",     CFGTOK_TYPE     },
+        {   "ALIGN",            CFGTOK_ALIGN            },
+        {   "ALIGN_LOAD",       CFGTOK_ALIGN_LOAD       },
+        {   "DEFINE",           CFGTOK_DEFINE           },
+       	{   "LOAD",    	        CFGTOK_LOAD             },
+	{   "OFFSET",  	        CFGTOK_OFFSET           },
+        {   "OPTIONAL",         CFGTOK_OPTIONAL         },
+	{   "RUN",     	        CFGTOK_RUN              },
+	{   "START",   	        CFGTOK_START            },
+        {   "TYPE",             CFGTOK_TYPE             },
     };
     static const IdentTok Types [] = {
-       	{   "RO",      	CFGTOK_RO       },
-       	{   "RW",      	CFGTOK_RW       },
-       	{   "BSS",     	CFGTOK_BSS      },
-	{   "ZP",      	CFGTOK_ZP	},
-        {   "WPROT",    CFGTOK_RO       },      /* ### OBSOLETE */
+       	{   "RO",      	        CFGTOK_RO               },
+       	{   "RW",      	        CFGTOK_RW               },
+       	{   "BSS",     	        CFGTOK_BSS              },
+	{   "ZP",      	        CFGTOK_ZP	        },
     };
 
     unsigned Count;
@@ -652,6 +653,17 @@ static void ParseSegments (void)
 	    	     	CfgError ("Alignment must be a power of 2");
 	    	    }
 	    	    S->Flags |= SF_ALIGN;
+	    	    break;
+
+                case CFGTOK_ALIGN_LOAD:
+	    	    CfgAssureInt ();
+	    	    FlagAttr (&S->Attr, SA_ALIGN_LOAD, "ALIGN_LOAD");
+	    	    CfgRangeCheck (1, 0x10000);
+       	       	    S->AlignLoad = BitFind (CfgIVal);
+	    	    if ((0x01UL << S->AlignLoad) != CfgIVal) {
+	    	     	CfgError ("Alignment must be a power of 2");
+	    	    }
+	    	    S->Flags |= SF_ALIGN_LOAD;
 	    	    break;
 
 	        case CFGTOK_DEFINE:
@@ -705,7 +717,7 @@ static void ParseSegments (void)
 	    		case CFGTOK_RW:	   /* Default */		    break;
 	    	     	case CFGTOK_BSS:   S->Flags |= SF_BSS;              break;
 	    	     	case CFGTOK_ZP:	   S->Flags |= (SF_BSS | SF_ZP);    break;
-	    	     	default:	   Internal ("Unexpected token: %d", CfgTok);
+	    	     	default:      	   Internal ("Unexpected token: %d", CfgTok);
 	    	    }
 	    	    break;
 
@@ -726,14 +738,7 @@ static void ParseSegments (void)
 	if ((S->Attr & SA_RUN) == 0) {
 	    S->Attr |= SA_RUN;
 	    S->Run = S->Load;
-	} else {
-	    /* Both attributes given */
-	    S->Flags |= SF_LOAD_AND_RUN;
-	}
-	if ((S->Attr & SA_ALIGN) == 0) {
-	    S->Attr |= SA_ALIGN;
-	    S->Align = 0;
-	}
+	} 
 
 	/* If the segment is marked as BSS style, and if the segment exists
          * in any of the object file, check that there's no initialized data
@@ -744,10 +749,21 @@ static void ParseSegments (void)
 	    	     CfgGetName (), CfgErrorLine);
 	}
 
+        /* An attribute of ALIGN_LOAD doesn't make sense if there are no
+         * separate run and load memory areas.
+         */
+        if ((S->Flags & SF_ALIGN_LOAD) != 0 && (S->Load == S->Run)) {
+       	    Warning ("%s(%u): ALIGN_LOAD attribute specified, but no separate "
+                     "LOAD and RUN memory areas assigned",
+                     CfgGetName (), CfgErrorLine);
+            /* Remove the flag */
+            S->Flags &= ~SF_ALIGN_LOAD;
+        }
+
         /* If the segment is marked as BSS style, it may not have separate
          * load and run memory areas, because it's is never written to disk.
          */
-        if ((S->Flags & SF_BSS) != 0 && (S->Flags & SF_LOAD_AND_RUN) != 0) {
+        if ((S->Flags & SF_BSS) != 0 && (S->Load != S->Run)) {
        	    Warning ("%s(%u): Segment with type `bss' has both LOAD and RUN "
                      "memory areas assigned", CfgGetName (), CfgErrorLine);
         }
@@ -778,8 +794,8 @@ static void ParseSegments (void)
 	    SegDescInsert (S);
       	    /* Insert the segment into the memory area list */
       	    MemoryInsert (S->Run, S);
-      	    if ((S->Flags & SF_LOAD_AND_RUN) != 0) {
-      	    	/* We have a separate RUN area given */
+      	    if (S->Load != S->Run) {
+      	    	/* We have separate RUN and LOAD areas */
       	    	MemoryInsert (S->Load, S);
       	    }
       	} else {
@@ -1448,40 +1464,58 @@ void CfgAssignSegments (void)
      	    /* Get the segment from the node */
      	    SegDesc* S = N->Seg;
 
-     	    /* Handle ALIGN and OFFSET/START */
-     	    if (S->Flags & SF_ALIGN) {
-     	   	/* Align the address */
-     	   	unsigned long Val = (0x01UL << S->Align) - 1;
-     	   	Addr = (Addr + Val) & ~Val;
-     	    } else if (S->Flags & (SF_OFFSET | SF_START)) {
-     	   	/* Give the segment a fixed starting address */
-     	   	unsigned long NewAddr = S->Addr;
-     	   	if (S->Flags & SF_OFFSET) {
-     	   	    /* An offset was given, no address, make an address */
-     	   	    NewAddr += M->Start;
-     	   	}
-       	       	if (Addr > NewAddr) {
-     	   	    /* Offset already too large */
-     	   	    if (S->Flags & SF_OFFSET) {
-     	   	        Error ("Offset too small in `%s', segment `%s'",
-     	   	     	       GetString (M->Name), GetString (S->Name));
-     	   	    } else {
-     	   	     	Error ("Start address too low in `%s', segment `%s'",
-     	   	     	       GetString (M->Name), GetString (S->Name));
-     	   	    }
-     	   	}
-     	   	Addr = NewAddr;
-     	    }
-
-       	    /* If this is the run area, set the start address of this segment,
-             * set the readonly flag in the segment and and remember if the
-             * segment is in a relocatable file or not.
+            /* Some actions depend on wether this is the load or run memory
+             * area.
              */
-     	    if (S->Run == M) {
-     	        S->Seg->PC = Addr;
+            if (S->Run == M) {
+
+                /* This is the run (and maybe load) memory area. Handle 
+                 * alignment and explict start address and offset.
+                 */
+                if (S->Flags & SF_ALIGN) {
+                    /* Align the address */
+                    unsigned long Val = (0x01UL << S->Align) - 1;
+                    Addr = (Addr + Val) & ~Val;
+                } else if (S->Flags & (SF_OFFSET | SF_START)) {
+                    /* Give the segment a fixed starting address */
+                    unsigned long NewAddr = S->Addr;
+                    if (S->Flags & SF_OFFSET) {
+                        /* An offset was given, no address, make an address */
+                        NewAddr += M->Start;
+                    }
+                    if (Addr > NewAddr) {
+                        /* Offset already too large */
+                        if (S->Flags & SF_OFFSET) {
+                            Error ("Offset too small in `%s', segment `%s'",
+                                   GetString (M->Name), GetString (S->Name));
+                        } else {
+                            Error ("Start address too low in `%s', segment `%s'",
+                                   GetString (M->Name), GetString (S->Name));
+                        }
+                    }
+                    Addr = NewAddr;
+                }
+
+                /* Set the start address of this segment, set the readonly flag
+                 * in the segment and and remember if the segment is in a
+                 * relocatable file or not.
+                 */
+                S->Seg->PC = Addr;
                 S->Seg->ReadOnly = (S->Flags & SF_RO) != 0;
                 S->Seg->Relocatable = M->Relocatable;
-     	    }
+
+            } else if (S->Load == M) {
+
+                /* This is the load memory area, *and* run and load are
+                 * different (because of the "else" above). Handle alignment.
+                 */
+                if (S->Flags & SF_ALIGN_LOAD) {
+                    /* Align the address */
+                    unsigned long Val = (0x01UL << S->AlignLoad) - 1;
+                    Addr = (Addr + Val) & ~Val;
+                }
+
+            }
 
      	    /* Increment the fill level of the memory area and check for an
      	     * overflow.
@@ -1497,33 +1531,12 @@ void CfgAssignSegments (void)
      	     * segment.
      	     */
      	    if (S->Flags & SF_DEFINE) {
-		if ((S->Flags & SF_LOAD_AND_RUN) && S->Run == S->Load) {
-		    /* RUN and LOAD given and in one memory area.
-		     * Be careful: We will encounter this code twice, the
-		     * first time when walking the RUN list, second time when
-		     * walking the LOAD list. Be sure to define only the
-		     * relevant symbols on each walk.
-		     */
-		    if (S->Load == M) {
-		       	if ((S->Flags & SF_LOAD_DEF) == 0) {
-		       	    CreateLoadDefines (S, Addr);
-		       	} else {
-		       	    CHECK ((S->Flags & SF_RUN_DEF) == 0);
-		       	    CreateRunDefines (S, Addr);
-		       	}
-		    }
-		} else {
-		    /* RUN and LOAD in different memory areas, or RUN not
-     		     * given, so RUN defaults to LOAD. In the latter case, we
-		     * have only one copy of the segment in the area.
-		     */
-		    if (S->Run == M) {
-		       	CreateRunDefines (S, Addr);
-		    }
-		    if (S->Load == M) {
-		       	CreateLoadDefines (S, Addr);
-		    }
-		}
+                if (S->Run == M && (S->Flags & SF_RUN_DEF) == 0) {
+                    CreateRunDefines (S, Addr);
+                }
+                if (S->Load == M && (S->Flags & SF_LOAD_DEF) == 0) {
+                    CreateLoadDefines (S, Addr);
+                }
      	    }
 
      	    /* Calculate the new address */

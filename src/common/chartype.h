@@ -65,7 +65,7 @@ int IsAscii (char C);
 /* Check for an ASCII character */
 
 int IsBlank (char C);
-/* Check for a space, tab or newline */
+/* Check for a space or tab */
 
 int IsDigit (char C);
 /* Check for a digit */
@@ -73,11 +73,11 @@ int IsDigit (char C);
 int IsLower (char C);
 /* Check for a lower case char */
 
-int IsSpace (char C);
-/* Check for white space characters */
-
 int IsUpper (char C);
 /* Check for upper case characters */
+
+int IsBDigit (char C);
+/* Check for binary digits (0/1) */
 
 int IsXDigit (char C);
 /* Check for hexadecimal digits */

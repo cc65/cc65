@@ -79,9 +79,9 @@ int IsAscii (char C)
 
 
 int IsBlank (char C)
-/* Check for a space, tab or newline */
+/* Check for a space or tab */
 {
-    return (C == ' ' || C == '\t' || C == '\n');
+    return (C == ' ' || C == '\t');
 }
 
 
@@ -106,6 +106,14 @@ int IsUpper (char C)
 /* Check for upper case characters */
 {
     return (C >= 'A' && C <= 'Z');
+}
+
+
+
+int IsBDigit (char C)
+/* Check for binary digits (0/1) */
+{
+    return (C == '0' || C == '1');
 }
 
 

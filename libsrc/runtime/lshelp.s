@@ -7,23 +7,18 @@
 ; When negating values, we will ignore the possibility here, that one of the
 ; values if $80000000, in which case the negate will fail.
 
-       	.export		poplsargs, adjlsres
-	.import		getlop, negeax
-	.importzp	sreg, tmp1, ptr1, ptr3, ptr4
+       	.export		poplsargs
+	.import		getlop
+	.importzp	sreg, tmp1, tmp2, ptr1, ptr3, ptr4
 
 poplsargs:
 	jsr	getlop	   	; Get the operands
 
-; Calculate the sign of the result, that is sign(op1) * sign(op2) and
-; remember it.
+; Remember the signs of the operands (that is, the high bytes) in tmp1 and
+; tmp2. Make both operands positive.
 
-      	lda   	sreg+1
-      	eor   	ptr4+1
-      	sta   	tmp1  	   	; Save it across call
-
-; Make both operands positive
-
-	lda   	sreg+1		; Is the operand negative?
+	lda   	sreg+1		; Is the left operand negative?
+        sta     tmp1            ; Remember the sign for later
 	bpl   	L1		; Jump if not
 
 	clc			; Make it positive
@@ -44,7 +39,8 @@ poplsargs:
 	adc	#$00
 	sta	sreg+1
 
-L1:	lda	ptr4+1		; Is the operand nagative?
+L1:	lda	ptr4+1		; Is the right operand nagative?
+        sta     tmp2            ; Remember the sign for later
 	bpl	L2		; Jump if not
 
 	clc			; Make it positive
@@ -66,11 +62,4 @@ L1:	lda	ptr4+1		; Is the operand nagative?
 	sta	ptr4+1
 
 L2:	rts
-
-; Adjust the result of a mod/div/mul operation
-
-adjlsres:
-      	ldy	tmp1		; Check if we must adjust the sign
-      	bpl	L2
-      	jmp    	negeax 		; Netage value
 

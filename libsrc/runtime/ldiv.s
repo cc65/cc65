@@ -8,13 +8,28 @@
 ; values if $80000000, in which case the negate will fail.
 
        	.export		tosdiveax
-	.import		poplsargs, udiv32, adjlsres
-	.importzp	ptr1
+	.import		poplsargs, udiv32, negeax
+	.importzp	ptr1, tmp1, tmp2
 
 tosdiveax:
        	jsr	poplsargs  	; Get arguments from stack, adjust sign
-       	jsr    	udiv32 		; Do the division
-   	lda	ptr1		; Result is in (ptr1:sreg)
-   	ldx	ptr1+1
-	jmp	adjlsres    	; Adjust the sign of the result if needed
+       	jsr    	udiv32 		; Do the division, result is in (ptr1:sreg)
+        ldx     ptr1+1          ; Load byte 1 of result
+
+; Adjust the sign of the result
+
+        lda     tmp1            ; Get sign of left operand
+        eor     tmp2            ; Calculate sign of result
+        bpl     Pos             ; Jump if result positive
+
+; Result is negative
+
+   	lda    	ptr1		; Load byte 0
+      	jmp    	negeax 		; Negate value
+
+; Result is positive
+
+Pos:    lda     ptr1
+        rts
+
 

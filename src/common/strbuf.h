@@ -38,6 +38,14 @@
 
 
 
+#include <string.h>
+
+/* common */
+#include "attrib.h"
+#include "inline.h"
+
+
+
 /*****************************************************************************/
 /*				     Data                                    */
 /*****************************************************************************/
@@ -51,10 +59,13 @@ struct StrBuf {
     char*       Buf;
 };
 
+/* Initializer for static string bufs */
+#define STATIC_STRBUF_INITIALIZER 	{ 0, 0, 0 }
+
 
 
 /*****************************************************************************/
-/*	      			     Code	   	     		     */
+/*	      			     Code    	   	     		     */
 /*****************************************************************************/
 
 
@@ -71,6 +82,51 @@ StrBuf* NewStrBuf (void);
 void FreeStrBuf (StrBuf* B);
 /* Free a string buffer */
 
+void SB_Realloc (StrBuf* B, unsigned NewSize);
+/* Reallocate the string buffer space, make sure at least NewSize bytes are
+ * available. THIS IS NOT A USER CALLABLE FUNCTION!
+ */
+
+#if defined(HAVE_INLINE)
+INLINE unsigned SB_GetLen (StrBuf* B)
+/* Return the length of the buffer contents */
+{
+    return B->Len;
+}
+#else
+#  define SB_GetLen(B)  (B)->Len
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE const char* SB_GetConstBuf (const StrBuf* B)
+/* Return a buffer pointer */
+{
+    return B->Buf;
+}
+#else
+#  define SB_GetConstBuf(B)     (B)->Buf
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE char* SB_GetBuf (StrBuf* B)
+/* Return a buffer pointer */
+{
+    return B->Buf;
+}
+#else
+#  define SB_GetBuf(B)     (B)->Buf
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void SB_Clear (StrBuf* B)
+/* Clear the string buffer (make it empty) */
+{
+    B->Len = 0;
+}
+#else
+#  define SB_Clear(B)   ((B)->Len = 0)
+#endif
+
 void SB_Terminate (StrBuf* B);
 /* Zero terminate the given string buffer. NOTE: The terminating zero is not
  * accounted for in B->Len, if you want that, you have to use AppendChar!
@@ -79,17 +135,52 @@ void SB_Terminate (StrBuf* B);
 void SB_AppendChar (StrBuf* B, char C);
 /* Append a character to a string buffer */
 
-void SB_AppendStr (StrBuf* B, const char* S);
-/* Append a string to the end of the string buffer */
-
 void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size);
 /* Append a character buffer to the end of the string buffer */
+
+#if defined(HAVE_INLINE)
+INLINE void SB_AppendStr (StrBuf* B, const char* S)
+/* Append a string to the end of the string buffer */
+{
+    SB_AppendBuf (B, S, strlen (S));
+}
+#else
+#  define SB_AppendStr(B, S)    SB_AppendBuf (B, S, strlen (S))
+#endif
 
 void SB_Copy (StrBuf* Target, const StrBuf* Source);
 /* Copy Source to Target, discarding the old contents of Target */
 
-void SB_Append (StrBuf* Target, const StrBuf* Source);
+#if defined(HAVE_INLINE)
+INLINE void SB_Append (StrBuf* Target, const StrBuf* Source)
 /* Append the contents of Source to Target */
+{
+    SB_AppendBuf (Target, Source->Buf, Source->Len);
+}
+#else
+#  define SB_Append(Target, Source)     SB_AppendBuf (Target, (Source)->Buf, (Source)->Len)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void SB_Cut (StrBuf* B, unsigned Len)
+/* Cut the contents of B at the given length. If the current length of the
+ * buffer is smaller than Len, nothing will happen.
+ */
+{
+    if (Len < B->Len) {
+       	B->Len = Len;
+    }
+}
+#else
+#  define SB_Cut(B, L)        if ((L) < (B)->Len) { (B)->Len = (L); }
+#endif
+
+void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Len);
+/* Copy a slice from Source into Target. The current contents of Target are
+ * destroyed. If Start is greater than the length of Source, or if Len
+ * characters aren't available, the result will be a buffer with less than Len
+ * bytes.
+ */
 
 
 

@@ -47,7 +47,7 @@
 
 
 
-static void SB_Realloc (StrBuf* B, unsigned NewSize)
+void SB_Realloc (StrBuf* B, unsigned NewSize)
 /* Reallocate the string buffer space, make sure at least NewSize bytes are
  * available.
  */
@@ -91,9 +91,6 @@ void DoneStrBuf (StrBuf* B)
 /* Free the data of a string buffer (but not the struct itself) */
 {
     xfree (B->Buf);
-    B->Allocated = 0;
-    B->Len       = 0;
-    B->Buf       = 0;
 }
 
 
@@ -116,8 +113,7 @@ StrBuf* NewStrBuf (void)
 void FreeStrBuf (StrBuf* B)
 /* Free a string buffer */
 {
-    /* Don't use Done here, since we won't use the struct later */
-    xfree (B->Buf);
+    DoneStrBuf (B);
     xfree (B);
 }
 
@@ -150,14 +146,6 @@ void SB_AppendChar (StrBuf* B, char C)
 
 
 
-void SB_AppendStr (StrBuf* B, const char* S)
-/* Append a string to the end of the string buffer */
-{
-    SB_AppendBuf (B, S, strlen (S));
-}
-
-
-
 void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size)
 /* Append a character buffer to the end of the string buffer */
 {
@@ -183,10 +171,30 @@ void SB_Copy (StrBuf* Target, const StrBuf* Source)
 
 
 
-void SB_Append (StrBuf* Target, const StrBuf* Source)
-/* Append the contents of Source to Target */
+void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Len)
+/* Copy a slice from Source into Target. The current contents of Target are
+ * destroyed. If Start is greater than the length of Source, or if Len
+ * characters aren't available, the result will be a buffer with less than Len
+ * bytes.
+ */
 {
-    SB_AppendBuf (Target, Source->Buf, Source->Len);
+    /* Calculate the length of the resulting buffer */
+    if (Start >= Source->Len) {
+       	/* Target will be empty */
+	SB_Clear (Target);
+	return;
+    } else if (Start + Len > Source->Len) {
+       	Len = (Start + Len) - Source->Len;
+    }
+
+    /* Make sure we have enough room in the target string buffer */
+    if (Len > Target->Allocated) {
+	SB_Realloc (Target, Len);
+    }
+
+    /* Copy the slice */
+    memcpy (Target->Buf, Source->Buf + Start, Len);
+    Target->Len = Len;
 }
 
 

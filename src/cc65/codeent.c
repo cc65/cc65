@@ -119,7 +119,7 @@ int CodeEntryHasLabel (const CodeEntry* E)
 
 
 
-void OutputCodeEntry (FILE* F, const CodeEntry* E)
+void OutputCodeEntry (const CodeEntry* E, FILE* F)
 /* Output the code entry to a file */
 {
     const OPCDesc* D;
@@ -129,7 +129,7 @@ void OutputCodeEntry (FILE* F, const CodeEntry* E)
     unsigned LabelCount = CollCount (&E->Labels);
     unsigned I;
     for (I = 0; I < LabelCount; ++I) {
-    	OutputCodeLabel (F, CollConstAt (&E->Labels, I));
+    	OutputCodeLabel (CollConstAt (&E->Labels, I), F);
     }
 
     /* Get the opcode description */

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -37,13 +37,12 @@
 #include <string.h>
 
 /* cc65 */
-#include "codegen.h"
 #include "error.h"
 #include "expr.h"
 #include "global.h"
 #include "litpool.h"
 #include "scanner.h"
-#include "segname.h"
+#include "segments.h"
 #include "symtab.h"
 #include "pragma.h"
 
@@ -138,7 +137,7 @@ static void StringPragma (void (*Func) (const char*))
 
 
 
-static void SegNamePragma (void (*Func) (const char*))
+static void SegNamePragma (segment_t Seg)
 /* Handle a pragma that expects a segment name parameter */
 {
     if (curtok != TOK_SCONST) {
@@ -150,8 +149,8 @@ static void SegNamePragma (void (*Func) (const char*))
 	/* Check if the name is valid */
 	if (ValidSegName (Name)) {
 
-       	    /* Call the given function to set the name */
-	    Func (Name);
+       	    /* Set the new name */
+	    NewSegName (Seg, Name);
 
 	} else {
 
@@ -216,7 +215,7 @@ void DoPragma (void)
     switch (Pragma) {
 
 	case PR_BSSSEG:
-	    SegNamePragma (g_bssname);
+	    SegNamePragma (SEG_BSS);
 	    break;
 
 	case PR_CHECKSTACK:
@@ -224,11 +223,11 @@ void DoPragma (void)
 	    break;
 
 	case PR_CODESEG:
-	    SegNamePragma (g_codename);
+	    SegNamePragma (SEG_CODE);
 	    break;
 
 	case PR_DATASEG:
-	    SegNamePragma (g_dataname);
+	    SegNamePragma (SEG_DATA);
 	    break;
 
 	case PR_REGVARADDR:
@@ -236,7 +235,7 @@ void DoPragma (void)
 	    break;
 
 	case PR_RODATASEG:
-	    SegNamePragma (g_rodataname);
+	    SegNamePragma (SEG_RODATA);
 	    break;
 
 	case PR_SIGNEDCHARS:

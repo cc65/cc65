@@ -59,7 +59,7 @@
 #include "input.h"
 #include "macrotab.h"
 #include "scanner.h"
-#include "segname.h"
+#include "segments.h"
 
 
 

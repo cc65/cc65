@@ -744,8 +744,7 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
 	 */
 	if (IsFunc) {
 	    Entry->V.F.Func = GetFuncDesc (Entry->Type);
-	    Entry->V.F.CS   = 0;
-	    Entry->V.F.DS   = 0;
+	    Entry->V.F.Seg  = 0;
 	}
 
      	/* Add the entry to the symbol table */

@@ -36,7 +36,7 @@
 /* common */
 #include "xmalloc.h"
 
-/* cc65 */	 
+/* cc65 */
 #include "codeent.h"
 #include "codelab.h"
 
@@ -107,7 +107,7 @@ unsigned RemoveLabelRef (CodeLabel* L, const struct CodeEntry* E)
 
 
 
-void OutputCodeLabel (FILE* F, const CodeLabel* L)
+void OutputCodeLabel (const CodeLabel* L, FILE* F)
 /* Output the code label to a file */
 {
     fprintf (F, "%s:", L->Name);

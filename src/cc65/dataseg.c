@@ -39,18 +39,8 @@
 #include "xsprintf.h"
 
 /* cc65 */
+#include "error.h"
 #include "dataseg.h"
-
-
-
-/*****************************************************************************/
-/*  	       	 	  	     Data				     */
-/*****************************************************************************/
-
-
-
-/* Pointer to current data segment */
-DataSeg* DS = 0;
 
 
 
@@ -60,15 +50,15 @@ DataSeg* DS = 0;
 
 
 
-DataSeg* NewDataSeg (const char* Name)
+DataSeg* NewDataSeg (const char* Name, SymEntry* Func)
 /* Create a new data segment, initialize and return it */
 {
     /* Allocate memory */
-    DataSeg* S = xmalloc (sizeof (DataSeg));
+    DataSeg* S	= xmalloc (sizeof (DataSeg));
 
     /* Initialize the fields */
-    S->Next = 0;
-    S->Name = xstrdup (Name);
+    S->SegName	= xstrdup (Name);
+    S->Func	= Func;
     InitCollection (&S->Lines);
 
     /* Return the new struct */
@@ -80,50 +70,7 @@ DataSeg* NewDataSeg (const char* Name)
 void FreeDataSeg (DataSeg* S)
 /* Free a data segment including all line entries */
 {
-    unsigned I, Count;
-			     
-    /* Free the name */
-    xfree (S->Name);
-
-    /* Free the lines */
-    Count = CollCount (&S->Lines);
-    for (I = 0; I < Count; ++I) {
-	xfree (CollAt (&S->Lines, I));
-    }
-
-    /* Free the collection */
-    DoneCollection (&S->Lines);
-
-    /* Free the struct */
-    xfree (S);
-}
-
-
-
-void PushDataSeg (DataSeg* S)
-/* Push the given data segment onto the stack */
-{
-    /* Push */
-    S->Next = DS;
-    DS	    = S;
-}
-
-
-
-DataSeg* PopDataSeg (void)
-/* Remove the current data segment from the stack and return it */
-{
-    /* Remember the current data segment */
-    DataSeg* S = DS;
-
-    /* Cannot pop on empty stack */
-    PRECONDITION (S != 0);
-
-    /* Pop */
-    DS = S->Next;
-
-    /* Return the popped data segment */
-    return S;
+    Internal ("Not implemented");
 }
 
 
@@ -142,16 +89,12 @@ void AppendDataSeg (DataSeg* Target, const DataSeg* Source)
 
 
 
-void AddDataSegLine (DataSeg* S, const char* Format, ...)
+void AddDataEntry (DataSeg* S, const char* Format, va_list ap)
 /* Add a line to the given data segment */
 {
-    va_list ap;
-    char Buf [256];
-
     /* Format the line */
-    va_start (ap, Format);
+    char Buf [256];
     xvsprintf (Buf, sizeof (Buf), Format, ap);
-    va_end (ap);
 
     /* Add a copy to the data segment */
     CollAppend (&S->Lines, xstrdup (Buf));
@@ -159,7 +102,7 @@ void AddDataSegLine (DataSeg* S, const char* Format, ...)
 
 
 
-void OutputDataSeg (FILE* F, const DataSeg* S)
+void OutputDataSeg (const DataSeg* S, FILE* F)
 /* Output the data segment data to a file */
 {
     unsigned I;
@@ -167,10 +110,21 @@ void OutputDataSeg (FILE* F, const DataSeg* S)
     /* Get the number of entries in this segment */
     unsigned Count = CollCount (&S->Lines);
 
+    /* If the segment is actually empty, bail out */
+    if (Count == 0) {
+	return;
+    }
+
+    /* Output the segment directive */
+    fprintf (F, ".segment\t\"%s\"\n\n", S->SegName);
+
     /* Output all entries */
     for (I = 0; I < Count; ++I) {
 	fprintf (F, "%s\n", (const char*) CollConstAt (&S->Lines, I));
     }
+
+    /* Add an additional newline after the segment output */
+    fprintf (F, "\n");
 }
 
 

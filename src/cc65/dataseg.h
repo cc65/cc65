@@ -38,29 +38,30 @@
 
 
 
+#include <stdarg.h>
 #include <stdio.h>
 
 /* common */
 #include "attrib.h"
 #include "coll.h"
 
+/* cc65 */
+#include "symentry.h"
+
 
 
 /*****************************************************************************/
-/*  	       	 	  	     Data				     */
+/*  	       	 	  	     Data		    		     */
 /*****************************************************************************/
 
 
 
 typedef struct DataSeg DataSeg;
 struct DataSeg {
-    DataSeg*		Next;	       	/* Pointer to next DataSeg */
-    char*		Name;		/* Segment name */
+    char*		SegName; 	/* Segment name */
+    SymEntry*		Func;		/* Owner function */
     Collection 	       	Lines;	       	/* List of code lines */
 };
-
-/* Pointer to current data segment */
-extern DataSeg* DS;
 
 
 
@@ -70,25 +71,19 @@ extern DataSeg* DS;
 
 
 
-DataSeg* NewDataSeg (const char* Name);
+DataSeg* NewDataSeg (const char* SegName, SymEntry* Func);
 /* Create a new data segment, initialize and return it */
 
 void FreeDataSeg (DataSeg* S);
 /* Free a data segment including all line entries */
 
-void PushDataSeg (DataSeg* S);
-/* Push the given data segment onto the stack */
-
-DataSeg* PopDataSeg (void);
-/* Remove the current data segment from the stack and return it */
-
 void AppendDataSeg (DataSeg* Target, const DataSeg* Source);
 /* Append the data from Source to Target. */
 
-void AddDataSegLine (DataSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
+void AddDataEntry (DataSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
 /* Add a line to the given data segment */
 
-void OutputDataSeg (FILE* F, const DataSeg* S);
+void OutputDataSeg (const DataSeg* S, FILE* F);
 /* Output the data segment data to a file */
 
 

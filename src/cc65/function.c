@@ -47,6 +47,7 @@
 #include "litpool.h"
 #include "locals.h"
 #include "scanner.h"
+#include "segments.h"
 #include "stmt.h"
 #include "symtab.h"
 #include "function.h"
@@ -246,7 +247,7 @@ void NewFunc (SymEntry* Func)
     InitRegVars ();
 
     /* Allocate code and data segments for this function */
-    g_pushseg (&Func->V.F.CS, &Func->V.F.DS, Func->Name);
+    Func->V.F.Seg = PushSegments (Func);
 
     /* If this is a fastcall function, push the last parameter onto the stack */
     if (IsFastCallFunc (Func->Type) && D->ParamCount > 0) {
@@ -336,7 +337,7 @@ void NewFunc (SymEntry* Func)
     LeaveFunctionLevel ();
 
     /* Switch back to the old segments */
-    g_popseg ();
+    PopSegments ();		      
 
     /* Reset the current function pointer */
     FreeFunction (CurrentFunc);

@@ -53,17 +53,6 @@
 
 
 /*****************************************************************************/
-/*  	       	 	  	     Data				     */
-/*****************************************************************************/
-
-
-
-/* Pointer to current code segment */
-CodeSeg* CS = 0;
-
-
-
-/*****************************************************************************/
 /*		      Functions for parsing instructions		     */
 /*****************************************************************************/
 
@@ -309,7 +298,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 
 
 
-CodeSeg* NewCodeSeg (const char* SegName, const char* FuncName)
+CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
 /* Create a new code segment, initialize and return it */
 {
     unsigned I;
@@ -318,9 +307,8 @@ CodeSeg* NewCodeSeg (const char* SegName, const char* FuncName)
     CodeSeg* S = xmalloc (sizeof (CodeSeg));
 
     /* Initialize the fields */
-    S->Next     = 0;
     S->SegName  = xstrdup (SegName);
-    S->FuncName	= xstrdup (FuncName);
+    S->Func	= Func;
     InitCollection (&S->Entries);
     InitCollection (&S->Labels);
     for (I = 0; I < sizeof(S->LabelHash) / sizeof(S->LabelHash[0]); ++I) {
@@ -336,39 +324,12 @@ CodeSeg* NewCodeSeg (const char* SegName, const char* FuncName)
 void FreeCodeSeg (CodeSeg* S)
 /* Free a code segment including all code entries */
 {
-    FAIL ("Not implemented");
+    Internal ("Not implemented");
 }
 
 
 
-void PushCodeSeg (CodeSeg* S)
-/* Push the given code segment onto the stack */
-{
-    S->Next = CS;
-    CS	    = S;
-}
-
-
-
-CodeSeg* PopCodeSeg (void)
-/* Remove the current code segment from the stack and return it */
-{
-    /* Remember the current code segment */
-    CodeSeg* S = CS;
-
-    /* Cannot pop on empty stack */
-    PRECONDITION (S != 0);
-
-    /* Pop */
-    CS = S->Next;
-
-    /* Return the popped code segment */
-    return S;
-}
-
-
-
-void AddCodeSegLine (CodeSeg* S, const char* Format, ...)
+void AddCodeEntry (CodeSeg* S, const char* Format, va_list ap)
 /* Add a line to the given code segment */
 {
     const char* L;
@@ -376,11 +337,8 @@ void AddCodeSegLine (CodeSeg* S, const char* Format, ...)
     char	Token[64];
 
     /* Format the line */
-    va_list ap;
     char Buf [256];
-    va_start (ap, Format);
     xvsprintf (Buf, sizeof (Buf), Format, ap);
-    va_end (ap);
 
     /* Skip whitespace */
     L = SkipSpace (Buf);
@@ -436,7 +394,7 @@ void AddCodeSegLine (CodeSeg* S, const char* Format, ...)
 
 
 
-void DelCodeSegLine (CodeSeg* S, unsigned Index)
+void DelCodeEntry (CodeSeg* S, unsigned Index)
 /* Delete an entry from the code segment. This includes deleting any associated
  * labels, removing references to labels and even removing the referenced labels
  * if the reference count drops to zero.
@@ -592,7 +550,7 @@ void DelCodeSegAfter (CodeSeg* S, unsigned Last)
 
 
 
-void OutputCodeSeg (FILE* F, const CodeSeg* S)
+void OutputCodeSeg (const CodeSeg* S, FILE* F)
 /* Output the code segment data to a file */
 {
     unsigned I;
@@ -600,31 +558,26 @@ void OutputCodeSeg (FILE* F, const CodeSeg* S)
     /* Get the number of entries in this segment */
     unsigned Count = CollCount (&S->Entries);
 
-    fprintf (F, "; Labels: ");
-    for (I = 0; I < CS_LABEL_HASH_SIZE; ++I) {
-    	const CodeLabel* L = S->LabelHash[I];
-    	while (L) {
-    	    fprintf (F, "%s ", L->Name);
-    	    L = L->Next;
-    	}
+    /* If the code segment is empty, bail out here */
+    if (Count == 0) {
+	return;
     }
-    fprintf (F, "\n");
 
     /* Output the segment directive */
     fprintf (F, ".segment\t\"%s\"\n\n", S->SegName);
 
     /* If this is a segment for a function, enter a function */
-    if (S->FuncName[0] != '\0') {
-	fprintf (F, ".proc\t_%s\n\n", S->FuncName);
+    if (S->Func) {
+	fprintf (F, ".proc\t_%s\n\n", S->Func->Name);
     }
 
     /* Output all entries */
     for (I = 0; I < Count; ++I) {
-	OutputCodeEntry (F, CollConstAt (&S->Entries, I));
+	OutputCodeEntry (CollConstAt (&S->Entries, I), F);
     }
 
     /* If this is a segment for a function, leave the function */
-    if (S->FuncName[0] != '\0') {
+    if (S->Func) {
 	fprintf (F, "\n.endproc\n\n");
     }
 }

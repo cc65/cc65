@@ -56,14 +56,14 @@ OBJS =	anonname.o	\
 	opcodes.o	\
 	preproc.o      	\
 	pragma.o       	\
-	scanner.o      	\
-	segname.o	\
-	stdfunc.o	\
-	stmt.o 		\
-	symentry.o	\
-	symtab.o       	\
-	typecmp.o	\
-	util.o
+    	scanner.o      	\
+	segments.o	\
+    	stdfunc.o	\
+    	stmt.o 		\
+    	symentry.o	\
+    	symtab.o       	\
+    	typecmp.o	\
+    	util.o
 
 LIBS =	$(COMMON)/common.a
 

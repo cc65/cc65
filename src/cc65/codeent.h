@@ -91,7 +91,7 @@ void FreeCodeEntry (CodeEntry* E);
 int CodeEntryHasLabel (const CodeEntry* E);
 /* Check if the given code entry has labels attached */
 
-void OutputCodeEntry (FILE* F, const CodeEntry* E);
+void OutputCodeEntry (const CodeEntry* E, FILE* F);
 /* Output the code entry to a file */
 
 

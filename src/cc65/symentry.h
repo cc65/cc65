@@ -40,27 +40,38 @@
 
 #include <stdio.h>
 
+/* cc65 */
 #include "datatype.h"
 
 
 
 /*****************************************************************************/
-/*	       	  	       	struct SymEntry				     */
+/*				    Forwards				     */
+/*****************************************************************************/
+
+
+
+struct Segments;
+
+
+
+/*****************************************************************************/
+/*	       	     	       	struct SymEntry				     */
 /*****************************************************************************/
 
 
 
 /* Storage classes and flags */
-#define SC_AUTO     	0x0001U
+#define SC_AUTO      	0x0001U
 #define SC_REGISTER    	0x0002U	/* Register variable, is in static storage */
 #define SC_STATIC    	0x0004U
 #define SC_EXTERN    	0x0008U
 
 #define SC_ENUM	     	0x0030U	/* An enum (numeric constant) */
-#define SC_CONST	0x0020U	/* A numeric constant with a type */
+#define SC_CONST     	0x0020U	/* A numeric constant with a type */
 #define SC_LABEL       	0x0040U	/* A goto label */
 #define SC_PARAM       	0x0080U	/* This is a function parameter */
-#define SC_FUNC		0x0100U	/* Function entry */
+#define SC_FUNC	     	0x0100U	/* Function entry */
 
 #define SC_STORAGE     	0x0400U	/* Symbol with associated storage */
 #define SC_DEFAULT     	0x0800U	/* Flag: default storage class was used */
@@ -83,7 +94,7 @@ struct SymEntry {
     SymEntry*  			NextHash; /* Next entry in hash list */
     SymEntry*  			PrevSym;  /* Previous symbol in dl list */
     SymEntry*  			NextSym;  /* Next symbol double linked list */
-    SymEntry*  			Link;  	  /* General purpose single linked list */
+    SymEntry*  	     		Link;  	  /* General purpose single linked list */
     struct SymTable*		Owner; 	  /* Symbol table the symbol is in */
     unsigned   			Flags; 	  /* Symbol flags */
     type*      			Type;  	  /* Symbol type */
@@ -109,18 +120,17 @@ struct SymEntry {
 	/* Data for functions */
 	struct {
 	    struct FuncDesc*	Func;	  /* Function descriptor */
-	    struct CodeSeg*	CS;	  /* Code for function */
-	    struct DataSeg*	DS;	  /* Data segment for function */
+       	    struct Segments*	Seg;	  /* Segments for this function */
        	} F;
 
     } V;
-    char       	   	       Name[1];	/* Name, dynamically allocated */
+    char       	     	       Name[1];	/* Name, dynamically allocated */
 };
 
 
 
 /*****************************************************************************/
-/*	       	  	       	     Code				     */
+/*	       	     	       	     Code				     */
 /*****************************************************************************/
 
 

@@ -88,7 +88,7 @@ static void OptDeadJumps (CodeSeg* S)
 	if (E->AM == AM_BRA && E->JumpTo && E->JumpTo->Owner == CollAt (&S->Entries, I+1)) {
 
 	    /* Delete the dead jump */
-	    DelCodeSegLine (S, I);
+	    DelCodeEntry (S, I);
 
 	    /* Keep the number of entries updated */
 	    --Count;
@@ -140,7 +140,7 @@ static void OptDeadCode (CodeSeg* S)
        	    !CodeEntryHasLabel (CollAt (&S->Entries, I+1))) {
 
  	    /* Delete the next entry */
- 	    DelCodeSegLine (S, I+1);
+ 	    DelCodeEntry (S, I+1);
 
  	    /* Keep the number of entries updated */
  	    --Count;

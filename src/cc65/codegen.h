@@ -38,14 +38,8 @@
 
 
 
-/*****************************************************************************/
-/*				   Forwards				     */
-/*****************************************************************************/
-
-
-
-struct CodeSeg;
-struct DataSeg;
+/* cc65 */
+#include "segments.h"
 
 
 
@@ -109,12 +103,6 @@ void g_preamble (void);
 
 
 
-void g_pushseg (struct CodeSeg** CS, struct DataSeg** DS, const char* FuncName);
-/* Push the current segments and generate new ones for the given function */
-
-void g_popseg (void);
-/* Restore the old segments */
-
 void g_userodata (void);
 /* Switch to the read only data segment */
 
@@ -123,18 +111,6 @@ void g_usedata (void);
 
 void g_usebss (void);
 /* Switch to the bss segment */
-
-void g_codename (const char* Name);
-/* Set the name of the CODE segment */
-
-void g_rodataname (const char* Name);
-/* Set the name of the RODATA segment */
-
-void g_dataname (const char* Name);
-/* Set the name of the DATA segment */
-
-void g_bssname (const char* Name);
-/* Set the name of the BSS segment */
 
 
 

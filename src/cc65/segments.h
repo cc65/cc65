@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   asmcode.c				     */
+/*				  segments.h				     */
 /*                                                                           */
-/*	    Assembler output code handling for the cc65 C compiler	     */
+/*			      Segment management			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,74 +33,100 @@
 
 
 
+#ifndef SEGMENTS_H
+#define SEGMENTS_H
+
+
+
+#include <stdio.h>
+
 /* common */
-#include "check.h"
-
-/* cc65 */
-#include "codeopt.h"
-#include "codeseg.h"
-#include "dataseg.h"
-#include "segments.h"
-#include "symtab.h"
-#include "asmcode.h"
+#include "attrib.h"
 
 
 
 /*****************************************************************************/
-/*	       		    	     Code   				     */
+/*		  		   Forwards				     */
 /*****************************************************************************/
 
 
 
-void AddCodeHint (const char* Hint)
-/* Add an optimizer hint */
-{
-    /* ### AddCodeLine ("+%s", Hint); */
-}
+struct CodeSeg;
+struct DataSeg;
+struct SymEntry;
 
 
 
-CodeMark GetCodePos (void)
-/* Get a marker pointing to the current output position */
-{
-    return GetCodeSegEntries (CS->Code);
-}
+/*****************************************************************************/
+/*		  		     Data				     */
+/*****************************************************************************/
 
 
 
-void RemoveCode (CodeMark M)
-/* Remove all code after the given code marker */
-{
-    DelCodeSegAfter (CS->Code, M);
-}
+/* Segment types */
+typedef enum segment_t {
+    SEG_CODE,
+    SEG_RODATA,
+    SEG_DATA,
+    SEG_BSS,
+    SEG_COUNT
+} segment_t;
+
+/* A list of all segments used when generating code */
+typedef struct Segments Segments;
+struct Segments {
+    struct CodeSeg*	Code; 		/* Code segment */
+    struct DataSeg*	Data; 		/* Data segment */
+    struct DataSeg*	ROData;		/* Readonly data segment */
+    struct DataSeg*	BSS;		/* Segment for uninitialized data */
+    segment_t  	       	CurDSeg;	/* Current data segment */
+};
+
+/* Pointer to the current segment list. Output goes here. */
+extern Segments* CS;
 
 
 
-void WriteOutput (FILE* F)
-/* Write the final output to a file */
-{
-    SymTable* SymTab;
-    SymEntry* Entry;
+/*****************************************************************************/
+/*		  	    	     Code				     */
+/*****************************************************************************/
 
-    /* Output the global data segment */
-    CHECK (GetCodeSegEntries (CS->Code) == 0);
-    OutputSegments (CS, F);
 
-    /* Output all global or referenced functions */
-    SymTab = GetGlobalSymTab ();
-    Entry  = SymTab->SymHead;
-    while (Entry) {
-       	if (IsTypeFunc (Entry->Type) 	  	&&
-	    (Entry->Flags & SC_DEF) != 0  	&&
-	    (Entry->Flags & (SC_REF | SC_EXTERN)) != 0) {
-	    /* Function which is defined and referenced or extern */
-	    MergeCodeLabels (Entry->V.F.Seg->Code);
-	    RunOpt (Entry->V.F.Seg->Code);
-	    OutputSegments (Entry->V.F.Seg, F);
-     	}
-	Entry = Entry->NextSym;
-    }
-}
+
+void InitSegNames (void);
+/* Initialize the segment names */
+
+void NewSegName (segment_t Seg, const char* Name);
+/* Set a new name for a segment */
+
+int ValidSegName (const char* Name);
+/* Return true if the given segment name is valid, return false otherwise */
+
+Segments* PushSegments (struct SymEntry* Func);
+/* Make the new segment list current but remember the old one */
+
+void PopSegments (void);
+/* Pop the old segment list (make it current) */
+
+void UseDataSeg (segment_t DSeg);
+/* For the current segment list, use the data segment DSeg */
+
+struct DataSeg* GetDataSeg (void);
+/* Return the current data segment */
+
+void AddCodeLine (const char* Format, ...) attribute ((format (printf, 1, 2)));
+/* Add a line of code to the current code segment */
+
+void AddDataLine (const char* Format, ...) attribute ((format (printf, 1, 2)));
+/* Add a line of data to the current data segment */
+
+void OutputSegments (const Segments* S, FILE* F);
+/* Output the given segments to the file */
+
+
+
+/* End of segments.h */
+#endif
 
 
 

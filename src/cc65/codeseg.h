@@ -37,7 +37,8 @@
 #define CODESEG_H
 
 
-
+		  
+#include <stdarg.h>
 #include <stdio.h>
 
 /* common */
@@ -46,11 +47,12 @@
 
 /* cc65 */
 #include "codelab.h"
+#include "symentry.h"
 
 
 
 /*****************************************************************************/
-/*  	       	 	  	     Data				     */
+/*  	       	     	  	     Data				     */
 /*****************************************************************************/
 
 
@@ -61,41 +63,31 @@
 /* Code segment structure */
 typedef struct CodeSeg CodeSeg;
 struct CodeSeg {
-    CodeSeg*	Next;				/* Pointer to next CodeSeg */
     char*	SegName;  			/* Segment name */
-    char*	FuncName;			/* Name of function */
+    SymEntry*	Func;				/* Owner function */
     Collection	Entries;			/* List of code entries */
     Collection	Labels;				/* Labels for next insn */
     CodeLabel* 	LabelHash [CS_LABEL_HASH_SIZE];	/* Label hash table */
 };
 
-/* Pointer to current code segment */
-extern CodeSeg* CS;
-
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code      				     */
+/*     	       	      	  	     Code      		  		     */
 /*****************************************************************************/
 
 
 
-CodeSeg* NewCodeSeg (const char* SegName, const char* FuncName);
+CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func);
 /* Create a new code segment, initialize and return it */
 
 void FreeCodeSeg (CodeSeg* S);
 /* Free a code segment including all code entries */
 
-void PushCodeSeg (CodeSeg* S);
-/* Push the given code segment onto the stack */
-
-CodeSeg* PopCodeSeg (void);
-/* Remove the current code segment from the stack and return it */
-
-void AddCodeSegLine (CodeSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
+void AddCodeEntry (CodeSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
 /* Add a line to the given code segment */
 
-void DelCodeSegLine (CodeSeg* S, unsigned Index);
+void DelCodeEntry (CodeSeg* S, unsigned Index);
 /* Delete an entry from the code segment. This includes deleting any associated
  * labels, removing references to labels and even removing the referenced labels
  * if the reference count drops to zero.
@@ -113,7 +105,7 @@ void AddCodeSegHint (CodeSeg* S, unsigned Hint);
 void DelCodeSegAfter (CodeSeg* S, unsigned Last);
 /* Delete all entries including the given one */
 
-void OutputCodeSeg (FILE* F, const CodeSeg* S);
+void OutputCodeSeg (const CodeSeg* S, FILE* F);
 /* Output the code segment data to a file */
 
 CodeLabel* FindCodeLabel (CodeSeg* S, const char* Name, unsigned Hash);

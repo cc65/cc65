@@ -42,10 +42,11 @@
 /* common */
 #include "cmdline.h"
 #include "version.h"
-	  
+
 /* ca65 */
 #include "error.h"
 #include "expr.h"
+#include "filetab.h"
 #include "global.h"
 #include "incpath.h"
 #include "instr.h"
@@ -307,7 +308,7 @@ static void OneLine (void)
      */
     if (!HavePushedInput ()) {
 	InitListingLine ();
-    }	  
+    }
 
     if (Tok == TOK_COLON) {
 	/* An unnamed label */

@@ -68,9 +68,11 @@ CCCFG	= $(CCCFG) -i=..\common
 # All library OBJ files
 
 OBJS = 	condasm.obj	\
+	dbginfo.obj	\
 	ea.obj		\
 	error.obj	\
 	expr.obj	\
+	filetab.obj	\
 	fragment.obj	\
 	global.obj	\
 	incpath.obj	\
@@ -112,9 +114,11 @@ DEBUG ALL
 OPTION QUIET
 NAME $<
 FILE condasm.obj
+FILE dbginfo.obj
 FILE ea.obj
 FILE error.obj
-FILE expr.obj
+FILE expr.obj	
+FILE filetab.obj
 FILE fragment.obj
 FILE global.obj
 FILE incpath.obj

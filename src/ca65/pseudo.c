@@ -45,6 +45,7 @@
 
 /* ca65 */
 #include "condasm.h"
+#include "dbginfo.h"
 #include "error.h"
 #include "expr.h"
 #include "global.h"
@@ -343,6 +344,42 @@ static void DoData (void)
 /* Switch to the data segment */
 {
     UseDataSeg ();
+}
+
+
+
+static void DoDbg (void)
+/* Add debug information from high level code */
+{
+    static const char* Keys[] = {
+       	"FILE",
+	"LINE",
+    	"SYM",
+    };
+    int Key;
+
+
+    /* We expect a subkey */
+    if (Tok != TOK_IDENT) {
+     	ErrorSkip (ERR_IDENT_EXPECTED);
+     	return;
+    }
+
+    /* Map the following keyword to a number */
+    Key = GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]));
+
+    /* Skip the subkey */
+    NextTok ();
+	    
+    /* Parameters are separated by a comma */
+    ConsumeComma ();
+
+    /* Check the key and dispatch to a handler */
+    switch (Key) {
+	case 0:     DbgInfoFile ();		break;
+	case 1:
+	default:    ErrorSkip (ERR_SYNTAX);	break;
+    }
 }
 
 
@@ -1113,6 +1150,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoUnexpected	},	/* .CONST */
     { ccNone,		DoUnexpected	},	/* .CPU */
     { ccNone,		DoData		},
+    { ccNone,		DoDbg,		},
     { ccNone,		DoDByt		},
     { ccNone,        	DoDebugInfo	},
     { ccNone,		DoDefine	},

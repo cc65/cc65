@@ -124,6 +124,7 @@ enum Token {
     TOK_CONST,
     TOK_CPU,
     TOK_DATA,
+    TOK_DBG,
     TOK_DBYT,
     TOK_DEBUGINFO,
     TOK_DEFINE,
@@ -226,9 +227,6 @@ extern int     	ForcedEnd;		/* Force end of assembly */
 
 
 
-const char* GetFileName (unsigned char Name);
-/* Get the name of a file where the name index is known */
-
 void NewInputFile (const char* Name);
 /* Open a new input file */
 
@@ -256,9 +254,6 @@ int GetSubKey (const char** Keys, unsigned Count);
  * uppercased in the process. The function returns the index of the keyword,
  * or -1 if the keyword was not found.
  */
-
-void WriteFiles (void);
-/* Write the list of input files to the object file */
 
 void InitScanner (const char* InFile);
 /* Initialize the scanner, open the given input file */

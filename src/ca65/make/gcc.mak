@@ -10,9 +10,11 @@ CC	= gcc
 LDFLAGS	=
 
 OBJS =  condasm.o	\
+	dbginfo.o	\
 	ea.o	      	\
         error.o	      	\
         expr.o	      	\
+	filetab.o	\
 	fragment.o	\
         global.o       	\
 	incpath.o      	\

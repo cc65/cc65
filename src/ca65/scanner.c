@@ -48,13 +48,13 @@
 /* ca65 */
 #include "condasm.h"
 #include "error.h"
+#include "filetab.h"
 #include "global.h"
 #include "incpath.h"
 #include "instr.h"
 #include "istack.h"
 #include "listing.h"
 #include "macro.h"
-#include "objfile.h"
 #include "toklist.h"
 #include "scanner.h"
 
@@ -101,14 +101,6 @@ struct InputData_ {
     InputData*	    Next;		/* Linked list of input data */
 };
 
-/* List of input files */
-static struct {
-    unsigned long  MTime;		/* Time of last modification */
-    unsigned long  Size;		/* Size of file */
-    const char*	   Name;		/* Name of file */
-} Files [MAX_INPUT_FILES];
-static unsigned    FileCount = 0;
-
 /* Current input variables */
 static InputFile* IFile        	= 0;	/* Current input file */
 static InputData* IData        	= 0;	/* Current input memory data */
@@ -139,10 +131,11 @@ struct DotKeyword {
     { "BYTE", 	    	TOK_BYTE	},
     { "CASE",  	    	TOK_CASE	},
     { "CODE", 	    	TOK_CODE    	},
-    { "CONCAT",		TOK_CONCAT	},
+    { "CONCAT",	  	TOK_CONCAT	},
     { "CONST", 	    	TOK_CONST	},
-    { "CPU", 		TOK_CPU		},
-    { "DATA",  		TOK_DATA	},
+    { "CPU", 	  	TOK_CPU		},
+    { "DATA",  	  	TOK_DATA	},
+    { "DBG",		TOK_DBG		},
     { "DBYT",  		TOK_DBYT	},
     { "DEBUGINFO",	TOK_DEBUGINFO	},
     { "DEF",   		TOK_DEFINED	},
@@ -311,38 +304,11 @@ static int IsIdStart (int C)
 
 
 
-const char* GetFileName (unsigned char Name)
-/* Get the name of a file where the name index is known */
-{
-    PRECONDITION (Name <= FileCount);
-    if (Name == 0) {
-	/* Name was defined outside any file scope, use the name of the first
-	 * file instead. Errors are then reported with a file position of
-     	 * line zero in the first file.
-	 */
-	if (FileCount == 0) {
-    	    /* No files defined until now */
-       	    return "(outside file scope)";
-	} else {
-	    return Files [0].Name;
-	}
-    } else {
-        return Files [Name-1].Name;
-    }
-}
-
-
-
 void NewInputFile (const char* Name)
 /* Open a new input file */
 {
     InputFile* I;
     FILE* F;
-
-    /* Check for nested include overflow */
-    if (FileCount >= MAX_INPUT_FILES) {
-     	Fatal (FAT_MAX_INPUT_FILES);
-    }
 
     /* First try to open the file */
     F = fopen (Name, "r");
@@ -372,29 +338,30 @@ void NewInputFile (const char* Name)
     /* check again if we do now have an open file */
     if (F != 0) {
 
+	unsigned FileIdx;
+
      	/* Stat the file and remember the values */
      	struct stat Buf;
      	if (fstat (fileno (F), &Buf) != 0) {
      	    Fatal (FAT_CANNOT_STAT_INPUT, Name, strerror (errno));
      	}
-     	Files [FileCount].MTime = Buf.st_mtime;
-     	Files [FileCount].Size  = Buf.st_size;
-     	Files [FileCount].Name  = xstrdup (Name);
-     	++FileCount;
+
+	/* Add the file to the input file table and remember the index */
+	FileIdx = AddFile (Name, Buf.st_size, Buf.st_mtime);
 
      	/* Create a new state variable and initialize it */
-     	I  	    = xmalloc (sizeof (*I));
+     	I      	    = xmalloc (sizeof (*I));
      	I->F   	    = F;
      	I->Pos.Line = 0;
      	I->Pos.Col  = 0;
-     	I->Pos.Name = FileCount;
+     	I->Pos.Name = FileIdx;
      	I->Tok      = Tok;
-     	I->C	    = C;
+     	I->C   	    = C;
      	I->Line[0]  = '\0';
 
      	/* Use the new file */
      	I->Next	    = IFile;
-     	IFile 	    = I;
+     	IFile  	    = I;
      	++ICount;
 
      	/* Prime the pump */
@@ -899,7 +866,7 @@ CharAgain:
 		    IVal = 0;
 		    do {
 		     	--IVal;
-		     	NextChar ();
+	  	     	NextChar ();
 		    } while (C == '-');
 		    Tok = TOK_ULABEL;
 		    break;
@@ -1124,30 +1091,6 @@ int GetSubKey (const char** Keys, unsigned Count)
 
     /* Not found */
     return -1;
-}
-
-
-
-void WriteFiles (void)
-/* Write the list of input files to the object file */
-{
-    unsigned I;
-
-    /* Tell the obj file module that we're about to start the file list */
-    ObjStartFiles ();
-
-    /* Write the file count */
-    ObjWrite8 (FileCount);
-
-    /* Write the file data */
-    for (I = 0; I < FileCount; ++I) {
-	ObjWrite32 (Files [I].MTime);
-	ObjWrite32 (Files [I].Size);
-	ObjWriteStr (Files [I].Name);
-    }
-
-    /* Done writing files */
-    ObjEndFiles ();
 }
 
 

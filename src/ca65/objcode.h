@@ -38,7 +38,10 @@
 
 
 
-#include "../common/segdefs.h"
+/* common */
+#include "segdefs.h"
+
+/* ca65 */
 #include "expr.h"
 
 
@@ -163,6 +166,6 @@ void EmitFill (unsigned long Count);
 /* End of objcode.h */
 
 #endif
-		
+
 
 

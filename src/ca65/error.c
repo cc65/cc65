@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    error.c				     */
+/*  				    error.c				     */
 /*                                                                           */
-/*		  Error handling for the ca65 macroassembler		     */
+/*  		  Error handling for the ca65 macroassembler		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -36,7 +36,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-
+		    
+/* ca65 */
+#include "filetab.h"
 #include "nexttok.h"
 #include "error.h"
 
@@ -180,7 +182,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
        	"Conditional assembly branch was never closed",
 	"Lexical level was not terminated correctly",
 	"Segment attribute mismatch",
-	"CPU not supported",
+    	"CPU not supported",
 	"Counter underflow",
 	"Undefined label",
 	"Open `%s´",

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2003 Ullrich von Bassewitz                                       */
+/* (C) 1999-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -62,9 +62,11 @@ typedef struct O65Desc O65Desc;
 #define O65OPT_TIMESTAMP	4
 
 /* Operating system codes for O65OPT_OS */
+#define O65OS_MIN               1
 #define O65OS_OSA65		1
 #define O65OS_LUNIX		2
 #define O65OS_CC65              3
+#define O65OS_MAX               255
 
 
 

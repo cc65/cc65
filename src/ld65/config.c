@@ -912,7 +912,7 @@ static void ParseO65 (void)
 		    CfgError ("Exported symbol `%s' cannot be an import", CfgSVal);
 		}
       		/* Check if we have this symbol defined already. The entry
-      		 * routine will check this also, but we get a more verbose
+      	     	 * routine will check this also, but we get a more verbose
       		 * error message when checking it here.
       		 */
       	 	if (O65GetExport (O65FmtDesc, CfgSValId) != 0) {
@@ -962,20 +962,27 @@ static void ParseO65 (void)
 	    	    default:
 	    	     	CfgError ("Unexpected type token");
 	    	}
-	    	break;
+	     	break;
 
 	    case CFGTOK_OS:
-		/* Cannot use this attribute twice */
-	  	FlagAttr (&AttrFlags, atOS, "OS");
-		/* Get the operating system */
-	    	CfgSpecialToken (OperatingSystems, ENTRY_COUNT (OperatingSystems), "OS type");
-		switch (CfgTok) {
-		    case CFGTOK_LUNIX:  OS = O65OS_LUNIX;       break;
-		    case CFGTOK_OSA65:  OS = O65OS_OSA65;       break;
-		    case CFGTOK_CC65:   OS = O65OS_CC65;        break;
-		    default:            CfgError ("Unexpected OS token");
-		}
-		break;
+	     	/* Cannot use this attribute twice */
+	     	FlagAttr (&AttrFlags, atOS, "OS");
+	     	/* Get the operating system. It may be specified as name or
+                 * as a number in the range 1..255.
+                 */
+		if (CfgTok == CFGTOK_INTCON) {
+		    CfgRangeCheck (O65OS_MIN, O65OS_MAX);
+		    OS = (unsigned) CfgIVal;
+		} else {
+                    CfgSpecialToken (OperatingSystems, ENTRY_COUNT (OperatingSystems), "OS type");
+                    switch (CfgTok) {
+                        case CFGTOK_LUNIX:  OS = O65OS_LUNIX;       break;
+                        case CFGTOK_OSA65:  OS = O65OS_OSA65;       break;
+                        case CFGTOK_CC65:   OS = O65OS_CC65;        break;
+                        default:            CfgError ("Unexpected OS token");
+                    }
+                }
+	     	break;
 
             case CFGTOK_ID:
                 /* Cannot have this attribute twice */
@@ -1010,8 +1017,8 @@ static void ParseO65 (void)
 
     /* Check for attributes that may not be combined */
     if (OS == O65OS_CC65) {
-        if ((AttrFlags & (atImport | atExport)) != 0) {
-            CfgError ("OS type CC65 may not have imports or exports");
+        if ((AttrFlags & (atImport | atExport)) != 0 && ModuleId < 0x8000) {
+            CfgError ("OS type CC65 may not have imports or exports for ids < $8000");
         }
     } else {
         if (AttrFlags & atID) {

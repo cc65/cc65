@@ -15,7 +15,7 @@
         .macpack        generic
 
 ; Sprite definitions. The first value can be changed to adjust the number
-; of the sprite used for the mouse.
+; of the sprite used for the mouse. All others depend on this value.
 MOUSE_SPR       = 0                             ; Sprite used for the mouse
 MOUSE_SPR_MASK  = $01 .shl MOUSE_SPR            ; Positive mask
 MOUSE_SPR_NMASK = .lobyte(.not MOUSE_SPR_MASK)  ; Negative mask
@@ -82,14 +82,7 @@ VIC_SPR_Y       = (VIC_SPR0_Y + 2*MOUSE_SPR)    ; Sprite Y register
 
 .proc   movey
 
-        clc
-        ldx     PALFLAG
-        bne     @L1
-        adc     #50                     ; FIXME: Should be NTSC, is PAL value
-       	sta    	VIC_SPR_Y               ; Set Y position
-        rts
-
-@L1:    adc     #50                     ; Add PAL correction
+        add     #50                     ; Y correction (first visible line)
        	sta    	VIC_SPR_Y               ; Set Y position
         rts
 

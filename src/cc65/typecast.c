@@ -78,24 +78,21 @@ int TypeCast (ExprDesc* lval)
     	lval->Type = PointerTo (lval->Type);
     }
 
-    /* Remember the old type and use the new one */
+    /* Remember the old type */
     OldType = lval->Type;
-    lval->Type = TypeDup (NewType);
 
     /* If we're casting to void, we're done. Note: This does also cover a cast
      * void -> void.
      */
     if (IsTypeVoid (NewType)) {
-        return 0;       /* Never an lvalue */
+        k = 0;          /* Never an lvalue */
+        goto ExitPoint;
     }
 
-    /* Don't allow casts from void to something else. The new type is already
-     * set which should avoid more errors, but code will not get generated
-     * because of the error.
-     */
+    /* Don't allow casts from void to something else. */
     if (IsTypeVoid (OldType)) {
         Error ("Cannot cast from `void' to something else");
-        return k;
+        goto ExitPoint;
     }
 
     /* Get the sizes of the types. Since we've excluded void types, checking
@@ -200,6 +197,10 @@ int TypeCast (ExprDesc* lval)
             k = 0;
         }
     }
+
+ExitPoint:
+    /* The expression has always the new type */
+    ReplaceType (lval, NewType);
 
     /* Done */
     return k;

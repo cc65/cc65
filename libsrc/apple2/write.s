@@ -14,10 +14,10 @@
 
 	.include	"apple2.inc"
 
-_write:
-	jsr	popax		; get count
-	sta	ptr2
-	stx	ptr2+1		; save for later
+.proc   _write
+
+	sta	ptr2            ; Save count for later
+	stx	ptr2+1
 	sta	ptr3
 	sta	ptr3+1		; save for result
 	jsr	popax		; get buf
@@ -51,3 +51,6 @@ L3:	dec	ptr2
 L9:   	lda	ptr3
     	ldx	ptr3+1
     	rts
+
+.endproc
+

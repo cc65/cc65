@@ -20,7 +20,7 @@
 
 char* __fastcall__ fgets (char* s, unsigned size, FILE* f)
 {
-    int i = 0;
+    unsigned i;
     int c;
 
     if (size == 0) {

@@ -6,7 +6,7 @@
 
 	.export		_exit
 	.import		initlib, donelib, callirq
-       	.import	       	zerobss, push0
+       	.import	       	zerobss
 	.import	     	callmain
         .import         RESTOR, BSOUT, CLRCH
 	.import	       	__INTERRUPTOR_COUNT__

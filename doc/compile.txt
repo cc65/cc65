@@ -6,18 +6,20 @@ Instructions for compiling cc65 and the ca65 binutils:
 Linux (and probably most other Unices)
 --------------------------------------
 
-You need the GNU C compiler. Do a
+You need the GNU C compiler. Enter the src/ directory and do a
 
-	make -f make/gcc.mak
+       	make -f make/gcc.mak
 
-twice(!) in each of the directories
+This will build all executables. You may use
 
-	cc65
-	binutils
+	make -f make/gcc.mak strip
+
+to remove debugging information from the binaries.
 
 After that, you need to compile the libraries. Do
 
-	cd lib
+	cd libsrc
+	make clean atarilib
 	make clean c64lib
 	make clean c128lib
 	make clean plus4lib
@@ -147,13 +149,11 @@ Watcom tools, or you have to change the makefile.
 
      	make -f make\watcom.mak
 
-   in each of the directories
-
-     	cc65
-     	binutils
+   in the src/ directory.
 
 3. Use Linux to build the libraries:-) If you don't have Linux, get it
-   now! More serious: There is no makefile to build the libraries. Use a
-   batch file similar to the one above, or rewrite the makefile.
+   now! More serious: There is no makefile to build the libraries under
+   any of the DOS based operating systems. Use a batch file similar to 
+   the one above, or rewrite the makefile.
 
 

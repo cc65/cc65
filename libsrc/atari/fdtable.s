@@ -188,13 +188,9 @@ ret:	rts
 ;	C    - 0/1 for no open needed/open should be performed
 ; all registers preserved!
 
-; local variables:
-;   AX     - 0 (A-0,X-1)
-;   Y      - 2
-;   ptr4   - 3,4  (backup)
-;   devnum - 5
-
 	.bss
+
+; local variables:
 loc_Y:		.res	1
 loc_ptr4_l:	.res	1
 loc_ptr4_h:	.res	1

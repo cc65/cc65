@@ -214,7 +214,9 @@ unsigned OptDeadJumps (CodeSeg* S)
 	/* Check if it's a branch, if it has a local target, and if the target
 	 * is the next instruction.
 	 */
-	if (E->AM == AM65_BRA && E->JumpTo && E->JumpTo->Owner == CS_GetEntry (S, I+1)) {
+       	if (E->AM == AM65_BRA                               &&
+	    E->JumpTo                                       &&
+	    E->JumpTo->Owner == CS_GetNextEntry (S, I)) {
 
 	    /* Delete the dead jump */
 	    CS_DelEntry (S, I);
@@ -467,30 +469,24 @@ unsigned OptJumpTarget (CodeSeg* S)
     CodeEntry* E1;     		/* Entry 1 */
     CodeEntry* E2;		/* Entry 2 */
     CodeEntry* T1;		/* Jump target entry 1 */
-    CodeEntry* T2;		/* Jump target entry 2 */
     CodeLabel* TL1;		/* Target label 1 */
-    unsigned TI;		/* Target index */
 
     /* Walk over the entries */
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
       	/* Get next entry */
-       	E2 = CS_GetEntry (S, I+1);
+       	E2 = CS_GetNextEntry (S, I);
 
 	/* Check if we have a jump or branch, and a matching label */
-       	if ((E2->Info & OF_UBRA) != 0 && E2->JumpTo) {
+       	if (E2 && (E2->Info & OF_UBRA) != 0 && E2->JumpTo) {
 
-	    /* Get the target instruction for the label */
-	    T2 = E2->JumpTo->Owner;
-
-	    /* Get the entry preceeding this one (if possible) */
-	    TI = CS_GetEntryIndex (S, T2);
-	    if (TI == 0) {
-	       	/* There is no entry before this one */
+	    /* Get the entry preceeding the branch target */
+	    T1 = CS_GetPrevEntry (S, CS_GetEntryIndex (S, E2->JumpTo->Owner));
+       	    if (T1 == 0) {
+	       	/* There is no such entry */
 	       	goto NextEntry;
 	    }
-	    T1 = CS_GetEntry (S, TI-1);
 
 	    /* Get the entry preceeding the jump */
 	    E1 = CS_GetEntry (S, I);

@@ -126,7 +126,7 @@ Octal:          I = 0;
 
 
 /*****************************************************************************/
-/*		     		     Code				     */
+/*	    	     		     Code				     */
 /*****************************************************************************/
 
 
@@ -144,7 +144,7 @@ void SB_SkipWhite (StrBuf* B)
 int SB_GetSym (StrBuf* B, char* S)
 /* Get a symbol from the string buffer. S must be able to hold MAX_IDENTLEN
  * characters. Returns 1 if a symbol was found and 0 otherwise.
- */                               
+ */
 {
     if (IsIdent (SB_Peek (B))) {
         unsigned I = 0;
@@ -308,6 +308,7 @@ int SB_GetNumber (StrBuf* B, long* Val)
     }
 
     /* Success, value read is in Val */
+    *Val *= Sign;
     return 1;
 }
 

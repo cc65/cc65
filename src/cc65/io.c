@@ -112,7 +112,7 @@ static void CloseInclude (void)
 
 
 
-int readline (void)
+int NextLine (void)
 /* Get a line from the current input.  Returns -1 on end of file. */
 {
     unsigned	Len;

@@ -16,6 +16,7 @@ OBJS =	anonname.o	\
 	check.o       	\
 	codegen.o	\
 	compile.o	\
+	cpu.o		\
 	ctrans.o       	\
 	datatype.o	\
 	declare.o      	\
@@ -26,7 +27,7 @@ OBJS =	anonname.o	\
 	global.o 	\
 	goto.o		\
 	ident.o		\
-	include.o     	\
+	incpath.o      	\
 	io.o		\
 	litpool.o      	\
 	locals.o	\

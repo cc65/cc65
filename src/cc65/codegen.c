@@ -41,6 +41,7 @@
 #include "asmcode.h"
 #include "asmlabel.h"
 #include "check.h"
+#include "cpu.h"
 #include "error.h"
 #include "global.h"
 #include "io.h"
@@ -156,6 +157,11 @@ void g_preamble (void)
     /* Insert some object file options */
     AddCodeLine (".fopt\t\tcompiler,\"cc65 v %u.%u.%u\"", VER_MAJOR, VER_MINOR, VER_PATCH);
     AddEmptyLine ();
+
+    /* If we're producing code for some other CPU, switch the command set */
+    if (CPU == CPU_65C02) {
+	AddCodeLine (".pc02");
+    }
 
     /* Allow auto import for runtime library routines */
     AddCodeLine (".autoimport\ton");
@@ -920,7 +926,7 @@ void g_getind (unsigned flags, unsigned offs)
 }
 
 
-							 
+
 void g_leasp (int offs)
 /* Fetch the address of the specified symbol into the primary register */
 {
@@ -3096,14 +3102,26 @@ void g_inc (unsigned flags, unsigned long val)
 
      	case CF_CHAR:
      	    if (flags & CF_FORCECHAR) {
-     		AddCodeLine ("\tclc");
-     		AddCodeLine ("\tadc\t#$%02X", val & 0xFF);
+		if (CPU == CPU_65C02 && val <= 2) {
+		    while (val--) {
+		 	AddCodeLine ("\tina");
+		    }
+		} else {
+		    AddCodeLine ("\tclc");
+		    AddCodeLine ("\tadc\t#$%02X", val & 0xFF);
+		}
      		break;
      	    }
      	    /* FALLTHROUGH */
 
      	case CF_INT:
-     	    if (FavourSize) {
+	    if (CPU == CPU_65C02 && val == 1) {
+		AddCodeLine ("\tina");
+		AddCodeLine ("\tbne\t*+3");
+		AddCodeLine ("\tinx");
+		/* Tell the optimizer that the X register may be invalid */
+		AddCodeHint ("x:!");
+     	    } else if (FavourSize) {
      		/* Use jsr calls */
      		if (val <= 8) {
      		    AddCodeLine ("\tjsr\tincax%u", val);
@@ -3172,8 +3190,14 @@ void g_dec (unsigned flags, unsigned long val)
 
      	case CF_CHAR:
 	    if (flags & CF_FORCECHAR) {
-     		AddCodeLine ("\tsec");
-		AddCodeLine ("\tsbc\t#$%02X", val & 0xFF);
+		if (CPU == CPU_65C02 && val <= 2) {
+		    while (val--) {
+		 	AddCodeLine ("\tdea");
+		    }
+		} else {
+		    AddCodeLine ("\tsec");
+		    AddCodeLine ("\tsbc\t#$%02X", val & 0xFF);
+		}
 		break;
      	    }
 	    /* FALLTHROUGH */

@@ -1,0 +1,72 @@
+/*****************************************************************************/
+/*                                                                           */
+/*				   incpath.h				     */
+/*                                                                           */
+/*			Include path handling for cc65			     */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 2000      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
+
+
+
+#ifndef INCPATH_H
+#define INCPATH_H
+
+
+
+/*****************************************************************************/
+/*	       	     		     Data		     		     */
+/*****************************************************************************/
+
+
+
+#define INC_SYS		0x0001	      	/* Add to system include path */
+#define INC_USER	0x0002	      	/* Add to user include path */
+
+
+
+/*****************************************************************************/
+/*	       	     	     	     Code		     		     */
+/*****************************************************************************/
+
+
+
+void AddIncludePath (const char* NewPath, unsigned Where);
+/* Add a new include path to the existing one */
+
+char* FindInclude (const char* Name, unsigned Where);
+/* Find an include file. Return a pointer to a malloced area that contains
+ * the complete path, if found, return 0 otherwise.
+ */
+
+
+
+/* End of incpath.h */
+#endif
+
+
+

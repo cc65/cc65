@@ -12,7 +12,7 @@
 #include "expr.h"
 #include "global.h"
 #include "ident.h"
-#include "include.h"
+#include "incpath.h"
 #include "io.h"
 #include "macrotab.h"
 #include "mem.h"
@@ -89,7 +89,7 @@ static void comment (void)
     gch ();
     while (*lptr != '*' || nch () != '/') {
     	if (*lptr == '\0') {
-    	    if (readline () == 0) {
+    	    if (NextLine () == 0) {
     		PPError (ERR_EOF_IN_COMMENT, StartingLine);
     	    	return;
     	    }
@@ -283,7 +283,7 @@ static int MacroCall (Macro* M)
      	    skipblank ();
      	} else if (C == '\0') {
 	    /* End of line inside macro argument list - read next line */
-     	    if (readline () == 0) {
+     	    if (NextLine () == 0) {
      	       	return 0;
      	    }
      	} else {
@@ -864,7 +864,7 @@ void preprocess (void)
 	    }
 
     	}
-    	if (readline () == 0) {
+    	if (NextLine () == 0) {
     	    if (i_ifdef >= 0) {
     		PPError (ERR_CPP_ENDIF_EXPECTED);
     	    }

@@ -44,7 +44,7 @@
 #include "expr.h"
 #include "function.h"
 #include "global.h"
-#include "include.h"
+#include "incpath.h"
 #include "io.h"
 #include "litpool.h"
 #include "macrotab.h"

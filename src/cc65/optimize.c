@@ -40,6 +40,7 @@
 #include "asmlabel.h"
 #include "asmline.h"
 #include "check.h"
+#include "cpu.h"
 #include "error.h"
 #include "global.h"
 #include "io.h"
@@ -123,10 +124,14 @@ static const struct {
     { "\tcmp\t",       	  0,   	REG_A, 	    REG_NONE	  },
     { "\tcpx\t",       	  0,   	REG_X, 	    REG_NONE	  },
     { "\tcpy\t",       	  0,   	REG_Y, 	    REG_NONE	  },
+    { "\tdea",		  1,	REG_A,	    REG_NONE	  },
+    { "\tdec\ta",	  1,	REG_A,	    REG_NONE	  },
     { "\tdec\t",       	  0,   	REG_NONE,   REG_NONE	  },
     { "\tdex", 	       	  1,   	REG_X, 	    REG_NONE	  },
     { "\tdey", 	       	  1,   	REG_Y, 	    REG_NONE	  },
     { "\teor\t",       	  0,   	REG_A, 	    REG_NONE	  },
+    { "\tina",		  1,	REG_A,	    REG_NONE	  },
+    { "\tinc\ta",	  1,    REG_A,	    REG_NONE	  },
     { "\tinc\t",       	  0,   	REG_NONE,   REG_NONE	  },
     { "\tinx", 	       	  1,   	REG_X, 	    REG_NONE	  },
     { "\tiny", 	       	  1,   	REG_Y, 	    REG_NONE	  },
@@ -164,6 +169,7 @@ static const struct {
     { "\tsta\t",       	  0,   	REG_A, 	    REG_NONE	  },
     { "\tstx\t",       	  0,   	REG_X, 	    REG_NONE	  },
     { "\tsty\t",       	  0,   	REG_Y, 	    REG_NONE	  },
+    { "\tstz\t",	  0,	REG_NONE,   REG_NONE	  },
     { "\ttax",         	  1,   	REG_A, 	    REG_X  	  },
     { "\ttay",         	  1,   	REG_A, 	    REG_Y  	  },
     { "\ttsx",         	  1,   	REG_NONE,   REG_X  	  },
@@ -559,7 +565,7 @@ static int IsCondJump (Line* L)
 
 
 
-static int IsXIndAddrMode (Line* L)
+static int IsXAddrMode (Line* L)
 /* Return true if the given line does use the X register */
 {
     unsigned Len = strlen (L->Line);
@@ -569,15 +575,15 @@ static int IsXIndAddrMode (Line* L)
 
 
 
-static int NoXIndAddrMode (Line* L)
+static int NoXAddrMode (Line* L)
 /* Return true if the given line does use the X register */
 {
-    return !IsXIndAddrMode (L);
+    return !IsXAddrMode (L);
 }
 
 
 
-static int IsYIndAddrMode (Line* L)
+static int IsYAddrMode (Line* L)
 /* Return true if the given line does use the Y register */
 {
     unsigned Len = strlen (L->Line);
@@ -779,7 +785,13 @@ static unsigned EstimateDataSize (Line* L, unsigned Chunk)
 static unsigned EstimateSize (Line* L)
 /* Estimate the size of an instruction */
 {
-    static const char* Transfers [] = {
+    static const char* OneByteCmds [] = {
+	"\tdea",
+	"\tdex",
+	"\tdey",
+	"\tina",
+	"\tinx",
+	"\tiny"
 	"\ttax",
 	"\ttay",
 	"\ttsx",
@@ -819,7 +831,7 @@ static unsigned EstimateSize (Line* L)
     if (LineMatchX (L, LongBranches) >= 0) {
 	return 5;
     }
-    if (LineMatchX (L, Transfers) >= 0) {
+    if (LineMatchX (L, OneByteCmds) >= 0) {
 	return 1;
     }
     return 3;
@@ -1141,9 +1153,9 @@ static unsigned RVUInt2 (Line* L,
 
 	/* Evaluate the use flags, check for addressing modes */
 	R = CmdDesc[I].Use;
-	if (IsXIndAddrMode (L)) {
+	if (IsXAddrMode (L)) {
 	    R |= REG_X;
-	} else if (IsYIndAddrMode (L)) {
+	} else if (IsYAddrMode (L)) {
 	    R |= REG_Y;
 	}
 	if (R) {
@@ -1323,7 +1335,7 @@ static void OptCompares1 (void)
 	    	 (Cond = TosCmpFunc (L2[4])) >= 0) {
 
 	    /* Replace it */
-	    if (IsXIndAddrMode (L2[0])) {
+	    if (IsXAddrMode (L2[0])) {
 		/* The load is X indirect, so we may not remove the load
 		 * of the X register.
 		 */
@@ -1377,7 +1389,7 @@ static void OptCompares1 (void)
 	    Offs = GetHexNum (L2[2]->Line+7) - 2;
 
 	    /* Replace it */
-	    if (IsXIndAddrMode (L2[0])) {
+	    if (IsXAddrMode (L2[0])) {
 		/* The load is X indirect, so we may not remove the load
 		 * of the X register.
 		 */
@@ -1637,7 +1649,7 @@ static void OptLoads (void)
  	         LineFullMatch (L2 [1], "\tjsr\tpushax")) {
 
 	    /* Be sure, X is not used in the load */
-	    if (NoXIndAddrMode (L2 [0])) {
+	    if (NoXAddrMode (L2 [0])) {
 
 	    	/* Replace the subroutine call */
 	    	L2 [1] = ReplaceLine (L2 [1], "\tjsr\tpusha0");
@@ -1667,7 +1679,7 @@ static void OptLoads (void)
 	    	 LineMatch (L2 [1], "\tcmp\t#$")) {
 
 	    /* Be sure, X is not used in the load */
-	    if (NoXIndAddrMode (L2 [0])) {
+	    if (NoXAddrMode (L2 [0])) {
 
 	       	/* Remove the unnecessary load */
 	       	FreeLine (L);
@@ -1693,7 +1705,7 @@ static void OptLoads (void)
        	         LineFullMatch (L2 [1], "\tjsr\tbnega")) {
 
 	    /* Be sure, X is not used in the load */
- 	    if (NoXIndAddrMode (L2 [0])) {
+ 	    if (NoXAddrMode (L2 [0])) {
 
 	       	/* Remove the unnecessary load */
 	       	FreeLine (L);
@@ -3630,12 +3642,16 @@ static Line* OptOneBlock (Line* L)
 	    if (A != -1) {
 	     	A = (A << 1) & 0xFF;
 	    }
+	} else if (CPU == CPU_65C02 && LineFullMatch (L, "\tdea")) {
+	    DEC (A, 1);
 	} else if (LineFullMatch (L, "\tdex")) {
 	    DEC (X, 1);
 	} else if (LineFullMatch (L, "\tdey")) {
 	    DEC (Y, 1);
 	} else if (LineMatch (L, "\teor")) {
 	    A = -1;
+	} else if (CPU == CPU_65C02 && LineFullMatch (L, "\tina")) {
+	    INC (A, 1);
 	} else if (LineFullMatch (L, "\tinx")) {
 	    INC (X, 1);
 	} else if (LineFullMatch (L, "\tiny")) {
@@ -3949,7 +3965,7 @@ static Line* OptOneBlock (Line* L)
 	     	/* The value loaded is not used later, remove it */
 	     	Delete = 1;
 	    } else if (LineMatch (L, "\tlda\t(")) {
-	     	if (IsXIndAddrMode (L)) {
+	     	if (IsXAddrMode (L)) {
 	     	    /* lda (zp,x) - if Y and X are both zero, replace by
 		     * load indirect y and save one cycle in some cases.
 		     */
@@ -3982,6 +3998,13 @@ static Line* OptOneBlock (Line* L)
 		} else if (NewVal == Y) {
 		    /* Requested value is already in Y */
 		    L = ReplaceLine (L, "\ttya");
+		} else if (CPU == CPU_65C02 && A != -1) {
+		    /* Try ina/dea operators of 65C02 */
+		    if (NewVal == ((A - 1) & 0xFF)) {
+			L = ReplaceLine (L, "\tdea");
+		    } else if (NewVal == ((A + 1) & 0xFF)) {
+			L = ReplaceLine (L, "\tina");
+		    }
 		}
 		/* Anyway, the new value is now in A */
 		A = NewVal;
@@ -4066,6 +4089,22 @@ static Line* OptOneBlock (Line* L)
 	    A = X = Y = -1;
 	} else if (LineMatch (L, "\tsbc\t")) {
 	    A = -1;
+	} else if (CPU == CPU_65C02 && LineMatch (L, "\tst")) {
+	    /* Try to replace by stz if possible */
+	    if (A == 0 && LineMatch (L, "\tsta\t")) {
+		/* Not indirect and not Y allowed */
+		if (L->Line[5] != '(' && !IsYAddrMode (L)) {
+		    L->Line[3] = 'z';
+		}
+	    } else if (X == 0 && LineMatch (L, "\tstx\t")) {
+		/* absolute,y not allowed */
+		if (!IsYAddrMode (L)) {
+		    L->Line[3] = 'z';
+		}
+	    } else if (Y == 0 && LineMatch (L, "\tsty\t")) {
+		/* sty and stz share all addressing modes */
+ 		L->Line[3] = 'z';
+	    }
 	} else if (LineFullMatch (L, "\ttax")) {
 	    if (A != -1 && X == A) {
 		/* Load has no effect */

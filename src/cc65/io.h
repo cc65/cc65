@@ -73,7 +73,7 @@ int gch (void);
  * pointer (no end of line check is performed).
  */
 
-int readline (void);
+int NextLine (void);
 /* Get a line from the current input.  Returns -1 on end of file. */
 
 

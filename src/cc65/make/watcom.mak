@@ -70,6 +70,7 @@ OBJS =	anonname.obj	\
 	check.obj	\
 	codegen.obj	\
 	compile.obj	\
+	cpu.obj		\
 	ctrans.obj	\
 	datatype.obj	\
 	declare.obj	\
@@ -80,7 +81,7 @@ OBJS =	anonname.obj	\
 	global.obj	\
 	goto.obj	\
 	ident.obj	\
-	include.obj	\
+	incpath.obj    	\
 	io.obj		\
 	litpool.obj	\
 	locals.obj	\
@@ -126,6 +127,7 @@ FILE asmline.obj
 FILE check.obj
 FILE codegen.obj
 FILE compile.obj
+FILE cpu.obj
 FILE ctrans.obj
 FILE datatype.obj
 FILE declare.obj
@@ -136,7 +138,7 @@ FILE function.obj
 FILE global.obj
 FILE goto.obj
 FILE ident.obj
-FILE include.obj
+FILE incpath.obj
 FILE io.obj
 FILE litpool.obj
 FILE locals.obj

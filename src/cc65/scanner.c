@@ -137,7 +137,7 @@ static int skipwhite (void)
 {
     while (1) {
        	while (*lptr == 0) {
-	    if (readline () == 0) {
+	    if (NextLine () == 0) {
 	     	return 0;
      	    }
 	    preprocess ();

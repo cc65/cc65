@@ -42,13 +42,14 @@ XCORR		= SPRITE_WIDTH
 _mouse_init:
 	jsr	popa			; Ignore type and port
 
-       	ldy    	OldIRQ+1		; Already initialized?
+       	lda    	OldIRQ+1		; Already initialized?
        	bne    	AlreadyInitialized	; Jump if yes
 
 ; Initialize variables
 
        	ldx 	#0
-	stx	XPos
+	lda	#XCORR
+       	sta	XPos
 	stx	XPos+1
    	stx	YPos
 	stx	YPos+1
@@ -56,8 +57,10 @@ _mouse_init:
 	stx	OldPotY
        	stx    	XMin
  	stx	XMin+1		   	; XMin = 0
-	lda	#50			; ## FIXME: This is the PAL value
+	lda	#50   		   	; ## FIXME: This is the PAL value
 	sta	YCorr
+	sta	YPos
+	stx	YPos+1
 	sec
         sbc    	#SPRITE_HEIGHT		; Sprite height in pixels
 	sta    	YMin
@@ -79,14 +82,13 @@ _mouse_init:
      	lda   	IRQVec+1
      	sta   	OldIRQ+1
 
-; Set our own IRQ vector. We cheat here to save a few bytes of code:
-; The function is expected to return a value not equal to zero on success,
-; and since we know that the high byte of the IRQ handler address is never
-; zero, we will return just this byte.
+; Set our own IRQ vector.
 
-     	ldx    	#<MouseIRQ
-     	lda   	#>MouseIRQ
-     	bne   	SetIRQ			; Branch always
+       	ldx    	#<MouseIRQ
+     	ldy   	#>MouseIRQ
+	jsr	SetIRQ	  		; Set our IRQ vector, disable sprite 0
+	lda	#1			; Mouse successfully initialized
+	rts
 
 AlreadyInitialized:
 	lda	#0			; Error
@@ -98,16 +100,20 @@ AlreadyInitialized:
 ;
 
 _mouse_done:
-       	ldx    	OldIRQ	  	      	; Initialized?
-     	lda 	OldIRQ+1
+     	ldx    	OldIRQ
+       	ldy    	OldIRQ+1  	      	; Initialized?
      	beq    	Done   	       	      	; Jump if no
-	ldy 	#0
-   	sty 	OldIRQ+1  		; Reset the initialized flag
-SetIRQ:	sei 		  		; Disable interrupts
+	lda 	#0
+   	sta 	OldIRQ+1  		; Reset the initialized flag
+SetIRQ:	sei 	      	  		; Disable interrupts
       	stx 	IRQVec	  		; Set the new/old vector
-      	sta 	IRQVec+1
-   	cli 				; Enable interrupts
+       	sty    	IRQVec+1
+       	lda    	VIC_SPR_ENA		; Get sprite enable register
+	and	#$FE			; Disable sprite #0
+	sta 	VIC_SPR_ENA		; Write back
+   	cli 	      			; Enable interrupts
 Done: 	rts
+
 
 ; --------------------------------------------------------------------------
 ;

@@ -1885,7 +1885,7 @@ static unsigned OptPtrStore2 (CodeSeg* S)
 {
     unsigned Changes = 0;
 
-    /* Walk over the entries */
+    /* Walk over the entries */	  
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
@@ -2233,9 +2233,9 @@ static unsigned OptPtrLoad4 (CodeSeg* S)
  *
  * and replace it by:
  *
- *      ldy     xxx
+ *      ldx     xxx
+ *      lda     label,x
  *      ldx     #$00
- *      lda     label,y
  */
 {
     unsigned Changes = 0;
@@ -2288,17 +2288,17 @@ static unsigned OptPtrLoad4 (CodeSeg* S)
 	    /* We will create all the new stuff behind the current one so
 	     * we keep the line references.
 	     */
-	    X = NewCodeEntry (OP65_LDY,	L[3]->AM, L[3]->Arg, 0, L[0]->LI);
+	    X = NewCodeEntry (OP65_LDX,	L[3]->AM, L[3]->Arg, 0, L[0]->LI);
 	    CS_InsertEntry (S, X, I+8);
-
-	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+9);
 
 	    Label = memcpy (xmalloc (Len-2), L[0]->Arg+2, Len-3);
 	    Label[Len-3] = '\0';
-	    X = NewCodeEntry (OP65_LDA, AM65_ABSY, Label, 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+10);
+	    X = NewCodeEntry (OP65_LDA, AM65_ABSX, Label, 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+9);
 	    xfree (Label);
+
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+10);
 
 	    /* Remove the old code */
 	    CS_DelEntries (S, I, 8);
@@ -2335,10 +2335,10 @@ static unsigned OptPtrLoad5 (CodeSeg* S)
  * and replace it by:
  *
  *      ldy     #$xx
- *      ldx     #$00
  *      lda     (sp),y
- *      tay
- *      lda     label,y
+ *      tax
+ *      lda     label,x
+ *      ldx     #$00
  */
 {
     unsigned Changes = 0;
@@ -2391,24 +2391,24 @@ static unsigned OptPtrLoad5 (CodeSeg* S)
 	    CodeEntry* X;
 	    char* Label;
 
-	    /* Add the ldx */
-	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+3);
-
 	    /* Add the lda */
 	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, L[4]->Arg, 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+4);
+	    CS_InsertEntry (S, X, I+3);
 
-	    /* Add the tay */
-	    X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+5);
+	    /* Add the tax */
+	    X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+4);
 
 	    /* Add the lda */
 	    Label = memcpy (xmalloc (Len-2), L[0]->Arg+2, Len-3);
 	    Label[Len-3] = '\0';
-	    X = NewCodeEntry (OP65_LDA, AM65_ABSY, Label, 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+6);
+	    X = NewCodeEntry (OP65_LDA, AM65_ABSX, Label, 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+5);
 	    xfree (Label);
+
+	    /* Add the ldx */
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+6);
 
 	    /* Remove the old code */
 	    CS_DelEntries (S, I, 2);

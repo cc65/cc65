@@ -1,7 +1,8 @@
 /*
  * fseek.c
  *
- * Christian Groessler, 07-Aug-2000
+ * Christian Groessler, 2000-08-07
+ * Ullrich von Bassewitz, 2004-05-12
  */
 
 
@@ -11,7 +12,7 @@
 #include <unistd.h>
 #include "_file.h"
 
-		 
+
 
 /*****************************************************************************/
 /*     	    	     		     Code				     */
@@ -19,7 +20,7 @@
 
 
 
-int __fastcall__ fseek (FILE* f, long offset, int whence)
+int __fastcall__ fseek (register FILE* f, long offset, int whence)
 {
     long res;
 
@@ -29,8 +30,31 @@ int __fastcall__ fseek (FILE* f, long offset, int whence)
         return -1;
     }
 
+    /* If we have a pushed back character, and whence is relative to the
+     * current position, correct the offset.
+     */
+    if ((f->f_flags & _FPUSHBACK) && whence == SEEK_CUR) {
+        --offset;
+    }
+
+    /* Do the seek */
     res = lseek(f->f_fd, offset, whence);
-    if (res == -1L) return -1;
+
+    /* If we had an error, set the error indicator on the stream, and
+     * return -1. We will check for < 0 here, because that saves some code,
+     * and we don't have files with 2 gigabytes in size anyway:-)
+     */
+    if (res < 0) {
+        f->f_flags |= _FERROR;
+        return -1;
+    }
+
+    /* The seek was successful. Discard any effects of the ungetc function,
+     * and clear the end-of-file indicator.
+     */
+    f->f_flags &= ~(_FEOF | _FPUSHBACK);
+
+    /* Done */
     return 0;
 }
 

@@ -22,7 +22,6 @@ _tgi_mode:      .res    1               ; Graphics mode or zero
 _tgi_curx:      .res    2               ; Current drawing cursor X
 _tgi_cury:      .res    2               ; Current drawing cursor Y
 _tgi_color:     .res    1               ; Current drawing color
-_tgi_bgcolor:   .res    1               ; Current background color
 _tgi_xres:      .res    2               ; X resolution of the current mode
 _tgi_yres:      .res    2               ; Y resolution of the current mode
 _tgi_colorcount:.res    1               ; Number of available colors

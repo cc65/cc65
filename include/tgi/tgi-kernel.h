@@ -86,7 +86,6 @@ extern unsigned char    tgi_mode;       /* Graphics mode or zero */
 extern int              tgi_curx;       /* Current drawing cursor X */
 extern int              tgi_cury;       /* Current drawing cursor Y */
 extern unsigned char    tgi_color;      /* Current drawing color */
-extern unsigned char    tgi_bgcolor;    /* Current background color */
 extern unsigned         tgi_xres;       /* X resolution of the current mode */
 extern unsigned         tgi_yres;       /* Y resolution of the current mode */
 extern unsigned char    tgi_colorcount; /* Number of available colors */

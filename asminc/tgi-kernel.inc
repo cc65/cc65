@@ -72,7 +72,6 @@ TGI_HDR_JUMPCOUNT       = 14            ; Number of jump vectors
         .global _tgi_curx               ; Current drawing cursor X
         .global _tgi_cury               ; Current drawing cursor Y
         .global _tgi_color              ; Current drawing color
-        .global _tgi_bgcolor            ; Current background color
         .global _tgi_xres               ; X resolution of the current mode
         .global _tgi_yres               ; Y resolution of the current mode
         .global _tgi_colorcount         ; Number of available colors

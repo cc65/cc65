@@ -29,6 +29,7 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_getset.o            \
                 tgi_getxres.o           \
                 tgi_getyres.o           \
+                tgi_gotoxy.o            \
                 tgi_init.o              \
                 tgi_line.o              \
                 tgi_linepop.o           \

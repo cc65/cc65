@@ -131,34 +131,33 @@ void __fastcall__ tgi_setcolor (unsigned char color);
 unsigned char __fastcall__ tgi_getcolor (void);
 /* Return the current drawing color */
 
-unsigned char __fastcall__ tgi_getbkcolor (void);
-/* Return the current background color */
-
-void __fastcall__ tgi_setbkcolor (unsigned char color);
-/* Set the background color */
-
 unsigned char __fastcall__ tgi_getpixel (int x, int y);
 /* Get the color value of a pixel */
 
 void __fastcall__ tgi_setpixel (int x, int y);
 /* Plot a point in the current drawing color */
 
+void __fastcall__ tgi_gotoxy (int x, int y);
+/* Set the graphics cursor to the given position. */
+
 void __fastcall__ tgi_line (int x1, int y1, int x2, int y2);
-/* Draw a line in the current drawing color */
+/* Draw a line in the current drawing color. The graphics cursor will
+ * be set to x2/y2 by this call.
+ */
 
 void __fastcall__ tgi_lineto (int x2, int y2);
 /* Draw a line in the current drawing color from the graphics cursor to the
- * new end point.
+ * new end point. The graphics cursor will be updated to x2/y2.
  */
 
 void __fastcall__ tgi_circle (int x, int y, unsigned char radius);
-/* Draw a circle in the current drawing color */
+/* Draw a circle in the current drawing color. */
 
 void __fastcall__ tgi_outtext (int x, int y, const char* text);
 /* Print a text in graphics mode */
 
 void __fastcall__ tgi_bar (int x1, int y1, int x2, int y2);
-/* Draw a bar (a filled rectangle) using the current color */
+/* Draw a bar (a filled rectangle) using the current color. */
 
 
 

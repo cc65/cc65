@@ -39,9 +39,9 @@
 
 
 /* Define __JOYSTICK__ for systems that support a joystick */
-#if defined(__ATARI__) || defined(__C64__) || defined(__C128__) || defined(__PLUS4__) || defined(__CBM510__) || defined(__VIC20__)
+#if defined(__ATARI__) || defined(__C16__) || defined(__C64__) || defined(__C128__) || defined(__PLUS4__) || defined(__CBM510__) || defined(__VIC20__)
 #  define __JOYSTICK__
-#else                      
+#else
 #  error The target system does not support a joystick!
 # endif
 

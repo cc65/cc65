@@ -36,7 +36,7 @@ DOS using the DJGPP compiler
 ----------------------------
 
 Most information in this section was provided by Keith W. Gerdes
-(kwg@freebird.ghofn.org). Thanks a lot!
+(kwg@netzero.net). Thanks a lot!
 
 The tmpfile() function in DJGPP has a bug and will not open the scratch
 file in binary mode. If you have problems with the archiver (which uses
@@ -153,7 +153,7 @@ Watcom tools, or you have to change the makefile.
 
 3. Use Linux to build the libraries:-) If you don't have Linux, get it
    now! More serious: There is no makefile to build the libraries under
-   any of the DOS based operating systems. Use a batch file similar to 
+   any of the DOS based operating systems. Use a batch file similar to
    the one above, or rewrite the makefile.
 
 

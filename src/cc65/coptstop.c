@@ -104,7 +104,7 @@ static unsigned AdjustStackOffset (CodeSeg* S, unsigned Start, unsigned Stop,
             /* We need to correct this one */
             NeedCorrection = 1;
 
-        } else if (CE_IsCall (E, "ldaxysp")) {
+        } else if (CE_IsCallTo (E, "ldaxysp")) {
 
             /* We need to correct this one */
             NeedCorrection = 1;
@@ -663,8 +663,7 @@ unsigned OptStackOps (CodeSeg* S)
 	/* Handling depends if we're inside a sequence or not */
 	if (InSeq) {
 
-	    if ((E->Info & OF_BRA) != 0                              ||
-		((E->Use & REG_SP) != 0                         &&
+       	    if (((E->Use & REG_SP) != 0                         &&
 		 (E->AM != AM65_ZP_INDY || E->RI->In.RegY < 0))) {
 
 	    	/* All this stuff is not allowed in a sequence */
@@ -753,7 +752,7 @@ unsigned OptStackOps (CodeSeg* S)
 
 	    }
 
-	} else if (CE_IsCall (E, "pushax")) {
+	} else if (CE_IsCallTo (E, "pushax")) {
 
 	    /* This starts a sequence */
 	    Push     = I;

@@ -57,7 +57,7 @@ unsigned OptAdd1 (CodeSeg* S)
  *      jsr     tosaddax
  *
  * and replace it by:
- *      
+ *
  *      ldy     #xx-1
  *      lda     (sp),y
  *      clc
@@ -88,12 +88,12 @@ unsigned OptAdd1 (CodeSeg* S)
 	    CE_KnownImm (L[0])               &&
 	    !CS_RangeHasLabel (S, I+1, 5)    &&
        	    CS_GetEntries (S, L+1, I+1, 5)   &&
-       	    CE_IsCall (L[1], "ldaxysp")      &&
-       	    CE_IsCall (L[2], "pushax")       &&
+       	    CE_IsCallTo (L[1], "ldaxysp")    &&
+       	    CE_IsCallTo (L[2], "pushax")     &&
        	    L[3]->OPC == OP65_LDY            &&
 	    CE_KnownImm (L[3])               &&
-       	    CE_IsCall (L[4], "ldaxysp")      &&
-       	    CE_IsCall (L[5], "tosaddax")) {
+       	    CE_IsCallTo (L[4], "ldaxysp")    &&
+       	    CE_IsCallTo (L[5], "tosaddax")) {
 
 	    CodeEntry* X;
             const char* Arg;
@@ -208,10 +208,10 @@ unsigned OptAdd2 (CodeSeg* S)
 	    CE_KnownImm (L[0])                  &&
 	    !CS_RangeHasLabel (S, I+1, 3)       &&
        	    CS_GetEntries (S, L+1, I+1, 3)   	&&
-	    CE_IsCall (L[1], "ldaxysp")         &&
+	    CE_IsCallTo (L[1], "ldaxysp")       &&
        	    L[2]->OPC == OP65_LDY               &&
 	    CE_KnownImm (L[2])                  &&
-       	    CE_IsCall (L[3], "addeqysp")        &&
+       	    CE_IsCallTo (L[3], "addeqysp")      &&
        	    (GetRegInfo (S, I+4, REG_AX) & REG_AX) == 0) {
 
 	    /* Insert new code behind the addeqysp */

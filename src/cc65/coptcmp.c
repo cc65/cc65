@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -558,7 +558,7 @@ unsigned OptCmp4 (CodeSeg* S)
 	    CE_KnownImm (L[0])              &&
 	    CS_GetEntries (S, L+1, I+1, 5)  &&
 	    !CE_HasLabel (L[1])             &&
-	    CE_IsCall (L[1], "ldaxysp")     &&
+	    CE_IsCallTo (L[1], "ldaxysp")   &&
 	    IsImmCmp16 (L+2)) {
 
        	    if ((L[5]->Info & OF_FBRA) != 0 && L[2]->Num == 0 && L[4]->Num == 0) {

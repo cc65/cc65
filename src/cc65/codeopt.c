@@ -64,6 +64,23 @@
 
 
 /*****************************************************************************/
+/*                                     Data                                  */
+/*****************************************************************************/
+
+
+
+/* Shift types */
+enum {
+    SHIFT_NONE,
+    SHIFT_ASR_1,
+    SHIFT_ASL_1,
+    SHIFT_LSR_1,
+    SHIFT_LSL_1
+};
+
+
+
+/*****************************************************************************/
 /*				Optimize shifts                              */
 /*****************************************************************************/
 
@@ -164,6 +181,148 @@ static unsigned OptShift2 (CodeSeg* S)
 
 
 
+static unsigned GetShiftType (const char* Sub)
+/* Helper function for OptShift3 */
+{
+    if (*Sub == 'a') {
+        if (strcmp (Sub+1, "slax1") == 0) {
+            return SHIFT_ASL_1;
+        } else if (strcmp (Sub+1, "srax1") == 0) {
+            return SHIFT_ASR_1;
+        }
+    } else if (*Sub == 's') {
+        if (strcmp (Sub+1, "hlax1") == 0) {
+            return SHIFT_LSL_1;
+        } else if (strcmp (Sub+1, "hrax1") == 0) {
+            return SHIFT_LSR_1;
+        }
+    }
+    return SHIFT_NONE;
+}
+
+
+
+static unsigned OptShift3 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *      lda     xxx
+ *      ldx     yyy
+ *      jsr     aslax1/asrax1/shlax1/shrax1
+ *      sta     aaa
+ *      stx     bbb
+ *
+ * and replace it by
+ *
+ *      lda     xxx
+ *      asl     a
+ *      sta     aaa
+ *      lda     yyy
+ *      rol     a
+ *      sta     bbb
+ *
+ * or similar, provided that a/x is not used later
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+        unsigned ShiftType;
+     	CodeEntry* L[5];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_LDA                               &&
+            (L[0]->AM == AM65_ABS || L[0]->AM == AM65_ZP)       &&
+       	    CS_GetEntries (S, L+1, I+1, 4)     	                &&
+            !CS_RangeHasLabel (S, I+1, 4)                       &&
+            L[1]->OPC == OP65_LDX                               &&
+            (L[1]->AM == AM65_ABS || L[1]->AM == AM65_ZP)       &&
+            L[2]->OPC == OP65_JSR                               &&
+            (ShiftType = GetShiftType (L[2]->Arg)) != SHIFT_NONE&&
+       	    L[3]->OPC == OP65_STA                               &&
+            (L[3]->AM == AM65_ABS || L[3]->AM == AM65_ZP)       &&
+            L[4]->OPC == OP65_STX                               &&
+            (L[4]->AM == AM65_ABS || L[4]->AM == AM65_ZP)       &&
+            !RegAXUsed (S, I+5)) {
+
+            CodeEntry* X;
+
+            /* Handle the four shift types differently */
+            switch (ShiftType) {
+
+                case SHIFT_ASR_1:
+                    X = NewCodeEntry (OP65_LDA, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
+                    CS_InsertEntry (S, X, I+5);
+                    X = NewCodeEntry (OP65_CMP, AM65_IMM, "$80", 0, L[2]->LI);
+                    CS_InsertEntry (S, X, I+6);
+                    X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, L[2]->LI);
+                    CS_InsertEntry (S, X, I+7);
+                    X = NewCodeEntry (OP65_STA, L[4]->AM, L[4]->Arg, 0, L[4]->LI);
+                    CS_InsertEntry (S, X, I+8);
+                    X = NewCodeEntry (OP65_LDA, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
+                    CS_InsertEntry (S, X, I+9);
+                    X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, L[2]->LI);
+                    CS_InsertEntry (S, X, I+10);
+                    X = NewCodeEntry (OP65_STA, L[3]->AM, L[3]->Arg, 0, L[3]->LI);
+                    CS_InsertEntry (S, X, I+11);
+                    CS_DelEntries (S, I, 5);
+                    break;
+
+                case SHIFT_LSR_1:
+                    X = NewCodeEntry (OP65_LDA, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
+                    CS_InsertEntry (S, X, I+5);
+                    X = NewCodeEntry (OP65_LSR, AM65_ACC, "a", 0, L[2]->LI);
+                    CS_InsertEntry (S, X, I+6);
+                    X = NewCodeEntry (OP65_STA, L[4]->AM, L[4]->Arg, 0, L[4]->LI);
+                    CS_InsertEntry (S, X, I+7);
+                    X = NewCodeEntry (OP65_LDA, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
+                    CS_InsertEntry (S, X, I+8);
+                    X = NewCodeEntry (OP65_ROR, AM65_ACC, "a", 0, L[2]->LI);
+                    CS_InsertEntry (S, X, I+9);
+                    X = NewCodeEntry (OP65_STA, L[3]->AM, L[3]->Arg, 0, L[3]->LI);
+                    CS_InsertEntry (S, X, I+10);
+                    CS_DelEntries (S, I, 5);
+                    break;
+
+                case SHIFT_LSL_1:
+                case SHIFT_ASL_1:
+                    /* These two are identical */
+                    X = NewCodeEntry (OP65_ASL, AM65_ACC, "a", 0, L[2]->LI);
+                    CS_InsertEntry (S, X, I+1);
+                    X = NewCodeEntry (OP65_STA, L[3]->AM, L[3]->Arg, 0, L[3]->LI);
+                    CS_InsertEntry (S, X, I+2);
+                    X = NewCodeEntry (OP65_LDA, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
+                    CS_InsertEntry (S, X, I+3);
+                    X = NewCodeEntry (OP65_ROL, AM65_ACC, "a", 0, L[2]->LI);
+                    CS_InsertEntry (S, X, I+4);
+                    X = NewCodeEntry (OP65_STA, L[4]->AM, L[4]->Arg, 0, L[4]->LI);
+                    CS_InsertEntry (S, X, I+5);
+                    CS_DelEntries (S, I+6, 4);
+                    break;
+
+            }
+
+	    /* Remember, we had changes */
+            ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 /*****************************************************************************/
 /*		       Optimize stores through pointers                      */
 /*****************************************************************************/
@@ -243,19 +402,19 @@ static unsigned OptPtrStore1 (CodeSeg* S)
        	L[0] = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (CE_IsCall (L[0], "pushax")              &&
+       	if (CE_IsCallTo (L[0], "pushax")            &&
        	    CS_GetEntries (S, L+1, I+1, 3)     	    &&
        	    L[1]->OPC == OP65_LDY              	    &&
      	    CE_KnownImm (L[1])                      &&
      	    !CE_HasLabel (L[1])      	       	    &&
-       	    CE_IsCall (L[2], "ldauidx")             &&
+       	    CE_IsCallTo (L[2], "ldauidx")           &&
      	    !CE_HasLabel (L[2])                     &&
        	    (K = OptPtrStore1Sub (S, I+3, L+3)) > 0 &&
 	    CS_GetEntries (S, L+3+K, I+3+K, 2)      &&
        	    L[3+K]->OPC == OP65_LDY                 &&
      	    CE_KnownImm (L[3+K])                    &&
 	    !CE_HasLabel (L[3+K])                   &&
-	    CE_IsCall (L[4+K], "staspidx")          &&
+	    CE_IsCallTo (L[4+K], "staspidx")        &&
 	    !CE_HasLabel (L[4+K])) {
 
 	    CodeEntry* X;
@@ -331,13 +490,13 @@ static unsigned OptPtrStore2 (CodeSeg* S)
        	L[0] = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (CE_IsCall (L[0], "pushax")          &&
+       	if (CE_IsCallTo (L[0], "pushax")        &&
        	    CS_GetEntries (S, L+1, I+1, 3)   	&&
        	    L[1]->OPC == OP65_LDA              	&&
 	    !CE_HasLabel (L[1])    	       	&&
 	    L[2]->OPC == OP65_LDY               &&
 	    !CE_HasLabel (L[2])                 &&
-	    CE_IsCall (L[3], "staspidx")        &&
+	    CE_IsCallTo (L[3], "staspidx")      &&
 	    !CE_HasLabel (L[3])) {
 
 	    CodeEntry* X;
@@ -421,7 +580,7 @@ static unsigned OptPtrLoad1 (CodeSeg* S)
 	    !CE_HasLabel (L[2])                 &&
 	    L[3]->OPC == OP65_LDY               &&
 	    !CE_HasLabel (L[3])                 &&
-	    CE_IsCall (L[4], "ldauidx")         &&
+	    CE_IsCallTo (L[4], "ldauidx")       &&
 	    !CE_HasLabel (L[4])) {
 
 	    CodeEntry* X;
@@ -514,7 +673,7 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
 	    !CE_HasLabel (L[6])                 &&
 	    L[7]->OPC == OP65_LDY               &&
 	    !CE_HasLabel (L[7])                 &&
-       	    CE_IsCall (L[8], "ldauidx")         &&
+       	    CE_IsCallTo (L[8], "ldauidx")       &&
 	    !CE_HasLabel (L[8])) {
 
 	    CodeEntry* X;
@@ -624,7 +783,7 @@ static unsigned OptPtrLoad3 (CodeSeg* S)
 	    !CE_HasLabel (L[6])                 &&
 	    L[7]->OPC == OP65_LDY               &&
 	    !CE_HasLabel (L[7])                 &&
-       	    CE_IsCall (L[8], "ldauidx")         &&
+       	    CE_IsCallTo (L[8], "ldauidx")       &&
 	    !CE_HasLabel (L[8])) {
 
 	    CodeEntry* X;
@@ -719,7 +878,7 @@ static unsigned OptPtrLoad4 (CodeSeg* S)
 	    L[6]->OPC == OP65_LDY                            &&
 	    CE_KnownImm (L[6])                               &&
 	    L[6]->Num == 0                                   &&
-       	    CE_IsCall (L[7], "ldauidx")                      &&
+       	    CE_IsCallTo (L[7], "ldauidx")                    &&
 	    !CE_HasLabel (L[7])                              &&
 	    /* Check the label last because this is quite costly */
 	    (Len = strlen (L[0]->Arg)) > 3                   &&
@@ -824,7 +983,7 @@ static unsigned OptPtrLoad5 (CodeSeg* S)
 	    L[7]->OPC == OP65_LDY                            &&
 	    CE_KnownImm (L[7])                               &&
 	    L[7]->Num == 0                                   &&
-       	    CE_IsCall (L[8], "ldauidx")                      &&
+       	    CE_IsCallTo (L[8], "ldauidx")                    &&
 	    !CE_HasLabel (L[8])                              &&
 	    /* Check the label last because this is quite costly */
 	    (Len = strlen (L[0]->Arg)) > 3                   &&
@@ -907,7 +1066,7 @@ static unsigned OptPtrLoad6 (CodeSeg* S)
      	/* Check for the sequence */
        	if (L[0]->OPC == OP65_LDY      	       	&&
        	    CS_GetEntries (S, L+1, I+1, 1)     	&&
-       	    CE_IsCall (L[1], "ldauidx")         &&
+       	    CE_IsCallTo (L[1], "ldauidx")       &&
     	    !CE_HasLabel (L[1])) {
 
     	    CodeEntry* X;
@@ -1150,49 +1309,36 @@ static unsigned OptSize1 (CodeSeg* S)
  * removal pass.
  */
 {
-    static const char* Func = {
-	"stax0sp",           /* staxysp, y = 0 */
-	"addeq0sp",
-	"ldax0sp",           /* ldaxysp, y = 1 */
-       	"ldeax0sp",          /* ldeaxysp, y = 3 */
-	"push0",             /* pushax, a = 0, x = 0 */
-	"pusha0",            /* pushax, x = 0 */
-	"pushaFF",           /* pushax, x = ff */
-	"pusha0sp",          /* pushaysp, y = 0 */
-	"tosadda0",          /* tosaddax, x = 0 */
-	"tosanda0",          /* tosandax, x = 0 */
-	"tosdiva0",          /* tosdivax, x = 0 */
-	"toseqa0",           /* toseqax, x = 0 */
-	"tosgea0",           /* tosgeax, x = 0 */
-       	"tosgta0",           /* tosgtax, x = 0 */
-	"tosadd0ax",         /* tosaddeax, sreg = 0 */
-	"laddeqa",           /* laddeq, sreg = 0, x = 0 */
-	"laddeq1",           /* laddeq, sreg = 0, x = 0, a = 1 */
-	"laddeq0sp",         /* laddeqysp, y = 0 */
-       	"tosand0ax",         /* tosandeax, sreg = 0 */
-        "ldaxi",             /* ldaxidx, y = 1 */
-	"ldeaxi",            /* ldeaxidx, y = 3 */
-	"ldeax0sp",          /* ldeaxysp, y = 3 */
-	"tosdiv0ax",         /* tosdiveax, sreg = 0 */
-	"toslea0",           /* tosleax, x = 0 */
-	"tosmod0ax",         /* tosmodeax, sreg = 0 */
-	"tosmul0ax",         /* tosmuleax, sreg = 0 */
-       	"tosumul0ax",        /* tosumuleax, sreg = 0 */
-	"tosor0ax",          /* tosoreax, sreg = 0 */
-	"push0ax",           /* pusheax, sreg = 0 */
-	"tosrsub0ax",        /* tosrsubeax, sreg = 0 */
-	"tosshl0ax",         /* tosshleax, sreg = 0 */
-	"tosasl0ax",         /* tosasleax, sreg = 0 */
-	"tosshr0ax",         /* tosshreax, sreg = 0 */
-	"tosasr0ax",         /* tosasreax, sreg = 0 */
-	"tossub0ax",         /* tossubeax, sreg = 0 */
-	"lsubeqa",           /* lsubeq, sreg = 0, x = 0 */
-	"lsubeq1",           /* lsubeq, sreg = 0, x = 0, a = 1 */
-	"lsubeq0sp",         /* lsubeqysp, y = 0 */
+    typedef struct CallDesc CallDesc;
+    struct CallDesc {
+        const char*     LongFunc;       /* Long function name */
+        short           A, X, Y;        /* Register contents */
+        const char*     ShortFunc;      /* Short function name */
+    };
+
+    static const CallDesc CallTable [] = {
+       	{ "staxysp",    -1,   -1,    0, "stax0sp"       },
+       	{ "addeqysp",   -1,   -1,    0, "addeq0sp"      },
+       	{ "ldaxysp",    -1,   -1,    1, "ldax0sp"       },
+       	{ "ldeaxysp",   -1,   -1,    3, "ldeax0sp"      },
+       	{ "pushax",      0,    0,   -1, "push0"         },
+       	{ "pushax",     -1,    0,   -1, "pusha0"        },
+       	{ "pushax",     -1, 0xFF,   -1, "pushaFF"       },
+       	{ "pushaysp",   -1,   -1,    0, "pusha0sp"      },
+       	{ "tosaddax",   -1,    0,   -1, "tosadda0"      },
+       	{ "tosandax",   -1,    0,   -1, "tosanda0"      },
+       	{ "tosdivax",   -1,    0,   -1, "tosdiva0"      },
+       	{ "toseqax",    -1,    0,   -1, "toseqa0"       },
+       	{ "tosgeax",    -1,    0,   -1, "tosgea0"       },
+       	{ "tosgtax",    -1,    0,   -1, "tosgta0"       },
+       	{ "laddeqysp",  -1,   -1,    0, "laddeq0sp"     },
+        { "ldaxidx",    -1,   -1,    1, "ldaxi"         },
+       	{ "ldeaxidx",   -1,   -1,    3, "ldeaxi"        },
+        { "ldeaxysp",   -1,   -1,    3, "ldeax0sp"      },
+       	{ "tosleax",    -1,    0,   -1, "toslea0"       },
+        { "lsubeqysp",  -1,   -1,    0, "lsubeq0sp"     },
+
 	"toslta0",           /* tosltax, x = 0 */
-	"tosudiv0ax",        /* tosudiveax, sreg = 0 */
-	"tosumod0ax",        /* tosumodeax, sreg = 0 */
-     	"tosxor0ax",         /* tosxoreax, sreg = 0 */
 	"tosmoda0",          /* tosmodax, x = 0 */
 	"tosmula0",          /* tosmulax, x = 0 */
 	"tosumula0",         /* tosumulax, x = 0 */
@@ -1223,6 +1369,29 @@ static unsigned OptSize1 (CodeSeg* S)
        	"tosulta0",          /* tosultax, x = 0 */
        	"tosumoda0",         /* tosumodax, x = 0 */
        	"tosxora0",          /* tosxorax, x = 0 */
+
+       	"tosadd0ax",         /* tosaddeax, sreg = 0 */
+	"laddeqa",           /* laddeq, sreg = 0, x = 0 */
+	"laddeq1",           /* laddeq, sreg = 0, x = 0, a = 1 */
+       	"tosand0ax",         /* tosandeax, sreg = 0 */
+	"tosdiv0ax",         /* tosdiveax, sreg = 0 */
+	"tosmod0ax",         /* tosmodeax, sreg = 0 */
+	"tosmul0ax",         /* tosmuleax, sreg = 0 */
+       	"tosumul0ax",        /* tosumuleax, sreg = 0 */
+	"tosor0ax",          /* tosoreax, sreg = 0 */
+	"push0ax",           /* pusheax, sreg = 0 */
+	"tosrsub0ax",        /* tosrsubeax, sreg = 0 */
+	"tosshl0ax",         /* tosshleax, sreg = 0 */
+	"tosasl0ax",         /* tosasleax, sreg = 0 */
+	"tosshr0ax",         /* tosshreax, sreg = 0 */
+	"tosasr0ax",         /* tosasreax, sreg = 0 */
+	"tossub0ax",         /* tossubeax, sreg = 0 */
+	"lsubeqa",           /* lsubeq, sreg = 0, x = 0 */
+	"lsubeq1",           /* lsubeq, sreg = 0, x = 0, a = 1 */
+	"tosudiv0ax",        /* tosudiveax, sreg = 0 */
+	"tosumod0ax",        /* tosumodeax, sreg = 0 */
+     	"tosxor0ax",         /* tosxoreax, sreg = 0 */
+
     };
 
     unsigned Changes = 0;
@@ -1428,6 +1597,7 @@ static OptFunc DOptPush1       	= { OptPush1,        "OptPush1",         65, 0, 
 static OptFunc DOptPushPop      = { OptPushPop,      "OptPushPop",        0, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",      	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift2      	= { OptShift2,       "OptShift2",      	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptShift3      	= { OptShift3,       "OptShift3",      	110, 0, 0, 0, 0, 0 };
 /*static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };*/
 static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",    	100, 0, 0, 0, 0, 0 };
@@ -1485,6 +1655,7 @@ static OptFunc* OptFuncs[] = {
     &DOptRTSJumps2,
     &DOptShift1,
     &DOptShift2,
+    &DOptShift3,
     /*&DOptSize1,*/
     &DOptSize2,
     &DOptStackOps,
@@ -1743,6 +1914,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptAdd2, 1);
     Changes += RunOptFunc (S, &DOptShift1, 1);
     Changes += RunOptFunc (S, &DOptShift2, 1);
+    Changes += RunOptFunc (S, &DOptShift3, 1);
 
     /* Return the number of changes */
     return Changes;

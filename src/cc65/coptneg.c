@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -76,7 +76,7 @@ unsigned OptNegA1 (CodeSeg* S)
 	    L[0]->OPC == OP65_LDA		&&
 	    (L[0]->Use & REG_X) == 0	    	&&
 	    !CE_HasLabel (L[0])                 &&
-	    CE_IsCall (L[1], "bnega")           &&
+	    CE_IsCallTo (L[1], "bnega")         &&
 	    !CE_HasLabel (L[1])) {
 
 	    /* Remove the ldx instruction */
@@ -132,7 +132,7 @@ unsigned OptNegA2 (CodeSeg* S)
 	     E->OPC == OP65_TXA ||
 	     E->OPC == OP65_TYA)                &&
 	    CS_GetEntries (S, L, I+1, 2)	&&
-       	    CE_IsCall (L[0], "bnega")           &&
+       	    CE_IsCallTo (L[0], "bnega")         &&
 	    !CE_HasLabel (L[0])	  	        &&
 	    (L[1]->Info & OF_ZBRA) != 0         &&
 	    !CE_HasLabel (L[1])) {
@@ -185,7 +185,7 @@ unsigned OptNegAX1 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if this is a call to bnegax, and if X is known and zero */
-	if (E->RI->In.RegX == 0 && CE_IsCall (E, "bnegax")) {
+	if (E->RI->In.RegX == 0 && CE_IsCallTo (E, "bnegax")) {
 
 	    CodeEntry* X = NewCodeEntry (OP65_JSR, AM65_ABS, "bnega", 0, E->LI);
 	    CS_InsertEntry (S, X, I+1);
@@ -242,8 +242,8 @@ unsigned OptNegAX2 (CodeSeg* S)
 	    CE_KnownImm (L[0])			&&
 	    !CS_RangeHasLabel (S, I+1, 3)       &&
        	    CS_GetEntries (S, L+1, I+1, 3)      &&
-	    CE_IsCall (L[1], "ldaxysp")         &&
-       	    CE_IsCall (L[2], "bnegax")          &&
+	    CE_IsCallTo (L[1], "ldaxysp")       &&
+       	    CE_IsCallTo (L[2], "bnegax")        &&
        	    (L[3]->Info & OF_ZBRA) != 0) {
 
 	    CodeEntry* X;
@@ -313,7 +313,7 @@ unsigned OptNegAX3 (CodeSeg* S)
        	    CS_GetEntries (S, L, I+1, 3)	&&
 	    L[0]->OPC == OP65_LDX       	&&
 	    !CE_HasLabel (L[0]) 		&&
-       	    CE_IsCall (L[1], "bnegax")          &&
+       	    CE_IsCallTo (L[1], "bnegax")        &&
 	    !CE_HasLabel (L[1]) 		&&
        	    (L[2]->Info & OF_ZBRA) != 0         &&
 	    !CE_HasLabel (L[2])) {

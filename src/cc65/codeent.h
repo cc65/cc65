@@ -187,13 +187,13 @@ int CE_KnownImm (const CodeEntry* E);
 /* Return true if the argument of E is a known immediate value */
 
 #if defined(HAVE_INLINE)
-INLINE int CE_IsCall (const CodeEntry* E, const char* Name)
+INLINE int CE_IsCallTo (const CodeEntry* E, const char* Name)
 /* Check if this is a call to the given function */
 {
     return (E->OPC == OP65_JSR && strcmp (E->Arg, Name) == 0);
 }
 #else
-#  define CE_IsCall(E, Name) ((E)->OPC == OP65_JSR && strcmp ((E)->Arg, (Name)) == 0)
+#  define CE_IsCallTo(E, Name) ((E)->OPC == OP65_JSR && strcmp ((E)->Arg, (Name)) == 0)
 #endif
 
 int CE_UseLoadFlags (const CodeEntry* E);

@@ -78,8 +78,8 @@ unsigned OptPush1 (CodeSeg* S)
 	    L[0]->Num < 0xFE                    &&
 	    !CS_RangeHasLabel (S, I+1, 2)       &&
        	    CS_GetEntries (S, L+1, I+1, 2)   	&&
-	    CE_IsCall (L[1], "ldaxysp")         &&
-       	    CE_IsCall (L[2], "pushax")          &&
+	    CE_IsCallTo (L[1], "ldaxysp")       &&
+       	    CE_IsCallTo (L[2], "pushax")        &&
        	    (GetRegInfo (S, I+3, REG_AX) & REG_AX) == 0) {
 
 	    /* Insert new code behind the pushax */

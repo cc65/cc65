@@ -16,15 +16,16 @@ LD = ../../src/ld65/ld65
 ALLTARGETS =   	apple2	\
 		atari 	\
 		atmos	\
-		vic20	\
                 c16  	\
-		c64  	\
 		c128 	\
+		c64  	\
 		cbm510	\
 		cbm610	\
 		geos 	\
+                nes     \
 		pet  	\
-		plus4
+		plus4   \
+		vic20	\
 
 #-----------------------------------------------------------------------------
 

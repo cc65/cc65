@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   segname.h				     */
+/*				   textseg.h				     */
 /*                                                                           */
-/*			    Segment name management			     */
+/*			    Text segment structure			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
+/* (C) 2001      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,51 +33,61 @@
 
 
 
-#ifndef SEGNAME_H
-#define SEGNAME_H
+/* Note: This is NOT some sort of code segment, it is used to store lines of
+ * output that are textual (not real code) instead.
+ */
+
+
+
+#ifndef TEXTSEG_H
+#define TEXTSEG_H
+
+
+
+#include <stdarg.h>
+#include <stdio.h>
+
+/* common */
+#include "attrib.h"
+#include "coll.h"
+
+/* cc65 */
+#include "symentry.h"
 
 
 
 /*****************************************************************************/
-/*	       	    		     Data				     */
+/*  	       	 	  	     Data		    		     */
 /*****************************************************************************/
 
 
 
-/* Current segment */
-typedef enum segment_t {
-    SEG_INV = -1,     	/* Invalid segment */
-    SEG_CODE,
-    SEG_RODATA,
-    SEG_DATA,
-    SEG_BSS,
-    SEG_COUNT
-} segment_t;
-
-/* Actual names for the segments */
-extern char* SegmentNames[SEG_COUNT];
+typedef struct TextSeg TextSeg;
+struct TextSeg {
+    SymEntry*		Func;		/* Owner function */
+    Collection 	       	Lines;	       	/* List of text lines */
+};
 
 
 
 /*****************************************************************************/
-/*	       	    		     Code				     */
+/*     	       	       	  	     Code 				     */
 /*****************************************************************************/
 
 
 
-void InitSegNames (void);
-/* Initialize the segment names */
+TextSeg* NewTextSeg (SymEntry* Func);
+/* Create a new text segment, initialize and return it */
 
-void NewSegName (segment_t Seg, const char* Name);
-/* Set a new name for a segment */
+void AddTextEntry (TextSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
+/* Add a line to the given text segment */
 
-int ValidSegName (const char* Name);
-/* Return true if the given segment name is valid, return false otherwise */
+void OutputTextSeg (const TextSeg* S, FILE* F);
+/* Output the text segment data to a file */
 
 
 
-/* End of segname.h */
-
+/* End of textseg.h */
 #endif
 
 

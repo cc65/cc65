@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   dataseg.h				     */
+/*		   		   dataseg.h				     */
 /*                                                                           */
-/*			    Data segment structure			     */
+/*		   	    Data segment structure			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2001      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -73,9 +73,6 @@ struct DataSeg {
 
 DataSeg* NewDataSeg (const char* SegName, SymEntry* Func);
 /* Create a new data segment, initialize and return it */
-
-void FreeDataSeg (DataSeg* S);
-/* Free a data segment including all line entries */
 
 void AppendDataSeg (DataSeg* Target, const DataSeg* Source);
 /* Append the data from Source to Target. */

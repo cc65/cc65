@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   segname.c				     */
+/*				   textseg.c				     */
 /*                                                                           */
-/*			    Segment name management			     */
+/*			    Text segment structure			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
+/* (C) 2001      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,76 +33,76 @@
 
 
 
-#include <string.h>
+/* Note: This is NOT some sort of code segment, it is used to store lines of
+ * output that are textual (not real code) instead.
+ */
+
+
 
 /* common */
-#include "chartype.h"
-#include "check.h"
 #include "xmalloc.h"
+#include "xsprintf.h"
 
 /* cc65 */
-#include "segname.h"
+#include "textseg.h"
 
 
 
 /*****************************************************************************/
-/*	       	     		     Data		      		     */
+/*     	       	       	  	     Code 				     */
 /*****************************************************************************/
 
 
 
-/* Actual names for the segments */
-char* SegmentNames[SEG_COUNT];
-
-
-
-/*****************************************************************************/
-/*	       	     		     Code				     */
-/*****************************************************************************/
-
-
-
-void InitSegNames (void)
-/* Initialize the segment names */
+TextSeg* NewTextSeg (SymEntry* Func)
+/* Create a new text segment, initialize and return it */
 {
-    SegmentNames [SEG_BSS]	= xstrdup ("BSS");
-    SegmentNames [SEG_CODE] 	= xstrdup ("CODE");
-    SegmentNames [SEG_DATA]	= xstrdup ("DATA");
-    SegmentNames [SEG_RODATA]	= xstrdup ("RODATA");
+    /* Allocate memory for the structure */
+    TextSeg* S 	= xmalloc (sizeof (TextSeg));
+
+    /* Initialize the fields */
+    S->Func	= Func;
+    InitCollection (&S->Lines);
+
+    /* Return the new struct */
+    return S;
 }
 
 
 
-void NewSegName (segment_t Seg, const char* Name)
-/* Set a new name for a segment */
+void AddTextEntry (TextSeg* S, const char* Format, va_list ap)
+/* Add a line to the given text segment */
 {
-    /* Check the parameter */
-    CHECK (Seg != SEG_INV);
+    /* Format the line */
+    char Buf [256];
+    xvsprintf (Buf, sizeof (Buf), Format, ap);
 
-    /* Free the old name and set a new one */
-    xfree (SegmentNames [Seg]);
-    SegmentNames [Seg] = xstrdup (Name);
+    /* Add a copy to the data segment */
+    CollAppend (&S->Lines, xstrdup (Buf));
 }
 
 
 
-int ValidSegName (const char* Name)
-/* Return true if the given segment name is valid, return false otherwise */
+void OutputTextSeg (const TextSeg* S, FILE* F)
+/* Output the text segment data to a file */
 {
-    /* Must start with '_' or a letter */
-    if ((*Name != '_' && !IsAlpha(*Name)) || strlen(Name) > 80) {
-     	return 0;
+    unsigned I;
+
+    /* Get the number of entries in this segment */
+    unsigned Count = CollCount (&S->Lines);
+
+    /* If the segment is actually empty, bail out */
+    if (Count == 0) {
+	return;
     }
 
-    /* Can have letters, digits or the underline */
-    while (*++Name) {
-     	if (*Name != '_' && !IsAlNum(*Name)) {
-     	    return 0;
-     	}
+    /* Output all entries */
+    for (I = 0; I < Count; ++I) {
+	fprintf (F, "%s\n", (const char*) CollConstAt (&S->Lines, I));
     }
 
-    /* Name is ok */
-    return 1;
+    /* Add an additional newline after the segment output */
+    fprintf (F, "\n");
 }
 
 

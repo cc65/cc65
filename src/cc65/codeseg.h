@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2001      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -37,7 +37,7 @@
 #define CODESEG_H
 
 
-		  
+
 #include <stdarg.h>
 #include <stdio.h>
 
@@ -80,9 +80,6 @@ struct CodeSeg {
 
 CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func);
 /* Create a new code segment, initialize and return it */
-
-void FreeCodeSeg (CodeSeg* S);
-/* Free a code segment including all code entries */
 
 void AddCodeEntry (CodeSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
 /* Add a line to the given code segment */

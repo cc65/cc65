@@ -45,6 +45,7 @@
 /* cc65 */
 #include "codeseg.h"
 #include "dataseg.h"
+#include "textseg.h"
 #include "segments.h"
 
 
@@ -125,6 +126,7 @@ static Segments* NewSegments (SymEntry* Func)
     Segments* S = xmalloc (sizeof (Segments));
 
     /* Initialize the fields */
+    S->Text	= NewTextSeg (Func);
     S->Code	= NewCodeSeg (SegmentNames[SEG_CODE], Func);
     S->Data	= NewDataSeg (SegmentNames[SEG_DATA], Func);
     S->ROData	= NewDataSeg (SegmentNames[SEG_RODATA], Func);
@@ -190,6 +192,18 @@ struct DataSeg* GetDataSeg (void)
 
 
 
+void AddTextLine (const char* Format, ...)
+/* Add a line of code to the current text segment */
+{
+    va_list ap;
+    va_start (ap, Format);
+    CHECK (CS != 0);
+    AddTextEntry (CS->Text, Format, ap);
+    va_end (ap);
+}
+
+
+
 void AddCodeLine (const char* Format, ...)
 /* Add a line of code to the current code segment */
 {
@@ -236,6 +250,9 @@ void OutputSegments (const Segments* S, FILE* F)
     if (S->Code->Func) {
 	PrintFunctionHeader (S->Code->Func, F);
     }
+
+    /* Output the text segment */
+    OutputTextSeg (S->Text, F);
 
     /* Output the three data segments */
     OutputDataSeg (S->Data, F);

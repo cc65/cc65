@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2001      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -63,14 +63,6 @@ DataSeg* NewDataSeg (const char* Name, SymEntry* Func)
 
     /* Return the new struct */
     return S;
-}
-
-
-
-void FreeDataSeg (DataSeg* S)
-/* Free a data segment including all line entries */
-{
-    Internal ("Not implemented");
 }
 
 

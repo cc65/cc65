@@ -159,6 +159,9 @@ OBJS = 	add.o		\
 	pushlysp.o	\
        	pushw.o		\
        	pushwsp.o	\
+        regswap.o       \
+        regswap1.o      \
+        regswap2.o      \
 	return0.o	\
 	return1.o	\
        	rsub.o 		\

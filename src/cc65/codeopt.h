@@ -44,12 +44,6 @@
 
 
 /*****************************************************************************/
-/*  	       	    	  	     Data				     */
-/*****************************************************************************/
-
-
-
-/*****************************************************************************/
 /*     	       	      	  	     Code				     */
 /*****************************************************************************/
 
@@ -60,6 +54,9 @@ void DisableOpt (const char* Name);
 
 void EnableOpt (const char* Name);
 /* Enable the optimization with the given name */
+
+void ListOptSteps (FILE* F);
+/* List all optimization steps */
 
 void RunOpt (CodeSeg* S);
 /* Run the optimizer */

@@ -104,10 +104,12 @@ static void Usage (void)
        	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug\t\tDebug mode\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
+	     "  --debug-opt name\tDebug optimization steps\n"
 	     "  --disable-opt name\tDisable an optimization step\n"
        	     "  --enable-opt name\tEnable an optimization step\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
+	     "  --list-opt-steps\tList all optimizer steps\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
        	     "  --signed-chars\tDefault characters are signed\n"
        	     "  --static-locals\tMake local variables static\n"
@@ -380,6 +382,73 @@ static void OptDebugInfo (const char* Opt, const char* Arg)
 
 
 
+static void OptDebugOpt (const char* Opt, const char* Arg)
+/* Debug optimization steps */
+{
+    char Buf [128];
+    char* Line;
+
+    /* Open the file */
+    FILE* F = fopen (Arg, "r");
+    if (F == 0) {
+       	AbEnd ("Cannot open `%s': %s", Arg, strerror (errno));
+    }
+
+    /* Read line by line, ignore empty lines and switch optimization
+     * steps on/off.
+     */
+    while (fgets (Buf, sizeof (Buf), F) != 0) {
+
+	/* Remove trailing control chars. This will also remove the
+	 * trailing newline.
+	 */
+	unsigned Len = strlen (Buf);
+	while (Len > 0 && IsControl (Buf[Len-1])) {
+	    --Len;
+	}
+	Buf[Len] = '\0';
+
+	/* Get a pointer to the buffer and remove leading white space */
+	Line = Buf;
+	while (IsBlank (*Line)) {
+	    ++Line;
+	}
+
+	/* Check the first character and enable/disable the step or
+	 * ignore the line
+	 */
+	switch (*Line) {
+
+	    case '\0':
+	    case '#':
+	    case ';':
+	        /* Empty or comment line */
+	        continue;
+
+	    case '-':
+	        DisableOpt (Line+1);
+	        break;
+
+	    case '+':
+	        ++Line;
+	        /* FALLTHROUGH */
+
+	    default:
+	       	EnableOpt (Line);
+	        break;
+
+	}
+
+    }
+
+    /* Close the file, no error check here since we were just reading and
+     * this is only a debug function.
+     */
+    (void) fclose (F);
+}
+
+
+
 static void OptDisableOpt (const char* Opt, const char* Arg)
 /* Disable an optimization step */
 {
@@ -409,6 +478,14 @@ static void OptIncludeDir (const char* Opt, const char* Arg)
 /* Add an include search path */
 {
     AddIncludePath (Arg, INC_SYS | INC_USER);
+}
+
+
+
+static void OptListOptSteps (const char* Opt, const char* Arg)
+/* List all optimizer steps */
+{
+    ListOptSteps (stdout);
 }
 
 
@@ -482,10 +559,12 @@ int main (int argc, char* argv[])
 	{ "--data-name",	1, 	OptDataName  		},
        	{ "--debug",           	0,     	OptDebug     		},
 	{ "--debug-info",      	0, 	OptDebugInfo 		},
+        { "--debug-opt",        1,      OptDebugOpt             },
 	{ "--disable-opt",	1,	OptDisableOpt		},
 	{ "--enable-opt",	1,	OptEnableOpt,		},
 	{ "--help",	 	0, 	OptHelp	     		},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
+	{ "--list-opt-steps",   0,      OptListOptSteps         },
 	{ "--rodata-name",	1, 	OptRodataName		},
 	{ "--signed-chars",	0, 	OptSignedChars	       	},
        	{ "--static-locals",   	0, 	OptStaticLocals	       	},

@@ -1662,67 +1662,78 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
 
 
 
+/* Types of optimization steps */
+enum {
+    optPre,			/* Repeated once */
+    optPreMain,                 /* Repeated more than once */
+    optMain,                    /* dito */
+    optPostMain,                /* dito */
+    optPost                     /* Repeated once */
+};
+
 /* Table with all the optimization functions */
 typedef struct OptFunc OptFunc;
 struct OptFunc {
-    unsigned (*Func) (CodeSeg*);/* Optimizer function */
-    const char*	Name;		/* Name of optimizer step */
-    char	Disabled;	/* True if pass disabled */
+    unsigned        (*Func) (CodeSeg*); /* Optimizer function */
+    const char*	    Name;  	        /* Name of optimizer step */
+    unsigned char   Type;		/* Type of this step */
+    char	    Disabled;  	        /* True if pass disabled */
 };
 
+/* Macro that builds a table entry */
+#define OptEntry(func,type)     { func, #func, type, 0 }
 
-
-/* Table with optimizer steps -  are called in this order */
+/* Table with optimizer steps */
 static OptFunc OptFuncs [] = {
     /* Optimizes stores through pointers */
-    { OptPtrStore1,         "OptPtrStore1",             0       },
+    OptEntry (OptPtrStore1, optPre),
     /* Optimize loads through pointers */
-    { OptPtrLoad1,          "OptPtrLoad1",              0       },
-    { OptPtrLoad2,          "OptPtrLoad2",              0       },
-    /* Optimize subtractions */
-    { OptSub1, 	            "OptSub1", 	       	        0      	},
-    { OptSub2, 	            "OptSub2", 	       	        0      	},
-    /* Optimize additions */
-    { OptAdd1,         	    "OptAdd1",  		0      	},
-    /* Optimize jump cascades */
-    { OptJumpCascades, 	    "OptJumpCascades",		0      	},
-    /* Remove dead jumps */
-    { OptDeadJumps,    	    "OptDeadJumps",		0      	},
-    /* Change jsr/rts to jmp */
-    { OptRTS,  	       	    "OptRTS",			0      	},
-    /* Remove dead code */
-    { OptDeadCode,     	    "OptDeadCode",		0      	},
-    /* Optimize jump targets */
-    { OptJumpTarget,   	    "OptJumpTarget",		0      	},
-    /* Optimize conditional branches */
-    { OptCondBranches, 	    "OptCondBranches", 		0    	},
-    /* Replace jumps to RTS by RTS */
-    { OptRTSJumps,     	    "OptRTSJumps",		0      	},
-    /* Remove calls to the bool transformer subroutines	*/
-    { OptBoolTransforms,    "OptBoolTransforms",	0	},
+    OptEntry (OptPtrLoad1, optMain),
+    OptEntry (OptPtrLoad2, optMain),
     /* Optimize calls to nega */
-    { OptNegA1,	       	    "OptNegA1",			0	},
-    { OptNegA2,	       	    "OptNegA2",			0	},
+    OptEntry (OptNegA1, optPre),
+    OptEntry (OptNegA2, optPre),
     /* Optimize calls to negax */
-    { OptNegAX1,       	    "OptNegAX1",		0	},
-    { OptNegAX2,       	    "OptNegAX2",       	       	0      	},
-    { OptNegAX3,       	    "OptNegAX3",       	       	0      	},
-    { OptNegAX4,       	    "OptNegAX4",       	       	0      	},
+    OptEntry (OptNegAX1, optPre),
+    OptEntry (OptNegAX2, optPre),
+    OptEntry (OptNegAX3, optPre),
+    OptEntry (OptNegAX4, optPre),
+    /* Optimize subtractions */
+    OptEntry (OptSub1, optMain),
+    OptEntry (OptSub2, optMain),
+    /* Optimize additions */
+    OptEntry (OptAdd1, optMain),
+    /* Optimize jump cascades */
+    OptEntry (OptJumpCascades, optMain),
+    /* Remove dead jumps */
+    OptEntry (OptDeadJumps, optMain),
+    /* Change jsr/rts to jmp */
+    OptEntry (OptRTS, optMain),
+    /* Remove dead code */
+    OptEntry (OptDeadCode, optMain),
+    /* Optimize jump targets */
+    OptEntry (OptJumpTarget, optMain),
+    /* Optimize conditional branches */
+    OptEntry (OptCondBranches, optMain),
+    /* Replace jumps to RTS by RTS */
+    OptEntry (OptRTSJumps, optMain),
+    /* Remove calls to the bool transformer subroutines	*/
+    OptEntry (OptBoolTransforms, optMain),
     /* Optimize compares */
-    { OptCmp1,              "OptCmp1",                  0       },
-    { OptCmp2,              "OptCmp2",                  0       },
-    { OptCmp3,              "OptCmp3",                  0       },
-    { OptCmp4,              "OptCmp4",                  0       },
-    { OptCmp5,              "OptCmp5",                  0       },
-    { OptCmp6,              "OptCmp6",                  0       },
+    OptEntry (OptCmp1, optMain),
+    OptEntry (OptCmp2, optMain),
+    OptEntry (OptCmp3, optMain),
+    OptEntry (OptCmp4, optMain),
+    OptEntry (OptCmp5, optMain),
+    OptEntry (OptCmp6, optMain),
     /* Optimize tests */
-    { OptTest1,             "OptTest1",                 0       },
+    OptEntry (OptTest1, optMain),
     /* Remove unused loads */
-    { OptUnusedLoads,	    "OptUnusedLoads",		0	},
-    { OptDuplicateLoads,    "OptDuplicateLoads",        0       },
-    { OptStoreLoad,         "OptStoreLoad",             0       },
+    OptEntry (OptUnusedLoads, optMain),
+    OptEntry (OptDuplicateLoads, optMain),
+    OptEntry (OptStoreLoad, optMain),
     /* Optimize branch distance */
-    { OptBranchDist,   	    "OptBranchDist",		0	},
+    OptEntry (OptBranchDist, optMain),
 };
 
 
@@ -1756,7 +1767,7 @@ void DisableOpt (const char* Name)
 	unsigned I;
        	for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
        	    OptFuncs[I].Disabled = 1;
-	}
+    	}
     } else {
      	OptFunc* F = FindOptStep (Name);
      	F->Disabled = 1;
@@ -1781,12 +1792,65 @@ void EnableOpt (const char* Name)
 
 
 
-void RunOpt (CodeSeg* S)
-/* Run the optimizer */
+void ListOptSteps (FILE* F)
+/* List all optimization steps */
+{
+    unsigned I;
+    for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
+	fprintf (F, "%s\n", OptFuncs[I].Name);
+    }
+}
+
+
+
+static void RepeatOptStep (CodeSeg* S, unsigned char Type, unsigned Max)
+/* Repeat the optimizer step of type Type at may Max times */
 {
     unsigned I;
     unsigned Pass = 0;
     unsigned OptChanges;
+
+    /* Repeat max times of until there are no more changes */
+    do {
+     	/* Reset the number of changes */
+     	OptChanges = 0;
+
+    	/* Keep the user hapy */
+    	Print (stdout, 1, "  Optimizer pass %u:\n", ++Pass);
+
+       	/* Run all optimization steps */
+       	for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
+
+	    /* Get the table entry */
+	    const OptFunc* F = OptFuncs + I;
+
+	    /* Check if the type matches */
+	    if (F->Type != Type) {
+		/* Skip it */
+		continue;
+	    }
+
+    	    /* Print the name of the following optimizer step */
+    	    Print (stdout, 1, "    %s:%*s", F->Name, (int) (30-strlen(F->Name)), "");
+
+    	    /* Check if the step is disabled */
+       	    if (F->Disabled) {
+    	       	Print (stdout, 1, "Disabled\n");
+    	    } else {
+    	       	unsigned Changes = F->Func (S);
+    		OptChanges += Changes;
+    		Print (stdout, 1, "%u Changes\n", Changes);
+    	    }
+    	}
+
+    } while (--Max > 0 && OptChanges > 0);
+}
+
+
+
+void RunOpt (CodeSeg* S)
+/* Run the optimizer */
+{
 
     /* If we shouldn't run the optimizer, bail out */
     if (!Optimize) {
@@ -1801,31 +1865,11 @@ void RunOpt (CodeSeg* S)
     }
 
     /* Repeat all steps until there are no more changes */
-    do {
-     	/* Reset the number of changes */
-     	OptChanges = 0;
-
-	/* Keep the user hapy */
-	Print (stdout, 1, "  Optimizer pass %u:\n", ++Pass);
-
-       	/* Run all optimization steps */
-       	for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
-
-	    /* Print the name of the following optimizer step */
-	    Print (stdout, 1, "    %s:%*s", OptFuncs[I].Name,
-	       	   (int) (30-strlen(OptFuncs[I].Name)), "");
-
-	    /* Check if the step is disabled */
-       	    if (OptFuncs[I].Disabled) {
-	       	Print (stdout, 1, "Disabled\n");
-	    } else {
-	       	unsigned Changes = OptFuncs[I].Func (S);
-		OptChanges += Changes;
-		Print (stdout, 1, "%u Changes\n", Changes);
-	    }
-	}
-
-    } while (OptChanges > 0);
+    RepeatOptStep (S, optPre, 1);
+    RepeatOptStep (S, optPreMain, 0xFFFF);
+    RepeatOptStep (S, optMain, 0xFFFF);
+    RepeatOptStep (S, optPostMain, 0xFFFF);
+    RepeatOptStep (S, optPost, 1);
 }
 
 

@@ -95,6 +95,7 @@ Here is a description of all the command line options:
 
 <descrip>
 
+  <label id="option-A">
   <tag><tt>-A, --ansi</tt></tag>
 
   This option disables any compiler exensions. Have a look at section 5
@@ -141,9 +142,9 @@ Here is a description of all the command line options:
   Using this option, you can make the default characters signed. Since the
   6502 has no provisions for sign extending characters (which is needed on
   almost any load operation), this will make the code larger and slower. A
-  better way is to declare characters explicitly as "signed" if needed.
-  You can also use <tt/#pragma signedchars/ for better control of this option
-  (see section <ref id="pragmas" name="#pragmas">).
+  better way is to declare characters explicitly as "signed" if needed. You
+  can also use <tt><ref id="pragma-signedchars" name="#pragma
+  signedchars"></tt> for better control of this option.
 
 
   <tag><tt>-t target, --target target</tt></tag>
@@ -202,8 +203,8 @@ Here is a description of all the command line options:
   is entered, and will keep the old value from one call of the function to
   the next.
 
-  You may also use <tt/#pragma staticlocals/ to change this setting in your
-  sources (see section <ref id="pragmas" name="#pragmas">).
+  You may also use <tt><ref id="pragma-staticlocals" name="#pragma
+  staticlocals"></tt> to change this setting in your sources.
 
 
   <tag><tt>-I dir, --include-dir dir</tt></tag>
@@ -351,17 +352,20 @@ This cc65 version has some extensions to the ISO C standard.
 <itemize>
 
 <item>	The compiler allows // comments (like in C++ and in the proposed C9x
-     	standard). This feature is disabled by <tt/-A/.
+     	standard). This feature is disabled by <tt><ref id="option-A"
+	name="-A"></tt>.
+	<p>
 
 <item>	The compiler allows to insert assembler statements into the output
      	file. The syntax is
-	<p>
-       	<tt/asm (&lt;string literal&gt;) ;/
-     	<p>
+
+	<tscreen><verb>
+	asm (&lt;string literal&gt;) ;
+     	</verb></tscreen>
      	or
-     	<p>
-       	<tt/__asm__ (&lt;string literal&gt;) ;/
-     	<p>
+	<tscreen><verb>
+       	__asm__ (&lt;string literal&gt;) ;
+     	</verb></tscreen>
 
      	The first form is in the user namespace and is disabled if the <tt/-A/
      	switch is given.
@@ -372,21 +376,23 @@ This cc65 version has some extensions to the ISO C standard.
 
      	The asm statement may be used inside a function and on global file
      	level.
+	<p>
 
 <item>	There is a special calling convention named "fastcall". This calling
      	convention is currently only usable for functions written in
      	assembler. The syntax for a function declaration using fastcall is
-     	<p>
+
+	<tscreen><verb>
 	<tt/&lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)/
-	<p>
+     	</verb></tscreen>
      	or
-	<p>
+	<tscreen><verb>
 	<tt/&lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)/
-	<p>
+     	</verb></tscreen>
 	An example would be
-	<p>
+	<tscreen><verb>
        	<tt/void __fastcall__ f (unsigned char c)/
-	<p>
+     	</verb></tscreen>
 	The first form of the fastcall keyword is in the user namespace and is
 	therefore disabled in strict ANSI mode.
 
@@ -394,6 +400,7 @@ This cc65 version has some extensions to the ISO C standard.
 	pushed on the stack but left in the primary register when the function
 	is called. This will reduce the cost when calling assembler functions
 	significantly, especially when the function itself is rather small.
+	<p>
 
 <item>	There are two pseudo variables named <tt/__AX__/ and <tt/__EAX__/.
 	Both refer to the primary register that is used by the compiler to
@@ -404,10 +411,11 @@ This cc65 version has some extensions to the ISO C standard.
 	sequences of assembler code. For example, the macro
 
 	<tscreen><verb>
-	    #define hi(x) (__AX__=(x),asm("\ttxa\n\tldx\t#$00",__AX__)
+	#define hi(x) (__AX__=(x),asm("\ttxa\n\tldx\t#$00",__AX__)
 	</verb></tscreen>
 
 	will give the high byte of any unsigned value.
+	<p>
 
 <item>	Inside a function, the identifier <tt/__func__/ gives the name of the
 	current function as a string. Outside of functions, <tt/__func__/ is
@@ -415,11 +423,12 @@ This cc65 version has some extensions to the ISO C standard.
 	Example:
 
 	<tscreen><verb>
-	    #define PRINT_DEBUG(s)	printf ("%s: %s\n", __func__, s);
+	#define PRINT_DEBUG(s)	printf ("%s: %s\n", __func__, s);
 	</verb></tscreen>
 
 	The macro will print the name of the current function plus a given
 	string.
+	<p>
 </itemize>
 <p>
 
@@ -511,9 +520,8 @@ The compiler defines several macros at startup:
 The compiler understands some pragmas that may be used to change code
 generation and other stuff.
 
-<descrip>
 
-  <tag><tt>#pragma bssseg (&lt;name&gt;)</tt></tag>
+<sect1><tt>#pragma bssseg (&lt;name&gt;)</tt><p>
 
   This pragma changes the name used for the BSS segment (the BSS segment
   is used to store uninitialized data). The argument is a string enclosed
@@ -529,11 +537,11 @@ generation and other stuff.
 
   Example:
   <tscreen><verb>
-  	#pragma bssseg ("MyBSS")
+      	#pragma bssseg ("MyBSS")
   </verb></tscreen>
 
 
-  <tag><tt>#pragma codeseg (&lt;name&gt;)</tt></tag>
+<sect1><tt>#pragma codeseg (&lt;name&gt;)</tt><p>
 
   This pragma changes the name used for the CODE segment (the CODE segment
   is used to store executable code). The argument is a string enclosed in
@@ -549,7 +557,7 @@ generation and other stuff.
   </verb></tscreen>
 
 
-  <tag><tt>#pragma dataseg (&lt;name&gt;)</tt></tag>
+<sect1><tt>#pragma dataseg (&lt;name&gt;)</tt><p>
 
   This pragma changes the name used for the DATA segment (the DATA segment
   is used to store initialized data). The argument is a string enclosed in
@@ -565,7 +573,7 @@ generation and other stuff.
   </verb></tscreen>
 
 
-  <tag><tt>#pragma rodataseg (&lt;name&gt;)</tt></tag>
+<sect1><tt>#pragma rodataseg (&lt;name&gt;)</tt><p>
 
   This pragma changes the name used for the RODATA segment (the RODATA
   segment is used to store readonly data). The argument is a string
@@ -581,7 +589,7 @@ generation and other stuff.
   </verb></tscreen>
 
 
-  <tag><tt>#pragma regvaraddr (&lt;const int&gt;)</tt></tag>
+<sect1><tt>#pragma regvaraddr (&lt;const int&gt;)</tt><p>
 
   The compiler does not allow to take the address of register variables.
   The regvaraddr pragma changes this. Taking the address of a register
@@ -597,13 +605,14 @@ generation and other stuff.
 
   Example:
   <tscreen><verb>
-   	#pragma regvaraddr(1)  	/* Allow taking the address
-   			       	 * of register variables
-   			       	 */
+       	#pragma regvaraddr(1)  	/* Allow taking the address
+       			       	 * of register variables
+       			       	 */
   </verb></tscreen>
 
 
-  <tag><tt>#pragma signedchars (&lt;const int&gt;)</tt></tag>
+<sect1><tt>#pragma signedchars (&lt;const int&gt;)</tt><label
+id="pragma-signedchars"><p>
 
   Changed the signedness of the default character type. If the argument
   is not zero, default characters are signed, otherwise characters are
@@ -612,7 +621,8 @@ generation and other stuff.
   <tt/--signed-chars/ command line option.
 
 
-  <tag><tt>#pragma staticlocals (&lt;const int&gt;)</tt></tag>
+<sect1><tt>#pragma staticlocals (&lt;const int&gt;)</tt><label
+id="pragma-staticlocals"<p>
 
   Use variables in the bss segment instead of variables on the stack. This
   pragma changes the default set by the compiler option <tt/-Cl/. If the
@@ -620,7 +630,7 @@ generation and other stuff.
   leading to shorter and in most cases faster, but non-reentrant code.
 
 
-  <tag><tt>#pragma zpsym (&lt;name&gt;)</tt></tag>
+<sect1><tt>#pragma zpsym (&lt;name&gt;)</tt><p>
 
   Tell the compiler that the - previously as external declared - symbol with
   the given name is a zero page symbol (usually from an assembler file).
@@ -632,7 +642,6 @@ generation and other stuff.
       	#pragma zpsym ("foo");	/* foo is in the zeropage */
   </verb></tscreen>
 
-</descrip>
 
 
 

@@ -20,7 +20,7 @@ More special thanks to:
   * Tennessee Carmel-Veilleux <veilleux@ameth.org>
 
     Tennessee worked on the NES port (which is unfinished and was removed
-    because having an unfinished port it was confusing and people started 
+    because having an unfinished port it was confusing and people started
     mailing me about it).
 
   * Kevin Ruland <kevin@rodin.wustl.edu>
@@ -30,7 +30,7 @@ More special thanks to:
 
   * Christian Groessler <cpg@aladdin.de>
     Mark Keates <markk@dendrite.co.uk>
-    Freddy Offenga <F.Offenga@student.kun.nl>
+    Freddy Offenga <taf_offenga@yahoo.com>
     David Lloyd <dmlloyd@atari-central.com>
 
     The team that added support for the Atari 8 bit machines.
@@ -46,7 +46,7 @@ More special thanks to:
 
   * Eric Au <eric_au@hotmail.com>
 
-    Eric is one of the most active testers, and supplied me with dozens of 
+    Eric is one of the most active testers, and supplied me with dozens of
     bug reports.
 
   * MicroSystems Development Technologies Inc. located in San Jose,

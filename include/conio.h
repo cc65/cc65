@@ -121,7 +121,7 @@ void __fastcall__ cputsxy (unsigned char x, unsigned char y, const char* s);
 int cprintf (const char* format, ...);
 /* Like printf, but uses direct screen I/O */
 
-int vcprintf (const char* format, va_list ap);
+int __fastcall__ vcprintf (const char* format, va_list ap);
 /* Like vprintf, but uses direct screen I/O */
 
 char cgetc (void);

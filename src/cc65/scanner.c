@@ -283,6 +283,8 @@ static int ParseChar (void)
 		break;
 	    case '0':
 	    case '1':
+	    case '2':
+	    case '3':
 		/* Octal constant */
 		i = 0;
      		C = CurC - '0';

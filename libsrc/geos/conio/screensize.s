@@ -3,6 +3,7 @@
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
 ; 27.10.2001
+; 06.03.2002
 
 ; void screensize (unsigned char* x, unsigned char* y);
 ;
@@ -11,6 +12,7 @@
 
 	.import	 	popax
 	.importzp	ptr1, ptr2
+	.import		xsize, ysize
 	
 	.include 	"../inc/geossym.inc"
 
@@ -23,13 +25,8 @@ _screensize:
 	sta	ptr2
 	stx	ptr2+1
 
-	ldy	#0
-	lda	graphMode
-	bpl	L1
-	lda	#80		; 80 columns (more or less)
-	.byte	$2c
-L1:	lda	#40		; 40 columns (more or less)
+	lda	xsize
 	sta	(ptr2),y
-	lda	#24		; something like that for Y size
+	lda	ysize
 	sta	(ptr1),y
    	rts

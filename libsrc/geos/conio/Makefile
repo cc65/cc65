@@ -7,8 +7,9 @@
 	@$(AS) -o $@ $(AFLAGS) $<
 
 
-S_OBJS	= cchvline.o cgetc.o clrscr.o color.o cputc.o cputs.o cursor.o gotoxy.o kbhit.o\
-	revers.o screensize.o where.o
+S_OBJS	= cclear.o chline.o cvline.o cgetc.o clrscr.o color.o\
+	cputc.o cpputs.o cputs.o cursor.o gotoxy.o kbhit.o revers.o\
+	screensize.o where.o _scrsize.o
 
 all: $(S_OBJS)
 

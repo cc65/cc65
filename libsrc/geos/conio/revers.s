@@ -7,7 +7,7 @@
 ; unsigned char revers (unsigned char onoff);
 
 	    .export _revers
-	    .import tmp1
+	    .importzp tmp1
 
 	    .include "../inc/geossym.inc"
 	    .include "../inc/const.inc"

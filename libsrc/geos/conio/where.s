@@ -3,6 +3,7 @@
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
 ; 27.10.2001
+; 06.03.2002
 
 ; unsigned char wherex (void);
 ; unsigned char wherey (void);
@@ -11,20 +12,10 @@
 	    .importzp tmp1, tmp2
 
 	    .include "../inc/jumptab.inc"
-	    .include "cursor.inc"
+	    .include "../inc/cursor.inc"
 
-_wherex:    lda cursor_x
-	    sta tmp1
-	    lda cursor_x+1
-	    sta tmp2
-	    ldx #tmp1
-	    ldy #3
-	    jsr DShiftRight
-	    lda tmp1
+_wherex:    lda cursor_c
 	    rts
 
-_wherey:    lda cursor_y
-	    lsr
-	    lsr
-	    lsr
+_wherey:    lda cursor_r
 	    rts

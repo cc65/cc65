@@ -3,19 +3,21 @@
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
 ; 27.10.2001
+; 06.03.2002
 
 ; void cputcxy (unsigned char x, unsigned char y, char c);
 ; void cputc (char c);
 
 	    .export _cputcxy, _cputc, update_cursor
 
-	    .import _gotoxy
+	    .import _gotoxy, fixcursor
 	    .import popa
+	    .import xsize,ysize
 
 	    .include "../inc/const.inc"
 	    .include "../inc/geossym.inc"
 	    .include "../inc/jumptab.inc"
-	    .include "cursor.inc"
+	    .include "../inc/cursor.inc"
 
 _cputcxy:
 	pha	    		; Save C
@@ -30,10 +32,15 @@ _cputc:
 ; some characters are not safe for PutChar
 	cmp	#$20
 	bcs	L1
+	cmp	#CR
+	beq	echo_crlf
+	cmp	#LF
+	beq	do_lf
 	cmp	#$1d
 	bne	L00
 	ldx	#BACKSPACE
-	bne	L1
+	sec
+	bcs	L2
 L00:	cmp	#ESC_GRAPHICS
 	beq	L0
 	cmp	#ESC_RULER
@@ -50,7 +57,9 @@ L00:	cmp	#ESC_GRAPHICS
 	bne	L1
 L0:	rts
 
-L1:	lda	cursor_x
+L1:	clc
+L2:	php
+	lda	cursor_x
 	sta 	r11L
 	lda	cursor_x+1
 	sta	r11H
@@ -58,18 +67,31 @@ L1:	lda	cursor_x
 	sta	r1H
 	txa
 	jsr	PutChar
+	plp
+	bcs	update_cursor
+
+	inc	cursor_c
+	lda	cursor_c
+	cmp	xsize
+	bne	update_cursor
+echo_crlf:
+	lda	#0
+	sta	cursor_c
+do_lf:	inc	cursor_r
+	lda	cursor_r
+	cmp	ysize
+	bne	update_cursor
+	dec	cursor_r
 
 update_cursor:
-	lda	r11L
-	sta	cursor_x
+	jsr 	fixcursor
+	lda	cursor_x
 	sta	r4L
-	lda	r11H
-	sta	cursor_x+1
+	lda	cursor_x+1
 	sta	r4H
-	lda	r1H
-	sta	cursor_y
+	lda	cursor_y
 	sec
-	sbc 	curHeight
+	sbc	curHeight
 	sta	r5L
 	lda	#1		; update cursor prompt position
 	sta	r3L

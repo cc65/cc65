@@ -1,41 +1,36 @@
-
 ;
-; Maciej 'YTM/Elysium' Witkowiak
+; Ullrich von Bassewitz, 06.08.1998
 ;
-; 27.10.2001
-
 ; void cputsxy (unsigned char x, unsigned char y, char* s);
 ; void cputs (char* s);
+;
 
-	    .export _cputsxy, _cputs
-
-	    .import update_cursor, _gotoxy
-	    .import popa
-
-	    .include "../inc/const.inc"
-	    .include "../inc/geossym.inc"
-	    .include "../inc/jumptab.inc"
-	    .include "cursor.inc"
+	.export		_cputsxy, _cputs
+	.import		popa, _gotoxy, _cputc
+	.importzp	ptr1, tmp1
 
 _cputsxy:
-	sta	r0L		; Save s for later
-	stx	r0H
+	sta	ptr1		; Save s for later
+	stx	ptr1+1
 	jsr	popa		; Get Y
 	jsr	_gotoxy		; Set cursor, pop x
    	jmp	L0		; Same as cputs...
 
-_cputs:	sta	r0L		; Save s
-   	stx	r0H
+_cputs:	sta	ptr1		; Save s
+   	stx	ptr1+1
 L0:	ldy	#0
-	lda	(r0),y
-   	bne	L1		; Jump if there's something
-	rts
+L1:	lda	(ptr1),y
+   	beq	L9		; Jump if done
+   	iny
+   	sty	tmp1		; Save offset
+   	jsr	_cputc		; Output char, advance cursor
+   	ldy	tmp1		; Get offset
+   	bne	L1		; Next char
+   	inc	ptr1+1 		; Bump high byte
+	bne	L1
 
-L1:	lda	cursor_x
-	sta 	r11L
-	lda	cursor_x+1
-	sta	r11H
-	lda	cursor_y
-	sta	r1H
-	jsr	PutString
-	jmp	update_cursor
+; Done
+
+L9:	rts
+
+

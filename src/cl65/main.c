@@ -646,6 +646,7 @@ static void Usage (void)
              "  --lib-path path\tSpecify a library search path\n"
 	     "  --list-targets\tList all available targets\n"
        	     "  --listing\t\tCreate an assembler listing\n"
+             "  --list-bytes n\tNumber of bytes per assembler listing line\n"
 	     "  --mapfile name\tCreate a map file\n"
              "  --memory-model model\tSet the memory model\n"
              "  --module\t\tLink as a module\n"
@@ -881,6 +882,14 @@ static void OptLibPath (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptListBytes (const char* Opt attribute ((unused)), const char* Arg)
+/* Set the maximum number of bytes per asm listing line */
+{
+    CmdAddArg2 (&CA65, "--list-bytes", Arg);
+}
+
+
+
 static void OptListing (const char* Opt attribute ((unused)),
 			const char* Arg attribute ((unused)))
 /* Create an assembler listing */
@@ -1108,6 +1117,7 @@ int main (int argc, char* argv [])
        	{ "--lib-path",	       	1,     	OptLibPath              },
 	{ "--list-targets",	0,	OptListTargets		},
 	{ "--listing",	      	0,	OptListing		},
+        { "--list-bytes",       1,      OptListBytes            },
 	{ "--mapfile",	      	1,	OptMapFile		},
         { "--memory-model",     1,      OptMemoryModel          },
         { "--module",           0,      OptModule               },

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -111,6 +111,7 @@ static void Usage (void)
 	     "  --ignore-case\t\tIgnore case of symbols\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
        	     "  --listing\t\tCreate a listing if assembly was ok\n"
+             "  --list-bytes n\tMaximum number of bytes per listing line\n"
              "  --memory-model model\tSet the memory model\n"
        	     "  --pagelength n\tSet the page length for the listing\n"
        	     "  --smart\t\tEnable smart mode\n"
@@ -203,7 +204,7 @@ static void DefineSymbol (const char* Def)
 
 
 static void OptAutoImport (const char* Opt attribute ((unused)),
-			   const char* Arg attribute ((unused)))
+	    		   const char* Arg attribute ((unused)))
 /* Mark unresolved symbols as imported */
 {
     AutoImport = 1;
@@ -267,6 +268,28 @@ static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg
 /* Add an include search path */
 {
     AddIncludePath (Arg);
+}
+
+
+
+static void OptListBytes (const char* Opt, const char* Arg)
+/* Set the maximum number of bytes per listing line */
+{
+    unsigned Num;
+    char     Check;
+
+    /* Convert the argument to a number */
+    if (sscanf (Arg, "%u%c", &Num, &Check) != 1) {
+        AbEnd ("Invalid argument for option `%s'", Opt);
+    }
+
+    /* Check the bounds */
+    if (Num != 0 && (Num < MIN_LIST_BYTES || Num > MAX_LIST_BYTES)) {
+        AbEnd ("Argument for option `%s' is out of range", Opt);
+    }
+
+    /* Use the value */
+    SetListBytes (Num);
 }
 
 
@@ -593,6 +616,7 @@ int main (int argc, char* argv [])
 	{ "--help",    		0,	OptHelp			},
 	{ "--ignore-case",     	0,	OptIgnoreCase 		},
 	{ "--include-dir",     	1,	OptIncludeDir		},
+        { "--list-bytes",       1,      OptListBytes            },
 	{ "--listing", 	       	0,	OptListing		},
         { "--memory-model",     1,      OptMemoryModel          },
 	{ "--pagelength",      	1,	OptPageLength		},

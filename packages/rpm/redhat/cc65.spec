@@ -83,7 +83,7 @@ programs for the Apple ][ using the cc65 crosscompiler.
 %files apple2
 %attr(644,root,root)		/usr/lib/cc65/lib/apple2.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/apple2.o
-%attr(644,root,root) 		/usr/lib/cc65/joy/apple2-*.joy
+%attr(644,root,root) 		/usr/lib/cc65/joy/a2-*.joy
 %doc src/ld65/cfg/apple2.cfg
 
 

@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 21.08.1998
 ;
-; CC65 runtime: Load effective address with offset in A relative to SP and pus it
+; CC65 runtime: Load effective address with offset in A relative to SP and push it
 ;
 
     	.export		pleaasp

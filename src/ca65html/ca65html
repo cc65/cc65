@@ -87,7 +87,7 @@ my $LineLabels      = 0;            # Add a HTML label to each line
 my $LineNumbers     = 0;            # Add line numbers to the output
 my $LinkStyle  	    = 0;       	    # Default link style
 my $ReplaceExt 	    = 0;       	    # Replace extension instead of appending
-my $StringColor     = "#666666";    # Color for strings
+my $StringColor     = "#6169C1";    # Color for strings
 my $TextColor  	    = "#000000";    # Text color
 my $Verbose    	    = 0;       	    # Be quiet
 
@@ -180,8 +180,12 @@ sub StripPath {
 sub DocHeader {
     my $OUT = shift (@_);
     my $Asm = shift (@_);
+    if (not $Colorize) {
+        # Colorization generates invalid HTML. Common browsers display it
+        # correctly, but we don't claim it adheres to some standard ...
+        print $OUT "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">\n";
+    }
     print $OUT <<"EOF";
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
@@ -191,8 +195,7 @@ sub DocHeader {
 <body bgcolor="$BGColor" text="$TextColor" link="#0000d0" vlink="#000060" alink="#00d0d0">
 <p><br><p>
 <center><h1>$Asm</h1></center>
-<hr><p><br><p>
-<pre>
+<hr size="1" noshade><p><br><p>
 EOF
 }
 
@@ -204,18 +207,18 @@ sub DocFooter {
     # Get the current date and time
     my $Today = localtime;
 
-    print $OUT <<"EOF";
-</pre>
-<p><br><p>
-<hr size=1 noshade>
-<address>
-<a href="http://validator.w3.org/check/referer"><img border="0" src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!" height="31" width="88" align=right></a>
-$Name; generated on $Today by ca65html<br>
-<a href=\"mailto:uz\@cc65.org\">uz\@cc65.org</a>
-</address>
-</body>
-</html>
-EOF
+    # Print
+    print $OUT "<p><br><p>\n";
+    print $OUT "<hr size=\"1\" noshade>\n";
+    print $OUT "<address>\n";
+    if (not $Colorize) {
+        print $OUT "<a href=\"http://validator.w3.org/check/referer\"><img border=\"0\" src=\"http://www.w3.org/Icons/valid-html401\" alt=\"Valid HTML 4.01!\" height=\"31\" width=\"88\" align=\"right\"></a>\n";
+    }
+    print $OUT "$Name; generated on $Today by ca65html<br>\n";
+    print $OUT "<a href=\"mailto:uz&#64;cc65.org\">uz&#64;cc65.org</a>\n";
+    print $OUT "</address>\n";
+    print $OUT "</body>\n";
+    print $OUT "</html>\n";
 }
 
 
@@ -470,6 +473,7 @@ sub Process2 {
     my $Label;
     my $Operand;
     my $Comment;
+    my $Trailer;
 
     # Input file is parameter
     my $InName = shift(@_);
@@ -487,6 +491,7 @@ sub Process2 {
     # Open the output file and print the HTML header
     open (OUTPUT, ">$HTMLDir$OutName") or Abort ("Cannot open $OutName: $!");
     DocHeader (OUTPUT, $InName);
+    print OUTPUT "<pre>\n";
 
     # Keep the user happy
     Gabble ("$FileName => $OutName");
@@ -537,8 +542,46 @@ sub Process2 {
             $OutLine .= sprintf ("%6d:  ", $LineNo);
         }
 
-	# Check for a label. If we have one, process it and remove it
-	# from the line
+        # Cut off a comment from the input line. Beware: We have to check for
+        # strings, since these may contain a semicolon that is no comment
+        # start. A perl guru would probably write all this in one line...
+        my $L = $Line;
+        $Line = "";
+        $Comment = "";
+        while ($L ne "") {
+            if ($L =~ /^([^\"\';]+)(.*)$/) {
+                $Line .= $1;
+                $L    = $2;
+            }
+            if ($L =~ /^;/) {
+                # The remainder is a comment
+                $Comment = $L;
+                last;
+            } elsif ($L =~ /^(\"[^\"]*\")(.*)$/) {
+                $Line .= $1;
+                $L    = $2;
+            } elsif ($L =~ /^(\'[^\']*\')(.*)$/) {
+                $Line .= $1;
+                $L    = $2;
+            } elsif ($L =~ /^[\"\']/) {
+                # Line with invalid syntax - there's a string start but
+                # no string end.
+                Abort (sprintf ("Invalid input at %s(%d)", $FileName, $LineNo));
+            }
+        }
+
+        # Remove trailing whitespace and move it together with the comment
+        # into the $Trailer variable.
+        if ($Line =~ /^(.*?)(\s*)$/) {
+            $Line    = $1;
+            $Trailer = $2;
+        } else {
+            $Trailer = "";
+        }
+        $Trailer .= ColorizeComment (Cleanup ($Comment));
+
+       	# Check for a label at the start of the line. If we have one, process
+        # it and remove it from the line
 	if ($Line =~ /^\s*?(\@?)([_a-zA-Z][_\w]*)(\s*)(:|=)(.*)$/) {
 
 	    # Is this a local label?
@@ -573,7 +616,7 @@ sub Process2 {
 	if ($Line =~ /^(\.import|\.importzp)(\s+)(.*)$/) {
 
 	    # Print any fixed stuff from the line and remove it
-       	    $OutLine .= ColorizeCtrl ($1) . $2;
+       	    $OutLine .= $1 . $2;
  	    $Line = $3;
 
  	    # Print all identifiers if there are any
@@ -610,7 +653,7 @@ sub Process2 {
 		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
      		    $OutLine .= "$1,$2";
 		    $Line = $3;
-       		} else {
+       	     	} else {
 		    last;
       		}
 	    }
@@ -622,7 +665,7 @@ sub Process2 {
 	} elsif ($Line =~ /^(\.export|\.exportzp)(\s+)(.*)$/) {
 
 	    # Print the command the and white space
-	    $OutLine .= ColorizeCtrl ($1) . $2;
+	    $OutLine .= $1 . $2;
 	    $Line = $3;
 
 	    # Print all identifiers if there are any
@@ -653,14 +696,14 @@ sub Process2 {
 
      		# Add the HTML stuff to the output line
 		if ($Contents ne "") {
-		    $OutLine .= sprintf ("<a%s>%s</a>", $Contents, $Id);
+	     	    $OutLine .= sprintf ("<a%s>%s</a>", $Contents, $Id);
 		} else {
 		    $OutLine .= $Id;
 		}
 
      		# Check if another identifier follows
       	      	if ($Line =~ /^(\s*),(\s*)(.*)$/) {
-     		    $OutLine .= "$1,$2";
+     	    	    $OutLine .= "$1,$2";
      		    $Line = $3;
      		} else {
      		    last;
@@ -674,7 +717,7 @@ sub Process2 {
      	} elsif ($Line =~ /^(\.addr|\.word)(\s+)(.*)$/) {
 
      	    # Print the command the and white space
-     	    $OutLine .= ColorizeCtrl ($1) . $2;
+       	    $OutLine .= "$1$2";
      	    $Line = $3;
 
      	    # Print all identifiers if there are any
@@ -703,35 +746,32 @@ sub Process2 {
 	    # Do we have an identifier?
 	    if ($3 ne "") {
       	      	# Get the label for the id
-		$Label = $Labels{$OutName}{$3};
+	    	$Label = $Labels{$OutName}{$3};
 
 		# Print the label with a tag
-		$OutLine .= sprintf ("%s%s<a name=\"%s\">%s</a>%s",
-                                ColorizeCtrl ($1), $2, $Label, $3, Cleanup ($4));
+		$OutLine .= "$1$2<a name=\"$Label\">$3</a>";
+
 	    } else {
 
 		# Print the label
-		$OutLine .= ColorizeCtrl ($1) . $2 . $3 . Cleanup ($4);
+       	       	$OutLine .= "$1$2$3";
 
             }
 
+            # Add the remainder
+            $OutLine .= Cleanup ($4);
+
 	# Handle .include
-	} elsif ($Line =~ /^(\.include)(\s+)\"((?:[^\"]+?|\\\")+)\"(\s*)(;.*$|$)/) {
+	} elsif ($Line =~ /^(\.include)(\s+)\"((?:[^\"]+?|\\\")+)(\".*)$/) {
 
 	    # Add the fixed stuff to the output line
-	    $OutLine .= ColorizeCtrl ($1) . $2 . "\"";
+	    $OutLine .= "$1$2&quot;";
 
 	    # Get the filename into a named variable
-	    my $FileName = $3;
-
-	    # Remember the remainder
-	    $Line = "\"$4$5";
+	    my $FileName = Cleanup ($3);
 
 	    # Get the name without a path
-	    my $Name = StripPath ($FileName);
-
-	    # We don't need FileName any longer as is, so clean it up
-	    $FileName = Cleanup ($FileName);
+	    my $Name = StripPath ($3);
 
 	    # If the include file is among the list of our files, add a link,
 	    # otherwise just add the name as is.
@@ -742,38 +782,38 @@ sub Process2 {
 	    }
 
 	    # Add the remainder
-	    $OutLine .= Cleanup ($Line);
+	    $OutLine .= Cleanup ($4);
 
         # Handle .dbg line
         } elsif ($CRefs && $Line =~ /^(\.dbg)(\s+)(.*)$/) {
 
             # Add the fixed stuff to the output line
-            $OutLine .= ColorizeCtrl ($1) . $2;
+            $OutLine .= "$1$2";
 
             # Remember the remainder
             $Line = $3;
 
             # Check for the type of the .dbg directive
-            if ($Line =~ /^(line,\s*)\"((?:[^\"]+?|\\\")+)\"(,\s*)(\d+)(.*$)/) {
+            if ($Line =~ /^(line,\s*)\"((?:[^\"]+?|\\\")+)\"(,\s*)(\d+)(.*)$/) {
 
                 # Add the fixed stuff to the output line
-                $OutLine .= $1 . "\"";
+                $OutLine .= "$1&quot;";
 
                 # Get the filename and line number into named variables
-                my $FileName = $2;
-                my $LineNo   = $4;
+                my $DbgFile = $2;
+                my $DbgLine = $4;
 
                 # Remember the remainder
                 $Line = "\"$3$4$5";
 
                 # Get the name without a path
-                my $Name = StripPath ($FileName);
+                my $Name = StripPath ($DbgFile);
 
                 # We don't need FileName any longer as is, so clean it up
-                $FileName = Cleanup ($FileName);
+                $DbgFile = Cleanup ($DbgFile);
 
                 # Add a link to the source file
-                $OutLine .= sprintf ("<a href=\"%s.html#line%d\">%s</a>", $Name, $LineNo, $FileName);
+                $OutLine .= sprintf ("<a href=\"%s.html#line%d\">%s</a>", $Name, $DbgLine, $DbgFile);
 
                 # Add the remainder
                 $OutLine .= Cleanup ($Line);
@@ -781,14 +821,14 @@ sub Process2 {
             } elsif ($Line =~ /^(file,\s*)\"((?:[^\"]+?|\\\")+)\"(.*)$/) {
 
                 # Get the filename into a named variables
-                my $FileName = Cleanup ($2);
+                my $DbgFile = Cleanup ($2);
 
                 # Get the name without a path
                 my $Name = Cleanup (StripPath ($2));
 
                 # Add the fixed stuff to the output line
                 $OutLine .= sprintf ("%s\"<a href=\"%s.html\">%s</a>\"%s",
-                                     $1, $Name, $FileName, $3);
+                                     $1, $Name, $DbgFile, $3);
 
             } else {
 
@@ -800,7 +840,7 @@ sub Process2 {
         } elsif ($CRefs && $Line =~ /^(\.dbg)(\s+line,\s*)\"((?:[^\"]+?|\\\")+)\"(,\s*)(\d+)(.*$)/) {
 
             # Add the fixed stuff to the output line
-            $OutLine .= ColorizeCtrl ($1) . $2 . "\"";
+            $OutLine .= "$1$2&quot;";
 
 	    # Get the filename and line number into named variables
 	    my $FileName = $3;
@@ -822,53 +862,39 @@ sub Process2 {
 	    $OutLine .= Cleanup ($Line);
 
      	# Check for instructions with labels
-     	} elsif ($Line =~ /^($LabelIns)(\s+)(.*?)(\s*)(;.*$|$)/) {
+     	} elsif ($Line =~ /^($LabelIns)(\s+)(.*)$/) {
 
 	    # Print the instruction and white space
             $OutLine .= ColorizeKeyword ($1) . $2;
 
 	    # Remember the remaining parts
 	    $Operand = $3;
-	    $Comment = Cleanup ("$4$5");
 
   	    # Check for the first identifier in the operand and replace it
-	    # by a hyperlink
+    	    # by a hyperlink
        	    if ($Operand =~ /^([^_a-zA-Z]*?)(\@?)([_a-zA-Z][_\w]*)(.*)$/) {
 
 		# Is this a local label?
 		if ("$2" eq "\@") {
 		    # Use the prefix
 		    $Id = "$CheapPrefix$2$3";
-		} else {
-		    # Use as is
-		    $Id = $3;
-		}
+	     	} else {
+	     	    # Use as is
+	     	    $Id = $3;
+	     	}
 
-		# Get the reference to this label if we find it
+	     	# Get the reference to this label if we find it
 	     	$Operand = Cleanup($1) . RefLabel($OutName, $Id, $2 . $3) . Cleanup($4);
 	    }
 
 	    # Reassemble and print the line
-       	    $OutLine .= $Operand . ColorizeComment ($Comment);
+       	    $OutLine .= $Operand;
 
      	# Check for all other instructions
-     	} elsif ($Line =~ /^($AllIns)(\s+.*?\s*|\s*)(;.*$|$)/) {
+     	} elsif ($Line =~ /^($AllIns)(.*)$/) {
 
 	    # Colorize and print
-            $OutLine .= ColorizeKeyword ($1) . Cleanup ($2) . ColorizeComment (Cleanup ($3));
-
-        # Check for a comment line
-        } elsif ($Line =~ /^(\s*)(;.*)$/) {
-
-	    # Colorize and print
-            $OutLine .= $1 . ColorizeComment (Cleanup ($2));
-
-        # Check for a keyword
-        } elsif ($Line =~ /^(\s*)(\.[_a-zA-Z][_\w]*)(.*?)(;.*$|$)/) {
-
-	    # Colorize and print
-            $OutLine .= $1 . ColorizeCtrl ($2) . Cleanup ($3) .
-                        ColorizeComment (Cleanup ($4));
+            $OutLine .= ColorizeKeyword ($1) . Cleanup ($2);
 
       	} else {
 
@@ -877,11 +903,18 @@ sub Process2 {
 
 	}
 
+        # Colorize all keywords
+       	$OutLine =~ s/(?<![\w;])\.[_a-zA-Z][_\w]*/ColorizeCtrl ($&)/ge;
+
+        # Add the trailer
+        $OutLine .= $Trailer;
+
 	# Print the result
      	print OUTPUT "$OutLine\n";
     }
 
     # Print the HTML footer
+    print OUTPUT "</pre>\n";
     DocFooter (OUTPUT, $OutName);
 
     # Close the files
@@ -989,19 +1022,7 @@ sub CreateIndex {
     open (INDEX, ">$HTMLDir$IndexName") or Abort ("Cannot open $IndexName: $!");
 
     # Print the header
-    print INDEX <<"EOF";
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
-<html>
-<head>
-<meta http-equiv="Content-Type" content=\"text/html; charset=iso-8859-1">
-<meta name="GENERATOR" content="ca65html">
-<title>$IndexTitle</title>
-</head>
-<body bgcolor="$BGColor" text="$TextColor" link="#0000d0" vlink="#000060" alink="#00d0d0">
-<p><br><p>
-<center><h1>$IndexTitle</h1></center>
-<hr><p><br><p>
-EOF
+    DocHeader (INDEX, $IndexTitle, 0);
 
     # Print the file list in a table
     FileIndex (INDEX);
@@ -1025,21 +1046,24 @@ EOF
 sub Usage {
     print "Usage: ca65html [options] file ...\n";
     print "Options:\n";
-    print "  --bgcolor color     Use background color c instead of $BGColor\n";
-    print "  --colorize          Colorize the output\n";
-    print "  --crefs             Generate references to the C source file(s)\n";
-    print "  --cvttabs           Convert tabs to spaces in the output\n";
-    print "  --help              This text\n";
-    print "  --htmldir dir       Specify directory for HTML files\n";
-    print "  --indexcols n       Use n columns on index page (default $IndexCols)\n";
-    print "  --indexname file    Use file for the index file instead of $IndexName\n";
-    print "  --indexpage         Create an index page\n";
-    print "  --indextitle title  Use title as the index title instead of $IndexTitle\n";
-    print "  --linenumbers       Add line numbers to the output\n";
-    print "  --linkstyle style   Use the given link style\n";
-    print "  --replaceext        Replace source extension instead of appending .html\n";
-    print "  --textcolor color   Use text color c instead of $TextColor\n";
-    print "  --verbose           Be more verbose\n";
+    print "  --bgcolor c        Use background color c instead of $BGColor\n";
+    print "  --colorize         Colorize the output (generates non standard HTML)\n";
+    print "  --commentcolor c   Use color c for comments instead of $CommentColor\n";
+    print "  --crefs            Generate references to the C source file(s)\n";
+    print "  --ctrlcolor c      Use color c for directives instead of $CtrlColor\n";
+    print "  --cvttabs          Convert tabs to spaces in the output\n";
+    print "  --help             This text\n";
+    print "  --htmldir dir      Specify directory for HTML files\n";
+    print "  --indexcols n      Use n columns on index page (default $IndexCols)\n";
+    print "  --indexname file   Use file for the index file instead of $IndexName\n";
+    print "  --indexpage        Create an index page\n";
+    print "  --indextitle title Use title as the index title instead of $IndexTitle\n";
+    print "  --keywordcolor c   Use color c for keywords instead of $KeywordColor\n";
+    print "  --linenumbers      Add line numbers to the output\n";
+    print "  --linkstyle style  Use the given link style\n";
+    print "  --replaceext       Replace source extension instead of appending .html\n";
+    print "  --textcolor c      Use text color c instead of $TextColor\n";
+    print "  --verbose          Be more verbose\n";
 }
 
 
@@ -1053,7 +1077,9 @@ sub Usage {
 # Get program options
 GetOptions ("bgcolor=s"	      	=> \$BGColor,
             "colorize"          => \$Colorize,
+            "commentcolor=s"    => \$CommentColor,
             "crefs"             => \$CRefs,
+            "ctrlcolor=s"       => \$CtrlColor,
 	    "cvttabs"		=> \$CvtTabs,
 	    "debug!"   	      	=> \$Debug,
 	    "help"     	      	=> \$Help,
@@ -1062,6 +1088,7 @@ GetOptions ("bgcolor=s"	      	=> \$BGColor,
 	    "indexname=s"     	=> \$IndexName,
 	    "indexpage"	      	=> \$IndexPage,
 	    "indextitle=s"    	=> \$IndexTitle,
+            "keywordcolor=s"    => \$KeywordColor,
             "linelabels"        => \$LineLabels,
             "linenumbers"       => \$LineNumbers,
 	    "linkstyle=i"     	=> \$LinkStyle,

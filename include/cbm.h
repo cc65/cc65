@@ -181,8 +181,7 @@ void __fastcall__ cbm_k_clrch (void);
 
 
 
-unsigned int cbm_load (const char* name, unsigned char device,
-                       const char* data);
+unsigned int cbm_load (const char* name, unsigned char device, void* data);
 /* Loads file "name" from given device to given address or to the load
  * address of the file if "data" is the null pointer (like load"name",8,1
  * in BASIC).
@@ -191,7 +190,7 @@ unsigned int cbm_load (const char* name, unsigned char device,
  */
 
 unsigned char cbm_save (const char* name, unsigned char device,
-                       unsigned char* data, unsigned int size);
+                        const void* data, unsigned int size);
 /* Saves "size" bytes starting at "data" to a file.
  * Returns 0 if saving was successful, otherwise an errorcode (see table
  * below).

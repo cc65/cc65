@@ -3367,14 +3367,47 @@ void g_dec (unsigned flags, unsigned long val)
 	    /* FALLTHROUGH */
 
      	case CF_INT:
-     	    if (val <= 8) {
-     		AddCodeLine ("\tjsr\tdecax%d", (int) val);
-     	    } else if (val <= 255) {
-		ldyconst (val);
-		AddCodeLine ("\tjsr\tdecaxy");
+	    if (CodeSizeFactor < 200) {
+		/* Use subroutines */
+		if (val <= 8) {
+		    AddCodeLine ("\tjsr\tdecax%d", (int) val);
+		} else if (val <= 255) {
+		    ldyconst (val);
+		    AddCodeLine ("\tjsr\tdecaxy");
+		} else {
+		    g_sub (flags | CF_CONST, val);
+		}
 	    } else {
-     		g_sub (flags | CF_CONST, val);
-     	    }
+		/* Inline the code */
+		if (val < 0x300) {
+		    if ((val & 0xFF) != 0) {
+		       	AddCodeLine ("\tsec");
+		       	AddCodeLine ("\tsbc\t#$%02X", (unsigned char) val);
+     		       	AddCodeLine ("\tbcs\t*+3");
+     		       	AddCodeLine ("\tdex");
+		       	/* Tell the optimizer that the X register may be invalid */
+       	       	       	AddCodeHint ("x:!");
+		    }
+     		    if (val >= 0x100) {
+     		       	AddCodeLine ("\tdex");
+     		    }
+     		    if (val >= 0x200) {
+     		       	AddCodeLine ("\tdex");
+     		    }
+     		} else {
+		    AddCodeLine ("\tsec");
+		    if ((val & 0xFF) != 0) {
+	     	       	AddCodeLine ("\tsbc\t#$%02X", (unsigned char) val);
+		       	/* Tell the optimizer that the X register may be invalid */
+		       	AddCodeHint ("x:!");
+		    }
+     		    AddCodeLine ("\tpha");
+     		    AddCodeLine ("\ttxa");
+     		    AddCodeLine ("\tsbc\t#$%02X", (unsigned char) (val >> 8));
+     		    AddCodeLine ("\ttax");
+     		    AddCodeLine ("\tpla");
+     		}
+	    }
      	    break;
 
      	case CF_LONG:

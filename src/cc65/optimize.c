@@ -1737,10 +1737,10 @@ static void OptLoads (void)
 	 * and replace it by:
 	 *
 	 *     	lda    	xx
-	 *	ldy	#$01
+	 *   	ldy	#$01
 	 *    	sta	(sp),y
        	 *     	dey
-	 *	lda	yy
+	 *   	lda	yy
 	 *    	sta	(sp),y
 	 *
 	 * provided that that the X register is not used later. This code
@@ -1762,22 +1762,63 @@ static void OptLoads (void)
 
 	    /* Remove the remaining line */
 	    FreeLine (L2[1]);
-	}
+
+	/* Search for
+	 *
+	 *  	adc	#xx
+	 *  	bcc    	*+3
+	 *  	inx
+	 *
+	 * Remove the handling of the high byte if the X register
+	 * is not used any more
+	 */
+     	} else if (LineMatch (L, "\tadc\t#") 		&&
+     	    GetNextCodeLines (L, L2, 3)			&&
+     	    LineFullMatch (L2[0], "\tbcc\t*+3")		&&
+       	    LineFullMatch (L2[1], "\tinx")		&&
+     	    L2[1]->Next	     				&&
+     	    IsHint (L2[1]->Next, "x:!")			&&
+	    !RegXUsed (L2[1])) {
+
+     	    /* Delete the lines */
+     	    FreeLines (L2[0], L2[1]->Next);
+
+	/* Search for
+	 *
+	 *  	sbc	#xx
+	 *  	bcs    	*+3
+	 *  	dex
+	 *
+	 * Remove the handling of the high byte if the X register
+	 * is not used any more
+	 */
+     	} else if (LineMatch (L, "\tsbc\t#") 		&&
+     	    GetNextCodeLines (L, L2, 3)			&&
+     	    LineFullMatch (L2[0], "\tbcs\t*+3")		&&
+       	    LineFullMatch (L2[1], "\tdex")		&&
+     	    L2[1]->Next	     				&&
+     	    IsHint (L2[1]->Next, "x:!")			&&
+	    !RegXUsed (L2[1])) {
+
+     	    /* Delete the lines */
+     	    FreeLines (L2[0], L2[1]->Next);
+     	}
+
 
        	/* All other patterns start with this one: */
 	if (!LineFullMatch (L, "\tldx\t#$00")) {
 	    /* Next line */
 	    goto NextLine;
-	}
+	}				
 
 	/* Search for:
 	 *
-	 *  	ldx   	#$00
-	 *  	jsr   	pushax
+	 *   	ldx   	#$00
+	 *   	jsr   	pushax
 	 *
 	 * and replace it by:
 	 *
-	 *  	jsr   	pusha0
+	 *   	jsr   	pusha0
 	 *
 	 */
        	if (GetNextCodeLines (L, L2, 1)			&&
@@ -1792,13 +1833,13 @@ static void OptLoads (void)
 
 	/* Search for:
 	 *
-	 *  	ldx   	#$00
-	 *  	lda   	...
-	 *  	jsr   	pushax
+	 *   	ldx   	#$00
+	 *   	lda   	...
+	 *   	jsr   	pushax
 	 *
 	 * and replace it by:
 	 *
-	 *  	lda   	...
+	 *   	lda   	...
 	 *  	jsr   	pusha0
 	 *
 	 */
@@ -1812,7 +1853,7 @@ static void OptLoads (void)
 	    	/* Replace the subroutine call */
 	    	L2 [1] = ReplaceLine (L2 [1], "\tjsr\tpusha0");
 
-     	    	/* Remove the unnecessary load */
+     	     	/* Remove the unnecessary load */
 	       	FreeLine (L);
 
 	       	/* L must be valid */
@@ -1898,20 +1939,20 @@ static void OptRegLoads (void)
 
 	    /* Search for a load of X and check if the value is used later */
 	    if (LineMatch (L, "\tldx\t") 		&&
-	    	!RegXUsed (L)		 		&&
-	    	!IsCondJump (NextInstruction (L))) {
+	     	!RegXUsed (L)		 		&&
+	     	!IsCondJump (NextInstruction (L))) {
 
-	    	/* Remember to delete this line */
-	    	Delete = 1;
+	     	/* Remember to delete this line */
+	     	Delete = 1;
 	    }
 
 	    /* Search for a load of A and check if the value is used later */
 	    else if (LineMatch (L, "\tlda\t") 	       	&&
-	    	       !RegAUsed (L)	 	       	&&
-	    	       !IsCondJump (NextInstruction (L))) {
+	     	       !RegAUsed (L)	 	       	&&
+	     	       !IsCondJump (NextInstruction (L))) {
 
-	    	/* Remember to delete this line */
-	    	Delete = 1;
+	     	/* Remember to delete this line */
+	     	Delete = 1;
 	    }
 
 	    /* Search for a load of Y and check if the value is used later */
@@ -1919,8 +1960,8 @@ static void OptRegLoads (void)
        	       	       !RegYUsed (L) 	       	       	&&
 	     	       !IsCondJump (NextInstruction (L))) {
 
-	    	/* Remember to delete this line */
-	    	Delete = 1;
+	     	/* Remember to delete this line */
+	     	Delete = 1;
 	    }
 
 	    /* Go to the next line, delete the current if requested */

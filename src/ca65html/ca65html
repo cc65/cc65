@@ -7,10 +7,10 @@
 #                                                                             #
 #                                                                             #
 #                                                                             #
-#  (C) 2000      Ullrich von Bassewitz                                        #
-#                Wacholderweg 14                                              #
-#                D-70597 Stuttgart                                            #
-#  EMail:        uz@musoftware.de                                             #
+#  (C) 2000-2003 Ullrich von Bassewitz                                        #
+#                Römerstrasse 52                                              #
+#                D-70794 Filderstadt                                          #
+#  EMail:        uz@cc65.org                                                  #
 #                                                                             #
 #                                                                             #
 #  This software is provided 'as-is', without any expressed or implied        #
@@ -77,6 +77,8 @@ my $IndexCols  	= 6;		# Columns in the file listing
 my $IndexTitle 	= "Index";	# Title of index page
 my $IndexName  	= "index.html";	# Name of index page
 my $IndexPage  	= 0;		# Create an index page
+my $LineLabels  = 0;            # Add a HTML label to each line
+my $LineNumbers = 0;            # Add line numbers to the output
 my $LinkStyle  	= 0;		# Default link style
 my $ReplaceExt 	= 0;		# Replace extension instead of appending
 my $TextColor  	= "#000000";	# Text color
@@ -172,7 +174,7 @@ sub DocHeader {
     my $OUT = shift (@_);
     my $Asm = shift (@_);
     print $OUT <<"EOF";
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html-40/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
@@ -200,7 +202,7 @@ sub DocFooter {
 <p><br><p>
 <hr size=1 noshade>
 <address>
-<a href="http://validator.w3.org/check/referer"><img border=0 src="http://validator.w3.org/images/vh40" alt="Valid HTML 4.0!" height=31 width=88 align=right></a>
+<a href="http://validator.w3.org/check/referer"><img border="0" src="http://www.w3.org/Icons/valid-html401" alt="Valid HTML 4.01!" height="31" width="88" align=right></a>
 $Name; generated on $Today by ca65html<br>
 <a href=\"mailto:uz\@cc65.org\">uz\@cc65.org</a>
 </address>
@@ -443,13 +445,28 @@ sub Process2 {
 
     # Read the input file, replacing references by hyperlinks and mark
     # labels as link targets.
+    my $LineNo = 0;
     while ($Line = <INPUT>) {
+
+        # Count input lines
+        $LineNo++;
 
  	# Remove the newline
 	chop ($Line);
 
-	# Clear the output line
+       	# Clear the output line
 	$OutLine = "";
+
+        # If requested, add a html label to each line with a name "linexxx",
+        # so it can be referenced from the outside (this is the same convention
+        # that is used by c2html). If we have line numbers enabled, add them.
+        if ($LineLabels && $LineNumbers) {
+            $OutLine .= sprintf ("<a name=\"line%d\">%6d</a>:  ", $LineNo, $LineNo);
+        } elsif ($LineLabels) {
+            $OutLine .= sprintf ("<a name=\"line%d\"></a>", $LineNo);
+        } elsif ($LineNumbers) {
+            $OutLine .= sprintf ("%6d:  ", $LineNo);
+        }
 
 	# Check for a label. If we have one, process it and remove it
 	# from the line
@@ -808,7 +825,7 @@ sub CreateIndex {
 
     # Print the header
     print INDEX <<"EOF";
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html-40/loose.dtd">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
 <meta http-equiv="Content-Type" content=\"text/html; charset=iso-8859-1">
@@ -850,6 +867,7 @@ sub Usage {
     print "  --indexname file    Use file for the index file instead of $IndexName\n";
     print "  --indexpage         Create an index page\n";
     print "  --indextitle title  Use title as the index title instead of $IndexTitle\n";
+    print "  --linenumbers       Add line numbers to the output\n";
     print "  --linkstyle style   Use the given link style\n";
     print "  --replaceext        Replace source extension instead of appending .html\n";
     print "  --textcolor color   Use text color c instead of $TextColor\n";
@@ -873,6 +891,8 @@ GetOptions ("bgcolor=s"		=> \$BGColor,
 	    "indexname=s"	=> \$IndexName,
 	    "indexpage"		=> \$IndexPage,
 	    "indextitle=s"	=> \$IndexTitle,
+            "linelabels"        => \$LineLabels,
+            "linenumbers"       => \$LineNumbers,
 	    "linkstyle=i"	=> \$LinkStyle,
 	    "replaceext"	=> \$ReplaceExt,
 	    "textcolor=s"	=> \$TextColor,

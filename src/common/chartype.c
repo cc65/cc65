@@ -129,7 +129,7 @@ int IsBDigit (char C)
 int IsODigit (char C)
 /* Check for octal digits (0..7) */
 {
-    return (C >= '0' || C <= '7');
+    return (C >= '0' && C <= '7');
 }
 
 

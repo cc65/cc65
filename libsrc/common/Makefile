@@ -60,7 +60,6 @@ C_OBJS =	_afailed.o	\
 		rewind.o	\
                 scanf.o         \
 		sleep.o		\
-		sscanf.o	\
                 strftime.o      \
 		strxfrm.o	\
 		strtok.o	\
@@ -139,6 +138,7 @@ S_OBJS = 	_cwd.o          \
                 signal.o        \
                 sigtable.o      \
 		sprintf.o	\
+		sscanf.o	\
 		strcat.o    	\
 		strchr.o	\
 		strcmp.o	\

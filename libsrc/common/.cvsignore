@@ -30,7 +30,6 @@ realloc.s
 rewind.s
 scanf.s
 sleep.s
-sscanf.s
 strftime.s
 strtok.s
 strxfrm.s

@@ -68,6 +68,11 @@ CodeMark GetCodePos (void);
 void RemoveCode (CodeMark M);
 /* Remove all code after the given code marker */
 
+void MoveCode (CodeMark Start, CodeMark End, CodeMark Target);
+/* Move the code between Start (inclusive) and End (exclusive) to
+ * (before) Target.
+ */
+
 void WriteOutput (FILE* F);
 /* Write the final output to a file */
 

@@ -81,7 +81,7 @@ static void CheckSemi (int* PendingToken)
 static void SkipPending (int PendingToken)
 /* Skip the pending token if we have one */
 {
-    if (PendingToken) {    
+    if (PendingToken) {
 	NextToken ();
     }
 }
@@ -641,6 +641,9 @@ static void ForStatement (void)
     struct expent lval1;
     struct expent lval2;
     struct expent lval3;
+    int HaveIncExpr;  
+    CodeMark IncExprStart;
+    CodeMark IncExprEnd;
     int PendingToken;
 
     /* Get several local labels needed later */
@@ -649,7 +652,7 @@ static void ForStatement (void)
     unsigned IncLabel  = GetLocalLabel ();
     unsigned lstat     = GetLocalLabel ();
 
-    /* Skip the FOR token */
+    /* Skip the FOR token */	       
     NextToken ();
 
     /* Add the loop to the loop stack */
@@ -677,16 +680,23 @@ static void ForStatement (void)
     }
     ConsumeSemi ();
 
+    /* Remember the start of the increment expression */
+    IncExprStart = GetCodePos();
+
     /* Label for the increment expression */
     g_defcodelabel (IncLabel);
 
     /* Parse the increment expression */
-    if (CurTok.Tok != TOK_RPAREN) {
+    HaveIncExpr = (CurTok.Tok != TOK_RPAREN);
+    if (HaveIncExpr) {
     	expression (&lval3);
     }
 
     /* Jump to the test */
     g_jump (TestLabel);
+
+    /* Remember the end of the increment expression */
+    IncExprEnd = GetCodePos();
 
     /* Skip the closing paren */
     ConsumeRParen ();
@@ -695,9 +705,17 @@ static void ForStatement (void)
     g_defcodelabel (lstat);
     Statement (&PendingToken);
 
-    /* Jump back to the increment expression */
-    g_jump (IncLabel);
-			    
+    /* If we had an increment expression, move the code to the bottom of
+     * the loop. In this case we don't need to jump there at the end of
+     * the loop body.
+     */
+    if (HaveIncExpr) {
+	MoveCode (IncExprStart, IncExprEnd, GetCodePos());
+    } else {
+	/* Jump back to the increment expression */
+	g_jump (IncLabel);
+    }
+    
     /* Skip a pending token if we have one */
     SkipPending (PendingToken);
 

@@ -235,7 +235,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	    L = ReadToken (L+1, ",)", Arg, sizeof (Arg));
 
 	    /* Check for errors */
-	    if (*L == '\0') {
+   	    if (*L == '\0') {
 	     	Error ("ASM code error: syntax error");
 	     	return 0;
 	    }
@@ -278,7 +278,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	     	    AM = AM65_ZP_IND;
 	     	} else {
 	     	    Error ("ASM code error: syntax error");
-	     	    return 0;
+   	     	    return 0;
 	     	}
 	    }
 	    break;
@@ -321,7 +321,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 			    AM = AM65_ABSX;
 			}
 		    } else if (Reg == 'Y') {
-		     	AM = AM65_ABSY;
+   		     	AM = AM65_ABSY;
 		    } else {
 		     	Error ("ASM code error: syntax error");
 	       	     	return 0;
@@ -545,29 +545,8 @@ void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count)
      * memory moving.
      */
     while (Count--) {
-	CS_DelEntry (S, Start + Count);
+   	CS_DelEntry (S, Start + Count);
     }
-}
-
-
-
-void CS_MoveEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos)
-/* Move an entry from one position to another. OldPos is the current position
- * of the entry, NewPos is the new position of the entry.
- */
-{
-    /* Get the code entry and remove it from the collection */
-    CodeEntry* E = CS_GetEntry (S, OldPos);
-    CollDelete (&S->Entries, OldPos);
-
-    /* Correct NewPos if needed */
-    if (NewPos >= OldPos) {
-	/* Position has changed with removal */
-	--NewPos;
-    }
-
-    /* Now insert it at the new position */
-    CollInsert (&S->Entries, E, NewPos);
 }
 
 
@@ -578,10 +557,10 @@ struct CodeEntry* CS_GetNextEntry (CodeSeg* S, unsigned Index)
  */
 {
     if (Index >= CollCount (&S->Entries)-1) {
-	/* This is the last entry */
-	return 0;
+   	/* This is the last entry */
+   	return 0;
     } else {
-	/* Code entries left */
+   	/* Code entries left */
        	return CollAtUnchecked (&S->Entries, Index+1);
     }
 }

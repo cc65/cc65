@@ -116,10 +116,32 @@ void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count);
  * labels attached to the entries and so on.
  */
 
-void CS_MoveEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos);
+#if defined(HAVE_INLINE)
+INLINE void CS_MoveEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos)
 /* Move an entry from one position to another. OldPos is the current position
  * of the entry, NewPos is the new position of the entry.
  */
+{
+    CollMove (&S->Entries, OldPos, NewPos);
+}
+#else
+#  define CS_MoveEntry(S, OldPos, NewPos)       CollMove (&(S)->Entries, OldPos, NewPos)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos)
+/* Move a range of entries from one position to another. Start is the index
+ * of the first entry to move, Count is the number of entries and NewPos is
+ * the index of the target entry. The entry with the index Start will later
+ * have the index NewPos. All entries with indices NewPos and above are
+ * moved to higher indices.
+ */
+{
+    CollMoveMultiple (&S->Entries, Start, Count, NewPos);
+}
+#else
+#  define CS_MoveEntries(S, Start, Count, NewPos) CollMoveMultiple (&(S)->Entries, Start, Count, NewPos)
+#endif
 
 #if defined(HAVE_INLINE)
 INLINE struct CodeEntry* CS_GetEntry (CodeSeg* S, unsigned Index)

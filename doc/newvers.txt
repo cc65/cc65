@@ -504,7 +504,7 @@ Currently the following limitations the are known:
 -------
 
 Please note that the compiler and the libraries are beta! Send bug reports to
-uz@musoftware.de.
+uz@cc65.org.
 
 
 

@@ -65,7 +65,7 @@ tgi_outtext:        jmp     $0000
 
 ; Driver header signature
 .rodata
-tgi_sig:        .byte   $74, $67, $69, $00      ; "tgi", version
+tgi_sig:        .byte   $74, $67, $69, TGI_API_VERSION  ; "tgi", version
 tgi_sig_len     = * - tgi_sig
 
 

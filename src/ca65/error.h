@@ -39,6 +39,7 @@
 
 
 /* common */
+#include "attrib.h"
 #include "filepos.h"
 
 
@@ -190,10 +191,10 @@ void PError (const FilePos* Pos, unsigned ErrNum, ...);
 void ErrorSkip (unsigned ErrNum, ...);
 /* Print an error message and skip the rest of the line */
 
-void Fatal (unsigned FatNum, ...);
+void Fatal (unsigned FatNum, ...) attribute ((noreturn));
 /* Print a message about a fatal error and die */
 
-void Internal (const char* Format, ...);
+void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print a message about an internal compiler error and die. */
 
 

@@ -816,7 +816,7 @@ static void DoFileOpt (void)
 		break;
 
 	    default:
-	        Internal ("Invalid OptNum: %l", OptNum);
+	        Internal ("Invalid OptNum: %ld", OptNum);
 
 	}
 

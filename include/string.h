@@ -67,7 +67,7 @@ void* __fastcall__ memset (void* s, int c, size_t count);
 /* The following is an internal function, the compiler will replace memset
  * with it if the fill value is zero. Never use this one directly!
  */
-void* __fastcall__ _bzero (void* ptr, size_t n);                           
+void* __fastcall__ _bzero (void* ptr, size_t n);
 
 /* Non standard: */
 #ifndef __STRICT_ANSI__
@@ -80,6 +80,9 @@ char* __fastcall__ strlower (char* s);
 char* __fastcall__ strupr (char* s);
 char* __fastcall__ strupper (char* s);
 #endif
+
+const char* __fastcall__ _stroserror (unsigned char errcode);
+/* Map an operating system error number to an error message. */
 
 
 

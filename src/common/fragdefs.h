@@ -47,7 +47,6 @@
 /* Masks for the fragment type byte */
 #define FRAG_TYPEMASK   0x38   	        /* Mask the type of the fragment */
 #define FRAG_BYTEMASK   0x07   	        /* Mask for byte count */
-#define FRAG_CHECKMASK  0x40            /* Mask for check expressions */
 
 /* Fragment types */
 #define FRAG_LITERAL   	0x00   	        /* Literal data */
@@ -65,13 +64,6 @@
 #define FRAG_SEXPR32   	(FRAG_SEXPR | 4)/* 32 bit signed expression */
 
 #define FRAG_FILL      	0x20   	        /* Fill bytes */
-
-/* Fragment checks */
-#define FRAG_CHECK      0x40            /* Check expressions exist */
-
-/* Fragment check actions */
-#define FRAG_ACT_WARN   0x00U           /* Print a warning */
-#define FRAG_ACT_ERROR  0x01U           /* Exit with an error */
 
 
 

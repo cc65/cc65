@@ -68,7 +68,7 @@ typedef struct StringPool StringPool;
 struct StringPool {
     Collection        Entries;    /* Entries sorted by number */
     unsigned          TotalSize;  /* Total size of all string data */
-    StringPoolEntry*  Tab[211];   /* Entry hash table */
+    StringPoolEntry*  Tab[4177];  /* Entry hash table */
 };
 
 /* A string pool initializer. We do only initialize the first field, all

@@ -365,22 +365,16 @@ programs for the Commodore VIC20 using the cc65 crosscompiler.
 
 
 %prep
-%setup
+%setup -q
 
 
 %build
 # Binaries
-cd src
-make -f make/gcc.mak
-cd ..
+cd src; make -f make/gcc.mak; cd ..
 # Libraries
-cd libsrc
-make -s zap all
-cd ..
+cd libsrc; make -s zap all; cd ..
 # Documentation
-cd doc
-make html
-cd ..
+cd doc; make html; cd ..
 
 
 %install
@@ -413,8 +407,15 @@ install -m 644 libsrc/*.joy $RPM_BUILD_ROOT/usr/lib/cc65/joy
 install -m 644 libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi
 
 
+%clean
+rm -rf $RPM_BUILD_ROOT
+
+
 
 %changelog
+* Thu Oct 02 2003 Ullrich von Bassewitz <uz@cc65.org>
+- Better cleanup
+
 * Thu Jun 12 2003 Ullrich von Bassewitz <uz@cc65.org>
 - Added subdirectories of include/
 

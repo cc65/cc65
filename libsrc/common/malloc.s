@@ -150,21 +150,21 @@ _malloc:
 
 	jmp	@L4
 
-@L3:	ldy	#freeblock_size
+@L3:	ldy	#freeblock::size
        	lda	(ptr2),y
        	sub	ptr1
 	tax		   	        ; Remember low byte for later
-      	iny		   	        ; Y points to freeblock_size+1
+      	iny		   	        ; Y points to freeblock::size+1
        	lda	(ptr2),y
 	sbc	ptr1+1
 	bcs    	BlockFound 	        ; Beware: Contents of a/x/y are known!
 
 ; Next block in list
 
-      	iny		       	        ; Points to freeblock_next
+      	iny		       	        ; Points to freeblock::next
       	lda	(ptr2),y
       	tax
-      	iny			        ; Points to freeblock_next+1
+      	iny			        ; Points to freeblock::next+1
       	lda	(ptr2),y
       	stx	ptr2
       	sta	ptr2+1
@@ -221,13 +221,13 @@ BlockFound:
 ; does already contain the correct size word, all we have to do is to
 ; remove it from the free list.
 
-       	ldy    	#freeblock_prev+1	; Load f->prev
+       	ldy    	#freeblock::prev+1	; Load f->prev
 	lda	(ptr2),y
 	sta	ptr3+1
 	dey
 	lda	(ptr2),y
 	sta	ptr3
-	dey	   	    	        ; Points to freeblock_next+1
+	dey	   	    	        ; Points to freeblock::next+1
 	ora	ptr3+1
 	beq	@L1   		        ; Jump if f->prev zero
 
@@ -312,10 +312,10 @@ SliceBlock:
 ; Fill the size into the admin space of the block and return the user pointer
 
 FillSizeAndRet:
-	ldy	#freeblock_size	  	; *p = size;
+	ldy	#freeblock::size        ; *p = size;
 	lda	ptr1		        ; Low byte of block size
 	sta	(ptr2),y
-	iny			        ; Points to freeblock_size+1
+	iny			        ; Points to freeblock::size+1
 	lda	ptr1+1
 	sta	(ptr2),y
 

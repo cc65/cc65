@@ -7,10 +7,11 @@
 ; Assembler include file that makes the constants and structures in _file.h
 ; available for asm code.
 
-; Struct _FILE offsets and size
-_FILE_f_fd      = $00
-_FILE_f_flags   = $01
-_FILE_size      = $02
+; Struct _FILE
+.struct _FILE
+        f_fd    .byte
+        f_flags .byte
+.endstruct
 
 ; Flags field
 _FCLOSED        = $00

@@ -15,12 +15,12 @@
 
        	ldy	#0
         lda     #_FOPEN
-Loop:  	and    	__filetab + _FILE_f_flags,y     ; load flags
+Loop:  	and    	__filetab + _FILE::f_flags,y    ; load flags
        	beq    	Found		                ; jump if closed
-.repeat ::_FILE_size
+.repeat .sizeof(_FILE)
       	iny
 .endrepeat
-       	cpy    	#(FOPEN_MAX * _FILE_size)       ; Done?
+       	cpy    	#(FOPEN_MAX * .sizeof(_FILE))   ; Done?
       	bne	Loop
 
 ; File table is full

@@ -31,7 +31,7 @@
 
 ; Check if the file is open
 
-	ldy	#_FILE_f_flags
+	ldy	#_FILE::f_flags
 	lda	(ptr1),y
 	and	#_FOPEN		      	; Is the file open?
        	bne    	@L2			; Branch if yes
@@ -53,7 +53,7 @@
 
 ; Build the stackframe for write()
 
-        ldy     #_FILE_f_fd
+        ldy     #_FILE::f_fd
         lda     (ptr1),y
         ldx     #$00
         jsr     pushax                  ; file->f_fd
@@ -102,7 +102,7 @@
         sta     ptr1
         lda     file+1
         sta     ptr1+1
-        ldy     #_FILE_f_flags
+        ldy     #_FILE::f_flags
         lda     (ptr1),y
         ora     #_FERROR
         sta     (ptr1),y

@@ -1,4 +1,4 @@
-;                     
+;
 ; Ullrich von Bassewitz, 22.11.2002
 ;
 ; FILE* __fastcall__ _fopen (const char* name, const char* mode, FILE* f);
@@ -101,9 +101,9 @@ openok: ldy     file
         sty     ptr1
         ldy     file+1
         sty     ptr1+1
-        ldy     #_FILE_f_fd
+        ldy     #_FILE::f_fd
         sta     (ptr1),y        ; file->f_fd = fd;
-        ldy     #_FILE_f_flags
+        ldy     #_FILE::f_flags
         lda     #_FOPEN
         sta     (ptr1),y        ; file->f_flags = _FOPEN;
 

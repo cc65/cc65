@@ -6,7 +6,7 @@
 ; size_t __fastcall__ _heapmaxavail (void);
 ;
 ;
-
+                            
 	.importzp    	ptr1, ptr2
        	.export	     	__heapmaxavail
 
@@ -42,7 +42,7 @@ __heapmaxavail:
 
 ; if (Size < F->size) {
 
-        ldy     #freeblock_size
+        ldy     #freeblock::size
         lda     ptr2
         sub     (ptr1),y
         iny
@@ -52,7 +52,7 @@ __heapmaxavail:
 
 ; Size = F->size;
 
-        ldy     #freeblock_size
+        ldy     #freeblock::size
         lda     (ptr1),y
         sta     ptr2
         iny

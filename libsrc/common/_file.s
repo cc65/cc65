@@ -5,7 +5,7 @@
 ;
 
        	.export	       	__filetab
-                                 
+
         .include        "stdio.inc"
         .include        "fcntl.inc"
         .include        "_file.inc"
@@ -27,12 +27,12 @@ __filetab:
 ; Standard file descriptors
 
 _stdin:
-	.word	__filetab + (STDIN_FILENO * _FILE_size)
+	.word	__filetab + (STDIN_FILENO * .sizeof(_FILE))
 
 _stdout:
-	.word	__filetab + (STDOUT_FILENO * _FILE_size)
+	.word	__filetab + (STDOUT_FILENO * .sizeof(_FILE))
 
 _stderr:
-	.word	__filetab + (STDERR_FILENO * _FILE_size)
+	.word	__filetab + (STDERR_FILENO * .sizeof(_FILE))
 
 

@@ -16,7 +16,7 @@
 
 getf:	sta	ptr1
 	stx	ptr1+1
-	ldy	#_FILE_f_flags
+	ldy	#_FILE::f_flags
 	lda	(ptr1),y      	; get f->f_flags
 	and	#_FOPEN         ; file open?
 	beq    	@L1   		; jump if no

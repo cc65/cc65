@@ -40,7 +40,7 @@ __heapadd:
 
 ; The block is large enough. Set the size field in the block.
 
-@L1:	ldy	#freeblock_size
+@L1:	ldy	#freeblock::size
     	sta	(ptr2),y
 	iny
 	txa

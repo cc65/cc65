@@ -96,13 +96,13 @@ L1:	lda	sp,x
 
 	lda	#0
 	jsr	getfd
-       	sta    	__filetab + (0 * _FILE_size)    ; setup stdin
+       	sta    	__filetab + (0 * .sizeof(_FILE)); setup stdin
 	lda	#0
 	jsr	getfd
-	sta	__filetab + (1 * _FILE_size)    ; setup stdout
+	sta	__filetab + (1 * .sizeof(_FILE)); setup stdout
 	lda	#0
 	jsr	getfd
-	sta	__filetab + (2 * _FILE_size)    ; setup stderr
+	sta	__filetab + (2 * .sizeof(_FILE)); setup stderr
 
 ; Push arguments and call main
 

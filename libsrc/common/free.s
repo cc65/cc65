@@ -86,7 +86,7 @@ _free: 	sta    	ptr2
 	sta	ptr2
     	bcs	@L1
     	dec	ptr2+1
-@L1:	ldy	#freeblock_size+1
+@L1:	ldy	#freeblock::size+1
 	lda	(ptr2),y       	      	; High byte of size
 	sta	ptr1+1 	       	      	; Save it
 	dey
@@ -122,7 +122,7 @@ _free: 	sta    	ptr2
 	lda	__heaplast+1
 	sta	ptr1+1 	     		; Pointer to last block now in ptr1
 
-	ldy	#freeblock_size
+	ldy	#freeblock::size
        	lda    	(ptr1),y     		; Low byte of block size
        	add	ptr1
 	tax
@@ -144,7 +144,7 @@ _free: 	sta    	ptr2
 
 ; Correct the next pointer of the now last block
 
-	ldy    	#freeblock_prev+1	; Offset of ->prev field
+	ldy    	#freeblock::prev+1	; Offset of ->prev field
        	lda    	(ptr1),y
 	sta    	ptr2+1	    	 	; Remember f->prev in ptr2
 	sta	__heaplast+1
@@ -282,10 +282,10 @@ heapadd:
 ; The free list is empty, so this is the first and only block. A contains
 ; zero if we come here.
 
-	ldy	#freeblock_next-1
+	ldy	#freeblock::next-1
 @L2:	iny   	       		        ; f->next = f->prev = 0;
     	sta   	(ptr2),y
-    	cpy   	#freeblock_prev+1        ; Done?
+    	cpy   	#freeblock::prev+1      ; Done?
     	bne   	@L2
 
   	lda   	ptr2
@@ -308,7 +308,7 @@ SearchFreeList:
   	lda	#0
   	sta	ptr4
   	sta	ptr4+1	   	        ; left = 0;
-  	ldy	#freeblock_next+1
+  	ldy	#freeblock::next+1
        	ldx	ptr3
 
 @Loop:	lda	ptr3+1		        ; High byte of right
@@ -367,7 +367,7 @@ CheckRightMerge:
 
 ; Merge with the right block. Do f->size += right->size;
 
-  	ldy	#freeblock_size
+  	ldy	#freeblock::size
   	lda    	ptr1
        	add    	(ptr3),y
   	sta	(ptr2),y
@@ -411,7 +411,7 @@ CheckRightMerge:
 ; No right merge, just set the link.
 
 NoRightMerge:
-  	ldy	#freeblock_next        	; f->next = right;
+  	ldy	#freeblock::next        ; f->next = right;
   	lda	ptr3
   	sta	(ptr2),y
   	iny	      		        ; Points to next+1
@@ -434,7 +434,7 @@ CheckLeftMerge:
 
 ; We don't have a left block, so f is actually the new freelist start
 
-  	ldy	#freeblock_prev
+  	ldy	#freeblock::prev
   	sta	(ptr2),y       	        ; f->prev = 0;
    	iny
   	sta	(ptr2),y
@@ -449,7 +449,7 @@ CheckLeftMerge:
 ; Check if the left block is adjacent to the following one
 
 CheckLeftMerge2:
-	ldy	#freeblock_size		; Calculate left + left->size
+	ldy	#freeblock::size        ; Calculate left + left->size
 	lda	(ptr4),y       	        ; Low byte of left->size
 	add	ptr4
 	tax
@@ -529,4 +529,4 @@ NoLeftMerge:
 
 
 
-                                        
+

@@ -8,7 +8,7 @@
         .export         _fclose
 
         .import         _close
-        .importzp       ptr1                                   
+        .importzp       ptr1
 
         .include        "errno.inc"
         .include        "_file.inc"
@@ -23,7 +23,7 @@
 
 ; Check if the file is really open
 
-        ldy     #_FILE_f_flags
+        ldy     #_FILE::f_flags
         lda     (ptr1),y
         and     #_FOPEN
         bne     @L1
@@ -43,7 +43,7 @@
 @L1:    lda     #_FCLOSED
         sta     (ptr1),y
 
-        ldy     #_FILE_f_fd
+        ldy     #_FILE::f_fd
         lda     (ptr1),y
         ldx     #0
         jmp     _close          ; Will set errno and return an error flag

@@ -19,7 +19,7 @@
 
 __heapmemavail:
 
-; size_t Size = 0;           
+; size_t Size = 0;
 
         lda     #0
         sta     ptr2
@@ -39,7 +39,7 @@ __heapmemavail:
 
 ; Size += F->size;
 
-        ldy     #freeblock_size
+        ldy     #freeblock::size
         lda     (ptr1),y
         add     ptr2
         sta     ptr2

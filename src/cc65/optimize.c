@@ -3839,10 +3839,6 @@ static Line* OptOneBlock (Line* L)
 	    /* We know about this function */
 	    Y = 0;
 	} else if (LineFullMatch (L, "\tjsr\tpusha0")) {
-	    /* We know about this function */
-	    X = 0;
-	    Y = 1;
-	} else if (LineFullMatch (L, "\tjsr\tpusha0")) {
 	    /* We know about this function
 	     * If X is already zero, we may call pushax instead and save two
 	     * cycles.
@@ -3912,7 +3908,7 @@ static Line* OptOneBlock (Line* L)
 	    Y = -1;
 	} else if (LineFullMatch (L, "\tjsr\tstaxspp")) {
 	    /* We know about this function */
-	    Y = -1;				 
+	    Y = -1;
 	} else if (LineFullMatch (L, "\tjsr\tstax0sp")) {
 	    /* We know about this function */
 	    Y = 1;

@@ -778,7 +778,6 @@ static void Primary (ExprDesc* E)
         E->FVal  = CurTok.FVal;
         E->Flags = E_LOC_ABS | E_RTYPE_RVAL;
         E->Type  = CurTok.Type;
-        printf ("Floating point constant: %f\n", E->FVal);
         NextToken ();
         return;
     }

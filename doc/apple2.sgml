@@ -144,7 +144,8 @@ how to use it.
   <tag><tt/a2.lc.emd/</tag>
   Gives access to 12KB RAM (48 pages of 256 bytes each) on the
   Apple&nbsp;&rsqb;&lsqb; language card. The driver was contributed by
-  Stefan Haubenthal.
+  Stefan Haubenthal. Note: This driver is incompatible with any DOS using 
+  the language card memory!
 
 </descrip><p>
 
@@ -207,7 +208,7 @@ Command line arguments can be passed to <tt/main()/. Since this is not
 supported by BASIC, the following syntax was choosen:
 
 <tscreen><verb>
-    RUN:REM,ARG1," ARG2", ARG 3,, ARG5, ...
+    CALL2048:REM,ARG1," ARG2", ARG 3,, ARG5, ...
 </verb></tscreen>
 
 <enum>

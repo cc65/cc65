@@ -33,6 +33,11 @@
 
 
 
+/* common */
+#include "check.h"
+
+/* cc65 */
+#include "error.h"
 #include "exprnode.h"
 
 
@@ -154,6 +159,323 @@ void SetNodeSym (ExprNode* N, struct SymEntry* Sym)
     SetItem (N, Sym, IDX_SYM);
 }
 
+
+
+int IsLeafNode (const ExprNode* E)
+/* Return true if this is a leaf node */
+{
+    return (E->NT & NT_MASK_LEAF) == NT_LEAF;
+}
+
+
+
+int IsBranchNode (const ExprNode* E)
+/* Return true if this is a branch node */
+{
+    return (E->NT & NT_MASK_LEAF) == NT_BRANCH;
+}
+
+
+
+void DumpExpr (FILE* F, const ExprNode* E)
+/* Dump an expression in UPN notation to the given file */
+{
+    if (IsLeafNode (E)) {
+
+	/* Operand */
+	switch (E->NT) {
+
+	    case NT_SYM:
+		/* Symbol */
+		fprintf (F, "SYM ");
+		break;
+
+	    case NT_CONST:
+		/* A constant of some sort */
+		if (IsClassInt (E->Type)) {
+		    fprintf (F, "%0*lX ", SizeOf (E->Type), E->IVal);
+		} else if (IsClassFloat (E->Type)) {
+		    fprintf (F, "%f ", E->FVal);
+		} else {
+		    Internal ("Unknown type for NT_CONST");
+		}
+		break;
+
+	    case NT_ASM:
+		/* Inline assembler */
+		fprintf (F, "ASM ");
+		break;
+
+	    case NT_REG_A:
+		/* A register */
+		fprintf (F, "REG_A ");
+		break;
+
+	    case NT_REG_X:
+		/* X register */
+		fprintf (F, "REG_X ");
+		break;
+
+	    case NT_REG_Y:
+		/* Y register */
+		fprintf (F, "REG_Y ");
+		break;
+
+	    case NT_REG_AX:
+		/* AX register */
+		fprintf (F, "REG_AX ");
+		break;
+
+	    case NT_REG_EAX:
+		/* EAX register */
+		fprintf (F, "REG_EAX ");
+		break;
+
+	    default:
+		Internal ("Unknown node type: %04X", E->NT);
+		break;
+
+	}
+
+    } else {
+
+	unsigned I, Count;
+
+	/* Dump the operands */
+	switch (E->NT & NT_MASK_LIST) {
+
+	    case NT_LIST_EXPR:
+		Count = CollCount (&E->List);
+		for (I = 0; I < Count; ++I) {
+		    DumpExpr (F, CollConstAt (&E->List, I));
+		}
+		break;
+
+	    default:
+		Internal ("Operator with LIST != NT_LIST_EXPR");
+
+	}
+
+	/* Dump the operator */
+	switch (E->NT) {
+
+	    case NT_ARRAY_SUBSCRIPT:
+		/* Array subscript */
+		fprintf (F, "[] ");
+		break;
+
+	    case NT_STRUCT_ACCESS:
+		/* Access of a struct field */
+		fprintf (F, ". ");
+		break;
+
+	    case NT_STRUCTPTR_ACCESS:
+		/* Access via struct ptr */
+		fprintf (F, "-> ");
+		break;
+
+	    case NT_FUNCTION_CALL:
+		/* Call a function */
+		fprintf (F, "CALL ");
+		break;
+
+	    case NT_TYPECAST:
+		/* A cast */
+		fprintf (F, "CAST ");
+		break;
+
+	    case NT_ADDRESS:
+		/* Address operator (&) */
+		fprintf (F, "ADDR ");
+		break;
+
+	    case NT_INDIRECT:
+		/* Indirection operator (*) */
+		fprintf (F, "FETCH ");
+		break;
+
+	    case NT_UNARY_MINUS:
+		/* - */
+		fprintf (F, "NEG ");
+		break;
+
+	    case NT_COMPLEMENT:
+		/* ~ */
+		fprintf (F, "~ ");
+		break;
+
+	    case NT_BOOL_NOT:
+		/* ! */
+		fprintf (F, "! ");
+		break;
+
+	    case NT_PLUS:
+		/* + */
+		fprintf (F, "+ ");
+		break;
+
+	    case NT_MINUS:
+		/* - */
+		fprintf (F, "- ");
+		break;
+
+	    case NT_MUL:
+		/* * */
+		fprintf (F, "* ");
+		break;
+
+	    case NT_DIV:
+		/* / */
+		fprintf (F, "/ ");
+		break;
+
+	    case NT_SHL:
+		/* << */
+		fprintf (F, "<< ");
+		break;
+
+	    case NT_SHR:
+		/* >> */
+		fprintf (F, ">> ");
+		break;
+
+	    case NT_AND:
+		/* & */
+		fprintf (F, "& ");
+		break;
+
+	    case NT_OR:
+		/* | */
+		fprintf (F, "| ");
+		break;
+
+	    case NT_XOR:
+		/* ^ */
+		fprintf (F, "^ ");
+		break;
+
+	    case NT_TERNARY:
+		/* ?: */
+		fprintf (F, "?: ");
+		break;
+
+	    case NT_ASSIGN:
+		/* = */
+		fprintf (F, "= ");
+		break;
+
+	    case NT_PLUS_ASSIGN:
+		/* += */
+		fprintf (F, "+= ");
+		break;
+
+	    case NT_MINUS_ASSIGN:
+		/* -= */
+		fprintf (F, "-= ");
+		break;
+
+	    case NT_MUL_ASSIGN:
+		/* *= */
+		fprintf (F, "*= ");
+		break;
+
+	    case NT_DIV_ASSIGN:
+		/* /= */
+		fprintf (F, "/= ");
+		break;
+
+	    case NT_SHL_ASSIGN:
+		/* <<= */
+		fprintf (F, "<<= ");
+		break;
+
+	    case NT_SHR_ASSIGN:
+		/* >>= */
+		fprintf (F, ">>= ");
+		break;
+
+	    case NT_AND_ASSIGN:
+		/* &= */
+		fprintf (F, "&= ");
+		break;
+
+	    case NT_OR_ASSIGN:
+		/* |= */
+		fprintf (F, "|= ");
+		break;
+
+	    case NT_XOR_ASSIGN:
+		/* ^= */
+		fprintf (F, "^= ");
+		break;
+
+	    case NT_PRE_DEC:
+		/* -- */
+		fprintf (F, "<-- ");
+		break;
+
+	    case NT_POST_DEC:
+		/* -- */
+		fprintf (F, "--> ");
+		break;
+
+	    case NT_PRE_INC:
+		/* ++ */
+		fprintf (F, "<++ ");
+		break;
+
+	    case NT_POST_INC:
+		/* ++ */
+		fprintf (F, "++> ");
+		break;
+
+	    case NT_BOOL_OR:
+		/* || */
+		fprintf (F, "|| ");
+		break;
+
+	    case NT_BOOL_AND:
+		/* && */
+		fprintf (F, "&& ");
+		break;
+
+	    case NT_EQ:
+		/* == */
+		fprintf (F, "== ");
+		break;
+
+	    case NT_NE:
+		/* != */
+		fprintf (F, "!= ");
+		break;
+
+	    case NT_LT:
+		/* < */
+		fprintf (F, "< ");
+		break;
+
+	    case NT_LE:
+		/* <= */
+		fprintf (F, "<= ");
+		break;
+
+	    case NT_GT:
+		/* > */
+		fprintf (F, "> ");
+		break;
+
+	    case NT_GE:
+		/* >= */
+		fprintf (F, ">= ");
+		break;
+
+	    default:
+		Internal ("Unknown node type: %04X", E->NT);
+		break;
+
+	}
+    }
+}
 
 
 

@@ -543,8 +543,8 @@ static ExprNode* DoFunctionCall (ExprNode* Left)
 	/* Call to non function */
 	Error (ERR_ILLEGAL_FUNC_CALL);
 
-	/* Free the old node */
-	FreeExprNode (Left);
+	/* Free the old tree */
+	FreeExprTree (Left);
 
 	/* Return something safe */
 	return GetIntNode (0);
@@ -759,11 +759,11 @@ static ExprNode* DoUnaryPlusMinus (void)
     /* Type check */
     if (!IsClassInt (Op->Type) && !IsClassFloat (Op->Type)) {
 
-	/* Display diagnostic */
+	/* Output diagnostic */
 	Error (ERR_SYNTAX);
 
 	/* Free the errorneous node */
-	FreeExprNode (Op);
+	FreeExprTree (Op);
 
 	/* Return something that makes sense later */
 	return GetIntNode (0);
@@ -822,7 +822,7 @@ static ExprNode* DoComplement (void)
 	Error (ERR_OP_NOT_ALLOWED);
 
 	/* Free the errorneous node */
-	FreeExprNode (Op);
+	FreeExprTree (Op);
 
 	/* Return something that makes sense later */
 	return GetIntNode (0);
@@ -894,8 +894,8 @@ static ExprNode* DoAddress (void)
     	/* Print diagnostics */
     	Error (ERR_ILLEGAL_ADDRESS);
 
-    	/* Free the problematic node */
-    	FreeExprNode (Op);
+    	/* Free the problematic tree */
+    	FreeExprTree (Op);
 
     	/* Return something that is safe later */
     	Root = AllocExprNode (NT_CONST, PointerTo (type_void), 0);
@@ -928,8 +928,8 @@ static ExprNode* DoIndirect (void)
     	/* Print diagnostics */
     	Error (ERR_ILLEGAL_INDIRECT);
 
-    	/* Free the problematic node */
-    	FreeExprNode (Op);
+    	/* Free the problematic tree */
+    	FreeExprTree (Op);	     
 
     	/* Return something that is safe later ### */
 	return GetIntNode (0);
@@ -980,7 +980,7 @@ static ExprNode* DoSizeOf (void)
        	Size = SizeOf (N->Type);
 
        	/* Free the node */
-       	FreeExprNode (N);
+       	FreeExprTree (N);
 
     }
 
@@ -1021,8 +1021,8 @@ static ExprNode* DoTypeCast (void)
 
     } else {
 
-	/* Must be casted. Setup the expression tree and return the new node */
-	Root = AllocExprNode (NT_BOOL_NOT, TargetType, RVALUE);
+    	/* Must be casted. Setup the expression tree and return the new node */
+    	Root = AllocExprNode (NT_BOOL_NOT, TargetType, RVALUE);
 	SetLeftNode (Root, Op);
 	return Root;
 
@@ -1049,7 +1049,7 @@ static ExprNode* UnaryExpr (void)
 
      	    case TOK_PLUS:
      	    case TOK_MINUS:
-		return DoUnaryPlusMinus ();
+       		return DoUnaryPlusMinus ();
 
      	    case TOK_COMP:
 		return DoComplement ();
@@ -1066,18 +1066,57 @@ static ExprNode* UnaryExpr (void)
 	    case TOK_SIZEOF:
 	       	return DoSizeOf ();
 
-	    default:
-	     	/* Type cast */
-	     	return DoTypeCast ();
+    	    default:
+    	     	/* Type cast */
+    	     	return DoTypeCast ();
 
-	}
+    	}
 
     } else {
 
-	/* Call the lower level */
-	return PostfixExpr ();
+    	/* Call the lower level */
+    	return PostfixExpr ();
 
     }
+}
+
+
+
+static ExprNode* DoMul (ExprNode* Left)
+/* Handle multiplication */
+{
+    type      TargetType[MAXTYPELEN];
+    ExprNode* Right;
+    ExprNode* Root;
+
+    /* Check the type of the left operand */
+    if (!IsClassInt (Left->Type) && !IsClassFloat (Left->Type)) {
+     	MError ("Invalid left operand to binary operator `*'");
+    	FreeExprTree (Left);
+    	Left = GetIntNode (0);
+    }
+
+    /* Skip the operator token */
+    NextToken ();
+
+    /* Read the right expression */
+    Right = UnaryExpr ();
+
+    /* Check the type of the right operand */
+    if (!IsClassInt (Right->Type) && !IsClassFloat (Right->Type)) {
+     	MError ("Invalid right operand to binary operator `*'");
+	FreeExprTree (Right);
+	Right = GetIntNode (0);
+    }
+
+    /* Do minor optimizations ### */
+
+    /* Make the root node */
+    Root = AllocExprNode (NT_BOOL_NOT, TargetType, RVALUE);
+    SetLeftNode (Root, Left);
+    SetRightNode (Root, Right);
+
+    return Root;
 }
 
 
@@ -1094,6 +1133,7 @@ static ExprNode* MultExpr (void)
      	switch (CurTok.Tok) {
 
      	    case TOK_MUL:
+		Root = DoMul (Root);
 		break;
 
      	    case TOK_DIV:
@@ -1262,8 +1302,8 @@ static ExprNode* AndExpr (void)
 	    Error (ERR_OP_NOT_ALLOWED);
 
 	    /* Remove the unneeded nodes */
-	    FreeExprNode (Right);
-	    FreeExprNode (Left);
+	    FreeExprTree (Right);
+	    FreeExprTree (Left);
 
 	    /* Create something safe */
 	    Root = GetIntNode (0);
@@ -1277,8 +1317,8 @@ static ExprNode* AndExpr (void)
 		int Result = GetBoolRep (Left) & GetBoolRep (Right);
 
 		/* Remove the unneeded nodes */
-		FreeExprNode (Right);
-		FreeExprNode (Left);
+		FreeExprTree (Right);
+		FreeExprTree (Left);
 
 		/* Create a constant result */
 		Root = GetIntNode (Result);
@@ -1325,8 +1365,8 @@ static ExprNode* XorExpr (void)
 	    Error (ERR_OP_NOT_ALLOWED);
 
 	    /* Remove the unneeded nodes */
-	    FreeExprNode (Right);
-	    FreeExprNode (Left);
+	    FreeExprTree (Right);
+	    FreeExprTree (Left);
 
 	    /* Create something safe */
 	    Root = GetIntNode (0);
@@ -1340,8 +1380,8 @@ static ExprNode* XorExpr (void)
 		int Result = GetBoolRep (Left) ^ GetBoolRep (Right);
 
 		/* Remove the unneeded nodes */
-		FreeExprNode (Right);
-		FreeExprNode (Left);
+		FreeExprTree (Right);
+		FreeExprTree (Left);
 
 		/* Create a constant result */
 		Root = GetIntNode (Result);
@@ -1388,8 +1428,8 @@ static ExprNode* OrExpr (void)
 	    Error (ERR_OP_NOT_ALLOWED);
 
 	    /* Remove the unneeded nodes */
-	    FreeExprNode (Right);
-	    FreeExprNode (Left);
+	    FreeExprTree (Right);
+	    FreeExprTree (Left);
 
 	    /* Create something safe */
 	    Root = GetIntNode (0);
@@ -1403,8 +1443,8 @@ static ExprNode* OrExpr (void)
 		int Result = GetBoolRep (Left) | GetBoolRep (Right);
 
 		/* Remove the unneeded nodes */
-		FreeExprNode (Right);
-		FreeExprNode (Left);
+		FreeExprTree (Right);
+		FreeExprTree (Left);
 
 		/* Create a constant result */
 		Root = GetIntNode (Result);
@@ -1451,8 +1491,8 @@ static ExprNode* BoolAndExpr (void)
 	    int Result = GetBoolRep (Left) && GetBoolRep (Right);
 
 	    /* Remove the unneeded nodes */
-	    FreeExprNode (Right);
-	    FreeExprNode (Left);
+	    FreeExprTree (Right);
+	    FreeExprTree (Left);
 
 	    /* Create a constant result */
 	    Root = GetIntNode (Result);
@@ -1499,8 +1539,8 @@ static ExprNode* BoolOrExpr (void)
 	    int Result = GetBoolRep (Left) && GetBoolRep (Right);
 
 	    /* Remove the unneeded nodes */
-	    FreeExprNode (Right);
-	    FreeExprNode (Left);
+	    FreeExprTree (Right);
+	    FreeExprTree (Left);
 
 	    /* Create a constant result */
 	    Root = GetIntNode (Result);

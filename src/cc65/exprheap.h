@@ -73,6 +73,9 @@ ExprNode* AllocExprNode (nodetype_t NT, type* Type, int LValue);
 void FreeExprNode (ExprNode* N);
 /* Free an expression node from the current expression heap */
 
+void FreeExprTree (ExprNode* N);
+/* Free a complete expression tree starting with the current node */
+
 
 
 /* End of exprheap.h */

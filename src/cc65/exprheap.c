@@ -163,7 +163,7 @@ ExprHeap* PopExprHeap (void)
 
 ExprNode* AllocExprNode (nodetype_t NT, type* Type, int LValue)
 /* Get a new node from the current expression heap */
-{							       
+{
     ExprNode* N;
 
     /* Must have a heap */
@@ -203,6 +203,25 @@ void FreeExprNode (ExprNode* N)
     CurHeap->FreeList = N;
 }
 
+
+
+void FreeExprTree (ExprNode* N)
+/* Free a complete expression tree starting with the current node */
+{
+    if (IsBranchNode (N)) {
+     	/* Free the leaf nodes if necessary */
+     	if ((N->NT & NT_MASK_LIST) == NT_LIST_EXPR) {
+     	    unsigned I;
+     	    unsigned Count = CollCount (&N->List);
+     	    for (I = 0; I < Count; ++I) {
+     	 	FreeExprNode (CollAt (&N->List, I));
+     	    }
+     	}
+    }
+
+    /* Free the node itself */
+    FreeExprNode (N);
+}
 
 
 

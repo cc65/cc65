@@ -76,8 +76,9 @@ typedef enum {
     NT_MASK_LIST      	= 0x0300,
 
     /* Two bits telling if this is a leaf or a branch */
-    NT_BRANCH         	= 0x4000,      	/* Branch */
-    NT_LEAF	      	= 0x8000, 	/* Leaf */
+    NT_LEAF    	       	= 0x0000, 	/* Leaf */
+    NT_BRANCH         	= 0x8000,      	/* Branch */
+    NT_MASK_LEAF	= 0x8000,
 
     /* Special node type */
     NT_NONE	      	= 0x0000, 	/* None (invalid) op */
@@ -142,7 +143,9 @@ typedef enum {
     NT_LT		= 0x0037 | NT_BRANCH | NT_LIST_EXPR,	/* < */
     NT_LE		= 0x0038 | NT_BRANCH | NT_LIST_EXPR,	/* <= */
     NT_GT		= 0x0039 | NT_BRANCH | NT_LIST_EXPR,	/* > */
-    NT_GE      	       	= 0x003A | NT_BRANCH | NT_LIST_EXPR	/* >= */
+    NT_GE      	       	= 0x003A | NT_BRANCH | NT_LIST_EXPR,   	/* >= */
+
+    NT_MASK_TYPE	= 0x00FF
 
 } nodetype_t;
 
@@ -224,13 +227,17 @@ struct SymEntry* GetNodeSym (ExprNode* N);
 void SetNodeSym (ExprNode* N, struct SymEntry* Sym);
 /* Set the symbol entry in a NT_SYM node */
 
+int IsLeafNode (const ExprNode* E);
+/* Return true if this is a leaf node */
+
+int IsBranchNode (const ExprNode* E);
+/* Return true if this is a branch node */
+
 
 
 /* End of exprnode.h */
 
 #endif
-
-
 
 
 

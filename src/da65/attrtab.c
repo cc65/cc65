@@ -69,7 +69,7 @@ static const char* SymTab [0x10000];
 
 
 
-void AddrCheck (unsigned Addr)
+static void AddrCheck (unsigned Addr)
 /* Check if the given address has a valid range */
 {
     if (Addr >= 0x10000) {
@@ -112,7 +112,7 @@ void MarkAddr (unsigned Addr, attr_t Attr)
 const char* MakeLabelName (unsigned Addr)
 /* Make the default label name from the given address and return it in a
  * static buffer.
- */
+ */    
 {
     static char LabelBuf [32];
     xsprintf (LabelBuf, sizeof (LabelBuf), "L%04X", Addr);

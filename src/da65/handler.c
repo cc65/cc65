@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -265,7 +265,7 @@ void OH_Relative (const OpcDesc* D)
     signed char Offs = GetCodeByte (PC+1);
 
     /* Calculate the target address */
-    unsigned Addr = (unsigned) (((int) PC+2) + Offs);
+    unsigned Addr = (((int) PC+2) + Offs) & 0xFFFF;
 
     /* Generate a label in pass 1 */
     GenerateLabel (D->Flags, Addr);
@@ -346,7 +346,7 @@ void OH_BitBranch (const OpcDesc* D)
     signed char   BranchOffs = GetCodeByte (PC+2);
 
     /* Calculate the target address for the branch */
-    unsigned BranchAddr = (unsigned) (((int) PC+3) + BranchOffs);
+    unsigned BranchAddr = (((int) PC+3) + BranchOffs) & 0xFFFF;
 
     /* Generate labels in pass 1. The bit branch codes are special in that
      * they don't really match the remainder of the 6502 instruction set (they

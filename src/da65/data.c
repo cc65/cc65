@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -226,7 +226,7 @@ unsigned RtsTable (void)
     while (BytesLeft > 0) {
 
 	/* Get the address */
-	unsigned Addr = GetCodeWord (PC) + 1;
+	unsigned Addr = (GetCodeWord (PC) + 1) & 0xFFFF;
 
 	/* In pass 1, define a label, in pass 2 output the line */
 	if (Pass == 1) {
@@ -315,7 +315,7 @@ unsigned TextTable (void)
 	Count = 0;
 	while (Count < BytesLeft && Count < BytesPerLine) {
 	    unsigned char C = GetCodeByte (PC + Count);
-       	    if (C < 0x20 || C > 0x7E || C == '\"') {  
+       	    if (C < 0x20 || C > 0x7E || C == '\"') {
 	    	++Count;
 	    } else {
 	    	break;

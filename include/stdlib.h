@@ -89,6 +89,7 @@ void __fastcall__ exit (int ret);
 char* __fastcall__ getenv (const char* name);
 void qsort (void* base, size_t count, size_t size,
 	    int (*compare) (const void*, const void*));
+int system (const char* s);
 
 /* Non-ANSI functions */
 void __fastcall__ _swap (void* p, void* q, size_t size);

@@ -738,10 +738,11 @@ static void ParseSegments (void)
 	    S->Align = 0;
 	}
 
-	/* If the segment is marked as BSS style, check that there's no
-	 * initialized data in the segment.
+	/* If the segment is marked as BSS style, and if the segment exists 
+         * in any of the object file, check that there's no initialized data 
+         * in the segment.
 	 */
-	if ((S->Flags & SF_BSS) != 0 && !IsBSSType (S->Seg)) {
+	if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
 	    Warning ("%s(%u): Segment with type `bss' contains initialized data",
 		     CfgGetName (), CfgErrorLine);
 	}

@@ -38,6 +38,7 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
+#include <math.h>
 
 /* common */
 #include "chartype.h"
@@ -391,7 +392,7 @@ static void StringConst (void)
 	}
 
 	/* Skip closing quote char if there was one */
-	NextChar ();
+     	NextChar ();
 
 	/* Skip white space, read new input */
 	SkipWhite ();
@@ -400,6 +401,252 @@ static void StringConst (void)
 
     /* Terminate the string */
     AddLiteralChar ('\0');
+}
+
+
+
+static void NumericConst (void)
+/* Parse a numeric constant */
+{
+    unsigned Base;              /* Temporary number base */
+    unsigned Prefix;            /* Base according to prefix */
+    StrBuf   S;
+    int      IsFloat;
+    char     C;
+    unsigned DigitVal;
+    unsigned long IVal;         /* Value */
+
+    /* Check for a leading hex or octal prefix and determine the possible
+     * integer types.
+     */
+    if (CurC == '0') {
+        /* Gobble 0 and examine next char */
+        NextChar ();
+        if (toupper (CurC) == 'X') {
+            Base = Prefix = 16;
+            NextChar ();    	/* gobble "x" */
+        } else {
+            Base = 10;          /* Assume 10 for now - see below */
+            Prefix = 8;         /* Actual prefix says octal */
+        }
+    } else {
+        Base  = Prefix = 10;
+    }
+
+    /* Because floating point numbers don't have octal prefixes (a number
+     * with a leading zero is decimal), we first have to read the number
+     * before converting it, so we can determine if it's a float or an
+     * integer.
+     */
+    InitStrBuf (&S);
+    while (IsXDigit (CurC) && HexVal (CurC) < Base) {
+        SB_AppendChar (&S, CurC);
+        NextChar ();
+    }
+    SB_Terminate (&S);
+
+    /* The following character tells us if we have an integer or floating
+     * point constant.
+     */
+    IsFloat = (CurC == '.' ||
+               (Base == 10 && toupper (CurC) == 'E') ||
+               (Base == 16 && toupper (CurC) == 'P'));
+
+    /* If we don't have a floating point type, an octal prefix results in an
+     * octal base.
+     */
+    if (!IsFloat && Prefix == 8) {
+        Base = 8;
+    }
+
+    /* Since we do now know the correct base, convert the remembered input
+     * into a number.
+     */
+    SB_Reset (&S);
+    IVal = 0;
+    while ((C = SB_Get (&S)) != '\0') {
+        DigitVal = HexVal (C);
+        if (DigitVal >= Base) {
+            Error ("Numeric constant contains digits beyond the radix");
+        }
+        IVal = (IVal * Base) + DigitVal;
+    }
+
+    /* We don't need the string buffer any longer */
+    DoneStrBuf (&S);
+
+    /* Distinguish between integer and floating point constants */
+    if (!IsFloat) {
+
+        unsigned Types;
+        int      HaveSuffix;
+
+        /* Check for a suffix and determine the possible types */
+        HaveSuffix = 1;
+        if (toupper (CurC) == 'U') {
+            /* Unsigned type */
+            NextChar ();
+            if (toupper (CurC) != 'L') {
+                Types = IT_UINT | IT_ULONG;
+            } else {
+                NextChar ();
+                Types = IT_ULONG;
+            }
+        } else if (toupper (CurC) == 'L') {
+            /* Long type */
+            NextChar ();
+            if (toupper (CurC) != 'U') {
+                Types = IT_LONG | IT_ULONG;
+            } else {
+                NextChar ();
+                Types = IT_ULONG;
+            }
+        } else {
+            HaveSuffix = 0;
+            if (Prefix == 10) {
+                /* Decimal constants are of any type but uint */
+                Types = IT_INT | IT_LONG | IT_ULONG;
+            } else {
+                /* Octal or hex constants are of any type */
+                Types = IT_INT | IT_UINT | IT_LONG | IT_ULONG;
+            }
+        }
+
+        /* Check the range to determine the type */
+        if (IVal > 0x7FFF) {
+            /* Out of range for int */
+            Types &= ~IT_INT;
+            /* If the value is in the range 0x8000..0xFFFF, unsigned int is not
+             * allowed, and we don't have a type specifying suffix, emit a
+             * warning, because the constant is of type long.
+             */
+            if (IVal <= 0xFFFF && (Types & IT_UINT) == 0 && !HaveSuffix) {
+                Warning ("Constant is long");
+            }
+        }
+        if (IVal > 0xFFFF) {
+            /* Out of range for unsigned int */
+            Types &= ~IT_UINT;
+        }
+        if (IVal > 0x7FFFFFFF) {
+            /* Out of range for long int */
+            Types &= ~IT_LONG;
+        }
+
+        /* Now set the type string to the smallest type in types */
+        if (Types & IT_INT) {
+            NextTok.Type = type_int;
+        } else if (Types & IT_UINT) {
+            NextTok.Type = type_uint;
+        } else if (Types & IT_LONG) {
+            NextTok.Type = type_long;
+        } else {
+            NextTok.Type = type_ulong;
+        }
+
+        /* Set the value and the token */
+        NextTok.IVal = IVal;
+        NextTok.Tok  = TOK_ICONST;
+
+    } else {
+
+        /* Float constant */
+        double FVal = IVal;             /* Convert to float */
+
+        /* Check for a fractional part and read it */
+        if (CurC == '.') {
+
+            unsigned Digits;
+            unsigned long Frac;
+            unsigned long Scale;
+
+            /* Skip the dot */
+            NextChar ();
+
+            /* Read fractional digits. Since we support only 32 bit floats
+             * with a maximum of 7 fractional digits, we read the fractional
+             * part as integer with up to 8 digits and drop the remainder.
+             * This avoids an overflow of Frac and Scale.
+             */
+            Digits = 0;
+            Frac   = 0;
+            Scale  = 1;
+            while (IsXDigit (CurC) && (DigitVal = HexVal (CurC)) < Base) {
+                if (Digits < 8) {
+                    Frac = Frac * Base + DigitVal;
+                    ++Digits;
+                    Scale *= Base;
+                }
+                NextChar ();
+            }
+
+            /* Scale the fractional part and add it */
+            if (Frac) {
+                FVal += ((double) Frac) / ((double) Scale);
+            }
+        }
+
+        /* Check for an exponent and read it */
+        if ((Base == 16 && toupper (CurC) == 'F') ||
+            (Base == 10 && toupper (CurC) == 'E')) {
+
+            int Sign;
+            unsigned Digits;
+            unsigned Exp;
+
+            /* Skip the exponent notifier */
+            NextChar ();
+
+            /* Read an optional sign */
+            Sign = 1;
+            if (CurC == '-') {
+                Sign = -1;
+                NextChar ();
+            }
+
+            /* Read exponent digits. Since we support only 32 bit floats
+             * with a maximum exponent of +-/127, we read the exponent
+             * part as integer with up to 3 digits and drop the remainder.
+             * This avoids an overflow of Exp. The exponent is always
+             * decimal, even for hex float consts.
+             */
+            Digits = 0;
+            Exp    = 0;
+            while (IsDigit (CurC)) {
+                if (++Digits <= 3) {
+                    Exp = Exp * 10 + HexVal (CurC);
+                }
+                NextChar ();
+            }
+
+            /* Check for errors: We must have exponent digits, and not more
+             * than three.
+             */
+            if (Digits == 0) {
+                Error ("Floating constant exponent has no digits");
+            } else if (Digits > 3) {
+                Warning ("Floating constant exponent is too large");
+            }
+
+            /* Scale the exponent and adjust the value accordingly */
+            if (Exp) {
+                FVal *= pow (10, Exp);
+            }
+        }
+
+        /* Check for a suffix and determine the type of the constant */
+        if (toupper (CurC) == 'F') {
+            NextChar ();
+            NextTok.Type = type_float;
+        } else {
+            NextTok.Type = type_double;
+        }
+
+        /* Set the value and the token */
+        NextTok.FVal = FVal;
+        NextTok.Tok  = TOK_FCONST;
+
+    }
 }
 
 
@@ -442,108 +689,8 @@ void NextToken (void)
 
     /* Determine the next token from the lookahead */
     if (IsDigit (CurC)) {
-
      	/* A number */
-   	int HaveSuffix;		/* True if we have a type suffix */
-     	unsigned types;		/* Possible types */
-     	unsigned Base;
-        unsigned DigitVal;
-     	unsigned long k;  	/* Value */
-
-     	k     = 0;
-     	Base  = 10;
-     	types = IT_INT | IT_LONG | IT_ULONG;
-
-       	if (CurC == '0') {
-     	    /* Octal or hex constants may also be of type unsigned int */
-     	    types = IT_INT | IT_UINT | IT_LONG | IT_ULONG;
-     	    /* gobble 0 and examin next char */
-	    NextChar ();
-     	    if (toupper (CurC) == 'X') {
-     	       	Base = 16;
-     	       	NextTok.Type = type_uint;
-       	       	NextChar ();	/* gobble "x" */
-     	    } else {
-     	       	Base = 8;
-     	    }
-     	}
-        while (IsXDigit (CurC) && (DigitVal = HexVal (CurC)) < Base) {
-            k = k * Base + DigitVal;
-            NextChar ();
-        }
-        /* Check for errorneous digits */
-        if (Base == 8 && IsDigit (CurC)) {
-            Error ("Numeric constant contains digits beyond the radix");
-            /* Do error recovery */
-            do {
-                NextChar ();
-            } while (IsDigit (CurC));
-        } else if (Base != 16 && IsXDigit (CurC)) {
-            Error ("Nondigits in number and not hexadecimal");
-            do {
-                NextChar ();
-            } while (IsXDigit (CurC));
-        }
-
-     	/* Check for a suffix */
-	HaveSuffix = 1;
-     	if (CurC == 'u' || CurC == 'U') {
-     	    /* Unsigned type */
-	    NextChar ();
-     	    if (toupper (CurC) != 'L') {
-     	    	types = IT_UINT | IT_ULONG;
-     	    } else {
-     	    	NextChar ();
-     	    	types = IT_ULONG;
-     	    }
-     	} else if (CurC == 'l' || CurC == 'L') {
-     	    /* Long type */
-       	    NextChar ();
-     	    if (toupper (CurC) != 'U') {
-     	    	types = IT_LONG | IT_ULONG;
-     	    } else {
-     	    	NextChar ();
-     	    	types = IT_ULONG;
-     	    }
-     	} else {
-	    HaveSuffix = 0;
-	}
-
-     	/* Check the range to determine the type */
-       	if (k > 0x7FFF) {
-     	    /* Out of range for int */
-     	    types &= ~IT_INT;
-	    /* If the value is in the range 0x8000..0xFFFF, unsigned int is not
-	     * allowed, and we don't have a type specifying suffix, emit a
-	     * warning.
-	     */
-       	    if (k <= 0xFFFF && (types & IT_UINT) == 0 && !HaveSuffix) {
-		Warning ("Constant is long");
-	    }
-     	}
-     	if (k > 0xFFFF) {
-     	    /* Out of range for unsigned int */
-     	    types &= ~IT_UINT;
-     	}
-     	if (k > 0x7FFFFFFF) {
-     	    /* Out of range for long int */
-     	    types &= ~IT_LONG;
-     	}
-
-     	/* Now set the type string to the smallest type in types */
-     	if (types & IT_INT) {
-     	    NextTok.Type = type_int;
-     	} else if (types & IT_UINT) {
-     	    NextTok.Type = type_uint;
-     	} else if (types & IT_LONG) {
-     	    NextTok.Type = type_long;
-     	} else {
-     	    NextTok.Type = type_ulong;
-     	}
-
-     	/* Set the value and the token */
-     	NextTok.IVal = k;
-     	NextTok.Tok  = TOK_ICONST;
+        NumericConst ();
      	return;
     }
 
@@ -677,18 +824,22 @@ void NextToken (void)
     	    }
     	    break;
 
-    	case '.':
-	    NextChar ();
-       	    if (CurC == '.') {
-		NextChar ();
-    		if (CurC == '.') {
-    		    SetTok (TOK_ELLIPSIS);
-    		} else {
-    		    UnknownChar (CurC);
-    		}
-    	    } else {
-    		NextTok.Tok = TOK_DOT;
-    	    }
+    	case '.':     
+            if (IsDigit (NextC)) {
+                NumericConst ();
+            } else {
+                NextChar ();
+                if (CurC == '.') {
+                    NextChar ();
+                    if (CurC == '.') {
+                        SetTok (TOK_ELLIPSIS);
+                    } else {
+                        UnknownChar (CurC);
+                    }
+                } else {
+                    NextTok.Tok = TOK_DOT;
+                }
+            }
     	    break;
 
     	case '/':

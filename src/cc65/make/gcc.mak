@@ -20,7 +20,7 @@ COMMON	= ../common
 CFLAGS = -O2 -g -Wall -W -I$(COMMON) $(CDEFS)
 CC=gcc
 EBIND=emxbind
-LDFLAGS=
+LDFLAGS=-lm
 
 # ------------------------------------------------------------------------------
 # Object files and libraries to link

@@ -766,21 +766,31 @@ static void Primary (ExprDesc* E)
 
     /* Character and integer constants. */
     if (CurTok.Tok == TOK_ICONST || CurTok.Tok == TOK_CCONST) {
+    	E->IVal  = CurTok.IVal;
     	E->Flags = E_LOC_ABS | E_RTYPE_RVAL;
     	E->Type  = CurTok.Type;
-    	E->IVal  = CurTok.IVal;
     	NextToken ();
     	return;
+    }
+
+    /* Floating point constant */
+    if (CurTok.Tok == TOK_FCONST) {
+        E->FVal  = CurTok.FVal;
+        E->Flags = E_LOC_ABS | E_RTYPE_RVAL;
+        E->Type  = CurTok.Type;
+        printf ("Floating point constant: %f\n", E->FVal);
+        NextToken ();
+        return;
     }
 
     /* Process parenthesized subexpression by calling the whole parser
      * recursively.
      */
     if (CurTok.Tok == TOK_LPAREN) {
-    	NextToken ();
+     	NextToken ();
         hie0 (E);
        	ConsumeRParen ();
-    	return;
+     	return;
     }
 
     /* If we run into an identifier in preprocessing mode, we assume that this
@@ -1475,7 +1485,7 @@ static void PreInc (ExprDesc* Expr)
     ED_MakeRValExpr (Expr);
 }
 
-                                         
+
 
 static void PreDec (ExprDesc* Expr)
 /* Handle the predecrement operators */
@@ -1547,7 +1557,7 @@ static void PreDec (ExprDesc* Expr)
 }
 
 
-                                         
+
 static void PostIncDec (ExprDesc* Expr, void (*inc) (unsigned, unsigned long))
 /* Handle i-- and i++ */
 {

@@ -41,7 +41,7 @@ while ($Line = <IN>) {
     $Line =~ s/\'/\\\'/g;
 
     # Print to output
-    print OUT "\"$Line\"";
+    print OUT "\"$Line\\n\"";
 
     # Add a comment if we have one
     if ($Comment ne "") {

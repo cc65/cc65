@@ -16,11 +16,12 @@
 ;      code avoids this by using locking mechanisms, but it's complex and
 ;      has a size and performance penalty.
 ;
-; As the normal condes routine, this one has the limitation of 127 table 
+; As the normal condes routine, this one has the limitation of 127 table
 ; entries.
 ;
 
        	.export	callirq
+        .export callirq_y       ; Same but with Y preloaded
 
        	.import	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
 
@@ -33,10 +34,10 @@
 
 .data
 
-.proc	callirq
-
-        ldy     #.lobyte(__IRQFUNC_COUNT__)
-loop:   dey
+callirq:
+        ldy     #.lobyte(__IRQFUNC_COUNT__*2)
+callirq_y:
+        dey
         lda     __IRQFUNC_TABLE__+1,y
         sta     jmpvec+2                ; Modify code below
      	dey
@@ -45,9 +46,8 @@ loop:   dey
        	sty    	index+1                 ; Modify code below
 jmpvec: jsr    	$FFFF                   ; Patched at runtime
 index: 	ldy    	#$FF                    ; Patched at runtime
-       	bne     loop
+       	bne     callirq_y
         rts
 
-.endproc
 
 

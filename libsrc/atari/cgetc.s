@@ -6,9 +6,9 @@
 ;
 
 	.include "atari.inc"
-	.export _cgetc
-	.import	cursor
-	
+	.export _cgetc,setcursor
+	.import	cursor,mul40
+
 _cgetc:
 	jsr	setcursor
 	jsr	@1
@@ -26,8 +26,25 @@ _cgetc:
 
 .proc	setcursor
 
-	lda	OLDCHR		; get char at current cursor position
-	ldy	#0		; needed later
+	ldy	#0
+	lda	OLDCHR
+	sta	(OLDADR),y
+
+	lda	ROWCRS
+	jsr	mul40
+	clc
+	adc	SAVMSC		; add start of screen memory
+	sta	OLDADR
+	txa
+	adc	SAVMSC+1
+	sta	OLDADR+1
+	lda	COLCRS
+	adc	OLDADR
+	sta	OLDADR
+	bcc	nc
+	inc	OLDADR+1
+nc:	lda	(OLDADR),y
+	sta	OLDCHR
 
 	ldx	cursor		; current cursor setting as requested by the user
 	beq	off

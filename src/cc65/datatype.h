@@ -161,13 +161,15 @@ typedef unsigned short type;
 #define SIZEOF_PTR      2
 
 /* Predefined type strings */
-extern type type_uchar [];
-extern type type_int [];
-extern type type_uint [];
-extern type type_long [];
-extern type type_ulong [];
-extern type type_void [];
-extern type type_size_t [];
+extern type type_uchar[];
+extern type type_int[];
+extern type type_uint[];
+extern type type_long[];
+extern type type_ulong[];
+extern type type_void[];
+extern type type_size_t[];
+extern type type_float[];
+extern type type_double[];
 
 
 

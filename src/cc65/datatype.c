@@ -57,13 +57,15 @@
 
 
 /* Predefined type strings */
-type type_uchar []     	= { T_UCHAR,	T_END };
-type type_int []	= { T_INT,	T_END };
-type type_uint []   	= { T_UINT,	T_END };
-type type_long []   	= { T_LONG,	T_END };
-type type_ulong []  	= { T_ULONG,	T_END };
-type type_void []   	= { T_VOID,	T_END };
-type type_size_t []	= { T_SIZE_T,   T_END };
+type type_uchar[]       = { T_UCHAR,	T_END };
+type type_int[]         = { T_INT,	T_END };
+type type_uint[]        = { T_UINT,	T_END };
+type type_long[]        = { T_LONG,	T_END };
+type type_ulong[]       = { T_ULONG,	T_END };
+type type_void[]        = { T_VOID,	T_END };
+type type_size_t[]      = { T_SIZE_T,   T_END };
+type type_float[]       = { T_FLOAT,    T_END };
+type type_double[]      = { T_DOUBLE,   T_END };
 
 
 

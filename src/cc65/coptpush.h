@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -62,6 +62,18 @@ unsigned OptPush1 (CodeSeg* S);
  *     jsr     pushwysp
  *
  * saving 3 bytes and several cycles.
+ */
+
+unsigned OptPush2 (CodeSeg* S);
+/* A sequence
+ *
+ *     jsr     ldaxidx
+ *     jsr     pushax
+ *
+ * may get replaced by
+ *
+ *     jsr     pushwidx
+ *
  */
 
 

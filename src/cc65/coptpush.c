@@ -49,11 +49,10 @@
 unsigned OptPush1 (CodeSeg* S)
 /* Given a sequence
  *
- *     ldy     #xx
  *     jsr     ldaxysp
  *     jsr     pushax
  *
- * If a/x are not used later, replace that by
+ * If a/x are not used later, and Y is known, replace that by
  *
  *     ldy     #xx+2
  *     jsr     pushwysp
@@ -61,42 +60,45 @@ unsigned OptPush1 (CodeSeg* S)
  * saving 3 bytes and several cycles.
  */
 {
+    unsigned I;
     unsigned Changes = 0;
 
+    /* Generate register info */
+    CS_GenRegInfo (S);
+
     /* Walk over the entries */
-    unsigned I = 0;
+    I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-     	CodeEntry* L[3];
+     	CodeEntry* L[2];
 
       	/* Get next entry */
        	L[0] = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-	if (L[0]->OPC == OP65_LDY               &&
-	    CE_KnownImm (L[0])                  &&
-	    L[0]->Num < 0xFE                    &&
-	    !CS_RangeHasLabel (S, I+1, 2)       &&
-       	    CS_GetEntries (S, L+1, I+1, 2)   	&&
-	    CE_IsCallTo (L[1], "ldaxysp")       &&
-       	    CE_IsCallTo (L[2], "pushax")        &&
-       	    !RegAXUsed (S, I+3)) {
+       	if (CE_IsCallTo (L[0], "ldaxysp")               &&
+            RegValIsKnown (L[0]->RI->In.RegY)           &&
+            L[0]->RI->In.RegY < 0xFE                    &&
+            (L[1] = CS_GetNextEntry (S, I)) != 0        &&
+            !CE_HasLabel (L[1])                         &&
+       	    CE_IsCallTo (L[1], "pushax")                &&
+       	    !RegAXUsed (S, I+2)) {
 
 	    /* Insert new code behind the pushax */
 	    const char* Arg;
 	    CodeEntry* X;
 
 	    /* ldy     #xx+1 */
-	    Arg = MakeHexArg (L[0]->Num+2);
+	    Arg = MakeHexArg (L[0]->RI->In.RegY+2);
 	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+3);
+	    CS_InsertEntry (S, X, I+2);
 
 	    /* jsr pushwysp */
-	    X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushwysp", 0, L[2]->LI);
-	    CS_InsertEntry (S, X, I+4);
+	    X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushwysp", 0, L[1]->LI);
+	    CS_InsertEntry (S, X, I+3);
 
 	    /* Delete the old code */
-	    CS_DelEntries (S, I, 3);
+	    CS_DelEntries (S, I, 2);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -107,6 +109,71 @@ unsigned OptPush1 (CodeSeg* S)
 	++I;
 
     }
+
+    /* Free the register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPush2 (CodeSeg* S)
+/* A sequence
+ *
+ *     jsr     ldaxidx
+ *     jsr     pushax
+ *
+ * may get replaced by
+ *
+ *     jsr     pushwidx
+ *
+ */
+{
+    unsigned I;
+    unsigned Changes = 0;
+
+    /* Generate register info */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+     	CodeEntry* L[2];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (CE_IsCallTo (L[0], "ldaxidx")               &&
+            (L[1] = CS_GetNextEntry (S, I)) != 0        &&
+            !CE_HasLabel (L[1])                         &&
+       	    CE_IsCallTo (L[1], "pushax")) {
+
+	    /* Insert new code behind the pushax */
+	    CodeEntry* X;
+
+	    /* jsr pushwidx */
+	    X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushwidx", 0, L[1]->LI);
+	    CS_InsertEntry (S, X, I+2);
+
+	    /* Delete the old code */
+	    CS_DelEntries (S, I, 2);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free the register info */
+    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

@@ -607,7 +607,7 @@ static int HarmlessCall (const char* Name)
  */
 {
     static const char* Tab[] = {
-        "ldaxidx",
+        "ldaxidx", 
         "ldaxysp",
     };
 
@@ -699,7 +699,7 @@ unsigned OptStackOps (CodeSeg* S)
 		     	    Data.ZPLo = "ptr1";
 		     	    Data.ZPHi = "ptr1+1";
 		     	} else if ((UsedRegs & REG_PTR2) == REG_NONE) {
-		     	    Data.ZPLo = "ptr2";
+		       	    Data.ZPLo = "ptr2";
 		     	    Data.ZPHi = "ptr2+1";
 		     	} else {
 		     	    /* No registers available */
@@ -741,16 +741,17 @@ unsigned OptStackOps (CodeSeg* S)
 	    	    /* Restart the sequence */
 	    	    Push     = I;
 	    	    UsedRegs = REG_NONE;
-	    	} else if (!HarmlessCall (E->Arg)) {
+	    	} else if (HarmlessCall (E->Arg)) {
+                    /* Track zeropage register usage */
+                    UsedRegs |= (E->Use | E->Chg);
+                } else {
 	    	    /* A call to an unkown subroutine ends the sequence */
 	    	    InSeq = 0;
 	    	}
 
 	    } else {
-
 	    	/* Other stuff: Track zeropage register usage */
 	    	UsedRegs |= (E->Use | E->Chg);
-
 	    }
 
 	} else if (CE_IsCallTo (E, "pushax")) {

@@ -1438,6 +1438,7 @@ static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",    	100, 0, 
 static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush1       	= { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
+static OptFunc DOptPush2       	= { OptPush2,        "OptPush2",         50, 0, 0, 0, 0, 0 };
 static OptFunc DOptPushPop      = { OptPushPop,      "OptPushPop",        0, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",      	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift2      	= { OptShift2,       "OptShift2",      	100, 0, 0, 0, 0, 0 };
@@ -1496,6 +1497,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrStore1,
     &DOptPtrStore2,
     &DOptPush1,
+    &DOptPush2,
     &DOptPushPop,
     &DOptRTS,
     &DOptRTSJumps1,
@@ -1875,6 +1877,8 @@ static unsigned RunOptGroup5 (CodeSeg* S)
     unsigned Changes = 0;
 
     Changes += RunOptFunc (S, &DOptPush1, 1);
+    Changes += RunOptFunc (S, &DOptPush2, 1);
+    Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
 
     /* Return the number of changes */
     return Changes;

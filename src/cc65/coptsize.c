@@ -82,6 +82,8 @@ static const CallDesc CallTable [] = {
     { "pushax",     -1,    0,   -1, "pusha0"        },
     { "pushax",     -1, 0xFF,   -1, "pushaFF"       },
     { "pushaysp",   -1,   -1,    0, "pusha0sp"      },
+    { "pushwidx",   -1,   -1,    1, "pushw"         },
+    { "pushwysp",   -1,   -1,    3, "pushw0sp"      },
     { "staxysp",    -1,   -1,    0, "stax0sp"       },
     { "tosaddax",   -1,    0,   -1, "tosadda0"      },
     { "tosandax",   -1,    0,   -1, "tosanda0"      },

@@ -48,7 +48,7 @@ the assembler, have a look at ca65.txt).
 
 <sect1>Command line option overview<p>
 
-The compiler may be called as follows:			   
+The compiler may be called as follows:
 
 <tscreen><verb>
 ---------------------------------------------------------------------------
@@ -154,6 +154,7 @@ Here is a description of all the command line options:
 
   <itemize>
   <item>none
+  <item>atari
   <item>c64
   <item>c128
   <item>plus4

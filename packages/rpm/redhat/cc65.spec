@@ -367,6 +367,7 @@ crosscompiler.
 %files nes
 %attr(644,root,root)		/usr/lib/cc65/lib/nes.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/nes.o
+%attr(644,root,root) 		/usr/lib/cc65/joy/nes-*.joy
 
 
 

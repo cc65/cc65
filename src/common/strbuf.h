@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001    	 Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -55,16 +55,17 @@
 
 typedef struct StrBuf StrBuf;
 struct StrBuf {
-    unsigned    Allocated;
-    unsigned    Len;
-    char*       Buf;
+    unsigned    Allocated;              /* Size of allocated memory */
+    unsigned    Len;                    /* Length of the string */
+    unsigned    Index;                  /* Used for reading (Get and friends) */
+    char*       Buf;                    /* Pointer to buffer */
 };
 
 /* An empty string buf */
 extern const StrBuf EmptyStrBuf;
 
 /* Initializer for static string bufs */
-#define STATIC_STRBUF_INITIALIZER 	{ 0, 0, 0 }
+#define STATIC_STRBUF_INITIALIZER 	{ 0, 0, 0, 0 }
 
 /* Initializer for auto string bufs */
 #define AUTO_STRBUF_INITIALIZER         EmptyStrBuf
@@ -102,6 +103,16 @@ INLINE unsigned SB_GetLen (StrBuf* B)
 }
 #else
 #  define SB_GetLen(B)  (B)->Len
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE unsigned SB_GetIndex (StrBuf* B)
+/* Return the user index of the string buffer */
+{
+    return B->Index;
+}
+#else
+#  define SB_GetIndex(B)  (B)->Index
 #endif
 
 #if defined(HAVE_INLINE)
@@ -164,6 +175,30 @@ INLINE void SB_Clear (StrBuf* B)
 }
 #else
 #  define SB_Clear(B)   ((B)->Len = 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE char SB_Get (StrBuf* B)
+/* Return the next character from the string incrementing Index. Returns NUL
+ * if the end of the string is reached.
+ */
+{
+    return (B->Index < B->Len)? B->Buf[B->Index++] : '\0';
+}
+#else
+#  define SB_Get(B)     (((B)->Index < (B)->Len)? (B)->Buf[(B)->Index++] : '\0')
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE char SB_Peek (StrBuf* B)
+/* Look at the next character from the string without incrementing Index. 
+ * Returns NUL if the end of the string is reached.
+ */
+{
+    return (B->Index < B->Len)? B->Buf[B->Index] : '\0';
+}
+#else
+#  define SB_Peek(B)     (((B)->Index < (B)->Len)? (B)->Buf[(B)->Index] : '\0')
 #endif
 
 void SB_Terminate (StrBuf* B);

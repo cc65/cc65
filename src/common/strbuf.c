@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   strbuf.c                                  */
+/*		     		   strbuf.c                                  */
 /*                                                                           */
 /*			 Variable sized string buffers                       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001    	 Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -42,7 +42,7 @@
 
 
 /*****************************************************************************/
-/*				     Data                                    */
+/*		     		     Data                                    */
 /*****************************************************************************/
 
 
@@ -63,6 +63,7 @@ StrBuf* InitStrBuf (StrBuf* B)
 {
     B->Allocated = 0;
     B->Len       = 0;
+    B->Index     = 0;
     B->Buf       = 0;
     return B;
 }

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -36,9 +36,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../common/version.h"
-#include "../common/xmalloc.h"
+/* common */
+#include "version.h"
+#include "xmalloc.h"
 
+/* cc65 */
 #include "asmcode.h"
 #include "asmlabel.h"
 #include "check.h"
@@ -47,31 +49,25 @@
 #include "global.h"
 #include "litpool.h"
 #include "optimize.h"
+#include "segname.h"
 #include "util.h"
 #include "codegen.h"
 
-
+									     
 
 /*****************************************************************************/
-/*				     Data				     */
+/*	  			     Data				     */
 /*****************************************************************************/
 
 
 
 /* Compiler relative stk ptr */
-int oursp	= 0;
+int oursp 	= 0;
 
 /* Current segment */
-static enum {
-    SEG_INV = -1,	/* Invalid segment */
-    SEG_CODE,
-    SEG_RODATA,
-    SEG_DATA,
-    SEG_BSS
-} CurSeg = SEG_CODE;
+segment_t CurSeg = SEG_INV;
 
 /* Segment names */
-static char* SegmentNames [4];
 static char* SegmentHints [4] = {
     "seg:code", "seg:rodata", "seg:data", "seg:bss"
 };
@@ -165,7 +161,7 @@ void g_preamble (void)
     /* Allow auto import for runtime library routines */
     AddCodeLine (".autoimport\ton");
 
-    /* Switch the assembler into case sensible mode */
+    /* Switch the assembler into case sensitive mode */
     AddCodeLine (".case\t\ton");
 
     /* Tell the assembler if we want to generate debug info */
@@ -184,12 +180,6 @@ void g_preamble (void)
     AddCodeLine ("        ldx     #>(Value)");
     AddCodeLine (".endmacro");
     AddEmptyLine ();
-
-    /* Define the default names for the segments */
-    SegmentNames [SEG_CODE] 	= xstrdup ("CODE");
-    SegmentNames [SEG_RODATA]	= xstrdup ("RODATA");
-    SegmentNames [SEG_DATA]	= xstrdup ("DATA");
-    SegmentNames [SEG_BSS]	= xstrdup ("BSS");
 
     /* Tell the optimizer that this is the end of the preamble */
     AddCodeHint ("end_of_preamble");
@@ -256,12 +246,11 @@ void g_usebss (void)
 
 
 
-static void SegName (int Seg, const char* Name)
+static void SegName (segment_t Seg, const char* Name)
 /* Set the name of a segment */
 {
     /* Free the old name and set a new one */
-    xfree (SegmentNames [Seg]);
-    SegmentNames [Seg] = xstrdup (Name);
+    NewSegName (Seg, Name);
 
     /* If the new segment is the current segment, emit a segment directive
      * with the new name.

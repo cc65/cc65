@@ -39,11 +39,14 @@
 #include <ctype.h>
 #include <errno.h>
 
-#include "../common/cmdline.h"
-#include "../common/fname.h"
-#include "../common/version.h"
-#include "../common/xmalloc.h"
+/* common */
+#include "abend.h"
+#include "cmdline.h"
+#include "fname.h"
+#include "version.h"
+#include "xmalloc.h"
 
+/* cc65 */
 #include "asmcode.h"
 #include "compile.h"
 #include "cpu.h"
@@ -54,6 +57,7 @@
 #include "macrotab.h"
 #include "optimize.h"
 #include "scanner.h"
+#include "segname.h"
 
 
 
@@ -112,11 +116,15 @@ static void Usage (void)
 	     "\n"
 	     "Long options:\n"
        	     "  --ansi\t\tStrict ANSI mode\n"
+	     "  --bss-name seg\tSet the name of the BSS segment\n"
+       	     "  --code-name seg\tSet the name of the CODE segment\n"
        	     "  --cpu type\t\tSet cpu type\n"
+       	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug\t\tDebug mode\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
+       	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
        	     "  --signed-chars\tDefault characters are signed\n"
        	     "  --static-locals\tMake local variables static\n"
        	     "  --target sys\t\tSet the target system\n"
@@ -194,25 +202,24 @@ static void SetSys (const char* Sys)
 	    break;
 
 	case TGT_PET:
-	    cbmsys ("__PET__");
-	    break;
+     	    cbmsys ("__PET__");
+     	    break;
 
-	case TGT_NES:
-	    AddNumericMacro ("__NES__", 1);
-	    break;
+     	case TGT_NES:
+     	    AddNumericMacro ("__NES__", 1);
+     	    break;
 
-	case TGT_APPLE2:
-	    AddNumericMacro ("__APPLE2__", 1);
-	    break;
+     	case TGT_APPLE2:
+     	    AddNumericMacro ("__APPLE2__", 1);
+     	    break;
 
-	case TGT_GEOS:
-	    /* Do not handle as a CBM system */
-	    AddNumericMacro ("__GEOS__", 1);
-	    break;
+     	case TGT_GEOS:
+     	    /* Do not handle as a CBM system */
+     	    AddNumericMacro ("__GEOS__", 1);
+     	    break;
 
-	default:
-	    fputs ("Unknown system type\n", stderr);
-	    exit (EXIT_FAILURE);
+     	default:
+       	    AbEnd ("Unknown target system type");
     }
 }
 
@@ -239,7 +246,7 @@ static void DefineSym (const char* Def)
 	    InvDef (Def);
 	}
 	/* No value given. Define the macro with the value 1 */
-	AddNumericMacro (Def, 1);
+     	AddNumericMacro (Def, 1);
     } else {
 	/* We have a value, P points to the '=' character. Since the argument
 	 * is const, create a copy and replace the '=' in the copy by a zero
@@ -262,6 +269,17 @@ static void DefineSym (const char* Def)
 
 
 
+static void CheckSegName (const char* Seg)
+/* Abort if the given name is not a valid segment name */
+{
+    /* Print an error and abort if the name is not ok */
+    if (!ValidSegName (Seg)) {
+	AbEnd ("Segment name `%s' is invalid", Seg);
+    }
+}
+
+
+
 static void OptAddSource (const char* Opt, const char* Arg)
 /* Add source lines as comments in generated assembler file */
 {
@@ -278,6 +296,40 @@ static void OptAnsi (const char* Opt, const char* Arg)
 
 
 
+static void OptBssName (const char* Opt, const char* Arg)
+/* Handle the --bss-name option */
+{
+    /* Must have a segment name */
+    if (Arg == 0) {
+    	NeedArg (Opt);
+    }
+
+    /* Check for a valid name */
+    CheckSegName (Arg);
+
+    /* Set the name */
+    NewSegName (SEG_BSS, Arg);
+}
+
+
+
+static void OptCodeName (const char* Opt, const char* Arg)
+/* Handle the --code-name option */
+{
+    /* Must have a segment name */
+    if (Arg == 0) {
+    	NeedArg (Opt);
+    }
+
+    /* Check for a valid name */
+    CheckSegName (Arg);
+
+    /* Set the name */
+    NewSegName (SEG_CODE, Arg);
+}
+
+
+
 static void OptCPU (const char* Opt, const char* Arg)
 /* Handle the --cpu option */
 {
@@ -289,9 +341,25 @@ static void OptCPU (const char* Opt, const char* Arg)
     } else if (strcmp (Arg, "65C02") == 0) {
 	CPU = CPU_65C02;
     } else {
-	fprintf (stderr, "Invalid CPU: `%s'\n", Arg);
-	exit (EXIT_FAILURE);
+	AbEnd ("Invalid CPU: `%s'", Arg);
     }
+}
+
+
+
+static void OptDataName (const char* Opt, const char* Arg)
+/* Handle the --code-name option */
+{
+    /* Must have a segment name */
+    if (Arg == 0) {
+    	NeedArg (Opt);
+    }
+
+    /* Check for a valid name */
+    CheckSegName (Arg);
+
+    /* Set the name */
+    NewSegName (SEG_DATA, Arg);
 }
 
 
@@ -328,6 +396,23 @@ static void OptIncludeDir (const char* Opt, const char* Arg)
 	NeedArg (Opt);
     }
     AddIncludePath (Arg, INC_SYS | INC_USER);
+}
+
+
+
+static void OptRodataName (const char* Opt, const char* Arg)
+/* Handle the --rodata-name option */
+{
+    /* Must have a segment name */
+    if (Arg == 0) {
+    	NeedArg (Opt);
+    }
+
+    /* Check for a valid name */
+    CheckSegName (Arg);
+
+    /* Set the name */
+    NewSegName (SEG_RODATA, Arg);
 }
 
 
@@ -383,11 +468,15 @@ int main (int argc, char* argv[])
     static const LongOpt OptTab[] = {
 	{ "--add-source",	0,    	OptAddSource		},
 	{ "--ansi",   	 	0,	OptAnsi			},
+	{ "--bss-name",		1, 	OptBssName		},
+	{ "--code-name",	1,	OptCodeName		},
         { "--cpu",     	       	1,	OptCPU 			},
+	{ "--data-name",	1,	OptDataName		},
        	{ "--debug",           	0,     	OptDebug		},
 	{ "--debug-info",      	0,	OptDebugInfo		},
 	{ "--help",	 	0,	OptHelp			},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
+	{ "--rodata-name",	1,	OptRodataName		},
 	{ "--signed-chars",	0,	OptSignedChars		},
        	{ "--static-locals",   	0,	OptStaticLocals		},
 	{ "--target",	 	1,  	OptTarget		},
@@ -403,6 +492,9 @@ int main (int argc, char* argv[])
 
     /* Initialize the cmdline module */
     InitCmdLine (argc, argv, "cc65");
+
+    /* Initialize the default segment names */
+    InitSegNames ();
 
     /* Parse the command line */
     I = 1;
@@ -528,8 +620,7 @@ int main (int argc, char* argv[])
 
     /* Did we have a file spec on the command line? */
     if (InputFile == 0) {
-	fprintf (stderr, "%s: No input files\n", argv [0]);
-	exit (EXIT_FAILURE);
+	AbEnd ("No input files");
     }
 
     /* Open the input file */

@@ -97,6 +97,7 @@ OBJS =	anonname.obj	\
 	preproc.obj	\
 	stmt.obj	\
 	scanner.obj	\
+	segname.obj	\
 	stdfunc.obj	\
 	symentry.obj	\
 	symtab.obj	\
@@ -153,6 +154,7 @@ FILE pragma.obj
 FILE preproc.obj
 FILE stmt.obj
 FILE scanner.obj
+FILE segname.obj
 FILE stdfunc.obj
 FILE symentry.obj
 FILE symtab.obj

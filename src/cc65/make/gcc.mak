@@ -38,6 +38,7 @@ OBJS =	anonname.o	\
 	preproc.o      	\
 	pragma.o       	\
 	scanner.o      	\
+	segname.o	\
 	stdfunc.o	\
 	stmt.o 		\
 	symentry.o	\

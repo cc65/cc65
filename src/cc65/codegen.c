@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -3493,7 +3493,7 @@ void g_le (unsigned flags, unsigned long val)
      		     	}
      		    } else {
 			/* Signed compare */
-     		     	if (val < 0x7F) {
+     		     	if ((long) val < 0x7F) {
 		    	    /* Use < instead of <= because the former gives
 		    	     * better code on the 6502 than the latter.
 		    	     */
@@ -3523,7 +3523,7 @@ void g_le (unsigned flags, unsigned long val)
 		    }
      		} else {
      		    /* Signed compare */
-     		    if (val < 0x7FFF) {
+     		    if ((long) val < 0x7FFF) {
      		       	g_lt (flags, val+1);
      		    } else {
 			/* Always true */
@@ -3548,7 +3548,7 @@ void g_le (unsigned flags, unsigned long val)
 		    }
      		} else {
      		    /* Signed compare */
-     		    if (val < 0x7FFFFFFF) {
+     		    if ((long) val < 0x7FFFFFFF) {
      		       	g_lt (flags, val+1);
      		    } else {
 			/* Always true */
@@ -3579,7 +3579,7 @@ void g_gt (unsigned flags, unsigned long val)
 /* Test for greater than */
 {
     static char* ops [12] = {
-     	"tosgt00",    	"tosgta0",	"tosgtax",
+     	"tosgt00",    	"tosgta0", 	"tosgtax",
      	"tosugt00",   	"tosugta0",	"tosugtax",
      	0,	      	0,	    	"tosgteax",
      	0,	      	0, 	    	"tosugteax",
@@ -3614,7 +3614,7 @@ void g_gt (unsigned flags, unsigned long val)
 			    AddCodeLine ("jsr return0");
 			}
      		    } else {
-		    	if (val < 0x7F) {
+		    	if ((long) val < 0x7F) {
 		    	    /* Use >= instead of > because the former gives
 		    	     * better code on the 6502 than the latter.
 		    	     */
@@ -3650,7 +3650,7 @@ void g_gt (unsigned flags, unsigned long val)
 	 	    }
        	       	} else {
 		    /* Signed compare */
-		    if (val < 0x7FFF) {
+		    if ((long) val < 0x7FFF) {
 			g_ge (flags, val+1);
 		    } else {
 			/* Never true */
@@ -3681,7 +3681,7 @@ void g_gt (unsigned flags, unsigned long val)
 	 	    }
        	       	} else {
 		    /* Signed compare */
-		    if (val < 0x7FFFFFFF) {
+		    if ((long) val < 0x7FFFFFFF) {
 			g_ge (flags, val+1);
 		    } else {
 			/* Never true */

@@ -65,6 +65,19 @@
 
 
 
+/* Remember which sections we had encountered */
+static enum {
+    SE_NONE     = 0x0000,
+    SE_MEMORY   = 0x0001,
+    SE_SEGMENTS = 0x0002,
+    SE_FEATURES = 0x0004,
+    SE_FILES    = 0x0008,
+    SE_FORMATS  = 0x0010,
+    SE_SYMBOLS  = 0x0020
+} SectionsEncountered = SE_NONE;
+
+
+
 /* File list */
 static File*	    	FileList; 	/* Single linked list */
 static unsigned	    	FileCount;  	/* Number of entries in the list */
@@ -505,6 +518,9 @@ static void ParseMemory (void)
 	    FileInsert (GetFile (GetStringId (OutputName)), M);
 	}
     }
+
+    /* Remember we had this section */
+    SectionsEncountered |= SE_MEMORY;
 }
 
 
@@ -516,11 +532,16 @@ static void ParseFiles (void)
        	{   "FORMAT",  	CFGTOK_FORMAT   },
     };
     static const IdentTok Formats [] = {
-       	{   "O65",     	CFGTOK_O65	     },
+       	{   "O65",     	CFGTOK_O65  	     },
        	{   "BIN",     	CFGTOK_BIN      },
        	{   "BINARY",   CFGTOK_BIN      },
     };
 
+
+    /* The MEMORY section must preceed the FILES section */
+    if ((SectionsEncountered & SE_MEMORY) == 0) {
+        CfgError ("MEMORY must precede FILES");
+    }
 
     /* Parse all files */
     while (CfgTok != CFGTOK_RCURLY) {
@@ -533,7 +554,7 @@ static void ParseFiles (void)
 	/* Search for the file, it must exist */
        	F = FindFile (GetStringId (CfgSVal));
 	if (F == 0) {
-	    CfgError ("No such file: `%s'", CfgSVal);
+       	    CfgError ("File `%s' not found in MEMORY section", CfgSVal);
 	}
 
 	/* Skip the token and the following colon */
@@ -591,7 +612,10 @@ static void ParseFiles (void)
 	CfgConsumeSemi ();
 
     }
-}
+
+    /* Remember we had this section */
+    SectionsEncountered |= SE_FILES;
+}                                     
 
 
 
@@ -617,6 +641,11 @@ static void ParseSegments (void)
     };
 
     unsigned Count;
+
+    /* The MEMORY section must preceed the SEGMENTS section */
+    if ((SectionsEncountered & SE_MEMORY) == 0) {
+        CfgError ("MEMORY must precede SEGMENTS");
+    }
 
     while (CfgTok == CFGTOK_IDENT) {
 
@@ -738,7 +767,7 @@ static void ParseSegments (void)
 	if ((S->Attr & SA_RUN) == 0) {
 	    S->Attr |= SA_RUN;
 	    S->Run = S->Load;
-	} 
+	}
 
 	/* If the segment is marked as BSS style, and if the segment exists
          * in any of the object file, check that there's no initialized data
@@ -810,6 +839,9 @@ static void ParseSegments (void)
 	/* Skip the semicolon */
 	CfgConsumeSemi ();
     }
+
+    /* Remember we had this section */
+    SectionsEncountered |= SE_SEGMENTS;
 }
 
 
@@ -1031,6 +1063,10 @@ static void ParseFormats (void)
 	/* Skip the semicolon */
 	CfgConsumeSemi ();
     }
+
+
+    /* Remember we had this section */
+    SectionsEncountered |= SE_FORMATS;
 }
 
 
@@ -1296,6 +1332,9 @@ static void ParseFeatures (void)
     	/* Skip the semicolon */
     	CfgConsumeSemi ();
     }
+
+    /* Remember we had this section */
+    SectionsEncountered |= SE_FEATURES;
 }
 
 
@@ -1325,6 +1364,9 @@ static void ParseSymbols (void)
 	/* Skip the semicolon */
 	CfgConsumeSemi ();
     }
+
+    /* Remember we had this section */
+    SectionsEncountered |= SE_SYMBOLS;
 }
 
 
@@ -1469,7 +1511,7 @@ void CfgAssignSegments (void)
              */
             if (S->Run == M) {
 
-                /* This is the run (and maybe load) memory area. Handle 
+                /* This is the run (and maybe load) memory area. Handle
                  * alignment and explict start address and offset.
                  */
                 if (S->Flags & SF_ALIGN) {

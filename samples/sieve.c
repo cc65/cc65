@@ -26,7 +26,7 @@ static unsigned char Sieve[COUNT];
 
 
 /*****************************************************************************/
-/*     	      	    	  	     Code	      			     */
+/*     	      	    	  	     Code     	      			     */
 /*****************************************************************************/
 
 
@@ -35,7 +35,7 @@ static unsigned char Sieve[COUNT];
 
 
 
-int main (void)					      
+int main (void)
 {
     /* Clock variable */
     clock_t Ticks;
@@ -44,6 +44,11 @@ int main (void)
     register unsigned char* S;
     register unsigned 	    I;
     register unsigned 	    J;
+
+    /* Output a header */
+    printf ("Sieve benchmark - calculating primes\n");
+    printf ("between 2 and %u\n", COUNT);
+    printf ("Please wait patiently ...\n");
 
     /* Read the clock */
     Ticks = clock();

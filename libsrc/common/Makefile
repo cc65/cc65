@@ -44,11 +44,8 @@ C_OBJS =	_afailed.o	\
 		putchar.o	\
 		puts.o 		\
 		qsort.o		\
-                raise.o         \
 		realloc.o	\
 		rewind.o	\
-                signal.o        \
-                sigtable.o      \
 		sscanf.o	\
                 strftime.o      \
 		strxfrm.o	\
@@ -111,7 +108,10 @@ S_OBJS = 	_fdesc.o 	\
 		modload.o       \
 		printf.o      	\
 	 	rand.o	      	\
+                raise.o         \
 	 	setjmp.o      	\
+                signal.o        \
+                sigtable.o      \
 		sprintf.o	\
 		strcat.o    	\
 		strchr.o	\

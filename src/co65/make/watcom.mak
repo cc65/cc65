@@ -5,33 +5,49 @@
 # ------------------------------------------------------------------------------
 # Generic stuff
 
-AR  	= WLIB
-LD  	= WLINK
+# Environment variables for the watcom compiler
+export WATCOM  = c:\\watcom
+export INCLUDE = $(WATCOM)\\h
+
+# We will use the windows compiler under linux (define as empty for windows)
+WINE = wine --
+
+# Programs
+AR     	= $(WINE) WLIB
+CC      = $(WINE) WCC386
+LD     	= $(WINE) WLINK
+WSTRIP	= $(WINE) WSTRIP
+
 LNKCFG  = ld.tmp
+
+# Program arguments
+CFLAGS  = -d1 -onatx -zp4 -5 -zq -w2 -i=..\\common
+
+# Target files
+EXE	= co65.exe
+
+# Create NT programs by default
+ifndef TARGET
+TARGET = NT
+endif
 
 # --------------------- OS2 ---------------------
 ifeq ($(TARGET),OS2)
 SYSTEM  = os2v2
-CC      = WCC386
-CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+CFLAGS  += -bt=$(TARGET)
 endif
 
 # -------------------- DOS4G --------------------
 ifeq ($(TARGET),DOS32)
 SYSTEM  = dos4g
-CC      = WCC386
-CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+CFLAGS  += -bt=$(TARGET)
 endif
 
 # --------------------- NT ----------------------
 ifeq ($(TARGET),NT)
 SYSTEM  = nt
-CC      = WCC386
-CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+CFLAGS  += -bt=$(TARGET)
 endif
-
-# Add the include dir
-CFLAGS  += -i=..\common
 
 # ------------------------------------------------------------------------------
 # Implicit rules
@@ -51,34 +67,34 @@ OBJS = 	convert.obj     \
         model.obj       \
         o65.obj
 
-LIBS = ..\common\common.lib
+LIBS = ../common/common.lib
 
 
 # ------------------------------------------------------------------------------
 # Main targets
 
-all:	       	co65
-
-co65:		co65.exe
+all:	       	$(EXE)
 
 
 # ------------------------------------------------------------------------------
 # Other targets
 
 
-co65.exe:	$(OBJS) $(LIBS)
-	@echo DEBUG ALL > $(LNKCFG)
-	@echo OPTION QUIET >> $(LNKCFG)
-	@echo NAME $@ >> $(LNKCFG)
-	@for %%i in ($(OBJS)) do echo FILE %%i >> $(LNKCFG)
-	@for %%i in ($(LIBS)) do echo LIBRARY %%i >> $(LNKCFG)
-	$(LD) system $(SYSTEM) @$(LNKCFG)
+$(EXE): 	$(OBJS) $(LIBS)
+	@echo "DEBUG ALL" > $(LNKCFG)
+	@echo "OPTION QUIET" >> $(LNKCFG)
+	@echo "NAME $@" >> $(LNKCFG)
+	@for i in $(OBJS); do echo "FILE $${i}"; done >> $(LNKCFG)
+	@for i in $(LIBS); do echo "LIBRARY $${i}"; done >> $(LNKCFG)
+	@$(LD) system $(SYSTEM) @$(LNKCFG)
 	@rm $(LNKCFG)
 
 clean:
-	@if exist *.obj del *.obj
-	@if exist co65.exe del co65.exe
+	@rm -f *~ core
+
+zap:	clean
+	@rm -f *.obj $(EXE)
 
 strip:
-	@-wstrip co65.exe
+	@-$(WSTRIP) $(EXE)
 

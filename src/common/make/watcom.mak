@@ -95,8 +95,11 @@ $(LIB): $(OBJS)
 	@echo Done!
 
 clean:
-	@if exist *.obj del *.obj
-	@if exist $(LIB) del $(LIB)
+	@rm -f *~ core
+
+zap:	clean
+	@rm -f *.obj $(LIB)
+
 
 
 

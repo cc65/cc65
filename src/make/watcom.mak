@@ -17,21 +17,24 @@ SUBDIRS =	  	\
 all:	nt
 
 
-nt:
-	for %%i in ($(SUBDIRS)) do $(MAKE) TARGET=NT -C %%i -f make\watcom.mak
+nt:								  
+	for i in $(SUBDIRS); do $(MAKE) TARGET=NT -C $${i} -f make/watcom.mak; done
 
 
 dos:
-	for %%i in ($(SUBDIRS)) do $(MAKE) TARGET=DOS32 -C %%i -f make\watcom.mak
+	for i in $(SUBDIRS); do $(MAKE) TARGET=DOS32 -C $${i} -f make/watcom.mak; done
 
 os2:
-	for %%i in ($(SUBDIRS)) do $(MAKE) TARGET=OS2 -C %%i -f make\watcom.mak
+	for i in $(SUBDIRS); do $(MAKE) TARGET=OS2 -C $${i} -f make/watcom.mak; done
 
 clean:
-	for %%i in ($(SUBDIRS)) do $(MAKE) -C %%i -f make\watcom.mak clean
+	for i in $(SUBDIRS); do $(MAKE) -C $${i} -f make/watcom.mak clean; done
+
+zap:
+	for i in $(SUBDIRS); do $(MAKE) -C $${i} -f make/watcom.mak zap; done
 
 strip:
-	for %%i in ($(SUBDIRS)) do $(MAKE) -C %%i -f make\watcom.mak strip
+	for i in $(SUBDIRS); do $(MAKE) -C $${i} -f make/watcom.mak strip; done
 
 
 

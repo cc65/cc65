@@ -23,6 +23,9 @@ LNKCFG  = ld.tmp
 # Program arguments
 CFLAGS  = -d1 -onatx -zp4 -5 -zq -w2 -i=..\\common
 
+# Target files
+EXE	= ca65.exe
+
 # Create NT programs by default
 ifndef TARGET
 TARGET = NT
@@ -95,16 +98,14 @@ LIBS = ../common/common.lib
 # ------------------------------------------------------------------------------
 # Main targets
 
-all:	  	ca65
-
-ca65:	  	ca65.exe
+all:	  	$(EXE)
 
 
 # ------------------------------------------------------------------------------
 # Other targets
 
 
-ca65.exe: 	$(OBJS) $(LIBS)
+$(EXE): 	$(OBJS) $(LIBS)
 	@echo "DEBUG ALL" > $(LNKCFG)
 	@echo "OPTION QUIET" >> $(LNKCFG)
 	@echo "NAME $@" >> $(LNKCFG)
@@ -114,9 +115,11 @@ ca65.exe: 	$(OBJS) $(LIBS)
 	@rm $(LNKCFG)
 
 clean:
-	@if exist *.obj del *.obj
-	@if exist ca65.exe del ca65.exe
+	@rm -f *~ core
+
+zap:	clean
+	@rm -f *.obj $(EXE)
 
 strip:
-	@-$(WSTRIP) ca65.exe
+	@-$(WSTRIP) $(EXE)
 

@@ -12,8 +12,7 @@
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
 C_OBJS =  	cbm_load.o	\
-		cbm_save.o 	\
-		cbm_write.o
+		cbm_save.o
 
 S_OBJS =	c_acptr.o	\
 	 	c_basin.o 	\
@@ -38,6 +37,7 @@ S_OBJS =	c_acptr.o	\
 		cbm_close.o	\
 		cbm_open.o 	\
 		cbm_read.o 	\
+		cbm_write.o     \
 		cclear.o 	\
 		chline.o 	\
 	 	clock.o 	\

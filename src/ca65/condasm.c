@@ -33,8 +33,10 @@
 
 
 
+/* ca65 */
 #include "error.h"
 #include "expr.h"
+#include "instr.h"
 #include "nexttok.h"
 #include "symtab.h"
 #include "condasm.h"
@@ -308,7 +310,7 @@ void DoConditionals (void)
 		break;
 
 	    case TOK_IFNBLANK:
-		D = AllocIf (".IFNBLANK", 1);
+	     	D = AllocIf (".IFNBLANK", 1);
 		NextTok ();
 		if (IfCond) {
 		    SetIfCond (D, Tok != TOK_SEP);
@@ -351,17 +353,35 @@ void DoConditionals (void)
 		  	SetIfCond (D, !SymIsRef (SVal));
 		  	NextTok ();
 		    }
-		}
+	     	}
 	        IfCond = GetCurrentIfCond ();
 		break;
 
 	    case TOK_IFP02:
+       	       	D = AllocIf (".IFP02", 1);
+		NextTok ();
+		if (IfCond) {
+		    SetIfCond (D, GetCPU() == CPU_6502);
+		}
+		IfCond = GetCurrentIfCond ();
 		break;
 
 	    case TOK_IFP816:
+		D = AllocIf (".IFP816", 1);
+		NextTok ();
+		if (IfCond) {
+       	       	    SetIfCond (D, GetCPU() == CPU_65816);
+		}
+		IfCond = GetCurrentIfCond ();
 		break;
 
 	    case TOK_IFPC02:
+		D = AllocIf (".IFPC02", 1);
+		NextTok ();
+		if (IfCond) {
+       	       	    SetIfCond (D, GetCPU() == CPU_65C02);
+		}
+		IfCond = GetCurrentIfCond ();
 		break;
 
 	    case TOK_IFREF:

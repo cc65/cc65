@@ -8,54 +8,58 @@
 	.importzp	crtc
 
       	.include      	"zeropage.inc"
-
+	.include	"io.inc"
+	
+	
+; ------------------------------------------------------------------------
+;
 
 .proc	k_plot
 
-	bcc	set
-	ldx	CURS_Y
-	ldy	CURS_X
+	bcc    	set
+	ldx    	CURS_Y
+	ldy    	CURS_X
 	rts
 
-set:   	stx	CURS_Y
-     	sty	CURS_X
-	
+set:   	stx    	CURS_Y
+     	sty    	CURS_X
+
+	lda    	LineLSBTab,x
+	sta    	CharPtr
+	lda    	LineMSBTab,x
+	sta    	CharPtr+1
+
 .if	0
-	lda	LineLSBTab,x
-	sta	CharPtr
-	lda	LineMSBTab,x
-	sta	CharPtr+1
-
-	lda	IndReg
+	lda    	IndReg
 	pha
-	lda	#$0F
-	sta	IndReg
+	lda    	#$0F
+	sta    	IndReg
 
-	ldy	#$00
+	ldy    	#$00
 	clc
 	sei
-	sta	(crtc),y
-	lda	CharPtr
-	adc	CURS_X
+	sta    	(crtc),y
+	lda    	CharPtr
+	adc    	CURS_X
 	iny
-	sta	(crtc),y
+	sta    	(crtc),y
 	dey
-	lda	#$0E
-	sta	(crtc),y
+	lda    	#$0E
+	sta    	(crtc),y
 	iny
-	lda	(crtc),y
-	and	#$F8
-	sta	sedt1
-	lda	CharPtr+1
-	adc	#$00
-	and	#$07
-	ora	sedt1
-	sta	(crtc),y
+	lda    	(crtc),y
+	and    	#$F8
+	sta    	sedt1
+	lda    	CharPtr+1
+	adc    	#$00
+	and    	#$07
+	ora    	sedt1
+	sta    	(crtc),y
 	cli
 
 	pla
-	sta	IndReg
-.endif	
+	sta    	IndReg
+.endif
 	rts
 .endproc
 
@@ -64,16 +68,23 @@ set:   	stx	CURS_Y
 
 .rodata
 
-LineLSBTab:
-        .byte   $00,$50,$A0,$F0,$40,$90,$E0,$30
-        .byte   $80,$D0,$20,$70,$C0,$10,$60,$B0
-        .byte   $00,$50,$A0,$F0,$40,$90,$E0,$30
-        .byte   $80
+.macro  LineLoTab
+	.repeat 25, I
+	.byte   <(VIDEO_RAM + I * 40)
+	.endrep
+.endmacro
+
+LineLSBTab:    	LineLoTab
+
 ; -------------------------------------------------------------------------
 ; High bytes of the start address of the screen lines
 
-LineMSBTab:
-        .byte   $D0,$D0,$D0,$D0,$D1,$D1,$D1,$D2
-        .byte   $D2,$D2,$D3,$D3,$D3,$D4,$D4,$D4
-        .byte   $D5,$D5,$D5,$D5,$D6,$D6,$D6,$D7
-        .byte   $D7
+.macro  LineHiTab
+	.repeat 25, I
+	.byte   >(VIDEO_RAM + I * 40)
+	.endrep
+.endmacro
+
+LineMSBTab:	LineHiTab
+
+

@@ -5,24 +5,24 @@
 ;
 
    	.export	     	_exit
-   	.import		initlib, donelib
-   	.import	     	push0, _main
-   	.import	       	__BSS_RUN__, __BSS_SIZE__
-   	.import		irq, nmi
+     	.import		_clrscr, initlib, donelib
+     	.import	     	push0, _main
+     	.import	       	__BSS_RUN__, __BSS_SIZE__
+     	.import		irq, nmi
        	.import	       	k_irq, k_nmi, k_plot, k_udtim, k_scnkey
 
-   	.include     	"zeropage.inc"
-   	.include    	"io.inc"
+     	.include     	"zeropage.inc"
+     	.include    	"io.inc"
 
 
 ; ------------------------------------------------------------------------
 ; Define and export the ZP variables for the CBM510 runtime
 
-   	.exportzp	sp, sreg, regsave
-   	.exportzp	ptr1, ptr2, ptr3, ptr4
-   	.exportzp	tmp1, tmp2, tmp3, tmp4
-   	.exportzp	regbank, zpspace
-      	.exportzp	vic, sid, IPCcia, cia, acia, tpi1, tpi2
+     	.exportzp	sp, sreg, regsave
+     	.exportzp	ptr1, ptr2, ptr3, ptr4
+     	.exportzp	tmp1, tmp2, tmp3, tmp4
+     	.exportzp	regbank, zpspace
+      	.exportzp	vic, sid, cia1, cia2, acia, tpi1, tpi2
       	.exportzp	ktab1, ktab2, ktab3, ktab4, time, RecvBuf, SendBuf
 
 .zeropage
@@ -90,8 +90,8 @@ Head:	.byte	$03,$00,$11,$00,$0a,$00,$81,$20,$49,$b2,$30,$20,$a4,$20,$34,$00
 
 vic:  		.word  	$d800
 sid:		.word  	$da00
-IPCcia:		.word  	$db00
-cia:   		.word  	$dc00
+cia1:		.word  	$db00
+cia2:  		.word  	$dc00
 acia:  		.word  	$dd00
 tpi1:		.word  	$de00
 tpi2:  		.word  	$df00
@@ -119,7 +119,7 @@ Back:	ldx	spsave
 ; actually used here:
 
      	sei
-     	lda	#$01
+     	lda	#$00
      	sta	ExecReg
 
 ; This is the actual starting point of our code after switching banks for
@@ -176,9 +176,37 @@ L3:	lda	(ptr1),y
    	iny
    	bne	L3
 
+; Reprogram the VIC so that the text screen is at $F800 in the execution bank
+
+; Place the VIC video RAM into bank 0
+; CA (STATVID) = 0
+
+  	ldy	#tpiCtrlReg
+  	lda	(tpi1),y
+  	and	#$CF
+  	ora	#$20
+  	sta	(tpi1),y
+
+; Set bit 14/15 of the VIC address range to the high bits of VIDEO_RAM
+; PC6/PC7 (VICBANKSEL 0/1) = 11
+
+	ldy    	#tpiPortC
+	lda	(tpi2),y
+	and	#$3F
+       	ora    	#((>VIDEO_RAM) & $C0)
+	sta	(tpi2),y
+
+; Set bits 10-13 of the VIC address range to address F800
+
+        ldy	#VIC_VIDEO_ADR
+	lda	(vic),y
+	and	#$0F
+       	ora    	#(((>VIDEO_RAM) & $3F) << 2)
+	sta	(vic),y
+
 ; Set the indirect segment to bank we're executing in
 
-	lda	ExecReg
+  	lda	ExecReg
 	sta	IndReg
 
 ; Zero the BSS segment. We will do that here instead calling the routine
@@ -216,9 +244,9 @@ Z4:
 ; Setup the C stack
 
 	lda   	#<$FF81
-	sta	sp
-       	lda	#>$FF81
-	sta	sp+1
+	sta 	sp
+       	lda 	#>$FF81
+	sta 	sp+1
 
 ; We expect to be in page 2 now
 
@@ -235,6 +263,10 @@ Z4:
 
 ; This code is in page 2, so we may now start calling subroutines safely,
 ; since the code we execute is no longer in the stack page.
+; Clear the video memory
+
+        jsr     _clrscr
+
 ; Call module constructors
 
 	jsr	initlib
@@ -365,8 +397,8 @@ reset_size = * - reset
 ; Code for a few simpler kernal calls goes here
 
 k_iobase:
-	ldx	cia
-	ldy	cia+1
+	ldx	cia2
+	ldy	cia2+1
 	rts
 
 k_screen:

@@ -15,6 +15,7 @@ OBJS =	_scrsize.o	\
 	banking.o	\
        	break.o		\
        	cgetc.o		\
+	clrscr.o	\
        	color.o	 	\
        	crt0.o 	 	\
        	kbhit.o	 	\
@@ -22,6 +23,7 @@ OBJS =	_scrsize.o	\
        	kplot.o	 	\
 	kscnkey.o	\
 	kudtim.o 	\
+	peeksys.o	\
 	pokesys.o
 
 all:	$(OBJS)

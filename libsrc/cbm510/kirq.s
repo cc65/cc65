@@ -5,12 +5,12 @@
 ;
 
  	.export	  	irq, nmi, k_irq, k_nmi
-	.import		k_scnkey, k_udtim, k_rs232
-	.importzp     	tpi1
+ 	.import		k_scnkey, k_udtim, k_rs232
+ 	.importzp     	tpi1
 
-	.include      	"zeropage.inc"
-	.include	"io.inc"
-	.include	"page3.inc"
+ 	.include      	"zeropage.inc"
+ 	.include	"io.inc"
+ 	.include	"page3.inc"
 
 
 ; -------------------------------------------------------------------------
@@ -19,8 +19,8 @@
 ; Bit   7       6       5       4       3       2       1       0
 ;                               |       |       |       |       ^ 50 Hz
 ;                               |       |       |       ^ SRQ IEEE 488
-;                               |       |       ^ cia
-;                               |       ^ IRQB ext. Port
+;                               |       |       ^ cia2
+;                               |       ^ cia1 IRQB ext. Port
 ;                               ^ acia
 
 

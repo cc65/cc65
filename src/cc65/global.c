@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -52,6 +52,7 @@ unsigned char FavourSize	= 1;   	/* Favour size over speed */
 unsigned      CodeSizeFactor	= 100;	/* Size factor for generated code */
 unsigned char InlineStdFuncs	= 0;   	/* Inline some known functions */
 unsigned char EnableRegVars	= 0;   	/* Enable register variables */
+unsigned      RegisterSpace     = 6;    /* Space available for register vars */
 unsigned char AllowRegVarAddr	= 0;	/* Allow taking addresses of register vars */
 unsigned char RegVarsToCallStack= 0;   	/* Save reg variables on call stack */
 unsigned char StaticLocals	= 0;   	/* Make local variables static */

@@ -60,9 +60,6 @@
 
 
 
-/* Maximum register variable size */
-#define MAX_REG_SPACE   6
-
 /* Structure that holds all data needed for function activation */
 struct Function {
     struct SymEntry*   	FuncEntry;  	/* Symbol table entry */
@@ -98,7 +95,7 @@ static Function* NewFunction (struct SymEntry* Sym)
     F->Reserved	  = 0;
     F->RetLab	  = GetLocalLabel ();
     F->TopLevelSP = 0;
-    F->RegOffs    = MAX_REG_SPACE;
+    F->RegOffs    = RegisterSpace;
 
     /* Return the new structure */
     return F;
@@ -260,7 +257,7 @@ static void F_RestoreRegVars (Function* F)
     const SymEntry* Sym;
 
     /* If we don't have register variables in this function, bail out early */
-    if (F->RegOffs == MAX_REG_SPACE) {
+    if (F->RegOffs == RegisterSpace) {
        	return;
     }
 

@@ -113,6 +113,7 @@ static void Usage (void)
 	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
 	     "  --list-opt-steps\tList all optimizer steps and exit\n"
+             "  --register-space b\tSet space available for register variables\n"
              "  --register-vars\tEnable register variables\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
        	     "  --signed-chars\tDefault characters are signed\n"
@@ -530,7 +531,18 @@ static void OptListOptSteps (const char* Opt attribute ((unused)),
 
 
 
-static void OptRegisterVars (const char* Opt attribute ((unused)), 
+static void OptRegisterSpace (const char* Opt, const char* Arg)
+/* Handle the --register-space option */
+{
+    /* Numeric argument expected */
+    if (sscanf (Arg, "%u", &RegisterSpace) != 1 || RegisterSpace > 256) {
+       	AbEnd ("Argument for option %s is invalid", Opt);
+    }
+}
+
+
+
+static void OptRegisterVars (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
 /* Handle the --register-vars option */
 {
@@ -618,6 +630,7 @@ int main (int argc, char* argv[])
 	{ "--help",	 	0, 	OptHelp	     		},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
 	{ "--list-opt-steps",   0,      OptListOptSteps         },
+        { "--register-space",   1,      OptRegisterSpace        },
         { "--register-vars",    0,      OptRegisterVars         },
 	{ "--rodata-name",	1, 	OptRodataName		},
 	{ "--signed-chars",	0, 	OptSignedChars	       	},

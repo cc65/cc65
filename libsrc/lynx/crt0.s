@@ -25,7 +25,7 @@
 	.import         zerobss
 	.import	     	callmain
 	.import         _main
-	.import         __CODE_LOAD__, __BSS_LOAD__
+	.import         __BSS_LOAD__
 	.import         __RAM_START__, __RAM_SIZE__
 
 	.include        "zeropage.inc"
@@ -36,8 +36,8 @@
 
 	.segment "EXEHDR"
 	.word   $0880
-	.byte   >__CODE_LOAD__, <__CODE_LOAD__
-	.byte   >__BSS_LOAD__, <(__BSS_LOAD__ - 1)
+	.dbyt   __RAM_START__
+       	.dbyt   __BSS_LOAD__ - 1
 	.byte   $42,$53
 	.byte   $39,$33
 

@@ -377,11 +377,14 @@ static int MacroCall (Macro* M)
     const char* ArgStart;
     char*    	B;
 
-    /* Expect an argument list */
+    /* Check for an argument list. If we don't have a list, we won't expand
+     * the macro.
+     */
     SkipBlank ();
     if (CurC != '(') {
-     	PPError ("Illegal macro call");
-     	return 0;
+        KeepStr (M->Name);
+        KeepChar (' ');
+     	return 1;
     }
 
     /* Eat the left paren */
@@ -404,29 +407,29 @@ static int MacroCall (Macro* M)
     	    B = CopyQuotedString (B);
      	} else if (CurC == ',' || CurC == ')') {
      	    if (ParCount == 0) {
- 	    	/* End of actual argument */
+    	    	/* End of actual argument */
      	       	*B++ = '\0';
- 	    	while (IsBlank(*ArgStart)) {
- 	    	    ++ArgStart;
- 	    	}
+    	    	while (IsBlank(*ArgStart)) {
+    	    	    ++ArgStart;
+    	    	}
     	      	if (ArgCount < M->ArgCount) {
     	      	    M->ActualArgs[ArgCount++] = ArgStart;
        	       	} else if (CurC != ')' || *ArgStart != '\0' || M->ArgCount > 0) {
- 	       	    /* Be sure not to count the single empty argument for a
- 	    	     * macro that does not have arguments.
- 	    	     */
+    	       	    /* Be sure not to count the single empty argument for a
+    	    	     * macro that does not have arguments.
+    	    	     */
     	      	    ++ArgCount;
- 	    	}
+    	    	}
 
- 	    	/* Check for end of macro param list */
+    	    	/* Check for end of macro param list */
     	    	if (CurC == ')') {
- 	    	    NextChar ();
- 	    	    break;
+    	    	    NextChar ();
+    	    	    break;
     	    	}
 
        	       	/* Start the next param */
      	       	ArgStart = B;
- 	    	NextChar ();
+    	    	NextChar ();
      	    } else {
     	    	/* Comma or right paren inside nested parenthesis */
      	       	if (CurC == ')') {
@@ -436,15 +439,15 @@ static int MacroCall (Macro* M)
       	    	NextChar ();
      	    }
      	} else if (IsBlank (CurC)) {
- 	    /* Squeeze runs of blanks */
+    	    /* Squeeze runs of blanks */
      	    *B++ = ' ';
      	    SkipBlank ();
-	} else if (CurC == '/' && NextC == '*') {
-	    *B++ = ' ';
+    	} else if (CurC == '/' && NextC == '*') {
+    	    *B++ = ' ';
      	    OldStyleComment ();
      	} else if (ANSI == 0 && CurC == '/' && NextC == '/') {
      	    *B++ = ' ';
-	    NewStyleComment ();
+    	    NewStyleComment ();
      	} else if (CurC == '\0') {
     	    /* End of line inside macro argument list - read next line */
      	    if (NextLine () == 0) {
@@ -480,12 +483,12 @@ static void ExpandMacro (Macro* M)
 {
     /* Check if this is a function like macro */
     if (M->ArgCount >= 0) {
- 	/* Function like macro */
+    	/* Function like macro */
        	if (MacroCall (M) == 0) {
      	    ClearLine ();
      	}
     } else {
- 	/* Just copy the replacement text */
+    	/* Just copy the replacement text */
      	KeepStr (M->Replacement);
     }
 }
@@ -499,7 +502,7 @@ static void DefineMacro (void)
     ident   	Ident;
     char    	Buf[LINESIZE];
     Macro*  	M;
-    Macro*	Existing;
+    Macro*  	Existing;
 
     /* Read the macro name */
     SkipBlank ();
@@ -625,7 +628,7 @@ static int Pass1 (const char* From, char* To)
     	    	}
 	    } else {
 	    	if (MaybeMacro (Ident[0])) {
-	    	    done = 0;
+    	    	    done = 0;
 	    	}
 	    	KeepStr (Ident);
 	    }
@@ -668,17 +671,17 @@ static int Pass2 (const char* From, char* To)
      	if (IsIdent (CurC)) {
      	    SymName (Ident);
      	    M = FindMacro (Ident);
-	    if (M) {
-	    	ExpandMacro (M);
-	    	no_chg = 0;
-	    } else {
-	    	KeepStr (Ident);
-	    }
+    	    if (M) {
+    	    	ExpandMacro (M);
+    	    	no_chg = 0;
+    	    } else {
+    	    	KeepStr (Ident);
+    	    }
      	} else if (IsQuote (CurC)) {
      	    mptr = CopyQuotedString (mptr);
      	} else {
      	    KeepChar (CurC);
-	    NextChar ();
+    	    NextChar ();
      	}
     }
     return no_chg;

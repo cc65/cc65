@@ -53,7 +53,6 @@
         .word   GETDEFPALETTE
         .word   SETPIXEL
         .word   GETPIXEL
-        .word   HORLINE
         .word   LINE
         .word   BAR
         .word   CIRCLE
@@ -819,6 +818,10 @@ FIXY:   cpy     #255         ;Y=255 or Y=8
 ;
 ; Must set an error code: NO
 ;
+		  
+; Note: This function needs optimization. It's just a cheap translation of 
+; the original C wrapper and could be written much smaller (besides that, 
+; calling LINE is not a good idea either).
 
 BAR:	lda     Y2
         sta     Y2SAVE
@@ -840,7 +843,11 @@ BAR:	lda     Y2
         lda     X1+1
         sta     X1SAVE+1
 
-@L1:    jsr     HORLINE
+@L1:	lda     Y1
+        sta     Y2
+        lda     Y1+1
+        sta     Y2+1
+	jsr     LINE
 
         lda     Y1SAVE
         cmp     Y2SAVE

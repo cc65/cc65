@@ -7,7 +7,7 @@
 ;*                                                                           */
 ;*                                                                           */
 ;* (C) 2002-2003 Ullrich von Bassewitz                                       */
-;*               Römerstrasse 52                                             */
+;*               Römerstraße 52                                              */
 ;*               D-70794 Filderstadt                                         */
 ;* EMail:        uz@cc65.org                                                 */
 ;*                                                                           */
@@ -62,14 +62,13 @@ TGI_HDR_GETPALETTE      = TGI_HDR_JUMPTAB+22    ; GETPALETTE routine
 TGI_HDR_GETDEFPALETTE   = TGI_HDR_JUMPTAB+24    ; GETDEFPALETTE routine
 TGI_HDR_SETPIXEL        = TGI_HDR_JUMPTAB+26    ; SETPIXEL routine
 TGI_HDR_GETPIXEL        = TGI_HDR_JUMPTAB+28    ; GETPIXEL routine
-TGI_HDR_HORLINE         = TGI_HDR_JUMPTAB+30    ; HORLINE routine
-TGI_HDR_LINE            = TGI_HDR_JUMPTAB+32    ; LINE routine
-TGI_HDR_BAR             = TGI_HDR_JUMPTAB+34    ; BAR routine
-TGI_HDR_CIRCLE          = TGI_HDR_JUMPTAB+36    ; CIRCLE routine
-TGI_HDR_TEXTSTYLE       = TGI_HDR_JUMPTAB+39    ; TEXTSTYLE routine
-TGI_HDR_OUTTEXT         = TGI_HDR_JUMPTAB+42    ; OUTTEXT routine
+TGI_HDR_LINE            = TGI_HDR_JUMPTAB+30    ; LINE routine
+TGI_HDR_BAR             = TGI_HDR_JUMPTAB+32    ; BAR routine
+TGI_HDR_CIRCLE          = TGI_HDR_JUMPTAB+34    ; CIRCLE routine
+TGI_HDR_TEXTSTYLE       = TGI_HDR_JUMPTAB+36    ; TEXTSTYLE routine
+TGI_HDR_OUTTEXT         = TGI_HDR_JUMPTAB+38    ; OUTTEXT routine
 
-TGI_HDR_JUMPCOUNT       = 21            ; Number of jump vectors
+TGI_HDR_JUMPCOUNT       = 20			; Number of jump vectors
 
 ;------------------------------------------------------------------------------
 ; The TGI API version, stored at TGI_HDR_VERSION
@@ -119,7 +118,6 @@ TGI_TEXT_VERTICAL       = 1
         .global tgi_getdefpalette
         .global tgi_setpixel
         .global tgi_getpixel
-        .global tgi_horline
         .global tgi_line
         .global tgi_bar
         .global tgi_circle
@@ -176,6 +174,5 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_textheight
         .global _tgi_outtext
         .global _tgi_outtextxy
-
 
 

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -46,7 +46,7 @@
 
 /* A structure that describes the header of a graphics driver loaded into
  * memory.
- */                                          
+ */
 typedef struct {
 
     /* Data that describes the capabilities of the driver */
@@ -74,7 +74,6 @@ typedef struct {
     void*               getdefpalette;  /* GETDEFPALETTE routine */
     void*               setpixel;       /* SETPIXEL routine */
     void*               getpixel;       /* GETPIXEL routine */
-    void*               horline;        /* HORLINE routine */
     void*               line;           /* LINE routine */
     void*               bar;            /* BAR routine */
     void*               circle;         /* CIRCLE routine */

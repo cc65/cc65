@@ -72,32 +72,38 @@ extern FILE* stderr;
 
 
 
+/*****************************************************************************/
+/*     	    	     		     Code				     */
+/*****************************************************************************/
+
+
+
 /* Functions */
 void __fastcall__ clearerr (FILE* f);
 int __fastcall__ fclose (FILE* f);
 int __fastcall__ feof (FILE* f);
 int __fastcall__ ferror (FILE* f);
 int __fastcall__ fflush (FILE* f);
-int fgetc (FILE* f);
-char* fgets (char* buf, size_t size, FILE* f);
+int __fastcall__ fgetc (FILE* f);
+char* __fastcall__ fgets (char* buf, size_t size, FILE* f);
 FILE* __fastcall__ fopen (const char* name, const char* mode);
 int fprintf (FILE* f, const char* format, ...);
-int fputc (int c, FILE* f);
+int __fastcall__ fputc (int c, FILE* f);
 int __fastcall__ fputs (const char* s, FILE* f);
 size_t __fastcall__ fread (void* buf, size_t size, size_t count, FILE* f);
-FILE* freopen (const char* name, const char* mode, FILE* f);
+FILE* __fastcall__ freopen (const char* name, const char* mode, FILE* f);
 size_t __fastcall__ fwrite (const void* buf, size_t size, size_t count, FILE* f);
-int fgetpos (FILE* f, fpos_t *pos);
-int fsetpos (FILE* f, const fpos_t* pos);
-long ftell (FILE* f);
-int fseek (FILE* f, long offset, int whence);
-void rewind (FILE *f);
-int getchar (void);
-char* gets (char* s);
+int __fastcall__ fgetpos (FILE* f, fpos_t *pos);
+int __fastcall__ fsetpos (FILE* f, const fpos_t* pos);
+long __fastcall__ ftell (FILE* f);
+int __fastcall__ fseek (FILE* f, long offset, int whence);
+void __fastcall__ rewind (FILE *f);
+int __fastcall__ getchar (void);
+char* __fastcall__ gets (char* s);
 void __fastcall__ perror (const char* s);
 int printf (const char* format, ...);
-int putchar (int c);
-int puts (const char* s);
+int __fastcall__ putchar (int c);
+int __fastcall__ puts (const char* s);
 int __fastcall__ remove (const char* name);
 int __fastcall__ rename (const char* oldname, const char* newname);
 int sprintf (char* buf, const char* format, ...);
@@ -109,15 +115,15 @@ int __fastcall__ vsprintf (char* buf, const char* format, va_list ap);
 int scanf (const char* format, ...);
 int fscanf (FILE* f, const char* format, ...);
 int sscanf (const char* s, const char* format, ...);
-int vscanf (const char* format, va_list ap);
-int vsscanf (const char* s, const char* format, va_list ap);
-int vfscanf (FILE* f, const char* format, va_list ap);
+int __fastcall__ vscanf (const char* format, va_list ap);
+int __fastcall__ vsscanf (const char* s, const char* format, va_list ap);
+int __fastcall__ vfscanf (FILE* f, const char* format, va_list ap);
 
 #ifndef __STRICT_ANSI__
-FILE* fdopen (int fd, const char* mode); 	/* Unix */
-int __fastcall__ fileno (FILE* f);		/* Unix */
+FILE* __fastcall__ fdopen (int fd, const char* mode); 	/* Unix */
+int __fastcall__ fileno (FILE* f);			/* Unix */
 #endif
-void __fastcall__ _poserror (const char* msg);  /* cc65 */
+void __fastcall__ _poserror (const char* msg);  	/* cc65 */
 
 /* Masking macros for some functions */
 #define getchar()   	fgetc (stdin)		/* ANSI */
@@ -137,3 +143,4 @@ void __fastcall__ _poserror (const char* msg);  /* cc65 */
 
 
 
+							

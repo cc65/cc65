@@ -81,6 +81,7 @@ OBJS = 	add.o		\
        	ldaxsp.o	\
        	ldeax.o		\
        	ldeaxi.o	\
+	ldeaxysp.o	\
        	ldec.o		\
        	ldiv.o		\
        	le.o		\
@@ -100,7 +101,6 @@ OBJS = 	add.o		\
        	lpop.o		\
        	lpush.o		\
        	lrsub.o		\
-       	lruntime.o	\
        	lsave.o		\
        	lshelp.o	\
        	lshl.o		\
@@ -143,6 +143,7 @@ OBJS = 	add.o		\
 	pushc0.o	\
        	pushc1.o	\
 	pushc2.o	\
+	pushlysp.o	\
        	pushw.o		\
        	pushwsp.o	\
 	return0.o	\
@@ -163,6 +164,7 @@ OBJS = 	add.o		\
 	staxspidx.o	\
 	staxspp.o	\
        	steaxsp.o	\
+	steaxspp.o	\
        	sub.o		\
        	subeqsp.o	\
 	subysp.o	\

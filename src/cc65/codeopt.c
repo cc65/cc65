@@ -53,6 +53,7 @@
 #include "coptind.h"
 #include "coptneg.h"
 #include "coptpush.h"
+#include "coptsize.h"
 #include "coptstop.h"
 #include "coptsub.h"
 #include "copttest.h"
@@ -1277,238 +1278,7 @@ static unsigned OptDecouple (CodeSeg* S)
 
 	/* Insert the replacement if we have one */
 	if (X) {
-	    CS_InsertEntry (S, X, I+1);
-	    CS_DelEntry (S, I);
-	    ++Changes;
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-/*****************************************************************************/
-/*	      		       Size optimization                             */
-/*****************************************************************************/
-
-
-
-#if 0
-static unsigned OptSize1 (CodeSeg* S)
-/* Do size optimization by calling special subroutines that preload registers.
- * This routine does not work standalone, it needs a following register load
- * removal pass.
- */
-{
-    typedef struct CallDesc CallDesc;
-    struct CallDesc {
-        const char*     LongFunc;       /* Long function name */
-        short           A, X, Y;        /* Register contents */
-        const char*     ShortFunc;      /* Short function name */
-    };
-
-    static const CallDesc CallTable [] = {
-       	{ "staxysp",    -1,   -1,    0, "stax0sp"       },
-       	{ "addeqysp",   -1,   -1,    0, "addeq0sp"      },
-       	{ "ldaxysp",    -1,   -1,    1, "ldax0sp"       },
-       	{ "ldeaxysp",   -1,   -1,    3, "ldeax0sp"      },
-       	{ "pushax",      0,    0,   -1, "push0"         },
-       	{ "pushax",     -1,    0,   -1, "pusha0"        },
-       	{ "pushax",     -1, 0xFF,   -1, "pushaFF"       },
-       	{ "pushaysp",   -1,   -1,    0, "pusha0sp"      },
-       	{ "tosaddax",   -1,    0,   -1, "tosadda0"      },
-       	{ "tosandax",   -1,    0,   -1, "tosanda0"      },
-       	{ "tosdivax",   -1,    0,   -1, "tosdiva0"      },
-       	{ "toseqax",    -1,    0,   -1, "toseqa0"       },
-       	{ "tosgeax",    -1,    0,   -1, "tosgea0"       },
-       	{ "tosgtax",    -1,    0,   -1, "tosgta0"       },
-       	{ "laddeqysp",  -1,   -1,    0, "laddeq0sp"     },
-        { "ldaxidx",    -1,   -1,    1, "ldaxi"         },
-       	{ "ldeaxidx",   -1,   -1,    3, "ldeaxi"        },
-        { "ldeaxysp",   -1,   -1,    3, "ldeax0sp"      },
-       	{ "tosleax",    -1,    0,   -1, "toslea0"       },
-        { "lsubeqysp",  -1,   -1,    0, "lsubeq0sp"     },
-
-	"toslta0",           /* tosltax, x = 0 */
-	"tosmoda0",          /* tosmodax, x = 0 */
-	"tosmula0",          /* tosmulax, x = 0 */
-	"tosumula0",         /* tosumulax, x = 0 */
-	"tosnea0",           /* tosneax, x = 0 */
-	"tosora0",           /* tosorax, x = 0 */
-	"push1",             /* pushax, x = 0, a = 1 */
-       	"push2",             /* pushax, x = 0, a = 2 */
-	"push3",             /* pushax, x = 0, a = 3 */
-	"push4",             /* pushax, x = 0, a = 4 */
-	"push5",             /* pushax, x = 0, a = 5 */
-	"push6",             /* pushax, x = 0, a = 6 */
-	"push7",             /* pushax, x = 0, a = 7 */
-	"pushc0",            /* pusha, a = 0 */
-       	"pushc1",            /* pusha, a = 1 */
-	"pushc2",            /* pusha, a = 2 */
-	"tosrsuba0",         /* tosrsubax, x = 0 */
-	"tosshla0",          /* tosshlax, x = 0 */
-	"tosasla0",          /* tosaslax, x = 0 */
-	"tosshra0",          /* tosshrax, x = 0 */
-	"tosasra0",          /* tosasrax, x = 0 */
-	"steax0sp",          /* steaxsp, y = 0 */
-	"tossuba0",          /* tossubax, x = 0 */
-	"subeq0sp",          /* subeqysp, y = 0 */
-	"tosudiva0",         /* tosudivax, x = 0 */
-	"tosugea0",          /* tosugeax, x = 0 */
-       	"tosugta0",          /* tosugtax, x = 0 */
-       	"tosulea0",          /* tosuleax, x = 0 */
-       	"tosulta0",          /* tosultax, x = 0 */
-       	"tosumoda0",         /* tosumodax, x = 0 */
-       	"tosxora0",          /* tosxorax, x = 0 */
-
-       	"tosadd0ax",         /* tosaddeax, sreg = 0 */
-	"laddeqa",           /* laddeq, sreg = 0, x = 0 */
-	"laddeq1",           /* laddeq, sreg = 0, x = 0, a = 1 */
-       	"tosand0ax",         /* tosandeax, sreg = 0 */
-	"tosdiv0ax",         /* tosdiveax, sreg = 0 */
-	"tosmod0ax",         /* tosmodeax, sreg = 0 */
-	"tosmul0ax",         /* tosmuleax, sreg = 0 */
-       	"tosumul0ax",        /* tosumuleax, sreg = 0 */
-	"tosor0ax",          /* tosoreax, sreg = 0 */
-	"push0ax",           /* pusheax, sreg = 0 */
-	"tosrsub0ax",        /* tosrsubeax, sreg = 0 */
-	"tosshl0ax",         /* tosshleax, sreg = 0 */
-	"tosasl0ax",         /* tosasleax, sreg = 0 */
-	"tosshr0ax",         /* tosshreax, sreg = 0 */
-	"tosasr0ax",         /* tosasreax, sreg = 0 */
-	"tossub0ax",         /* tossubeax, sreg = 0 */
-	"lsubeqa",           /* lsubeq, sreg = 0, x = 0 */
-	"lsubeq1",           /* lsubeq, sreg = 0, x = 0, a = 1 */
-	"tosudiv0ax",        /* tosudiveax, sreg = 0 */
-	"tosumod0ax",        /* tosumodeax, sreg = 0 */
-     	"tosxor0ax",         /* tosxoreax, sreg = 0 */
-
-    };
-
-    unsigned Changes = 0;
-    unsigned I;
-
-    /* Generate register info for the following step */
-    CS_GenRegInfo (S);
-
-    /* Walk over the entries */
-    I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-	/* Check if it's a subroutine call */
-	if (E->OPC == OP65_JSR) {
-
-	    /* Check for any of the known functions */
-
-
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
-
-    /* Return the number of changes made */
-    return Changes;
-}
-#endif
-
-
-
-static unsigned OptSize2 (CodeSeg* S)
-/* Do size optimization by using shorter code sequences, even if this
- * introduces relations between instructions. This step must be one of the
- * last steps, because it makes further work much more difficult.
- */
-{
-    unsigned Changes = 0;
-    unsigned I;
-
-    /* Generate register info for the following step */
-    CS_GenRegInfo (S);
-
-    /* Walk over the entries */
-    I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-	/* Assume we have no replacement */
-	CodeEntry* X = 0;
-
-	/* Check the instruction */
-	switch (E->OPC) {
-
-	    case OP65_LDA:
-	        if (CE_KnownImm (E)) {
-		    short Val = (short) E->Num;
-		    if (Val == E->RI->In.RegX) {
-		    	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
-		    } else if (Val == E->RI->In.RegY) {
-		    	X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
-		    } else if (E->RI->In.RegA >= 0 && CPU >= CPU_65C02) {
-		    	if (Val == ((E->RI->In.RegA - 1) & 0xFF)) {
-		     	    X = NewCodeEntry (OP65_DEA, AM65_IMP, 0, 0, E->LI);
-		    	} else if (Val == ((E->RI->In.RegA + 1) & 0xFF)) {
-		    	    X = NewCodeEntry (OP65_INA, AM65_IMP, 0, 0, E->LI);
-	      	    	}
-		    }
-	      	}
-	        break;
-
-	    case OP65_LDX:
-	        if (CE_KnownImm (E)) {
-		    short Val = (short) E->Num;
-		    if (E->RI->In.RegX >= 0 && Val == ((E->RI->In.RegX - 1) & 0xFF)) {
-			X = NewCodeEntry (OP65_DEX, AM65_IMP, 0, 0, E->LI);
-		    } else if (E->RI->In.RegX >= 0 && Val == ((E->RI->In.RegX + 1) & 0xFF)) {
-			X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
-		    } else if (Val == E->RI->In.RegA) {
-			X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
-                    }
-		}
-	        break;
-
-	    case OP65_LDY:
-	        if (CE_KnownImm (E)) {
-		    short Val = (short) E->Num;
-		    if (E->RI->In.RegY >= 0 && Val == ((E->RI->In.RegY - 1) & 0xFF)) {
-			X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, E->LI);
-		    } else if (E->RI->In.RegY >= 0 && Val == ((E->RI->In.RegY + 1) & 0xFF)) {
-			X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, E->LI);
-		    } else if (Val == E->RI->In.RegA) {
-			X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
-		    }
-		}
-	        break;
-
-	    default:
-	        /* Avoid gcc warnings */
-	        break;
-
-	}
-
-	/* Insert the replacement if we have one */
-	if (X) {
-	    CS_InsertEntry (S, X, I+1);
+       	    CS_InsertEntry (S, X, I+1);
 	    CS_DelEntry (S, I);
 	    ++Changes;
 	}
@@ -1598,7 +1368,7 @@ static OptFunc DOptPushPop      = { OptPushPop,      "OptPushPop",        0, 0, 
 static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",      	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift2      	= { OptShift2,       "OptShift2",      	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift3      	= { OptShift3,       "OptShift3",      	110, 0, 0, 0, 0, 0 };
-/*static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };*/
+static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",      0, 0, 0, 0, 0, 0 };
@@ -1656,7 +1426,7 @@ static OptFunc* OptFuncs[] = {
     &DOptShift1,
     &DOptShift2,
     &DOptShift3,
-    /*&DOptSize1,*/
+    &DOptSize1,
     &DOptSize2,
     &DOptStackOps,
     &DOptStoreLoad,
@@ -2037,16 +1807,30 @@ static unsigned RunOptGroup6 (CodeSeg* S)
     unsigned Changes = 0;
     unsigned C;
 
-    /* Optimize for size, that is replace operations by shorter ones, even
-     * if this does hinder further optimizations (no problem since we're
-     * done soon).
-     */
-    Changes += RunOptFunc (S, &DOptSize2, 1);
-
-    /* Run the jump target optimization again, since the size optimization
-     * above may have opened new oportunities.
-     */
-    Changes += RunOptFunc (S, &DOptJumpTarget, 5);
+    if (CodeSizeFactor <= 100) {
+        /* Optimize for size, that is replace operations by shorter ones, even
+         * if this does hinder further optimizations (no problem since we're
+         * done soon).
+         */
+        C = RunOptFunc (S, &DOptSize1, 1);
+        if (C) {
+            Changes += C;
+            /* Run some optimization passes again, since the size optimizations
+             * may have opened new oportunities.
+             */
+            Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+            Changes += RunOptFunc (S, &DOptJumpTarget, 5);
+        }
+    }
+    C = RunOptFunc (S, &DOptSize2, 1);
+    if (C) {
+        Changes += C;
+        /* Run some optimization passes again, since the size optimizations
+         * may have opened new oportunities.
+         */
+        Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+        Changes += RunOptFunc (S, &DOptJumpTarget, 5);
+    }
 
     /* Adjust branch distances */
     Changes += RunOptFunc (S, &DOptBranchDist, 3);

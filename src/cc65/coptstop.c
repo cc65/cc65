@@ -38,8 +38,6 @@
 /* cc65 */
 #include "codeent.h"
 #include "codeinfo.h"
-#include "codeopt.h"
-#include "error.h"
 #include "coptstop.h"
 
 

@@ -85,6 +85,7 @@ OBJS =	anonname.obj	\
 	coptind.obj	\
 	coptneg.obj	\
 	coptpush.obj	\
+        coptsize.obj    \
 	coptstop.obj	\
 	coptsub.obj	\
 	copttest.obj	\
@@ -166,6 +167,7 @@ FILE coptcmp.obj
 FILE coptind.obj
 FILE coptneg.obj
 FILE coptpush.obj
+FILE coptsize.obj
 FILE coptstop.obj
 FILE coptsub.obj
 FILE copttest.obj
@@ -181,7 +183,7 @@ FILE exprnode.obj
 FILE funcdesc.obj
 FILE function.obj
 FILE global.obj
-FILE goto.obj            
+FILE goto.obj
 FILE hexval.obj
 FILE ident.obj
 FILE incpath.obj

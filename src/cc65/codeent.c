@@ -1229,7 +1229,7 @@ void CE_Output (const CodeEntry* E, FILE* F)
 	char Use [128];
 	char Chg [128];
        	fprintf (F,
-       	       	 "%*s; USE: %-20s CHG: %-20s SIZE: %u\n",
+       	       	 "%*s; USE: %-12s CHG: %-12s SIZE: %u\n",
        	       	 30-Chars, "",
 		 RegInfoDesc (E->Use, Use),
 		 RegInfoDesc (E->Chg, Chg),

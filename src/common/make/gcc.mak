@@ -21,6 +21,7 @@ OBJS =	abend.o		\
 	hashstr.o	\
         matchpat.o      \
 	print.o		\
+        segdefs.o       \
 	strbuf.o	\
 	strutil.o	\
 	target.o	\

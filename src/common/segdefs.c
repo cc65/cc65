@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   segdefs.h   	       	       	       	     */
+/*				   segdefs.c   	       	       	       	     */
 /*                                                                           */
 /*		Segment definitions for the bin65 binary utils		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
+/* (C) 2002      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -33,54 +33,12 @@
 
 
 
-#ifndef SEGDEFS_H
-#define SEGDEFS_H
+#include <string.h>
 
-
-
-/*****************************************************************************/
-/*     	       	    	    	     Data				     */
-/*****************************************************************************/
-
-
-
-/* Available segment types */
-#define SEGTYPE_DEFAULT	0
-#define SEGTYPE_ABS	1
-#define SEGTYPE_ZP	2
-#define SEGTYPE_FAR	3
-
-/* Fragment types in the object file */
-#define FRAG_TYPEMASK	0x38		/* Mask the type of the fragment */
-#define FRAG_BYTEMASK   0x07		/* Mask for byte count */
-
-#define FRAG_LITERAL	0x00		/* Literal data */
-
-#define FRAG_EXPR	0x08		/* Expression */
-#define FRAG_EXPR8     	0x09   	       	/* 8 bit expression */
-#define FRAG_EXPR16	0x0A		/* 16 bit expression */
-#define FRAG_EXPR24	0x0B		/* 24 bit expression */
-#define FRAG_EXPR32	0x0C		/* 32 bit expression */
-
-#define FRAG_SEXPR	0x10		/* Signed expression */
-#define FRAG_SEXPR8    	0x11 		/* 8 bit signed expression */
-#define FRAG_SEXPR16   	0x12 		/* 16 bit signed expression */
-#define FRAG_SEXPR24  	0x13		/* 24 bit signed expression */
-#define FRAG_SEXPR32  	0x14		/* 32 bit signed expression */
-
-#define FRAG_FILL      	0x20		/* Fill bytes */
-
-
-
-/* Segment definition */
-typedef struct SegDef SegDef;
-struct SegDef {
-    const char* Name;           /* Segment name */
-    unsigned    Type;           /* Segment type, see above */
-};
-
-/* Initializer for static SegDefs */
-#define STATIC_SEGDEF_INITIALIZER(name, type) { (name), (type) }
+/* common */
+#include "chartype.h"
+#include "xmalloc.h"
+#include "segdefs.h"
 
 
 
@@ -90,23 +48,59 @@ struct SegDef {
 
 
 
-SegDef* NewSegDef (const char* Name, unsigned Type);
+SegDef* NewSegDef (const char* Name, unsigned Type)
 /* Create a new segment definition and return it */
+{
+    /* Allocate memory */
+    SegDef* D = xmalloc (sizeof (SegDef));
 
-void FreeSegDef (SegDef* D);
+    /* Initialize it */
+    if (D) {
+        D->Name = xstrdup (Name);
+        D->Type = Type;
+    }
+
+    /* Return the result */
+    return D;
+}
+
+
+
+void FreeSegDef (SegDef* D)
 /* Free a segment definition */
+{
+    xfree (D->Name);
+    xfree (D);
+}
 
-SegDef* DupSegDef (const SegDef* D);
+
+
+SegDef* DupSegDef (const SegDef* Def)
 /* Duplicate a segment definition and return it */
+{
+    return NewSegDef (Def->Name, Def->Type);
+}
 
-int ValidSegName (const char* Name);
+
+
+int ValidSegName (const char* Name)
 /* Return true if the given segment name is valid, return false otherwise */
+{
+    /* Must start with '_' or a letter */
+    if ((*Name != '_' && !IsAlpha(*Name)) || strlen(Name) > 80) {
+       	return 0;
+    }
 
+    /* Can have letters, digits or the underline */
+    while (*++Name) {
+       	if (*Name != '_' && !IsAlNum(*Name)) {
+       	    return 0;
+       	}
+    }
 
-
-/* End of segdefs.h */
-
-#endif
+    /* Name is ok */
+    return 1;
+}
 
 
 

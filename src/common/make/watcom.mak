@@ -77,6 +77,7 @@ OBJS =	abend.obj	\
 	hashstr.obj	\
         matchpat.obj    \
 	print.obj	\
+        segdefs.obj     \
 	strbuf.obj	\
 	strutil.obj	\
 	target.obj	\

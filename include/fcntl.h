@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*	       	   	  	     Data				     */
+/*	       	   	    	     Data				     */
 /*****************************************************************************/
 
 
@@ -51,6 +51,7 @@
 #define O_CREAT         0x10
 #define O_TRUNC         0x20
 #define O_APPEND        0x40
+#define O_EXCL          0x80
 
 
 

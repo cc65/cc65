@@ -14,6 +14,8 @@ O_RDWR		= $03
 O_CREAT		= $10
 O_TRUNC		= $20
 O_APPEND	= $40
+O_EXCL          = $80
+
 
 
 

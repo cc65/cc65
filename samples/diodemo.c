@@ -1,3 +1,35 @@
+/*****************************************************************************/
+/*                                                                           */
+/*                                 diodemo.c                                 */
+/*                                                                           */
+/*                       Direct Disk I/O Demo Program                        */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) Copyright 2005, Oliver Schmidt, <ol.sc@web.de>                        */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
+
+
+
 #include <stddef.h>
 #include <stdlib.h>
 #include <limits.h>
@@ -7,7 +39,7 @@
 #include <dio.h>
 
 
-#define MAX_CHUNKS 10 // Maximum acceptable number of chunks
+#define MAX_CHUNKS 10 /* Maximum acceptable number of chunks */
 
 
 static unsigned char ScreenX;
@@ -15,13 +47,15 @@ static unsigned char ScreenY;
 
 
 static void ClearLine (void)
+/* Clear the screen line the cursor is on */
 {
     cputc ('\r');
     cclear (ScreenX);
 }
 
 
-static driveid_t AskForDrive (char* Name)
+static driveid_t AskForDrive (const char* Name)
+/* Ask for a drive id and return it */
 {
     driveid_t Drive = 0;
     char      Char;
@@ -40,7 +74,8 @@ static driveid_t AskForDrive (char* Name)
 }
 
 
-static void AskForDisk (char* Name, driveid_t Drive)
+static void AskForDisk (const char* Name, driveid_t Drive)
+/* Ask the user to insert a specific disk */
 {
     ClearLine ();
     cprintf ("\rInsert %s Disk into Drive %d !", Name, Drive);
@@ -50,11 +85,14 @@ static void AskForDisk (char* Name, driveid_t Drive)
 
 
 static char* AllocBuffer (sectsize_t SectSize, sectnum_t SectCount, sectnum_t* ChunkCount)
+/* Allocate a copy buffer on the heap and return a pointer to it */
 {
     void*         Buffer = NULL;
     unsigned long BufferSize;
     unsigned int  Chunks = 1;
 
+    /* Increase number of chunks resp. decrease size */
+    /* of one chunk until buffer allocation succeeds */
     do {
         *ChunkCount = (sectnum_t) ((SectCount + Chunks - 1) / Chunks);
         BufferSize = *ChunkCount * (unsigned long) SectSize;
@@ -87,72 +125,84 @@ int main (void)
     chline (16);
     cputs ("\r\n");
 
+    /* Get source and target drive id (which may very well be identical) */
     SourceId = AskForDrive ("Source");
     TargetId = AskForDrive ("Target");
-    cputs ("\r\n\r\n");
+    cputs ("\r\n\n");
 
     do {
+        /* Check for single drive copy or inital iteration */
         if (SourceId == TargetId || Source == NULL) {
             AskForDisk ("Source", SourceId);
         }
 
+        /* Open drive on initial iteration */
         if (Source == NULL) {
             Source = dio_open (SourceId);
             if (Source == NULL) {
-                cprintf ("\r\n\r\nError %d on opening Drive %d\r\n", (int) _oserror, SourceId);
+                cprintf ("\r\n\nError %d on opening Drive %d\r\n", (int) _oserror, SourceId);
                 return EXIT_FAILURE;
             }
 
             SectSize  = dio_query_sectsize (Source);
             SectCount = dio_query_sectcount (Source);
 
+            /* */
             Buffer = AllocBuffer (SectSize, SectCount, &ChunkCount);
             if (Buffer == NULL) {
-                cputs ("\r\n\r\nError on allocating Buffer\r\n");
+                cputs ("\r\n\nError on allocating Buffer\r\n");
                 return EXIT_FAILURE;
             }
         }
 
         ClearLine ();
 
+        /* Read one chunk of sectors into buffer */
         for (Sector = ChunkOffset; Sector < SectCount && (Sector - ChunkOffset) < ChunkCount; ++Sector) {
             cprintf ("\rReading Sector %d of %d", Sector + 1, SectCount);
 
+            /* Read one sector */
             if (dio_read (Source, Sector, Buffer + (Sector - ChunkOffset) * SectSize) != 0) {
-                cprintf ("\r\n\r\nError %d on reading Drive %d\r\n", (int) _oserror, SourceId);
+                cprintf ("\r\n\nError %d on reading Drive %d\r\n", (int) _oserror, SourceId);
                 return EXIT_FAILURE;
             }
         }
 
+        /* Check for single drive copy or inital iteration */
         if (TargetId == SourceId || Target == NULL) {
             AskForDisk ("Target", TargetId);
         }
 
+        /* Open drive on initial iteration */
         if (Target == NULL) {
             Target = dio_open (TargetId);
             if (Target == NULL) {
-                cprintf ("\r\n\r\nError %d on opening Drive %d\r\n", (int) _oserror, TargetId);
+                cprintf ("\r\n\nError %d on opening Drive %d\r\n", (int) _oserror, TargetId);
                 return EXIT_FAILURE;
             }
 
+            /* Check for compatible drives */
             if (dio_query_sectsize (Target)  != SectSize ||
                 dio_query_sectcount (Target) != SectCount) {
-                cputs ("\r\n\r\nFormat mismatch between Drives\r\n");
+                cputs ("\r\n\nFormat mismatch between Drives\r\n");
                 return EXIT_FAILURE;
             }
         }
 
         ClearLine ();
 
+        /* Write one chunk of sectors from buffer */
         for (Sector = ChunkOffset; Sector < SectCount && (Sector - ChunkOffset) < ChunkCount; ++Sector) {
             cprintf ("\rWriting Sector %d of %d", Sector + 1, SectCount);
 
+            /* Write one sector */
             if (dio_write (Target, Sector, Buffer + (Sector - ChunkOffset) * SectSize) != 0) {
-                cprintf ("\r\n\r\nError %d on opening Drive %d\r\n", (int) _oserror, TargetId);
+                cprintf ("\r\n\nError %d on opening Drive %d\r\n", (int) _oserror, TargetId);
                 return EXIT_FAILURE;
             }
         }
 
+        /* Advance to next chunk */
         ChunkOffset += ChunkCount;
 
     } while (Sector < SectCount);

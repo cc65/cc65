@@ -116,6 +116,7 @@ S_OBJS = 	_fdesc.o 	\
 		strspn.o	\
 		strstr.o	\
 		strupper.o	\
+                time.o          \
 		tolower.o	\
 		toupper.o	\
 		vcprintf.o	\

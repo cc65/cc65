@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -82,6 +82,7 @@ unsigned _clocks_per_sec (void);
 
 /* Function prototypes */
 clock_t clock (void);
+time_t __fastcall__ time (time_t* t);
 
 
 

@@ -178,7 +178,7 @@ static int SkipWhite (void)
      	    }
 	    Preprocess ();
      	}
-	if (CurC == ' ' || CurC == '\r') {
+	if (IsSpace (CurC)) {
     	    NextChar ();
 	} else {
     	    return 1;
@@ -403,7 +403,7 @@ void NextToken (void)
 {
     ident token;
 
-    /* We have to skip white space here before shifting tokens, since the 
+    /* We have to skip white space here before shifting tokens, since the
      * tokens and the current line info is invalid at startup and will get
      * initialized by reading the first time from the file. Remember if
      * we were at end of input and handle that later.
@@ -420,7 +420,7 @@ void NextToken (void)
     NextTok.LI = UseLineInfo (GetCurLineInfo ());
 
     /* Now handle end of input. */
-    if (GotEOF) {	
+    if (GotEOF) {
 	/* End of file reached */
 	NextTok.Tok = TOK_CEOF;
 	return;

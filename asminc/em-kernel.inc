@@ -34,30 +34,38 @@
 
 
 ;------------------------------------------------------------------------------
-; Driver header stuff
-
-EMD_HDR_ID              = 0                     ; 0x65, 0x6d, 0x64 ("emd")
-EMD_HDR_VERSION         = 3                     ; Interface version
-
-EMD_HDR_JUMPTAB         = 4
-EMD_HDR_INSTALL         = EMD_HDR_JUMPTAB+0     ; INSTALL routine
-EMD_HDR_UNINSTALL       = EMD_HDR_JUMPTAB+2     ; UNINSTALL routine
-EMD_HDR_PAGECOUNT       = EMD_HDR_JUMPTAB+4     ; PAGECOUNT routine
-EMD_HDR_MAP             = EMD_HDR_JUMPTAB+6     ; MAP routine
-EMD_HDR_USE             = EMD_HDR_JUMPTAB+8     ; USE routine
-EMD_HDR_MAPCLEAN        = EMD_HDR_JUMPTAB+10    ; MAPCLEAN routine
-EMD_HDR_COPYFROM        = EMD_HDR_JUMPTAB+12    ; COPYFROM routine
-EMD_HDR_COPYTO          = EMD_HDR_JUMPTAB+14    ; COPYTO routine
-
-EMD_HDR_JUMPCOUNT       = 8                     ; Number of jump vectors
+; The driver header
+		   
+.struct	EMD_HDR
+	ID	.byte	3	; Contains 0x65, 0x6d, 0x64 ("emd")
+	VERSION .byte	1	; Interface version
+	JUMPTAB .struct
+	    INSTALL	.word	; INSTALL routine
+	    UNINSTALL	.word	; UNINSTALL routine
+	    PAGECOUNT	.word	; PAGECOUNT routine
+	    MAP	.word	; MAP routine
+	    USE	.word	; USE routine
+	    MAPCLEAN	.word	; MAPCLEAN routine
+	    COPYFROM	.word	; COPYFROM routine
+	    COPYTO	.word	; COPYTO routine
+	.endstruct
+.endstruct
 
 ;------------------------------------------------------------------------------
-; Offsets into the em_copy structure
+; The AMD API version, stored in EMD_HDR::VERSION
 
-EM_COPY_BUF             = 0
-EM_COPY_OFFS            = 2
-EM_COPY_PAGE            = 3
-EM_COPY_COUNT           = 5
+EMD_API_VERSION         = $00
+
+;------------------------------------------------------------------------------
+; The asm equivalent to the C em_copy structure
+
+.struct	EM_COPY
+	BUF	.word		; Memory buffer to copy from or to
+	OFFS	.byte		; Offset into page
+	PAGE	.word		; Starting page to copy from or to
+	COUNT	.word		; Number of bytes to copy
+	UNUSED	.byte		; Make the size 8 bytes 
+.endstruct
 
 ;------------------------------------------------------------------------------
 ; Variables
@@ -84,7 +92,7 @@ EM_COPY_COUNT           = 5
 	.global _em_uninstall
 	.global	_em_pagecount
 	.global	_em_map
-        .global _em_use	  
+        .global _em_use
 	.global	_em_commit
 	.global _em_copyfrom
 	.global	_em_copyto

@@ -413,7 +413,7 @@ already known, after evaluating the left hand side, the right hand side is
 not evaluated.
 
 
-<sect1>Available operators<p>
+<sect1>Available operators<label id="operators"><p>
 
 Available operators sorted by precedence:
 
@@ -950,15 +950,10 @@ Here's a list of all control commands and a description, what they do:
 <sect1><tt>.CPU</tt><label id=".CPU"><p>
 
   Reading this pseudo variable will give a constant integer value that
-  tells which instruction set is currently enabled. Possible values are:
-
-  <tscreen><verb>
-  	0 -->  	6502
-  	1 -->	65SC02
-        2 -->   65C02
-  	3 -->	65SC816
-  	4 -->	SunPlus SPC
-  </verb></tscreen>
+  tells which CPU is currently enabled. It can also tell which instruction
+  set the CPU is able to translate. The value read from the pseudo variable
+  should be further examined by using one of the constants defined by the
+  "cpu" macro package (see <tt/<ref id=".MACPACK" name=".MACPACK">/).
 
   It may be used to replace the .IFPxx pseudo instructions or to construct
   even more complex expressions.
@@ -966,15 +961,16 @@ Here's a list of all control commands and a description, what they do:
   Example:
 
   <tscreen><verb>
-	.if	(.cpu = 0) .or (.cpu = 1) .or (.cpu = 2)
-	 	txa
- 	 	pha
-	 	tya
-	 	pha
-	.else
-	 	phx
-	 	phy
-	.endif
+        .macpack        cpu
+       	.if	(.cpu .bitand CPU_ISET_65816)
+  	 	phx
+  	 	phy
+  	.else
+  	 	txa
+  	 	pha
+  	 	tya
+  	 	pha
+  	.endif
   </verb></tscreen>
 
 
@@ -1744,6 +1740,8 @@ Here's a list of all control commands and a description, what they do:
   <tscreen><verb>
 	generic		Defines generic macros like add and sub.
     	longbranch     	Defines conditional long jump macros.
+        cbm             Defines the scrcode macro
+        cpu             Defines constants for the .CPU variable
   </verb></tscreen>
 
   Including a macro package twice, or including a macro package that
@@ -2826,6 +2824,66 @@ The package defines the following macros:
 
 
 
+<sect1><tt>.MACPACK cbm</tt><p>
+
+The cbm macro package will define a macro named <tt/scrcode/. It takes a
+string as argument and places this string into memory translated into screen
+codes.
+
+
+<sect1><tt>.MACPACK cpu</tt><p>
+
+This macro package does not define any macros but constants used to examine
+the value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable. For
+each supported CPU a constant similar to
+
+<tscreen><verb>
+    CPU_6502
+    CPU_65SC02
+    CPU_65C02
+    CPU_65816
+    CPU_SUNPLUS
+</verb></tscreen>
+
+is defined. These constants may be used to determine the exact type of the
+currently enabled CPU. In addition to that, for each CPU instruction set,
+another constant is defined:
+
+<tscreen><verb>
+    CPU_ISET_6502
+    CPU_ISET_65SC02
+    CPU_ISET_65C02
+    CPU_ISET_65816
+    CPU_ISET_SUNPLUS
+</verb></tscreen>
+
+The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may
+be checked with <tt/<ref id="operators" name=".BITAND">/ to determine if the
+currently enabled CPU supports a specific instruction set. For example the
+65C02 supports all instructions of the 65SC02 CPU, so it has the
+<tt/CPU_ISET_65SC02/ bit set in addition to its native <tt/CPU_ISET_65C02/
+bit. Using
+
+<tscreen><verb>
+        .if (.cpu .bitand CPU_ISET_65SC02)
+                lda     (sp)
+        .else
+                ldy     #$00
+                lda     (sp),y
+        .endif
+</verb></tscreen>
+
+it is possible to determine if the
+
+<tscreen><verb>
+                lda     (sp)
+</verb></tscreen>
+
+instruction is supported, which is the case for the 65SC02, 65C02 and 65816
+CPUs (the latter two are upwards compatible to the 65SC02).
+
+
+
 <sect>Module constructors/destructors<label id="condes"><p>
 
 <em>Note:</em> This section applies mostly to C programs, so the explanation
@@ -2962,13 +3020,13 @@ of such simple assemblers.
 <tscreen><verb>
         ; if you want TASS style labels without colons
         .feature labels_without_colons
-        
+
         ; if you want TASS style character constants
         ; ("a" instead of the default 'a')
         .feature loose_char_term
-        
+
                 .word *+2       ; the cbm load address
-        
+
                 [yourcode here]
 </verb></tscreen>
 

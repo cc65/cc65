@@ -1,16 +1,55 @@
 #!/usr/bin/perl
+###############################################################################
+#                                                                             #
+# 				    main.c				      #
+#                                                                             #
+# 		       Convert a ca65 source into HTML			      #
+#                                                                             #
+#                                                                             #
+#                                                                             #
+#  (C) 2000      Ullrich von Bassewitz                                        #
+#                Wacholderweg 14                                              #
+#                D-70597 Stuttgart                                            #
+#  EMail:        uz@musoftware.de                                             #
+#                                                                             #
+#                                                                             #
+#  This software is provided 'as-is', without any expressed or implied        #
+#  warranty.  In no event will the authors be held liable for any damages     #
+#  arising from the use of this software.                                     #
+#                                                                             #
+#  Permission is granted to anyone to use this software for any purpose,      #
+#  including commercial applications, and to alter it and redistribute it     #
+#  freely, subject to the following restrictions:                             #
+#                                                                             #
+#  1. The origin of this software must not be misrepresented; you must not    #
+#     claim that you wrote the original software. If you use this software    #
+#     in a product, an acknowledgment in the product documentation would be   #
+#     appreciated but is not required.                                        #
+#  2. Altered source versions must be plainly marked as such, and must not    #
+#     be misrepresented as being the original software.                       #
+#  3. This notice may not be removed or altered from any source               #
+#     distribution.                                                           #
+#                                                                             #
+###############################################################################
 
-#
-# Convert a ca65 source into HTML
-#
-# Ullrich von Bassewitz, 05.12.2000
-#
+
+
+#-----------------------------------------------------------------------------#
+#			  	   Variables				      #
+# ----------------------------------------------------------------------------#
 
 
 
-# ----------------------------------------------------------
-#     	       	         Helper functions
-# ----------------------------------------------------------
+%Files		= ();	  	# List of all files.
+%Exports	= ();	  	# List of exported symbol. Value is html tag.
+%Labels		= ();	  	# List of all labels
+$LabelNum	= 0;	  	# Counter to generate unique labels
+
+
+
+#-----------------------------------------------------------------------------#
+#			       Helper functions				      #
+# ----------------------------------------------------------------------------#
 
 
 
@@ -18,6 +57,26 @@
 sub Abort {
     print "@_\n";
     exit 1;
+}
+
+# Generate a label and return it
+sub GenLabel {
+    # Generate the label
+    return sprintf ("L%06X", $LabelNum++);
+}
+
+# Make an output file name from an input file name
+sub GetOutName {
+
+    # Input name is parameter
+    local $InName = @_[0];
+
+    # Create the output file name from the input file name
+    if ($InName =~ /^(.+)\.([^\.\/]*)$/) {
+       	return "$1.html";
+    } else {
+	return "$InName.html";
+    }
 }
 
 # Print the document header
@@ -79,182 +138,383 @@ sub Cleanup {
 
 
 
+#-----------------------------------------------------------------------------#
+#    				    Pass 1 				      #
+# ----------------------------------------------------------------------------#
+
+
+
+# Process1: Read one file for the first time.
+sub Process1 {
+
+    # Variables
+    local $Line;
+    local $Id;
+
+    # Filename is parameter
+    local $InName = shift(@_);
+
+    # Create the output file name from the input file name
+    local $OutName = GetOutName ($InName);
+
+    # Current cheap local label prefix is empty
+    local $CheapPrefix = "";
+
+    # Open a the input file
+    open (INPUT, "<$InName") or Abort ("Cannot open $InName");
+
+    # Read and process all lines from the file
+    while ($Line = <INPUT>) {
+
+	# Remove the newline
+	chop ($Line);
+
+	# Check for a label
+	if ($Line =~ /^\s*(\@?)([_a-zA-Z][_\w]*)\s*(:|=)/) {
+
+	    # Is this a local label?
+	    if ($1 eq "\@") {
+		# Use the prefix
+		$Id = "$CheapPrefix$1$2";
+	    } else {
+		# Use as is
+		$Id = $2;
+		# Remember the id as new cheap local prefix
+		$CheapPrefix = $Id;
+	    }
+
+	    # Remember the label
+	    $Labels{$InName}{$Id} = GenLabel();
+
+	# Check for an import statement
+	} elsif ($Line =~ /^\s*(\.import|\.importzp|.proc)\s+(.*?)(\s*)(;.*$|$)/) {
+
+	    # Split into a list of identifiers
+	    local @Ids = split (/\s*,\s*/, $2);
+	    for my $Id (@Ids) {
+		$Labels{$InName}{$Id} = GenLabel();
+	    }
+
+	# Check for an export statement
+	} elsif ($Line =~ /^\s*(\.export|\.exportzp)\s+(.*?)(\s*)(;.*$|$)/) {
+
+	    # Split into a list of identifiers
+	    local @Ids = split (/\s*,\s*/, $2);
+       	    for my $Id (@Ids) {
+		$Exports{$Id} = sprintf ("%s#%s", $OutName, GenLabel());
+	    }
+
+	}
+    }
+
+    # Close the input file
+    close (INPUT);
+}
+
+
+
+# Pass1: Read all files for the first time.
+sub Pass1 {
+
+    # List of new files we found
+    local @NewFiles = ();
+
+    # Walk over the files
+    for my $InName (@_) {
+
+ 	# Process one file
+	Process1 ($InName);
+
+    }
+}
+
+
+
+#-----------------------------------------------------------------------------#
+#    		     		    Pass 2				      #
+# ----------------------------------------------------------------------------#
+
+
+
+# Process2: Read one file the second time.
+sub Process2 {
+
+    # Variables
+    local $Base;
+    local $Ext;
+    local $Line;
+    local $OutLine;
+    local $Id;
+    local $Label;
+    local $Operand;
+    local $Comment;
+
+    # Input file is parameter
+    local $InName = shift(@_);
+
+    # Create the output file name from the input file name
+    local $OutName = GetOutName ($InName);
+
+    # Current cheap local label prefix is empty
+    local $CheapPrefix = "";
+
+    # Open a the input file
+    open (INPUT, "<$InName") or Abort ("Cannot open $InName");
+
+    # Open the output file and print the HTML header
+    open (OUTPUT, ">$OutName") or Abort ("Cannot open $OutName");
+    DocHeader (OUTPUT, $InName);
+
+    # The instructions that will have hyperlinks if a label is used
+    local $Ins = "adc|add|and|bcc|bcs|beq|bit|bmi|bne|bpl|bcv|bvs|cmp|cpx|cpy|dec|".
+		 "eor|inc|jmp|jsr|lda|ldx|ldy|ora|rol|sbc|sta|stx|sty|sub|";
+
+    # Read the input file, replacing references by hyperlinks and mark
+    # labels as link targets.
+    while ($Line = <INPUT>) {
+
+ 	# Remove the newline
+	chop ($Line);
+
+	# Clear the output line
+	$OutLine = "";
+
+	# Check for a label. If we have one, process it and remove it
+	# from the line
+	if ($Line =~ /^\s*?(\@?)([_a-zA-Z][_\w]*)(\s*)(:|=)(.*)$/) {
+
+	    # Is this a local label?
+       	    if ("$1" eq "\@") {
+		# Use the prefix
+		$Id = "$CheapPrefix$1$2";
+	    } else {
+	      	# Use as is
+	      	$Id = $2;
+	      	# Remember the id as new cheap local prefix
+	      	$CheapPrefix = $Id;
+	    }
+
+	    # Get the label for the id
+	    $Label = $Labels{$InName}{$Id};
+
+	    # Print the label with a tag
+       	    $OutLine .= sprintf ("<a name=\"%s\">%s%s</a>%s%s", $Label, $1, $2, $3, $4);
+
+	    # Use the remainder for line
+	    $Line = $5;
+	}
+
+	# Print any leading whitespace and remove it, so we don't have to
+	# care about whitespace below.
+	if ($Line =~ /^(\s+)(.*)$/) {
+	    $OutLine .= "$1";
+	    $Line = $2;
+	}
+
+	# Handle the import statements
+	if ($Line =~ /^(\.import|\.importzp)(\s+)(.*)$/) {
+
+	    # Print any fixed stuff from the line and remove it
+	    $OutLine .= "$1$2";
+ 	    $Line = $3;
+
+ 	    # Print all identifiers if there are any
+ 	    while ($Line =~ /^([_a-zA-Z][_\w]*)(.*)$/) {
+
+		# Identifier is $1, remainder is $2
+		$Id = $1;
+		$Line = $2;
+
+		# Variable to assemble HTML representation
+		local $Item = $Id;
+
+		# If we have an export for this import, add a link to this
+		# export definition
+		if (exists ($Exports{$Id})) {
+		    $Label = $Exports{$Id};
+		    $Item = sprintf ("<a href=\"%s\">%s</a>", $Label, $Item);
+		}
+
+		# Make this import a link target
+		if (exists ($Labels{$InName}{$Id})) {
+       	       	    $Label = $Labels{$InName}{$1};
+		    $Item = sprintf ("<a name=\"%s\">%s</a>", $Label, $Item);
+		}
+
+		# Add the HTML stuff to the output line
+		$OutLine .= $Item;
+
+		# Check if another identifier follows
+		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
+		    $OutLine .= "$1,$2";
+		    $Line = $3;
+       		} else {
+		    last;
+		}
+	    }
+
+	    # Add an remainder if there is one
+	    $OutLine .= Cleanup ($Line);
+
+       	# Handle export statements
+	} elsif ($Line =~ /^(\.export|\.exportzp)(\s+)(.*)$/) {
+
+	    # Print the command the and white space
+	    $OutLine .= "$1$2";
+	    $Line = $3;
+
+	    # Print all identifiers if there are any
+	    while ($Line =~ /^([_a-zA-Z][_\w]*)(.*)$/) {
+
+		# Identifier is $1, remainder is $2
+		$Id = $1;
+		$Line = $2;
+
+		# Variable to assemble HTML representation
+		local $Item = $Id;
+
+		# If we have a definition for this export in this file, add
+		# a link to the definition.
+		if (exists ($Labels{$InName}{$1})) {
+		    $Label = $Labels{$InName}{$1};
+       	       	    $Item = sprintf ("<a href=\"#%s\">%s</a>", $Label, $Item);
+		}
+
+		# If we have this identifier in the list of exports, add a
+		# jump target for the export.
+		if (exists ($Exports{$Id})) {
+		    $Label = $Exports{$Id};
+       	       	    # Be sure to use only the label part
+		    $Label =~ s/^(.*#)(.*)$/$2/;
+		    $Item = sprintf ("<a name=\"%s\">%s</a>", $Label, $Item);
+		}
+
+		# Add the HTML stuff to the output line
+		$OutLine .= $Item;
+
+		# Check if another identifier follows
+		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
+		    $OutLine .= "$1,$2";
+		    $Line = $3;
+		} else {
+		    last;
+ 		}
+	    }
+
+	    # Add an remainder if there is one
+	    $OutLine .= Cleanup ($Line);
+
+	# Check for .addr and .word
+	} elsif ($Line =~ /^(\.addr|\.word)(\s+)(.*)$/) {
+
+	    # Print the command the and white space
+	    $OutLine .= "$1$2";
+	    $Line = $3;
+
+	    # Print all identifiers if there are any
+	    while ($Line =~ /^([_a-zA-Z][_\w]*)(.*)$/) {
+		if (exists ($Labels{$InName}{$1})) {
+		    $Label = $Labels{$InName}{$1};
+       	       	    $OutLine .= sprintf ("<a href=\"#%s\">%s</a>", $Label, $1);
+		} else {
+		    $OutLine .= "$1";
+		}
+		$Line = $2;
+		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
+		    $OutLine .= "$1,$2";
+		    $Line = $3;
+		} else {
+		    last;
+ 		}
+	    }
+
+	    # Add an remainder if there is one
+	    $OutLine .= Cleanup ($Line);
+
+	# Check for any legal instruction
+	} elsif ($Line =~ /^($Ins)(\s+)(.*?)(\s*)(;.*$|$)/) {
+
+	    # Print the instruction and white space
+	    $OutLine .= "$1$2";
+
+	    # Remember the remaining parts
+	    $Operand = $3;
+	    $Comment = Cleanup ("$4$5");
+
+  	    # Check for the first identifier in the operand and replace it
+	    # by a hyperlink
+       	    if ($Operand =~ /^([^_a-zA-Z]*?)(\@?)([_a-zA-Z][_\w]*)(.*)$/) {
+
+		# Is this a local label?
+		if ("$2" eq "\@") {
+		    # Use the prefix
+		    $Id = "$CheapPrefix$2$3";
+		} else {
+		    # Use as is
+		    $Id = $3;
+		}
+
+		# Do we have a label for this id?
+		if (exists ($Labels{$InName}{$Id})) {
+		    $Label = $Labels{$InName}{$Id};
+		    $Operand = sprintf ("%s<a href=\"#%s\">%s%s</a>%s",
+		 		       	Cleanup($1), $Label, $2, $3, Cleanup ($4));
+		}
+
+	    }
+
+	    # Reassemble and print the line
+       	    $OutLine .= "$Operand$Comment";
+
+ 	} else {
+
+	    # Nothing known - print the line
+	    $OutLine .= Cleanup ($Line);
+
+	}
+
+	# Print the result
+	print OUTPUT "$OutLine\n";
+    }
+
+    # Print the HTML footer
+    DocFooter (OUTPUT, $OutName);
+
+    # Close the files
+    close (INPUT);
+    close (OUTPUT);
+}
+
+
+
+# Pass2: Read all files the second time.
+sub Pass2 {
+
+    # Walk over the files
+    for my $InName (@_) {
+
+       	# Process one file
+       	Process2 ($InName);
+
+    }
+}
+
+
+
 # ----------------------------------------------------------
-#    	       	      	      	Code
+#      	       	      	      	Code
 # ----------------------------------------------------------
 
 # Get the arguments
-if ($#ARGV != 1) {
-    printf STDERR "Usage: %s asm-file output-file\n", $ARGV[0];
-    exit (1);
-}
-$ASM = shift (@ARGV);
-$OUT = shift (@ARGV);
+#if ($#ARGV != 0) {
+#    printf STDERR "Usage: %s asm-file\n", $ARGV[0];
+#    exit (1);
+#}
 
-# Open a the input file
-open (ASM, "<$ASM") or Abort ("Cannot open $ASM");
+#
+Pass1 (@ARGV);
+Pass2 (@ARGV);
 
-# Read all lines and remember labels
-$LNum = 1;
-%Label = ();
-while ($Line = <ASM>) {
-
-    # Remove the newline
-    chop ($Line);
-
-    # Check for a label
-    if ($Line =~ /^\s*([_\w][_\w\d]*)\s*(:|=)/) {
-     	$Label { $1 } = $LNum++;
-    } elsif ($Line =~ /^\s*(\.import|\.importzp|.proc)\s+(.*?)(\s*)(;.*$|$)/) {
-	@L = split (/\s*,\s*/, $2);
-	for my $Id (@L) {
-	    $Label { $Id } = $LNum++;
-	}
-    }
-}
-
-# Reset the file pointer to the beginning
-seek (ASM, 0, 0);
-
-# Open the output file and print the HTML header
-open (OUT, ">$OUT") or Abort ("Cannot open $OUT");
-DocHeader (OUT, $ASM);
-
-# The instructions that will have hyperlinks if a label is used
-$Ins = "adc|add|and|bcc|bcs|beq|bit|bmi|bne|bpl|bcv|bvs|cmp|cpx|cpy|dec|".
-       "eor|inc|jmp|jsr|lda|ldx|ldy|ora|rol|sbc|sta|stx|sty|sub|";
-
-# Read the input file again, replacing references by hyperlinks and mark
-# labels as link targets.
-while ($Line = <ASM>) {
-
-    # Remove the newline
-    chop ($Line);
-
-    # Clear the output line
-    $OutLine = "";
-
-    # Check for and ignore a local label
-    if ($Line =~ /^(\s*\@[_\w][_\w\d]*\s*:)(.*)$/) {
-       	# Print the label
-       	$OutLine .= "$1";
-       	# Use the remainder for line
-       	$Line = $2;
-    }
-
-    # Check for a label, if we have one, remove it from the line
-    if ($Line =~ /^\s*([_\w][_\w\d]*)(\s*)(:|=)(.*)$/) {
-       	# Print the label with a tag
-       	$OutLine .= sprintf ("<a name=\"L%04X\">%s</a>%s%s", $Label { $1 }, $1, $2, $3);
-       	# Use the remainder for line
-       	$Line = $4;
-    }
-
-    # Print any leading whitespace
-    if ($Line =~ /^(\s+)(.*)$/) {
-       	$OutLine .= "$1";
-	$Line = $2;
-    }
-
-    # Handle the import statements
-    if ($Line =~ /^(\.import|\.importzp|.proc|)(\s+)(.*)$/) {
-	$OutLine .= "$1$2";
-	$Line = $3;
-
-	# Print all identifiers if there are any
-	while ($Line =~ /^([_\w][_\w\d]*)(.*)$/) {
-	    $Num = $Label { $1 };
-	    if ($Num != 0) {
-	     	$OutLine .= sprintf ("<a name=\"L%04X\">%s</a>", $Num, $1);
-	    } else {
-	     	$OutLine .= "$1";
-	    }
-	    $Line = $2;
-	    if ($Line =~ /^(\s*),(\s*)(.*)$/) {
-	     	$OutLine .= "$1,$2";
-	     	$Line = $3;
-	    } else {
-	     	last;
-	    }
-	}
-
-       	# Add an remainder if there is one
-	$OutLine .= Cleanup ($Line);
-
-    # Check for control commands that may reference lists of labels
-    } elsif ($Line =~ /^(\.addr|\.word|\.export)(\s+)(.*)$/) {
-
-	# Print the command the and white space
-	$OutLine .= "$1$2";
-	$Line = $3;
-
-	# Print all identifiers if there are any
-	while ($Line =~ /^([_\w][_\w\d]*)(.*)$/) {
-	    $Num = $Label { $1 };
-	    if ($Num != 0) {
-	       	$OutLine .= sprintf ("<a href=\"#L%04X\">%s</a>", $Num, $1);
-	    } else {
- 	     	$OutLine .= "$1";
-	    }
-	    $Line = $2;
-	    if ($Line =~ /^(\s*),(\s*)(.*)$/) {
-	     	$OutLine .= "$1,$2";
-	     	$Line = $3;
-	    } else {
-	     	last;
-	    }
-	}
-
-       	# Add an remainder if there is one
-	$OutLine .= Cleanup ($Line);
-
-    # Check for any legal instruction
-    } elsif ($Line =~ /^($Ins)(\s+)(.*)$/) {
-
-	# Print the instruction and white space
-	$OutLine .= "$1$2";
-	$Line = $3;
-
-	# Check for a comment or traling whitespace and separate it
-       	if ($Line =~ /^(.*?)(\s*)(;.*)$/) {
-	    $Line    = $1;
-	    $Comment = "$2$3";
-	} elsif ($Line =~ /^(.*?)(\s*)$/) {
-	    $Line    = $1;
-	    $Comment = $2;
-	} else {
-	    $Comment = "";
-	}
-
-	# Check for the first identifier and replace it by a hyperlink
-       	if ($Line =~ /^([^_a-zA-Z]*)([_a-zA-Z][_\w]*)(.*)$/ && $Label { $2 } != 0) {
-	    $Line = sprintf ("%s<a href=\"#L%04X\">%s</a>%s",
-		    Cleanup ($1), $Label { $2 }, $2, Cleanup ($3));
-	}
-
-	# Clean the comment
-	$Comment = Cleanup ($Comment);
-
-	# Reassemble and print the line
-	$OutLine .= "$Line$Comment";
-
-    } else {
-
-       	# Nothing known - print the line
-       	$OutLine .= Cleanup ($Line);
-
-    }
-
-    # Print the result
-    print OUT "$OutLine\n";
-}
-
-# Print the HTML footer
-DocFooter (OUT, $OUT);
-
-# Close the files
-close (ASM);
-close (OUT);
 
 # Done
 exit 0;

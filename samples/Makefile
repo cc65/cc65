@@ -7,22 +7,23 @@
 # Enter the target system here
 SYS	= c64
 
-CRT0	= ../lib/$(SYS).o
-CLIB	= ../lib/$(SYS).lib
-CC	= ../cc65/cc65
-CL	= ../cl65/cl65
-AS	= ../binutils/ca65/ca65
-LD	= ../binutils/ld65/ld65
+CRT0   	= ../libsrc/$(SYS).o
+CLIB	= ../libsrc/$(SYS).lib
+CC	= ../src/cc65/cc65
+CL	= ../src/cl65/cl65
+AS	= ../src/ca65/ca65
+LD	= ../src/ld65/ld65
 C1541  	= c1541
 
 
 .c.o:
 	@echo $<
-	@$(CL) -c -Oirs -t $(SYS) -I../include/ $<
+	@$(CC) -g -Oirs -t $(SYS) -I../include/ $<
+	@$(AS) $(basename $<).s
 
 .s.o:
 	@echo $<
-	@$(CL) -c $(basename $<).s
+	@$(AS) $(basename $<).s
 
 
 .PHONY:	all

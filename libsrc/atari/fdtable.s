@@ -88,7 +88,7 @@ loop:	sta	ICHID,x
 
 
 ; gets fd in ax
-; return iocb index in A
+; return iocb index in A, fd_table index in X
 ; return N bit set for invalid fd
 ; all registers destroyed
 .proc	fdtoiocb

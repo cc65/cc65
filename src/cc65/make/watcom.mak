@@ -69,6 +69,7 @@ OBJS =	anonname.obj	\
 	asmline.obj	\
 	check.obj	\
 	codegen.obj	\
+	compile.obj	\
 	ctrans.obj	\
 	datatype.obj	\
 	declare.obj	\
@@ -124,6 +125,7 @@ FILE asmlabel.obj
 FILE asmline.obj
 FILE check.obj
 FILE codegen.obj
+FILE compile.obj
 FILE ctrans.obj
 FILE datatype.obj
 FILE declare.obj

@@ -9,24 +9,15 @@
 #include "../common/version.h"
 
 #include "asmcode.h"
-#include "asmlabel.h"
-#include "codegen.h"
-#include "datatype.h"
-#include "declare.h"
+#include "compile.h"
 #include "error.h"
-#include "expr.h"
-#include "function.h"
 #include "global.h"
 #include "include.h"
 #include "io.h"
-#include "litpool.h"
 #include "macrotab.h"
 #include "mem.h"
 #include "optimize.h"
-#include "pragma.h"
 #include "scanner.h"
-#include "stmt.h"
-#include "symtab.h"
 
 
 
@@ -54,7 +45,7 @@ static const char* TargetNames [] = {
 
 
 /*****************************************************************************/
-/*				     code				     */
+/*				     Code				     */
 /*****************************************************************************/
 
 
@@ -248,259 +239,6 @@ static void DefineSym (const char* Def)
 	/* Release the allocated memory */
 	xfree (S);
     }
-}
-
-
-
-static void Parse (void)
-/* Process all input text.
- * At this level, only static declarations, defines, includes, and function
- * definitions are legal....
- */
-{
-    int comma;
-    SymEntry* Entry;
-
-    kill ();
-    gettok ();		 	/* "prime" the pump */
-    gettok ();
-    while (curtok != CEOF) {
-
-	DeclSpec 	Spec;
-	Declaration 	Decl;
-	int		NeedStorage;
-
-	/* Check for an ASM statement (which is allowed also on global level) */
-	if (curtok == ASM) {
-	    doasm ();
-	    ConsumeSemi ();
-	    continue;
-	}
-
-	/* Check for a #pragma */
-	if (curtok == PRAGMA) {
-	    DoPragma ();
-	    continue;
-	}
-
-       	/* Read variable defs and functions */
-	ParseDeclSpec (&Spec, SC_EXTERN | SC_STATIC, T_INT);
-
-	/* Don't accept illegal storage classes */
-	if (Spec.StorageClass == SC_AUTO || Spec.StorageClass == SC_REGISTER) {
-	    Error (ERR_ILLEGAL_STORAGE_CLASS);
-	    Spec.StorageClass = SC_EXTERN | SC_STATIC;
-	}
-
-	/* Check if this is only a type declaration */
-	if (curtok == SEMI) {
-	    gettok ();
-	    continue;
-	}
-
-       	/* Check if we must reserve storage for the variable. We do
-	 * this if we don't had a storage class given ("int i") or
-	 * if the storage class is explicitly specified as static.
-	 * This means that "extern int i" will not get storage
-	 * allocated.
-	 */
-	NeedStorage = (Spec.StorageClass & SC_TYPEDEF) == 0 &&
-		      ((Spec.Flags & DS_DEF_STORAGE) != 0  ||
-	   	      (Spec.StorageClass & (SC_STATIC | SC_EXTERN)) == SC_STATIC);
-
-	/* Read declarations for this type */
-	Entry = 0;
-	comma = 0;
-       	while (1) {
-
-	    unsigned SymFlags;
-
-	    /* Read the next declaration */
-	    ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
-	    if (Decl.Ident[0] == '\0') {
-	    	gettok ();
-	    	break;
-	    }
-
-	    /* Get the symbol flags */
-	    SymFlags = Spec.StorageClass;
-	    if (IsFunc (Decl.Type)) {
-		SymFlags |= SC_FUNC;
-	    } else {
-	    	if (NeedStorage) {
-		    /* We will allocate storage, variable is defined */
-		    SymFlags |= SC_STORAGE | SC_DEF;
-		}
-	    }
-
-	    /* Add an entry to the symbol table */
-	    Entry = AddGlobalSym (Decl.Ident, Decl.Type, SymFlags);
-
-	    /* Reserve storage for the variable if we need to */
-       	    if (SymFlags & SC_STORAGE) {
-
-	     	/* Get the size of the variable */
-	     	unsigned Size = SizeOf (Decl.Type);
-
-	     	/* Allow initialization */
-	     	if (curtok == ASGN) {
-
-	     	    /* We cannot initialize types of unknown size, or
-	     	     * void types in non ANSI mode.
-	     	     */
-       	       	    if (Size == 0) {
-	     		if (!IsVoid (Decl.Type)) {
-	     		    if (!IsArray (Decl.Type)) {
-	     		      	/* Size is unknown and not an array */
-	     		      	Error (ERR_UNKNOWN_SIZE);
-	     		    }
-	     		} else if (ANSI) {
-	     		    /* We cannot declare variables of type void */
-	     		    Error (ERR_ILLEGAL_TYPE);
-	     		}
-	     	    }
-
-	     	    /* Switch to the data segment */
-	     	    g_usedata ();
-
-	     	    /* Define a label */
-	     	    g_defgloblabel (Entry->Name);
-
-	     	    /* Skip the '=' */
-	     	    gettok ();
-
-	     	    /* Parse the initialization */
-	     	    ParseInit (Entry->Type);
-	     	} else {
-
-	     	    if (IsVoid (Decl.Type)) {
-	     	    	/* We cannot declare variables of type void */
-	     		Error (ERR_ILLEGAL_TYPE);
-	     	    } else if (Size == 0) {
-	     		/* Size is unknown */
-	     		Error (ERR_UNKNOWN_SIZE);
-	     	    }
-
-	     	    /* Switch to the BSS segment */
-	     	    g_usebss ();
-
-	     	    /* Define a label */
-	     	    g_defgloblabel (Entry->Name);
-
-	     	    /* Allocate space for uninitialized variable */
-	     	    g_res (SizeOf (Entry->Type));
-	     	}
-
-	    }
-
-	    /* Check for end of declaration list */
-	    if (curtok == COMMA) {
-	    	gettok ();
-	    	comma = 1;
-	    } else {
-	     	break;
-	    }
-	}
-
-	/* Function declaration? */
-	if (IsFunc (Decl.Type)) {
-
-	    /* Function */
-	    if (!comma) {
-
-	     	if (curtok == SEMI) {
-
-	     	    /* Prototype only */
-	     	    gettok ();
-
-	     	} else {
-	     	    if (Entry) {
-	     	        NewFunc (Entry);
-	     	    }
-	     	}
-	    }
-
-	} else {
-
-	    /* Must be followed by a semicolon */
-	    ConsumeSemi ();
-
-	}
-    }
-}
-
-
-
-static void Compile (void)
-/* Compiler begins execution here. inp is input fd, output is output fd. */
-{
-    char* Path;
-
-
-    /* Setup variables */
-    filetab[0].f_iocb = inp;
-    LiteralLabel = GetLabel ();
-
-    /* Add some standard paths to the include search path */
-    AddIncludePath ("", INC_USER);		/* Current directory */
-    AddIncludePath ("include", INC_SYS);
-#ifdef CC65_INC
-    AddIncludePath (CC65_INC, INC_SYS);
-#else
-    AddIncludePath ("/usr/lib/cc65/include", INC_SYS);
-#endif
-    Path = getenv ("CC65_INC");
-    if (Path) {
-	AddIncludePath (Path, INC_SYS | INC_USER);
-    }
-
-    /* Add macros that are always defined */
-    AddNumericMacro ("__CC65__", (VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH);
-
-    /* Strict ANSI macro */
-    if (ANSI) {
-	AddNumericMacro ("__STRICT_ANSI__", 1);
-    }
-
-    /* Optimization macros */
-    if (Optimize) {
-	AddNumericMacro ("__OPT__", 1);
-	if (FavourSize == 0) {
-	    AddNumericMacro ("__OPT_i__", 1);
-	}
-	if (EnableRegVars) {
-	    AddNumericMacro ("__OPT_r__", 1);
-	}
-	if (InlineStdFuncs) {
-	    AddNumericMacro ("__OPT_s__", 1);
-	}
-    }
-
-    /* Create the base lexical level */
-    EnterGlobalLevel ();
-
-    /* Generate the code generator preamble */
-    g_preamble ();
-
-    /* Ok, start the ball rolling... */
-    Parse ();
-
-    /* Dump literal pool. */
-    DumpLiteralPool ();
-
-    /* Write imported/exported symbols */
-    EmitExternals ();
-
-    if (Debug) {
-	PrintLiteralStats (stdout);
-	PrintMacroStats (stdout);
-    }
-
-    /* Leave the main lexical level */
-    LeaveGlobalLevel ();
-
-    /* Print an error report */
-    ErrorReport ();
 }
 
 

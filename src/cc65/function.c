@@ -157,7 +157,7 @@ int AllocLocalSpace (Function* F, unsigned Size)
 /* Allocate space for the function locals, return stack offset */
 {
     /* Add the size */
-    F->LocalSize += Size;			
+    F->LocalSize += Size;
     if (F->LocalSize > F->LocalMax) {
       	F->LocalMax = F->LocalSize;
     }
@@ -213,7 +213,7 @@ void NewFunc (SymEntry* Func)
     }
 
     /* Need a starting curly brace */
-    if (curtok != LCURLY) {
+    if (curtok != TOK_LCURLY) {
     	Error (ERR_LCURLY_EXPECTED);
     }
 

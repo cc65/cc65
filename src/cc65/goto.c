@@ -51,10 +51,10 @@ void DoGoto (void)
 /* Process a goto statement. */
 {
     /* Eat the "goto" */
-    gettok ();
+    NextToken ();
 
     /* Label name must follow */
-    if (curtok != IDENT) {
+    if (curtok != TOK_IDENT) {
 
        	Error (ERR_IDENT_EXPECTED);
 
@@ -68,7 +68,7 @@ void DoGoto (void)
     }
 
     /* Eat the label name */
-    gettok ();
+    NextToken ();
 }
 
 
@@ -83,8 +83,8 @@ void DoLabel (void)
     g_defloclabel (Entry->V.Label);
 
     /* Eat the ident and colon */
-    gettok ();
-    gettok ();
+    NextToken ();
+    NextToken ();
 }
 
 

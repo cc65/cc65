@@ -79,7 +79,7 @@ enum {
 static void StringPragma (void (*Func) (const char*))
 /* Handle a pragma that expects a string parameter */
 {
-    if (curtok != SCONST) {
+    if (curtok != TOK_SCONST) {
 	Error (ERR_STRLIT_EXPECTED);
     } else {
      	/* Get the string */
@@ -93,7 +93,7 @@ static void StringPragma (void (*Func) (const char*))
     }
 
     /* Skip the string (or error) token */
-    gettok ();
+    NextToken ();
 }
 
 
@@ -129,10 +129,10 @@ void DoPragma (void)
     int Pragma;
 
     /* Skip the token itself */
-    gettok ();
+    NextToken ();
 
     /* Identifier must follow */
-    if (curtok != IDENT) {
+    if (curtok != TOK_IDENT) {
 	Error (ERR_IDENT_EXPECTED);
 	return;
     }
@@ -149,7 +149,7 @@ void DoPragma (void)
     }
 
     /* Skip the identifier and check for an open paren */
-    gettok ();
+    NextToken ();
     ConsumeLParen ();
 
     /* Switch for the different pragmas */

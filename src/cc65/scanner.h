@@ -17,115 +17,120 @@
 
 
 /*****************************************************************************/
-/*			       token definitions			     */
+/*			       Token definitions			     */
 /*****************************************************************************/
 
 
 
-#define CEOF 		0
+typedef enum token_t {
+    TOK_CEOF,
 
-#define AUTO	     	10
-#define EXTERN	     	11
-#define REGISTER     	12
-#define STATIC	     	13
-#define TYPEDEF	     	14
-#define ENUM		15
-#define CONST		16
-#define VOLATILE	17
+    TOK_AUTO,
+    TOK_EXTERN,
+    TOK_REGISTER,
+    TOK_STATIC,
+    TOK_TYPEDEF,
+    TOK_ENUM,
+    TOK_CONST,
+    TOK_VOLATILE,
 
-#define FIRSTTYPE      	19
-#define CHAR	     	19
-#define INT	     	20
-#define DOUBLE	     	21
-#define FLOAT	     	22
-#define LONG	     	23
-#define UNSIGNED     	24
-#define SIGNED	     	25
-#define SHORT	     	26
-#define STRUCT	     	27
-#define UNION	     	28
-#define VOID	     	29
-#define LASTTYPE     	29
+    /* Tokens denoting types */
+    TOK_FIRSTTYPE,
+    TOK_CHAR		= TOK_FIRSTTYPE,
+    TOK_INT,
+    TOK_DOUBLE,
+    TOK_FLOAT,
+    TOK_LONG,
+    TOK_UNSIGNED,
+    TOK_SIGNED,
+    TOK_SHORT,
+    TOK_STRUCT,
+    TOK_UNION,
+    TOK_VOID,
+    TOK_LASTTYPE	= TOK_VOID,
 
-#define DO		30
-#define FOR		31
-#define GOTO		32
-#define IF		33
-#define RETURN		34
-#define SWITCH		35
-#define WHILE		36
+    /* Control statements */
+    TOK_DO,
+    TOK_FOR,
+    TOK_GOTO,
+    TOK_IF,
+    TOK_RETURN,
+    TOK_SWITCH,
+    TOK_WHILE,
 
-#define ASM		40
-#define CASE		41
-#define DEFAULT		42
-#define BREAK		43
-#define CONTINUE	44
-#define ELSE		45
-#define ELLIPSIS	46
-#define SIZEOF 		47
+    TOK_ASM,
+    TOK_CASE,
+    TOK_DEFAULT,
+    TOK_BREAK,
+    TOK_CONTINUE,
+    TOK_ELSE,
+    TOK_ELLIPSIS,
+    TOK_SIZEOF,
 
-#define IDENT 		50
-#define SEMI 		51
+    TOK_IDENT,
+    TOK_SEMI,
 
-/* primary operators */
-#define LBRACK	     	52
-#define LPAREN	     	53
-#define DOT	     	54
-#define PREF	     	55
+    /* Primary operators */
+    TOK_LBRACK,
+    TOK_LPAREN,
+    TOK_DOT,
+    TOK_PTR_REF,
 
-#define LCURLY	     	56
-#define RBRACK 	     	57
-#define COMP 	     	58
-#define INC 	     	59
-#define PASGN 	     	60
-#define PLUS 	     	61
-#define COMMA 	     	62
-#define DEC 	     	63
-#define SASGN 	     	64
-#define RCURLY 	     	65
-#define MINUS 	     	66
-#define MASGN 	     	67
-#define STAR 	     	68
-#define DASGN 	     	69
-#define DIV 	     	70
-#define DAMP 	     	71
-#define AASGN 	     	72
-#define AMP 	     	73
-#define NE 	     	74
-#define BANG 	     	75
-#define DBAR 	     	76
-#define OASGN 	     	77
-#define BAR 	     	78
-#define EQ 	     	79
-#define ASGN 	     	80
-#define SLASGN 	     	81
-#define ASL 	     	82
+    TOK_LCURLY,
+    TOK_RBRACK,
+    TOK_COMP,
+    TOK_INC,
+    TOK_PLUS_ASSIGN,
+    TOK_PLUS,
+    TOK_COMMA,
+    TOK_DEC,
+    TOK_MINUS_ASSIGN,
+    TOK_RCURLY,
+    TOK_MINUS,
+    TOK_MUL_ASSIGN,
+    TOK_STAR,
+    TOK_DIV_ASSIGN,
+    TOK_DIV,
+    TOK_BOOL_AND,
+    TOK_AND_ASSIGN,
+    TOK_AND,
+    TOK_NE,
+    TOK_BOOL_NOT,
+    TOK_BOOL_OR,
+    TOK_OR_ASSIGN,
+    TOK_OR,
+    TOK_EQ,
+    TOK_ASSIGN,
+    TOK_SHL_ASSIGN,
+    TOK_SHL,
 
-/* inequalities */
-#define LE	     	83
-#define LT	     	84
-#define GE	     	85
-#define GT	     	86
+    /* Inequalities */
+    TOK_LE,
+    TOK_LT,
+    TOK_GE,
+    TOK_GT,
 
-#define SRASGN 	     	87
-#define ASR 	     	88
-#define XOASGN 	     	89
-#define XOR 	     	90
-#define MOASGN 	     	91
-#define MOD 	     	92
-#define QUEST 	     	93
-#define COLON 	     	94
-#define RPAREN 	     	95
-#define SCONST 	     	96
-#define ICONST 	     	97
-#define CCONST 	     	98
-#define FCONST 	     	99
+    TOK_SHR_ASSIGN,
+    TOK_SHR,
+    TOK_XOR_ASSIGN,
+    TOK_XOR,
+    TOK_MOD_ASSIGN,
+    TOK_MOD,
+    TOK_QUEST,
+    TOK_COLON,
+    TOK_RPAREN,
+    TOK_SCONST,
+    TOK_ICONST,
+    TOK_CCONST,
+    TOK_FCONST,
 
-#define	FASTCALL	100
-#define AX 	       	101
-#define EAX		102
+    TOK_ATTRIBUTE,
+    TOK_FASTCALL,
+    TOK_AX,
+    TOK_EAX,
 
-#define PRAGMA		110
+    TOK_PRAGMA
+} token_t;
 
 
 
@@ -138,7 +143,7 @@
 /* Token stuff */
 typedef struct Token_ Token;
 struct Token_ {
-    unsigned	Tok;		/* The token itself */
+    token_t	Tok;		/* The token itself */
     long	IVal;		/* The integer attribute */
     ident	Ident;		/* Identifier if IDENT */
     unsigned	Pos;		/* Source line where the token comes from */
@@ -173,10 +178,10 @@ void symname (char* s);
 int issym (char* s);
 /* Get symbol from input stream or return 0 if not a symbol. */
 
-void gettok (void);
+void NextToken (void);		      
 /* Get next token from input stream */
 
-void Consume (unsigned Token, unsigned char ErrNum);
+void Consume (token_t Token, unsigned ErrNum);
 /* Eat token if it is the next in the input stream, otherwise print an error
  * message.
  */

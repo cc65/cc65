@@ -60,7 +60,8 @@ enum Warnings {
     WARN_UNUSED_ITEM,
     WARN_CONSTANT_IS_LONG,
     WARN_NESTED_COMMENT,
-    WARN_COUNT	 		   	/* Warning count */
+    WARN_USELESS_DECL,
+    WARN_COUNT	      		   	/* Warning count */
 };
 
 /* Error numbers */
@@ -142,6 +143,7 @@ enum Errors {
     ERR_ILLEGAL_SIZE,
     ERR_FASTCALL,
     ERR_UNKNOWN_SIZE,
+    ERR_UNKNOWN_IDENT,
     ERR_COUNT 	     	    	   	/* Error count */
 };
 

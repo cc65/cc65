@@ -61,7 +61,7 @@ static int doif (void)
     int gotbreak;
 
     /* Skip the if */
-    gettok ();
+    NextToken ();
 
     /* Generate a jump label and parse the condition */
     flab1 = GetLabel ();
@@ -71,7 +71,7 @@ static int doif (void)
     gotbreak = statement ();
 
     /* Else clause present? */
-    if (curtok != ELSE) {
+    if (curtok != TOK_ELSE) {
 
       	g_defloclabel (flab1);
      	/* Since there's no else clause, we're not sure, if the a break
@@ -82,7 +82,7 @@ static int doif (void)
     } else {
 
      	/* Skip the else */
-     	gettok ();
+     	NextToken ();
 
      	/* If we had some sort of break statement at the end of the if clause,
      	 * there's no need to generate an additional jump around the else
@@ -116,7 +116,7 @@ static void dowhile (char wtype)
     int loop;
     int lab;
 
-    gettok ();
+    NextToken ();
     loop = GetLabel ();
     lab = GetLabel ();
     addloop (oursp, loop, lab, 0, 0);
@@ -132,9 +132,9 @@ static void dowhile (char wtype)
 	 * do another small optimization here, and use a conditional jump
 	 * instead an absolute one.
 	 */
-	if (curtok == SEMI) {
+	if (curtok == TOK_SEMI) {
 	    /* Shortcut */
-	    gettok ();
+	    NextToken ();
 	    /* Use a conditional jump */
 	    g_truejump (CF_NONE, loop);
 	} else {
@@ -148,7 +148,7 @@ static void dowhile (char wtype)
 
 	/* Do loop */
        	statement ();
-	Consume (WHILE, ERR_WHILE_EXPECTED);
+	Consume (TOK_WHILE, ERR_WHILE_EXPECTED);
     	test (loop, 1);
     	ConsumeSemi ();
 	g_defloclabel (lab);
@@ -167,8 +167,8 @@ static void doreturn (void)
     int HaveVal = 0;		/* Do we have a return value in ax? */
 
 
-    gettok ();
-    if (curtok != SEMI) {
+    NextToken ();
+    if (curtok != TOK_SEMI) {
        	if (HasVoidReturn (CurrentFunc)) {
        	    Error (ERR_CANNOT_RETURN_VALUE);
        	}
@@ -198,7 +198,7 @@ static void dobreak (void)
 {
     struct loopdesc* l;
 
-    gettok ();
+    NextToken ();
     if ((l = currentloop ()) == 0) {
 	/* Error: No current loop */
        	return;
@@ -214,7 +214,7 @@ static void docontinue (void)
 {
     struct loopdesc* l;
 
-    gettok ();
+    NextToken ();
     if ((l = currentloop ()) == 0) {
 	/* Error: Not in loop */
        	return;
@@ -263,9 +263,9 @@ static void cascadeswitch (struct expent* eval)
 
     /* Parse the labels */
     lcount = 0;
-    while (curtok != RCURLY) {
+    while (curtok != TOK_RCURLY) {
 
-	if (curtok == CASE || curtok == DEFAULT) {
+	if (curtok == TOK_CASE || curtok == TOK_DEFAULT) {
 
 	    /* If the code for the previous selector did not end with a
 	     * break statement, we must jump over the next selector test.
@@ -284,16 +284,16 @@ static void cascadeswitch (struct expent* eval)
 		nextlab = 0;
 	    }
 
-	    while (curtok == CASE || curtok == DEFAULT) {
+	    while (curtok == TOK_CASE || curtok == TOK_DEFAULT) {
 
 		/* Parse the selector */
-		if (curtok == CASE) {
+		if (curtok == TOK_CASE) {
 
 		    /* Count labels */
 		    ++lcount;
 
 		    /* Skip the "case" token */
-		    gettok ();
+		    NextToken ();
 
 		    /* Read the selector expression */
 		    constexpr (&lval);
@@ -343,13 +343,13 @@ static void cascadeswitch (struct expent* eval)
 		    /* If another case follows, we will jump to the code if
 		     * the condition is true.
 		     */
-		    if (curtok == CASE) {
+		    if (curtok == TOK_CASE) {
 			/* Create a code label if needed */
 			if (codelab == 0) {
 			    codelab = GetLabel ();
 			}
 			g_falsejump (CF_NONE, codelab);
-		    } else if (curtok != DEFAULT) {
+		    } else if (curtok != TOK_DEFAULT) {
 			/* No case follows, jump to next selector */
 			if (nextlab == 0) {
 			    nextlab = GetLabel ();
@@ -360,13 +360,13 @@ static void cascadeswitch (struct expent* eval)
 		} else {
 
 		    /* Default case */
-		    gettok ();
+		    NextToken ();
 
 		    /* Skip the colon */
 		    ConsumeColon ();
 
 		    /* Handle the pathologic case: DEFAULT followed by CASE */
-		    if (curtok == CASE) {
+		    if (curtok == TOK_CASE) {
 			if (codelab == 0) {
 			    codelab = GetLabel ();
 			}
@@ -385,7 +385,7 @@ static void cascadeswitch (struct expent* eval)
 	}
 
 	/* Parse statements */
-	if (curtok != RCURLY) {
+	if (curtok != TOK_RCURLY) {
        	    havebreak = statement ();
 	}
     }
@@ -396,7 +396,7 @@ static void cascadeswitch (struct expent* eval)
     }
 
     /* Eat the closing curly brace */
-    gettok ();
+    NextToken ();
 
     /* Define the exit label and, if there's a next label left, create this
      * one, too.
@@ -445,15 +445,15 @@ static void tableswitch (struct expent* eval)
     /* Jump behind the code for the CASE labels */
     g_jump (lcase = GetLabel ());
     lcount = 0;
-    while (curtok != RCURLY) {
-    	if (curtok == CASE || curtok == DEFAULT) {
+    while (curtok != TOK_RCURLY) {
+    	if (curtok == TOK_CASE || curtok == TOK_DEFAULT) {
 	    if (lcount >= CASE_MAX) {
        	       	Fatal (FAT_TOO_MANY_CASE_LABELS);
      	    }
     	    label = GetLabel ();
     	    do {
-    	    	if (curtok == CASE) {
-       	    	    gettok ();
+    	    	if (curtok == TOK_CASE) {
+       	    	    NextToken ();
     	    	    constexpr (&lval);
 	    	    if (!IsInt (lval.e_tptr)) {
 	    		Error (ERR_ILLEGAL_TYPE);
@@ -463,15 +463,15 @@ static void tableswitch (struct expent* eval)
     	    	    ++p;
 	    	    ++lcount;
     	    	} else {
-    	    	    gettok ();
+    	    	    NextToken ();
      	    	    dlabel = label;
     	    	}
     	    	ConsumeColon ();
-    	    } while (curtok == CASE || curtok == DEFAULT);
+    	    } while (curtok == TOK_CASE || curtok == TOK_DEFAULT);
     	    g_defloclabel (label);
 	    havebreak = 0;
     	}
-    	if (curtok != RCURLY) {
+    	if (curtok != TOK_RCURLY) {
     	    havebreak = statement ();
     	}
     }
@@ -482,7 +482,7 @@ static void tableswitch (struct expent* eval)
     }
 
     /* Eat the closing curly brace */
-    gettok ();
+    NextToken ();
 
     /* If the last statement doesn't have a break or return, add one */
     if (!havebreak) {
@@ -526,7 +526,7 @@ static void doswitch (void)
     struct expent eval;		/* Switch statement expression */
 
     /* Eat the "switch" */
-    gettok ();
+    NextToken ();
 
     /* Read the switch expression */
     ConsumeLParen ();
@@ -557,19 +557,19 @@ static void dofor (void)
     struct expent lval2;
     struct expent lval3;
 
-    gettok ();
+    NextToken ();
     loop = GetLabel ();
     lab = GetLabel ();
     linc = GetLabel ();
     lstat = GetLabel ();
     addloop (oursp, loop, lab, linc, lstat);
     ConsumeLParen ();
-    if (curtok != SEMI) {	/* exp1 */
+    if (curtok != TOK_SEMI) {	/* exp1 */
 	expression (&lval1);
     }
     ConsumeSemi ();
     g_defloclabel (loop);
-    if (curtok != SEMI) { 	/* exp2 */
+    if (curtok != TOK_SEMI) { 	/* exp2 */
 	boolexpr (&lval2);
 	g_truejump (CF_NONE, lstat);
 	g_jump (lab);
@@ -578,7 +578,7 @@ static void dofor (void)
     }
     ConsumeSemi ();
     g_defloclabel (linc);
-    if (curtok != RPAREN) {	/* exp3 */
+    if (curtok != TOK_RPAREN) {	/* exp3 */
     	expression (&lval3);
     }
     ConsumeRParen ();
@@ -601,7 +601,7 @@ static int statement (void)
     struct expent lval;
 
     /* */
-    if (curtok == IDENT && nxttok == COLON) {
+    if (curtok == TOK_IDENT && nxttok == TOK_COLON) {
 
 	/* Special handling for a label */
 	DoLabel ();
@@ -610,54 +610,54 @@ static int statement (void)
 
      	switch (curtok) {
 
-     	    case LCURLY:
+     	    case TOK_LCURLY:
      		return compound ();
 
-     	    case IF:
+     	    case TOK_IF:
      		return doif ();
 
-     	    case WHILE:
+     	    case TOK_WHILE:
      		dowhile ('w');
 		break;
 
-	    case DO:
+	    case TOK_DO:
 		dowhile ('d');
 		break;
 
-	    case SWITCH:
+	    case TOK_SWITCH:
 		doswitch ();
 		break;
 
-	    case RETURN:
+	    case TOK_RETURN:
 		doreturn ();
 		ConsumeSemi ();
 		return 1;
 
-	    case BREAK:
+	    case TOK_BREAK:
 		dobreak ();
 		ConsumeSemi ();
 		return 1;
 
-	    case CONTINUE:
+	    case TOK_CONTINUE:
 		docontinue ();
 		ConsumeSemi ();
 		return 1;
 
-	    case FOR:
+	    case TOK_FOR:
 		dofor ();
 		break;
 
-	    case GOTO:
+	    case TOK_GOTO:
 		DoGoto ();
 		ConsumeSemi ();
 		return 1;
 
-	    case SEMI:
+	    case TOK_SEMI:
 		/* ignore it. */
-		gettok ();
+		NextToken ();
 		break;
 
-	    case PRAGMA:
+	    case TOK_PRAGMA:
 		DoPragma ();
 		break;
 
@@ -682,7 +682,7 @@ int compound (void)
     int oldsp;
 
     /* eat LCURLY */
-    gettok ();
+    NextToken ();
 
     /* Remember the stack at block entry */
     oldsp = oursp;
@@ -698,8 +698,8 @@ int compound (void)
 
     /* Now process statements in the function body */
     isbrk = 0;
-    while (curtok != RCURLY) {
-     	if (curtok == CEOF)
+    while (curtok != TOK_RCURLY) {
+     	if (curtok == TOK_CEOF)
      	    break;
      	else {
      	    isbrk = statement ();

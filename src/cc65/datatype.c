@@ -184,10 +184,9 @@ type* GetImplicitFuncType (void)
     type* T = TypeAlloc (1 + DECODE_SIZE + 2);
 
     /* Prepare the function descriptor */
-    F->Flags 	 = FD_IMPLICIT | FD_ELLIPSIS;
-    F->SymTab	 = &EmptySymTab;
-    F->StructTab = &EmptySymTab;
-    F->EnumTab   = &EmptySymTab;
+    F->Flags  = FD_IMPLICIT | FD_EMPTY | FD_ELLIPSIS;
+    F->SymTab = &EmptySymTab;
+    F->TagTab = &EmptySymTab;
 
     /* Fill the type string */
     T [0]    	      = T_FUNC;

@@ -15,6 +15,7 @@ OBJS =	anonname.o	\
 	asmline.o	\
 	check.o       	\
 	codegen.o	\
+	compile.o	\
 	ctrans.o       	\
 	datatype.o	\
 	declare.o      	\

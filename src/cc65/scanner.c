@@ -48,44 +48,45 @@ static struct Keyword {
     unsigned char   Tok;    	/* The token */
     unsigned char   Type;      	/* Token type */
 } Keywords [] = {
-    { "__AX__",	       	AX,    	       	TT_C	},
-    { "__EAX__",       	EAX,   	       	TT_C	},
-    { "__asm__",       	ASM,   	       	TT_C	},
-    { "__fastcall__",  	FASTCALL,      	TT_C	},
-    { "asm",   	       	ASM,   		TT_EXT 	},
-    { "auto",  	       	AUTO,  	       	TT_C  	},
-    { "break", 	       	BREAK, 	       	TT_C  	},
-    { "case",  	       	CASE,  	       	TT_C  	},
-    { "char",  	       	CHAR,  	       	TT_C  	},
-    { "const", 	       	CONST, 	       	TT_C  	},
-    { "continue",      	CONTINUE,      	TT_C  	},
-    { "default",       	DEFAULT,       	TT_C  	},
-    { "do",    	       	DO,    	       	TT_C  	},
-    { "double",        	DOUBLE,	       	TT_C   	},
-    { "else",  	       	ELSE,  	       	TT_C  	},
-    { "enum",  	       	ENUM,  	       	TT_C  	},
-    { "extern",        	EXTERN,	       	TT_C   	},
-    { "fastcall",      	FASTCALL,	TT_EXT 	},
-    { "float", 	       	FLOAT, 	       	TT_C  	},
-    { "for",   	       	FOR,   	       	TT_C  	},
-    { "goto",  	       	GOTO,  	       	TT_C  	},
-    { "if",    	       	IF,    	       	TT_C  	},
-    { "int",   	       	INT,   	       	TT_C  	},
-    { "long",  	       	LONG,  	       	TT_C  	},
-    { "register",      	REGISTER,      	TT_C  	},
-    { "return",        	RETURN,	       	TT_C  	},
-    { "short", 	       	SHORT, 	       	TT_C  	},
-    { "signed",	       	SIGNED,	       	TT_C  	},
-    { "sizeof",        	SIZEOF,	       	TT_C  	},
-    { "static",        	STATIC,	       	TT_C  	},
-    { "struct",        	STRUCT,	       	TT_C  	},
-    { "switch",        	SWITCH,	       	TT_C	},
-    { "typedef",       	TYPEDEF,       	TT_C	},
-    { "union", 	       	UNION, 	       	TT_C	},
-    { "unsigned",      	UNSIGNED,      	TT_C	},
-    { "void",  	       	VOID,  	       	TT_C	},
-    { "volatile",      	VOLATILE,      	TT_C	},
-    { "while", 	       	WHILE, 	       	TT_C	},
+    { "__AX__",	       	TOK_AX,		TT_C	},
+    { "__EAX__",       	TOK_EAX,   	TT_C	},
+    { "__asm__",       	TOK_ASM,   	TT_C	},
+    { "__attribute__",	TOK_ATTRIBUTE,	TT_C	},
+    { "__fastcall__",  	TOK_FASTCALL,   TT_C	},
+    { "asm",   	       	TOK_ASM,   	TT_EXT 	},
+    { "auto",  	       	TOK_AUTO,  	TT_C  	},
+    { "break", 	       	TOK_BREAK, 	TT_C  	},
+    { "case",  	       	TOK_CASE,  	TT_C  	},
+    { "char",  	       	TOK_CHAR,  	TT_C  	},
+    { "const", 	       	TOK_CONST, 	TT_C  	},
+    { "continue",      	TOK_CONTINUE,   TT_C  	},
+    { "default",       	TOK_DEFAULT,    TT_C  	},
+    { "do",    	       	TOK_DO,    	TT_C  	},
+    { "double",        	TOK_DOUBLE,	TT_C   	},
+    { "else",  	       	TOK_ELSE,  	TT_C  	},
+    { "enum",  	       	TOK_ENUM,  	TT_C  	},
+    { "extern",        	TOK_EXTERN,	TT_C   	},
+    { "fastcall",      	TOK_FASTCALL,	TT_EXT 	},
+    { "float", 	       	TOK_FLOAT, 	TT_C  	},
+    { "for",   	       	TOK_FOR,   	TT_C  	},
+    { "goto",  	       	TOK_GOTO,  	TT_C  	},
+    { "if",    	       	TOK_IF,    	TT_C  	},
+    { "int",   	       	TOK_INT,   	TT_C  	},
+    { "long",  	       	TOK_LONG,  	TT_C  	},
+    { "register",      	TOK_REGISTER,   TT_C  	},
+    { "return",        	TOK_RETURN,	TT_C  	},
+    { "short", 	       	TOK_SHORT, 	TT_C  	},
+    { "signed",	       	TOK_SIGNED,	TT_C  	},
+    { "sizeof",        	TOK_SIZEOF,	TT_C  	},
+    { "static",        	TOK_STATIC,	TT_C  	},
+    { "struct",        	TOK_STRUCT,	TT_C  	},
+    { "switch",        	TOK_SWITCH,	TT_C	},
+    { "typedef",       	TOK_TYPEDEF,    TT_C	},
+    { "union", 	       	TOK_UNION, 	TT_C	},
+    { "unsigned",      	TOK_UNSIGNED,   TT_C	},
+    { "void",  	       	TOK_VOID,  	TT_C	},
+    { "volatile",      	TOK_VOLATILE,   TT_C	},
+    { "while", 	       	TOK_WHILE, 	TT_C	},
 };
 #define KEY_COUNT	(sizeof (Keywords) / sizeof (Keywords [0]))
 
@@ -123,7 +124,7 @@ static int FindKey (char* Key)
     if (K && (K->Type != TT_EXT || ANSI == 0)) {
 	return K->Tok;
     } else {
-	return IDENT;
+	return TOK_IDENT;
     }
 }
 
@@ -303,7 +304,7 @@ static void CharConst (void)
     }
 
     /* Setup values and attributes */
-    nxttok  = CCONST;
+    nxttok  = TOK_CCONST;
     nxtval  = SignExtendChar (ctrans (c)); 	/* Translate into target charset */
     nxttype = type_int;	       			/* Character constants have type int */
 }
@@ -314,7 +315,7 @@ static void StringConst (void)
 /* Parse a quoted string */
 {
     nxtval = GetLiteralOffs ();
-    nxttok = SCONST;
+    nxttok = TOK_SCONST;
 
     /* Be sure to concatenate strings */
     while (*lptr == '\"') {
@@ -344,7 +345,7 @@ static void StringConst (void)
 
 
 
-void gettok (void)
+void NextToken (void)
 /* Get next token from input stream */
 {
     char c;
@@ -359,7 +360,7 @@ void gettok (void)
     /* Skip spaces and read the next line if needed */
     if (skipwhite () == 0) {
 	/* End of file reached */
-	nxttok = CEOF;
+	nxttok = TOK_CEOF;
 	return;
     }
 
@@ -460,14 +461,14 @@ void gettok (void)
 
      	/* Set the value and the token */
      	nxtval = k;
-     	nxttok = ICONST;
+     	nxttok = TOK_ICONST;
      	return;
     }
 
     if (issym (token)) {
 
      	/* Check for a keyword */
-     	if ((nxttok = FindKey (token)) != IDENT) {
+     	if ((nxttok = FindKey (token)) != TOK_IDENT) {
      	    /* Reserved word found */
      	    return;
      	}
@@ -476,15 +477,15 @@ void gettok (void)
      	    /* Special symbols */
      	    if (strcmp (token, "__FILE__") == 0) {
 	       	nxtval = AddLiteral (fin);
-	       	nxttok = SCONST;
+	       	nxttok = TOK_SCONST;
 	       	return;
 	    } else if (strcmp (token, "__LINE__") == 0) {
-	       	nxttok  = ICONST;
+	       	nxttok  = TOK_ICONST;
     	       	nxtval  = ln;
     	       	nxttype = type_int;
     	       	return;
     	    } else if (strcmp (token, "__fixargs__") == 0) {
-    	       	nxttok  = ICONST;
+    	       	nxttok  = TOK_ICONST;
     	       	nxtval  = GetParamSize (CurrentFunc);
     	       	nxttype = type_uint;
     	       	return;
@@ -492,7 +493,7 @@ void gettok (void)
 	       	/* __func__ is only defined in functions */
 	       	if (CurrentFunc) {
 	       	    nxtval = AddLiteral (GetFuncName (CurrentFunc));
-	       	    nxttok = SCONST;
+	       	    nxttok = TOK_SCONST;
 	       	    return;
 	       	}
 	    }
@@ -500,7 +501,7 @@ void gettok (void)
 
        	/* No reserved word but identifier */
 	strcpy (NextTok.Ident, token);
-     	NextTok.Tok = IDENT;
+     	NextTok.Tok = TOK_IDENT;
     	return;
     }
 
@@ -509,9 +510,9 @@ void gettok (void)
 
     	case '!':
     	    if (*++lptr == '=') {
-    		SetTok (NE);
+    		SetTok (TOK_NE);
     	    } else {
-    		nxttok = BANG;
+    		nxttok = TOK_BOOL_NOT;
     	    }
     	    break;
 
@@ -521,22 +522,22 @@ void gettok (void)
 
     	case '%':
     	    if (*++lptr == '=') {
-    		SetTok (MOASGN);
+    		SetTok (TOK_MOD_ASSIGN);
     	    } else {
-    		nxttok = MOD;
+    		nxttok = TOK_MOD;
     	    }
     	    break;
 
     	case '&':
     	    switch (*++lptr) {
     		case '&':
-    		    SetTok (DAMP);
+    		    SetTok (TOK_BOOL_AND);
     		    break;
     		case '=':
-    		    SetTok (AASGN);
+    		    SetTok (TOK_AND_ASSIGN);
     	      	    break;
     		default:
-    		    nxttok = AMP;
+    		    nxttok = TOK_AND;
     	    }
     	    break;
 
@@ -545,167 +546,167 @@ void gettok (void)
     	    break;
 
     	case '(':
-    	    SetTok (LPAREN);
+    	    SetTok (TOK_LPAREN);
     	    break;
 
     	case ')':
-    	    SetTok (RPAREN);
+    	    SetTok (TOK_RPAREN);
     	    break;
 
     	case '*':
     	    if (*++lptr == '=') {
-    		SetTok (MASGN);
+    		SetTok (TOK_MUL_ASSIGN);
     	    } else {
-    		nxttok = STAR;
+    		nxttok = TOK_STAR;
     	    }
     	    break;
 
     	case '+':
     	    switch (*++lptr) {
     	    	case '+':
-    		    SetTok (INC);
+    		    SetTok (TOK_INC);
     		    break;
     	     	case '=':
-    		    SetTok (PASGN);
+    		    SetTok (TOK_PLUS_ASSIGN);
     		    break;
     		default:
-    		    nxttok = PLUS;
+    		    nxttok = TOK_PLUS;
     	    }
     	    break;
 
     	case ',':
-    	    SetTok (COMMA);
+    	    SetTok (TOK_COMMA);
     	    break;
 
     	case '-':
     	    switch (*++lptr) {
     	      	case '-':
-    		    SetTok (DEC);
+    		    SetTok (TOK_DEC);
     		    break;
     		case '=':
-    	    	    SetTok (SASGN);
+    	    	    SetTok (TOK_MINUS_ASSIGN);
     		    break;
     		case '>':
-    	    	    SetTok (PREF);
+    	    	    SetTok (TOK_PTR_REF);
     		    break;
     		default:
-    		    nxttok = MINUS;
+    		    nxttok = TOK_MINUS;
     	    }
     	    break;
 
     	case '.':
     	    if (*++lptr == '.') {
     		if (*++lptr == '.') {
-    		    SetTok (ELLIPSIS);
+    		    SetTok (TOK_ELLIPSIS);
     		} else {
     		    unknown (*lptr);
     		}
     	    } else {
-    		nxttok = DOT;
+    		nxttok = TOK_DOT;
     	    }
     	    break;
 
     	case '/':
     	    if (*++lptr == '=') {
-    		SetTok (DASGN);
+    		SetTok (TOK_DIV_ASSIGN);
     	    } else {
-    		nxttok = DIV;
+    	     	nxttok = TOK_DIV;
     	    }
     	    break;
 
     	case ':':
-    	    SetTok (COLON);
+    	    SetTok (TOK_COLON);
     	    break;
 
     	case ';':
-    	    SetTok (SEMI);
+    	    SetTok (TOK_SEMI);
     	    break;
 
     	case '<':
     	    switch (*++lptr) {
     		case '=':
-    	      	    SetTok (LE);
+    	      	    SetTok (TOK_LE);
     	    	    break;
     		case '<':
     		    if (*++lptr == '=') {
-    		    	SetTok (SLASGN);
+    		    	SetTok (TOK_SHL_ASSIGN);
     		    } else {
-    		    	nxttok = ASL;
+    		    	nxttok = TOK_SHL;
     	    	    }
     		    break;
     		default:
-    		    nxttok = LT;
+    		    nxttok = TOK_LT;
     	    }
     	    break;
 
     	case '=':
     	    if (*++lptr == '=') {
-    		SetTok (EQ);
+    		SetTok (TOK_EQ);
     	    } else {
-    		nxttok = ASGN;
+    		nxttok = TOK_ASSIGN;
     	    }
     	    break;
 
     	case '>':
     	    switch (*++lptr) {
     		case '=':
-    		    SetTok (GE);
+    		    SetTok (TOK_GE);
     		    break;
     		case '>':
     		    if (*++lptr == '=') {
-    		    	SetTok (SRASGN);
+    		    	SetTok (TOK_SHR_ASSIGN);
     		    } else {
-    	     	    	nxttok = ASR;
+    	     	    	nxttok = TOK_SHR;
     		    }
     		    break;
     		default:
-    		    nxttok = GT;
+    		    nxttok = TOK_GT;
     	    }
     	    break;
 
     	case '?':
-    	    SetTok (QUEST);
+    	    SetTok (TOK_QUEST);
     	    break;
 
     	case '[':
-    	    SetTok (LBRACK);
+    	    SetTok (TOK_LBRACK);
     	    break;
 
     	case ']':
-    	    SetTok (RBRACK);
+    	    SetTok (TOK_RBRACK);
     	    break;
 
     	case '^':
     	    if (*++lptr == '=') {
-    		SetTok (XOASGN);
+    		SetTok (TOK_XOR_ASSIGN);
     	    } else {
-    		nxttok = XOR;
+    		nxttok = TOK_XOR;
     	    }
     	    break;
 
     	case '{':
-    	    SetTok (LCURLY);
+    	    SetTok (TOK_LCURLY);
     	    break;
 
         case '|':
     	    switch (*++lptr) {
     		case '|':
-    		    SetTok (DBAR);
+    		    SetTok (TOK_BOOL_OR);
     		    break;
     		case '=':
-    		    SetTok (OASGN);
+    		    SetTok (TOK_OR_ASSIGN);
     		    break;
     		default:
-    		    nxttok = BAR;
+    		    nxttok = TOK_OR;
     	    }
     	    break;
 
     	case '}':
-    	    SetTok (RCURLY);
+    	    SetTok (TOK_RCURLY);
     	    break;
 
     	case '~':
-    	    SetTok (COMP);
+    	    SetTok (TOK_COMP);
     	    break;
 
         case '#':
@@ -714,7 +715,7 @@ void gettok (void)
 	      	/* OOPS - should not happen */
 	      	Error (ERR_CPP_DIRECTIVE_EXPECTED);
 	    }
-	    nxttok = PRAGMA;
+	    nxttok = TOK_PRAGMA;
 	    break;
 
     	default:
@@ -726,13 +727,13 @@ void gettok (void)
 
 
 
-void Consume (unsigned Token, unsigned char ErrNum)
+void Consume (token_t Token, unsigned ErrNum)
 /* Eat token if it is the next in the input stream, otherwise print an error
  * message.
  */
 {
     if (curtok == Token) {
-	gettok ();
+	NextToken ();
     } else {
        	Error (ErrNum);
     }
@@ -743,7 +744,7 @@ void Consume (unsigned Token, unsigned char ErrNum)
 void ConsumeColon (void)
 /* Check for a colon and skip it. */
 {
-    Consume (COLON, ERR_COLON_EXPECTED);
+    Consume (TOK_COLON, ERR_COLON_EXPECTED);
 }
 
 
@@ -752,12 +753,12 @@ void ConsumeSemi (void)
 /* Check for a semicolon and skip it. */
 {
     /* Try do be smart about typos... */
-    if (curtok == SEMI) {
-	gettok ();
+    if (curtok == TOK_SEMI) {
+	NextToken ();
     } else {
 	Error (ERR_SEMICOLON_EXPECTED);
-	if (curtok == COLON || curtok == COMMA) {
-	    gettok ();
+	if (curtok == TOK_COLON || curtok == TOK_COMMA) {
+	    NextToken ();
 	}
     }
 }
@@ -767,7 +768,7 @@ void ConsumeSemi (void)
 void ConsumeLParen (void)
 /* Check for a left parenthesis and skip it */
 {
-    Consume (LPAREN, ERR_LPAREN_EXPECTED);
+    Consume (TOK_LPAREN, ERR_LPAREN_EXPECTED);
 }
 
 
@@ -775,7 +776,7 @@ void ConsumeLParen (void)
 void ConsumeRParen (void)
 /* Check for a right parenthesis and skip it */
 {
-    Consume (RPAREN, ERR_RPAREN_EXPECTED);
+    Consume (TOK_RPAREN, ERR_RPAREN_EXPECTED);
 }
 
 
@@ -783,7 +784,7 @@ void ConsumeRParen (void)
 void ConsumeLBrack (void)
 /* Check for a left bracket and skip it */
 {
-    Consume (LBRACK, ERR_LBRACK_EXPECTED);
+    Consume (TOK_LBRACK, ERR_LBRACK_EXPECTED);
 }
 
 
@@ -791,7 +792,7 @@ void ConsumeLBrack (void)
 void ConsumeRBrack (void)
 /* Check for a right bracket and skip it */
 {
-    Consume (RBRACK, ERR_RBRACK_EXPECTED);
+    Consume (TOK_RBRACK, ERR_RBRACK_EXPECTED);
 }
 
 
@@ -799,7 +800,7 @@ void ConsumeRBrack (void)
 void ConsumeLCurly (void)
 /* Check for a left curly brace and skip it */
 {
-    Consume (LCURLY, ERR_LCURLY_EXPECTED);
+    Consume (TOK_LCURLY, ERR_LCURLY_EXPECTED);
 }
 
 
@@ -807,7 +808,7 @@ void ConsumeLCurly (void)
 void ConsumeRCurly (void)
 /* Check for a right curly brace and skip it */
 {
-    Consume (RCURLY, ERR_RCURLY_EXPECTED);
+    Consume (TOK_RCURLY, ERR_RCURLY_EXPECTED);
 }
 
 

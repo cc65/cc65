@@ -65,6 +65,7 @@ static char* WarnMsg [WARN_COUNT-1] = {
     "`%s' is defined but never used",
     "Constant is long",
     "`/*' found inside a comment",
+    "Useless declaration",
 };
 
 
@@ -147,6 +148,7 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "Illegal size of data type",
     "__fastcall__ is not allowed for C functions",
     "Variable has unknown size",
+    "Unknown identifier: `%s'",
 };
 
 

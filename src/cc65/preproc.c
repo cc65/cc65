@@ -401,7 +401,7 @@ static void addmac (void)
 static int Pass1 (char* from, char* to)
 /* Preprocessor pass 1.  Remove whitespace and comments. */
 {
-    int 	c;	
+    int 	c;
     int 	done;
     ident	Ident;
     int 	HaveParen;
@@ -586,8 +586,8 @@ static int doiff (int skip)
     xlateline ();
 
     /* Prime the token pump (remove old tokens from the stream) */
-    gettok ();
-    gettok ();
+    NextToken ();
+    NextToken ();
 
     /* Call the expression parser */
     constexpr (&lval);

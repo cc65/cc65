@@ -117,11 +117,11 @@ void LeaveStructLevel (void);
 SymEntry* FindSym (const char* Name);
 /* Find the symbol with the given name */
 
-SymEntry* FindStructSym (const char* Name);
-/* Find the symbol with the given name in the struct table */
+SymEntry* FindLocalSym (const char* Name);
+/* Find the symbol with the given name in the current symbol table only */
 
-SymEntry* FindEnumSym (const char* Name);
-/* Find the symbol with the given name in the enum table */
+SymEntry* FindTagSym (const char* Name);
+/* Find the symbol with the given name in the tag table */
 
 SymEntry* FindStructField (const type* TypeArray, const char* Name);
 /* Find a struct field in the fields list */
@@ -159,6 +159,9 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags);
 
 SymTable* GetSymTab (void);
 /* Return the current symbol table */
+
+int SymIsLocal (SymEntry* Sym);
+/* Return true if the symbol is defined in the highest lexical level */
 
 int EqualTypes (const type* t1, const type* t2);
 /* Recursively compare two types. Return 1 if the types match, return 0

@@ -37,7 +37,7 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-		    
+
 #include "../common/hashstr.h"
 
 #include "asmcode.h"
@@ -86,10 +86,8 @@ SymTable	EmptySymTab = {
 static unsigned		LexicalLevel   	= 0;	/* For safety checks */
 static SymTable*	SymTab0	       	= 0;
 static SymTable*	SymTab         	= 0;
-static SymTable*	StructTab0     	= 0;
-static SymTable*	StructTab      	= 0;
-static SymTable*	EnumTab0       	= 0;
-static SymTable*	EnumTab	       	= 0;
+static SymTable*	TagTab0     	= 0;
+static SymTable*	TagTab      	= 0;
 static SymTable*	LabelTab       	= 0;
 
 
@@ -207,11 +205,8 @@ void EnterGlobalLevel (void)
     /* Create and assign the symbol table */
     SymTab0 = SymTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
 
-    /* Create and assign the struct table */
-    StructTab0 = StructTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
-
-    /* Create and assign the enum table */
-    EnumTab0 = EnumTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
+    /* Create and assign the tag table */
+    TagTab0 = TagTab = NewSymTable (SYMTAB_SIZE_GLOBAL);
 }
 
 
@@ -228,14 +223,12 @@ void LeaveGlobalLevel (void)
     /* Dump the tables if requested */
     if (Debug) {
 	PrintSymTable (SymTab0, stdout, "Global symbol table");
-	PrintSymTable (StructTab0, stdout, "Global struct table");
-	PrintSymTable (EnumTab0, stdout, "Global enum table");
+	PrintSymTable (TagTab0, stdout, "Global tag table");
     }
 
     /* Don't delete the symbol and struct tables! */
-    SymTab0  	= SymTab    = 0;
-    StructTab0	= StructTab = 0;
-    EnumTab0 	= EnumTab   = 0;
+    SymTab0 = SymTab = 0;
+    TagTab0 = TagTab = 0;
 }
 
 
@@ -253,15 +246,10 @@ void EnterFunctionLevel (void)
     S->PrevTab = SymTab;
     SymTab     = S;
 
-    /* Get a new struct table and make it current */
+    /* Get a new tag table and make it current */
     S = NewSymTable (SYMTAB_SIZE_FUNCTION);
-    S->PrevTab = StructTab;
-    StructTab  = S;
-
-    /* Get a new enum table and make it current */
-    S = NewSymTable (SYMTAB_SIZE_FUNCTION);
-    S->PrevTab = EnumTab;
-    EnumTab    = S;
+    S->PrevTab = TagTab;
+    TagTab  = S;
 
     /* Create and assign a new label table */
     LabelTab = NewSymTable (SYMTAB_SIZE_LABEL);
@@ -276,14 +264,12 @@ void RememberFunctionLevel (struct FuncDesc* F)
     --LexicalLevel;
 
     /* Remember the tables */
-    F->SymTab	 = SymTab;
-    F->StructTab = StructTab;
-    F->EnumTab	 = EnumTab;
+    F->SymTab = SymTab;
+    F->TagTab = TagTab;
 
     /* Don't delete the tables */
-    SymTab    = SymTab->PrevTab;
-    StructTab = StructTab->PrevTab;
-    EnumTab   = EnumTab->PrevTab;
+    SymTab = SymTab->PrevTab;
+    TagTab = TagTab->PrevTab;
 }
 
 
@@ -298,11 +284,8 @@ void ReenterFunctionLevel (struct FuncDesc* F)
     F->SymTab->PrevTab = SymTab;
     SymTab = F->SymTab;
 
-    F->StructTab->PrevTab = StructTab;
-    StructTab = F->StructTab;
-
-    F->EnumTab->PrevTab = EnumTab;
-    EnumTab = F->EnumTab;
+    F->TagTab->PrevTab = TagTab;
+    TagTab = F->TagTab;
 
     /* Create and assign a new label table */
     LabelTab = NewSymTable (SYMTAB_SIZE_LABEL);
@@ -326,9 +309,8 @@ void LeaveFunctionLevel (void)
     }
 
     /* Don't delete the tables */
-    SymTab    = SymTab->PrevTab;
-    StructTab = StructTab->PrevTab;
-    EnumTab   = EnumTab->PrevTab;
+    SymTab = SymTab->PrevTab;
+    TagTab = TagTab->PrevTab;
     LabelTab  = 0;
 }
 
@@ -347,15 +329,10 @@ void EnterBlockLevel (void)
     S->PrevTab 	= SymTab;
     SymTab     	= S;
 
-    /* Get a new struct table and make it current */
+    /* Get a new tag table and make it current */
     S = NewSymTable (SYMTAB_SIZE_BLOCK);
-    S->PrevTab 	= StructTab;
-    StructTab   = S;
-
-    /* Get a new enum table and make it current */
-    S = NewSymTable (SYMTAB_SIZE_BLOCK);
-    S->PrevTab = EnumTab;
-    EnumTab    = S;
+    S->PrevTab = TagTab;
+    TagTab     = S;
 }
 
 
@@ -370,9 +347,8 @@ void LeaveBlockLevel (void)
     CheckSymTable (SymTab);
 
     /* Don't delete the tables */
-    SymTab    = SymTab->PrevTab;
-    StructTab = StructTab->PrevTab;
-    EnumTab   = EnumTab->PrevTab;
+    SymTab = SymTab->PrevTab;
+    TagTab = TagTab->PrevTab;
 }
 
 
@@ -463,18 +439,18 @@ SymEntry* FindSym (const char* Name)
 
 
 
-SymEntry* FindStructSym (const char* Name)
-/* Find the symbol with the given name in the struct table */
+SymEntry* FindLocalSym (const char* Name)
+/* Find the symbol with the given name in the current symbol table only */
 {
-    return FindSymInTree (StructTab, Name);
+    return FindSymInTable (SymTab, Name, HashStr (Name));
 }
 
 
 
-SymEntry* FindEnumSym (const char* Name)
-/* Find the symbol with the given name in the enum table */
+SymEntry* FindTagSym (const char* Name)
+/* Find the symbol with the given name in the tag table */
 {
-    return FindSymInTree (EnumTab, Name);
+    return FindSymInTree (TagTab, Name);
 }
 
 
@@ -552,11 +528,11 @@ SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab)
 /* Add a struct/union entry and return it */
 {
     /* Do we have an entry with this name already? */
-    SymEntry* Entry = FindSymInTable (StructTab, Name, HashStr (Name));
+    SymEntry* Entry = FindSymInTable (TagTab, Name, HashStr (Name));
     if (Entry) {
 
      	/* We do have an entry. This may be a forward, so check it. */
-     	if (Entry->Flags != SC_STRUCT) {
+     	if ((Entry->Flags & SC_STRUCT) == 0) {
 	    /* Existing symbol is not a struct */
 	    Error (ERR_SYMBOL_KIND);
 	} else if (Size > 0 && Entry->V.S.Size > 0) {
@@ -580,7 +556,7 @@ SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab)
  	Entry->V.S.Size	  = Size;
 
     	/* Add it to the current table */
-    	AddSymEntry (StructTab, Entry);
+    	AddSymEntry (TagTab, Entry);
     }
 
     /* Return the entry */
@@ -786,6 +762,14 @@ SymTable* GetSymTab (void)
 
 
 
+int SymIsLocal (SymEntry* Sym)
+/* Return true if the symbol is defined in the highest lexical level */
+{
+    return (Sym->Owner == SymTab || Sym->Owner == TagTab);
+}
+
+
+
 static int EqualSymTables (SymTable* Tab1, SymTable* Tab2)
 /* Compare two symbol tables. Return 1 if they are equal and 0 otherwise */
 {
@@ -825,6 +809,7 @@ int EqualTypes (const type* Type1, const type* Type2)
     SymTable* Tab2;
     FuncDesc* F1;
     FuncDesc* F2;
+    int	      Ok;
 
 
     /* Shortcut here: If the pointers are identical, the types are identical */
@@ -841,17 +826,36 @@ int EqualTypes (const type* Type1, const type* Type2)
     	       	/* Compare the function descriptors */
 		F1 = DecodePtr (Type1+1);
 		F2 = DecodePtr (Type2+1);
-		if ((F1->Flags & ~FD_IMPLICIT) != (F2->Flags & ~FD_IMPLICIT)) {
-		    /* Flags differ */
-		    return 0;
+
+		/* If one of the functions is implicitly declared, both
+		 * functions are considered equal. If one of the functions is
+		 * old style, and the other is empty, the functions are
+		 * considered equal.
+		 */
+       	       	if ((F1->Flags & FD_IMPLICIT) != 0 || (F2->Flags & FD_IMPLICIT) != 0) {
+		    Ok = 1;
+		} else if ((F1->Flags & FD_OLDSTYLE) != 0 && (F2->Flags & FD_EMPTY) != 0) {
+		    Ok = 1;
+		} else if ((F1->Flags & FD_EMPTY) != 0 && (F2->Flags & FD_OLDSTYLE) != 0) {
+		    Ok = 1;
+		} else {
+		    Ok = 0;
 		}
 
-		/* Compare the parameter lists */
-		if (EqualSymTables (F1->SymTab, F2->SymTab) 	  == 0 ||
-		    EqualSymTables (F1->StructTab, F2->StructTab) == 0 ||
-		    EqualSymTables (F1->EnumTab, F2->EnumTab) == 0) {
-		    /* One of the tables is not identical */
-		    return 0;
+		if (!Ok) {
+
+		    /* Check the remaining flags */
+		    if ((F1->Flags & ~FD_IGNORE) != (F2->Flags & ~FD_IGNORE)) {
+		    	/* Flags differ */
+		    	return 0;
+		    }
+
+		    /* Compare the parameter lists */
+		    if (EqualSymTables (F1->SymTab, F2->SymTab) == 0 ||
+		    	EqualSymTables (F1->TagTab, F2->TagTab) == 0) {
+		    	/* One of the tables is not identical */
+		    	return 0;
+		    }
 		}
 
 		/* Skip the FuncDesc pointers to compare the return type */

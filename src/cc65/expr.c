@@ -49,30 +49,30 @@ typedef struct {
 } GenDesc;
 
 /* Descriptors for the operations */
-static GenDesc GenMUL    = { STAR,   GEN_NOPUSH,       		g_mul };
-static GenDesc GenDIV    = { DIV,    GEN_NOPUSH,       		g_div };
-static GenDesc GenMOD    = { MOD,    GEN_NOPUSH,       		g_mod };
-static GenDesc GenASL    = { ASL,    GEN_NOPUSH,       		g_asl };
-static GenDesc GenASR    = { ASR,    GEN_NOPUSH,        	g_asr };
-static GenDesc GenLT     = { LT,     GEN_NOPUSH,		g_lt  };
-static GenDesc GenLE     = { LE,     GEN_NOPUSH,		g_le  };
-static GenDesc GenGE     = { GE,     GEN_NOPUSH,		g_ge  };
-static GenDesc GenGT     = { GT,     GEN_NOPUSH,		g_gt  };
-static GenDesc GenEQ     = { EQ,     GEN_NOPUSH,		g_eq  };
-static GenDesc GenNE     = { NE,     GEN_NOPUSH,		g_ne  };
-static GenDesc GenAND    = { AMP,    GEN_NOPUSH,       		g_and };
-static GenDesc GenXOR    = { XOR,    GEN_NOPUSH,       		g_xor };
-static GenDesc GenOR     = { BAR,    GEN_NOPUSH,       		g_or  };
-static GenDesc GenPASGN  = { PASGN,  GEN_NOPUSH,       		g_add };
-static GenDesc GenSASGN  = { SASGN,  GEN_NOPUSH,       		g_sub };
-static GenDesc GenMASGN  = { MASGN,  GEN_NOPUSH,       		g_mul };
-static GenDesc GenDASGN  = { DASGN,  GEN_NOPUSH,       		g_div };
-static GenDesc GenMOASGN = { MOASGN, GEN_NOPUSH,       		g_mod };
-static GenDesc GenSLASGN = { SLASGN, GEN_NOPUSH,       		g_asl };
-static GenDesc GenSRASGN = { SRASGN, GEN_NOPUSH,       		g_asr };
-static GenDesc GenAASGN  = { AASGN,  GEN_NOPUSH,       		g_and };
-static GenDesc GenXOASGN = { XOASGN, GEN_NOPUSH,       		g_xor };
-static GenDesc GenOASGN  = { OASGN,  GEN_NOPUSH,       		g_or  };
+static GenDesc GenMUL    = { TOK_STAR,   	GEN_NOPUSH,	g_mul };
+static GenDesc GenDIV    = { TOK_DIV,    	GEN_NOPUSH,     g_div };
+static GenDesc GenMOD    = { TOK_MOD,    	GEN_NOPUSH,     g_mod };
+static GenDesc GenASL    = { TOK_SHL,    	GEN_NOPUSH,     g_asl };
+static GenDesc GenASR    = { TOK_SHR,    	GEN_NOPUSH,     g_asr };
+static GenDesc GenLT     = { TOK_LT,     	GEN_NOPUSH,	g_lt  };
+static GenDesc GenLE     = { TOK_LE,     	GEN_NOPUSH,	g_le  };
+static GenDesc GenGE     = { TOK_GE,     	GEN_NOPUSH,	g_ge  };
+static GenDesc GenGT     = { TOK_GT,     	GEN_NOPUSH,	g_gt  };
+static GenDesc GenEQ     = { TOK_EQ,     	GEN_NOPUSH,	g_eq  };
+static GenDesc GenNE     = { TOK_NE,     	GEN_NOPUSH,	g_ne  };
+static GenDesc GenAND    = { TOK_AND,    	GEN_NOPUSH,     g_and };
+static GenDesc GenXOR    = { TOK_XOR,    	GEN_NOPUSH,     g_xor };
+static GenDesc GenOR     = { TOK_OR,    	GEN_NOPUSH,     g_or  };
+static GenDesc GenPASGN  = { TOK_PLUS_ASSIGN,	GEN_NOPUSH,     g_add };
+static GenDesc GenSASGN  = { TOK_MINUS_ASSIGN,  GEN_NOPUSH,     g_sub };
+static GenDesc GenMASGN  = { TOK_MUL_ASSIGN,	GEN_NOPUSH,     g_mul };
+static GenDesc GenDASGN  = { TOK_DIV_ASSIGN,	GEN_NOPUSH,     g_div };
+static GenDesc GenMOASGN = { TOK_MOD_ASSIGN,	GEN_NOPUSH,     g_mod };
+static GenDesc GenSLASGN = { TOK_SHL_ASSIGN,	GEN_NOPUSH,     g_asl };
+static GenDesc GenSRASGN = { TOK_SHR_ASSIGN,	GEN_NOPUSH,     g_asr };
+static GenDesc GenAASGN  = { TOK_AND_ASSIGN,	GEN_NOPUSH,     g_and };
+static GenDesc GenXOASGN = { TOK_XOR_ASSIGN,	GEN_NOPUSH,     g_xor };
+static GenDesc GenOASGN  = { TOK_OR_ASSIGN,	GEN_NOPUSH,     g_or  };
 
 
 
@@ -346,37 +346,37 @@ static int kcalc (int tok, long val1, long val2)
 /* Calculate an operation with left and right operand constant. */
 {
     switch (tok) {
-  	case EQ:
+       	case TOK_EQ:
   	    return (val1 == val2);
-	case NE:
+       	case TOK_NE:
 	    return (val1 != val2);
-	case LT:
+       	case TOK_LT:
 	    return (val1 < val2);
-	case LE:
+       	case TOK_LE:
 	    return (val1 <= val2);
-	case GE:
+       	case TOK_GE:
 	    return (val1 >= val2);
-	case GT:
+       	case TOK_GT:
 	    return (val1 > val2);
-  	case BAR:
+       	case TOK_OR:
   	    return (val1 | val2);
-  	case XOR:
+       	case TOK_XOR:
   	    return (val1 ^ val2);
-  	case AMP:
+       	case TOK_AND:
   	    return (val1 & val2);
-  	case ASR:
+       	case TOK_SHR:
   	    return (val1 >> val2);
-  	case ASL:
+       	case TOK_SHL:
   	    return (val1 << val2);
-  	case STAR:
+       	case TOK_STAR:
   	    return (val1 * val2);
-  	case DIV:
+       	case TOK_DIV:
 	    if (val2 == 0) {
 	   	Error (ERR_DIV_BY_ZERO);
 	   	return 0x7FFFFFFF;
 	    }
   	    return (val1 / val2);
-  	case MOD:
+       	case TOK_MOD:
 	    if (val2 == 0) {
 	   	Error (ERR_MOD_BY_ZERO);
 	       	return 0;
@@ -411,11 +411,11 @@ static int istypeexpr (void)
 {
     SymEntry* Entry;
 
-    return curtok == LPAREN && (
-       	    (nxttok >= FIRSTTYPE && nxttok <= LASTTYPE) ||
-	    (nxttok == CONST)                           ||
-       	    (nxttok  == IDENT 			    &&
-	    (Entry = FindSym (NextTok.Ident)) != 0  &&
+    return curtok == TOK_LPAREN && (
+       	    (nxttok >= TOK_FIRSTTYPE && nxttok <= TOK_LASTTYPE) ||
+	    (nxttok == TOK_CONST)                           	||
+       	    (nxttok  == TOK_IDENT 			      	&&
+	    (Entry = FindSym (NextTok.Ident)) != 0  		&&
 	    IsTypeDef (Entry))
            );
 }
@@ -531,7 +531,7 @@ static void callfunction (struct expent* lval)
     ParamSize  = 0;
     ParamCount = 0;
     Ellipsis   = 0;
-    while (curtok != RPAREN) {
+    while (curtok != TOK_RPAREN) {
 
      	/* Add a hint for the optimizer */
      	AddCodeHint ("param:start");
@@ -606,10 +606,10 @@ static void callfunction (struct expent* lval)
 	AddCodeHint ("param:end");
 
 	/* Check for end of argument list */
-     	if (curtok != COMMA) {
+     	if (curtok != TOK_COMMA) {
      	    break;
 	}
-     	gettok ();
+     	NextToken ();
     }
 
     /* We need the closing bracket here */
@@ -644,13 +644,13 @@ void doasm (void)
  */
 {
     /* Skip the ASM */
-    gettok ();
+    NextToken ();
 
     /* Need left parenthesis */
     ConsumeLParen ();
 
     /* String literal */
-    if (curtok != SCONST) {
+    if (curtok != TOK_SCONST) {
      	Error (ERR_STRLIT_EXPECTED);
     } else {
      	/* Write the string directly into the output, followed by a newline */
@@ -665,7 +665,7 @@ void doasm (void)
     }
 
     /* Skip the string token */
-    gettok ();
+    NextToken ();
 
     /* Closing paren needed */
     ConsumeRParen ();
@@ -682,19 +682,19 @@ static int primary (struct expent* lval)
     lval->e_test = 0;
 
     /* Character and integer constants. */
-    if (curtok == ICONST || curtok == CCONST) {
+    if (curtok == TOK_ICONST || curtok == TOK_CCONST) {
     	lval->e_flags = E_MCONST | E_TCONST;
     	lval->e_tptr  = curtype;
     	lval->e_const = curval;
-    	gettok ();
+    	NextToken ();
     	return 0;
     }
 
     /* Process parenthesized subexpression by calling the whole parser
      * recursively.
      */
-    if (curtok == LPAREN) {
-    	gettok ();
+    if (curtok == TOK_LPAREN) {
+    	NextToken ();
     	memset (lval, 0, sizeof (*lval));	/* Remove any attributes */
     	k = hie0 (lval);
        	ConsumeRParen ();
@@ -713,7 +713,7 @@ static int primary (struct expent* lval)
     }
 
     /* Identifier? */
-    if (curtok == IDENT) {
+    if (curtok == TOK_IDENT) {
 
 	SymEntry* Sym;
 	ident Ident;
@@ -725,7 +725,7 @@ static int primary (struct expent* lval)
  	if (Sym) {
 
 	    /* We found the symbol - skip the name token */
-     	    gettok ();
+     	    NextToken ();
 
 	    /* The expression type is the symbol type */
 	    lval->e_tptr = Sym->Type;
@@ -791,10 +791,10 @@ static int primary (struct expent* lval)
 
      	/* We did not find the symbol. Remember the name, then skip it */
 	strcpy (Ident, CurTok.Ident);
-	gettok ();
+	NextToken ();
 
 	/* IDENT is either an auto-declared function or an undefined variable. */
-	if (curtok == LPAREN) {
+	if (curtok == TOK_LPAREN) {
 	    /* Declare a function returning int. For that purpose, prepare a
 	     * function signature for a function having an empty param list
 	     * and returning int.
@@ -821,16 +821,16 @@ static int primary (struct expent* lval)
     }
 
     /* String literal? */
-    if (curtok == SCONST) {
+    if (curtok == TOK_SCONST) {
    	lval->e_flags = E_MCONST | E_TLIT;
        	lval->e_const = curval;
 	lval->e_tptr  = GetCharArrayType (strlen (GetLiteral (curval)));
-    	gettok ();
+    	NextToken ();
 	return 0;
     }
 
     /* ASM statement? */
-    if (curtok == ASM) {
+    if (curtok == TOK_ASM) {
 	doasm ();
 	lval->e_tptr  = type_void;
 	lval->e_flags = E_MEXPR;
@@ -839,12 +839,12 @@ static int primary (struct expent* lval)
     }
 
     /* __AX__ and __EAX__ pseudo values? */
-    if (curtok == AX || curtok == EAX) {
-       	lval->e_tptr  = (curtok == AX)? type_uint : type_ulong;
+    if (curtok == TOK_AX || curtok == TOK_EAX) {
+       	lval->e_tptr  = (curtok == TOK_AX)? type_uint : type_ulong;
    	lval->e_flags = E_MREG;
 	lval->e_test &= ~E_CC;
    	lval->e_const = 0;
-	gettok ();
+	NextToken ();
     	return 1;    	  	/* May be used as lvalue */
     }
 
@@ -873,7 +873,7 @@ static int arrayref (int k, struct expent* lval)
 
 
     /* Skip the bracket */
-    gettok ();
+    NextToken ();
 
     /* Get the type of left side */
     tptr1 = lval->e_tptr;
@@ -1098,8 +1098,8 @@ static int structref (int k, struct expent* lval)
     int flags;
 
     /* Skip the token and check for an identifier */
-    gettok ();
-    if (curtok != IDENT) {
+    NextToken ();
+    if (curtok != TOK_IDENT) {
     	Error (ERR_IDENT_EXPECTED);
     	lval->e_tptr = type_int;
     	return 0;
@@ -1107,7 +1107,7 @@ static int structref (int k, struct expent* lval)
 
     /* Get the symbol table entry and check for a struct field */
     strcpy (Ident, CurTok.Ident);
-    gettok ();
+    NextToken ();
     Field = FindStructField (lval->e_tptr, Ident);
     if (Field == 0) {
      	Error (ERR_STRUCT_FIELD_MISMATCH, Ident);
@@ -1143,22 +1143,22 @@ static int hie11 (struct expent *lval)
 
 
     k = primary (lval);
-    if (curtok < LBRACK || curtok > PREF) {
+    if (curtok < TOK_LBRACK || curtok > TOK_PTR_REF) {
 	/* Not for us */
        	return k;
     }
 
     while (1) {
 
-	if (curtok == LBRACK) {
+	if (curtok == TOK_LBRACK) {
 
 	    /* Array reference */
 	    k = arrayref (k, lval);
 
-	} else if (curtok == LPAREN) {
+	} else if (curtok == TOK_LPAREN) {
 
 	    /* Function call. Skip the opening parenthesis */
-	    gettok ();
+	    NextToken ();
 	    tptr = lval->e_tptr;
 	    if (IsFunc (tptr) || IsFuncPtr (tptr)) {
 	    	if (IsFuncPtr (tptr)) {
@@ -1175,14 +1175,14 @@ static int hie11 (struct expent *lval)
      	    }
      	    k = 0;
 
-     	} else if (curtok == DOT) {
+     	} else if (curtok == TOK_DOT) {
 
      	    if (!IsStruct (lval->e_tptr)) {
      	   	Error (ERR_STRUCT_EXPECTED);
      	    }
      	    k = structref (0, lval);
 
-     	} else if (curtok == PREF) {
+     	} else if (curtok == TOK_PTR_REF) {
 
      	    tptr = lval->e_tptr;
      	    if (tptr[0] != T_PTR || (tptr[1] & T_STRUCT) == 0) {
@@ -1242,7 +1242,7 @@ static void pre_incdec (struct expent* lval, void (*inc) (unsigned, unsigned lon
     unsigned flags;
     unsigned long val;
 
-    gettok ();
+    NextToken ();
     if ((k = hie10 (lval)) == 0) {
     	Error (ERR_LVALUE_EXPECTED);
     	return;
@@ -1321,7 +1321,7 @@ static void post_incdec (struct expent *lval, int k, void (*inc) (unsigned, unsi
 {
     unsigned flags;
 
-    gettok ();
+    NextToken ();
     if (k == 0) {
     	Error (ERR_LVALUE_EXPECTED);
        	return;
@@ -1360,15 +1360,15 @@ static void unaryop (int tok, struct expent* lval)
     int k;
     unsigned flags;
 
-    gettok ();
+    NextToken ();
     k = hie10 (lval);
     if (k == 0 && lval->e_flags & E_MCONST) {
     	/* Value is constant */
 	switch (tok) {
-	    case MINUS:	lval->e_const =	-lval->e_const;	break;
-	    case PLUS:  				break;
-	    case COMP:  lval->e_const = ~lval->e_const; break;
-	    default:	Internal ("Unexpected token: %d", tok);
+	    case TOK_MINUS: lval->e_const =	-lval->e_const;	break;
+	    case TOK_PLUS:  	  				break;
+	    case TOK_COMP:  lval->e_const = ~lval->e_const; 	break;
+	    default:	    Internal ("Unexpected token: %d", tok);
 	}
     } else {
     	/* Value is not constant */
@@ -1379,9 +1379,9 @@ static void unaryop (int tok, struct expent* lval)
 
     	/* Handle the operation */
 	switch (tok) {
-       	    case MINUS:	g_neg (flags);	break;
-	    case PLUS:  	       	break;
-	    case COMP:  g_com (flags);	break;
+       	    case TOK_MINUS: g_neg (flags);  break;
+	    case TOK_PLUS:  	       	    break;
+	    case TOK_COMP:  g_com (flags);  break;
 	    default:	Internal ("Unexpected token: %d", tok);
 	}
      	lval->e_flags = E_MEXPR;
@@ -1398,7 +1398,7 @@ static int typecast (struct expent* lval)
     unsigned rflags;
 
     /* Skip the left paren */
-    gettok ();
+    NextToken ();
 
     /* Read the type */
     ParseType (Type);
@@ -1438,22 +1438,22 @@ static int hie10 (struct expent* lval)
 
     switch (curtok) {
 
-     	case INC:
+     	case TOK_INC:
      	    pre_incdec (lval, g_inc);
      	    return 0;
 
-     	case DEC:
+     	case TOK_DEC:
      	    pre_incdec (lval, g_dec);
      	    return 0;
 
-	case PLUS:
-     	case MINUS:
-     	case COMP:
+	case TOK_PLUS:
+     	case TOK_MINUS:
+     	case TOK_COMP:
      	    unaryop (curtok, lval);
      	    return 0;
 
-     	case BANG:
-     	    gettok ();
+     	case TOK_BOOL_NOT:
+     	    NextToken ();
     	    if (evalexpr (CF_NONE, hie10, lval) == 0) {
     	     	/* Constant expression */
     	   	lval->e_const = !lval->e_const;
@@ -1464,8 +1464,8 @@ static int hie10 (struct expent* lval)
     	    }
      	    return 0; 	      	     		/* expr not storable */
 
-     	case STAR:
-     	    gettok ();
+     	case TOK_STAR:
+     	    NextToken ();
     	    if (evalexpr (CF_NONE, hie10, lval) != 0) {
     	     	/* Expression is not const, indirect value loaded into primary */
 	     	lval->e_flags = E_MEXPR;
@@ -1479,11 +1479,11 @@ static int hie10 (struct expent* lval)
      	    }
      	    return 1;
 
-     	case AMP:
-     	    gettok ();
+     	case TOK_AND:
+     	    NextToken ();
      	    k = hie10 (lval);
      	    if (k == 0) {
-	   	/* Allow the & operator with an array */
+	    	/* Allow the & operator with an array */
 	     	if (!IsArray (lval->e_tptr)) {
      	     	    Error (ERR_ILLEGAL_ADDRESS);
 	     	}
@@ -1495,11 +1495,11 @@ static int hie10 (struct expent* lval)
 	    }
      	    return 0;
 
-     	case SIZEOF:
-     	    gettok ();
+     	case TOK_SIZEOF:
+     	    NextToken ();
        	    if (istypeexpr ()) {
     		type Type[MAXTYPELEN];
-     	     	gettok ();
+     	     	NextToken ();
 		lval->e_const = SizeOf (ParseType (Type));
      	     	ConsumeRParen ();
      	    } else {
@@ -1524,11 +1524,11 @@ static int hie10 (struct expent* lval)
 
     k = hie11 (lval);
     switch (curtok) {
-     	case INC:
+     	case TOK_INC:
        	    post_incdec (lval, k, g_inc);
      	    return 0;
 
-     	case DEC:
+     	case TOK_DEC:
      	    post_incdec (lval, k, g_dec);
      	    return 0;
 
@@ -1550,7 +1550,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
     CodeMark Mark1;
     CodeMark Mark2;
     GenDesc* Gen;
-    int tok;  	      	     	       	/* The operator token */
+    token_t tok;			/* The operator token */
     unsigned ltype, type;
     int rconst;	       	       	       	/* Operand is a constant */
 
@@ -1570,7 +1570,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 
 	/* Remember the operator token, then skip it */
        	tok = curtok;
-	gettok ();
+	NextToken ();
 
 	/* Get the lhs on stack */
        	Mark1 = GetCodePos ();
@@ -1619,9 +1619,9 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	     	/* Second value is constant - check for div */
 	     	type |= CF_CONST;
 		rtype |= CF_CONST;
-	     	if (tok == DIV && lval2.e_const == 0) {
+	     	if (tok == TOK_DIV && lval2.e_const == 0) {
 	      	    Error (ERR_DIV_BY_ZERO);
-	     	} else if (tok == MOD && lval2.e_const == 0) {
+	     	} else if (tok == TOK_MOD && lval2.e_const == 0) {
 	     	    Error (ERR_MOD_BY_ZERO);
 	     	}
 		if ((Gen->Flags & GEN_NOPUSH) != 0) {
@@ -1659,7 +1659,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
     CodeMark Mark1;
     CodeMark Mark2;
     GenDesc* Gen;
-    int tok;   	      	     	       	/* The operator token */
+    token_t tok;			/* The operator token */
     unsigned ltype;
     int rconst;	       	       	       	/* Operand is a constant */
 
@@ -1670,7 +1670,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 
 	/* Remember the operator token, then skip it */
        	tok = curtok;
-	gettok ();
+	NextToken ();
 
 	/* Get the lhs on stack */
 	Mark1 = GetCodePos ();
@@ -1800,7 +1800,7 @@ static void parseadd (int k, struct expent* lval)
 
 
     /* Skip the PLUS token */
-    gettok ();
+    NextToken ();
 
     /* Get the left hand side type, initialize operation flags */
     lhst = lval->e_tptr;
@@ -1972,7 +1972,7 @@ static void parsesub (int k, struct expent* lval)
 
 
     /* Skip the MINUS token */
-    gettok ();
+    NextToken ();
 
     /* Get the left hand side type, initialize operation flags */
     lhst = lval->e_tptr;
@@ -2126,9 +2126,9 @@ static int hie8 (struct expent* lval)
 /* Process + and - binary operators. */
 {
     int k = hie9 (lval);
-    while (curtok == PLUS || curtok == MINUS) {
+    while (curtok == TOK_PLUS || curtok == TOK_MINUS) {
 
-       	if (curtok == PLUS) {
+       	if (curtok == TOK_PLUS) {
        	    parseadd (k, lval);
        	} else {
        	    parsesub (k, lval);
@@ -2222,7 +2222,7 @@ static int hieAnd (struct expent* lval, unsigned TrueLab, int* BoolOp)
     struct expent lval2;
 
     k = hie2 (lval);
-    if (curtok == DAMP) {
+    if (curtok == TOK_BOOL_AND) {
 
        	/* Tell our caller that we're evaluating a boolean */
        	*BoolOp = 1;
@@ -2242,10 +2242,10 @@ static int hieAnd (struct expent* lval, unsigned TrueLab, int* BoolOp)
        	g_falsejump (CF_NONE, lab);
 
        	/* Parse more boolean and's */
-       	while (curtok == DAMP) {
+       	while (curtok == TOK_BOOL_AND) {
 
        	    /* Skip the && */
-    	    gettok ();
+    	    NextToken ();
 
     	    /* Get rhs */
     	    k = hie2 (&lval2);
@@ -2255,7 +2255,7 @@ static int hieAnd (struct expent* lval, unsigned TrueLab, int* BoolOp)
     	    exprhs (CF_FORCECHAR, k, &lval2);
 
        	    /* Do short circuit evaluation */
-    	    if (curtok == DAMP) {
+    	    if (curtok == TOK_BOOL_AND) {
     	        g_falsejump (CF_NONE, lab);
        	    } else {
        		/* Last expression - will evaluate to true */
@@ -2293,7 +2293,7 @@ static int hieOr (struct expent *lval)
     k = hieAnd (lval, TrueLab, &BoolOp);
 
     /* Any boolean or's? */
-    if (curtok == DBAR) {
+    if (curtok == TOK_BOOL_OR) {
 
     	/* If the expr hasn't set condition codes, set the force-test flag */
        	if ((lval->e_test & E_CC) == 0) {
@@ -2314,10 +2314,10 @@ static int hieOr (struct expent *lval)
     	BoolOp = 1;
 
     	/* while there's more expr */
-       	while (curtok == DBAR) {
+       	while (curtok == TOK_BOOL_OR) {
 
        	    /* skip the || */
-    	    gettok ();
+    	    NextToken ();
 
        	    /* Get a subexpr */
     	    AndOp = 0;
@@ -2333,7 +2333,7 @@ static int hieOr (struct expent *lval)
     	     */
 #if 	0
 /* Seems this sometimes generates wrong code */
-    	    if (curtok == DBAR && !AndOp) {
+    	    if (curtok == TOK_BOOL_OR && !AndOp) {
     	      	g_truejump (CF_NONE, TrueLab);
        	    }
 #else
@@ -2376,8 +2376,8 @@ static int hieQuest (struct expent *lval)
 
 
     k = hieOr (lval);
-    if (curtok == QUEST) {
-    	gettok ();
+    if (curtok == TOK_QUEST) {
+    	NextToken ();
     	if ((lval->e_test & E_CC) == 0) {
     	    /* Condition codes not set, force a test */
     	    lval->e_test |= E_FORCETEST;
@@ -2481,7 +2481,7 @@ static void opeq (GenDesc* Gen, struct expent *lval, int k)
     CodeMark Mark;
     int MustScale;
 
-    gettok ();
+    NextToken ();
     if (k == 0) {
      	Error (ERR_LVALUE_EXPECTED);
      	return;
@@ -2578,7 +2578,7 @@ static void addsubeq (GenDesc* Gen, struct expent *lval, int k)
     }
 
     /* Skip the operator */
-    gettok ();
+    NextToken ();
 
     /* Check if we have a pointer expression and must scale rhs */
     MustScale = (lval->e_tptr [0] == T_PTR);
@@ -2609,14 +2609,14 @@ static void addsubeq (GenDesc* Gen, struct expent *lval, int k)
     if (lval->e_flags & E_MGLOBAL) {
 	/* Static variable */
 	flags |= GlobalModeFlags (lval->e_flags);
-	if (Gen->Tok == PASGN) {
+	if (Gen->Tok == TOK_PLUS_ASSIGN) {
 	    g_addeqstatic (flags, lval->e_name, lval->e_const, lval2.e_const);
 	} else {
        	    g_subeqstatic (flags, lval->e_name, lval->e_const, lval2.e_const);
 	}
     } else if (lval->e_flags & E_MLOCAL) {
 	/* ref to localvar */
-	if (Gen->Tok == PASGN) {
+	if (Gen->Tok == TOK_PLUS_ASSIGN) {
     	    g_addeqlocal (flags, lval->e_const, lval2.e_const);
 	} else {
 	    g_subeqlocal (flags, lval->e_const, lval2.e_const);
@@ -2624,14 +2624,14 @@ static void addsubeq (GenDesc* Gen, struct expent *lval, int k)
     } else if (lval->e_flags & E_MCONST) {
 	/* ref to absolute address */
 	flags |= CF_ABSOLUTE;
-	if (Gen->Tok == PASGN) {
+	if (Gen->Tok == TOK_PLUS_ASSIGN) {
 	    g_addeqstatic (flags, lval->e_const, 0, lval2.e_const);
 	} else {
        	    g_subeqstatic (flags, lval->e_const, 0, lval2.e_const);
 	}
     } else if (lval->e_flags & E_MEXPR) {
        	/* Address in a/x. */
-	if (Gen->Tok == PASGN) {
+	if (Gen->Tok == TOK_PLUS_ASSIGN) {
        	    g_addeqind (flags, lval->e_const, lval2.e_const);
 	} else {
        	    g_subeqind (flags, lval->e_const, lval2.e_const);
@@ -2726,12 +2726,12 @@ int hie1 (struct expent* lval)
     k = hieQuest (lval);
     switch (curtok) {
 
-    	case RPAREN:
-    	case SEMI:
+    	case TOK_RPAREN:
+    	case TOK_SEMI:
     	    return k;
 
-    	case ASGN:
-    	    gettok ();
+    	case TOK_ASSIGN:
+    	    NextToken ();
     	    if (k == 0) {
     	      	Error (ERR_LVALUE_EXPECTED);
     	    } else {
@@ -2739,43 +2739,43 @@ int hie1 (struct expent* lval)
     	    }
     	    break;
 
-    	case PASGN:
+    	case TOK_PLUS_ASSIGN:
        	    addsubeq (&GenPASGN, lval, k);
     	    break;
 
-    	case SASGN:
+    	case TOK_MINUS_ASSIGN:
        	    addsubeq (&GenSASGN, lval, k);
     	    break;
 
-    	case MASGN:
+    	case TOK_MUL_ASSIGN:
        	    opeq (&GenMASGN, lval, k);
      	    break;
 
-     	case DASGN:
+     	case TOK_DIV_ASSIGN:
        	    opeq (&GenDASGN, lval, k);
      	    break;
 
-     	case MOASGN:
+     	case TOK_MOD_ASSIGN:
        	    opeq (&GenMOASGN, lval, k);
      	    break;
 
-     	case SLASGN:
+     	case TOK_SHL_ASSIGN:
        	    opeq (&GenSLASGN, lval, k);
      	    break;
 
-     	case SRASGN:
+     	case TOK_SHR_ASSIGN:
        	    opeq (&GenSRASGN, lval, k);
      	    break;
 
-     	case AASGN:
+     	case TOK_AND_ASSIGN:
        	    opeq (&GenAASGN, lval, k);
      	    break;
 
-     	case XOASGN:
+     	case TOK_XOR_ASSIGN:
        	    opeq (&GenXOASGN, lval, k);
      	    break;
 
-     	case OASGN:
+     	case TOK_OR_ASSIGN:
        	    opeq (&GenOASGN, lval, k);
      	    break;
 
@@ -2793,8 +2793,8 @@ int hie0 (struct expent *lval)
     int k;
 
     k = hie1 (lval);
-    while (curtok == COMMA) {
-    	gettok ();
+    while (curtok == TOK_COMMA) {
+    	NextToken ();
     	k = hie1 (lval);
     }
     return k;
@@ -2965,7 +2965,7 @@ void test (unsigned label, int cond)
 	 * compiler itself is one big hack...): If a semicolon follows, we
 	 * don't have a statement and may omit the jump.
 	 */
-	if (curtok != SEMI) {
+	if (curtok != TOK_SEMI) {
             g_falsejump (CF_NONE, label);
 	}
     }

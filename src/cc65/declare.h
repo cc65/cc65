@@ -23,15 +23,16 @@
 
 
 /* Masks for the Flags field in DeclSpec */
-#define DS_DEF_STORAGE		0x0001U	/* Default storage class used */
-#define DS_DEF_TYPE		0x0002U	/* Default type used */
+#define DS_DEF_STORAGE		0x0001U	/* Default storage class used 	*/
+#define DS_DEF_TYPE		0x0002U	/* Default type used 		*/
+#define DS_EXTRA_TYPE		0x0004U	/* Extra type declared 		*/
 
 /* Result of ParseDeclSpec */
 typedef struct DeclSpec DeclSpec;
 struct DeclSpec {
-    unsigned	StorageClass;  	 	/* One of the SC_xxx flags */
+    unsigned	StorageClass;  	 	/* One of the SC_xxx flags 	*/
     type	Type [MAXTYPELEN];	/* Type of the declaration spec */
-    unsigned	Flags;			/* Bitmapped flags */
+    unsigned	Flags;			/* Bitmapped flags 		*/
 };
 
 /* Result of ParseDecl */
@@ -65,6 +66,12 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode);
 
 void ParseDeclSpec (DeclSpec* D, unsigned DefStorage, int DefType);
 /* Parse a declaration specification */
+
+void CheckEmptyDecl (const DeclSpec* D);
+/* Called after an empty type declaration (that is, a type declaration without
+ * a variable). Checks if the declaration does really make sense and issues a
+ * warning if not.
+ */
 
 void ParseInit (type* tptr);
 /* Parse initialization of variables */

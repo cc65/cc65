@@ -45,21 +45,27 @@
 
 
 /* Masks for the Flags field in FuncDesc */
-#define FD_IMPLICIT		0x0001U	/* Implicitly declared function  */
-#define FD_EMPTY      		0x0002U	/* Function with empty param list */
-#define FD_VOID_PARAM   	0x0004U	/* Function with a void param list */
+#define FD_IMPLICIT		0x0001U	/* Implicitly declared function      */
+#define FD_EMPTY      		0x0002U	/* Function with empty param list    */
+#define FD_VOID_PARAM   	0x0004U	/* Function with a void param list   */
 #define FD_ELLIPSIS		0x0008U	/* Function with variable param list */
-#define FD_FASTCALL		0x0010U	/* __fastcall__ function */
+#define FD_FASTCALL		0x0010U	/* __fastcall__ function 	     */
+#define FD_OLDSTYLE		0x0020U	/* Old style (K&R) function	     */
+#define FD_UNNAMED_PARAMS	0x0040U	/* Function has unnamed params	     */
+
+/* Bits that must be ignored when comparing funcs */
+#define FD_IGNORE 	(FD_IMPLICIT | FD_UNNAMED_PARAMS)
+
+
 
 /* Function descriptor */
 typedef struct FuncDesc FuncDesc;
 struct FuncDesc {
-    unsigned		Flags;		/* Bitmapped flags FD_... */
-    struct SymTable*	SymTab;	  	/* Symbol table */
-    struct SymTable*	StructTab;	/* Struct table */
-    struct SymTable*	EnumTab;  	/* Enum table */
-    unsigned		ParamCount;	/* Number of parameters */
-    unsigned		ParamSize;	/* Size of the parameters */
+    unsigned		Flags;		/* Bitmapped flags FD_... 	     */
+    struct SymTable*	SymTab;	  	/* Symbol table 		     */
+    struct SymTable*   	TagTab;		/* Symbol table for structs/enums    */
+    unsigned		ParamCount;	/* Number of parameters		     */
+    unsigned		ParamSize;	/* Size of the parameters	     */
 };
 
 

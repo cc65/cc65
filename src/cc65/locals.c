@@ -38,7 +38,7 @@
 #include "codegen.h"
 #include "declare.h"
 #include "expr.h"
-#include "function.h"	/* ## */
+#include "function.h"
 #include "global.h"
 #include "mem.h"
 #include "symtab.h"
@@ -131,10 +131,10 @@ static int AllocRegVar (const SymEntry* Sym, const type* tarray)
 void DeclareLocals (void)
 /* Declare local variables and types. */
 {
-    int offs = oursp; 	      	/* Current stack offset for variable */
-    int AutoSpace = 0;		/* Unallocated space on the stack */
-    int Size;	      	      	/* Size of an auto variable */
-    int Reg; 	      		/* Register variable offset */
+    int offs = oursp;  	      	/* Current stack offset for variable */
+    int AutoSpace = 0; 		/* Unallocated space on the stack */
+    int Size;	       	      	/* Size of an auto variable */
+    int Reg; 	       		/* Register variable offset */
     unsigned flags = 0;		/* Code generator flags */
     int SymbolSC;      		/* Storage class for symbol */
     int ldata = 0;     		/* Local symbol data temp storage */
@@ -155,9 +155,10 @@ void DeclareLocals (void)
 	}
 
 	/* Accept type only declarations */
-	if (curtok == SEMI) {
-	    /* Type declaration only ### Check struct/union here */
-	    gettok ();
+	if (curtok == TOK_SEMI) {
+	    /* Type declaration only */
+	    CheckEmptyDecl (&Spec);
+	    NextToken ();
 	    continue;
 	}
 
@@ -205,12 +206,12 @@ void DeclareLocals (void)
     	     	    g_save_regvars (Reg, Size);
 
     	     	    /* Allow variable initialization */
-    	      	    if (curtok == ASGN) {
+    	      	    if (curtok == TOK_ASSIGN) {
 
     	      	       	struct expent lval;
 
     	      	       	/* Skip the '=' */
-    	      	       	gettok ();
+    	      	       	NextToken ();
 
     	      	       	/* Get the expression into the primary */
 	    		expression1 (&lval);
@@ -247,7 +248,7 @@ void DeclareLocals (void)
 
 			/* Change SC in case it was register */
        	       	       	SymbolSC = (SymbolSC & ~SC_REGISTER) | SC_AUTO;
-	    	    	if (curtok == ASGN) {
+	    	    	if (curtok == TOK_ASSIGN) {
 
 	    	    	    struct expent lval;
 
@@ -260,7 +261,7 @@ void DeclareLocals (void)
 	    	    	    AutoSpace = 0;
 
 	    	    	    /* Skip the '=' */
-	    	    	    gettok ();
+	    	    	    NextToken ();
 
 	    	    	    /* Setup the type flags for the assignment */
 	    	    	    flags = Size == 1? CF_FORCECHAR : CF_NONE;
@@ -307,7 +308,7 @@ void DeclareLocals (void)
      	      	       	g_res (Size);
 
 	    	    	/* Allow assignments */
-	    	    	if (curtok == ASGN) {
+	    	    	if (curtok == TOK_ASSIGN) {
 
 	    	    	    struct expent lval;
 
@@ -315,7 +316,7 @@ void DeclareLocals (void)
 	    	    	    g_usecode ();
 
 	    	    	    /* Skip the '=' */
-	    	    	    gettok ();
+	    	    	    NextToken ();
 
 	    	    	    /* Get the expression into the primary */
 	    	    	    expression1 (&lval);
@@ -340,7 +341,7 @@ void DeclareLocals (void)
      	       	} else if ((SymbolSC & SC_STATIC) == SC_STATIC) {
 
 	      	    /* Static data */
-     	      	    if (curtok == ASGN) {
+     	      	    if (curtok == TOK_ASSIGN) {
 
     	      	    	/* Initialization ahead, switch to data segment */
       	      	    	g_usedata ();
@@ -349,7 +350,7 @@ void DeclareLocals (void)
      	      	        g_defloclabel (ldata = GetLabel ());
 
 	      	      	/* Skip the '=' */
-     	      	       	gettok ();
+     	      	       	NextToken ();
 
      	      	       	/* Allow initialization of static vars */
      	      	       	ParseInit (Decl.Type);
@@ -381,13 +382,13 @@ void DeclareLocals (void)
 	    /* Add the symbol to the symbol table */
  	    AddLocalSym (Decl.Ident, Decl.Type, SymbolSC, ldata);
 
-     	    if (curtok != COMMA) {
+     	    if (curtok != TOK_COMMA) {
      	      	break;
 	    }
-     	    gettok ();
+     	    NextToken ();
        	}
-     	if (curtok == SEMI) {
-     	    gettok ();
+     	if (curtok == TOK_SEMI) {
+     	    NextToken ();
      	}
     }
 
@@ -466,5 +467,5 @@ void RestoreRegVars (int HaveResult)
     }
 }
 
-	
+
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  funcdesc.c				     */
+/*				   compile.h				     */
 /*                                                                           */
-/*	     Function descriptor structure for the cc65 C compiler	     */
+/*			 Top level compiler subroutine			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,42 +33,25 @@
 
 
 
-#include "mem.h"
-#include "funcdesc.h"
+#ifndef COMPILE_H
+#define COMPILE_H
 
 
 
 /*****************************************************************************/
-/*	       	      	       	     Code				     */
+/*		    		     Code				     */
 /*****************************************************************************/
 
 
 
-FuncDesc* NewFuncDesc (void)
-/* Create a new symbol table with the given name */
-{
-    /* Create a new function descriptor */
-    FuncDesc* F = xmalloc (sizeof (FuncDesc));
-
-    /* Nullify the fields */
-    F->Flags	  = 0;
-    F->SymTab	  = 0;
-    F->TagTab	  = 0;
-    F->ParamCount = 0;
-    F->ParamSize  = 0;
-
-    /* Return the new struct */
-    return F;
-}
+void Compile (void);
+/* Top level compile routine. Will setup things and call the parser. */
 
 
 
-void FreeFuncDesc (FuncDesc* F)
-/* Free a function descriptor */
-{
-    /* Free the structure */
-    xfree (F);
-}
+/* End of compile.h */
+
+#endif
 
 
 

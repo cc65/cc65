@@ -132,6 +132,7 @@ programs for the 8 bit Atari machines using the cc65 crosscompiler.
 %files atari
 %attr(644,root,root)  		/usr/lib/cc65/lib/atari.lib
 %attr(644,root,root)  		/usr/lib/cc65/lib/atari.o
+%attr(644,root,root) 		/usr/lib/cc65/joy/atari-*.joy
 
 
 

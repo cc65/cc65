@@ -161,45 +161,68 @@ static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add,
 			      const char* ZPLo, const char* ZPHi)
 /* Optimize the tosaddax sequence if possible */
 {
+    CodeEntry* P;
     CodeEntry* N;
     CodeEntry* X;
     CodeEntry* PushEntry;
     CodeEntry* AddEntry;
+    int        DirectAdd;
+
 
     /* We need the entry behind the add */
     CHECK ((N = CS_GetNextEntry (S, Add)) != 0);
 
+    /* And the entry before the push */
+    CHECK ((P = CS_GetPrevEntry (S, Push)) != 0);
+
     /* Get the push entry */
     PushEntry = CS_GetEntry (S, Push);
 
-    /* Store the value into the zeropage instead of pushing it */
-    X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
-    CS_InsertEntry (S, X, Push+1);
-    X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
-    CS_InsertEntry (S, X, Push+2);
+    /* Check the entry before the push, if it's a lda instruction with an
+     * addressing mode that does not use an additional index register. If
+     * so, we may use this location for the add and must not save the
+     * value in the zero page location.
+     */
+    DirectAdd = (P->OPC == OP65_LDA &&
+		 (P->AM == AM65_IMM || P->AM == AM65_ZP || P->AM == AM65_ABS));
 
-    /* Correct the index of the add and get a pointer to the entry */
-    Add += 2;
+    /* Store the value into the zeropage instead of pushing it */
+    X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
+    CS_InsertEntry (S, X, Push+1);
+    ++Add;      /* Correct the index */
+    if (!DirectAdd) {
+     	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
+     	CS_InsertEntry (S, X, Push+1);
+	++Add;	/* Correct the index */
+    }
+
+    /* Get a pointer to the add entry */
     AddEntry = CS_GetEntry (S, Add);
 
     /* Inline the add */
     X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, AddEntry->LI);
     CS_InsertEntry (S, X, Add+1);
-    X = NewCodeEntry (OP65_ADC, AM65_ZP, ZPLo, 0, AddEntry->LI);
+    if (DirectAdd) {
+	/* Add from variable location */
+	X = NewCodeEntry (OP65_ADC, P->AM, P->Arg, 0, AddEntry->LI);
+    } else {
+	/* Add from temp storage */
+	X = NewCodeEntry (OP65_ADC, AM65_ZP, ZPLo, 0, AddEntry->LI);
+    }
     CS_InsertEntry (S, X, Add+2);
     if (PushEntry->RI->In.RegX == 0) {
-	/* The high byte is the value in X plus the carry */
-	CodeLabel* L = CS_GenLabel (S, N);
-	X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, AddEntry->LI);
-	CS_InsertEntry (S, X, Add+3);
-	X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, AddEntry->LI);
-	CS_InsertEntry (S, X, Add+4);
+     	/* The high byte is the value in X plus the carry */
+     	CodeLabel* L = CS_GenLabel (S, N);
+     	X = NewCodeEntry (OP65_BCC, AM65_BRA, L->Name, L, AddEntry->LI);
+     	CS_InsertEntry (S, X, Add+3);
+     	X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, AddEntry->LI);
+     	CS_InsertEntry (S, X, Add+4);
     } else if (AddEntry->RI->In.RegX == 0) {
-	/* The high byte is that of the first operand plus carry */
-	CodeLabel* L;
-	if (PushEntry->RI->In.RegX >= 0) {
-	    /* Value of first op high byte is known */
-	    char Buf [16];
+     	/* The high byte is that of the first operand plus carry */
+     	CodeLabel* L;
+     	if (PushEntry->RI->In.RegX >= 0) {
+     	    /* Value of first op high byte is known */
+     	    char Buf [16];
 	    xsprintf (Buf, sizeof (Buf), "$%02X", PushEntry->RI->In.RegX);
 	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, AddEntry->LI);
 	} else {
@@ -237,28 +260,50 @@ static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add,
 
 
 static unsigned Opt_tosandax (CodeSeg* S, unsigned Push, unsigned And,
-		     	      const char* ZPLo, const char* ZPHi)
+	    	     	      const char* ZPLo, const char* ZPHi)
 /* Optimize the tosandax sequence if possible */
 {
+    CodeEntry* P;
     CodeEntry* X;
     CodeEntry* PushEntry;
     CodeEntry* AndEntry;
+    int        DirectAnd;
+
+    /* Get the entry before the push */
+    CHECK ((P = CS_GetPrevEntry (S, Push)) != 0);
 
     /* Get the push entry */
     PushEntry = CS_GetEntry (S, Push);
 
-    /* Store the value into the zeropage instead of pushing it */
-    X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
-    CS_InsertEntry (S, X, Push+1);
-    X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
-    CS_InsertEntry (S, X, Push+2);
+    /* Check the entry before the push, if it's a lda instruction with an
+     * addressing mode that does not use an additional index register. If
+     * so, we may use this location for the and and must not save the
+     * value in the zero page location.
+     */
+    DirectAnd = (P->OPC == OP65_LDA &&
+	    	 (P->AM == AM65_IMM || P->AM == AM65_ZP || P->AM == AM65_ABS));
 
-    /* Correct the index of the add and get a pointer to the entry */
-    And += 2;
+    /* Store the value into the zeropage instead of pushing it */
+    X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
+    CS_InsertEntry (S, X, Push+1);
+    ++And;      /* Correct the index */
+    if (!DirectAnd) {
+	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
+	CS_InsertEntry (S, X, Push+1);
+	++And;  /* Correct the index */
+    }
+
+    /* Get a pointer to the and entry */
     AndEntry = CS_GetEntry (S, And);
 
     /* Inline the and */
-    X = NewCodeEntry (OP65_AND, AM65_ZP, ZPLo, 0, AndEntry->LI);
+    if (DirectAnd) {
+     	/* And with variable location */
+	X = NewCodeEntry (OP65_AND, P->AM, P->Arg, 0, AndEntry->LI);
+    } else {
+     	/* And with temp storage */
+     	X = NewCodeEntry (OP65_AND, AM65_ZP, ZPLo, 0, AndEntry->LI);
+    }
     CS_InsertEntry (S, X, And+1);
     if (PushEntry->RI->In.RegX == 0 || AndEntry->RI->In.RegX == 0) {
      	/* The high byte is zero */
@@ -289,28 +334,49 @@ static unsigned Opt_tosandax (CodeSeg* S, unsigned Push, unsigned And,
 
 
 static unsigned Opt_tosorax (CodeSeg* S, unsigned Push, unsigned Or,
-		     	     const char* ZPLo, const char* ZPHi)
+     		     	     const char* ZPLo, const char* ZPHi)
 /* Optimize the tosorax sequence if possible */
 {
+    CodeEntry* P;
     CodeEntry* X;
     CodeEntry* PushEntry;
     CodeEntry* OrEntry;
+    int        DirectOr;
+
+    /* Get the entry before the push */
+    CHECK ((P = CS_GetPrevEntry (S, Push)) != 0);
 
     /* Get the push entry */
     PushEntry = CS_GetEntry (S, Push);
 
-    /* Store the value into the zeropage instead of pushing it */
-    X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
-    CS_InsertEntry (S, X, Push+1);
-    X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
-    CS_InsertEntry (S, X, Push+2);
+    /* Check the entry before the push, if it's a lda instruction with an
+     * addressing mode that does not use an additional index register. If
+     * so, we may use this location for the or and must not save the
+     * value in the zero page location.
+     */
+    DirectOr = (P->OPC == OP65_LDA &&
+     		(P->AM == AM65_IMM || P->AM == AM65_ZP || P->AM == AM65_ABS));
 
-    /* Correct the index of the add and get a pointer to the entry */
-    Or += 2;
+    /* Store the value into the zeropage instead of pushing it */
+    X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
+    CS_InsertEntry (S, X, Push+1);
+    ++Or;  /* Correct the index */
+    if (DirectOr) {
+     	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
+     	CS_InsertEntry (S, X, Push+1);
+     	++Or;  /* Correct the index */
+    }
+
+    /* Get a pointer to the or entry */
     OrEntry = CS_GetEntry (S, Or);
 
     /* Inline the or */
-    X = NewCodeEntry (OP65_ORA, AM65_ZP, ZPLo, 0, OrEntry->LI);
+    if (DirectOr) {
+     	/* Or with variable location */
+     	X = NewCodeEntry (OP65_ORA, P->AM, P->Arg, 0, OrEntry->LI);
+    } else {
+     	X = NewCodeEntry (OP65_ORA, AM65_ZP, ZPLo, 0, OrEntry->LI);
+    }
     CS_InsertEntry (S, X, Or+1);
     if (PushEntry->RI->In.RegX >= 0 && OrEntry->RI->In.RegX >= 0) {
      	/* Both values known, precalculate the result */
@@ -345,35 +411,57 @@ static unsigned Opt_tosorax (CodeSeg* S, unsigned Push, unsigned Or,
 
 static unsigned Opt_tosxorax (CodeSeg* S, unsigned Push, unsigned Xor,
 			      const char* ZPLo, const char* ZPHi)
-/* Optimize the tosorax sequence if possible */
+/* Optimize the tosxorax sequence if possible */
 {
+    CodeEntry* P;
     CodeEntry* X;
     CodeEntry* PushEntry;
     CodeEntry* XorEntry;
+    int        DirectXor;
+
+    /* Get the entry before the push */
+    CHECK ((P = CS_GetPrevEntry (S, Push)) != 0);
 
     /* Get the push entry */
     PushEntry = CS_GetEntry (S, Push);
 
-    /* Store the value into the zeropage instead of pushing it */
-    X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
-    CS_InsertEntry (S, X, Push+1);
-    X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
-    CS_InsertEntry (S, X, Push+2);
+    /* Check the entry before the push, if it's a lda instruction with an
+     * addressing mode that does not use an additional index register. If
+     * so, we may use this location for the xor and must not save the
+     * value in the zero page location.
+     */
+    DirectXor = (P->OPC == OP65_LDA &&
+		 (P->AM == AM65_IMM || P->AM == AM65_ZP || P->AM == AM65_ABS));
 
-    /* Correct the index of the add and get a pointer to the entry */
-    Xor += 2;
+    /* Store the value into the zeropage instead of pushing it */
+    X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
+    CS_InsertEntry (S, X, Push+1);
+    ++Xor;  /* Correct the index */
+    if (DirectXor) {
+	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
+	CS_InsertEntry (S, X, Push+1);
+	++Xor;  /* Correct the index */
+    }
+
+    /* Get a pointer to the entry */
     XorEntry = CS_GetEntry (S, Xor);
 
-    /* Inline the or */
-    X = NewCodeEntry (OP65_EOR, AM65_ZP, ZPLo, 0, XorEntry->LI);
+    /* Inline the xor */
+    if (DirectXor) {
+	/* Xor with variable location */
+	X = NewCodeEntry (OP65_EOR, P->AM, P->Arg, 0, XorEntry->LI);
+    } else {
+	/* Xor with temp storage */
+	X = NewCodeEntry (OP65_EOR, AM65_ZP, ZPLo, 0, XorEntry->LI);
+    }
     CS_InsertEntry (S, X, Xor+1);
     if (PushEntry->RI->In.RegX >= 0 && XorEntry->RI->In.RegX >= 0) {
      	/* Both values known, precalculate the result */
-	char Buf [16];
-	int Val = (PushEntry->RI->In.RegX ^ XorEntry->RI->In.RegX);
-	xsprintf (Buf, sizeof (Buf), "$%02X", Val);
+     	char Buf [16];
+     	int Val = (PushEntry->RI->In.RegX ^ XorEntry->RI->In.RegX);
+     	xsprintf (Buf, sizeof (Buf), "$%02X", Val);
        	X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, XorEntry->LI);
-	CS_InsertEntry (S, X, Xor+2);
+     	CS_InsertEntry (S, X, Xor+2);
     } else if (PushEntry->RI->In.RegX != 0) {
      	/* High byte is unknown */
        	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, XorEntry->LI);
@@ -399,13 +487,13 @@ static unsigned Opt_tosxorax (CodeSeg* S, unsigned Push, unsigned Xor,
 
 
 /*****************************************************************************/
-/*  		      		     Code                                    */
+/*   		      		     Code                                    */
 /*****************************************************************************/
 
 
 
 typedef unsigned (*OptFunc) (CodeSeg* S, unsigned Push, unsigned Store,
-			     const char* ZPLo, const char* ZPHi);
+     			     const char* ZPLo, const char* ZPHi);
 typedef struct OptFuncDesc OptFuncDesc;
 struct OptFuncDesc {
     const char*         Name;   /* Name of the replaced runtime function */

@@ -8,18 +8,17 @@
 
    	.export	    	_mouse_init, _mouse_done
    	.export	    	_mouse_hide, _mouse_show
-   	.export	    	_mouse_box, _mouse_info
-   	.export		_mouse_x, _mouse_y
+   	.export	    	_mouse_box
+   	.export		_mouse_pos, _mouse_info
    	.export	    	_mouse_move, _mouse_buttons
-						   
+
        	.import	       	popax, popsreg, addysp1
-   	.importzp   	sp, sreg
+   	.importzp   	sp, sreg, ptr1
 
 	.include "../inc/const.inc"
 	.include "../inc/jumptab.inc"
 	.include "../inc/geossym.inc"
 
-;	.macpack	generic
 
 .code
 
@@ -75,10 +74,9 @@ _mouse_show = MouseUp
 ;
 
 _mouse_box:
-   	ldy 	#0			; Stack offset
+   	ldy 	#0		  	; Stack offset
 
    	sta 	mouseBottom
-;   	stx 	YMax+1			; maxy
 
    	lda 	(sp),y
    	sta 	mouseRight
@@ -89,9 +87,7 @@ _mouse_box:
    	iny
    	lda	(sp),y
    	sta	mouseTop
-   	iny
-;   	lda	(sp),y
-;  	sta	YMin+1			; miny
+   	iny				; Skip high byte
 
    	iny
    	lda	(sp),y
@@ -104,32 +100,55 @@ _mouse_box:
 
 ; --------------------------------------------------------------------------
 ;
-; int __fastcall__ mouse_x (void);
+; void __fastcall__ mouse_pos (struct mouse_pos* pos);
+; /* Return the current mouse position */
 ;
 
-_mouse_x:
-	lda	mouseXPos
-	ldx	mouseXPos+1
-      	rts
+_mouse_pos:
+       	sta	ptr1
+	stx	ptr1+1			; Remember the argument pointer
+
+	ldy	#0			; Structure offset
+
+	sei				; Disable interrupts
+
+       	lda     mouseXPos		; Transfer the position
+	sta	(ptr1),y
+	lda	mouseXPos+1
+	iny
+	sta	(ptr1),y
+      	lda	mouseYPos
+      	iny
+      	sta	(ptr1),y
+      	lda	#$00
+	iny
+	sta	(ptr1),y
+
+	cli				; Reenable interrupts
+	rts				; Done
 
 ; --------------------------------------------------------------------------
 ;
-; int __fastcall__ mouse_y (void);
-;
-
-_mouse_y:
-	lda	mouseYPos
-	ldx	#0
-      	rts
-
-; --------------------------------------------------------------------------
-;
-; void mouse_info (...);
+; void __fastcall__ mouse_info (struct mouse_info* info);
+; /* Return the state of the mouse buttons and the position of the mouse */
 ;
 
 _mouse_info:
-      	rts
 
+; We're cheating here to keep the code smaller: The first fields of the
+; mouse_info struct are identical to the mouse_pos struct, so we will just
+; call _mouse_pos to initialize the struct pointer and fill the position
+; fields.
+
+        jsr	_mouse_pos
+
+; Fill in the button state
+
+	jsr     _mouse_buttons		; Will not touch ptr1
+	iny
+	sta	(ptr1),y
+
+      	rts
 
 ; --------------------------------------------------------------------------
 ;
@@ -139,13 +158,12 @@ _mouse_info:
 _mouse_move:
 	jsr	popsreg			; Get X
 	sei				; Disable interrupts
-
 	sta	mouseYPos
-;	stx	YPos+1
 	lda	sreg
 	ldx	sreg+1
    	sta	mouseXPos
 	stx	mouseXPos+1
+	cli		   		; Enable interrupts
 	rts
 
 ; --------------------------------------------------------------------------
@@ -158,3 +176,4 @@ _mouse_buttons:
 	and	#SET_MOUSE
 	lsr
 	rts
+

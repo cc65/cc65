@@ -104,7 +104,7 @@ int blocks,rest;
 				Error("couldn't open %s:%s\n",argv[i],strerror(errno));
 			bytes = fread(buffer,1,BLOODY_BIG_BUFFER,input);
 			fclose(input);
-			if (bytes<0)
+			if (bytes==0)
 				Error("couldn't read %s:%s\n",argv[i],strerror(errno));
 			blocks = bytes / 254;
 			rest = bytes % 254 + 2;

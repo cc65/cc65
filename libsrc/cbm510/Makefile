@@ -4,6 +4,25 @@
 
 .SUFFIXES: .o .s .c
 
+#--------------------------------------------------------------------------
+# Rules
+
+%.o:   	%.c
+	@$(CC) $(CFLAGS) $<
+	@$(AS) -o $@ $(AFLAGS) $(*).s
+
+%.o:	%.s
+	@$(AS) -g -o $@ $(AFLAGS) $<
+
+%.emd:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+%.tgi:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+#--------------------------------------------------------------------------
+# Object files
+
 %.o:   	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
@@ -33,8 +52,21 @@ OBJS =	_scrsize.o	\
 	rs232.o		\
 	tgi_mode_table.o
 
-all:	$(OBJS)
+#--------------------------------------------------------------------------
+# Drivers
+
+TGIS =
+
+EMDS =	cbm510-ram.emd
+
+#--------------------------------------------------------------------------
+# Targets
+
+all:	$(OBJS) $(EMDS) $(TGIS)
+
+../runtime/zeropage.o:
+	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@rm -f $(OBJS)
+	@rm -f $(OBJS) $(EMDS:.emd=.o) $(TGIS:.tgi=.o)
 

@@ -155,12 +155,13 @@ cbm510lib:
 	    $(AR) a cbm510.lib $$i/*.o;\
 	done
 	mv cbm510/crt0.o cbm510.o
+	cp cbm510/*.emd .
 
 #-----------------------------------------------------------------------------
 # PET-II series
 
 cbm610lib:
-	for i in cbm610 cbm common runtime conio dbg; do \
+	for i in cbm610 cbm common runtime conio dbg em; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \
@@ -170,6 +171,7 @@ cbm610lib:
 	    $(AR) a cbm610.lib $$i/*.o;\
 	done
 	mv cbm610/crt0.o cbm610.o
+	cp cbm610/*.emd .
 
 #-----------------------------------------------------------------------------
 # GEOS on the C64/128

@@ -4,12 +4,24 @@
 
 .SUFFIXES: .o .s .c
 
+#--------------------------------------------------------------------------
+# Rules
+
 %.o:   	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
+
+%.emd:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+%.tgi:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+#--------------------------------------------------------------------------
+# Object files
 
 OBJS =	_scrsize.o	\
 	banking.o	\
@@ -30,8 +42,21 @@ OBJS =	_scrsize.o	\
         randomize.o     \
 	rs232.o
 
-all:	$(OBJS)
+#--------------------------------------------------------------------------
+# Drivers
+
+TGIS =
+
+EMDS =	cbm610-ram.emd
+
+#--------------------------------------------------------------------------
+# Targets
+
+all:	$(OBJS) $(EMDS) $(TGIS)
+
+../runtime/zeropage.o:
+	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@rm -f $(OBJS)
+	@rm -f $(OBJS) $(EMDS:.emd=.o) $(TGIS:.tgi=.o)
 

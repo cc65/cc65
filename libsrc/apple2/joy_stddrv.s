@@ -10,5 +10,5 @@
 
 .rodata
 
-_joy_stddrv:	.asciiz	"apple2-stdjoy.joy"
+_joy_stddrv:	.asciiz	"A2.STDJOY.JOY"
 

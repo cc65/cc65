@@ -55,11 +55,11 @@ OBJS=	_scrsize.o	\
 #--------------------------------------------------------------------------
 # Drivers
 
-EMDS =
+EMDS = apple2-lc.emd
 
 JOYS = apple2-stdjoy.joy
 
-SERS = apple2-lc.emd
+SERS =
 
 TGIS = apple2-40-40-16.tgi apple2-280-192-6.tgi
 

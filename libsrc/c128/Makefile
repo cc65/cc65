@@ -4,12 +4,24 @@
 
 .SUFFIXES: .o .s .c
 
+#--------------------------------------------------------------------------
+# Rules
+
 %.o:   	%.c
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
+
+%.emd:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+%.tgi:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
+#--------------------------------------------------------------------------
+# Object files
 
 OBJS =	_scrsize.o	\
 	break.o	       	\
@@ -27,7 +39,20 @@ OBJS =	_scrsize.o	\
 	rs232.o		\
 	tgi_mode_table.o
 
-all:   	$(OBJS)
+#--------------------------------------------------------------------------
+# Drivers
+
+TGIS =
+
+EMDS =	c128-georam.emd c128-reu.emd
+
+#--------------------------------------------------------------------------
+# Targets
+
+all:   	$(OBJS) $(EMDS) $(TGIS)
+
+../runtime/zeropage.o:
+	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
 	@rm -f $(OBJS)

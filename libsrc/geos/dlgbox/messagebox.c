@@ -20,7 +20,6 @@ static dlgBoxStr _mbdlg_EMPTY = {
 
 static dlgBoxStr _mbdlg_OK = {
 	DB_DEFPOS(1),
-	DB_OPVEC(&RstrFrmDialogue),
 	DB_USRROUT(&_mbprintout),
 	DB_ICON(OK, DBI_X_1, DBI_Y_2),
 	DB_END,
@@ -28,7 +27,6 @@ static dlgBoxStr _mbdlg_OK = {
 
 static dlgBoxStr _mbdlg_OKCANCEL = {
 	DB_DEFPOS(1),
-	DB_OPVEC(&RstrFrmDialogue),
 	DB_USRROUT(&_mbprintout),
 	DB_ICON(OK, DBI_X_0, DBI_Y_2),
 	DB_ICON(CANCEL, DBI_X_2, DBI_Y_2),
@@ -37,7 +35,6 @@ static dlgBoxStr _mbdlg_OKCANCEL = {
 
 static dlgBoxStr _mbdlg_YESNO = {
 	DB_DEFPOS(1),
-	DB_OPVEC(&RstrFrmDialogue),
 	DB_USRROUT(&_mbprintout),
 	DB_ICON(YES, DBI_X_0, DBI_Y_2),
 	DB_ICON(NO, DBI_X_2, DBI_Y_2),

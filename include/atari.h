@@ -142,10 +142,10 @@ extern void __fastcall__ _scroll (signed char numlines);
                                           /* numlines < 0  scrolls down */
 
 /* misc. functions */
+extern unsigned char get_ostype(void);  /* get ROM version */
+extern unsigned char get_tv(void);      /* get TV system */
 extern void _save_vecs(void);           /* save system vectors */
 extern void _rest_vecs(void);           /* restore system vectors */
-extern unsigned char _get_ostype(void); /* get ROM version */
-extern unsigned char _get_tv(void);     /* get TV system */
 extern char *_getdefdev(void);          /* get default floppy device */
 
 /* global variables */
@@ -160,8 +160,6 @@ extern unsigned char _dos_type;        /* the DOS flavour */
 #define scroll       _scroll
 #define save_vecs    _save_vecs
 #define rest_vecs    _rest_vecs
-#define get_ostype   _get_ostype
-#define get_tv       _get_tv
 #define getdefdev    _getdefdev
 #endif  /* #ifdef ATARI_COMPAT_PRE_2_11 */
 

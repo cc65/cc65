@@ -70,7 +70,6 @@ OBJS = 	_scrsize.o      \
        	ostype.o        \
        	randomize.o     \
        	read.o 	        \
-       	readjoy.o       \
        	remove.o        \
        	revers.o        \
        	rs232.o	        \

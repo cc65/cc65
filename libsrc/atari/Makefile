@@ -3,13 +3,15 @@
 #
 # NUMDRVS - number of supported drives (max. 16)
 #           4 bytes for each device are statically allocated
+# LINEBUF - support line buffered reads from E: (the number specifies
+#           the length of the buffer
 # UCASE_FILENAME - all filenames get uppercased
 # DEFAULT_DEVICE - if the string passed to the uppercase function doesn't
 #                  include a device (":" at position 2 or 3), provide "D:"
 #                  as a default device
 #                  needs UCASE_FILENAME to be defined, otherwise no effect
 
-ATARIDEFS = -DNUMDRVS=4 -DUCASE_FILENAME=1 -DDEFAULT_DEVICE=1
+ATARIDEFS = -DNUMDRVS=4 -DUCASE_FILENAME=1 -DDEFAULT_DEVICE=1 -DLINEBUF=80
 
 .SUFFIXES: .o .s .c
 

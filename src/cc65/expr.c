@@ -198,8 +198,8 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
  * set to the type of the left hand side.
  */
 {
-    /* Get the type of the right hand side. Treat function types as 
-     * pointer-to-function 
+    /* Get the type of the right hand side. Treat function types as
+     * pointer-to-function
      */
     type* rhst = rhs->e_tptr;
     if (IsTypeFunc (rhst)) {
@@ -1316,11 +1316,12 @@ static void pre_incdec (struct expent* lval, void (*inc) (unsigned, unsigned lon
 	     	g_subeqstatic (flags, lval->e_const, 0, val);
 	    }
 	} else if (lval->e_flags & E_MEXPR) {
-	    /* Address in a/x. */
+	    /* Address in a/x, check if we have an offset */
+	    unsigned Offs = (lval->e_flags == E_MEOFFS)? lval->e_const : 0;
 	    if (inc == g_inc) {
-	     	g_addeqind (flags, lval->e_const, val);
+	     	g_addeqind (flags, Offs, val);
 	    } else {
-	       	g_subeqind (flags, lval->e_const, val);
+	       	g_subeqind (flags, Offs, val);
 	    }
 	} else {
 	    Internal ("Invalid addressing mode");

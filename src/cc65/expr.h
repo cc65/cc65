@@ -27,7 +27,7 @@
 #define E_MLOCAL    	0x0040	/* Reference to local variable (stack offset) */
 #define E_MCONST    	0x0020	/* Constant value */
 #define E_MEXPR	    	0x0010	/* Result is in primary register */
-#define E_MEOFFS    	0x0011	/* Offset is in primary register, base on stack */
+#define E_MEOFFS       	0x0011 	/* Base is in primary register, const offset */
 
 #define E_MCTYPE    	0x0007	/* Type of a constant */
 #define E_TCONST    	0x0000  /* Constant */

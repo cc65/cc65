@@ -60,6 +60,19 @@
 /* Mouse button masks */
 #define MOUSE_BTN_LEFT	     0x10
 
+/* Structure containing the mouse coordinates */
+struct mouse_pos {
+    int x;
+    int y;
+};
+
+/* Structure containing information about the mouse */
+struct mouse_info {
+    int                 xpos;          /* Mouse x position */
+    int                 ypos;          /* Mouse y position */
+    unsigned char       buttons;       /* Mouse button mask */
+};
+
 
 
 /*****************************************************************************/
@@ -69,8 +82,8 @@
 
 
 unsigned char __fastcall__ mouse_init (unsigned char port,
-				       unsigned char sprite,
-				       unsigned char type);
+		  		       unsigned char sprite,
+		  		       unsigned char type);
 /* Setup the mouse interrupt handler. If the sprite value is != zero, the
  * mouse routines will manage the sprite with this number. That means, it
  * is moved if the mouse is moved (provided that the mouse cursor is visible),
@@ -87,21 +100,21 @@ unsigned char __fastcall__ mouse_init (unsigned char port,
  * detect a mouse reliably).
  */
 
-void mouse_done (void);
+void __fastcall__ mouse_done (void);
 /* Disable the mouse, remove the interrupt handler. This function MUST be
  * called before terminating the program, otherwise odd things may happen.
  * If in doubt, install an exit handler (using atexit) that calls this
  * function.
  */
 
-void mouse_hide (void);
+void __fastcall__ mouse_hide (void);
 /* Hide the mouse. This function doesn't do anything visible if no sprite is
  * used. The function manages a counter and may be called more than once.
  * For each call to mouse_hide there must be a call to mouse_show to make
  * the mouse visible again.
  */
 
-void mouse_show (void);
+void __fastcall__ mouse_show (void);
 /* Show the mouse. This function doesn't do anything visible if no sprite is
  * used. See mouse_hide for more information.
  */
@@ -129,14 +142,16 @@ void __fastcall__ mouse_move (int x, int y);
  * inside the bounding box.
  */
 
-unsigned char mouse_buttons (void);
+unsigned char __fastcall__ mouse_buttons (void);
 /* Return a bit mask encoding the states of the mouse buttons. Use the
  * MOUSE_BTN_XXX flags to decode a specific button.
  */
 
-void mouse_info (void);
-/* Hmmm...
- */
+void __fastcall__ mouse_pos (struct mouse_pos* pos);
+/* Return the current mouse position */
+
+void __fastcall__ mouse_info (struct mouse_info* info);
+/* Return the state of the mouse buttons and the position of the mouse */
 
 
 /* End of mouse.h */

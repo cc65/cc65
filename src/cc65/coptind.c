@@ -913,6 +913,7 @@ unsigned OptStoreLoad (CodeSeg* S)
 	    (N = CS_GetNextEntry (S, I)) != 0  	            &&
 	    !CE_HasLabel (N)                                &&
        	    (N->Info & OF_LOAD) != 0                        &&
+	    E->AM == N->AM                                  &&
        	    ((E->OPC == OP65_STA && N->OPC == OP65_LDA) ||
 	     (E->OPC == OP65_STX && N->OPC == OP65_LDX) ||
 	     (E->OPC == OP65_STY && N->OPC == OP65_LDY))    &&

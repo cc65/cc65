@@ -26,7 +26,7 @@ _bgcolor:
 
 
 _bordercolor:
-	ldx	VIC_BG_COLOR0	; get old value
+       	ldx    	VIC_BORDERCOLOR ; get old value
 	sta	VIC_BORDERCOLOR	; set new value
 	txa
 	rts

@@ -86,23 +86,29 @@ static const FuncInfo FuncInfoTable[] = {
     { "decax7",     	REG_AX,		REG_AX  	},
     { "decax8",     	REG_AX,		REG_AX      	},
     { "decaxy",	   	REG_AXY,	REG_AX	    	},
-    { "decsp2",    	REG_NONE,	REG_A	    	},
-    { "decsp3",    	REG_NONE,	REG_A	    	},
-    { "decsp4",    	REG_NONE,	REG_A	    	},
-    { "decsp5",    	REG_NONE,	REG_A	    	},
-    { "decsp6",     	REG_NONE,	REG_A	    	},
-    { "decsp7",    	REG_NONE,	REG_A	    	},
-    { "decsp8",      	REG_NONE,	REG_A	    	},
+    { "decsp1",        	REG_NONE,      	REG_Y 	    	},
+    { "decsp2",    	REG_NONE,	REG_A 	    	},
+    { "decsp3",    	REG_NONE,	REG_A 	    	},
+    { "decsp4",    	REG_NONE,	REG_A 	    	},
+    { "decsp5",    	REG_NONE,	REG_A 	    	},
+    { "decsp6",     	REG_NONE,	REG_A 	    	},
+    { "decsp7",    	REG_NONE,	REG_A 	    	},
+    { "decsp8",      	REG_NONE,	REG_A 	    	},
     { "incsp1",		REG_NONE,	REG_NONE    	},
-    { "incsp2",		REG_NONE,	REG_Y	    	},
-    { "incsp3",		REG_NONE,	REG_Y	    	},
-    { "incsp4",		REG_NONE,	REG_Y	    	},
-    { "incsp5",		REG_NONE,	REG_Y	    	},
-    { "incsp6",		REG_NONE,	REG_Y	    	},
-    { "incsp7",		REG_NONE,	REG_Y	    	},
-    { "incsp8",		REG_NONE,	REG_Y	    	},
+    { "incsp2",		REG_NONE,	REG_Y 	    	},
+    { "incsp3",		REG_NONE,	REG_Y 	    	},
+    { "incsp4",		REG_NONE,	REG_Y 	    	},
+    { "incsp5",		REG_NONE,	REG_Y 	    	},
+    { "incsp6",		REG_NONE,	REG_Y 	    	},
+    { "incsp7",		REG_NONE,	REG_Y 	    	},
+    { "incsp8",		REG_NONE,	REG_Y 	    	},
+    { "ldaui",          REG_AX,         REG_AXY         },
+    { "ldauidx",        REG_AXY,        REG_AX          },
     { "ldax0sp",   	REG_Y,		REG_AX	    	},
+    { "ldaxi",          REG_AX,         REG_AXY         },
+    { "ldaxidx",        REG_AXY,        REG_AX          },
     { "ldaxysp",   	REG_Y,		REG_AX 	    	},
+    { "leaasp",         REG_A,          REG_AX          },
     { "pusha",	   	REG_A,		REG_Y	    	},
     { "pusha0",	       	REG_A,		REG_XY	    	},
     { "pushax",	   	REG_AX,		REG_Y	    	},
@@ -157,11 +163,11 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
     if (Name[0] == '_') {
 
      	/* Search in the symbol table, skip the leading underscore */
-     	SymEntry* E = FindSym (Name+1);
+     	SymEntry* E = FindGlobalSym (Name+1);
 
      	/* Did we find it in the top level table? */
-     	if (E && E->Owner->PrevTab == 0 && IsTypeFunc (E->Type)) {
-
+     	if (E && IsTypeFunc (E->Type)) {
+		 
      	    /* A function may use the A or A/X registers if it is a fastcall
      	     * function. If it is not a fastcall function but a variadic one,
 	     * it will use the Y register (the parameter size is passed here).

@@ -121,14 +121,14 @@ const OPCDesc OPCTable[OPC_COUNT] = {
     { OPC_STA, "sta", 0, REG_A,    REG_NONE, OF_NONE			    },
     { OPC_STX, "stx", 0, REG_X,    REG_NONE, OF_NONE			    },
     { OPC_STY, "sty", 0, REG_Y,    REG_NONE, OF_NONE			    },
-    { OPC_TAX, "tax", 1, REG_A,    REG_X,    OF_NONE			    },
-    { OPC_TAY, "tay", 1, REG_A,    REG_Y,    OF_NONE			    },
+    { OPC_TAX, "tax", 1, REG_A,    REG_X,    OF_XFR			    },
+    { OPC_TAY, "tay", 1, REG_A,    REG_Y,    OF_XFR			    },
     { OPC_TRB, "trb", 0, REG_A,    REG_NONE, OF_NONE			    },
     { OPC_TSB, "tsb", 0, REG_A,    REG_NONE, OF_NONE			    },
-    { OPC_TSX, "tsx", 1, REG_NONE, REG_X,    OF_NONE			    },
-    { OPC_TXA, "txa", 1, REG_X,    REG_A,    OF_NONE			    },
-    { OPC_TXS, "txs", 1, REG_X,    REG_NONE, OF_NONE			    },
-    { OPC_TYA, "tya", 1, REG_A,    REG_A,    OF_NONE			    },
+    { OPC_TSX, "tsx", 1, REG_NONE, REG_X,    OF_XFR			    },
+    { OPC_TXA, "txa", 1, REG_X,    REG_A,    OF_XFR			    },
+    { OPC_TXS, "txs", 1, REG_X,    REG_NONE, OF_XFR			    },
+    { OPC_TYA, "tya", 1, REG_A,    REG_A,    OF_XFR			    },
 };
 
 

@@ -51,8 +51,8 @@
 
 
 
-static int doif (void)
-/* Handle 'if' statement here */
+static int DoIf (void)
+/* Handle an 'if' statement */
 {
     int flab1;
     int flab2;
@@ -108,57 +108,84 @@ static int doif (void)
 
 
 
-static void dowhile (char wtype)
-/* Handle 'while' statement here */
+static void DoDo (void)
+/* Handle the 'do' statement */
 {
-    int loop;
-    int lab;
+    /* Get the loop control labels */
+    unsigned loop = GetLocalLabel ();
+    unsigned lab = GetLocalLabel ();
 
+    /* Skip the while token */
     NextToken ();
-    loop = GetLocalLabel ();
-    lab = GetLocalLabel ();
+
+    /* Add the loop to the loop stack */
     AddLoop (oursp, loop, lab, 0, 0);
+
+    /* Define the head label */
     g_defcodelabel (loop);
-    if (wtype == 'w') {
 
-	/* While loop */
-       	test (lab, 0);
+    /* Parse the loop body */
+    Statement ();
 
-	/* If the statement following the while loop is empty, that is, we have
-	 * something like "while (1) ;", the test function ommitted the jump as
-	 * an optimization. Since we know, the condition codes are set, we can
-	 * do another small optimization here, and use a conditional jump
-	 * instead an absolute one.
-	 */
-	if (CurTok.Tok == TOK_SEMI) {
-	    /* Shortcut */
-	    NextToken ();
-	    /* Use a conditional jump */
-	    g_truejump (CF_NONE, loop);
-	} else {
-	    /* There is code inside the while loop */
-	    Statement ();
-	    g_jump (loop);
-	    g_defcodelabel (lab);
-     	}
+    /* Parse the end condition */
+    Consume (TOK_WHILE, "`while' expected");
+    test (loop, 1);
+    ConsumeSemi ();
 
+    /* Define the break label */
+    g_defcodelabel (lab);
+
+    /* Remove the loop from the loop stack */
+    DelLoop ();
+}
+
+
+
+static void DoWhile (void)
+/* Handle the 'while' statement */
+{
+    /* Get the loop control labels */
+    unsigned loop = GetLocalLabel ();
+    unsigned lab = GetLocalLabel ();
+
+    /* Skip the while token */
+    NextToken ();
+
+    /* Add the loop to the loop stack */
+    AddLoop (oursp, loop, lab, 0, 0);
+
+    /* Define the head label */
+    g_defcodelabel (loop);
+
+    /* Test the loop condition */
+    test (lab, 0);
+
+    /* If the statement following the while loop is empty, that is, we have
+     * something like "while (1) ;", the test function ommitted the jump as
+     * an optimization. Since we know, the condition codes are set, we can
+     * do another small optimization here, and use a conditional jump
+     * instead an absolute one.
+     */
+    if (CurTok.Tok == TOK_SEMI) {
+    	/* Use a conditional jump */
+    	g_truejump (CF_NONE, loop);
+    	/* Shortcut */
+    	NextToken ();
     } else {
-
-	/* Do loop */
-       	Statement ();
-	Consume (TOK_WHILE, "`while' expected");
-    	test (loop, 1);
-    	ConsumeSemi ();
-	g_defcodelabel (lab);
-
+    	/* There is code inside the while loop, parse the body */
+    	Statement ();
+    	g_jump (loop);
+    	g_defcodelabel (lab);
     }
+
+    /* Remove the loop from the loop stack */
     DelLoop ();
 }
 
 
 
 static void DoReturn (void)
-/* Handle 'return' statement here */
+/* Handle the 'return' statement */
 {
     struct expent lval;
 
@@ -188,8 +215,8 @@ static void DoReturn (void)
 
 
 
-static void dobreak (void)
-/* Handle 'break' statement here */
+static void DoBreak (void)
+/* Handle the 'break' statement */
 {
     LoopDesc* L;
 
@@ -215,8 +242,8 @@ static void dobreak (void)
 
 
 
-static void docontinue (void)
-/* Handle 'continue' statement here */
+static void DoContinue (void)
+/* Handle the 'continue' statement */
 {
     LoopDesc* L;
 
@@ -254,7 +281,7 @@ static void docontinue (void)
 
 
 
-static void cascadeswitch (struct expent* eval)
+static void CascadeSwitch (struct expent* eval)
 /* Handle a switch statement for chars with a cmp cascade for the selector */
 {
     unsigned ExitLab;  		/* Exit label */
@@ -339,9 +366,9 @@ static void cascadeswitch (struct expent* eval)
 			    if (Val < -32768 || Val > 32767) {
 			  	Error ("Range error");
 			    }
-			    break;
+		   	    break;
 
-		  	case T_UINT:
+		    	case T_UINT:
 		  	    if (Val < 0 || Val > 65535) {
 			  	Error ("Range error");
 		  	    }
@@ -382,9 +409,9 @@ static void cascadeswitch (struct expent* eval)
 		    /* Handle the pathologic case: DEFAULT followed by CASE */
 		    if (CurTok.Tok == TOK_CASE) {
 		  	if (CodeLab == 0) {
-		  	    CodeLab = GetLocalLabel ();
+		   	    CodeLab = GetLocalLabel ();
 		  	}
-		  	g_jump (CodeLab);
+		    	g_jump (CodeLab);
 		    }
 
 		    /* Skip the colon */
@@ -432,7 +459,7 @@ static void cascadeswitch (struct expent* eval)
 
 
 
-static void tableswitch (struct expent* eval)
+static void TableSwitch (struct expent* eval)
 /* Handle a switch statement via table based selector */
 {
     /* Entry for one case in a switch statement */
@@ -542,10 +569,10 @@ static void tableswitch (struct expent* eval)
 
 
 
-static void doswitch (void)
-/* Handle 'switch' statement here */
+static void DoSwitch (void)
+/* Handle a 'switch' statement */
 {
-    struct expent eval;		/* Switch statement expression */
+    struct expent eval;	       	/* Switch statement expression */
 
     /* Eat the "switch" */
     NextToken ();
@@ -560,16 +587,16 @@ static void doswitch (void)
 
     /* Now decide which sort of switch we will create: */
     if (IsTypeChar (eval.e_tptr) || (CodeSizeFactor >= 200 && IsClassInt (eval.e_tptr))) {
-       	cascadeswitch (&eval);
+       	CascadeSwitch (&eval);
     } else {
-      	tableswitch (&eval);
+      	TableSwitch (&eval);
     }
 }
 
 
 
-static void dofor (void)
-/* Handle 'for' statement here */
+static void DoFor (void)
+/* Handle a 'for' statement */
 {
     int loop;
     int lab;
@@ -685,37 +712,37 @@ int Statement (void)
      	    	return CompoundStatement ();
 
      	    case TOK_IF:
-     	    	return doif ();
+     	    	return DoIf ();
 
      	    case TOK_WHILE:
-     		dowhile ('w');
-		break;
+     	    	DoWhile ();
+	    	break;
 
 	    case TOK_DO:
-		dowhile ('d');
-		break;
+	    	DoDo ();
+	    	break;
 
 	    case TOK_SWITCH:
-		doswitch ();
-		break;
+	    	DoSwitch ();
+	    	break;
 
 	    case TOK_RETURN:
-		DoReturn ();
-		ConsumeSemi ();
-		return 1;
+	    	DoReturn ();
+	    	ConsumeSemi ();
+	    	return 1;
 
 	    case TOK_BREAK:
-		dobreak ();
+		DoBreak ();
 		ConsumeSemi ();
 		return 1;
 
 	    case TOK_CONTINUE:
-		docontinue ();
+		DoContinue ();
 		ConsumeSemi ();
 		return 1;
 
 	    case TOK_FOR:
-		dofor ();
+		DoFor ();
 		break;
 
 	    case TOK_GOTO:
@@ -724,7 +751,7 @@ int Statement (void)
 		return 1;
 
 	    case TOK_SEMI:
-		/* ignore it. */
+		/* Ignore it */
 		NextToken ();
 		break;
 
@@ -733,6 +760,7 @@ int Statement (void)
 		break;
 
 	    default:
+	        /* Actual statement */
 		expression (&lval);
 		ConsumeSemi ();
 	}

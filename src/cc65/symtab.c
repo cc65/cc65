@@ -441,6 +441,14 @@ SymEntry* FindSym (const char* Name)
 
 
 
+SymEntry* FindGlobalSym (const char* Name)
+/* Find the symbol with the given name in the global symbol table only */
+{
+    return FindSymInTable (SymTab0, Name, HashStr (Name));
+}
+
+
+
 SymEntry* FindLocalSym (const char* Name)
 /* Find the symbol with the given name in the current symbol table only */
 {

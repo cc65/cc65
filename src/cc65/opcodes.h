@@ -162,9 +162,10 @@ typedef enum {
 #define OF_CBRA	0x0002U	       	 	/* Conditional branch */
 #define OF_ZBRA 0x0004U		 	/* Branch on zero flag condition */
 #define OF_FBRA 0x0008U                 /* Branch on cond set by a load */
-#define OF_LBRA 0x0010U		  	/* Jump/branch is long */	  
+#define OF_LBRA 0x0010U		  	/* Jump/branch is long */
 #define OF_RET 	0x0020U	       	 	/* Return from function */
 #define OF_LOAD 0x0040U			/* Register load */
+#define OF_XFR  0x0080                  /* Transfer instruction */
 #define OF_BRA 	(OF_UBRA|OF_CBRA)	/* Operation is a jump/branch */
 #define OF_DEAD	(OF_UBRA|OF_RET)	/* Dead end - no exec behind this point */
 

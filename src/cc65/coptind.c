@@ -588,38 +588,32 @@ unsigned OptUnusedLoads (CodeSeg* S)
 /* Remove loads of registers where the value loaded is not used later. */
 {
     unsigned Changes = 0;
-    unsigned I;
-
-    /* Get the number of entries, bail out if we have not enough */
-    unsigned Count = GetCodeEntryCount (S);
-    if (Count < 2) {
-     	return 0;
-    }
 
     /* Walk over the entries */
-    I = 0;
-    while (I < Count-1) {
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* N;
 
       	/* Get next entry */
        	CodeEntry* E = GetCodeEntry (S, I);
 
-	/* Check if it's a register load */
-       	if ((E->Info & OF_LOAD) != 0) {
+	/* Check if it's a register load or transfer insn */
+	if ((E->Info & (OF_LOAD | OF_XFR)) != 0    &&
+	    (N = GetNextCodeEntry (S, I)) != 0     &&
+	    (N->Info & OF_FBRA) == 0) {
 
-	    unsigned char R;
-
-	    /* Get the next instruction, it must not be a conditional branch */
-	    CodeEntry* N = GetCodeEntry (S, I+1);
-	    if ((N->Info & OF_CBRA) != 0) {
-		goto NextEntry;
-	    }
-
-	    /* Check which sort of load it is */
+	    /* Check which sort of load or transfer it is */
+	    unsigned R;
 	    switch (E->OPC) {
+		case OPC_TXA:
+		case OPC_TYA:
 		case OPC_LDA:	R = REG_A;	break;
+		case OPC_TAX:
        	       	case OPC_LDX:  	R = REG_X;	break;
+		case OPC_TAY:
 		case OPC_LDY:	R = REG_Y;	break;
-		default:	goto NextEntry;		/* OOPS */
+		default:     	goto NextEntry;		/* OOPS */
 	    }
 
 	    /* Get register usage and check if the register value is used later */
@@ -627,7 +621,6 @@ unsigned OptUnusedLoads (CodeSeg* S)
 
 		/* Register value is not used, remove the load */
 		DelCodeEntry (S, I);
-		--Count;
 
 		/* Remember, we had changes */
 		++Changes;

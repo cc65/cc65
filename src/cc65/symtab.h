@@ -117,6 +117,9 @@ void LeaveStructLevel (void);
 SymEntry* FindSym (const char* Name);
 /* Find the symbol with the given name */
 
+SymEntry* FindGlobalSym (const char* Name);
+/* Find the symbol with the given name in the global symbol table only */
+
 SymEntry* FindLocalSym (const char* Name);
 /* Find the symbol with the given name in the current symbol table only */
 

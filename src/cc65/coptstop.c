@@ -209,10 +209,12 @@ static void CheckDirectOp (StackOpData* D)
             /* These insns are all ok and replaceable */
             D->Flags |= OP_DIRECT;
         } else if (E->AM == AM65_ZP_INDY && RegValIsKnown (E->RI->In.RegY) &&
-                   strcmp (E->Arg, D->ZPLo) != 0 && strcmp (E->Arg, D->ZPHi) != 0) {
-            /* Load indirect with known offset is also ok, provided that
-             * the zeropage location used is not the same as the one we're
-             * using for the temp storage.
+                   strcmp (E->Arg, "sp") == 0) {
+            /* A load from the stack with known offset is also ok, but in this
+             * case we must reload the index register later. Please note that
+             * a load indirect via other zero page locations is not ok, since
+             * these locations may change between the push and the actual
+             * operation.
              */
             D->Flags |= (OP_DIRECT | OP_RELOAD_Y);
         }

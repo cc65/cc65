@@ -15,7 +15,7 @@
 #define nameBuf		char[17]
 #define blockBuf	char[256]
 
-#define	zpage		*(char*)0x0000
+#define	zpage		(char*)0x0000
 
 #define	CPU_DDR		*(char*)0x00
 #define	CPU_DATA	*(char*)0x01
@@ -89,10 +89,10 @@
 #define	bkvec		*(unsigned int*)0x0316
 #define	nmivec		*(unsigned int*)0x0318
 
-#define	APP_RAM		*(char*)0x0400
-#define	BACK_SCR_BASE	*(char*)0x6000
-#define	PRINTBASE	*(char*)0x7900
-#define	OS_VARS		*(char*)0x8000
+#define	APP_RAM		(char*)0x0400
+#define	BACK_SCR_BASE	(char*)0x6000
+#define	PRINTBASE	(char*)0x7900
+#define	OS_VARS		(char*)0x8000
 
 #define	diskBlkBuf	((blockBuf)0x8000)
 #define fileHeader	(*(struct fileheader*)0x8100)
@@ -170,37 +170,35 @@
 #define	DrCCurDkNm	((nameBuf)0x88dc)
 #define	DrDCurDkNm	((nameBuf)0x88ee)
 #define	dir2Head	((blockBuf)0x8900)
-#define	SPRITE_PICS	*(char*)0x8a00
+#define	SPRITE_PICS	(char*)0x8a00
 #define sprpic		((char[8][64])0x8a00)
 #define COLOR_MATRIX	((char[1000])0x8c00)
 #define objPointer	((char[8])0x8ff8)
 
-#define	DISK_BASE	*(char*)0x9000
-#define	SCREEN_BASE	*(char*)0xa000
-#define	OS_ROM		*(char*)0xc000
-#define	OS_JUMPTAB	*(char*)0xc100
-#define	RAMC_BASE	*(char*)0xde00
-#define	RAMC_WINDOW	*(char*)0xdf00
-#define	EXP_BASE	*(char*)0xdf00
-#define	MOUSE_BASE_128	*(char*)0xfd00
-#define	MOUSE_JMP_128	*(char*)0xfd00
-#define	END_MOUSE_128	*(char*)0xfe80
-#define	MOUSE_BASE	*(char*)0xfe80
-#define	MOUSE_JMP	*(char*)0xfe80
+#define	DISK_BASE	(char*)0x9000
+#define	SCREEN_BASE	(char*)0xa000
+#define	OS_ROM		(char*)0xc000
+#define	OS_JUMPTAB	(char*)0xc100
+#define	EXP_BASE	(char*)0xdf00
+#define	MOUSE_BASE_128	(char*)0xfd00
+#define	MOUSE_JMP_128	(char*)0xfd00
+#define	END_MOUSE_128	(char*)0xfe80
+#define	MOUSE_BASE	(char*)0xfe80
+#define	MOUSE_JMP	(char*)0xfe80
 
 #define	config		*(char*)0xff00
-#define	END_MOUSE	*(char*)0xfffa
+#define	END_MOUSE	(char*)0xfffa
 #define	NMI_VECTOR	*(unsigned int*)0xfffa
 #define	RESET_VECTOR	*(unsigned int*)0xfffc
 #define	IRQ_VECTOR	*(unsigned int*)0xfffe
 
-#define	vicbase		*(char*)0xd000
-#define	sidbase		*(char*)0xd400
-#define	mmu		*(char*)0xd500
-#define	VDC		*(char*)0xd600
-#define	ctab		*(char*)0xd800
-#define	cia1base	*(char*)0xdc00
-#define	cia2base	*(char*)0xdd00
+#define	vicbase		(char*)0xd000
+#define	sidbase		(char*)0xd400
+#define	mmu		(char*)0xd500
+#define	VDC		(char*)0xd600
+#define	ctab		(char*)0xd800
+#define	cia1base	(char*)0xdc00
+#define	cia2base	(char*)0xdd00
 
 #define	mob0xpos	*(char*)0xd000
 #define	mob0ypos	*(char*)0xd001

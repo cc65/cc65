@@ -9,6 +9,11 @@ List of known bugs that will not get fixed before any new major release:
   * Initialization of local variables with compound data types is not
     possible.
 
+  * The assembler/linker do not have special handling for the "jump indirect"
+    bug of the NMOS 6502 CPUs. This bug will cause the CPU to behave
+    erratically if the address argument crosses a page.
+
+
 Introduced with version 2.5:
 
   * Use of "goto" to jump into or out of blocks that declare local variables

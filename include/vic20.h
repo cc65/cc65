@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -80,6 +80,10 @@
 /* Define hardware */
 #include <_vic.h>
 #define VIC    	(*(struct __vic*)0x9000)
+
+#include <_6522.h>
+#define VIA1   	(*(struct __6522*)0x9110)
+#define VIA2	(*(struct __6522*)0x9120)
 
 
 

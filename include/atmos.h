@@ -6,11 +6,11 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Debrune Jérome, <jede@oric.org>		             */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Roemerstrasse 52                                            */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2002       Debrune Jérome, <jede@oric.org>                            */
+/* (C) 2003-2004  Ullrich von Bassewitz                                      */
+/*                Roemerstrasse 52                                           */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,7 +41,7 @@
 
 /* Check for errors */
 #if !defined(__ATMOS__)
-#  error This module may only be used when compiling for the Oric Atmos !
+#  error This module may only be used when compiling for the Oric Atmos!
 #endif
 
 
@@ -56,6 +56,14 @@
 #define COLOR_CYAN 	0x06
 #define COLOR_WHITE 	0x07
 
+
+
+/* Define hardware */
+#include <_6522.h>
+#define VIA    	(*(struct __6522*)0x300)
+
+
+
 /* Character codes */
 #define CH_ULCORNER 	'+'
 #define CH_URCORNER 	'+'
@@ -66,8 +74,6 @@
 #define CH_LTEE     	'+'
 #define CH_RTEE     	'+'
 #define CH_CROSS    	'+'
-
-
 
 
 

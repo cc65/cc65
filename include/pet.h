@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -48,6 +48,16 @@
 /* Color defines */
 #define COLOR_BLACK  	       	0x00
 #define COLOR_WHITE  	       	0x01
+
+
+
+/* Define hardware */
+#include <_pia.h>
+#define PIA1	(*(struct __pia*)0xE810)
+#define PIA2	(*(struct __pia*)0xE820)
+
+#include <_6522.h>
+#define VIA    	(*(struct __6522*)0xE840)
 
 
 

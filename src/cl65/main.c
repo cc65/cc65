@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1999-2001 Ullrich von Bassewitz					     */
+/* (C) 1999-2002 Ullrich von Bassewitz					     */
 /*		 Wacholderweg 14					     */
 /*		 D-70597 Stuttgart					     */
 /* EMail:	 uz@musoftware.de					     */
@@ -64,8 +64,8 @@
 
 
 /* Struct that describes a command */
-typedef struct CmdDesc_ CmdDesc;
-struct CmdDesc_ {
+typedef struct CmdDesc CmdDesc;
+struct CmdDesc {
     char*	Name;		/* The command name */
 
     unsigned	ArgCount;	/* Count of arguments */
@@ -110,6 +110,9 @@ static const char* LinkerConfig = 0;
  * executable file name if no explicit name is given.
  */
 static const char* FirstInput = 0;
+
+/* Remember if we should link a module */
+static int Module = 0;
 
 /* Name of the crt0 object file and the runtime library */
 static char* TargetCRT0 = 0;
@@ -340,8 +343,13 @@ static void Link (void)
      * Otherwise pass the target to the linker if we have one.
      */
     if (LinkerConfig) {
+        if (Module) {
+            Error ("Cannot use -C and --module together");
+        }
        	CmdAddArg (&LD65, "-C");
 	CmdAddArg (&LD65, LinkerConfig);
+    } else if (Module) {
+        CmdSetTarget (&LD65, TGT_MODULE);
     } else if (Target != TGT_NONE) {
 	CmdSetTarget (&LD65, Target);
     }
@@ -577,6 +585,8 @@ static void Usage (void)
        	     "  --include-dir dir\tSet a compiler include directory path\n"
        	     "  --listing\t\tCreate an assembler listing\n"
 	     "  --mapfile name\tCreate a map file\n"
+             "  --module\t\tLink as a module\n"
+             "  --module-id id\tSpecify a module id for the linker\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
        	     "  --signed-chars\tDefault characters are signed\n"
        	     "  --start-addr addr\tSet the default start address\n"
@@ -748,6 +758,25 @@ static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptModule (const char* Opt attribute ((unused)),
+                       const char* Arg attribute ((unused)))
+/* Link as a module */
+{
+    Module = 1;
+}
+
+
+
+static void OptModuleId (const char* Opt attribute ((unused)), const char* Arg)
+/* Specify a module if for the linker */
+{
+    /* Pass it straight to the linker */
+    CmdAddArg (&LD65, "--module-id");
+    CmdAddArg (&LD65, Arg);
+}
+
+
+
 static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --rodata-name option */
 {
@@ -776,7 +805,7 @@ static void OptStartAddr (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptStaticLocals (const char* Opt attribute ((unused)),
-			     const char* Arg attribute ((unused)))
+	      		     const char* Arg attribute ((unused)))
 /* Place local variables in static storage */
 {
     CmdAddArg (&CC65, "-Cl");
@@ -787,9 +816,15 @@ static void OptStaticLocals (const char* Opt attribute ((unused)),
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the target system */
 {
-    Target = FindTarget (Arg);
-    if (Target == TGT_UNKNOWN) {
-	Error ("No such target system: `%s'", Arg);
+    if (Target != TGT_NONE) {
+        Error ("Cannot specify -t twice");
+    } else {
+        Target = FindTarget (Arg);
+        if (Target == TGT_UNKNOWN) {
+            Error ("No such target system: `%s'", Arg);
+        } else if (Target == TGT_MODULE) {
+            Error ("Cannot use `module' as target, use --module instead");
+        }
     }
 }
 
@@ -837,15 +872,17 @@ int main (int argc, char* argv [])
 	{ "--feature",	     	1,	OptFeature		},
 	{ "--help",	     	0,	OptHelp			},
 	{ "--include-dir",   	1,	OptIncludeDir		},
-	{ "--listing",	     	0,	OptListing		},
-	{ "--mapfile",	     	1,	OptMapFile		},
-	{ "--rodata-name",	1, 	OptRodataName		},
-	{ "--signed-chars",	0, 	OptSignedChars	       	},
-	{ "--start-addr",    	1,	OptStartAddr		},
+	{ "--listing",	      	0,	OptListing		},
+	{ "--mapfile",	      	1,	OptMapFile		},
+        { "--module",           0,      OptModule               },
+        { "--module-id",        1,      OptModuleId             },
+	{ "--rodata-name",    	1, 	OptRodataName		},
+	{ "--signed-chars",   	0, 	OptSignedChars	       	},
+	{ "--start-addr",     	1,	OptStartAddr		},
        	{ "--static-locals",   	0, 	OptStaticLocals	       	},
-	{ "--target",	     	1,	OptTarget		},
-	{ "--verbose",	     	0,	OptVerbose		},
-	{ "--version",	     	0,	OptVersion		},
+	{ "--target",	      	1,	OptTarget		},
+	{ "--verbose",	      	0,	OptVerbose		},
+	{ "--version",	      	0,	OptVersion		},
     };
 
     unsigned I;

@@ -27,8 +27,7 @@ BuildRoot: /var/tmp/%{name}-%{version}
 A C crosscompiler for 6502 systems, including a macroassembler that
 supports 6502, 65SC02 and 65816 CPUs, a linker, an archiver and some
 other tools. To create programs for one of the supported target
-machines, you have to install at least one of the library packages,
-too.
+machines, you have to install at least one of the library packages.
 
 %files
 %defattr(644,root,root,755)
@@ -62,6 +61,7 @@ too.
 
 %package c64
 Requires: cc65 = 2.6.0
+Copyright: Freeware
 Summary: C64 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -76,11 +76,12 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 
 
 ###############################################################################
-#				C128 subpackage				      #
+#		    		C128 subpackage				      #
 ###############################################################################
 
 %package c128
 Requires: cc65 = 2.6.0
+Copyright: Freeware
 Summary: C128 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -100,6 +101,7 @@ programs for the Commodore C128 using the cc65 crosscompiler.
 
 %package atari
 Requires: cc65 = 2.6.0
+Copyright: Freeware
 Summary: Atari specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -119,6 +121,7 @@ programs for the 8 bit Atari machines using the cc65 crosscompiler.
 
 %package plus4
 Requires: cc65 = 2.6.0
+Copyright: Freeware
 Summary: Plus/4 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -139,6 +142,7 @@ crosscompiler.
 
 %package pet
 Requires: cc65 = 2.6.0
+Copyright: Freeware
 Summary: PET specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -159,6 +163,7 @@ crosscompiler.
 
 %package cbm610
 Requires: cc65 = 2.6.0
+Copyright: Freeware
 Summary: CBM 610 specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -179,6 +184,7 @@ the cc65 crosscompiler.
 
 %package apple2
 Requires: cc65 = 2.6.0
+Copyright: Freeware
 Summary: Apple ][ specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
@@ -198,6 +204,7 @@ programs for the Apple ][ using the cc65 crosscompiler.
 
 %package geos
 Requires: cc65 = 2.6.0
+Copyright: Freeware
 Summary: GEOS specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 

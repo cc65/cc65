@@ -25,7 +25,7 @@
 	.constructor	initmainargs, 24
 	.import		__argc, __argv
 
-	.include	"c64.inc"
+	.include	"plus4.inc"
 
 
 
@@ -117,7 +117,7 @@ argloop:lda     BASIC_BUF,x
 
 ; (The last vector in argv[] already is NULL.)
 
-done:	lda	#<argv
+done:	lda	#<argv        
 	ldx	#>argv
 	sta	__argv
 	stx	__argv + 1

@@ -2848,7 +2848,7 @@ Here's a list of all control commands and a description, what they do:
   <tscreen><verb>
 	.macro	Crypt  	Arg
 		.repeat	.strlen(Arg), I
-		.byte  	.strat(Arg, I) .xor $55
+		.byte  	.strat(Arg, I) ^ $55
 		.endrep
 	.endmacro
   </verb></tscreen>
@@ -2976,7 +2976,7 @@ Here's a list of all control commands and a description, what they do:
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 6502X, 65SC02, 65C02, 65816 and sunplus. Please note that 
+  namely: 6502, 6502X, 65SC02, 65C02, 65816 and sunplus. Please note that
   support for the sunplus CPU is not available in the freeware version,
   because the instruction set of the sunplus CPU is "proprietary and
   confidential".

@@ -5,8 +5,8 @@
 
    example of using DlgBoxYesNo, DlgBoxOkCancel and DlgBoxOk functions
 
-   Maciej 'YTM/Alliance' Witkowiak
-   <ytm@friko.onet.pl>
+   Maciej 'YTM/Elysium' Witkowiak
+   <ytm@elysium.pl>
 
    26.12.1999
  */
@@ -23,5 +23,4 @@ void main(void)
 		};
 	} while (DlgBoxOkCancel("Do you want to try again?", "") == OK);
 
-    EnterDeskTop();
 }

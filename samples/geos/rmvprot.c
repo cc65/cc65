@@ -6,8 +6,8 @@
     This small application removes GEOS disk write protection tag.
     e.g. boot disk is always protected after boot-up
     
-    Maciej 'YTM/Alliance' Witkowiak
-    <ytm@friko.onet.pl>
+    Maciej 'YTM/Elysium' Witkowiak
+    <ytm@elysium.pl>
     
     21.03.2000
 */
@@ -81,7 +81,7 @@ void main(void)
 			GetPtrCurDkNm(diskName);
 			break;
 		default:	/* CANCEL is the third option */
-			EnterDeskTop();
+			return;
 			break;
 		}
 	}

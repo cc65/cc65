@@ -5,8 +5,8 @@
     
     using DlgBoxFileSelect
     
-    Maciej 'YTM/Alliance' Witkowiak
-    <ytm@friko.onet.pl>
+    Maciej 'YTM/Elysium' Witkowiak
+    <ytm@elysium.pl>
     
     26.12.1999
 */
@@ -24,5 +24,4 @@ void main (void)
     DlgBoxFileSelect("",APPLICATION,fName);
     DlgBoxOk("You've chosen:" CBOLDON, fName);
 
-    EnterDeskTop();
 }

@@ -45,6 +45,12 @@ void main (void)
 /* Normal apps exit from main into system's mainloop, and app finish
    when user selects it from icons or menu, but here we want to exit
    immediately.
+   So instead:
+    MainLoop();
+   we can do:
+    (nothing as this is the end of main function)
+    exit(0);
+    return;
 */
-    EnterDeskTop();
+    return;
 }

@@ -55,6 +55,4 @@ char ch;
 
     DlgBoxOk("Bye,", "Bye.");
 
-    EnterDeskTop();
-
 }

@@ -471,6 +471,9 @@ static void Assemble (const char* File)
     /* Remember the current assembler argument count */
     unsigned ArgCount = CA65.ArgCount;
 
+    /* Set the target system */
+    CmdSetTarget (&CA65, Target);
+
     /* If we won't link, this is the final step. In this case, set the
      * output name.
      */
@@ -500,7 +503,7 @@ static void Assemble (const char* File)
 }
 
 
-
+		     
 static void Compile (const char* File)
 /* Compile the given file */
 {
@@ -871,7 +874,7 @@ int main (int argc, char* argv [])
 		    break;
 
 		case 't':
-		    /* Set target system - compiler and linker */
+		    /* Set target system - compiler, assembler and linker */
 		    OptTarget (Arg, GetArg (&I, 2));
 		    break;
 

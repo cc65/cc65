@@ -1029,7 +1029,7 @@ static unsigned OptPtrLoad4 (CodeSeg* S)
        	    L[1]->OPC == OP65_LDX              	             &&
 	    L[1]->AM == AM65_IMM                             &&
 	    !CE_HasLabel (L[1])        	       	             &&
-	    L[2]->OPC == OP65_LDY                            &&
+  	    L[2]->OPC == OP65_LDY                            &&
 	    CE_KnownImm (L[2])                               &&
 	    !CE_HasLabel (L[2])                              &&
 	    L[3]->OPC == OP65_CLC                            &&
@@ -1059,7 +1059,7 @@ static unsigned OptPtrLoad4 (CodeSeg* S)
 	    CodeEntry* X;
 	    char* Label;
 
-	    /* Add the lda */
+  	    /* Add the lda */
 	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, L[4]->Arg, 0, L[0]->LI);
 	    CS_InsertEntry (S, X, I+3);
 
@@ -1079,7 +1079,7 @@ static unsigned OptPtrLoad4 (CodeSeg* S)
 	    xfree (Label);
 
 	    /* Remove the old code */
-	    CS_DelEntries (S, I, 2);
+  	    CS_DelEntries (S, I, 2);
 	    CS_DelEntries (S, I+5, 6);
 
 	    /* Remember, we had changes */
@@ -1099,6 +1099,152 @@ static unsigned OptPtrLoad4 (CodeSeg* S)
 
 
 static unsigned OptPtrLoad5 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *      lda     regbank+n
+ *      ldx     regbank+n+1
+ *      sta     regsave
+ *      stx     regsave+1
+ *      clc
+ *      adc     #$01
+ *      bcc     L0005
+ *      inx
+ * L:   sta     regbank+n
+ *      stx     regbank+n+1
+ *      lda     regsave
+ *      ldx     regsave+1
+ *      ldy     #$00
+ *      jsr     ldauidx
+ *
+ * and replace it by:
+ *
+ *      ldy     #$00
+ *      ldx     #$00
+ *      lda     (regbank+n),y
+ *      inc     regbank+n
+ *      bne     L1
+ *      inc     regbank+n+1
+ * L1:  tay                     <- only if flags are used
+ *
+ * This function must execute before OptPtrLoad5!
+ *
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+       	CodeEntry* L[15];
+	unsigned Len;
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_LDA                               &&
+            L[0]->AM == AM65_ZP                                 &&
+            strncmp (L[0]->Arg, "regbank+", 8) == 0             &&
+            (Len = strlen (L[0]->Arg)) > 0                      &&
+       	    CS_GetEntries (S, L+1, I+1, 14)    	                &&
+            !CS_RangeHasLabel (S, I+1, 7)                       &&
+            !CS_RangeHasLabel (S, I+9, 5)                       &&
+            L[1]->OPC == OP65_LDX                               &&
+            L[1]->AM == AM65_ZP                                 &&
+            strncmp (L[1]->Arg, L[0]->Arg, Len) == 0            &&
+            strcmp (L[1]->Arg+Len, "+1") == 0                   &&
+            L[2]->OPC == OP65_STA                               &&
+            L[2]->AM == AM65_ZP                                 &&
+            strcmp (L[2]->Arg, "regsave") == 0                  &&
+            L[3]->OPC == OP65_STX                               &&
+            L[3]->AM == AM65_ZP                                 &&
+            strcmp (L[3]->Arg, "regsave+1") == 0                &&
+            L[4]->OPC == OP65_CLC                               &&
+            L[5]->OPC == OP65_ADC                               &&
+            CE_KnownImm (L[5])                                  &&
+            L[5]->Num == 1                                      &&
+            L[6]->OPC == OP65_BCC                               &&
+            L[6]->JumpTo != 0                                   &&
+            L[6]->JumpTo->Owner == L[8]                         &&
+            L[7]->OPC == OP65_INX                               &&
+            L[8]->OPC == OP65_STA                               &&
+            L[8]->AM == AM65_ZP                                 &&
+            strcmp (L[8]->Arg, L[0]->Arg) == 0                  &&
+            L[9]->OPC == OP65_STX                               &&
+            L[9]->AM == AM65_ZP                                 &&
+            strcmp (L[9]->Arg, L[1]->Arg) == 0                  &&
+            L[10]->OPC == OP65_LDA                              &&
+            L[10]->AM == AM65_ZP                                &&
+            strcmp (L[10]->Arg, "regsave") == 0                 &&
+            L[11]->OPC == OP65_LDX                              &&
+            L[11]->AM == AM65_ZP                                &&
+            strcmp (L[11]->Arg, "regsave+1") == 0               &&
+            L[12]->OPC == OP65_LDY                              &&
+            CE_KnownImm (L[12])                                 &&
+            CE_IsCallTo (L[13], "ldauidx")) {
+
+	    CodeEntry* X;
+            CodeLabel* Label;
+
+            /* Check if the instruction following the sequence uses the flags
+             * set by the load. If so, insert a test of the value in the
+             * accumulator.
+             */
+            if (CE_UseLoadFlags (L[14])) {
+                X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, L[13]->LI);
+                CS_InsertEntry (S, X, I+14);
+            }
+
+            /* Attach a label to L[14]. This may be either the just inserted
+             * instruction, or the one following the sequence.
+             */
+            Label = CS_GenLabel (S, L[14]);
+
+	    /* ldy #$xx */
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[12]->Arg, 0, L[12]->LI);
+	    CS_InsertEntry (S, X, I+14);
+
+	    /* ldx #$xx */
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[13]->LI);
+	    CS_InsertEntry (S, X, I+15);
+
+            /* lda (regbank+n),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, L[0]->Arg, 0, L[13]->LI);
+            CS_InsertEntry (S, X, I+16);
+
+            /* inc regbank+n */
+            X = NewCodeEntry (OP65_INC, AM65_ZP, L[0]->Arg, 0, L[5]->LI);
+            CS_InsertEntry (S, X, I+17);
+
+            /* bne ... */
+            X = NewCodeEntry (OP65_BNE, AM65_BRA, Label->Name, Label, L[6]->LI);
+            CS_InsertEntry (S, X, I+18);
+
+            /* inc regbank+n+1 */
+            X = NewCodeEntry (OP65_INC, AM65_ZP, L[1]->Arg, 0, L[7]->LI);
+            CS_InsertEntry (S, X, I+19);
+
+            /* Delete the old code */
+	    CS_DelEntries (S, I, 14);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptPtrLoad6 (CodeSeg* S)
 /* Search for the sequence:
  *
  *      lda     zp
@@ -1166,7 +1312,7 @@ static unsigned OptPtrLoad5 (CodeSeg* S)
 
 
 
-static unsigned OptPtrLoad6 (CodeSeg* S)
+static unsigned OptPtrLoad7 (CodeSeg* S)
 /* Search for the sequence:
  *
  *      lda     zp
@@ -1244,7 +1390,7 @@ static unsigned OptPtrLoad6 (CodeSeg* S)
 
 
 
-static unsigned OptPtrLoad7 (CodeSeg* S)
+static unsigned OptPtrLoad8 (CodeSeg* S)
 /* Search for the sequence
  *
  *      ldy     ...
@@ -1258,7 +1404,7 @@ static unsigned OptPtrLoad7 (CodeSeg* S)
  *      ldx     #$00
  *      lda     (ptr1),y
  *
- * This step must be execute *after* OptPtrLoad1!
+ * This step must be executed *after* OptPtrLoad1!
  */
 {
     unsigned Changes = 0;
@@ -1615,9 +1761,10 @@ static OptFunc DOptPtrLoad1    	= { OptPtrLoad1,     "OptPtrLoad1",    	100, 0, 
 static OptFunc DOptPtrLoad2    	= { OptPtrLoad2,     "OptPtrLoad2",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad3    	= { OptPtrLoad3,     "OptPtrLoad3",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad4    	= { OptPtrLoad4,     "OptPtrLoad4",    	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",    	 65, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",    	 86, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad7    	= { OptPtrLoad7,     "OptPtrLoad7",    	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",    	 50, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",    	 65, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad7    	= { OptPtrLoad7,     "OptPtrLoad7",    	 86, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad8    	= { OptPtrLoad8,     "OptPtrLoad8",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",     40, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush1       	= { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
@@ -1684,6 +1831,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrLoad5,
     &DOptPtrLoad6,
     &DOptPtrLoad7,
+    &DOptPtrLoad8,
     &DOptPtrStore1,
     &DOptPtrStore2,
     &DOptPush1,
@@ -1951,6 +2099,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptPtrLoad4, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad5, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad6, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad7, 1);
     Changes += RunOptFunc (S, &DOptNegAX1, 1);
     Changes += RunOptFunc (S, &DOptNegAX2, 1);
     Changes += RunOptFunc (S, &DOptNegAX3, 1);
@@ -2001,7 +2150,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
     do {
        	C = 0;
 
-       	C += RunOptFunc (S, &DOptPtrLoad7, 1);
+       	C += RunOptFunc (S, &DOptPtrLoad8, 1);
        	C += RunOptFunc (S, &DOptNegA1, 1);
        	C += RunOptFunc (S, &DOptNegA2, 1);
        	C += RunOptFunc (S, &DOptSub1, 1);

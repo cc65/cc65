@@ -613,17 +613,38 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
        	AddCodeLine ("lda (sp),y");
        	AddCodeLine ("sta regbank%+d", RegOffs+2);
 
+    } else if (StackOffs <= RegOffs) {
+
+        /* More bytes, but the relation between the register offset in the
+         * register bank and the stack offset allows us to generate short
+         * code that uses just one index register.
+         */
+       	unsigned Label = GetLocalLabel ();
+     	ldyconst (StackOffs);
+       	g_defcodelabel (Label);
+     	AddCodeLine ("lda (sp),y");
+     	AddCodeLine ("sta regbank%+d,y", RegOffs - StackOffs);
+     	AddCodeLine ("iny");
+     	AddCodeLine ("cpy #$%02X", StackOffs + Bytes);
+     	AddCodeLine ("bne %s", LocalLabelName (Label));
+
     } else {
 
-       	/* More bytes - loop */
+        /* Ok, this is the generic code. We need to save X because the
+         * caller will only save A.
+         */
        	unsigned Label = GetLocalLabel ();
-	ldyconst (StackOffs);
+        AddCodeLine ("stx tmp1");
+     	ldyconst (StackOffs + Bytes - 1);
+        ldxconst (Bytes - 1);
        	g_defcodelabel (Label);
-	AddCodeLine ("lda (sp),y");
-	AddCodeLine ("sta regbank%+d,y", RegOffs - StackOffs);
-	AddCodeLine ("iny");
-	AddCodeLine ("cpy #$%02X", StackOffs + Bytes);
-	AddCodeLine ("bne %s", LocalLabelName (Label));
+     	AddCodeLine ("lda (sp),y");
+       	AddCodeLine ("sta regbank%+d,x", RegOffs);
+     	AddCodeLine ("dey");
+        AddCodeLine ("dex");
+     	AddCodeLine ("bpl %s", LocalLabelName (Label));
+        AddCodeLine ("ldx tmp1");
+
     }
 }
 
@@ -2776,11 +2797,12 @@ void g_or (unsigned flags, unsigned long val)
 		typeerror (flags);
 	}
 
-	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-	 * into the normal, non-optimized stuff.
-	 */
-	g_push (flags & ~CF_CONST, 0);
-
+     	/* If we go here, we didn't emit code. Push the lhs on stack and fall
+      	 * into the normal, non-optimized stuff. Note: The standard stuff will
+         * always work with ints.
+     	 */
+        flags &= ~CF_FORCECHAR;
+       	g_push (flags & ~CF_CONST, 0);
     }
 
     /* Use long way over the stack */
@@ -2845,11 +2867,12 @@ void g_xor (unsigned flags, unsigned long val)
 		typeerror (flags);
 	}
 
-	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-	 * into the normal, non-optimized stuff.
-	 */
-	g_push (flags & ~CF_CONST, 0);
-
+     	/* If we go here, we didn't emit code. Push the lhs on stack and fall
+      	 * into the normal, non-optimized stuff. Note: The standard stuff will
+         * always work with ints.
+     	 */
+        flags &= ~CF_FORCECHAR;
+       	g_push (flags & ~CF_CONST, 0);
     }
 
     /* Use long way over the stack */
@@ -2931,11 +2954,12 @@ void g_and (unsigned flags, unsigned long val)
 		typeerror (flags);
 	}
 
-	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-	 * into the normal, non-optimized stuff.
-	 */
-	g_push (flags & ~CF_CONST, 0);
-
+     	/* If we go here, we didn't emit code. Push the lhs on stack and fall
+      	 * into the normal, non-optimized stuff. Note: The standard stuff will
+         * always work with ints.
+     	 */
+        flags &= ~CF_FORCECHAR;
+       	g_push (flags & ~CF_CONST, 0);
     }
 
     /* Use long way over the stack */
@@ -3021,10 +3045,11 @@ void g_asr (unsigned flags, unsigned long val)
      	}
 
      	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-      	 * into the normal, non-optimized stuff.
+      	 * into the normal, non-optimized stuff. Note: The standard stuff will
+         * always work with ints.
      	 */
-     	g_push (flags & ~CF_CONST, 0);
-
+        flags &= ~CF_FORCECHAR;
+       	g_push (flags & ~CF_CONST, 0);
     }
 
     /* Use long way over the stack */
@@ -3102,11 +3127,12 @@ void g_asl (unsigned flags, unsigned long val)
 		typeerror (flags);
 	}
 
-	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-      	 * into the normal, non-optimized stuff.
-	 */
-	g_push (flags & ~CF_CONST, 0);
-
+     	/* If we go here, we didn't emit code. Push the lhs on stack and fall
+      	 * into the normal, non-optimized stuff. Note: The standard stuff will
+         * always work with ints.
+     	 */
+        flags &= ~CF_FORCECHAR;
+       	g_push (flags & ~CF_CONST, 0);
     }
 
     /* Use long way over the stack */
@@ -3115,12 +3141,20 @@ void g_asl (unsigned flags, unsigned long val)
 
 
 
-void g_neg (unsigned flags)
+void g_neg (unsigned Flags)
 /* Primary = -Primary */
 {
-    switch (flags & CF_TYPE) {
+    switch (Flags & CF_TYPE) {
 
 	case CF_CHAR:
+            if (Flags & CF_FORCECHAR) {
+                AddCodeLine ("eor #$FF");
+                AddCodeLine ("clc");
+                AddCodeLine ("adc #$01");
+                return;
+            }
+            /* FALLTHROUGH */
+
      	case CF_INT:
 	    AddCodeLine ("jsr negax");
 	    break;
@@ -3130,7 +3164,7 @@ void g_neg (unsigned flags)
 	    break;
 
 	default:
-	    typeerror (flags);
+	    typeerror (Flags);
     }
 }
 
@@ -3160,12 +3194,18 @@ void g_bneg (unsigned flags)
 
 
 
-void g_com (unsigned flags)
+void g_com (unsigned Flags)
 /* Primary = ~Primary */
 {
-    switch (flags & CF_TYPE) {
+    switch (Flags & CF_TYPE) {
 
 	case CF_CHAR:
+            if (Flags & CF_FORCECHAR) {
+                AddCodeLine ("eor #$FF");
+                return;
+            }
+            /* FALLTHROUGH */
+
 	case CF_INT:
 	    AddCodeLine ("jsr complax");
 	    break;
@@ -3175,7 +3215,7 @@ void g_com (unsigned flags)
      	    break;
 
 	default:
-     	    typeerror (flags);
+     	    typeerror (Flags);
     }
 }
 

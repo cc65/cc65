@@ -33,16 +33,22 @@
 
 typedef unsigned char _driveid_t;
 typedef unsigned int  _sectnum_t;
+typedef unsigned int  _sectsize_t;
 
 
 #ifdef __ATARI__
-#define _dio_query_sectsize(x) ((unsigned int)128)
-#else
-#define _dio_query_sectsize(x) ((unsigned int)256)
-#endif
 
-extern unsigned char __fastcall__ _dio_setup       (_driveid_t drive_id);
-extern unsigned char __fastcall__ _dio_finish      (_driveid_t drive_id);
+#define _dio_query_sectsize(x) ((_sectsize_t)128)
+#define _dio_open(x)
+#define _dio_close(x)
+
+#else
+
+#define _dio_query_sectsize(x) ((_sectsize_t)256)
+extern unsigned char __fastcall__ _dio_open        (_driveid_t drive_id);
+extern unsigned char __fastcall__ _dio_close       (_driveid_t drive_id);
+
+#endif
 
 extern unsigned char __fastcall__ _dio_format      (_driveid_t drive_id, unsigned int format);
 extern unsigned char __fastcall__ _dio_read        (_driveid_t drive_id, _sectnum_t sect_num, void *buffer);

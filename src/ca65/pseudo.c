@@ -42,6 +42,7 @@
 /* common */
 #include "bitops.h"
 #include "check.h"
+#include "symdefs.h"
 #include "tgttrans.h"
 
 /* ca65 */
@@ -727,9 +728,9 @@ static void DoInclude (void)
     if (Tok != TOK_STRCON) {
 	ErrorSkip (ERR_STRCON_EXPECTED);
     } else {
-	strcpy (Name, SVal);
-	NextTok ();
-	NewInputFile (Name);
+    	strcpy (Name, SVal);
+    	NextTok ();
+    	NewInputFile (Name);
     }
 }
 
@@ -738,7 +739,34 @@ static void DoInclude (void)
 static void DoInitializer (void)
 /* Export a symbol as initializer */
 {
-    ExportImport (SymInitializer, 0);
+    char Name [sizeof (SVal)];
+    long Val;
+
+    /* Symbol name follows */
+    if (Tok != TOK_IDENT) {
+    	ErrorSkip (ERR_IDENT_EXPECTED);
+    	return;
+    }
+    strcpy (Name, SVal);
+    NextTok ();
+
+    /* Optional initializer value */
+    if (Tok == TOK_COMMA) {
+    	/* Initializer value follows */
+    	NextTok ();
+    	Val = ConstExpression ();
+    	if (Val < EXP_INIT_MIN || Val > EXP_INIT_MAX) {
+    	    /* Value out of range */
+    	    Error (ERR_RANGE);
+    	    return;
+    	}
+    } else {
+    	/* Use the default initializer value */
+    	Val = EXP_INIT_DEF;
+    }
+
+    /* Define the symbol */
+    SymInitializer (Name, (unsigned) Val);
 }
 
 

@@ -97,6 +97,7 @@ struct SymEntry_ {
 	long	    	    Val;  	/* Value (if CONST set) */
 	SymEntry*	    Sym;	/* Symbol (if trampoline entry) */
     } V;
+    unsigned char	    InitVal;	/* Initializer value */
     char       	       	    Name [1];	/* Dynamic allocation */
 };
 
@@ -158,13 +159,14 @@ static SymEntry* NewSymEntry (const char* Name)
     S = xmalloc (sizeof (SymEntry) + Len);
 
     /* Initialize the entry */
-    S->Left   = 0;
-    S->Right  = 0;
-    S->Locals = 0;
-    S->SymTab = 0;
-    S->Flags  = 0;
-    S->V.Expr = 0;
-    S->Pos    = CurPos;
+    S->Left	= 0;
+    S->Right	= 0;
+    S->Locals	= 0;
+    S->SymTab	= 0;
+    S->Pos	= CurPos;
+    S->Flags	= 0;
+    S->V.Expr	= 0;
+    S->InitVal	= 0;
     memcpy (S->Name, Name, Len+1);
 
     /* Insert it into the list of all entries */
@@ -482,7 +484,7 @@ void SymImport (const char* Name, int ZP)
     }
     if (S->Flags & SF_EXPORT) {
      	/* The symbol is already marked as exported symbol */
-     	Error (ERR_SYM_ALREADY_EXPORT);
+     	Error (ERR_SYM_ALREADY_EXPORT, Name);
      	return;
     }
 
@@ -520,7 +522,7 @@ void SymExport (const char* Name, int ZP)
     S = SymFind (SymTab, Name, SF_ALLOC_NEW);
     if (S->Flags & SF_IMPORT) {
      	/* The symbol is already marked as imported external symbol */
-     	Error (ERR_SYM_ALREADY_IMPORT);
+     	Error (ERR_SYM_ALREADY_IMPORT, Name);
      	return;
     }
 
@@ -577,18 +579,15 @@ void SymGlobal (const char* Name, int ZP)
 
 
 
-void SymInitializer (const char* Name, int ZP)
+void SymInitializer (const char* Name, unsigned InitVal)
 /* Mark the given symbol as an initializer. This will also mark the symbol as
- * an export. Initializers may never be zero page symbols, the ZP parameter
- * is supplied to make the prototype the same as the other functions (this
- * is used in pseudo.c). Passing something else but zero as ZP argument will
- * trigger an internal error.
+ * an export. Initializers may never be zero page symbols.
  */
 {
     SymEntry* S;
 
-    /* Check the ZP parameter */
-    CHECK (ZP == 0);
+    /* Check the InitVal parameter */
+    CHECK (InitVal >= EXP_INIT_MIN && InitVal <= EXP_INIT_MAX);
 
     /* Don't accept local symbols */
     if (IsLocal (Name)) {
@@ -600,19 +599,29 @@ void SymInitializer (const char* Name, int ZP)
     S = SymFind (SymTab, Name, SF_ALLOC_NEW);
     if (S->Flags & SF_IMPORT) {
      	/* The symbol is already marked as imported external symbol */
-     	Error (ERR_SYM_ALREADY_IMPORT);
+     	Error (ERR_SYM_ALREADY_IMPORT, Name);
      	return;
     }
 
-    /* If the symbol is marked as global, check the symbol size, then do
-     * silently remove the global flag
-     */
+    /* If the symbol is marked as global, silently remove the global flag */
     if (S->Flags & SF_GLOBAL) {
-       	if ((S->Flags & SF_ZP) != 0) {
-     	    Error (ERR_SYM_REDECL_MISMATCH);
-     	}
         S->Flags &= ~SF_GLOBAL;
     }
+
+    /* Check if the symbol was not already defined as ZP symbol */
+    if ((S->Flags & SF_ZP) != 0) {
+	Error (ERR_SYM_REDECL_MISMATCH);
+    }
+
+    /* If the symbol was already declared as an initializer, check if the new
+     * initializer value is the same as the old one.
+     */
+    if (S->Flags & SF_INITIALIZER) {
+	if (S->InitVal != InitVal) {
+	    Error (ERR_SYM_REDECL_MISMATCH);
+	}
+    }
+    S->InitVal = InitVal;
 
     /* Set the symbol data */
     S->Flags |= SF_EXPORT | SF_INITIALIZER | SF_REFERENCED;
@@ -634,7 +643,7 @@ int SymIsRef (const char* Name)
 {
     SymEntry* S = SymFindAny (SymTab, Name);
     return S != 0 && (S->Flags & SF_REFERENCED) != 0;
-}
+}					   
 
 
 
@@ -1079,7 +1088,7 @@ void WriteExports (void)
 
 	    /* Add the initializer bits */
 	    if (S->Flags & SF_INITIALIZER) {
-	     	ExprMask |= EXP_INIT;
+	     	ExprMask |= S->InitVal;
 	    }
 
 	    /* Write the type */
@@ -1151,7 +1160,7 @@ void WriteDbgSyms (void)
 
 		/* Add the initializer bits */
 		if (S->Flags & SF_INITIALIZER) {
-		    ExprMask |= EXP_INIT;
+		    ExprMask |= S->InitVal;
 		}
 
 		/* Write the type */

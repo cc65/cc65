@@ -213,7 +213,7 @@ static const char* GetExportFlags (unsigned Flags)
  	case EXP_EXPR:	strcat (TypeDesc, ",EXP_EXPR");		break;
     }
     if (IS_EXP_INIT (Flags)) {
- 	strcat (TypeDesc, ",EXP_INIT");
+	sprintf (TypeDesc+strlen(TypeDesc), ",EXP_INIT=%u", GET_EXP_INIT_VAL(Flags));
     }
 
     /* Return the result */

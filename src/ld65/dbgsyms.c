@@ -151,7 +151,7 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
     D->Name = ReadStr (F);
 
     /* Read the value */
-    if (Type & EXP_EXPR) {
+    if (IS_EXP_EXPR (Type)) {
        	D->Expr = ReadExpr (F, O);
     } else {
     	D->Expr = LiteralExpr (Read32 (F), O);

@@ -39,6 +39,7 @@
 
 /* common */
 #include "check.h"
+#include "coll.h"
 #include "hashstr.h"
 #include "symdefs.h"
 #include "xmalloc.h"
@@ -54,25 +55,28 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*     	      	       		     Data				     */
 /*****************************************************************************/
 
 
 
 /* Hash table */
-#define HASHTAB_SIZE	4081
-static Export* 		HashTab [HASHTAB_SIZE];
+#define HASHTAB_SIZE   	4081
+static Export* 	       	HashTab [HASHTAB_SIZE];
 
 /* Import management variables */
-static unsigned		ImpCount = 0;	   	/* Import count */
-static unsigned		ImpOpen  = 0;		/* Count of open imports */
+static unsigned	       	ImpCount = 0;	   	/* Import count */
+static unsigned	       	ImpOpen  = 0;		/* Count of open imports */
 
 /* Export management variables */
-static unsigned		ExpCount = 0;	   	/* Export count */
-static Export**		ExpPool  = 0;	  	/* Exports array */
+static unsigned	       	ExpCount = 0;	   	/* Export count */
+static Export**	       	ExpPool  = 0;	  	/* Exports array */
 
 /* Defines for the flags in Export */
-#define EXP_USERMARK	0x0001
+#define EXP_USERMARK   	0x0001
+
+/* List of all exports that are also initializers */
+static Collection	Initializers = STATIC_COLLECTION_INITIALIZER;
 
 
 
@@ -227,6 +231,11 @@ void InsertExport (Export* E)
     Import* Imp;
     unsigned HashVal;
 
+    /* If this is an initializer, insert it into the initializer list */
+    if (IS_EXP_INIT (E->Type)) {
+	CollAppend (&Initializers, E);
+    }
+
     /* Create a hash value for the given name */
     HashVal = HashStr (E->Name) % HASHTAB_SIZE;
 
@@ -242,7 +251,7 @@ void InsertExport (Export* E)
       	do {
       	    if (strcmp (L->Name, E->Name) == 0) {
       	   	/* This may be an unresolved external */
-      	   	if (L->Expr == 0) {
+      	      	if (L->Expr == 0) {
 
       	   	    /* This *is* an unresolved external */
       	   	    E->Next     = L->Next;
@@ -298,7 +307,7 @@ Export* ReadExport (FILE* F, ObjData* O)
     E->Name = ReadStr (F);
 
     /* Read the value */
-    if (Type & EXP_EXPR) {
+    if (IS_EXP_EXPR (Type)) {
        	E->Expr = ReadExpr (F, O);
     } else {
      	E->Expr = LiteralExpr (Read32 (F), O);
@@ -408,18 +417,18 @@ long GetExportVal (const Export* E)
 
 
 
-static void CheckSymType (Export* E)
+static void CheckSymType (const Export* E)
 /* Check the types for one export */
 {
     /* External with matching imports */
     Import* Imp = E->ImpList;
-    int ZP = (E->Type & EXP_ZP) != 0;
+    int ZP = IS_EXP_ZP (E->Type);
     while (Imp) {
-	if (ZP != ((Imp->Type & IMP_ZP) != 0)) {
+	if (ZP != IS_IMP_ZP (Imp->Type)) {
 	    /* Export is ZP, import is abs or the other way round */
 	    if (E->Obj) {
-		/* User defined export */
-		Warning ("Type mismatch for `%s', export in "
+	      	/* User defined export */
+	      	Warning ("Type mismatch for `%s', export in "
 			 "%s(%lu), import in %s(%lu)",
 			 E->Name, E->Obj->Files [Imp->Pos.Name],
     			 E->Pos.Line, Imp->Obj->Files [Imp->Pos.Name],
@@ -444,7 +453,7 @@ static void CheckSymTypes (void)
 
     /* Print all open imports */
     for (I = 0; I < ExpCount; ++I) {
-	Export* E = ExpPool [I];
+	const Export* E = ExpPool [I];
 	if (E->Expr != 0 && E->ImpCount > 0) {
 	    /* External with matching imports */
 	    CheckSymType (E);
@@ -545,19 +554,20 @@ void PrintExportMap (FILE* F)
     /* Print all exports */
     Count = 0;
     for (I = 0; I < ExpCount; ++I) {
-     	Export* E = ExpPool [I];
+     	const Export* E = ExpPool [I];
 
 	/* Print unreferenced symbols only if explictly requested */
 	if (VerboseMap || E->ImpCount > 0) {
 	    fprintf (F,
-		     "%-25s %06lX %c%c    ",
-		     E->Name,
-	 	     GetExportVal (E),
-		     E->ImpCount? 'R' : ' ',
-		     (E->Type & EXP_ZP)? 'Z' : ' ');
+	      	     "%-25s %06lX %c%c%c   ",
+	      	     E->Name,
+	      	     GetExportVal (E),
+	      	     E->ImpCount? 'R' : ' ',
+	      	     IS_EXP_ZP (E->Type)? 'Z' : ' ',
+		     IS_EXP_INIT (E->Type)? 'I' : ' ');
 	    if (++Count == 2) {
-	 	Count = 0;
-	 	fprintf (F, "\n");
+	      	Count = 0;
+	      	fprintf (F, "\n");
 	    }
 	}
     }
@@ -570,13 +580,13 @@ void PrintImportMap (FILE* F)
 /* Print an import map to the given file */
 {
     unsigned I;
-    Import* Imp;
+    const Import* Imp;
 
     /* Loop over all exports */
     for (I = 0; I < ExpCount; ++I) {
 
 	/* Get the export */
-     	Export* Exp = ExpPool [I];
+     	const Export* Exp = ExpPool [I];
 
 	/* Print the symbol only if there are imports, or if a verbose map
 	 * file is requested.
@@ -591,23 +601,23 @@ void PrintImportMap (FILE* F)
 
 	    /* Print the export */
 	    fprintf (F,
-		     "%s (%s):\n",
-		     Exp->Name,
-		     ObjName);
+	      	     "%s (%s):\n",
+	      	     Exp->Name,
+	      	     ObjName);
 
 	    /* Print all imports for this symbol */
 	    Imp = Exp->ImpList;
 	    while (Imp) {
 
-		/* Print the import */
-		fprintf (F,
-			 "    %-25s %s(%lu)\n",
-			 Imp->Obj->Name,
-			 Imp->Obj->Files [Imp->Pos.Name],
-			 Imp->Pos.Line);
+	      	/* Print the import */
+	      	fprintf (F,
+	      		 "    %-25s %s(%lu)\n",
+	      		 Imp->Obj->Name,
+	      		 Imp->Obj->Files [Imp->Pos.Name],
+	      	       	 Imp->Pos.Line);
 
-		/* Next import */
-		Imp = Imp->Next;
+	      	/* Next import */
+	      	Imp = Imp->Next;
 	    }
 	}
     }
@@ -623,7 +633,7 @@ void PrintExportLabels (FILE* F)
 
     /* Print all exports */
     for (I = 0; I < ExpCount; ++I) {
- 	Export* E = ExpPool [I];
+ 	const Export* E = ExpPool [I];
        	fprintf (F, "al %06lX .%s\n", GetExportVal (E), E->Name);
     }
 }

@@ -159,6 +159,7 @@ struct DotKeyword {
     { ".ENDPROC",	TOK_ENDPROC 	},
     { ".ENDREP",	TOK_ENDREP	},
     { ".ENDREPEAT",	TOK_ENDREP	},
+    { ".ENDSTRUCT",	TOK_ENDSTRUCT	},
     { ".ERROR", 	TOK_ERROR   	},
     { ".EXITMAC",	TOK_EXITMACRO 	},
     { ".EXITMACRO",	TOK_EXITMACRO	},
@@ -233,9 +234,12 @@ struct DotKeyword {
     { ".STRAT",		TOK_STRAT	},
     { ".STRING",	TOK_STRING	},
     { ".STRLEN",	TOK_STRLEN	},
+    { ".STRUCT",        TOK_STRUCT      },
     { ".SUNPLUS",  	TOK_SUNPLUS	},
+    { ".TAG",           TOK_TAG         },
     { ".TCOUNT",	TOK_TCOUNT	},
     { ".TIME",         	TOK_TIME	},
+    { ".UNION",         TOK_UNION       },
     { ".VERSION",       TOK_VERSION     },
     { ".WARNING",	TOK_WARNING	},
     { ".WORD", 	  	TOK_WORD	},
@@ -910,6 +914,11 @@ CharAgain:
 	       	    } while (C == '+');
 		    Tok = TOK_ULABEL;
 		    break;
+
+                case '=':
+                    NextChar ();
+                    Tok = TOK_ASSIGN;
+                    break;
 
 		default:
 	            Tok = TOK_COLON;

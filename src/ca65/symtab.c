@@ -394,7 +394,7 @@ int SymIsLocalLevel (void)
 
 
 
-void SymDef (const char* Name, ExprNode* Expr, int ZP, int Label)
+void SymDef (const char* Name, ExprNode* Expr, unsigned Flags)
 /* Define a new symbol */
 {
     /* Do we have such a symbol? */
@@ -422,10 +422,10 @@ void SymDef (const char* Name, ExprNode* Expr, int ZP, int Label)
         S->V.Expr  = Expr;
     }
     S->Flags |= SF_DEFINED;
-    if (ZP) {
+    if (Flags & SYM_ZP) {
 	S->Flags |= SF_ZP;
     }
-    if (Label) {
+    if (Flags & SYM_LABEL) {
 	S->Flags |= SF_LABEL;
     }
 

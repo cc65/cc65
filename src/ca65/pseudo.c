@@ -1243,7 +1243,11 @@ static void DoProc (void)
 {
     if (Tok == TOK_IDENT) {
 	/* The new scope has a name */
-	SymDef (SVal, GenCurrentPC (), IsZPSeg (), 1);
+        unsigned Flags = SYM_LABEL;
+        if (IsZPSeg ()) {
+            Flags |= SYM_ZP;
+        }
+	SymDef (SVal, GenCurrentPC (), Flags);
 	NextTok ();
     }
     SymEnterLevel ();
@@ -1418,10 +1422,26 @@ static void DoSmart (void)
 
 
 
+static void DoStruct (void)
+/* Struct definition */
+{
+    Error (ERR_NOT_IMPLEMENTED);
+}
+
+
+
 static void DoSunPlus (void)
 /* Switch to the SUNPLUS CPU */
 {
     SetCPU (CPU_SUNPLUS);
+}
+
+
+
+static void DoUnion (void)
+/* Union definition */
+{
+    Error (ERR_NOT_IMPLEMENTED);
 }
 
 
@@ -1525,6 +1545,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,     	DoUnexpected	},	/* .ENDMACRO */
     { ccNone,		DoEndProc	},
     { ccNone,		DoUnexpected	},	/* .ENDREPEAT */
+    { ccNone,           DoUnexpected    },      /* .ENDSTRUCT */
     { ccNone,		DoError	  	},
     { ccNone,		DoExitMacro	},
     { ccNone,		DoExport  	},
@@ -1589,9 +1610,12 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoUnexpected	},	/* .STRAT */
     { ccNone,          	DoUnexpected	},	/* .STRING */
     { ccNone,		DoUnexpected	},	/* .STRLEN */
+    { ccNone,           DoStruct        },
     { ccNone,		DoSunPlus	},
+    { ccNone,           DoUnexpected    },      /* .TAG */
     { ccNone,		DoUnexpected	},	/* .TCOUNT */
     { ccNone,  	       	DoUnexpected	},	/* .TIME */
+    { ccNone,           DoUnion         },
     { ccNone,           DoUnexpected    },      /* .VERSION */
     { ccNone,		DoWarning	},
     { ccNone,       	DoWord		},

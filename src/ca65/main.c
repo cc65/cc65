@@ -183,7 +183,7 @@ static void DefineSymbol (const char* Def)
     }
 
     /* Define the symbol */
-    SymDef (SymName, GenLiteralExpr (Val), 0, 0);
+    SymDef (SymName, GenLiteralExpr (Val), SYM_DEFAULT);
 }
 
 
@@ -373,16 +373,20 @@ static void OneLine (void)
      	    /* If a colon follows, this is a label definition. If there
      	     * is no colon, it's an assignment.
      	     */
-       	    if (Tok == TOK_EQ) {
+       	    if (Tok == TOK_EQ || Tok == TOK_ASSIGN) {
+                /* If it's an assign token, we have a label */
+                unsigned Flags = (Tok == TOK_ASSIGN)? SYM_LABEL : SYM_DEFAULT;
      	    	/* Skip the '=' */
      	    	NextTok ();
      	    	/* Define the symbol with the expression following the '=' */
-     	    	SymDef (Ident, Expression(), 0, 0);
+     	    	SymDef (Ident, Expression(), Flags);
      	    	/* Don't allow anything after a symbol definition */
      	    	Done = 1;
      	    } else {
+                /* Define the symbol flags */
+                unsigned Flags = IsZPSeg ()? SYM_ZP | SYM_LABEL : SYM_LABEL;
      	    	/* Define a label */
-     	    	SymDef (Ident, GenCurrentPC(), IsZPSeg(), 1);
+     	    	SymDef (Ident, GenCurrentPC (), Flags);
      	    	/* Skip the colon. If NoColonLabels is enabled, allow labels
      	    	 * without a colon if there is no whitespace before the
      	    	 * identifier.

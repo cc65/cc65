@@ -59,6 +59,11 @@
 #define SCOPE_GLOBAL    1
 #define SCOPE_LOCAL     2
 
+/* Flags used in SymDef */
+#define SYM_DEFAULT     0x00
+#define SYM_ZP          0x01
+#define SYM_LABEL       0x02
+
 
 
 /*****************************************************************************/
@@ -76,7 +81,7 @@ void SymLeaveLevel (void);
 int SymIsLocalLevel (void);
 /* Return true if we are on a local symbol table level. */
 
-void SymDef (const char* Name, ExprNode* Expr, int ZP, int Label);
+void SymDef (const char* Name, ExprNode* Expr, unsigned Flags);
 /* Define a new symbol */
 
 SymEntry* SymRef (const char* Name, int Scope);

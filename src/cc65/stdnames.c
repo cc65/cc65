@@ -43,9 +43,9 @@
 
 
 
-const char Func_memcpy[]        = "_memcpy";        /* Asm name of "memcpy" */
-const char Func_memset[]        = "_memset";        /* Asm name of "memset" */
-const char Func__bzero[]        = "__bzero";        /* Asm name of "_bzero */
+const char Func_memcpy[]        = "memcpy";     /* Asm name of "memcpy" */
+const char Func_memset[]        = "memset";     /* Asm name of "memset" */
+const char Func__bzero[]        = "_bzero";     /* Asm name of "_bzero */
 
 
 

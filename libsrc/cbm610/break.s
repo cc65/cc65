@@ -46,9 +46,9 @@ uservec:    	jmp	$FFFF		; Patched at runtime
  	sta	oldvec+1	; Save the old vector
 
 L1:	lda	#<brk_handler	; Set the break vector to our routine
+	ldx	#>brk_handler
 	sta	BRKVec
-	lda	#>brk_handler
-	sta	BRKVec+1
+	stx	BRKVec+1
 	rts
 
 .endproc
@@ -58,11 +58,13 @@ L1:	lda	#<brk_handler	; Set the break vector to our routine
 .proc	_reset_brk
 
 	lda  	oldvec
-	bne  	@L1
-	ldx  	oldvec
+	ldx  	oldvec+1
 	beq  	@L9		; Jump if vector not installed
-@L1:	sta    	BRKVec
+	sta    	BRKVec
 	stx  	BRKVec+1
+	lda	#$00
+	sta	oldvec		; Clear the old vector
+	stx	oldvec+1
 @L9:	rts
 
 .endproc

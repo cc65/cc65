@@ -3,8 +3,8 @@
 <article>
 
 <title>cc65 compiler intro
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
-<date>03.12.2000
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org"> and CyberX
+<date>06.13.2002
 
 <abstract>
 How to use the cc65 C compiler - an introduction.
@@ -17,16 +17,31 @@ How to use the cc65 C compiler - an introduction.
 
 <sect>Overview<p>
 
-This is a short intro, how to use the compiler and the binutils. It contains a
-step-by-step example, how to build a complete application from one C and one
+This is a short intro of how to use the compiler and the binutils. It contains a
+step-by-step example of how to build a complete application from one C and one
 assembler module. This file does <em/not/ contain a complete reference for the
 tools used in the process. There are separate files describing these tools in
 detail.
 
+You are assumed to have downloaded and extracted the executables and the
+target specific files. For example, for Windows users targeting C64, you need
+cc65-win32-2.8.0.zip and cc65-c64-2.8.0.zip extracted to the same directory.
+If you received the files as a bzip2 archive (extension *.bz2), you will need
+to get the <htmlurl url="http://sources.redhat.com/bzip2/#bzip2-latest"
+name="bzip2 package"> to decompress it.
+
 <bf>Note</bf>: There is a much simpler way to compile this example using the
 cl65 compiler and link utility. However, it makes sense to understand how the
 separate steps work. How to do the example with the cl65 utility is described
-<ref id="using-cl65" name="below">.
+<ref id="using-cl65" name="later">.
+
+
+<sect1>Before we start<p>
+
+You will find a copy of the sample modules used in the next section in the
+samples/tutorial directory. Windows users will also find a small batch file in
+this directory named "cc65setup.bat". Be sure to examine and understand the
+commands in this file, then adjust them for your setup, and execute the file.
 
 
 <sect1>The sample modules<p>
@@ -194,7 +209,7 @@ example.
 To compile both files into one executable enter
 
 <tscreen><verb>
-	cl65 -O -I ../include hello.c test.s
+	cl65 -O -I ../include hello.c text.s
 </verb></tscreen>
 
 (The <tt/-I/ switch is not needed if you are working under Linux with the
@@ -215,6 +230,104 @@ current directory.
 For more information about the compile &amp; link utility see <htmlurl
 url="cl65.html" name="cl65.html">.
 
+<sect>Running The Executable<p>
+
+<bf>Note: this section is incomplete!</bf>
+
+Depending on the target, the compiler chooses several methods of making a
+program available for execution.  Here we list sample emulators and
+instructions for running the program.  Unless noted, similar instructions
+would also apply to a real machine.
+
+<sect1>Apple<p>
+
+<bf>AppleWin 1.10.4</bf>: Emulates Apple II+/IIe computer, with sound, video,
+joysticks, serial port, and disk images. Roms and dos disk included. Includes
+monitor. Only for Windows. Unfortunately we were unable to find documentation
+on running programs.  Please help.
+
+<sect1>Atari<p>
+
+<bf>Atari800Win Plus 3.0</bf> (available at
+<url url="http://www.a800win.atari-area.prv.pl">): Emulates Atari
+400/800/65XE/130XE/800XL/1200XL/5200, with stereo sound, disk images, scanline
+exact NTSC/PAL video, joysticks, mouse, cartridges and ram expansions.
+Includes monitor. Unfortunately only for Windows. You will need the emulator
+only.  Optionally you will need atarixl.rom and/or atariosb.rom/ataribas.rom
+and dos25.xfd files (not supplied).
+
+Compile the tutorial with
+
+<tscreen><verb>
+cl65 -O -t atari hello.c text.s
+</verb></tscreen>
+
+Start the emulator, choose File>Autoboot image or File>Load executable, and point
+to the hello executable.  It is customary to rename executables of this type to
+hello.xex.  The file has a 7 byte header meant to be loaded directly from Atari
+DOS 2/2.5 or compatibles.
+
+On a real Atari, you would need a disk drive and Atari Dos 2.5 or compatible.
+Turn on the computer, type
+
+<tscreen><verb>
+DOS
+</verb></tscreen>
+
+at the basic prompt, then choose N. CREATE MEM.SAV then choose L. BINARY LOAD
+and enter HELLO.
+
+The emulation also supports this method.  Look at Atari>Settings and check
+Enable H: Patch for Hard Disk Devices, then Atari>Hard disks and set the path
+of H1: to your executables directory, then use H0:HELLO.XEX in the above
+proceedure to access your hardrive directly.
+
+<bf>Note:</bf> There is no delay after the program exits.  Your C program
+should wait for a keypress if you want to see any output.
+
+<sect1>Commodore<p>
+
+<bf>Vice 1.9</bf> (available at
+<url url="ftp://ftp.funet.fi/pub/cbm/crossplatform/emulators/VICE/">):
+Emulates Commodore 64/128/Vic 20/PET/CBM II computers. Missing is the Plus/4
+and Commodore 16. Supports printer, serial port, stereo sound, disk drives and
+images, ram expansions, cartridges, cycle exact NTSC/PAL video, mice,
+joysticks. Includes monitor. Runs on Win9x/NT/2000/XP/ME/OS2/MSDOS, Beos x86,
+Acorn RISC OS, and many Unixes.
+
+Start the desired version of the emulator, choose File>Autoboot disk/tape
+image, and choose your executable.  The file has a 14 byte header which
+corresponds to a PRG format BASIC program, consisting of a single line;
+
+<tscreen><code>
+1000 sys2061
+</code></tscreen>
+
+On a real Commodore with attached disk drive, you would type:
+
+<tscreen><verb>
+LOAD "HELLO",8
+</verb></tscreen>
+
+for Vic 20/C64, or
+
+<tscreen><verb>
+DLOAD "0:HELLO"
+</verb></tscreen>
+
+on PET/CBM II/C128, then type
+
+<tscreen><verb>
+RUN
+</verb></tscreen>
+
+We need your help! Recommended emulators and instructions for other machines
+are missing. We suggest an emulator with good compatibility. Also, being able
+to run all computers in the target series is good for target compatibility
+testing. A machine language monitor is almost essential for debugging, but a
+native debugger could be used as well.
+
+Finally, emulators which run on Unix/Windows would help reach a wider audience.
 
 </article>
 

@@ -140,6 +140,9 @@ function GetMsg (Key)
                 Msg = Msg & " the installation."
             case "MSG_ANNOUNCEMENT"
                 Msg = "cc65 Announcement"
+            case "MSG_INCOMPLETE"
+                Msg = "The package seems to be incomplete and cannot be"
+                Msg = Msg & " installed."
             case else
                 Msg = Key
         end select
@@ -661,6 +664,23 @@ end function
 
 
 '******************************************************************************
+' Check that there's something to install
+'******************************************************************************
+sub CheckFilesToInstall ()
+
+    ' If the uninstaller is unavailable for some reason or the other, we
+    ' have a problem, because the installer will create an uninstaller entry
+    ' in the registry, but it will not work, which means that the package
+    ' cannot be deinstalled or overwritten. So we have to check that at least
+    ' the uninstaller is available in the same directory as the installer.
+    if not FileExists (Uninstaller) then
+        Abort (GetMsg ("MSG_INCOMPLETE"))
+    end if
+end sub
+
+
+
+'******************************************************************************
 ' Check that were running this script as admin
 '******************************************************************************
 sub CheckAdminRights ()
@@ -975,7 +995,7 @@ end sub
 ' Function that creates the menu entries
 '******************************************************************************
 sub CreateMenuEntries ()
-    dim Folder, Result, Name, Desc, Exe, Args(2)
+    dim Folder, Result, Name, Desc, Target, Args(2)
 
     ' Create the start menu folder.
     Folder = BuildPath (Programs, AppName)
@@ -994,17 +1014,21 @@ sub CreateMenuEntries ()
     call CreateShortcut (Name, Uninstaller, UninstallerCmdLine, Desc)
 
     ' Create a documentation shortcut in the menu folder
-    Args(1) = AppName
-    Desc = FmtMsg ("MSG_DOCENTRY", Args)
-    Name = BuildPath (Folder, Desc & ".url")
-    Exe  = "file://" & BuildPath (InstallTarget, DocIndexFile)
-    call CreateUrl (Name, Exe, Desc)
+    Target = BuildPath (InstallTarget, DocIndexFile)
+    if FileExists (Target) then
+        Args(1) = AppName
+        Desc = FmtMsg ("MSG_DOCENTRY", Args)
+        Name = BuildPath (Folder, Desc & ".url")
+        call CreateUrl (Name, "file://" & Target, Desc)
+    end if
 
     ' Create the shortcut to the announcement in the menu folder
-    Desc = GetMsg ("MSG_ANNOUNCEMENT")
-    Name = BuildPath (Folder, Desc & ".url")
-    Exe = "file://" & BuildPath (InstallTarget, AnnouncementFile)
-    call CreateUrl (Name, Exe, Desc)
+    Target = BuildPath (InstallTarget, AnnouncementFile)
+    if FileExists (Target) then
+        Desc = GetMsg ("MSG_ANNOUNCEMENT")
+        Name = BuildPath (Folder, Desc & ".url")
+        call CreateUrl (Name, "file://" & Target, Desc)
+    end if
 
     ' Update the uninstall control file
     call WriteUninstallCtrlFile ("D " & Folder)
@@ -1064,9 +1088,9 @@ sub AddEnvironment ()
     if not DirInPath (BinDir) then
 	call AddToSysPath (BinDir)
 
-	' Run the wm_settingchange program to notify other running programs
+	' Run the wm_envchange program to notify other running programs
 	' of the changed environment. Ignore errors.
-	call Run (BuildPath (BinDir, "wm_settingchange.exe"), 0)
+	call Run (BuildPath (BinDir, "wm_envchange.exe"), 0)
     end if
 
 end sub
@@ -1092,6 +1116,9 @@ sub Main ()
     if Dbg then
         call ShowPathsAndLocations ()
     end if
+
+    ' Check that there's something to install
+    call CheckFilesToInstall ()
 
     ' Check that we're running this script as admin
     call CheckAdminRights ()

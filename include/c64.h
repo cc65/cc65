@@ -67,6 +67,7 @@
 #define COLOR_RED    	       	0x02
 #define COLOR_CYAN      	0x03
 #define COLOR_VIOLET 	       	0x04
+#define COLOR_PURPLE            COLOR_VIOLET
 #define COLOR_GREEN  	       	0x05
 #define COLOR_BLUE   	       	0x06
 #define COLOR_YELLOW 	       	0x07
@@ -97,7 +98,7 @@
 #define C64_OS_US       0xAA            /* US version */
 #define C64_OS_PET64    0x64            /* PET 64 */
 #define C64_OS_SX64     0x43            /* SX-64 */
-#define C64_EU_NEW      0x03            
+#define C64_EU_NEW      0x03
 #define C64_EU_OLD      0x00
 
 

@@ -133,6 +133,7 @@ extern void __fastcall__ setcolor_low (unsigned char color_reg, unsigned char co
 extern unsigned char __fastcall__ getcolor (unsigned char color_reg);
 
 /* other screen functions */
+extern int  __fastcall__ graphics(unsigned char mode); /* mode value same as in BASIC */
 extern void __fastcall__ scroll (signed char numlines);
                                           /* numlines > 0  scrolls up */
                                           /* numlines < 0  scrolls down */
@@ -190,7 +191,7 @@ extern unsigned char get_tv(void);     /* get TV system */
 /* device control block */
 struct __dcb {
     unsigned char device;     /* device id */
-    unsigned char unit;       /* unix number */
+    unsigned char unit;       /* unit number */
     unsigned char command;    /* command */
     unsigned char status;     /* command type / status return */
     void          *buffer;    /* pointer to buffer */

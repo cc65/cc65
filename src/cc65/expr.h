@@ -92,8 +92,11 @@ int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval);
  * primary register and 1 is returned.
  */
 
-void constexpr (ExprDesc* lval);
+void ConstExpr (ExprDesc* lval);
 /* Get a constant value */
+
+void ConstIntExpr (ExprDesc* Val);
+/* Get a constant int value */
 
 void intexpr (ExprDesc* lval);
 /* Get an integer expression */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -230,7 +230,7 @@ static void ParseEnumDecl (void)
    	if (CurTok.Tok == TOK_ASSIGN) {
     	    ExprDesc lval;
    	    NextToken ();
-   	    constexpr (&lval);
+   	    ConstExpr (&lval);
    	    EnumVal = lval.ConstVal;
     	}
 
@@ -858,7 +858,7 @@ static void Decl (Declaration* D, unsigned Mode)
 	    /* Read the size if it is given */
        	    if (CurTok.Tok != TOK_RBRACK) {
     	     	ExprDesc lval;
-       	       	constexpr (&lval);
+       	       	ConstExpr (&lval);
        	       	Size = lval.ConstVal;
        	    }
        	    ConsumeRBrack ();
@@ -960,7 +960,7 @@ static void ParseVoidInit (void)
     /* Allow an arbitrary list of values */
     ConsumeLCurly ();
     do {
-	constexpr (&lval);
+	ConstExpr (&lval);
 	switch (lval.Type[0]) {
 
 	    case T_SCHAR:
@@ -1069,7 +1069,7 @@ void ParseInit (type* T)
 
      	case T_SCHAR:
      	case T_UCHAR:
-     	    constexpr (&lval);
+     	    ConstExpr (&lval);
 	    if ((lval.Flags & E_MCTYPE) == E_TCONST) {
 	    	/* Make it byte sized */
 	    	lval.ConstVal &= 0xFF;
@@ -1083,7 +1083,7 @@ void ParseInit (type* T)
      	case T_INT:
      	case T_UINT:
      	case T_PTR:
-     	    constexpr (&lval);
+     	    ConstExpr (&lval);
 	    if ((lval.Flags & E_MCTYPE) == E_TCONST) {
 	    	/* Make it word sized */
 	    	lval.ConstVal &= 0xFFFF;
@@ -1094,7 +1094,7 @@ void ParseInit (type* T)
 
     	case T_LONG:
     	case T_ULONG:
-	    constexpr (&lval);
+	    ConstExpr (&lval);
 	    if ((lval.Flags & E_MCTYPE) == E_TCONST) {
 	    	/* Make it long sized */
 	    	lval.ConstVal &= 0xFFFFFFFF;

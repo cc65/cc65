@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -121,7 +121,7 @@ void SwitchStatement (void)
 		NextToken ();
 
 		/* Read the selector expression */
-		constexpr (&CaseExpr);
+		ConstExpr (&CaseExpr);
 		if (!IsClassInt (CaseExpr.Type)) {
 		    Error ("Switch quantity not an integer");
 		}
@@ -142,14 +142,14 @@ void SwitchStatement (void)
 		      	    Error ("Range error");
 		      	}
 		      	break;
-			     
+
 		    case T_SHORT:
 		    case T_INT:
 		      	if (Val < -32768 || Val > 32767) {
 		      	    Error ("Range error");
 		      	}
 		      	break;
-				 
+
 		    case T_USHORT:
 		    case T_UINT:
 		      	if (Val < 0 || Val > 65535) {

@@ -3215,14 +3215,29 @@ void expression (ExprDesc* lval)
 
 
 
-void constexpr (ExprDesc* lval)
+void ConstExpr (ExprDesc* lval)
 /* Get a constant value */
 {
     memset (lval, 0, sizeof (*lval));
     if (expr (hie1, lval) != 0 || (lval->Flags & E_MCONST) == 0) {
      	Error ("Constant expression expected");
      	/* To avoid any compiler errors, make the expression a valid const */
-	MakeConstIntExpr (lval, 1);
+     	MakeConstIntExpr (lval, 1);
+    }
+}
+
+
+
+void ConstIntExpr (ExprDesc* Val)
+/* Get a constant int value */
+{
+    memset (Val, 0, sizeof (*Val));
+    if (expr (hie1, Val) != 0        ||
+	(Val->Flags & E_MCONST) == 0 ||
+	!IsClassInt (Val->Type)) {
+     	Error ("Constant integer expression expected");
+     	/* To avoid any compiler errors, make the expression a valid const */
+     	MakeConstIntExpr (Val, 1);
     }
 }
 
@@ -3235,7 +3250,7 @@ void intexpr (ExprDesc* lval)
     if (!IsClassInt (lval->Type)) {
      	Error ("Integer expression expected");
      	/* To avoid any compiler errors, make the expression a valid int */
-	MakeConstIntExpr (lval, 1);
+     	MakeConstIntExpr (lval, 1);
     }
 }
 

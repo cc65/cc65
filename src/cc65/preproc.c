@@ -147,7 +147,7 @@ static void keepch (char c)
 {
     *mptr++ = c;
 }
-	    
+
 
 
 static void keepstr (const char* S)
@@ -758,7 +758,7 @@ static int DoIf (int Skip)
     NextToken ();
 
     /* Call the expression parser */
-    constexpr (&lval);
+    ConstExpr (&lval);
 
     /* End preprocessing mode */
     Preprocessing = 0;

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -36,6 +36,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* common */
+#include "tgttrans.h"
+
 /* cc65 */
 #include "codegen.h"
 #include "error.h"
@@ -58,6 +61,7 @@
 /* Tokens for the #pragmas */
 typedef enum {
     PR_BSSSEG,
+    PR_CHARMAP,
     PR_CHECKSTACK,
     PR_CODESEG,
     PR_DATASEG,
@@ -72,9 +76,10 @@ typedef enum {
 /* Pragma table */
 static const struct Pragma {
     const char*	Key;		/* Keyword */
-    pragma_t	Tok;		/* Token */
+    pragma_t   	Tok;		/* Token */
 } Pragmas[] = {
     { 	"bssseg",       PR_BSSSEG	},
+    {   "charmap",      PR_CHARMAP      },
     {	"checkstack",	PR_CHECKSTACK	},
     {   "codeseg",    	PR_CODESEG	},
     {   "dataseg",    	PR_DATASEG	},
@@ -170,15 +175,49 @@ static void SegNamePragma (segment_t Seg)
 
 
 
+static void CharMapPragma (void)
+/* Change the character map */
+{
+    unsigned Index, C;
+
+    ExprDesc Val;
+
+    /* Read the character index */
+    ConstIntExpr (&Val);
+    if (Val.ConstVal < 1 || Val.ConstVal > 255) {
+    	Error ("Character index out of range");
+    	Index = 'A';
+    } else {
+    	Index = Val.ConstVal;
+    }
+
+    /* Comma follows */
+    ConsumeComma ();
+
+    /* Read the character code */
+    ConstIntExpr (&Val);
+    if (Val.ConstVal < 1 || Val.ConstVal > 255) {
+    	Error ("Character code out of range");
+    	C = 'A';
+    } else {
+    	C = Val.ConstVal;
+    }
+
+    /* Remap the character */
+    TgtTranslateSet (Index, C);
+}
+
+
+
 static void FlagPragma (unsigned char* Flag)
 /* Handle a pragma that expects a boolean paramater */
 {
-    /* Read a constant expression */
-    ExprDesc val;
-    constexpr (&val);
+    /* Read a constant integer expression */
+    ExprDesc Val;
+    ConstIntExpr (&Val);
 
     /* Store the value into the flag parameter */
-    *Flag = (val.ConstVal != 0);
+    *Flag = (Val.ConstVal != 0);
 }
 
 
@@ -219,6 +258,10 @@ void DoPragma (void)
 
 	case PR_BSSSEG:
 	    SegNamePragma (SEG_BSS);
+	    break;
+
+	case PR_CHARMAP:
+	    CharMapPragma ();
 	    break;
 
 	case PR_CHECKSTACK:

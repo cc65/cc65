@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
@@ -236,7 +236,7 @@ static void ParseEnumDecl (void)
 
 	/* Add an entry to the symbol table */
 	AddConstSym (Ident, type_int, SC_ENUM, EnumVal++);
-
+                                     
 	/* Check for end of definition */
     	if (CurTok.Tok != TOK_COMMA)
     	    break;
@@ -251,7 +251,8 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 /* Parse a struct/union declaration. */
 {
 
-    unsigned Size;
+    unsigned StructSize;
+    unsigned FieldSize;
     unsigned Offs;
     SymTable* FieldTab;
     SymEntry* Entry;
@@ -282,7 +283,7 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
     EnterStructLevel ();
 
     /* Parse struct fields */
-    Size = 0;
+    StructSize = 0;
     while (CurTok.Tok != TOK_RCURLY) {
 
 	/* Get the type of the entry */
@@ -298,18 +299,20 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 	    ParseDecl (&Spec, &Decl, 0);
 
             /* Get the offset of this field */
-            Offs = (StructType == T_STRUCT)? Size : 0;
+            Offs = (StructType == T_STRUCT)? StructSize : 0;
 
 	    /* Add a field entry to the table */
 	    AddLocalSym (Decl.Ident, Decl.Type, SC_STRUCTFIELD, Offs);
 
 	    /* Calculate offset of next field/size of the union */
-    	    Offs = CheckedSizeOf (Decl.Type);
+    	    FieldSize = CheckedSizeOf (Decl.Type);
 	    if (StructType == T_STRUCT) {
-	       	Size += Offs;
+                /* It's a struct */
+	       	StructSize += FieldSize;
 	    } else {
-	       	if (Offs > Size) {
-	       	    Size = Offs;
+                /* It's a union */
+	       	if (FieldSize > StructSize) {
+	       	    StructSize = FieldSize;
 	       	}
 	    }
 
@@ -328,7 +331,7 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
     LeaveStructLevel ();
 
     /* Make a real entry from the forward decl and return it */
-    return AddStructSym (Name, Size, FieldTab);
+    return AddStructSym (Name, StructSize, FieldTab);
 }
 
 
@@ -874,6 +877,14 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
        	    if (CurTok.Tok != TOK_RBRACK) {
     	     	ExprDesc lval;
        	       	ConstExpr (&lval);
+                if (lval.ConstVal < 0) {
+                    if (D->Ident[0] != '\0') {
+                        Error ("Size of array `%s' is negative", D->Ident);
+                    } else {
+                        Error ("Size of array is negative");
+                    }
+                    lval.ConstVal = 1;
+                }
        	       	Size = lval.ConstVal;
        	    }
        	    ConsumeRBrack ();

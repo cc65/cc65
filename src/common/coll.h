@@ -40,8 +40,8 @@
 
 /* common */
 #include "attrib.h"
-#include "cfeature.h"
 #include "check.h"
+#include "inline.h"
 
 
 

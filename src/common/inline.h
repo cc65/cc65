@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  cfeature.h				     */
+/*				   inline.h				     */
 /*                                                                           */
-/*			   Define compiler features			     */
+/*		Definitions to use the inline compiler feature		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,13 +33,13 @@
 
 
 
-#ifndef CFEATURE_H
-#define CFEATURE_H
+#ifndef INLINE_H
+#define INLINE_H
 
 
 
 /*****************************************************************************/
-/*				    Defines				     */
+/*	      			    Defines				     */
 /*****************************************************************************/
 
 
@@ -51,7 +51,7 @@
 
 
 
-/* End of cfeature.h */
+/* End of inline.h */
 
 #endif
 

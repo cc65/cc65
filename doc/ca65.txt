@@ -517,7 +517,7 @@ use symbols and labels, giving a lot of flexibility.
     or plus characters as a label designator. Using the '-' characters
     will create a back reference (use the n'th label backwards), using
     '+' will create a forward reference (use the n'th label in forward
-    direction. An example will help to understand this:
+    direction). An example will help to understand this:
 
        	:	lda	(ptr1),y	; #1
     		cmp	(ptr2),y
@@ -1188,7 +1188,7 @@ Here's a list of all control commands and a description, what they do:
 
   Example:
 
-   	.ifdef	ToHex	    		; If someone used this subroutine
+   	.ifref 	ToHex	    		; If someone used this subroutine
    	ToHex:	tay	    		; Define subroutine
    		lda	HexTab,y
    		rts
@@ -1410,7 +1410,8 @@ Here's a list of all control commands and a description, what they do:
 
   Please note that the function does only compare tokens, not token
   attributes. So any number is equal to any other number, regardless of
-  the actual value. The same is true for strings.
+  the actual value. The same is true for strings. If you need to compare
+  tokens <em/and/ token attributes, use the .XMATCH function.
 
   Example:
 
@@ -1988,7 +1989,7 @@ following .DEFINE:
 
       	foo	EQU	$1234	   	; This is accepted now
 
-You may use the directive to define string constants use elsewhere:
+You may use the directive to define string constants used elsewhere:
 
       	; Define the version number
       	.define	VERSION	       	"12.3a"

@@ -20,7 +20,7 @@ More special thanks to:
   * Tennessee Carmel-Veilleux <veilleux@ameth.org>
 
     Tennessee worked on the NES port (which is unfinished and was removed
-    because having an unfinished port it was confusing and people started
+    because having an unfinished port was confusing and people started 
     mailing me about it).
 
   * Kevin Ruland <kevin@rodin.wustl.edu>
@@ -65,6 +65,10 @@ More special thanks to:
 
     Marc wrote and contributed BASIC compatible file I/O routines for the
     Commodore machines.
+
+  * Groepaz <groepaz@gmx.net>
+
+    Thanks for the contribution of the plasma.c sample program.
 
 
 

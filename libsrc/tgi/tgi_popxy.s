@@ -9,7 +9,8 @@
         .import         popax
         .importzp       ptr1, ptr2
 
-tgi_popxy:
+.proc   tgi_popxy
+
         sta     ptr2            ; Y
         stx     ptr2+1
         jsr     popax
@@ -17,4 +18,5 @@ tgi_popxy:
         stx     ptr1+1
         rts
 
+.endproc
 

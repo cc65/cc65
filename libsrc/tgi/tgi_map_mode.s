@@ -16,7 +16,8 @@
 
 .code
 
-_tgi_map_mode:
+.proc   _tgi_map_mode
+
         sta     tmp1                    ; Save mode
         ldy     #$00
 
@@ -48,4 +49,6 @@ Found:  tya
         inx
 @L1:    rts
 
-    
+.endproc
+
+

@@ -9,10 +9,10 @@
 
         .importzp       ptr1, ptr2, ptr3, ptr4
         .import         popax
-        .import         _tgi_getmaxx, _tgi_getmaxy
-        .export         _tgi_bar
 
-_tgi_bar:
+
+.proc   _tgi_bar
+
         sta     ptr4            ; Y2
         stx     ptr4+1
 
@@ -130,4 +130,4 @@ _tgi_bar:
 
 @L9:    rts
 
-
+.endproc

@@ -10,12 +10,12 @@
         .include        "tgi-kernel.inc"
 
         .importzp       ptr1
-        .export         _tgi_setpalette
 
+.proc   _tgi_setpalette
 
-_tgi_setpalette:
         sta     ptr1
         stx     ptr1+1
         jmp     tgi_setpalette          ; Call the driver
 
+.endproc
 

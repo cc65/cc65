@@ -6,13 +6,13 @@
 
 
         .include        "tgi-kernel.inc"
-        .export         _tgi_setdrawpage
 
-_tgi_setdrawpage:
+.proc   _tgi_setdrawpage
+
         cmp     _tgi_pagecount  ; Compare to available pages
         bcs     @L1
         jmp     tgi_setdrawpage ; Call the driver
 @L1:    jmp     tgi_inv_arg     ; Invalid argument
 
-
+.endproc
 

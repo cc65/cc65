@@ -6,10 +6,11 @@
 
 
         .include        "tgi-kernel.inc"
-        .export         _tgi_getcolor
 
-_tgi_getcolor:
+.proc   _tgi_getcolor
+
         lda     _tgi_color      ; Get the current drawing color
         ldx     #0              ; Clear high byte
         rts
 
+.endproc

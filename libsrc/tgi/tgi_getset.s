@@ -11,7 +11,8 @@
         .importzp       ptr1, ptr2
 
 
-tgi_getset:
+.proc   tgi_getset
+
         jsr     tgi_popxy       ; Pop X/Y into ptr1/ptr2
 
 ; Are the coordinates out of range? First check if any coord is negative.
@@ -36,4 +37,5 @@ tgi_getset:
         sbc     _tgi_yres+1
 @L9:    rts
 
+.endproc
 

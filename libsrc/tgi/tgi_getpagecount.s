@@ -6,11 +6,12 @@
 ;
 
         .include        "tgi-kernel.inc"
-        .export         _tgi_getpagecount
 
+.proc   _tgi_getpagecount
 
-_tgi_getpagecount:
         lda     _tgi_pagecount
         ldx     #0
         rts
+
+.endproc
 

@@ -6,12 +6,12 @@
 
 
         .include        "tgi-kernel.inc"
-        .export         _tgi_getxres
 
+.proc   _tgi_getxres
 
-_tgi_getxres:
         lda     _tgi_xres
         ldx     _tgi_xres+1
         rts
 
+.endproc
 

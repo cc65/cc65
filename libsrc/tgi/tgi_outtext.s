@@ -9,12 +9,13 @@
 
         .import         popax
         .importzp       ptr3
-        .export         _tgi_outtext
 
-_tgi_outtext:
+.proc   _tgi_outtext
+
         sta     ptr3
         stx     ptr3+1          ; Save s
         jsr     tgi_curtoxy     ; Copy curx/cury into ptr1/ptr2
         jmp     tgi_outtext     ; Call the driver
 
+.endproc
 

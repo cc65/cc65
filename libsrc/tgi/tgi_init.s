@@ -9,11 +9,9 @@
         .include        "tgi-error.inc"
 
         .importzp       ptr1
-        .import         _tgi_done
-        .import         _tgi_setcolor
-        .export         _tgi_init
 
-_tgi_init:
+.proc   _tgi_init
+
         jsr     _tgi_done               ; Switch off graphics if needed
         jsr     tgi_init                ; Go into graphics mode
         jsr     tgi_geterror            ; Get the error code
@@ -56,4 +54,7 @@ _tgi_init:
 ; Error exit
 
 @L9:    rts
+
+.endproc
+
 

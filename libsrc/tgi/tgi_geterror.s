@@ -8,9 +8,8 @@
 
         .include        "tgi-kernel.inc"
 
-        .export         _tgi_geterror
+.proc   _tgi_geterror
 
-_tgi_geterror:
         lda     _tgi_drv                ; Check if we have a driver
         ora     _tgi_drv+1
         beq     @L1
@@ -21,4 +20,6 @@ _tgi_geterror:
         tya                             ; Use high level code if we have one
         stx     _tgi_error              ; Clear high level error code
 @L2:    rts
+
+.endproc
 

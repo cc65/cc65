@@ -8,7 +8,6 @@
 ;
 
         .include        "tgi-kernel.inc"
-        .export         _tgi_getdefpalette
 
 _tgi_getdefpalette      =       tgi_getdefpalette       ; Call the driver
 

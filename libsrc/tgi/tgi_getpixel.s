@@ -6,13 +6,15 @@
 
 
         .include        "tgi-kernel.inc"
-                       
-        .import         return0
-        .export         _tgi_getpixel
 
-_tgi_getpixel:
+        .import         return0
+
+.proc   _tgi_getpixel
+
         jsr     tgi_getset      ; Pop args, check range
         bcs     @L9
         jmp     tgi_getpixel    ; Call the driver
 @L9:    jmp     return0         ; Assume bg color
+
+.endproc
 

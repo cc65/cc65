@@ -8,12 +8,12 @@
 
         .import         popax
         .importzp       tmp1
-        .export         _tgi_circle
 
-_tgi_circle:
+.proc   _tgi_circle
+
         sta     tmp1            ; Get the coordinates
         jsr     popax
         jsr     tgi_popxy       ; Pop X/Y into ptr1/ptr2
         jmp     tgi_circle      ; Call the driver
 
-
+.endproc

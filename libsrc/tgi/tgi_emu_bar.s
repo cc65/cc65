@@ -7,9 +7,9 @@
         .include        "tgi-kernel.inc"
 
         .importzp       ptr1, ptr2, ptr3, ptr4
-        .export         tgi_emu_bar
 
-tgi_emu_bar:
+.proc   tgi_emu_bar
+
         lda     ptr4
         sta     Y2
         lda     ptr4+1
@@ -62,6 +62,8 @@ tgi_emu_bar:
         jmp     @L1
 
 @L4:    rts
+
+.endproc
 
 ;-----------------------------------------------------------------------------
 ; Data

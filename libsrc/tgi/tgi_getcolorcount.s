@@ -5,11 +5,12 @@
 ; /* Get the number of available colors */
 
         .include        "tgi-kernel.inc"
-        .export         _tgi_getcolorcount
 
+.proc   _tgi_getcolorcount
 
-_tgi_getcolorcount:
         lda     _tgi_colorcount
         ldx     #0
         rts
+
+.endproc
 

@@ -7,7 +7,7 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
 
-        .export         _tgi_setup
+        .export         tgi_clear_ptr
         .importzp       ptr1
 
 
@@ -42,7 +42,7 @@ tgi_driver_var_size     = * - tgi_driver_vars
 ; Jump table for the driver functions.
 
 tgi_install:   	    jmp     $0000
-tgi_deinstall: 	    jmp     $0000
+tgi_uninstall: 	    jmp     $0000
 tgi_init:           jmp     $0000
 tgi_done:           jmp     $0000
 tgi_geterror:	    jmp	    $0000
@@ -63,21 +63,31 @@ tgi_circle:         jmp     $0000
 tgi_textstyle:      jmp     $0000
 tgi_outtext:        jmp     $0000
 
+; Driver header signature
+.rodata
+tgi_sig:        .byte   $74, $67, $69, $00      ; "tgi", version
+tgi_sig_len     = * - tgi_sig
+
 
 ;----------------------------------------------------------------------------
-; void __fastcall__ tgi_setup (void);
-; /* Setup the driver and graphics kernel once the driver is loaded */
+; void __fastcall__ tgi_install (void* driver);
+; /* Install an already loaded driver. */
 
 
-copy:   lda     (ptr1),y
-        sta     tgi_install,x
-        iny
-        inx
-        rts
+_tgi_install:
+       	sta     _tgi_drv
+  	sta 	ptr1
+  	stx     _tgi_drv+1
+  	stx    	ptr1+1
 
+; Check the driver signature
 
-_tgi_setup:
- 	jsr     tgi_set_ptr             ; load _tgi_drv into ptr1
+        ldy     #tgi_sig_len-1
+@L0:    lda     (ptr1),y
+        cmp     tgi_sig,y
+        bne     tgi_inv_drv
+        dey
+        bpl     @L0
 
 ; Copy the jump vectors
 
@@ -125,14 +135,12 @@ _tgi_setup:
 
 	rts
 
-;----------------------------------------------------------------------------
-; Load the pointer to the tgi driver into ptr1.
+; Copy one byte from the jump vectors
 
-tgi_set_ptr:
-       	lda	_tgi_drv
-  	sta	ptr1
-  	lda	_tgi_drv+1
-  	sta	ptr1+1
+copy:   lda     (ptr1),y
+        sta     tgi_install,x
+        iny
+        inx
         rts
 
 ;----------------------------------------------------------------------------
@@ -142,4 +150,43 @@ tgi_inv_arg:
         lda     #TGI_ERR_INV_ARG
         sta     _tgi_error
         rts
+
+;----------------------------------------------------------------------------
+; Set an invalid driver error
+
+tgi_inv_drv:
+        lda     #TGI_ERR_INV_DRIVER
+        sta     _tgi_error
+        rts
+
+;----------------------------------------------------------------------------
+; Load the pointer to the tgi driver into ptr1.
+
+tgi_set_ptr:
+       	lda 	_tgi_drv
+  	sta 	ptr1
+  	lda 	_tgi_drv+1
+  	sta 	ptr1+1
+        rts
+
+;----------------------------------------------------------------------------
+; void __fastcall__ tgi_uninstall (void);
+; /* Uninstall the currently loaded driver but do not unload it. Will call
+;  * tgi_done if necessary.
+;  */
+
+_tgi_uninstall:
+        jsr     _tgi_done               ; Switch off graphics
+        jsr     tgi_uninstall           ; Allow the driver to clean up
+
+; Clear driver pointer and error code
+
+tgi_clear_ptr:                          ; External entry point
+        lda     #$00
+        sta     _tgi_drv
+        sta     _tgi_drv+1
+        sta     _tgi_error
+
+        rts
+
 

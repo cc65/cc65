@@ -8,9 +8,9 @@
         .include        "tgi-kernel.inc"
 
         .import         popax
-        .export         _tgi_gotoxy
 
-_tgi_gotoxy:
+.proc   _tgi_gotoxy
+
         sta     _tgi_cury               ; Y
         stx     _tgi_cury+1
         jsr     popax
@@ -18,5 +18,5 @@ _tgi_gotoxy:
         stx     _tgi_curx+1
         rts
 
+.endproc
 
- 

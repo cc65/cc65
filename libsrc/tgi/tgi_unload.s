@@ -8,25 +8,18 @@
         .include        "tgi-kernel.inc"
         .include        "modload.inc"
 
-        .import         _tgi_done
-        .export         _tgi_unload
+        .import         tgi_clear_ptr
 
+.proc   _tgi_unload
 
-_tgi_unload:
         jsr     _tgi_done               ; Switch off graphics
-        jsr     tgi_deinstall           ; Allow the driver to clean up
+        jsr     tgi_uninstall           ; Allow the driver to clean up
 
         lda     _tgi_drv
         ldx     _tgi_drv+1
         jsr     _mod_free               ; Free the driver
 
-; Clear variables
+        jmp     tgi_clear_ptr           ; Clear the driver pointer and exit
 
-        lda     #$00
-        sta     _tgi_drv
-        sta     _tgi_drv+1
-        sta     _tgi_error
-        
-        rts
-
+.endproc
 

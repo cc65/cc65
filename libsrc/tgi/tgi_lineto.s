@@ -9,11 +9,12 @@
         .include        "tgi-kernel.inc"
 
         .import         popax
-        .export         _tgi_lineto
 
-_tgi_lineto:
+.proc   _tgi_lineto
+
         jsr     tgi_curtoxy     ; Copy curx/cury into ptr1/ptr2
         jsr     tgi_linepop     ; Pop x2/y2 into ptr3/ptr4 and curx/cury
         jmp     tgi_line        ; Call the driver
 
+.endproc
 

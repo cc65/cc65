@@ -1,4 +1,4 @@
-;                
+;
 ; Ullrich von Bassewitz, 22.06.2002
 ;
 
@@ -6,8 +6,6 @@
         .include        "tgi-kernel.inc"
 
         .import         _strlen, pushax, tosumulax
-        .export         _tgi_textwidth
-        .export         _tgi_textheight
 
 ;-----------------------------------------------------------------------------
 ; unsigned __fastcall__ tgi_textwidth (const char* s);
@@ -17,6 +15,7 @@
 
 
 _tgi_textwidth:
+
         ldy     _tgi_textdir            ; Get text direction
         bne     height
 

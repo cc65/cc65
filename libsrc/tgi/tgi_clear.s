@@ -6,8 +6,6 @@
 
         .include        "tgi-kernel.inc"
 
-        .export         _tgi_clear
-
 _tgi_clear      = tgi_clear               ; Call the driver
 
 

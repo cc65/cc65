@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -66,24 +66,38 @@
 
 
 void __fastcall__ tgi_load (unsigned char mode);
-/* Install the matching driver for the given mode. Will just load the driver
- * and check if loading was successul. Will not switch to gaphics mode.
+/* Load and install the matching driver for the given mode. Will just load
+ * the driver and check if loading was successul. Will not switch to gaphics
+ * mode.
  */
 
 void __fastcall__ tgi_load_driver (const char* name);
-/* Install the given driver. This function is identical to tgi_load with the
- * only difference that the name of the driver is specified explicitly. You
- * should NOT use this function in most cases, use tgi_load() instead.
+/* Load and install the given driver. This function is identical to tgi_load
+ * with the only difference that the name of the driver is specified
+ * explicitly. You should NOT use this function in most cases, use tgi_load()
+ * instead.
  */
 
 void __fastcall__ tgi_unload (void);
-/* Unload the currently loaded driver. Will call tgi_done if necessary. */
+/* Uninstall, then unload the currently loaded driver. Will call tgi_done if
+ * necessary.
+ */
+
+void __fastcall__ tgi_install (void* driver);
+/* Install an already loaded driver. */
+
+void __fastcall__ tgi_uninstall (void);
+/* Uninstall the currently loaded driver but do not unload it. Will call
+ * tgi_done if necessary.
+ */
 
 void __fastcall__ tgi_init (void);
-/* Initialize the already loaded graphics driver */
+/* Initialize the already loaded graphics driver. */
 
 void __fastcall__ tgi_done (void);
-/* End graphics mode, switch back to text mode. Will NOT unload the driver! */
+/* End graphics mode, switch back to text mode. Will NOT uninstall or unload
+ * the driver!
+ */
 
 unsigned char __fastcall__ tgi_geterror (void);
 /* Return the error code for the last operation. This will also clear the

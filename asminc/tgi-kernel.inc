@@ -6,10 +6,10 @@
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */
-;* (C) 2002      Ullrich von Bassewitz                                       */
-;*               Wacholderweg 14                                             */
-;*               D-70597 Stuttgart                                           */
-;* EMail:        uz@musoftware.de                                            */
+;* (C) 2002-2003 Ullrich von Bassewitz                                       */
+;*               Römerstrasse 52                                             */
+;*               D-70794 Filderstadt                                         */
+;* EMail:        uz@cc65.org                                                 */
 ;*                                                                           */
 ;*                                                                           */
 ;* This software is provided 'as-is', without any expressed or implied       */
@@ -48,7 +48,7 @@ TGI_HDR_RES             = 12            ; Reserved for extensions
 
 TGI_HDR_JUMPTAB         = 16
 TGI_HDR_INSTALL         = TGI_HDR_JUMPTAB+0     ; INSTALL routine
-TGI_HDR_DEINSTALL       = TGI_HDR_JUMPTAB+2     ; DEINSTALL routine
+TGI_HDR_UNINSTALL       = TGI_HDR_JUMPTAB+2     ; UNINSTALL routine
 TGI_HDR_INIT            = TGI_HDR_JUMPTAB+4     ; INIT routine
 TGI_HDR_DONE            = TGI_HDR_JUMPTAB+6     ; DONE routine
 TGI_HDR_GETERROR	= TGI_HDR_JUMPTAB+8 	; GETERROR routine
@@ -100,7 +100,7 @@ TGI_TEXT_VERTICAL       = 1
 ; Driver entry points
 
         .global tgi_install
-        .global tgi_deinstall
+        .global tgi_uninstall
         .global tgi_init
         .global tgi_done
 	.global	tgi_geterror
@@ -127,10 +127,51 @@ TGI_TEXT_VERTICAL       = 1
         .global tgi_emu_bar
         .global tgi_getset
         .global tgi_inv_arg
+        .global tgi_inv_drv
         .global tgi_linepop
         .global tgi_set_ptr
         .global tgi_popxy
         .global tgi_popxy2
         .global tgi_curtoxy
+
+;------------------------------------------------------------------------------
+; C callable functions
+
+        .global _tgi_load
+        .global _tgi_load_driver
+        .global _tgi_unload
+        .global _tgi_install
+        .global _tgi_uninstall
+        .global _tgi_init
+        .global _tgi_done
+        .global _tgi_geterror
+        .global _tgi_clear
+        .global _tgi_getpagecount
+        .global _tgi_setviewpage
+        .global _tgi_setdrawpage
+        .global _tgi_getcolorcount
+        .global _tgi_getmaxcolor
+        .global _tgi_setcolor
+        .global _tgi_getcolor
+        .global _tgi_setpalette
+        .global _tgi_getpalette
+        .global _tgi_getdefpalette
+        .global _tgi_getxres
+        .global _tgi_getmaxx
+        .global _tgi_getyres
+        .global _tgi_getmaxy
+        .global _tgi_getpixel
+        .global _tgi_setpixel
+        .global _tgi_gotoxy
+        .global _tgi_line
+        .global _tgi_lineto
+        .global _tgi_circle
+        .global _tgi_bar
+        .global _tgi_textstyle
+        .global _tgi_textwidth
+        .global _tgi_textheight
+        .global _tgi_outtext
+        .global _tgi_outtextxy
+
 
 

@@ -9,9 +9,9 @@
         .include        "tgi-kernel.inc"
 
         .import         popax, incsp2
-        .export         _tgi_textstyle
 
-_tgi_textstyle:
+.proc   _tgi_textstyle
+
         pha
         jsr     popax                   ; Get magx/magy in one call
         tay
@@ -38,4 +38,6 @@ DirOk:  cpy     #$00
 ; Call the driver, parameters are passed in registers
 
         jmp     tgi_textstyle
+
+.endproc
 

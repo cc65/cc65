@@ -7,9 +7,8 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
 
-        .export         _tgi_done
+.proc   _tgi_done
 
-_tgi_done:
         lda     _tgi_gmode              ; Is a graphics mode active?
         beq     @L1                     ; Jump if not
         jsr     tgi_done                ; Call the driver routine
@@ -20,5 +19,5 @@ _tgi_done:
         sta     _tgi_gmode              ; Reset the graph mode flag (A = 0)
 @L1:    rts
 
-
+.endproc
 

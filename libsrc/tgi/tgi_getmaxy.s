@@ -7,13 +7,12 @@
 ;  */
 
         .include        "tgi-kernel.inc"
-        .export         _tgi_getmaxy
-        .import         _tgi_getyres
         .import         decax1
 
+.proc   _tgi_getmaxy
 
-_tgi_getmaxy:
         jsr     _tgi_getyres
         jmp     decax1
 
+.endproc
 

@@ -7,13 +7,13 @@
 
         .include        "tgi-kernel.inc"
 
-        .export         _tgi_setpixel
+.proc   _tgi_setpixel
 
-_tgi_setpixel:
         jsr     tgi_getset      ; Pop args, check range
         bcs     @L9
         jmp     tgi_setpixel    ; Call the driver
 @L9:    rts
 
+.endproc
 
 

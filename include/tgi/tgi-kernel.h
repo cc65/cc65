@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,7 +46,7 @@
 
 /* A structure that describes the header of a graphics driver loaded into
  * memory.
- */
+ */                                          
 typedef struct {
 
     /* Data that describes the capabilities of the driver */
@@ -60,7 +60,7 @@ typedef struct {
 
     /* Jump vectors. Note that these are not C callable */
     void*               install;        /* INSTALL routine */
-    void*               deinstall;      /* DEINSTALL routine */
+    void*               uninstall;      /* UNINSTALL routine */
     void*               init;           /* INIT routine */
     void*               done;           /* DONE routine */
     void*		geterror;	/* GETERROR routine */
@@ -105,9 +105,6 @@ extern unsigned char    tgi_pagecount;  /* Number of available screens */
 
 const char* __fastcall__ tgi_map_mode (unsigned char mode);
 /* Map a tgi mode to a driver name. Returns NULL if no driver available. */
-
-void __fastcall__ tgi_setup (void);
-/* Setup the driver and graphics kernel once the driver is loaded */
 
 
 

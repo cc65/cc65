@@ -64,8 +64,6 @@ void __fastcall__ tgi_load_driver (const char* name)
  * should NOT use this function in most cases, use tgi_load() instead.
  */
 {
-    static const unsigned char marker[4] = { 0x74, 0x67, 0x69, 0x00 };
-
     static struct mod_ctrl ctrl = {
         read            /* Read from disk */
     };
@@ -78,38 +76,24 @@ void __fastcall__ tgi_load_driver (const char* name)
 
     /* Now open the file */
     ctrl.callerdata = open (name, O_RDONLY);
-    if (ctrl.callerdata < 0) {
-        tgi_error = TGI_ERR_CANNOT_LOAD;
-        return;
-    }
+    if (ctrl.callerdata >= 0) {
 
-    /* Load the module */
-    Res = mod_load (&ctrl);
+        /* Load the module */
+        Res = mod_load (&ctrl);
 
-    /* Close the input file */
-    close (ctrl.callerdata);
+        /* Close the input file */
+        close (ctrl.callerdata);
 
-    /* Check the return code */
-    if (Res == MLOAD_OK) {
+        /* Check the return code */
+        if (Res == MLOAD_OK) {
 
-        /* Get a pointer to the loaded driver */
-        tgi_drv = (tgi_drv_header*) ctrl.module;
+            /* Check the driver signature, install the driver */
+            tgi_install (ctrl.module);
+            return;
 
-        /* Check the header */
-        if (memcmp (tgi_drv, marker, sizeof (marker)) != 0) {
-            /* Invalid driver */
-            mod_free (tgi_drv);
-            tgi_drv = 0;
-            tgi_error = TGI_ERR_INV_DRIVER;
-        } else {
-            /* Driver is ok do setup */
-            tgi_setup ();
         }
-
-    } else {
-
-        /* Error loading the driver */
-        tgi_error = TGI_ERR_CANNOT_LOAD;
-
     }
+
+    /* Error loading the driver */
+    tgi_error = TGI_ERR_CANNOT_LOAD;
 }

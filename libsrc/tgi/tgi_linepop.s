@@ -9,7 +9,8 @@
         .import         popax
         .importzp       ptr3, ptr4
 
-tgi_linepop:
+.proc   tgi_linepop
+
         sta     ptr4            ; Y2
         stx     ptr4+1
         sta     _tgi_cury
@@ -21,4 +22,5 @@ tgi_linepop:
         stx     _tgi_curx+1
         rts
 
+.endproc
 

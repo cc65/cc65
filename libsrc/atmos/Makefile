@@ -36,6 +36,7 @@ S_OBJS  =       _scrsize.o      \
                 gotoy.o         \
                 kbhit.o         \
                 mainargs.o      \
+                oserrlist.o     \
                 revers.o        \
                 systime.o       \
                 sysuname.o      \

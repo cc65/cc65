@@ -6,7 +6,7 @@
 
 	.export		_strcpy
 	.import		popax
-	.importzp	ptr1, ptr2, ptr3
+	.importzp	ptr1, ptr2, tmp3
 
 _strcpy:
 	sta	ptr1		; Save src
@@ -14,8 +14,7 @@ _strcpy:
 	jsr	popax 		; Get dest
 	sta	ptr2
 	stx	ptr2+1
-	sta	ptr3  		; remember for function return
-	stx    	ptr3+1
+       	sta    	tmp3  		; remember for function return
 	ldy	#$00
 
 L1:	lda	(ptr1),y
@@ -27,7 +26,6 @@ L1:	lda	(ptr1),y
 	inc	ptr2+1
 	bne	L1
 
-L9:	lda	ptr3
-	ldx	ptr3+1
+L9:	lda	tmp3            ; X still contains high byte
  	rts
 

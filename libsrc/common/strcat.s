@@ -6,7 +6,7 @@
 
        	.export		_strcat
 	.import		popax
-	.importzp	ptr1, ptr2, ptr3
+	.importzp	ptr1, ptr2, tmp3
 
 _strcat:
        	sta	ptr1		; Save src
@@ -14,8 +14,7 @@ _strcat:
        	jsr	popax 	  	; Get dest
 	sta	ptr2
 	stx	ptr2+1
-	sta	ptr3  	  	; Remember for function return
-	stx    	ptr3+1
+	sta	tmp3  	  	; Remember for function return
 	ldy	#0
 
 ; find end of dest
@@ -50,8 +49,7 @@ sc4:	lda	(ptr1),y
 
 ; done, return pointer to dest
 
-sc5:	lda	ptr3
-	ldx	ptr3+1
+sc5:	lda	tmp3            ; X does still contain high byte
 	rts
 
 

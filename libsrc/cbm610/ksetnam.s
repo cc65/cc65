@@ -14,9 +14,9 @@
 
 .proc   SETNAM
 
-        sta     FileNameLen
-        stx     FileNameAdrLo
-        sty     FileNameAdrHi
+        sta     FNAM_LEN
+        stx     FNAM_ADR 
+        sty     FNAM_ADR+1
         rts
 
 .endproc

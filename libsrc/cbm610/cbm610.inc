@@ -24,7 +24,7 @@ SendHead  	= $24		; Head of send buffer
 SendTail  	= $25		; Tail of send buffer
 SendFreeCnt	= $26		; Number of bytes free in send buffer
 
-FNAM            := $90          ; File name address
+FNAM_ADR        := $90          ; File name address
 FNAM_SEG        := $92          ; Unused
 SaveAdrLow     	= $93
 SaveAdrHi      	= $94

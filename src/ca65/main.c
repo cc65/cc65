@@ -94,6 +94,7 @@ static void Usage (void)
        	     "  -h\t\t\tHelp (this text)\n"
        	     "  -i\t\t\tIgnore case of symbols\n"
        	     "  -l\t\t\tCreate a listing if assembly was ok\n"
+             "  -mm model\t\tSet the memory model\n"
        	     "  -o name\t\tName the output file\n"
        	     "  -s\t\t\tEnable smart mode\n"
        	     "  -t sys\t\tSet the target system\n"
@@ -108,6 +109,7 @@ static void Usage (void)
 	     "  --ignore-case\t\tIgnore case of symbols\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
        	     "  --listing\t\tCreate a listing if assembly was ok\n"
+             "  --memory-model model\tSet the memory model\n"
        	     "  --pagelength n\tSet the page length for the listing\n"
        	     "  --smart\t\tEnable smart mode\n"
        	     "  --target sys\t\tSet the target system\n"
@@ -268,6 +270,20 @@ static void OptListing (const char* Opt attribute ((unused)),
 /* Create a listing file */
 {
     Listing = 1;
+}
+
+
+
+static void OptMemoryModel (const char* Opt attribute ((unused)), const char* Arg)
+/* Set the memory model */
+{
+    if (strcmp (Arg, "near") == 0) {
+        DefAddrSize = ADDR_SIZE_ABS;
+    } else if (strcmp (Arg, "far") == 0) {
+        DefAddrSize = ADDR_SIZE_FAR;
+    } else {
+        AbEnd ("Unknown memory model: %s", Arg);
+    }
 }
 
 
@@ -509,6 +525,7 @@ int main (int argc, char* argv [])
 	{ "--ignore-case",     	0,	OptIgnoreCase 		},
 	{ "--include-dir",     	1,	OptIncludeDir		},
 	{ "--listing", 	       	0,	OptListing		},
+        { "--memory-model",     1,      OptMemoryModel          },
 	{ "--pagelength",      	1,	OptPageLength		},
 	{ "--smart",   	       	0,	OptSmart		},
 	{ "--target",  		1,	OptTarget		},
@@ -534,28 +551,36 @@ int main (int argc, char* argv [])
        	const char* Arg = ArgVec [I];
 
        	/* Check for an option */
-       	if (Arg [0] == '-') {
-       	    switch (Arg [1]) {
+       	if (Arg[0] == '-') {
+       	    switch (Arg[1]) {
 
-		case '-':
-		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-		    break;
+	       	case '-':
+	       	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+	       	    break;
 
-       	    	case 'g':
-       		    OptDebugInfo (Arg, 0);
-       		    break;
+       	       	case 'g':
+       	       	    OptDebugInfo (Arg, 0);
+       	       	    break;
 
-		case 'h':
-		    OptHelp (Arg, 0);
-		    break;
+	       	case 'h':
+	       	    OptHelp (Arg, 0);
+	       	    break;
 
        	        case 'i':
-       		    OptIgnoreCase (Arg, 0);
-       		    break;
+       	       	    OptIgnoreCase (Arg, 0);
+       	       	    break;
 
-       		case 'l':
-		    OptListing (Arg, 0);
-       		    break;
+       	       	case 'l':
+	       	    OptListing (Arg, 0);
+       	       	    break;
+
+                case 'm':
+                    if (Arg[2] == 'm') {
+                        OptMemoryModel (Arg, GetArg (&I, 3));
+                    } else {
+                        UnknownOption (Arg);
+                    }
+                    break;
 
        	        case 'o':
        		    OutFile = GetArg (&I, 2);

@@ -50,20 +50,24 @@
  * code of mod_load before accessing any of these additional struct members.
  */
 struct mod_ctrl {
-    /* Parameters passed into the loader routine. The second pointer
-     * (callerdata) is an opaque pointer that may be used by the caller to
+    /* Parameters passed into the loader routine. The member callerdata
+     * is an opaque 16 bit datatype that may be used by the caller to
      * pass data through to the read routine. The read routine is used by the
      * loader to load any required data. There are several calls where the
-     * read routine is called with a size of 1, so you may choose to make this
-     * a special case when implementing read().
+     * read routine is passed a count of 1, so you may choose to make this
+     * a special case when implementing read(). The read() should return the
+     * number of bytes actually read. If the return value differs from the
+     * passed count, this is considered an error.
+     * NOTE: read() is designed so that the POSIX read() routine can be used
+     * for this vector, if you're loading from disk.
      */
-    unsigned char   (*read) (struct mod_ctrl*, void* buffer, unsigned size);
-    void*           callerdata;
+    int               (*read) (int callerdata, void* buffer, unsigned count);
+    int               callerdata;
 
     /* Parameters set by the loader routine */
-    void*           module;             /* Pointer to module data */
-    unsigned        module_size;        /* Total size of loaded module */
-    unsigned        module_id;          /* Module id */
+    void*             module;           /* Pointer to module data */
+    unsigned          module_size;      /* Total size of loaded module */
+    unsigned          module_id;        /* Module id */
 };
 
 
@@ -77,7 +81,7 @@ unsigned char mod_load (struct mod_ctrl* ctrl);
 
 void mod_free (void* module);
 /* Free a loaded module. Note: The given pointer is the pointer to the
- * module memory, not a pointer to a control structure. 
+ * module memory, not a pointer to a control structure.
  */
 
 

@@ -85,12 +85,16 @@ ExpectedHdrSize = * - ExpectedHdr
 
 
 ;------------------------------------------------------------------------------
-; PushCtrl: Push the address of the control structure onto the C stack.
+; PushCallerData: Push the callerdata member from control structure onto the
+; C stack.
 
 .code
-PushCtrl:
-        lda     Ctrl
-        ldx     Ctrl+1
+PushCallerData:
+        ldy     #MODCTRL_CALLERDATA+1
+        lda     (Ctrl),y
+        tax
+        dey
+        lda     (Ctrl),y
         jmp     pushax
 
 ;------------------------------------------------------------------------------
@@ -129,6 +133,47 @@ GetReloc:
 @L1:    lda     #<__ZP_START__
         ldx     #>__ZP_START__
         rts
+
+;------------------------------------------------------------------------------
+; ReadByte: Read one byte with error checking into InputByte and A.
+; ReadAndCheckError: Call read with the current C stack and check for errors.
+
+.bss
+ReadSize:       .res    2
+
+.code
+ReadByte:
+
+; C->read (C->callerdata, &B, 1)
+
+        jsr     PushCallerData
+        lda     #<InputByte
+        ldx     #>InputByte
+        jsr     pushax
+        ldx     #0
+        lda     #1
+
+; This is a second entry point used by the other calls to Read
+
+ReadAndCheckError:
+        sta     ReadSize
+        stx     ReadSize+1
+        jsr     pushax
+        jsr     Read
+
+; Check the return code and bail out in case of problems
+
+        cmp     ReadSize
+        bne     @L1
+        cpx     ReadSize+1
+        beq     @L2                     ; Jump if ok
+@L1:    lda     #MLOAD_ERR_READ
+        bne     CleanupAndExit
+
+; Done
+
+@L2:    lda     InputByte               ; If called ReadByte, load the byte read
+Done:   rts
 
 ;------------------------------------------------------------------------------
 ; FormatError: Bail out with an o65 format error
@@ -173,38 +218,6 @@ CleanupAndExit:
         ldx     #$00                    ; Load the high byte
         pla
         rts
-
-;------------------------------------------------------------------------------
-; ReadByte: Read one byte with error checking into InputByte and A.
-; ReadAndCheckError: Call read with the current C stack and check for errors.
-
-.code
-ReadByte:
-
-; C->read (C, &B, 1)
-
-        jsr     PushCtrl
-        lda     #<InputByte
-        ldx     #>InputByte
-        jsr     pushax
-        jsr     push1
-
-; This is a second entry point used by the other calls to Read
-
-ReadAndCheckError:
-        jsr     Read
-
-; Check the return code and bail out in case of problems
-
-        tax
-        beq     @L1                     ; Jump if ok
-        lda     #MLOAD_ERR_READ
-        bne     CleanupAndExit
-
-; Done
-
-@L1:    lda     InputByte               ; If called ReadByte, load the byte read
-Done:   rts
 
 ;------------------------------------------------------------------------------
 ; RelocSeg: Relocate the segment pointed to by a/x
@@ -331,14 +344,14 @@ _mod_load:
         lda     (Ctrl),y
         sta     Read+2
 
-; Read the o65 header: C->read (C, &H, sizeof (H))
+; Read the o65 header: C->read (C->callerdata, &H, sizeof (H))
 
-        jsr     PushCtrl
+        jsr     PushCallerData
         lda     #<Header
         ldx     #>Header
         jsr     pushax
         lda     #O65_HDR_SIZE
-        jsr     pusha0                  ; Always less than 256
+        ldx     #0                      ; Always less than 256
         jsr     ReadAndCheckError       ; Bails out in case of errors
 
 ; We read the o65 header successfully. Validate it.
@@ -483,15 +496,14 @@ GotMem: lda     Module
 
 ; Load code and data segment into memory. The sum of the sizes of
 ; code+data segment is still in TPtr.
-; C->read (C, C->module, H.tlen + H.dlen)
+; C->read (C->callerdata, C->module, H.tlen + H.dlen)
 
-        jsr     PushCtrl
+        jsr     PushCallerData
         lda     Module
         ldx     Module+1
         jsr     pushax
         lda     TPtr
         ldx     TPtr+1
-        jsr     pushax
         jsr     ReadAndCheckError       ; Bails out in case of errors
 
 ; We've got the code and data segments in memory. Next section contains

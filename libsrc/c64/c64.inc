@@ -24,6 +24,9 @@ CURS_X		= $D3		; Cursor column
 CURS_Y		= $D6		; Cursor row
 CRAM_PTR	= $F3		; Pointer to current char in color RAM
 
+BASIC_BUF	= $200		; Location of command-line
+BASIC_BUF_LEN	= 89		; Maximum length of command-line
+
 CHARCOLOR       = $286
 CURS_COLOR      = $287		; Color under the cursor
 PALFLAG		= $2A6		; $01 = PAL, $00 = NTSC

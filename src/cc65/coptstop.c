@@ -711,8 +711,16 @@ unsigned OptStackOps (CodeSeg* S)
 	/* Handling depends if we're inside a sequence or not */
 	if (InSeq) {
 
-       	    if (((E->Use & REG_SP) != 0 &&
-		 (E->AM != AM65_ZP_INDY || RegValIsUnknown (E->RI->In.RegY)))) {
+            /* If we are using the stack, and we don't have "indirect Y"
+             * addressing mode, or the value of Y is unknown, or less than
+             * two, we cannot cope with this piece of code. Having an unknown
+             * value of Y means that we cannot correct the stack offset, while
+             * having an offset less than two means that the code works with
+             * the value on stack which is to be removed.
+             */
+       	    if ((E->Use & REG_SP) != 0 &&
+	       	(E->AM != AM65_ZP_INDY || RegValIsUnknown (E->RI->In.RegY) ||
+                 E->RI->In.RegY < 2)) {
 
 	    	/* All this stuff is not allowed in a sequence */
 	    	InSeq = 0;

@@ -3191,6 +3191,11 @@ void g_inc (unsigned flags, unsigned long val)
 void g_dec (unsigned flags, unsigned long val)
 /* Decrement the primary register by a given number */
 {
+    /* Don't dec by zero */
+    if (val == 0) {
+     	return;
+    }
+
     /* Generate code for the supported types */
     flags &= ~CF_CONST;
     switch (flags & CF_TYPE) {

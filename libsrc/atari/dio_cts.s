@@ -1,51 +1,69 @@
 ;
 ; Christian Groessler, October 2000
 ;
-; this file provides the _dio_chs_to_snum function
+; this file provides the _dio_phys_to_log function
+; (previously called _dio_chs_to_snum, so the filename)
 ;
 ; on the Atari this function is a dummy, it ignores
-; cylinder and head 0 and returns as sector number the
+; cylinder and head and returns as sector number the
 ; sector number it got
 ;
-; _sectnum_t __fastcall__ _dio_chs_to_snum(_dhandle_t handle,
-;                                          unsigned int cyl,
-;                                          unsigned int head,
-;                                          unsigned int sector);
+; unsigned char __fastcall__ _dio_phys_to_log(_dhandle_t handle,
+;					      _dio_phys_pos *physpos,	/* input */
+;					      _sectnum_t *sectnum);	/* output */
+;
 ; _dhandle_t - 16bit (ptr)
 ; _sectnum_t - 16bit
 ;
 
- 	.export		__dio_chs_to_snum
-	.import		addsp4,popax
-	.importzp	ptr1
+	.export		__dio_phys_to_log
+	.import		popax,__oserror
+	.importzp	ptr1,ptr2,ptr3
 	.include	"atari.inc"
 
-.proc	__dio_chs_to_snum
+.proc	__dio_phys_to_log
 
-	pha			; save sector value
-	txa
-	pha
-	jsr	addsp4		; ignore other parameters
+	sta	ptr1
+	stx	ptr1+1		; pointer to result
 
 	jsr	popax
-	sta	ptr1
-	stx	ptr1+1
+	sta	ptr2
+	stx	ptr2+1		; pointer to input structure
+
+	jsr	popax
+	sta	ptr3
+	stx	ptr3+1		; pointer to handle
+
 	ldy	#sst_flag
-	lda	(ptr1),y
+	lda	(ptr3),y
 	and	#128
 	beq	_inv_hand	; handle not open or invalid
 
-	pla
-	tay
-	pla
-	rts
+; ignore head and track and return the sector value
+
+	ldy	#diopp_sector
+	lda	(ptr2),y
+	tax
+	iny
+	lda	(ptr2),y
+	ldy	#1
+	sta	(ptr1),y
+	dey
+	txa
+	sta	(ptr1),y
+
+	ldx	#0
+	txa
+ret:
+	sta	__oserror
+	rts			; return success
+
+; invalid handle
 
 _inv_hand:
-	pla
-	pla
-	ldx	#255
-	txa
-	rts
+	ldx	#0
+	lda	#BADIOC
+	bne	ret
 
 .endproc
 

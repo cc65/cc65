@@ -1,56 +1,74 @@
 ;
 ; Christian Groessler, October 2000
 ;
-; this file provides the _dio_snum_to_chs function
+; this file provides the _dio_log_to_phys function
+; (previously called _dio_snum_to_chs, so the filename)
 ;
 ; on the Atari this function is a dummy, it returns
 ; cylinder and head 0 and as sector the sectnum it got
 ;
-; void       __fastcall__ _dio_snum_to_chs(_dhandle_t handle,
-;                                          _sectnum_t sect_num,
-;                                          unsigned int *cyl,
-;                                          unsigned int *head,
-;                                          unsigned int *sector);
+; unsigned char __fastcall__ _dio_log_to_phys(_dhandle_t handle,
+;					      _dio_phys_pos *physpos,	/* output */
+;					      _sectnum_t *sectnum);	/* input */
+;
 ; _dhandle_t - 16bit (ptr)
 ; _sectnum_t - 16bit
 ;
 
- 	.export		__dio_snum_to_chs
+	.export		__dio_log_to_phys
 	.include	"atari.inc"
-	.importzp	ptr1,ptr2
-	.import		popax,addsp2
+	.importzp	ptr1,ptr2,ptr3
+	.import		popax,__oserror
 
-.proc	__dio_snum_to_chs
+.proc	__dio_log_to_phys
 
 	sta	ptr1
-	stx	ptr1+1		; save pointer to sector #
-	jsr	popax		; get pointer to head
+	stx	ptr1+1		; save pointer to input data
+
+	jsr	popax
 	sta	ptr2
-	stx	ptr2+1
+	stx	ptr2+1		; pointer to output structure
+
+	jsr	popax
+	sta	ptr3
+	stx	ptr3+1		; pointer to handle
+
+	ldy	#sst_flag
+	lda	(ptr3),y
+	and	#128
+	beq	_inv_hand	; handle not open or invalid
+
 	lda	#0
 	tay
-	sta	(ptr2),y	; set head number
+	tax
+	sta	(ptr2),y	; head
 	iny
-	sta	(ptr2),y
-	jsr	popax		; get pointer to cyl
-	sta	ptr2
-	stx	ptr2+1
-	dey
-	tya
-	sta	(ptr2),y	; set cylinder number
+	sta	(ptr2),y	; track (low)
 	iny
-	sta	(ptr2),y
-	jsr	popax		; get sector #
+	sta	(ptr2),y	; track (high)
+	iny
 
-	dey
-	sta	(ptr1),y
+	lda	(ptr1,x)
+	sta	(ptr2),y
 	iny
+	inc	ptr1
+	bne	_l1
+	inc	ptr1+1
+_l1:	lda	(ptr1,x)
+	sta	(ptr2),y
+
+	ldx	#0
 	txa
-	sta	(ptr1),y
+ret:
+	sta	__oserror
+	rts			; return success
 
-	jsr	addsp2
+; invalid handle
 
-	rts
+_inv_hand:
+	ldx	#0
+	lda	#BADIOC
+	bne	ret
 
 .endproc
 

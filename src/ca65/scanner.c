@@ -136,6 +136,7 @@ struct DotKeyword {
     { "BYTE", 	    	TOK_BYTE	},
     { "CASE",  	    	TOK_CASE	},
     { "CODE", 	    	TOK_CODE    	},
+    { "CONCAT",		TOK_CONCAT	},
     { "CONST", 	    	TOK_CONST	},
     { "CPU", 		TOK_CPU		},
     { "DATA",  		TOK_DATA	},

@@ -25,7 +25,6 @@ OBJS =  condasm.o	\
        	options.o	\
         pseudo.o	\
         scanner.o	\
-	strexpr.o	\
         symtab.o	\
        	toklist.o      	\
 	ulabel.o

@@ -33,6 +33,8 @@
 
 
 
+#include <stdio.h>
+
 #include "error.h"
 #include "expr.h"
 #include "scanner.h"
@@ -93,10 +95,79 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
 
 
 
+static void FuncConcat (void)
+/* Handle the .CONCAT function */
+{
+    char    	Buf[MAX_STR_LEN+1];
+    char*	B;
+    unsigned 	Length;
+    unsigned	L;
+
+    /* Skip it */
+    NextTok ();
+
+    /* Left paren expected */
+    ConsumeLParen ();
+
+    /* Concatenate any number of strings */
+    B = Buf;
+    B[0] = '\0';
+    Length = 0;
+    while (1) {
+
+     	/* Next token must be a string */
+     	if (Tok != TOK_STRCON) {
+     	    Error (ERR_STRCON_EXPECTED);
+     	    SkipUntilSep ();
+     	    return;
+     	}
+
+     	/* Get the length of the string const and check total length */
+     	L = strlen (SVal);
+     	if (Length + L > MAX_STR_LEN) {
+     	    Error (ERR_STRING_TOO_LONG);
+     	    /* Try to recover */
+     	    SkipUntilSep ();
+     	    return;
+     	}
+
+     	/* Add the new string */
+     	memcpy (B, SVal, L);
+     	Length += L;
+     	B      += L;
+
+     	/* Skip the string token */
+     	NextTok ();
+
+     	/* Comma means another argument */
+     	if (Tok == TOK_COMMA) {
+     	    NextTok ();
+     	} else {
+     	    /* Done */
+     	    break;
+     	}
+    }
+
+    /* Terminate the string */
+    *B = '\0';
+
+    /* We expect a closing parenthesis, but will not skip it but replace it
+     * by the string token just created.
+     */
+    if (Tok != TOK_RPAREN) {
+     	Error (ERR_RPAREN_EXPECTED);
+    } else {
+     	Tok = TOK_STRCON;
+     	strcpy (SVal, Buf);
+    }
+}
+
+
+
 static void FuncMid (void)
 /* Handle the .MID function */
 {
-    long 	Start;
+    long    	Start;
     long       	Count;
     TokList* 	List;
 
@@ -104,13 +175,13 @@ static void FuncMid (void)
     NextTok ();
 
     /* Left paren expected */
-    ConsumeRParen ();
+    ConsumeLParen ();
 
     /* Start argument */
     Start = ConstExpression ();
     if (Start < 0 || Start > 100) {
 	Error (ERR_RANGE);
-	Start = 0;
+     	Start = 0;
     }
     ConsumeComma ();
 
@@ -133,6 +204,41 @@ static void FuncMid (void)
 
 
 
+static void FuncString (void)
+/* Handle the .STRING function */
+{
+    char Buf[MAX_STR_LEN+1];
+
+    /* Skip it */
+    NextTok ();
+
+    /* Left paren expected */
+    ConsumeLParen ();
+
+    /* Accept identifiers or numeric expressions */
+    if (Tok == TOK_IDENT) {
+     	/* Save the identifier, then skip it */
+     	strcpy (Buf, SVal);
+     	NextTok ();
+    } else {
+     	/* Numeric expression */
+     	long Val = ConstExpression ();
+     	sprintf (Buf, "%ld", Val);
+    }
+
+    /* We expect a closing parenthesis, but will not skip it but replace it
+     * by the string token just created.
+     */
+    if (Tok != TOK_RPAREN) {
+     	Error (ERR_RPAREN_EXPECTED);
+    } else {
+     	Tok = TOK_STRCON;
+     	strcpy (SVal, Buf);
+    }
+}
+
+
+
 void NextTok (void)
 /* Get next token and handle token level functions */
 {
@@ -142,8 +248,16 @@ void NextTok (void)
     /* Check for token handling functions */
     switch (Tok) {
 
+     	case TOK_CONCAT:
+     	    FuncConcat ();
+	    break;
+
 	case TOK_MID:
 	    FuncMid ();
+	    break;
+
+	case TOK_STRING:
+	    FuncString ();
 	    break;
 
 	default:

@@ -52,7 +52,6 @@
 #include "nexttok.h"
 #include "objcode.h"
 #include "options.h"
-#include "strexpr.h"
 #include "symtab.h"
 #include "pseudo.h"
 
@@ -250,7 +249,7 @@ static void DoASCIIZ (void)
 /* Define text with a zero terminator */
 {
     while (1) {
-	if (StringExpression () == 0) {
+	if (Tok != TOK_STRCON) {
 	    ErrorSkip (ERR_STRCON_EXPECTED);
 	    return;
 	}
@@ -287,7 +286,7 @@ static void DoByte (void)
 /* Define bytes */
 {
     while (1) {
-	if (StringExpression () != 0) {
+	if (Tok == TOK_STRCON) {
 	    /* A string */
 	    EmitData (SVal, strlen (SVal));
 	    NextTok ();
@@ -399,7 +398,7 @@ static void DoEndProc (void)
 static void DoError (void)
 /* Use error */
 {
-    if (StringExpression () == 0) {
+    if (Tok == TOK_STRCON) {
  	ErrorSkip (ERR_STRCON_EXPECTED);
     } else {
        	Error (ERR_USER, SVal);
@@ -535,7 +534,7 @@ static void DoFileOpt (void)
 	ConsumeComma ();
 
 	/* We accept only string options for now */
-	if (StringExpression () == 0) {
+	if (Tok != TOK_STRCON) {
 	    ErrorSkip (ERR_STRCON_EXPECTED);
 	    return;
 	}
@@ -579,7 +578,7 @@ static void DoFileOpt (void)
 	ConsumeComma ();
 
 	/* We accept only string options for now */
-	if (StringExpression () == 0) {
+	if (Tok != TOK_STRCON) {
 	    ErrorSkip (ERR_STRCON_EXPECTED);
 	    return;
 	}
@@ -656,7 +655,7 @@ static void DoIncBin (void)
 /* Include a binary file */
 {
     /* Name must follow */
-    if (StringExpression () == 0) {
+    if (Tok != TOK_STRCON) {
 	ErrorSkip (ERR_STRCON_EXPECTED);
     } else {
 	/* Try to open the file */
@@ -686,7 +685,7 @@ static void DoInclude (void)
     char Name [MAX_STR_LEN+1];
 
     /* Name must follow */
-    if (StringExpression () == 0) {
+    if (Tok != TOK_STRCON) {
 	ErrorSkip (ERR_STRCON_EXPECTED);
     } else {
 	strcpy (Name, SVal);
@@ -823,7 +822,7 @@ static void DoOrg (void)
 static void DoOut (void)
 /* Output a string */
 {
-    if (StringExpression () == 0) {
+    if (Tok != TOK_STRCON) {
 	ErrorSkip (ERR_STRCON_EXPECTED);
     } else {
 	/* Output the string and be sure to flush the output to keep it in
@@ -950,7 +949,7 @@ static void DoSegment (void)
     char Name [sizeof (SVal)];
     int SegType;
 
-    if (StringExpression () == 0) {
+    if (Tok != TOK_STRCON) {
 	ErrorSkip (ERR_STRCON_EXPECTED);
     } else {
 
@@ -1079,6 +1078,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,       	DoByte		},
     { ccNone,       	DoCase		},
     { ccNone,		DoCode		},
+    { ccNone,		DoUnexpected,	},	/* .CONCAT */
     { ccNone,		DoUnexpected	},	/* .CONST */
     { ccNone,		DoUnexpected	},	/* .CPU */
     { ccNone,		DoData		},

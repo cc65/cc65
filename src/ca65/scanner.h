@@ -118,6 +118,7 @@ enum Token {
     TOK_BYTE,
     TOK_CASE,
     TOK_CODE,
+    TOK_CONCAT,
     TOK_CONST,
     TOK_CPU,
     TOK_DATA,

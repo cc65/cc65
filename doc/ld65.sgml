@@ -58,7 +58,6 @@ Short options:
   -C name               Use linker config file
   -L path               Specify a library search path
   -Ln name              Create a VICE label file
-  -Lp                   Mark write protected segments as such (VICE)
   -S addr               Set the default start address
   -V                    Print the linker version
   -h                    Help (this text)
@@ -71,6 +70,7 @@ Short options:
 Long options:
   --cfg-path path       Specify a config file search path
   --config name         Use linker config file
+  --dbgfile name        Generate debug information
   --dump-config name    Dump a builtin configuration
   --help                Help (this text)
   --lib file            Link this library
@@ -190,11 +190,6 @@ Here is a description of all the command line options:
   version.
 
 
-  <tag><tt>-Lp</tt></tag>
-
-  Deprecated option.
-
-
   <label id="option-S">
   <tag><tt>-S addr, --start-addr addr</tt></tag>
 
@@ -219,6 +214,16 @@ Here is a description of all the command line options:
   its name is searched in the current directory, in the directory given in the
   <tt/LD65_CFG/ environment variable, and in the list of directories specified
   using <tt/--cfg-path/.
+
+
+  <label id="option--dbgfile">
+  <tag><tt>--dbgfile name</tt></tag>
+
+  Specify an output file for debug information. Available information will be
+  written to this file. Using the <tt/-g/ option for the compiler and assembler
+  will increase the amount of information available. Please note that debug
+  information generation is currently being developed, so the format of the
+  file and it's contents are subject to change without further notice.
 
 
   <tag><tt>--lib file</tt></tag>

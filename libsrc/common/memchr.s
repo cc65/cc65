@@ -1,57 +1,57 @@
 ;
-; Ullrich von Bassewitz, 09.06.1998
+; Ullrich von Bassewitz, 2003-05-05
 ;
-; void* memchr (const void* p, int c, size_t n);
+; void* __fastcall__ memchr (const void* p, int c, size_t n);
 ;
 
-	.export		_memchr
-	.import		popax, return0
-	.importzp	ptr1, ptr2, tmp1
+  	.export		_memchr
+  	.import		popax, return0
+  	.importzp	ptr1, ptr2
 
 
-_memchr:
-       	sta	ptr2		; Save n
-	stx	ptr2+1
-	jsr	popax		; get c
-	sta	tmp1
+.proc   _memchr
+
+        eor     #$FF
+       	sta	ptr2
+        txa
+        eor     #$FF
+  	sta    	ptr2+1          ; Save ones complement of n
+  	jsr	popax		; get c
+  	pha
        	jsr	popax 	     	; get p
        	sta	ptr1
        	stx	ptr1+1
 
-       	ldy	#0
-	lda	tmp1		; get c
-	ldx	ptr2		; use X as low counter byte
-	beq	L3		; check high byte
+        ldy     #$00
+        pla                     ; Get c
+        ldx     ptr2            ; Use X as low counter byte
 
-; Search for the char
+L1:     inx
+        beq     L3
+L2:     cmp     (ptr1),y
+        beq     found
+        iny
+        bne     L1
+        inc     ptr1+1
+        bne     L1              ; Branch always
 
-L1:	cmp	(ptr1),y
-       	beq    	L5  		; jump if found
-   	iny
-   	bne	L2
-   	inc     ptr1+1
-L2:	cpx	#0
-   	beq	L3
-   	dex
-   	jmp	L1
-L3:	ldx	ptr2+1		; Check high byte
-   	beq	L4  		; Jump if counter off
-   	dec	ptr2+1
-   	ldx	#$FF
-   	bne	L1		; branch always
+L3:     inc     ptr2+1          ; Bump counter high byte
+        bne     L2
 
-; Character not found, return zero
+; Not found, return NULL
 
-L4:	jmp	return0
+notfound:
+        jmp     return0
 
-; Character found, calculate pointer
+; Found, return pointer to char
 
-L5:  	ldx 	ptr1+1		; get high byte of pointer
+found:  ldx 	ptr1+1		; get high byte of pointer
        	tya 			; low byte offset
        	clc
        	adc 	ptr1
-       	bcc 	L6
+       	bcc 	L9
        	inx
-L6:  	rts
+L9:  	rts
 
+.endproc
 

@@ -172,7 +172,7 @@ cbm610lib:
 	done
 	mv cbm610/crt0.o cbm610.o
 	cp cbm610/*.emd .
-	cp cbm610/*.ser .
+	cp cbm610/cbm610-stdser.ser cbm610-std.ser
 
 #-----------------------------------------------------------------------------
 # GEOS on the C64/128

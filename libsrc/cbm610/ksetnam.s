@@ -12,9 +12,8 @@
 
         .import         sys_bank, restore_bank
         .import         sysp0: zp, ktmp: zp
-
-	.include      	"cbm610.inc"
-
+                                                  
+        .include        "cbm610.inc"
 
 .proc   SETNAM
 
@@ -23,7 +22,7 @@
         sty     ktmp
 
         txa
-        ldy     #FNAM_ADR
+        ldy     #$90                    ; FNAM
         sta     (sysp0),y
 
         lda     ktmp
@@ -31,10 +30,10 @@
         sta     (sysp0),y
 
 	lda	ExecReg			; Assume name is always in this segment
-	ldy	#FNAM_SEG
+	ldy	#$92                    ; FNAM_SEG
 	sta	(sysp0),y
 
-        ldy     #FNAM_LEN
+        ldy     #$9D                    ; FNAM_LEN
         pla
         sta     (sysp0),y
         ldy     ktmp

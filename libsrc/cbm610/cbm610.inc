@@ -7,37 +7,10 @@
 
 
 ; ---------------------------------------------------------------------------
-; Zeropage stuff
+; Zeropage registers
 
-ExecReg		= $0000
-IndReg		= $0001
-
-FNAM_ADR        := $90          ; File name address
-FNAM_SEG        := $92          ; Unused
-ST              := $9C          ; Status
-FNAM_LEN        := $9D
-LFN             := $9E
-DEVNUM          := $9F
-SECADR          := $A0
-;CharPtr	       	= $C8
-;CURS_Y 	       	= $CA
-;CURS_X 	       	= $CB
-GrafMode       	= $CC
-LastIndex      	= $CD
-KeyIndex       	= $D1
-Config 	       	= $D4
-RepeatCount    	= $D7
-RepeatDelay    	= $D8
-ModKey 	       	= $E0
-NorKey 	       	= $E1
-
-
-; ---------------------------------------------------------------------------
-; Page 3 variables
-
-RVS		     = $0397
-KeyBuf		     = $03AB	; Keyboard buffer
-
+ExecReg		= $00
+IndReg		= $01
 
 ; ---------------------------------------------------------------------------
 ; Screen size
@@ -51,37 +24,10 @@ YSIZE           = 25
 
 ; I/O  $d800: CRTC 6545
 
-CRTC		= $D800
-CRTC_ADDR	= $00
-CRTC_DATA	= $01
-
-
-; I/O  $da00: SID 6581
-
-; 	sid		=	$da00
-
-Osc1		=	$00
-Osc2		=	$07
-Osc3		=	$0e
-
-FreqLo		=	$00
-FreqHi		=	$01
-PulseF		=	$02
-PulseC		=	$03
-OscCtl		=	$04
-AtkDcy		=	$05
-SusRel		=	$06
-
-FiCtlLo		=	$15
-FiCtlHi		=	$16
-Resonance	=	$17
-Volume		=	$18
-PotX		=	$19
-PotY		=	$1A
-Random		=	$1B
-Env3		=	$1C
-
-
+.struct CRTC
+        ADDR   	.byte
+        DATA   	.byte
+.endstruct
 
 ; I/O  $db00: CIA 6526 Inter Process Communication
 ;
@@ -118,13 +64,13 @@ Env3		=	$1C
 
 
 ; I/O  $dc00: CIA 6526
-
+;
 ; 	cia		=	$dc00
 
 
 
 ; I/O  $dd00: ACIA 6551
-
+;
 ; 	acia	       	=	$dd00
 
 .struct ACIA
@@ -136,7 +82,7 @@ Env3		=	$1C
 
 
 ; I/O  $de00: Triport #1 6525
-
+;
 ; 	tpi1  		=	$de00
 
 .struct TPI

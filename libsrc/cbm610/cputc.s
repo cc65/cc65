@@ -11,7 +11,8 @@
 	.import	      	_gotoxy
 	.import	      	popa
 
-        .import         ktmp: zp, crtc: zp, CURS_X: zp, CURS_Y: zp, CharPtr: zp
+        .import         ktmp: zp, crtc: zp, CURS_X: zp, CURS_Y: zp, RVS: zp
+        .import         CharPtr: zp
 
 	.include     	"cbm610.inc"
 

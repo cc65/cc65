@@ -16,8 +16,8 @@
 
         jsr     sys_bank
         sty     ktmp                    ; Save Y register
-        ldy     #ST
-        lda     (sysp0),y               ; Load ST from system bank
+        ldy     #$9C                    ; STATUS
+        lda     (sysp0),y               ; Load STATUS from system bank
         ldy     ktmp
         jmp     restore_bank            ; Will set condition codes on A
 

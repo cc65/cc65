@@ -37,7 +37,9 @@ scanbuf:        .byte   0
 ktmp:           .byte   0
 CURS_X:         .byte   0
 CURS_Y:         .byte   0
+RVS:            .byte   0
 CharPtr:        .word   0
+
 
 
 

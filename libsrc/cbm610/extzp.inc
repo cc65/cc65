@@ -9,5 +9,6 @@
         .globalzp       sysp1, sysp3, crtc, sid, ipccia, cia, acia, tpi1, tpi2
         .globalzp       ktab1, ktab2, ktab3, ktab4
 
-        .globalzp       sysp0, time, segsave, ktmp, CURS_X, CURS_Y, CharPtr
+        .globalzp       sysp0, time, segsave, ktmp, CURS_X, CURS_Y, RVS
+        .globalzp       CharPtr
 

@@ -1,5 +1,4 @@
-/*
- * expr.c
+/* expr.c
  *
  * Ullrich von Bassewitz, 21.06.1998
  */
@@ -325,25 +324,31 @@ static const GenDesc* FindGen (token_t Tok, const GenDesc* Table)
 
 
 
-static int istypeexpr (void)
-/* Return true if some sort of variable or type is waiting (helper for cast
- * and sizeof() in hie10).
+static int TypeSpecAhead (void)
+/* Return true if some sort of type is waiting (helper for cast and sizeof()
+ * in hie10).
  */
 {
     SymEntry* Entry;
 
+    /* There's a type waiting if:
+     *
+     *   1.    We have an opening paren, and
+     *     a.  the next token is a type, or
+     *     b.  the next token is a type qualifier, or
+     *     c.  the next token is a typedef'd type
+     */
     return CurTok.Tok == TOK_LPAREN && (
-       	   (NextTok.Tok >= TOK_FIRSTTYPE && NextTok.Tok <= TOK_LASTTYPE) ||
-	   (NextTok.Tok == TOK_CONST)                           	 ||
-           (NextTok.Tok == TOK_VOLATILE)                                 ||
-       	   (NextTok.Tok  == TOK_IDENT 			      	         &&
-	   (Entry = FindSym (NextTok.Ident)) != 0  		         &&
+       	   TokIsType (&NextTok)                         ||
+           TokIsTypeQual (&NextTok)                     ||
+       	   (NextTok.Tok  == TOK_IDENT 			&&
+	   (Entry = FindSym (NextTok.Ident)) != 0  	&&
 	   SymIsTypeDef (Entry)));
 }
 
 
 
-void PushAddr (ExprDesc* lval)
+void PushAddr (ExprDesc* Expr)
 /* If the expression contains an address that was somehow evaluated,
  * push this address on the stack. This is a helper function for all
  * sorts of implicit or explicit assignment functions where the lvalue
@@ -351,7 +356,7 @@ void PushAddr (ExprDesc* lval)
  */
 {
     /* Get the address on stack if needed */
-    if (lval->Flags != E_MREG && (lval->Flags & E_MEXPR)) {
+    if (Expr->Flags != E_MREG && (Expr->Flags & E_MEXPR)) {
      	/* Push the address (always a pointer) */
      	g_push (CF_PTR, 0);
     }
@@ -376,7 +381,7 @@ void ConstSubExpr (void (*Func) (ExprDesc*), ExprDesc* Expr)
 
 
 
-void CheckBoolExpr (ExprDesc* lval)
+void CheckBoolExpr (ExprDesc* Expr)
 /* Check if the given expression is a boolean expression, output a diagnostic
  * if not.
  */
@@ -384,10 +389,10 @@ void CheckBoolExpr (ExprDesc* lval)
     /* If it's an integer, it's ok. If it's not an integer, but a pointer,
      * the pointer used in a boolean context is also ok
      */
-    if (!IsClassInt (lval->Type) && !IsClassPtr (lval->Type)) {
+    if (!IsClassInt (Expr->Type) && !IsClassPtr (Expr->Type)) {
  	Error ("Boolean expression expected");
  	/* To avoid any compiler errors, make the expression a valid int */
-	ED_MakeConstInt (lval, 1);
+	ED_MakeConstInt (Expr, 1);
     }
 }
 
@@ -1284,51 +1289,51 @@ static void hie11 (ExprDesc *Expr)
 
 
 
-void Store (ExprDesc* lval, const type* StoreType)
-/* Store the primary register into the location denoted by lval. If StoreType
- * is given, use this type when storing instead of lval->Type. If StoreType
- * is NULL, use lval->Type instead.
+void Store (ExprDesc* Expr, const type* StoreType)
+/* Store the primary register into the location denoted by Expr. If StoreType
+ * is given, use this type when storing instead of Expr->Type. If StoreType
+ * is NULL, use Expr->Type instead.
  */
 {
     unsigned Flags;
 
-    unsigned f = lval->Flags;
+    unsigned f = Expr->Flags;
 
-    /* If StoreType was not given, use lval->Type instead */
+    /* If StoreType was not given, use Expr->Type instead */
     if (StoreType == 0) {
-        StoreType = lval->Type;
+        StoreType = Expr->Type;
     }
 
     /* Get the code generator flags */
     Flags = TypeOf (StoreType);
     if (f & E_MGLOBAL) {
      	Flags |= GlobalModeFlags (f);
-     	if (lval->Test) {
+     	if (Expr->Test) {
    	    /* Just testing */
        	    Flags |= CF_TEST;
    	}
 
     	/* Generate code */
-       	g_putstatic (Flags, lval->Name, lval->ConstVal);
+       	g_putstatic (Flags, Expr->Name, Expr->ConstVal);
 
     } else if (f & E_MLOCAL) {
         /* Store an auto variable */
-       	g_putlocal (Flags, lval->ConstVal, 0);
+       	g_putlocal (Flags, Expr->ConstVal, 0);
     } else if (f == E_MEOFFS) {
         /* Store indirect with offset */
-    	g_putind (Flags, lval->ConstVal);
+    	g_putind (Flags, Expr->ConstVal);
     } else if (f != E_MREG) {
     	if (f & E_MEXPR) {
             /* Indirect without offset */
     	    g_putind (Flags, 0);
     	} else {
     	    /* Store into absolute address */
-    	    g_putstatic (Flags | CF_ABSOLUTE, lval->ConstVal, 0);
+    	    g_putstatic (Flags | CF_ABSOLUTE, Expr->ConstVal, 0);
     	}
     }
 
     /* Assume that each one of the stores will invalidate CC */
-    lval->Test &= ~E_CC;
+    Expr->Test &= ~E_CC;
 }
 
 
@@ -1567,7 +1572,7 @@ void hie10 (ExprDesc* Expr)
 
      	case TOK_SIZEOF:
      	    NextToken ();
-       	    if (istypeexpr ()) {
+       	    if (TypeSpecAhead ()) {
     	       	type Type[MAXTYPELEN];
      	       	NextToken ();
 	       	Expr->ConstVal = CheckedSizeOf (ParseType (Type));
@@ -1581,12 +1586,12 @@ void hie10 (ExprDesc* Expr)
     	       	RemoveCode (Mark);
      	    }
      	    Expr->Flags = E_MCONST | E_TCONST | E_RVAL;
-     	    Expr->Type = type_uint;
+     	    Expr->Type = type_size_t;
 	    Expr->Test &= ~E_CC;
        	    break;
 
      	default:
-       	    if (istypeexpr ()) {
+       	    if (TypeSpecAhead ()) {
 
      	       	/* A typecast */
     	       	TypeCast (Expr);
@@ -1611,9 +1616,9 @@ void hie10 (ExprDesc* Expr)
 
 
 static void hie_internal (const GenDesc* Ops,   /* List of generators */
-       	                  ExprDesc* Expr,       /* parent expr's lval */
+       	                  ExprDesc* Expr,
        	                  void (*hienext) (ExprDesc*),
-    	       	       	  int* UsedGen) 	/* next higher level */
+    	       	       	  int* UsedGen)
 /* Helper function */
 {
     ExprDesc lval2;
@@ -1717,7 +1722,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
 
 
 static void hie_compare (const GenDesc* Ops,    /* List of generators */
-       	                 ExprDesc* Expr,	/* parent expr's lval */
+       	                 ExprDesc* Expr,
        	                 void (*hienext) (ExprDesc*))
 /* Helper function for the compare operators */
 {
@@ -2930,7 +2935,7 @@ void hie0 (ExprDesc *Expr)
 
 int evalexpr (unsigned Flags, void (*Func) (ExprDesc*), ExprDesc* Expr)
 /* Will evaluate an expression via the given function. If the result is a
- * constant, 0 is returned and the value is put in the lval struct. If the
+ * constant, 0 is returned and the value is put in the Expr struct. If the
  * result is not constant, ExprLoad is called to bring the value into the
  * primary register and 1 is returned.
  */
@@ -2992,29 +2997,27 @@ void expression0 (ExprDesc* Expr)
 
 
 
-void ConstExpr (ExprDesc* lval)
+void ConstExpr (ExprDesc* Expr)
 /* Get a constant value */
 {
-    expr (hie1, InitExprDesc (lval));
-    if (ED_IsLVal (lval) || (lval->Flags & E_MCONST) == 0) {
+    expr (hie1, InitExprDesc (Expr));
+    if (ED_IsLVal (Expr) || (Expr->Flags & E_MCONST) == 0) {
      	Error ("Constant expression expected");
      	/* To avoid any compiler errors, make the expression a valid const */
-     	ED_MakeConstInt (lval, 1);
+     	ED_MakeConstInt (Expr, 1);
     }
 }
 
 
 
-void ConstIntExpr (ExprDesc* Val)
+void ConstIntExpr (ExprDesc* Expr)
 /* Get a constant int value */
 {
-    expr (hie1, InitExprDesc (Val));
-    if (ED_IsLVal (Val)               ||
-	(Val->Flags & E_MCONST) == 0 ||
-	!IsClassInt (Val->Type)) {
+    expr (hie1, InitExprDesc (Expr));
+    if (ED_IsLVal (Expr) || (Expr->Flags & E_MCONST) == 0 || !IsClassInt (Expr->Type)) {
      	Error ("Constant integer expression expected");
      	/* To avoid any compiler errors, make the expression a valid const */
-     	ED_MakeConstInt (Val, 1);
+     	ED_MakeConstInt (Expr, 1);
     }
 }
 

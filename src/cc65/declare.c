@@ -84,7 +84,7 @@ static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers);
 static type OptionalQualifiers (type Q)
 /* Read type qualifiers if we have any */
 {
-    while (CurTok.Tok == TOK_CONST || CurTok.Tok == TOK_VOLATILE) {
+    while (TokIsTypeQual (&CurTok)) {
 
 	switch (CurTok.Tok) {
 
@@ -103,8 +103,7 @@ static type OptionalQualifiers (type Q)
 		break;
 
 	    default:
-		/* Keep gcc silent */
-		break;
+		Internal ("Unexpected type qualifier token: %d", CurTok.Tok);
 
 	}
 

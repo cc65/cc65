@@ -61,12 +61,16 @@ typedef enum token_t {
     TOK_RESTRICT,
     TOK_STATIC,
     TOK_TYPEDEF,
-    TOK_CONST,
+
+    /* Tokens denoting type qualifiers */
+    TOK_FIRST_TYPEQUAL,
+    TOK_CONST           = TOK_FIRST_TYPEQUAL,
     TOK_VOLATILE,
+    TOK_LAST_TYPEQUAL   = TOK_VOLATILE,
 
     /* Tokens denoting types */
-    TOK_FIRSTTYPE,
-    TOK_ENUM		= TOK_FIRSTTYPE,
+    TOK_FIRST_TYPE,
+    TOK_ENUM	 	= TOK_FIRST_TYPE,
     TOK_CHAR,
     TOK_INT,
     TOK_DOUBLE,
@@ -78,7 +82,7 @@ typedef enum token_t {
     TOK_STRUCT,
     TOK_UNION,
     TOK_VOID,
-    TOK_LASTTYPE	= TOK_VOID,
+    TOK_LAST_TYPE       = TOK_VOID,
 
     /* Control statements */
     TOK_DO,
@@ -198,6 +202,26 @@ extern Token NextTok;		/* The next token */
 /*****************************************************************************/
 
 
+
+#if defined(HAVE_INLINE)
+INLINE int TokIsType (const Token* T)
+/* Return true if the token is a type */
+{
+    return (T->Tok >= TOK_FIRST_TYPE && T->Tok <= TOK_LAST_TYPE);
+}
+#else
+#  define TokIsType(T)  ((T)->Tok >= TOK_FIRST_TYPE && (T)->Tok <= TOK_LAST_TYPE)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int TokIsTypeQual (const Token* T)
+/* Return true if the token is a type qualifier */
+{
+    return (T->Tok >= TOK_FIRST_TYPEQUAL && T->Tok <= TOK_LAST_TYPEQUAL);
+}
+#else
+#  define TokIsTypeQual(T)  ((T)->Tok >= TOK_FIRST_TYPEQUAL && (T)->Tok <= TOK_LAST_TYPEQUAL)
+#endif
 
 void SymName (char* s);
 /* Get symbol from input stream */

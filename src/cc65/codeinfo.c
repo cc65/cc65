@@ -82,45 +82,55 @@ static const FuncInfo FuncInfoTable[] = {
     { "decax3",     	REG_AX,		REG_AX  	},
     { "decax4",     	REG_AX,		REG_AX  	},
     { "decax5",     	REG_AX,		REG_AX  	},
-    { "decax6",     	REG_AX,		REG_AX  	},
+    { "decax6",     	REG_AX,		REG_AX      	},
     { "decax7",     	REG_AX,		REG_AX  	},
-    { "decax8",     	REG_AX,		REG_AX  	},
-    { "decaxy",	   	REG_AXY,	REG_AX		},
-    { "decsp2",    	REG_NONE,	REG_A		},
-    { "decsp3",    	REG_NONE,	REG_A		},
-    { "decsp4",    	REG_NONE,	REG_A		},
-    { "decsp5",    	REG_NONE,	REG_A		},
-    { "decsp6",     	REG_NONE,	REG_A		},
-    { "decsp7",    	REG_NONE,	REG_A		},
-    { "decsp8",      	REG_NONE,	REG_A		},
-    { "incsp1",		REG_NONE,	REG_NONE	},
-    { "incsp2",		REG_NONE,	REG_Y		},
-    { "incsp3",		REG_NONE,	REG_Y		},
-    { "incsp4",		REG_NONE,	REG_Y		},
-    { "incsp5",		REG_NONE,	REG_Y		},
-    { "incsp6",		REG_NONE,	REG_Y		},
-    { "incsp7",		REG_NONE,	REG_Y		},
-    { "incsp8",		REG_NONE,	REG_Y		},
-    { "ldax0sp",   	REG_Y,		REG_AX		},
-    { "ldaxysp",   	REG_Y,		REG_AX 		},
-    { "pusha",	   	REG_A,		REG_Y		},
-    { "pusha0",	       	REG_A,		REG_XY		},
-    { "pushax",	   	REG_AX,		REG_Y		},
-    { "pushw0sp",  	REG_NONE,	REG_AXY		},
-    { "pushwysp",  	REG_Y,		REG_AXY		},
-    { "tosicmp",   	REG_AX,		REG_AXY 	},
+    { "decax8",     	REG_AX,		REG_AX      	},
+    { "decaxy",	   	REG_AXY,	REG_AX	    	},
+    { "decsp2",    	REG_NONE,	REG_A	    	},
+    { "decsp3",    	REG_NONE,	REG_A	    	},
+    { "decsp4",    	REG_NONE,	REG_A	    	},
+    { "decsp5",    	REG_NONE,	REG_A	    	},
+    { "decsp6",     	REG_NONE,	REG_A	    	},
+    { "decsp7",    	REG_NONE,	REG_A	    	},
+    { "decsp8",      	REG_NONE,	REG_A	    	},
+    { "incsp1",		REG_NONE,	REG_NONE    	},
+    { "incsp2",		REG_NONE,	REG_Y	    	},
+    { "incsp3",		REG_NONE,	REG_Y	    	},
+    { "incsp4",		REG_NONE,	REG_Y	    	},
+    { "incsp5",		REG_NONE,	REG_Y	    	},
+    { "incsp6",		REG_NONE,	REG_Y	    	},
+    { "incsp7",		REG_NONE,	REG_Y	    	},
+    { "incsp8",		REG_NONE,	REG_Y	    	},
+    { "ldax0sp",   	REG_Y,		REG_AX	    	},
+    { "ldaxysp",   	REG_Y,		REG_AX 	    	},
+    { "pusha",	   	REG_A,		REG_Y	    	},
+    { "pusha0",	       	REG_A,		REG_XY	    	},
+    { "pushax",	   	REG_AX,		REG_Y	    	},
+    { "pushw0sp",  	REG_NONE,	REG_AXY	    	},
+    { "pushwysp",  	REG_Y,		REG_AXY	    	},
+    { "tosicmp",   	REG_AX,		REG_AXY     	},
 };
 #define FuncInfoCount	(sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
 /* Table with names of zero page locations used by the compiler */
-static const char* ZPNameTable[] = {
-    "ptr1", "regbank", "regsave", "sp", "sreg", "tmp1"
+typedef struct ZPInfo ZPInfo;
+struct ZPInfo {
+    unsigned char Len;		/* Length of the following string */
+    char          Name[11];     /* Name of zero page symbol */
 };
-#define ZPNameCount	(sizeof(ZPNameTable) / sizeof(ZPNameTable[0]))
+static const ZPInfo ZPInfoTable[] = {
+    {  	4,     	"ptr1"          },
+    {   7,      "regbank"       },
+    {   7,      "regsave"       },
+    {   2,      "sp"            },
+    {   4,      "sreg"          },
+    {   4,      "tmp1"          },
+};
+#define ZPInfoCount    	(sizeof(ZPInfoTable) / sizeof(ZPInfoTable[0]))
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code 		 		     */
+/*     	       	      	  	     Code 	    	 		     */
 /*****************************************************************************/
 
 
@@ -207,10 +217,12 @@ int IsZPName (const char* Name)
 /* Return true if the given name is a zero page symbol */
 {
     unsigned I;
+    const ZPInfo* Info;
 
     /* Because of the low number of symbols, we do a linear search here */
-    for (I = 0; I < ZPNameCount; ++I) {
-	if (strcmp (Name, ZPNameTable[I]) == 0) {
+    for (I = 0, Info = ZPInfoTable; I < ZPInfoCount; ++I, ++Info) {
+       	if (strncmp (Name, Info->Name, Info->Len) == 0 &&
+	    (Name[Info->Len] == '\0' || Name[Info->Len] == '+')) {
 	    /* Found */
 	    return 1;
 	}

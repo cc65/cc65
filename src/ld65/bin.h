@@ -49,7 +49,7 @@
 
 
 /* Structure describing the format */
-typedef struct BinDesc_ BinDesc;
+typedef struct BinDesc BinDesc;
 
 
 

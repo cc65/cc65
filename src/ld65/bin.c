@@ -58,7 +58,7 @@
 
 
 
-struct BinDesc_ {
+struct BinDesc {
     unsigned	Undef;	  	/* Count of undefined externals */
     FILE*    	F;		/* Output file */
     const char* Filename;	/* Name of output file */
@@ -102,7 +102,7 @@ static unsigned BinWriteExpr (ExprNode* E, int Signed, unsigned Size,
 /* Called from SegWrite for an expression. Evaluate the expression, check the
  * range and write the expression value to the file.
  */
-{
+{	      
     /* There's a predefined function to handle constant expressions */
     return SegWriteConstExpr (((BinDesc*)Data)->F, E, Signed, Size);
 }

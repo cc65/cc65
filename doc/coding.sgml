@@ -365,7 +365,7 @@ instead will give shorter and faster code.
 Since cc65 has the "wrong" calling order, the location of the fixed parameters
 in a variadic function (a function with a variable parameter list) depends on
 the number and size of variable arguments passed. Since this number and size
-is unknown at compiler time, the compiler will generate code to calculate the
+is unknown at compile time, the compiler will generate code to calculate the
 location on the stack when needed.
 
 Because of this additional code, accessing the fixed parameters in a variadic

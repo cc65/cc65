@@ -128,7 +128,6 @@ void __fastcall__ _poserror (const char* msg);  /* cc65 */
 /* Non-standard function like macros */
 #ifndef __STRICT_ANSI__
 #define flushall()     		      		/* Unix */
-#define unlink(name)   	remove (name) 		/* Unix */
 #endif
 
 
@@ -138,4 +137,3 @@ void __fastcall__ _poserror (const char* msg);  /* cc65 */
 
 
 
-            

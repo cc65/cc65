@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    fcntl.h				     */
+/*                                 unistd.h                                  */
 /*                                                                           */
-/*                            File control operations                        */
+/*                  Unix compatibility header file for cc65                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2003      Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef _FCNTL_H
-#define _FCNTL_H
+#ifndef _UNISTD_H
+#define _UNISTD_H
 
 
 
@@ -44,13 +44,10 @@
 
 
 
-/* Flag values for the open() call */
-#define O_RDONLY        0x01
-#define O_WRONLY        0x02
-#define O_RDWR          0x03
-#define O_CREAT         0x10
-#define O_TRUNC         0x20
-#define O_APPEND        0x40
+/* Predefined file handles */
+#define STDIN_FILENO	0
+#define STDOUT_FILENO	1
+#define STDERR_FILENO	2
 
 
 
@@ -60,14 +57,23 @@
 
 
 
-/* Functions */
-int open (const char* name, int flags, ...);	/* May take a mode argument */
-int __fastcall__ close (int fd);
-int __fastcall__ creat (const char* name, unsigned mode);
+/* Files */
+int __fastcall__ write (int fd, const void* buf, unsigned count);
+int __fastcall__ read (int fd, void* buf, unsigned count);
+off_t __fastcall__ lseek (int fd, off_t offset, int whence);
+int __fastcall__ unlink (const char* name);	/* Same as remove() */
+
+/* Directories */
+int __fastcall__ chdir (const char* name);
+int mkdir (const char* name, ...);	  	/* May take a mode argument */
+int __fastcall__ rmdir (const char* name);
+
+/* Others */
+unsigned __fastcall__ sleep (unsigned seconds);
 
 
 
-/* End of fcntl.h */
+/* End of unistd.h */
 #endif
 
 

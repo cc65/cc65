@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    fcntl.h				     */
+/*                                  types.h                                  */
 /*                                                                           */
-/*                            File control operations                        */
+/*                   Primitive system data types for cc65                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2003      Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef _FCNTL_H
-#define _FCNTL_H
+#ifndef _TYPES_H
+#define _TYPES_H
 
 
 
@@ -44,30 +44,17 @@
 
 
 
-/* Flag values for the open() call */
-#define O_RDONLY        0x01
-#define O_WRONLY        0x02
-#define O_RDWR          0x03
-#define O_CREAT         0x10
-#define O_TRUNC         0x20
-#define O_APPEND        0x40
+typedef long int off_t;
 
 
 
 /*****************************************************************************/
-/*		   		     Code				     */
+/*	       	   		     Code				     */
 /*****************************************************************************/
 
 
 
-/* Functions */
-int open (const char* name, int flags, ...);	/* May take a mode argument */
-int __fastcall__ close (int fd);
-int __fastcall__ creat (const char* name, unsigned mode);
-
-
-
-/* End of fcntl.h */
+/* End of types.h */
 #endif
 
 

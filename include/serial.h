@@ -154,7 +154,7 @@ unsigned char __fastcall__ ser_pause (void);
 unsigned char __fastcall__ ser_unpause (void);
 /* Re-enable interrupts and release flow control */
 
-unsigned char __fastcall__ rs232_status (unsigned char* status);
+unsigned char __fastcall__ ser_status (unsigned char* status);
 /* Return the serial port status. */
 
 

@@ -36,8 +36,24 @@
 #include <string.h>
 #include <fcntl.h>
 #include <modload.h>
-#include <ser.h>
-#include <ser/ser-kernel.h>
+#include <serial.h>
+
+
+
+/*****************************************************************************/
+/*     	      	    	  	     Data	     			     */
+/*****************************************************************************/
+
+
+
+/* Pointer to serial driver, exported from ser-kernel.s */
+extern void* ser_drv;
+
+
+
+/*****************************************************************************/
+/*     	      	    	  	     Code	     			     */
+/*****************************************************************************/
 
 
 
@@ -79,4 +95,3 @@ unsigned char __fastcall__ ser_load_driver (const char* name)
 
 
 
-              

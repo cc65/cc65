@@ -59,6 +59,8 @@ OBJS=	_scrsize.o	\
 	dosdetect.o	\
         get_ostype.o    \
         getenv.o        \
+	gotoxy.o	\
+	gotoy.o		\
         joy_stddrv.o    \
      	kbhit.o		\
         mainargs.o      \

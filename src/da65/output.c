@@ -130,18 +130,44 @@ void DefLabel (const char* Name)
 
 
 
-void OneDataByte (void)
-/* Output a .byte line with the current code byte */
+void DataByteLine (unsigned Count)
+/* Output a line with Count data bytes */
 {
-    unsigned char B = GetCodeByte ();
+    unsigned I;
 
-    if (Pass > 1) {
-	Indent (MIndent);
-	Output (".byte");
-	Indent (AIndent);
-	Output ("$%02X", B);
-	LineFeed ();
+    Indent (MIndent);
+    Output (".byte");
+    Indent (AIndent);
+    for (I = 0; I < Count; ++I) {
+	if (I > 0) {
+	    Output (",$%02X", CodeBuf[PC+I]);
+	} else {
+	    Output ("$%02X", CodeBuf[PC+I]);
+	}
     }
+    LineComment (PC, Count);
+    LineFeed ();
+}
+
+
+
+void DataWordLine (unsigned Count)
+/* Output a line with Count data words */
+{
+    unsigned I;
+
+    Indent (MIndent);
+    Output (".word");
+    Indent (AIndent);
+    for (I = 0; I < Count; I += 2) {
+	if (I > 0) {
+	    Output (",$%04X", GetCodeWord (PC+I));
+	} else {
+	    Output ("$%04X", GetCodeWord (PC+I));
+	}
+    }
+    LineComment (PC, Count);
+    LineFeed ();
 }
 
 
@@ -149,10 +175,25 @@ void OneDataByte (void)
 void SeparatorLine (void)
 /* Print a separator line */
 {
-    Output ("; -------------------------------------------------------------------------");
+    Output ("; ----------------------------------------------------------------------------");
     LineFeed ();
 }
 
 
 
-			  
+void LineComment (unsigned PC, unsigned Count)
+/* Add a line comment with the PC and data bytes */
+{
+    if (Pass > 1 && Verbosity >= 3) {
+	Indent (CIndent);
+	Output ("; %04X", PC);
+	if (Verbosity >= 4) {
+	    while (Count--) {
+		Output (" %02X", CodeBuf [PC++]);
+	    }
+	}
+    }
+}
+
+
+

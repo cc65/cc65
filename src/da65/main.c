@@ -50,6 +50,7 @@
 #include "code.h"
 #include "config.h"
 #include "cpu.h"
+#include "error.h"
 #include "global.h"
 #include "opctable.h"
 #include "output.h"
@@ -168,14 +169,149 @@ static void OptVersion (const char* Opt, const char* Arg)
 
 
 
+static void ByteTable (unsigned RemainingBytes)
+/* Output a table of bytes */
+{
+    /* Count how many bytes may be output. This number is limited by the
+     * number of remaining bytes, a label, or the end of the ByteTable
+     * attribute.
+     */
+    unsigned Count = 1;
+    while (Count < RemainingBytes) {
+	if (HaveLabel(PC+Count) || GetStyle (PC+Count) != atByteTab) {
+	    break;
+     	}
+	++Count;
+    }
+    RemainingBytes -= Count;
+
+    /* Output as many data bytes lines as needed */
+    while (Count > 0) {
+
+     	/* Calculate the number of bytes for the next line */
+     	unsigned Chunk = (Count > BytesPerLine)? BytesPerLine : Count;
+
+     	/* Output a line with these bytes */
+     	DataByteLine (Chunk);
+
+     	/* Next line */
+     	Count -= Chunk;
+     	PC    += Chunk;
+    }
+
+    /* If the next line is not a byte table line, add a separator */
+    if (RemainingBytes > 0 && GetStyle (PC) != atByteTab) {
+	SeparatorLine ();
+    }
+}
+
+
+
+static void WordTable (unsigned RemainingBytes)
+/* Output a table of words */
+{
+    /* Count how many bytes may be output. This number is limited by the
+     * number of remaining bytes, a label, or the end of the WordTable
+     * attribute.
+     */
+    unsigned Count = 1;
+    while (Count < RemainingBytes) {
+	if (HaveLabel(PC+Count) || GetStyle (PC+Count) != atWordTab) {
+	    break;
+     	}
+	++Count;
+    }
+    RemainingBytes -= Count;
+
+    /* Make the given number even */
+    Count &= ~1U;
+
+    /* Output as many data word lines as needed */
+    while (Count > 0) {
+
+	/* Calculate the number of bytes for the next line */
+	unsigned Chunk = (Count > BytesPerLine)? BytesPerLine : Count;
+
+	/* Output a line with these bytes */
+       	DataWordLine (Chunk);
+
+	/* Next line */
+	PC    += Chunk;
+       	Count -= Chunk;
+    }
+
+    /* If the next line is not a byte table line, add a separator */
+    if (RemainingBytes > 0 && GetStyle (PC) != atWordTab) {
+	SeparatorLine ();
+    }
+}
+
+
+
+static void AddrTable (unsigned RemainingBytes)
+/* Output a table of addresses */
+{
+    /* Count how many bytes may be output. This number is limited by the
+     * number of remaining bytes, a label, or the end of the WordTable
+     * attribute.
+     */
+    unsigned Count = 1;
+    while (Count < RemainingBytes) {
+	if (HaveLabel(PC+Count) || GetStyle (PC+Count) != atAddrTab) {
+	    break;
+     	}
+	++Count;
+    }
+    RemainingBytes -= Count;
+
+    /* Make the given number even */
+    Count &= ~1U;
+
+    /* Output as many data bytes lines as needed. For addresses, each line
+     * will hold just one address.
+     */
+    while (Count > 0) {
+
+	/* Get the address */
+	unsigned Addr = GetCodeWord (PC);
+
+	/* In pass 1, define a label, in pass 2 output the line */
+	if (Pass == 1) {
+	    if (!HaveLabel (Addr)) {
+		AddLabel (Addr, MakeLabelName (Addr));
+	    }
+	} else {
+	    const char* Label = GetLabel (Addr);
+	    if (Label == 0) {
+		/* OOPS! Should not happen */
+		Internal ("OOPS - Label for address %04X disappeard!", Addr);
+	    }
+	    Indent (MIndent);
+	    Output (".word");
+	    Indent (AIndent);
+	    Output ("%s", Label);
+	    LineComment (PC, 2);
+	    LineFeed ();
+	}
+
+	/* Next line */
+	PC    += 2;
+       	Count -= 2;
+    }
+
+    /* If the next line is not a byte table line, add a separator */
+    if (RemainingBytes > 0 && GetStyle (PC) != atAddrTab) {
+	SeparatorLine ();
+    }
+}
+
+
+
 static void OneOpcode (unsigned RemainingBytes)
 /* Disassemble one opcode */
 {
-    /* Get the current PC */
-    unsigned PC = GetPC ();
-
     /* Get the opcode from the current address */
-    unsigned char OPC = PeekCodeByte ();
+    unsigned char OPC = GetCodeByte (PC);
 
     /* Get the opcode description for the opcode byte */
     const OpcDesc* D = &OpcTable[OPC];
@@ -213,12 +349,25 @@ static void OneOpcode (unsigned RemainingBytes)
 
 	case atDefault:
 	case atCode:
-	    GetCodeByte ();
 	    D->Handler (D);
+	    PC += D->Size;
+	    break;
+
+	case atByteTab:
+	    ByteTable (RemainingBytes);
+	    break;
+
+	case atWordTab:
+	    WordTable (RemainingBytes);
+	    break;
+
+	case atAddrTab:
+	    AddrTable (RemainingBytes);
 	    break;
 
 	default:
-	    OneDataByte ();
+	    DataByteLine (1);
+	    ++PC;
 	    break;
 
     }
@@ -250,8 +399,9 @@ static void Disassemble (void)
     LineFeed ();
 
     /* Pass 2 */
+    Pass = 2;		   
     ResetCode ();
-    Pass = 2;
+    DefOutOfRangeLabels ();
     OnePass ();
 }
 

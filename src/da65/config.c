@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   config.c				     */
+/*		    		   config.c				     */
 /*                                                                           */
 /*		   Disassembler configuration file handling		     */
 /*                                                                           */
@@ -45,6 +45,8 @@
 #include "xmalloc.h"
 
 /* da65 */
+#include "attrtab.h"
+#include "error.h"
 #include "global.h"
 #include "scanner.h"
 #include "config.h"
@@ -127,10 +129,33 @@ static void RangeSection (void)
 /* Parse a range section */
 {
     static const IdentTok RangeDefs[] = {
-       	{   "START",   		CFGTOK_START	},
-	{   "END",		CFGTOK_END	},
+       	{   "START",   	    	CFGTOK_START	},
+	{   "END",	    	CFGTOK_END 	},
 	{   "TYPE",            	CFGTOK_TYPE	},
     };
+
+    static const IdentTok TypeDefs[] = {
+	{   "CODE",	    	CFGTOK_CODE	},
+	{   "BYTETABLE",    	CFGTOK_BYTETAB	},
+	{   "WORDTABLE",    	CFGTOK_WORDTAB	},
+	{   "ADDRTABLE",	CFGTOK_ADDRTAB	},
+	{   "RTSTABLE",	    	CFGTOK_RTSTAB	},
+    };
+
+
+    /* Which values did we get? */
+    enum {
+	tNone	= 0x00,
+	tStart	= 0x01,
+	tEnd	= 0x02,
+	tType	= 0x04,
+	tAll	= 0x07
+    } Needed = tNone;
+
+    /* Locals - initialize to avoid gcc warnings */
+    unsigned Start	= 0;
+    unsigned End	= 0;
+    unsigned char Type	= 0;
 
     /* Skip the token */
     CfgNextTok ();
@@ -141,8 +166,62 @@ static void RangeSection (void)
     /* Look for section tokens */
     while (CfgTok != CFGTOK_RCURLY) {
 
+	/* Convert to special token */
+       	CfgSpecialToken (RangeDefs, ENTRY_COUNT (RangeDefs), "Range directive");
+
+	/* Look at the token */
+	switch (CfgTok) {
+
+	    case CFGTOK_START:
+	        CfgNextTok ();
+		CfgAssureInt ();
+		CfgRangeCheck (0x0000, 0xFFFF);
+		Start = CfgIVal;
+	       	Needed |= tStart;
+	     	CfgNextTok ();
+	     	break;
+
+	    case CFGTOK_END:
+	     	CfgNextTok ();
+		CfgAssureInt ();
+		CfgRangeCheck (0x0000, 0xFFFF);
+		End = CfgIVal;
+	       	Needed |= tEnd;
+	     	CfgNextTok ();
+	     	break;
+
+	    case CFGTOK_TYPE:
+	     	CfgNextTok ();
+		CfgSpecialToken (TypeDefs, ENTRY_COUNT (TypeDefs), "Type");
+		switch (CfgTok) {
+		    case CFGTOK_CODE:		Type = atCode;		break;
+		    case CFGTOK_BYTETAB:	Type = atByteTab;	break;
+		    case CFGTOK_WORDTAB:	Type = atWordTab;	break;
+		    case CFGTOK_ADDRTAB:	Type = atAddrTab;	break;
+		    case CFGTOK_RTSTAB:		Type = atRtsTab;	break;
+		}
+		Needed |= tType;
+		CfgNextTok ();
+		break;
+	}
+
+	/* Directive is followed by a semicolon */
+	CfgConsumeSemi ();
 
     }
+
+    /* Did we get all required values? */
+    if (Needed != tAll) {
+    	Error ("Required values missing from this section");
+    }
+
+    /* Start must be less than end */
+    if (Start > End) {
+	Error ("Start value must not be greater than end value");
+    }
+
+    /* Set the range */
+    MarkRange (Start, End, Type);
 
     /* Consume the closing brace */
     CfgConsumeRCurly ();

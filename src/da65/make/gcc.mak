@@ -32,7 +32,7 @@ all : $(EXECS)
 include .depend
 else
 all:	depend
-  	@$(MAKE) -f make/gcc.mak all
+	@$(MAKE) -f make/gcc.mak all
 endif
 
 

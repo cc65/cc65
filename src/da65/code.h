@@ -39,7 +39,20 @@
 
 
 /*****************************************************************************/
-/*	    			     Code				     */
+/*     	    			     Data				     */
+/*****************************************************************************/
+
+
+
+extern unsigned char CodeBuf [0x10000];		/* Code buffer */
+extern unsigned long CodeStart;			/* Start address */
+extern unsigned long CodeEnd;	  		/* End address */
+extern unsigned long PC;			/* Current PC */
+
+
+
+/*****************************************************************************/
+/*     	    			     Code				     */
 /*****************************************************************************/
 
 
@@ -47,17 +60,11 @@
 void LoadCode (const char* Name, unsigned long StartAddress);
 /* Load the code from the given file */
 
-unsigned GetPC (void);
-/* Get the current program counter */
+unsigned char GetCodeByte (unsigned Addr);
+/* Get a byte from the given address */
 
-unsigned char PeekCodeByte (void);
-/* Peek at the byte at the current PC */
-
-unsigned char GetCodeByte (void);
-/* Get a byte from the PC and increment it */
-
-unsigned GetCodeWord (void);
-/* Get a word from the current PC and increment it */
+unsigned GetCodeWord (unsigned Addr);
+/* Get a word from the given address */
 
 unsigned GetRemainingBytes (void);
 /* Return the number of remaining code bytes */

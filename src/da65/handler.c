@@ -64,15 +64,15 @@ static void Mnemonic (const char* M)
 
 
 
-static void OneLine (const char* Mnemo, const char* Arg, ...) attribute ((format(printf, 2, 3)));
-static void OneLine (const char* Mnemo, const char* Arg, ...)
+static void OneLine (const OpcDesc* D, const char* Arg, ...) attribute ((format(printf, 2, 3)));
+static void OneLine (const OpcDesc* D, const char* Arg, ...)
 /* Output one line with the given mnemonic and argument */
 {
     char Buf [256];
     va_list ap;
 
     /* Mnemonic */
-    Mnemonic (Mnemo);
+    Mnemonic (D->Mnemo);
 
     /* Argument */
     va_start (ap, Arg);
@@ -80,6 +80,9 @@ static void OneLine (const char* Mnemo, const char* Arg, ...)
     va_end (ap);
     Indent (AIndent);
     Output (Buf);
+
+    /* Add the code stuff as comment */
+    LineComment (PC, D->Size);
 
     /* End the line */
     LineFeed ();
@@ -112,8 +115,11 @@ static const char* GetAddrArg (const OpcDesc* D, unsigned Addr)
 static void GenerateLabel (const OpcDesc* D, unsigned Addr)
 /* Generate a label in pass one if requested */
 {
-    if (Pass == 1 && !HaveLabel (Addr) && (D->LabelFlag & lfGenLabel) != 0) {
-	AddLabel (Addr, MakeLabelName (Addr));
+    if (Pass == 1 && !HaveLabel (Addr)) {
+	if ((D->LabelFlag & lfGenLabel) != 0 ||
+       	    ((D->LabelFlag & lfUseLabel) != 0 && Addr >= CodeStart && Addr <= CodeEnd)) {
+	    AddLabel (Addr, MakeLabelName (Addr));
+	}
     }
 }
 
@@ -127,7 +133,7 @@ static void GenerateLabel (const OpcDesc* D, unsigned Addr)
 
 void OH_Accumulator (const OpcDesc* D)
 {
-    OneLine (D->Mnemo, "a");
+    OneLine (D, "a");
 }
 
 
@@ -135,6 +141,7 @@ void OH_Accumulator (const OpcDesc* D)
 void OH_Implicit (const OpcDesc* D)
 {
     Mnemonic (D->Mnemo);
+    LineComment (PC, D->Size);
     LineFeed ();
 }
 
@@ -142,7 +149,7 @@ void OH_Implicit (const OpcDesc* D)
 
 void OH_Immidiate (const OpcDesc* D)
 {
-    OneLine (D->Mnemo, "#$%02X", GetCodeByte ());
+    OneLine (D, "#$%02X", GetCodeByte (PC+1));
 }
 
 
@@ -150,13 +157,13 @@ void OH_Immidiate (const OpcDesc* D)
 void OH_Direct (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte ();
+    unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D->Mnemo, "%s", GetAddrArg (D, Addr));
+    OneLine (D, "%s", GetAddrArg (D, Addr));
 }
 
 
@@ -164,13 +171,13 @@ void OH_Direct (const OpcDesc* D)
 void OH_DirectX (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte ();
+    unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D->Mnemo, "%s,y", GetAddrArg (D, Addr));
+    OneLine (D, "%s,y", GetAddrArg (D, Addr));
 }
 
 
@@ -178,13 +185,13 @@ void OH_DirectX (const OpcDesc* D)
 void OH_DirectY (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte ();
+    unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D->Mnemo, "%s,y", GetAddrArg (D, Addr));
+    OneLine (D, "%s,y", GetAddrArg (D, Addr));
 }
 
 
@@ -192,13 +199,13 @@ void OH_DirectY (const OpcDesc* D)
 void OH_Absolute (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeWord ();
+    unsigned Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D->Mnemo, "%s", GetAddrArg (D, Addr));
+    OneLine (D, "%s", GetAddrArg (D, Addr));
 }
 
 
@@ -206,13 +213,13 @@ void OH_Absolute (const OpcDesc* D)
 void OH_AbsoluteX (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeWord ();
+    unsigned Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D->Mnemo, "%s,x", GetAddrArg (D, Addr));
+    OneLine (D, "%s,x", GetAddrArg (D, Addr));
 }
 
 
@@ -220,13 +227,13 @@ void OH_AbsoluteX (const OpcDesc* D)
 void OH_AbsoluteY (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeWord ();
+    unsigned Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D->Mnemo, "%s,y", GetAddrArg (D, Addr));
+    OneLine (D, "%s,y", GetAddrArg (D, Addr));
 }
 
 
@@ -248,16 +255,16 @@ void OH_AbsoluteLongX (const OpcDesc* D)
 void OH_Relative (const OpcDesc* D)
 {
     /* Get the operand */
-    signed char Offs = GetCodeByte ();
+    signed char Offs = GetCodeByte (PC+1);
 
     /* Calculate the target address */
-    unsigned Addr = (unsigned) (((int) GetPC()) + Offs);
+    unsigned Addr = (unsigned) (((int) PC+2) + Offs);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D->Mnemo, "%s", GetAddrArg (D, Addr));
+    OneLine (D, "%s", GetAddrArg (D, Addr));
 }
 
 
@@ -272,13 +279,13 @@ void OH_RelativeLong (const OpcDesc* D)
 void OH_DirectIndirect (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte ();
+    unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D->Mnemo, "(%s)", GetAddrArg (D, Addr));
+    OneLine (D, "(%s)", GetAddrArg (D, Addr));
 }
 
 
@@ -286,13 +293,13 @@ void OH_DirectIndirect (const OpcDesc* D)
 void OH_DirectIndirectY (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte ();
+    unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D->Mnemo, "(%s),y", GetAddrArg (D, Addr));
+    OneLine (D, "(%s),y", GetAddrArg (D, Addr));
 }
 
 
@@ -300,13 +307,13 @@ void OH_DirectIndirectY (const OpcDesc* D)
 void OH_DirectXIndirect (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeByte ();
+    unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D->Mnemo, "(%s,x)", GetAddrArg (D, Addr));
+    OneLine (D, "(%s,x)", GetAddrArg (D, Addr));
 }
 
 
@@ -314,13 +321,13 @@ void OH_DirectXIndirect (const OpcDesc* D)
 void OH_AbsoluteIndirect (const OpcDesc* D)
 {
     /* Get the operand */
-    unsigned Addr = GetCodeWord ();
+    unsigned Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
     GenerateLabel (D, Addr);
 
     /* Output the line */
-    OneLine (D->Mnemo, "(%s)", GetAddrArg (D, Addr));
+    OneLine (D, "(%s)", GetAddrArg (D, Addr));
 }
 
 
@@ -387,6 +394,7 @@ void OH_JmpAbsolute (const OpcDesc* D)
     OH_Absolute (D);
     SeparatorLine ();
 }
+
 
 
 

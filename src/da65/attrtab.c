@@ -41,7 +41,10 @@
 #include "xsprintf.h"
 
 /* da65 */
+#include "code.h"
 #include "error.h"
+#include "global.h"
+#include "output.h"
 #include "attrtab.h"
 
 
@@ -171,6 +174,43 @@ unsigned char GetStyle (unsigned Addr)
 
     /* Return the attribute */
     return (AttrTab[Addr] & atStyleMask);
+}
+
+
+
+static void DefineConst (unsigned Addr)
+/* Define an address constant */
+{
+    Output ("%s", SymTab [Addr]);
+    Indent (AIndent);
+    Output ("= $%04X", Addr);
+    LineFeed ();
+}
+
+
+
+void DefOutOfRangeLabels (void)
+/* Output any labels that are out of the loaded code range */
+{
+    unsigned long Addr;
+
+    SeparatorLine ();
+
+    /* Low range */
+    for (Addr = 0; Addr < CodeStart; ++Addr) {
+	if (SymTab [Addr]) {
+	    DefineConst (Addr);
+	}
+    }
+
+    /* High range */
+    for (Addr = CodeEnd+1; Addr < 0x10000; ++Addr) {
+	if (SymTab [Addr]) {
+	    DefineConst (Addr);
+	}
+    }
+
+    SeparatorLine ();
 }
 
 

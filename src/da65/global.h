@@ -65,6 +65,7 @@ extern int	     	PageLength;	/* Length of a listing page */
 extern unsigned		MIndent;	/* Mnemonic indent */
 extern unsigned		AIndent;	/* Argument indent */
 extern unsigned 	CIndent;	/* Comment indent */
+extern unsigned		BytesPerLine;	/* Max. number of data bytes per line */
 
 
 

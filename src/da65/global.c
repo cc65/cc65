@@ -52,7 +52,7 @@ const char OutExt[]	      = ".dis";	/* Output file extension */
 const char CfgExt[]    	      = ".cfg";	/* Config file extension */
 
 /* Flags and other command line stuff */
-unsigned char Verbosity	      = 2;	/* Verbosity of the output file */
+unsigned char Verbosity	      = 4;	/* Verbosity of the output file */
 
 /* Stuff needed by many routines */
 unsigned Pass		      = 0;	/* Disassembler pass */
@@ -61,7 +61,8 @@ unsigned Pass		      = 0;	/* Disassembler pass */
 int PageLength		      = -1;	/* Length of a listing page */
 unsigned MIndent	      = 9;	/* Mnemonic indent */
 unsigned AIndent	      = 17;	/* Argument indent */
-unsigned CIndent	      = 33;	/* Comment indent */
+unsigned CIndent	      = 49;	/* Comment indent */
+unsigned BytesPerLine	      = 8;	/* Max. number of data bytes per line */
 
 
 

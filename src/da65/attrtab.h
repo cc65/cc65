@@ -49,10 +49,10 @@ enum attr_t {
     atDefault	= 0x00,		/* Default style */
     atCode	= 0x01,
     atIllegal	= 0x02,
-    atByteTab	= 0x02,		/* Same as illegal */
+    atByteTab  	= 0x03,		/* Same as illegal */
     atWordTab	= 0x04,
-    atRtsTab	= 0x08,
-    atLabel	= 0x80,
+    atAddrTab	= 0x05,
+    atRtsTab	= 0x06,
 
     atStyleMask = 0x0F		/* Output style */
 };
@@ -87,6 +87,9 @@ const char* GetLabel (unsigned Addr);
 
 unsigned char GetStyle (unsigned Addr);
 /* Return the style attribute for the given address */
+
+void DefOutOfRangeLabels (void);
+/* Output any labels that are out of the loaded code range */
 
 
 

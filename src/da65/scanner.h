@@ -74,6 +74,12 @@ typedef enum token_t {
     CFGTOK_END,
     CFGTOK_TYPE,
 
+    CFGTOK_CODE,
+    CFGTOK_BYTETAB,
+    CFGTOK_WORDTAB,
+    CFGTOK_ADDRTAB,
+    CFGTOK_RTSTAB,
+
     /* Label section */
 
 
@@ -87,7 +93,7 @@ typedef enum token_t {
 typedef struct IdentTok_ IdentTok;
 struct IdentTok_ {
     const char*	 	Ident;	     	/* Identifier */
-    token_t		Tok;	     	/* Token for identifier */
+    token_t	 	Tok;	     	/* Token for identifier */
 };
 #define ENTRY_COUNT(s) 	(sizeof (s) / sizeof (s [0]))
 

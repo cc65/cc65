@@ -52,10 +52,10 @@
 
 
 
-static unsigned char CodeBuf [0x10000];		/* Code buffer */
-static unsigned long CodeStart;			/* Start address */
-static unsigned long CodeEnd;	  		/* End address */
-static unsigned long PC;			/* Current PC */
+unsigned char CodeBuf [0x10000];	/* Code buffer */
+unsigned long CodeStart;		/* Start address */
+unsigned long CodeEnd;	  	     	/* End address */
+unsigned long PC;			/* Current PC */
 
 
 
@@ -99,37 +99,20 @@ void LoadCode (const char* Name, unsigned long StartAddress)
 
 
 
-unsigned GetPC (void)
-/* Get the current program counter */
+unsigned char GetCodeByte (unsigned Addr)
+/* Get a byte from the given address */
 {
-    return PC;
+    PRECONDITION (Addr <= CodeEnd);
+    return CodeBuf [Addr];
 }
 
 
 
-unsigned char PeekCodeByte (void)
-/* Peek at the byte at the current PC */
+unsigned GetCodeWord (unsigned Addr)
+/* Get a word from the given address */
 {
-    PRECONDITION (PC <= CodeEnd);
-    return CodeBuf [PC];
-}
-
-
-
-unsigned char GetCodeByte (void)
-/* Get a byte from the PC and increment it */
-{
-    PRECONDITION (PC <= CodeEnd);
-    return CodeBuf [PC++];
-}
-
-
-
-unsigned GetCodeWord (void)
-/* Get a word from the current PC and increment it */
-{
-    unsigned Lo = GetCodeByte ();
-    unsigned Hi = GetCodeByte ();
+    unsigned Lo = GetCodeByte (Addr);
+    unsigned Hi = GetCodeByte (Addr+1);
     return Lo | (Hi << 8);
 }
 

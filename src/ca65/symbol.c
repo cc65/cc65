@@ -181,11 +181,8 @@ SymEntry* ParseScopedSymName (int AllocNew)
         /* Search for the symbol and return it. If no scope was specified,
          * search also in the upper levels.
          */
-        if (NoScope) {
+        if (NoScope && !AllocNew) {
             Sym = SymFindAny (Scope, Ident);
-            if (Sym == 0 && AllocNew) {
-                Sym = SymFind (Scope, Ident, AllocNew);
-            }
         } else {
             Sym = SymFind (Scope, Ident, AllocNew);
         }

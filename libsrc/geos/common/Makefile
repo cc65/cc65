@@ -16,6 +16,4 @@ S_OBJS	= copydata.o memcpy.o memset.o zerobss.o
 all: $(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f *.~ $(S_OBJS) core
-	@rm -f $(C_OBJS:.o=.s)
-	@rm -f $(C_OBJS)
+	@rm -f core *.~ $(S_OBJS) $(C_OBJS:.o=.s) $(C_OBJS)

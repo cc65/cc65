@@ -25,6 +25,7 @@ OBJS =	_scrsize.o	\
        	kplot.o		\
 	kscnkey.o	\
 	kudtim.o	\
+	peeksys.o	\
 	pokesys.o	\
 	rs232.o
 

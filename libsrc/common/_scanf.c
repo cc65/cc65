@@ -71,12 +71,12 @@ static const unsigned char Bits[8] = {
 
 
 /*****************************************************************************/
-/*  		       	    	Character sets				     */
+/*  	 	       	    	Character sets				     */
 /*****************************************************************************/
 
 
 
-static void AddCharToSet (unsigned char C)
+static void __fastcall__ AddCharToSet (unsigned char C)
 /* Set the given bit in the character set */
 {
     asm ("ldy #%o", C);
@@ -95,7 +95,7 @@ static void AddCharToSet (unsigned char C)
 
 
 
-static unsigned char IsCharInSet (unsigned char C)
+static unsigned char __fastcall__ IsCharInSet (unsigned char C)
 /* Check if the given char is part of the character set */
 {
     asm ("ldy #%o", C);

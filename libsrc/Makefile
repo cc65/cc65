@@ -131,7 +131,7 @@ geoslib:
 	CC=../$(CC) \
 	AS=../$(AS) \
 	AR=../$(AR) \
-	CFLAGS="-Osir -g -T -t geos -I../../include" \
+	CFLAGS="-Osir -g -T -t geos -I../../../include" \
 	AFLAGS="-t geos" \
 	$(MAKE) -C geos || exit 1
 	for i in common runtime; do \

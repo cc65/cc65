@@ -64,7 +64,7 @@ const unsigned char icon1[] = {
 			128, 0, 1, 128, 0, 1, 128, 0, 1, 128, 0, 1, 128, 0, 1,
 			128, 0, 1, 128, 0, 1, 128, 0, 1, 128, 0, 1, 255, 255, 255 };
 
-char *progName;
+char *ProgName;	// for AbEnd, later remove and use common/cmdline.h
 
 char *outputCName=NULL, *outputSName=NULL, *outputVName=NULL;
 FILE *outputCFile, *outputSFile, *outputVFile;

@@ -2,7 +2,9 @@
 # gcc Makefile for grc
 #
 
-CFLAGS 	= -g -O2 -Wall -W
+COMMON = ../common
+
+CFLAGS 	= -g -O2 -Wall -W -I$(COMMON)
 CC	= gcc
 LDFLAGS	=
 EBIND	= emxbind
@@ -10,6 +12,8 @@ EBIND	= emxbind
 OBJS =  grc.o
 
 EXECS = grc
+
+LIBS = $(COMMON)/common.a
 
 .PHONY: all
 ifeq (.depend,$(wildcard .depend))
@@ -38,6 +42,6 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -MM $^ > .depend
+	$(CC) -I$(COMMON) -MM $^ > .depend
 
 

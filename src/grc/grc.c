@@ -4,8 +4,6 @@
 
     by Maciej 'YTM/Elysium' Witkowiak
 
-    Error function by Uz
-
     see GEOSLib documentation for license info
 
 */
@@ -24,25 +22,16 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
-#include <ctype.h>
 #include <errno.h>
 #include <time.h>
 
 #include "grc.h"
 
-
-void Error (const char* Format, ...)
-/* borrowed from cl65/error.c	  */
-/* Print an error message and die */
-{
-    va_list ap;
-    va_start (ap, Format);
-    fprintf (stderr, "%s: ", progName);
-    vfprintf (stderr, Format, ap);
-    va_end (ap);
-    exit (EXIT_FAILURE);
-}
-
+/* common stuff */
+//#include "cmdline.h"
+#include "fname.h"
+#include "abend.h"
+#include "chartype.h"
 
 void VLIRLinker(int argc, char *argv[]) {
 FILE *outCVT, *input;
@@ -58,23 +47,23 @@ int blocks,rest;
 	/* check if we know enough */
 
 	if (argc<4)
-    	    Error("too less arguments, required [out] [cvthead] [vlir0] ...\n");
+    	    AbEnd("too few arguments, required [out] [cvthead] [vlir0] ...\n");
 
 	/* first open and copy CVT header */
 
-        outCVT = fopen(argv[i],"wb+");
+	outCVT = fopen(argv[i],"wb+");
 	if (outCVT==NULL)
-	    Error("can't open output\n");
+	    AbEnd("can't open output:%s\n",strerror(errno));
 
 	++i;
-        input = fopen(argv[i],"rb");
+	input = fopen(argv[i],"rb");
 	if (input==NULL)
-	    Error("can't open input:%s\n",strerror(errno));
+	    AbEnd("can't open input:%s\n",strerror(errno));
 
 	bytes = fread(buffer,1,BLOODY_BIG_BUFFER,input);
 	fclose(input);
 	if (bytes!=508)
-		Error("%s is not a cvt header\n",argv[i]);
+		AbEnd("%s is not a cvt header\n",argv[i]);
 
 	fwrite(buffer,1,bytes,outCVT);
 
@@ -88,7 +77,7 @@ int blocks,rest;
 		vlirtabs[j]=0;
 	}
 
-	/* now read all VLIR chains, aligned to 254 bytes */
+	/* now read all VLIR chains, align to 254 bytes */
 
 	++i;
 	j=0;
@@ -101,11 +90,11 @@ int blocks,rest;
 			memset(buffer,0,BLOODY_BIG_BUFFER);
                         input = fopen(argv[i],"rb");
 			if (input==NULL)
-				Error("couldn't open %s:%s\n",argv[i],strerror(errno));
+				AbEnd("couldn't open %s:%s\n",argv[i],strerror(errno));
 			bytes = fread(buffer,1,BLOODY_BIG_BUFFER,input);
 			fclose(input);
 			if (bytes==0)
-				Error("couldn't read %s:%s\n",argv[i],strerror(errno));
+				AbEnd("couldn't read %s:%s\n",argv[i],strerror(errno));
 			blocks = bytes / 254;
 			rest = bytes % 254 + 2;
 			if (rest>255) rest=255;
@@ -156,34 +145,46 @@ void printVHeader (void) {
 void openCFile (void) {
     if ((CFnum==0) && (forceFlag==0)) {
 	/* test if file exists already and no forcing*/
-	if ((outputCFile = fopen (outputCName,"r"))!=0)
-	    Error("file %s already exists, no forcing, aborting\n", outputCName);
+	    if ((outputCFile = fopen (outputCName,"r"))!=0)
+	        AbEnd("file %s already exists, aborting\n", outputCName);
 	}
     if ((outputCFile = fopen (outputCName,outputCMode))==0)
-	Error("can't open file %s for writting: %s\n",outputCName,strerror (errno));
-    if (CFnum==0) { outputCMode[0]='a'; printCHeader(); CFnum++; }
+	    AbEnd("can't open file %s for writing: %s\n",outputCName,strerror (errno));
+    if (CFnum==0) {
+		outputCMode[0]='a';
+		printCHeader();
+		CFnum++;
+	}
 }
 
 void openSFile (void) {
     if ((SFnum==0) && (forceFlag==0)) {
 	/* test if file exists already and no forcing*/
-	if ((outputSFile = fopen (outputSName,"r"))!=0)
-	    Error("file %s already exists, no forcing, aborting\n", outputSName);
+	    if ((outputSFile = fopen (outputSName,"r"))!=0)
+	        AbEnd("file %s already exists, aborting\n", outputSName);
 	}
     if ((outputSFile = fopen (outputSName,outputSMode))==0)
-	Error("can't open file %s for writting: %s\n",outputSName,strerror (errno));
-    if (SFnum==0) { outputSMode[0]='a'; printSHeader(); SFnum++; }
+	     AbEnd("can't open file %s for writing: %s\n",outputSName,strerror (errno));
+    if (SFnum==0) {
+		outputSMode[0]='a';
+		printSHeader();
+		SFnum++;
+	}
 }
 
 void openVFile (void) {
     if ((VFnum==0) && (forceFlag==0)) {
 	/* test if file exists already and no forcing*/
-	if ((outputVFile = fopen (outputVName,"r"))!=0)
-	    Error("file %s already exists, no forcing, aborting\n", outputVName);
+	    if ((outputVFile = fopen (outputVName,"r"))!=0)
+	        AbEnd("file %s already exists, aborting\n", outputVName);
 	}
     if ((outputVFile = fopen (outputVName,outputVMode))==0)
-	Error("can't open file %s for writting: %s\n",outputVName,strerror (errno));
-    if (VFnum==0) { outputVMode[0]='a'; printVHeader(); VFnum++; }
+	     AbEnd("can't open file %s for writting: %s\n",outputVName,strerror (errno));
+    if (VFnum==0) {
+		outputVMode[0]='a';
+		printVHeader();
+		VFnum++;
+	}
 }
 
 void printUsage (void) {
@@ -195,8 +196,7 @@ void printUsage (void) {
 	    "\t-s name\t\tname asm output file\n"
 	    "\t-l name\t\tname ld65 config output file (for vlir)\n"
 	    "Or as VLIR linker: %s -vlir output.cvt header [vlir0] ... [blank] ... [vlir_n]\n",
-	    progName,progName);
-
+	    ProgName,ProgName);
 }
 
 int findToken (const char **tokenTbl, const char *token) {
@@ -204,8 +204,8 @@ int findToken (const char **tokenTbl, const char *token) {
 int a=0;
 
     while (strlen(tokenTbl[a])!=0) {
-	if (strcmp(tokenTbl[a],token)==0) break;
-	a++;
+		if (strcmp(tokenTbl[a],token)==0) break;
+		a++;
     }
     if (strlen(tokenTbl[a])==0) a=-1;
     return a;
@@ -236,7 +236,8 @@ int a;
 	}
 }
 
-char *bintos(unsigned char a, char *out) {
+//char *bintos(unsigned char a, char *out) {
+char *bintos(unsigned char a, char out[7]) {
 int i=0;
     for (;i<8;i++) {
     out[7-i] = ((a & 1)==0) ? '0' : '1';
@@ -271,7 +272,7 @@ struct menuitem *curItem, *newItem;
     myMenu.type=nextWord();
 
     if (strcmp(nextWord(),"{")!=0) {
-	Error ("menu %s description has no opening bracket!\n", myMenu.name);
+	AbEnd ("menu '%s' description has no opening bracket!\n", myMenu.name);
 	};
     curItem=malloc(sizeof(struct menuitem));
     myMenu.item=curItem;
@@ -296,8 +297,8 @@ struct menuitem *curItem, *newItem;
 	curItem=newItem;
 	item++;
 	} while (strcmp(token,"}")!=0);
-    if (item==0) Error ("menu %s has 0 items!\n", myMenu.name);
-    if (item>31) Error ("menu %s has too many items!\n", myMenu.name);
+    if (item==0) AbEnd ("menu '%s' has 0 items!\n", myMenu.name);
+    if (item>31) AbEnd ("menu '%s' has too many items!\n", myMenu.name);
 
     curItem->next=NULL;
 
@@ -347,7 +348,7 @@ struct menuitem *curItem, *newItem;
     fprintf(outputCFile, "\t};\n\n");
 
     if (fclose (outputCFile)!=0)
-	Error("error closing %s: %s\n",outputCName,strerror (errno));
+	AbEnd("error closing %s: %s\n",outputCName,strerror (errno));
 }
 
 void DoHeader (void) {
@@ -367,7 +368,7 @@ int a, b;
     a = findToken (hdrFTypes, token);
 
     if (a>1)
-	Error("filetype %s isn't supported yet\n", token);
+	   AbEnd("filetype '%s' is not supported yet\n", token);
 
     switch (a) {
 	case 0: myHead.geostype = 6; break;
@@ -396,16 +397,15 @@ int a, b;
     myHead.hour = my_tm->tm_hour;
     myHead.min = my_tm->tm_min;
 
-    if (strcmp(nextWord(),"{")!=0) {
-	Error ("header %s has no opening bracket!\n", myHead.dosname);
-	};
+    if (strcmp(nextWord(),"{")!=0)
+		AbEnd ("header '%s' has no opening bracket!\n", myHead.dosname);
 
     do {
 	token=nextWord();
 	if (strcmp(token, "}")==0) break;
         switch (a = findToken (hdrFields, token)) {
 		case -1:
-		    Error ("unknown field %s in header %s\n", token, myHead.dosname);
+		    AbEnd ("unknown field '%s' in header '%s'\n", token, myHead.dosname);
 		    break;
 		case 0: /* author */
 		    myHead.author = nextPhrase(); break;
@@ -421,7 +421,7 @@ int a, b;
 		case 3:	/* dostype */
 		    switch (b = findToken (hdrDOSTp, nextWord())) {
 			case -1:
-			    Error ("unknown dostype in header %s\n", myHead.dosname);
+			    AbEnd ("unknown dostype in header '%s'\n", myHead.dosname);
 			    break;
 			default:
 			    myHead.dostype = b/2 + 128 + 1;
@@ -431,7 +431,7 @@ int a, b;
 		case 4:	/* mode */
 		    switch (b = findToken (hdrModes, nextWord())) {
 			case -1:
-			    Error ("unknown mode in header %s\n", myHead.dosname);
+			    AbEnd ("unknown mode in header '%s'\n", myHead.dosname);
 			case 0:
 			    myHead.mode = 0x40; break;
 			case 1:
@@ -445,7 +445,7 @@ int a, b;
 		case 5: /* structure */
 		    switch (b = findToken(hdrStructTp, nextWord())) {
 			case -1:
-			    Error ("unknown structure type in header %s\n", myHead.dosname);
+			    AbEnd ("unknown structure type in header '%s'\n", myHead.dosname);
 			case 0:
 			case 1:
 			    myHead.structure = 0; break;
@@ -499,8 +499,7 @@ int a, b;
 	    myHead.info, (int) (strlen(myHead.info)+1));
 
     if (fclose (outputSFile)!=0)
-	Error("error closing %s: %s\n",outputSName,strerror (errno));
-
+		AbEnd("error closing %s: %s\n",outputSName,strerror (errno));
 
 }
 
@@ -522,9 +521,8 @@ struct vlirentry vlirtable[127];
 
     vlirbase = strtol(nextWord(),NULL,0);
 
-    if (strcmp(nextWord(),"{")!=0) {
-	Error ("VLIR description has no opening bracket!\n");
-	};
+    if (strcmp(nextWord(),"{")!=0)
+		AbEnd ("VLIR description has no opening bracket!\n");
 
     numchains=0;
 
@@ -533,7 +531,7 @@ struct vlirentry vlirtable[127];
 	if (strcmp(token, "}")==0) break;
 	numchains++;
 	if (numchains>127) {
-	    Error("Too many VLIR chains!\n");
+	    AbEnd("Too many VLIR chains!\n");
 	}
 	vlirtable[numchains].chainname=token;
 
@@ -557,7 +555,7 @@ struct vlirentry vlirtable[127];
     fprintf(outputVFile,"}\n\n");
 
     if (numchains==0) {
-	Error("There must be at least one VLIR chain.\n");
+	AbEnd("There must be at least one VLIR chain.\n");
     };
 
     /* now put segments info */
@@ -584,7 +582,7 @@ struct vlirentry vlirtable[127];
     fprintf(outputVFile,"\n");
 
     if (fclose (outputVFile)!=0)
-	Error("error closing %s: %s\n",outputVName,strerror (errno));
+		AbEnd("error closing %s: %s\n",outputVName,strerror (errno));
 }
 
 char *filterInput (FILE *F, char *tbl) {
@@ -601,7 +599,7 @@ int a, prevchar=-1, i=0, bracket=0, quote=1;
 	    if ((a=='}')||(a==')')) bracket--;
 	}
 	if (a==EOF) { tbl[i]='\0'; realloc(tbl, i+1); break; };
-	if (isspace(a)) {
+	if (IsSpace(a)) {
 	    if ((prevchar!=' ') && (prevchar!=-1)) { tbl[i++]=' '; prevchar=' '; }
 	} else {
 	    if (a==';' && quote) { do { a = getc (F); } while (a!='\n'); fseek(F,-1,SEEK_CUR); }
@@ -610,7 +608,7 @@ int a, prevchar=-1, i=0, bracket=0, quote=1;
 	}
     }
 
-    if (bracket!=0) Error("there are unclosed brackets!\n");
+    if (bracket!=0) AbEnd("there are unclosed brackets!\n");
 
     return tbl;
 }
@@ -626,7 +624,7 @@ int head=0;	/* number of processed HEADER sections */
 int vlir=0;	/* number of processed VLIR sections */
 
     if ((F = fopen (filename,"r"))==0)
-	Error("can't open file %s for reading: %s\n",filename,strerror (errno));
+		AbEnd("can't open file %s for reading: %s\n",filename,strerror (errno));
 
     str=filterInput(F, malloc(BLOODY_BIG_BUFFER));
 
@@ -639,7 +637,7 @@ int vlir=0;	/* number of processed VLIR sections */
 	    case 0: DoMenu(); break;
 	    case 1:
 		if (++head!=1) {
-			Error ("more than one HEADER section, aborting.\n");
+			AbEnd ("more than one HEADER section, aborting.\n");
 		    } else {
 			DoHeader();
 		    }
@@ -648,12 +646,12 @@ int vlir=0;	/* number of processed VLIR sections */
 	    case 3: break;	/* dialog not implemented yet */
 	    case 4:
 		if (++vlir!=1) {
-			Error ("more than one VLIR section, aborting.\n");
+			AbEnd ("more than one VLIR section, aborting.\n");
 		} else {
 			DoVLIR();
 		}
 		break;
-	    default: Error ("unknown section %s.\n",token); break;
+	    default: AbEnd ("unknown section %s.\n",token); break;
 	    }
 	}
 	token = nextWord();
@@ -663,9 +661,8 @@ int vlir=0;	/* number of processed VLIR sections */
 int main(int argc, char *argv[]) {
 
 int ffile=0, i=1;
-char *p, *tmp;
 
-    progName = argv[0];
+    ProgName = argv[0];
     while (i < argc) {
 	const char *arg = argv[i];
 	if (arg[0] == '-') {
@@ -693,47 +690,27 @@ char *p, *tmp;
 			exit (EXIT_SUCCESS);
 			break;
 		    } else {
-			Error("unknown option %s\n",arg);
+			AbEnd("unknown option %s\n",arg);
 			break;
 		    }
-		default: Error("unknown option %s\n",arg);
+		default: AbEnd("unknown option %s\n",arg);
 	    }
 	} else {
 	    ffile++;
 
-	    tmp = malloc(strlen(arg)+4);
-	    strcpy (tmp, arg);
-	    if ((p = strrchr (tmp, '.')))
-		*p = '\0';
-
-
-	    if (outputCName==NULL) {
-		outputCName = malloc(strlen(arg));
-		strcpy (outputCName, tmp);
-		strcat (outputCName, ".h");
-	    }
-
-
-	    if (outputSName==NULL) {
-		outputSName = malloc(strlen(arg));
-		strcpy (outputSName, tmp);
-		strcat (outputSName, ".s");
-	    }
-
-
-	    if (outputVName==NULL) {
-		outputVName = malloc(strlen(arg));
-		strcpy (outputVName, tmp);
-		strcat (outputVName, ".cfg");
-	    }
-
+		if (outputCName==NULL)
+			outputCName = MakeFilename(arg,".h");
+		if (outputSName==NULL)
+			outputSName = MakeFilename(arg,".s");
+		if (outputVName==NULL)
+			outputVName = MakeFilename(arg,".cfg");
 
 	    processFile(arg);
 
 	    }
 	i++;
 	}
-    if (ffile==0) Error("no input file\n");
+    if (ffile==0) AbEnd("no input file\n");
 
     return EXIT_SUCCESS;
 }

@@ -97,7 +97,8 @@ is present in source that includes generated header. It can point to a function
 or to another menu definition.
 
 If you are doing sub(sub)menus definitions remember to place the lowest level
-definition first. This way C compiler won't complain about unknown names.
+definition first and top lever menu as the last one. This way C compiler won't
+complain about unknown names.
 
 
 b) header definition

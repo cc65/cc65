@@ -7,20 +7,19 @@
 ;Note that if you want to use any C operators (like '|', '&' etc.) do it WITHOUT spaces
 ;between arguments (parser is simple and weak)
 
-
 ; format: MENU "name" left,top ALIGN { "itemname" TYPE pointer ... }
-
-MENU mainMenu 0,0 HORIZONTAL
-{
-    "sub menu1" SUB_MENU subMenu1			; goes for _subMenu1
-    "quit"     MENU_ACTION EnterDeskTop			; goes for _EnterDeskTop
-}
 
 MENU subMenu1 15,0 VERTICAL
 {
     "subitem1" MENU_ACTION smenu1
     "mubitem2" MENU_ACTION|DYN_SUB_MENU smenu2
     "subitem3" MENU_ACTION smenu3
+}
+
+MENU mainMenu 0,0 HORIZONTAL
+{
+    "sub menu1" SUB_MENU subMenu1			; goes for _subMenu1
+    "quit"     MENU_ACTION EnterDeskTop			; goes for _EnterDeskTop
 }
 
 ; format: HEADER GEOS_TYPE "dosname" "classname" "version"

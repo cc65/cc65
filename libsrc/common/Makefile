@@ -51,6 +51,7 @@ C_OBJS =	_afailed.o	\
                 strftime.o      \
 		strxfrm.o	\
 		strtok.o	\
+                system.o        \
                 timezone.o      \
 		vprintf.o       \
                 vsscanf.o

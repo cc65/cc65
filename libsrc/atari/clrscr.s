@@ -7,6 +7,7 @@
 	.export		_clrscr
 	.include	"atari.inc"
 	.importzp	ptr1
+	.import		setcursor
 
 _clrscr:lda	SAVMSC		; screen memory
 	sta	ptr1
@@ -15,6 +16,7 @@ _clrscr:lda	SAVMSC		; screen memory
 	adc	#>(40*24)
 	sta	ptr1+1
 	lda	#0		; screen code of space char
+	sta	OLDCHR
 	ldy	#<(40*24)	; 40x24: size of default atari screen
 	ldx	#>(40*24)
 _clr1:	sta	(ptr1),y
@@ -31,5 +33,4 @@ _clr1:	sta	(ptr1),y
 
 done:	sta	COLCRS
 	sta	ROWCRS
-	rts
-
+	jmp	setcursor

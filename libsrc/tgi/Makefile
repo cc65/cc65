@@ -29,6 +29,7 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_getcolorcount.o     \
                 tgi_getdefpalette.o     \
                 tgi_geterror.o          \
+                tgi_geterrormsg.o       \
                 tgi_getmaxcolor.o       \
                 tgi_getmaxx.o           \
                 tgi_getmaxy.o           \

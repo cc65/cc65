@@ -542,6 +542,20 @@ void DelCodeEntries (CodeSeg* S, unsigned Start, unsigned Count)
 
 
 
+struct CodeEntry* RetrieveCodeEntry (CodeSeg* S, unsigned Index)
+/* Retrieve a code entry. This means, the code entry is removed from the
+ * entry collection, but not deleted and returned instead. The entry may
+ * then be inserted again at another position.
+ */
+{
+    /* Get the code entry, remove it from the collection and return it */
+    CodeEntry* E = GetCodeEntry (S, Index);
+    CollDelete (&S->Entries, Index);
+    return E;
+}
+
+
+
 struct CodeEntry* GetNextCodeEntry (CodeSeg* S, unsigned Index)
 /* Get the code entry following the one with the index Index. If there is no
  * following code entry, return NULL.

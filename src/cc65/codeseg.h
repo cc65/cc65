@@ -112,6 +112,12 @@ void DelCodeEntries (CodeSeg* S, unsigned Start, unsigned Count);
  * labels attached to the entries and so on.
  */
 
+struct CodeEntry* RetrieveCodeEntry (CodeSeg* S, unsigned Index);
+/* Retrieve a code entry. This means, the code entry is removed from the
+ * entry collection, but not deleted and returned instead. The entry may
+ * then be inserted again at another position.
+ */
+
 #if defined(HAVE_INLINE)
 INLINE struct CodeEntry* GetCodeEntry (CodeSeg* S, unsigned Index)
 /* Get an entry from the given code segment */

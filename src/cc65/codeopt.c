@@ -91,26 +91,114 @@ static const char CmpSignedTab [] = {
 
 
 /*****************************************************************************/
-/*	     	 	       Helper functions				     */
+/*  	     	   	       Helper functions	    			     */
 /*****************************************************************************/
 
 
 
-static cmp_t FindCmpCond (const char* Suffix)
-/* Map a condition suffix to a code. Return the code or CMP_INV on failure */
+static cmp_t FindCmpCond (const char* Code, unsigned CodeLen)
+/* Search for a compare condition by the given code using the given length */
 {
-    int I;
+    unsigned I;
 
     /* Linear search */
     for (I = 0; I < sizeof (CmpSuffixTab) / sizeof (CmpSuffixTab [0]); ++I) {
-       	if (strcmp (Suffix, CmpSuffixTab [I]) == 0) {
+	if (strncmp (Code, CmpSuffixTab [I], CodeLen) == 0) {
 	    /* Found */
-     	    return I;
-     	}
+	    return I;
+	}
     }
 
     /* Not found */
     return CMP_INV;
+}
+
+
+
+static cmp_t FindBoolCmpCond (const char* Name)
+/* Map a condition suffix to a code. Return the code or CMP_INV on failure */
+{
+    /* Check for the correct subroutine name */
+    if (strncmp (Name, "bool", 4) == 0) {
+	/* Name is ok, search for the code in the table */
+	return FindCmpCond (Name+4, strlen(Name)-4);
+    } else {
+	/* Not found */
+	return CMP_INV;
+    }
+}
+
+
+
+static int FindTosCmpCond (const char* Name)
+/* Check if this is a call to one of the TOS compare functions (tosgtax).
+ * Return the condition code or CMP_INV on failure.
+ */
+{
+    unsigned Len = strlen (Name);
+
+    /* Check for the correct subroutine name */
+    if (strncmp (Name, "tos", 3) == 0 && strcmp (Name+Len-2, "ax") == 0) {
+	/* Name is ok, search for the code in the table */
+	return FindCmpCond (Name+3, Len-3-2);
+    } else {
+	/* Not found */
+	return CMP_INV;
+    }
+}
+
+
+
+static int IsUnsignedCmp (int Code)
+/* Check if this is an unsigned compare */
+{
+    CHECK (Code >= 0);
+    return CmpSignedTab [Code] == 0;
+}
+
+
+
+static const char* MakeBoolCmp (cmp_t Cond)
+/* Create the name of a bool transformer subroutine for the given code. The
+ * result is placed into a static buffer, so beware!
+ */
+{
+    static char Buffer[20];
+    CHECK (Cond != CMP_INV);
+    sprintf (Buffer, "bool%s", CmpSuffixTab[Cond]);
+    return Buffer;
+}
+
+
+
+static const char* MakeTosCmp (cmp_t Cond)
+/* Create the name of a tos compare subroutine for the given code. The
+ * result is placed into a static buffer, so beware!
+ */
+{
+    static char Buffer[20];
+    CHECK (Cond != CMP_INV);
+    sprintf (Buffer, "tos%sax", CmpSuffixTab[Cond]);
+    return Buffer;
+}
+
+
+
+static int IsBitOp (const CodeEntry* E)
+/* Check if E is one of the bit operations (and, or, eor) */
+{
+    return (E->OPC == OPC_AND || E->OPC == OPC_ORA || E->OPC == OPC_EOR);
+}
+
+
+
+static int IsCmpToZero (const CodeEntry* E)
+/* Check if the given instrcuction is a compare to zero instruction */
+{
+    return (E->OPC == OPC_CMP             &&
+	    E->AM  == AM_IMM              &&
+	    (E->Flags & CEF_NUMARG) != 0  &&
+	    E->Num == 0);
 }
 
 
@@ -140,10 +228,9 @@ static unsigned OptBoolTransforms (CodeSeg* S)
 
 	/* Check for a boolean transformer */
 	if (E->OPC == OPC_JSR                            &&
-	    strncmp (E->Arg, "bool", 4) == 0             &&
+	    (Cond = FindBoolCmpCond (E->Arg)) != CMP_INV &&
 	    (N = GetNextCodeEntry (S, I)) != 0           &&
-	    (N->Info & OF_ZBRA) != 0                     &&
-	    (Cond = FindCmpCond (E->Arg+4)) != CMP_INV) {
+	    (N->Info & OF_ZBRA) != 0) {
 
 	    CodeEntry* X;
 	    CodeLabel* L;
@@ -266,7 +353,204 @@ NextEntry:
 
 
 /*****************************************************************************/
-/*			      nega optimizations			     */
+/*		  	  Optimizations for compares                         */
+/*****************************************************************************/
+
+
+
+static unsigned OptCmp1 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *  	stx	xx
+ *  	stx	tmp1
+ *  	ora	tmp1
+ *
+ * and replace it by
+ *
+ *  	stx	xx
+ *  	ora	xx
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[2];
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (E->OPC == OPC_STX 	  		&&
+	    GetCodeEntries (S, L, I+1, 2)	&&
+       	    L[0]->OPC == OPC_STX		&&
+	    strcmp (L[0]->Arg, "tmp1") == 0     &&
+	    !CodeEntryHasLabel (L[0])           &&
+	    L[1]->OPC == OPC_ORA	    	&&
+	    strcmp (L[1]->Arg, "tmp1") == 0     &&
+	    !CodeEntryHasLabel (L[1])) {
+
+	    /* Remove the remaining instructions */
+	    DelCodeEntries (S, I+1, 2);
+
+	    /* Insert the ora instead */
+	    InsertCodeEntry (S, NewCodeEntry (OPC_ORA, E->AM, E->Arg, 0), I+1);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptCmp2 (CodeSeg* S)
+/* Search for
+ *
+ *     	lda/and/ora/eor	...
+ *  	cmp #$00
+ *  	jeq/jne
+ *
+ * and remove the cmp.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[2];
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for the sequence */
+       	if ((E->OPC == OPC_LDA || IsBitOp (E))	  &&
+	    GetCodeEntries (S, L, I+1, 2)      	  &&
+       	    IsCmpToZero (L[0])                    &&
+	    !CodeEntryHasLabel (L[0])             &&
+       	    (L[1]->Info & OF_FBRA) != 0           &&
+	    !CodeEntryHasLabel (L[1])) {
+
+	    /* Remove the compare */
+	    DelCodeEntry (S, I+1);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptCmp3 (CodeSeg* S)
+/* Search for
+ *
+ *  	lda	x
+ *  	ldx	y
+ *  	cpx 	#a
+ *  	bne 	L1
+ *  	cmp 	#b
+ *     	jne/jeq	L2
+ *
+ * If a is zero, we may remove the compare. If a and b are both zero, we may
+ * replace it by the sequence
+ *
+ *  	lda 	x
+ *  	ora 	x+1
+ *  	jne/jeq ...
+ *
+ * L1 may be either the label at the branch instruction, or the target label
+ * of this instruction.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[5];
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (E->OPC == OPC_LDA                                                &&
+	    GetCodeEntries (S, L, I+1, 5)      	                             &&
+	    L[0]->OPC == OPC_LDX                                             &&
+	    !CodeEntryHasLabel (L[0])                                        &&
+	    L[1]->OPC == OPC_CPX                                             &&
+	    L[1]->AM == AM_IMM                                               &&
+       	    (L[1]->Flags & CEF_NUMARG) != 0                                  &&
+	    !CodeEntryHasLabel (L[1])                                        &&
+	    (L[2]->OPC == OPC_JNE || L[2]->OPC == OPC_BNE)                   &&
+	    L[2]->JumpTo != 0                                                &&
+	    !CodeEntryHasLabel (L[2])                                        &&
+       	    L[3]->OPC == OPC_CMP                                             &&
+	    L[3]->AM == AM_IMM                                               &&
+	    (L[3]->Flags & CEF_NUMARG) != 0                                  &&
+	    (L[4]->Info & OF_ZBRA) != 0                                      &&
+	    L[4]->JumpTo != 0                                                &&
+	    (L[2]->JumpTo->Owner == L[4] || L[2]->JumpTo == L[4]->JumpTo)) {
+
+	    /* Get the compare value */
+	    unsigned Val = ((L[1]->Num & 0xFF) << 8) | (L[3]->Num & 0xFF);
+
+	    if (Val == 0) {
+		/* The value is zero, we may use the simple code version. */
+		ReplaceOPC (L[0], OPC_ORA);
+		DelCodeEntries (S, I+2, 3);
+       	    } else {
+		/* Move the lda instruction after the first branch */
+		CodeEntry* N = RetrieveCodeEntry (S, I);
+		InsertCodeEntry (S, N, I+3);
+
+		/* Replace the ldx/cpx by lda/cmp */
+		ReplaceOPC (L[0], OPC_LDA);
+		ReplaceOPC (L[1], OPC_CMP);
+
+		/* The high byte is zero, remove the CMP */
+		if ((Val & 0xFF00) == 0) {
+	     	    DelCodeEntry (S, I+1);
+	     	}
+	    }
+
+	    ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*		  	      nega optimizations			     */
 /*****************************************************************************/
 
 
@@ -625,6 +909,12 @@ static OptFunc OptFuncs [] = {
     { OptNegAX2,       	    "OptNegAX2",       	       	0      	},
     /* Optimize calls to negax */
     { OptNegAX3,       	    "OptNegAX3",       	       	0      	},
+    /* Optimize compares */
+    { OptCmp1,              "OptCmp1",                  0       },
+    /* Optimize compares */
+    { OptCmp2,              "OptCmp2",                  0       },
+    /* Optimize compares */
+    { OptCmp3,              "OptCmp3",                  0       },
     /* Remove unused loads */
     { OptUnusedLoads,	    "OptUnusedLoads",		0	},
     /* Optimize branch distance */

@@ -250,10 +250,26 @@ static void CmdAddFile (CmdDesc* Cmd, const char* File)
 	Cmd->FileMax = NewMax;
     }
 
-    /* Add a copy of the file name, allow a NULL pointer */
+    /* If the file name is not NULL (which is legal and is used to terminate
+     * the file list), check if the file name does already exist in the file
+     * list and print a warning if so. Regardless of the search result, add
+     * the file.
+     */
     if (File) {
+	unsigned I;
+	for (I = 0; I < Cmd->FileCount; ++I) {
+	    if (strcmp (Cmd->Files[I], File) == 0) {
+	     	/* Duplicate file */
+		Warning ("Duplicate file in argument list: `%s'", File);
+		/* No need to search further */
+	     	break;
+	    }
+	}
+
+	/* Add the file */
 	Cmd->Files [Cmd->FileCount++] = xstrdup (File);
     } else {
+	/* Add a NULL pointer */
 	Cmd->Files [Cmd->FileCount++] = 0;
     }
 }

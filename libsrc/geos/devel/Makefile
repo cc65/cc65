@@ -19,6 +19,7 @@
 S_OBJS	= crt0.o                \
           extzp.o               \
           fio_module.o          \
+          joy_stddrv.o          \
           mainargs.o            \
           oserror.o             \
           oserrlist.o           \

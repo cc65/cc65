@@ -12,7 +12,7 @@
 	.import	     	push0, callmain
 	.import	       	__BSS_RUN__, __BSS_SIZE__
 	.import		irq, nmi
-       	.import	       	k_irq, k_nmi, PLOT, UDTIM, SCNKEY
+       	.import	       	k_irq, k_nmi
 
 	.include     	"zeropage.inc"
 	.include    	"cbm610.inc"
@@ -102,17 +102,17 @@ Back:	ldx	spsave
 ; use the stack (since it's in page 1)!
 
       	tsx
-       	stx	spsave 		; Save the system stackpointer
-	ldx	#$FF
-	txs	       		; Set up our own stack
+       	stx	spsave 	 	; Save the system stackpointer
+ 	ldx	#$FF
+ 	txs	       	 	; Set up our own stack
 
 ; Set the interrupt, NMI and other vectors
 
-      	ldy	#vectable_size
-L0:   	lda	vectable-1,y
-      	sta	$FF80,y
+      	ldy	#vectors_size-1
+L0:    	lda    	vectors,y
+      	sta	$10000 - vectors_size,y
       	dey
-       	bne    	L0
+       	bpl     L0
 
 ; Switch the indirect segment to the system bank
 
@@ -123,7 +123,7 @@ L0:   	lda	vectable-1,y
 
    	lda  	#$90
    	sta	ptr1
-	lda	#$00
+ 	lda	#$00
    	sta	ptr1+1
    	ldy	#$62-1
 L1:	lda	(ptr1),y
@@ -133,19 +133,19 @@ L1:	lda	(ptr1),y
 
 ; Copy the page 3 vectors in place
 
-	ldy	#$00
-L2:	lda	p3vectable,y
+ 	ldy	#$00
+L2:	lda	p3vectors,y
   	sta	$300,y
    	iny
-  	cpy	#p3vectable_size
+  	cpy	#p3vectors_size
        	bne	L2
 
 ; Copy the rest of page 3 from the system bank
 
       	lda	#$00
       	sta	ptr1
-	lda	#$03
-	sta	ptr1+1
+ 	lda	#$03
+ 	sta	ptr1+1
 L3:	lda	(ptr1),y
    	sta	$300,y
    	iny
@@ -153,8 +153,8 @@ L3:	lda	(ptr1),y
 
 ; Set the indirect segment to bank we're executing in
 
-	lda	ExecReg
-	sta	IndReg
+ 	lda	ExecReg
+ 	sta	IndReg
 
 ; Zero the BSS segment. We will do that here instead calling the routine
 ; in the common library, since we have the memory anyway, and this way,
@@ -222,59 +222,20 @@ Z4:
 ; Additional data that we need for initialization and that's overwritten
 ; later
 
-vectable:
-      	jmp	$0000		; CINT
-      	jmp	$0000		; IOINIT
-      	jmp	$0000		; RAMTAS
-      	jmp	$0000	      	; RESTOR
-      	jmp	$0000	      	; VECTOR
-      	jmp	$0000	      	; SETMSG
-      	jmp	$0000  	      	; SECOND
-      	jmp	$0000	      	; TKSA
-      	jmp	$0000	      	; MEMTOP
-      	jmp	$0000	      	; MEMBOT
-      	jmp	SCNKEY
-      	jmp	$0000	      	; SETTMO
-      	jmp	$0000	      	; ACPTR
-      	jmp	$0000	      	; CIOUT
-      	jmp	$0000  	      	; UNTLK
-      	jmp	$0000	      	; UNLSN
-      	jmp	$0000	      	; LISTEN
-      	jmp	$0000	      	; TALK
-   	jmp	$0000	      	; READST
-       	jmp    	SETLFS
-       	jmp    	SETNAM
-     	jmp	$0000	      	; OPEN
-	jmp	$0000 	      	; CLOSE
-	jmp	$0000	      	; CHKIN
-	jmp	$0000	      	; CKOUT
-	jmp	$0000	      	; CLRCH
-	jmp	$0000	      	; BASIN
-      	jmp	$0000	      	; BSOUT
-	jmp	$0000	      	; LOAD
-	jmp	$0000	      	; SAVE
-	jmp	SETTIM
-       	jmp    	RDTIM
-	jmp	$0000	      	; STOP
-   	jmp	$0000	      	; GETIN
-	jmp	$0000	      	; CLALL
-	jmp	UDTIM
-   	jmp	SCREEN
-	jmp	PLOT
-	jmp	IOBASE
-   	sta	ExecReg
-	rts
-	.byte  	$01 	      	; Filler
+vectors:
+       	sta	ExecReg
+       	rts
+       	.byte  	$01 	      	; Filler
        	.word	nmi
        	.word	0     	      	; Reset - not used
        	.word	irq
-vectable_size	= * - vectable
+vectors_size   = * - vectors
 
-p3vectable:
-	.word	k_irq		; IRQ user vector
-	.word	k_brk		; BRK user vector
-	.word	k_nmi		; NMI user vector
-p3vectable_size	= * - p3vectable
+p3vectors:
+ 	.word	k_irq		; IRQ user vector
+ 	.word	k_brk		; BRK user vector
+ 	.word	k_nmi		; NMI user vector
+p3vectors_size = * - p3vectors
 
 
 ; ------------------------------------------------------------------------
@@ -327,65 +288,8 @@ Clear:	sta	$02,x
 ; Code that is copied into the system bank at $100 when switching back
 
 reset:	cli
-	jmp	$8000		   	; BASIC cold start
+	jmp	$8000		    	; BASIC cold start
 reset_size = * - reset
-
-; ------------------------------------------------------------------------
-; Code for a few simpler kernal calls goes here
-
-.export IOBASE
-.proc   IOBASE
-	ldx   	cia
-	ldy   	cia+1
-	rts
-.endproc
-
-.export SCREEN
-.proc   SCREEN
-   	ldx	#80		; Columns
-	ldy	#25		; Lines
-	rts
-.endproc
-
-.export SETLFS
-.proc   SETLFS
-        sta     LogicalAdr
-        stx     FirstAdr
-        sty     SecondAdr
-        rts
-.endproc
-
-.export SETNAM
-.proc   SETNAM
-        sta     FileNameLen
-        lda     $00,x
-        sta     FileNameAdrLo
-        lda     $01,x
-        sta     FileNameAdrHi
-        lda     $02,x
-        sta     FileNameAdrSeg
-        rts
-.endproc
-
-.export RDTIM
-.proc   RDTIM
-	sei
-	lda  	time+0
-   	ldx  	time+1
-	ldy  	time+2
-	cli
-	rts
-.endproc
-
-.export SETTIM
-.proc   SETTIM
-	sei
-	sta  	time+0
-   	stx  	time+1
-	sty	time+2
-	cli
-	rts
-.endproc
 
 ; -------------------------------------------------------------------------
 ; Data area - switch back to relocatable mode

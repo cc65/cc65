@@ -33,10 +33,19 @@ OBJS =	_scrsize.o	\
        	crt0.o 		\
        	crtc.o 		\
        	kbhit.o		\
+        kiec.o          \
+        kiobase.o       \
        	kirq.o 		\
        	kplot.o		\
+        krdtim.o        \
+        kreadst.o       \
 	kscnkey.o	\
+        kscreen.o       \
+        ksetlfs.o       \
+        ksetnam.o       \
+        ksettim.o       \
 	kudtim.o	\
+        kupdst.o        \
         mainargs.o      \
 	peeksys.o	\
 	pokesys.o	\

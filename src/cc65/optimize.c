@@ -3520,7 +3520,7 @@ static void OptTriples (void)
 	"\tjsr\tldaxysp",
 	"\tjsr\tldax0sp",
 	"\tjsr\tldaysp",
-	"\tjsr\tleaysp",
+	"\tjsr\tleaasp",
 	"\tjsr\tldaxi",
 	0
     };
@@ -3536,7 +3536,7 @@ static void OptTriples (void)
 	"\tjsr\tpushwysp",
        	"\tjsr\tpushw0sp",
 	"\tjsr\tpushbysp",
-	"\tjsr\tpleaysp",
+	"\tjsr\tpleaasp",
 	"\tjsr\tpushw",
     };
 
@@ -3648,6 +3648,27 @@ static Line* OptOneBlock (Line* L)
 	    /* We know about this function */
 	    A = X = -1;
 	    INC (Y, 1);
+	} else if (LineFullMatch (L, "\tjsr\taxulong")) {
+	    /* We know about this function and we're trying to replace it by
+	     * inline code if we have already a register that contains zero.
+	     */
+	    char C;
+	    if (A == 0) {
+	     	C = 'a';
+	    } else if (X == 0) {
+	     	C = 'x';
+	    } else if (Y == 0) {
+	     	C = 'y';
+	    } else {
+	     	C = '\0';
+	    }
+	    if (C == '\0') {
+		/* We cannot replace the code, but we know about the results */
+		Y = 0;
+	    } else {
+		L = ReplaceLine (L, "\tst%c\tsreg", C);
+		NewLineAfter (L, "\tst%c\tsreg+1", C);
+	    }
 	} else if (LineFullMatch (L, "\tjsr\tbnega")) {
 	    /* We know about this function */
 	    A = -1;
@@ -3660,10 +3681,33 @@ static Line* OptOneBlock (Line* L)
 	    /* We know about this function */
 	    A = -1;
 	    X = 0;
+	} else if (LineFullMatch (L, "\tjsr\tcomplax")) {
+	    /* We know about this function */
+	    if (A != -1) {
+		A ^= 0xFF;
+	    }
+	    if (X != -1) {
+		X ^= 0xFF;
+	    }
+	} else if (LineFullMatch (L, "\tjsr\tdecax1")) {
+	    /* We know about this function */
+	    A = X = -1;
+	} else if (LineFullMatch (L, "\tjsr\tdecax2")) {
+	    /* We know about this function */
+	    A = X = -1;
+	} else if (LineFullMatch (L, "\tjsr\tdecaxy")) {
+	    /* We know about this function */
+	    A = X = -1;
+	} else if (LineFullMatch (L, "\tjsr\tdeceaxy")) {
+	    /* We know about this function */
+	    A = X = -1;
       	} else if (LineFullMatch (L, "\tjsr\tincax1")) {
 	    /* We know about this function */
 	    A = X = -1;
 	} else if (LineFullMatch (L, "\tjsr\tincax2")) {
+	    /* We know about this function */
+	    A = X = -1;
+	} else if (LineFullMatch (L, "\tjsr\tinceaxy")) {
 	    /* We know about this function */
 	    A = X = -1;
 	} else if (LineFullMatch (L, "\tjsr\tladdeq")) {
@@ -3674,6 +3718,17 @@ static Line* OptOneBlock (Line* L)
 	    /* We know about this function */
 	    A = X = -1;
 	    Y = 3;
+	} else if (LineFullMatch (L, "\tjsr\tlbneg")) {
+	    /* We know about this function */
+       	    A = -1;
+	    X = 0;
+	} else if (LineFullMatch (L, "\tjsr\tldai")) {
+	    /* We know about this function */
+	    A = X = -1;
+	    Y = 0;
+	} else if (LineFullMatch (L, "\tjsr\tldaidx")) {
+	    /* We know about this function */
+	    A = X = -1;
 	} else if (LineFullMatch (L, "\tjsr\tldau00sp")) {
 	    /* We know about this function */
 	    A = -1;
@@ -3734,6 +3789,12 @@ static Line* OptOneBlock (Line* L)
 	    /* We know about this function */
 	    A = X = -1;
 	    Y = 3;
+       	} else if (LineFullMatch (L, "\tjsr\tnegax")) {
+	    /* We know about this function */
+	    A = X = -1;
+       	} else if (LineFullMatch (L, "\tjsr\tnegeax")) {
+	    /* We know about this function */
+	    A = X = -1;
       	} else if (LineFullMatch (L, "\tjsr\tpush0")) {
 	    /* We know about this function */
 	    A = 0;
@@ -3822,12 +3883,36 @@ static Line* OptOneBlock (Line* L)
 	    /* We know about this function (calls pushax) */
 	    A = X = -1;
 	    Y = 1;
+	} else if (LineFullMatch (L, "\tjsr\tresteax")) {
+	    /* We know about this function */
+	    A = X = -1;
+	} else if (LineFullMatch (L, "\tjsr\tsaveeax")) {
+	    /* We know about this function */
+	    /* Changes nothing */
+	} else if (LineFullMatch (L, "\tjsr\tshrax1")) {
+	    /* We know about this function */
+	    A = X = -1;
+	} else if (LineFullMatch (L, "\tjsr\tshrax2")) {
+	    /* We know about this function */
+	    A = X = -1;
+	} else if (LineFullMatch (L, "\tjsr\tshrax3")) {
+	    /* We know about this function */
+	    A = X = -1;
+	} else if (LineFullMatch (L, "\tjsr\tshreax1")) {
+	    /* We know about this function */
+	    A = X = -1;
+	} else if (LineFullMatch (L, "\tjsr\tshreax2")) {
+	    /* We know about this function */
+	    A = X = -1;
+	} else if (LineFullMatch (L, "\tjsr\tshreax3")) {
+	    /* We know about this function */
+	    A = X = -1;
 	} else if (LineFullMatch (L, "\tjsr\tstaspp")) {
 	    /* We know about this function */
 	    Y = -1;
 	} else if (LineFullMatch (L, "\tjsr\tstaxspp")) {
 	    /* We know about this function */
-	    Y = -1;
+	    Y = -1;				 
 	} else if (LineFullMatch (L, "\tjsr\tstax0sp")) {
 	    /* We know about this function */
 	    Y = 1;
@@ -3842,6 +3927,14 @@ static Line* OptOneBlock (Line* L)
 	    /* We know about this function */
 	    A = X = -1;
 	    INC (Y, 1);
+	} else if (LineFullMatch (L, "\tjsr\ttosadda0")) {
+	    /* We know about this function */
+	    A = X = -1;
+       	    Y = 1;
+	} else if (LineFullMatch (L, "\tjsr\ttosaddax")) {
+	    /* We know about this function */
+	    A = X = -1;
+       	    Y = 1;
 	} else if (LineFullMatch (L, "\tjsr\ttosicmp")) {
 	    /* We know about this function */
 	    A = X = -1;

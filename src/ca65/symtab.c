@@ -592,7 +592,11 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
     SymEntry* S;
 
     /* Check the parameters */
+#if (CD_TYPE_MIN != 0)
     CHECK (Type >= CD_TYPE_MIN && Type <= CD_TYPE_MAX);
+#else
+    CHECK (Type <= CD_TYPE_MAX);
+#endif    
     CHECK (Prio >= CD_PRIO_MIN && Prio <= CD_PRIO_MAX);
 
     /* Don't accept local symbols */

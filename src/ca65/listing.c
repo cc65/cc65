@@ -67,7 +67,7 @@ ListLine*       LineLast = 0;   	/* Last (current) listing line */
 /* Page and other formatting */
 int    	     	PageLength = -1;    	/* Length of a listing page */
 static unsigned	PageNumber = 1;		/* Current listing page number */
-static unsigned PageLines  = 0;		/* Current line on page */
+static int      PageLines  = 0;		/* Current line on page */
 static unsigned ListBytes  = 12;	/* Number of bytes to list for one line */
 
 /* Switch the listing on/off */

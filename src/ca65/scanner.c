@@ -687,7 +687,7 @@ Again:
 	/* Read the number */
 	IVal = 0;
 	while (IsDigit (C)) {
-	    if (IVal > (0xFFFFFFFF / 10)) {
+       	    if (IVal > (long) (0xFFFFFFFFUL / 10)) {
        	      	Error (ERR_NUM_OVERFLOW);
 	    	IVal = 0;
 	    }

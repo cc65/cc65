@@ -295,7 +295,7 @@ static void FuncRight (void)
     List = CollectTokens (0, 9999);
 
     /* Delete tokens from the list until Count tokens are remaining */
-    while (List->Count > Count) {
+    while (List->Count > (unsigned) Count) {
 	/* Get the first node */
 	TokNode* T = List->Root;
 

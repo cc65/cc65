@@ -510,7 +510,7 @@ int main (int argc, char* argv [])
 	{ "--version", 	       	0,	OptVersion		},
     };
 
-    int I;
+    unsigned I;
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "ca65");
@@ -553,7 +553,7 @@ int main (int argc, char* argv [])
 
        	        case 'o':
        		    OutFile = GetArg (&I, 2);
-       		    break;
+       	     	    break;
 
        		case 's':
        		    OptSmart (Arg, 0);

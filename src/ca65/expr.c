@@ -360,7 +360,7 @@ static int FuncStrAt (void)
     Index = ConstExpression ();
 
     /* Must be a valid index */
-    if (Index >= strlen (Str)) {
+    if (Index >= (long) strlen (Str)) {
 	Error (ERR_RANGE);
 	return 0;
     }

@@ -16,3 +16,4 @@ posixio-test.c  -       test POSIX file i/o routines (open/read/write/close)
 seek.c		-	test lseek()/fseek()/ftell()
 signal-test.c   -       small test program for signal/raise
 time-test.c     -       test the time/mktime/gmtime/asctime functions
+uname-test.c    -       test the uname function

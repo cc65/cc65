@@ -243,8 +243,8 @@ static void SetTok (int tok)
 static int ParseChar (void)
 /* Parse a character. Converts \n into EOL, etc. */
 {
-    int i;
-    unsigned val;
+    int I;
+    unsigned Val;
     int C;
 
     /* Check for escape chars */
@@ -253,51 +253,71 @@ static int ParseChar (void)
 	switch (CurC) {
 	    case 'b':
 	       	C = '\b';
-	   	break;
+	      	break;
      	    case 'f':
-	   	C = '\f';
-		break;
+	      	C = '\f';
+	      	break;
 	    case 'r':
-		C = '\r';
-		break;
+	      	C = '\r';
+	      	break;
 	    case 'n':
-		C = '\n';
-		break;
+	      	C = '\n';
+	      	break;
 	    case 't':
-		C = '\t';
-		break;
+	      	C = '\t';
+	      	break;
+            case 'v':
+                C = '\v';
+                break;
 	    case '\"':
-		C = '\"';
-		break;
+	      	C = '\"';
+	      	break;
 	    case '\'':
-		C = '\'';
-		break;
+	      	C = '\'';
+	      	break;
 	    case '\\':
-		C = '\\';
-		break;
+	      	C = '\\';
+	      	break;
 	    case 'x':
 	    case 'X':
-		/* Hex character constant */
-		NextChar ();
-		val = HexVal (CurC) << 4;
-		NextChar ();
-       	       	C = val | HexVal (CurC); 	/* Do not translate */
-		break;
+	      	/* Hex character constant */
+	      	NextChar ();
+	       	Val = HexVal (CurC) << 4;
+	      	NextChar ();
+       	       	C = Val | HexVal (CurC); 	/* Do not translate */
+	      	break;
 	    case '0':
 	    case '1':
 	    case '2':
 	    case '3':
+	    case '4':
+	    case '5':
+	    case '6':
+	    case '7':
 		/* Octal constant */
-		i = 0;
-     		C = CurC - '0';
-       	       	while (NextC >= '0' && NextC <= '7' && i++ < 4) {
+		I = 0;
+       	       	Val = CurC - '0';
+       	       	while (NextC >= '0' && NextC <= '7' && ++I <= 3) {
      	 	    NextChar ();
-     	       	    C = (C << 3) | (CurC - '0');
+     	       	    Val = (Val << 3) | (CurC - '0');
      		}
+                C = (int) Val;
+                if (Val >= 256) {
+                    Error ("Character constant out of range");
+                    C = ' ';
+                }
      		break;
      	    default:
      		Error ("Illegal character constant");
 		C = ' ';
+                /* Try to do error recovery, otherwise the compiler will spit
+                 * out thousands of errors in this place and abort.
+                 */
+                if (CurC != '\'' && CurC != '\0') {
+                    while (NextC != '\'' && NextC != '\"' && NextC != '\0') {
+                        NextChar ();
+                    }
+                }
 		break;
      	}
     } else {

@@ -34,6 +34,7 @@
 
 
 /* common */
+#include "check.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -111,6 +112,14 @@ const char* GetFuncName (const Function* F)
 /* Return the name of the current function */
 {
     return F->FuncEntry->Name;
+}
+
+
+
+unsigned GetParamCount (const Function* F)
+/* Return the parameter count for the current function */
+{
+    return F->Desc->ParamCount;
 }
 
 
@@ -213,11 +222,6 @@ void NewFunc (SymEntry* Func)
     /* Function body now defined */
     Func->Flags |= SC_DEF;
 
-    /* C functions cannot currently have __fastcall__ calling conventions */
-    if (IsFastCallFunc (Func->Type)) {
-    	Error ("__fastcall__ is not allowed for C functions");
-    }
-
     /* Need a starting curly brace */
     if (curtok != TOK_LCURLY) {
     	Error ("`{' expected");
@@ -230,7 +234,25 @@ void NewFunc (SymEntry* Func)
     g_usecode ();
     g_defgloblabel (Func->Name);
 
-    /* If stack cehcking code is requested, emit a call to the helper routine */
+    /* If this is a fastcall function, push the last parameter onto the stack */
+    if (IsFastCallFunc (Func->Type) && D->ParamCount > 0 && (D->Flags & FD_ELLIPSIS) == 0) {
+
+	unsigned Flags;
+
+	/* Get a pointer to the last parameter entry */
+	SymEntry* LastParam = D->SymTab->SymTail;
+
+	/* Generate the push */
+	if (IsTypeFunc (LastParam->Type)) {
+	    /* Pointer to function */
+	    Flags = CF_PTR;
+	} else {
+	    Flags = TypeOf (LastParam->Type) | CF_FORCECHAR;
+	}
+	g_push (Flags, 0);
+    }
+
+    /* If stack checking code is requested, emit a call to the helper routine */
     if (CheckStack) {
 	g_stackcheck ();
     }

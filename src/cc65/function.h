@@ -34,6 +34,9 @@ extern Function* CurrentFunc;
 const char* GetFuncName (const Function* F);
 /* Return the name of the current function */
 
+unsigned GetParamCount (const Function* F);
+/* Return the parameter count for the current function */
+
 unsigned GetParamSize (const Function* F);
 /* Return the parameter size for the current function */
 

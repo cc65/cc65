@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000	 Ullrich von Bassewitz                                       */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -164,7 +164,7 @@ ExprNode* DoAsm (void)
     if (CurTok.Tok != TOK_SCONST) {
 
        	/* Print an error */
-     	Error (ERR_STRLIT_EXPECTED);
+     	Error ("String literal expected");
 
 	/* To be on the safe side later, insert an empty asm string */
 	AppendItem (N, xstrdup (""));
@@ -238,7 +238,7 @@ static ExprNode* Primary (void)
      */
     if (Preprocessing) {
        	/* Illegal expression in PP mode */
-	Error (ERR_CPP_EXPR_EXPECTED);
+	Error ("Preprocessor expression expected");
 
 	/* Skip the token for error recovery */
 	NextToken ();
@@ -266,11 +266,11 @@ static ExprNode* Primary (void)
     	    /* Check for illegal symbol types */
 	    if ((Sym->Flags & SC_LABEL) == SC_LABEL) {
 	       	/* Cannot use labels in expressions */
-	       	Error (ERR_SYMBOL_KIND);
+	       	Error ("Cannot use a label in an expression");
 	       	return GetIntNode (0);
        	    } else if (Sym->Flags & SC_TYPE) {
 	       	/* Cannot use type symbols */
-	       	Error (ERR_VAR_IDENT_EXPECTED);
+	       	Error ("Cannot use a type in an expression");
 	       	/* Assume an int type to make lval valid */
 	   	return GetIntNode (0);
 	    }
@@ -307,7 +307,7 @@ static ExprNode* Primary (void)
 	    if (CurTok.Tok == TOK_LPAREN) {
 
 	     	/* Warn about the use of a function without prototype */
-	     	Warning (WARN_FUNC_WITHOUT_PROTO);
+	     	Warning ("Function call without a prototype");
 
 	     	/* Declare a function returning int. For that purpose, prepare
 	     	 * a function signature for a function having an empty param
@@ -320,7 +320,7 @@ static ExprNode* Primary (void)
 	    } else {
 
 	     	/* Print an error about an undeclared variable */
-	     	Error (ERR_UNDEFINED_SYMBOL, Ident);
+	     	Error ("Undefined symbiol: `%s'", Ident);
 
 	     	/* Undeclared Variable */
 	     	Sym = AddLocalSym (Ident, type_int, SC_AUTO | SC_REF, 0);
@@ -370,7 +370,7 @@ static ExprNode* Primary (void)
     } else {
 
 	/* Illegal primary. */
-	Error (ERR_EXPR_EXPECTED);
+	Error ("Expression expected");
        	N = GetIntNode (0);
 
     }
@@ -402,7 +402,7 @@ static ExprNode* DoArray (ExprNode* Left)
 	/* Right side must be some sort of integer */
 	if (!IsClassInt (Right->Type)) {
 	    /* Print an error */
-	    Error (ERR_CANNOT_SUBSCRIPT);
+	    Error ("Invalid subscript");
 	    /* To avoid problems later, create a new, legal subscript
 	     * expression
 	     */
@@ -413,9 +413,9 @@ static ExprNode* DoArray (ExprNode* Left)
 	ExprNode* Tmp;
 
 	/* Left side must be some sort of integer */
-	if (!IsClassInt (Right->Type)) {
+	if (!IsClassInt (Left->Type)) {
 	    /* Print an error */
-	    Error (ERR_CANNOT_SUBSCRIPT);
+	    Error ("Invalid subscript");
 	    /* To avoid problems later, create a new, legal subscript
 	     * expression
 	     */
@@ -431,7 +431,7 @@ static ExprNode* DoArray (ExprNode* Left)
 	/* Invalid array expression. Skip the closing bracket, then return
 	 * an integer instead of the array expression to be safe later.
 	 */
-	Error (ERR_CANNOT_SUBSCRIPT);
+	Error ("Invalid subscript");
 	ConsumeRBrack ();
 	return GetIntNode (0);
     }
@@ -473,7 +473,7 @@ static ExprNode* DoStruct (ExprNode* Left)
     if (CurTok.Tok == TOK_PTR_REF) {
 	NT = NT_STRUCTPTR_ACCESS;
 	if (!IsTypePtr (StructType)) {
-	    Error (ERR_STRUCT_PTR_EXPECTED);
+	    Error ("Struct pointer expected");
 	    return GetIntNode (0);
 	}
 	StructType = Indirect (StructType);
@@ -481,7 +481,7 @@ static ExprNode* DoStruct (ExprNode* Left)
 	NT = NT_STRUCT_ACCESS;
     }
     if (!IsClassStruct (StructType)) {
-	Error (ERR_STRUCT_EXPECTED);
+	Error ("Struct expected");
 	return GetIntNode (0);
     }
 
@@ -489,7 +489,7 @@ static ExprNode* DoStruct (ExprNode* Left)
     NextToken ();
     if (CurTok.Tok != TOK_IDENT) {
     	/* Print an error */
-    	Error (ERR_IDENT_EXPECTED);
+    	Error ("Identifier expected");
     	/* Return an integer expression instead */
     	return GetIntNode (0);
     }
@@ -500,7 +500,7 @@ static ExprNode* DoStruct (ExprNode* Left)
     Field = FindStructField (StructType, Ident);
     if (Field == 0) {
     	/* Struct field not found */
-     	Error (ERR_STRUCT_FIELD_MISMATCH, Ident);
+     	Error ("Struct/union has no field named `%s'", Ident);
     	/* Return an integer expression instead */
     	return GetIntNode (0);
     }
@@ -539,7 +539,7 @@ static ExprNode* DoFunctionCall (ExprNode* Left)
     if (!IsTypeFunc (Left->Type) && !IsTypeFuncPtr (Left->Type)) {
 
 	/* Call to non function */
-	Error (ERR_ILLEGAL_FUNC_CALL);
+	Error ("Illegal function call");
 
 	/* Free the old tree */
 	FreeExprTree (Left);
@@ -590,7 +590,7 @@ static ExprNode* DoFunctionCall (ExprNode* Left)
 	    /* Too many arguments. Do we have an open param list? */
 	    if ((Func->Flags & FD_ELLIPSIS) == 0) {
 	      	/* End of param list reached, no ellipsis */
-     	      	Error (ERR_TOO_MANY_FUNC_ARGS);
+     	      	Error ("Too many function arguments");
 	    }
 	    /* Assume an ellipsis even in case of errors to avoid an error
 	     * message for each other argument.
@@ -615,7 +615,7 @@ static ExprNode* DoFunctionCall (ExprNode* Left)
 
     /* Check if we had enough parameters */
     if (ParamCount < Func->ParamCount) {
-      	Error (ERR_TOO_FEW_FUNC_ARGS);
+      	Error ("Too few function arguments");
     }
 
     /* Return the function call node */
@@ -639,7 +639,7 @@ static ExprNode* DoPostIncDec (ExprNode* Left)
     if (Left->LValue == 0) {
 
     	/* Print a diagnostics */
-     	Error (ERR_LVALUE_EXPECTED);
+     	Error ("lvalue expected");
 
     	/* It is safe to return the operand expression and probably better
     	 * than returning an int, since the operand expression already has
@@ -721,7 +721,7 @@ static ExprNode* DoPreIncDec (void)
     if (Op->LValue == 0) {
 
     	/* Print a diagnostics */
-     	Error (ERR_LVALUE_EXPECTED);
+     	Error ("lvalue expected");
 
     	/* It is safe to return the operand expression and probably better
     	 * than returning an int, since the operand expression already has
@@ -758,7 +758,7 @@ static ExprNode* DoUnaryPlusMinus (void)
     if (!IsClassInt (Op->Type) && !IsClassFloat (Op->Type)) {
 
 	/* Output diagnostic */
-	Error (ERR_SYNTAX);
+	Error ("Syntax error");
 
 	/* Free the errorneous node */
 	FreeExprTree (Op);
@@ -817,7 +817,7 @@ static ExprNode* DoComplement (void)
     if (!IsClassInt (Op->Type)) {
 
 	/* Display diagnostic */
-	Error (ERR_OP_NOT_ALLOWED);
+	Error ("Operation not allowed on this type");
 
 	/* Free the errorneous node */
 	FreeExprTree (Op);
@@ -890,7 +890,7 @@ static ExprNode* DoAddress (void)
 	ExprNode* Root;
 
     	/* Print diagnostics */
-    	Error (ERR_ILLEGAL_ADDRESS);
+    	Error ("Cannot take address of rvalue");
 
     	/* Free the problematic tree */
     	FreeExprTree (Op);
@@ -924,7 +924,7 @@ static ExprNode* DoIndirect (void)
     if (!IsClassPtr (Op->Type)) {
 
     	/* Print diagnostics */
-    	Error (ERR_ILLEGAL_INDIRECT);
+    	Error ("Illegal indirection");
 
     	/* Free the problematic tree */
     	FreeExprTree (Op);
@@ -1089,7 +1089,7 @@ static ExprNode* DoMul (ExprNode* Left)
 
     /* Check the type of the left operand */
     if (!IsClassInt (Left->Type) && !IsClassFloat (Left->Type)) {
-     	MError ("Invalid left operand to binary operator `*'");
+     	Error ("Invalid left operand to binary operator `*'");
     	FreeExprTree (Left);
     	Left = GetIntNode (0);
     }
@@ -1102,7 +1102,7 @@ static ExprNode* DoMul (ExprNode* Left)
 
     /* Check the type of the right operand */
     if (!IsClassInt (Right->Type) && !IsClassFloat (Right->Type)) {
-     	MError ("Invalid right operand to binary operator `*'");
+     	Error ("Invalid right operand to binary operator `*'");
 	FreeExprTree (Right);
 	Right = GetIntNode (0);
     }
@@ -1295,7 +1295,7 @@ static ExprNode* AndExpr (void)
 	if (!IsClassInt (Left->Type) || !IsClassInt (Right->Type)) {
 
 	    /* Print a diagnostic */
-	    Error (ERR_OP_NOT_ALLOWED);
+	    Error ("Operation not allowed for these types");
 
 	    /* Remove the unneeded nodes */
 	    FreeExprTree (Right);
@@ -1358,7 +1358,7 @@ static ExprNode* XorExpr (void)
 	if (!IsClassInt (Left->Type) || !IsClassInt (Right->Type)) {
 
 	    /* Print a diagnostic */
-	    Error (ERR_OP_NOT_ALLOWED);
+	    Error ("Operation not allowed for these types");
 
 	    /* Remove the unneeded nodes */
 	    FreeExprTree (Right);
@@ -1421,7 +1421,7 @@ static ExprNode* OrExpr (void)
 	if (!IsClassInt (Left->Type) || !IsClassInt (Right->Type)) {
 
 	    /* Print a diagnostic */
-	    Error (ERR_OP_NOT_ALLOWED);
+	    Error ("Operation not allowed for these types");
 
 	    /* Remove the unneeded nodes */
 	    FreeExprTree (Right);

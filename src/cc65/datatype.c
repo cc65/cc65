@@ -450,7 +450,7 @@ unsigned TypeOf (const type* T)
     FuncDesc* F;
 
     switch (UnqualifiedType (T[0])) {
-	    
+
 	case T_SCHAR:
     	    return CF_CHAR;
 
@@ -648,6 +648,17 @@ int IsFastCallFunc (const type* T)
 
 
 
+int IsEllipsisFunc (const type* T)
+/* Return true if this is a function type with variable parameter list */
+{
+    FuncDesc* F;
+    CHECK (IsTypeFunc (T));
+    F = DecodePtr (T+1);
+    return (F->Flags & FD_ELLIPSIS) != 0;
+}
+
+
+
 int IsTypeFuncPtr (const type* T)
 /* Return true if this is a function pointer */
 {
@@ -657,7 +668,7 @@ int IsTypeFuncPtr (const type* T)
 
 
 type GetType (const type* T)
-/* Get the raw type */
+/* Get the raw type */		  
 {
     PRECONDITION (T[0] != T_END);
     return (T[0] & T_MASK_TYPE);

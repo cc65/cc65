@@ -283,6 +283,9 @@ int IsQualVolatile (const type* T) attribute ((const));
 int IsFastCallFunc (const type* T) attribute ((const));
 /* Return true if this is a function type with __fastcall__ calling conventions */
 
+int IsEllipsisFunc (const type* T) attribute ((const));
+/* Return true if this is a function type with variable parameter list */
+
 int IsTypeFuncPtr (const type* T) attribute ((const));
 /* Return true if this is a function pointer */
 

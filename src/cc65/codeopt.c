@@ -952,14 +952,17 @@ static unsigned OptPtrLoad6 (CodeSeg* S)
 static unsigned OptDecouple (CodeSeg* S)
 /* Decouple operations, that is, do the following replacements:
  *
- *   dex  -> ldx
- *   inx  -> ldx
- *   dey  -> ldy
- *   iny  -> ldy
- *   tax  -> ldx
- *   txa  -> lda
- *   tay  -> ldy
- *   tya  -> lda
+ *   dex        -> ldx #imm
+ *   inx        -> ldx #imm
+ *   dey        -> ldy #imm
+ *   iny        -> ldy #imm
+ *   tax        -> ldx #imm
+ *   txa        -> lda #imm
+ *   tay        -> ldy #imm
+ *   tya        -> lda #imm
+ *   lda sreg   -> lda #imm
+ *   ldx sreg   -> ldx #imm
+ *   ldy sreg   -> ldy #imm
  *
  * Provided that the register values are known of course.
  */
@@ -1012,6 +1015,42 @@ static unsigned OptDecouple (CodeSeg* S)
 	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
 	    	}
 	        break;
+
+	    case OP65_LDA:
+	        if (E->AM == AM65_ZP) {
+		    if ((E->Use & REG_SREG_LO) != 0 && E->RI->In.SRegLo >= 0) {
+			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegLo);
+			X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, E->LI);
+		    } else if ((E->Use & REG_SREG_HI) != 0 && E->RI->In.SRegHi >= 0) {
+			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegHi);
+			X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, E->LI);
+		    }
+		}
+		break;
+
+	    case OP65_LDX:
+	        if (E->AM == AM65_ZP) {
+		    if ((E->Use & REG_SREG_LO) != 0 && E->RI->In.SRegLo >= 0) {
+			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegLo);
+			X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, E->LI);
+		    } else if ((E->Use & REG_SREG_HI) != 0 && E->RI->In.SRegHi >= 0) {
+			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegHi);
+			X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, E->LI);
+		    }
+		}
+		break;
+
+	    case OP65_LDY:
+	        if (E->AM == AM65_ZP) {
+		    if ((E->Use & REG_SREG_LO) != 0 && E->RI->In.SRegLo >= 0) {
+			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegLo);
+			X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
+		    } else if ((E->Use & REG_SREG_HI) != 0 && E->RI->In.SRegHi >= 0) {
+			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegHi);
+			X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
+		    }
+		}
+		break;
 
 	    case OP65_TAX:
 	        if (E->RI->In.RegA >= 0) {

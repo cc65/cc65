@@ -341,7 +341,7 @@ zap:	clean
 	@for i in cbm common conio dbg em joystick mouse runtime tgi zlib $(ALLTARGETS); do\
 	   $(MAKE) -C $$i zap;     	    	       	      	   		\
 	done
-	@$(RM) *.o *.emd *.joy *.lib *.tgi
+	@$(RM) *.o *.emd *.joy *.lib *.tgi *.ser *.mou
 
 
 

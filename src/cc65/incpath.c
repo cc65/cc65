@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -34,6 +34,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #if defined(_MSC_VER)
 /* Microsoft compiler */
@@ -186,6 +187,27 @@ char* FindInclude (const char* Name, unsigned Where)
 	return Find (UserIncludePath, Name);
     }
     return 0;
+}
+
+
+
+void InitIncludePaths (void)
+/* Initialize the include path search list */
+{
+    const char* Path;
+
+    /* Add some standard paths to the include search path */
+    AddIncludePath ("", INC_USER);		/* Current directory */
+    AddIncludePath ("include", INC_SYS);
+#ifdef CC65_INC
+    AddIncludePath (CC65_INC, INC_SYS);
+#else
+    AddIncludePath ("/usr/lib/cc65/include", INC_SYS);
+#endif
+    Path = getenv ("CC65_INC");
+    if (Path) {
+	AddIncludePath (Path, INC_SYS | INC_USER);
+    }
 }
 
 

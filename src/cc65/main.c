@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -654,6 +654,9 @@ int main (int argc, char* argv[])
 
     /* Initialize the default segment names */
     InitSegNames ();
+
+    /* Initialize the include search paths */
+    InitIncludePaths ();
 
     /* Parse the command line */
     I = 1;

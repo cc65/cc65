@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -51,7 +51,6 @@
 #include "expr.h"
 #include "function.h"
 #include "global.h"
-#include "incpath.h"
 #include "input.h"
 #include "litpool.h"
 #include "macrotab.h"
@@ -270,7 +269,6 @@ static void Parse (void)
 void Compile (const char* FileName)
 /* Top level compile routine. Will setup things and call the parser. */
 {
-    char*       Path;
     char        Buf[20];
     char        DateStr[20];
     char        TimeStr[20];
@@ -284,19 +282,6 @@ void Compile (const char* FileName)
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
-
-    /* Add some standard paths to the include search path */
-    AddIncludePath ("", INC_USER);		/* Current directory */
-    AddIncludePath ("include", INC_SYS);
-#ifdef CC65_INC
-    AddIncludePath (CC65_INC, INC_SYS);
-#else
-    AddIncludePath ("/usr/lib/cc65/include", INC_SYS);
-#endif
-    Path = getenv ("CC65_INC");
-    if (Path) {
-	AddIncludePath (Path, INC_SYS | INC_USER);
-    }
 
     /* Add macros that are always defined */
     DefineNumericMacro ("__CC65__", (VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH);

@@ -3,20 +3,21 @@
 ; Ullrich von Bassewitz, 2003-03-07
 ; Based on code from Stefan A. Haubenthal, <polluks@web.de>
 ; 2003-05-18, Greg King
+; 2004-04-28, Ullrich von Bassewitz
 ;
 ; Scan a group of arguments that are in BASIC's input-buffer.
 ; Build an array that points to the beginning of each argument.
 ; Send, to main(), that array and the count of the arguments.
-
+;
 ; Command-lines look like these lines:
 ;
 ; run
-; run : rem  no arguments because no comma!
-; run:rem,arg1," arg 2" , arg 3 ,, arg5, ...
+; run : rem
+; run:rem arg1 " arg 2 is quoted "  arg3 "" arg5
 ;
-; "run" and "rem" are entokenned; the args. are not.  Leading spaces are
-; ignored; trailing spaces are included -- unless the argument was quoted.
-
+; "run" and "rem" are entokenned; the args. are not.  Leading and trailing
+; spaces outside of quotes are ignored.
+;
 ; TO-DO:
 ; - The "file-name" might be a path-name; don't copy the directory-components.
 ; - Add a control-character quoting mechanism.
@@ -133,4 +134,4 @@ name:	.res	NAME_LEN + 1
 .data
 argv:   .addr   name
         .res   	MAXARGS * 2
-                 
+

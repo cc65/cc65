@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
-/*               D-70794 Filderstadt                                         */
-/* EMail:        uz@cc65.org                                                 */
+/* (C) 2003-2005, Ullrich von Bassewitz                                      */
+/*                Römerstrasse 52                                            */
+/*                D-70794 Filderstadt                                        */
+/* EMail:         uz@cc65.org                                                */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -64,10 +64,12 @@ static const FileType TypeTable[] = {
     {   "GRC",	FILETYPE_GR	},
     {   "JOY",  FILETYPE_O65    },
     {   "LIB",	FILETYPE_LIB	},
+    {   "MOU",  FILETYPE_O65    },
     {   "O",	FILETYPE_OBJ	},
     {   "O65",  FILETYPE_O65    },
     {   "OBJ",	FILETYPE_OBJ	},
     {   "S",	FILETYPE_ASM	},
+    {   "SER",  FILETYPE_O65    },
     {   "TGI",  FILETYPE_O65    },
 
     {   "a",	FILETYPE_LIB	},
@@ -78,10 +80,12 @@ static const FileType TypeTable[] = {
     {   "grc",	FILETYPE_GR	},
     {   "joy",  FILETYPE_O65    },
     {   "lib",	FILETYPE_LIB	},
+    {   "mou",  FILETYPE_O65    },
     {   "o",	FILETYPE_OBJ	},
     {   "o65",  FILETYPE_O65    },
     {   "obj",	FILETYPE_OBJ	},
     {   "s",	FILETYPE_ASM	},
+    {   "ser",  FILETYPE_O65    },
     {   "tgi",  FILETYPE_O65    },
 };
 
@@ -116,7 +120,7 @@ FILETYPE GetFileType (const char* Name)
     /* Do we have an extension? */
     if (Ext == 0) {
     	return FILETYPE_UNKNOWN;
-    }    
+    }
 
     /* Search for a table entry */
     FT = bsearch (Ext+1, TypeTable, FILETYPE_COUNT, sizeof (FileType), Compare);

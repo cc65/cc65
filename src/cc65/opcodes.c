@@ -679,7 +679,7 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
     {   OP65_TYA,      	                        /* opcode */
        	"tya", 	       	                        /* mnemonic */
        	1,     	       	                        /* size */
-       	REG_A, 	       	                        /* use */
+       	REG_Y, 	       	                        /* use */
        	REG_A, 	       	                        /* chg */
 	OF_XFR	      		 		/* flags */
     },

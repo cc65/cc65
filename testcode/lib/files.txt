@@ -1,0 +1,10 @@
+
+Test programs for the runtime lib:
+----------------------------------
+
+ft.c		-	File I/O test program (open + read functions)
+getsp.s		-	Helper routine for ft.c
+
+joytest.c	-	readjoy function test program
+
+cprintf.c	-	test program for cprintf \n and \r operators

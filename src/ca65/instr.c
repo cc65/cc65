@@ -147,7 +147,7 @@ static const struct {
 };
 
 /* Instruction table for the 6502 with illegal instructions */
-#define INS_COUNT_6502X        	57
+#define INS_COUNT_6502X        	70
 static const struct {
     unsigned Count;
     InsDesc  Ins[INS_COUNT_6502X];
@@ -155,8 +155,12 @@ static const struct {
     INS_COUNT_6502X,
     {
        	{ "ADC",  0x080A26C, 0x60, 0, PutAll },
+        { "ALR",  0x0800000, 0x4B, 0, PutAll },         /* X */
+        { "ANC",  0x0800000, 0x0B, 0, PutAll },         /* X */
        	{ "AND",  0x080A26C, 0x20, 0, PutAll },
+        { "ARR",  0x0800000, 0x6B, 0, PutAll },         /* X */
        	{ "ASL",  0x000006e, 0x02, 1, PutAll },
+        { "AXS",  0x0800000, 0xCB, 0, PutAll },         /* X */
        	{ "BCC",  0x0020000, 0x90, 0, PutPCRel8 },
        	{ "BCS",  0x0020000, 0xb0, 0, PutPCRel8 },
        	{ "BEQ",  0x0020000, 0xf0, 0, PutPCRel8 },
@@ -174,6 +178,7 @@ static const struct {
        	{ "CMP",  0x080A26C, 0xc0, 0, PutAll },
        	{ "CPX",  0x080000C, 0xe0, 1, PutAll },
        	{ "CPY",  0x080000C, 0xc0, 1, PutAll },
+        { "DCP",  0x000A26C, 0xC3, 0, PutAll },         /* X */
        	{ "DEC",  0x000006C, 0x00, 3, PutAll },
        	{ "DEX",  0x0000001, 0xca, 0, PutAll },
        	{ "DEY",  0x0000001, 0x88, 0, PutAll },
@@ -181,9 +186,12 @@ static const struct {
        	{ "INC",  0x000006c, 0x00, 4, PutAll },
        	{ "INX",  0x0000001, 0xe8, 0, PutAll },
        	{ "INY",  0x0000001, 0xc8, 0, PutAll },
+        { "ISC",  0x000A26C, 0xE3, 0, PutAll },         /* X */
         { "JAM",  0x0000001, 0x02, 0, PutAll },         /* X */
        	{ "JMP",  0x0000808, 0x4c, 6, PutJMP },
        	{ "JSR",  0x0000008, 0x20, 7, PutAll },
+        { "LAS",  0x0000200, 0xBB, 0, PutAll },         /* X */
+        { "LAX",  0x000A30C, 0xA3, 1, PutAll },         /* X */
        	{ "LDA",  0x080A26C, 0xa0, 0, PutAll },
        	{ "LDX",  0x080030C, 0xa2, 1, PutAll },
        	{ "LDY",  0x080006C, 0xa0, 1, PutAll },
@@ -194,14 +202,19 @@ static const struct {
        	{ "PHP",  0x0000001, 0x08, 0, PutAll },
        	{ "PLA",  0x0000001, 0x68, 0, PutAll },
        	{ "PLP",  0x0000001, 0x28, 0, PutAll },
+        { "RLA",  0x000A26C, 0x23, 0, PutAll },         /* X */
        	{ "ROL",  0x000006F, 0x22, 1, PutAll },
        	{ "ROR",  0x000006F, 0x62, 1, PutAll },
+        { "RRA",  0x000A26C, 0x63, 0, PutAll },         /* X */
        	{ "RTI",  0x0000001, 0x40, 0, PutAll },
        	{ "RTS",  0x0000001, 0x60, 0, PutAll },
+        { "SAX",  0x000810C, 0x83, 1, PutAll },         /* X */
        	{ "SBC",  0x080A26C, 0xe0, 0, PutAll },
        	{ "SEC",  0x0000001, 0x38, 0, PutAll },
        	{ "SED",  0x0000001, 0xf8, 0, PutAll },
        	{ "SEI",  0x0000001, 0x78, 0, PutAll },
+        { "SLO",  0x000A26C, 0x03, 0, PutAll },         /* X */
+        { "SRE",  0x000A26C, 0x43, 0, PutAll },         /* X */
        	{ "STA",  0x000A26C, 0x80, 0, PutAll },
        	{ "STX",  0x000010c, 0x82, 1, PutAll },
        	{ "STY",  0x000002c, 0x80, 1, PutAll },
@@ -406,7 +419,7 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[INS_COUNT_65816];
 } InsTab65816 = {
-    INS_COUNT_65816,
+    INS_COUNT_65816,             
     {
        	{ "ADC",  0x0b8f6fc, 0x60, 0, PutAll },
        	{ "AND",  0x0b8f6fc, 0x20, 0, PutAll },
@@ -544,7 +557,7 @@ unsigned char EATab [9][AMI_COUNT] = {
     },
     {   /* Table 1 */
      	0x08, 0x08, 0x04, 0x0C, 0x00, 0x14, 0x1C, 0x00,
-     	0x14, 0x1C, 0x00, 0x80, 0x00, 0x00, 0x00, 0x00,
+     	0x14, 0x1C, 0x00, 0x80, 0x00, 0x10, 0x00, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
        	0x00
     },
@@ -552,7 +565,7 @@ unsigned char EATab [9][AMI_COUNT] = {
      	0x00, 0x00, 0x24, 0x2C, 0x0F, 0x34, 0x3C, 0x00,
       	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
      	0x00, 0x00, 0x00, 0x00, 0x00, 0x89, 0x00, 0x00,
-       	0x00                        
+       	0x00
     },
     {   /* Table 3 */
      	0x3A, 0x3A, 0xC6, 0xCE, 0x00, 0xD6, 0xDE, 0x00,

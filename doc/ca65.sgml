@@ -309,6 +309,8 @@ The assembler accepts
 <itemize>
 <item>all valid 6502 mnemonics when in 6502 mode (the default or after the
       <tt><ref id=".P02" name=".P02"></tt> command was given).
+<item>all valid 6502 mnemonics plus a set of illegal instructions when in
+      <ref id="6502X-mode" name="6502X mode">.
 <item>all valid 65SC02 mnemonics when in 65SC02 mode (after the
       <tt><ref id=".PSC02" name=".PSC02"></tt> command was given).
 <item>all valid 65C02 mnemonics when in 65C02 mode (after the
@@ -338,17 +340,36 @@ mnemonics:
   	TSA is an alias for TSC
 </verb></tscreen>
 
-Evaluation of banked expressions in 65816 mode differs slightly from the
-official syntax:
 
-Instead of accepting a 24 bit address (something that is difficult for
-the assembler to determine and would have required one more special
-.import command), the bank and the absolute address in that bank are
-separated by a dot:
 
-<tscreen><verb>
-   	jsl	3.$1234	       	; Call subroutine at $1234 in bank 3
-</verb></tscreen>
+<sect1>6502X mode<label id="6502X-mode"><p>
+
+6502X mode is an extension to the normal 6502 mode. In this mode, several
+mnemomics for illegal instructions of the NMOS 6502 CPUs are accepted. Since
+these instructions are illegal, there are no official mnemonics for them. The
+unofficial ones are taken from <htmlurl
+url="http://oxyron.net/graham/opcodes02.html"
+name="http://oxyron.net/graham/opcodes02.html">. Please note that only the
+ones marked as "stable" are supported. The following table uses information
+from the mentioned web page, for more information, see there.
+
+<itemize>
+<item><tt>ALR: A:=(A and #{imm})*2;</tt>
+<item><tt>ANC: A:=A and #{imm};</tt> Generates opcode &dollar;0B.
+<item><tt>ARR: A:=(A and #{imm})/2;</tt>
+<item><tt>AXS: X:=A and X-#{imm};</tt>
+<item><tt>DCP: {adr}:={adr}-1; A-{adr};</tt>
+<item><tt>ISC: {adr}:={adr}+1; A:=A-{adr};</tt>
+<item><tt>LAS: A,X,S:={adr} and S;</tt>
+<item><tt>LAX: A,X:={adr};</tt>
+<item><tt>RLA: {adr}:={adr}rol; A:=A and {adr};</tt>
+<item><tt>RRA: {adr}:={adr}ror; A:=A adc {adr};</tt>
+<item><tt>SAX: {adr}:=A and X;</tt>
+<item><tt>SLO: {adr}:={adr}*2; A:=A or {adr};</tt>
+<item><tt>SRE: {adr}:={adr}/2; A:=A xor {adr};</tt>
+</itemize>
+
+
 
 <sect1>Number format<p>
 
@@ -2955,9 +2976,10 @@ Here's a list of all control commands and a description, what they do:
   Switch the CPU instruction set. The command is followed by a string that
   specifies the CPU. Possible values are those that can also be supplied to
   the <tt><ref id="option--cpu" name="--cpu"></tt> command line option,
-  namely: 6502, 65SC02, 65C02, 65816 and sunplus. Please note that support
-  for the sunplus CPU is not available in the freeware version, because the
-  instruction set of the sunplus CPU is "proprietary and confidential".
+  namely: 6502, 6502X, 65SC02, 65C02, 65816 and sunplus. Please note that 
+  support for the sunplus CPU is not available in the freeware version,
+  because the instruction set of the sunplus CPU is "proprietary and
+  confidential".
 
   See: <tt><ref id=".CPU" name=".CPU"></tt>,
        <tt><ref id=".IFP02" name=".IFP02"></tt>,

@@ -105,6 +105,20 @@ static unsigned char IsCharInSet (unsigned char C)
 
 
 
+static void InvertCharSet (void)
+/* Invert the character set */
+{
+    asm ("ldy #%b", sizeof (CharSet) - 1);
+    asm ("L1:");
+    asm ("lda %v,y", CharSet);
+    asm ("eor #$FF");
+    asm ("sta %v,y", CharSet);
+    asm ("dey");
+    asm ("bpl L1");
+}
+
+
+
 /*****************************************************************************/
 /*  		       		     Code				     */
 /*****************************************************************************/
@@ -206,7 +220,7 @@ static void AssignInt (void)
 
 
 
-int _scanf (struct indesc* D_, const char* format, va_list ap_)
+int _scanf (struct indesc* D_, register const char* format, va_list ap_)
 /* This is the routine used to do the actual work. It is called from several
  * types of wrappers to implement the actual ISO xxscanf functions.
  */
@@ -467,9 +481,7 @@ FlagsDone:
 
                         /* Invert the set if requested */
                         if (Invert) {
-                            for (Start = 0; Start < sizeof (CharSet); ++Start) {
-                                CharSet[Start] ^= 0xFF;
-                            }
+                            InvertCharSet ();
                         }
 
                         /* We have the set in CharSet. Read characters and

@@ -1,66 +1,43 @@
 #
-# CL65 Makefile for the Watcom compiler
+# CL65 Makefile for the Watcom compiler (using GNU make)
 #
 
 # ------------------------------------------------------------------------------
 # Generic stuff
 
-.AUTODEPEND
-.SUFFIXES	.ASM .C .CC .CPP
-.SWAP
-
 AR	= WLIB
 LD	= WLINK
-
-!if !$d(TARGET)
-!if $d(__OS2__)
-TARGET = OS2
-!else
-TARGET = NT
-!endif
-!endif
-
-# target specific macros.
-!if $(TARGET)==OS2
+LNKCFG  = ld.tmp
 
 # --------------------- OS2 ---------------------
-SYSTEM = os2v2
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!elif $(TARGET)==DOS32
+ifeq ($(TARGET),OS2)
+SYSTEM  = os2v2
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # -------------------- DOS4G --------------------
-SYSTEM = dos4g
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!elif $(TARGET)==DOS
-
-# --------------------- DOS ---------------------
-SYSTEM = dos
-CC = WCC
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp2 -2 -ml -zq -w2
-
-!elif $(TARGET)==NT
+ifeq ($(TARGET),DOS32)
+SYSTEM  = dos4g
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # --------------------- NT ----------------------
-SYSTEM = nt
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!else
-!error
-!endif
+ifeq ($(TARGET),NT)
+SYSTEM  = nt
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # Add the include dir
-CCCFG	= $(CCCFG) -i=..\common
+CFLAGS  += -i=..\common
 
 # ------------------------------------------------------------------------------
 # Implicit rules
 
-.c.obj:
-  $(CC) $(CCCFG) $<
+%.obj:  %.c
+	$(CC) $(CFLAGS) $^
 
 
 # ------------------------------------------------------------------------------
@@ -70,7 +47,7 @@ OBJS =	error.obj	\
 	global.obj	\
 	main.obj
 
-.PRECIOUS $(OBJS:.obj=.c)
+LIBS = ..\common\common.lib
 
 # ------------------------------------------------------------------------------
 # Main targets
@@ -84,21 +61,18 @@ cl65:		cl65.exe
 # Other targets
 
 
-cl65.exe:	$(OBJS)
-	$(LD) system $(SYSTEM) @&&|
-DEBUG ALL
-OPTION QUIET
-NAME $<
-FILE error.obj
-FILE global.obj
-FILE main.obj
-LIBRARY ..\common\common.lib
-|
-
+cl65.exe:	$(OBJS) $(LIBS)
+	@echo DEBUG ALL > $(LNKCFG)
+	@echo OPTION QUIET >> $(LNKCFG)
+	@echo NAME $@ >> $(LNKCFG)
+	@for %%i in ($(OBJS)) do echo FILE %%i >> $(LNKCFG)
+	@for %%i in ($(LIBS)) do echo LIBRARY %%i >> $(LNKCFG)
+	$(LD) system $(SYSTEM) @$(LNKCFG)
+	@rm $(LNKCFG)
 
 clean:
 	@if exist *.obj del *.obj
-       	@if exist cl65.exe del cl65.exe
+	@if exist cl65.exe del cl65.exe
 
 strip:
 	@-wstrip cl65.exe

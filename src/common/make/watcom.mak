@@ -1,65 +1,41 @@
 #
-# CC65 Makefile for the Watcom compiler
+# CC65 Makefile for the Watcom compiler (using GNU make)
 #
 
 # ------------------------------------------------------------------------------
 # Generic stuff
 
-.AUTODEPEND
-.SUFFIXES	.ASM .C .CC .CPP
-.SWAP
-
 AR	= WLIB
 LD	= WLINK
-
 LIB	= common.lib
 
-!if !$d(TARGET)
-!if $d(__OS2__)
-TARGET = OS2
-!else
-TARGET = NT
-!endif
-!endif
-
-# target specific macros.
-!if $(TARGET)==OS2
 
 # --------------------- OS2 ---------------------
-SYSTEM = os2v2
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!elif $(TARGET)==DOS32
+ifeq ($(TARGET),OS2)
+SYSTEM  = os2v2
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # -------------------- DOS4G --------------------
-SYSTEM = dos4g
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!elif $(TARGET)==DOS
-
-# --------------------- DOS ---------------------
-SYSTEM = dos
-CC = WCC
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp2 -2 -ml -zq -w2
-
-!elif $(TARGET)==NT
+ifeq ($(TARGET),DOS32)
+SYSTEM  = dos4g
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # --------------------- NT ----------------------
-SYSTEM = nt
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!else
-!error
-!endif
+ifeq ($(TARGET),NT)
+SYSTEM  = nt
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # ------------------------------------------------------------------------------
 # Implicit rules
 
-.c.obj:
-  $(CC) $(CCCFG) $<
+%.obj:  %.c
+	$(CC) $(CFLAGS) $^
 
 
 # ------------------------------------------------------------------------------
@@ -87,8 +63,6 @@ OBJS =	abend.obj	\
 	xsprintf.obj
 
 
-.PRECIOUS $(OBJS:.obj=.cc) $(LIB)
-
 # ------------------------------------------------------------------------------
 # Main targets
 
@@ -98,7 +72,7 @@ lib:	$(LIB)
 
 $(LIB): $(OBJS)
 	@echo Creating library...
-	&@$(AR) -q -b -P=32 $(LIB) +-$?
+	$(AR) -q -b -P=32 $(LIB) $(foreach OBJ, $(OBJS), +-$(OBJ))
 	@echo Done!
 
 clean:

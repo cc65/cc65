@@ -1,67 +1,43 @@
 #
-# da65 Makefile for the Watcom compiler
+# da65 Makefile for the Watcom compiler (using GNU make)
 #
 
 # ------------------------------------------------------------------------------
 # Generic stuff
 
-.AUTODEPEND
-.SUFFIXES	.ASM .C .CC .CPP
-.SWAP
-
-AR  	= WLIB
-LD  	= WLINK
-
-!if !$d(TARGET)
-!if $d(__OS2__)
-TARGET = OS2
-!else
-TARGET = NT
-!endif
-!endif
-
-# target specific macros.
-!if $(TARGET)==OS2
+AR	= WLIB
+LD	= WLINK
+LNKCFG  = ld.tmp
 
 # --------------------- OS2 ---------------------
-SYSTEM = os2v2
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!elif $(TARGET)==DOS32
+ifeq ($(TARGET),OS2)
+SYSTEM  = os2v2
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # -------------------- DOS4G --------------------
-SYSTEM = dos4g
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!elif $(TARGET)==DOS
-
-# --------------------- DOS ---------------------
-SYSTEM = dos
-CC = WCC
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp2 -2 -ml -zq -w2
-
-!elif $(TARGET)==NT
+ifeq ($(TARGET),DOS32)
+SYSTEM  = dos4g
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # --------------------- NT ----------------------
-SYSTEM = nt
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!else
-!error
-!endif
+ifeq ($(TARGET),NT)
+SYSTEM  = nt
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # Add the include dir
-CCCFG	= $(CCCFG) -i=..\common
-
+CFLAGS  += -i=..\common
 
 # ------------------------------------------------------------------------------
 # Implicit rules
 
-.c.obj:
-  $(CC) $(CCCFG) $<
+%.obj:  %.c
+	$(CC) $(CFLAGS) $^
 
 
 # ------------------------------------------------------------------------------
@@ -96,25 +72,14 @@ da65:	      	da65.exe
 # Other targets
 
 
-da65.exe:     	$(OBJS) $(LIBS)
-  	$(LD) system $(SYSTEM) @&&|
-DEBUG ALL
-OPTION QUIET
-NAME $<
-FILE attrtab.obj
-FILE code.obj
-FILE config.obj
-FILE cpu.obj
-FILE data.obj
-FILE error.obj
-FILE global.obj
-FILE handler.obj
-FILE main.obj
-FILE opctable.obj
-FILE output.obj
-FILE scanner.obj
-LIBRARY ..\common\common.lib
-|
+da65.exe:	$(OBJS) $(LIBS)
+	@echo DEBUG ALL > $(LNKCFG)
+	@echo OPTION QUIET >> $(LNKCFG)
+	@echo NAME $@ >> $(LNKCFG)
+	@for %%i in ($(OBJS)) do echo FILE %%i >> $(LNKCFG)
+	@for %%i in ($(LIBS)) do echo LIBRARY %%i >> $(LNKCFG)
+	$(LD) system $(SYSTEM) @$(LNKCFG)
+	@rm $(LNKCFG)
 
 clean:
 	@if exist *.obj del *.obj

@@ -1,67 +1,43 @@
 #
-# ld65 Makefile for the Watcom compiler
+# ld65 Makefile for the Watcom compiler (using GNU make)
 #
 
 # ------------------------------------------------------------------------------
 # Generic stuff
 
-.AUTODEPEND
-.SUFFIXES	.ASM .C .CC .CPP
-.SWAP
-
 AR	= WLIB
 LD	= WLINK
-
-!if !$d(TARGET)
-!if $d(__OS2__)
-TARGET = OS2
-!else
-TARGET = NT
-!endif
-!endif
-
-# target specific macros.
-!if $(TARGET)==OS2
+LNKCFG  = ld.tmp
 
 # --------------------- OS2 ---------------------
-SYSTEM = os2v2
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!elif $(TARGET)==DOS32
+ifeq ($(TARGET),OS2)
+SYSTEM  = os2v2
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # -------------------- DOS4G --------------------
-SYSTEM = dos4g
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!elif $(TARGET)==DOS
-
-# --------------------- DOS ---------------------
-SYSTEM = dos
-CC = WCC
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp2 -2 -ml -zq -w2
-
-!elif $(TARGET)==NT
+ifeq ($(TARGET),DOS32)
+SYSTEM  = dos4g
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # --------------------- NT ----------------------
-SYSTEM = nt
-CC = WCC386
-CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
-
-!else
-!error
-!endif
+ifeq ($(TARGET),NT)
+SYSTEM  = nt
+CC      = WCC386
+CFLAGS  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
+endif
 
 # Add the include dir
-CCCFG	= $(CCCFG) -i=..\common
-
+CFLAGS  += -i=..\common
 
 # ------------------------------------------------------------------------------
 # Implicit rules
 
-.c.obj:
-  $(CC) $(CCCFG) $<
+%.obj:  %.c
+	$(CC) $(CFLAGS) $^
 
 
 # ------------------------------------------------------------------------------
@@ -107,37 +83,15 @@ ld65:	      	ld65.exe
 # Other targets
 
 
-ld65.exe:     	$(OBJS) $(LIBS)
-	$(LD) system $(SYSTEM) @&&|
-DEBUG ALL
-OPTION QUIET
-NAME $<
-FILE bin.obj
-FILE binfmt.obj
-FILE condes.obj
-FILE config.obj
-FILE dbginfo.obj
-FILE dbgsyms.obj
-FILE error.obj
-FILE exports.obj
-FILE expr.obj
-FILE extsyms.obj
-FILE fileinfo.obj
-FILE fileio.obj
-FILE fragment.obj
-FILE global.obj
-FILE library.obj
-FILE lineinfo.obj
-FILE main.obj
-FILE mapfile.obj
-FILE o65.obj
-FILE objdata.obj
-FILE objfile.obj
-FILE scanner.obj
-FILE segments.obj
-FILE tgtcfg.obj
-LIBRARY ..\common\common.lib
-|
+ld65.exe:	$(OBJS) $(LIBS)
+	@echo DEBUG ALL > $(LNKCFG)
+	@echo OPTION QUIET >> $(LNKCFG)
+	@echo NAME $@ >> $(LNKCFG)
+	@for %%i in ($(OBJS)) do echo FILE %%i >> $(LNKCFG)
+	@for %%i in ($(LIBS)) do echo LIBRARY %%i >> $(LNKCFG)
+	$(LD) system $(SYSTEM) @$(LNKCFG)
+	@rm $(LNKCFG)
+
 
 clean:
 	@if exist *.obj del *.obj

@@ -16,6 +16,10 @@ ldau0ysp:
      	lda	(sp),y
      	sta	ptr1
 	ldx	#0
-	lda	(ptr1,x)
+.ifpc02
+      	lda	(ptr1)		; Save one cycle for the C02
+.else
+      	lda	(ptr1,x)
+.endif
 	rts
 

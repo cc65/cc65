@@ -13,13 +13,18 @@
 tosadda0:
 	ldx	#0
 tosaddax:
-	ldy	#0
-	clc
-	adc	(sp),y		; lo byte
+      	clc
+.ifpc02
+     	adc	(sp)		; 65C02 version - saves 2 cycles
+	ldy	#1
+.else
+      	ldy	#0
+      	adc	(sp),y		; lo byte
+      	iny
+.endif
        	pha			; save it
-	txa
-	iny
-	adc	(sp),y		; hi byte
+      	txa
+      	adc	(sp),y		; hi byte
 	tax
 	clc
 	lda	sp

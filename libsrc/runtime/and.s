@@ -11,13 +11,18 @@
 tosanda0:
       	ldx	#$00
 tosandax:
-	ldy	#0
+.ifpc02
+	and	(sp)		; 65C02 version, saves 2 cycles and 1 byte
+	ldy	#1
+.else
+      	ldy	#0
        	and	(sp),y
-	sta	ptr4
-	iny
-	txa
-	and	(sp),y
+      	iny
+.endif
+       	pha
+      	txa
+      	and	(sp),y
 	tax
-	lda	ptr4
+	pla
 	jmp	addysp1		; drop TOS, set condition codes
 

@@ -10,8 +10,13 @@
 
 .proc	incax1
 
-    	add	#1
-    	bcc   	@L9
+.ifpc02
+	ina	   		; 65C02 version
+	bne	@L9
+.else
+      	add	#1
+      	bcc   	@L9
+.endif
     	inx
 @L9:	rts
 

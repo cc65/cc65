@@ -10,15 +10,22 @@
 
 ; Convert TOS from long to int by cutting of the high 16bit
 
-tosint:	pha
-	ldy    	#0
-	lda	(sp),y 	       	; sp+1
-	ldy	#2
-	sta	(sp),y
-	ldy	#1
-	lda	(sp),y
-	ldy	#3
-	sta	(sp),y
+.proc	tosint
+
+	pha
+.ifpc02
+	lda   	(sp)
+.else
+      	ldy    	#0
+      	lda   	(sp),y 	       	; sp+1
+.endif
+	ldy   	#2
+	sta   	(sp),y
+	dey
+	lda   	(sp),y
+	ldy   	#3
+	sta   	(sp),y
 	pla
        	jmp    	incsp2	  	; Drop 16 bit
 
+.endproc

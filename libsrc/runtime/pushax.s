@@ -21,11 +21,16 @@ pushax:	ldy	sp
        	beq	@L2
        	dey
 @L0:	sty	sp
-	ldy	#0    		; get index
-    	sta	(sp),y		; store lo byte
-    	pha	      		; save it
-    	txa	      		; get hi byte
-    	iny	      		; bump idx
+.ifpc02
+      	sta	(sp)		; 65C02 version - saves 2 cycles and one byte
+      	ldy	#1		; get hi index
+.else
+      	ldy	#0    		; get index
+      	sta	(sp),y		; store lo byte
+      	iny	      		; bump idx
+.endif
+      	pha	      		; save it
+      	txa	      		; get hi byte
     	sta	(sp),y		; store hi byte
     	pla	    		; get A back
     	rts	    		; done
@@ -33,6 +38,10 @@ pushax:	ldy	sp
 @L1:	dey
 @L2:	dey
     	dec	sp+1
+.ifpc02
+     	bra	@L0
+.else
     	jmp	@L0
+.endif
 
-		    
+

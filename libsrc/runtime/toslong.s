@@ -13,40 +13,50 @@
 tosulong:
        	pha
     	jsr	decsp2		; Make room
-	ldy    	#2
-	lda	(sp),y
-	ldy	#0
+      	ldy    	#2
+      	lda	(sp),y
+.ifpc02
+      	sta	(sp)		; 65C02 version
+      	iny			; Y = 3
+.else
+      	ldy	#0
        	sta	(sp),y
-	ldy    	#3
-	lda    	(sp),y
-	ldy	#1
-	sta	(sp),y
-	lda    	#0    		; Zero extend
+      	ldy    	#3
+.endif
+      	lda    	(sp),y
+      	ldy	#1
+      	sta	(sp),y
+     	lda    	#0    		; Zero extend
 toslong2:
-	iny
-	sta	(sp),y
-	iny
-	sta	(sp),y
-	pla
-	rts
+     	iny
+     	sta	(sp),y
+     	iny
+     	sta	(sp),y
+     	pla
+     	rts
 
 toslong:
        	pha
-    	jsr	decsp2		; Make room
-	ldy    	#2
-	lda	(sp),y
-	ldy	#0		   
+     	jsr	decsp2		; Make room
+     	ldy    	#2
+     	lda	(sp),y
+.ifpc02
+     	sta	(sp)		; 65C02 version
+     	iny			; Y = 3
+.else
+     	ldy	#0
        	sta	(sp),y
-	ldy    	#3
-	lda    	(sp),y
-	bmi	toslong1
-	ldy	#1
-	sta	(sp),y
-	lda	#$00  		; Positive, high word is zero
-	bne	toslong2
+     	ldy    	#3
+.endif
+     	lda    	(sp),y
+     	bmi	toslong1
+     	ldy	#1
+     	sta	(sp),y
+     	lda	#$00  		; Positive, high word is zero
+     	bne	toslong2
 toslong1:
-	ldy	#1
-	sta	(sp),y
-	lda	#$FF
-	bne	toslong2
+     	ldy	#1
+     	sta	(sp),y
+     	lda	#$FF
+     	bne	toslong2
 

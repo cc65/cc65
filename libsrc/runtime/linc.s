@@ -7,16 +7,18 @@
        	.export	       	inceaxy
 	.importzp	ptr4, sreg
 
-inceaxy:
+.proc	inceaxy
+
        	sty    	ptr4
        	clc
        	adc	ptr4
-       	bcc	inceax9
+       	bcc	@L9
        	inx
-       	bne	inceax9
+       	bne	@L9
        	inc	sreg
-       	bne	inceax9
+       	bne	@L9
        	inc	sreg+1
-inceax9:
-       	rts
+@L9:	rts
+
+.endproc
 

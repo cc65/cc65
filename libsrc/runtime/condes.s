@@ -11,6 +11,7 @@
 ; libinit and libdone call condes with the predefined module constructor and
 ; destructor tables, they must be called from the platform specific startup
 ; code.
+
 ;
 ; The function does also export jmpvec as general purpose jump vector that
 ; lies in the data segment so it's address may be patched at runtime.
@@ -73,7 +74,11 @@ loop:	ldy	index
 	sta	jmpvec+1
 	sty	index
 	jsr	jmpvec
-	jmp	loop
+.ifpc02
+	bra	loop
+.else
+     	jmp	loop
+.endif
 
 done:	rts
 

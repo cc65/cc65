@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -1269,6 +1269,35 @@ static char* RegInfoDesc (unsigned U, char* Buf)
 
 
 
+static char* RegContentDesc (const RegContents* RC, char* Buf)
+/* Return a string containing register contents */
+{
+    char* B = Buf;
+
+    if (RegValIsUnknown (RC->RegA)) {
+        strcpy (B, "A:XX ");
+    } else {
+        sprintf (B, "A:%02X ", RC->RegA);
+    }
+    B += 5;
+    if (RegValIsUnknown (RC->RegX)) {
+        strcpy (B, "X:XX ");
+    } else {
+        sprintf (B, "X:%02X ", RC->RegX);
+    }
+    B += 5;
+    if (RegValIsUnknown (RC->RegY)) {
+        strcpy (B, "Y:XX");
+    } else {
+        sprintf (B, "Y:%02X", RC->RegY);
+    }
+    B += 4;
+
+    return Buf;
+}
+
+
+
 void CE_Output (const CodeEntry* E, FILE* F)
 /* Output the code entry to a file */
 {
@@ -1357,15 +1386,24 @@ void CE_Output (const CodeEntry* E, FILE* F)
 	char Use [128];
 	char Chg [128];
        	fprintf (F,
-       	       	 "%*s; USE: %-12s CHG: %-12s SIZE: %u\n",
+       	       	 "%*s; USE: %-12s CHG: %-12s SIZE: %u",
        	       	 30-Chars, "",
-		 RegInfoDesc (E->Use, Use),
-		 RegInfoDesc (E->Chg, Chg),
+	    	 RegInfoDesc (E->Use, Use),
+	    	 RegInfoDesc (E->Chg, Chg),
 	       	 E->Size);
-    } else {
-	/* Terminate the line */
-	fprintf (F, "\n");
+
+        if (E->RI) {
+            char RegIn[32];
+            char RegOut[32];
+            fprintf (F,
+                     "    In %s  Out %s",
+                     RegContentDesc (&E->RI->In, RegIn),
+                     RegContentDesc (&E->RI->Out, RegOut));
+        }
     }
+
+    /* Terminate the line */
+    fprintf (F, "\n");
 }
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -275,7 +275,7 @@ void CS_OutputEpilogue (const CodeSeg* S, FILE* F);
  * assembler epilogue into the file. That is: Close the local function scope.
  */
 
-void CS_Output (const CodeSeg* S, FILE* F);
+void CS_Output (CodeSeg* S, FILE* F);
 /* Output the code segment data to a file */
 
 void CS_FreeRegInfo (CodeSeg* S);

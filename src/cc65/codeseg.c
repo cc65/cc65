@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -807,7 +807,7 @@ CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E)
 	/* Attach this label to the code entry */
 	CE_AttachLabel (E, L);
 
-    }    
+    }
 
     /* Return the label */
     return L;
@@ -1253,7 +1253,7 @@ void CS_OutputEpilogue (const CodeSeg* S, FILE* F)
 
 
 
-void CS_Output (const CodeSeg* S, FILE* F)
+void CS_Output (CodeSeg* S, FILE* F)
 /* Output the code segment data to a file */
 {
     unsigned I;
@@ -1266,6 +1266,9 @@ void CS_Output (const CodeSeg* S, FILE* F)
     if (Count == 0) {
 	return;
     }
+
+    /* Generate register info */
+    CS_GenRegInfo (S);
 
     /* Output the segment directive */
     fprintf (F, ".segment\t\"%s\"\n\n", S->SegName);
@@ -1303,7 +1306,7 @@ void CS_Output (const CodeSeg* S, FILE* F)
 	    /* Add line debug info */
 	    if (DebugInfo) {
 	       	fprintf (F, "\t.dbg\tline, \"%s\", %u\n",
-	       	     	 GetInputName (LI), GetInputLine (LI));
+	       	      	 GetInputName (LI), GetInputLine (LI));
 	    }
 	}
 	/* Output the code */
@@ -1314,6 +1317,9 @@ void CS_Output (const CodeSeg* S, FILE* F)
     if (DebugInfo) {
        	fputs ("\t.dbg\tline\n", F);
     }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
 }
 
 
@@ -1463,7 +1469,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			/* A is zero in one execution flow direction */
 			if (BC == BC_EQ) {
 			    E->RI->Out2.RegA = 0;
-			} else {
+		      	} else {
 			    E->RI->Out.RegA = 0;
 			}
 			break;
@@ -1477,7 +1483,7 @@ void CS_GenRegInfo (CodeSeg* S)
 				E->RI->Out2.RegA = (unsigned char)P->Num;
 			    } else {
 				E->RI->Out.RegA = (unsigned char)P->Num;
-			    }
+		      	    }
     			}
 			break;
 
@@ -1516,7 +1522,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			    E->RI->Out2.RegX = 0;
 			} else {
 			    E->RI->Out.RegX = 0;
-			}
+		      	}
 			break;
 
 		    case OP65_DEY:

@@ -202,6 +202,10 @@ static void SetSys (const char* Sys)
      	    DefineNumericMacro ("__APPLE2__", 1);
      	    break;
 
+     	case TGT_APPLE2ENH:
+            DefineNumericMacro ("__APPLE2ENH__", 1);
+     	    break;
+
      	case TGT_GEOS:
      	    /* Do not handle as a CBM system */
      	    DefineNumericMacro ("__GEOS__", 1);

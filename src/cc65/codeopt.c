@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -430,7 +430,7 @@ static unsigned OptPtrStore1Sub (CodeSeg* S, unsigned I, CodeEntry** const L)
 	       (L[1] = CS_GetNextEntry (S, I)) != 0       &&
 	       L[1]->OPC == OP65_SBC                      &&
 	       !CE_HasLabel (L[1])) {
-	return 2;
+   	return 2;
     }
 
 
@@ -500,105 +500,28 @@ static unsigned OptPtrStore1 (CodeSeg* S)
 	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
 	    CS_InsertEntry (S, X, I+2);
 
-	    /* Delete the call to pushax */
-	    CS_DelEntry (S, I);
-
-	    /* Delete the call to ldauidx */
-	    CS_DelEntry (S, I+3);
-
 	    /* Insert the load from ptr1 */
 	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+3);
+	    CS_InsertEntry (S, X, I+5);
 	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[2]->LI);
-	    CS_InsertEntry (S, X, I+4);
+   	    CS_InsertEntry (S, X, I+6);
 
-	    /* Insert the store through ptr1 */
-	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "ptr1", 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+6+K);
+   	    /* Insert the store through ptr1 */
+   	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "ptr1", 0, L[3]->LI);
+   	    CS_InsertEntry (S, X, I+8+K);
 
-	    /* Delete the call to staspidx */
-	    CS_DelEntry (S, I+7+K);
+   	    /* Delete the old code */
+   	    CS_DelEntry (S, I+9+K);     /* jsr spaspidx */
+            CS_DelEntry (S, I+4);       /* jsr ldauidx */
+            CS_DelEntry (S, I);         /* jsr pushax */
 
-	    /* Remember, we had changes */
-	    ++Changes;
+   	    /* Remember, we had changes */
+   	    ++Changes;
 
-	}
+   	}
 
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-static unsigned OptPtrStore2 (CodeSeg* S)
-/* Search for the sequence:
- *
- *    	jsr   	pushax
- *      lda     xxx
- *      ldy     yyy
- *  	jsr   	staspidx
- *
- * and replace it by:
- *
- *      sta     ptr1
- *      stx     ptr1+1
- *      lda     xxx
- *      ldy     yyy
- *      sta     (ptr1),y
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[4];
-
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (CE_IsCallTo (L[0], "pushax")        &&
-       	    CS_GetEntries (S, L+1, I+1, 3)   	&&
-       	    L[1]->OPC == OP65_LDA              	&&
-	    !CE_HasLabel (L[1])    	       	&&
-	    L[2]->OPC == OP65_LDY               &&
-	    !CE_HasLabel (L[2])                 &&
-	    CE_IsCallTo (L[3], "staspidx")      &&
-	    !CE_HasLabel (L[3])) {
-
-	    CodeEntry* X;
-
-	    /* Create and insert the stores */
-       	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+1);
-
-	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+2);
-
-	    /* Delete the call to pushax */
-	    CS_DelEntry (S, I);
-
-	    /* Insert the store through ptr1 */
-	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "ptr1", 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+4);
-
-	    /* Delete the call to staspidx */
-	    CS_DelEntry (S, I+5);
-
-	    /* Remember, we had changes */
-	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
+   	/* Next entry */
+   	++I;
 
     }
 
@@ -655,58 +578,60 @@ static unsigned OptPtrLoad1 (CodeSeg* S)
        	if (L[0]->OPC == OP65_CLC               &&
        	    CS_GetEntries (S, L+1, I+1, 8)     	&&
 	    L[1]->OPC == OP65_ADC      	       	&&
-	    !CE_HasLabel (L[1])                 &&
        	    L[2]->OPC == OP65_TAY              	&&
-	    !CE_HasLabel (L[2])        	       	&&
 	    L[3]->OPC == OP65_TXA               &&
-	    !CE_HasLabel (L[3])                 &&
 	    L[4]->OPC == OP65_ADC               &&
-	    !CE_HasLabel (L[4])                 &&
 	    L[5]->OPC == OP65_TAX               &&
-	    !CE_HasLabel (L[5])                 &&
 	    L[6]->OPC == OP65_TYA               &&
-	    !CE_HasLabel (L[6])                 &&
 	    L[7]->OPC == OP65_LDY               &&
-	    !CE_HasLabel (L[7])                 &&
        	    CE_IsCallTo (L[8], "ldauidx")       &&
-	    !CE_HasLabel (L[8])) {
+            !CS_RangeHasLabel (S, I+1, 8)) {
 
 	    CodeEntry* X;
 	    CodeEntry* P;
 
-       	    /* Store the low byte and remove the TAY instead */
-	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[1]->LI);
-	    CS_InsertEntry (S, X, I+2);
-	    CS_DelEntry (S, I+3);
+            /* Track the insertion point */
+            unsigned IP = I+2;
 
-	    /* Store the high byte */
-	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[4]->LI);
-	    CS_InsertEntry (S, X, I+5);
+            /* sta ptr1 */
+            X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[2]->LI);
+            CS_InsertEntry (S, X, IP++);
 
-	    /* If the instruction before the adc is a ldx, replace the
-	     * txa by and lda with the same location of the ldx.
+	    /* If the instruction before the clc is a ldx, replace the
+	     * txa by an lda with the same location of the ldx. Otherwise
+             * transfer the value in X to A.
 	     */
 	    if ((P = CS_GetPrevEntry (S, I)) != 0 &&
-	    	P->OPC == OP65_LDX                &&
+   	    	P->OPC == OP65_LDX                &&
 	    	!CE_HasLabel (P)) {
-
 	    	X = NewCodeEntry (OP65_LDA, P->AM, P->Arg, 0, P->LI);
-	    	CS_InsertEntry (S, X, I+4);
-	    	CS_DelEntry (S,	I+3);
-	    }
+	    } else {
+                X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, L[3]->LI);
+            }
+            CS_InsertEntry (S, X, IP++);
 
-	    /* Delete more transfer insns */
-	    CS_DelEntry (S, I+7);
-	    CS_DelEntry (S, I+6);
+            /* adc yyy */
+            X = NewCodeEntry (OP65_ADC, L[4]->AM, L[4]->Arg, 0, L[4]->LI);
+            CS_InsertEntry (S, X, IP++);
 
-	    /* Delete the call to ldauidx */
-	    CS_DelEntry (S, I+7);
+            /* sta ptr1+1 */
+            X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[5]->LI);
+            CS_InsertEntry (S, X, IP++);
 
-	    /* Load high and low byte */
-	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[7]->LI);
-	    CS_InsertEntry (S, X, I+7);
-	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[7]->LI);
-	    CS_InsertEntry (S, X, I+8);
+            /* ldy ... */
+            X = NewCodeEntry (OP65_LDY, L[7]->AM, L[7]->Arg, 0, L[7]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* ldx #$00 */
+            X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[8]->LI);
+            CS_InsertEntry (S, X, IP++);
+
+            /* lda (ptr1),y */
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[8]->LI);
+	    CS_InsertEntry (S, X, IP++);
+
+            /* Remove the old instructions */
+            CS_DelEntries (S, IP, 7);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -748,6 +673,20 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
  *      ldy
  *     	ldx     #$00
  *      lda     (ptr1),y
+ *
+ *      adc    	xxx
+ *      sta     ptr1
+ *      pha
+ *      txa
+ *      iny
+ *      adc     yyy
+ *      sta     ptr1+1
+ *      tax
+ *      pla
+ *      ldy
+ *      ldx     #$00
+ *      lda     (ptr1),y
+ *  	jsr    	ldauidx
  */
 {
     unsigned Changes = 0;
@@ -756,7 +695,7 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[9];
+   	CodeEntry* L[9];
 
       	/* Get next entry */
        	L[0] = CS_GetEntry (S, I);
@@ -765,53 +704,44 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
        	if (L[0]->OPC == OP65_ADC      	       	&&
        	    CS_GetEntries (S, L+1, I+1, 8)     	&&
        	    L[1]->OPC == OP65_PHA              	&&
-	    !CE_HasLabel (L[1])        	       	&&
-	    L[2]->OPC == OP65_TXA               &&
-	    !CE_HasLabel (L[2])                 &&
-	    L[3]->OPC == OP65_INY               &&
-	    !CE_HasLabel (L[3])                 &&
+   	    L[2]->OPC == OP65_TXA               &&
+   	    L[3]->OPC == OP65_INY               &&
        	    L[4]->OPC == OP65_ADC               &&
-	    !CE_HasLabel (L[4])                 &&
-	    L[5]->OPC == OP65_TAX               &&
-	    !CE_HasLabel (L[5])                 &&
-	    L[6]->OPC == OP65_PLA               &&
-	    !CE_HasLabel (L[6])                 &&
-	    L[7]->OPC == OP65_LDY               &&
-	    !CE_HasLabel (L[7])                 &&
+   	    L[5]->OPC == OP65_TAX               &&
+   	    L[6]->OPC == OP65_PLA               &&
+   	    L[7]->OPC == OP65_LDY               &&
        	    CE_IsCallTo (L[8], "ldauidx")       &&
-	    !CE_HasLabel (L[8])) {
+       	    !CS_RangeHasLabel (S, I+1, 8)) {
 
-	    CodeEntry* X;
+   	    CodeEntry* X;
 
        	    /* Store the low byte and remove the PHA instead */
-	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+1);
-	    CS_DelEntry (S, I+2);
+   	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
+   	    CS_InsertEntry (S, X, I+1);
 
-	    /* Store the high byte */
-	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[4]->LI);
-	    CS_InsertEntry (S, X, I+5);
+   	    /* Store the high byte */
+   	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[4]->LI);
+   	    CS_InsertEntry (S, X, I+6);
 
-	    /* Delete more transfer and PLA insns */
-	    CS_DelEntry (S, I+7);
-	    CS_DelEntry (S, I+6);
+   	    /* Load high and low byte */
+   	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[6]->LI);
+   	    CS_InsertEntry (S, X, I+10);
+   	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[6]->LI);
+   	    CS_InsertEntry (S, X, I+11);
 
-	    /* Delete the call to ldauidx */
-	    CS_DelEntry (S, I+7);
+   	    /* Delete the old code */
+   	    CS_DelEntry (S, I+12);      /* jsr ldauidx */
+   	    CS_DelEntry (S, I+8);       /* pla */
+   	    CS_DelEntry (S, I+7);       /* tax */
+   	    CS_DelEntry (S, I+2);       /* pha */
 
-	    /* Load high and low byte */
-	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[6]->LI);
-	    CS_InsertEntry (S, X, I+7);
-	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[6]->LI);
-	    CS_InsertEntry (S, X, I+8);
+   	    /* Remember, we had changes */
+   	    ++Changes;
 
-	    /* Remember, we had changes */
-	    ++Changes;
+   	}
 
-	}
-
-	/* Next entry */
-	++I;
+   	/* Next entry */
+   	++I;
 
     }
 
@@ -858,23 +788,18 @@ static unsigned OptPtrLoad3 (CodeSeg* S)
        	    CS_GetEntries (S, L+1, I+1, 7)     	             &&
        	    L[1]->OPC == OP65_LDX              	             &&
 	    L[1]->AM == AM65_IMM                             &&
-	    !CE_HasLabel (L[1])        	       	             &&
 	    L[2]->OPC == OP65_CLC                            &&
-	    !CE_HasLabel (L[2])                              &&
 	    L[3]->OPC == OP65_ADC                            &&
 	    (L[3]->AM == AM65_ABS || L[3]->AM == AM65_ZP)    &&
-	    !CE_HasLabel (L[3])                              &&
        	    (L[4]->OPC == OP65_BCC || L[4]->OPC == OP65_JCC) &&
        	    L[4]->JumpTo != 0                                &&
        	    L[4]->JumpTo->Owner == L[6]                      &&
-	    !CE_HasLabel (L[4])                              &&
 	    L[5]->OPC == OP65_INX                            &&
-	    !CE_HasLabel (L[5])                              &&
 	    L[6]->OPC == OP65_LDY                            &&
 	    CE_KnownImm (L[6])                               &&
 	    L[6]->Num == 0                                   &&
        	    CE_IsCallTo (L[7], "ldauidx")                    &&
-	    !CE_HasLabel (L[7])                              &&
+       	    !CS_RangeHasLabel (S, I+1, 7)                    &&
 	    /* Check the label last because this is quite costly */
 	    (Len = strlen (L[0]->Arg)) > 3                   &&
 	    L[0]->Arg[0] == '<'                              &&
@@ -1506,7 +1431,6 @@ static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",    	 65, 0, 
 static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",    	 86, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad7    	= { OptPtrLoad7,     "OptPtrLoad7",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    100, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush1       	= { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush2       	= { OptPush2,        "OptPush2",         50, 0, 0, 0, 0, 0 };
 static OptFunc DOptPushPop      = { OptPushPop,      "OptPushPop",        0, 0, 0, 0, 0, 0 };
@@ -1568,7 +1492,6 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrLoad6,
     &DOptPtrLoad7,
     &DOptPtrStore1,
-    &DOptPtrStore2,
     &DOptPush1,
     &DOptPush2,
     &DOptPushPop,
@@ -1824,7 +1747,6 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     unsigned Changes = 0;
 
     Changes += RunOptFunc (S, &DOptPtrStore1, 1);
-    Changes += RunOptFunc (S, &DOptPtrStore2, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad1, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad2, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad3, 1);

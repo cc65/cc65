@@ -1664,9 +1664,9 @@ static void OptLoads (void)
 	 * and replace it by:
 	 *
 	 *     	lda    	xx
-	 *    	sta	zzz
-       	 *     	lda	yy
 	 *    	sta	zzz+1
+       	 *     	lda	yy
+	 *    	sta	zzz
 	 *
 	 * provided that that the X register is not used later. While this is
 	 * no direct optimization, it helps with other optimizations.
@@ -1678,10 +1678,47 @@ static void OptLoads (void)
 	    !RegXUsed (L2[2])) {
 
       	    /* Found - replace it */
-	    NewLineAfter (L2[1], "\tlda\t%s", L->Line+5);
-	    L2[2]->Line[3] = 'a';
-	    FreeLine (L);
-	    L = L2[2]; 
+	    L->Line[3] = 'a';
+	    NewLineAfter (L, "\tsta\t%s", L2[2]->Line+5);
+	    FreeLine (L2[2]);
+	    L = L2[1];
+
+	/* Search for:
+	 *
+	 *     	ldx    	xx
+	 *     	lda	yy
+       	 *     	ldy	#$zz
+	 *    	jsr	staxysp
+	 *
+	 * and replace it by:
+	 *
+	 *     	lda    	xx
+	 *	ldy	#$zz+1
+	 *    	sta	(sp),y
+       	 *     	dey
+	 *	lda	yy
+	 *    	sta	(sp),y
+	 *
+	 * provided that that the X register is not used later. This code
+	 * sequence is two bytes longer, but a lot faster and it does not
+	 * use the X register, so other loads may get removed later.
+     	 */
+       	} else if (LineMatch (L, "\tldx\t")	  	&&
+       	    GetNextCodeLines (L, L2, 3)	 	  	&&
+      	    LineMatch (L2 [0], "\tlda\t")	  	&&
+	    LineMatch (L2 [1], "\tldy\t#$")	  	&&
+	    LineFullMatch (L2 [2], "\tjsr\tstaxysp")	&&
+	    !RegXUsed (L2[2])) {
+
+      	    /* Found - replace it */
+	    L->Line[3] = 'a';
+	    L = NewLineAfter (L, "\tldy\t#$%02X", GetHexNum (L2[1]->Line+7)+1);
+	    L = NewLineAfter (L, "\tsta\t(sp),y");
+	    L = NewLineAfter (L, "\tdey");
+	    L = NewLineAfter (L2[0], "\tsta\t(sp),y");
+
+	    /* Remove the remaining lines */
+	    FreeLines (L2[1], L2[2]);
 	}
 
 

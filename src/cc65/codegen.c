@@ -719,12 +719,8 @@ void g_getlocal (unsigned flags, int offs)
 
 	case CF_CHAR:
 	    if ((flags & CF_FORCECHAR) || (flags & CF_TEST)) {
-		if (CPU == CPU_65C02 && offs == 0) {
-		    AddCodeLine ("lda (sp)");
-		} else {
-		    ldyconst (offs);
-		    AddCodeLine ("lda (sp),y");
-		}
+		ldyconst (offs);
+		AddCodeLine ("lda (sp),y");
 	    } else {
 		ldyconst (offs);
 		AddCodeLine ("ldx #$00");
@@ -881,12 +877,8 @@ void g_leavariadic (int Offs)
     CheckLocalOffs (ArgSizeOffs);
 
     /* Get the size of all parameters. */
-    if (ArgSizeOffs == 0 && CPU == CPU_65C02) {
-       	AddCodeLine ("lda (sp)");
-    } else {
-       	ldyconst (ArgSizeOffs);
-       	AddCodeLine ("lda (sp),y");
-    }
+    ldyconst (ArgSizeOffs);
+    AddCodeLine ("lda (sp),y");
 
     /* Add the value of the stackpointer */
     if (CodeSizeFactor > 250) {
@@ -963,12 +955,8 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 	    if (Flags & CF_CONST) {
 	     	AddCodeLine ("lda #$%02X", (unsigned char) Val);
 	    }
-     	    if (CPU == CPU_65C02 && Offs == 0) {
-     	     	AddCodeLine ("sta (sp)");
-     	    } else {
-     	     	ldyconst (Offs);
-     	     	AddCodeLine ("sta (sp),y");
-     	    }
+	    ldyconst (Offs);
+	    AddCodeLine ("sta (sp),y");
      	    break;
 
      	case CF_INT:
@@ -980,37 +968,25 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 		    /* Place high byte into X */
 		    AddCodeLine ("tax");
 		}
-		if (CPU == CPU_65C02 && Offs == 0) {
-		    AddCodeLine ("lda #$%02X", (unsigned char) Val);
-		    AddCodeLine ("sta (sp)");
+		if ((Val & 0xFF) == Offs+1) {
+		    /* The value we need is already in Y */
+		    AddCodeLine ("tya");
+		    AddCodeLine ("dey");
 		} else {
-		    if ((Val & 0xFF) == Offs+1) {
-			/* The value we need is already in Y */
-			AddCodeLine ("tya");
-			AddCodeLine ("dey");
-		    } else {
-			AddCodeLine ("dey");
-			AddCodeLine ("lda #$%02X", (unsigned char) Val);
-		    }
-		    AddCodeLine ("sta (sp),y");
+		    AddCodeLine ("dey");
+		    AddCodeLine ("lda #$%02X", (unsigned char) Val);
 		}
+		AddCodeLine ("sta (sp),y");
 	    } else {
 		if ((Flags & CF_NOKEEP) == 0 || CodeSizeFactor < 160) {
 		    ldyconst (Offs);
 		    AddCodeLine ("jsr staxysp");
 		} else {
-		    if (CPU == CPU_65C02 && Offs == 0) {
-			AddCodeLine ("sta (sp)");
-		     	ldyconst (1);
-		     	AddCodeLine ("txa");
-		     	AddCodeLine ("sta (sp),y");
-		    } else {
-			ldyconst (Offs);
-			AddCodeLine ("sta (sp),y");
-			AddCodeLine ("iny");
-			AddCodeLine ("txa");
-			AddCodeLine ("sta (sp),y");
-		    }
+		    ldyconst (Offs);
+		    AddCodeLine ("sta (sp),y");
+		    AddCodeLine ("iny");
+		    AddCodeLine ("txa");
+		    AddCodeLine ("sta (sp),y");
 		}
 	    }
      	    break;
@@ -3078,7 +3054,7 @@ void g_inc (unsigned flags, unsigned long val)
      	    if (flags & CF_FORCECHAR) {
 		if (CPU == CPU_65C02 && val <= 2) {
 		    while (val--) {
-		 	AddCodeLine ("ina");
+		       	AddCodeLine ("ina");
 		    }
 	     	} else {
 		    AddCodeLine ("clc");
@@ -3107,19 +3083,22 @@ void g_inc (unsigned flags, unsigned long val)
      		}
      	    } else {
      		/* Inline the code */
-		if (val < 0x300) {
+		if (val <= 0x300) {
 		    if ((val & 0xFF) != 0) {
-			unsigned L = GetLocalLabel();
+		       	unsigned L = GetLocalLabel();
 		       	AddCodeLine ("clc");
 		       	AddCodeLine ("adc #$%02X", (unsigned char) val);
 		       	AddCodeLine ("bcc %s", LocalLabelName (L));
 		       	AddCodeLine ("inx");
-			g_defcodelabel (L);
+		       	g_defcodelabel (L);
 		    }
      		    if (val >= 0x100) {
      		       	AddCodeLine ("inx");
      		    }
      		    if (val >= 0x200) {
+     		       	AddCodeLine ("inx");
+     		    }
+     		    if (val >= 0x300) {
      		       	AddCodeLine ("inx");
      		    }
      		} else {

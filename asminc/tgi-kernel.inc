@@ -145,6 +145,7 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_install
         .global _tgi_uninstall
         .global _tgi_init
+        .global _tgi_ioctl
         .global _tgi_done
         .global _tgi_geterror
         .global _tgi_geterrormsg

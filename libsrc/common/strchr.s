@@ -4,9 +4,9 @@
 ; const char* strchr (const char* s, int c);
 ;
 
-	.export		_strchr
-	.import		popax
-	.importzp	ptr1, tmp1
+      	.export		_strchr
+      	.import		popax
+      	.importzp	ptr1, tmp1
 
 _strchr:
        	sta	tmp1		; Save c
@@ -15,27 +15,34 @@ _strchr:
        	stx	ptr1+1
        	ldy	#0
 
-scloop:	lda	(ptr1),y	; get next char
-       	beq	strz  		; jump if end of string
-       	cmp	tmp1  		; found?
-       	beq	strf  		; jump if yes
+Loop: 	lda	(ptr1),y	; Get next char
+	beq	EOS		; Jump on end of string
+      	cmp	tmp1		; Found?
+      	beq	Found		; Jump if yes
        	iny
-       	bne	scloop
+       	bne	Loop
        	inc	ptr1+1
-       	bne	scloop		; jump always
+       	bne	Loop		; Branch always
 
-; found, calculate pointer to c
+; End of string. Check if we're searching for the terminating zero
 
-strf:  	ldx	ptr1+1		; get high byte of pointer
-       	tya			; low byte offset
+EOS:	lda	tmp1		; Get the char we're searching for
+      	bne	NotFound	; Jump if not searching for terminator
+
+; Found. Calculate pointer to c.
+
+Found:	ldx	ptr1+1		; Load high byte of pointer
+	tya			; Low byte offset	   
        	clc
        	adc	ptr1
-       	bcc	str1
+       	bcc	Found1
        	inx
-str1:  	rts
+Found1:	rts
 
-; not found, return zero
+; Not found, return NULL
 
-strz:	tax			; return 0
+NotFound:
+	lda	#0
+	tax
 	rts
 

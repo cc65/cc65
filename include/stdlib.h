@@ -89,8 +89,8 @@ void* __fastcall__ bsearch (const void* key, const void* base, size_t n,
 div_t __fastcall__ div (int numer, int denom);
 void __fastcall__ exit (int ret);
 char* __fastcall__ getenv (const char* name);
-void qsort (void* base, size_t count, size_t size,
-	    int (*compare) (const void*, const void*));
+void __fastcall__ qsort (void* base, size_t count, size_t size,
+	                 int (*compare) (const void*, const void*));
 int system (const char* s);
 
 /* Non-ANSI functions */

@@ -53,8 +53,8 @@ static void QuickSort (void* Base, int Lo, int Hi, size_t Size,
 
 
 
-void qsort (void* base, size_t nmemb, size_t size,
-	    int (*compare)(const void*, const void*))
+void __fastcall__ qsort (void* base, size_t nmemb, size_t size,
+	                 int (*compare)(const void*, const void*))
 /* Quicksort implementation */
 {
     if (nmemb > 1) {

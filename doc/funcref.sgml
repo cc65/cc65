@@ -140,9 +140,11 @@ function.
 
 <itemize>
 <item><ref id="abort" name="abort">
+<item><ref id="abs" name="abs">
 <item><ref id="atexit" name="atexit">
 <item><ref id="exit" name="exit">
-</itemize>
+<item><ref id="labs" name="labs">
+</itemize>                   
 
 
 <sect1><tt/string.h/<label id="string.h"><p>
@@ -246,6 +248,28 @@ terminates the program with an exit code of 3.
 <tag/See also/
 <ref id="assert" name="assert">,
 <ref id="exit" name="exit">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>abs<label id="abs"><p>
+
+<quote>
+<descrip>
+<tag/Function/Returns the absolute value of an integer.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/int __fastcall__ abs (int v);/
+<tag/Description/<tt/abs/ returns the absolute value of the argument passed to
+the function.
+<tag/Limits/<itemize>
+<item>The return value is undefined if <tt/INT_MIN/ is passed to the function.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="labs" name="labs">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1405,6 +1429,28 @@ do), the function is rather useless.
 <tag/See also/
 <ref id="cgetc" name="cgetc">,
 <ref id="cursor" name="cursor">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>labs<label id="labs"><p>
+
+<quote>
+<descrip>
+<tag/Function/Returns the absolute value of a long integer.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/int __fastcall__ labs (long v);/
+<tag/Description/<tt/labs/ returns the absolute value of the argument passed to
+the function.
+<tag/Limits/<itemize>
+<item>The return value is undefined if <tt/LONG_MIN/ is passed to the function.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="abs" name="abs">
 <tag/Example/None.
 </descrip>
 </quote>

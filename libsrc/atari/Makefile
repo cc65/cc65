@@ -50,6 +50,7 @@ OBJS =	_scrsize.o   \
 	oserrlist.o  \
 	oserror.o    \
 	ostype.o     \
+	randomize.o  \
 	read.o 	     \
 	readjoy.o    \
 	remove.o     \

@@ -8,15 +8,30 @@
 ; values if $8000, in which case the negate will fail.
 
        	.export		tosdiva0, tosdivax
-	.import		popsargs, udiv16, adjsres
-	.importzp	sreg
+	.import		popsargs, udiv16, negax
+	.importzp	sreg, tmp1, tmp2
 
 tosdiva0:
       	ldx	#0
 tosdivax:
 	jsr	popsargs	; Get arguments from stack, adjust sign
       	jsr	udiv16		; Do the division
-   	lda	sreg		; Result is in sreg, remainder in ptr1
-   	ldx	sreg+1
-	jmp	adjsres	      	; Adjust the sign of the result if needed
+        ldx     sreg+1          ; Load high byte of result
+
+; Adjust the sign of the result. tmp1 contains the high byte of the left
+; operand, tmp2 contains the high byte of the right operand.
+
+        lda     tmp1
+        eor     tmp2
+        bpl     Pos             ; Jump if sign of result positive
+
+; Result is negative
+
+        lda     sreg            ; Load low byte of result
+        jmp     negax           ; Adjust the sign
+
+; Result is positive
+
+Pos:    lda     sreg
+        rts
 

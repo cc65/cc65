@@ -149,7 +149,7 @@ static const struct {
 	{ "BCC", 0x0020000, 0x90, 0, PutPCRel8 },
 	{ "BCS", 0x0020000, 0xb0, 0, PutPCRel8 },
 	{ "BEQ", 0x0020000, 0xf0, 0, PutPCRel8 },
-	{ "BIT", 0x080006C, 0x00, 2, PutAll },
+	{ "BIT", 0x0A0006C, 0x00, 2, PutAll },
 	{ "BMI", 0x0020000, 0x30, 0, PutPCRel8 },
 	{ "BNE", 0x0020000, 0xd0, 0, PutPCRel8 },
 	{ "BPL", 0x0020000, 0x10, 0, PutPCRel8 },

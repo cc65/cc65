@@ -82,7 +82,10 @@ enum CPUType {
 #define AM_REL_LONG            	0x00040000UL
 #define AM_STACK_REL        	0x00080000UL
 #define AM_STACK_REL_IND_Y	0x00100000UL
-#define AM_IMM           	0x00E00000UL
+#define AM_IMM_ACCU		0x00200000UL
+#define AM_IMM_INDEX		0x00400000UL
+#define AM_IMM_IMPLICIT		0x00800000UL
+#define AM_IMM           	(AM_IMM_ACCU | AM_IMM_INDEX | AM_IMM_IMPLICIT)
 #define AM_BLOCKMOVE           	0x01000000UL
 
 /* Bitmask for all ZP operations that have correspondent ABS ops */

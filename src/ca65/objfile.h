@@ -55,6 +55,12 @@ void ObjOpen (void);
 void ObjClose (void);
 /* Write an update header and close the object file. */
 
+unsigned long ObjGetFilePos (void);
+/* Get the current file position */
+
+void ObjSetFilePos (unsigned long Pos);
+/* Set the file position */
+
 void ObjWrite8 (unsigned V);
 /* Write an 8 bit value to the file */
 
@@ -130,7 +136,7 @@ void ObjEndStrPool (void);
 
 
 /* End of objfile.h */
-              
+
 #endif
 
 

@@ -211,27 +211,25 @@ Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Type)
 Section* ReadSection (FILE* F, ObjData* O)
 /* Read a section from a file */
 {
-    char* Name;
-    unsigned long Size;
+    char*         Name;
+    unsigned      Size;
     unsigned char Align;
     unsigned char Type;
-    Segment* S;
-    Section* Sec;
+    unsigned      FragCount;
+    Segment*      S;
+    Section*      Sec;
 
-    /* Read the name */
-    Name = ReadStr (F);
+    /* Read the segment data */
+    (void) Read32 (F);            /* File size of data */
+    Name      = ReadStr (F);      /* Segment name */
+    Size      = Read32 (F);       /* Size of data */
+    Align     = Read8 (F);        /* Alignment */
+    Type      = Read8 (F);        /* Segment type */
+    FragCount = ReadVar (F);      /* Number of fragments */
 
-    /* Read the size */
-    Size = Read32 (F);
-
-    /* Read the alignment */
-    Align = Read8 (F);
-
-    /* Read the segment type */
-    Type = Read8 (F);
 
     /* Print some data */
-    Print (stdout, 2, "Module `%s': Found segment `%s', size = %lu, align = %u, type = %u\n",
+    Print (stdout, 2, "Module `%s': Found segment `%s', size = %u, align = %u, type = %u\n",
 	   GetObjFileName (O), Name, Size, Align, Type);
 
     /* Get the segment for this section */
@@ -251,7 +249,7 @@ Section* ReadSection (FILE* F, ObjData* O)
     }
 
     /* Start reading fragments from the file and insert them into the section . */
-    while (Size) {
+    while (FragCount--) {
 
     	Fragment* Frag;
 	unsigned  LineInfoIndex;
@@ -261,24 +259,21 @@ Section* ReadSection (FILE* F, ObjData* O)
 
         /* Extract the check mask from the type */
         unsigned char Check = Type & FRAG_CHECKMASK;
-        Type &= ~FRAG_CHECKMASK;
+        unsigned char Bytes = Type & FRAG_BYTEMASK;
+        Type &= FRAG_TYPEMASK;
 
     	/* Handle the different fragment types */
 	switch (Type) {
 
 	    case FRAG_LITERAL:
 	       	Frag = NewFragment (Type, ReadVar (F), Sec);
+		ReadData (F, Frag->LitBuf, Frag->Size);
 	       	break;
 
-	    case FRAG_EXPR8:
-    	    case FRAG_EXPR16:
-       	    case FRAG_EXPR24:
-	    case FRAG_EXPR32:
-	    case FRAG_SEXPR8:
-	    case FRAG_SEXPR16:
-	    case FRAG_SEXPR24:
-	    case FRAG_SEXPR32:
-       	       	Frag = NewFragment (Type & FRAG_TYPEMASK, Type & FRAG_BYTEMASK, Sec);
+	    case FRAG_EXPR:
+	    case FRAG_SEXPR:
+       	       	Frag = NewFragment (Type, Bytes, Sec);
+		Frag->Expr = ReadExpr (F, O);
 	  	break;
 
 	    case FRAG_FILL:
@@ -293,28 +288,17 @@ Section* ReadSection (FILE* F, ObjData* O)
 	 	return 0;
        	}
 
-	/* Now read the fragment data */
-	switch (Frag->Type) {
+        /* A list of check expressions may follow */
+        if (Check) {
 
-	    case FRAG_LITERAL:
-		/* Literal data */
-		ReadData (F, Frag->LitBuf, Frag->Size);
-		break;
+            /* Read the number of expressions that follow */
+            unsigned Count = ReadVar (F);
 
-	    case FRAG_EXPR:
-	    case FRAG_SEXPR:
-		/* An expression */
-		Frag->Expr = ReadExpr (F, O);
-	    	break;
-
-	}
-
-        /* A check expression may follow */
-        if (Check & FRAG_CHECK_WARN) {
-            Frag->WarnExpr = ReadExpr (F, O);
-        }
-        if (Check & FRAG_CHECK_ERROR) {
-            Frag->ErrorExpr = ReadExpr (F, O);
+            /* Read the expressions */
+            CheckExpr* Last = 0;
+            while (Count--) {
+                /* ### */
+            }
         }
 
 	/* Read the file position of the fragment */
@@ -339,10 +323,6 @@ Section* ReadSection (FILE* F, ObjData* O)
 
 	/* Remember the module we had this fragment from */
 	Frag->Obj = O;
-
-     	/* Next one */
-	CHECK (Size >= Frag->Size);
-     	Size -= Frag->Size;
     }
 
     /* Return the section */
@@ -410,7 +390,7 @@ void SegDump (void)
 		switch (F->Type) {
 
 		    case FRAG_LITERAL:
-			printf ("    Literal (%lu bytes):", F->Size);
+			printf ("    Literal (%u bytes):", F->Size);
 			Count = F->Size;
 			Data  = F->LitBuf;
 			I = 100;
@@ -426,21 +406,21 @@ void SegDump (void)
 			break;
 
 		    case FRAG_EXPR:
-			printf ("    Expression (%lu bytes):\n", F->Size);
+			printf ("    Expression (%u bytes):\n", F->Size);
 			printf ("    ");
 			DumpExpr (F->Expr);
 			break;
 
 		    case FRAG_SEXPR:
-			printf ("    Signed expression (%lu bytes):\n", F->Size);
+			printf ("    Signed expression (%u bytes):\n", F->Size);
 			printf ("      ");
 			DumpExpr (F->Expr);
 			break;
 
 		    case FRAG_FILL:
-			printf ("    Empty space (%lu bytes)\n", F->Size);
+			printf ("    Empty space (%u bytes)\n", F->Size);
 		     	break;
-
+                                                   
 		    default:
 			Internal ("Invalid fragment type: %02X", F->Type);
 		}
@@ -518,7 +498,7 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 	/* Loop over all fragments in this section */
 	Frag = Sec->FragRoot;
 	while (Frag) {
-                                      
+
             /* Do fragment alignment checks */
 
 

@@ -42,6 +42,7 @@ OBJS = 	bin.o		\
 	objfile.o	\
 	scanner.o	\
 	segments.o	\
+        spool.o         \
 	tgtcfg.o
 
 # -----------------------------------------------------------------------------

@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -62,8 +62,7 @@ struct LineInfo;
 
 typedef struct Fragment Fragment;
 struct Fragment {
-    Fragment*		List;		/* List of all fragments */
-    Fragment*  	       	Next;		/* Fragment list in one segment */
+    Fragment*  	       	Next;		/* Pointer to next fragment in segment */
     Fragment*		LineList;	/* List of fragments for one src line */
     FilePos    	    	Pos;		/* File position for this fragment */
     struct LineInfo*    LI;             /* Extra line info */
@@ -74,12 +73,6 @@ struct Fragment {
        	ExprNode*   	Expr;		/* Expression */
     } V;
 };
-
-
-
-/* List of all fragments */
-extern Fragment* FragList;
-extern Fragment* FragLast;
 
 
 

@@ -40,6 +40,7 @@
 /* common */
 #include "abend.h"
 #include "chartype.h"
+#include "fname.h"
 #include "xmalloc.h"
 #include "cmdline.h"
 
@@ -60,9 +61,9 @@ unsigned ArgCount = 0;
 
 /* Struct to pass the command line */
 typedef struct {
-    char**     	Vec; 		/* The argument vector */
-    unsigned   	Count;		/* Actual number of arguments */
-    unsigned   	Size;		/* Number of argument allocated */
+    char**      Vec;            /* The argument vector */
+    unsigned   	Count;	        /* Actual number of arguments */
+    unsigned   	Size;	        /* Number of argument allocated */
 } CmdLine;
 
 
@@ -94,7 +95,7 @@ static void NewCmdLine (CmdLine* L)
 
 
 
-static void AddArg (CmdLine* L, const char* Arg)
+static void AddArg (CmdLine* L, char* Arg)
 /* Add one argument to the list */
 {
     if (L->Size <= L->Count) {
@@ -108,7 +109,7 @@ static void AddArg (CmdLine* L, const char* Arg)
     }
 
     /* We have space left, add a copy of the argument */
-    L->Vec [L->Count++] = xstrdup (Arg);
+    L->Vec[L->Count++] = Arg;
 }
 
 
@@ -152,7 +153,7 @@ static void ExpandFile (CmdLine* L, const char* Name)
 	}
 
 	/* Add anything not empty to the command line */
-	AddArg (L, B);
+	AddArg (L, xstrdup (B));
 
     }
 
@@ -185,15 +186,7 @@ void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName)
     	ProgName = aProgName;
     } else {
     	/* Strip a path */
-	const char* FirstArg = (*aArgVec)[0];
-       	ProgName = strchr (FirstArg, '\0');
-    	while (ProgName > FirstArg) {
-    	    --ProgName;
-       	    if (*ProgName == '/' || *ProgName == '\\') {
-    	   	++ProgName;
-    	 	break;
-    	    }
-    	}
+       	ProgName = FindName ((*aArgVec)[0]);
     	if (ProgName[0] == '\0') {
     	    /* Use the default */
     	    ProgName = aProgName;
@@ -319,4 +312,4 @@ void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount)
 
 
 
-                                    
+

@@ -191,6 +191,28 @@ void ObjClose (void)
 
 
 
+unsigned long ObjGetFilePos (void)
+/* Get the current file position */
+{
+    long Pos = ftell (F);
+    if (Pos < 0) {
+        ObjWriteError ();
+    }
+    return Pos;
+}
+
+
+
+void ObjSetFilePos (unsigned long Pos)
+/* Set the file position */
+{
+    if (fseek (F, Pos, SEEK_SET) != 0) {
+        ObjWriteError ();
+    }
+}
+
+
+
 void ObjWrite8 (unsigned V)
 /* Write an 8 bit value to the file */
 {

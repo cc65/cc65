@@ -67,6 +67,7 @@ OBJS =	bin.obj		\
 	objfile.obj	\
 	scanner.obj	\
 	segments.obj	\
+        spool.obj       \
 	tgtcfg.obj
 
 LIBS = ..\common\common.lib

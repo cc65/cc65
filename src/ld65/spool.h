@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   listing.h				     */
+/*                                  spool.h                                  */
 /*                                                                           */
-/*		  Listing support for the ca65 crossassembler		     */
+/*                  Id and message pool for the ld65 linker                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,85 +33,48 @@
 
 
 
-#ifndef LISTING_H
-#define LISTING_H
+#ifndef SPOOL_H
+#define SPOOL_H
 
 
 
-/* ca65 */
-#include "fragment.h"
-
-
-
-/*****************************************************************************/
-/*   				     Data		   		     */
-/*****************************************************************************/
-
-
-
-/* Length of the header of a listing line */
-#define LINE_HEADER_LEN		24
-
-/* One listing line as it is stored in memory */
-typedef struct ListLine ListLine;
-struct ListLine {
-    ListLine*		Next;	  	/* Pointer to next line */
-    Fragment*		FragList; 	/* List of fragments for this line */
-    Fragment*		FragLast; 	/* Last entry in fragment list */
-    unsigned long	PC; 		/* Program counter for this line */
-    unsigned char	Reloc;		/* Relocatable mode? */
-    unsigned char	File;		/* From which file is the line? */
-    unsigned char	Depth;		/* Include depth */
-    unsigned char	Output;		/* Should we output this line? */
-    unsigned char	ListBytes;	/* How many bytes at max? */
-    char    		Line[1];  	/* Line with dynamic length */
-};
-
-/* Single linked list of lines */
-extern ListLine*	LineList; 	/* List of listing lines */
-extern ListLine*	LineCur;	/* Current listing line */
-extern ListLine*       	LineLast;  	/* Last listing line */
-
-/* Page formatting */
-#define MIN_PAGE_LEN	32
-#define MAX_PAGE_LEN	127
-extern int	     	PageLength;	/* Length of a listing page */
-
-/* Byte for one listing line */
-#define MIN_LIST_BYTES	4
-#define MAX_LIST_BYTES	255
+/* common */
+#include "strpool.h"
 
 
 
 /*****************************************************************************/
-/*     	       	    	    	     Code		   		     */
+/*     	       	     	      	     Data				     */
 /*****************************************************************************/
 
 
 
-void NewListingLine (const char* Line, unsigned char File, unsigned char Depth);
-/* Create a new ListLine struct */
-
-void EnableListing (void);
-/* Enable output of lines to the listing */
-
-void DisableListing (void);
-/* Disable output of lines to the listing */
-
-void SetListBytes (int Bytes);
-/* Set the maximum number of bytes listed for one line */
-
-void InitListingLine (void);
-/* Initialize the current listing line */
-
-void CreateListing (void);
-/* Create the listing */
+extern StringPool StrPool;
 
 
 
-/* End of listing.h */
+/*****************************************************************************/
+/*   	       		      	     Code				     */
+/*****************************************************************************/
+
+
+
+#if defined(HAVE_INLINE)
+INLINE unsigned GetStringId (const char* S)
+/* Return the id of the given string */
+{
+    return SP_Add (&StrPool, S);
+}
+#else
+#  define GetStringId(S)        SP_Add (&StrPool, (S))
+#endif
+
+
+
+/* End of spool.h */
 
 #endif
+
 
 
 

@@ -156,87 +156,7 @@ static void SkipExpr (FILE* F)
     	/* Not a leaf node */
        	SkipExpr (F);
 	SkipExpr (F);
-
     }
-}
-
-
-
-static unsigned SkipFragment (FILE* F)
-/* Skip a fragment from the given file and return the size */
-{
-    FilePos Pos;
-    unsigned long Size;
-
-    /* Read the fragment type */
-    unsigned char Type = Read8 (F);
-
-    /* Extract the check mask */
-    unsigned char Check = Type & FRAG_CHECKMASK;
-    Type &= ~FRAG_CHECKMASK;
-
-    /* Handle the different fragment types */
-    switch (Type) {
-
-	case FRAG_LITERAL:
-       	    Size = ReadVar (F);
-	    break;
-
-	case FRAG_EXPR8:
-	case FRAG_EXPR16:
-	case FRAG_EXPR24:
-	case FRAG_EXPR32:
-	case FRAG_SEXPR8:
-	case FRAG_SEXPR16:
-	case FRAG_SEXPR24:
-	case FRAG_SEXPR32:
-	    Size = Type & FRAG_BYTEMASK;
-	    break;
-
-	case FRAG_FILL:
-	    Size = ReadVar (F);
-	    break;
-
-	default:
-	    Error ("Unknown fragment type: 0x%02X", Type);
-	    /* NOTREACHED */
-	    return 0;
-    }
-
-
-
-    /* Now read the fragment data */
-    switch (Type & FRAG_TYPEMASK) {
-
-	case FRAG_LITERAL:
-	    /* Literal data */
-	    FileSeek (F, ftell (F) + Size);
-	    break;
-
-	case FRAG_EXPR:
-	case FRAG_SEXPR:
-	    /* An expression */
-	    SkipExpr (F);
-	    break;
-
-    }
-
-    /* Skip the check expression if we have one */
-    if (Check & FRAG_CHECK_WARN) {
-        SkipExpr (F);
-    }
-    if (Check & FRAG_CHECK_ERROR) {
-        SkipExpr (F);
-    }
-
-    /* Skip the file position of the fragment */
-    ReadFilePos (F, &Pos);
-
-    /* Skip the	additional line info */
-    (void) ReadVar (F);
-
-    /* Return the size */
-    return Size;
 }
 
 
@@ -291,7 +211,7 @@ void DumpObjHeader (FILE* F, unsigned long Offset)
     ObjHeader H;
 
     /* Seek to the header position */
-    FileSeek (F, Offset);
+    FileSetPos (F, Offset);
 
     /* Read the header */
     ReadObjHeader (F, &H);
@@ -350,15 +270,15 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
     unsigned   I;
 
     /* Seek to the header position and read the header */
-    FileSeek (F, Offset);
+    FileSetPos (F, Offset);
     ReadObjHeader (F, &H);
 
     /* Seek to the start of the string pool and read it */
-    FileSeek (F, Offset + H.StrPoolOffs);
+    FileSetPos (F, Offset + H.StrPoolOffs);
     ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the options */
-    FileSeek (F, Offset + H.OptionOffs);
+    FileSetPos (F, Offset + H.OptionOffs);
 
     /* Output a header */
     printf ("  Options:\n");
@@ -370,7 +290,7 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
     /* Read and print all options */
     for (I = 0; I < Count; ++I) {
 
-    	const char*   ArgStr;                      
+    	const char*   ArgStr;
     	unsigned      ArgLen;
 
     	/* Read the type of the option and the value */
@@ -438,15 +358,15 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
     unsigned   I;
 
     /* Seek to the header position and read the header */
-    FileSeek (F, Offset);
+    FileSetPos (F, Offset);
     ReadObjHeader (F, &H);
 
     /* Seek to the start of the string pool and read it */
-    FileSeek (F, Offset + H.StrPoolOffs);
+    FileSetPos (F, Offset + H.StrPoolOffs);
     ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the source files */
-    FileSeek (F, Offset + H.FileOffs);
+    FileSetPos (F, Offset + H.FileOffs);
 
     /* Output a header */
     printf ("  Files:\n");
@@ -489,18 +409,17 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
     Collection StrPool = AUTO_COLLECTION_INITIALIZER;
     unsigned   Count;
     unsigned   I;
-    unsigned   FragCount;
 
     /* Seek to the header position and read the header */
-    FileSeek (F, Offset);
+    FileSetPos (F, Offset);
     ReadObjHeader (F, &H);
 
     /* Seek to the start of the string pool and read it */
-    FileSeek (F, Offset + H.StrPoolOffs);
+    FileSetPos (F, Offset + H.StrPoolOffs);
     ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the segments */
-    FileSeek (F, Offset + H.SegOffs);
+    FileSetPos (F, Offset + H.SegOffs);
 
     /* Output a header */
     printf ("  Segments:\n");
@@ -513,11 +432,14 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
     for (I = 0; I < Count; ++I) {
 
 	/* Read the data for one segments */
-	char*	      Name  = ReadStr (F);
-	unsigned      Len   = strlen (Name);
-	unsigned long Size  = Read32 (F);
-	unsigned      Align = (1U << Read8 (F));
-	unsigned char Type  = Read8 (F);
+        unsigned long DataSize  = Read32 (F);
+        unsigned long NextSeg   = ftell (F) + DataSize;
+	char*	      Name      = ReadStr (F);
+	unsigned      Len       = strlen (Name);
+	unsigned long Size      = Read32 (F);
+	unsigned      Align     = (1U << Read8 (F));
+	unsigned char Type      = Read8 (F);
+        unsigned long FragCount = ReadVar (F);
 
 	/* Get the description for the type */
 	const char* TypeDesc;
@@ -526,7 +448,7 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 	    case SEGTYPE_ABS:  		TypeDesc = "SEGTYPE_ABS";	break;
 	    case SEGTYPE_ZP:   		TypeDesc = "SEGTYPE_ZP";	break;
 	    case SEGTYPE_FAR:  		TypeDesc = "SEGTYPE_FAR";	break;
-	    default:	       	   	TypeDesc = "SEGTYPE_UNKNOWN";	break;
+	    default:  	       	   	TypeDesc = "SEGTYPE_UNKNOWN";	break;
 	}
 
 	/* Print the header */
@@ -537,24 +459,13 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
        	printf ("      Size:%26lu\n", Size);
 	printf ("      Alignment:%21u\n", Align);
 	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
+       	printf ("      Fragment count:%16lu\n", FragCount);
 
 	/* Free the Name */
 	xfree (Name);
 
-	/* Skip the fragments for this segment, counting them */
-	FragCount = 0;
-	while (Size > 0) {
-	    unsigned FragSize = SkipFragment (F);
-	    if (FragSize > Size) {
-	       	/* OOPS - file data invalid */
-	       	Error ("Invalid fragment data - file corrupt!");
-	    }
-	    Size -= FragSize;
-	    ++FragCount;
-	}
-
-	/* Print the fragment count */
-       	printf ("      Fragment count:%16u\n", FragCount);
+        /* Seek to the end of the segment data (start of next) */
+        FileSetPos (F, NextSeg);
     }
 
     /* Destroy the string pool */
@@ -573,15 +484,15 @@ void DumpObjImports (FILE* F, unsigned long Offset)
     FilePos    Pos;
 
     /* Seek to the header position and read the header */
-    FileSeek (F, Offset);
+    FileSetPos (F, Offset);
     ReadObjHeader (F, &H);
 
     /* Seek to the start of the string pool and read it */
-    FileSeek (F, Offset + H.StrPoolOffs);
+    FileSetPos (F, Offset + H.StrPoolOffs);
     ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the imports */
-    FileSeek (F, Offset + H.ImportOffs);
+    FileSetPos (F, Offset + H.ImportOffs);
 
     /* Output a header */
     printf ("  Imports:\n");
@@ -632,15 +543,15 @@ void DumpObjExports (FILE* F, unsigned long Offset)
     FilePos    	Pos;
 
     /* Seek to the header position and read the header */
-    FileSeek (F, Offset);
+    FileSetPos (F, Offset);
     ReadObjHeader (F, &H);
 
     /* Seek to the start of the string pool and read it */
-    FileSeek (F, Offset + H.StrPoolOffs);
+    FileSetPos (F, Offset + H.StrPoolOffs);
     ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the exports */
-    FileSeek (F, Offset + H.ExportOffs);
+    FileSetPos (F, Offset + H.ExportOffs);
 
     /* Output a header */
     printf ("  Exports:\n");
@@ -701,15 +612,15 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
     FilePos     Pos;
 
     /* Seek to the header position and read the header */
-    FileSeek (F, Offset);
+    FileSetPos (F, Offset);
     ReadObjHeader (F, &H);
 
     /* Seek to the start of the string pool and read it */
-    FileSeek (F, Offset + H.StrPoolOffs);
+    FileSetPos (F, Offset + H.StrPoolOffs);
     ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the debug syms */
-    FileSeek (F, Offset + H.DbgSymOffs);
+    FileSetPos (F, Offset + H.DbgSymOffs);
 
     /* Output a header */
     printf ("  Debug symbols:\n");
@@ -775,15 +686,15 @@ void DumpObjLineInfo (FILE* F, unsigned long Offset)
     unsigned    I;
 
     /* Seek to the header position and read the header */
-    FileSeek (F, Offset);
+    FileSetPos (F, Offset);
     ReadObjHeader (F, &H);
 
     /* Seek to the start of the string pool and read it */
-    FileSeek (F, Offset + H.StrPoolOffs);
+    FileSetPos (F, Offset + H.StrPoolOffs);
     ReadStrPool (F, &StrPool);
 
     /* Seek to the start of line infos */
-    FileSeek (F, Offset + H.LineInfoOffs);
+    FileSetPos (F, Offset + H.LineInfoOffs);
 
     /* Output a header */
     printf ("  Line info:\n");
@@ -830,15 +741,15 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
     unsigned    Count;
 
     /* Seek to the header position and read the header */
-    FileSeek (F, Offset);
+    FileSetPos (F, Offset);
     ReadObjHeader (F, &H);
 
     /* Seek to the start of the string pool and read it */
-    FileSeek (F, Offset + H.StrPoolOffs);
+    FileSetPos (F, Offset + H.StrPoolOffs);
     ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the segments */
-    FileSeek (F, Offset + H.SegOffs);
+    FileSetPos (F, Offset + H.SegOffs);
 
     /* Output a header */
     printf ("  Segment sizes:\n");
@@ -850,13 +761,16 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
     while (Count--) {
 
        	/* Read the data for one segments */
-	char*	      Name  = ReadStr (F);
-	unsigned      Len   = strlen (Name);
-	unsigned long Size  = Read32 (F);
+        unsigned long DataSize = Read32 (F);
+        unsigned long NextSeg  = ftell (F) + DataSize;
+	char*	      Name     = ReadStr (F);
+	unsigned      Len      = strlen (Name);
+	unsigned long Size     = Read32 (F);
 
-        /* Skip alignment and type */
+        /* Skip alignment, type and fragment count */
         (void) Read8 (F);
         (void) Read8 (F);
+        (void) ReadVar (F);
 
 	/* Print the size for this segment */
 	printf ("    %s:%*s%6lu\n", Name, 24-Len, "", Size);
@@ -864,16 +778,9 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
 	/* Free the Name */
 	xfree (Name);
 
-	/* Skip the fragments for this segment, counting them */
-	while (Size > 0) {
-	    unsigned FragSize = SkipFragment (F);
-	    if (FragSize > Size) {
-	    	/* OOPS - file data invalid */
-	    	Error ("Invalid fragment data - file corrupt!");
-	    }
-	    Size -= FragSize;
-	}
-    }
+        /* Seek to the end of the segment data (start of next) */
+        FileSetPos (F, NextSeg);
+    }                               
 
     /* Destroy the string pool */
     DestroyStrPool (&StrPool);

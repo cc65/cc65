@@ -34,6 +34,7 @@
 
 
 /* common */
+#include "segdefs.h"
 #include "xmalloc.h"
 
 /* ld65 */
@@ -48,11 +49,21 @@
 
 
 
-Fragment* NewFragment (unsigned char Type, unsigned long Size, Section* S)
+Fragment* NewFragment (unsigned char Type, unsigned Size, Section* S)
 /* Create a new fragment and insert it into the section S */
 {
+    Fragment* F;
+
+    /* Calculate the size of the memory block. LitBuf is only needed if the
+     * fragment contains literal data.
+     */
+    unsigned FragSize = sizeof (Fragment) - 1;
+    if (Type == FRAG_LITERAL) {
+        FragSize += Size;
+    }
+
     /* Allocate memory */
-    Fragment* F = xmalloc (sizeof (Fragment) - 1 + Size);    
+    F = xmalloc (FragSize);
 
     /* Initialize the data */
     F->Next      = 0;
@@ -61,8 +72,7 @@ Fragment* NewFragment (unsigned char Type, unsigned long Size, Section* S)
     F->Expr      = 0;
     InitFilePos (&F->Pos);
     F->LI        = 0;
-    F->WarnExpr  = 0;
-    F->ErrorExpr = 0;
+    F->Check     = 0;
     F->Type      = Type;
 
     /* Insert the code fragment into the section */

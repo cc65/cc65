@@ -53,7 +53,7 @@
 /* Fragment types in the object file */
 #define FRAG_TYPEMASK  	        0x38   	/* Mask the type of the fragment */
 #define FRAG_BYTEMASK           0x07   	/* Mask for byte count */
-#define FRAG_CHECKMASK          0xC0    /* Mask for check type */
+#define FRAG_CHECKMASK          0x40    /* Mask for check expressions */
 
 /* Fragment types */
 #define FRAG_LITERAL   	        0x00   	/* Literal data */
@@ -73,9 +73,7 @@
 #define FRAG_FILL      	        0x20   	/* Fill bytes */
 
 /* Fragment checks */
-#define FRAG_CHECK_NONE         0x00    /* No checks applied */
-#define FRAG_CHECK_WARN         0x40    /* Check and warn */
-#define FRAG_CHECK_ERROR        0x80    /* Check and abort */
+#define FRAG_CHECK              0x40    /* Check expressions exist */
 
 
 

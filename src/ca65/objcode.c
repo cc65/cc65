@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -73,6 +73,7 @@ struct Segment {
     Segment*   	    List;      	       	/* List of all segments */
     Fragment*  	    Root;  	  	/* Root of fragment list */
     Fragment*  	    Last;  	  	/* Pointer to last fragment */
+    unsigned long   FragCount;          /* Number of fragments */
     unsigned        Num;   		/* Segment number */
     unsigned        Align; 		/* Segment alignment */
     unsigned long   PC;
@@ -81,7 +82,7 @@ struct Segment {
 
 
 #define SEG(segdef, num, prev)      \
-    { prev, 0, 0, num, 0, 0, segdef }
+    { prev, 0, 0, 0, num, 0, 0, segdef }
 
 /* Definitions for predefined segments */
 SegDef NullSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_NULL,     SEGTYPE_ABS);
@@ -136,13 +137,14 @@ static Segment* NewSegment (const char* Name, unsigned SegType)
     S = xmalloc (sizeof (*S));
 
     /* Initialize it */
-    S->List   = 0;
-    S->Root   = 0;
-    S->Last   = 0;
-    S->Num    = SegmentCount++;
-    S->Align  = 0;
-    S->PC     = 0;
-    S->Def    = NewSegDef (Name, SegType);
+    S->List      = 0;
+    S->Root      = 0;
+    S->Last      = 0;
+    S->FragCount = 0;
+    S->Num       = SegmentCount++;
+    S->Align     = 0;
+    S->PC        = 0;
+    S->Def       = NewSegDef (Name, SegType);
 
     /* Insert it into the segment list */
     SegmentLast->List = S;
@@ -314,7 +316,7 @@ void SegCheck (void)
      	       	       	     	PError (&F->Pos, ERR_RANGE);
      	       		    }
      	       		} else {
-     	     		    /* PC relative value */
+     	     	 	    /* PC relative value */
      	     		    if (Val < -128 || Val > 127) {
      	     	       	     	PError (&F->Pos, ERR_RANGE);
      	     		    }
@@ -408,12 +410,21 @@ static void WriteOneSeg (Segment* Seg)
 {
     Fragment* Frag;
     unsigned LineInfoIndex;
+    unsigned long DataSize;
+    unsigned long EndPos;
 
-    /* Write the segment name followed by the byte count in this segment */
-    ObjWriteStr (Seg->Def->Name);
-    ObjWrite32 (Seg->PC);
-    ObjWrite8 (Seg->Align);
-    ObjWrite8 (Seg->Def->Type);
+    /* Remember the file position, then write a dummy for the size of the
+     * following data
+     */
+    unsigned long SizePos = ObjGetFilePos ();
+    ObjWrite32 (0);
+
+    /* Write the segment data */
+    ObjWriteStr (Seg->Def->Name);       /* Name of the segment */
+    ObjWrite32 (Seg->PC);               /* Size */
+    ObjWrite8 (Seg->Align);             /* Segment alignment */
+    ObjWrite8 (Seg->Def->Type);         /* Type of the segment */
+    ObjWriteVar (Seg->FragCount);       /* Number of fragments that follow */
 
     /* Now walk through the fragment list for this segment and write the
      * fragments.
@@ -425,40 +436,40 @@ static void WriteOneSeg (Segment* Seg)
        	switch (Frag->Type) {
 
     	    case FRAG_LITERAL:
-		ObjWrite8 (FRAG_LITERAL);
-		ObjWriteVar (Frag->Len);
-	        ObjWriteData (Frag->V.Data, Frag->Len);
-    		break;
+    	    	ObjWrite8 (FRAG_LITERAL);
+    	    	ObjWriteVar (Frag->Len);
+    	        ObjWriteData (Frag->V.Data, Frag->Len);
+    	    	break;
 
     	    case FRAG_EXPR:
-    		switch (Frag->Len) {
-    		    case 1:   ObjWrite8 (FRAG_EXPR8);   break;
-    		    case 2:   ObjWrite8 (FRAG_EXPR16);	break;
-    		    case 3:   ObjWrite8 (FRAG_EXPR24);	break;
-    		    case 4:   ObjWrite8 (FRAG_EXPR32);	break;
-    		    default:  Internal ("Invalid fragment size: %u", Frag->Len);
-     		}
-    		WriteExpr (Frag->V.Expr);
-    		break;
+    	    	switch (Frag->Len) {
+    	    	    case 1:   ObjWrite8 (FRAG_EXPR8);   break;
+    	    	    case 2:   ObjWrite8 (FRAG_EXPR16);	break;
+    	    	    case 3:   ObjWrite8 (FRAG_EXPR24);	break;
+    	    	    case 4:   ObjWrite8 (FRAG_EXPR32);	break;
+    	    	    default:  Internal ("Invalid fragment size: %u", Frag->Len);
+     	    	}
+    	    	WriteExpr (Frag->V.Expr);
+    	    	break;
 
     	    case FRAG_SEXPR:
-    		switch (Frag->Len) {
-    		    case 1:   ObjWrite8 (FRAG_SEXPR8);  break;
-    		    case 2:   ObjWrite8 (FRAG_SEXPR16);	break;
-    		    case 3:   ObjWrite8 (FRAG_SEXPR24);	break;
-    		    case 4:   ObjWrite8 (FRAG_SEXPR32);	break;
-    		    default:  Internal ("Invalid fragment size: %u", Frag->Len);
-    		}
-    		WriteExpr (Frag->V.Expr);
-    		break;
+    	    	switch (Frag->Len) {
+    	    	    case 1:   ObjWrite8 (FRAG_SEXPR8);  break;
+    	    	    case 2:   ObjWrite8 (FRAG_SEXPR16);	break;
+    	    	    case 3:   ObjWrite8 (FRAG_SEXPR24);	break;
+    	    	    case 4:   ObjWrite8 (FRAG_SEXPR32);	break;
+    	    	    default:  Internal ("Invalid fragment size: %u", Frag->Len);
+    	    	}
+    	    	WriteExpr (Frag->V.Expr);
+    	    	break;
 
 	    case FRAG_FILL:
-		ObjWrite8 (FRAG_FILL);
+	    	ObjWrite8 (FRAG_FILL);
        	       	ObjWriteVar (Frag->Len);
-		break;
+	    	break;
 
     	    default:
-    	 	Internal ("Invalid fragment type: %u", Frag->Type);
+    	    	Internal ("Invalid fragment type: %u", Frag->Type);
 
     	}
 
@@ -474,6 +485,13 @@ static void WriteOneSeg (Segment* Seg)
 	/* Next fragment */
 	Frag = Frag->Next;
     }
+
+    /* Calculate the size of the data, seek back and write it */
+    EndPos = ObjGetFilePos ();          /* Remember where we are */
+    DataSize = EndPos - SizePos - 4;    /* Don't count size itself */
+    ObjSetFilePos (SizePos);            /* Seek back to the size */
+    ObjWrite32 (DataSize);              /* Write the size */
+    ObjSetFilePos (EndPos);             /* Seek back to the end */
 }
 
 
@@ -532,7 +550,6 @@ static Fragment* NewFragment (unsigned char Type, unsigned short Len)
     F = xmalloc (sizeof (*F));
 
     /* Initialize it */
-    F->List 	= 0;
     F->Next 	= 0;
     F->LineList = 0;
     F->Pos  	= CurPos;
@@ -540,21 +557,14 @@ static Fragment* NewFragment (unsigned char Type, unsigned short Len)
     F->Len  	= Len;
     F->Type 	= Type;
 
-    /* Insert it into the list of all segments */
-    if (FragList == 0) {
-    	FragList = F;
-    } else {
-    	FragLast->List = F;
-    }
-    FragLast = F;
-
-    /* Insert it into the current segment */
+    /* Insert the fragment into the current segment */
     if (ActiveSeg->Root) {
     	ActiveSeg->Last->Next = F;
     	ActiveSeg->Last = F;
     } else {
     	ActiveSeg->Root = ActiveSeg->Last = F;
     }
+    ++ActiveSeg->FragCount;
 
     /* Add this fragment to the current listing line */
     if (LineCur) {

@@ -60,17 +60,25 @@ struct Section;
 
 
 
+/* Fragment check expression */
+typedef struct CheckExpr CheckExpr;
+struct CheckExpr {
+    struct CheckExpr*   Next;           /* Next check expression */
+    struct ExprNode*    Expr;           /* The expression itself */
+    unsigned            Action;         /* Action to take if the check fails */
+    unsigned            Message;        /* Message number */
+};
+
 /* Fragment structure */
 typedef struct Fragment Fragment;
 struct Fragment {
     Fragment*	   	Next;  		/* Next fragment in list */
     struct ObjData*	Obj;		/* Source of fragment */
-    unsigned long      	Size;  		/* Size of data/expression */
+    unsigned            Size;  		/* Size of data/expression */
     struct ExprNode*	Expr;		/* Expression if FRAG_EXPR */
     FilePos  		Pos;		/* File position in source */
     struct LineInfo*    LI;             /* Additional line info */
-    struct ExprNode*    WarnExpr;       /* Print warning if expr true */
-    struct ExprNode*    ErrorExpr;      /* Print error if expr true */
+    CheckExpr*          Check;          /* Single linked list of expressions */
     unsigned char    	Type;  		/* Type of fragment */
     unsigned char      	LitBuf [1]; 	/* Dynamically alloc'ed literal buffer */
 };
@@ -83,7 +91,7 @@ struct Fragment {
 
 
 
-Fragment* NewFragment (unsigned char Type, unsigned long Size, struct Section* S);
+Fragment* NewFragment (unsigned char Type, unsigned Size, struct Section* S);
 /* Create a new fragment and insert it into the section S */
 
 

@@ -53,8 +53,11 @@
 
 
 
-void FileSeek (FILE* F, unsigned long Pos);
+void FileSetPos (FILE* F, unsigned long Pos);
 /* Seek to the given absolute position, fail on errors */
+
+unsigned long FileGetPos (FILE* F);
+/* Return the current file position, fail on errors */
 
 unsigned Read8 (FILE* F);
 /* Read an 8 bit value from the file */

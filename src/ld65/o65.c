@@ -398,9 +398,9 @@ static O65RelocTab* NewO65RelocTab (void)
     O65RelocTab* R = xmalloc (sizeof (O65RelocTab));
 
     /* Initialize the data */
-    R->Size = RELOC_BLOCKSIZE;
+    R->Size = 0;
     R->Fill = 0;
-    R->Buf  = xmalloc (RELOC_BLOCKSIZE);
+    R->Buf  = 0;
 
     /* Return the created struct */
     return R;

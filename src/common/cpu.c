@@ -50,8 +50,9 @@
 cpu_t CPU = CPU_UNKNOWN;
 
 /* Table with target names */
-const char* CPUNames [CPU_COUNT] = {
+const char* CPUNames[CPU_COUNT] = {
     "6502",
+    "65SC02",
     "65C02",
     "65816",
     "sunplus",

@@ -48,22 +48,23 @@
 typedef enum {
     CPU_UNKNOWN = -1,           /* Not specified or invalid target */
     CPU_6502,
+    CPU_65SC02,
     CPU_65C02,
     CPU_65816,
     CPU_SUNPLUS,	        /* Not in the freeware version - sorry */
-    CPU_COUNT 	    	        /* Number of different CPUs */
+    CPU_COUNT  	    	        /* Number of different CPUs */
 } cpu_t;
 
 /* CPU used */
 extern cpu_t CPU;
 
 /* Table with target names */
-extern const char* CPUNames [CPU_COUNT];
+extern const char* CPUNames[CPU_COUNT];
 
 
 
 /*****************************************************************************/
-/*     	       	     		     Code      			    	     */
+/*     	       	     	   	     Code      			    	     */
 /*****************************************************************************/
 
 
@@ -77,7 +78,7 @@ cpu_t FindCPU (const char* Name);
 
 /* End of cpu.h */
 
-#endif
+#endif                     
 
 
 

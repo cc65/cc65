@@ -91,7 +91,6 @@ S_OBJS = 	_fdesc.o	\
 	 	rand.o	      	\
 	 	setjmp.o      	\
 		sprintf.o	\
-		stkcheck.o  	\
 		strcat.o    	\
 		strchr.o	\
 		strcmp.o	\

@@ -38,6 +38,7 @@
 #include "dataseg.h"
 
 /* cc65 */
+#include "symtab.h"
 #include "asmcode.h"
 
 
@@ -72,12 +73,47 @@ void RemoveCode (CodeMark M)
 
 
 
+static void PrintFunctionHeader (FILE* F, SymEntry* Entry)
+{
+    /* Print a comment with the function signature */
+    fprintf (F,
+    	     "; ---------------------------------------------------------------\n"
+    	     "; ");
+    PrintFuncSig (F, Entry->Name, Entry->Type);
+    fprintf (F,
+       	     "\n"
+	     "; ---------------------------------------------------------------\n"
+ 	     "\n");
+}
+
+
+
 void WriteOutput (FILE* F)
 /* Write the final output to a file */
 {
-    OutputDataSeg (F, DS);
+    SymTable* SymTab;
+    SymEntry* Entry;
+
+    /* Output the global code and data segments */
     MergeCodeLabels (CS);
+    OutputDataSeg (F, DS);
     OutputCodeSeg (F, CS);
+
+    /* Output all global or referenced functions */
+    SymTab = GetGlobalSymTab ();
+    Entry  = SymTab->SymHead;
+    while (Entry) {
+       	if (IsTypeFunc (Entry->Type) 		&&
+	    (Entry->Flags & SC_DEF) != 0	&&
+	    (Entry->Flags & (SC_REF | SC_EXTERN)) != 0) {
+	    /* Function which is defined and referenced or extern */
+	    PrintFunctionHeader (F, Entry);
+	    MergeCodeLabels (Entry->V.F.CS);
+	    OutputDataSeg (F, Entry->V.F.DS);
+	    OutputCodeSeg (F, Entry->V.F.CS);
+     	}
+	Entry = Entry->NextSym;
+    }
 }
 
 

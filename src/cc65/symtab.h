@@ -160,6 +160,9 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags);
 SymTable* GetSymTab (void);
 /* Return the current symbol table */
 
+SymTable* GetGlobalSymTab (void);
+/* Return the global symbol table */
+
 int SymIsLocal (SymEntry* Sym);
 /* Return true if the symbol is defined in the highest lexical level */
 

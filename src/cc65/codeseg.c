@@ -309,7 +309,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 
 
 
-CodeSeg* NewCodeSeg (const char* Name)
+CodeSeg* NewCodeSeg (const char* SegName, const char* FuncName)
 /* Create a new code segment, initialize and return it */
 {
     unsigned I;
@@ -318,8 +318,9 @@ CodeSeg* NewCodeSeg (const char* Name)
     CodeSeg* S = xmalloc (sizeof (CodeSeg));
 
     /* Initialize the fields */
-    S->Next = 0;
-    S->Name = xstrdup (Name);
+    S->Next     = 0;
+    S->SegName  = xstrdup (SegName);
+    S->FuncName	= xstrdup (FuncName);
     InitCollection (&S->Entries);
     InitCollection (&S->Labels);
     for (I = 0; I < sizeof(S->LabelHash) / sizeof(S->LabelHash[0]); ++I) {
@@ -337,8 +338,9 @@ void FreeCodeSeg (CodeSeg* S)
 {
     unsigned I, Count;
 
-    /* Free the name */
-    xfree (S->Name);
+    /* Free the names */
+    xfree (S->SegName);
+    xfree (S->FuncName);
 
     /* Free the entries */
     Count = CollCount (&S->Entries);
@@ -566,11 +568,21 @@ void OutputCodeSeg (FILE* F, const CodeSeg* S)
     unsigned Count = CollCount (&S->Entries);
 
     /* Output the segment directive */
-    fprintf (F, ".segment\t\"%s\"\n", S->Name);
+    fprintf (F, ".segment\t\"%s\"\n\n", S->SegName);
+
+    /* If this is a segment for a function, enter a function */
+    if (S->FuncName[0] != '\0') {
+	fprintf (F, ".proc\t_%s\n\n", S->FuncName);
+    }
 
     /* Output all entries */
     for (I = 0; I < Count; ++I) {
 	OutputCodeEntry (F, CollConstAt (&S->Entries, I));
+    }
+
+    /* If this is a segment for a function, leave the function */
+    if (S->FuncName[0] != '\0') {
+	fprintf (F, "\n.endproc\n\n");
     }
 }
 

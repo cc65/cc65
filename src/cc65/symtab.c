@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -224,13 +224,13 @@ void LeaveGlobalLevel (void)
 
     /* Dump the tables if requested */
     if (Debug) {
-	PrintSymTable (SymTab0, stdout, "Global symbol table");
-	PrintSymTable (TagTab0, stdout, "Global tag table");
+     	PrintSymTable (SymTab0, stdout, "Global symbol table");
+     	PrintSymTable (TagTab0, stdout, "Global tag table");
     }
 
     /* Don't delete the symbol and struct tables! */
-    SymTab0 = SymTab = 0;
-    TagTab0 = TagTab = 0;
+    SymTab = 0;
+    TagTab = 0;
 }
 
 
@@ -664,8 +664,11 @@ SymEntry* AddLocalSym (const char* Name, const type* Type, unsigned Flags, int O
 SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
 /* Add an external or global symbol to the symbol table and return the entry */
 {
+    /* There is some special handling for functions, so check if it is one */
+    int IsFunc = IsTypeFunc (Type);
+
     /* Functions must be inserted in the global symbol table */
-    SymTable* Tab = IsTypeFunc (Type)? SymTab0 : SymTab;
+    SymTable* Tab = IsFunc? SymTab0 : SymTab;
 
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
@@ -716,8 +719,12 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
 	     * contains pointers to the new symbol tables that are needed if
 	     * an actual function definition follows.
 	     */
-	    if (IsTypeFunc (Type)) {
-	  	CopyEncode (Type+1, EType+1);
+	    if (IsFunc) {
+		/* Get the function descriptor from the new type */
+		FuncDesc* F = GetFuncDesc (Type);
+		/* Use this new function descriptor */
+		Entry->V.F.Func = F;
+		EncodePtr (EType+1, F);
 	    }
      	}
 
@@ -731,6 +738,15 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
 
      	/* Set the symbol attributes */
      	Entry->Type = TypeDup (Type);
+
+	/* If this is a function, set the function descriptor and clear
+	 * additional fields.
+	 */
+	if (IsFunc) {
+	    Entry->V.F.Func = GetFuncDesc (Entry->Type);
+	    Entry->V.F.CS   = 0;
+	    Entry->V.F.DS   = 0;
+	}
 
      	/* Add the entry to the symbol table */
      	AddSymEntry (Tab, Entry);
@@ -752,6 +768,14 @@ SymTable* GetSymTab (void)
 /* Return the current symbol table */
 {
     return SymTab;
+}
+
+
+
+SymTable* GetGlobalSymTab (void)
+/* Return the global symbol table */
+{
+    return SymTab0;
 }
 
 

@@ -39,7 +39,18 @@
 
 
 /*****************************************************************************/
-/*   			    	     data				     */
+/*				   Forwards				     */
+/*****************************************************************************/
+
+
+
+struct CodeSeg;
+struct DataSeg;
+
+
+
+/*****************************************************************************/
+/*   			    	     Data				     */
 /*****************************************************************************/
 
 
@@ -98,6 +109,12 @@ void g_preamble (void);
 /*****************************************************************************/
 
 
+
+void g_pushseg (struct CodeSeg** CS, struct DataSeg** DS, const char* FuncName);
+/* Push the current segments and generate new ones for the given function */
+
+void g_popseg (void);
+/* Restore the old segments */
 
 void g_usecode (void);
 /* Switch to the code segment */

@@ -200,6 +200,9 @@ void PrintType (FILE* F, const type* Type);
 void PrintRawType (FILE* F, const type* Type);
 /* Print a type string in raw format (for debugging) */
 
+void PrintFuncSig (FILE* F, const char* Name, type* Type);
+/* Print a function signature. */
+
 void Encode (type* Type, unsigned long Val);
 /* Encode an unsigned long into a type array */
 
@@ -309,6 +312,9 @@ type GetQualifier (const type* T) attribute ((const));
 
 FuncDesc* GetFuncDesc (const type* T) attribute ((const));
 /* Get the FuncDesc pointer from a function or pointer-to-function type */
+
+type* GetFuncReturn (type* T) attribute ((const));
+/* Return a pointer to the return type of a function or pointer-to-function type */
 
 
 

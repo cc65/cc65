@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -134,8 +134,9 @@ void DumpSymEntry (FILE* F, const SymEntry* E)
     if (E->Type) {
      	PrintType (F, E->Type);
     } else {
-     	fprintf (F, "(none)\n");
+     	fprintf (F, "(none)");
     }
+    fprintf (F, "\n");
 }
 
 

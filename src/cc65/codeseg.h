@@ -62,7 +62,8 @@
 typedef struct CodeSeg CodeSeg;
 struct CodeSeg {
     CodeSeg*	Next;				/* Pointer to next CodeSeg */
-    char*	Name;	  			/* Segment name */
+    char*	SegName;  			/* Segment name */
+    char*	FuncName;			/* Name of function */
     Collection	Entries;			/* List of code entries */
     Collection	Labels;				/* Labels for next insn */
     CodeLabel* 	LabelHash [CS_LABEL_HASH_SIZE];	/* Label hash table */
@@ -79,7 +80,7 @@ extern CodeSeg* CS;
 
 
 
-CodeSeg* NewCodeSeg (const char* Name);
+CodeSeg* NewCodeSeg (const char* SegName, const char* FuncName);
 /* Create a new code segment, initialize and return it */
 
 void FreeCodeSeg (CodeSeg* S);

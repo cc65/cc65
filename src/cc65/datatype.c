@@ -239,42 +239,44 @@ void PrintType (FILE* F, const type* Type)
     	T = PrintTypeComp (F, T, T_QUAL_CONST, "const");
 	T = PrintTypeComp (F, T, T_QUAL_VOLATILE, "volatile");
 
-    	/* Signedness */
-    	T = PrintTypeComp (F, T, T_SIGN_SIGNED, "signed");
+    	/* Signedness. Omit the signedness specifier for long and int */
+	if ((T & T_MASK_TYPE) != T_TYPE_INT && (T & T_MASK_TYPE) != T_TYPE_LONG) {
+	    T = PrintTypeComp (F, T, T_SIGN_SIGNED, "signed");
+	}
     	T = PrintTypeComp (F, T, T_SIGN_UNSIGNED, "unsigned");
 
     	/* Now check the real type */
      	switch (T & T_MASK_TYPE) {
     	    case T_TYPE_CHAR:
-    	  	fprintf (F, "char\n");
+    	  	fprintf (F, "char");
     	  	break;
 	    case T_TYPE_SHORT:
-		fprintf (F, "short\n");
+		fprintf (F, "short");
 		break;
     	    case T_TYPE_INT:
-    	  	fprintf (F, "int\n");
+    	  	fprintf (F, "int");
     	  	break;
 	    case T_TYPE_LONG:
-		fprintf (F, "long\n");
+		fprintf (F, "long");
 		break;
 	    case T_TYPE_LONGLONG:
-		fprintf (F, "long long\n");
+		fprintf (F, "long long");
 		break;
     	    case T_TYPE_FLOAT:
-    	     	fprintf (F, "float\n");
+    	     	fprintf (F, "float");
     	     	break;
     	    case T_TYPE_DOUBLE:
-    	     	fprintf (F, "double\n");
+    	     	fprintf (F, "double");
     	     	break;
      	    case T_TYPE_VOID:
-     	  	fprintf (F, "void\n");
+     	  	fprintf (F, "void");
     	  	break;
     	    case T_TYPE_STRUCT:
-    	     	fprintf (F, "struct %s\n", ((SymEntry*) DecodePtr (Type))->Name);
+    	     	fprintf (F, "struct %s", ((SymEntry*) DecodePtr (Type))->Name);
        	     	Type += DECODE_SIZE;
 	     	break;
 	    case T_TYPE_UNION:
-	     	fprintf (F, "union %s\n", ((SymEntry*) DecodePtr (Type))->Name);
+	     	fprintf (F, "union %s", ((SymEntry*) DecodePtr (Type))->Name);
 	     	Type += DECODE_SIZE;
 	     	break;
 	    case T_TYPE_ARRAY:
@@ -289,10 +291,44 @@ void PrintType (FILE* F, const type* Type)
 	     	Type += DECODE_SIZE;
 	     	break;
 	    default:
-	     	fprintf (F, "unknown type: %04X\n", T);
+	     	fprintf (F, "unknown type: %04X", T);
 	}
 
     }
+}
+
+
+
+void PrintFuncSig (FILE* F, const char* Name, type* Type)
+/* Print a function signature. */
+{
+    /* Get the function descriptor */
+    const FuncDesc* D = GetFuncDesc (Type);
+
+    /* Print a comment with the function signature */
+    PrintType (F, GetFuncReturn (Type));
+    if (D->Flags & FD_FASTCALL) {
+     	fprintf (F, " __fastcall__");
+    }
+    fprintf (F, " %s (", Name);
+
+    /* Parameters */
+    if (D->Flags & FD_VOID_PARAM) {
+ 	fprintf (F, "void");
+    } else {
+ 	unsigned I;
+ 	SymEntry* E = D->SymTab->SymHead;
+ 	for (I = 0; I < D->ParamCount; ++I) {
+ 	    if (I > 0) {
+ 		fprintf (F, ", ");
+ 	    }
+ 	    PrintType (F, E->Type);
+ 	    E = E->NextSym;
+ 	}
+    }
+
+    /* End of parameter list */
+    fprintf (F, ")");
 }
 
 
@@ -732,6 +768,23 @@ FuncDesc* GetFuncDesc (const type* T)
     return (FuncDesc*) DecodePtr (T+1);
 }
 
+
+
+type* GetFuncReturn (type* T)
+/* Return a pointer to the return type of a function or pointer-to-function type */
+{
+    if (T[0] == T_PTR) {
+	/* Pointer to function */
+	++T;
+    }
+
+    /* Be sure it's a function type */
+    CHECK (T[0] == T_FUNC);
+
+    /* Return a pointer to the return type */
+    return T + 1 + DECODE_SIZE;
+
+}
 
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -62,7 +62,7 @@
 /* Structure that holds all data needed for function activation */
 struct Function {
     struct SymEntry*   	FuncEntry;	/* Symbol table entry */
-    type*   	  	ReturnType;	/* Function return type */
+    type*		ReturnType;	/* Function return type */
     struct FuncDesc*	Desc;	  	/* Function descriptor */
     int			Reserved;	/* Reserved local space */
     unsigned	  	RetLab;	    	/* Return code label */
@@ -88,7 +88,7 @@ static Function* NewFunction (struct SymEntry* Sym)
 
     /* Initialize the fields */
     F->FuncEntry  = Sym;
-    F->ReturnType = Sym->Type + 1 + DECODE_SIZE;
+    F->ReturnType = GetFuncReturn (Sym->Type);
     F->Desc   	  = (FuncDesc*) DecodePtr (Sym->Type + 1);
     F->Reserved	  = 0;
     F->RetLab	  = GetLocalLabel ();
@@ -220,7 +220,7 @@ void NewFunc (SymEntry* Func)
     unsigned Flags;
 
     /* Get the function descriptor from the function entry */
-    FuncDesc* D = (FuncDesc*) DecodePtr (Func->Type+1);
+    FuncDesc* D = Func->V.F.Func;
 
     /* Allocate the function activation record for the function */
     CurrentFunc = NewFunction (Func);
@@ -248,9 +248,8 @@ void NewFunc (SymEntry* Func)
     /* Setup register variables */
     InitRegVars ();
 
-    /* Switch to the code segment and define the function name label */
-    g_usecode ();
-    g_defgloblabel (Func->Name);
+    /* Allocate code and data segments for this function */
+    g_pushseg (&Func->V.F.CS, &Func->V.F.DS, Func->Name);
 
     /* If this is a fastcall function, push the last parameter onto the stack */
     if (IsFastCallFunc (Func->Type) && D->ParamCount > 0) {
@@ -339,11 +338,13 @@ void NewFunc (SymEntry* Func)
     /* Leave the lexical level */
     LeaveFunctionLevel ();
 
+    /* Switch back to the old segments */
+    g_popseg ();
+
     /* Reset the current function pointer */
     FreeFunction (CurrentFunc);
     CurrentFunc = 0;
 }
-
 
 
 

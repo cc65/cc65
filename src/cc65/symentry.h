@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -107,7 +107,11 @@ struct SymEntry {
 	} S;
 
 	/* Data for functions */
-	struct FuncDesc*	Func;	  /* Function descriptor */
+	struct {
+	    struct FuncDesc*	Func;	  /* Function descriptor */
+	    struct CodeSeg*	CS;	  /* Code for function */
+	    struct DataSeg*	DS;	  /* Data segment for function */
+       	} F;
 
     } V;
     char       	   	       Name[1];	/* Name, dynamically allocated */

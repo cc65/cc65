@@ -1677,7 +1677,7 @@ void hie10 (ExprDesc* Expr)
      	case TOK_STAR:
      	    NextToken ();
             ExprWithCheck (hie10, Expr);
-            if (ED_IsLVal (Expr) || !(ED_IsLocConst (Expr) || ED_IsLocStack (Expr)))) {
+            if (ED_IsLVal (Expr) || !(ED_IsLocConst (Expr) || ED_IsLocStack (Expr))) {
                 /* Not a const, load it into the primary and make it a
                  * calculated value.
                  */

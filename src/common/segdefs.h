@@ -77,6 +77,9 @@ void FreeSegDef (SegDef* D);
 SegDef* DupSegDef (const SegDef* D);
 /* Duplicate a segment definition and return it */
 
+const char* SetTypeToStr (unsigned char Type);
+/* Map a segment type into a string */
+
 
 
 /* End of segdefs.h */

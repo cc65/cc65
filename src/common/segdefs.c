@@ -80,3 +80,16 @@ SegDef* DupSegDef (const SegDef* Def)
 
 
 
+const char* SetTypeToStr (unsigned char Type)
+/* Map a segment type into a string */
+{
+    switch (Type) {
+        case SEGTYPE_ABS:       return "abs";
+        case SEGTYPE_ZP:        return "zp";
+        case SEGTYPE_FAR:       return "far";
+        default:                return "unknown";
+    }
+}
+
+
+

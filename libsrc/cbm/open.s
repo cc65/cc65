@@ -57,13 +57,14 @@ next:   dex
 
 .proc   _open
 
-	cpy	#4     	   	; correct # of arguments (bytes)?
-	beq	parmok 	   	; parameter count ok
-	tya	       	   	; parm count < 4 shouldn't be needed to be...
-       	sec    	       	       	; ...checked (it generates a c compiler warning)
-	sbc	#4
-	tay
-	jsr	addysp	   	; fix stack, throw away unused parameters
+; Throw away any additional parameters passed through the ellipsis
+
+       	dey                     ; Parm count < 4 shouldn't be needed to be...
+       	dey                     ; ...checked (it generates a c compiler warning)
+        dey
+	dey
+	beq  	parmok 	   	; Branch if parameter count ok
+	jsr  	addysp	   	; Fix stack, throw away unused parameters
 
 ; Parameters ok. Pop the flags and save them into tmp3
 

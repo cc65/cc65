@@ -50,7 +50,7 @@ clean:
 	rm -f *~
 
 zap:	clean
-	rm -f $(TXT) $(HTML) $(INFO) $(DVI)
+	rm -f $(TXT) $(HTML) $(INFO) $(DVI) *.html *.info-*
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

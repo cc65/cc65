@@ -210,7 +210,7 @@ INLINE void ED_MakeLVal (ExprDesc* Expr)
     Expr->Flags |= E_RTYPE_LVAL;
 }
 #else
-#  define ED_MakeLVal(Expr)       do { (Expr)->Flags |= R_RTYPE_LVAL; } while (0)
+#  define ED_MakeLVal(Expr)       do { (Expr)->Flags |= E_RTYPE_LVAL; } while (0)
 #endif
 
 #if defined(HAVE_INLINE)

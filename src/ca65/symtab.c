@@ -83,21 +83,21 @@
 #define SF_DBGINFOVAL 	(SF_DEFINED)
 
 /* Structure of a symbol table entry */
-struct SymEntry_ {
+struct SymEntry {
     SymEntry*  	      	    Left;      	/* Lexically smaller entry */
-    SymEntry* 	    	    Right; 	/* Lexically larger entry */
-    SymEntry*	    	    List;	/* List of all entries */
+    SymEntry*  	    	    Right; 	/* Lexically larger entry */
+    SymEntry*  	    	    List;	/* List of all entries */
     SymEntry*  	       	    Locals;  	/* Root of subtree for local symbols */
-    struct SymTable_*	    SymTab;	/* Table this symbol is in, 0 for locals */
+    struct SymTable*	    SymTab;	/* Table this symbol is in, 0 for locals */
     FilePos    	       	    Pos;  	/* File position for this symbol */
     unsigned                Flags;	/* Symbol flags */
     unsigned	    	    Index;	/* Index of import/export entries */
     union {
-        struct ExprNode_*   Expr;      	/* Expression if CONST not set */
+        struct ExprNode*    Expr;      	/* Expression if CONST not set */
 	long	    	    Val;  	/* Value (if CONST set) */
-	SymEntry*	    Sym;	/* Symbol (if trampoline entry) */
+	SymEntry*  	    Sym;	/* Symbol (if trampoline entry) */
     } V;
-    unsigned char	    InitVal;	/* Initializer value */
+    unsigned char  	    InitVal;	/* Initializer value */
     char       	       	    Name [1];	/* Dynamic allocation */
 };
 
@@ -106,12 +106,12 @@ struct SymEntry_ {
 /* Definitions for the hash table */
 #define MAIN_HASHTAB_SIZE   	213
 #define SUB_HASHTAB_SIZE    	53
-typedef struct SymTable_ SymTable;
-struct SymTable_ {
-    unsigned 	     	TableSlots;	/* Number of hash table slots */
-    unsigned 	    	TableEntries;	/* Number of entries in the table */
+typedef struct SymTable SymTable;
+struct SymTable {
+    unsigned   	     	TableSlots;	/* Number of hash table slots */
+    unsigned   	    	TableEntries;	/* Number of entries in the table */
     SymTable*       	BackLink;   	/* Link to enclosing scope if any */
-    SymEntry*	    	Table [1];  	/* Dynamic allocation */
+    SymEntry*  	    	Table [1];  	/* Dynamic allocation */
 };
 
 
@@ -140,7 +140,7 @@ static unsigned     	ExportCount = 0;/* Counter for export symbols */
 
 static int IsLocal (const char* Name)
 /* Return true if Name is the name of a local symbol */
-{
+{	       
     return (*Name == LocalStart);
 }
 

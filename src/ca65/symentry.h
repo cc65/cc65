@@ -45,7 +45,7 @@
 
 
 /* Forward declaration for struct SymEntry */
-typedef struct SymEntry_ SymEntry;
+typedef struct SymEntry SymEntry;
 
 
 

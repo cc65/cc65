@@ -89,7 +89,7 @@
 #define EXPR_FORCEWORD		(EXPR_UNARYNODE | 0x05)
 #define EXPR_FORCEFAR		(EXPR_UNARYNODE | 0x06)
 
-#define EXPR_BYTE0            	(EXPR_UNARYNODE | 0x08)	
+#define EXPR_BYTE0            	(EXPR_UNARYNODE | 0x08)
 #define EXPR_BYTE1            	(EXPR_UNARYNODE | 0x09)
 #define EXPR_BYTE2		(EXPR_UNARYNODE | 0x0A)
 #define EXPR_BYTE3		(EXPR_UNARYNODE | 0x0B)
@@ -99,18 +99,18 @@
 
 
 /* The expression node itself */
-typedef struct ExprNode_ ExprNode;
-struct ExprNode_ {
+typedef struct ExprNode ExprNode;
+struct ExprNode {
     unsigned char    	    Op;	    	/* Operand/Type */
-    ExprNode*	     	    Left;      	/* Left leaf */
-    ExprNode*	     	    Right;     	/* Right leaf */
-    struct ObjData_*	    Obj;	/* Object file reference (linker) */
+    ExprNode*  	     	    Left;      	/* Left leaf */
+    ExprNode*  	     	    Right;     	/* Right leaf */
+    struct ObjData*	    Obj;	/* Object file reference (linker) */
     union {
        	long         	    Val;	/* If this is a value */
-       	struct SymEntry_*   Sym;	/* If this is a symbol */
-	unsigned	    SegNum;  	/* If this is a segment */
+       	struct SymEntry*    Sym;	/* If this is a symbol */
+	unsigned       	    SegNum;  	/* If this is a segment */
 	unsigned	    ImpNum;	/* If this is an import */
-	struct Memory_*	    MemArea;	/* If this is a memory area */
+	struct Memory*	    MemArea;	/* If this is a memory area */
     } V;
 };
 

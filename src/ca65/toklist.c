@@ -37,6 +37,7 @@
 
 #include "../common/xmalloc.h"
 
+#include "istack.h"
 #include "scanner.h"
 #include "toklist.h"
 
@@ -177,6 +178,59 @@ void AddCurTok (TokList* List)
 
     /* Count nodes */
     List->Count++;
+}
+
+
+
+static int ReplayTokList (void* List)
+/* Function that gets the next token from a token list and sets it. This
+ * function may be used together with the PushInput function from the istack
+ * module.
+ */
+{
+    /* Cast the generic pointer to an actual list */
+    TokList* L = List;
+
+    /* Set the next token from the list */
+    TokSet (L->Last);
+
+    /* If this was the last token, decrement the repeat counter. If it goes
+     * zero, delete the list and remove the function from the stack.
+     */
+    if (L->Last == 0) {
+	if (--L->Repeat == 0) {
+	    /* Done with this list */
+	    FreeTokList (L);
+	    PopInput ();
+	} else {
+	    /* Replay one more time */
+	    L->Last = L->Root;
+	}
+    }
+
+    /* We have a token */
+    return 1;
+}
+
+
+
+void PushTokList (TokList* List, const char* Desc)
+/* Push a token list to be used as input for InputFromStack. This includes
+ * several initializations needed in the token list structure, so don't use
+ * PushInput directly.
+ */
+{
+    /* If the list is empty, just delete it and bail out */
+    if (List->Count == 0) {
+	FreeTokList (List);
+	return;
+    }
+
+    /* Reset the last pointer to the first element */
+    List->Last = List->Root;
+
+    /* Insert the list specifying our input function */
+    PushInput (ReplayTokList, List, Desc);
 }
 
 

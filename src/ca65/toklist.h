@@ -105,6 +105,12 @@ void FreeTokList (TokList* T);
 void AddCurTok (TokList* T);
 /* Add the current token to the token list */
 
+void PushTokList (TokList* List, const char* Desc);
+/* Push a token list to be used as input for InputFromStack. This includes
+ * several initializations needed in the token list structure, so don't use
+ * PushInput directly.
+ */
+
 
 
 /* End of toklist.h */

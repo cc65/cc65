@@ -61,7 +61,7 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
     /* Read the token list */
     unsigned Current = 0;
     unsigned Parens  = 0;
-    while (Parens != 0 && Tok != TOK_RPAREN) {
+    while (Parens != 0 || Tok != TOK_RPAREN) {
 
     	/* Check for end of line or end of input */
     	if (Tok == TOK_SEP || Tok == TOK_EOF) {
@@ -83,6 +83,7 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
 	}
 
 	/* Get the next token */
+	++Current;
 	NextTok ();
     }
 
@@ -187,7 +188,7 @@ static void FuncMid (void)
 
     /* Count argument */
     Count = ConstExpression ();
-    if (Count > 100) {
+    if (Count < 0 || Count > 100) {
 	Error (ERR_RANGE);
 	Count = 1;
     }
@@ -197,9 +198,7 @@ static void FuncMid (void)
     List = CollectTokens ((unsigned) Start, (unsigned) Count);
 
     /* Insert it into the scanner feed */
-
-
-
+    PushTokList (List, ".MID");
 }
 
 

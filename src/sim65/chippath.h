@@ -47,7 +47,7 @@
 void AddChipPath (const char* NewPath);
 /* Add a search path for chips */
 
-char* FindChip (const char* LibName);
+char* FindChipLib (const char* LibName);
 /* Find a chip library. Return a pointer to a malloced area that contains
  * the complete path, if found, return 0 otherwise.
  */

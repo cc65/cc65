@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                    chip.h                                 */
+/*				     ram.c				     */
 /*                                                                           */
-/*                        Interface for the chip plugins                     */
+/*		    RAM plugin for the sim65 6502 simulator		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef CHIP_H
-#define CHIP_H
+/* sim65 */
+#include "chipif.h"
 
 
 
@@ -44,54 +44,23 @@
 
 
 
-/* Forward */
-struct SimData;
-
-/* Chip structure */
-typedef struct Chip Chip;
-struct Chip {
-    char*       Name;                   /* Name - must be unique */
-    char*       LibName;                /* Name of the associated library */
-    void*       Handle;                 /* Library handle or pointer to it */
-
-    /* -- Exported functions -- */
-    unsigned        (*InitChip) (const struct SimData* Data);
-    const char*     (*GetName) (void);
-    unsigned        (*GetVersion) (void);
-
-    void            (*WriteCtrl) (unsigned Addr, unsigned char Val);
-    void            (*Write) (unsigned Addr, unsigned char Val);
-
-    unsigned char   (*ReadCtrl) (unsigned Addr);
-    unsigned char   (*Read) (unsigned Addr);
-};
-
-
-
 /*****************************************************************************/
 /*     	      	    		     Code				     */
 /*****************************************************************************/
 
 
 
-void LoadChip (const char* LibName);
-/* Load a chip. This includes loading the shared libary, allocating and
- * initializing the data structure.
- */
-
-void InitChips (void);
-/* Initialize the chips. Must be called *after* all chips are loaded */
-
-const Chip* FindChip (const char* Name);
-/* Find a chip by name. Returns the Chip data structure or NULL if the chip
- * could not be found.
- */
+const char* GetName (void)
+{
+    return "RAM";
+}
 
 
 
-/* End of chip.h */
-
-#endif
+unsigned GetVersion (void)
+{
+    return 1;
+}
 
 
 

@@ -17,7 +17,8 @@ OBJS = 	chip.o          \
         error.o         \
 	global.o	\
 	main.o          \
-        memory.o
+        memory.o	\
+        simdata.o
 
 LIBS = $(COMMON)/common.a
 

@@ -38,6 +38,7 @@
 
 /* common */
 #include "coll.h"
+#include "print.h"
 #include "xmalloc.h"
 
 /* sim65 */
@@ -64,7 +65,7 @@ static Collection Chips = STATIC_COLLECTION_INITIALIZER;
 
 
 
-static int CmpChips (void* Data attribute ((unused)), 
+static int CmpChips (void* Data attribute ((unused)),
 		     const void* lhs, const void* rhs)
 /* Compare function for CollSort */
 {
@@ -153,9 +154,11 @@ void LoadChip (const char* LibName)
     Chip* C;
     void* H;
     const char* Msg;
+    unsigned Ver;
+    const char* Name;
 
     /* Locate the library */
-    char* PathName = FindChip (LibName);
+    char* PathName = FindChipLib (LibName);
     if (PathName == 0) {
         /* Library not found */
         Error ("Cannot find chip plugin library `%s'", LibName);
@@ -178,16 +181,21 @@ void LoadChip (const char* LibName)
     C = NewChip (H, LibName);
 
     /* Read function pointers */
-    C->InitChip     = GetSym (C, "InitChip");
+/*    C->InitChip     = GetSym (C, "InitChip"); */
     C->GetName      = GetSym (C, "GetName");
     C->GetVersion   = GetSym (C, "GetVersion");
-    C->WriteCtrl    = GetSym (C, "WriteCtrl");
-    C->Write        = GetSym (C, "Write");
-    C->ReadCtrl     = GetSym (C, "ReadCtrl");
-    C->Read         = GetSym (C, "Read");
+/*    C->WriteCtrl    = GetSym (C, "WriteCtrl"); */
+/*    C->Write        = GetSym (C, "Write"); */
+/*    C->ReadCtrl     = GetSym (C, "ReadCtrl"); */
+/*    C->Read         = GetSym (C, "Read"); */
 
     /* Insert the structure into the list of all chips */
     CollAppend (&Chips, C);
+
+    /* Call the functions */
+    Name = C->GetName ();
+    Ver  = C->GetVersion ();
+    printf ("%s version %u\n", Name, Ver);
 }
 
 
@@ -201,7 +209,7 @@ void InitChips (void)
 
 
 
-const Chip* GetChip (const char* Name)
+const Chip* FindChip (const char* Name)
 /* Find a chip by name. Returns the Chip data structure or NULL if the chip
  * could not be found.
  */

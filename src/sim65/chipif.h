@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                    chip.h                                 */
+/*				   chipif.h				     */
 /*                                                                           */
-/*                        Interface for the chip plugins                     */
+/*	      Interface header file for plugins - unused by sim65	     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,63 +33,17 @@
 
 
 
-#ifndef CHIP_H
-#define CHIP_H
+#ifndef CHIPIF_H
+#define CHIPIF_H
 
 
 
-/*****************************************************************************/
-/*                                     Data                                  */
-/*****************************************************************************/
+/* sim65 */
+#include "simdata.h"
 
 
 
-/* Forward */
-struct SimData;
-
-/* Chip structure */
-typedef struct Chip Chip;
-struct Chip {
-    char*       Name;                   /* Name - must be unique */
-    char*       LibName;                /* Name of the associated library */
-    void*       Handle;                 /* Library handle or pointer to it */
-
-    /* -- Exported functions -- */
-    unsigned        (*InitChip) (const struct SimData* Data);
-    const char*     (*GetName) (void);
-    unsigned        (*GetVersion) (void);
-
-    void            (*WriteCtrl) (unsigned Addr, unsigned char Val);
-    void            (*Write) (unsigned Addr, unsigned char Val);
-
-    unsigned char   (*ReadCtrl) (unsigned Addr);
-    unsigned char   (*Read) (unsigned Addr);
-};
-
-
-
-/*****************************************************************************/
-/*     	      	    		     Code				     */
-/*****************************************************************************/
-
-
-
-void LoadChip (const char* LibName);
-/* Load a chip. This includes loading the shared libary, allocating and
- * initializing the data structure.
- */
-
-void InitChips (void);
-/* Initialize the chips. Must be called *after* all chips are loaded */
-
-const Chip* FindChip (const char* Name);
-/* Find a chip by name. Returns the Chip data structure or NULL if the chip
- * could not be found.
- */
-
-
-
-/* End of chip.h */
+/* End of chipif.h */
 
 #endif
 

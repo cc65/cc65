@@ -11,6 +11,7 @@ EBIND	= emxbind
 LDFLAGS	=
 
 OBJS = 	addrspace.o     \
+        callback.o      \
         cfgdata.o       \
         chip.o          \
         chippath.o      \

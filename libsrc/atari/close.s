@@ -10,7 +10,6 @@
 	.import	fdtoiocb_down,__inviocb
 
 .proc	_close
-	jsr	popax
 	jsr	fdtoiocb_down		; get iocb index into X and decr. usage count
 	bmi	inverr
 	bne	ok			; not last one -> don't close yet

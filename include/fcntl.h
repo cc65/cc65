@@ -58,7 +58,7 @@ typedef long int off_t;
 
 /* Functions */
 int open (const char* name, int flags, ...);	/* May take a mode argument */
-int close (int fd);
+int __fastcall__ close (int fd);
 int write (int fd, const void* buf, unsigned count);
 int read (int fd, void* buf, unsigned count);
 int mkdir (const char* name, ...);		/* May take a mode argument */

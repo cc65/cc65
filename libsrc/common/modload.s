@@ -68,14 +68,12 @@ Header:         .res    O65_HDR_SIZE    ; The o65 header
 ; Input
 InputByte       = Header                ; Byte read from input
 
-; Stuff needed for relocation. Since the ld65 linker uses a relocation base
-; address of zero for all segments, the relocation values needed are actually
-; the start addresses of the segments. Among other things this means that the
-; relocation value for the text segment is the same as the start address as
-; the whole module block.
-TextReloc       = Module                ; Relocation value for code seg
-DataReloc       = Header + 1            ; Relocation value for data seg
-BssReloc        = Header + 3            ; Relocation value for bss seg
+; Segment addresses. Since the ld65 linker uses a relocation base address
+; of zero for all segments, the addresses of the segments are also the
+; relocation values.
+CodeAddr        = Module                ; Address of code seg
+DataAddr        = Header + 1            ; Address of data seg
+BssAddr         = Header + 3            ; Address of bss seg
 
 .data
 Read:           jmp     $FFFF           ; Jump to read routine
@@ -98,18 +96,6 @@ PushCtrl:
         jmp     pushax
 
 ;------------------------------------------------------------------------------
-; LoadCtrl: Load a word from the control structure into a/x. The offset of the
-;           high byte is passed in Y.
-
-.code
-LoadCtrl:
-        lda     (Ctrl),y
-        tax
-        dey
-        lda     (Ctrl),y
-        rts
-
-;------------------------------------------------------------------------------
 ; RestoreRegBank: Restore the register bank contents from the save area. Will
 ;                 destroy A and X (the latter will be zero on return).
 
@@ -129,20 +115,20 @@ RestoreRegBank:
 GetReloc:
         cmp     #O65_SEGID_TEXT
         bne     @L1
-        lda     TextReloc
-        ldx     TextReloc+1
+        lda     CodeAddr
+        ldx     CodeAddr+1
         rts
 
 @L1:    cmp     #O65_SEGID_DATA
         bne     @L2
-        lda     DataReloc
-        ldx     DataReloc+1
+        lda     DataAddr
+        ldx     DataAddr+1
         rts
 
 @L2:    cmp     #O65_SEGID_BSS
         bne     @L3
-        lda     BssReloc
-        ldx     BssReloc+1
+        lda     BssAddr
+        ldx     BssAddr+1
         rts
 
 @L3:    cmp     #O65_SEGID_ZP
@@ -344,10 +330,12 @@ _mod_load:
 ; Get the read function pointer from the control structure and place it into
 ; our call vector
 
-        ldy     #MODCTRL_READ+1
-        jsr     LoadCtrl
+        ldy     #MODCTRL_READ
+        lda     (Ctrl),y
         sta     Read+1
-        stx     Read+2
+        iny
+        lda     (Ctrl),y     
+        sta     Read+2
 
 ; Read the o65 header: C->read (C, &H, sizeof (H))
 
@@ -418,58 +406,33 @@ OptDone:
         lda     #MLOAD_ERR_MEM
         jmp     CleanupAndExit
 
-; We got the memory block. Setup the pointers and sizes in the control
-; structure. We will use internal knowlege about the layout of the structure
-; here to save some code.
+; We got the memory block. Place a pointer to the memory block also in the
+; module control structure.
 
 GotMem: lda     Module                  ; Ctrl->module = Module;
         ldy     #MODCTRL_MODULE
         sta     (Ctrl),y
-        ldy     #MODCTRL_CODE           ; Ctrl->code = Module;
-        sta     (Ctrl),y
         txa
         iny
-        sta     (Ctrl),y                ; MODCTRL_CODE+1
-        ldy     #MODCTRL_MODULE+1
         sta     (Ctrl),y
 
-; The following loop will also copy some information that is not needed just
-; to save some code.
+; Calculate the start addresses of the segments. Since the linker uses a
+; base address of zero for all segments, the load addresses are also the
+; relocation values for the segments.
 
-        ldx     #O65_HDR_TLEN
-        ldy     #MODCTRL_CODE_SIZE
-CLoop:  lda     Header,x
-        sta     (Ctrl),y
-        inx
-        iny
-        cpy     #MODCTRL_SIZE
-        bne     CLoop
-
-; Missing in the control structure now: start of the data and bss segments.
-; Since the linker relocates all segments to zero, these addresses are also
-; the relocation values for the segments.
-
-        ldy     #MODCTRL_DATA
         lda     Module
         add     Header + O65_HDR_TLEN
-        sta     (Ctrl),y
-        sta     DataReloc
-        iny
+        sta     DataAddr
         lda     Module + 1
         adc     Header + O65_HDR_TLEN + 1
-        sta     (Ctrl),y
-        sta     DataReloc + 1
+        sta     DataAddr + 1
 
-        ldy     #MODCTRL_BSS
         lda     Module
         add     TPtr
-        sta     (Ctrl),y
-        sta     BssReloc
-        iny
+        sta     BssAddr
         lda     Module+1
         add     TPtr+1
-        sta     (Ctrl),y
-        sta     BssReloc + 1
+        sta     BssAddr + 1
 
 ; Control structure is complete now. Load code and data segment into memory.
 ; The sum of the sizes of code+data segment is still in TPtr.
@@ -494,8 +457,8 @@ CLoop:  lda     Header,x
         beq     Reloc
 Undef:  jmp     FormatError
 
-; Number of undefined references was zero. Next sections are the relocation
-; tables for code and data segment. Relocate the code segment
+; Number of undefined references was zero. Next come the relocation tables
+; for code and data segment. Relocate the code segment
 
 Reloc:  lda     Module
         ldx     Module + 1              ; Code segment address
@@ -503,14 +466,19 @@ Reloc:  lda     Module
 
 ; Relocate the data segment
 
-        ldy     #MODCTRL_DATA + 1
-        jsr     LoadCtrl                ; Get data segment address
+        lda     Module
+        add     Header + O65_HDR_TLEN
+        pha
+        lda     Module + 1
+        adc     Header + O65_HDR_TLEN + 1
+        tax
+        pla                             ; Date segment address in a/x
         jsr     RelocSeg
 
-; Clear the bss segment
+; Clear the bss segment: memset (bss_addr, 0, bss_size)
 
-        ldy     #MODCTRL_BSS + 1
-        jsr     LoadCtrl                ; Load bss segment address
+        lda     BssAddr
+        ldx     BssAddr + 1
         jsr     pushax
         jsr     push0
         lda     Header + O65_HDR_BLEN

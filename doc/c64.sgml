@@ -148,9 +148,10 @@ structures, accessing the struct fields will access the chip registers.
 
 <sect1>Graphics drivers<p>
 
-All available graphics drivers for the TGI interface will use the space below
-the I/O area and kernal ROM, so you can have hires graphics in the standard
-setup without any memory loss or need for a changed configuration.
+<em>Note:</em> All available graphics drivers for the TGI interface will use
+the space below the I/O area and kernal ROM, so you can have hires graphics in
+the standard setup without any memory loss or need for a changed
+configuration.
 
 <descrip>
   <tag><tt/c64-hi.tgi/</tag>

@@ -12,10 +12,8 @@
 
 <!-- Begin the document -->
 
-<sect>Overview
+<sect>Overview<p>
 
-
-<p>
 ca65 is a replacement for the ra65 assembler that was part of the cc65 C
 compiler developed by John R. Dunning. I had some problems with ra65 and
 the copyright does not permit some things which I wanted to be possible,
@@ -72,9 +70,8 @@ development:
 </itemize>
 
 
-<sect>Usage
+<sect>Usage<p>
 
-<p>
 The assembler accepts the following options:
 
 <tscreen><verb>
@@ -232,9 +229,8 @@ Here is a description of all the command line options:
 
 
 
-<sect>Input format
+<sect>Input format<p>
 
-<p>
 The assembler accepts the standard 6502/65816 assembler syntax. One line
 may contain a label (which is identified by a colon), and, in addition to
 the label, an assembler mnemonic, a macro, or a control command (see
@@ -2309,9 +2305,8 @@ with just one command. Available macro packages are:
 </descrip>
 
 
-<sect>Bugs/Feedback
+<sect>Bugs/Feedback<p>
 
-<p>
 If you have problems using the assembler, if you find any bugs, or if
 you're doing something interesting with the assembler, I would be glad to
 hear from you. Feel free to contact me by email
@@ -2319,9 +2314,8 @@ hear from you. Feel free to contact me by email
 
 
 
-<sect>Copyright
+<sect>Copyright<p>
 
-<p>
 ca65 (and all cc65 binutils) are (C) Copyright 1998-2000 Ullrich von
 Bassewitz. For usage of the binaries and/or sources the following
 conditions do apply:

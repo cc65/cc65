@@ -12,8 +12,6 @@ realloc.s
 bsearch.s
 printf.s
 _hextab.s
-malloc.s
-free.s
 vfprintf.s
 fdopen.s
 _afailed.s

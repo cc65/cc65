@@ -10,12 +10,12 @@
 	@$(AS) -g -o $@ $(AFLAGS) $(*).s
 
 %.o:	%.s
-	@echo $<
+	@echo $<		 
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
 C_OBJS = fclose.o fgets.o fprintf.o strdup.o calloc.o _fopen.o\
       	 fputs.o fread.o fwrite.o gets.o realloc.o bsearch.o strxfrm.o\
-      	 printf.o _hextab.o malloc.o vfprintf.o fdopen.o strtok.o\
+      	 printf.o _hextab.o vfprintf.o fdopen.o strtok.o\
     	 _afailed.o fopen.o fgetc.o fputc.o puts.o gets.o perror.o getchar.o\
     	 _printf.o vprintf.o vsprintf.o sprintf.o abort.o qsort.o putchar.o\
     	 errormsg.o _hadd.o cprintf.o vcprintf.o freopen.o locale.o
@@ -51,16 +51,17 @@ S_OBJS =	_fdesc.o	\
 		jmpvec.o	\
 		labs.o		\
 	 	longjmp.o	\
-	 	ltoa.o		\
-		maperrno.o	\
-		memchr.o	\
-		memcmp.o	\
-		memcpy.o	\
-		memset.o	\
-		rand.o		\
-		setjmp.o	\
-		stkcheck.o	\
-		strcat.o	\
+	 	ltoa.o	    	\
+		malloc.o	\
+		maperrno.o  	\
+		memchr.o    	\
+		memcmp.o    	\
+		memcpy.o    	\
+		memset.o    	\
+		rand.o	    	\
+		setjmp.o    	\
+		stkcheck.o  	\
+		strcat.o    	\
 		strchr.o	\
 		strcmp.o	\
 		strcoll.o	\

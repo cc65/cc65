@@ -12,6 +12,6 @@
 void perror(const char* msg)
 {
 
-    DlgBoxOk((char*)msg,strerror(errno));
+    DlgBoxOk(msg,strerror(errno));
 
 }

@@ -536,6 +536,20 @@ empty (<tt/NULL/ at the start), then all files with given filetype will be shown
 At present this file selector handles only first 16 files of given type and supports only one
 (current) drive.
 
+<sect3>MessageBox
+<p>
+<tt/char MessageBox (char mode, const char *format, ...)/
+<p>
+This function is a more general one. It works very much like <tt/printf/ in a
+box. The only difference is <tt/mode/ parameter which allows for placing
+default icons (see <tt/gdlgbox.h/ for list of possible <tt/MB_/ values).
+Any too wide text will be clipped to the size of the default window. If mode
+parameter is invalid or equal to <tt/MB_EMPTY/ then the window will be closed
+after a click. Otherwise the user must choose an icon.
+<p>
+Note: use it if you really need (or if you will use it in many places) as
+it adds quite amount of code to your program.
+
 <sect1>Mouse, Sprites and Cursors
 <p>
 You will find here functions related to sprite and mouse drawing and handling.

@@ -687,6 +687,8 @@ static char GetAddrSizeCode (unsigned char AddrSize)
         case ADDR_SIZE_LONG:    return 'L';
         default:
             Internal ("Invalid address size: %u", AddrSize);
+	    /* NOTREACHED */
+	    return '-';
     }
 }
 

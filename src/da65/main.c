@@ -50,6 +50,7 @@
 #include "code.h"
 #include "config.h"
 #include "cpu.h"
+#include "data.h"
 #include "error.h"
 #include "global.h"
 #include "opctable.h"
@@ -59,7 +60,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code				     */
+/*     	       	       	       	     Code			  	     */
 /*****************************************************************************/
 
 
@@ -72,30 +73,16 @@ static void Usage (void)
     	     "Short options:\n"
        	     "  -g\t\t\tAdd debug info to object file\n"
        	     "  -h\t\t\tHelp (this text)\n"
-       	     "  -i\t\t\tIgnore case of symbols\n"
-       	     "  -l\t\t\tCreate a listing if assembly was ok\n"
        	     "  -o name\t\tName the output file\n"
-       	     "  -s\t\t\tEnable smart mode\n"
-       	     "  -t sys\t\tSet the target system\n"
        	     "  -v\t\t\tIncrease verbosity\n"
-       	     "  -D name[=value]\tDefine a symbol\n"
-       	     "  -I dir\t\tSet an include directory search path\n"
-       	     "  -U\t\t\tMark unresolved symbols as import\n"
+       	     "  -F\t\t\tAdd formfeeds to the output\n"
        	     "  -V\t\t\tPrint the assembler version\n"
-       	     "  -W n\t\t\tSet warning level n\n"
 	     "\n"
 	     "Long options:\n"
-       	     "  --auto-import\t\tMark unresolved symbols as import\n"
        	     "  --cpu type\t\tSet cpu type\n"
-       	     "  --debug-info\t\tAdd debug info to object file\n"
-	     "  --feature name\tSet an emulation feature\n"
+	     "  --formfeeds\t\tAdd formfeeds to the output\n"
 	     "  --help\t\tHelp (this text)\n"
-	     "  --ignore-case\t\tIgnore case of symbols\n"
-       	     "  --include-dir dir\tSet an include directory search path\n"
-       	     "  --listing\t\tCreate a listing if assembly was ok\n"
        	     "  --pagelength n\tSet the page length for the listing\n"
-       	     "  --smart\t\tEnable smart mode\n"
-       	     "  --target sys\t\tSet the target system\n"
        	     "  --verbose\t\tIncrease verbosity\n"
        	     "  --version\t\tPrint the assembler version\n",
     	     ProgName);
@@ -122,6 +109,14 @@ static void OptCPU (const char* Opt, const char* Arg)
     } else {
 	AbEnd ("Invalid CPU: `%s'", Arg);
     }
+}
+
+
+
+static void OptFormFeeds (const char* Opt, const char* Arg)
+/* Add form feeds to the output */
+{
+    FormFeeds = 1;
 }
 
 
@@ -165,144 +160,6 @@ static void OptVersion (const char* Opt, const char* Arg)
     fprintf (stderr,
        	     "da65 V%u.%u.%u - (C) Copyright 2000 Ullrich von Bassewitz\n",
        	     VER_MAJOR, VER_MINOR, VER_PATCH);
-}
-
-
-
-static void ByteTable (unsigned RemainingBytes)
-/* Output a table of bytes */
-{
-    /* Count how many bytes may be output. This number is limited by the
-     * number of remaining bytes, a label, or the end of the ByteTable
-     * attribute.
-     */
-    unsigned Count = 1;
-    while (Count < RemainingBytes) {
-	if (HaveLabel(PC+Count) || GetStyle (PC+Count) != atByteTab) {
-	    break;
-     	}
-	++Count;
-    }
-    RemainingBytes -= Count;
-
-    /* Output as many data bytes lines as needed */
-    while (Count > 0) {
-
-     	/* Calculate the number of bytes for the next line */
-     	unsigned Chunk = (Count > BytesPerLine)? BytesPerLine : Count;
-
-     	/* Output a line with these bytes */
-     	DataByteLine (Chunk);
-
-     	/* Next line */
-     	Count -= Chunk;
-     	PC    += Chunk;
-    }
-
-    /* If the next line is not a byte table line, add a separator */
-    if (RemainingBytes > 0 && GetStyle (PC) != atByteTab) {
-	SeparatorLine ();
-    }
-}
-
-
-
-static void WordTable (unsigned RemainingBytes)
-/* Output a table of words */
-{
-    /* Count how many bytes may be output. This number is limited by the
-     * number of remaining bytes, a label, or the end of the WordTable
-     * attribute.
-     */
-    unsigned Count = 1;
-    while (Count < RemainingBytes) {
-	if (HaveLabel(PC+Count) || GetStyle (PC+Count) != atWordTab) {
-	    break;
-     	}
-	++Count;
-    }
-    RemainingBytes -= Count;
-
-    /* Make the given number even */
-    Count &= ~1U;
-
-    /* Output as many data word lines as needed */
-    while (Count > 0) {
-
-	/* Calculate the number of bytes for the next line */
-	unsigned Chunk = (Count > BytesPerLine)? BytesPerLine : Count;
-
-	/* Output a line with these bytes */
-       	DataWordLine (Chunk);
-
-	/* Next line */
-	PC    += Chunk;
-       	Count -= Chunk;
-    }
-
-    /* If the next line is not a byte table line, add a separator */
-    if (RemainingBytes > 0 && GetStyle (PC) != atWordTab) {
-	SeparatorLine ();
-    }
-}
-
-
-
-static void AddrTable (unsigned RemainingBytes)
-/* Output a table of addresses */
-{
-    /* Count how many bytes may be output. This number is limited by the
-     * number of remaining bytes, a label, or the end of the WordTable
-     * attribute.
-     */
-    unsigned Count = 1;
-    while (Count < RemainingBytes) {
-	if (HaveLabel(PC+Count) || GetStyle (PC+Count) != atAddrTab) {
-	    break;
-     	}
-	++Count;
-    }
-    RemainingBytes -= Count;
-
-    /* Make the given number even */
-    Count &= ~1U;
-
-    /* Output as many data bytes lines as needed. For addresses, each line
-     * will hold just one address.
-     */
-    while (Count > 0) {
-
-	/* Get the address */
-	unsigned Addr = GetCodeWord (PC);
-
-	/* In pass 1, define a label, in pass 2 output the line */
-	if (Pass == 1) {
-	    if (!HaveLabel (Addr)) {
-		AddLabel (Addr, MakeLabelName (Addr));
-	    }
-	} else {
-	    const char* Label = GetLabel (Addr);
-	    if (Label == 0) {
-		/* OOPS! Should not happen */
-		Internal ("OOPS - Label for address %04X disappeard!", Addr);
-	    }
-	    Indent (MIndent);
-	    Output (".word");
-	    Indent (AIndent);
-	    Output ("%s", Label);
-	    LineComment (PC, 2);
-	    LineFeed ();
-	}
-
-	/* Next line */
-	PC    += 2;
-       	Count -= 2;
-    }
-
-    /* If the next line is not a byte table line, add a separator */
-    if (RemainingBytes > 0 && GetStyle (PC) != atAddrTab) {
-	SeparatorLine ();
-    }
 }
 
 
@@ -399,7 +256,7 @@ static void Disassemble (void)
     LineFeed ();
 
     /* Pass 2 */
-    Pass = 2;		   
+    Pass = 2;
     ResetCode ();
     DefOutOfRangeLabels ();
     OnePass ();
@@ -413,6 +270,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--cpu",     	       	1,	OptCPU 			},
+	{ "--formfeeds",	0,	OptFormFeeds		},
       	{ "--help",    		0,	OptHelp			},
       	{ "--pagelength",      	1,	OptPageLength		},
       	{ "--verbose", 	       	0,	OptVerbose		},

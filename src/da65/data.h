@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.c				     */
+/*				    data.h				     */
 /*                                                                           */
-/*		  Global variables for the da65 disassembler		     */
+/*			     Data output routines			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,37 +33,30 @@
 
 
 
-#include "global.h"
+#ifndef DATA_H
+#define DATA_H
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*   	     			     Code				     */
 /*****************************************************************************/
 
 
 
-/* File names */
-const char* InFile     	      = 0;      /* Name of input file */
-const char* OutFile    	      = 0;      /* Name of output file */
+void ByteTable (unsigned RemainingBytes);
+/* Output a table of bytes */
 
-/* Default extensions */
-const char OutExt[]	      = ".dis";	/* Output file extension */
-const char CfgExt[]    	      = ".cfg";	/* Config file extension */
+void WordTable (unsigned RemainingBytes);
+/* Output a table of words */
 
-/* Flags and other command line stuff */
-unsigned char Verbosity	      = 4;	/* Verbosity of the output file */
-unsigned char FormFeeds	      = 0;	/* Add form feeds to the output? */
-				  
-/* Stuff needed by many routines */
-unsigned Pass		      = 0;	/* Disassembler pass */
+void AddrTable (unsigned RemainingBytes);
+/* Output a table of addresses */
 
-/* Page formatting */
-int PageLength		      = -1;	/* Length of a listing page */
-unsigned MIndent	      = 9;	/* Mnemonic indent */
-unsigned AIndent	      = 17;	/* Argument indent */
-unsigned CIndent	      = 49;	/* Comment indent */
-unsigned BytesPerLine	      = 8;	/* Max. number of data bytes per line */
+
+
+/* End of data.h */
+#endif
 
 
 

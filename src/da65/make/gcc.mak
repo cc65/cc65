@@ -13,6 +13,7 @@ OBJS = 	attrtab.o	\
 	code.o	 	\
 	config.o	\
 	cpu.o	 	\
+	data.o		\
 	error.o	 	\
 	global.o 	\
   	handler.o	\

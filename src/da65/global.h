@@ -54,6 +54,7 @@ extern const char 	CfgExt[];	/* Config file extension */
 
 /* Flags and other command line stuff */
 extern unsigned char   	Verbosity;	/* Verbosity of the output file */
+extern unsigned char	FormFeeds;	/* Add form feeds to the output? */
 
 /* Stuff needed by many routines */
 extern unsigned 	Pass;		/* Disassembler pass */

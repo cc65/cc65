@@ -38,6 +38,9 @@
 #include <string.h>
 #include <errno.h>
 
+/* common */
+#include "version.h"
+
 /* da65 */
 #include "code.h"
 #include "error.h"
@@ -54,11 +57,28 @@
 
 static FILE* 	F 	= 0;		/* Output stream */
 static unsigned	Col    	= 1;		/* Current column */
+static unsigned Line   	= 0;		/* Current line on page */
+static unsigned Page	= 1;		/* Current output page */
+
 
 
 /*****************************************************************************/
 /*	      	  		     Code				     */
 /*****************************************************************************/
+
+
+
+static void PageHeader (void)
+/* Print a page header */
+{
+    fprintf (F,
+       	     "; da65 V%u.%u.%u - (C) Copyright 2000 Ullrich von Bassewitz\n"
+    	     "; Input file: %s\n"
+    	     "; Page:       %u\n\n",
+       	     VER_MAJOR, VER_MINOR, VER_PATCH,
+    	     InFile,
+    	     Page);
+}
 
 
 
@@ -70,6 +90,9 @@ void OpenOutput (const char* Name)
     if (F == 0) {
 	Error ("Cannot open `%s': %s", Name, strerror (errno));
     }
+    PageHeader ();
+    Line = 4;
+    Col  = 1;
 }
 
 
@@ -115,6 +138,14 @@ void LineFeed (void)
 {
     if (Pass > 1) {
 	fputc ('\n', F);
+	if (++Line >= PageLength) {
+	    if (FormFeeds) {
+		fputc ('\f', F);
+	    }
+	    ++Page;
+	    PageHeader ();
+	    Line = 4;
+	}
 	Col = 1;
     }
 }

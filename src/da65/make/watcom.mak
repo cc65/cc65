@@ -71,6 +71,7 @@ OBJS = 	attrtab.obj	\
 	code.obj       	\
 	config.obj 	\
 	cpu.obj	   	\
+	data.obj	\
 	error.obj  	\
 	global.obj 	\
   	handler.obj	\
@@ -104,6 +105,7 @@ FILE attrtab.obj
 FILE code.obj
 FILE config.obj
 FILE cpu.obj
+FILE data.obj
 FILE error.obj
 FILE global.obj
 FILE handler.obj

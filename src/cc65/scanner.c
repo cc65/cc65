@@ -192,7 +192,7 @@ int IsSym (char *s)
 static void unknown (char C)
 /* Error message for unknown character */
 {
-    Error (ERR_INVALID_CHAR, C);
+    MError ("Invalid input character with code %02X", C & 0xFF);
     NextChar (); 			/* Skip */
 }
 
@@ -350,7 +350,7 @@ static void StringConst (void)
 
 	while (CurC != '\"') {
 	    if (CurC == '\0') {
-	     	Error (ERR_UNEXPECTED_NEWLINE);
+	     	MError ("Unexpected newline");
 	     	break;
 	    }
 	    AddLiteralChar (ParseChar ());
@@ -458,7 +458,7 @@ void NextToken (void)
 	     * warning.
 	     */
        	    if (k <= 0xFFFF && (types & IT_UINT) == 0 && !HaveSuffix) {
-		Warning (WARN_CONSTANT_IS_LONG);
+		Warning ("Constant is long");
 	    }
      	}
      	if (k > 0xFFFF) {
@@ -754,7 +754,7 @@ void NextToken (void)
 	    } while (CurC == ' ');
 	    if (!IsSym (token) || strcmp (token, "pragma") != 0) {
 	      	/* OOPS - should not happen */
-	      	Error (ERR_CPP_DIRECTIVE_EXPECTED);
+	      	MError ("Preprocessor directive expected");
 	    }
 	    nxttok = TOK_PRAGMA;
 	    break;

@@ -140,7 +140,7 @@ void AddLiteralChar (char C)
 /* Add one character to the literal pool */
 {
     if (LiteralOffs >= LITPOOL_SIZE) {
-	Fatal (FAT_OUT_OF_STRSPACE);
+	Fatal ("Out of literal space");
     }
     LiteralPool[LiteralOffs++] = C;
 }

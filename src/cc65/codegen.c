@@ -3372,7 +3372,7 @@ void g_lt (unsigned flags, unsigned long val)
 
      	/* Give a warning in some special cases */
      	if ((flags & CF_UNSIGNED) && val == 0) {
-     	    Warning (WARN_COND_NEVER_TRUE);
+     	    Warning ("Condition is never true");
      	}
 
      	/* Look at the type */
@@ -3587,7 +3587,7 @@ void g_ge (unsigned flags, unsigned long val)
 
 	/* Give a warning in some special cases */
 	if ((flags & CF_UNSIGNED) && val == 0) {
-     	    Warning (WARN_COND_ALWAYS_TRUE);
+     	    Warning ("Condition is always true");
 	}
 
 	/* Look at the type */

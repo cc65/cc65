@@ -51,30 +51,8 @@
 
 
 
-static char* WarnMsg [WARN_COUNT-1] = {
-    "Unreachable code",
-    "Condition is never true",
-    "Condition is always true",
-    "Converting pointer to integer without a cast",
-    "Converting integer to pointer without a cast",
-    "Function call without a prototype",
-    "Unknown #pragma",
-    "No case labels",
-    "Function must be extern",
-    "Parameter `%s' is never used",
-    "`%s' is defined but never used",
-    "Constant is long",
-    "`/*' found inside a comment",
-    "Useless declaration",
-};
-
-
-
 /* Error messages sorted by ErrTypes */
 static char* ErrMsg [ERR_COUNT-1] = {
-    "Invalid character (%u)",
-    "Unexpected newline",
-    "End-of-file reached in comment starting at line %u",
     "Syntax error",
     "`\"' expected",
     "`:' expected",
@@ -92,23 +70,11 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "Incompatible pointer types",
     "Too many arguments in function call",
     "Too few arguments in function call",
-    "Macro argument count mismatch",
     "Duplicate macro parameter: %s",
-    "Macro redefinition is not identical",
     "Variable identifier expected",
     "Integer expression expected",
     "Constant expression expected",
     "No active loop",
-    "`\"' or `<' expected",
-    "Missing terminator or name too long",
-    "Include file `%s' not found",
-    "Cannot open include file `%s': %s",
-    "Invalid #error directive",
-    "#error: %s",
-    "Unexpected `#endif'",
-    "Unexpected `#else'",
-    "`#endif' expected",
-    "Compiler directive expected",
     "Redefinition of `%s'",
     "Conflicting types for `%s'",
     "String literal expected",
@@ -118,7 +84,6 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "Unexpected `continue'",
     "Undefined symbol: `%s'",
     "Undefined label: `%s'",
-    "Include nesting too deep",
     "Too many local variables",
     "Too many initializers",
     "Cannot initialize incomplete type",
@@ -134,7 +99,6 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "Illegal function call",
     "Illegal indirection",
     "Illegal address",
-    "Illegal macro call",
     "Illegal hex digit",
     "Illegal character constant",
     "Illegal modifier",
@@ -162,20 +126,6 @@ static char* ErrMsg [ERR_COUNT-1] = {
 
 
 
-static char* FatMsg [FAT_COUNT-1] = {
-    "Too many errors",
-    "Cannot open output file: %s",
-    "Cannot write to output file (disk full?)",
-    "Cannot open input file: %s",
-    "Out of memory",
-    "Stack overflow",
-    "Stack empty",
-    "Out of string space",
-    "Too many case labels",
-};
-
-
-
 /* Count of errors/warnings */
 unsigned ErrorCount	= 0;
 unsigned WarningCount	= 0;
@@ -188,44 +138,59 @@ unsigned WarningCount	= 0;
 
 
 
-void Warning (unsigned WarnNum, ...)
-/* Print warning message. */
+static void IntWarning (const char* Filename, unsigned Line, const char* Msg, va_list ap)
+/* Print warning message - internal function. */
 {
-    va_list ap;
-
     if (!NoWarn) {
-      	fprintf (stderr, "%s(%u): Warning #%u: ",
-		 GetCurrentFile(), curpos, WarnNum);
-
-     	va_start (ap, WarnNum);
-     	vfprintf (stderr, WarnMsg [WarnNum-1], ap);
-     	va_end (ap);
+       	fprintf (stderr, "%s(%u): Warning: ", Filename, Line);
+     	vfprintf (stderr, Msg, ap);
      	fprintf (stderr, "\n");
 
      	if (Verbose) {
      	    fprintf (stderr, "Line: %s\n", line);
      	}
+	++WarningCount;
     }
-    ++ WarningCount;
 }
 
 
 
-void PPWarning (unsigned WarnNum, ...)
+void Warning (const char* Format, ...)
+/* Print warning message. */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntWarning (GetCurrentFile(), curpos, Format, ap);
+    va_end (ap);
+}
+
+
+
+void PPWarning (const char* Format, ...)
 /* Print warning message. For use within the preprocessor. */
 {
     va_list ap;
+    va_start (ap, Format);
+    IntWarning (GetCurrentFile(), GetCurrentLine(), Format, ap);
+    va_end (ap);
+}
 
-    if (!NoWarn) {
-      	fprintf (stderr, "%s(%u): Warning #%u: ",
-		 GetCurrentFile(), GetCurrentLine(), WarnNum);
 
-     	va_start (ap, WarnNum);
-     	vfprintf (stderr, WarnMsg [WarnNum-1], ap);
-     	va_end (ap);
-     	fprintf (stderr, "\n");
+
+static void IntError (const char* Filename, unsigned Line, const char* Msg, va_list ap)
+/* Print an error message - internal function*/
+{
+    fprintf (stderr, "%s(%u): Error: ", Filename, Line);
+    vfprintf (stderr, Msg, ap);
+    fprintf (stderr, "\n");
+
+    if (Verbose) {
+       	fprintf (stderr, "Line: %s\n", line);
     }
-    ++WarningCount;
+    ++ErrorCount;
+    if (ErrorCount > 10) {
+       	Fatal ("Too many errors");
+    }
 }
 
 
@@ -234,57 +199,44 @@ void Error (unsigned ErrNum, ...)
 /* Print an error message */
 {
     va_list ap;
-
-    fprintf (stderr, "%s(%u): Error #%u: ",
-	     GetCurrentFile(), curpos, ErrNum);
-
     va_start (ap, ErrNum);
-    vfprintf (stderr, ErrMsg [ErrNum-1], ap);
+    IntError (GetCurrentFile(), curpos, ErrMsg [ErrNum-1], ap);
     va_end (ap);
-    fprintf (stderr, "\n");
-
-    if (Verbose) {
-       	fprintf (stderr, "Line: %s\n", line);
-    }
-    ++ErrorCount;
-    if (ErrorCount > 10) {
-       	Fatal (FAT_TOO_MANY_ERRORS);
-    }
 }
 
 
 
-void PPError (unsigned ErrNum, ...)
+void MError (const char* Format, ...)
+/* Print an error message */
+{
+    va_list ap;
+    va_start (ap, Format);
+    IntError (GetCurrentFile(), curpos, Format, ap);
+    va_end (ap);
+}
+
+
+
+void PPError (const char* Format, ...)
 /* Print an error message. For use within the preprocessor.  */
 {
     va_list ap;
-
-    fprintf (stderr, "%s(%u): Error #%u: ",
-	     GetCurrentFile(), GetCurrentLine(), ErrNum);
-
-    va_start (ap, ErrNum);
-    vfprintf (stderr, ErrMsg [ErrNum-1], ap);
+    va_start (ap, Format);
+    IntError (GetCurrentFile(), GetCurrentLine(), Format, ap);
     va_end (ap);
-    fprintf (stderr, "\n");
-
-    ++ErrorCount;
-    if (ErrorCount > 10) {
-       	Fatal (FAT_TOO_MANY_ERRORS);
-    }
 }
 
 
 
-void Fatal (unsigned FatNum, ...)
+void Fatal (const char* Format, ...)
 /* Print a message about a fatal error and die */
 {
     va_list ap;
 
-    fprintf (stderr, "%s(%u): Fatal #%u: ",
-	     GetCurrentFile(), curpos, FatNum);
+    fprintf (stderr, "%s(%u): Fatal: ", GetCurrentFile(), curpos);
 
-    va_start (ap, FatNum);
-    vfprintf (stderr, FatMsg [FatNum-1], ap);
+    va_start (ap, Format);
+    vfprintf (stderr, Format, ap);
     va_end (ap);
     fprintf (stderr, "\n");
 

@@ -213,9 +213,9 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
     } else if (IsClassInt (lhst)) {
        	if (IsClassPtr (rhst)) {
      	    /* Pointer -> int conversion */
-     	    Warning (WARN_PTR_TO_INT_CONV);
+     	    Warning ("Converting pointer to integer without a cast");
        	} else if (!IsClassInt (rhst)) {
-     	    Error (ERR_INCOMPATIBLE_TYPES);
+     	    Error (ERR_INCOMPATIBLE_TYPES);			   
      	} else {
    	    /* Adjust the int types. To avoid manipulation of TOS mark lhs
    	     * as const.
@@ -253,7 +253,7 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
      	} else if (IsClassInt (rhst)) {
      	    /* Int to pointer assignment is valid only for constant zero */
      	    if ((rhs->e_flags & E_MCONST) == 0 || rhs->e_const != 0) {
-     	       	Warning (WARN_INT_TO_PTR_CONV);
+     	       	Warning ("Converting integer to pointer without a cast");
      	    }
 	} else if (IsTypeFuncPtr (lhst) && IsTypeFunc(rhst)) {
 	    /* Assignment of function to function pointer is allowed, provided
@@ -815,7 +815,7 @@ static int primary (struct expent* lval)
 	     * function signature for a function having an empty param list
 	     * and returning int.
 	     */
-	    Warning (WARN_FUNC_WITHOUT_PROTO);
+	    Warning ("Function call without a prototype");
 	    Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_EXTERN | SC_REF | SC_FUNC);
 	    lval->e_tptr  = Sym->Type;
 	    lval->e_flags = E_MGLOBAL | E_MCONST | E_TGLAB;
@@ -3008,7 +3008,7 @@ void test (unsigned label, int cond)
       	/* Constant rvalue */
        	if (cond == 0 && lval.e_const == 0) {
       	    g_jump (label);
-     	    Warning (WARN_UNREACHABLE_CODE);
+     	    Warning ("Unreachable code");
      	} else if (cond && lval.e_const) {
  	    g_jump (label);
       	}

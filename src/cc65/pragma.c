@@ -151,7 +151,7 @@ static void SegNamePragma (void (*Func) (const char*))
 	    Func (Name);
 
 	} else {
-			   
+
 	    /* Segment name is invalid */
 	    Error (ERR_ILLEGAL_SEG_NAME, Name);
 
@@ -201,7 +201,7 @@ void DoPragma (void)
 	 * for unknown pragmas, however, we're allowed to warn - and we will
 	 * do so. Otherwise one typo may give you hours of bug hunting...
 	 */
-    	Warning (WARN_UNKNOWN_PRAGMA);
+    	Warning ("Unknown #pragma `%s'", CurTok.Ident);
      	return;
     }
 

@@ -152,7 +152,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
     if (IsTypeFunc (Decl.Type)) {
 	/* Function prototypes are always external */
 	if ((SC & SC_EXTERN) == 0) {
-       	    Warning (WARN_FUNC_MUST_BE_EXTERN);
+       	    Warning ("Function must be extern");
 	}
        	SC |= SC_FUNC | SC_EXTERN;
 

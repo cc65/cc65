@@ -174,7 +174,7 @@ static void SetSys (const char* Sys)
 
      	default:
        	    AbEnd ("Unknown target system type");
-    }	    
+    }
 
     /* Initialize the translation tables for the target system */
     TgtTranslateInit ();
@@ -191,7 +191,7 @@ static void DoCreateDep (const char* OutputName)
     /* Open the file */
     FILE* F = fopen (DepName, "w");
     if (F == 0) {
-    	Fatal (FAT_CANNOT_OPEN_OUTPUT, strerror (errno));
+    	Fatal ("Cannot open dependency file `%s': %s", DepName, strerror (errno));
     }
 
     /* Write the dependencies to the file */
@@ -200,7 +200,7 @@ static void DoCreateDep (const char* OutputName)
     /* Close the file, check for errors */
     if (fclose (F) != 0) {
     	remove (DepName);
-    	Fatal (FAT_CANNOT_WRITE_OUTPUT);
+    	Fatal ("Cannot write to dependeny file (disk full?)");
     }
 
     /* Free the name */
@@ -615,7 +615,7 @@ int main (int argc, char* argv[])
 	/* Open the file */
 	F = fopen (OutputFile, "w");
 	if (F == 0) {
-	    Fatal (FAT_CANNOT_OPEN_OUTPUT, strerror (errno));
+	    Fatal ("Cannot open output file `%s': %s", OutputFile, strerror (errno));
 	}
 
 	/* Write the output to the file */
@@ -624,7 +624,7 @@ int main (int argc, char* argv[])
 	/* Close the file, check for errors */
 	if (fclose (F) != 0) {
 	    remove (OutputFile);
-	    Fatal (FAT_CANNOT_WRITE_OUTPUT);
+	    Fatal ("Cannot write to output file (disk full?)");
 	}
 
 	/* Create dependencies if requested */

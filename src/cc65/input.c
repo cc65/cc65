@@ -198,7 +198,7 @@ void OpenMainFile (const char* Name)
     FILE* F = fopen (Name, "r");
     if (F == 0) {
        	/* Cannot open */
-       	Fatal (FAT_CANNOT_OPEN_INPUT, strerror (errno));
+       	Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
     }
 
     /* Allocate a new AFile structure for the file */
@@ -216,14 +216,14 @@ void OpenIncludeFile (const char* Name, unsigned DirSpec)
 
     /* Check for the maximum include nesting */
     if (CollCount (&AFiles) > MAX_INC_NESTING) {
-     	PPError (ERR_INCLUDE_NESTING);
+     	PPError ("Include nesting too deep");
       	return;
     }
 
     /* Search for the file */
     N = FindInclude (Name, DirSpec);
     if (N == 0) {
-	PPError (ERR_INCLUDE_NOT_FOUND, Name);
+	PPError ("Include file `%s' not found", Name);
      	return;
     }
 
@@ -242,7 +242,7 @@ void OpenIncludeFile (const char* Name, unsigned DirSpec)
     F = fopen (IF->Name, "r");
     if (F == 0) {
 	/* Error opening the file */
-	PPError (ERR_INCLUDE_OPEN_FAILURE, IF->Name, strerror (errno));
+	PPError ("Cannot open include file `%s': %s", IF->Name, strerror (errno));
 	return;
     }
 

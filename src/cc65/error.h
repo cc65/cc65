@@ -49,32 +49,9 @@
 
 
 
-/* Warning numbers */
-enum Warnings {
-    WARN_NONE,		 	   	/* No warning */
-    WARN_UNREACHABLE_CODE,
-    WARN_COND_NEVER_TRUE,
-    WARN_COND_ALWAYS_TRUE,
-    WARN_PTR_TO_INT_CONV,
-    WARN_INT_TO_PTR_CONV,
-    WARN_FUNC_WITHOUT_PROTO,
-    WARN_UNKNOWN_PRAGMA,
-    WARN_NO_CASE_LABELS,
-    WARN_FUNC_MUST_BE_EXTERN,
-    WARN_UNUSED_PARM,
-    WARN_UNUSED_ITEM,
-    WARN_CONSTANT_IS_LONG,
-    WARN_NESTED_COMMENT,
-    WARN_USELESS_DECL,
-    WARN_COUNT	      		   	/* Warning count */
-};
-
 /* Error numbers */
-enum Errors {	
+enum Errors {
     ERR_NONE,	       	       		/* No error */
-    ERR_INVALID_CHAR,
-    ERR_UNEXPECTED_NEWLINE,
-    ERR_EOF_IN_COMMENT,
     ERR_SYNTAX,
     ERR_QUOTE_EXPECTED,
     ERR_COLON_EXPECTED,
@@ -92,23 +69,11 @@ enum Errors {
     ERR_INCOMPATIBLE_POINTERS,
     ERR_TOO_MANY_FUNC_ARGS,
     ERR_TOO_FEW_FUNC_ARGS,
-    ERR_MACRO_ARGCOUNT,
     ERR_DUPLICATE_MACRO_ARG,
-    ERR_MACRO_REDEF,
     ERR_VAR_IDENT_EXPECTED,
     ERR_INT_EXPR_EXPECTED,
     ERR_CONST_EXPR_EXPECTED,
     ERR_NO_ACTIVE_LOOP,
-    ERR_INCLUDE_LTERM_EXPECTED,
-    ERR_INCLUDE_RTERM_EXPECTED,
-    ERR_INCLUDE_NOT_FOUND,
-    ERR_INCLUDE_OPEN_FAILURE,
-    ERR_INVALID_USER_ERROR,
-    ERR_USER_ERROR,
-    ERR_UNEXPECTED_CPP_ENDIF,
-    ERR_UNEXPECTED_CPP_ELSE,
-    ERR_CPP_ENDIF_EXPECTED,
-    ERR_CPP_DIRECTIVE_EXPECTED,
     ERR_MULTIPLE_DEFINITION,
     ERR_CONFLICTING_TYPES,
     ERR_STRLIT_EXPECTED,
@@ -118,7 +83,6 @@ enum Errors {
     ERR_UNEXPECTED_CONTINUE,
     ERR_UNDEFINED_SYMBOL,
     ERR_UNDEFINED_LABEL,
-    ERR_INCLUDE_NESTING,
     ERR_TOO_MANY_LOCALS,
     ERR_TOO_MANY_INITIALIZERS,
     ERR_INIT_INCOMPLETE_TYPE,
@@ -134,7 +98,6 @@ enum Errors {
     ERR_ILLEGAL_FUNC_CALL,
     ERR_ILLEGAL_INDIRECT,
     ERR_ILLEGAL_ADDRESS,
-    ERR_ILLEGAL_MACRO_CALL,
     ERR_ILLEGAL_HEX_DIGIT,
     ERR_ILLEGAL_CHARCONST,
     ERR_ILLEGAL_MODIFIER,
@@ -161,23 +124,6 @@ enum Errors {
     ERR_COUNT 	     	    	   	/* Error count */
 };
 
-/* Fatal errors */
-enum Fatals {
-    FAT_NONE,
-    FAT_TOO_MANY_ERRORS,
-    FAT_CANNOT_OPEN_OUTPUT,
-    FAT_CANNOT_WRITE_OUTPUT,
-    FAT_CANNOT_OPEN_INPUT,
-    FAT_OUT_OF_MEMORY,
-    FAT_STACK_OVERFLOW,
-    FAT_STACK_EMPTY,
-    FAT_OUT_OF_STRSPACE,
-    FAT_TOO_MANY_CASE_LABELS,
-    FAT_COUNT				/* Fatal error count */
-};
-
-
-
 /* Count of errors/warnings */
 extern unsigned ErrorCount;
 extern unsigned WarningCount;
@@ -190,22 +136,25 @@ extern unsigned WarningCount;
 
 
 
-void Warning (unsigned WarnNum, ...);
+void Warning (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print warning message. */
 
-void PPWarning (unsigned WarnNum, ...);
+void PPWarning (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print warning message. For use within the preprocessor. */
 
 void Error (unsigned ErrNum, ...);
 /* Print an error message */
 
-void PPError (unsigned ErrNum, ...);
+void MError (const char* Format, ...) attribute ((format (printf, 1, 2)));
+/* Print an error message */
+
+void PPError (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message. For use within the preprocessor.  */
 
-void Fatal (unsigned FatNum, ...);
+void Fatal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
 /* Print a message about a fatal error and die */
 
-void Internal (char* Format, ...) attribute ((noreturn));
+void Internal (char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
 /* Print a message about an internal compiler error and die. */
 
 void ErrorReport (void);

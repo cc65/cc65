@@ -98,12 +98,13 @@ static void Comment (void)
     while (CurC != '*' || NextC != '/') {
     	if (CurC == '\0') {
     	    if (NextLine () == 0) {
-    		PPError (ERR_EOF_IN_COMMENT, StartingLine);
+    		PPError ("End-of-file reached in comment starting at line %u",
+			 StartingLine);
     	    	return;
     	    }
 	} else {
 	    if (CurC == '/' && NextC == '*') {
-		PPWarning (WARN_NESTED_COMMENT);
+		PPWarning ("`/*' found inside a comment");
 	    }
 	    NextChar ();
 	}
@@ -170,7 +171,7 @@ static int MacName (char* Ident)
 /* Get macro symbol name.  If error, print message and clear line. */
 {
     if (IsSym (Ident) == 0) {
-	PPError (ERR_IDENT_EXPECTED);
+	PPError ("Identifier expected");
      	ClearLine ();
 	return 0;
     } else {
@@ -242,7 +243,7 @@ static int MacroCall (Macro* M)
     /* Expect an argument list */
     SkipBlank ();
     if (CurC != '(') {
-     	PPError (ERR_ILLEGAL_MACRO_CALL);
+     	PPError ("Illegal macro call");
      	return 0;
     }
 
@@ -315,7 +316,7 @@ static int MacroCall (Macro* M)
 
     /* Compare formal argument count with actual */
     if (M->ArgCount != ArgCount) {
-	PPError (ERR_MACRO_ARGCOUNT);
+	PPError ("Macro argument count mismatch");
 	/* Be sure to make enough empty arguments available */
 	while (ArgCount < M->ArgCount) {
 	    M->ActualArgs [ArgCount++] = "";
@@ -395,7 +396,7 @@ static void addmac (void)
 
 	/* Check for a right paren and eat it if we find one */
      	if (CurC != ')') {
-       	    PPError (ERR_RPAREN_EXPECTED);
+       	    PPError ("`)' expected");
      	    ClearLine ();
      	    return;
      	}
@@ -421,7 +422,7 @@ static void addmac (void)
      */
     if (Existing) {
 	if (MacroCmp (M, Existing) != 0) {
-	    PPError (ERR_MACRO_REDEF);
+	    PPError ("Macro redefinition is not identical");
 	}
     }
 }
@@ -465,7 +466,7 @@ static int Pass1 (const char* From, char* To)
      	    	    SkipBlank();
      	    	}
      	    	if (!IsIdent (CurC)) {
-     	    	    PPError (ERR_IDENT_EXPECTED);
+     	    	    PPError ("Identifier expected");
      	    	    *mptr++ = '0';
      	    	} else {
      	    	    SymName (Ident);
@@ -473,7 +474,7 @@ static int Pass1 (const char* From, char* To)
      	    	    if (HaveParen) {
      	    	       	SkipBlank();
      	    	       	if (CurC != ')') {
-     	    	       	    PPError (ERR_RPAREN_EXPECTED);
+     	    	       	    PPError ("`)' expected");
 	    	       	} else {
 	    	       	    NextChar ();
 	    	       	}
@@ -701,7 +702,7 @@ static void doinclude (void)
        	    break;
 
        	default:
-       	    PPError (ERR_INCLUDE_LTERM_EXPECTED);
+       	    PPError ("`\"' or `<' expected");
        	    goto Done;
     }
     NextChar ();
@@ -719,7 +720,7 @@ static void doinclude (void)
     /* Check if we got a terminator */
     if (CurC != RTerm) {
        	/* No terminator found */
-       	PPError (ERR_INCLUDE_RTERM_EXPECTED);
+       	PPError ("Missing terminator or file name too long");
        	goto Done;
     }
 
@@ -740,9 +741,9 @@ static void doerror (void)
 {
     SkipBlank ();
     if (CurC == '\0') {
- 	PPError (ERR_INVALID_USER_ERROR);
+ 	PPError ("Invalid #error directive");
     } else {
-        PPError (ERR_USER_ERROR, lptr);
+        PPError ("#error: %s", lptr);
     }
 
     /* clear rest of line */
@@ -818,7 +819,7 @@ void Preprocess (void)
        	    	continue;
        	    }
        	    if (!IsSym (Directive)) {
-       	    	PPError (ERR_CPP_DIRECTIVE_EXPECTED);
+       	    	PPError ("Preprocessor directive expected");
        	    	ClearLine ();
        	    } else {
        	       	switch (searchtok (Directive, pre_toks)) {
@@ -836,7 +837,7 @@ void Preprocess (void)
        	    	    	    }
        	    	    	    s_ifdef[i_ifdef] ^= 2;
        	    	    	} else {
-       	    	    	    PPError (ERR_UNEXPECTED_CPP_ELSE);
+       	    	    	    PPError ("Unexpected `#else'");
        	    	    	}
        	    	    	break;
 
@@ -844,7 +845,7 @@ void Preprocess (void)
        	    	    	if (i_ifdef >= 0) {
        	    	     	    Skip = s_ifdef[i_ifdef--] & 1;
        	    	    	} else {
-       	    	    	    PPError (ERR_UNEXPECTED_CPP_ENDIF);
+       	    	    	    PPError ("Unexpected `#endif'");
        	    	    	}
        	    	    	break;
 
@@ -875,7 +876,7 @@ void Preprocess (void)
        	       	    case PP_LINE:
 	    	    	/* Not allowed in strict ANSI mode */
 	    	    	if (ANSI) {
-	    	    	    PPError (ERR_CPP_DIRECTIVE_EXPECTED);
+	    	    	    PPError ("Preprocessor directive expected");
 	    	    	    ClearLine ();
 	    	    	}
 	    	    	break;
@@ -896,7 +897,7 @@ void Preprocess (void)
     	    	    	break;
 
     	    	    default:
-    	    	    	PPError (ERR_CPP_DIRECTIVE_EXPECTED);
+    	    	    	PPError ("Preprocessor directive expected");
     	    	    	ClearLine ();
     	    	}
 	    }
@@ -904,7 +905,7 @@ void Preprocess (void)
     	}
     	if (NextLine () == 0) {
     	    if (i_ifdef >= 0) {
-    	    	PPError (ERR_CPP_ENDIF_EXPECTED);
+    	    	PPError ("`#endif' expected");
     	    }
     	    return;
     	}

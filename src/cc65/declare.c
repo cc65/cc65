@@ -907,7 +907,7 @@ void CheckEmptyDecl (const DeclSpec* D)
  */
 {
     if ((D->Flags & DS_EXTRA_TYPE) == 0) {
-	Warning (WARN_USELESS_DECL);
+   	Warning ("Useless declaration");
     }
 }
 

@@ -13,7 +13,7 @@
 
 /* common */
 #include "xmalloc.h"
-	  
+
 /* cc65 */
 #include "asmcode.h"
 #include "asmlabel.h"
@@ -395,7 +395,7 @@ static void cascadeswitch (struct expent* eval)
 
     /* Check if we have any labels */
     if (lcount == 0) {
-     	Warning (WARN_NO_CASE_LABELS);
+     	Warning ("No case labels");
     }
 
     /* Eat the closing curly brace */
@@ -451,7 +451,7 @@ static void tableswitch (struct expent* eval)
     while (curtok != TOK_RCURLY) {
     	if (curtok == TOK_CASE || curtok == TOK_DEFAULT) {
 	    if (lcount >= CASE_MAX) {
-       	       	Fatal (FAT_TOO_MANY_CASE_LABELS);
+       	       	Fatal ("Too many case labels");
      	    }
     	    label = GetLabel ();
     	    do {
@@ -481,7 +481,7 @@ static void tableswitch (struct expent* eval)
 
     /* Check if we have any labels */
     if (lcount == 0) {
-     	Warning (WARN_NO_CASE_LABELS);
+     	Warning ("No case labels");
     }
 
     /* Eat the closing curly brace */

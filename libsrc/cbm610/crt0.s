@@ -293,7 +293,7 @@ Init:  	jsr	initlib
 
        	jsr    	callmain
 
-; Disable Call module destructors. This is also the _exit entry and the default entry
+; Call module destructors. This is also the _exit entry and the default entry
 ; point for the break vector.
 
 _exit:  lda     #$00
@@ -306,7 +306,7 @@ _exit:  lda     #$00
         sta     IndReg
 
 ; Copy stuff back from our zeropage to the systems
-     
+
 .if 0
         lda     #.sizeof(transfer_table)
         sta     ktmp
@@ -319,7 +319,7 @@ _exit:  lda     #$00
         dec     ktmp
         dec     ktmp
         bne     @L0
-.endif     
+.endif
 
 ; Copy back the old system bank stack contents
 

@@ -161,12 +161,6 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)),
     int      MemSet    = 1;             /* Use real memset if true */
     unsigned ParamSize = 0;
 
-
-    /* Check the prototype of the function against what we know about it, so
-     * we can detect errors.
-     */
-    /* ### */
-
     /* Argument #1 */
     Flags = ParseArg (Arg1Type, &Arg);
     g_push (Flags, Arg.ConstVal);

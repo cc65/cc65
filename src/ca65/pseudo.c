@@ -42,6 +42,7 @@
 /* common */
 #include "bitops.h"
 #include "check.h"
+#include "tgttrans.h"
 
 /* ca65 */
 #include "condasm.h"
@@ -58,7 +59,6 @@
 #include "options.h"
 #include "repeat.h"
 #include "symtab.h"
-#include "target.h"
 #include "pseudo.h"
 
 
@@ -270,7 +270,7 @@ static void DoASCIIZ (void)
 	    return;
 	}
 	/* Translate into target charset and emit */
-	XlatStr (SVal);
+	TgtTranslateStr (SVal);
        	EmitData ((unsigned char*) SVal, strlen (SVal));
 	NextTok ();
 	if (Tok == TOK_COMMA) {
@@ -306,7 +306,7 @@ static void DoByte (void)
     while (1) {
 	if (Tok == TOK_STRCON) {
 	    /* A string, translate into target charset and emit */
-	    XlatStr (SVal);
+	    TgtTranslateStr (SVal);
        	    EmitData ((unsigned char*) SVal, strlen (SVal));
 	    NextTok ();
 	} else {

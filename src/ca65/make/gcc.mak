@@ -32,7 +32,6 @@ OBJS =  condasm.o	\
 	repeat.o	\
         scanner.o	\
         symtab.o	\
-	target.o	\
        	toklist.o      	\
 	ulabel.o
 

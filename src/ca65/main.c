@@ -41,6 +41,7 @@
 
 /* common */
 #include "cmdline.h"
+#include "target.h"
 #include "version.h"
 
 /* ca65 */
@@ -61,7 +62,6 @@
 #include "pseudo.h"
 #include "scanner.h"
 #include "symtab.h"
-#include "target.h"
 #include "ulabel.h"
 
 
@@ -283,17 +283,15 @@ static void OptSmart (const char* Opt, const char* Arg)
 static void OptTarget (const char* Opt, const char* Arg)
 /* Set the target system */
 {
-    int T;
     if (Arg == 0) {
 	NeedArg (Opt);
     }
 
     /* Map the target name to a target id */
-    T = MapTarget (Arg);
-    if (T < 0) {
+    Target = FindTarget (Arg);
+    if (Target == TGT_UNKNOWN) {
 	AbEnd ("Invalid target name: `%s'", Arg);
     }
-    Target = (target_t) T;
 }
 
 
@@ -554,10 +552,10 @@ int main (int argc, char* argv [])
     	    /* Filename. Check if we already had one */
     	    if (InFile) {
     	       	fprintf (stderr, "%s: Don't know what to do with `%s'\n",
-			 ProgName, Arg);
-		exit (EXIT_FAILURE);
+	     		 ProgName, Arg);
+	     	exit (EXIT_FAILURE);
     	    } else {
-		InFile = Arg;
+	     	InFile = Arg;
 	    }
      	}
 

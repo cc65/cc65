@@ -36,6 +36,7 @@
 /* common */
 #include "check.h"
 #include "exprdefs.h"
+#include "tgttrans.h"
 #include "xmalloc.h"
 
 /* ca65 */
@@ -46,7 +47,6 @@
 #include "objcode.h"
 #include "objfile.h"
 #include "symtab.h"
-#include "target.h"
 #include "toklist.h"
 #include "ulabel.h"
 #include "expr.h"
@@ -484,7 +484,7 @@ static ExprNode* Factor (void)
 	    break;
 
 	case TOK_CHARCON:
-    	    N = LiteralExpr ((unsigned char) XlatChar ((char)IVal));
+    	    N = LiteralExpr (TgtTranslateChar (IVal));
        	    NextTok ();
 	    break;
 

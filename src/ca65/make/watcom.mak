@@ -90,7 +90,6 @@ OBJS = 	condasm.obj	\
 	repeat.obj	\
 	scanner.obj	\
 	symtab.obj	\
-	target.obj	\
 	toklist.obj	\
 	ulabel.obj
 
@@ -137,7 +136,6 @@ FILE pseudo.obj
 FILE repeat.obj
 FILE scanner.obj
 FILE symtab.obj
-FILE target.obj
 FILE toklist.obj
 FILE ulabel.obj
 LIBRARY ..\common\common.lib

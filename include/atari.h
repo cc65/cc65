@@ -152,6 +152,10 @@ extern void save_vecs(void);           /* save system vectors */
 extern void rest_vecs(void);           /* restore system vectors */
 extern unsigned char get_ostype(void); /* get ROM version */
 extern unsigned char get_tv(void);     /* get TV system */
+extern char *getdefdev(void);          /* get default floppy device */
+
+/* global variables */
+extern unsigned char _dos_type;        /* the DOS flavour */
 
 /* get_ostype return value defines (for explanation, see ostype.s) */
 /* masks */
@@ -179,6 +183,13 @@ extern unsigned char get_tv(void);     /* get TV system */
 /* get_tv return values */
 #define AT_NTSC     0
 #define AT_PAL      1
+
+/* valid _dos_type values */
+#define ATARIDOS    0
+#define SPARTADOS   1
+#define OSADOS      2
+#define MYDOS       3     /* detection currently not implemented */
+#define NODOS       255   /* detection currently not implemented */
 
 /* Define hardware */
 #include <_gtia.h>

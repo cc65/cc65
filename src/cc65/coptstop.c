@@ -713,7 +713,7 @@ struct OptFuncDesc {
 };
 
 static const OptFuncDesc FuncTable[] = {
-    { "__bzero",    Opt___bzero,   STOP_NONE     },
+    { "__bzero",    Opt___bzero,   STOP_X_ZERO   },
     { "staspidx",   Opt_staspidx,  STOP_NONE     },
     { "staxspidx",  Opt_staxspidx, STOP_A_UNUSED },
     { "tosaddax",   Opt_tosaddax,  STOP_NONE     },

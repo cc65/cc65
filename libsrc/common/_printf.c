@@ -148,15 +148,26 @@ flags_done:
 
        	    case 'd':
        	    case 'i':
-		if (addsign) {
-		    *s++ = '+';
-		} else if (addblank) {
-		    *s++ = ' ';
-		}
-	   	if (islong) {
-	   	    ltoa (va_arg (ap, long), s, 10);
-	   	} else {
-    	   	    itoa (va_arg (ap, int), s, 10);
+		if (islong) {
+		    l = va_arg (ap, long);
+		    if (l >= 0) {
+			if (addsign) {
+			    *s++ = '+';
+			} else if (addblank) {
+			    *s++ = ' ';
+			}
+		    }
+	   	    ltoa (l, s, 10);
+		} else {
+		    i = va_arg (ap, int);
+		    if (i >= 0) {
+			if (addsign) {
+			    *s++ = '+';
+			} else if (addblank) {
+			    *s++ = ' ';
+			}
+		    }
+    	   	    itoa (i, s, 10);
 	   	}
     	    	break;
 

@@ -49,20 +49,27 @@
 unsigned OptAdd1 (CodeSeg* S)
 /* Search for the sequence
  *
- *     	jsr     pushax
- *      ldy     xxx
- *  	ldx     #$00
- *      lda     (sp),y
+ *      ldy     #xx
+ *      jsr     ldaxysp
+ *      jsr     pushax
+ *      ldy     #yy
+ *      jsr     ldaxysp
  *      jsr     tosaddax
  *
  * and replace it by:
- *
- *      ldy     xxx-2
+ *      
+ *      ldy     #xx-1
+ *      lda     (sp),y
  *      clc
+ *      ldy     #yy-3
  *      adc     (sp),y
- *      bcc     L
- *      inx
- * L:
+ *      pha
+ *      ldy     #xx
+ *      lda     (sp),y
+ *      ldy     #yy-2
+ *      adc     (sp),y
+ *      tax
+ *      pla
  */
 {
     unsigned Changes = 0;
@@ -71,58 +78,78 @@ unsigned OptAdd1 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-     	CodeEntry* L[5];
+     	CodeEntry* L[6];
 
       	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+       	L[0] = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (CE_IsCall (E, "pushax")          &&
-       	    CS_GetEntries (S, L, I+1, 5)     &&
-       	    L[0]->OPC == OP65_LDY            &&
+       	if (L[0]->OPC == OP65_LDY            &&
 	    CE_KnownImm (L[0])               &&
-	    !CE_HasLabel (L[0])              &&
-	    L[1]->OPC == OP65_LDX            &&
-	    CE_KnownImm (L[1])               &&
-	    L[1]->Num == 0                   &&
-	    !CE_HasLabel (L[1])              &&
-	    L[2]->OPC == OP65_LDA            &&
-	    !CE_HasLabel (L[2])              &&
-	    CE_IsCall (L[3], "tosaddax")     &&
-	    !CE_HasLabel (L[3])) {
+	    !CS_RangeHasLabel (S, I+1, 5)    &&
+       	    CS_GetEntries (S, L+1, I+1, 5)   &&
+       	    CE_IsCall (L[1], "ldaxysp")      &&
+       	    CE_IsCall (L[2], "pushax")       &&
+       	    L[3]->OPC == OP65_LDY            &&
+	    CE_KnownImm (L[3])               &&
+       	    CE_IsCall (L[4], "ldaxysp")      &&
+       	    CE_IsCall (L[5], "tosaddax")) {
 
 	    CodeEntry* X;
-	    CodeLabel* Label;
+            const char* Arg;
 
-	    /* Remove the call to pushax */
-	    CS_DelEntry (S, I);
+       	    /* Correct the stack of the first Y register load */
+	    CE_SetNumArg (L[0], L[0]->Num - 1);
 
-	    /* Correct the stack offset (needed since pushax was removed) */
-	    CE_SetNumArg (L[0], L[0]->Num - 2);
+            /* lda (sp),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+            CS_InsertEntry (S, X, I+1);
 
-	    /* Add the clc . */
-	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+1);
-
-	    /* Remove the load */
-	    CS_DelEntry (S, I+3);      /* lda */
-	    CS_DelEntry (S, I+2);      /* ldx */
-
-	    /* Add the adc */
-	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[3]->LI);
+       	    /* clc */
+	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[5]->LI);
 	    CS_InsertEntry (S, X, I+2);
 
-	    /* Generate the branch label and the branch */
-	    Label = CS_GenLabel (S, L[4]);
-	    X = NewCodeEntry (OP65_BCC, AM65_BRA, Label->Name, Label, L[3]->LI);
+            /* ldy #yy-3 */
+	    Arg = MakeHexArg (L[3]->Num - 3);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[4]->LI);
 	    CS_InsertEntry (S, X, I+3);
 
-	    /* Generate the increment of the high byte */
-	    X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, L[3]->LI);
+	    /* adc (sp),y */
+	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[5]->LI);
 	    CS_InsertEntry (S, X, I+4);
 
-	    /* Delete the call to tosaddax */
-	    CS_DelEntry (S, I+5);
+            /* pha */
+            X = NewCodeEntry (OP65_PHA, AM65_IMP, 0, 0, L[5]->LI);
+            CS_InsertEntry (S, X, I+5);
+
+            /* ldy #xx (beware: L[0] has changed) */
+	    Arg = MakeHexArg (L[0]->Num + 1);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[1]->LI);
+	    CS_InsertEntry (S, X, I+6);
+
+            /* lda (sp),y */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+            CS_InsertEntry (S, X, I+7);
+
+            /* ldy #yy-2 */
+	    Arg = MakeHexArg (L[3]->Num - 2);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[4]->LI);
+	    CS_InsertEntry (S, X, I+8);
+
+	    /* adc (sp),y */
+	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[5]->LI);
+	    CS_InsertEntry (S, X, I+9);
+
+            /* tax */
+            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[5]->LI);
+            CS_InsertEntry (S, X, I+10);
+
+            /* pla */
+            X = NewCodeEntry (OP65_PLA, AM65_IMP, 0, 0, L[5]->LI);
+            CS_InsertEntry (S, X, I+11);
+
+	    /* Delete the old code */
+	    CS_DelEntries (S, I+12, 5);
 
 	    /* Remember, we had changes */
 	    ++Changes;

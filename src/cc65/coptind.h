@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -104,6 +104,9 @@ unsigned OptStoreLoad (CodeSeg* S);
 
 unsigned OptTransfers (CodeSeg* S);
 /* Remove transfers from one register to another and back */
+
+unsigned OptPushPop (CodeSeg* S);
+/* Remove a PHA/PLA sequence were A is not used later */
 
 unsigned OptBranchDist (CodeSeg* S);
 /* Change branches for the distance needed. */

@@ -594,6 +594,8 @@ void CS_DelEntry (CodeSeg* S, unsigned Index)
 /* Delete an entry from the code segment. This includes moving any associated
  * labels, removing references to labels and even removing the referenced labels
  * if the reference count drops to zero.
+ * Note: Labels are moved forward if possible, that is, they are moved to the
+ * next insn (not the preceeding one).
  */
 {
     /* Get the code entry for the given index */

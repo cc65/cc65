@@ -1013,7 +1013,7 @@ static unsigned OptDecouple (CodeSeg* S)
 	        break;
 
 	    case OP65_INY:
-	        if (E->RI->In.RegY >= 0) {		     
+	        if (E->RI->In.RegY >= 0) {
 	      	    Arg = MakeHexArg ((E->RI->In.RegY + 1) & 0xFF);
 	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
 	    	}
@@ -1097,7 +1097,7 @@ static unsigned OptDecouple (CodeSeg* S)
 	        break;
 
 	    case OP65_TXA:
-	        if (E->RI->In.RegX >= 0) {		     
+	        if (E->RI->In.RegX >= 0) {
 		    Arg = MakeHexArg (In->RegX);
 	      	    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
 	    	}
@@ -1425,6 +1425,7 @@ static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",    	100, 0, 
 static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush1       	= { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
+static OptFunc DOptPushPop      = { OptPushPop,      "OptPushPop",        0, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",      	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift2      	= { OptShift2,       "OptShift2",      	100, 0, 0, 0, 0, 0 };
 /*static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };*/
@@ -1477,7 +1478,8 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrLoad6,
     &DOptPtrStore1,
     &DOptPtrStore2,
-    &DOptPush1,
+    &DOptPush1, 
+    &DOptPushPop,
     &DOptRTS,
     &DOptRTSJumps1,
     &DOptRTSJumps2,
@@ -1805,6 +1807,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptDupLoads, 1);
        	C += RunOptFunc (S, &DOptStoreLoad, 1);
        	C += RunOptFunc (S, &DOptTransfers, 1);
+        C += RunOptFunc (S, &DOptPushPop, 1);
 
 	Changes += C;
 

@@ -1054,9 +1054,9 @@ unsigned OptTransfers (CodeSeg* S)
        	    (N->Info & OF_XFR) != 0) {
 
 	    /* Check if it's a transfer and back */
-       	    if ((E->OPC == OP65_TAX && N->OPC == OP65_TXA && !RegXUsed (S, I+2)) ||
-       	        (E->OPC == OP65_TAY && N->OPC == OP65_TYA && !RegYUsed (S, I+2)) ||
-       	        (E->OPC == OP65_TXA && N->OPC == OP65_TAX && !RegAUsed (S, I+2)) ||
+       	    if ((E->OPC == OP65_TAX && N->OPC == OP65_TXA && !RegXUsed (S, I+1)) ||
+       	        (E->OPC == OP65_TAY && N->OPC == OP65_TYA && !RegYUsed (S, I+1)) ||
+       	        (E->OPC == OP65_TXA && N->OPC == OP65_TAX && !RegAUsed (S, I+1)) ||
        	        (E->OPC == OP65_TYA && N->OPC == OP65_TAY && !RegAUsed (S, I+1))) {
 
 		/* If the next insn is a conditional branch, check if the insn
@@ -1074,20 +1074,85 @@ unsigned OptTransfers (CodeSeg* S)
 		    P = CS_GetEntry (S, I-1);
 		    if ((P->Info & OF_SETF) == 0) {
 			/* Does not set the flags */
-			goto NextEntry;
-		    }
-		}
+	    		goto NextEntry;
+	    	    }
+	    	}
 
-		/* Remove both transfers */
-		CS_DelEntry (S, I+1);
-		CS_DelEntry (S, I);
+	    	/* Remove both transfers */
+	    	CS_DelEntry (S, I+1);
+	    	CS_DelEntry (S, I);
 
-		/* Remember, we had changes */
-		++Changes;
+	    	/* Remember, we had changes */
+	    	++Changes;
 	    }
 	}
 
 NextEntry:
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptPushPop (CodeSeg* S)
+/* Remove a PHA/PLA sequence were A is not used later */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* N;
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if it is a PLA instruction that does not have a label and
+         * where the register value is not used later and that is not followed
+         * by a conditional branch.
+	 */
+        if (E->OPC == OP65_PLA                  &&
+       	    !CE_HasLabel (E)                    &&
+       	    (N = CS_GetNextEntry (S, I)) != 0  	&&
+       	    (N->Info & OF_CBRA) == 0            &&
+            !RegAUsed (S, I+1)) {
+
+            /* Search back until we find the matching PHA instruction. If we
+             * find a label or another PLA somewhere in between, bail out
+             * since this may have side effects.
+             */
+            unsigned J = I;
+            while (J-- > 0) {
+
+                /* Get the previous entry */
+                CodeEntry* P = CS_GetEntry (S, J);
+
+                /* Check this entry */
+                if (P->OPC == OP65_PHA) {
+
+                    /* Found the matching push, remove both */
+                    CS_DelEntry (S, I);
+                    CS_DelEntry (S, J);
+
+                    /* Remember that we had changes and bail out */
+                    ++Changes;
+                    break;
+
+                } else if (CE_HasLabel (P) || P->OPC == OP65_PLA) {
+
+                    /* OOPS - too dangerous! */
+                    break;
+
+                }
+            }
+	}
+
 	/* Next entry */
 	++I;
 

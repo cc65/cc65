@@ -22,6 +22,7 @@ TXT   =	$(SGML:.sgml=.txt)
 HTML  = $(SGML:.sgml=.html)
 INFO  = $(SGML:.sgml=.info)
 DVI   = $(SGML:.sgml=.dvi)
+TEX   = $(SGML:.sgml=.tex)
 
 # ------------------------------------------------------------------------------
 # Rules to make targets
@@ -30,7 +31,7 @@ DVI   = $(SGML:.sgml=.dvi)
 	sgml2txt $<
 
 %.html:	%.sgml
-	sgml2html --split=1 $<
+      	sgml2html --split=1 $<
 
 %.info:	%.sgml
 	sgml2info $<
@@ -38,33 +39,39 @@ DVI   = $(SGML:.sgml=.dvi)
 %.dvi:	%.sgml
 	sgml2latex $<
 
+%.tex:	%.sgml
+      	sgml2latex --output=tex $<
+
 # ------------------------------------------------------------------------------
 # Targets
 
 .PHONY: all
-all: 	txt html info dvi
+all:  	txt html info dvi
 
 .PHONY:	txt
-txt:	$(TXT)
+txt:  	$(TXT)
 
 .PHONY:	html
-html:	$(HTML)
+html: 	$(HTML)
 
 .PHONY:	info
-info:	$(INFO)
+info: 	$(INFO)
 
 .PHONY:	dvi
-dvi:	$(DVI)
+dvi:  	$(DVI)
+
+.PHONY:	tex
+tex:  	$(TEX)
 
 # The index.html target is special, since it does not get splitted
 index.html:	index.sgml
-	sgml2html --split=0 $<
+      	sgml2html --split=0 $<
 
 clean:
 	rm -f *~
 
 zap:	clean
-	rm -f $(TXT) $(HTML) $(INFO) $(DVI) *.html *.info-* *.man
+	rm -f $(TXT) $(HTML) $(INFO) $(DVI) $(TEX) *.html *.info-* *.man
 
 # ------------------------------------------------------------------------------
 # Make the dependencies

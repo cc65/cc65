@@ -1397,13 +1397,13 @@ void CfgRead (void)
 
 
 
-static void CreateRunDefines (SegDesc* S)
+static void CreateRunDefines (SegDesc* S, unsigned long SegAddr)
 /* Create the defines for a RUN segment */
 {
     char Buf [256];
 
     xsprintf (Buf, sizeof (Buf), "__%s_RUN__", GetString (S->Name));
-    CreateSegmentExport (GetStringId (Buf), S->Seg, 0);
+    CreateMemoryExport (GetStringId (Buf), S->Run, SegAddr - S->Run->Start);
     xsprintf (Buf, sizeof (Buf), "__%s_SIZE__", GetString (S->Name));
     CreateConstExport (GetStringId (Buf), S->Seg->Size);
     S->Flags |= SF_RUN_DEF;
@@ -1411,13 +1411,13 @@ static void CreateRunDefines (SegDesc* S)
 
 
 
-static void CreateLoadDefines (Memory* M, SegDesc* S)
+static void CreateLoadDefines (SegDesc* S, unsigned long SegAddr)
 /* Create the defines for a LOAD segment */
 {
     char Buf [256];
 
     xsprintf (Buf, sizeof (Buf), "__%s_LOAD__", GetString (S->Name));
-    CreateMemoryExport (GetStringId (Buf), M, S->Seg->PC - M->Start);
+    CreateMemoryExport (GetStringId (Buf), S->Load, SegAddr - S->Load->Start);
     S->Flags |= SF_LOAD_DEF;
 }
 
@@ -1504,10 +1504,10 @@ void CfgAssignSegments (void)
 		     */
 		    if (S->Load == M) {
 		       	if ((S->Flags & SF_LOAD_DEF) == 0) {
-		       	    CreateLoadDefines (M, S);
+		       	    CreateLoadDefines (S, Addr);
 		       	} else {
 		       	    CHECK ((S->Flags & SF_RUN_DEF) == 0);
-		       	    CreateRunDefines (S);
+		       	    CreateRunDefines (S, Addr);
 		       	}
 		    }
 		} else {
@@ -1516,10 +1516,10 @@ void CfgAssignSegments (void)
 		     * have only one copy of the segment in the area.
 		     */
 		    if (S->Run == M) {
-		       	CreateRunDefines (S);
+		       	CreateRunDefines (S, Addr);
 		    }
 		    if (S->Load == M) {
-		       	CreateLoadDefines (M, S);
+		       	CreateLoadDefines (S, Addr);
 		    }
 		}
      	    }

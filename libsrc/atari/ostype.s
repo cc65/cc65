@@ -1,15 +1,14 @@
 ;
-; Christian Groessler, July 2000
+; Christian Groessler, December 2000
 ; from Freddy Offenga's rominfo.c
 ;
-; unsigned int get_ostype(void)
+; unsigned char get_ostype(void)
 ;
-; x x x x x x x x  x x x x x x x x   -	16 bit flag
-; | | | | | | | |  | | | | | | | |
-; | | | | | | | |  | | | | | +-+-+-- main OS rev.
-; | | | | | | | |  | | | +-+-------- PAL/NTSC flag
-; | | | | | | | |  +-+-+------------ minor OS rev.
-; +-+-+-+-+-+-+-+------------------- unused
+; x x x x x x x x   -	8 bit flag
+; | | | | | | | |
+; | | | | | +-+-+-- main OS rev.
+; | | +-+-+-------- minor OS rev.
+; +-+-------------- unused
 ;
 ; main OS rev.:
 ;	000 - unknown
@@ -17,17 +16,14 @@
 ;	010 - 1200XL ROM
 ;	011 - XL/XE ROM
 ;	1xx - unassigned
-; PAL/NTSC flag:
-;	00 - unknown
-;	01 - PAL
-;	10 - NTSC
-;	11 - (invalid)
 ; minor OS rev.: (depending on main OS rev.);
 ;	400/800:
 ;		000 - unknown
-;		001 - Rev. A
-;		010 - Rev. B
-;		011 - unassigned (up to 111)
+;		001 - Rev. A PAL
+;		010 - Rev. B PAL
+;		011 - Rev. A NTSC
+;		100 - Rev. B NTSC
+;		101 - unassigned (up to 111)
 ;	1200XL:
 ;		000 - unknown
 ;		001 - Rev. 10
@@ -42,10 +38,7 @@
 ;		101 - unassigned (up to 111)
 ;
 
-
-	.include	"atari.inc"
 	.export		_get_ostype
-	.importzp	tmp1
 
 .proc	_get_ostype
 
@@ -67,30 +60,8 @@
 	asl	a
 	asl	a
 	asl	a
-	asl	a
-	asl	a
-	and	#%11100000
+	and	#%00111000
 	ora	#%11
-_fin_xl:sta	tmp1
-	lda	PALNTS		; get OS PAL/NTSC flag (0 = NTSC, 1 = PAL)
-	beq	_xl_ntsc
-	cmp	#1
-	beq	_xl_pal
-	lda	#0
-	beq	_fxlcont
-
-_xl_ntsc:
-	lda	#%10
-	bne	_fxlcont
-
-_xl_pal:lda	#1
-
-_fxlcont:
-	asl	a
-	asl	a
-	asl	a
-	ora	tmp1
-
 _fin:	ldx	#0
 	rts
 
@@ -113,15 +84,15 @@ _1200xl:
 	beq	_1200_fin
 
 _1200_10:
-	lda	#%00100000
+	lda	#%00001000
 	bne	_1200_fin
 
 _1200_11:
-	lda	#%01000000
+	lda	#%00010000
 
 _1200_fin:
 	ora	#%010
-	bne	_fin_xl
+	bne	_fin
 
 ; 400/800 ROM
 
@@ -135,7 +106,7 @@ _400800:
 
 ; 400/800 NTSC Rev. A
 
-	lda	#%00110001
+	lda	#%00011001
 	bne	_400800_done
 
 ; 400/800 unknown
@@ -152,7 +123,7 @@ _400800_1:
 
 ; 400/800 PAL Rev. A
 
-	lda	#%00101001
+	lda	#%00001001
 	bne	_400800_done
 
 _400800_2:
@@ -163,7 +134,7 @@ _400800_2:
 
 ; 400/800 NTSC Rev. B
 
-	lda	#%01010001
+	lda	#%00100001
 	bne	_400800_done
 
 _400800_3:
@@ -175,7 +146,7 @@ _400800_3:
 
 ; 400/800 PAL Rev. B
 
-	lda	#%01001001
+	lda	#%00010001
 
 _400800_done:
 	bne	_fin

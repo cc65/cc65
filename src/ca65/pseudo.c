@@ -1108,7 +1108,8 @@ static void DoMacPack (void)
     static const char* Keys [] = {
     	"GENERIC",
        	"LONGBRANCH",
-        "CBM"
+        "CBM",
+        "CPU"
     };
 
     int Package;

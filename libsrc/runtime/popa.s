@@ -7,9 +7,11 @@
        	.export	  	popa
 	.importzp	sp
 
+        .macpack        cpu
+
 .proc	popa
 
-.ifpc02
+.if (.cpu .bitand ::CPU_ISET_65SC02)
 	lda	(sp)
 .else
 	ldy 	#0              ; (2)

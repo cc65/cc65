@@ -7,6 +7,8 @@
        	.export	  	pusha0sp, pushaysp, pusha
 	.importzp	sp
 
+        .macpack        cpu
+
 ; Beware: The optimizer knows about this function!
 
 pusha0sp:
@@ -16,7 +18,7 @@ pushaysp:
 pusha:	ldy	sp              ; (3)
        	beq	@L1             ; (6)
  	dec	sp              ; (11)
-.ifpc02
+.if (.cpu .bitand CPU_ISET_65SC02)
 	sta	(sp)
 .else
     	ldy	#0              ; (13)

@@ -19,7 +19,7 @@
        	.import	__CONSTRUCTOR_TABLE__, __CONSTRUCTOR_COUNT__
 	.import	__DESTRUCTOR_TABLE__, __DESTRUCTOR_COUNT__
 
-
+        .macpack        cpu
 
 .code
 
@@ -58,7 +58,7 @@
 
 	sta   	getbyt+1
 	stx	getbyt+2
-	sty	index 
+	sty	index
 
 loop:	ldy	index
      	beq	done
@@ -69,7 +69,7 @@ loop:	ldy	index
 	jsr	getbyt
 	sty	index
 	jsr	callax
-.ifpc02
+.if (.cpu .bitand ::CPU_ISET_65SC02)
 	bra	loop
 .else
      	jmp	loop

@@ -8,11 +8,13 @@
 	.import		addysp1
 	.importzp	sp, ptr4
 
+        .macpack        cpu
+
 tosanda0:
       	ldx	#$00
 tosandax:
-.ifpc02
-	and	(sp)		; 65C02 version, saves 2 cycles and 1 byte
+.if (.cpu .bitand CPU_ISET_65SC02)
+	and	(sp)		; 65SC02 version, saves 2 cycles and 1 byte
 	ldy	#1
 .else
       	ldy	#0

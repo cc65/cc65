@@ -10,12 +10,14 @@
        	.export		tosadda0, tosaddax
 	.importzp	sp
 
+        .macpack        cpu
+
 tosadda0:
 	ldx	#0
 tosaddax:
       	clc
-.ifpc02
-     	adc	(sp)		; 65C02 version - saves 2 cycles
+.if (.cpu .bitand CPU_ISET_65SC02)
+     	adc	(sp)	       	; 65SC02 version - saves 2 cycles
 	ldy	#1
 .else
       	ldy	#0

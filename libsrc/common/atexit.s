@@ -11,13 +11,15 @@
 
 	.include	"errno.inc"
 
+        .macpack        cpu
+
 ; ---------------------------------------------------------------------------
 
 .proc	_atexit
 
 	ldy	exitfunc_index
        	cpy    	#exitfunc_max		; Slot available?
-       	beq    	@Error			; Jump if no
+       	beq    	@Error	   		; Jump if no
 
 ; Enter the function into the table
 
@@ -63,7 +65,7 @@
    	lda	exitfunc_table,y
    	sty	exitfunc_index
        	jsr    	callax                  ; Call the function
-.ifpc02
+.if (.cpu .bitand ::CPU_ISET_65SC02)
 	bra	doatexit
 .else
  	jmp	doatexit     		; Next one
@@ -71,7 +73,7 @@
 
 @L9:	rts
 
-.endproc                      
+.endproc
 
 
 

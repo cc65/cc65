@@ -8,16 +8,16 @@
 	.import		addysp1
 	.importzp	sp
 
-;
+        .macpack        cpu
+
 ; AX = TOS - AX
-;
 
 tossuba0:
 	ldx	#0
 tossubax:
       	sec
       	eor	#$FF
-.ifpc02
+.if (.cpu .bitand CPU_ISET_65SC02)
         adc	(sp)
 	ldy	#1
 .else

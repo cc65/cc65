@@ -11,6 +11,7 @@
 	.import	      	_strlen, _malloc, _memcpy
 	.export	     	_strdup
 
+        .macpack        cpu
 	.macpack      	generic
 
 _strdup:
@@ -18,7 +19,7 @@ _strdup:
 ; Since we need some place to store the intermediate results, allocate a
 ; stack frame. To make this somewhat more efficient, create the stackframe
 ; as needed for the final call to the memcpy function.
-		
+
 	pha			; decsp will destroy A (but not X)
 	jsr	decsp4	       	; Target/source
 
@@ -27,8 +28,8 @@ _strdup:
 	ldy	#1
 	txa
 	sta	(sp),y
-	pla	      
-.ifpc02
+	pla
+.if (.cpu .bitand CPU_ISET_65SC02)
 	sta	(sp)
 .else
        	dey

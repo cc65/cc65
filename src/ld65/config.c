@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -98,6 +98,7 @@ unsigned	       	SegDescCount;	/* Number of entries in list */
 #define SA_DEFINE	0x0010
 #define SA_OFFSET	0x0020
 #define SA_START	0x0040
+#define SA_OPTIONAL     0x0080
 
 
 
@@ -336,11 +337,10 @@ static SegDesc* NewSegDesc (const char* Name)
 	CfgError ("Segment `%s' defined twice", Name);
     }
 
-    /* Verify that the given segment does really exist */
+    /* Search for the actual segment in the input files. The function may
+     * return NULL (no such segment), this is checked later.
+     */
     Seg = SegFind (Name);
-    if (Seg == 0) {
-       	CfgWarning ("Segment `%s' does not exist", Name);
-    }
 
     /* Allocate memory */
     S = xmalloc (sizeof (SegDesc) + Len);
@@ -608,21 +608,22 @@ static void ParseSegments (void)
 /* Parse a SEGMENTS section */
 {
     static const IdentTok Attributes [] = {
-       	{   "LOAD",  	CFGTOK_LOAD     },
-	{   "RUN",    	CFGTOK_RUN      },
-        {   "TYPE",     CFGTOK_TYPE     },
         {   "ALIGN",    CFGTOK_ALIGN    },
         {   "DEFINE",   CFGTOK_DEFINE   },
-	{   "OFFSET", 	CFGTOK_OFFSET   },
-	{   "START",  	CFGTOK_START    },
+       	{   "LOAD",    	CFGTOK_LOAD     },
+	{   "OFFSET",  	CFGTOK_OFFSET   },
+        {   "OPTIONAL", CFGTOK_OPTIONAL },
+	{   "RUN",     	CFGTOK_RUN      },
+	{   "START",   	CFGTOK_START    },
+        {   "TYPE",     CFGTOK_TYPE     },
     };
     static const IdentTok Types [] = {
-       	{   "RO",     	CFGTOK_RO       },
-       	{   "RW",     	CFGTOK_RW       },
-       	{   "BSS",    	CFGTOK_BSS      },
-	{   "ZP",     	CFGTOK_ZP	},
-	{   "WP",     	CFGTOK_WPROT	},
-	{   "WPROT",  	CFGTOK_WPROT	},
+       	{   "RO",      	CFGTOK_RO       },
+       	{   "RW",      	CFGTOK_RW       },
+       	{   "BSS",     	CFGTOK_BSS      },
+	{   "ZP",      	CFGTOK_ZP	},
+	{   "WP",      	CFGTOK_WPROT	},
+	{   "WPROT",   	CFGTOK_WPROT	},
     };
 
     unsigned Count;
@@ -653,66 +654,74 @@ static void ParseSegments (void)
 	    /* Check which attribute was given */
 	    switch (AttrTok) {
 
-		case CFGTOK_LOAD:
-	      	    FlagAttr (&S->Attr, SA_LOAD, "LOAD");
-		    S->Load = CfgGetMemory (CfgSVal);
-		    break;
-
-		case CFGTOK_RUN:
-      		    FlagAttr (&S->Attr, SA_RUN, "RUN");
- 		    S->Run = CfgGetMemory (CfgSVal);
-		    break;
-
-		case CFGTOK_TYPE:
- 		    FlagAttr (&S->Attr, SA_TYPE, "TYPE");
-       		    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
-		    switch (CfgTok) {
-       	       	       	case CFGTOK_RO:	   S->Flags |= SF_RO;               break;
-			case CFGTOK_RW:	   /* Default */		    break;
-		     	case CFGTOK_BSS:   S->Flags |= SF_BSS;              break;
-		     	case CFGTOK_ZP:	   S->Flags |= (SF_BSS | SF_ZP);    break;
-		     	case CFGTOK_WPROT: S->Flags |= (SF_RO | SF_WPROT);  break;
-		     	default:	   Internal ("Unexpected token: %d", CfgTok);
-		    }
-		    break;
-
 	        case CFGTOK_ALIGN:
-		    CfgAssureInt ();
-		    FlagAttr (&S->Attr, SA_ALIGN, "ALIGN");
-		    CfgRangeCheck (1, 0x10000);
-		    S->Align = BitFind (CfgIVal);
-		    if ((0x01UL << S->Align) != CfgIVal) {
-		     	CfgError ("Alignment must be a power of 2");
-		    }
-		    S->Flags |= SF_ALIGN;
-		    break;
+	    	    CfgAssureInt ();
+	    	    FlagAttr (&S->Attr, SA_ALIGN, "ALIGN");
+	    	    CfgRangeCheck (1, 0x10000);
+	    	    S->Align = BitFind (CfgIVal);
+	    	    if ((0x01UL << S->Align) != CfgIVal) {
+	    	     	CfgError ("Alignment must be a power of 2");
+	    	    }
+	    	    S->Flags |= SF_ALIGN;
+	    	    break;
 
 	        case CFGTOK_DEFINE:
- 		    FlagAttr (&S->Attr, SA_DEFINE, "DEFINE");
-		    /* Map the token to a boolean */
-		    CfgBoolToken ();
-		    if (CfgTok == CFGTOK_TRUE) {
-	  	     	S->Flags |= SF_DEFINE;
-		    }
-		    break;
+ 	    	    FlagAttr (&S->Attr, SA_DEFINE, "DEFINE");
+	    	    /* Map the token to a boolean */
+	    	    CfgBoolToken ();
+	    	    if (CfgTok == CFGTOK_TRUE) {
+	    	     	S->Flags |= SF_DEFINE;
+	    	    }
+	    	    break;
+
+	    	case CFGTOK_LOAD:
+	      	    FlagAttr (&S->Attr, SA_LOAD, "LOAD");
+	    	    S->Load = CfgGetMemory (CfgSVal);
+	    	    break;
 
 	        case CFGTOK_OFFSET:
 	    	    CfgAssureInt ();
-		    FlagAttr (&S->Attr, SA_OFFSET, "OFFSET");
-		    CfgRangeCheck (1, 0x1000000);
-		    S->Addr   = CfgIVal;
-		    S->Flags |= SF_OFFSET;
-		    break;
+	    	    FlagAttr (&S->Attr, SA_OFFSET, "OFFSET");
+	    	    CfgRangeCheck (1, 0x1000000);
+	    	    S->Addr   = CfgIVal;
+	    	    S->Flags |= SF_OFFSET;
+	    	    break;
+
+	        case CFGTOK_OPTIONAL:
+	    	    FlagAttr (&S->Attr, SA_OPTIONAL, "OPTIONAL");
+		    CfgBoolToken ();
+		    if (CfgTok == CFGTOK_TRUE) {
+	  	    	S->Flags |= SF_OPTIONAL;
+		    }
+	    	    break;
+
+	    	case CFGTOK_RUN:
+      	    	    FlagAttr (&S->Attr, SA_RUN, "RUN");
+ 	    	    S->Run = CfgGetMemory (CfgSVal);
+	    	    break;
 
 	        case CFGTOK_START:
-      		    CfgAssureInt ();
-		    FlagAttr (&S->Attr, SA_START, "START");
-		    CfgRangeCheck (1, 0x1000000);
-		    S->Addr   = CfgIVal;
-		    S->Flags |= SF_START;
-		    break;
+      	    	    CfgAssureInt ();
+	    	    FlagAttr (&S->Attr, SA_START, "START");
+	    	    CfgRangeCheck (1, 0x1000000);
+	    	    S->Addr   = CfgIVal;
+	    	    S->Flags |= SF_START;
+	    	    break;
 
-		default:
+	    	case CFGTOK_TYPE:
+ 	    	    FlagAttr (&S->Attr, SA_TYPE, "TYPE");
+       	    	    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+	    	    switch (CfgTok) {
+       	       	       	case CFGTOK_RO:	   S->Flags |= SF_RO;               break;
+	    		case CFGTOK_RW:	   /* Default */		    break;
+	    	     	case CFGTOK_BSS:   S->Flags |= SF_BSS;              break;
+	    	     	case CFGTOK_ZP:	   S->Flags |= (SF_BSS | SF_ZP);    break;
+	    	     	case CFGTOK_WPROT: S->Flags |= (SF_RO | SF_WPROT);  break;
+	    	     	default:	   Internal ("Unexpected token: %d", CfgTok);
+	    	    }
+	    	    break;
+
+	    	default:
        	       	    FAIL ("Unexpected attribute token");
 
 	    }
@@ -738,13 +747,13 @@ static void ParseSegments (void)
 	    S->Align = 0;
 	}
 
-	/* If the segment is marked as BSS style, and if the segment exists 
-         * in any of the object file, check that there's no initialized data 
+	/* If the segment is marked as BSS style, and if the segment exists
+         * in any of the object file, check that there's no initialized data
          * in the segment.
 	 */
 	if ((S->Flags & SF_BSS) != 0 && S->Seg != 0 && !IsBSSType (S->Seg)) {
 	    Warning ("%s(%u): Segment with type `bss' contains initialized data",
-		     CfgGetName (), CfgErrorLine);
+	    	     CfgGetName (), CfgErrorLine);
 	}
 
         /* If the segment is marked as BSS style, it may not have separate
@@ -758,23 +767,23 @@ static void ParseSegments (void)
       	/* Don't allow read/write data to be put into a readonly area */
       	if ((S->Flags & SF_RO) == 0) {
        	    if (S->Run->Flags & MF_RO) {
-      	 	CfgError ("Cannot put r/w segment `%s' in r/o memory area `%s'",
-      	 	     	  S->Name, S->Run->Name);
+      	    	CfgError ("Cannot put r/w segment `%s' in r/o memory area `%s'",
+      	    	     	  S->Name, S->Run->Name);
       	    }
       	}
 
       	/* Only one of ALIGN, START and OFFSET may be used */
        	Count = ((S->Flags & SF_ALIGN)  != 0) +
       	       	((S->Flags & SF_OFFSET) != 0) +
-      		((S->Flags & SF_START)  != 0);
+      	    	((S->Flags & SF_START)  != 0);
       	if (Count > 1) {
        	    CfgError ("Only one of ALIGN, START, OFFSET may be used");
       	}
 
       	/* If this segment does exist in any of the object files, insert the
-      	 * descriptor into the list of segment descriptors. Otherwise discard
-      	 * it silently, because the segment pointer in the descriptor is
-      	 * invalid.
+      	 * descriptor into the list of segment descriptors. Otherwise print a
+         * warning and discard it, because the segment pointer in the
+         * descriptor is invalid.
       	 */
       	if (S->Seg != 0) {
 	    /* Insert the descriptor into the list of all descriptors */
@@ -782,11 +791,15 @@ static void ParseSegments (void)
       	    /* Insert the segment into the memory area list */
       	    MemoryInsert (S->Run, S);
       	    if ((S->Flags & SF_LOAD_AND_RUN) != 0) {
-      		/* We have a separate RUN area given */
-      		MemoryInsert (S->Load, S);
+      	    	/* We have a separate RUN area given */
+      	    	MemoryInsert (S->Load, S);
       	    }
       	} else {
-      	    /* Segment does not exist, discard the descriptor */
+            /* Print a warning if the segment is not optional */
+            if ((S->Flags & SF_OPTIONAL) == 0) {
+                CfgWarning ("Segment `%s' does not exist", S->Name);
+            }
+      	    /* Discard the descriptor */
       	    FreeSegDesc (S);
       	}
 

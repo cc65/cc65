@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -107,14 +107,15 @@ extern unsigned	       	SegDescCount;	/* Number of entries in list */
 #define MF_RO	       	0x0004	  	/* Read only memory area */
 
 /* Segment flags */
-#define SF_RO	      	0x0001	  	/* Read only segment */
+#define SF_RO  	      	0x0001	  	/* Read only segment */
 #define SF_BSS 	      	0x0002	  	/* Segment is BSS style segment */
-#define SF_ZP	      	0x0004		/* Zeropage segment (o65 only) */
+#define SF_ZP  	      	0x0004		/* Zeropage segment (o65 only) */
 #define SF_WPROT      	0x0008		/* Write protected segment */
 #define SF_DEFINE      	0x0010	  	/* Define start and size */
 #define SF_ALIGN      	0x0020	  	/* Align the segment */
 #define SF_OFFSET     	0x0040		/* Segment has offset in memory */
 #define SF_START      	0x0080	  	/* Segment has fixed start address */
+#define SF_OPTIONAL     0x0100          /* Segment is optional (must not exist) */
 #define SF_LOAD_AND_RUN	0x1000 	       	/* LOAD and RUN given */
 #define SF_RUN_DEF     	0x2000		/* RUN symbols already defined */
 #define SF_LOAD_DEF   	0x4000		/* LOAD symbols already defined */
@@ -145,4 +146,4 @@ void CfgWriteTarget (void);
 
 
 
-		      
+

@@ -159,63 +159,42 @@ void GetEA (EffAddr* A)
 	/* Remaining stuff:
 	 *
 	 * adr
-	 * bank.adr
 	 * adr,x
-	 * bank.adr,x
 	 * adr,y
 	 * adr,s
 	 */
        	A->Expr = Expression ();
 
-       	if (Tok == TOK_DOT) {
+        if (Tok == TOK_COMMA) {
 
-       	    /* Expr was a bank specification: bank.adr or bank.adr,x */
-       	    A->Bank = A->Expr;
-       	    NextTok ();
-       	    A->Expr = Expression ();
-       	    if (Tok == TOK_COMMA) {
-       	       	/* bank.adr,x */
-       	       	NextTok ();
-       	       	Consume (TOK_X, "`X' expected");
-       	       	A->AddrModeSet = AM_ABS_LONG_X;
-       	    } else {
-       	     	/* bank.adr */
-       	     	A->AddrModeSet = AM_ABS_LONG;
-       	    }
+            NextTok ();
+            switch (Tok) {
 
-	} else {
+                case TOK_X:
+                    A->AddrModeSet = AM_ABS_LONG_X | AM_ABS_X | AM_DIR_X;
+                    NextTok ();
+                    break;
 
-	    if (Tok == TOK_COMMA) {
+                case TOK_Y:
+                    A->AddrModeSet = AM_ABS_Y | AM_DIR_Y;
+                    NextTok ();
+                    break;
 
-	 	NextTok ();
-	 	switch (Tok) {
+                case TOK_S:
+                    A->AddrModeSet = AM_STACK_REL;
+                    NextTok ();
+                    break;
 
-	 	    case TOK_X:
-       	       	       	A->AddrModeSet = AM_ABS_LONG_X | AM_ABS_X | AM_DIR_X;
-	 		NextTok ();
-	 		break;
+                default:
+                    Error ("Syntax error");
 
-	 	    case TOK_Y:
-	 		A->AddrModeSet = AM_ABS_Y | AM_DIR_Y;
-	 		NextTok ();
-	 		break;
+            }
 
-	 	    case TOK_S:
-	 		A->AddrModeSet = AM_STACK_REL;
-	 		NextTok ();
-	 		break;
+        } else {
 
-	 	    default:
-	 		Error ("Syntax error");
+            A->AddrModeSet = AM_ABS_LONG | AM_ABS | AM_DIR;
 
-	 	}
-
-	    } else {
-
-	 	A->AddrModeSet = AM_ABS_LONG | AM_ABS | AM_DIR;
-
-	    }
-	}
+        }
     }
 
     /* Apply addressing mode overrides */

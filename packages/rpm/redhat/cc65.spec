@@ -57,9 +57,11 @@ machines, you have to install at least one of the library packages.
 %attr(644,root,root)   		/usr/lib/cc65/include/em/*.h
 %attr(755,root,root) %dir	/usr/lib/cc65/include/joystick
 %attr(644,root,root)   		/usr/lib/cc65/include/joystick/*.h
+%attr(755,root,root) %dir	/usr/lib/cc65/include/mouse
+%attr(644,root,root)   		/usr/lib/cc65/include/mouse/*.h
 %attr(755,root,root) %dir	/usr/lib/cc65/include/sys
 %attr(644,root,root)   		/usr/lib/cc65/include/sys/*.h
-%attr(755,root,root) %dir	/usr/lib/cc65/include/tgi
+%attr(755,root,root) %dir	/usr/lib/cc65/include/tgi  
 %attr(644,root,root)   		/usr/lib/cc65/include/tgi/*.h
 %attr(755,root,root) %dir	/usr/lib/cc65/asminc
 %attr(644,root,root)   		/usr/lib/cc65/asminc/*.inc

@@ -43,7 +43,7 @@ offs:   .byte   <(msg0-msgtab)
 msgtab:
 msg0:   .asciiz         "No error"
 msg1:   .asciiz         "No driver available"
-msg2:   .asciiz         "Error loading driver"
+msg2:   .asciiz         "Cannot load driver"
 msg3:   .asciiz         "Invalid driver"
 msg4:   .asciiz         "Mode not supported by driver"
 msg5:   .asciiz         "Invalid function argument"

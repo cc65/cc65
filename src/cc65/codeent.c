@@ -133,6 +133,27 @@ static int NumArg (const char* Arg, unsigned long* Num)
 
 
 
+static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
+/* Set the Use and Chg in E */
+{
+    /* If this is a subroutine call, or a jump to an external function,
+     * lookup the information about this function and use it. The jump itself
+     * does not change any registers, so we don't need to use the data from D.
+     */
+    if (E->OPC == OPC_JSR || ((E->Info & OF_BRA) != 0 && E->JumpTo == 0)) {
+     	/* A subroutine call or jump to external symbol (function exit) */
+     	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
+    } else {
+     	/* Some other instruction. Use the values from the opcode description
+	 * plus addressing mode info
+	 */
+     	E->Use = D->Use | GetAMUseInfo (E->AM);
+	E->Chg = D->Chg;
+    }
+}
+
+
+
 /*****************************************************************************/
 /*     	       	      	   	     Code				     */
 /*****************************************************************************/
@@ -145,7 +166,7 @@ CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg, CodeLabel* JumpTo)
     /* Get the opcode description */
     const OPCDesc* D = GetOPCDesc (OPC);
 
-    /* Allocate memory */	  
+    /* Allocate memory */
     CodeEntry* E = xmalloc (sizeof (CodeEntry));
 
     /* Initialize the fields */
@@ -155,24 +176,13 @@ CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg, CodeLabel* JumpTo)
     E->Hints	= 0;
     E->Arg     	= GetArgCopy (Arg);
     if (NumArg (E->Arg, &E->Num)) {
-	E-> Flags = CEF_NUMARG;
+    	E-> Flags = CEF_NUMARG;
     } else {
        	E->Flags  = 0;
     }
-    E->Info	= D->Info;
-    E->Use	= D->Use;
-    E->Chg	= D->Chg;
-    if (E->OPC == OPC_JSR) {
-     	/* A subroutine call */
-     	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
-    } else if ((E->Info & OF_BRA) != 0 && JumpTo == 0) {
-	/* Jump to external symbol (function exit) */
-     	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
-    } else {
-     	/* Some other instruction */
-     	E->Use |= GetAMUseInfo (E->AM);
-    }
+    E->Info   = D->Info;
     E->JumpTo = JumpTo;
+    SetUseChgInfo (E, D);
     InitCollection (&E->Labels);
 
     /* If we have a label given, add this entry to the label */
@@ -210,18 +220,10 @@ void ReplaceOPC (CodeEntry* E, opc_t OPC)
     const OPCDesc* D = GetOPCDesc (OPC);
 
     /* Replace the opcode */
-    E->OPC	= OPC;
-    E->Size 	= GetInsnSize (E->OPC, E->AM);
-    E->Info	= D->Info;
-    E->Use	= D->Use;
-    E->Chg	= D->Chg;
-    if (E->OPC == OPC_JSR) {
-     	/* A subroutine call */
-     	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
-    } else {
-     	/* Some other instruction */
-     	E->Use |= GetAMUseInfo (E->AM);
-    }
+    E->OPC  = OPC;
+    E->Size = GetInsnSize (E->OPC, E->AM);
+    E->Info = D->Info;
+    SetUseChgInfo (E, D);
 }
 
 

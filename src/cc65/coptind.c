@@ -217,38 +217,25 @@ unsigned OptJumpCascades (CodeSeg* S)
  */
 {
     unsigned Changes = 0;
-    unsigned I;
-
-    /* Get the number of entries, bail out if we have no entries */
-    unsigned Count = GetCodeEntryCount (S);
-    if (Count == 0) {
-     	return 0;
-    }
 
     /* Walk over all entries */
-    I = 0;
-    while (I < Count) {
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* N;
+	CodeLabel* OldLabel;
 
 	/* Get this entry */
 	CodeEntry* E = GetCodeEntry (S, I);
 
-       	/* Check if it's a branch, if it has a jump label, and if this jump
-	 * label is not attached to the instruction itself.
+       	/* Check if it's a branch, if it has a jump label, if this jump
+	 * label is not attached to the instruction itself, and if the
+	 * target instruction is itself a branch.
 	 */
-     	if ((E->Info & OF_BRA) != 0 && E->JumpTo != 0 && E->JumpTo->Owner != E) {
-
-     	    /* Get the label this insn is branching to */
-     	    CodeLabel* OldLabel = E->JumpTo;
-
-     	    /* Get the entry we're branching to */
-     	    CodeEntry* N = OldLabel->Owner;
-
-	    /* If the entry we're branching to is not itself a branch, it is
-	     * not what we're searching for.
-	     */
-	    if ((N->Info & OF_BRA) == 0) {
-	       	goto NextEntry;
-	    }
+     	if ((E->Info & OF_BRA) != 0        &&
+	    (OldLabel = E->JumpTo) != 0    &&
+	    (N = OldLabel->Owner) != E     &&
+	    (N->Info & OF_BRA) != 0) {
 
 	    /* Check if we can use the final target label. This is the case,
 	     * if the target branch is an absolut branch, or if it is a
@@ -259,23 +246,15 @@ unsigned OptJumpCascades (CodeSeg* S)
 		 GetBranchCond (E->OPC)  == GetBranchCond (N->OPC))) {
 
 	     	/* This is a jump cascade and we may jump to the final target.
-	     	 * If we have a label, move the reference to this label. If
-	     	 * we don't have a label, use the argument instead.
+		 * Insert a new instruction, then remove the old one
 	     	 */
-	     	if (N->JumpTo) {
-	     	    /* Move the reference to the new insn */
-	     	    MoveCodeLabelRef (S, E, N->JumpTo);
-	     	} else {
-		    /* Remove the reference to the old label */
-		    RemoveCodeLabelRef (S, E);
-		}
+		CodeEntry* X = NewCodeEntry (E->OPC, E->AM, N->Arg, N->JumpTo);
 
-	     	/* Use the new argument */
-	     	CodeEntrySetArg (E, N->Arg);
+		/* Insert it behind E */
+		InsertCodeEntry (S, X, I+1);
 
-	     	/* Use the usage information from the new instruction */
-	     	E->Use = N->Use;
-	     	E->Chg = N->Chg;
+		/* Remove E */
+		DelCodeEntry (S, I);
 
 	     	/* Remember, we had changes */
 	     	++Changes;
@@ -292,7 +271,6 @@ unsigned OptJumpCascades (CodeSeg* S)
 	     */
 	    if ((E->Info & OF_CBRA) != 0 && (N->Info & OF_CBRA) != 0) {
 
-		unsigned NI;	/* Index of N */
 		CodeEntry* X;	/* Instruction behind N */
 		CodeLabel* LX;	/* Label attached to X */
 
@@ -306,17 +284,13 @@ unsigned OptJumpCascades (CodeSeg* S)
 		    goto NextEntry;
 		}
 
-		/* We may jump behind this conditional branch. This means that
-		 * N may not be the last entry.
+		/* We may jump behind this conditional branch. Get the 
+		 * pointer to the next instruction 
 		 */
-		NI = GetCodeEntryIndex (S, N);
-		if (NI >= Count-1) {
-		    /* N is last entry */
+		if ((X = GetNextCodeEntry (S, GetCodeEntryIndex (S, N))) == 0) {
+		    /* N is the last entry, bail out */
 		    goto NextEntry;
 		}
-
-		/* Get the pointer to the next instruction */
-		X = GetCodeEntry (S, NI+1);
 
 		/* Get the label attached to X, create a new one if needed */
 		LX = GenCodeLabel (S, X);

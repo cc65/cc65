@@ -127,25 +127,24 @@ static int CompareFuncInfo (const void* Key, const void* Info)
 
 
 void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
-/* For the given function, lookup register information and combine it with
- * the information already in place. If the function is unknown, assume it
- * will use all registers and load all registers.
- * See codeinfo.h for possible flags.
+/* For the given function, lookup register information and store it into
+ * the given variables. If the function is unknown, assume it will use and
+ * load all registers.
  */
 {
     /* Search for the function */
     const FuncInfo* Info = bsearch (Name, FuncInfoTable, FuncInfoCount,
-			  	    sizeof(FuncInfo), CompareFuncInfo);
+	     		  	    sizeof(FuncInfo), CompareFuncInfo);
 
     /* Do we know the function? */
     if (Info) {
 	/* Use the information we have */
-	*Use |= Info->Use;
-	*Chg |= Info->Chg;
+       	*Use = Info->Use;
+	*Chg = Info->Chg;
     } else {
 	/* Assume all registers used */
-	*Use |= REG_AXY;
-	*Chg |= REG_AXY;
+	*Use = REG_AXY;
+	*Chg = REG_AXY;
     }
 }
 

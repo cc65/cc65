@@ -77,9 +77,9 @@ struct CodeSeg;
 
 
 void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg);
-/* For the given function, lookup register information and combine it with
- * the information already in place. If the function is unknown, assume it
- * will use all registers and load all registers.
+/* For the given function, lookup register information and store it into
+ * the given variables. If the function is unknown, assume it will use and
+ * load all registers.
  */
 
 unsigned char GetRegInfo (struct CodeSeg* S, unsigned Index);

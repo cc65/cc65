@@ -5,15 +5,16 @@
 ; the Commodore 1351 mouse users guide.
 ;
 
-	.export	    	_mouse_init, _mouse_done
-	.export	    	_mouse_hide, _mouse_show
-	.export	    	_mouse_box, _mouse_info
-	.export	    	_mouse_move
+   	.export	    	_mouse_init, _mouse_done
+   	.export	    	_mouse_hide, _mouse_show
+   	.export	    	_mouse_box, _mouse_info
+   	.export		_mouse_x, _mouse_y
+   	.export	    	_mouse_move
 
        	.import	       	popa, popsreg, addysp1
-	.importzp   	sp, sreg
+   	.importzp   	sp, sreg
 
-	.include    	"c64.inc"
+   	.include    	"c64.inc"
 
 .code
 
@@ -23,21 +24,21 @@
 ;
 
 _mouse_init:
-	tax				; Save sprite number
-	jsr	popa			; Get the port number
+   	tax				; Save sprite number
+   	jsr	popa			; Get the port number
 
        	ldy    	OldIRQ+1		; Already initialized?
        	bne    	Done			; Jump if yes
 
-	stx	MouseSprite		; Remember the sprite number
-	sta	MousePort		; Remember the port number
+   	stx	MouseSprite		; Remember the sprite number
+   	sta	MousePort		; Remember the port number
 
 ; Initialize variables
 
        	ldx 	#0
 	stx	XPos
 	stx	XPos+1
-	stx	YPos
+   	stx	YPos
 	stx	YPos+1
 	stx	OldPotX
 	stx	OldPotY
@@ -45,7 +46,7 @@ _mouse_init:
  	stx	XMin+1
 	stx	YMin
 	stx	YMin+1
-	stx	YMax+1
+   	stx	YMax+1
 	inx	      			; X = 1
        	stx	Visible			; Mouse *not* visible
 	stx	XMax+1			; >320
@@ -74,14 +75,14 @@ _mouse_init:
 
 _mouse_done:
        	lda    	OldIRQ	  		; Initialized?
-     	ldx	OldIRQ+1
+     	ldx 	OldIRQ+1
      	beq    	Done  	  		; Jump if no
-	ldy	#0
-	sty	OldIRQ+1  		; Reset the initialized flag
-SetIRQ:	sei		  		; Disable interrupts
-      	sta	IRQVec	  		; Set the new/old vector
-      	stx	IRQVec+1
-	cli				; Enable interrupts
+	ldy 	#0
+   	sty 	OldIRQ+1  		; Reset the initialized flag
+SetIRQ:	sei 		  		; Disable interrupts
+      	sta 	IRQVec	  		; Set the new/old vector
+      	stx 	IRQVec+1
+   	cli 				; Enable interrupts
 Done: 	rts
 
 ; --------------------------------------------------------------------------
@@ -90,20 +91,19 @@ Done: 	rts
 ;
 
 _mouse_hide:
-       	lda	Visible			; Get the flag
-	bne	@L1			; Jump if already invisible
-       	ldx	MouseSprite		; Sprite defined?
-	beq	@L1			; Jump if no
+       	lda 	Visible			; Get the flag
+	bne 	@L1			; Jump if already invisible
+       	ldx 	MouseSprite		; Sprite defined?
+	beq 	@L1			; Jump if no
 
-	lda	BitMask-1,x		; Get bit mask
-	eor	#$FF			; We must clear the bit
+	lda    	NotMask-1,x		; Get clean mask
 
-  	sei				; Disable interrupts
-	and	VIC_SPR_ENA
-	sta	VIC_SPR_ENA	     	; Disable sprite
-	cli				; Enable interrupts
+  	sei 				; Disable interrupts
+	and 	VIC_SPR_ENA
+	sta 	VIC_SPR_ENA	     	; Disable sprite
+	cli 				; Enable interrupts
 
-@L1:	inc	Visible			; Set the flag to invisible
+@L1:	inc 	Visible			; Set the flag to invisible
 	rts
 
 ; --------------------------------------------------------------------------
@@ -112,16 +112,22 @@ _mouse_hide:
 ;
 
 _mouse_show:
-       	dec	Visible			; Get the flag
-	bne	@L1			; Jump if still invisible
-       	ldx	MouseSprite		; Sprite defined?
-	beq	@L1			; Jump if no
+	lda 	Visible			; Mouse already visible?
+	beq 	@L1			; Jump if yes
+       	dec 	Visible			; Get the flag
+	bne 	@L1			; Jump if still invisible
+       	ldx 	MouseSprite		; Sprite defined?	   
+	beq 	@L1			; Jump if no
 
-	lda	BitMask-1,x		; Get bit mask
-       	sei				; Disable interrupts
-       	ora	VIC_SPR_ENA
-	sta	VIC_SPR_ENA		; Enable sprite
-	cli				; Enable interrupts
+       	sei 				; Disable interrupts
+	jsr	MoveSprite1		; Move the sprite to it's position
+
+	ldx	MouseSprite		; Get sprite number (again)
+	lda 	BitMask-1,x		; Get bit mask
+       	ora 	VIC_SPR_ENA
+	sta 	VIC_SPR_ENA		; Enable sprite
+
+	cli 				; Enable interrupts
 
 @L1:	rts
 
@@ -131,35 +137,63 @@ _mouse_show:
 ;
 
 _mouse_box:
-	sei	    			; Disable interrupts
+   	ldy 	#0			; Stack offset
 
-	sta	YMax
-	stx	YMax+1			; maxy
+   	php
+   	sei 	    			; Disable interrupts
 
-	ldy	#0
-	lda	(sp),y
-	sta	XMax
-	iny
-	lda	(sp),y
-	sta	XMax+1			; maxx
+   	sta 	YMax
+   	stx 	YMax+1			; maxy
 
-	iny
-	lda	(sp),y
-	sta	YMin
-	iny
-	lda	(sp),y
-	sta	YMin+1			; miny
+   	lda 	(sp),y
+   	sta 	XMax
+   	iny
+   	lda 	(sp),y
+   	sta 	XMax+1			; maxx
 
-	iny
-	lda	(sp),y
-	sta	XMin
-	iny
-	lda	(sp),y
-	sta	XMin+1			; minx
+   	iny
+   	lda	(sp),y
+   	sta	YMin
+   	iny
+   	lda	(sp),y
+   	sta	YMin+1			; miny
 
-	cli	      			; Enable interrupts
+   	iny
+   	lda	(sp),y
+   	sta	XMin
+   	iny
+   	lda	(sp),y
+   	sta	XMin+1			; minx
 
-	jmp	addysp1			; Drop params, return
+   	plp	      			; Enable interrupts
+
+   	jmp	addysp1			; Drop params, return
+
+; --------------------------------------------------------------------------
+;
+; int __fastcall__ mouse_x (void);
+;
+
+_mouse_x:
+	php
+	sei
+   	lda	XPos
+	ldx	XPos+1
+	plp
+      	rts
+
+; --------------------------------------------------------------------------
+;
+; int __fastcall__ mouse_y (void);
+;
+
+_mouse_y:
+	php
+   	sei
+	lda	YPos
+	ldx	YPos+1
+	plp
+      	rts
 
 ; --------------------------------------------------------------------------
 ;
@@ -183,13 +217,8 @@ _mouse_move:
 	stx	YPos+1
 	lda	sreg
 	ldx	sreg+1
-	sta	XPos
+   	sta	XPos
 	stx	XPos+1			; Set new position
-
-	lda	Visible			; Mouse visible?
-	bne	@L9			; Jump if no
-	lda	MouseSprite		; Sprite defined?
-	beq	@L9
 
 	jsr	MoveSprite		; Move the sprite to the mouse pos
 
@@ -203,38 +232,37 @@ _mouse_move:
 
 MouseIRQ:
 	cld
-	lda	SID_ADConv1		; Get mouse X movement
-	ldy	OldPotX
-	jsr	MoveCheck  		; Calculate movement vector
-	sty	OldPotX
+      	lda	SID_ADConv1		; Get mouse X movement
+      	ldy	OldPotX
+      	jsr	MoveCheck  		; Calculate movement vector
+      	sty	OldPotX
 
 ; Calculate the new X coordinate (--> a/y)
 
- 	clc
-	adc	XPos
-	tay				; Remember low byte
-	txa
-	adc	XPos+1
+      	clc
+      	adc	XPos
+      	tay	      			; Remember low byte
+      	txa
+      	adc	XPos+1
+	tax
 
 ; Limit the X coordinate to the bounding box
 
-	cpy    	XMin+1
-	bne	@L1
-	cmp	XMin
-@L1:	bpl	@L2
-       	ldy	XMin
-    	lda	XMin+1
-    	jmp	@L4
+	cpy	XMin
+	sbc	XMin+1
+	bpl	@L1
+       	ldy    	XMin
+       	ldx	XMin+1
+    	jmp	@L2
+@L1:	txa
 
-@L2:	cpy	XMax+1
-	bne	@L3
-	cmp	XMax
-	beq	@L4
-@L3:	bmi	@L4
-       	ldy    	XMax
-	lda	XMax+1
-@L4:	sty	XPos
-    	sta	XPos+1
+    	cpy	XMax
+    	sbc	XMax+1
+    	bmi	@L2
+    	ldy	XMax
+    	ldx	XMax+1
+@L2:	sty	XPos
+	stx	XPos+1
 
 ; Calculate the Y movement vector
 
@@ -249,47 +277,47 @@ MouseIRQ:
 	adc	YPos
 	tay	    			; Remember low byte
 	txa
-	adc	YPos+1
+	adc 	YPos+1
 
-; Limit the Y coordinate to the bounding box
+   	cpy	YMin
+	sbc	YMin+1
+	bpl	@L3
+       	ldy    	YMin
+       	ldx	YMin+1
+    	jmp	@L4
+@L3:	txa
 
-       	cpy    	YMin+1
-	bne	@L5
-    	cmp	YMin
-@L5:	bpl	@L6
-       	ldy	YMin
-    	lda	YMin+1
-    	jmp	@L8
+    	cpy	YMax
+    	sbc	YMax+1
+    	bmi	@L4
+    	ldy	YMax
+    	ldx	YMax+1
+@L4:	sty	YPos
+	stx	YPos+1
 
-@L6:	cpy	YMax+1
-    	bne	@L7
-    	cmp	YMax
-    	beq	@L8
-@L7:	bmi	@L8
-       	ldy    	YMax
-    	lda	YMax+1
-@L8:   	sty	YPos
-	sta	YPos+1
+; Move the mouse sprite if it is enabled
+
+	jsr	MoveSprite		; Move the sprite
 
 ; Jump to the next IRQ handler
 
-  	jmp	(OldIRQ)
+	jmp	(OldIRQ)
 
 
 ; --------------------------------------------------------------------------
 ;
 ; Move check routine, called for both coordinates.
 ;
-; Entry:	y = old value of pot register
-;     		a = current value of pot register
-; Exit:		y = value to use for old value
-;     		x/a = delta value for position
+; Entry:   	y = old value of pot register
+;     	   	a = current value of pot register
+; Exit:	   	y = value to use for old value
+;     	   	x/a = delta value for position
 ;
 
 MoveCheck:
       	sty	OldValue
       	sta	NewValue
-      	ldx	#$00
+      	ldx 	#$00
 
       	sec	    			; a = mod64 (new - old)
       	sbc	OldValue
@@ -298,58 +326,64 @@ MoveCheck:
       	bcs	@L1 			;
       	lsr	a   			;   a /= 2;
       	beq	@L2 			;   if (a != 0)
-      	ldy	NewValue     		;     y = NewValue
-      	rts	    			;   return
+      	ldy   	NewValue     		;     y = NewValue
+      	rts   	    			;   return
 
-@L1:  	ora	#%11000000		; else or in high order bits
-      	cmp	#$FF			; if (a != -1)
-      	beq	@L2
+@L1:  	ora   	#%11000000		; else or in high order bits
+      	cmp   	#$FF			; if (a != -1)
+      	beq   	@L2
       	sec
-      	ror	a   			;   a /= 2
-      	ldx	#$FF			;   high byte = -1
-      	ldy	NewValue
+      	ror   	a   			;   a /= 2
+      	ldx   	#$FF			;   high byte = -1
+      	ldy   	NewValue
       	rts
 
-@L2:  	lda	#0
+@L2:  	lda   	#0
       	rts
 
 ; --------------------------------------------------------------------------
 ;
 ; Move the mouse sprite to the current mouse position. Must be called
-; with interrupts off.
+; with interrupts off. MoveSprite1 is an entry without checking and
+; loading X
 ;
 
 MoveSprite:
-	lda	Visible			; Mouse pointer visible?
-	bne	@L9    			; Jump if no
-	ldx    	MouseSprite    	       	; Sprite defined?
-	beq	@L9    			; Jump if no
-	ldy	BitMask-1,x		; Get high bit mask
-	txa
- 	asl	a   			; Index*2
-	tax
 
-; Set the X position
+	lda   	Visible			; Mouse visible?
+       	bne    	MoveSpriteDone		; Jump if no
+	ldx    	MouseSprite		; Sprite defined?
+	beq	MoveSpriteDone		; Jump if no
 
-	lda    	XPos+1 	       	       	; Negative?
-       	bmi	@L2    			; Jump if yes
-	beq	@L1
-       	tya				; Load high position bit
-@L1:	ora	VIC_SPR_HI_X		; Set high bit
-	sta	VIC_SPR_HI_X
-	lda	XPos
-	sta	VIC_SPR0_X,x		; Set low byte
+; Set the high X bit
+
+MoveSprite1:
+   	lda	VIC_SPR_HI_X		; Get high X bits of all sprites
+   	and	NotMask-1,x		; Mask out sprite bit
+   	ldy	XPos+1			; Test Y position
+   	beq	@L1
+   	ora	BitMask-1,x		; Set high X bit
+@L1:	sta	VIC_SPR_HI_X		; Set hi X sprite values
+
+; Set the low X byte
+
+   	txa
+   	asl	a   			; Index*2
+   	tax
+   	lda	XPos
+   	sta	VIC_SPR0_X-2,x 	       	; Set low byte
 
 ; Set the Y position
 
-@L2:	ldy	YPos+1			; Negative or too large?
-	bne	@L9			; Jump if yes
-	lda	YPos
-	sta	VIC_SPR0_Y,x		; Set Y position
+   	ldy	YPos+1	      		; Negative or too large?
+   	bne	MoveSpriteDone		; Jump if yes
+   	lda	YPos
+   	sta	VIC_SPR0_Y-2,x		; Set Y position
 
 ; Done
 
-@L9:  	rts
+MoveSpriteDone:
+	rts
 
 ; --------------------------------------------------------------------------
 ; Data
@@ -377,8 +411,9 @@ YMax:		.res	2		; Y2 value of bounding box
 .data
 
 BitMask:	.byte  	$01, $02, $04, $08, $10, $20, $40, $80
+NotMask:       	.byte  	$FE, $FD, $FB, $F7, $EF, $DF, $BF, $7F
 
 
 
 
-		    
+

@@ -160,6 +160,7 @@ void TgtTranslateInit (void)
        	case TGT_ATMOS:		memcpy (Tab, CTNone, sizeof (Tab));  	break;
        	case TGT_NES:		memcpy (Tab, CTNone, sizeof (Tab));  	break;
         case TGT_SUPERVISION:   memcpy (Tab, CTNone, sizeof (Tab));     break;
+        case TGT_LYNX:          memcpy (Tab, CTNone, sizeof (Tab));     break;
 	default:
 	    AbEnd ("Internal error: Target system unknown (%d)", Target);
     }

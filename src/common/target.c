@@ -65,13 +65,14 @@ const char* TargetNames [TGT_COUNT] = {
     "cbm610",
     "pet",
     "bbc",
-    "apple2",   
+    "apple2",
     "apple2enh",
     "geos",
     "lunix",
     "atmos",
     "nes",
     "supervision",
+    "lynx"
 };
 
 
@@ -98,6 +99,7 @@ const cpu_t DefaultCPU[TGT_COUNT] = {
     CPU_6502,           /* atmos */
     CPU_6502,           /* nes */
     CPU_65SC02,         /* supervision */
+    CPU_65C02,          /* lynx */
 };
 
 
@@ -138,3 +140,4 @@ target_t FindTarget (const char* Name)
 
 
 
+                        

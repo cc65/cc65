@@ -229,6 +229,10 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__SUPERVISION__", 1);
             break;
 
+        case TGT_SUPERVISION:
+            DefineNumericMacro ("__LYNX__", 1);
+            break;
+
      	default:
        	    AbEnd ("Unknown target system type %d", Target);
     }
@@ -726,7 +730,7 @@ int main (int argc, char* argv[])
 
     /* Initialize the default segment names */
     InitSegNames ();
-
+                                       
     /* Initialize the include search paths */
     InitIncludePaths ();
 
@@ -807,7 +811,7 @@ int main (int argc, char* argv[])
                     PreprocessOnly = 1;
                     break;
 
-       		case 'I':                               
+       		case 'I':
 		    OptIncludeDir (Arg, GetArg (&I, 2));
 		    break;
 

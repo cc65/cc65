@@ -72,6 +72,7 @@ typedef enum {
     TGT_ATMOS,
     TGT_NES,
     TGT_SUPERVISION,
+    TGT_LYNX,
     TGT_COUNT			/* Number of target systems */
 } target_t;
 

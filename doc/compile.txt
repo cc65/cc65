@@ -5,8 +5,28 @@ Instructions for compiling cc65 and the ca65 binutils:
 
 Linux (and probably most other Unices)
 --------------------------------------
+                           
+Preconditions:
 
-You need the GNU C compiler. Enter the src/ directory and do a
+You need the GNU C Compiler, Perl and sgml-tools installed.
+
+The simple way:
+
+From the main directory, use
+
+        make -f make/gcc.mak
+
+to build all binaries, libraries and the docs. Use
+
+        make -f make/gcc.mak install
+
+to install the files. Check the makefile before doing so and adjust the PREFIX
+variable as you like it.
+
+
+Step by step:
+
+Enter the src/ directory and do a
 
        	make -f make/gcc.mak
 
@@ -20,11 +40,16 @@ After that, you need to compile the libraries. Do
 
 	cd libsrc; make
 
+HTML docs can be generated with
+
+        cd doc; make html
+
 That's it! Installation directories for the RPM packages are
 
-	/usr/bin		for the binaries
-	/usr/lib/cc65/include	for include files
-	/usr/lib/cc65/lib	for libraries and startup files
+	/usr/bin		        for the binaries
+	/usr/lib/cc65/include	        for include files
+	/usr/lib/cc65/lib	        for libraries and startup files
+        /usr/share/doc/cc65-<version>   for documentation
 
 When using these directories, you don't need to set the CC65_INC and
 CC65_LIB environment variables. You may also use the /usr/local tree

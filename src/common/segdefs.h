@@ -37,7 +37,7 @@
 #define SEGDEFS_H
 
 
-                     
+
 /* common */
 #include "addrsize.h"
 
@@ -52,8 +52,8 @@
 /* Segment definition */
 typedef struct SegDef SegDef;
 struct SegDef {
-    char*       Name;           /* Segment name */
-    unsigned    AddrSize;       /* Default address size */
+    char*         Name;         /* Segment name */
+    unsigned char AddrSize;     /* Default address size */
 };
 
 /* Initializer for static SegDefs */
@@ -67,7 +67,7 @@ struct SegDef {
 
 
 
-SegDef* NewSegDef (const char* Name, unsigned AddrSize);
+SegDef* NewSegDef (const char* Name, unsigned char AddrSize);
 /* Create a new segment definition and return it */
 
 void FreeSegDef (SegDef* D);
@@ -77,7 +77,7 @@ SegDef* DupSegDef (const SegDef* D);
 /* Duplicate a segment definition and return it */
 
 
-
+                                                   
 /* End of segdefs.h */
 
 #endif

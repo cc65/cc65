@@ -102,7 +102,7 @@ Segment* ActiveSeg = &CodeSeg;
 
 
 
-static Segment* NewSegment (const char* Name, unsigned AddrSize)
+static Segment* NewSegment (const char* Name, unsigned char AddrSize)
 /* Create a new segment, insert it into the global list and return it */
 {
     Segment* S;
@@ -261,7 +261,7 @@ void SegAlign (unsigned Power, int Val)
 
 
 
-unsigned GetSegAddrSize (unsigned SegNum)
+unsigned char GetSegAddrSize (unsigned SegNum)
 /* Return the address size of the segment with the given number */
 {
     /* Search for the segment */

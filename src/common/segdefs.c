@@ -45,7 +45,7 @@
 
 
 
-SegDef* NewSegDef (const char* Name, unsigned AddrSize)
+SegDef* NewSegDef (const char* Name, unsigned char AddrSize)
 /* Create a new segment definition and return it */
 {
     /* Allocate memory */
@@ -78,3 +78,4 @@ SegDef* DupSegDef (const SegDef* Def)
 
 
 
+                                                   

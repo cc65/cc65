@@ -116,7 +116,7 @@ INLINE unsigned GetCurrentSegNum (void)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned GetCurrentSegAddrSize (void)
+INLINE unsigned char GetCurrentSegAddrSize (void)
 /* Get the address size of the current segment */
 {
     return ActiveSeg->Def->AddrSize;
@@ -131,7 +131,7 @@ void SegAlign (unsigned Power, int Val);
  * given value.
  */
 
-unsigned GetSegAddrSize (unsigned SegNum);
+unsigned char GetSegAddrSize (unsigned SegNum);
 /* Return the address size of the segment with the given number */
 
 unsigned long GetPC (void);

@@ -144,27 +144,20 @@ int TypeCast (ExprDesc* lval)
                 unsigned OldBits = OldSize * 8;
                 unsigned NewBits = NewSize * 8;
 
-                /* Remember if the old value was negative */
-                int Negative = (lval->ConstVal & (0x01UL << (OldBits-1))) != 0UL;
-
-                /* Check if the new datatype will have a smaller range */
+                /* Check if the new datatype will have a smaller range. If it
+                 * has a larger range, things are ok, since the value is 
+                 * internally already represented by a long.
+                 */
                 if (NewBits <= OldBits) {
 
                     /* Cut the value to the new size */
                     lval->ConstVal &= (0xFFFFFFFFUL >> (32 - NewBits));
 
-                    /* If the new type is signed and negative, sign extend the 
-                     * value 
-                     */
-                    if (Negative && !IsSignUnsigned (NewType)) {
-                        lval->ConstVal |= ((~0L) << NewBits);
-                    }
-
-                } else {
-
-                    /* Sign extend the value if needed */
-                    if (Negative && !IsSignUnsigned (OldType) && !IsSignUnsigned (NewType)) {
-                        lval->ConstVal |= ((~0L) << OldBits);
+                    /* If the new type is signed, sign extend the value */
+                    if (!IsSignUnsigned (NewType)) {
+                        if (lval->ConstVal & (0x01UL << (NewBits-1))) {
+                            lval->ConstVal |= ((~0L) << NewBits);
+                        }
                     }
                 }
 

@@ -36,6 +36,7 @@
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+#include <sys/types.h>		/* EMX needs this */
 #include <sys/stat.h>
 
 /* common */
@@ -226,4 +227,4 @@ void ObjAdd (FILE* Obj, const char* Name)
 
 
 
-			     
+

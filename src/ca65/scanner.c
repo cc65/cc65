@@ -38,6 +38,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
+#include <sys/types.h>		/* EMX needs this */
 #include <sys/stat.h>
 
 /* common */

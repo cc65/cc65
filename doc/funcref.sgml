@@ -144,7 +144,7 @@ function.
 <item><ref id="atexit" name="atexit">
 <item><ref id="exit" name="exit">
 <item><ref id="labs" name="labs">
-</itemize>                   
+</itemize>
 
 
 <sect1><tt/string.h/<label id="string.h"><p>
@@ -1440,7 +1440,7 @@ do), the function is rather useless.
 <descrip>
 <tag/Function/Returns the absolute value of a long integer.
 <tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
-<tag/Declaration/<tt/int __fastcall__ labs (long v);/
+<tag/Declaration/<tt/long __fastcall__ labs (long v);/
 <tag/Description/<tt/labs/ returns the absolute value of the argument passed to
 the function.
 <tag/Limits/<itemize>

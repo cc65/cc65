@@ -486,23 +486,27 @@ sub Process2 {
 		$Line = $2;
 
 		# Variable to assemble HTML representation
-		my $Item = $Id;
+       	       	my $Contents = "";
+
+		# Make this import a link target
+		if (exists ($Imports{$OutName}{$Id})) {
+       	       	    $Label = $Imports{$OutName}{$1};
+       	       	    $Contents .= sprintf (" name=\"%s\"", $Label);
+		}
 
 		# If we have an export for this import, add a link to this
 	     	# export definition
 		if (exists ($Exports{$Id})) {
 		    $Label = $Exports{$Id};
-		    $Item = sprintf ("<a href=\"%s\">%s</a>", $Label, $Item);
+		    $Contents .= sprintf (" href=\"%s\"", $Label);
 		}
 
-		# Make this import a link target
-		if (exists ($Imports{$OutName}{$Id})) {
-       	       	    $Label = $Imports{$OutName}{$1};
-		    $Item = sprintf ("<a name=\"%s\">%s</a>", $Label, $Item);
+     		# Add the HTML stuff to the output line
+		if ($Contents ne "") {
+		    $OutLine .= sprintf ("<a%s>%s</a>", $Contents, $Id);
+		} else {
+		    $OutLine .= $Id;
 		}
-
-		# Add the HTML stuff to the output line
-	    	$OutLine .= $Item;
 
 	     	# Check if another identifier follows
 		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
@@ -531,13 +535,13 @@ sub Process2 {
 		$Line = $2;
 
 		# Variable to assemble HTML representation
-		my $Item = $Id;
+       	       	my $Contents = "";
 
 		# If we have a definition for this export in this file, add
 		# a link to the definition.
 		if (exists ($Labels{$OutName}{$1})) {
 		    $Label = $Labels{$OutName}{$1};
-       	       	    $Item = sprintf ("<a href=\"#%s\">%s</a>", $Label, $Item);
+       	       	    $Contents = sprintf (" href=\"#%s\"", $Label);
 		}
 
 		# If we have this identifier in the list of exports, add a
@@ -545,12 +549,16 @@ sub Process2 {
 		if (exists ($Exports{$Id})) {
 		    $Label = $Exports{$Id};
        	       	    # Be sure to use only the label part
-	    	    $Label =~ s/^(.*#)(.*)$/$2/;
-		    $Item = sprintf ("<a name=\"%s\">%s</a>", $Label, $Item);
+	    	    $Label =~ s/^(.*#)(.*)$/$2/;	# ##FIXME: Expensive
+		    $Contents .= sprintf (" name=\"%s\"", $Label);
 	     	}
 
      		# Add the HTML stuff to the output line
-     		$OutLine .= $Item;
+		if ($Contents ne "") {
+		    $OutLine .= sprintf ("<a%s>%s</a>", $Contents, $Id);
+		} else {
+		    $OutLine .= $Id;
+		}
 
      		# Check if another identifier follows
       		if ($Line =~ /^(\s*),(\s*)(.*)$/) {

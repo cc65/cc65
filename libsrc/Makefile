@@ -265,7 +265,7 @@ plus4lib:
 
 .PHONY: clean
 clean:
-	@for i in cbm common conio dbg em joystick runtime tgi $(ALLTARGETS); do\
+	@for i in cbm common conio dbg em joystick runtime serial tgi $(ALLTARGETS); do\
        	   $(MAKE) -C $$i clean;			      			\
 	done
 

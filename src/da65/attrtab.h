@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/* (C) 2000-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */

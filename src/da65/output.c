@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -74,12 +74,12 @@ static void PageHeader (void)
 /* Print a page header */
 {
     fprintf (F,
-       	     "; da65 V%u.%u.%u - (C) Copyright 2000-2003 Ullrich von Bassewitz\n"
-    	     "; Input file: %s\n"
-    	     "; Page:       %u\n\n",
+       	     "; da65 V%u.%u.%u - (C) Copyright 2000-2005 Ullrich von Bassewitz\n"
+     	     "; Input file: %s\n"
+     	     "; Page:       %u\n\n",
        	     VER_MAJOR, VER_MINOR, VER_PATCH,
-    	     InFile,
-    	     Page);
+     	     InFile,
+     	     Page);
 }
 
 
@@ -286,17 +286,17 @@ void LineComment (unsigned PC, unsigned Count)
 	Output ("; %04X", PC);
 	if (Comments >= 3) {
 	    for (I = 0; I < Count; ++I) {
-		Output (" %02X", CodeBuf [PC+I]);
+	      	Output (" %02X", CodeBuf [PC+I]);
 	    }
 	    if (Comments >= 4) {
-		Indent (TIndent);
-		for (I = 0; I < Count; ++I) {
-		    unsigned char C = CodeBuf [PC+I];
-		    if (!isprint (C)) {
-			C = '.';
-		    }
-		    Output ("%c", C);
-		}
+	      	Indent (TIndent);
+	      	for (I = 0; I < Count; ++I) {
+	      	    unsigned char C = CodeBuf [PC+I];
+	      	    if (!isprint (C)) {
+	      		C = '.';
+	      	    }
+	      	    Output ("%c", C);
+	      	}
 	    }
 	}
     }
@@ -314,6 +314,23 @@ void OutputSettings (void)
     Output ("\"%s\"", CPUNames[CPU]);
     LineFeed ();
     LineFeed ();
+}
+
+
+
+void DefineConst (const char* Name, const char* Comment, unsigned Addr)
+/* Define an address constant */
+{
+    if (Pass == PassCount) {
+        Output ("%s", Name);
+        Indent (AIndent);
+        Output (":= $%04X", Addr);
+        if (Comment) {
+            Indent (CIndent);
+            Output ("; %s", Comment);
+        }
+        LineFeed ();
+    }
 }
 
 

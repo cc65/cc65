@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -387,17 +387,6 @@ unsigned char GetLabelAttr (unsigned Addr)
 
 
 
-static void DefineConst (unsigned Addr)
-/* Define an address constant */
-{
-    Output ("%s", SymTab[Addr]->Name);
-    Indent (AIndent);
-    Output ("= $%04X", Addr);
-    LineFeed ();
-}
-
-
-
 void DefOutOfRangeLabels (void)
 /* Output any labels that are out of the loaded code range */
 {
@@ -409,7 +398,7 @@ void DefOutOfRangeLabels (void)
     Addr = 0;
     while (Addr < CodeStart) {
 	if (MustDefLabel (Addr)) {
-	    DefineConst (Addr);
+	    DefineConst (SymTab[Addr]->Name, SymTab[Addr]->Comment, Addr);
     	}
         ++Addr;
     }
@@ -417,7 +406,7 @@ void DefOutOfRangeLabels (void)
     /* Skip areas in code range */
     while (Addr <= CodeEnd) {
         if ((AttrTab[Addr] & atStyleMask) == atSkip && MustDefLabel (Addr)) {
-            DefineConst (Addr);
+	    DefineConst (SymTab[Addr]->Name, SymTab[Addr]->Comment, Addr);
         }
         ++Addr;
     }
@@ -425,7 +414,7 @@ void DefOutOfRangeLabels (void)
     /* High range */
     while (Addr < 0x10000) {
 	if (MustDefLabel (Addr)) {
-	    DefineConst (Addr);
+	    DefineConst (SymTab[Addr]->Name, SymTab[Addr]->Comment, Addr);
 	}
         ++Addr;
     }

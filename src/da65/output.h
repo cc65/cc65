@@ -94,6 +94,9 @@ void LineComment (unsigned PC, unsigned Count);
 void OutputSettings (void);
 /* Output CPU and other settings */
 
+void DefineConst (const char* Name, const char* Comment, unsigned Addr);
+/* Define an address constant */
+
 
 
 /* End of output.h */

@@ -16,6 +16,9 @@ LD	= ../src/ld65/ld65
 C1541  	= c1541
 
 
+# --------------------------------------------------------------------------
+# Generic rules
+
 .c.o:
 	@echo $<
 	@$(CC) -Oirs -T --codesize 500 -g -t $(SYS) -I../include/ $<
@@ -26,27 +29,46 @@ C1541  	= c1541
 	@$(AS) $(basename $<).s
 
 
-.PHONY:	all
-all:   	nachtm hello sieve mousedemo
+# --------------------------------------------------------------------------
+# Rules how to make each one of the binaries
 
-nachtm:	$(CRT0) nachtm.o $(CLIB)
-	@$(LD) -t $(SYS) -m nachtm.map -Ln nachtm.lbl -o $@ $^
+EXELIST=hello mousedemo nachtm plasma sieve
+
+.PHONY:	all
+all:   	$(EXELIST)
 
 hello: 	$(CRT0) hello.o $(CLIB)
 	@$(LD) -t $(SYS) -m hello.map -Ln hello.lbl -o $@ $^
 
+mousedemo:     	$(CRT0) mousedemo.o $(CLIB)
+	@$(LD) -t $(SYS) -m mousedemo.map -Ln mousedemo.lbl -o $@ $^
+
+nachtm:	$(CRT0) nachtm.o $(CLIB)
+	@$(LD) -t $(SYS) -m nachtm.map -Ln nachtm.lbl -o $@ $^
+
+plasma:	$(CRT0) plasma.o $(CLIB)
+	@$(LD) -t $(SYS) -m nachtm.map -Ln nachtm.lbl -o $@ $^
+
 sieve: 	$(CRT0) sieve.o $(CLIB)
 	@$(LD) -t $(SYS) -m sieve.map -Ln sieve.lbl -o $@ $^
 
-mousedemo:     	$(CRT0) mousedemo.o $(CLIB)
-	@$(LD) -t $(SYS) -m mousedemo.map -Ln mousedemo.lbl -o $@ $^
+
+# --------------------------------------------------------------------------
+# Rule to make a disk with all samples. Needs the c1541 program that comes
+# with the VICE emulator.
 
 .PHONY:	disk
 disk:  	samples.d64
 
 samples.d64:	all
 	$(C1541) -format samples,AA  d64 $@
-	$(C1541) -attach $@ -write nachtm -write hello -write sieve -write mousedemo
+	for exe in $(EXELIST); do\
+	    $(C1541) -attach $@ -write $$exe;\
+	done
+
+
+# --------------------------------------------------------------------------
+# Cleanup rules
 
 .PHONY:	clean
 clean:
@@ -54,7 +76,7 @@ clean:
 
 .PHONY:	zap
 zap:	clean
-	rm -f nachtm hello sieve mousedemo samples.d64
+	rm -f $(EXELIST) samples.d64
 
 
 

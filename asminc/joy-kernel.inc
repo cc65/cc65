@@ -39,19 +39,22 @@
 ;------------------------------------------------------------------------------
 ; Driver header stuff
 
-JOY_HDR_ID              = 0                     ; $6A, $6F, $79 ("joy")
-JOY_HDR_VERSION         = 3                     ; Interface version
+.struct JOY_HDR
+	ID	.byte	3	; $6A, $6F, $79 ("joy")
+	VERSION .byte	1	; Interface version
+	MASKS	.byte	8	; Joystick state mask array
+	JUMPTAB .struct
+	    INSTALL	.word	; INSTALL routine
+	    UNINSTALL   .word	; UNINSTALL routine
+	    COUNT       .word	; COUNT routine
+	    READ 	.word	; READ routine
+	.endstruct
+.endstruct
 
-JOY_MASKS               = 4                     ; Joystick state mask array
-JOY_MASK_COUNT          = 8                     ; Size of the array
+;------------------------------------------------------------------------------
+; The JOY API version, stored in JOY_HDR::VERSION
 
-JOY_HDR_JUMPTAB         = 12
-JOY_HDR_INSTALL         = JOY_HDR_JUMPTAB+0     ; INSTALL routine
-JOY_HDR_UNINSTALL       = JOY_HDR_JUMPTAB+2     ; UNINSTALL routine
-JOY_HDR_COUNT           = JOY_HDR_JUMPTAB+4     ; COUNT routine
-JOY_HDR_READ            = JOY_HDR_JUMPTAB+6     ; READ routine
-
-JOY_HDR_JUMPCOUNT       = 4                     ; Number of jump vectors
+JOY_API_VERSION         = $00
 
 ;------------------------------------------------------------------------------
 ; Variables
@@ -74,4 +77,4 @@ JOY_HDR_JUMPCOUNT       = 4                     ; Number of jump vectors
        	.global	_joy_count
        	.global	_joy_read
 
-                       
+

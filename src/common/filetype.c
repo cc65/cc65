@@ -33,6 +33,7 @@
 
 
 
+#include <stdlib.h>
 #include <string.h>
 
 /* common */
@@ -47,25 +48,44 @@
 
 
 
-/* Table that maps extensions to file types */
-static const struct {
+/* Table that maps extensions to file types. Sorted alphabetically. */
+typedef struct {
     const char	Ext[4];
-    unsigned	Type;
-} FileTypes [] = {
-    {   "c",	FILETYPE_C	},
-    {   "s",	FILETYPE_ASM	},
-    {   "asm",	FILETYPE_ASM	},
-    {   "a65",	FILETYPE_ASM	},
-    {   "o",	FILETYPE_OBJ	},
-    {   "obj",	FILETYPE_OBJ	},
+    FILETYPE    Type;
+} FileType;
+
+static const FileType TypeTable[] = {
+    /* Upper case stuff for obsolete operating systems */
+    {   "A",	FILETYPE_LIB	},
+    {   "A65",	FILETYPE_ASM	},
+    {   "ASM",	FILETYPE_ASM	},
+    {   "C",	FILETYPE_C	},
+    {   "EMD",  FILETYPE_O65    },
+    {   "GRC",	FILETYPE_GR	},
+    {   "JOY",  FILETYPE_O65    },
+    {   "LIB",	FILETYPE_LIB	},
+    {   "O",	FILETYPE_OBJ	},
+    {   "O65",  FILETYPE_O65    },
+    {   "OBJ",	FILETYPE_OBJ	},
+    {   "S",	FILETYPE_ASM	},
+    {   "TGI",  FILETYPE_O65    },
+
     {   "a",	FILETYPE_LIB	},
-    {   "lib",	FILETYPE_LIB	},
-    {   "grc",	FILETYPE_GR	},
-    {   "o65",  FILETYPE_O65    },
+    {   "a65",	FILETYPE_ASM	},
+    {   "asm",	FILETYPE_ASM	},
+    {   "c",	FILETYPE_C	},
     {   "emd",  FILETYPE_O65    },
+    {   "grc",	FILETYPE_GR	},
     {   "joy",  FILETYPE_O65    },
+    {   "lib",	FILETYPE_LIB	},
+    {   "o",	FILETYPE_OBJ	},
+    {   "o65",  FILETYPE_O65    },
+    {   "obj",	FILETYPE_OBJ	},
+    {   "s",	FILETYPE_ASM	},
     {   "tgi",  FILETYPE_O65    },
 };
+
+#define FILETYPE_COUNT (sizeof (TypeTable) / sizeof (TypeTable[0]))
 
 
 
@@ -75,34 +95,34 @@ static const struct {
 
 
 
-int GetFileType (const char* Name)
+static int Compare (const void* Key, const void* Type)
+/* Compare function for bsearch */
+{
+    return strcmp (Key, ((const FileType*) Type)->Ext);
+}
+
+
+
+FILETYPE GetFileType (const char* Name)
 /* Determine the type of the given file by looking at the name. If the file
  * type could not be determined, the function returns FILETYPE_UNKOWN.
  */
 {
-    unsigned I;
+    const FileType* FT;
 
     /* Determine the file type by the extension */
     const char* Ext = FindExt (Name);
 
     /* Do we have an extension? */
     if (Ext == 0) {
-	return FILETYPE_UNKNOWN;
-    }
-                
-    /* Skip the dot */
-    ++Ext;
+    	return FILETYPE_UNKNOWN;
+    }    
 
-    /* Check for known extensions */
-    for (I = 0; I < sizeof (FileTypes) / sizeof (FileTypes [0]); ++I) {
-	if (strcmp (FileTypes [I].Ext, Ext) == 0) {
-	    /* Found */
-	    return FileTypes [I].Type;
-	}
-    }
+    /* Search for a table entry */
+    FT = bsearch (Ext+1, TypeTable, FILETYPE_COUNT, sizeof (FileType), Compare);
 
-    /* Not found, return the default */
-    return FILETYPE_UNKNOWN;
+    /* Return the result */
+    return FT? FT->Type : FILETYPE_UNKNOWN;
 }
 
 

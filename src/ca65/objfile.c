@@ -113,12 +113,14 @@ static void ObjWriteHeader (void)
     ObjWrite32 (Header.ExportSize);
     ObjWrite32 (Header.DbgSymOffs);
     ObjWrite32 (Header.DbgSymSize);
+    ObjWrite32 (Header.LineInfoOffs);
+    ObjWrite32 (Header.LineInfoSize);
 }
 
 
 
 /*****************************************************************************/
-/*     	      	      	      	     Code				     */
+/*     	      	      	      	     Code		  		     */
 /*****************************************************************************/
 
 
@@ -241,7 +243,7 @@ void ObjWriteStr (const char* S)
      */
     ObjWriteVar (Len);
     ObjWriteData (S, Len);
-}
+}			       
 
 
 
@@ -370,6 +372,7 @@ void ObjEndDbgSyms (void)
 void ObjStartLineInfos (void)
 /* Mark the start of the line info section */
 {
+    Header.LineInfoOffs = ftell (F);
 }
 
 
@@ -377,6 +380,7 @@ void ObjStartLineInfos (void)
 void ObjEndLineInfos (void)
 /* Mark the end of the line info section */
 {
+    Header.LineInfoSize = ftell (F) - Header.LineInfoOffs;
 }
 
 

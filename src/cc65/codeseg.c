@@ -966,6 +966,11 @@ void OutputCodeSeg (const CodeSeg* S, FILE* F)
 	OutputCodeEntry (E, F);
     }
 
+    /* If debug info is enabled, terminate the last line number information */
+    if (DebugInfo) {
+	fprintf (F, "\t.dbg\tline\n");
+    }
+
     /* If this is a segment for a function, leave the function */
     if (S->Func) {
 	fprintf (F, "\n.endproc\n\n");

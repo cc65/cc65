@@ -482,9 +482,6 @@ static void DoDbg (void)
     /* Skip the subkey */
     NextTok ();
 
-    /* Parameters are separated by a comma */
-    ConsumeComma ();
-
     /* Check the key and dispatch to a handler */
     switch (Key) {
 	case 0:     DbgInfoFile ();		break;

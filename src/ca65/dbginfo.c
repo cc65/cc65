@@ -58,6 +58,9 @@ void DbgInfoFile (void)
     unsigned long Size;
     unsigned long MTime;
 
+    /* Parameters are separated by a comma */
+    ConsumeComma ();
+
     /* Name */
     if (Tok != TOK_STRCON) {
        	ErrorSkip (ERR_STRCON_EXPECTED);
@@ -89,6 +92,17 @@ void DbgInfoLine (void)
 {
     unsigned Index;
     long LineNum;
+
+    /* If a parameters follow, this is actual line info. If no parameters
+     * follow, the last line info is terminated.
+     */
+    if (Tok == TOK_SEP) {
+	ClearLineInfo ();
+	return;
+    }
+
+    /* Parameters are separated by a comma */
+    ConsumeComma ();
 
     /* The name of the file follows */
     if (Tok != TOK_STRCON) {

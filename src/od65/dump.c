@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -190,6 +190,9 @@ static unsigned SkipFragment (FILE* F)
 
     /* Skip the file position of the fragment */
     ReadFilePos (F, &Pos);
+
+    /* Skip the	additional line info */
+    (void) ReadVar (F);
 
     /* Return the size */
     return Size;
@@ -388,7 +391,7 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
     /* Read the header */
     ReadObjHeader (F, &H);
 
-    /* Seek to the start of the options */
+    /* Seek to the start of the source files */
     FileSeek (F, Offset + H.FileOffs);
 
     /* Output a header */
@@ -436,7 +439,7 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
     /* Read the header */
     ReadObjHeader (F, &H);
 
-    /* Seek to the start of the options */
+    /* Seek to the start of the segments */
     FileSeek (F, Offset + H.SegOffs);
 
     /* Output a header */
@@ -511,7 +514,7 @@ void DumpObjImports (FILE* F, unsigned long Offset)
     /* Read the header */
     ReadObjHeader (F, &H);
 
-    /* Seek to the start of the options */
+    /* Seek to the start of the imports */
     FileSeek (F, Offset + H.ImportOffs);
 
     /* Output a header */
@@ -567,7 +570,7 @@ void DumpObjExports (FILE* F, unsigned long Offset)
     /* Read the header */
     ReadObjHeader (F, &H);
 
-    /* Seek to the start of the options */
+    /* Seek to the start of the exports */
     FileSeek (F, Offset + H.ExportOffs);
 
     /* Output a header */
@@ -633,7 +636,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
     /* Read the header */
     ReadObjHeader (F, &H);
 
-    /* Seek to the start of the options */
+    /* Seek to the start of the debug syms */
     FileSeek (F, Offset + H.DbgSymOffs);
 
     /* Output a header */
@@ -686,6 +689,56 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 
 	/* Free the Name */
 	xfree (Name);
+    }
+}
+
+
+
+void DumpObjLineInfo (FILE* F, unsigned long Offset)
+/* Dump the line info from an object file */
+{
+    ObjHeader H;
+    unsigned  Count;
+    unsigned  I;
+
+    /* Seek to the header position */
+    FileSeek (F, Offset);
+
+    /* Read the header */
+    ReadObjHeader (F, &H);
+
+    /* Seek to the start of line infos */
+    FileSeek (F, Offset + H.LineInfoOffs);
+
+    /* Output a header */
+    printf ("  Line info:\n");
+
+    /* Check if the object file was compiled with debug info */
+    if ((H.Flags & OBJ_FLAGS_DBGINFO) == 0) {
+	/* Print that there no line infos and bail out */
+	printf ("    Count:%27u\n", 0);
+	return;
+    }
+
+    /* Read the number of line infos and print it */
+    Count = ReadVar (F);
+    printf ("    Count:%27u\n", Count);
+
+    /* Read and print all line infos */
+    for (I = 0; I < Count; ++I) {
+
+	FilePos   Pos;
+
+       	/* Read one line info */
+	ReadFilePos (F, &Pos);
+
+	/* Print the header */
+	printf ("    Index:%27u\n", I);
+
+	/* Print the data */
+       	printf ("      Line:%26lu\n", Pos.Line);
+       	printf ("      Col:%27u\n", Pos.Col);
+       	printf ("      Name:%26u\n", Pos.Name);
     }
 }
 

@@ -51,6 +51,9 @@
 /* common */
 #include "filepos.h"
 
+/* ca65 */
+#include "global.h"
+
 
 
 /*****************************************************************************/
@@ -94,6 +97,17 @@ LineInfo* UseLineInfo (LineInfo* LI);
 
 void GenLineInfo (unsigned FileIndex, unsigned long LineNum);
 /* Generate a new line info */
+
+void ClearLineInfo (void);
+/* Clear the current line info */
+
+void MakeLineInfoIndex (void);
+/* Walk over the line info list and make an index of all entries ignoring
+ * those with a usage count of zero.
+ */
+
+void WriteLineInfo (void);
+/* Write a list of all line infos to the object file. */
 
 
 

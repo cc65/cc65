@@ -31,6 +31,7 @@ OBJS = 	bin.o		\
 	fragment.o	\
 	global.o        \
 	library.o	\
+	lineinfo.o	\
 	main.o	       	\
 	mapfile.o	\
 	o65.o		\

@@ -183,7 +183,7 @@ void* ReadData (FILE* F, void* Data, unsigned Size)
     if (Size > 0) {
 	if (fread (Data, 1, Size, F) != Size) {
 	    Error ("Read error (file corrupt?)");
-	}	   
+	}
     }
     return Data;
 }
@@ -209,6 +209,8 @@ void ReadObjHeader (FILE* F, ObjHeader* H)
     H->ExportSize   = Read32 (F);
     H->DbgSymOffs   = Read32 (F);
     H->DbgSymSize   = Read32 (F);
+    H->LineInfoOffs = Read32 (F);
+    H->LineInfoSize = Read32 (F);
 }
 
 

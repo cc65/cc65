@@ -48,6 +48,7 @@
 #include "xmalloc.h"
 
 /* ca65 */
+#include "objfile.h"
 #include "lineinfo.h"
 
 
@@ -128,6 +129,14 @@ void GenLineInfo (unsigned FileIndex, unsigned long LineNum)
 
 
 
+void ClearLineInfo (void)
+/* Clear the current line info */
+{
+    CurLineInfo = 0;
+}
+
+
+
 void MakeLineInfoIndex (void)
 /* Walk over the line info list and make an index of all entries ignoring
  * those with a usage count of zero.
@@ -140,6 +149,40 @@ void MakeLineInfoIndex (void)
 	    LI->Index = LineInfoValid++;
 	}
 	LI = LI->Next;
+    }
+}
+
+
+
+void WriteLineInfo (void)
+/* Write a list of all line infos to the object file. */
+{
+    LineInfo* LI;
+
+    /* Tell the object file module that we're about to write line infos */
+    ObjStartLineInfos ();
+
+    /* Check if debug info is requested */
+    if (DbgSyms) {
+
+	/* Write the line info count to the list */
+       	ObjWriteVar (LineInfoValid);
+
+       	/* Walk through list and write all line infos that have references */
+	LI = LineInfoRoot;
+	while (LI) {
+	    if (LI->Usage) {
+		/* Write the source file position */
+		ObjWritePos (&LI->Pos);
+	    }
+	    LI = LI->Next;
+	}
+
+    } else {
+
+	/* No line infos */
+	ObjWriteVar (0);
+
     }
 }
 

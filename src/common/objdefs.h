@@ -46,10 +46,10 @@
 
 /* Defines for magic and version */
 #define OBJ_MAGIC	0x616E7A55
-#define OBJ_VERSION	0x0008
+#define OBJ_VERSION	0x0009
 
 /* Size of an object file header */
-#define	OBJ_HDR_SIZE	56
+#define	OBJ_HDR_SIZE	64
 
 /* Flag bits */
 #define OBJ_FLAGS_DBGINFO	0x0001	/* File has debug info */
@@ -74,6 +74,8 @@ struct ObjHeader_ {
     unsigned long	ExportSize;	/* 32: Size of export list */
     unsigned long       DbgSymOffs;    	/* 32: Offset to list of debug symbols */
     unsigned long	DbgSymSize;	/* 32: Size of debug symbols */
+    unsigned long       LineInfoOffs;   /* 32: Offset to list of line infos */
+    unsigned long       LineInfoSize;   /* 32: Size of line infos */
 };
 
 

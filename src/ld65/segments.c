@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,6 +51,7 @@
 #include "fileio.h"
 #include "fragment.h"
 #include "global.h"
+#include "lineinfo.h"
 #include "segments.h"
 
 
@@ -253,6 +254,7 @@ Section* ReadSection (FILE* F, ObjData* O)
     while (Size) {
 
     	Fragment* Frag;
+	unsigned  LineInfoIndex;
 
     	/* Read the fragment type */
     	unsigned char Type = Read8 (F);
@@ -299,12 +301,23 @@ Section* ReadSection (FILE* F, ObjData* O)
 	    case FRAG_SEXPR:
 		/* An expression */
 		Frag->Expr = ReadExpr (F, O);
-		break;
+	    	break;
 
 	}
 
 	/* Read the file position of the fragment */
 	ReadFilePos (F, &Frag->Pos);
+
+	/* Read the additional line info and resolve it */
+	LineInfoIndex = ReadVar (F);
+	if (LineInfoIndex) {
+	    --LineInfoIndex;
+	    CHECK (LineInfoIndex < O->LineInfoCount);
+	    /* Point from the fragment to the line info... */
+	    Frag->LI = O->LineInfos[LineInfoIndex];
+	    /* ...and back from the line info to the fragment */
+	    CollAppend (&Frag->LI->Fragments, Frag);
+	}
 
 	/* Remember the module we had this fragment from */
 	Frag->Obj = O;

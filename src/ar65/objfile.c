@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998	Ullrich von Bassewitz					     */
-/*		Wacholderweg 14						     */
-/*		D-70597 Stuttgart					     */
-/* EMail:	uz@musoftware.de					     */
+/* (C) 1998-2001 Ullrich von Bassewitz					     */
+/*		 Wacholderweg 14        				     */
+/*		 D-70597 Stuttgart					     */
+/* EMail:	 uz@cc65.org     					     */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -47,7 +47,7 @@
 
 /* common */
 #include "xmalloc.h"
-
+					
 /* ar65 */
 #include "error.h"
 #include "objdata.h"
@@ -94,19 +94,21 @@ void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     if (H->Version != OBJ_VERSION) {
 	Error ("Object file `%s' has wrong version", Name);
     }
-    H->Flags	  = Read16 (Obj);
-    H->OptionOffs = Read32 (Obj);
-    H->OptionSize = Read32 (Obj);
-    H->FileOffs   = Read32 (Obj);
-    H->FileSize   = Read32 (Obj);
-    H->SegOffs	  = Read32 (Obj);
-    H->SegSize	  = Read32 (Obj);
-    H->ImportOffs = Read32 (Obj);
-    H->ImportSize = Read32 (Obj);
-    H->ExportOffs = Read32 (Obj);
-    H->ExportSize = Read32 (Obj);
-    H->DbgSymOffs = Read32 (Obj);
-    H->DbgSymSize = Read32 (Obj);
+    H->Flags   	    = Read16 (Obj);
+    H->OptionOffs   = Read32 (Obj);
+    H->OptionSize   = Read32 (Obj);
+    H->FileOffs     = Read32 (Obj);
+    H->FileSize     = Read32 (Obj);
+    H->SegOffs 	    = Read32 (Obj);
+    H->SegSize 	    = Read32 (Obj);
+    H->ImportOffs   = Read32 (Obj);
+    H->ImportSize   = Read32 (Obj);
+    H->ExportOffs   = Read32 (Obj);
+    H->ExportSize   = Read32 (Obj);
+    H->DbgSymOffs   = Read32 (Obj);
+    H->DbgSymSize   = Read32 (Obj);
+    H->LineInfoOffs = Read32 (Obj);
+    H->LineInfoSize = Read32 (Obj);
 }
 
 
@@ -129,6 +131,8 @@ void ObjWriteHeader (FILE* Obj, ObjHeader* H)
     Write32 (Obj, H->ExportSize);
     Write32 (Obj, H->DbgSymOffs);
     Write32 (Obj, H->DbgSymSize);
+    Write32 (Obj, H->LineInfoOffs);
+    Write32 (Obj, H->LineInfoSize);
 }
 
 
@@ -173,9 +177,9 @@ void ObjAdd (const char* Name)
     }
 
     /* Initialize the object module data structure */
-    O->Name	  = xstrdup (Module);
-    O->Flags	  = OBJ_HAVEDATA;
-    O->MTime	  = StatBuf.st_mtime;
+    O->Name   	  = xstrdup (Module);
+    O->Flags  	  = OBJ_HAVEDATA;
+    O->MTime  	  = StatBuf.st_mtime;
     O->ImportSize = H.ImportSize;
     O->Imports	  = xmalloc (O->ImportSize);
     O->ExportSize = H.ExportSize;
@@ -200,6 +204,8 @@ void ObjAdd (const char* Name)
     H.SegOffs = LibCopyTo (Obj, H.SegSize) - O->Start;
     fseek (Obj, H.FileOffs, SEEK_SET);
     H.FileOffs = LibCopyTo (Obj, H.FileSize) - O->Start;
+    fseek (Obj, H.LineInfoOffs, SEEK_SET);
+    H.LineInfoOffs = LibCopyTo (Obj, H.LineInfoSize) - O->Start;
 
     /* Calculate the amount of data written */
     O->Size = ftell (NewLib) - O->Start;

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -83,6 +83,8 @@ ObjData* NewObjData (void)
     O->Imports     	= 0;
     O->DbgSymCount	= 0;
     O->DbgSyms		= 0;
+    O->LineInfoCount    = 0;
+    O->LineInfos        = 0;
 
     /* Link it into the list */
     if (ObjLast) {
@@ -108,7 +110,8 @@ void FreeObjData (ObjData* O)
     xfree (O->Name);
     xfree (O->Imports);
     xfree (O->Exports);
-    xfree (O->DbgSyms);
+    xfree (O->DbgSyms);	    
+    xfree (O->LineInfos);
     xfree (O);
 }
 
@@ -143,7 +146,7 @@ const char* GetSourceFileName (const ObjData* O, unsigned Index)
 	/* Return the name */
 	return O->Files[Index];
 
-    }		 
+    }
 }
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,6 +57,7 @@ struct Fragment {
     unsigned long      	Size;  		/* Size of data/expression */
     struct ExprNode*	Expr;		/* Expression if FRAG_EXPR */
     FilePos  		Pos;		/* File position in source */
+    struct LineInfo*    LI;             /* Additional line info */
     unsigned char    	Type;  		/* Type of fragment */
     unsigned char      	LitBuf [1]; 	/* Dynamically alloc'ed literal buffer */
 };

@@ -460,6 +460,7 @@ static void WriteOneSeg (Segment* Seg)
     Fragment* Frag;
     Fragment* F;
     unsigned long Size;
+    unsigned LineInfoIndex;
 
     /* Write the segment name followed by the byte count in this segment */
     ObjWriteStr (Seg->Name);
@@ -533,6 +534,12 @@ static void WriteOneSeg (Segment* Seg)
 
        	/* Write the file position of this fragment */
 	ObjWritePos (&Frag->Pos);
+
+	/* Write extra line info for this fragment. Zero is considered
+	 * "no line info", so add one to the value.
+	 */		   
+	LineInfoIndex = Frag->LI? Frag->LI->Index + 1 : 0;
+	ObjWriteVar (LineInfoIndex);
 
 	/* Next fragment */
 	Frag = Frag->Next;

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -68,6 +68,9 @@ void DumpObjExports (FILE* F, unsigned long Offset);
 
 void DumpObjDbgSyms (FILE* F, unsigned long Offset);
 /* Dump the debug symbols from an object file */
+
+void DumpObjLineInfo (FILE* F, unsigned long Offset);
+/* Dump the line infos from an object file */
 
 
 

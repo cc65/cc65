@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -83,6 +83,7 @@ static void Usage (void)
 	     "  --dump-files\t\tDump the source files\n"
 	     "  --dump-header\t\tDump the object file header\n"
 	     "  --dump-imports\tDump imported symbols\n"
+	     "  --dump-lineinfo\tDump line information\n"
 	     "  --dump-options\tDump object file options\n"
 	     "  --dump-segments\tDump the segments in the file\n"
 	     "  --help\t\tHelp (this text)\n"
@@ -136,6 +137,14 @@ static void OptDumpImports (const char* Opt, const char* Arg)
 /* Dump the imported symbols */
 {
     What |= D_IMPORTS;
+}
+
+
+
+static void OptDumpLineInfo (const char* Opt, const char* Arg)
+/* Dump the line infos */
+{
+    What |= D_LINEINFO;
 }
 
 
@@ -227,6 +236,9 @@ static void DumpFile (const char* Name)
 	if (What & D_DBGSYMS) {
 	    DumpObjDbgSyms (F, 0);
 	}
+	if (What & D_LINEINFO) {
+	    DumpObjLineInfo (F, 0);
+	}
     }
 
     /* Close the file */
@@ -246,6 +258,7 @@ int main (int argc, char* argv [])
 	{ "--dump-files", 	0,	OptDumpFiles		},
 	{ "--dump-header",	0,	OptDumpHeader		},
 	{ "--dump-imports",	0,	OptDumpImports		},
+        { "--dump-lineinfo",    0,      OptDumpLineInfo         },
 	{ "--dump-options",	0,	OptDumpOptions		},
 	{ "--dump-segments",	0,	OptDumpSegments		},
 	{ "--help",		0,	OptHelp			},

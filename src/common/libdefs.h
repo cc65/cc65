@@ -46,7 +46,7 @@
 
 /* Defines for magic and version */
 #define LIB_MAGIC	0x7A55616E
-#define LIB_VERSION	0x0008
+#define LIB_VERSION	0x0009
 
 /* Size of an library file header */
 #define	LIB_HDR_SIZE  	12

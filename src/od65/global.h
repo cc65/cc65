@@ -51,6 +51,7 @@
 #define D_IMPORTS      	0x0010U		/* Dump imported symbols */
 #define D_EXPORTS      	0x0020U		/* Dump exported symbols */
 #define D_DBGSYMS      	0x0040U		/* Dump debug symbols */
+#define D_LINEINFO      0x0080U         /* Dump line infos */
 #define D_ALL  	       	0xFFFFU		/* Dump anything */
 
 

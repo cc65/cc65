@@ -47,6 +47,7 @@
 #include "error.h"
 #include "exports.h"
 #include "fileio.h"
+#include "lineinfo.h"
 #include "objdata.h"
 #include "segments.h"
 #include "objfile.h"
@@ -86,19 +87,21 @@ static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     if (H->Version != OBJ_VERSION) {
        	Error ("Object file `%s' has wrong version", Name);
     }
-    H->Flags	  = Read16 (Obj);
-    H->OptionOffs = Read32 (Obj);
-    H->OptionSize = Read32 (Obj);
-    H->FileOffs   = Read32 (Obj);
-    H->FileSize   = Read32 (Obj);
-    H->SegOffs	  = Read32 (Obj);
-    H->SegSize	  = Read32 (Obj);
-    H->ImportOffs = Read32 (Obj);
-    H->ImportSize = Read32 (Obj);
-    H->ExportOffs = Read32 (Obj);
-    H->ExportSize = Read32 (Obj);
-    H->DbgSymOffs = Read32 (Obj);
-    H->DbgSymSize = Read32 (Obj);
+    H->Flags	    = Read16 (Obj);
+    H->OptionOffs   = Read32 (Obj);
+    H->OptionSize   = Read32 (Obj);
+    H->FileOffs     = Read32 (Obj);
+    H->FileSize     = Read32 (Obj);
+    H->SegOffs	    = Read32 (Obj);
+    H->SegSize	    = Read32 (Obj);
+    H->ImportOffs   = Read32 (Obj);
+    H->ImportSize   = Read32 (Obj);
+    H->ExportOffs   = Read32 (Obj);
+    H->ExportSize   = Read32 (Obj);
+    H->DbgSymOffs   = Read32 (Obj);
+    H->DbgSymSize   = Read32 (Obj);
+    H->LineInfoOffs = Read32 (Obj);
+    H->LineInfoSize = Read32 (Obj);
 }
 
 
@@ -155,11 +158,25 @@ void ObjReadDbgSyms (FILE* F, ObjData* O)
 /* Read the debug symbols from a file at the current position */
 {
     unsigned I;
-
+		     
     O->DbgSymCount = ReadVar (F);
     O->DbgSyms	   = xmalloc (O->DbgSymCount * sizeof (DbgSym*));
     for (I = 0; I < O->DbgSymCount; ++I) {
 	O->DbgSyms [I] = ReadDbgSym (F, O);
+    }
+}
+
+
+
+void ObjReadLineInfos (FILE* F, ObjData* O)
+/* Read the line infos from a file at the current position */
+{
+    unsigned I;
+
+    O->LineInfoCount = ReadVar (F);
+    O->LineInfos     = xmalloc (O->LineInfoCount * sizeof (LineInfo*));
+    for (I = 0; I < O->LineInfoCount; ++I) {
+       	O->LineInfos[I] = ReadLineInfo (F, O);
     }
 }
 
@@ -210,6 +227,10 @@ void ObjAdd (FILE* Obj, const char* Name)
     /* Read the object debug symbols from the object file */
     fseek (Obj, O->Header.DbgSymOffs, SEEK_SET);
     ObjReadDbgSyms (Obj, O);
+
+    /* Read the line infos from the object file */
+    fseek (Obj, O->Header.LineInfoOffs, SEEK_SET);
+    ObjReadLineInfos (Obj, O);
 
     /* Read the segment list from the object file. This must be last, since
      * the expressions stored in the code may reference segments or imported

@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  fragment.c				     */
+/*				  lineinfo.h                                 */
 /*                                                                           */
-/*			  Code/data fragment routines			     */
+/*			Source file line info structure                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 2001      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -37,49 +37,44 @@
 #include "xmalloc.h"
 
 /* ld65 */
-#include "segments.h"
-#include "fragment.h"
+#include "fileio.h"
+#include "lineinfo.h"
 
 
 
 /*****************************************************************************/
-/*     	      	     	   	     Code  	      	  	  	     */
+/*     	       	      	      	     Code			     	     */
 /*****************************************************************************/
 
 
 
-Fragment* NewFragment (unsigned char Type, unsigned long Size, Section* S)
-/* Create a new fragment and insert it into the section S */
+static LineInfo* NewLineInfo (void)
+/* Create and return a new LineInfo struct */
 {
     /* Allocate memory */
-    Fragment* F = xmalloc (sizeof (Fragment) - 1 + Size);  	/* Portable? */
+    LineInfo* LI = xmalloc (sizeof (LineInfo));
 
-    /* Initialize the data */
-    F->Next = 0;
-    F->Obj  = 0;
-    F->Size = Size;
-    F->Expr = 0;
-    InitFilePos (&F->Pos);
-    F->LI   = 0;
-    F->Type = Type;
+    /* Initialize the fields */
+    InitFilePos (&LI->Pos);
+    InitCollection (&LI->Fragments);
 
-    /* Insert the code fragment into the section */
-    if (S->FragRoot == 0) {
-      	/* First fragment */
-      	S->FragRoot = F;
-    } else {
-      	S->FragLast->Next = F;
-    }
-    S->FragLast = F;
+    /* Return the new struct */
+    return LI;
+}
 
-    /* Increment the size of the section by the size of the fragment */
-    S->Size += Size;
 
-    /* Increment the size of the segment that contains the section */
-    S->Seg->Size += Size;
 
-    /* Return the new fragment */
-    return F;
+LineInfo* ReadLineInfo (FILE* F, ObjData* O)
+/* Read a line info from a file and return it */
+{
+    /* Allocate a new LineInfo struct and initialize it */
+    LineInfo* LI = NewLineInfo ();
+
+    /* Read the file position */
+    ReadFilePos (F, &LI->Pos);
+
+    /* Return the new LineInfo */
+    return LI;
 }
 
 

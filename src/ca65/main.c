@@ -56,6 +56,7 @@
 #include "incpath.h"
 #include "instr.h"
 #include "istack.h"
+#include "lineinfo.h"
 #include "listing.h"
 #include "macro.h"
 #include "nexttok.h"
@@ -480,6 +481,9 @@ static void CreateObjFile (void)
     /* Write debug symbols if requested */
     WriteDbgSyms ();
 
+    /* Write line infos if requested */
+    WriteLineInfo ();
+
     /* Write an updated header and close the file */
     ObjClose ();
 }
@@ -635,6 +639,9 @@ int main (int argc, char* argv [])
     if (ErrorCount == 0) {
         SegCheck ();
     }
+
+    /* If we didn't have an errors, index the line infos */
+    MakeLineInfoIndex ();
 
     /* Dump the data */
     if (Verbosity >= 2) {

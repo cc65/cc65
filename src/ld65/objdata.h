@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -74,6 +74,8 @@ struct ObjData {
     struct Import**	Imports;	/* List of all imports */
     unsigned	 	DbgSymCount;	/* Count of debug symbols */
     struct DbgSym**   	DbgSyms;       	/* List of debug symbols */
+    unsigned            LineInfoCount;  /* Count of additional line infos */
+    struct LineInfo**   LineInfos;      /* List of additional line infos */
 };
 
 
@@ -104,7 +106,7 @@ const char* GetObjFileName (const ObjData* O);
 
 const char* GetSourceFileName (const ObjData* O, unsigned Index);
 /* Get the name of the source file with the given index. If O is NULL, return
- * "[linker generated]" as the file name.		      
+ * "[linker generated]" as the file name.
  */
 
 
@@ -112,6 +114,7 @@ const char* GetSourceFileName (const ObjData* O, unsigned Index);
 /* End of objdata.h */
 
 #endif
+
 
 
 

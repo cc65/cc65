@@ -267,6 +267,15 @@ void SeparatorLine (void)
 
 
 
+void UserComment (const char* Comment)
+/* Output a comment line */
+{
+    Output ("; %s", Comment);
+    LineFeed ();
+}
+
+
+
 void LineComment (unsigned PC, unsigned Count)
 /* Add a line comment with the PC and data bytes */
 {

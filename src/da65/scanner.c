@@ -153,7 +153,7 @@ void InfoNextTok (void)
 /* Read the next token from the input stream */
 {
     unsigned I;
-
+    int	     Esc;
 
 Again:
     /* Skip whitespace */
@@ -249,8 +249,19 @@ Again:
 	    NextChar ();
 	    I = 0;
 	    while (C != '\"') {
+		Esc = (C == '\\');
+		if (Esc) {
+		    NextChar ();
+		}
 		if (C == EOF || C == '\n') {
 		    InfoError ("Unterminated string");
+		}
+		if (Esc) {
+		    switch (C) {
+			case '\"':	C = '\"';	break;
+			case '\'':	C = '\'';	break;
+			default:	InfoError ("Invalid escape char: %c", C);
+		    }
 		}
 	       	if (I < CFG_MAX_IDENT_LEN) {
 		    InfoSVal [I++] = C;

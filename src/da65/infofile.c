@@ -205,6 +205,7 @@ static void RangeSection (void)
 /* Parse a range section */
 {
     static const IdentTok RangeDefs[] = {
+        {   "COMMENT",          INFOTOK_COMMENT },
 	{   "END",	    	INFOTOK_END 	},
         {   "NAME",             INFOTOK_NAME    },
        	{   "START",   	    	INFOTOK_START	},
@@ -212,11 +213,11 @@ static void RangeSection (void)
     };
 
     static const IdentTok TypeDefs[] = {
-      	{   "ADDRTABLE",	INFOTOK_ADDRTAB	 },
+      	{   "ADDRTABLE",    	INFOTOK_ADDRTAB	 },
       	{   "BYTETABLE",    	INFOTOK_BYTETAB	 },
       	{   "CODE",	    	INFOTOK_CODE	 },
         {   "DBYTETABLE",       INFOTOK_DBYTETAB },
-      	{   "DWORDTABLE",	INFOTOK_DWORDTAB },
+      	{   "DWORDTABLE",   	INFOTOK_DWORDTAB },
       	{   "RTSTABLE",	    	INFOTOK_RTSTAB	 },
         {   "SKIP",             INFOTOK_SKIP     },
       	{   "TEXTTABLE",        INFOTOK_TEXTTAB  },
@@ -231,6 +232,7 @@ static void RangeSection (void)
       	tEnd	= 0x02,
       	tType	= 0x04,
         tName   = 0x08,
+        tComment= 0x10,
        	tNeeded = (tStart | tEnd | tType)
     };
     unsigned Attributes = tNone;
@@ -240,6 +242,7 @@ static void RangeSection (void)
     unsigned End	= 0;
     unsigned char Type	= 0;
     char* Name          = 0;
+    char* Comment       = 0;
     unsigned MemberSize = 0;
 
 
@@ -257,6 +260,18 @@ static void RangeSection (void)
 
 	/* Look at the token */
 	switch (InfoTok) {
+
+	    case INFOTOK_COMMENT:
+                AddAttr ("COMMENT", &Attributes, tComment);
+	        InfoNextTok ();
+	       	InfoAssureStr ();
+	     	if (InfoSVal[0] == '\0') {
+	     	    InfoError ("Comment may not be empty");
+	     	}
+	       	Comment = xstrdup (InfoSVal);
+                Attributes |= tComment;
+	       	InfoNextTok ();
+      	       	break;
 
 	    case INFOTOK_END:
                 AddAttr ("END", &Attributes, tEnd);
@@ -333,9 +348,10 @@ static void RangeSection (void)
     /* Do we have a label? */
     if (Attributes & tName) {
         /* Define a label for the table */
-        AddLabel (Start, atExtLabel, Name);
-        /* Delete the name */
+        AddExtLabel (Start, Name, Comment);
+        /* Delete name and comment */
         xfree (Name);
+        xfree (Comment);
     }
 
     /* Consume the closing brace */
@@ -348,15 +364,17 @@ static void LabelSection (void)
 /* Parse a label section */
 {
     static const IdentTok LabelDefs[] = {
-       	{   "NAME",	INFOTOK_NAME	},
+       	{   "COMMENT",  INFOTOK_COMMENT },
 	{   "ADDR",	INFOTOK_ADDR	},
+       	{   "NAME",	INFOTOK_NAME	},
        	{   "SIZE",    	INFOTOK_SIZE	},
     };
 
     /* Locals - initialize to avoid gcc warnings */
-    char* Name = 0;
-    long Value = -1;
-    long Size  = -1;
+    char* Name    = 0;
+    char* Comment = 0;
+    long Value    = -1;
+    long Size     = -1;
 
     /* Skip the token */
     InfoNextTok ();
@@ -373,6 +391,30 @@ static void LabelSection (void)
 	/* Look at the token */
 	switch (InfoTok) {
 
+	    case INFOTOK_ADDR:
+	       	InfoNextTok ();
+	       	if (Value >= 0) {
+	       	    InfoError ("Value already given");
+	       	}
+	       	InfoAssureInt ();
+		InfoRangeCheck (0, 0xFFFF);
+	       	Value = InfoIVal;
+	       	InfoNextTok ();
+	       	break;
+
+	    case INFOTOK_COMMENT:
+	        InfoNextTok ();
+	       	if (Comment) {
+	       	    InfoError ("Comment already given");
+	       	}
+	       	InfoAssureStr ();
+		if (InfoSVal[0] == '\0') {
+		    InfoError ("Comment may not be empty");
+		}
+	       	Comment = xstrdup (InfoSVal);
+	       	InfoNextTok ();
+	       	break;
+
 	    case INFOTOK_NAME:
 	        InfoNextTok ();
 	       	if (Name) {
@@ -383,17 +425,6 @@ static void LabelSection (void)
 		    InfoError ("Name may not be empty");
 		}
 	       	Name = xstrdup (InfoSVal);
-	       	InfoNextTok ();
-	       	break;
-
-	    case INFOTOK_ADDR:
-	       	InfoNextTok ();
-	       	if (Value >= 0) {
-	       	    InfoError ("Value already given");
-	       	}
-	       	InfoAssureInt ();
-		InfoRangeCheck (0, 0xFFFF);
-	       	Value = InfoIVal;
 	       	InfoNextTok ();
 	       	break;
 
@@ -433,10 +464,11 @@ static void LabelSection (void)
     }
 
     /* Define the label(s) */
-    AddExtLabelRange ((unsigned) Value, Name, Size);
+    AddExtLabelRange ((unsigned) Value, Name, Comment, Size);
 
-    /* Delete the dynamically allocated memory for Name */
+    /* Delete the dynamically allocated memory for Name and Comment */
     xfree (Name);
+    xfree (Comment);
 
     /* Consume the closing brace */
     InfoConsumeRCurly ();

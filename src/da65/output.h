@@ -85,6 +85,9 @@ void DataDWordLine (unsigned ByteCount);
 void SeparatorLine (void);
 /* Print a separator line */
 
+void UserComment (const char* Comment);
+/* Output a comment line */
+
 void LineComment (unsigned PC, unsigned Count);
 /* Add a line comment with the PC and data bytes */
 

@@ -81,6 +81,7 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
 {
     char        Buf[1024];
     char*       L;
+    const char* Comment;
     unsigned    Line;
     unsigned	Len;
     long        Val;
@@ -147,7 +148,7 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
         } else {
 	    if (!IgnoreUnknown) {
 	       	Error ("%s(%u): Missing `='", Filename, Line);
-	    }				   
+	    }
 	    continue;
 	}
 
@@ -198,6 +199,16 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
         /* Skip whitespace again */
         L = SkipWhitespace (L);
 
+        /* Check for a comment */
+        if (*L == CommentStart) {
+            Comment = SkipWhitespace (L+1);
+            if (*Comment == '\0') {
+                Comment = 0;
+            }
+        } else {
+            Comment = 0;
+        }
+
         /* Check for a comment character or end of line */
         if (*L != CommentStart && *L != '\0') {
             if (!IgnoreUnknown) {
@@ -210,7 +221,7 @@ void AsmInc (const char* Filename, char CommentStart, int IgnoreUnknown)
         Val *= Sign;
 
         /* Define the symbol */
-        AddExtLabelRange (Val, SB_GetConstBuf (&Ident), 1);
+        AddExtLabel (Val, SB_GetConstBuf (&Ident), Comment);
 
     }
 

@@ -251,10 +251,14 @@ static void OneOpcode (unsigned RemainingBytes)
     /* Get the output style for the current PC */
     attr_t Style = GetStyleAttr (PC);
 
-    /* If we have a label at this address, output the label, provided that
-     * we aren't in a skip area.
+    /* If we have a label at this address, output the label and an attached
+     * comment, provided that we aren't in a skip area.
      */
     if (Style != atSkip && MustDefLabel (PC)) {
+        const char* Comment = GetComment (PC);
+        if (Comment) {
+            UserComment (Comment);
+        }
 	DefLabel (GetLabel (PC));
     }
 

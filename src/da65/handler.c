@@ -145,7 +145,7 @@ static void GenerateLabel (unsigned Flags, unsigned Addr)
 
 	if (Granularity == 1) {
 	    /* Just add the label */
-	    AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
+	    AddIntLabel (Addr);
 	} else {
 	    /* Search for the start of the range or the last non dependent
 	     * label in the range.
@@ -170,13 +170,13 @@ static void GenerateLabel (unsigned Flags, unsigned Addr)
 
 	    /* If the proposed label address doesn't have a label, define one */
 	    if ((GetLabelAttr (LabelAddr) & (atIntLabel|atExtLabel)) == 0) {
-		AddLabel (LabelAddr, atIntLabel, MakeLabelName (LabelAddr));
+		AddIntLabel (LabelAddr);
 	    }
 
 	    /* Create the label */
 	    Offs = Addr - LabelAddr;
 	    if (Offs == 0) {
-		AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
+		AddIntLabel (Addr);
 	    } else {
 	     	AddDepLabel (Addr, atIntLabel, GetLabel (LabelAddr), Offs);
 	    }

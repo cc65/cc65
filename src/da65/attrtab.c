@@ -55,11 +55,53 @@
 
 
 
+/* Label + comment */
+typedef struct {
+    const char*	Name;
+    const char* Comment;
+} Label;
+
+/* A whole lot of Labels, so we don't have to allocate them separately */
+static Label* LabelHeap = 0;
+static unsigned LabelsLeft = 0;
+
 /* Attribute table */
 static unsigned char AttrTab [0x10000];
 
 /* Symbol table */
-static const char* SymTab [0x10000];
+static const Label* SymTab [0x10000];
+
+
+
+/*****************************************************************************/
+/*                               struct Label                                */
+/*****************************************************************************/
+
+
+
+Label* NewLabel (const char* Name, const char* Comment)
+/* Create a new Label structure, initialize and return it */
+{
+    Label* L;
+
+    /* Check if we have some free labels left */
+    if (LabelsLeft == 0) {
+        /* Allocate a new block of memory */
+        LabelsLeft = 200;
+        LabelHeap = xmalloc (LabelsLeft * sizeof (Label));
+    }
+
+    /* Get a new one from the buffer */
+    L = LabelHeap++;
+    --LabelsLeft;
+
+    /* Initialize the new label */
+    L->Name = xstrdup (Name);
+    L->Comment = Comment? xstrdup (Comment) : 0;
+
+    /* Return the new label */
+    return L;
+}
 
 
 
@@ -133,7 +175,7 @@ void MarkAddr (unsigned Addr, attr_t Attr)
 
 
 
-const char* MakeLabelName (unsigned Addr)
+static const char* MakeLabelName (unsigned Addr)
 /* Make the default label name from the given address and return it in a
  * static buffer.
  */
@@ -145,7 +187,7 @@ const char* MakeLabelName (unsigned Addr)
 
 
 
-void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
+void AddLabel (unsigned Addr, attr_t Attr, const char* Name, const char* Comment)
 /* Add a label */
 {
     /* Get an existing label attribute */
@@ -154,17 +196,33 @@ void AddLabel (unsigned Addr, attr_t Attr, const char* Name)
     /* Must not have two symbols for one address */
     if (ExistingAttr != atNoLabel) {
     	/* Allow redefinition if identical */
-       	if (ExistingAttr == Attr && strcmp (SymTab[Addr], Name) == 0) {
+       	if (ExistingAttr == Attr && strcmp (SymTab[Addr]->Name, Name) == 0) {
     	    return;
     	}
-    	Error ("Duplicate label for address $%04X: %s/%s", Addr, SymTab[Addr], Name);
+    	Error ("Duplicate label for address $%04X: %s/%s", Addr, SymTab[Addr]->Name, Name);
     }
 
     /* Create a new label */
-    SymTab[Addr] = xstrdup (Name);
+    SymTab[Addr] = NewLabel (Name, Comment);
 
     /* Remember the attribute */
     AttrTab[Addr] |= Attr;
+}
+
+
+
+void AddIntLabel (unsigned Addr)
+/* Add an internal label using the address to generate the name. */
+{
+    AddLabel (Addr, atIntLabel, MakeLabelName (Addr), 0);
+}
+
+
+
+void AddExtLabel (unsigned Addr, const char* Name, const char* Comment)
+/* Add an external label */
+{
+    AddLabel (Addr, atExtLabel, Name, Comment);
 }
 
 
@@ -186,7 +244,7 @@ void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Off
     }
 
     /* Define the labels */
-    AddLabel (Addr, Attr | atDepLabel, DepName);
+    AddLabel (Addr, Attr | atDepLabel, DepName, 0);
 
     /* Free the name buffer */
     xfree (DepName);
@@ -194,13 +252,15 @@ void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Off
 
 
 
-static void AddLabelRange (unsigned Addr, attr_t Attr, const char* Name, unsigned Count)
+static void AddLabelRange (unsigned Addr, attr_t Attr,
+                           const char* Name, const char* Comment,
+                           unsigned Count)
 /* Add a label for a range. The first entry gets the label "Name" while the
  * others get "Name+offs".
  */
 {
     /* Define the label */
-    AddLabel (Addr, Attr, Name);
+    AddLabel (Addr, Attr, Name, Comment);
 
     /* Define dependent labels if necessary */
     if (Count > 1) {
@@ -221,7 +281,7 @@ static void AddLabelRange (unsigned Addr, attr_t Attr, const char* Name, unsigne
     	/* Define the labels */
        	for (Offs = 1; Offs < Count; ++Offs) {
     	    sprintf (DepOffs, Format, Offs);
-    	    AddLabel (Addr + Offs, Attr | atDepLabel, DepName);
+    	    AddLabel (Addr + Offs, Attr | atDepLabel, DepName, 0);
     	}
 
     	/* Free the name buffer */
@@ -237,18 +297,18 @@ void AddIntLabelRange (unsigned Addr, const char* Name, unsigned Count)
  */
 {
     /* Define the label range */
-    AddLabelRange (Addr, atIntLabel, Name, Count);
+    AddLabelRange (Addr, atIntLabel, Name, 0, Count);
 }
 
 
 
-void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count)
+void AddExtLabelRange (unsigned Addr, const char* Name, const char* Comment, unsigned Count)
 /* Add an external label for a range. The first entry gets the label "Name"
  * while the others get "Name+offs".
  */
 {
     /* Define the label range */
-    AddLabelRange (Addr, atExtLabel, Name, Count);
+    AddLabelRange (Addr, atExtLabel, Name, Comment, Count);
 }
 
 
@@ -286,7 +346,19 @@ const char* GetLabel (unsigned Addr)
     AddrCheck (Addr);
 
     /* Return the label if any */
-    return SymTab[Addr];
+    return SymTab[Addr]? SymTab[Addr]->Name : 0;
+}
+
+
+
+const char* GetComment (unsigned Addr)
+/* Return the comment for an address */
+{
+    /* Check the given address */
+    AddrCheck (Addr);
+
+    /* Return the label if any */
+    return SymTab[Addr]? SymTab[Addr]->Comment : 0;
 }
 
 
@@ -318,7 +390,7 @@ unsigned char GetLabelAttr (unsigned Addr)
 static void DefineConst (unsigned Addr)
 /* Define an address constant */
 {
-    Output ("%s", SymTab [Addr]);
+    Output ("%s", SymTab[Addr]->Name);
     Indent (AIndent);
     Output ("= $%04X", Addr);
     LineFeed ();

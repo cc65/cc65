@@ -86,13 +86,14 @@ void MarkRange (unsigned Start, unsigned End, attr_t Attr);
 void MarkAddr (unsigned Addr, attr_t Attr);
 /* Mark an address with an attribute */
 
-const char* MakeLabelName (unsigned Addr);
-/* Make the default label name from the given address and return it in a
- * static buffer.
- */
-
-void AddLabel (unsigned Addr, attr_t Attr, const char* Name);
+void AddLabel (unsigned Addr, attr_t Attr, const char* Name, const char* Comment);
 /* Add a label */
+
+void AddIntLabel (unsigned Addr);
+/* Add an internal label using the address to generate the name. */
+
+void AddExtLabel (unsigned Addr, const char* Name, const char* Comment);
+/* Add an external label */
 
 void AddDepLabel (unsigned Addr, attr_t Attr, const char* BaseName, unsigned Offs);
 /* Add a dependent label at the given address using "base name+Offs" as the new
@@ -104,7 +105,7 @@ void AddIntLabelRange (unsigned Addr, const char* Name, unsigned Count);
  * while the others get "Name+offs".
  */
 
-void AddExtLabelRange (unsigned Addr, const char* Name, unsigned Count);
+void AddExtLabelRange (unsigned Addr, const char* Name, const char* Comment, unsigned Count);
 /* Add an external label for a range. The first entry gets the label "Name"
  * while the others get "Name+offs".
  */
@@ -119,6 +120,9 @@ int MustDefLabel (unsigned Addr);
 
 const char* GetLabel (unsigned Addr);
 /* Return the label for an address or NULL if there is none */
+
+const char* GetComment (unsigned Addr);
+/* Return the comment for an address */
 
 unsigned char GetStyleAttr (unsigned Addr);
 /* Return the style attribute for the given address */

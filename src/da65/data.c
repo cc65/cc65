@@ -183,7 +183,7 @@ unsigned AddrTable (void)
 	/* In pass 1, define a label, in pass 2 output the line */
 	if (Pass == 1) {
 	    if (!HaveLabel (Addr)) {
-	   	AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
+	   	AddIntLabel (Addr);
 	    }
 	} else {
 	    const char* Label = GetLabel (Addr);
@@ -243,7 +243,7 @@ unsigned RtsTable (void)
 	/* In pass 1, define a label, in pass 2 output the line */
 	if (Pass == 1) {
 	    if (!HaveLabel (Addr)) {
-	   	AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
+	   	AddIntLabel (Addr);
 	    }
 	} else {
 	    const char* Label = GetLabel (Addr);

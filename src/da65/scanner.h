@@ -94,6 +94,7 @@ typedef enum token_t {
 
     /* Label section */
     INFOTOK_NAME,
+    INFOTOK_COMMENT,
     INFOTOK_ADDR,
     INFOTOK_SIZE,
 

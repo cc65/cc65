@@ -65,12 +65,14 @@
 #  include <apple2.h>
 #elif defined(__ATARI__) && !defined(_ATARI_H)
 #  include <atari.h>
+#elif defined(__ATMOS__) && !defined(_ATMOS_H)
+#  include <atmos.h>
 #endif
 
 
 
 /*****************************************************************************/
-/* 	      			   Functions	     			     */
+/*   	      			   Functions	     			     */
 /*****************************************************************************/
 
 

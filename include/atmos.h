@@ -6,7 +6,11 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002  Debrune Jérome, <jede@oric.org>		                     */
+/* (C) 2002      Debrune Jérome, <jede@oric.org>		             */
+/* (C) 2003      Ullrich von Bassewitz                                       */
+/*               Roemerstrasse 52                                            */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,6 +55,19 @@
 #define COLOR_MAGENTA 	0x05
 #define COLOR_CYAN 	0x06
 #define COLOR_WHITE 	0x07
+
+/* Character codes */
+#define CH_ULCORNER 	'+'
+#define CH_URCORNER 	'+'
+#define CH_LLCORNER 	'+'
+#define CH_LRCORNER 	'+'
+#define CH_TTEE     	'+'
+#define CH_BTEE     	'+'
+#define CH_LTEE     	'+'
+#define CH_RTEE     	'+'
+#define CH_CROSS    	'+'
+
+
 
 
 

@@ -323,31 +323,35 @@ static ExprNode* FuncBankByte (void)
 static ExprNode* FuncBlank (void)
 /* Handle the .BLANK builtin function */
 {
-    int Result = 1;
-
-    /* Assume no tokens if the closing brace follows (this is not correct in
-     * all cases, since the token may be the closing brace, but this will
-     * give a syntax error anyway and may not be handled by .BLANK.
+    /* We have a list of tokens that ends with the closing paren. Skip
+     * the tokens, and count them. Allow optionally curly braces.
      */
-    if (Tok != TOK_RPAREN) {
-	/* Skip any tokens */
-	int Braces = 0;
-	while (!TokIsSep (Tok)) {
-	    if (Tok == TOK_LPAREN) {
-		++Braces;
-	    } else if (Tok == TOK_RPAREN) {
-		if (Braces == 0) {
-	    	    /* Done */
-		    break;
-		} else {
-		    --Braces;
-		}
-	    }
-	    NextTok ();
+    enum Token Term = GetTokListTerm (TOK_RPAREN);
+    unsigned Count = 0;
+    while (Tok != Term) {
+
+     	/* Check for end of line or end of input. Since the calling function
+	 * will check for the closing paren, we don't need to print an error
+	 * here, just bail out.
+	 */
+     	if (TokIsSep (Tok)) {
+	    break;
      	}
-        Result = 0;
+
+	/* One more token */
+	++Count;
+
+	/* Skip the token */
+	NextTok ();
     }
-    return GenLiteralExpr (Result);
+
+    /* If the list was enclosed in curly braces, skip the closing brace */
+    if (Term == TOK_RCURLY && Tok == TOK_RCURLY) {
+        NextTok ();
+    }
+
+    /* Return true if the list was empty */
+    return GenLiteralExpr (Count == 0);
 }
 
 
@@ -418,7 +422,6 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
 /* Handle the .MATCH and .XMATCH builtin functions */
 {
     int Result;
-    enum Token Term;
     TokNode* Root = 0;
     TokNode* Last = 0;
     TokNode* Node;
@@ -427,12 +430,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
      * single linked list of tokens including attributes. The list is
      * either enclosed in curly braces, or terminated by a comma.
      */
-    if (Tok == TOK_LCURLY) {
-        NextTok ();
-        Term = TOK_RCURLY;
-    } else {
-        Term = TOK_COMMA;
-    }
+    enum Token Term = GetTokListTerm (TOK_COMMA);
     while (Tok != Term) {
 
     	/* We may not end-of-line of end-of-file here */
@@ -465,15 +463,10 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     }
 
     /* Read the second list which is optionally enclosed in curly braces and
-     * terminated by the right parenthesis. Compare each token against the 
+     * terminated by the right parenthesis. Compare each token against the
      * one in the first list.
      */
-    if (Tok == TOK_LCURLY) {
-        NextTok ();
-        Term = TOK_RCURLY;
-    } else {
-        Term = TOK_RPAREN;
-    }
+    Term = GetTokListTerm (TOK_RPAREN);
     Result = 1;
     Node = Root;
     while (Tok != Term) {
@@ -716,11 +709,11 @@ static ExprNode* FuncTCount (void)
 /* Handle the .TCOUNT function */
 {
     /* We have a list of tokens that ends with the closing paren. Skip
-     * the tokens, handling nested braces and count them.
+     * the tokens, and count them. Allow optionally curly braces.
      */
-    int      Count  = 0;
-    unsigned Parens = 0;
-    while (Parens != 0 || Tok != TOK_RPAREN) {
+    enum Token Term = GetTokListTerm (TOK_RPAREN);
+    int Count = 0;
+    while (Tok != Term) {
 
      	/* Check for end of line or end of input. Since the calling function
 	 * will check for the closing paren, we don't need to print an error
@@ -733,15 +726,13 @@ static ExprNode* FuncTCount (void)
 	/* One more token */
 	++Count;
 
-	/* Keep track of the nesting level */
-	switch (Tok) {
-	    case TOK_LPAREN:	++Parens;	break;
-	    case TOK_RPAREN:	--Parens;	break;
-	    default:		  		break;
-	}
-
 	/* Skip the token */
 	NextTok ();
+    }
+
+    /* If the list was enclosed in curly braces, skip the closing brace */
+    if (Term == TOK_RCURLY && Tok == TOK_RCURLY) {
+        NextTok ();
     }
 
     /* Return the number of tokens */
@@ -760,7 +751,7 @@ static ExprNode* FuncXMatch (void)
 
 static ExprNode* Function (ExprNode* (*F) (void))
 /* Handle builtin functions */
-{
+{            
     ExprNode* E;
 
     /* Skip the keyword */

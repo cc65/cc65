@@ -71,22 +71,15 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
  * return this token list.
  */
 {
-    enum Token Term;
-    unsigned   Current;
 
     /* Create the token list */
     TokList* List = NewTokList ();
 
     /* Determine if the list is enclosed in curly braces. */
-    if (Tok == TOK_LCURLY) {
-        NextTok ();
-        Term = TOK_RCURLY;
-    } else {
-        Term = TOK_LCURLY;
-    }
+    enum Token Term = GetTokListTerm (TOK_RPAREN);
 
     /* Read the token list */
-    Current = 0;
+    unsigned Current = 0;
     while (Tok != Term) {
 
      	/* Check for end of line or end of input */

@@ -42,6 +42,7 @@
 /* ca65 */
 #include "error.h"
 #include "istack.h"
+#include "nexttok.h"
 #include "scanner.h"
 #include "toklist.h"
 
@@ -170,6 +171,22 @@ void FreeTokList (TokList* List)
 
     /* Free the list structure itself */
     xfree (List);
+}
+
+
+
+enum Token GetTokListTerm (enum Token Term)
+/* Determine if the following token list is enclosed in curly braces. This is
+ * the case if the next token is the opening brace. If so, skip it and return
+ * a closing brace, otherwise return Term.
+ */
+{
+    if (Tok == TOK_LCURLY) {
+        NextTok ();
+        return TOK_RCURLY;
+    } else {
+        return Term;
+    }
 }
 
 

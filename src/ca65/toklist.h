@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -108,6 +108,12 @@ TokList* NewTokList (void);
 
 void FreeTokList (TokList* T);
 /* Delete the token list including all token nodes */
+
+enum Token GetTokListTerm (enum Token Term);
+/* Determine if the following token list is enclosed in curly braces. This is
+ * the case if the next token is the opening brace. If so, skip it and return
+ * a closing brace, otherwise return Term.
+ */
 
 void AddCurTok (TokList* T);
 /* Add the current token to the token list */

@@ -677,12 +677,7 @@ static void StartExpClassic (Macro* M)
 	}
 
         /* The macro may optionally be enclosed in curly braces */
-        if (Tok == TOK_LCURLY) {
-            NextTok ();
-            Term = TOK_RCURLY;
-        } else {
-            Term = TOK_COMMA;
-        }
+        Term = GetTokListTerm (TOK_COMMA);
 
        	/* Read tokens for one parameter, accept empty params */
 	Last = 0;
@@ -760,16 +755,10 @@ static void StartExpDefine (Macro* M)
     /* Read the actual parameters */
     while (Count--) {
 
-        enum Token Term;
        	TokNode*   Last;
 
         /* The macro may optionally be enclosed in curly braces */
-        if (Tok == TOK_LCURLY) {
-            NextTok ();
-            Term = TOK_RCURLY;
-        } else {
-            Term = TOK_COMMA;
-        }
+        enum Token Term = GetTokListTerm (TOK_COMMA);
 
        	/* Check if there is really a parameter */
        	if (TokIsSep (Tok) || Tok == Term) {

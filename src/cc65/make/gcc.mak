@@ -14,7 +14,7 @@ COMMON	= ../common
 
 # Default for the compiler lib search path as compiler define
 CDEFS=-DCC65_INC=\"/usr/lib/cc65/include/\"
-CFLAGS = -O2 -g -Wall -I$(COMMON) $(CDEFS)
+CFLAGS = -O2 -g -Wall -W -Wno-unused-parameter -I$(COMMON) $(CDEFS)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=

@@ -314,7 +314,7 @@ static void ExpandMacroArgs (Macro* M)
 static int MacroCall (Macro* M)
 /* Process a function like macro */
 {
-    unsigned  	ArgCount;      	/* Macro argument count */
+    int         ArgCount;      	/* Macro argument count */
     unsigned 	ParCount;       /* Number of open parenthesis */
     char     	Buf[LINESIZE];	/* Argument buffer */
     const char* ArgStart;
@@ -355,7 +355,7 @@ static int MacroCall (Macro* M)
     	      	if (ArgCount < M->ArgCount) {
     	      	    M->ActualArgs[ArgCount++] = ArgStart;
        	       	} else if (CurC != ')' || *ArgStart != '\0' || M->ArgCount > 0) {
- 	    	    /* Be sure not to count the single empty argument for a
+ 	       	    /* Be sure not to count the single empty argument for a
  	    	     * macro that does not have arguments.
  	    	     */
     	      	    ++ArgCount;

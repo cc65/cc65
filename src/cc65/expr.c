@@ -411,7 +411,7 @@ static int kcalc (int tok, long val1, long val2)
 
 
 
-static GenDesc* FindGen (int Tok, GenDesc** Table)
+static GenDesc* FindGen (token_t Tok, GenDesc** Table)
 {
     GenDesc* G;
     while ((G = *Table) != 0) {

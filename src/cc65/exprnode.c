@@ -92,7 +92,7 @@ void SetItem (ExprNode* N, void* Item, unsigned Index)
 {
     if (Index >= CollCount (&N->List)) {
 	/* Fill up with NULL pointers */
-       	while (Index >= CollCount (&N->List) < Index) {
+       	while (Index >= CollCount (&N->List)) {
 	    CollAppend (&N->List, 0);
 	}
 	/* Append the new item */

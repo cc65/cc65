@@ -673,7 +673,7 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	    case OP65_LDA:
 	        if (E->RI->In.RegA >= 0               && /* Value of A is known */
        		    CE_KnownImm (E)                   && /* Value to be loaded is known */
-       	       	    E->RI->In.RegA == E->Num          && /* Both are equal */
+       	       	    E->RI->In.RegA == (long) E->Num   && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
 		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
 		    Delete = 1;
@@ -683,7 +683,7 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	    case OP65_LDX:
        	        if (E->RI->In.RegX >= 0               && /* Value of X is known */
 		    CE_KnownImm (E)                   && /* Value to be loaded is known */
-		    E->RI->In.RegX == E->Num          && /* Both are equal */
+		    E->RI->In.RegX == (long) E->Num   && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
 		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
 		    Delete = 1;
@@ -693,7 +693,7 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	    case OP65_LDY:
        	        if (E->RI->In.RegY >= 0               && /* Value of Y is known */
 		    CE_KnownImm (E)                   && /* Value to be loaded is known */
-		    E->RI->In.RegY == E->Num          && /* Both are equal */
+		    E->RI->In.RegY == (long) E->Num   && /* Both are equal */
        	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
 		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
 		    Delete = 1;
@@ -900,11 +900,11 @@ unsigned OptTransfers (CodeSeg* S)
 			goto NextEntry;
 		    }
 		}
-    
+
 		/* Remove both transfers */
 		CS_DelEntry (S, I+1);
 		CS_DelEntry (S, I);
-    
+
 		/* Remember, we had changes */
 		++Changes;
 	    }

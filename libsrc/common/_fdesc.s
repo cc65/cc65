@@ -8,6 +8,7 @@
        	.export		__fdesc
 	.import		return0
 
+        .include        "stdio.inc"
         .include        "_file.inc"
 
 .proc   __fdesc

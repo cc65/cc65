@@ -576,11 +576,6 @@ int main (int argc, char* argv[])
 	AbEnd ("No input files");
     }
 
-    /* If we did not have a target system given, use the "none" target */
-    if (Target == TGT_UNKNOWN) {
-	Target = TGT_NONE;
-    }
-
     /* Open the input file */
     OpenMainFile (InputFile);
 

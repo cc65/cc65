@@ -55,65 +55,86 @@
 static int ParseChar (StrBuf* B)
 /* Parse a character. Converts \n into EOL, etc. */
 {
-    unsigned I;
+    unsigned I;       
+    unsigned Val;
     int C;
 
     /* Check for escape chars */
     if ((C = SB_Get (B)) == '\\') {
-	switch (SB_Get (B)) {
+       	switch (SB_Peek (B)) {
+       	    case '?':
+		C = '?';
+                SB_Skip (B);
+		break;
 	    case 'a':
 	       	C = '\a';
+                SB_Skip (B);
 	    	break;
 	    case 'b':
 	       	C = '\b';
+                SB_Skip (B);
 	    	break;
      	    case 'f':
 	    	C = '\f';
+                SB_Skip (B);
 	    	break;
 	    case 'r':
 	    	C = '\r';
+                SB_Skip (B);
 	    	break;
 	    case 'n':
 	    	C = '\n';
+                SB_Skip (B);
 	    	break;
 	    case 't':
 	    	C = '\t';
+                SB_Skip (B);
 	    	break;
 	    case 'v':
 	    	C = '\v';
+                SB_Skip (B);
 	    	break;
 	    case '\"':
 	    	C = '\"';
+                SB_Skip (B);
 	    	break;
 	    case '\'':
 	    	C = '\'';
+                SB_Skip (B);
 	    	break;
 	    case '\\':
 		C = '\\';
-		break;
-	    case '\?':
-		C = '\?';
+                SB_Skip (B);
 		break;
 	    case 'x':
 	    case 'X':
 		/* Hex character constant */
+                SB_Skip (B);
        	       	C = HexVal (SB_Get (B)) << 4;
        	       	C |= HexVal (SB_Get (B));
 	   	break;
 	    case '0':
-	   	/* Octal constant */
-                C = 0;
-                goto Octal;
 	    case '1':
+            case '2':
+            case '3':
+            case '4':
+            case '5':
+            case '6':
+            case '7':
                 /* Octal constant */
-                C = 1;
-Octal:          I = 0;
-       	       	while (SB_Peek (B) >= '0' && SB_Peek (B) <= '7' && I++ < 4) {
-                    C = (C << 3) | (SB_Get (B) - '0');
+                I = 0;
+                Val = SB_Get (B) - '0';
+       	       	while (SB_Peek (B) >= '0' && SB_Peek (B) <= '7' && ++I <= 3) {
+                    Val = (Val << 3) | (SB_Get (B) - '0');
      	   	}
+                C = (int) Val;
+                if (Val > 256) {
+                    Error ("Character constant out of range");
+                    C = ' ';
+                }
      	       	break;
      	    default:
-     	    	Error ("Illegal character constant");
+     	    	Error ("Illegal character constant 0x%02X", SB_Get (B));
 	   	C = ' ';
 	   	break;
      	}

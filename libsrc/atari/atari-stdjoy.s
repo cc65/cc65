@@ -32,16 +32,17 @@
         .byte   $04                     ; JOY_LEFT
         .byte   $08                     ; JOY_RIGHT
         .byte   $10                     ; JOY_FIRE
-        .byte   $00                     ; Future expansion
+        .byte   $00                     ; JOY_FIRE2 not available
         .byte   $00                     ; Future expansion
         .byte   $00                     ; Future expansion
 
 ; Jump table.
 
-        .word   INSTALL
-        .word   UNINSTALL
-        .word   COUNT
-        .word   READJOY
+        .addr   INSTALL
+        .addr   UNINSTALL
+        .addr   COUNT
+        .addr   READJOY
+        .addr   0                       ; IRQ entry not used
 
 ; ------------------------------------------------------------------------
 ; Constants

@@ -136,14 +136,10 @@ void __fastcall__ tgi_setpalette (const unsigned char* palette);
  */
 
 const unsigned char* __fastcall__ tgi_getpalette (void);
-/* Return the current palette. Will return NULL for drivers that do not
- * support palettes.
- */
+/* Return the current palette. */
 
 const unsigned char* __fastcall__ tgi_getdefpalette (void);
-/* Return the default palette. Will return NULL for drivers that do not
- * support palettes.
- */
+/* Return the default palette. */
 
 unsigned __fastcall__ tgi_getxres (void);
 /* Return the resolution in X direction. */

@@ -629,6 +629,7 @@ static void Usage (void)
              "  --code-label name\tDefine and export a CODE segment label\n"
        	     "  --code-name seg\tSet the name of the CODE segment\n"
 	     "  --codesize x\t\tAccept larger code by factor x\n"
+       	     "  --config name\t\tUse linker config file\n"
        	     "  --cpu type\t\tSet cpu type\n"
 	     "  --create-dep\t\tCreate a make dependency file\n"
              "  --data-label name\tDefine and export a DATA segment label\n"
@@ -753,6 +754,17 @@ static void OptCodeSize (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --codesize option */
 {
     CmdAddArg2 (&CC65, "--codesize", Arg);
+}
+
+
+
+static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
+/* Config file (linker) */
+{
+    if (LinkerConfig) {
+        Error ("Cannot specify -C/--config twice");
+    }
+    LinkerConfig = Arg;
 }
 
 
@@ -1010,7 +1022,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
  	     VER_MAJOR, VER_MINOR, VER_PATCH);
 }
 
-
+        
 
 static void OptZeropageLabel (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --zeropage-label option */
@@ -1044,6 +1056,7 @@ int main (int argc, char* argv [])
        	{ "--code-label",      	1,     	OptCodeLabel            },
 	{ "--code-name", 	1, 	OptCodeName  		},
 	{ "--codesize",	 	1,	OptCodeSize		},
+        { "--config",           1,      OptConfig               },
         { "--cpu",     	       	1, 	OptCPU 			},
 	{ "--create-dep",    	0,	OptCreateDep 		},
        	{ "--data-label",      	1,     	OptDataLabel            },
@@ -1118,7 +1131,7 @@ int main (int argc, char* argv [])
 			OptStaticLocals (Arg, 0);
 		    } else {
 		     	/* Specify linker config file */
-		     	LinkerConfig = GetArg (&I, 2);
+		     	OptConfig (Arg, GetArg (&I, 2));
 		    }
 	     	    break;
 

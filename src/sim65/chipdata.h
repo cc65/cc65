@@ -46,7 +46,7 @@
 
 /* Version information. */
 #define CHIPDATA_VER_MAJOR      1U
-#define CHIPDATA_VER_MINOR      0U 
+#define CHIPDATA_VER_MINOR      0U
 
 /* Forwards */
 struct SimData;
@@ -59,7 +59,8 @@ struct ChipData {
     unsigned    MinorVersion;
 
     /* -- Exported functions -- */
-    void*         (*Init) (const struct SimData* Data, unsigned Addr, unsigned Range);
+    int           (*InitChip) (const struct SimData* Data);
+    void*         (*InitInstance) (unsigned Addr, unsigned Range);
     void          (*WriteCtrl) (void* Data, unsigned Addr, unsigned char Val);
     void          (*Write) (void* Data, unsigned Addr, unsigned char Val);
     unsigned char (*ReadCtrl) (void* Data, unsigned Addr);

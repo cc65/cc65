@@ -57,6 +57,15 @@
 /* Sorted list of all chip data structures */
 static Collection Chips = STATIC_COLLECTION_INITIALIZER;
 
+/* SimData instance */
+static const SimData Sim65Data = {
+    1, 		    	/* MajorVersion */
+    1, 		    	/* MinorVersion */
+    xmalloc,            /* void* (*Malloc) (size_t Size); */
+    Warning,		/* void (*Warning) (const char* Format, ...); */
+    Error		/* void (*Error) (const char* Format, ...); */
+};
+
 
 
 /*****************************************************************************/
@@ -101,14 +110,14 @@ static Chip* NewChip (ChipLibrary* Library, const ChipData* Data)
 }
 
 
-                             
+
 #if 0
 static void FreeChip (Chip* C)
 /* ## Free the given chip structure */
 {
     /* Free the structure itself */
     xfree (C);
-}    
+}
 #endif
 
 

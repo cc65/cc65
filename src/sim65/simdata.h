@@ -49,10 +49,12 @@ typedef struct SimData SimData;
 struct SimData {
     unsigned	MajorVersion;
     unsigned	MinorVersion;
-};
 
-/* SimData instance */
-extern const SimData Sim65Data;
+    /* -- Callback functions -- */
+    void* (*Malloc) (size_t Size);
+    void (*Warning) (const char* Format, ...);
+    void (*Error) (const char* Format, ...);
+};
 
 
 

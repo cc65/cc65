@@ -18,8 +18,7 @@ OBJS = 	chip.o          \
         error.o         \
 	global.o      	\
 	main.o          \
-        memory.o      	\
-        simdata.o
+        memory.o
 
 LIBS = $(COMMON)/common.a
 
@@ -31,7 +30,7 @@ all:	$(EXECS) chips
 include .depend
 else
 all:	depend
- 	@$(MAKE) -f make/gcc.mak all
+	@$(MAKE) -f make/gcc.mak all
 endif
 
 
@@ -45,9 +44,11 @@ chips:
 
 
 clean:
+	@$(MAKE) -C chips -f make/gcc.mak clean
 	rm -f *~ core *.lst
 
 zap:  	clean
+	@$(MAKE) -C chips -f make/gcc.mak zap
 	rm -f *.o $(EXECS) .depend
 
 # ------------------------------------------------------------------------------

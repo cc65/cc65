@@ -196,6 +196,106 @@ static int IsEasyConst (const ExprNode* E, long* Val)
 
 
 
+static ExprNode* LoByte (ExprNode* Operand)
+/* Return the low byte of the given expression */
+{
+    ExprNode* Expr;       
+    long      Val;
+
+    /* Special handling for const expressions */
+    if (IsEasyConst (Operand, &Val)) {
+        FreeExpr (Operand);
+        Expr = GenLiteralExpr (Val & 0xFF);
+    } else {
+        /* Extract byte #0 */
+        Expr = NewExprNode (EXPR_BYTE0);
+        Expr->Left = Operand;
+    }
+    return Expr;
+}
+
+
+
+static ExprNode* HiByte (ExprNode* Operand)
+/* Return the high byte of the given expression */
+{
+    ExprNode* Expr;
+    long      Val;
+
+    /* Special handling for const expressions */
+    if (IsEasyConst (Operand, &Val)) {
+        FreeExpr (Operand);
+        Expr = GenLiteralExpr ((Val >> 8) & 0xFF);
+    } else {
+        /* Extract byte #1 */
+        Expr = NewExprNode (EXPR_BYTE1);
+        Expr->Left = Operand;
+    }
+    return Expr;
+}
+
+
+
+static ExprNode* BankByte (ExprNode* Operand)
+/* Return the bank byte of the given expression */
+{
+    ExprNode* Expr;
+    long      Val;
+
+    /* Special handling for const expressions */
+    if (IsEasyConst (Operand, &Val)) {
+        FreeExpr (Operand);
+        Expr = GenLiteralExpr ((Val >> 16) & 0xFF);
+    } else {
+        /* Extract byte #2 */
+        Expr = NewExprNode (EXPR_BYTE2);
+        Expr->Left = Operand;
+    }
+    return Expr;
+}
+
+
+
+static ExprNode* LoWord (ExprNode* Operand)
+/* Return the low word of the given expression */
+{
+    ExprNode* Expr;
+    long      Val;
+
+    /* Special handling for const expressions */
+    if (IsEasyConst (Operand, &Val)) {
+        FreeExpr (Operand);
+        Expr = GenLiteralExpr (Val & 0xFFFF);
+    } else {
+        /* Extract word #0 */
+        Expr = NewExprNode (EXPR_WORD0);
+        Expr->Left = Operand;
+    }
+    return Expr;
+}
+
+
+
+static ExprNode* HiWord (ExprNode* Operand)
+/* Return the high word of the given expression */
+{
+    ExprNode* Expr;
+    long      Val;
+
+    /* Special handling for const expressions */
+    if (IsEasyConst (Operand, &Val)) {
+        FreeExpr (Operand);
+        Expr = GenLiteralExpr ((Val >> 16) & 0xFFFF);
+    } else {
+        /* Extract word #1 */
+        Expr = NewExprNode (EXPR_WORD1);
+        Expr->Left = Operand;
+    }
+    return Expr;
+}
+
+
+
 static ExprNode* Symbol (SymEntry* S)
 /* Reference a symbol and return an expression for it */
 {
@@ -208,6 +308,14 @@ static ExprNode* Symbol (SymEntry* S)
         /* Create symbol node */
         return GenSymExpr (S);
     }
+}
+
+
+
+static ExprNode* FuncBankByte (void)
+/* Handle the .BANKBYTE builtin function */
+{
+    return BankByte (Expression ());
 }
 
 
@@ -270,6 +378,38 @@ static ExprNode* FuncDefined (void)
 
     /* Check if the symbol is defined */
     return GenLiteralExpr (Sym != 0 && SymIsDef (Sym));
+}
+
+
+
+static ExprNode* FuncHiByte (void)
+/* Handle the .HIBYTE builtin function */
+{
+    return HiByte (Expression ());
+}
+
+
+
+static ExprNode* FuncHiWord (void)
+/* Handle the .HIWORD builtin function */
+{
+    return HiWord (Expression ());
+}
+
+
+
+static ExprNode* FuncLoByte (void)
+/* Handle the .LOBYTE builtin function */
+{
+    return LoByte (Expression ());
+}
+
+
+
+static ExprNode* FuncLoWord (void)
+/* Handle the .LOWORD builtin function */
+{
+    return LoWord (Expression ());
 }
 
 
@@ -687,38 +827,17 @@ static ExprNode* Factor (void)
 
 	case TOK_LT:
 	    NextTok ();
-            L = Factor ();
-            if (IsEasyConst (L, &Val)) {
-                FreeExpr (L);
-                N = GenLiteralExpr (Val & 0xFF);
-            } else {
-                N = NewExprNode (EXPR_BYTE0);
-                N->Left = L;
-            }
+            N = LoByte (Factor ());
 	    break;
 
 	case TOK_GT:
 	    NextTok ();
-            L = Factor ();
-            if (IsEasyConst (L, &Val)) {
-                FreeExpr (L);
-                N = GenLiteralExpr ((Val >> 8) & 0xFF);
-            } else {
-                N = NewExprNode (EXPR_BYTE1);
-                N->Left = L;
-            }
+            N = HiByte (Factor ());
 	    break;
 
         case TOK_BANK:
             NextTok ();
-            L = Factor ();
-            if (IsEasyConst (L, &Val)) {
-                FreeExpr (L);
-                N = GenLiteralExpr ((Val >> 16) & 0xFF);
-            } else {
-                N = NewExprNode (EXPR_BYTE2);
-                N->Left = L;
-            }
+            N = BankByte (Factor ());
             break;
 
 	case TOK_LPAREN:
@@ -726,6 +845,10 @@ static ExprNode* Factor (void)
 	    N = Expr0 ();
        	    ConsumeRParen ();
 	    break;
+
+        case TOK_BANKBYTE:
+            N = Function (FuncBankByte);
+            break;
 
         case TOK_BLANK:
 	    N = Function (FuncBlank);
@@ -743,6 +866,22 @@ static ExprNode* Factor (void)
         case TOK_DEFINED:
 	    N = Function (FuncDefined);
 	    break;
+
+        case TOK_HIBYTE:
+            N = Function (FuncHiByte);
+            break;
+
+        case TOK_HIWORD:
+            N = Function (FuncHiWord);
+            break;
+
+        case TOK_LOBYTE:
+            N = Function (FuncLoByte);
+            break;
+
+        case TOK_LOWORD:
+            N = Function (FuncLoWord);
+            break;
 
 	case TOK_MATCH:
 	    N = Function (FuncMatch);

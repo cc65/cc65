@@ -126,6 +126,7 @@ struct DotKeyword {
     { ".ASCIIZ",       	TOK_ASCIIZ	},
     { ".ASSERT",        TOK_ASSERT      },
     { ".AUTOIMPORT", 	TOK_AUTOIMPORT	},
+    { ".BANKBYTE",      TOK_BANKBYTE    },
     { ".BITAND",	TOK_AND		},
     { ".BITNOT",	TOK_NOT		},
     { ".BITOR",	    	TOK_OR		},
@@ -178,6 +179,8 @@ struct DotKeyword {
     { ".FORCEWORD",	TOK_FORCEWORD	},
     { ".GLOBAL",	TOK_GLOBAL	},
     { ".GLOBALZP",	TOK_GLOBALZP	},
+    { ".HIBYTE",        TOK_HIBYTE      },
+    { ".HIWORD",        TOK_HIWORD      },
     { ".I16",   	TOK_I16		},
     { ".I8",    	TOK_I8		},
     { ".IF",    	TOK_IF		},
@@ -201,8 +204,10 @@ struct DotKeyword {
     { ".LINECONT",	TOK_LINECONT	},
     { ".LIST",		TOK_LIST	},
     { ".LISTBYTES",	TOK_LISTBYTES	},
+    { ".LOBYTE",        TOK_LOBYTE      },
     { ".LOCAL",		TOK_LOCAL	},
     { ".LOCALCHAR",	TOK_LOCALCHAR	},
+    { ".LOWORD",        TOK_LOWORD      },
     { ".MAC",  		TOK_MACRO	},
     { ".MACPACK",	TOK_MACPACK	},
     { ".MACRO",	  	TOK_MACRO	},
@@ -1127,7 +1132,7 @@ int GetSubKey (const char** Keys, unsigned Count)
     if (!IgnoreCase) {
     	UpcaseSVal ();
     }
-                         
+
     /* Do a linear search (a binary search is not worth the effort) */
     for (I = 0; I < Count; ++I) {
 	if (strcmp (SVal, Keys [I]) == 0) {

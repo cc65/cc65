@@ -1626,6 +1626,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,       	DoASCIIZ	},
     { ccNone,           DoAssert        },
     { ccNone,       	DoAutoImport	},
+    { ccNone,        	DoUnexpected	},	/* .BANKBYTE */
     { ccNone,        	DoUnexpected	},	/* .BLANK */
     { ccNone,       	DoBss		},
     { ccNone,       	DoByte		},
@@ -1668,6 +1669,8 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoUnexpected	},	/* .FORCEWORD */
     { ccNone,		DoGlobal	},
     { ccNone,		DoGlobalZP	},
+    { ccNone,        	DoUnexpected	},	/* .HIBYTE */
+    { ccNone,        	DoUnexpected	},	/* .HIWORD */
     { ccNone,		DoI16	  	},
     { ccNone,		DoI8	  	},
     { ccKeepToken,	DoConditionals	},	/* .IF */
@@ -1691,8 +1694,10 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoLineCont	},
     { ccNone,		DoList		},
     { ccNone,  	       	DoListBytes	},
+    { ccNone,        	DoUnexpected	},	/* .LOBYTE */
     { ccNone,		DoUnexpected	},	/* .LOCAL */
     { ccNone,		DoLocalChar	},
+    { ccNone,        	DoUnexpected	},	/* .LOWORD */
     { ccNone,		DoMacPack	},
     { ccNone,		DoMacro		},
     { ccNone,  	       	DoUnexpected	},	/* .MATCH */

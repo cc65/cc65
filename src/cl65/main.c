@@ -830,10 +830,11 @@ static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
-static void OptForgetIncPaths (const char* Opt attribute ((unused)), const char* Arg)
+static void OptForgetIncPaths (const char* Opt attribute ((unused)), 
+                               const char* Arg attribute ((unused)))
 /* Forget all currently defined include paths */
 {
-    CmdAddArg2 (&CC65, "--forget-inc-paths", Arg);
+    CmdAddArg (&CC65, "--forget-inc-paths");
 }
 
 

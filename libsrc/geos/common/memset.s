@@ -34,8 +34,12 @@ _memset:
 	    sta r2L
 common:	    jsr popax
 	    sta r1L
+	    pha
 	    stx r1H
+	    txa
+	    pha
 	    jsr FillRam
-	    lda	r1L		; restore ptr and pass as result
-	    ldx r1H
+	    pla			; restore ptr and return it
+	    tax
+	    pla
 	    rts

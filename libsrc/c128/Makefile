@@ -28,12 +28,14 @@
 
 OBJS =	_scrsize.o		\
 	break.o	       		\
+	c64mode.o		\
      	cgetc.o	       		\
        	clrscr.o       		\
       	conio.o	       		\
      	crt0.o	       		\
        	color.o	       		\
      	cputc.o	       		\
+	fast.o			\
         get_tv.o        	\
 	joy_stddrv.o		\
      	kbhit.o	       		\
@@ -42,6 +44,7 @@ OBJS =	_scrsize.o		\
         randomize.o     	\
         revers.o        	\
 	rs232.o			\
+	slow.o			\
 	tgi_mode_table.o	\
 	toggle_videomode.o
 

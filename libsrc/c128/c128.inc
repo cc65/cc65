@@ -47,7 +47,8 @@ KBDREAD		= $C006
 NEWLINE		= $C363
 PRINT		= $C322
 
-; Extended jump table
+; Extended jump table  
+C64MODE		= $FF4D
 SWAPPER		= $FF5F
 SETBNK          = $FF68
 

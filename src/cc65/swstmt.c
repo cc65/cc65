@@ -69,6 +69,8 @@ void SwitchStatement (void)
     ExprDesc CaseExpr;          /* Case label expression */
     type SwitchExprType;        /* Basic switch expression type */
     CodeMark CaseCodeStart;     /* Start of code marker */
+    CodeMark SwitchCodeStart;   /* Start of switch code */
+    CodeMark SwitchCodeEnd;     /* End of switch code */
     unsigned Depth;             /* Number of bytes the selector type has */
     unsigned ExitLabel;	       	/* Exit label */
     unsigned CaseLabel;         /* Label for case */
@@ -91,7 +93,6 @@ void SwitchStatement (void)
      	/* To avoid any compiler errors, make the expression a valid int */
      	ED_MakeConstAbsInt (&SwitchExpr, 1);
     }
-    /* Load the expression into the primary register */
     ConsumeRParen ();
 
     /* Add a jump to the switch code. This jump is usually unnecessary,
@@ -119,7 +120,7 @@ void SwitchStatement (void)
 
     /* Get the number of bytes the selector type has */
     Depth = SizeOf (SwitchExpr.Type);
-    CHECK (Depth == 1 || Depth == 2 || Depth == 4);
+    CHECK (Depth == SIZEOF_CHAR || Depth == SIZEOF_INT || Depth == SIZEOF_LONG);
 
     /* Get the exit label for the switch statement */
     ExitLabel = GetLocalLabel ();
@@ -230,35 +231,31 @@ void SwitchStatement (void)
 
 	Warning ("No case labels");
 
-    } else {
-
-        CodeMark SwitchCodeStart, SwitchCodeEnd;
-
-        /* If the last statement did not have a break, we may have an open
-         * label (maybe from an if or similar). Emitting code and then moving
-         * this code to the top will also move the label to the top which is
-         * wrong. So if the last statement did not have a break (which would
-         * carry the label), add a jump to the exit. If it is useless, the
-         * optimizer will remove it later.
-         */
-        if (!HaveBreak) {
-            g_jump (ExitLabel);
-        }
-
-	/* Remember the current position */
-	GetCodePos (&SwitchCodeStart);
-
-        /* Output the switch code label */
-        g_defcodelabel (SwitchCodeLabel);
-
-	/* Generate code */
-       	g_switch (Nodes, DefaultLabel? DefaultLabel : ExitLabel, Depth);
-
-	/* Move the code to the front */
-        GetCodePos (&SwitchCodeEnd);
-	MoveCode (&SwitchCodeStart, &SwitchCodeEnd, &CaseCodeStart);
-
     }
+
+    /* If the last statement did not have a break, we may have an open
+     * label (maybe from an if or similar). Emitting code and then moving
+     * this code to the top will also move the label to the top which is
+     * wrong. So if the last statement did not have a break (which would
+     * carry the label), add a jump to the exit. If it is useless, the
+     * optimizer will remove it later.
+     */
+    if (!HaveBreak) {
+        g_jump (ExitLabel);
+    }
+
+    /* Remember the current position */
+    GetCodePos (&SwitchCodeStart);
+
+    /* Output the switch code label */
+    g_defcodelabel (SwitchCodeLabel);
+
+    /* Generate code */
+    g_switch (Nodes, DefaultLabel? DefaultLabel : ExitLabel, Depth);
+
+    /* Move the code to the front */
+    GetCodePos (&SwitchCodeEnd);
+    MoveCode (&SwitchCodeStart, &SwitchCodeEnd, &CaseCodeStart);
 
     /* Define the exit label */
     g_defcodelabel (ExitLabel);

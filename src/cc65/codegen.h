@@ -206,7 +206,7 @@ void g_scale (unsigned flags, long val);
 void g_enter (unsigned flags, unsigned argsize);
 /* Function prologue */
 
-void g_leave (int flags, int val);
+void g_leave (void);
 /* Function epilogue */
 
 

@@ -58,17 +58,17 @@ static const OPCDesc OPCTable[OPC_COUNT] = {
     { OPC_ADC, "adc", 0, REG_A,	   REG_A,    OF_NONE	},
     { OPC_AND, "and", 0, REG_A,    REG_A,    OF_NONE	},
     { OPC_ASL, "asl", 0, REG_A,    REG_A,    OF_NONE	},
-    { OPC_BCC, "bcc", 2, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_BCS, "bcs", 2, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_BEQ, "beq", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_BCC, "bcc", 2, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_BCS, "bcs", 2, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_BEQ, "beq", 2, REG_NONE, REG_NONE, OF_CBRA	},
     { OPC_BIT, "bit", 0, REG_A,    REG_NONE, OF_NONE	},
-    { OPC_BMI, "bmi", 2, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_BNE, "bne", 2, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_BPL, "bpl", 2, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_BRA, "bra", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_BMI, "bmi", 2, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_BNE, "bne", 2, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_BPL, "bpl", 2, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_BRA, "bra", 2, REG_NONE, REG_NONE, OF_UBRA	},
     { OPC_BRK, "brk", 1, REG_NONE, REG_NONE, OF_NONE	},
-    { OPC_BVC, "bvc", 2, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_BVS, "bvs", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_BVC, "bvc", 2, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_BVS, "bvs", 2, REG_NONE, REG_NONE, OF_CBRA	},
     { OPC_CLC, "clc", 1, REG_NONE, REG_NONE, OF_NONE	},
     { OPC_CLD, "cld", 1, REG_NONE, REG_NONE, OF_NONE	},
     { OPC_CLI, "cli", 1, REG_NONE, REG_NONE, OF_NONE	},
@@ -85,16 +85,16 @@ static const OPCDesc OPCTable[OPC_COUNT] = {
     { OPC_INC, "inc", 0, REG_NONE, REG_NONE, OF_NONE	},
     { OPC_INX, "inx", 1, REG_X,    REG_X,    OF_NONE	},
     { OPC_INY, "iny", 1, REG_Y,    REG_Y,    OF_NONE	},
-    { OPC_JCC, "jcc", 5, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_JCS, "jcs", 5, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_JEQ, "jeq", 5, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_JMI, "jmi", 5, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_JMP, "jmp", 3, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_JNE, "jne", 5, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_JPL, "jpl", 5, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_JCC, "jcc", 5, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_JCS, "jcs", 5, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_JEQ, "jeq", 5, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_JMI, "jmi", 5, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_JMP, "jmp", 3, REG_NONE, REG_NONE, OF_UBRA   	},
+    { OPC_JNE, "jne", 5, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_JPL, "jpl", 5, REG_NONE, REG_NONE, OF_CBRA	},
     { OPC_JSR, "jsr", 3, REG_NONE, REG_NONE, OF_NONE	},
-    { OPC_JVC, "jvc", 5, REG_NONE, REG_NONE, OF_BRA	},
-    { OPC_JVS, "jvs", 5, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_JVC, "jvc", 5, REG_NONE, REG_NONE, OF_CBRA	},
+    { OPC_JVS, "jvs", 5, REG_NONE, REG_NONE, OF_CBRA	},
     { OPC_LDA, "lda", 0, REG_NONE, REG_A,    OF_NONE	},
     { OPC_LDX, "ldx", 0, REG_NONE, REG_X,    OF_NONE	},
     { OPC_LDY, "ldy", 0, REG_NONE, REG_Y,    OF_NONE	},
@@ -111,8 +111,8 @@ static const OPCDesc OPCTable[OPC_COUNT] = {
     { OPC_PLY, "ply", 1, REG_NONE, REG_Y,    OF_NONE	},
     { OPC_ROL, "rol", 0, REG_A,    REG_A,    OF_NONE	},
     { OPC_ROR, "ror", 0, REG_A,    REG_A,    OF_NONE	},
-    { OPC_RTI, "rti", 1, REG_NONE, REG_NONE, OF_NONE	},
-    { OPC_RTS, "rts", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_RTI, "rti", 1, REG_NONE, REG_NONE, OF_RET   	},
+    { OPC_RTS, "rts", 1, REG_NONE, REG_NONE, OF_RET   	},
     { OPC_SBC, "sbc", 0, REG_A,    REG_A,    OF_NONE	},
     { OPC_SEC, "sec", 1, REG_NONE, REG_NONE, OF_NONE	},
     { OPC_SED, "sed", 1, REG_NONE, REG_NONE, OF_NONE	},
@@ -214,6 +214,18 @@ const OPCDesc* GetOPCDesc (opc_t OPC)
 
 
 
+unsigned char GetOPCInfo (opc_t OPC)
+/* Get opcode information */
+{
+    /* Check the range */
+    PRECONDITION (OPC >= (opc_t)0 && OPC < OPC_COUNT);
+
+    /* Return the info */
+    return OPCTable[OPC].Info;
+}
+
+
+
 unsigned char GetAMUseInfo (am_t AM)
 /* Get usage info for the given addressing mode (addressing modes that use
  * index registers return REG_r info for these registers).
@@ -234,7 +246,7 @@ unsigned char GetAMUseInfo (am_t AM)
 
 
 opc_t GetInverseBranch (opc_t OPC)
-/* Return a brahcn that reverse the condition of the branch given in OPC */
+/* Return a branch that reverse the condition of the branch given in OPC */
 {
     switch (OPC) {
 	case OPC_BCC:	return OPC_BCS;

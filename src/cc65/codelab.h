@@ -95,6 +95,11 @@ void AddLabelRef (CodeLabel* L, struct CodeEntry* E);
 unsigned RemoveLabelRef (CodeLabel* L, const struct CodeEntry* E);
 /* Remove a reference to this label, return the number of remaining references */
 
+void MoveLabelRefs (CodeLabel* OldLabel, CodeLabel* NewLabel);
+/* Move all references to OldLabel to point to NewLabel. OldLabel will have no
+ * more references on return.
+ */
+
 void OutputCodeLabel (const CodeLabel* L, FILE* F);
 /* Output the code label to a file */
 

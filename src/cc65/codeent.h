@@ -69,6 +69,7 @@ struct CodeEntry {
     char*      	       	Arg;   	       	/* Argument as string */
     unsigned    	Num;		/* Numeric argument */
     unsigned short  	Flags;		/* Flags */
+    unsigned char	Info;		/* Additional code info */
     unsigned char	Use;		/* Registers used */
     unsigned char	Chg;		/* Registers changed/destroyed */
     CodeLabel*	  	JumpTo;		/* Jump label */
@@ -91,6 +92,21 @@ void FreeCodeEntry (CodeEntry* E);
 
 int CodeEntryHasLabel (const CodeEntry* E);
 /* Check if the given code entry has labels attached */
+
+int CodeEntryHasMark (const CodeEntry* E);
+/* Return true if the given code entry has the CEF_USERMARK flag set */
+
+void CodeEntrySetMark (CodeEntry* E);
+/* Set the CEF_USERMARK flag for the given entry */
+
+void CodeEntryResetMark (CodeEntry* E);
+/* Reset the CEF_USERMARK flag for the given entry */
+
+CodeLabel* GetCodeLabel (CodeEntry* E, unsigned Index);
+/* Get a label from this code entry */
+
+void MoveCodeLabel (CodeLabel* L, CodeEntry* E);
+/* Move the code label L from it's former owner to the code entry E. */
 
 void OutputCodeEntry (const CodeEntry* E, FILE* F);
 /* Output the code entry to a file */

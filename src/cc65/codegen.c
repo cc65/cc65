@@ -396,77 +396,41 @@ void g_enter (unsigned flags, unsigned argsize)
 
 
 
-void g_leave (int flags, int val)
+void g_leave (void)
 /* Function epilogue */
 {
-    int k;
-    char buf [40];
-
-    /* CF_REG is set if we're returning a value from the function */
-    if ((flags & CF_REG) == 0) {
-	AddCodeHint ("x:-");
-	AddCodeHint ("a:-");
-    }
-
     /* How many bytes of locals do we have to drop? */
-    k = -oursp;
+    int k = -oursp;
 
     /* If we didn't have a variable argument list, don't call leave */
     if (funcargs >= 0) {
 
-     	/* Load a function return code if needed */
-     	if ((flags & CF_CONST) != 0) {
-     	    g_getimmed (flags, val, 0);
-     	}
-
-     	/* Drop stackframe or leave with rts */
+     	/* Drop stackframe if needed */
      	k += funcargs;
-     	if (k == 0) {
-	    AddCodeHint ("y:-");	/* Y register no longer used */
-     	    AddCodeLine ("rts");
-     	} else if (k <= 8) {
-	    AddCodeHint ("y:-");	/* Y register no longer used */
-     	    AddCodeLine ("jmp incsp%d", k);
-     	} else {
-     	    CheckLocalOffs (k);
-     	    ldyconst (k);
-     	    AddCodeLine ("jmp addysp");
+       	if (k > 0) {
+	    if (k <= 8) {
+     	    AddCodeLine ("jsr incsp%d", k);
+	    } else {
+		CheckLocalOffs (k);
+		ldyconst (k);
+		AddCodeLine ("jsr addysp");
+	    }
      	}
 
     } else {
 
-     	strcpy (buf, "\tjmp\tleave");
-     	if (k) {
+     	if (k == 0) {
+	    /* Nothing to drop */
+	    AddCodeLine ("jsr leave");
+	} else {
      	    /* We've a stack frame to drop */
      	    ldyconst (k);
-     	    strcat (buf, "y");
-     	} else {
-	    /* Y register no longer used */
-	    AddCodeHint ("y:-");
+     	    AddCodeLine ("jsr leavey");
 	}
-     	if (flags & CF_CONST) {
-     	    if ((flags & CF_TYPE) != CF_LONG) {
-     	   	/* Constant int sized value given for return code */
-     	   	if (val == 0) {
-     	   	    /* Special case: return 0 */
-     	   	    strcat (buf, "00");
-       	       	} else if (((val >> 8) & 0xFF) == 0) {
-     	   	    /* Special case: constant with high byte zero */
-     	   	    ldaconst (val);    		/* Load low byte */
-     		    strcat (buf, "0");
-     		} else {
-     		    /* Others: arbitrary constant value */
-     		    g_getimmed (flags, val, 0);	/* Load value */
-     		}
-     	    } else {
-     		/* Constant long value: No shortcut possible */
-     		g_getimmed (flags, val, 0);
-     	    }
-     	}
-
-     	/* Output the jump */
-     	AddCodeLine (buf);
     }
+
+    /* Add the final rts */
+    AddCodeLine ("rts");
 }
 
 

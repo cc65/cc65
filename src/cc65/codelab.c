@@ -34,6 +34,7 @@
 
 
 /* common */
+#include "check.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -103,6 +104,30 @@ unsigned RemoveLabelRef (CodeLabel* L, const struct CodeEntry* E)
 
     /* Return the number of remaining references */
     return CollCount (&L->JumpFrom);
+}
+
+
+
+void MoveLabelRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
+/* Move all references to OldLabel to point to NewLabel. OldLabel will have no
+ * more references on return.
+ */
+{
+    /* Walk through all instructions referencing the old label */
+    unsigned Count = CollCount (&OldLabel->JumpFrom);
+    while (Count--) {
+
+	/* Get the instruction that references the old label */
+	CodeEntry* E = CollAt (&OldLabel->JumpFrom, Count);
+
+	/* Change the reference to the new label */
+	CHECK (E->JumpTo == OldLabel);
+	AddLabelRef (NewLabel, E);
+
+    }
+
+    /* There are no more references to the old label */
+    CollDeleteAll (&OldLabel->JumpFrom);
 }
 
 

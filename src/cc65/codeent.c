@@ -73,6 +73,7 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* 
     E->Arg  	= (Arg && Arg[0] != '\0')? xstrdup (Arg) : 0;
     E->Num  	= 0;
     E->Flags	= 0;
+    E->Info	= D->Info;
     E->Use	= D->Use;
     E->Chg	= D->Chg;
     if (E->OPC == OPC_JSR && E->Arg) {
@@ -115,6 +116,51 @@ int CodeEntryHasLabel (const CodeEntry* E)
 /* Check if the given code entry has labels attached */
 {
     return (CollCount (&E->Labels) > 0);
+}
+
+
+
+int CodeEntryHasMark (const CodeEntry* E)
+/* Return true if the given code entry has the CEF_USERMARK flag set */
+{
+    return (E->Flags & CEF_USERMARK) != 0;
+}
+
+
+
+void CodeEntrySetMark (CodeEntry* E)
+/* Set the CEF_USERMARK flag for the given entry */
+{
+    E->Flags |= CEF_USERMARK;
+}
+
+
+
+void CodeEntryResetMark (CodeEntry* E)
+/* Reset the CEF_USERMARK flag for the given entry */
+{
+    E->Flags &= ~CEF_USERMARK;
+}
+
+
+
+CodeLabel* GetCodeLabel (CodeEntry* E, unsigned Index)
+/* Get a label from this code entry */
+{
+    return CollAt (&E->Labels, Index);
+}
+
+
+
+void MoveCodeLabel (CodeLabel* L, CodeEntry* E)
+/* Move the code label L from it's former owner to the code entry E. */
+{
+    /* Delete the label from the owner */
+    CollDeleteItem (&L->Owner->Labels, L);
+
+    /* Set the new owner */
+    CollAppend (&E->Labels, L);
+    L->Owner = E;
 }
 
 

@@ -52,6 +52,16 @@
 
 
 /*****************************************************************************/
+/*				   Forwards				     */
+/*****************************************************************************/
+
+
+
+struct CodeEntry;
+
+
+
+/*****************************************************************************/
 /*  	       	     	  	     Data				     */
 /*****************************************************************************/
 
@@ -85,10 +95,13 @@ void AddCodeEntry (CodeSeg* S, const char* Format, va_list ap) attribute ((forma
 /* Add a line to the given code segment */
 
 void DelCodeEntry (CodeSeg* S, unsigned Index);
-/* Delete an entry from the code segment. This includes deleting any associated
+/* Delete an entry from the code segment. This includes moving any associated
  * labels, removing references to labels and even removing the referenced labels
  * if the reference count drops to zero.
  */
+
+struct CodeEntry* GetCodeEntry (CodeSeg* S, unsigned Index);
+/* Get an entry from the given code segment */
 
 void AddCodeLabel (CodeSeg* S, const char* Name);
 /* Add a code label for the next instruction to follow */
@@ -104,9 +117,6 @@ void DelCodeSegAfter (CodeSeg* S, unsigned Last);
 
 void OutputCodeSeg (const CodeSeg* S, FILE* F);
 /* Output the code segment data to a file */
-
-CodeLabel* FindCodeLabel (CodeSeg* S, const char* Name, unsigned Hash);
-/* Find the label with the given name. Return the label or NULL if not found */
 
 void MergeCodeLabels (CodeSeg* S);
 /* Merge code labels. That means: For each instruction, remove all labels but

@@ -230,7 +230,7 @@ void PrintType (FILE* F, const type* Type)
 /* Output translation of type array. */
 {
     type T;
-
+    unsigned long Size;
 
     /* Walk over the complete string */
     while ((T = *Type++) != T_END) {
@@ -280,12 +280,20 @@ void PrintType (FILE* F, const type* Type)
 	     	Type += DECODE_SIZE;
 	     	break;
 	    case T_TYPE_ARRAY:
-       	       	fprintf (F, "array[%lu] of ", Decode (Type));
-	     	Type += DECODE_SIZE;
-	     	break;
+		/* Recursive call */
+		PrintType (F, Type + DECODE_SIZE);
+		Size = Decode (Type);
+		if (Size == 0) {
+		    fprintf (F, "[]");
+		} else {
+		    fprintf (F, "[%lu]", Size);
+		}
+	     	return;
 	    case T_TYPE_PTR:
-	     	fprintf (F, "pointer to ");
-	     	break;
+ 		/* Recursive call */
+		PrintType (F, Type);
+		fprintf (F, "*");
+	     	return;
 	    case T_TYPE_FUNC:
 	     	fprintf (F, "function returning ");
 	     	Type += DECODE_SIZE;

@@ -119,37 +119,41 @@ typedef enum {
     OPC_TXA,
     OPC_TXS,
     OPC_TYA,
-    OPC_COUNT 	       		/* Number of opcodes available */
+    OPC_COUNT  	       	       		/* Number of opcodes available */
 } opc_t;
 
 /* Addressing modes (bitmapped). */
 typedef enum {
-    AM_IMP	= 0x0001,      	/* implicit */
-    AM_ACC	= 0x0002,      	/* accumulator */
-    AM_IMM	= 0x0004,      	/* immidiate */
-    AM_ZP      	= 0x0008,      	/* zeropage */
-    AM_ZPX 	= 0x0010,      	/* zeropage,X */
-    AM_ABS 	= 0x0020,      	/* absolute */
-    AM_ABSX	= 0x0040,      	/* absolute,X */
-    AM_ABSY    	= 0x0080,      	/* absolute,Y */
-    AM_ZPX_IND	= 0x0100,      	/* (zeropage,x) */
-    AM_ZP_INDY	= 0x0200,      	/* (zeropage),y */
-    AM_ZP_IND	= 0x0400,      	/* (zeropage) */
-    AM_BRA	= 0x0800       	/* branch */
+    AM_IMP     	= 0x0001,      		/* implicit */
+    AM_ACC     	= 0x0002,      		/* accumulator */
+    AM_IMM     	= 0x0004,      		/* immidiate */
+    AM_ZP      	= 0x0008,      		/* zeropage */
+    AM_ZPX     	= 0x0010,      		/* zeropage,X */
+    AM_ABS     	= 0x0020,      		/* absolute */
+    AM_ABSX    	= 0x0040,      		/* absolute,X */
+    AM_ABSY    	= 0x0080,      		/* absolute,Y */
+    AM_ZPX_IND 	= 0x0100,      		/* (zeropage,x) */
+    AM_ZP_INDY 	= 0x0200,      		/* (zeropage),y */
+    AM_ZP_IND  	= 0x0400,      		/* (zeropage) */
+    AM_BRA     	= 0x0800       		/* branch */
 } am_t;
 
 /* Opcode info */
-#define OF_NONE	0x0000U		/* No additional information */
-#define OF_BRA 	0x0001U		/* Operation is a jump/branch */
+#define OF_NONE	0x0000U	       		/* No additional information */
+#define OF_UBRA	0x0001U	       		/* Unconditional branch */
+#define OF_CBRA	0x0002U	       		/* Conditional branch */
+#define OF_RET 	0x0004U	       		/* Return from function */
+#define OF_BRA 	(OF_UBRA|OF_CBRA)	/* Operation is a jump/branch */
+#define OF_DEAD	(OF_UBRA|OF_RET)	/* Dead end - no exec behind this point */
 
 /* Opcode description */
 typedef struct {
-    opc_t   	    OPC;       	/* Opcode */
-    char       	    Mnemo[4];	/* Mnemonic */
-    unsigned char   Size;      	/* Size, 0 means "check addressing mode" */
-    unsigned char   Use;	/* Registers used by this insn */
-    unsigned char   Chg;	/* Registers changed/destroyed by this insn */
-    unsigned char   Info;	/* Additional information */
+    opc_t      	    OPC;       		/* Opcode */
+    char       	    Mnemo[4];  		/* Mnemonic */
+    unsigned char   Size;      		/* Size, 0 = check addressing mode */
+    unsigned char   Use;       		/* Registers used by this insn */
+    unsigned char   Chg;       		/* Registers changed by this insn */
+    unsigned char   Info;      		/* Additional information */
 } OPCDesc;
 
 
@@ -171,13 +175,16 @@ unsigned GetInsnSize (opc_t OPC, am_t AM);
 const OPCDesc* GetOPCDesc (opc_t OPC);
 /* Get an opcode description */
 
+unsigned char GetOPCInfo (opc_t OPC);
+/* Get opcode information */
+
 unsigned char GetAMUseInfo (am_t AM);
 /* Get usage info for the given addressing mode (addressing modes that use
  * index registers return REG_r info for these registers).
  */
 
 opc_t GetInverseBranch (opc_t OPC);
-/* Return a brahcn that reverse the condition of the branch given in OPC */
+/* Return a branch that reverse the condition of the branch given in OPC */
 
 
 

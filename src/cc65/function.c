@@ -215,7 +215,6 @@ void NewFunc (SymEntry* Func)
 {
     int HadReturn;
     int IsVoidFunc;
-    unsigned Flags;
 
     /* Get the function descriptor from the function entry */
     FuncDesc* D = Func->V.F.Func;
@@ -321,8 +320,7 @@ void NewFunc (SymEntry* Func)
     RestoreRegVars (!IsVoidFunc);
 
     /* Generate the exit code */
-    Flags = IsVoidFunc? CF_NONE : CF_REG;
-    g_leave (Flags, 0);
+    g_leave ();
 
     /* Eat the closing brace */
     ConsumeRCurly ();
@@ -337,7 +335,7 @@ void NewFunc (SymEntry* Func)
     LeaveFunctionLevel ();
 
     /* Switch back to the old segments */
-    PopSegments ();		      
+    PopSegments ();
 
     /* Reset the current function pointer */
     FreeFunction (CurrentFunc);

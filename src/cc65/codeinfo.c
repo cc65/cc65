@@ -36,6 +36,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+/* common */
+#include "coll.h"
+
 /* cc65 */
 #include "codeinfo.h"
 
@@ -95,6 +98,12 @@ static const FuncInfo FuncInfoTable[] = {
 };
 #define FuncInfoCount	(sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
+/* Structure used to pass information to the RegValUsedInt1 and 2 functions */
+typedef struct RVUInfo RVUInfo;
+struct RVUInfo {
+    Collection	VisitedLines;		/* Lines already visited */
+};
+
 
 
 /*****************************************************************************/
@@ -133,6 +142,201 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
     }
 }
 
+					
+#if 0
+
+static unsigned RVUInt2 (Line* L,
+    		       	 LineColl* LC, 	    /* To remember visited lines */
+    		   	 unsigned Used,     /* Definitely used registers */
+    		   	 unsigned Unused)   /* Definitely unused registers */
+/* Subfunction for RegValUsed. Will be called recursively in case of branches. */
+{
+    int I;
+
+    /* Check the following instructions. We classifiy them into primary
+     * loads (register value not used), neutral (check next instruction),
+     * and unknown (assume register was used).
+     */
+    while (1) {
+
+    	unsigned R;
+
+    	/* Get the next line and follow jumps */
+    	do {
+
+    	    /* Handle jumps to local labels (continue there) */
+       	    if (LineMatch (L, "\tjmp\tL") || LineMatch (L, "\tbra\tL")) {
+    	     	/* Get the target of the jump */
+    	     	L = GetTargetLine (L->Line+5);
+    	    }
+
+    	    /* Get the next line, skip local labels */
+    	    do {
+       	    	L = NextCodeSegLine (L);
+    	    } while (L && (IsLocalLabel (L) || L->Line[0] == '\0'));
+
+    	    /* Bail out if we're done */
+    	    if (L == 0 || IsExtLabel (L)) {
+    	    	/* End of function reached */
+    	    	goto ExitPoint;
+    	    }
+
+    	    /* Check if we had this line already. If so, bail out, if not,
+    	     * add it to the list of known lines.
+    	     */
+    	    if (LCHasLine (LC, L) || !LCAddLine (LC, L)) {
+    	    	goto ExitPoint;
+    	    }
+
+     	} while (LineMatch (L, "\tjmp\tL") || LineMatch (L, "\tbra\tL"));
+
+    	/* Special handling of code hints */
+       	if (IsHintLine (L)) {
+
+    	    if (IsHint (L, "a:-") && (Used & REG_A) == 0) {
+    		Unused |= REG_A;
+    	    } else if (IsHint (L, "x:-") && (Used & REG_X) == 0) {
+    		Unused |= REG_X;
+    	    } else if (IsHint (L, "y:-") && (Used & REG_Y) == 0) {
+    		Unused |= REG_Y;
+    	    }
+
+    	/* Special handling for branches */
+    	} else if (LineMatchX (L, ShortBranches) >= 0 ||
+    	    LineMatchX (L, LongBranches) >= 0) {
+    	    const char* Target = L->Line+5;
+    	    if (Target[0] == 'L') {
+    	       	/* Jump to local label. Check the register usage starting at
+    	       	 * the branch target and at the code following the branch.
+    	       	 * All registers that are unused in both execution flows are
+    	       	 * returned as unused.
+    	       	 */
+    	       	unsigned U1, U2;
+       	       	U2 = RVUInt1 (GetTargetLine (Target), LC, Used, Unused);
+    	       	U1 = RVUInt1 (L, LC, Used, Unused);
+    	       	return U1 | U2;		/* Used in any of the branches */
+    	    }
+    	} else {
+
+    	    /* Search for the instruction in this line */
+    	    I = FindCmd (L);
+
+    	    /* If we don't find it, assume all other registers are used */
+    	    if (I < 0) {
+    		break;
+    	    }
+
+    	    /* Evaluate the use flags, check for addressing modes */
+    	    R = CmdDesc[I].Use;
+    	    if (IsXAddrMode (L)) {
+    		R |= REG_X;
+    	    } else if (IsYAddrMode (L)) {
+    		R |= REG_Y;
+    	    }
+     	    if (R) {
+    		/* Remove registers that were already new loaded */
+    		R &= ~Unused;
+
+    		/* Remember the remaining registers */
+    		Used |= R;
+    	    }
+
+    	    /* Evaluate the load flags */
+    	    R = CmdDesc[I].Load;
+    	    if (R) {
+    		/* Remove registers that were already used */
+    		R &= ~Used;
+
+    		/* Remember the remaining registers */
+    		Unused |= R;
+    	    }
+
+    	}
+
+       	/* If we know about all registers, bail out */
+       	if ((Used | Unused) == REG_ALL) {
+    	    break;
+    	}
+    }
+
+ExitPoint:
+    /* Return to the caller the complement of all unused registers */
+    return ~Unused & REG_ALL;
+}
 
 
 
+static unsigned RVUInt1 (Line* L,
+    		       	 LineColl* LC, 	    /* To remember visited lines */
+    		       	 unsigned Used,     /* Definitely used registers */
+    		       	 unsigned Unused)   /* Definitely unused registers */
+/* Subfunction for RegValUsed. Will be called recursively in case of branches. */
+{
+    /* Remember the current count of the line collection */
+    unsigned Count = LC->Count;
+
+    /* Call the worker routine */
+    unsigned R = RVUInt2 (L, LC, Used, Unused);
+
+    /* Restore the old count */
+    LC->Count = Count;
+
+    /* Return the result */
+    return R;
+}
+
+
+
+static unsigned RegValUsed (Line* Start)
+/* Check the next instructions after the one in L for register usage. If
+ * a register is used as an index, or in a store or other instruction, it
+ * is assumed to be used. If a register is loaded with a value, before it
+ * was used by one of the actions described above, it is assumed unused.
+ * If the end of the lookahead is reached, all registers that are uncertain
+ * are marked as used.
+ * The result of the search is returned.
+ */
+{
+    unsigned R;
+
+    /* Create a new line collection and enter the start line */
+    LineColl* LC = NewLineColl (256);
+    LCAddLine (LC, Start);
+
+    /* Call the recursive subfunction */
+    R = RVUInt1 (Start, LC, REG_NONE, REG_NONE);
+
+    /* Delete the line collection */
+    FreeLineColl (LC);
+
+    /* Return the registers used */
+    return R;
+}
+
+
+
+static int RegAUsed (Line* Start)
+/* Check if the value in A is used. */
+{
+    return (RegValUsed (Start) & REG_A) != 0;
+}
+
+
+
+static int RegXUsed (Line* Start)
+/* Check if the value in X is used. */
+{
+    return (RegValUsed (Start) & REG_X) != 0;
+}
+
+
+
+static int RegYUsed (Line* Start)
+/* Check if the value in Y is used. */
+{
+    return (RegValUsed (Start) & REG_Y) != 0;
+}
+
+
+
+#endif     

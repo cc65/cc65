@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -279,6 +279,25 @@ void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Le
     /* Copy the slice */
     memcpy (Target->Buf, Source->Buf + Start, Len);
     Target->Len = Len;
+}
+
+
+
+void SB_Move (StrBuf* Target, StrBuf* Source)
+/* Move the complete contents of Source to target. This will delete the old
+ * contents of Target, and Source will be empty after the call.
+ */                                          
+{
+    /* Free the target string */
+    if (Target->Buf) {
+        xfree (Target->Buf);
+    }
+
+    /* Move all data from Source to Target */
+    *Target = *Source;
+
+    /* Clear Source */
+    InitStrBuf (Source);
 }
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -225,7 +225,7 @@ INLINE char SB_LookAt (const StrBuf* B, unsigned Index)
     return (Index < B->Len)? B->Buf[Index] : '\0';
 }
 #else
-#  define SB_Peek(B,Index)     (((Index) < (B)->Len)? (B)->Buf[(Index)] : '\0')
+#  define SB_LookAt(B,Index)     (((Index) < (B)->Len)? (B)->Buf[(Index)] : '\0')
 #endif
 
 #if defined(HAVE_INLINE)
@@ -336,6 +336,11 @@ void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Le
  * destroyed. If Start is greater than the length of Source, or if Len
  * characters aren't available, the result will be a buffer with less than Len
  * bytes.
+ */
+
+void SB_Move (StrBuf* Target, StrBuf* Source);
+/* Move the complete contents of Source to target. This will delete the old
+ * contents of Target, and Source will be empty after the call.
  */
 
 

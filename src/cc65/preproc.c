@@ -316,7 +316,6 @@ static void ExpandMacroArgs (Macro* M)
                     switch (*Replacement) {
                         case '\"':
                         case '\\':
-                        case '\'':
                             keepch ('\\');
                         /* FALLTHROUGH */
                         default:

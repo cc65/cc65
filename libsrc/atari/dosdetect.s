@@ -8,7 +8,10 @@
 	.constructor	detect,26
 	.export		__dos_type
 
+; ------------------------------------------------------------------------
 ; DOS type detection
+
+.segment        "INIT"
 
 detect:	lda	#ATARIDOS
 	sta	__dos_type	; set default
@@ -43,7 +46,10 @@ mydos:	lda	#MYDOS
 	sta	__dos_type
 	rts
 
-	.bss
+; ------------------------------------------------------------------------
+; Data
+
+      	.bss
 
 __dos_type:	.res	1
 

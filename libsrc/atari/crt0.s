@@ -161,6 +161,8 @@ L2:	lda	zpsave,x
 
 ; setup sp
 
+.segment        "INIT"
+
 initsp:
 	lda	APPMHI
 	sta	sp
@@ -168,7 +170,7 @@ initsp:
 	sta	sp+1
 	rts
 
-	.data
+	.data         
 
 zpsave:	.res	zpspace
 

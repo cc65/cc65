@@ -12,7 +12,10 @@ SPACE	= 32		; SPACE char.
 	.import		__dos_type
 	.constructor	initmainargs,25
 
+; --------------------------------------------------------------------------
 ; Get command line
+
+.segment        "INIT"
 
 initmainargs:
 	lda	#0
@@ -32,7 +35,7 @@ nargdos:rts
 
 argdos:	lda	#ATEOL
 	sta	ourcl+CL_SIZE
-	 
+
 ; Move SpartaDOS command line to our own buffer
 
 	lda	DOSVEC
@@ -112,7 +115,7 @@ eopar:
 
 finargs:
 	lda	__argc
-	asl
+	asl           
 	tax
 	lda	#0
 	sta	argv,x
@@ -123,7 +126,10 @@ finargs:
 	stx	__argv+1
 	rts
 
-	.bss
+; --------------------------------------------------------------------------
+; Data
+
+.bss
 
 argv:	.res	(1 + MAXARGS) * 2
 

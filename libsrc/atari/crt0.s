@@ -16,6 +16,9 @@
        	.import	       	zerobss, pushax
 	.import		_main, __filetab, getfd
 	.import		__CODE_LOAD__, __BSS_LOAD__
+.ifdef	DYNAMIC_DD
+	.import		__getdefdev
+.endif
 
         .include        "zeropage.inc"
 	.include	"atari.inc"
@@ -73,6 +76,9 @@ L1:	lda	sp,x
 ; Call module constructors
 
 	jsr	initlib
+.ifdef	DYNAMIC_DD
+	jsr	__getdefdev
+.endif
 
 ; set left margin to 0
 

@@ -20,6 +20,9 @@
 
 .ifdef	DEFAULT_DEVICE
 	.importzp tmp2
+.ifdef	DYNAMIC_DD
+	.import	__defdev
+.endif
 .endif
 	.importzp tmp3,ptr4,sp
 	.import	_strupr,subysp
@@ -88,7 +91,11 @@ loop2:	lda	(ptr4),y
 	lda	#':'
 	sta	(sp),y		; insert ':'
 	dey
-	lda	#'0' + DEFAULT_DEVICE 
+.ifdef	DYNAMIC_DD
+	lda	__defdev+1
+.else
+	lda	#'0'+DEFAULT_DEVICE
+.endif
 	sta	(sp),y		; insert device number
 	dey
 	lda	#'D'

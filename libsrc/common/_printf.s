@@ -59,9 +59,8 @@ Output1:
 	lda	#<CharArg
 	ldx	#>CharArg
 	jsr	pushax
-	jsr  	push1
-CallOutFunc:
-	jmp	(OutFunc)     	; fout (OutData, &CharArg, 1)
+    	jsr  	push1
+	jmp	CallOutFunc	; fout (OutData, &CharArg, 1)
 
 ; ----------------------------------------------------------------------------
 ; Decrement the argument list pointer by 2
@@ -213,7 +212,7 @@ OutputArg:
 	lda	ArgLen
 	ldx	ArgLen+1
 	jsr	pushax
-	jmp	(OutFunc)
+	jmp	CallOutFunc
 
 ; ----------------------------------------------------------------------------
 ; ltoa: Wrapper for _ltoa that pushes all arguments
@@ -275,10 +274,10 @@ Save:	lda	regbank,y
 
 	iny
 	lda	(OutData),y
-	sta  	OutFunc
+	sta  	CallOutFunc+1
 	iny
 	lda  	(OutData),y
-	sta  	OutFunc+1
+	sta  	CallOutFunc+2
 
 ; Start parsing the format string
 
@@ -752,9 +751,6 @@ HaveArg:
 ; Save area for the zero page registers
 RegSave:	.res  	6
 
-; Stuff from OutData. Is used as a vector and must be aligned
-OutFunc:	.word 	0
-
 ; One character argument for OutFunc
 CharArg:	.byte 	0
 
@@ -776,4 +772,11 @@ FormatVarSize	= * - FormatVars
 Buf:		.res  	20
 Str: 		.word 	0
 ArgLen:		.res	2
+
+.data
+
+; Stuff from OutData. Is used as a vector and must be aligned
+CallOutFunc:	jmp	$0000
+
+
 

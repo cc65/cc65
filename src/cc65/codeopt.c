@@ -552,15 +552,19 @@ static unsigned OptPtrStore1 (CodeSeg* S)
    	    /* Delete the old code */
    	    CS_DelEntry (S, I+7+K);     /* jsr spaspidx */
             CS_DelEntry (S, I+2);       /* jsr ldauidx */
-            CS_DelEntry (S, I);         /* jsr pushax */
 
 	    /* Create and insert the stores into the zp pointer if needed */
             if (RegBank == 0) {
                 X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
-                CS_InsertEntry (S, X, I);
-                X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
                 CS_InsertEntry (S, X, I+1);
+                X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+                CS_InsertEntry (S, X, I+2);
             }
+
+            /* Delete more old code. Do it here to keep a label attached to
+             * entry I in place.
+             */
+            CS_DelEntry (S, I);         /* jsr pushax */
 
    	    /* Remember, we had changes */
    	    ++Changes;

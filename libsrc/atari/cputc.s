@@ -20,6 +20,7 @@ _cputcxy:
 .ifdef DIRECT_SCREEN
 
 	.importzp tmp4,ptr4
+	.import	_revflag
 
 _cputc:
 	cmp	#$0D		; CR
@@ -92,7 +93,7 @@ L3:	clc
 	adc	SAVMSC+1
 	sta	ptr4+1
 	pla			; get char again
-	ora	INVFLG
+	ora	_revflag
 	ldy	COLCRS
 	sta	(ptr4),y
 	rts

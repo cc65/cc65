@@ -109,9 +109,11 @@ S_OBJS = 	_fdesc.o 	\
 	 	memset.o      	\
 		modfree.o       \
 		modload.o       \
+                oserrcheck.o    \
 		printf.o      	\
 	 	rand.o	      	\
                 raise.o         \
+                rename.o        \
 	 	setjmp.o      	\
                 signal.o        \
                 sigtable.o      \

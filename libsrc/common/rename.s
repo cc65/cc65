@@ -1,20 +1,20 @@
 ;
 ; Ullrich von Bassewitz, 2003-08-12
 ;
-; int __fastcall__ remove (const char* name);
+; int __fastcall__ rename (const char* oldname, const char* newname);
 ;
 
-        .export         _remove
+        .export         _rename
 
-        .import         __sysremove
+        .import         __sysrename
         .import         oserrcheck
 
 
 ;--------------------------------------------------------------------------
 
-.proc   _remove
+.proc   _rename
 
-        jsr     __sysremove     ; Call the machine specific function
+        jsr     __sysrename     ; Call the machine specific function
         jmp     oserrcheck      ; Store into _oserror, set errno, return 0/-1
 
 .endproc

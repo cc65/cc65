@@ -1,0 +1,8 @@
+
+Test programs for the Atari runtime lib:
+----------------------------------------
+
+mem.c		-	displays size of available memory
+
+ostype.c	-	demo program for get_ostype() function
+

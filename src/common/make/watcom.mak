@@ -69,6 +69,7 @@ OBJS =	abend.obj	\
 	fname.obj	\
 	hashstr.obj	\
         hashtab.obj     \
+        intstack.obj    \
         matchpat.obj    \
         mmodel.obj      \
 	print.obj	\

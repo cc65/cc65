@@ -24,6 +24,7 @@ OBJS =	abend.o		\
 	fname.o		\
 	hashstr.o	\
         hashtab.o       \
+        intstack.o      \
         matchpat.o      \
         mmodel.o        \
 	print.o		\

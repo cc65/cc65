@@ -209,7 +209,7 @@ INLINE int SymHasExpr (const SymEntry* S)
     return ((S->Flags & (SF_DEFINED|SF_IMPORT)) == SF_DEFINED);
 }
 #else
-#  define SymHasExpr(S)   (((S)->Flags & (SF_DEFINED|SF_IMPORT)) != SF_DEFINED)
+#  define SymHasExpr(S)   (((S)->Flags & (SF_DEFINED|SF_IMPORT)) == SF_DEFINED)
 #endif
 
 #if defined(HAVE_INLINE)

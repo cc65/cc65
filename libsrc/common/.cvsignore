@@ -1,4 +1,4 @@
-*.lst
+*.lst	
 _afailed.s
 _fopen.s
 _hextab.s
@@ -29,6 +29,7 @@ puts.s
 qsort.s
 realloc.s
 rewind.s
+sscanf.s
 strtok.s
 strxfrm.s
 vprintf.s

@@ -1839,6 +1839,198 @@ static unsigned OptPtrLoad1 (CodeSeg* S)
 
 
 static unsigned OptPtrLoad2 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *      adc    	xxx
+ *      tay
+ *      txa
+ *      adc     yyy
+ *      tax
+ *      tya
+ *      ldy
+ *  	jsr    	ldauidx
+ *
+ * and replace it by:
+ *
+ *      adc    	xxx
+ *      sta     ptr1
+ *      txa
+ *      adc     yyy
+ *      sta     ptr1+1
+ *      ldy
+ *     	ldx     #$00
+ *      lda     (ptr1),y
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[8];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_ADC      	       	&&
+       	    CS_GetEntries (S, L+1, I+1, 7)     	&&
+       	    L[1]->OPC == OP65_TAY              	&&
+	    !CE_HasLabel (L[1])        	       	&&
+	    L[2]->OPC == OP65_TXA               &&
+	    !CE_HasLabel (L[2])                 &&
+	    L[3]->OPC == OP65_ADC               &&
+	    !CE_HasLabel (L[3])                 &&
+	    L[4]->OPC == OP65_TAX               &&
+	    !CE_HasLabel (L[4])                 &&
+	    L[5]->OPC == OP65_TYA               &&
+	    !CE_HasLabel (L[5])                 &&
+	    L[6]->OPC == OP65_LDY               &&
+	    !CE_HasLabel (L[6])                 &&
+	    L[7]->OPC == OP65_JSR               &&
+       	    strcmp (L[7]->Arg, "ldauidx") == 0  &&
+	    !CE_HasLabel (L[7])) {
+
+	    CodeEntry* X;
+
+       	    /* Store the low byte and remove the TAY instead */
+	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+1);
+	    CS_DelEntry (S, I+2);
+
+	    /* Store the high byte */
+	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+4);
+
+	    /* Delete more transfer insns */
+	    CS_DelEntry (S, I+6);
+	    CS_DelEntry (S, I+5);
+
+	    /* Delete the call to ldauidx */
+	    CS_DelEntry (S, I+6);
+
+	    /* Load high and low byte */
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[6]->LI);
+	    CS_InsertEntry (S, X, I+6);
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[6]->LI);
+	    CS_InsertEntry (S, X, I+7);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptPtrLoad3 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *      adc    	xxx
+ *      pha
+ *      txa
+ *      iny
+ *      adc     yyy
+ *      tax
+ *      pla
+ *      ldy
+ *  	jsr    	ldauidx
+ *
+ * and replace it by:
+ *
+ *      adc    	xxx
+ *      sta     ptr1
+ *      txa
+ *      iny
+ *      adc     yyy
+ *      sta     ptr1+1
+ *      ldy
+ *     	ldx     #$00
+ *      lda     (ptr1),y
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[9];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_ADC      	       	&&
+       	    CS_GetEntries (S, L+1, I+1, 8)     	&&
+       	    L[1]->OPC == OP65_PHA              	&&
+	    !CE_HasLabel (L[1])        	       	&&
+	    L[2]->OPC == OP65_TXA               &&
+	    !CE_HasLabel (L[2])                 &&
+	    L[3]->OPC == OP65_INY               &&
+	    !CE_HasLabel (L[3])                 &&
+       	    L[4]->OPC == OP65_ADC               &&
+	    !CE_HasLabel (L[4])                 &&
+	    L[5]->OPC == OP65_TAX               &&
+	    !CE_HasLabel (L[5])                 &&
+	    L[6]->OPC == OP65_PLA               &&
+	    !CE_HasLabel (L[6])                 &&
+	    L[7]->OPC == OP65_LDY               &&
+	    !CE_HasLabel (L[7])                 &&
+	    L[8]->OPC == OP65_JSR               &&
+       	    strcmp (L[8]->Arg, "ldauidx") == 0  &&
+	    !CE_HasLabel (L[8])) {
+
+	    CodeEntry* X;
+
+       	    /* Store the low byte and remove the PHA instead */
+	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+1);
+	    CS_DelEntry (S, I+2);
+
+	    /* Store the high byte */
+	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[4]->LI);
+	    CS_InsertEntry (S, X, I+5);
+
+	    /* Delete more transfer and PLA insns */	     
+	    CS_DelEntry (S, I+7);
+	    CS_DelEntry (S, I+6);
+
+	    /* Delete the call to ldauidx */
+	    CS_DelEntry (S, I+7);
+
+	    /* Load high and low byte */
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[6]->LI);
+	    CS_InsertEntry (S, X, I+7);
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[6]->LI);
+	    CS_InsertEntry (S, X, I+8);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptPtrLoad4 (CodeSeg* S)
 /* Search for the sequence
  *
  *      ldy     ...
@@ -1941,8 +2133,10 @@ static OptFunc OptFuncs [] = {
     OptEntry (OptPtrStore1, optPre),
     OptEntry (OptPtrStore2, optPre),
     /* Optimize loads through pointers */
-    OptEntry (OptPtrLoad1, optMain),
-    OptEntry (OptPtrLoad2, optMain),
+    OptEntry (OptPtrLoad1, optPre),
+    OptEntry (OptPtrLoad2, optPre),
+    OptEntry (OptPtrLoad3, optPre),
+    OptEntry (OptPtrLoad4, optMain),
     /* Optimize calls to nega */
     OptEntry (OptNegA1, optMain),
     OptEntry (OptNegA2, optMain),

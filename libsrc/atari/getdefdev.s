@@ -67,7 +67,7 @@ crvec:	jsr	$FFFF		; will be set to crunch vector
 	lda	(DOSVEC),y
 	sta	defdev+1
 
-; return ointer to default device
+; Return pointer to default device
 
 finish:	lda	#<defdev
 	ldx	#>defdev

@@ -10,7 +10,7 @@
      	.import	     	push0, callmain
 	.import	   	__CHARRAM_START__, __CHARRAM_SIZE__, __VIDRAM_START__
 	.import	       	__BSS_RUN__, __BSS_SIZE__, __EXTZP_RUN__
-	.import	       	__IRQFUNC_COUNT__
+	.import	       	__INTERRUPTOR_COUNT__
 	.import		scnkey, UDTIM
 
      	.include     	"zeropage.inc"
@@ -428,7 +428,7 @@ ccopy2:	lda	__VIDRAM_START__,y
 ; Call module constructors, enable chained IRQs afterwards.
 
         jsr	initlib
-        lda     #.lobyte(__IRQFUNC_COUNT__*2)
+        lda     #.lobyte(__INTERRUPTOR_COUNT__*2)
         sta     irqcount
 
 ; Enable interrupts

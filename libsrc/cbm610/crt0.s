@@ -9,7 +9,7 @@
 	.import		callirq_y, initlib, donelib
 	.import	     	push0, callmain
 	.import	       	__BSS_RUN__, __BSS_SIZE__, __EXTZP_RUN__
-	.import	       	__IRQFUNC_COUNT__
+	.import	       	__INTERRUPTOR_COUNT__
 	.import		scnkey, UDTIM
 
 	.include     	"zeropage.inc"
@@ -349,7 +349,7 @@ Z4:     jmp     Init
 ; Call module constructors, enable chained IRQs afterwards.
 
 Init:  	jsr	initlib
-        lda     #.lobyte(__IRQFUNC_COUNT__*2)
+        lda     #.lobyte(__INTERRUPTOR_COUNT__*2)
         sta     irqcount
 
 ; Enable interrupts

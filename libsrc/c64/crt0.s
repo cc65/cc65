@@ -9,7 +9,7 @@
        	.import	       	zerobss, push0
 	.import	     	callmain
         .import         RESTOR, BSOUT, CLRCH
-	.import	       	__IRQFUNC_COUNT__
+	.import	       	__INTERRUPTOR_COUNT__
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 
         .include        "zeropage.inc"
@@ -79,7 +79,7 @@ L1:	lda	sp,x
 
 ; If we have IRQ functions, chain our stub into the IRQ vector
 
-        lda     #<__IRQFUNC_COUNT__
+        lda     #<__INTERRUPTOR_COUNT__
       	beq	NoIRQ1
       	lda	IRQVec
        	ldx	IRQVec+1
@@ -100,7 +100,7 @@ NoIRQ1: jsr     callmain
 ; chained it.
 
 _exit: 	pha  			; Save the return code on stack
-	lda     #<__IRQFUNC_COUNT__
+	lda     #<__INTERRUPTOR_COUNT__
 	beq	NoIRQ2
 	lda	IRQInd+1
 	ldx	IRQInd+2

@@ -9,7 +9,7 @@
     	.import	     	zerobss
     	.import		push0, callmain
         .import         RESTOR, BSOUT, CLRCH
-	.import	       	__IRQFUNC_COUNT__
+	.import	       	__INTERRUPTOR_COUNT__
     	.import	 	__RAM_START__, __RAM_SIZE__
 
         .include        "zeropage.inc"
@@ -88,8 +88,8 @@ L1:	lda    	sp,x
 
 	jsr	initlib
 
-; Set the bank for the file name to our execution bank. We must do this, 
-; *after* calling constructors, because some of them may depend on the 
+; Set the bank for the file name to our execution bank. We must do this,
+; *after* calling constructors, because some of them may depend on the
 ; original value of this register.
 
         lda     #0
@@ -97,7 +97,7 @@ L1:	lda    	sp,x
 
 ; If we have IRQ functions, chain our stub into the IRQ vector
 
-        lda     #<__IRQFUNC_COUNT__
+        lda     #<__INTERRUPTOR_COUNT__
       	beq	NoIRQ1
       	lda	IRQVec
        	ldx	IRQVec+1
@@ -118,7 +118,7 @@ NoIRQ1:	jsr	callmain
 ; chained it.
 
 _exit:	pha				; Save the return code on stack
-	lda     #<__IRQFUNC_COUNT__
+	lda     #<__INTERRUPTOR_COUNT__
 	beq	NoIRQ2
 	lda	IRQInd+1
 	ldx	IRQInd+2

@@ -23,7 +23,7 @@
        	.export	callirq
         .export callirq_y       ; Same but with Y preloaded
 
-       	.import	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
+       	.import	__INTERRUPTOR_TABLE__, __INTERRUPTOR_COUNT__
 
 .code
 
@@ -35,13 +35,13 @@
 .data
 
 callirq:
-        ldy     #.lobyte(__IRQFUNC_COUNT__*2)
+        ldy     #.lobyte(__INTERRUPTOR_COUNT__*2)
 callirq_y:
         dey
-        lda     __IRQFUNC_TABLE__,y
+        lda     __INTERRUPTOR_TABLE__,y
         sta     jmpvec+2                ; Modify code below
      	dey
-        lda     __IRQFUNC_TABLE__,y
+        lda     __INTERRUPTOR_TABLE__,y
         sta     jmpvec+1                ; Modify code below
        	sty    	index+1                 ; Modify code below
 jmpvec: jsr    	$FFFF                   ; Patched at runtime

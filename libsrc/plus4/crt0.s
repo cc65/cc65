@@ -9,7 +9,7 @@
 
 	.import		callirq_y, initlib, donelib
 	.import	     	push0, callmain, zerobss
-	.import	       	__IRQFUNC_COUNT__
+	.import	       	__INTERRUPTOR_COUNT__
 
         .include        "zeropage.inc"
 	.include	"plus4.inc"
@@ -87,7 +87,7 @@ L1:	lda	sp,x
 ; Initialize irqcount, which means that from now own custom linked in IRQ
 ; handlers (via condes) will be called.
 
-        lda     #.lobyte(__IRQFUNC_COUNT__*2)
+        lda     #.lobyte(__INTERRUPTOR_COUNT__*2)
         sta     irqcount
 
 ; Push arguments and call main()
@@ -147,9 +147,9 @@ IRQ:    cld			; Just to be sure
         bne     dobreak
 
 ; It's an IRQ and RAM is enabled. If we have handlers, call them. We will use
-; a flag here instead of loading __IRQFUNC_COUNT__ directly, since the condes
-; function is not reentrant. The irqcount flag will be set/reset from the main
-; code, to avoid races.
+; a flag here instead of loading __INTERRUPTOR_COUNT__ directly, since the 
+; condes function is not reentrant. The irqcount flag will be set/reset from 
+; the main code, to avoid races.
 
    	ldy    	irqcount
     	beq	@L1

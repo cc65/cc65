@@ -187,6 +187,11 @@ function.
 
 <sect1><tt/locale.h/<label id="locale.h"><p>
 
+<itemize>
+<item><ref id="localeconv" name="localeconv">
+<item><ref id="setlocale" name="setlocale">
+</itemize>
+
 
 <sect1><tt/modload.h/<label id="modload.h"><p>
 
@@ -284,16 +289,16 @@ function.
 <item><ref id="memcpy" name="memcpy">
 <item><ref id="memmove" name="memmove">
 <item><ref id="memset" name="memset">
-<!-- <item><ref id="strcasecmp" name="strcasecmp"> -->
+<item><ref id="strcasecmp" name="strcasecmp">
 <item><ref id="strcat" name="strcat">
 <item><ref id="strchr" name="strchr">
-<!-- <item><ref id="strcmp" name="strcmp"> -->
-<!-- <item><ref id="strcoll" name="strcoll"> -->
+<item><ref id="strcmp" name="strcmp">
+<item><ref id="strcoll" name="strcoll">
 <item><ref id="strcpy" name="strcpy">
 <!-- <item><ref id="strcspn" name="strcspn"> -->
 <!-- <item><ref id="strdup" name="strdup"> -->
 <!-- <item><ref id="strerror" name="strerror"> -->
-<!-- <item><ref id="stricmp" name="stricmp"> -->
+<item><ref id="stricmp" name="stricmp">
 <item><ref id="strlen" name="strlen">
 <item><ref id="strlower" name="strlower">
 <item><ref id="strlwr" name="strlwr">
@@ -314,6 +319,20 @@ function.
 
 
 <sect1><tt/time.h/<label id="time.h"><p>
+                           
+<!--
+<itemize>
+<item><ref id="_systime" name="_systime">
+<item><ref id="asctime" name="asctime">
+<item><ref id="clock" name="clock">
+<item><ref id="ctime" name="ctime">
+<item><ref id="gmtime" name="gmtime">
+<item><ref id="localtime" name="localtime">
+<item><ref id="mktime" name="mktime">
+<item><ref id="strftime" name="strftime">
+<item><ref id="time" name="time">
+</itemize>
+-->    
 
 
 <sect1><tt/unistd.h/<label id="unistd.h"><p>
@@ -2212,6 +2231,28 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>localeconv<label id="localeconv"><p>
+
+<quote>
+<descrip>
+<tag/Function/Returns a pointer to the current locale structure.
+<tag/Header/<tt/<ref id="locale.h" name="locale.h">/
+<tag/Declaration/<tt/struct lconv* localeconv (void);/
+<tag/Description/<tt/localeconv/ returns a pointer to the current locale
+structure.
+<tag/Limits/<itemize>
+<item>cc65 supports only the "C" locale, so even after setting a new locale
+using <tt/<ref id="setlocale" name="setlocale">/, the structure returned will
+always be the same.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="setlocale" name="setlocale">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>malloc<label id="malloc"><p>
 
 <quote>
@@ -2554,6 +2595,30 @@ the program terminates.
 </quote>
 
 
+<sect1>setlocale<label id="setlocale"><p>
+
+<quote>
+<descrip>
+<tag/Function/Selects a locale.
+<tag/Header/<tt/<ref id="locale.h" name="locale.h">/
+<tag/Declaration/<tt/char* __fastcall__ setlocale (int category, const char* locale);/
+<tag/Description/<tt/setlocale/ sets or queries the program's locale.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>cc65 supports only the "C" locale, so calling this function to set a
+different locale has no effect.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="localeconv" name="localeconv">,
+<ref id="strcoll" name="strcoll">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>signal<label id="signal"><p>
 
 <quote>
@@ -2642,6 +2707,32 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>strcasecmp<label id="strcasecmp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compare two strings case insensitive.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/int __fastcall__ strcasecmp (const char* s1, const char* s2);/
+<tag/Description/The <tt/strcasecmp/ function compares the two strings passed
+as parameters without case sensitivity. It returns a value that is less than
+zero if <tt/s1/ is less than <tt/s2/, zero if <tt/s1/ is the same as <tt/s2/,
+and a value greater than zero if <tt/s1/ is greater than <tt/s2/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function is not available in strict ANSI mode.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="strcmp" name="strcmp">,
+<ref id="strcoll" name="strcoll">,
+<ref id="stricmp" name="stricmp">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>strcat<label id="strcat"><p>
 
 <quote>
@@ -2691,6 +2782,58 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>strcmp<label id="strcmp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compare two strings.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/int __fastcall__ strcmp (const char* s1, const char* s2);/
+<tag/Description/The <tt/strcmp/ function compares the two strings passed as
+parameters. It returns a value that is less than zero if <tt/s1/ is less than
+<tt/s2/, zero if <tt/s1/ is the same as <tt/s2/, and a value greater than zero
+if <tt/s1/ is greater than <tt/s2/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcasecmp" name="strcasecmp">,
+<ref id="strcoll" name="strcoll">,
+<ref id="stricmp" name="stricmp">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strcoll<label id="strcoll"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compare two strings.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/int __fastcall__ strcoll (const char* s1, const char* s2);/
+<tag/Description/The <tt/strcoll/ function compares the two strings passed as
+parameters, according to the collating sequence set by <tt/<ref id="setlocale"
+name="setlocale">/. It returns a value that is less than zero if <tt/s1/ is
+less than <tt/s2/, zero if <tt/s1/ is the same as <tt/s2/, and a value greater
+than zero if <tt/s1/ is greater than <tt/s2/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="setlocale" name="setlocale">,
+<ref id="strcasecmp" name="strcasecmp">,
+<ref id="strcmp" name="strcmp">,
+<ref id="stricmp" name="stricmp">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>strcpy<label id="strcpy"><p>
 
 <quote>
@@ -2719,6 +2862,32 @@ static char hello[14];
 
 strcpy (hello, "Hello world!\n");
 </verb>
+</descrip>
+</quote>
+
+
+<sect1>stricmp<label id="stricmp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compare two strings case insensitive.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/int __fastcall__ stricmp (const char* s1, const char* s2);/
+<tag/Description/The <tt/stricmp/ function compares the two strings passed as
+parameters without case sensitivity. It returns a value that is less than zero
+if <tt/s1/ is less than <tt/s2/, zero if <tt/s1/ is the same as <tt/s2/, and a
+value greater than zero if <tt/s1/ is greater than <tt/s2/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The function is not available in strict ANSI mode.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="strcasecmp" name="strcasecmp">,
+<ref id="strcmp" name="strcmp">,
+<ref id="strcoll" name="strcoll">
+<tag/Example/None.
 </descrip>
 </quote>
 

@@ -18,7 +18,3 @@ Introduced with version 2.5:
     did not work with the new symbol table code, and should be unnecessary as
     soon as local variables are allocated in one chunk on function entry.
 
-  * Register variables are currently unavailable. The command line switches
-    and the "register" keyword is still accepted, so this should not harm
-    existing programs.
-

@@ -101,6 +101,65 @@ static void SetupSegLabels (FILE* F)
 
 
 
+static const char* LabelPlusOffs (const char* Label, long Offs)
+/* Generate "Label+xxx" in a static buffer and return a pointer to the buffer */
+{
+    static char Buf[256];
+    xsprintf (Buf, sizeof (Buf), "%s%+ld", Label, Offs);
+    return Buf;
+}
+
+
+
+static const char* RelocExpr (const O65Data* D, unsigned char SegID,
+                              unsigned long Val, const O65Reloc* R)
+/* Generate the segment relative relocation expression. R is only used if the
+ * expression contains am import, and may be NULL if this is an error (which
+ * is then flagged).
+ */
+{
+    const O65Import* Import;
+
+    switch (SegID) {
+
+        case O65_SEGID_UNDEF:
+            if (R) {
+                if (R->SymIdx >= CollCount (&D->Imports)) {
+                    Error ("Import index out of range (input file corrupt)");
+                }
+                Import = CollConstAt (&D->Imports, R->SymIdx);
+                return LabelPlusOffs (Import->Name, Val);
+            } else {
+                Error ("Relocation references an import which is not allowed here");
+                return 0;
+            }
+            break;
+
+        case O65_SEGID_TEXT:
+            return LabelPlusOffs (CodeLabel, Val - D->Header.tbase);
+
+        case O65_SEGID_DATA:
+            return LabelPlusOffs (DataLabel, Val - D->Header.dbase);
+
+        case O65_SEGID_BSS:
+            return LabelPlusOffs (BssLabel, Val - D->Header.bbase);
+
+        case O65_SEGID_ZP:
+            return LabelPlusOffs (ZeropageLabel, Val - D->Header.zbase);
+
+        case O65_SEGID_ABS:
+            return LabelPlusOffs ("", Val);
+
+        default:
+            Internal ("Cannot handle this segment reference in reloc entry");
+    }
+
+    /* NOTREACHED */
+    return 0;
+}
+
+
+
 static void ConvertImports (FILE* F, const O65Data* D)
 /* Convert the imports */
 {
@@ -133,62 +192,15 @@ static void ConvertExports (FILE* F, const O65Data* D)
             const O65Export* Export = CollConstAt (&D->Exports, I);
 
             /* First define it */
-            fprintf (F, "%s = XXX\n", Export->Name);    /* ### */
+            fprintf (F, "%s = %s\n",
+                     Export->Name,
+                     RelocExpr (D, Export->SegID, Export->Val, 0));
 
             /* Then export it by name */
             fprintf (F, ".export\t%s\n", Export->Name);
         }
         fprintf (F, "\n");
     }
-}
-
-
-
-static const char* LabelPlusOffs (const char* Label, long Offs)
-/* Generate "Label+xxx" in a static buffer and return a pointer to the buffer */
-{
-    static char Buf[256];
-    xsprintf (Buf, sizeof (Buf), "%s%+ld", Label, Offs);
-    return Buf;
-}
-
-
-
-static const char* RelocExpr (const O65Data* D, const O65Reloc* R, unsigned long Val)
-/* Generate the segment relative relocation expression */
-{
-    const O65Import* Import;
-
-    switch (R->SegID) {
-
-        case O65_SEGID_UNDEF:
-            if (R->SymIdx >= CollCount (&D->Imports)) {
-                Error ("Import index out of range (input file corrupt)");
-            }
-            Import = CollConstAt (&D->Imports, R->SymIdx);
-            return LabelPlusOffs (Import->Name, Val);
-
-        case O65_SEGID_TEXT:
-            return LabelPlusOffs (CodeLabel, Val - D->Header.tbase);
-
-        case O65_SEGID_DATA:
-            return LabelPlusOffs (DataLabel, Val - D->Header.dbase);
-
-        case O65_SEGID_BSS:
-            return LabelPlusOffs (BssLabel, Val - D->Header.bbase);
-
-        case O65_SEGID_ZP:
-            return LabelPlusOffs (ZeropageLabel, Val - D->Header.zbase);
-
-        case O65_SEGID_ABS:
-            return LabelPlusOffs ("", Val);
-
-        default:
-            Internal ("Cannot handle this segment reference in reloc entry");
-    }
-
-    /* NOTREACHED */
-    return 0;
 }
 
 
@@ -222,18 +234,18 @@ static void ConvertSeg (FILE* F, const O65Data* D, const Collection* Relocs,
                     } else {
                         Val = (Data[Byte+1] << 8) + Data[Byte];
                         Byte += 2;
-                        fprintf (F, "\t.word\t%s\n", RelocExpr (D, R, Val));
+                        fprintf (F, "\t.word\t%s\n", RelocExpr (D, R->SegID, Val, R));
                     }
                     break;
 
                 case O65_RTYPE_HIGH:
                     Val = (Data[Byte++] << 8) + R->Val;
-                    fprintf (F, "\t.byte\t>(%s)\n", RelocExpr (D, R, Val));
+                    fprintf (F, "\t.byte\t>(%s)\n", RelocExpr (D, R->SegID, Val, R));
                     break;
 
                 case O65_RTYPE_LOW:
                     Val = Data[Byte++];
-                    fprintf (F, "\t.byte\t<(%s)\n", RelocExpr (D, R, Val));
+                    fprintf (F, "\t.byte\t<(%s)\n", RelocExpr (D, R->SegID, Val, R));
                     break;
 
                 case O65_RTYPE_SEGADDR:
@@ -245,7 +257,7 @@ static void ConvertSeg (FILE* F, const O65Data* D, const Collection* Relocs,
                               (((unsigned long) Data[Byte+0]) <<  0) +
                               R->Val;
                         Byte += 3;
-                        fprintf (F, "\t.faraddr\t%s\n", RelocExpr (D, R, Val));
+                        fprintf (F, "\t.faraddr\t%s\n", RelocExpr (D, R->SegID, Val, R));
                     }
                     break;
 
@@ -342,7 +354,7 @@ static void ConvertZeropageSeg (FILE* F, const O65Data* D)
         fprintf (F, "%s = __ZP_START__\n", ZeropageLabel);
     } else {
         /* Header */
-        fprintf (F, ".segment\t\"%s\", zeropage\n%s:\n", ZeropageSeg, ZeropageLabel);
+        fprintf (F, ".segment\t\"%s\": zeropage\n%s:\n", ZeropageSeg, ZeropageLabel);
 
         /* Segment data */
         fprintf (F, "\t.res\t%lu\n", D->Header.zlen);

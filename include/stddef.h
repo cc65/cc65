@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   stddef.h				     */
+/*	 			   stddef.h				     */
 /*                                                                           */
-/*			      Common definitions			     */
+/*	 		      Common definitions			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,24 +39,24 @@
 
 
 /* Standard data types */
-#ifndef _PTRDIFF_T
-#define _PTRDIFF_T
+#ifndef _HAVE_ptrdiff_t
+#define _HAVE_ptrdiff_t
 typedef int ptrdiff_t;
 #endif
-#ifndef _WCHAR_T
-#define _WCHAR_T
+#ifndef _HAVE_wchar_t
+#define _HAVE_wchar_t
 typedef unsigned short wchar_t;
 #endif
-#ifndef _SIZE_T
-#define _SIZE_T
+#ifndef _HAVE_size_t
+#define _HAVE_size_t
 typedef unsigned size_t;
 #endif
 
 /* NULL pointer */
-#ifdef NULL
-#  undef NULL
-#endif
+#ifndef _HAVE_NULL
 #define NULL	0
+#define _HAVE_NULL
+#endif
 
 /* offsetof macro */
 #define offsetof(type, member)	(size_t) (&((type*) 0)->member)
@@ -65,7 +65,6 @@ typedef unsigned size_t;
 
 /* End of stddef.h */
 #endif
-
 
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,9 +38,11 @@
 
 
 
-#include <stddef.h>
-
-
+/* size_t is needed */
+#ifndef _HAVE_size_t
+typedef unsigned size_t;
+#define _HAVE_size_t
+#endif
 
 /* Standard exit codes */
 #define EXIT_SUCCESS	0

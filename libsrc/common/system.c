@@ -5,6 +5,7 @@
  * Ullrich von Bassewitz, 2003-05-27
  */
 
+#include <stdio.h>
 #include <stdlib.h>
 
 int system (const char* s)

@@ -37,7 +37,7 @@
 #define _UNISTD_H
 
 
-                                                   
+
 /*****************************************************************************/
 /*	       	   	  	     Data	   			     */
 /*****************************************************************************/
@@ -49,9 +49,15 @@
 #define STDOUT_FILENO	1
 #define STDERR_FILENO	2
 
+/* WE need size_t */
+#ifndef _HAVE_size_t
+#define _HAVE_size_t
+typedef unsigned size_t;
+#endif
+
 /* We need off_t if sys/types is not included */
-#ifndef __HAVE_off_t
-#define __HAVE_off_t
+#ifndef _HAVE_off_t
+#define _HAVE_off_t
 typedef long int off_t;
 #endif
 

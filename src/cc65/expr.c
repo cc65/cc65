@@ -2755,7 +2755,7 @@ static int hieQuest (ExprDesc *lval)
 	type3 = lval3.Type;
         if (!IsTypeVoid (lval3.Type)) {
             /* Load it into the primary */
-            exprhs (CF_NONE, k, &lval2);
+            exprhs (CF_NONE, k, &lval3);
         }
 
     	/* Check if any conversions are needed, if so, do them.

@@ -73,15 +73,16 @@ struct CodeSeg;
 #define REG_PTR4_LO    	0x4000U
 #define REG_PTR4_HI    	0x8000U
 #define	REG_AX		(REG_A | REG_X)
-#define REG_EAX         (REG_A | REG_X | REG_SREG_LO | REG_SREG_HI)
-#define REG_XY		(REG_X | REG_Y)
-#define REG_AXY		(REG_A | REG_X | REG_Y)
 #define REG_SREG        (REG_SREG_LO | REG_SREG_HI)
+#define REG_EAX         (REG_AX | REG_SREG)
+#define REG_XY		(REG_X | REG_Y)
+#define REG_AXY		(REG_AX | REG_Y)
+#define REG_EAXY        (REG_EAX | REG_Y)
 #define REG_PTR1        (REG_PTR1_LO | REG_PTR1_HI)
 #define REG_PTR2        (REG_PTR2_LO | REG_PTR2_HI)
 #define REG_PTR3        (REG_PTR3_LO | REG_PTR3_HI)
 #define REG_PTR4        (REG_PTR4_LO | REG_PTR4_HI)
-
+#define REG_ALL         0xFFFFU
 
 
 /*****************************************************************************/
@@ -96,8 +97,11 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg);
  * load all registers.
  */
 
-int IsZPName (const char* Name);
-/* Return true if the given name is a zero page symbol */
+int IsZPName (const char* Name, unsigned short* RegInfo);
+/* Return true if the given name is a zero page symbol. If the RegInfo
+ * pointer is not NULL, it is filled with the register info for the
+ * zero page location found.
+ */
 
 unsigned GetRegInfo (struct CodeSeg* S, unsigned Index);
 /* Determine register usage information for the instructions starting at the

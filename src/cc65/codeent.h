@@ -169,8 +169,10 @@ INLINE void CE_ResetMark (CodeEntry* E)
 #  define CE_ResetMark(E)	((E)->Flags &= ~CEF_USERMARK)
 #endif
 
-void CE_SetArg (CodeEntry* E, const char* Arg);
-/* Set a new argument for the given code entry. An old string is deleted. */
+void CE_SetNumArg (CodeEntry* E, long Num);
+/* Set a new numeric argument for the given code entry that must already
+ * have a numeric argument.
+ */
 
 int CE_KnownImm (const CodeEntry* E);
 /* Return true if the argument of E is a known immediate value */

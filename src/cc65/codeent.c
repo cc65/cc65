@@ -40,6 +40,7 @@
 #include "chartype.h"
 #include "check.h"
 #include "xmalloc.h"
+#include "xsprintf.h"
 
 /* cc65 */
 #include "codeinfo.h"
@@ -136,6 +137,8 @@ static int NumArg (const char* Arg, unsigned long* Num)
 static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 /* Set the Use and Chg in E */
 {
+    unsigned short Use;
+
     /* If this is a subroutine call, or a jump to an external function,
      * lookup the information about this function and use it. The jump itself
      * does not change any registers, so we don't need to use the data from D.
@@ -145,10 +148,45 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
      	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
     } else {
      	/* Some other instruction. Use the values from the opcode description
-	 * plus addressing mode info
+	 * plus addressing mode info.
 	 */
      	E->Use = D->Use | GetAMUseInfo (E->AM);
 	E->Chg = D->Chg;
+
+	/* Check for special zero page registers used */
+	switch (E->AM) {
+
+	    case AM65_ZP:
+	    case AM65_ABS:
+	    /* Be conservative: */
+	    case AM65_ZPX:
+	    case AM65_ABSX:
+	    case AM65_ABSY:
+	        if (IsZPName (E->Arg, &Use) && Use != REG_NONE) {
+		    if (E->OPC == OP65_INC || E->OPC == OP65_DEC) {
+			E->Chg |= Use;
+			E->Use |= Use;
+		    } else if ((E->Info & OF_STORE) != 0) {
+			E->Chg |= Use;
+		    } else {
+			E->Use |= Use;
+		    }
+		}
+	        break;
+
+	    case AM65_ZPX_IND:
+	    case AM65_ZP_INDY:
+	    case AM65_ZP_IND:
+	        if (IsZPName (E->Arg, &Use) && Use != REG_NONE) {
+		    /* These addressing modes will never change the zp loc */
+		    E->Use |= Use;
+		}
+	        break;
+	    
+	    default:
+	        /* Keep gcc silent */
+	        break;
+	}
     }
 }
 
@@ -265,14 +303,35 @@ void CE_MoveLabel (CodeLabel* L, CodeEntry* E)
 
 
 
-void CE_SetArg (CodeEntry* E, const char* Arg)
-/* Set a new argument for the given code entry. An old string is deleted. */
+void CE_SetNumArg (CodeEntry* E, long Num)
+/* Set a new numeric argument for the given code entry that must already
+ * have a numeric argument.
+ */
 {
+    char Buf[16];
+
+    /* Check that the entry has a numerical argument */
+    CHECK (E->Flags & CEF_NUMARG);
+
+    /* Make the new argument string */
+    if (E->Size == 2) {
+	Num &= 0xFF;
+    	xsprintf (Buf, sizeof (Buf), "$%02X", (unsigned) Num);
+    } else if (E->Size == 3) {
+	Num &= 0xFFFF;
+    	xsprintf (Buf, sizeof (Buf), "$%04X", (unsigned) Num);
+    } else {
+    	Internal ("Invalid instruction size in CE_SetNumArg");
+    }
+
     /* Free the old argument */
     FreeArg (E->Arg);
 
     /* Assign the new one */
-    E->Arg = GetArgCopy (Arg);
+    E->Arg = GetArgCopy (Buf);
+
+    /* Use the new numerical value */
+    E->Num = Num;
 }
 
 
@@ -655,6 +714,48 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 
 
+static char* RegInfoDesc (unsigned U, char* Buf)
+/* Return a string containing register info */
+{
+    Buf[0] = '\0';
+    if (U & REG_SREG) {
+    	strcat (Buf, "E");
+    }
+    if (U & REG_A) {
+	strcat (Buf, "A");
+    }
+    if (U & REG_X) {
+    	strcat (Buf, "X");
+    }
+    if (U & REG_Y) {
+    	strcat (Buf, "Y");
+    }
+    if (U & REG_TMP1) {
+    	strcat (Buf, "T1");
+    }
+    if (U & REG_TMP2) {
+    	strcat (Buf, "T2");
+    }
+    if (U & REG_TMP3) {
+    	strcat (Buf, "T3");
+    }
+    if (U & REG_PTR1) {
+    	strcat (Buf, "P1");
+    }
+    if (U & REG_PTR2) {
+    	strcat (Buf, "P2");
+    }
+    if (U & REG_PTR3) {
+    	strcat (Buf, "P3");
+    }
+    if (U & REG_PTR4) {
+    	strcat (Buf, "P4");
+    }
+    return Buf;
+}
+
+
+
 void CE_Output (const CodeEntry* E, FILE* F)
 /* Output the code entry to a file */
 {
@@ -699,7 +800,7 @@ void CE_Output (const CodeEntry* E, FILE* F)
     	case AM65_ABS:
 	    /* zeropage and absolute */
 	    Chars += fprintf (F, "%*s%s", 9-Chars, "", E->Arg);
-	    break;
+       	    break;
 
 	case AM65_ZPX:
 	case AM65_ABSX:
@@ -740,16 +841,14 @@ void CE_Output (const CodeEntry* E, FILE* F)
 
     /* Print usage info if requested by the debugging flag */
     if (Debug) {
-  	fprintf (F,
-		 "%*s; USE: %c%c%c CHG: %c%c%c SIZE: %u\n",
-		 30-Chars, "",
-		 (E->Use & REG_A)? 'A' : '_',
-		 (E->Use & REG_X)? 'X' : '_',
-		 (E->Use & REG_Y)? 'Y' : '_',
-		 (E->Chg & REG_A)? 'A' : '_',
-		 (E->Chg & REG_X)? 'X' : '_',
-		 (E->Chg & REG_Y)? 'Y' : '_',
-		 E->Size);
+	char Use [128];
+	char Chg [128];
+       	fprintf (F,
+       	       	 "%*s; USE: %-18s CHG: %-18s SIZE: %u\n",
+       	       	 30-Chars, "",
+		 RegInfoDesc (E->Use, Use),
+		 RegInfoDesc (E->Chg, Chg),
+	       	 E->Size);
     } else {
 	/* Terminate the line */
 	fprintf (F, "\n");

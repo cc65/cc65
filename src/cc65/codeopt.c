@@ -591,15 +591,12 @@ static unsigned OptAdd1 (CodeSeg* S)
 
 	    CodeEntry* X;
 	    CodeLabel* Label;
-	    char Buf [16];
 
 	    /* Remove the call to pushax */
 	    CS_DelEntry (S, I);
 
 	    /* Correct the stack offset (needed since pushax was removed) */
-	    L[0]->Num -= 2;
-	    xsprintf (Buf, sizeof (Buf), "$%02lX", L[0]->Num);
-	    CE_SetArg (L[0], Buf);
+	    CE_SetNumArg (L[0], L[0]->Num - 2);
 
 	    /* Add the clc . */
 	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[3]->LI);
@@ -1885,7 +1882,7 @@ static unsigned OptPtrStore2 (CodeSeg* S)
 {
     unsigned Changes = 0;
 
-    /* Walk over the entries */	  
+    /* Walk over the entries */
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 

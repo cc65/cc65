@@ -64,8 +64,14 @@ void* __fastcall__ memcpy (void* dest, const void* src, size_t count);
 void* __fastcall__ memmove (void* dest, const void* src, size_t count);
 void* __fastcall__ memset (void* s, int c, size_t count);
 
+/* The following is an internal function, the compiler will replace memset
+ * with it if the fill value is zero. Never use this one directly!
+ */
+void* __fastcall__ _bzero (void* ptr, size_t n);                           
+
 /* Non standard: */
 #ifndef __STRICT_ANSI__
+void __fastcall__ bzero (void* ptr, size_t n);                /* BSD */
 char* __fastcall__ strdup (const char* s);		      /* SYSV/BSD */
 int __fastcall__ stricmp (const char* s1, const char* s2);    /* DOS/Windows */
 int __fastcall__ strcasecmp (const char* s1, const char* s2); /* Same for Unix */

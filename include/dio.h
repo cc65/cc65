@@ -54,35 +54,40 @@ extern dhandle_t     __fastcall__ dio_open(driveid_t drive_id);
 /* open drive for subsequent dio access */
 
 extern unsigned char __fastcall__ dio_close(dhandle_t handle);
-/* close drive */
+/* close drive, returns oserror (0 for success) */
 
 extern unsigned char __fastcall__ dio_read(dhandle_t handle,
                                            sectnum_t sect_num,
                                            void *buffer);
 /* read sector <sect_num> from drive <handle> to memory at <buffer> */
 /* the number of bytes transferred depends on the sector size */
+/* returns oserror (0 for success) */
 
 extern unsigned char __fastcall__ dio_write(dhandle_t handle,
                                             sectnum_t sect_num,
                                             const void *buffer);
 /* write memory at <buffer> to sector <sect_num> on drive <handle>, no verify */
 /* the number of bytes transferred depends on the sector size */
+/* returns oserror (0 for success) */
 
 extern unsigned char __fastcall__ dio_write_verify(dhandle_t handle,
                                                    sectnum_t sect_num,
                                                    const void *buffer);
 /* write memory at <buffer> to sector <sect_num> on drive <handle>, verify after write */
 /* the number of bytes transferred depends on the sector size */
+/* returns oserror (0 for success) */
 
 
 extern unsigned char __fastcall__ dio_phys_to_log(dhandle_t handle,
                                                   const dio_phys_pos *physpos, /* input */
                                                   sectnum_t *sectnum);        /* output */
 /* convert physical sector address (head/track/sector) to logical sector number */
+/* returns oserror (0 for success) */
 
 extern unsigned char __fastcall__ dio_log_to_phys(dhandle_t handle,
                                                   const sectnum_t *sectnum,    /* input */
                                                   dio_phys_pos *physpos);     /* output */
 /* convert logical sector number to physical sector address (head/track/sector) */
+/* returns oserror (0 for success) */
 
 #endif /* #ifndef _DIO_H */

@@ -9,7 +9,7 @@
 
 	    .export _get_ostype
 	    .export _get_tv
-	    .import tmp1
+	    .importzp tmp1
 
 	    .include "../inc/geossym.inc"
 	    .include "../inc/geossym2.inc"

@@ -91,6 +91,26 @@ Long options:
 Here is a description of all the command line options:
 
 <descrip>
+  
+  <label id="option--start-group">
+  <tag><tt>-(, --start-group</tt></tag>
+
+  Start a library group. The libraries specified within a group are searched
+  multiple times to resolve crossreferences within the libraries. Normally,
+  crossreferences are only resolved within a library, that is the library is
+  searched multiple times. Libraries specified later on the command line
+  cannot reference otherwise unreferenced symbols in libraries specified
+  earlier, because the linker has already handled them. Library groups are
+  a solution for this problem, because the linker will search repeatedly
+  through all libraries specified in the group, until all possible open
+  symbol references have been satisfied.
+
+
+  <tag><tt>-), --end-group</tt></tag>
+
+  End a library group. See the explanation of the <tt><ref
+  id="option--start-group" name="--start-group"></tt> option.
+
 
   <tag><tt>-h, --help</tt></tag>
 

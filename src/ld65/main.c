@@ -91,6 +91,8 @@ static void Usage (void)
 {
     printf ("Usage: %s [options] module ...\n"
             "Short options:\n"
+            "  -(\t\t\tStart a library group\n"
+            "  -)\t\t\tEnd a library group\n"
             "  -C name\t\tUse linker config file\n"
             "  -L path\t\tSpecify a library search path\n"
             "  -Ln name\t\tCreate a VICE label file\n"
@@ -108,6 +110,7 @@ static void Usage (void)
             "  --config name\t\tUse linker config file\n"
             "  --dbgfile name\tGenerate debug information\n"
             "  --dump-config name\tDump a builtin configuration\n"
+            "  --end-group\t\tEnd a library group\n"
             "  --help\t\tHelp (this text)\n"
             "  --lib file\t\tLink this library\n"
             "  --lib-path path\tSpecify a library search path\n"
@@ -116,6 +119,7 @@ static void Usage (void)
             "  --obj file\t\tLink this object file\n"
             "  --obj-path path\tSpecify an object file search path\n"
             "  --start-addr addr\tSet the default start address\n"
+            "  --start-group\t\tStart a library group\n"
             "  --target sys\t\tSet the target system\n"
             "  --version\t\tPrint the linker version\n",
             ProgName);
@@ -273,6 +277,15 @@ static void OptDumpConfig (const char* Opt attribute ((unused)), const char* Arg
 
 
 
+static void OptEndGroup (const char* Opt attribute ((unused)),
+		         const char* Arg attribute ((unused)))
+/* End a library group */
+{
+    LibEndGroup ();
+}
+
+
+
 static void OptHelp (const char* Opt attribute ((unused)),
 		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
@@ -344,6 +357,15 @@ static void OptStartAddr (const char* Opt, const char* Arg)
 
 
 
+static void OptStartGroup (const char* Opt attribute ((unused)),
+		           const char* Arg attribute ((unused)))
+/* Start a library group */
+{
+    LibStartGroup ();
+}
+
+
+
 static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
 /* Set the target system */
 {
@@ -385,6 +407,7 @@ int main (int argc, char* argv [])
        	{ "--config",  	       	1,     	OptConfig    	    	},
      	{ "--dbgfile",          1,      OptDbgFile              },
        	{ "--dump-config",     	1,     	OptDumpConfig           },
+        { "--end-group",        0,      OptEndGroup             },
      	{ "--help",	       	0,     	OptHelp	     	    	},
         { "--lib",              1,      OptLib                  },
        	{ "--lib-path",         1,     	OptLibPath              },
@@ -393,6 +416,7 @@ int main (int argc, char* argv [])
         { "--obj",              1,      OptObj                  },
        	{ "--obj-path",         1,     	OptObjPath              },
 	{ "--start-addr",	1,	OptStartAddr	    	},
+        { "--start-group",      0,      OptStartGroup           },
 	{ "--target",		1,	OptTarget    	    	},
 	{ "--version",	       	0,  	OptVersion   	    	},
     };
@@ -425,6 +449,14 @@ int main (int argc, char* argv [])
 		case '-':
 	       	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
 	       	    break;
+
+                case '(':
+                    OptStartGroup (Arg, 0);
+                    break;
+
+                case ')':
+                    OptEndGroup (Arg, 0);
+                    break;
 
 		case 'h':
 		case '?':
@@ -499,6 +531,9 @@ int main (int argc, char* argv [])
     if (!CfgAvail ()) {
        	Error ("Memory configuration missing");
     }
+
+    /* Check if we have open library groups */
+    LibCheckGroup ();
 
     /* Read the config file */
     CfgRead ();

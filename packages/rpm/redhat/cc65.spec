@@ -110,6 +110,7 @@ programs for the Apple ][ using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/lib/apple2.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/apple2.o
 %attr(644,root,root) 		/usr/lib/cc65/joy/a2-*.joy
+%attr(644,root,root) 		/usr/lib/cc65/tgi/apple2-*.tgi
 
 
 
@@ -288,7 +289,7 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/emd/geos-*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/geos-*.joy
 %attr(644,root,root) 		/usr/lib/cc65/tgi/geos-*.tgi
-						      
+
 
 
 ###############################################################################

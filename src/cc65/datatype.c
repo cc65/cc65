@@ -426,8 +426,7 @@ unsigned SizeOf (const type* T)
     switch (UnqualifiedType (T[0])) {
 
     	case T_VOID:
-    	    Error ("Variable has unknown size");
-	    return 1;	/* Return something that makes sense */
+       	    return 0;   /* Assume voids have size zero */
 
 	case T_SCHAR:
 	case T_UCHAR:
@@ -485,6 +484,38 @@ unsigned PSizeOf (const type* T)
     } else {
       	return SizeOf (T + 1);
     }
+}
+
+
+
+unsigned CheckedSizeOf (const type* T)
+/* Return the size of a data type. If the size is zero, emit an error and
+ * return some valid size instead (so the rest of the compiler doesn't have
+ * to work with invalid sizes).
+ */
+{
+    unsigned Size = SizeOf (T);
+    if (Size == 0) {
+        Error ("Size of data type is unknown");
+        Size = 1;
+    }
+    return Size;
+}
+
+
+
+unsigned CheckedPSizeOf (const type* T)
+/* Return the size of a data type that is pointed to by a pointer. If the
+ * size is zero, emit an error and return some valid size instead (so the
+ * rest of the compiler doesn't have to work with invalid sizes).
+ */
+{
+    unsigned Size = PSizeOf (T);
+    if (Size == 0) {
+        Error ("Size of data type is unknown");
+        Size = 1;
+    }
+    return Size;
 }
 
 

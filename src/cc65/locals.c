@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -112,7 +112,7 @@ static int AllocRegVar (const SymEntry* Sym, const type* tarray)
     if (EnableRegVars) {
 
 	/* Get the size of the variable */
-	unsigned Size = SizeOf (tarray);
+	unsigned Size = CheckedSizeOf (tarray);
 
 	/* Do we have space left? */
 	if (RegOffs >= Size) {
@@ -417,7 +417,7 @@ void RestoreRegVars (int HaveResult)
 	/* Check for more than one variable */
        	const SymEntry* Sym = RegSyms[I];
 	Offs  = Sym->V.Offs;
-	Bytes = SizeOf (Sym->Type);
+	Bytes = CheckedSizeOf (Sym->Type);
 	J = I+1;
 
        	while (J < RegSymCount) {
@@ -426,7 +426,7 @@ void RestoreRegVars (int HaveResult)
 	    const SymEntry* NextSym = RegSyms [J];
 
 	    /* Get the size */
-	    int Size = SizeOf (NextSym->Type);
+	    int Size = CheckedSizeOf (NextSym->Type);
 
 	    /* Adjacent variable? */
 	    if (NextSym->V.Offs + Size != Offs) {

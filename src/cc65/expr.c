@@ -573,7 +573,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	if (FrameParams > 0 && (Func->Flags & FD_FASTCALL) != 0) {
 	    /* Last parameter is not pushed */
 	    const SymEntry* LastParam = Func->SymTab->SymTail;
-	    FrameSize -= SizeOf (LastParam->Type);
+	    FrameSize -= CheckedSizeOf (LastParam->Type);
 	    --FrameParams;
 	}
 
@@ -632,7 +632,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
      	 * use a special function that may optimize.
      	 */
        	CFlags = CF_NONE;
-       	if (!Ellipsis && SizeOf (Param->Type) == 1) {
+       	if (!Ellipsis && CheckedSizeOf (Param->Type) == 1) {
 	    CFlags = CF_FORCECHAR;
       	}
 	Flags = CF_NONE;
@@ -1079,7 +1079,7 @@ static int arrayref (int k, ExprDesc* lval)
      	if (IsClassPtr (tptr1)) {
 
      	    /* Scale the subscript value according to element size */
-     	    lval2.ConstVal *= PSizeOf (tptr1);
+     	    lval2.ConstVal *= CheckedPSizeOf (tptr1);
 
 	    /* Remove code for lhs load */
 	    RemoveCode (Mark1);
@@ -1114,7 +1114,7 @@ static int arrayref (int k, ExprDesc* lval)
     	    lval2.Type = Indirect (tptr2);
 
     	    /* Scale the rhs value in the primary register */
-    	    g_scale (TypeOf (tptr1), SizeOf (lval2.Type));
+    	    g_scale (TypeOf (tptr1), CheckedSizeOf (lval2.Type));
     	    /* */
     	    lval->Type = lval2.Type;
     	} else {
@@ -1143,7 +1143,7 @@ static int arrayref (int k, ExprDesc* lval)
 	     * portion of the index (which is in (e)ax, so there's no further
 	     * action required).
 	     */
-	    g_scale (CF_INT, SizeOf (lval->Type));
+	    g_scale (CF_INT, CheckedSizeOf (lval->Type));
 
 	} else if (IsClassPtr (tptr2)) {
 
@@ -1165,7 +1165,7 @@ static int arrayref (int k, ExprDesc* lval)
 	    }
 
 	    /* Scale it */
-	    g_scale (TypeOf (tptr1), SizeOf (lval2.Type));
+	    g_scale (TypeOf (tptr1), CheckedSizeOf (lval2.Type));
 	    lval->Type = lval2.Type;
 	} else {
 	    Error ("Cannot subscript");
@@ -1194,12 +1194,12 @@ static int arrayref (int k, ExprDesc* lval)
        	       	       	    (rflags & E_MGLOBAL) != 0 || /* Static array, or ... */
 	    	    	    rflags == E_MLOCAL;      	 /* Local array */
 
-       	    if (ConstSubAddr && SizeOf (lval->Type) == 1) {
+       	    if (ConstSubAddr && CheckedSizeOf (lval->Type) == 1) {
 
 	    	type* SavedType;
 
 	    	/* Reverse the order of evaluation */
-	    	unsigned flags = (SizeOf (lval2.Type) == 1)? CF_CHAR : CF_INT;
+	    	unsigned flags = (CheckedSizeOf (lval2.Type) == 1)? CF_CHAR : CF_INT;
     	     	RemoveCode (Mark2);
 
 	    	/* Get a pointer to the array into the primary. We have changed
@@ -1414,7 +1414,7 @@ static void pre_incdec (ExprDesc* lval, void (*inc) (unsigned, unsigned long))
     flags = TypeOf (lval->Type) | CF_FORCECHAR | CF_CONST;
 
     /* Get the increment value in bytes */
-    val = (lval->Type [0] == T_PTR)? PSizeOf (lval->Type) : 1;
+    val = (lval->Type [0] == T_PTR)? CheckedPSizeOf (lval->Type) : 1;
 
     /* We're currently only able to handle some adressing modes */
     if ((lval->Flags & E_MGLOBAL) == 0 && 	/* Global address? */
@@ -1502,7 +1502,7 @@ static void post_incdec (ExprDesc *lval, int k, void (*inc) (unsigned, unsigned 
 
     /* If we have a pointer expression, increment by the size of the type */
     if (lval->Type[0] == T_PTR) {
-    	inc (flags | CF_CONST | CF_FORCECHAR, SizeOf (lval->Type + 1));
+    	inc (flags | CF_CONST | CF_FORCECHAR, CheckedSizeOf (lval->Type + 1));
     } else {
      	inc (flags | CF_CONST | CF_FORCECHAR, 1);
     }
@@ -1587,8 +1587,8 @@ static int typecast (ExprDesc* lval)
 	if (IsClassInt (Type)) {
 
 	    /* Get the current and new size of the value */
-	    unsigned OldSize = SizeOf (lval->Type);
-	    unsigned NewSize = SizeOf (Type);
+	    unsigned OldSize = CheckedSizeOf (lval->Type);
+	    unsigned NewSize = CheckedSizeOf (Type);
 	    unsigned OldBits = OldSize * 8;
 	    unsigned NewBits = NewSize * 8;
 
@@ -1720,13 +1720,13 @@ static int hie10 (ExprDesc* lval)
        	    if (istypeexpr ()) {
     		type Type[MAXTYPELEN];
      	     	NextToken ();
-		lval->ConstVal = SizeOf (ParseType (Type));
+		lval->ConstVal = CheckedSizeOf (ParseType (Type));
      	     	ConsumeRParen ();
      	    } else {
     	   	/* Remember the output queue pointer */
     	    	CodeMark Mark = GetCodePos ();
      	     	hie10 (lval);
-     	       	lval->ConstVal = SizeOf (lval->Type);
+     	       	lval->ConstVal = CheckedSizeOf (lval->Type);
     	   	/* Remove any generated code */
     	   	RemoveCode (Mark);
      	    }
@@ -2039,11 +2039,11 @@ static void parseadd (int k, ExprDesc* lval)
     	    /* Both expressions are constants. Check for pointer arithmetic */
        	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
        	    	/* Left is pointer, right is int, must scale rhs */
-    	    	lval->ConstVal = lval->ConstVal + lval2.ConstVal * PSizeOf (lhst);
+       	       	lval->ConstVal += lval2.ConstVal * CheckedPSizeOf (lhst);
     	    	/* Result type is a pointer */
     	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is int, right is pointer, must scale lhs */
-       	       	lval->ConstVal = lval->ConstVal * PSizeOf (rhst) + lval2.ConstVal;
+       	       	lval->ConstVal = lval->ConstVal * CheckedPSizeOf (rhst) + lval2.ConstVal;
     	    	/* Result type is a pointer */
     	    	lval->Type = lval2.Type;
        	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
@@ -2085,7 +2085,7 @@ static void parseadd (int k, ExprDesc* lval)
     	    /* Check for pointer arithmetic */
     	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    	/* Left is pointer, right is int, must scale rhs */
-    	    	g_scale (CF_INT, PSizeOf (lhst));
+    	    	g_scale (CF_INT, CheckedPSizeOf (lhst));
     	    	/* Operate on pointers, result type is a pointer */
       	    	flags |= CF_PTR;
 		/* Generate the code for the add */
@@ -2099,7 +2099,7 @@ static void parseadd (int k, ExprDesc* lval)
     	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
 
     	      	/* Left is int, right is pointer, must scale lhs. */
-		unsigned ScaleFactor = PSizeOf (rhst);
+		unsigned ScaleFactor = CheckedPSizeOf (rhst);
 
        	       	/* Operate on pointers, result type is a pointer */
 		flags |= CF_PTR;
@@ -2166,12 +2166,12 @@ static void parseadd (int k, ExprDesc* lval)
        	    /* Check for pointer arithmetic */
        	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	       	/* Left is pointer, right is int, must scale rhs */
-    	       	lval2.ConstVal *= PSizeOf (lhst);
+    	       	lval2.ConstVal *= CheckedPSizeOf (lhst);
     	      	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
     	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
     	      	/* Left is int, right is pointer, must scale lhs (ptr only) */
-       	       	g_scale (CF_INT | CF_CONST, PSizeOf (rhst));
+       	       	g_scale (CF_INT | CF_CONST, CheckedPSizeOf (rhst));
        	       	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
     	      	lval->Type = lval2.Type;
@@ -2198,14 +2198,14 @@ static void parseadd (int k, ExprDesc* lval)
     	    /* Check for pointer arithmetic */
       	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	      	/* Left is pointer, right is int, must scale rhs */
-    	      	g_scale (CF_INT, PSizeOf (lhst));
+    	      	g_scale (CF_INT, CheckedPSizeOf (lhst));
     	      	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
     	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
     	      	/* Left is int, right is pointer, must scale lhs */
     	      	g_tosint (TypeOf (rhst));	/* Make sure, TOS is int */
     	    	g_swap (CF_INT);  		/* Swap TOS and primary */
-    	    	g_scale (CF_INT, PSizeOf (rhst));
+    	    	g_scale (CF_INT, CheckedPSizeOf (rhst));
     	      	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
     	      	lval->Type = lval2.Type;
@@ -2276,14 +2276,15 @@ static void parsesub (int k, ExprDesc* lval)
     	    /* Check for pointer arithmetic */
     	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    	/* Left is pointer, right is int, must scale rhs */
-    	    	lval->ConstVal -= lval2.ConstVal * PSizeOf (lhst);
+    	    	lval->ConstVal -= lval2.ConstVal * CheckedPSizeOf (lhst);
     	    	/* Operate on pointers, result type is a pointer */
     	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is pointer, right is pointer, must scale result */
     	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
     	    	    Error ("Incompatible pointer types");
     	    	} else {
-    	    	    lval->ConstVal = (lval->ConstVal - lval2.ConstVal) / PSizeOf (lhst);
+    	    	    lval->ConstVal = (lval->ConstVal - lval2.ConstVal) / 
+                                      CheckedPSizeOf (lhst);
     	    	}
     	    	/* Operate on pointers, result type is an integer */
     	    	lval->Type = type_int;
@@ -2310,7 +2311,7 @@ static void parsesub (int k, ExprDesc* lval)
 
     	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    	/* Left is pointer, right is int, must scale rhs */
-       	       	lval2.ConstVal *= PSizeOf (lhst);
+       	       	lval2.ConstVal *= CheckedPSizeOf (lhst);
     	    	/* Operate on pointers, result type is a pointer */
     	    	flags = CF_PTR;
     	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
@@ -2318,7 +2319,7 @@ static void parsesub (int k, ExprDesc* lval)
     	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
     	    	    Error ("Incompatible pointer types");
     	    	} else {
-    	    	    rscale = PSizeOf (lhst);
+    	    	    rscale = CheckedPSizeOf (lhst);
     	    	}
     	    	/* Operate on pointers, result type is an integer */
     	    	flags = CF_PTR;
@@ -2353,7 +2354,7 @@ static void parsesub (int k, ExprDesc* lval)
        	/* Check for pointer arithmetic */
  	if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    /* Left is pointer, right is int, must scale rhs */
- 	    g_scale (CF_INT, PSizeOf (lhst));
+ 	    g_scale (CF_INT, CheckedPSizeOf (lhst));
  	    /* Operate on pointers, result type is a pointer */
  	    flags = CF_PTR;
  	} else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
@@ -2361,7 +2362,7 @@ static void parsesub (int k, ExprDesc* lval)
  	    if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_QUAL_DIFF) {
  	       	Error ("Incompatible pointer types");
  	    } else {
- 	    	rscale = PSizeOf (lhst);
+ 	    	rscale = CheckedPSizeOf (lhst);
  	    }
  	    /* Operate on pointers, result type is an integer */
  	    flags = CF_PTR;
@@ -2848,13 +2849,13 @@ static void opeq (GenDesc* Gen, ExprDesc *lval, int k)
 	}
        	if (MustScale) {
 	    /* lhs is a pointer, scale rhs */
-	    lval2.ConstVal *= SizeOf (lval->Type+1);
+	    lval2.ConstVal *= CheckedSizeOf (lval->Type+1);
 	}
 
 	/* If the lhs is character sized, the operation may be later done
 	 * with characters.
 	 */
-	if (SizeOf (lval->Type) == 1) {
+	if (CheckedSizeOf (lval->Type) == 1) {
 	    flags |= CF_FORCECHAR;
 	}
 
@@ -2870,13 +2871,13 @@ static void opeq (GenDesc* Gen, ExprDesc *lval, int k)
 	/* rhs is not constant and already in the primary register */
        	if (MustScale) {
  	    /* lhs is a pointer, scale rhs */
-       	    g_scale (TypeOf (lval2.Type), SizeOf (lval->Type+1));
+       	    g_scale (TypeOf (lval2.Type), CheckedSizeOf (lval->Type+1));
 	}
 
 	/* If the lhs is character sized, the operation may be later done
 	 * with characters.
 	 */
-	if (SizeOf (lval->Type) == 1) {
+	if (CheckedSizeOf (lval->Type) == 1) {
 	    flags |= CF_FORCECHAR;
 	}
 
@@ -2928,7 +2929,7 @@ static void addsubeq (GenDesc* Gen, ExprDesc *lval, int k)
     	/* The resulting value is a constant. */
        	if (MustScale) {
     	    /* lhs is a pointer, scale rhs */
-    	    lval2.ConstVal *= SizeOf (lval->Type+1);
+    	    lval2.ConstVal *= CheckedSizeOf (lval->Type+1);
     	}
      	rflags |= CF_CONST;
 	lflags |= CF_CONST;
@@ -2936,7 +2937,7 @@ static void addsubeq (GenDesc* Gen, ExprDesc *lval, int k)
      	/* rhs is not constant and already in the primary register */
        	if (MustScale) {
      	    /* lhs is a pointer, scale rhs */
-       	    g_scale (TypeOf (lval2.Type), SizeOf (lval->Type+1));
+       	    g_scale (TypeOf (lval2.Type), CheckedSizeOf (lval->Type+1));
      	}
     }
 
@@ -3027,7 +3028,7 @@ static void Assignment (ExprDesc* lval)
 	}
 
 	/* Load the size of the struct into the primary */
-	g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, SizeOf (ltype), 0);
+	g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, CheckedSizeOf (ltype), 0);
 
 	/* Call the memcpy function */
 	g_call (CF_FIXARGC, "memcpy", 4);
@@ -3038,7 +3039,7 @@ static void Assignment (ExprDesc* lval)
 	PushAddr (lval);
 
      	/* No struct, setup flags for the load */
-     	flags = SizeOf (ltype) == 1? CF_FORCECHAR : CF_NONE;
+     	flags = CheckedSizeOf (ltype) == 1? CF_FORCECHAR : CF_NONE;
 
      	/* Get the expression on the right of the '=' into the primary */
      	if (evalexpr (flags, hie1, &lval2) == 0) {

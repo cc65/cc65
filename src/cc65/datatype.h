@@ -230,6 +230,17 @@ unsigned SizeOf (const type* Type);
 unsigned PSizeOf (const type* Type);
 /* Compute size of pointer object. */
 
+unsigned CheckedSizeOf (const type* T);
+/* Return the size of a data type. If the size is zero, emit an error and
+ * return some valid size instead (so the rest of the compiler doesn't have
+ * to work with invalid sizes).
+ */
+unsigned CheckedPSizeOf (const type* T);
+/* Return the size of a data type that is pointed to by a pointer. If the
+ * size is zero, emit an error and return some valid size instead (so the
+ * rest of the compiler doesn't have to work with invalid sizes).
+ */
+
 unsigned TypeOf (const type* Type);
 /* Get the code generator base type of the object */
 

@@ -251,11 +251,14 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
      	    if ((D->Flags & FD_FASTCALL) != 0 && D->ParamCount > 0) {
      		/* Will use registers depending on the last param */
      		SymEntry* LastParam = D->SymTab->SymTail;
-     		if (SizeOf (LastParam->Type) == 1) {
+                unsigned LastParamSize = CheckedSizeOf (LastParam->Type);
+     		if (LastParamSize == 1) {
      		    *Use = REG_A;
-     		} else {
+     		} else if (LastParamSize == 2) {
      		    *Use = REG_AX;
-     		}
+     		} else {
+                    *Use = REG_EAX;
+                }
 	    } else if ((D->Flags & FD_VARIADIC) != 0) {
 		*Use = REG_Y;
      	    } else {

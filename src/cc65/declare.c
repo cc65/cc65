@@ -301,7 +301,7 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 	    AddLocalSym (Decl.Ident, Decl.Type, SC_SFLD, (StructType == T_STRUCT)? Size : 0);
 
 	    /* Calculate offset of next field/size of the union */
-    	    Offs = SizeOf (Decl.Type);
+    	    Offs = CheckedSizeOf (Decl.Type);
 	    if (StructType == T_STRUCT) {
 	       	Size += Offs;
 	    } else {
@@ -767,7 +767,7 @@ static FuncDesc* ParseFuncDecl (void)
     Offs = (F->Flags & FD_VARIADIC)? 1 : 0;
     Sym = GetSymTab()->SymTail;
     while (Sym) {
-	unsigned Size = SizeOf (Sym->Type);
+	unsigned Size = CheckedSizeOf (Sym->Type);
      	Sym->V.Offs = Offs;
        	Offs += Size;
 	F->ParamSize += Size;
@@ -1049,7 +1049,7 @@ static void ParseStructInit (type* Type)
 
     /* If there are struct fields left, reserve additional storage */
     while (Entry) {
- 	g_zerobytes (SizeOf (Entry->Type));
+ 	g_zerobytes (CheckedSizeOf (Entry->Type));
  	Entry = Entry->NextSym;
     }
 }
@@ -1128,7 +1128,7 @@ void ParseInit (type* T)
      	    if (Size == 0) {
      	     	Encode (T + 1, Count);
      	    } else if (Count < Size) {
-     	     	g_zerobytes ((Size - Count) * SizeOf (T + DECODE_SIZE + 1));
+     	     	g_zerobytes ((Size - Count) * CheckedSizeOf (T + DECODE_SIZE + 1));
      	    } else if (Count > Size) {
      	     	Error ("Too many initializers");
      	    }

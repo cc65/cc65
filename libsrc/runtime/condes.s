@@ -52,9 +52,8 @@ exit:   rts
 
 
 ; --------------------------------------------------------------------------
-; Generic table call handler. Since the routine is also used to call a table
-; of interrupt handlers, it uses heavily self modifying code for performance
-; reasons. It will go into the data segment for this reason ...
+; Generic table call handler. The code uses self modifying code and goes
+; into the data segment for this reason.
 ; NOTE: The routine must not be called if the table is empty!
 
 .data

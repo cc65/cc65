@@ -41,6 +41,7 @@ OBJS = 	add.o		\
        	bneg.o		\
        	bpushbsp.o	\
        	call.o		\
+        callirq.o       \
         callmain.o      \
        	compl.o		\
 	condes.o	\

@@ -4,7 +4,7 @@
 ;
 ; 4.4.2003
 
-; char __fastcall__ GetFile(char saveflag, char loadflag, const char *fname, const char *loadaddr, const char *datadname, char *datafname);
+; char __fastcall__ GetFile(char flag, const char *fname, const char *loadaddr, const char *datadname, char *datafname);
 
 	    .export _GetFile
 	    .import popa, popax, setoserror
@@ -26,7 +26,7 @@ _GetFile:
 	stx r6H
 	jsr popa
 	sta r0L
-	jsr popa
+	lda #0
 	sta r10L
 	jsr GetFile
 	jmp setoserror

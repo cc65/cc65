@@ -7,6 +7,7 @@
 
 
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <mouse.h>
@@ -21,12 +22,15 @@
 #if defined(__C64__)
 #  define SPRITE0_DATA    0x0340
 #  define SPRITE0_PTR  	  0x07F8
+#  define DRIVER          "c64-1351.mou"
 #elif defined(__C128__)
 #  define SPRITE0_DATA    0x0E00
 #  define SPRITE0_PTR     0x07F8
+#  define DRIVER          "c128-1351.mou"
 #elif defined(__CBM510__)
 #  define SPRITE0_DATA    0xF400
 #  define SPRITE0_PTR     0xF3F8
+#  define DRIVER          ""            /* Currently unavailable */
 #endif
 
 /* The mouse sprite (an arrow) */
@@ -59,6 +63,32 @@ static const unsigned char MouseSprite[64] = {
 
 
 
+static void CheckError (const char* S, unsigned char Error)
+{
+    if (Error != MOUSE_ERR_OK) {
+        printf ("%s: %s(%d)\n", S, mouse_geterrormsg (Error), Error);
+        exit (EXIT_FAILURE);
+    }
+}
+
+
+
+static void DoWarning (void)
+/* Warn the user that a mouse driver is needed for this program */
+{
+    printf ("Warning: This program needs the mouse\n"
+            "driver with the name\n"
+            "    %s\n"
+            "on disk! Press 'y' if you have it or\n"
+            "any other key to exit.\n", DRIVER);
+    if (cgetc () != 'y') {
+        exit (EXIT_SUCCESS);
+    }
+    printf ("Ok. Please wait patiently...\n");
+}
+
+
+
 static void ShowState (unsigned char Invisible)
 /* Display cursor visibility */
 {
@@ -75,12 +105,12 @@ int main (void)
     struct mouse_info info;
     unsigned char Invisible;
     unsigned char Done;
-#if defined(__ATARI__)
-    unsigned char type;
-#endif
 
     /* Initialize the debugger */
     DbgInit (0);
+
+    /* Output a warning about the driver that is needed */
+    DoWarning ();
 
     /* Clear the screen, set white on black */
     bordercolor (COLOR_BLACK);
@@ -103,28 +133,10 @@ int main (void)
     VIC.spr0_color = COLOR_WHITE;
 #endif
 
-    /* Initialize the mouse */
-    mouse_init (MOUSE_CBM1351);
-
-#elif defined(__ATARI__)
-
-    do {
-        cputs("\r\n");
-        cputs("0 = trak-ball\r\n");
-        cputs("1 = ST mouse\r\n");
-        cputs("2 = Amiga mouse\r\n");
-        cputs("Enter type (0-2): ");
-        type = cgetc();
-        cputc(type);
-    } while (type < '0' || type > '2');
-    type -= '0';
-
-    /* Initialize the mouse */
-    mouse_init (type);
-    *(unsigned char *)0x2c0 = 15;  /* set mouse cursor color (PM0) */
-    clrscr ();
-
 #endif
+
+    /* Load and install the mouse driver */
+    CheckError ("mouse_load_driver", mouse_load_driver (&mouse_def_callbacks, DRIVER));
 
     /* Print a help line */
     revers (1);
@@ -169,7 +181,10 @@ int main (void)
 
     }
 
-    mouse_done ();
+    /* Uninstall and unload the mouse driver */
+    CheckError ("mouse_unload", mouse_unload ());
+
+    /* Say goodbye */
     clrscr ();
     cputs ("Goodbye!\r\n");
 

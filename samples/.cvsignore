@@ -12,4 +12,5 @@ tgidemo
 *.d64
 *.s
 *.lbl
+*.mou
 *.tgi

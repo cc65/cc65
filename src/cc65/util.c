@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998	 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,34 +38,24 @@
 
 
 /*****************************************************************************/
-/*		     		     data				     */
+/*		     	   	     Code				     */
 /*****************************************************************************/
 
 
 
-
-
-
-/*****************************************************************************/
-/*		     	   	     code				     */
-/*****************************************************************************/
-
-
-
-int powerof2 (unsigned long val)
+int PowerOf2 (unsigned long Val)
 /* Return the exponent if val is a power of two. Return -1 if val is not a
  * power of two.
  */
 {
-    int i;
-    unsigned long mask;
-    mask = 0x0001;
+    int I;
+    unsigned long Mask = 0x0001;
 
-    for (i = 0; i < 32; ++i) {
-	if (val == mask) {
-	    return i;
+    for (I = 0; I < 32; ++I) {
+	if (Val == Mask) {
+	    return I;
 	}
-	mask <<= 1;
+	Mask <<= 1;
     }
     return -1;
 }

@@ -512,7 +512,7 @@ static ExprNode* Function (int (*F) (void))
     if (Tok != TOK_LPAREN) {
      	Error (ERR_LPAREN_EXPECTED);
      	SkipUntilSep ();
-	return LiteralExpr (0);
+	return GenLiteralExpr (0);
     }
     NextTok ();
 
@@ -523,7 +523,7 @@ static ExprNode* Function (int (*F) (void))
     ConsumeRParen ();
 
     /* Return an expression node with the boolean code */
-    return LiteralExpr (Result);
+    return GenLiteralExpr (Result);
 }
 
 
@@ -536,12 +536,12 @@ static ExprNode* Factor (void)
     switch (Tok) {
 
 	case TOK_INTCON:
-    	    N = LiteralExpr (IVal);
+    	    N = GenLiteralExpr (IVal);
        	    NextTok ();
 	    break;
 
 	case TOK_CHARCON:
-    	    N = LiteralExpr (TgtTranslateChar (IVal));
+    	    N = GenLiteralExpr (TgtTranslateChar (IVal));
        	    NextTok ();
 	    break;
 
@@ -549,12 +549,12 @@ static ExprNode* Factor (void)
 	    NextTok ();
 	    if (Tok != TOK_IDENT) {
 	     	Error (ERR_IDENT_EXPECTED);
-		N = LiteralExpr (0);	/* Dummy */
+		N = GenLiteralExpr (0);	/* Dummy */
 	    } else {
 		S = SymRef (SVal, SCOPE_GLOBAL);
 		if (SymIsConst (S)) {
 		    /* Use the literal value instead */
-		    N = LiteralExpr (GetSymVal (S));
+		    N = GenLiteralExpr (GetSymVal (S));
 		} else {
 	    	    /* Create symbol node */
 		    N = NewExprNode ();
@@ -569,7 +569,7 @@ static ExprNode* Factor (void)
 	    S = SymRef (SVal, SCOPE_LOCAL);
 	    if (SymIsConst (S)) {
 	     	/* Use the literal value instead */
-	     	N = LiteralExpr (GetSymVal (S));
+	     	N = GenLiteralExpr (GetSymVal (S));
 	    } else {
 	     	/* Create symbol node */
 	     	N = NewExprNode ();
@@ -601,7 +601,7 @@ static ExprNode* Factor (void)
      	case TOK_STAR:
 	case TOK_PC:
      	    NextTok ();
-       	    N = CurrentPC ();
+       	    N = GenCurrentPC ();
 	    break;
 
 	case TOK_LT:
@@ -633,7 +633,7 @@ static ExprNode* Factor (void)
 	    break;
 
 	case TOK_CPU:
-	    N = LiteralExpr (GetCPU());
+	    N = GenLiteralExpr (GetCPU());
 	    NextTok ();
 	    break;
 
@@ -662,7 +662,7 @@ static ExprNode* Factor (void)
 	    break;
 
 	case TOK_TIME:
-	    N = LiteralExpr (time (0));
+	    N = GenLiteralExpr (time (0));
 	    NextTok ();
 	    break;
 
@@ -673,9 +673,9 @@ static ExprNode* Factor (void)
 	default:
 	    if (LooseCharTerm && Tok == TOK_STRCON && strlen(SVal) == 1) {
 		/* A character constant */
-		N = LiteralExpr (TgtTranslateChar (SVal[0]));
+		N = GenLiteralExpr (TgtTranslateChar (SVal[0]));
 	    } else {
-		N = LiteralExpr (0);	/* Dummy */
+		N = GenLiteralExpr (0);	/* Dummy */
 		Error (ERR_SYNTAX);
 	    }
 	    NextTok ();
@@ -963,7 +963,7 @@ void FreeExpr (ExprNode* Root)
 
 
 
-ExprNode* LiteralExpr (long Val)
+ExprNode* GenLiteralExpr (long Val)
 /* Return an expression tree that encodes the given literal value */
 {
     ExprNode* Expr = NewExprNode ();
@@ -974,7 +974,7 @@ ExprNode* LiteralExpr (long Val)
 
 
 
-ExprNode* CurrentPC (void)
+ExprNode* GenCurrentPC (void)
 /* Return the current program counter as expression */
 {
     ExprNode* Left;
@@ -988,11 +988,11 @@ ExprNode* CurrentPC (void)
 
 	Root = NewExprNode ();
 	Root->Left  = Left;
-	Root->Right = LiteralExpr (GetPC ());
+	Root->Right = GenLiteralExpr (GetPC ());
 	Root->Op = EXPR_PLUS;
     } else {
-	/* Absolute mode, just return PC value */
-	Root = LiteralExpr (GetPC ());
+     	/* Absolute mode, just return PC value */
+	Root = GenLiteralExpr (GetPC ());
     }
 
     return Root;
@@ -1000,7 +1000,7 @@ ExprNode* CurrentPC (void)
 
 
 
-ExprNode* SwapExpr (ExprNode* Expr)
+ExprNode* GenSwapExpr (ExprNode* Expr)
 /* Return an extended expression with lo and hi bytes swapped */
 {
     ExprNode* N = NewExprNode ();
@@ -1011,7 +1011,7 @@ ExprNode* SwapExpr (ExprNode* Expr)
 
 
 
-ExprNode* BranchExpr (unsigned Offs)
+ExprNode* GenBranchExpr (unsigned Offs)
 /* Return an expression that encodes the difference between current PC plus
  * offset and the target expression (that is, Expression() - (*+Offs) ).
  */
@@ -1028,10 +1028,10 @@ ExprNode* BranchExpr (unsigned Offs)
 
 	N = NewExprNode ();
 	N->Left  = Left;
-	N->Right = LiteralExpr (GetPC () + Offs);
+	N->Right = GenLiteralExpr (GetPC () + Offs);
 	N->Op = EXPR_PLUS;
     } else {
-	N = LiteralExpr (GetPC () + Offs);
+	N = GenLiteralExpr (GetPC () + Offs);
     }
 
     /* Create the root node */
@@ -1046,7 +1046,7 @@ ExprNode* BranchExpr (unsigned Offs)
 
 
 
-ExprNode* ULabelExpr (unsigned Num)
+ExprNode* GenULabelExpr (unsigned Num)
 /* Return an expression for an unnamed label with the given index */
 {
     /* Get an expression node */
@@ -1062,7 +1062,7 @@ ExprNode* ULabelExpr (unsigned Num)
 
 
 
-ExprNode* ForceByteExpr (ExprNode* Expr)
+ExprNode* GenByteExpr (ExprNode* Expr)
 /* Force the given expression into a byte and return the result */
 {
     /* Use the low byte operator to force the expression into byte size */
@@ -1076,14 +1076,14 @@ ExprNode* ForceByteExpr (ExprNode* Expr)
 
 
 
-ExprNode* ForceWordExpr (ExprNode* Expr)
+ExprNode* GenWordExpr (ExprNode* Expr)
 /* Force the given expression into a word and return the result. */
 {
     /* AND the expression by $FFFF to force it into word size */
     ExprNode* Root = NewExprNode ();
     Root->Left  = Expr;
     Root->Op    = EXPR_AND;
-    Root->Right	= LiteralExpr (0xFFFF);
+    Root->Right	= GenLiteralExpr (0xFFFF);
 
     /* Return the result */
     return Root;
@@ -1091,14 +1091,14 @@ ExprNode* ForceWordExpr (ExprNode* Expr)
 
 
 
-ExprNode* CompareExpr (ExprNode* Expr, long Val)
-/* Generate an expression that compares Expr and Val for equality */
+ExprNode* GenNE (ExprNode* Expr, long Val)
+/* Generate an expression that compares Expr and Val for inequality */
 {
     /* Generate a compare node */
     ExprNode* Root = NewExprNode ();
     Root->Left  = Expr;
-    Root->Op    = EXPR_EQ;
-    Root->Right	= LiteralExpr (Val);
+    Root->Op    = EXPR_NE;
+    Root->Right	= GenLiteralExpr (Val);
 
     /* Return the result */
     return Root;
@@ -1402,7 +1402,7 @@ static ExprNode* RemoveSyms (ExprNode* Expr, int MustClone)
 			DumpExpr (Expr);
 		    }
 		    PError (GetSymPos (Sym), ERR_CIRCULAR_REFERENCE);
-		    return LiteralExpr (0);		/* Return a dummy value */
+		    return GenLiteralExpr (0);		/* Return a dummy value */
 		}
 		SymMarkUser (Sym);
 		Expr = RemoveSyms (GetSymExpr (Sym), 1);
@@ -1410,7 +1410,7 @@ static ExprNode* RemoveSyms (ExprNode* Expr, int MustClone)
 		return Expr;
 	    } else if (SymIsConst (Expr->V.Sym)) {
 		/* The symbol is a constant */
-		return LiteralExpr (GetSymVal (Expr->V.Sym));
+		return GenLiteralExpr (GetSymVal (Expr->V.Sym));
 	    }
 	    break;
 
@@ -1548,13 +1548,13 @@ ExprNode* FinalizeExpr (ExprNode* Expr)
     Expr = ConstExtract (Expr, &Val, 1);
     if (Expr == 0) {
      	/* Reduced to a literal value */
-	Expr = LiteralExpr (Val);
+	Expr = GenLiteralExpr (Val);
     } else if (Val) {
      	/* Extracted a value */
      	N = NewExprNode ();
      	N->Op = EXPR_PLUS;
      	N->Left = Expr;
-     	N->Right = LiteralExpr (Val);
+     	N->Right = GenLiteralExpr (Val);
      	Expr = N;
     }
     return Expr;

@@ -525,7 +525,7 @@ static void EmitCode (EffAddr* A)
 	      	 * mode, force this address into 16 bit range to allow
 	      	 * addressing inside a 64K segment.
 	      	 */
-       	      	Emit2 (A->Opcode, ForceWordExpr (A->Expr));
+       	      	Emit2 (A->Opcode, GenWordExpr (A->Expr));
 	    } else {
 	      	Emit2 (A->Opcode, A->Expr);
 	    }
@@ -588,7 +588,7 @@ static long PutImmed8 (const InsDesc* Ins)
 static void PutPCRel8 (const InsDesc* Ins)
 /* Handle branches with a 8 bit distance */
 {
-    EmitPCRel (Ins->BaseCode, BranchExpr (2), 1);
+    EmitPCRel (Ins->BaseCode, GenBranchExpr (2), 1);
 }
 
 
@@ -596,7 +596,7 @@ static void PutPCRel8 (const InsDesc* Ins)
 static void PutPCRel16 (const InsDesc* Ins)
 /* Handle branches with an 16 bit distance and PER */
 {
-    EmitPCRel (Ins->BaseCode, BranchExpr (3), 2);
+    EmitPCRel (Ins->BaseCode, GenBranchExpr (3), 2);
 }
 
 
@@ -687,7 +687,7 @@ static void PutJmp (const InsDesc* Ins)
              * a page cross. Be sure to use a copy of the expression otherwise
              * things will go weird later.
              */
-            ExprNode* E = CompareExpr (ForceByteExpr (CloneExpr (A.Expr)), 0xFF);
+            ExprNode* E = GenNE (GenByteExpr (CloneExpr (A.Expr)), 0xFF);
 
             /* Generate the message */
             unsigned Msg = GetStringId ("\"jmp (abs)\" across page border");

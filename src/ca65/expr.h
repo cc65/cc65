@@ -63,31 +63,31 @@ long ConstExpression (void);
 void FreeExpr (ExprNode* Root);
 /* Free the expression tree, Root is pointing to. */
 
-ExprNode* LiteralExpr (long Val);
+ExprNode* GenLiteralExpr (long Val);
 /* Return an expression tree that encodes the given literal value */
 
-ExprNode* CurrentPC (void);
+ExprNode* GenCurrentPC (void);
 /* Return the current program counter as expression */
 
-ExprNode* SwapExpr (ExprNode* Expr);
+ExprNode* GenSwapExpr (ExprNode* Expr);
 /* Return an extended expression with lo and hi bytes swapped */
 
-ExprNode* BranchExpr (unsigned Offs);
+ExprNode* GenBranchExpr (unsigned Offs);
 /* Return an expression that encodes the difference between current PC plus
  * offset and the target expression (that is, Expression() - (*+Offs) ).
  */
 
-ExprNode* ULabelExpr (unsigned Num);
+ExprNode* GenULabelExpr (unsigned Num);
 /* Return an expression for an unnamed label with the given index */
 
-ExprNode* ForceByteExpr (ExprNode* Expr);
+ExprNode* GenByteExpr (ExprNode* Expr);
 /* Force the given expression into a byte and return the result */
 
-ExprNode* ForceWordExpr (ExprNode* Expr);
+ExprNode* GenWordExpr (ExprNode* Expr);
 /* Force the given expression into a word and return the result. */
 
-ExprNode* CompareExpr (ExprNode* Expr, long Val);
-/* Generate an expression that compares Expr and Val for equality */
+ExprNode* GenNE (ExprNode* Expr, long Val);
+/* Generate an expression that compares Expr and Val for inequality */
 
 int IsConstExpr (ExprNode* Root);
 /* Return true if the given expression is a constant expression, that is, one

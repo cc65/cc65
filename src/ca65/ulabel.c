@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -137,7 +137,7 @@ ExprNode* ULabRef (int Which)
       	    /* Label does not exist */
       	    Error (ERR_UNDEFINED_LABEL);
       	    /* We must return something valid */
-      	    return CurrentPC();
+      	    return GenCurrentPC();
       	} else {
       	    /* Return a copy of the label value */
       	    return CloneExpr (L->Val);
@@ -150,7 +150,7 @@ ExprNode* ULabRef (int Which)
 	}
 
 	/* Return an unnamed label expression */
-       	return ULabelExpr (LabelNum);
+       	return GenULabelExpr (LabelNum);
     }
 }
 
@@ -162,11 +162,11 @@ void ULabDef (void)
     /* Create a new label if needed, or use an existing one */
     if (ULabLastDef == 0 || ULabLastDef->Next == 0) {
       	/* The last label is also the last defined label, we need a new one */
-      	ULabLastDef = NewULabel (CurrentPC ());
+      	ULabLastDef = NewULabel (GenCurrentPC ());
     } else {
       	/* We do already have the label, but it's undefined until now */
       	ULabLastDef = ULabLastDef->Next;
-      	ULabLastDef->Val = CurrentPC ();
+      	ULabLastDef->Val = GenCurrentPC ();
       	ULabLastDef->Pos = CurPos;
     }
     ++ULabDefCount;
@@ -199,7 +199,7 @@ ExprNode* ULabResolve (unsigned Index)
 
     /* If the label is open (not defined), return some valid value */
     if (L->Val == 0) {
-	return LiteralExpr (0);
+	return GenLiteralExpr (0);
     } else {
 	return CloneExpr (L->Val);
     }

@@ -39,7 +39,7 @@
 #include <ctype.h>
 #include <errno.h>
 
-/* common */     
+/* common */
 #include "assertdefs.h"
 #include "bitops.h"
 #include "cddefs.h"
@@ -246,7 +246,7 @@ static void DoAddr (void)
 {
     while (1) {
 	if (GetCPU() == CPU_65816) {
-       	    EmitWord (ForceWordExpr (Expression ()));
+       	    EmitWord (GenWordExpr (Expression ()));
 	} else {
 	    /* Do a range check */
 	    EmitWord (Expression ());
@@ -588,7 +588,7 @@ static void DoDByt (void)
 /* Output double bytes */
 {
     while (1) {
-	EmitWord (SwapExpr (Expression ()));
+	EmitWord (GenSwapExpr (Expression ()));
 	if (Tok != TOK_COMMA) {
 	    break;
 	} else {
@@ -1242,7 +1242,7 @@ static void DoProc (void)
 {
     if (Tok == TOK_IDENT) {
 	/* The new scope has a name */
-	SymDef (SVal, CurrentPC (), IsZPSeg (), 1);
+	SymDef (SVal, GenCurrentPC (), IsZPSeg (), 1);
 	NextTok ();
     }
     SymEnterLevel ();

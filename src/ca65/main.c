@@ -183,7 +183,7 @@ static void DefineSymbol (const char* Def)
     }
 
     /* Define the symbol */
-    SymDef (SymName, LiteralExpr (Val), 0, 0);
+    SymDef (SymName, GenLiteralExpr (Val), 0, 0);
 }
 
 
@@ -389,7 +389,7 @@ static void OneLine (void)
      	    	Done = 1;
      	    } else {
      	    	/* Define a label */
-     	    	SymDef (Ident, CurrentPC(), IsZPSeg(), 1);
+     	    	SymDef (Ident, GenCurrentPC(), IsZPSeg(), 1);
      	    	/* Skip the colon. If NoColonLabels is enabled, allow labels
      	    	 * without a colon if there is no whitespace before the
      	    	 * identifier.

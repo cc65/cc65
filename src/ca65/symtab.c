@@ -66,6 +66,7 @@
 #define SF_GLOBAL	0x0010		/* Global symbol */
 #define SF_ZP  	       	0x0020		/* Declared as zeropage symbol */
 #define SF_ABS		0x0040 		/* Declared as absolute symbol */
+#define SF_LABEL        0x0080          /* Used as a label */
 #define SF_INDEXED	0x0800		/* Index is valid */
 #define SF_CONST    	0x1000		/* The symbol has a constant value */
 #define SF_MULTDEF     	0x2000		/* Multiply defined symbol */
@@ -399,7 +400,7 @@ void SymLeaveLevel (void)
 
 
 
-void SymDef (const char* Name, ExprNode* Expr, int ZP)
+void SymDef (const char* Name, ExprNode* Expr, int ZP, int Label)
 /* Define a new symbol */
 {
     /* Do we have such a symbol? */
@@ -429,6 +430,9 @@ void SymDef (const char* Name, ExprNode* Expr, int ZP)
     S->Flags |= SF_DEFINED;
     if (ZP) {
 	S->Flags |= SF_ZP;
+    }
+    if (Label) {
+	S->Flags |= SF_LABEL;
     }
 
     /* If the symbol is a ZP symbol, check if the value is in correct range */
@@ -1062,6 +1066,26 @@ void WriteImports (void)
 
 
 
+static unsigned char GetExprMask (SymEntry* S)
+/* Return the expression bits for the given symbol table entry */
+{
+    unsigned char ExprMask;
+
+    /* Check if the symbol is const */
+    ExprMask = (SymIsConst (S))? EXP_CONST : EXP_EXPR;
+
+    /* Add zeropage/abs bits */
+    ExprMask |= (S->Flags & SF_ZP)? EXP_ZP : EXP_ABS;
+
+    /* Add the label/equate bits */
+    ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;
+
+    /* Return the mask */
+    return ExprMask;
+}
+
+
+
 void WriteExports (void)
 /* Write the exports list to the object file */
 {
@@ -1083,11 +1107,8 @@ void WriteExports (void)
 	    /* Finalize an associated expression if we have one */
 	    SymFinalize (S);
 
-	    /* Check if the symbol is const */
-	    ExprMask = (SymIsConst (S))? EXP_CONST : EXP_EXPR;
-
-	    /* Add zeropage/abs bits */
-	    ExprMask |= (S->Flags & SF_ZP)? EXP_ZP : EXP_ABS;
+	    /* Get the expression bits */
+	    ExprMask = GetExprMask (S);
 
 	    /* Count the number of ConDes types */
 	    for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
@@ -1104,7 +1125,7 @@ void WriteExports (void)
 		for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
 		    unsigned char Prio = S->ConDesPrio[Type];
 		    if (Prio != CD_PRIO_NONE) {
-			ObjWrite8 (CD_BUILD (Type, Prio));
+		    	ObjWrite8 (CD_BUILD (Type, Prio));
 		    }
 		}
 	    }
@@ -1167,11 +1188,8 @@ void WriteDbgSyms (void)
 		/* Finalize an associated expression if we have one */
 		SymFinalize (S);
 
-		/* Check if the symbol is const */
-		ExprMask = (SymIsConst (S))? EXP_CONST : EXP_EXPR;
-
-		/* Add zeropage/abs bits */
-		ExprMask |= (S->Flags & SF_ZP)? EXP_ZP : EXP_ABS;
+		/* Get the expression bits */
+       	       	ExprMask = GetExprMask (S);
 
 		/* Write the type */
 		ObjWrite8 (ExprMask);

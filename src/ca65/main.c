@@ -181,7 +181,7 @@ static void DefineSymbol (const char* Def)
     }
 
     /* Define the symbol */
-    SymDef (SymName, LiteralExpr (Val), 0);
+    SymDef (SymName, LiteralExpr (Val), 0, 0);
 }
 
 
@@ -386,12 +386,12 @@ static void OneLine (void)
      	    	/* Skip the '=' */
      	    	NextTok ();
      	    	/* Define the symbol with the expression following the '=' */
-     	    	SymDef (Ident, Expression (), 0);
+     	    	SymDef (Ident, Expression(), 0, 0);
      	    	/* Don't allow anything after a symbol definition */
      	    	Done = 1;
      	    } else {
      	    	/* Define a label */
-     	    	SymDef (Ident, CurrentPC (), IsZPSeg ());
+     	    	SymDef (Ident, CurrentPC(), IsZPSeg(), 1);
      	    	/* Skip the colon. If NoColonLabels is enabled, allow labels
      	    	 * without a colon if there is no whitespace before the
      	    	 * identifier.

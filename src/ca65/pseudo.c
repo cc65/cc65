@@ -1100,7 +1100,7 @@ static void DoProc (void)
 {
     if (Tok == TOK_IDENT) {
 	/* The new scope has a name */
-	SymDef (SVal, CurrentPC (), IsZPSeg ());
+	SymDef (SVal, CurrentPC (), IsZPSeg (), 1);
 	NextTok ();
     }
     SymEnterLevel ();

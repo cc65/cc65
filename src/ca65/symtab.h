@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/*  	       		      	     Code				     */
+/*   	       		      	     Code				     */
 /*****************************************************************************/
 
 
@@ -60,7 +60,7 @@ void SymEnterLevel (void);
 void SymLeaveLevel (void);
 /* Leave the current lexical level */
 
-void SymDef (const char* Name, ExprNode* Expr, int ZP);
+void SymDef (const char* Name, ExprNode* Expr, int ZP, int Label);
 /* Define a new symbol */
 
 SymEntry* SymRef (const char* Name);

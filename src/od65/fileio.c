@@ -34,6 +34,7 @@
 
 
 #include <string.h>
+#include <errno.h>
 
 /* common */
 #include "xmalloc.h"
@@ -50,13 +51,23 @@
 
 
 
+void FileSeek (FILE* F, unsigned long Pos)
+/* Seek to the given absolute position, fail on errors */
+{
+    if (fseek (F, Pos, SEEK_SET) != 0) {
+ 	Error ("Cannot seek: %s", strerror (errno));
+    }
+}
+
+
+
 unsigned Read8 (FILE* F)
 /* Read an 8 bit value from the file */
 {
     int C = getc (F);
     if (C == EOF) {
  	Error ("Read error (file corrupt?)");
-    }
+    }		  
     return C;
 }
 

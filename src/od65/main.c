@@ -77,7 +77,8 @@ static void Usage (void)
        	     "  -V\t\t\tPrint the version number and exit\n"
 	     "\n"
 	     "Long options:\n"
-	     "  --dump-header\t\tDump the object file header\n"
+	     "  --dump-header\t\tDump the object file header\n"	  
+	     "  --dump-options\t\tDump object file options\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --version\t\tPrint the version number and exit\n",
     	     ProgName);
@@ -89,6 +90,14 @@ static void OptDumpHeader (const char* Opt, const char* Arg)
 /* Dump the object file header */
 {
     What |= D_HEADER;
+}
+
+
+
+static void OptDumpOptions (const char* Opt, const char* Arg)
+/* Dump the object file options */
+{
+    What |= D_OPTIONS;
 }
 
 
@@ -130,7 +139,7 @@ static void DumpFile (const char* Name)
     if (Magic != OBJ_MAGIC) {
 
 	/* Unknown format */
-       	printf ("%s: (no xo65 object file)\n", Name);
+       	printf ("%s: (no x65 object file)\n", Name);
 
     } else if (What == 0) {
 
@@ -144,9 +153,11 @@ static void DumpFile (const char* Name)
 
      	/* Check what to dump */
      	if (What & D_HEADER) {
-     	    DumpHeader (F, 0);
+     	    DumpObjHeader (F, 0);
      	}
-
+	if (What & D_OPTIONS) {
+	    DumpObjOptions (F, 0);
+	}
     }
 
     /* Close the file */
@@ -161,6 +172,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
 	{ "--dump-header",	0,	OptDumpHeader		},
+	{ "--dump-options",	0,	OptDumpOptions		},
 	{ "--help",		0,	OptHelp			},
 	{ "--version",	       	0,	OptVersion		},
     };

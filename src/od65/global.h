@@ -44,7 +44,13 @@
 
 
 
-#define	D_HEADER	0x00000001UL	/* Dump the header */	 
+#define	D_HEADER	0x00000001UL	/* Dump the header */
+#define D_OPTIONS	0x00000002UL	/* Dump the options */
+#define D_FILES		0x00000004UL	/* Dump source file info */
+#define D_SEGMENTS	0x00000008UL	/* Dump segment info */
+#define D_IMPORTS	0x00000010UL	/* Dump imported symbols */
+#define D_EXPORTS	0x00000020UL	/* Dump exported symbols */
+#define D_DBGSYMS	0x00000040UL	/* Dump debug symbols */
 
 
 

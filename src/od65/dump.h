@@ -37,19 +37,22 @@
 
 
 
-#ifndef DUMP_H	  
+#ifndef DUMP_H
 #define DUMP_H
 
 
 
 /*****************************************************************************/
-/*    				     Code				     */
+/*    	      			     Code				     */
 /*****************************************************************************/
 
 
 
-void DumpHeader (FILE* F, unsigned long Offset);
+void DumpObjHeader (FILE* F, unsigned long Offset);
 /* Dump the header of the given object file */
+	    
+void DumpObjOptions (FILE* F, unsigned long Offset);
+/* Dump the file options */
 
 
 

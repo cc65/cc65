@@ -154,7 +154,10 @@ unsigned AddrTable (void)
     /* Count how many bytes may be output. */
     unsigned Count = GetSpan (atAddrTab);
 
-    /* Need to handle Count == 1 here!!! ### */
+    /* Handle Count == 1 ### */
+    if (Count == 1) {
+	ByteTable ();
+    }
 
     /* Make the given number even */
     Count &= ~1U;

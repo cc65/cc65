@@ -69,6 +69,7 @@ void LoadCode (const char* Name, unsigned long StartAddress)
 /* Load the code from the given file */
 {
     unsigned Count, MaxCount;
+    long Size;
     FILE* F;
 
 
@@ -80,17 +81,35 @@ void LoadCode (const char* Name, unsigned long StartAddress)
     /* Open the file */
     F = fopen (Name, "rb");
     if (F == 0) {
-	Error ("Cannot open `%s': %s", Name, strerror (errno));
+     	Error ("Cannot open `%s': %s", Name, strerror (errno));
+    }
+
+    /* Seek to the end to get the size of the file */
+    if (fseek (F, 0, SEEK_END) != 0) {
+	Error ("Cannot seek on file `%s': %s", Name, strerror (errno));
+    }
+    Size = ftell (F);
+    rewind (F);
+
+    /* Check if the size is larger than what we can read */
+    if (Size == 0) {
+     	Error ("File `%s' contains no data", Name);
+    }
+    if (Size > MaxCount) {
+	Warning ("File `%s' is too large, ignoring %ld bytes",
+		 Name, Size - MaxCount);
+    } else if (MaxCount > Size) {
+	MaxCount = (unsigned) Size;
     }
 
     /* Read from the file and remember the number of bytes read */
     Count = fread (CodeBuf + StartAddress, 1, MaxCount, F);
-    if (ferror (F)) {
-	Error ("Error reading from `%s': %s", Name, strerror (errno));
+    if (ferror (F) || Count != MaxCount) {
+     	Error ("Error reading from `%s': %s", Name, strerror (errno));
     }
-    if (Count == 0) {
-    	Error ("File `%s' contains no data", Name);
-    }
+
+    /* Close the file */
+    fclose (F);
 
     /* Set the buffer variables */
     CodeStart = PC = StartAddress;

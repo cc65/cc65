@@ -60,7 +60,7 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code			  	     */
+/*     	       	       	       	     Code 			  	     */
 /*****************************************************************************/
 
 
@@ -76,16 +76,45 @@ static void Usage (void)
        	     "  -o name\t\tName the output file\n"
        	     "  -v\t\t\tIncrease verbosity\n"
        	     "  -F\t\t\tAdd formfeeds to the output\n"
-       	     "  -V\t\t\tPrint the assembler version\n"
+	     "  -S addr\t\tSet the start/load address\n"
+       	     "  -V\t\t\tPrint the disassembler version\n"
 	     "\n"
 	     "Long options:\n"
        	     "  --cpu type\t\tSet cpu type\n"
 	     "  --formfeeds\t\tAdd formfeeds to the output\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --pagelength n\tSet the page length for the listing\n"
+       	     "  --start-addr addr\tSet the start/load address\n"
        	     "  --verbose\t\tIncrease verbosity\n"
-       	     "  --version\t\tPrint the assembler version\n",
+       	     "  --version\t\tPrint the disassembler version\n",
     	     ProgName);
+}
+
+
+
+static unsigned long CvtNumber (const char* Arg, const char* Number)
+/* Convert a number from a string. Allow '$' and '0x' prefixes for hex
+ * numbers.
+ */
+{
+    unsigned long Val;
+    int 	  Converted;
+
+    /* Convert */
+    if (*Number == '$') {
+	++Number;
+	Converted = sscanf (Number, "%lx", &Val);
+    } else {
+	Converted = sscanf (Number, "%li", (long*)&Val);
+    }
+
+    /* Check if we do really have a number */
+    if (Converted != 1) {
+       	Error ("Invalid number given in argument: %s\n", Arg);
+    }
+
+    /* Return the result */
+    return Val;
 }
 
 
@@ -142,6 +171,14 @@ static void OptPageLength (const char* Opt, const char* Arg)
 	AbEnd ("Invalid page length: %d", Len);
     }
     PageLength = Len;
+}
+
+
+
+static void OptStartAddr (const char* Opt, const char* Arg)
+/* Set the default start address */
+{
+    StartAddr = CvtNumber (Opt, Arg);
 }
 
 
@@ -280,6 +317,7 @@ int main (int argc, char* argv [])
 	{ "--formfeeds",	0,	OptFormFeeds		},
       	{ "--help",    		0,	OptHelp			},
       	{ "--pagelength",      	1,	OptPageLength		},
+	{ "--start-addr",	1,	OptStartAddr		},
       	{ "--verbose", 	       	0,	OptVerbose		},
       	{ "--version", 	       	0,	OptVersion		},
     };
@@ -315,6 +353,10 @@ int main (int argc, char* argv [])
        	       	case 'v':
 		    OptVerbose (Arg, 0);
        	       	    break;
+
+		case 'S':
+		    OptStartAddr (Arg, GetArg (&I, 2));
+		    break;
 
        	        case 'V':
     	    	    OptVersion (Arg, 0);
@@ -359,7 +401,7 @@ int main (int argc, char* argv [])
     }
 
     /* Load the input file */
-    LoadCode (InFile, 0xE000);	/* ### */
+    LoadCode (InFile, StartAddr);
 
     /* Open the output file */
     OpenOutput (OutFile);

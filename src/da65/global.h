@@ -56,6 +56,8 @@ extern const char 	CfgExt[];	/* Config file extension */
 extern unsigned char   	Verbosity;	/* Verbosity of the output file */
 extern unsigned char	FormFeeds;	/* Add form feeds to the output? */
 extern unsigned char	PassCount;	/* How many passed do we do? */
+extern unsigned long	StartAddr;	/* Start/load address of the program */
+
 
 /* Stuff needed by many routines */
 extern unsigned char	Pass;		/* Disassembler pass */

@@ -68,6 +68,7 @@ typedef enum token_t {
     CFGTOK_INPUTNAME,
     CFGTOK_OUTPUTNAME,
     CFGTOK_PAGELENGTH,
+    CFGTOK_STARTADDR,
 
     /* Range section */
     CFGTOK_START,

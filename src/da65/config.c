@@ -68,6 +68,7 @@ static void GlobalSection (void)
        	{   "INPUTNAME",  	CFGTOK_INPUTNAME	},
 	{   "OUTPUTNAME",      	CFGTOK_OUTPUTNAME	},
 	{   "PAGELENGTH",      	CFGTOK_PAGELENGTH	},
+	{   "STARTADDR",	CFGTOK_STARTADDR	},
     };
 
     /* Skip the token */
@@ -114,6 +115,15 @@ static void GlobalSection (void)
 		PageLength = CfgIVal;
 		CfgNextTok ();
 		break;
+
+	    case CFGTOK_STARTADDR:
+		CfgNextTok ();
+		CfgAssureInt ();
+		CfgRangeCheck (0x0000, 0xFFFF);
+		StartAddr = CfgIVal;
+		CfgNextTok ();
+		break;
+
 	}
 
 	/* Directive is followed by a semicolon */

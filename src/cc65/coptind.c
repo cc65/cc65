@@ -1103,59 +1103,75 @@ unsigned OptPushPop (CodeSeg* S)
 /* Remove a PHA/PLA sequence were A is not used later */
 {
     unsigned Changes = 0;
+    unsigned Push    = 0;       /* Index of push insn */
+    unsigned Pop     = 0;       /* Index of pop insn */
+    enum {
+        Searching,
+        FoundPush,
+        FoundPop
+    } State = Searching;
 
-    /* Walk over the entries */
+    /* Walk over the entries. Look for a push instruction that is followed by
+     * a pop later, where the pop is not followed by an conditional branch,
+     * and where the value of the A register is not used later on.
+     * Look out for the following problems:
+     *
+     *  - There may be another PHA/PLA inside the sequence: Restart it.
+     *  - If the PLA has a label, all jumps to this label must be inside
+     *    the sequence, otherwise we cannot remove the PHA/PLA.
+     */
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* N;
 
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
-	/* Check if it is a PLA instruction that does not have a label and
-         * where the register value is not used later and that is not followed
-         * by a conditional branch.
-	 */
-        if (E->OPC == OP65_PLA                  &&
-       	    !CE_HasLabel (E)                    &&
-       	    (N = CS_GetNextEntry (S, I)) != 0  	&&
-       	    (N->Info & OF_CBRA) == 0            &&
-            !RegAUsed (S, I+1)) {
+        switch (State) {
 
-            /* Search back until we find the matching PHA instruction. If we
-             * find a label or another PLA somewhere in between, bail out
-             * since this may have side effects.
-             */
-            unsigned J = I;
-            while (J-- > 0) {
-
-                /* Get the previous entry */
-                CodeEntry* P = CS_GetEntry (S, J);
-
-                /* Check this entry */
-                if (P->OPC == OP65_PHA) {
-
-                    /* Found the matching push, remove both */
-                    CS_DelEntry (S, I);
-                    CS_DelEntry (S, J);
-
-                    /* Remember that we had changes and bail out */
-                    ++Changes;
-                    break;
-
-                } else if (CE_HasLabel (P) || P->OPC == OP65_PLA) {
-
-                    /* OOPS - too dangerous! */
-                    break;
-
+            case Searching:
+                if (E->OPC == OP65_PHA) {
+                    /* Found start of sequence */
+                    Push  = I;
+                    State = FoundPush;
                 }
-            }
-	}
+                break;
+
+            case FoundPush:
+                if (E->OPC == OP65_PHA) {
+                    /* Inner push/pop, restart */
+                    Push = I;
+                } else if (E->OPC == OP65_PLA) {
+                    /* Found a matching pop */
+                    Pop = I;
+                    State = FoundPop;
+                }
+                break;
+
+            case FoundPop:
+                /* Next insn, just check if it is no conditional branch and
+                 * that A is not used later. Check also that the range we have
+                 * found now is a basic block, which means that the PHA is the
+                 * only entrance and the PLA the only exit.
+                 */
+                if ((E->Info & OF_CBRA) == 0    &&
+                    !RegAUsed (S, I)            &&
+                    CS_IsBasicBlock (S, Push, Pop)) {
+                    /* We can remove the PHA and PLA instructions */
+                    CS_DelEntry (S, Pop);
+                    CS_DelEntry (S, Push);
+                    /* Correct I so we continue with the next insn */
+                    I -= 2;
+                    /* Remember we had changes */
+                    ++Changes;
+                }
+                /* Go into search mode again */
+                State = Searching;
+                break;
+
+        }
 
 	/* Next entry */
 	++I;
-
     }
 
     /* Return the number of changes made */

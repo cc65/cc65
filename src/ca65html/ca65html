@@ -34,29 +34,60 @@
 
 
 
+use strict 'vars';
+use warnings;
+
+# Modules
+use Getopt::Long;
+
+
+
 #-----------------------------------------------------------------------------#
-#			  	   Variables				      #
+#    		  	  	   Variables				      #
 # ----------------------------------------------------------------------------#
 
 
 
-%Files		= ();	  	# List of all files.
-%Exports	= ();	  	# List of exported symbol. Value is html tag.
-%Labels		= ();	  	# List of all labels
-$LabelNum	= 0;	  	# Counter to generate unique labels
+# Global variables
+my %Files	= (); 	  	# List of all files.
+my $FileCount	= 0;  		# Number of input files
+my %Exports	= (); 	  	# List of exported symbols.
+my %Imports	= (); 	      	# List of imported symbols.
+my %Labels	= (); 	      	# List of all labels
+my $LabelNum	= 0;  	      	# Counter to generate unique labels
+
+# Command line options
+my $BGColor	= "#FFFFFF";	# Background color
+my $Debug	= 0;		# No debugging
+my $Help	= 0;		# Help flag
+my $IndexCols  	= 6;		# Columns in the file listing
+my $IndexTitle	= "Index";	# Title of index page
+my $IndexName	= "index.html";	# Name of index page
+my $IndexPage	= 0;		# Create an index page
+my $LinkStyle  	= 0;		# Default link style
+my $ReplaceExt	= 0;		# Replace extension instead of appending
+my $TextColor	= "#000000";	# Text color
+my $Verbose    	= 0;		# Be quiet
 
 
 
 #-----------------------------------------------------------------------------#
-#			       Helper functions				      #
+#     			       Helper functions				      #
 # ----------------------------------------------------------------------------#
 
 
 
 # Terminate with an error
 sub Abort {
-    print "@_\n";
+    print STDERR "ca65html: @_\n";
     exit 1;
+}
+
+# Print a message if verbose is true
+sub Gabble {
+    if ($Verbose) {
+      	print "ca65html: @_\n";
+    }
 }
 
 # Generate a label and return it
@@ -69,43 +100,61 @@ sub GenLabel {
 sub GetOutName {
 
     # Input name is parameter
-    local $InName = @_[0];
+    my $InName = $_[0];
 
     # Create the output file name from the input file name
-    if ($InName =~ /^(.+)\.([^\.\/]*)$/) {
+    if ($ReplaceExt && $InName =~ /^(.+)\.([^\.\/]*)$/) {
        	return "$1.html";
     } else {
-	return "$InName.html";
+       	return "$InName.html";
     }
 }
 
+# Remove illegal characters from a string
+sub Cleanup {
+    my $S = shift (@_);
+    $S =~ s/&/&amp;/g;
+    $S =~ s/</&lt;/g;
+    $S =~ s/>/&gt;/g;
+    $S =~ s/\"/&quot;/g;
+    return $S;
+}
+
+
+
+#-----------------------------------------------------------------------------#
+#			  Document header and footer			      #
+# ----------------------------------------------------------------------------#
+
+
+
 # Print the document header
 sub DocHeader {
-    local $OUT = shift (@_);
-    local $Asm = shift (@_);
+    my $OUT = shift (@_);
+    my $Asm = shift (@_);
     print $OUT <<"EOF";
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html-40/loose.dtd">
 <html>
 <head>
-<title>SDSL Traffic</title>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="ca65html">
+<title>$Asm</title>
 </head>
-
-<body bgcolor="#FFFFFF" text="#000000" link="#0000d0" vlink="#000060" alink="#00d0d0">
+<body bgcolor="$BGColor" text="$TextColor" link="#0000d0" vlink="#000060" alink="#00d0d0">
 <p><br><p>
 <center><h1>$Asm</h1></center>
 <hr><p><br><p>
 <pre>
-
 EOF
 }
 
 # Print the document footer
 sub DocFooter {
-    local $OUT  = shift (@_);
-    local $Name	= shift (@_);
+    my $OUT  = shift (@_);
+    my $Name = shift (@_);
 
     # Get the current date and time
-    $Today = localtime;
+    my $Today = localtime;
 
     print $OUT <<"EOF";
 </pre>
@@ -118,7 +167,6 @@ sub DocFooter {
     $Name; generated on $Today by ca65html<br>
     <a href=\"mailto:uz\@cc65.org\">uz\@cc65.org</a>
 </address>
-
 </body>
 </html>
 EOF
@@ -126,20 +174,93 @@ EOF
 
 
 
-# Remove illegal characters from a string
-sub Cleanup {
-    local $S = shift (@_);
-    $S =~ s/&/&amp;/g;
-    $S =~ s/</&lt;/g;
-    $S =~ s/>/&gt;/g;
-    $S =~ s/\"/&quot;/g;
-    return $S;
+#-----------------------------------------------------------------------------#
+#			     File list management			      #
+# ----------------------------------------------------------------------------#
+
+
+
+sub AddFile {
+
+    # Argument is file to add
+    my $FileName = $_[0];
+
+    # Remove a path name if we have one
+    $FileName =~ /^(.*?)([^\/]*)$/;
+    my $Path = $1;
+    my $Name = $2;
+
+    # Check if we have the file already
+    if (exists ($Files{$Name})) {
+	Gabble ("File \"$FileName\" already known");
+	return;
+    }
+
+    # Check with the full pathname. If we don't find it, search in the current
+    # directory
+    if (-f $FileName && -r $FileName) {
+	$Files{$Name} = $FileName;
+	$FileCount++;
+    } elsif (-f $Name && -r $Name) {
+	$Files{$Name} = $Name;
+	$FileCount++;
+    } else {
+     	Abort ("$FileName not found or not readable");
+    }
 }
 
 
 
 #-----------------------------------------------------------------------------#
-#    				    Pass 1 				      #
+#			Referencing and defining labels			      #
+# ----------------------------------------------------------------------------#
+
+
+
+# Get a label reference
+sub RefLabel {
+
+    # Arguments are: Filename, identifier, item that should be tagged
+    my $FileName = $_[0];
+    my $Id       = $_[1];
+    my $Item  	 = $_[2];
+
+    # Search for the identifier in the list of labels
+    if (exists ($Labels{$FileName}{$Id})) {
+	# It is a label (in this file)
+	return sprintf ("<a href=\"#%s\">%s</a>", $Labels{$FileName}{$Id}, $Item);
+    } elsif (exists ($Imports{$FileName}{$Id})) {
+       	# It is an import. If LinkStyle is 1, or if the file exporting the
+	# identifier is not visible, we link to the .import statement in the
+	# current file. Otherwise we link directly to the referenced symbol
+	# in the file that exports it.
+	if ($LinkStyle == 1 or not exists ($Exports{$Id})) {
+	    return sprintf ("<a href=\"#%s\">%s</a>", $Imports{$FileName}{$Id}, $Item);
+	} else {
+	    # Get the filename from the export
+	    my $Label;
+       	    ($FileName, $Label) = split (/#/, $Exports{$Id});
+       	    if (not defined ($Labels{$FileName}{$Id})) {
+		# This may currently happen because we don't see .include
+		# statements, so we may have an export but no definition.
+		# Link to the .export statement instead
+		$Label = $Exports{$Id};
+	    } else {
+		# Link to the definition in the file
+		$Label = sprintf ("%s#%s", $FileName, $Labels{$FileName}{$Id});
+	    }
+	    return sprintf ("<a href=\"%s\">%s</a>", $Label, $Item);
+	}
+    } else {
+	# The symbol is unknown, return as is
+	return $Item;
+    }
+}
+
+
+
+#-----------------------------------------------------------------------------#
+#    	     	   		    Pass 1 		   		      #
 # ----------------------------------------------------------------------------#
 
 
@@ -148,63 +269,73 @@ sub Cleanup {
 sub Process1 {
 
     # Variables
-    local $Line;
-    local $Id;
+    my $Line;
+    my $Id;
 
     # Filename is parameter
-    local $InName = shift(@_);
+    my $InName = shift(@_);
 
     # Create the output file name from the input file name
-    local $OutName = GetOutName ($InName);
+    my $OutName = GetOutName ($InName);
 
     # Current cheap local label prefix is empty
-    local $CheapPrefix = "";
+    my $CheapPrefix = "";
 
     # Open a the input file
-    open (INPUT, "<$InName") or Abort ("Cannot open $InName");
+    my $FileName = $Files{$InName};	# Includes path if needed
+    open (INPUT, "<$FileName") or Abort ("Cannot open $FileName: $!");
 
     # Read and process all lines from the file
     while ($Line = <INPUT>) {
 
-	# Remove the newline
-	chop ($Line);
+       	# Remove the newline
+       	chop ($Line);
 
-	# Check for a label
-	if ($Line =~ /^\s*(\@?)([_a-zA-Z][_\w]*)\s*(:|=)/) {
+       	# Check for a label
+       	if ($Line =~ /^\s*(\@?)([_a-zA-Z][_\w]*)\s*(:|=)/) {
 
 	    # Is this a local label?
 	    if ($1 eq "\@") {
-		# Use the prefix
-		$Id = "$CheapPrefix$1$2";
+	       	# Use the prefix
+	       	$Id = "$CheapPrefix$1$2";
 	    } else {
-		# Use as is
-		$Id = $2;
-		# Remember the id as new cheap local prefix
-		$CheapPrefix = $Id;
+	       	# Use as is
+	       	$Id = $2;
+	       	# Remember the id as new cheap local prefix
+	       	$CheapPrefix = $Id;
 	    }
 
 	    # Remember the label
-	    $Labels{$InName}{$Id} = GenLabel();
+	    $Labels{$OutName}{$Id} = GenLabel();
 
-	# Check for an import statement
-	} elsif ($Line =~ /^\s*(\.import|\.importzp|.proc)\s+(.*?)(\s*)(;.*$|$)/) {
+      	# Check for an import statement
+	} elsif ($Line =~ /^\s*(\.import|\.importzp)\s+(.*?)(\s*)(;.*$|$)/) {
 
 	    # Split into a list of identifiers
-	    local @Ids = split (/\s*,\s*/, $2);
-	    for my $Id (@Ids) {
-		$Labels{$InName}{$Id} = GenLabel();
+	    my @Ids = split (/\s*,\s*/, $2);
+	    for $Id (@Ids) {
+	       	$Imports{$OutName}{$Id} = GenLabel();
 	    }
 
 	# Check for an export statement
 	} elsif ($Line =~ /^\s*(\.export|\.exportzp)\s+(.*?)(\s*)(;.*$|$)/) {
 
 	    # Split into a list of identifiers
-	    local @Ids = split (/\s*,\s*/, $2);
-       	    for my $Id (@Ids) {
-		$Exports{$Id} = sprintf ("%s#%s", $OutName, GenLabel());
+	    my @Ids = split (/\s*,\s*/, $2);
+       	    for $Id (@Ids) {
+	       	$Exports{$Id} = sprintf ("%s#%s", $OutName, GenLabel());
 	    }
 
-	}
+	# Check for a .proc statement
+       	} elsif ($Line =~ /^\s*\.proc\s+([_a-zA-Z][_\w]*)?.*$/) {
+
+	    # Do we have an id?
+	    $Id = $1;
+	    if ($Id ne "") {
+	       	$Labels{$OutName}{$Id} = GenLabel();
+	    }
+
+     	}
     }
 
     # Close the input file
@@ -214,16 +345,13 @@ sub Process1 {
 
 
 # Pass1: Read all files for the first time.
-sub Pass1 {
-
-    # List of new files we found
-    local @NewFiles = ();
+sub Pass1 () {
 
     # Walk over the files
-    for my $InName (@_) {
+    for my $InName (keys (%Files)) {
 
- 	# Process one file
-	Process1 ($InName);
+     	# Process one file
+      	Process1 ($InName);
 
     }
 }
@@ -240,34 +368,36 @@ sub Pass1 {
 sub Process2 {
 
     # Variables
-    local $Base;
-    local $Ext;
-    local $Line;
-    local $OutLine;
-    local $Id;
-    local $Label;
-    local $Operand;
-    local $Comment;
+    my $Base;
+    my $Ext;
+    my $Line;
+    my $OutLine;
+    my $Id;
+    my $Label;
+    my $Operand;
+    my $Comment;
 
     # Input file is parameter
-    local $InName = shift(@_);
+    my $InName = shift(@_);
 
     # Create the output file name from the input file name
-    local $OutName = GetOutName ($InName);
+    my $OutName = GetOutName ($InName);
 
     # Current cheap local label prefix is empty
-    local $CheapPrefix = "";
+    my $CheapPrefix = "";
 
     # Open a the input file
-    open (INPUT, "<$InName") or Abort ("Cannot open $InName");
+    my $FileName = $Files{$InName};	# Includes path if needed
+    open (INPUT, "<$FileName") or Abort ("Cannot open $FileName: $!");
 
     # Open the output file and print the HTML header
-    open (OUTPUT, ">$OutName") or Abort ("Cannot open $OutName");
+    open (OUTPUT, ">$OutName") or Abort ("Cannot open $OutName: $!");
     DocHeader (OUTPUT, $InName);
 
     # The instructions that will have hyperlinks if a label is used
-    local $Ins = "adc|add|and|bcc|bcs|beq|bit|bmi|bne|bpl|bcv|bvs|cmp|cpx|cpy|dec|".
-		 "eor|inc|jmp|jsr|lda|ldx|ldy|ora|rol|sbc|sta|stx|sty|sub|";
+    my $Ins = "adc|add|and|bcc|bcs|beq|bit|bmi|bne|bpl|bcv|bra|bvs|".
+	      "cmp|cpx|cpy|dec|eor|inc|jmp|jsr|lda|ldx|ldy|ora|rol|".
+	      "sbc|sta|stx|sty|sub|";
 
     # Read the input file, replacing references by hyperlinks and mark
     # labels as link targets.
@@ -286,7 +416,7 @@ sub Process2 {
 	    # Is this a local label?
        	    if ("$1" eq "\@") {
 		# Use the prefix
-		$Id = "$CheapPrefix$1$2";
+	     	$Id = "$CheapPrefix$1$2";
 	    } else {
 	      	# Use as is
 	      	$Id = $2;
@@ -295,7 +425,7 @@ sub Process2 {
 	    }
 
 	    # Get the label for the id
-	    $Label = $Labels{$InName}{$Id};
+	    $Label = $Labels{$OutName}{$Id};
 
 	    # Print the label with a tag
        	    $OutLine .= sprintf ("<a name=\"%s\">%s%s</a>%s%s", $Label, $1, $2, $3, $4);
@@ -307,7 +437,7 @@ sub Process2 {
 	# Print any leading whitespace and remove it, so we don't have to
 	# care about whitespace below.
 	if ($Line =~ /^(\s+)(.*)$/) {
-	    $OutLine .= "$1";
+      	    $OutLine .= "$1";
 	    $Line = $2;
 	}
 
@@ -326,31 +456,31 @@ sub Process2 {
 		$Line = $2;
 
 		# Variable to assemble HTML representation
-		local $Item = $Id;
+		my $Item = $Id;
 
 		# If we have an export for this import, add a link to this
-		# export definition
+	     	# export definition
 		if (exists ($Exports{$Id})) {
 		    $Label = $Exports{$Id};
 		    $Item = sprintf ("<a href=\"%s\">%s</a>", $Label, $Item);
 		}
 
 		# Make this import a link target
-		if (exists ($Labels{$InName}{$Id})) {
-       	       	    $Label = $Labels{$InName}{$1};
+		if (exists ($Imports{$OutName}{$Id})) {
+       	       	    $Label = $Imports{$OutName}{$1};
 		    $Item = sprintf ("<a name=\"%s\">%s</a>", $Label, $Item);
 		}
 
 		# Add the HTML stuff to the output line
-		$OutLine .= $Item;
+	    	$OutLine .= $Item;
 
-		# Check if another identifier follows
+	     	# Check if another identifier follows
 		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
-		    $OutLine .= "$1,$2";
+     		    $OutLine .= "$1,$2";
 		    $Line = $3;
        		} else {
 		    last;
-		}
+      		}
 	    }
 
 	    # Add an remainder if there is one
@@ -371,12 +501,12 @@ sub Process2 {
 		$Line = $2;
 
 		# Variable to assemble HTML representation
-		local $Item = $Id;
+		my $Item = $Id;
 
 		# If we have a definition for this export in this file, add
 		# a link to the definition.
-		if (exists ($Labels{$InName}{$1})) {
-		    $Label = $Labels{$InName}{$1};
+		if (exists ($Labels{$OutName}{$1})) {
+		    $Label = $Labels{$OutName}{$1};
        	       	    $Item = sprintf ("<a href=\"#%s\">%s</a>", $Label, $Item);
 		}
 
@@ -385,54 +515,72 @@ sub Process2 {
 		if (exists ($Exports{$Id})) {
 		    $Label = $Exports{$Id};
        	       	    # Be sure to use only the label part
-		    $Label =~ s/^(.*#)(.*)$/$2/;
+	    	    $Label =~ s/^(.*#)(.*)$/$2/;
 		    $Item = sprintf ("<a name=\"%s\">%s</a>", $Label, $Item);
-		}
+	     	}
 
-		# Add the HTML stuff to the output line
-		$OutLine .= $Item;
+     		# Add the HTML stuff to the output line
+     		$OutLine .= $Item;
 
-		# Check if another identifier follows
-		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
-		    $OutLine .= "$1,$2";
-		    $Line = $3;
-		} else {
-		    last;
- 		}
-	    }
+     		# Check if another identifier follows
+      		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
+     		    $OutLine .= "$1,$2";
+     		    $Line = $3;
+     		} else {
+     		    last;
+     		}
+     	    }
 
-	    # Add an remainder if there is one
-	    $OutLine .= Cleanup ($Line);
+     	    # Add an remainder if there is one
+     	    $OutLine .= Cleanup ($Line);
 
-	# Check for .addr and .word
-	} elsif ($Line =~ /^(\.addr|\.word)(\s+)(.*)$/) {
+     	# Check for .addr and .word
+     	} elsif ($Line =~ /^(\.addr|\.word)(\s+)(.*)$/) {
 
-	    # Print the command the and white space
-	    $OutLine .= "$1$2";
-	    $Line = $3;
+     	    # Print the command the and white space
+     	    $OutLine .= "$1$2";
+     	    $Line = $3;
 
-	    # Print all identifiers if there are any
-	    while ($Line =~ /^([_a-zA-Z][_\w]*)(.*)$/) {
-		if (exists ($Labels{$InName}{$1})) {
-		    $Label = $Labels{$InName}{$1};
+     	    # Print all identifiers if there are any
+     	    while ($Line =~ /^([_a-zA-Z][_\w]*)(.*)$/) {
+     		if (exists ($Labels{$OutName}{$1})) {
+     		    $Label = $Labels{$OutName}{$1};
        	       	    $OutLine .= sprintf ("<a href=\"#%s\">%s</a>", $Label, $1);
-		} else {
-		    $OutLine .= "$1";
-		}
-		$Line = $2;
-		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
-		    $OutLine .= "$1,$2";
-		    $Line = $3;
-		} else {
-		    last;
- 		}
+     		} else {
+     		    $OutLine .= "$1";
+     		}
+     		$Line = $2;
+     		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
+     		    $OutLine .= "$1,$2";
+     		    $Line = $3;
+     		} else {
+     		    last;
+     		}
+     	    }
+
+     	    # Add an remainder if there is one
+     	    $OutLine .= Cleanup ($Line);
+
+	# Handle .proc
+       	} elsif ($Line =~ /^(\.proc\s+)([_a-zA-Z][_\w]*)?(.*)$/) {
+
+	    # Do we have an identifier?
+	    if ($2 ne "") {
+      		# Get the label for the id
+		$Label = $Labels{$OutName}{$2};
+
+		# Print the label with a tag
+		$OutLine .= sprintf ("%s<a name=\"%s\">%s</a>", $1, $Label, $2);
+
+		# Use the remainder for line
+		$Line = $3;
 	    }
 
-	    # Add an remainder if there is one
+	    # Cleanup the remainder and add it
 	    $OutLine .= Cleanup ($Line);
 
-	# Check for any legal instruction
-	} elsif ($Line =~ /^($Ins)(\s+)(.*?)(\s*)(;.*$|$)/) {
+     	# Check for any legal instruction
+     	} elsif ($Line =~ /^($Ins)(\s+)(.*?)(\s*)(;.*$|$)/) {
 
 	    # Print the instruction and white space
 	    $OutLine .= "$1$2";
@@ -454,19 +602,14 @@ sub Process2 {
 		    $Id = $3;
 		}
 
-		# Do we have a label for this id?
-		if (exists ($Labels{$InName}{$Id})) {
-		    $Label = $Labels{$InName}{$Id};
-		    $Operand = sprintf ("%s<a href=\"#%s\">%s%s</a>%s",
-		 		       	Cleanup($1), $Label, $2, $3, Cleanup ($4));
-		}
-
+		# Get the reference to this label if we find it
+	     	$Operand = Cleanup($1) . RefLabel($OutName, $Id, $2 . $3) . Cleanup($4);
 	    }
 
 	    # Reassemble and print the line
        	    $OutLine .= "$Operand$Comment";
 
- 	} else {
+      	} else {
 
 	    # Nothing known - print the line
 	    $OutLine .= Cleanup ($Line);
@@ -474,7 +617,7 @@ sub Process2 {
 	}
 
 	# Print the result
-	print OUTPUT "$OutLine\n";
+     	print OUTPUT "$OutLine\n";
     }
 
     # Print the HTML footer
@@ -488,10 +631,10 @@ sub Process2 {
 
 
 # Pass2: Read all files the second time.
-sub Pass2 {
+sub Pass2 () {
 
     # Walk over the files
-    for my $InName (@_) {
+    for my $InName (keys (%Files)) {
 
        	# Process one file
        	Process2 ($InName);
@@ -501,20 +644,195 @@ sub Pass2 {
 
 
 
-# ----------------------------------------------------------
-#      	       	      	      	Code
-# ----------------------------------------------------------
+#-----------------------------------------------------------------------------#
+#		   	     Create an index page     			      #
+# ----------------------------------------------------------------------------#
 
-# Get the arguments
-#if ($#ARGV != 0) {
-#    printf STDERR "Usage: %s asm-file\n", $ARGV[0];
-#    exit (1);
-#}
 
-#
-Pass1 (@ARGV);
-Pass2 (@ARGV);
 
+# Print a list of all files
+sub FileIndex {
+
+    # File is argument
+    my $INDEX = $_[0];
+
+    # Print the file list in a table
+    print $INDEX "<h2>Files</h2><p>\n";
+    print $INDEX "<table border=\"0\" width=\"100%\">\n";
+    my $Count = 0;
+    for my $File (sort (keys (%Files))) {
+
+	#
+     	if (($Count % $IndexCols) == 0) {
+     	    print $INDEX "<tr>\n";
+     	}
+     	printf $INDEX "<td><a href=\"%s\">%s</a></td>\n", GetOutName ($File), $File;
+     	if (($Count % $IndexCols) == $IndexCols-1) {
+     	    print $INDEX "</tr>\n";
+     	}
+     	$Count++;
+    }
+    if (($Count % $IndexCols) != 0) {
+     	print $INDEX "</tr>\n";
+    }
+    print $INDEX "</table><p><br><p>\n";
+}
+
+
+
+# Print a list of all exports
+sub ExportIndex {
+
+    # File is argument
+    my $INDEX = $_[0];
+
+    # Print the file list in a table
+    print $INDEX "<h2>Exports</h2><p>\n";
+    print $INDEX "<table border=\"0\" width=\"100%\">\n";
+    my $Count = 0;
+    for my $Export (sort (keys (%Exports))) {
+
+	# Get the export
+	my $File;
+	my $Label;
+	($File, $Label) = split (/#/, $Exports{$Export});
+
+	# The label is the label of the export statement. If we can find the
+	# actual label, use this instead.
+       	if (exists ($Labels{$File}{$Export})) {
+	    $Label = $Labels{$File}{$Export};
+	}
+
+	#
+	if (($Count % $IndexCols) == 0) {
+	    print $INDEX "<tr>\n";
+	}
+	printf $INDEX "<td><a href=\"%s#%s\">%s</a></td>\n", $File, $Label, $Export;
+	if (($Count % $IndexCols) == $IndexCols-1) {
+	    print $INDEX "</tr>\n";
+	}
+	$Count++;
+    }
+    if (($Count % $IndexCols) != 0) {
+	print $INDEX "</tr>\n";
+    }
+    print $INDEX "</table><p><br><p>\n";
+}
+
+
+
+sub CreateIndex {
+
+    # Open the index page file
+    open (INDEX, ">$IndexName") or Abort ("Cannot open $IndexName: $!");
+
+    # Print the header
+    print INDEX <<"EOF";
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html-40/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content=\"text/html; charset=iso-8859-1">
+<meta name="GENERATOR" content="ca65html">
+<title>$IndexTitle</title>
+</head>
+<body bgcolor="$BGColor" text="$TextColor" link="#0000d0" vlink="#000060" alink="#00d0d0">
+<p><br><p>
+<center><h1>$IndexTitle</h1></center>
+<hr><p><br><p>
+EOF
+
+    # Print the file list in a table
+    FileIndex (INDEX);
+    ExportIndex (INDEX);
+
+    # Print the document footer
+    my $Today = localtime;
+    print INDEX <<"EOF";
+<p><br><p>
+<hr size=1 noshade>
+<address>
+    <a href="http://validator.w3.org/check/referer"><img border=0
+       src="http://validator.w3.org/images/vh40"
+       alt="Valid HTML 4.0!" height="31" width="88" align=right></a>
+    $IndexName; generated on $Today by ca65html<br>
+    <a href=\"mailto:uz\@cc65.org\">uz\@cc65.org</a>
+</address>
+</body>
+</html>
+EOF
+
+    # Close the index file
+    close (INDEX);
+}
+
+
+
+#-----------------------------------------------------------------------------#
+#			    Print usage information			      #
+# ----------------------------------------------------------------------------#
+
+
+
+sub Usage {
+    print "Usage: ca65html [options] file ...\n";
+    print "Options:\n";
+    print "\t--bgcolor c\tUse background color c instead of $BGColor\n";
+    print "\t--help\t\tThis text\n";
+    print "\t--indexcols n\tUse n columns on index page (default $IndexCols)\n";
+    print "\t--indexname f\tUse name f for the index file instead of $IndexName\n";
+    print "\t--indexpage\tCreate an index page\n";
+    print "\t--indextitle t\tUse t as the index title instead of $IndexTitle\n";
+    print "\t--linkstyle s\tUse the given link style\n";
+    print "\t--replaceext\tReplace source extension instead of appending .html\n";
+    print "\t--textcolor c\tUse text color c instead of $TextColor\n";
+    print "\t--verbose\tBe more verbose\n";
+}
+
+
+
+#-----------------------------------------------------------------------------#
+#	     			     Main      				      #
+# ----------------------------------------------------------------------------#
+
+
+
+# Get program options
+GetOptions ("bgcolor=s"		=> \$BGColor,
+	    "debug!"   		=> \$Debug,
+	    "help"     		=> \$Help,
+	    "indexcols=i"      	=> \$IndexCols,
+	    "indexname=s"	=> \$IndexName,
+	    "indexpage"		=> \$IndexPage,
+	    "indextitle=s"	=> \$IndexTitle,
+	    "linkstyle=i"	=> \$LinkStyle,
+	    "replaceext"	=> \$ReplaceExt,
+	    "textcolor=s"	=> \$TextColor,
+       	    "verbose!" 		=> \$Verbose,
+	    "<>"		=> \&AddFile);
+
+# Check some arguments
+if ($IndexCols <= 0 || $IndexCols >= 20) {
+    Abort ("Invalid value for --indexcols option");
+}
+
+# Print help if requested
+if ($Help) {
+    Usage ();
+}
+
+# Check if we have input files given
+if ($FileCount == 0) {
+    Abort ("No input files");
+}
+
+# Convert the documents
+Pass1 ();
+Pass2 ();
+
+# Generate an index page if requested
+if ($IndexPage) {
+    CreateIndex ();
+}
 
 # Done
 exit 0;

@@ -276,6 +276,16 @@ int IsZPName (const char* Name)
 
 
 
+static unsigned char GetRegInfo1 (CodeSeg* S,
+		   		  CodeEntry* E,
+		   		  int Index,
+		     		  Collection* Visited,
+		     		  unsigned char Used,
+		     		  unsigned char Unused);
+/* Recursively called subfunction for GetRegInfo. */
+
+
+
 static unsigned char GetRegInfo2 (CodeSeg* S,
 		    		  CodeEntry* E,
 		    		  int Index,
@@ -365,7 +375,7 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
 		unsigned char U1;
 		unsigned char U2;
 
-		U1 = GetRegInfo2 (S, E->JumpTo->Owner, -1, Visited, Used, Unused);
+		U1 = GetRegInfo1 (S, E->JumpTo->Owner, -1, Visited, Used, Unused);
 		if (U1 == REG_AXY) {
 		    /* All registers used, no need for second call */
 		    return REG_AXY;
@@ -376,7 +386,7 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
        	       	if ((E = CS_GetEntry (S, ++Index)) == 0) {
 		    Internal ("GetRegInfo2: No next entry!");
 		}
-		U2 = GetRegInfo2 (S, E, Index, Visited, Used, Unused);
+		U2 = GetRegInfo1 (S, E, Index, Visited, Used, Unused);
 	   	return U1 | U2;	       	/* Used in any of the branches */
 
 	    } else {

@@ -178,6 +178,7 @@ programs for the Oric Atmos using the cc65 crosscompiler.
 %files atmos
 %attr(644,root,root)		/usr/lib/cc65/lib/atmos.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/atmos.o
+%attr(644,root,root) 		/usr/lib/cc65/tgi/atmos-*.tgi
 
 
 

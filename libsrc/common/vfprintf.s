@@ -61,8 +61,7 @@ out:
   	lda	(ptr1),y
   	tax
   	dey
-  	lda	(ptr1),y
-  	jsr	pushax		; Push D->ptr
+  	lda	(ptr1),y        ; Load D->ptr
   	jsr	_fwrite
        	sta	ptr2		; Save function result
 	stx	ptr2+1

@@ -30,7 +30,6 @@ C_OBJS =	_afailed.o	\
 		fseek.o		\
 		fsetpos.o	\
 		ftell.o		\
-		fwrite.o	\
 		getchar.o	\
 		gets.o		\
                 gmtime.o        \
@@ -74,6 +73,7 @@ S_OBJS = 	_fdesc.o 	\
 		fopen.o		\
 		fprintf.o	\
 		free.o		\
+		fwrite.o	\
 		getcpu.o	\
 		isalnum.o	\
 		isalpha.o	\

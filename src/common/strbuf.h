@@ -7,9 +7,9 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -237,6 +237,7 @@ INLINE void SB_Copy (StrBuf* Target, const StrBuf* Source)
 /* Copy Source to Target, discarding the old contents of Target */
 {
     SB_CopyBuf (Target, Source->Buf, Source->Len);
+    Target->Index = Source->Index;
 }
 #else
 void SB_Copy (StrBuf* Target, const StrBuf* Source);

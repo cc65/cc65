@@ -101,11 +101,6 @@ _exit: 	pha			; Save the return code
         sta     irqcount        ; Disable custom IRQ handlers
         jsr	donelib         ; Run module destructors
 
-; Restore system stuff
-
-       	ldx	spsave
-       	txs
-
 ; Copy back the zero page stuff
 
   	ldx	#zpspace-1
@@ -118,6 +113,11 @@ L2:	lda	zpsave,x
 
 	pla
 	sta	ST
+
+; Restore the stack pointer
+
+       	ldx	spsave
+       	txs
 
 ; Enable the ROM, reset changed vectors and return to BASIC
 

@@ -85,13 +85,6 @@ L1:	lda	sp,x
 _exit: 	pha			; Save the return code
 	jsr	donelib		; Run module destructors
 
-; Restore system stuff
-
-  	ldx	spsave
-	txs	   	  	; Restore stack pointer
-       	lda    	mmusave
-	sta	$01	  	; Restore memory configuration
-
 ; Copy back the zero page stuff
 
        	ldx	#zpspace-1
@@ -104,6 +97,13 @@ L2:	lda	zpsave,x
 
 	pla
 	sta	ST
+
+; Restore system stuff
+
+  	ldx	spsave
+	txs	       	  	; Restore stack pointer
+       	ldx    	mmusave
+	stx	$01    	  	; Restore memory configuration
 
 ; Reset changed vectors, back to basic
 

@@ -74,11 +74,6 @@ L1:	lda	sp,x
 _exit: 	pha			; Save the return code on stack
 	jsr	donelib		; Run module destructors
 
-; Restore system stuff
-
-	ldx	spsave
-	txs	    	 	; Restore stack pointer
-
 ; Copy back the zero page stuff
 
 	ldx	#zpspace-1
@@ -91,6 +86,11 @@ L2:	lda	zpsave,x
 
 	pla
 	sta	ST
+
+; Restore the stack pointer
+
+	ldx	spsave
+	txs	    	 	; Restore stack pointer
 
 ; Back to basic
 

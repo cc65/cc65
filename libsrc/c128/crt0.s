@@ -112,7 +112,7 @@ L1:	lda    	sp,x
 
 NoIRQ1:	jsr	callmain
 
-; Back from main (this is also the _exit entry). Reset the IRQ vector if we 
+; Back from main (this is also the _exit entry). Reset the IRQ vector if we
 ; chained it.
 
 _exit:	pha				; Save the return code on stack
@@ -129,11 +129,6 @@ _exit:	pha				; Save the return code on stack
 
 NoIRQ2: jsr    	donelib
 
-; Reset the stack
-
-	ldx    	spsave
- 	txs
-
 ; Copy back the zero page stuff
 
  	ldx	#zpspace-1
@@ -142,15 +137,17 @@ L2:	lda	zpsave,x
      	dex
      	bpl	L2
 
-; Reset the memory configuration
-
-       	lda    	mmusave
-	sta	MMU_CR
-
 ; Place the program return code into ST
 
 	pla
 	sta	ST
+
+; Reset the stack and the memory configuration
+
+	ldx    	spsave
+ 	txs
+       	ldx    	mmusave
+	stx	MMU_CR
 
 ; Done, restore kernal vectors in an attempt to cleanup
 

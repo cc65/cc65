@@ -305,6 +305,11 @@ O_GHP_DISK		=	97
 O_GHP_FNAME		=	117
 O_GHINFO_TXT		=	$a0
 
+; values for CPU_DATA - C64 memory config
+IO_IN			=	$35	;60K RAM, 4K I/O space in
+KRNL_IO_IN		=	$36	;kernal and I/O mapped into memory
+KRNL_BAS_IO_IN		=	$37	;kernal, I/O and basic mapped into memory
+
 ;values for config - C128 mmu
 CIOIN			=	$7E	;60K RAM, 4K I/O space in
 CRAM64K 		=	$7F	;64K RAM

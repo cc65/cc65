@@ -47,6 +47,7 @@ C_OBJS =	_afailed.o	\
 		qsort.o		\
 		realloc.o	\
 		rewind.o	\
+		sleep.o		\
 		sscanf.o	\
                 strftime.o      \
 		strxfrm.o	\

@@ -301,9 +301,10 @@ proper values.
 
 <sect3>DrawPoint
 <p>
-<tt/void DrawPoint (struct pixel *myPixel)/
+<tt/void DrawPoint (char mode, struct pixel *myPixel)/
 <p>
-Draws single point on the screen, no matter what the current pattern is.
+Depending on <tt/mode/ (see <tt/DrawLine/) draws/erases/copies a single point
+on the screen.
 
 <sect3>TestPoint
 <p>

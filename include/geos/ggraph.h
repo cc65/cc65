@@ -32,7 +32,7 @@ void __fastcall__ RecoverRectangle(void);
 
 void __fastcall__ DrawLine(char mode, struct window *topBotCoords);
 
-void __fastcall__ DrawPoint(struct pixel *myPixel);
+void __fastcall__ DrawPoint(char mode, struct pixel *myPixel);
 char __fastcall__ TestPoint(struct pixel *myPixel);
 
 void __fastcall__ PutChar(char character, char y, unsigned x);
@@ -170,7 +170,7 @@ void __fastcall__ GraphicsString(char *myGfxString);
 #define	ADD1_W		0x2000
 #define	DOUBLE_B	0x80
 #define	DOUBLE_W	0x8000
-/* DrawLine mode values */
+/* DrawLine/DrawPoint mode values */
 #define DRAW_ERASE	0x00
 #define DRAW_DRAW	0x40
 #define DRAW_COPY	0x80

@@ -86,9 +86,6 @@ ExprNode* SegmentExpr (Segment* Seg, long Offs, ObjData* O);
 ExprNode* SectionExpr (Section* Sec, long Offs, ObjData* O);
 /* Return an expression tree that encodes an offset into a section */
 
-void DumpExpr (const ExprNode* Expr);
-/* Dump an expression tree to stdout */
-
 ExprNode* ReadExpr (FILE* F, ObjData* O);
 /* Read an expression from the given file */
 

@@ -385,13 +385,13 @@ void SegDump (void)
 		    case FRAG_EXPR:
 			printf ("    Expression (%u bytes):\n", F->Size);
 			printf ("    ");
-			DumpExpr (F->Expr);
+			DumpExpr (F->Expr, 0);
 			break;
 
 		    case FRAG_SEXPR:
 			printf ("    Signed expression (%u bytes):\n", F->Size);
 			printf ("      ");
-			DumpExpr (F->Expr);
+			DumpExpr (F->Expr, 0);
 			break;
 
 		    case FRAG_FILL:
@@ -493,18 +493,18 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 		    /* Call the users function and evaluate the result */
 		    switch (F (Frag->Expr, Sign, Frag->Size, Offs, Data)) {
 
-			case SEG_EXPR_OK:
-			    break;
+		   	case SEG_EXPR_OK:
+		   	    break;
 
-			case SEG_EXPR_RANGE_ERROR:
-			    Error ("Range error in module `%s', line %lu",
-			    	   GetSourceFileName (Frag->Obj, Frag->Pos.Name),
-			 	   Frag->Pos.Line);
-			    break;
+		   	case SEG_EXPR_RANGE_ERROR:
+		   	    Error ("Range error in module `%s', line %lu",
+		   	    	   GetSourceFileName (Frag->Obj, Frag->Pos.Name),
+		   	 	   Frag->Pos.Line);
+		   	    break;
 
-			case SEG_EXPR_TOO_COMPLEX:
-			    Error ("Expression too complex in module `%s', line %lu",
-			     	   GetSourceFileName (Frag->Obj, Frag->Pos.Name),
+		   	case SEG_EXPR_TOO_COMPLEX:
+		   	    Error ("Expression too complex in module `%s', line %lu",
+		   	     	   GetSourceFileName (Frag->Obj, Frag->Pos.Name),
 			     	   Frag->Pos.Line);
 			    break;
 

@@ -82,7 +82,8 @@ L1:	lda	sp,x
 
 ; Call module destructors. This is also the _exit entry.
 
-_exit:	jsr	donelib		; Run module destructors
+_exit: 	sta	ST		; Place return code into ST
+	jsr	donelib		; Run module destructors
 
 ; Restore system stuff
 

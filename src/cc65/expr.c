@@ -18,8 +18,8 @@
 #include "asmcode.h"
 #include "asmlabel.h"
 #include "asmstmt.h"
+#include "assignment.h"
 #include "codegen.h"
-#include "datatype.h"
 #include "declare.h"
 #include "error.h"
 #include "funcdesc.h"
@@ -319,7 +319,7 @@ void DefineData (ExprDesc* Expr)
 
 
 
-static void lconst (unsigned Flags, ExprDesc* Expr)
+static void LoadConstant (unsigned Flags, ExprDesc* Expr)
 /* Load the primary register with some constant value. */
 {
     switch (Expr->Flags & E_MCTYPE) {
@@ -442,7 +442,7 @@ static int istypeexpr (void)
 
 
 
-static void PushAddr (ExprDesc* lval)
+void PushAddr (ExprDesc* lval)
 /* If the expression contains an address that was somehow evaluated,
  * push this address on the stack. This is a helper function for all
  * sorts of implicit or explicit assignment functions where the lvalue
@@ -451,19 +451,9 @@ static void PushAddr (ExprDesc* lval)
 {
     /* Get the address on stack if needed */
     if (lval->Flags != E_MREG && (lval->Flags & E_MEXPR)) {
-	/* Push the address (always a pointer) */
-	g_push (CF_PTR, 0);
+     	/* Push the address (always a pointer) */
+     	g_push (CF_PTR, 0);
     }
-}
-
-
-
-static void MakeConstIntExpr (ExprDesc* Expr, long Value)
-/* Make Expr a constant integer expression with the given value */
-{
-    Expr->Flags = E_MCONST;
-    Expr->Type = type_int;
-    Expr->ConstVal = Value;
 }
 
 
@@ -479,7 +469,7 @@ void ConstSubExpr (int (*F) (ExprDesc*), ExprDesc* Expr)
     if (F (Expr) != 0 || Expr->Flags != E_MCONST) {
        	Error ("Constant expression expected");
        	/* To avoid any compiler errors, make the expression a valid const */
-	MakeConstIntExpr (Expr, 1);
+     	MakeConstIntExpr (Expr, 1);
     }
 }
 
@@ -525,7 +515,7 @@ void exprhs (unsigned flags, int k, ExprDesc *lval)
        	g_inc (flags | CF_CONST, lval->ConstVal);
     } else if ((f & E_MEXPR) == 0) {
      	/* Constant of some sort, load it into the primary */
-     	lconst (flags, lval);
+     	LoadConstant (flags, lval);
     }
     /* Are we testing this value? */
     if (lval->Test & E_FORCETEST) {
@@ -1370,34 +1360,46 @@ static int hie11 (ExprDesc *lval)
 
 
 
-static void store (ExprDesc* lval)
-/* Store primary reg into this reference */
+void Store (ExprDesc* lval, const type* StoreType)
+/* Store the primary register into the location denoted by lval. If StoreType
+ * is given, use this type when storing instead of lval->Type. If StoreType
+ * is NULL, use lval->Type instead.
+ */
 {
-    int f;
-    unsigned flags;
+    unsigned Flags;
 
-    f = lval->Flags;
-    flags = TypeOf (lval->Type);
+    unsigned f = lval->Flags;
+
+    /* If StoreType was not given, use lval->Type instead */
+    if (StoreType == 0) {
+        StoreType = lval->Type;
+    }
+
+    /* Get the code generator flags */
+    Flags = TypeOf (StoreType);
     if (f & E_MGLOBAL) {
-	flags |= GlobalModeFlags (f);
+     	Flags |= GlobalModeFlags (f);
      	if (lval->Test) {
-	    /* Just testing */
-       	    flags |= CF_TEST;
-	}
+   	    /* Just testing */
+       	    Flags |= CF_TEST;
+   	}
 
     	/* Generate code */
-       	g_putstatic (flags, lval->Name, lval->ConstVal);
+       	g_putstatic (Flags, lval->Name, lval->ConstVal);
 
     } else if (f & E_MLOCAL) {
-       	g_putlocal (flags, lval->ConstVal, 0);
+        /* Store an auto variable */
+       	g_putlocal (Flags, lval->ConstVal, 0);
     } else if (f == E_MEOFFS) {
-    	g_putind (flags, lval->ConstVal);
+        /* Store indirect with offset */
+    	g_putind (Flags, lval->ConstVal);
     } else if (f != E_MREG) {
     	if (f & E_MEXPR) {
-    	    g_putind (flags, 0);
+            /* Indirect without offset */
+    	    g_putind (Flags, 0);
     	} else {
     	    /* Store into absolute address */
-    	    g_putstatic (flags | CF_ABSOLUTE, lval->ConstVal, 0);
+    	    g_putstatic (Flags | CF_ABSOLUTE, lval->ConstVal, 0);
     	}
     }
 
@@ -1442,7 +1444,7 @@ static void pre_incdec (ExprDesc* lval, void (*inc) (unsigned, unsigned long))
        	inc (flags, val);
 
 	/* Store the result back */
-	store (lval);
+	Store (lval, 0);
 
     } else {
 
@@ -1518,7 +1520,7 @@ static void post_incdec (ExprDesc* lval, int k, void (*inc) (unsigned, unsigned 
     }
 
     /* Store the result back */
-    store (lval);
+    Store (lval, 0);
 
     /* Restore the original value */
     g_restore (flags | CF_FORCECHAR);
@@ -2815,7 +2817,7 @@ static void opeq (const GenDesc* Gen, ExprDesc *lval, int k)
 	/* Adjust the types of the operands if needed */
        	Gen->Func (g_typeadjust (flags, TypeOf (lval2.Type)), 0);
     }
-    store (lval);
+    Store (lval, 0);
     lval->Flags = E_MEXPR;
 }
 
@@ -2915,85 +2917,6 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *lval, int k)
     }
 
     /* Expression is in the primary now */
-    lval->Flags = E_MEXPR;
-}
-
-
-
-static void Assignment (ExprDesc* lval)
-/* Parse an assignment */
-{
-    int k;
-    ExprDesc lval2;
-    unsigned flags;
-    type* ltype = lval->Type;
-
-    /* Check for assignment to const */
-    if (IsQualConst (ltype)) {
-	Error ("Assignment to const");
-    }
-
-    /* cc65 does not have full support for handling structs by value. Since
-     * assigning structs is one of the more useful operations from this
-     * family, allow it here.
-     */
-    if (IsClassStruct (ltype)) {
-
-       	/* Bring the address of the lhs into the primary and push it */
-	exprhs (0, 0, lval);
-	g_push (CF_PTR | CF_UNSIGNED, 0);
-
-     	/* Get the expression on the right of the '=' into the primary */
-	k = hie1 (&lval2);
-	if (k) {
-	    /* Get the address */
-	    exprhs (0, 0, &lval2);
-	}
-
-	/* Push the address (or whatever is in ax in case of errors) */
-	g_push (CF_PTR | CF_UNSIGNED, 0);
-
-	/* Check for equality of the structs */
-	if (TypeCmp (ltype, lval2.Type) < TC_STRICT_COMPATIBLE) {
-     	    Error ("Incompatible types");
-	}
-
-	/* Load the size of the struct into the primary */
-	g_getimmed (CF_INT | CF_UNSIGNED | CF_CONST, CheckedSizeOf (ltype), 0);
-
-	/* Call the memcpy function */
-	g_call (CF_FIXARGC, "memcpy", 4);
-
-    } else {
-
-	/* Get the address on stack if needed */
-	PushAddr (lval);
-
-     	/* No struct, setup flags for the load */
-#if 0
-        /* Generates wrong code!!! ### */
-     	flags = CheckedSizeOf (ltype) == 1? CF_FORCECHAR : CF_NONE;
-#else
-        flags = CF_NONE;
-#endif
-
-     	/* Get the expression on the right of the '=' into the primary */
-     	if (evalexpr (flags, hie1, &lval2) == 0) {
-     	    /* Constant expression. Adjust the types */
-     	    assignadjust (ltype, &lval2);
-     	    /* Put the value into the primary register */
-     	    lconst (flags, &lval2);
-     	} else {
-     	    /* Expression is not constant and already in the primary */
-     	    assignadjust (ltype, &lval2);
-     	}
-
-     	/* Generate a store instruction */
-     	store (lval);
-
-    }
-
-    /* Value is still in primary */
     lval->Flags = E_MEXPR;
 }
 

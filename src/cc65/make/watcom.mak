@@ -71,6 +71,7 @@ OBJS =	anonname.obj	\
      	asmcode.obj	\
 	asmlabel.obj	\
 	asmstmt.obj	\
+        assignment.obj  \
 	casenode.obj	\
 	codeent.obj	\
 	codegen.obj	\
@@ -96,7 +97,8 @@ OBJS =	anonname.obj	\
 	declare.obj	\
 	declattr.obj	\
 	error.obj	\
-	expr.obj	\
+	expr.obj 	\
+        exprdesc.obj    \
 	exprheap.obj	\
 	exprnode.obj	\
 	funcdesc.obj	\
@@ -155,6 +157,7 @@ FILE anonname.obj
 FILE asmcode.obj
 FILE asmlabel.obj
 FILE asmstmt.obj
+FILE assignment.obj
 FILE casenode.obj
 FILE codeent.obj
 FILE codegen.obj
@@ -181,6 +184,7 @@ FILE declare.obj
 FILE declattr.obj
 FILE error.obj
 FILE expr.obj
+FILE exprdesc.obj
 FILE exprheap.obj
 FILE exprnode.obj
 FILE funcdesc.obj

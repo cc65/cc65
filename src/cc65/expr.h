@@ -11,54 +11,24 @@
 
 
 
+/* cc65 */
 #include "datatype.h"
+#include "exprdesc.h"
 
 
 
 /*****************************************************************************/
-/*				     data  		   		     */
+/*		     	   	     code  				     */
 /*****************************************************************************/
 
 
 
-/* Defines for the flags field of the expression descriptor */
-#define E_MREG 	       	0x0110U	/* Special: Expression is primary register */
-#define E_MGLOBAL      	0x0080U	/* Reference to static variable */
-#define E_MLOCAL    	0x0040U	/* Reference to local variable (stack offset) */
-#define E_MCONST    	0x0020U	/* Constant value */
-#define E_MEXPR	    	0x0010U	/* Result is in primary register */
-#define E_MEOFFS       	0x0011U	/* Base is in primary register, const offset */
-
-#define E_MCTYPE       	0x0007U /* Type of a constant */
-#define E_TCONST       	0x0000U /* Constant */
-#define E_TGLAB	       	0x0001U /* Global label */
-#define E_TLIT 	       	0x0002U /* Literal of some kind */
-#define E_TLOFFS       	0x0003U /* Constant stack offset */
-#define E_TLLAB	       	0x0004U /* Local label */
-#define E_TREGISTER    	0x0005U	/* Register variable */
-
-/* Defines for the test field of the expression descriptor */
-#define E_CC   	       	0x0001U	/* expr has set cond codes apropos result value */
-#define E_FORCETEST    	0x0002U /* if expr has NOT set CC, force a test */
-
-/* Describe the result of an expression */
-typedef struct ExprDesc ExprDesc;
-struct ExprDesc {
-    struct SymEntry*	Sym;	 /* Symbol table entry if known */
-    type*	       	Type;    /* Type array of expression */
-    long       	       	ConstVal;/* Value if expression constant */
-    unsigned short     	Flags;
-    unsigned short  	Test;	 /* */
-    unsigned long 	Name;	 /* Name or label number */
-};
-
-
-
-/*****************************************************************************/
-/*			   	     code  				     */
-/*****************************************************************************/
-
-
+void PushAddr (ExprDesc* lval);
+/* If the expression contains an address that was somehow evaluated,
+ * push this address on the stack. This is a helper function for all
+ * sorts of implicit or explicit assignment functions where the lvalue
+ * must be saved if it's not constant, before evaluating the rhs.
+ */
 
 void ConstSubExpr (int (*F) (ExprDesc*), ExprDesc* Expr);
 /* Will evaluate an expression via the given function. If the result is not
@@ -76,6 +46,12 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs);
 
 void exprhs (unsigned flags, int k, ExprDesc *lval);
 /* Put the result of an expression into the primary register */
+
+void Store (ExprDesc* lval, const type* StoreType);
+/* Store the primary register into the location denoted by lval. If StoreType
+ * is given, use this type when storing instead of lval->Type. If StoreType
+ * is NULL, use lval->Type instead.
+ */
 
 void expression1 (ExprDesc* lval);
 /* Evaluate an expression on level 1 (no comma operator) and put it into

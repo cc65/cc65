@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                typecast.h                                 */
+/*                                exprdesc.c                                 */
 /*                                                                           */
-/*                             Handle type casts                             */
+/*                      Expression descriptor structure                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,12 +33,9 @@
 
 
 
-#ifndef TYPECAST_H
-#define TYPECAST_H
-
-
-                     
 /* cc65 */
+#include "datatype.h"
+#include "symentry.h"
 #include "exprdesc.h"
 
 
@@ -49,15 +46,67 @@
 
 
 
-int TypeCast (ExprDesc* lval);
-/* Handle an explicit cast. The function returns true if the resulting
- * expression is an lvalue and false if not.
- */
+void MakeConstIntExpr (ExprDesc* Expr, long Value)
+/* Make Expr a constant integer expression with the given value */
+{
+    Expr->Flags = E_MCONST;
+    Expr->Type = type_int;
+    Expr->ConstVal = Value;
+}
 
 
 
-/* End of typecast.h */
-#endif
+void PrintExprDesc (FILE* F, ExprDesc* E)
+/* Print an ExprDesc */
+{
+    fprintf (F, "Symbol: %s\n", E->Sym? E->Sym->Name : "(none)");
+    fprintf (F, "Type:   ");
+    if (E->Type) {
+        PrintType (F, E->Type);
+    } else {
+        fprintf (F, "(unknown)");
+    }
+    fprintf (F, "\n");
+    fprintf (F, "Value:  0x%08lX\n", E->ConstVal);
+    fprintf (F, "Flags:  ");
+    switch (E->Flags & E_MCTYPE) {
+        case E_TCONST:    fprintf (F, "E_TCONST ");                    break;
+        case E_TGLAB:     fprintf (F, "E_TGLAB ");                     break;
+        case E_TLIT:      fprintf (F, "E_TLIT ");                      break;
+        case E_TLOFFS:    fprintf (F, "E_TLOFFS ");                    break;
+        case E_TLLAB:     fprintf (F, "E_TLLAB ");                     break;
+        case E_TREGISTER: fprintf (F, "E_TREGISTER ");                 break;
+        default:          fprintf (F, "0x%02X ", E->Flags & E_MCTYPE); break;
+    }
+    if ((E->Flags & E_MREG) == E_MREG) {
+        fprintf (F, "E_MREG ");
+    } else if ((E->Flags & E_MEOFFS) == E_MEOFFS) {
+        fprintf (F, "E_MEOFFS ");
+    } else if ((E->Flags & E_MEXPR) == E_MEXPR) {
+        fprintf (F, "E_MEXPR ");
+    }
+    if ((E->Flags & E_MGLOBAL) == E_MGLOBAL) {
+        fprintf (F, "E_MGLOBAL ");
+    }
+    if ((E->Flags & E_MLOCAL) == E_MLOCAL) {
+        fprintf (F, "E_MLOCAL ");
+    }
+    if ((E->Flags & E_MCONST) == E_MCONST) {
+        fprintf (F, "E_MCONST ");
+    }
+    fprintf (F, "\n");
+
+    fprintf (F, "Test:    ");
+    if (E->Test & E_CC) {
+        fprintf (F, "E_CC ");
+    }
+    if (E->Test & E_FORCETEST) {
+        fprintf (F, "E_FORCETEST ");
+    }
+    fprintf (F, "\n");
+
+    fprintf (F, "Name:   0x%08lX\n", E->Name);
+}
 
 
 

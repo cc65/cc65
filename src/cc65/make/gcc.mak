@@ -26,6 +26,7 @@ OBJS =	anonname.o	\
      	asmcode.o 	\
 	asmlabel.o	\
 	asmstmt.o	\
+        assignment.o    \
 	casenode.o	\
 	codeent.o	\
 	codegen.o 	\
@@ -52,6 +53,7 @@ OBJS =	anonname.o	\
 	declattr.o	\
 	error.o	  	\
 	expr.o	 	\
+        exprdesc.o      \
 	exprheap.o     	\
 	exprnode.o	\
 	funcdesc.o	\

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                typecast.h                                 */
+/*                               assignment.h                                */
 /*                                                                           */
-/*                             Handle type casts                             */
+/*                             Parse assignments                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,11 +33,11 @@
 
 
 
-#ifndef TYPECAST_H
-#define TYPECAST_H
+#ifndef ASSIGNMENT_H
+#define ASSIGNMENT_H
 
 
-                     
+
 /* cc65 */
 #include "exprdesc.h"
 
@@ -49,14 +49,12 @@
 
 
 
-int TypeCast (ExprDesc* lval);
-/* Handle an explicit cast. The function returns true if the resulting
- * expression is an lvalue and false if not.
- */
+void Assignment (ExprDesc* lval);
+/* Parse an assignment */
 
 
 
-/* End of typecast.h */
+/* End of assignment.h */
 #endif
 
 

@@ -143,6 +143,11 @@ typedef unsigned short type;
 /* Type elements needed for Encode/Decode */
 #define DECODE_SIZE    	5
 
+/* Sizes */
+#define SIZEOF_CHAR     1
+#define SIZEOF_INT      2
+#define SIZEOF_LONG     4
+
 /* Predefined type strings */
 extern type type_uchar [];
 extern type type_int [];

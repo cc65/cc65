@@ -33,6 +33,7 @@
 
 
 
+#include <stdlib.h>
 #include <string.h>
 
 /* common */
@@ -54,12 +55,6 @@
 #include "error.h"
 #include "global.h"
 #include "codeopt.h"
-
-
-
-/*****************************************************************************/
-/*  	     	   	       Helper functions	    			     */
-/*****************************************************************************/
 
 
 
@@ -1370,22 +1365,26 @@ static unsigned OptPtrLoad6 (CodeSeg* S)
 
 
 /*****************************************************************************/
-/*  				struct OptFunc                               */
+/*  	     	    		struct OptFunc                               */
 /*****************************************************************************/
 
 
 
 typedef struct OptFunc OptFunc;
 struct OptFunc {
-    unsigned     (*Func) (CodeSeg*);    /* Optimizer function */
-    const char*  Name;                  /* Name of the function/group */
-    char         Disabled;              /* True if function disabled */
+    unsigned       (*Func) (CodeSeg*);  /* Optimizer function */
+    const char*    Name;                /* Name of the function/group */
+    unsigned long  TotalRuns;		/* Total number of runs */
+    unsigned long  LastRuns;            /* Last number of runs */
+    unsigned long  TotalChanges;        /* Total number of changes */
+    unsigned long  LastChanges;         /* Last number of changes */
+    char           Disabled;            /* True if function disabled */
 };
 
 
 
 /*****************************************************************************/
-/*     	       	      	     	     Code	   	  		     */
+/*     	       	      	       	     Code	   	  		     */
 /*****************************************************************************/
 
 
@@ -1394,49 +1393,49 @@ struct OptFunc {
 #define OptFuncEntry(func) static OptFuncDesc D##func = { func, #func, 0 }
 
 /* A list of all the function descriptions */
-static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    0 };
-static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    0 };
-static OptFunc DOptPtrLoad1    	= { OptPtrLoad1,     "OptPtrLoad1",  	0 };
-static OptFunc DOptPtrLoad2    	= { OptPtrLoad2,     "OptPtrLoad2",  	0 };
-static OptFunc DOptPtrLoad3    	= { OptPtrLoad3,     "OptPtrLoad3",  	0 };
-static OptFunc DOptPtrLoad4    	= { OptPtrLoad4,     "OptPtrLoad4",  	0 };
-static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",  	0 };
-static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",  	0 };
-static OptFunc DOptNegA1       	= { OptNegA1,  	     "OptNegA1",     	0 };
-static OptFunc DOptNegA2       	= { OptNegA2,  	     "OptNegA2",     	0 };
-static OptFunc DOptNegAX1      	= { OptNegAX1,       "OptNegAX1",    	0 };
-static OptFunc DOptNegAX2      	= { OptNegAX2,       "OptNegAX2",    	0 };
-static OptFunc DOptNegAX3      	= { OptNegAX3,       "OptNegAX3",    	0 };
-static OptFunc DOptNegAX4      	= { OptNegAX4,       "OptNegAX4",    	0 };
-static OptFunc DOptSub1	       	= { OptSub1,   	     "OptSub1",      	0 };
-static OptFunc DOptSub2	       	= { OptSub2,   	     "OptSub2",      	0 };
-static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",      	0 };
-static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",      	0 };
-static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",      	0 };
-static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",    	0 };
-static OptFunc DOptJumpCascades	= { OptJumpCascades, "OptJumpCascades", 0 };
-static OptFunc DOptDeadJumps   	= { OptDeadJumps,    "OptDeadJumps",    0 };
-static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",       	0 };
-static OptFunc DOptDeadCode    	= { OptDeadCode,     "OptDeadCode",  	0 };
-static OptFunc DOptJumpTarget  	= { OptJumpTarget,   "OptJumpTarget",   0 };
-static OptFunc DOptCondBranches	= { OptCondBranches, "OptCondBranches", 0 };
-static OptFunc DOptRTSJumps    	= { OptRTSJumps,     "OptRTSJumps",  	0 };
-static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    0 };
-static OptFunc DOptCmp1	       	= { OptCmp1,   	     "OptCmp1",      	0 };
-static OptFunc DOptCmp2	       	= { OptCmp2,   	     "OptCmp2",      	0 };
-static OptFunc DOptCmp3	       	= { OptCmp3,   	     "OptCmp3",      	0 };
-static OptFunc DOptCmp4	       	= { OptCmp4,   	     "OptCmp4",      	0 };
-static OptFunc DOptCmp5	       	= { OptCmp5,   	     "OptCmp5",      	0 };
-static OptFunc DOptCmp6	       	= { OptCmp6,   	     "OptCmp6",      	0 };
-static OptFunc DOptCmp7	       	= { OptCmp7,   	     "OptCmp7",      	0 };
-static OptFunc DOptTest1       	= { OptTest1,  	     "OptTest1",     	0 };
-static OptFunc DOptUnusedLoads 	= { OptUnusedLoads,  "OptUnusedLoads",  0 };
-static OptFunc DOptUnusedStores	= { OptUnusedStores, "OptUnusedStores", 0 };
-static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",     0 };
-static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",    0 };
-static OptFunc DOptTransfers   	= { OptTransfers,    "OptTransfers",    0 };
-static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",  	0 };
-static OptFunc DOptBranchDist  	= { OptBranchDist,   "OptBranchDist",   0 };
+static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    0, 0, 0, 0, 0 };
+static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad1    	= { OptPtrLoad1,     "OptPtrLoad1",  	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad2    	= { OptPtrLoad2,     "OptPtrLoad2",  	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad3    	= { OptPtrLoad3,     "OptPtrLoad3",  	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad4    	= { OptPtrLoad4,     "OptPtrLoad4",  	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",  	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",  	0, 0, 0, 0, 0 };
+static OptFunc DOptNegA1       	= { OptNegA1,  	     "OptNegA1",     	0, 0, 0, 0, 0 };
+static OptFunc DOptNegA2       	= { OptNegA2,  	     "OptNegA2",     	0, 0, 0, 0, 0 };
+static OptFunc DOptNegAX1      	= { OptNegAX1,       "OptNegAX1",    	0, 0, 0, 0, 0 };
+static OptFunc DOptNegAX2      	= { OptNegAX2,       "OptNegAX2",    	0, 0, 0, 0, 0 };
+static OptFunc DOptNegAX3      	= { OptNegAX3,       "OptNegAX3",    	0, 0, 0, 0, 0 };
+static OptFunc DOptNegAX4      	= { OptNegAX4,       "OptNegAX4",    	0, 0, 0, 0, 0 };
+static OptFunc DOptSub1	       	= { OptSub1,   	     "OptSub1",      	0, 0, 0, 0, 0 };
+static OptFunc DOptSub2	       	= { OptSub2,   	     "OptSub2",      	0, 0, 0, 0, 0 };
+static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",      	0, 0, 0, 0, 0 };
+static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",      	0, 0, 0, 0, 0 };
+static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",      	0, 0, 0, 0, 0 };
+static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",    	0, 0, 0, 0, 0 };
+static OptFunc DOptJumpCascades	= { OptJumpCascades, "OptJumpCascades", 0, 0, 0, 0, 0 };
+static OptFunc DOptDeadJumps   	= { OptDeadJumps,    "OptDeadJumps",    0, 0, 0, 0, 0 };
+static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",       	0, 0, 0, 0, 0 };
+static OptFunc DOptDeadCode    	= { OptDeadCode,     "OptDeadCode",  	0, 0, 0, 0, 0 };
+static OptFunc DOptJumpTarget  	= { OptJumpTarget,   "OptJumpTarget",   0, 0, 0, 0, 0 };
+static OptFunc DOptCondBranches	= { OptCondBranches, "OptCondBranches", 0, 0, 0, 0, 0 };
+static OptFunc DOptRTSJumps    	= { OptRTSJumps,     "OptRTSJumps",  	0, 0, 0, 0, 0 };
+static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    0, 0, 0, 0, 0 };
+static OptFunc DOptCmp1	       	= { OptCmp1,   	     "OptCmp1",      	0, 0, 0, 0, 0 };
+static OptFunc DOptCmp2	       	= { OptCmp2,   	     "OptCmp2",      	0, 0, 0, 0, 0 };
+static OptFunc DOptCmp3	       	= { OptCmp3,   	     "OptCmp3",      	0, 0, 0, 0, 0 };
+static OptFunc DOptCmp4	       	= { OptCmp4,   	     "OptCmp4",      	0, 0, 0, 0, 0 };
+static OptFunc DOptCmp5	       	= { OptCmp5,   	     "OptCmp5",      	0, 0, 0, 0, 0 };
+static OptFunc DOptCmp6	       	= { OptCmp6,   	     "OptCmp6",      	0, 0, 0, 0, 0 };
+static OptFunc DOptCmp7	       	= { OptCmp7,   	     "OptCmp7",      	0, 0, 0, 0, 0 };
+static OptFunc DOptTest1       	= { OptTest1,  	     "OptTest1",     	0, 0, 0, 0, 0 };
+static OptFunc DOptUnusedLoads 	= { OptUnusedLoads,  "OptUnusedLoads",  0, 0, 0, 0, 0 };
+static OptFunc DOptUnusedStores	= { OptUnusedStores, "OptUnusedStores", 0, 0, 0, 0, 0 };
+static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",     0, 0, 0, 0, 0 };
+static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",    0, 0, 0, 0, 0 };
+static OptFunc DOptTransfers   	= { OptTransfers,    "OptTransfers",    0, 0, 0, 0, 0 };
+static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",  	0, 0, 0, 0, 0 };
+static OptFunc DOptBranchDist  	= { OptBranchDist,   "OptBranchDist",   0, 0, 0, 0, 0 };
 
 /* Table containing all the steps in alphabetical order */
 static OptFunc* OptFuncs[] = {
@@ -1488,47 +1487,38 @@ static OptFunc* OptFuncs[] = {
 
 
 
-static unsigned RunOptStep (CodeSeg* S, OptFunc* O, unsigned Max)
-/* Run one optimizer function Max times or until there are no more changes */
+static int CmpOptStep (const void* Key, const void* Func)
+/* Compare function for bsearch */
 {
-    unsigned Changes, C;
-
-    /* Don't run the function if it is disabled */
-    if (O->Disabled) {
-    	return 0;
-    }
-
-    /* Run this until there are no more changes */
-    Changes = 0;
-    do {
-    	C = O->Func (S);
-	Changes += C;
-    } while (--Max && C > 0);
-
-    /* Return the number of changes */
-    return Changes;
+    return strcmp (Key, (*(const OptFunc**)Func)->Name);
 }
 
 
 
-static OptFunc* FindOptStep (const char* Name)
+static OptFunc* FindOptFunc (const char* Name)
+/* Find an optimizer step by name in the table and return a pointer. Return
+ * NULL if no such step is found.
+ */
+{
+    /* Search for the function in the list */
+    OptFunc** O = bsearch (Name, OptFuncs, OPTFUNC_COUNT, sizeof (OptFuncs[0]), CmpOptStep);
+    return O? *O : 0;
+}
+
+
+
+static OptFunc* GetOptFunc (const char* Name)
 /* Find an optimizer step by name in the table and return a pointer. Print an
  * error and call AbEnd if not found.
  */
 {
-    unsigned I;
-
-    /* Run all optimization steps */
-    for (I = 0; I < OPTFUNC_COUNT; ++I) {
-       	if (strcmp (OptFuncs[I]->Name, Name) == 0) {
-    	    /* Found */
-    	    return OptFuncs[I];
-    	}
+    /* Search for the function in the list */
+    OptFunc* F = FindOptFunc (Name);
+    if (F == 0) {
+	/* Not found */
+	AbEnd ("Optimization step `%s' not found", Name);
     }
-
-    /* Not found */
-    AbEnd ("Optimization step `%s' not found", Name);
-    return 0;
+    return F;
 }
 
 
@@ -1542,8 +1532,7 @@ void DisableOpt (const char* Name)
        	    OptFuncs[I]->Disabled = 1;
     	}
     } else {
-     	OptFunc* F = FindOptStep (Name);
-     	F->Disabled = 1;
+     	GetOptFunc(Name)->Disabled = 1;
     }
 }
 
@@ -1558,8 +1547,7 @@ void EnableOpt (const char* Name)
        	    OptFuncs[I]->Disabled = 0;
 	}
     } else {
-     	OptFunc* F = FindOptStep (Name);
-     	F->Disabled = 0;
+     	GetOptFunc(Name)->Disabled = 0;
     }
 }
 
@@ -1576,6 +1564,140 @@ void ListOptSteps (FILE* F)
 
 
 
+static void ReadOptStats (const char* Name)
+/* Read the optimizer statistics file */
+{
+    char Buf [256];
+    unsigned Lines;
+
+    /* Try to open the file */
+    FILE* F = fopen (Name, "r");
+    if (F == 0) {
+    	/* Ignore the error */
+    	return;
+    }
+
+    /* Read and parse the lines */
+    Lines = 0;
+    while (fgets (Buf, sizeof (Buf), F) != 0) {
+
+	char* B;
+	unsigned Len;
+	OptFunc* Func;
+
+	/* Fields */
+	char Name[32];
+       	unsigned long  TotalRuns;
+	unsigned long  TotalChanges;
+
+	/* Count lines */
+	++Lines;
+
+	/* Remove trailing white space including the line terminator */
+	B = Buf;
+	Len = strlen (B);
+	while (Len > 0 && IsSpace (B[Len-1])) {
+	    --Len;
+	}
+    	B[Len] = '\0';
+
+	/* Remove leading whitespace */
+	while (IsSpace (*B)) {
+	    ++B;
+	}
+
+	/* Check for empty and comment lines */
+	if (*B == '\0' || *B == ';' || *B == '#') {
+	    continue;
+	}
+
+	/* Parse the line */
+       	if (sscanf (B, "%31s %lu %*u %lu %*u", Name, &TotalRuns, &TotalChanges) != 3) {
+	    /* Syntax error */
+	    continue;
+	}
+
+	/* Search for the optimizer step. */
+	Func = FindOptFunc (Name);
+	if (Func == 0) {
+	    /* Not found */
+	    continue;
+	}
+
+	/* Found the step, set the fields */
+	Func->TotalRuns    = TotalRuns;
+	Func->TotalChanges = TotalChanges;
+
+    }
+
+    /* Close the file, ignore errors here. */
+    fclose (F);
+}
+
+
+
+static void WriteOptStats (const char* Name)
+/* Write the optimizer statistics file */
+{
+    unsigned I;
+
+    /* Try to open the file */
+    FILE* F = fopen (Name, "w");
+    if (F == 0) {
+    	/* Ignore the error */
+    	return;
+    }
+
+    /* Write the file */
+    for (I = 0; I < OPTFUNC_COUNT; ++I) {
+	const OptFunc* O = OptFuncs[I];
+	fprintf (F,
+		 "%s %lu %lu %lu %lu\n",
+		 O->Name,
+		 O->TotalRuns,
+		 O->LastRuns,
+		 O->TotalChanges,
+		 O->LastChanges);
+    }
+
+    /* Close the file, ignore errors here. */
+    fclose (F);
+}
+
+
+
+static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
+/* Run one optimizer function Max times or until there are no more changes */
+{
+    unsigned Changes, C;
+
+    /* Don't run the function if it is disabled */
+    if (F->Disabled) {
+    	return 0;
+    }
+
+    /* Run this until there are no more changes */
+    Changes = 0;
+    do {
+	
+	/* Run the function */
+    	C = F->Func (S);
+    	Changes += C;
+
+    	/* Do statistics */
+    	++F->TotalRuns;
+    	++F->LastRuns;
+    	F->TotalChanges += C;
+    	F->LastChanges  += C;
+
+    } while (--Max && C > 0);
+
+    /* Return the number of changes */
+    return Changes;
+}
+
+
+
 static void RunOptGroup1 (CodeSeg* S)
 /* Run the first group of optimization steps. These steps translate known
  * patterns emitted by the code generator into more optimal patterns. Order
@@ -1583,20 +1705,20 @@ static void RunOptGroup1 (CodeSeg* S)
  * the same patterns as later steps as subpatterns.
  */
 {
-    RunOptStep (S, &DOptPtrStore1, 1);
-    RunOptStep (S, &DOptPtrStore2, 1);
-    RunOptStep (S, &DOptPtrLoad1, 1);
-    RunOptStep (S, &DOptPtrLoad2, 1);
-    RunOptStep (S, &DOptPtrLoad3, 1);
-    RunOptStep (S, &DOptPtrLoad4, 1);
-    RunOptStep (S, &DOptPtrLoad5, 1);
-    RunOptStep (S, &DOptNegAX1, 1);
-    RunOptStep (S, &DOptNegAX2, 1);
-    RunOptStep (S, &DOptNegAX3, 1);
-    RunOptStep (S, &DOptNegAX4, 1);
-    RunOptStep (S, &DOptAdd1, 1);
-    RunOptStep (S, &DOptAdd2, 1);
-    RunOptStep (S, &DOptShift1, 1);
+    RunOptFunc (S, &DOptPtrStore1, 1);
+    RunOptFunc (S, &DOptPtrStore2, 1);
+    RunOptFunc (S, &DOptPtrLoad1, 1);
+    RunOptFunc (S, &DOptPtrLoad2, 1);
+    RunOptFunc (S, &DOptPtrLoad3, 1);
+    RunOptFunc (S, &DOptPtrLoad4, 1);
+    RunOptFunc (S, &DOptPtrLoad5, 1);
+    RunOptFunc (S, &DOptNegAX1, 1);
+    RunOptFunc (S, &DOptNegAX2, 1);
+    RunOptFunc (S, &DOptNegAX3, 1);
+    RunOptFunc (S, &DOptNegAX4, 1);
+    RunOptFunc (S, &DOptAdd1, 1);
+    RunOptFunc (S, &DOptAdd2, 1);
+    RunOptFunc (S, &DOptShift1, 1);
 }
 
 
@@ -1612,34 +1734,34 @@ static void RunOptGroup2 (CodeSeg* S)
     do {
 	Changes = 0;
 
-	Changes += RunOptStep (S, &DOptPtrLoad6, 1);
-	Changes += RunOptStep (S, &DOptNegA1, 1);
-	Changes += RunOptStep (S, &DOptNegA2, 1);
-	Changes += RunOptStep (S, &DOptSub1, 1);
-	Changes += RunOptStep (S, &DOptSub2, 1);
-	Changes += RunOptStep (S, &DOptAdd3, 1);
-	Changes += RunOptStep (S, &DOptJumpCascades, 1);
-	Changes += RunOptStep (S, &DOptDeadJumps, 1);
-	Changes += RunOptStep (S, &DOptRTS, 1);
-	Changes += RunOptStep (S, &DOptDeadCode, 1);
-	Changes += RunOptStep (S, &DOptJumpTarget, 1);
-	Changes += RunOptStep (S, &DOptCondBranches, 1);
-	Changes += RunOptStep (S, &DOptRTSJumps, 1);
-	Changes += RunOptStep (S, &DOptBoolTrans, 1);
-	Changes += RunOptStep (S, &DOptCmp1, 1);
-	Changes += RunOptStep (S, &DOptCmp2, 1);
-	Changes += RunOptStep (S, &DOptCmp3, 1);
-	Changes += RunOptStep (S, &DOptCmp4, 1);
-	Changes += RunOptStep (S, &DOptCmp5, 1);
-	Changes += RunOptStep (S, &DOptCmp6, 1);
-	Changes += RunOptStep (S, &DOptCmp7, 1);
-	Changes += RunOptStep (S, &DOptTest1, 1);
-	Changes += RunOptStep (S, &DOptUnusedLoads, 1);
-	Changes += RunOptStep (S, &DOptUnusedStores, 1);
-	Changes += RunOptStep (S, &DOptDupLoads, 1);
-	Changes += RunOptStep (S, &DOptStoreLoad, 1);
-	Changes += RunOptStep (S, &DOptTransfers, 1);
-	Changes += RunOptStep (S, &DOptStackOps, 1);
+	Changes += RunOptFunc (S, &DOptPtrLoad6, 1);
+	Changes += RunOptFunc (S, &DOptNegA1, 1);
+	Changes += RunOptFunc (S, &DOptNegA2, 1);
+	Changes += RunOptFunc (S, &DOptSub1, 1);
+	Changes += RunOptFunc (S, &DOptSub2, 1);
+	Changes += RunOptFunc (S, &DOptAdd3, 1);
+	Changes += RunOptFunc (S, &DOptJumpCascades, 1);
+	Changes += RunOptFunc (S, &DOptDeadJumps, 1);
+	Changes += RunOptFunc (S, &DOptRTS, 1);
+	Changes += RunOptFunc (S, &DOptDeadCode, 1);
+	Changes += RunOptFunc (S, &DOptJumpTarget, 1);
+	Changes += RunOptFunc (S, &DOptCondBranches, 1);
+	Changes += RunOptFunc (S, &DOptRTSJumps, 1);
+	Changes += RunOptFunc (S, &DOptBoolTrans, 1);
+	Changes += RunOptFunc (S, &DOptCmp1, 1);
+	Changes += RunOptFunc (S, &DOptCmp2, 1);
+	Changes += RunOptFunc (S, &DOptCmp3, 1);
+	Changes += RunOptFunc (S, &DOptCmp4, 1);
+	Changes += RunOptFunc (S, &DOptCmp5, 1);
+	Changes += RunOptFunc (S, &DOptCmp6, 1);
+	Changes += RunOptFunc (S, &DOptCmp7, 1);
+	Changes += RunOptFunc (S, &DOptTest1, 1);
+	Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+	Changes += RunOptFunc (S, &DOptUnusedStores, 1);
+	Changes += RunOptFunc (S, &DOptDupLoads, 1);
+	Changes += RunOptFunc (S, &DOptStoreLoad, 1);
+	Changes += RunOptFunc (S, &DOptTransfers, 1);
+	Changes += RunOptFunc (S, &DOptStackOps, 1);
 
     } while (Changes);
 }
@@ -1650,7 +1772,7 @@ static void RunOptGroup3 (CodeSeg* S)
 /* The last group of optimization steps. Adjust branches.
  */
 {
-    RunOptStep (S, &DOptBranchDist, 3);
+    RunOptFunc (S, &DOptBranchDist, 3);
 }
 
 
@@ -1658,10 +1780,17 @@ static void RunOptGroup3 (CodeSeg* S)
 void RunOpt (CodeSeg* S)
 /* Run the optimizer */
 {
+    const char* StatFileName;
 
     /* If we shouldn't run the optimizer, bail out */
     if (!Optimize) {
     	return;
+    }
+
+    /* Check if we are requested to write optimizer statistics */
+    StatFileName = getenv ("CC65_OPTSTATS");
+    if (StatFileName) {
+	ReadOptStats (StatFileName);
     }
 
     /* Print the name of the function we are working on */
@@ -1675,6 +1804,11 @@ void RunOpt (CodeSeg* S)
     RunOptGroup1 (S);
     RunOptGroup2 (S);
     RunOptGroup3 (S);
+
+    /* Write statistics */
+    if (StatFileName) {
+	WriteOptStats (StatFileName);
+    }
 }
 
 

@@ -41,6 +41,7 @@
 #include "objdefs.h"
 #include "optdefs.h"
 #include "segdefs.h"
+#include "symdefs.h"
 #include "xmalloc.h"
 
 /* od65 */
@@ -363,7 +364,7 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
     Count = Read8 (F);
     printf ("    Count:%27u\n", Count);
 
-    /* Read and print all options */
+    /* Read and print all files */
     for (I = 0; I < Count; ++I) {
 
 	/* Read the data for one file */
@@ -407,11 +408,11 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
     /* Output a header */
     printf ("  Segments:\n");
 
-    /* Read the number of files and print it */
+    /* Read the number of segments and print it */
     Count = Read8 (F);
     printf ("    Count:%27u\n", Count);
 
-    /* Read and print all options */
+    /* Read and print all segments */
     for (I = 0; I < Count; ++I) {
 
 	/* Read the data for one segments */
@@ -428,7 +429,7 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 	    case SEGTYPE_ABS:  		TypeDesc = "SEGTYPE_ABS";	break;
 	    case SEGTYPE_ZP:   		TypeDesc = "SEGTYPE_ZP";	break;
 	    case SEGTYPE_FAR:  		TypeDesc = "SEGTYPE_FAR";	break;
-	    default:	       		TypeDesc = "SEGTYPE_UNKNOWN";	break;
+	    default:	       	   	TypeDesc = "SEGTYPE_UNKNOWN";	break;
 	}
 
 	/* Print the header */
@@ -457,6 +458,125 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 
 	/* Print the fragment count */
        	printf ("      Fragment count:%16u\n", FragCount);
+    }
+}
+
+
+
+void DumpObjImports (FILE* F, unsigned long Offset)
+/* Dump the imports in the object file */
+{
+    ObjHeader H;
+    unsigned  Count;
+    unsigned  I;
+    FilePos   Pos;
+
+    /* Seek to the header position */
+    FileSeek (F, Offset);
+
+    /* Read the header */
+    ReadObjHeader (F, &H);
+
+    /* Seek to the start of the options */
+    FileSeek (F, Offset + H.ImportOffs);
+
+    /* Output a header */
+    printf ("  Imports:\n");
+
+    /* Read the number of imports and print it */
+    Count = Read16 (F);
+    printf ("    Count:%27u\n", Count);
+
+    /* Read and print all imports */
+    for (I = 0; I < Count; ++I) {
+
+	const char* TypeDesc;
+
+       	/* Read the data for one import */
+       	unsigned char Type  = Read8 (F);
+	char* 	      Name  = ReadMallocedStr (F);
+	unsigned      Len   = strlen (Name);
+	ReadFilePos (F, &Pos);
+
+	/* Get a description for the type */
+	switch (Type) {
+	    case IMP_ZP:	TypeDesc = "IMP_ZP";		break;
+	    case IMP_ABS:	TypeDesc = "IMP_ABS";		break;
+	    default:		TypeDesc = "IMP_UNKNOWN";	break;
+	}
+
+	/* Print the header */
+	printf ("    Index:%27u\n", I);
+
+	/* Print the data */
+       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
+	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
+
+	/* Free the Name */
+	xfree (Name);
+    }
+}
+
+
+
+void DumpObjExports (FILE* F, unsigned long Offset)
+/* Dump the exports in the object file */
+{
+    ObjHeader H;
+    unsigned  Count;
+    unsigned  I;
+    FilePos   Pos;
+
+    /* Seek to the header position */
+    FileSeek (F, Offset);
+
+    /* Read the header */
+    ReadObjHeader (F, &H);
+
+    /* Seek to the start of the options */
+    FileSeek (F, Offset + H.ExportOffs);
+
+    /* Output a header */
+    printf ("  Exports:\n");
+
+    /* Read the number of exports and print it */
+    Count = Read16 (F);
+    printf ("    Count:%27u\n", Count);
+
+    /* Read and print all exports */
+    for (I = 0; I < Count; ++I) {
+
+ 	const char* TypeDesc;
+
+       	/* Read the data for one export */
+       	unsigned char Type  = Read8 (F);
+	char* 	      Name  = ReadMallocedStr (F);
+	unsigned      Len   = strlen (Name);
+	if (Type & EXP_EXPR) {
+	    SkipExpr (F);
+	} else {
+	    (void) Read32 (F);
+	}
+	ReadFilePos (F, &Pos);
+
+	/* Get a description for the type */
+	switch (Type) {
+	    case EXP_ABS|EXP_CONST:	TypeDesc = "EXP_ABS,EXP_CONST";	break;
+	    case EXP_ZP|EXP_CONST:	TypeDesc = "EXP_ZP,EXP_CONST";	break;
+	    case EXP_ABS|EXP_EXPR:	TypeDesc = "EXP_ABS,EXP_EXPR";	break;
+       	    case EXP_ZP|EXP_EXPR:	TypeDesc = "EXP_ZP,EXP_EXPR";	break;
+	    default:			TypeDesc = "EXP_UNKNOWN";	break;
+	}
+
+	/* Print the header */
+	printf ("    Index:%27u\n", I);
+
+	/* Print the data */
+       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
+	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
+
+	/* Free the Name */
+	xfree (Name);
     }
 }
 

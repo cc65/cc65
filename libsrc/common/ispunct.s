@@ -5,15 +5,15 @@
 ;
 
 	.export		_ispunct
-	.import		__ctype
+       	.include	"ctype.inc"
 
 _ispunct:
 	cpx	#$00		; Char range ok?
 	bne	@L1		; Jump if no
 	tay
 	lda	__ctype,y	; Get character classification
-       	eor    	#$37   	       	; NOT (space | control | digit | char)
-       	and    	#$37		; Mask relevant bits
+       	eor    	#CT_NOT_PUNCT	; NOT (space | control | digit | alpha)
+       	and    	#CT_NOT_PUNCT	; Mask relevant bits
 	rts
 
 @L1:	lda	#$00		; Return false

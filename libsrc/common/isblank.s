@@ -7,14 +7,14 @@
 ;
 
 	.export		_isblank
-	.import		__ctype
+	.include	"ctype.inc"
 
 _isblank:
 	cpx	#$00		; Char range ok?
 	bne	@L1		; Jump if no
 	tay
 	lda	__ctype,y	; Get character classification
-       	and    	#$80		; Mask blank bit
+       	and    	#CT_SPACE_TAB	; Mask blank bit
 	rts
 
 @L1:	lda	#$00		; Return false

@@ -5,14 +5,14 @@
 ;
 
 	.export		_isspace
-	.import		__ctype
+       	.include	"ctype.inc"
 
 _isspace:
 	cpx	#$00		; Char range ok?
 	bne	@L1		; Jump if no
 	tay
 	lda	__ctype,y	; Get character classification
-       	and    	#$60   	       	; Mask space bits
+       	and    	#(CT_SPACE | CT_OTHER_WS)   ; Mask space bits
 	rts
 
 @L1:	lda	#$00		; Return false

@@ -5,14 +5,14 @@
 ;
 
 	.export		_isalnum
-	.import		__ctype
+	.include	"ctype.inc"
 
 _isalnum:
 	cpx	#$00		; Char range ok?
 	bne	@L1		; Jump if no
 	tay
 	lda	__ctype,y	; Get character classification
-	and    	#$07		; Mask character/digit bits
+	and    	#CT_ALNUM	; Mask character/digit bits
 	rts
 
 @L1:	lda	#$00		; Return false

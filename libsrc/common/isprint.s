@@ -5,15 +5,15 @@
 ;
 
 	.export		_isprint
-	.import		__ctype
+       	.include	"ctype.inc"
 
 _isprint:
 	cpx	#$00		; Char range ok?
 	bne	@L1		; Jump if no
 	tay
 	lda	__ctype,y	; Get character classification
-	eor	#$10		; NOT a control char
-       	and    	#$10		; Mask control char bit
+       	eor    	#CT_CTRL	; NOT a control char
+       	and    	#CT_CTRL	; Mask control char bit
 	rts
 
 @L1:	lda	#$00		; Return false

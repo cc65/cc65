@@ -5,14 +5,14 @@
 ;
 
 	.export		_iscntrl
-	.import		__ctype
+	.include	"ctype.inc"
 
 _iscntrl:
 	cpx	#$00		; Char range ok?
 	bne	@L1		; Jump if no
 	tay
 	lda	__ctype,y	; Get character classification
-	and    	#$10		; Mask control character bit
+       	and    	#CT_CTRL	; Mask control character bit
 	rts
 
 @L1:	lda	#$00		; Return false

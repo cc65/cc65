@@ -54,7 +54,8 @@ int xsprintf (char* Buf, size_t BufSize, const char* Format, ...)
 	attribute ((format (printf, 3, 4)));
 /* Replacement function for sprintf */
 
-int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap);
+int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap)
+	attribute ((format (printf, 3, 0)));
 /* Replacement function for sprintf */
 
 

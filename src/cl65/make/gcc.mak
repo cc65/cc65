@@ -7,6 +7,7 @@ COMMON	= ../common
 
 CC=gcc
 CFLAGS = -O2 -g -Wall -I$(COMMON)
+EBIND  = emxbind
 LDFLAGS=
 
 OBJS =	error.o	 	\
@@ -31,6 +32,7 @@ endif
 
 cl65:	$(OBJS) $(LIBS)
 	$(CC) $(LDFLAGS) -o cl65 $(CFLAGS) $(OBJS) $(LIBS)
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) cl65 ; fi
 
 clean:
 	rm -f *~ core

@@ -8,6 +8,7 @@ COMMON	= ../common
 
 CFLAGS = -O2 -g -Wall -I$(COMMON)
 CC=gcc
+EBIND=emxbind
 LDFLAGS=
 
 OBJS = 	dump.o		\
@@ -33,6 +34,7 @@ endif
 
 $(EXE):	$(OBJS)
 	$(CC) $(LDFLAGS) -o $(EXE) $(CFLAGS) $(OBJS) $(LIBS)
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $(EXE) ; fi
 
 clean:
 	rm -f *~ core *.map

@@ -9,6 +9,7 @@ COMMON	= ../common
 CDEFS=-DCC65_LIB=\"/usr/lib/cc65/lib/\"
 CFLAGS = -g -O2 -Wall -I$(COMMON) $(CDEFS)
 CC=gcc
+EBIND=emxbind
 LDFLAGS=
 
 # Perl script for config file conversion
@@ -74,6 +75,7 @@ endif
 
 ld65:   $(INCS) $(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
 
 inc:	$(INCS)
 

@@ -5,6 +5,7 @@
 CFLAGS 	= -g -O2 -Wall
 CC	= gcc
 LDFLAGS	=
+EBIND	= emxbind
 
 OBJS =  grc.o
 
@@ -23,6 +24,7 @@ endif
 
 grc:	$(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
 
 clean:
 	rm -f *~ core *.lst

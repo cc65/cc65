@@ -7,6 +7,7 @@ COMMON	= ../common
 
 CFLAGS = -g -O2 -Wall -I$(COMMON)
 CC=gcc
+EBIND=emxbind
 LDFLAGS=
 
 OBJS = 	attrtab.o	\
@@ -40,6 +41,7 @@ endif
 
 da65:   $(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
 
 clean:
 	rm -f *~ core *.map

@@ -7,6 +7,7 @@ COMMON	= ../common
 
 CFLAGS 	= -g -O2 -Wall -I$(COMMON)
 CC	= gcc
+EBIND	= emxbind
 LDFLAGS	=
 
 OBJS =  condasm.o	\
@@ -53,6 +54,7 @@ endif
 
 ca65:   $(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
 
 clean:
 	rm -f *~ core *.lst

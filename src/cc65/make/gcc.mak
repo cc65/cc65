@@ -10,6 +10,7 @@ COMMON	= ../common
 CDEFS=-DCC65_INC=\"/usr/lib/cc65/include/\"
 CFLAGS = -O2 -g -Wall -I$(COMMON) $(CDEFS)
 CC=gcc
+EBIND=emxbind
 LDFLAGS=
 
 OBJS =	anonname.o	\
@@ -67,6 +68,7 @@ endif
 
 cc65:	$(OBJS)
 	$(CC) $(LDFLAGS) -o cc65 $(CFLAGS) $(OBJS) $(LIBS)
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) cc65 ; fi
 
 clean:
 	rm -f *~ core *.map

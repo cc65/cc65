@@ -1,6 +1,8 @@
 #
 # Makefile for cc65 samples
 #
+# This Makefile requires GNU make
+#
 
 # Enter the target system here
 SYS	= c64

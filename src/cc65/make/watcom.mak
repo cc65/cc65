@@ -101,6 +101,7 @@ OBJS =	anonname.obj	\
 	function.obj	\
 	global.obj	\
 	goto.obj	\
+        hexval.obj      \
 	ident.obj	\
 	incpath.obj	\
 	input.obj	\
@@ -115,6 +116,7 @@ OBJS =	anonname.obj	\
 	pragma.obj	\
 	reginfo.obj	\
     	scanner.obj	\
+        scanstrbuf.obj  \
 	segments.obj	\
     	stdfunc.obj	\
     	stmt.obj	\
@@ -179,7 +181,8 @@ FILE exprnode.obj
 FILE funcdesc.obj
 FILE function.obj
 FILE global.obj
-FILE goto.obj
+FILE goto.obj            
+FILE hexval.obj
 FILE ident.obj
 FILE incpath.obj
 FILE input.obj
@@ -194,6 +197,7 @@ FILE preproc.obj
 FILE pragma.obj
 FILE reginfo.obj
 FILE scanner.obj
+FILE scanstrbuf.obj
 FILE segments.obj
 FILE stdfunc.obj
 FILE stmt.obj

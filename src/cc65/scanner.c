@@ -48,6 +48,7 @@
 #include "error.h"
 #include "function.h"
 #include "global.h"
+#include "hexval.h"
 #include "ident.h"
 #include "input.h"
 #include "litpool.h"
@@ -79,6 +80,7 @@ static const struct Keyword {
     unsigned char   Tok;    	/* The token */
     unsigned char   Type;      	/* Token type */
 } Keywords [] = {
+    { "_Pragma",        TOK_PRAGMA,     TT_C    },
     { "__A__",	       	TOK_A,	       	TT_C   	},
     { "__AX__",	       	TOK_AX,		TT_C	},
     { "__EAX__",       	TOK_EAX,   	TT_C	},
@@ -222,21 +224,6 @@ static void UnknownChar (char C)
 {
     Error ("Invalid input character with code %02X", C & 0xFF);
     NextChar (); 			/* Skip */
-}
-
-
-
-static unsigned HexVal (int c)
-/* Convert a hex digit into a value */
-{
-    if (!IsXDigit (c)) {
-	Error ("Invalid hexadecimal digit: `%c'", c);
-    }
-    if (IsDigit (c)) {
-	return c - '0';
-    } else {
-       	return toupper (c) - 'A' + 10;
-    }
 }
 
 
@@ -780,18 +767,6 @@ void NextToken (void)
     	    SetTok (TOK_COMP);
     	    break;
 
-        case '#':
-	    /* Skip it and following whitespace */
-	    do {
-	    	NextChar ();
-	    } while (CurC == ' ');
-	    if (!IsSym (token) || strcmp (token, "pragma") != 0) {
-	      	/* OOPS - should not happen */
-	      	Error ("Preprocessor directive expected");
-	    }
-	    NextTok.Tok = TOK_PRAGMA;
-	    break;
-
     	default:
        	    UnknownChar (CurC);
 
@@ -825,104 +800,110 @@ void SkipTokens (const token_t* TokenList, unsigned TokenCount)
 
 
 
-void Consume (token_t Token, const char* ErrorMsg)
+int Consume (token_t Token, const char* ErrorMsg)
 /* Eat token if it is the next in the input stream, otherwise print an error
- * message.
+ * message. Returns true if the token was found and false otherwise.
  */
 {
     if (CurTok.Tok == Token) {
 	NextToken ();
+        return 1;
     } else {
        	Error (ErrorMsg);
+        return 0;
     }
 }
 
 
 
-void ConsumeColon (void)
+int ConsumeColon (void)
 /* Check for a colon and skip it. */
 {
-    Consume (TOK_COLON, "`:' expected");
+    return Consume (TOK_COLON, "`:' expected");
 }
 
 
 
-void ConsumeSemi (void)
+int ConsumeSemi (void)
 /* Check for a semicolon and skip it. */
 {
     /* Try do be smart about typos... */
     if (CurTok.Tok == TOK_SEMI) {
-	NextToken ();
+    	NextToken ();
+        return 1;
     } else {
 	Error ("`;' expected");
 	if (CurTok.Tok == TOK_COLON || CurTok.Tok == TOK_COMMA) {
 	    NextToken ();
 	}
+        return 0;
     }
 }
 
 
 
-void ConsumeComma (void)
+int ConsumeComma (void)
 /* Check for a comma and skip it. */
 {
     /* Try do be smart about typos... */
     if (CurTok.Tok == TOK_COMMA) {
-	NextToken ();
+    	NextToken ();
+        return 1;
     } else {
       	Error ("`,' expected");
 	if (CurTok.Tok == TOK_SEMI) {
 	    NextToken ();
 	}
+        return 0;
     }
 }
 
 
 
-void ConsumeLParen (void)
+int ConsumeLParen (void)
 /* Check for a left parenthesis and skip it */
 {
-    Consume (TOK_LPAREN, "`(' expected");
+    return Consume (TOK_LPAREN, "`(' expected");
 }
 
 
 
-void ConsumeRParen (void)
+int ConsumeRParen (void)
 /* Check for a right parenthesis and skip it */
 {
-    Consume (TOK_RPAREN, "`)' expected");
+    return Consume (TOK_RPAREN, "`)' expected");
 }
 
 
 
-void ConsumeLBrack (void)
+int ConsumeLBrack (void)
 /* Check for a left bracket and skip it */
 {
-    Consume (TOK_LBRACK, "`[' expected");
+    return Consume (TOK_LBRACK, "`[' expected");
 }
 
 
 
-void ConsumeRBrack (void)
+int ConsumeRBrack (void)
 /* Check for a right bracket and skip it */
 {
-    Consume (TOK_RBRACK, "`]' expected");
+    return Consume (TOK_RBRACK, "`]' expected");
 }
 
 
 
-void ConsumeLCurly (void)
+int ConsumeLCurly (void)
 /* Check for a left curly brace and skip it */
 {
-    Consume (TOK_LCURLY, "`{' expected");
+    return Consume (TOK_LCURLY, "`{' expected");
 }
 
 
 
-void ConsumeRCurly (void)
+int ConsumeRCurly (void)
 /* Check for a right curly brace and skip it */
 {
-    Consume (TOK_RCURLY, "`}' expected");
+    return Consume (TOK_RCURLY, "`}' expected");
 }
 
 

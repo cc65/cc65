@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   pragma.h				     */
+/*                                   hexval.h                                */
 /*                                                                           */
-/*		    Pragma handling for the cc65 C compiler		     */
+/*                     Convert hex digits to numeric values                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
+/* (C) 2002      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef PRAGMA_H
-#define PRAGMA_H
+#ifndef HEXVAL_H
+#define HEXVAL_H
 
 
 
@@ -44,12 +44,14 @@
 
 
 
-void DoPragma (void);
-/* Handle pragmas. These come always in form of the new C99 _Pragma() operator. */
+unsigned HexVal (int C);
+/* Convert a hex digit into a value. The function will emit an error for 
+ * invalid hex digits.
+ */
 
 
 
-/* End of pragma.h */
+/* End of hexval.h */
 #endif
 
 

@@ -56,6 +56,7 @@ OBJS =	anonname.o	\
 	function.o     	\
 	global.o 	\
 	goto.o	   	\
+        hexval.o        \
 	ident.o		\
 	incpath.o      	\
 	input.o		\
@@ -70,6 +71,7 @@ OBJS =	anonname.o	\
 	pragma.o       	\
 	reginfo.o	\
     	scanner.o      	\
+        scanstrbuf.o    \
 	segments.o	\
     	stdfunc.o	\
     	stmt.o 		\

@@ -373,7 +373,9 @@ void AsmStatement (void)
     NextToken ();
 
     /* Need left parenthesis */
-    ConsumeLParen ();
+    if (!ConsumeLParen ()) {
+        return;
+    }
 
     /* String literal */
     if (CurTok.Tok != TOK_SCONST) {

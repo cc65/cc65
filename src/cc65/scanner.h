@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -210,36 +210,36 @@ void SkipTokens (const token_t* TokenList, unsigned TokenCount);
  * This routine is used for error recovery.
  */
 
-void Consume (token_t Token, const char* ErrorMsg);
+int Consume (token_t Token, const char* ErrorMsg);
 /* Eat token if it is the next in the input stream, otherwise print an error
- * message.
+ * message. Returns true if the token was found and false otherwise.
  */
 
-void ConsumeColon (void);
+int ConsumeColon (void);
 /* Check for a colon and skip it. */
 
-void ConsumeSemi (void);
+int ConsumeSemi (void);
 /* Check for a semicolon and skip it. */
 
-void ConsumeComma (void);
+int ConsumeComma (void);
 /* Check for a comma and skip it. */
 
-void ConsumeLParen (void);
+int ConsumeLParen (void);
 /* Check for a left parenthesis and skip it */
 
-void ConsumeRParen (void);
+int ConsumeRParen (void);
 /* Check for a right parenthesis and skip it */
 
-void ConsumeLBrack (void);
+int ConsumeLBrack (void);
 /* Check for a left bracket and skip it */
 
-void ConsumeRBrack (void);
+int ConsumeRBrack (void);
 /* Check for a right bracket and skip it */
 
-void ConsumeLCurly (void);
+int ConsumeLCurly (void);
 /* Check for a left curly brace and skip it */
 
-void ConsumeRCurly (void);
+int ConsumeRCurly (void);
 /* Check for a right curly brace and skip it */
 
 

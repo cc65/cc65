@@ -46,6 +46,7 @@
 #include "global.h"
 #include "litpool.h"
 #include "scanner.h"
+#include "scanstrbuf.h"
 #include "segments.h"
 #include "symtab.h"
 #include "pragma.h"
@@ -70,7 +71,7 @@ typedef enum {
     PR_RODATASEG,
     PR_SIGNEDCHARS,
     PR_STATICLOCALS,
-    PR_ZPSYM,	    
+    PR_ZPSYM,
     PR_COUNT
 } pragma_t;
 
@@ -99,6 +100,17 @@ static const struct Pragma {
 
 
 
+static void PragmaErrorSkip (void)
+/* Called in case of an error, skips tokens until the closing paren or a
+ * semicolon is reached.
+ */
+{
+    static const token_t TokenList[] = { TOK_RPAREN, TOK_SEMI };
+    SkipTokens (TokenList, sizeof(TokenList) / sizeof(TokenList[0]));
+}
+
+
+
 static int CmpKey (const void* Key, const void* Elem)
 /* Compare function for bsearch */
 {
@@ -119,36 +131,30 @@ static pragma_t FindPragma (const char* Key)
 
 
 
-static void StringPragma (void (*Func) (const char*))
+static void StringPragma (StrBuf* B, void (*Func) (const char*))
 /* Handle a pragma that expects a string parameter */
 {
-    if (CurTok.Tok != TOK_SCONST) {
-	Error ("String literal expected");
-    } else {
-     	/* Get the string */
-     	const char* Name = GetLiteral (CurTok.IVal);
+    StrBuf S;
 
+    if (SB_GetString (B, &S)) {
        	/* Call the given function with the string argument */
-	Func (Name);
-
-     	/* Reset the string pointer, removing the string from the pool */
-     	ResetLiteralPoolOffs (CurTok.IVal);
+	Func (SB_GetConstBuf (&S));
+    } else {
+	Error ("String literal expected");
     }
-
-    /* Skip the string (or error) token */
-    NextToken ();
 }
 
 
 
-static void SegNamePragma (segment_t Seg)
+static void SegNamePragma (StrBuf* B, segment_t Seg)
 /* Handle a pragma that expects a segment name parameter */
 {
-    if (CurTok.Tok != TOK_SCONST) {
-	Error ("String literal expected");
-    } else {
-     	/* Get the segment name */
-     	const char* Name = GetLiteral (CurTok.IVal);
+    StrBuf S;
+
+    if (SB_GetString (B, &S)) {
+
+        /* Get the string */
+        const char* Name = SB_GetConstBuf (&S);
 
 	/* Check if the name is valid */
 	if (ValidSegName (Name)) {
@@ -163,17 +169,14 @@ static void SegNamePragma (segment_t Seg)
 
 	}
 
-     	/* Reset the string pointer, removing the string from the pool */
-     	ResetLiteralPoolOffs (CurTok.IVal);
+    } else {
+	Error ("String literal expected");
     }
-
-    /* Skip the string (or error) token */
-    NextToken ();
 }
 
 
 
-static void CharMapPragma (void)
+static void CharMapPragma (StrBuf* B)
 /* Change the character map */
 {
     unsigned Index, C;
@@ -207,36 +210,61 @@ static void CharMapPragma (void)
 
 
 
-static void FlagPragma (unsigned char* Flag)
+static void FlagPragma (StrBuf* B, unsigned char* Flag)
 /* Handle a pragma that expects a boolean paramater */
 {
-    /* Read a constant integer expression */
-    ExprDesc Val;
-    ConstIntExpr (&Val);
+    ident Ident;
 
-    /* Store the value into the flag parameter */
-    *Flag = (Val.ConstVal != 0);
+    if (SB_Peek (B) == '0') {
+        SB_Skip (B);
+        *Flag = 0;
+    } else if (SB_Peek (B) == '1') {
+        SB_Skip (B);
+        *Flag = 1;
+    } else if (SB_GetSym (B, Ident)) {
+        if (strcmp (Ident, "true") == 0 || strcmp (Ident, "on") == 0) {
+            *Flag = 1;
+        } else if (strcmp (Ident, "false") == 0 || strcmp (Ident, "off") == 0) {
+            *Flag = 0;
+        } else {
+            Error ("Pragma argument must be one of `on', `off', `true' or `false'");
+        }
+    } else {
+        Error ("Invalid pragma argument");
+    }
 }
 
 
 
-void DoPragma (void)
-/* Handle pragmas */
+static void ParsePragma (void)
+/* Parse the contents of the _Pragma statement */
 {
     pragma_t Pragma;
+    ident    Ident;
 
-    /* Skip the token itself */
+    /* Create a string buffer from the string literal */
+    StrBuf B = AUTO_STRBUF_INITIALIZER;
+    GetLiteralStrBuf (&B, CurTok.IVal);
+
+    /* Reset the string pointer, effectivly clearing the string from the
+     * string table. Since we're working with one token lookahead, this
+     * will fail if the next token is also a string token, but that's a
+     * syntax error anyway, because we expect a right paren.
+     */
+    ResetLiteralPoolOffs (CurTok.IVal);
+
+    /* Skip the string token */
     NextToken ();
 
-    /* Identifier must follow */
-    if (CurTok.Tok != TOK_IDENT) {
-	Error ("Identifier expected");
-	return;
+    /* Get the pragma name from the string */
+    SB_SkipWhite (&B);
+    if (!SB_GetSym (&B, Ident)) {
+        Error ("Invalid pragma");
+        return;
     }
 
-    /* Search for the name, then skip the identifier */
-    Pragma = FindPragma (CurTok.Ident);
-    NextToken ();
+    /* Search for the name */
+    Pragma = FindPragma (Ident);
 
     /* Do we know this pragma? */
     if (Pragma == PR_ILLEGAL) {
@@ -244,58 +272,109 @@ void DoPragma (void)
        	 * for unknown pragmas, however, we're allowed to warn - and we will
        	 * do so. Otherwise one typo may give you hours of bug hunting...
        	 */
-       	Warning ("Unknown #pragma `%s'", CurTok.Ident);
+       	Warning ("Unknown pragma `%s'", Ident);
        	return;
     }
 
     /* Check for an open paren */
-    ConsumeLParen ();
+    SB_SkipWhite (&B);
+    if (SB_Get (&B) != '(') {
+        Error ("'(' expected");
+        return;
+    }
+
+    /* Skip white space before the argument */
+    SB_SkipWhite (&B);
 
     /* Switch for the different pragmas */
     switch (Pragma) {
 
-	case PR_BSSSEG:
-	    SegNamePragma (SEG_BSS);
-	    break;
+     	case PR_BSSSEG:
+     	    SegNamePragma (&B, SEG_BSS);
+     	    break;
 
-	case PR_CHARMAP:
-	    CharMapPragma ();
-	    break;
+     	case PR_CHARMAP:
+     	    CharMapPragma (&B);
+     	    break;
 
-	case PR_CHECKSTACK:
-	    FlagPragma (&CheckStack);
-	    break;
+     	case PR_CHECKSTACK:
+     	    FlagPragma (&B, &CheckStack);
+     	    break;
 
-	case PR_CODESEG:
-	    SegNamePragma (SEG_CODE);
-	    break;
+     	case PR_CODESEG:
+     	    SegNamePragma (&B, SEG_CODE);
+     	    break;
 
-	case PR_DATASEG:
-	    SegNamePragma (SEG_DATA);
-	    break;
+     	case PR_DATASEG:
+     	    SegNamePragma (&B, SEG_DATA);
+     	    break;
 
-	case PR_REGVARADDR:
-	    FlagPragma (&AllowRegVarAddr);
-	    break;
+     	case PR_REGVARADDR:
+     	    FlagPragma (&B, &AllowRegVarAddr);
+     	    break;
 
-	case PR_RODATASEG:
-	    SegNamePragma (SEG_RODATA);
-	    break;
+     	case PR_RODATASEG:
+     	    SegNamePragma (&B, SEG_RODATA);
+     	    break;
 
-	case PR_SIGNEDCHARS:
-	    FlagPragma (&SignedChars);
-	    break;
+     	case PR_SIGNEDCHARS:
+     	    FlagPragma (&B, &SignedChars);
+     	    break;
 
-	case PR_STATICLOCALS:
-	    FlagPragma (&StaticLocals);
-	    break;
+     	case PR_STATICLOCALS:
+     	    FlagPragma (&B, &StaticLocals);
+     	    break;
 
-	case PR_ZPSYM:
-	    StringPragma (MakeZPSym);
-	    break;
+     	case PR_ZPSYM:
+     	    StringPragma (&B, MakeZPSym);
+     	    break;
 
-	default:
+     	default:
        	    Internal ("Invalid pragma");
+    }
+
+    /* Closing paren expected */
+    SB_SkipWhite (&B);
+    if (SB_Get (&B) != ')') {
+        Error ("')' expected");
+        return;
+    }
+
+    /* Make sure nothing follows */
+    SB_SkipWhite (&B);
+    if (SB_Peek (&B) != '\0') {
+        Error ("Unexpected input following pragma directive");
+    }
+}
+
+
+
+void DoPragma (void)
+/* Handle pragmas. These come always in form of the new C99 _Pragma() operator. */
+{
+    /* Skip the token itself */
+    NextToken ();
+
+    /* We expect an opening paren */
+    if (!ConsumeLParen ()) {
+	return;
+    }
+
+    /* String literal */
+    if (CurTok.Tok != TOK_SCONST) {
+
+    	/* Print a diagnostic */
+     	Error ("String literal expected");
+
+    	/* Try some smart error recovery: Skip tokens until we reach the
+    	 * enclosing paren, or a semicolon.
+    	 */
+       	PragmaErrorSkip ();
+
+    } else {
+
+    	/* Parse the _Pragma statement */
+    	ParsePragma ();
     }
 
     /* Closing paren needed */

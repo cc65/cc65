@@ -19,6 +19,7 @@
 #include "ident.h"
 #include "incpath.h"
 #include "input.h"
+#include "lineinfo.h"
 #include "macrotab.h"
 #include "scanner.h"
 #include "util.h"
@@ -620,9 +621,19 @@ static int doiff (int skip)
 
     /* We're about to abuse the compiler expression parser to evaluate the
      * #if expression. Save the current tokens to come back here later.
+     * NOTE: Yes, this is a hack, but it saves a complete separate expression
+     * evaluation for the preprocessor.
      */
     Token sv1 = CurTok;
     Token sv2 = NextTok;
+
+    /* Make sure the line infos for the tokens won't get removed */
+    if (sv1.LI) {
+	UseLineInfo (sv1.LI);
+    }
+    if (sv2.LI) {
+	UseLineInfo (sv2.LI);
+    }
 
     /* Remove the #if from the line and add two semicolons as sentinels */
     SkipBlank ();

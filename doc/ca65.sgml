@@ -1928,7 +1928,7 @@ Here's a list of all control commands and a description, what they do:
   Push the currently active segment onto a stack. The entries on the stack
   include the name of the segment and the segment type. The stack has a size
   of 16 entries.
-                 
+
   <tt/.PUSHSEG/ allows together with <tt><ref id=".POPSEG" name=".POPSEG"></tt>
   to switch to another segment and to restore the old segment later, without
   even knowing the name and type of the current segment.
@@ -2760,7 +2760,7 @@ be requested separately.
 <item>
 Constructors and destructors may have priorities. These priorities determine
 the order of the functions in the table. If your intialization or cleanup code
-does depend on other intiialization or cleanup code, you have to choose the
+does depend on other initialization or cleanup code, you have to choose the
 priority for the functions accordingly.
 
 <item>

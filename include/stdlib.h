@@ -50,7 +50,7 @@
 
 /* Memory management */
 void* __fastcall__ malloc (size_t size);
-void* calloc (size_t count, size_t size);
+void* __fastcall__ calloc (size_t count, size_t size);
 void* realloc (void* block, size_t size);
 void __fastcall__ free (void* block);
 #ifndef __STRICT_ANSI__

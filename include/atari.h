@@ -152,7 +152,7 @@ extern char *_getdefdev(void);          /* get default floppy device */
 extern unsigned char _dos_type;        /* the DOS flavour */
 
 /* provide old names for backwards compatibility */
-#ifdef ATARI_COMPAT_PRE_2_10
+#ifdef ATARI_COMPAT_PRE_2_11
 #define setcolor     _setcolor
 #define setcolor_low _setcolor_low
 #define getcolor     _getcolor

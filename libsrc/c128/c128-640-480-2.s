@@ -605,7 +605,7 @@ LINE:
 	jsr	abs
 	sta	NY
 	sty	NY+1
-	; if (x2>x1)
+	; if (x2>=x1)
 	ldx	#X2
 	lda	X1
 	ldy	X1+1
@@ -618,7 +618,7 @@ LINE:
 	; dx = -1;
 @L0243:	lda	#$ff
 @L0244:	sta	DX
-	; if (y2>y1)
+	; if (y2>=y1)
 	ldx	#Y2
 	lda	Y1
 	ldy	Y1+1

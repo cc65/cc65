@@ -187,6 +187,7 @@ typedef enum {
 #define OF_CALL         0x0200U /* A subroutine call */
 #define OF_REG_INCDEC   0x0400U /* A register increment or decrement */
 #define OF_SETF         0x0800U /* Insn will set all load flags (not carry) */
+#define OF_CMP          0x1000U /* A compare A/X/Y instruction */
 
 /* Combined infos */
 #define OF_BRA 	(OF_UBRA | OF_CBRA)	/* Operation is a jump/branch */

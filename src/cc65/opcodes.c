@@ -189,21 +189,21 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
        	0,     	       	                        /* size */
        	REG_A, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_SETF			 		/* flags */
+       	OF_SETF	| OF_CMP	 		/* flags */
     },
     {   OP65_CPX,      	                        /* opcode */
        	"cpx", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_X, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_SETF			 		/* flags */
+	OF_SETF	| OF_CMP	 		/* flags */
     },
     {   OP65_CPY,      	                        /* opcode */
        	"cpy", 	       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_Y, 	       	                        /* use */
        	REG_NONE,      	                        /* chg */
-	OF_SETF			 		/* flags */
+	OF_SETF	| OF_CMP	 		/* flags */
     },
     {   OP65_DEA,      	                        /* opcode */
        	"dea", 	       	                        /* mnemonic */
@@ -581,7 +581,7 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
 
 static int FindCmp (const void* Key, const void* Desc)
 /* Compare function for FindOpcode */
-{						
+{
     return strcmp (Key, ((OPCDesc*)Desc)->Mnemo);
 }
 

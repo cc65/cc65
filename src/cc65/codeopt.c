@@ -256,6 +256,20 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 
 
 
+static int GetCmpRegVal (const CodeEntry* E)
+/* Return the register value for an immediate compare */
+{
+    switch (E->OPC) {
+	case OP65_CMP: return E->RI->In.RegA;
+	case OP65_CPX: return E->RI->In.RegX;
+	case OP65_CPY: return E->RI->In.RegY;
+	default:       Internal ("Invalid opcode in GetCmpRegVal");
+	               return 0;  /* Not reached */
+    }
+}
+
+
+
 static int IsCmpToZero (const CodeEntry* E)
 /* Check if the given instrcuction is a compare to zero instruction */
 {
@@ -937,6 +951,10 @@ static unsigned OptCmp2 (CodeSeg* S)
  *     	lda/and/ora/eor	...
  *  	cmp #$00
  *  	jeq/jne
+ * or
+ *     	lda/and/ora/eor	...
+ *  	cmp #$00
+ *  	jsr boolxx
  *
  * and remove the cmp.
  */
@@ -963,11 +981,13 @@ static unsigned OptCmp2 (CodeSeg* S)
 	     E->OPC == OP65_PLA ||
 	     E->OPC == OP65_SBC ||
 	     E->OPC == OP65_TXA ||
-	     E->OPC == OP65_TYA)                  &&
-	    CS_GetEntries (S, L, I+1, 2)   	  &&
-       	    IsCmpToZero (L[0])                    &&
-	    !CE_HasLabel (L[0])                   &&
-       	    (L[1]->Info & OF_FBRA) != 0           &&
+	     E->OPC == OP65_TYA)                       &&
+	    CS_GetEntries (S, L, I+1, 2)   	       &&
+       	    IsCmpToZero (L[0])                         &&
+	    !CE_HasLabel (L[0])                        &&
+       	    ((L[1]->Info & OF_FBRA) != 0         ||
+	     (L[1]->OPC == OP65_JSR        &&
+	      FindBoolCmpCond (L[1]->Arg) != CMP_INV)) &&
 	    !CE_HasLabel (L[1])) {
 
 	    /* Remove the compare */
@@ -985,7 +1005,7 @@ static unsigned OptCmp2 (CodeSeg* S)
 
     /* Return the number of changes made */
     return Changes;
-}
+}		  
 
 
 
@@ -1128,7 +1148,7 @@ static unsigned OptCmp4 (CodeSeg* S)
 	    ++Changes;
 	}
 
-	/* Next entry */
+    	/* Next entry */
 	++I;
 
     }
@@ -1171,7 +1191,7 @@ static unsigned OptCmp5 (CodeSeg* S)
 	     * boolean value but only valid flags. Note: jeq jumps if
 	     * the condition is not met, jne jumps if the condition is met.
      	     * Invert the code if we jump on condition not met.
-	     */
+    	     */
        	    if (GetBranchCond (N->OPC) == BC_EQ) {
 	       	/* Jumps if condition false, invert condition */
 	       	Cond = CmpInvertTab [Cond];
@@ -1238,6 +1258,110 @@ static unsigned OptCmp6 (CodeSeg* S)
 	++I;
 
     }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptCmp7 (CodeSeg* S)
+/* Check for register compares where the contents of the register and therefore
+ * the result of the compare is known.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	int RegVal;
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+     	/* Check for a compare against an immediate value */
+       	if ((E->Info & OF_CMP) != 0           &&
+	    (RegVal = GetCmpRegVal (E)) >= 0  &&
+	    CE_KnownImm (E)) {
+
+	    /* We are able to evaluate the compare at compile time. Check if
+	     * one or more branches are ahead.
+	     */
+	    unsigned JumpsChanged = 0;
+	    CodeEntry* N;
+	    while ((N = CS_GetNextEntry (S, I)) != 0 &&   /* Followed by something.. */
+	       	   (N->Info & OF_CBRA) != 0          &&   /* ..that is a cond branch.. */
+	       	   !CE_HasLabel (N)) {                    /* ..and has no label */
+
+	       	/* Evaluate the branch condition */
+	       	int Cond;
+	       	switch (GetBranchCond (N->OPC)) {
+	       	    case BC_CC:
+	       	        Cond = ((unsigned char)RegVal) < ((unsigned char)E->Num);
+	       	        break;
+
+	       	    case BC_CS:
+	       	        Cond = ((unsigned char)RegVal) >= ((unsigned char)E->Num);
+	       	        break;
+
+	       	    case BC_EQ:
+	       	        Cond = ((unsigned char)RegVal) == ((unsigned char)E->Num);
+	       	        break;
+
+	       	    case BC_MI:
+       	       	        Cond = ((signed char)RegVal) < ((signed char)E->Num);
+	       	        break;
+
+	       	    case BC_NE:
+	       	        Cond = ((unsigned char)RegVal) != ((unsigned char)E->Num);
+	       	        break;
+
+	       	    case BC_PL:
+       	       	        Cond = ((signed char)RegVal) >= ((signed char)E->Num);
+	       	        break;
+
+	       	    case BC_VC:
+	       	    case BC_VS:
+	       	}
+
+	       	/* If the condition is false, we may remove the jump. Otherwise
+	       	 * the branch will always be taken, so we may replace it by a
+	       	 * jump (and bail out).
+	       	 */
+		if (!Cond) {
+		    CS_DelEntry (S, I+1);
+		} else {
+		    CodeLabel* L = N->JumpTo;
+		    CodeEntry* X = NewCodeEntry (OP65_JMP, AM65_BRA, L->Name, L, N->LI);
+		    CS_InsertEntry (S, X, I+2);
+		    CS_DelEntry (S, I+1);
+		}
+
+	     	/* Remember, we had changes */
+	    	++JumpsChanged;
+	     	++Changes;
+	    }
+
+	    /* If we have made changes above, we may also remove the compare */
+	    if (JumpsChanged) {
+		CS_DelEntry (S, I);
+	    }
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -1319,10 +1443,10 @@ static unsigned OptTest1 (CodeSeg* S)
 
 		/* Remove the two other insns */
 		CS_DelEntry (S, I+1);
-		CS_DelEntry (S, I);
+	  	CS_DelEntry (S, I);
 
-		/* We had changes */
-		++Changes;
+	  	/* We had changes */
+	  	++Changes;
 	    }
 	}
 
@@ -2576,6 +2700,7 @@ static OptFunc OptFuncs [] = {
     OptEntry (OptCmp4, optMain),
     OptEntry (OptCmp5, optMain),
     OptEntry (OptCmp6, optMain),
+    OptEntry (OptCmp7, optMain),
     /* Optimize tests */
     OptEntry (OptTest1, optMain),
     /* Remove unused loads */

@@ -170,7 +170,7 @@ void g_preamble (void)
     AddTextLine ("\t.debuginfo\t%s", (DebugInfo != 0)? "on" : "off");
 
     /* Import the stack pointer for direct auto variable access */
-    AddTextLine ("\t.importzp\tsp, sreg, regsave, regbank, tmp1, ptr1");
+    AddTextLine ("\t.importzp\tsp, sreg, regsave, regbank, tmp1, ptr1, ptr2");
 
     /* Define long branch macros */
     AddTextLine ("\t.macpack\tlongbranch");
@@ -608,7 +608,7 @@ void g_getimmed (unsigned Flags, unsigned long Val, unsigned Offs)
 	        if (B2 == B4) {
 		    AddCodeLine ("stx sreg+1");
 		    Done |= 0x08;
-		}
+     		}
 	    	if ((Done & 0x04) == 0 && B1 != B3) {
 		    AddCodeLine ("lda #$%02X", B3);
 		    AddCodeLine ("sta sreg");
@@ -1701,11 +1701,27 @@ void g_addeqlocal (unsigned flags, int offs, unsigned long val)
        	    /* FALLTHROUGH */
 
        	case CF_INT:
-     	    if (flags & CF_CONST) {
-     	     	g_getimmed (flags, val, 0);
-     	    }
 	    ldyconst (offs);
-	    AddCodeLine ("jsr addeqysp");
+     	    if (flags & CF_CONST) {
+		if (CodeSizeFactor >= 400) {
+		    AddCodeLine ("clc");
+		    AddCodeLine ("lda #$%02X", (int)(val & 0xFF));
+		    AddCodeLine ("adc (sp),y");
+		    AddCodeLine ("sta (sp),y");
+		    AddCodeLine ("iny");
+		    AddCodeLine ("lda #$%02X", (int) ((val >> 8) & 0xFF));
+		    AddCodeLine ("adc (sp),y");
+		    AddCodeLine ("sta (sp),y");
+		    AddCodeLine ("tax");
+		    AddCodeLine ("dey");
+		    AddCodeLine ("lda (sp),y");
+		} else {
+		    g_getimmed (flags, val, 0);
+		    AddCodeLine ("jsr addeqysp");
+		}
+     	    } else {
+	     	AddCodeLine ("jsr addeqysp");
+	    }
        	    break;
 
        	case CF_LONG:

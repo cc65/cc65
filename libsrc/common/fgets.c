@@ -14,46 +14,47 @@
 
 char* fgets (char* s, unsigned size, FILE* f)
 {
-    int i, c;
+    int i = 0;
+    int c;
 
-    /* We do not handle the case "size == 0" here */
-    i = 0; --size;
-    while (i < size) {
+    if (size == 0) {
+        /* Invalid size */
+        _errno = EINVAL;
+        return 0;
+    }
+
+    /* Read input */
+    i = 0;
+    while (--size) {
 
        	/* Get next character */
-       	c = fgetc (f);
-       	if (c == EOF) {
-       	    s [i] = 0;
+       	if ((c = fgetc (f)) == EOF) {
+       	    s[i] = '\0';
        	    /* Error or EOF */
-       	    if (f->f_flags & _FERROR) {
-       	    	/* ERROR */
-       	    	return 0;
+       	    if ((f->f_flags & _FERROR) != 0 || i == 0) {
+       	     	/* ERROR or EOF on first char */
+       	     	return 0;
        	    } else {
-       	        /* EOF */
-		if (i) {
-    	    	    return s;
-		} else {
-		    return 0;
-		}
+       	        /* EOF with data already read */
+                break;
     	    }
        	}
 
        	/* One char more */
-       	s [i++] = c;
+       	s[i++] = c;
 
-	/* Stop at end of line */
-	if (c == '\n') {
- 	    break;
-	}
+     	/* Stop at end of line */
+     	if (c == '\n') {
+     	    break;
+     	}
     }
 
-    /* Replace newline by NUL */
-    s [i-1] = '\0';
+    /* Terminate the string */
+    s[i] = '\0';
 
     /* Done */
     return s;
 }
-
 
 
 

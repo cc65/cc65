@@ -7,7 +7,7 @@
 	.include "atari.inc"
 	
     	.export		_cvlinexy, _cvline
-	.import		popa, _gotoxy, putchar, newline
+	.import		popa, _gotoxy, putchar
 	.importzp	tmp1
 
 _cvlinexy:

@@ -561,10 +561,18 @@ static void callfunction (struct expent* lval)
 
 	/* Fetch the pointer to the next argument, check for too many args */
 	if (ParamCount <= Func->ParamCount) {
+	    /* Beware: If there are parameters with identical names, they
+	     * cannot go into the same symbol table, which means that in this
+	     * case of errorneous input, the number of nodes in the symbol
+	     * table and ParamCount are NOT equal. We have to handle this case
+	     * below to avoid segmentation violations. Since we know that this
+	     * problem can only occur if there is more than one parameter,
+	     * we will just use the last one.
+	     */
 	    if (ParamCount == 1) {
-		/* First argument */
-		Param = Func->SymTab->SymHead;
-	    } else {
+	       	/* First argument */
+	       	Param = Func->SymTab->SymHead;
+	    } else if (Param->NextSym != 0) {
 	     	/* Next argument */
 	     	Param = Param->NextSym;
 	     	CHECK ((Param->Flags & SC_PARAM) != 0);

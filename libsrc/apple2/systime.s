@@ -13,16 +13,9 @@
 
         .importzp       sreg
 
-.code
-
-.proc   __systime
-
+__systime:
         lda     #$FF
         tax
         sta     sreg
         sta     sreg+1
         rts                     ; Return -1
-
-.endproc
-
-

@@ -14,7 +14,6 @@
 
 	.include	"../apple2/apple2.inc"
 
-
 initconio:
 	lda	#$FF		; Normal character display mode
 	sta	INVFLG
@@ -33,10 +32,7 @@ _cputcxy:
 
 _cputc:
 	cmp	#$0D		; Test for \r = carrage return
-	bne	L1
-	stz	CH		; Goto left edge of screen
-	rts			; That's all we do
-L1:
+	beq	left
 	cmp	#$0A		; Test for \n = line feed
 	beq	newline
 	ora	#$80		; Turn on high bit
@@ -46,9 +42,18 @@ cputdirect:
 	inc	CH		; Bump to next column
 	lda	CH
 	cmp	WNDWDTH
-	bne	return
-	stz	CH
-return:
+	bne	done
+left:	stz	CH		; Goto left edge of screen
+done:	rts
+
+newline:
+	inc	CV
+	lda	CV
+	cmp	#24
+	bne	:+
+	lda	#$00
+	sta	CV
+:	jsr	BASCALC
 	rts
 
 putchar:
@@ -56,13 +61,11 @@ putchar:
 	cpy	#$FF		; Normal character display mode?
 	beq	put
 	cmp	#$E0		; Lowercase?
-	bmi	mask
+	bcc	mask
 	and	#$7F		; Inverse lowercase
 	bra	put
-mask:
-	and	INVFLG		; Apply normal, inverse, flash
-put:
-	ldy	CH
+mask:	and	INVFLG		; Apply normal, inverse, flash
+put:	ldy	CH
 	bit	RD80VID 	; In 80 column mode?
 	bpl	col40		; No, in 40 cols
 	pha
@@ -75,23 +78,7 @@ put:
 	sta	(BASL),Y
 	bit	LOWSCR
 	rts
-col40:
-	sta	(BASL),Y
-	rts
-
-newline:
-	lda	CH
-	pha
-	inc	CV
-	lda	CV
-	cmp	#24
-	bne	L2
-	lda	#$00
-	sta	CV
-L2:
-	jsr	BASCALC
-	pla
-	sta	CH
+col40:	sta	(BASL),Y
 	rts
 
 _gotoxy:

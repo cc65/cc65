@@ -20,11 +20,11 @@ _cvline:
 
 cvlinedirect:
 	cmp	#$00		; Is the length zero?
-   	beq	L9  		; Jump if done
+   	beq	done  		; Jump if done
     	sta	tmp1
-L1:	txa			; Screen code
+:	txa			; Screen code
    	jsr	putchar		; Write, no cursor advance
    	jsr	newline		; Advance cursor to next line
 	dec	tmp1
-	bne	L1
-L9:	rts
+	bne	:-
+done:	rts

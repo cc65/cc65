@@ -20,10 +20,10 @@ _chline:
 
 chlinedirect:
 	cmp	#$00		; Is the length zero?
-   	beq	L9  		; Jump if done
+   	beq	done  		; Jump if done
 	sta	tmp1
-L1:	txa			; Screen code
+:	txa			; Screen code
    	jsr	cputdirect	; Direct output
    	dec	tmp1
-	bne	L1
-L9:	rts
+	bne	:-
+done:	rts

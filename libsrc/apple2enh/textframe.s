@@ -47,15 +47,15 @@ noxy:	sta	XORIGIN
 	plx			; Restore index
 loop:	lda	XOFFS,x
 	clc
-	bpl	L1		; Relative to left edge?
+	bpl	:+		; Relative to left edge?
 	adc	WIDTH
-L1:	adc	XORIGIN
+:	adc	XORIGIN
 	jsr	pusha
 	lda	YOFFS,x
 	clc
-	bpl	L2		; Relative to top?
+	bpl	:+		; Relative to top?
 	adc	HEIGHT
-L2:	adc	YORIGIN
+:	adc	YORIGIN
 	jsr	_gotoxy		; Call this one, will pop params
 	txa
 	tay

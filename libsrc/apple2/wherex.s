@@ -7,11 +7,7 @@
 
 	.include	"apple2.inc"
 
-.proc   _wherex
-
+_wherex:
 	lda    	CH
         ldx     #$00
 	rts
-
-.endproc
-

@@ -31,16 +31,12 @@ _cputcxy:
 
 _cputc:
 	cmp	#$0D		; Test for \r = carrage return
-	bne	L1
-	lda	#$00		; Goto left edge of screen
-	sta	CH
-	rts			; That's all we do
-L1:
+	beq	left
 	cmp	#$0A		; Test for \n = line feed
 	beq	newline
 	ora	#$80		; Turn on high bit
 	cmp	#$E0		; Test for lowercase
-	bmi	cputdirect
+	bcc	cputdirect
 	and	#$DF		; Convert to uppercase
 
 cputdirect:
@@ -48,33 +44,27 @@ cputdirect:
 	inc	CH		; Bump to next column
 	lda	CH
 	cmp	#40
-	bne	return
-	lda	#$00
+	bne	done
+left:	lda	#$00		; Goto left edge of screen
 	sta	CH
-return:	
-	rts
+done:	rts
 
+newline:
+	inc	CV
+	lda	CV
+	cmp	#24
+	bne	:+
+	lda	#$00
+	sta	CV
+:	jsr	BASCALC
+	rts
+		
 putchar:	
 	and	INVFLG		; Apply normal, inverse, flash
 	ldy	CH
 	sta	(BASL),Y
 	rts
 
-newline:
-	lda	CH
-	pha
-	inc	CV
-	lda	CV
-	cmp	#24
-	bne	L2
-	lda	#$00
-	sta	CV
-L2:
-	jsr	BASCALC
-	pla
-	sta	CH
-	rts
-		
 _gotoxy:
 	sta	CV		; Store Y
 	jsr	BASCALC

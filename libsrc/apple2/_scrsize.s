@@ -6,10 +6,7 @@
 
 	.export	      	screensize
 
-.proc   screensize
-
+screensize:
 	ldx	#40
 	ldy	#24
         rts
-
-.endproc

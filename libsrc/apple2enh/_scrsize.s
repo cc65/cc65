@@ -8,11 +8,7 @@
 
         .include        "../apple2/apple2.inc"
 
-.proc   screensize
-
+screensize:
 	ldx	WNDWDTH
 	ldy	#24
         rts
-
-.endproc
-

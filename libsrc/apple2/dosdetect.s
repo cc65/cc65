@@ -19,7 +19,6 @@
 ; ProDOS 2.0.2  $22
 ; ProDOS 2.0.3  $23
 
-
 	.constructor	initdostype
 	.export		__dos_type
 
@@ -36,9 +35,9 @@ initdostype:
 	bne	done
 	lda	$BFFF		; ProDOS KVERSION
 	cmp	#$10
-	bpl	L1
+	bcs	:+
 	ora	#$10		; Make high nibble match major version
-L1:	sta	__dos_type
+:	sta	__dos_type
 done:	rts
 
 	.bss

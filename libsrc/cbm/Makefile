@@ -60,7 +60,8 @@ S_OBJS =	c_acptr.o	\
                 scratch.o       \
                 sysremove.o     \
                 systime.o       \
-		where.o         \
+		wherex.o        \
+                wherey.o        \
                 write.o
 
 all:	$(C_OBJS) $(S_OBJS)

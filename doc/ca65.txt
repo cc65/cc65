@@ -377,20 +377,22 @@ Available operators sorted by precedence:
 
     Op 	        Description			      	Precedence
   -------------------------------------------------------------------
+    .CONCAT	Builtin function			0
+    .LEFT	Builtin function			0
+    .MID	Builtin function			0
+    .RIGHT	Builtin function			0
+    .STRING	Builtin function			0
+
     *		Builtin pseudo variable (r/o)	      	1
     .BLANK	Builtin function	     		1
-    .CONCAT	Builtin function			1
     .CONST	Builtin function	     		1
     .CPU	Builtin pseudo variable (r/o)		1
     .DEFINED	Builtin function	     		1
-    .LEFT	Builtin function			1
     .MATCH	Builtin function			1
-    .MID	Builtin function			1
+    .TCOUNT	Builtin function			1
     .XMATCH	Builtin function			1
     .PARAMCOUNT Builtin pseudo variable	(r/o)		1
     .REFERENCED Builtin function			1
-    .RIGHT	Builtin function			1
-    .STRING	Builtin function			1
     :: 	    	Global namespace override		1
     +  	    	Unary plus			   	1
     -  	    	Unary minus				1
@@ -1597,7 +1599,7 @@ Here's a list of all control commands and a description, what they do:
   storage should be defined. The second, optional expression must by a
   constant byte value that will be used as value of the data. If there
   is no fill value given, the linker will use the value defined in the
-  linker configuration file (default: zero).	
+  linker configuration file (default: zero).
 
   Example:
 
@@ -1700,10 +1702,33 @@ Here's a list of all control commands and a description, what they do:
 
   Example:
 
-	; Emulate other assemblers:
-	.macro	section	name
-		.segment	.string(name)
-	.endmacro
+       	; Emulate other assemblers:
+       	.macro	section	name
+       		.segment	.string(name)
+       	.endmacro
+
+
+.TCOUNT
+
+  Builtin function. The function accepts a token list in braces. The
+  function result is the number of tokens given as argument.
+
+  Example:
+
+    The ldax macro accepts the '#' token to denote immidiate addressing
+    (as with the normal 6502 instructions). To translate it into two
+    separate 8 bit load instructions, the '#' token has to get stripped
+    from the argument:
+
+    	.macro	ldax	arg
+    		.if (.match (.mid (0, 1, arg), #))
+    		; ldax called with immidiate operand
+		lda	#<(.right (.tcount (arg)-1, arg))
+		ldx	#>(.right (.tcount (arg)-1, arg))
+		.else
+		...
+    		.endif
+       	.endmacro
 
 
 .WORD
@@ -1976,7 +2001,7 @@ Macros with parameters may also be useful:
       	.define DEBUG(message)	.out	message
 
       	DEBUG	"Assembling include file #3"
-			       
+
 Note that, while formal parameters have to be placed in braces, this is
 not true for the actual parameters. Beware: Since the assembler cannot
 detect the end of one parameter, only the first token is used. If you

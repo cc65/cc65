@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  graphics.h                                 */
+/*                                     tgi.h                                 */
 /*                                                                           */
-/*			       Graphics library                              */
+/*                            Tiny graphics interface                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2002      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -33,20 +33,17 @@
 
 
 
-#ifndef _GRAPHICS_H
-#define _GRAPHICS_H
+#ifndef _TGI_H
+#define _TGI_H
 
 
 
-/*****************************************************************************/
-/*		  		   Constants                                 */
-/*****************************************************************************/
-
-
-
-#define GM_TEXT	       	       	0U     	/* Text mode */
-#define GM_320_200_2            1U      /* 320x200, 2 colors (b/w) */
-#define GM_160_200_4            2U      /* 160x200, 4 colors */
+#ifndef _TGI_MODE_H
+#include "tgi/tgi-mode.h"
+#endif
+#ifndef _TGI_ERROR_H
+#include "tgi/tgi-error.h"
+#endif
 
 
 
@@ -70,83 +67,91 @@ struct palettetype {
 
 
 
-unsigned char __fastcall__ initgraph (unsigned char mode);
-/* Initialize the graphics screen to the given mode, return the new mode.
- * Not all modes are available on all systems, check the returned mode
- * to see if the initialization was successful.
+void __fastcall__ tgi_load (unsigned char mode);
+/* Install the matching driver for the given mode. Will just load the driver
+ * and check if loading was successul. Will not switch to gaphics mode.
  */
 
-void closegraph (void);
-/* End graphics mode, switch back to text mode */
+void __fastcall__ tgi_load_driver (const char* name);
+/* Install the given driver. This function is identical to tgi_load with the
+ * only difference that the name of the driver is specified explicitly. You
+ * should NOT use this function in most cases, use tgi_load() instead.
+ */
 
-void cleargraphscreen (void);
+void __fastcall__ tgi_unload (void);
+/* Unload the currently loaded driver. */
+
+void __fastcall__ tgi_init (unsigned char mode);
+/* Initialize the given graphics mode. */
+
+void __fastcall__ tgi_done (void);
+/* End graphics mode, switch back to text mode. Will NOT unload the driver! */
+
+unsigned char __fastcall__ tgi_error (void);
+/* Return the error code for the last operation. */
+
+void __fastcall__ tgi_clear (void);
 /* Clear the screen */
 
-unsigned char getgraphmode (void);
-/* Return the current graphics mode */
-
-unsigned char getmaxcolor (void);
+unsigned char __fastcall__ tgi_getmaxcolor (void);
 /* Return the maximum supported color number (the number of colors would
  * then be getmaxcolor()+1).
  */
 
-unsigned getmaxx (void);
+unsigned __fastcall__ tgi_getmaxx (void);
 /* Return the maximum x coordinate. The resolution in x direction is
  * getmaxx() + 1
  */
 
-unsigned getmaxy (void);
+unsigned __fastcall__ tgi_getmaxy (void);
 /* Return the maximum y coordinate. The resolution in y direction is
  * getmaxy() + 1
  */
 
-void __fastcall__ getaspectratio (unsigned* xasp, unsigned* yasp);
-/* Get the aspect ratio for the current graphics mode. yasp will always be
- * 10000, xasp depends on the maxx/mayy ratio of the current resolution.
- */
+unsigned __fastcall__ tgi_getxres (void);
+/* Return the resolution in X direction */
 
-void __fastcall__ setcolor (unsigned char color);
+unsigned __fastcall__ tgi_getyres (void);
+/* Return the resolution in Y direction */
+
+void __fastcall__ tgi_setcolor (unsigned char color);
 /* Set the current drawing color */
 
-unsigned char getcolor (void);
+unsigned char __fastcall__ tgi_getcolor (void);
 /* Return the current drawing color */
 
-unsigned char getbkcolor (void);
+unsigned char __fastcall__ tgi_getbkcolor (void);
 /* Return the current background color */
 
-void __fastcall__ setbkcolor (unsigned char color);
+void __fastcall__ tgi_setbkcolor (unsigned char color);
 /* Set the background color */
 
-void __fastcall__ setpalette (unsigned num, const struct palettetype* palette);
-/* Set one palette entry */
-
-void __fastcall__ getpalette (unsigned num, struct palettetype* palette);
-/* Get one palette entry */
-
-void __fastcall__ setallpalette (const struct palettetype* allpalette);
-/* Set all palette entries */
-
-unsigned char __fastcall__ getpixel (int x, int y);
+unsigned char __fastcall__ tgi_getpixel (int x, int y);
 /* Get the color value of a pixel */
 
-void __fastcall__ putpixel (int x, int y);
+void __fastcall__ tgi_setpixel (int x, int y);
 /* Plot a point in the current drawing color */
 
-void __fastcall__ line (int x1, int y1, int x2, int y2);
+void __fastcall__ tgi_line (int x1, int y1, int x2, int y2);
 /* Draw a line in the current drawing color */
 
-void __fastcall__ circle (int x, int y, unsigned radius);
+void __fastcall__ tgi_lineto (int x2, int y2);
+/* Draw a line in the current drawing color from the graphics cursor to the
+ * new end point.
+ */
+
+void __fastcall__ tgi_circle (int x, int y, unsigned radius);
 /* Draw a circle in the current drawing color */
 
-void __fastcall__ outtext (int x, int y, const char* text);
+void __fastcall__ tgi_outtext (int x, int y, const char* text);
 /* Print a text in graphics mode */
 
-void __fastcall__ bar (int x1, int y1, int x2, int y2);
+void __fastcall__ tgi_bar (int x1, int y1, int x2, int y2);
 /* Draw a bar (a filled rectangle) using the current color */
 
 
 
-/* End of graphics.h */
+/* End of tgi.h */
 #endif
 
 

@@ -21,7 +21,14 @@
 
         inc     _tgi_gmode              ; Remember that graph mode is active
 
-; Do driver initialization. First set the default palette.
+; Do driver initialization. Set draw and view pages.
+
+	lda	#0
+	jsr	tgi_setviewpage
+	lda	#0
+	jsr	tgi_setdrawpage
+
+; Set the default palette.
 
         jsr     tgi_getdefpalette       ; Get the default palette into A/X
         sta     ptr1

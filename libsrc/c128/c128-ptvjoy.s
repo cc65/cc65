@@ -1,6 +1,6 @@
 ;
 ; PTV-4 Player joystick driver for the C128
-;                                          
+;
 ; Ullrich von Bassewitz, 2003-09-28, using the C64 driver from
 ; Groepaz/Hitmen, 2002-12-23, which is
 ; obviously based on Ullrichs driver :)
@@ -21,8 +21,8 @@
 
 ; Driver signature
 
-        .byte   $6A, $6F, $79   ; "joy"
-        .byte   $00             ; Driver API version number
+        .byte   $6A, $6F, $79           ; "joy"
+        .byte   JOY_API_VERSION         ; Driver API version number
 
 ; Button state masks (8 values)
 
@@ -38,7 +38,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   COUNT
         .word   READ
 
@@ -60,15 +60,14 @@ JOY_COUNT       = 4             ; Number of joysticks we support
 INSTALL:
         lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
-
-;	rts                     ; Run into DEINSTALL instead
+;	rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 

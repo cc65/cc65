@@ -6,7 +6,7 @@
 
         .export         _joy_install, _joy_uninstall, _joy_masks
         .export         joy_clear_ptr
-              
+
         .importzp       ptr1
 
         .include        "joy-kernel.inc"
@@ -20,7 +20,7 @@
 .bss
 _joy_drv:       .res    2      		; Pointer to driver
 
-_joy_masks:     .res    JOY_MASK_COUNT
+_joy_masks:     .res    .sizeof(JOY_HDR::MASKS)
 
 ; Jump table for the driver functions.
 .data
@@ -32,8 +32,7 @@ joy_read:       jmp     $0000
 
 ; Driver header signature
 .rodata
-joy_sig:        .byte   $6A, $6F, $79, $00      ; "joy", version
-joy_sig_len     = * - joy_sig
+joy_sig:        .byte   $6A, $6F, $79, JOY_API_VERSION	; "joy", version
 
 
 ;----------------------------------------------------------------------------
@@ -49,7 +48,7 @@ _joy_install:
 
 ; Check the driver signature
 
-        ldy     #joy_sig_len-1
+        ldy     #.sizeof(joy_sig)-1
 @L0:    lda     (ptr1),y
         cmp     joy_sig,y
         bne     inv_drv
@@ -58,8 +57,8 @@ _joy_install:
 
 ; Copy the mask array
 
-        ldy     #JOY_MASKS + JOY_MASK_COUNT - 1
-        ldx     #JOY_MASK_COUNT-1
+        ldy     #JOY_HDR::MASKS + .sizeof(JOY_HDR::MASKS) - 1
+        ldx     #.sizeof(JOY_HDR::MASKS)-1
 @L1:    lda     (ptr1),y
         sta     _joy_masks,x
         dey
@@ -68,12 +67,12 @@ _joy_install:
 
 ; Copy the jump vectors
 
-        ldy     #JOY_HDR_JUMPTAB
+        ldy     #JOY_HDR::JUMPTAB
         ldx     #0
 @L2:    inx                             ; Skip the JMP opcode
         jsr     copy                    ; Copy one byte
         jsr     copy                    ; Copy one byte
-        cpx     #(JOY_HDR_JUMPCOUNT*3)
+        cpy     #(JOY_HDR::JUMPTAB + .sizeof(JOY_HDR::JUMPTAB))
         bne     @L2
 
         jmp     joy_install             ; Call driver install routine

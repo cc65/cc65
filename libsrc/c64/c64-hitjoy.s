@@ -21,7 +21,7 @@
 ; Driver signature
 
         .byte   $6A, $6F, $79	; "joy"
-        .byte   $00             ; Driver API version number
+        .byte   JOY_API_VERSION	; Driver API version number
 
 ; Button state masks (8 values)
 
@@ -103,11 +103,9 @@ pollirq:
          ldy #$00  ; port b direction
          sty $dd03 ; => input
 
-;         ldy #$00
          sty $dd05 ; cia2 timer a highbyte
          sty $dc05 ; cia1 timer a highbyte
          iny
-;         lda #$01
          sty $dd04 ; cia2 timer a lowbyte
          sty $dc04 ; cia1 timer a lowbyte
 
@@ -119,10 +117,6 @@ pollirq:
                    ; serial port: input
 
          ; cia 1 setup
-
-;         lda #%00000001
-;         sty $dc0d ; irq ctrl reg
-
          lda #%01010001
          sta $dc0e ; control register a
                    ; timer: start
@@ -132,13 +126,11 @@ pollirq:
 
 
          ; read directions 3
-
          lda $dd01 ;read cia 2 port b
          and #$0f
          sta temp3
 
          ; read button 3
-
          lda $dd02      ;cia 2 port a
          and #%11111011 ;data direction
          sta $dd02      ;=> bit 2 input
@@ -151,7 +143,6 @@ pollirq:
          sta temp3
 
          ; read directions 4
-
          lda $dd01 ;read cia 2 port b
          lsr a
          lsr a
@@ -160,7 +151,6 @@ pollirq:
          sta temp4
 
          ; read button 4
-
          ldx #$ff ;serial data register
          stx $dc0c;=> writing $ff causes
                   ;cia to output some

@@ -23,7 +23,7 @@
 ; Driver signature
 
         .byte   $6A, $6F, $79		; "joy"
-        .byte   $00                     ; Driver API version number
+        .byte   JOY_API_VERSION         ; Driver API version number
 
 ; Button state masks (8 values)
 
@@ -65,7 +65,6 @@ JOY_COUNT       = 2             ; Number of joysticks we support
 INSTALL:
         lda     #<JOY_ERR_OK
         ldx     #>JOY_ERR_OK
-
 ;	rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------

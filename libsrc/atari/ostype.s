@@ -45,6 +45,7 @@
 
 	.include	"atari.inc"
 	.export		_get_ostype
+	.importzp	tmp1
 
 .proc	_get_ostype
 
@@ -68,7 +69,28 @@
 	asl	a
 	asl	a
 	asl	a
+	and	#%11100000
 	ora	#%11
+_fin_xl:sta	tmp1
+	lda	PALNTS		; get OS PAL/NTSC flag (0 = NTSC, 1 = PAL)
+	beq	_xl_ntsc
+	cmp	#1
+	beq	_xl_pal
+	lda	#0
+	beq	_fxlcont
+
+_xl_ntsc:
+	lda	#%10
+	bne	_fxlcont
+
+_xl_pal:lda	#1
+
+_fxlcont:
+	asl	a
+	asl	a
+	asl	a
+	ora	tmp1
+
 _fin:	ldx	#0
 	rts
 
@@ -99,7 +121,7 @@ _1200_11:
 
 _1200_fin:
 	ora	#%010
-	bne	_fin
+	bne	_fin_xl
 
 ; 400/800 ROM
 
@@ -116,7 +138,7 @@ _400800:
 	lda	#%00110001
 	bne	_400800_done
 
-; 400/900 unknown
+; 400/800 unknown
 
 _400800_unknown:
 	lda	#%00000001

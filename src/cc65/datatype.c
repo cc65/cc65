@@ -342,6 +342,9 @@ void PrintFuncSig (FILE* F, const char* Name, type* Type)
  	    if (I > 0) {
  		fprintf (F, ", ");
  	    }
+            if (SymIsRegVar (E)) {
+                fprintf (F, "register ");
+            }
  	    PrintType (F, E->Type);
  	    E = E->NextSym;
  	}

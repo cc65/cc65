@@ -116,6 +116,11 @@ unsigned OptAdd3 (CodeSeg* S);
  */
 
 unsigned OptAdd4 (CodeSeg* S);
+/* Search for a call to incaxn and replace it by an 8 bit add if the X register
+ * is not used later.
+ */
+
+unsigned OptAdd5 (CodeSeg* S);
 /* Search for the sequence
  *
  *  	adc     ...

@@ -1099,6 +1099,84 @@ static unsigned OptPtrLoad5 (CodeSeg* S)
 
 
 static unsigned OptPtrLoad6 (CodeSeg* S)
+/* Search for the sequence:
+ *
+ *      lda     zp
+ *      ldx     zp+1
+ *      ldy     xx
+ *      jsr     ldaxidx
+ *
+ * and replace it by:
+ *
+ *      ldy     xx
+ *      lda     (zp),y
+ *      tax
+ *      dey
+ *      lda     (zp),y
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[4];
+	unsigned Len;
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_LDA && L[0]->AM == AM65_ZP        &&
+       	    CS_GetEntries (S, L+1, I+1, 3)     	                &&
+            !CS_RangeHasLabel (S, I+1, 3)                       &&
+       	    L[1]->OPC == OP65_LDX && L[1]->AM == AM65_ZP        &&
+            (Len = strlen (L[0]->Arg)) > 0                      &&
+            strncmp (L[0]->Arg, L[1]->Arg, Len) == 0            &&
+            strcmp (L[1]->Arg + Len, "+1") == 0                 &&
+	    L[2]->OPC == OP65_LDY                               &&
+       	    CE_IsCallTo (L[3], "ldaxidx")) {
+
+	    CodeEntry* X;
+
+       	    /* lda (zp),y */
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, L[0]->Arg, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+4);
+
+	    /* tax */
+            X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[3]->LI);
+            CS_InsertEntry (S, X, I+5);
+
+	    /* dey */
+            X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[3]->LI);
+            CS_InsertEntry (S, X, I+6);
+
+       	    /* lda (zp),y */
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, L[0]->Arg, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+7);
+
+	    /* Remove the old code */
+	    CS_DelEntry (S, I+3);
+	    CS_DelEntries (S, I, 2);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptPtrLoad7 (CodeSeg* S)
 /* Search for the sequence
  *
  *      ldy     ...
@@ -1392,7 +1470,8 @@ static OptFunc DOpt65C02Stores  = { Opt65C02Stores,  "Opt65C02Stores",  100, 0, 
 static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",        	125, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",        	200, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",        	 90, 0, 0, 0, 0, 0 };
-static OptFunc DOptAdd4	       	= { OptAdd4,   	     "OptAdd4",        	 40, 0, 0, 0, 0, 0 };
+static OptFunc DOptAdd4	       	= { OptAdd4,   	     "OptAdd4",        	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptAdd5	       	= { OptAdd5,   	     "OptAdd5",        	 40, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBranchDist  	= { OptBranchDist,   "OptBranchDist",     0, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp1	       	= { OptCmp1,   	     "OptCmp1",        	 85, 0, 0, 0, 0, 0 };
@@ -1424,7 +1503,8 @@ static OptFunc DOptPtrLoad2    	= { OptPtrLoad2,     "OptPtrLoad2",    	100, 0, 
 static OptFunc DOptPtrLoad3    	= { OptPtrLoad3,     "OptPtrLoad3",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad4    	= { OptPtrLoad4,     "OptPtrLoad4",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",    	 65, 0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",    	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",    	 86, 0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad7    	= { OptPtrLoad7,     "OptPtrLoad7",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPush1       	= { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
@@ -1456,6 +1536,7 @@ static OptFunc* OptFuncs[] = {
     &DOptAdd2,
     &DOptAdd3,
     &DOptAdd4,
+    &DOptAdd5,
     &DOptBoolTrans,
     &DOptBranchDist,
     &DOptCmp1,
@@ -1485,6 +1566,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrLoad4,
     &DOptPtrLoad5,
     &DOptPtrLoad6,
+    &DOptPtrLoad7,
     &DOptPtrStore1,
     &DOptPtrStore2,
     &DOptPush1,
@@ -1706,7 +1788,7 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
     /* Don't run the function if it is disabled or if it is prohibited by the
      * code size factor
      */
-    if (F->Disabled || CodeSizeFactor < F->CodeSizeFactor) {
+    if (F->Disabled || F->CodeSizeFactor > CodeSizeFactor) {
     	return 0;
     }
 
@@ -1748,6 +1830,7 @@ static unsigned RunOptGroup1 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptPtrLoad3, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad4, 1);
     Changes += RunOptFunc (S, &DOptPtrLoad5, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad6, 1);
     Changes += RunOptFunc (S, &DOptNegAX1, 1);
     Changes += RunOptFunc (S, &DOptNegAX2, 1);
     Changes += RunOptFunc (S, &DOptNegAX3, 1);
@@ -1796,12 +1879,13 @@ static unsigned RunOptGroup3 (CodeSeg* S)
     do {
        	C = 0;
 
-       	C += RunOptFunc (S, &DOptPtrLoad6, 1);
+       	C += RunOptFunc (S, &DOptPtrLoad7, 1);
        	C += RunOptFunc (S, &DOptNegA1, 1);
        	C += RunOptFunc (S, &DOptNegA2, 1);
        	C += RunOptFunc (S, &DOptSub1, 1);
        	C += RunOptFunc (S, &DOptSub2, 1);
-       	C += RunOptFunc (S, &DOptAdd3, 1);
+       	C += RunOptFunc (S, &DOptAdd4, 1);
+       	C += RunOptFunc (S, &DOptAdd5, 1);
        	C += RunOptFunc (S, &DOptStackOps, 1);
        	C += RunOptFunc (S, &DOptJumpCascades, 1);
        	C += RunOptFunc (S, &DOptDeadJumps, 1);

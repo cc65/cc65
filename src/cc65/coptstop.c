@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -72,13 +72,13 @@ struct StackOpData {
 
 
 /*****************************************************************************/
-/*     		      	       	    Helpers                                  */
+/*     	   	      	       	    Helpers                                  */
 /*****************************************************************************/
 
 
 
 static unsigned AdjustStackOffset (CodeSeg* S, unsigned Start, unsigned Stop,
-		  	  	   unsigned Offs)
+	   	  	  	   unsigned Offs)
 /* Adjust the offset for all stack accesses in the range Start to Stop, both
  * inclusive. The function returns the number of instructions that have been
  * inserted.
@@ -114,31 +114,50 @@ static unsigned AdjustStackOffset (CodeSeg* S, unsigned Start, unsigned Stop,
 
      	    CodeEntry* P;
 
+            /* If the Y register value is needed later, we have to reload the
+             * register after changing it.
+             */
+            int NeedY = RegYUsed (S, I+1);
+            unsigned YVal = E->RI->In.RegY;
+
      	    /* Get the code entry before this one. If it's a LDY, adjust the
      	     * value.
      	     */
      	    P = CS_GetPrevEntry (S, I);
      	    if (P && P->OPC == OP65_LDY && CE_KnownImm (P)) {
 
-     		/* The Y load is just before the stack access, adjust it */
-     		CE_SetNumArg (P, P->Num - Offs);
+     	   	/* The Y load is just before the stack access, adjust it */
+     	   	CE_SetNumArg (P, P->Num - Offs);
 
      	    } else {
 
-     		/* Insert a new load instruction before the stack access */
-     		const char* Arg = MakeHexArg (E->RI->In.RegY - Offs);
-     		CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
-     		CS_InsertEntry (S, X, I);
+     	   	/* Insert a new load instruction before the stack access */
+     	   	const char* Arg = MakeHexArg (YVal - Offs);
+     	   	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+     	   	CS_InsertEntry (S, X, I);
 
-     		/* One more inserted entries */
-     		++Inserted;
-     		++Stop;
+     	   	/* One more inserted entries */
+     	   	++Inserted;
+     	   	++Stop;
 
-     		/* Be sure to skip the stack access for the next round */
-     		++I;
+     	   	/* Be sure to skip the stack access for the next round */
+     	   	++I;
 
      	    }
 
+            /* If we need the value of Y later, be sure to reload it */
+            if (NeedY) {
+     	   	const char* Arg = MakeHexArg (YVal);
+     	   	CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+     	   	CS_InsertEntry (S, X, I+1);
+
+     	   	/* One more inserted entries */
+     	   	++Inserted;
+     	   	++Stop;
+
+     	   	/* Skip this instruction int the next round */
+     	   	++I;
+            }
      	}
 
      	/* Next entry */

@@ -34,6 +34,18 @@
 
 
 
+# Things currently missing:
+#
+#   - Scoping with .proc/.endproc
+#   - .global is ignored
+#   - .constructor/.destructor/.condes dito
+#   - .ignorecase is ignored, labels are always case sensitive
+#   - .include handling (difficult)
+#   - The global namespace operator ::
+#
+
+
+
 use strict 'vars';
 use warnings;
 
@@ -68,7 +80,7 @@ my $IndexPage  	= 0;		# Create an index page
 my $LinkStyle  	= 0;		# Default link style
 my $ReplaceExt 	= 0;		# Replace extension instead of appending
 my $TextColor  	= "#000000";	# Text color
-my $Verbose    	= 0;		# Be quiet
+my $Verbose    	= 0;	       	# Be quiet
 
 # Table used to convert the label number into names
 my @NameTab    	= ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
@@ -283,7 +295,7 @@ sub RefLabel {
 
 
 #-----------------------------------------------------------------------------#
-#    	     	   		    Pass 1 		   		      #
+#    	     	   	       	    Pass 1 		   		      #
 # ----------------------------------------------------------------------------#
 
 

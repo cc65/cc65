@@ -193,7 +193,7 @@ INIT:
 
         lda     $D011        	; And turn on bitmap
         ora     #$20
-        sta     $D011
+DONE1:  sta     $D011
 
 ; Done, reset the error code
 
@@ -221,8 +221,7 @@ DONE:   lda     $DD02           ; Set the data direction regs
 
         lda     $D011
         and     #<~$20
-        sta     $D011
-        rts
+        jmp     DONE1
 
 ; ------------------------------------------------------------------------
 ; GETERROR: Return the error code in A and clear it.

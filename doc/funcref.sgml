@@ -217,7 +217,14 @@ function.
 
 <sect1><tt/joystick.h/<label id="joystick.h"><p>
 
-(incomplete)
+<itemize>
+<item><ref id="joy_count" name="joy_count">
+<item><ref id="joy_install" name="joy_install">
+<item><ref id="joy_load_driver" name="joy_load_driver">
+<item><ref id="joy_read" name="joy_read">
+<item><ref id="joy_uninstall" name="joy_uninstall">
+<item><ref id="joy_unload" name="joy_unload">
+</itemize>
 
 
 <sect1><tt/locale.h/<label id="locale.h"><p>
@@ -2679,6 +2686,156 @@ used in presence of a prototype.
 <ref id="ltoa" name="ltoa">,
 <ref id="ultoa" name="ultoa">,
 <ref id="utoa" name="utoa">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>joy_count<label id="joy_count"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the number of joysticks supported by the current driver.
+<tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ joy_count (void);/
+<tag/Description/The function returns a the number of joysticks supported
+by the current joystick driver.
+<tag/Limits/<itemize>
+<item>A joystick driver must be loaded using <ref id="joy_load_driver"
+name="joy_load_driver"> before calling this function.
+<item>The function returns the number of joysticks supported by the driver.
+There's no way to check for the number of actually connected joysticks.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="joy_load_driver" name="joy_load_driver">,
+<ref id="joy_read" name="joy_read">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>joy_install<label id="joy_install"><p>
+
+<quote>
+<descrip>
+<tag/Function/Install an already loaded driver and return an error code.
+<tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ joy_install (void* driver);/
+<tag/Description/The function installs a driver that was already loaded into
+memory (or linked statically to the program). It returns an error code
+(<tt/JOY_ERR_OK/ in case of success).
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="joy_load_driver" name="joy_load_driver">,
+<ref id="joy_uninstall" name="joy_uninstall">,
+<ref id="joy_unload" name="joy_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>joy_load_driver<label id="joy_load_driver"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load a driver from disk and install it.
+<tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ joy_load_driver (const char* driver);/
+<tag/Description/The function loads a driver with the given name from disk
+and installs it. An error code is returned, which is <tt/JOY_ERR_OK/ if the
+driver was successfully loaded and installed.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="joy_install" name="joy_install">,
+<ref id="joy_uninstall" name="joy_uninstall">,
+<ref id="joy_unload" name="joy_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>joy_read<label id="joy_read"><p>
+
+<quote>
+<descrip>
+<tag/Function/Read the status of a joystick.
+<tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ joy_read (unsigned char joystick);/
+<tag/Description/The function reads the status bits for a joystick. The number
+of the joystick is passed as parameter. The result may be examined by using one
+of the <tt/JOY_xxx/ macros from <ref id="joystick.h" name="joystick.h">.
+<tag/Limits/<itemize>
+<item>A joystick driver must be loaded using <ref id="joy_load_driver"
+name="joy_load_driver"> before calling this function.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="joy_count" name="joy_count">,
+<ref id="joy_load_driver" name="joy_load_driver">,
+<ref id="joy_unload" name="joy_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>joy_uninstall<label id="joy_uninstall"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uninstall the current joystick driver.
+<tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ joy_uninstall (void);/
+<tag/Description/The function uninstalls the currently installed joystick
+driver. It does not remove the driver from memory. The function returns an
+error code, which is <tt/JOY_ERR_OK/ if the driver was successfully uninstalled.
+<tag/Limits/<itemize>
+<item>A joystick driver must be installed using <ref id="joy_install"
+name="joy_install"> before calling this function.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="joy_install" name="joy_install">,
+<ref id="joy_load_driver" name="joy_load_driver">,
+<ref id="joy_unload" name="joy_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>joy_unload<label id="joy_unload"><p>
+
+<quote>
+<descrip>
+<tag/Function/Uninstall, then unload the current joystick driver.
+<tag/Header/<tt/<ref id="joystick.h" name="joystick.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ joy_unload (void);/
+<tag/Description/The function uninstalls the currently installed joystick
+driver and removes it from memory. An error code is returned, which is 
+<tt/JOY_ERR_OK/ if the driver was successfully uninstalled.
+<tag/Limits/<itemize>
+<item>A joystick driver must be loaded using <ref id="joy_load_driver"
+name="joy_load_driver"> before calling this function.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="joy_load_driver" name="joy_load_driver">
 <tag/Example/None.
 </descrip>
 </quote>

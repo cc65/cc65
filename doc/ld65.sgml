@@ -346,7 +346,6 @@ specify a segment attribute. There are five possible segment attributes:
 		the VICE label file if -Lp is given
 	rw   	means read/write
 	bss  	means that this is an uninitialized segment
-	empty	will not go in any output file
 	zp	a zeropage segment
 </verb></tscreen>
 

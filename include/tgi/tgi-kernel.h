@@ -54,9 +54,10 @@ typedef struct {
     unsigned char       version;        /* Interface version */
     unsigned            xres;           /* X resolution */
     unsigned            yres;           /* Y resolution */
-    unsigned char       colors;         /* Number of available colors */
-    unsigned char	error;		/* Error code */
-    unsigned char       res[6];         /* Reserved for extensions */
+    unsigned char       colorcount;     /* Number of available colors */
+    unsigned char       pagecount;      /* Number of screens available */
+    unsigned char	error;	       	/* Error code */
+    unsigned char       res[5];         /* Reserved for extensions */
 
     /* Jump vectors. Note that these are not C callable */
     void*               install;        /* INSTALL routine */
@@ -65,6 +66,8 @@ typedef struct {
     void*               done;           /* DONE routine */
     void*               control;        /* CONTROL routine */
     void*               clear;          /* CLEAR routine */
+    void*               setviewpage;    /* SETVIEWPAGE routine */
+    void*               setdrawpage;    /* SETDRAWPAGE routine */
     void*               setcolor;       /* SETCOLOR routine */
     void*               setpixel;       /* SETPIXEL routine */
     void*               getpixel;       /* GETPIXEL routine */
@@ -77,11 +80,17 @@ typedef struct {
 
 
 /* TGI kernel variables */
-extern tgi_drv_header*	tgi_drv;	/* Pointer to driver */
-extern unsigned char  	tgi_error;	/* Last error code */
+extern tgi_drv_header*	tgi_drv;       	/* Pointer to driver */
+extern unsigned char  	tgi_error;     	/* Last error code */
 extern unsigned char    tgi_mode;       /* Graphics mode or zero */
+extern int              tgi_curx;       /* Current drawing cursor X */
+extern int              tgi_cury;       /* Current drawing cursor Y */
+extern unsigned char    tgi_color;      /* Current drawing color */
+extern unsigned char    tgi_bgcolor;    /* Current background color */
 extern unsigned         tgi_xres;       /* X resolution of the current mode */
 extern unsigned         tgi_yres;       /* Y resolution of the current mode */
+extern unsigned char    tgi_colorcount; /* Number of available colors */
+extern unsigned char    tgi_pagecount;  /* Number of available screens */
 
 
 

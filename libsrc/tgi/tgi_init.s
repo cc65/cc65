@@ -9,6 +9,7 @@
         .include        "tgi-error.inc"
 
         .import         _tgi_done
+        .import         _tgi_setcolor
         .export         _tgi_init
 
 _tgi_init:
@@ -18,8 +19,13 @@ _tgi_init:
         sta     _tgi_mode               ; Remember the mode
         jsr     tgi_init                ; Go into graphics mode
         jsr     tgi_fetch_error         ; Get the error code
-        beq     @L1                     ; Jump if no error
-        lda     #$00
+        bne     @L1                     ; Jump on error
+        ldx     _tgi_colorcount
+        dex
+        txa
+        jmp     _tgi_setcolor           ; tgi_setcolor (tgi_getmaxcolor ());
+
+@L1:    lda     #$00
         sta     _tgi_mode               ; Clear the mode if init was not successful
-@L1:    rts
+        rts
 

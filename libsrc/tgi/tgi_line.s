@@ -8,15 +8,12 @@
         .include        "tgi-kernel.inc"
 
         .import         popax
-        .importzp       ptr1, ptr2, ptr3, ptr4
+        .importzp       ptr1, ptr2
         .export         _tgi_line
 
 _tgi_line:
-        sta     ptr4            ; Get the coordinates
-        stx     ptr4+1
-        jsr     popax
-        sta     ptr3
-        stx     ptr3+1
+        jsr     tgi_linepop     ; Pop/store Y2/X2
+
         jsr     popax
         sta     ptr2
         stx     ptr2+1

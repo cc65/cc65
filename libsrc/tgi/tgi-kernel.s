@@ -19,9 +19,13 @@
 _tgi_drv:	.res	2		; Pointer to driver
 _tgi_error:	.res	1		; Last error code
 _tgi_mode:      .res    1               ; Graphics mode or zero
+_tgi_curx:      .res    2               ; Current drawing cursor X
+_tgi_cury:      .res    2               ; Current drawing cursor Y
+_tgi_color:     .res    1               ; Current drawing color
+_tgi_bgcolor:   .res    1               ; Current background color
 _tgi_xres:      .res    2               ; X resolution of the current mode
 _tgi_yres:      .res    2               ; Y resolution of the current mode
-_tgi_colors:    .res    1               ; Number of available colors
+_tgi_colorcount:.res    1               ; Number of available colors
 _tgi_pagecount: .res    1               ; Number of available screen pages
 
 
@@ -95,8 +99,10 @@ _tgi_setup:
 ; Initialize variables
 
         lda     #$00
-        sta     _tgi_error
-        sta     _tgi_mode
+        ldx     #6-1
+@L4:    sta     _tgi_error,x            ; Clear error/mode/curx/cury
+        dex
+        bpl     @L4
 
         jsr     tgi_install             ; Call driver install routine
 

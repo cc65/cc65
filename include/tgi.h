@@ -95,6 +95,12 @@ unsigned char __fastcall__ tgi_geterror (void);
 void __fastcall__ tgi_clear (void);
 /* Clear the screen */
 
+void __fastcall__ tgi_setviewpage (unsigned char page);
+/* Set the visible page. */
+
+void __fastcall__ tgi_setdrawpage (unsigned char page);
+/* Set the drawable page */
+
 unsigned char __fastcall__ tgi_getmaxcolor (void);
 /* Return the maximum supported color number (the number of colors would
  * then be getmaxcolor()+1).
@@ -109,6 +115,9 @@ unsigned __fastcall__ tgi_getmaxy (void);
 /* Return the maximum y coordinate. The resolution in y direction is
  * getmaxy() + 1
  */
+
+unsigned char __fastcall__ tgi_getcolorcount (void);
+/* Get the number of available colors */
 
 unsigned __fastcall__ tgi_getxres (void);
 /* Return the resolution in X direction */

@@ -37,7 +37,7 @@
 #define SCANNER_H
 
 
-                   
+
 /* common */
 #include "attrib.h"
 
@@ -66,7 +66,12 @@ typedef enum {
     CFGTOK_EOF,
 
     /* Primary blocks */
+    CFGTOK_CPU,
     CFGTOK_MEMORY,
+
+    /* CPU block */
+    CFGTOK_TYPE,
+    CFGTOK_ADDRSPACE,
 
     /* Special identifiers */
     CFGTOK_TRUE,
@@ -121,6 +126,9 @@ void CfgConsumeSemi (void);
 
 void CfgConsumeColon (void);
 /* Consume a colon */
+
+void CfgConsumeRCurly (void);
+/* Consume a right curly brace */
 
 void CfgOptionalComma (void);
 /* Consume a comma if there is one */

@@ -63,6 +63,92 @@
 
 
 
+static void FlagAttr (unsigned* Flags, unsigned Mask, const char* Name)
+/* Check if the item is already defined. Print an error if so. If not, set
+ * the marker that we have a definition now.
+ */
+{
+    if (*Flags & Mask) {
+    	CfgError ("%s is already defined", Name);
+    }
+    *Flags |= Mask;
+}
+
+
+
+static void AttrCheck (unsigned Attr, unsigned Mask, const char* Name)
+/* Check that a mandatory attribute was given */
+{
+    if ((Attr & Mask) == 0) {
+	CfgError ("%s attribute is missing", Name);
+    }
+}
+
+
+
+static void ParseCPU (void)
+/* Parse a CPU section */
+{
+    static const IdentTok Attributes [] = {
+        {   "TYPE",             CFGTOK_TYPE             },
+        {   "ADDRSPACE",        CFGTOK_ADDRSPACE        },
+    };
+
+    enum {
+        atNone      = 0x0000,
+        atType      = 0x0001,
+        atAddrSpace = 0x0002
+    };
+    unsigned Attr = 0;
+    unsigned long Size = 0;
+
+
+    while (CfgTok == CFGTOK_IDENT) {
+
+        cfgtok_t AttrTok;
+        CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+        AttrTok = CfgTok;
+
+        /* An optional assignment follows */
+        CfgNextTok ();
+        CfgOptionalAssign ();
+
+        /* Check which attribute was given */
+        switch (AttrTok) {
+
+            case CFGTOK_TYPE:
+                FlagAttr (&Attr, atType, "TYPE");
+                CfgAssureIdent ();
+                /* ### */
+                break;
+
+            case CFGTOK_ADDRSPACE:
+                FlagAttr (&Attr, atAddrSpace, "ADDRSPACE");
+                CfgAssureInt ();
+                CfgRangeCheck (0x1000, 0x1000000);
+                Size = CfgIVal;
+                break;
+
+            default:
+                FAIL ("Unexpected attribute token");
+
+        }
+
+        /* Skip the attribute value and an optional comma */
+        CfgNextTok ();
+        CfgOptionalComma ();
+    }
+
+    /* Must have some attributes */
+    AttrCheck (Attr, atType, "TYPE");
+    AttrCheck (Attr, atAddrSpace, "ADDRSPACE");
+
+    /* Skip the semicolon */
+    CfgConsumeSemi ();
+}
+
+
+
 static void ParseMemory (void)
 /* Parse a MEMORY section */
 {
@@ -241,6 +327,7 @@ static void ParseConfig (void)
 /* Parse the config file */
 {
     static const IdentTok BlockNames [] = {
+       	{   "CPU",     	CFGTOK_CPU      },
        	{   "MEMORY",  	CFGTOK_MEMORY   },
     };
     cfgtok_t BlockTok;
@@ -258,6 +345,10 @@ static void ParseConfig (void)
 	/* Read the block */
 	switch (BlockTok) {
 
+            case CFGTOK_CPU:
+                ParseCPU ();
+                break;
+
             case CFGTOK_MEMORY:
                 ParseMemory ();
                 break;
@@ -268,7 +359,7 @@ static void ParseConfig (void)
 	}
 
 	/* Skip closing brace */
-	CfgConsume (CFGTOK_RCURLY, "`}' expected");
+       	CfgConsumeRCurly ();
 
     } while (CfgTok != CFGTOK_EOF);
 }

@@ -67,9 +67,6 @@ struct SimData {
     void (*Internal) (const char* Format, ...);
     /* Print an internal program error and terminate */
 
-    void (*Break) (const char* Format, ...);
-    /* Stop the CPU and display the given message */
-
     int (*GetCfgId) (void* CfgInfo, const char* Name, char** Id);
     /* Search CfgInfo for an attribute with the given name and type "id". If
      * found, remove it from the configuration, pass a pointer to a dynamically
@@ -91,6 +88,18 @@ struct SimData {
      * If found, remove it from the configuration, copy it into Val and return
      * true. If not found, return false.
      */
+
+    void (*Break) (const char* Format, ...);
+    /* Stop the CPU and display the given message */
+
+    void (*IRQ) (void);
+    /* Issue an irq request */
+
+    void (*NMI) (void);
+    /* Issue an nmi request */
+
+    
+
 };
 
 

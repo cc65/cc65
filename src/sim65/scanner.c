@@ -237,7 +237,7 @@ Again:
 	    break;
 
 	case '.':
-	    NextChar ();   
+	    NextChar ();
             if (C == '.') {
                 NextChar ();
                 CfgTok = CFGTOK_DOTDOT;
@@ -324,6 +324,14 @@ void CfgConsumeColon (void)
 /* Consume a colon */
 {
     CfgConsume (CFGTOK_COLON, "`:' expected");
+}
+
+
+
+void CfgConsumeRCurly (void)
+/* Consume a right curly brace */
+{
+    CfgConsume (CFGTOK_RCURLY, "`}' expected");
 }
 
 

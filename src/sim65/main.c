@@ -308,9 +308,10 @@ int main (int argc, char* argv[])
     CfgRead ();
 
     CPUInit ();
-#if 1
-    CPURun ();
-#endif
+
+    while (1) {
+        CPURun ();
+    }
 
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;

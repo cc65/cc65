@@ -102,10 +102,12 @@ static const SimData Sim65Data = {
     Warning,
     Error,
     Internal,
-    Break,
     GetCfgId,
     GetCfgStr,
-    GetCfgNum
+    GetCfgNum,
+    Break,
+    IRQRequest,
+    NMIRequest,
 };
 
 

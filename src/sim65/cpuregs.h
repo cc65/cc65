@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                   cpucore.h                               */
+/*                                 cpuregs.h                                 */
 /*                                                                           */
-/*                        CPU core for the 6502 simulator                    */
+/*                               CPU registers                               */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,56 +33,49 @@
 
 
 
-#ifndef CPUCORE_H
-#define CPUCORE_H
-
-
-
-/* sim65 */
-#include "cpuregs.h"
+#ifndef CPUREGS_H
+#define CPUREGS_H
 
 
 
 /*****************************************************************************/
-/*  	   			     Data				     */
+/*     		    		     Data				     */
 /*****************************************************************************/
 
 
 
-/* Registers */
-extern CPURegs Regs;
+typedef struct CPURegs CPURegs;
+struct CPURegs {
+    unsigned    AC;		/* Accumulator */
+    unsigned    XR;		/* X register */
+    unsigned    YR;		/* Y register */
+    unsigned    ZR;             /* Z register */
+    unsigned    SR;		/* Status register */
+    unsigned    SP;		/* Stackpointer */
+    unsigned	PC;		/* Program counter */
+};
+
+/* Status register bits */
+#define CF	0x01		/* Carry flag */
+#define ZF	0x02		/* Zero flag */
+#define IF	0x04		/* Interrupt flag */
+#define DF	0x08		/* Decimal flag */
+#define BF	0x10   		/* Break flag */
+#define OF	0x40		/* Overflow flag */
+#define SF	0x80		/* Sign flag */
 
 
 
 /*****************************************************************************/
-/*  			   	     Code				     */
+/*     	     	    	   	     Code				     */
 /*****************************************************************************/
 
 
 
-void CPUInit (void);
-/* Initialize the CPU */
-
-void RESET (void);
-/* Generate a CPU RESET */
-
-void IRQRequest (void);
-/* Generate an IRQ */
-
-void NMIRequest (void);
-/* Generate an NMI */
-
-void Break (const char* Format, ...);
-/* Stop running and display the given message */
-
-void CPURun (void);
-/* Run one CPU instruction */
-
-
-
-/* End of cpucore.h */
+/* End of cpuregs.h */
 
 #endif
+
 
 
 

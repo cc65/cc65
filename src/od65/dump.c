@@ -380,9 +380,9 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
     for (I = 0; I < Count; ++I) {
 
 	/* Read the data for one file */
+       	const char*   Name  = GetString (&StrPool, ReadVar (F));
 	unsigned long MTime = Read32 (F);
 	unsigned long Size  = Read32 (F);
-	char*	      Name  = ReadStr (F);
 	unsigned      Len   = strlen (Name);
 
 	/* Print the header */
@@ -392,9 +392,6 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
 	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
        	printf ("      Size:%26lu\n", Size);
 	printf ("      Modification time:%13lu  (%s)\n", MTime, TimeToStr (MTime));
-
-	/* Free the Name */
-	xfree (Name);
     }
 
     /* Destroy the string pool */

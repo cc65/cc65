@@ -199,24 +199,17 @@ static void WhileStatement (void)
     /* Test the loop condition */
     test (lab, 0);
 
-    /* If the statement following the while loop is empty, that is, we have
-     * something like "while (1) ;", the test function ommitted the jump as
-     * an optimization. Since we know, the condition codes are set, we can
-     * do another small optimization here, and use a conditional jump
-     * instead an absolute one.
-     */
-    if (CurTok.Tok == TOK_SEMI) {
-    	/* Use a conditional jump */
-    	g_truejump (CF_NONE, loop);
-    	/* Shortcut */
-    	NextToken ();
-    } else {
-    	/* There is code inside the while loop, parse the body */
-    	Statement (&PendingToken);
-    	g_jump (loop);
-    	g_defcodelabel (lab);
-	SkipPending (PendingToken);
-    }
+    /* Loop body */
+    Statement (&PendingToken);
+    
+    /* Jump back to loop top */
+    g_jump (loop);
+    
+    /* Exit label */
+    g_defcodelabel (lab);
+    
+    /* Eat remaining tokens that were delay because of line info correctness */
+    SkipPending (PendingToken);
 
     /* Remove the loop from the loop stack */
     DelLoop ();
@@ -641,7 +634,7 @@ static void ForStatement (void)
     struct expent lval1;
     struct expent lval2;
     struct expent lval3;
-    int HaveIncExpr;  
+    int HaveIncExpr;
     CodeMark IncExprStart;
     CodeMark IncExprEnd;
     int PendingToken;
@@ -652,7 +645,7 @@ static void ForStatement (void)
     unsigned IncLabel  = GetLocalLabel ();
     unsigned lstat     = GetLocalLabel ();
 
-    /* Skip the FOR token */	       
+    /* Skip the FOR token */
     NextToken ();
 
     /* Add the loop to the loop stack */
@@ -715,7 +708,7 @@ static void ForStatement (void)
 	/* Jump back to the increment expression */
 	g_jump (IncLabel);
     }
-    
+
     /* Skip a pending token if we have one */
     SkipPending (PendingToken);
 

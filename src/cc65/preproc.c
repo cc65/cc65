@@ -595,9 +595,13 @@ static void MacroCall (StrBuf* Target, Macro* M)
 
     /* Compare formal and actual argument count */
     if (CollCount (&E.ActualArgs) != (unsigned) M->ArgCount) {
-    	PPError ("Macro argument count mismatch");
-    	/* Be sure to make enough empty arguments available */
+
         StrBuf Arg = STATIC_STRBUF_INITIALIZER;
+
+        /* Argument count mismatch */
+    	PPError ("Macro argument count mismatch");
+
+    	/* Be sure to make enough empty arguments available */
        	while (CollCount (&E.ActualArgs) < (unsigned) M->ArgCount) {
             ME_AppendActual (&E, &Arg);
     	}

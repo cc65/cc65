@@ -1,0 +1,137 @@
+/*****************************************************************************/
+/*                                                                           */
+/*				     o65.h				     */
+/*                                                                           */
+/*		      Definitions for the o65 file format		     */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 2002      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
+
+
+
+/* This files exports structures and constants to handle the o65 relocatable
+ * file format as defined by Andre Fachat. See the original document under
+ *
+ *      http://www.6502.org/users/andre/o65/fileformat.html
+ *
+ * for more information.
+ */
+
+
+
+#ifndef _O65_H
+#define _O65_H
+
+
+
+/* o65 size type. It is 2 bytes for the 6502 and 4 bytes for the 65816 */
+typedef unsigned o65_size;
+
+
+/* Define a structure with the sid register offsets */
+typedef struct o65_header o65_header;
+struct o65_header {
+    char        marker[2];      /* Non-C64 marker */
+    char        magic[3];       /* o65 magic */
+    char        version;	/* Version number */
+    unsigned    mode;           /* Mode word */
+    o65_size	tbase;          /* Original text (code) segment address */
+    o65_size    tlen;           /* Size of text (code) segment */
+    o65_size    dbase;          /* Original data segment address */
+    o65_size    dlen;           /* Size of data segment */
+    o65_size    bbase;          /* Original bss segment address */
+    o65_size    blen;           /* Size of bss segment */
+    o65_size    zbase;          /* Original zp segment address */
+    o65_size    zlen;           /* Size of zp segment */
+    o65_size    stack;          /* Stacksize needed */
+};
+
+
+
+/* Defines for the mode word */
+#define O65_CPU_65816           0x8000 	/* Executable is for 65816 */
+#define O65_CPU_6502            0x0000  /* Executable is for the 6502 */
+#define O65_CPU_MASK            0x8000  /* Mask to extract CPU type */
+
+#define O65_RELOC_PAGE          0x4000  /* Page wise relocation */
+#define O65_RELOC_BYTE          0x0000  /* Byte wise relocation */
+#define O65_RELOC_MASK          0x4000  /* Mask to extract relocation type */
+
+#define O65_SIZE_32BIT          0x2000 	/* All size words are 32bit */
+#define O65_SIZE_16BIT          0x0000  /* All size words are 16bit */
+#define O65_SIZE_MASK           0x2000  /* Mask to extract size */
+
+#define O65_ALIGN_1             0x0000  /* Bytewise alignment */
+#define O65_ALIGN_2             0x0001  /* Align words */
+#define O65_ALIGN_4             0x0002  /* Align longwords */
+#define O65_ALIGN_256           0x0003  /* Align pages (256 bytes) */
+#define O65_ALIGN_MASK          0x0003  /* Mask to extract alignment */
+
+/* The four o65 segment types. */
+#define O65_SEG_UNDEF  	        0x00
+#define O65_SEG_ABS	        0x01
+#define O65_SEG_TEXT   	        0x02
+#define O65_SEG_DATA	        0x03
+#define O65_SEG_BSS	        0x04
+#define O65_SEG_ZP 	        0x05
+
+/* Relocation type codes */
+#define O65_RTYPE_WORD          0x80
+#define O65_RTYPE_HIGH          0x40
+#define O65_RTYPE_LOW           0x20
+#define O65_RTYPE_SEGADDR       0xC0
+#define O65_RTYPE_SEG           0xA0
+#define O65_RTYPE_MASK          0xE0
+
+/* Segment IDs */
+#define O65_SEGID_UNDEF         0x00
+#define O65_SEGID_ABS           0x01
+#define O65_SEGID_TEXT          0x02
+#define O65_SEGID_DATA          0x03
+#define O65_SEGID_BSS           0x04
+#define O65_SEGID_ZP            0x05
+#define O65_SEGID_MASK          0x07
+
+/* Option tags */
+#define O65_OPT_FILENAME        0
+#define O65_OPT_OS     		1
+#define O65_OPT_ASM		2
+#define O65_OPT_AUTHOR		3
+#define O65_OPT_TIMESTAMP	4
+
+/* Operating system codes for O65_OPT_OS */
+#define O65_OS_OSA65		1
+#define O65_OS_LUNIX		2
+#define O65_OS_CC65_MODULE      3
+
+
+
+/* End of o65.h */
+#endif
+
+
+

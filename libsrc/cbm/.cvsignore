@@ -1,2 +1,5 @@
 cbm_load.s
+cbm_open.s
+cbm_read.s
 cbm_save.s
+cbm_write.s

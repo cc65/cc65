@@ -218,7 +218,9 @@ unsigned OptSize1 (CodeSeg* S)
 
      	    /* Check for any of the known functions. */
             const CallDesc* D = FindCall (E->Arg);
-            while (D && strcmp (D->LongFunc, E->Arg) == 0) {
+            while (D && 
+                   D < CallTable + (sizeof (CallTable) / sizeof (CallTable[0])) &&
+                   strcmp (D->LongFunc, E->Arg) == 0) {
                 /* Check the registers */
                 if ((D->A < 0 || D->A == E->RI->In.RegA) &&
                     (D->X < 0 || D->X == E->RI->In.RegX) &&

@@ -3,7 +3,7 @@
 #
 # NUMDRVS - number of supported drives (max. 16)
 
-ATARIDEFS = -DNUMDRVS=4
+ATARIDEFS = -DNUMDRVS=4 -DUCASE_FILENAME=1
 
 .SUFFIXES: .o .s .c
 
@@ -59,6 +59,7 @@ OBJS =	_scrsize.o   \
 	setcolor.o   \
 	siocall.o    \
 	tvtype.o     \
+	ucase_fn.o   \
 	where.o      \
 	write.o
 

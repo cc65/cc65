@@ -13,7 +13,6 @@ fgetpos.s
 fgets.s
 fputc.s
 fputs.s
-fread.s
 freopen.s
 fseek.s
 fsetpos.s

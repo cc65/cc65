@@ -59,7 +59,7 @@ Special locations:
   <tag/Heap/
   The C heap is located at the end of the program and grows towards the C
   runtime stack.
-  
+
 </descrip><p>
 
 
@@ -194,6 +194,18 @@ setup without any memory loss or need for a changed configuration.
 <sect1>Joystick drivers<p>
 
 <descrip>
+
+  <tag><tt/c64-hitjoy.joy/</tag>
+  Driver for the Digital Excess & Hitmen adapter. See
+  <htmlurl url="http://www.digitalexcess.de/downloads/productions.php"
+  name="http://www.digitalexcess.de/downloads/productions.php"> on
+  instructions how to build one. Up to four joysticks are supported.
+
+  <tag><tt/c64-ptvjoy.joy/</tag>
+  Driver for the Protovision 4-player adapter. See
+  <htmlurl url="http://www.protovision-online.de/hardw/hardwstart.htm"
+  name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices
+  and building instructions. Up to four joysticks are supported.
 
   <tag><tt/c64-stdjoy.joy/</tag>
   Supports up to two standard joysticks connected to the joysticks port of

@@ -1,0 +1,8 @@
+Implementation notes:
+
+CONDES routines with a type code of 2 are used to implement interrupt
+handlers. Note that these are called as soon as the program is started,
+so they have to cope with this. The indirect segment is set to the 
+system bank when calling interrupt routines, this must must not be changed
+when returning.
+

@@ -63,58 +63,50 @@ VIC_BG_COLOR3  	= $24
 
 ; I/O  $da00: SID 6581
 
-; 	sid		=	$da00
+SID_S1Lo       	= $00
+SID_S1Hi       	= $01
+SID_PB1Lo      	= $02
+SID_PB1Hi      	= $03
+SID_Ctl1       	= $04
+SID_AD1	       	= $05
+SID_SUR1       	= $06
 
- 	Osc1		=	$00
- 	Osc2		=	$07
- 	Osc3		=	$0e
+SID_S2Lo       	= $07
+SID_S2Hi       	= $08
+SID_PB2Lo      	= $09
+SID_PB2Hi      	= $0A
+SID_Ctl2       	= $0B
+SID_AD2	       	= $0C
+SID_SUR2       	= $0D
 
- 	FreqLo		=	$00
- 	FreqHi		=	$01
- 	PulseF		=	$02
- 	PulseC		=	$03
- 	OscCtl		=	$04
- 	AtkDcy		=	$05
- 	SusRel		=	$06
+SID_S3Lo       	= $0E
+SID_S3Hi       	= $0F
+SID_PB3Lo      	= $10
+SID_PB3Hi      	= $11
+SID_Ctl3       	= $12
+SID_AD3	       	= $13
+SID_SUR3       	= $14
 
- 	FiCtlLo		=	$15
- 	FiCtlHi		=	$16
- 	Resonance	=	$17
- 	Volume		=	$18
- 	PotX		=	$19
- 	PotY		=	$1A
- 	Random		=	$1B
- 	Env3		=	$1C
-
+SID_FltLo      	= $15
+SID_FltHi      	= $16
+SID_FltCtl     	= $17
+SID_Amp	       	= $18
+SID_ADConv1    	= $19
+SID_ADConv2    	= $1A
+SID_Noise      	= $1B
+SID_Read3      	= $1C
 
 
 ; I/O  $db00: CIA 6526 Inter Process Communication
-
-; 	IPCcia		=	$db00
-
- 	PortA		=	$00
- 	PortB		=	$01
- 	DDRA		=	$02
- 	DDRB		=	$03
- 	TimALo		=	$04
- 	TimAHi		=	$05
- 	TimBLo		=	$06
- 	TimBHi		=	$07
- 	TOD10		=	$08
- 	TODsec		=	$09
- 	TODmin		=	$0A
- 	TODhour		=	$0B
- 	SerDataReg	=	$0C
- 	IntCtrReg	=	$0D
- 	CtrlA		=	$0E
- 	CtrlB		=	$0F
-
-
-
 ; I/O  $dc00: CIA 6526
 
-; 	cia		=	$dc00
-
+CIA_PRA	        = $00
+CIA_PRB		= $01
+CIA_DDRA       	= $02
+CIA_DDRB	= $03
+CIA_ICR		= $0D
+CIA_CRA		= $0E
+CIA_CRB		= $0F
 
 
 ; I/O  $dd00: ACIA 6551

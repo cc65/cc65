@@ -5,7 +5,9 @@
 ;
 
  	.export	  	irq, nmi, k_irq, k_nmi
- 	.import		k_blncur, k_scnkey, k_udtim, k_rs232
+ 	.import		k_scnkey, k_udtim, k_rs232
+	.import		condes
+	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
  	.importzp     	tpi1
 
  	.include      	"zeropage.inc"
@@ -40,7 +42,7 @@
 	and	#$10	    		; Test break flag
 	bne	L1
 	jmp	(IRQVec)
-L1:	jmp	(BRKVec)
+L1: 	jmp	(BRKVec)
 
 .endproc
 
@@ -70,16 +72,26 @@ k_irq:
 ; -------------------------------------------------------------------------
 ; 50/60Hz interrupt
 
-	cmp	#%00000001		; ticker irq?
+	cmp	#%00000001    		; ticker irq?
 	bne	irq1
-	jsr	k_blncur		; Blink the cursor
-	jsr     k_scnkey		; Poll the keyboard
-        jsr	k_udtim			; Bump the time
+
+; Call user IRQ handlers if we have any
+
+	ldy 	#<(__IRQFUNC_COUNT__*2)
+	beq	@L1
+       	lda    	#<__IRQFUNC_TABLE__
+	ldx 	#>__IRQFUNC_TABLE__
+	jsr	condes 	      	   	; Call the functions
+
+; Call replacement kernal IRQ routines
+
+@L1:	jsr     k_scnkey      		; Poll the keyboard
+        jsr	k_udtim	      		; Bump the time
 
 ; -------------------------------------------------------------------------
 ; UART interrupt
 
-irq1:	cmp	#%00010000		; interrupt from uart?
+irq1:	cmp	#%00010000    		; interrupt from uart?
      	bne	irqend
 	jsr	k_rs232			; Read character from uart
 

@@ -270,11 +270,10 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
     }
 
     /* If the instruction is a branch, check for the label and generate it
-     * if it does not exist. In case of a PC relative branch (*+x) we will
-     * not generate a label, because the target label will not be defined.
+     * if it does not exist. Ignore anything but local labels here.
      */
     Label = 0;
-    if ((OPC->Info & CI_MASK_BRA) == CI_BRA && Expr[0] != '*') {
+    if ((OPC->Info & CI_MASK_BRA) == CI_BRA && Expr[0] == 'L') {
 
 	unsigned Hash;
 
@@ -455,6 +454,8 @@ void AddCodeSegLine (CodeSeg* S, const char* Format, ...)
 	    L->Flags |= LF_DEF;
 	    /* Move it to the code entry */
 	    CollAppend (&E->Labels, L);
+	    /* Tell the label about it's owner */
+	    L->Owner = E;
 	}
 
 	/* Delete the transfered labels */

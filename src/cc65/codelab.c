@@ -82,6 +82,18 @@ void FreeCodeLabel (CodeLabel* L)
 
 
 
+unsigned RemoveLabelRef (CodeLabel* L, const struct CodeEntry* E)
+/* Remove a reference to this label, return the number of remaining references */
+{
+    /* Delete the item */
+    CollDeleteItem (&L->JumpFrom, E);
+
+    /* Return the number of remaining references */
+    return CollCount (&L->JumpFrom);
+}
+
+
+
 void OutputCodeLabel (FILE* F, const CodeLabel* L)
 /* Output the code label to a file */
 {

@@ -37,6 +37,7 @@
 #include "check.h"
 
 /* b6502 */
+#include "codeopt.h"
 #include "codeseg.h"
 #include "dataseg.h"
 
@@ -111,6 +112,7 @@ void WriteOutput (FILE* F)
 	    /* Function which is defined and referenced or extern */
 	    PrintFunctionHeader (F, Entry);
 	    MergeCodeLabels (Entry->V.F.CS);
+	    RunOpt (Entry->V.F.CS);
 	    fprintf (F, "; Data segment for function %s:\n", Entry->Name);
 	    OutputDataSeg (F, Entry->V.F.DS);
 	    fprintf (F, "; Code segment for function %s:\n", Entry->Name);

@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    label.h				     */
+/*				   codeopt.h				     */
 /*                                                                           */
-/*			     Code label structure			     */
+/*			     Optimizer subroutines			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2001      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,71 +33,34 @@
 
 
 
-#ifndef LABEL_H
-#define LABEL_H
+#ifndef CODEOPT_H
+#define CODEOPT_H
 
 
 
-#include <stdio.h>
-
-/* common */
-#include "coll.h"
-
-
-
-/*****************************************************************************/
-/*				   Forwards				     */
-/*****************************************************************************/
-
-
-
-struct CodeEntry;
+/* b6502 */
+#include "codeseg.h"
 
 
 
 /*****************************************************************************/
-/*		  	       struct CodeLabel				     */
+/*  	       	    	  	     Data				     */
 /*****************************************************************************/
 
 
 
-/* Label flags, bitmapped */
-#define LF_DEF		0x0001U		/* Label was defined */
-
-/* Label structure */
-typedef struct CodeLabel CodeLabel;
-struct CodeLabel {
-    CodeLabel*		Next;		/* Next in hash list */
-    char*		Name;		/* Label name */
-    unsigned short	Hash;		/* Hash over the name */
-    unsigned short	Flags;		/* Flag flags */
-    struct CodeEntry*	Owner;		/* Owner entry */
-    Collection	    	JumpFrom;	/* Entries that jump here */
-};
-
-
-
 /*****************************************************************************/
-/*     	       	      	  	     Code			     	     */
+/*     	       	      	  	     Code				     */
 /*****************************************************************************/
 
 
 
-CodeLabel* NewCodeLabel (const char* Name, unsigned Hash);
-/* Create a new code label, initialize and return it */
-
-void FreeCodeLabel (CodeLabel* L);
-/* Free the given code label */
-
-unsigned RemoveLabelRef (CodeLabel* L, const struct CodeEntry* E);
-/* Remove a reference to this label, return the number of remaining references */
-
-void OutputCodeLabel (FILE* F, const CodeLabel* L);
-/* Output the code label to a file */
+void RunOpt (CodeSeg* S);
+/* Run the optimizer */
 
 
 
-/* End of label.h */
+/* End of codeopt.h */
 #endif
 
 

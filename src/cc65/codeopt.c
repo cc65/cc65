@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   opcodes.h				     */
+/*				   codeopt.c				     */
 /*                                                                           */
-/*		    Opcode and addressing mode definitions		     */
+/*			     Optimizer subroutines			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,8 +33,9 @@
 
 
 
-#ifndef OPCODES_H
-#define OPCODES_H
+/* b6502 */
+#include "codeent.h"
+#include "codeopt.h"
 
 
 
@@ -44,107 +45,79 @@
 
 
 
-/* Definitions for the possible opcodes */
-typedef enum {
-    OPC_ADC,
-    OPC_AND,
-    OPC_ASL,
-    OPC_BCC,
-    OPC_BCS,
-    OPC_BEQ,
-    OPC_BIT,
-    OPC_BMI,
-    OPC_BNE,
-    OPC_BPL,
-    OPC_BRA,
-    OPC_BRK,
-    OPC_BVC,
-    OPC_BVS,
-    OPC_CLC,
-    OPC_CLD,
-    OPC_CLI,
-    OPC_CLV,
-    OPC_CMP,
-    OPC_CPX,
-    OPC_CPY,
-    OPC_DEA,
-    OPC_DEC,
-    OPC_DEX,
-    OPC_DEY,
-    OPC_EOR,
-    OPC_INA,
-    OPC_INC,
-    OPC_INX,
-    OPC_INY,
-    OPC_JCC,
-    OPC_JCS,
-    OPC_JEQ,
-    OPC_JMI,
-    OPC_JMP,
-    OPC_JNE,
-    OPC_JPL,
-    OPC_JSR,
-    OPC_JVC,
-    OPC_JVS,
-    OPC_LDA,
-    OPC_LDX,
-    OPC_LDY,
-    OPC_LSR,
-    OPC_NOP,
-    OPC_ORA,
-    OPC_PHA,
-    OPC_PHP,
-    OPC_PHX,
-    OPC_PHY,
-    OPC_PLA,
-    OPC_PLP,
-    OPC_PLX,
-    OPC_PLY,
-    OPC_ROL,
-    OPC_ROR,
-    OPC_RTI,
-    OPC_RTS,
-    OPC_SBC,
-    OPC_SEC,
-    OPC_SED,
-    OPC_SEI,
-    OPC_STA,
-    OPC_STX,
-    OPC_STY,
-    OPC_TAX,
-    OPC_TAY,
-    OPC_TRB,
-    OPC_TSB,
-    OPC_TSX,
-    OPC_TXA,
-    OPC_TXS,
-    OPC_TYA,
-    OPC_COUNT 	       		/* Number of opcodes available */
-} opc_t;
+/* Counter for the number of changes in one run. The optimizer process is
+ * repeated until there are no more changes.
+ */
+static unsigned OptChanges;
 
-/* Addressing modes (bitmapped). */
-typedef enum {
-    AM_IMP	= 0x0001,      	/* implicit */
-    AM_ACC	= 0x0002,	/* accumulator */
-    AM_IMM	= 0x0004,	/* immidiate */
-    AM_ZP      	= 0x0008, 	/* zeropage */
-    AM_ZPX 	= 0x0010,	/* zeropage,X */
-    AM_ABS 	= 0x0020,	/* absolute */
-    AM_ABSX	= 0x0040,      	/* absolute,X */
-    AM_ABSY    	= 0x0080,	/* absolute,Y */
-    AM_ZPX_IND	= 0x0100,	/* (zeropage,x) */
-    AM_ZP_INDY	= 0x0200,	/* (zeropage),y */
-    AM_ZP_IND	= 0x0400,	/* (zeropage) */
-    AM_BRA	= 0x0800	/* branch */
-} am_t;
 
-/* Opcode description */
-typedef struct {
-    char    	Mnemo[4];	/* Mnemonic */
-    opc_t   	OPC;   		/* Opcode */
-    unsigned	Size;		/* Size, 0 means "check addressing mode" */
-    unsigned   	Info;		/* Usage flags */
-} OPCDesc;
+
+/*****************************************************************************/
+/*			       Remove dead jumps			     */
+/*****************************************************************************/
+
+
+
+static void OptDeadJumps (CodeSeg* S)
+/* Remove dead jumps (jumps to the next instruction) */
+{
+    CodeEntry* E;
+    unsigned I;
+
+    /* Get the number of entries, bail out if we have less than two entries */
+    unsigned Count = CollCount (&S->Entries);
+    if (Count < 2) {
+     	return;
+    }
+
+    /* Walk over all entries minus the last one */
+    I = 0;
+    while (I < Count-1) {
+
+	/* Get the next entry */
+	E = CollAt (&S->Entries, I);
+
+	/* Check if it's a branch, if it has a local target, and if the target
+	 * is the next instruction.
+	 */
+	if (E->AM == AM_BRA) {
+	    printf ("BRA on entry %u:\n", I);
+	    if (E->JumpTo) {
+		printf ("  JumpTo ok\n");
+		if (E->JumpTo->Owner == CollAt (&S->Entries, I+1)) {
+		    printf ("  Branch to next insn\n");
+		}
+	    }
+	}
+
+	if (E->AM == AM_BRA && E->JumpTo && E->JumpTo->Owner == CollAt (&S->Entries, I+1)) {
+
+	    /* Remember the label */
+	    CodeLabel* L = E->JumpTo;
+
+	    /* Jump to next instruction, remove it */
+	    unsigned Remaining = RemoveLabelRef (L, E);
+	    CollDelete (&S->Entries, I);
+	    FreeCodeEntry (E);
+	    --Count;
+
+	    /* If the label has no more references, remove it */
+	    if (Remaining == 0) {
+		CollDeleteItem (&L->Owner->Labels, L);
+		FreeCodeLabel (L);
+	    }
+
+	    /* Remember we had changes */
+	    ++OptChanges;
+
+	} else {
+
+	    /* Next entry */
+	    ++I;
+
+	}
+    }
+}
 
 
 
@@ -154,21 +127,21 @@ typedef struct {
 
 
 
-const OPCDesc* FindOpcode (const char* OPC);
-/* Find the given opcode and return the opcode description. If the opcode was
- * not found, NULL is returned.
- */
+void RunOpt (CodeSeg* S)
+/* Run the optimizer */
+{
+    printf ("Optimize\n");
 
-unsigned GetInsnSize (opc_t OPC, am_t AM);
-/* Return the size of the given instruction */
+    /* Repeat all steps until there are no more changes */
+    do {
 
-const OPCDesc* GetOPCDesc (opc_t OPC);
-/* Get an opcode description */
+     	/* Reset the number of changes */
+     	OptChanges = 0;
 
+	OptDeadJumps (S);
 
-
-/* End of opcodes.h */
-#endif
+    } while (OptChanges > 0);
+}
 
 
 

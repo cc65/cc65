@@ -61,12 +61,13 @@ typedef struct {
     void*               uninstall;      /* UNINSTALL routine */
     void*               count;          /* COUNT routine */
     void*               read;           /* READ routine */
+    void*               irq;            /* IRQ routine */
 
 } joy_drv_header;
 
 
 
-/* JOY kernel variables */                                                   
+/* JOY kernel variables */
 extern joy_drv_header* 	joy_drv;       	/* Pointer to driver */
 
 

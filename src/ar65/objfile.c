@@ -35,11 +35,11 @@
 
 #include <string.h>
 #include <errno.h>
-#ifdef __WATCOMC__
-/* Watcom has the file in the wrong directory */
+#if defined(__WATCOMC__) || defined(_MSC_VER)
+/* The Windows compilers have the file in the wrong directory */
 #  include <sys/utime.h>
 #else
-#  include <sys/types.h>		/* FreeBSD needs this */
+#  include <sys/types.h>     		/* FreeBSD needs this */
 #  include <utime.h>
 #endif
 #include <time.h>
@@ -55,11 +55,11 @@
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*			     	     Code				     */
 /*****************************************************************************/
 
 
-
+			     
 static const char* GetModule (const char* Name)
 /* Get a module name from the file name */
 {

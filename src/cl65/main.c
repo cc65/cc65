@@ -38,7 +38,7 @@
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#ifdef __WATCOMC__
+#if defined(__WATCOMC__) || defined(_MSC_VER)
 #  include <process.h>		/* DOS, OS/2 and Windows */
 #else
 #  include "spawn.h"		/* All others */

@@ -534,6 +534,8 @@ names here. Segments that go into <tt/ROM1/ will be written to a file named
 "rom1.bin", and segments that go into <tt/ROM2/ will be written to a file
 named "rom2.bin". The name given on the command line is ignored in both cases.
 
+Assigning an empty file name for a memory area will discard the data written
+to it.
 
 <sect1>LOAD and RUN addresses (ROMable code)<p>
 

@@ -237,7 +237,7 @@ petlib:
 # Commodore Plus/4
 
 plus4lib:
-	for i in plus4 cbm common runtime conio dbg em joystick tgi zlib; do \
+	for i in plus4 cbm common runtime conio dbg em joystick serial tgi zlib; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \
@@ -248,6 +248,7 @@ plus4lib:
 	done
 	mv plus4/crt0.o plus4.o
 	cp plus4/*.joy .
+	cp plus4/*.ser .
 
 #-----------------------------------------------------------------------------
 # Supervision

@@ -355,6 +355,7 @@ crosscompiler.
 %attr(644,root,root)   		/usr/lib/cc65/lib/plus4.lib
 %attr(644,root,root)   		/usr/lib/cc65/lib/plus4.o
 %attr(644,root,root) 		/usr/lib/cc65/joy/plus4-*.joy
+%attr(644,root,root) 		/usr/lib/cc65/ser/plus4-*.ser
 
 
 

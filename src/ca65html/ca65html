@@ -1,0 +1,261 @@
+#!/usr/bin/perl
+
+#
+# Convert a ca65 source into HTML
+#
+# Ullrich von Bassewitz, 05.12.2000
+#
+
+
+
+# ----------------------------------------------------------
+#     	       	         Helper functions
+# ----------------------------------------------------------
+
+
+
+# Terminate with an error
+sub Abort {
+    print "@_\n";
+    exit 1;
+}
+
+# Print the document header
+sub DocHeader {
+    local $OUT = shift (@_);
+    local $Asm = shift (@_);
+    print $OUT <<"EOF";
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN" "http://www.w3.org/TR/REC-html-40/loose.dtd">
+<html>
+<head>
+<title>SDSL Traffic</title>
+</head>
+
+<body bgcolor="#FFFFFF" text="#000000" link="#0000d0" vlink="#000060" alink="#00d0d0">
+<p><br><p>
+<center><h1>$Asm</h1></center>
+<hr><p><br><p>
+<pre>
+
+EOF
+}
+
+# Print the document footer
+sub DocFooter {
+    local $OUT  = shift (@_);
+    local $Name	= shift (@_);
+
+    # Get the current date and time
+    $Today = localtime;
+
+    print $OUT <<"EOF";
+</pre>
+<p><br><p>
+<hr size=1 noshade>
+<address>
+    <a href=\"http://validator.w3.org/check/referer\"><img border=0
+       src=\"http://validator.w3.org/images/vh40\"
+       alt=\"Valid HTML 4.0!\" height=31 width=88 align=right></a>
+    $Name; generated on $Today by ca65html<br>
+    <a href=\"mailto:uz\@cc65.org\">uz\@cc65.org</a>
+</address>
+
+</body>
+</html>
+EOF
+}
+
+
+
+# Remove illegal characters from a string
+sub Cleanup {
+    local $S = shift (@_);
+    $S =~ s/&/&amp;/g;
+    $S =~ s/</&lt;/g;
+    $S =~ s/>/&gt;/g;
+    $S =~ s/\"/&quot;/g;
+    return $S;
+}
+
+
+
+# ----------------------------------------------------------
+#    	       	      	      	Code
+# ----------------------------------------------------------
+
+# Get the arguments
+if ($#ARGV != 1) {
+    printf STDERR "Usage: %s asm-file output-file\n", $ARGV[0];
+    exit (1);
+}
+$ASM = shift (@ARGV);
+$OUT = shift (@ARGV);
+
+# Open a the input file
+open (ASM, "<$ASM") or Abort ("Cannot open $ASM");
+
+# Read all lines and remember labels
+$LNum = 1;
+%Label = ();
+while ($Line = <ASM>) {
+
+    # Remove the newline
+    chop ($Line);
+
+    # Check for a label
+    if ($Line =~ /^\s*([_\w][_\w\d]*)\s*(:|=)/) {
+     	$Label { $1 } = $LNum++;
+    } elsif ($Line =~ /^\s*(\.import|\.importzp|.proc)\s+(.*?)(\s*)(;.*$|$)/) {
+	@L = split (/\s*,\s*/, $2);
+	for my $Id (@L) {
+	    $Label { $Id } = $LNum++;
+	}
+    }
+}
+
+# Reset the file pointer to the beginning
+seek (ASM, 0, 0);
+
+# Open the output file and print the HTML header
+open (OUT, ">$OUT") or Abort ("Cannot open $OUT");
+DocHeader (OUT, $ASM);
+
+# The instructions that will have hyperlinks if a label is used
+$Ins = "adc|add|and|bcc|bcs|beq|bit|bmi|bne|bpl|bcv|bvs|cmp|cpx|cpy|dec|".
+       "eor|inc|jmp|jsr|lda|ldx|ldy|ora|rol|sbc|sta|stx|sty|sub|";
+
+# Read the input file again, replacing references by hyperlinks and mark
+# labels as link targets.
+while ($Line = <ASM>) {
+
+    # Remove the newline
+    chop ($Line);
+
+    # Clear the output line
+    $OutLine = "";
+
+    # Check for and ignore a local label
+    if ($Line =~ /^(\s*\@[_\w][_\w\d]*\s*:)(.*)$/) {
+       	# Print the label
+       	$OutLine .= "$1";
+       	# Use the remainder for line
+       	$Line = $2;
+    }
+
+    # Check for a label, if we have one, remove it from the line
+    if ($Line =~ /^\s*([_\w][_\w\d]*)(\s*)(:|=)(.*)$/) {
+       	# Print the label with a tag
+       	$OutLine .= sprintf ("<a name=\"L%04X\">%s</a>%s%s", $Label { $1 }, $1, $2, $3);
+       	# Use the remainder for line
+       	$Line = $4;
+    }
+
+    # Print any leading whitespace
+    if ($Line =~ /^(\s+)(.*)$/) {
+       	$OutLine .= "$1";
+	$Line = $2;
+    }
+
+    # Handle the import statements
+    if ($Line =~ /^(\.import|\.importzp|.proc|)(\s+)(.*)$/) {
+	$OutLine .= "$1$2";
+	$Line = $3;
+
+	# Print all identifiers if there are any
+	while ($Line =~ /^([_\w][_\w\d]*)(.*)$/) {
+	    $Num = $Label { $1 };
+	    if ($Num != 0) {
+	     	$OutLine .= sprintf ("<a name=\"L%04X\">%s</a>", $Num, $1);
+	    } else {
+	     	$OutLine .= "$1";
+	    }
+	    $Line = $2;
+	    if ($Line =~ /^(\s*),(\s*)(.*)$/) {
+	     	$OutLine .= "$1,$2";
+	     	$Line = $3;
+	    } else {
+	     	last;
+	    }
+	}
+
+       	# Add an remainder if there is one
+	$OutLine .= Cleanup ($Line);
+
+    # Check for control commands that may reference lists of labels
+    } elsif ($Line =~ /^(\.addr|\.word|\.export)(\s+)(.*)$/) {
+
+	# Print the command the and white space
+	$OutLine .= "$1$2";
+	$Line = $3;
+
+	# Print all identifiers if there are any
+	while ($Line =~ /^([_\w][_\w\d]*)(.*)$/) {
+	    $Num = $Label { $1 };
+	    if ($Num != 0) {
+	       	$OutLine .= sprintf ("<a href=\"#L%04X\">%s</a>", $Num, $1);
+	    } else {
+ 	     	$OutLine .= "$1";
+	    }
+	    $Line = $2;
+	    if ($Line =~ /^(\s*),(\s*)(.*)$/) {
+	     	$OutLine .= "$1,$2";
+	     	$Line = $3;
+	    } else {
+	     	last;
+	    }
+	}
+
+       	# Add an remainder if there is one
+	$OutLine .= Cleanup ($Line);
+
+    # Check for any legal instruction
+    } elsif ($Line =~ /^($Ins)(\s+)(.*)$/) {
+
+	# Print the instruction and white space
+	$OutLine .= "$1$2";
+	$Line = $3;
+
+	# Check for a comment or traling whitespace and separate it
+       	if ($Line =~ /^(.*?)(\s*)(;.*)$/) {
+	    $Line    = $1;
+	    $Comment = "$2$3";
+	} elsif ($Line =~ /^(.*?)(\s*)$/) {
+	    $Line    = $1;
+	    $Comment = $2;
+	} else {
+	    $Comment = "";
+	}
+
+	# Check for the first identifier and replace it by a hyperlink
+       	if ($Line =~ /^([^_a-zA-Z]*)([_a-zA-Z][_\w]*)(.*)$/ && $Label { $2 } != 0) {
+	    $Line = sprintf ("%s<a href=\"#L%04X\">%s</a>%s",
+		    Cleanup ($1), $Label { $2 }, $2, Cleanup ($3));
+	}
+
+	# Clean the comment
+	$Comment = Cleanup ($Comment);
+
+	# Reassemble and print the line
+	$OutLine .= "$Line$Comment";
+
+    } else {
+
+       	# Nothing known - print the line
+       	$OutLine .= Cleanup ($Line);
+
+    }
+
+    # Print the result
+    print OUT "$OutLine\n";
+}
+
+# Print the HTML footer
+DocFooter (OUT, $OUT);
+
+# Close the files
+close (ASM);
+close (OUT);
+
+# Done
+exit 0;
+

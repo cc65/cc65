@@ -50,7 +50,7 @@
 stkchk:	tsx
        	cpx  	#12
        	bcc    	Fail	     	; Jump on stack overflow
-	rts			; Return if ok
+	rts	  		; Return if ok
 
 ; ----------------------------------------------------------------------------
 ; C stack checking routine. Does not need to save any registers.
@@ -85,7 +85,7 @@ CStackOverflow:
 ; difficult, since we're operating at a lower level here.
 
 Fail:	lda	#4
- 	jsr	pusha0
+        ldx     #0
  	jmp	_exit
 
 ; ----------------------------------------------------------------------------
@@ -101,3 +101,4 @@ initialsp: 	.word	0
 lowwater:  	.word	0
 
 
+                  

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
+/* (C) 2003-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -48,6 +48,7 @@
 typedef enum {
     CPU_UNKNOWN = -1,           /* Not specified or invalid target */
     CPU_6502,
+    CPU_6502X,                  /* "Extended", that is: with illegal opcodes */
     CPU_65SC02,
     CPU_65C02,
     CPU_65816,
@@ -58,6 +59,7 @@ typedef enum {
 /* CPU instruction sets */
 enum {
     CPU_ISET_6502       = 1 << CPU_6502,
+    CPU_ISET_6502X      = 1 << CPU_6502X,
     CPU_ISET_65SC02     = 1 << CPU_65SC02,
     CPU_ISET_65C02      = 1 << CPU_65C02,
     CPU_ISET_65816      = 1 << CPU_65816,

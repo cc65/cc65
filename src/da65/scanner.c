@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -37,7 +37,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <ctype.h>
 
 /* common */
 #include "chartype.h"
@@ -57,17 +56,16 @@
 
 
 /* Current token and attributes */
-unsigned        CfgTok;
-char   	       	CfgSVal [CFG_MAX_IDENT_LEN+1];
-long            CfgIVal;
+unsigned        InfoTok;
+char   	       	InfoSVal [CFG_MAX_IDENT_LEN+1];
+long            InfoIVal;
 
 /* Error location */
-unsigned        	CfgErrorLine;
-unsigned        	CfgErrorCol;
+unsigned        	InfoErrorLine;
+unsigned        	InfoErrorCol;
 
 /* Input sources for the configuration */
-static const char*     	CfgFile		= 0;
-static const char*      CfgBuf 		= 0;
+static const char*     	InfoFile        = 0;
 
 /* Other input stuff */
 static int     	       	C      	     	= ' ';
@@ -83,7 +81,7 @@ static FILE*   	       	InputFile    	= 0;
 
 
 
-void CfgWarning (const char* Format, ...)
+void InfoWarning (const char* Format, ...)
 /* Print a warning message adding file name and line number of the config file */
 {
     char Buf [512];
@@ -93,12 +91,12 @@ void CfgWarning (const char* Format, ...)
     xvsprintf (Buf, sizeof (Buf), Format, ap);
     va_end (ap);
 
-    Warning ("%s(%u): %s", CfgFile, CfgErrorLine, Buf);
+    Warning ("%s(%u): %s", InfoFile, InfoErrorLine, Buf);
 }
 
 
 
-void CfgError (const char* Format, ...)
+void InfoError (const char* Format, ...)
 /* Print an error message adding file name and line number of the config file */
 {
     char Buf [512];
@@ -108,7 +106,7 @@ void CfgError (const char* Format, ...)
     xvsprintf (Buf, sizeof (Buf), Format, ap);
     va_end (ap);
 
-    Error ("%s(%u): %s", CfgFile, CfgErrorLine, Buf);
+    Error ("%s(%u): %s", InfoFile, InfoErrorLine, Buf);
 }
 
 
@@ -122,18 +120,8 @@ void CfgError (const char* Format, ...)
 static void NextChar (void)
 /* Read the next character from the input file */
 {
-    if (CfgBuf) {
-	/* Read from buffer */
-	C = (unsigned char)(*CfgBuf);
-	if (C == 0) {
-	    C = EOF;
-	} else {
-	    ++CfgBuf;
-	}
-    } else {
-	/* Read from the file */
-	C = getc (InputFile);
-    }
+    /* Read from the file */
+    C = getc (InputFile);
 
     /* Count columns */
     if (C != EOF) {
@@ -152,7 +140,7 @@ static void NextChar (void)
 static unsigned DigitVal (int C)
 /* Return the value for a numeric digit */
 {
-    if (isdigit (C)) {
+    if (IsDigit (C)) {
 	return C - '0';
     } else {
 	return toupper (C) - 'A' + 10;
@@ -161,7 +149,7 @@ static unsigned DigitVal (int C)
 
 
 
-void CfgNextTok (void)
+void InfoNextTok (void)
 /* Read the next token from the input stream */
 {
     unsigned I;
@@ -169,13 +157,13 @@ void CfgNextTok (void)
 
 Again:
     /* Skip whitespace */
-    while (isspace (C)) {
+    while (IsSpace (C)) {
      	NextChar ();
     }
 
     /* Remember the current position */
-    CfgErrorLine = InputLine;
-    CfgErrorCol  = InputCol;
+    InfoErrorLine = InputLine;
+    InfoErrorCol  = InputCol;
 
     /* Identifier? */
     if (C == '_' || IsAlpha (C)) {
@@ -184,38 +172,38 @@ Again:
 	I = 0;
 	while (C == '_' || IsAlNum (C)) {
 	    if (I < CFG_MAX_IDENT_LEN) {
-	        CfgSVal [I++] = C;
+	        InfoSVal [I++] = C;
 	    }
 	    NextChar ();
      	}
-	CfgSVal [I] = '\0';
-     	CfgTok = CFGTOK_IDENT;
+	InfoSVal [I] = '\0';
+     	InfoTok = INFOTOK_IDENT;
 	return;
     }
 
     /* Hex number? */
     if (C == '$') {
 	NextChar ();
-	if (!isxdigit (C)) {
-	    CfgError ("Hex digit expected");
+	if (!IsXDigit (C)) {
+	    InfoError ("Hex digit expected");
 	}
-	CfgIVal = 0;
-	while (isxdigit (C)) {
-       	    CfgIVal = CfgIVal * 16 + DigitVal (C);
+	InfoIVal = 0;
+	while (IsXDigit (C)) {
+       	    InfoIVal = InfoIVal * 16 + DigitVal (C);
 	    NextChar ();
 	}
-	CfgTok = CFGTOK_INTCON;
+	InfoTok = INFOTOK_INTCON;
 	return;
     }
 
     /* Decimal number? */
-    if (isdigit (C)) {
-	CfgIVal = 0;
-	while (isdigit (C)) {
-       	    CfgIVal = CfgIVal * 10 + DigitVal (C);
+    if (IsDigit (C)) {
+	InfoIVal = 0;
+	while (IsDigit (C)) {
+       	    InfoIVal = InfoIVal * 10 + DigitVal (C);
 	    NextChar ();
 	}
-	CfgTok = CFGTOK_INTCON;
+	InfoTok = INFOTOK_INTCON;
 	return;
     }
 
@@ -224,37 +212,37 @@ Again:
 
 	case '{':
 	    NextChar ();
-	    CfgTok = CFGTOK_LCURLY;
+	    InfoTok = INFOTOK_LCURLY;
 	    break;
 
 	case '}':
 	    NextChar ();
-	    CfgTok = CFGTOK_RCURLY;
+	    InfoTok = INFOTOK_RCURLY;
 	    break;
 
 	case ';':
 	    NextChar ();
-     	    CfgTok = CFGTOK_SEMI;
+     	    InfoTok = INFOTOK_SEMI;
 	    break;
 
 	case '.':
 	    NextChar ();
-	    CfgTok = CFGTOK_DOT;
+	    InfoTok = INFOTOK_DOT;
 	    break;
 
 	case ',':
 	    NextChar ();
-	    CfgTok = CFGTOK_COMMA;
+	    InfoTok = INFOTOK_COMMA;
 	    break;
 
 	case '=':
 	    NextChar ();
-	    CfgTok = CFGTOK_EQ;
+	    InfoTok = INFOTOK_EQ;
 	    break;
 
         case ':':
 	    NextChar ();
-	    CfgTok = CFGTOK_COLON;
+	    InfoTok = INFOTOK_COLON;
 	    break;
 
         case '\"':
@@ -262,16 +250,16 @@ Again:
 	    I = 0;
 	    while (C != '\"') {
 		if (C == EOF || C == '\n') {
-		    CfgError ("Unterminated string");
+		    InfoError ("Unterminated string");
 		}
 	       	if (I < CFG_MAX_IDENT_LEN) {
-		    CfgSVal [I++] = C;
+		    InfoSVal [I++] = C;
 		}
 		NextChar ();
 	    }
        	    NextChar ();
-	    CfgSVal [I] = '\0';
-	    CfgTok = CFGTOK_STRCON;
+	    InfoSVal [I] = '\0';
+	    InfoTok = INFOTOK_STRCON;
 	    break;
 
         case '#':
@@ -282,143 +270,143 @@ Again:
      	    if (C != EOF) {
 	     	goto Again;
 	    }
-	    CfgTok = CFGTOK_EOF;
+	    InfoTok = INFOTOK_EOF;
 	    break;
 
         case EOF:
-	    CfgTok = CFGTOK_EOF;
+	    InfoTok = INFOTOK_EOF;
 	    break;
 
 	default:
-	    CfgError ("Invalid character `%c'", C);
+	    InfoError ("Invalid character `%c'", C);
 
     }
 }
 
 
 
-void CfgConsume (unsigned T, const char* Msg)
+void InfoConsume (unsigned T, const char* Msg)
 /* Skip a token, print an error message if not found */
 {
-    if (CfgTok != T) {
-       	CfgError (Msg);
+    if (InfoTok != T) {
+       	InfoError (Msg);
     }
-    CfgNextTok ();
+    InfoNextTok ();
 }
 
 
 
-void CfgConsumeLCurly (void)
+void InfoConsumeLCurly (void)
 /* Consume a left curly brace */
 {
-    CfgConsume (CFGTOK_LCURLY, "`{' expected");
+    InfoConsume (INFOTOK_LCURLY, "`{' expected");
 }
 
 
 
-void CfgConsumeRCurly (void)
+void InfoConsumeRCurly (void)
 /* Consume a right curly brace */
 {
-    CfgConsume (CFGTOK_RCURLY, "`}' expected");
+    InfoConsume (INFOTOK_RCURLY, "`}' expected");
 }
 
 
 
-void CfgConsumeSemi (void)
+void InfoConsumeSemi (void)
 /* Consume a semicolon */
 {
-    CfgConsume (CFGTOK_SEMI, "`;' expected");
+    InfoConsume (INFOTOK_SEMI, "`;' expected");
 }
 
 
 
-void CfgConsumeColon (void)
+void InfoConsumeColon (void)
 /* Consume a colon */
 {
-    CfgConsume (CFGTOK_COLON, "`:' expected");
+    InfoConsume (INFOTOK_COLON, "`:' expected");
 }
 
 
 
-void CfgOptionalComma (void)
+void InfoOptionalComma (void)
 /* Consume a comma if there is one */
 {
-    if (CfgTok == CFGTOK_COMMA) {
-       	CfgNextTok ();
+    if (InfoTok == INFOTOK_COMMA) {
+       	InfoNextTok ();
     }
 }
 
 
 
-void CfgOptionalAssign (void)
+void InfoOptionalAssign (void)
 /* Consume an equal sign if there is one */
 {
-    if (CfgTok == CFGTOK_EQ) {
-       	CfgNextTok ();
+    if (InfoTok == INFOTOK_EQ) {
+       	InfoNextTok ();
     }
 }
 
 
 
-void CfgAssureInt (void)
+void InfoAssureInt (void)
 /* Make sure the next token is an integer */
 {
-    if (CfgTok != CFGTOK_INTCON) {
-       	CfgError ("Integer constant expected");
+    if (InfoTok != INFOTOK_INTCON) {
+       	InfoError ("Integer constant expected");
     }
 }
 
 
 
-void CfgAssureStr (void)
+void InfoAssureStr (void)
 /* Make sure the next token is a string constant */
 {
-    if (CfgTok != CFGTOK_STRCON) {
-       	CfgError ("String constant expected");
+    if (InfoTok != INFOTOK_STRCON) {
+       	InfoError ("String constant expected");
     }
 }
 
 
 
-void CfgAssureIdent (void)
+void InfoAssureIdent (void)
 /* Make sure the next token is an identifier */
 {
-    if (CfgTok != CFGTOK_IDENT) {
-       	CfgError ("Identifier expected");
+    if (InfoTok != INFOTOK_IDENT) {
+       	InfoError ("Identifier expected");
     }
 }
 
 
 
-void CfgRangeCheck (long Lo, long Hi)
-/* Check the range of CfgIVal */
+void InfoRangeCheck (long Lo, long Hi)
+/* Check the range of InfoIVal */
 {
-    if (CfgIVal < Lo || CfgIVal > Hi) {
-	CfgError ("Range error");
+    if (InfoIVal < Lo || InfoIVal > Hi) {
+	InfoError ("Range error");
     }
 }
 
 
 
-void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
+void InfoSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
 /* Map an identifier to one of the special tokens in the table */
 {
     unsigned I;
 
     /* We need an identifier */
-    if (CfgTok == CFGTOK_IDENT) {
+    if (InfoTok == INFOTOK_IDENT) {
 
  	/* Make it upper case */
 	I = 0;
-	while (CfgSVal [I]) {
-	    CfgSVal [I] = toupper (CfgSVal [I]);
+	while (InfoSVal [I]) {
+	    InfoSVal [I] = toupper (InfoSVal [I]);
 	    ++I;
 	}
 
        	/* Linear search */
 	for (I = 0; I < Size; ++I) {
-	    if (strcmp (CfgSVal, Table [I].Ident) == 0) {
-	    	CfgTok = Table [I].Tok;
+	    if (strcmp (InfoSVal, Table [I].Ident) == 0) {
+	    	InfoTok = Table [I].Tok;
 	    	return;
 	    }
 	}
@@ -426,81 +414,66 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
     }
 
     /* Not found or no identifier */
-    CfgError ("%s expected", Name);
+    InfoError ("%s expected", Name);
 }
 
 
 
-void CfgBoolToken (void)
+void InfoBoolToken (void)
 /* Map an identifier or integer to a boolean token */
 {
     static const IdentTok Booleans [] = {
-       	{   "YES",     	CFGTOK_TRUE     },
-	{   "NO",    	CFGTOK_FALSE    },
-        {   "TRUE",     CFGTOK_TRUE     },
-        {   "FALSE",    CFGTOK_FALSE    },
+       	{   "YES",     	INFOTOK_TRUE     },
+	{   "NO",    	INFOTOK_FALSE    },
+        {   "TRUE",     INFOTOK_TRUE     },
+        {   "FALSE",    INFOTOK_FALSE    },
     };
 
     /* If we have an identifier, map it to a boolean token */
-    if (CfgTok == CFGTOK_IDENT) {
-	CfgSpecialToken (Booleans, ENTRY_COUNT (Booleans), "Boolean");
+    if (InfoTok == INFOTOK_IDENT) {
+	InfoSpecialToken (Booleans, ENTRY_COUNT (Booleans), "Boolean");
     } else {
 	/* We expected an integer here */
-	if (CfgTok != CFGTOK_INTCON) {
-     	    CfgError ("Boolean value expected");
+	if (InfoTok != INFOTOK_INTCON) {
+     	    InfoError ("Boolean value expected");
 	}
-	CfgTok = (CfgIVal == 0)? CFGTOK_FALSE : CFGTOK_TRUE;
+	InfoTok = (InfoIVal == 0)? INFOTOK_FALSE : INFOTOK_TRUE;
     }
 }
 
 
 
-void CfgSetName (const char* Name)
+void InfoSetName (const char* Name)
 /* Set a name for a config file */
 {
-    CfgFile = Name;
+    InfoFile = Name;
 }
 
 
 
-const char* CfgGetName (void)
+const char* InfoGetName (void)
 /* Get the name of the config file */
 {
-    return CfgFile? CfgFile : "";
+    return InfoFile? InfoFile : "";
 }
 
 
 
-void CfgSetBuf (const char* Buf)
-/* Set a memory buffer for the config */
+int InfoAvail ()
+/* Return true if we have an info file given */
 {
-    CfgBuf = Buf;
+    return (InfoFile != 0);
 }
 
 
 
-int CfgAvail (void)
-/* Return true if we have a configuration available */
+void InfoOpenInput (void)
+/* Open the input file */
 {
-    return CfgFile != 0 || CfgBuf != 0;
-}
-
-
-
-void CfgOpenInput (void)
-/* Open the input file if we have one */
-{
-    /* If we have a config name given, open the file, otherwise we will read
-     * from a buffer.
-     */
-    if (!CfgBuf) {
-
-	/* Open the file */
-	InputFile = fopen (CfgFile, "r");
-	if (InputFile == 0) {
- 	    Error ("Cannot open `%s': %s", CfgFile, strerror (errno));
-	}
-
+    /* Open the file */
+    InputFile = fopen (InfoFile, "r");
+    if (InputFile == 0) {
+        Error ("Cannot open `%s': %s", InfoFile, strerror (errno));
     }
 
     /* Initialize variables */
@@ -509,12 +482,12 @@ void CfgOpenInput (void)
     InputCol  = 0;
 
     /* Start the ball rolling ... */
-    CfgNextTok ();
+    InfoNextTok ();
 }
 
 
 
-void CfgCloseInput (void)
+void InfoCloseInput (void)
 /* Close the input file if we have one */
 {
     /* Close the input file if we had one */

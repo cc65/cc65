@@ -45,14 +45,18 @@ CFLAGS  += -i=..\common
 
 OBJS = 	attrtab.obj	\
 	code.obj       	\
-	config.obj 	\
 	cpu.obj	   	\
 	data.obj	\
 	error.obj  	\
 	global.obj 	\
   	handler.obj	\
+	infofile.obj 	\
 	main.obj   	\
-  	opctable.obj	\
+        opc6502.obj     \
+        opc65816.obj    \
+        opc65c02.obj    \
+        opc65sc02.obj   \
+  	opctable.obj 	\
 	output.obj 	\
 	scanner.obj
 

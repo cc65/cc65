@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,59 +44,59 @@
 
 
 
-/* Config file tokens */
+/* Info file tokens */
 typedef enum token_t {
-    CFGTOK_NONE,
-    CFGTOK_INTCON,
-    CFGTOK_STRCON,
-    CFGTOK_IDENT,
-    CFGTOK_LCURLY,
-    CFGTOK_RCURLY,
-    CFGTOK_SEMI,
-    CFGTOK_COMMA,
-    CFGTOK_EQ,
-    CFGTOK_COLON,
-    CFGTOK_DOT,
-    CFGTOK_EOF,
+    INFOTOK_NONE,
+    INFOTOK_INTCON,
+    INFOTOK_STRCON,
+    INFOTOK_IDENT,
+    INFOTOK_LCURLY,
+    INFOTOK_RCURLY,
+    INFOTOK_SEMI,
+    INFOTOK_COMMA,
+    INFOTOK_EQ,
+    INFOTOK_COLON,
+    INFOTOK_DOT,
+    INFOTOK_EOF,
 
     /* Special tokens */
-    CFGTOK_GLOBAL,
-    CFGTOK_RANGE,
-    CFGTOK_LABEL,
+    INFOTOK_GLOBAL,
+    INFOTOK_RANGE,
+    INFOTOK_LABEL,
 
     /* Global section */
-    CFGTOK_INPUTNAME,
-    CFGTOK_OUTPUTNAME,
-    CFGTOK_PAGELENGTH,
-    CFGTOK_STARTADDR,
+    INFOTOK_INPUTNAME,
+    INFOTOK_OUTPUTNAME,
+    INFOTOK_PAGELENGTH,
+    INFOTOK_STARTADDR,
 
     /* Range section */
-    CFGTOK_START,
-    CFGTOK_END,
-    CFGTOK_TYPE,
+    INFOTOK_START,
+    INFOTOK_END,
+    INFOTOK_TYPE,
 
-    CFGTOK_CODE,
-    CFGTOK_BYTETAB,
-    CFGTOK_WORDTAB,
-    CFGTOK_DWORDTAB,
-    CFGTOK_ADDRTAB,
-    CFGTOK_RTSTAB,
-    CFGTOK_TEXTTAB,
+    INFOTOK_CODE,
+    INFOTOK_BYTETAB,
+    INFOTOK_WORDTAB,
+    INFOTOK_DWORDTAB,
+    INFOTOK_ADDRTAB,
+    INFOTOK_RTSTAB,
+    INFOTOK_TEXTTAB,
 
     /* Label section */
-    CFGTOK_NAME,
-    CFGTOK_ADDR,
-    CFGTOK_SIZE,
+    INFOTOK_NAME,
+    INFOTOK_ADDR,
+    INFOTOK_SIZE,
 
     /* */
-    CFGTOK_TRUE,
-    CFGTOK_FALSE
+    INFOTOK_TRUE,
+    INFOTOK_FALSE
 } token_t;
 
 
 /* Mapping table entry, special identifier --> token */
-typedef struct IdentTok_ IdentTok;
-struct IdentTok_ {
+typedef struct IdentTok IdentTok;
+struct IdentTok {
     const char*	 	Ident;	     	/* Identifier */
     token_t	 	Tok;	     	/* Token for identifier */
 };
@@ -106,13 +106,13 @@ struct IdentTok_ {
 
 /* Current token and attributes */
 #define CFG_MAX_IDENT_LEN  255
-extern unsigned		CfgTok;
-extern char    	       	CfgSVal [CFG_MAX_IDENT_LEN+1];
-extern long	        CfgIVal;
+extern unsigned		InfoTok;
+extern char    	       	InfoSVal [CFG_MAX_IDENT_LEN+1];
+extern long	        InfoIVal;
 
 /* Error location */
-extern unsigned        	CfgErrorLine;
-extern unsigned        	CfgErrorCol;
+extern unsigned        	InfoErrorLine;
+extern unsigned        	InfoErrorCol;
 
 
 
@@ -122,70 +122,67 @@ extern unsigned        	CfgErrorCol;
 
 
 
-void CfgWarning (const char* Format, ...);
+void InfoWarning (const char* Format, ...);
 /* Print a warning message adding file name and line number of the config file */
 
-void CfgError (const char* Format, ...);
+void InfoError (const char* Format, ...);
 /* Print an error message adding file name and line number of the config file */
 
-void CfgNextTok (void);
+void InfoNextTok (void);
 /* Read the next token from the input stream */
 
-void CfgConsume (unsigned T, const char* Msg);
+void InfoConsume (unsigned T, const char* Msg);
 /* Skip a token, print an error message if not found */
 
-void CfgConsumeLCurly (void);
+void InfoConsumeLCurly (void);
 /* Consume a left curly brace */
 
-void CfgConsumeRCurly (void);
+void InfoConsumeRCurly (void);
 /* Consume a right curly brace */
 
-void CfgConsumeSemi (void);
+void InfoConsumeSemi (void);
 /* Consume a semicolon */
 
-void CfgConsumeColon (void);
+void InfoConsumeColon (void);
 /* Consume a colon */
 
-void CfgOptionalComma (void);
+void InfoOptionalComma (void);
 /* Consume a comma if there is one */
 
-void CfgOptionalAssign (void);
+void InfoOptionalAssign (void);
 /* Consume an equal sign if there is one */
 
-void CfgAssureInt (void);
+void InfoAssureInt (void);
 /* Make sure the next token is an integer */
 
-void CfgAssureStr (void);
+void InfoAssureStr (void);
 /* Make sure the next token is a string constant */
 
-void CfgAssureIdent (void);
+void InfoAssureIdent (void);
 /* Make sure the next token is an identifier */
 
-void CfgRangeCheck (long Lo, long Hi);
-/* Check the range of CfgIVal */
+void InfoRangeCheck (long Lo, long Hi);
+/* Check the range of InfoIVal */
 
-void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name);
+void InfoSpecialToken (const IdentTok* Table, unsigned Size, const char* Name);
 /* Map an identifier to one of the special tokens in the table */
 
-void CfgBoolToken (void);
+void InfoBoolToken (void);
 /* Map an identifier or integer to a boolean token */
 
-void CfgSetName (const char* Name);
+void InfoSetName (const char* Name);
 /* Set a name for a config file */
 
-const char* CfgGetName (void);
+const char* InfoGetName (void);
 /* Get the name of the config file */
 
-void CfgSetBuf (const char* Buf);
-/* Set a memory buffer for the config */
+int InfoAvail ();
+/* Return true if we have an info file given */
 
-int CfgAvail (void);
-/* Return true if we have a configuration available */
-
-void CfgOpenInput (void);
+void InfoOpenInput (void);
 /* Open the input file if we have one */
 
-void CfgCloseInput (void);
+void InfoCloseInput (void);
 /* Close the input file if we have one */
 
 

@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   config.h				     */
+/*                                infofile.h                                 */
 /*                                                                           */
-/*		   Disassembler configuration file handling		     */
+/*                      Disassembler info file handling                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef CONFIG_H
-#define CONFIG_H
+#ifndef INFOFILE_H
+#define INFOFILE_H
 
 
 
@@ -44,12 +44,12 @@
 
 
 
-void CfgRead (void);					 
-/* Read the configuration if a configuration file exists */
+void ReadInfoFile (void);
+/* Read the info file */
 
 
 
-/* End of config.h */
+/* End of infofile.h */
 #endif
 
 

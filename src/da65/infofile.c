@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*		    		   config.c				     */
+/*                                infofile.h                                 */
 /*                                                                           */
-/*		   Disassembler configuration file handling		     */
+/*                      Disassembler info file handling                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -50,8 +50,8 @@
 #include "attrtab.h"
 #include "error.h"
 #include "global.h"
+#include "infofile.h"
 #include "scanner.h"
-#include "config.h"
 
 
 
@@ -65,74 +65,74 @@ static void GlobalSection (void)
 /* Parse a global section */
 {
     static const IdentTok GlobalDefs[] = {
-       	{   "INPUTNAME",  	CFGTOK_INPUTNAME	},
-	{   "OUTPUTNAME",      	CFGTOK_OUTPUTNAME	},
-	{   "PAGELENGTH",      	CFGTOK_PAGELENGTH	},
-	{   "STARTADDR",	CFGTOK_STARTADDR	},
+       	{   "INPUTNAME",  	INFOTOK_INPUTNAME	},
+	{   "OUTPUTNAME",      	INFOTOK_OUTPUTNAME	},
+	{   "PAGELENGTH",      	INFOTOK_PAGELENGTH	},
+	{   "STARTADDR",	INFOTOK_STARTADDR	},
     };
 
     /* Skip the token */
-    CfgNextTok ();
+    InfoNextTok ();
 
     /* Expect the opening curly brace */
-    CfgConsumeLCurly ();
+    InfoConsumeLCurly ();
 
     /* Look for section tokens */
-    while (CfgTok != CFGTOK_RCURLY) {
+    while (InfoTok != INFOTOK_RCURLY) {
 
 	/* Convert to special token */
-       	CfgSpecialToken (GlobalDefs, ENTRY_COUNT (GlobalDefs), "Global directive");
+       	InfoSpecialToken (GlobalDefs, ENTRY_COUNT (GlobalDefs), "Global directive");
 
 	/* Look at the token */
-	switch (CfgTok) {
+	switch (InfoTok) {
 
-	    case CFGTOK_INPUTNAME:
-	        CfgNextTok ();
-		CfgAssureStr ();
+	    case INFOTOK_INPUTNAME:
+	        InfoNextTok ();
+		InfoAssureStr ();
 		if (InFile) {
-		    CfgError ("Input file name already given");
+		    InfoError ("Input file name already given");
 		}
-		InFile = xstrdup (CfgSVal);
-		CfgNextTok ();
+		InFile = xstrdup (InfoSVal);
+		InfoNextTok ();
 		break;
 
-	    case CFGTOK_OUTPUTNAME:
-		CfgNextTok ();
-		CfgAssureStr ();
+	    case INFOTOK_OUTPUTNAME:
+		InfoNextTok ();
+		InfoAssureStr ();
 		if (OutFile) {
-		    CfgError ("Output file name already given");
+		    InfoError ("Output file name already given");
 		}
-		OutFile = xstrdup (CfgSVal);
-		CfgNextTok ();
+		OutFile = xstrdup (InfoSVal);
+		InfoNextTok ();
 		break;
 
-	    case CFGTOK_PAGELENGTH:
-		CfgNextTok ();
-		CfgAssureInt ();
-		if (CfgIVal != -1) {
-		    CfgRangeCheck (MIN_PAGE_LEN, MAX_PAGE_LEN);
+	    case INFOTOK_PAGELENGTH:
+		InfoNextTok ();
+		InfoAssureInt ();
+		if (InfoIVal != -1) {
+		    InfoRangeCheck (MIN_PAGE_LEN, MAX_PAGE_LEN);
 		}
-		PageLength = CfgIVal;
-		CfgNextTok ();
+		PageLength = InfoIVal;
+		InfoNextTok ();
 		break;
 
-	    case CFGTOK_STARTADDR:
-		CfgNextTok ();
-		CfgAssureInt ();
-		CfgRangeCheck (0x0000, 0xFFFF);
-		StartAddr = CfgIVal;
-		CfgNextTok ();
+	    case INFOTOK_STARTADDR:
+		InfoNextTok ();
+		InfoAssureInt ();
+		InfoRangeCheck (0x0000, 0xFFFF);
+		StartAddr = InfoIVal;
+		InfoNextTok ();
 		break;
 
 	}
 
 	/* Directive is followed by a semicolon */
-	CfgConsumeSemi ();
+	InfoConsumeSemi ();
 
     }
 
     /* Consume the closing brace */
-    CfgConsumeRCurly ();
+    InfoConsumeRCurly ();
 }
 
 
@@ -141,19 +141,19 @@ static void RangeSection (void)
 /* Parse a range section */
 {
     static const IdentTok RangeDefs[] = {
-       	{   "START",   	    	CFGTOK_START	},
-	{   "END",	    	CFGTOK_END 	},
-	{   "TYPE",            	CFGTOK_TYPE	},
+       	{   "START",   	    	INFOTOK_START	},
+	{   "END",	    	INFOTOK_END 	},
+	{   "TYPE",            	INFOTOK_TYPE	},
     };
 
     static const IdentTok TypeDefs[] = {
-	{   "CODE",	    	CFGTOK_CODE	},
-	{   "BYTETABLE",    	CFGTOK_BYTETAB	},
-	{   "WORDTABLE",    	CFGTOK_WORDTAB	},
-	{   "DWORDTABLE",	CFGTOK_DWORDTAB	},
-	{   "ADDRTABLE",	CFGTOK_ADDRTAB	},
-	{   "RTSTABLE",	    	CFGTOK_RTSTAB	},
-	{   "TEXTTABLE",        CFGTOK_TEXTTAB  },
+	{   "CODE",	    	INFOTOK_CODE	 },
+	{   "BYTETABLE",    	INFOTOK_BYTETAB	 },
+	{   "WORDTABLE",    	INFOTOK_WORDTAB	 },
+	{   "DWORDTABLE",	INFOTOK_DWORDTAB },
+	{   "ADDRTABLE",	INFOTOK_ADDRTAB	 },
+	{   "RTSTABLE",	    	INFOTOK_RTSTAB	 },
+	{   "TEXTTABLE",        INFOTOK_TEXTTAB  },
     };
 
 
@@ -172,75 +172,75 @@ static void RangeSection (void)
     unsigned char Type	= 0;
 
     /* Skip the token */
-    CfgNextTok ();
+    InfoNextTok ();
 
     /* Expect the opening curly brace */
-    CfgConsumeLCurly ();
+    InfoConsumeLCurly ();
 
     /* Look for section tokens */
-    while (CfgTok != CFGTOK_RCURLY) {
+    while (InfoTok != INFOTOK_RCURLY) {
 
 	/* Convert to special token */
-       	CfgSpecialToken (RangeDefs, ENTRY_COUNT (RangeDefs), "Range directive");
+       	InfoSpecialToken (RangeDefs, ENTRY_COUNT (RangeDefs), "Range directive");
 
 	/* Look at the token */
-	switch (CfgTok) {
+	switch (InfoTok) {
 
-	    case CFGTOK_START:
-	        CfgNextTok ();
-		CfgAssureInt ();
-		CfgRangeCheck (0x0000, 0xFFFF);
-		Start = CfgIVal;
+	    case INFOTOK_START:
+	        InfoNextTok ();
+		InfoAssureInt ();
+		InfoRangeCheck (0x0000, 0xFFFF);
+		Start = InfoIVal;
 	       	Needed |= tStart;
-	     	CfgNextTok ();
+	     	InfoNextTok ();
 	     	break;
 
-	    case CFGTOK_END:
-	     	CfgNextTok ();
-		CfgAssureInt ();
-		CfgRangeCheck (0x0000, 0xFFFF);
-		End = CfgIVal;
+	    case INFOTOK_END:
+	     	InfoNextTok ();
+		InfoAssureInt ();
+		InfoRangeCheck (0x0000, 0xFFFF);
+		End = InfoIVal;
 	       	Needed |= tEnd;
-	     	CfgNextTok ();
+	     	InfoNextTok ();
 	     	break;
 
-	    case CFGTOK_TYPE:
-	     	CfgNextTok ();
-		CfgSpecialToken (TypeDefs, ENTRY_COUNT (TypeDefs), "Type");
-		switch (CfgTok) {
-		    case CFGTOK_CODE:		Type = atCode;		break;
-		    case CFGTOK_BYTETAB:	Type = atByteTab;	break;
-		    case CFGTOK_WORDTAB:	Type = atWordTab;	break;
-		    case CFGTOK_DWORDTAB:	Type = atDWordTab;	break;
-		    case CFGTOK_ADDRTAB:	Type = atAddrTab;	break;
-       		    case CFGTOK_RTSTAB:		Type = atRtsTab;	break;
-		    case CFGTOK_TEXTTAB:       	Type = atTextTab;       break;
+	    case INFOTOK_TYPE:
+	     	InfoNextTok ();
+		InfoSpecialToken (TypeDefs, ENTRY_COUNT (TypeDefs), "Type");
+		switch (InfoTok) {
+		    case INFOTOK_CODE:		Type = atCode;		break;
+		    case INFOTOK_BYTETAB:	Type = atByteTab;	break;
+		    case INFOTOK_WORDTAB:	Type = atWordTab;	break;
+		    case INFOTOK_DWORDTAB:	Type = atDWordTab;	break;
+		    case INFOTOK_ADDRTAB:	Type = atAddrTab;	break;
+       		    case INFOTOK_RTSTAB:       	Type = atRtsTab;	break;
+		    case INFOTOK_TEXTTAB:       Type = atTextTab;       break;
 		}
 		Needed |= tType;
-		CfgNextTok ();
+		InfoNextTok ();
 		break;
 	}
 
 	/* Directive is followed by a semicolon */
-	CfgConsumeSemi ();
+	InfoConsumeSemi ();
 
     }
 
     /* Did we get all required values? */
     if (Needed != tAll) {
-    	CfgError ("Required values missing from this section");
+    	InfoError ("Required values missing from this section");
     }
 
     /* Start must be less than end */
     if (Start > End) {
-	CfgError ("Start value must not be greater than end value");
+	InfoError ("Start value must not be greater than end value");
     }
 
     /* Set the range */
     MarkRange (Start, End, Type);
 
     /* Consume the closing brace */
-    CfgConsumeRCurly ();
+    InfoConsumeRCurly ();
 }
 
 
@@ -249,9 +249,9 @@ static void LabelSection (void)
 /* Parse a label section */
 {
     static const IdentTok LabelDefs[] = {
-       	{   "NAME",	CFGTOK_NAME	},
-	{   "ADDR",	CFGTOK_ADDR	},
-       	{   "SIZE",    	CFGTOK_SIZE	},
+       	{   "NAME",	INFOTOK_NAME	},
+	{   "ADDR",	INFOTOK_ADDR	},
+       	{   "SIZE",    	INFOTOK_SIZE	},
     };
 
     /* Locals - initialize to avoid gcc warnings */
@@ -260,77 +260,77 @@ static void LabelSection (void)
     long Size  = -1;
 
     /* Skip the token */
-    CfgNextTok ();
+    InfoNextTok ();
 
     /* Expect the opening curly brace */
-    CfgConsumeLCurly ();
+    InfoConsumeLCurly ();
 
     /* Look for section tokens */
-    while (CfgTok != CFGTOK_RCURLY) {
+    while (InfoTok != INFOTOK_RCURLY) {
 
 	/* Convert to special token */
-       	CfgSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Label directive");
+       	InfoSpecialToken (LabelDefs, ENTRY_COUNT (LabelDefs), "Label directive");
 
 	/* Look at the token */
-	switch (CfgTok) {
+	switch (InfoTok) {
 
-	    case CFGTOK_NAME:
-	        CfgNextTok ();
+	    case INFOTOK_NAME:
+	        InfoNextTok ();
 	       	if (Name) {
-	       	    CfgError ("Name already given");
+	       	    InfoError ("Name already given");
 	       	}
-	       	CfgAssureStr ();
-		if (CfgSVal[0] == '\0') {
-		    CfgError ("Name may not be empty");
+	       	InfoAssureStr ();
+		if (InfoSVal[0] == '\0') {
+		    InfoError ("Name may not be empty");
 		}
-	       	Name = xstrdup (CfgSVal);
-	       	CfgNextTok ();
+	       	Name = xstrdup (InfoSVal);
+	       	InfoNextTok ();
 	       	break;
 
-	    case CFGTOK_ADDR:
-	       	CfgNextTok ();
+	    case INFOTOK_ADDR:
+	       	InfoNextTok ();
 	       	if (Value >= 0) {
-	       	    CfgError ("Value already given");
+	       	    InfoError ("Value already given");
 	       	}
-	       	CfgAssureInt ();
-		CfgRangeCheck (0, 0xFFFF);
-	       	Value = CfgIVal;
-	       	CfgNextTok ();
+	       	InfoAssureInt ();
+		InfoRangeCheck (0, 0xFFFF);
+	       	Value = InfoIVal;
+	       	InfoNextTok ();
 	       	break;
 
-	    case CFGTOK_SIZE:
-	       	CfgNextTok ();
+	    case INFOTOK_SIZE:
+	       	InfoNextTok ();
 	       	if (Size >= 0) {
-	       	    CfgError ("Size already given");
+	       	    InfoError ("Size already given");
 	       	}
-	       	CfgAssureInt ();
-		CfgRangeCheck (1, 0x10000);
-	       	Size = CfgIVal;
-	       	CfgNextTok ();
+	       	InfoAssureInt ();
+		InfoRangeCheck (1, 0x10000);
+	       	Size = InfoIVal;
+	       	InfoNextTok ();
 	       	break;
 
 	}
 
 	/* Directive is followed by a semicolon */
-	CfgConsumeSemi ();
+	InfoConsumeSemi ();
     }
 
     /* Did we get the necessary data */
     if (Name == 0) {
-	CfgError ("Label name is missing");
+	InfoError ("Label name is missing");
     }
     if (Value < 0) {
-	CfgError ("Label value is missing");
+	InfoError ("Label value is missing");
     }
     if (Size < 0) {
 	/* Use default */
 	Size = 1;
     }
     if (Value + Size > 0x10000) {
-	CfgError ("Invalid size (address out of range)");
+	InfoError ("Invalid size (address out of range)");
     }
     if (HaveLabel ((unsigned) Value)) {
-	CfgError ("Label for address $%04lX already defined", Value);
+	InfoError ("Label for address $%04lX already defined", Value);
     }
 
     /* Define the label */
@@ -363,66 +363,63 @@ static void LabelSection (void)
     xfree (Name);
 
     /* Consume the closing brace */
-    CfgConsumeRCurly ();
+    InfoConsumeRCurly ();
 }
 
 
 
-static void CfgParse (void)
+static void InfoParse (void)
 /* Parse the config file */
 {
     static const IdentTok Globals[] = {
-     	{   "GLOBAL", 	CFGTOK_GLOBAL	},
-     	{   "RANGE",	CFGTOK_RANGE	},
-	{   "LABEL",	CFGTOK_LABEL	},
+     	{   "GLOBAL", 	INFOTOK_GLOBAL	},
+     	{   "RANGE",	INFOTOK_RANGE	},
+	{   "LABEL",	INFOTOK_LABEL	},
     };
 
-    while (CfgTok != CFGTOK_EOF) {
+    while (InfoTok != INFOTOK_EOF) {
 
 	/* Convert an identifier into a token */
-	CfgSpecialToken (Globals, ENTRY_COUNT (Globals), "Config directive");
+	InfoSpecialToken (Globals, ENTRY_COUNT (Globals), "Config directive");
 
 	/* Check the token */
-	switch (CfgTok) {
+	switch (InfoTok) {
 
-	    case CFGTOK_GLOBAL:
+	    case INFOTOK_GLOBAL:
 		GlobalSection ();
 		break;
 
-	    case CFGTOK_RANGE:
+	    case INFOTOK_RANGE:
 		RangeSection ();
 		break;
 
-	    case CFGTOK_LABEL:
+	    case INFOTOK_LABEL:
 		LabelSection ();
 		break;
 
 	}
 
 	/* Semicolon expected */
-	CfgConsumeSemi ();
+	InfoConsumeSemi ();
     }
 }
 
 
 
-void CfgRead (void)
-/* Read the configuration if a configuration file exists */
+void ReadInfoFile (void)
+/* Read the info file */
 {
-    /* Check if we have a config file given */
-    if (!CfgAvail() || access (CfgGetName(), 0) != 0) {
-	/* No name given or file not found */
-    	return;
+    /* Check if we have a info file given */
+    if (InfoAvail()) {
+        /* Open the config file */
+        InfoOpenInput ();
+
+        /* Parse the config file */
+        InfoParse ();
+
+        /* Close the file */
+        InfoCloseInput ();
     }
-
-    /* Open the config file */
-    CfgOpenInput ();
-
-    /* Parse the config file */
-    CfgParse ();
-
-    /* Close the file */
-    CfgCloseInput ();
 }
 
 

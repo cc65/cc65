@@ -12,11 +12,11 @@ LDFLAGS=
 
 OBJS = 	attrtab.o	\
 	code.o	 	\
-	config.o	\
 	data.o		\
 	error.o	 	\
 	global.o 	\
   	handler.o	\
+	infofile.o	\
 	main.o	 	\
         opc6502.o       \
         opc65816.o      \

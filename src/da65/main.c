@@ -50,10 +50,10 @@
 /* da65 */
 #include "attrtab.h"
 #include "code.h"
-#include "config.h"
 #include "data.h"
 #include "error.h"
 #include "global.h"
+#include "infofile.h"
 #include "opctable.h"
 #include "output.h"
 #include "scanner.h"
@@ -74,6 +74,7 @@ static void Usage (void)
     	     "Short options:\n"
        	     "  -g\t\t\tAdd debug info to object file\n"
        	     "  -h\t\t\tHelp (this text)\n"
+             "  -i name\t\tSpecify an info file\n"
        	     "  -o name\t\tName the output file\n"
        	     "  -v\t\t\tIncrease verbosity\n"
        	     "  -F\t\t\tAdd formfeeds to the output\n"
@@ -85,6 +86,7 @@ static void Usage (void)
        	     "  --debug-info\t\tAdd debug info to object file\n"
 	     "  --formfeeds\t\tAdd formfeeds to the output\n"
 	     "  --help\t\tHelp (this text)\n"
+             "  --info name\t\tSpecify an info file\n"
        	     "  --pagelength n\tSet the page length for the listing\n"
        	     "  --start-addr addr\tSet the start/load address\n"
        	     "  --verbose\t\tIncrease verbosity\n"
@@ -159,6 +161,14 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 
+static void OptInfo (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --info option */
+{
+    InfoSetName (Arg);
+}
+
+
+
 static void OptPageLength (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --pagelength option */
 {
@@ -222,7 +232,7 @@ static void OneOpcode (unsigned RemainingBytes)
     if (GetStyleAttr (PC) == atDefault) {
 	if (D->Size > RemainingBytes) {
 	    MarkAddr (PC, atIllegal);
-       	} else if (D->Flags & flIllegal) {  
+       	} else if (D->Flags & flIllegal) {
 	    MarkAddr (PC, atIllegal);
 	} else {
 	    unsigned I;
@@ -320,6 +330,7 @@ int main (int argc, char* argv [])
        	{ "--debug-info",      	0,     	OptDebugInfo            },
 	{ "--formfeeds",  	0,	OptFormFeeds		},
       	{ "--help",    	  	0,	OptHelp			},
+       	{ "--info",    	       	1,     	OptInfo                 },
       	{ "--pagelength",      	1,	OptPageLength		},
 	{ "--start-addr", 	1,	OptStartAddr		},
       	{ "--verbose", 	       	0,	OptVerbose		},
@@ -353,6 +364,10 @@ int main (int argc, char* argv [])
 		case 'h':
 		    OptHelp (Arg, 0);
 		    break;
+
+       	        case 'i':
+       		    OptInfo (Arg, GetArg (&I, 2));
+       		    break;
 
        	        case 'o':
        		    OutFile = GetArg (&I, 2);
@@ -395,13 +410,8 @@ int main (int argc, char* argv [])
      	AbEnd ("No input file");
     }
 
-    /* Make the config file name from the input file if none was given */
-    if (!CfgAvail ()) {
-	CfgSetName (MakeFilename (InFile, CfgExt));
-    }
-
     /* Try to read the configuration file */
-    CfgRead ();
+    ReadInfoFile ();
 
     /* Make the output file name from the input file name if none was given */
     if (OutFile == 0) {

@@ -118,6 +118,9 @@ unsigned char __fastcall__ mouse_install (const struct mouse_callbacks* c,
 unsigned char __fastcall__ mouse_uninstall (void);
 /* Uninstall the currently loaded driver. Returns an error code. */
 
+const char* __fastcall__ mouse_geterrormsg (unsigned char code);
+/* Get an error message describing the error in code. */
+
 void __fastcall__ mouse_hide (void);
 /* Hide the mouse. The function manages a counter and may be called more than
  * once. For each call to mouse_hide there must be a call to mouse_show to make

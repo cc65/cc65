@@ -14,15 +14,7 @@ ldax0sp:
 ldaxysp:
 	lda	(sp),y		; get high byte
 	tax			; and save it
-       	bne    	L1		; Try to generate FAST code
    	dey	      		; point to lo byte
    	lda	(sp),y		; load low byte
 	rts
-
-L1:	php			; Save Z flag
-  	dey
-  	lda	(sp),y
-  	plp
-  	rts
-
 

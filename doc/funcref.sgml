@@ -443,7 +443,7 @@ previously been allocated by <tt/<ref id="malloc" name="malloc">/, <tt/<ref
 id="calloc" name="calloc">/ or <tt/<ref id="realloc" name="realloc">/.
 <tag/Limits/
 <itemize>
-<item>Passing a pointer to a block that was is not the result of one of the 
+<item>Passing a pointer to a block that was is not the result of one of the
 allocation functions, or that has been free'd will give unpredicable results.
 </itemize>
 <tag/Availability/cc65
@@ -954,8 +954,9 @@ used in presence of a prototype.
 <tag/Function/Set the background text color.
 <tag/Header/<tt/<ref id="conio.h" name="conio.h">/
 <tag/Declaration/<tt/unsigned char __fastcall__ bgcolor (unsigned char color);/
-<tag/Description/The function will set a new background text color. It returns
-the old (current) background color.
+<tag/Description/The function will set a new background color and return the
+old (current) one. The background color is valid for the whole text output
+area of the screen, not just for new text.
 <tag/Limits/<itemize>
 <item>Background colors are system dependent. The function may have no effect
 on systems where the background color cannot be changed.
@@ -979,7 +980,7 @@ used in presence of a prototype.
 <tag/Header/<tt/<ref id="conio.h" name="conio.h">/
 <tag/Declaration/<tt/unsigned char __fastcall__ bordercolor (unsigned char color);/
 <tag/Description/The function will set a new border color. It returns the old
-(current) border color.
+(current) border color.                    
 <tag/Limits/<itemize>
 <item>Border colors are system dependent. The function may have no effect
 on systems where the border color cannot be changed.

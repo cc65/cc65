@@ -45,12 +45,14 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 #--------------------------------------------------------------------------
 # Object files
 
-OBJS =	crt0.o          \
+OBJS =	cgetc.o         \
+        crt0.o          \
 	ctype.o		\
         eeprom.o        \
         extzp.o         \
         framerate.o     \
 	getenv.o	\
+        kbhit.o         \
 	mainargs.o	\
 	sysuname.o	\
         upload.o

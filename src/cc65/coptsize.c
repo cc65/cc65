@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2002-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -42,6 +42,7 @@
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptsize.h"
+#include "reginfo.h"
 
 
 
@@ -64,58 +65,55 @@ struct CallDesc {
  * at least none of the following ones are better).
  */
 static const CallDesc CallTable [] = {
-    { "addeqysp",   -1,   -1,    0, "addeq0sp"      },
-    { "laddeqysp",  -1,   -1,    0, "laddeq0sp"     },
-    { "ldaxidx",    -1,   -1,    1, "ldaxi"         },
-    { "ldaxysp",    -1,   -1,    1, "ldax0sp"       },
-    { "ldeaxidx",   -1,   -1,    3, "ldeaxi"        },
-    { "ldeaxysp",   -1,   -1,    3, "ldeax0sp"      },
-    { "pusha",       0,   -1,   -1, "pushc0"        },
-    { "pusha",       1,   -1,   -1, "pushc1"        },
-    { "pusha",       2,   -1,   -1, "pushc2"        },
-    { "pushax",      0,    0,   -1, "push0"         },
-    { "pushax",      1,    0,   -1, "push1"         },
-    { "pushax",      2,    0,   -1, "push2"         },
-    { "pushax",      3,    0,   -1, "push3"         },
-    { "pushax",      4,    0,   -1, "push4"         },
-    { "pushax",      5,    0,   -1, "push5"         },
-    { "pushax",      6,    0,   -1, "push6"         },
-    { "pushax",      7,    0,   -1, "push7"         },
-    { "pushax",     -1,    0,   -1, "pusha0"        },
-    { "pushax",     -1, 0xFF,   -1, "pushaFF"       },
-    { "pushaysp",   -1,   -1,    0, "pusha0sp"      },
-    { "pushwidx",   -1,   -1,    1, "pushw"         },
-    { "pushwysp",   -1,   -1,    3, "pushw0sp"      },
-    { "staxysp",    -1,   -1,    0, "stax0sp"       },
-    { "tosaddax",   -1,    0,   -1, "tosadda0"      },
-    { "tosandax",   -1,    0,   -1, "tosanda0"      },
-    { "tosdivax",   -1,    0,   -1, "tosdiva0"      },
-    { "toseqax",    -1,    0,   -1, "toseqa0"       },
-    { "tosgeax",    -1,    0,   -1, "tosgea0"       },
-    { "tosgtax",    -1,    0,   -1, "tosgta0"       },
-    { "tosleax",    -1,    0,   -1, "toslea0"       },
-    { "tosorax",    -1,    0,   -1, "tosora0"       },
-    { "lsubeqysp",  -1,   -1,    0, "lsubeq0sp"     },
-    { "steaxysp",   -1,   -1,    0, "steax0sp"      },
-    { "subeqysp",   -1,   -1,    0, "subeq0sp"      },
-    { "tosaslax",   -1,    0,   -1, "tosasla0"      },
-    { "tosasrax",   -1,    0,   -1, "tosasra0"      },
-    { "tosltax",    -1,    0,   -1, "toslta0"       },
-    { "tosmodax",   -1,    0,   -1, "tosmoda0"      },
-    { "tosmulax",   -1,    0,   -1, "tosmula0"      },
-    { "tosneax",    -1,    0,   -1, "tosnea0"       },
-    { "tosrsubax",  -1,    0,   -1, "tosrsuba0"     },
-    { "tosshlax",   -1,    0,   -1, "tosshla0"      },
-    { "tosshrax",   -1,    0,   -1, "tosshra0"      },
-    { "tossubax",   -1,    0,   -1, "tossuba0"      },
-    { "tosudivax",  -1,    0,   -1, "tosudiva0"     },
-    { "tosugeax",   -1,    0,   -1, "tosugea0"      },
-    { "tosugtax",   -1,    0,   -1, "tosugta0"      },
-    { "tosuleax",   -1,    0,   -1, "tosulea0"      },
-    { "tosultax",   -1,    0,   -1, "tosulta0"      },
-    { "tosumodax",  -1,    0,   -1, "tosumoda0"     },
-    { "tosumulax",  -1,    0,   -1, "tosumula0"     },
-    { "tosxorax",   -1,    0,   -1, "tosxora0"      },
+    /* Name          A register      X register     Y register     replacement */
+    { "addeqysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "addeq0sp"  },
+    { "laddeqysp", UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "laddeq0sp" },
+    { "ldaxidx",   UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, "ldaxi"     },
+    { "ldaxysp",   UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, "ldax0sp"   },
+    { "ldeaxidx",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, "ldeaxi"    },
+    { "ldeaxysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, "ldeax0sp"  },
+    { "pusha",                  0, UNKNOWN_REGVAL, UNKNOWN_REGVAL, "pushc0"    },
+    { "pusha",                  1, UNKNOWN_REGVAL, UNKNOWN_REGVAL, "pushc1"    },
+    { "pusha",                  2, UNKNOWN_REGVAL, UNKNOWN_REGVAL, "pushc2"    },
+    { "pushax",                 0,              0, UNKNOWN_REGVAL, "push0"     },
+    { "pushax",                 1,              0, UNKNOWN_REGVAL, "push1"     },
+    { "pushax",                 2,              0, UNKNOWN_REGVAL, "push2"     },
+    { "pushax",                 3,              0, UNKNOWN_REGVAL, "push3"     },
+    { "pushax",                 4,              0, UNKNOWN_REGVAL, "push4"     },
+    { "pushax",                 5,              0, UNKNOWN_REGVAL, "push5"     },
+    { "pushax",                 6,              0, UNKNOWN_REGVAL, "push6"     },
+    { "pushax",                 7,              0, UNKNOWN_REGVAL, "push7"     },
+    { "pushax",    UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "pusha0"    },
+    { "pushax",    UNKNOWN_REGVAL,           0xFF, UNKNOWN_REGVAL, "pushaFF"   },
+    { "pushaysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "pusha0sp"  },
+    { "pushwidx",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              1, "pushw"     },
+    { "pushwysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              3, "pushw0sp"  },
+    { "staxysp",   UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "stax0sp"   },
+    { "tosaddax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosadda0"  },
+    { "tosandax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosanda0"  },
+    { "tosdivax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosdiva0"  },
+    { "toseqax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "toseqa0"   },
+    { "tosgeax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosgea0"   },
+    { "tosgtax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosgta0"   },
+    { "tosleax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "toslea0"   },
+    { "tosorax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosora0"   },
+    { "lsubeqysp", UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "lsubeq0sp" },
+    { "steaxysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "steax0sp"  },
+    { "subeqysp",  UNKNOWN_REGVAL, UNKNOWN_REGVAL,              0, "subeq0sp"  },
+    { "tosltax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "toslta0"   },
+    { "tosmodax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosmoda0"  },
+    { "tosmulax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosmula0"  },
+    { "tosneax",   UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosnea0"   },
+    { "tosrsubax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosrsuba0" },
+    { "tossubax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tossuba0"  },
+    { "tosudivax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosudiva0" },
+    { "tosugeax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosugea0"  },
+    { "tosugtax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosugta0"  },
+    { "tosuleax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosulea0"  },
+    { "tosultax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosulta0"  },
+    { "tosumodax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosumoda0" },
+    { "tosumulax", UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosumula0" },
+    { "tosxorax",  UNKNOWN_REGVAL,              0, UNKNOWN_REGVAL, "tosxora0"  },
 
 #if 0
     "tosadd0ax",         /* tosaddeax, sreg = 0 */

@@ -77,6 +77,7 @@ static void LoadConstant (unsigned Flags, ExprDesc* Expr)
 	     	Error ("Cannot take the address of a register variable");
 	    }
        	    g_getimmed ((Flags | CF_REGVAR) & ~CF_CONST, Expr->Name, Expr->IVal);
+	    break;
 
     	case E_LOC_STACK:
        	    g_leasp (Expr->IVal);

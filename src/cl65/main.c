@@ -56,6 +56,7 @@
 /* common */
 #include "attrib.h"
 #include "cmdline.h"
+#include "filetype.h"
 #include "fname.h"
 #include "strbuf.h"
 #include "target.h"
@@ -69,7 +70,7 @@
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*	   			     Data				     */
 /*****************************************************************************/
 
 
@@ -94,20 +95,6 @@ static CmdDesc CA65 = { 0, 0, 0, 0, 0, 0, 0 };
 static CmdDesc CO65 = { 0, 0, 0, 0, 0, 0, 0 };
 static CmdDesc LD65 = { 0, 0, 0, 0, 0, 0, 0 };
 static CmdDesc GRC  = { 0, 0, 0, 0, 0, 0, 0 };
-
-/* File types */
-enum {
-    FILETYPE_UNKNOWN,
-    FILETYPE_C,
-    FILETYPE_ASM,
-    FILETYPE_OBJ,
-    FILETYPE_LIB,
-    FILETYPE_GR,  		/* GEOS resource file */
-    FILETYPE_O65                /* O65 object file */
-};
-
-/* Default file type, used if type unknown */
-static unsigned DefaultFileType = FILETYPE_UNKNOWN;
 
 /* Variables controlling the steps we're doing */
 static int DontLink	= 0;
@@ -151,59 +138,6 @@ static char* TargetLib	= 0;
 #    error "Don't know which spawn module to include!"
 #  endif
 #endif
-
-
-
-/*****************************************************************************/
-/*    	    		     Determine a file type			     */
-/*****************************************************************************/
-
-
-
-static unsigned GetFileType (const char* File)
-/* Determine the type of the given file */
-{
-    /* Table mapping extensions to file types */
-    static const struct {
-	const char*	Ext;
-	unsigned	Type;
-    } FileTypes [] = {
-	{   ".c",	FILETYPE_C	},
-	{   ".s",	FILETYPE_ASM	},
-	{   ".asm",	FILETYPE_ASM	},
-	{   ".a65",	FILETYPE_ASM	},
-	{   ".o",	FILETYPE_OBJ	},
-	{   ".obj",	FILETYPE_OBJ	},
-	{   ".a",	FILETYPE_LIB	},
-	{   ".lib",	FILETYPE_LIB	},
-	{   ".grc",	FILETYPE_GR	},
-        {   ".o65",     FILETYPE_O65    },
-        {   ".emd",     FILETYPE_O65    },
-        {   ".joy",     FILETYPE_O65    },
-        {   ".tgi",     FILETYPE_O65    },
-    };
-
-    unsigned I;
-
-    /* Determine the file type by the extension */
-    const char* Ext = FindExt (File);
-
-    /* Do we have an extension? */
-    if (Ext == 0) {
-	return DefaultFileType;
-    }
-
-    /* Check for known extensions */
-    for (I = 0; I < sizeof (FileTypes) / sizeof (FileTypes [0]); ++I) {
-	if (strcmp (FileTypes [I].Ext, Ext) == 0) {
-	    /* Found */
-	    return FileTypes [I].Type;
-	}
-    }
-
-    /* Not found, return the default */
-    return DefaultFileType;
-}
 
 
 

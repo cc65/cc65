@@ -155,29 +155,66 @@ static void StringPragma (StrBuf* B, void (*Func) (const char*))
 static void SegNamePragma (StrBuf* B, segment_t Seg)
 /* Handle a pragma that expects a segment name parameter */
 {
-    StrBuf S;
+    ident       Ident;
+    StrBuf      S;
+    const char* Name;
 
-    if (SB_GetString (B, &S)) {
+    /* Try to read an identifier */
+    int Push = 0;
+    if (SB_GetSym (B, Ident)) {
 
-        /* Get the string */
-        const char* Name = SB_GetConstBuf (&S);
+        /* Check if we have a first argument named "pop" */
+        if (strcmp (Ident, "pop") == 0) {
 
-	/* Check if the name is valid */
-	if (ValidSegName (Name)) {
+            /* Pop the old value */
+            PopSegName (Seg);
 
-       	    /* Set the new name */
-	    g_segname (Seg, Name);
+            /* Set the segment name */
+            g_segname (Seg);
 
-	} else {
+            /* Done */
+            return;
 
-	    /* Segment name is invalid */
-	    Error ("Illegal segment name: `%s'", Name);
+        /* Check if we have a first argument named "push" */
+        } else if (strcmp (Ident, "push") == 0) {
 
-	}
+            Push = 1;
+            SB_SkipWhite (B);
+            if (SB_Get (B) != ',') {
+                Error ("Comma expected");
+                return;
+            }
+            SB_SkipWhite (B);
 
-    } else {
-	Error ("String literal expected");
+        } else {
+            Error ("Invalid pragma arguments");
+            return;
+        }
     }
+
+    /* A string argument must follow */
+    if (!SB_GetString (B, &S)) {
+	Error ("String literal expected");
+        return;
+    }
+
+    /* Get the string */
+    Name = SB_GetConstBuf (&S);
+
+    /* Check if the name is valid */
+    if (!ValidSegName (Name)) {
+        /* Segment name is invalid */
+        Error ("Illegal segment name: `%s'", Name);
+        return;
+    }
+
+    /* Set the new name */
+    if (Push) {
+        PushSegName (Seg, Name);
+    } else {
+        SetSegName (Seg, Name);
+    }
+    g_segname (Seg);          
 
     /* Call the string buf destructor */
     DoneStrBuf (&S);
@@ -237,7 +274,7 @@ static void FlagPragma (StrBuf* B, IntStack* Stack)
         if (IS_GetCount (Stack) < 2) {
             Error ("Cannot pop, stack is empty");
         } else {
-            IS_Drop (Stack); 
+            IS_Drop (Stack);
         }
         /* No other arguments allowed */
         return;

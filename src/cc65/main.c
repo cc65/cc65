@@ -340,7 +340,7 @@ static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
     CheckSegName (Arg);
 
     /* Set the name */
-    NewSegName (SEG_BSS, Arg);
+    SetSegName (SEG_BSS, Arg);
 }
 
 
@@ -361,7 +361,7 @@ static void OptCodeName (const char* Opt attribute ((unused)), const char* Arg)
     CheckSegName (Arg);
 
     /* Set the name */
-    NewSegName (SEG_CODE, Arg);
+    SetSegName (SEG_CODE, Arg);
 }
 
 
@@ -408,7 +408,7 @@ static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
     CheckSegName (Arg);
 
     /* Set the name */
-    NewSegName (SEG_DATA, Arg);
+    SetSegName (SEG_DATA, Arg);
 }
 
 
@@ -605,7 +605,7 @@ static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg
     CheckSegName (Arg);
 
     /* Set the name */
-    NewSegName (SEG_RODATA, Arg);
+    SetSegName (SEG_RODATA, Arg);
 }
 
 

@@ -42,12 +42,14 @@
 #include "coll.h"
 #include "scanner.h"
 #include "segnames.h"
+#include "strstack.h"
 #include "xmalloc.h"
 
 /* cc65 */
 #include "codeent.h"
 #include "codeseg.h"
 #include "dataseg.h"
+#include "error.h"
 #include "textseg.h"
 #include "segments.h"
 
@@ -66,7 +68,7 @@ Segments* CS = 0;
 Segments* GS = 0;
 
 /* Actual names for the segments */
-static char* SegmentNames[SEG_COUNT];
+static StrStack SegmentNames[SEG_COUNT];
 
 /* We're using a collection for the stack instead of a linked list. Since
  * functions may not be nested (at least in the current implementation), the
@@ -86,20 +88,50 @@ static Collection SegmentStack = STATIC_COLLECTION_INITIALIZER;
 void InitSegNames (void)
 /* Initialize the segment names */
 {
-    SegmentNames [SEG_BSS]	= xstrdup (SEGNAME_BSS);
-    SegmentNames [SEG_CODE] 	= xstrdup (SEGNAME_CODE);
-    SegmentNames [SEG_DATA]	= xstrdup (SEGNAME_DATA);
-    SegmentNames [SEG_RODATA]	= xstrdup (SEGNAME_RODATA);
+    SS_Push (&SegmentNames[SEG_BSS], SEGNAME_BSS);
+    SS_Push (&SegmentNames[SEG_CODE], SEGNAME_CODE);
+    SS_Push (&SegmentNames[SEG_DATA], SEGNAME_DATA);
+    SS_Push (&SegmentNames[SEG_RODATA], SEGNAME_RODATA);
 }
 
 
 
-void NewSegName (segment_t Seg, const char* Name)
+void SetSegName (segment_t Seg, const char* Name)
 /* Set a new name for a segment */
 {
-    /* Free the old name and set a new one */
-    xfree (SegmentNames [Seg]);
-    SegmentNames [Seg] = xstrdup (Name);
+    SS_Set (&SegmentNames[Seg], Name);
+}
+
+
+
+void PushSegName (segment_t Seg, const char* Name)
+/* Push the current segment name and set a new name for a segment */
+{
+    if (SS_IsFull (&SegmentNames[Seg])) {
+        Error ("Segment name stack overflow");
+    } else {
+        SS_Push (&SegmentNames[Seg], Name);
+    }
+}
+
+
+
+void PopSegName (segment_t Seg)
+/* Restore a segment name from the segment name stack */
+{
+    if (SS_GetCount (&SegmentNames[Seg]) < 2) {
+        Error ("Segment name stack is empty");
+    } else {
+        SS_Drop (&SegmentNames[Seg]);
+    }
+}
+
+
+
+const char* GetSegName (segment_t Seg)
+/* Get the name of the given segment */
+{
+    return SS_Get (&SegmentNames[Seg]);
 }
 
 
@@ -112,10 +144,10 @@ static Segments* NewSegments (SymEntry* Func)
 
     /* Initialize the fields */
     S->Text	= NewTextSeg (Func);
-    S->Code	= NewCodeSeg (SegmentNames[SEG_CODE], Func);
-    S->Data	= NewDataSeg (SegmentNames[SEG_DATA], Func);
-    S->ROData	= NewDataSeg (SegmentNames[SEG_RODATA], Func);
-    S->BSS	= NewDataSeg (SegmentNames[SEG_BSS], Func);
+    S->Code    	= NewCodeSeg (GetSegName (SEG_CODE), Func);
+    S->Data    	= NewDataSeg (GetSegName (SEG_DATA), Func);
+    S->ROData  	= NewDataSeg (GetSegName (SEG_RODATA), Func);
+    S->BSS     	= NewDataSeg (GetSegName (SEG_BSS), Func);
     S->CurDSeg 	= SEG_DATA;
 
     /* Return the new struct */

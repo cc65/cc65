@@ -237,15 +237,11 @@ void g_usebss (void)
 
 
 
-void g_segname (segment_t Seg, const char* Name)
-/* Set the name of a segment */
+void g_segname (segment_t Seg)
+/* Emit the name of a segment if necessary */
 {
-    DataSeg* S;
-
-    /* Remember the new name */
-    NewSegName (Seg, Name);
-
     /* Emit a segment directive for the data style segments */
+    DataSeg* S;
     switch (Seg) {
      	case SEG_RODATA: S = CS->ROData; break;
      	case SEG_DATA:   S = CS->Data;   break;
@@ -253,7 +249,7 @@ void g_segname (segment_t Seg, const char* Name)
 	default:         S = 0;          break;
     }
     if (S) {
-       	DS_AddLine (S, ".segment\t\"%s\"", Name);
+       	DS_AddLine (S, ".segment\t\"%s\"", GetSegName (Seg));
     }
 }
 

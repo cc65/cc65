@@ -105,8 +105,17 @@ extern Segments* GS;
 void InitSegNames (void);
 /* Initialize the segment names */
 
-void NewSegName (segment_t Seg, const char* Name);
+void SetSegName (segment_t Seg, const char* Name);
 /* Set a new name for a segment */
+
+void PushSegName (segment_t Seg, const char* Name);
+/* Push the current segment name and set a new name for a segment */
+
+void PopSegName (segment_t Seg);
+/* Restore a segment name from the segment name stack */
+
+const char* GetSegName (segment_t Seg);
+/* Get the name of the given segment */
 
 Segments* PushSegments (struct SymEntry* Func);
 /* Make the new segment list current but remember the old one */

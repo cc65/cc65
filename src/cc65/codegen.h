@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -122,8 +122,8 @@ void g_usedata (void);
 void g_usebss (void);
 /* Switch to the bss segment */
 
-void g_segname (segment_t Seg, const char* Name);
-/* Set the name of a segment */
+void g_segname (segment_t Seg);
+/* Emit the name of a segment if necessary */
 
 
 

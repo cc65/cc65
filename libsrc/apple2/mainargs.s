@@ -3,6 +3,7 @@
 ; Ullrich von Bassewitz, 2003-03-07
 ; Based on code from Stefan A. Haubenthal <polluks@web.de>, 2003-11-08
 ; Greg King, 2003-05-18
+; Stefan Haubenthal, 2005-01-07
 ;
 ; Scan a group of arguments that are in BASIC's input-buffer.
 ; Build an array that points to the beginning of each argument.
@@ -11,11 +12,11 @@
 ; Command-lines look like these lines:
 ;
 ; call2048
-; call2048 : rem  no arguments because no comma!
-; call2048:rem,arg1," arg 2" , arg 3 ,, arg5, ...
+; call2048 : rem
+; call2048:rem arg1 " arg 2 is quoted "  arg3 "" arg5
 ;
-; "call" and "rem" are entokenned; the args. are not.  Leading spaces are
-; ignored; trailing spaces are included -- unless the argument was quoted.
+; "call" and "rem" are entokenned; the args. are not.  Leading and trailing
+; spaces outside of quotes are ignored.
 
 ; TO-DO:
 ; - The "file-name" might be a path-name; don't copy the directory-components.
@@ -33,8 +34,9 @@ BASIC_BUF = $200
 BASIC_BUF_LEN = 239
 FNAM_LEN = $280
 FNAM = $281
-MAXARGS	 = BASIC_BUF_LEN - 2	; (don't count REM and terminating '\0')
 
+	.assert		MAXARGS <= (BASIC_BUF_LEN - 2)/2, error, "Too many arguments"
+MAXARGS	 = 10			; Maximum number of arguments allowed
 REM	 = $B2			; BASIC token-code
 NAME_LEN = 15			; maximum length of command-name
 
@@ -55,68 +57,73 @@ L0:	lda	FNAM,y
 	sta	name,y
 L1:	dey
 	bpl	L0
-	lda	#<name
-	ldx	#>name
-	sta	argv
-	stx	argv + 1
 	inc	__argc		; argc always is equal to, at least, 1
 
 ; Find the "rem" token.
-;
-	ldx	#$00
+
+	ldx	#0
 L2:	lda	BASIC_BUF,x
-	beq	done		; no "rem," no args.
+	beq	done		; no "rem" no args.
 	inx
 	cmp	#REM
 	bne	L2
-	ldy	#$01 * 2
+	ldy	#1 * 2
 
 ; Find the next argument.
-;
+
 next:	lda	BASIC_BUF,x
 	beq	done
 	inx
-	cmp	#','		; look for argument-list separator
-	bne	next
-	lda	#$00
-	sta	BASIC_BUF-1,x	; make the previous arg. be a legal C string
-	inc	__argc		; found another arg.
+	cmp	#' '		; Skip leading spaces
+	beq	next		;
 
-L4:	lda	BASIC_BUF,x
-	beq	point		; zero-length argument
-	inx
-	cmp	#' '
-	beq	L4		; skip leading spaces
+; Found start of next argument. We've incremented the pointer in X already, so
+; it points to the second character of the argument. This is useful since we
+; will check now for a quoted argument, in which case we will have to skip this
+; first character.
 
-	cmp	#'"'		; is argument quoted?
-	beq	L5
-	dex			; no, don't skip over character
-	clc			; (quotation-mark sets flag)
-L5:	ror	quoted		; save it
+found:	cmp	#'"'		; Is the argument quoted?
+	beq	setterm		; Jump if so
+	dex			; Reset pointer to first argument character
+	lda	#' '		; A space ends the argument
+setterm:sta	term		; Set end of argument marker
 
-; BASIC's input-buffer starts at the beginning of a RAM page.
-; So, we don't need to add the offset -- just store it.
-;
-point:	txa
+; Now store a pointer to the argument into the next slot. Since the BASIC
+; input buffer is located at the start of a RAM page, no calculations are
+; necessary.
+
+	txa			; Get low byte
 	sta	argv,y		; argv[y]= &arg
 	iny
 	lda	#>BASIC_BUF
 	sta	argv,y
 	iny
+	inc	__argc		; Found another arg
 
-	asl	quoted		; is argument a string-literal?
-	bcc	next		; no, don't look for ending quotation-mark
-L7:	lda	BASIC_BUF,x
+; Search for the end of the argument
+
+argloop:lda	BASIC_BUF,x
 	beq	done
 	inx
-	cmp	#'"'
-	bne	L7
-	lda	#$00
-	sta	BASIC_BUF-1,x	; make this arg. be a legal C string
-	beq	next		;(bra)
+	cmp	term
+	bne	argloop
+
+; We've found the end of the argument. X points one character behind it, and
+; A contains the terminating character. To make the argument a valid C string,
+; replace the terminating character by a zero.
+
+	lda	#0
+	sta	BASIC_BUF-1,x
+
+; Check if the maximum number of command line arguments is reached. If not,
+; parse the next one.
+
+	lda	__argc		; Get low byte of argument count
+	cmp	#MAXARGS	; Maximum number of arguments reached?
+	bcc	next		; Parse next one if not
 
 ; (The last vector in argv[] already is NULL.)
-;
+
 done:	lda	#<argv
 	ldx	#>argv
 	sta	__argv
@@ -124,10 +131,13 @@ done:	lda	#<argv
 	rts
 
 ; These arrays are zeroed before initmainargs is called.
-; char	name[16+1];
+; char	name[NAME_LEN+1];
 ; char* argv[MAXARGS+1]={name};
-;
-	.bss
-quoted:	.res	1, %00000000
+
+.bss
+term:	.res	1
 name:	.res	NAME_LEN + 1
-argv:	.res	(MAXARGS + 1) * 2
+
+.data
+argv:	.addr	name
+	.res	MAXARGS * 2

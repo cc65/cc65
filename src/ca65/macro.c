@@ -464,7 +464,7 @@ void MacDef (unsigned Style)
        		NextTok ();
 
      		/* Need an identifer */
-     		if (Tok != TOK_IDENT) {
+     		if (Tok != TOK_IDENT && Tok != TOK_LOCAL_IDENT) {
      	       	    Error ("Identifier expected");
      		    SkipUntilSep ();
      		    break;

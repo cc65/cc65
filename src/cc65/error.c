@@ -75,9 +75,11 @@ static void IntWarning (const char* Filename, unsigned LineNo, const char* Msg, 
        	fprintf (stderr, "%s(%u): Warning: ", Filename, LineNo);
      	vfprintf (stderr, Msg, ap);
      	fprintf (stderr, "\n");
-
-     	Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
-	++WarningCount;
+     
+        if (Line) {
+     	    Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+        }
+     	++WarningCount;
     }
 }
 
@@ -112,7 +114,9 @@ static void IntError (const char* Filename, unsigned LineNo, const char* Msg, va
     vfprintf (stderr, Msg, ap);
     fprintf (stderr, "\n");
 
-    Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+    if (Line) {
+        Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+    }
     ++ErrorCount;
     if (ErrorCount > 10) {
        	Fatal ("Too many errors");
@@ -151,11 +155,11 @@ void Fatal (const char* Format, ...)
     const char* FileName;
     unsigned    LineNum;
     if (CurTok.LI) {
-	FileName = GetInputName (CurTok.LI);
-	LineNum  = GetInputLine (CurTok.LI);
+     	FileName = GetInputName (CurTok.LI);
+     	LineNum  = GetInputLine (CurTok.LI);
     } else {
-	FileName = GetCurrentFile ();
-	LineNum  = GetCurrentLine ();
+     	FileName = GetCurrentFile ();
+     	LineNum  = GetCurrentLine ();
     }
 
     fprintf (stderr, "%s(%u): Fatal: ", FileName, LineNum);
@@ -165,7 +169,9 @@ void Fatal (const char* Format, ...)
     va_end (ap);
     fprintf (stderr, "\n");
 
-    Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+    if (Line) {
+        Print (stderr, 1, "Input: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+    }
     exit (EXIT_FAILURE);
 }
 
@@ -179,20 +185,23 @@ void Internal (const char* Format, ...)
     const char* FileName;
     unsigned    LineNum;
     if (CurTok.LI) {
-	FileName = GetInputName (CurTok.LI);
-	LineNum  = GetInputLine (CurTok.LI);
+     	FileName = GetInputName (CurTok.LI);
+     	LineNum  = GetInputLine (CurTok.LI);
     } else {
-	FileName = GetCurrentFile ();
-	LineNum  = GetCurrentLine ();
+     	FileName = GetCurrentFile ();
+     	LineNum  = GetCurrentLine ();
     }
 
     fprintf (stderr, "%s(%u): Internal compiler error:\n",
-	     FileName, LineNum);
+     	     FileName, LineNum);
 
     va_start (ap, Format);
     vfprintf (stderr, Format, ap);
     va_end (ap);
-    fprintf (stderr, "\nInput: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+
+    if (Line) {
+        fprintf (stderr, "\nInput: %.*s\n", SB_GetLen (Line), SB_GetConstBuf (Line));
+    }
 
     /* Use abort to create a core dump */
     abort ();

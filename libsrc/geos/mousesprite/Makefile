@@ -11,7 +11,8 @@
 S_OBJS	= startmousemode.o clearmousemode.o mouseup.o mouseoff.o\
 	  drawsprite.o possprite.o enablsprite.o disablsprite.o\
 	  ismseinregion.o inittextprompt.o promptoff.o prompton.o\
-	  getnextchar.o
+	  getnextchar.o\
+	  mouse.o readjoy.o
 
 all: $(S_OBJS)
 

@@ -114,6 +114,7 @@ geoslib:
 	for i in geos common runtime; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
+	    AR=$(AR) \
 	    CFLAGS="-Osir -g -t geos -I../../include" \
 	    AFLAGS="-t geos" \
 	    $(MAKE) -C $$i || exit 1; \

@@ -2,14 +2,7 @@
 # Makefile for GEOS lib
 # for cc65
 #
-# Maciej 'YTM/Alliance' Witkowiak
-
-export CC	= ../../../src/cc65
-export CFLAGS	= -O
-export AS      	= ../../../src/ca65/ca65
-export ASFLAGS	=
-AR      	= ../../src/ar65/ar65
-
+# Maciej 'YTM/Elysium' Witkowiak
 
 OBJ_DIRS=disk dlgbox file graph menuicon memory mousesprite process system
 

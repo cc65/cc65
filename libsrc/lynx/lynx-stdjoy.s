@@ -92,6 +92,7 @@ COUNT:
 READ:
        	ldx     #$00            ; Clear high byte
         lda     JOYSTICK        ; Read joystick
+        and     #$F3            ; Mask relevant keys
         rts
 
 

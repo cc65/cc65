@@ -38,6 +38,7 @@
 /* common */
 #include "abend.h"
 #include "print.h"
+#include "xsprintf.h"
 
 /* cc65 */
 #include "asmlabel.h"
@@ -632,6 +633,130 @@ static unsigned OptAdd1 (CodeSeg* S)
 
 
 static unsigned OptAdd2 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *     	ldy     #xx
+ *      lda     (sp),y
+ *  	tax
+ *      dey
+ *      lda     (sp),y
+ *      ldy     #$yy
+ *      jsr     addeqysp
+ *
+ * and replace it by:
+ *
+ *      ldy     #xx-1
+ *      lda     (sp),y
+ *      ldy     #yy
+ *      clc
+ *      adc     (sp),y
+ *      sta     (sp),y
+ *      ldy     #xx
+ *      lda     (sp),y
+ *      ldy     #yy+1
+ *      adc     (sp),y
+ *      sta     (sp),y
+ *
+ * provided that a/x is not used later.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+     	CodeEntry* L[7];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+	if (L[0]->OPC == OP65_LDY               &&
+	    CE_KnownImm (L[0])                  &&
+       	    CS_GetEntries (S, L+1, I+1, 6)   	&&
+	    L[1]->OPC == OP65_LDA               &&
+	    L[1]->AM == AM65_ZP_INDY            &&
+	    !CE_HasLabel (L[1])                 &&
+	    L[2]->OPC == OP65_TAX               &&
+	    !CE_HasLabel (L[2])                 &&
+	    L[3]->OPC == OP65_DEY               &&
+       	    !CE_HasLabel (L[3])                 &&
+	    L[4]->OPC == OP65_LDA               &&
+	    L[4]->AM == AM65_ZP_INDY            &&
+	    !CE_HasLabel (L[4])                 &&
+	    L[5]->OPC == OP65_LDY               &&
+	    CE_KnownImm (L[5])                  &&
+	    !CE_HasLabel (L[5])                 &&
+	    L[6]->OPC == OP65_JSR               &&
+       	    strcmp (L[6]->Arg, "addeqysp") == 0 &&
+	    !CE_HasLabel (L[6])) {
+
+	    char Buf [20];
+	    CodeEntry* X;
+	    int Offs;
+
+
+	    /* Create a replacement for the first LDY */
+	    Offs = (int) (L[0]->Num - 1);
+	    xsprintf (Buf, sizeof (Buf), "$%02X", Offs);
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+1);
+	    CS_DelEntry (S, I);
+
+	    /* Load Y with the low offset of the target variable */
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[5]->Arg, 0, L[1]->LI);
+	    CS_InsertEntry (S, X, I+2);
+
+	    /* Add the CLC */
+	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[1]->LI);
+	    CS_InsertEntry (S, X, I+3);
+
+	    /* Remove the TAX/DEY sequence */
+	    CS_DelEntry (S, I+5);      /* dey */
+	    CS_DelEntry (S, I+4);      /* tax */
+
+	    /* Addition of the low byte */
+	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[4]->LI);
+	    CS_InsertEntry (S, X, I+4);
+	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[4]->LI);
+	    CS_InsertEntry (S, X, I+5);
+
+	    /* LDY */
+	    xsprintf (Buf, sizeof (Buf), "$%02X", (Offs+1));
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[4]->LI);
+	    CS_InsertEntry (S, X, I+6);
+
+	    /* Addition of the high byte */
+	    xsprintf (Buf, sizeof (Buf), "$%02X", (int)(L[5]->Num+1));
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[5]->LI);
+	    CS_InsertEntry (S, X, I+8);
+	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[6]->LI);
+	    CS_InsertEntry (S, X, I+9);
+	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[6]->LI);
+	    CS_InsertEntry (S, X, I+10);
+
+	    /* Delete the remaining stuff */
+	    CS_DelEntry (S, I+12);
+	    CS_DelEntry (S, I+11);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptAdd3 (CodeSeg* S)
 /* Search for the sequence
  *
  *  	adc     ...
@@ -1890,7 +2015,8 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
 	    !CE_HasLabel (L[6])                 &&
 	    L[7]->OPC == OP65_JSR               &&
        	    strcmp (L[7]->Arg, "ldauidx") == 0  &&
-	    !CE_HasLabel (L[7])) {
+	    !CE_HasLabel (L[7])                 &&
+	    (GetRegInfo (S, I+8) & REG_AX) == 0) {
 
 	    CodeEntry* X;
 
@@ -2001,7 +2127,7 @@ static unsigned OptPtrLoad3 (CodeSeg* S)
 	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[4]->LI);
 	    CS_InsertEntry (S, X, I+5);
 
-	    /* Delete more transfer and PLA insns */	     
+	    /* Delete more transfer and PLA insns */
 	    CS_DelEntry (S, I+7);
 	    CS_DelEntry (S, I+6);
 
@@ -2150,7 +2276,8 @@ static OptFunc OptFuncs [] = {
     OptEntry (OptSub2, optMain),
     /* Optimize additions */
     OptEntry (OptAdd1, optPre),
-    OptEntry (OptAdd2, optMain),
+    OptEntry (OptAdd2, optPre),
+    OptEntry (OptAdd3, optMain),
     /* Optimize jump cascades */
     OptEntry (OptJumpCascades, optMain),
     /* Remove dead jumps */

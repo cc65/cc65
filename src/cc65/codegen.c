@@ -1713,12 +1713,8 @@ void g_addeqlocal (unsigned flags, int offs, unsigned long val)
      	    if (flags & CF_CONST) {
      	     	g_getimmed (flags, val, 0);
      	    }
-     	    if (offs == 0) {
-     	     	AddCodeLine ("jsr addeq0sp");
-     	    } else {
-     	     	ldyconst (offs);
-     	     	AddCodeLine ("jsr addeqysp");
-     	    }
+	    ldyconst (offs);
+	    AddCodeLine ("jsr addeqysp");
        	    break;
 
        	case CF_LONG:

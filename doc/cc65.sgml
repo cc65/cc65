@@ -589,10 +589,6 @@ The compiler defines several macros at startup:
 
   This macro is defined if the target is the c128 (-t c128).
 
-  <tag><tt>__PLUS4__</tt></tag>
-
-  This macro is defined if the target is the plus/4 (-t plus4).
-
   <tag><tt>__CBM510__</tt></tag>
 
   This macro is defined if the target is the CBM 500 series of computers.
@@ -602,13 +598,21 @@ The compiler defines several macros at startup:
   This macro is defined if the target is one of the CBM 600/700 family of
   computers (called B series in the US).
 
+  <tag><tt>__GEOS__</tt></tag>
+
+  This macro is defined if you are compiling for the GEOS system (-t geos).
+
   <tag><tt>__PET__</tt></tag>
 
   This macro is defined if the target is the PET family of computers (-t pet).
 
-  <tag><tt>__GEOS__</tt></tag>
+  <tag><tt>__PLUS4__</tt></tag>
 
-  This macro is defined if you are compiling for the GEOS system (-t geos).
+  This macro is defined if the target is the plus/4 (-t plus4).
+
+  <tag><tt>__VIC20__</tt></tag>
+
+  This macro is defined if the target is the vic20 (-t vic20).
 
   <tag><tt>__FILE__</tt></tag>
 

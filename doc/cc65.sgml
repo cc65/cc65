@@ -86,6 +86,7 @@ Long options:
   --data-name seg       Set the name of the DATA segment
   --debug               Debug mode
   --debug-info          Add debug info to object file
+  --forget-inc-paths    Forget include search paths
   --help                Help (this text)
   --include-dir dir     Set an include directory search path
   --register-space b    Set space available for register variables
@@ -96,6 +97,7 @@ Long options:
   --target sys          Set the target system
   --verbose             Increase verbosity
   --version             Print the compiler version number
+  --writable-strings    Make string literals writable
 ---------------------------------------------------------------------------
 </verb></tscreen>
 
@@ -166,6 +168,13 @@ Here is a description of all the command line options:
 
   Define a macro on the command line. If no definition is given, the macro
   is defined to the value "1".
+
+
+  <tag><tt>--forget-inc-paths</tt></tag>
+
+  Forget the builtin include paths. This is most useful when building 
+  customized C or runtime libraries, in which case the standard header
+  files should be ignored.
 
 
   <tag><tt>-g, --debug-info</tt></tag>
@@ -255,6 +264,12 @@ Here is a description of all the command line options:
 
   Using this option, the compiler will be somewhat more verbose if errors
   or warnings are encountered.
+
+
+  <tag><tt>--writable-strings</tt></tag>
+
+  Make string literals writable by placing them into the data segment instead
+  of the rodata segment.
 
 
   <tag><tt>-Cl, --static-locals</tt></tag>

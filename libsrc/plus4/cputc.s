@@ -28,34 +28,35 @@ _cputc: cmp    	#$0A  		; CR?
        	beq    	plot		; Recalculate pointers
 
 L1: 	cmp	#$0D  	  	; LF?
-       	bne	L2
-	ldy	CURS_Y
-	iny
-	bne	newline		; Recalculate pointers
+       	beq	newline		; Recalculate pointers
 
 ; Printable char of some sort
 
-L2:    	cmp	#' '
+	cmp	#' '
     	bcc	cputdirect	; Other control char
     	tay
     	bmi	L10
     	cmp	#$60
-    	bcc	L3
+    	bcc	L2
     	and	#$DF
     	bne	cputdirect	; Branch always
-L3: 	and	#$3F
+L2: 	and	#$3F
 
 cputdirect:
-	jsr	putchar		; Write the character to the screen
+  	jsr	putchar		; Write the character to the screen
 
 ; Advance cursor position
 
 advance:
-   	iny
-   	cpy	xsize
-   	bne	L9
+        iny
+        cpy     xsize
+        bne     L3
+        jsr     newline         ; new line
+        ldy     #0              ; + cr
+L3:     sty     CURS_X
+        rts
+
 newline:
-   	ldy	#0    	  	; new line
    	clc
    	lda	xsize
    	adc	SCREEN_PTR
@@ -69,7 +70,6 @@ L4:	lda    	xsize
    	bcc	L5
    	inc	CRAM_PTR+1
 L5:	inc	CURS_Y
-L9:    	sty	CURS_X
    	rts
 
 ; Handle character if high bit set

@@ -59,7 +59,7 @@ EMDS =
 
 JOYS = apple2-stdjoy.joy
 
-TGIS = apple2-280-192-6.tgi
+TGIS = apple2-40-40-16.tgi apple2-280-192-6.tgi
 
 #--------------------------------------------------------------------------
 # Targets

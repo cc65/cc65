@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -41,9 +41,10 @@
 
 void* __fastcall__ realloc (void* block, size_t size)
 {
-    unsigned* b;
-    unsigned* newblock;
+    struct usedblock* b;
+    struct usedblock* newblock;
     unsigned oldsize;
+    unsigned newhptr;
     int diff;
 
     /* Check the block parameter */
@@ -56,7 +57,7 @@ void* __fastcall__ realloc (void* block, size_t size)
     if (size == 0) {
      	/* Block is not NULL, but size is: free the block */
      	free (block);
-	return 0;
+    	return 0;
     }
 
     /* Make the internal used size from the given size */
@@ -65,22 +66,26 @@ void* __fastcall__ realloc (void* block, size_t size)
         size = sizeof (struct freeblock);
     }
 
-    /* Get a pointer to the real block, get the old block size */
-    b = (unsigned*) (((int) block) - 2);
-    oldsize = *b;
+    /* The word below the user block contains a pointer to the start of the
+     * raw memory block. The first word of this raw memory block is the full
+     * size of the block. Get a pointer to the real block, get the old block
+     * size.
+     */
+    b = (((struct usedblock*) block) - 1)->start;
+    oldsize = b->size;
 
     /* Get the size difference as a signed quantity */
     diff = size - oldsize;
 
     /* Is the block at the current heap top? */
-    if (((int) b) + oldsize == ((int) _heapptr)) {
+    if (((unsigned) b) + oldsize == ((unsigned) _heapptr)) {
     	/* Check if we've enough memory at the heap top */
-    	int newhptr;
-    	newhptr = ((int) _heapptr) + diff;
-    	if (newhptr <= ((int) _heapend)) {
+    	newhptr = ((unsigned) _heapptr) + diff;
+    	if (newhptr <= ((unsigned) _heapend)) {
     	    /* Ok, there's space enough */
        	    _heapptr = (unsigned*) newhptr;
-    	    *b = size;
+            b->size = size;
+            b->start = b;
     	    return block;
     	}
     }
@@ -90,17 +95,17 @@ void* __fastcall__ realloc (void* block, size_t size)
      */
     if (newblock = malloc (size)) {
 
-	/* Adjust the old size to the user visible portion */
-	oldsize -= sizeof (unsigned);
+    	/* Adjust the old size to the user visible portion */
+    	oldsize -= HEAP_ADMIN_SPACE;
 
-	/* If the new block is larger than the old one, copy the old
-	 * data only
-	 */
-	if (size > oldsize) {
-	    size = oldsize;
-	}
+    	/* If the new block is larger than the old one, copy the old
+    	 * data only
+    	 */
+    	if (size > oldsize) {
+    	    size = oldsize;
+    	}
 
-	/* Copy the block data */
+    	/* Copy the block data */
      	memcpy (newblock, block, size);
      	free (block);
     }
@@ -109,4 +114,4 @@ void* __fastcall__ realloc (void* block, size_t size)
 
 
 
-                 
+

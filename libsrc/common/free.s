@@ -72,23 +72,32 @@
 _free: 	sta    	ptr2
 	stx	ptr2+1	       	      	; Save block
 
-; Is the argument NULL?
+; Is the argument NULL? If so, bail out.
 
 	ora 	ptr2+1 	       	      	; Is the argument NULL?
-       	beq 	@L9 	       		; Jump if yes
+       	bne     @L0 	       		; Jump if no
+        rts                             ; Bail out if yes
 
-; Decrement the given pointer by the admin space amount, so it points to the
-; real block allocated. The size of the block is stored in the admin space.
+; There's a pointer below the user space that points to the real start of the
+; raw block. The first word of the raw block is the total size of the block.
 ; Remember the block size in ptr1.
 
-	lda	ptr2
-	sub	#HEAP_ADMIN_SPACE
+@L0:    lda	ptr2
+	sub	#2
 	sta	ptr2
     	bcs	@L1
     	dec	ptr2+1
-@L1:	ldy	#freeblock::size+1
+@L1:   	ldy    	#1
+        lda     (ptr2),y                ; High byte of real block address
+        tax
+        dey
+        lda     (ptr2),y
+        stx     ptr2+1
+        sta     ptr2                    ; Set ptr2 to start of real block
+
+        ldy     #usedblock::size+1
 	lda	(ptr2),y       	      	; High byte of size
-	sta	ptr1+1 	       	      	; Save it
+       	sta    	ptr1+1 	       	      	; Save it
 	dey
 	lda	(ptr2),y
 	sta	ptr1
@@ -261,7 +270,7 @@ _free: 	sta    	ptr2
 ;     		}
 ;     	    } else {
 ;     		f->prev = 0;
-;     		/* Special case: This is the new freelist start */
+;     	   	/* Special case: This is the new freelist start */
 ;     		_hfirst = f;
 ;     	    }
 ; 	}
@@ -524,6 +533,7 @@ NoLeftMerge:
 	lda	ptr4+1
 	sta	(ptr2),y
 	rts			        ; Done
+
 
 
 

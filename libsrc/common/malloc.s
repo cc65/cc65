@@ -309,17 +309,27 @@ SliceBlock:
     	stx	ptr2
     	sta	ptr2+1
 
-; Fill the size into the admin space of the block and return the user pointer
+; Fill the size and start address into the admin space of the block 
+; (struct usedblock) and return the user pointer
 
 FillSizeAndRet:
-	ldy	#freeblock::size        ; *p = size;
-	lda	ptr1		        ; Low byte of block size
+	ldy    	#usedblock::size        ; p->size = size;
+	lda	ptr1 		        ; Low byte of block size
 	sta	(ptr2),y
-	iny			        ; Points to freeblock::size+1
+	iny	     		        ; Points to freeblock::size+1
 	lda	ptr1+1
 	sta	(ptr2),y
 
 RetUserPtr:
+        ldy     #usedblock::start       ; p->start = p
+        lda     ptr2
+        sta     (ptr2),y
+        iny
+        lda     ptr2+1
+        sta     (ptr2),y
+
+; Return the user pointer, which points behind the struct usedblock
+
 	lda	ptr2   	       	        ; return ++p;
 	ldx	ptr2+1
 	add	#HEAP_ADMIN_SPACE

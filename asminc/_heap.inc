@@ -13,12 +13,19 @@
 ; probably not work.
 .struct freeblock
         size    .word
-        next    .word
-        prev    .word
+        next    .addr
+        prev    .addr
 .endstruct
 
-HEAP_ADMIN_SPACE    = 2
+; Struct usedblock
+; See notes above
+.struct usedblock
+        size    .word
+        start   .addr
+.endstruct
+
 HEAP_MIN_BLOCKSIZE  = .sizeof (freeblock)   ; Minimum size of an allocated block
+HEAP_ADMIN_SPACE    = .sizeof (usedblock)   ; Additional space for used bocks
 
 ; Variables
 .global         __heaporg

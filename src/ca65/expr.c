@@ -923,18 +923,24 @@ long ConstExpression (void)
  * not constant.
  */
 {
+    long Val;
+
     /* Read the expression, and call finalize (exception here, since we
      * expect a const).
      */
     ExprNode* Expr = FinalizeExpr (Expression ());
 
-    /* Return the value */
+    /* Get the value */
     if (IsConstExpr (Expr)) {
-     	return GetExprVal (Expr);
+     	Val = GetExprVal (Expr);
     } else {
      	Error (ERR_CONSTEXPR_EXPECTED);
-     	return 0;
+     	Val = 0;
     }
+
+    /* Free the expression tree and return the value */
+    FreeExpr (Expr);
+    return Val;
 }
 
 
@@ -1644,4 +1650,4 @@ void WriteExpr (ExprNode* Expr)
 
 
 
-                  
+

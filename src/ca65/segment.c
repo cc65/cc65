@@ -370,6 +370,9 @@ void SegCheck (void)
 	     		}
 	     	    }
 
+                    /* We don't need the expression tree any longer */
+                    FreeExpr (F->V.Expr);
+
 	     	    /* Convert the fragment into a literal fragment */
 	     	    for (I = 0; I < F->Len; ++I) {
 	     	       	F->V.Data [I] = Val & 0xFF;

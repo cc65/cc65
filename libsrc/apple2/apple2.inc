@@ -4,10 +4,6 @@ BRKVec  = $03F0
 ; Goto Dos
 RESTOR	=	$03D0
 
-; Top of available memory
-; This is actually for DOS 3.3 need to change it for ProDos
-TOPMEM  =       $9600
-
 ; Soft switches
 ;
 ; write to USEROM to enable apple rom C000-CFFF
@@ -42,3 +38,50 @@ KEY_STROBE       = $C000
 ; Game controller
 OPEN_APPLE = $C061
 CLOSED_APPLE = $C062
+
+;Graphics entry points, by cbmnut (applenut??) cbmnut@hushmail.com
+WHITE   = $01     ;white for $1c, I think...
+
+COLOR   = $1C     ;Current plot color
+
+HGR2    = $F3D8   ;Initialize and clear hi-res page 2.
+
+HGR     = $F3E2   ;Initialize and clear hi-res page 1.
+
+HCLR    = $F3F2   ;Clear the current hi-res screen to black.
+
+BKGND   = $F3F6   ;Clear the current hi-res screen to the
+                 ;last plotted color (from ($1C).
+
+HPOSN   = $F411  ;Positions the hi-res cursor without
+                 ;plotting a point.
+                 ;Enter with (A) = Y-coordinate, and
+                 ;(Y,X) = X-coordinate.
+
+HPLOT   = $F457  ;Calls HPOSN and tries to plot a dot at
+                 ;the cursor's position.  If you are
+                 ;trying to plot a non-white color at
+                 ;a complementary color position, no
+                 ;dot will be plotted.
+
+HLIN    = $F53A  ;Draws a line from the last plotted
+                 ;point or line destination to:
+                 ;(X,A) = X-coordinate, and
+                 ;(Y) = Y-coordinate.
+
+HFIND   = $F5CB  ;Converts the hi-res coursor's position
+                 ;back to X- and Y-coordinates; stores
+                 ;X-coordinate at $E0,E1 and Y-coordinate
+                 ;at $E2.
+
+DRAW    = $F601  ;Draws a shape.  Enter with (Y,X) = the
+                 ;address of the shape table, and (A) =
+                 ;the rotation factor.  Uses the current
+                 ;color.
+
+XDRAW   = $F65D  ;Draws a shape by inverting the existing
+                 ;color of the dots the shape draws over.
+                 ;Same entry parameters as DRAW.
+
+SETHCOL = $F6EC  ;Set the hi-res color to (X), where (X)
+                 ;must be between 0 and 7.

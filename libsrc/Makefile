@@ -206,7 +206,7 @@ plus4lib:
 
 .PHONY: clean
 clean:
-	@for i in apple2 atari c128 c64 cbm cbm510 cbm610 common conio dbg geos pet plus4 runtime; do 	\
+	@for i in apple2 atari c128 c64 cbm cbm510 cbm610 common conio dbg geos pet plus4 runtime tgi; do 	\
 	   $(MAKE) -C $$i clean;     	    		  	   					\
 	done
 

@@ -27,6 +27,7 @@ S_OBJS  =       _scrsize.o      \
                 color.o         \
                 cputc.o         \
                 crt0.o          \
+                ctype.o         \
                 cvline.o        \
                 getenv.o        \
                 gotox.o         \

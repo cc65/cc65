@@ -1550,374 +1550,439 @@ static void OptDeadJumps (void)
 static void OptLoads (void)
 /* Remove unnecessary loads of values */
 {
-    Line* L2 [10];
+    unsigned Changes;
 
-    Line* L = FirstCode;
-    while (L) {
+    do {
 
-	/* Check for
-	 *
-	 *  	ldy	#$..
-     	 *  	lda	(sp),y
-	 *  	tax
-	 *  	dey
-	 *  	lda	(sp),y
-	 *  	jsr	pushax
-      	 *
-	 * and replace it by
-	 *
-	 *  	ldy	#$..
-	 *  	jsr	pushwysp
-	 *
-	 * or even
-	 *
-	 *  	jsr	pushw0sp
-	 *
-	 * This change will cost 3 cycles (one additional jump inside the
-	 * subroutine), but it saves a lot of code (6 bytes per occurrence),
-	 * so we will accept the overhead. It may even be possible to rewrite
-	 * the library routine to get rid of the additional overhead.
-	 */
-	if (LineMatch (L, "\tldy\t#$")			&&
-	    GetNextCodeLines (L, L2, 5)			&&
-	    LineFullMatch (L2 [0], "\tlda\t(sp),y")	&&
-	    LineFullMatch (L2 [1], "\ttax")		&&
-	    LineFullMatch (L2 [2], "\tdey")		&&
-	    LineFullMatch (L2 [3], "\tlda\t(sp),y")	&&
-	    LineFullMatch (L2 [4], "\tjsr\tpushax")) {
+	Line* L2 [10];
+	Line* L = FirstCode;
+       	Changes = 0;
+	while (L) {
 
-	    /* Found - replace it */
-	    if (LineFullMatch (L, "\tldy\t#$01")) {
-	    	/* Word at offset zero */
-	    	FreeLine (L);
-       	       	L = ReplaceLine (L2 [4], "\tjsr\tpushw0sp");
-	    } else {
-	       	ReplaceLine (L2 [4], "\tjsr\tpushwysp");
+	    /* Check for
+	     *
+	     *  	ldy	#$..
+	     *  	lda	(sp),y
+	     *  	tax
+	     *  	dey
+	     *  	lda	(sp),y
+	     *  	jsr	pushax
+	     *
+	     * and replace it by
+	     *
+	     *  	ldy	#$..
+	     *  	jsr	pushwysp
+	     *
+	     * or even
+	     *
+	     *  	jsr	pushw0sp
+	     *
+	     * This change will cost 3 cycles (one additional jump inside the
+	     * subroutine), but it saves a lot of code (6 bytes per occurrence),
+	     * so we will accept the overhead. It may even be possible to rewrite
+	     * the library routine to get rid of the additional overhead.
+	     */
+	    if (LineMatch (L, "\tldy\t#$")			&&
+	       	GetNextCodeLines (L, L2, 5)			&&
+	       	LineFullMatch (L2 [0], "\tlda\t(sp),y")	&&
+	       	LineFullMatch (L2 [1], "\ttax")		&&
+	       	LineFullMatch (L2 [2], "\tdey")		&&
+	       	LineFullMatch (L2 [3], "\tlda\t(sp),y")	&&
+	       	LineFullMatch (L2 [4], "\tjsr\tpushax")) {
+
+	       	/* Found - replace it */
+	       	if (LineFullMatch (L, "\tldy\t#$01")) {
+	       	    /* Word at offset zero */
+	       	    FreeLine (L);
+	       	    L = ReplaceLine (L2 [4], "\tjsr\tpushw0sp");
+	       	} else {
+	       	    ReplaceLine (L2 [4], "\tjsr\tpushwysp");
+	       	}
+
+	       	/* Delete the remaining lines */
+	       	FreeLines (L2 [0], L2 [3]);
+
+		/* We have changes */
+		++Changes;
+
+	    /* Check for
+	     *
+	     *  	ldy  	#$xx
+	     *  	lda	(sp),y
+	     *  	tax
+	     *  	dey
+	     *  	lda	(sp),y
+	     *  	ldy	#$yy
+	     *  	jsr	ldauidx
+	     *
+	     * and replace it by
+	     *
+	     *  	ldy	#$xx
+	     *  	ldx	#$yy
+	     *  	jsr	ldauiysp
+	     *
+	     * or even
+	     *
+	     *  	jsr	ldaui0sp
+	     *
+	     * This change will cost 2 cycles, but it saves a lot of code (6 bytes
+	     * per occurrence), so we will accept the overhead. It may even be
+	     * possible to rewrite the library routine to get rid of the additional
+	     * overhead.
+	     */
+	    } else if (LineMatch (L, "\tldy\t#$")  		&&
+		GetNextCodeLines (L, L2, 6)			&&
+		LineFullMatch (L2 [0], "\tlda\t(sp),y")	&&
+		LineFullMatch (L2 [1], "\ttax")		&&
+		LineFullMatch (L2 [2], "\tdey")		&&
+		LineFullMatch (L2 [3], "\tlda\t(sp),y")	&&
+		LineMatch     (L2 [4], "\tldy\t#$")		&&
+		LineFullMatch (L2 [5], "\tjsr\tldauidx")) {
+
+		/* Found - replace it */
+		L2 [4]->Line [3] = 'x';		/* Change to ldx */
+		if (LineFullMatch (L, "\tldy\t#$01")) {
+		    /* Word at offset zero */
+		    FreeLine (L);
+		    L = ReplaceLine (L2 [5], "\tjsr\tldaui0sp");
+		} else {
+		    ReplaceLine (L2 [5], "\tjsr\tldauiysp");
+		}
+
+		/* Delete the remaining lines */
+		FreeLines (L2 [0], L2 [3]);
+
+		/* We have changes */
+		++Changes;
+
+	    /* Search for:
+	     *
+	     *     	lda    	(sp),y
+	     *     	jsr	pusha
+	     *
+	     * And replace by
+	     *
+	     *     	jsr    	pushaysp
+	     */
+	    } else if (LineFullMatch (L, "\tlda\t(sp),y")	&&
+		GetNextCodeLines (L, L2, 1)	       	       	&&
+		LineFullMatch (L2 [0], "\tjsr\tpusha")) {
+
+		/* Found, replace it */
+		L = ReplaceLine (L, "\tjsr\tpushaysp");
+		FreeLine (L2 [0]);
+
+		/* We have changes */
+		++Changes;
+
+	    /* Search for:
+	     *
+	     *     	ldx    	xx
+	     *     	lda	yy
+	     *    	sta	zzz
+	     *    	stx	zzz+1
+	     *
+	     * and replace it by:
+	     *
+	     *     	lda    	xx
+	     *    	sta	zzz+1
+	     *     	lda	yy
+	     *    	sta	zzz
+	     *
+	     * provided that that the X register is not used later. While this is
+	     * no direct optimization, it helps with other optimizations.
+	     */
+	    } else if (LineMatch (L, "\tldx\t")		&&
+		GetNextCodeLines (L, L2, 3)	 		&&
+		LineMatch (L2 [0], "\tlda\t")		&&
+		Is16BitStore (L2[1], L2[2])			&&
+		!RegXUsed (L2[2])) {
+
+		/* Found - replace it */
+		L->Line[3] = 'a';
+		NewLineAfter (L, "\tsta\t%s", L2[2]->Line+5);
+		FreeLine (L2[2]);
+		L = L2[1];
+
+		/* We have changes */
+		++Changes;
+
+	    /* Search for:
+	     *
+	     *     	ldx    	xx
+	     *     	lda	yy
+	     *     	ldy	#$zz
+	     *    	jsr	staxysp
+	     *
+	     * and replace it by:
+	     *
+	     *     	lda    	xx
+	     *	ldy	#$zz+1
+	     *    	sta	(sp),y
+	     *     	dey
+	     *	lda	yy
+	     *    	sta	(sp),y
+	     *
+	     * provided that that the X register is not used later. This code
+	     * sequence is two bytes longer, but a lot faster and it does not
+	     * use the X register, so other loads may get removed later.
+	     */
+	    } else if (LineMatch (L, "\tldx\t")	  	&&
+		GetNextCodeLines (L, L2, 3)	 	  	&&
+		LineMatch (L2 [0], "\tlda\t")	  	&&
+		LineMatch (L2 [1], "\tldy\t#$")	  	&&
+		LineFullMatch (L2 [2], "\tjsr\tstaxysp")	&&
+		!RegXUsed (L2[2])) {
+
+		/* Found - replace it */
+		L->Line[3] = 'a';
+		L = NewLineAfter (L, "\tldy\t#$%02X", GetHexNum (L2[1]->Line+7)+1);
+		L = NewLineAfter (L, "\tsta\t(sp),y");
+		L = NewLineAfter (L, "\tdey");
+		L = NewLineAfter (L2[0], "\tsta\t(sp),y");
+
+		/* Remove the remaining lines */
+		FreeLines (L2[1], L2[2]);
+
+		/* We have changes */
+		++Changes;
+
+	    /* Search for:
+	     *
+	     *     	ldx    	xx
+	     *     	lda	yy
+	     *    	jsr	stax0sp
+	     *
+	     * and replace it by:
+	     *
+	     *     	lda    	xx
+	     *   	ldy	#$01
+	     *    	sta	(sp),y
+	     *     	dey
+	     *   	lda	yy
+	     *    	sta	(sp),y
+	     *
+	     * provided that that the X register is not used later. This code
+	     * sequence is four bytes longer, but a lot faster and it does not
+	     * use the X register, so other loads may get removed later.
+	     */
+	    } else if (LineMatch (L, "\tldx\t")	  	&&
+		GetNextCodeLines (L, L2, 2)	 	  	&&
+		LineMatch (L2 [0], "\tlda\t")	  	&&
+		LineFullMatch (L2 [1], "\tjsr\tstax0sp")	&&
+		!RegXUsed (L2[1])) {
+
+		/* Found - replace it */
+		L->Line[3] = 'a';
+		L = NewLineAfter (L, "\tldy\t#$01");
+		L = NewLineAfter (L, "\tsta\t(sp),y");
+		L = NewLineAfter (L, "\tdey");
+		L = NewLineAfter (L2[0], "\tsta\t(sp),y");
+
+		/* Remove the remaining line */
+		FreeLine (L2[1]);
+
+		/* We have changes */
+		++Changes;
+
+	    /* Search for
+	     *
+	     *  	adc	xx
+	     *  	bcc    	*+3
+	     *  	inx
+	     *
+	     * Remove the handling of the high byte if the X register
+	     * is not used any more
+	     */
+	    } else if (LineMatch (L, "\tadc\t") 		&&
+		GetNextCodeLines (L, L2, 3)	 		&&
+		LineFullMatch (L2[0], "\tbcc\t*+3")		&&
+		LineFullMatch (L2[1], "\tinx")		&&
+		L2[1]->Next	     		 		&&
+		IsHint (L2[1]->Next, "x:!")	 		&&
+		!RegXUsed (L2[1])) {
+
+		/* Delete the lines */
+		FreeLines (L2[0], L2[1]->Next);
+
+		/* We have changes */
+		++Changes;
+
+	    /* Search for
+	     *
+	     *  	sbc	xx
+	     *  	bcs    	*+3
+	     *  	dex
+	     *
+	     * Remove the handling of the high byte if the X register
+	     * is not used any more
+	     */
+	    } else if (LineMatch (L, "\tsbc\t") 		&&
+		GetNextCodeLines (L, L2, 3)			&&
+		LineFullMatch (L2[0], "\tbcs\t*+3")		&&
+		LineFullMatch (L2[1], "\tdex")		&&
+		L2[1]->Next	     				&&
+		IsHint (L2[1]->Next, "x:!")			&&
+		!RegXUsed (L2[1])) {
+
+		/* Delete the lines */
+		FreeLines (L2[0], L2[1]->Next);
+
+		/* We have changes */
+		++Changes;
+
+	    /* Search for
+	     *
+	     *  	lda	xx
+	     *  	bpl    	*+3
+	     *  	dex
+	     *
+	     * Remove the handling of the high byte if the X register
+	     * is not used any more
+	     */
+	    } else if (LineMatch (L, "\tlda\t") 		&&
+		GetNextCodeLines (L, L2, 3)			&&
+		LineFullMatch (L2[0], "\tbpl\t*+3")		&&
+		LineFullMatch (L2[1], "\tdex")		&&
+		L2[1]->Next	     				&&
+		IsHint (L2[1]->Next, "x:!")			&&
+		!RegXUsed (L2[1])) {
+
+		/* Delete the lines */
+		FreeLines (L2[0], L2[1]->Next);
+
+		/* We have changes */
+		++Changes;
+
 	    }
 
-	    /* Delete the remaining lines */
-	    FreeLines (L2 [0], L2 [3]);
-
-	/* Check for
-	 *
-	 *  	ldy  	#$xx
-	 *  	lda	(sp),y
-     	 *  	tax
-	 *  	dey
-      	 *  	lda	(sp),y
-      	 *  	ldy	#$yy
-      	 *  	jsr	ldauidx
-      	 *
-      	 * and replace it by
-      	 *
-      	 *  	ldy	#$xx
-      	 *  	ldx	#$yy
-      	 *  	jsr	ldauiysp
-      	 *
-      	 * or even
-      	 *
-      	 *  	jsr	ldaui0sp
-      	 *
-      	 * This change will cost 2 cycles, but it saves a lot of code (6 bytes
-      	 * per occurrence), so we will accept the overhead. It may even be
-      	 * possible to rewrite the library routine to get rid of the additional
-      	 * overhead.
-      	 */
-       	} else if (LineMatch (L, "\tldy\t#$")  		&&
-      	    GetNextCodeLines (L, L2, 6)			&&
-      	    LineFullMatch (L2 [0], "\tlda\t(sp),y")	&&
-      	    LineFullMatch (L2 [1], "\ttax")		&&
-      	    LineFullMatch (L2 [2], "\tdey")		&&
-      	    LineFullMatch (L2 [3], "\tlda\t(sp),y")	&&
-       	    LineMatch     (L2 [4], "\tldy\t#$")		&&
-      	    LineFullMatch (L2 [5], "\tjsr\tldauidx")) {
-
-      	    /* Found - replace it */
-       	    L2 [4]->Line [3] = 'x';		/* Change to ldx */
-      	    if (LineFullMatch (L, "\tldy\t#$01")) {
-      	    	/* Word at offset zero */
-      	       	FreeLine (L);
-      	    	L = ReplaceLine (L2 [5], "\tjsr\tldaui0sp");
-      	    } else {
-       	       	ReplaceLine (L2 [5], "\tjsr\tldauiysp");
-      	    }
-
-	    /* Delete the remaining lines */
-	    FreeLines (L2 [0], L2 [3]);
-
-	/* Search for:
-     	 *
-       	 *     	lda    	(sp),y
-	 *     	jsr	pusha
-	 *
-       	 * And replace by
-	 *
-       	 *     	jsr    	pushaysp
-	 */
-       	} else if (LineFullMatch (L, "\tlda\t(sp),y")	&&
-      	    GetNextCodeLines (L, L2, 1)	       	       	&&
-      	    LineFullMatch (L2 [0], "\tjsr\tpusha")) {
-
-	    /* Found, replace it */
-	    L = ReplaceLine (L, "\tjsr\tpushaysp");
-	    FreeLine (L2 [0]);
-
-	/* Search for:
-	 *
-	 *     	ldx    	xx
-	 *     	lda	yy
-	 *    	sta	zzz
-	 *    	stx	zzz+1
-	 *
-	 * and replace it by:
-	 *
-	 *     	lda    	xx
-	 *    	sta	zzz+1
-       	 *     	lda	yy
-	 *    	sta	zzz
-	 *
-	 * provided that that the X register is not used later. While this is
-	 * no direct optimization, it helps with other optimizations.
-     	 */
-       	} else if (LineMatch (L, "\tldx\t")		&&
-       	    GetNextCodeLines (L, L2, 3)	 		&&
-      	    LineMatch (L2 [0], "\tlda\t")		&&
-	    Is16BitStore (L2[1], L2[2])			&&
-	    !RegXUsed (L2[2])) {
-
-      	    /* Found - replace it */
-	    L->Line[3] = 'a';
-	    NewLineAfter (L, "\tsta\t%s", L2[2]->Line+5);
-	    FreeLine (L2[2]);
-	    L = L2[1];
-
-	/* Search for:
-	 *
-	 *     	ldx    	xx
-	 *     	lda	yy
-       	 *     	ldy	#$zz
-	 *    	jsr	staxysp
-	 *
-	 * and replace it by:
-	 *
-	 *     	lda    	xx
-	 *	ldy	#$zz+1
-	 *    	sta	(sp),y
-       	 *     	dey
-	 *	lda	yy
-	 *    	sta	(sp),y
-	 *
-	 * provided that that the X register is not used later. This code
-	 * sequence is two bytes longer, but a lot faster and it does not
-	 * use the X register, so other loads may get removed later.
-     	 */
-       	} else if (LineMatch (L, "\tldx\t")	  	&&
-       	    GetNextCodeLines (L, L2, 3)	 	  	&&
-      	    LineMatch (L2 [0], "\tlda\t")	  	&&
-	    LineMatch (L2 [1], "\tldy\t#$")	  	&&
-	    LineFullMatch (L2 [2], "\tjsr\tstaxysp")	&&
-	    !RegXUsed (L2[2])) {
-
-      	    /* Found - replace it */
-	    L->Line[3] = 'a';
-	    L = NewLineAfter (L, "\tldy\t#$%02X", GetHexNum (L2[1]->Line+7)+1);
-	    L = NewLineAfter (L, "\tsta\t(sp),y");
-	    L = NewLineAfter (L, "\tdey");
-	    L = NewLineAfter (L2[0], "\tsta\t(sp),y");
-
-	    /* Remove the remaining lines */
-	    FreeLines (L2[1], L2[2]);
-
-	/* Search for:
-	 *
-	 *     	ldx    	xx
-	 *     	lda	yy
-	 *    	jsr	stax0sp
-	 *
-	 * and replace it by:
-	 *
-	 *     	lda    	xx
-	 *   	ldy	#$01
-	 *    	sta	(sp),y
-       	 *     	dey
-	 *   	lda	yy
-	 *    	sta	(sp),y
-	 *
-	 * provided that that the X register is not used later. This code
-	 * sequence is four bytes longer, but a lot faster and it does not
-	 * use the X register, so other loads may get removed later.
-     	 */
-       	} else if (LineMatch (L, "\tldx\t")	  	&&
-       	    GetNextCodeLines (L, L2, 2)	 	  	&&
-      	    LineMatch (L2 [0], "\tlda\t")	  	&&
-       	    LineFullMatch (L2 [1], "\tjsr\tstax0sp")	&&
-	    !RegXUsed (L2[1])) {
-
-      	    /* Found - replace it */
-	    L->Line[3] = 'a';
-	    L = NewLineAfter (L, "\tldy\t#$01");
-	    L = NewLineAfter (L, "\tsta\t(sp),y");
-	    L = NewLineAfter (L, "\tdey");
-	    L = NewLineAfter (L2[0], "\tsta\t(sp),y");
-
-	    /* Remove the remaining line */
-	    FreeLine (L2[1]);
-
-	/* Search for
-	 *
-	 *  	adc	xx		 
-	 *  	bcc    	*+3
-	 *  	inx
-	 *
-	 * Remove the handling of the high byte if the X register
-	 * is not used any more
-	 */
-     	} else if (LineMatch (L, "\tadc\t") 		&&
-     	    GetNextCodeLines (L, L2, 3)	 		&&
-     	    LineFullMatch (L2[0], "\tbcc\t*+3")		&&
-       	    LineFullMatch (L2[1], "\tinx")		&&
-     	    L2[1]->Next	     		 		&&
-     	    IsHint (L2[1]->Next, "x:!")	 		&&
-	    !RegXUsed (L2[1])) {
-
-     	    /* Delete the lines */
-     	    FreeLines (L2[0], L2[1]->Next);
-
-	/* Search for
-	 *
-	 *  	sbc	xx
-	 *  	bcs    	*+3
-	 *  	dex
-	 *
-	 * Remove the handling of the high byte if the X register
-	 * is not used any more
-	 */
-     	} else if (LineMatch (L, "\tsbc\t") 		&&
-     	    GetNextCodeLines (L, L2, 3)			&&
-     	    LineFullMatch (L2[0], "\tbcs\t*+3")		&&
-       	    LineFullMatch (L2[1], "\tdex")		&&
-     	    L2[1]->Next	     				&&
-     	    IsHint (L2[1]->Next, "x:!")			&&
-	    !RegXUsed (L2[1])) {
-
-     	    /* Delete the lines */
-     	    FreeLines (L2[0], L2[1]->Next);
-     	}
-
-
-       	/* All other patterns start with this one: */
-	if (!LineFullMatch (L, "\tldx\t#$00")) {
-	    /* Next line */
-	    goto NextLine;
-	}
-
-	/* Search for:
-	 *
-	 *   	ldx   	#$00
-	 *   	jsr   	pushax
-	 *
-	 * and replace it by:
-	 *
-	 *   	jsr   	pusha0
-	 *
-	 */
-       	if (GetNextCodeLines (L, L2, 1)			&&
-       	    LineFullMatch (L2 [0], "\tjsr\tpushax")) {
-
-	    /* Replace the subroutine call */
-       	    L = ReplaceLine (L, "\tjsr\tpusha0");
-
-	    /* Remove the unnecessary line */
-	    FreeLine (L2[0]);
-	}
-
-	/* Search for:
-	 *
-	 *   	ldx   	#$00
-	 *   	lda   	...
-	 *   	jsr   	pushax
-	 *
-	 * and replace it by:
-	 *
-	 *   	lda   	...
-	 *  	jsr   	pusha0
-	 *
-	 */
-       	else if (GetNextCodeLines (L, L2, 2)			&&
-	         LineMatch (L2 [0], "\tlda\t")      	  	&&
- 	         LineFullMatch (L2 [1], "\tjsr\tpushax")) {
-
-	    /* Be sure, X is not used in the load */
-	    if (NoXAddrMode (L2 [0])) {
-
-	    	/* Replace the subroutine call */
-	    	L2 [1] = ReplaceLine (L2 [1], "\tjsr\tpusha0");
-
-     	     	/* Remove the unnecessary load */
-	       	FreeLine (L);
-
-	       	/* L must be valid */
-	       	L = L2 [0];
+	    /* All other patterns start with this one: */
+	    if (!LineFullMatch (L, "\tldx\t#$00")) {
+		/* Next line */
+		goto NextLine;
 	    }
 
-	}
+	    /* Search for:
+	     *
+	     *   	ldx   	#$00
+	     *   	jsr   	pushax
+	     *
+	     * and replace it by:
+	     *
+	     *   	jsr   	pusha0
+	     *
+	     */
+	    if (GetNextCodeLines (L, L2, 1)			&&
+		LineFullMatch (L2 [0], "\tjsr\tpushax")) {
 
-	/* Search for:
-	 *
-	 *     	ldx   	#$00
-	 *     	lda   	...
-	 *     	cmp   	#$..
-	 *
-	 * and replace it by:
-	 *
-	 *     	lda   	...
-	 *     	cmp   	#$..
-	 */
-       	else if (GetNextCodeLines (L, L2, 2)		&&
-	    	 LineMatch (L2 [0], "\tlda\t")		&&
-	    	 LineMatch (L2 [1], "\tcmp\t#$")) {
+		/* Replace the subroutine call */
+		L = ReplaceLine (L, "\tjsr\tpusha0");
 
-	    /* Be sure, X is not used in the load */
-	    if (NoXAddrMode (L2 [0])) {
+		/* Remove the unnecessary line */
+		FreeLine (L2[0]);
 
-	       	/* Remove the unnecessary load */
-	       	FreeLine (L);
-
-	       	/* L must be valid */
-	       	L = L2 [0];
+		/* We have changes */
+		++Changes;
 	    }
-	}
 
-	/* Search for:
-	 *
-	 *     	ldx   	#$00
-	 *     	lda   	...
-	 *     	jsr 	bnega
-	 *
-	 * and replace it by:
-	 *
-	 *     	lda   	...
-	 *     	jsr	bnega
-     	 */
-	else if (GetNextCodeLines (L, L2, 2)		&&
-	    	 LineMatch (L2 [0], "\tlda\t")		&&
-       	         LineFullMatch (L2 [1], "\tjsr\tbnega")) {
+	    /* Search for:
+	     *
+	     *   	ldx   	#$00
+	     *   	lda   	...
+	     *   	jsr   	pushax
+	     *
+	     * and replace it by:
+	     *
+	     *   	lda   	...
+	     *  	jsr   	pusha0
+	     *
+	     */
+	    else if (GetNextCodeLines (L, L2, 2)			&&
+		     LineMatch (L2 [0], "\tlda\t")      	  	&&
+		     LineFullMatch (L2 [1], "\tjsr\tpushax")) {
 
-	    /* Be sure, X is not used in the load */
- 	    if (NoXAddrMode (L2 [0])) {
+		/* Be sure, X is not used in the load */
+		if (NoXAddrMode (L2 [0])) {
 
-	       	/* Remove the unnecessary load */
-	       	FreeLine (L);
+		    /* Replace the subroutine call */
+		    L2 [1] = ReplaceLine (L2 [1], "\tjsr\tpusha0");
 
-	       	/* L must be valid */
-	       	L = L2 [0];
+		    /* Remove the unnecessary load */
+		    FreeLine (L);
+
+		    /* L must be valid */
+		    L = L2 [0];
+
+		    /* We have changes */
+		    ++Changes;
+		}
+
 	    }
+
+	    /* Search for:
+	     *
+	     *     	ldx   	#$00
+	     *     	lda   	...
+	     *     	cmp   	#$..
+	     *
+	     * and replace it by:
+	     *
+	     *     	lda   	...
+	     *     	cmp   	#$..
+	     */
+	    else if (GetNextCodeLines (L, L2, 2)		&&
+		     LineMatch (L2 [0], "\tlda\t")		&&
+		     LineMatch (L2 [1], "\tcmp\t#$")) {
+
+		/* Be sure, X is not used in the load */
+		if (NoXAddrMode (L2 [0])) {
+
+		    /* Remove the unnecessary load */
+		    FreeLine (L);
+
+		    /* L must be valid */
+		    L = L2 [0];
+
+		    /* We have changes */
+		    ++Changes;
+		}
+	    }
+
+	    /* Search for:
+	     *
+	     *     	ldx   	#$00
+	     *     	lda   	...
+	     *     	jsr 	bnega
+	     *
+	     * and replace it by:
+	     *
+	     *     	lda   	...
+	     *     	jsr	bnega
+	     */
+	    else if (GetNextCodeLines (L, L2, 2)		&&
+		     LineMatch (L2 [0], "\tlda\t")		&&
+		     LineFullMatch (L2 [1], "\tjsr\tbnega")) {
+
+		/* Be sure, X is not used in the load */
+		if (NoXAddrMode (L2 [0])) {
+
+		    /* Remove the unnecessary load */
+		    FreeLine (L);
+
+		    /* L must be valid */
+		    L = L2 [0];
+
+		    /* We have changes */
+		    ++Changes;
+		}
+	    }
+
+    NextLine:
+	    /* Go to the next line */
+	    L = NextCodeLine (L);
 	}
 
-NextLine:
-	/* Go to the next line */
-	L = NextCodeLine (L);
-    }
+    } while (Changes);
 }
 
 

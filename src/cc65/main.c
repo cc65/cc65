@@ -104,7 +104,7 @@ static void Usage (void)
        	     "  --check-stack\t\tGenerate stack overflow checks\n"
        	     "  --code-name seg\tSet the name of the CODE segment\n"
 	     "  --codesize x\t\tAccept larger code by factor x\n"
-       	     "  --cpu type\t\tSet cpu type\n"
+       	     "  --cpu type\t\tSet cpu type (6502, 65c02)\n"
 	     "  --create-dep\t\tCreate a make dependency file\n"
        	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug\t\tDebug mode\n"

@@ -23,7 +23,7 @@ of loading them from disk.
 
 co65 is an object file conversion utility. It converts o65 object files into
 assembler files, which may be translated by ca65 to generate object files in
-the native object file format used by the cc65 tool chain. 
+the native object file format used by the cc65 tool chain.
 
 Since loadable drivers used by the library that comes with cc65 use the o65
 relocatable object code format, using the co65 utility allows to link these
@@ -121,7 +121,7 @@ Here is a description of all the command line options:
   When accessing such a label from C code, be sure to include the leading
   underscore. If you don't need to access the data segment, there's no need to
   use this option.
-                                                   
+
 
   <tag><tt>--data-name seg</tt></tag>
 
@@ -213,6 +213,7 @@ Here is a description of all the command line options:
   Set the name of the data segment. The default name is "ZEROPAGE" which is
   compatible with the standard ld65 linker configurations.
 
+</descrip>
 
 
 <sect>Input and output<p>
@@ -260,7 +261,7 @@ used to access the functions in the driver code.
 When loading a driver at runtime, the load address of the driver is also the
 address of the code segment, so the locations of the header and jump table are
 known. However, when linking the driver statically, it is up to the programmer
-to provide this information to the driver API. 
+to provide this information to the driver API.
 
 For this purpose, it is necessary to define a code segment label that can be
 accessed from the outside later. Please note that the converter does currently
@@ -273,6 +274,9 @@ it from C code. In your code, define an arbitrary variable with this name. Use
 the address of this variable as the address of the code segment of the driver.
 Be sure to never modify the variable which is in reality the start of your
 driver!
+                          
+
+<sect1>Example: Convert and link a graphics driver<p>
 
 As an example, here are some instructions to convert and use the c64-hi.tgi
 graphics driver:
@@ -298,7 +302,7 @@ uninstall the driver, which will be already in memory after linking:
 
   <tscreen><verb>
         /* Install the driver */
-        tgi_install (&c64_hi);
+        tgi_install (&amp;c64_hi);
 
         ...
 

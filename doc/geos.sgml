@@ -1194,7 +1194,7 @@ This calls system's <tt/Panic/ handler - it shows dialog box with message
 <tscreen><verb>
 System error at:xxxx
 </verb></tscreen>
-where <tt/xxxx/ is last known execution address (caller). By default this is binded to <tt/BRK/
+where <tt/xxxx/ is last known execution address (caller). By default this is bound to <tt/BRK/
 instruction, but it might be usable in debugging as kind of <tt/assert/.
 <p>
 System is halted after call to <tt/Panic/.
@@ -1236,7 +1236,7 @@ new value in <tt/curDevice/, in other case new disk driver is loaded from REU or
 <sect>Library Structures
 <p>
 To simplify usage and optimize passing parameters to functions I have declared several structures
-which describe most common objects. Some of these structures are binded to static addresses in
+which describe most common objects. Some of these structures are bound to static addresses in
 GEOS data space ($8000-$8fff), so you can use their fields directly in optimized way.
 Please see <tt/gsym.h/ and find them. All structures are defined in <tt/gstruct.h/ and you may
 find also some comments there.
@@ -1250,7 +1250,7 @@ One simple structure describing a point on the screen.
 <sect2>fontdesc
 <p>
 This structure describes a font in one pointsize. There is current font - <tt/struct fontdesc/
-binded at <tt/curFontDesc/. You can also force GEOS to use your own fonts by calling
+bound to <tt/curFontDesc/. You can also force GEOS to use your own fonts by calling
 <tt/LoadCharSet/. You just need to open a VLIR font file and load one record - one pointsize
 somewhere. At the start of this area you already have all data for <tt/fontdesc/ so you can
 pass a pointer to the load adress of that pointsize to <tt/LoadCharSet/.

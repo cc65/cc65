@@ -142,7 +142,7 @@ first in your source code. This will speed up the code.
 
 <sect>Use the preincrement and predecrement operators<p>
 
-The compiler not always smart enough to figure out, if the rvalue of an
+The compiler is not always smart enough to figure out, if the rvalue of an
 increment is used or not. So it has to save and restore that value when
 producing code for the postincrement and postdecrement operators, even if this
 value is never used. To avoid the additional overhead, use the preincrement
@@ -377,7 +377,7 @@ is unknown at compiler time, the compiler will generate code to calculate the
 location on the stack when needed.
 
 Because of this additional code, accessing the fixed parameters in a variadic
-function is much more expensive than access to parameters in a "normal" 
+function is much more expensive than access to parameters in a "normal"
 function. Unfortunately, this additional code is also invisible to the
 programmer, so it is easy to forget.
 

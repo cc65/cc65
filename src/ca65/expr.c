@@ -345,7 +345,7 @@ static ExprNode* FuncBlank (void)
 	    }
 	    NextTok ();
      	}
-	return 0;
+        Result = 0;
     }
     return GenLiteralExpr (Result);
 }
@@ -431,7 +431,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     	/* We may not end-of-line of end-of-file here */
     	if (TokIsSep (Tok)) {
     	    Error ("Unexpected end of line");
-    	    return 0;
+    	    return GenLiteralExpr (0);
     	}
 
 	/* Get a node with this token */
@@ -462,7 +462,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     	/* We may not end-of-line of end-of-file here */
     	if (TokIsSep (Tok)) {
     	    Error ("Unexpected end of line");
-    	    return 0;
+    	    return GenLiteralExpr (0);
     	}
 
        	/* Compare the tokens if the result is not already known */
@@ -644,7 +644,7 @@ static ExprNode* FuncStrAt (void)
     /* Must be a valid index */
     if (Index >= (long) strlen (Str)) {
 	Error ("Range error");
-	return 0;
+	return GenLiteralExpr (0);
     }
 
     /* Get the char, handle as unsigned. Be sure to translate it into
@@ -766,7 +766,7 @@ static ExprNode* Factor (void)
 {
     ExprNode* L;
     ExprNode* N;
-    long      Val;
+    long      Val;                
 
     switch (Tok) {
 

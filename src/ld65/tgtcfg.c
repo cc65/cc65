@@ -76,7 +76,6 @@ const TargetDesc Targets [TGT_COUNT] = {
     {  	BINFMT_BINARY,  CfgNone         },
     {  	BINFMT_O65,     CfgModule       },
     {  	BINFMT_BINARY,	CfgAtari        },
-    {  	BINFMT_BINARY,	CfgAtmos        },
     {  	BINFMT_BINARY,	CfgC64          },
     {  	BINFMT_BINARY,	CfgC128         },
     {  	BINFMT_BINARY,	CfgEmpty	},    	/* Ace */
@@ -88,6 +87,7 @@ const TargetDesc Targets [TGT_COUNT] = {
     {   BINFMT_BINARY,	CfgApple2       },
     {   BINFMT_BINARY,  CfgGeos         },
     {   BINFMT_O65,     CfgLunix        },
+    {  	BINFMT_BINARY,	CfgAtmos        },
 };
 
 

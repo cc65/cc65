@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -77,7 +77,7 @@ unsigned Opt65C02Ind (CodeSeg* S)
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
-       	/* Check for addressing mode indirect indexed Y where Y is zero. 
+       	/* Check for addressing mode indirect indexed Y where Y is zero.
 	 * Note: All opcodes that are available as (zp),y are also available
 	 * as (zp), so we can ignore the actual opcode here.
 	 */
@@ -105,6 +105,83 @@ unsigned Opt65C02Ind (CodeSeg* S)
     return Changes;
 }
 
+
+
+unsigned Opt65C02BitOps (CodeSeg* S)
+/* Use special bit op instructions of the C02 */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[3];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+	/* Check for the sequence */
+	if (L[0]->OPC == OP65_LDA      	       	                &&
+            (L[0]->AM == AM65_ZP || L[0]->AM == AM65_ABS)       &&
+            !CS_RangeHasLabel (S, I+1, 2)                       &&
+            CS_GetEntries (S, L+1, I+1, 2)                      &&
+            (L[1]->OPC == OP65_AND || L[1]->OPC == OP65_ORA)    &&
+            CE_KnownImm (L[1])                                  &&
+            L[2]->OPC == OP65_STA                               &&
+            L[2]->AM == L[0]->AM                                &&
+            strcmp (L[2]->Arg, L[0]->Arg) == 0                  &&
+            !RegAUsed (S, I+3)) {
+
+            char Buf[32];
+            CodeEntry* X;
+
+            /* Use TRB for AND and TSB for ORA */
+            if (L[1]->OPC == OP65_AND) {
+
+                /* LDA #XX */
+                sprintf (Buf, "$%02X", (int) ((~L[1]->Num) & 0xFF));
+                X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, L[1]->LI);
+                CS_InsertEntry (S, X, I);
+
+                /* TRB */
+                X = NewCodeEntry (OP65_TRB, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
+                CS_InsertEntry (S, X, I+1);
+
+            } else {
+
+                /* LDA #XX */
+                sprintf (Buf, "$%02X", (int) L[1]->Num);
+                X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, L[1]->LI);
+                CS_InsertEntry (S, X, I);
+
+                /* TRB */
+                X = NewCodeEntry (OP65_TSB, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
+                CS_InsertEntry (S, X, I+1);
+            }
+
+            /* Delete the old stuff */
+            CS_DelEntries (S, I+2, 3);
+
+	    /* We had changes */
+	    ++Changes;
+	}
+
+     	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
 
 
 

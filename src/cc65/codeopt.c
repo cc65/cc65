@@ -1352,6 +1352,7 @@ struct OptFunc {
 #define OptFuncEntry(func) static OptFuncDesc D##func = { func, #func, 0 }
 
 /* A list of all the function descriptions */
+static OptFunc DOpt65C02BitOps  = { Opt65C02BitOps,  "Opt65C02BitOps",   66, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Ind    	= { Opt65C02Ind,     "Opt65C02Ind",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",        	 60, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",        	200, 0, 0, 0, 0, 0 };
@@ -1406,6 +1407,7 @@ static OptFunc DOptUnusedStores	= { OptUnusedStores, "OptUnusedStores",   0, 0, 
 
 /* Table containing all the steps in alphabetical order */
 static OptFunc* OptFuncs[] = {
+    &DOpt65C02BitOps,
     &DOpt65C02Ind,
     &DOptAdd1,
     &DOptAdd2,
@@ -1775,14 +1777,16 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 
 static unsigned RunOptGroup4 (CodeSeg* S)
 /* 65C02 specific optimizations. */
-{
+{                        
+    unsigned C;
     unsigned Changes = 0;
 
     if (CPU >= CPU_65C02) {
+        Changes += RunOptFunc (S, &DOpt65C02BitOps, 1);
     	/* Replace (zp),y by (zp) if Y is zero. If we have changes, run register
     	 * load optimization again, since loads of Y may have become unnecessary.
     	 */
-    	unsigned C = RunOptFunc (S, &DOpt65C02Ind, 1);
+    	C = RunOptFunc (S, &DOpt65C02Ind, 1);
     	Changes += C;
     	if (C) {
     	    Changes += RunOptFunc (S, &DOptUnusedLoads, 1);

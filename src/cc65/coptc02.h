@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -51,6 +51,9 @@
 
 unsigned Opt65C02Ind (CodeSeg* S);
 /* Try to use the indirect addressing mode where possible */
+
+unsigned Opt65C02BitOps (CodeSeg* S);
+/* Use special bit op instructions of the C02 */
 
 
 

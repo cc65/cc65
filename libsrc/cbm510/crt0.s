@@ -68,7 +68,6 @@
         .byte   $CA, CURS_Y
         .byte   $CB, CURS_X
         .byte   $EC, CHARCOLOR
-        .byte   
 
 .endproc
 

@@ -363,7 +363,8 @@ Init:  	jsr	initlib
 ; Call module destructors. This is also the _exit entry and the default entry
 ; point for the break vector.
 
-_exit:  lda     #$00
+_exit:  pha			; Save the return code
+	lda     #$00
         sta     irqcount        ; Disable custom irq handlers
         jsr	donelib	     	; Run module destructors
 
@@ -387,6 +388,12 @@ _exit:  lda     #$00
         dec     ktmp
         bne     @L0
 .endif
+
+; Place the program return code into ST
+
+	pla
+	ldy	#ST
+	sta	(sysp0),y
 
 ; Setup the welcome code at the stack bottom in the system bank.
 

@@ -76,7 +76,8 @@ MemOk:	stx	sp
 
 ; Call module destructors. This is also the _exit entry.
 
-_exit:	jsr	donelib		; Run module destructors
+_exit: 	pha			; Save the return code on stack
+	jsr	donelib		; Run module destructors
 
 ; Restore system stuff
 
@@ -90,6 +91,11 @@ L2:	lda	zpsave,x
 	sta	sp,x
 	dex
        	bpl	L2
+
+; Store the return code into ST
+
+	pla
+	sta	ST
 
 ; Reset changed vectors
 

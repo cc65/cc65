@@ -112,11 +112,10 @@ L1:	lda    	sp,x
 
 NoIRQ1:	jsr	callmain
 
-; Back from main (this is also the _exit entry). Store the return code into
-; ST, where it is accessible from BASIC. Reset the IRQ vector if we chained 
-; it.
+; Back from main (this is also the _exit entry). Reset the IRQ vector if we 
+; chained it.
 
-_exit:  sta	ST
+_exit:	pha				; Save the return code on stack
 	lda     #<__IRQFUNC_COUNT__
 	beq	NoIRQ2
 	lda	IRQInd+1
@@ -147,6 +146,11 @@ L2:	lda	zpsave,x
 
        	lda    	mmusave
 	sta	MMU_CR
+
+; Place the program return code into ST
+
+	pla
+	sta	ST
 
 ; Done, restore kernal vectors in an attempt to cleanup
 

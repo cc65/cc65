@@ -96,7 +96,8 @@ L1:	lda	sp,x
 
 ; Back from main (this is also the _exit entry). Run module destructors.
 
-_exit: 	lda     #0
+_exit: 	pha			; Save the return code
+	lda     #0
         sta     irqcount        ; Disable custom IRQ handlers
         jsr	donelib         ; Run module destructors
 
@@ -112,6 +113,11 @@ L2:	lda	zpsave,x
   	sta	sp,x
   	dex
        	bpl	L2
+
+; Place the program return code into ST
+
+	pla
+	sta	ST
 
 ; Enable the ROM, reset changed vectors and return to BASIC
 

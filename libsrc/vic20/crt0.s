@@ -76,7 +76,8 @@ L1:	lda	sp,x
 
 ; Call module destructors. This is also the _exit entry.
 
-_exit:	jsr	donelib		; Run module destructors
+_exit: 	pha			; Save the return code on stack
+	jsr	donelib		; Run module destructors
 
 ; Restore system stuff
 
@@ -90,6 +91,11 @@ L2:	lda	zpsave,x
 	sta	sp,x
 	dex
        	bpl	L2
+
+; Place the program return code into ST
+
+	pla
+	sta	ST
 
 ; Reset changed vectors, back to basic
 

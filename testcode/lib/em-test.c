@@ -10,24 +10,27 @@
 #define FORCE_ERROR2 0
 
 
-static unsigned buf[128];
+#define PAGE_SIZE       128                     /* Size in words */
+#define BUF_SIZE        (PAGE_SIZE + PAGE_SIZE/2)
+static unsigned buf[BUF_SIZE];
 
 
 
-static void fill (register unsigned* page, register unsigned num)
+static void fill (register unsigned* page, register unsigned char count, register unsigned num)
 {
-    unsigned char i;
-    for (i = 0; i < 128; ++i, ++page) {
+    register unsigned char i;
+    for (i = 0; i < count; ++i, ++page) {
         *page = num;
     }
 }
 
 
 
-static void cmp (unsigned page, register const unsigned* buf, register unsigned num)
+static void cmp (unsigned page, register const unsigned* buf,
+                 register unsigned char count, register unsigned num)
 {
-    unsigned char i;
-    for (i = 0; i < 128; ++i, ++buf) {
+    register unsigned char i;
+    for (i = 0; i < count; ++i, ++buf) {
         if (*buf != num) {
             cprintf ("\r\nData mismatch in page $%04X at $%04X\r\n"
                      "Data is $%04X (should be $%04X)\r\n",
@@ -43,12 +46,13 @@ int main (void)
 {
     unsigned char Res;
     unsigned I;
+    unsigned Offs;
     unsigned PageCount;
     unsigned char X, Y;
     struct em_copy c;
 
     clrscr ();
-    Res = em_load_driver ("c128-reu.emd");
+    Res = em_load_driver ("c64-ram.emd");
     if (Res != EM_ERR_OK) {
        	cprintf ("Error in em_load_driver: %u\r\n", Res);
         cprintf ("os: %u, %s\r\n", _oserror, _stroserror (_oserror));
@@ -59,13 +63,20 @@ int main (void)
     PageCount = em_pagecount ();
     cprintf ("Loaded ok, page count = $%04X\r\n", PageCount);
 
+    /* TEST #1: em_map/em_use/em_commit */
+    cputs ("Testing em_map/em_use/em_commit");
+
     /* Fill all pages */
-    cputs ("Filling   ");
+    cputs ("\r\n  Filling   ");
     X = wherex ();
     Y = wherey ();
     for (I = 0; I < PageCount; ++I) {
-        fill (em_use (I), I);
+
+        /* Fill the buffer and copy it to em */
+        fill (em_use (I), PAGE_SIZE, I);
         em_commit ();
+
+        /* Keep the user happy */
         gotoxy (X, Y);
         cputhex16 (I);
     }
@@ -76,28 +87,49 @@ int main (void)
 #endif
 
     /* Check all pages */
-    cputs ("\r\nComparing ");
+    cputs ("\r\n  Comparing ");
     X = wherex ();
     Y = wherey ();
     for (I = 0; I < PageCount; ++I) {
-        cmp (I, em_map (I), I);
+
+        /* Get the buffer and compare it */
+        cmp (I, em_map (I), PAGE_SIZE, I);
+
+        /* Keep the user happy */
         gotoxy (X, Y);
         cputhex16 (I);
     }
 
+    /* TEST #1: em_copyfrom/em_copyto. */
+    cputs ("\r\nTesting em_copyfrom/em_copyto");
+
+    /* We're filling now 384 bytes per run to test the copy routines with
+     * other sizes.
+     */
+    PageCount = (PageCount * 2) / 3;
+
     /* Setup the copy structure */
-    c.offs  = 0;
     c.buf   = buf;
     c.count = sizeof (buf);
 
     /* Fill again all pages */
-    cputs ("\r\nFilling   ");
+    cputs ("\r\n  Filling   ");
     X = wherex ();
     Y = wherey ();
+    c.page = 0;
+    c.offs = 0;
     for (I = 0; I < PageCount; ++I) {
-        fill (buf, I ^ 0xFFFF);
-        c.page  = I;
+
+        /* Fill the buffer and copy it to em */
+        fill (buf, BUF_SIZE, I ^ 0xFFFF);
         em_copyto (&c);
+
+        /* Adjust the em offset */
+        Offs = c.offs + sizeof (buf);
+        c.offs = (unsigned char) Offs;
+        c.page += (Offs >> 8);
+
+        /* Keep the user happy */
         gotoxy (X, Y);
         cputhex16 (I);
     }
@@ -110,19 +142,29 @@ int main (void)
 #endif
 
     /* Check all pages */
-    cputs ("\r\nComparing ");
+    cputs ("\r\n  Comparing ");
     X = wherex ();
     Y = wherey ();
+    c.page = 0;
+    c.offs = 0;
     for (I = 0; I < PageCount; ++I) {
-        c.page = I;
+
+        /* Get the buffer and compare it */
         em_copyfrom (&c);
-        cmp (I, buf, I ^ 0xFFFF);
+        cmp (I, buf, BUF_SIZE, I ^ 0xFFFF);
+
+        /* Adjust the em offset */
+        Offs = c.offs + sizeof (buf);
+        c.offs = (unsigned char) Offs;
+        c.page += (Offs >> 8);
+
+        /* Keep the user happy */
         gotoxy (X, Y);
         cputhex16 (I);
     }
-    cprintf ("\r\n");
 
-    cprintf ("Passed!\r\n");
+    /* Success */
+    cprintf ("\r\nPassed!\r\n");
 
     return 0;
 

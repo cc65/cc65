@@ -355,12 +355,16 @@ static void addmac (void)
     ident   	Ident;
     char    	Buf[LINESIZE];
     Macro*  	M;
+    Macro*	Existing;
 
     /* Read the macro name */
     SkipBlank ();
     if (!MacName (Ident)) {
     	return;
     }
+
+    /* Get an existing macro definition with this name */
+    Existing = FindMacro (Ident);
 
     /* Create a new macro definition */
     M = NewMacro (Ident);
@@ -411,6 +415,15 @@ static void addmac (void)
 
     /* Create a copy of the replacement */
     M->Replacement = xstrdup (Buf);
+
+    /* If we have an existing macro, check if the redefinition is identical.
+     * Print a diagnostic if not.
+     */
+    if (Existing) {
+	if (MacroCmp (M, Existing) != 0) {
+	    PPError (ERR_MACRO_REDEF);
+	}
+    }
 }
 
 

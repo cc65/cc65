@@ -94,6 +94,7 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "Too few arguments in function call",
     "Macro argument count mismatch",
     "Duplicate macro parameter: %s",
+    "Macro redefinition is not identical",
     "Variable identifier expected",
     "Integer expression expected",
     "Constant expression expected",

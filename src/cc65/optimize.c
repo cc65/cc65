@@ -42,6 +42,7 @@
 #include "attrib.h"
 #include "check.h"
 #include "xmalloc.h"
+#include "xsprintf.h"
 
 /* cc65 */
 #include "asmlabel.h"

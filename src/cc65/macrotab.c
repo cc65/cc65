@@ -36,9 +36,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../common/hashstr.h"
-#include "../common/xmalloc.h"
-
+/* common */
+#include "hashstr.h"
+#include "xmalloc.h"
+	  
+/* cc65 */
 #include "error.h"
 #include "macrotab.h"
 
@@ -300,6 +302,29 @@ void AddMacroArg (Macro* M, const char* Arg)
 
     /* Add the new argument */
     M->FormalArgs[M->ArgCount++] = xstrdup (Arg);
+}
+
+
+
+int MacroCmp (const Macro* M1, const Macro* M2)
+/* Compare two macros and return zero if both are identical. */
+{	    
+    int I;
+
+    /* Argument count must be identical */
+    if (M1->ArgCount != M2->ArgCount) {
+	return 1;
+    }
+
+    /* Compare the arguments */
+    for (I = 0; I < M1->ArgCount; ++I) {
+	if (strcmp (M1->FormalArgs[I], M2->FormalArgs[I]) != 0) {
+	    return 1;
+	}
+    }
+
+    /* Compare the replacement */
+    return strcmp (M1->Replacement, M2->Replacement);
 }
 
 

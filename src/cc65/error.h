@@ -70,7 +70,7 @@ enum Warnings {
 };
 
 /* Error numbers */
-enum Errors {
+enum Errors {	
     ERR_NONE,	       	       		/* No error */
     ERR_INVALID_CHAR,
     ERR_UNEXPECTED_NEWLINE,
@@ -94,6 +94,7 @@ enum Errors {
     ERR_TOO_FEW_FUNC_ARGS,
     ERR_MACRO_ARGCOUNT,
     ERR_DUPLICATE_MACRO_ARG,
+    ERR_MACRO_REDEF,
     ERR_VAR_IDENT_EXPECTED,
     ERR_INT_EXPR_EXPECTED,
     ERR_CONST_EXPR_EXPECTED,

@@ -113,6 +113,7 @@ static void Usage (void)
 	     "Long options:\n"
        	     "  --ansi\t\tStrict ANSI mode\n"
        	     "  --cpu type\t\tSet cpu type\n"
+       	     "  --debug\t\tDebug mode\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
@@ -295,6 +296,14 @@ static void OptCPU (const char* Opt, const char* Arg)
 
 
 
+static void OptDebug (const char* Opt, const char* Arg)
+/* Compiler debug mode */
+{
+    Debug = 1;
+}
+
+
+
 static void OptDebugInfo (const char* Opt, const char* Arg)
 /* Add debug info to the object file */
 {
@@ -375,6 +384,7 @@ int main (int argc, char* argv[])
 	{ "--add-source",	0,    	OptAddSource		},
 	{ "--ansi",   	 	0,	OptAnsi			},
         { "--cpu",     	       	1,	OptCPU 			},
+       	{ "--debug",           	0,     	OptDebug		},
 	{ "--debug-info",      	0,	OptDebugInfo		},
 	{ "--help",	 	0,	OptHelp			},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
@@ -410,10 +420,10 @@ int main (int argc, char* argv[])
 
 		case '-':
 		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-		    break;
+	 	    break;
 
-		case 'd':    	/* debug mode */
-		    Debug = 1;
+		case 'd':
+		    OptDebug (Arg, 0);
 		    break;
 
 		case 'h':

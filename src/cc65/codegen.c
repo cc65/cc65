@@ -1748,7 +1748,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, long offs,
        		     	AddCodeLine ("sbc #$%02X", (int)(val & 0xFF));
        		     	AddCodeLine ("sta %s", lbuf);
        		    }
-       	  	} else {	      
+       	  	} else {
 		    AddCodeLine ("eor #$FF");
        		    AddCodeLine ("sec");
        	       	    AddCodeLine ("adc %s", lbuf);
@@ -1783,7 +1783,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, long offs,
 		    AddCodeLine ("tax");
 		    AddCodeLine ("lda %s", lbuf);
 		}
-	    } else {	      
+	    } else {
 		AddCodeLine ("eor #$FF");
        	       	AddCodeLine ("adc %s", lbuf);
 		AddCodeLine ("sta %s", lbuf);
@@ -3219,9 +3219,9 @@ void g_eq (unsigned flags, unsigned long val)
 {
     static char* ops [12] = {
      	"toseq00",	"toseqa0",	"toseqax",
-     	"toseq00",	"toseqa0",	"toseqax",
-     	0,		0,	  	"toseqeax",
-     	0,		0,	  	"toseqeax",
+     	"toseq00", 	"toseqa0",	"toseqax",
+     	0,	   	0,	  	"toseqeax",
+     	0,	   	0,	  	"toseqeax",
     };
 
     unsigned L;
@@ -3332,7 +3332,7 @@ void g_lt (unsigned flags, unsigned long val)
     static char* ops [12] = {
      	"toslt00",	"toslta0",    	"tosltax",
      	"tosult00",	"tosulta0",   	"tosultax",
-     	0,		0,    	      	"toslteax",
+     	0,	   	0,    	      	"toslteax",
      	0,		0,    	      	"tosulteax",
     };
 
@@ -3344,6 +3344,8 @@ void g_lt (unsigned flags, unsigned long val)
      	/* Give a warning in some special cases */
      	if ((flags & CF_UNSIGNED) && val == 0) {
      	    Warning ("Condition is never true");
+	    AddCodeLine ("jsr return0");
+	    return;
      	}
 
      	/* Look at the type */
@@ -3353,7 +3355,7 @@ void g_lt (unsigned flags, unsigned long val)
      	       	if (flags & CF_FORCECHAR) {
      	       	    AddCodeLine ("cmp #$%02X", (unsigned char)val);
      	       	    if (flags & CF_UNSIGNED) {
-     	       		AddCodeLine ("jsr boolult");
+     	       	   	AddCodeLine ("jsr boolult");
      	       	    } else {
      	       	        AddCodeLine ("jsr boollt");
      	       	    }
@@ -3370,16 +3372,32 @@ void g_lt (unsigned flags, unsigned long val)
 	       	    AddCodeLine ("jsr boollt");
 	       	    return;
 	       	}
-	       	/* Direct code only for unsigned data types */
 	       	if (flags & CF_UNSIGNED) {
-		    unsigned L = GetLocalLabel();
-	       	    AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
-       	       	    AddCodeLine ("bne %s", LocalLabelName (L));
-     	       	    AddCodeLine ("cmp #$%02X", (unsigned char)val);
-		    g_defcodelabel (L);
+		    /* Unsigned compare */
+		    /* If the low byte is zero, we must only test the high
+		     * byte. Or, citing Piotr Fusik:
+		     *   Another interpretation: the code is effectively:
+		     *     if (ax >= 0xAB00) goto L2;
+		     *   It's equivalent to:
+		     *     if ((ax >> 8) >= 0xAB) goto L2;
+		     */
+		    AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
+		    if ((val & 0xFF) != 0) {
+		     	unsigned L = GetLocalLabel();
+		     	AddCodeLine ("bne %s", LocalLabelName (L));
+		     	AddCodeLine ("cmp #$%02X", (unsigned char)val);
+		     	g_defcodelabel (L);
+		    }
 	 	    AddCodeLine ("jsr boolult");
 	 	    return;
-     	 	}
+     	 	} else {
+		    /* Signed compare */
+		    if ((val & 0xFF) == 0) {
+			AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
+			AddCodeLine ("jsr boollt");
+			return;
+		    }
+		}
      	 	break;
 
      	    case CF_LONG:
@@ -3426,26 +3444,30 @@ void g_le (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
-     	/* <= is not very effective on the 6502, so try to convert
-     	 * it into < if the value is in a valid range.
-     	 */
-
      	/* Look at the type */
      	switch (flags & CF_TYPE) {
 
      	    case CF_CHAR:
      		if (flags & CF_FORCECHAR) {
      		    if (flags & CF_UNSIGNED) {
+			/* Unsigned compare */
      		     	if (val < 255) {
-     		     	    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
+		    	    /* Use < instead of <= because the former gives
+		    	     * better code on the 6502 than the latter.
+		    	     */
+     		      	    AddCodeLine ("cmp #$%02X", (unsigned char)(val+1));
      		     	    AddCodeLine ("jsr boolult");
      		     	} else {
      		     	    AddCodeLine ("cmp #$%02X", (unsigned char)val);
      		     	    AddCodeLine ("jsr boolule");
      		     	}
      		    } else {
+			/* Signed compare */
      		     	if (val < 127) {
-     		     	    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
+		    	    /* Use < instead of <= because the former gives
+		    	     * better code on the 6502 than the latter.
+		    	     */
+     		     	    AddCodeLine ("cmp #$%02X", (unsigned char)(val+1));
      		     	    AddCodeLine ("jsr boollt");
      		     	} else {
      		     	    AddCodeLine ("cmp #$%02X", (unsigned char)val);
@@ -3458,18 +3480,27 @@ void g_le (unsigned flags, unsigned long val)
 
 	    case CF_INT:
 		if (flags & CF_UNSIGNED) {
-		    unsigned L = GetLocalLabel();
-		    const char* Name = "boolule";
+		    /* Unsigned compare */
 		    if (val < 65535) {
-		     	++val;
-		     	Name = "boolult";
+		      	/* Use < instead of <= because the former gives
+		      	 * better code on the 6502 than the latter.
+		      	 */
+		      	g_lt (flags, val+1);
+		    } else {
+		      	unsigned L = GetLocalLabel();
+		      	AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
+		      	AddCodeLine ("bne %s", LocalLabelName (L));
+		      	AddCodeLine ("cmp #$%02X", (unsigned char)val);
+		      	g_defcodelabel (L);
+		      	AddCodeLine ("jsr %s", "boolule");
 		    }
-		    AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
-		    AddCodeLine ("bne %s", LocalLabelName (L));
-		    AddCodeLine ("cmp #$%02X", (unsigned char)val);
-		    g_defcodelabel (L);
-		    AddCodeLine ("jsr %s", Name);
 		    return;
+     		} else {
+     		    /* Signed compare */
+     		    if (val < 32767) {
+     		       	g_lt (flags, val+1);
+     		 	return;
+     		    }
 		}
 	  	break;
 
@@ -3509,34 +3540,36 @@ void g_gt (unsigned flags, unsigned long val)
      */
     if (flags & CF_CONST) {
 
-       	/* > is not very effective on the 6502, so try to convert
-     	 * it into >= if the value is in a valid range.
-     	 */
-
      	/* Look at the type */
      	switch (flags & CF_TYPE) {
 
      	    case CF_CHAR:
      		if (flags & CF_FORCECHAR) {
      		    if (flags & CF_UNSIGNED) {
-     		      	/* If we have a compare > 0, we will replace it by
-     		      	 * != 0 here, since both are identical but the latter
-     		      	 * is easier to optimize.
-     		      	 */
        	       	       	if (val == 0) {
-			    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+		    	    /* If we have a compare > 0, we will replace it by
+		    	     * != 0 here, since both are identical but the
+			     * latter is easier to optimize.
+		    	     */
+		    	    AddCodeLine ("cmp #$%02X", (unsigned char)val);
      		      	    AddCodeLine ("jsr boolne");
      		      	} else if (val < 255) {
-			    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
+		    	    /* Use >= instead of > because the former gives
+		    	     * better code on the 6502 than the latter.
+		    	     */
+		    	    AddCodeLine ("cmp #$%02X", (unsigned char)(val+1));
      		      	    AddCodeLine ("jsr booluge");
      		      	} else {
-			    AddCodeLine ("cmp #$%02X", (unsigned char)val);
+		    	    AddCodeLine ("cmp #$%02X", (unsigned char)val);
      		       	    AddCodeLine ("jsr boolugt");
-			}
+		    	}
      		    } else {
-			if (val < 127) {
-			    AddCodeLine ("cmp #$%02X", (unsigned char)val+1);
-			    AddCodeLine ("jsr boolge");
+		    	if (val < 127) {
+		    	    /* Use >= instead of > because the former gives
+		    	     * better code on the 6502 than the latter.
+		    	     */
+		    	    AddCodeLine ("cmp #$%02X", (unsigned char)(val+1));
+		    	    AddCodeLine ("jsr boolge");
 			} else {
 			    AddCodeLine ("cmp #$%02X", (unsigned char)val);
 			    AddCodeLine ("jsr boolgt");
@@ -3548,29 +3581,36 @@ void g_gt (unsigned flags, unsigned long val)
 
      	    case CF_INT:
      		if (flags & CF_UNSIGNED) {
-     		    /* If we have a compare > 0, we will replace it by
-     		     * != 0 here, since both are identical but the latter
-     	 	     * is easier to optimize.
-	 	     */
+		    /* Unsigned compare */
 	 	    if (val == 0) {
+		    	/* If we have a compare > 0, we will replace it by
+		    	 * != 0 here, since both are identical but the latter
+		    	 * is easier to optimize.
+		    	 */
 	 	     	AddCodeLine ("stx tmp1");
 	 	     	AddCodeLine ("ora tmp1");
 	 	     	AddCodeLine ("jsr boolne");
-	 	    } else {
+	 	    } else if (val < 65535U) {
+		    	/* Use >= instead of > because the former gives better
+		    	 * code on the 6502 than the latter.
+		    	 */
+		    	g_ge (flags, val+1);
+		    } else {
 		     	unsigned L = GetLocalLabel();
-			const char* Name = "boolugt";
-			if (val < 65535) {
-			    ++val;
-			    Name = "booluge";
-			}
        	       	       	AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
 	 	     	AddCodeLine ("bne %s", LocalLabelName (L));
 	 	     	AddCodeLine ("cmp #$%02X", (unsigned char)val);
 		     	g_defcodelabel (L);
-       	       	       	AddCodeLine ("jsr %s", Name);
+       	       	       	AddCodeLine ("jsr %s", "boolugt");
 	 	    }
 	 	    return;
-       	       	}
+       	       	} else {
+		    /* Signed compare */
+		    if (val < 32767) {
+			g_ge (flags, val+1);
+			return;
+		    }
+		}
 	 	break;
 
 	    case CF_LONG:
@@ -3612,6 +3652,8 @@ void g_ge (unsigned flags, unsigned long val)
 	/* Give a warning in some special cases */
 	if ((flags & CF_UNSIGNED) && val == 0) {
      	    Warning ("Condition is always true");
+	    AddCodeLine ("jsr return1");
+	    return;
 	}
 
 	/* Look at the type */
@@ -3640,14 +3682,30 @@ void g_ge (unsigned flags, unsigned long val)
 		}
 		/* Direct code only for unsigned data types */
 		if (flags & CF_UNSIGNED) {
-		    unsigned L = GetLocalLabel();
-       	       	    AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
-       	       	    AddCodeLine ("bne %s", LocalLabelName (L));
-     		    AddCodeLine ("cmp #$%02X", (unsigned char)val);
-		    g_defcodelabel (L);
+		    /* If the low byte is zero, we must only test the high
+		     * byte. Or, citing Piotr Fusik:
+		     *   Another interpretation: the code is effectively:
+		     *     if (ax >= 0xAB00) goto L2;
+		     *   It's equivalent to:
+		     *     if ((ax >> 8) >= 0xAB) goto L2;
+		     */
+		    AddCodeLine ("cpx #$%02X", (unsigned char)(val >> 8));
+		    if ((val & 0xFF) != 0) {
+		     	unsigned L = GetLocalLabel();
+		     	AddCodeLine ("bne %s", LocalLabelName (L));
+		     	AddCodeLine ("cmp #$%02X", (unsigned char)val);
+		     	g_defcodelabel (L);
+		    }
 		    AddCodeLine ("jsr booluge");
 		    return;
-	 	}
+	 	} else {
+		    /* Signed compare */
+		    if ((val & 0xFF) == 0) {
+		    	AddCodeLine ("cpx #$%02X", (unsigned char) (val >> 8));
+		    	AddCodeLine ("jsr boolge");
+		    	return;
+		    }
+		}
 	     	break;
 
 	    case CF_LONG:

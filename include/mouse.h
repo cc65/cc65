@@ -96,8 +96,12 @@ struct mouse_callbacks {
 
 
 
-unsigned char __fastcall__ mouse_set_callbacks (const struct mouse_callbacks* c);
-/* Sets the callbacks to be used by the driver. */
+void __fastcall__ mouse_set_callbacks (const struct mouse_callbacks* c);
+/* Sets the callbacks to be used by the driver. NOTE: The function will just
+ * remember the pointer, it will not copy the contents of the passed struct.
+ * The latter is done in mouse_install. This means that the struct must be
+ * valid at least until mouse_install is called. Do not use a local variable!
+ */
 
 unsigned char __fastcall__ mouse_load_driver (const char* driver);
 /* Load and install a mouse driver, return an error code. */
@@ -155,8 +159,8 @@ void __fastcall__ mouse_info (struct mouse_info* info);
 /* Return the state of the mouse buttons and the position of the mouse */
 
 unsigned char __fastcall__ mouse_ioctl (unsigned char code, void* data);
-/* Call the driver specific ioctl function. NON PORTABLE! Returns an error 
- * code. 
+/* Call the driver specific ioctl function. NON PORTABLE! Returns an error
+ * code.
  */
 
 

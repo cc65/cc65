@@ -7,7 +7,7 @@
 	.include "atari.inc"
 	
     	.export		_cvlinexy, _cvline
-	.import		popa, _gotoxy, putchar
+	.import		popa, _gotoxy, putchar, setcursor
 	.importzp	tmp1
 
 _cvlinexy:
@@ -29,7 +29,7 @@ L1:	lda	COLCRS
    	inc	ROWCRS
 	dec	tmp1
 	bne	L1
-L9:	rts
+L9:	jmp	setcursor
 
 
 

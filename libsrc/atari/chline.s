@@ -6,7 +6,7 @@
 ;
 
     	.export		_chlinexy, _chline
-	.import		popa, _gotoxy, cputdirect
+	.import		popa, _gotoxy, cputdirect, setcursor
 	.importzp	tmp1
 
 _chlinexy:
@@ -23,7 +23,7 @@ L1:    	lda    	#$12+64		; Horizontal line, screen code
    	jsr	cputdirect	; Direct output
    	dec	tmp1
 	bne	L1
-L9:	rts
+L9:	jmp	setcursor
 
 
 

@@ -41,6 +41,7 @@
 #include "xmalloc.h"
 
 /* sim65 */
+#include "cfgdata.h"
 #include "chipdata.h"
 #include "chiplib.h"
 #include "error.h"
@@ -88,50 +89,6 @@ static int CmpChips (void* Data attribute ((unused)),
 
 
 
-/*****************************************************************************/
-/*     	      	       	   	     Code				     */
-/*****************************************************************************/
-
-
-
-Chip* NewChip (ChipLibrary* Library, const ChipData* Data)
-/* Allocate a new chip structure, initialize and return it */
-{
-    /* Allocate memory */
-    Chip* C = xmalloc (sizeof (Chip));
-
-    /* Initialize the fields */
-    C->Library   = Library;
-    C->Data      = Data;
-    C->Instances = EmptyCollection;
-
-    /* Insert the new chip into the collection of all chips */
-    CollAppend (&Chips, C);
-
-    /* Return the structure */
-    return C;
-}
-
-
-
-ChipInstance* NewChipInstance (unsigned long Addr, unsigned Size)
-/* Allocate a new chip instance for the chip. */
-{
-    /* Allocate a new ChipInstance structure */
-    ChipInstance* Instance = xmalloc (sizeof (*Instance));
-
-    /* Initialize the fields */
-    Instance->C             = 0;
-    Instance->Addr          = Addr;
-    Instance->Size          = Size;
-    Instance->InstanceData  = 0;
-
-    /* Return the new struct */
-    return Instance;
-}
-
-
-
 static Chip* FindChip (const char* Name)
 /* Find a chip by name. Returns the Chip data structure or NULL if the chip
  * could not be found.
@@ -158,24 +115,80 @@ static Chip* FindChip (const char* Name)
 
 
 
-void InitChipInstance (ChipInstance* CI, const char* ChipName,
-                       const struct CfgData** Data, unsigned Count)
-/* Initialize the given chip instance. Assign it to the chip named ChipName,
- * and call the init function of the chip passing the given config data.
- */
+/*****************************************************************************/
+/*     	      	       	   	     Code	   			     */
+/*****************************************************************************/
+
+
+
+Chip* NewChip (ChipLibrary* Library, const ChipData* Data)
+/* Allocate a new chip structure, initialize and return it */
 {
+    /* Allocate memory */
+    Chip* C = xmalloc (sizeof (Chip));
+
+    /* Initialize the fields */
+    C->Library   = Library;
+    C->Data      = Data;
+    C->Instances = EmptyCollection;
+
+    /* Insert the new chip into the collection of all chips */
+    CollAppend (&Chips, C);
+
+    /* Return the structure */
+    return C;
+}
+
+
+
+ChipInstance* NewChipInstance (const char* ChipName, unsigned Addr,
+                               unsigned Size, const Collection* Attributes)
+{
+    ChipInstance* CI;
+
     /* Find the chip with the given name */
     Chip* C = FindChip (ChipName);
     if (C == 0) {
-        Error ("No chip `%s' found for address $%6lX", ChipName, CI->Addr);
+        Error ("No chip `%s' found for address $%06X", ChipName, Addr);
     }
 
-    /* Call the initialization function */
-    CI->InstanceData = C->Data->InitInstance (CI->Addr, CI->Size, Data, Count);
+    /* Allocate a new ChipInstance structure */
+    CI = xmalloc (sizeof (*CI));
+
+    /* Initialize the fields */
+    CI->C    = C;
+    CI->Addr = Addr;
+    CI->Size = Size;
+    CI->Data = C->Data->InitInstance (Addr, Size,
+                                      (const CfgData**) Attributes->Items,
+                                      CollCount (Attributes));
 
     /* Assign the chip instance to the chip */
-    CI->C = C;
     CollAppend (&C->Instances, CI);
+
+    /* Return the new instance struct */
+    return CI;
+}
+
+
+
+ChipInstance* MirrorChipInstance (const ChipInstance* Orig, unsigned Addr)
+/* Generate a chip instance mirror and return it. */
+{
+    /* Allocate a new ChipInstance structure */
+    ChipInstance* CI = xmalloc (sizeof (*CI));
+
+    /* Initialize the fields */
+    CI->C    = Orig->C;
+    CI->Addr = Addr;
+    CI->Size = Orig->Size;
+    CI->Data = Orig->Data;
+
+    /* Assign the chip instance to the chip */
+    CollAppend (&CI->C->Instances, CI);
+
+    /* Return the new instance struct */
+    return CI;
 }
 
 

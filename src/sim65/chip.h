@@ -61,10 +61,10 @@ typedef struct ChipInstance ChipInstance;
 
 /* One instance of a chip */
 struct ChipInstance {
-    Chip*           C;                  /* Pointer to corresponding chip */
-    unsigned long   Addr;               /* Start address of range */
-    unsigned        Size;               /* Size of range */
-    void*           InstanceData;       /* Chip instance data */
+    Chip*               C;              /* Pointer to corresponding chip */
+    unsigned            Addr;           /* Start address of range */
+    unsigned            Size;           /* Size of range */
+    void*               Data;           /* Chip instance data */
 };
 
 /* Chip structure */
@@ -85,14 +85,12 @@ struct Chip {
 Chip* NewChip (struct ChipLibrary* Library, const ChipData* Data);
 /* Allocate a new chip structure, initialize and return it */
 
-ChipInstance* NewChipInstance (unsigned long Addr, unsigned Size);
+ChipInstance* NewChipInstance (const char* ChipName, unsigned Addr,
+                               unsigned Size, const Collection* Attributes);
 /* Allocate a new chip instance for the chip. */
 
-void InitChipInstance (ChipInstance* CI, const char* ChipName,
-                       const struct CfgData** Data, unsigned Count);
-/* Initialize the given chip instance. Assign it to the chip named ChipName,
- * and call the init function of the chip passing the given config data.
- */
+ChipInstance* MirrorChipInstance (const ChipInstance* Orig, unsigned Addr);
+/* Generate a chip instance mirror and return it. */
 
 void SortChips (void);
 /* Sort all chips by name. Called after loading */

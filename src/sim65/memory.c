@@ -39,24 +39,13 @@
 
 /* common */
 #include "coll.h"
+#include "xmalloc.h"
 
 /* sim65 */
+#include "chip.h"
+#include "cputype.h"
 #include "error.h"
 #include "memory.h"
-
-
-
-/*****************************************************************************/
-/*                                   Forwards                                */
-/*****************************************************************************/
-
-
-
-static void MemWrite (unsigned Addr, unsigned char Val);
-/* Write one byte to the memory cell */
-
-static unsigned char MemRead (unsigned Attr);
-/* Read one memory cell */
 
 
 
@@ -66,57 +55,9 @@ static unsigned char MemRead (unsigned Attr);
 
 
 
-/* RAM attributes */
-#define RA_READFUNC_MASK        0x000F  /* Up to 16 read functions */
-#define RA_WRITEFUNC_MASK       0x00F0  /* Up to 16 write functions */
-#define RA_INITIALIZED          0x0100  /* Memory cell is initialized */
-#define RA_WPROT                0x0200  /* Memory cell is write protected */
-
-/* Defines reader and writer functions */
-#define RA_READFUNC_SHIFT       0
-#define RA_WRITEFUNC_SHIFT      4
-#define RA_READFUNC_MAX         16
-#define RA_WRITEFUNC_MAX        16
-
-/* Read/write function declarations */
-typedef unsigned char (*ReadFunc) (unsigned Addr);
-typedef void (*WriteFunc) (unsigned Addr, unsigned char Val);
-static Collection ReadFuncs  = STATIC_COLLECTION_INITIALIZER;
-static Collection WriteFuncs = STATIC_COLLECTION_INITIALIZER;
-
-/* Memory attributes and the memory */
-static unsigned short MemAttr[0x10000];
-static unsigned char Mem[0x10000];
-
-
-
-/*****************************************************************************/
-/*                              Internal functions                           */
-/*****************************************************************************/
-
-
-
-static void MemWrite (unsigned Addr, unsigned char Val)
-/* Write one byte to the memory cell */
-{
-    if (MemAttr[Addr] & RA_WPROT) {
-        Warning ("Writing to write protected memory at $%04X", Addr);
-    }
-    Mem[Addr] = Val;
-    MemAttr[Addr] |= RA_INITIALIZED;
-}
-
-
-
-static unsigned char MemRead (unsigned Addr)
-/* Read one memory cell */
-{
-    if ((MemAttr[Addr] & RA_INITIALIZED) == 0) {
-        /* We're reading a memory cell that was never written */
-        Warning ("Reading from uninitialized memory at $%04X", Addr);
-    }
-    return Mem[Addr];
-}
+/* Pointer to our memory */
+static const ChipInstance** MemData = 0;
+unsigned MemSize                    = 0;
 
 
 
@@ -129,12 +70,15 @@ static unsigned char MemRead (unsigned Addr)
 void MemWriteByte (unsigned Addr, unsigned char Val)
 /* Write a byte to a memory location */
 {
-    /* Get the writer function */
-    unsigned  WI = (MemAttr[Addr] & RA_WRITEFUNC_MASK) >> RA_WRITEFUNC_SHIFT;
-    WriteFunc WF = CollAt (&WriteFuncs, WI);
+    /* Get the instance of the chip at this address */
+    const ChipInstance* CI = MemData[Addr];
 
-    /* Call the writer function */
-    WF (Addr, Val);
+    /* Check if the memory is mapped */
+    if (CI == 0) {
+        Warning ("Writing to unassigned memory at $%06X", Addr);
+    } else {
+        CI->C->Data->Write (CI->Data, Addr - CI->Addr, Val);
+    }
 }
 
 
@@ -142,12 +86,16 @@ void MemWriteByte (unsigned Addr, unsigned char Val)
 unsigned char MemReadByte (unsigned Addr)
 /* Read a byte from a memory location */
 {
-    /* Get the reader function */
-    unsigned  RI = (MemAttr[Addr] & RA_READFUNC_MASK) >> RA_READFUNC_SHIFT;
-    ReadFunc RF = CollAt (&ReadFuncs, RI);
+    /* Get the instance of the chip at this address */
+    const ChipInstance* CI = MemData[Addr];
 
-    /* Call the reader function */
-    return RF (Addr);
+    /* Check if the memory is mapped */
+    if (CI == 0) {
+        Warning ("Reading from unassigned memory at $%06X", Addr);
+        return 0xFF;
+    } else {
+        return CI->C->Data->Read (CI->Data, Addr - CI->Addr);
+    }
 }
 
 
@@ -163,9 +111,9 @@ unsigned MemReadWord (unsigned Addr)
 
 unsigned MemReadZPWord (unsigned char Addr)
 /* Read a word from the zero page. This function differs from ReadMemW in that
-* the read will always be in the zero page, even in case of an address
-* overflow.
-*/
+ * the read will always be in the zero page, even in case of an address
+ * overflow.
+ */
 {
     unsigned W = MemReadByte (Addr++);
     return (W | (MemReadByte (Addr) << 8));
@@ -173,46 +121,29 @@ unsigned MemReadZPWord (unsigned char Addr)
 
 
 
-void MemLoad (const char* Filename, unsigned Addr, unsigned Size)
-/* Load the contents of the given file into the RAM at the given address.
- * If Size is not zero, we will read exactly Size bytes from the file and
- * consider it an error if this is not possible. The memory attributes
- * for the range is set to initialized.
- */
+void MemAssignChip (const ChipInstance* CI, unsigned Addr, unsigned Range)
+/* Assign a chip instance to memory locations */
 {
-    unsigned BytesToRead;
-    unsigned BytesRead;
-    unsigned I;
+    /* Make sure, the addresses are in a valid range */
+    PRECONDITION (Addr + Range <= MemSize);
 
-    /* Open the file */
-    FILE* F = fopen (Filename, "rb");
-    if (F == 0) {
-        Error ("Cannot open `%s': %s", Filename, strerror (errno));
+    /* Assign the chip instance */
+    while (Range--) {
+        CHECK (MemData[Addr] == 0);
+        MemData[Addr++] = CI;
     }
+}
 
-    /* Set the number of bytes to read */
-    BytesToRead = 0x10000 - Addr;
-    if (Size > 0) {
-        CHECK (Size <= BytesToRead);    /* Must not exceed RAM */
-        BytesToRead = Size;
-    }
 
-    /* Read data from the file */
-    BytesRead = fread (Mem + Addr, 1, BytesToRead, F);
-    if (ferror (F)) {
-        Error ("Error reading from `%s': %s", Filename, strerror (errno));
-    }
-    if (Size > 0 && BytesRead != Size) {
-        Error ("Cannot read %u bytes from `%s'", Size, Filename);
-    }
 
-    /* Close the file. Ignore errors, we were just reading. */
-    fclose (F);
+const struct ChipInstance* MemGetChip (unsigned Addr)
+/* Get the chip that is located at the given address (may return NULL). */
+{
+    /* Make sure, the address is valid */
+    PRECONDITION (Addr < MemSize);
 
-    /* Set the memory attribute for the range to initialized */
-    for (I = 0; I < BytesRead; ++I) {
-        MemAttr[Addr+I] |= RA_INITIALIZED;
-    }
+    /* Return the chip instance */
+    return MemData[Addr];
 }
 
 
@@ -222,23 +153,21 @@ void MemInit (void)
 {
     unsigned I;
 
-    /* Clear the memory and it's attributes. Writing zeroes to the
-     * attribute array will cause any special flags to be reset and
-     * the default read and write functions to be used.
-     */
-    for (I = 0; I < sizeof (Mem) / sizeof (Mem[0]); ++I) {
-        Mem[I] = 0;
+    /* Allocate memory depending on the CPU type */
+    switch (CPU) {
+        case CPU_6502:
+        case CPU_65C02:
+            MemSize = 0x10000;
+            break;
+        default:
+            Internal ("Unexpected CPU type: %d", CPU);
     }
-    for (I = 0; I < sizeof (MemAttr) / sizeof (MemAttr[0]); ++I) {
-        MemAttr[I] = 0;
+    MemData = xmalloc (MemSize);
+
+    /* Clear the memory */
+    for (I = 0; I < MemSize; ++I) {
+        MemData[I] = 0;
     }
-
-    /* Add the default reader and writer functions to the collection */
-    CollAppend (&ReadFuncs, MemRead);
-    CollAppend (&WriteFuncs, MemWrite);
-
-    MemWriteByte (0xFFFC, 0x00);
-    MemWriteByte (0xFFFD, 0x02);
 }
 
 

@@ -39,13 +39,21 @@
 
 
 /*****************************************************************************/
-/*  				     Data				     */
+/*  		    		     Data				     */
 /*****************************************************************************/
 
 
 
+/* Forwards */
+struct ChipInstance;
+
+/* Memory size of the CPU */
+extern unsigned MemSize;
+
+
+
 /*****************************************************************************/
-/*  				     Code				     */
+/*  	     	    	   	     Code				     */
 /*****************************************************************************/
 
 
@@ -65,12 +73,11 @@ unsigned MemReadZPWord (unsigned char Addr);
  * overflow.
  */
 
-void MemLoad (const char* Filename, unsigned Addr, unsigned Size);
-/* Load the contents of the given file into the RAM at the given address.
- * If Size is not zero, we will read exactly Size bytes from the file and
- * consider it an error if this is not possible. The memory attributes
- * for the range is set to initialized.
- */
+void MemAssignChip (const struct ChipInstance* CI, unsigned Addr, unsigned Range);
+/* Assign a chip instance to memory locations */
+
+const struct ChipInstance* MemGetChip (unsigned Addr);
+/* Get the chip that is located at the given address (may return NULL). */
 
 void MemInit (void);
 /* Initialize the memory subsystem */
@@ -80,6 +87,7 @@ void MemInit (void);
 /* End of memory.h */
 
 #endif
+
 
 
 

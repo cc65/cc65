@@ -50,6 +50,7 @@
 #include "chip.h"
 #include "error.h"
 #include "global.h"
+#include "memory.h"
 #include "scanner.h"
 #include "config.h"
 
@@ -67,11 +68,11 @@ static Collection Locations;
 /* One memory location */
 typedef struct Location Location;
 struct Location {
-    unsigned long       Start;          /* Start of memory location */
-    unsigned long       End;            /* End memory location */
-    Collection          Attributes;     /* Attributes given */
-    unsigned            Line;           /* Line in config file */
-    unsigned            Col;            /* Column in config file */
+    unsigned    Start;          /* Start of memory location */
+    unsigned    End;            /* End memory location */
+    Collection  Attributes;     /* Attributes given */
+    unsigned    Line;           /* Line in config file */
+    unsigned    Col;            /* Column in config file */
 };
 
 
@@ -94,13 +95,37 @@ static CfgData* NewCfgData (void)
     CfgData* D = xmalloc (sizeof (CfgData) + AttrLen);
 
     /* Initialize the fields */
-    D->Type = CfgDataInvalid;                 
+    D->Type = CfgDataInvalid;
     D->Line = CfgErrorLine;
     D->Col  = CfgErrorCol;
     memcpy (D->Attr, CfgSVal, AttrLen+1);
 
     /* Return the new struct */
     return D;
+}
+
+
+
+static void FreeCfgData (CfgData* D)
+/* Free a config data structure */
+{
+    if (D->Type == CfgDataString) {
+        /* Free the string value */
+        xfree (D->V.SVal);
+    }
+    /* Free the structure */
+    xfree (D);
+}
+
+
+
+static void CfgDataCheckType (const CfgData* D, unsigned Type)
+/* Check the config data type */
+{
+    if (D->Type != Type) {
+        Error ("%s(%u): Attribute `%s' has invalid type",
+               CfgGetName (), D->Line, D->Attr);
+    }
 }
 
 
@@ -150,9 +175,9 @@ static int CmpLocations (void* Data attribute ((unused)),
 
 
 
-static const CfgData* LocationFindAttr (const Location* L, const char* AttrName)
-/* Find the attribute with the given name and return it. Return NULL if the
- * attribute was not found.
+static int LocationFindAttr (const Location* L, const char* AttrName)
+/* Find the attribute with the given name and return its index. Return -1 if
+ * the attribute was not found.
  */
 {
     unsigned I;
@@ -166,12 +191,26 @@ static const CfgData* LocationFindAttr (const Location* L, const char* AttrName)
         /* Compare the name */
         if (StrCaseCmp (D->Attr, AttrName) == 0) {
             /* Found */
-            return D;
+            return I;
         }
     }
 
     /* Not found */
-    return 0;
+    return -1;
+}
+
+
+
+static int LocationGetAttr (const Location* L, const char* AttrName)
+/* Find the attribute with the given name and return it. Call Error() if the
+ * attribute was not found.
+ */
+{
+    int I = LocationFindAttr (L, AttrName);
+    if (I < 0) {
+        Error ("%s(%u): Attribute `%s' missing", CfgGetName(), L->Line, AttrName);
+    }
+    return I;
 }
 
 
@@ -180,37 +219,14 @@ static int LocationIsMirror (const Location* L)
 /* Return true if the given location is a mirror of another one. */
 {
     /* Find the "mirror" attribute */
-    return (LocationFindAttr (L, "mirror") != 0);
+    return (LocationFindAttr (L, "mirror") >= 0);
 }
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*     	      	    		     Code		  		     */
 /*****************************************************************************/
-
-
-
-static void FlagAttr (unsigned* Flags, unsigned Mask, const char* Name)
-/* Check if the item is already defined. Print an error if so. If not, set
- * the marker that we have a definition now.
- */
-{
-    if (*Flags & Mask) {
-    	CfgError ("%s is already defined", Name);
-    }
-    *Flags |= Mask;
-}
-
-
-
-static void AttrCheck (unsigned Attr, unsigned Mask, const char* Name)
-/* Check that a mandatory attribute was given */
-{
-    if ((Attr & Mask) == 0) {
-	CfgError ("%s attribute is missing", Name);
-    }
-}
 
 
 
@@ -312,18 +328,105 @@ static void ParseMemory (void)
         if (LocationIsMirror (L)) {
             const CfgData* D;
             if (CollCount (&L->Attributes) > 1) {
-                Error ("%s(%u): Location at address $%06lX is a mirror "
+                Error ("%s(%u): Location at address $%06X is a mirror "
                        "but has attributes", CfgGetName(), L->Line, L->Start);
             }
             D = CollConstAt (&L->Attributes, 0);
-            if (D->Type != CfgDataNumber) {
-                Error ("%s(%u): Mirror attribute is not an integer",
-                       CfgGetName (), L->Line);
-            }
+            CfgDataCheckType (D, CfgDataNumber);
         }
 
         /* Remember this entry */
         Last = L;
+    }
+
+    /* Now create the chip instances. Since we can only mirror existing chips,
+     * we will first create all real chips and the mirrors in a second run.
+     */
+    for (I = 0; I < CollCount (&Locations); ++I) {
+
+        int Index;
+        CfgData* D;
+        unsigned Range;         /* Address range for this chip */
+        ChipInstance* CI;
+
+        /* Get this location */
+        Location* L = CollAtUnchecked (&Locations, I);
+
+        /* Skip mirrors */
+        if (LocationIsMirror (L)) {
+            continue;
+        }
+
+        /* The chip must have an attribute "name" of type string */
+        Index = LocationGetAttr (L, "name");
+        D = CollAt (&L->Attributes, Index);
+        CfgDataCheckType (D, CfgDataString);
+
+        /* Remove the "name" attribute from the attribute list */
+        CollDelete (&L->Attributes, Index);
+
+        /* Create the chip instance for the address range */
+        Range = L->End - L->Start;
+        CI = NewChipInstance (D->V.SVal, L->Start, Range, &L->Attributes);
+
+        /* Delete the "name" attribute */
+        FreeCfgData (D);
+
+        /* Assign the chip instance to memory */
+        MemAssignChip (CI, L->Start, Range);
+    }
+
+    /* Create the mirrors */
+    for (I = 0; I < CollCount (&Locations); ++I) {
+
+        const CfgData* D;
+        unsigned MirrorAddr;    /* Mirror address */
+        unsigned Range;         /* Address range for this chip */
+        unsigned Offs;          /* Offset of the mirror */
+        const ChipInstance* CI; /* Original chip instance */
+        ChipInstance* MCI;      /* Mirrored chip instance */
+
+        /* Get this location */
+        const Location* L = CollAtUnchecked (&Locations, I);
+
+        /* Skip non mirrors */
+        if (!LocationIsMirror (L)) {
+            continue;
+        }
+
+        /* Calculate the address range */
+        Range = L->End - L->Start;
+
+        /* Get the mirror address */
+        D = CollConstAt (&L->Attributes, 0);
+        MirrorAddr = (unsigned) D->V.IVal;
+
+        /* For simplicity, get the chip instance we're mirroring from the
+         * memory, instead of searching for the range in the list.
+         */
+        CI = MemGetChip (MirrorAddr);
+        if (CI == 0) {
+            /* We are mirroring an unassigned address */
+            Error ("%s(%u): Mirroring an unassigned address",
+                   CfgGetName (), L->Line);
+        }
+
+        /* Make sure we're mirroring the correct chip */
+        CHECK (MirrorAddr >= CI->Addr && MirrorAddr < CI->Addr + CI->Size);
+
+        /* Calculate the offset of the mirror */
+        Offs = MirrorAddr - CI->Addr;
+
+        /* Check if the mirror range is ok */
+        if (Offs + Range > CI->Size) {
+            Error ("%s(%u): Mirror range is too large", CfgGetName (), L->Line);
+        }
+
+        /* Clone the chip instance for the new location */
+        MCI = MirrorChipInstance (CI, L->Start - Offs);
+
+        /* Assign the chip instance to memory */
+        MemAssignChip (MCI, L->Start, Range);
     }
 }
 

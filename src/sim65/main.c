@@ -292,10 +292,13 @@ int main (int argc, char* argv[])
        	Error ("Simulator configuration missing");
     }
 
+    /* Initialize the simulated CPU memory */
+    MemInit ();
+
     /* Read the config file */
     CfgRead ();
 
-    MemInit ();
+    /* Initialize the CPU */
     CPUInit ();
 #if 0
     CPURun ();

@@ -5,9 +5,12 @@
 # Library dir
 COMMON	= ../common
 
-# Default for the compiler lib search path as compiler define
-CDEFS=-DCC65_LIB=\"/usr/lib/cc65/lib/\"
-CFLAGS = -g -O2 -Wall -W -I$(COMMON) $(CDEFS)
+# The linker library search path. Default is "/usr/lib/cc65/lib/" if nothing 
+# is defined. You may use CC65_LIB=foo on the command line to override it.
+CC65_LIB = \"/usr/lib/cc65/lib/\"
+
+#
+CFLAGS = -g -O2 -Wall -W -I$(COMMON) -DCC65_LIB=$(CC65_LIB)
 CC=gcc
 EBIND=emxbind
 LDFLAGS=
@@ -115,7 +118,7 @@ depend dep:	$(OBJS:.o=.c)
 
 apple2.inc:	cfg/apple2.cfg
 	@$(CVT) $< $@ CfgApple2
-				  
+
 # The apple2enh target uses the same config as the apple2
 apple2enh.inc:	cfg/apple2.cfg
 	@$(CVT) $< $@ CfgApple2Enh

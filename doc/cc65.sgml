@@ -194,8 +194,9 @@ Here is a description of all the command line options:
   <item>atari
   <item>c64
   <item>c128
-  <item>plus4
-  <item>cbm610 (all CBM series-II computers with 80 column video)
+  <item>plus4 
+  <item>cbm510 (CBM-II series with 40 column video)
+  <item>cbm610 (all CBM-II II computers with 80 column video)
   <item>pet (all CBM PET systems except the 2001)
   <item>apple2
   <item>geos
@@ -368,7 +369,7 @@ and the one defined by the ISO standard:
 	parameter list in a C function.
 	<p>
 <item>	Functions may not return structs (or unions), and structs may not be
-	passed as parameters by value. However, struct assignment *is* 
+	passed as parameters by value. However, struct assignment *is*
 	possible.
 	<p>
 <item>	Part of the C library is available only with fastcall calling
@@ -524,6 +525,10 @@ The compiler defines several macros at startup:
   <tag><tt>__PLUS4__</tt></tag>
 
   This macro is defined if the target is the plus/4 (-t plus4).
+
+  <tag><tt>__CBM510__</tt></tag>
+
+  This macro is defined if the target is the CBM 500 series of computers.
 
   <tag><tt>__CBM610__</tt></tag>
 

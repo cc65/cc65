@@ -165,7 +165,7 @@ and keyboard I/O. The functions will write directly to the screen or poll the
 keyboard directly with no more help from the operating system than needed.
 This has some disadvantages, but on the other side it's fast and reasonably
 portable. conio implementations exist for the following targets:
-
+		    
   <itemize>
   <item>atari
   <item>c64
@@ -192,12 +192,13 @@ symbol <tt/__JOYSTICK__/ on systems that have a joystick.
 
 <sect>Using a mouse - <tt/mouse.h/<p>
 
-Some target machines support a mouse. Mouse support is currently in beta and
-available for the following targets:
+Some target machines support a mouse. Mouse support is currently available for
+the following targets:
 
   <itemize>
   <item>atari
   <item>c64
+  <item>c128
   </itemize>
 
 The available functions are declared in <tt/mouse.h/ To help writing portable
@@ -217,7 +218,7 @@ name="uz@cc65.org">).
 <sect>Copyright<p>
 
 This C runtime library implementation for the cc65 compiler is (C)
-Copyright 1998-1999 Ullrich von Bassewitz. For usage of the binaries
+Copyright 1998-2001 Ullrich von Bassewitz. For usage of the binaries
 and/or sources the following conditions do apply:
 
 This software is provided 'as-is', without any expressed or implied

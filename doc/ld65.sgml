@@ -120,6 +120,7 @@ Here is a description of all the command line options:
   <item>c64
   <item>c128
   <item>plus4
+  <item>cbm510 (CBM-II series with 40 column video)
   <item>cbm610 (all CBM series-II computers with 80 column video)
   <item>pet (all CBM PET systems except the 2001)
   <item>apple2
@@ -690,13 +691,16 @@ types:
 	}
 	FEATURES {
 	    CONDES: segment = RODATA,
-	       	    type = constructor,
-	       	    label = __CONSTRUCTOR_TABLE__,
-	       	    count = __CONSTRUCTOR_COUNT__;
+		    type = constructor,
+		    label = __CONSTRUCTOR_TABLE__,
+		    count = __CONSTRUCTOR_COUNT__;
 	    CONDES: segment = RODATA,
-	       	    type = destructor,
-	       	    label = __DESTRUCTOR_TABLE__,
-	       	    count = __DESTRUCTOR_COUNT__;
+		    type = destructor,
+		    label = __DESTRUCTOR_TABLE__,
+		    count = __DESTRUCTOR_COUNT__;
+	}
+	SYMBOLS {
+	    __STACKSIZE__ = $800;	# 2K stack
 	}
 </verb></tscreen>
 
@@ -705,7 +709,7 @@ types:
 	MEMORY {
 	    ZP: start = $82, size = $7E, type = rw;
 	    HEADER: start = $0000, size = $6, file = %O;
-	    RAM: start = $1F00, size = $9D1F, file = %O;
+	    RAM: start = $1F00, size = $9D1F, file = %O;    # $9D1F: matches upper bound $BC1F
 	}
 	SEGMENTS {
 	    EXEHDR: load = HEADER, type = wprot;
@@ -718,13 +722,16 @@ types:
 	}
 	FEATURES {
 	    CONDES: segment = RODATA,
-	       	    type = constructor,
-	       	    label = __CONSTRUCTOR_TABLE__,
-	       	    count = __CONSTRUCTOR_COUNT__;
+		    type = constructor,
+		    label = __CONSTRUCTOR_TABLE__,
+		    count = __CONSTRUCTOR_COUNT__;
 	    CONDES: segment = RODATA,
-	       	    type = destructor,
-	       	    label = __DESTRUCTOR_TABLE__,
-	       	    count = __DESTRUCTOR_COUNT__;
+		    type = destructor,
+		    label = __DESTRUCTOR_TABLE__,
+		    count = __DESTRUCTOR_COUNT__;
+	}
+	SYMBOLS {
+	    __STACKSIZE__ = $800;	# 2K stack
 	}
 </verb></tscreen>
 
@@ -732,34 +739,7 @@ types:
 <tscreen><verb>
 	MEMORY {
 	    ZP: start = $02, size = $1A, type = rw;
-	    RAM: start = $7FF, size = $c801, file = %O;
-	}
-	SEGMENTS {
-	    CODE: load = RAM, type = wprot;
-	    RODATA: load = RAM, type = wprot;
-	    DATA: load = RAM, type = rw;
-	    BSS: load = RAM, type = bss, define = yes;
-	    ZEROPAGE: load = ZP, type = zp;
-	}
-	FEATURES {
-	    CONDES: segment = RODATA,
-	       	    type = constructor,
-	       	    label = __CONSTRUCTOR_TABLE__,
-	       	    count = __CONSTRUCTOR_COUNT__;
-	    CONDES: segment = RODATA,
-	       	    type = destructor,
-	       	    label = __DESTRUCTOR_TABLE__,
-	       	    count = __DESTRUCTOR_COUNT__;
-	}
-
-
-</verb></tscreen>
-
-<tag><tt>c128</tt></tag>
-<tscreen><verb>
-	MEMORY {
-	    ZP: start = $02, size = $1A, type = rw;
-	    RAM: start = $1bff, size = $a401, file = %O;
+	    RAM: start = $7FF, size = $c801, define = yes, file = %O;
 	}
 	SEGMENTS {
 	    CODE: load = RAM, type = wprot;
@@ -777,6 +757,41 @@ types:
 		    type = destructor,
 		    label = __DESTRUCTOR_TABLE__,
 		    count = __DESTRUCTOR_COUNT__;
+	}
+	SYMBOLS {
+	    __STACKSIZE__ = $800;	# 2K stack
+	}
+</verb></tscreen>
+
+<tag><tt>c128</tt></tag>
+<tscreen><verb>
+	MEMORY {
+	    ZP: start = $02, size = $1A, type = rw;
+	    RAM: start = $1bff, size = $a401, define = yes, file = %O;
+	}
+	SEGMENTS {
+	    CODE: load = RAM, type = wprot;
+	    RODATA: load = RAM, type = wprot;
+	    DATA: load = RAM, type = rw;
+	    BSS: load = RAM, type = bss, define = yes;
+	    ZEROPAGE: load = ZP, type = zp;
+	}
+	FEATURES {
+	    CONDES: segment = RODATA,
+		    type = constructor,
+		    label = __CONSTRUCTOR_TABLE__,
+		    count = __CONSTRUCTOR_COUNT__;
+	    CONDES: segment = RODATA,
+		    type = destructor,
+		    label = __DESTRUCTOR_TABLE__,
+		    count = __DESTRUCTOR_COUNT__;
+	    CONDES: segment = RODATA,
+		    type = 2,
+		    label = __IRQFUNC_TABLE__,
+		    count = __IRQFUNC_COUNT__;
+	}
+	SYMBOLS {
+	    __STACKSIZE__ = $800;	# 2K stack
 	}
 </verb></tscreen>
 
@@ -803,6 +818,38 @@ types:
 		    label = __DESTRUCTOR_TABLE__,
 		    count = __DESTRUCTOR_COUNT__;
 	}
+	SYMBOLS {
+	    __STACKSIZE__ = $800;	# 2K stack
+	}
+</verb></tscreen>
+
+<tag><tt>cbm510</tt></tag>
+<tscreen><verb>
+	MEMORY {
+	    ZP: start = $02, size = $1A, type = rw;
+	    RAM: start = $0001, size = $F3FF, file = %O;
+	    VIDRAM: start = $F400, size = $0400, define = yes, file = "";
+	}
+	SEGMENTS {
+	    CODE: load = RAM, type = wprot;
+	    RODATA: load = RAM, type = wprot;
+	    DATA: load = RAM, type = rw;
+	    BSS: load = RAM, type = bss, define = yes;
+	    ZEROPAGE: load = ZP, type = zp;
+	}
+	FEATURES {
+	    CONDES: segment = RODATA,
+		    type = constructor,
+		    label = __CONSTRUCTOR_TABLE__,
+		    count = __CONSTRUCTOR_COUNT__;
+	    CONDES: segment = RODATA,
+		    type = destructor,
+		    label = __DESTRUCTOR_TABLE__,
+		    count = __DESTRUCTOR_COUNT__;
+	}
+	SYMBOLS {
+	    __STACKSIZE__ = $781;      	# ~2K stack
+	}
 </verb></tscreen>
 
 <tag><tt>cbm610</tt></tag>
@@ -828,6 +875,9 @@ types:
 		    label = __DESTRUCTOR_TABLE__,
 		    count = __DESTRUCTOR_COUNT__;
 	}
+	SYMBOLS {
+	    __STACKSIZE__ = $800;	# 2K stack
+	}
 </verb></tscreen>
 
 <tag><tt>pet</tt></tag>
@@ -849,9 +899,12 @@ types:
 		    label = __CONSTRUCTOR_TABLE__,
 		    count = __CONSTRUCTOR_COUNT__;
 	    CONDES: segment = RODATA,
-	       	    type = destructor,
+		    type = destructor,
 		    label = __DESTRUCTOR_TABLE__,
 		    count = __DESTRUCTOR_COUNT__;
+	}
+	SYMBOLS {
+	    __STACKSIZE__ = $800;	# 2K stack
 	}
 </verb></tscreen>
 
@@ -878,13 +931,16 @@ types:
 		    label = __DESTRUCTOR_TABLE__,
 		    count = __DESTRUCTOR_COUNT__;
 	}
+	SYMBOLS {
+	    __STACKSIZE__ = $800;	# 2K stack
+	}
 </verb></tscreen>
 
 <tag><tt>geos</tt></tag>
 <tscreen><verb>
 	MEMORY {
 	    HEADER: start = $204, size = 508, file = %O;
-	    RAM: start = $400, size = $7C00, file = %O;
+	    RAM: start = $400, size = $5C00, file = %O;
 	}
 	SEGMENTS {
 	    HEADER: load = HEADER, type = ro;
@@ -902,6 +958,9 @@ types:
 		    type = destructor,
 		    label = __DESTRUCTOR_TABLE__,
 		    count = __DESTRUCTOR_COUNT__;
+	}
+	SYMBOLS {
+	    __STACKSIZE__ = $800;	# 2K stack
 	}
 </verb></tscreen>
 
@@ -924,7 +983,7 @@ name="uz@cc65.org">).
 
 <sect>Copyright<p>
 
-ld65 (and all cc65 binutils) are (C) Copyright 1998-2000 Ullrich von
+ld65 (and all cc65 binutils) are (C) Copyright 1998-2001 Ullrich von
 Bassewitz. For usage of the binaries and/or sources the following
 conditions do apply:
 

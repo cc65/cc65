@@ -55,80 +55,82 @@
 
 
 /* Opcode description table */
-const OPCDesc OPCTable[OPC_COUNT] = {
-    { OPC_ADC, "adc", 0, REG_A,	   REG_A,    OF_NONE			    },
-    { OPC_AND, "and", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OPC_ASL, "asl", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OPC_BCC, "bcc", 2, REG_NONE, REG_NONE, OF_CBRA			    },
-    { OPC_BCS, "bcs", 2, REG_NONE, REG_NONE, OF_CBRA			    },
-    { OPC_BEQ, "beq", 2, REG_NONE, REG_NONE, OF_CBRA | OF_ZBRA | OF_FBRA    },
-    { OPC_BIT, "bit", 0, REG_A,    REG_NONE, OF_NONE			    },
-    { OPC_BMI, "bmi", 2, REG_NONE, REG_NONE, OF_CBRA | OF_FBRA 	  	    },
-    { OPC_BNE, "bne", 2, REG_NONE, REG_NONE, OF_CBRA | OF_ZBRA | OF_FBRA    },
-    { OPC_BPL, "bpl", 2, REG_NONE, REG_NONE, OF_CBRA | OF_FBRA 	  	    },
-    { OPC_BRA, "bra", 2, REG_NONE, REG_NONE, OF_UBRA			    },
-    { OPC_BRK, "brk", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_BVC, "bvc", 2, REG_NONE, REG_NONE, OF_CBRA			    },
-    { OPC_BVS, "bvs", 2, REG_NONE, REG_NONE, OF_CBRA			    },
-    { OPC_CLC, "clc", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_CLD, "cld", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_CLI, "cli", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_CLV, "clv", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_CMP, "cmp", 0, REG_A,    REG_NONE, OF_NONE			    },
-    { OPC_CPX, "cpx", 0, REG_X,    REG_NONE, OF_NONE			    },
-    { OPC_CPY, "cpy", 0, REG_Y,    REG_NONE, OF_NONE			    },
-    { OPC_DEA, "dea", 1, REG_A,    REG_A,    OF_NONE			    },
-    { OPC_DEC, "dec", 0, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_DEX, "dex", 1, REG_X,    REG_X,    OF_NONE			    },
-    { OPC_DEY, "dey", 1, REG_Y,    REG_Y,    OF_NONE			    },
-    { OPC_EOR, "eor", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OPC_INA, "ina", 1, REG_A,    REG_A,    OF_NONE			    },
-    { OPC_INC, "inc", 0, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_INX, "inx", 1, REG_X,    REG_X,    OF_NONE			    },
-    { OPC_INY, "iny", 1, REG_Y,    REG_Y,    OF_NONE			    },
-    { OPC_JCC, "jcc", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
-    { OPC_JCS, "jcs", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
-    { OPC_JEQ, "jeq", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA },
-    { OPC_JMI, "jmi", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_FBRA    },
-    { OPC_JMP, "jmp", 3, REG_NONE, REG_NONE, OF_UBRA | OF_LBRA  	    },
-    { OPC_JNE, "jne", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA },
-    { OPC_JPL, "jpl", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_FBRA    },
-    { OPC_JSR, "jsr", 3, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_JVC, "jvc", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
-    { OPC_JVS, "jvs", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
-    { OPC_LDA, "lda", 0, REG_NONE, REG_A,    OF_LOAD   			    },
-    { OPC_LDX, "ldx", 0, REG_NONE, REG_X,    OF_LOAD			    },
-    { OPC_LDY, "ldy", 0, REG_NONE, REG_Y,    OF_LOAD			    },
-    { OPC_LSR, "lsr", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OPC_NOP, "nop", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_ORA, "ora", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OPC_PHA, "pha", 1, REG_A,    REG_NONE, OF_NONE			    },
-    { OPC_PHP, "php", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_PHX, "phx", 1, REG_X,    REG_NONE, OF_NONE			    },
-    { OPC_PHY, "phy", 1, REG_Y,    REG_NONE, OF_NONE			    },
-    { OPC_PLA, "pla", 1, REG_NONE, REG_A,    OF_NONE			    },
-    { OPC_PLP, "plp", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_PLX, "plx", 1, REG_NONE, REG_X,    OF_NONE			    },
-    { OPC_PLY, "ply", 1, REG_NONE, REG_Y,    OF_NONE			    },
-    { OPC_ROL, "rol", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OPC_ROR, "ror", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OPC_RTI, "rti", 1, REG_NONE, REG_NONE, OF_RET   			    },
-    { OPC_RTS, "rts", 1, REG_NONE, REG_NONE, OF_RET   			    },
-    { OPC_SBC, "sbc", 0, REG_A,    REG_A,    OF_NONE			    },
-    { OPC_SEC, "sec", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_SED, "sed", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_SEI, "sei", 1, REG_NONE, REG_NONE, OF_NONE			    },
-    { OPC_STA, "sta", 0, REG_A,    REG_NONE, OF_NONE			    },
-    { OPC_STX, "stx", 0, REG_X,    REG_NONE, OF_NONE			    },
-    { OPC_STY, "sty", 0, REG_Y,    REG_NONE, OF_NONE			    },
-    { OPC_TAX, "tax", 1, REG_A,    REG_X,    OF_XFR			    },
-    { OPC_TAY, "tay", 1, REG_A,    REG_Y,    OF_XFR			    },
-    { OPC_TRB, "trb", 0, REG_A,    REG_NONE, OF_NONE			    },
-    { OPC_TSB, "tsb", 0, REG_A,    REG_NONE, OF_NONE			    },
-    { OPC_TSX, "tsx", 1, REG_NONE, REG_X,    OF_XFR			    },
-    { OPC_TXA, "txa", 1, REG_X,    REG_A,    OF_XFR			    },
-    { OPC_TXS, "txs", 1, REG_X,    REG_NONE, OF_XFR			    },
-    { OPC_TYA, "tya", 1, REG_A,    REG_A,    OF_XFR			    },
+const OPCDesc OPCTable[OPCODE_COUNT] = {
+
+    /* 65XX opcodes */
+    { OP65_ADC, "adc", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OP65_AND, "and", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OP65_ASL, "asl", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OP65_BCC, "bcc", 2, REG_NONE, REG_NONE, OF_CBRA			    },
+    { OP65_BCS, "bcs", 2, REG_NONE, REG_NONE, OF_CBRA			    },
+    { OP65_BEQ, "beq", 2, REG_NONE, REG_NONE, OF_CBRA | OF_ZBRA | OF_FBRA    },
+    { OP65_BIT, "bit", 0, REG_A,    REG_NONE, OF_NONE			    },
+    { OP65_BMI, "bmi", 2, REG_NONE, REG_NONE, OF_CBRA | OF_FBRA 	  	    },
+    { OP65_BNE, "bne", 2, REG_NONE, REG_NONE, OF_CBRA | OF_ZBRA | OF_FBRA    },
+    { OP65_BPL, "bpl", 2, REG_NONE, REG_NONE, OF_CBRA | OF_FBRA 	  	    },
+    { OP65_BRA, "bra", 2, REG_NONE, REG_NONE, OF_UBRA			    },
+    { OP65_BRK, "brk", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_BVC, "bvc", 2, REG_NONE, REG_NONE, OF_CBRA			    },
+    { OP65_BVS, "bvs", 2, REG_NONE, REG_NONE, OF_CBRA			    },
+    { OP65_CLC, "clc", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_CLD, "cld", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_CLI, "cli", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_CLV, "clv", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_CMP, "cmp", 0, REG_A,    REG_NONE, OF_NONE			    },
+    { OP65_CPX, "cpx", 0, REG_X,    REG_NONE, OF_NONE			    },
+    { OP65_CPY, "cpy", 0, REG_Y,    REG_NONE, OF_NONE			    },
+    { OP65_DEA, "dea", 1, REG_A,    REG_A,    OF_NONE			    },
+    { OP65_DEC, "dec", 0, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_DEX, "dex", 1, REG_X,    REG_X,    OF_NONE			    },
+    { OP65_DEY, "dey", 1, REG_Y,    REG_Y,    OF_NONE			    },
+    { OP65_EOR, "eor", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OP65_INA, "ina", 1, REG_A,    REG_A,    OF_NONE			    },
+    { OP65_INC, "inc", 0, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_INX, "inx", 1, REG_X,    REG_X,    OF_NONE			    },
+    { OP65_INY, "iny", 1, REG_Y,    REG_Y,    OF_NONE			    },
+    { OP65_JCC, "jcc", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
+    { OP65_JCS, "jcs", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
+    { OP65_JEQ, "jeq", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA },
+    { OP65_JMI, "jmi", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_FBRA    },
+    { OP65_JMP, "jmp", 3, REG_NONE, REG_NONE, OF_UBRA | OF_LBRA  	    },
+    { OP65_JNE, "jne", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_ZBRA | OF_FBRA },
+    { OP65_JPL, "jpl", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA | OF_FBRA    },
+    { OP65_JSR, "jsr", 3, REG_NONE, REG_NONE, OF_CALL			    },
+    { OP65_JVC, "jvc", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
+    { OP65_JVS, "jvs", 5, REG_NONE, REG_NONE, OF_CBRA | OF_LBRA  	    },
+    { OP65_LDA, "lda", 0, REG_NONE, REG_A,    OF_LOAD   			    },
+    { OP65_LDX, "ldx", 0, REG_NONE, REG_X,    OF_LOAD			    },
+    { OP65_LDY, "ldy", 0, REG_NONE, REG_Y,    OF_LOAD			    },
+    { OP65_LSR, "lsr", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OP65_NOP, "nop", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_ORA, "ora", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OP65_PHA, "pha", 1, REG_A,    REG_NONE, OF_NONE			    },
+    { OP65_PHP, "php", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_PHX, "phx", 1, REG_X,    REG_NONE, OF_NONE			    },
+    { OP65_PHY, "phy", 1, REG_Y,    REG_NONE, OF_NONE			    },
+    { OP65_PLA, "pla", 1, REG_NONE, REG_A,    OF_NONE			    },
+    { OP65_PLP, "plp", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_PLX, "plx", 1, REG_NONE, REG_X,    OF_NONE			    },
+    { OP65_PLY, "ply", 1, REG_NONE, REG_Y,    OF_NONE			    },
+    { OP65_ROL, "rol", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OP65_ROR, "ror", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OP65_RTI, "rti", 1, REG_NONE, REG_NONE, OF_RET   			    },
+    { OP65_RTS, "rts", 1, REG_NONE, REG_NONE, OF_RET   			    },
+    { OP65_SBC, "sbc", 0, REG_A,    REG_A,    OF_NONE			    },
+    { OP65_SEC, "sec", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_SED, "sed", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_SEI, "sei", 1, REG_NONE, REG_NONE, OF_NONE			    },
+    { OP65_STA, "sta", 0, REG_A,    REG_NONE, OF_NONE			    },
+    { OP65_STX, "stx", 0, REG_X,    REG_NONE, OF_NONE			    },
+    { OP65_STY, "sty", 0, REG_Y,    REG_NONE, OF_NONE			    },
+    { OP65_TAX, "tax", 1, REG_A,    REG_X,    OF_XFR			    },
+    { OP65_TAY, "tay", 1, REG_A,    REG_Y,    OF_XFR			    },
+    { OP65_TRB, "trb", 0, REG_A,    REG_NONE, OF_NONE			    },
+    { OP65_TSB, "tsb", 0, REG_A,    REG_NONE, OF_NONE			    },
+    { OP65_TSX, "tsx", 1, REG_NONE, REG_X,    OF_XFR			    },
+    { OP65_TXA, "txa", 1, REG_X,    REG_A,    OF_XFR			    },
+    { OP65_TXS, "txs", 1, REG_X,    REG_NONE, OF_XFR			    },
+    { OP65_TYA, "tya", 1, REG_A,    REG_A,    OF_XFR			    },
 };
 
 
@@ -149,7 +151,7 @@ static int Compare (const void* Key, const void* Desc)
 
 const OPCDesc* FindOpcode (const char* M)
 /* Find the given opcode and return the opcode number. If the opcode was not
- * found, return OPC_INVALID.
+ * found, return OP65_INVALID.
  */
 {
     unsigned I;
@@ -170,7 +172,7 @@ const OPCDesc* FindOpcode (const char* M)
     Mnemo[I] = '\0';
 
     /* Search for the mnemonic in the table and return the result */
-    return bsearch (Mnemo, OPCTable, OPC_COUNT, sizeof (OPCTable[0]), Compare);
+    return bsearch (Mnemo, OPCTable, OPCODE_COUNT, sizeof (OPCTable[0]), Compare);
 }
 
 
@@ -186,17 +188,17 @@ unsigned GetInsnSize (opc_t OPC, am_t AM)
 
     /* Check the addressing mode. */
     switch (AM) {
- 	case AM_IMP:	  return 1;
- 	case AM_ACC:	  return 1;
- 	case AM_IMM:	  return 2;
- 	case AM_ZP:	  return 2;
- 	case AM_ZPX:	  return 2;
- 	case AM_ABS:	  return 3;
- 	case AM_ABSX:	  return 3;
- 	case AM_ABSY:	  return 3;
- 	case AM_ZPX_IND:  return 2;
- 	case AM_ZP_INDY:  return 2;
- 	case AM_ZP_IND:   return 2;
+ 	case AM65_IMP: 	   return 1;
+ 	case AM65_ACC:	   return 1;
+ 	case AM65_IMM:	   return 2;
+ 	case AM65_ZP: 	   return 2;
+ 	case AM65_ZPX:	   return 2;
+ 	case AM65_ABS:	   return 3;
+ 	case AM65_ABSX:	   return 3;
+ 	case AM65_ABSY:	   return 3;
+ 	case AM65_ZPX_IND: return 2;
+ 	case AM65_ZP_INDY: return 2;
+ 	case AM65_ZP_IND:  return 2;
  	default:
 	    Internal ("Invalid addressing mode");
 	    return 0;
@@ -212,13 +214,13 @@ unsigned char GetAMUseInfo (am_t AM)
 {
     /* Check the addressing mode. */
     switch (AM) {
-       	case AM_ACC:   	  return REG_A;
-       	case AM_ZPX:   	  return REG_X;
-       	case AM_ABSX:  	  return REG_X;
-       	case AM_ABSY:  	  return REG_Y;
-       	case AM_ZPX_IND:  return REG_X;
-       	case AM_ZP_INDY:  return REG_Y;
-       	default:       	  return REG_NONE;
+       	case AM65_ACC:     return REG_A;
+       	case AM65_ZPX:     return REG_X;
+       	case AM65_ABSX:    return REG_X;
+       	case AM65_ABSY:    return REG_Y;
+       	case AM65_ZPX_IND: return REG_X;
+       	case AM65_ZP_INDY: return REG_Y;
+       	default:       	   return REG_NONE;
     }
 }
 
@@ -228,22 +230,22 @@ opc_t GetInverseBranch (opc_t OPC)
 /* Return a branch that reverse the condition of the branch given in OPC */
 {
     switch (OPC) {
-	case OPC_BCC:	return OPC_BCS;
-	case OPC_BCS:	return OPC_BCC;
-	case OPC_BEQ:	return OPC_BNE;
-	case OPC_BMI:	return OPC_BPL;
-	case OPC_BNE:	return OPC_BEQ;
-	case OPC_BPL:	return OPC_BMI;
-	case OPC_BVC:  	return OPC_BVS;
-	case OPC_BVS:	return OPC_BVC;
-       	case OPC_JCC:  	return OPC_JCS;
-       	case OPC_JCS:  	return OPC_JCC;
-       	case OPC_JEQ:  	return OPC_JNE;
-       	case OPC_JMI:  	return OPC_JPL;
-       	case OPC_JNE:  	return OPC_JEQ;
-       	case OPC_JPL:  	return OPC_JMI;
-       	case OPC_JVC:  	return OPC_JVS;
-       	case OPC_JVS:  	return OPC_JVC;
+	case OP65_BCC:	return OP65_BCS;
+	case OP65_BCS:	return OP65_BCC;
+	case OP65_BEQ:	return OP65_BNE;
+	case OP65_BMI:	return OP65_BPL;
+	case OP65_BNE:	return OP65_BEQ;
+	case OP65_BPL:	return OP65_BMI;
+	case OP65_BVC:  	return OP65_BVS;
+	case OP65_BVS:	return OP65_BVC;
+       	case OP65_JCC:  	return OP65_JCS;
+       	case OP65_JCS:  	return OP65_JCC;
+       	case OP65_JEQ:  	return OP65_JNE;
+       	case OP65_JMI:  	return OP65_JPL;
+       	case OP65_JNE:  	return OP65_JEQ;
+       	case OP65_JPL:  	return OP65_JMI;
+       	case OP65_JVC:  	return OP65_JVS;
+       	case OP65_JVS:  	return OP65_JVC;
 	default:
 	    Internal ("GetInverseBranch: Invalid opcode: %d", OPC);
 	    return 0;
@@ -258,24 +260,24 @@ opc_t MakeShortBranch (opc_t OPC)
  */
 {
     switch (OPC) {
-       	case OPC_BCC:
-       	case OPC_JCC:  	return OPC_BCC;
-       	case OPC_BCS:
-       	case OPC_JCS:  	return OPC_BCS;
-       	case OPC_BEQ:
-       	case OPC_JEQ:  	return OPC_BEQ;
-       	case OPC_BMI:
-       	case OPC_JMI:  	return OPC_BMI;
-       	case OPC_BNE:
-       	case OPC_JNE:  	return OPC_BNE;
-       	case OPC_BPL:
-       	case OPC_JPL:  	return OPC_BPL;
-       	case OPC_BVC:
-       	case OPC_JVC:  	return OPC_BVC;
-       	case OPC_BVS:
-       	case OPC_JVS:  	return OPC_BVS;
-       	case OPC_BRA:
-	case OPC_JMP:	return (CPU == CPU_65C02)? OPC_BRA : OPC_JMP;
+       	case OP65_BCC:
+       	case OP65_JCC:  	return OP65_BCC;
+       	case OP65_BCS:
+       	case OP65_JCS:  	return OP65_BCS;
+       	case OP65_BEQ:
+       	case OP65_JEQ:  	return OP65_BEQ;
+       	case OP65_BMI:
+       	case OP65_JMI:  	return OP65_BMI;
+       	case OP65_BNE:
+       	case OP65_JNE:  	return OP65_BNE;
+       	case OP65_BPL:
+       	case OP65_JPL:  	return OP65_BPL;
+       	case OP65_BVC:
+       	case OP65_JVC:  	return OP65_BVC;
+       	case OP65_BVS:
+       	case OP65_JVS:  	return OP65_BVS;
+       	case OP65_BRA:
+	case OP65_JMP:	return (CPU == CPU_65C02)? OP65_BRA : OP65_JMP;
        	default:
 	    Internal ("MakeShortBranch: Invalid opcode: %d", OPC);
 	    return 0;
@@ -290,24 +292,24 @@ opc_t MakeLongBranch (opc_t OPC)
  */
 {
     switch (OPC) {
-       	case OPC_BCC:
-       	case OPC_JCC:  	return OPC_JCC;
-       	case OPC_BCS:
-       	case OPC_JCS:  	return OPC_JCS;
-       	case OPC_BEQ:
-       	case OPC_JEQ:  	return OPC_JEQ;
-       	case OPC_BMI:
-       	case OPC_JMI:  	return OPC_JMI;
-       	case OPC_BNE:
-       	case OPC_JNE:  	return OPC_JNE;
-       	case OPC_BPL:
-       	case OPC_JPL:  	return OPC_JPL;
-       	case OPC_BVC:
-       	case OPC_JVC:  	return OPC_JVC;
-       	case OPC_BVS:
-       	case OPC_JVS:  	return OPC_JVS;
-	case OPC_BRA:
-	case OPC_JMP:	return OPC_JMP;
+       	case OP65_BCC:
+       	case OP65_JCC:  	return OP65_JCC;
+       	case OP65_BCS:
+       	case OP65_JCS:  	return OP65_JCS;
+       	case OP65_BEQ:
+       	case OP65_JEQ:  	return OP65_JEQ;
+       	case OP65_BMI:
+       	case OP65_JMI:  	return OP65_JMI;
+       	case OP65_BNE:
+       	case OP65_JNE:  	return OP65_JNE;
+       	case OP65_BPL:
+       	case OP65_JPL:  	return OP65_JPL;
+       	case OP65_BVC:
+       	case OP65_JVC:  	return OP65_JVC;
+       	case OP65_BVS:
+       	case OP65_JVS:  	return OP65_JVS;
+	case OP65_BRA:
+	case OP65_JMP:	return OP65_JMP;
        	default:
 	    Internal ("MakeLongBranch: Invalid opcode: %d", OPC);
 	    return 0;
@@ -320,22 +322,22 @@ bc_t GetBranchCond (opc_t OPC)
 /* Get the condition for the conditional branch in OPC */
 {
     switch (OPC) {
-       	case OPC_BCC:  	return BC_CC;
-       	case OPC_BCS:  	return BC_CS;
-       	case OPC_BEQ:  	return BC_EQ;
-       	case OPC_BMI:  	return BC_MI;
-       	case OPC_BNE:  	return BC_NE;
-       	case OPC_BPL:  	return BC_PL;
-       	case OPC_BVC:  	return BC_VC;
-       	case OPC_BVS:  	return BC_VS;
-       	case OPC_JCC:  	return BC_CC;
-       	case OPC_JCS:  	return BC_CS;
-       	case OPC_JEQ:  	return BC_EQ;
-       	case OPC_JMI:  	return BC_MI;
-       	case OPC_JNE:  	return BC_NE;
-       	case OPC_JPL:  	return BC_PL;
-       	case OPC_JVC:  	return BC_VC;
-       	case OPC_JVS:  	return BC_VS;
+       	case OP65_BCC:  	return BC_CC;
+       	case OP65_BCS:  	return BC_CS;
+       	case OP65_BEQ:  	return BC_EQ;
+       	case OP65_BMI:  	return BC_MI;
+       	case OP65_BNE:  	return BC_NE;
+       	case OP65_BPL:  	return BC_PL;
+       	case OP65_BVC:  	return BC_VC;
+       	case OP65_BVS:  	return BC_VS;
+       	case OP65_JCC:  	return BC_CC;
+       	case OP65_JCS:  	return BC_CS;
+       	case OP65_JEQ:  	return BC_EQ;
+       	case OP65_JMI:  	return BC_MI;
+       	case OP65_JNE:  	return BC_NE;
+       	case OP65_JPL:  	return BC_PL;
+       	case OP65_JVC:  	return BC_VC;
+       	case OP65_JVS:  	return BC_VS;
 	default:
 	    Internal ("GetBranchCond: Invalid opcode: %d", OPC);
 	    return 0;

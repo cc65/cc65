@@ -140,7 +140,7 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
      * lookup the information about this function and use it. The jump itself
      * does not change any registers, so we don't need to use the data from D.
      */
-    if (E->OPC == OPC_JSR || ((E->Info & OF_BRA) != 0 && E->JumpTo == 0)) {
+    if ((E->Info & (OF_BRA | OF_CALL)) != 0 && E->JumpTo == 0) {
      	/* A subroutine call or jump to external symbol (function exit) */
      	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
     } else {
@@ -175,8 +175,8 @@ CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
     E->AM     = AM;
     E->Arg    = GetArgCopy (Arg);
     E->Flags  = NumArg (E->Arg, &E->Num)? CEF_NUMARG : 0;
-    E->Size   = GetInsnSize (E->OPC, E->AM);
     E->Info   = D->Info;
+    E->Size   = GetInsnSize (E->OPC, E->AM);
     E->JumpTo = JumpTo;
     E->LI     = UseLineInfo (LI);
     SetUseChgInfo (E, D);
@@ -221,8 +221,8 @@ void ReplaceOPC (CodeEntry* E, opc_t OPC)
 
     /* Replace the opcode */
     E->OPC  = OPC;
-    E->Size = GetInsnSize (E->OPC, E->AM);
     E->Info = D->Info;
+    E->Size = GetInsnSize (E->OPC, E->AM);
     SetUseChgInfo (E, D);
 }
 
@@ -296,53 +296,53 @@ void OutputCodeEntry (const CodeEntry* E, FILE* F)
     /* Print the operand */
     switch (E->AM) {
 
-    	case AM_IMP:
+    	case AM65_IMP:
     	    /* implicit */
     	    break;
 
-    	case AM_ACC:
+    	case AM65_ACC:
     	    /* accumulator */
     	    Chars += fprintf (F, "%*sa", 9-Chars, "");
     	    break;
 
-    	case AM_IMM:
+    	case AM65_IMM:
     	    /* immidiate */
     	    Chars += fprintf (F, "%*s#%s", 9-Chars, "", E->Arg);
     	    break;
 
-    	case AM_ZP:
-    	case AM_ABS:
+    	case AM65_ZP:
+    	case AM65_ABS:
 	    /* zeropage and absolute */
 	    Chars += fprintf (F, "%*s%s", 9-Chars, "", E->Arg);
 	    break;
 
-	case AM_ZPX:
-	case AM_ABSX:
+	case AM65_ZPX:
+	case AM65_ABSX:
 	    /* zeropage,X and absolute,X */
 	    Chars += fprintf (F, "%*s%s,x", 9-Chars, "", E->Arg);
 	    break;
 
-	case AM_ABSY:
+	case AM65_ABSY:
 	    /* absolute,Y */
 	    Chars += fprintf (F, "%*s%s,y", 9-Chars, "", E->Arg);
 	    break;
 
-	case AM_ZPX_IND:
+	case AM65_ZPX_IND:
 	    /* (zeropage,x) */
        	    Chars += fprintf (F, "%*s(%s,x)", 9-Chars, "", E->Arg);
 	    break;
 
-	case AM_ZP_INDY:
+	case AM65_ZP_INDY:
 	    /* (zeropage),y */
        	    Chars += fprintf (F, "%*s(%s),y", 9-Chars, "", E->Arg);
 	    break;
 
-	case AM_ZP_IND:
+	case AM65_ZP_IND:
 	    /* (zeropage) */
        	    Chars += fprintf (F, "%*s(%s)", 9-Chars, "", E->Arg);
 	    break;
 
-	case AM_BRA:
+	case AM65_BRA:
 	    /* branch */
 	    Target = E->JumpTo? E->JumpTo->Name : E->Arg;
 	    Chars += fprintf (F, "%*s%s", 9-Chars, "", Target);

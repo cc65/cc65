@@ -167,11 +167,11 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
     switch (Cond) {
 
 	case CMP_EQ:
-	    ReplaceOPC (E, OPC_JEQ);
+	    ReplaceOPC (E, OP65_JEQ);
 	    break;
 
 	case CMP_NE:
-	    ReplaceOPC (E, OPC_JNE);
+	    ReplaceOPC (E, OP65_JNE);
 	    break;
 
 	case CMP_GT:
@@ -185,17 +185,17 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 		Internal ("Invalid program flow");
 	    }
 	    L = GenCodeLabel (S, N);
-	    N = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L, E->LI);
+	    N = NewCodeEntry (OP65_BEQ, AM65_BRA, L->Name, L, E->LI);
 	    InsertCodeEntry (S, N, I);
-	    ReplaceOPC (E, OPC_JPL);
+	    ReplaceOPC (E, OP65_JPL);
 	    break;
 
 	case CMP_GE:
-	    ReplaceOPC (E, OPC_JPL);
+	    ReplaceOPC (E, OP65_JPL);
 	    break;
 
 	case CMP_LT:
-	    ReplaceOPC (E, OPC_JMI);
+	    ReplaceOPC (E, OP65_JMI);
 	    break;
 
 	case CMP_LE:
@@ -203,9 +203,9 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 	     *	   jmi Target
 	     *     jeq Target
 	     */
-	    ReplaceOPC (E, OPC_JMI);
+	    ReplaceOPC (E, OP65_JMI);
 	    L = E->JumpTo;
-	    N = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L, E->LI);
+	    N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
 	    InsertCodeEntry (S, N, I+1);
 	    break;
 
@@ -220,17 +220,17 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 		Internal ("Invalid program flow");
 	    }
 	    L = GenCodeLabel (S, N);
-	    N = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L, E->LI);
+	    N = NewCodeEntry (OP65_BEQ, AM65_BRA, L->Name, L, E->LI);
 	    InsertCodeEntry (S, N, I);
-	    ReplaceOPC (E, OPC_JCS);
+	    ReplaceOPC (E, OP65_JCS);
 	    break;
 
 	case CMP_UGE:
-	    ReplaceOPC (E, OPC_JCS);
+	    ReplaceOPC (E, OP65_JCS);
 	    break;
 
 	case CMP_ULT:
-	    ReplaceOPC (E, OPC_JCC);
+	    ReplaceOPC (E, OP65_JCC);
 	    break;
 
 	case CMP_ULE:
@@ -238,9 +238,9 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 	     *	   jcc Target
 	     *     jeq Target
 	     */
-	    ReplaceOPC (E, OPC_JCC);
+	    ReplaceOPC (E, OP65_JCC);
 	    L = E->JumpTo;
-	    N = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L, E->LI);
+	    N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
 	    InsertCodeEntry (S, N, I+1);
 	    break;
 
@@ -253,19 +253,10 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 
 
 
-static int IsUnsignedCmp (int Code)
-/* Check if this is an unsigned compare */
-{
-    CHECK (Code >= 0);
-    return CmpSignedTab [Code] == 0;
-}
-
-
-
 static int IsBitOp (const CodeEntry* E)
 /* Check if E is one of the bit operations (and, or, eor) */
 {
-    return (E->OPC == OPC_AND || E->OPC == OPC_ORA || E->OPC == OPC_EOR);
+    return (E->OPC == OP65_AND || E->OPC == OP65_ORA || E->OPC == OP65_EOR);
 }
 
 
@@ -273,8 +264,8 @@ static int IsBitOp (const CodeEntry* E)
 static int IsCmpToZero (const CodeEntry* E)
 /* Check if the given instrcuction is a compare to zero instruction */
 {
-    return (E->OPC == OPC_CMP             &&
-	    E->AM  == AM_IMM              &&
+    return (E->OPC == OP65_CMP            &&
+	    E->AM  == AM65_IMM            &&
 	    (E->Flags & CEF_NUMARG) != 0  &&
 	    E->Num == 0);
 }
@@ -284,7 +275,7 @@ static int IsCmpToZero (const CodeEntry* E)
 static int IsSpLoad (const CodeEntry* E)
 /* Return true if this is the load of A from the stack */
 {
-    return E->OPC == OPC_LDA && E->AM == AM_ZP_INDY && strcmp (E->Arg, "sp") == 0;
+    return E->OPC == OP65_LDA && E->AM == AM65_ZP_INDY && strcmp (E->Arg, "sp") == 0;
 }
 
 
@@ -310,15 +301,15 @@ static int IsLocalLoad16 (CodeSeg* S, unsigned Index,
     L[0] = GetCodeEntry (S, Index);
 
     /* Check for the sequence */
-    return (L[0]->OPC == OPC_LDY                      &&
-	    L[0]->AM == AM_IMM                        &&
+    return (L[0]->OPC == OP65_LDY                     &&
+	    L[0]->AM == AM65_IMM                      &&
 	    (L[0]->Flags & CEF_NUMARG) != 0           &&
        	    GetCodeEntries (S, L+1, Index+1, Count-1) &&
        	    IsSpLoad (L[1])                           &&
 	    !CodeEntryHasLabel (L[1])                 &&
-	    L[2]->OPC == OPC_TAX                      &&
+	    L[2]->OPC == OP65_TAX                     &&
 	    !CodeEntryHasLabel (L[2])                 &&
-	    L[3]->OPC == OPC_DEY                      &&
+	    L[3]->OPC == OP65_DEY                     &&
 	    !CodeEntryHasLabel (L[3])                 &&
 	    IsSpLoad (L[4])                           &&
 	    !CodeEntryHasLabel (L[4]));
@@ -332,18 +323,18 @@ static int IsImmCmp16 (CodeSeg* S, CodeEntry** L)
  *
  */
 {
-    return (L[0]->OPC == OPC_CPX                                             &&
-	    L[0]->AM == AM_IMM                                               &&
-	    (L[0]->Flags & CEF_NUMARG) != 0                                  &&
-	    !CodeEntryHasLabel (L[0])                                        &&
-	    (L[1]->OPC == OPC_JNE || L[1]->OPC == OPC_BNE)                   &&
-       	    L[1]->JumpTo != 0                                                &&
-	    !CodeEntryHasLabel (L[1])                                        &&
-       	    L[2]->OPC == OPC_CMP                                             &&
-	    L[2]->AM == AM_IMM                                               &&
-	    (L[2]->Flags & CEF_NUMARG) != 0                                  &&
-	    (L[3]->Info & OF_ZBRA) != 0                                      &&
-	    L[3]->JumpTo != 0                                                &&
+    return (L[0]->OPC == OP65_CPX                              &&
+	    L[0]->AM == AM65_IMM                               &&
+	    (L[0]->Flags & CEF_NUMARG) != 0                    &&
+	    !CodeEntryHasLabel (L[0])                          &&
+	    (L[1]->OPC == OP65_JNE || L[1]->OPC == OP65_BNE)   &&
+       	    L[1]->JumpTo != 0                                  &&
+	    !CodeEntryHasLabel (L[1])                          &&
+       	    L[2]->OPC == OP65_CMP                              &&
+	    L[2]->AM == AM65_IMM                                 &&
+	    (L[2]->Flags & CEF_NUMARG) != 0                    &&
+	    (L[3]->Info & OF_ZBRA) != 0                        &&
+	    L[3]->JumpTo != 0                                  &&
 	    (L[1]->JumpTo->Owner == L[3] || L[1]->JumpTo == L[3]->JumpTo));
 }
 
@@ -373,7 +364,7 @@ static unsigned OptBoolTransforms (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
 	/* Check for a boolean transformer */
-	if (E->OPC == OPC_JSR                            &&
+	if (E->OPC == OP65_JSR                           &&
 	    (Cond = FindBoolCmpCond (E->Arg)) != CMP_INV &&
 	    (N = GetNextCodeEntry (S, I)) != 0           &&
 	    (N->Info & OF_ZBRA) != 0) {
@@ -440,14 +431,14 @@ static unsigned OptSub1 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_SBC 	  		           &&
-	    GetCodeEntries (S, L, I+1, 3) 	           &&
-       	    (L[0]->OPC == OPC_BCS || L[0]->OPC == OPC_JCS) &&
-	    L[0]->JumpTo != 0                              &&
-	    !CodeEntryHasLabel (L[0])                      &&
-	    L[1]->OPC == OPC_DEX       	       	           &&
-	    !CodeEntryHasLabel (L[1])                      &&
-	    L[0]->JumpTo->Owner == L[2]                    &&
+       	if (E->OPC == OP65_SBC 	  		             &&
+	    GetCodeEntries (S, L, I+1, 3) 	             &&
+       	    (L[0]->OPC == OP65_BCS || L[0]->OPC == OP65_JCS) &&
+	    L[0]->JumpTo != 0                                &&
+	    !CodeEntryHasLabel (L[0])                        &&
+	    L[1]->OPC == OP65_DEX       	       	     &&
+	    !CodeEntryHasLabel (L[1])                        &&
+	    L[0]->JumpTo->Owner == L[2]                      &&
 	    !RegXUsed (S, I+3)) {
 
 	    /* Remove the bcs/dex */
@@ -499,19 +490,19 @@ static unsigned OptSub2 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_LDA 	      		           &&
+       	if (E->OPC == OP65_LDA 	      		           &&
 	    GetCodeEntries (S, L, I+1, 5) 	           &&
-       	    L[0]->OPC == OPC_SEC                           &&
+       	    L[0]->OPC == OP65_SEC                          &&
 	    !CodeEntryHasLabel (L[0])                      &&
-       	    L[1]->OPC == OPC_STA       	       	           &&
+       	    L[1]->OPC == OP65_STA       	       	   &&
 	    strcmp (L[1]->Arg, "tmp1") == 0                &&
 	    !CodeEntryHasLabel (L[1])                      &&
-	    L[2]->OPC == OPC_LDA                           &&
+	    L[2]->OPC == OP65_LDA                          &&
        	    !CodeEntryHasLabel (L[2])                      &&
-	    L[3]->OPC == OPC_SBC                           &&
+	    L[3]->OPC == OP65_SBC                          &&
 	    strcmp (L[3]->Arg, "tmp1") == 0                &&
        	    !CodeEntryHasLabel (L[3])                      &&
-	    L[4]->OPC == OPC_STA                           &&
+	    L[4]->OPC == OP65_STA                          &&
 	    strcmp (L[4]->Arg, L[2]->Arg) == 0             &&
        	    !CodeEntryHasLabel (L[4])) {
 
@@ -525,7 +516,7 @@ static unsigned OptSub2 (CodeSeg* S)
 	     * op to SBC.
 	     */
 	    MoveCodeEntry (S, I, I+3);
-	    ReplaceOPC (E, OPC_SBC);
+	    ReplaceOPC (E, OP65_SBC);
 
 	    /* If the sequence head had a label, move this label back to the
 	     * head.
@@ -579,14 +570,14 @@ static unsigned OptAdd1 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_ADC 	  		           &&
-	    GetCodeEntries (S, L, I+1, 3) 	           &&
-       	    (L[0]->OPC == OPC_BCC || L[0]->OPC == OPC_JCC) &&
-	    L[0]->JumpTo != 0                              &&
-	    !CodeEntryHasLabel (L[0])                      &&
-	    L[1]->OPC == OPC_INX       	       	           &&
-	    !CodeEntryHasLabel (L[1])                      &&
-	    L[0]->JumpTo->Owner == L[2]                    &&
+       	if (E->OPC == OP65_ADC 	  	     	             &&
+	    GetCodeEntries (S, L, I+1, 3)    	             &&
+       	    (L[0]->OPC == OP65_BCC || L[0]->OPC == OP65_JCC) &&
+	    L[0]->JumpTo != 0                                &&
+	    !CodeEntryHasLabel (L[0])                        &&
+	    L[1]->OPC == OP65_INX            	       	     &&
+	    !CodeEntryHasLabel (L[1])                        &&
+	    L[0]->JumpTo->Owner == L[2]                      &&
 	    !RegXUsed (S, I+3)) {
 
 	    /* Remove the bcs/dex */
@@ -639,12 +630,12 @@ static unsigned OptCmp1 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_STX 	  		&&
+       	if (E->OPC == OP65_STX 	  		&&
 	    GetCodeEntries (S, L, I+1, 2)	&&
-       	    L[0]->OPC == OPC_STX		&&
+       	    L[0]->OPC == OP65_STX		&&
 	    strcmp (L[0]->Arg, "tmp1") == 0     &&
 	    !CodeEntryHasLabel (L[0])           &&
-	    L[1]->OPC == OPC_ORA	    	&&
+	    L[1]->OPC == OP65_ORA	    	&&
 	    strcmp (L[1]->Arg, "tmp1") == 0     &&
 	    !CodeEntryHasLabel (L[1])) {
 
@@ -652,7 +643,7 @@ static unsigned OptCmp1 (CodeSeg* S)
 	    DelCodeEntries (S, I+1, 2);
 
 	    /* Insert the ora instead */
-	    InsertCodeEntry (S, NewCodeEntry (OPC_ORA, E->AM, E->Arg, 0, E->LI), I+1);
+	    InsertCodeEntry (S, NewCodeEntry (OP65_ORA, E->AM, E->Arg, 0, E->LI), I+1);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -692,7 +683,7 @@ static unsigned OptCmp2 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if ((E->OPC == OPC_LDA || IsBitOp (E))	  &&
+       	if ((E->OPC == OP65_LDA || IsBitOp (E))	  &&
 	    GetCodeEntries (S, L, I+1, 2)      	  &&
        	    IsCmpToZero (L[0])                    &&
 	    !CodeEntryHasLabel (L[0])             &&
@@ -751,15 +742,15 @@ static unsigned OptCmp3 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_LDA                                                &&
-	    GetCodeEntries (S, L, I+1, 5)      	                             &&
-	    L[0]->OPC == OPC_LDX                                             &&
-	    !CodeEntryHasLabel (L[0])                                        &&
+       	if (E->OPC == OP65_LDA               &&
+	    GetCodeEntries (S, L, I+1, 5)    &&
+	    L[0]->OPC == OP65_LDX            &&
+	    !CodeEntryHasLabel (L[0])        &&
 	    IsImmCmp16 (S, L+1)) {
 
 	    if (L[1]->Num == 0 && L[3]->Num == 0) {
 		/* The value is zero, we may use the simple code version. */
-		ReplaceOPC (L[0], OPC_ORA);
+		ReplaceOPC (L[0], OP65_ORA);
 		DelCodeEntries (S, I+2, 3);
        	    } else {
 		/* Move the lda instruction after the first branch. This will
@@ -769,8 +760,8 @@ static unsigned OptCmp3 (CodeSeg* S)
 		MoveCodeEntry (S, I, I+4);
 
 		/* We will replace the ldx/cpx by lda/cmp */
-		ReplaceOPC (L[0], OPC_LDA);
-		ReplaceOPC (L[1], OPC_CMP);
+		ReplaceOPC (L[0], OP65_LDA);
+		ReplaceOPC (L[1], OP65_CMP);
 
 		/* Beware: If the first LDA instruction had a label, we have
 		 * to move this label to the top of the sequence again.
@@ -829,7 +820,7 @@ static unsigned OptCmp4 (CodeSeg* S)
 		 *      ora    	(sp),y
 		 *      jne/jeq ...
 		 */
-		ReplaceOPC (L[4], OPC_ORA);
+		ReplaceOPC (L[4], OP65_ORA);
 		DelCodeEntries (S, I+5, 3);   /* cpx/bne/cmp */
 		DelCodeEntry (S, I+2);        /* tax */
 
@@ -848,7 +839,7 @@ static unsigned OptCmp4 (CodeSeg* S)
 		 *      jne/jeq ...
 		 */
        	       	DelCodeEntry (S, I+2);         /* tax */
-		ReplaceOPC (L[5], OPC_CMP);    /* cpx -> cmp */
+		ReplaceOPC (L[5], OP65_CMP);   /* cpx -> cmp */
 		MoveCodeEntry (S, I+4, I+2);   /* cmp */
 		MoveCodeEntry (S, I+5, I+3);   /* bne */
 
@@ -888,7 +879,7 @@ static unsigned OptCmp5 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_JSR 	  		        &&
+       	if (E->OPC == OP65_JSR 	  		        &&
 	    (Cond = FindTosCmpCond (E->Arg)) != CMP_INV	&&
 	    (N = GetNextCodeEntry (S, I)) != 0	        &&
 	    (N->Info & OF_ZBRA) != 0                    &&
@@ -907,7 +898,7 @@ static unsigned OptCmp5 (CodeSeg* S)
   	    }
 
 	    /* Replace the subroutine call. */
-	    E = NewCodeEntry (OPC_JSR, AM_ABS, "tosicmp", 0, E->LI);
+	    E = NewCodeEntry (OP65_JSR, AM65_ABS, "tosicmp", 0, E->LI);
 	    InsertCodeEntry (S, E, I+1);
 	    DelCodeEntry (S, I);
 
@@ -958,14 +949,14 @@ static unsigned OptNegA1 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for a ldx */
-       	if (E->OPC == OPC_LDX 			&&
-	    E->AM == AM_IMM	    		&&
+       	if (E->OPC == OP65_LDX 			&&
+	    E->AM == AM65_IMM	    		&&
 	    (E->Flags & CEF_NUMARG) != 0	&&
 	    E->Num == 0	   			&&
 	    GetCodeEntries (S, L, I+1, 2)	&&
-	    L[0]->OPC == OPC_LDA		&&
+	    L[0]->OPC == OP65_LDA		&&
 	    (L[0]->Use & REG_X) == 0	    	&&
-	    L[1]->OPC == OPC_JSR	    	&&
+	    L[1]->OPC == OP65_JSR	    	&&
 	    strcmp (L[1]->Arg, "bnega") == 0) {
 
 	    /* Remove the ldx instruction */
@@ -1009,9 +1000,9 @@ static unsigned OptNegA2 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_LDA  	  	    	&&
+       	if (E->OPC == OP65_LDA  	  	&&
 	    GetCodeEntries (S, L, I+1, 2)	&&
-       	    L[0]->OPC == OPC_JSR  	    	&&
+       	    L[0]->OPC == OP65_JSR  	    	&&
 	    strcmp (L[0]->Arg, "bnega") == 0	&&
 	    !CodeEntryHasLabel (L[0])		&&
 	    (L[1]->Info & OF_ZBRA) != 0) {
@@ -1074,22 +1065,22 @@ static unsigned OptNegAX1 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_LDA  	      		&&
-	    E->AM == AM_ZP_INDY	      		&&
+       	if (E->OPC == OP65_LDA  	      	&&
+	    E->AM == AM65_ZP_INDY	      	&&
 	    GetCodeEntries (S, L, I+1, 5)	&&
-	    L[0]->OPC == OPC_TAX    		&&
-	    L[1]->OPC == OPC_DEY    		&&
-	    L[2]->OPC == OPC_LDA    		&&
-	    L[2]->AM == AM_ZP_INDY  		&&
+	    L[0]->OPC == OP65_TAX    		&&
+	    L[1]->OPC == OP65_DEY    		&&
+	    L[2]->OPC == OP65_LDA    		&&
+	    L[2]->AM == AM65_ZP_INDY  		&&
 	    strcmp (L[2]->Arg, E->Arg) == 0	&&
 	    !CodeEntryHasLabel (L[2])		&&
-	    L[3]->OPC == OPC_JSR    		&&
+	    L[3]->OPC == OP65_JSR    		&&
 	    strcmp (L[3]->Arg, "bnegax") == 0	&&
 	    !CodeEntryHasLabel (L[3])		&&
        	    (L[4]->Info & OF_ZBRA) != 0) {
 
 	    /* lda --> ora */
-	    ReplaceOPC (L[2], OPC_ORA);
+	    ReplaceOPC (L[2], OP65_ORA);
 
 	    /* Invert the branch */
 	    ReplaceOPC (L[4], GetInverseBranch (L[4]->OPC));
@@ -1143,17 +1134,17 @@ static unsigned OptNegAX2 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_LDA  	      		&&
+       	if (E->OPC == OP65_LDA  	      	&&
        	    GetCodeEntries (S, L, I+1, 3)	&&
-	    L[0]->OPC == OPC_LDX       	       	&&
+	    L[0]->OPC == OP65_LDX       	&&
 	    !CodeEntryHasLabel (L[0]) 		&&
-       	    L[1]->OPC == OPC_JSR      		&&
+       	    L[1]->OPC == OP65_JSR      		&&
 	    strcmp (L[1]->Arg, "bnegax") == 0	&&
 	    !CodeEntryHasLabel (L[1]) 		&&
        	    (L[2]->Info & OF_ZBRA) != 0) {
 
 	    /* ldx --> ora */
-	    ReplaceOPC (L[0], OPC_ORA);
+	    ReplaceOPC (L[0], OP65_ORA);
 
 	    /* Invert the branch */
        	    ReplaceOPC (L[2], GetInverseBranch (L[2]->OPC));
@@ -1203,10 +1194,10 @@ static unsigned OptNegAX3 (CodeSeg* S)
        	CodeEntry* E = GetCodeEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OPC_JSR  	      	       	&&
-	    E->Arg[0] == '_'	      	       	&&
+       	if (E->OPC == OP65_JSR  	      	&&
+	    E->Arg[0] == '_'	       	       	&&
        	    GetCodeEntries (S, L, I+1, 2)      	&&
-       	    L[0]->OPC == OPC_JSR       	       	&&
+       	    L[0]->OPC == OP65_JSR              	&&
 	    strncmp (L[0]->Arg,"bnega",5) == 0 	&&
 	    !CodeEntryHasLabel (L[0]) 	       	&&
        	    (L[1]->Info & OF_ZBRA) != 0) {
@@ -1219,13 +1210,13 @@ static unsigned OptNegAX3 (CodeSeg* S)
 	    /* Insert apropriate test code */
 	    if (ByteSized) {
 		/* Test bytes */
-		X = NewCodeEntry (OPC_TAX, AM_IMP, 0, 0, L[0]->LI);
+		X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
 		InsertCodeEntry (S, X, I+2);
 	    } else {
 		/* Test words */
-		X = NewCodeEntry (OPC_STX, AM_ZP, "tmp1", 0, L[0]->LI);
+		X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, L[0]->LI);
 		InsertCodeEntry (S, X, I+2);
-		X = NewCodeEntry (OPC_ORA, AM_ZP, "tmp1", 0, L[0]->LI);
+		X = NewCodeEntry (OP65_ORA, AM65_ZP, "tmp1", 0, L[0]->LI);
 		InsertCodeEntry (S, X, I+3);
 	    }
 

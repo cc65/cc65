@@ -167,7 +167,7 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
 
      	/* Did we find it in the top level table? */
      	if (E && IsTypeFunc (E->Type)) {
-		 
+
      	    /* A function may use the A or A/X registers if it is a fastcall
      	     * function. If it is not a fastcall function but a variadic one,
 	     * it will use the Y register (the parameter size is passed here).
@@ -266,7 +266,7 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
 
 	/* Evaluate the used registers */
 	R = E->Use;
-	if (E->OPC == OPC_RTS ||
+	if (E->OPC == OP65_RTS ||
 	    ((E->Info & OF_BRA) != 0 && E->JumpTo == 0)) {
 	    /* This instruction will leave the function */
 	    R |= S->ExitRegs;
@@ -296,7 +296,7 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
     	}
 
 	/* If the instruction is an RTS or RTI, we're done */
-	if (E->OPC == OPC_RTS || E->OPC == OPC_RTI) {
+	if (E->OPC == OP65_RTS || E->OPC == OP65_RTI) {
 	    break;
 	}
 

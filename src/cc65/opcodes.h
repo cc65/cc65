@@ -44,110 +44,112 @@
 
 
 /*****************************************************************************/
-/*  	       	 	  	     Data				     */
+/*  	       	   	  	     Data				     */
 /*****************************************************************************/
 
 
 
 /* Definitions for the possible opcodes */
 typedef enum {
-    OPC_ADC,
-    OPC_AND,
-    OPC_ASL,
-    OPC_BCC,
-    OPC_BCS,
-    OPC_BEQ,
-    OPC_BIT,
-    OPC_BMI,
-    OPC_BNE,
-    OPC_BPL,
-    OPC_BRA,
-    OPC_BRK,
-    OPC_BVC,
-    OPC_BVS,
-    OPC_CLC,
-    OPC_CLD,
-    OPC_CLI,
-    OPC_CLV,
-    OPC_CMP,
-    OPC_CPX,
-    OPC_CPY,
-    OPC_DEA,
-    OPC_DEC,
-    OPC_DEX,
-    OPC_DEY,
-    OPC_EOR,
-    OPC_INA,
-    OPC_INC,
-    OPC_INX,
-    OPC_INY,
-    OPC_JCC,
-    OPC_JCS,
-    OPC_JEQ,
-    OPC_JMI,
-    OPC_JMP,
-    OPC_JNE,
-    OPC_JPL,
-    OPC_JSR,
-    OPC_JVC,
-    OPC_JVS,
-    OPC_LDA,
-    OPC_LDX,
-    OPC_LDY,
-    OPC_LSR,
-    OPC_NOP,
-    OPC_ORA,
-    OPC_PHA,
-    OPC_PHP,
-    OPC_PHX,
-    OPC_PHY,
-    OPC_PLA,
-    OPC_PLP,
-    OPC_PLX,
-    OPC_PLY,
-    OPC_ROL,
-    OPC_ROR,
-    OPC_RTI,
-    OPC_RTS,
-    OPC_SBC,
-    OPC_SEC,
-    OPC_SED,
-    OPC_SEI,
-    OPC_STA,
-    OPC_STX,
-    OPC_STY,
-    OPC_TAX,
-    OPC_TAY,
-    OPC_TRB,
-    OPC_TSB,
-    OPC_TSX,
-    OPC_TXA,
-    OPC_TXS,
-    OPC_TYA,
-    OPC_COUNT  	       	       		/* Number of opcodes available */
+
+    /* 65XX opcodes */
+    OP65_ADC,
+    OP65_AND,
+    OP65_ASL,
+    OP65_BCC,
+    OP65_BCS,
+    OP65_BEQ,
+    OP65_BIT,
+    OP65_BMI,
+    OP65_BNE,
+    OP65_BPL,
+    OP65_BRA,
+    OP65_BRK,
+    OP65_BVC,
+    OP65_BVS,
+    OP65_CLC,
+    OP65_CLD,
+    OP65_CLI,
+    OP65_CLV,
+    OP65_CMP,
+    OP65_CPX,
+    OP65_CPY,
+    OP65_DEA,
+    OP65_DEC,
+    OP65_DEX,
+    OP65_DEY,
+    OP65_EOR,
+    OP65_INA,
+    OP65_INC,
+    OP65_INX,
+    OP65_INY,
+    OP65_JCC,
+    OP65_JCS,
+    OP65_JEQ,
+    OP65_JMI,
+    OP65_JMP,
+    OP65_JNE,
+    OP65_JPL,
+    OP65_JSR,
+    OP65_JVC,
+    OP65_JVS,
+    OP65_LDA,
+    OP65_LDX,
+    OP65_LDY,
+    OP65_LSR,
+    OP65_NOP,
+    OP65_ORA,
+    OP65_PHA,
+    OP65_PHP,
+    OP65_PHX,
+    OP65_PHY,
+    OP65_PLA,
+    OP65_PLP,
+    OP65_PLX,
+    OP65_PLY,
+    OP65_ROL,
+    OP65_ROR,
+    OP65_RTI,
+    OP65_RTS,
+    OP65_SBC,
+    OP65_SEC,
+    OP65_SED,
+    OP65_SEI,
+    OP65_STA,
+    OP65_STX,
+    OP65_STY,
+    OP65_TAX,
+    OP65_TAY,
+    OP65_TRB,
+    OP65_TSB,
+    OP65_TSX,
+    OP65_TXA,
+    OP65_TXS,
+    OP65_TYA,
+    OPCODE_COUNT       	       	/* Number of opcodes available */
 } opc_t;
 
 /* Addressing modes (bitmapped). */
 typedef enum {
-    AM_IMP     	= 0x0001,      		/* implicit */
-    AM_ACC     	= 0x0002,      		/* accumulator */
-    AM_IMM     	= 0x0004,      		/* immidiate */
-    AM_ZP      	= 0x0008,      		/* zeropage */
-    AM_ZPX     	= 0x0010,      		/* zeropage,X */
-    AM_ABS     	= 0x0020,      		/* absolute */
-    AM_ABSX    	= 0x0040,      		/* absolute,X */
-    AM_ABSY    	= 0x0080,      		/* absolute,Y */
-    AM_ZPX_IND 	= 0x0100,      		/* (zeropage,x) */
-    AM_ZP_INDY 	= 0x0200,      		/* (zeropage),y */
-    AM_ZP_IND  	= 0x0400,      		/* (zeropage) */
-    AM_BRA     	= 0x0800       		/* branch */
+    AM65_IMP,      	   	/* implicit */
+    AM65_ACC,      	   	/* accumulator */
+    AM65_IMM,      	   	/* immidiate */
+    AM65_ZP,       	   	/* zeropage */
+    AM65_ZPX,      	   	/* zeropage,X */
+    AM65_ABS,      	   	/* absolute */
+    AM65_ABSX,      	   	/* absolute,X */
+    AM65_ABSY,      	   	/* absolute,Y */
+    AM65_ZPX_IND,      		/* (zeropage,x) */
+    AM65_ZP_INDY,      		/* (zeropage),y */
+    AM65_ZP_IND,      		/* (zeropage) */
+    AM65_BRA                    /* branch */
 } am_t;
 
 /* Branch conditions */
 typedef enum {
     BC_CC,
     BC_CS,
-    BC_EQ,
+    BC_EQ,		   
     BC_MI,
     BC_NE,
     BC_PL,
@@ -156,35 +158,38 @@ typedef enum {
 } bc_t;
 
 /* Opcode info */
-#define OF_NONE	0x0000U	       		/* No additional information */
-#define OF_UBRA	0x0001U	       	 	/* Unconditional branch */
-#define OF_CBRA	0x0002U	       	 	/* Conditional branch */
-#define OF_ZBRA 0x0004U		 	/* Branch on zero flag condition */
+#define OF_NONE	0x0000U	       	    	/* No additional information */
+#define OF_UBRA	0x0001U	       	    	/* Unconditional branch */
+#define OF_CBRA	0x0002U	       	    	/* Conditional branch */
+#define OF_ZBRA 0x0004U	   	    	/* Branch on zero flag condition */
 #define OF_FBRA 0x0008U                 /* Branch on cond set by a load */
-#define OF_LBRA 0x0010U		  	/* Jump/branch is long */
-#define OF_RET 	0x0020U	       	 	/* Return from function */
-#define OF_LOAD 0x0040U			/* Register load */
-#define OF_XFR  0x0080                  /* Transfer instruction */
-#define OF_BRA 	(OF_UBRA|OF_CBRA)	/* Operation is a jump/branch */
-#define OF_DEAD	(OF_UBRA|OF_RET)	/* Dead end - no exec behind this point */
+#define OF_LBRA 0x0010U	   	    	/* Jump/branch is long */
+#define OF_RET 	0x0020U	       	    	/* Return from function */
+#define OF_LOAD 0x0040U	   	    	/* Register load */
+#define OF_XFR  0x0080U                 /* Transfer instruction */
+#define OF_CALL 0x0100U                 /* A subroutine call */
+
+/* Combined infos */
+#define OF_BRA 	(OF_UBRA | OF_CBRA)	/* Operation is a jump/branch */
+#define OF_DEAD	(OF_UBRA | OF_RET)	/* Dead end - no exec behind this point */
 
 /* Opcode description */
 typedef struct {
     opc_t      	    OPC;       		/* Opcode */
-    char       	    Mnemo[4];  		/* Mnemonic */
+    char       	    Mnemo[8];  		/* Mnemonic */
     unsigned char   Size;      		/* Size, 0 = check addressing mode */
     unsigned char   Use;       		/* Registers used by this insn */
     unsigned char   Chg;       		/* Registers changed by this insn */
-    unsigned char   Info;      		/* Additional information */
+    unsigned short  Info;      		/* Additional information */
 } OPCDesc;
 
 /* Opcode description table */
-extern const OPCDesc OPCTable[OPC_COUNT];
+extern const OPCDesc OPCTable[OPCODE_COUNT];
 
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code		    		     */
+/*     	       	      	   	     Code		    		     */
 /*****************************************************************************/
 
 
@@ -209,14 +214,14 @@ INLINE const OPCDesc* GetOPCDesc (opc_t OPC)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned char GetOPCInfo (opc_t OPC)
+INLINE unsigned GetOPCInfo (opc_t OPC)
 /* Get opcode information */
 {
     /* Return the info */
     return OPCTable[OPC].Info;
 }
 #else
-#  define GetOPCInfo(OPC)	(OPCTable[(OPC)].Info)
+#  define GetOPCInfo(OPC)  	(OPCTable[(OPC)].Info)
 #endif
 
 unsigned char GetAMUseInfo (am_t AM);

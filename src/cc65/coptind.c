@@ -65,10 +65,10 @@ unsigned OptRTSJumps (CodeSeg* S)
        	/* Check if it's an unconditional branch to a local target */
        	if ((E->Info & OF_UBRA) != 0 		&&
 	    E->JumpTo != 0  			&&
-	    E->JumpTo->Owner->OPC == OPC_RTS) {
+	    E->JumpTo->Owner->OPC == OP65_RTS) {
 
 	    /* Insert an RTS instruction */
-	    CodeEntry* X = NewCodeEntry (OPC_RTS, AM_IMP, 0, 0, E->LI);
+	    CodeEntry* X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, E->LI);
 	    InsertCodeEntry (S, X, I+1);
 
 	    /* Delete the jump */
@@ -119,7 +119,7 @@ unsigned OptDeadJumps (CodeSeg* S)
 	/* Check if it's a branch, if it has a local target, and if the target
 	 * is the next instruction.
 	 */
-	if (E->AM == AM_BRA && E->JumpTo && E->JumpTo->Owner == GetCodeEntry (S, I+1)) {
+	if (E->AM == AM65_BRA && E->JumpTo && E->JumpTo->Owner == GetCodeEntry (S, I+1)) {
 
 	    /* Delete the dead jump */
 	    DelCodeEntry (S, I);
@@ -351,13 +351,13 @@ unsigned OptRTS (CodeSeg* S)
 	CodeEntry* E = GetCodeEntry (S, I);
 
 	/* Check if it's a subroutine call and if the following insn is RTS */
-	if (E->OPC == OPC_JSR  			&&
+	if (E->OPC == OP65_JSR         	       	&&
 	    (N = GetNextCodeEntry (S, I)) != 0	&&
-	    N->OPC == OPC_RTS) {
+	    N->OPC == OP65_RTS) {
 
 	    /* Change the jsr to a jmp and use the additional info for a jump */
-       	    E->AM = AM_BRA;
-	    ReplaceOPC (E, OPC_JMP);
+       	    E->AM = AM65_BRA;
+	    ReplaceOPC (E, OP65_JMP);
 
        	    /* Remember, we had changes */
 	    ++Changes;
@@ -510,7 +510,7 @@ unsigned OptCondBranches (CodeSeg* S)
 
 	/* Check if it's a register load */
        	if ((E->Info & OF_LOAD) != 0   		&&  /* It's a load instruction */
-	    E->AM == AM_IMM 	       		&&  /* ..with immidiate addressing */
+	    E->AM == AM65_IMM 	       		&&  /* ..with immidiate addressing */
 	    (E->Flags & CEF_NUMARG) != 0	&&  /* ..and a numeric argument. */
 	    (N = GetNextCodeEntry (S, I)) != 0	&&  /* There is a following entry */
        	    (N->Info & OF_CBRA) != 0		&&  /* ..which is a conditional branch */
@@ -538,7 +538,7 @@ unsigned OptCondBranches (CodeSeg* S)
      	    	       (BC == BC_MI && (E->Num & 0x80) != 0)) {
 
      		/* The branch is always taken, replace it by a jump */
-     		ReplaceOPC (N, OPC_JMP);
+     		ReplaceOPC (N, OP65_JMP);
 
      		/* Remember, we had changes */
      		++Changes;
@@ -606,13 +606,13 @@ unsigned OptUnusedLoads (CodeSeg* S)
 	    /* Check which sort of load or transfer it is */
 	    unsigned R;
 	    switch (E->OPC) {
-		case OPC_TXA:
-		case OPC_TYA:
-		case OPC_LDA:	R = REG_A;	break;
-		case OPC_TAX:
-       	       	case OPC_LDX:  	R = REG_X;	break;
-		case OPC_TAY:
-		case OPC_LDY:	R = REG_Y;	break;
+		case OP65_TXA:
+		case OP65_TYA:
+		case OP65_LDA:	R = REG_A;	break;
+		case OP65_TAX:
+       	       	case OP65_LDX:  R = REG_X;	break;
+		case OP65_TAY:
+		case OP65_LDY:	R = REG_Y;	break;
 		default:     	goto NextEntry;		/* OOPS */
 	    }
 

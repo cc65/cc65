@@ -221,13 +221,13 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 
 	case '\0':
 	    /* Implicit */
-	    AM = AM_IMP;
+	    AM = AM65_IMP;
 	    break;
 
 	case '#':
 	    /* Immidiate */
 	    StrCopy (Arg, sizeof (Arg), L+1);
-	    AM = AM_IMM;
+	    AM = AM65_IMM;
 	    break;
 
 	case '(':
@@ -258,7 +258,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	     	    Error ("ASM code error: syntax error");
 	     	    return 0;
 	     	}
-	     	AM = AM_ZPX_IND;
+	     	AM = AM65_ZPX_IND;
 	    } else if (*L == ')') {
 	     	/* zp indirect or zp indirect, y */
 	     	L = SkipSpace (L+1);
@@ -273,9 +273,9 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	       	    	Error ("ASM code error: syntax error");
 	     	    	return 0;
 	     	    }
-	     	    AM = AM_ZP_INDY;
+	     	    AM = AM65_ZP_INDY;
 	     	} else if (*L == '\0') {
-	     	    AM = AM_ZP_IND;
+	     	    AM = AM65_ZP_IND;
 	     	} else {
 	     	    Error ("ASM code error: syntax error");
 	     	    return 0;
@@ -287,7 +287,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
        	case 'A':
 	    /* Accumulator? */
 	    if (L[1] == '\0') {
-	     	AM = AM_ACC;
+	     	AM = AM65_ACC;
 	     	break;
 	    }
 	    /* FALLTHROUGH */
@@ -299,11 +299,11 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	     	/* Absolute, zeropage or branch */
 		if ((OPC->Info & OF_BRA) != 0) {
 		    /* Branch */
-		    AM = AM_BRA;
+		    AM = AM65_BRA;
 		} else if (IsZPName (Arg)) {
-		    AM = AM_ZP;
+		    AM = AM65_ZP;
 		} else {
-		    AM = AM_ABS;
+		    AM = AM65_ABS;
 		}
 	    } else if (*L == ',') {
 		/* Indexed */
@@ -316,12 +316,12 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 		    L = SkipSpace (L+1);
 		    if (Reg == 'X') {
 			if (IsZPName (Arg)) {
-			    AM = AM_ZPX;
+			    AM = AM65_ZPX;
 			} else {
-			    AM = AM_ABSX;
+			    AM = AM65_ABSX;
 			}
 		    } else if (Reg == 'Y') {
-		     	AM = AM_ABSY;
+		     	AM = AM65_ABSY;
 		    } else {
 		     	Error ("ASM code error: syntax error");
 	       	     	return 0;
@@ -340,7 +340,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
      * if it does not exist. Ignore anything but local labels here.
      */
     Label = 0;
-    if (AM == AM_BRA && Arg[0] == 'L') {
+    if (AM == AM65_BRA && Arg[0] == 'L') {
 
 	/* Generate the hash over the label, then search for the label */
 	unsigned Hash = HashStr (Arg) % CS_LABEL_HASH_SIZE;

@@ -69,8 +69,8 @@ struct CodeEntry {
     char*      	       	Arg;   	       	/* Argument as string */
     unsigned long    	Num;		/* Numeric argument */
     unsigned short   	Flags;		/* Flags */
+    unsigned short      Info;		/* Additional code info */
     unsigned char    	Size;		/* Estimated size */
-    unsigned char    	Info;		/* Additional code info */
     unsigned char    	Use;		/* Registers used */
     unsigned char    	Chg;		/* Registers changed/destroyed */
     CodeLabel*	     	JumpTo;		/* Jump label */

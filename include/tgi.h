@@ -79,8 +79,8 @@ void __fastcall__ tgi_load_driver (const char* name);
 void __fastcall__ tgi_unload (void);
 /* Unload the currently loaded driver. Will call tgi_done if necessary. */
 
-void __fastcall__ tgi_init (unsigned char mode);
-/* Initialize the given graphics mode. */
+void __fastcall__ tgi_init (void);
+/* Initialize the already loaded graphics driver */
 
 void __fastcall__ tgi_done (void);
 /* End graphics mode, switch back to text mode. Will NOT unload the driver! */

@@ -73,9 +73,11 @@ Long options:
   --config name         Use linker config file
   --dump-config name    Dump a builtin configuration
   --help                Help (this text)
+  --lib file            Link this library
   --lib-path path       Specify a library search path
   --mapfile name        Create a map file
   --module-id id        Specify a module id
+  --obj file            Link this object file
   --obj-path path       Specify an object file search path
   --start-addr addr     Set the default start address
   --target sys          Set the target system
@@ -213,6 +215,20 @@ Here is a description of all the command line options:
   with the <tt><ref id="option-C" name="-C"></tt> option that has no path in
   its name is searched in the current directory and in the list of directories
   specified using <tt/--cfg-path/.
+
+
+  <tag><tt>--lib file</tt></tag>
+
+  Links a library to the output. Use this command line option instead of just
+  naming the library file, if the linker is not able to determine the file
+  type because of an unusual extension.
+
+
+  <tag><tt>--obj file</tt></tag>
+
+  Links an object file to the output. Use this command line option instead
+  of just naming the object file, if the linker is not able to determine the
+  file type because of an unusual extension.
 
 
   <tag><tt>--obj-path path</tt></tag>

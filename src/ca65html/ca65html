@@ -60,6 +60,7 @@ my $LabelNum	= 0;  	      	# Counter to generate unique labels
 my $BGColor	= "#FFFFFF";	# Background color
 my $Debug	= 0;		# No debugging
 my $Help	= 0;		# Help flag
+my $HTMLDir	= "";		# Directory in which to create the files
 my $IndexCols  	= 6;		# Columns in the file listing
 my $IndexTitle	= "Index";	# Title of index page
 my $IndexName	= "index.html";	# Name of index page
@@ -118,6 +119,17 @@ sub Cleanup {
     $S =~ s/>/&gt;/g;
     $S =~ s/\"/&quot;/g;
     return $S;
+}
+
+# Strip a path from a filename and return just the name
+sub StripPath {
+
+    # Filename is argument
+    my $FileName = $_[0];
+
+    # Remove a path name if we have one
+    $FileName =~ /^(.*?)([^\/]*)$/;
+    return $2;
 }
 
 
@@ -185,25 +197,23 @@ sub AddFile {
     # Argument is file to add
     my $FileName = $_[0];
 
-    # Remove a path name if we have one
-    $FileName =~ /^(.*?)([^\/]*)$/;
-    my $Path = $1;
-    my $Name = $2;
+    # Get just the name (remove a path if there is one)
+    my $Name = StripPath ($FileName);
 
     # Check if we have the file already
     if (exists ($Files{$Name})) {
-	Gabble ("File \"$FileName\" already known");
-	return;
+    	Gabble ("File \"$FileName\" already known");
+    	return;
     }
 
     # Check with the full pathname. If we don't find it, search in the current
     # directory
     if (-f $FileName && -r $FileName) {
-	$Files{$Name} = $FileName;
-	$FileCount++;
+    	$Files{$Name} = $FileName;
+    	$FileCount++;
     } elsif (-f $Name && -r $Name) {
-	$Files{$Name} = $Name;
-	$FileCount++;
+    	$Files{$Name} = $Name;
+    	$FileCount++;
     } else {
      	Abort ("$FileName not found or not readable");
     }
@@ -212,7 +222,7 @@ sub AddFile {
 
 
 #-----------------------------------------------------------------------------#
-#			Referencing and defining labels			      #
+#   			Referencing and defining labels			      #
 # ----------------------------------------------------------------------------#
 
 
@@ -285,6 +295,9 @@ sub Process1 {
     my $FileName = $Files{$InName};	# Includes path if needed
     open (INPUT, "<$FileName") or Abort ("Cannot open $FileName: $!");
 
+    # Keep the user happy
+    Gabble ("$FileName => $OutName");
+
     # Read and process all lines from the file
     while ($Line = <INPUT>) {
 
@@ -347,12 +360,13 @@ sub Process1 {
 # Pass1: Read all files for the first time.
 sub Pass1 () {
 
+    # Keep the user happy
+    Gabble ("Pass 1");
+
     # Walk over the files
     for my $InName (keys (%Files)) {
-
      	# Process one file
       	Process1 ($InName);
-
     }
 }
 
@@ -391,8 +405,11 @@ sub Process2 {
     open (INPUT, "<$FileName") or Abort ("Cannot open $FileName: $!");
 
     # Open the output file and print the HTML header
-    open (OUTPUT, ">$OutName") or Abort ("Cannot open $OutName: $!");
+    open (OUTPUT, ">$HTMLDir$OutName") or Abort ("Cannot open $OutName: $!");
     DocHeader (OUTPUT, $InName);
+
+    # Keep the user happy
+    Gabble ("$FileName => $OutName");
 
     # The instructions that will have hyperlinks if a label is used
     my $Ins = "adc|add|and|bcc|bcs|beq|bit|bmi|bne|bpl|bcv|bra|bvs|".
@@ -579,6 +596,35 @@ sub Process2 {
 	    # Cleanup the remainder and add it
 	    $OutLine .= Cleanup ($Line);
 
+	# Handle .include
+	} elsif ($Line =~ /^(\.include)(\s+)\"((?:[^\"]+?|\\\")+)\"(\s*)(;.*$|$)/) {
+
+	    # Add the fixed stuff to the output line
+	    $OutLine .= "$1$2\"";
+
+	    # Get the filename into a named variable
+	    my $FileName = $3;
+
+	    # Remember the remainder
+	    $Line = "\"$4$5";
+
+	    # Get the name without a path
+	    my $Name = StripPath ($FileName);
+
+	    # We don't need FileName any longer as is, so clean it up
+	    $FileName = Cleanup ($FileName);
+
+	    # If the include file is among the list of our files, add a link,
+	    # otherwise just add the name as is.
+	    if (exists ($Files{$Name})) {
+		$OutLine .= sprintf ("<a href=\"%s\">%s</a>", GetOutName ($Name), $FileName);
+	    } else {
+		$OutLine .= $FileName;
+	    }
+
+	    # Add the remainder
+	    $OutLine .= Cleanup ($Line);
+
      	# Check for any legal instruction
      	} elsif ($Line =~ /^($Ins)(\s+)(.*?)(\s*)(;.*$|$)/) {
 
@@ -633,12 +679,13 @@ sub Process2 {
 # Pass2: Read all files the second time.
 sub Pass2 () {
 
+    # Keep the user happy
+    Gabble ("Pass 2");
+
     # Walk over the files
     for my $InName (keys (%Files)) {
-
        	# Process one file
        	Process2 ($InName);
-
     }
 }
 
@@ -724,7 +771,7 @@ sub ExportIndex {
 sub CreateIndex {
 
     # Open the index page file
-    open (INDEX, ">$IndexName") or Abort ("Cannot open $IndexName: $!");
+    open (INDEX, ">$HTMLDir$IndexName") or Abort ("Cannot open $IndexName: $!");
 
     # Print the header
     print INDEX <<"EOF";
@@ -776,16 +823,17 @@ EOF
 sub Usage {
     print "Usage: ca65html [options] file ...\n";
     print "Options:\n";
-    print "\t--bgcolor c\tUse background color c instead of $BGColor\n";
-    print "\t--help\t\tThis text\n";
-    print "\t--indexcols n\tUse n columns on index page (default $IndexCols)\n";
-    print "\t--indexname f\tUse name f for the index file instead of $IndexName\n";
-    print "\t--indexpage\tCreate an index page\n";
-    print "\t--indextitle t\tUse t as the index title instead of $IndexTitle\n";
-    print "\t--linkstyle s\tUse the given link style\n";
-    print "\t--replaceext\tReplace source extension instead of appending .html\n";
-    print "\t--textcolor c\tUse text color c instead of $TextColor\n";
-    print "\t--verbose\tBe more verbose\n";
+    print "  --bgcolor color     Use background color c instead of $BGColor\n";
+    print "  --help              This text\n";
+    print "  --htmldir dir       Specify directory for HTML files\n";
+    print "  --indexcols n       Use n columns on index page (default $IndexCols)\n";
+    print "  --indexname file    Use file for the index file instead of $IndexName\n";
+    print "  --indexpage         Create an index page\n";
+    print "  --indextitle title  Use title as the index title instead of $IndexTitle\n";
+    print "  --linkstyle style   Use the given link style\n";
+    print "  --replaceext        Replace source extension instead of appending .html\n";
+    print "  --textcolor color   Use text color c instead of $TextColor\n";
+    print "  --verbose           Be more verbose\n";
 }
 
 
@@ -800,6 +848,7 @@ sub Usage {
 GetOptions ("bgcolor=s"		=> \$BGColor,
 	    "debug!"   		=> \$Debug,
 	    "help"     		=> \$Help,
+	    "htmldir=s"		=> \$HTMLDir,
 	    "indexcols=i"      	=> \$IndexCols,
 	    "indexname=s"	=> \$IndexName,
 	    "indexpage"		=> \$IndexPage,
@@ -814,6 +863,12 @@ GetOptions ("bgcolor=s"		=> \$BGColor,
 if ($IndexCols <= 0 || $IndexCols >= 20) {
     Abort ("Invalid value for --indexcols option");
 }
+if ($HTMLDir ne "" && $HTMLDir =~ /[^\/]$/) {
+    # Add a trailing path separator
+    $HTMLDir .= "/";
+}
+
+
 
 # Print help if requested
 if ($Help) {

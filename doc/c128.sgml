@@ -179,7 +179,7 @@ memory drivers using the VDC memory!
 </descrip><p>
 
 Note: The colors are translated from definitions in headers to correct VDC values
-so please use definitions or VIC color numbers only. Colors GRAY3 and BROWN are
+so please use definitions or VIC color numbers only. Colors <tt/GRAY3/ and <tt/BROWN/ are
 missing on VDC and are translated to the two colors missing from VIC palette.
 
 <sect1>Extended memory drivers<p>

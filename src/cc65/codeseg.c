@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -51,6 +51,7 @@
 #include "codeinfo.h"
 #include "datatype.h"
 #include "error.h"
+#include "ident.h"
 #include "symentry.h"
 #include "codeseg.h"
 
@@ -277,13 +278,13 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
  * white space, for example.
  */
 {
-    char       		Mnemo[64];
-    const OPCDesc*	OPC;
-    am_t      		AM = 0;		/* Initialize to keep gcc silent */
-    char      		Arg[64];
+    char                Mnemo[IDENTSIZE+10];
+    const OPCDesc* 	OPC;
+    am_t      	   	AM = 0;	       	/* Initialize to keep gcc silent */
+    char                Arg[IDENTSIZE+10];
     char      	      	Reg;
     CodeEntry*	     	E;
-    CodeLabel*		Label;
+    CodeLabel*	   	Label;
 
     /* Read the first token and skip white space after it */
     L = SkipSpace (ReadToken (L, " \t:", Mnemo, sizeof (Mnemo)));
@@ -527,7 +528,7 @@ void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
 {
     const char* L;
     CodeEntry*  E;
-    char   	Token[64];
+    char        Token[IDENTSIZE+10];
 
     /* Format the line */
     char Buf [256];
@@ -537,7 +538,7 @@ void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
     L = SkipSpace (Buf);
 
     /* Check which type of instruction we have */
-    E = 0; 	/* Assume no insn created */
+    E = 0;  	/* Assume no insn created */
     switch (*L) {
 
     	case '\0':

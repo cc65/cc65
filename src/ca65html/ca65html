@@ -62,13 +62,19 @@ my $Debug	= 0;		# No debugging
 my $Help	= 0;		# Help flag
 my $HTMLDir	= "";		# Directory in which to create the files
 my $IndexCols  	= 6;		# Columns in the file listing
-my $IndexTitle	= "Index";	# Title of index page
-my $IndexName	= "index.html";	# Name of index page
-my $IndexPage	= 0;		# Create an index page
+my $IndexTitle 	= "Index";	# Title of index page
+my $IndexName  	= "index.html";	# Name of index page
+my $IndexPage  	= 0;		# Create an index page
 my $LinkStyle  	= 0;		# Default link style
-my $ReplaceExt	= 0;		# Replace extension instead of appending
-my $TextColor	= "#000000";	# Text color
+my $ReplaceExt 	= 0;		# Replace extension instead of appending
+my $TextColor  	= "#000000";	# Text color
 my $Verbose    	= 0;		# Be quiet
+
+# Table used to convert the label number into names
+my @NameTab    	= ("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K",
+       	       	   "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V",
+       	       	   "W", "X", "Y", "Z", "0", "1", "2", "3", "4", "5", "6",
+       	       	   "7", "8", "9");
 
 
 
@@ -93,8 +99,17 @@ sub Gabble {
 
 # Generate a label and return it
 sub GenLabel {
+
+    my $I;
+    my $L = "";;
+    my $Num = $LabelNum++;
+
     # Generate the label
-    return sprintf ("L%06X", $LabelNum++);
+    for ($I = 0; $I < 4; $I++) {
+	$L = $NameTab[$Num % 36] . $L;
+	$Num /= 36;
+    }
+    return $L;
 }
 
 # Make an output file name from an input file name
@@ -135,7 +150,7 @@ sub StripPath {
 
 
 #-----------------------------------------------------------------------------#
-#			  Document header and footer			      #
+#		  	  Document header and footer			      #
 # ----------------------------------------------------------------------------#
 
 
@@ -173,11 +188,9 @@ sub DocFooter {
 <p><br><p>
 <hr size=1 noshade>
 <address>
-    <a href=\"http://validator.w3.org/check/referer\"><img border=0
-       src=\"http://validator.w3.org/images/vh40\"
-       alt=\"Valid HTML 4.0!\" height=31 width=88 align=right></a>
-    $Name; generated on $Today by ca65html<br>
-    <a href=\"mailto:uz\@cc65.org\">uz\@cc65.org</a>
+<a href="http://validator.w3.org/check/referer"><img border=0 src="http://validator.w3.org/images/vh40" alt="Valid HTML 4.0!" height=31 width=88 align=right></a>
+$Name; generated on $Today by ca65html<br>
+<a href=\"mailto:uz\@cc65.org\">uz\@cc65.org</a>
 </address>
 </body>
 </html>
@@ -793,20 +806,7 @@ EOF
     ExportIndex (INDEX);
 
     # Print the document footer
-    my $Today = localtime;
-    print INDEX <<"EOF";
-<p><br><p>
-<hr size=1 noshade>
-<address>
-    <a href="http://validator.w3.org/check/referer"><img border=0
-       src="http://validator.w3.org/images/vh40"
-       alt="Valid HTML 4.0!" height="31" width="88" align=right></a>
-    $IndexName; generated on $Today by ca65html<br>
-    <a href=\"mailto:uz\@cc65.org\">uz\@cc65.org</a>
-</address>
-</body>
-</html>
-EOF
+    DocFooter (INDEX, $IndexName);
 
     # Close the index file
     close (INDEX);

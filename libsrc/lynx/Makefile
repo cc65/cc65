@@ -35,7 +35,8 @@
 
 OBJS =	crt0.o          \
         eeprom.o        \
-        framerate.o
+        framerate.o     \
+        upload.o        
 
 #--------------------------------------------------------------------------
 # Drivers

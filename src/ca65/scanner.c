@@ -493,6 +493,18 @@ static void NextChar (void)
 
 
 
+void LocaseSVal (void)
+/* Make SVal lower case */
+{
+    unsigned I = 0;
+    while (SVal [I]) {
+	SVal [I] = tolower (SVal [I]);
+     	++I;
+    }
+}
+
+
+
 void UpcaseSVal (void)
 /* Make SVal upper case */
 {

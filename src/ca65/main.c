@@ -48,6 +48,7 @@
 #include "abend.h"
 #include "error.h"
 #include "expr.h"
+#include "feature.h"
 #include "filetab.h"
 #include "global.h"
 #include "incpath.h"
@@ -96,6 +97,7 @@ static void Usage (void)
        	     "  --auto-import\t\tMark unresolved symbols as import\n"
        	     "  --cpu type\t\tSet cpu type\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
+	     "  --feature name\tSet an emulation feature\n"
 	     "  --help\t\tHelp (this text)\n"
 	     "  --ignore-case\t\tIgnore case of symbols\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
@@ -216,6 +218,17 @@ static void OptDebugInfo (const char* Opt, const char* Arg)
 /* Add debug info to the object file */
 {
     DbgSyms = 1;
+}
+
+
+
+static void OptFeature (const char* Opt, const char* Arg)
+/* Set an emulation feature */
+{
+    /* Set the feature, check for errors */
+    if (SetFeature (Arg) == FEAT_UNKNOWN) {
+      	AbEnd ("Illegal emulation feature: `%s'", Arg);
+    }
 }
 
 
@@ -479,15 +492,16 @@ int main (int argc, char* argv [])
         { "--auto-import",     	0,	OptAutoImport		},
         { "--cpu",     	       	1,	OptCPU 			},
 	{ "--debug-info",      	0,	OptDebugInfo		},
-	{ "--help",		0,	OptHelp			},
+	{ "--feature",		1,	OptFeature		},
+	{ "--help",    		0,	OptHelp			},
 	{ "--ignore-case",     	0,	OptIgnoreCase 		},
 	{ "--include-dir",     	1,	OptIncludeDir		},
-	{ "--listing",	       	0,	OptListing		},
+	{ "--listing", 	       	0,	OptListing		},
 	{ "--pagelength",      	1,	OptPageLength		},
-	{ "--smart",	       	0,	OptSmart		},
-	{ "--target",		1,	OptTarget		},
-	{ "--verbose",	       	0,	OptVerbose		},
-	{ "--version",	       	0,	OptVersion		},
+	{ "--smart",   	       	0,	OptSmart		},
+	{ "--target",  		1,	OptTarget		},
+	{ "--verbose", 	       	0,	OptVerbose		},
+	{ "--version", 	       	0,	OptVersion		},
     };
 
     int I;

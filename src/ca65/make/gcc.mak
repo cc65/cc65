@@ -14,6 +14,7 @@ OBJS =  condasm.o	\
 	ea.o	      	\
         error.o	      	\
         expr.o	      	\
+	feature.o	\
 	filetab.o	\
 	fragment.o	\
         global.o       	\

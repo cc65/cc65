@@ -49,6 +49,7 @@
 #include "dbginfo.h"
 #include "error.h"
 #include "expr.h"
+#include "feature.h"
 #include "global.h"
 #include "instr.h"
 #include "listing.h"
@@ -511,17 +512,6 @@ static void DoFarAddr (void)
 static void DoFeature (void)
 /* Switch the Feature option */
 {
-    int Feature;
-
-    static const char* Keys[] = {
-       	"DOLLAR_IS_PC",
-    	"LABELS_WITHOUT_COLONS",
-    	"LOOSE_STRING_TERM",
-    	"AT_IN_IDENTIFIERS",
-    	"DOLLAR_IN_IDENTIFIERS",
-	"PC_ASSIGNMENT",
-    };
-
     /* Allow a list of comma separated keywords */
     while (1) {
 
@@ -531,27 +521,18 @@ static void DoFeature (void)
      	    return;
      	}
 
-     	/* Map the keyword to a number */
-     	Feature = GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]));
-     	if (Feature < 0) {
+	/* Make the string attribute lower case */
+	LocaseSVal ();
+
+     	/* Set the feature and check for errors */
+	if (SetFeature (SVal) == FEAT_UNKNOWN) {
      	    /* Not found */
      	    ErrorSkip (ERR_ILLEGAL_FEATURE);
      	    return;
-     	}
-
-     	/* Skip the keyword */
-     	NextTok ();
-
-     	/* Switch the feature on */
-     	switch (Feature) {
-     	    case 0:	DollarIsPC 	= 1;	break;
-     	    case 1:	NoColonLabels 	= 1;	break;
-     	    case 2:	LooseStringTerm = 1;	break;
-	    case 3:	AtInIdents 	= 1;	break;
-	    case 4:	DollarInIdents	= 1;	break;
-	    case 5:	PCAssignment	= 1;	break;
-     	    default:	Internal ("Invalid feature: %d", Feature);
-     	}
+     	} else {
+	    /* Skip the keyword */
+	    NextTok ();
+	}
 
      	/* Allow more than one keyword */
      	if (Tok == TOK_COMMA) {

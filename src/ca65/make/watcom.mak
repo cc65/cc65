@@ -72,6 +72,7 @@ OBJS = 	condasm.obj	\
 	ea.obj		\
 	error.obj	\
 	expr.obj	\
+	feature.obj	\
 	filetab.obj	\
 	fragment.obj	\
 	global.obj	\
@@ -118,6 +119,7 @@ FILE dbginfo.obj
 FILE ea.obj
 FILE error.obj
 FILE expr.obj
+FILE feature.obj
 FILE filetab.obj
 FILE fragment.obj
 FILE global.obj

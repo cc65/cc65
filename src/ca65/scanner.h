@@ -236,6 +236,9 @@ void DoneInputFile (void);
 void NewInputData (const char* Data, int Malloced);
 /* Add a chunk of input data to the input stream */
 
+void LocaseSVal (void);
+/* Make SVal lower case */
+
 void UpcaseSVal (void);
 /* Make SVal upper case */
 

@@ -4,12 +4,16 @@
 ; Screen size variables
 ;
 
-	.export	 	xsize, ysize
+	.export		screensize
 
-.rodata
+        .include        "cbm510.inc"
 
-xsize: 	.byte	40
-ysize:	.byte	25
+.proc   screensize
 
+        ldx     #XSIZE
+        ldy     #YSIZE
+        rts
+
+.endproc
 
 

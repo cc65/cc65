@@ -4,27 +4,16 @@
 ; Screen size variables
 ;
 
-
-	.export		xsize, ysize
-       	.constructor	initscrsize
+	.export		screensize
 
 	.include	"pet.inc"
 
-.code
+.proc   screensize
 
-initscrsize:
        	ldx	SCR_LINELEN
 	inx			; Variable is one less
-       	stx 	xsize
-	lda	#25
-	sta    	ysize
+       	ldy	#25
 	rts
 
-
-.bss
-
-xsize: 	.res	1
-ysize:	.res	1
-
-
+.endproc
 

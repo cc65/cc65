@@ -12,7 +12,6 @@
         .import         PLOT
 	.import		_gotoxy
 	.import	     	popa
-	.import	     	xsize
 
 	.include     	"cbm610.inc"
 
@@ -53,7 +52,7 @@ cputdirect:
 
 advance:
         iny
-        cpy     xsize
+        cpy     #XSIZE
         bne     L3
         jsr     newline         ; new line
         ldy     #0              ; + cr
@@ -62,7 +61,7 @@ L3:     sty     CURS_X
 
 newline:
    	clc
-   	lda	xsize
+   	lda	#XSIZE
    	adc	CharPtr
    	sta     CharPtr
    	bcc	L4

@@ -4,12 +4,15 @@
 ; Screen size variables
 ;
 
-	.export		xsize, ysize
+	.export	      	screensize
 
-.rodata
+        .include        "apple2.inc"
 
-xsize: 	.byte	40
-ysize:	.byte	24
+.proc   screensize
 
+        ldx     #XSIZE
+        ldy     #YSIZE
+        rts
 
+.endproc
 

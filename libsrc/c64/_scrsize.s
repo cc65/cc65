@@ -4,22 +4,9 @@
 ; Screen size variables
 ;
 
-	.export		xsize, ysize
+	.export		screensize
         .import         SCREEN
-	.constructor	initscrsize
 
-
-.code
-
-initscrsize:
-   	jsr	SCREEN
-   	stx	xsize
-   	sty	ysize
-	rts
-
-.bss
-
-xsize: 	.res	1
-ysize:	.res	1
+screensize      = SCREEN
 
 

@@ -4,26 +4,19 @@
 ; Screen size variables
 ;
 
-	.export		xsize, ysize
-        .import         SCREEN
-	.constructor	initscrsize
+	.export		screensize
 
+        .include        "c128.inc"
 
-.code
+.proc   screensize
 
-initscrsize:
-   	jsr	SCREEN
-	inx
-   	stx	xsize
-	iny
-   	sty	ysize
-	rts
+        ldx     #40             ; Assume 40 column mode
+        bit     MODE
+        bpl     C40             ; Jump if 40 column mode
+        ldx     #80
+C40:    ldy     #25
+        rts
 
-.bss
-
-xsize: 	.res	1
-ysize:	.res	1
-
-
+.endproc
 
 

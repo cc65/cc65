@@ -4,12 +4,14 @@
 ; Screen size variables
 ;
 
-	.export		xsize, ysize
+	.export		screensize
 
-.rodata
+.proc   screensize
 
-xsize: 	.byte	40
-ysize:	.byte	24
+        ldx     #40
+        ldy     #24
+        rts
 
+.endproc
 
 

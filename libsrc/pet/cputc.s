@@ -8,10 +8,8 @@
     	.export	       	_cputcxy, _cputc, cputdirect, putchar
 	.export		newline, plot
 	.import		popa, _gotoxy
-	.import		xsize
 
 	.include	"pet.inc"
-;	.include	"../cbm/cbm.inc"
 
 _cputcxy:
 	pha	    	    	; Save C
@@ -48,17 +46,17 @@ cputdirect:
 ; Advance cursor position
 
 advance:
-        iny
-        cpy     xsize
+        cpy     SCR_LINELEN     ; xsize-1
         bne     L3
         jsr     newline         ; new line
-        ldy     #0              ; + cr
-L3:     sty     CURS_X
+        ldy     #$FF            ; + cr
+L3:     iny
+        sty     CURS_X
         rts
 
 newline:
-   	clc
-   	lda	xsize
+   	lda    	SCR_LINELEN     ; xsize-1
+        sec                     ; Account for -1 above
    	adc	SCREEN_PTR
    	sta	SCREEN_PTR
    	bcc	L4
@@ -84,9 +82,9 @@ plot:	ldy	CURS_Y
 	lda	ScrLo,y
 	sta	SCREEN_PTR
 	lda	ScrHi,y
-	ldy	xsize
-	cpy	#40
-       	beq	@L1
+	ldy	SCR_LINELEN
+	cpy	#40+1
+       	bcc     @L1
        	asl    	SCREEN_PTR		; 80 column mode
  	rol	a
 @L1:	ora	#$80			; Screen at $8000

@@ -10,7 +10,6 @@
 
         .import         PLOT
 	.import		popa, _gotoxy
-	.import		xsize
 
 	.include	"cbm510.inc"
 
@@ -53,7 +52,7 @@ cputdirect:
 
 advance:
    	iny
-   	cpy	xsize
+   	cpy	#XSIZE
    	bne	L3
 	jsr	newline		; new line
    	ldy	#0    	  	; + cr
@@ -62,13 +61,13 @@ L3:	sty	CURS_X
 
 newline:
    	clc
-   	lda	xsize
+   	lda	#XSIZE
    	adc	SCREEN_PTR
    	sta	SCREEN_PTR
    	bcc	L4
    	inc	SCREEN_PTR+1
    	clc
-L4:	lda    	xsize
+L4:	lda    	#XSIZE
    	adc	CRAM_PTR
    	sta	CRAM_PTR
    	bcc	L5

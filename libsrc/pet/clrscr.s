@@ -7,7 +7,6 @@
 	.export	    	_clrscr
 	.import		plot
        	.importzp   	ptr1
-	.import	    	xsize
 
 	.include    	"pet.inc"
 
@@ -23,9 +22,9 @@ _clrscr:
 ; Determine, how many pages to fill
 
 	ldx 	#4
-	lda	xsize
-	cmp	#40
-       	beq	L1
+	lda	SCR_LINELEN     ; Check length of one line
+	cmp	#40+1
+       	bcc    	L1
 	ldx	#8
 
 ; Clear the screen

@@ -4,11 +4,18 @@
 ; Screen size variables
 ;
 
-	.export		xsize, ysize
+	.export	   	screensize
 
-.data             
+; We will return the values directly instead of banking in the ROM and calling
+; SCREEN which is a lot more overhead in code size and CPU cycles.
 
-xsize: 	.byte   40
-ysize:	.byte   25
+.proc   screensize
+
+        ldx     #40
+        ldy     #25
+        rts
+
+.endproc
+
 
 

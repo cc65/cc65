@@ -11,11 +11,15 @@
 _longjmp:
 	sta	ptr2	     	; Save retval
 	stx	ptr2+1
-	jsr	popax		; get buf
+	ora	ptr2+1		; Check for 0
+    	bne	@L1
+    	lda	#1		; 0 is illegal according to the standard...
+	sta	ptr2		; ... and must be replaced by 1
+@L1:	jsr	popax		; get buf
 	sta	ptr1
 	stx	ptr1+1
 	ldy	#0
-	   
+
 ; Get the old parameter stack
 
        	lda	(ptr1),y

@@ -11,10 +11,13 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-OBJS =  crt0.o
+C_OBJS =
 
-all:	$(OBJS)
+S_OBJS  =       crt0.o          \
+                systime.o
+
+all:   	$(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f $(OBJS)
+	@rm -f $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS)
 

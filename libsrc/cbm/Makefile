@@ -50,6 +50,7 @@ S_OBJS =	c_acptr.o	\
                 oserrlist.o     \
 		oserror.o	\
 		revers.o	\
+                systime.o       \
 		where.o
 
 all:	$(C_OBJS) $(S_OBJS)

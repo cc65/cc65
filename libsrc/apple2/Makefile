@@ -28,12 +28,13 @@ S_OBJS=	_scrsize.o	\
         randomize.o     \
 	read.o		\
 	revers.o	\
+        systime.o       \
 	where.o		\
 	write.o
 
 all:	$(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS) crt0.o
+	@rm -f $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS)
 
 

@@ -61,6 +61,7 @@ OBJS =	_scrsize.o   \
 	scroll.o     \
 	setcolor.o   \
 	siocall.o    \
+        systime.o    \
 	tvtype.o     \
 	ucase_fn.o   \
 	where.o      \

@@ -72,19 +72,15 @@
 enum Token Tok = TOK_NONE;		/* Current token */
 int WS;	  				/* Flag: Whitespace before token */
 long IVal;	       	       	    	/* Integer token attribute */
-char SVal [MAX_STR_LEN+1];	    	/* String token attribute */
+char SVal[MAX_STR_LEN+1];               /* String token attribute */
 
 FilePos	CurPos = { 0, 0, 0 };		/* Name and position in current file */
 
 
 
-/* Struct to handle include files. Note: The length of the input line may
- * not exceed 255+1, since the column is stored in the file position struct
- * as a character. Increasing this value means changing the FilePos struct,
- * and the read and write routines in the assembler and linker.
- */
-typedef struct InputFile_ InputFile;
-struct InputFile_ {
+/* Struct to handle include files. */
+typedef struct InputFile InputFile;
+struct InputFile {
     FILE*      	    F;		       	/* Input file descriptor */
     FilePos	    Pos;	       	/* Position in file */
     enum Token	    Tok;	       	/* Last token */
@@ -94,8 +90,8 @@ struct InputFile_ {
 };
 
 /* Struct to handle textual input data */
-typedef struct InputData_ InputData;
-struct InputData_ {
+typedef struct InputData InputData;
+struct InputData {
     char*	    Data;		/* Pointer to the data */
     const char*     Pos;		/* Pointer to current position */
     int		    Malloced;		/* Memory was malloced */
@@ -111,7 +107,7 @@ static unsigned	  ICount 	= 0;  	/* Count of input files */
 static int	  C 		= 0;	/* Current input character */
 
 /* Force end of assembly */
-int 		  ForcedEnd = 0;
+int 		  ForcedEnd     = 0;
 
 /* List of dot keywords with the corresponding tokens */
 struct DotKeyword {
@@ -752,19 +748,62 @@ Again:
 	return;
     }
 
-    /* Decimal number? */
+    /* Number? */
     if (IsDigit (C)) {
 
-	/* Read the number */
+        char Buf[16];
+        unsigned Digits;
+        unsigned Base;
+        unsigned I;
+        long     Max;
+        unsigned DVal;
+
+        /* Ignore leading zeros */
+        while (C == '0') {
+            NextChar ();
+        }
+
+        /* Read the number into Buf counting the digits */
+        Digits = 0;
+        while (IsXDigit (C)) {
+
+            /* Buf is big enough to allow any decimal and hex number to
+             * overflow, so ignore excess digits here, they will be detected
+             * when we convert the value.
+             */
+            if (Digits < sizeof (Buf)) {
+                Buf[Digits++] = C;
+            }
+
+            NextChar ();
+        }
+
+        /* Allow zilog/intel style hex numbers with a 'h' suffix */
+        if (C == 'h' || C == 'H') {
+            NextChar ();
+            Base = 16;
+            Max  = 0xFFFFFFFFUL / 16;
+        } else {
+            Base = 10;
+            Max  = 0xFFFFFFFFUL / 10;
+        }
+
+        /* Convert the number using the given base */
 	IVal = 0;
-	while (IsDigit (C)) {
-       	    if (IVal > (long) (0xFFFFFFFFUL / 10)) {
-       	      	Error ("Overflow in decimal number");
-	    	IVal = 0;
+        for (I = 0; I < Digits; ++I) {
+       	    if (IVal > Max) {
+       	       	Error ("Number out of range");
+	       	IVal = 0;
+                break;
 	    }
-	    IVal = (IVal * 10) + DigitVal (C);
-	    NextChar ();
-	}
+            DVal = DigitVal (Buf[I]);
+            if (DVal > Base) {
+                Error ("Invalid digits in number");
+                IVal = 0;
+                break;
+            }
+	    IVal = (IVal * Base) + DVal;
+        }
 
 	/* This is an integer constant */
        	Tok = TOK_INTCON;

@@ -402,10 +402,10 @@ name="http://www.6502.org/source/interpreters/sweet16.htm">.
 
 <sect1>Number format<p>
 
-For literal values, the assembler accepts the widely used number formats:
-A preceeding '&dollar;' denotes a hex value, a preceeding '%' denotes a
-binary value, and a bare number is interpeted as a decimal. There are
-currently no octal values and no floats.
+For literal values, the assembler accepts the widely used number formats: A
+preceeding '&dollar;' or a trailing 'h' denotes a hex value, a preceeding '%'
+denotes a binary value, and a bare number is interpeted as a decimal. There
+are currently no octal values and no floats.
 
 
 <sect1>Conditional assembly<p>

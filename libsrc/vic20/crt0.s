@@ -10,34 +10,9 @@
 	.import	     	_main
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 
+        .include        "zeropage.inc"
 	.include     	"vic20.inc"
 	.include     	"../cbm/cbm.inc"
-
-; ------------------------------------------------------------------------
-; Define and export the ZP variables for the Vic20 runtime
-
-	.exportzp   	sp, sreg, regsave
-	.exportzp   	ptr1, ptr2, ptr3, ptr4
-	.exportzp   	tmp1, tmp2, tmp3, tmp4
-	.exportzp   	regbank, zpspace
-
-.zeropage
-
-zpstart	= *
-sp:	      	.res   	2 	; Stack pointer
-sreg:	      	.res	2	; Secondary register/high 16 bit for longs
-regsave:      	.res	4	; slot to save/restore (E)AX into
-ptr1:	      	.res	2
-ptr2:	      	.res	2
-ptr3:	      	.res	2
-ptr4:	      	.res	2
-tmp1:	      	.res	1
-tmp2:	      	.res	1
-tmp3:	      	.res	1
-tmp4:	      	.res	1
-regbank:      	.res	6	; 6 byte register bank
-
-zpspace	= * - zpstart		; Zero page space allocated
 
 .code
 
@@ -48,7 +23,7 @@ zpspace	= * - zpstart		; Zero page space allocated
         .word   Head            ; Load address
 Head:   .word   @Next
         .word   1000            ; Line number
-        .byte   $9E,"4109"      ; SYS 2061
+        .byte   $9E,"4109"      ; SYS 4109
         .byte   $00             ; End of BASIC line
 @Next:  .word   0               ; BASIC end marker
 	.reloc
@@ -80,12 +55,6 @@ L1:	lda	sp,x
        	tsx
        	stx    	spsave 		; Save the system stack ptr
 
-;	lda	$01
-;	sta	mmusave      	; Save the memory configuration
-;	and	#$F8
-;	ora	#$06		; Enable kernal+I/O, disable basic
-;	sta	$01
-
 	lda    	#<(__RAM_START__ + __RAM_SIZE__)
 	sta	sp
 	lda	#>(__RAM_START__ + __RAM_SIZE__)
@@ -111,8 +80,6 @@ _exit:	jsr	donelib		; Run module destructors
 
   	ldx	spsave
 	txs	   	  	; Restore stack pointer
-;	lda    	mmusave
-;	sta	$01	  	; Restore memory configuration
 
 ; Copy back the zero page stuff
 
@@ -134,4 +101,3 @@ zpsave:	.res	zpspace
 .bss
 
 spsave:	.res	1
-mmusave:.res	1

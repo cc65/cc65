@@ -84,14 +84,12 @@ COUNT:
 ; READ: Read a particular joystick passed in A.
 ;
 
-READ:
-        tax	    ; Joystick number into X
-        bne joy2
+READ:   tax	                ; Joystick number into X
+        bne     joy2
 
-        ; Read joystick 1
+; Read joystick 1
 
-joy1:
-        lda	#$7F
+joy1:   lda	#$7F
         sei
         sta	CIA1_PRA
         lda	CIA1_PRB
@@ -100,58 +98,53 @@ joy1:
         eor	#$1F
         rts
 
-        ; Read joystick 2
+; Read joystick 2
 
-joy2:
-        dex
-        bne joy3
+joy2:   dex
+        bne     joy3
 
-        ; ldx	#0
-        lda	#$E0
-        ldy	#$FF
+        lda 	#$E0
+        ldy 	#$FF
         sei
-        sta	CIA1_DDRA
-        lda	CIA1_PRA
-        sty	CIA1_DDRA
+        sta 	CIA1_DDRA
+        lda 	CIA1_PRA
+        sty 	CIA1_DDRA
         cli
-        and	#$1F
-        eor	#$1F
+        and 	#$1F
+        eor 	#$1F
         rts
 
-        ; Read joystick 3
+; Read joystick 3
 
-joy3:
-        dex
-        bne joy4
+joy3:   dex
+        bne     joy4
 
-        lda #%10000000  ; cia 2 port B Data-Direction
-        sta $dd03       ; bit 7: out    bit 6-0: in
+        lda     #%10000000      ; cia 2 port B Data-Direction
+        sta     CIA2_DDRB       ; bit 7: out    bit 6-0: in
 
-        lda #$80        ; cia 2 port B read/write
-        sta $dd01       ; (output one at PB7)
+        lda     #$80            ; cia 2 port B read/write
+        sta     CIA2_PRB        ; (output one at PB7)
 
-        lda $dd01       ; cia 2 port B read/write
-        and #$1f        ; get bit 4-0 (PB4-PB0)
-        ; ldx #0
+        lda     CIA2_PRB        ; cia 2 port B read/write
+        and     #$1f            ; get bit 4-0 (PB4-PB0)
         rts
 
-        ; Read joystick 4
+; Read joystick 4
 
-joy4:
-        lda #%10000000  ; cia 2 port B Data-Direction
-        sta $dd03       ; bit 7: out    bit 6-0: in
+joy4:   lda     #%10000000      ; cia 2 port B Data-Direction
+        sta     CIA2_DDRB       ; bit 7: out    bit 6-0: in
 
-        lda #$00        ; cia 2 port B read/write
-        sta $dd01       ; (output zero at PB7)
+        lda     #$00            ; cia 2 port B read/write
+        sta     CIA2_PRB        ; (output zero at PB7)
 
-        lda $dd01       ; cia 2 port B read/write
-        and #$0f        ; get bit 3-0 (PB3-PB0)
-        sta tmp1        ; joy 4 directions
+        lda     CIA2_PRB        ; cia 2 port B read/write
+        and     #$0f            ; get bit 3-0 (PB3-PB0)
+        sta     tmp1            ; joy 4 directions
 
-        lda $dd01       ; cia 2 port B read/write
-        and #%00100000  ; get bit 5 (PB5)
+        lda     CIA2_PRB        ; cia 2 port B read/write
+        and     #%00100000      ; get bit 5 (PB5)
         lsr
-        ora tmp1
+        ora     tmp1
 
         ldx #0
         rts

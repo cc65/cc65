@@ -5,7 +5,6 @@
 ;
 
  	.export		bnegeax
-	.import		return0, return1
 	.importzp	sreg, tmp1
 
 bnegeax:

@@ -136,6 +136,14 @@ int InputFromStack (void)
 
 
 
+int HavePushedInput (void)
+/* Return true if we have stacked input available, return false if not */
+{
+    return (IStack != 0);
+}
+
+
+
 void CheckInputStack (void)
 /* Called from the scanner before closing an input file. Will check for any
  * stuff on the input stack.

@@ -47,6 +47,7 @@
 #include "global.h"
 #include "incpath.h"
 #include "instr.h"
+#include "istack.h"
 #include "listing.h"
 #include "macro.h"
 #include "nexttok.h"
@@ -299,8 +300,12 @@ static void OneLine (void)
     char Ident [MAX_STR_LEN+1];
     int Done = 0;
 
-    /* Initialize the listing line */
-    InitListingLine ();
+    /* Initialize the new listing line if we are actually reading from file
+     * and not from internally pushed input.				    
+     */
+    if (!HavePushedInput ()) {
+	InitListingLine ();
+    }
 
     if (Tok == TOK_COLON) {
 	/* An unnamed label */
@@ -342,40 +347,35 @@ static void OneLine (void)
 	    	 * without a colon if there is no whitespace before the
 	    	 * identifier.
 	    	 */
-	    	if (Tok != TOK_COLON) {
-	    	    if (HadWS || !NoColonLabels) {
-	    	     	Error (ERR_COLON_EXPECTED);
-	    	    }
-	    	    if (Tok == TOK_NAMESPACE) {
-	    	       	/* Smart :: handling */
-	    	       	NextTok ();
-	    	    }
-	    	} else {
-	     	    /* Skip the colon */
-	    	    NextTok ();
-	    	}
-	    }
-	}
+     	    	if (Tok != TOK_COLON) {
+     	    	    if (HadWS || !NoColonLabels) {
+     	    	     	Error (ERR_COLON_EXPECTED);
+     	    	    }
+     	    	    if (Tok == TOK_NAMESPACE) {
+     	    	       	/* Smart :: handling */
+     	    	       	NextTok ();
+     	    	    }
+     	    	} else {
+     	     	    /* Skip the colon */
+     	    	    NextTok ();
+     	    	}
+     	    }
+     	}
     }
 
     if (!Done) {
 
-	if (TokIsPseudo (Tok)) {
-	    /* A control command, IVal is index into table */
-	    HandlePseudo ();
-	} else if (Tok == TOK_MNEMO) {
-	    /* A mnemonic - assemble one instruction */
-	    HandleInstruction (IVal);
-	} else if (Tok == TOK_IDENT && IsMacro (SVal)) {
-	    /* A macro expansion */
-    	    MacExpandStart ();
-	}
+     	if (TokIsPseudo (Tok)) {
+     	    /* A control command, IVal is index into table */
+     	    HandlePseudo ();
+     	} else if (Tok == TOK_MNEMO) {
+     	    /* A mnemonic - assemble one instruction */
+     	    HandleInstruction (IVal);
+     	} else if (Tok == TOK_IDENT && IsMacro (SVal)) {
+     	    /* A macro expansion */
+     	    MacExpandStart ();
+     	}
     }
-
-    /* Calling InitListingLine again here is part of a hack that introduces
-     * enough magic to make the PC output in the listing work.
-     */
-    InitListingLine ();
 
     /* Line separator must come here */
     ConsumeSep ();

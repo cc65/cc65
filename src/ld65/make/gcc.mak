@@ -30,6 +30,7 @@ OBJS = 	bin.o		\
 	extsyms.o	\
 	fileinfo.o	\
 	fileio.o	\
+        filepath.o      \
 	fragment.o	\
 	global.o        \
 	library.o	\

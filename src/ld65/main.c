@@ -54,6 +54,7 @@
 #include "error.h"
 #include "exports.h"
 #include "fileio.h"
+#include "filepath.h"
 #include "global.h"
 #include "library.h"
 #include "mapfile.h"
@@ -90,6 +91,7 @@ static void Usage (void)
 	     "Usage: %s [options] module ...\n"
     	     "Short options:\n"
        	     "  -C name\t\tUse linker config file\n"
+             "  -L path\t\tSpecify a library search path\n"
        	     "  -Ln name\t\tCreate a VICE label file\n"
        	     "  -Lp\t\t\tMark write protected segments as such (VICE)\n"
        	     "  -S addr\t\tSet the default start address\n"
@@ -102,11 +104,14 @@ static void Usage (void)
        	     "  -vm\t\t\tVerbose map file\n"
 	     "\n"
 	     "Long options:\n"
+             "  --cfg-path path\tSpecify a config file search path\n"
        	     "  --config name\t\tUse linker config file\n"
              "  --dump-config name\tDump a builtin configuration\n"
 	     "  --help\t\tHelp (this text)\n"
+             "  --lib-path path\tSpecify a library search path\n"
 	     "  --mapfile name\tCreate a map file\n"
              "  --module-id id\tSpecify a module id\n"
+             "  --obj-path path\tSpecify an object file search path\n"
        	     "  --start-addr addr\tSet the default start address\n"
        	     "  --target sys\t\tSet the target system\n"
        	     "  --version\t\tPrint the linker version\n",
@@ -218,6 +223,14 @@ static void LinkFile (const char* Name)
 
 
 
+static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
+/* Specify a config file search path */
+{
+    AddSearchPath (Arg, SEARCH_CFG);
+}
+
+
+
 static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 /* Define the config file */
 {
@@ -262,6 +275,14 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 
+static void OptLibPath (const char* Opt attribute ((unused)), const char* Arg)
+/* Specify a library file search path */
+{
+    AddSearchPath (Arg, SEARCH_LIB);
+}
+
+
+
 static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 /* Give the name of the map file */
 {
@@ -278,6 +299,14 @@ static void OptModuleId (const char* Opt, const char* Arg)
         Error ("Range error in module id");
     }
     ModuleId = (unsigned) Id;
+}
+
+
+
+static void OptObjPath (const char* Opt attribute ((unused)), const char* Arg)
+/* Specify an object file search path */
+{
+    AddSearchPath (Arg, SEARCH_OBJ);
 }
 
 
@@ -328,12 +357,15 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
+       	{ "--cfg-path",         1,     	OptCfgPath              },
        	{ "--config",  	       	1,     	OptConfig    	    	},
      	{ "--dbgfile",          1,      OptDbgFile              },
        	{ "--dump-config",     	1,     	OptDumpConfig           },
      	{ "--help",	       	0,     	OptHelp	     	    	},
+       	{ "--lib-path",         1,     	OptLibPath              },
      	{ "--mapfile",		1,	OptMapFile	    	},
        	{ "--module-id",        1,     	OptModuleId             },
+       	{ "--obj-path",         1,     	OptObjPath              },
 	{ "--start-addr",	1,	OptStartAddr	    	},
 	{ "--target",		1,	OptTarget    	    	},
 	{ "--version",	       	0,  	OptVersion   	    	},
@@ -407,9 +439,10 @@ int main (int argc, char* argv [])
 
 		case 'L':
 		    switch (Arg [2]) {
-		      	case 'n': LabelFileName = GetArg (&I, 3); break;
-		      	case 'p': WProtSegs = 1;    	      	  break;
-		      	default:  UnknownOption (Arg);		  break;
+                        /* ## The first two are obsolete and will go */
+		      	case 'n': LabelFileName = GetArg (&I, 3);   break;
+		      	case 'p': WProtSegs = 1;    	      	    break;
+		      	default:  OptLibPath (Arg, GetArg (&I, 2)); break;
 		    }
 		    break;
 

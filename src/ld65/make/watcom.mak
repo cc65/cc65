@@ -55,6 +55,7 @@ OBJS =	bin.obj		\
 	extsyms.obj	\
 	fileinfo.obj	\
 	fileio.obj	\
+        filepath.obj    \
 	fragment.obj	\
 	global.obj	\
 	library.obj	\

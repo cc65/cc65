@@ -2615,16 +2615,9 @@ static int hieQuest (struct expent *lval)
 	    Mark2 = GetCodePos ();	/* Remember position */
 	    g_typecast (TypeOf (rtype), TypeOf (type2));
 
-	    /* If the typecast did not produce code, remove the jump,
-	     * otherwise output the label.
-	     */
-	    if (GetCodePos() == Mark2) {
-		RemoveCode (Mark1);	/* Remove code */
-	    } else {
-		/* We have typecast code, output label */
-	    	g_defcodelabel (labf);
-	    	labt = 0;		/* Mark other label as invalid */
-	    }
+	    /* Jump here around the typecase code. */
+	    g_defcodelabel (labf);
+	    labt = 0;		/* Mark other label as invalid */
 
 	} else if (IsClassPtr (type2) && IsClassPtr (type3)) {
 	    /* Must point to same type */

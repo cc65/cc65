@@ -93,12 +93,6 @@ static CodeLabel* FindCodeLabel (CodeSeg* S, const char* Name, unsigned Hash)
 
 
 
-/*****************************************************************************/
-/*		      Functions for parsing instructions		     */
-/*****************************************************************************/
-
-
-
 static CodeLabel* NewCodeSegLabel (CodeSeg* S, const char* Name, unsigned Hash)
 /* Create a new label and insert it into the label hash table */
 {
@@ -112,6 +106,38 @@ static CodeLabel* NewCodeSegLabel (CodeSeg* S, const char* Name, unsigned Hash)
     /* Return the new label */
     return L;
 }
+
+
+
+static void RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
+/* Remove the given code label from the hash list */
+{
+    /* Get the first entry in the hash chain */
+    CodeLabel* List = S->LabelHash[L->Hash];
+    CHECK (List != 0);
+
+    /* First, remove the label from the hash chain */
+    if (List == L) {
+       	/* First entry in hash chain */
+       	S->LabelHash[L->Hash] = L->Next;
+    } else {
+       	/* Must search through the chain */
+       	while (List->Next != L) {
+       	    /* If we've reached the end of the chain, something is *really* wrong */
+       	    CHECK (List->Next != 0);
+       	    /* Next entry */
+       	    List = List->Next;
+       	}
+       	/* The next entry is the one, we have been searching for */
+       	List->Next = L->Next;
+    }
+}
+
+
+
+/*****************************************************************************/
+/*		      Functions for parsing instructions		     */
+/*****************************************************************************/
 
 
 
@@ -386,7 +412,7 @@ void AddCodeEntry (CodeSeg* S, const char* Format, va_list ap)
 
 	case ';':
 	    /* Comment or hint, ignore it for now */
-	    break;
+     	    break;
 
 	case '.':
 	    /* Control instruction */
@@ -443,23 +469,23 @@ void DelCodeEntry (CodeSeg* S, unsigned Index)
     unsigned Count = GetCodeLabelCount (E);
     if (Count > 0) {
 
-	/* The instruction has labels attached. Check if there is a next
-	 * instruction.
-	 */
-	if (Index == GetCodeEntryCount (S)-1) {
+     	/* The instruction has labels attached. Check if there is a next
+     	 * instruction.
+     	 */
+     	if (Index == GetCodeEntryCount (S)-1) {
 
-	    /* No next instruction, move to the codeseg label pool */
-	    MoveLabelsToPool (S, E);
+     	    /* No next instruction, move to the codeseg label pool */
+     	    MoveLabelsToPool (S, E);
 
-	} else {
+     	} else {
 
-	    /* There is a next insn, get it */
-	    CodeEntry* N = GetCodeEntry (S, Index+1);
+     	    /* There is a next insn, get it */
+     	    CodeEntry* N = GetCodeEntry (S, Index+1);
 
-	    /* Move labels to the next entry */
-	    MoveCodeLabels (S, E, N);
+     	    /* Move labels to the next entry */
+     	    MoveCodeLabels (S, E, N);
 
-	}
+     	}
     }
 
     /* If this insn references a label, remove the reference. And, if the
@@ -515,6 +541,11 @@ void AddCodeLabel (CodeSeg* S, const char* Name)
      	L = NewCodeSegLabel (S, Name, Hash);
     }
 
+    /* Safety. This call is quite costly, but safety is better */
+    if (CollIndex (&S->Labels, L) >= 0) {
+     	Internal ("AddCodeLabel: Label `%s' already defined", Name);
+    }
+
     /* We do now have a valid label. Remember it for later */
     CollAppend (&S->Labels, L);
 }
@@ -560,24 +591,8 @@ void DelCodeLabel (CodeSeg* S, CodeLabel* L)
 {
     unsigned Count, I;
 
-    /* Get the first entry in the hash chain */
-    CodeLabel* List = S->LabelHash[L->Hash];
-
     /* First, remove the label from the hash chain */
-    if (List == L) {
-       	/* First entry in hash chain */
-       	S->LabelHash[L->Hash] = L->Next;
-    } else {
-       	/* Must search through the chain */
-       	while (List->Next != L) {
-       	    /* If we've reached the end of the chain, something is *really* wrong */
-       	    CHECK (List->Next != 0);
-       	    /* Next entry */
-       	    List = List->Next;
-       	}
-       	/* The next entry is the one, we have been searching for */
-       	List->Next = L->Next;
-    }
+    RemoveLabelFromHash (S, L);
 
     /* Remove references from insns jumping to this label */
     Count = CollCount (&L->JumpFrom);
@@ -589,8 +604,14 @@ void DelCodeLabel (CodeSeg* S, CodeLabel* L)
     }
     CollDeleteAll (&L->JumpFrom);
 
-    /* Remove the reference to the owning instruction */
-    CollDeleteItem (&L->Owner->Labels, L);
+    /* Remove the reference to the owning instruction if it has one. The
+     * function may be called for a label without an owner when deleting
+     * unfinished parts of the code. This is unfortunate since it allows
+     * errors to slip through.
+     */
+    if (L->Owner) {
+	CollDeleteItem (&L->Owner->Labels, L);
+    }
 
     /* All references removed, delete the label itself */
     FreeCodeLabel (L);
@@ -615,7 +636,7 @@ void MergeCodeLabels (CodeSeg* S)
 	/* Get a pointer to the next entry */
 	CodeEntry* E = GetCodeEntry (S, I);
 
-    	/* If this entry has zero labels, continue with the next one */
+     	/* If this entry has zero labels, continue with the next one */
     	unsigned LabelCount = GetCodeLabelCount (E);
     	if (LabelCount == 0) {
     	    continue;
@@ -635,7 +656,7 @@ void MergeCodeLabels (CodeSeg* S)
     	    CodeLabel* L = GetCodeLabel (E, J);
 
 	    /* Move all references from this label to the reference label */
-	    MoveLabelRefs (L, RefLab);
+     	    MoveLabelRefs (L, RefLab);
 
        	    /* Remove the label completely. */
        	    DelCodeLabel (S, L);
@@ -680,7 +701,7 @@ void MoveCodeLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
 	    /* Delete the label */
 	    DelCodeLabel (S, OldLabel);
 
-	}
+     	}
 
     } else {
 
@@ -697,7 +718,7 @@ void MoveCodeLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
 
 
 
-void RemoveCodeLabelRef (CodeSeg* S, struct CodeEntry* E)			  
+void RemoveCodeLabelRef (CodeSeg* S, struct CodeEntry* E)
 /* Remove the reference between E and the label it jumps to. The reference
  * will be removed on both sides and E->JumpTo will be 0 after that. If
  * the reference was the only one for the label, the label will get
@@ -769,19 +790,29 @@ void DelCodeSegAfter (CodeSeg* S, unsigned Last)
     /* Get the number of entries in this segment */
     unsigned Count = GetCodeEntryCount (S);
 
-    /* Remove all entries after the given one */
-    while (Last < Count) {
+    /* Check if we have to delete anything */
+    if (Last < Count) {
 
-	/* Get the next entry */
-	CodeEntry* E = GetCodeEntry (S, Count-1);
+ 	/* Remove all entries after the given one */
+ 	while (Last < Count--) {
 
-	/* We have to transfer all labels to the code segment label pool */
-	MoveLabelsToPool (S, E);
+      	    /* Get the next entry */
+      	    CodeEntry* E = GetCodeEntry (S, Count);
 
-	/* Remove the code entry */
-      	FreeCodeEntry (E);
-      	CollDelete (&S->Entries, Count-1);
-      	--Count;
+      	    /* If the code entry has labels, delete them */
+      	    while (CodeEntryHasLabel (E)) {
+
+      		/* Get the label */
+      		CodeLabel* L = GetCodeLabel (E, 0);
+
+      		/* Delete it */
+      		DelCodeLabel (S, L);
+
+      	    }
+
+     	    /* Delete the entry itself */
+     	    DelCodeEntry (S, Count);
+      	}
     }
 }
 

@@ -1103,7 +1103,7 @@ static unsigned RVUInt2 (Line* L,
 	do {
 
 	    /* Handle jumps to local labels (continue there) */
-       	    if (LineMatch (L, "\tjmp\tL")) {
+       	    if (LineMatch (L, "\tjmp\tL") || LineMatch (L, "\tbra\tL")) {
 	     	/* Get the target of the jump */
 	     	L = GetTargetLine (L->Line+5);
 	    }
@@ -1113,33 +1113,33 @@ static unsigned RVUInt2 (Line* L,
 
 	    /* Bail out if we're done */
 	    if (L == 0 || IsLabel (L)) {
-		/* Something is wrong */
-		return REG_ALL;
+	    	/* Something is wrong */
+	    	return REG_ALL;
 	    }
 
 	    /* Check if we had this line already. If so, bail out, if not,
 	     * add it to the list of known lines.
 	     */
 	    if (LCHasLine (LC, L) || !LCAddLine (LC, L)) {
-		goto ExitPoint;
+	    	goto ExitPoint;
 	    }
 
-	} while (LineMatch (L, "\tjmp\tL"));
+	} while (LineMatch (L, "\tjmp\tL") || LineMatch (L, "\tbra\tL"));
 
 	/* Special handling for branches */
 	if (LineMatchX (L, ShortBranches) >= 0 ||
 	    LineMatchX (L, LongBranches) >= 0) {
 	    const char* Target = L->Line+5;
 	    if (Target[0] == 'L') {
-		/* Jump to local label. Check the register usage starting at
-		 * the branch target and at the code following the branch.
-		 * All registers that are unused in both execution flows are
-		 * returned as unused.
-		 */
-		unsigned U1, U2;
+	    	/* Jump to local label. Check the register usage starting at
+	    	 * the branch target and at the code following the branch.
+	    	 * All registers that are unused in both execution flows are
+	    	 * returned as unused.
+	    	 */
+	    	unsigned U1, U2;
        	       	U2 = RVUInt1 (GetTargetLine (Target), LC, Used, Unused);
-		U1 = RVUInt1 (L, LC, Used, Unused);
-		return U1 | U2;		/* Used in any of the branches */
+	    	U1 = RVUInt1 (L, LC, Used, Unused);
+	    	return U1 | U2;		/* Used in any of the branches */
 	    }
 	}
 
@@ -1218,7 +1218,7 @@ static unsigned RegValUsed (Line* Start)
  * If the end of the lookahead is reached, all registers that are uncertain
  * are marked as used.
  * The result of the search is returned.
- */
+ */								
 {
     unsigned R;
 
@@ -1758,7 +1758,7 @@ static void OptRegLoads (void)
 
 	    /* Search for a load of Y and check if the value is used later */
 	    else if (LineMatch (L, "\tldy\t") 	       	&&
-       	       	       !RegYUsed (L) 		       	&&
+       	       	       !RegYUsed (L) 	       	       	&&
 	     	       !IsCondJump (NextInstruction (L))) {
 
 		/* Remember to delete this line */
@@ -3867,6 +3867,10 @@ static Line* OptOneBlock (Line* L)
 	} else if (LineFullMatch (L, "\tjsr\tpushax")) {
 	    /* We know about this function */
 	    Y = 1;
+	} else if (LineFullMatch (L, "\tjsr\tpushaysp")) {
+	    /* We know about this function */
+	    A = -1;
+	    Y = 0;
 	} else if (LineFullMatch (L, "\tjsr\tpushc0")) {
 	    /* We know about this function */
 	    A = 0;
@@ -4195,6 +4199,26 @@ static void OptJumps (void)
  	    }
  	}
  	L = NextCodeLine (L);
+    }
+
+    /* Special treatment for jumps on the 65C02 */
+    if (CPU == CPU_65C02) {
+
+	Line* L = FirstCode;
+	while (L) {
+	    if (LineMatch (L, "\tjmp\tL")) {
+		Line* Target = GetTargetLine (L->Line+5);
+		unsigned Distance = GetJumpDistance (L, Target);
+		if (Distance < 123) {		/* Safety */
+       	       	    L->Line [1] = 'b';		/* Make a short branch */
+		    L->Line [2] = 'r';
+		    L->Line [3] = 'a';
+		    L->Size = 2;      		/* Set new size */
+		}
+	    }
+	    L = NextCodeLine (L);
+	}
+
     }
 }
 

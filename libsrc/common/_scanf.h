@@ -30,7 +30,7 @@ struct indesc {
     infunc	    fin;	/* Pointer to input routine */
     unsigned	    ccount;	/* Number of chars read */
 
-    /* Fields used outside from _scanf */
+    /* Fields used outside of _scanf */
     char*      	    buf; 	/* Pointer to input buffer */
     unsigned	    size;	/* Size of input buffer */
     unsigned	    fill;	/* Fill mark of input buffer */
@@ -49,4 +49,4 @@ int _scanf (struct indesc* d, const char* format, va_list ap);
 
 
 
-	     
+

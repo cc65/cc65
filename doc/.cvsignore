@@ -1,9 +1,12 @@
 .depend
-*.man
+*.aux
 *.dvi
 *.html
-*.info 
+*.info
+*.log
+*.man
 *.tex
+*.toc
 ar65.txt
 ca65.txt
 cc65.txt
@@ -11,6 +14,7 @@ cl65.txt
 coding.txt
 debugging.txt
 dio.txt
+funcref.txt
 geos.txt
 index.txt
 intro.txt

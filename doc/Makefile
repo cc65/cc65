@@ -12,6 +12,7 @@ SGML  =	ar65.sgml	\
 	coding.sgml	\
 	debugging.sgml	\
 	dio.sgml    	\
+        funcref.sgml    \
 	geos.sgml   	\
 	index.sgml  	\
 	intro.sgml	\

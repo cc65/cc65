@@ -43,6 +43,9 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="dio.html" name="dio.html"></tag>
   Low level disk I/O API.
 
+  <tag><htmlurl url="funcref.html" name="funcref.html"></tag>
+  A (currently incomplete) function reference.
+
   <tag><htmlurl url="geos.html" name="geos.html"></tag>
   GEOSLib manual in several formats.
 

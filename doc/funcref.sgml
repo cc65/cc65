@@ -1,0 +1,795 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>cc65 function reference
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
+<date>07.11.2002
+
+<abstract>
+cc65 is a C compiler for 6502 based systems. This function reference describes
+the available C functions supplied by the library.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Introduction<p>
+
+cc65 is a C compiler for 6502 based systems. It implements a subset of the ISO
+C standard plus additional functions specially crafted for 6502 systems or
+just some of the supported machines. This function refrence describes the
+available functions together with any limitations.
+
+<bf/Note:/ Standard C functions are listed here, but not described in detail.
+Since these functions behave identical on all standard compliant systems, they
+are described in any book covering standard C.
+
+Each entry for a function contains a detailed description
+
+<quote>
+<descrip>
+<tag/Function/Summary of what <bf/function/ does.
+<tag/Header/The header file that contains the declaration.
+<tag/Declaration/Describes the needed header files and declaration of the
+function.
+<tag/Description/Description of the function.
+<tag/Limits/Limits.
+<tag/Availability/The availability of the function.
+<tag/See also/Other related functions.
+<tag/Example/A piece of actual code using the function.
+</descrip>
+</quote>
+
+
+<sect>Functions by header file<p>
+
+<sect1><tt/conio.h/<label id="conio.h"><p>
+
+<itemize>
+<item><ref id="bgcolor" name="bgcolor">
+<item><ref id="bordercolor" name="bordercolor">
+<item><ref id="cclear" name="cclear">
+<item><ref id="cclearxy" name="cclearxy">
+<item><ref id="cgetc" name="cgetc">
+<!-- <item><ref id="chline" name="chline"> -->
+<!-- <item><ref id="chlinexy" name="chlinexy"> -->
+<item><ref id="clrscr" name="clrscr">
+<!-- <item><ref id="cprintf" name="cprintf"> -->
+<!-- <item><ref id="cputc" name="cputc"> -->
+<!-- <item><ref id="cputcxy" name="cputcxy"> -->
+<!-- <item><ref id="cputs" name="cputs"> -->
+<!-- <item><ref id="cputsxy" name="cputsxy"> -->
+<!-- <item><ref id="cursor" name="cursor"> -->
+<!-- <item><ref id="cvline" name="cvline"> -->
+<!-- <item><ref id="cvlinexy" name="cvlinexy"> -->
+<!-- <item><ref id="gotox" name="gotox"> -->
+<!-- <item><ref id="gotoxy" name="gotoxy"> -->
+<!-- <item><ref id="gotoy" name="gotoy"> -->
+<item><ref id="kbhit" name="kbhit">
+<!-- <item><ref id="revers" name="revers"> -->
+<!-- <item><ref id="screensize" name="screensize"> -->
+<item><ref id="textcolor" name="textcolor">
+<!-- <item><ref id="vcprintf" name="vcprintf"> -->
+<!-- <item><ref id="wherex" name="wherey"> -->
+</itemize>
+
+
+<sect1><tt/ctype.h/<label id="ctype.h"><p>
+
+<itemize>
+<item><ref id="isalnum" name="isalnum">
+<item><ref id="isalpha" name="isalpha">
+<item><ref id="isascii" name="isascii">
+<item><ref id="isblank" name="isblank">
+<item><ref id="iscntrl" name="iscntrl">
+<item><ref id="isdigit" name="isdigit">
+<item><ref id="isgraph" name="isgraph">
+<item><ref id="islower" name="islower">
+<item><ref id="isprint" name="isprint">
+<item><ref id="ispunct" name="ispunct">
+<item><ref id="isspace" name="isspace">
+<item><ref id="isupper" name="isupper">
+<item><ref id="isxdigit" name="isxdigit">
+<item><ref id="tolower" name="tolower">
+<item><ref id="toupper" name="toupper">
+</itemize>
+
+
+
+
+<sect>Alphabetical function reference<p>
+
+<sect1>bgcolor<label id="bgcolor"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the background text color.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ bgcolor (unsigned char color);/
+<tag/Description/The function will set a new background text color. It returns
+the old (current) background color.
+<tag/Limits/Background colors are system dependent. The function may have no effect
+on systems where the background color cannot be changed. The function is only
+available as fastcall function, so it may only be used in presence of a
+prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="bordercolor" name="bordercolor">,
+<ref id="textcolor" name="textcolor">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>bordercolor<label id="bordercolor"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the border (frame) color.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ bordercolor (unsigned char color);/
+<tag/Description/The function will set a new border color. It returns the old
+(current) border color.
+<tag/Limits/Border colors are system dependent. The function may have no effect
+on systems where the border color cannot be changed. The function is only
+available as fastcall function, so it may only be used in presence of a
+prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="bgcolor" name="bgcolor">,
+<ref id="textcolor" name="textcolor">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>cclear<label id="cclear"><p>
+
+<quote>
+<descrip>
+<tag/Function/Clear part of a line (write a given amount of spaces).
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ cclear (unsigned char length);/
+<tag/Description/The function clears part of a line by writing <tt/length/
+spaces in the current text color.
+<tag/Limits/The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cclearxy" name="cclearxy">,
+<ref id="clrscr" name="clrscr">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>cclearxy<label id="cclearxy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Clear part of a line (write a given amount of spaces) starting
+at a specific screen position.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void __fastcall__ cclearxy (unsigned char length);/
+<tag/Description/The function moves the cursor to a specific position, and
+will then clear part of the line by writing <tt/length/ spaces in the current
+text color.
+<tag/Limits/The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cclear" name="cclear">,
+<ref id="clrscr" name="clrscr">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>cgetc<label id="cgetc"><p>
+
+<quote>
+<descrip>
+<tag/Function/Read a character from the keyboard.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/char cgetc (void);/
+<tag/Description/The function reads a character from the keyboard. If there is
+no character available, <tt/cgetc/ waits until the user presses a key. If the
+cursor is enabled by use of the <tt/cursor/ function, a blinking cursor is
+displayed while waiting.
+<tag/Limits/If the system supports a keyboard buffer, <tt/cgetc/ will fetch a
+key from this buffer and wait only if the buffer is empty.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cursor" name="cursor">,
+<ref id="kbhit" name="kbhit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>clrscr<label id="clrscr"><p>
+
+<quote>
+<descrip>
+<tag/Function/Clear the text screen.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/void clrscr (void);/
+<tag/Description/The function clears the text screen and moves the cursor to
+the upper left corner.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cclear" name="cclear">,
+<ref id="cclearxy" name="cclearxy">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>cursor<label id="cursor"><p>
+
+<quote>
+<descrip>
+<tag/Function/Enable/disable a blinking cursor when waiting for keyboard input.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ cursor (unsigned char onoff);/
+<tag/Description/If the argument to the function is non zero, a blinking cursor
+will be enabled when the <tt/cgetc/ function waits for input from the keyboard.
+If the argument is zero, <tt/cgetc/ will wait without a blinking cursor.
+<tag/Limits/The function is only available as fastcall function, so it may only 
+be used in presence of a prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cgetc" name="cgetc">,
+<ref id="kbhit" name="kbhit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>isalnum<label id="isalnum"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is a letter or digit.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ isalnum (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is a letter or digit. The return value is non zero if the character
+is anything else.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalpha" name="isalpha">,
+<ref id="isascii" name="isascii">,
+<ref id="isblank" name="isblank">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isdigit" name="isdigit">,
+<ref id="isgraph" name="isgraph">,
+<ref id="islower" name="islower">,
+<ref id="isprint" name="isprint">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isspace" name="isspace">,
+<ref id="isupper" name="isupper">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>isalpha<label id="isalpha"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is a letter.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ isalpha (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is a letter. The return value is non zero if the character is anything else.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isascii" name="isascii">,
+<ref id="isblank" name="isblank">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isdigit" name="isdigit">,
+<ref id="isgraph" name="isgraph">,
+<ref id="islower" name="islower">,
+<ref id="isprint" name="isprint">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isspace" name="isspace">,
+<ref id="isupper" name="isupper">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>isascii<label id="isascii"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is in the ASCII (0..127) range.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ isascii (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is in the range 0..127 (the range of valid ASCII characters) and a non zero
+value if not.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isalpha" name="isalpha">,
+<ref id="isblank" name="isblank">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isdigit" name="isdigit">,
+<ref id="isgraph" name="isgraph">,
+<ref id="islower" name="islower">,
+<ref id="isprint" name="isprint">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isspace" name="isspace">,
+<ref id="isupper" name="isupper">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>isblank<label id="isblank"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is a space or tab.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ isblank (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is a blank or space character. The return value is non zero if the character
+is anything else.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isalpha" name="isalpha">,
+<ref id="isascii" name="isascii">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isdigit" name="isdigit">,
+<ref id="isgraph" name="isgraph">,
+<ref id="islower" name="islower">,
+<ref id="isprint" name="isprint">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isspace" name="isspace">,
+<ref id="isupper" name="isupper">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>iscntrl<label id="iscntrl"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is a control character.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ iscntrl (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is a control character. The return value is non zero if the character
+is anything else.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isalpha" name="isalpha">,
+<ref id="isascii" name="isascii">,
+<ref id="isblank" name="isblank">,
+<ref id="isdigit" name="isdigit">,
+<ref id="isgraph" name="isgraph">,
+<ref id="islower" name="islower">,
+<ref id="isprint" name="isprint">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isspace" name="isspace">,
+<ref id="isupper" name="isupper">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>isdigit<label id="isdigit"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is a digit.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ isdigit (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is a digit. The return value is non zero if the character is anything else.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isalpha" name="isalpha">,
+<ref id="isascii" name="isascii">,
+<ref id="isblank" name="isblank">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isgraph" name="isgraph">,
+<ref id="islower" name="islower">,
+<ref id="isprint" name="isprint">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isspace" name="isspace">,
+<ref id="isupper" name="isupper">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>isgraph<label id="isgraph"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is a printable character (except
+space).
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ isgraph (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is a printable character with the exception of space. The return value is non
+zero if the character is anything else.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isalpha" name="isalpha">,
+<ref id="isascii" name="isascii">,
+<ref id="isblank" name="isblank">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isdigit" name="isdigit">,
+<ref id="islower" name="islower">,
+<ref id="isprint" name="isprint">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isspace" name="isspace">,
+<ref id="isupper" name="isupper">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>islower<label id="islower"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is a lower case letter.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ islower (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is a lower case letter. The return value is non zero if the character is
+anything else.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isalpha" name="isalpha">,
+<ref id="isascii" name="isascii">,
+<ref id="isblank" name="isblank">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isdigit" name="isdigit">,
+<ref id="isgraph" name="isgraph">,
+<ref id="isprint" name="isprint">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isspace" name="isspace">,
+<ref id="isupper" name="isupper">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>isprint<label id="isprint"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is a printable character.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ isprint (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is a printable character (this includes the space character). The return value
+is non zero if the character is anything else.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isalpha" name="isalpha">,
+<ref id="isascii" name="isascii">,
+<ref id="isblank" name="isblank">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isdigit" name="isdigit">,
+<ref id="isgraph" name="isgraph">,
+<ref id="islower" name="islower">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isspace" name="isspace">,
+<ref id="isupper" name="isupper">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>ispunct<label id="ispunct"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is a printable character but not a
+space or an alphanumeric character.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ ispunct (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is a printable character, but not a space or anything alphanumeric. The return
+value is non zero if the character is anything else.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isalpha" name="isalpha">,
+<ref id="isascii" name="isascii">,
+<ref id="isblank" name="isblank">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isdigit" name="isdigit">,
+<ref id="isgraph" name="isgraph">,
+<ref id="islower" name="islower">,
+<ref id="isprint" name="isprint">,
+<ref id="isspace" name="isspace">,
+<ref id="isupper" name="isupper">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>isspace<label id="isspace"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is a a white-space character.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ isspace (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is a white space character. The return value is non zero if the character is
+anything else. The standard white space characters are: space, formfeed ('\f'),
+newline ('\n'), carriage return ('\r'), horizontal tab ('\t'), and vertical tab
+('\v').
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isalpha" name="isalpha">,
+<ref id="isascii" name="isascii">,
+<ref id="isblank" name="isblank">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isdigit" name="isdigit">,
+<ref id="isgraph" name="isgraph">,
+<ref id="islower" name="islower">,
+<ref id="isprint" name="isprint">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isupper" name="isupper">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>isupper<label id="isupper"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is an upper case letter.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ isupper (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is an upper case letter. The return value is non zero if the character is
+anything else.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isalpha" name="isalpha">,
+<ref id="isascii" name="isascii">,
+<ref id="isblank" name="isblank">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isdigit" name="isdigit">,
+<ref id="isgraph" name="isgraph">,
+<ref id="islower" name="islower">,
+<ref id="isprint" name="isprint">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isspace" name="isspace">,
+<ref id="isxdigit" name="isxdigit">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>isxdigit<label id="isxdigit"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if a given character is a hexadecimal digit.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ isxdigit (int c);/
+<tag/Description/The function returns a value of zero if the given argument
+is a hexadecimal digit (0..9, a..f and A..F). The return value is non zero
+if the character is anything else.
+<tag/Limits/When compiling with <tt/-Os/ the function is actually a macro. The
+generated inline sequence will not work correctly for values outside the range
+0..255. <bf/Note:/ The constant <tt/EOF/ is not part of this range. The non
+inline function may be accessed by <tt/#undef/'ing the macro. When compiling
+without <tt/-Os/, the function is only available as fastcall function, so it
+may only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="isalnum" name="isalnum">,
+<ref id="isalpha" name="isalpha">,
+<ref id="isascii" name="isascii">,
+<ref id="isblank" name="isblank">,
+<ref id="iscntrl" name="iscntrl">,
+<ref id="isdigit" name="isdigit">,
+<ref id="isgraph" name="isgraph">,
+<ref id="islower" name="islower">,
+<ref id="isprint" name="isprint">,
+<ref id="ispunct" name="ispunct">,
+<ref id="isspace" name="isspace">,
+<ref id="isupper" name="isupper">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>kbhit<label id="kbhit"><p>
+
+<quote>
+<descrip>
+<tag/Function/Check if there's a key waiting in the keyboard buffer.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char kbhit (void);/
+<tag/Description/The function returns a value of zero if there is no character
+waiting to be read from the keyboard. It returns non zero otherwise.
+<tag/Limits/If the system does not support a keyboard buffer (most systems
+do), the function is rather useless.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="cgetc" name="cgetc">,
+<ref id="cursor" name="cursor">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>textcolor<label id="textcolor"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the text color.
+<tag/Header/<tt/<ref id="conio.h" name="conio.h">/
+<tag/Declaration/<tt/unsigned char __fastcall__ textcolor (unsigned char color);/
+<tag/Description/The function will set a new text color. It returns the old
+(current) text color. Text output using any <tt/conio.h/ function will use
+the color set by this function.
+<tag/Limits/Text colors are system dependent. The function may have no effect
+on systems where the text color cannot be changed. The function is only
+available as fastcall function, so it may only be used in presence of a
+prototype.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="bgcolor" name="bgcolor">,
+<ref id="bordercolor" name="bordercolor">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>tolower<label id="tolower"><p>
+
+<quote>
+<descrip>
+<tag/Function/Convert a character into its lower case representation.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ tolower (int c);/
+<tag/Description/The function returns the given character converted to lower
+case. If the given character is not a letter, it is returned unchanged.
+<tag/Limits/The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="islower" name="islower">,
+<ref id="isupper" name="isupper">,
+<ref id="toupper" name="toupper">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+<sect1>toupper<label id="toupper"><p>
+
+<quote>
+<descrip>
+<tag/Function/Convert a character into its upper case representation.
+<tag/Header/<tt/<ref id="ctype.h" name="ctype.h">/
+<tag/Declaration/<tt/int __fastcall__ toupper (int c);/
+<tag/Description/The function returns the given character converted to upper
+case. If the given character is not a letter, it is returned unchanged.
+<tag/Limits/The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="islower" name="islower">,
+<ref id="isupper" name="isupper">,
+<ref id="tolower" name="tolower">
+<tag/Example/Actual code using the function.
+</descrip>
+</quote>
+
+
+</article>
+
+

@@ -242,4 +242,4 @@ clean:
 
 .PHONY: zap
 zap:	clean
-	@rm -f *.o *.lib *.tgi
+	@rm -f *.o *.emd *.lib *.tgi

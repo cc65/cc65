@@ -42,6 +42,7 @@
 /* common */
 #include "check.h"
 #include "coll.h"
+#include "print.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -258,6 +259,9 @@ void OpenIncludeFile (const char* Name, unsigned DirSpec)
 	PPError ("Cannot open include file `%s': %s", IF->Name, strerror (errno));
 	return;
     }
+
+    /* Debugging output */
+    Print (stdout, 1, "Opened include file `%s'\n", IF->Name);
 
     /* Allocate a new AFile structure */
     (void) NewAFile (IF, F);

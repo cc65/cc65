@@ -2135,7 +2135,7 @@ be used in presence of a prototype.
 <descrip>
 <tag/Function/Open and possibly create a file.
 <tag/Header/<tt/<ref id="fcntl.h" name="fcntl.h">/
-<tag/Declaration/<tt/int __fastcall__ open (const char* name, int flags, ...);/
+<tag/Declaration/<tt/int open (const char* name, int flags, ...);/
 <tag/Description/<tt/open/ opens a file and returns the file descriptor
 associated with it. On error, -1 is returned and an error code is stored in
 <tt/errno/. Several flags may be passed to <tt/open/ that change the behaviour.

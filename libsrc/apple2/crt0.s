@@ -7,7 +7,7 @@
 	.export		_exit
 	.import	   	initlib, donelib
 	.import	   	zerobss, push0
-	.import		__CODE_LOAD__, __BSS_LOAD__	; Linker generated
+       	.import	       	__STARTUP_LOAD__, __BSS_LOAD__	; Linker generated
 	.import		_main
 
         .include        "zeropage.inc"
@@ -18,13 +18,18 @@
 
 .segment	"EXEHDR"
 
-	.word	__CODE_LOAD__			; Start address
-	.word	__BSS_LOAD__ - __CODE_LOAD__	; Size
+       	.word  	__STARTUP_LOAD__                ; Start address
+       	.word  	__BSS_LOAD__ - __STARTUP_LOAD__	; Size
 
 ; ------------------------------------------------------------------------
-; Actual code
+; Create an empty LOWCODE segment to avoid linker warnings
 
-.code
+.segment        "LOWCODE"
+
+; ------------------------------------------------------------------------
+; Place the startup code in a special segment.
+
+.segment       	"STARTUP"
 
        	ldx	#zpspace-1
 L1:	lda	sp,x
@@ -91,6 +96,8 @@ L2:	lda	zpsave,x
 
 	jmp	RESTOR
 
+; ------------------------------------------------------------------------
+; Data
 
 .data
 

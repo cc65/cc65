@@ -13,35 +13,14 @@
 
 
 ; ------------------------------------------------------------------------
-; Define and export the ZP variables for the Oric runtime
+; Create an empty LOWCODE segment to avoid linker warnings
 
-	.exportzp	sp, sreg, regsave
-	.exportzp	ptr1, ptr2, ptr3, ptr4
-	.exportzp	tmp1, tmp2, tmp3, tmp4
-	.exportzp	regbank, zpspace
-
-.zeropage
-
-zpstart	= *
-sp:	      	.res   	2 	; Stack pointer
-sreg:	      	.res	2	; Secondary register/high 16 bit for longs
-regsave:      	.res	2	; slot to save/restore (E)AX into
-ptr1:	      	.res	2
-ptr2:	      	.res	2
-ptr3:	      	.res	2
-ptr4:	      	.res	2
-tmp1:	      	.res	1
-tmp2:	      	.res	1
-tmp3:	      	.res	1
-tmp4:	      	.res	1
-regbank:      	.res	6	; 6 byte register bank
-
-zpspace	= * - zpstart		; Zero page space allocated
-
-.code
+.segment        "LOWCODE"
 
 ; ------------------------------------------------------------------------
-; Actual code
+; Place the startup code in a special segment.
+
+.segment       	"STARTUP"
 
 ; Clear the BSS data
 
@@ -81,6 +60,9 @@ _exit:	jsr	donelib		; Run module destructors
 ; Back to BASIC
 
 	rts
+
+; ------------------------------------------------------------------------
+; Data
 
 .bss
 spsave:	.res	1

@@ -64,10 +64,10 @@ The linker is called as follows:
 ---------------------------------------------------------------------------
 Usage: ld65 [options] module ...
 Short options:
-  -h			Help (this text)
-  -m name		Create a map file
-  -o name	   	Name the default output file
-  -t type		Type of target system
+  -h	   		Help (this text)
+  -m name  		Create a map file
+  -o name  	   	Name the default output file
+  -t sys		Set the target system
   -v			Verbose mode
   -vm			Verbose map file
   -C name		Use linker config file
@@ -78,7 +78,9 @@ Short options:
 
 Long options:
   --help		Help (this text)
-  --version		Print the linker version
+  --mapfile name	Create a map file
+  --target sys		Set the target system
+  --version   		Print the linker version
 ---------------------------------------------------------------------------
 
 
@@ -88,8 +90,9 @@ Long options:
   Print the short option summary shown above.
 
 
-  -m name	   
-
+  -m name
+  --mapfile name
+	      
   This option (which needs an argument that will used as a filename for
   the generated map file) will cause the linker to generate a map file.
   The map file does contain a detailed overview over the modules used, the
@@ -104,7 +107,8 @@ Long options:
   name for the output file. However, for the builtin configurations, this
   name is used for the output file name.
 
-  -t target
+  -t sys
+  --target sys
 
   The argument for the -t switch is the name of the target system. Since
   this switch will activate a builtin configuration, it may not be used
@@ -170,7 +174,7 @@ Long options:
   address is used depends on the config file in use. For the builtin
   configurations, only the "none" system honors an explicit start address,
   all other builtin config provide their own.
-  
+
 
   -V
   --version

@@ -60,6 +60,7 @@ Long options:
   --debug-info 		Add debug info
   --help       		Help (this text)
   --include-dir dir	Set a compiler include directory path
+  --mapfile name	Create a map file
   --target sys 		Set the target system
   --version    		Print the version number
   --verbose    		Verbose mode
@@ -104,11 +105,11 @@ There are a few remaining options that control the behaviour of cl65:
 
   <tag><tt>-t sys, --target sys</tt></tag>
 
-  The default for this option is different from the compiler and linker in
-  the case that the option is missing: While the compiler and linker will
-  use the "none" system settings by default, cl65 will use the C64 as a
-  target system by default. This was choosen since most people seem to use
-  cc65 to develop for the C64.
+  The default for this option is different from the compiler and linker in the
+  case that the option is missing: While the other tools (compiler, assembler
+  and linker) will use the "none" system settings by default, cl65 will use
+  the C64 as a target system by default. This was choosen since most people
+  seem to use cc65 to develop for the C64.
 
 </descrip>
 

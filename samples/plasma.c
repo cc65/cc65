@@ -38,7 +38,7 @@
 
 
 /* Use static local variables for speed */
-#pragma staticlocals (1);
+#pragma staticlocals (1); 
 
 
 
@@ -79,19 +79,15 @@ static const unsigned char sinustable[0x100] = {
 
 
 
-static unsigned char *scrn;
-
-
-
-static void doplasma (void)
+static void doplasma (register unsigned char* scrn)
 {
     unsigned char xbuf[40];
     unsigned char ybuf[25];
-    unsigned char i,ii;
     unsigned char c1a,c1b;
     unsigned char c2a,c2b;
     unsigned char c1A,c1B;
     unsigned char c2A,c2B;
+    register unsigned char i, ii;
 
     c1a = c1A;
     c1b = c1B;
@@ -165,6 +161,7 @@ int main (void)
     unsigned long fps;
     unsigned      fps10;
 
+
 #if defined(__C64__)
     unsigned char block;
 #endif
@@ -206,13 +203,11 @@ int main (void)
     t = clock ();
     while (!kbhit()) {
       	/* Build page 1, then make it visible */
-        scrn = (unsigned char*)SCREEN1;
-        doplasma ();
+        doplasma ((unsigned char*)SCREEN1);
       	outb (&VIC.addr, PAGE1);
 
       	/* Build page 2, then make it visible */
-        scrn = (unsigned char*)SCREEN2;
-        doplasma ();
+        doplasma ((unsigned char*)SCREEN2);
       	outb (&VIC.addr, PAGE2);
 
       	/* Count frames */

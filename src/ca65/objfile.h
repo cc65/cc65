@@ -54,7 +54,7 @@ void ObjOpen (void);
 void ObjClose (void);
 /* Write an update header and close the object file. */
 
-void ObjWrite8 (unsigned char V);
+void ObjWrite8 (unsigned V);
 /* Write an 8 bit value to the file */
 
 void ObjWrite16 (unsigned V);

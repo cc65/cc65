@@ -237,7 +237,7 @@ static void DoAlign (void)
 
     /* Check if the alignment is a power of two */
     Bit = BitFind (Align);
-    if (Align != (0x01UL << Bit)) {
+    if (Align != (0x01L << Bit)) {
 	Error (ERR_ALIGN);
     } else {
 	SegAlign (Bit, (int) Val);
@@ -739,7 +739,7 @@ static void DoLocalChar (void)
 	if (IVal != '@' && IVal != '?') {
 	    Error (ERR_ILLEGAL_LOCALSTART);
 	} else {
-     	    LocalStart = IVal;
+     	    LocalStart = (char) IVal;
        	}
      	NextTok ();
     }

@@ -169,7 +169,7 @@ void ObjClose (void)
 
 
 
-void ObjWrite8 (unsigned char V)
+void ObjWrite8 (unsigned V)
 /* Write an 8 bit value to the file */
 {
     if (putc (V, F) == EOF) {

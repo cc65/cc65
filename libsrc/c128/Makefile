@@ -20,6 +20,9 @@
 %.joy:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
+%.mou:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
 %.ser:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
@@ -44,7 +47,7 @@ OBJS =	_scrsize.o		\
      	kbhit.o	       		\
         kernal.o        	\
         mainargs.o              \
-	mouse.o			\
+	mcbdefault.o		\
         randomize.o     	\
         revers.o        	\
 	slow.o			\
@@ -59,6 +62,8 @@ EMDS = c128-georam.emd c128-ram.emd c128-ramcart.emd c128-reu.emd c128-vdc.emd
 
 JOYS = c128-ptvjoy.joy c128-stdjoy.joy
 
+MOUS = c128-1351.mou
+
 SERS = c128-swlink.ser
 
 TGIS = c128-640-200-2.tgi c128-640-480-2.tgi
@@ -68,16 +73,16 @@ TGIS = c128-640-200-2.tgi c128-640-480-2.tgi
 
 .PHONY:	all clean zap
 
-all:   	$(OBJS) $(EMDS) $(JOYS) $(SERS) $(TGIS)
+all:   	$(OBJS) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(MOUS:.mou=.o) $(SERS:.ser=.o) $(TGIS:.tgi=.o)
 
 
 zap:	clean
-	@$(RM) $(EMDS) $(JOYS) $(SERS) $(TGIS)
+	@$(RM) $(EMDS) $(JOYS) $(MOUS) $(SERS) $(TGIS)
 
 

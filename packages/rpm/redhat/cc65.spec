@@ -103,7 +103,7 @@ Requires: %{name} = %{version}
 Copyright: Freeware
 Summary: Apple ][ specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
-                    
+
 %description apple2
 This package contains the header files and libraries needed to write
 programs for the Apple ][ using the cc65 crosscompiler.
@@ -200,6 +200,7 @@ programs for the Commodore C128 using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/lib/c128.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/c128-*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/c128-*.joy
+%attr(644,root,root) 		/usr/lib/cc65/mou/c128-*.mou
 %attr(644,root,root) 		/usr/lib/cc65/ser/c128-*.ser
 %attr(644,root,root) 		/usr/lib/cc65/tgi/c128-*.tgi
 
@@ -291,7 +292,7 @@ This package contains the header files and libraries needed to write
 programs for the Commodore PET-II (CBM600/700) family of computers using
 the cc65 crosscompiler.
 
-%files cbm610
+%files cbm610					      
 %attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm610.lib
 %attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm610.o
 %attr(644,root,root) 	       	/usr/lib/cc65/emd/cbm610-*.emd

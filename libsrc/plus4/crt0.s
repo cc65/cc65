@@ -4,10 +4,9 @@
 ; This must be the *first* file on the linker command line
 ;
 
-	.export		_exit  
+	.export		_exit
 	.import		initlib, donelib
-	.import	     	push0, _main
-	.import		initconio, doneconio, zerobss
+	.import	     	push0, _main, zerobss
 
 	.include	"plus4.inc"
 	.include	"../cbm/cbm.inc"
@@ -92,10 +91,6 @@ MemOk:	stx	sp
 
 	jsr	initlib
 
-; Initialize conio stuff
-
-	jsr	initconio
-
 ; Pass an empty command line
 
        	jsr    	push0		; argc
@@ -112,10 +107,6 @@ _exit:	jsr	donelib		; Run module destructors
 
 	ldx	spsave
 	txs
-
-; Reset the conio stuff
-
-	jsr	doneconio
 
 ; Copy back the zero page stuff
 

@@ -10,6 +10,8 @@
        	.include	"plus4.inc"
 
 
+; --------------------------------------------------------------------------
+
 _cgetc:	lda	KEY_COUNT 	; Get number of characters
        	ora	FKEY_COUNT	; Or with number of function key chars
        	bne	L2	  	; Jump if there are already chars waiting
@@ -45,4 +47,42 @@ L1:    	lda	KEY_COUNT
 L2:    	jsr    	KBDREAD	       	; Read char and return in A
        	ldx	#0
        	rts
+
+; --------------------------------------------------------------------------
+; Make the function keys return function key codes instead of the current
+; strings so the program will see and may handle them.
+; Undo this change when the program ends
+
+	.constructor	initkbd
+	.destructor	donekbd
+
+.proc	initkbd
+
+     	ldy	#15
+@L1:  	lda	fnkeys,y
+     	sta 	FKEY_SPACE,y
+     	dey
+     	bpl	@L1
+     	rts
+
+.endproc
+
+
+.proc	donekbd
+
+     	ldx    	#$39		; Copy the original function keys
+@L1:  	lda    	FKEY_ORIG,x
+     	sta    	FKEY_SPACE,x
+     	dex
+     	bpl    	@L1
+     	rts
+
+.endproc
+
+
+; Function key table, readonly
+
+.rodata
+fnkeys:	.byte	$01, $01, $01, $01, $01, $01, $01, $01
+     	.byte	133, 137, 134, 138, 135, 139, 136, 140
 

@@ -1054,10 +1054,10 @@ unsigned OptTransfers (CodeSeg* S)
        	    (N->Info & OF_XFR) != 0) {
 
 	    /* Check if it's a transfer and back */
-       	    if ((E->OPC == OP65_TAX && N->OPC == OP65_TXA && !RegXUsed (S, I+1)) ||
-       	        (E->OPC == OP65_TAY && N->OPC == OP65_TYA && !RegYUsed (S, I+1)) ||
-       	        (E->OPC == OP65_TXA && N->OPC == OP65_TAX && !RegAUsed (S, I+1)) ||
-       	        (E->OPC == OP65_TYA && N->OPC == OP65_TAY && !RegAUsed (S, I+1))) {
+       	    if ((E->OPC == OP65_TAX && N->OPC == OP65_TXA && !RegXUsed (S, I+2)) ||
+       	        (E->OPC == OP65_TAY && N->OPC == OP65_TYA && !RegYUsed (S, I+2)) ||
+       	        (E->OPC == OP65_TXA && N->OPC == OP65_TAX && !RegAUsed (S, I+2)) ||
+       	        (E->OPC == OP65_TYA && N->OPC == OP65_TAY && !RegAUsed (S, I+2))) {
 
 		/* If the next insn is a conditional branch, check if the insn
 		 * preceeding the first xfr will set the flags right, otherwise we

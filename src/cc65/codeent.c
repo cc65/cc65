@@ -710,7 +710,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (Chg & REG_SREG_HI) {
 	     	Out->SRegHi = -1;
 	    }
-	    /* Quick hack for some known functions: */
+       	    /* ## FIXME: Quick hack for some known functions: */
 	    if (strcmp (E->Arg, "tosandax") == 0) {
 		if (In->RegA == 0) {
 		    Out->RegA = 0;
@@ -725,6 +725,8 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		if (In->RegX == 0xFF) {
                     Out->RegX = 0xFF;
                 }
+            } else if (FindBoolCmpCond (E->Arg) != CMP_INV) {
+                Out->RegX = 0;
             }
 	    break;
 

@@ -7,9 +7,9 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,6 +39,7 @@
 /* common */
 #include "check.h"
 #include "hashstr.h"
+#include "hashtab.h"
 #include "xmalloc.h"
 
 /* ca65 */
@@ -54,24 +55,44 @@
 
 
 /*****************************************************************************/
+/*                                 Forwards                                  */
+/*****************************************************************************/
+
+
+
+static unsigned HT_GenHash (const void* Key);
+/* Generate the hash over a key. */
+
+static const void* HT_GetKey (void* Entry);
+/* Given a pointer to the user entry data, return a pointer to the key */
+
+static HashNode* HT_GetHashNode (void* Entry);
+/* Given a pointer to the user entry data, return a pointer to the hash node */
+
+static int HT_Compare (const void* Key1, const void* Key2);
+/* Compare two keys for equality */
+
+
+
+/*****************************************************************************/
 /*     	       	    		     Data				     */
 /*****************************************************************************/
 
 
 
 /* Struct that describes an identifer (macro param, local list) */
-typedef struct IdDesc_ IdDesc;
-struct IdDesc_ {
-    IdDesc*	    Next;     	/* Linked list */
+typedef struct IdDesc IdDesc;
+struct IdDesc {
+    IdDesc*  	    Next;     	/* Linked list */
     char       	    Id [1];	/* Identifier, dynamically allocated */
 };
 
 
 
 /* Struct that describes a macro definition */
-typedef struct Macro_ Macro;
-struct Macro_ {
-    Macro*     	    Next;      	/* Next macro with same hash */
+typedef struct Macro Macro;
+struct Macro {
+    HashNode        Node;       /* Hash list node */
     Macro*   	    List;	/* List of all macros */
     unsigned 	    LocalCount;	/* Count of local symbols */
     IdDesc*  	    Locals;	/* List of local symbols */
@@ -84,25 +105,32 @@ struct Macro_ {
     char       	    Name [1];	/* Macro name, dynamically allocated */
 };
 
+/* Hash table functions */
+static const HashFunctions HashFunc = {
+    HT_GenHash,
+    HT_GetKey,
+    HT_GetHashNode,
+    HT_Compare
+};
+
 /* Macro hash table */
-#define HASHTAB_SIZE     	117
-static Macro*  	MacroTab [HASHTAB_SIZE];
+static HashTable MacroTab = STATIC_HASHTABLE_INITIALIZER (117, &HashFunc);
 
 /* Global macro data */
 static Macro*  	MacroRoot = 0;	/* List of all macros */
 
 /* Structs that holds data for a macro expansion */
-typedef struct MacExp_ MacExp;
-struct MacExp_ {
-    MacExp*	Next;		/* Pointer to next expansion */
-    Macro* 	M;  	  	/* Which macro do we expand? */
-    unsigned	IfSP;		/* .IF stack pointer at start of expansion */
+typedef struct MacExp MacExp;
+struct MacExp {
+    MacExp*  	Next;		/* Pointer to next expansion */
+    Macro*   	M;  	  	/* Which macro do we expand? */
+    unsigned 	IfSP;		/* .IF stack pointer at start of expansion */
     TokNode*   	Exp;		/* Pointer to current token */
-    TokNode*	Final;		/* Pointer to final token */
+    TokNode* 	Final;		/* Pointer to final token */
     unsigned    LocalStart;	/* Start of counter for local symbol names */
-    unsigned	ParamCount;	/* Number of actual parameters */
+    unsigned 	ParamCount;	/* Number of actual parameters */
     TokNode**	Params;	  	/* List of actual parameters */
-    TokNode*	ParamExp;	/* Node for expanding parameters */
+    TokNode* 	ParamExp;	/* Node for expanding parameters */
 };
 
 /* Number of active macro expansions */
@@ -113,6 +141,44 @@ static int DoMacAbort = 0;
 
 /* Counter to create local names for symbols */
 static unsigned LocalName = 0;
+
+
+
+/*****************************************************************************/
+/*                           Hash table functions                            */
+/*****************************************************************************/
+
+
+
+static unsigned HT_GenHash (const void* Key)
+/* Generate the hash over a key. */
+{
+    return HashStr (Key);
+}
+
+
+
+static const void* HT_GetKey (void* Entry)
+/* Given a pointer to the user entry data, return a pointer to the index */
+{
+    return ((Macro*) Entry)->Name;
+}
+
+
+
+static HashNode* HT_GetHashNode (void* Entry)
+/* Given a pointer to the user entry data, return a pointer to the hash node */
+{
+    return &((Macro*) Entry)->Node;
+}
+
+
+
+static int HT_Compare (const void* Key1, const void* Key2)
+/* Compare two keys for equality */
+{
+    return (strcmp (Key1, Key2) == 0);
+}
 
 
 
@@ -140,7 +206,7 @@ static IdDesc* NewIdDesc (const char* Id)
 
 
 
-static Macro* NewMacro (const char* Name, unsigned HashVal, unsigned char Style)
+static Macro* NewMacro (const char* Name, unsigned char Style)
 /* Generate a new macro entry, initialize and return it */
 {
     /* Allocate memory */
@@ -148,6 +214,7 @@ static Macro* NewMacro (const char* Name, unsigned HashVal, unsigned char Style)
     Macro* M = xmalloc (sizeof (Macro) + Len);
 
     /* Initialize the macro struct */
+    InitHashNode (&M->Node, M);
     M->LocalCount = 0;
     M->Locals     = 0;
     M->ParamCount = 0;
@@ -156,16 +223,14 @@ static Macro* NewMacro (const char* Name, unsigned HashVal, unsigned char Style)
     M->TokRoot    = 0;
     M->TokLast    = 0;
     M->Style	  = Style;
-    memcpy (M->Name, Name, Len);
-    M->Name [Len] = '\0';
+    memcpy (M->Name, Name, Len+1);
 
     /* Insert the macro into the global macro list */
     M->List = MacroRoot;
     MacroRoot = M;
 
     /* Insert the macro into the hash table */
-    M->Next = MacroTab [HashVal];
-    MacroTab [HashVal] = M;
+    HT_Insert (&MacroTab, &M->Node);
 
     /* Return the new macro struct */
     return M;
@@ -250,28 +315,11 @@ static void MacSkipDef (unsigned Style)
 
 
 
-static Macro* MacFind (const char* Name, unsigned HashVal)
-/* Search for a macro in the hash table */
-{
-    /* Search for the identifier */
-    Macro* M = MacroTab [HashVal];
-    while (M) {
- 	if (strcmp (Name, M->Name) == 0) {
-	    return M;
-	}
-	M = M->Next;
-    }
-    return 0;
-}
-
-
-
 void MacDef (unsigned Style)
 /* Parse a macro definition */
 {
     Macro* M;
     TokNode* T;
-    unsigned HashVal;
     int HaveParams;
 
     /* We expect a macro name here */
@@ -281,11 +329,8 @@ void MacDef (unsigned Style)
     	return;
     }
 
-    /* Generate the hash value */
-    HashVal = HashStr (SVal) % HASHTAB_SIZE;
-
     /* Did we already define that macro? */
-    if (MacFind (SVal, HashVal) != 0) {
+    if (HT_Find (&MacroTab, SVal) != 0) {
        	/* Macro is already defined */
      	Error (ERR_SYM_ALREADY_DEFINED, SVal);
      	/* Skip tokens until we reach the final .endmacro */
@@ -294,7 +339,7 @@ void MacDef (unsigned Style)
     }
 
     /* Define the macro */
-    M = NewMacro (SVal, HashVal, Style);
+    M = NewMacro (SVal, Style);
 
     /* Switch to raw token mode and skip the macro name */
     EnterRawTokenMode ();
@@ -738,7 +783,7 @@ void MacExpandStart (void)
 /* Start expanding the macro in SVal */
 {
     /* Search for the macro */
-    Macro* M = MacFind (SVal, HashStr (SVal) % HASHTAB_SIZE);
+    Macro* M = HT_FindEntry (&MacroTab, SVal);
     CHECK (M != 0);
 
     /* Call the apropriate subroutine */
@@ -766,7 +811,7 @@ void MacAbort (void)
 int IsMacro (const char* Name)
 /* Return true if the given name is the name of a macro */
 {
-    return MacFind (Name, HashStr (Name) % HASHTAB_SIZE) != 0;
+    return (HT_Find (&MacroTab, Name) != 0);
 }
 
 
@@ -774,7 +819,7 @@ int IsMacro (const char* Name)
 int IsDefine (const char* Name)
 /* Return true if the given name is the name of a define style macro */
 {
-    Macro* M = MacFind (Name, HashStr (Name) % HASHTAB_SIZE);
+    Macro* M = HT_FindEntry (&MacroTab, Name);
     return (M != 0 && M->Style == MAC_STYLE_DEFINE);
 }
 

@@ -55,17 +55,17 @@
 
 
 
-static unsigned GenHash (const void* Index);
-/* Generate the hash over an index. */
+static unsigned HT_GenHash (const void* Key);
+/* Generate the hash over a key. */
 
-static const void* GetIndex (void* Entry);
-/* Given a pointer to the user entry data, return a pointer to the index */
+static const void* HT_GetKey (void* Entry);
+/* Given a pointer to the user entry data, return a pointer to the key. */
 
-static HashNode* GetHashNode (void* Entry);
+static HashNode* HT_GetHashNode (void* Entry);
 /* Given a pointer to the user entry data, return a pointer to the hash node */
 
-static int Compare (const void* Index1, const void* Index2);
-/* Compare two indices for equality */
+static int HT_Compare (const void* Key1, const void* Key2);
+/* Compare two keys for equality */
 
 
 
@@ -84,7 +84,7 @@ typedef struct FileEntry FileEntry;
 struct FileEntry {
     HashNode            Node;
     unsigned            Name;           /* File name */
-    unsigned	      	Index;		/* Index of entry */
+    unsigned  	      	Index;		/* Index of entry */
     unsigned long     	Size;		/* Size of file */
     unsigned long     	MTime;		/* Time of last modification */
 };
@@ -94,10 +94,10 @@ static Collection FileTab = STATIC_COLLECTION_INITIALIZER;
 
 /* Hash table functions */
 static const HashFunctions HashFunc = {
-    GenHash,
-    GetIndex,
-    GetHashNode,
-    Compare
+    HT_GenHash,
+    HT_GetKey,
+    HT_GetHashNode,
+    HT_Compare
 };
 
 /* Hash table, hashed by name */
@@ -111,15 +111,15 @@ static HashTable HashTab = STATIC_HASHTABLE_INITIALIZER (HASHTAB_COUNT, &HashFun
 
 
 
-static unsigned GenHash (const void* Index)
-/* Generate the hash over an index. */
+static unsigned HT_GenHash (const void* Key)
+/* Generate the hash over a key. */
 {
-    return (*(const unsigned*)Index & HASHTAB_MASK);
+    return (*(const unsigned*)Key & HASHTAB_MASK);
 }
 
 
 
-static const void* GetIndex (void* Entry)
+static const void* HT_GetKey (void* Entry)
 /* Given a pointer to the user entry data, return a pointer to the index */
 {
     return &((FileEntry*) Entry)->Name;
@@ -127,7 +127,7 @@ static const void* GetIndex (void* Entry)
 
 
 
-static HashNode* GetHashNode (void* Entry)
+static HashNode* HT_GetHashNode (void* Entry)
 /* Given a pointer to the user entry data, return a pointer to the hash node */
 {
     return &((FileEntry*) Entry)->Node;
@@ -135,10 +135,10 @@ static HashNode* GetHashNode (void* Entry)
 
 
 
-static int Compare (const void* Index1, const void* Index2)
-/* Compare two indices for equality */
+static int HT_Compare (const void* Key1, const void* Key2)
+/* Compare two keys for equality */
 {
-    return (*(const unsigned*)Index1 == *(const unsigned*)Index2);
+    return (*(const unsigned*)Key1 == *(const unsigned*)Key2);
 }
 
 

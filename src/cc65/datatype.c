@@ -713,9 +713,9 @@ type GetQualifier (const type* T)
      * type itself.
      */
     if (IsTypeArray (T)) {
-    	T += DECODE_SIZE + 1;
+     	T += DECODE_SIZE + 1;
     }
-    return (T[0] & T_QUAL_CONST);
+    return (T[0] & T_MASK_QUAL);
 }
 
 

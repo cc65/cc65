@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -65,6 +65,18 @@ unsigned OptBoolTrans (CodeSeg* S);
 unsigned OptCmp1 (CodeSeg* S);
 /* Search for the sequence
  *
+ *  	ldx	xx
+ *  	stx	tmp1
+ *  	ora	tmp1
+ *
+ * and replace it by
+ *
+ *  	ora	xx
+ */
+
+unsigned OptCmp2 (CodeSeg* S);
+/* Search for the sequence
+ *
  *  	stx	xx
  *  	stx	tmp1
  *  	ora	tmp1
@@ -75,7 +87,7 @@ unsigned OptCmp1 (CodeSeg* S);
  *  	ora	xx
  */
 
-unsigned OptCmp2 (CodeSeg* S);
+unsigned OptCmp3 (CodeSeg* S);
 /* Search for
  *
  *     	lda/and/ora/eor	...
@@ -89,7 +101,7 @@ unsigned OptCmp2 (CodeSeg* S);
  * and remove the cmp.
  */
 
-unsigned OptCmp3 (CodeSeg* S);
+unsigned OptCmp4 (CodeSeg* S);
 /* Search for
  *
  *  	lda	x
@@ -110,7 +122,7 @@ unsigned OptCmp3 (CodeSeg* S);
  * of this instruction.
  */
 
-unsigned OptCmp4 (CodeSeg* S);
+unsigned OptCmp5 (CodeSeg* S);
 /* Optimize compares of local variables:
  *
  *      ldy     #o
@@ -124,19 +136,19 @@ unsigned OptCmp4 (CodeSeg* S);
  *      jne/jeq L2
  */
 
-unsigned OptCmp5 (CodeSeg* S);
+unsigned OptCmp6 (CodeSeg* S);
 /* Search for calls to compare subroutines followed by a conditional branch
  * and replace them by cheaper versions, since the branch means that the
  * boolean value returned by these routines is not needed (we may also check
  * that explicitly, but for the current code generator it is always true).
  */
 
-unsigned OptCmp6 (CodeSeg* S);
+unsigned OptCmp7 (CodeSeg* S);
 /* Search for a sequence ldx/txa/branch and remove the txa if A is not
  * used later.
  */
 
-unsigned OptCmp7 (CodeSeg* S);
+unsigned OptCmp8 (CodeSeg* S);
 /* Check for register compares where the contents of the register and therefore
  * the result of the compare is known.
  */

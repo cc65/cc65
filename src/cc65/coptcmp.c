@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -281,6 +281,63 @@ unsigned OptBoolTrans (CodeSeg* S)
 unsigned OptCmp1 (CodeSeg* S)
 /* Search for the sequence
  *
+ *  	ldx	xx
+ *  	stx	tmp1
+ *  	ora	tmp1
+ *
+ * and replace it by
+ *
+ *  	ora	xx
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* L[3];
+
+      	/* Get next entry */
+       	L[0] = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (L[0]->OPC == OP65_LDX               &&
+	    !CS_RangeHasLabel (S, I+1, 2)       &&
+	    CS_GetEntries (S, L+1, I+1, 2)	&&
+       	    L[1]->OPC == OP65_STX	  	&&
+	    strcmp (L[1]->Arg, "tmp1") == 0     &&
+	    L[2]->OPC == OP65_ORA	    	&&
+	    strcmp (L[2]->Arg, "tmp1") == 0) {
+                
+            CodeEntry* X;
+
+	    /* Insert the ora instead */
+            X = NewCodeEntry (OP65_ORA, L[0]->AM, L[0]->Arg, 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I);
+
+	    /* Remove all other instructions */
+	    CS_DelEntries (S, I+1, 3);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptCmp2 (CodeSeg* S)        
+/* Search for the sequence
+ *
  *  	stx	xx
  *  	stx	tmp1
  *  	ora	tmp1
@@ -303,12 +360,12 @@ unsigned OptCmp1 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OP65_STX 	  		&&
+       	if (E->OPC == OP65_STX 	     		&&
 	    !CS_RangeHasLabel (S, I+1, 2)       &&
 	    CS_GetEntries (S, L, I+1, 2)	&&
-       	    L[0]->OPC == OP65_STX	  	&&
+       	    L[0]->OPC == OP65_STX    	  	&&
 	    strcmp (L[0]->Arg, "tmp1") == 0     &&
-	    L[1]->OPC == OP65_ORA	    	&&
+	    L[1]->OPC == OP65_ORA    	    	&&
 	    strcmp (L[1]->Arg, "tmp1") == 0) {
 
 	    /* Remove the remaining instructions */
@@ -333,7 +390,7 @@ unsigned OptCmp1 (CodeSeg* S)
 
 
 
-unsigned OptCmp2 (CodeSeg* S)
+unsigned OptCmp3 (CodeSeg* S)
 /* Search for
  *
  *     	lda/and/ora/eor	...
@@ -455,7 +512,7 @@ unsigned OptCmp2 (CodeSeg* S)
 
 
 
-unsigned OptCmp3 (CodeSeg* S)
+unsigned OptCmp4 (CodeSeg* S)
 /* Search for
  *
  *  	lda	x
@@ -533,7 +590,7 @@ unsigned OptCmp3 (CodeSeg* S)
 
 
 
-unsigned OptCmp4 (CodeSeg* S)
+unsigned OptCmp5 (CodeSeg* S)
 /* Optimize compares of local variables:
  *
  *      ldy     #o
@@ -642,7 +699,7 @@ unsigned OptCmp4 (CodeSeg* S)
 
 
 
-unsigned OptCmp5 (CodeSeg* S)
+unsigned OptCmp6 (CodeSeg* S)
 /* Search for calls to compare subroutines followed by a conditional branch
  * and replace them by cheaper versions, since the branch means that the
  * boolean value returned by these routines is not needed (we may also check
@@ -704,7 +761,7 @@ unsigned OptCmp5 (CodeSeg* S)
 
 
 
-unsigned OptCmp6 (CodeSeg* S)
+unsigned OptCmp7 (CodeSeg* S)
 /* Search for a sequence ldx/txa/branch and remove the txa if A is not
  * used later.
  */
@@ -748,7 +805,7 @@ unsigned OptCmp6 (CodeSeg* S)
 
 
 
-unsigned OptCmp7 (CodeSeg* S)
+unsigned OptCmp8 (CodeSeg* S)
 /* Check for register compares where the contents of the register and therefore
  * the result of the compare is known.
  */

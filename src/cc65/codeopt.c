@@ -1732,13 +1732,14 @@ static OptFunc DOptAdd4	       	= { OptAdd4,   	     "OptAdd4",        	100, 0, 
 static OptFunc DOptAdd5	       	= { OptAdd5,   	     "OptAdd5",        	 40, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBranchDist  	= { OptBranchDist,   "OptBranchDist",     0, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp1	       	= { OptCmp1,   	     "OptCmp1",        	 85, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp2	       	= { OptCmp2,   	     "OptCmp2",        	 75, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp1	       	= { OptCmp1,   	     "OptCmp1",        	 42, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp2	       	= { OptCmp2,   	     "OptCmp2",        	 85, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp3	       	= { OptCmp3,   	     "OptCmp3",        	 75, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp4	       	= { OptCmp4,   	     "OptCmp4",        	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp4	       	= { OptCmp4,   	     "OptCmp4",        	 75, 0, 0, 0, 0, 0 };
 static OptFunc DOptCmp5	       	= { OptCmp5,   	     "OptCmp5",        	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp6	       	= { OptCmp6,   	     "OptCmp6",        	 85, 0, 0, 0, 0, 0 };
-static OptFunc DOptCmp7	       	= { OptCmp7,   	     "OptCmp7",        	 50, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp6	       	= { OptCmp6,   	     "OptCmp6",        	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp7	       	= { OptCmp7,   	     "OptCmp7",        	 85, 0, 0, 0, 0, 0 };
+static OptFunc DOptCmp8	       	= { OptCmp8,   	     "OptCmp8",        	 50, 0, 0, 0, 0, 0 };
 static OptFunc DOptCondBranches	= { OptCondBranches, "OptCondBranches",  80, 0, 0, 0, 0, 0 };
 static OptFunc DOptDeadCode    	= { OptDeadCode,     "OptDeadCode",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptDeadJumps   	= { OptDeadJumps,    "OptDeadJumps",    100, 0, 0, 0, 0, 0 };
@@ -1809,6 +1810,7 @@ static OptFunc* OptFuncs[] = {
     &DOptCmp5,
     &DOptCmp6,
     &DOptCmp7,
+    &DOptCmp8,
     &DOptCondBranches,
     &DOptDeadCode,
     &DOptDeadJumps,
@@ -2173,6 +2175,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptCmp5, 1);
        	C += RunOptFunc (S, &DOptCmp6, 1);
        	C += RunOptFunc (S, &DOptCmp7, 1);
+       	C += RunOptFunc (S, &DOptCmp8, 1);
        	C += RunOptFunc (S, &DOptTest1, 1);
         C += RunOptFunc (S, &DOptLoad1, 1);
        	C += RunOptFunc (S, &DOptUnusedLoads, 1);

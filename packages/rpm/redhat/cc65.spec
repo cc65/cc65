@@ -290,6 +290,27 @@ programs for the Apple ][ using the cc65 crosscompiler.
 
 
 ###############################################################################
+#                            Oric Atmos subpackage                            #
+###############################################################################
+
+%package atmos
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: Oric Atmos specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description atmos
+This package contains the header files and libraries needed to write
+programs for the Oric Atmos using the cc65 crosscompiler.
+
+%files apple2
+%attr(644,root,root)		/usr/lib/cc65/lib/atmos.lib
+%attr(644,root,root)		/usr/lib/cc65/lib/atmos.o
+%doc src/ld65/cfg/atmos.cfg
+
+
+
+###############################################################################
 #		 		GEOS subpackage	 			      #
 ###############################################################################
 
@@ -365,6 +386,10 @@ install -m 644 libsrc/*.joy $RPM_BUILD_ROOT/usr/lib/cc65/joy
 install -m 644 libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi
 
 
+
+%changelog
+* Mon Apr 14 2003 Ullrich von Bassewitz <uz@cc65.org>
+Added a subpackage for the Oric Atmos.
 
 %changelog
 * Mon Feb 10 2003 Ullrich von Bassewitz <uz@cc65.org>

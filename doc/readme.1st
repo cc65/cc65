@@ -7,8 +7,9 @@ for instructions how to compile the stuff for the different systems.
 
 
 If you have a binary package: Have a look in the doc directory for
-information on how to use the tools. If you are new to cc65, the file
-intro.txt may be of interest to you.
+information on how to use the tools. If the doc dir is mostly empty,
+you will have to install the (separate) documentation package. If you
+are new to cc65, the file intro.txt may be of interest to you.
 
 To avoid having to mess with paths, you may want to set the environment
 variables

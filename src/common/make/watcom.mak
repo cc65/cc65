@@ -66,10 +66,11 @@ CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
 # All library OBJ files
 
 OBJS =	bitops.obj	\
+	cmdline.obj	\
 	hashstr.obj	\
 	wildargv.obj	\
 	xsprintf.obj
-			
+
 
 .PRECIOUS $(OBJS:.obj=.cc) $(LIB)
 

@@ -690,8 +690,9 @@ static unsigned OptAdd2 (CodeSeg* S)
 	    !CE_HasLabel (L[5])                 &&
 	    L[6]->OPC == OP65_JSR               &&
        	    strcmp (L[6]->Arg, "addeqysp") == 0 &&
-	    !CE_HasLabel (L[6])) {
-
+	    !CE_HasLabel (L[6])                 &&
+	    (GetRegInfo (S, I+7) & REG_AX) == 0) {
+		
 	    char Buf [20];
 	    CodeEntry* X;
 	    int Offs;
@@ -2015,9 +2016,8 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
 	    !CE_HasLabel (L[6])                 &&
 	    L[7]->OPC == OP65_JSR               &&
        	    strcmp (L[7]->Arg, "ldauidx") == 0  &&
-	    !CE_HasLabel (L[7])                 &&
-	    (GetRegInfo (S, I+8) & REG_AX) == 0) {
-
+	    !CE_HasLabel (L[7])) {
+		
 	    CodeEntry* X;
 
        	    /* Store the low byte and remove the TAY instead */

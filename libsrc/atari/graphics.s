@@ -1,25 +1,109 @@
 ;
-; Christian Groessler, December 2000
+; Christian Groessler, October 2001
 ;
 ; this file provides an equivalent to the BASIC GRAPHICS function
 ;
-; void __fastcall__ graphics(unsigned char mode);
+; int __fastcall__ graphics(unsigned char mode);
+;
+;
 
 	.export	_graphics
 	.constructor	initscrmem,28
 
+	.import	findfreeiocb
+	.import	__seterrno,__do_oserror,__oserror
+	.import	fddecusage
+	.import	clriocb
+	.import	fdtoiocb
+	.import	newfd
 	.import	__graphmode_used
+	.importzp tmp1,tmp2,tmp3
 
 	.include	"atari.inc"
+	.include	"../common/errno.inc"
 
 	.code
 
+; set new grapics mode
+; gets new mode in A
+; returns handle or -1 on error
+; uses tmp1, tmp2, tmp3, tmp4 (in subroutines)
 
 .proc	_graphics
 
-	rts		; not implemented yet!
+;	tax
+;	and	#15		; get required graphics mode
+;	cmp	#12
+;	bcs	invmode		; invalid mode
+;	txa
+;	and	#$c0		; invalid bits set?
+;	bne	invmode
 
-.endproc
+;	stx	tmp1
+	sta	tmp1		; remember graphics mode
+
+parmok:	jsr	findfreeiocb
+	beq	iocbok		; we found one
+
+	lda	#<EMFILE	; "too many open files"
+	ldx	#>EMFILE
+seterr:	jsr	__seterrno
+	lda	#$FF
+	tax
+	rts			; return -1
+
+;invmode:ldx	#>EINVAL
+;	lda	#<EINVAL
+;	bne	seterr
+
+iocbok:	txa
+	tay			; move iocb # into Y
+	lda	#3
+	sta	tmp3		; name length + 1
+	lda	#<scrdev
+	ldx	#>scrdev
+	jsr	newfd
+	tya
+	tax
+	bcs	doopen		; C set: open needed
+
+	ldx	#0
+	lda	tmp2		; get fd used
+	jsr	fdtoiocb
+
+doopen:	txa
+	;brk
+	pha
+	jsr	clriocb
+	pla
+	tax
+	lda	#<scrdev
+	sta	ICBAL,x
+	lda	#>scrdev
+	sta	ICBAH,x
+	lda	#OPEN
+	sta	ICCOM,x
+	lda	tmp1		; get requested graphics mode
+	and	#15
+	sta	ICAX2,x
+	lda	tmp1
+	and	#$30
+	eor	#$10
+	ora	#12
+	sta	ICAX1,x
+
+	jsr	CIOV
+	bmi	cioerr
+
+	lda	tmp2		; get fd
+	ldx	#0
+	stx	__oserror
+	rts
+
+cioerr:	jsr	fddecusage	; decrement usage counter of fd as open failed
+	jmp	__do_oserror
+
+.endproc	; _graphics
 
 
 ; calc. upper memory limit to use
@@ -42,9 +126,12 @@
 	sta	APPMHI+1
 ignore:	rts
 
-.endproc
+.endproc	; initscrmem
 
 	.rodata
+
+scrdev:	.byte	"S:", 0
+
 
 ; memory usage of the different graphics modes (0-31)
 ; values < 0 of "bytes needed" are mappped to 0

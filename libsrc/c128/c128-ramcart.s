@@ -100,7 +100,7 @@ INSTALL:
 @readonly:
 	lda	#<EM_ERR_NO_DEVICE
 	ldx	#>EM_ERR_NO_DEVICE
-	rts
+;	rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.

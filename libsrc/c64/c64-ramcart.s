@@ -1,5 +1,5 @@
 ;
-; Extended memory driver for the RamCart 64/128KB cartridge. Driver works 
+; Extended memory driver for the RamCart 64/128KB cartridge. Driver works
 ; without problems when statically linked.
 ; Code is based on GEORAM code by Ullrich von Bassewitz.
 ; Maciej 'YTM/Elysium' Witkowiak <ytm@elysium.pl>
@@ -100,7 +100,7 @@ INSTALL:
 @readonly:
 	lda	#<EM_ERR_NO_DEVICE
 	ldx	#>EM_ERR_NO_DEVICE
-	rts
+;	rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.

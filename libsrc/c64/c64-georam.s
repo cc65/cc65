@@ -61,7 +61,7 @@ pagecount:      .word   2048            ; Currently fixed
 INSTALL:
         lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
-        rts
+;       rts                     ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.

@@ -61,7 +61,7 @@ pagecount:      .word   2048            ; Currently fixed
 INSTALL:
         lda     #<EM_ERR_OK
         ldx     #>EM_ERR_OK
-        rts
+;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.
@@ -245,7 +245,7 @@ setup:  sta     ptr1
         sta     ptr2
         iny
         lda     (ptr1),y
-        sta     ptr2+1
+        sta     ptr2+1                                              
 
 ; Get the count, calculate -(count-1) and store it into ptr3
 

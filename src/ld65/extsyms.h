@@ -58,7 +58,7 @@ typedef struct ExtSymTab ExtSymTab;
 
 
 
-ExtSym* NewExtSym (ExtSymTab* Tab, const char* Name);
+ExtSym* NewExtSym (ExtSymTab* Tab, unsigned Name);
 /* Create a new external symbol and insert it into the list */
 
 ExtSymTab* NewExtSymTab (void);
@@ -67,7 +67,7 @@ ExtSymTab* NewExtSymTab (void);
 void FreeExtSymTab (ExtSymTab* Tab);
 /* Free an external symbol structure */
 
-ExtSym* GetExtSym (const ExtSymTab* Tab, const char* Name);
+ExtSym* GetExtSym (const ExtSymTab* Tab, unsigned Name);
 /* Return the entry for the external symbol with the given name. Return NULL
  * if there is no such symbol.
  */
@@ -83,8 +83,8 @@ const ExtSym* ExtSymList (const ExtSymTab* Tab);
 unsigned ExtSymNum (const ExtSym* E);
 /* Return the number of an external symbol */
 
-const char* ExtSymName (const ExtSym* E);
-/* Return the symbol name */
+unsigned ExtSymName (const ExtSym* E);
+/* Return the symbol name index */
 
 const ExtSym* ExtSymNext (const ExtSym* E);
 /* Return the next symbol in the list */

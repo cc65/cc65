@@ -834,6 +834,7 @@ static void ParseO65 (void)
     unsigned AttrFlags = atNone;
 
     /* Remember the attributes read */
+    unsigned CfgSValId;
     unsigned OS = 0;            /* Initialize to keep gcc happy */
     unsigned Version = 0;
 
@@ -857,19 +858,21 @@ static void ParseO65 (void)
                 AttrFlags |= atExport;
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
+                /* Convert the string into a string index */
+                CfgSValId = GetStringId (CfgSVal);
 	        /* Check if the export symbol is also defined as an import. */
-	       	if (O65GetImport (O65FmtDesc, CfgSVal) != 0) {
+	       	if (O65GetImport (O65FmtDesc, CfgSValId) != 0) {
 		    CfgError ("Exported symbol `%s' cannot be an import", CfgSVal);
 		}
       		/* Check if we have this symbol defined already. The entry
       		 * routine will check this also, but we get a more verbose
       		 * error message when checking it here.
       		 */
-      	 	if (O65GetExport (O65FmtDesc, CfgSVal) != 0) {
+      	 	if (O65GetExport (O65FmtDesc, CfgSValId) != 0) {
       	  	    CfgError ("Duplicate exported symbol: `%s'", CfgSVal);
       	 	}
 		/* Insert the symbol into the table */
-	  	O65SetExport (O65FmtDesc, CfgSVal);
+	  	O65SetExport (O65FmtDesc, CfgSValId);
 	    	break;
 
 	    case CFGTOK_IMPORT:
@@ -877,19 +880,21 @@ static void ParseO65 (void)
                 AttrFlags |= atImport;
 	      	/* We expect an identifier */
 		CfgAssureIdent ();
+                /* Convert the string into a string index */
+                CfgSValId = GetStringId (CfgSVal);
 	        /* Check if the imported symbol is also defined as an export. */
-	       	if (O65GetExport (O65FmtDesc, CfgSVal) != 0) {
+	       	if (O65GetExport (O65FmtDesc, CfgSValId) != 0) {
 		    CfgError ("Imported symbol `%s' cannot be an export", CfgSVal);
 		}
       	    	/* Check if we have this symbol defined already. The entry
       	    	 * routine will check this also, but we get a more verbose
       	    	 * error message when checking it here.
       	    	 */
-      	    	if (O65GetImport (O65FmtDesc, CfgSVal) != 0) {
+      	    	if (O65GetImport (O65FmtDesc, CfgSValId) != 0) {
       	    	    CfgError ("Duplicate imported symbol: `%s'", CfgSVal);
       	    	}
 	    	/* Insert the symbol into the table */
-	    	O65SetImport (O65FmtDesc, CfgSVal);
+	    	O65SetImport (O65FmtDesc, CfgSValId);
 	    	break;
 
 	    case CFGTOK_TYPE:
@@ -987,7 +992,7 @@ static void ParseFormats (void)
 	/* Map the identifier to a token */
 	cfgtok_t FormatTok;
        	CfgSpecialToken (Formats, ENTRY_COUNT (Formats), "Format");
-	FormatTok = CfgTok;
+	FormatTok = CfgTok;                        
 
 	/* Skip the name and the following colon */
 	CfgNextTok ();

@@ -69,6 +69,16 @@ INLINE unsigned GetStringId (const char* S)
 #  define GetStringId(S)        SP_Add (&StrPool, (S))
 #endif
 
+#if defined(HAVE_INLINE)
+INLINE const char* GetString (unsigned Index)
+/* Convert a string index into a string */
+{
+    return SP_Get (&StrPool, Index);
+}
+#else
+#  define GetString(Index)      SP_Get (&StrPool, (Index))
+#endif
+
 void WriteStrPool (void);
 /* Write the string pool to the object file */
 

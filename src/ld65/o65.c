@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1999-2003 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -316,7 +316,7 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
     		CircularRefError (E);
     	    } else if (E->Expr == 0) {
     		/* Dummy export, must be an o65 imported symbol */
-    		ExtSym* S = O65GetImport (D->D, GetString (E->Name));
+    		ExtSym* S = O65GetImport (D->D, E->Name);
     		CHECK (S != 0);
     		if (D->ExtRef) {
     		    /* We cannot have more than one external reference in o65 */
@@ -820,7 +820,7 @@ static void O65WriteImports (O65Desc* D)
     S = ExtSymList (D->Imports);
     while (S) {
      	/* Get the name */
-     	const char* Name = ExtSymName (S);
+     	const char* Name = GetString (ExtSymName (S));
      	/* And write it to the output file */
      	WriteData (D->F, Name, strlen (Name) + 1);
      	/* Next symbol */
@@ -863,13 +863,14 @@ static void O65WriteExports (O65Desc* D)
 	ExprDesc ED;
 
 	/* Get the name */
-	const char* Name = ExtSymName (S);
+	unsigned NameIdx = ExtSymName (S);
+        const char* Name = GetString (NameIdx);
 
 	/* Get the export for this symbol. We've checked before that this
 	 * export does really exist, so if it is unresolved, or if we don't
 	 * find it, there is an error in the linker code.
 	 */
-	Export*	E = FindExport (GetStringId (Name));
+	Export*	E = FindExport (NameIdx);
 	if (E == 0 || IsUnresolvedExport (E)) {
 	    Internal ("Unresolved export `%s' found in O65WriteExports", Name);
 	}
@@ -1105,7 +1106,7 @@ void O65SetOS (O65Desc* D, unsigned OS, unsigned Version, unsigned Id)
 
 
 
-ExtSym* O65GetImport (O65Desc* D, const char* Ident)
+ExtSym* O65GetImport (O65Desc* D, unsigned Ident)
 /* Return the imported symbol or NULL if not found */
 {
     /* Retrieve the symbol from the table */
@@ -1114,7 +1115,7 @@ ExtSym* O65GetImport (O65Desc* D, const char* Ident)
 
 
 
-void O65SetImport (O65Desc* D, const char* Ident)
+void O65SetImport (O65Desc* D, unsigned Ident)
 /* Set an imported identifier */
 {
     /* Insert the entry into the table */
@@ -1123,7 +1124,7 @@ void O65SetImport (O65Desc* D, const char* Ident)
 
 
 
-ExtSym* O65GetExport (O65Desc* D, const char* Ident)
+ExtSym* O65GetExport (O65Desc* D, unsigned Ident)
 /* Return the exported symbol or NULL if not found */
 {
     /* Retrieve the symbol from the table */
@@ -1132,15 +1133,15 @@ ExtSym* O65GetExport (O65Desc* D, const char* Ident)
 
 
 
-void O65SetExport (O65Desc* D, const char* Ident)
+void O65SetExport (O65Desc* D, unsigned Ident)
 /* Set an exported identifier */
 {
     /* Get the export for this symbol and check if it does exist and is
      * a resolved symbol.
      */
-    Export* E = FindExport (GetStringId (Ident));
+    Export* E = FindExport (Ident);
     if (E == 0 || IsUnresolvedExport (E)) {
-	Error ("Unresolved export: `%s'", Ident);
+	Error ("Unresolved export: `%s'", GetString (Ident));
     }
 
     /* Insert the entry into the table */
@@ -1229,7 +1230,7 @@ static int O65Unresolved (unsigned Name, void* D)
 /* Called if an unresolved symbol is encountered */
 {
     /* Check if the symbol is an imported o65 symbol */
-    if (O65GetImport (D, GetString (Name)) != 0) {
+    if (O65GetImport (D, Name) != 0) {
 	/* This is an external symbol, relax... */
 	return 1;
     } else {

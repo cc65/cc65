@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -37,13 +37,15 @@
 
 /* common */
 #include "check.h"
+#include "coll.h"
 #include "hashstr.h"
 #include "xmalloc.h"
 
 /* ca65 */
 #include "error.h"
-#include "objfile.h"
 #include "filetab.h"
+#include "objfile.h"
+#include "spool.h"
 
 
 
@@ -56,65 +58,46 @@
 /* An entry in the file table */
 typedef struct FileEntry FileEntry;
 struct FileEntry {
+    unsigned            Name;           /* File name */
     FileEntry* 	      	Next;		/* Next in hash list */
     unsigned	      	Index;		/* Index of entry */
     unsigned long     	Size;		/* Size of file */
     unsigned long     	MTime;		/* Time of last modification */
-    char	      	Name[1];	/* Name, dynamically allocated */
 };
 
 /* Array of all entries, listed by index */
-static FileEntry**	FileTab   = 0;
-static unsigned		FileCount = 0;
-static unsigned 	FileMax   = 0;
+static Collection FileTab = STATIC_COLLECTION_INITIALIZER;
 
 /* Hash table, hashed by name */
-#define HASHTAB_SIZE	31
+#define HASHTAB_MASK    0x1FU
+#define HASHTAB_SIZE   	(HASHTAB_MASK + 1)
 static FileEntry*	HashTab[HASHTAB_SIZE];
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code			   	     */
+/*     	       	    	 	     Code			   	     */
 /*****************************************************************************/
 
 
 
-static FileEntry* NewFileEntry (const char* Name, unsigned long Size, unsigned long MTime)
+static FileEntry* NewFileEntry (unsigned Name, unsigned long Size, unsigned long MTime)
 /* Create a new FileEntry, insert it into the tables and return it */
 {
-    /* Get the length of the name */
-    unsigned Len = strlen (Name);
-
     /* Get the hash over the name */
-    unsigned Hash = HashStr (Name) % HASHTAB_SIZE;
+    unsigned Hash = (Name & HASHTAB_MASK);
 
     /* Allocate memory for the entry */
-    FileEntry* F = xmalloc (sizeof (FileEntry) + Len);
+    FileEntry* F = xmalloc (sizeof (FileEntry));
 
     /* Initialize the fields */
-    F->Index  	= FileCount+1;
+    F->Name     = Name;
+    F->Index  	= CollCount (&FileTab) + 1;     /* First file has index #1 */
     F->Size   	= Size;
     F->MTime  	= MTime;
-    memcpy (F->Name, Name, Len+1);
-
-    /* Count the entries and grow the file table if needed */
-    if (FileCount >= FileMax) {
-    	/* We need to grow the table. Create a new one. */
-    	unsigned NewFileMax   = (FileMax == 0)? 32 : FileMax * 2;
-       	FileEntry** NewFileTab = xmalloc (sizeof (FileEntry*) * NewFileMax);
-
-    	/* Copy the old entries */
-    	memcpy (NewFileTab, FileTab, sizeof (FileEntry*) * FileCount);
-
-    	/* Use the new table */
-    	xfree (FileTab);
-    	FileTab = NewFileTab;
-    	FileMax = NewFileMax;
-    }
 
     /* Insert the file into the file table */
-    FileTab [FileCount++] = F;
+    CollAppend (&FileTab, F);
 
     /* Insert the entry into the hash table */
     F->Next = HashTab[Hash];
@@ -129,21 +112,23 @@ static FileEntry* NewFileEntry (const char* Name, unsigned long Size, unsigned l
 const char* GetFileName (unsigned Name)
 /* Get the name of a file where the name index is known */
 {
-    PRECONDITION (Name <= FileCount);
+    const FileEntry* F;
+
     if (Name == 0) {
 	/* Name was defined outside any file scope, use the name of the first
 	 * file instead. Errors are then reported with a file position of
      	 * line zero in the first file.
 	 */
-	if (FileCount == 0) {
+	if (CollCount (&FileTab) == 0) {
     	    /* No files defined until now */
        	    return "(outside file scope)";
 	} else {
-       	    return FileTab [0]->Name;
+            F = CollConstAt (&FileTab, 0);
 	}
     } else {
-        return FileTab [Name-1]->Name;
+        F = CollConstAt (&FileTab, Name-1);
     }
+    return GetString (F->Name);
 }
 
 
@@ -151,14 +136,17 @@ const char* GetFileName (unsigned Name)
 unsigned GetFileIndex (const char* Name)
 /* Return the file index for the given file name. */
 {
+    /* Get the string pool index from the name */
+    unsigned NameIdx = GetStringId (Name);
+
     /* Get the hash over the name */
-    unsigned Hash = HashStr (Name) % HASHTAB_SIZE;
+    unsigned Hash = (NameIdx & HASHTAB_MASK);
 
     /* Search the linear hash list */
     FileEntry* F = HashTab[Hash];
     while (F) {
 	/* Is it this one? */
-	if (strcmp (Name, F->Name) == 0) {
+       	if (NameIdx == F->Name) {
 	    /* Found, return the index */
 	    return F->Index;
 	}
@@ -179,7 +167,7 @@ unsigned AddFile (const char* Name, unsigned long Size, unsigned long MTime)
  */
 {
     /* Create a new file entry and insert it into the tables */
-    FileEntry* F = NewFileEntry (Name, Size, MTime);
+    FileEntry* F = NewFileEntry (GetStringId (Name), Size, MTime);
 
     /* Return the index */
     return F->Index;
@@ -196,16 +184,16 @@ void WriteFiles (void)
     ObjStartFiles ();
 
     /* Write the file count */
-    ObjWriteVar (FileCount);
+    ObjWriteVar (CollCount (&FileTab));
 
     /* Write the file data */
-    for (I = 0; I < FileCount; ++I) {
+    for (I = 0; I < CollCount (&FileTab); ++I) {
 	/* Get a pointer to the entry */
-	FileEntry* F = FileTab[I];
+	const FileEntry* F = CollConstAt (&FileTab, I);
 	/* Write the fields */
+	ObjWriteVar (F->Name);
 	ObjWrite32 (F->MTime);
 	ObjWrite32 (F->Size);
-	ObjWriteStr (F->Name);
     }
 
     /* Done writing files */

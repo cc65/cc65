@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1999-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -101,16 +101,16 @@ void O65SetOption (O65Desc* D, unsigned Type, const void* Data, unsigned DataLen
 void O65SetOS (O65Desc* D, unsigned OS, unsigned Version, unsigned Id);
 /* Set an option describing the target operating system */
 
-ExtSym* O65GetImport (O65Desc* D, const char* Ident);
+ExtSym* O65GetImport (O65Desc* D, unsigned Ident);
 /* Return the imported symbol or NULL if not found */
 
-void O65SetImport (O65Desc* D, const char* Ident);
+void O65SetImport (O65Desc* D, unsigned Ident);
 /* Set an imported identifier */
 
-ExtSym* O65GetExport (O65Desc* D, const char* Ident);
+ExtSym* O65GetExport (O65Desc* D, unsigned Ident);
 /* Return the exported symbol or NULL if not found */
 
-void O65SetExport (O65Desc* D, const char* Ident);
+void O65SetExport (O65Desc* D, unsigned Ident);
 /* Set an exported identifier */
 
 void O65WriteTarget (O65Desc* D, File* F);

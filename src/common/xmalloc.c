@@ -6,10 +6,10 @@
 /*					    				     */
 /*					    				     */
 /*					    				     */
-/* (C) 2000-2001 Ullrich von Bassewitz	    				     */
-/*	   	 Wacholderweg 14					     */
-/*	   	 D-70597 Stuttgart					     */
-/* EMail:  	 uz@musoftware.de					     */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*	   								     */
 /*	   								     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -35,7 +35,8 @@
 
 #include <stdlib.h>
 #include <string.h>
-
+           
+/* common */
 #include "abend.h"
 #include "debugflag.h"
 #include "xmalloc.h"
@@ -51,12 +52,19 @@
 void* xmalloc (size_t Size)
 /* Allocate memory, check for out of memory condition. Do some debugging */
 {
-    /* Allocate memory */
-    void* P = malloc (Size);
+    void* P = 0;
 
-    /* Check for errors */
-    if (P == 0 && Size != 0) {
-	AbEnd ("Out of memory - requested block size = %lu", (unsigned long) Size);
+    /* Allow zero sized requests and return NULL in this case */
+    if (Size) {
+
+        /* Allocate memory */
+        P = malloc (Size);
+
+        /* Check for errors */
+        if (P == 0) {
+            AbEnd ("Out of memory - requested block size = %lu",
+                   (unsigned long) Size);
+        }
     }
 
     /* Return a pointer to the block */

@@ -57,9 +57,9 @@
 
 typedef struct FileInfo FileInfo;
 struct FileInfo {
+    unsigned        Name;      	       	  /* File name index */
     unsigned long   MTime;                /* Time of last modification */
     unsigned long   Size;                 /* Size of the file */
-    char*           Name;      	       	  /* File name */
 };
 
 

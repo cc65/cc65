@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -34,9 +34,10 @@
 
 
 /* ld65 */
+#include "dbginfo.h"
 #include "fileinfo.h"
 #include "lineinfo.h"
-#include "dbginfo.h"
+#include "spool.h"
 
 
 
@@ -54,7 +55,8 @@ void PrintDbgInfo (ObjData* O, FILE* F)
     /* Output the files section */
     for (I = 0; I < O->FileCount; ++I) {
 	const FileInfo* FI = O->Files[I];
-	fprintf (F, "file\t\"%s\", %lu, %lu\n", FI->Name, FI->Size, FI->MTime);
+	fprintf (F, "file\t\"%s\", %lu, %lu\n",
+                 GetString (FI->Name), FI->Size, FI->MTime);
     }
 
     /* Output the lines */
@@ -72,7 +74,7 @@ void PrintDbgInfo (ObjData* O, FILE* F)
 	}
 
 	/* Name and line number */
-	fprintf (F, "line\t\"%s\", %lu", LI->File->Name, LI->Pos.Line);
+	fprintf (F, "line\t\"%s\", %lu", GetString (LI->File->Name), LI->Pos.Line);
 
 	/* Code ranges */
 	for (J = 0; J < CollCount (CodeRanges); ++J) {

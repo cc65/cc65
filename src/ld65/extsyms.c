@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1999-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -42,6 +42,7 @@
 /* ld65 */
 #include "error.h"
 #include "extsyms.h"
+#include "spool.h"
 
 
 
@@ -53,20 +54,21 @@
 
 /* Structure holding an external symbol */
 struct ExtSym {
+    unsigned    Name;  	        /* Name index */
     ExtSym*  	List;		/* Next entry in list of all symbols */
     ExtSym*    	Next;  		/* Next entry in hash list */
     unsigned   	Flags;		/* Generic flags */
     unsigned 	Num;		/* Number of external symbol */
-    char       	Name [1];	/* Name - dynamically allocated */
 };
 
 /* External symbol table structure */
-#define HASHTAB_SIZE  	53
+#define HASHTAB_MASK    0x3FU
+#define HASHTAB_SIZE   	(HASHTAB_MASK + 1)
 struct ExtSymTab {
     ExtSym*	Root;  		/* List of symbols */
-    ExtSym*	Last;		/* Pointer to last symbol */
-    unsigned	Count;		/* Number of symbols */
-    ExtSym*	HashTab [HASHTAB_SIZE];
+    ExtSym*	Last;  		/* Pointer to last symbol */
+    unsigned	Count; 		/* Number of symbols */
+    ExtSym*	HashTab[HASHTAB_SIZE];
 };
 
 
@@ -77,30 +79,27 @@ struct ExtSymTab {
 
 
 
-ExtSym* NewExtSym (ExtSymTab* Tab, const char* Name)
+ExtSym* NewExtSym (ExtSymTab* Tab, unsigned Name)
 /* Create a new external symbol and insert it into the table */
 {
     /* Get the hash value of the string */
-    unsigned Hash = HashStr (Name) % HASHTAB_SIZE;
-
-    /* Get the length of the name */
-    unsigned Len = strlen (Name);
+    unsigned Hash = (Name & HASHTAB_MASK);
 
     /* Check for duplicates */
-    ExtSym* E =	GetExtSym (Tab, Name);	/* Don't care about duplicate hash here... */
+    ExtSym* E =	GetExtSym (Tab, Name);
     if (E != 0) {
 	/* We do already have a symbol with this name */
-     	Error ("Duplicate external symbol `%s'", Name);
+     	Error ("Duplicate external symbol `%s'", GetString (Name));
     }
 
     /* Allocate memory for the structure */
-    E = xmalloc (sizeof (ExtSym) + Len);
+    E = xmalloc (sizeof (ExtSym));
 
     /* Initialize the structure */
+    E->Name  = Name;
     E->List  = 0;
     E->Flags = 0;
     E->Num   = Tab->Count;
-    memcpy (E->Name, Name, Len+1);
 
     /* Insert the entry into the list of all symbols */
     if (Tab->Last == 0) {
@@ -114,8 +113,8 @@ ExtSym* NewExtSym (ExtSymTab* Tab, const char* Name)
     ++Tab->Count;
 
     /* Insert the symbol into the hash table */
-    E->Next = Tab->HashTab [Hash];
-    Tab->HashTab [Hash] = E;
+    E->Next = Tab->HashTab[Hash];
+    Tab->HashTab[Hash] = E;
 
     /* Done, return the created entry */
     return E;
@@ -171,18 +170,18 @@ void FreeExtSymTab (ExtSymTab* Tab)
 
 
 
-ExtSym* GetExtSym (const ExtSymTab* Tab, const char* Name)
+ExtSym* GetExtSym (const ExtSymTab* Tab, unsigned Name)
 /* Return the entry for the external symbol with the given name. Return NULL
  * if there is no such symbol.
  */
 {
     /* Hash the name */
-    unsigned Hash = HashStr (Name) % HASHTAB_SIZE;
+    unsigned Hash = (Name & HASHTAB_MASK);
 
     /* Check the linked list */
-    ExtSym* E = Tab->HashTab [Hash];
+    ExtSym* E = Tab->HashTab[Hash];
     while (E) {
-	if (strcmp (E->Name, Name) == 0) {
+	if (E->Name == Name) {
 	    /* Found it */
 	    break;
 	}
@@ -221,8 +220,8 @@ unsigned ExtSymNum (const ExtSym* E)
 
 
 
-const char* ExtSymName (const ExtSym* E)
-/* Return the symbol name */
+unsigned ExtSymName (const ExtSym* E)
+/* Return the symbol name index */
 {
     return E->Name;
 }
@@ -234,6 +233,7 @@ const ExtSym* ExtSymNext (const ExtSym* E)
 {
     return E->List;
 }
+
 
 
 

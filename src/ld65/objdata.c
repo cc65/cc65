@@ -175,7 +175,7 @@ const char* GetSourceFileName (const ObjData* O, unsigned Index)
 	PRECONDITION (Index < O->FileCount);
 
 	/* Return the name */
-	return O->Files[Index]->Name;
+	return GetString (O->Files[Index]->Name);
 
     }
 }

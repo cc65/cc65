@@ -58,14 +58,14 @@ static type OptionalQualifiers (type Q)
 
 	    case TOK_CONST:
 		if (Q & T_QUAL_CONST) {
-		    Error (ERR_DUPLICATE_QUALIFIER, "const");
-		}
+		    Error ("Duplicate qualifier: `const'");
+		}					 
 		Q |= T_QUAL_CONST;
 		break;
 
 	    case TOK_VOLATILE:
 		if (Q & T_QUAL_VOLATILE) {
-		    Error (ERR_DUPLICATE_QUALIFIER, "volatile");
+		    Error ("Duplicate qualifier: `volatile'");
 		}
 		Q |= T_QUAL_VOLATILE;
 		break;
@@ -192,7 +192,7 @@ static void ParseEnumDecl (void)
 
 	/* We expect an identifier */
    	if (curtok != TOK_IDENT) {
-   	    Error (ERR_IDENT_EXPECTED);
+   	    Error ("Identifier expected");
    	    continue;
    	}
 
@@ -241,7 +241,7 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 	    Entry = AddStructSym (Name, 0, 0);
 	} else if (SymIsLocal (Entry) && (Entry->Flags & SC_STRUCT) == 0) {
 	    /* Already defined in the level but no struct */
-	    Error (ERR_SYMBOL_KIND);
+	    Error ("Symbol `%s' is already different kind", Name);
 	}
     	return Entry;
     }
@@ -469,7 +469,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 		    Entry = FindTagSym (CurTok.Ident);
 		    if (Entry) {
 			if (SymIsLocal (Entry) && (Entry->Flags & SC_ENUM) == 0) {
-		    	    Error (ERR_SYMBOL_KIND);
+		    	    Error ("Symbol `%s' is already different kind", Entry->Name);
 			}
 		    } else {
 			/* Insert entry into table ### */
@@ -477,7 +477,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 		    /* Skip the identifier */
 		    NextToken ();
 		} else {
-    	            Error (ERR_IDENT_EXPECTED);
+    	            Error ("Identifier expected");
 		}
 	    }
 	    /* Remember we have an extra type decl */
@@ -500,7 +500,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 
     	default:
     	    if (Default < 0) {
-    		Error (ERR_TYPE_EXPECTED);
+    		Error ("Type expected");
 		D->Type[0] = T_INT;
 		D->Type[1] = T_END;
     	    } else {
@@ -539,7 +539,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 
 	/* List of identifiers expected */
 	if (curtok != TOK_IDENT) {
-	    Error (ERR_IDENT_EXPECTED);
+	    Error ("Identifier expected");
 	}
 
 	/* Create a symbol table entry with type int */
@@ -567,7 +567,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
     /* An optional list of type specifications follows */
     while (curtok != TOK_LCURLY) {
 
-	DeclSpec 	Spec;
+	DeclSpec    	Spec;
 
 	/* Read the declaration specifier */
 	ParseDeclSpec (&Spec, SC_AUTO, T_INT);
@@ -577,7 +577,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 	 */
 	if ((Spec.StorageClass & SC_AUTO) == 0 &&
 	    (Spec.StorageClass & SC_REGISTER) == 0) {
-	    Error (ERR_ILLEGAL_STORAGE_CLASS);
+	    Error ("Illegal storage class");
 	}
 
 	/* Parse a comma separated variable list */
@@ -595,7 +595,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 		    /* Found it, change the default type to the one given */
 		    ChangeSymType (Sym, ParamTypeCvt (Decl.Type));
 		} else {
-		    Error (ERR_UNKNOWN_IDENT, Decl.Ident);
+		    Error ("Unknown identifier: `%s'", Decl.Ident);
 		}
 	    }
 
@@ -639,7 +639,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 	 */
 	if ((Spec.StorageClass & SC_AUTO) == 0 &&
 	    (Spec.StorageClass & SC_REGISTER) == 0) {
-	    Error (ERR_ILLEGAL_STORAGE_CLASS);
+	    Error ("Illegal storage class");
 	}
 	Spec.StorageClass = SC_AUTO | SC_PARAM | SC_DEF;
 
@@ -687,7 +687,7 @@ static void ParseAnsiParamList (FuncDesc* F)
      	 * parameters.
      	 */
        	if (ANSI && (F->Flags & FD_UNNAMED_PARAMS) != 0) {
-     	    Error (ERR_MISSING_PARAM_NAME);
+     	    Error ("Parameter name omitted");
      	}
     }
 }
@@ -775,7 +775,7 @@ static void Decl (Declaration* D, unsigned Mode)
 	Decl (D, Mode);
 	/* Set the fastcall flag */
 	if (!IsTypeFunc (T)) {
-	    Error (ERR_ILLEGAL_MODIFIER);
+	    Error ("__fastcall__ modifier applied to non function");
 	} else {
 	    FuncDesc* F = DecodePtr (T+1);
        	    F->Flags |= FD_FASTCALL;
@@ -799,7 +799,7 @@ static void Decl (Declaration* D, unsigned Mode)
      	    NextToken ();
      	} else {
      	    if (Mode == DM_NEED_IDENT) {
-     	       	Error (ERR_IDENT_EXPECTED);
+     	       	Error ("Identifier expected");
      	    }
      	    D->Ident[0] = '\0';
      	    return;
@@ -879,7 +879,11 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 
     /* Check the size of the generated type */
     if (!IsTypeFunc (D->Type) && !IsTypeVoid (D->Type) && SizeOf (D->Type) >= 0x10000) {
-     	Error (ERR_ILLEGAL_SIZE);
+	if (D->Ident[0] != '\0') {
+	    Error ("Size of `%s' is invalid", D->Ident);
+	} else {
+	    Error ("Invalid size");
+	}
     }
 }
 
@@ -952,7 +956,7 @@ static void ParseVoidInit (void)
 		break;
 
 	    default:
-		Error (ERR_ILLEGAL_TYPE);
+		Error ("Illegal type in initialization");
 	    	break;
 
 	}
@@ -986,7 +990,7 @@ static void ParseStructInit (type* Type)
      */
     Tab = Entry->V.S.SymTab;
     if (Tab == 0) {
-     	Error (ERR_INIT_INCOMPLETE_TYPE);
+     	Error ("Cannot initialize variables with incomplete type");
 	/* Returning here will cause lots of errors, but recovery is difficult */
 	return;
     }
@@ -995,7 +999,7 @@ static void ParseStructInit (type* Type)
     Entry = Tab->SymHead;
     while (curtok != TOK_RCURLY) {
  	if (Entry == 0) {
- 	    Error (ERR_TOO_MANY_INITIALIZERS);
+ 	    Error ("Too many initializers");
  	    return;
  	}
  	ParseInit (Entry->Type);
@@ -1091,7 +1095,7 @@ void ParseInit (type* T)
      	    } else if (count < sz) {
      	     	g_zerobytes ((sz - count) * SizeOf (T + DECODE_SIZE + 1));
      	    } else if (count > sz) {
-     	     	Error (ERR_TOO_MANY_INITIALIZERS);
+     	     	Error ("Too many initializers");
      	    }
      	    break;
 
@@ -1109,7 +1113,7 @@ void ParseInit (type* T)
 	    /* FALLTHROUGH */
 
      	default:
-	    Error (ERR_ILLEGAL_TYPE);
+	    Error ("Illegal type");
 	    break;
 
     }

@@ -99,7 +99,7 @@ static void Parse (void)
 
 	/* Don't accept illegal storage classes */
 	if (Spec.StorageClass == SC_AUTO || Spec.StorageClass == SC_REGISTER) {
-	    Error (ERR_ILLEGAL_STORAGE_CLASS);
+	    Error ("Illegal storage class");
 	    Spec.StorageClass = SC_EXTERN | SC_STATIC;
 	}
 
@@ -164,11 +164,11 @@ static void Parse (void)
 	     	    	if (!IsTypeVoid (Decl.Type)) {
 	     	    	    if (!IsTypeArray (Decl.Type)) {
 	     	    	      	/* Size is unknown and not an array */
-	     	    	      	Error (ERR_UNKNOWN_SIZE);
+	     	    	      	Error ("Variable `%s' has unknown size", Decl.Ident);
 	     	    	    }
 	     	    	} else if (ANSI) {
 	     	    	    /* We cannot declare variables of type void */
-	     	    	    Error (ERR_ILLEGAL_TYPE);
+	     	    	    Error ("Illegal type for variable `%s'", Decl.Ident);
 	     	    	}
 	     	    }
 
@@ -191,10 +191,10 @@ static void Parse (void)
 
 	     	    if (IsTypeVoid (Decl.Type)) {
 	     	    	/* We cannot declare variables of type void */
-	     		Error (ERR_ILLEGAL_TYPE);
+			Error ("Illegal type for variable `%s'", Decl.Ident);
 	     	    } else if (Size == 0) {
 	     		/* Size is unknown */
-	     		Error (ERR_UNKNOWN_SIZE);
+			Error ("Variable `%s' has unknown size", Decl.Ident);
 	     	    }
 
 	     	    /* Switch to the BSS segment */

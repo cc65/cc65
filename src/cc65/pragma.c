@@ -117,7 +117,7 @@ static void StringPragma (void (*Func) (const char*))
 /* Handle a pragma that expects a string parameter */
 {
     if (curtok != TOK_SCONST) {
-	Error (ERR_STRLIT_EXPECTED);
+	Error ("String literal expected");
     } else {
      	/* Get the string */
      	const char* Name = GetLiteral (curval);
@@ -139,7 +139,7 @@ static void SegNamePragma (void (*Func) (const char*))
 /* Handle a pragma that expects a segment name parameter */
 {
     if (curtok != TOK_SCONST) {
-	Error (ERR_STRLIT_EXPECTED);
+	Error ("String literal expected");
     } else {
      	/* Get the segment name */
      	const char* Name = GetLiteral (curval);
@@ -153,7 +153,7 @@ static void SegNamePragma (void (*Func) (const char*))
 	} else {
 
 	    /* Segment name is invalid */
-	    Error (ERR_ILLEGAL_SEG_NAME, Name);
+	    Error ("Illegal segment name: `%s'", Name);
 
 	}
 
@@ -190,7 +190,7 @@ void DoPragma (void)
 
     /* Identifier must follow */
     if (curtok != TOK_IDENT) {
-	Error (ERR_IDENT_EXPECTED);
+	Error ("Identifier expected");
 	return;
     }
 

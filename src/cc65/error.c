@@ -46,83 +46,8 @@
 
 
 /*****************************************************************************/
-/*	  			     Data  		     		     */
+/*   	  			     Data  		     		     */
 /*****************************************************************************/
-
-
-
-/* Error messages sorted by ErrTypes */
-static char* ErrMsg [ERR_COUNT-1] = {
-    "Syntax error",
-    "`\"' expected",
-    "`:' expected",
-    "`;' expected",
-    "`,' expected",
-    "`(' expected",
-    "`)' expected",
-    "`[' expected",
-    "`]' expected",
-    "`{' expected",
-    "`}' expected",
-    "Identifier expected",
-    "Type expected",
-    "Incompatible types",
-    "Incompatible pointer types",
-    "Too many arguments in function call",
-    "Too few arguments in function call",
-    "Duplicate macro parameter: %s",
-    "Variable identifier expected",
-    "Integer expression expected",
-    "Constant expression expected",
-    "No active loop",
-    "Redefinition of `%s'",
-    "Conflicting types for `%s'",
-    "String literal expected",
-    "`while' expected",
-    "Function must return a value",
-    "Function cannot return a value",
-    "Unexpected `continue'",
-    "Undefined symbol: `%s'",
-    "Undefined label: `%s'",
-    "Too many local variables",
-    "Too many initializers",
-    "Cannot initialize incomplete type",
-    "Cannot subscript",
-    "Operation not allowed with this type of argument",
-    "Struct expected",
-    "Struct/union has no field named `%s'",
-    "Struct pointer expected",
-    "lvalue expected",
-    "Expression expected",
-    "Preprocessor expression expected",
-    "Illegal type",
-    "Illegal function call",
-    "Illegal indirection",
-    "Illegal address",
-    "Illegal hex digit",
-    "Illegal character constant",
-    "Illegal modifier",
-    "Illegal type qualifier",
-    "Illegal storage class",
-    "Illegal attribute",
-    "Illegal segment name: `%s'",
-    "Division by zero",
-    "Modulo operation with zero",
-    "Range error",
-    "Symbol is already different kind",
-    "Too many lexical levels",
-    "Parameter name omitted",
-    "Old style function decl used as prototype",
-    "Declaration for parameter `%s' but no such parameter",
-    "Cannot take address of a register variable",
-    "Illegal size of data type",
-    "__fastcall__ is not allowed for C functions",
-    "Variable has unknown size",
-    "Unknown identifier: `%s'",
-    "Duplicate qualifier: `%s'",
-    "Assignment to const",
-    "Pointer types differ in type qualifiers",
-};
 
 
 
@@ -195,18 +120,7 @@ static void IntError (const char* Filename, unsigned Line, const char* Msg, va_l
 
 
 
-void Error (unsigned ErrNum, ...)
-/* Print an error message */
-{
-    va_list ap;
-    va_start (ap, ErrNum);
-    IntError (GetCurrentFile(), curpos, ErrMsg [ErrNum-1], ap);
-    va_end (ap);
-}
-
-
-
-void MError (const char* Format, ...)
+void Error (const char* Format, ...)
 /* Print an error message */
 {
     va_list ap;

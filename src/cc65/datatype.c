@@ -194,7 +194,7 @@ type* GetImplicitFuncType (void)
 type* PointerTo (const type* T)
 /* Return a type string that is "pointer to T". The type string is allocated
  * on the heap and may be freed after use.
- */			       
+ */
 {
     /* Get the size of the type string including the terminator */
     unsigned Size = TypeLen (T) + 1;
@@ -382,7 +382,7 @@ unsigned SizeOf (const type* T)
     switch (UnqualifiedType (T[0])) {
 
     	case T_VOID:
-    	    Error (ERR_ILLEGAL_SIZE);
+    	    Error ("Variable has unknown size");
 	    return 1;	/* Return something that makes sense */
 
 	case T_SCHAR:
@@ -450,7 +450,7 @@ unsigned TypeOf (const type* T)
     FuncDesc* F;
 
     switch (UnqualifiedType (T[0])) {
-
+	    
 	case T_SCHAR:
     	    return CF_CHAR;
 
@@ -484,7 +484,7 @@ unsigned TypeOf (const type* T)
        	    return CF_INT | CF_UNSIGNED;
 
        	default:
-       	    Error (ERR_ILLEGAL_TYPE);
+       	    Error ("Illegal type");
        	    return CF_INT;
     }
 }

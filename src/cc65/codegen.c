@@ -94,7 +94,7 @@ static void CheckLocalOffs (unsigned Offs)
     if (Offs >= 256) {
 	/* Too many local vars */
        	AddCodeLine (";*** Too many locals");
-	Error (ERR_TOO_MANY_LOCALS);
+	Error ("Too many local variables");
     }
 }
 

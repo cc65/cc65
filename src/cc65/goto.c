@@ -56,7 +56,7 @@ void DoGoto (void)
     /* Label name must follow */
     if (curtok != TOK_IDENT) {
 
-       	Error (ERR_IDENT_EXPECTED);
+       	Error ("Identifier expected");
 
     } else {
 

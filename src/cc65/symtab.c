@@ -176,7 +176,7 @@ static void CheckSymTable (SymTable* Tab)
 	    if (Flags & SC_LABEL) {
 		if ((Flags & SC_DEF) == 0) {
 		    /* Undefined label */
-		    Error (ERR_UNDEFINED_LABEL, Entry->Name);
+		    Error ("Undefined label: `%s'", Entry->Name);
 		} else if ((Flags & SC_REF) == 0) {
 		    /* Defined but not used */
 		    Warning ("`%s' is defined but never used", Entry->Name);
@@ -536,10 +536,10 @@ SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab)
      	/* We do have an entry. This may be a forward, so check it. */
      	if ((Entry->Flags & SC_STRUCT) == 0) {
 	    /* Existing symbol is not a struct */
-	    Error (ERR_SYMBOL_KIND);
+	    Error ("Symbol `%s' is already different kind", Name);
 	} else if (Size > 0 && Entry->V.S.Size > 0) {
      	    /* Both structs are definitions. */
-     	    Error (ERR_MULTIPLE_DEFINITION, Name);
+     	    Error ("Multiple definition for `%s'", Name);
      	} else {
 	    /* Define the struct size if it is given */
 	    if (Size > 0) {
@@ -574,9 +574,9 @@ SymEntry* AddEnumSym (const char* Name, int Val)
     SymEntry* Entry = FindSymInTable (SymTab, Name, HashStr (Name));
     if (Entry) {
 	if (Entry->Flags != SC_ENUM) {
-	    Error (ERR_SYMBOL_KIND);
+	    Error ("Symbol `%s' is already different kind", Name);
 	} else {
-	    Error (ERR_MULTIPLE_DEFINITION, Name);
+     	    Error ("Multiple definition for `%s'", Name);
 	}
 	return Entry;
     }
@@ -608,8 +608,8 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
      	if ((Entry->Flags & SC_DEF) != 0 && (Flags & SC_DEF) != 0) {
      	    /* Trying to define the label more than once */
-       	    Error (ERR_MULTIPLE_DEFINITION, Name);
-     	}
+       	    Error ("Label `%s' is defined more than once", Name);
+     	}						 
      	Entry->Flags |= Flags;
 
     } else {
@@ -639,7 +639,7 @@ SymEntry* AddLocalSym (const char* Name, type* Type, unsigned Flags, int Offs)
     if (Entry) {
 
     	/* We have a symbol with this name already */
-     	Error (ERR_MULTIPLE_DEFINITION, Name);
+     	Error ("Multiple definition for `%s'", Name);
 
     } else {
 
@@ -675,7 +675,7 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
 
     	/* We have a symbol with this name already */
      	if (Entry->Flags & SC_TYPE) {
-     	    Error (ERR_MULTIPLE_DEFINITION, Name);
+     	    Error ("Multiple definition for `%s'", Name);
      	    return Entry;
      	}
 
@@ -695,7 +695,7 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
     	    if ((Size != 0 && ESize != 0) ||
     	  	TypeCmp (Type+DECODE_SIZE+1, EType+DECODE_SIZE+1) < TC_EQUAL) {
     	  	/* Types not identical: Conflicting types */
-    	  	Error (ERR_CONFLICTING_TYPES, Name);
+    	  	Error ("Conflicting types for `%s'", Name);
     	    } else {
     	  	/* Check if we have a size in the existing definition */
     	  	if (ESize == 0) {
@@ -707,8 +707,8 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
        	} else {
 	    /* New type must be identical */
 	    if (TypeCmp (EType, Type) < TC_EQUAL) {
-     	     	Error (ERR_CONFLICTING_TYPES, Name);
-	    }
+     	     	Error ("Conflicting types for `%s'", Name);
+	    }					   
 
 	    /* In case of a function, use the new type descriptor, since it
 	     * contains pointers to the new symbol tables that are needed if
@@ -772,7 +772,7 @@ void MakeZPSym (const char* Name)
     if (Entry) {
 	Entry->Flags |= SC_ZEROPAGE;
     } else {
-     	Error (ERR_UNDEFINED_SYMBOL, Name);
+     	Error ("Undefined symbol: `%s'", Name);
     }
 }
 

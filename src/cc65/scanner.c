@@ -192,7 +192,7 @@ int IsSym (char *s)
 static void unknown (char C)
 /* Error message for unknown character */
 {
-    MError ("Invalid input character with code %02X", C & 0xFF);
+    Error ("Invalid input character with code %02X", C & 0xFF);
     NextChar (); 			/* Skip */
 }
 
@@ -202,7 +202,7 @@ static unsigned hexval (int c)
 /* Convert a hex digit into a value */
 {
     if (!isxdigit (c)) {
-	Error (ERR_ILLEGAL_HEX_DIGIT);
+	Error ("Invalid hexadecimal digit: `%c'", c);
     }
     if (isdigit (c)) {
 	return c - '0';
@@ -288,7 +288,7 @@ static int ParseChar (void)
      		}
      		break;
      	    default:
-     		Error (ERR_ILLEGAL_CHARCONST);
+     		Error ("Illegal character constant");
 		C = ' ';
 		break;
      	}
@@ -318,7 +318,7 @@ static void CharConst (void)
 
     /* Check for closing quote */
     if (CurC != '\'') {
-       	Error (ERR_QUOTE_EXPECTED);
+       	Error ("`\'' expected");
     } else {
 	/* Skip the quote */
 	NextChar ();
@@ -350,7 +350,7 @@ static void StringConst (void)
 
 	while (CurC != '\"') {
 	    if (CurC == '\0') {
-	     	MError ("Unexpected newline");
+	     	Error ("Unexpected newline");
 	     	break;
 	    }
 	    AddLiteralChar (ParseChar ());
@@ -754,7 +754,7 @@ void NextToken (void)
 	    } while (CurC == ' ');
 	    if (!IsSym (token) || strcmp (token, "pragma") != 0) {
 	      	/* OOPS - should not happen */
-	      	MError ("Preprocessor directive expected");
+	      	Error ("Preprocessor directive expected");
 	    }
 	    nxttok = TOK_PRAGMA;
 	    break;
@@ -768,7 +768,7 @@ void NextToken (void)
 
 
 
-void Consume (token_t Token, unsigned ErrNum)
+void Consume (token_t Token, const char* ErrorMsg)
 /* Eat token if it is the next in the input stream, otherwise print an error
  * message.
  */
@@ -776,7 +776,7 @@ void Consume (token_t Token, unsigned ErrNum)
     if (curtok == Token) {
 	NextToken ();
     } else {
-       	Error (ErrNum);
+       	Error (ErrorMsg);
     }
 }
 
@@ -785,7 +785,7 @@ void Consume (token_t Token, unsigned ErrNum)
 void ConsumeColon (void)
 /* Check for a colon and skip it. */
 {
-    Consume (TOK_COLON, ERR_COLON_EXPECTED);
+    Consume (TOK_COLON, "`:' expected");
 }
 
 
@@ -797,7 +797,7 @@ void ConsumeSemi (void)
     if (curtok == TOK_SEMI) {
 	NextToken ();
     } else {
-	Error (ERR_SEMICOLON_EXPECTED);
+	Error ("`;' expected");
 	if (curtok == TOK_COLON || curtok == TOK_COMMA) {
 	    NextToken ();
 	}
@@ -813,7 +813,7 @@ void ConsumeComma (void)
     if (CurTok.Tok == TOK_COMMA) {
 	NextToken ();
     } else {
-	Error (ERR_COMMA_EXPECTED);
+      	Error ("`,' expected");
 	if (CurTok.Tok == TOK_SEMI) {
 	    NextToken ();
 	}
@@ -825,7 +825,7 @@ void ConsumeComma (void)
 void ConsumeLParen (void)
 /* Check for a left parenthesis and skip it */
 {
-    Consume (TOK_LPAREN, ERR_LPAREN_EXPECTED);
+    Consume (TOK_LPAREN, "`(' expected");
 }
 
 
@@ -833,7 +833,7 @@ void ConsumeLParen (void)
 void ConsumeRParen (void)
 /* Check for a right parenthesis and skip it */
 {
-    Consume (TOK_RPAREN, ERR_RPAREN_EXPECTED);
+    Consume (TOK_RPAREN, "`)' expected");
 }
 
 
@@ -841,7 +841,7 @@ void ConsumeRParen (void)
 void ConsumeLBrack (void)
 /* Check for a left bracket and skip it */
 {
-    Consume (TOK_LBRACK, ERR_LBRACK_EXPECTED);
+    Consume (TOK_LBRACK, "`[' expected");
 }
 
 
@@ -849,7 +849,7 @@ void ConsumeLBrack (void)
 void ConsumeRBrack (void)
 /* Check for a right bracket and skip it */
 {
-    Consume (TOK_RBRACK, ERR_RBRACK_EXPECTED);
+    Consume (TOK_RBRACK, "`]' expected");
 }
 
 
@@ -857,7 +857,7 @@ void ConsumeRBrack (void)
 void ConsumeLCurly (void)
 /* Check for a left curly brace and skip it */
 {
-    Consume (TOK_LCURLY, ERR_LCURLY_EXPECTED);
+    Consume (TOK_LCURLY, "`{' expected");
 }
 
 
@@ -865,7 +865,7 @@ void ConsumeLCurly (void)
 void ConsumeRCurly (void)
 /* Check for a right curly brace and skip it */
 {
-    Consume (TOK_RCURLY, ERR_RCURLY_EXPECTED);
+    Consume (TOK_RCURLY, "`}' expected");
 }
 
 

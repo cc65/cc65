@@ -92,14 +92,14 @@ static void AliasAttrib (const Declaration* D, DeclAttr* A)
 
     /* The next identifier is the name of the alias symbol */
     if (CurTok.Tok != TOK_IDENT) {
-       	Error (ERR_IDENT_EXPECTED);
+       	Error ("Identifier expected");
     	return;
     }
 
     /* Lookup the symbol for this name, it must exist */
     Sym = FindSym (CurTok.Ident);
     if (Sym == 0) {
-    	Error (ERR_UNKNOWN_IDENT, CurTok.Ident);
+    	Error ("Unknown identifier: `%s'", CurTok.Ident);
     	NextToken ();
     	return;
     }
@@ -110,7 +110,7 @@ static void AliasAttrib (const Declaration* D, DeclAttr* A)
     /* Check if the types of the symbols are identical */
     if (TypeCmp (D->Type, Sym->Type) < TC_EQUAL) {
 	/* Types are not identical */
-	Error (ERR_INCOMPATIBLE_TYPES);
+	Error ("Incompatible types");
 	return;
     }
 
@@ -124,7 +124,8 @@ static void AliasAttrib (const Declaration* D, DeclAttr* A)
 void ParseAttribute (const Declaration* D, DeclAttr* A)
 /* Parse an additional __attribute__ modifier */
 {
-    attrib_t AttrType;
+    ident    AttrName;
+    attrib_t AttrType;		     
 
     /* Initialize the attribute description with "no attribute" */
     A->AttrType = atNone;
@@ -144,13 +145,14 @@ void ParseAttribute (const Declaration* D, DeclAttr* A)
 
     /* Identifier follows */
     if (CurTok.Tok != TOK_IDENT) {
-       	Error (ERR_IDENT_EXPECTED);
+       	Error ("Identifier expected");
     	/* We should *really* try to recover here, but for now: */
     	return;
     }
 
     /* Map the attribute name to its id, then skip the identifier */
-    AttrType = FindAttribute (CurTok.Ident);
+    strcpy (AttrName, CurTok.Ident);
+    AttrType = FindAttribute (AttrName);
     NextToken ();
 
     /* Handle possible attributes */
@@ -162,7 +164,7 @@ void ParseAttribute (const Declaration* D, DeclAttr* A)
 
 	default:
 	    /* Attribute not known, maybe typo */
-	    Error (ERR_ILLEGAL_ATTRIBUTE);
+	    Error ("Illegal attribute: `%s'", AttrName);
 	    break;
     }
 

@@ -187,7 +187,7 @@ int IsSym (char* s);
 void NextToken (void);
 /* Get next token from input stream */
 
-void Consume (token_t Token, unsigned ErrNum);
+void Consume (token_t Token, const char* ErrorMsg);
 /* Eat token if it is the next in the input stream, otherwise print an error
  * message.
  */

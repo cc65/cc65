@@ -39,7 +39,7 @@
 /* common */
 #include "hashstr.h"
 #include "xmalloc.h"
-	  
+
 /* cc65 */
 #include "error.h"
 #include "macrotab.h"
@@ -283,7 +283,7 @@ void AddMacroArg (Macro* M, const char* Arg)
     for (I = 0; I < M->ArgCount; ++I) {
 	if (strcmp (M->FormalArgs[I], Arg) == 0) {
 	    /* Found */
-	    Error (ERR_DUPLICATE_MACRO_ARG, Arg);
+	    Error ("Duplicate macro parameter: `%s'", Arg);
 	    break;
 	}
     }
@@ -308,7 +308,7 @@ void AddMacroArg (Macro* M, const char* Arg)
 
 int MacroCmp (const Macro* M1, const Macro* M2)
 /* Compare two macros and return zero if both are identical. */
-{	    
+{
     int I;
 
     /* Argument count must be identical */

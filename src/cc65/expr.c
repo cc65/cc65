@@ -209,13 +209,13 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
     	/* If one of the sides are of type void, output a more apropriate
     	 * error message.
     	 */
-       	Error (ERR_ILLEGAL_TYPE);
+       	Error ("Illegal type");
     } else if (IsClassInt (lhst)) {
        	if (IsClassPtr (rhst)) {
      	    /* Pointer -> int conversion */
      	    Warning ("Converting pointer to integer without a cast");
        	} else if (!IsClassInt (rhst)) {
-     	    Error (ERR_INCOMPATIBLE_TYPES);			   
+     	    Error ("Incompatible types");
      	} else {
    	    /* Adjust the int types. To avoid manipulation of TOS mark lhs
    	     * as const.
@@ -238,11 +238,11 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
 		switch (TypeCmp (lhst, rhst)) {
 
 		    case TC_INCOMPATIBLE:
-			Error (ERR_INCOMPATIBLE_POINTERS);
+			Error ("Incompatible pointer types");
 			break;
 
 		    case TC_QUAL_DIFF:
-			Error (ERR_QUAL_DIFF);
+			Error ("Pointer types differ in type qualifiers");
 			break;
 
 		    default:
@@ -260,13 +260,13 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
 	     * that both functions have the same parameter list.
 	     */
 	    if (TypeCmp (Indirect (lhst), rhst) < TC_EQUAL) {
-	 	Error (ERR_INCOMPATIBLE_TYPES);
+	 	Error ("Incompatible types");
 	    }
      	} else {
-	    Error (ERR_INCOMPATIBLE_TYPES);
+	    Error ("Incompatible types");
 	}
     } else {
-	Error (ERR_INCOMPATIBLE_TYPES);
+	Error ("Incompatible types");
     }
 
     /* Return an int value in all cases where the operands are not both ints */
@@ -292,7 +292,7 @@ void DefineData (struct expent* lval)
 	     * allowed.
 	     */
 	    if (!AllowRegVarAddr) {
-	     	Error (ERR_CANNOT_TAKE_ADDR_OF_REG);
+	     	Error ("Cannot take the address of a register variable");
 	    }
 	    /* FALLTHROUGH */
 
@@ -333,7 +333,7 @@ static void lconst (unsigned flags, struct expent* lval)
 	     * allowed.
 	     */
 	    if (!AllowRegVarAddr) {
-	     	Error (ERR_CANNOT_TAKE_ADDR_OF_REG);
+	     	Error ("Cannot take the address of a register variable");
 	    }
 	    /* FALLTHROUGH */
 
@@ -387,13 +387,13 @@ static int kcalc (int tok, long val1, long val2)
   	    return (val1 * val2);
        	case TOK_DIV:
 	    if (val2 == 0) {
-	   	Error (ERR_DIV_BY_ZERO);
+	   	Error ("Division by zero");
 	   	return 0x7FFFFFFF;
 	    }
   	    return (val1 / val2);
        	case TOK_MOD:
 	    if (val2 == 0) {
-	   	Error (ERR_MOD_BY_ZERO);
+	   	Error ("Modulo operation with zero");
 	       	return 0;
 	    }
   	    return (val1 % val2);
@@ -568,7 +568,7 @@ static void callfunction (struct expent* lval)
 	    /* Too many arguments. Do we have an open param list? */
 	    if ((Func->Flags & FD_ELLIPSIS) == 0) {
 	      	/* End of param list reached, no ellipsis */
-     	      	Error (ERR_TOO_MANY_FUNC_ARGS);
+     	      	Error ("Too many arguments in function call");
 	    }
 	    /* Assume an ellipsis even in case of errors to avoid an error
 	     * message for each other argument.
@@ -633,7 +633,7 @@ static void callfunction (struct expent* lval)
 
     /* Check if we had enough parameters */
     if (ParamCount < Func->ParamCount) {
-      	Error (ERR_TOO_FEW_FUNC_ARGS);
+      	Error ("Too few arguments in function call");
     }
 
     /* */
@@ -667,7 +667,7 @@ void doasm (void)
 
     /* String literal */
     if (curtok != TOK_SCONST) {
-     	Error (ERR_STRLIT_EXPECTED);
+     	Error ("String literal expected");
     } else {
      	/* Write the string directly into the output, followed by a newline */
        	AddCodeLine (GetLiteral (curval));
@@ -722,7 +722,7 @@ static int primary (struct expent* lval)
      */
     if (Preprocessing) {
        	/* Illegal expression in PP mode */
-	Error (ERR_CPP_EXPR_EXPECTED);
+	Error ("Preprocessor expression expected");
 	lval->e_flags = E_MCONST;
 	lval->e_tptr = type_int;
 	return 0;
@@ -747,13 +747,10 @@ static int primary (struct expent* lval)
 	    lval->e_tptr = Sym->Type;
 
     	    /* Check for illegal symbol types */
-	    if ((Sym->Flags & SC_LABEL) == SC_LABEL) {
-	       	/* Cannot use labels in expressions */
-	       	Error (ERR_SYMBOL_KIND);
-	       	return 1;
-       	    } else if (Sym->Flags & SC_TYPE) {
+	    CHECK ((Sym->Flags & SC_LABEL) != SC_LABEL);
+       	    if (Sym->Flags & SC_TYPE) {
 	       	/* Cannot use type symbols */
-	       	Error (ERR_VAR_IDENT_EXPECTED);
+	       	Error ("Variable identifier expected");
 	       	/* Assume an int type to make lval valid */
 	       	lval->e_flags = E_MLOCAL | E_TLOFFS;
 	       	lval->e_tptr = type_int;
@@ -830,7 +827,7 @@ static int primary (struct expent* lval)
 	    lval->e_flags = E_MLOCAL | E_TLOFFS;
 	    lval->e_tptr = type_int;
 	    lval->e_const = 0;
-	    Error (ERR_UNDEFINED_SYMBOL, Ident);
+	    Error ("Undefined symbol: `%s'", Ident);
 	    return 1;
 
 	}
@@ -865,7 +862,7 @@ static int primary (struct expent* lval)
     }
 
     /* Illegal primary. */
-    Error (ERR_EXPR_EXPECTED);
+    Error ("Expression expected");
     lval->e_flags = E_MCONST;
     lval->e_tptr = type_int;
     return 0;
@@ -973,7 +970,7 @@ static int arrayref (int k, struct expent* lval)
     	    /* */
     	    lval->e_tptr = lval2.e_tptr;
     	} else {
-    	    Error (ERR_CANNOT_SUBSCRIPT);
+    	    Error ("Cannot subscript");
     	}
 
     	/* Add the subscript. Since arrays are indexed by integers,
@@ -1023,7 +1020,7 @@ static int arrayref (int k, struct expent* lval)
 	    g_scale (TypeOf (tptr1), SizeOf (lval2.e_tptr));
 	    lval->e_tptr = lval2.e_tptr;
 	} else {
-	    Error (ERR_CANNOT_SUBSCRIPT);
+	    Error ("Cannot subscript");
 	}
 
 	/* The offset is now in the primary register. It didn't have a
@@ -1116,7 +1113,7 @@ static int structref (int k, struct expent* lval)
     /* Skip the token and check for an identifier */
     NextToken ();
     if (curtok != TOK_IDENT) {
-    	Error (ERR_IDENT_EXPECTED);
+    	Error ("Identifier expected");
     	lval->e_tptr = type_int;
     	return 0;
     }
@@ -1126,7 +1123,7 @@ static int structref (int k, struct expent* lval)
     NextToken ();
     Field = FindStructField (lval->e_tptr, Ident);
     if (Field == 0) {
-     	Error (ERR_STRUCT_FIELD_MISMATCH, Ident);
+     	Error ("Struct/union has no field named `%s'", Ident);
        	lval->e_tptr = type_int;
      	return 0;
     }
@@ -1187,14 +1184,14 @@ static int hie11 (struct expent *lval)
      	    	lval->e_flags = E_MEXPR;
      	    	lval->e_tptr += DECODE_SIZE + 1;       	/* Set to result */
      	    } else {
-     	    	Error (ERR_ILLEGAL_FUNC_CALL);
+     	    	Error ("Illegal function call");
      	    }
      	    k = 0;
 
      	} else if (curtok == TOK_DOT) {
 
      	    if (!IsClassStruct (lval->e_tptr)) {
-     	   	Error (ERR_STRUCT_EXPECTED);
+     	   	Error ("Struct expected");
      	    }
      	    k = structref (0, lval);
 
@@ -1202,7 +1199,7 @@ static int hie11 (struct expent *lval)
 
      	    tptr = lval->e_tptr;
      	    if (tptr[0] != T_PTR || (tptr[1] & T_STRUCT) == 0) {
-     	   	Error (ERR_STRUCT_PTR_EXPECTED);
+     	   	Error ("Struct pointer expected");
      	    }
      	    k = structref (k, lval);
 
@@ -1260,7 +1257,7 @@ static void pre_incdec (struct expent* lval, void (*inc) (unsigned, unsigned lon
 
     NextToken ();
     if ((k = hie10 (lval)) == 0) {
-    	Error (ERR_LVALUE_EXPECTED);
+    	Error ("Invalid lvalue");
     	return;
     }
 
@@ -1339,7 +1336,7 @@ static void post_incdec (struct expent *lval, int k, void (*inc) (unsigned, unsi
 
     NextToken ();
     if (k == 0) {
-    	Error (ERR_LVALUE_EXPECTED);
+    	Error ("Invalid lvalue");
        	return;
     }
 
@@ -1540,7 +1537,7 @@ static int hie10 (struct expent* lval)
        	    if (IsClassPtr (t)) {
        	       	lval->e_tptr = Indirect (t);
      	    } else {
-     	     	Error (ERR_ILLEGAL_INDIRECT);
+     	     	Error ("Illegal indirection");
      	    }
      	    return 1;
 
@@ -1550,7 +1547,7 @@ static int hie10 (struct expent* lval)
      	    if (k == 0) {
 	    	/* Allow the & operator with an array */
 	     	if (!IsTypeArray (lval->e_tptr)) {
-     	     	    Error (ERR_ILLEGAL_ADDRESS);
+     	     	    Error ("Illegal address");
 	     	}
      	    } else {
 	     	t = TypeAlloc (TypeLen (lval->e_tptr) + 2);
@@ -1630,7 +1627,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 
 	/* All operators that call this function expect an int on the lhs */
 	if (!IsClassInt (lval->e_tptr)) {
-	    Error (ERR_INT_EXPR_EXPECTED);
+	    Error ("Integer expression expected");
 	}
 
 	/* Remember the operator token, then skip it */
@@ -1656,7 +1653,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 
 	/* Check the type of the rhs */
 	if (!IsClassInt (lval2.e_tptr)) {
-	    Error (ERR_INT_EXPR_EXPECTED);
+	    Error ("Integer expression expected");
 	}
 
 	/* Check for const operands */
@@ -1685,9 +1682,9 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	     	type |= CF_CONST;
 		rtype |= CF_CONST;
 	     	if (tok == TOK_DIV && lval2.e_const == 0) {
-	      	    Error (ERR_DIV_BY_ZERO);
+	      	    Error ("Division by zero");
 	     	} else if (tok == TOK_MOD && lval2.e_const == 0) {
-	     	    Error (ERR_MOD_BY_ZERO);
+	     	    Error ("Modulo operation with zero");
 	     	}
 		if ((Gen->Flags & GEN_NOPUSH) != 0) {
 		    RemoveCode (Mark2);
@@ -1757,7 +1754,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	/* Make sure, the types are compatible */
 	if (IsClassInt (lval->e_tptr)) {
 	    if (!IsClassInt (lval2.e_tptr) && !(IsClassPtr(lval2.e_tptr) && IsNullPtr(lval))) {
-	   	Error (ERR_INCOMPATIBLE_TYPES);
+	   	Error ("Incompatible types");
 	    }
 	} else if (IsClassPtr (lval->e_tptr)) {
 	    if (IsClassPtr (lval2.e_tptr)) {
@@ -1768,10 +1765,10 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	   	type* right = Indirect (lval2.e_tptr);
 	   	if (TypeCmp (left, right) < TC_EQUAL && *left != T_VOID && *right != T_VOID) {
 	   	    /* Incomatible pointers */
-	   	    Error (ERR_INCOMPATIBLE_TYPES);
+	   	    Error ("Incompatible types");
 	   	}
 	    } else if (!IsNullPtr (&lval2)) {
-	   	Error (ERR_INCOMPATIBLE_TYPES);
+	   	Error ("Incompatible types");
 	    }
 	}
 
@@ -1896,7 +1893,7 @@ static void parseadd (int k, struct expent* lval)
     	    	typeadjust (lval, &lval2, 1);
     	    } else {
        	       	/* OOPS */
-    	    	Error (ERR_OP_NOT_ALLOWED);
+    	    	Error ("Invalid operands for binary operator `+'");
     	    }
 
        	    /* Result is constant, condition codes not set */
@@ -1924,7 +1921,7 @@ static void parseadd (int k, struct expent* lval)
        	       	flags = typeadjust (lval, &lval2, 1);
     	    } else {
        	       	/* OOPS */
-    	    	Error (ERR_OP_NOT_ALLOWED);
+    	    	Error ("Invalid operands for binary operator `+'");
        	    }
 
     	    /* Generate code for the add */
@@ -1970,7 +1967,7 @@ static void parseadd (int k, struct expent* lval)
     	      	flags = typeadjust (lval, &lval2, 1);
        	    } else {
        	       	/* OOPS */
-    	    	Error (ERR_OP_NOT_ALLOWED);
+    	    	Error ("Invalid operands for binary operator `+'");
     	    }
 
     	    /* Generate code for the add */
@@ -2004,7 +2001,7 @@ static void parseadd (int k, struct expent* lval)
        	       	flags = typeadjust (lval, &lval2, 0);
     	    } else {
        	       	/* OOPS */
-    	    	Error (ERR_OP_NOT_ALLOWED);
+    	    	Error ("Invalid operands for binary operator `+'");
     	    }
 
     	    /* Generate code for the add */
@@ -2032,7 +2029,7 @@ static void parsesub (int k, struct expent* lval)
     type* lhst;	    	    	/* Type of left hand side */
     type* rhst;	    	    	/* Type of right hand side */
     CodeMark Mark1;		/* Save position of output queue */
-    CodeMark Mark2;		/* Another position in the queue */
+    CodeMark Mark2;    		/* Another position in the queue */
     int rscale;     	    	/* Scale factor for the result */
 
 
@@ -2071,7 +2068,7 @@ static void parsesub (int k, struct expent* lval)
     	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is pointer, right is pointer, must scale result */
     	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_EQUAL) {
-    	    	    Error (ERR_INCOMPATIBLE_POINTERS);
+    	    	    Error ("Incompatible pointer types");
     	    	} else {
     	    	    lval->e_const = (lval->e_const - lval2.e_const) / PSizeOf (lhst);
     	    	}
@@ -2083,7 +2080,7 @@ static void parsesub (int k, struct expent* lval)
     	    	lval->e_const -= lval2.e_const;
     	    } else {
     	    	/* OOPS */
-    	    	Error (ERR_OP_NOT_ALLOWED);
+    	    	Error ("Invalid operands for binary operator `-'");
     	    }
 
     	    /* Result is constant, condition codes not set */
@@ -2106,7 +2103,7 @@ static void parsesub (int k, struct expent* lval)
     	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is pointer, right is pointer, must scale result */
     	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_EQUAL) {
-    	    	    Error (ERR_INCOMPATIBLE_POINTERS);
+    	    	    Error ("Incompatible pointer types");
     	    	} else {
     	    	    rscale = PSizeOf (lhst);
     	    	}
@@ -2118,7 +2115,7 @@ static void parsesub (int k, struct expent* lval)
        	       	flags = typeadjust (lval, &lval2, 1);
     	    } else {
     	    	/* OOPS */
-    	    	Error (ERR_OP_NOT_ALLOWED);
+    	    	Error ("Invalid operands for binary operator `-'");
     	    }
 
     	    /* Do the subtraction */
@@ -2149,7 +2146,7 @@ static void parsesub (int k, struct expent* lval)
  	} else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
  	    /* Left is pointer, right is pointer, must scale result */
  	    if (TypeCmp (Indirect (lhst), Indirect (rhst)) < TC_EQUAL) {
- 	       	Error (ERR_INCOMPATIBLE_POINTERS);
+ 	       	Error ("Incompatible pointer types");
  	    } else {
  	    	rscale = PSizeOf (lhst);
  	    }
@@ -2168,7 +2165,7 @@ static void parsesub (int k, struct expent* lval)
  	    flags = typeadjust (lval, &lval2, 0);
  	} else {
  	    /* OOPS */
- 	    Error (ERR_OP_NOT_ALLOWED);
+	    Error ("Invalid operands for binary operator `-'");
  	}
 
  	/* Generate code for the sub (the & is a hack here) */
@@ -2508,7 +2505,7 @@ static int hieQuest (struct expent *lval)
 	} else if (IsClassPtr (type2) && IsClassPtr (type3)) {
 	    /* Must point to same type */
 	    if (TypeCmp (Indirect (type2), Indirect (type3)) < TC_EQUAL) {
-		Error (ERR_INCOMPATIBLE_TYPES);
+		Error ("Incompatible pointer types");
 	    }
 	    /* Result has the common type */
 	    rtype = lval2.e_tptr;
@@ -2519,7 +2516,7 @@ static int hieQuest (struct expent *lval)
 	    /* Result type is pointer, no cast needed */
 	    rtype = lval3.e_tptr;
 	} else {
-	    Error (ERR_INCOMPATIBLE_TYPES);
+	    Error ("Incompatible types");
 	    rtype = lval2.e_tptr;	 	/* Doesn't matter here */
 	}
 
@@ -2548,7 +2545,7 @@ static void opeq (GenDesc* Gen, struct expent *lval, int k)
 
     NextToken ();
     if (k == 0) {
-     	Error (ERR_LVALUE_EXPECTED);
+     	Error ("Invalid lvalue in assignment");
      	return;
     }
 
@@ -2628,7 +2625,7 @@ static void addsubeq (GenDesc* Gen, struct expent *lval, int k)
 
 
     if (k == 0) {
-     	Error (ERR_LVALUE_EXPECTED);
+     	Error ("Invalid lvalue in assignment");
      	return;
     }
 
@@ -2721,7 +2718,7 @@ static void Assignment (struct expent* lval)
 
     /* Check for assignment to const */
     if (IsQualConst (ltype)) {
-	Error (ERR_CONST_ASSIGN);
+	Error ("Assignment to const");
     }
 
     /* cc65 does not have full support for handling structs by value. Since
@@ -2741,7 +2738,7 @@ static void Assignment (struct expent* lval)
 	    exprhs (0, 0, &lval2);
 	} else {
 	    /* We need an lvalue */
-	    Error (ERR_LVALUE_EXPECTED);
+	    Error ("Invalid lvalue in assignment");
 	}
 
 	/* Push the address (or whatever is in ax in case of errors) */
@@ -2749,7 +2746,7 @@ static void Assignment (struct expent* lval)
 
 	/* Check for equality of the structs */
 	if (TypeCmp (ltype, lval2.e_tptr) < TC_EQUAL) {
-     	    Error (ERR_INCOMPATIBLE_TYPES);
+     	    Error ("Incompatible types");
 	}
 
 	/* Load the size of the struct into the primary */
@@ -2803,7 +2800,7 @@ int hie1 (struct expent* lval)
     	case TOK_ASSIGN:
     	    NextToken ();
     	    if (k == 0) {
-    	      	Error (ERR_LVALUE_EXPECTED);
+    	      	Error ("Invalid lvalue in assignment");
     	    } else {
     	      	Assignment (lval);
     	    }
@@ -2943,7 +2940,7 @@ void constexpr (struct expent* lval)
 {
     memset (lval, 0, sizeof (*lval));
     if (expr (hie1, lval) != 0 || (lval->e_flags & E_MCONST) == 0) {
-     	Error (ERR_CONST_EXPR_EXPECTED);
+     	Error ("Constant expression expected");
      	/* To avoid any compiler errors, make the expression a valid const */
      	lval->e_flags = E_MCONST;
      	lval->e_tptr = type_int;
@@ -2958,7 +2955,7 @@ void intexpr (struct expent* lval)
 {
     expression (lval);
     if (!IsClassInt (lval->e_tptr)) {
-     	Error (ERR_INT_EXPR_EXPECTED);
+     	Error ("Integer expression expected");
      	/* To avoid any compiler errors, make the expression a valid int */
      	lval->e_flags = E_MCONST;
      	lval->e_tptr = type_int;
@@ -2975,11 +2972,10 @@ void boolexpr (struct expent* lval)
     expression (lval);
 
     /* If it's an integer, it's ok. If it's not an integer, but a pointer,
-     * the pointer used in a boolean context is also ok (Ootherwise check if it's a pointer
-     * expression.
+     * the pointer used in a boolean context is also ok
      */
     if (!IsClassInt (lval->e_tptr) && !IsClassPtr (lval->e_tptr)) {
- 	Error (ERR_INT_EXPR_EXPECTED);
+ 	Error ("Boolean expression expected");
  	/* To avoid any compiler errors, make the expression a valid int */
  	lval->e_flags = E_MCONST;
  	lval->e_tptr = type_int;

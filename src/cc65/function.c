@@ -213,12 +213,12 @@ void NewFunc (SymEntry* Func)
 
     /* C functions cannot currently have __fastcall__ calling conventions */
     if (IsFastCallFunc (Func->Type)) {
-    	Error (ERR_FASTCALL);
+    	Error ("__fastcall__ is not allowed for C functions");
     }
 
     /* Need a starting curly brace */
     if (curtok != TOK_LCURLY) {
-    	Error (ERR_LCURLY_EXPECTED);
+    	Error ("`{' expected");
     }
 
     /* Setup register variables */
@@ -247,7 +247,7 @@ void NewFunc (SymEntry* Func)
 #if 0
      	/* If the function has a return type, flag an error */
      	if (!voidfunc) {
-     	    Error (ERR_MUST_RETURN_VALUE);
+     	    Error ("Function `%s' must return a value",	Func->Name);
      	}
 #endif
 	RestoreRegVars (0);

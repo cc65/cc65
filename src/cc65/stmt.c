@@ -122,7 +122,7 @@ static void dowhile (char wtype)
     NextToken ();
     loop = GetLabel ();
     lab = GetLabel ();
-    addloop (oursp, loop, lab, 0, 0);
+    AddLoop (oursp, loop, lab, 0, 0);
     g_defloclabel (loop);
     if (wtype == 'w') {
 
@@ -151,13 +151,13 @@ static void dowhile (char wtype)
 
 	/* Do loop */
        	statement ();
-	Consume (TOK_WHILE, ERR_WHILE_EXPECTED);
+	Consume (TOK_WHILE, "`while' expected");
     	test (loop, 1);
     	ConsumeSemi ();
 	g_defloclabel (lab);
 
     }
-    delloop ();
+    DelLoop ();
 }
 
 
@@ -173,7 +173,7 @@ static void doreturn (void)
     NextToken ();
     if (curtok != TOK_SEMI) {
        	if (HasVoidReturn (CurrentFunc)) {
-       	    Error (ERR_CANNOT_RETURN_VALUE);
+       	    Error ("Returning a value in function with return type void");
        	}
        	if (evalexpr (CF_NONE, hie0, &lval) == 0) {
        	    /* Constant value */
@@ -188,7 +188,7 @@ static void doreturn (void)
        	    etype |= assignadjust (GetReturnType (CurrentFunc), &lval) & ~CF_CONST;
 	}
     } else if (!HasVoidReturn (CurrentFunc)) {
-       	Error (ERR_MUST_RETURN_VALUE);
+	Error ("Function `%s' must return a value", GetFuncName (CurrentFunc));
     }
     RestoreRegVars (HaveVal);
     g_leave (etype, lval.e_const);
@@ -199,15 +199,26 @@ static void doreturn (void)
 static void dobreak (void)
 /* Handle 'break' statement here */
 {
-    struct loopdesc* l;
+    LoopDesc* L;
 
+    /* Skip the break */
     NextToken ();
-    if ((l = currentloop ()) == 0) {
+
+    /* Get the current loop descriptor */
+    L = CurrentLoop ();
+
+    /* Check if we are inside a loop */
+    if (L == 0) {
 	/* Error: No current loop */
-       	return;
+	Error ("`break' statement not within loop or switch");
+	return;
     }
-    g_space (oursp - l->sp);
-    g_jump (l->label);
+
+    /* Correct the stack pointer if needed */
+    g_space (oursp - L->StackPtr);
+
+    /* Jump to the exit label of the loop */
+    g_jump (L->Label);
 }
 
 
@@ -215,28 +226,37 @@ static void dobreak (void)
 static void docontinue (void)
 /* Handle 'continue' statement here */
 {
-    struct loopdesc* l;
+    LoopDesc* L;
 
+    /* Skip the continue */
     NextToken ();
-    if ((l = currentloop ()) == 0) {
-	/* Error: Not in loop */
-       	return;
+
+    /* Get the current loop descriptor */
+    L = CurrentLoop ();
+    if (L) {
+	/* Search for the correct loop */
+	do {
+	    if (L->Loop) {
+		break;
+	    }
+	    L = L->Next;
+	} while (L);
     }
-    do {
-	if (l->loop) {
-	    break;
-	}
-	l = l->next;
-    } while (l);
-    if (l == 0) {
-       	Error (ERR_UNEXPECTED_CONTINUE);
-       	return;
+
+    /* Did we find it? */
+    if (L == 0) {
+	Error ("`continue' statement not within a loop");
+	return;
     }
-    g_space (oursp - l->sp);
-    if (l->linc) {
-       	g_jump (l->linc);
+
+    /* Correct the stackpointer if needed */
+    g_space (oursp - L->StackPtr);
+
+    /* Output the loop code */
+    if (L->linc) {
+       	g_jump (L->linc);
     } else {
-       	g_jump (l->loop);
+       	g_jump (L->Loop);
     }
 }
 
@@ -257,7 +277,7 @@ static void cascadeswitch (struct expent* eval)
 
     /* Create a loop so we may break out, init labels */
     exitlab = GetLabel ();
-    addloop (oursp, 0, exitlab, 0, 0);
+    AddLoop (oursp, 0, exitlab, 0, 0);
 
     /* Setup some variables needed in the loop  below */
     flags = TypeOf (eval->e_tptr) | CF_CONST | CF_FORCECHAR;
@@ -301,7 +321,7 @@ static void cascadeswitch (struct expent* eval)
 		    /* Read the selector expression */
 		    constexpr (&lval);
 		    if (!IsClassInt (lval.e_tptr)) {
-			Error (ERR_ILLEGAL_TYPE);
+			Error ("Switch quantity not an integer");
 		    }
 
 		    /* Check the range of the expression */
@@ -311,26 +331,26 @@ static void cascadeswitch (struct expent* eval)
 			case T_SCHAR:
 			    /* Signed char */
 			    if (val < -128 || val > 127) {
-				Error (ERR_RANGE);
+				Error ("Range error");
 			    }
 			    break;
 
 			case T_UCHAR:
 			    if (val < 0 || val > 255) {
-				Error (ERR_RANGE);
+				Error ("Range error");
 			    }
 			    break;
 
 			case T_INT:
 			    if (val < -32768 || val > 32767) {
-				Error (ERR_RANGE);
+				Error ("Range error");
 			    }
 			    break;
 
 			case T_UINT:
 			    if (val < 0 || val > 65535) {
-				Error (ERR_RANGE);
-			    }
+				Error ("Range error");
+			    }			      
 			    break;
 
 			default:
@@ -410,7 +430,7 @@ static void cascadeswitch (struct expent* eval)
     g_defloclabel (exitlab);
 
     /* End the loop */
-    delloop ();
+    DelLoop ();
 }
 
 
@@ -443,7 +463,7 @@ static void tableswitch (struct expent* eval)
     dlabel = 0;	     	   	/* init */
     lab = GetLabel ();		/* get exit */
     p = swtab;
-    addloop (oursp, 0, lab, 0, 0);
+    AddLoop (oursp, 0, lab, 0, 0);
 
     /* Jump behind the code for the CASE labels */
     g_jump (lcase = GetLabel ());
@@ -459,7 +479,7 @@ static void tableswitch (struct expent* eval)
        	    	    NextToken ();
     	    	    constexpr (&lval);
 	    	    if (!IsClassInt (lval.e_tptr)) {
-	    		Error (ERR_ILLEGAL_TYPE);
+	    		Error ("Switch quantity not an integer");
 	      	    }
      	    	    p->sw_const = lval.e_const;
     	    	    p->sw_lab = label;
@@ -515,7 +535,7 @@ static void tableswitch (struct expent* eval)
        	g_jump (dlabel);
     }
     g_defloclabel (lab);
-    delloop ();
+    DelLoop ();
 
     /* Free the allocated space for the labels */
     xfree (swtab);
@@ -565,7 +585,7 @@ static void dofor (void)
     lab = GetLabel ();
     linc = GetLabel ();
     lstat = GetLabel ();
-    addloop (oursp, loop, lab, linc, lstat);
+    AddLoop (oursp, loop, lab, linc, lstat);
     ConsumeLParen ();
     if (curtok != TOK_SEMI) {	/* exp1 */
 	expression (&lval1);
@@ -590,7 +610,7 @@ static void dofor (void)
     statement ();
     g_jump (linc);
     g_defloclabel (lab);
-    delloop ();
+    DelLoop ();
 }
 
 

@@ -2,7 +2,7 @@
 /*                                                                           */
 /*				   _pokey.h			       	     */
 /*                                                                           */
-/*		    Internal include file, do not use directly		     */
+/*		  Internal include file, do not use directly                 */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -28,8 +28,11 @@
 /*                                                                           */
 /*****************************************************************************/
 
+
+
 #ifndef __POKEY_H
 #define __POKEY_H
+
 
 
 /* Define a structure with the pokey register offsets */

@@ -10,5 +10,4 @@
 
 	    .include "../inc/jumptab.inc"
 
-_MainLoop:
-	    jmp MainLoop
+_MainLoop = MainLoop

@@ -5,6 +5,9 @@
 ;
 
 	.export	     	_exit
+	.exportzp       crtc, sid, IPCcia, cia, acia, tpi1, tpi2, ktab1
+	.exportzp       ktab2, ktab3, ktab4, time, RecvBuf, SendBuf
+
 	.import		initlib, donelib
 	.import	     	push0, _main
 	.import	       	__BSS_RUN__, __BSS_SIZE__

@@ -77,6 +77,12 @@
 
 
 
+/* Define hardware */
+#include <_vic.h>
+#define VIC    	(*(struct __vic*)0x9000)
+
+
+
 /* Define special memory areas */
 #define COLOR_RAM	((unsigned char*)0x9600)
 

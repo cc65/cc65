@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -98,9 +98,9 @@ void __fastcall__ pokewsys (unsigned addr, unsigned val);
 
 
 /* Define hardware */
-#include <_vic.h>
-#define VIC    	(*(struct __vic*)0xD800)
-								  
+#include <_vic2.h>
+#define VIC    	(*(struct __vic2*)0xD800)
+
 #include <_sid.h>
 #define	SID	(*(struct __sid*)0xDA00)
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -78,8 +78,8 @@
 
 
 /* Define hardware */
-#include <_vic.h>
-#define VIC	(*(struct __vic*)0xD000)
+#include <_vic2.h>
+#define VIC    	(*(struct __vic2*)0xD000)
 
 #include <_sid.h>
 #define	SID	(*(struct __sid*)0xD400)

@@ -1216,13 +1216,11 @@ CALC:
 
 abs:
 	; a/y := abs(a/y)
-	dey
-	iny
+	cpy     #$00
 	bpl	absend
 	; negay
-neg:	clc
-	eor	#$ff
-	adc	#1
+neg:	eor	#$ff
+	add	#1
 	pha
 	tya
 	eor	#$ff

@@ -62,7 +62,7 @@ EMDS = c128-georam.emd c128-ram.emd c128-ramcart.emd c128-reu.emd c128-vdc.emd
 
 JOYS = c128-ptvjoy.joy c128-stdjoy.joy
 
-MOUS = c128-1351.mou
+MOUS = c128-1351.mou c128-joymouse.mou
 
 SERS = c128-swlink.ser
 

@@ -1039,48 +1039,81 @@ void g_putlocal (unsigned flags, int offs)
 
 
 
-void g_putind (unsigned flags, unsigned offs)
+void g_putind (unsigned Flags, unsigned Offs)
 /* Store the specified object type in the primary register at the address
  * on the top of the stack
  */
 {
-    /* We cannot currently handle more than byte sized offsets */
-    if (offs > 256 - sizeofarg (flags)) {
-	Internal ("g_putind: Large offsets not implemented");
+    /* We can handle offsets below $100 directly, larger offsets must be added
+     * to the address. Since a/x is in use, best code is achieved by adding
+     * just the high byte. Be sure to check if the low byte will overflow while
+     * while storing.
+     */
+    if ((Offs & 0xFF) > 256 - sizeofarg (Flags | CF_FORCECHAR)) {
+
+	/* Overflow - we need to add the low byte also */
+	AddCodeLine ("\tldy\t#$00");
+	AddCodeLine ("\tclc");
+	AddCodeLine ("\tpha");
+	AddCodeLine ("\tlda\t#$%02X", Offs & 0xFF);
+	AddCodeLine ("\tadc\t(sp),y");
+	AddCodeLine ("\tsta\t(sp),y");
+	AddCodeLine ("\tiny");
+       	AddCodeLine ("\tlda\t#$%02X", (Offs >> 8) & 0xFF);
+	AddCodeLine ("\tadc\t(sp),y");
+	AddCodeLine ("\tsta\t(sp),y");
+	AddCodeLine ("\tpla");
+
+	/* Complete address is on stack, new offset is zero */
+	Offs = 0;
+
+    } else if ((Offs & 0xFF00) != 0) {
+
+	/* We can just add the high byte */
+	AddCodeLine ("\tldy\t#$01");
+	AddCodeLine ("\tclc");
+	AddCodeLine ("\tpha");
+	AddCodeLine ("\tlda\t#$%02X", (Offs >> 8) & 0xFF);
+	AddCodeLine ("\tadc\t(sp),y");
+	AddCodeLine ("\tsta\t(sp),y");
+	AddCodeLine ("\tpla");
+
+	/* Offset is now just the low byte */
+	Offs &= 0x00FF;
     }
 
     /* Check the size and determine operation */
-    switch (flags & CF_TYPE) {
+    switch (Flags & CF_TYPE) {
 
      	case CF_CHAR:
-     	    if (offs) {
-     	        ldyconst (offs);
+     	    if (Offs) {
+     	        ldyconst (Offs);
      	       	AddCodeLine ("\tjsr\tstaspidx");
      	    } else {
-     	    	AddCodeLine ("\tjsr\tstaspp");
+     	     	AddCodeLine ("\tjsr\tstaspp");
      	    }
      	    break;
 
      	case CF_INT:
-     	    if (offs) {
-     	        ldyconst (offs);
-     		AddCodeLine ("\tjsr\tstaxspidx");
+     	    if (Offs) {
+     	        ldyconst (Offs);
+     	     	AddCodeLine ("\tjsr\tstaxspidx");
      	    } else {
-     		AddCodeLine ("\tjsr\tstaxspp");
+     	     	AddCodeLine ("\tjsr\tstaxspp");
      	    }
      	    break;
 
      	case CF_LONG:
-     	    if (offs) {
-     	        ldyconst (offs);
-     		AddCodeLine ("\tjsr\tsteaxspidx");
+     	    if (Offs) {
+     	        ldyconst (Offs);
+     	     	AddCodeLine ("\tjsr\tsteaxspidx");
      	    } else {
-     		AddCodeLine ("\tjsr\tsteaxspp");
+     	     	AddCodeLine ("\tjsr\tsteaxspp");
      	    }
      	    break;
 
      	default:
-     	    typeerror (flags);
+     	    typeerror (Flags);
 
     }
 

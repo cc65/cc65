@@ -1,11 +1,10 @@
 ;
-; Ullrich von Bassewitz, 31.08.1998
+; Ullrich von Bassewitz, 24.10.2001
 ;
 ; CC65 runtime: Load word from stack slot and push
 ;
 
        	.export		pushwysp, pushw0sp
-      	.import		pushax
       	.importzp	sp
 
 	.macpack	generic
@@ -29,3 +28,4 @@ pushwysp:
 	sta	(sp),y		; 5
 	rts
 
+				   

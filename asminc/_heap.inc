@@ -1,7 +1,7 @@
 ;
 ; _heap.inc
 ;
-; (C) Copyright 2003 Ullrich von Bassewitz (uz@cc65.org)
+; (c) Copyright 2003, Ullrich von Bassewitz (uz@cc65.org)
 ;
 
 ; Assembler include file that makes the constants and structures in _heap.h
@@ -25,7 +25,7 @@
 .endstruct
 
 HEAP_MIN_BLOCKSIZE  = .sizeof (freeblock)   ; Minimum size of an allocated block
-HEAP_ADMIN_SPACE    = .sizeof (usedblock)   ; Additional space for used bocks
+HEAP_ADMIN_SPACE    = .sizeof (usedblock)   ; Additional space for used bock
 
 ; Variables
 .global         __heaporg

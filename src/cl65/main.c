@@ -44,11 +44,14 @@
 #  include "spawn.h"		/* All others */
 #endif
 
-#include "../common/cmdline.h"
-#include "../common/fname.h"
-#include "../common/version.h"
-#include "../common/xmalloc.h"
+/* common */
+#include "cmdline.h"
+#include "fname.h"
+#include "target.h"
+#include "version.h"
+#include "xmalloc.h"
 
+/* cl65 */
 #include "global.h"
 #include "error.h"
 
@@ -107,39 +110,6 @@ static const char* LinkerConfig = 0;
  * executable file name if no explicit name is given.
  */
 static const char* FirstInput = 0;
-
-/* The target system */
-enum {
-    TGT_UNKNOWN = -1,
-    TGT_NONE,
-    TGT_FIRSTREAL,
-    TGT_ATARI = TGT_FIRSTREAL,
-    TGT_C64,
-    TGT_C128,
-    TGT_ACE,
-    TGT_PLUS4,
-    TGT_CBM610,
-    TGT_PET,
-    TGT_NES,
-    TGT_APPLE2,
-    TGT_GEOS,
-    TGT_COUNT
-} Target = TGT_UNKNOWN;
-
-/* Names of the target systems sorted by target name */
-static const char* TargetNames [] = {
-    "none",
-    "atari",
-    "c64",
-    "c128",
-    "ace",
-    "plus4",
-    "cbm610",
-    "pet",
-    "nes",
-    "apple2",
-    "geos",
-};
 
 /* Name of the crt0 object file and the runtime library */
 static char* TargetCRT0 = 0;
@@ -296,18 +266,11 @@ static void CmdSetOutput (CmdDesc* Cmd, const char* File)
 
 
 
-static void CmdSetTarget (CmdDesc* Cmd, int Target)
+static void CmdSetTarget (CmdDesc* Cmd, target_t Target)
 /* Set the output file in a command desc */
 {
-    if (Target == TGT_UNKNOWN) {
-	/* Use C64 as default */
-	Target = TGT_C64;
-    }
-
-    if (Target != TGT_NONE) {
-	CmdAddArg (Cmd, "-t");
-	CmdAddArg (Cmd, TargetNames[Target]);
-    }
+    CmdAddArg (Cmd, "-t");
+    CmdAddArg (Cmd, TargetNames[Target]);
 }
 
 
@@ -318,38 +281,11 @@ static void CmdSetTarget (CmdDesc* Cmd, int Target)
 
 
 
-static int MapTarget (const char* Name)
-/* Map a target name to a system code. Abort on errors */
-{
-    int I;
-
-    /* Check for a numeric target */
-    if (isdigit (*Name)) {
-	int Target = atoi (Name);
-	if (Target >= 0 && Target < TGT_COUNT) {
-	    return Target;
-	}
-    }
-
-    /* Check for a target string */
-    for (I = 0; I < TGT_COUNT; ++I) {
-	if (strcmp (TargetNames [I], Name) == 0) {
-	    return I;
-	}
-    }
-
-    /* Not found */
-    Error ("No such target system: `%s'", Name);
-    return -1;	/* Not reached */
-}
-
-
-
 static void SetTargetFiles (void)
 /* Set the target system files */
 {
     /* Determine the names of the default startup and library file */
-    if (Target >= TGT_FIRSTREAL) {
+    if (Target != TGT_NONE) {
 
  	/* Get a pointer to the system name and its length */
  	const char* TargetName = TargetNames [Target];
@@ -366,15 +302,6 @@ static void SetTargetFiles (void)
  	strcat (TargetLib, ".lib");
 
     }
-}
-
-
-
-static void SetTargetByName (const char* Name)
-/* Set the target system by name */
-{
-    Target = MapTarget (Name);
-    SetTargetFiles ();
 }
 
 
@@ -415,12 +342,8 @@ static void Link (void)
        	CmdAddArg (&LD65, "-C");
 	CmdAddArg (&LD65, LinkerConfig);
     } else {
-	if (Target == TGT_UNKNOWN) {
-	    /* Use c64 instead */
-	    Target = TGT_C64;
-	}
-	SetTargetFiles ();
 	CmdSetTarget (&LD65, Target);
+	SetTargetFiles ();
     }
 
     /* Since linking is always the final step, if we have an output file name
@@ -503,7 +426,7 @@ static void Assemble (const char* File)
 }
 
 
-		     
+
 static void Compile (const char* File)
 /* Compile the given file */
 {
@@ -710,7 +633,10 @@ static void OptTarget (const char* Opt, const char* Arg)
     if (Arg == 0) {
 	NeedArg (Opt);
     }
-    SetTargetByName (Arg);
+    Target = FindTarget (Arg);
+    if (Target == TGT_UNKNOWN) {
+	Error ("No such target system: `%s'", Arg);
+    }
 }
 
 
@@ -761,6 +687,9 @@ int main (int argc, char* argv [])
     CmdInit (&CA65, "ca65");
     CmdInit (&LD65, "ld65");
     CmdInit (&GRC,  "grc");
+
+    /* Our default target is the C64 instead of "none" */
+    Target = TGT_C64;
 
     /* Check the parameters */
     I = 1;

@@ -2,7 +2,7 @@
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 29.10.99, 15.08.2003
+; 29.10.99, 5.03.2003
 
 ; void DrawLine         (char mode, struct window *mywindow);
 
@@ -24,5 +24,8 @@ _DrawLine:
 	    PopW r2
 	    jsr popa
 	    sta tmp1
+	    clc
 	    bit tmp1
-	    jmp DrawLine
+	    bvc @1
+	    sec
+@1:	    jmp DrawLine

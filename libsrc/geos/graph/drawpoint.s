@@ -2,7 +2,7 @@
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 29.10.99, 16.8.2003
+; 29.10.99, 05.3.2003
 
 ; void DrawPoint	(char mode, struct pixel *mypixel);
 
@@ -18,5 +18,8 @@ _DrawPoint:
 	    jsr PointRegs
 	    jsr popa
 	    sta tmp1
+	    clc
 	    bit tmp1
-	    jmp DrawPoint
+	    bvc @1
+	    sec
+@1:	    jmp DrawPoint

@@ -23,7 +23,7 @@
 
         .word   Head            ; Load address
 Head:   .word   @Next
-        .word   1000            ; Line number
+        .word   .version        ; Line number
         .byte   $9E,"1037"      ; SYS 1037
         .byte   $00             ; End of BASIC line
 @Next:  .word   0               ; BASIC end marker

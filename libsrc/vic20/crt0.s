@@ -24,7 +24,7 @@
 
         .word   Head            ; Load address
 Head:   .word   @Next
-        .word   1000            ; Line number
+        .word   .version        ; Line number
         .byte   $9E             ; SYS token
         .byte   <(((@Start / 1000) .mod 10) + $30)
         .byte   <(((@Start /  100) .mod 10) + $30)

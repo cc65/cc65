@@ -28,7 +28,7 @@ IRQInd 	       	= $500	; JMP $0000 - used as indirect IRQ vector
 
         .word   Head            ; Load address
 Head:   .word   @Next
-        .word   1000            ; Line number
+        .word   .version        ; Line number
         .byte   $9E,"4109"	; SYS 4109
         .byte   $00             ; End of BASIC line
 @Next:  .word   0               ; BASIC end marker

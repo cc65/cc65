@@ -17,12 +17,11 @@ _bgcolor:
 	cmp	#8
 	bcs	bright
 	lda	#$0e
-	sta	COLOR1
-	txa
-	rts
+	.byte	$2c	; bit opcode, eats the next 2 bytes
 bright:	lda	#0
 	sta	COLOR1
 	txa
+	ldx	#0	; fix X
 	rts
 
 
@@ -30,5 +29,6 @@ _bordercolor:
 	ldx	COLOR4	; get old value
 	sta	COLOR4	; set new value
 	txa
+	ldx	#0	; fix X
 	rts
 

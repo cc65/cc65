@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*     	       	    		     Code				     */
+/*     	       	    		     Code	    			     */
 /*****************************************************************************/
 
 
@@ -52,9 +52,10 @@ const char* AddrSizeToStr (unsigned char AddrSize)
         case ADDR_SIZE_ZP:              return "zeropage";
         case ADDR_SIZE_ABS:             return "absolute";
         case ADDR_SIZE_FAR:             return "far";
+        case ADDR_SIZE_LONG:            return "long";
         default:                        return "unknown";
     }
 }
 
 
-
+                                                    

@@ -48,6 +48,7 @@
 #define ADDR_SIZE_ZP            0x01
 #define ADDR_SIZE_ABS           0x02
 #define ADDR_SIZE_FAR           0x03
+#define ADDR_SIZE_LONG          0x04
 
 
 

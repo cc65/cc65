@@ -115,7 +115,7 @@ static unsigned char* CTab [TGT_COUNT] = {
     CTPET,		/* PET */
     CTNone,		/* NES */
     CTNone,		/* Apple2 */
-    CTPET,		/* GEOS */
+    CTNone,		/* GEOS */
 };
 
 

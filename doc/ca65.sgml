@@ -1465,11 +1465,22 @@ Here's a list of all control commands and a description, what they do:
 
   Include a file as binary data. The command expects a string argument
   that is the name of a file to include literally in the current segment.
+  In addition to that, a start offset and a size value may be specified,
+  separated by commas. If no size is specified, all of the file from the
+  start offset to end-of-file is used. If no start position is specified
+  either, zero is assume (which means that the whole file is inserted).
 
   Example:
 
   <tscreen><verb>
-   	.incbin		"sprites.dat"
+	; Include whole file
+   	.incbin	 	"sprites.dat"
+
+	; Include file starting at offset 256
+	.incbin		"music.dat", $100
+					     
+	; Read 100 bytes starting at offset 200
+	.incbin		"graphics.dat", 200, 100
   </verb></tscreen>
 
 

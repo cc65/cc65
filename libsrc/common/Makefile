@@ -108,6 +108,7 @@ S_OBJS = 	_fdesc.o	\
 		strncat.o	\
 		strncmp.o	\
 		strncpy.o	\
+                stroserr.o      \
 		strpbrk.o	\
 		strrchr.o	\
 		strspn.o	\

@@ -47,6 +47,7 @@ S_OBJS =	c_acptr.o	\
 		gotox.o 	\
 		gotoxy.o 	\
 		gotoy.o 	\
+                oserrlist.o     \
 		oserror.o	\
 		revers.o	\
 		where.o

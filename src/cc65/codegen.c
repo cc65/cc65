@@ -2526,7 +2526,7 @@ void g_mul (unsigned flags, unsigned long val)
     if (flags & CF_CONST && (p2 = powerof2 (val)) >= 0) {
      	/* Generate a shift instead */
      	g_asl (flags, p2);
-	return;
+     	return;
     }
 
     /* If the right hand side is const, the lhs is not on stack but still
@@ -2538,50 +2538,61 @@ void g_mul (unsigned flags, unsigned long val)
 
       	    case CF_CHAR:
       		if (flags & CF_FORCECHAR) {
-		    /* Handle some special cases */
-		    switch (val) {
+     		    /* Handle some special cases */
+     		    switch (val) {
 
-		     	case 3:
-		     	    AddCodeLine ("sta tmp1");
-		     	    AddCodeLine ("asl a");
-		     	    AddCodeLine ("clc");
-		     	    AddCodeLine ("adc tmp1");
-		     	    return;
-
-		     	case 5:
-		     	    AddCodeLine ("sta tmp1");
-		     	    AddCodeLine ("asl a");
-		     	    AddCodeLine ("asl a");
-		     	    AddCodeLine ("clc");
+     		     	case 3:
+     		     	    AddCodeLine ("sta tmp1");
+     		     	    AddCodeLine ("asl a");
+     		     	    AddCodeLine ("clc");
      		     	    AddCodeLine ("adc tmp1");
-		     	    return;
+     		     	    return;
 
-		     	case 10:
-		     	    AddCodeLine ("sta tmp1");
-		     	    AddCodeLine ("asl a");
-		     	    AddCodeLine ("asl a");
-	     	     	    AddCodeLine ("clc");
-		     	    AddCodeLine ("adc tmp1");
-		     	    AddCodeLine ("asl a");
-		     	    return;
-		    }
+     		     	case 5:
+     		     	    AddCodeLine ("sta tmp1");
+     		     	    AddCodeLine ("asl a");
+     		     	    AddCodeLine ("asl a");
+     		     	    AddCodeLine ("clc");
+     		     	    AddCodeLine ("adc tmp1");
+     		     	    return;
+
+     		     	case 10:
+     		     	    AddCodeLine ("sta tmp1");
+     		     	    AddCodeLine ("asl a");
+     		     	    AddCodeLine ("asl a");
+     	     	     	    AddCodeLine ("clc");
+     		     	    AddCodeLine ("adc tmp1");
+     		     	    AddCodeLine ("asl a");
+     		     	    return;
+     		    }
       		}
      		/* FALLTHROUGH */
 
-	    case CF_INT:
-		break;
+     	    case CF_INT:
+	        switch (val) {
+		    case 3:
+		        AddCodeLine ("jsr mulax3");
+		        return;
+		    case 5:
+		        AddCodeLine ("jsr mulax5");
+		        return;
+		    case 10:
+		        AddCodeLine ("jsr mulax10");
+		        return;
+		}
+     		break;
 
-	    case CF_LONG:
-		break;
+     	    case CF_LONG:
+     		break;
 
-	    default:
-		typeerror (flags);
-	}
+     	    default:
+     		typeerror (flags);
+     	}
 
-	/* If we go here, we didn't emit code. Push the lhs on stack and fall
-	 * into the normal, non-optimized stuff.
-	 */
-    	flags &= ~CF_FORCECHAR;	/* Handle chars as ints */
+     	/* If we go here, we didn't emit code. Push the lhs on stack and fall
+     	 * into the normal, non-optimized stuff.
+     	 */
+     	flags &= ~CF_FORCECHAR;	/* Handle chars as ints */
      	g_push (flags & ~CF_CONST, 0);
 
     }

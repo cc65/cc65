@@ -130,6 +130,9 @@ OBJS = 	add.o		\
        	makebool.o	\
        	mod.o  		\
        	mul.o  		\
+	mulax3.o	\
+	mulax5.o	\
+	mulax10.o	\
        	ne.o   		\
        	neg.o  		\
        	or.o   		\

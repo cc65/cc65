@@ -115,6 +115,53 @@ static unsigned OptShift1 (CodeSeg* S)
 
 
 
+static unsigned OptShift2 (CodeSeg* S)
+/* A call to the shraxN routine may get replaced by one or more lsr insns
+ * if the value of X is not used later.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+	if (E->OPC == OP65_JSR                       &&
+       	    strncmp (E->Arg, "shrax", 5) == 0        &&
+	    strlen (E->Arg) == 6                     &&
+	    IsDigit (E->Arg[5])                      &&
+	    !RegXUsed (S, I+1)) {
+
+	    /* Insert shift insns */
+	    unsigned Count = E->Arg[5] - '0';
+	    while (Count--) {
+	    	CodeEntry* X = NewCodeEntry (OP65_LSR, AM65_ACC, "a", 0, E->LI);
+	    	CS_InsertEntry (S, X, I+1);
+	    }
+
+	    /* Delete the call to shlax */
+	    CS_DelEntry (S, I);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
 /*****************************************************************************/
 /*		       Optimize stores through pointers                      */
 /*****************************************************************************/
@@ -1299,6 +1346,7 @@ static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",  	0, 0, 0, 0
 static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    0, 0, 0, 0, 0 };
 static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",    	0, 0, 0, 0, 0 };
+static OptFunc DOptShift2      	= { OptShift2,       "OptShift2",    	0, 0, 0, 0, 0 };
 static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        0, 0, 0, 0, 0 };
 static OptFunc DOptSize2        = { OptSize2,        "OptSize2",        0, 0, 0, 0, 0 };
 static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",  	0, 0, 0, 0, 0 };
@@ -1349,6 +1397,7 @@ static OptFunc* OptFuncs[] = {
     &DOptRTS,
     &DOptRTSJumps,
     &DOptShift1,
+    &DOptShift2,
     &DOptSize1,
     &DOptSize2,
     &DOptStackOps,
@@ -1596,6 +1645,7 @@ static void RunOptGroup1 (CodeSeg* S)
     RunOptFunc (S, &DOptAdd1, 1);
     RunOptFunc (S, &DOptAdd2, 1);
     RunOptFunc (S, &DOptShift1, 1);
+    RunOptFunc (S, &DOptShift2, 1);
 }
 
 

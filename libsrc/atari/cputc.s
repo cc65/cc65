@@ -45,15 +45,20 @@ L4:	cmp	#$0A		; LF
 cputdirect:			; accepts screen code
 	jsr	putchar
 
-	lda	OLDADR		; update cursor position pointer
-	clc
-	adc	#1
-	sta	OLDADR
-	bcc	l1
+	; update cursor position pointer
+	ldy	#0
+	lda	OLDCHR
+	sta	(OLDADR),y
+	inc	OLDADR
+	bne	L1
 	inc	OLDADR+1
+L1:	lda	(OLDADR),y
+	sta	OLDCHR
+	ora	_revflag
+	sta	(OLDADR),y
 	
 ; advance cursor
-l1:	inc	COLCRS
+	inc	COLCRS
 	lda	COLCRS
 	cmp	#40
 	bcc	plot
@@ -96,6 +101,7 @@ L3:	clc
 	ldy	COLCRS
 	sta	(ptr4),y
 
+	; update OLDADR (maybe ROWCRS and COLCRS were changed)
 	sty	tmp4
 	lda	ptr4
 	clc
@@ -104,7 +110,6 @@ L3:	clc
 	lda	ptr4+1
 	adc	#0
 	sta	OLDADR+1
-
 	rts
 
 	.rodata

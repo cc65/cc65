@@ -1,5 +1,5 @@
 ;
-; Kevin Ruland
+; Ullrich von Bassewitz, 2005-03-28
 ;
 ; unsigned char __fastcall__ revers (unsigned char onoff)
 ;
@@ -9,15 +9,14 @@
 	.include	"apple2.inc"
 
 _revers:
-	ldy	INVFLG		; Stash old value
-	and	#$FF		; Test for any bit
-	beq	normal		; Nothing set
-	lda	#~$3F		; Not Inverse
-normal:	eor	#$FF		; Xor Normal
-	sta	INVFLG
-	tya			; What was the old value?
-	eor	#$FF		; Normal = $FF, Inverse = $3F
-	beq	:+
-	lda	#$01
+	tax			; Test onoff
+	beq	normal		; If zero, "normal" must be set
+	ldx	#$3F+1		; Set "inverse"
+normal: dex			; $00->$FF, $40->$3F
+	lda	#$00		; Preload return code for "normal"
+	ldy	INVFLG		; Load current flag value
+	stx	INVFLG		; Save new flag value
+	bmi	:+		; Jump if current value is $FF (normal)
+	lda	#$01		; Return "inverse"
 :	ldx	#$00
 	rts

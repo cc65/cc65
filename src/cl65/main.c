@@ -549,6 +549,7 @@ static void Usage (void)
        	     "  -d\t\t\tDebug mode\n"
        	     "  -g\t\t\tAdd debug info\n"
        	     "  -h\t\t\tHelp (this text)\n"
+       	     "  -l\t\t\tCreate a listing if assembly was ok\n"
        	     "  -m name\t\tCreate a map file\n"
        	     "  -o name\t\tName the output file\n"
        	     "  -t sys\t\tSet the target system\n"
@@ -563,6 +564,7 @@ static void Usage (void)
 	     "  --feature name\tSet an emulation feature\n"
        	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet a compiler include directory path\n"
+       	     "  --listing\t\tCreate a listing if assembly was ok\n"
 	     "  --mapfile name\tCreate a map file\n"
        	     "  --start-addr addr\tSet the default start address\n"
        	     "  --target sys\t\tSet the target system\n"
@@ -634,6 +636,14 @@ static void OptIncludeDir (const char* Opt, const char* Arg)
 
 
 
+static void OptListing (const char* Opt, const char* Arg)
+/* Create an assembler listing */
+{
+    CmdAddArg (&CA65, "-l");
+}
+
+
+
 static void OptMapFile (const char* Opt, const char* Arg)
 /* Create a map file */
 {
@@ -693,14 +703,15 @@ int main (int argc, char* argv [])
 	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
 	{ "--debug",		0,	OptDebug		},
 	{ "--debug-info",	0,	OptDebugInfo		},
-	{ "--feature",		1,	OptFeature		},
-	{ "--help",	 	0,	OptHelp			},
+	{ "--feature",	  	1,	OptFeature		},
+	{ "--help",	  	0,	OptHelp			},
 	{ "--include-dir",	1,	OptIncludeDir		},
-	{ "--mapfile",	 	1,	OptMapFile		},
-	{ "--start-addr",	1,	OptStartAddr		},
-	{ "--target",	 	1,	OptTarget		},
-	{ "--verbose",	 	0,	OptVerbose		},
-	{ "--version",	 	0,	OptVersion		},
+	{ "--listing",		0,	OptListing		},
+	{ "--mapfile",	  	1,	OptMapFile		},
+	{ "--start-addr", 	1,	OptStartAddr		},
+	{ "--target",	  	1,	OptTarget		},
+	{ "--verbose",	  	0,	OptVerbose		},
+	{ "--version",	  	0,	OptVersion		},
     };
 
     int I;
@@ -815,6 +826,11 @@ int main (int argc, char* argv [])
 		case '?':
 		    /* Print help - cl65 */
 	     	    OptHelp (Arg, 0);
+		    break;
+
+	   	case 'l':
+		    /* Create an assembler listing */
+		    OptListing (Arg, 0);
 		    break;
 
 	   	case 'm':

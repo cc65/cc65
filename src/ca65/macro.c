@@ -40,7 +40,7 @@
 #include "check.h"
 #include "hashstr.h"
 #include "xmalloc.h"
-	  
+
 /* ca65 */
 #include "condasm.h"
 #include "error.h"
@@ -616,7 +616,7 @@ static void StartExpClassic (Macro* M)
 
 	    /* Check for end of file */
 	    if (Tok == TOK_EOF) {
-	    	Error (ERR_SYNTAX);
+	    	Error (ERR_UNEXPECTED_EOF);
 	    	return;
 	    }
 

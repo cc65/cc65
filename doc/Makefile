@@ -1,0 +1,63 @@
+#
+# Makefile for the cc65 documentation
+#
+
+
+# Default for the compiler lib search path as compiler define
+
+SGML  =	ar65.sgml	\
+	ca65.sgml
+
+TXT   =	$(SGML:.sgml=.txt)
+HTML  = $(SGML:.sgml=.html)
+INFO  = $(SGML:.sgml=.info)
+DVI   = $(SGML:.sgml=.dvi)
+
+# ------------------------------------------------------------------------------
+# Rules to make targets
+
+%.txt:	%.sgml
+	sgml2txt $<
+
+%.html:	%.sgml
+	sgml2html $<
+
+%.info:	%.sgml
+	sgml2info $<
+
+%.dvi:	%.sgml
+	sgml2latex $<
+
+# ------------------------------------------------------------------------------
+# Targets
+
+.PHONY: all
+all: 	txt html info dvi
+
+.PHONY:	txt
+txt:	$(TXT)
+
+.PHONY:	html
+html:	$(HTML)
+
+.PHONY:	info
+info:	$(INFO)
+
+.PHONY:	dvi
+dvi:	$(DVI)
+
+clean:
+	rm -f *~
+
+zap:	clean
+	rm -f $(TXT) $(HTML) $(INFO) $(DVI)
+
+# ------------------------------------------------------------------------------
+# Make the dependencies
+
+.PHONY: depend dep
+depend dep:	$(OBJS:.o=.c)
+	@echo "Creating dependency information"
+	$(CC) -MM $^ > .depend
+
+

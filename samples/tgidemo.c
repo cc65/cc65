@@ -56,7 +56,7 @@ static unsigned YRes;
 
 
 /*****************************************************************************/
-/*     	      	    	  	     Code				     */
+/*     	      	    	    	     Code				     */
 /*****************************************************************************/
 
 
@@ -90,15 +90,17 @@ static void DoCircles (void)
     static const unsigned char Palette[2] = { COLOR_WHITE, COLOR_LIGHTRED };
     unsigned char I;
     unsigned char Color = 1;
+    unsigned X = XRes / 2;
+    unsigned Y = YRes / 2;
 
     tgi_setpalette (Palette);
     while (!kbhit ()) {
         tgi_setcolor (1);
-        tgi_line (0, 0, 319, 199);
-        tgi_line (0, 199, 319, 0);
+        tgi_line (0, 0, XRes-1, YRes-1);
+        tgi_line (0, YRes-1, XRes-1, 0);
         tgi_setcolor (Color);
         for (I = 10; I < 240; I += 10) {
-            tgi_circle (160, 100, I);
+            tgi_circle (X, Y, I);
         }
         Color ^= 0x01;
     }
@@ -140,23 +142,27 @@ static void DoCheckerboard (void)
 static void DoDiagram (void)
 {
     static const unsigned char Palette[2] = { COLOR_WHITE, COLOR_BLACK };
-    unsigned X;
+    unsigned X, I;
 
     tgi_setpalette (Palette);
     tgi_setcolor (1);
-    tgi_line (10, 10, 10, 190);
-    tgi_lineto (310, 190);
+    tgi_line (10, 10, 10, YRes-10);
+    tgi_lineto (XRes-10, YRes-10);
     tgi_line (8, 12, 10, 10);
     tgi_lineto (12, 12);
-    tgi_line (308, 188, 310, 190);
-    tgi_lineto (308, 192);
-    for (X = 0; X < sizeof (SinusTable); ++X) {
-        tgi_setpixel (X+10, SinusTable[X]);
+    tgi_line (XRes-12, YRes-12, XRes-10, YRes-10);
+    tgi_lineto (XRes-12, YRes-8);
+    for (I = 0, X = 10; X < XRes-10; ++X) {
+        tgi_setpixel (X, SinusTable[I]);
+	if (++I >= sizeof (SinusTable)) {
+	    I = 0;
+	}
     }
 
     cgetc ();
     tgi_clear ();
 }
+
 
 
 static void DoLines (void)
@@ -167,16 +173,18 @@ static void DoLines (void)
     tgi_setpalette (Palette);
     tgi_setcolor (1);
 
-    for	(X = 0; X < 200; X+=10) {
-	tgi_line(0, 0, 200, X);
-	tgi_line(0, 0, X, 200);
-	tgi_line(200, 200, 0, 200-X);
-	tgi_line(200, 200, 200-X, 0);
+    for	(X = 0; X < YRes; X+=10) {
+	tgi_line (0, 0, YRes, X);
+	tgi_line (0, 0, X, YRes);
+	tgi_line (YRes, YRes, 0, YRes-X);
+	tgi_line (YRes, YRes, YRes-X, 0);
     }
 
     cgetc ();
     tgi_clear ();
 }
+
+
 
 int main (void)
 {
@@ -214,3 +222,5 @@ int main (void)
     printf ("Done\n");
     return EXIT_SUCCESS;
 }
+
+

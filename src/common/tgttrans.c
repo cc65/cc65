@@ -150,3 +150,23 @@ char* TgtTranslateStr (char* S)
 
 
 
+char* TgtTranslateBuf (char* Buf, unsigned Len)
+/* Translate a buffer of the given length from the source character set into
+ * the target system character set.
+ */
+{
+    /* Translate */
+    if (Tab) {
+       	unsigned char* B = (unsigned char*)Buf;
+	while (Len--) {
+	    *B = Tab[*B];
+	    ++B;
+	}
+    }
+
+    /* Return the argument string */
+    return Buf;
+}
+
+
+

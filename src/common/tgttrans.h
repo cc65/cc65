@@ -57,6 +57,11 @@ char* TgtTranslateStr (char* S);
  * system character set.
  */
 
+char* TgtTranslateBuf (char* Buf, unsigned Len);
+/* Translate a buffer of the given length from the source character set into
+ * the target system character set.
+ */
+
 
 
 /* End of tgttrans.h */

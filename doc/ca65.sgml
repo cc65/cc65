@@ -378,7 +378,7 @@ for the Apple ][ machines. It is available in the Apple ][ ROM. ca65 can
 generate code for this pseudo CPU when switched into sweet16 mode. The
 following is special in sweet16 mode:
 
-<itemize> 
+<itemize>
 
 <item>The '@' character denotes indirect addressing and is no longer available
 for cheap local labels. If you need cheap local labels, you will have to
@@ -395,7 +395,7 @@ SWEET 16 code, nor the zero page locations needed for the SWEET 16 registers,
 nor does it call the interpreter. All this must be done by your program. Apple
 ][ programmers do probably know how to use sweet16 mode.
 
-For more information about SWEET 16, see 
+For more information about SWEET 16, see
 <htmlurl url="http://www.6502.org/source/interpreters/sweet16.htm"
 name="http://www.6502.org/source/interpreters/sweet16.htm">.
 
@@ -3657,6 +3657,7 @@ each supported CPU a constant similar to
     CPU_65C02
     CPU_65816
     CPU_SUNPLUS
+    CPU_SWEET16
 </verb></tscreen>
 
 is defined. These constants may be used to determine the exact type of the
@@ -3669,6 +3670,7 @@ another constant is defined:
     CPU_ISET_65C02
     CPU_ISET_65816
     CPU_ISET_SUNPLUS
+    CPU_ISET_SWEET16
 </verb></tscreen>
 
 The value read from the <tt/<ref id=".CPU" name=".CPU">/ pseudo variable may
@@ -3696,6 +3698,34 @@ it is possible to determine if the
 instruction is supported, which is the case for the 65SC02, 65C02 and 65816
 CPUs (the latter two are upwards compatible to the 65SC02).
 
+
+
+<sect>Predefined constants<label id="predefined-constants"><p>
+
+For better orthogonality, the assembler defines similar symbols as the
+compiler, depending on the target system selected:
+
+<itemize>
+<item><tt/__ACE__/ - Target system is <tt/ace/
+<item><tt/__APPLE2__",/ - Target system is <tt/apple2/
+<item><tt/__APPLE2ENH__",/ - Target system is <tt/apple2enh/
+<item><tt/__ATARI__/ - Target system is <tt/atari/
+<item><tt/__ATMOS__",/ - Target system is <tt/atmos/
+<item><tt/__BBC__",/ - Target system is <tt/bbc/
+<item><tt/__C128__/ - Target system is <tt/c128/
+<item><tt/__C16__/ - Target system is <tt/c16/
+<item><tt/__C64__/ - Target system is <tt/c64/
+<item><tt/__CBM__/ - Target is a Commodore system
+<item><tt/__CBM510__/ - Target system is <tt/cbm510/
+<item><tt/__CBM610__/ - Target system is <tt/cbm610/
+<item><tt/__GEOS__",/ - Target system is <tt/geos/
+<item><tt/__LUNIX__",/ - Target system is <tt/lunix/
+<item><tt/__NES__",/ - Target system is <tt/nes/
+<item><tt/__PET__/ - Target system is <tt/pet/
+<item><tt/__PLUS4__/ - Target system is <tt/plus4/
+<item><tt/__SUPERVISION__",/ - Target system is <tt/supervision/
+<item><tt/__VIC20__/ - Target system is <tt/vic20/
+</itemize>
 
 
 <sect>Structs and unions<label id="structs"><p>

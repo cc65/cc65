@@ -20,6 +20,7 @@ struct appheader {
 	int mode;
 	int dostype;
 	int geostype;
+	int structure;
 	char *dosname;
 	char *classname;
 	char *version;
@@ -27,16 +28,19 @@ struct appheader {
 	char *info; };
 
 const char *mainToken[] = {
-	"MENU", "HEADER", "ICON", "DIALOG", "" };
+	"MENU", "HEADER", "ICON", "DIALOG", "VLIR", "" };
 
 const char *hdrFTypes[] = {
 	"APPLICATION", "AUTO_EXEC", "DESK_ACC", "ASSEMBLY", "DISK_DEVICE", "PRINTER", "SYSTEM", "" };
 
 const char *hdrFields[] = {
-	"author", "info", "date", "dostype", "mode", "" };
+	"author", "info", "date", "dostype", "mode", "structure", "" };
 
 const char *hdrDOSTp[] = {
 	"seq", "SEQ", "prg", "PRG", "usr", "USR", "" };
+
+const char *hdrStructTp[] = {
+	"seq", "SEQ", "vlir", "VLIR", "" };
 
 const char *hdrModes[] = {
 	"any", "40only", "80only", "c64only", "" };
@@ -62,9 +66,10 @@ const unsigned char icon1[] = {
 
 char *progName;
 
-char *outputCName=NULL, *outputSName=NULL;
-FILE *outputCFile, *outputSFile;
-int CFnum=0, SFnum=0;
+char *outputCName=NULL, *outputSName=NULL, *outputVName=NULL;
+FILE *outputCFile, *outputSFile, *outputVFile;
+int CFnum=0, SFnum=0, VFnum=0;
 int forceFlag=0;
 char outputCMode[2]="w";
 char outputSMode[2]="w";
+char outputVMode[2]="w";

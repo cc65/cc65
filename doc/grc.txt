@@ -3,11 +3,11 @@
 
     grc - GEOS resource compiler
 
-    Maciej 'YTM/Alliance' Witkowiak
-    <ytm@friko.onet.pl>
+    Maciej 'YTM/Elysium' Witkowiak
+    <ytm@elysium.pl>
 
     VII 2000
-
+    VI  2002
 
 
 
@@ -22,13 +22,16 @@ menu definitions, other headers (e.g. for data files of an app), dialogs
 definitions etc. Without application header GEOS is unable to load and start
 it.
 
-Currently, grc supports only menus and required header definition.
+Currently, grc supports only menus and required header definition as long with
+support for building VLIR structured files.
 
-grc generates output in two formats - as C header and ca65 source (.s). This
-is because application header data must be in assembler format while menu
-definitions can be easily translated into C. The purpose of C file is to include
-it as header in only one project file. Assembler source should be processed with
-ca65 and linked as first object (read Building process below).
+grc generates output in three formats - as C header, ca65 source (.s) and for
+linking VLIR - ld65 configuration file. This is because application header data
+must be in assembler format while menu definitions can be easily translated
+into C. The purpose of C file is to include it as header in only one project
+file. Assembler source should be processed with ca65 and linked as first object
+(read Building process below). VLIR structure is currently supported only for
+project written entirely in assembler.
 
 2. Usage
 --------
@@ -37,13 +40,14 @@ grc accepts following options:
     -f 		force writting output files
     -o name	name C output file
     -s name	name S output file
+    -l name     name ld65 output file
     -h		help
 
 Default output names are made from input name with extension replaced by '.h'
 and '.s'. grc will not overwrite existing files unless forced to do so.
 This is to avoid situation where you have test.c and test.grc files. Both would
 make output into test.s. For this reason you should name your resources files
-differently than sources, e.g. as resource.grc or apphead.grc
+differently than sources, e.g. as resource.grc or apphead.grc.
 
 
 3. Resource file format
@@ -57,7 +61,6 @@ Everything after a ';' till the end of line is considered as comment and
 ignored.
 See included commented example .grc file for better view of the problem.
 
-Currently grc supports only two types of resources - menu and header.
 
 a) menu definition
 
@@ -90,6 +93,7 @@ or to another menu definition.
 If you are doing sub(sub)menus definitions remember to place the lowest level
 definition first. This way C compiler won't complain about unknown names.
 
+
 b) header definition
 
 HEADER GEOS_TYPE "dosname" "classname" "version"
@@ -99,6 +103,7 @@ HEADER GEOS_TYPE "dosname" "classname" "version"
     date   yy mm dd hh ss
     dostype SEQ
     mode    any
+    structure SEQ
 }
 
 Header definition describes GEOS header sector which is unique to each file.
@@ -121,9 +126,39 @@ Mode can be 'any', '40only', '80only', 'c64only' and describes system
 requirements. 'any' will work both on GEOS64 and GEOS128 in 40 and 80 column
 modes. '40only' will work on GEOS128 in 40 column mode only. '80only' will
 work only on GEOS128 and 'c64only' will work only on GEOS64.
+The default value for 'structure' is SEQ (sequential). You can also put 'VLIR'
+there but then you have also to place third type of resources - VLIR table
+description.
 
 
-4. Building GEOS application
+c) VLIR table description
+
+VLIR headname address {
+    vlir0
+    blank
+    vlir2
+    blank
+    vlir4
+}
+
+The first element is keyword 'VLIR', then goes the name for header binary name
+(read below) and base address for all VLIR chains diffrent than 0. It can be
+either decimal (e.g. '4096') or hexadecimal with '0x' prefix (e.g. '0x1000').
+Then between brackets are names of vlir chain binaries or keyword 'blank' which
+denotes empty chains. In this example chains #1 and #3 are missing.
+The names between brackets are names of binaries containing code for each VLIR
+part. They matter only for generated ld65 configuration file and will be the
+names of resulting binary files after linking. Each one will contain one VLIR
+chain and they will have to be put together into VLIR .cvt by vlink utility in
+correct order.
+The 'headname' will be the name for binary which will contain only GEOS .cvt
+header made out of compiling .s header file generated also by grc.
+At the end of resulting ld65 config file (.cfg) in comments there will be
+information what commands are required for putting the stuff together. Read
+info below and see example somewhere around.
+
+
+4. Building GEOS application (SEQUENTIAL)
 ----------------------------
 
 Before proceeding please read cc65, ca65 and ld65 documentation and find
@@ -191,7 +226,7 @@ And voilá - resource.o is ready
 
 4. Fourth and the last step - linking it together
 
-$ ld -t geos -o test.cvt resource.o geos.o test.o geos.lib
+$ ld65 -t geos -o test.cvt resource.o geos.o test.o geos.lib
 
 resource.o comes first because it contains the header. Next one is geos.o, a
 required starter code, then actual application code in test.o and the last is
@@ -204,7 +239,64 @@ On each step a '-t geos' was present at the command line. This switch is require
 for correct process of app building.
 
 
-5. Bugs and feedback
+5. Building GEOS application (VLIR)
+-----------------------------------
+
+Currently you can only build VLIR application if your code is written in
+assembler. No .c allowed.
+
+In your sources only command '.segment "NAME"' will decide which code/data goes
+where. Filenames doesn't matter.
+Segments CODE, RODATA, DATA and BSS go into VLIR part #0. Segment VLIR1 go to
+VLIR part #1, VLIR2 - VLIR part #2 and so on.
+
+GEOS resource file contents are similar to seq example but there is also 'VLIR'
+section and 'structure VLIR' tag. Here is that part:
+
+VLIR vlir-head.bin 0x3000 {
+  vlir-0.bin	; CODE, RODATA, DATA, BSS
+  vlir-1.bin	; VLIR1
+  vlir-2.bin	; VLIR2
+}
+
+Source files are only .s.
+Ok. We have 'cvthead.grc' so let's allow grc to compile it:
+
+$ grc cvthead.grc
+
+Now there are two new files: cvthead.cfg and cvthead.s - the first one is a
+config file for ld65 and the second one contains GEOS .cvt header. It can be
+assembled now:
+
+$ ca65 cvthead.s
+
+Now we have cvthead.o. The rest of assembly sources can be also assembled now:
+
+$ ca65 vlir0.s
+$ ca65 vlir1.s
+$ ca65 vlir2.s
+
+Note that filenames here although similar to those from VLIR section of .grc file
+are not significant. The only thing that matters is which code will go to which
+segment.
+Now we can generate binaries. This time order of arguments in command line is
+not important.
+
+$ ld65 -C cvthead.cfg cvthead.o vlir0.o vlir1.o vlir2.o
+
+As defined in .grc file, we have now binary parts of VLIR file:
+vlir-head.bin, vlir-0.bin, vilr-1.bin, vlir-2.bin
+
+The last step is to put them together in the right order, order of arguments
+is important this time. As suggested in comments at the end of cvthead.cfg
+we do:
+
+$ vlink output.cvt vlir-head.bin vlir-0.bin vlir-1.bin vlir-2.bin
+
+This is the end. The file 'output.cvt' can be unconverted under GEOS.
+Note that the switch '-t geos' wasn't present at any stage of this process.
+
+6. Bugs and feedback
 --------------------
 
 This is the first release of grc and it contains bugs for sure. I am aware of
@@ -216,7 +308,7 @@ I would also appreciate comments and help on this file because I am sure that
 it can be written better.
 
 
-6. Legal stuff
+7. Legal stuff
 --------------
 
 grc is covered by the same license as whole cc65 package, so see its
@@ -268,6 +360,7 @@ HEADER APPLICATION "MyFirstApp" "Class Name" "V1.0"
     info "Information text"			; always in quotes!
 ;    date yy mm dd hh ss			; always 5 fields!
 ;    dostype seq				; can be PRG, SEQ, USR (only UPPER or lower case)
+;    structure seq				; can be SEQ, VLIR (only UPPER or lower case)
     mode c64only				; can be any, 40only, 80only, c64only
 }
 

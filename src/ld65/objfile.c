@@ -40,6 +40,7 @@
 #include <sys/stat.h>
 
 /* common */
+#include "fname.h"
 #include "xmalloc.h"
 
 /* ld65 */
@@ -65,14 +66,7 @@ static const char* GetModule (const char* Name)
 /* Get a module name from the file name */
 {
     /* Make a module name from the file name */
-    const char* Module = Name + strlen (Name);
-    while (Module > Name) {
-	--Module;
-	if (*Module == '/' || *Module == '\\') {
-	    ++Module;
-	    break;
-	}
-    }
+    const char* Module = FindName (Name);
     if (*Module == 0) {
 	Error ("Cannot make module name from `%s'", Name);
     }

@@ -40,6 +40,7 @@
 
 /* common */
 #include "cmdline.h"
+#include "filetype.h"
 #include "libdefs.h"
 #include "objdefs.h"
 #include "print.h"
@@ -73,8 +74,6 @@
 
 static unsigned		ObjFiles   = 0; /* Count of object files linked */
 static unsigned		LibFiles   = 0; /* Count of library files linked */
-static const char*	LibPath    = 0; /* Search path for modules */
-static unsigned		LibPathLen = 0; /* Length of LibPath */
 
 
 
@@ -108,9 +107,11 @@ static void Usage (void)
        	     "  --config name\t\tUse linker config file\n"
              "  --dump-config name\tDump a builtin configuration\n"
 	     "  --help\t\tHelp (this text)\n"
+             "  --lib file\t\tLink this library\n"
              "  --lib-path path\tSpecify a library search path\n"
 	     "  --mapfile name\tCreate a map file\n"
              "  --module-id id\tSpecify a module id\n"
+             "  --obj file\t\tLink this object file\n"
              "  --obj-path path\tSpecify an object file search path\n"
        	     "  --start-addr addr\tSet the default start address\n"
        	     "  --target sys\t\tSet the target system\n"
@@ -147,78 +148,75 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
 
 
 
-static int HasPath (const char* Name)
-/* Check if the given Name has a path component */
-{
-    return strchr (Name, '/') != 0 || strchr (Name, '\\') != 0;
-}
-
-
-
-static void LinkFile (const char* Name)
+static void LinkFile (const char* Name, FILETYPE Type)
 /* Handle one file */
 {
+    char*         PathName;
+    FILE*         F;
     unsigned long Magic;
-    unsigned Len;
-    char* NewName = 0;
+
+
+    /* If we don't know the file type, determine it from the extension */
+    if (Type == FILETYPE_UNKNOWN) {
+        Type = GetFileType (Name);
+    }
+
+    /* For known file types, search the file in the directory list */
+    switch (Type) {
+
+        case FILETYPE_LIB:
+            PathName = SearchFile (Name, SEARCH_LIB);
+            break;
+
+        case FILETYPE_OBJ:
+            PathName = SearchFile (Name, SEARCH_OBJ);
+            break;
+
+        default:
+            PathName = xstrdup (Name);   /* Use the name as is */
+            break;
+    }
+
+    /* We must have a valid name now */
+    if (PathName == 0) {
+        Error ("Input file `%s' not found", Name);
+    }
 
     /* Try to open the file */
-    FILE* F = fopen (Name, "rb");
+    F = fopen (PathName, "rb");
     if (F == 0) {
-	/* We couldn't open the file. If the name doesn't have a path, and we
-	 * have a search path given, try the name with the search path
-	 * prepended.
-	 */
-	if (LibPathLen > 0 && !HasPath (Name)) {
-	    /* Allocate memory. Account for the trailing zero, and for a
-	     * path separator character eventually needed.
-	     */
-	    Len = LibPathLen;
-	    NewName = xmalloc (strlen (Name) + Len + 2);
-	    /* Build the new name */
-	    memcpy (NewName, LibPath, Len);
-	    if (NewName [Len-1] != '/' && NewName [Len-1] != '\\') {
-		/* We need an additional path separator */
-		NewName [Len++] = '/';
-	    }
-    	    strcpy (NewName + Len, Name);
-
-	    /* Now try to open the new file */
-	    F = fopen (NewName, "rb");
-	}
-
-	if (F == 0) {
-	    Error ("Cannot open `%s': %s", Name, strerror (errno));
-	}
+        Error ("Cannot open `%s': %s", PathName, strerror (errno));
     }
 
     /* Read the magic word */
     Magic = Read32 (F);
 
-    /* Do we know this type of file? */
+    /* Check the magic for known file types. The handling is somewhat weird
+     * since we may have given a file with a ".lib" extension, which was
+     * searched and found in a directory for library files, but we now find
+     * out (by looking at the magic) that it's indeed an object file. We just
+     * ignore the problem and hope no one will notice...
+     */
     switch (Magic) {
 
-	case OBJ_MAGIC:
-	    ObjAdd (F, Name);
-	    ++ObjFiles;
-	    break;
+       	case OBJ_MAGIC:
+       	    ObjAdd (F, PathName);
+       	    ++ObjFiles;
+       	    break;
 
-	case LIB_MAGIC:
-	    LibAdd (F, Name);
-	    ++LibFiles;
-	    break;
+       	case LIB_MAGIC:
+       	    LibAdd (F, PathName);
+       	    ++LibFiles;
+       	    break;
 
-	default:
+       	default:
 	    fclose (F);
-	    Error ("File `%s' has unknown type", Name);
+	    Error ("File `%s' has unknown type", PathName);
 
     }
 
-    /* If we have allocated memory, free it here. Note: Memory will not always
-     * be freed if we run into an error, but that's no problem. Adding more
-     * code to work around it will use more memory than the chunk that's lost.
-     */
-    xfree (NewName);
+    /* Free allocated memory. */
+    xfree (PathName);
 }
 
 
@@ -234,10 +232,19 @@ static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
 static void OptConfig (const char* Opt attribute ((unused)), const char* Arg)
 /* Define the config file */
 {
+    char* PathName;
+
     if (CfgAvail ()) {
 	Error ("Cannot use -C/-t twice");
     }
-    CfgSetName (Arg);
+    /* Search for the file */
+    PathName = SearchFile (Arg, SEARCH_CFG);
+    if (PathName == 0) {
+        Error ("Cannot find config file `%s'", Arg);
+    } else {
+        CfgSetName (PathName);
+        xfree (PathName);
+    }
 }
 
 
@@ -275,6 +282,14 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 
+static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
+/* Link a library */
+{
+    LinkFile (Arg, FILETYPE_LIB);
+}
+
+
+
 static void OptLibPath (const char* Opt attribute ((unused)), const char* Arg)
 /* Specify a library file search path */
 {
@@ -299,6 +314,14 @@ static void OptModuleId (const char* Opt, const char* Arg)
         Error ("Range error in module id");
     }
     ModuleId = (unsigned) Id;
+}
+
+
+
+static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
+/* Link an object file */
+{
+    LinkFile (Arg, FILETYPE_OBJ);
 }
 
 
@@ -362,9 +385,11 @@ int main (int argc, char* argv [])
      	{ "--dbgfile",          1,      OptDbgFile              },
        	{ "--dump-config",     	1,     	OptDumpConfig           },
      	{ "--help",	       	0,     	OptHelp	     	    	},
+        { "--lib",              1,      OptLib                  },
        	{ "--lib-path",         1,     	OptLibPath              },
      	{ "--mapfile",		1,	OptMapFile	    	},
        	{ "--module-id",        1,     	OptModuleId             },
+        { "--obj",              1,      OptObj                  },
        	{ "--obj-path",         1,     	OptObjPath              },
 	{ "--start-addr",	1,	OptStartAddr	    	},
 	{ "--target",		1,	OptTarget    	    	},
@@ -376,17 +401,8 @@ int main (int argc, char* argv [])
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "ld65");
 
-    /* Evaluate the CC65_LIB environment variable */
-    LibPath = getenv ("CC65_LIB");
-    if (LibPath == 0) {
-	/* Use some default path */
-#ifdef CC65_LIB
-	LibPath = CC65_LIB;
-#else
-     	LibPath = "/usr/lib/cc65/lib/";
-#endif
-    }
-    LibPathLen = strlen (LibPath);
+    /* Initialize the input file search paths */
+    InitSearchPaths ();
 
     /* Check the parameters */
     I = 1;
@@ -462,7 +478,7 @@ int main (int argc, char* argv [])
 	} else {
 
 	    /* A filename */
-	    LinkFile (Arg);
+	    LinkFile (Arg, FILETYPE_UNKNOWN);
 
 	}
 

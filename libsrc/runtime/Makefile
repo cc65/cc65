@@ -34,9 +34,6 @@ LOBJS  = lruntime.o lconvert.o ladd.o lsub.o lrsub.o leq.o lne.o\
 all:	$(OBJS) $(LOBJS)
 
 clean:
-	@rm -f *~
-	@rm -f $(COBJS:.o=.s)
-	@rm -f $(OBJS)
-	@rm -f $(LOBJS)
+	@rm -f *~ $(COBJS:.o=.s) $(OBJS) $(LOBJS)
 
 

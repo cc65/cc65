@@ -16,13 +16,10 @@
 C_OBJS =
 
 S_OBJS = crt0.o conio.o kbhit.o clrscr.o cgetc.o readjoy.o\
-  	 color.o cputc.o break.o
+	 color.o cputc.o break.o
 
 all:	$(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f $(C_OBJS:.c=.s)
-	@rm -f $(C_OBJS)
-	@rm -f $(S_OBJS)
-	@rm -f crt0.o
+	@rm -f $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS) crt0.o
 

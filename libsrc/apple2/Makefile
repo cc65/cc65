@@ -22,8 +22,5 @@ S_OBJS = break.o clrscr.o cclear.o cgetc.o chline.o color.o \
 all:	$(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f $(C_OBJS:.c=.s)
-	@rm -f $(C_OBJS)
-	@rm -f $(S_OBJS)
-	@rm -f crt0.o
+	@rm -f $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS) crt0.o
 

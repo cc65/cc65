@@ -20,7 +20,4 @@ S_OBJS = cputs.o cursor.o cputhex.o scrsize.o
 all:  	$(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f *~
-	@rm -f $(C_OBJS:.o=.s)
-	@rm -f $(C_OBJS)
-	@rm -f $(S_OBJS)
+	@rm -f *~ $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS)

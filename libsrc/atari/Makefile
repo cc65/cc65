@@ -25,8 +25,5 @@ S_OBJS = crt0.o kbhit.o conio.o clrscr.o cputc.o ctype.o chline.o cvline.o \
 all:	$(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f $(C_OBJS:.c=.s)
-	@rm -f $(C_OBJS)
-	@rm -f $(S_OBJS)
-	@rm -f crt0.o
+	@rm -f $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS) crt0.o
 

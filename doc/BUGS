@@ -1,4 +1,4 @@
-List of known bugs that will not get fixed in the near future:
+List of known bugs that will not get fixed before any new major release:
 
   * The compiler does not detect if part of an expression evaluated
     with && or || is constant. Since the expression evaluation is also
@@ -8,4 +8,17 @@ List of known bugs that will not get fixed in the near future:
 
   * Initialization of local variables with compound data types is not
     possible.
+								      
+Introduced with version 2.5:
+
+  * Use of "goto" to jump into or out of blocks that declare local variables
+    will create programs that crash, since the stack is not corrected. The old
+    stack correction code was removed because of the restructuring of the 
+    symbol table stuff and was not reintroduced because it was ugly anyway,
+    did not work with the new symbol table code, and should be unnecessary as
+    soon as local variables are allocated in one chunk on function entry.
+
+  * Register variables are not currently unavailable. The command line
+    switches and the "register" keyword is still accepted, so this should not
+    harm existing programs.
 

@@ -13,6 +13,7 @@ void __fastcall__ _poserror (const char* msg)
 {
     const char *errmsg = _stroserror(_oserror);
 
+    ExitTurbo();
     if (msg && *msg) {
 	DlgBoxOk(msg, errmsg);
     } else {

@@ -11,6 +11,8 @@
 void _afailed (char* file, unsigned line)
 {
 
+    ExitTurbo();
+
     drawWindow.top = 0;
     drawWindow.left = 0;
     drawWindow.bot = 15;

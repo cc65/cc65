@@ -13,6 +13,7 @@ void __fastcall__ perror(const char* msg)
 {
     const char *errmsg = strerror(errno);
 
+    ExitTurbo();
     if (msg && *msg) {
 	DlgBoxOk(msg, errmsg);
     } else {

@@ -128,16 +128,25 @@ static void DumpFile (const char* Name)
 
     /* Do we know this type of file? */
     if (Magic != OBJ_MAGIC) {
-	fclose (F);
-	Warning ("File `%s' is not an xo65 object file", Name);
-    }
 
-    /* Print the filename */
-    printf ("%s:\n", Name);
+	/* Unknown format */
+       	printf ("%s: (no xo65 object file)\n", Name);
 
-    /* Check what to dump */
-    if (What & D_HEADER) { 
-	DumpHeader (F, 0);
+    } else if (What == 0) {
+
+	/* Special handling if no info was requested */
+     	printf ("%s: (no information requested)\n", Name);
+
+    } else {
+
+     	/* Print the filename */
+     	printf ("%s:\n", Name);
+
+     	/* Check what to dump */
+     	if (What & D_HEADER) {
+     	    DumpHeader (F, 0);
+     	}
+
     }
 
     /* Close the file */

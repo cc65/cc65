@@ -420,7 +420,7 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
     int Result;
     TokNode* Root = 0;
     TokNode* Last = 0;
-    TokNode* Node = 0;
+    TokNode* Node;
 
     /* A list of tokens follows. Read this list and remember it building a
      * single linked list of tokens including attributes. The list is
@@ -766,7 +766,7 @@ static ExprNode* Factor (void)
 {
     ExprNode* L;
     ExprNode* N;
-    long      Val;                
+    long      Val;
 
     switch (Tok) {
 

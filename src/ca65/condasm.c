@@ -122,7 +122,7 @@ static IfDesc* GetCurrentIf (void)
 static void FreeIf (void)
 /* Free all .IF descriptors until we reach one with the NeedTerm bit set */
 {
-    int Done = 0;
+    int Done;
     do {
        	IfDesc* D = GetCurrentIf();
        	if (D == 0) {

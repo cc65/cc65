@@ -9,7 +9,7 @@
 #include <errno.h>
 #include <geos.h>
 
-void perror(const char* msg)
+void __fastcall__ perror(const char* msg)
 {
 
     DlgBoxOk(msg,strerror(errno));

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -165,6 +165,16 @@ void SymConDes (SymEntry* Sym, unsigned char AddrSize, unsigned Type, unsigned P
  * mark the symbol as an export. Initializers may never be zero page symbols.
  */
 
+void SymExportFromGlobal (SymEntry* S);
+/* Called at the end of assembly. Converts a global symbol that is defined
+ * into an export.
+ */
+
+void SymImportFromGlobal (SymEntry* S);
+/* Called at the end of assembly. Converts a global symbol that is undefined
+ * into an import.
+ */
+
 #if defined(HAVE_INLINE)
 INLINE int SymIsDef (const SymEntry* S)
 /* Return true if the given symbol is already defined */
@@ -194,6 +204,17 @@ INLINE int SymIsImport (const SymEntry* S)
 }
 #else
 #  define SymIsImport(S)  (((S)->Flags & SF_IMPORT) != 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int SymIsExport (const SymEntry* S)
+/* Return true if the given symbol is marked as export */
+{
+    /* Check the export flag */
+    return (S->Flags & SF_EXPORT) != 0;
+}
+#else
+#  define SymIsExport(S)  (((S)->Flags & SF_EXPORT) != 0)
 #endif
 
 int SymIsConst (SymEntry* Sym, long* Val);

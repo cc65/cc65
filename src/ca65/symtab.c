@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -520,11 +520,10 @@ void SymCheck (void)
 	 * already defined, otherwise mark it as import.
 	 */
 	if (S->Flags & SF_GLOBAL) {
-	    S->Flags &= ~SF_GLOBAL;
 	    if (S->Flags & SF_DEFINED) {
-	     	S->Flags |= SF_EXPORT;
+	     	SymExportFromGlobal (S);
 	    } else {
-	     	S->Flags |= SF_IMPORT;
+	     	SymImportFromGlobal (S);
 	    }
 	}
 
@@ -584,6 +583,18 @@ void SymCheck (void)
                 ED_Init (&ED);
                 StudyExpr (S->Expr, &ED);
                 S->AddrSize = ED.AddrSize;
+                if (SymIsExport (S)) {
+                    if (S->ExportSize == ADDR_SIZE_DEFAULT) {
+                        /* Use the real export size */
+                        S->ExportSize = S->AddrSize;
+                    } else if (S->AddrSize > S->ExportSize) {
+                        /* We're exporting a symbol smaller than it actually is */
+                        PWarning (&S->Pos, 1,
+                                  "Symbol `%s' is %s but exported %s",
+                                  GetSymName (S), AddrSizeToStr (S->AddrSize),
+                                  AddrSizeToStr (S->ExportSize));
+                    }
+                }
                 ED_Done (&ED);
             }
 	}

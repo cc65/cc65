@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -470,6 +470,30 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
 
     /* Set the symbol data */
     S->Flags |= (SF_EXPORT | SF_REFERENCED);
+}
+
+
+
+void SymExportFromGlobal (SymEntry* S)
+/* Called at the end of assembly. Converts a global symbol that is defined
+ * into an export.
+ */
+{
+    /* Remove the global flag and make the symbol an export */
+    S->Flags &= ~SF_GLOBAL;
+    S->Flags |= SF_EXPORT;
+}
+
+
+
+void SymImportFromGlobal (SymEntry* S)
+/* Called at the end of assembly. Converts a global symbol that is undefined
+ * into an import.
+ */
+{
+    /* Remove the global flag and make it an import */
+    S->Flags &= ~SF_GLOBAL;
+    S->Flags |= SF_IMPORT;
 }
 
 

@@ -429,6 +429,32 @@ This cc65 version has some extensions to the ISO C standard.
 	The macro will print the name of the current function plus a given
 	string.
 	<p>
+
+<item> 	cc65 allows the initialization of <tt/void/ variables. This may be 
+	used to create variable structures that are more compatible with 
+	interfaces written for assembler languages. Here is an example:
+
+	<tscreen><verb>
+	void GCmd = {	(char)3, (unsigned)0x2000, (unsigned)0x3000 };
+	</verb></tscreen>
+
+	This will be translated as follows:
+
+	<tscreen><verb>
+	_GCmd:
+	 	.byte	3
+		.word	$2000
+		.word	$3000
+	</verb></tscreen>
+
+	Since the variable is of type <tt/void/ you may not use it as is. 
+	However, taking the address of the variable results in a <tt/void*/
+	which may be passed to any function expecting a pointer.
+
+	See the <htmlurl url="geos.html" name="GEOS library"> for examples on
+	how to use this feature.
+	<p>
+
 </itemize>
 <p>
 

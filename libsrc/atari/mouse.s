@@ -14,8 +14,9 @@
 	.export	_mouse_init, _mouse_done, _mouse_box
 	.export _mouse_show, _mouse_hide, _mouse_move
 	.export _mouse_buttons
+	.constructor	mousemem
 
-	.import popa,popax,mouse_pm0
+	.import popa,popax
 
 	.include "atari.inc"
 
@@ -34,6 +35,23 @@ pmsize	= 16		; y size pm shape
 
 xinit	= defxmin	; init. x pos.
 yinit	= defymin	; init. y pos.
+
+;--------------------------------------------------------------------
+; reserve memory for the mouse pointer
+
+mousemem:
+	lda	APPMHI+1
+	and	#%11111000	; make 2k aligned
+	sec
+	sbc	#%00001000	; reserve 2k
+	tax
+	adc	#3		; add 4 (C = 1)
+	sta	mouse_pm0
+	lda	#0
+	sta	APPMHI
+	stx	APPMHI+1
+	rts
+	
 
 ;--------------------------------------------------------------------
 ; Initialize mouse routines
@@ -532,4 +550,6 @@ omy:	.res 1		; old y pos
 mouse_on:
 	.res 1
 port_nr:
+	.res 1
+mouse_pm0:
 	.res 1

@@ -9,9 +9,6 @@
         .include        "em-error.inc"
         .include        "modload.inc"
 
-	.import		return0
-
-
 _em_unload:
 	lda	_em_drv
 	ora	_em_drv+1
@@ -23,7 +20,12 @@ _em_unload:
         ldx     _em_drv+1
         jsr     _mod_free               ; Free the driver
 
-	jmp	return0
+        lda     #0
+        sta     _em_drv
+        sta     _em_drv+1               ; Clear the driver pointer
+
+        tax
+        rts                             ; Return zero
 
 no_driver:
 	tax				; X = 0

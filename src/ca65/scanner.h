@@ -106,6 +106,8 @@ enum Token {
     TOK_RPAREN,	  	/* ) */
     TOK_LBRACK,	  	/* [ */
     TOK_RBRACK,	  	/* ] */
+    TOK_LCURLY,         /* { */
+    TOK_RCURLY,         /* } */
 
     TOK_OVERRIDE_ZP,    /* z: */
     TOK_OVERRIDE_ABS,   /* a: */

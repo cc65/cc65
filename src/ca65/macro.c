@@ -655,7 +655,9 @@ MacEnd:
 static void StartExpClassic (Macro* M)
 /* Start expanding the classic macro M */
 {
-    MacExp* E;
+    MacExp*     E;
+    enum Token  Term;
+
 
     /* Skip the macro name */
     NextTok ();
@@ -670,21 +672,29 @@ static void StartExpClassic (Macro* M)
 
        	/* Check for maximum parameter count */
 	if (E->ParamCount >= M->ParamCount) {
-	    Error ("Too many macro parameters");
-	    SkipUntilSep ();
+       	    ErrorSkip ("Too many macro parameters");
 	    break;
 	}
 
-	/* Read tokens for one parameter, accept empty params */
+        /* The macro may optionally be enclosed in curly braces */
+        if (Tok == TOK_LCURLY) {
+            NextTok ();
+            Term = TOK_RCURLY;
+        } else {
+            Term = TOK_COMMA;
+        }
+
+       	/* Read tokens for one parameter, accept empty params */
 	Last = 0;
-	while (Tok != TOK_COMMA && Tok != TOK_SEP) {
+	while (Tok != Term && Tok != TOK_SEP) {
 
 	    TokNode* T;
 
 	    /* Check for end of file */
 	    if (Tok == TOK_EOF) {
-	    	Error ("Unexpected end of file");
-	    	return;
+	     	Error ("Unexpected end of file");
+                FreeMacExp (E);
+	     	return;
 	    }
 
 	    /* Get the next token in a node */
@@ -694,7 +704,7 @@ static void StartExpClassic (Macro* M)
 	    if (Last == 0) {
 	      	E->Params [E->ParamCount] = T;
 	    } else {
-	    	Last->Next = T;
+	     	Last->Next = T;
 	    }
 	    Last = T;
 
@@ -705,13 +715,27 @@ static void StartExpClassic (Macro* M)
 	/* One parameter more */
 	++E->ParamCount;
 
+        /* If the macro argument was enclosed in curly braces, end-of-line
+         * is an error. Skip the closing curly brace.
+         */
+        if (Term == TOK_RCURLY) {
+            if (Tok == TOK_SEP) {
+                Error ("End of line encountered within macro argument");
+                break;
+            }
+            NextTok ();
+        }
+
 	/* Check for a comma */
 	if (Tok == TOK_COMMA) {
-	    NextTok ();
-	} else {
-	    break;
-	}
+ 	    NextTok ();
+ 	} else {
+ 	    break;
+ 	}
     }
+
+    /* We must be at end of line now, otherwise something is wrong */
+    ExpectSep ();
 
     /* Insert a new token input function */
     PushInput (MacExpand, E, ".MACRO");
@@ -736,14 +760,23 @@ static void StartExpDefine (Macro* M)
     /* Read the actual parameters */
     while (Count--) {
 
-       	TokNode* Last;
+        enum Token Term;
+       	TokNode*   Last;
+
+        /* The macro may optionally be enclosed in curly braces */
+        if (Tok == TOK_LCURLY) {
+            NextTok ();
+            Term = TOK_RCURLY;
+        } else {
+            Term = TOK_COMMA;
+        }
 
        	/* Check if there is really a parameter */
-       	if (TokIsSep (Tok) || Tok == TOK_COMMA) {
-       	    Error ("Macro parameter expected");
-       	    SkipUntilSep ();
-       	    return;
-       	}
+       	if (TokIsSep (Tok) || Tok == Term) {
+            ErrorSkip ("Macro parameter #%u is empty", E->ParamCount+1);
+            FreeMacExp (E);
+            return;
+        }
 
        	/* Read tokens for one parameter */
        	Last = 0;
@@ -765,10 +798,21 @@ static void StartExpDefine (Macro* M)
 	    /* And skip it... */
 	    NextTok ();
 
-	} while (Tok != TOK_COMMA && !TokIsSep (Tok));
+       	} while (Tok != Term && !TokIsSep (Tok));
 
 	/* One parameter more */
 	++E->ParamCount;
+
+        /* If the macro argument was enclosed in curly braces, end-of-line
+         * is an error. Skip the closing curly brace.
+         */
+        if (Term == TOK_RCURLY) {
+            if (TokIsSep (Tok)) {
+                Error ("End of line encountered within macro argument");
+                break;
+            }
+            NextTok ();
+        }
 
        	/* Check for a comma */
        	if (Count > 0) {
@@ -782,7 +826,7 @@ static void StartExpDefine (Macro* M)
 
     /* Macro expansion will overwrite the current token. This is a problem
      * for define style macros since these are called from the scanner level.
-     * To avoid it, remember the current token and re-insert it if macro
+     * To avoid it, remember the current token and re-insert it, once macro
      * expansion is done.
      */
     E->Final = NewTokNode ();

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -418,15 +418,22 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
 /* Handle the .MATCH and .XMATCH builtin functions */
 {
     int Result;
+    enum Token Term;
     TokNode* Root = 0;
     TokNode* Last = 0;
     TokNode* Node;
 
     /* A list of tokens follows. Read this list and remember it building a
      * single linked list of tokens including attributes. The list is
-     * terminated by a comma.
+     * either enclosed in curly braces, or terminated by a comma.
      */
-    while (Tok != TOK_COMMA) {
+    if (Tok == TOK_LCURLY) {
+        NextTok ();
+        Term = TOK_RCURLY;
+    } else {
+        Term = TOK_COMMA;
+    }
+    while (Tok != Term) {
 
     	/* We may not end-of-line of end-of-file here */
     	if (TokIsSep (Tok)) {
@@ -449,15 +456,27 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
 	NextTok ();
     }
 
-    /* Skip the comma */
+    /* Skip the terminator token*/
     NextTok ();
 
-    /* Read the second list which is terminated by the right parenthesis and
-     * compare each token against the one in the first list.
+    /* If the token list was enclosed in curly braces, we expect a comma */
+    if (Term == TOK_RCURLY) {
+        ConsumeComma ();
+    }
+
+    /* Read the second list which is optionally enclosed in curly braces and
+     * terminated by the right parenthesis. Compare each token against the 
+     * one in the first list.
      */
+    if (Tok == TOK_LCURLY) {
+        NextTok ();
+        Term = TOK_RCURLY;
+    } else {
+        Term = TOK_RPAREN;
+    }
     Result = 1;
     Node = Root;
-    while (Tok != TOK_RPAREN) {
+    while (Tok != Term) {
 
     	/* We may not end-of-line of end-of-file here */
     	if (TokIsSep (Tok)) {
@@ -483,6 +502,11 @@ static ExprNode* DoMatch (enum TC EqualityLevel)
 
        	/* Next token in current list */
 	NextTok ();
+    }
+
+    /* If the token list was enclosed in curly braces, eat the closing brace */
+    if (Term == TOK_RCURLY) {
+        NextTok ();
     }
 
     /* Check if there are remaining tokens in the first list */

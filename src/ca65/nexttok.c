@@ -65,18 +65,29 @@ static unsigned RawMode = 0;		/* Raw token mode flag/counter */
 
 
 static TokList* CollectTokens (unsigned Start, unsigned Count)
-/* Read a list of tokens that is terminated by a right paren. For all tokens
- * starting at the one with index Start, and ending at (Start+Count-1), place
- * them into a token list, and return this token list.
+/* Read a list of tokens that is optionally enclosed in curly braces and
+ * terminated by a right paren. For all tokens starting at the one with index
+ * Start, and ending at (Start+Count-1), place them into a token list, and
+ * return this token list.
  */
 {
+    enum Token Term;
+    unsigned   Current;
+
     /* Create the token list */
     TokList* List = NewTokList ();
 
+    /* Determine if the list is enclosed in curly braces. */
+    if (Tok == TOK_LCURLY) {
+        NextTok ();
+        Term = TOK_RCURLY;
+    } else {
+        Term = TOK_LCURLY;
+    }
+
     /* Read the token list */
-    unsigned Current = 0;
-    unsigned Parens  = 0;
-    while (Parens != 0 || Tok != TOK_RPAREN) {
+    Current = 0;
+    while (Tok != Term) {
 
      	/* Check for end of line or end of input */
      	if (TokIsSep (Tok)) {
@@ -90,20 +101,18 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
      	    AddCurTok (List);
      	}
 
-     	/* Check for and count parenthesii */
-     	if (Tok == TOK_LPAREN) {
-     	    ++Parens;
-     	} else if (Tok == TOK_RPAREN) {
-     	    --Parens;
-     	}
-
      	/* Get the next token */
      	++Current;
      	NextTok ();
     }
 
-    /* Eat the closing paren */
-    ConsumeRParen ();
+    /* Eat the terminator token */
+    NextTok ();
+
+    /* If the list was enclosed in curly braces, we do expect now a right paren */
+    if (Term == TOK_RCURLY) {
+        ConsumeRParen ();
+    }
 
     /* Return the list of collected tokens */
     return List;
@@ -422,7 +431,7 @@ void ConsumeSep (void)
     /* We expect a separator token */
     ExpectSep ();
 
-    /* If we have one, skip it */
+    /* If we are at end of line, skip it */
     if (Tok == TOK_SEP) {
 	NextTok ();
     }

@@ -980,6 +980,16 @@ CharAgain:
 	    Tok = TOK_RBRACK;
 	    return;
 
+	case '{':
+	    NextChar ();
+	    Tok = TOK_LCURLY;
+	    return;
+
+	case '}':
+	    NextChar ();
+	    Tok = TOK_RCURLY;
+	    return;
+
 	case '<':
  	    NextChar ();
 	    if (C == '=') {

@@ -62,21 +62,21 @@ int main (void)
     /* Calculate the time used */
     Ticks = clock() - Ticks;
 
-    /* Print the time used and wait for a key */
+    /* Print the time used */
     printf ("Time used: %lu ticks\n", Ticks);
     printf ("Press Q to quit, any other key for list\n");
-    if (toupper (cgetc()) == 'Q') {
-	exit (EXIT_SUCCESS);
-    }
-
-    /* Print the result */
-    for (I = 2; I < COUNT; ++I) {
-	if (Sieve[I] == 0) {
-	    printf ("%4d\n", I);
-	}
-	if (kbhit() && toupper (cgetc()) == 'q') {
-	    break;
-	}
+    
+    /* Wait for a key and print the list if not 'Q' */
+    if (toupper (cgetc()) != 'Q') {
+     	/* Print the result */
+     	for (I = 2; I < COUNT; ++I) {
+     	    if (Sieve[I] == 0) {
+     		printf ("%4d\n", I);
+     	    }
+     	    if (kbhit() && toupper (cgetc()) == 'Q') {
+     		break;
+     	    }
+     	}
     }
 
     return EXIT_SUCCESS;

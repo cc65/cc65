@@ -424,9 +424,10 @@ void ConsumeSep (void)
      	if (Tok != TOK_SEP) {
        	    Error ("Unexpected trailing garbage characters");
      	    SkipUntilSep ();
-     	} else {
-     	    NextTok ();
      	}
+	if (Tok == TOK_SEP) {
+	    NextTok ();
+	}
     }
 }
 

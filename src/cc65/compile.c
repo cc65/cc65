@@ -39,6 +39,7 @@
 /* common */
 #include "version.h"
 #include "xmalloc.h"
+#include "xsprintf.h"
 
 /* cc65 */
 #include "asmlabel.h"
@@ -257,10 +258,20 @@ static void Parse (void)
 void Compile (const char* FileName)
 /* Top level compile routine. Will setup things and call the parser. */
 {
-    char*  Path;
-    char   Buf[16];
-    time_t Time;
-    char*  TimeStr;
+    char*       Path;
+    char        Buf[20];
+    char        DateStr[20];
+    char        TimeStr[20];
+    time_t      Time;
+    struct tm*  TM;
+
+    /* Since strftime is locale dependent, we need the abbreviated month names
+     * in english.
+     */
+    static const char MonthNames[12][4] = {
+        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
+    };
 
     /* Add some standard paths to the include search path */
     AddIncludePath ("", INC_USER);		/* Current directory */
@@ -299,11 +310,12 @@ void Compile (const char* FileName)
 
     /* __TIME__ and __DATE__ macros */
     Time = time (0);
-    TimeStr = ctime (&Time);
-    sprintf (Buf, "\"%.10s\"", TimeStr);
-    DefineTextMacro ("__DATE__", Buf);
-    sprintf (Buf, "\"%.15s\"", TimeStr+11);
-    DefineTextMacro ("__TIME__", Buf);
+    TM   = localtime (&Time);
+    strftime (Buf, sizeof (Buf), "%e %Y", TM);
+    xsprintf (DateStr, sizeof (DateStr), "\"%s %s\"", MonthNames[TM->tm_mon], Buf);
+    strftime (TimeStr, sizeof (TimeStr), "\"%H:%M:%S\"", TM);
+    DefineTextMacro ("__DATE__", DateStr);
+    DefineTextMacro ("__TIME__", TimeStr);
 
     /* Initialize the literal pool */
     InitLiteralPool ();

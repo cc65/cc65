@@ -112,7 +112,7 @@ extern unsigned int get_ostype(void); /* get ROM version */
 /* masks */
 #define AT_OS_TYPE_MAIN  7
 #define AT_OS_PALNTSC    (3 << 3)
-#define AS_OS_TYPE_MINOR (7 << 5)
+#define AT_OS_TYPE_MINOR (7 << 5)
 /* AT_OS_TYPE_MAIN values */
 #define AT_OS_UNKNOWN  0
 #define AT_OS_400800   1

@@ -249,6 +249,12 @@ Command line argument passing is currently not supported for the Commodore
 610.
 
 
+<sect1>Program return code<p>
+
+The program return code (low byte) is passed back to BASIC by use of the
+<tt/ST/ variable.
+
+
 <sect1>Interrupts<p>
 
 The runtime for the Commodore 610 uses routines marked as <tt/.CONDES/ type 2

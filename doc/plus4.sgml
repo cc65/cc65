@@ -185,7 +185,7 @@ does not exist).
   that because of the peculiarities of the 6551 chip transmits are not
   interrupt driven, and the transceiver blocks if the receiver asserts flow
   control because of a full buffer.
-                                                               
+
   You need an adapter to use the builtin port, since the output levels
   available at the user port don't follow the RS232 standard.
 
@@ -202,6 +202,12 @@ does not exist).
 <sect1>Passing arguments to the program<p>
 
 Command line argument passing is currently not supported for the Plus/4.
+
+
+<sect1>Program return code<p>
+
+The program return code (low byte) is passed back to BASIC by use of the
+<tt/ST/ variable.
 
 
 <sect1>Interrupts<p>

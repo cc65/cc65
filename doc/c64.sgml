@@ -263,6 +263,11 @@ supported by BASIC, the following syntax was choosen:
 </enum>
 
 
+<sect1>Program return code<p>
+
+The program return code (low byte) is passed back to BASIC by use of the
+<tt/ST/ variable.
+
 
 <sect>Bugs/Feedback<p>
 

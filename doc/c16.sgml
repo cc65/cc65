@@ -203,6 +203,11 @@ library, because the latter does not support interrupts needed by the driver.
 Command line argument passing is currently not supported for the C16/C116.
 
 
+<sect1>Program return code<p>
+
+The program return code (low byte) is passed back to BASIC by use of the
+<tt/ST/ variable.
+
 
 
 <sect>Bugs/Feedback<p>

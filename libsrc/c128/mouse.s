@@ -204,7 +204,7 @@ _mouse_pos:
 	lda	YPos
 	iny
 	sta	(ptr1),y
-	lda	YPos
+	lda	YPos+1
 	iny
 	sta	(ptr1),y
 

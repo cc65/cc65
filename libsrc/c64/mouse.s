@@ -115,7 +115,7 @@ _mouse_hide:
   	sei 				; Disable interrupts
 	and 	VIC_SPR_ENA
 	sta 	VIC_SPR_ENA	     	; Disable sprite
-	cli 				; Enable interrupts
+      	cli 				; Enable interrupts
 
 @L1:	inc 	Invisible		; Set the flag to invisible
 	rts
@@ -158,7 +158,7 @@ _mouse_box:
    	sta 	YMax
    	stx 	YMax+1			; maxy
 
-   	lda 	(sp),y
+      	lda 	(sp),y
    	sta 	XMax
    	iny
    	lda 	(sp),y
@@ -201,10 +201,10 @@ _mouse_pos:
 	lda	XPos+1
 	iny
 	sta	(ptr1),y
-	lda	YPos
-	iny
-	sta	(ptr1),y
-	lda	YPos
+      	lda	YPos
+      	iny
+      	sta	(ptr1),y
+      	lda	YPos+1
 	iny
 	sta	(ptr1),y
 
@@ -244,7 +244,7 @@ _mouse_move:
 	jsr	popsreg			; Get X
 	sei				; Disable interrupts
 
-	sta	YPos
+      	sta	YPos
 	stx	YPos+1
 	lda	sreg
 	ldx	sreg+1

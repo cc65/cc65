@@ -1,0 +1,18 @@
+
+HEADER APPLICATION "test" "TestApp" "V1.0" {
+structure VLIR
+dostype USR
+author "Maciej Witkowiak"
+info "This is just an example."
+}
+
+; output binary file for header will be 'vlir-head'
+; base address for chains >=1 will be $3000
+; output binary file for chain #0 is 'vlir0'
+; output binary file for chain #1 is 'vlir1'
+; output binary file for chain #2 is 'vlir2'
+VLIR vlir-head 0x3000 {
+vlir0
+vlir1
+vlir2
+}

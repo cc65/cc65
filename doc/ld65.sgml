@@ -171,12 +171,14 @@ Here is a description of all the command line options:
   id="option-t" name="-t"></tt>.
 
 
+  <label id="option--lib-path">
   <tag><tt>-L path, --lib-path path</tt></tag>
 
   Specify a library search path. This option may be used more than once. It
   adds a directory to the search path for library files. Libraries specified
-  without a path are searched in current directory and in the list of
-  directories specified using <tt/--lib-path/.
+  without a path are searched in current directory, in the directory given in
+  the <tt/LD65_LIB/ environment variable, and in the list of directories
+  specified using <tt/--lib-path/.
 
 
   <tag><tt>-Ln</tt></tag>
@@ -208,13 +210,15 @@ Here is a description of all the command line options:
   suggestions or bugfixes, please include this number.
 
 
+  <label id="option--cfg-path">
   <tag><tt>--cfg-path path</tt></tag>
 
   Specify a config file search path. This option may be used more than once.
   It adds a directory to the search path for config files. A config file given
   with the <tt><ref id="option-C" name="-C"></tt> option that has no path in
-  its name is searched in the current directory and in the list of directories
-  specified using <tt/--cfg-path/.
+  its name is searched in the current directory, in the directory given in the
+  <tt/LD65_CFG/ environment variable, and in the list of directories specified
+  using <tt/--cfg-path/.
 
 
   <tag><tt>--lib file</tt></tag>
@@ -231,19 +235,72 @@ Here is a description of all the command line options:
   file type because of an unusual extension.
 
 
+  <label id="option--obj-path">
   <tag><tt>--obj-path path</tt></tag>
 
   Specify an object file search path. This option may be used more than once.
   It adds a directory to the search path for object files. An object file
   passed to the linker that has no path in its name is searched in current
-  directory and in the list of directories specified using <tt/--obj-path/.
+  directory, in the directory given in the <tt/LD65_OBJ/ environment variable,
+  and in the list of directories specified using <tt/--obj-path/.
 
 </descrip>
 
-If one of the modules is not found in the current directory, and the module
-name does not have a path component, the value of the environment variable
-<tt/CC65_LIB/ is prepended to the name, and the linker tries to open the
-module with this new name.
+
+
+<sect>Search paths<p>
+
+Starting with version 2.10 there are now several search paths for files needed
+by the linker: One for libraries, one for object files and one for config
+files.
+
+
+<sect1>Library search path<p>
+
+The library search path contains in this order:
+
+<enum>
+<item>The current directory.
+<item>A compiled in library path which is often <tt>/usr/lib/cc65/lib</tt> on
+      Linux systems.
+<item>The value of the environment variable <tt/LD65_LIB/ if it is defined.
+<item>The value of the environment variable <tt/CC65_LIB/ if it is defined.
+      Please note that use of this environment variable is obsolete and may
+      get removed in future versions.
+<item>Any directory added with the <tt><ref id="option--lib-path"
+      name="--lib-path"></tt> option on the command line.
+</enum>
+
+
+<sect1>Object file search path<p>
+
+The object file search path contains in this order:
+
+<enum>
+<item>The current directory.
+<item>A compiled in directory which is often <tt>/usr/lib/cc65/lib</tt> on
+      Linux systems.
+<item>The value of the environment variable <tt/LD65_OBJ/ if it is defined.
+<item>The value of the environment variable <tt/CC65_LIB/ if it is defined.
+      Please note that use of this environment variable is obsolete and may
+      get removed in future versions.
+<item>Any directory added with the <tt><ref id="option--obj-path"
+      name="--obj-path"></tt> option on the command line.
+</enum>
+
+
+<sect1>Config file search path<p>
+
+The config file search path contains in this order:
+
+<enum>
+<item>The current directory.
+<item>A compiled in directory which is often <tt>/usr/lib/cc65/lib</tt> on
+      Linux systems.
+<item>The value of the environment variable <tt/LD65_CFG/ if it is defined.
+<item>Any directory added with the <tt><ref id="option--cfg-path"
+      name="--cfg-path"></tt> option on the command line.
+</enum>
 
 
 
@@ -764,8 +821,10 @@ The <tt/CONDES/ feature has several attributes:
   <tt/decreasing/ as an argument. Specifies the sorting order of the entries
   within the table. The default is <tt/increasing/, which means that the
   entries are sorted with increasing priority (the first entry has the lowest
-  priority). You may change this behaviour by specifying <tt/decreasing/ as
-  the argument, the order of entries is reversed in this case.
+  priority). "Priority" is the priority specified when declaring a symbol as
+  <tt/.CONDES/ with the assembler, higher values mean higher priority. You may
+  change this behaviour by specifying <tt/decreasing/ as the argument, the
+  order of entries is reversed in this case.
 
   Please note that the order of entries with equal priority is undefined.
 
@@ -827,4 +886,3 @@ freely, subject to the following restrictions:
 
 
 </article>
-

@@ -12,10 +12,10 @@
 ; its' bounds.
 ;
 
- 	.export		stkchk
+ 	.export	 	stkchk
  	.constructor	initstkchk, 25
-	.import		__STACKSIZE__			; Linker defined
-       	.import	       	pusha0, exit
+	.import	 	__STACKSIZE__			; Linker defined
+       	.import	       	pusha0, _exit
  	.importzp	sp
 
 	; Use macros for better readability
@@ -60,14 +60,17 @@
 	bcs	@Overflow
 	rts
 
-; We have a stack overflow. Set the stack pointer to the low water mark, so
-; we have
+; We have a stack overflow. Set the stack pointer to the initial value, so
+; we can continue without worrying about stack issues.
 
 @Overflow:
+	lda	initialsp
+	sta	sp
+	lda	initialsp+1
+	sta	sp+1
  	lda	#4
  	jsr	pusha0
- 	jmp	exit
-
+ 	jmp	_exit
 
 .endproc
 
@@ -83,4 +86,4 @@ initialsp: 	.word	0
 ; Stack low water mark.
 lowwater:  	.word	0
 
-	   
+

@@ -17,6 +17,8 @@
 #ifndef _GSTRUCT_H
 #define _GSTRUCT_H
 
+typedef void (*void_func) (void);
+
 struct f_date {			/* date in filedesctiptor */
 	char f_year;
 	char f_month;

@@ -15,7 +15,7 @@
 #define nameBuf		char[17]
 #define blockBuf	char[256]
 
-#define	zpage		(char*)0x0000
+#define	zpage		((blockBuf)0x0000)
 
 #define	CPU_DDR		*(char*)0x00
 #define	CPU_DATA	*(char*)0x01
@@ -85,9 +85,9 @@
 #define	STATUS		*(char*)0x90
 #define	curDevice	*(char*)0xba
 
-#define	irqvec		*(unsigned int*)0x0314
-#define	bkvec		*(unsigned int*)0x0316
-#define	nmivec		*(unsigned int*)0x0318
+#define	irqvec		(*(void_func*)0x0314)
+#define	bkvec		(*(void_func*)0x0316)
+#define	nmivec		(*(void_func*)0x0318)
 
 #define	APP_RAM		(char*)0x0400
 #define	BACK_SCR_BASE	(char*)0x6000
@@ -118,18 +118,19 @@
 
 #define	VLIRInfo	(*(struct VLIR_info*)0x8496)
 
-#define	appMain		*(unsigned int*)0x849b
-#define	intTopVector	*(unsigned int*)0x849d
-#define	intBotVector	*(unsigned int*)0x849f
-#define	mouseVector	*(unsigned int*)0x84a1
-#define	keyVector	*(unsigned int*)0x84a3
-#define	inputVector	*(unsigned int*)0x84a5
-#define	mouseFaultVec	*(unsigned int*)0x84a7
-#define	otherPressVec	*(unsigned int*)0x84a9
-#define	StringFaultVec	*(unsigned int*)0x84ab
-#define	alarmTmtVector	*(unsigned int*)0x84ad
-#define	BRKVector	*(unsigned int*)0x84af
-#define	RecoverVector	*(unsigned int*)0x84b1
+#define appMain		(*(void_func*)0x849b)
+#define intTopVector	(*(void_func*)0x849d)
+#define intBotVector	(*(void_func*)0x849f)
+#define mouseVector	(*(void_func*)0x84a1)
+#define keyVector	(*(void_func*)0x84a3)
+#define	inputVector	(*(void_func*)0x84a5)
+#define	mouseFaultVec	(*(void_func*)0x84a7)
+#define	otherPressVec	(*(void_func*)0x84a9)
+#define	StringFaultVec	(*(void_func*)0x84ab)
+#define	alarmTmtVector	(*(void_func*)0x84ad)
+#define	BRKVector	(*(void_func*)0x84af)
+#define	RecoverVector	(*(void_func*)0x84b1)
+
 #define	selectionFlash	*(char*)0x84b3
 #define	alphaFlag	*(char*)0x84b4
 #define	iconSelFlg	*(char*)0x84b5
@@ -188,9 +189,10 @@
 
 #define	config		*(char*)0xff00
 #define	END_MOUSE	(char*)0xfffa
-#define	NMI_VECTOR	*(unsigned int*)0xfffa
-#define	RESET_VECTOR	*(unsigned int*)0xfffc
-#define	IRQ_VECTOR	*(unsigned int*)0xfffe
+
+#define	NMI_VECTOR	(*(void_func*)0xfffa)
+#define	RESET_VECTOR	(*(void_func*)0xfffc)
+#define	IRQ_VECTOR	(*(void_func*)0xfffe)
 
 #define	vicbase		(char*)0xd000
 #define	sidbase		(char*)0xd400

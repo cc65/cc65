@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -131,7 +131,7 @@ extern unsigned char _filetype;         /* Default 'u' */
 #define CBM_A_RO    1           /* Read only   */
 #define CBM_A_RW    3           /* Read, Write */
 
-struct cbm_dirent {     
+struct cbm_dirent {
     char          name[17];     /* File name in PETSCII, limited to 16 chars */
     unsigned int  size;         /* Size in 256B blocks */
     unsigned char type;
@@ -146,15 +146,12 @@ struct cbm_dirent {
 
 
 
-#if defined(__C16__) || defined(__C64__) || defined(__C128__) || defined(__PLUS4__)
-
-#define TV_NTSC 0
-#define TV_PAL  1
+#define TV_NTSC         0
+#define TV_PAL          1
+#define TV_OTHER        2
 
 unsigned char __fastcall__ get_tv (void);
-/* Return the video mode the machine is using */
-
-#endif
+/* Return the video mode the machine is using. */
 
 
 

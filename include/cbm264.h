@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -42,6 +42,12 @@
 #if !defined(__PLUS4__) && !defined(__C16__)
 #  error This module may only be used when compiling for the Plus/4 or C16!
 #endif
+
+
+
+/*****************************************************************************/
+/*	       	   	  	     Data				     */
+/*****************************************************************************/
 
 
 
@@ -87,8 +93,6 @@
 #define BCOLOR_DARKBLUE		0x0E
 #define BCOLOR_LIGHTGREEN	0x0F
 
-
-
 /* Now try to mix up a C64/C128 compatible palette */
 #define COLOR_BLACK  	       	(BCOLOR_BLACK)
 #define COLOR_WHITE  	       	(BCOLOR_WHITE | CATTR_LUMA7)
@@ -107,6 +111,19 @@
 #define COLOR_LIGHTGREEN     	(BCOLOR_LIGHTGREEN | CATTR_LUMA7)
 #define COLOR_LIGHTBLUE      	(BCOLOR_LIGHTBLUE | CATTR_LUMA7)
 #define COLOR_GRAY3  	       	(BCOLOR_WHITE | CATTR_LUMA5)
+
+/* Define hardware */
+#include <_ted.h>
+#define TED             (*(struct __ted*)0xFF00)
+
+/* Define special memory areas */
+#define COLOR_RAM	((unsigned char*)0x0800)
+
+
+
+/*****************************************************************************/
+/*	       	   		     Code				     */
+/*****************************************************************************/
 
 
 

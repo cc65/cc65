@@ -25,8 +25,8 @@
 #  define SPRITE0_DATA    0x0E00
 #  define SPRITE0_PTR     0x07F8
 #elif defined(__CBM510__)
-#  define SPRITE0_DATA    0xF800
-#  define SPRITE0_PTR     0xF7F8
+#  define SPRITE0_DATA    0xF400
+#  define SPRITE0_PTR     0xF3F8
 #endif
 
 /* The mouse sprite (an arrow) */
@@ -99,7 +99,11 @@ int main (void)
     *(unsigned char*)SPRITE0_PTR = SPRITE0_DATA / 64;
 
     /* Set the color of sprite 0 */
+#ifdef __CBM510__
+    pokebsys ((unsigned) &VIC.spr0_color, COLOR_WHITE);
+#else
     VIC.spr0_color = COLOR_WHITE;
+#endif
 
     /* Initialize the mouse */
     mouse_init (MOUSE_CBM1351);

@@ -203,7 +203,8 @@ void DefineData (ExprDesc* Expr)
             break;
 
         case E_LOC_STATIC:
-            /* Static variable */
+        case E_LOC_LITERAL:
+            /* Static variable or literal in the literal pool */
             g_defdata (CF_STATIC, Expr->Name, Expr->Val);
             break;
 
@@ -215,11 +216,6 @@ void DefineData (ExprDesc* Expr)
 	     	Error ("Cannot take the address of a register variable");
 	    }
             g_defdata (CF_REGVAR, Expr->Name, Expr->Val);
-            break;
-
-        case E_LOC_LITERAL:
-            /* Literal in the literal pool */
-            g_defdata (CF_STATIC, LiteralPoolLabel, Expr->Val);
             break;
 
        	default:
@@ -245,7 +241,8 @@ static void LoadConstant (unsigned Flags, ExprDesc* Expr)
        	    break;
 
        	case E_LOC_STATIC:
-       	    /* Static symbol, load address */
+       	case E_LOC_LITERAL:
+       	    /* Static symbol or literal, load address */
        	    g_getimmed ((Flags | CF_STATIC) & ~CF_CONST, Expr->Name, Expr->Val);
        	    break;
 
@@ -261,11 +258,6 @@ static void LoadConstant (unsigned Flags, ExprDesc* Expr)
     	case E_LOC_STACK:
        	    g_leasp (Expr->Val);
 	    break;
-
-       	case E_LOC_LITERAL:
-	    /* Literal string */
-	    g_getimmed (CF_STATIC, LiteralPoolLabel, Expr->Val);
-       	    break;
 
        	default:
 	    Internal ("Unknown constant type: %04X", Expr->Flags);
@@ -409,7 +401,8 @@ void ExprLoad (unsigned Flags, ExprDesc* Expr)
                 break;
 
             case E_LOC_STATIC:
-                /* Static variable */
+            case E_LOC_LITERAL:
+                /* Static variable or literal in the literal pool */
                 g_getstatic (Flags | CF_STATIC, Expr->Name, Expr->Val);
                 break;
 
@@ -433,11 +426,6 @@ void ExprLoad (unsigned Flags, ExprDesc* Expr)
             case E_LOC_EXPR:
                 /* Reference to address in primary with offset in Expr */
                 g_getind (Flags, Expr->Val);
-                break;
-
-            case E_LOC_LITERAL:
-                /* Literal in the literal pool */
-                g_getstatic (Flags | CF_STATIC, LiteralPoolLabel, Expr->Val);
                 break;
 
             default:
@@ -929,9 +917,10 @@ static void Primary (ExprDesc* E)
 
         case TOK_SCONST:
             /* String literal */
-            E->Flags = E_LOC_LITERAL | E_RTYPE_RVAL;
-            E->Val = CurTok.IVal;
             E->Type  = GetCharArrayType (GetLiteralPoolOffs () - CurTok.IVal);
+            E->Flags = E_LOC_LITERAL | E_RTYPE_RVAL;
+            E->Val   = CurTok.IVal;
+            E->Name  = LiteralPoolLabel;
             NextToken ();
             break;
 
@@ -1390,7 +1379,8 @@ void Store (ExprDesc* Expr, const type* StoreType)
             break;
 
         case E_LOC_STATIC:
-            /* Static variable */
+        case E_LOC_LITERAL:
+            /* Static variable or literal in the literal pool */
             g_putstatic (Flags | CF_STATIC, Expr->Name, Expr->Val);
             break;
 
@@ -1412,11 +1402,6 @@ void Store (ExprDesc* Expr, const type* StoreType)
         case E_LOC_EXPR:
             /* An expression in the primary register */
             g_putind (Flags, Expr->Val);
-            break;
-
-        case E_LOC_LITERAL:
-            /* Literal in the literal pool */
-            g_putstatic (Flags | CF_STATIC, LiteralPoolLabel, Expr->Val);
             break;
 
         default:
@@ -1465,7 +1450,8 @@ static void PreInc (ExprDesc* Expr)
             break;
 
         case E_LOC_STATIC:
-            /* Static variable */
+        case E_LOC_LITERAL:
+            /* Static variable or literal in the literal pool */
             g_addeqstatic (Flags | CF_STATIC, Expr->Name, Expr->Val, Val);
             break;
 
@@ -1487,11 +1473,6 @@ static void PreInc (ExprDesc* Expr)
         case E_LOC_EXPR:
             /* An expression in the primary register */
             g_addeqind (Flags, Expr->Val, Val);
-            break;
-
-        case E_LOC_LITERAL:
-            /* Literal in the literal pool */
-            g_addeqstatic (Flags | CF_STATIC, LiteralPoolLabel, Expr->Val, Val);
             break;
 
         default:
@@ -1540,7 +1521,8 @@ static void PreDec (ExprDesc* Expr)
             break;
 
         case E_LOC_STATIC:
-            /* Static variable */
+        case E_LOC_LITERAL:
+            /* Static variable or literal in the literal pool */
             g_subeqstatic (Flags | CF_STATIC, Expr->Name, Expr->Val, Val);
             break;
 
@@ -1562,11 +1544,6 @@ static void PreDec (ExprDesc* Expr)
         case E_LOC_EXPR:
             /* An expression in the primary register */
             g_subeqind (Flags, Expr->Val, Val);
-            break;
-
-        case E_LOC_LITERAL:
-            /* Literal in the literal pool */
-            g_subeqstatic (Flags | CF_STATIC, LiteralPoolLabel, Expr->Val, Val);
             break;
 
         default:
@@ -3009,7 +2986,8 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
             break;
 
         case E_LOC_STATIC:
-            /* Static variable */
+        case E_LOC_LITERAL:
+            /* Static variable or literal in the literal pool */
             lflags |= CF_STATIC;
             if (Gen->Tok == TOK_PLUS_ASSIGN) {
                 g_addeqstatic (lflags, Expr->Name, Expr->Val, Expr2.Val);
@@ -3034,16 +3012,6 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
                 g_addeqlocal (lflags, Expr->Val, Expr2.Val);
             } else {
                 g_subeqlocal (lflags, Expr->Val, Expr2.Val);
-            }
-            break;
-
-        case E_LOC_LITERAL:
-            /* Literal in the literal pool */
-            lflags |= CF_STATIC;
-            if (Gen->Tok == TOK_PLUS_ASSIGN) {
-                g_addeqstatic (lflags, LiteralPoolLabel, Expr->Val, Expr2.Val);
-            } else {
-                g_subeqstatic (lflags, LiteralPoolLabel, Expr->Val, Expr2.Val);
             }
             break;
 

@@ -42,8 +42,8 @@ struct fileheader {		/* header block (like fileHeader) */
 	int exec_address;
 	char class_name[19];
 	char column_flag;
-	char author[64];
-	char note[95];
+	char author[63];
+	char note[96];
 };
 
 struct filehandle {		/* filehandle in directory sectors */

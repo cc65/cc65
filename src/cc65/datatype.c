@@ -755,3 +755,12 @@ long GetElementCount (const type* T)
 
 
 
+type* GetElementType (type* T)
+/* Return the element type of the given array type. */
+{
+    CHECK (IsTypeArray (T));
+    return T + DECODE_SIZE + 1;
+}
+
+
+

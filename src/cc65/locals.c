@@ -94,9 +94,16 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
             g_defdatalabel (InitLabel);
 
             /* Parse the initialization generating a memory image of the
-             * data in the RODATA segment.
+             * data in the RODATA segment. The function does return the size
+             * of the initialization data, which may be greater than the 
+             * actual size of the type, if the type is a structure with a 
+             * flexible array member that has been initialized. Since we must
+             * know the size of the data in advance for register variables,
+             * we cannot allow that here.
              */
-            ParseInit (Decl->Type);
+            if (ParseInit (Decl->Type) != Size) {
+                Error ("Cannot initialize flexible array members of storage class `register'");
+            }
 
             /* Generate code to copy this data into the variable space */
             g_initregister (InitLabel, Reg, Size);
@@ -172,14 +179,6 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
             /* Special handling for compound types */
             if (IsCompound) {
 
-                /* First reserve space for the variable */
-                SymData = F_ReserveLocalSpace (CurrentFunc, Size);
-
-                /* Next, allocate the space on the stack. This means that the
-                 * variable is now located at offset 0 from the current sp.
-                 */
-                F_AllocLocalSpace (CurrentFunc);
-
                 /* Switch to read only data */
                 g_userodata ();
 
@@ -188,11 +187,25 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
                 g_defdatalabel (InitLabel);
 
                 /* Parse the initialization generating a memory image of the
-                 * data in the RODATA segment.
+                 * data in the RODATA segment. The function will return the
+                 * actual size of the initialization data, which may be
+                 * greater than the size of the variable if it is a struct
+                 * that contains a flexible array member and we're not in
+                 * ANSI mode.
                  */
-                ParseInit (Decl->Type);
+                Size = ParseInit (Decl->Type);
 
-                /* Generate code to copy this data into the variable space */
+                /* Now reserve space for the variable on the stack */
+                SymData = F_ReserveLocalSpace (CurrentFunc, Size);
+
+                /* Next, allocate the space on the stack. This means that the
+                 * variable is now located at offset 0 from the current sp.
+                 */
+                F_AllocLocalSpace (CurrentFunc);
+
+                /* Generate code to copy the initialization data into the
+                 * variable space
+                 */
                 g_initauto (InitLabel, Size);
 
             } else {

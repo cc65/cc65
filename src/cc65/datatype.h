@@ -144,8 +144,9 @@ typedef unsigned short type;
 /* Type elements needed for Encode/Decode */
 #define DECODE_SIZE    	5
 
-/* Unspecified size for the element count of an array */
-#define UNSPECIFIED     -1L
+/* Special encodings for element counts of an array */
+#define UNSPECIFIED     -1L     /* Element count was not specified */
+#define FLEXIBLE        0L      /* Flexible array struct member */
 
 /* Sizes */
 #define SIZEOF_CHAR     1
@@ -481,6 +482,9 @@ long GetElementCount (const type* T);
 /* Get the element count of the array specified in T (which must be of
  * array type).
  */
+
+type* GetElementType (type* T);
+/* Return the element type of the given array type. */
 
 
 

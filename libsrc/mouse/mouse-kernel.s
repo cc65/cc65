@@ -19,6 +19,8 @@
 .bss
 _mouse_drv:     .res    2      		; Pointer to driver
 
+_mouse_hidden:  .res    1               ; Mouse visibility flag
+
 ; Jump table for the driver functions.
 .data
 mouse_vectors:
@@ -60,6 +62,11 @@ _mouse_install:
         dey
         bpl     @L0
 
+; Reset flags
+
+        lda     #1
+        sta     _mouse_hidden
+
 ; Copy the jump vectors
 
         ldy     #MOUSE_HDR::JUMPTAB
@@ -70,7 +77,7 @@ _mouse_install:
         cpy     #(MOUSE_HDR::JUMPTAB + .sizeof(MOUSE_HDR::JUMPTAB))
         bne     @L1
 
-        jmp     mouse_install           ; Call driver install routine
+        jsr     mouse_install           ; Call driver install routine
 
         ldy     mouse_irq+2             ; Check high byte of IRQ vector
         beq     @L2                     ; Jump if vector invalid

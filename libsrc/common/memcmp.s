@@ -1,5 +1,5 @@
 ;
-; Ullrich von Bassewitz, 09.06.1998
+; Ullrich von Bassewitz, 15.09.2000
 ;
 ; int memcmp (const void* p1, const void* p2, size_t count);
 ;
@@ -9,46 +9,64 @@
 	.importzp	ptr1, ptr2, ptr3
 
 _memcmp:
-    	sta	ptr3		; Save count
-    	sta	ptr3+1
-       	jsr	popax 	  	; get p2
+
+; Calculate (-count-1) and store it into ptr3. This is some overhead here but
+; saves time in the compare loop
+
+	eor	#$FF
+	sta	ptr3
+	txa
+	eor	#$FF
+	sta	ptr3+1
+
+; Get the pointer parameters
+
+       	jsr	popax 	       	; Get p2
     	sta	ptr2
     	stx	ptr2+1
-    	jsr	popax 		; get p1
+    	jsr	popax 		; Get p1
     	sta	ptr1
     	stx	ptr1+1
 
-    	ldy	#0
-    	ldx	ptr3		; use X as low counter byte
-    	beq	L3
+; Loop initialization
 
-L1: 	lda	(ptr1),y
-    	cmp	(ptr2),y
-    	bne    	L5
-    	iny
-    	bne	L2
-    	inc	ptr1+1
-    	inc	ptr2+1
-L2:    	txa
-  	beq	L3
-	dex
-	jmp	L1
-L3:	lda	ptr3+1		; check high byte
-	beq	L4
-	dec	ptr3+1
-	dex			; X = $FF
-	bne	L1		; branch always
+     	ldx	ptr3		; Load low counter byte into X
+     	ldy	#$00		; Initialize pointer
 
-; Memory areas are equal
+; Head of compare loop: Test for the end condition
 
-L4:	jmp	return0
+Loop:	inx	      		; Bump low byte of (-count-1)
+       	beq	BumpHiCnt	; Jump on overflow
+
+; Do the compare
+
+Comp:	lda	(ptr1),y
+	cmp	(ptr2),y
+	bne	NotEqual	; Jump if bytes not equal
+
+; Bump the pointers
+
+	iny	   		; Increment pointer
+	bne	Loop
+	inc	ptr1+1		; Increment high bytes
+	inc	ptr2+1
+	bne	Loop		; Branch always (pointer wrap is illegal)
+
+; Entry on low counter byte overflow
+
+BumpHiCnt:
+    	inc	ptr3+1		; Bump high byte of (-count-1)
+       	bne	Comp		; Jump if not done
+	jmp	return0		; Count is zero, areas are identical
 
 ; Not equal, check which one is greater
 
-L5:	bcs	L6
-  	ldx	#$FF
+NotEqual:
+	bcs	Greater
+  	ldx	#$FF		; Make result negative
   	rts
 
-L6:	ldx	#$01
+Greater:
+	ldx	#$01		; Make result positive
 	rts
 

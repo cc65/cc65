@@ -146,7 +146,7 @@ structures, accessing the struct fields will access the chip registers.
   directory for the declaration of the structure.
 
   <tag><tt/CIA1, CIA2/</tag>
-  Access to the two CIA (complex interface adapater) chips is available via
+  Access to the two CIA (complex interface adapter) chips is available via
   the <tt/CIA1/ and <tt/CIA2/ variables. The structure behind these variables
   is explained in <tt/_cia.h/.
 
@@ -168,13 +168,13 @@ memory drivers using the VDC memory!
   <tag><tt/c128-vdc.tgi/</tag>
   This driver was written by Maciej Witkowiak. It uses the 80 column display
   and features a resolution of 640*200 with two colors and an adjustable
-  palette (that means that the two colors can be choosen out of the 16 VDC
+  palette (that means that the two colors can be chosen out of the 16 VDC
   colors).
 
   <tag><tt/c128-vdc2.tgi/</tag>
   This driver was written by Maciej Witkowiak. This driver uses the 80 column
   display and features a resolution of 640*480 with two colors and an
-  adjustable palette (that means that the two colors can be choosen out of the
+  adjustable palette (that means that the two colors can be chosen out of the
   16 VDC colors). The driver requires 64KB VDC RAM.
 </descrip><p>
 
@@ -266,7 +266,7 @@ does not exist).
 <sect1>Passing arguments to the program<p>
 
 Command line arguments can be passed to <tt/main()/. Since this is not
-supported by BASIC, the following syntax was choosen:
+supported by BASIC, the following syntax was chosen:
 
 <tscreen><verb>
     RUN:REM ARG1 " ARG2 IS QUOTED" ARG3 "" ARG5

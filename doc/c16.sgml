@@ -201,7 +201,7 @@ library, because the latter does not support interrupts needed by the driver.
 <sect1>Passing arguments to the program<p>
 
 Command line arguments can be passed to <tt/main()/. Since this is not
-supported by BASIC, the following syntax was choosen:
+supported by BASIC, the following syntax was chosen:
 
 <tscreen><verb>
     RUN:REM ARG1 " ARG2 IS QUOTED" ARG3 "" ARG5

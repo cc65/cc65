@@ -18,10 +18,8 @@ zerobss:
 	    ldx #>__BSS_SIZE__
 	    sta r0L
 	    stx r0H
-	    lda #0
-	    sta r2L
 	    lda #<__BSS_RUN__
 	    ldx #>__BSS_RUN__
 	    sta r1L
 	    stx r1H
-	    jmp FillRam
+	    jmp ClearRam

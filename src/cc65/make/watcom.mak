@@ -78,7 +78,6 @@ OBJS =	anonname.obj	\
 	function.obj	\
 	global.obj	\
 	goto.obj	\
-	hashstr.obj	\
 	ident.obj	\
 	include.obj	\
 	io.obj		\
@@ -134,7 +133,6 @@ FILE funcdesc.obj
 FILE function.obj
 FILE global.obj
 FILE goto.obj
-FILE hashstr.obj
 FILE ident.obj
 FILE include.obj
 FILE io.obj

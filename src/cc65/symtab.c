@@ -37,6 +37,8 @@
 #include <stdlib.h>
 #include <stdarg.h>
 #include <string.h>
+		    
+#include "../common/hashstr.h"
 
 #include "asmcode.h"
 #include "asmlabel.h"
@@ -47,7 +49,6 @@
 #include "error.h"
 #include "funcdesc.h"
 #include "global.h"
-#include "hashstr.h"
 #include "io.h"
 #include "mem.h"
 #include "symentry.h"
@@ -170,7 +171,7 @@ static void CheckSymTable (SymTable* Tab)
 		    }
 		}
 	    }
-    
+
 	    /* If the entry is a label, check if it was defined in the function */
 	    if (Flags & SC_LABEL) {
 		if ((Flags & SC_DEF) == 0) {
@@ -181,7 +182,7 @@ static void CheckSymTable (SymTable* Tab)
 		    Warning (WARN_UNUSED_ITEM, Entry->Name);
 		}
 	    }
-    
+
 	}
 
      	/* Next entry */

@@ -43,10 +43,13 @@ type* GetReturnType (Function* F);
 int HasVoidReturn (const Function* F);
 /* Return true if the function does not have a return value */
 
+void RememberEntry (Function* F);
+/* Remember the current output position for local space creation later */
+
 unsigned GetRetLab (const Function* F);
 /* Return the return jump label */
 
-unsigned AllocLocalSpace (Function* F, unsigned Size);
+int AllocLocalSpace (Function* F, unsigned Size);
 /* Allocate space for the function locals, return stack offset  */
 
 void FreeLocalSpace (Function* F, unsigned Size);
@@ -55,7 +58,10 @@ void FreeLocalSpace (Function* F, unsigned Size);
 void NewFunc (struct SymEntry* Func);
 /* Parse argument declarations and function body. */
 
+unsigned GetLocalSpace (const Function* F);
+/* Get the local variable space needed for the function */
 
+				 
 
 /* End of function.h */
 #endif

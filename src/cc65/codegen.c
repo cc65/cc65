@@ -437,10 +437,9 @@ static void ldyconst (unsigned val)
 static int funcargs;
 
 
-void g_enter (unsigned flags, const char* Name, unsigned argsize)
-/* Function prologue */
+void g_enter (unsigned flags, unsigned argsize)
+/* Function prologue */	      
 {
-    g_defgloblabel (Name);    	/* Define function name as label */
     if ((flags & CF_FIXARGC) != 0) {
 	/* Just remember the argument size for the leave */
 	funcargs = argsize;

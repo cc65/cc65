@@ -35,6 +35,8 @@
 
 #include <stdio.h>
 
+#include "../common/xsprintf.h"
+
 #include "error.h"
 #include "mem.h"
 #include "asmline.h"
@@ -66,21 +68,12 @@ static Line* NewLine (const char* Format, va_list ap)
 /* Interal routine to create a new line from the given text */
 {
     char 	Buf [8192];
-    int 	OVF;
     unsigned	Len;
     Line*	L;
 
 
     /* Make a string from the given format and arguments */
-#if defined(__WATCOMC__)
-    OVF = (_vbprintf (Buf, sizeof (Buf), Format, ap) >= sizeof (S));
-#else
-    /* Assume gcc running on a Unix OS */
-    OVF = (vsnprintf (Buf, sizeof (Buf), Format, ap) < 0);
-#endif
-    if (OVF) {
-	Internal ("String size overflow");
-    }
+    xvsprintf (Buf, sizeof (Buf), Format, ap);
 
     /* Get the length of the line */
     Len = strlen (Buf);

@@ -24,7 +24,6 @@ OBJS =	anonname.o	\
 	function.o     	\
 	global.o 	\
 	goto.o		\
-	hashstr.o	\
 	ident.o		\
 	include.o     	\
 	io.o		\
@@ -44,6 +43,8 @@ OBJS =	anonname.o	\
 	symtab.o       	\
 	util.o
 
+LIBS = ../common/common.a
+
 EXECS = cc65
 
 
@@ -58,7 +59,7 @@ endif
 
 
 cc65:	$(OBJS)
-	$(CC) $(LDFLAGS) -o cc65 $(CFLAGS) $(OBJS)
+	$(CC) $(LDFLAGS) -o cc65 $(CFLAGS) $(OBJS) $(LIBS)
 
 clean:
 	rm -f *~ core *.map

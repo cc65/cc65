@@ -71,7 +71,7 @@ Function* CurrentFunc = 0;
 
 
 /*****************************************************************************/
-/*     	      	 	    	     code	      		 	     */
+/*		   Subroutines working with struct Function		     */
 /*****************************************************************************/
 
 
@@ -86,7 +86,7 @@ static Function* NewFunction (struct SymEntry* Sym)
     F->FuncEntry  = Sym;
     F->ReturnType = Sym->Type + 1 + DECODE_SIZE;
     F->Desc   	  = DecodePtr (Sym->Type + 1);
-    F->EntryCode  = GetCodePos ();
+    F->EntryCode  = 0;
     F->LocalMax	  = 0;
     F->LocalSize  = 0;
     F->RetLab	  = GetLabel ();
@@ -137,6 +137,14 @@ int HasVoidReturn (const Function* F)
 
 
 
+void RememberEntry (Function* F)
+/* Remember the current output position for local space creation later */
+{
+    F->EntryCode = GetCodePos ();
+}
+
+
+
 unsigned GetRetLab (const Function* F)
 /* Return the return jump label */
 {
@@ -145,7 +153,7 @@ unsigned GetRetLab (const Function* F)
 
 
 
-unsigned AllocLocalSpace (Function* F, unsigned Size)
+int AllocLocalSpace (Function* F, unsigned Size)
 /* Allocate space for the function locals, return stack offset */
 {
     /* Remember the current offset */
@@ -157,8 +165,8 @@ unsigned AllocLocalSpace (Function* F, unsigned Size)
       	F->LocalMax = F->LocalSize;
     }
 
-    /* Return the offset */
-    return Offs;
+    /* Return the offset, it is below the initial stack pointer */
+    return -(int)Offs;
 }
 
 
@@ -168,6 +176,20 @@ void FreeLocalSpace (Function* F, unsigned Size)
 {
     F->LocalSize -= Size;
 }
+
+
+
+unsigned GetLocalSpace (const Function* F)
+/* Get the local variable space needed for the function */
+{
+    return F->LocalMax;
+}
+
+
+
+/*****************************************************************************/
+/*     	      	 	    	     code	      		 	     */
+/*****************************************************************************/
 
 
 
@@ -190,7 +212,7 @@ void NewFunc (SymEntry* Func)
 
     /* C functions cannot currently have __fastcall__ calling conventions */
     if (IsFastCallFunc (Func->Type)) {
-	Error (ERR_FASTCALL);
+    	Error (ERR_FASTCALL);
     }
 
     /* Need a starting curly brace */
@@ -201,9 +223,17 @@ void NewFunc (SymEntry* Func)
     /* Setup register variables */
     InitRegVars ();
 
-    /* Switch to the code segment and generate function entry code */
+    /* Switch to the code segment and define the function name label */
     g_usecode ();
-    g_enter (TypeOf (Func->Type), Func->Name, GetParamSize (CurrentFunc));
+    g_defgloblabel (Func->Name);
+
+    /* Generate function entry code if needed */
+    g_enter (TypeOf (Func->Type), GetParamSize (CurrentFunc));
+
+    /* Remember the current code position to create local variable space once
+     * we have created the function body itself.
+     */
+    RememberEntry (Func);
 
     /* Parse the function body */
     oursp = 0;

@@ -36,8 +36,9 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../common/hashstr.h"
+
 #include "error.h"
-#include "hashstr.h"
 #include "mem.h"
 #include "macrotab.h"
 

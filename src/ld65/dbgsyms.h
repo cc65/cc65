@@ -81,6 +81,9 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* Obj);
 long GetDbgSymVal (DbgSym* D);
 /* Get the value of this symbol */
 
+void PrintDbgSyms (ObjData* O, FILE* F);
+/* Print the debug symbols in a debug file */
+
 void PrintDbgSymLabels (ObjData* O, FILE* F);
 /* Print the debug symbols in a VICE label file */
 

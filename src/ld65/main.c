@@ -106,7 +106,7 @@ static void Usage (void)
 	     "Long options:\n"
              "  --cfg-path path\tSpecify a config file search path\n"
        	     "  --config name\t\tUse linker config file\n"
-	     "  --dbgfile name\t\tGenerate debug information\n"
+       	     "  --dbgfile name\tGenerate debug information\n"
              "  --dump-config name\tDump a builtin configuration\n"
 	     "  --help\t\tHelp (this text)\n"
              "  --lib file\t\tLink this library\n"

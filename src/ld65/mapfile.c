@@ -149,7 +149,7 @@ void CreateLabelFile (void)
 
     /* Close the file */
     if (fclose (F) != 0) {
-	Error ("Error closing map file `%s': %s", LabelFileName, strerror (errno));
+       	Error ("Error closing label file `%s': %s", LabelFileName, strerror (errno));
     }
 }
 
@@ -163,7 +163,7 @@ void CreateDbgFile (void)
     /* Open the debug info file */
     FILE* F = fopen (DbgFileName, "w");
     if (F == 0) {
-    	Error ("Cannot create label file `%s': %s", DbgFileName, strerror (errno));
+       	Error ("Cannot create debug file `%s': %s", DbgFileName, strerror (errno));
     }
 
     /* Print line infos from all modules we have linked into the output file */
@@ -174,11 +174,12 @@ void CreateDbgFile (void)
 
         /* Output debug info */
 	PrintDbgInfo (O, F);
+        PrintDbgSyms (O, F);
     }
 
     /* Close the file */
     if (fclose (F) != 0) {
-	Error ("Error closing map file `%s': %s", DbgFileName, strerror (errno));
+	Error ("Error closing debug file `%s': %s", DbgFileName, strerror (errno));
     }
 }
 

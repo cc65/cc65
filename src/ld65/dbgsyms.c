@@ -35,7 +35,7 @@
 
 #include <string.h>
 
-/* common */                                                      
+/* common */
 #include "check.h"
 #include "symdefs.h"
 #include "xmalloc.h"
@@ -60,7 +60,7 @@
 /* We will collect all debug symbols in the following array and remove
  * duplicates before outputing them.
  */
-static DbgSym*	DbgSymPool [256];
+static DbgSym*	DbgSymPool[256];
 
 
 
@@ -139,20 +139,17 @@ static void InsertDbgSym (DbgSym* D, long Val)
 DbgSym* ReadDbgSym (FILE* F, ObjData* O)
 /* Read a debug symbol from a file, insert and return it */
 {
-    unsigned char Type;
-    DbgSym* D;
-
     /* Read the type */
-    Type = Read8 (F);
+    unsigned char Type = Read8 (F);
 
     /* Create a new debug symbol */
-    D = NewDbgSym (Type, O);
+    DbgSym* D = NewDbgSym (Type, O);
 
     /* Read and assign the name */
     D->Name = MakeGlobalStringId (O, ReadVar (F));
 
     /* Read the value */
-    if (IS_EXP_EXPR (Type)) {
+    if (IS_EXP_EXPR (D->Type)) {
        	D->Expr = ReadExpr (F, O);
     } else {
     	D->Expr = LiteralExpr (Read32 (F), O);
@@ -167,6 +164,23 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
 
 
 
+static void ClearDbgSymTable (void)
+/* Clear the debug symbol table */
+{
+    unsigned I;
+    for (I = 0; I < sizeof (DbgSymPool) / sizeof (DbgSymPool[0]); ++I) {
+        DbgSym* Sym = DbgSymPool[I];
+        DbgSymPool[I] = 0;
+        while (Sym) {
+            DbgSym* NextSym = Sym->Next;
+            Sym->Next = 0;
+            Sym = NextSym;
+        }
+    }
+}
+
+
+
 long GetDbgSymVal (DbgSym* D)
 /* Get the value of this symbol */
 {
@@ -176,19 +190,69 @@ long GetDbgSymVal (DbgSym* D)
 
 
 
-void PrintDbgSymLabels (ObjData* O, FILE* F)
-/* Print the debug symbols in a VICE label file */
+void PrintDbgSyms (ObjData* O, FILE* F)
+/* Print the debug symbols in a debug file */
 {
     unsigned I;
 
+    /* Clear the debug sym table */
+    ClearDbgSymTable ();
+
     /* Walk through all debug symbols in this module */
     for (I = 0; I < O->DbgSymCount; ++I) {
+
+	long Val;
 
 	/* Get the next debug symbol */
  	DbgSym* D = O->DbgSyms [I];
 
 	/* Get the symbol value */
-	long Val = GetDbgSymVal (D);
+	Val = GetDbgSymVal (D);
+
+	/* Lookup this symbol in the table. If it is found in the table, it was
+	 * already written to the file, so don't emit it twice. If it is not in
+	 * the table, insert and output it.
+	 */
+       	if (GetDbgSym (D, Val) == 0) {
+
+	    /* Emit the debug file line */
+       	    fprintf (F,
+                     "sym\t\"%s\", 0x%02X, 0x%08lX\n",
+                     GetString (D->Name),
+                     D->Type,
+                     Val);
+
+	    /* Insert the symbol into the table */
+	    InsertDbgSym (D, Val);
+       	}
+    }
+}
+
+
+
+void PrintDbgSymLabels (ObjData* O, FILE* F)
+/* Print the debug symbols in a VICE label file */
+{
+    unsigned I;
+
+    /* Clear the debug sym table */
+    ClearDbgSymTable ();
+
+    /* Walk through all debug symbols in this module */
+    for (I = 0; I < O->DbgSymCount; ++I) {
+
+	long Val;
+
+	/* Get the next debug symbol */
+ 	DbgSym* D = O->DbgSyms [I];
+
+        /* Emit this symbol only if it is a label (ignore equates) */
+        if (IS_EXP_EQUATE (D->Type)) {
+            continue;
+        }
+
+	/* Get the symbol value */
+	Val = GetDbgSymVal (D);
 
 	/* Lookup this symbol in the table. If it is found in the table, it was
 	 * already written to the file, so don't emit it twice. If it is not in

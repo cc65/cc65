@@ -39,10 +39,10 @@
 
 
 #ifndef _TGI_MODE_H
-#include "tgi/tgi-mode.h"
+#include <tgi/tgi-mode.h>
 #endif
 #ifndef _TGI_ERROR_H
-#include "tgi/tgi-error.h"
+#include <tgi/tgi-error.h>
 #endif
 
 

@@ -890,14 +890,14 @@ starting track and sector which may point either to start of a chain for VLIR or
 
 <sect3>GetFile
 <p>
-<tt/char __fastcall__ GetFile(char flag, const char *fname, const char *loadaddr, const char *datadname, char *datafname)/
+<tt/char __fastcall__ GetFile(char saveflag, char loadflag, const char *fname, const char *loadaddr, const char *datadname, char *datafname)/
 <p>
 This routine loads and runs a given file <tt/fname/. The file must be one of following types:
 <tt/SYSTEM, DESK_ACC, APPLICATION, APPL_DATA, PRINTER,/ or <tt/INPUT_DEVICE/. The execution
 address is taken from file header. It is zero, then file is only loaded. Only the first chain
-from VLIR files is loaded. If <tt/flag/ has bit 0 set then load address is taken from <tt/loadaddr/
+from VLIR files is loaded. If <tt/loadflag/ has bit 0 set then load address is taken from <tt/loadaddr/
 and not from file header. In this case <tt/APPLICATION/ files will be only loaded, not executed.
-This does not apply to <tt/DESK_ACC/. If either bit 6 or 7 of <tt/flag/ are set, then 16 bytes from
+This does not apply to <tt/DESK_ACC/. If either bit 6 or 7 of <tt/loadflag/ are set, then 16 bytes from
 <tt/datadname/ is copied to <tt/dataDiskName/ and 16 bytes from <tt/datafname/ goes to <tt/dataFileName/
 in system case. If you don't use it it is safe to pass <tt/NULL/ to this function.
 
@@ -925,17 +925,19 @@ returned value is invalid.
 
 <sect3>SaveFile
 <p>
-<tt/char SaveFile (struct fileheader *myHeader)/
+<tt/char SaveFile (char skip, struct fileheader *myHeader)/
 <p>
 <tt/SaveFile/ will take care of everything needed to create a GEOS file, no matter VLIR of SEQ
 structure. All you need to do is to place data in proper place and prepare a header which will
-contain all information about a file.
+contain all information about a file. The <tt/skip/ parameter says how many directory pages you
+want to skip before searching for a free slot for directory entry. In most cases you will put
+<tt/0/ there.
 
 You have to declare a <tt/struct fileheader/ and fill it with proper values. There is only one
 difference - the first two bytes which are link to nonexistant next sector are replaced by a
 pointer to the DOS filename of the file.
 
-When saving files two most important fields in <tt/struct fileheader/ are <tt/fileheader.load_address/
+When saving sequential files two most important fields in <tt/struct fileheader/ are <tt/fileheader.load_address/
 and <tt/fileheader.end_address/.
 
 <sect3>FreeFile

@@ -19,11 +19,11 @@
        	sta    	sreg+1
 	php			; Save current I flag value
 	sei			; Disable interrupts
-	lda	RTCLOK+2
-	sta	sreg
 	lda	RTCLOK		; Read clock
 	ldx	RTCLOK+1
-	plp			; Restore old I bit
+       	ldy	RTCLOK+2
+	plp	    		; Restore old I bit
+       	sty	sreg
 	rts
 
 .endproc

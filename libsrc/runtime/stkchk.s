@@ -45,10 +45,10 @@
 
 ; ----------------------------------------------------------------------------
 ; 6502 stack checking routine. Does not need to save any registers.
-; Safety zone for the hardware stack is 10 bytes.
+; Safety zone for the hardware stack is 12 bytes.
 
 stkchk:	tsx
-       	cpx  	#10
+       	cpx  	#12
        	bcc    	Fail	     	; Jump on stack overflow
 	rts			; Return if ok
 

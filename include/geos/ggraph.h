@@ -14,14 +14,14 @@
 #endif
 
 void __fastcall__ cpputs(char *s);
-void __fastcall__ cpputsxy(int x, int y, char *s);
+void __fastcall__ cpputsxy(unsigned x, unsigned y, char *s);
 
 void __fastcall__ SetPattern(char newpattern);
 
-void __fastcall__ HorizontalLine(char pattern, char y, int xstart, int xend);
-void __fastcall__ InvertLine(char y, int xstart, int xend);
-void __fastcall__ RecoverLine(char y, int xstart, int xend);
-void __fastcall__ VerticalLine(char pattern, char ystart, char yend, int x);
+void __fastcall__ HorizontalLine(char pattern, char y, unsigned xstart, unsigned xend);
+void __fastcall__ InvertLine(char y, unsigned xstart, unsigned xend);
+void __fastcall__ RecoverLine(char y, unsigned xstart, unsigned xend);
+void __fastcall__ VerticalLine(char pattern, char ystart, char yend, unsigned x);
 
 void __fastcall__ InitDrawWindow(struct window *myRectangle);
 void __fastcall__ Rectangle(void);
@@ -35,19 +35,19 @@ void __fastcall__ DrawLine(struct window *topBotCoords);
 void __fastcall__ DrawPoint(struct pixel *myPixel);
 char __fastcall__ TestPoint(struct pixel *myPixel);
 
-void __fastcall__ PutChar(char character, char y, int x);
-void __fastcall__ PutString(char *myString, char y, int x);
-void __fastcall__ PutDecimal(char style, int value, char y, int x);
+void __fastcall__ PutChar(char character, char y, unsigned x);
+void __fastcall__ PutString(char *myString, char y, unsigned x);
+void __fastcall__ PutDecimal(char style, int value, char y, unsigned x);
 
 char __fastcall__ GetCharWidth(char character);
 void __fastcall__ LoadCharSet(struct fontdesc *myFont);
 void __fastcall__ UseSystemFont(void);
 
 void __fastcall__ BitmapUp(struct iconpic *myIcon);
-void __fastcall__ BitmapClip(char skipl, char skipr, int skiptop,
+void __fastcall__ BitmapClip(char skipl, char skipr, unsigned skiptop,
 			     struct iconpic *myIcon);
 void __fastcall__ BitOtherClip(void *proc1, void *proc2, char skipl,
-			       char skipr, int skiptop,
+			       char skipr, unsigned skiptop,
 			       struct iconpic *myIcon);
 
 void __fastcall__ GraphicsString(char *myGfxString);

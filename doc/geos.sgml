@@ -50,17 +50,20 @@ changed between <tt/tgi_init/ and <tt/tgi_done/.
 <p>
 <tt/joy/ - JOY driver for GEOS supports only joystick, not current pointing device.
 <p>
-It is safe to use these standard includes and its contents:
+It is safe to use these standard includes and their contents:
 <tt/assert.h, conio.h, dio.h, errno.h, em.h, geos.h, joystick.h, modload.h, mouse.h, stdlib.h, string.h, tgi.h, time.h/
 <p>
 It was not tested enough, but functions from these includes might work under GEOS:
 <tt/rs232.h, zlib.h/
 <p>
+Functions from the headers above are either standard C library functions or cc65-specific, in
+either case they are not GEOS specific and so they are not described here.
+<p>
 I am an assembler programmer and GEOSLib was designed in such way that cc65 could emit the best
 available code (well, the best as for machine :). Many of the <tt/void foo (void)/ functions are
 just raw calls to Kernal (assembled just as <tt/jsr _foo/), look in <tt/gsym.h/, where you
 will find many definitions of standard GEOS locations. Access to these addresses is optimized by
-cc65 to simple <tt/lda/ and <tt/sta/. Don't be afraid to use the power of C.
+cc65 to simple <tt/lda/ and <tt/sta/. Don't be afraid to use C syntax.
 
 <sect1>Requirements
 <p>
@@ -159,9 +162,9 @@ series of <tt/lda/ and <tt/sta/, so you can't do it better :-).
 Don't hesitate to use library functions. Everything was written with size and speed in mind. In
 fact many calls are just redirections to GEOS kernal which results in simple <tt/jsr/.
 <p>
-You might wonder why I have chosen sometimes weird order of arguments in functions. It is because
-I wanted to avoid unnecessary pushing and popping arguments from stack. cc65 can pass single <tt/int/
-through CPU registers.
+You might wonder why I have chosen sometimes weird order of arguments in functions. I just
+wanted to avoid unnecessary pushing and popping arguments from stack because cc65 can pass single
+<tt/unsigned int/ through CPU registers.
 <p>
 Do not try to compile in strict ANSI mode. Library uses cc65 extensions which are not available in
 ANSI.
@@ -248,27 +251,27 @@ horizontal lines.
 
 <sect3>HorizontalLine
 <p>
-<tt/void HorizontalLine (char pattern, char y, int xStart, int xEnd)/
+<tt/void HorizontalLine (char pattern, char y, unsigned xStart, unsigned xEnd)/
 <p>
 This function draws horizontal line using given pattern - here it is a true bit pattern, not
 pattern set by <tt/SetPattern/.
 
 <sect3>InvertLine
 <p>
-<tt/void InvertLine (char y, int xStart, int xEnd)/
+<tt/void InvertLine (char y, unsigned xStart, unsigned xEnd)/
 <p>
 There is only horizontal version.
 
 <sect3>RecoverLine
 <p>
-<tt/void RecoverLine (char y, int xStart, int xEnd)/
+<tt/void RecoverLine (char y, unsigned xStart, unsigned xEnd)/
 <p>
 This function recovers only one line. It is utilized by <tt/RecoverRectangle/. See its description
 for more details.
 
 <sect3>VerticalLine
 <p>
-<tt/void VerticalLine (char pattern, char yStart, char yEnd, int x)/
+<tt/void VerticalLine (char pattern, char yStart, char yEnd, unsigned x)/
 <p>
 This function draws vertical line using given pattern. Note that <tt/pattern/ is not a pattern
 number as set in <tt/SetPattern/ but a true bit pattern.
@@ -317,7 +320,7 @@ This function outputs single character using current style and font to screen.
 
 <sect3>PutString
 <p>
-<tt/void PutString (char *myString, char y, int x)/
+<tt/void PutString (char *myString, char y, unsigned x)/
 <p>
 Same as <tt/PutChar/ except the fact that you can output whole <tt/NULL/-terminated string.
 See <tt/ggraph.h/ for list of tokens that you can also place in the string - like <tt/CBOLDON/ or
@@ -325,7 +328,7 @@ See <tt/ggraph.h/ for list of tokens that you can also place in the string - lik
 
 <sect3>PutDecimal
 <p>
-<tt/void PutDecimal (char parameter, int value, char y, int x)/
+<tt/void PutDecimal (char parameter, int value, char y, unsigned x)/
 <p>
 This function converts <tt/value/ to its decimal representation and outputs it to the screen.
 Depending on given <tt/parameter/ the string can be filled with zeroes (string always 5 characters
@@ -370,7 +373,7 @@ structure. Note that you can only use packed GEOS bitmaps - simple Photo Scrap i
 
 <sect3>BitmapClip
 <p>
-<tt/void BitmapClip (char skipLeft, char skipRight, int skipTop, struct iconpic *myPic)/
+<tt/void BitmapClip (char skipLeft, char skipRight, unsigned skipTop, struct iconpic *myPic)/
 <p>
 This function acts similar to <tt/BitmapUp/ but you can also define which parts of the bitmap are
 to be drawn - you give the number of columns (8-pixel) to skip on the right and left of the bitmap,
@@ -378,7 +381,7 @@ and the number of rows to skip from the top if it.
 
 <sect3>BitOtherClip
 <p>
-<tt/void BitOtherClip (void *proc1, void *proc2, char skipLeft, char skip Right, int skipTop,
+<tt/void BitOtherClip (void *proc1, void *proc2, char skipLeft, char skip Right, unsigned skipTop,
 	struct iconpic *myPic)/
 <p>
 Similar to the previous one with some extension. <tt/proc1/ is called before reading a byte (it
@@ -691,7 +694,7 @@ disk. Otherwise they will be lost. Operating area is the <tt/curDirHead/.
 
 <sect3>CalcBlksFree
 <p>
-<tt/int CalcBlksFree (void)/
+<tt/unsigned CalcBlksFree (void)/
 <p>
 This function returns the number of free blocks on current disk. It is counted using data in
 <tt/curDirHead/ so you must initialize the disk before calling it.
@@ -730,9 +733,9 @@ Anyway, I feel that this function is too low-level.
 
 <sect3>BlkAlloc and NxtBlkAlloc
 <p>
-<tt/char BlkAlloc (struct tr_se output&lsqb;&rsqb, int length)/
+<tt/char BlkAlloc (struct tr_se output&lsqb;&rsqb, unsigned length)/
 <p>
-<tt/char NxtBlkAlloc (struct tr_se *myTrSe, struct tr_se output&lsqb;&rsqb, int length)/
+<tt/char NxtBlkAlloc (struct tr_se *myTrSe, struct tr_se output&lsqb;&rsqb, unsigned length)/
 <p>
 Both functions are allocating enough disk sectors to fit the number of <tt/length/ in them. You
 will find output in <tt/output/ which is table of <tt/struct tr_se/. The last entry will have the
@@ -757,11 +760,11 @@ Simply deallocates a block in BAM. You need to update BAM with <tt/PutDirHead/.
 This function finds the first free sector starting from given track and sector and allocates it.
 It might return the same argument if the given block is not allocated. I wanted it to be type
 clean, but it made usage a bit tricky. To assign a value to own <tt/struct tr_se/ you have to
-cast both variables to <tt/int/. E.g.
+cast both variables to <tt/unsigned/. E.g.
 <tscreen><verb>
 struct tr_se myTrSe;
 ...
-(int)myTrSe=(int)SetNextFree(&amp;otherTrSe);
+(unsigned)myTrSe=(unsigned)SetNextFree(&amp;otherTrSe);
 </verb></tscreen>
 <p>
 In this example <tt/otherTrSe/ can be replaced by <tt/myTrSe/.
@@ -834,7 +837,7 @@ Functions described here are common for SEQ and VLIR structures.
 <p>
 These two functions are best suited for scanning whole directory for particular files. Note that
 returned filehandles describes all file slots in the directory - even those with deleted files.
-The return value can be obtained by casting both sides to <tt/int/ - as in <tt/SetNextFree/
+The return value can be obtained by casting both sides to <tt/unsigned/ - as in <tt/SetNextFree/
 function or read directly after call to those two functions from <tt/r5/. Current sector number
 is in <tt/r1/ and sector data itself is in <tt/diskBlkBuf/.
 
@@ -901,7 +904,7 @@ in system case. If you don't use it it is safe to pass <tt/NULL/ to this functio
 
 <sect3>ReadFile
 <p>
-<tt/char ReadFile (struct tr_se *myTrSe, char *buffer, int fLength)/
+<tt/char ReadFile (struct tr_se *myTrSe, char *buffer, unsigned fLength)/
 <p>
 This function reads at most <tt/fLength/ bytes into <tt/buffer/ from chained sectors starting at
 <tt/myTrSe/.
@@ -1027,9 +1030,9 @@ can be found in <tt/VLIRInfo.curRecord + 1/).
 
 <sect3>ReadRecord and WriteRecord
 <p>
-<tt/char ReadRecord (char *buffer, int fLength)/
+<tt/char ReadRecord (char *buffer, unsigned fLength)/
 <p>
-<tt/char WriteRecord (char *buffer, int fLength)/
+<tt/char WriteRecord (char *buffer, unsigned fLength)/
 <p>
 This function will load or save at most <tt/fLength/ bytes from currently pointed record into or from
 <tt/buffer/.
@@ -1072,16 +1075,16 @@ characters - they are not treated as delimiters.
 
 <sect2>CRC
 <p>
-<tt/int CRC (char *src, int length)/
+<tt/unsigned CRC (char *src, unsigned length)/
 <p>
 This function calculates the CRC checksum for given memory range. I don't know if it is
 compatible with standard CRC routines.
 
 <sect2>FillRam and ClearRam
 <p>
-<tt/void FillRam (char *dest, char value, int length)/
+<tt/void FillRam (char *dest, char value, unsigned length)/
 <p>
-<tt/void ClearRam (char *dest, int length)/
+<tt/void ClearRam (char *dest, unsigned length)/
 <p>
 Both functions are filling given memory range. <tt/ClearRam/ fills with <tt/NULLs/, while
 <tt/FillRam/ uses given <tt/value/. Be warned that these functions destroy <tt/r0, r1 and
@@ -1089,7 +1092,7 @@ r2L/ registers. <tt/FillRam/ is an alias for <tt/memset/.
 
 <sect2>MoveData
 <p>
-<tt/void MoveData (char *dest, char *src, int length)/
+<tt/void MoveData (char *dest, char *src, unsigned length)/
 <p>
 This functions copies one memory region to another. There are checks for overlap and the
 non-destructive method is chosen. Be warned that this function destroys contents of
@@ -1105,13 +1108,13 @@ This is done with <tt/table/ where everything is defined. See structures chapter
 
 <sect2>Stash, Fetch, Swap, and VerifyRAM
 <p>
-<tt/void StashRAM (char bank, int length, char *reuAddress, char *cpuAddress)/
+<tt/void StashRAM (char bank, unsigned length, char *reuAddress, char *cpuAddress)/
 <p>
-<tt/void FetchRAM (char bank, int length, char *reuAddress, char *cpuAddress)/
+<tt/void FetchRAM (char bank, unsigned length, char *reuAddress, char *cpuAddress)/
 <p>
-<tt/void SwapRAM (char bank, int length, char *reuAddress, char *cpuAddress)/
+<tt/void SwapRAM (char bank, unsigned length, char *reuAddress, char *cpuAddress)/
 <p>
-<tt/ char VerifyRAM (char bank, int length, char *reuAddress, char *cpuAddress)/
+<tt/ char VerifyRAM (char bank, unsigned length, char *reuAddress, char *cpuAddress)/
 <p>
 These functions are interface to REU - Ram Expansion Unit. I think that they are self-explanatory.
 You can check for REU presence by taking value of <tt/ramExpSize/.
@@ -1179,7 +1182,7 @@ This is not equal to <tt/RestartProcess/ as timers are not filled with initial v
 
 <sect2>Sleep
 <p>
-<tt/void Sleep (int jiffies)/
+<tt/void Sleep (unsigned jiffies)/
 <p>
 This function is multitasking sleep - the program is halted, but it doesn't block other functions.
 The only argument here is the number of jiffies to wait until app will wake up.
@@ -1256,7 +1259,7 @@ you don't need to check if the pointer is valid.
 
 <sect2>GetSerialNumber
 <p>
-<tt/int GetSerialNumber (void)/
+<tt/unsigned GetSerialNumber (void)/
 <p>
 This function returns the serial number of system. It might be used for copy-protection.
 However, please remember that the Free Software is a true power and you are using it
@@ -1403,9 +1406,9 @@ pair.
 You should declare a table of that type to prepare data for <tt/InitProcesses/. The maximum number
 of processes is 20, and the last entry has to be equal to <tt/&lcub;NULL,NULL&rcub;/, so this table may hold
 only 21 entries. The first member of this structure (<tt/pointer/) holds the pointer to called
-function (void returning void), you will probably have to cast that pointer into int. The second
-field <tt/jiffies/ holds the amount of time between calls to that function. On PAL systems there
-are 50 jiffies per second, while NTSC have 60 of them.
+function (void returning void), you will probably have to cast that pointer into <tt/unsigned int/.
+The second field <tt/jiffies/ holds the amount of time between calls to that function.
+On PAL systems there are 50 jiffies per second, while NTSC have 60 of them.
 
 <sect1>Few thing in detail...
 <p>
@@ -1522,7 +1525,7 @@ is variable. Consider following:
 <tscreen><verb>
 char text = "foo";
 	...
-	r15=(int)text;		// in code just before call to DoDlgBox
+	r15=(unsigned)text;		// in code just before call to DoDlgBox
 	...
 	DB_VARSTR (TXT_LN_X, TXT_LN_1_Y, &amp;r15),
 	...

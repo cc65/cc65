@@ -20,6 +20,6 @@ void __fastcall__ UnBlockProcess(char number);
 void __fastcall__ FreezeProcess(char number);
 void __fastcall__ UnFreezeProcess(char number);
 
-void __fastcall__ Sleep(int jiffies);
+void __fastcall__ Sleep(unsigned jiffies);
 
 #endif

@@ -46,9 +46,9 @@ struct fileheader {		/* header block (like fileHeader) */
 	char dostype;
 	char type;
 	char structure;
-	int load_address;
-	int end_address;
-	int exec_address;
+	unsigned load_address;
+	unsigned end_address;
+	unsigned exec_address;
 	char class_name[19];
 	char column_flag;
 	char author[63];
@@ -63,11 +63,11 @@ struct filehandle {		/* filehandle in directory sectors */
 	char structure;
 	char type;
 	struct f_date date;
-	int size;
+	unsigned size;
 };
 
 struct pixel {			/* describes point              */
-	int x;
+	unsigned x;
 	char y;
 };
 
@@ -82,20 +82,20 @@ struct fontdesc {		/* describes font               */
 struct window {			/* describes screen region      */
 	char top;
 	char bot;
-	int left;
-	int right;
+	unsigned left;
+	unsigned right;
 };
 
 struct VLIR_info {		/* VLIR information             */
 	char curRecord;		/* currently only used in VLIR  */
 	char usedRecords;	/* as system info (curRecord is mainly of your interest */
 	char fileWritten;
-	int fileSize;
+	unsigned fileSize;
 };
 
 struct process {		/* process info, declare table of that type */
-	int pointer;		/* (like: struct process proctab[2]=...    */
-	int jiffies;		/* last entry HAVE TO BE {0,0}              */
+	unsigned pointer;	/* (like: struct process proctab[2]=...    */
+	unsigned jiffies;	/* last entry HAVE TO BE {0,0}              */
 };
 
 
@@ -113,7 +113,7 @@ struct icondef {		/* icon definition for DoIcons              */
 	char y;
 	char width;		/* of icon (in cards)                       */
 	char heigth;		/* of icon in lines (pixels)                */
-	int proc_ptr;		/* pointer to function handling that icon   */
+	unsigned proc_ptr;	/* pointer to function handling that icon   */
 };
 
 struct icontab {
@@ -136,7 +136,7 @@ struct menu {
 };
 
 struct inittab {		/* use struct inittab mytab[n] for initram              */
-	int ptr;		/* ptr to 1st byte                                      */
+	unsigned ptr;		/* ptr to 1st byte                                      */
 	char number;		/* number of following bytes                            */
 	char values[];		/* actual string of bytes                               */
 };

@@ -18,7 +18,7 @@ void __fastcall__ Panic(void);
 
 void __fastcall__ CallRoutine(void *myRoutine);
 
-int __fastcall__ GetSerialNumber(void);
+unsigned __fastcall__ GetSerialNumber(void);
 char __fastcall__ GetRandom(void);
 
 void __fastcall__ SetDevice(char newdev);

@@ -17,9 +17,10 @@ struct filehandle *__fastcall__ GetNxtDirEntry(void);
 
 char __fastcall__ FindFTypes(char *buffer, char ftype, char fmaxnum, const char *classtxt);
 
-char __fastcall__ GetFile(char flag, const char *fname, const char *loadaddr, const char *datadname, char *datafname);
+char __fastcall__ GetFile(char flag, const char *fname, const char *loadaddr,
+                          const char *datadname, char *datafname);
 char __fastcall__ FindFile(const char *fname);
-char __fastcall__ ReadFile(struct tr_se *myTrSe, char *buffer, int flength);
+char __fastcall__ ReadFile(struct tr_se *myTrSe, char *buffer, unsigned flength);
 char __fastcall__ SaveFile(struct fileheader *myHeader);
 char __fastcall__ FreeFile(struct tr_se myTable[]);
 char __fastcall__ DeleteFile(const char *fname);
@@ -38,8 +39,8 @@ char __fastcall__ PointRecord(char);
 char __fastcall__ DeleteRecord(void);
 char __fastcall__ InsertRecord(void);
 char __fastcall__ AppendRecord(void);
-char __fastcall__ ReadRecord(char *buffer, int flength);
-char __fastcall__ WriteRecord(const char *buffer, int flength);
+char __fastcall__ ReadRecord(char *buffer, unsigned flength);
+char __fastcall__ WriteRecord(const char *buffer, unsigned flength);
 char __fastcall__ UpdateRecordFile(void);
 
 /* GEOS filetypes */

@@ -21,19 +21,19 @@ char __fastcall__ ReadBlock(struct tr_se *myTrSe, char *buffer);
 char __fastcall__ WriteBlock(struct tr_se *myTrSe, const char *buffer);
 char __fastcall__ VerWriteBlock(struct tr_se *myTrSe, const char *buffer);
 
-int __fastcall__ CalcBlksFree(void);
+unsigned __fastcall__ CalcBlksFree(void);
 char __fastcall__ ChkDkGEOS(void);
 char __fastcall__ SetGEOSDisk(void);
 char __fastcall__ NewDisk(void);
 char __fastcall__ OpenDisk(void);
 
 char __fastcall__ FindBAMBit(struct tr_se *myTrSe);
-char __fastcall__ BlkAlloc(struct tr_se output[], int length);
+char __fastcall__ BlkAlloc(struct tr_se output[], unsigned length);
 char __fastcall__ NxtBlkAlloc(struct tr_se *startTrSe,
-			      struct tr_se output[], int length);
+			      struct tr_se output[], unsigned length);
 char __fastcall__ FreeBlock(struct tr_se *myTrSe);
 struct tr_se __fastcall__ SetNextFree(struct tr_se *myTrSe);
-// above needs (int) casts on both sides of '='
+// above needs (unsigned) casts on both sides of '='
 
 char __fastcall__ GetDirHead(void);
 char __fastcall__ PutDirHead(void);

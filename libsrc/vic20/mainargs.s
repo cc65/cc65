@@ -3,7 +3,7 @@
 ; Ullrich von Bassewitz, 2003-03-07
 ; Based on code from Stefan A. Haubenthal, <polluks@web.de>
 ; 2003-05-18, Greg King
-; 2004-04-28, Ullrich von Bassewitz
+; 2004-04-28, 2005-02-26, Ullrich von Bassewitz
 ;
 ; Scan a group of arguments that are in BASIC's input-buffer.
 ; Build an array that points to the beginning of each argument.
@@ -33,8 +33,11 @@ MAXARGS	 = 10                   ; Maximum number of arguments allowed
 REM	 = $8f			; BASIC token-code
 NAME_LEN = 16			; maximum length of command-name
 
-; Get possible command-line arguments.
-;
+; Get possible command-line arguments. Goes into the special INIT segment,
+; which may be reused after the startup code is run
+
+.segment        "INIT"
+
 initmainargs:
 
 ; Assume that the program was loaded, a moment ago, by the traditional LOAD
@@ -100,7 +103,7 @@ argloop:lda     BASIC_BUF,x
         inx
         cmp     term
         bne     argloop
-
+                          
 ; We've found the end of the argument. X points one character behind it, and
 ; A contains the terminating character. To make the argument a valid C string,
 ; replace the terminating character by a zero.

@@ -7,7 +7,7 @@
 ;
 
     	.export	       	_cputcxy, _cputc, cputdirect, putchar
-	.export		newline               
+	.export		newline
         .constructor    conioinit
 	.import		popa, _gotoxy
         .import         ppuinit, paletteinit, ppubuf_put
@@ -18,12 +18,14 @@
 	.include	"nes.inc"
 
 ;-----------------------------------------------------------------------------
+                      
+.code
 
 _cputcxy:
-	pha	    		; Save C
-	jsr	popa		; Get Y
+	pha	      		; Save C
+	jsr	popa  		; Get Y
 	jsr	_gotoxy		; Set cursor, drop x
-	pla			; Restore C
+	pla	      		; Restore C
 
 ; Plot a character - also used as internal function
 
@@ -67,13 +69,16 @@ plot:	ldy	CURS_X
 ; position in Y
 
 putchar:
-    	ora	RVS             ; Set revers bit
+     	ora	RVS             ; Set revers bit
         ldy     SCREEN_PTR+1
 	ldx     SCREEN_PTR
        	jmp     ppubuf_put
 
 ;-----------------------------------------------------------------------------
-; Initialize the conio subsystem
+; Initialize the conio subsystem. Code goes into the INIT segment, which may
+; be reused after startup.
+
+.segment        "INIT"
 
 conioinit:
         jsr     ppuinit

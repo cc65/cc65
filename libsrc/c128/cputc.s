@@ -18,6 +18,9 @@
 cputdirect      = PRINT
 newline         = NEWLINE
 
+;--------------------------------------------------------------------------
+
+.code
 
 _cputcxy:
  	pha	       		; Save C
@@ -75,7 +78,8 @@ plot:	ldy	CURS_X
 putchar	= $CC2F
 
 ;--------------------------------------------------------------------------
-; Module constructor/destructor
+; Module constructor/destructor. Don't move the constructor into the INIT
+; segment, because it shares most of the code with the destructor.
 
 initcputc:
 	lda	#$C0

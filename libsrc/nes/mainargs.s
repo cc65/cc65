@@ -10,7 +10,10 @@
 
 
 ;---------------------------------------------------------------------------
-; Setup arguments for main
+; Get possible command-line arguments. Goes into the special INIT segment,
+; which may be reused after the startup code is run
+
+.segment        "INIT"
 
 .proc   initmainargs
 

@@ -6,7 +6,7 @@
 ;
 ; 6.3.2001, 17.4.2003
 
-	
+
 	.include 	"../inc/geossym.inc"
 
 	.export		xsize, ysize
@@ -14,8 +14,8 @@
 	.importzp	cursor_r, cursor_c
 	.import		_cursor
 	.constructor	initscrsize
-
-.code
+                      
+.segment        "INIT"
 
 initscrsize:
 	lda	graphMode

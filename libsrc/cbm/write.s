@@ -20,6 +20,8 @@
 ;--------------------------------------------------------------------------
 ; initstdout: Open the stdout and stderr file descriptors for the screen.
 
+.segment        "INIT"
+
 .proc   initstdout
 
         lda     #LFN_WRITE
@@ -40,7 +42,8 @@
 
 ;--------------------------------------------------------------------------
 ; _write
-
+                      
+.code
 
 .proc   _write
 

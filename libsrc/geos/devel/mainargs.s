@@ -21,6 +21,8 @@
 ;---------------------------------------------------------------------------
 ; Setup arguments for main
 
+.segment        "INIT"
+
 .proc   initmainargs
 
 ; Setup a pointer to our argv vector

@@ -20,6 +20,8 @@
 
 ;--------------------------------------------------------------------------
 ; initstdin: Open the stdin file descriptors for the keyboard
+     
+.segment        "INIT"
 
 .proc   initstdin
 
@@ -37,6 +39,7 @@
 ;--------------------------------------------------------------------------
 ; _read
 
+.code
 
 .proc   _read
 

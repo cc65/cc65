@@ -59,7 +59,7 @@ L2:    	sta     ENABLE_ROM      ; Bank in the ROM
 	.constructor	initkbd
 	.destructor	donekbd
 
-.code                           ; Can go into the normal code segment
+.segment        "INIT"          ; Special init code segment may get overwritten
 
 .proc	initkbd
 

@@ -49,7 +49,10 @@
 .endproc
 
 ; ------------------------------------------------------------------------
-; Switch the cursor off, disable capslock
+; Switch the cursor off, disable capslock. Code goes into the INIT segment
+; which may be reused after it is run.
+
+.segment        "INIT"
 
 initcgetc:
         lda     STATUS

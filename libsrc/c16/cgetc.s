@@ -56,6 +56,8 @@ L2:    	jsr    	KBDREAD	       	; Read char and return in A
 	.constructor	initkbd
 	.destructor	donekbd
 
+.segment        "INIT"
+
 .proc	initkbd
 
      	ldy	#15
@@ -67,6 +69,8 @@ L2:    	jsr    	KBDREAD	       	; Read char and return in A
 
 .endproc
 
+
+.code
 
 .proc	donekbd
 

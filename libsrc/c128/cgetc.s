@@ -40,32 +40,31 @@ L2:    	lda	KEY_COUNT	; Check characters again
 .bss
 keyvec:	.res	2
 
-.code
+.segment        "INIT"
 initcgetc:
 
 ; Save the old vector
 
-	lda	KeyStoreVec
-	sta	keyvec
-	lda	KeyStoreVec+1
-	sta	keyvec+1
+     	lda	KeyStoreVec
+     	sta	keyvec
+     	lda	KeyStoreVec+1
+     	sta	keyvec+1
 
 ; Set the new vector. I can only hope that this works for other C128
 ; versions...
 
-	lda	#<$C6B7
-	ldx	#>$C6B7
+     	lda	#<$C6B7
+     	ldx	#>$C6B7
+        jmp     SetVec
 
-SetVec:	sei
-	sta	KeyStoreVec
-	stx	KeyStoreVec+1
-	cli
-	rts
-
+.code
 donecgetc:
-        lda     #$00
-        sta     SCROLL
 	lda	keyvec
 	ldx	keyvec+1
-	bne	SetVec
+SetVec:	sei
+     	sta	KeyStoreVec
+     	stx	KeyStoreVec+1
+     	cli
+     	rts
+
 

@@ -542,6 +542,98 @@ static unsigned OptSub2 (CodeSeg* S)
 static unsigned OptAdd1 (CodeSeg* S)
 /* Search for the sequence
  *
+ *     	jsr     pushax
+ *      ldy     xxx
+ *  	ldx     #$00
+ *      lda     (sp),y
+ *      jsr     tosaddax
+ *
+ * and replace it by:
+ *
+ *      ldy     xxx
+ *      clc
+ *      adc     (sp),y
+ *      bcc     L
+ *      inx
+ * L:
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+     	CodeEntry* L[5];
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+	if (E->OPC == OP65_JSR                               &&
+	    strcmp (E->Arg, "pushax") == 0                   &&
+       	    CS_GetEntries (S, L, I+1, 5)   	             &&
+       	    L[0]->OPC == OP65_LDY                            &&
+	    !CE_HasLabel (L[0])                              &&
+	    L[1]->OPC == OP65_LDX                            &&
+	    CE_KnownImm (L[1])                               &&
+	    L[1]->Num == 0                                   &&
+	    !CE_HasLabel (L[1])                              &&
+	    L[2]->OPC == OP65_LDA                            &&
+	    !CE_HasLabel (L[2])                              &&
+	    L[3]->OPC == OP65_JSR                            &&
+	    strcmp (L[3]->Arg, "tosaddax") == 0              &&
+	    !CE_HasLabel (L[3])) {
+
+	    CodeEntry* X;
+	    CodeLabel* Label;
+
+	    /* Remove the call to pushax */
+	    CS_DelEntry (S, I);
+
+	    /* Add the clc . */
+	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+1);
+
+	    /* Remove the load */
+	    CS_DelEntry (S, I+3);      /* lda */
+	    CS_DelEntry (S, I+2);      /* ldx */
+
+	    /* Add the adc */
+	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+2);
+
+	    /* Generate the branch label and the branch */
+	    Label = CS_GenLabel (S, L[4]);
+	    X = NewCodeEntry (OP65_BCC, AM65_BRA, Label->Name, Label, L[3]->LI);
+	    CS_InsertEntry (S, X, I+3);
+
+	    /* Generate the increment of the high byte */
+	    X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, L[3]->LI);
+	    CS_InsertEntry (S, X, I+4);
+
+	    /* Delete the call to tosaddax */
+	    CS_DelEntry (S, I+5);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptAdd2 (CodeSeg* S)
+/* Search for the sequence
+ *
  *  	adc     ...
  *      bcc     L
  *  	inx
@@ -1844,7 +1936,8 @@ static OptFunc OptFuncs [] = {
     OptEntry (OptSub1, optMain),
     OptEntry (OptSub2, optMain),
     /* Optimize additions */
-    OptEntry (OptAdd1, optMain),
+    OptEntry (OptAdd1, optPre),
+    OptEntry (OptAdd2, optMain),
     /* Optimize jump cascades */
     OptEntry (OptJumpCascades, optMain),
     /* Remove dead jumps */

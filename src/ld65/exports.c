@@ -350,7 +350,7 @@ Export* CreateConstExport (const char* Name, long Value)
 /* Create an export for a literal date */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_ABS | EXP_CONST, Name, 0);
+    Export* E = NewExport (EXP_ABS | EXP_CONST | EXP_EQUATE, Name, 0);
 
     /* Assign the value */
     E->Expr = LiteralExpr (Value, 0);
@@ -368,7 +368,7 @@ Export* CreateMemExport (const char* Name, Memory* Mem, unsigned long Offs)
 /* Create an relative export for a memory area offset */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_ABS | EXP_EXPR, Name, 0);
+    Export* E = NewExport (EXP_ABS | EXP_EXPR | EXP_LABEL, Name, 0);
 
     /* Assign the value */
     E->Expr = MemExpr (Mem, Offs, 0);
@@ -386,10 +386,10 @@ Export* CreateSegExport (const char* Name, Section* Sec, unsigned long Offs)
 /* Create a relative export to a segment (section) */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_ABS | EXP_EXPR, Name, 0);
+    Export* E = NewExport (EXP_ABS | EXP_EXPR | EXP_LABEL, Name, 0);
 
     /* Assign the value */
-    E->Expr = SegExpr (Sec, Offs, 0);		       
+    E->Expr = SegExpr (Sec, Offs, 0);
 
     /* Insert the export */
     InsertExport (E);
@@ -402,7 +402,7 @@ Export* CreateSegExport (const char* Name, Section* Sec, unsigned long Offs)
 
 static Export* FindExport (const char* Name)
 /* Check for an identifier in the list. Return 0 if not found, otherwise
- * return a pointer to the export.
+ * return a pointer to the export.			 
  */
 {
     /* Get a pointer to the list with the symbols hash value */
@@ -601,10 +601,11 @@ void PrintExportMap (FILE* F)
 	/* Print unreferenced symbols only if explictly requested */
 	if (VerboseMap || E->ImpCount > 0 || IS_EXP_CONDES (E->Type)) {
 	    fprintf (F,
-	      	     "%-25s %06lX %c%c%c   ",
+	      	     "%-25s %06lX %c%c%c%c   ",
 	      	     E->Name,
 	      	     GetExportVal (E),
 	      	     E->ImpCount? 'R' : ' ',
+		     IS_EXP_LABEL (E->Type)? 'L' : 'E',
 	      	     IS_EXP_ZP (E->Type)? 'Z' : ' ',
 		     IS_EXP_CONDES (E->Type)? 'I' : ' ');
 	    if (++Count == 2) {

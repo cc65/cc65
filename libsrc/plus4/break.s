@@ -55,11 +55,12 @@ uservec:    	jmp	$FFFF  	   	; Patched at runtime
 
 
 
-; Break handler, called if a break occurs. Note: Y is not on the stack!
+; Break handler, called if a break occurs. 
 
 .proc	brk_handler
 
-       	sty	_brk_y
+	pla
+       	sta	_brk_y
 	pla
 	sta	_brk_x
 	pla

@@ -41,33 +41,19 @@ Head:   .word   @Next
        	ldx   	#zpspace-1
 L1:	lda	sp,x
    	sta	zpsave,x	; save the zero page locations we need
-	dex
+  	dex
        	bpl	L1
         sta     ENABLE_ROM
         cli
 
 ; Close open files
 
-	jsr	$FFCC           ; CLRCH
+  	jsr	$FFCC           ; CLRCH
 
 ; Switch to second charset
 
-	lda	#14
-	jsr	$FFD2           ; BSOUT
-
-; Setup the IRQ vector in the banked RAM and switch off the ROM
-
-        sei                     ; No ints, handler not yet in place
-        sta     ENABLE_RAM
-        lda     #<IRQ
-        sta     $FFFE           ; Install interrupt handler
-        lda     #>IRQ
-        sta     $FFFF
-        cli                     ; Allow interrupts
-
-; Clear the BSS data
-
-	jsr	zerobss
+  	lda	#14
+  	jsr	$FFD2           ; BSOUT
 
 ; Save system stuff and setup the stack. The stack starts at the top of the
 ; usable RAM.
@@ -80,88 +66,110 @@ L1:	lda	sp,x
         lda     #>$FD00
         sta     sp+1
 
+; Setup the IRQ vector in the banked RAM and switch off the ROM
+
+        ldx     #<IRQ
+        ldy     #>IRQ
+        sei                     ; No ints, handler not yet in place
+        sta     ENABLE_RAM
+        stx     $FFFE           ; Install interrupt handler
+        sty     $FFFF
+        cli                     ; Allow interrupts
+
+; Clear the BSS data
+
+  	jsr	zerobss
+
 ; Call module constructors
 
-	jsr	initlib
+  	jsr	initlib
 
-; If we have IRQ functions, chain our stub into the IRQ vector
+; Initialize irqcount, which means that from now own custom linked in IRQ
+; handlers (via condes) will be called.
 
-        lda     #<__IRQFUNC_COUNT__
-      	beq	NoIRQ1
-      	lda	IRQVec
-       	ldx	IRQVec+1
-      	sta	IRQInd+1
-      	stx	IRQInd+2
-      	lda	#<IRQStub
-      	ldx	#>IRQStub
-      	sei
-      	sta	IRQVec
-      	stx	IRQVec+1
-      	cli
+        lda     #.lobyte(__IRQFUNC_COUNT__*2)
+        sta     irqcount
 
 ; Push arguments and call main()
 
-NoIRQ1: jsr    	callmain
+  	jsr    	callmain
 
-; Back from main (this is also the _exit entry). Reset the IRQ vector if
-; we chained it.
+; Back from main (this is also the _exit entry). Run module destructors.
 
-_exit:  lda     #<__IRQFUNC_COUNT__
-	beq	NoIRQ2
-	lda	IRQInd+1
-	ldx	IRQInd+2
-	sei
-	sta	IRQVec
-	stx	IRQVec+1
-	cli
-
-; Run module destructors.
-
-NoIRQ2:	jsr	donelib	 	; Run module destructors
+_exit: 	lda     #0
+        sta     irqcount        ; Disable custom IRQ handlers
+        jsr	donelib         ; Run module destructors
 
 ; Restore system stuff
 
-	ldx	spsave
-	txs
+       	ldx	spsave
+       	txs
 
 ; Copy back the zero page stuff
 
-	ldx	#zpspace-1
+  	ldx	#zpspace-1
 L2:	lda	zpsave,x
-	sta	sp,x
-	dex
+  	sta	sp,x
+  	dex
        	bpl	L2
 
 ; Enable the ROM, reset changed vectors and return to BASIC
 
         sta     ENABLE_ROM
-	jmp	$FF8A           ; RESTOR
+  	jmp	$FF8A           ; RESTOR
 
 
 ; ------------------------------------------------------------------------
-; IRQ handler
+; IRQ handler. The handler in the ROM enables the kernal and jumps to
+; $CE00, where the ROM code checks for a BRK or IRQ and branches via the
+; indirect vectors at $314/$316.
+; To make our stub as fast as possible, we skip the whole part of the ROM
+; handler and jump to the indirect vectors directly. We do also call our
+; own interrupt handlers if we have any, so they need not use $314.
 
 .segment        "LOWCODE"
 
-IRQ:    pha
+IRQ:    cld			; Just to be sure
+  	pha
         txa
         pha
+  	tya
+  	pha
         tsx                     ; Get the stack pointer
-        lda     $0103,x         ; Get the saved status register
-        tax                     ; Save for later
+        lda     $0104,x         ; Get the saved status register
         and     #$10            ; Test for BRK bit
         bne     dobreak
-        lda     #>irq_ret       ; Push new return address
+
+; It's an IRQ and RAM is enabled. If we have handlers, call them. We will use
+; a flag here instead of loading __IRQFUNC_COUNT__ directly, since the condes
+; function is not reentrant. The irqcount flag will be set/reset from the main
+; code, to avoid races.
+
+   	ldy    	irqcount
+    	beq	@L1
+       	lda    	#<__IRQFUNC_TABLE__
+    	ldx 	#>__IRQFUNC_TABLE__
+    	jsr	condes 	 	   	; Call the IRQ functions
+
+; Since the ROM handler will end with an RTI, we have to fake an IRQ return
+; on stack, so we get control of the CPU after the ROM handler and can switch
+; back to RAM.
+
+@L1:    lda     #>irq_ret       ; Push new return address
         pha
         lda     #<irq_ret
         pha
-        txa
-        pha
+       	php			; Push faked IRQ frame on stack
+	pha			; Push faked A register
+	pha			; Push faked X register
+	pha			; Push faked Y register
         sta     ENABLE_ROM      ; Switch to ROM
-        jmp     ($FFFE)         ; Jump to kernal irq handler
+        jmp     (IRQVec)        ; Jump indirect to kernal irq handler
 
 irq_ret:
         sta     ENABLE_RAM      ; Switch back to RAM
+	pla
+	tay
         pla
         tax
         pla
@@ -175,26 +183,8 @@ dobreak:
 ; No break handler installed, jump to ROM
 
 nohandler:
-        tya
-        pha                     ; ROM handler expects Y on stack
         sta     ENABLE_ROM
         jmp     (BRKVec)        ; Jump indirect to the break vector
-
-; ------------------------------------------------------------------------
-; Stub for the IRQ chain. Is used only if there are IRQs defined. Needed in
-; low memory because of the banking.
-
-.segment        "LOWCODE"
-
-IRQStub:
-        cld                     ; Just to be sure
-        sta     ENABLE_RAM      ; Switch to RAM
-	ldy 	#<(__IRQFUNC_COUNT__*2)
-       	lda    	#<__IRQFUNC_TABLE__
-	ldx 	#>__IRQFUNC_TABLE__
-	jsr	condes 		   	; Call the IRQ functions
-	sta    	ENABLE_ROM
-       	jmp    	IRQInd			; Jump to the saved IRQ vector
 
 ; ------------------------------------------------------------------------
 ; Data
@@ -205,8 +195,8 @@ zpsave:	        .res	zpspace
 ; BRK handling
 brk_jmp:        jmp     $0000
 
-.bss
 spsave:	        .res	1
 
-
+.bss
+irqcount:       .byte   0
 

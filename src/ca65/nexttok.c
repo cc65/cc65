@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -419,15 +419,12 @@ void Consume (enum Token Expected, const char* ErrMsg)
 void ConsumeSep (void)
 /* Consume a separator token */
 {
-    /* Accept an EOF as separator */
-    if (Tok != TOK_EOF) {
-     	if (Tok != TOK_SEP) {
-       	    Error ("Unexpected trailing garbage characters");
-     	    SkipUntilSep ();
-     	}
-	if (Tok == TOK_SEP) {
-	    NextTok ();
-	}
+    /* We expect a separator token */
+    ExpectSep ();
+
+    /* If we have one, skip it */
+    if (Tok == TOK_SEP) {
+	NextTok ();
     }
 }
 
@@ -462,6 +459,18 @@ void SkipUntilSep (void)
 {
     while (!TokIsSep (Tok)) {
      	NextTok ();
+    }
+}
+
+
+
+void ExpectSep (void)
+/* Check if we've reached a line separator, and output an error if not. Do
+ * not skip the line separator.
+ */
+{
+    if (!TokIsSep (Tok)) {
+       	ErrorSkip ("Unexpected trailing garbage characters");
     }
 }
 

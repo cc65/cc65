@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -68,6 +68,11 @@ void ConsumeComma (void);
 
 void SkipUntilSep (void);
 /* Skip tokens until we reach a line separator or end of file */
+
+void ExpectSep (void);
+/* Check if we've reached a line separator, and output an error if not. Do
+ * not skip the line separator.
+ */
 
 void EnterRawTokenMode (void);
 /* Enter raw token mode. In raw mode, token handling functions are not

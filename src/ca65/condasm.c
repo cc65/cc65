@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -210,7 +210,7 @@ void DoConditionals (void)
     	    case TOK_ELSE:
        	        D = GetCurrentIf ();
 	       	if (D == 0) {
-	       	    Error ("Unexpected .ELSE");
+       	       	    Error ("Unexpected .ELSE");
        	       	} else if (GetElse(D)) {
 	       	    /* We already had a .ELSE ! */
 	       	    Error ("Duplicate .ELSE");
@@ -223,6 +223,7 @@ void DoConditionals (void)
 	  	    IfCond = GetCurrentIfCond ();
 	  	}
 	       	NextTok ();
+		ExpectSep ();
        	       	break;
 
        	    case TOK_ELSEIF:
@@ -247,6 +248,7 @@ void DoConditionals (void)
 		     */
 		    if (IfCond == 0) {
 		       	SetIfCond (D, ConstExpression ());
+			ExpectSep ();
 		    }
 
 		    /* Get the new overall condition */
@@ -262,6 +264,7 @@ void DoConditionals (void)
 		 * has been cleanup up, since we may be at end of file.
 		 */
 		NextTok ();
+		ExpectSep ();
 
 		/* Get the new overall condition */
 	        IfCond = GetCurrentIfCond ();
@@ -272,6 +275,7 @@ void DoConditionals (void)
 	      	NextTok ();
 		if (IfCond) {
 		    SetIfCond (D, ConstExpression ());
+		    ExpectSep ();
 		}
 	      	IfCond = GetCurrentIfCond ();
 	      	break;
@@ -297,6 +301,7 @@ void DoConditionals (void)
 		    ExprNode* Expr = Expression();
 		    SetIfCond (D, IsConstExpr (Expr, 0));
 		    FreeExpr (Expr);
+		    ExpectSep ();
 		}
 		IfCond = GetCurrentIfCond ();
 		break;
@@ -332,6 +337,7 @@ void DoConditionals (void)
 		    ExprNode* Expr = Expression();
 		    SetIfCond (D, !IsConstExpr (Expr, 0));
 		    FreeExpr (Expr);
+		    ExpectSep ();
 		}
 		IfCond = GetCurrentIfCond ();
 		break;
@@ -342,6 +348,7 @@ void DoConditionals (void)
 		if (IfCond) {
 		    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
 		    SetIfCond (D, Sym == 0 || !SymIsDef (Sym));
+		    ExpectSep ();
 		}
 	        IfCond = GetCurrentIfCond ();
     	     	break;
@@ -352,6 +359,7 @@ void DoConditionals (void)
 		if (IfCond) {
 		    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
 		    SetIfCond (D, Sym == 0 || !SymIsRef (Sym));
+		    ExpectSep ();
 	     	}
 	        IfCond = GetCurrentIfCond ();
 		break;
@@ -363,6 +371,7 @@ void DoConditionals (void)
 		    SetIfCond (D, GetCPU() == CPU_6502);
 		}
 		IfCond = GetCurrentIfCond ();
+		ExpectSep ();
 		break;
 
 	    case TOK_IFP816:
@@ -372,6 +381,7 @@ void DoConditionals (void)
        	       	    SetIfCond (D, GetCPU() == CPU_65816);
 		}
 		IfCond = GetCurrentIfCond ();
+		ExpectSep ();
 		break;
 
 	    case TOK_IFPC02:
@@ -381,6 +391,7 @@ void DoConditionals (void)
        	       	    SetIfCond (D, GetCPU() == CPU_65C02);
 		}
 		IfCond = GetCurrentIfCond ();
+		ExpectSep ();
 		break;
 
 	    case TOK_IFPSC02:
@@ -390,6 +401,7 @@ void DoConditionals (void)
        	       	    SetIfCond (D, GetCPU() == CPU_65SC02);
 		}
 		IfCond = GetCurrentIfCond ();
+		ExpectSep ();
 		break;
 
 	    case TOK_IFREF:
@@ -398,6 +410,7 @@ void DoConditionals (void)
      		if (IfCond) {
 		    SymEntry* Sym = ParseScopedSymName (SYM_FIND_EXISTING);
 		    SetIfCond (D, Sym != 0 && SymIsRef (Sym));
+		    ExpectSep ();
      		}
      	        IfCond = GetCurrentIfCond ();
      		break;

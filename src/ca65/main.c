@@ -39,6 +39,7 @@
 #include <ctype.h>
 #include <time.h>
 
+#include "../common/cmdline.h"
 #include "../common/version.h"
 
 #include "error.h"
@@ -88,6 +89,7 @@ static void Usage (void)
        	     "  --auto-import\t\tMark unresolved symbols as import\n"
        	     "  --cpu type\t\tSet cpu type\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
+	     "  --help\t\tPrint this text\n"
 	     "  --ignore-case\t\tIgnore case of symbols\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
        	     "  --listing\t\tCreate a listing if assembly was ok\n"
@@ -97,54 +99,6 @@ static void Usage (void)
        	     "  --version\t\tPrint the assembler version\n",
     	     ProgName);
     exit (EXIT_FAILURE);
-}
-
-
-
-static void UnknownOption (const char* Arg)
-/* Print an error about an unknown option. Print usage information and exit */
-{
-    fprintf (stderr, "Unknown option: %s\n", Arg);
-    Usage ();
-}
-
-
-
-static void NeedArg (const char* Arg)
-/* Print an error about a missing option argument and exit. */
-{
-    fprintf (stderr, "Option requires an argument: %s\n", Arg);
-    exit (EXIT_FAILURE);
-}
-
-
-
-static void InvSym (const char* Def)
-/* Print an error about an invalid symbol definition and die */
-{
-    fprintf (stderr, "Invalid symbol definition: `%s'\n", Def);
-    exit (EXIT_FAILURE);
-}
-
-
-
-static const char* GetArg (int* ArgNum, char* argv [], unsigned Len)
-/* Get an option argument */
-{
-    const char* Arg = argv [*ArgNum];
-    if (Arg [Len] != '\0') {
-	/* Argument appended */
-	return Arg + Len;
-    } else {
-	/* Separate argument */
-	Arg = argv [*ArgNum + 1];
-	if (Arg == 0) {
-	    /* End of arguments */
-	    NeedArg (argv [*ArgNum]);
-	}
-	++(*ArgNum);
-	return Arg;
-    }
 }
 
 
@@ -221,7 +175,7 @@ static void DefineSymbol (const char* Def)
 
 
 
-static void OptAutoImport (const char* Opt)
+static void OptAutoImport (const char* Opt, const char* Arg)
 /* Mark unresolved symbols as imported */
 {
     AutoImport = 1;
@@ -253,7 +207,7 @@ static void OptCPU (const char* Opt, const char* Arg)
 
 
 
-static void OptDebugInfo (const char* Opt)
+static void OptDebugInfo (const char* Opt, const char* Arg)
 /* Add debug info to the object file */
 {
     DbgSyms = 1;
@@ -261,7 +215,15 @@ static void OptDebugInfo (const char* Opt)
 
 
 
-static void OptIgnoreCase (const char* Opt)
+static void OptHelp (const char* Opt, const char* Arg)
+/* Print usage information and exit */
+{
+    Usage ();
+}
+
+
+
+static void OptIgnoreCase (const char* Opt, const char* Arg)
 /* Ignore case on symbols */
 {
     IgnoreCase = 1;
@@ -280,7 +242,7 @@ static void OptIncludeDir (const char* Opt, const char* Arg)
 
 
 
-static void OptListing (const char* Opt)
+static void OptListing (const char* Opt, const char* Arg)
 /* Create a listing file */
 {
     Listing = 1;
@@ -305,7 +267,7 @@ static void OptPageLength (const char* Opt, const char* Arg)
 
 
 
-static void OptSmart (const char* Opt)
+static void OptSmart (const char* Opt, const char* Arg)
 /* Handle the -s/--smart options */
 {
     SmartMode = 1;
@@ -313,7 +275,7 @@ static void OptSmart (const char* Opt)
 
 
 
-static void OptVerbose (const char* Opt)
+static void OptVerbose (const char* Opt, const char* Arg)
 /* Increase verbosity */
 {
     ++Verbose;
@@ -321,48 +283,12 @@ static void OptVerbose (const char* Opt)
 
 
 
-static void OptVersion (const char* Opt)
+static void OptVersion (const char* Opt, const char* Arg)
 /* Print the assembler version */
 {
     fprintf (stderr,
        	     "ca65 V%u.%u.%u - (C) Copyright 1998-2000 Ullrich von Bassewitz\n",
        	     VER_MAJOR, VER_MINOR, VER_PATCH);
-}
-
-
-
-static void LongOption (int* ArgNum, char* argv [])
-/* Handle a long command line option */
-{
-    const char* Opt = argv [*ArgNum];
-    const char* Arg = argv [*ArgNum+1];
-
-    if (strcmp (Opt, "--auto-import") == 0) {
-       	OptAutoImport (Opt);
-    } else if (strcmp (Opt, "--cpu") == 0) {
-    	OptCPU (Opt, Arg);
-    	++(*ArgNum);
-    } else if (strcmp (Opt, "--debug-info") == 0) {
-    	OptIgnoreCase (Opt);
-    } else if (strcmp (Opt, "--ignore-case") == 0) {
-    	OptIgnoreCase (Opt);
-    } else if (strcmp (Opt, "--include-dir") == 0) {
-    	OptIncludeDir (Opt, Arg);
-    	++(*ArgNum);
-    } else if (strcmp (Opt, "--listing") == 0) {
-    	OptListing (Opt);
-    } else if (strcmp (Opt, "--pagelength") == 0) {
-    	OptPageLength (Opt, Arg);
-    	++(*ArgNum);
-    } else if (strcmp (Opt, "--smart") == 0) {
-       	OptSmart (Opt);
-    } else if (strcmp (Opt, "--verbose") == 0) {
-       	OptVerbose (Opt);
-    } else if (strcmp (Opt, "--version") == 0) {
-       	OptVersion (Opt);
-    } else {
-        UnknownOption (Opt);
-    }
 }
 
 
@@ -427,7 +353,7 @@ static void OneLine (void)
 		       	NextTok ();
 		    }
 		} else {
-		    /* Skip the colon */
+	     	    /* Skip the colon */
 		    NextTok ();
 		}
 	    }
@@ -506,7 +432,25 @@ static void CreateObjFile (void)
 int main (int argc, char* argv [])
 /* Assembler main program */
 {
+    /* Program long options */
+    static const LongOpt OptTab[] = {
+        { "--auto-import",     	0,	OptAutoImport		},
+        { "--cpu",     	       	1,	OptCPU 			},
+	{ "--debug-info",      	0,	OptDebugInfo		},
+	{ "--help",		0,	OptHelp			},
+	{ "--ignore-case",     	0,	OptIgnoreCase 		},
+	{ "--include-dir",     	1,	OptIncludeDir		},
+	{ "--listing",	       	0,	OptListing		},
+	{ "--pagelength",      	1,	OptPageLength		},
+	{ "--smart",	       	0,	OptSmart		},
+	{ "--verbose",	       	0,	OptVerbose		},
+	{ "--version",	       	0,	OptVersion		},
+    };
+
     int I;
+
+    /* Initialize the cmdline module */
+    InitCmdLine (argc, argv);
 
     /* Set the program name */
     ProgName = argv [0];
@@ -533,51 +477,51 @@ int main (int argc, char* argv [])
        	    switch (Arg [1]) {
 
 		case '-':
-		    LongOption (&I, argv);
+		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
 		    break;
 
        		case 'g':
-       		    OptDebugInfo (Arg);
+       		    OptDebugInfo (Arg, 0);
        		    break;
 
        	        case 'i':
-       		    OptIgnoreCase (Arg);
+       		    OptIgnoreCase (Arg, 0);
        		    break;
 
        		case 'l':
-		    OptListing (Arg);
+		    OptListing (Arg, 0);
        		    break;
 
        	        case 'o':
-       		    OutFile = GetArg (&I, argv, 2);
+       		    OutFile = GetArg (&I, 2);
        		    break;
 
        		case 's':
-       		    OptSmart (Arg);
+       		    OptSmart (Arg, 0);
        		    break;
 
        	       	case 'v':
-		    OptVerbose (Arg);
+		    OptVerbose (Arg, 0);
        	       	    break;
 
     	        case 'D':
-    		    DefineSymbol (GetArg (&I, argv, 2));
+    		    DefineSymbol (GetArg (&I, 2));
     		    break;
 
     		case 'I':
-    		    OptIncludeDir (Arg, GetArg (&I, argv, 2));
+    		    OptIncludeDir (Arg, GetArg (&I, 2));
     		    break;
 
        	        case 'U':
-		    OptAutoImport (Arg);
+		    OptAutoImport (Arg, 0);
        		    break;
 
        	        case 'V':
-    		    OptVersion (Arg);
+    		    OptVersion (Arg, 0);
        		    break;
 
        	        case 'W':
-       		    WarnLevel = atoi (GetArg (&I, argv, 2));
+       		    WarnLevel = atoi (GetArg (&I, 2));
        		    break;
 
        	       	default:

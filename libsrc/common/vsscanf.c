@@ -9,7 +9,7 @@
 
 #include <stdio.h>
 #include "_scanf.h"
-
+		 
 
 
 /*****************************************************************************/
@@ -31,7 +31,7 @@ static char get (struct indesc* d)
 
 
 
-int vsscanf (const char* str, const char* format, va_list ap)
+int __fastcall__ vsscanf (const char* str, const char* format, va_list ap)
 /* Standard C function */
 {
     struct indesc id;

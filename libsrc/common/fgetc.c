@@ -20,7 +20,7 @@
 
 
 
-int fgetc (FILE* f)
+int __fastcall__ fgetc (FILE* f)
 {
     unsigned char c;
 

@@ -7,13 +7,17 @@
 
 
 #include <stdio.h>
-
-/* This is usually declared as a macro */
-#undef putchar
+#undef putchar	  	/* This is usually declared as a macro */
 
 
 
-int putchar (int c)
+/*****************************************************************************/
+/*     	    	     		     Code				     */
+/*****************************************************************************/
+
+
+
+int __fastcall__ putchar (int c)
 {
     return fputc (c, stdout);
 }

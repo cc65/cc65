@@ -13,7 +13,13 @@
 
 
 
-FILE* freopen (const char* name, const char* mode, FILE* f)
+/*****************************************************************************/
+/*     	    	     		     Code				     */
+/*****************************************************************************/
+
+
+
+FILE* __fastcall__ freopen (const char* name, const char* mode, FILE* f)
 {
     /* Check if the file is open, if so, close it */
     if ((f->f_flags & _FOPEN) == 0) {

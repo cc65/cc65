@@ -5,13 +5,21 @@
  */
 
 
+
 #include <stdio.h>
 #include <errno.h>
 #include <unistd.h>
 #include "_file.h"
 
 
-long ftell(FILE* f)
+
+/*****************************************************************************/
+/*     	    	     		     Code				     */
+/*****************************************************************************/
+
+
+
+long __fastcall__ ftell (FILE* f)
 {
     long pos;
 

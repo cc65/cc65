@@ -7,13 +7,17 @@
 
 
 #include <stdio.h>
-
-/* This is usually declared as a macro */
-#undef getchar
+#undef getchar		/* This is usually declared as a macro */
 
 
 
-int getchar (void)
+/*****************************************************************************/
+/*     	    	     		     Code				     */
+/*****************************************************************************/
+
+
+
+int __fastcall__ getchar (void)
 {
     return fgetc (stdin);
 }

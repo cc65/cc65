@@ -1,0 +1,49 @@
+
+This directory contains sample programs for the cc65 compiler. 
+
+Below is a short description for each of the programs together with a list of
+the supported platforms. 
+
+Please note:				  
+
+  * The supplied makefile needs with GNU make. It works out of the box on
+    Linux and similar systems. If you're using Windows, you will have to
+    compile the programs manually.
+
+  * The makefile specifies the C64 as the default target platform, because all
+    of the programs run on this platform. When compiling for another platform,
+    you will have to change the line that specifies the target system at the
+    top of the makefile.
+
+
+List of supplied sample programs:
+
+---------------------------------------------------------------------------
+Name:	        hello
+Description:	A fancy "Hello world" type program that uses the conio
+		console I/O library for output.
+Platforms:	Runs on all platforms that support conio, which means:
+		Apple ][, Atari, C64, C128, CBM510, CBM610, PET, Plus/4
+
+---------------------------------------------------------------------------
+Name:           mousedemo
+Description:	Shows how to use the mouse.
+Platforms:	All systems with mouse and conio support:
+		Atari (untested), C64, C128 and CBM510
+
+---------------------------------------------------------------------------
+Name:           nachtm
+Description:	Plays "Eine kleine Nachtmusik" by Wolfgang Amadeus Mozart
+Platforms:	All systems that have the Commodore SID (Sound Interface
+		Device):
+		C64, C128, CBM510, CBM610
+
+---------------------------------------------------------------------------
+Name:           sieve
+Description:	Implements the "Sieve of Eratosthenes" as a way to find all
+		prime numbers in a specific number interval. Often used as
+		a benchmark program.
+Platforms:	All systems with conio and clock support:
+		Atari, C64, C128, CBM510, CBM610, PET, Plus/4
+
+		       

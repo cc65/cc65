@@ -64,42 +64,46 @@
 	.import	   	pushax, __hadd
 	.export		_free
 
-; Offsets into struct freeblock
+	.macpack	generic
 
-	size	= 0
-	next	= 2
-	prev	= 4
+; Offsets into struct freeblock and other constant stuff
+
+size		= 0
+next		= 2
+prev		= 4
+admin_space	= 2
+min_size	= 6
+
 
 ; Code
 
 _free:	sta	ptr1
-	stx	ptr1+1		      	; Save block
+	stx	ptr1+1	       	      	; Save block
 
 ; Is the argument NULL?
 
-	ora 	ptr1+1 		      	; Is the argument NULL?
-       	beq 	@L9 			; Jump if yes
+	ora 	ptr1+1 	       	      	; Is the argument NULL?
+       	beq 	@L9 	       		; Jump if yes
 
-; Decrement the given pointer by 2. The size of the block is stored there.
+; Decrement the given pointer by the admin space amount, so it points to the
+; real block allocated. The size of the block is stored in the admin space.
 ; Remember the block size in ptr2.
 
-	sec
 	lda	ptr1
-	sbc	#2
+	sub	#admin_space
 	sta	ptr1
     	bcs	@L1
     	dec	ptr1+1
 @L1:	ldy	#size+1
-	lda	(ptr1),y	      	; High byte of size
-	sta	ptr2+1 		      	; Save it
+	lda	(ptr1),y       	      	; High byte of size
+	sta	ptr2+1 	       	      	; Save it
 	dey
 	lda	(ptr1),y
 	sta	ptr2
 
 ; Check if the block is on top of the heap
 
-	clc
-	adc	ptr1
+	add	ptr1
 	tay
 	lda	ptr1+1
 	adc	ptr2+1
@@ -126,12 +130,11 @@ _free:	sta	ptr1
 	lda	__hlast+1
 	sta	ptr2+1 	     		; Pointer to last block now in ptr2
 
-	clc
 	ldy	#size
 	lda	(ptr2),y     		; Low byte of block size
-	adc	ptr2
+       	add	ptr2
 	tax
-	iny				; High byte of block size
+	iny		    		; High byte of block size
 	lda	(ptr2),y
 	adc	ptr2+1
 
@@ -151,14 +154,14 @@ _free:	sta	ptr1
 
 	ldy    	#prev+1	     		; Offset of ->prev field
        	lda    	(ptr2),y
-	sta    	ptr1+1			; Remember f->prev in ptr1
+	sta    	ptr1+1	    		; Remember f->prev in ptr1
 	sta	__hlast+1
 	dey
 	lda	(ptr2),y
-	sta	ptr1  			; Remember f->prev in ptr1
+	sta	ptr1  	    		; Remember f->prev in ptr1
 	sta	__hlast
-    	ora	__hlast+1		; -> prev == 0?
-       	bne    	@L8    			; Jump if free list not empty
+    	ora	__hlast+1   		; -> prev == 0?
+       	bne    	@L8    	    		; Jump if free list not empty
 
 ; Free list is now empty (A = 0)
 
@@ -172,11 +175,11 @@ _free:	sta	ptr1
 ; Block before is now last block. ptr1 points to f->prev.
 
 @L8:	lda	#$00
-    	dey	      			; Points to high byte of ->next
+    	dey	      	    		; Points to high byte of ->next
     	sta	(ptr1),y
-    	dey	   			; Low byte of f->prev->next
+    	dey	   	    		; Low byte of f->prev->next
     	sta	(ptr1),y
-    	rts				; Done
+    	rts		    		; Done
 
 ; The block is not on top of the heap. Add it to the free list.
 
@@ -191,3 +194,4 @@ _free:	sta	ptr1
 
 
 
+			    

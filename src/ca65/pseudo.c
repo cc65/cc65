@@ -69,6 +69,8 @@
 #include "repeat.h"
 #include "segment.h"
 #include "spool.h"
+#include "struct.h"
+#include "symbol.h"
 #include "symtab.h"
 
 
@@ -80,7 +82,7 @@
 
 
 /* Keyword we're about to handle */
-static char Keyword [sizeof (SVal)+1] = ".";
+static char Keyword [sizeof (SVal)+1];
 
 /* Segment stack */
 #define MAX_PUSHED_SEGMENTS     16
@@ -1494,14 +1496,6 @@ static void DoSmart (void)
 
 
 
-static void DoStruct (void)
-/* Struct definition */
-{
-    Error ("Not implemented");
-}
-
-
-
 static void DoSunPlus (void)
 /* Switch to the SUNPLUS CPU */
 {
@@ -1510,10 +1504,42 @@ static void DoSunPlus (void)
 
 
 
-static void DoUnion (void)
-/* Union definition */
+static void DoTag (void)
+/* Allocate space for a struct */
 {
-    Error ("Not implemented");
+    long Size;
+
+    /* Read the struct name */
+    SymTable* Struct = ParseScopedSymTable (SYM_FIND_EXISTING);
+
+    /* Check the supposed struct */
+    if (Struct == 0) {
+        ErrorSkip ("Unknown struct");
+        return;
+    }
+    if (GetSymTabType (Struct) != ST_STRUCT) {
+        ErrorSkip ("Not a struct");
+        return;
+    }
+
+    /* Get the size of the struct */
+    Size = GetSymVal (SymFind (Struct, ".size", SYM_FIND_EXISTING));
+
+    /* Optional multiplicator may follow */
+    if (Tok == TOK_COMMA) {
+        long Multiplicator;
+        NextTok ();
+        Multiplicator = ConstExpression ();
+        /* Multiplicator must make sense */
+        if (Multiplicator <= 0) {
+            ErrorSkip ("Range error");
+            return;
+        }
+        Size *= Multiplicator;
+    }
+
+    /* Emit fill fragments */
+    EmitFill (Size);
 }
 
 
@@ -1619,6 +1645,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoUnexpected	},	/* .ENDREPEAT */
     { ccNone,           DoEndScope      },
     { ccNone,           DoUnexpected    },      /* .ENDSTRUCT */
+    { ccNone,           DoUnexpected    },      /* .ENDUNION */
     { ccNone,		DoError	  	},
     { ccNone,		DoExitMacro	},
     { ccNone,		DoExport  	},
@@ -1686,7 +1713,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoUnexpected	},   	/* .STRLEN */
     { ccNone,           DoStruct        },
     { ccNone,		DoSunPlus	},
-    { ccNone,           DoUnexpected    },      /* .TAG */
+    { ccNone,           DoTag           },
     { ccNone,		DoUnexpected	},   	/* .TCOUNT */
     { ccNone,  	       	DoUnexpected	},   	/* .TIME */
     { ccNone,           DoUnion         },
@@ -1733,7 +1760,7 @@ void HandlePseudo (void)
 
     /* Remember the instruction, then skip it if needed */
     if ((D->Flags & ccKeepToken) == 0) {
-    	strcpy (Keyword+1, SVal);
+    	strcpy (Keyword, SVal);
      	NextTok ();
     }
 

@@ -38,6 +38,7 @@ OBJS =  anonname.o      \
         scanner.o	\
         segment.o       \
         spool.o         \
+        struct.o        \
         symentry.o      \
         symbol.o        \
         symtab.o	\

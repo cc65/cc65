@@ -116,6 +116,15 @@ int IsLocalNameId (unsigned Name);
 SymEntry* NewSymEntry (const char* Name);
 /* Allocate a symbol table entry, initialize and return it */
 
+int SymSearchTree (SymEntry* T, const char* Name, SymEntry** E);
+/* Search in the given tree for a name. If we find the symbol, the function
+ * will return 0 and put the entry pointer into E. If we did not find the
+ * symbol, and the tree is empty, E is set to NULL. If the tree is not empty,
+ * E will be set to the last entry, and the result of the function is <0 if
+ * the entry should be inserted on the left side, and >0 if it should get
+ * inserted on the right side.
+ */
+
 #if defined(HAVE_INLINE)
 INLINE void SymAddExprRef (SymEntry* Sym, struct ExprNode* Expr)
 /* Add an expression reference to this symbol */
@@ -195,9 +204,14 @@ const struct ExprNode* SymResolve (const SymEntry* Sym);
 const char* GetSymName (const SymEntry* Sym);
 /* Return the name of the symbol */
 
-unsigned GetSymAddrSize (const SymEntry* Sym);
+unsigned char GetSymAddrSize (const SymEntry* Sym);
 /* Return the address size of the symbol. Beware: This function will just
  * return the AddrSize member, it will not look at the expression!
+ */
+
+long GetSymVal (SymEntry* Sym);
+/* Return the value of a symbol assuming it's constant. FAIL will be called
+ * in case the symbol is undefined or not constant.
  */
 
 unsigned GetSymIndex (const SymEntry* Sym);

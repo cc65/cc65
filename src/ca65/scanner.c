@@ -162,6 +162,7 @@ struct DotKeyword {
     { ".ENDREPEAT",	TOK_ENDREP	},
     { ".ENDSCOPE",      TOK_ENDSCOPE    },
     { ".ENDSTRUCT",	TOK_ENDSTRUCT	},
+    { ".ENDUNION",     	TOK_ENDUNION    },
     { ".ERROR", 	TOK_ERROR   	},
     { ".EXITMAC",	TOK_EXITMACRO 	},
     { ".EXITMACRO",	TOK_EXITMACRO	},

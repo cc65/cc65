@@ -45,13 +45,13 @@
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*     	      	       		     Data				     */
 /*****************************************************************************/
 
 
 
 /*****************************************************************************/
-/*     	       	   	  	     Code	  		   	     */
+/*     	       	       	  	     Code	  		   	     */
 /*****************************************************************************/
 
 
@@ -68,6 +68,7 @@ SymEntry* ParseScopedSymName (int AllocNew)
         NextTok ();
     } else {
         Scope = CurrentScope;
+        /* ### Need to walk up the tree */
     }
 
     /* Resolve scopes */
@@ -107,6 +108,64 @@ SymEntry* ParseScopedSymName (int AllocNew)
 
         }
     }
+}
+
+
+
+SymTable* ParseScopedSymTable (int AllocNew)
+/* Parse a (possibly scoped) symbol table (scope) name, search for it in the
+ * symbol space and return the symbol table struct.
+ */
+{
+    /* Get the starting table */
+    SymTable* Scope;
+    if (Tok == TOK_NAMESPACE) {
+        Scope = RootScope;
+        NextTok ();
+    } else {
+        Scope = CurrentScope;
+        if (Tok != TOK_IDENT) {
+            Error ("Identifier expected");
+            return Scope;
+        }
+
+        /* If no new scope should be allocated, the scope may specify any
+         * scope in any of the parent scopes, so search for it.
+         */
+        if (!AllocNew) {
+            Scope = SymFindAnyScope (Scope, SVal);
+            NextTok ();
+            if (Tok != TOK_NAMESPACE) {
+                return Scope;
+            }
+            NextTok ();
+        }
+    }
+
+    /* Resolve scopes. */
+    while (Tok == TOK_IDENT) {
+
+        /* Search for the child scope if we have a valid parent */
+        if (Scope) {
+            Scope = SymFindScope (Scope, SVal, AllocNew);
+        }
+
+        /* Skip the name token */
+        NextTok ();
+
+        /* If a namespace token follows, read on, otherwise bail out */
+        if (Tok == TOK_NAMESPACE) {
+            NextTok ();
+            if (Tok != TOK_IDENT) {
+                Error ("Identifier expected");
+            }
+        } else {
+            break;
+        }
+    }
+
+    /* Return the scope we found or created */
+    return Scope;
 }
 
 

@@ -160,43 +160,6 @@ static SymTable* NewSymTable (SymTable* Parent, const char* Name)
 
 
 
-static int SearchSymTree (SymEntry* T, const char* Name, SymEntry** E)
-/* Search in the given tree for a name. If we find the symbol, the function
- * will return 0 and put the entry pointer into E. If we did not find the
- * symbol, and the tree is empty, E is set to NULL. If the tree is not empty,
- * E will be set to the last entry, and the result of the function is <0 if
- * the entry should be inserted on the left side, and >0 if it should get
- * inserted on the right side.
- */
-{
-    /* Is there a tree? */
-    if (T == 0) {
-      	*E = 0;
-      	return 1;
-    }
-
-    /* We have a table, search it */
-    while (1) {
-
-        /* Get the symbol name */
-        const char* SymName = GetString (T->Name);
-
-      	/* Choose next entry */
-        int Cmp = strcmp (Name, SymName);
-       	if (Cmp < 0 && T->Left) {
-	    T = T->Left;
-	} else if (Cmp > 0&& T->Right) {
-	    T = T->Right;
-	} else {
-     	    /* Found or end of search, return the result */
-            *E = T;
-            return Cmp;
-       	}
-    }
-}
-
-
-
 /*****************************************************************************/
 /*     	       	   	   	     Code			   	     */
 /*****************************************************************************/
@@ -272,6 +235,27 @@ SymTable* SymFindScope (SymTable* Parent, const char* Name, int AllocNew)
 
 
 
+SymTable* SymFindAnyScope (SymTable* Parent, const char* Name)
+/* Find a scope in the given or any of its parent scopes. The function will
+ * never create a new symbol, since this can only be done in one specific
+ * scope.
+ */
+{
+    SymTable* Scope;
+    do {
+	/* Search in the current table */
+	Scope = SymFindScope (Parent, Name, SYM_FIND_EXISTING);
+       	if (Scope == 0) {
+	    /* Not found, search in the parent scope, if we have one */
+	    Parent = Parent->Parent;
+	}
+    } while (Scope == 0 && Parent != 0);
+
+    return Scope;
+}
+
+
+
 SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
 /* Find a new symbol table entry in the given table. If AllocNew is given and
  * the entry is not found, create a new one. Return the entry found, or the
@@ -295,7 +279,7 @@ SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
        	}
 
     	/* Search for the symbol if we have a table */
-        Cmp = SearchSymTree (SymLast->Locals, Name, &S);
+        Cmp = SymSearchTree (SymLast->Locals, Name, &S);
 
     	/* If we found an entry, return it */
     	if (Cmp == 0) {
@@ -322,7 +306,7 @@ SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
        	unsigned Hash = HashStr (Name) % Scope->TableSlots;
 
 	/* Search for the entry */
-	Cmp = SearchSymTree (Scope->Table[Hash], Name, &S);
+	Cmp = SymSearchTree (Scope->Table[Hash], Name, &S);
 
 	/* If we found an entry, return it */
 	if (Cmp == 0) {

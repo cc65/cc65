@@ -131,6 +131,43 @@ SymEntry* NewSymEntry (const char* Name)
 
 
 
+int SymSearchTree (SymEntry* T, const char* Name, SymEntry** E)
+/* Search in the given tree for a name. If we find the symbol, the function
+ * will return 0 and put the entry pointer into E. If we did not find the
+ * symbol, and the tree is empty, E is set to NULL. If the tree is not empty,
+ * E will be set to the last entry, and the result of the function is <0 if
+ * the entry should be inserted on the left side, and >0 if it should get
+ * inserted on the right side.
+ */
+{
+    /* Is there a tree? */
+    if (T == 0) {
+      	*E = 0;
+      	return 1;
+    }
+
+    /* We have a table, search it */
+    while (1) {
+
+        /* Get the symbol name */
+        const char* SymName = GetString (T->Name);
+
+      	/* Choose next entry */
+        int Cmp = strcmp (Name, SymName);
+       	if (Cmp < 0 && T->Left) {
+	    T = T->Left;
+	} else if (Cmp > 0&& T->Right) {
+	    T = T->Right;
+	} else {
+     	    /* Found or end of search, return the result */
+            *E = T;
+            return Cmp;
+       	}
+    }
+}
+
+
+
 void SymRef (SymEntry* S)
 /* Mark the given symbol as referenced */
 {
@@ -580,7 +617,7 @@ const char* GetSymName (const SymEntry* S)
 
 
 
-unsigned GetSymAddrSize (const SymEntry* S)
+unsigned char GetSymAddrSize (const SymEntry* S)
 /* Return the address size of the symbol. Beware: This function will just
  * return the AddrSize member, it will not look at the expression!
  */
@@ -589,6 +626,18 @@ unsigned GetSymAddrSize (const SymEntry* S)
 	S = S->V.Sym;
     }
     return S->AddrSize;
+}
+
+
+
+long GetSymVal (SymEntry* S)
+/* Return the value of a symbol assuming it's constant. FAIL will be called
+ * in case the symbol is undefined or not constant.
+ */
+{
+    long Val;
+    CHECK (S != 0 && SymHasExpr (S) && IsConstExpr (GetSymExpr (S), &Val));
+    return Val;
 }
 
 

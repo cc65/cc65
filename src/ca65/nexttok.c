@@ -422,7 +422,7 @@ void ConsumeSep (void)
     /* Accept an EOF as separator */
     if (Tok != TOK_EOF) {
      	if (Tok != TOK_SEP) {
-     	    Error ("Too many characters");
+       	    Error ("Unexpected trailing garbage characters");
      	    SkipUntilSep ();
      	} else {
      	    NextTok ();

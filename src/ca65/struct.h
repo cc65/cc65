@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 symbol.h                                  */
+/*                                 struct.h                                  */
 /*                                                                           */
-/*                   Parse a symbol name and search for it                   */
+/*                              .STRUCT command                              */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,36 +33,39 @@
 
 
 
-#ifndef SYMBOL_H
-#define SYMBOL_H
+#ifndef STRUCT_H
+#define STRUCT_H
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*     	       	    		     Data				     */
 /*****************************************************************************/
 
 
 
+struct SymTable;
+
+
+
 /*****************************************************************************/
-/*     	       	   	  	     Code	  		   	     */
+/*     	       	    		     Code				     */
 /*****************************************************************************/
 
 
 
-struct SymEntry* ParseScopedSymName (int AllowNew);
-/* Parse a (possibly scoped) symbol name, search for it in the symbol table
- * and return the symbol table entry.
- */                                  
+long GetStructSize (SymTable* Struct);
+/* Get the size of a struct */
 
-struct SymTable* ParseScopedSymTable (int AllocNew);
-/* Parse a (possibly scoped) symbol table (scope) name, search for it in the
- * symbol space and return the symbol table struct.
- */
+void DoStruct (void);
+/* Handle the .STRUCT command */
 
+void DoUnion (void);
+/* Handle the .UNION command */
 
 
-/* End of symbol.h */
+
+/* End of struct.h */
 
 #endif
 

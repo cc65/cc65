@@ -42,6 +42,7 @@
 
 /* common */
 #include "exprdefs.h"
+#include "inline.h"
 
 /* ca65 */
 #include "symentry.h"
@@ -62,7 +63,8 @@
 #define ST_GLOBAL       0x00            /* Root level */
 #define ST_PROC         0x01            /* .PROC */
 #define ST_SCOPE        0x02            /* .SCOPE */
-#define ST_STUCT        0x03            /* .STRUCT */
+#define ST_STRUCT       0x03            /* .STRUCT */
+#define ST_UNION        0x04            /* .UNION */
 #define ST_UNDEF        0xFF
 
 /* A symbol table */
@@ -103,6 +105,12 @@ void SymLeaveLevel (void);
 SymTable* SymFindScope (SymTable* Parent, const char* Name, int AllocNew);
 /* Find a scope in the given enclosing scope */
 
+SymTable* SymFindAnyScope (SymTable* Parent, const char* Name);
+/* Find a scope in the given or any of its parent scopes. The function will
+ * never create a new symbol, since this can only be done in one specific
+ * scope.
+ */
+
 SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew);
 /* Find a new symbol table entry in the given table. If AllocNew is given and
  * the entry is not found, create a new one. Return the entry found, or the
@@ -111,6 +119,16 @@ SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew);
 
 int SymIsZP (SymEntry* Sym);
 /* Return true if the symbol is explicitly marked as zeropage symbol */
+
+#if defined(HAVE_INLINE)
+INLINE unsigned char GetSymTabType (const SymTable* S)
+/* Return the type of the given symbol table */
+{
+    return S->Type;
+}
+#else
+#  define GetSymTabType(S)      ((S)->Type)
+#endif
 
 unsigned char GetCurrentSymTabType ();
 /* Return the type of the current symbol table */

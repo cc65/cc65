@@ -93,7 +93,7 @@ static void Usage (void)
 	     "Short options:\n"
        	     "  -d\t\t\tDebug mode\n"
        	     "  -g\t\t\tAdd debug info to object file\n"
-       	     "  -h\t\t\tPrint this help\n"
+       	     "  -h\t\t\tHelp (this text)\n"
        	     "  -j\t\t\tDefault characters are signed\n"
        	     "  -o name\t\tName the output file\n"
        	     "  -t sys\t\tSet the target system\n"

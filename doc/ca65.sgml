@@ -561,8 +561,8 @@ names like "Loop". Here is an example:
 		dey
 		bne    @Loop  	     	; Ok
 		rts
-	Sub:    ... 	       	     	; New global label
-		bne    @Loop  	     	; ERROR: Unknown identifier!
+       	Sub:    ... 	       	     	; New global label
+	 	bne    @Loop  	     	; ERROR: Unknown identifier!
 </verb></tscreen>
 
 <sect1>Unnamed labels<p>
@@ -2934,7 +2934,90 @@ specify an additional type. Predefined types are 0 (constructor) and 1
 </itemize>
 
 
+<sect>Porting sources from other assemblers<p>
 
+Sometimes it is necessary to port code written for older assemblers to ca65.
+In some cases, this can be done without any changes to the source code by
+using the emulation features of ca65 (see <tt><ref id=".FEATURE"
+name=".FEATURE"></tt>). In other cases, it is necessary to make changes to the
+source code.
+
+Probably the biggest difference is the handling of the <tt><ref id=".ORG"
+name=".ORG"></tt> directive. ca65 generates relocatable code, and placement is
+done by the linker. Most other assemblers generate absolute code, placement is
+done within the assembler and there is no external linker.
+
+In general it is not a good idea to write new code using the emulation
+features of the assembler, but there may be situations where even this rule is
+not valid.
+
+<sect1>TASS<p>
+
+You need to use some of the ca65 emulation features to simulate the behaviour
+of such simple assemblers.
+
+<enum>
+<item>Prepare your sourcecode like this:
+
+<tscreen><verb>
+        ; if you want TASS style labels without colons
+        .feature labels_without_colons
+        
+        ; if you want TASS style character constants
+        ; ("a" instead of the default 'a')
+        .feature loose_char_term
+        
+                .word *+2       ; the cbm load address
+        
+                [yourcode here]
+</verb></tscreen>
+
+notice that the two emulation features are mostly useful for porting
+sources originally written in/for TASS, they are not needed for the
+actual "simple assembler operation" and are not recommended if you are
+writing new code from scratch.
+
+<item>Replace all program counter assignments (which are not possible in ca65
+by default, and the respective emulation feature works different from what
+you'd expect) by another way to skip to another memory location, for example
+the <tt><ref id=".RES" name=".RES"></tt>directive.
+
+<tscreen><verb>
+        ; *=$2000
+        .res $2000-*    ; reserve memory up to $2000
+</verb></tscreen>
+
+notice that other than the original TASS, ca65 can never move the
+programmcounter backwards - think of it as if you are assembling to disc with
+TASS.
+
+<item>Conditional assembly (<tt/.ifeq//<tt/.endif//<tt/.gogo/ etc.) must be
+rewritten to match ca65 syntax. Most importantly notice that due to the lack
+of <tt/.goto/, everything involving loops must be replaced by
+<tt><ref id=".REPEAT" name=".REPEAT"></tt>.
+
+<item>To assemble code to a different address than it is executed at, use the
+<tt><ref id=".ORG" name=".ORG"></tt> directive instead of
+<tt/.offs/-constructs.
+
+<tscreen><verb>
+        .org $1800
+
+        [floppy code here]
+
+        .reloc  ; back to normal
+</verb></tscreen>
+
+<item>Then assemble like this:
+
+<tscreen><verb>
+        cl65 --start-addr 0x0ffe -t none myprog.s -o myprog.prg
+</verb></tscreen>
+
+notice that you need to use the actual start address minus two, since two
+bytes are used for the cbm load address.
+
+</enum>
 
 
 <sect>Bugs/Feedback<p>

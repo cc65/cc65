@@ -19,8 +19,29 @@ OBJS =	_scrsize.o	\
 	conio.o		\
 	cputc.o		\
 	crt0.o		\
+        kacptr.o        \
+        kbasin.o        \
 	kbhit.o		\
-        kernal.o        \
+        kbsout.o        \
+        kchkin.o        \
+        kciout.o        \
+        kckout.o        \
+        kclall.o        \
+        kclose.o        \
+        kclrch.o        \
+        kiobase.o       \
+        klisten.o       \
+        kload.o         \
+        kopen.o         \
+        krdtim.o        \
+        kreadst.o       \
+        ksave.o         \
+        ksetlfs.o       \
+        ksetnam.o       \
+        ksettim.s       \
+        ktalk.o         \
+        kunlsn.o        \
+        kuntlk.o        \
         randomize.o     \
 	readjoy.o	\
 	tgi_mode_table.o

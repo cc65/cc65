@@ -1,24 +1,20 @@
 ;
-; Ullrich von Bassewitz, 06.08.1998
+; Ullrich von Bassewitz, 22.11.2002
 ;
-; void clrscr (void);
+; BASIN replacement function
 ;
+             
+        .export         BASIN
 
-	.export		_clrscr
-
-	.include	"plus4.inc"
+        .include        "plus4.inc"
 
 .segment        "LOWCODE"               ; Must go into low memory
 
-.proc   _clrscr
+.proc   BASIN
         sta     ENABLE_ROM              ; Enable the ROM
-        jsr     CLRSCR                  ; Call the ROM routine
+        jsr     $FFCF                   ; Call the ROM routine
         sta     ENABLE_RAM              ; Switch back to RAM
         rts                             ; Return to caller
 .endproc
-
-
-
-
 
 

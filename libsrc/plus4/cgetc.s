@@ -9,8 +9,9 @@
 
        	.include	"plus4.inc"
 
-
 ; --------------------------------------------------------------------------
+
+.segment        "LOWMEM"        ; Accesses the ROM - must go into low mem
 
 _cgetc:	lda	KEY_COUNT 	; Get number of characters
        	ora	FKEY_COUNT	; Or with number of function key chars
@@ -44,7 +45,9 @@ L1:    	lda	KEY_COUNT
        	sta	TED_CURSLO	; Cursor off
        	sta	TED_CURSHI
 
-L2:    	jsr    	KBDREAD	       	; Read char and return in A
+L2:    	sta     ENABLE_ROM      ; Bank in the ROM
+        jsr    	KBDREAD	       	; Read char and return in A (ROM routine)
+        sta     ENABLE_RAM      ; Reenable the RAM
        	ldx	#0
        	rts
 
@@ -55,6 +58,8 @@ L2:    	jsr    	KBDREAD	       	; Read char and return in A
 
 	.constructor	initkbd
 	.destructor	donekbd
+
+.code                           ; Can go into the normal code segment
 
 .proc	initkbd
 
@@ -68,13 +73,17 @@ L2:    	jsr    	KBDREAD	       	; Read char and return in A
 .endproc
 
 
+.segment        "LOWMEM"        ; Accesses the ROM - must go into low mem
+
 .proc	donekbd
 
      	ldx    	#$39		; Copy the original function keys
+        sta     ENABLE_ROM      ; Bank in the ROM
 @L1:  	lda    	FKEY_ORIG,x
      	sta    	FKEY_SPACE,x
      	dex
      	bpl    	@L1
+        sta     ENABLE_RAM      ; Bank out the ROM
      	rts
 
 .endproc

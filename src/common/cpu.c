@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     cpu.c				     */
+/*                                   cpu.c                                 */
 /*                                                                           */
-/*			     CPU type definitions			     */
+/*                            CPU specifications                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2003      Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,18 +33,55 @@
 
 
 
+#include <string.h>
+
+/* common */              
 #include "cpu.h"
 
 
 
 /*****************************************************************************/
-/*	   	    		     Data				     */
+/*     	       	    		     Data			    	     */
 /*****************************************************************************/
 
 
 
-/* Current CPU */
-CPUType	CPU = CPU_6502;
+/* CPU used */
+cpu_t CPU = CPU_UNKNOWN;
+
+/* Table with target names */
+const char* CPUNames [CPU_COUNT] = {
+    "6502"
+    "65C02",
+    "65816",
+    "sunplus",
+};
+
+
+
+/*****************************************************************************/
+/*     	       	     		     Code			    	     */
+/*****************************************************************************/
+
+
+
+cpu_t FindCPU (const char* Name)
+/* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
+ * the given name is no valid target.
+ */
+{
+    unsigned I;
+
+    /* Check all CPU names */
+    for (I = 0; I < CPU_COUNT; ++I) {
+	if (strcmp (CPUNames [I], Name) == 0) {
+	    return (cpu_t)I;
+	}
+    }
+
+    /* Not found */
+    return CPU_UNKNOWN;
+}
 
 
 

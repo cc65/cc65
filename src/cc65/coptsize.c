@@ -35,10 +35,12 @@
 
 #include <stdlib.h>
 
+/* common */
+#include "cpu.h"
+
 /* cc65 */
 #include "codeent.h"
 #include "codeinfo.h"
-#include "cpu.h"
 #include "coptsize.h"
 
 

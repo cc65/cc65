@@ -609,6 +609,15 @@ int main (int argc, char* argv [])
 	exit (EXIT_FAILURE);
     }
 
+    /* If no CPU given, use the default CPU for the target */
+    if (GetCPU () == CPU_UNKNOWN) { 
+        if (Target != TGT_UNKNOWN) {
+            SetCPU (DefaultCPU[Target]);
+        } else {
+            SetCPU (CPU_6502);
+        }
+    }
+
     /* Intialize the target translation tables */
     TgtTranslateInit ();
 

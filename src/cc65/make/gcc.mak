@@ -46,7 +46,6 @@ OBJS =	anonname.o	\
         coptstore.o     \
 	coptsub.o	\
 	copttest.o	\
-	cpu.o	  	\
 	dataseg.o	\
 	datatype.o	\
 	declare.o      	\

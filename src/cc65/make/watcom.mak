@@ -67,7 +67,6 @@ OBJS =	anonname.obj	\
         coptstore.obj   \
 	coptsub.obj	\
 	copttest.obj	\
-	cpu.obj		\
 	dataseg.obj	\
 	datatype.obj	\
 	declare.obj	\

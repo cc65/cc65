@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -331,8 +331,7 @@ static const struct {
 
 
 
-/* The current CPU and an array with instruction tables */
-static enum CPUType CPU = CPU_6502;
+/* An array with instruction tables */
 static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTab6502,
     (const InsTable*) &InsTab65SC02,
@@ -676,7 +675,7 @@ static int CmpName (const void* Key, const void* Instr)
 
 
 
-void SetCPU (enum CPUType NewCPU)
+void SetCPU (cpu_t NewCPU)
 /* Set a new CPU */
 {
     /* Make sure the parameter is correct */
@@ -693,7 +692,7 @@ void SetCPU (enum CPUType NewCPU)
 
 
 
-enum CPUType GetCPU (void)
+cpu_t GetCPU (void)
 /* Return the current CPU */
 {
     return CPU;

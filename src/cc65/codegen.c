@@ -39,6 +39,7 @@
 
 /* common */
 #include "check.h"
+#include "cpu.h"
 #include "strbuf.h"
 #include "version.h"
 #include "xmalloc.h"
@@ -49,7 +50,6 @@
 #include "asmlabel.h"
 #include "casenode.h"
 #include "codeseg.h"
-#include "cpu.h"
 #include "dataseg.h"
 #include "error.h"
 #include "global.h"
@@ -189,7 +189,7 @@ void g_preamble (void)
 
 void g_fileinfo (const char* Name, unsigned long Size, unsigned long MTime)
 /* If debug info is enabled, place a file info into the source */
-{   
+{
     if (DebugInfo) {
 	/* We have to place this into the global text segment, so it will
 	 * appear before all .dbg line statements.

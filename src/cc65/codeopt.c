@@ -39,6 +39,7 @@
 /* common */
 #include "abend.h"
 #include "chartype.h"
+#include "cpu.h"
 #include "print.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
@@ -58,7 +59,6 @@
 #include "coptstore.h"
 #include "coptsub.h"
 #include "copttest.h"
-#include "cpu.h"
 #include "error.h"
 #include "global.h"
 #include "codeopt.h"

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -69,7 +69,30 @@ const char* TargetNames [TGT_COUNT] = {
     "geos",
     "lunix",
     "atmos"
-};        
+};
+
+
+
+/* Table with default CPUs per target */
+const cpu_t DefaultCPU[TGT_COUNT] = {
+    CPU_6502,           /* none */
+    CPU_6502,           /* module */
+    CPU_6502,           /* atari */
+    CPU_6502,           /* vic20 */
+    CPU_6502,           /* c16 */
+    CPU_6502,           /* c64 */
+    CPU_6502,           /* c128 */
+    CPU_6502,           /* ace */
+    CPU_6502,           /* plus4 */
+    CPU_6502,           /* cbm510 */
+    CPU_6502,           /* cbm610 */
+    CPU_6502,           /* pet */
+    CPU_6502,           /* bbc */
+    CPU_6502,           /* apple2 */
+    CPU_6502,           /* geos */
+    CPU_6502,           /* lunix */
+    CPU_6502,           /* atmos */
+};
 
 
 

@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    instr.h				     */
+/*	       			    instr.h				     */
 /*                                                                           */
 /*	       Instruction encoding for the ca65 macroassembler		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,20 +38,16 @@
 
 
 
+/* common */
+#include "cpu.h"
+
+
+
 /*****************************************************************************/
-/*     	     	    		     Data   				     */
+/*     	       	    		     Data   				     */
 /*****************************************************************************/
 
 
-
-/* Supported CPUs */
-enum CPUType {
-    CPU_6502,
-    CPU_65C02,
-    CPU_65816,
-    CPU_SUNPLUS,	/* Not in the freeware version - sorry */
-    CPU_COUNT 	    	/* Count of different CPUs */
-};
 
 /* Constants for the addressing mode. If an opcode is available in zero page
  * and absolut adressing mode, both bits are set. When checking for valid
@@ -134,10 +130,10 @@ extern unsigned char ExtBytes [AMI_COUNT];
 
 
 
-void SetCPU (enum CPUType NewCPU);
+void SetCPU (cpu_t NewCPU);
 /* Set a new CPU */
 
-enum CPUType GetCPU (void);
+cpu_t GetCPU (void);
 /* Return the current CPU */
 
 int FindInstruction (const char* Ident);

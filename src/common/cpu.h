@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     cpu.h				     */
+/*                                   cpu.h                                   */
 /*                                                                           */
-/*			     CPU type definitions			     */
+/*                            CPU specifications                             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2003      Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,19 +39,39 @@
 
 
 /*****************************************************************************/
-/*	   	    		     Data				     */
+/*     	       	    		     Data			    	     */
 /*****************************************************************************/
 
 
 
-/* Supported CPUs */
-typedef enum CPUType {
+/* CPUs */
+typedef enum {
+    CPU_UNKNOWN = -1,           /* Not specified or invalid target */
     CPU_6502,
-    CPU_65C02
-} CPUType;
+    CPU_65C02,
+    CPU_65816,
+    CPU_SUNPLUS,	        /* Not in the freeware version - sorry */
+    CPU_COUNT 	    	        /* Number of different CPUs */
+} cpu_t;
 
-/* Current CPU */
-extern CPUType	CPU;
+/* CPU used */
+extern cpu_t CPU;
+
+/* Table with target names */
+extern const char* CPUNames [CPU_COUNT];
+
+
+
+/*****************************************************************************/
+/*     	       	     		     Code      			    	     */
+/*****************************************************************************/
+
+
+
+cpu_t FindCPU (const char* Name);
+/* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
+ * the given name is no valid target.
+ */
 
 
 

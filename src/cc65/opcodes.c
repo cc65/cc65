@@ -39,10 +39,10 @@
 
 /* common */
 #include "check.h"
+#include "cpu.h"
 
 /* cc65 */
 #include "codeinfo.h"
-#include "cpu.h"
 #include "error.h"
 #include "opcodes.h"
 

@@ -33,11 +33,13 @@
 
 
 
+/* common */
+#include "cpu.h"
+
 /* cc65 */
 #include "codeent.h"
 #include "codeinfo.h"
 #include "codeopt.h"
-#include "cpu.h"
 #include "error.h"
 #include "coptind.h"
 

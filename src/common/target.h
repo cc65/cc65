@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -35,6 +35,11 @@
 
 #ifndef TARGET_H
 #define TARGET_H
+
+
+
+/* common */
+#include "cpu.h"
 
 
 
@@ -71,7 +76,10 @@ typedef enum {
 extern target_t		Target;
 
 /* Table with target names */
-extern const char* TargetNames [TGT_COUNT];
+extern const char* TargetNames[TGT_COUNT];
+
+/* Table with default CPUs per target */
+extern const cpu_t DefaultCPU[TGT_COUNT];
 
 
 

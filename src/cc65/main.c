@@ -42,6 +42,7 @@
 #include "abend.h"
 #include "chartype.h"
 #include "cmdline.h"
+#include "cpu.h"
 #include "debugflag.h"
 #include "fname.h"
 #include "print.h"
@@ -55,7 +56,6 @@
 #include "asmcode.h"
 #include "compile.h"
 #include "codeopt.h"
-#include "cpu.h"
 #include "error.h"
 #include "global.h"
 #include "incpath.h"
@@ -378,11 +378,8 @@ static void OptCreateDep (const char* Opt attribute ((unused)),
 static void OptCPU (const char* Opt, const char* Arg)
 /* Handle the --cpu option */
 {
-    if (strcmp (Arg, "6502") == 0) {
-       	CPU = CPU_6502;
-    } else if (strcmp (Arg, "65C02") == 0) {
-	CPU = CPU_65C02;
-    } else {
+    CPU = FindCPU (Arg);
+    if (CPU != CPU_6502 && CPU != CPU_65C02) {
        	AbEnd ("Invalid argument for %s: `%s'", Opt, Arg);
     }
 }
@@ -795,23 +792,23 @@ int main (int argc, char* argv[])
 	OutputFile = MakeFilename (InputFile, ".s");
     }
 
+    /* If no CPU given, use the default CPU for the target */
+    if (CPU == CPU_UNKNOWN) {
+        if (Target != TGT_UNKNOWN) {
+            CPU = DefaultCPU[Target];
+        } else {
+            CPU = CPU_6502;
+        }
+    }
+
     /* Go! */
     Compile (InputFile);
 
     /* Create the output file if we didn't had any errors */
     if (ErrorCount == 0 || Debug) {
 
-	FILE* F;
-
-#if 0
-     	/* Optimize the output if requested */
-     	if (Optimize) {
-     	    OptDoOpt ();
-     	}
-#endif
-
 	/* Open the file */
-	F = fopen (OutputFile, "w");
+	FILE* F = fopen (OutputFile, "w");
 	if (F == 0) {
 	    Fatal ("Cannot open output file `%s': %s", OutputFile, strerror (errno));
 	}

@@ -49,6 +49,7 @@
 #include "scanner.h"
 #include "segments.h"
 #include "stackptr.h"
+#include "standard.h"
 #include "stmt.h"
 #include "symtab.h"
 #include "function.h"
@@ -371,6 +372,13 @@ void NewFunc (SymEntry* Func)
         /* Main cannot be a fastcall function */
         if (IsFastCallFunc (Func->Type)) {
             Error ("`main' cannot be declared as __fastcall__");
+        }
+
+        /* If cc65 extensions aren't enabled, don't allow a main function that 
+         * doesn't return an int.
+         */
+        if (IS_Get (&Standard) != STD_CC65 && CurrentFunc->ReturnType[0] != T_INT) {
+            Error ("`main' must always return an int");
         }
 
         /* If main() takes parameters, generate a forced import to a function

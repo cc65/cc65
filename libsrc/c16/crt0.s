@@ -2,7 +2,7 @@
 ; Startup code for cc65 (C16 version)
 ;
 ; This must be the *first* file on the linker command line
-;                            
+;
 ; Note: The C16 is actually the Plus/4 with just 16KB of memory. So many
 ; things are similar here, and we even use the plus4.inc include file.
 ;
@@ -17,18 +17,23 @@
 
 
 ; ------------------------------------------------------------------------
+; Create an empty LOWCODE segment to avoid linker warnings
+
+.segment        "LOWCODE"
+
+; ------------------------------------------------------------------------
+; Place the startup code in a special segment.
+
+.segment       	"STARTUP"
+
 ; BASIC header with a SYS call
 
-.code
-
-	.org	$0FFF
         .word   Head            ; Load address
 Head:   .word   @Next
         .word   1000            ; Line number
         .byte   $9E,"4109"	; SYS 4109
         .byte   $00             ; End of BASIC line
 @Next:  .word   0               ; BASIC end marker
-	.reloc
 
 ; ------------------------------------------------------------------------
 ; Actual code

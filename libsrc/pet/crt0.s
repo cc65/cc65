@@ -15,25 +15,30 @@
 	.include	"../cbm/cbm.inc"
 
 ; ------------------------------------------------------------------------
+; Create an empty LOWCODE segment to avoid linker warnings
+
+.segment        "LOWCODE"
+
+; ------------------------------------------------------------------------
+; Place the startup code in a special segment.
+
+.segment       	"STARTUP"
+
 ; BASIC header with a SYS call
 
-.code
-
-	.org	$3FF
         .word   Head            ; Load address
 Head:   .word   @Next
         .word   1000            ; Line number
         .byte   $9E,"1037"      ; SYS 1037
         .byte   $00             ; End of BASIC line
 @Next:  .word   0               ; BASIC end marker
-	.reloc
 
 ; ------------------------------------------------------------------------
 ; Actual code
 
        	ldx	#zpspace-1
 L1:	lda	sp,x
-   	sta	zpsave,x	; Save the zero page locations we need
+      	sta	zpsave,x	; Save the zero page locations we need
 	dex
        	bpl	L1
 
@@ -94,6 +99,9 @@ L2:	lda	zpsave,x
 
        	rts
 
+
+; ------------------------------------------------------------------------
+; Data
 
 .data
 

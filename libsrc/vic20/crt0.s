@@ -16,9 +16,17 @@
      	.include     	"../cbm/cbm.inc"
 
 ; ------------------------------------------------------------------------
+; Create an empty LOWCODE segment to avoid linker warnings
+
+.segment        "LOWCODE"
+
+; ------------------------------------------------------------------------
+; Place the startup code in a special segment.
+
+.segment       	"STARTUP"
+
 ; BASIC header with a SYS call
 
-.segment        "EXEHDR"
         .word   Head            ; Load address
 Head:   .word   @Next
         .word   1000            ; Line number
@@ -33,8 +41,6 @@ Head:   .word   @Next
 
 ; ------------------------------------------------------------------------
 ; Actual code
-
-.code
 
 	ldx    	#zpspace-1
 L1:	lda	sp,x
@@ -98,6 +104,9 @@ L2:	lda	zpsave,x
 
 	jmp	RESTOR
 
+
+; ------------------------------------------------------------------------
+; Data
 
 .data
 

@@ -7,27 +7,27 @@
 ; on the Atari this function is a dummy, it returns
 ; cylinder and head 0 and as sector the sectnum it got
 ;
-; unsigned char __fastcall__ _dio_log_to_phys(_dhandle_t handle,
-;					      _dio_phys_pos *physpos,	/* output */
-;					      _sectnum_t *sectnum);	/* input */
+; unsigned char __fastcall__ dio_log_to_phys(dhandle_t handle,
+;					     sectnum_t *sectnum,	/* input */
+;					     dio_phys_pos *physpos);	/* output */
 ;
-; _dhandle_t - 16bit (ptr)
-; _sectnum_t - 16bit
+; dhandle_t - 16bit (ptr)
+; sectnum_t - 16bit
 ;
 
-	.export		__dio_log_to_phys
+	.export		_dio_log_to_phys
 	.include	"atari.inc"
 	.importzp	ptr1,ptr2,ptr3
 	.import		popax,__oserror
 
-.proc	__dio_log_to_phys
+.proc	_dio_log_to_phys
 
-	sta	ptr1
-	stx	ptr1+1		; save pointer to input data
-
-	jsr	popax
 	sta	ptr2
 	stx	ptr2+1		; pointer to output structure
+
+	jsr	popax
+	sta	ptr1
+	stx	ptr1+1		; save pointer to input data
 
 	jsr	popax
 	sta	ptr3
@@ -57,7 +57,6 @@
 _l1:	lda	(ptr1,x)
 	sta	(ptr2),y
 
-	ldx	#0
 	txa
 ret:
 	sta	__oserror

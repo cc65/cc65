@@ -231,26 +231,37 @@ Env3		=	$1C
 
 
 ; I/O  $db00: CIA 6526 Inter Process Communication
-
+;
 ; 	IPCcia		=	$db00
 
-PortA		=	$00
-PortB		=	$01
-DDRA		=	$02
-DDRB		=	$03
-TimALo		=	$04
-TimAHi		=	$05
-TimBLo		=	$06
-TimBHi		=	$07
-TOD10		=	$08
-TODsec		=	$09
-TODmin		=	$0A
-TODhour		=	$0B
-SerDataReg	=	$0C
-IntCtrReg	=	$0D
-CtrlA		=	$0E
-CtrlB		=	$0F
-
+.struct CIA
+        PRA     .byte
+        PRB     .byte
+        DDRA    .byte
+        DDRB    .byte
+        .union
+            .struct
+                TALO    .byte
+                TAHI    .byte
+            .endstruct
+            TA          .word
+        .endunion
+        .union
+            .struct
+                TBLO    .byte
+                TBHI    .byte
+            .endstruct
+            TB          .word
+        .endunion
+        TOD10   .byte
+        TODSEC  .byte
+        TODMIN  .byte
+        TODHR   .byte
+        SDR     .byte
+        ICR     .byte
+        CRA     .byte
+        CRB     .byte
+.endstruct
 
 
 ; I/O  $dc00: CIA 6526
@@ -261,7 +272,7 @@ CtrlB		=	$0F
 
 ; I/O  $dd00: ACIA 6551
 
-; 	acia		=	$dd00
+; 	acia	       	=	$dd00
 
 ADataReg	=	$00
 AStatusReg	=	$01
@@ -272,23 +283,28 @@ ACtrlReg	=	$03
 
 ; I/O  $de00: Triport #1 6525
 
-; 	tpi1		=	$de00
+; 	tpi1  		=	$de00
 
-tpiPortA	=	$00
-tpiPortB	=	$01
-tpiPortC	=	$02
-tpiIntLatch	=	$02
-tpiDDRA		=	$03
-tpiDDRB		=	$04
-tpiDDRC		=	$05
-tpiIntMask	=	$05
-tpiCtrlReg	=	$06
-tpiActIntReg	=	$07
-
+.struct TPI
+        PRA     .byte
+        PRB     .byte
+        .union
+                PRC     .byte
+                INT     .byte
+        .endunion
+        DDRA    .byte
+        DDRB    .byte
+        .union
+                DDRC    .byte
+                IMR     .byte
+        .endunion
+        CR      .byte
+        AIR     .byte
+.endstruct
 
 
 ; I/O  $df00: Triport #2 6525
 
-; 	tpi2		=	$df00
+; 	tpi2	     	=	$df00
 
 

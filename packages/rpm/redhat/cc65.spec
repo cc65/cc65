@@ -155,9 +155,9 @@ This package contains the header files and libraries needed to write
 programs for the 8 bit Atari machines using the cc65 crosscompiler.
 
 %files atari
-%attr(644,root,root)  		/usr/lib/cc65/lib/atari.lib
-%attr(644,root,root)  		/usr/lib/cc65/lib/atari.o
-%attr(644,root,root) 		/usr/lib/cc65/joy/atari-*.joy
+%attr(644,root,root)  	       	/usr/lib/cc65/lib/atari.lib
+%attr(644,root,root)  	       	/usr/lib/cc65/lib/atari.o
+%attr(644,root,root) 	       	/usr/lib/cc65/joy/atari*.joy
 
 
 
@@ -292,7 +292,7 @@ This package contains the header files and libraries needed to write
 programs for the Commodore PET-II (CBM600/700) family of computers using
 the cc65 crosscompiler.
 
-%files cbm610					      
+%files cbm610
 %attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm610.lib
 %attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm610.o
 %attr(644,root,root) 	       	/usr/lib/cc65/emd/cbm610-*.emd

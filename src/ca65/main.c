@@ -49,7 +49,6 @@
 #include "instr.h"
 #include "listing.h"
 #include "macro.h"
-/*#include "mem.h"*/
 #include "nexttok.h"
 #include "objcode.h"
 #include "objfile.h"

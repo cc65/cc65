@@ -214,7 +214,7 @@ TakeFromTop:
 
 BlockFound:
        	bne    	SliceBlock     	        ; Block is large enough to slice
-	cpx    	#HEAP_MIN_BLOCKSIZE+1	; Check low byte
+       	cpx    	#HEAP_MIN_BLOCKSIZE     ; Check low byte
        	bcs	SliceBlock 	        ; Jump if block is large enough to slice
 
 ; The block is too small to slice it. Use the block in full. The block
@@ -309,7 +309,7 @@ SliceBlock:
     	stx	ptr2
     	sta	ptr2+1
 
-; Fill the size and start address into the admin space of the block 
+; Fill the size and start address into the admin space of the block
 ; (struct usedblock) and return the user pointer
 
 FillSizeAndRet:

@@ -47,8 +47,8 @@
 
 ; Instead of banking in the ROM, store the values directly into the zeropage
 
-@L3:    stx     FNAM_ADR
-        sty     FNAM_ADR+1
+@L3:    stx     FNAM
+        sty     FNAM+1
 
 ; Return to caller
 

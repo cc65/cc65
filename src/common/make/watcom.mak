@@ -79,6 +79,7 @@ OBJS =	abend.obj	\
         shift.obj       \
 	strbuf.obj	\
         strpool.obj     \
+        strstack.obj    \
 	strutil.obj	\
 	target.obj	\
 	tgttrans.obj	\

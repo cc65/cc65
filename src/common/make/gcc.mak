@@ -34,6 +34,7 @@ OBJS =	abend.o		\
         shift.o         \
 	strbuf.o	\
         strpool.o       \
+        strstack.o      \
 	strutil.o	\
 	target.o	\
 	tgttrans.o	\

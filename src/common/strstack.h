@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                intstack.h                                 */
+/*                                strstack.h                                 */
 /*                                                                           */
-/*                  Integer stack used for program settings                  */
+/*                  String stack used for program settings                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef INTSTACK_H
-#define INTSTACK_H
+#ifndef STRSTACK_H
+#define STRSTACK_H
 
 
 
@@ -48,14 +48,14 @@
 
 
 
-typedef struct IntStack IntStack;
-struct IntStack {
+typedef struct StrStack StrStack;
+struct StrStack {
     unsigned    Count;
-    long        Stack[8];
+    char*       Stack[8];
 };
 
-/* Declare an int stack with the given value as first element */
-#define INTSTACK(Val)   { 1, { Val, 0, 0, 0, 0, 0, 0, 0 } }
+/* Declare an empty string stack */
+#define STRSTACK()      { 0 };
 
 
 
@@ -66,40 +66,40 @@ struct IntStack {
 
 
 #if defined(HAVE_INLINE)
-INLINE int IS_IsFull (const IntStack* S)
-/* Return true if there is no space left on the given int stack */
+INLINE int SS_IsFull (const StrStack* S)
+/* Return true if there is no space left on the given string stack */
 {
     return (S->Count >= sizeof (S->Stack) / sizeof (S->Stack[0]));
 }
 #else
-#  define IS_IsFull(S)  ((S)->Count >= sizeof ((S)->Stack) / sizeof ((S)->Stack[0]))
+#  define SS_IsFull(S)  ((S)->Count >= sizeof ((S)->Stack) / sizeof ((S)->Stack[0]))
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned IS_GetCount (const IntStack* S)
-/* Return the number of elements on the given int stack */
+INLINE unsigned SS_GetCount (const StrStack* S)
+/* Return the number of elements on the given string stack */
 {
     return S->Count;
 }
 #else
-#  define IS_GetCount(S)        (S)->Count
+#  define SS_GetCount(S)        (S)->Count
 #endif
 
-long IS_Get (const IntStack* S);
-/* Get the value on top of an int stack */
+const char* SS_Get (const StrStack* S);
+/* Get the value on top of a string stack */
 
-void IS_Set (IntStack* S, long Val);
-/* Set the value on top of an int stack */
+void SS_Set (StrStack* S, const char* Val);
+/* Set the value on top of a string stack */
 
-void IS_Drop (IntStack* S);
-/* Drop a value from an int stack */
+void SS_Drop (StrStack* S);
+/* Drop a value from a string stack */
 
-void IS_Push (IntStack* S, long Val);
-/* Push a value onto an int stack */
+void SS_Push (StrStack* S, const char* Val);
+/* Push a value onto a string stack */
 
 
 
-/* End of intstack.h */
+/* End of strstack.h */
 #endif
 
 

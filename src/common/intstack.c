@@ -63,11 +63,11 @@ void IS_Set (IntStack* S, long Val)
 
 
 
-long IS_Pop (IntStack* S)
-/* Pop a value from an int stack */
+void IS_Drop (IntStack* S)
+/* Drop a value from an int stack */
 {
     CHECK (S->Count > 1);
-    return S->Stack[--S->Count];
+    --S->Count;
 }
 
 

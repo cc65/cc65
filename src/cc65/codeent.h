@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -89,8 +89,16 @@ struct CodeEntry {
 
 
 
+const char* MakeHexArg (unsigned Num);
+/* Convert Num into a string in the form $XY, suitable for passing it as an
+ * argument to NewCodeEntry, and return a pointer to the string.
+ * BEWARE: The function returns a pointer to a static buffer, so the value is
+ * gone if you call it twice (and apart from that it's not thread and signal
+ * safe).
+ */
+
 CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
-	       	    	 CodeLabel* JumpTo, LineInfo* LI);
+   	       	    	 CodeLabel* JumpTo, LineInfo* LI);
 /* Create a new code entry, initialize and return it */
 
 void FreeCodeEntry (CodeEntry* E);

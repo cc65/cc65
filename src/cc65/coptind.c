@@ -89,6 +89,28 @@ static int IsShortDist (int Distance)
 
 
 
+static short RegVal (unsigned short Use, const RegContents* RC)
+/* Return the contents of the given register */
+{
+    if ((Use & REG_A) != 0) {
+       	return RC->RegA;
+    } else if ((Use & REG_X) != 0) {
+	return RC->RegX;
+    } else if ((Use & REG_Y) != 0) {
+	return RC->RegY;
+    } else if ((Use & REG_TMP1) != 0) {
+	return RC->Tmp1;
+    } else if ((Use & REG_SREG_LO) != 0) {
+	return RC->SRegLo;
+    } else if ((Use & REG_SREG_HI) != 0) {
+	return RC->SRegHi;
+    } else {
+	return REG_NONE;
+    }
+}
+
+
+
 /*****************************************************************************/
 /*	 		  Replace jumps to RTS by RTS			     */
 /*****************************************************************************/
@@ -809,10 +831,8 @@ unsigned OptDupLoads (CodeSeg* S)
 		 */
 	        if (In->RegA >= 0                     && /* Value of A is known */
 		    E->AM == AM65_ZP                  && /* Store into zp */
-		    (((E->Chg & REG_SREG_LO) != 0 &&     /* Store into sreg */
-		      In->RegA == In->SRegLo)       ||   /* Value identical */
-       	       	     ((E->Chg & REG_SREG_HI) != 0 &&     /* Store into sreg+1 */
-       	       	      In->RegA == In->SRegHi))) {        /* Value identical */
+		    In->RegA == RegVal (E->Chg, In)) { 	 /* Value identical */
+
 		    Delete = 1;
 		}
 	        break;
@@ -824,10 +844,8 @@ unsigned OptDupLoads (CodeSeg* S)
 		 */
 	        if (In->RegX >= 0                     && /* Value of A is known */
 		    E->AM == AM65_ZP                  && /* Store into zp */
-		    (((E->Chg & REG_SREG_LO) != 0 &&     /* Store into sreg */
-		      In->RegX == In->SRegLo)       ||   /* Value identical */
-       	       	     ((E->Chg & REG_SREG_HI) != 0 &&     /* Store into sreg+1 */
-       	       	      In->RegX == In->SRegHi))) {        /* Value identical */
+       	       	    In->RegX == RegVal (E->Chg, In)) { 	 /* Value identical */
+
 		    Delete = 1;
 
 		/* If the value in the X register is known and the same as
@@ -852,11 +870,10 @@ unsigned OptDupLoads (CodeSeg* S)
 		 */
 	        if (In->RegY >= 0                     && /* Value of Y is known */
 		    E->AM == AM65_ZP                  && /* Store into zp */
-		    (((E->Chg & REG_SREG_LO) != 0 &&     /* Store into sreg */
-		      In->RegY == In->SRegLo)       ||   /* Value identical */
-       	       	     ((E->Chg & REG_SREG_HI) != 0 &&     /* Store into sreg+1 */
-       	       	      In->RegY == In->SRegHi))) {        /* Value identical */
+		    In->RegX == RegVal (E->Chg, In)) { 	 /* Value identical */
+
 		    Delete = 1;
+
 	        /* If the value in the Y register is known and the same as
 		 * that in the A register, replace the store by a STA. The
 		 * optimizer will then remove the load instruction for Y
@@ -881,8 +898,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 * remove the store.
 		 */
        	        if (CPU >= CPU_65C02 && E->AM == AM65_ZP) {
-                    if (((E->Chg & REG_SREG_LO) != 0 && In->SRegLo == 0) ||
-                        ((E->Chg & REG_SREG_HI) != 0 && In->SRegHi == 0)) {
+		    if (RegVal (E->Chg, In) == 0) {
                         Delete = 1;
                     }
 		}

@@ -962,9 +962,9 @@ static unsigned OptDecouple (CodeSeg* S)
  *   txa        -> lda #imm
  *   tay        -> ldy #imm
  *   tya        -> lda #imm
- *   lda sreg   -> lda #imm
- *   ldx sreg   -> ldx #imm
- *   ldy sreg   -> ldy #imm
+ *   lda zp     -> lda #imm
+ *   ldx zp     -> ldx #imm
+ *   ldy zp	-> ldy #imm
  *
  * Provided that the register values are known of course.
  */
@@ -979,10 +979,11 @@ static unsigned OptDecouple (CodeSeg* S)
     I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	char Buf [16];
+	const char* Arg;
 
-      	/* Get next entry */
+      	/* Get next entry and it's input register values */
        	CodeEntry* E = CS_GetEntry (S, I);
+	const RegContents* In = &E->RI->In;
 
 	/* Assume we have no replacement */
 	CodeEntry* X = 0;
@@ -992,93 +993,120 @@ static unsigned OptDecouple (CodeSeg* S)
 
 	    case OP65_DEX:
 	        if (E->RI->In.RegX >= 0) {
-	      	    xsprintf (Buf, sizeof (Buf), "$%02X", (E->RI->In.RegX - 1) & 0xFF);
-	      	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, E->LI);
+	      	    Arg = MakeHexArg ((E->RI->In.RegX - 1) & 0xFF);
+	      	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
 	    case OP65_DEY:
 	        if (E->RI->In.RegY >= 0) {
-	      	    xsprintf (Buf, sizeof (Buf), "$%02X", (E->RI->In.RegY - 1) & 0xFF);
-	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
+	      	    Arg = MakeHexArg ((E->RI->In.RegY - 1) & 0xFF);
+	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
 	    case OP65_INX:
 	        if (E->RI->In.RegX >= 0) {
-	      	    xsprintf (Buf, sizeof (Buf), "$%02X", (E->RI->In.RegX + 1) & 0xFF);
-	      	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, E->LI);
+	      	    Arg = MakeHexArg ((E->RI->In.RegX + 1) & 0xFF);
+	      	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
 	    case OP65_INY:
-	        if (E->RI->In.RegY >= 0) {
-	      	    xsprintf (Buf, sizeof (Buf), "$%02X", (E->RI->In.RegY + 1) & 0xFF);
-	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
+	        if (E->RI->In.RegY >= 0) {		     
+	      	    Arg = MakeHexArg ((E->RI->In.RegY + 1) & 0xFF);
+	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
 	    case OP65_LDA:
 	        if (E->AM == AM65_ZP) {
-		    if ((E->Use & REG_SREG_LO) != 0 && E->RI->In.SRegLo >= 0) {
-			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegLo);
-			X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, E->LI);
-		    } else if ((E->Use & REG_SREG_HI) != 0 && E->RI->In.SRegHi >= 0) {
-			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegHi);
-			X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, E->LI);
+		    switch (GetKnownReg (E->Use, In)) {
+			case REG_TMP1:
+			    Arg = MakeHexArg (In->Tmp1);
+			    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_SREG_LO:
+			    Arg = MakeHexArg (In->SRegLo);
+			    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_SREG_HI:
+			    Arg = MakeHexArg (In->SRegHi);
+			    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+			    break;
 		    }
 		}
 		break;
 
 	    case OP65_LDX:
 	        if (E->AM == AM65_ZP) {
-		    if ((E->Use & REG_SREG_LO) != 0 && E->RI->In.SRegLo >= 0) {
-			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegLo);
-			X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, E->LI);
-		    } else if ((E->Use & REG_SREG_HI) != 0 && E->RI->In.SRegHi >= 0) {
-			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegHi);
-			X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, E->LI);
+		    switch (GetKnownReg (E->Use, In)) {
+			case REG_TMP1:
+			    Arg = MakeHexArg (In->Tmp1);
+			    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_SREG_LO:
+			    Arg = MakeHexArg (In->SRegLo);
+			    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_SREG_HI:
+			    Arg = MakeHexArg (In->SRegHi);
+			    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, E->LI);
+			    break;
 		    }
 		}
 		break;
 
 	    case OP65_LDY:
 	        if (E->AM == AM65_ZP) {
-		    if ((E->Use & REG_SREG_LO) != 0 && E->RI->In.SRegLo >= 0) {
-			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegLo);
-			X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
-		    } else if ((E->Use & REG_SREG_HI) != 0 && E->RI->In.SRegHi >= 0) {
-			xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.SRegHi);
-			X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
+		    switch (GetKnownReg (E->Use, In)) {
+			case REG_TMP1:
+			    Arg = MakeHexArg (In->Tmp1);
+			    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_SREG_LO:
+			    Arg = MakeHexArg (In->SRegLo);
+			    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+			    break;
+
+			case REG_SREG_HI:
+			    Arg = MakeHexArg (In->SRegHi);
+			    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+			    break;
 		    }
 		}
 		break;
 
 	    case OP65_TAX:
 	        if (E->RI->In.RegA >= 0) {
-	      	    xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.RegA);
-	      	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, E->LI);
+		    Arg = MakeHexArg (In->RegA);
+	      	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
 	    case OP65_TAY:
 	        if (E->RI->In.RegA >= 0) {
-	      	    xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.RegA);
-	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
+		    Arg = MakeHexArg (In->RegA);
+	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
 	    case OP65_TXA:
-	        if (E->RI->In.RegX >= 0) {
-	      	    xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.RegX);
-	      	    X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, E->LI);
+	        if (E->RI->In.RegX >= 0) {		     
+		    Arg = MakeHexArg (In->RegX);
+	      	    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
 	    case OP65_TYA:
 	        if (E->RI->In.RegY >= 0) {
-	      	    xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.RegY);
-	      	    X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, E->LI);
+		    Arg = MakeHexArg (In->RegY);
+	      	    X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
 	    	}
 	        break;
 
@@ -1210,6 +1238,14 @@ static unsigned OptSize1 (CodeSeg* S)
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
+	/* Check if it's a subroutine call */
+	if (E->OPC == OP65_JSR) {
+
+	    /* Check for any of the known functions */
+
+
+
+	}
 
 	/* Next entry */
 	++I;
@@ -1623,12 +1659,18 @@ static void WriteOptStats (const char* Name)
     	return;
     }
 
-    /* Write the file */
+    /* Write a header */
+    fprintf (F,
+	     "; Optimizer           Total  Last   Total  Last\n"
+       	     ";   Step              Runs   Runs    Chg   Chg\n");
+
+
+    /* Write the data */
     for (I = 0; I < OPTFUNC_COUNT; ++I) {
-	const OptFunc* O = OptFuncs[I];
-	fprintf (F,
+    	const OptFunc* O = OptFuncs[I];
+    	fprintf (F,
        	       	 "%-20s %6lu %6lu %6lu %6lu\n",
-		 O->Name,
+    		 O->Name,
 		 O->TotalRuns,
       	       	 O->LastRuns,
 		 O->TotalChanges,

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -44,6 +44,7 @@
 #include "codeseg.h"
 #include "datatype.h"
 #include "error.h"
+#include "reginfo.h"
 #include "symtab.h"
 #include "codeinfo.h"
 
@@ -554,6 +555,31 @@ int RegAXUsed (struct CodeSeg* S, unsigned Index)
 /* Check if the value in A or(!) the value in X are used. */
 {
     return (GetRegInfo (S, Index, REG_AX) & REG_AX) != 0;
+}
+
+
+
+unsigned GetKnownReg (unsigned Use, const RegContents* RC)
+/* Return the register or zero page location from the set in Use, thats
+ * contents are known. If Use does not contain any register, or if the
+ * register in question does not have a known value, return REG_NONE.
+ */
+{
+    if ((Use & REG_A) != 0) {
+	return (RC && RC->RegA >= 0)? REG_A : REG_NONE;
+    } else if ((Use & REG_X) != 0) {
+	return (RC && RC->RegX >= 0)? REG_X : REG_NONE;
+    } else if ((Use & REG_Y) != 0) {
+	return (RC && RC->RegY >= 0)? REG_Y : REG_NONE;
+    } else if ((Use & REG_TMP1) != 0) {
+	return (RC && RC->Tmp1 >= 0)? REG_TMP1 : REG_NONE;
+    } else if ((Use & REG_SREG_LO) != 0) {
+	return (RC && RC->SRegLo >= 0)? REG_SREG_LO : REG_NONE;
+    } else if ((Use & REG_SREG_HI) != 0) {
+	return (RC && RC->SRegHi >= 0)? REG_SREG_HI : REG_NONE;
+    } else {
+	return REG_NONE;
+    }
 }
 
 

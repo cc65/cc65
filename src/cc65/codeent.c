@@ -200,33 +200,24 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 
 
 
-static unsigned GetReg (unsigned short Use, const RegContents* RC)
-/* Map the register info in Use plus the validity into in RI into exactly
- * one register.
- */
-{
-    if ((Use & REG_A) != 0) {
-	return (RC && RC->RegA >= 0)? REG_A : REG_NONE;
-    } else if ((Use & REG_X) != 0) {
-	return (RC && RC->RegX >= 0)? REG_X : REG_NONE;
-    } else if ((Use & REG_Y) != 0) {
-	return (RC && RC->RegY >= 0)? REG_Y : REG_NONE;
-    } else if ((Use & REG_TMP1) != 0) {
-	return (RC && RC->Tmp1 >= 0)? REG_TMP1 : REG_NONE;
-    } else if ((Use & REG_SREG_LO) != 0) {
-	return (RC && RC->SRegLo >= 0)? REG_SREG_LO : REG_NONE;
-    } else if ((Use & REG_SREG_HI) != 0) {
-	return (RC && RC->SRegHi >= 0)? REG_SREG_HI : REG_NONE;
-    } else {
-	return REG_NONE;
-    }
-}
-
-
-
 /*****************************************************************************/
 /*     	       	      	   	     Code				     */
 /*****************************************************************************/
+
+
+
+const char* MakeHexArg (unsigned Num)
+/* Convert Num into a string in the form $XY, suitable for passing it as an
+ * argument to NewCodeEntry, and return a pointer to the string.
+ * BEWARE: The function returns a pointer to a static buffer, so the value is
+ * gone if you call it twice (and apart from that it's not thread and signal
+ * safe).
+ */
+{
+    static char Buf[4];
+    xsprintf (Buf, sizeof (Buf), "$%02X", (char) Num);
+    return Buf;
+}
 
 
 
@@ -430,7 +421,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		if (CE_KnownImm (E)) {
 		    Out->RegA = In->RegA & (short) E->Num;
 		} else if (E->AM == AM65_ZP) {
-		    switch (GetReg (E->Use, In)) {
+		    switch (GetKnownReg (E->Use, In)) {
 		    	case REG_TMP1:
 		    	    Out->RegA = In->RegA & In->Tmp1;
 		    	    break;
@@ -454,7 +445,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
 		Out->RegA = (In->RegA << 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
-		switch (GetReg (E->Chg, In)) {
+		switch (GetKnownReg (E->Chg, In)) {
 		    case REG_TMP1:
 			Out->Tmp1 = (In->Tmp1 << 1) & 0xFF;
 			break;
@@ -535,7 +526,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
 	    	Out->RegA = (In->RegA - 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
-		switch (GetReg (E->Chg, In)) {
+		switch (GetKnownReg (E->Chg, In)) {
 		    case REG_TMP1:
 			Out->Tmp1 = (In->Tmp1 - 1) & 0xFF;
 			break;
@@ -569,7 +560,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		if (CE_KnownImm (E)) {
 		    Out->RegA = In->RegA ^ (short) E->Num;
 		} else if (E->AM == AM65_ZP) {
-		    switch (GetReg (E->Use, In)) {
+		    switch (GetKnownReg (E->Use, In)) {
 		    	case REG_TMP1:
 		    	    Out->RegA = In->RegA ^ In->Tmp1;
 		    	    break;
@@ -599,7 +590,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
 	     	Out->RegA = (In->RegA + 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
-	     	switch (GetReg (E->Chg, In)) {
+	     	switch (GetKnownReg (E->Chg, In)) {
 		    case REG_TMP1:
 			Out->Tmp1 = (In->Tmp1 + 1) & 0xFF;
 			break;
@@ -682,7 +673,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (CE_KnownImm (E)) {
 	     	Out->RegA = (unsigned char) E->Num;
 	    } else if (E->AM == AM65_ZP) {
-		switch (GetReg (E->Use, In)) {
+		switch (GetKnownReg (E->Use, In)) {
 		    case REG_TMP1:
 			Out->RegA = In->Tmp1;
 			break;
@@ -706,7 +697,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (CE_KnownImm (E)) {
 	     	Out->RegX = (unsigned char) E->Num;
 	    } else if (E->AM == AM65_ZP) {
-		switch (GetReg (E->Use, In)) {
+		switch (GetKnownReg (E->Use, In)) {
 		    case REG_TMP1:
 			Out->RegX = In->Tmp1;
 			break;
@@ -730,7 +721,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (CE_KnownImm (E)) {
 	     	Out->RegY = (unsigned char) E->Num;
 	    } else if (E->AM == AM65_ZP) {
-		switch (GetReg (E->Use, In)) {
+		switch (GetKnownReg (E->Use, In)) {
 		    case REG_TMP1:
 			Out->RegY = In->Tmp1;
 			break;
@@ -754,7 +745,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
 		Out->RegA = (In->RegA >> 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
-		switch (GetReg (E->Chg, In)) {
+		switch (GetKnownReg (E->Chg, In)) {
 		    case REG_TMP1:
 			Out->Tmp1 = (In->Tmp1 >> 1) & 0xFF;
 			break;
@@ -779,7 +770,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 		if (CE_KnownImm (E)) {
 		    Out->RegA = In->RegA | (short) E->Num;
 		} else if (E->AM == AM65_ZP) {
-		    switch (GetReg (E->Use, In)) {
+		    switch (GetKnownReg (E->Use, In)) {
 		    	case REG_TMP1:
 		    	    Out->RegA = In->RegA | In->Tmp1;
 		    	    break;
@@ -832,7 +823,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
     	    if (E->AM == AM65_ACC) {
     		Out->RegA = -1;
     	    } else if (E->AM == AM65_ZP) {
-	     	switch (GetReg (E->Chg, In)) {
+	     	switch (GetKnownReg (E->Chg, In)) {
 		    case REG_TMP1:
 			Out->Tmp1 = -1;
 			break;
@@ -854,7 +845,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
     	    if (E->AM == AM65_ACC) {
     		Out->RegA = -1;
     	    } else if (E->AM == AM65_ZP) {
-	     	switch (GetReg (E->Chg, In)) {
+	     	switch (GetKnownReg (E->Chg, In)) {
 		    case REG_TMP1:
 			Out->Tmp1 = -1;
 			break;
@@ -893,7 +884,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
     	case OP65_STA:
 	    if (E->AM == AM65_ZP) {
-		switch (GetReg (E->Chg, 0)) {
+		switch (GetKnownReg (E->Chg, 0)) {
 		    case REG_TMP1:
 			Out->Tmp1 = In->RegA;
 			break;
@@ -912,7 +903,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_STX:
 	    if (E->AM == AM65_ZP) {
-		switch (GetReg (E->Chg, 0)) {
+		switch (GetKnownReg (E->Chg, 0)) {
 		    case REG_TMP1:
 			Out->Tmp1 = In->RegX;
 			break;
@@ -931,7 +922,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_STY:
 	    if (E->AM == AM65_ZP) {
-		switch (GetReg (E->Chg, 0)) {
+		switch (GetKnownReg (E->Chg, 0)) {
 		    case REG_TMP1:
 			Out->Tmp1 = In->RegY;
 			break;
@@ -950,7 +941,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_STZ:
 	    if (E->AM == AM65_ZP) {
-		switch (GetReg (E->Chg, 0)) {
+		switch (GetKnownReg (E->Chg, 0)) {
 		    case REG_TMP1:
 			Out->Tmp1 = 0;
 			break;
@@ -981,7 +972,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    	RC_InvalidateZP (Out);
 	    } else if (E->AM == AM65_ZP) {
 	    	if (In->RegA >= 0) {
-		    switch (GetReg (E->Chg, In)) {
+		    switch (GetKnownReg (E->Chg, In)) {
 			case REG_TMP1:
 			    Out->Tmp1 &= ~In->RegA;
 			    break;
@@ -993,7 +984,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			    break;
 		    }
 	    	} else {
-		    switch (GetReg (E->Chg, In)) {
+		    switch (GetKnownReg (E->Chg, In)) {
 			case REG_TMP1:
 			    Out->Tmp1 = -1;
 			    break;
@@ -1014,7 +1005,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    	RC_InvalidateZP (Out);
 	    } else if (E->AM == AM65_ZP) {
 	    	if (In->RegA >= 0) {
-		    switch (GetReg (E->Chg, In)) {
+		    switch (GetKnownReg (E->Chg, In)) {
 			case REG_TMP1:
 			    Out->Tmp1 |= In->RegA;
 			    break;
@@ -1026,7 +1017,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 			    break;
 		    }
 	    	} else {
-		    switch (GetReg (E->Chg, In)) {
+		    switch (GetKnownReg (E->Chg, In)) {
 			case REG_TMP1:
 			    Out->Tmp1 = -1;
 			    break;

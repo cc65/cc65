@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -53,6 +53,9 @@ struct CodeSeg;
 /*****************************************************************************/
 
 
+
+/* Forward to struct RegContents */
+struct RegContents;
 
 /* Defines for registers. */
 #define REG_NONE       	0x0000U
@@ -133,6 +136,12 @@ int RegYUsed (struct CodeSeg* S, unsigned Index);
 
 int RegAXUsed (struct CodeSeg* S, unsigned Index);
 /* Check if the value in A or(!) the value in X are used. */
+
+unsigned GetKnownReg (unsigned Use, const struct RegContents* RC);
+/* Return the register or zero page location from the set in Use, thats
+ * contents are known. If Use does not contain any register, or if the
+ * register in question does not have a known value, return REG_NONE.
+ */
 
 
 

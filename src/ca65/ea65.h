@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                   cpu.c                                   */
+/*	  			    ea65.h                                   */
 /*                                                                           */
-/*                            CPU specifications                             */
+/*        65XX effective address parsing for the ca65 macroassembler         */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,69 +33,35 @@
 
 
 
-#include <string.h>
-
-/* common */
-#include "cpu.h"
+#ifndef EA65_H
+#define EA65_H
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Data			    	     */
+/*                                 Forwards                                  */
 /*****************************************************************************/
 
 
 
-/* CPU used */
-cpu_t CPU = CPU_UNKNOWN;
-
-/* Table with target names */
-const char* CPUNames[CPU_COUNT] = {
-    "6502",
-    "6502X",
-    "65SC02",
-    "65C02",
-    "65816",
-    "sunplus",
-    "sweet16",
-};
-
-/* Tables with CPU instruction sets */
-const unsigned CPUIsets[CPU_COUNT] = {
-    CPU_ISET_6502,
-    CPU_ISET_6502 | CPU_ISET_6502X,
-    CPU_ISET_6502 | CPU_ISET_65SC02,
-    CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
-    CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02 | CPU_ISET_65816,
-    CPU_ISET_SUNPLUS,
-    CPU_ISET_SWEET16,
-};
+struct EffAddr;
 
 
 
 /*****************************************************************************/
-/*     	       	     		     Code			    	     */
+/*     	      	    		     Code	    			     */
 /*****************************************************************************/
 
 
 
-cpu_t FindCPU (const char* Name)
-/* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
- * the given name is no valid target.
- */
-{
-    unsigned I;
+void GetEA (EffAddr* A);
+/* Parse an effective address, return the result in A */
 
-    /* Check all CPU names */
-    for (I = 0; I < CPU_COUNT; ++I) {
-	if (strcmp (CPUNames [I], Name) == 0) {
-	    return (cpu_t)I;
-	}
-    }
 
-    /* Not found */
-    return CPU_UNKNOWN;
-}
+
+/* End of ea65.h */
+
+#endif
 
 
 

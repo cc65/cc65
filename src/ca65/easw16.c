@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                   cpu.c                                   */
+/*	  			   easw16.c                                  */
 /*                                                                           */
-/*                            CPU specifications                             */
+/*       SWEET16 effective address parsing for the ca65 macroassembler       */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2004 Ullrich von Bassewitz                                       */
+/* (C) 2004      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,68 +33,74 @@
 
 
 
-#include <string.h>
-
-/* common */
-#include "cpu.h"
-
-
-
-/*****************************************************************************/
-/*     	       	    		     Data			    	     */
-/*****************************************************************************/
-
-
-
-/* CPU used */
-cpu_t CPU = CPU_UNKNOWN;
-
-/* Table with target names */
-const char* CPUNames[CPU_COUNT] = {
-    "6502",
-    "6502X",
-    "65SC02",
-    "65C02",
-    "65816",
-    "sunplus",
-    "sweet16",
-};
-
-/* Tables with CPU instruction sets */
-const unsigned CPUIsets[CPU_COUNT] = {
-    CPU_ISET_6502,
-    CPU_ISET_6502 | CPU_ISET_6502X,
-    CPU_ISET_6502 | CPU_ISET_65SC02,
-    CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
-    CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02 | CPU_ISET_65816,
-    CPU_ISET_SUNPLUS,
-    CPU_ISET_SWEET16,
-};
+/* ca65 */
+#include "ea.h"
+#include "ea65.h"
+#include "error.h"
+#include "expr.h"
+#include "instr.h"
+#include "nexttok.h"
 
 
 
 /*****************************************************************************/
-/*     	       	     		     Code			    	     */
+/*     	       	    	      	     Code				     */
 /*****************************************************************************/
 
 
 
-cpu_t FindCPU (const char* Name)
-/* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
- * the given name is no valid target.
- */
+void GetSweet16EA (EffAddr* A)
+/* Parse an effective address, return the result in A */
 {
-    unsigned I;
+    /* Clear the output struct */
+    A->AddrModeSet = 0;
+    A->Expr = 0;
+    A->Reg  = 0;
 
-    /* Check all CPU names */
-    for (I = 0; I < CPU_COUNT; ++I) {
-	if (strcmp (CPUNames [I], Name) == 0) {
-	    return (cpu_t)I;
-	}
+    /* Parse the effective address */
+    if (TokIsSep (Tok)) {
+
+       	A->AddrModeSet = AMSW16_IMP;
+
+    } else if (Tok == TOK_AT) {
+
+	/* @reg */
+	A->AddrModeSet = AMSW16_IND;
+	NextTok ();
+        if (Tok != TOK_REG) {
+            ErrorSkip ("Register expected");
+            A->Reg = 0;
+        } else {
+            A->Reg = (unsigned) IVal;
+            NextTok ();
+        }
+
+    } else if (Tok == TOK_REG) {
+
+        A->Reg = (unsigned) IVal;
+        NextTok ();
+
+        if (Tok == TOK_COMMA) {
+
+            /* Rx, Constant */
+            NextTok ();
+            A->Expr = Expression ();
+
+            A->AddrModeSet = AMSW16_IMM;
+
+        } else {
+
+            A->AddrModeSet = AMSW16_REG;
+
+        }
+
+    } else {
+
+        /* OPC  ea */
+        A->Expr = Expression ();
+        A->AddrModeSet = AMSW16_BRA;
+
     }
-
-    /* Not found */
-    return CPU_UNKNOWN;
 }
 
 

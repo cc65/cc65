@@ -640,6 +640,32 @@ static unsigned ReadStringConst (int StringTerm)
 
 
 
+static int Sweet16Reg (const char* Ident)
+/* Check if the given identifier is a sweet16 register. Return -1 if this is
+ * not the case, return the register number otherwise.
+ */
+{
+    unsigned RegNum;
+    char Check;
+
+    if (Ident[0] != 'r' && Ident[0] != 'R') {
+        return -1;
+    }
+    if (!IsDigit (Ident[1])) {
+        return -1;
+    }
+
+    if (sscanf (Ident+1, "%u%c", &RegNum, &Check) != 1 || RegNum > 15) {
+        /* Invalid register */
+        return -1;
+    }
+
+    /* The register number is valid */
+    return (int) RegNum;
+}
+
+
+
 void NextRawTok (void)
 /* Read the next raw token from the input stream */
 {
@@ -791,6 +817,15 @@ Again:
 	return;
     }
 
+    /* Indirect op for sweet16 cpu. Must check this before checking for local
+     * symbols, because these may also use the '@' symbol.
+     */
+    if (CPU == CPU_SWEET16 && C == '@') {
+        NextChar ();
+        Tok = TOK_AT;
+        return;
+    }
+
     /* Local symbol? */
     if (C == LocalStart) {
 
@@ -834,7 +869,7 @@ Again:
                     if (C == ':') {
                         NextChar ();
                         Tok = TOK_OVERRIDE_FAR;
-			return;
+		       	return;
                     }
 		    break;
 
@@ -854,14 +889,21 @@ Again:
                     if (C == ':') {
                         NextChar ();
                         Tok = TOK_OVERRIDE_ZP;
-			return;
+		       	return;
                     }
                     break;
 
 	      	default:
 	     	    break;
    	    }
-	}
+
+	} else if (CPU == CPU_SWEET16 && (IVal = Sweet16Reg (SVal)) >= 0) {
+
+            /* A sweet16 register number in sweet16 mode */
+            Tok = TOK_REG;
+            return;
+
+        }
 
 	/* Check for define style macro */
        	if (IsDefine (SVal)) {
@@ -1147,7 +1189,7 @@ int TokHasSVal (enum Token Tok)
 int TokHasIVal (enum Token Tok)
 /* Return true if the given token has an attached IVal */
 {
-    return (Tok == TOK_INTCON || Tok == TOK_CHARCON);
+    return (Tok == TOK_INTCON || Tok == TOK_CHARCON || Tok == TOK_REG);
 }
 
 

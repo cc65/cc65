@@ -269,7 +269,7 @@ static void DoA16 (void)
 	Error ("Command is only valid in 65816 mode");
     } else {
        	/* Immidiate mode has two extension bytes */
-	ExtBytes [AMI_IMM_ACCU] = 2;
+	ExtBytes [AM65I_IMM_ACCU] = 2;
     }
 }
 
@@ -282,7 +282,7 @@ static void DoA8 (void)
 	Error ("Command is only valid in 65816 mode");
     } else {
 	/* Immidiate mode has one extension byte */
-	ExtBytes [AMI_IMM_ACCU] = 1;
+	ExtBytes [AM65I_IMM_ACCU] = 1;
     }
 }
 
@@ -524,7 +524,7 @@ static void DoConDes (void)
 {
     static const char* Keys[] = {
        	"CONSTRUCTOR",
-	"DESTRUCTOR", 
+	"DESTRUCTOR",
         "INTERRUPTOR",
     };
     char Name [sizeof (SVal)];
@@ -568,7 +568,7 @@ static void DoConDes (void)
     /* Parse the remainder of the line and export the symbol */
     ConDes (Name, (unsigned) Type);
 }
-                      
+
 
 
 static void DoConstructor (void)
@@ -943,7 +943,7 @@ static void DoI16 (void)
      	Error ("Command is only valid in 65816 mode");
     } else {
        	/* Immidiate mode has two extension bytes */
-     	ExtBytes [AMI_IMM_INDEX] = 2;
+     	ExtBytes [AM65I_IMM_INDEX] = 2;
     }
 }
 
@@ -956,7 +956,7 @@ static void DoI8 (void)
 	Error ("Command is only valid in 65816 mode");
     } else {
 	/* Immidiate mode has one extension byte */
-	ExtBytes [AMI_IMM_INDEX] = 1;
+	ExtBytes [AM65I_IMM_INDEX] = 1;
     }
 }
 
@@ -1501,12 +1501,16 @@ static void DoSetCPU (void)
     if (Tok != TOK_STRCON) {
 	ErrorSkip ("String constant expected");
     } else {
-        /* Try to find the CPU, then skip the identifier */
+        /* Try to find the CPU */
         cpu_t CPU = FindCPU (SVal);
-        NextTok ();
 
         /* Switch to the new CPU */
         SetCPU (CPU);
+
+        /* Skip the identifier. If the CPU switch was successful, the scanner
+         * will treat the input now correctly for the new CPU.
+         */
+        NextTok ();
     }
 }
 

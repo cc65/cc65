@@ -53,6 +53,7 @@ typedef enum {
     CPU_65C02,
     CPU_65816,
     CPU_SUNPLUS,	        /* Not in the freeware version - sorry */
+    CPU_SWEET16,
     CPU_COUNT  	    	        /* Number of different CPUs */
 } cpu_t;
 
@@ -63,7 +64,8 @@ enum {
     CPU_ISET_65SC02     = 1 << CPU_65SC02,
     CPU_ISET_65C02      = 1 << CPU_65C02,
     CPU_ISET_65816      = 1 << CPU_65816,
-    CPU_ISET_SUNPLUS    = 1 << CPU_SUNPLUS
+    CPU_ISET_SUNPLUS    = 1 << CPU_SUNPLUS,
+    CPU_ISET_SWEET16    = 1 << CPU_SWEET16,
 };
 
 /* CPU used */
@@ -81,7 +83,7 @@ extern const unsigned CPUIsets[CPU_COUNT];
 /*     	       	     	   	     Code      			    	     */
 /*****************************************************************************/
 
-
+                                           
 
 cpu_t FindCPU (const char* Name);
 /* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if

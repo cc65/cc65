@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                   cpu.c                                   */
+/*	  			    ea65.h                                   */
 /*                                                                           */
-/*                            CPU specifications                             */
+/*                  Effective address structure definition                   */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003-2004 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,69 +33,36 @@
 
 
 
-#include <string.h>
-
-/* common */
-#include "cpu.h"
+#ifndef EA_H
+#define EA_H
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Data			    	     */
+/*     	      	    		     Data			    	     */
 /*****************************************************************************/
 
 
 
-/* CPU used */
-cpu_t CPU = CPU_UNKNOWN;
+/* GetEA result struct */
+typedef struct EffAddr EffAddr;
+struct EffAddr {
+    /* First three fields get filled when calling GetEA */
+    unsigned long       AddrModeSet;    /* Possible addressing modes */
+    struct ExprNode*    Expr;           /* Expression if any (NULL otherwise) */
+    unsigned            Reg;            /* Register number in sweet16 mode */
 
-/* Table with target names */
-const char* CPUNames[CPU_COUNT] = {
-    "6502",
-    "6502X",
-    "65SC02",
-    "65C02",
-    "65816",
-    "sunplus",
-    "sweet16",
-};
-
-/* Tables with CPU instruction sets */
-const unsigned CPUIsets[CPU_COUNT] = {
-    CPU_ISET_6502,
-    CPU_ISET_6502 | CPU_ISET_6502X,
-    CPU_ISET_6502 | CPU_ISET_65SC02,
-    CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02,
-    CPU_ISET_6502 | CPU_ISET_65SC02 | CPU_ISET_65C02 | CPU_ISET_65816,
-    CPU_ISET_SUNPLUS,
-    CPU_ISET_SWEET16,
+    /* The following fields are used inside instr.c */
+    unsigned            AddrMode;       /* Actual addressing mode used */
+    unsigned long       AddrModeBit;    /* Addressing mode as bit mask */
+    unsigned char       Opcode;         /* Opcode */
 };
 
 
 
-/*****************************************************************************/
-/*     	       	     		     Code			    	     */
-/*****************************************************************************/
+/* End of ea.h */
 
-
-
-cpu_t FindCPU (const char* Name)
-/* Find a CPU by name and return the target id. CPU_UNKNOWN is returned if
- * the given name is no valid target.
- */
-{
-    unsigned I;
-
-    /* Check all CPU names */
-    for (I = 0; I < CPU_COUNT; ++I) {
-	if (strcmp (CPUNames [I], Name) == 0) {
-	    return (cpu_t)I;
-	}
-    }
-
-    /* Not found */
-    return CPU_UNKNOWN;
-}
+#endif
 
 
 

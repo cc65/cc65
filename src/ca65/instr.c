@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -48,6 +48,8 @@
 /* ca65 */
 #include "asserts.h"
 #include "ea.h"
+#include "ea65.h"
+#include "easw16.h"
 #include "error.h"
 #include "expr.h"
 #include "global.h"
@@ -76,6 +78,8 @@ static void PutSEP (const InsDesc* Ins);
 static void PutJMP (const InsDesc* Ins);
 static void PutRTS (const InsDesc* Ins);
 static void PutAll (const InsDesc* Ins);
+static void PutSweet16 (const InsDesc* Ins);
+static void PutSweet16Branch (const InsDesc* Ins);
 
 
 
@@ -419,7 +423,7 @@ static const struct {
     unsigned Count;
     InsDesc  Ins[INS_COUNT_65816];
 } InsTab65816 = {
-    INS_COUNT_65816,             
+    INS_COUNT_65816,
     {
        	{ "ADC",  0x0b8f6fc, 0x60, 0, PutAll },
        	{ "AND",  0x0b8f6fc, 0x20, 0, PutAll },
@@ -530,6 +534,43 @@ static const struct {
 #include "sunplus.inc"
 #endif
 
+/* Instruction table for the SWEET16 pseudo CPU */
+#define INS_COUNT_SWEET16 27
+static const struct {
+    unsigned Count;
+    InsDesc  Ins[INS_COUNT_SWEET16];
+} InsTabSweet16 = {
+    INS_COUNT_SWEET16,
+    {
+        { "ADD",  AMSW16_REG,              0xA0, 0, PutSweet16 },
+        { "BC",   AMSW16_BRA,              0x03, 0, PutSweet16Branch },
+        { "BK",   AMSW16_IMP,              0x0A, 0, PutSweet16 },
+        { "BM",   AMSW16_BRA,              0x05, 0, PutSweet16Branch },
+        { "BM1",  AMSW16_BRA,              0x08, 0, PutSweet16Branch },
+        { "BNC",  AMSW16_BRA,              0x02, 0, PutSweet16Branch },
+        { "BNM1", AMSW16_BRA,              0x09, 0, PutSweet16Branch },
+        { "BNZ",  AMSW16_BRA,              0x07, 0, PutSweet16Branch },
+        { "BP",   AMSW16_BRA,              0x04, 0, PutSweet16Branch },
+        { "BR",   AMSW16_BRA,              0x01, 0, PutSweet16Branch },
+        { "BS",   AMSW16_BRA,              0x0B, 0, PutSweet16Branch },
+        { "BZ",   AMSW16_BRA,              0x06, 0, PutSweet16Branch },
+        { "CPR",  AMSW16_REG,              0xD0, 0, PutSweet16 },
+        { "DCR",  AMSW16_REG,              0xF0, 0, PutSweet16 },
+        { "INR",  AMSW16_REG,              0xE0, 0, PutSweet16 },
+        { "LD",   AMSW16_REG | AMSW16_IND, 0x00, 1, PutSweet16 },
+        { "LDD",  AMSW16_IND,              0x60, 0, PutSweet16 },
+        { "POP",  AMSW16_IND,              0x80, 0, PutSweet16 },
+        { "POPD", AMSW16_IND,              0xC0, 0, PutSweet16 },
+        { "RS",   AMSW16_IMP,              0x0B, 0, PutSweet16 },
+        { "RTN",  AMSW16_IMP,              0x00, 0, PutSweet16 },
+        { "SET",  AMSW16_IMM,              0x10, 0, PutSweet16 },
+        { "ST",   AMSW16_REG | AMSW16_IND, 0x10, 1, PutSweet16 },
+        { "STD",  AMSW16_IND,              0x70, 0, PutSweet16 },
+        { "STP",  AMSW16_IND,              0x90, 0, PutSweet16 },
+        { "SUB",  AMSW16_IMM,              0xB0, 0, PutSweet16 },
+    }
+};
+
 
 
 /* An array with instruction tables */
@@ -541,14 +582,17 @@ static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTab65816,
 #ifdef SUNPLUS
     (const InsTable*) &InsTabSunPlus,
+#else
+    NULL,
 #endif
+    (const InsTable*) &InsTabSweet16,
 };
 const InsTable* InsTab = (const InsTable*) &InsTab6502;
 
-/* Table to build the effective opcode from a base opcode and an addressing
- * mode.
+/* Table to build the effective 65xx opcode from a base opcode and an
+ * addressing mode.
  */
-unsigned char EATab [9][AMI_COUNT] = {
+static unsigned char EATab[9][AM65I_COUNT] = {
     {   /* Table 0 */
      	0x00, 0x00, 0x05, 0x0D, 0x0F, 0x15, 0x1D, 0x1F,
      	0x00, 0x19, 0x12, 0x00, 0x07, 0x11, 0x17, 0x01,
@@ -605,8 +649,20 @@ unsigned char EATab [9][AMI_COUNT] = {
     },
 };
 
-/* Table that encodes the additional bytes for each instruction */
-unsigned char ExtBytes [AMI_COUNT] = {
+/* Table to build the effective SWEET16 opcode from a base opcode and an
+ * addressing mode.
+ */
+static unsigned char Sweet16EATab[2][AMSW16I_COUNT] = {
+    {   /* Table 0 */
+       	0x00, 0x00, 0x00, 0x00, 0x00,
+    },
+    {   /* Table 1 */
+       	0x00, 0x00, 0x00, 0x40, 0x20,
+    },
+};
+
+/* Table that encodes the additional bytes for each 65xx instruction */
+unsigned char ExtBytes[AM65I_COUNT] = {
     0,	    	/* Implicit */
     0,	    	/* Accu */
     1,	    	/* Direct */
@@ -634,10 +690,19 @@ unsigned char ExtBytes [AMI_COUNT] = {
     2 	    	/* Blockmove */
 };
 
+/* Table that encodes the additional bytes for each SWEET16 instruction */
+static unsigned char Sweet16ExtBytes[AMSW16I_COUNT] = {
+    0,          /* AMSW16_IMP */
+    1,          /* AMSW16_BRA */
+    2,          /* AMSW16_IMM */
+    0,          /* AMSW16_IND */
+    0,          /* AMSW16_REG */
+};
+
 
 
 /*****************************************************************************/
-/*    	       	 	       Handler functions		    	     */
+/*                   Handler functions for 6502 derivates                    */
 /*****************************************************************************/
 
 
@@ -680,11 +745,11 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
         switch (ED.AddrSize) {
 
             case ADDR_SIZE_ABS:
-                A->AddrModeSet &= ~AM_SET_ZP;
+                A->AddrModeSet &= ~AM65_SET_ZP;
                 break;
 
             case ADDR_SIZE_FAR:
-                A->AddrModeSet &= ~(AM_SET_ZP | AM_SET_ABS);
+                A->AddrModeSet &= ~(AM65_SET_ZP | AM65_SET_ABS);
                 break;
         }
 
@@ -706,8 +771,8 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
      * emit a warning. This warning protects against a typo, where the '#'
      * for the immediate operand is omitted.
      */
-    if (A->Expr && (Ins->AddrMode & AM_IMM)                &&
-        (A->AddrModeSet & (AM_DIR | AM_ABS | AM_ABS_LONG)) &&
+    if (A->Expr && (Ins->AddrMode & AM65_IMM)                    &&
+        (A->AddrModeSet & (AM65_DIR | AM65_ABS | AM65_ABS_LONG)) &&
         ExtBytes[A->AddrMode] == 1) {
 
         /* Found, check the expression */
@@ -745,7 +810,7 @@ static void EmitCode (EffAddr* A)
       	    break;
 
       	case 2:
-	    if (CPU == CPU_65816 && (A->AddrModeBit & (AM_ABS | AM_ABS_X | AM_ABS_Y))) {
+	    if (CPU == CPU_65816 && (A->AddrModeBit & (AM65_ABS | AM65_ABS_X | AM65_ABS_Y))) {
 	      	/* This is a 16 bit mode that uses an address. If in 65816,
 	      	 * mode, force this address into 16 bit range to allow
 	      	 * addressing inside a 64K segment.
@@ -859,11 +924,11 @@ static void PutREP (const InsDesc* Ins)
 	} else {
 	    if (Val & 0x10) {
 	       	/* Index registers to 16 bit */
-	       	ExtBytes[AMI_IMM_INDEX] = 2;
+	       	ExtBytes[AM65I_IMM_INDEX] = 2;
      	    }
      	    if (Val & 0x20) {
      	       	/* Accu to 16 bit */
-	       	ExtBytes[AMI_IMM_ACCU] = 2;
+	       	ExtBytes[AM65I_IMM_ACCU] = 2;
      	    }
      	}
     }
@@ -887,11 +952,11 @@ static void PutSEP (const InsDesc* Ins)
      	} else {
      	    if (Val & 0x10) {
      	   	/* Index registers to 8 bit */
-     	   	ExtBytes [AMI_IMM_INDEX] = 1;
+     	   	ExtBytes[AM65I_IMM_INDEX] = 1;
      	    }
      	    if (Val & 0x20) {
      	   	/* Accu to 8 bit */
-     	   	ExtBytes [AMI_IMM_ACCU] = 1;
+     	   	ExtBytes[AM65I_IMM_ACCU] = 1;
      	    }
      	}
     }
@@ -912,7 +977,7 @@ static void PutJMP (const InsDesc* Ins)
     if (EvalEA (Ins, &A)) {
 
         /* Check for indirect addressing */
-        if (A.AddrModeBit & AM_ABS_IND) {
+        if (A.AddrModeBit & AM65_ABS_IND) {
 
             /* Compare the low byte of the expression to 0xFF to check for
              * a page cross. Be sure to use a copy of the expression otherwise
@@ -963,7 +1028,68 @@ static void PutAll (const InsDesc* Ins)
 
 
 /*****************************************************************************/
-/*     	     	    	   	     Code   				     */
+/*                       Handler functions for SWEET16                       */
+/*****************************************************************************/
+
+
+
+static void PutSweet16 (const InsDesc* Ins)
+/* Handle a generic sweet16 instruction */
+{
+    EffAddr A;
+
+    /* Evaluate the addressing mode used */
+    GetSweet16EA (&A);
+
+    /* From the possible addressing modes, remove the ones that are invalid
+     * for this instruction or CPU.
+     */
+    A.AddrModeSet &= Ins->AddrMode;
+
+    /* Check if we have any adressing modes left */
+    if (A.AddrModeSet == 0) {
+       	Error ("Illegal addressing mode");
+       	return;
+    }
+    A.AddrMode    = BitFind (A.AddrModeSet);
+    A.AddrModeBit = (0x01UL << A.AddrMode);
+
+    /* Build the opcode */
+    A.Opcode = Ins->BaseCode | Sweet16EATab[Ins->ExtCode][A.AddrMode] | A.Reg;
+
+    /* Check how many extension bytes are needed and output the instruction */
+    switch (Sweet16ExtBytes[A.AddrMode]) {
+
+        case 0:
+      	    Emit0 (A.Opcode);
+      	    break;
+
+      	case 1:
+      	    Emit1 (A.Opcode, A.Expr);
+      	    break;
+
+      	case 2:
+            Emit2 (A.Opcode, A.Expr);
+	    break;
+
+	default:
+	    Internal ("Invalid operand byte count: %u", Sweet16ExtBytes[A.AddrMode]);
+
+    }
+}
+
+
+
+static void PutSweet16Branch (const InsDesc* Ins)
+/* Handle a sweet16 branch instruction */
+{
+    EmitPCRel (Ins->BaseCode, GenBranchExpr (2), 1);
+}
+
+
+
+/*****************************************************************************/
+/*     	     	    	   	     Code   		      		     */
 /*****************************************************************************/
 
 

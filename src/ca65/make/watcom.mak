@@ -63,7 +63,8 @@ OBJS = 	anonname.obj    \
         asserts.obj     \
         condasm.obj	\
 	dbginfo.obj	\
-	ea.obj		\
+	ea65.obj        \
+        easw16.obj      \
         enum.obj        \
 	error.obj	\
 	expr.obj	\

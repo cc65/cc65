@@ -62,10 +62,11 @@ enum Token {
     TOK_CHARCON,  	/* Character constant */
     TOK_STRCON,	  	/* String constant */
 
-    TOK_A,	  	/* A)ccu */
+    TOK_A,	  	/* A)ccumulator */
     TOK_X,	  	/* X register */
     TOK_Y,	  	/* Y register */
     TOK_S,	  	/* S register */
+    TOK_REG,            /* Sweet16 R.. register (in sweet16 mode) */
 
     TOK_ASSIGN,         /* := */
     TOK_ULABEL,	  	/* :++ or :-- */
@@ -108,6 +109,7 @@ enum Token {
     TOK_RBRACK,	  	/* ] */
     TOK_LCURLY,         /* { */
     TOK_RCURLY,         /* } */
+    TOK_AT,             /* @ - in Sweet16 mode */
 
     TOK_OVERRIDE_ZP,    /* z: */
     TOK_OVERRIDE_ABS,   /* a: */
@@ -194,7 +196,7 @@ enum Token {
     TOK_LINECONT,
     TOK_LIST,
     TOK_LISTBYTES,
-    TOK_LOBYTE,     
+    TOK_LOBYTE,
     TOK_LOCAL,
     TOK_LOCALCHAR,
     TOK_LOWORD,

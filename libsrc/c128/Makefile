@@ -23,6 +23,7 @@ OBJS =	_scrsize.o	\
 	mouse.o		\
 	readjoy.o	\
 	rs232.o		\
+	tgi_mode_table.o\
 	write.o
 
 all:   	$(OBJS)

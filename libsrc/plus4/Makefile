@@ -20,10 +20,11 @@ OBJS =	_scrsize.o	\
 	cputc.o		\
 	crt0.o		\
 	kbhit.o		\
-	readjoy.o
+	readjoy.o	\
+	tgi_mode_table.o
 
 all:	$(OBJS)
 
 clean:
-	@rm -f $(OBJS) 
+	@rm -f $(OBJS)
 

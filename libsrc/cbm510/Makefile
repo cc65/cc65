@@ -29,7 +29,8 @@ OBJS =	_scrsize.o	\
 	peeksys.o	\
 	pokesys.o	\
 	readjoy.o	\
-	rs232.o
+	rs232.o		\
+	tgi_mode_table.o
 
 all:	$(OBJS)
 

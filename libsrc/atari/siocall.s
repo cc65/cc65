@@ -55,7 +55,7 @@
 	lda	(ptr1),y
 	sta	DBYTHI
 
-	lda	#$31		; D1 (drive_id == 0) has id $31
+	lda	#DISKID		; SIO bus ID of diskette drive
 	sta	DDEVIC
 	lda	#15
 	sta	DTIMLO		; value got from DOS source

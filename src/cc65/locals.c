@@ -35,7 +35,8 @@
 
 /* common */
 #include "xmalloc.h"
-	  
+#include "xsprintf.h"
+
 /* cc65 */
 #include "anonname.h"
 #include "asmlabel.h"

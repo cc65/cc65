@@ -54,6 +54,7 @@ struct __sid {
     unsigned char	flt_ctrl;	/* Filter control register */
     unsigned char	amp;		/* Amplitude */
     unsigned char	ad1;		/* A/D converter 1 */
+    unsigned char      	ad2;		/* A/D converter 2 */
     unsigned char	noise;		/* Noise generator */
     unsigned char	read3;		/* Value of voice 3 */
 };

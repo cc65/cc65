@@ -1,6 +1,5 @@
 *.lst
 _afailed.s
-_fopen.s
 _hextab.s
 _scanf.s
 abort.s

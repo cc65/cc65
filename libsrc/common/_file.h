@@ -34,7 +34,7 @@ extern FILE _filetab [FOPEN_MAX];
 
 
 
-FILE* _fopen (const char* name, const char* mode, FILE* f);
+FILE* __fastcall__ _fopen (const char* name, const char* mode, FILE* f);
 /* Open the specified file and fill the descriptor values into f */
 
 FILE* _fdesc (void);

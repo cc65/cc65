@@ -988,7 +988,7 @@ static int primary (ExprDesc* lval)
     if (CurTok.Tok == TOK_SCONST) {
    	lval->Flags = E_MCONST | E_TLIT;
        	lval->ConstVal = CurTok.IVal;
-	lval->Type  = GetCharArrayType (strlen (GetLiteral (CurTok.IVal)));
+	lval->Type  = GetCharArrayType (GetLiteralPoolOffs () - CurTok.IVal);
     	NextToken ();
 	return 0;
     }

@@ -80,5 +80,5 @@ clean:
 	@if exist co65.exe del co65.exe
 
 strip:
-  	@-wstrip co65.exe
+	@-wstrip co65.exe
 

@@ -6,7 +6,7 @@
 
         .import         return0, popsreg, incsp2
         .importzp       sreg, ptr1, tmp1, tmp2
-       	.condes	       	mouse_irq, 2		; Export as IRQ handler
+       	.interruptor    mouse_irq               ; Export as IRQ handler
 
         .include        "mouse-kernel.inc"
 

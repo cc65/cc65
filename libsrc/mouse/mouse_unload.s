@@ -5,8 +5,6 @@
 ; /* Uninstall, then unload the currently loaded driver. */
 
 
-        .import         mouse_clear_ptr
-
         .include        "mouse-kernel.inc"
         .include        "modload.inc"
 

@@ -45,9 +45,6 @@
 
 
 
-/* Additional key defines */
-#define CH_ESC                  27
-
 /* Color defines */
 #define COLOR_BLACK  	       	0x00
 #define COLOR_WHITE  	       	0x01

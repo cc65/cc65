@@ -75,6 +75,7 @@ OBJS =	abend.obj	\
 	filepos.obj	\
 	fname.obj	\
 	hashstr.obj	\
+        matchpat.obj    \
 	print.obj	\
 	strbuf.obj	\
 	strutil.obj	\
@@ -103,7 +104,7 @@ clean:
 	@if exist *.obj del *.obj
 	@if exist $(LIB) del $(LIB)
 
-			 
+
 
 
 

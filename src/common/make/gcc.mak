@@ -19,6 +19,7 @@ OBJS =	abend.o		\
 	filepos.o	\
 	fname.o		\
 	hashstr.o	\
+        matchpat.o      \
 	print.o		\
 	strbuf.o	\
 	strutil.o	\

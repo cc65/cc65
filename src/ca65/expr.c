@@ -1815,11 +1815,14 @@ int IsConstExpr (ExprNode* Expr, long* Val)
 
 
 
-static void CheckByteExpr (const ExprNode* N, int* IsByte)
-/* Internal routine that is recursively called to check if there is a zeropage
- * symbol in the expression tree.
+static void CheckAddrSize (const ExprNode* N, unsigned char* AddrSize)
+/* Internal routine that is recursively called to check for the address size
+ * of the expression tree.
  */
 {
+    unsigned char A;
+    unsigned char Left, Right;
+
     if (N) {
     	switch (N->Op & EXPR_TYPEMASK) {
 
@@ -1827,30 +1830,68 @@ static void CheckByteExpr (const ExprNode* N, int* IsByte)
 	       	switch (N->Op) {
 
     	       	    case EXPR_SYMBOL:
-    	       		if (SymIsZP (N->V.Sym)) {
-    	       		    *IsByte = 1;
+    	       	    	if (SymIsZP (N->V.Sym)) {
+    	       	    	    if (*AddrSize < ADDR_SIZE_ZP) {
+                                *AddrSize = ADDR_SIZE_ZP;
+                            }
     	       	       	} else if (SymHasExpr (N->V.Sym)) {
-	       		    /* Check if this expression is a byte expression */
-	       		    CheckByteExpr (GetSymExpr (N->V.Sym), IsByte);
-	       		}
-	       		break;
+	       	    	    /* Check if this expression is a byte expression */
+	       	    	    CheckAddrSize (GetSymExpr (N->V.Sym), AddrSize);
+	       	    	} else {
+                            /* Undefined symbol, use absolute */
+                            if (*AddrSize < ADDR_SIZE_ABS) {
+                                *AddrSize = ADDR_SIZE_ABS;
+                            }
+                        }
+	       	    	break;
 
 	       	    case EXPR_SECTION:
-	       		if (GetSegAddrSize (N->V.SegNum) == ADDR_SIZE_ZP) {
-	       		    *IsByte = 1;
-	       		}
+                        A = GetSegAddrSize (N->V.SegNum);
+                        if (A > *AddrSize) {
+                            *AddrSize = A;
+                        }
 	       		break;
 
 	       	}
     	       	break;
 
     	    case EXPR_UNARYNODE:
-    	       	CheckByteExpr (N->Left, IsByte);
-    	       	break;
+                switch (N->Op) {
+
+                    case EXPR_BYTE0:
+                    case EXPR_BYTE1:
+                    case EXPR_BYTE2:
+                    case EXPR_BYTE3:
+                        /* No need to look at the expression */
+                        *AddrSize = ADDR_SIZE_ZP;
+                        break;
+
+                    case EXPR_WORD0:
+                    case EXPR_WORD1:
+                    case EXPR_FORCEWORD:
+                        /* No need to look at the expression */
+                        *AddrSize = ADDR_SIZE_ABS;
+                        break;
+
+                    case EXPR_FORCEFAR:
+                        /* No need to look at the expression */
+                        *AddrSize = ADDR_SIZE_FAR;
+                        break;
+
+                    default:
+                        CheckAddrSize (N->Left, AddrSize);
+                        break;
+                }
+                break;
 
     	    case EXPR_BINARYNODE:
-    	       	CheckByteExpr (N->Left, IsByte);
-    	       	CheckByteExpr (N->Right, IsByte);
+                Left = Right = ADDR_SIZE_DEFAULT;
+    	       	CheckAddrSize (N->Left, &Left);
+    	       	CheckAddrSize (N->Right, &Right);
+                A = (Left > Right)? Left : Right;
+                if (A > *AddrSize) {
+                    *AddrSize = A;
+                }
     	       	break;
 
     	    default:
@@ -1864,26 +1905,15 @@ static void CheckByteExpr (const ExprNode* N, int* IsByte)
 int IsByteExpr (ExprNode* Root)
 /* Return true if this is a byte expression */
 {
-    int IsByte;
     long Val;
 
     if (IsConstExpr (Root, &Val)) {
-       	IsByte = IsByteRange (Val);
-    } else if (Root->Op == EXPR_BYTE0 || Root->Op == EXPR_BYTE1 ||
-	       Root->Op == EXPR_BYTE2 || Root->Op == EXPR_BYTE3) {
-    	/* Symbol forced to have byte range */
-       	IsByte = 1;
+       	return IsByteRange (Val);
     } else {
-    	/* We have undefined symbols in the expression. Assume that the
-    	 * expression is a byte expression if there is at least one symbol
-    	 * declared as zeropage in it. Being wrong here is not a very big
-    	 * problem since the linker knows about all symbols and detects
-    	 * error like mixing absolute and zeropage labels.
-    	 */
-    	IsByte = 0;
-    	CheckByteExpr (Root, &IsByte);
+        unsigned char AddrSize = ADDR_SIZE_DEFAULT;
+        CheckAddrSize (Root, &AddrSize);
+        return (AddrSize == ADDR_SIZE_ZP);
     }
-    return IsByte;
 }
 
 

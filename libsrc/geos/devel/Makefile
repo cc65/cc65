@@ -37,4 +37,4 @@ TGIS = geos-tgi.tgi
 all: $(S_OBJS) $(EMDS) $(JOYS) $(TGIS)
 
 clean:
-	@rm -f *.~ core $(S_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
+	@$(RM) *.~ core $(S_OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)

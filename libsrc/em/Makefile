@@ -37,10 +37,7 @@ S_OBJS =       	em-kernel.o	\
 all:  	$(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f *~
-	@rm -f $(C_OBJS:.o=.s)
-	@rm -f $(C_OBJS)
-	@rm -f $(S_OBJS)
+	@$(RM) *~ $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) 
 
 zap:	clean
 

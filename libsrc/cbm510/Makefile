@@ -78,8 +78,8 @@ all:	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@rm -f $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
+	@$(RM) $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
 
 zap:	clean
-	@rm -f $(EMDS) $(JOYS) $(TGIS)
+	@$(RM) $(EMDS) $(JOYS) $(TGIS)
 

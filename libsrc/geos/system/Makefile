@@ -30,4 +30,4 @@ C_OBJS	=	systime.o
 all: $(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f *.~ $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) core
+	@$(RM) *.~ $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) core

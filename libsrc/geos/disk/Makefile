@@ -18,4 +18,4 @@ S_OBJS	= blkalloc.o calcblksfree.o changediskdevice.o chkdkgeos.o enterturbo.o e
 all: $(S_OBJS)
 
 clean:
-	@rm -f *.~ $(S_OBJS) core
+	@$(RM) *.~ $(S_OBJS) core

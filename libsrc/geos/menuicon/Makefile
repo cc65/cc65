@@ -14,4 +14,4 @@ S_OBJS	= domenu.o dopreviousmenu.o redomenu.o recovermenu.o recoverallmenus.o\
 all: $(S_OBJS)
 
 clean:
-	@rm -f *.~ $(S_OBJS) core
+	@$(RM) *.~ $(S_OBJS) core

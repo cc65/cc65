@@ -17,4 +17,4 @@ S_OBJS	= get1stdirentry.o getnxtdirentry.o\
 all: $(S_OBJS)
 
 clean:
-	@rm -f *.~ $(S_OBJS) core
+	@$(RM) *.~ $(S_OBJS) core

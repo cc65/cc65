@@ -79,7 +79,7 @@ S_OBJS =	c_acptr.o	\
 all:	$(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f *~ *.bck $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS)
+	@$(RM) *~ *.bck $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS)
 
 zap:	clean
 

@@ -14,4 +14,4 @@ S_OBJS	= cclear.o chline.o cvline.o cgetc.o clrscr.o color.o\
 all: $(S_OBJS)
 
 clean:
-	@rm -f *.~ $(S_OBJS) core
+	@$(RM) *.~ $(S_OBJS) core

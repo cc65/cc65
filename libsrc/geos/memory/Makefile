@@ -15,4 +15,4 @@ S_OBJS	= crc.o doublepop.o reuregs.o clearram.o fillram.o initram.o movedata.o\
 all: $(S_OBJS)
 
 clean:
-	@rm -f *.~ $(S_OBJS) core
+	@$(RM) *.~ $(S_OBJS) core

@@ -18,4 +18,4 @@ S_OBJS	= drawline.o drawpoint.o framerectangle.o hlineregs.o horizontalline.o\
 all: $(S_OBJS)
 
 clean:
-	@rm -f *.~ $(S_OBJS) core
+	@$(RM) *.~ $(S_OBJS) core

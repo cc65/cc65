@@ -17,4 +17,4 @@ S_OBJS	= startmousemode.o clearmousemode.o mouseup.o mouseoff.o\
 all: $(S_OBJS)
 
 clean:
-	@rm -f *.~ $(S_OBJS) core
+	@$(RM) *.~ $(S_OBJS) core

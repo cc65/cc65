@@ -51,7 +51,7 @@ S_OBJS  =       _scrsize.o      \
 all:   	$(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS)
+	@$(RM) $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS)
 
 zap:	clean
 

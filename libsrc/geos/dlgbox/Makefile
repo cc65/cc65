@@ -19,4 +19,4 @@ S_OBJS	= dodlgbox.o rstrfrmdialogue.o\
 all: $(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f core *.~ $(S_OBJS) $(C_OBJS:.o=.s) $(C_OBJS)
+	@$(RM) core *.~ $(S_OBJS) $(C_OBJS:.o=.s) $(C_OBJS)

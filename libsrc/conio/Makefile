@@ -33,7 +33,7 @@ OBJS =	_cursor.o	\
 all:  	$(OBJS)
 
 clean:
-	@rm -f *~ $(OBJS)
+	@$(RM) *~ $(OBJS)
 
 zap:	clean
 

@@ -24,5 +24,5 @@ clean:
 
 .PHONY: zap
 zap:	clean
-	@rm -f ../geos.lib ../geos.o
+	@$(RM) ../geos.lib ../geos.o
 

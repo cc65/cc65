@@ -214,7 +214,7 @@ OBJS = 	add.o		\
 all:   	$(OBJS)
 
 clean:
-	@rm -f *~ $(COBJS:.o=.s) $(OBJS)
+	@$(RM) *~ $(COBJS:.o=.s) $(OBJS)
 
 zap:	clean
 

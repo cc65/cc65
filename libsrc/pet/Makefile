@@ -51,7 +51,7 @@ OBJS =	_scrsize.o	\
 all:	$(OBJS)
 
 clean:
-	@rm -f $(OBJS)
+	@$(RM) $(OBJS)
 
 zap:	clean
 

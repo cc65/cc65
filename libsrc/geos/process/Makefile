@@ -13,4 +13,4 @@ S_OBJS	= processinitrestartenable.o processblock.o processfreeze.o processsleep.
 all: $(S_OBJS)
 
 clean:
-	@rm -f *.~ $(S_OBJS) core
+	@$(RM) *.~ $(S_OBJS) core

@@ -14,11 +14,12 @@
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
 C_OBJS = fclose.o fgets.o fprintf.o calloc.o _fopen.o\
-      	 fputs.o fread.o fwrite.o gets.o realloc.o bsearch.o strxfrm.o\
-      	 printf.o _hextab.o vfprintf.o fdopen.o strtok.o\
-    	 _afailed.o fopen.o fgetc.o fputc.o puts.o gets.o perror.o getchar.o\
-    	 _printf.o vprintf.o vsprintf.o sprintf.o abort.o qsort.o putchar.o\
-    	 errormsg.o cprintf.o vcprintf.o freopen.o locale.o
+	 fputs.o fread.o fwrite.o gets.o realloc.o bsearch.o strxfrm.o\
+	 printf.o _hextab.o vfprintf.o fdopen.o strtok.o\
+	 _afailed.o fopen.o fgetc.o fputc.o puts.o gets.o perror.o getchar.o\
+	 _printf.o vprintf.o vsprintf.o sprintf.o abort.o qsort.o putchar.o\
+	 errormsg.o cprintf.o vcprintf.o freopen.o locale.o fsetpos.o\
+	 fgetpos.o rewind.o fseek.o ftell.o
 
 S_OBJS =	_fdesc.o	\
 		_file.o 	\
@@ -43,7 +44,7 @@ S_OBJS =	_fdesc.o	\
 		isdigit.o 	\
 		isgraph.o	\
 		islower.o	\
-       	 	isprint.o	\
+	 	isprint.o	\
 		ispunct.o	\
 		isspace.o	\
 		isupper.o	\

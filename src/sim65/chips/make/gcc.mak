@@ -2,15 +2,19 @@
 # gcc Makefile for the sim65 chip plugins
 #
 
-# Library dir
+# Include directories
+COMMON  = ../../common
 SIM65	= ..
 
-CFLAGS 	= -g -O2 -Wall -W -I$(SIM65) -fpic
+CFLAGS 	= -g -O2 -Wall -W -I$(COMMON) -I$(SIM65) -fpic
 CC	= gcc
 EBIND	= emxbind
 LDFLAGS	=
 
-CHIPS  	=      	ram.so
+LIBS 	= $(COMMON)/common.a
+
+CHIPS  	=      	ram.so		\
+		stdio.so
 
 OBJS	= $(CHIPS:.so=.o)
 
@@ -24,9 +28,17 @@ all:	depend
 endif
 
 
+# Rules to make chips
+
 ram.so:         ram.o
-	$(CC) $(CFLAGS) -shared -o $@ $^
+	$(CC) $(CFLAGS) -shared -o $@ $(LIBS) $^
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
+
+stdio.so:	stdio.o
+	$(CC) $(CFLAGS) -shared -o $@ $(LIBS) $^
+	@if [ $(OS2_SHELL) ] ;	then $(EBIND) $@ ; fi
+
+# Admin stuff
 
 clean:
 	rm -f *~ core *.lst
@@ -40,6 +52,6 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(CHIPS:.so=.c)
 	@echo "Creating dependency information"
-	$(CC) -I$(SIM65) -MM $^ > .depend
+	$(CC) -I$(COMMON) -I$(SIM65) -MM $^ > .depend
 
 

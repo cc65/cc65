@@ -49,8 +49,10 @@ OBJS = 	_scrsize.o      \
        	dioread.o       \
        	diowrite.o      \
        	diowritev.o     \
+       	dosdetect.o     \
        	fdtable.o       \
        	getargs.o       \
+       	getdefdev.o     \
        	getfd.o         \
        	gotox.o         \
        	gotoy.o         \

@@ -61,8 +61,8 @@
 typedef struct FuncInfo FuncInfo;
 struct FuncInfo {
     const char*	    Name;	/* Function name */
-    unsigned char   Use;	/* Register usage */
-    unsigned char   Chg;	/* Changed/destroyed registers */
+    unsigned short  Use;	/* Register usage */
+    unsigned short  Chg;	/* Changed/destroyed registers */
 };
 
 static const FuncInfo FuncInfoTable[] = {
@@ -105,13 +105,13 @@ static const FuncInfo FuncInfoTable[] = {
     { "incax1",         REG_AX,         REG_AX          },
     { "incax2",         REG_AX,         REG_AX          },
     { "incsp1",		REG_NONE,	REG_NONE    	},
-    { "incsp2",		REG_NONE,	REG_Y 	    	},
+    { "incsp2",	    	REG_NONE,	REG_Y 	    	},
     { "incsp3",		REG_NONE,	REG_Y 	    	},
     { "incsp4",		REG_NONE,	REG_Y 	    	},
     { "incsp5",		REG_NONE,	REG_Y 	    	},
     { "incsp6",		REG_NONE,	REG_Y 	    	},
     { "incsp7",		REG_NONE,	REG_Y 	    	},
-    { "incsp8",		REG_NONE,	REG_Y 	    	},
+    { "incsp8",	    	REG_NONE,	REG_Y 	    	},
     { "ldaidx",         REG_AXY,        REG_AX          },
     { "ldauidx",        REG_AXY,        REG_AX          },
     { "ldax0sp",   	REG_Y,		REG_AX	    	},
@@ -185,7 +185,7 @@ static int CompareFuncInfo (const void* Key, const void* Info)
 
 
 
-void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
+void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
 /* For the given function, lookup register information and store it into
  * the given variables. If the function is unknown, assume it will use and
  * load all registers.
@@ -276,28 +276,28 @@ int IsZPName (const char* Name)
 
 
 
-static unsigned char GetRegInfo1 (CodeSeg* S,
-		   		  CodeEntry* E,
-		   		  int Index,
-		     		  Collection* Visited,
-		     		  unsigned char Used,
-		     		  unsigned char Unused);
+static unsigned GetRegInfo1 (CodeSeg* S,
+		      	     CodeEntry* E,
+		   	     int Index,
+		     	     Collection* Visited,
+		     	     unsigned Used,
+		     	     unsigned Unused);
 /* Recursively called subfunction for GetRegInfo. */
 
 
 
-static unsigned char GetRegInfo2 (CodeSeg* S,
-		    		  CodeEntry* E,
-		    		  int Index,
-		     		  Collection* Visited,
-		     		  unsigned char Used,
-		     		  unsigned char Unused)
+static unsigned GetRegInfo2 (CodeSeg* S,
+		      	     CodeEntry* E,
+		    	     int Index,
+		     	     Collection* Visited,
+		     	     unsigned Used,
+		     	     unsigned Unused)
 /* Recursively called subfunction for GetRegInfo. */
 {
     /* Follow the instruction flow recording register usage. */
     while (1) {
 
-	unsigned char R;
+	unsigned R;
 
 	/* Check if we have already visited the current code entry. If so,
 	 * bail out.
@@ -372,8 +372,8 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
     	    if (E->JumpTo) {
 
 	       	/* Recursively determine register usage at the branch target */
-		unsigned char U1;
-		unsigned char U2;
+		unsigned U1;
+		unsigned U2;
 
 		U1 = GetRegInfo1 (S, E->JumpTo->Owner, -1, Visited, Used, Unused);
 		if (U1 == REG_AXY) {
@@ -416,19 +416,19 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
 
 
 
-static unsigned char GetRegInfo1 (CodeSeg* S,
-		   		  CodeEntry* E,
-		   		  int Index,
-		     		  Collection* Visited,
-		     		  unsigned char Used,
-		     		  unsigned char Unused)
+static unsigned GetRegInfo1 (CodeSeg* S,
+		      	     CodeEntry* E,
+		   	     int Index,
+		     	     Collection* Visited,
+		     	     unsigned Used,
+		     	     unsigned Unused)
 /* Recursively called subfunction for GetRegInfo. */
 {
     /* Remember the current count of the line collection */
     unsigned Count = CollCount (Visited);
 
     /* Call the worker routine */
-    unsigned char R = GetRegInfo2 (S, E, Index, Visited, Used, Unused);
+    unsigned R = GetRegInfo2 (S, E, Index, Visited, Used, Unused);
 
     /* Restore the old count, unmarking all new entries */
     unsigned NewCount = CollCount (Visited);
@@ -444,14 +444,14 @@ static unsigned char GetRegInfo1 (CodeSeg* S,
 
 
 
-unsigned char GetRegInfo (struct CodeSeg* S, unsigned Index)
+unsigned GetRegInfo (struct CodeSeg* S, unsigned Index)
 /* Determine register usage information for the instructions starting at the
  * given index.
  */
 {
-    CodeEntry*	    E;
-    Collection	    Visited;	/* Visited entries */
-    unsigned char   R;
+    CodeEntry* 	    E;
+    Collection 	    Visited;	/* Visited entries */
+    unsigned        R;
 
     /* Get the code entry for the given index */
     if (Index >= CS_GetEntryCount (S)) {
@@ -496,6 +496,7 @@ int RegYUsed (struct CodeSeg* S, unsigned Index)
 {
     return (GetRegInfo (S, Index) & REG_Y) != 0;
 }
+
 
 
 

@@ -49,37 +49,48 @@ struct CodeSeg;
 
 
 /*****************************************************************************/
-/*  	       	 	  	     Data				     */
+/*  	       	 	  	     Data			       	     */
 /*****************************************************************************/
 
 
 
 /* Defines for registers. */
-#define REG_NONE	0x00U
-#define REG_A		0x01U
-#define REG_X		0x02U
-#define REG_Y		0x04U
-#define REG_SREG_LO	0x08U
-#define REG_SREG_HI	0x10U
-#define REG_TMP1	0x20U
-#define REG_PTR1_LO	0x40U
-#define REG_PTR1_HI	0x80U
+#define REG_NONE       	0x0000U
+#define REG_A  	       	0x0001U
+#define REG_X  	       	0x0002U
+#define REG_Y  	       	0x0004U
+#define REG_SREG_LO    	0x0008U
+#define REG_SREG_HI    	0x0010U
+#define REG_TMP1       	0x0020U
+#define REG_TMP2        0x0040U
+#define REG_TMP3        0x0080U
+#define REG_PTR1_LO    	0x0100U
+#define REG_PTR1_HI    	0x0200U
+#define REG_PTR2_LO    	0x0400U
+#define REG_PTR2_HI    	0x0800U
+#define REG_PTR3_LO    	0x1000U
+#define REG_PTR3_HI    	0x2000U
+#define REG_PTR4_LO    	0x4000U
+#define REG_PTR4_HI    	0x8000U
 #define	REG_AX		(REG_A | REG_X)
 #define REG_EAX         (REG_A | REG_X | REG_SREG_LO | REG_SREG_HI)
 #define REG_XY		(REG_X | REG_Y)
 #define REG_AXY		(REG_A | REG_X | REG_Y)
 #define REG_SREG        (REG_SREG_LO | REG_SREG_HI)
 #define REG_PTR1        (REG_PTR1_LO | REG_PTR1_HI)
+#define REG_PTR2        (REG_PTR2_LO | REG_PTR2_HI)
+#define REG_PTR3        (REG_PTR3_LO | REG_PTR3_HI)
+#define REG_PTR4        (REG_PTR4_LO | REG_PTR4_HI)
 
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code				     */
+/*     	       	      	  	     Code			       	     */
 /*****************************************************************************/
 
 
 
-void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg);
+void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg);
 /* For the given function, lookup register information and store it into
  * the given variables. If the function is unknown, assume it will use and
  * load all registers.
@@ -88,7 +99,7 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg);
 int IsZPName (const char* Name);
 /* Return true if the given name is a zero page symbol */
 
-unsigned char GetRegInfo (struct CodeSeg* S, unsigned Index);
+unsigned GetRegInfo (struct CodeSeg* S, unsigned Index);
 /* Determine register usage information for the instructions starting at the
  * given index.
  */

@@ -71,9 +71,9 @@ struct CodeEntry {
     unsigned long    	Num;		/* Numeric argument */
     unsigned short   	Flags;		/* Flags */
     unsigned short      Info;		/* Additional code info */
+    unsigned short      Use;		/* Registers used */
+    unsigned short      Chg;		/* Registers changed/destroyed */
     unsigned char    	Size;		/* Estimated size */
-    unsigned char    	Use;		/* Registers used */
-    unsigned char    	Chg;		/* Registers changed/destroyed */
     CodeLabel*	     	JumpTo;		/* Jump label */
     Collection	     	Labels;		/* Labels for this instruction */
     LineInfo*           LI;             /* Source line info for this insn */

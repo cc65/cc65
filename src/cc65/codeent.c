@@ -306,7 +306,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
     RegContents* Out;
 
     /* Function register usage */
-    unsigned char Use, Chg;
+    unsigned short Use, Chg;
 
     /* If we don't have a register info struct, allocate one. */
     if (E->RI == 0) {

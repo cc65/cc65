@@ -15,7 +15,7 @@
 ;
 
 	.import		findfreeiocb
-	.import		__seterrno, __do_oserror, __oserror
+	.import		__do_oserror
 	.import		fddecusage
 	.import		fdtoiocb
 	.import		__inviocb
@@ -60,16 +60,8 @@ rshand:	.word	$ffff
 .proc	_rs232_init
 
 	jsr	findfreeiocb
-	beq	iocbok		; we found one
-
-	lda	#<EMFILE	; "too many open files"
-	ldx	#>EMFILE
-seterr:	jsr	__seterrno
-	lda	#$FF
-	tax
-	rts			; return -1
-
-iocbok:	txa
+	bne	init_err
+	txa
 	tay			; move iocb # into Y
 	lda	#3
 	sta	tmp3		; name length + 1
@@ -102,18 +94,21 @@ doopen:	tax
 	sta	ICBLL,x		; zap buf len
 	sta	ICBLH,x
 	jsr	CIOV
-	bmi	cioerr
+	bmi	cioerr1
 
 	lda	tmp2		; get fd
 	sta	rshand
 	ldx	#0
 	stx	rshand+1
 	txa
-	stx	__oserror
 	rts
 
-cioerr:	jsr	fddecusage	; decrement usage counter of fd as open failed
-	jmp	__do_oserror
+cioerr1:jsr	fddecusage	; decrement usage counter of fd as open failed
+
+init_err:
+	ldx	#0
+	lda	#RS_ERR_INIT_FAILED
+	rts
 
 .endproc	; _rs232_init
 

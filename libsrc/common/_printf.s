@@ -259,7 +259,7 @@ Save:	lda	regbank,y
 	sta	Format
 	stx	Format+1
 
-	jsr	popax 	 		; Output descriptor
+  	jsr	popax 	 		; Output descriptor
       	sta	OutData
 	stx	OutData+1
 
@@ -527,7 +527,7 @@ CheckInt:
 
 ; Integer argument
 
-   	jsr	GetSignedArg      		; Get argument as a long
+   	jsr	GetSignedArg           	; Get argument as a long
    	ldy	sreg+1	 	    	; Check sign
    	bmi	@Int1
    	ldy	Leader
@@ -562,28 +562,43 @@ CheckCount:
 
 CheckOctal:
 	cmp	#'o'
-	bne	CheckString
+	bne	CheckPointer
 
 ; Integer in octal representation
 
-	jsr	GetSignedArg		; Get argument as a long
-       	ldy	AltForm			; Alternative form?
-	beq	@Oct1  			; Jump if no
-	pha    	       			; Save low byte of value
+	jsr	GetSignedArg	   	; Get argument as a long
+       	ldy	AltForm		   	; Alternative form?
+	beq	@Oct1  		   	; Jump if no
+	pha    	       		   	; Save low byte of value
 	stx	tmp1
 	ora	tmp1
 	ora	sreg
 	ora	sreg+1
 	ora	Prec
-	ora	Prec+1 			; Check if value or Prec != 0
+	ora	Prec+1 		   	; Check if value or Prec != 0
 	beq	@Oct1
 	lda	#'0'
 	jsr	PutBuf
-	pla	       			; Restore low byte
+	pla	       		   	; Restore low byte
 
-@Oct1:	ldy    	#8     			; Load base
-	jsr	ltoa			; Push arguments, call _ltoa
+@Oct1:	ldy    	#8     		   	; Load base
+	jsr	ltoa		   	; Push arguments, call _ltoa
     	jmp	HaveArg
+
+; Check for a pointer specifier (%p)
+
+CheckPointer:
+	cmp	#'p'
+	bne	CheckString
+
+; It's a pointer. Use %#x conversion
+
+	ldx	#0
+	stx	IsLong			; IsLong = 0;
+	inx
+       	stx	AltForm			; AltForm = 1;
+	lda	#'x'
+	bne	IsHex			; Branch always
 
 ; Check for a string specifier (%s)
 
@@ -615,13 +630,13 @@ CheckUnsigned:
 
 CheckHex:
 	cmp	#'x'
-	beq	@IsHex
+	beq	IsHex
 	cmp	#'X'
 	bne	UnknownFormat
 
 ; Hexadecimal integer
 
-@IsHex:	pha	       			; Save the format spec
+IsHex:	pha	       			; Save the format spec
 	lda	AltForm
 	beq	@L1
 	lda	#'0'
@@ -641,7 +656,7 @@ CheckHex:
 	jsr	_strlower		; Make characters lower case
 @L2:	jmp	HaveArg
 
-; Unsigned format character, skip it
+; Unknown format character, skip it
 
 UnknownFormat:
 	jmp	MainLoop

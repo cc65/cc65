@@ -38,6 +38,7 @@ _signal:
         asl     a               ; Prepare for word access
         tax
 
+        sei                     ; Disable interrupts in case of async signals
         lda     sigtable,x
         pha
         lda     ptr1
@@ -46,6 +47,7 @@ _signal:
         pha
         lda     ptr1+1
         sta     sigtable+1,x
+        cli                     ; Reenable interrupts
 
 ; Get the old value from the stack and return it
 

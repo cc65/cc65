@@ -10,8 +10,8 @@
 
 .proc   screensize
 
-        ldx     #XSIZE
-        ldy     #YSIZE
+        ldx     MAX_X
+        ldy     MAX_Y
         rts
 
 .endproc

@@ -20,12 +20,6 @@ MEMSIZE	=	$73		; Highest free RAM location
 BRKVec  =       $03F0           ; Break vector
 RESTOR	=	$03D0           ; Goto Dos
 
-; ---------------------------------------------------------------------------
-; Screen size
-
-XSIZE           = 40
-YSIZE           = 24
-
 ;-----------------------------------------------------------------------------
 ; Hardware
 

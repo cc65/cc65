@@ -4,7 +4,7 @@
 
 <title>Atari specific information for cc65
 <author>Shawn Jefferson, <htmlurl url="mailto:shawnjefferson@24fightingchickens.com" name="shawnjefferson@24fightingchickens.com">
-Christian Groessler, <htmlurl url="cpg@aladdin.de" name="cpg@aladdin.de">
+Christian Groessler, <htmlurl url="mailto:cpg@aladdin.de" name="cpg@aladdin.de">
 <date>16-Oct-2003
 
 <abstract>
@@ -47,7 +47,7 @@ and is calculated using __CODE_LOAD__ in crt0.s also.
 <sect>Memory layout<p>
 
 The default linker script assumes that the BASIC ROM is disabled (or
-the BASIC cartridge unplugged). This gives a unsable memory range from
+the BASIC cartridge unplugged). This gives a usable memory range from
 &dollar;2E00 - &dollar;BC1F. The library startup code examines the
 current memory configuration, which depends on the size of the
 installed memory and cartridges present, by inspecting the value in

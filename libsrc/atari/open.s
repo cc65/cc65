@@ -16,7 +16,7 @@
 	.import	clriocb
 	.import	fddecusage,newfd
 	.import	findfreeiocb
-	.import	__do_oserror,__seterrno,incsp4
+	.import	__do_oserror,incsp4
 	.import	ldaxysp,addysp
 	.import	__oserror
 	.importzp tmp4,tmp2
@@ -39,7 +39,6 @@ parmok:	jsr	findfreeiocb
 	beq	iocbok		; we found one
 
 	lda	#<EMFILE	; "too many open files"
-	ldx	#>EMFILE
 seterr:	jsr	__seterrno
 	jsr	incsp4		; clean up stack
 	lda	#$FF

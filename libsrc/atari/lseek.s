@@ -10,7 +10,7 @@
  	.export		_lseek
 	.import		incsp6,__oserror
 	.import		__inviocb,ldax0sp,ldaxysp,fdtoiocb
-	.import		__seterrno,__dos_type
+	.import		__dos_type
 	.import		fd_table
 	.importzp	sreg,ptr1,ptr2,ptr3,ptr4
 	.importzp	tmp1,tmp2,tmp3
@@ -21,12 +21,10 @@
 ; seeking not supported, return -1 and ENOSYS errno value
 no_supp:jsr	incsp6
 	lda	#<ENOSYS
-	ldx	#>ENOSYS
-	jsr	__seterrno
-	ldx	#0
-	stx	__oserror
-	dex
-	txa
+	jsr	__seterrno      ; set __errno, return zero in A
+       	sta	__oserror
+	lda     #$FF
+	tax
 	sta	sreg
 	sta	sreg+1
 	rts

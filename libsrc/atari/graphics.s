@@ -11,7 +11,7 @@
 	.constructor	initscrmem,28
 
 	.import	findfreeiocb
-	.import	__seterrno,__do_oserror,__oserror
+	.import	__do_oserror,__oserror
 	.import	fddecusage
 	.import	clriocb
 	.import	fdtoiocb
@@ -46,7 +46,6 @@ parmok:	jsr	findfreeiocb
 	beq	iocbok		; we found one
 
 	lda	#<EMFILE	; "too many open files"
-	ldx	#>EMFILE
 seterr:	jsr	__seterrno
 	lda	#$FF
 	tax

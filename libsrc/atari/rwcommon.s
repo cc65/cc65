@@ -1,4 +1,4 @@
-;				 
+;
 ; common iocb setup routine for read, write
 ; expects __fastcall__ parameters (int fd, void *buf, int count)
 ;
@@ -47,17 +47,12 @@ iocberr:jsr	incsp4		; pop args
 ; this routine updates errno.  do a JMP here right after calling
 ; CIOV.	 we expect status in Y.
 ;
-	.export __do_oserror,__seterrno,__inviocb
+	.export __do_oserror,__inviocb
 __do_oserror:
 	sty	__oserror	; save os dependent error code
 retminus:
 	lda	#$FF
 	tax			; return -1
-	rts
-
-__seterrno:
-	sta	__errno
-	stx	__errno+1
 	rts
 
 ;
@@ -66,6 +61,5 @@ __seterrno:
 
 __inviocb:
 	lda	#<EINVAL
-	ldx	#>EINVAL
 	jsr	__seterrno
 	jmp	retminus	; return -1

@@ -247,6 +247,49 @@ function.
 
 <sect1><tt/stdio.h/<label id="stdio.h"><p>
 
+<itemize>
+<item><ref id="clearerr" name="clearerr">
+<!-- <item><ref id="fclose" name="fclose"> -->
+<!-- <item><ref id="fdopen" name="fdopen"> -->
+<item><ref id="feof" name="feof">
+<item><ref id="ferror" name="ferror">
+<!-- <item><ref id="fflush" name="fflush"> -->
+<!-- <item><ref id="fgetc" name="fgetc"> -->
+<!-- <item><ref id="fgetpos" name="fgetpos"> -->
+<!-- <item><ref id="fgets" name="fgets"> -->
+<item><ref id="fileno" name="fileno">
+<!-- <item><ref id="flushall" name="flushall"> -->
+<!-- <item><ref id="fopen" name="fopen"> -->
+<!-- <item><ref id="fprintf" name="fprintf"> -->
+<!-- <item><ref id="fputc" name="fputc"> -->
+<!-- <item><ref id="fputs" name="fputs"> -->
+<!-- <item><ref id="fread" name="fread"> -->
+<!-- <item><ref id="freopen" name="freopen"> -->
+<!-- <item><ref id="fscanf" name="fscanf"> -->
+<!-- <item><ref id="fseek" name="fseek"> -->
+<!-- <item><ref id="fsetpos" name="fsetpos"> -->
+<!-- <item><ref id="ftell" name="ftell"> -->
+<!-- <item><ref id="fwrite" name="fwrite"> -->
+<!-- <item><ref id="getc" name="getc"> -->
+<!-- <item><ref id="getchar" name="getchar"> -->
+<!-- <item><ref id="gets" name="gets"> -->
+<!-- <item><ref id="printf" name="printf"> -->
+<!-- <item><ref id="putc" name="putc"> -->
+<!-- <item><ref id="putchar" name="putchar"> -->
+<!-- <item><ref id="puts" name="puts"> -->
+<!-- <item><ref id="rename" name="rename"> -->
+<!-- <item><ref id="rewind" name="rewind"> -->
+<!-- <item><ref id="scanf" name="scanf"> -->
+<!-- <item><ref id="sprintf" name="sprintf"> -->
+<!-- <item><ref id="sscanf" name="sscanf"> -->
+<!-- <item><ref id="vfprintf" name="vfprintf"> -->
+<!-- <item><ref id="vfscanf" name="vfscanf"> -->
+<!-- <item><ref id="vprintf" name="vprintf"> -->
+<!-- <item><ref id="vscanf" name="vscanf"> -->
+<!-- <item><ref id="vsprintf" name="vsprintf"> -->
+<!-- <item><ref id="vsscanf" name="vsscanf"> -->
+</itemize>
+
 
 <sect1><tt/stdlib.h/<label id="stdlib.h"><p>
 
@@ -265,62 +308,22 @@ function.
 <item><ref id="atol" name="atol">
 <item><ref id="bsearch" name="bsearch">
 <item><ref id="calloc" name="calloc">
-<!-- <item><ref id="clearerr" name="clearerr"> -->
 <item><ref id="div" name="div">
 <item><ref id="exit" name="exit">
-<!-- <item><ref id="fclose" name="fclose"> -->
-<!-- <item><ref id="fdopen" name="fdopen"> -->
-<!-- <item><ref id="feof" name="feof"> -->
-<!-- <item><ref id="ferror" name="ferror"> -->
-<!-- <item><ref id="fflush" name="fflush"> -->
-<!-- <item><ref id="fgetc" name="fgetc"> -->
-<!-- <item><ref id="fgetpos" name="fgetpos"> -->
-<!-- <item><ref id="fgets" name="fgets"> -->
-<!-- <item><ref id="fileno" name="fileno"> -->
-<!-- <item><ref id="flushall" name="flushall"> -->
-<!-- <item><ref id="fopen" name="fopen"> -->
-<!-- <item><ref id="fprintf" name="fprintf"> -->
-<!-- <item><ref id="fputc" name="fputc"> -->
-<!-- <item><ref id="fputs" name="fputs"> -->
-<!-- <item><ref id="fread" name="fread"> -->
 <item><ref id="free" name="free">
-<!-- <item><ref id="freopen" name="freopen"> -->
-<!-- <item><ref id="fscanf" name="fscanf"> -->
-<!-- <item><ref id="fseek" name="fseek"> -->
-<!-- <item><ref id="fsetpos" name="fsetpos"> -->
-<!-- <item><ref id="ftell" name="ftell"> -->
-<!-- <item><ref id="fwrite" name="fwrite"> -->
-<!-- <item><ref id="getc" name="getc"> -->
-<!-- <item><ref id="getchar" name="getchar"> -->
-<!-- <item><ref id="gets" name="gets"> -->
 <item><ref id="getenv" name="getenv">
 <item><ref id="itoa" name="itoa">
 <item><ref id="labs" name="labs">
 <item><ref id="ltoa" name="ltoa">
 <item><ref id="malloc" name="malloc">
 <item><ref id="perror" name="perror">
-<!-- <item><ref id="printf" name="printf"> -->
-<!-- <item><ref id="putc" name="putc"> -->
-<!-- <item><ref id="putchar" name="putchar"> -->
-<!-- <item><ref id="puts" name="puts"> -->
 <item><ref id="qsort" name="qsort">
 <item><ref id="rand" name="rand">
 <item><ref id="realloc" name="realloc">
 <item><ref id="remove" name="remove">
-<!-- <item><ref id="rename" name="rename"> -->
-<!-- <item><ref id="rewind" name="rewind"> -->
-<!-- <item><ref id="scanf" name="scanf"> -->
-<!-- <item><ref id="sprintf" name="sprintf"> -->
 <item><ref id="srand" name="srand">
-<!-- <item><ref id="sscanf" name="sscanf"> -->
 <item><ref id="ultoa" name="ultoa">
 <item><ref id="utoa" name="utoa">
-<!-- <item><ref id="vfprintf" name="vfprintf"> -->
-<!-- <item><ref id="vfscanf" name="vfscanf"> -->
-<!-- <item><ref id="vprintf" name="vprintf"> -->
-<!-- <item><ref id="vscanf" name="vscanf"> -->
-<!-- <item><ref id="vsprintf" name="vsprintf"> -->
-<!-- <item><ref id="vsscanf" name="vsscanf"> -->
 </itemize>
 
 
@@ -1226,6 +1229,28 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>clearerr<label id="clearerr"><p>
+
+<quote>
+<descrip>
+<tag/Function/Clear error and end-of-file status of a stream.
+<tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
+<tag/Declaration/<tt/void __fastcall__ clearerr (FILE* f);/
+<tag/Description/<tt/clearerr/ clears the error and end-of-file status
+indicators for the stream <tt/f/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="feof" name="feof">,
+<ref id="ferror" name="ferror">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>clrscr<label id="clrscr"><p>
 
 <quote>
@@ -1258,7 +1283,7 @@ reading the <tt/errno/ variable.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
-<tag/Availability/POSIX
+<tag/Availability/POSIX 1003.1
 <tag/See also/
 <ref id="creat" name="creat">,
 <ref id="open" name="open">
@@ -1283,7 +1308,7 @@ associated with it. On error, -1 is returned and an error code is stored in
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
-<tag/Availability/POSIX
+<tag/Availability/POSIX 1003.1
 <tag/See also/
 <ref id="close" name="close">,
 <ref id="open" name="open">
@@ -1789,6 +1814,79 @@ will nearly double the speed compared to slow mode.
 <tag/See also/
 <ref id="slow" name="slow">,
 <ref id="toggle_videomode" name="toggle_videomode">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>feof<label id="feof"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the end-of-file indicator of a stream.
+<tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
+<tag/Declaration/<tt/int __fastcall__ feof (FILE* f);/
+<tag/Description/<tt/feof/ tests the end-of-file indicator ofthe stream
+<tt/f/, and returns a non zero value if it is set.
+<tag/Limits/<itemize>
+<item>The indicator is set only after a read past the end of a file is
+attempted.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="feof" name="clearerr">,
+<ref id="ferror" name="ferror">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>ferror<label id="ferror"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the error indicator of a stream.
+<tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
+<tag/Declaration/<tt/int __fastcall__ ferror (FILE* f);/
+<tag/Description/<tt/ferror/ tests the error indicator of the stream
+<tt/f/, and returns a non zero value if it is set.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="feof" name="clearerr">,
+<ref id="ferror" name="feof">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>fileno<label id="fileno"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the file handle used by a stream.
+<tag/Header/<tt/<ref id="stdio.h" name="stdio.h">/
+<tag/Declaration/<tt/int __fastcall__ fileno (FILE* f);/
+<tag/Description/The <tt/fileno/ function returns the file handle used
+internally by a C stream. This file handle (an integer) can be used as a
+handle for the POSIX input/output functions.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+<item>Mixing C file I/O functions and POSIX file I/O functions for the same
+file may have unpredictable results.
+</itemize>
+<tag/Availability/POSIX 1003.1
+<tag/See also/
+<ref id="creat" name="creat">,
+<ref id="open" name="open"> <!-- , -->
+<!-- <ref id="read" name="read">, -->
+<!-- <ref id="write" name="write"> -->
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2737,7 +2835,7 @@ associated with it. On error, -1 is returned and an error code is stored in
 open, which is used as the permission mask when a new file is created. While
 cc65 allows to pass this argument, it is ignored.
 </itemize>
-<tag/Availability/POSIX
+<tag/Availability/POSIX 1003.1
 <tag/See also/
 <ref id="close" name="close">,
 <ref id="creat" name="creat">
@@ -3089,7 +3187,7 @@ seconds have elapsed.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
-<tag/Availability/POSIX
+<tag/Availability/POSIX 1003.1
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3811,8 +3909,11 @@ name="remove">/ instead, which is a native ANSI C function and does the same.
 availability of file I/O).
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
+<item>Instead of <tt/unlink/, <tt/<ref id="remove" name="remove">/ should be
+used, which has the same semantics, but is more portable, because it conforms
+to the ISO C standard.
 </itemize>
-<tag/Availability/POSIX
+<tag/Availability/POSIX 1003.1
 <tag/See also/
 <ref id="remove" name="remove">
 <tag/Example/

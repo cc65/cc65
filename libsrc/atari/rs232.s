@@ -18,9 +18,10 @@
 	.import		__seterrno, __do_oserror, __oserror
 	.import		fddecusage
 	.import		fdtoiocb
+	.import		__inviocb
 	.import		clriocb
 	.import		newfd
-	.import		_close, pushax, popax
+	.import		_close, pushax, popax, popa
 	.importzp	ptr1, tmp2, tmp3
 
 	.export	       	_rs232_init, _rs232_params, _rs232_done, _rs232_get
@@ -35,10 +36,10 @@ rdev:	.byte	"R:", ATEOL, 0
 
 	.bss
 
-RECVBUF_SZ = 256
-
 ; receive buffer
+RECVBUF_SZ = 256
 recv_buf: .res	RECVBUF_SZ
+
 cm_run:	.res	1	; concurrent mode running?
 
 	.data
@@ -119,33 +120,23 @@ cioerr:	jsr	fddecusage	; decrement usage counter of fd as open failed
 ;----------------------------------------------------------------------------
 ;
 ; unsigned char __fastcall__ rs232_params (unsigned char params, unsigned char parity);
-; /* Set the port parameters. Use a combination of the #defined values above. */
 ;
 ; Set communication parameters.
 ;
-; @@@ C64 values @@@ fixit
-; baud rates              stops     word    |   parity
-; ---------------------   -----     -----   |   ---------
-; $00=50     $08=9600     $00=1     $00=8   |   $00=none
-; $01=110    $09=19200    $80=2     $20=7   |   $20=odd
-; $02=134.5  $0a=38400              $40=6   |   $60=even
-; $03=300    $0b=57600              $60=5   |   $A0=mark
-; $04=600    $0c=115200                     |   $E0=space
-; $05=1200   $0d=230400
-; $06=2400   $0e=future
-; $07=4800   $0f=future
+; params contains baud rate, stop bits and word size
+; parity contains parity
+;
+; 850 manual documents restrictions on the baud rate (not > 300), when not
+; using 8 bit word size. So only 8 bit is currently tested.
 ;
 
-; we don't support word sizes != 8 (will never)
-; ignore parity for now, always none
-; ignore baud rate for now, always 9600
-
 ; shouldn't this come from a "rs232.inc" ??
-	ErrNotInitialized 	= $01
-	ErrNoData         	= $04
+ErrNotInitialized 	= $01
+ErrNoData         	= $04
 
 .proc	_rs232_params
 
+	sta	tmp2
 	lda	rshand
 	cmp	#$ff
 	bne	work		; work only if initialized
@@ -154,7 +145,7 @@ cioerr:	jsr	fddecusage	; decrement usage counter of fd as open failed
 work:	lda	rshand
 	ldx	#0
 	jsr	fdtoiocb	; get iocb index into X
-;	bmi	inverr		; !?!?
+	bmi	inverr		; shouldn't happen
 	tax
 
 	; set handshake lines
@@ -170,29 +161,37 @@ work:	lda	rshand
 	sta	ICBAH,x
 	sta	ICAX2,x
 	jsr	CIOV
+	bmi	cioerr
 
 	; set baud rate, word size, stop bits and ready monitoring
 
 	lda	#36		; xio 36, baud rate
 	sta	ICCOM,x
-	lda	#14		; 9600 baud
+	jsr	popa		; get parameter
 	sta	ICAX1,x
 	;ICAX2 = 0, monitor nothing
 	jsr	CIOV
+	bmi	cioerr
 
 	; set translation and parity
 
 	lda	#38		; xio 38, translation and parity
 	sta	ICCOM,x
-	lda	#32		; no translation, no parity
+	lda	tmp2
+	ora	#32		; no translation
 	sta	ICAX1,x
 	jsr	CIOV
+	bmi	cioerr
 
 	lda	#0
 done:	ldx	#0
 	rts
 
+inverr:	jmp	__inviocb
+
 .endproc	;_rs232_params
+
+cioerr:	jmp	__do_oserror
 
 
 ;----------------------------------------------------------------------------
@@ -209,12 +208,8 @@ done:	ldx	#0
 
 	lda	rshand
 	cmp	#$ff
-;	bne	work
-;	lda	rshand+1
-;	cmp	#$ff
 	beq	done
-work:	lda	rshand
-	ldx	rshand+1
+work:	ldx	rshand+1
 	jsr	pushax
 	jsr	_close
 	pha
@@ -241,8 +236,6 @@ done:	rts
 ;  */
 ;
 
-.import _cputc
-
 .proc	_rs232_get
 
 	ldy	rshand
@@ -267,26 +260,11 @@ go:	; check whether there is any input available
 	lda	#STATIS		; status request, returns bytes pending
 	sta	ICCOM,x
 	jsr	CIOV
-;	bmi	cioerr		; @@@ error handling
+	bmi	cioerr		; @@@ error handling
 
 	lda	DVSTAT+1	; get byte count pending
 	ora	DVSTAT+2
 	beq	nix_da		; no input waiting...
-
-.ifdef DEBUG
-	pha
-	txa
-	pha
-	tya
-	pha
-	lda	#'D'
-	jsr	_cputc
-	pla
-	tay
-	pla
-	tax
-	pla
-.endif
 
 	; input is available: get it!
 	
@@ -298,7 +276,7 @@ go:	; check whether there is any input available
 	sta	ICBAL,x
 	sta	ICBAH,x
 	jsr	CIOV		; go get it
-;	bmi	cioerr		; @@@ error handling
+	bmi	cioerr		; @@@ error handling
 
 	ldx	#0
 	sta	(ptr1,x)	; return received byte

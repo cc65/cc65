@@ -19,19 +19,25 @@
 	.exportzp   	tmp1, tmp2, tmp3, tmp4
 	.exportzp   	regbank, zpspace
 
-sp     	=      	$02  	       	; stack pointer
-sreg	=  	$04  	       	; secondary register/high 16 bit for longs
-regsave	=      	$06  	       	; slot to save/restore (E)AX into
-ptr1	=	$0A  	       	;
-ptr2	=	$0C
-ptr3	=	$0E
-ptr4	=	$10
-tmp1	=	$12
-tmp2	=	$13
-tmp3	=	$14
-tmp4	=	$15
-regbank =      	$16 	       	; 6 byte register bank
-zpspace	=	$1A    		; Zero page space allocated
+.zeropage
+
+zpstart	= *
+sp:	      	.res   	2 	; Stack pointer
+sreg:	      	.res	2	; Secondary register/high 16 bit for longs
+regsave:      	.res	2	; slot to save/restore (E)AX into
+ptr1:	      	.res	2
+ptr2:	      	.res	2
+ptr3:	      	.res	2
+ptr4:	      	.res	2
+tmp1:	      	.res	1
+tmp2:	      	.res	1
+tmp3:	      	.res	1
+tmp4:	      	.res	1
+regbank:      	.res	6	; 6 byte register bank
+
+zpspace	= * - zpstart		; Zero page space allocated
+
+.code
 
 ; ------------------------------------------------------------------------
 ; BASIC header with a SYS call

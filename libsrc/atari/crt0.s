@@ -26,20 +26,27 @@
 	.exportzp	tmp1, tmp2, tmp3, tmp4
 	.exportzp	fntemp, regbank, zpspace
 
-sp	= $D2		; (2bytes) stack pointer
-sreg	= $D4		; (2bytes) secondary register/high 16 bit for longs
-regsave = $D6		; (4bytes) slot to save/restore (E)AX into
-ptr1	= $DA		; (2bytes)
-ptr2	= $DC		; (2bytes)
-ptr3	= $DE		; (2bytes)
-ptr4	= $E0		; (2bytes)
-tmp1	= $E2		; (1byte)
-tmp2	= $E3		; (1byte)
-tmp3	= $E4		; (1byte)
-tmp4	= $E5		; (1byte)
-fntemp	= $E6		; (2bytes) pointer to file name
-regbank = $E8		; (6bytes) 6 byte register bank
-zpspace = $EE - sp	; Zero page space allocated
+
+.zeropage
+
+zpstart	= *
+sp:	      	.res   	2 	; Stack pointer
+sreg:	      	.res	2	; Secondary register/high 16 bit for longs
+regsave:      	.res	2	; slot to save/restore (E)AX into
+ptr1:	      	.res	2
+ptr2:	      	.res	2
+ptr3:	      	.res	2
+ptr4:	      	.res	2
+tmp1:	      	.res	1
+tmp2:	      	.res	1
+tmp3:	      	.res	1
+tmp4:	      	.res	1
+fntemp:		.res	2	; Pointer to file name
+regbank:      	.res	6	; 6 byte register bank
+
+zpspace	= * - zpstart		; Zero page space allocated
+
+.code
 
 ; ------------------------------------------------------------------------
 ; EXE header
@@ -86,12 +93,12 @@ L1:	lda	sp,y
 	sta	appmsav+1
 
 	jsr	getmemtop	; adjust for graphics mode to use
-	
+
 	sta	sp
 	sta	APPMHI
 	stx	sp+1		; Set argument stack ptr
 	stx	APPMHI+1
-	
+
 ; set left margin to 0
 
 	lda	LMARGN
@@ -104,7 +111,7 @@ L1:	lda	sp,y
 	ldx	SHFLOK
 	stx	old_shflok
 	sta	SHFLOK
-	
+
 ; Initialize the heap
 
 	jsr	__hinit
@@ -160,7 +167,7 @@ _exit:	jsr	doatexit	; call exit functions
 	sta	SHFLOK
 
 ; restore APPMHI
-	
+
 	lda	appmsav
 	sta	APPMHI
 	lda	appmsav+1
@@ -259,9 +266,9 @@ grmemusage:
 ;  220 GRAPHICS 0
 ;  230 FOR I=0 TO 31:PRINT #1;I;":",G(I);" - ";G(0)-G(I):NEXT I
 ;  240 CLOSE #1
-;  999 END 
+;  999 END
 ;  1000 VAL=PEEK(741)+256*PEEK(742)
-;  1010 RETURN 
+;  1010 RETURN
 
 	.bss
 

@@ -15,25 +15,33 @@
 ; Define and export the ZP variables for the C64 runtime
 
 	.exportzp	sp, sreg, regsave
-	.exportzp	ptr1, ptr2, ptr3, ptr4
-	.exportzp	tmp1, tmp2, tmp3, tmp4
-	.exportzp	regbank, zpspace
+  	.exportzp	ptr1, ptr2, ptr3, ptr4
+  	.exportzp	tmp1, tmp2, tmp3, tmp4
+  	.exportzp	regbank, zpspace
 
-; These zero page entries overlap with the sweet-16 registers.
-; must be changed if sweet-16 is to be supported
-sp     	=  	$00  		; stack pointer
-sreg	=  	$02  		; secondary register/high 16 bit for longs
-regsave	=  	$04  		; slot to save/restore (E)AX into
-ptr1	=	$08  		;
-ptr2	=	$0A
-ptr3	=	$0C
-ptr4	=	$0E
-tmp1	=	$10
-tmp2	=	$11
-tmp3	=	$12
-tmp4	=	$13
-regbank	=	$14		; 6 byte register bank
-zpspace	=	$1A		; Zero page space allocated
+; These zero page entries overlap with the sweet-16 registers in
+; the standard apple2 linker config. They must be changed if sweet-16
+; is to be supported
+
+.zeropage
+
+zpstart	= *
+sp:	      	.res   	2 	; Stack pointer
+sreg:	      	.res	2	; Secondary register/high 16 bit for longs
+regsave:      	.res	2	; slot to save/restore (E)AX into
+ptr1:	      	.res	2
+ptr2:	      	.res	2
+ptr3:	      	.res	2
+ptr4:	      	.res	2
+tmp1:	      	.res	1
+tmp2:	      	.res	1
+tmp3:	      	.res	1
+tmp4:	      	.res	1
+regbank:      	.res	6	; 6 byte register bank
+
+zpspace	= * - zpstart		; Zero page space allocated
+
+.code
 
 ; ------------------------------------------------------------------------
 ; Actual code

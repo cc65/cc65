@@ -226,10 +226,10 @@ Since the program runs in bank 1, and the kernal and all I/O chips are located
 in bank 15, calling ROM routines or accessing hardware needs special code. The
 cc65 runtime implements wrappers for all functions in the kernal jump table.
 While this simplifies things, it should be noted that the wrappers do have
-quite an impact on performance: A cross bank call has an extra 50-100us
+quite an impact on performance: A cross bank call has an extra 300&micro;s
 penalty added by the wrapper.
 
-                            
+
 
 <sect>Other hints<p>
 

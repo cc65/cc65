@@ -116,7 +116,7 @@ static unsigned GlobalModeFlags (unsigned flags)
 static int IsNullPtr (struct expent* lval)
 /* Return true if this is the NULL pointer constant */
 {
-    return (IsInt (lval->e_tptr) &&		/* Is it an int? */
+    return (IsClassInt (lval->e_tptr) &&	/* Is it an int? */
        	    lval->e_flags == E_MCONST &&	/* Is it constant? */
 	    lval->e_const == 0);		/* And is it's value zero? */
 }
@@ -131,7 +131,7 @@ static type* promoteint (type* lhst, type* rhst)
      *   - If one of the values	is unsigned, the result is also unsigned.
      *   - Otherwise the result is an int.
      */
-    if (IsLong (lhst) || IsLong (rhst)) {
+    if (IsTypeLong (lhst) || IsTypeLong (rhst)) {
 	if (IsUnsigned (lhst) || IsUnsigned (rhst)) {
        	    return type_ulong;
 	} else {
@@ -209,11 +209,11 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
     	 * error message.
     	 */
        	Error (ERR_ILLEGAL_TYPE);
-    } else if (IsInt (lhst)) {
-     	if (IsPtr (rhst)) {
+    } else if (IsClassInt (lhst)) {
+       	if (IsClassPtr (rhst)) {
      	    /* Pointer -> int conversion */
      	    Warning (WARN_PTR_TO_INT_CONV);
-       	} else if (!IsInt (rhst)) {
+       	} else if (!IsClassInt (rhst)) {
      	    Error (ERR_INCOMPATIBLE_TYPES);
      	} else {
    	    /* Adjust the int types. To avoid manipulation of TOS mark lhs
@@ -225,8 +225,8 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
    	    }
    	    return g_typeadjust (TypeOf (lhst) | CF_CONST, flags);
         }
-    } else if (IsPtr (lhst)) {
-     	if (IsPtr (rhst)) {
+    } else if (IsClassPtr (lhst)) {
+     	if (IsClassPtr (rhst)) {
      	    /* Pointer to pointer assignment is valid, if:
      	     *   - both point to the same types, or
      	     *   - the rhs pointer is a void pointer, or
@@ -237,12 +237,12 @@ unsigned assignadjust (type* lhst, struct expent* rhs)
        	    if (!EqualTypes (left, right) && *left != T_VOID && *right != T_VOID) {
      	       	Error (ERR_INCOMPATIBLE_POINTERS);
      	    }
-     	} else if (IsInt (rhst)) {
+     	} else if (IsClassInt (rhst)) {
      	    /* Int to pointer assignment is valid only for constant zero */
      	    if ((rhs->e_flags & E_MCONST) == 0 || rhs->e_const != 0) {
      	       	Warning (WARN_INT_TO_PTR_CONV);
      	    }
-	} else if (IsFuncPtr (lhst) && IsFunc(rhst)) {
+	} else if (IsTypeFuncPtr (lhst) && IsTypeFunc(rhst)) {
 	    /* Assignment of function to function pointer is allowed, provided
 	     * that both functions have the same parameter list.
 	     */
@@ -785,7 +785,7 @@ static int primary (struct expent* lval)
 
 	    /* The symbol is referenced now */
 	    Sym->Flags |= SC_REF;
-       	    if (IsFunc (lval->e_tptr) || IsArray (lval->e_tptr)) {
+       	    if (IsTypeFunc (lval->e_tptr) || IsTypeArray (lval->e_tptr)) {
 	    	return 0;
 	    }
    	    return 1;
@@ -917,7 +917,7 @@ static int arrayref (int k, struct expent* lval)
     	    exprhs (CF_NONE, k, lval);
     	}
 
-     	if (IsPtr (tptr1)) {
+     	if (IsClassPtr (tptr1)) {
 
      	    /* Scale the subscript value according to element size */
      	    lval2.e_const *= PSizeOf (tptr1);
@@ -928,7 +928,7 @@ static int arrayref (int k, struct expent* lval)
     	    /* Handle constant base array on stack. Be sure NOT to
     	     * handle pointers the same way, this won't work.
     	     */
-    	    if (IsArray (tptr1) &&
+    	    if (IsTypeArray (tptr1) &&
     	       	((lval->e_flags & ~E_MCTYPE) == E_MCONST ||
     	   	(lval->e_flags & ~E_MCTYPE) == E_MLOCAL ||
     	   	(lval->e_flags & E_MGLOBAL) != 0 ||
@@ -950,7 +950,7 @@ static int arrayref (int k, struct expent* lval)
 	    /* Done */
     	    goto end_array;
 
-       	} else if (IsPtr (tptr2 = lval2.e_tptr)) {
+       	} else if (IsClassPtr (tptr2 = lval2.e_tptr)) {
     	    /* Subscript is pointer, get element type */
     	    lval2.e_tptr = Indirect (tptr2);
 
@@ -975,7 +975,7 @@ static int arrayref (int k, struct expent* lval)
         exprhs (CF_NONE, l, &lval2);
 
 	tptr2 = lval2.e_tptr;
-	if (IsPtr (tptr1)) {
+	if (IsClassPtr (tptr1)) {
 
 	    /* Get the element type */
 	    lval->e_tptr = Indirect (tptr1);
@@ -986,7 +986,7 @@ static int arrayref (int k, struct expent* lval)
 	     */
 	    g_scale (CF_INT, SizeOf (lval->e_tptr));
 
-	} else if (IsPtr (tptr2)) {
+	} else if (IsClassPtr (tptr2)) {
 
 	    /* Get the element type */
 	    lval2.e_tptr = Indirect (tptr2);
@@ -1065,7 +1065,7 @@ static int arrayref (int k, struct expent* lval)
 	     	    g_inc (CF_INT | CF_UNSIGNED, lval->e_const);
 	     	} else if (lflags == E_MLOCAL) {
 	     	    /* Base address is a local variable address */
-		    if (IsArray (tptr1)) {
+		    if (IsTypeArray (tptr1)) {
 	     	        g_addaddr_local (CF_INT, lval->e_const);
 		    } else {
 	   		g_addlocal (CF_PTR, lval->e_const);
@@ -1074,7 +1074,7 @@ static int arrayref (int k, struct expent* lval)
 	     	    /* Base address is a static variable address */
 	     	    unsigned flags = CF_INT;
 		    flags |= GlobalModeFlags (lval->e_flags);
-		    if (IsArray (tptr1)) {
+		    if (IsTypeArray (tptr1)) {
 	     	        g_addaddr_static (flags, lval->e_name, lval->e_const);
 		    } else {
 			g_addstatic (flags, lval->e_name, lval->e_const);
@@ -1086,7 +1086,7 @@ static int arrayref (int k, struct expent* lval)
     lval->e_flags = E_MEXPR;
 end_array:
     ConsumeRBrack ();
-    return !IsArray (lval->e_tptr);
+    return !IsTypeArray (lval->e_tptr);
 
 }
 
@@ -1132,7 +1132,7 @@ static int structref (int k, struct expent* lval)
 	lval->e_flags = E_MEOFFS;
     }
     lval->e_tptr = Field->Type;
-    return !IsArray (Field->Type);
+    return !IsTypeArray (Field->Type);
 }
 
 
@@ -1162,8 +1162,8 @@ static int hie11 (struct expent *lval)
 	    /* Function call. Skip the opening parenthesis */
 	    NextToken ();
 	    tptr = lval->e_tptr;
-	    if (IsFunc (tptr) || IsFuncPtr (tptr)) {
-	    	if (IsFuncPtr (tptr)) {
+	    if (IsTypeFunc (tptr) || IsTypeFuncPtr (tptr)) {
+	    	if (IsTypeFuncPtr (tptr)) {
 	    	    /* Pointer to function. Handle transparently */
     	    	    exprhs (CF_NONE, k, lval);  /* Function pointer to A/X */
 	    	    ++lval->e_tptr; 	    	/* Skip T_PTR */
@@ -1179,7 +1179,7 @@ static int hie11 (struct expent *lval)
 
      	} else if (curtok == TOK_DOT) {
 
-     	    if (!IsStruct (lval->e_tptr)) {
+     	    if (!IsClassStruct (lval->e_tptr)) {
      	   	Error (ERR_STRUCT_EXPECTED);
      	    }
      	    k = structref (0, lval);
@@ -1474,7 +1474,7 @@ static int hie10 (struct expent* lval)
 	     	lval->e_const = 0;		/* Offset is zero now */
     	    }
 	    t = lval->e_tptr;
-       	    if (IsPtr (t)) {
+       	    if (IsClassPtr (t)) {
        	       	lval->e_tptr = Indirect (t);
      	    } else {
      	     	Error (ERR_ILLEGAL_INDIRECT);
@@ -1486,7 +1486,7 @@ static int hie10 (struct expent* lval)
      	    k = hie10 (lval);
      	    if (k == 0) {
 	    	/* Allow the & operator with an array */
-	     	if (!IsArray (lval->e_tptr)) {
+	     	if (!IsTypeArray (lval->e_tptr)) {
      	     	    Error (ERR_ILLEGAL_ADDRESS);
 	     	}
      	    } else {
@@ -1566,7 +1566,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	*UsedGen = 1;
 
 	/* All operators that call this function expect an int on the lhs */
-	if (!IsInt (lval->e_tptr)) {
+	if (!IsClassInt (lval->e_tptr)) {
 	    Error (ERR_INT_EXPR_EXPECTED);
 	}
 
@@ -1592,7 +1592,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	rconst = (evalexpr (CF_NONE, hienext, &lval2) == 0);
 
 	/* Check the type of the rhs */
-	if (!IsInt (lval2.e_tptr)) {
+	if (!IsClassInt (lval2.e_tptr)) {
 	    Error (ERR_INT_EXPR_EXPECTED);
 	}
 
@@ -1692,12 +1692,12 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	rconst = (evalexpr (CF_NONE, hienext, &lval2) == 0);
 
 	/* Make sure, the types are compatible */
-	if (IsInt (lval->e_tptr)) {
-	    if (!IsInt (lval2.e_tptr) && !(IsPtr(lval2.e_tptr) && IsNullPtr(lval))) {
+	if (IsClassInt (lval->e_tptr)) {
+	    if (!IsClassInt (lval2.e_tptr) && !(IsClassPtr(lval2.e_tptr) && IsNullPtr(lval))) {
 	   	Error (ERR_INCOMPATIBLE_TYPES);
 	    }
-	} else if (IsPtr (lval->e_tptr)) {
-	    if (IsPtr (lval2.e_tptr)) {
+	} else if (IsClassPtr (lval->e_tptr)) {
+	    if (IsClassPtr (lval2.e_tptr)) {
 	   	/* Both pointers are allowed in comparison if they point to
 	   	 * the same type, or if one of them is a void pointer.
 	         */
@@ -1744,7 +1744,7 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 	     * operation as char operation. Otherwise the default
 	     * promotions are used.
 	     */
-	    if (IsChar (lval->e_tptr) && (IsChar (lval2.e_tptr) || rconst)) {
+	    if (IsTypeChar (lval->e_tptr) && (IsTypeChar (lval2.e_tptr) || rconst)) {
 	       	flags |= CF_CHAR;
 	       	if (IsUnsigned (lval->e_tptr) || IsUnsigned (lval2.e_tptr)) {
 	       	    flags |= CF_UNSIGNED;
@@ -1818,16 +1818,16 @@ static void parseadd (int k, struct expent* lval)
     	    rhst = lval2.e_tptr;
 
     	    /* Both expressions are constants. Check for pointer arithmetic */
-       	    if (IsPtr (lhst) && IsInt (rhst)) {
+       	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
        	    	/* Left is pointer, right is int, must scale rhs */
     	    	lval->e_const = lval->e_const + lval2.e_const * PSizeOf (lhst);
     	    	/* Result type is a pointer */
-    	    } else if (IsInt (lhst) && IsPtr (rhst)) {
+    	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is int, right is pointer, must scale lhs */
        	       	lval->e_const = lval->e_const * PSizeOf (rhst) + lval2.e_const;
     	    	/* Result type is a pointer */
     	    	lval->e_tptr = lval2.e_tptr;
-       	    } else if (IsInt (lhst) && IsInt (rhst)) {
+       	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	    	/* Integer addition */
     	    	lval->e_const += lval2.e_const;
     	    	typeadjust (lval, &lval2, 1);
@@ -1845,18 +1845,18 @@ static void parseadd (int k, struct expent* lval)
     	    rhst = lval2.e_tptr;
 
     	    /* Check for pointer arithmetic */
-    	    if (IsPtr (lhst) && IsInt (rhst)) {
+    	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    	/* Left is pointer, right is int, must scale rhs */
     	    	g_scale (CF_INT, PSizeOf (lhst));
     	    	/* Operate on pointers, result type is a pointer */
       	    	flags = CF_PTR;
-    	    } else if (IsInt (lhst) && IsPtr (rhst)) {
+    	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
     	      	/* Left is int, right is pointer, must scale lhs */
        	       	lval->e_const *= PSizeOf (rhst);
     	      	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
     	      	lval->e_tptr = lval2.e_tptr;
-       	    } else if (IsInt (lhst) && IsInt (rhst)) {
+       	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	      	/* Integer addition */
        	       	flags = typeadjust (lval, &lval2, 1);
     	    } else {
@@ -1891,18 +1891,18 @@ static void parseadd (int k, struct expent* lval)
     	    pop (TypeOf (lval->e_tptr));
 
        	    /* Check for pointer arithmetic */
-       	    if (IsPtr (lhst) && IsInt (rhst)) {
+       	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	       	/* Left is pointer, right is int, must scale rhs */
     	       	lval2.e_const *= PSizeOf (lhst);
     	      	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
-    	    } else if (IsInt (lhst) && IsPtr (rhst)) {
+    	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
     	      	/* Left is int, right is pointer, must scale lhs (ptr only) */
        	       	g_scale (CF_INT | CF_CONST, PSizeOf (rhst));
        	       	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
     	      	lval->e_tptr = lval2.e_tptr;
-       	    } else if (IsInt (lhst) && IsInt (rhst)) {
+       	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	      	/* Integer addition */
     	      	flags = typeadjust (lval, &lval2, 1);
        	    } else {
@@ -1923,12 +1923,12 @@ static void parseadd (int k, struct expent* lval)
     	    rhst = lval2.e_tptr;
 
     	    /* Check for pointer arithmetic */
-      	    if (IsPtr (lhst) && IsInt (rhst)) {
+      	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	      	/* Left is pointer, right is int, must scale rhs */
     	      	g_scale (CF_INT, PSizeOf (lhst));
     	      	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
-    	    } else if (IsInt (lhst) && IsPtr (rhst)) {
+    	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
     	      	/* Left is int, right is pointer, must scale lhs */
     	      	g_tosint (TypeOf (rhst));	/* Make sure, TOS is int */
     	    	g_swap (CF_INT);  		/* Swap TOS and primary */
@@ -1936,7 +1936,7 @@ static void parseadd (int k, struct expent* lval)
     	      	/* Operate on pointers, result type is a pointer */
     	      	flags = CF_PTR;
     	      	lval->e_tptr = lval2.e_tptr;
-       	    } else if (IsInt (lhst) && IsInt (rhst)) {
+       	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	      	/* Integer addition */
        	       	flags = typeadjust (lval, &lval2, 0);
     	    } else {
@@ -2001,11 +2001,11 @@ static void parsesub (int k, struct expent* lval)
     	    pop (TypeOf (lhst));	/* Clean up the stack */
 
     	    /* Check for pointer arithmetic */
-    	    if (IsPtr (lhst) && IsInt (rhst)) {
+    	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    	/* Left is pointer, right is int, must scale rhs */
     	    	lval->e_const -= lval2.e_const * PSizeOf (lhst);
     	    	/* Operate on pointers, result type is a pointer */
-    	    } else if (IsPtr (lhst) && IsPtr (rhst)) {
+    	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is pointer, right is pointer, must scale result */
     	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) != 0) {
     	    	    Error (ERR_INCOMPATIBLE_POINTERS);
@@ -2014,7 +2014,7 @@ static void parsesub (int k, struct expent* lval)
     	    	}
     	    	/* Operate on pointers, result type is an integer */
     	    	lval->e_tptr = type_int;
-    	    } else if (IsInt (lhst) && IsInt (rhst)) {
+    	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	    	/* Integer subtraction */
        	       	typeadjust (lval, &lval2, 1);
     	    	lval->e_const -= lval2.e_const;
@@ -2035,12 +2035,12 @@ static void parsesub (int k, struct expent* lval)
     	    RemoveCode (Mark2);
     	    pop (TypeOf (lhst));
 
-    	    if (IsPtr (lhst) && IsInt (rhst)) {
+    	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    	/* Left is pointer, right is int, must scale rhs */
        	       	lval2.e_const *= PSizeOf (lhst);
     	    	/* Operate on pointers, result type is a pointer */
     	    	flags = CF_PTR;
-    	    } else if (IsPtr (lhst) && IsPtr (rhst)) {
+    	    } else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
     	    	/* Left is pointer, right is pointer, must scale result */
     	    	if (TypeCmp (Indirect (lhst), Indirect (rhst)) != 0) {
     	    	    Error (ERR_INCOMPATIBLE_POINTERS);
@@ -2050,7 +2050,7 @@ static void parsesub (int k, struct expent* lval)
     	    	/* Operate on pointers, result type is an integer */
     	    	flags = CF_PTR;
     	    	lval->e_tptr = type_int;
-    	    } else if (IsInt (lhst) && IsInt (rhst)) {
+    	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	    	/* Integer subtraction */
        	       	flags = typeadjust (lval, &lval2, 1);
     	    } else {
@@ -2078,12 +2078,12 @@ static void parsesub (int k, struct expent* lval)
  	rhst = lval2.e_tptr;
 
        	/* Check for pointer arithmetic */
- 	if (IsPtr (lhst) && IsInt (rhst)) {
+ 	if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    /* Left is pointer, right is int, must scale rhs */
  	    g_scale (CF_INT, PSizeOf (lhst));
  	    /* Operate on pointers, result type is a pointer */
  	    flags = CF_PTR;
- 	} else if (IsPtr (lhst) && IsPtr (rhst)) {
+ 	} else if (IsClassPtr (lhst) && IsClassPtr (rhst)) {
  	    /* Left is pointer, right is pointer, must scale result */
  	    if (TypeCmp (Indirect (lhst), Indirect (rhst)) != 0) {
  	       	Error (ERR_INCOMPATIBLE_POINTERS);
@@ -2093,7 +2093,7 @@ static void parsesub (int k, struct expent* lval)
  	    /* Operate on pointers, result type is an integer */
  	    flags = CF_PTR;
  	    lval->e_tptr = type_int;
- 	} else if (IsInt (lhst) && IsInt (rhst)) {
+ 	} else if (IsClassInt (lhst) && IsClassInt (rhst)) {
  	    /* Integer subtraction. If the left hand side descriptor says that
 	     * the lhs is const, we have to remove this mark, since this is no
 	     * longer true, lhs is on stack instead.
@@ -2409,7 +2409,7 @@ static int hieQuest (struct expent *lval)
 	 */
  	type2 = lval2.e_tptr;
 	type3 = lval3.e_tptr;
-	if (IsInt (type2) && IsInt (type3)) {
+	if (IsClassInt (type2) && IsClassInt (type3)) {
 
 	    /* Get common type */
 	    rtype = promoteint (type2, type3);
@@ -2442,17 +2442,17 @@ static int hieQuest (struct expent *lval)
 	    	labt = 0;		/* Mark other label as invalid */
 	    }
 
-	} else if (IsPtr (type2) && IsPtr (type3)) {
+	} else if (IsClassPtr (type2) && IsClassPtr (type3)) {
 	    /* Must point to same type */
 	    if (TypeCmp (Indirect (type2), Indirect (type3)) != 0) {
 		Error (ERR_INCOMPATIBLE_TYPES);
 	    }
 	    /* Result has the common type */
 	    rtype = lval2.e_tptr;
-	} else if (IsPtr (type2) && IsNullPtr (&lval3)) {
+	} else if (IsClassPtr (type2) && IsNullPtr (&lval3)) {
 	    /* Result type is pointer, no cast needed */
 	    rtype = lval2.e_tptr;
-	} else if (IsNullPtr (&lval2) && IsPtr (type3)) {
+	} else if (IsNullPtr (&lval2) && IsClassPtr (type3)) {
 	    /* Result type is pointer, no cast needed */
 	    rtype = lval3.e_tptr;
 	} else {
@@ -2656,11 +2656,16 @@ static void Assignment (struct expent* lval)
     unsigned flags;
     type* ltype = lval->e_tptr;
 
+    /* Check for assignment to const */
+    if (IsConst (ltype)) {
+	Error (ERR_CONST_ASSIGN);
+    }
+
     /* cc65 does not have full support for handling structs by value. Since
      * assigning structs is one of the more useful operations from this
      * familiy, allow it here.
      */
-    if (IsStruct (ltype)) {
+    if (IsClassStruct (ltype)) {
 
        	/* Bring the address of the lhs into the primary and push it */
 	exprhs (0, 0, lval);
@@ -2889,7 +2894,7 @@ void intexpr (struct expent* lval)
 /* Get an integer expression */
 {
     expression (lval);
-    if (!IsInt (lval->e_tptr)) {
+    if (!IsClassInt (lval->e_tptr)) {
      	Error (ERR_INT_EXPR_EXPECTED);
      	/* To avoid any compiler errors, make the expression a valid int */
      	lval->e_flags = E_MCONST;
@@ -2910,7 +2915,7 @@ void boolexpr (struct expent* lval)
      * the pointer used in a boolean context is also ok (Ootherwise check if it's a pointer
      * expression.
      */
-    if (!IsInt (lval->e_tptr) && !IsPtr (lval->e_tptr)) {
+    if (!IsClassInt (lval->e_tptr) && !IsClassPtr (lval->e_tptr)) {
  	Error (ERR_INT_EXPR_EXPECTED);
  	/* To avoid any compiler errors, make the expression a valid int */
  	lval->e_flags = E_MCONST;

@@ -11,8 +11,10 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../common/xmalloc.h"
-
+/* common */
+#include "xmalloc.h"
+	  
+/* cc65 */
 #include "asmcode.h"
 #include "asmlabel.h"
 #include "codegen.h"
@@ -298,7 +300,7 @@ static void cascadeswitch (struct expent* eval)
 
 		    /* Read the selector expression */
 		    constexpr (&lval);
-		    if (!IsInt (lval.e_tptr)) {
+		    if (!IsClassInt (lval.e_tptr)) {
 			Error (ERR_ILLEGAL_TYPE);
 		    }
 
@@ -456,7 +458,7 @@ static void tableswitch (struct expent* eval)
     	    	if (curtok == TOK_CASE) {
        	    	    NextToken ();
     	    	    constexpr (&lval);
-	    	    if (!IsInt (lval.e_tptr)) {
+	    	    if (!IsClassInt (lval.e_tptr)) {
 	    		Error (ERR_ILLEGAL_TYPE);
 	      	    }
      	    	    p->sw_const = lval.e_const;
@@ -538,7 +540,7 @@ static void doswitch (void)
     ConsumeLCurly ();
 
     /* Now decide which sort of switch we will create: */
-    if (IsChar (eval.e_tptr) || (FavourSize == 0 && IsInt (eval.e_tptr))) {
+    if (IsTypeChar (eval.e_tptr) || (FavourSize == 0 && IsClassInt (eval.e_tptr))) {
        	cascadeswitch (&eval);
     } else {
       	tableswitch (&eval);

@@ -222,45 +222,49 @@ static type PrintTypeComp (FILE* F, type T, type Mask, const char* Name)
 void PrintType (FILE* F, const type* Type)
 /* Output translation of type array. */
 {
-    /* If the first field has const and/or volatile qualifiers, print and
-     * remove them.
-     */
-    type T = *Type++;
-    T = PrintTypeComp (F, T, T_QUAL_CONST, "const");
-    T = PrintTypeComp (F, T, T_QUAL_VOLATILE, "volatile");
+    type T;
+
 
     /* Walk over the complete string */
-    do {
+    while ((T = *Type++) != T_END) {
 
-     	/* Check for the sizes */
-       	T = PrintTypeComp (F, T, T_SIZE_SHORT, "short");
-	T = PrintTypeComp (F, T, T_SIZE_LONG, "long");
-	T = PrintTypeComp (F, T, T_SIZE_LONGLONG, "long long");
+	/* Print any qualifiers */
+    	T = PrintTypeComp (F, T, T_QUAL_CONST, "const");
+	T = PrintTypeComp (F, T, T_QUAL_VOLATILE, "volatile");
 
-	/* Signedness */
-	T = PrintTypeComp (F, T, T_SIGN_SIGNED, "signed");
-	T = PrintTypeComp (F, T, T_SIGN_UNSIGNED, "unsigned");
+    	/* Signedness */
+    	T = PrintTypeComp (F, T, T_SIGN_SIGNED, "signed");
+    	T = PrintTypeComp (F, T, T_SIGN_UNSIGNED, "unsigned");
 
-	/* Now check the real type */
+    	/* Now check the real type */
      	switch (T & T_MASK_TYPE) {
-	    case T_TYPE_CHAR:
-	  	fprintf (F, "char\n");
-	  	break;
-	    case T_TYPE_INT:
-	  	fprintf (F, "int\n");
-	  	break;
-	    case T_TYPE_FLOAT:
-	     	fprintf (F, "float\n");
-	     	break;
-	    case T_TYPE_DOUBLE:
-	     	fprintf (F, "double\n");
-	     	break;
+    	    case T_TYPE_CHAR:
+    	  	fprintf (F, "char\n");
+    	  	break;
+	    case T_TYPE_SHORT:
+		fprintf (F, "short\n");
+		break;
+    	    case T_TYPE_INT:
+    	  	fprintf (F, "int\n");
+    	  	break;
+	    case T_TYPE_LONG:
+		fprintf (F, "long\n");
+		break;
+	    case T_TYPE_LONGLONG:
+		fprintf (F, "long long\n");
+		break;
+    	    case T_TYPE_FLOAT:
+    	     	fprintf (F, "float\n");
+    	     	break;
+    	    case T_TYPE_DOUBLE:
+    	     	fprintf (F, "double\n");
+    	     	break;
      	    case T_TYPE_VOID:
      	  	fprintf (F, "void\n");
-	  	break;
-	    case T_TYPE_STRUCT:
-	     	fprintf (F, "struct %s\n", ((SymEntry*) DecodePtr (Type))->Name);
-	     	Type += DECODE_SIZE;
+    	  	break;
+    	    case T_TYPE_STRUCT:
+    	     	fprintf (F, "struct %s\n", ((SymEntry*) DecodePtr (Type))->Name);
+       	     	Type += DECODE_SIZE;
 	     	break;
 	    case T_TYPE_UNION:
 	     	fprintf (F, "union %s\n", ((SymEntry*) DecodePtr (Type))->Name);
@@ -281,10 +285,7 @@ void PrintType (FILE* F, const type* Type)
 	     	fprintf (F, "unknown type: %04X\n", T);
 	}
 
-	/* Get the next type element */
-	T = *Type++;
-
-    } while (T != T_END);
+    }
 }
 
 
@@ -345,7 +346,7 @@ void* DecodePtr (const type* Type)
 int HasEncode (const type* Type)
 /* Return true if the given type has encoded data */
 {
-    return IsStruct (Type) || IsArray (Type) || IsFunc (Type);
+    return IsClassStruct (Type) || IsTypeArray (Type) || IsTypeFunc (Type);
 }
 
 
@@ -358,15 +359,23 @@ void CopyEncode (const type* Source, type* Target)
 
 
 
+type UnqualifiedType (type T)
+/* Return the unqalified type */
+{
+    return (T & ~T_MASK_QUAL);
+}
+
+
+
 unsigned SizeOf (const type* T)
 /* Compute size of object represented by type array. */
 {
     SymEntry* Entry;
 
-    switch (*T) {
+    switch (UnqualifiedType (T[0])) {
 
-	case T_VOID:
-	    Error (ERR_ILLEGAL_SIZE);
+    	case T_VOID:
+    	    Error (ERR_ILLEGAL_SIZE);
 	    return 0;
 
 	case T_SCHAR:
@@ -419,7 +428,7 @@ unsigned PSizeOf (const type* T)
     CHECK ((*T & T_CLASS_PTR) != 0);
 
     /* Skip the pointer or array token itself */
-    if (*T == T_ARRAY) {
+    if (IsTypeArray (T)) {
        	return SizeOf (T + DECODE_SIZE + 1);
     } else {
       	return SizeOf (T + 1);
@@ -428,12 +437,12 @@ unsigned PSizeOf (const type* T)
 
 
 
-unsigned TypeOf (const type* Type)
+unsigned TypeOf (const type* T)
 /* Get the code generator base type of the object */
 {
     FuncDesc* F;
 
-    switch (*Type) {
+    switch (UnqualifiedType (T[0])) {
 
 	case T_SCHAR:
     	    return CF_CHAR;
@@ -459,7 +468,7 @@ unsigned TypeOf (const type* Type)
        	    return CF_LONG | CF_UNSIGNED;
 
         case T_FUNC:
-	    F = DecodePtr (Type+1);
+	    F = DecodePtr (T+1);
 	    return (F->Flags & FD_ELLIPSIS)? 0 : CF_FIXARGC;
 
         case T_STRUCT:
@@ -484,7 +493,7 @@ type* Indirect (type* T)
     CHECK ((*T & T_MASK_CLASS) == T_CLASS_PTR);
 
     /* Skip the pointer or array token itself */
-    if (*T == T_ARRAY) {
+    if (IsTypeArray (T)) {
        	return T + DECODE_SIZE + 1;
     } else {
       	return T + 1;
@@ -493,15 +502,29 @@ type* Indirect (type* T)
 
 
 
-int IsTypeVoid (const type* T)
-/* Return true if this is a void type */
+int IsConst (const type* T)
+/* Return true if the given type has a const memory image */
 {
-    return (T[0] == T_VOID && T[1] == T_END);
+    /* If this is an array, look at the element type, otherwise look at the
+     * type itself.
+     */
+    if (IsTypeArray (T)) {
+	T += DECODE_SIZE + 1;
+    }
+    return ((T[0] & T_QUAL_CONST) == T_QUAL_CONST);
 }
 
 
 
-int IsPtr (const type* T)
+int IsTypeVoid (const type* T)
+/* Return true if this is a void type */
+{
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_VOID && T[1] == T_END);
+}
+
+
+
+int IsClassPtr (const type* T)
 /* Return true if this is a pointer type */
 {
     return (T[0] & T_MASK_CLASS) == T_CLASS_PTR;
@@ -509,7 +532,7 @@ int IsPtr (const type* T)
 
 
 
-int IsChar (const type* T)
+int IsTypeChar (const type* T)
 /* Return true if this is a character type */
 {
     return (T[0] & T_MASK_TYPE) == T_TYPE_CHAR && T[1] == T_END;
@@ -517,7 +540,7 @@ int IsChar (const type* T)
 
 
 
-int IsInt (const type* T)
+int IsClassInt (const type* T)
 /* Return true if this is an integer type */
 {
     return (T[0] & T_MASK_CLASS) == T_CLASS_INT;
@@ -525,10 +548,10 @@ int IsInt (const type* T)
 
 
 
-int IsLong (const type* T)
+int IsTypeLong (const type* T)
 /* Return true if this is a long type (signed or unsigned) */
 {
-    return (T[0] & T_MASK_SIZE) == T_SIZE_LONG;
+    return (T[0] & T_MASK_TYPE) == T_TYPE_LONG;
 }
 
 
@@ -541,7 +564,7 @@ int IsUnsigned (const type* T)
 
 
 
-int IsStruct (const type* T)
+int IsClassStruct (const type* T)
 /* Return true if this is a struct type */
 {
     return (T[0] & T_MASK_CLASS) == T_CLASS_STRUCT;
@@ -549,10 +572,10 @@ int IsStruct (const type* T)
 
 
 
-int IsFunc (const type* T)
-/* Return true if this is a function type */
+int IsTypeFunc (const type* T)
+/* Return true if this is a function class */
 {
-    return (T[0] == T_FUNC);
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_FUNC);
 }
 
 
@@ -561,25 +584,25 @@ int IsFastCallFunc (const type* T)
 /* Return true if this is a function type with __fastcall__ calling conventions */
 {
     FuncDesc* F;
-    CHECK (T[0] == T_FUNC);
+    CHECK (IsTypeFunc (T));
     F = DecodePtr (T+1);
     return (F->Flags & FD_FASTCALL) != 0;
 }
 
 
 
-int IsFuncPtr (const type* T)
+int IsTypeFuncPtr (const type* T)
 /* Return true if this is a function pointer */
 {
-    return (T[0] == T_PTR && T[1] == T_FUNC);
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_PTR && (T[1] & T_MASK_TYPE) == T_TYPE_FUNC);
 }
 
 
 
-int IsArray (const type* T)
+int IsTypeArray (const type* T)
 /* Return true if this is an array type */
 {
-    return (T[0] == T_ARRAY);
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_ARRAY);
 }
 
 

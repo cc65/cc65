@@ -146,7 +146,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
     ParseDecl (Spec, &Decl, DM_NEED_IDENT);
 
     /* Set the correct storage class for functions */
-    if (IsFunc (Decl.Type)) {
+    if (IsTypeFunc (Decl.Type)) {
 	/* Function prototypes are always external */
 	if ((SC & SC_EXTERN) == 0) {
        	    Warning (WARN_FUNC_MUST_BE_EXTERN);

@@ -467,7 +467,7 @@ SymEntry* FindStructField (const type* Type, const char* Name)
     }
 
     /* Non-structs do not have any struct fields... */
-    if (IsStruct (Type)) {
+    if (IsClassStruct (Type)) {
 
     	const SymTable* Tab;
 
@@ -664,7 +664,7 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
 /* Add an external or global symbol to the symbol table and return the entry */
 {
     /* Functions must be inserted in the global symbol table */
-    SymTable* Tab = IsFunc (Type)? SymTab0 : SymTab;
+    SymTable* Tab = IsTypeFunc (Type)? SymTab0 : SymTab;
 
     /* Do we have an entry with this name already? */
     SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
@@ -685,7 +685,7 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
     	 * incomplete declaration. Accept this, and if the exsting entry is
     	 * incomplete, complete it.
     	 */
-    	if (IsArray (Type) && IsArray (EType)) {
+    	if (IsTypeArray (Type) && IsTypeArray (EType)) {
 
     	    /* Get the array sizes */
     	    unsigned Size  = Decode (Type + 1);
@@ -713,7 +713,7 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
 	     * contains pointers to the new symbol tables that are needed if
 	     * an actual function definition follows.
 	     */
-	    if (IsFunc (Type)) {
+	    if (IsTypeFunc (Type)) {
 		CopyEncode (Type+1, EType+1);
 	    }
      	}

@@ -37,7 +37,7 @@
 
 /* common */
 #include "version.h"
-	  
+
 /* cc65 */
 #include "asmlabel.h"
 #include "codegen.h"
@@ -136,7 +136,7 @@ static void Parse (void)
 
 	    /* Get the symbol flags */
 	    SymFlags = Spec.StorageClass;
-	    if (IsFunc (Decl.Type)) {
+	    if (IsTypeFunc (Decl.Type)) {
 		SymFlags |= SC_FUNC;
 	    } else {
 	    	if (NeedStorage) {
@@ -161,19 +161,23 @@ static void Parse (void)
 	     	     * void types in non ANSI mode.
 	     	     */
        	       	    if (Size == 0) {
-	     		if (!IsTypeVoid (Decl.Type)) {
-	     		    if (!IsArray (Decl.Type)) {
-	     	   	      	/* Size is unknown and not an array */
-	     		      	Error (ERR_UNKNOWN_SIZE);
-	     		    }
-	     		} else if (ANSI) {
-	     		    /* We cannot declare variables of type void */
-	     		    Error (ERR_ILLEGAL_TYPE);
-	     		}
+	     	    	if (!IsTypeVoid (Decl.Type)) {
+	     	    	    if (!IsTypeArray (Decl.Type)) {
+	     	    	      	/* Size is unknown and not an array */
+	     	    	      	Error (ERR_UNKNOWN_SIZE);
+	     	    	    }
+	     	    	} else if (ANSI) {
+	     	    	    /* We cannot declare variables of type void */
+	     	    	    Error (ERR_ILLEGAL_TYPE);
+	     	    	}
 	     	    }
 
-	     	    /* Switch to the data segment */
-	     	    g_usedata ();
+	     	    /* Switch to the data or rodata segment */
+		    if (IsConst (Decl.Type)) {
+			g_userodata ();
+		    } else {
+			g_usedata ();
+		    }
 
 	     	    /* Define a label */
 	     	    g_defgloblabel (Entry->Name);
@@ -215,7 +219,7 @@ static void Parse (void)
 	}
 
 	/* Function declaration? */
-	if (IsFunc (Decl.Type)) {
+	if (IsTypeFunc (Decl.Type)) {
 
 	    /* Function */
 	    if (!comma) {

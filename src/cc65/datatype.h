@@ -56,16 +56,19 @@ enum {
     // Basic types
     T_TYPE_NONE	    = 0x0000,
     T_TYPE_CHAR	    = 0x0001,
-    T_TYPE_INT 	    = 0x0002,
-    T_TYPE_ENUM	    = 0x0003,
-    T_TYPE_FLOAT    = 0x0004,
-    T_TYPE_DOUBLE   = 0x0005,
-    T_TYPE_VOID     = 0x0006,
-    T_TYPE_STRUCT   = 0x0007,
-    T_TYPE_UNION    = 0x0008,
-    T_TYPE_ARRAY    = 0x0009,
-    T_TYPE_PTR      = 0x000A,
-    T_TYPE_FUNC     = 0x000B,
+    T_TYPE_SHORT    = 0x0002,
+    T_TYPE_INT 	    = 0x0003,
+    T_TYPE_LONG	    = 0x0004,
+    T_TYPE_LONGLONG = 0x0005,
+    T_TYPE_ENUM	    = 0x0006,
+    T_TYPE_FLOAT    = 0x0007,
+    T_TYPE_DOUBLE   = 0x0008,
+    T_TYPE_VOID     = 0x0009,
+    T_TYPE_STRUCT   = 0x000A,
+    T_TYPE_UNION    = 0x000B,
+    T_TYPE_ARRAY    = 0x000C,
+    T_TYPE_PTR      = 0x000D,
+    T_TYPE_FUNC     = 0x000E,
     T_MASK_TYPE	    = 0x001F,
 
     // Type classes
@@ -97,26 +100,26 @@ enum {
     T_MASK_QUAL	    = 0x3000,
 
     // Types
-    T_CHAR     	= T_TYPE_CHAR   | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
-    T_SCHAR  	= T_TYPE_CHAR   | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
-    T_UCHAR  	= T_TYPE_CHAR   | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
-    T_SHORT  	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_SHORT,
-    T_USHORT    = T_TYPE_INT    | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_SHORT,
-    T_INT    	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
-    T_UINT   	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
-    T_LONG   	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONG,
-    T_ULONG  	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONG,
-    T_LONGLONG 	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONGLONG,
-    T_ULONGLONG	= T_TYPE_INT    | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONGLONG,
-    T_ENUM     	= T_TYPE_ENUM   | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
-    T_FLOAT  	= T_TYPE_FLOAT  | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
-    T_DOUBLE 	= T_TYPE_DOUBLE | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
-    T_VOID   	= T_TYPE_VOID   | T_CLASS_NONE   | T_SIGN_NONE     | T_SIZE_NONE,
-    T_STRUCT    = T_TYPE_STRUCT | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
-    T_UNION     = T_TYPE_UNION  | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
-    T_ARRAY  	= T_TYPE_ARRAY  | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
-    T_PTR    	= T_TYPE_PTR    | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
-    T_FUNC     	= T_TYPE_FUNC   | T_CLASS_FUNC   | T_SIGN_NONE     | T_SIZE_NONE,
+    T_CHAR     	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_SCHAR    	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_UCHAR    	= T_TYPE_CHAR     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_SHORT    	= T_TYPE_SHORT    | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_SHORT,
+    T_USHORT    = T_TYPE_SHORT    | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_SHORT,
+    T_INT      	= T_TYPE_INT      | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_UINT     	= T_TYPE_INT      | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_NONE,
+    T_LONG     	= T_TYPE_LONG     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONG,
+    T_ULONG    	= T_TYPE_LONG     | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONG,
+    T_LONGLONG 	= T_TYPE_LONGLONG | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_LONGLONG,
+    T_ULONGLONG	= T_TYPE_LONGLONG | T_CLASS_INT    | T_SIGN_UNSIGNED | T_SIZE_LONGLONG,
+    T_ENUM     	= T_TYPE_ENUM     | T_CLASS_INT    | T_SIGN_SIGNED   | T_SIZE_NONE,
+    T_FLOAT    	= T_TYPE_FLOAT    | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
+    T_DOUBLE   	= T_TYPE_DOUBLE   | T_CLASS_FLOAT  | T_SIGN_NONE     | T_SIZE_NONE,
+    T_VOID     	= T_TYPE_VOID     | T_CLASS_NONE   | T_SIGN_NONE     | T_SIZE_NONE,
+    T_STRUCT    = T_TYPE_STRUCT   | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
+    T_UNION     = T_TYPE_UNION    | T_CLASS_STRUCT | T_SIGN_NONE     | T_SIZE_NONE,
+    T_ARRAY    	= T_TYPE_ARRAY    | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
+    T_PTR      	= T_TYPE_PTR      | T_CLASS_PTR    | T_SIGN_NONE     | T_SIZE_NONE,
+    T_FUNC     	= T_TYPE_FUNC     | T_CLASS_FUNC   | T_SIGN_NONE     | T_SIZE_NONE,
 
 };
 
@@ -207,6 +210,9 @@ int HasEncode (const type* Type);
 void CopyEncode (const type* Source, type* Target);
 /* Copy encoded data from Source to Target */
 
+type UnqualifiedType (type T);
+/* Return the unqalified type */
+
 unsigned SizeOf (const type* Type);
 /* Compute size of object represented by type array. */
 
@@ -221,37 +227,40 @@ type* Indirect (type* Type);
  * given type points to.
  */
 
+int IsConst (const type* T);
+/* Return true if the given type has a const memory image */
+
 int IsTypeVoid (const type* Type);
 /* Return true if this is a void type */
 
-int IsPtr (const type* Type);
+int IsClassPtr (const type* Type);
 /* Return true if this is a pointer type */
 
-int IsChar (const type* Type);
+int IsTypeChar (const type* Type);
 /* Return true if this is a character type */
 
-int IsInt (const type* Type);
+int IsClassInt (const type* Type);
 /* Return true if this is an integer type */
 
-int IsLong (const type* Type);
+int IsTypeLong (const type* Type);
 /* Return true if this is a long type (signed or unsigned) */
 
 int IsUnsigned (const type* Type);
 /* Return true if this is an unsigned type */
 
-int IsStruct (const type* Type);
+int IsClassStruct (const type* Type);
 /* Return true if this is a struct type */
 
-int IsFunc (const type* Type);
-/* Return true if this is a function type */
+int IsTypeFunc (const type* Type);
+/* Return true if this is a function class */
 
 int IsFastCallFunc (const type* Type);
 /* Return true if this is a function type with __fastcall__ calling conventions */
 
-int IsFuncPtr (const type* Type);
+int IsTypeFuncPtr (const type* Type);
 /* Return true if this is a function pointer */
 
-int IsArray (const type* Type);
+int IsTypeArray (const type* Type);
 /* Return true if this is an array type */
 
 struct FuncDesc* GetFuncDesc (const type* Type);

@@ -11,8 +11,10 @@
 #include <errno.h>
 #include <ctype.h>
 
-#include "../common/xmalloc.h"
+/* common */
+#include "xmalloc.h"
 
+/* cc65 */
 #include "anonname.h"
 #include "codegen.h"
 #include "datatype.h"
@@ -46,13 +48,39 @@ static void ParseTypeSpec (DeclSpec* D, int Default);
 
 
 
-static void optional_modifiers (void)
-/* Eat optional "const" or "volatile" tokens */
+static type OptionalQualifiers (type Q)
+/* Read type qualifiers if we have any */
 {
     while (curtok == TOK_CONST || curtok == TOK_VOLATILE) {
-	/* Skip it */
- 	NextToken ();
+
+	switch (curtok) {
+
+	    case TOK_CONST:
+		if (Q & T_QUAL_CONST) {
+		    Error (ERR_DUPLICATE_QUALIFIER, "const");
+		}
+		Q |= T_QUAL_CONST;
+		break;
+
+	    case TOK_VOLATILE:
+		if (Q & T_QUAL_VOLATILE) {
+		    Error (ERR_DUPLICATE_QUALIFIER, "volatile");
+		}
+		Q |= T_QUAL_VOLATILE;
+		break;
+
+	    default:
+		/* Keep gcc silent */
+		break;
+
+	}
+
+	/* Skip the token */
+	NextToken ();
     }
+
+    /* Return the qualifiers read */
+    return Q;
 }
 
 
@@ -93,7 +121,7 @@ static void InitDeclaration (Declaration* D)
 /* Initialize the Declaration struct for use */
 {
     D->Ident[0]		= '\0';
-    D->Type[0]		= T_END;
+    D->Type[0]	 	= T_END;
     D->T		= D->Type;
 }
 
@@ -278,15 +306,16 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 static void ParseTypeSpec (DeclSpec* D, int Default)
 /* Parse a type specificier */
 {
-    ident 	Ident;
+    ident     	Ident;
     SymEntry* 	Entry;
     type 	StructType;
+    type	Qualifiers;	/* Type qualifiers */
 
     /* Assume we have an explicit type */
     D->Flags &= ~DS_DEF_TYPE;
 
-    /* Skip const or volatile modifiers if needed */
-    optional_modifiers ();
+    /* Read type qualifiers if we have any */
+    Qualifiers = OptionalQualifiers (T_QUAL_NONE);
 
     /* Look at the data type */
     switch (curtok) {
@@ -306,29 +335,29 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     	case TOK_LONG:
     	    NextToken ();
     	    if (curtok == TOK_UNSIGNED) {
-    	     	NextToken ();
-    	     	optionalint ();
-		D->Type[0] = T_ULONG;
-		D->Type[1] = T_END;
+    	      	NextToken ();
+    	      	optionalint ();
+	      	D->Type[0] = T_ULONG;
+	      	D->Type[1] = T_END;
     	    } else {
-    	   	optionalsigned ();
-    	     	optionalint ();
-		D->Type[0] = T_LONG;
-		D->Type[1] = T_END;
+    	      	optionalsigned ();
+    	      	optionalint ();
+	      	D->Type[0] = T_LONG;
+	      	D->Type[1] = T_END;
     	    }
 	    break;
 
     	case TOK_SHORT:
     	    NextToken ();
     	    if (curtok == TOK_UNSIGNED) {
-    	   	NextToken ();
-    	   	optionalint ();
-		D->Type[0] = T_USHORT;
-		D->Type[1] = T_END;
+    	      	NextToken ();
+    	      	optionalint ();
+	      	D->Type[0] = T_USHORT;
+	      	D->Type[1] = T_END;
     	    } else {
-    		optionalsigned ();
-    		optionalint ();
-		D->Type[0] = T_SHORT;
+    	      	optionalsigned ();
+    	      	optionalint ();
+	      	D->Type[0] = T_SHORT;
 		D->Type[1] = T_END;
     	    }
 	    break;
@@ -480,6 +509,9 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 	    }
 	    break;
     }
+
+    /* There may also be qualifiers *after* the initial type */
+    D->Type[0] |= OptionalQualifiers (Qualifiers);
 }
 
 
@@ -489,7 +521,7 @@ static type* ParamTypeCvt (type* T)
  * resulting type.
  */
 {
-    if (IsArray (T)) {
+    if (IsTypeArray (T)) {
        	T += DECODE_SIZE;
 	T[0] = T_PTR;
     }
@@ -717,12 +749,14 @@ static FuncDesc* ParseFuncDecl (void)
 static void Decl (Declaration* D, unsigned Mode)
 /* Recursively process declarators. Build a type array in reverse order. */
 {
+
     if (curtok == TOK_STAR) {
+	type T = T_PTR;
        	NextToken ();
-	/* Allow optional const or volatile modifiers */
-	optional_modifiers ();
+	/* Allow optional const or volatile qualifiers */
+	T |= OptionalQualifiers (T_QUAL_NONE);
        	Decl (D, Mode);
-       	*D->T++ = T_PTR;
+       	*D->T++ = T;
        	return;
     } else if (curtok == TOK_LPAREN) {
        	NextToken ();
@@ -736,7 +770,7 @@ static void Decl (Declaration* D, unsigned Mode)
 	/* Parse the function */
 	Decl (D, Mode);
 	/* Set the fastcall flag */
-	if (!IsFunc (T)) {
+	if (!IsTypeFunc (T)) {
 	    Error (ERR_ILLEGAL_MODIFIER);
 	} else {
 	    FuncDesc* F = DecodePtr (T+1);
@@ -840,7 +874,7 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     TypeCpy (D->T, Spec->Type);
 
     /* Check the size of the generated type */
-    if (!IsFunc (D->Type) && !IsTypeVoid (D->Type) && SizeOf (D->Type) >= 0x10000) {
+    if (!IsTypeFunc (D->Type) && !IsTypeVoid (D->Type) && SizeOf (D->Type) >= 0x10000) {
      	Error (ERR_ILLEGAL_SIZE);
     }
 }
@@ -979,10 +1013,8 @@ static void ParseStructInit (type* Type)
 
 
 
-
-
-void ParseInit (type *tptr)
-/* Parse initialization of variables */
+void ParseInit (type* T)
+/* Parse initialization of variables. */
 {
     int count;
     struct expent lval;
@@ -990,7 +1022,7 @@ void ParseInit (type *tptr)
     const char* str;
     int sz;
 
-    switch (*tptr) {
+    switch (UnqualifiedType (*T)) {
 
      	case T_SCHAR:
      	case T_UCHAR:
@@ -999,7 +1031,7 @@ void ParseInit (type *tptr)
 	    	/* Make it byte sized */
 	    	lval.e_const &= 0xFF;
 	    }
-	    assignadjust (tptr, &lval);
+	    assignadjust (T, &lval);
 	    DefineData (&lval);
      	    break;
 
@@ -1013,7 +1045,7 @@ void ParseInit (type *tptr)
 	    	/* Make it word sized */
 	    	lval.e_const &= 0xFFFF;
 	    }
-	    assignadjust (tptr, &lval);
+	    assignadjust (T, &lval);
 	    DefineData (&lval);
      	    break;
 
@@ -1024,14 +1056,14 @@ void ParseInit (type *tptr)
 	    	/* Make it long sized */
 	    	lval.e_const &= 0xFFFFFFFF;
 	    }
-	    assignadjust (tptr, &lval);
+	    assignadjust (T, &lval);
 	    DefineData (&lval);
      	    break;
 
      	case T_ARRAY:
-     	    sz = Decode (tptr + 1);
-	    t = tptr + DECODE_SIZE + 1;
-       	    if ((t [0] == T_CHAR || t [0] == T_UCHAR) && curtok == TOK_SCONST) {
+     	    sz = Decode (T + 1);
+	    t = T + DECODE_SIZE + 1;
+       	    if (IsTypeChar(t) && curtok == TOK_SCONST) {
      	     	str = GetLiteral (curval);
      	     	count = strlen (str) + 1;
 	    	TranslateLiteralPool (curval);	/* Translate into target charset */
@@ -1042,7 +1074,7 @@ void ParseInit (type *tptr)
      	     	ConsumeLCurly ();
      	     	count = 0;
      	     	while (curtok != TOK_RCURLY) {
-     	     	    ParseInit (tptr + DECODE_SIZE + 1);
+     	     	    ParseInit (T + DECODE_SIZE + 1);
      	     	    ++count;
      	     	    if (curtok != TOK_COMMA)
      	     	 	break;
@@ -1051,9 +1083,9 @@ void ParseInit (type *tptr)
      	     	ConsumeRCurly ();
      	    }
      	    if (sz == 0) {
-     	     	Encode (tptr + 1, count);
+     	     	Encode (T + 1, count);
      	    } else if (count < sz) {
-     	     	g_zerobytes ((sz - count) * SizeOf (tptr + DECODE_SIZE + 1));
+     	     	g_zerobytes ((sz - count) * SizeOf (T + DECODE_SIZE + 1));
      	    } else if (count > sz) {
      	     	Error (ERR_TOO_MANY_INITIALIZERS);
      	    }
@@ -1061,7 +1093,7 @@ void ParseInit (type *tptr)
 
         case T_STRUCT:
         case T_UNION:
-	    ParseStructInit (tptr);
+	    ParseStructInit (T);
      	    break;
 
 	case T_VOID:

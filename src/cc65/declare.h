@@ -74,7 +74,7 @@ void CheckEmptyDecl (const DeclSpec* D);
  */
 
 void ParseInit (type* tptr);
-/* Parse initialization of variables */
+/* Parse initialization of variables. */
 
 
 

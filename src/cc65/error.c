@@ -135,6 +135,7 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "Illegal hex digit",
     "Illegal character constant",
     "Illegal modifier",
+    "Illegal type qualifier",
     "Illegal storage class",
     "Illegal segment name: `%s'",
     "Division by zero",
@@ -150,6 +151,8 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "__fastcall__ is not allowed for C functions",
     "Variable has unknown size",
     "Unknown identifier: `%s'",
+    "Duplicate qualifier: `%s'",
+    "Assignment to const",
 };
 
 

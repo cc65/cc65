@@ -404,11 +404,15 @@ static ExprNode* FuncSizeOf (void)
         /* Cheap local symbol */
         Sym = SymFindLocal (SymLast, SVal, SYM_FIND_EXISTING);
         if (Sym == 0) {
-            Error ("Unknown symbol or scope: `%s%s'",
-                   SB_GetConstBuf (&ScopeName), Name);
+            Error ("Unknown symbol or scope: `%s'", SVal);
         } else {
             SizeSym = GetSizeOfSymbol (Sym);
         }
+
+        /* Remember and skip SVal, terminate ScopeName so it is empty */
+        strcpy (Name, SVal);
+        NextTok ();
+        SB_Terminate (&ScopeName);
 
     } else {
 

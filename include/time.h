@@ -44,6 +44,12 @@
 #endif
 #define NULL	0
 
+/* size_t is needed */
+#ifndef _SIZE_T
+#define _SIZE_T
+typedef unsigned size_t;
+#endif
+
 typedef unsigned long time_t;
 typedef unsigned long clock_t;
 
@@ -91,7 +97,7 @@ unsigned _clocks_per_sec (void);
 
 
 time_t _systime (void);
-/* Similar to time(), but:                 
+/* Similar to time(), but:
  *   - Is not ISO C
  *   - Does not take the additional pointer
  *   - Does not set errno when returning -1
@@ -104,6 +110,7 @@ char* __fastcall__ ctime (const time_t* timep);
 struct tm* __fastcall__ gmtime (const time_t* timep);
 struct tm* __fastcall__ localtime (const time_t* timep);
 time_t __fastcall__ mktime (struct tm* timep);
+size_t __fastcall__ strftime (char* buf, size_t bufsize, const char* format, const struct tm* tm);
 time_t __fastcall__ time (time_t* t);
 
 

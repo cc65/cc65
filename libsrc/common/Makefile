@@ -46,6 +46,7 @@ C_OBJS =	_afailed.o	\
 		realloc.o	\
 		rewind.o	\
 		sscanf.o	\
+                strftime.o      \
 		strxfrm.o	\
 		strtok.o	\
                 timezone.o      \

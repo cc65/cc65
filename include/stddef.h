@@ -39,9 +39,18 @@
 
 
 /* Standard data types */
+#ifndef _PTRDIFF_T
+#define _PTRDIFF_T
 typedef int ptrdiff_t;
+#endif
+#ifndef _WCHAR_T
+#define _WCHAR_T
 typedef char wchar_t;
+#endif
+#ifndef _SIZE_T
+#define _SIZE_T
 typedef unsigned size_t;
+#endif
 
 /* NULL pointer */
 #ifdef NULL
@@ -59,4 +68,4 @@ typedef unsigned size_t;
 
 
 
-		     
+

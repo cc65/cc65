@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  joystick.h				     */
+/*                               joy-kernel.h                                */
 /*                                                                           */
-/*		 Read the joystick on systems that support it		     */
+/*                    Internally used joystick functions                     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
+/* (C) 2002      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -33,83 +33,62 @@
 
 
 
-#ifndef _JOYSTICK_H
-#define _JOYSTICK_H
+#ifndef _JOY_KERNEL_H
+#define _JOY_KERNEL_H
 
 
 
 /*****************************************************************************/
-/*                                  Definitions                              */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-/* Error codes */
-#define JOY_ERR_OK              0       /* No error */
-#define JOY_ERR_NO_DRIVER       1       /* No driver available */
-#define JOY_ERR_CANNOT_LOAD     2       /* Error loading driver */
-#define JOY_ERR_INV_DRIVER      3       /* Invalid driver */
-#define JOY_ERR_NO_DEVICE       4       /* Device (hardware) not found */
-
-/* Argument for the joy_read function */
-#define JOY_1		0
-#define JOY_2		1
-
-/* The following codes are *indices* into the joy_masks array */
-#define JOY_UP          0
-#define JOY_DOWN        1
-#define JOY_LEFT        2
-#define JOY_RIGHT       3
-#define JOY_FIRE        4
-
-/* Array of masks used to check the return value of joy_read for a state */
-extern const unsigned char joy_masks[8];
-
-
-
-/* Result codes of the function. The actual code is a bitwise or
- * of one or more of the following values.
+/* A structure that describes the header of a joystick driver loaded into
+ * memory.
  */
-#if 0
-#if defined(__VIC20__)
-#  define JOY_UP        0x02
-#  define JOY_DOWN      0x04
-#  define JOY_LEFT      0x08
-#  define JOY_RIGHT     0x80
-#  define JOY_FIRE      0x10
-#else
-#  define JOY_UP       	0x01
-#  define JOY_DOWN	0x02
-#  define JOY_LEFT	0x04
-#  define JOY_RIGHT	0x08
-#  define JOY_FIRE	0x10
-#endif
-#endif
+typedef struct {
+
+    /* Driver header */
+    char                id[3];          /* Contains 0x65, 0x6d, 0x64 ("emd") */
+    unsigned char       version;        /* Interface version */
+
+    /* Bitmasks for the joystick states. See joystick.h for indices */
+    unsigned char       masks[8];
+
+    /* Jump vectors. Note that these are not C callable */
+    void*               install;        /* INSTALL routine */
+    void*               deinstall;      /* DEINSTALL routine */
+    void*               count;          /* COUNT routine */
+    void*               read;           /* READ routine */
+
+} joy_drv_header;
+
+
+
+/* EM kernel variables */
+extern joy_drv_header* 	joy_drv;       	/* Pointer to driver */
+
 
 
 
 /*****************************************************************************/
-/* 	      	       	      	   Functions	       			     */
+/* 	      	       	      	   Functions	     			     */
 /*****************************************************************************/
 
 
 
-unsigned char __fastcall__ joy_load_driver (const char* driver);
-/* Load a joystick driver and return an error code */
+unsigned char __fastcall__ joy_install (void* driver);
+/* Install the driver once it is loaded, return an error code. */
 
-unsigned char __fastcall__ joy_unload (void);
-/* Unload the currently loaded driver. */
-
-unsigned char __fastcall__ joy_count (void);
-/* Return the number of joysticks supported by the driver */
-
-unsigned char __fastcall__ joy_read (unsigned char joystick);
-/* Read a particular joystick */
+void __fastcall__ joy_deinstall (void);
+/* Deinstall the driver before unloading it */
 
 
 
-/* End of joystick.h */
+/* End of joy-kernel.h */
 #endif
+
 
 
 

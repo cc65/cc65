@@ -129,13 +129,13 @@ Here is a description of all the command line options:
   <tag><tt>--codesize x</tt></tag>
 
   This options allows finer control about speed vs. size decisions in the
-  code generation phase. It gives the allowed size increase factor (in 
+  code generation phase. It gives the allowed size increase factor (in
   percent). The default is 100 when not using <tt/-Oi/ and 200 when using
   <tt/-Oi/ (<tt/-Oi/ is the same as <tt/--codesize 200/).
 
 
   <tag><tt>--cpu CPU</tt></tag>
-		      
+
   A new, still experimental option. You may specify "6502" or "65C02" as
   the CPU. 6502 is the default, so this will not change anything.
   Specifying 65C02 will use a few 65C02 instructions when generating code.
@@ -629,7 +629,7 @@ id="pragma-checkstack"><p>
 
   Example:
   <tscreen><verb>
-      	#pragma bssseg ("MyCODE")
+      	#pragma codeseg ("MyCODE")
   </verb></tscreen>
 
 
@@ -645,7 +645,7 @@ id="pragma-checkstack"><p>
 
   Example:
   <tscreen><verb>
-      	#pragma bssseg ("MyDATA")
+      	#pragma dataseg ("MyDATA")
   </verb></tscreen>
 
 
@@ -661,7 +661,7 @@ id="pragma-checkstack"><p>
 
   Example:
   <tscreen><verb>
-      	#pragma bssseg ("MyRODATA")
+      	#pragma rodataseg ("MyRODATA")
   </verb></tscreen>
 
 
@@ -682,8 +682,8 @@ id="pragma-checkstack"><p>
   Example:
   <tscreen><verb>
        	#pragma regvaraddr(1)  	/* Allow taking the address
-       			       	 * of register variables
-       			       	 */
+       		      	       	 * of register variables
+       		      	       	 */
   </verb></tscreen>
 
 

@@ -189,11 +189,12 @@ INLINE int SymIsRef (const SymEntry* Sym)
 #if defined(HAVE_INLINE)
 INLINE int SymIsRegVar (const SymEntry* Sym)
 /* Return true if the given entry is a register variable */
+/* ### HACK! Fix the ugly type flags! */
 {
-    return ((Sym->Flags & SC_REGISTER) == SC_REGISTER);
+    return ((Sym->Flags & (SC_REGISTER|SC_TYPE)) == SC_REGISTER);
 }
 #else
-#  define SymIsRegVar(Sym)      (((Sym)->Flags & SC_REGISTER) == SC_REGISTER)
+#  define SymIsRegVar(Sym)      (((Sym)->Flags & (SC_REGISTER|SC_TYPE)) == SC_REGISTER)
 #endif
 
 void CvtRegVarToAuto (SymEntry* Sym);

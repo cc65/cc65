@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -236,7 +236,7 @@ unsigned OptBoolTrans (CodeSeg* S)
 	/* Check for a boolean transformer */
 	if (E->OPC == OP65_JSR                           &&
 	    (Cond = FindBoolCmpCond (E->Arg)) != CMP_INV &&
-	    (N = CS_GetNextEntry (S, I)) != 0        &&
+	    (N = CS_GetNextEntry (S, I)) != 0            &&
 	    (N->Info & OF_ZBRA) != 0) {
 
 	    /* Make the boolean transformer unnecessary by changing the
@@ -306,7 +306,7 @@ unsigned OptCmp1 (CodeSeg* S)
        	if (E->OPC == OP65_STX 	  		&&
 	    !CS_RangeHasLabel (S, I+1, 2)       &&
 	    CS_GetEntries (S, L, I+1, 2)	&&
-       	    L[0]->OPC == OP65_STX		&&
+       	    L[0]->OPC == OP65_STX	  	&&
 	    strcmp (L[0]->Arg, "tmp1") == 0     &&
 	    L[1]->OPC == OP65_ORA	    	&&
 	    strcmp (L[1]->Arg, "tmp1") == 0) {
@@ -361,22 +361,24 @@ unsigned OptCmp2 (CodeSeg* S)
      	/* Check for the sequence */
        	if ((L[0]->OPC == OP65_ADC ||
        	     L[0]->OPC == OP65_AND ||
+             L[0]->OPC == OP65_ASL ||
        	     L[0]->OPC == OP65_DEA ||
        	     L[0]->OPC == OP65_EOR ||
        	     L[0]->OPC == OP65_INA ||
        	     L[0]->OPC == OP65_LDA ||
+             L[0]->OPC == OP65_LSR ||
        	     L[0]->OPC == OP65_ORA ||
        	     L[0]->OPC == OP65_PLA ||
        	     L[0]->OPC == OP65_SBC ||
        	     L[0]->OPC == OP65_TXA ||
        	     L[0]->OPC == OP65_TYA)         &&
 	    !CS_RangeHasLabel (S, I+1, 2)   &&
-	    CS_GetEntries (S, L+1, I+1, 2)   &&
+	    CS_GetEntries (S, L+1, I+1, 2)  &&
 	    L[1]->OPC == OP65_CMP           &&
 	    CE_KnownImm (L[1])              &&
 	    L[1]->Num == 0) {
 
-	    /* Check for the call to boolxx. We cannot remove the compare if
+	    /* Check for the call to boolxx. We only remove the compare if
 	     * the carry flag is evaluated later, because the load will not
 	     * set the carry flag.
 	     */

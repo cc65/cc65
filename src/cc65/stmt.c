@@ -543,7 +543,7 @@ int Statement (int* PendingToken)
 
 	    case TOK_SEMI:
 		/* Ignore it */
-		NextToken ();
+		CheckSemi (PendingToken);
 		break;
 
 	    case TOK_PRAGMA:

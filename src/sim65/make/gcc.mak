@@ -11,7 +11,6 @@ EBIND	= emxbind
 LDFLAGS	=
 
 OBJS = 	chip.o          \
-        chiplib.o       \
         chippath.o      \
         config.o        \
         cpucore.o     	\

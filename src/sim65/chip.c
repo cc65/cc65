@@ -34,16 +34,17 @@
 
 
 #include <string.h>
+#include <dlfcn.h>
 
 /* common */
 #include "coll.h"
+#include "fname.h"
 #include "print.h"
 #include "xmalloc.h"
 
 /* sim65 */
 #include "cfgdata.h"
 #include "chipdata.h"
-#include "chiplib.h"
 #include "error.h"
 #include "chip.h"
 
@@ -57,6 +58,9 @@
 
 /* Sorted list of all chip data structures */
 static Collection Chips = STATIC_COLLECTION_INITIALIZER;
+
+/* A collection containing all libraries */
+static Collection ChipLibraries = STATIC_COLLECTION_INITIALIZER;
 
 /* SimData instance */
 static const SimData Sim65Data = {
@@ -99,7 +103,7 @@ static Chip* FindChip (const char* Name)
     /* ## We do a linear search for now */
     for (I = 0; I < CollCount (&Chips); ++I) {
 
-    	/* Get the chip at this position */
+       	/* Get the chip at this position */
     	Chip* C = CollAt (&Chips, I);
 
     	/* Compare the name */
@@ -121,7 +125,47 @@ static Chip* FindChip (const char* Name)
 
 
 
-Chip* NewChip (ChipLibrary* Library, const ChipData* Data)
+static ChipLibrary* NewChipLibrary (const char* PathName)
+/* Create, initialize and return a new ChipLibrary structure */
+{
+    /* Allocate memory */
+    ChipLibrary* L = xmalloc (sizeof (ChipLibrary));
+
+    /* Initialize the fields */
+    L->LibName   = xstrdup (FindName (PathName));
+    L->PathName  = xstrdup (PathName);
+    L->Handle    = 0;
+    L->Chips     = EmptyCollection;
+
+    /* Return the allocated structure */
+    return L;
+}
+
+
+
+static void FreeChipLibrary (ChipLibrary* L)
+/* Free a ChipLibrary structure */
+{
+    /* Free the names */
+    xfree (L->LibName);
+    xfree (L->PathName);
+
+    /* If the library is open, close it. Discard any errors. */
+    if (L->Handle) {
+        dlclose (L->Handle);
+        (void) dlerror ();
+    }
+
+    /* We may have to handle the Chip pointers, but currently the function
+     * is never called with a non empty Chips collection, so we don't care
+     * for now.
+     */
+    xfree (L);
+}
+
+
+
+static Chip* NewChip (ChipLibrary* Library, const ChipData* Data)
 /* Allocate a new chip structure, initialize and return it */
 {
     /* Allocate memory */
@@ -142,7 +186,7 @@ Chip* NewChip (ChipLibrary* Library, const ChipData* Data)
 
 
 ChipInstance* NewChipInstance (const char* ChipName, unsigned Addr,
-                               unsigned Size, const Collection* Attributes)
+                               unsigned Size, Collection* Attributes)
 {
     ChipInstance* CI;
 
@@ -159,9 +203,7 @@ ChipInstance* NewChipInstance (const char* ChipName, unsigned Addr,
     CI->C    = C;
     CI->Addr = Addr;
     CI->Size = Size;
-    CI->Data = C->Data->InitInstance (Addr, Size,
-                                      (const CfgData**) Attributes->Items,
-                                      CollCount (Attributes));
+    CI->Data = C->Data->InitInstance (Addr, Size, Attributes);
 
     /* Assign the chip instance to the chip */
     CollAppend (&C->Instances, CI);
@@ -198,6 +240,95 @@ void SortChips (void)
 {
     /* Last act: Sort the chips by name */
     CollSort (&Chips, CmpChips, 0);
+}
+
+
+
+void LoadChipLibrary (const char* LibName)
+/* Load a chip library. This includes loading the shared libary, allocating
+ * and initializing the data structure, and loading all chip data from the
+ * library.
+ */
+{
+    const char* Msg;
+    int (*GetChipData) (const struct ChipData**, unsigned*);
+    int ErrorCode;
+    const ChipData* Data;       /* Pointer to chip data */
+    unsigned ChipCount;         /* Number of chips in this library */
+    unsigned I;
+
+
+    /* Allocate a new ChipLibrary structure */
+    ChipLibrary* L = NewChipLibrary (LibName);
+
+    /* Open the library */
+    L->Handle = dlopen (L->PathName, RTLD_GLOBAL | RTLD_LAZY);
+
+    /* Check for errors */
+    Msg = dlerror ();
+    if (Msg) {
+        Error ("Cannot open `%s': %s", L->PathName, Msg);
+        FreeChipLibrary (L);
+        return;
+    }
+
+    /* Locate the GetChipData function */
+    GetChipData = dlsym (L->Handle, "GetChipData");
+
+    /* Check the error message */
+    Msg = dlerror ();
+    if (Msg) {
+       	/* We had an error */
+        Error ("Cannot find export `GetChipData' in `%s': %s", L->LibName, Msg);
+        FreeChipLibrary (L);
+        return;
+    }
+
+    /* Call the function to read the chip data */
+    ErrorCode = GetChipData (&Data, &ChipCount);
+    if (ErrorCode != 0) {
+        Error ("Function `GetChipData' in `%s' returned error %d", L->LibName, ErrorCode);
+        FreeChipLibrary (L);
+        return;
+    }
+
+    /* Remember the library */
+    CollAppend (&ChipLibraries, L);
+
+    /* Print some information */
+    Print (stderr, 1, "Opened chip library `%s'\n", L->PathName);
+
+    /* Create the chips */
+    for (I = 0; I < ChipCount; ++I) {
+
+        Chip* C;
+
+        /* Get a pointer to the chip data */
+        const ChipData* D = Data + I;
+
+        /* Check if the chip data has the correct version */
+        if (Data->MajorVersion != CHIPDATA_VER_MAJOR) {
+            Warning ("Version mismatch for `%s' (%s), expected %u, got %u",
+                     D->ChipName, L->LibName,
+                     CHIPDATA_VER_MAJOR, D->MajorVersion);
+            /* Ignore this chip */
+            continue;
+        }
+
+        /* Generate a new chip */
+        C = NewChip (L, D);
+
+        /* Insert a reference to the chip into the library exporting it */
+        CollAppend (&L->Chips, C);
+
+        /* Output chip name and version to keep the user happy */
+        Print (stdout, 1,
+               "  Found `%s', version %u.%u in library `%s'\n",
+               Data->ChipName,
+               Data->MajorVersion,
+               Data->MinorVersion,
+               L->LibName);
+    }
 }
 
 

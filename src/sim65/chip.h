@@ -55,9 +55,9 @@
 
 /* Forwards */
 struct CfgData;
-struct ChipLibrary;
-typedef struct Chip Chip;
 typedef struct ChipInstance ChipInstance;
+typedef struct Chip Chip;
+typedef struct ChipLibrary ChipLibrary;
 
 /* One instance of a chip */
 struct ChipInstance {
@@ -74,6 +74,14 @@ struct Chip {
     Collection          Instances;      /* Pointer to chip instances */
 };
 
+/* ChipLibrary structure */
+struct ChipLibrary {
+    char*                   LibName;    /* Name of the library as given */
+    char*                   PathName;   /* Name of library including path */
+    void*                   Handle;     /* Pointer to libary handle */
+    Collection              Chips;      /* Chips in this library */
+};
+
 
 
 /*****************************************************************************/
@@ -82,11 +90,8 @@ struct Chip {
 
 
 
-Chip* NewChip (struct ChipLibrary* Library, const ChipData* Data);
-/* Allocate a new chip structure, initialize and return it */
-
 ChipInstance* NewChipInstance (const char* ChipName, unsigned Addr,
-                               unsigned Size, const Collection* Attributes);
+                               unsigned Size, Collection* Attributes);
 /* Allocate a new chip instance for the chip. */
 
 ChipInstance* MirrorChipInstance (const ChipInstance* Orig, unsigned Addr);
@@ -95,12 +100,17 @@ ChipInstance* MirrorChipInstance (const ChipInstance* Orig, unsigned Addr);
 void SortChips (void);
 /* Sort all chips by name. Called after loading */
 
+void LoadChipLibrary (const char* LibName);
+/* Load a chip library. This includes loading the shared libary, allocating
+ * and initializing the data structure, and loading all chip data from the
+ * library.
+ */
+
 
 
 /* End of chip.h */
 
 #endif
-
 
 
 

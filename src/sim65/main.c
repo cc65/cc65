@@ -51,7 +51,6 @@
 
 /* sim65 */
 #include "chip.h"
-#include "chiplib.h"
 #include "chippath.h"
 #include "config.h"
 #include "cpucore.h"
@@ -298,7 +297,6 @@ int main (int argc, char* argv[])
     /* Read the config file */
     CfgRead ();
 
-    /* Initialize the CPU */
     CPUInit ();
 #if 0
     CPURun ();

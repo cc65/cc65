@@ -61,8 +61,7 @@ struct ChipData {
 
     /* -- Exported functions -- */
     int           (*InitChip) (const struct SimData* Data);
-    void*         (*InitInstance) (unsigned Addr, unsigned Range, 
-                                   const struct CfgData** Data, unsigned CfgDataCount);
+    void*         (*InitInstance) (unsigned Addr, unsigned Range, void* CfgInfo);
     void          (*WriteCtrl) (void* Data, unsigned Offs, unsigned char Val);
     void          (*Write) (void* Data, unsigned Offs, unsigned char Val);
     unsigned char (*ReadCtrl) (void* Data, unsigned Offs);

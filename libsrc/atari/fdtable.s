@@ -42,7 +42,7 @@
 	cmp	fd_table+ft_iocb,x	; entry in use?
 	beq	inval			; no, return error
 	lda	fd_table+ft_usa,x	; get usage counter
-	beq	ok_notlast		; 0?
+	beq	ok_notlast		; 0? (shouldn't happen)
 	sec
 	sbc	#1			; decr usage counter
 	sta	fd_table+ft_usa,x
@@ -53,10 +53,11 @@ retiocb:php
 	tax
 	plp
 	bne	cont
-	php
 	lda	#$ff
 	sta	fd_table+ft_iocb,y	; clear table entry
-	plp
+	lda	fd_table+ft_flag,y
+	and	#16			; opened by app?
+	eor	#16			; return set Z if yes
 cont:	rts
 
 ok_notlast:
@@ -251,7 +252,7 @@ do_open:lda	tmp1
 	ldy	#$ff
 srchfree:
 	tya
-	cmp	fd_table,x
+	cmp	fd_table,x	; check ft_iocb field for $ff
 	beq	freefnd		; found a free slot
 	txa
 	clc
@@ -289,7 +290,8 @@ l2:	sta	fd_table+ft_dev,x	; set device
 	lda	loc_Y
 	sta	fd_table+ft_iocb,x	; set iocb index
 	lda	loc_devnum
-	and	#7			; only 3 bits
+	and	#7			; device number is 3 bits
+	ora	#16			; indicated a fd actively opened by the app
 	sta	fd_table+ft_flag,x
 	lda	tmp2
 	jsr	fdt_to_fdi		; get new index

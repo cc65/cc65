@@ -26,7 +26,7 @@ ppuhi           = $74
 ppulo           = $75
 ppuval          = $76
 
-screenrows 	= (32-4)
+screenrows 	= (30-1)
 charsperline    = 32
 xsize           = charsperline
 

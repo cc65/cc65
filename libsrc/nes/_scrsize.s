@@ -11,8 +11,8 @@
 
 .proc   screensize
 
-        ldx     #screenrows
-        ldy     #charsperline
+        ldx     #charsperline
+        ldy     #screenrows
         rts
 
 .endproc

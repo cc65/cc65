@@ -104,6 +104,9 @@ unsigned char __fastcall__ tgi_geterror (void);
  * error.
  */
 
+const char* __fastcall__ tgi_geterrormsg (unsigned char code);
+/* Get an error message describing the error in code. */
+
 void __fastcall__ tgi_clear (void);
 /* Clear the screen. */
 

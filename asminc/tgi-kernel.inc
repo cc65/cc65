@@ -6,7 +6,7 @@
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */
-;* (C) 2002-2003 Ullrich von Bassewitz                                       */
+;* (C) 2002-2004 Ullrich von Bassewitz                                       */
 ;*               Römerstraße 52                                              */
 ;*               D-70794 Filderstadt                                         */
 ;* EMail:        uz@cc65.org                                                 */
@@ -147,6 +147,7 @@ TGI_TEXT_VERTICAL       = 1
         .global _tgi_init
         .global _tgi_done
         .global _tgi_geterror
+        .global _tgi_geterrormsg
         .global _tgi_clear
         .global _tgi_getpagecount
         .global _tgi_setviewpage

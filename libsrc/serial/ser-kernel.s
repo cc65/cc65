@@ -59,12 +59,12 @@ _ser_install:
 
 ; Copy the jump vectors
 
-        ldy     #SER_HDR_JUMPTAB
+        ldy     #SER_HDR::JUMPTAB
         ldx     #0
 @L1:    inx                             ; Skip the JMP opcode
         jsr     copy                    ; Copy one byte
         jsr     copy                    ; Copy one byte
-        cpx     #(SER_HDR_JUMPCOUNT*3)
+        cpx     #(SER_HDR::JUMPTAB + .sizeof(SER_HDR::JUMPTAB))
         bne     @L1
 
         jmp     ser_install             ; Call driver install routine

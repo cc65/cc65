@@ -90,7 +90,7 @@ ExpectedHdrSize = * - ExpectedHdr
 
 .code
 PushCallerData:
-        ldy     #MODCTRL_CALLERDATA+1
+        ldy     #MOD_CTRL::CALLERDATA+1
         lda     (Ctrl),y
         tax
         dey
@@ -336,7 +336,7 @@ _mod_load:
 ; Get the read function pointer from the control structure and place it into
 ; our call vector
 
-        ldy     #MODCTRL_READ
+        ldy     #MOD_CTRL::READ
         lda     (Ctrl),y
         sta     Read+1
         iny
@@ -397,10 +397,10 @@ Opt:    jsr     ReadByte                ; Read the length byte
         bne     OSError                 ; Wrong version
 
         jsr     ReadByte                ; Get low byte of id
-        ldy     #MODCTRL_MODULE_ID
+        ldy     #MOD_CTRL::MODULE_ID
         sta     (Ctrl),y
         jsr     ReadByte
-        ldy     #MODCTRL_MODULE_ID+1
+        ldy     #MOD_CTRL::MODULE_ID+1
         sta     (Ctrl),y
 
         inc     TPtr+1                  ; Remember that we got the OS
@@ -448,7 +448,7 @@ CalcSizes:
         lda     TPtr
         add     Header + O65_HDR_BLEN
         pha                             ; Save low byte of total size
-        ldy     #MODCTRL_MODULE_SIZE
+        ldy     #MOD_CTRL::MODULE_SIZE
         sta     (Ctrl),y
         lda     TPtr+1
         adc     Header + O65_HDR_BLEN + 1
@@ -465,7 +465,7 @@ CalcSizes:
         sta     Module
         stx     Module+1
 
-        ldy     #MODCTRL_MODULE
+        ldy     #MOD_CTRL::MODULE
         sta     (Ctrl),y
         txa
         iny

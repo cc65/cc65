@@ -43,13 +43,13 @@
 ; loader will place informational data if it was successful. You will have to
 ; check the return code of mod_load before accessing any of these additional
 ; struct members.
-MODCTRL_READ            =       0
-MODCTRL_CALLERDATA      =       2
-MODCTRL_MODULE          =       4       ; Pointer to module data
-MODCTRL_MODULE_SIZE     =       6       ; Total size of loaded module
-MODCTRL_MODULE_ID       =       8
-MODCTRL_SIZE            =      10       ; Total size of struct
-
+.struct MOD_CTRL
+        READ            .addr
+        CALLERDATA      .word
+        MODULE          .addr           ; Pointer to module data
+        MODULE_SIZE     .word           ; Total size of loaded module
+        MODULE_ID       .word
+.endstruct
 
 ; unsigned char mod_load (struct mod_ctrl* ctrl);
 ; /* Load a module into memory and relocate it. The function will return an
@@ -65,15 +65,14 @@ MODCTRL_SIZE            =      10       ; Total size of struct
 ;  */
 .global		_mod_free
 
-
-
 ; Errors
-MLOAD_OK                =       0       ; Module load successful
-MLOAD_ERR_READ          =       1       ; Read error
-MLOAD_ERR_HDR           =       2       ; Header error
-MLOAD_ERR_OS            =       3       ; Wrong OS
-MLOAD_ERR_FMT           =       4       ; Data format error
-MLOAD_ERR_MEM           =       5       ; Not enough memory
-
+.enum
+        MLOAD_OK        ; Module load successful
+        MLOAD_ERR_READ  ; Read error
+        MLOAD_ERR_HDR   ; Header error
+        MLOAD_ERR_OS    ; Wrong OS
+        MLOAD_ERR_FMT   ; Data format error
+        MLOAD_ERR_MEM   ; Not enough memory
+.endenum
 
 

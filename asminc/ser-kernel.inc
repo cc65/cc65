@@ -34,31 +34,34 @@
 
 
 ;------------------------------------------------------------------------------
-; Offsets into the driver header
+; The driver header
 
-SER_HDR_ID              = 0             ; Contains 0x73, 0x65, 0x72 ("ser")
-SER_HDR_VERSION         = 3             ; Interface version
+.struct SER_HDR
+        ID      .byte   3       ; Contains 0x73, 0x65, 0x72 ("ser")
+        VERSION .byte   1       ; Interface version
+        JUMPTAB .struct 
+            INSTALL     .word   ; INSTALL routine
+            UNINSTALL   .word   ; UNINSTALL routine
+            OPEN        .word   ; OPEN routine
+            CLOSE       .word   ; CLOSE routine
+            GET         .word   ; GET routine
+            PUT         .word   ; PUT routine
+            STATUS      .word   ; STATUS routine
+            IOCTL       .word   ; IOCTL routine
+        .endstruct
+.endstruct
 
-SER_HDR_JUMPTAB         = 4
-SER_HDR_INSTALL         = SER_HDR_JUMPTAB+0     ; INSTALL routine
-SER_HDR_UNINSTALL       = SER_HDR_JUMPTAB+2     ; UNINSTALL routine
-SER_HDR_OPEN            = SER_HDR_JUMPTAB+4     ; OPEN routine
-SER_HDR_CLOSE           = SER_HDR_JUMPTAB+6     ; CLOSE routine
-SER_HDR_GET             = SER_HDR_JUMPTAB+8     ; GET routine
-SER_HDR_PUT             = SER_HDR_JUMPTAB+10     ; PUT routine
-SER_HDR_STATUS          = SER_HDR_JUMPTAB+12    ; STATUS routine
-SER_HDR_IOCTL           = SER_HDR_JUMPTAB+14    ; IOCTL routine
-
-SER_HDR_JUMPCOUNT       = 8                     ; Number of jump vectors
 
 ;------------------------------------------------------------------------------
-; Offsets into the struct passed to ser_params
+; ser_params
 
-SER_PARAMS_BAUDRATE     =       0       ; Baudrate
-SER_PARAMS_DATABITS     =       1       ; Number of data bits
-SER_PARAMS_STOPBITS     =       2       ; Number of stop bits
-SER_PARAMS_PARITY       =       3       ; Parity setting
-SER_PARAMS_HANDSHAKE    =       4       ; Type of handshake to use
+.struct SER_PARAMS
+        BAUDRATE        .byte           ; Baudrate
+        DATABITS        .byte           ; Number of data bits
+        STOPBITS        .byte           ; Number of stop bits
+        PARITY          .byte           ; Parity setting
+        HANDSHAKE       .byte           ; Type of handshake to use
+.endstruct
 
 ;------------------------------------------------------------------------------
 ; Serial parameters

@@ -63,7 +63,7 @@ ACIA_CLOCK      = ACIA+7        ; Turbo232 external baud-rate generator
 ; Global variables
 ;
 
-; We reuse the RS232 zero page variables for the driver, since the ROM 
+; We reuse the RS232 zero page variables for the driver, since the ROM
 ; routines cannot be used together with this driver.
 RecvHead        = $B5           ; Head of receive buffer
 RecvTail        = $BD           ; Tail of receive buffer
@@ -183,7 +183,7 @@ OPEN:
 
 ; Check if the handshake setting is valid
 
-        ldy	#SER_PARAMS_HANDSHAKE	; Handshake
+        ldy	#SER_PARAMS::HANDSHAKE	; Handshake
         lda     (ptr1),y
         cmp	#SER_HS_HW		; This is all we support
         bne	InvParam
@@ -195,21 +195,21 @@ OPEN:
 ; Set the value for the control register, which contains stop bits, word
 ; length and the baud rate.
 
-        ldy     #SER_PARAMS_BAUDRATE
+        ldy     #SER_PARAMS::BAUDRATE
         lda     (ptr1),y                ; Baudrate index
         tay
         lda     BaudTable,y             ; Get 6551 value
         bmi     InvBaud	   		; Branch if rate not supported
         sta     tmp1
 
-        ldy	#SER_PARAMS_DATABITS	; Databits
+        ldy	#SER_PARAMS::DATABITS	; Databits
         lda     (ptr1),y
         tay
         lda     BitTable,y
         ora     tmp1
         sta     tmp1
 
-        ldy	#SER_PARAMS_STOPBITS	; Stopbits
+        ldy	#SER_PARAMS::STOPBITS	; Stopbits
         lda     (ptr1),y
         tay
         lda     StopTable,y
@@ -220,7 +220,7 @@ OPEN:
 ; Set the value for the command register. We remember the base value in
 ; RtsOff, since we will have to manipulate ACIA_CMD often.
 
-        ldy	#SER_PARAMS_PARITY	; Parity
+        ldy    	#SER_PARAMS::PARITY	; Parity
         lda     (ptr1),y
         tay
         lda     ParityTable,y

@@ -25,7 +25,6 @@ vsprintf.s
 sprintf.s
 abort.s
 errormsg.s
-_hadd.s
 cprintf.s
 vcprintf.s
 freopen.s

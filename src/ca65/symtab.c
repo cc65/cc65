@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -152,9 +152,6 @@ static SymTable* NewSymTable (SymTable* Parent, const char* Name)
                 }
             }
         }
-    } else {
-        /* This is the root table */
-        RootScope = S;
     }
 
     /* Return the prepared struct */
@@ -215,12 +212,18 @@ void SymEnterLevel (const char* ScopeName, unsigned AddrSize)
         AddrSize = GetCurrentSegAddrSize ();
     }
 
-    /* Search for an existing table/create a new one */
-    CurrentScope = SymFindScope (CurrentScope, ScopeName, SYM_ALLOC_NEW);
-
-    /* Check if the scope has been defined before */
-    if (CurrentScope->Flags & ST_DEFINED) {
-        Error ("Duplicate scope `%s'", ScopeName);
+    /* If we have a current scope, search for the given name and create a 
+     * new one if it doesn't exist. If this is the root scope, just create it.
+     */
+    if (CurrentScope) {
+        CurrentScope = SymFindScope (CurrentScope, ScopeName, SYM_ALLOC_NEW);
+    
+        /* Check if the scope has been defined before */
+        if (CurrentScope->Flags & ST_DEFINED) {
+            Error ("Duplicate scope `%s'", ScopeName);
+        }
+    } else {
+        CurrentScope = RootScope = NewSymTable (0, ScopeName);
     }
 
     /* Mark the scope as defined */
@@ -467,21 +470,20 @@ int SymIsZP (SymEntry* S)
      * enclosing scope for a symbol with the same name, and return the ZP
      * attribute of this symbol if we find one.
      */
-    if (!IsLocalNameId (S->Name)                                        &&
-	(S->Flags & (SF_ZP | SF_ABS | SF_DEFINED | SF_IMPORT)) == 0     &&
+    if (!IsLocalNameId (S->Name) && (S->Flags & (SF_DEFINED | SF_IMPORT)) == 0 &&
 	S->SymTab->Parent != 0) {
 
 	/* Try to find a symbol with the same name in the enclosing scope */
 	SymEntry* E = SymFindAny (S->SymTab->Parent, GetString (S->Name));
 
 	/* If we found one, use the ZP flag */
-	if (E && (E->Flags & SF_ZP) != 0) {
-	    S->Flags |= SF_ZP;
+       	if (E && E->AddrSize == ADDR_SIZE_ZP) {
+            S->AddrSize = ADDR_SIZE_ZP;
 	}
     }
 
     /* Check the ZP flag */
-    return (S->Flags & SF_ZP) != 0;
+    return (S->AddrSize == ADDR_SIZE_ZP);
 }
 
 
@@ -537,7 +539,8 @@ static void SymCheckUndefined (SymEntry* S)
 	       	/* The symbol is already marked as imported external symbol */
 	       	PError (&S->Pos, "Symbol `%s' is already an import", GetString (S->Name));
 	    }
-	    Sym->Flags |= S->Flags & (SF_EXPORT | SF_ZP);
+	    Sym->Flags |= (S->Flags & SF_EXPORT);
+            Sym->ExportSize = S->ExportSize;
 	}
 
 	/* Transfer the referenced flag */
@@ -655,7 +658,7 @@ void SymDump (FILE* F)
 		     (S->Flags & SF_REFERENCED)? "REF" : "---",
 		     (S->Flags & SF_IMPORT)? "IMP" : "---",
 		     (S->Flags & SF_EXPORT)? "EXP" : "---",
-		     (S->Flags & SF_ZP)? "ZP" : "--");
+                     AddrSizeToStr (S->AddrSize));
 	}
 	/* Next symbol */
 	S = S->List;
@@ -685,7 +688,7 @@ void WriteImports (void)
         if ((S->Flags & (SF_TRAMPOLINE | SF_IMPORT)) == SF_IMPORT &&
             (S->Flags & (SF_REFERENCED | SF_FORCED)) != 0) {
 
-     	    if (S->Flags & SF_ZP) {
+     	    if (S->AddrSize == ADDR_SIZE_ZP) {
      		ObjWrite8 (IMP_ZP);
      	    } else {
      		ObjWrite8 (IMP_ABS);
@@ -711,7 +714,7 @@ static unsigned char GetExprMask (SymEntry* S)
     ExprMask = (SymIsConst (S))? EXP_CONST : EXP_EXPR;
 
     /* Add zeropage/abs bits */
-    ExprMask |= (S->Flags & SF_ZP)? EXP_ZP : EXP_ABS;
+    ExprMask |= (S->AddrSize == ADDR_SIZE_ZP)? EXP_ZP : EXP_ABS;
 
     /* Add the label/equate bits */
     ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;

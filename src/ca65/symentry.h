@@ -58,8 +58,6 @@
 #define SF_EXPORT      	0x0004	    	/* Export this symbol */
 #define SF_IMPORT   	0x0008	    	/* Import this symbol */
 #define SF_GLOBAL	0x0010	    	/* Global symbol */
-#define SF_ZP  	       	0x0020	    	/* Declared as zeropage symbol */
-#define SF_ABS		0x0040 		/* Declared as absolute symbol */
 #define SF_LABEL        0x0080          /* Used as a label */
 #define SF_FORCED       0x0100          /* Forced import, SF_IMPORT also set */
 #define SF_FINALIZED    0x0200          /* Symbol is finalized */

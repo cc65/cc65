@@ -116,17 +116,17 @@ static unsigned ParseArg (type* Type, ExprDesc* Arg)
     unsigned Flags = CF_FORCECHAR;
 
     /* Read the expression we're going to pass to the function */
-    int k = hie1 (InitExprDesc (Arg));
+    hie1 (InitExprDesc (Arg));
 
     /* Convert this expression to the expected type */
-    k = TypeConversion (Arg, k, Type);
+    TypeConversion (Arg, Type);
 
     /* If the value is not a constant, load it into the primary */
-    if (k != 0 || Arg->Flags != E_MCONST) {
+    if (ED_IsLVal (Arg) || Arg->Flags != E_MCONST) {
 
         /* Load into the primary */
-        ExprLoad (CF_NONE, k, Arg);
-        k = 0;
+        ExprLoad (CF_NONE, Arg);
+        ED_MakeRVal (Arg);
 
     } else {
 
@@ -191,7 +191,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)),
 	if (Arg.ConstVal == 0) {
 	    Warning ("Call to memset has no effect");
 	}
-        ExprLoad (CF_FORCECHAR, 0, &Arg);
+        ExprLoad (CF_FORCECHAR, &Arg);
     }
 
     /* Emit the actual function call */
@@ -208,7 +208,6 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
 /* Handle the strlen function */
 {
     static type   ParamType[] = { T_PTR, T_SCHAR, T_END };
-    int           k;
     ExprDesc      Param;
     unsigned      CodeFlags;
     unsigned long ParamName;
@@ -217,7 +216,8 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
     ParamType[1] = GetDefaultChar () | T_QUAL_CONST;
 
     /* Fetch the parameter and convert it to the type needed */
-    k = TypeConversion (&Param, hie1 (InitExprDesc (&Param)), ParamType);
+    hie1 (InitExprDesc (&Param));
+    TypeConversion (&Param, ParamType);
 
     /* Check if the parameter is a constant array of some type, or a numeric
      * address cast to a pointer.
@@ -259,9 +259,9 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
                 if (!WriteableStrings) {
                     /* String literals are const */
                     ExprDesc Length;
-                    MakeConstIntExpr (&Length, strlen (GetLiteral (Param.ConstVal)));
+                    ED_MakeConstInt (&Length, strlen (GetLiteral (Param.ConstVal)));
                     ResetLiteralPoolOffs (Param.ConstVal);
-                    ExprLoad (CF_NONE, 0, &Length);
+                    ExprLoad (CF_NONE, &Length);
                     goto ExitPoint;
                 } else {
                     CodeFlags |= CF_CONST | CF_STATIC;
@@ -276,7 +276,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
     } else {
 
      	/* Not an array with a constant address. Load parameter into primary */
-     	ExprLoad (CF_NONE, k, &Param);
+     	ExprLoad (CF_NONE, &Param);
 
     }
 

@@ -57,13 +57,13 @@ unsigned Test (unsigned Label, int Invert)
     unsigned Result;
 
     /* Evaluate the expression */
-    int k = expr (hie0, InitExprDesc (&lval));
+    expr (hie0, InitExprDesc (&lval));
 
     /* Check for a boolean expression */
     CheckBoolExpr (&lval);
 
     /* Check for a constant expression */
-    if (k == 0 && lval.Flags == E_MCONST) {
+    if (ED_IsRVal (&lval) && lval.Flags == E_MCONST) {
 
         /* Result is constant, so we know the outcome */
         Result = (lval.ConstVal != 0);
@@ -77,7 +77,7 @@ unsigned Test (unsigned Label, int Invert)
       	}
 
     } else {
-        
+
         /* Result is unknown */
         Result = TESTEXPR_UNKNOWN;
 
@@ -87,7 +87,7 @@ unsigned Test (unsigned Label, int Invert)
         }
 
         /* Load the value into the primary register */
-        ExprLoad (CF_FORCECHAR, k, &lval);
+        ExprLoad (CF_FORCECHAR, &lval);
 
         /* Generate the jump */
         if (Invert) {

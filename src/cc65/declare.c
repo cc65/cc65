@@ -1224,7 +1224,7 @@ static unsigned ParseScalarInit (type* T)
 
     /* Get the expression and convert it to the target type */
     ConstExpr (&ED);
-    TypeConversion (&ED, 0, T);
+    TypeConversion (&ED, T);
 
     /* Output the data */
     DefineData (&ED);
@@ -1251,7 +1251,7 @@ static unsigned ParsePointerInit (type* T)
         /* Make the const value the correct size */
         ED.ConstVal &= 0xFFFF;
     }
-    TypeConversion (&ED, 0, T);
+    TypeConversion (&ED, T);
 
     /* Output the data */
     DefineData (&ED);

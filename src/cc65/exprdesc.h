@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2002-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -70,6 +70,9 @@
 #define E_TLLAB	       	0x0004U /* Local label */
 #define E_TREGISTER    	0x0005U	/* Register variable */
 
+#define E_RVAL          0x0000U /* Expression node is a value */
+#define E_LVAL          0x1000U /* Expression node is a reference */
+
 /* Defines for the test field of the expression descriptor */
 #define E_CC   	       	0x0001U	/* expr has set cond codes apropos result value */
 #define E_FORCETEST    	0x0002U /* if expr has NOT set CC, force a test */
@@ -103,7 +106,61 @@ INLINE ExprDesc* InitExprDesc (ExprDesc* Expr)
 #  define InitExprDesc(E)       memset ((E), 0, sizeof (*(E)))
 #endif
 
-void MakeConstIntExpr (ExprDesc* Expr, long Value);
+#if defined(HAVE_INLINE)
+INLINE int ED_IsLVal (const ExprDesc* Expr)
+/* Return true if the expression is a reference */
+{
+    return (Expr->Flags & E_LVAL) != 0;
+}
+#else
+#  define ED_IsLVal(Expr)       (((Expr)->Flags & E_LVAL) != 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_IsRVal (const ExprDesc* Expr)
+/* Return true if the expression is a rvalue */
+{
+    return (Expr->Flags & E_LVAL) == 0;
+}
+#else
+#  define ED_IsRVal(Expr)       (((Expr)->Flags & E_LVAL) == 0)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_SetValType (ExprDesc* Expr, int Ref)
+/* Set the reference flag for an expression and return it (the flag) */
+{
+    Expr->Flags = Ref? (Expr->Flags | E_LVAL) : (Expr->Flags & ~E_LVAL);
+    return Ref;
+}
+#else
+/* Beware: Just one occurance of R below, since it may have side effects! */
+#  define ED_SetValType(E, R)                                                   \
+        (((E)->Flags = (R)? ((E)->Flags | E_LVAL) : ((E)->Flags & ~E_LVAL)),    \
+        ED_IsLVal (E))
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_MakeLVal (ExprDesc* Expr)
+/* Make the expression a lvalue and return true */
+{
+    return ED_SetValType (Expr, 1);
+}
+#else
+#  define ED_MakeLVal(Expr)       ED_SetValType (Expr, 1)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_MakeRVal (ExprDesc* Expr)
+/* Make the expression a rvalue and return false */
+{
+    return ED_SetValType (Expr, 0);
+}
+#else
+#  define ED_MakeRVal(Expr)       ED_SetValType (Expr, 0)
+#endif
+
+ExprDesc* ED_MakeConstInt (ExprDesc* Expr, long Value);
 /* Make Expr a constant integer expression with the given value */
 
 void PrintExprDesc (FILE* F, ExprDesc* Expr);

@@ -30,7 +30,7 @@ void PushAddr (ExprDesc* lval);
  * must be saved if it's not constant, before evaluating the rhs.
  */
 
-void ConstSubExpr (int (*F) (ExprDesc*), ExprDesc* Expr);
+void ConstSubExpr (void (*F) (ExprDesc*), ExprDesc* Expr);
 /* Will evaluate an expression via the given function. If the result is not
  * a constant, a diagnostic will be printed, and the value is replaced by
  * a constant one to make sure there are no internal errors that result
@@ -42,7 +42,7 @@ void CheckBoolExpr (ExprDesc* lval);
  * if not.
  */
 
-void ExprLoad (unsigned flags, int k, ExprDesc *lval);
+void ExprLoad (unsigned flags, ExprDesc *lval);
 /* Put the result of an expression into the primary register */
 
 void Store (ExprDesc* lval, const type* StoreType);
@@ -51,17 +51,17 @@ void Store (ExprDesc* lval, const type* StoreType);
  * is NULL, use lval->Type instead.
  */
 
-int hie0 (ExprDesc *lval);
+void hie0 (ExprDesc *lval);
 /* Parse comma operator. */
 
-int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval);
+int evalexpr (unsigned flags, void (*f) (ExprDesc*), ExprDesc* lval);
 /* Will evaluate an expression via the given function. If the result is a
  * constant, 0 is returned and the value is put in the lval struct. If the
  * result is not constant, ExprLoad is called to bring the value into the
  * primary register and 1 is returned.
  */
 
-int expr (int (*func) (ExprDesc*), ExprDesc *lval);
+void expr (void (*Func) (ExprDesc*), ExprDesc *Expr);
 /* Expression parser; func is either hie0 or hie1. */
 
 void expression1 (ExprDesc* lval);
@@ -69,8 +69,8 @@ void expression1 (ExprDesc* lval);
  * the primary register
  */
 
-void expression (ExprDesc* lval);
-/* Evaluate an expression and put it into the primary register */
+void expression0 (ExprDesc* lval);
+/* Evaluate an expression via hie0 and put it into the primary register */
 
 void ConstExpr (ExprDesc* lval);
 /* Get a constant value */
@@ -81,10 +81,10 @@ void ConstIntExpr (ExprDesc* Val);
 void intexpr (ExprDesc* lval);
 /* Get an integer expression */
 
-int hie10 (ExprDesc* lval);
+void hie10 (ExprDesc* lval);
 /* Handle ++, --, !, unary - etc. */
 
-int hie1 (ExprDesc* lval);
+void hie1 (ExprDesc* lval);
 /* Parse first level of expression hierarchy. */
 
 void DefineData (ExprDesc* lval);

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2002-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -34,13 +34,14 @@
 
 
 /* cc65 */
+#include "assignment.h"
 #include "codegen.h"
 #include "datatype.h"
 #include "error.h"
 #include "expr.h"
+#include "scanner.h"
 #include "typecmp.h"
 #include "typeconv.h"
-#include "assignment.h"
 
 
 
@@ -50,18 +51,25 @@
 
 
 
-int Assignment (ExprDesc* lval)
+void Assignment (ExprDesc* lval)
 /* Parse an assignment */
 {
-    int k;
     ExprDesc lval2;
     type* ltype = lval->Type;
 
+
+    /* We must have an lvalue for an assignment */
+    if (ED_IsRVal (lval)) {
+        Error ("Invalid lvalue in assignment");
+    }
 
     /* Check for assignment to const */
     if (IsQualConst (ltype)) {
     	Error ("Assignment to const");
     }
+
+    /* Skip the '=' token */
+    NextToken ();
 
     /* cc65 does not have full support for handling structs by value. Since
      * assigning structs is one of the more useful operations from this
@@ -87,12 +95,12 @@ int Assignment (ExprDesc* lval)
         if (UseReg) {
             PushAddr (lval);
         } else {
-    	    ExprLoad (0, 0, lval);
+    	    ExprLoad (CF_NONE, lval);
             g_push (CF_PTR | CF_UNSIGNED, 0);
         }
 
      	/* Get the expression on the right of the '=' into the primary */
-	k = hie1 (&lval2);
+	hie1 (&lval2);
 
         /* Check for equality of the structs */
         if (TypeCmp (ltype, lval2.Type) < TC_STRICT_COMPATIBLE) {
@@ -100,14 +108,14 @@ int Assignment (ExprDesc* lval)
         }
 
         /* Check if the right hand side is an lvalue */
-	if (k) {
+	if (ED_IsLVal (&lval2)) {
 	    /* We have an lvalue. Do we copy using the primary? */
             if (UseReg) {
                 /* Just use the replacement type */
                 lval2.Type = stype;
 
                 /* Load the value into the primary */
-                ExprLoad (CF_FORCECHAR, k, &lval2);
+                ExprLoad (CF_FORCECHAR, &lval2);
 
                 /* Store it into the new location */
                 Store (lval, stype);
@@ -115,7 +123,8 @@ int Assignment (ExprDesc* lval)
             } else {
 
                 /* We will use memcpy. Push the address of the rhs */
-                ExprLoad (0, 0, &lval2);
+                ED_MakeRVal (&lval2);
+                ExprLoad (CF_NONE, &lval2);
 
                 /* Push the address (or whatever is in ax in case of errors) */
                 g_push (CF_PTR | CF_UNSIGNED, 0);
@@ -148,17 +157,17 @@ int Assignment (ExprDesc* lval)
 
     } else {
 
-    	/* Get the address on stack if needed */
-    	PushAddr (lval);
+     	/* Get the address on stack if needed */
+     	PushAddr (lval);
 
-	/* Read the expression on the right side of the '=' */
-	k = hie1 (&lval2);
+     	/* Read the expression on the right side of the '=' */
+     	hie1 (&lval2);
 
-	/* Do type conversion if necessary */
-	k = TypeConversion (&lval2, k, ltype);
+     	/* Do type conversion if necessary */
+     	TypeConversion (&lval2, ltype);
 
-	/* If necessary, load the value into the primary register */
-	ExprLoad (CF_NONE, k, &lval2);
+     	/* If necessary, load the value into the primary register */
+     	ExprLoad (CF_NONE, &lval2);
 
      	/* Generate a store instruction */
      	Store (lval, 0);
@@ -166,8 +175,7 @@ int Assignment (ExprDesc* lval)
     }
 
     /* Value is still in primary and not an lvalue */
-    lval->Flags = E_MEXPR;
-    return 0;
+    lval->Flags = E_MEXPR | E_RVAL;
 }
 
 

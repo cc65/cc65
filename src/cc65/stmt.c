@@ -273,7 +273,6 @@ static void ReturnStatement (void)
 /* Handle the 'return' statement */
 {
     ExprDesc Expr;
-    int k;
 
     NextToken ();
     if (CurTok.Tok != TOK_SEMI) {
@@ -284,16 +283,16 @@ static void ReturnStatement (void)
        	}
 
 	/* Evaluate the return expression */
-	k = hie0 (InitExprDesc (&Expr));
+	hie0 (InitExprDesc (&Expr));
 
 	/* Ignore the return expression if the function returns void */
     	if (!F_HasVoidReturn (CurrentFunc)) {
 
 	    /* Convert the return value to the type of the function result */
-	    k = TypeConversion (&Expr, k, F_GetReturnType (CurrentFunc));
+	    TypeConversion (&Expr, F_GetReturnType (CurrentFunc));
 
 	    /* Load the value into the primary */
-	    ExprLoad (CF_NONE, k, &Expr);
+	    ExprLoad (CF_NONE, &Expr);
     	}
 
     } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {
@@ -400,7 +399,7 @@ static void ForStatement (void)
 
     /* Parse the initializer expression */
     if (CurTok.Tok != TOK_SEMI) {
-    	expression (&lval1);
+    	expression0 (&lval1);
     }
     ConsumeSemi ();
 
@@ -425,7 +424,7 @@ static void ForStatement (void)
     /* Parse the increment expression */
     HaveIncExpr = (CurTok.Tok != TOK_RPAREN);
     if (HaveIncExpr) {
-    	expression (&lval3);
+    	expression0 (&lval3);
     }
 
     /* Jump to the test */
@@ -591,7 +590,7 @@ int Statement (int* PendingToken)
 
 	    default:
 	        /* Actual statement */
-		expression (&lval);
+		expression0 (&lval);
 	    	CheckSemi (PendingToken);
 	}
     }

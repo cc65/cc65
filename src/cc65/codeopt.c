@@ -460,6 +460,20 @@ static unsigned OptPtrStore1 (CodeSeg* S)
  *	subop
  *      ldy     yyy
  *      sta     (ptr1),y
+ *
+ * In case a/x is loaded from the register bank before the pushax, we can even
+ * use the register bank instead of ptr1.
+ */
+/*
+ *    	jsr    	pushax
+ *      ldy     xxx
+ *      jsr     ldauidx
+ *      ldx     #$00
+ *      lda     (zp),y
+ *      subop
+ *      ldy     yyy
+ *      sta     (zp),y
+ *  	jsr   	staspidx
  */
 {
     unsigned Changes = 0;
@@ -490,29 +504,63 @@ static unsigned OptPtrStore1 (CodeSeg* S)
 	    CE_IsCallTo (L[4+K], "staspidx")        &&
 	    !CE_HasLabel (L[4+K])) {
 
+
+            const char* RegBank = 0;
+            const char* ZPLoc   = "ptr1";
 	    CodeEntry* X;
 
-	    /* Create and insert the stores */
-       	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+1);
 
-	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+2);
+            /* Get the preceeding two instructions and check them. We check
+             * for:
+             *          lda     regbank+n
+             *          ldx     regbank+n+1
+             */
+            if (I > 1) {
+                CodeEntry* P[2];
+                P[0] = CS_GetEntry (S, I-2);
+                P[1] = CS_GetEntry (S, I-1);
+                if (P[0]->OPC == OP65_LDA &&
+                    P[0]->AM  == AM65_ZP  &&
+                    P[1]->OPC == OP65_LDX &&
+                    P[1]->AM  == AM65_ZP  &&
+                    !CE_HasLabel (P[1])   &&
+                    strncmp (P[0]->Arg, "regbank+", 8) == 0) {
 
-	    /* Insert the load from ptr1 */
+                    unsigned Len = strlen (P[0]->Arg);
+
+                    if (strncmp (P[0]->Arg, P[1]->Arg, Len) == 0 &&
+                        P[1]->Arg[Len+0] == '+'                  &&
+                        P[1]->Arg[Len+1] == '1'                  &&
+                        P[1]->Arg[Len+2] == '\0') {
+
+                        /* Ok, found. Use the name of the register bank */
+                        RegBank = ZPLoc = P[0]->Arg;
+                    }
+                }
+            }
+
+	    /* Insert the load via the zp pointer */
 	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+5);
-	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[2]->LI);
-   	    CS_InsertEntry (S, X, I+6);
+	    CS_InsertEntry (S, X, I+3);
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, ZPLoc, 0, L[2]->LI);
+   	    CS_InsertEntry (S, X, I+4);
 
-   	    /* Insert the store through ptr1 */
-   	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "ptr1", 0, L[3]->LI);
-   	    CS_InsertEntry (S, X, I+8+K);
+   	    /* Insert the store through the zp pointer */
+   	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLoc, 0, L[3]->LI);
+   	    CS_InsertEntry (S, X, I+6+K);
 
    	    /* Delete the old code */
-   	    CS_DelEntry (S, I+9+K);     /* jsr spaspidx */
-            CS_DelEntry (S, I+4);       /* jsr ldauidx */
+   	    CS_DelEntry (S, I+7+K);     /* jsr spaspidx */
+            CS_DelEntry (S, I+2);       /* jsr ldauidx */
             CS_DelEntry (S, I);         /* jsr pushax */
+
+	    /* Create and insert the stores into the zp pointer if needed */
+            if (RegBank == 0) {
+                X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
+                CS_InsertEntry (S, X, I);
+                X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+                CS_InsertEntry (S, X, I+1);
+            }
 
    	    /* Remember, we had changes */
    	    ++Changes;

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -46,12 +46,13 @@
 
 
 /*****************************************************************************/
-/*			       Token definitions			     */
+/*  			       Token definitions			     */
 /*****************************************************************************/
 
 
 
 typedef enum token_t {
+    TOK_INVALID,
     TOK_CEOF,
 
     TOK_AUTO,

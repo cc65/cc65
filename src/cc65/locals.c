@@ -111,13 +111,13 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
         } else {
 
             /* Parse the expression */
-            int k = hie1 (InitExprDesc (&lval));
+            hie1 (InitExprDesc (&lval));
 
             /* Convert it to the target type */
-            k = TypeConversion (&lval, k, Decl->Type);
+            TypeConversion (&lval, Decl->Type);
 
             /* Load the value into the primary */
-            ExprLoad (CF_NONE, k, &lval);
+            ExprLoad (CF_NONE, &lval);
 
             /* Store the value into the variable */
             g_putstatic (CF_REGVAR | TypeOf (Decl->Type), Reg, 0);
@@ -200,8 +200,6 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
 
             } else {
 
-                int k;
-
                 /* Allocate previously reserved local space */
                 F_AllocLocalSpace (CurrentFunc);
 
@@ -209,17 +207,17 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
                 Flags = (Size == SIZEOF_CHAR)? CF_FORCECHAR : CF_NONE;
 
                 /* Parse the expression */
-                k = hie1 (InitExprDesc (&lval));
+                hie1 (InitExprDesc (&lval));
 
                 /* Convert it to the target type */
-                k = TypeConversion (&lval, k, Decl->Type);
+                TypeConversion (&lval, Decl->Type);
 
                 /* If the value is not const, load it into the primary.
                  * Otherwise pass the information to the code generator.
                  */
-                if (k != 0 || lval.Flags != E_MCONST) {
-                    ExprLoad (CF_NONE, k, &lval);
-                    k = 0;
+                if (ED_IsLVal (&lval) || lval.Flags != E_MCONST) {
+                    ExprLoad (CF_NONE, &lval);
+                    ED_MakeRVal (&lval);
                 } else {
                     Flags |= CF_CONST;
                 }
@@ -285,13 +283,13 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
             } else {
 
                 /* Parse the expression */
-                int k = hie1 (InitExprDesc (&lval));
+                hie1 (InitExprDesc (&lval));
 
                 /* Convert it to the target type */
-                k = TypeConversion (&lval, k, Decl->Type);
+                TypeConversion (&lval, Decl->Type);
 
                 /* Load the value into the primary */
-                ExprLoad (CF_NONE, k, &lval);
+                ExprLoad (CF_NONE, &lval);
 
                 /* Store the value into the variable */
                 g_putstatic (TypeOf (Decl->Type), SymData, 0);

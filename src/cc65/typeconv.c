@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2002-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -68,7 +68,7 @@ static void DoPtrConversions (ExprDesc* Expr)
 
 
 
-static int DoConversion (ExprDesc* Expr, int k, type* NewType)
+static void DoConversion (ExprDesc* Expr, type* NewType)
 /* Emit code to convert the given expression to a new type. */
 {
     type*    OldType;
@@ -83,7 +83,7 @@ static int DoConversion (ExprDesc* Expr, int k, type* NewType)
      * conversion void -> void.
      */
     if (IsTypeVoid (NewType)) {
-        k = 0;          /* Never an lvalue */
+        ED_MakeRVal (Expr);     /* Never an lvalue */
         goto ExitPoint;
     }
 
@@ -100,7 +100,7 @@ static int DoConversion (ExprDesc* Expr, int k, type* NewType)
     NewSize = CheckedSizeOf (NewType);
 
     /* lvalue? */
-    if (k != 0) {
+    if (ED_IsLVal (Expr)) {
 
         /* We have an lvalue. If the new size is smaller than the new one,
          * we don't need to do anything. The compiler will generate code
@@ -112,14 +112,13 @@ static int DoConversion (ExprDesc* Expr, int k, type* NewType)
          */
         if (NewSize > OldSize) {
             /* Load the value into the primary */
-            ExprLoad (CF_NONE, k, Expr);
+            ExprLoad (CF_NONE, Expr);
 
             /* Emit typecast code */
             g_typecast (TypeOf (NewType), TypeOf (OldType));
 
-            /* Value is now in primary */
-            Expr->Flags = E_MEXPR;
-            k = 0;
+            /* Value is now in primary and an rvalue */
+            Expr->Flags = E_MEXPR | E_RVAL;
         }
 
     } else {
@@ -162,14 +161,13 @@ static int DoConversion (ExprDesc* Expr, int k, type* NewType)
             if (OldSize != NewSize) {
 
                 /* Load the value into the primary */
-                ExprLoad (CF_NONE, k, Expr);
+                ExprLoad (CF_NONE, Expr);
 
                 /* Emit typecast code. */
                 g_typecast (TypeOf (NewType) | CF_FORCECHAR, TypeOf (OldType));
 
-                /* Value is now in primary */
-                Expr->Flags = E_MEXPR;
-                k = 0;
+                /* Value is now a rvalie in the primary */
+                Expr->Flags = E_MEXPR | E_RVAL;
             }
         }
     }
@@ -177,14 +175,11 @@ static int DoConversion (ExprDesc* Expr, int k, type* NewType)
 ExitPoint:
     /* The expression has always the new type */
     ReplaceType (Expr, NewType);
-
-    /* Done */
-    return k;
 }
 
 
 
-int TypeConversion (ExprDesc* Expr, int k, type* NewType)
+void TypeConversion (ExprDesc* Expr, type* NewType)
 /* Do an automatic conversion of the given expression to the new type. Output
  * warnings or errors where this automatic conversion is suspicious or
  * impossible.
@@ -197,15 +192,16 @@ int TypeConversion (ExprDesc* Expr, int k, type* NewType)
 
     /* First, do some type checking */
     if (IsTypeVoid (NewType) || IsTypeVoid (Expr->Type)) {
-    	/* If one of the sides are of type void, output a more apropriate
-    	 * error message.
-    	 */
+     	/* If one of the sides are of type void, output a more apropriate
+     	 * error message.
+     	 */
        	Error ("Illegal type");
-	return k;
     }
 
-    /* Handle conversions to int type */
+    /* Check for conversion problems */
     if (IsClassInt (NewType)) {
+
+        /* Handle conversions to int type */
        	if (IsClassPtr (Expr->Type)) {
      	    /* Pointer -> int conversion */
      	    Warning ("Converting pointer to integer without a cast");
@@ -213,12 +209,9 @@ int TypeConversion (ExprDesc* Expr, int k, type* NewType)
      	    Error ("Incompatible types");
        	}
 
-        /* Do a conversion regardless of errors and return the result. */
-        return DoConversion (Expr, k, NewType);
-    }
+    } else if (IsClassPtr (NewType)) {
 
-    /* Handle conversions to pointer type */
-    if (IsClassPtr (NewType)) {
+        /* Handle conversions to pointer type */
      	if (IsClassPtr (Expr->Type)) {
      	    /* Pointer to pointer assignment is valid, if:
      	     *   - both point to the same types, or
@@ -258,24 +251,24 @@ int TypeConversion (ExprDesc* Expr, int k, type* NewType)
 	    Error ("Incompatible types");
 	}
 
-       	/* Do the conversion even in case of errors */
-	return DoConversion (Expr, k, NewType);
+    } else {
+
+        /* Invalid automatic conversion */
+        Error ("Incompatible types");
 
     }
 
-    /* Invalid automatic conversion */
-    Error ("Incompatible types");
-    return DoConversion (Expr, k, NewType);
+    /* Do the actual conversion */
+    DoConversion (Expr, NewType);
 }
 
 
 
-int TypeCast (ExprDesc* Expr)
+void TypeCast (ExprDesc* Expr)
 /* Handle an explicit cast. The function returns true if the resulting
  * expression is an lvalue and false if not.
  */
 {
-    int	    k;
     type    NewType[MAXTYPELEN];
 
     /* Skip the left paren */
@@ -288,15 +281,15 @@ int TypeCast (ExprDesc* Expr)
     ConsumeRParen ();
 
     /* Read the expression we have to cast */
-    k = hie10 (Expr);
+    hie10 (Expr);
 
     /* Convert functions and arrays to "pointer to" object */
     DoPtrConversions (Expr);
 
-    /* Convert the value and return the result. */
-    return DoConversion (Expr, k, NewType);
+    /* Convert the value. */
+    DoConversion (Expr, NewType);
 }
 
 
 
-                  
+

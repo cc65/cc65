@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2002-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -46,12 +46,13 @@
 
 
 
-void MakeConstIntExpr (ExprDesc* Expr, long Value)
+ExprDesc* ED_MakeConstInt (ExprDesc* Expr, long Value)
 /* Make Expr a constant integer expression with the given value */
 {
-    Expr->Flags = E_MCONST;
+    Expr->Flags = E_MCONST | E_RVAL;
     Expr->Type = type_int;
     Expr->ConstVal = Value;
+    return Expr;
 }
 
 

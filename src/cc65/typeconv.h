@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2002-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -44,18 +44,18 @@
 
 
 /*****************************************************************************/
-/*				     Code                                    */
+/*   				     Code                                    */
 /*****************************************************************************/
 
 
 
-int TypeConversion (ExprDesc* Expr, int k, type* NewType);
+void TypeConversion (ExprDesc* Expr, type* NewType);
 /* Do an automatic conversion of the given expression to the new type. Output
  * warnings or errors where this automatic conversion is suspicious or
  * impossible.
  */
 
-int TypeCast (ExprDesc* Expr);
+void TypeCast (ExprDesc* Expr);
 /* Handle an explicit cast. The function returns true if the resulting
  * expression is an lvalue and false if not.
  */

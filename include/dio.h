@@ -44,9 +44,9 @@ typedef struct {
 
 
 #ifdef __ATARI__
-#define dio_query_sectsize(x) ((_sectsize_t)128)
+#define dio_query_sectsize(x) ((sectsize_t)128)
 #else
-#define dio_query_sectsize(x) ((_sectsize_t)256)
+#define dio_query_sectsize(x) ((sectsize_t)256)
 #endif
 /* queries sector size, currently hardcoded */
 

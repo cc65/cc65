@@ -10,7 +10,7 @@
 
 _cbm_k_open:
 	jsr	OPEN
+	ldx     #0              ; Clear high byte
 	bcs	@NotOk
-        lda     #0
-@NotOk:	ldx     #0              ; Clear high byte
-        rts
+        txa
+@NotOk: rts

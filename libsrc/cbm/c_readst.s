@@ -4,8 +4,11 @@
 ; unsigned char __fastcall__ cbm_k_readst (void);
 ;
 
-       	.export	       	_cbm_k_readst
-        .import         READST
+	.export		_cbm_k_readst
+	.import		READST
 
 
-_cbm_k_readst = READST
+_cbm_k_readst:
+	jsr	READST
+	ldx	#0		; Clear high byte
+	rts

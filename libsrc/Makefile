@@ -143,7 +143,7 @@ c16lib:
 # C64
 
 c64lib:
-	for i in c64 cbm common runtime conio dbg em joystick serial tgi zlib; do \
+	for i in c64 cbm common runtime conio dbg em joystick mouse serial tgi zlib; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
@@ -155,6 +155,7 @@ c64lib:
 	mv c64/crt0.o c64.o
 	cp c64/*.emd .
 	cp c64/*.joy .
+	cp c64/*.mou .
 	cp c64/*.ser .
 	cp c64/c64-320-200-2.tgi c64-hi.tgi
 
@@ -327,13 +328,13 @@ vic20lib:
 
 .PHONY: clean
 clean:
-	@for i in cbm common conio dbg em joystick runtime serial tgi zlib $(ALLTARGETS); do\
+	@for i in cbm common conio dbg em joystick mouse runtime serial tgi zlib $(ALLTARGETS); do\
        	   $(MAKE) -C $$i clean;			      		   	\
 	done
 
 .PHONY: zap
 zap:	clean
-	@for i in cbm common conio dbg em joystick runtime tgi zlib $(ALLTARGETS); do\
+	@for i in cbm common conio dbg em joystick mouse runtime tgi zlib $(ALLTARGETS); do\
 	   $(MAKE) -C $$i zap;     	    	       	      	   		\
 	done
 	@$(RM) *.o *.emd *.joy *.lib *.tgi

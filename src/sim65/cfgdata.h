@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   chipif.h				     */
+/*				   cfgdata.h				     */
 /*                                                                           */
-/*	      Interface header file for plugins - unused by sim65	     */
+/*	     		     Config data structure			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,19 +33,35 @@
 
 
 
-#ifndef CHIPIF_H
-#define CHIPIF_H
+#ifndef CFGDATA_H
+#define CFGDATA_H
 
 
 
-/* sim65 */
-#include "cfgdata.h"
-#include "chipdata.h"
-#include "simdata.h"
+/*****************************************************************************/
+/*                                     Data                                  */
+/*****************************************************************************/
 
 
 
-/* End of chipif.h */
+typedef struct CfgData CfgData;
+struct CfgData {
+    char*	Attr;		/* The attribute name */
+    enum {
+        Invalid,
+	Id,
+	Number,
+	String
+    }		Type;		/* Type of the value */
+    union {
+	char*	SVal;		/* String or id value */
+	long	IVal;		/* Integer value */
+    } V;
+};
+
+
+
+/* End of cfgdata.h */
 
 #endif
 

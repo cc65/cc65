@@ -45,11 +45,34 @@
 #include "xmalloc.h"
 
 /* sim65 */
+#include "cfgdata.h"
 #include "chip.h"
 #include "error.h"
 #include "global.h"
 #include "scanner.h"
 #include "config.h"
+
+
+
+/*****************************************************************************/
+/*		    		struct CfgData				     */
+/*****************************************************************************/
+
+
+
+static CfgData* NewCfgData (const char* Tok)
+/* Create and intialize a new CfgData struct, then return it */
+{
+    /* Allocate memory */
+    CfgData* D = xmalloc (sizeof (CfgData));
+
+    /* Initialize the fields */
+    D->Attr = xstrdup (Tok);
+    D->Type = Invalid;
+
+    /* Return the new struct */
+    return D;
+}
 
 
 

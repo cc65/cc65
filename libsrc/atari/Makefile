@@ -7,11 +7,17 @@
 #           the length of the buffer)
 # UCASE_FILENAME - all filenames get uppercased
 # DEFAULT_DEVICE - if the string passed to the uppercase function doesn't
-#                  include a device (":" at position 2 or 3), provide "D:"
-#                  as a default device
+#                  include a device (":" at position 2 or 3), provide "Dn:"
+#                  as a default disk device
+#                  n is the value of DEFAULT_DEVICE, unless DYNAMIC_DD is
+#                  also set, in which case it's overridden by a runtime
+#                  check (on SpartaDOS only)
 #                  needs UCASE_FILENAME to be defined, otherwise no effect
+# DYNAMIC_DD     - determine default disk device at runtime (SpartaDOS only)
+#                  needs DEFAULT_DEVICE to be defined, otherwise no effect
 
-ATARIDEFS = -DNUMDRVS=4 -DUCASE_FILENAME=1 -DDEFAULT_DEVICE=1 -DLINEBUF=80
+ATARIDEFS =  -DNUMDRVS=4 -DUCASE_FILENAME=1 -DDEFAULT_DEVICE=1 -DLINEBUF=80
+ATARIDEFS += -DDYNAMIC_DD=1
 
 .SUFFIXES: .o .s .c
 

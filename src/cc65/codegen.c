@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -283,7 +283,7 @@ unsigned sizeofarg (unsigned flags)
 }
 
 
-
+                                       
 int pop (unsigned flags)
 /* Pop an argument of the given size */
 {
@@ -2780,7 +2780,7 @@ void g_or (unsigned flags, unsigned long val)
      		/* FALLTHROUGH */
 
 	    case CF_INT:
-		if (val <= 0xFF) {       
+		if (val <= 0xFF) {
                     if ((val & 0xFF) != 0) {
 		        AddCodeLine ("ora #$%02X", (unsigned char)val);
                     }
@@ -2900,7 +2900,7 @@ void g_and (unsigned Flags, unsigned long Val)
       	0,	      	0,  		"tosandeax",
      	0,	      	0,  		"tosandeax",
     };
-                    
+
     /* If the right hand side is const, the lhs is not on stack but still
      * in the primary register.
      */
@@ -2973,7 +2973,7 @@ void g_and (unsigned Flags, unsigned long Val)
         Flags &= ~CF_FORCECHAR;
        	g_push (Flags & ~CF_CONST, 0);
     }
-                              
+
     /* Use long way over the stack */
     oper (Flags, Val, ops);
 }
@@ -3550,7 +3550,8 @@ void g_lt (unsigned flags, unsigned long val)
     if (flags & CF_CONST) {
 
         /* Because the handling of the overflow flag is too complex for
-         * inlining, we can handle only unsigned compares here.
+         * inlining, we can handle only unsigned compares, and signed
+         * compares against zero here.
          */
         if (flags & CF_UNSIGNED) {
 
@@ -3600,6 +3601,34 @@ void g_lt (unsigned flags, unsigned long val)
                     typeerror (flags);
             }
 
+        } else if (val == 0) {
+
+            /* Look at the type */
+            switch (flags & CF_TYPE) {
+
+                case CF_CHAR:
+                    if (flags & CF_FORCECHAR) {
+                        AddCodeLine ("tax");
+                        AddCodeLine ("jsr boollt");
+                        return;
+                    }
+                    /* FALLTHROUGH */
+
+                case CF_INT:
+                    /* Just check the high byte */
+                    AddCodeLine ("txa");
+                    AddCodeLine ("jsr boollt");
+                    return;
+
+                case CF_LONG:
+                    /* Just check the high byte */
+                    AddCodeLine ("lda sreg+1");
+                    AddCodeLine ("jsr boollt");
+                    return;
+
+                default:
+                    typeerror (flags);
+            }
         }
 
      	/* If we go here, we didn't emit code. Push the lhs on stack and fall
@@ -3885,7 +3914,8 @@ void g_ge (unsigned flags, unsigned long val)
     if (flags & CF_CONST) {
 
         /* Because the handling of the overflow flag is too complex for
-         * inlining, we can handle only unsigned compares here.
+         * inlining, we can handle only unsigned compares, and signed
+         * compares against zero here.
          */
         if (flags & CF_UNSIGNED) {
 
@@ -3935,7 +3965,36 @@ void g_ge (unsigned flags, unsigned long val)
                     typeerror (flags);
             }
 
+        } else if (val == 0) {
+
+            /* Look at the type */
+            switch (flags & CF_TYPE) {
+
+                case CF_CHAR:
+                    if (flags & CF_FORCECHAR) {
+                        AddCodeLine ("tax");
+                        AddCodeLine ("jsr boolge");
+                        return;
+                    }
+                    /* FALLTHROUGH */
+
+                case CF_INT:
+                    /* Just test the high byte */
+                    AddCodeLine ("txa");
+                    AddCodeLine ("jsr boolge");
+                    return;
+
+                case CF_LONG:
+                    /* Just test the high byte */
+                    AddCodeLine ("lda sreg+1");
+                    AddCodeLine ("jsr boolge");
+                    return;
+
+                default:
+                    typeerror (flags);
+            }
         }
+
 
      	/* If we go here, we didn't emit code. Push the lhs on stack and fall
       	 * into the normal, non-optimized stuff. Note: The standard stuff will

@@ -5,8 +5,9 @@
 ;
 
 	.export		_exit
-	.import	     	__hinit, initconio, doneconio, zerobss
-	.import		push0, doatexit, _main
+	.import		initlib, donelib
+	.import	     	initconio, doneconio, zerobss
+	.import		push0, _main
 
 	.include	"c128.inc"
 	.include	"../cbm/cbm.inc"
@@ -93,9 +94,9 @@ L1:	lda    	sp,x
 	lda	#>$C000
  	sta    	sp+1
 
-; Initialize the heap
+; Call module constructors
 
- 	jsr	__hinit
+	jsr	initlib
 
 ; Initialize conio stuff
 
@@ -109,9 +110,9 @@ L1:	lda    	sp,x
  	ldy	#4    	 	; Argument size
        	jsr    	_main 	 	; call the users code
 
-; fall thru to exit...
+; Call module destructors. This is also the _exit entry.
 
-_exit:	jsr	doatexit 	; call exit functions
+_exit:	jsr	donelib		; Run module destructors
 
 ; Reset the conio stuff
 

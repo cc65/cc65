@@ -5,11 +5,9 @@
 .SUFFIXES: .o .s .c
 
 .c.s:
-	@echo $<
 	@$(CC) $(CFLAGS) $<
 
 .s.o:
-	@echo $<
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
 OBJS = 	add.o		\

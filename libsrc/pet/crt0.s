@@ -4,8 +4,9 @@
 ; This must be the *first* file on the linker command line
 ;
 
-	.export	      	_exit
-       	.import	       	__hinit, initconio, zerobss, push0, doatexit
+	.export	      	_exit			 
+	.import		initlib, donelib
+       	.import	       	initconio, zerobss, push0
 	.import		_main
 
 	.include	"pet.inc"
@@ -84,9 +85,9 @@ L1:	lda	sp,x
 	lda	MEMSIZE+1
        	sta	sp+1   	 	; Set argument stack ptr
 
-; Initialize the heap
+; Call module constructors
 
-	jsr	__hinit
+	jsr	initlib
 
 ; Initialize conio stuff
 
@@ -100,9 +101,11 @@ L1:	lda	sp,x
 	ldy	#4  	 	; Argument size
        	jsr    	_main	 	; call the users code
 
-; fall thru to exit...
+; Call module destructors. This is also the _exit entry.
 
-_exit:	jsr	doatexit 	; call exit functions
+_exit:	jsr	donelib		; Run module destructors
+
+; Restore system stuff
 
 	ldx	spsave
 	txs	    	 	; Restore stack pointer

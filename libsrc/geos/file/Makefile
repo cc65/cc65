@@ -1,10 +1,9 @@
 #
 # Makefile for GEOS lib
 # for cc65
-# 
+#
 
 %.o:	%.s
-	@echo $<
 	@$(AS) -o $@ $(AFLAGS) $<
 
 

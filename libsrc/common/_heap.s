@@ -5,7 +5,7 @@
 ;
 
      	.export		__horg, __hptr, __hend, __hfirst, __hlast
-	.export		__hinit
+       	.constructor	initheap, 24
        	.import	       	__BSS_RUN__, __BSS_SIZE__, __stksize
 	.importzp	sp
 
@@ -17,19 +17,17 @@ __hptr:
    	.word	__BSS_RUN__+__BSS_SIZE__	; Dito
 __hend:
        	.word	__BSS_RUN__+__BSS_SIZE__
-__hfirst:		 
+__hfirst:
    	.word	0
 __hlast:
    	.word	0
 
 
-;
-; Initialization. Must be called from startup!
-;
+; Initialization. Will be called from startup!
 
 .code
 
-__hinit:
+initheap:
    	sec
    	lda	sp
 	sbc	__stksize
@@ -38,8 +36,4 @@ __hinit:
 	sbc	__stksize+1
 	sta	__hend+1
 	rts
-
-
-
-
 

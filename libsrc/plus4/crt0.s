@@ -4,8 +4,9 @@
 ; This must be the *first* file on the linker command line
 ;
 
-	.export		_exit
-	.import	     	__hinit, push0, doatexit, _main
+	.export		_exit  
+	.import		initlib, donelib
+	.import	     	push0, _main
 	.import		initconio, doneconio, zerobss
 
 	.include	"plus4.inc"
@@ -87,9 +88,9 @@ L1:	lda	sp,x
 MemOk:	stx	sp
       	sty	sp+1  		; set argument stack ptr
 
-; Initialize the heap
+; Call module constructors
 
-	jsr	__hinit
+	jsr	initlib
 
 ; Initialize conio stuff
 
@@ -103,9 +104,12 @@ MemOk:	stx	sp
 	ldy	#4    		; Argument size
        	jsr    	_main 		; call the users code
 
-; fall thru to exit...
+; Call module destructors. This is also the _exit entry.
 
-_exit:	jsr	doatexit	; call exit functions
+_exit:	jsr	donelib		; Run module destructors
+
+; Restore system stuff
+
 	ldx	spsave
 	txs
 

@@ -16,7 +16,7 @@
 ; lies in the data segment so it's address may be patched at runtime.
 ;
 
-       	.export	libinit, libdone, condes
+       	.export	initlib, donelib, condes
        	.export	jmpvec
 
        	.import	__CONSTRUCTOR_TABLE__, __CONSTRUCTOR_COUNT__
@@ -29,7 +29,7 @@
 ; --------------------------------------------------------------------------
 ; Initialize library modules
 
-.proc	libinit
+.proc	initlib
 
 	lda    	#<__CONSTRUCTOR_TABLE__
 	ldx    	#>__CONSTRUCTOR_TABLE__
@@ -43,12 +43,12 @@
 ; --------------------------------------------------------------------------
 ; Cleanup library modules
 
-.proc	libdone
+.proc	donelib
 
-	lda	#<__DESTRUCTOR_TABLE__
-	ldx	#>__DESTRUCTOR_TABLE__
-	ldy	#<(__DESTRUCTOR_COUNT__*2)
-	bne	condes
+	lda 	#<__DESTRUCTOR_TABLE__
+	ldx 	#>__DESTRUCTOR_TABLE__
+	ldy 	#<(__DESTRUCTOR_COUNT__*2)
+	bne 	condes
 	rts
 
 .endproc

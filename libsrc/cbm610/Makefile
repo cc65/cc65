@@ -5,12 +5,10 @@
 .SUFFIXES: .o .s .c
 
 %.o:   	%.c
-	@echo $<
 	@$(CC) $(CFLAGS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
 %.o:	%.s
-	@echo $<
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
 C_OBJS =

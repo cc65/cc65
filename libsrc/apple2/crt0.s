@@ -5,8 +5,8 @@
 ;
 
 	.export		_exit
-	.import	   	__hinit
-	.import	   	zerobss, push0, doatexit
+	.import	   	initlib, donelib
+	.import	   	zerobss, push0
 	.import		_main
 
 	.include	 "apple2.inc"
@@ -66,9 +66,9 @@ L1:	lda	sp,x
 	lda	#>TOPMEM
        	sta	sp+1   		; Set argument stack ptr
 
-; Initialize the heap
+; Call module constructors
 
-	jsr	__hinit
+	jsr	initlib
 
 ; Initialize conio stuff
 
@@ -77,22 +77,24 @@ L1:	lda	sp,x
 
 ; Set up to use Apple ROM $C000-$CFFF
 
-	;; 	sta	USEROM
+	;; 	sta    	USEROM
 
 ; Pass an empty command line
 
-	jsr	push0 	 	; argc
-	jsr	push0	 	; argv
+	jsr	push0  	 	; argc
+	jsr	push0  	 	; argv
 
-	ldy	#4	 	; Argument size
-       	jsr    	_main	 	; call the users code
+	ldy	#4     	 	; Argument size
+       	jsr    	_main  	 	; call the users code
 
-; fall thru to exit...
+; Call module destructors. This is also the _exit entry.
 
-_exit:	lda	#$ff
+_exit:	jsr	donelib
+		       
+; Restore system stuff
+
+	lda	#$ff  		; Reset text mode
 	sta	TEXTTYP
-
-	jsr	doatexit 	; call exit functions
 
 	ldx	spsave
 	txs	       		; Restore stack pointer

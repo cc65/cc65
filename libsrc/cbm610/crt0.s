@@ -5,7 +5,8 @@
 ;
 
 	.export	     	_exit
-	.import	     	__hinit, push0, doatexit, _main
+	.import		initlib, donelib
+	.import	     	push0, _main
 	.import	     	initconio
 	.import	       	__BSS_RUN__, __BSS_SIZE__
 	.import		irq, nmi
@@ -235,9 +236,13 @@ Z4:
 
 ; This code is in page 2, so we may now start calling subroutines safely,
 ; since the code we execute is no longer in the stack page.
+; Call module constructors
 
-	jsr	__hinit			; Initialize the heap
-	jsr	initconio		; Initialize conio stuff
+	jsr	initlib
+
+; Initialize conio stuff
+
+	jsr	initconio
 
 ; Create the (empty) command line for the program
 
@@ -323,9 +328,9 @@ Start:
        	ldy	#4    	       	; Argument size
        	jsr    	_main 		; call the users code
 
-; Fall thru to exit.
+; Call module destructors. This is also the _exit entry.
 
-_exit: 	jsr	doatexit	; call exit functions
+_exit:	jsr	donelib		; Run module destructors
 
 ; Clear the start of the zero page, since it will be interpreted as a
 ; (garbage) BASIC program otherwise. This is also the default entry for

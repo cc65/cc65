@@ -8,12 +8,10 @@ ATARIDEFS = -DNUMDRVS=4
 .SUFFIXES: .o .s .c
 
 %.o:   	%.c
-	@echo $<
 	@$(CC) $(CFLAGS) $(ATARIDEFS) $<
 	@$(AS) -o $@ $(AFLAGS) $(*).s
 
 %.o:	%.s
-	@echo $<
 	@$(AS) -g -o $@ $(AFLAGS) $(ATARIDEFS) $<
 
 C_OBJS =

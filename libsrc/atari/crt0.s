@@ -15,8 +15,9 @@ RESERVE_MOUSE_MEMORY	= 1	; for P/M
 	.export		mouse_pm0
 .endif
 	.export		_exit
-	.import		getargs, argc, argv
-	.import		__hinit, initconio, zerobss, pushax, doatexit
+	.import		getargs, argc, argv	  
+	.import		initlib, donelib
+       	.import	       	initconio, zerobss, pushax
 	.import		_main,__filetab,getfd
 	.import		__CODE_LOAD__, __BSS_LOAD__
 	.import		__graphmode_used
@@ -117,9 +118,9 @@ L1:	lda	sp,x
 	stx	old_shflok
 	sta	SHFLOK
 
-; Initialize the heap
+; Call module constructors
 
-	jsr	__hinit
+	jsr	initlib
 
 ; Initialize conio stuff
 
@@ -146,20 +147,22 @@ L1:	lda	sp,x
 
 	lda	argc
 	ldx	argc+1
-	jsr	pushax		; argc
+	jsr	pushax 		; argc
 	lda	#<argv
 	ldx	#>argv
-	jsr	pushax		; argv
+	jsr	pushax 		; argv
 
-	ldy	#4		; Argument size
-	jsr	_main		; call the users code
+	ldy	#4     		; Argument size
+	jsr	_main  		; call the users code
 
-; fall thru to exit...
+; Call module destructors. This is also the _exit entry.
 
-_exit:	jsr	doatexit	; call exit functions
+_exit:	jsr	donelib		; Run module destructors
+
+; Restore system stuff
 
 	ldx	spsave
-	txs			; Restore stack pointer
+	txs	       		; Restore stack pointer
 
 ; restore left margin
 

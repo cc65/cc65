@@ -5,11 +5,9 @@
 ;
 
 	.export		_exit
-       	.import	       	__hinit, initconio, zerobss, push0, condes
+	.import		initlib, donelib
+       	.import	       	initconio, zerobss, push0
 	.import	     	_main
-
-       	.import	       	__CONSTRUCTOR_TABLE__, __CONSTRUCTOR_COUNT__
-	.import		__DESTRUCTOR_TABLE__, __DESTRUCTOR_COUNT__
 
 	.include     	"c64.inc"
 	.include     	"../cbm/cbm.inc"
@@ -92,9 +90,9 @@ L1:	lda	sp,x
 	lda	#>$D000
        	sta	sp+1   		; Set argument stack ptr
 
-; Initialize the heap
+; Call module constructors
 
-	jsr	__hinit
+	jsr	initlib
 
 ; Initialize conio stuff
 
@@ -108,12 +106,9 @@ L1:	lda	sp,x
 	ldy	#4	  	; Argument size
        	jsr    	_main	  	; call the users code
 
-; Call module destructors
+; Call module destructors. This is also the _exit entry.
 
-_exit:	lda	#<__DESTRUCTOR_TABLE__
-	ldx	#>__DESTRUCTOR_TABLE__
-	ldy	#<(__DESTRUCTOR_COUNT__*2)
-	jsr	condes
+_exit:	jsr	donelib		; Run module destructors
 
 ; Restore system stuff
 

@@ -7,10 +7,11 @@
 
 ; no __hinit
 
-	.export		_exit
+	.export		_exit  
+	.import		initlib, donelib
        	.import	       	pushax
 	.import		_main
-	.import		zerobss, doatexit
+	.import		zerobss
 
 ; ------------------------------------------------------------------------
 ; Define and export the ZP variables for the C64 runtime
@@ -54,9 +55,9 @@ regbank =	$a3		; 6 bytes hopefully not used by Kernal
 	lda	#>$7900
        	sta	sp+1   		; Set argument stack ptr
 
-; Initialize the heap
+; Call module constructors
 
-;;!	jsr	__hinit
+	jsr	initlib
 
 ; Pass an empty command line
 
@@ -69,9 +70,10 @@ regbank =	$a3		; 6 bytes hopefully not used by Kernal
        	jsr    	_main	 	; call the users code
 	jmp	$c1c3		; jump to GEOS MainLoop
 
-; exit must be called from the code!
+; Call module destructors. This is also the _exit entry which must be called
+; explicitly by the code.
 
-_exit:	
-	jsr	doatexit 	; call exit functions
+_exit:	jsr	donelib	 	; Run module destructors
 
-	jmp	$c22c		; EnterDeskTop
+	jmp	$c22c	 	; EnterDeskTop
+			 

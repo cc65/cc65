@@ -35,7 +35,7 @@
 ; Driver signature
 
         .byte   $73, $65, $72           ; "ser"
-        .byte   $00                     ; Serial API version number
+        .byte   SER_API_VERSION         ; Serial API version number
 
 ; Jump table.
 

@@ -39,7 +39,7 @@
 .struct SER_HDR
         ID      .byte   3       ; Contains 0x73, 0x65, 0x72 ("ser")
         VERSION .byte   1       ; Interface version
-        JUMPTAB .struct 
+        JUMPTAB .struct
             INSTALL     .word   ; INSTALL routine
             UNINSTALL   .word   ; UNINSTALL routine
             OPEN        .word   ; OPEN routine
@@ -51,6 +51,11 @@
         .endstruct
 .endstruct
 
+
+;------------------------------------------------------------------------------
+; The SER API version, stored SER_HDR::VERSION
+
+SER_API_VERSION         = $01
 
 ;------------------------------------------------------------------------------
 ; ser_params

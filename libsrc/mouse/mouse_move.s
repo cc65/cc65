@@ -9,16 +9,15 @@
 ;  */
 ;
 
-        .import         ptr1: zp
+        .import         incsp2
+        .import         ptr1: zp                            
 
         .include        "mouse-kernel.inc"
 
 .proc   _mouse_move
 
-        sta     ptr1
-        stx     ptr1+1                  ; Store x into ptr1
-        jsr     popax
-        jmp     mouse_move              ; Call the driver
+        jsr     mouse_move              ; Call the driver
+        jmp     incsp2                  ; Drop the parameter
 
 .endproc
 

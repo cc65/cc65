@@ -175,8 +175,10 @@ BOX:    ldy     #5
        	rts
 
 ;----------------------------------------------------------------------------
-; MOVE: Move the mouse to a new position which is passed in X=ptr1, Y=a/x.
-; No checks are done if the new position is valid (within the bounding box or
+; MOVE: Move the mouse to a new position. The position is passed as it comes
+; from the C program, that is: X on the stack and Y in a/x. The C wrapper will
+; remove the parameter from the stack on return.
+; No checks are done if the new position is valid (within the bounding box or 
 ; the screen). No return code required.
 ;
 
@@ -186,10 +188,13 @@ MOVE:   sei                             ; No interrupts
         stx     YPos+1                  ; New Y position
         jsr     CMOVEY                  ; Set it
 
-        lda     ptr1
-        ldx     ptr1+1
-        sta     XPos
-        stx     XPos+1                  ; New X position
+        ldy     #$01
+        lda     (sp),y
+        sta     XPos+1
+        tax
+        dey
+        lda     (sp),y
+        sta     XPos                    ; New X position
 
         jsr     CMOVEX			; Move the cursor
 

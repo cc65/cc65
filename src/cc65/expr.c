@@ -84,6 +84,8 @@ static unsigned GlobalModeFlags (unsigned Flags)
         case E_LOC_REGISTER:    return CF_REGVAR;
         default:
             Internal ("GlobalModeFlags: Invalid flags value: %u", Flags);
+            /* NOTREACHED */
+            return 0;
     }
 }
 

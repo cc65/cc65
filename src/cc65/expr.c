@@ -855,6 +855,14 @@ static int primary (ExprDesc* lval)
     	return k;
     }
 
+    /* If we run into an identifier in preprocessing mode, we assume that this
+     * is an undefined macro and replace it by a constant value of zero.
+     */
+    if (Preprocessing && CurTok.Tok == TOK_IDENT) {
+        MakeConstIntExpr (lval, 0);
+        return 0;
+    }
+
     /* All others may only be used if the expression evaluation is not called
      * recursively by the preprocessor.
      */

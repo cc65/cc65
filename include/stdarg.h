@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -45,10 +45,10 @@ typedef unsigned char* va_list;
 #define va_copy(dest, src)	((dest)=(src))
 #define va_end(ap)
 
-/* This is only valid *before* the first call to va_arg. It will also work
- * only for int sized parameters.
- */
+/* PLEASE NOTE: The old va_fix macro is no longer needed. Just access the
+ * parameters by name.
 #define va_fix(ap, offs)       	(*(unsigned*)(ap+(__fixargs__-2*offs)))
+ */
 
 
 

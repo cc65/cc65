@@ -7,6 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000  Kevin Ruland, <kevin@rodin.wustl.edu>                           */
+/* (C) 2003  Ullrich von Bassewitz, <uz@cc65.org>                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -42,6 +43,12 @@
 
 
 
+/*****************************************************************************/
+/*	       	   	  	     Data				     */
+/*****************************************************************************/
+
+
+
 /* Color Defines
  * Since Apple2 does not support color text these defines are only
  * used to get the library to compile correctly.  They should not be used
@@ -49,8 +56,6 @@
  */
 #define COLOR_BLACK 	0x00
 #define COLOR_WHITE 	0x01
-
-
 
 /* Characters codes */
 #define CH_DEL 	    	0x7F
@@ -79,6 +84,25 @@
 #define CH_LTEE     	'+'
 #define CH_RTEE     	'+'
 #define CH_CROSS    	'+'
+
+/* Return codes for get_ostype */
+#define AP_OS_IIPLAIN  0x01             /* Plain Apple II */
+#define AP_OS_IIPLUS   0x02             /* Apple II+ */
+#define AP_OS_IIIEM    0x03             /* Apple /// in emulation mode */
+#define AP_OS_IIE      0x04             /* Apple IIe */
+#define AP_OS_IIC      0x05             /* Apple IIc */
+#define AP_OS_IIECARD  0x06             /* Apple IIe Card for the Macintosh LC */
+
+
+
+/*****************************************************************************/
+/*	       	   		     Code				     */
+/*****************************************************************************/
+
+
+
+unsigned char get_ostype (void);
+/* Get the ROM version. Returns one of the C64_OS_xxx codes. */
 
 
 

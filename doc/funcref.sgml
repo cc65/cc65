@@ -75,7 +75,7 @@ function.
 <item><ref id="c64mode" name="c64mode">
 <item><ref id="fast" name="fast">
 <item><ref id="toggle_videomode" name="toggle_videomode">
-<item><ref id="slow" name="slow">    
+<item><ref id="slow" name="slow">
 </itemize>
 
 
@@ -149,9 +149,9 @@ function.
 <sect1><tt/stdlib.h/<label id="stdlib.h"><p>
 
 <itemize>
-<!-- <item><ref id="_heapadd" name="_heapadd"> -->
-<!-- <item><ref id="_heapmaxavail" name="_heapmaxavail"> -->
-<!-- <item><ref id="_heapmemavail" name="_heapmemavail"> -->
+<item><ref id="_heapadd" name="_heapadd">
+<item><ref id="_heapmaxavail" name="_heapmaxavail">
+<item><ref id="_heapmemavail" name="_heapmemavail">
 <item><ref id="_randomize" name="_randomize">
 <!-- <item><ref id="_swap" name="_swap"> -->
 <item><ref id="abort" name="abort">
@@ -160,18 +160,18 @@ function.
 <!-- <item><ref id="atoi" name="atoi"> -->
 <!-- <item><ref id="atol" name="atol"> -->
 <!-- <item><ref id="bsearch" name="bsearch"> -->
-<!-- <item><ref id="calloc" name="calloc"> -->
+<item><ref id="calloc" name="calloc">
 <!-- <item><ref id="div" name="div"> -->
 <item><ref id="exit" name="exit">
-<!-- <item><ref id="free" name="free"> -->
+<item><ref id="free" name="free">
 <!-- <item><ref id="getenv" name="getenv"> -->
 <!-- <item><ref id="itoa" name="itoa"> -->
 <item><ref id="labs" name="labs">
 <!-- <item><ref id="ltoa" name="ltoa"> -->
-<!-- <item><ref id="malloc" name="malloc"> -->
+<item><ref id="malloc" name="malloc">
 <!-- <item><ref id="qsort" name="qsort"> -->
 <item><ref id="rand" name="rand">
-<!-- <item><ref id="realloc" name="realloc"> -->
+<item><ref id="realloc" name="realloc">
 <item><ref id="srand" name="srand">
 <!-- <item><ref id="ultoa" name="ultoa"> -->
 <!-- <item><ref id="utoa" name="utoa"> -->
@@ -181,14 +181,33 @@ function.
 <sect1><tt/string.h/<label id="string.h"><p>
 
 <itemize>
+<!-- <item><ref id="_stroserror" name="_stroserror"> -->
+<!-- <item><ref id="bzero" name="bzero"> -->
+<!-- <item><ref id="memchr" name="memchr"> -->
+<!-- <item><ref id="memcpy" name="memcpy"> -->
+<!-- <item><ref id="memmove" name="memmove"> -->
+<!-- <item><ref id="memset" name="memset"> -->
+<!-- <item><ref id="strcasecmp" name="strcasecmp"> -->
 <item><ref id="strcat" name="strcat">
 <item><ref id="strchr" name="strchr">
+<!-- <item><ref id="strcmp" name="strcmp"> -->
+<!-- <item><ref id="strcoll" name="strcoll"> -->
 <item><ref id="strcpy" name="strcpy">
+<!-- <item><ref id="strcspn" name="strcspn"> -->
+<!-- <item><ref id="strdup" name="strdup"> -->
+<!-- <item><ref id="strerror" name="strerror"> -->
+<!-- <item><ref id="stricmp" name="stricmp"> -->
 <item><ref id="strlen" name="strlen">
 <item><ref id="strlower" name="strlower">
 <item><ref id="strlwr" name="strlwr">
+<!-- <item><ref id="strncat" name="strncat"> -->
+<!-- <item><ref id="strncmp" name="strncmp"> -->
 <item><ref id="strncpy" name="strncpy">
 <item><ref id="strrchr" name="strrchr">
+<!-- <item><ref id="strspn" name="strspn"> -->
+<!-- <item><ref id="strstr" name="strstr"> -->
+<!-- <item><ref id="strtok" name="strtok"> -->
+<!-- <item><ref id="strxfrm" name="strxfrm"> -->
 <item><ref id="strupper" name="strupper">
 <item><ref id="strupr" name="strupr">
 </itemize>
@@ -197,6 +216,83 @@ function.
 
 
 <sect>Alphabetical function reference<p>
+
+<sect1>_heapadd<label id="_heapadd"><p>
+
+<quote>
+<descrip>
+<tag/Function/Add a block to the heap.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void __fastcall__ _heapadd (void* mem, size_t size);/
+<tag/Description/The function adds a block of raw memory to the heap.
+<tag/Limits/
+<itemize>
+<item>The minimum blocksize that can be added is 6 bytes; the function will
+ignore blocks with smaller sizes.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="_heapmaxavail" name="_heapmaxavail">,
+<ref id="_heapmemavail" name="_heapmemavail">,
+<ref id="calloc" name="calloc">,
+<ref id="free" name="free">,
+<ref id="malloc" name="malloc">,
+<ref id="realloc" name="realloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_heapmaxavail<label id="_heapmaxavail"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the largest block that is available on the heap.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/size_t __fastcall__ _heapmaxavail (void);/
+<tag/Description/The function returns the size of the largest block that may
+be allocated from the heap using <tt/<ref id="malloc" name="malloc">/.
+<tag/Availability/cc65
+<tag/See also/
+<ref id="_heapadd" name="_heapadd">,
+<ref id="_heapmemavail" name="_heapmemavail">,
+<ref id="calloc" name="calloc">,
+<ref id="free" name="free">,
+<ref id="malloc" name="malloc">,
+<ref id="realloc" name="realloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>_heapmemavail<label id="_heapmemavail"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the total available space on the heap.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/size_t __fastcall__ _heapmemavail (void);/
+<tag/Description/The function returns the total number of bytes available on
+the heap.
+<tag/Limits/
+<itemize>
+<item>This function is of less use than usually assumed, since the returned
+heap space may be available but not in one block. So even if this function
+says that several times more heap space is available than needed, <ref
+id="malloc" name="malloc"> may still return <tt/NULL/.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="_heapadd" name="_heapadd">,
+<ref id="_heapmaxavail" name="_heapmaxavail">,
+<ref id="calloc" name="calloc">,
+<ref id="free" name="free">,
+<ref id="malloc" name="malloc">,
+<ref id="realloc" name="realloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
 
 <sect1>_randomize<label id="_randomize"><p>
 
@@ -462,6 +558,39 @@ be used in presence of a prototype.
 <item>The function will not return to the caller.
 </itemize>
 <tag/Availability/C128
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>calloc<label id="calloc"><p>
+
+<quote>
+<descrip>
+<tag/Function/Allocate and clear memory.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void* __fastcall__ calloc (size_t n, size_t size);/
+<tag/Description/<tt/calloc/ allocates memory for an array of <tt/n/ elements
+of size <tt/size/, clears the whole block with binary zeroes and returns a
+pointer to it. On error (not enough memory available), <tt/calloc/ returns
+<tt/NULL/.
+<tag/Limits/
+<itemize>
+<item>Clearing the memory may not have the expected effect on all platforms:
+pointers in the block may not be <tt/NULL/ and floating point variables may
+not be zero (0.0). In other words: The "clearing" effect of this function
+should be used with care for portable programs.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="_heapadd" name="_heapadd">,
+<ref id="_heapmaxavail" name="_heapmaxavail">,
+<ref id="_heapmemavail" name="_heapmemavail">,
+<ref id="free" name="free">,
+<ref id="malloc" name="malloc">,
+<ref id="realloc" name="realloc">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -947,6 +1076,37 @@ will nearly double the speed compared to slow mode.
 <tag/See also/
 <ref id="slow" name="slow">,
 <ref id="toggle_videomode" name="toggle_videomode">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>free<label id="free"><p>
+
+<quote>
+<descrip>
+<tag/Function/Free a block of dynamic memory.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void __fastcall__ free (void* block);/
+<tag/Description/Free a block of dynamic memory previously allocated with
+<tt/<ref id="malloc" name="malloc">/, <tt/<ref id="calloc" name="calloc">/
+or <tt/<ref id="realloc" name="realloc">/. As an exception, if the passed
+pointer is <tt/NULL/, no action is performed.
+<tag/Limits/
+<itemize>
+<item>Passing an already free'd block to <tt/free/ again will cause undefined
+behaviour and may crash your program.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="_heapadd" name="_heapadd">,
+<ref id="_heapmaxavail" name="_heapmaxavail">,
+<ref id="_heapmemavail" name="_heapmemavail">,
+<ref id="calloc" name="calloc">,
+<ref id="malloc" name="malloc">,
+<ref id="realloc" name="realloc">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1595,6 +1755,34 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>malloc<label id="malloc"><p>
+
+<quote>
+<descrip>
+<tag/Function/Allocate dynamic memory.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void* __fastcall__ malloc (size_t size);/
+<tag/Description/<tt/malloc/ allocates size bytes on the heap and returns a
+pointer to the allocated memory block. On error (not enough memory available),
+<tt/malloc/ returns <tt/NULL/.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="_heapadd" name="_heapadd">,
+<ref id="_heapmaxavail" name="_heapmaxavail">,
+<ref id="_heapmemavail" name="_heapmemavail">,
+<ref id="calloc" name="calloc">,
+<ref id="free" name="free">,
+<ref id="realloc" name="realloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>rand<label id="rand"><p>
 
 <quote>
@@ -1614,6 +1802,44 @@ had been used with an argument of 1.
 <tag/See also/
 <ref id="_randomize" name="_randomize">,
 <ref id="srand" name="srand">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>realloc<label id="realloc"><p>
+
+<quote>
+<descrip>
+<tag/Function/Change the size of an allocated memory block.
+<tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
+<tag/Declaration/<tt/void* __fastcall__ realloc (void* block, size_t size);/
+<tag/Description/<tt/realloc/ changes the size of the memory block pointed to
+by <tt/block/ to <tt/size/ bytes. If <tt/block/ is <tt/NULL/, <tt/realloc/
+behaves as if <tt/malloc/ had been called. If <tt/size/ is zero, <tt/realloc/
+behaves as if <tt/free/ had been called. On error (not enough memory
+available), <tt/realloc/ returns <tt/NULL/.
+<tag/Limits/
+<itemize>
+<item>The part of the memory block that is returned will have its contents
+unchanged.
+<item>This function is somewhat dangerous to use. Be careful to save the
+pointer you're passing somewhere else, otherwise
+<tscreen><verb>
+        ptr = realloc (ptr, size);
+</verb></tscreen>
+will loose your only copy of <tt/ptr/ if <tt/realloc/ returns <tt/NULL/.
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="_heapadd" name="_heapadd">,
+<ref id="_heapmaxavail" name="_heapmaxavail">,
+<ref id="_heapmemavail" name="_heapmemavail">,
+<ref id="calloc" name="calloc">,
+<ref id="free" name="free">,
+<ref id="realloc" name="realloc">
 <tag/Example/None.
 </descrip>
 </quote>

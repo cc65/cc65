@@ -285,6 +285,7 @@ programs for the Apple ][ using the cc65 crosscompiler.
 %files apple2
 %attr(644,root,root)		/usr/lib/cc65/lib/apple2.lib
 %attr(644,root,root)		/usr/lib/cc65/lib/apple2.o
+%attr(644,root,root) 		/usr/lib/cc65/joy/apple2-*.joy
 %doc src/ld65/cfg/apple2.cfg
 
 
@@ -388,6 +389,9 @@ install -m 644 libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi
 
 
 %changelog
+* Fri May 02 2003 Ullrich von Bassewitz <uz@cc65.org>
+The Apple ][ has a joystick driver.
+
 * Mon Apr 14 2003 Ullrich von Bassewitz <uz@cc65.org>
 Added a subpackage for the Oric Atmos.
 

@@ -46,35 +46,36 @@
 
 /* cc65 */
 #include "codelab.h"
+#include "lineinfo.h"
 #include "opcodes.h"
 
 
 
 /*****************************************************************************/
-/*  	       	    	  	     Data				     */
+/*  	       	     	  	     Data				     */
 /*****************************************************************************/
 
 
 
 /* Flags used */
-#define CEF_USERMARK	0x0001U		/* Generic mark by user functions */
-#define CEF_NUMARG	0x0002U		/* Insn has numerical argument */
+#define CEF_USERMARK 	0x0001U		/* Generic mark by user functions */
+#define CEF_NUMARG   	0x0002U		/* Insn has numerical argument */
 
 /* Code entry structure */
 typedef struct CodeEntry CodeEntry;
 struct CodeEntry {
-    opc_t	    	OPC;		/* Opcode */
-    am_t	    	AM;		/* Adressing mode */
-    unsigned char   	Size;		/* Estimated size */
-    unsigned char   	Hints;		/* Hints for this entry */
+    opc_t	     	OPC;		/* Opcode */
+    am_t	     	AM;		/* Adressing mode */
     char*      	       	Arg;   	       	/* Argument as string */
-    unsigned long   	Num;		/* Numeric argument */
-    unsigned short  	Flags;		/* Flags */
-    unsigned char	Info;		/* Additional code info */
-    unsigned char	Use;		/* Registers used */
-    unsigned char	Chg;		/* Registers changed/destroyed */
-    CodeLabel*	  	JumpTo;		/* Jump label */
-    Collection	  	Labels;		/* Labels for this instruction */
+    unsigned long    	Num;		/* Numeric argument */
+    unsigned short   	Flags;		/* Flags */
+    unsigned char    	Size;		/* Estimated size */
+    unsigned char    	Info;		/* Additional code info */
+    unsigned char    	Use;		/* Registers used */
+    unsigned char    	Chg;		/* Registers changed/destroyed */
+    CodeLabel*	     	JumpTo;		/* Jump label */
+    Collection	     	Labels;		/* Labels for this instruction */
+    LineInfo*           LI;             /* Source line info for this insn */
 };
 
 
@@ -85,7 +86,8 @@ struct CodeEntry {
 
 
 
-CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg, CodeLabel* JumpTo);
+CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
+			 CodeLabel* JumpTo, LineInfo* LI);
 /* Create a new code entry, initialize and return it */
 
 void FreeCodeEntry (CodeEntry* E);

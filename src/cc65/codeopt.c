@@ -185,7 +185,7 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 		Internal ("Invalid program flow");
 	    }
 	    L = GenCodeLabel (S, N);
-	    N = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L);
+	    N = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L, E->LI);
 	    InsertCodeEntry (S, N, I);
 	    ReplaceOPC (E, OPC_JPL);
 	    break;
@@ -205,7 +205,7 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 	     */
 	    ReplaceOPC (E, OPC_JMI);
 	    L = E->JumpTo;
-	    N = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L);
+	    N = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L, E->LI);
 	    InsertCodeEntry (S, N, I+1);
 	    break;
 
@@ -220,7 +220,7 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 		Internal ("Invalid program flow");
 	    }
 	    L = GenCodeLabel (S, N);
-	    N = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L);
+	    N = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L, E->LI);
 	    InsertCodeEntry (S, N, I);
 	    ReplaceOPC (E, OPC_JCS);
 	    break;
@@ -240,7 +240,7 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 	     */
 	    ReplaceOPC (E, OPC_JCC);
 	    L = E->JumpTo;
-	    N = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L);
+	    N = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L, E->LI);
 	    InsertCodeEntry (S, N, I+1);
 	    break;
 
@@ -645,7 +645,7 @@ static unsigned OptCmp1 (CodeSeg* S)
 	    DelCodeEntries (S, I+1, 2);
 
 	    /* Insert the ora instead */
-	    InsertCodeEntry (S, NewCodeEntry (OPC_ORA, E->AM, E->Arg, 0), I+1);
+	    InsertCodeEntry (S, NewCodeEntry (OPC_ORA, E->AM, E->Arg, 0, E->LI), I+1);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -893,9 +893,9 @@ static unsigned OptCmp5 (CodeSeg* S)
   	    }
 
 	    /* Replace the subroutine call. */
+	    E = NewCodeEntry (OPC_JSR, AM_ABS, "tosicmp", 0, E->LI);
+	    InsertCodeEntry (S, E, I+1);
 	    DelCodeEntry (S, I);
-	    E = NewCodeEntry (OPC_JSR, AM_ABS, "tosicmp", 0);
-	    InsertCodeEntry (S, E, I);
 
 	    /* Replace the conditional branch */
 	    ReplaceCmp (S, I+1, Cond);
@@ -1197,21 +1197,26 @@ static unsigned OptNegAX3 (CodeSeg* S)
 	    !CodeEntryHasLabel (L[0]) 	       	&&
        	    (L[1]->Info & OF_ZBRA) != 0) {
 
+	    CodeEntry* X;
+
 	    /* Check if we're calling bnega or bnegax */
 	    int ByteSized = (strcmp (L[0]->Arg, "bnega") == 0);
-
-	    /* Delete the subroutine call */
-	    DelCodeEntry (S, I+1);
 
 	    /* Insert apropriate test code */
 	    if (ByteSized) {
 		/* Test bytes */
-		InsertCodeEntry (S, NewCodeEntry (OPC_TAX, AM_IMP, 0, 0), I+1);
+		X = NewCodeEntry (OPC_TAX, AM_IMP, 0, 0, L[0]->LI);
+		InsertCodeEntry (S, X, I+2);
 	    } else {
 		/* Test words */
-		InsertCodeEntry (S, NewCodeEntry (OPC_STX, AM_ZP, "tmp1", 0), I+1);
-		InsertCodeEntry (S, NewCodeEntry (OPC_ORA, AM_ZP, "tmp1", 0), I+2);
+		X = NewCodeEntry (OPC_STX, AM_ZP, "tmp1", 0, L[0]->LI);
+		InsertCodeEntry (S, X, I+2);
+		X = NewCodeEntry (OPC_ORA, AM_ZP, "tmp1", 0, L[0]->LI);
+		InsertCodeEntry (S, X, I+3);
 	    }
+
+	    /* Delete the subroutine call */
+	    DelCodeEntry (S, I+1);
 
 	    /* Invert the branch */
        	    ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));

@@ -431,13 +431,12 @@ static int istypeexpr (void)
 {
     SymEntry* Entry;
 
-    return curtok == TOK_LPAREN && (
-       	    (nxttok >= TOK_FIRSTTYPE && nxttok <= TOK_LASTTYPE) ||
-	    (nxttok == TOK_CONST)                           	||
-       	    (nxttok  == TOK_IDENT 			      	&&
-	    (Entry = FindSym (NextTok.Ident)) != 0  		&&
-	    IsTypeDef (Entry))
-           );
+    return CurTok.Tok == TOK_LPAREN && (
+       	   (NextTok.Tok >= TOK_FIRSTTYPE && NextTok.Tok <= TOK_LASTTYPE) ||
+	   (NextTok.Tok == TOK_CONST)                           	 ||
+       	   (NextTok.Tok  == TOK_IDENT 			      	         &&
+	   (Entry = FindSym (NextTok.Ident)) != 0  		         &&
+	   IsTypeDef (Entry)));
 }
 
 
@@ -563,7 +562,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
     }
 
     /* Parse the actual parameter list */
-    while (curtok != TOK_RPAREN) {
+    while (CurTok.Tok != TOK_RPAREN) {
 
     	unsigned CFlags;
     	unsigned Flags;
@@ -656,7 +655,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	}
 
 	/* Check for end of argument list */
-     	if (curtok != TOK_COMMA) {
+     	if (CurTok.Tok != TOK_COMMA) {
      	    break;
 	}
      	NextToken ();
@@ -745,14 +744,14 @@ void doasm (void)
     ConsumeLParen ();
 
     /* String literal */
-    if (curtok != TOK_SCONST) {
+    if (CurTok.Tok != TOK_SCONST) {
      	Error ("String literal expected");
     } else {
 
 	/* The string literal may consist of more than one line of assembler
 	 * code. Separate the single lines and output the code.
 	 */
-	const char* S = GetLiteral (curval);
+	const char* S = GetLiteral (CurTok.IVal);
 	while (*S) {
 
 	    /* Allow lines up to 256 bytes */
@@ -773,7 +772,7 @@ void doasm (void)
      	 * will fail if the next token is also a string token, but that's a
      	 * syntax error anyway, because we expect a right paren.
      	 */
-     	ResetLiteralPoolOffs (curval);
+     	ResetLiteralPoolOffs (CurTok.IVal);
     }
 
     /* Skip the string token */
@@ -794,10 +793,10 @@ static int primary (struct expent* lval)
     lval->e_test = 0;
 
     /* Character and integer constants. */
-    if (curtok == TOK_ICONST || curtok == TOK_CCONST) {
+    if (CurTok.Tok == TOK_ICONST || CurTok.Tok == TOK_CCONST) {
     	lval->e_flags = E_MCONST | E_TCONST;
-    	lval->e_tptr  = curtype;
-    	lval->e_const = curval;
+    	lval->e_tptr  = CurTok.Type;
+    	lval->e_const = CurTok.IVal;
     	NextToken ();
     	return 0;
     }
@@ -805,7 +804,7 @@ static int primary (struct expent* lval)
     /* Process parenthesized subexpression by calling the whole parser
      * recursively.
      */
-    if (curtok == TOK_LPAREN) {
+    if (CurTok.Tok == TOK_LPAREN) {
     	NextToken ();
     	memset (lval, 0, sizeof (*lval));	/* Remove any attributes */
     	k = hie0 (lval);
@@ -825,7 +824,7 @@ static int primary (struct expent* lval)
     }
 
     /* Identifier? */
-    if (curtok == TOK_IDENT) {
+    if (CurTok.Tok == TOK_IDENT) {
 
 	SymEntry* Sym;
 	ident Ident;
@@ -915,7 +914,7 @@ static int primary (struct expent* lval)
 	NextToken ();
 
 	/* IDENT is either an auto-declared function or an undefined variable. */
-	if (curtok == TOK_LPAREN) {
+	if (CurTok.Tok == TOK_LPAREN) {
 	    /* Declare a function returning int. For that purpose, prepare a
 	     * function signature for a function having an empty param list
 	     * and returning int.
@@ -942,16 +941,16 @@ static int primary (struct expent* lval)
     }
 
     /* String literal? */
-    if (curtok == TOK_SCONST) {
+    if (CurTok.Tok == TOK_SCONST) {
    	lval->e_flags = E_MCONST | E_TLIT;
-       	lval->e_const = curval;
-	lval->e_tptr  = GetCharArrayType (strlen (GetLiteral (curval)));
+       	lval->e_const = CurTok.IVal;
+	lval->e_tptr  = GetCharArrayType (strlen (GetLiteral (CurTok.IVal)));
     	NextToken ();
 	return 0;
     }
 
     /* ASM statement? */
-    if (curtok == TOK_ASM) {
+    if (CurTok.Tok == TOK_ASM) {
 	doasm ();
 	lval->e_tptr  = type_void;
 	lval->e_flags = E_MEXPR;
@@ -960,8 +959,8 @@ static int primary (struct expent* lval)
     }
 
     /* __AX__ and __EAX__ pseudo values? */
-    if (curtok == TOK_AX || curtok == TOK_EAX) {
-       	lval->e_tptr  = (curtok == TOK_AX)? type_uint : type_ulong;
+    if (CurTok.Tok == TOK_AX || CurTok.Tok == TOK_EAX) {
+       	lval->e_tptr  = (CurTok.Tok == TOK_AX)? type_uint : type_ulong;
    	lval->e_flags = E_MREG;
 	lval->e_test &= ~E_CC;
    	lval->e_const = 0;
@@ -1220,7 +1219,7 @@ static int structref (int k, struct expent* lval)
 
     /* Skip the token and check for an identifier */
     NextToken ();
-    if (curtok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
     	Error ("Identifier expected");
     	lval->e_tptr = type_int;
     	return 0;
@@ -1264,19 +1263,19 @@ static int hie11 (struct expent *lval)
 
 
     k = primary (lval);
-    if (curtok < TOK_LBRACK || curtok > TOK_PTR_REF) {
+    if (CurTok.Tok < TOK_LBRACK || CurTok.Tok > TOK_PTR_REF) {
 	/* Not for us */
        	return k;
     }
 
     while (1) {
 
-	if (curtok == TOK_LBRACK) {
+	if (CurTok.Tok == TOK_LBRACK) {
 
 	    /* Array reference */
 	    k = arrayref (k, lval);
 
-	} else if (curtok == TOK_LPAREN) {
+	} else if (CurTok.Tok == TOK_LPAREN) {
 
 	    /* Function call. Skip the opening parenthesis */
 	    NextToken ();
@@ -1296,14 +1295,14 @@ static int hie11 (struct expent *lval)
      	    }
      	    k = 0;
 
-     	} else if (curtok == TOK_DOT) {
+     	} else if (CurTok.Tok == TOK_DOT) {
 
      	    if (!IsClassStruct (lval->e_tptr)) {
      	   	Error ("Struct expected");
      	    }
      	    k = structref (0, lval);
 
-     	} else if (curtok == TOK_PTR_REF) {
+     	} else if (CurTok.Tok == TOK_PTR_REF) {
 
      	    tptr = lval->e_tptr;
      	    if (tptr[0] != T_PTR || (tptr[1] & T_STRUCT) == 0) {
@@ -1612,7 +1611,7 @@ static int hie10 (struct expent* lval)
     int k;
     type* t;
 
-    switch (curtok) {
+    switch (CurTok.Tok) {
 
      	case TOK_INC:
      	    pre_incdec (lval, g_inc);
@@ -1625,7 +1624,7 @@ static int hie10 (struct expent* lval)
 	case TOK_PLUS:
      	case TOK_MINUS:
      	case TOK_COMP:
-     	    unaryop (curtok, lval);
+     	    unaryop (CurTok.Tok, lval);
      	    return 0;
 
      	case TOK_BOOL_NOT:
@@ -1702,7 +1701,7 @@ static int hie10 (struct expent* lval)
     }
 
     k = hie11 (lval);
-    switch (curtok) {
+    switch (CurTok.Tok) {
      	case TOK_INC:
        	    post_incdec (lval, k, g_inc);
      	    return 0;
@@ -1737,7 +1736,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
     k = hienext (lval);
 
     *UsedGen = 0;
-    while ((Gen = FindGen (curtok, ops)) != 0) {
+    while ((Gen = FindGen (CurTok.Tok, ops)) != 0) {
 
 	/* Tell the caller that we handled it's ops */
 	*UsedGen = 1;
@@ -1748,7 +1747,7 @@ static int hie_internal (GenDesc** ops,		/* List of generators */
 	}
 
 	/* Remember the operator token, then skip it */
-       	tok = curtok;
+       	tok = CurTok.Tok;
 	NextToken ();
 
 	/* Get the lhs on stack */
@@ -1845,10 +1844,10 @@ static int hie_compare (GenDesc** ops,		/* List of generators */
 
     k = hienext (lval);
 
-    while ((Gen = FindGen (curtok, ops)) != 0) {
+    while ((Gen = FindGen (CurTok.Tok, ops)) != 0) {
 
 	/* Remember the operator token, then skip it */
-       	tok = curtok;
+       	tok = CurTok.Tok;
 	NextToken ();
 
 	/* Get the lhs on stack */
@@ -2305,9 +2304,9 @@ static int hie8 (struct expent* lval)
 /* Process + and - binary operators. */
 {
     int k = hie9 (lval);
-    while (curtok == TOK_PLUS || curtok == TOK_MINUS) {
+    while (CurTok.Tok == TOK_PLUS || CurTok.Tok == TOK_MINUS) {
 
-       	if (curtok == TOK_PLUS) {
+       	if (CurTok.Tok == TOK_PLUS) {
        	    parseadd (k, lval);
        	} else {
        	    parsesub (k, lval);
@@ -2401,7 +2400,7 @@ static int hieAnd (struct expent* lval, unsigned TrueLab, int* BoolOp)
     struct expent lval2;
 
     k = hie2 (lval);
-    if (curtok == TOK_BOOL_AND) {
+    if (CurTok.Tok == TOK_BOOL_AND) {
 
        	/* Tell our caller that we're evaluating a boolean */
        	*BoolOp = 1;
@@ -2421,7 +2420,7 @@ static int hieAnd (struct expent* lval, unsigned TrueLab, int* BoolOp)
        	g_falsejump (CF_NONE, lab);
 
        	/* Parse more boolean and's */
-       	while (curtok == TOK_BOOL_AND) {
+       	while (CurTok.Tok == TOK_BOOL_AND) {
 
        	    /* Skip the && */
     	    NextToken ();
@@ -2434,7 +2433,7 @@ static int hieAnd (struct expent* lval, unsigned TrueLab, int* BoolOp)
     	    exprhs (CF_FORCECHAR, k, &lval2);
 
        	    /* Do short circuit evaluation */
-    	    if (curtok == TOK_BOOL_AND) {
+    	    if (CurTok.Tok == TOK_BOOL_AND) {
     	        g_falsejump (CF_NONE, lab);
        	    } else {
        		/* Last expression - will evaluate to true */
@@ -2472,7 +2471,7 @@ static int hieOr (struct expent *lval)
     k = hieAnd (lval, TrueLab, &BoolOp);
 
     /* Any boolean or's? */
-    if (curtok == TOK_BOOL_OR) {
+    if (CurTok.Tok == TOK_BOOL_OR) {
 
     	/* If the expr hasn't set condition codes, set the force-test flag */
        	if ((lval->e_test & E_CC) == 0) {
@@ -2493,7 +2492,7 @@ static int hieOr (struct expent *lval)
     	BoolOp = 1;
 
     	/* while there's more expr */
-       	while (curtok == TOK_BOOL_OR) {
+       	while (CurTok.Tok == TOK_BOOL_OR) {
 
        	    /* skip the || */
     	    NextToken ();
@@ -2512,7 +2511,7 @@ static int hieOr (struct expent *lval)
     	     */
 #if 	0
 /* Seems this sometimes generates wrong code */
-    	    if (curtok == TOK_BOOL_OR && !AndOp) {
+    	    if (CurTok.Tok == TOK_BOOL_OR && !AndOp) {
     	      	g_truejump (CF_NONE, TrueLab);
        	    }
 #else
@@ -2555,7 +2554,7 @@ static int hieQuest (struct expent *lval)
 
 
     k = hieOr (lval);
-    if (curtok == TOK_QUEST) {
+    if (CurTok.Tok == TOK_QUEST) {
     	NextToken ();
     	if ((lval->e_test & E_CC) == 0) {
     	    /* Condition codes not set, force a test */
@@ -2901,7 +2900,7 @@ int hie1 (struct expent* lval)
     int k;
 
     k = hieQuest (lval);
-    switch (curtok) {
+    switch (CurTok.Tok) {
 
     	case TOK_RPAREN:
     	case TOK_SEMI:
@@ -2970,7 +2969,7 @@ int hie0 (struct expent *lval)
     int k;
 
     k = hie1 (lval);
-    while (curtok == TOK_COMMA) {
+    while (CurTok.Tok == TOK_COMMA) {
     	NextToken ();
      	k = hie1 (lval);
     }
@@ -3140,7 +3139,7 @@ void test (unsigned label, int cond)
 	 * compiler itself is one big hack...): If a semicolon follows, we
 	 * don't have a statement and may omit the jump.
 	 */
-	if (curtok != TOK_SEMI) {
+	if (CurTok.Tok != TOK_SEMI) {
             g_falsejump (CF_NONE, label);
 	}
     }

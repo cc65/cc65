@@ -119,17 +119,17 @@ static pragma_t FindPragma (const char* Key)
 static void StringPragma (void (*Func) (const char*))
 /* Handle a pragma that expects a string parameter */
 {
-    if (curtok != TOK_SCONST) {
+    if (CurTok.Tok != TOK_SCONST) {
 	Error ("String literal expected");
     } else {
      	/* Get the string */
-     	const char* Name = GetLiteral (curval);
+     	const char* Name = GetLiteral (CurTok.IVal);
 
        	/* Call the given function with the string argument */
 	Func (Name);
 
      	/* Reset the string pointer, removing the string from the pool */
-     	ResetLiteralPoolOffs (curval);
+     	ResetLiteralPoolOffs (CurTok.IVal);
     }
 
     /* Skip the string (or error) token */
@@ -141,11 +141,11 @@ static void StringPragma (void (*Func) (const char*))
 static void SegNamePragma (segment_t Seg)
 /* Handle a pragma that expects a segment name parameter */
 {
-    if (curtok != TOK_SCONST) {
+    if (CurTok.Tok != TOK_SCONST) {
 	Error ("String literal expected");
     } else {
      	/* Get the segment name */
-     	const char* Name = GetLiteral (curval);
+     	const char* Name = GetLiteral (CurTok.IVal);
 
 	/* Check if the name is valid */
 	if (ValidSegName (Name)) {
@@ -161,7 +161,7 @@ static void SegNamePragma (segment_t Seg)
 	}
 
      	/* Reset the string pointer, removing the string from the pool */
-     	ResetLiteralPoolOffs (curval);
+     	ResetLiteralPoolOffs (CurTok.IVal);
     }
 
     /* Skip the string (or error) token */
@@ -192,7 +192,7 @@ void DoPragma (void)
     NextToken ();
 
     /* Identifier must follow */
-    if (curtok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
 	Error ("Identifier expected");
 	return;
     }

@@ -56,7 +56,7 @@
 
 
 /*****************************************************************************/
-/*		    		     Code				     */
+/*		    	      	     Code				     */
 /*****************************************************************************/
 
 
@@ -67,29 +67,32 @@ static void Parse (void)
     int comma;
     SymEntry* Entry;
 
-    NextToken ();		 	/* "prime" the pump */
+    /* Go... */
     NextToken ();
-    while (curtok != TOK_CEOF) {
+    NextToken ();
+
+    /* Parse until end of input */
+    while (CurTok.Tok != TOK_CEOF) {
 
 	DeclSpec 	Spec;
 	Declaration 	Decl;
 	int		NeedStorage;
 
 	/* Check for empty statements */
-	if (curtok == TOK_SEMI) {
+	if (CurTok.Tok == TOK_SEMI) {
 	    NextToken ();
 	    continue;
 	}
 
 	/* Check for an ASM statement (which is allowed also on global level) */
-	if (curtok == TOK_ASM) {
+	if (CurTok.Tok == TOK_ASM) {
 	    doasm ();
 	    ConsumeSemi ();
 	    continue;
 	}
 
 	/* Check for a #pragma */
-	if (curtok == TOK_PRAGMA) {
+	if (CurTok.Tok == TOK_PRAGMA) {
 	    DoPragma ();
 	    continue;
 	}
@@ -104,7 +107,7 @@ static void Parse (void)
 	}
 
 	/* Check if this is only a type declaration */
-	if (curtok == TOK_SEMI) {
+	if (CurTok.Tok == TOK_SEMI) {
 	    CheckEmptyDecl (&Spec);
 	    NextToken ();
 	    continue;
@@ -155,7 +158,7 @@ static void Parse (void)
 	     	unsigned Size = SizeOf (Decl.Type);
 
 	     	/* Allow initialization */
-	     	if (curtok == TOK_ASSIGN) {
+	     	if (CurTok.Tok == TOK_ASSIGN) {
 
 	     	    /* We cannot initialize types of unknown size, or
 	     	     * void types in non ANSI mode.
@@ -210,7 +213,7 @@ static void Parse (void)
 	    }
 
 	    /* Check for end of declaration list */
-	    if (curtok == TOK_COMMA) {
+	    if (CurTok.Tok == TOK_COMMA) {
 	    	NextToken ();
 	    	comma = 1;
 	    } else {
@@ -224,7 +227,7 @@ static void Parse (void)
 	    /* Function */
 	    if (!comma) {
 
-	     	if (curtok == TOK_SEMI) {
+	     	if (CurTok.Tok == TOK_SEMI) {
 
 	     	    /* Prototype only */
 	     	    NextToken ();

@@ -294,8 +294,8 @@ void NewFunc (SymEntry* Func)
 
     /* Now process statements in this block */
     HadReturn = 0;
-    while (curtok != TOK_RCURLY) {
-     	if (curtok != TOK_CEOF) {
+    while (CurTok.Tok != TOK_RCURLY) {
+     	if (CurTok.Tok != TOK_CEOF) {
      	    HadReturn = Statement ();
      	} else {
      	    break;

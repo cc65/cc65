@@ -45,8 +45,8 @@
 /* cc65 */
 #include "asmcode.h"
 #include "error.h"
-#include "global.h"
 #include "incpath.h"
+#include "lineinfo.h"
 #include "input.h"
 
 
@@ -69,20 +69,12 @@ char NextC = '\0';
 /* Maximum count of nested includes */
 #define MAX_INC_NESTING 	16
 
-/* Struct that describes an input file */
-typedef struct IFile IFile;
-struct IFile {
-    unsigned	Index;	 	/* File index 				*/
-    unsigned	Usage;		/* Usage counter 		        */
-    char       	Name[1]; 	/* Name of file (dynamically allocated) */
-};
-
 /* Struct that describes an active input file */
 typedef struct AFile AFile;
 struct AFile {
     unsigned	Line; 	 	/* Line number for this file 		*/
     FILE*   	F;    	 	/* Input file stream 			*/
-    const char*	Name;		/* Points to corresponding IFile name	*/
+    IFile*      Input;          /* Points to corresponding IFile        */
 };
 
 /* List of all input files */
@@ -137,7 +129,7 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     /* Initialize the fields */
     AF->Line  = 0;
     AF->F     = F;
-    AF->Name  = IF->Name;
+    AF->Input = IF;
 
     /* Increment the usage counter of the corresponding IFile */
     ++IF->Usage;
@@ -378,16 +370,6 @@ int NextLine (void)
 	    --Len;
 	}
       	line [Len] = '\0';
-	    
-#if 0 
-	/* ######### */
-      	/* Output the source line in the generated assembler file
-      	 * if requested.
-      	 */
-      	if (AddSource && line[Start] != '\0') {
-      	    AddCodeLine ("; %s", line+Start);
-      	}
-#endif
 
 	/* Check if we have a line continuation character at the end. If not,
 	 * we're done.
@@ -402,6 +384,9 @@ int NextLine (void)
     /* Got a line. Initialize the current and next characters. */
     InitLine (line);
 
+    /* Create line information for this line */
+    UpdateLineInfo (Input->Input, Input->Line, line);
+
     /* Done */
     return 1;
 }
@@ -414,7 +399,7 @@ const char* GetCurrentFile (void)
     unsigned AFileCount = CollCount (&AFiles);
     if (AFileCount > 0) {
 	const AFile* AF = (const AFile*) CollAt (&AFiles, AFileCount-1);
-	return AF->Name;
+	return AF->Input->Name;
     } else {
 	/* No open file. Use the main file if we have one. */
 	unsigned IFileCount = CollCount (&IFiles);

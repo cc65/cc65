@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    input.h				     */
+/*				  lineinfo.h                                 */
 /*                                                                           */
-/*			      Input file handling			     */
+/*			Source file line info structure                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2001     Ullrich von Bassewitz                                        */
+/*              Wacholderweg 14                                              */
+/*              D-70597 Stuttgart                                            */
+/* EMail:       uz@musoftware.de                                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,83 +33,74 @@
 
 
 
-#ifndef INPUT_H
-#define INPUT_H
-
-
-
-#include <stdio.h>
+#ifndef LINEINFO_H
+#define LINEINFO_H
 
 
 
 /*****************************************************************************/
-/*	 			     data				     */
+/*				   Forwards                                  */
 /*****************************************************************************/
 
 
 
-/* Maximum length of an input line and the corresponding char array */
-#define LINEMAX		4095
-#define LINESIZE 	LINEMAX+1
+/* Input file structure */
+struct IFile;
 
-/* Input line stuff */
-extern char* line;
-extern const char* lptr;		/* ### Remove this */
 
-/* Current and next input character */
-extern char CurC;
-extern char NextC;
 
-/* Struct that describes an input file */
-typedef struct IFile IFile;
-struct IFile {
-    unsigned	Index;	 	/* File index 				*/
-    unsigned	Usage;		/* Usage counter 		        */
-    char       	Name[1]; 	/* Name of file (dynamically allocated) */
+/*****************************************************************************/
+/*				     Data                                    */
+/*****************************************************************************/
+
+
+
+/* The text for the actual line is allocated at the end of the structure, so
+ * the size of the structure varies.
+ */
+typedef struct LineInfo LineInfo;
+struct LineInfo {
+    unsigned   	    RefCount;             /* Reference counter */
+    struct IFile*   InputFile;            /* Input file for this line */
+    unsigned        LineNum;              /* Line number */
+    char            Line[1];              /* Source code line */
 };
 
 
 
 /*****************************************************************************/
-/*	       	     	     	     Code		     		     */
+/*     	       	      	  	     Code			     	     */
 /*****************************************************************************/
 
 
 
-void OpenMainFile (const char* Name);
-/* Open the main file. Will call Fatal() in case of failures. */
+LineInfo* UseLineInfo (LineInfo* LI);
+/* Increase the reference count of the given line info and return it. */
 
-void OpenIncludeFile (const char* Name, unsigned DirSpec);
-/* Open an include file and insert it into the tables. */
-
-void ClearLine (void);
-/* Clear the current input line */
-
-void InitLine (const char* Buf);
-/* Initialize lptr from Buf and read CurC and NextC from the new input line */
-
-void NextChar (void);
-/* Read the next character from the input stream and make CurC and NextC
- * valid. If end of line is reached, both are set to NUL, no more lines
- * are read by this function.
+void ReleaseLineInfo (LineInfo* LI);
+/* Release a reference to the given line info, free the structure if the
+ * reference count drops to zero.
  */
 
-int NextLine (void);
-/* Get a line from the current input. Returns 0 on end of file. */
+LineInfo* GetCurLineInfo (void);
+/* Return a pointer to the current line info. The reference count is NOT
+ * increased, use UseLineInfo for that purpose.
+ */
 
-const char* GetCurrentFile (void);
-/* Return the name of the current input file */
+void UpdateLineInfo (struct IFile* F, unsigned LineNum, const char* Line);
+/* Update the line info - called if a new line is read */
 
-unsigned GetCurrentLine (void);
-/* Return the line number in the current input file */
+const char* GetInputName (const LineInfo* LI);
+/* Return the file name from a line info */
 
-void WriteDependencies (FILE* F, const char* OutputFile);
-/* Write a makefile dependency list to the given file */
+unsigned GetInputLine (const LineInfo* LI);
+/* Return the line number from a line info */
 
 
 
-/* End of input.h */
+/* End of lineinfo.h */
 #endif
+
 
 
 

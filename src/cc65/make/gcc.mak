@@ -49,6 +49,7 @@ OBJS =	anonname.o	\
 	ident.o		\
 	incpath.o      	\
 	input.o		\
+	lineinfo.o	\
 	litpool.o      	\
 	locals.o	\
 	loop.o		\

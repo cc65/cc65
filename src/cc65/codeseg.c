@@ -39,6 +39,7 @@
 /* common */
 #include "chartype.h"
 #include "check.h"
+#include "global.h"
 #include "hashstr.h"
 #include "strutil.h"
 #include "xmalloc.h"
@@ -184,7 +185,7 @@ static const char* ReadToken (const char* L, const char* Term,
 
 
 
-static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
+static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 /* Parse an instruction nnd generate a code entry from it. If the line contains
  * errors, output an error message and return NULL.
  * For simplicity, we don't accept the broad range of input a "real" assembler
@@ -356,7 +357,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
     /* We do now have the addressing mode in AM. Allocate a new CodeEntry
      * structure and initialize it.
      */
-    E = NewCodeEntry (OPC->OPC, AM, Arg, Label);
+    E = NewCodeEntry (OPC->OPC, AM, Arg, Label, LI);
 
     /* Return the new code entry */
     return E;
@@ -365,7 +366,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 
 
 /*****************************************************************************/
-/*     	       	      	       	     Code				     */
+/*     	       	      	       	     Code	       			     */
 /*****************************************************************************/
 
 
@@ -402,7 +403,7 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
 
 
 
-void AddCodeEntry (CodeSeg* S, const char* Format, va_list ap)
+void AddCodeEntry (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
 /* Add a line to the given code segment */
 {
     const char* L;
@@ -435,7 +436,7 @@ void AddCodeEntry (CodeSeg* S, const char* Format, va_list ap)
 	    break;
 
 	default:
-	    E = ParseInsn (S, L);
+	    E = ParseInsn (S, LI, L);		  
 	    break;
     }
 
@@ -855,26 +856,6 @@ void MoveCodeLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L)
 
 
 
-void AddCodeSegHint (CodeSeg* S, unsigned Hint)
-/* Add a hint for the preceeding instruction */
-{
-    CodeEntry* E;
-
-    /* Get the number of entries in this segment */
-    unsigned EntryCount = GetCodeEntryCount (S);
-
-    /* Must have at least one entry */
-    CHECK (EntryCount > 0);
-
-    /* Get the last entry */
-    E = GetCodeEntry (S, EntryCount-1);
-
-    /* Add the hint */
-    E->Hints |= Hint;
-}
-
-
-
 void DelCodeSegAfter (CodeSeg* S, unsigned Last)
 /* Delete all entries including the given one */
 {
@@ -939,6 +920,7 @@ void OutputCodeSeg (const CodeSeg* S, FILE* F)
 /* Output the code segment data to a file */
 {
     unsigned I;
+    const LineInfo* LI;
 
     /* Get the number of entries in this segment */
     unsigned Count = GetCodeEntryCount (S);
@@ -956,24 +938,27 @@ void OutputCodeSeg (const CodeSeg* S, FILE* F)
 	fprintf (F, ".proc\t_%s\n\n", S->Func->Name);
     }
 
-    /* Output all entries */
+    /* Output all entries, prepended by the line information if it has changed */
+    LI = 0;
     for (I = 0; I < Count; ++I) {
-
-	unsigned char Use;
-
-	OutputCodeEntry (CollConstAt (&S->Entries, I), F);
-			      
-#if 0
-     	/* Print usage info */
-     	Use = GetRegInfo ((CodeSeg*) S, I+1);
-     	fprintf (F,
-     		 "  Use: %c%c%c\n",
-     		 (Use & REG_A)? 'A' : '_',
-     		 (Use & REG_X)? 'X' : '_',
-      		 (Use & REG_Y)? 'Y' : '_');
-#else
-	fprintf (F, "\n");
-#endif
+	/* Get the next entry */
+	const CodeEntry* E = CollConstAt (&S->Entries, I);
+	/* Check if the line info has changed. If so, output the source line
+	 * if the option is enabled.
+	 */
+	if (E->LI != LI) {
+	    LI = E->LI;
+	    if (AddSource) {
+		/* Skip spaces to make the output somewhat more readable */
+		const char* Line = LI->Line;
+		while (IsBlank (*Line)) {
+		    ++Line;
+		}
+		fprintf (F, ";\n; %s\n;\n", Line);
+	    }
+	}
+	/* Output the code */
+	OutputCodeEntry (E, F);
     }
 
     /* If this is a segment for a function, leave the function */

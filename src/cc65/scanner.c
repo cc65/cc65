@@ -1,8 +1,35 @@
-/*
- * scanner.c
- *
- * Ullrich von Bassewitz, 07.06.1998
- */
+/*****************************************************************************/
+/*                                                                           */
+/*				   scanner.c                                 */
+/*                                                                           */
+/*			Source file line info structure                      */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
 
 
 
@@ -190,7 +217,7 @@ int IsSym (char *s)
 
 
 
-static void unknown (char C)
+static void UnknownChar (char C)
 /* Error message for unknown character */
 {
     Error ("Invalid input character with code %02X", C & 0xFF);
@@ -215,9 +242,9 @@ static unsigned hexval (int c)
 
 
 static void SetTok (int tok)
-/* set nxttok and bump line ptr */
+/* Set NextTok.Tok and bump line ptr */
 {
-    nxttok = tok;
+    NextTok.Tok = tok;
     NextChar ();
 }
 
@@ -284,7 +311,7 @@ static int ParseChar (void)
 		i = 0;
      		C = CurC - '0';
        	       	while (NextC >= '0' && NextC <= '7' && i++ < 4) {
-     		    NextChar ();
+     	 	    NextChar ();
      	       	    C = (C << 3) | (CurC - '0');
      		}
      		break;
@@ -326,13 +353,13 @@ static void CharConst (void)
     }
 
     /* Setup values and attributes */
-    nxttok  = TOK_CCONST;
+    NextTok.Tok  = TOK_CCONST;
 
     /* Translate into target charset */
-    nxtval  = SignExtendChar (TgtTranslateChar (C));
+    NextTok.IVal = SignExtendChar (TgtTranslateChar (C));
 
     /* Character constants have type int */
-    nxttype = type_int;
+    NextTok.Type = type_int;
 }
 
 
@@ -340,8 +367,8 @@ static void CharConst (void)
 static void StringConst (void)
 /* Parse a quoted string */
 {
-    nxtval = GetLiteralPoolOffs ();
-    nxttok = TOK_SCONST;
+    NextTok.IVal = GetLiteralPoolOffs ();
+    NextTok.Tok  = TOK_SCONST;
 
     /* Be sure to concatenate strings */
     while (CurC == '\"') {
@@ -376,16 +403,26 @@ void NextToken (void)
 {
     ident token;
 
+    /* We have to skip white space here before shifting tokens, since the 
+     * tokens and the current line info is invalid at startup and will get
+     * initialized by reading the first time from the file. Remember if
+     * we were at end of input and handle that later.
+     */
+    int GotEOF = (SkipWhite() == 0);
+
     /* Current token is the lookahead token */
+    if (CurTok.LI) {
+	ReleaseLineInfo (CurTok.LI);
+    }
     CurTok = NextTok;
 
     /* Remember the starting position of the next token */
-    NextTok.Pos = GetCurrentLine();
+    NextTok.LI = UseLineInfo (GetCurLineInfo ());
 
-    /* Skip spaces and read the next line if needed */
-    if (SkipWhite () == 0) {
+    /* Now handle end of input. */
+    if (GotEOF) {	
 	/* End of file reached */
-	nxttok = TOK_CEOF;
+	NextTok.Tok = TOK_CEOF;
 	return;
     }
 
@@ -409,7 +446,7 @@ void NextToken (void)
 	    NextChar ();
      	    if (toupper (CurC) == 'X') {
      	     	base = 16;
-     	    	nxttype = type_uint;
+     	    	NextTok.Type = type_uint;
        	       	NextChar ();	/* gobble "x" */
      	    } else {
      	     	base = 8;
@@ -473,25 +510,25 @@ void NextToken (void)
 
      	/* Now set the type string to the smallest type in types */
      	if (types & IT_INT) {
-     	    nxttype = type_int;
+     	    NextTok.Type = type_int;
      	} else if (types & IT_UINT) {
-     	    nxttype = type_uint;
+     	    NextTok.Type = type_uint;
      	} else if (types & IT_LONG) {
-     	    nxttype = type_long;
+     	    NextTok.Type = type_long;
      	} else {
-     	    nxttype = type_ulong;
+     	    NextTok.Type = type_ulong;
      	}
 
      	/* Set the value and the token */
-     	nxtval = k;
-     	nxttok = TOK_ICONST;
+     	NextTok.IVal = k;
+     	NextTok.Tok  = TOK_ICONST;
      	return;
     }
 
     if (IsSym (token)) {
 
      	/* Check for a keyword */
-     	if ((nxttok = FindKey (token)) != TOK_IDENT) {
+     	if ((NextTok.Tok = FindKey (token)) != TOK_IDENT) {
      	    /* Reserved word found */
      	    return;
      	}
@@ -499,19 +536,19 @@ void NextToken (void)
      	if (token [0] == '_') {
      	    /* Special symbols */
      	    if (strcmp (token, "__FILE__") == 0) {
-	       	nxtval = AddLiteral (GetCurrentFile());
-	       	nxttok = TOK_SCONST;
+	       	NextTok.IVal = AddLiteral (GetCurrentFile());
+	       	NextTok.Tok  = TOK_SCONST;
 	       	return;
 	    } else if (strcmp (token, "__LINE__") == 0) {
-	       	nxttok  = TOK_ICONST;
-    	       	nxtval  = GetCurrentLine();
-    	       	nxttype = type_int;
+	       	NextTok.Tok  = TOK_ICONST;
+    	       	NextTok.IVal = GetCurrentLine();
+    	       	NextTok.Type = type_int;
     	       	return;
     	    } else if (strcmp (token, "__func__") == 0) {
 	       	/* __func__ is only defined in functions */
 	       	if (CurrentFunc) {
-	       	    nxtval = AddLiteral (GetFuncName (CurrentFunc));
-	       	    nxttok = TOK_SCONST;
+	       	    NextTok.IVal = AddLiteral (GetFuncName (CurrentFunc));
+	       	    NextTok.Tok  = TOK_SCONST;
 	       	    return;
 	       	}
 	    }
@@ -531,7 +568,7 @@ void NextToken (void)
     	    if (CurC == '=') {
     		SetTok (TOK_NE);
     	    } else {
-    		nxttok = TOK_BOOL_NOT;
+    		NextTok.Tok = TOK_BOOL_NOT;
     	    }
     	    break;
 
@@ -544,7 +581,7 @@ void NextToken (void)
     	    if (CurC == '=') {
     		SetTok (TOK_MOD_ASSIGN);
     	    } else {
-    		nxttok = TOK_MOD;
+    		NextTok.Tok = TOK_MOD;
     	    }
     	    break;
 
@@ -558,7 +595,7 @@ void NextToken (void)
     		    SetTok (TOK_AND_ASSIGN);
     	      	    break;
     		default:
-    		    nxttok = TOK_AND;
+    		    NextTok.Tok = TOK_AND;
     	    }
     	    break;
 
@@ -579,7 +616,7 @@ void NextToken (void)
     	    if (CurC == '=') {
     		SetTok (TOK_MUL_ASSIGN);
     	    } else {
-    		nxttok = TOK_STAR;
+    		NextTok.Tok = TOK_STAR;
     	    }
     	    break;
 
@@ -593,7 +630,7 @@ void NextToken (void)
     		    SetTok (TOK_PLUS_ASSIGN);
     		    break;
     		default:
-    		    nxttok = TOK_PLUS;
+    		    NextTok.Tok = TOK_PLUS;
     	    }
     	    break;
 
@@ -614,7 +651,7 @@ void NextToken (void)
     	    	    SetTok (TOK_PTR_REF);
     		    break;
     		default:
-    		    nxttok = TOK_MINUS;
+    		    NextTok.Tok = TOK_MINUS;
     	    }
     	    break;
 
@@ -625,10 +662,10 @@ void NextToken (void)
     		if (CurC == '.') {
     		    SetTok (TOK_ELLIPSIS);
     		} else {
-    		    unknown (CurC);
+    		    UnknownChar (CurC);
     		}
     	    } else {
-    		nxttok = TOK_DOT;
+    		NextTok.Tok = TOK_DOT;
     	    }
     	    break;
 
@@ -637,7 +674,7 @@ void NextToken (void)
     	    if (CurC == '=') {
     		SetTok (TOK_DIV_ASSIGN);
     	    } else {
-    	     	nxttok = TOK_DIV;
+    	     	NextTok.Tok = TOK_DIV;
     	    }
     	    break;
 
@@ -660,11 +697,11 @@ void NextToken (void)
     		    if (CurC == '=') {
     		    	SetTok (TOK_SHL_ASSIGN);
     		    } else {
-    		    	nxttok = TOK_SHL;
+    		    	NextTok.Tok = TOK_SHL;
     	    	    }
     		    break;
     		default:
-    		    nxttok = TOK_LT;
+    		    NextTok.Tok = TOK_LT;
     	    }
     	    break;
 
@@ -673,7 +710,7 @@ void NextToken (void)
        	    if (CurC == '=') {
     		SetTok (TOK_EQ);
     	    } else {
-    		nxttok = TOK_ASSIGN;
+    		NextTok.Tok = TOK_ASSIGN;
     	    }
     	    break;
 
@@ -688,11 +725,11 @@ void NextToken (void)
     		    if (CurC == '=') {
     		    	SetTok (TOK_SHR_ASSIGN);
     		    } else {
-    	     	    	nxttok = TOK_SHR;
+    	     	    	NextTok.Tok = TOK_SHR;
     		    }
     		    break;
     		default:
-    		    nxttok = TOK_GT;
+    		    NextTok.Tok = TOK_GT;
     	    }
     	    break;
 
@@ -713,7 +750,7 @@ void NextToken (void)
     	    if (CurC == '=') {
     		SetTok (TOK_XOR_ASSIGN);
     	    } else {
-    		nxttok = TOK_XOR;
+    		NextTok.Tok = TOK_XOR;
     	    }
     	    break;
 
@@ -731,7 +768,7 @@ void NextToken (void)
     		    SetTok (TOK_OR_ASSIGN);
     		    break;
     		default:
-    		    nxttok = TOK_OR;
+    		    NextTok.Tok = TOK_OR;
     	    }
     	    break;
 
@@ -752,11 +789,11 @@ void NextToken (void)
 	      	/* OOPS - should not happen */
 	      	Error ("Preprocessor directive expected");
 	    }
-	    nxttok = TOK_PRAGMA;
+	    NextTok.Tok = TOK_PRAGMA;
 	    break;
 
     	default:
-       	    unknown (CurC);
+       	    UnknownChar (CurC);
 
     }
 
@@ -769,7 +806,7 @@ void Consume (token_t Token, const char* ErrorMsg)
  * message.
  */
 {
-    if (curtok == Token) {
+    if (CurTok.Tok == Token) {
 	NextToken ();
     } else {
        	Error (ErrorMsg);
@@ -790,11 +827,11 @@ void ConsumeSemi (void)
 /* Check for a semicolon and skip it. */
 {
     /* Try do be smart about typos... */
-    if (curtok == TOK_SEMI) {
+    if (CurTok.Tok == TOK_SEMI) {
 	NextToken ();
     } else {
 	Error ("`;' expected");
-	if (curtok == TOK_COLON || curtok == TOK_COMMA) {
+	if (CurTok.Tok == TOK_COLON || CurTok.Tok == TOK_COMMA) {
 	    NextToken ();
 	}
     }

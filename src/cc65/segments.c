@@ -40,6 +40,7 @@
 #include "chartype.h"
 #include "check.h"
 #include "coll.h"
+#include "scanner.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -210,7 +211,7 @@ void AddCodeLine (const char* Format, ...)
     va_list ap;
     va_start (ap, Format);
     CHECK (CS != 0);
-    AddCodeEntry (CS->Code, Format, ap);
+    AddCodeEntry (CS->Code, CurTok.LI, Format, ap);
     va_end (ap);
 }
 

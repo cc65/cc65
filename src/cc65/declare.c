@@ -78,9 +78,9 @@ static void ParseTypeSpec (DeclSpec* D, int Default);
 static type OptionalQualifiers (type Q)
 /* Read type qualifiers if we have any */
 {
-    while (curtok == TOK_CONST || curtok == TOK_VOLATILE) {
+    while (CurTok.Tok == TOK_CONST || CurTok.Tok == TOK_VOLATILE) {
 
-	switch (curtok) {
+	switch (CurTok.Tok) {
 
 	    case TOK_CONST:
 		if (Q & T_QUAL_CONST) {
@@ -115,7 +115,7 @@ static type OptionalQualifiers (type Q)
 static void optionalint (void)
 /* Eat an optional "int" token */
 {
-    if (curtok == TOK_INT) {
+    if (CurTok.Tok == TOK_INT) {
 	/* Skip it */
  	NextToken ();
     }
@@ -126,7 +126,7 @@ static void optionalint (void)
 static void optionalsigned (void)
 /* Eat an optional "signed" token */
 {
-    if (curtok == TOK_SIGNED) {
+    if (CurTok.Tok == TOK_SIGNED) {
 	/* Skip it */
  	NextToken ();
     }
@@ -161,7 +161,7 @@ static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
     D->Flags &= ~DS_DEF_STORAGE;
 
     /* Check the storage class given */
-    switch (curtok) {
+    switch (CurTok.Tok) {
 
      	case TOK_EXTERN:
 	    D->StorageClass = SC_EXTERN | SC_STATIC;
@@ -205,7 +205,7 @@ static void ParseEnumDecl (void)
     ident Ident;
 
     /* Accept forward definitions */
-    if (curtok != TOK_LCURLY) {
+    if (CurTok.Tok != TOK_LCURLY) {
    	return;
     }
 
@@ -214,10 +214,10 @@ static void ParseEnumDecl (void)
 
     /* Read the enum tags */
     EnumVal = 0;
-    while (curtok != TOK_RCURLY) {
+    while (CurTok.Tok != TOK_RCURLY) {
 
 	/* We expect an identifier */
-   	if (curtok != TOK_IDENT) {
+   	if (CurTok.Tok != TOK_IDENT) {
    	    Error ("Identifier expected");
    	    continue;
    	}
@@ -227,7 +227,7 @@ static void ParseEnumDecl (void)
    	NextToken ();
 
 	/* Check for an assigned value */
-   	if (curtok == TOK_ASSIGN) {
+   	if (CurTok.Tok == TOK_ASSIGN) {
     	    struct expent lval;
    	    NextToken ();
    	    constexpr (&lval);
@@ -238,7 +238,7 @@ static void ParseEnumDecl (void)
 	AddConstSym (Ident, type_int, SC_ENUM, EnumVal++);
 
 	/* Check for end of definition */
-    	if (curtok != TOK_COMMA)
+    	if (CurTok.Tok != TOK_COMMA)
     	    break;
     	NextToken ();
     }
@@ -257,7 +257,7 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
     SymEntry* Entry;
 
 
-    if (curtok != TOK_LCURLY) {
+    if (CurTok.Tok != TOK_LCURLY) {
     	/* Just a forward declaration. Try to find a struct with the given
 	 * name. If there is none, insert a forward declaration into the
 	 * current lexical level.
@@ -283,7 +283,7 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 
     /* Parse struct fields */
     Size = 0;
-    while (curtok != TOK_RCURLY) {
+    while (CurTok.Tok != TOK_RCURLY) {
 
 	/* Get the type of the entry */
 	DeclSpec Spec;
@@ -310,7 +310,7 @@ static SymEntry* ParseStructDecl (const char* Name, type StructType)
 	       	}
 	    }
 
-	    if (curtok != TOK_COMMA)
+	    if (CurTok.Tok != TOK_COMMA)
 	       	break;
 	    NextToken ();
 	}
@@ -345,7 +345,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
     Qualifiers = OptionalQualifiers (T_QUAL_NONE);
 
     /* Look at the data type */
-    switch (curtok) {
+    switch (CurTok.Tok) {
 
     	case TOK_VOID:
     	    NextToken ();
@@ -361,7 +361,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 
     	case TOK_LONG:
     	    NextToken ();
-    	    if (curtok == TOK_UNSIGNED) {
+    	    if (CurTok.Tok == TOK_UNSIGNED) {
     	      	NextToken ();
     	      	optionalint ();
 	      	D->Type[0] = T_ULONG;
@@ -376,7 +376,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 
     	case TOK_SHORT:
     	    NextToken ();
-    	    if (curtok == TOK_UNSIGNED) {
+    	    if (CurTok.Tok == TOK_UNSIGNED) {
     	      	NextToken ();
     	      	optionalint ();
 	      	D->Type[0] = T_USHORT;
@@ -397,7 +397,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 
        case TOK_SIGNED:
     	    NextToken ();
-    	    switch (curtok) {
+    	    switch (CurTok.Tok) {
 
        		case TOK_CHAR:
     		    NextToken ();
@@ -432,7 +432,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 
     	case TOK_UNSIGNED:
     	    NextToken ();
-    	    switch (curtok) {
+    	    switch (CurTok.Tok) {
 
        	 	case TOK_CHAR:
     		    NextToken ();
@@ -467,10 +467,10 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 
     	case TOK_STRUCT:
     	case TOK_UNION:
-    	    StructType = (curtok == TOK_STRUCT)? T_STRUCT : T_UNION;
+    	    StructType = (CurTok.Tok == TOK_STRUCT)? T_STRUCT : T_UNION;
     	    NextToken ();
 	    /* */
-    	    if (curtok == TOK_IDENT) {
+    	    if (CurTok.Tok == TOK_IDENT) {
 	 	strcpy (Ident, CurTok.Ident);
     	 	NextToken ();
     	    } else {
@@ -488,9 +488,9 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
 
     	case TOK_ENUM:
     	    NextToken ();
-	    if (curtok != TOK_LCURLY) {
+	    if (CurTok.Tok != TOK_LCURLY) {
 	     	/* Named enum */
-		if (curtok == TOK_IDENT) {
+		if (CurTok.Tok == TOK_IDENT) {
 		    /* Find an entry with this name */
 		    Entry = FindTagSym (CurTok.Ident);
 		    if (Entry) {
@@ -561,10 +561,10 @@ static void ParseOldStyleParamList (FuncDesc* F)
 /* Parse an old style (K&R) parameter list */
 {
     /* Parse params */
-    while (curtok != TOK_RPAREN) {
+    while (CurTok.Tok != TOK_RPAREN) {
 
 	/* List of identifiers expected */
-	if (curtok != TOK_IDENT) {
+	if (CurTok.Tok != TOK_IDENT) {
 	    Error ("Identifier expected");
 	}
 
@@ -578,7 +578,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 	NextToken ();
 
 	/* Check for more parameters */
-	if (curtok == TOK_COMMA) {
+	if (CurTok.Tok == TOK_COMMA) {
 	    NextToken ();
 	} else {
 	    break;
@@ -591,7 +591,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
     ConsumeRParen ();
 
     /* An optional list of type specifications follows */
-    while (curtok != TOK_LCURLY) {
+    while (CurTok.Tok != TOK_LCURLY) {
 
 	DeclSpec    	Spec;
 
@@ -625,7 +625,7 @@ static void ParseOldStyleParamList (FuncDesc* F)
 		}
 	    }
 
-     	    if (curtok == TOK_COMMA) {
+     	    if (CurTok.Tok == TOK_COMMA) {
 		NextToken ();
 	    } else {
      	      	break;
@@ -644,14 +644,14 @@ static void ParseAnsiParamList (FuncDesc* F)
 /* Parse a new style (ANSI) parameter list */
 {
     /* Parse params */
-    while (curtok != TOK_RPAREN) {
+    while (CurTok.Tok != TOK_RPAREN) {
 
 	DeclSpec 	Spec;
 	Declaration 	Decl;
 	DeclAttr	Attr;
 
       	/* Allow an ellipsis as last parameter */
-	if (curtok == TOK_ELLIPSIS) {
+	if (CurTok.Tok == TOK_ELLIPSIS) {
 	    NextToken ();
 	    F->Flags |= FD_VARIADIC;
 	    break;
@@ -695,7 +695,7 @@ static void ParseAnsiParamList (FuncDesc* F)
        	++F->ParamCount;
 
 	/* Check for more parameters */
-	if (curtok == TOK_COMMA) {
+	if (CurTok.Tok == TOK_COMMA) {
 	    NextToken ();
 	} else {
 	    break;
@@ -708,7 +708,7 @@ static void ParseAnsiParamList (FuncDesc* F)
     ConsumeRParen ();
 
     /* Check if this is a function definition */
-    if (curtok == TOK_LCURLY) {
+    if (CurTok.Tok == TOK_LCURLY) {
      	/* Print an error if in strict ANSI mode and we have unnamed
      	 * parameters.
      	 */
@@ -733,14 +733,15 @@ static FuncDesc* ParseFuncDecl (void)
     EnterFunctionLevel ();
 
     /* Check for several special parameter lists */
-    if (curtok == TOK_RPAREN) {
+    if (CurTok.Tok == TOK_RPAREN) {
      	/* Parameter list is empty */
      	F->Flags |= (FD_EMPTY | FD_VARIADIC);
-    } else if (curtok == TOK_VOID && nxttok == TOK_RPAREN) {
+    } else if (CurTok.Tok == TOK_VOID && NextTok.Tok == TOK_RPAREN) {
      	/* Parameter list declared as void */
      	NextToken ();
      	F->Flags |= FD_VOID_PARAM;
-    } else if (curtok == TOK_IDENT && (nxttok == TOK_COMMA || nxttok == TOK_RPAREN)) {
+    } else if (CurTok.Tok == TOK_IDENT &&
+	       (NextTok.Tok == TOK_COMMA || NextTok.Tok == TOK_RPAREN)) {
 	/* If the identifier is a typedef, we have a new style parameter list,
 	 * if it's some other identifier, it's an old style parameter list.
 	 */
@@ -786,7 +787,7 @@ static void Decl (Declaration* D, unsigned Mode)
 /* Recursively process declarators. Build a type array in reverse order. */
 {
 
-    if (curtok == TOK_STAR) {
+    if (CurTok.Tok == TOK_STAR) {
 	type T = T_PTR;
        	NextToken ();
 	/* Allow optional const or volatile qualifiers */
@@ -794,11 +795,11 @@ static void Decl (Declaration* D, unsigned Mode)
        	Decl (D, Mode);
        	*D->T++ = T;
        	return;
-    } else if (curtok == TOK_LPAREN) {
+    } else if (CurTok.Tok == TOK_LPAREN) {
        	NextToken ();
        	Decl (D, Mode);
        	ConsumeRParen ();
-    } else if (curtok == TOK_FASTCALL) {
+    } else if (CurTok.Tok == TOK_FASTCALL) {
 	/* Remember the current type pointer */
 	type* T = D->T;
 	/* Skip the fastcall token */
@@ -828,7 +829,7 @@ static void Decl (Declaration* D, unsigned Mode)
      	 */
      	if (Mode == DM_NO_IDENT) {
      	    D->Ident[0] = '\0';
-     	} else if (curtok == TOK_IDENT) {
+     	} else if (CurTok.Tok == TOK_IDENT) {
        	    strcpy (D->Ident, CurTok.Ident);
      	    NextToken ();
      	} else {
@@ -840,8 +841,8 @@ static void Decl (Declaration* D, unsigned Mode)
      	}
     }
 
-    while (curtok == TOK_LBRACK || curtok == TOK_LPAREN) {
-       	if (curtok == TOK_LPAREN) {
+    while (CurTok.Tok == TOK_LBRACK || CurTok.Tok == TOK_LPAREN) {
+       	if (CurTok.Tok == TOK_LPAREN) {
        	    /* Function declaration */
 	    FuncDesc* F;
        	    NextToken ();
@@ -855,7 +856,7 @@ static void Decl (Declaration* D, unsigned Mode)
        	    unsigned long Size = 0;
        	    NextToken ();
 	    /* Read the size if it is given */
-       	    if (curtok != TOK_RBRACK) {
+       	    if (CurTok.Tok != TOK_RBRACK) {
     	     	struct expent lval;
        	       	constexpr (&lval);
        	       	Size = lval.e_const;
@@ -995,12 +996,12 @@ static void ParseVoidInit (void)
 
 	}
 
-	if (curtok != TOK_COMMA) {
+	if (CurTok.Tok != TOK_COMMA) {
 	    break;
 	}
 	NextToken ();
 
-    } while (curtok != TOK_RCURLY);
+    } while (CurTok.Tok != TOK_RCURLY);
 
     ConsumeRCurly ();
 }
@@ -1031,14 +1032,14 @@ static void ParseStructInit (type* Type)
 
     /* Get a pointer to the list of symbols */
     Entry = Tab->SymHead;
-    while (curtok != TOK_RCURLY) {
+    while (CurTok.Tok != TOK_RCURLY) {
  	if (Entry == 0) {
  	    Error ("Too many initializers");
  	    return;
  	}
  	ParseInit (Entry->Type);
  	Entry = Entry->NextSym;
- 	if (curtok != TOK_COMMA)
+ 	if (CurTok.Tok != TOK_COMMA)
  	    break;
  	NextToken ();
     }
@@ -1105,20 +1106,20 @@ void ParseInit (type* T)
      	case T_ARRAY:
      	    Size = Decode (T + 1);
 	    t = T + DECODE_SIZE + 1;
-       	    if (IsTypeChar(t) && curtok == TOK_SCONST) {
-     	     	str = GetLiteral (curval);
+       	    if (IsTypeChar(t) && CurTok.Tok == TOK_SCONST) {
+     	     	str = GetLiteral (CurTok.IVal);
      	     	Count = strlen (str) + 1;
-	    	TranslateLiteralPool (curval);	/* Translate into target charset */
+	    	TranslateLiteralPool (CurTok.IVal);	/* Translate into target charset */
      	     	g_defbytes (str, Count);
-     	     	ResetLiteralPoolOffs (curval);	/* Remove string from pool */
+     	     	ResetLiteralPoolOffs (CurTok.IVal);	/* Remove string from pool */
      	     	NextToken ();
      	    } else {
      	     	ConsumeLCurly ();
      	     	Count = 0;
-     	     	while (curtok != TOK_RCURLY) {
+     	     	while (CurTok.Tok != TOK_RCURLY) {
      	     	    ParseInit (T + DECODE_SIZE + 1);
      	     	    ++Count;
-     	     	    if (curtok != TOK_COMMA)
+     	     	    if (CurTok.Tok != TOK_COMMA)
      	     	 	break;
      	     	    NextToken ();
      	     	}

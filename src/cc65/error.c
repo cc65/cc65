@@ -43,6 +43,7 @@
 /* cc65 */
 #include "global.h"
 #include "input.h"
+#include "lineinfo.h"
 #include "scanner.h"
 #include "stmt.h"
 #include "error.h"
@@ -87,7 +88,7 @@ void Warning (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntWarning (GetCurrentFile(), curpos, Format, ap);
+    IntWarning (GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Format, ap);
     va_end (ap);
 }
 
@@ -125,7 +126,7 @@ void Error (const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    IntError (GetCurrentFile(), curpos, Format, ap);
+    IntError (GetInputName (CurTok.LI), GetInputLine (CurTok.LI), Format, ap);
     va_end (ap);
 }
 
@@ -146,8 +147,18 @@ void Fatal (const char* Format, ...)
 /* Print a message about a fatal error and die */
 {
     va_list ap;
+								  
+    const char* FileName;
+    unsigned    LineNum;
+    if (CurTok.LI) {
+	FileName = GetInputName (CurTok.LI);
+	LineNum  = GetInputLine (CurTok.LI);
+    } else {
+	FileName = GetCurrentFile ();
+	LineNum  = GetCurrentLine ();
+    }
 
-    fprintf (stderr, "%s(%u): Fatal: ", GetCurrentFile(), curpos);
+    fprintf (stderr, "%s(%u): Fatal: ", FileName, LineNum);
 
     va_start (ap, Format);
     vfprintf (stderr, Format, ap);
@@ -165,8 +176,18 @@ void Internal (char* Format, ...)
 {
     va_list ap;
 
+    const char* FileName;
+    unsigned    LineNum;
+    if (CurTok.LI) {
+	FileName = GetInputName (CurTok.LI);
+	LineNum  = GetInputLine (CurTok.LI);
+    } else {
+	FileName = GetCurrentFile ();
+	LineNum  = GetCurrentLine ();
+    }
+
     fprintf (stderr, "%s(%u): Internal compiler error:\n",
-	     GetCurrentFile(), curpos);
+	     FileName, LineNum);
 
     va_start (ap, Format);
     vfprintf (stderr, Format, ap);
@@ -190,3 +211,4 @@ void ErrorReport (void)
 
 
 
+				

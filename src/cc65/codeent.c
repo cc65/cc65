@@ -160,7 +160,8 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 
 
 
-CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg, CodeLabel* JumpTo)
+CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
+			 CodeLabel* JumpTo, LineInfo* LI)
 /* Create a new code entry, initialize and return it */
 {
     /* Get the opcode description */
@@ -170,18 +171,14 @@ CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg, CodeLabel* JumpTo)
     CodeEntry* E = xmalloc (sizeof (CodeEntry));
 
     /* Initialize the fields */
-    E->OPC  	= D->OPC;
-    E->AM   	= AM;
-    E->Size 	= GetInsnSize (E->OPC, E->AM);
-    E->Hints	= 0;
-    E->Arg     	= GetArgCopy (Arg);
-    if (NumArg (E->Arg, &E->Num)) {
-    	E-> Flags = CEF_NUMARG;
-    } else {
-       	E->Flags  = 0;
-    }
+    E->OPC    = D->OPC;
+    E->AM     = AM;
+    E->Arg    = GetArgCopy (Arg);
+    E->Flags  = NumArg (E->Arg, &E->Num)? CEF_NUMARG : 0;
+    E->Size   = GetInsnSize (E->OPC, E->AM);
     E->Info   = D->Info;
     E->JumpTo = JumpTo;
+    E->LI     = UseLineInfo (LI);
     SetUseChgInfo (E, D);
     InitCollection (&E->Labels);
 
@@ -204,6 +201,9 @@ void FreeCodeEntry (CodeEntry* E)
 
     /* Cleanup the collection */
     DoneCollection (&E->Labels);
+
+    /* Release the line info */
+    ReleaseLineInfo (E->LI);
 
     /* Free the entry */
     xfree (E);
@@ -359,7 +359,7 @@ void OutputCodeEntry (const CodeEntry* E, FILE* F)
     /* Print usage info if requested by the debugging flag */
 //    if (Debug) {
   	Chars += fprintf (F,
-  			  "%*s; USE: %c%c%c CHG: %c%c%c SIZE: %u",
+  			  "%*s; USE: %c%c%c CHG: %c%c%c SIZE: %u\n",
   			  30-Chars, "",
        	       	       	  (E->Use & REG_A)? 'A' : '_',
        	       	       	  (E->Use & REG_X)? 'X' : '_',
@@ -371,6 +371,7 @@ void OutputCodeEntry (const CodeEntry* E, FILE* F)
 //    }
 
 }
+
 
 
 

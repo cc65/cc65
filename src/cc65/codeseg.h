@@ -48,6 +48,7 @@
 
 /* cc65 */
 #include "codelab.h"
+#include "lineinfo.h"
 #include "symentry.h"
 
 
@@ -93,7 +94,7 @@ struct CodeSeg {
 CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func);
 /* Create a new code segment, initialize and return it */
 
-void AddCodeEntry (CodeSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
+void AddCodeEntry (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap) attribute ((format(printf,3,0)));
 /* Add a line to the given code segment */
 
 void InsertCodeEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index);
@@ -176,9 +177,6 @@ void MoveCodeLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L);
  * was the only reference to the old label, the old label will get
  * deleted.
  */
-
-void AddCodeSegHint (CodeSeg* S, unsigned Hint);
-/* Add a hint for the preceeding instruction */
 
 void DelCodeSegAfter (CodeSeg* S, unsigned Last);
 /* Delete all entries including the given one */

@@ -1,8 +1,35 @@
-/*
- * scanner.h
- *
- * Ullrich von Bassewitz, 07.06.1998
- */
+/*****************************************************************************/
+/*                                                                           */
+/*				   scanner.h                                 */
+/*                                                                           */
+/*			Source file line info structure                      */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
 
 
 
@@ -11,8 +38,10 @@
 
 
 
+/* cc65 */
 #include "datatype.h"
 #include "ident.h"
+#include "lineinfo.h"
 
 
 
@@ -146,29 +175,18 @@ typedef enum token_t {
 
 
 /* Token stuff */
-typedef struct Token_ Token;
-struct Token_ {
-    token_t	Tok;		/* The token itself */
-    long	IVal;		/* The integer attribute */
-    double	FVal;		/* The float attribute */
-    ident	Ident;		/* Identifier if IDENT */
-    unsigned	Pos;		/* Source line where the token comes from */
+typedef struct Token Token;
+struct Token {
+    token_t 	Tok;		/* The token itself */
+    long    	IVal;		/* The integer attribute */
+    double  	FVal;		/* The float attribute */
+    ident   	Ident;		/* Identifier if IDENT */
+    LineInfo*   LI;		/* Source line where the token comes from */
     type*	Type;		/* Type if integer or float constant */
 };
 
 extern Token CurTok;		/* The current token */
 extern Token NextTok;		/* The next token */
-
-/* Defines to make the old code work */
-#define curtok 	CurTok.Tok
-#define curval 	CurTok.IVal
-#define curpos 	CurTok.Pos
-#define curtype	CurTok.Type
-
-#define nxttok 	NextTok.Tok
-#define nxtval 	NextTok.IVal
-#define nxtpos 	NextTok.Pos
-#define nxttype	NextTok.Type
 
 
 

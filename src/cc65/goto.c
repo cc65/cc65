@@ -54,7 +54,7 @@ void DoGoto (void)
     NextToken ();
 
     /* Label name must follow */
-    if (curtok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
 
        	Error ("Label name expected");
 

@@ -67,11 +67,12 @@ unsigned OptRTSJumps (CodeSeg* S)
 	    E->JumpTo != 0  			&&
 	    E->JumpTo->Owner->OPC == OPC_RTS) {
 
+	    /* Insert an RTS instruction */
+	    CodeEntry* X = NewCodeEntry (OPC_RTS, AM_IMP, 0, 0, E->LI);
+	    InsertCodeEntry (S, X, I+1);
+
 	    /* Delete the jump */
 	    DelCodeEntry (S, I);
-
-	    /* Insert an RTS instruction instead */
-	    InsertCodeEntry (S, NewCodeEntry (OPC_RTS, AM_IMP, 0, 0), I);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -248,7 +249,7 @@ unsigned OptJumpCascades (CodeSeg* S)
 	     	/* This is a jump cascade and we may jump to the final target.
 		 * Insert a new instruction, then remove the old one
 	     	 */
-		CodeEntry* X = NewCodeEntry (E->OPC, E->AM, N->Arg, N->JumpTo);
+		CodeEntry* X = NewCodeEntry (E->OPC, E->AM, N->Arg, N->JumpTo, E->LI);
 
 		/* Insert it behind E */
 		InsertCodeEntry (S, X, I+1);
@@ -284,8 +285,8 @@ unsigned OptJumpCascades (CodeSeg* S)
 		    goto NextEntry;
 		}
 
-		/* We may jump behind this conditional branch. Get the 
-		 * pointer to the next instruction 
+		/* We may jump behind this conditional branch. Get the
+		 * pointer to the next instruction
 		 */
 		if ((X = GetNextCodeEntry (S, GetCodeEntryIndex (S, N))) == 0) {
 		    /* N is the last entry, bail out */

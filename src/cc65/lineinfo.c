@@ -1,0 +1,159 @@
+/*****************************************************************************/
+/*                                                                           */
+/*				  lineinfo.c                                 */
+/*                                                                           */
+/*			Source file line info structure                      */
+/*                                                                           */
+/*                                                                           */
+/*                                                                           */
+/* (C) 2001     Ullrich von Bassewitz                                        */
+/*              Wacholderweg 14                                              */
+/*              D-70597 Stuttgart                                            */
+/* EMail:       uz@musoftware.de                                             */
+/*                                                                           */
+/*                                                                           */
+/* This software is provided 'as-is', without any expressed or implied       */
+/* warranty.  In no event will the authors be held liable for any damages    */
+/* arising from the use of this software.                                    */
+/*                                                                           */
+/* Permission is granted to anyone to use this software for any purpose,     */
+/* including commercial applications, and to alter it and redistribute it    */
+/* freely, subject to the following restrictions:                            */
+/*                                                                           */
+/* 1. The origin of this software must not be misrepresented; you must not   */
+/*    claim that you wrote the original software. If you use this software   */
+/*    in a product, an acknowledgment in the product documentation would be  */
+/*    appreciated but is not required.                                       */
+/* 2. Altered source versions must be plainly marked as such, and must not   */
+/*    be misrepresented as being the original software.                      */
+/* 3. This notice may not be removed or altered from any source              */
+/*    distribution.                                                          */
+/*                                                                           */
+/*****************************************************************************/
+
+
+
+#include <string.h>
+
+/* common */
+#include "check.h"
+#include "xmalloc.h"
+
+/* cc65 */
+#include "input.h"
+#include "lineinfo.h"
+
+
+
+/*****************************************************************************/
+/*				     Data                                    */
+/*****************************************************************************/
+
+
+
+/* Global pointer to line information for the current line */
+static LineInfo* CurLineInfo = 0;
+
+
+
+/*****************************************************************************/
+/*     	       	      	  	     Code			     	     */
+/*****************************************************************************/
+
+
+
+static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const char* Line)
+/* Create and return a new line info. Ref count will be 1. */
+{
+    /* Calculate the length of the line */
+    unsigned Len = strlen (Line);
+
+    /* Allocate memory */
+    LineInfo* LI = xmalloc (sizeof (LineInfo) + Len);
+
+    /* Initialize the fields */
+    LI->RefCount  = 1;
+    LI->InputFile = F;
+    LI->LineNum   = LineNum;
+    memcpy (LI->Line, Line, Len+1);
+
+    /* Return the new struct */
+    return LI;
+}
+
+
+
+static void FreeLineInfo (LineInfo* LI)
+/* Free a LineInfo structure */
+{
+    xfree (LI);
+}
+
+
+
+LineInfo* UseLineInfo (LineInfo* LI)
+/* Increase the reference count of the given line info and return it. */
+{
+    CHECK (LI != 0);
+    ++LI->RefCount;
+    return LI;
+}
+
+
+
+void ReleaseLineInfo (LineInfo* LI)
+/* Release a reference to the given line info, free the structure if the
+ * reference count drops to zero.
+ */
+{
+    CHECK (LI && LI->RefCount > 0);
+    if (--LI->RefCount == 0) {
+	/* No more references, free it */
+	FreeLineInfo (LI);
+    }
+}
+
+
+
+LineInfo* GetCurLineInfo (void)
+/* Return a pointer to the current line info. The reference count is NOT
+ * increased, use UseLineInfo for that purpose.
+ */
+{
+    return CurLineInfo;
+}
+
+
+
+void UpdateLineInfo (struct IFile* F, unsigned LineNum, const char* Line)
+/* Update the line info - called if a new line is read */
+{
+    /* If a current line info exists, release it */
+    if (CurLineInfo) {
+	ReleaseLineInfo (CurLineInfo);
+    }
+
+    /* Create a new line info */
+    CurLineInfo = NewLineInfo (F, LineNum, Line);
+}
+
+
+
+const char* GetInputName (const LineInfo* LI)
+/* Return the file name from a line info */
+{
+    PRECONDITION (LI != 0);
+    return LI->InputFile->Name;
+}
+
+
+
+unsigned GetInputLine (const LineInfo* LI)
+/* Return the line number from a line info */
+{
+    PRECONDITION (LI != 0);
+    return LI->LineNum;
+}
+
+
+

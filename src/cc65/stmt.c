@@ -69,7 +69,7 @@ static int doif (void)
     gotbreak = Statement ();
 
     /* Else clause present? */
-    if (curtok != TOK_ELSE) {
+    if (CurTok.Tok != TOK_ELSE) {
 
       	g_defcodelabel (flab1);
      	/* Since there's no else clause, we're not sure, if the a break
@@ -130,7 +130,7 @@ static void dowhile (char wtype)
 	 * do another small optimization here, and use a conditional jump
 	 * instead an absolute one.
 	 */
-	if (curtok == TOK_SEMI) {
+	if (CurTok.Tok == TOK_SEMI) {
 	    /* Shortcut */
 	    NextToken ();
 	    /* Use a conditional jump */
@@ -163,7 +163,7 @@ static void DoReturn (void)
     struct expent lval;
 
     NextToken ();
-    if (curtok != TOK_SEMI) {
+    if (CurTok.Tok != TOK_SEMI) {
        	if (HasVoidReturn (CurrentFunc)) {
        	    Error ("Returning a value in function with return type void");
        	}
@@ -280,9 +280,9 @@ static void cascadeswitch (struct expent* eval)
 
     /* Parse the labels */
     lcount = 0;
-    while (curtok != TOK_RCURLY) {
+    while (CurTok.Tok != TOK_RCURLY) {
 
-	if (curtok == TOK_CASE || curtok == TOK_DEFAULT) {
+	if (CurTok.Tok == TOK_CASE || CurTok.Tok == TOK_DEFAULT) {
 
 	    /* If the code for the previous selector did not end with a
 	     * break statement, we must jump over the next selector test.
@@ -301,10 +301,10 @@ static void cascadeswitch (struct expent* eval)
 		NextLab = 0;
 	    }
 
-	    while (curtok == TOK_CASE || curtok == TOK_DEFAULT) {
+	    while (CurTok.Tok == TOK_CASE || CurTok.Tok == TOK_DEFAULT) {
 
 		/* Parse the selector */
-		if (curtok == TOK_CASE) {
+		if (CurTok.Tok == TOK_CASE) {
 
 		    /* Count labels */
 		    ++lcount;
@@ -325,25 +325,25 @@ static void cascadeswitch (struct expent* eval)
 			case T_SCHAR:
 			    /* Signed char */
 			    if (Val < -128 || Val > 127) {
-				Error ("Range error");
+			  	Error ("Range error");
 			    }
 			    break;
 
 			case T_UCHAR:
 		  	    if (Val < 0 || Val > 255) {
-				Error ("Range error");
+			  	Error ("Range error");
 			    }
 			    break;
 
 			case T_INT:
 			    if (Val < -32768 || Val > 32767) {
-				Error ("Range error");
+			  	Error ("Range error");
 			    }
 			    break;
 
 		  	case T_UINT:
 		  	    if (Val < 0 || Val > 65535) {
-				Error ("Range error");
+			  	Error ("Range error");
 		  	    }
 			    break;
 
@@ -351,22 +351,19 @@ static void cascadeswitch (struct expent* eval)
 		     	    Internal ("Invalid type: %02X", *eval->e_tptr & 0xFF);
 		    }
 
-		    /* Skip the colon */
-		    ConsumeColon ();
-
 		    /* Emit a compare */
 		    g_cmp (Flags, Val);
 
 		    /* If another case follows, we will jump to the code if
 		     * the condition is true.
 		     */
-		    if (curtok == TOK_CASE) {
+		    if (CurTok.Tok == TOK_CASE) {
 			/* Create a code label if needed */
 		    	if (CodeLab == 0) {
 			    CodeLab = GetLocalLabel ();
 			}
 			g_falsejump (CF_NONE, CodeLab);
-		    } else if (curtok != TOK_DEFAULT) {
+		    } else if (CurTok.Tok != TOK_DEFAULT) {
 		  	/* No case follows, jump to next selector */
 		  	if (NextLab == 0) {
 		  	    NextLab = GetLocalLabel ();
@@ -374,21 +371,24 @@ static void cascadeswitch (struct expent* eval)
 		  	g_truejump (CF_NONE, NextLab);
 		    }
 
+		    /* Skip the colon */
+		    ConsumeColon ();
+
 		} else {
 
 		    /* Default case */
 		    NextToken ();
 
-		    /* Skip the colon */
-		    ConsumeColon ();
-
 		    /* Handle the pathologic case: DEFAULT followed by CASE */
-		    if (curtok == TOK_CASE) {
+		    if (CurTok.Tok == TOK_CASE) {
 		  	if (CodeLab == 0) {
 		  	    CodeLab = GetLocalLabel ();
 		  	}
 		  	g_jump (CodeLab);
 		    }
+
+		    /* Skip the colon */
+		    ConsumeColon ();
 
 		    /* Remember that we had a default label */
 		    HaveDefault = 1;
@@ -405,7 +405,7 @@ static void cascadeswitch (struct expent* eval)
 	}
 
 	/* Parse statements */
-	if (curtok != TOK_RCURLY) {
+	if (CurTok.Tok != TOK_RCURLY) {
        	    HaveBreak = Statement ();
 	}
     }
@@ -415,9 +415,6 @@ static void cascadeswitch (struct expent* eval)
      	Warning ("No case labels");
     }
 
-    /* Eat the closing curly brace */
-    NextToken ();
-
     /* Define the exit label and, if there's a next label left, create this
      * one, too.
      */
@@ -425,6 +422,9 @@ static void cascadeswitch (struct expent* eval)
 	g_defcodelabel (NextLab);
     }
     g_defcodelabel (ExitLab);
+
+    /* Eat the closing curly brace */
+    NextToken ();
 
     /* End the loop */
     DelLoop ();
@@ -467,14 +467,14 @@ static void tableswitch (struct expent* eval)
     /* Jump behind the code for the CASE labels */
     g_jump (lcase = GetLocalLabel ());
     lcount = 0;
-    while (curtok != TOK_RCURLY) {
-    	if (curtok == TOK_CASE || curtok == TOK_DEFAULT) {
+    while (CurTok.Tok != TOK_RCURLY) {
+    	if (CurTok.Tok == TOK_CASE || CurTok.Tok == TOK_DEFAULT) {
 	    if (lcount >= CASE_MAX) {
        	       	Fatal ("Too many case labels");
      	    }
     	    label = GetLocalLabel ();
     	    do {
-    	    	if (curtok == TOK_CASE) {
+    	    	if (CurTok.Tok == TOK_CASE) {
        	    	    NextToken ();
     	    	    constexpr (&lval);
 	    	    if (!IsClassInt (lval.e_tptr)) {
@@ -490,11 +490,11 @@ static void tableswitch (struct expent* eval)
 		    HaveDefault = 1;
     	    	}
     	    	ConsumeColon ();
-    	    } while (curtok == TOK_CASE || curtok == TOK_DEFAULT);
+    	    } while (CurTok.Tok == TOK_CASE || CurTok.Tok == TOK_DEFAULT);
     	    g_defcodelabel (label);
 	    HaveBreak = 0;
     	}
-    	if (curtok != TOK_RCURLY) {
+    	if (CurTok.Tok != TOK_RCURLY) {
     	    HaveBreak = Statement ();
     	}
     }
@@ -586,12 +586,12 @@ static void dofor (void)
     lstat = GetLocalLabel ();
     AddLoop (oursp, loop, lab, linc, lstat);
     ConsumeLParen ();
-    if (curtok != TOK_SEMI) {	/* exp1 */
+    if (CurTok.Tok != TOK_SEMI) {	/* exp1 */
 	expression (&lval1);
     }
     ConsumeSemi ();
     g_defcodelabel (loop);
-    if (curtok != TOK_SEMI) { 	/* exp2 */
+    if (CurTok.Tok != TOK_SEMI) { 	/* exp2 */
 	boolexpr (&lval2);
 	g_truejump (CF_NONE, lstat);
 	g_jump (lab);
@@ -600,7 +600,7 @@ static void dofor (void)
     }
     ConsumeSemi ();
     g_defcodelabel (linc);
-    if (curtok != TOK_RPAREN) {	/* exp3 */
+    if (CurTok.Tok != TOK_RPAREN) {	/* exp3 */
     	expression (&lval3);
     }
     ConsumeRParen ();
@@ -634,8 +634,8 @@ static int CompoundStatement (void)
 
     /* Now process statements in this block */
     isbrk = 0;
-    while (curtok != TOK_RCURLY) {
-     	if (curtok != TOK_CEOF) {
+    while (CurTok.Tok != TOK_RCURLY) {
+     	if (CurTok.Tok != TOK_CEOF) {
      	    isbrk = Statement ();
      	} else {
      	    break;
@@ -672,14 +672,14 @@ int Statement (void)
     struct expent lval;
 
     /* */
-    if (curtok == TOK_IDENT && nxttok == TOK_COLON) {
+    if (CurTok.Tok == TOK_IDENT && NextTok.Tok == TOK_COLON) {
 
 	/* Special handling for a label */
 	DoLabel ();
 
     } else {
 
-     	switch (curtok) {
+     	switch (CurTok.Tok) {
 
      	    case TOK_LCURLY:
      	    	return CompoundStatement ();

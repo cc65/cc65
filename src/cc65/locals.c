@@ -178,7 +178,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 
      		/* Change SC in case it was register */
 		SC = (SC & ~SC_REGISTER) | SC_AUTO;
-		if (curtok == TOK_ASSIGN) {
+		if (CurTok.Tok == TOK_ASSIGN) {
 
 		    struct expent lval;
 
@@ -233,7 +233,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		g_res (Size);
 
 		/* Allow assignments */
-		if (curtok == TOK_ASSIGN) {
+		if (CurTok.Tok == TOK_ASSIGN) {
 
 		    struct expent lval;
 
@@ -263,7 +263,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 	} else if ((SC & SC_STATIC) == SC_STATIC) {
 
 	    /* Static data */
-	    if (curtok == TOK_ASSIGN) {
+	    if (CurTok.Tok == TOK_ASSIGN) {
 
 	      	/* Initialization ahead, switch to data segment */
 		if (IsQualConst (Decl.Type)) {
@@ -335,7 +335,7 @@ void DeclareLocals (void)
 	}
 
 	/* Accept type only declarations */
-	if (curtok == TOK_SEMI) {
+	if (CurTok.Tok == TOK_SEMI) {
 	    /* Type declaration only */
 	    CheckEmptyDecl (&Spec);
 	    NextToken ();
@@ -349,7 +349,7 @@ void DeclareLocals (void)
 	    ParseOneDecl (&Spec);
 
 	    /* Check if there is more */
-     	    if (curtok == TOK_COMMA) {
+     	    if (CurTok.Tok == TOK_COMMA) {
 		/* More to come */
 		NextToken ();
 	    } else {

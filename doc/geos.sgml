@@ -727,7 +727,7 @@ In this example <tt/otherTrSe/ can be replaced by <tt/myTrSe/.
 <p>
 NOTE that you <em/must/ use casting to have correct values.
 <p>
-<tt/SetNextFree/ only finds next free sector, it doesn't allocate it.
+<tt/SetNextFree/ finds next free sector and allocates it.
 
 <sect2>Low-level disk IO
 <p>
@@ -996,7 +996,7 @@ counting the terminating <tt/NULL/), and <tt/regions/ cover whole 64K of memory.
 <tt/void CopyString (char *dest, char *src)/
 <p>
 This function copies string from <tt/src/ to <tt/dest/, until it reaches <tt/NULL/. <tt/NULL/
-is also copied. 
+is also copied.
 
 <sect2>CmpString
 <p>

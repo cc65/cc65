@@ -260,6 +260,14 @@ static void DefineSym (const char* Def)
 
 
 
+static void OptAddSource (const char* Opt, const char* Arg)
+/* Add source lines as comments in generated assembler file */
+{
+    AddSource = 1;
+}
+
+
+
 static void OptAnsi (const char* Opt, const char* Arg)
 /* Compile in strict ANSI mode */
 {
@@ -355,6 +363,7 @@ int main (int argc, char* argv[])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
+	{ "--add-source",	0,	OptAddSource		},
 	{ "--ansi",   	 	0,	OptAnsi			},
         { "--cpu",     	       	1,	OptCPU 			},
 	{ "--debug-info",      	0,	OptDebugInfo		},
@@ -394,7 +403,7 @@ int main (int argc, char* argv[])
 		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
 		    break;
 
-		case 'd':	/* debug mode */
+		case 'd':    	/* debug mode */
 		    Debug = 1;
 		    break;
 
@@ -432,8 +441,8 @@ int main (int argc, char* argv[])
 		    while (*P) {
 		    	switch (*P++) {
 		    	    case 'l':
-		    	    	LocalsAreStatic = 1;
-		    		break;
+		    	     	LocalsAreStatic = 1;
+		    	     	break;
 		    	}
 		    }
 		    break;
@@ -442,7 +451,7 @@ int main (int argc, char* argv[])
 		    DefineSym (GetArg (&I, 2));
 		    break;
 
-		case 'I':
+       		case 'I':
 		    OptIncludeDir (Arg, GetArg (&I, 2));
 		    break;
 
@@ -468,26 +477,26 @@ int main (int argc, char* argv[])
 		    break;
 
 		case 'T':
-		    IncSource = 1;
-		    break;
+       		    OptAddSource (Arg, 0);
+       		    break;
 
-		case 'V':
-		    OptVersion (Arg, 0);
-		    break;
+       		case 'V':
+       		    OptVersion (Arg, 0);
+       		    break;
 
-		case 'W':
-		    NoWarn = 1;
-		    break;
+       		case 'W':
+       		    NoWarn = 1;
+       		    break;
 
-		default:
+       		default:
        	       	    UnknownOption (Arg);
-		    break;
-	    }
-	} else {
-	    if (fin) {
-		fprintf (stderr, "additional file specs ignored\n");
-	    } else {
-		fin = xstrdup (Arg);
+       		    break;
+       	    }
+       	} else {
+       	    if (fin) {
+       		fprintf (stderr, "additional file specs ignored\n");
+       	    } else {
+       		fin = xstrdup (Arg);
 		inp = fopen (fin, "r");
 		if (inp == 0) {
 		    Fatal (FAT_CANNOT_OPEN_INPUT, strerror (errno));

@@ -73,7 +73,7 @@ extern unsigned char	RegVarsToCallStack;	/* Save reg variables on call stack */
 extern unsigned char 	LocalsAreStatic;	/* Make local variables static */
 extern unsigned char	SignedChars;		/* Make characters signed by default */
 extern unsigned char	Verbose;		/* Verbose flag */
-extern unsigned char	IncSource;		/* Include source as comments */
+extern unsigned char	AddSource;		/* Add source lines as comments */
 extern unsigned char	DebugInfo;		/* Add debug info to the obj */
 extern unsigned char	Debug;			/* Debug mode */
 

@@ -56,11 +56,11 @@ unsigned char RegVarsToCallStack= 0;   	    /* Save reg variables on call stack 
 unsigned char LocalsAreStatic	= 0;   	    /* Make local variables static */
 unsigned char SignedChars	= 0;	    /* Make characters signed by default */
 unsigned char Verbose		= 0;   	    /* Verbose flag */
-unsigned char IncSource		= 0; 	    /* Include source as comments */
+unsigned char AddSource		= 0; 	    /* Add source lines as comments */
 unsigned char DebugInfo		= 0;	    /* Add debug info to the obj */
 unsigned char Debug		= 0;	    /* Debug mode */
 
 
 
 
-					   
+

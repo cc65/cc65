@@ -162,7 +162,7 @@ int NextLine (void)
 	/* Output the source line in the generated assembler file
 	 * if requested.
 	 */
-	if (IncSource && line[Start] != '\0') {
+	if (AddSource && line[Start] != '\0') {
 	    AddCodeLine ("; %s", line+Start);
 	}
 

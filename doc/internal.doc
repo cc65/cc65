@@ -118,7 +118,7 @@ who did the port).
 
 C64:  	The program runs in a memory configuration, where only the kernal ROM
       	is enabled. The text screen is expected at the usual place ($400), so
-      	54K of memory are available to the program.
+       	50K of memory are available to the program.
 
 C128: 	The startup code will reprogram the MMU, so that only the kernal ROM
       	is enabled. This means, there are 41K of memory available to the
@@ -154,7 +154,7 @@ Atari:  The startup code will adjust the upper memory limit to the installed
         text mode is used (_graphmode_used = 0), the values are $9C1F (with
         Basic) and $BC1F (no cartridge).
 	The program starts at $1F00 (to leave room for DOS), and the free
-        memory values are $6135 (24K, Basic, default mode), $8135 (32K, no 
+        memory values are $6135 (24K, Basic, default mode), $8135 (32K, no
         Basic, default mode), $7D1F (31K, Basic, mode 0) and $9D1F (39K,
         no Basic, mode 0).
 	These values are for a 48K or 64K machine.

@@ -1,4 +1,4 @@
-;
+;                     
 ; Ullrich von Bassewitz, 22.11.2002
 ;
 ; FILE* __fastcall__ _fopen (const char* name, const char* mode, FILE* f);
@@ -23,7 +23,7 @@
 .proc   __fopen
 
         sta     file
-        stx     file            ; Save f
+        stx     file+1          ; Save f
 
 ; Get a pointer to the mode string
 
@@ -76,7 +76,7 @@ invmode:
         jmp     incsp4
 
 ; Mode string successfully parsed. Store the binary mode onto the stack in
-; the same place where the mode string pointer was before. The call open()
+; the same place where the mode string pointer was before. Then call open()
 
 modeok: ldy     #$00
         txa                     ; Mode -> A

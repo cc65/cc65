@@ -2143,8 +2143,6 @@ associated with it. On error, -1 is returned and an error code is stored in
 <item>POSIX specifies an additional <tt/mode/ argument that may be passed to
 open, which is used as the permission mask when a new file is created. While
 cc65 allows to pass this argument, it is ignored.
-<item>The function is only available as fastcall function, so it may only
-be used in presence of a prototype.
 </itemize>
 <tag/Availability/POSIX
 <tag/See also/

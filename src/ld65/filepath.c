@@ -49,7 +49,7 @@
 
 /* If the standard library search path is not given, use a hardcoded one */
 #ifndef CC65_LIB
-#define CC65_LIB        "/usr/lib/cc65/lib/";
+#define CC65_LIB        "/usr/lib/cc65/lib/"
 #endif
 
 

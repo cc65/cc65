@@ -1388,7 +1388,7 @@ struct OptFunc {
 static OptFunc DOpt65C02BitOps  = { Opt65C02BitOps,  "Opt65C02BitOps",   66, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Ind    	= { Opt65C02Ind,     "Opt65C02Ind",     100, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Stores  = { Opt65C02Stores,  "Opt65C02Stores",  100, 0, 0, 0, 0, 0 };
-static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",        	 60, 0, 0, 0, 0, 0 };
+static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",        	125, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",        	200, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",        	 40, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
@@ -1478,7 +1478,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrLoad6,
     &DOptPtrStore1,
     &DOptPtrStore2,
-    &DOptPush1, 
+    &DOptPush1,
     &DOptPushPop,
     &DOptRTS,
     &DOptRTSJumps1,

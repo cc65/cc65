@@ -365,7 +365,7 @@ static void LoadConstant (unsigned Flags, ExprDesc* Expr)
 
 
 
-static int kcalc (int tok, long val1, long val2)
+static int kcalc (token_t tok, long val1, long val2)
 /* Calculate an operation with left and right operand constant. */
 {
     switch (tok) {
@@ -554,7 +554,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
  * each parameter separately, or creating the parameter frame once and then
  * storing into this frame.
  * The function returns the size of the parameters pushed.
- */      
+ */
 {
     ExprDesc lval;
 

@@ -7,8 +7,8 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -144,24 +144,27 @@ int TypeCast (ExprDesc* lval)
                 unsigned OldBits = OldSize * 8;
                 unsigned NewBits = NewSize * 8;
 
+                /* Remember if the old value was negative */
+                int Negative = (lval->ConstVal & (0x01UL << (OldBits-1))) != 0UL;
+
                 /* Check if the new datatype will have a smaller range */
                 if (NewBits <= OldBits) {
 
                     /* Cut the value to the new size */
                     lval->ConstVal &= (0xFFFFFFFFUL >> (32 - NewBits));
 
-                    /* If the new type is signed, sign extend the value */
-                    if (!IsSignUnsigned (NewType)) {
+                    /* If the new type is signed and negative, sign extend the 
+                     * value 
+                     */
+                    if (Negative && !IsSignUnsigned (NewType)) {
                         lval->ConstVal |= ((~0L) << NewBits);
                     }
 
                 } else {
 
                     /* Sign extend the value if needed */
-                    if (!IsSignUnsigned (OldType) && !IsSignUnsigned (NewType)) {
-                        if (lval->ConstVal & (0x01UL << (OldBits-1))) {
-                            lval->ConstVal |= ((~0L) << OldBits);
-                        }
+                    if (Negative && !IsSignUnsigned (OldType) && !IsSignUnsigned (NewType)) {
+                        lval->ConstVal |= ((~0L) << OldBits);
                     }
                 }
 

@@ -1155,6 +1155,18 @@ static unsigned ParseArrayInit (type* T, int AllowFlexibleMembers)
 
         /* Translate into target charset */
         TranslateLiteralPool (CurTok.IVal);
+
+        /* If the array is one too small for the string literal, omit the
+         * trailing zero.
+         */
+        if (ElementCount != UNSPECIFIED &&
+            ElementCount != FLEXIBLE    &&
+            Count        == ElementCount + 1) {
+            /* Omit the trailing zero */
+            --Count;
+        }
+
+        /* Output the data */
         g_defbytes (Str, Count);
 
         /* Remove string from pool */

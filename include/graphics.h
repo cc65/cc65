@@ -39,7 +39,7 @@
 
 
 /*****************************************************************************/
-/*				   Constants                                 */
+/*		  		   Constants                                 */
 /*****************************************************************************/
 
 
@@ -47,6 +47,20 @@
 #define GM_TEXT	       	       	0U     	/* Text mode */
 #define GM_320_200_2            1U      /* 320x200, 2 colors (b/w) */
 #define GM_160_200_4            2U      /* 160x200, 4 colors */
+
+
+
+/*****************************************************************************/
+/*				     Data                                    */
+/*****************************************************************************/
+
+
+
+struct palettetype {
+    unsigned char   r;          /* Red component */
+    unsigned char   g;          /* Green component */
+    unsigned char   b;          /* Blue component */
+};
 
 
 
@@ -96,6 +110,21 @@ void __fastcall__ setcolor (unsigned char color);
 
 unsigned char getcolor (void);
 /* Return the current drawing color */
+
+unsigned char getbkcolor (void);
+/* Return the current background color */
+
+void __fastcall__ setbkcolor (unsigned char color);
+/* Set the background color */
+
+void __fastcall__ setpalette (unsigned num, const struct palettetype* palette);
+/* Set one palette entry */
+
+void __fastcall__ getpalette (unsigned num, struct palettetype* palette);
+/* Get one palette entry */
+
+void __fastcall__ setallpalette (const struct palettetype* allpalette);
+/* Set all palette entries */
 
 unsigned char __fastcall__ getpixel (int x, int y);
 /* Get the color value of a pixel */

@@ -944,12 +944,22 @@ void OutputCodeSeg (const CodeSeg* S, FILE* F)
 	/* Get the next entry */
 	const CodeEntry* E = CollConstAt (&S->Entries, I);
 	/* Check if the line info has changed. If so, output the source line
-	 * if the option is enabled.
+	 * if the option is enabled and output debug line info if the debug
+	 * option is enabled.
 	 */
 	if (E->LI != LI) {
+	    /* Line info has changed, remember the new line info */
 	    LI = E->LI;
+
+	    /* Add the source line as a comment */
 	    if (AddSource) {
 		fprintf (F, ";\n; %s\n;\n", LI->Line);
+	    }
+
+	    /* Add line debug info */
+	    if (DebugInfo) {
+		fprintf (F, "\t.dbg\tline, \"%s\", %u\n",
+			 GetInputName (LI), GetInputLine (LI));
 	    }
 	}
 	/* Output the code */

@@ -36,6 +36,8 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 /* common */
 #include "check.h"
@@ -43,7 +45,8 @@
 #include "xmalloc.h"
 
 /* cc65 */
-#include "asmcode.h"
+#include "asmcode.h" 
+#include "codegen.h"
 #include "error.h"
 #include "incpath.h"
 #include "lineinfo.h"
@@ -86,7 +89,53 @@ static Collection AFiles = STATIC_COLLECTION_INITIALIZER;
 
 
 /*****************************************************************************/
-/*	       	      		 struct IFile				     */
+/*			       Helper functions                              */
+/*****************************************************************************/
+
+
+
+static long GetFileSize (FILE* F)
+/* Calculate the size of the file F, return -1 on error. */
+{
+    long Size;
+    long CurPos = ftell (F);
+    if (CurPos < 0) {
+     	/* Error */
+     	return -1;
+    }
+    if (fseek (F, 0, SEEK_END) != 0) {
+     	/* Error */
+     	return -1;
+    }
+    Size = ftell (F);
+    if (Size < 0) {
+     	/* Error */
+	return -1;
+    }
+    if (fseek (F, CurPos, SEEK_SET) != 0) {
+     	/* Error */
+	return -1;
+    }
+    return Size;
+}
+
+
+
+static long GetFileTime (const char* Name)
+/* Get the time of last modification for the given file. Return -1 on errors. */
+{
+    struct stat Buf;
+    if (stat (Name, &Buf) != 0) {
+	/* Error */
+     	return -1;
+    }
+    return (long) Buf.st_mtime;
+}
+
+
+
+/*****************************************************************************/
+/*  	       	      		 struct IFile				     */
 /*****************************************************************************/
 
 
@@ -103,6 +152,8 @@ static IFile* NewIFile (const char* Name)
     /* Initialize the fields */
     IF->Index = CollCount (&IFiles) + 1;
     IF->Usage = 0;
+    IF->Size  = 0;
+    IF->MTime = 0;
     memcpy (IF->Name, Name, Len+1);
 
     /* Insert the new structure into the IFile collection */
@@ -131,8 +182,31 @@ static AFile* NewAFile (IFile* IF, FILE* F)
     AF->F     = F;
     AF->Input = IF;
 
-    /* Increment the usage counter of the corresponding IFile */
-    ++IF->Usage;
+    /* Increment the usage counter of the corresponding IFile. If this
+     * is the first use, set the file data and output debug info if
+     * requested.
+     */
+    if (IF->Usage++ == 0) {
+
+	long Val;
+
+	/* Get the file size */
+	Val = GetFileSize (AF->F);
+	if (Val < 0) {
+	    Fatal ("Cannot seek on `%s': %s", IF->Name, strerror (errno));
+	}
+	IF->Size = Val;
+
+	/* Get the file modification time */
+       	Val = GetFileTime (IF->Name);
+	if (Val < 0) {
+	    Fatal ("Cannot stat `%s': %s", IF->Name, strerror (errno));
+	}
+	IF->MTime = Val;
+
+	/* Set the debug data */
+	g_fileinfo (IF->Name, IF->Size, IF->MTime);
+    }
 
     /* Insert the new structure into the AFile collection */
     CollAppend (&AFiles, AF);

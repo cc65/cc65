@@ -63,9 +63,11 @@ extern char NextC;
 /* Struct that describes an input file */
 typedef struct IFile IFile;
 struct IFile {
-    unsigned	Index;	 	/* File index 				*/
-    unsigned	Usage;		/* Usage counter 		        */
-    char       	Name[1]; 	/* Name of file (dynamically allocated) */
+    unsigned	    Index;     	/* File index */
+    unsigned	    Usage;	/* Usage counter */
+    unsigned long   Size;       /* File size */
+    unsigned long   MTime;      /* Time of last modification */
+    char       	    Name[1];  	/* Name of file (dynamically allocated) */
 };
 
 
@@ -84,7 +86,7 @@ void OpenIncludeFile (const char* Name, unsigned DirSpec);
 
 void ClearLine (void);
 /* Clear the current input line */
-
+							     
 void InitLine (const char* Buf);
 /* Initialize lptr from Buf and read CurC and NextC from the new input line */
 

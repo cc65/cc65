@@ -87,13 +87,16 @@ extern int oursp;
 
 
 /*****************************************************************************/
-/*			      Pre- and postamble			     */
+/*			   Files, pre- and postamble                         */
 /*****************************************************************************/
 
 
 
 void g_preamble (void);
 /* Generate the assembler code preamble */
+
+void g_fileinfo (const char* Name, unsigned long Size, unsigned long MTime);
+/* If debug info is enabled, place a file info into the source */
 
 
 

@@ -47,6 +47,7 @@
 #include "function.h"
 #include "global.h"
 #include "incpath.h"
+#include "input.h"
 #include "litpool.h"
 #include "macrotab.h"
 #include "pragma.h"
@@ -250,7 +251,7 @@ static void Parse (void)
 
 
 
-void Compile (void)
+void Compile (const char* FileName)
 /* Top level compile routine. Will setup things and call the parser. */
 {
     char* Path;
@@ -299,6 +300,9 @@ void Compile (void)
 
     /* Generate the code generator preamble */
     g_preamble ();
+
+    /* Open the input file */
+    OpenMainFile (FileName); 
 
     /* Ok, start the ball rolling... */
     Parse ();

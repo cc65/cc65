@@ -44,7 +44,7 @@
 
 
 
-void Compile (void);
+void Compile (const char* FileName);
 /* Top level compile routine. Will setup things and call the parser. */
 
 

@@ -57,7 +57,7 @@
 #include "error.h"
 #include "global.h"
 #include "incpath.h"
-#include "input.h"
+#include "input.h" 
 #include "macrotab.h"
 #include "scanner.h"
 #include "segments.h"
@@ -638,16 +638,13 @@ int main (int argc, char* argv[])
 	AbEnd ("No input files");
     }
 
-    /* Open the input file */
-    OpenMainFile (InputFile);
-
     /* Create the output file name if it was not explicitly given */
     if (OutputFile == 0) {
 	OutputFile = MakeFilename (InputFile, ".s");
     }
 
     /* Go! */
-    Compile ();
+    Compile (InputFile);
 
     /* Create the output file if we didn't had any errors */
     if (ErrorCount == 0 || Debug) {

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -79,7 +79,7 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
     while (Parens != 0 || Tok != TOK_RPAREN) {
 
      	/* Check for end of line or end of input */
-     	if (Tok == TOK_SEP || Tok == TOK_EOF) {
+     	if (TokIsSep (Tok)) {
      	    Error (ERR_UNEXPECTED_EOL);
      	    return List;
      	}
@@ -459,7 +459,7 @@ void ConsumeComma (void)
 void SkipUntilSep (void)
 /* Skip tokens until we reach a line separator or end of file */
 {
-    while (Tok != TOK_SEP && Tok != TOK_EOF) {
+    while (!TokIsSep (Tok)) {
      	NextTok ();
     }
 }

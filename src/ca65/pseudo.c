@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -128,7 +128,7 @@ static void SetBoolOption (unsigned char* Flag)
 	    case 1:	*Flag = 1; NextTok ();		break;
 	    default:	ErrorSkip (ERR_ONOFF_EXPECTED);	break;
 	}
-    } else if (Tok == TOK_SEP || Tok == TOK_EOF) {
+    } else if (TokIsSep (Tok)) {
 	/* Without anything assume switch on */
 	*Flag = 1;
     } else {

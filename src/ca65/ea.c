@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -56,7 +56,7 @@ void GetEA (unsigned long* AddrMode, ExprNode** Expr, ExprNode** Bank)
     *Bank = *Expr = 0;
 
 
-    if (Tok == TOK_SEP) {
+    if (TokIsSep (Tok)) {
 
 	*AddrMode = AM_IMPLICIT;
 
@@ -185,7 +185,7 @@ void GetEA (unsigned long* AddrMode, ExprNode** Expr, ExprNode** Bank)
 
 	 	}
 
-	    } else {
+	    } else {  
 
 	 	*AddrMode = AM_ABS | AM_DIR;
 

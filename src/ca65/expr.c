@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -160,7 +160,7 @@ static int FuncBlank (void)
     } else {
 	/* Skip any tokens */
 	int Braces = 0;
-	while (Tok != TOK_SEP && Tok != TOK_EOF) {
+	while (!TokIsSep (Tok)) {
 	    if (Tok == TOK_LPAREN) {
 		++Braces;
 	    } else if (Tok == TOK_RPAREN) {
@@ -284,7 +284,7 @@ static int DoMatch (enum TC EqualityLevel)
     while (Tok != TOK_COMMA) {
 
     	/* We may not end-of-line of end-of-file here */
-    	if (Tok == TOK_SEP || Tok == TOK_EOF) {
+    	if (TokIsSep (Tok)) {
     	    Error (ERR_UNEXPECTED_EOL);
     	    return 0;
     	}
@@ -315,7 +315,7 @@ static int DoMatch (enum TC EqualityLevel)
     while (Tok != TOK_RPAREN) {
 
     	/* We may not end-of-line of end-of-file here */
-    	if (Tok == TOK_SEP || Tok == TOK_EOF) {
+    	if (TokIsSep (Tok)) {
     	    Error (ERR_UNEXPECTED_EOL);
     	    return 0;
     	}
@@ -468,7 +468,7 @@ static int FuncTCount (void)
 	 * will check for the closing paren, we don't need to print an error
 	 * here, just bail out.
 	 */
-     	if (Tok == TOK_SEP || Tok == TOK_EOF) {
+     	if (TokIsSep (Tok)) {
 	    break;
      	}
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -279,7 +279,7 @@ void DoConditionals (void)
 		D = AllocIf (".IFBLANK", 1);
 		NextTok ();
 		if (IfCond) {
-                    if (Tok == TOK_SEP) {
+                    if (TokIsSep (Tok)) {
                         SetIfCond (D, 1);
                     } else {
 		        SetIfCond (D, 0);
@@ -318,7 +318,7 @@ void DoConditionals (void)
 	     	D = AllocIf (".IFNBLANK", 1);
 		NextTok ();
 		if (IfCond) {
-                    if (Tok == TOK_SEP) {
+                    if (TokIsSep (Tok)) {
                         SetIfCond (D, 0);
                     } else {
 		        SetIfCond (D, 1);

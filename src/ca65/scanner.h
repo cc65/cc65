@@ -40,6 +40,7 @@
 
 /* common */
 #include "filepos.h"
+#include "inline.h"
 
 
 
@@ -82,7 +83,7 @@ enum Token {
 
     TOK_PLUS,	 	/* + */
     TOK_MINUS,	 	/* - */
-    TOK_MUL,	 	/* * */
+    TOK_MUL,	   	/* * */
     TOK_STAR = TOK_MUL,	/* Alias */
     TOK_DIV,	 	/* / */
     TOK_MOD,	 	/* ! */
@@ -257,6 +258,16 @@ int TokHasSVal (enum Token Tok);
 
 int TokHasIVal (enum Token Tok);
 /* Return true if the given token has an attached IVal */
+
+#if defined(HAVE_INLINE)
+INLINE int TokIsSep (enum Token T)
+/* Return true if this is a separator token */
+{
+    return (T == TOK_SEP || T == TOK_EOF);
+}
+#else
+#  define TokIsSep(T)   (T == TOK_SEP || T == TOK_EOF)
+#endif
 
 int GetSubKey (const char** Keys, unsigned Count);
 /* Search for a subkey in a table of keywords. The current token must be an

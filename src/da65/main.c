@@ -266,14 +266,17 @@ static void OneOpcode (unsigned RemainingBytes)
      */
     if (Style == atDefault) {
 	if (D->Size > RemainingBytes) {
-	    MarkAddr (PC, atIllegal);
+	    Style = atIllegal;
+	    MarkAddr (PC, Style);
        	} else if (D->Flags & flIllegal) {
-	    MarkAddr (PC, atIllegal);
+	   Style = atIllegal;
+	    MarkAddr (PC, Style);
 	} else {
 	    unsigned I;
 	    for (I = 1; I < D->Size; ++I) {
 	     	if (HaveLabel (PC+I)) {
-     	     	    MarkAddr (PC, atIllegal);
+		    Style = atIllegal;
+     	     	    MarkAddr (PC, Style);
 	     	    break;
 	     	}
 	    }

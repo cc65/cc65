@@ -14,13 +14,13 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-%.emd:	%.o ../runtime/zeropage.o rom.o
+%.emd:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
-%.joy:	%.o ../runtime/zeropage.o rom.o
+%.joy:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
-%.tgi:	%.o ../runtime/zeropage.o rom.o
+%.tgi:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
 #--------------------------------------------------------------------------

@@ -89,7 +89,7 @@ way round.
 This function converts track/head/sector to logical sector number.
 
 <tscreen><verb>
-    unsigned char __fastcall__ dio_log_to_phys(_dhandle_t handle,
+    unsigned char __fastcall__ dio_log_to_phys (dhandle_t handle,
                                                 const _sectnum_t *sectnum,
                                                 dio_phys_pos *physpos);
 </verb></tscreen>

@@ -46,7 +46,10 @@
 const char* OutputName	    = "a.out"; 	/* Name of output file */
 
 unsigned ModuleId           = 0;        /* Id for o65 module */
-unsigned long StartAddr	    = 0x200;	/* Start address */
+
+/* Start address */
+unsigned char HaveStartAddr = 0;        /* Start address not given */
+unsigned long StartAddr     = 0x200;    /* Start address */
 
 unsigned char VerboseMap    = 0;	/* Verbose map file */
 const char* MapFileName	    = 0;       	/* Name of the map file */

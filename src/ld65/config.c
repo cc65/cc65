@@ -1152,37 +1152,115 @@ static void ParseConDes (void)
 
 
 
+static void ParseStartAddress (void)
+/* Parse the STARTADDRESS feature */
+{
+    static const IdentTok Attributes [] = {
+       	{   "DEFAULT",  CFGTOK_DEFAULT },
+    };
+
+
+    /* Attribute values. */
+    unsigned long DefStartAddr = 0;
+
+    /* Bitmask to remember the attributes we got already */
+    enum {
+	atNone		= 0x0000,
+       	atDefault       = 0x0001
+    };
+    unsigned AttrFlags = atNone;
+
+    /* Parse the attributes */
+    while (1) {
+
+	/* Map the identifier to a token */
+	cfgtok_t AttrTok;
+       	CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+	AttrTok = CfgTok;
+
+	/* An optional assignment follows */
+	CfgNextTok ();
+	CfgOptionalAssign ();
+
+	/* Check which attribute was given */
+	switch (AttrTok) {
+
+	    case CFGTOK_DEFAULT:
+	  	/* Don't allow this twice */
+		FlagAttr (&AttrFlags, atDefault, "DEFAULT");
+	      	/* We expect a number */
+		CfgAssureInt ();
+                CfgRangeCheck (0, 0xFFFFFF);
+		/* Remember the value for later */
+                DefStartAddr = CfgIVal;
+	    	break;
+
+	    default:
+		FAIL ("Unexpected attribute token");
+
+	}
+
+       	/* Skip the attribute value */
+	CfgNextTok ();
+
+	/* Semicolon ends the ConDes decl, otherwise accept an optional comma */
+	if (CfgTok == CFGTOK_SEMI) {
+	    break;
+	} else if (CfgTok == CFGTOK_COMMA) {
+	    CfgNextTok ();
+	}
+    }
+
+    /* Check if we have all mandatory attributes */
+    AttrCheck (AttrFlags, atDefault, "DEFAULT");
+
+    /* If no start address was given on the command line, use the one given
+     * here
+     */
+    if (!HaveStartAddr) {
+        StartAddr = DefStartAddr;
+    }
+}
+
+
+
 static void ParseFeatures (void)
 /* Parse a features section */
 {
     static const IdentTok Features [] = {
-       	{   "CONDES",  	CFGTOK_CONDES	},
+       	{   "CONDES",  	    CFGTOK_CONDES	},
+        {   "STARTADDRESS", CFGTOK_STARTADDRESS },
     };
 
     while (CfgTok == CFGTOK_IDENT) {
 
-	/* Map the identifier to a token */
-	cfgtok_t FeatureTok;
+    	/* Map the identifier to a token */
+    	cfgtok_t FeatureTok;
        	CfgSpecialToken (Features, ENTRY_COUNT (Features), "Feature");
        	FeatureTok = CfgTok;
 
-	/* Skip the name and the following colon */
-	CfgNextTok ();
-	CfgConsumeColon ();
+    	/* Skip the name and the following colon */
+    	CfgNextTok ();
+    	CfgConsumeColon ();
 
-	/* Parse the format options */
-	switch (FeatureTok) {
+    	/* Parse the format options */
+    	switch (FeatureTok) {
 
-	    case CFGTOK_CONDES:
-		ParseConDes ();
-		break;
+    	    case CFGTOK_CONDES:
+    		ParseConDes ();
+    		break;
 
-	    default:
-		Error ("Unexpected feature token");
-	}
+            case CFGTOK_STARTADDRESS:
+                ParseStartAddress ();
+                break;
 
-	/* Skip the semicolon */
-	CfgConsumeSemi ();
+
+    	    default:
+    		Error ("Unexpected feature token");
+    	}
+
+    	/* Skip the semicolon */
+    	CfgConsumeSemi ();
     }
 }
 

@@ -270,6 +270,7 @@ static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
 {
     StartAddr = CvtNumber (Opt, Arg);
+    HaveStartAddr = 1;
 }
 
 

@@ -45,8 +45,10 @@
 
 
 extern const char*	OutputName;	/* Name of output file */
-                                                                           
+
 extern unsigned         ModuleId;       /* Id for o65 module */
+
+extern unsigned char    HaveStartAddr;  /* True if start address was given */
 extern unsigned long 	StartAddr;	/* Start address */
 
 extern unsigned char	VerboseMap;	/* Verbose map file */

@@ -67,8 +67,9 @@ CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
 
 OBJS =	bitops.obj	\
 	hashstr.obj	\
-	wildargv.obj
-
+	wildargv.obj	\
+	xsprintf.obj
+			
 
 .PRECIOUS $(OBJS:.obj=.cc) $(LIB)
 

@@ -402,6 +402,46 @@ code. The following attributes are recognized:
 </descrip>
 
 
+<sect1>Specifying Assembler Includes<label id="infofile-asminc"><p>
+
+The <tt/ASMINC/ directive is used to give the names of input files containing
+symbol assignments in assembler syntax:
+
+<tscreen><verb>
+       	Name = value
+	Name := value
+</verb></tscreen>
+
+The usual conventions apply for symbol names. Values may be specified as hex
+(leading &dollar;), binary (leading %) or decimal. The values may optionally
+be signed.
+
+NOTE: The include file parser is very simple. Expressions are not allowed, and
+anything but symbol assignments is flagged as an error (but see the
+<tt/IGNOREUNKNOWN/ directive below).
+
+The following attributes are recognized:
+
+<descrip>
+
+  <tag><tt>FILE</tt></tag>
+  Followed by a string value. Specifies the name of the file to read.
+
+  <tag><tt>COMMENTSTART</tt></tag>
+  The optional attribute is followed by a character constant. It specifies the
+  character that starts a comment. The default value is a semicolon. This
+  value is ignored if <tt/IGNOREUNKNOWN/ is true.
+
+  <tag><tt>IGNOREUNKNOWN</tt></tag>
+  This attribute is optional and is followed by a boolean value. It allows to
+  ignore input lines that don't have a valid syntax. This allows to read in
+  assembler include files that contain more than just symbol assignments.
+  Note: When this attribute is used, the disassembler will ignore any errors
+  in the given include file. This may have undesired side effects.
+
+</descrip>
+
+
 <sect1>An Info File Example<p>
 
 The following is a short example for an info file that contains most of the

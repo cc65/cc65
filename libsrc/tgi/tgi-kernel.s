@@ -7,8 +7,8 @@
         .include        "tgi-kernel.inc"
         .include        "tgi-error.inc"
 
-        .export         tgi_clear_ptr
         .importzp       ptr1
+        .interruptor    tgi_irq         ; Export as IRQ handler
 
 
 ;----------------------------------------------------------------------------
@@ -34,7 +34,6 @@ _tgi_colorcount:    .res    1           ; Number of available colors
 _tgi_pagecount:     .res    1           ; Number of available screen pages
 _tgi_fontsizex:     .res    1           ; System font X size
 _tgi_fontsizey:     .res    1           ; System font Y size
-tgi_driver_var_size     = * - tgi_driver_vars
 
 
 .data
@@ -61,11 +60,11 @@ tgi_bar:            jmp     $0000
 tgi_circle:         jmp     $0000
 tgi_textstyle:      jmp     $0000
 tgi_outtext:        jmp     $0000
+tgi_irq:            .byte   $60, $00, $00       ; RTS plus two dummy bytes
 
 ; Driver header signature
 .rodata
 tgi_sig:        .byte   $74, $67, $69, TGI_API_VERSION  ; "tgi", version
-tgi_sig_len     = * - tgi_sig
 
 
 ;----------------------------------------------------------------------------
@@ -81,7 +80,7 @@ _tgi_install:
 
 ; Check the driver signature
 
-        ldy     #tgi_sig_len-1
+        ldy     #.sizeof(tgi_sig)-1
 @L0:    lda     (ptr1),y
         cmp     tgi_sig,y
         bne     tgi_inv_drv
@@ -90,39 +89,44 @@ _tgi_install:
 
 ; Copy the jump vectors
 
-        ldy     #TGI_HDR_JUMPTAB
+        ldy     #TGI_HDR::JUMPTAB
         ldx     #0
 @L1:    inx                             ; Skip JMP opcode
         jsr     copy                    ; Copy one byte
         jsr     copy                    ; Copy one byte
-        cpx     #(TGI_HDR_JUMPCOUNT*3)
+        cpx     #(TGI_HDR::JUMPTAB + .sizeof(TGI_HDR::JUMPTAB))
         bne     @L1
 
-; Call the driver install routine
+; Call the driver install routine. It may update header variables, so we copy
+; them after this call.
 
-        jsr     tgi_install             ; Call driver install routine, may...
-                                        ; ...update variables
+        jsr     tgi_install
+
+; Copy variables from the driver header for faster access.
+
         jsr     tgi_set_ptr             ; Set ptr1 to tgi_drv
-
-; Copy variables. Beware: We are using internal knowledge about variable
-; layout here!
-
-        ldy     #TGI_HDR_XRES
-        ldx     #0
+        ldy     #(TGI_HDR::VARS + .sizeof(TGI_HDR::VARS) - 1)
+        ldx     #.sizeof(TGI_HDR::VARS)-1
 @L3:    lda     (ptr1),y
         sta     tgi_driver_vars,x
-        iny
-        inx
-        cpx     #tgi_driver_var_size
-        bne     @L3
+        dey
+        dex
+        bpl     @L3
 
-; Initialize variables
+; Install the IRQ vector if the driver needs it.
+
+        lda     tgi_irq+2               ; Check high byte of IRQ vector
+        beq     @L4                     ; Jump if vector invalid
+   	lda	#$4C			; Jump opcode
+       	sta    	tgi_irq                 ; Activate IRQ routine
+
+; Initialize some other variables
 
         lda     #$00
-        ldx     #7-1
-@L4:    sta     _tgi_error,x            ; Clear error/mode/curx/cury/textdir
+@L4:    ldx     #8-1
+@L5:    sta     _tgi_error,x            ; Clear error/mode/curx/cury/textdir
         dex
-        bpl     @L4
+        bpl     @L5
 
 	rts
 
@@ -168,11 +172,14 @@ tgi_set_ptr:
 
 _tgi_uninstall:
         jsr     _tgi_done               ; Switch off graphics
+
         jsr     tgi_uninstall           ; Allow the driver to clean up
+
+	lda	#$60                    ; RTS opcode
+	sta	tgi_irq                 ; Disable IRQ entry point
 
 ; Clear driver pointer and error code
 
-tgi_clear_ptr:                          ; External entry point
         lda     #$00
         sta     _tgi_drv
         sta     _tgi_drv+1

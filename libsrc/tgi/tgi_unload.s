@@ -6,20 +6,31 @@
 
 
         .include        "tgi-kernel.inc"
+        .include        "tgi-error.inc"
         .include        "modload.inc"
 
-        .import         tgi_clear_ptr
 
-.proc   _tgi_unload
-
-        jsr     _tgi_done               ; Switch off graphics
-        jsr     tgi_uninstall           ; Allow the driver to clean up
+_tgi_unload:
 
         lda     _tgi_drv
-        ldx     _tgi_drv+1
-        jsr     _mod_free               ; Free the driver
+        ora     _tgi_drv
+        beq     no_driver               ; No driver
 
-        jmp     tgi_clear_ptr           ; Clear the driver pointer and exit
+        lda     _tgi_drv
+        pha
+        lda     _tgi_drv+1
+        pha                             ; Save pointer to driver
 
-.endproc
+        jsr     _tgi_uninstall          ; Uninstall the driver
+
+        pla
+        tax
+        pla
+        jmp     _mod_free               ; Free the driver
+
+no_driver:
+        lda     #<TGI_ERR_NO_DRIVER
+        sta     _tgi_error
+        rts
+
 

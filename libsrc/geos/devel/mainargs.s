@@ -39,7 +39,7 @@
 	beq	@fn_end
 	sta	argv0,y
 	iny
-	cpy	#16
+	cpy	#16+1
 	bne	@fn_loop
 @fn_end:
 	lda	#0

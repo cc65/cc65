@@ -1,4 +1,4 @@
-                                      
+
 This directory contains sample programs for the cc65 compiler.
 
 Below is a short description for each of the programs together with a list of
@@ -17,6 +17,14 @@ Please note:
 
 
 List of supplied sample programs:
+
+-----------------------------------------------------------------------------
+Name:           ascii
+Description:	Shows the ASCII (or ATASCII, PETSCII) codes of typed
+		characters. Written and contributed by Greg King 
+		<gngking@erols.com>.
+Platforms:     	All platforms with conio or stdio (compile time 
+		configurable).
 
 -----------------------------------------------------------------------------
 Name:           fire

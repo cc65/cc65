@@ -32,10 +32,13 @@ C1541  	= c1541
 # --------------------------------------------------------------------------
 # Rules how to make each one of the binaries
 
-EXELIST=fire hello mousedemo nachtm plasma sieve tgidemo
+EXELIST=ascii fire hello mousedemo nachtm plasma sieve tgidemo
 
 .PHONY:	all
 all:   	$(EXELIST)
+
+ascii: 		$(CRT0) ascii.o $(CLIB)
+	@$(LD) -t $(SYS) -m ascii.map -Ln ascii.lbl -o $@ $^
 
 fire: 		$(CRT0) fire.o $(CLIB)
 	@$(LD) -t $(SYS) -m fire.map -Ln fire.lbl -o $@ $^

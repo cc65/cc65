@@ -124,6 +124,16 @@ INLINE int ED_IsLocAbs (const ExprDesc* Expr)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int ED_IsLocRegister (const ExprDesc* Expr)
+/* Return true if the expression is located in a register */
+{
+    return (Expr->Flags & E_MASK_LOC) == E_LOC_REGISTER;
+}
+#else
+#  define ED_IsLocRegister(Expr)    (((Expr)->Flags & E_MASK_LOC) == E_LOC_REGISTER)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE int ED_IsLocStack (const ExprDesc* Expr)
 /* Return true if the expression is located on the stack */
 {
@@ -134,6 +144,16 @@ INLINE int ED_IsLocStack (const ExprDesc* Expr)
 #endif
 
 #if defined(HAVE_INLINE)
+INLINE int ED_IsLocPrimary (const ExprDesc* Expr)
+/* Return true if the expression is an expression in the register pseudo variable */
+{
+    return (Expr->Flags & E_MASK_LOC) == E_LOC_PRIMARY;
+}
+#else
+#  define ED_IsLocExpr(Expr)     (((Expr)->Flags & E_MASK_LOC) == E_LOC_PRIMARY)
+#endif
+
+#if defined(HAVE_INLINE)
 INLINE int ED_IsLocExpr (const ExprDesc* Expr)
 /* Return true if the expression is an expression in the primary */
 {
@@ -141,6 +161,16 @@ INLINE int ED_IsLocExpr (const ExprDesc* Expr)
 }
 #else
 #  define ED_IsLocExpr(Expr)     (((Expr)->Flags & E_MASK_LOC) == E_LOC_EXPR)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int ED_IsLocLiteral (const ExprDesc* Expr)
+/* Return true if the expression is a string from the literal pool */
+{
+    return (Expr->Flags & E_MASK_LOC) == E_LOC_LITERAL;
+}
+#else
+#  define ED_IsLocLiteral(Expr)   (((Expr)->Flags & E_MASK_LOC) == E_LOC_LITERAL)
 #endif
 
 #if defined(HAVE_INLINE)
@@ -192,6 +222,12 @@ INLINE void ED_MakeRVal (ExprDesc* Expr)
 #else
 #  define ED_MakeRVal(Expr)       do { (Expr)->Flags &= ~E_RTYPE_LVAL; } while (0)
 #endif
+
+const char* ED_GetLabelName (const ExprDesc* Expr, long Offs);
+/* Return the assembler label name of the given expression. Beware: This
+ * function may use a static buffer, so the name may get "lost" on the second
+ * call to the function.
+ */
 
 ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, type* Type);
 /* Make Expr an absolute const with the given value and type. */

@@ -127,7 +127,8 @@ static void Usage (void)
        	     "  --static-locals\tMake local variables static\n"
        	     "  --target sys\t\tSet the target system\n"
        	     "  --verbose\t\tIncrease verbosity\n"
-       	     "  --version\t\tPrint the compiler version number\n",
+       	     "  --version\t\tPrint the compiler version number\n"
+             "  --writable-strings\tMake string literals writable\n",
 	     ProgName);
 }
 
@@ -660,6 +661,15 @@ static void OptVersion (const char* Opt attribute ((unused)),
 
 
 
+static void OptWritableStrings (const char* Opt attribute ((unused)),
+	       		        const char* Arg attribute ((unused)))
+/* Make string literals writable */
+{
+    IS_Set (&WritableStrings, 1);
+}
+
+
+
 int main (int argc, char* argv[])
 {
     /* Program long options */
@@ -691,6 +701,7 @@ int main (int argc, char* argv[])
 	{ "--target",	  	1,  	OptTarget    	       	},
 	{ "--verbose",	       	0, 	OptVerbose   	       	},
 	{ "--version",	       	0,	OptVersion   	       	},
+       	{ "--writable-strings",	0,     	OptWritableStrings      },
     };
 
     unsigned I;

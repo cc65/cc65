@@ -33,8 +33,13 @@
 
 
 
+/* common */
+#include "xsprintf.h"
+
 /* cc65 */
+#include "asmlabel.h"
 #include "datatype.h"
+#include "error.h"
 #include "symentry.h"
 #include "exprdesc.h"
 
@@ -56,6 +61,64 @@ ExprDesc* ED_Init (ExprDesc* Expr)
     Expr->Test  = 0;
     Expr->Name  = 0;
     return Expr;
+}
+
+
+
+const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
+/* Return the assembler label name of the given expression. Beware: This
+ * function may use a static buffer, so the name may get "lost" on the second
+ * call to the function.
+ */
+{
+    static char Buf[256];
+
+    /* Expr may have it's own offset, adjust Offs accordingly */
+    Offs += Expr->Val;
+
+    /* Generate a label depending on the location */
+    switch (ED_GetLoc (Expr)) {
+
+        case E_LOC_ABS:
+            /* Absolute: numeric address or const */
+	    xsprintf (Buf, sizeof (Buf), "$%04X", (int)(Offs & 0xFFFF));
+            break;
+
+        case E_LOC_GLOBAL:
+        case E_LOC_STATIC:
+            /* Global or static variable */
+	    if (Offs) {
+	       	xsprintf (Buf, sizeof (Buf), "%s%+ld",
+                          SymGetAsmName (Expr->Sym), Offs);
+	    } else {
+	       	xsprintf (Buf, sizeof (Buf), "%s",
+                          SymGetAsmName (Expr->Sym));
+	    }
+            break;
+
+        case E_LOC_REGISTER:
+            /* Register variable */
+	    xsprintf (Buf, sizeof (Buf), "regbank+%u",
+                      (unsigned)(Offs & 0xFFFFU));
+            break;
+
+        case E_LOC_LITERAL:
+            /* Literal in the literal pool */
+	    if (Offs) {
+	       	xsprintf (Buf, sizeof (Buf), "%s%+ld",
+                          LocalLabelName (Expr->Name), Offs);
+	    } else {
+       	       	xsprintf (Buf, sizeof (Buf), "%s",
+                          LocalLabelName (Expr->Name));
+	    }
+            break;
+
+        default:
+            Internal ("Invalid location in ED_GetLabelName: 0x%04X", ED_GetLoc (Expr));
+    }
+
+    /* Return a pointer to the static buffer */
+    return Buf;
 }
 
 

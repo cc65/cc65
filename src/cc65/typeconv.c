@@ -68,7 +68,7 @@ static void DoPtrConversions (ExprDesc* Expr)
 
 
 
-static void DoConversion (ExprDesc* Expr, type* NewType)
+static void DoConversion (ExprDesc* Expr, const type* NewType)
 /* Emit code to convert the given expression to a new type. */
 {
     type*    OldType;

@@ -455,13 +455,6 @@ void ExprLoad (unsigned Flags, ExprDesc* Expr)
             Expr->Test &= ~E_FORCETEST;
         }
     }
-
-#if 0
-    /* Regardless of the original contents, Expr is now an rvalue in the
-     * primary. ### Later...
-     */
-    ED_MakeRValExpr (Expr);
-#endif
 }
 
 
@@ -637,6 +630,7 @@ static void FunctionCall (ExprDesc* Expr)
 {
     FuncDesc*	  Func;	       	  /* Function descriptor */
     int           IsFuncPtr;      /* Flag */
+    int           StdFunc;        /* Standard function index */
     unsigned 	  ParamSize;	  /* Number of parameter bytes */
     CodeMark 	  Mark = 0;       /* Initialize to keep gcc silent */
     int           PtrOffs = 0;    /* Offset of function pointer on stack */
@@ -682,11 +676,12 @@ static void FunctionCall (ExprDesc* Expr)
 	}
 
     /* Check for known standard functions and inline them if requested */
-    } else if (IS_Get (&InlineStdFuncs) && IsStdFunc ((const char*) Expr->Name)) {
+    } else if (IS_Get (&InlineStdFuncs) &&
+               (StdFunc = FindStdFunc ((const char*) Expr->Name)) >= 0) {
 
 	/* Inline this function */
-       	HandleStdFunc (Func, Expr);
-       	goto ExitPoint;
+       	HandleStdFunc (StdFunc, Func, Expr);
+       	return;
 
     }
 
@@ -712,7 +707,7 @@ static void FunctionCall (ExprDesc* Expr)
 	    	 */
 	    	if (ParamSize == 0) {
 	    	    RemoveCode (Mark);
-	    	    pop (CF_PTR);
+	       	    pop (CF_PTR);
 	    	    PtrOnStack = 0;
 	    	} else {
 	    	    /* Load from the saved copy */
@@ -752,7 +747,6 @@ static void FunctionCall (ExprDesc* Expr)
 
     }
 
-ExitPoint:
     /* The function result is an rvalue in the primary register */
     ED_MakeRValExpr (Expr);
     Expr->Type = GetFuncReturn (Expr->Type);
@@ -1110,7 +1104,7 @@ static void ArrayRef (ExprDesc* Expr)
 	     * portion of the index (which is in (e)ax, so there's no further
 	     * action required).
 	     */
-	    g_scale (CF_INT | CF_UNSIGNED, CheckedSizeOf (ElementType));
+	    g_scale (CF_INT, CheckedSizeOf (ElementType));
 
        	} else {
 
@@ -1144,7 +1138,7 @@ static void ArrayRef (ExprDesc* Expr)
        	    /* The array base address is on stack and the subscript is in the
              * primary. Add both.
              */
-	    g_add (CF_INT | CF_UNSIGNED, 0);
+	    g_add (CF_INT, 0);
 
     	} else {
 
@@ -1182,7 +1176,7 @@ static void ArrayRef (ExprDesc* Expr)
 	    } else {
 	     	if (ED_IsLocAbs (Expr)) {
 	     	    /* Constant numeric address. Just add it */
-	     	    g_inc (CF_INT | CF_UNSIGNED, Expr->Val);
+	     	    g_inc (CF_INT, Expr->Val);
 	     	} else if (ED_IsLocStack (Expr)) {
 	       	    /* Base address is a local variable address */
 	   	    if (IsTypeArray (Expr->Type)) {

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2004 Ullrich von Bassewitz                                        */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -93,7 +93,7 @@ void DumpLiteralPool (void)
     }
 
     /* Switch to the data segment */
-    if (WriteableStrings) {
+    if (IS_Get (&WritableStrings)) {
      	g_usedata ();
     } else {
        	g_userodata ();
@@ -168,7 +168,7 @@ void GetLiteralStrBuf (StrBuf* Target, unsigned Offs)
 /* Copy the string starting at Offs and lasting to the end of the buffer
  * into Target.
  */
-{					  
+{
     CHECK (Offs <= SB_GetLen (&LiteralPool));
     SB_Slice (Target, &LiteralPool, Offs, SB_GetLen (&LiteralPool) - Offs);
 }

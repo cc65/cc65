@@ -43,10 +43,11 @@
 /*****************************************************************************/
 
 
-                                                          
+
+extern const char Func__bzero[];        /* Asm name of "_bzero" */
 extern const char Func_memcpy[];        /* Asm name of "memcpy" */
 extern const char Func_memset[];        /* Asm name of "memset" */
-extern const char Func__bzero[];        /* Asm name of "_bzero */
+extern const char Func_strlen[];        /* Asm name of "strlen" */
 
 
 

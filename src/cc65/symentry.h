@@ -197,6 +197,16 @@ INLINE int SymIsRegVar (const SymEntry* Sym)
 #  define SymIsRegVar(Sym)      (((Sym)->Flags & (SC_REGISTER|SC_TYPE)) == SC_REGISTER)
 #endif
 
+#if defined(HAVE_INLINE)
+INLINE const char* SymGetAsmName (const SymEntry* Sym)
+/* Return the assembler label name for the symbol (beware: may be NULL!) */
+{
+    return Sym->AsmName;
+}
+#else
+#  define SymGetAsmName(Sym)      ((Sym)->AsmName)
+#endif
+
 void CvtRegVarToAuto (SymEntry* Sym);
 /* Convert a register variable to an auto variable */
 

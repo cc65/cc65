@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -50,12 +50,12 @@
 
 
 
-int IsStdFunc (const char* Name);
+int FindStdFunc (const char* Name);
 /* Determine if the given function is a known standard function that may be
- * called in a special way.
+ * called in a special way. If so, return the index, otherwise return -1.
  */
 
-void HandleStdFunc (struct FuncDesc* F, ExprDesc* lval);
+void HandleStdFunc (int Index, struct FuncDesc* F, ExprDesc* lval);
 /* Generate code for a known standard function. */
 
 

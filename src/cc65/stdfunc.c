@@ -41,6 +41,7 @@
 #include "check.h"
 
 /* cc65 */
+#include "asmlabel.h"
 #include "codegen.h"
 #include "error.h"
 #include "funcdesc.h"
@@ -54,7 +55,7 @@
 
 
 /*****************************************************************************/
-/*		     	       Function forwards	    		     */
+/*	  	     	       Function forwards	    		     */
 /*****************************************************************************/
 
 
@@ -65,7 +66,7 @@ static void StdFunc_strlen (FuncDesc*, ExprDesc*);
 
 
 /*****************************************************************************/
-/*  		    	  	     Data   	    	    		     */
+/*  	  	    	  	     Data   	    	    		     */
 /*****************************************************************************/
 
 
@@ -75,13 +76,14 @@ static void StdFunc_strlen (FuncDesc*, ExprDesc*);
  */
 static struct StdFuncDesc {
     const char*	 	Name;
-    void 	 	(*Handler) (FuncDesc*, ExprDesc*);
-} StdFuncs [] = {
+    void  	 	(*Handler) (FuncDesc*, ExprDesc*);
+} StdFuncs[] = {
     {  	"memset",      	StdFunc_memset	  	},
     {  	"strlen",	StdFunc_strlen	  	},
 
 };
-#define FUNC_COUNT	(sizeof (StdFuncs) / sizeof (StdFuncs [0]))
+#define FUNC_COUNT	(sizeof (StdFuncs) / sizeof (StdFuncs[0]))
+
 
 
 /*****************************************************************************/
@@ -94,16 +96,6 @@ static int CmpFunc (const void* Key, const void* Elem)
 /* Compare function for bsearch */
 {
     return strcmp ((const char*) Key, ((const struct StdFuncDesc*) Elem)->Name);
-}
-
-
-
-static struct StdFuncDesc* FindFunc (const char* Name)
-/* Find a function with the given name. Return a pointer to the descriptor if
- * found, return NULL otherwise.
- */
-{
-    return bsearch (Name, StdFuncs, FUNC_COUNT, sizeof (StdFuncs [0]), CmpFunc);
 }
 
 
@@ -146,8 +138,7 @@ static unsigned ParseArg (type* Type, ExprDesc* Arg)
 
 
 
-static void StdFunc_memset (FuncDesc* F attribute ((unused)),
-                            ExprDesc* lval attribute ((unused)))
+static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the memset function */
 {
     /* Argument types */
@@ -198,91 +189,123 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)),
 
     /* We expect the closing brace */
     ConsumeRParen ();
+
+    /* The function result is an rvalue in the primary register */
+    ED_MakeRValExpr (Expr);
+    Expr->Type = GetFuncReturn (Expr->Type);
 }
 
 
 
-static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
-                            ExprDesc* lval attribute ((unused)))
+static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
 /* Handle the strlen function */
 {
-    static type   ParamType[] = { T_PTR, T_SCHAR, T_END };
-    ExprDesc      Param;
-    unsigned      CodeFlags;
-    unsigned long ParamName;
+    static type ArgType[] = { T_PTR, T_SCHAR, T_END };
+    ExprDesc    Arg;
+    unsigned    L;
+
 
     /* Setup the argument type string */
-    ParamType[1] = GetDefaultChar () | T_QUAL_CONST;
+    ArgType[1] = GetDefaultChar () | T_QUAL_CONST;
 
-    /* Fetch the parameter and convert it to the type needed */
-    hie1 (&Param);
-    TypeConversion (&Param, ParamType);
+    /* Evaluate the parameter */
+    hie1 (&Arg);
 
-    /* Check if the parameter is a constant array of some type, or a numeric
-     * address cast to a pointer.
-     */
-    CodeFlags = 0;
-    ParamName = Param.Name;
-    if ((ED_IsLocConst (&Param) && IsTypeArray (Param.Type)) ||
-        (ED_IsLocAbs (&Param) && IsTypePtr (Param.Type))) {
+    /* We can generate special code for several locations */
+    if (ED_IsLocConst (&Arg) && IsTypeArray (Arg.Type)) {
 
-        /* Check which type of constant it is */
-        switch (ED_GetLoc (&Param)) {
+        /* Do type conversion */
+        TypeConversion (&Arg, ArgType);
 
-            case E_LOC_ABS:
-                /* Numerical address */
-                CodeFlags |= CF_CONST | CF_ABSOLUTE;
-                break;
+        /* If the expression is a literal, and if string literals are read
+         * only, we can calculate the length of the string and remove it
+         * from the literal pool. Otherwise we have to calculate the length
+         * at runtime.
+         */
+        if (ED_IsLocLiteral (&Arg) && IS_Get (&WritableStrings)) {
 
-            case E_LOC_GLOBAL:
-                /* Global label */
-                CodeFlags |= CF_CONST | CF_EXTERNAL;
-                break;
+            /* Constant string literal */
+            ED_MakeConstAbs (Expr, strlen (GetLiteral (Arg.Val)), type_size_t);
+            ResetLiteralPoolOffs (Arg.Val);
 
-            case E_LOC_STATIC:
-                /* Local symbol */
-                CodeFlags |= CF_CONST | CF_STATIC;
-                break;
+        } else {
 
-            case E_LOC_REGISTER:
-                /* Register variable */
-                CodeFlags |= CF_CONST | CF_REGVAR;
-                break;
+            /* Generate the strlen code */
+            L = GetLocalLabel ();
+            AddCodeLine ("ldy #$FF");
+            g_defcodelabel (L);
+            AddCodeLine ("iny");
+            AddCodeLine ("lda %s,y", ED_GetLabelName (&Arg, 0));
+            AddCodeLine ("bne %s", LocalLabelName (L));
+            AddCodeLine ("tax");
+            AddCodeLine ("tya");
 
-            case E_LOC_LITERAL:
-                /* A literal of some kind. If string literals are read only,
-                 * we can calculate the length of the string and remove it
-                 * from the literal pool. Otherwise we have to calculate the
-                 * length at runtime.
-                 */
-                if (!WriteableStrings) {
-                    /* String literals are const */
-                    ExprDesc Length;
-                    ED_MakeConstAbsInt (&Length, strlen (GetLiteral (Param.Val)));
-                    ResetLiteralPoolOffs (Param.Val);
-                    ExprLoad (CF_NONE, &Length);
-                    goto ExitPoint;
-                } else {
-                    CodeFlags |= CF_CONST | CF_STATIC;
-                    ParamName = LiteralPoolLabel;
-                }
-                break;
+            /* The function result is an rvalue in the primary register */
+            ED_MakeRValExpr (Expr);
+            Expr->Type = type_size_t;
 
-            default:
-                Internal ("Unknown constant type: %04X", Param.Flags);
         }
+
+    } else if (ED_IsLocStack (&Arg) && StackPtr >= -255 && IsTypeArray (Arg.Type)) {
+
+        /* Calculate the true stack offset */
+        unsigned Offs = (unsigned) (Arg.Val - StackPtr);
+
+        /* Do type conversion */
+        TypeConversion (&Arg, ArgType);
+
+        /* Generate the strlen code */
+        L = GetLocalLabel ();
+        AddCodeLine ("ldx #$FF");
+        AddCodeLine ("ldy #$%02X", (unsigned char) (Offs-1));
+        g_defcodelabel (L);
+        AddCodeLine ("inx");
+        AddCodeLine ("iny");
+        AddCodeLine ("lda (sp),y");
+        AddCodeLine ("bne %s", LocalLabelName (L));
+        AddCodeLine ("txa");
+        AddCodeLine ("ldx #$00");
+
+        /* The function result is an rvalue in the primary register */
+        ED_MakeRValExpr (Expr);
+        Expr->Type = type_size_t;
+
+    } else if (ED_IsLocRegister (&Arg) && ED_IsLVal (&Arg) && IsTypePtr (Arg.Type)) {
+
+        /* Do type conversion */
+        TypeConversion (&Arg, ArgType);
+
+        /* Generate the strlen code */
+        L = GetLocalLabel ();
+        AddCodeLine ("ldy #$FF");
+        g_defcodelabel (L);
+        AddCodeLine ("iny");
+        AddCodeLine ("lda (%s),y", ED_GetLabelName (&Arg, 0));
+        AddCodeLine ("bne %s", LocalLabelName (L));
+        AddCodeLine ("tax");
+        AddCodeLine ("tya");
+
+        /* The function result is an rvalue in the primary register */
+        ED_MakeRValExpr (Expr);
+        Expr->Type = type_size_t;
 
     } else {
 
-     	/* Not an array with a constant address. Load parameter into primary */
-     	ExprLoad (CF_NONE, &Param);
+        /* Do type conversion */
+        TypeConversion (&Arg, ArgType);
+
+        /* Load the expression into the primary */
+        ExprLoad (CF_NONE, &Arg);
+
+        /* Call the strlen function */
+        AddCodeLine ("jsr _%s", Func_strlen);
+
+        /* The function result is an rvalue in the primary register */
+        ED_MakeRValExpr (Expr);
+        Expr->Type = type_size_t;
 
     }
 
-    /* Generate the strlen code */
-    g_strlen (CodeFlags, ParamName, Param.Val);
-
-ExitPoint:
     /* We expect the closing brace */
     ConsumeRParen ();
 }
@@ -295,23 +318,33 @@ ExitPoint:
 
 
 
-int IsStdFunc (const char* Name)
+int FindStdFunc (const char* Name)
 /* Determine if the given function is a known standard function that may be
- * called in a special way.
+ * called in a special way. If so, return the index, otherwise return -1.
  */
 {
     /* Look into the table for known names */
-    return FindFunc (Name) != 0;
+    struct StdFuncDesc* D =
+        bsearch (Name, StdFuncs, FUNC_COUNT, sizeof (StdFuncs[0]), CmpFunc);
+
+    /* Return the function index or -1 */
+    if (D == 0) {
+        return -1;
+    } else {
+        return D - StdFuncs;
+    }
 }
 
 
 
-void HandleStdFunc (FuncDesc* F, ExprDesc* lval)
+void HandleStdFunc (int Index, FuncDesc* F, ExprDesc* lval)
 /* Generate code for a known standard function. */
 {
+    struct StdFuncDesc* D;
+
     /* Get a pointer to the table entry */
-    struct StdFuncDesc* D = FindFunc ((const char*) lval->Name);
-    CHECK (D != 0);
+    CHECK (Index >= 0 && Index < (int)FUNC_COUNT);
+    D = StdFuncs + Index;
 
     /* Call the handler function */
     D->Handler (F, lval);

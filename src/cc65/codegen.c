@@ -464,21 +464,22 @@ void g_leave (void)
 /* Function epilogue */
 {
     /* How many bytes of locals do we have to drop? */
-    int k = -StackPtr;
+    unsigned k = (unsigned) -StackPtr;
 
     /* If we didn't have a variable argument list, don't call leave */
     if (funcargs >= 0) {
 
-     	/* Drop stackframe if needed */
+     	/* Drop stackframe if needed. We can only drop 255 bytes at a time. */
      	k += funcargs;
-       	if (k > 0) {
-	    if (k <= 8) {
-     	    AddCodeLine ("jsr incsp%d", k);
+       	while (k > 0) {
+            unsigned ToDrop = (k > 255)? 255 : k;
+	    if (ToDrop <= 8) {
+     	        AddCodeLine ("jsr incsp%d", k);
 	    } else {
-		CheckLocalOffs (k);
-		ldyconst (k);
-		AddCodeLine ("jsr addysp");
+	       	ldyconst (ToDrop);
+	       	AddCodeLine ("jsr addysp");
 	    }
+            k -= ToDrop;
      	}
 
     } else {
@@ -488,6 +489,11 @@ void g_leave (void)
 	    AddCodeLine ("jsr leave");
 	} else {
      	    /* We've a stack frame to drop */
+            while (k > 255) {
+                ldyconst (255);
+                AddCodeLine ("jsr addysp");
+                k -= 255;
+            }
      	    ldyconst (k);
      	    AddCodeLine ("jsr leavey");
 	}
@@ -4275,56 +4281,6 @@ void g_asmcode (struct StrBuf* B)
 /* Output one line of assembler code. */
 {
     AddCodeLine ("%.*s", SB_GetLen (B), SB_GetConstBuf (B));
-}
-
-
-
-/*****************************************************************************/
-/*   	     		    Inlined known functions			     */
-/*****************************************************************************/
-
-
-
-void g_strlen (unsigned flags, unsigned long val, long offs)
-/* Inline the strlen() function */
-{
-    /* We need a label in both cases */
-    unsigned label = GetLocalLabel ();
-
-    /* Two different encodings */
-    if (flags & CF_CONST) {
-
-	/* The address of the string is constant. Create the correct label name */
-    	const char* lbuf = GetLabelName (flags, val, offs);
-
-	/* Generate the strlen code */
-	AddCodeLine ("ldy #$FF");
-	g_defcodelabel (label);
-	AddCodeLine ("iny");
-	AddCodeLine ("lda %s,y", lbuf);
-	AddCodeLine ("bne %s", LocalLabelName (label));
-       	AddCodeLine ("tax");
-	AddCodeLine ("tya");
-
-    } else {
-
-       	/* Address not constant but in primary */
-	if (CodeSizeFactor < 400) {
-	    /* This is too much code, so call strlen instead of inlining */
-    	    AddCodeLine ("jsr _strlen");
-	} else {
-	    /* Inline the function */
-	    AddCodeLine ("sta ptr1");
-	    AddCodeLine ("stx ptr1+1");
-	    AddCodeLine ("ldy #$FF");
-	    g_defcodelabel (label);
-	    AddCodeLine ("iny");
-	    AddCodeLine ("lda (ptr1),y");
-	    AddCodeLine ("bne %s", LocalLabelName (label));
-       	    AddCodeLine ("tax");
-	    AddCodeLine ("tya");
-     	}
-    }
 }
 
 

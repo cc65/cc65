@@ -472,17 +472,6 @@ void g_asmcode (struct StrBuf* B);
 
 
 
-/*****************************************************************************/
-/*			    Inlined known functions			     */
-/*****************************************************************************/
-
-
-
-void g_strlen (unsigned flags, unsigned long val, long offs);
-/* Inline the strlen() function */
-
-
-
 /* End of codegen.h */
 #endif
 

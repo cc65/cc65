@@ -53,7 +53,6 @@ extern unsigned char	AddSource;		/* Add source lines as comments */
 extern unsigned char	DebugInfo;		/* Add debug info to the obj */
 extern unsigned char	CreateDep;		/* Create a dependency file */
 extern unsigned char	ANSI;			/* Strict ANSI flag */
-extern unsigned char	WriteableStrings;	/* Literal strings are r/w */
 extern unsigned char	NoWarn;			/* Suppress warnings */
 extern unsigned char	Optimize;		/* Optimize flag */
 extern unsigned long	OptDisable;		/* Optimizer passes to disable */
@@ -62,6 +61,7 @@ extern unsigned	       	CodeSizeFactor;		/* Size factor for generated code */
 extern unsigned         RegisterSpace;          /* Space available for register vars */
 
 /* Stackable options */
+extern IntStack         WritableStrings;	/* Literal strings are r/w */
 extern IntStack         InlineStdFuncs;	       	/* Inline some known functions */
 extern IntStack         EnableRegVars;		/* Enable register variables */
 extern IntStack         AllowRegVarAddr;	/* Allow taking addresses of register vars */

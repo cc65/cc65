@@ -126,10 +126,10 @@ Here is a description of all the command line options:
   <label id="option-o">
   <tag><tt>-o name</tt></tag>
 
-  The default output name is the name of the input file with the extension
-  replaced by ".dis". If you don't like that, you may give another name with
-  the -o option. The output file will be placed in the same directory as
-  the source file, or, if -o is given, the full path in this name is used.
+  Specify a name for an output file. The default is to use <tt/stdout/, so
+  without this switch or the corresponding <ref id="global-options"
+  name="global option"> <tt><ref id="OUTPUTNAME" name="OUTPUTNAME"></tt>,
+  the output will go to the terminal.
 
 
   <label id="option--pagelength">
@@ -217,7 +217,7 @@ name="next section"> for more information.
 
 
 
-<sect>Info File Format<p><label id="infofile">
+<sect>Info File Format<label id="infofile"><p>
 
 The info file contains lists of specifications grouped together. Each group
 directive has an identifying token and an attribute list enclosed in curly
@@ -240,7 +240,7 @@ the mark to the end of the current line. Hash marks inside of strings will
 of course <em/not/ start a comment.
 
 
-<sect1>Specifying global options<p>
+<sect1>Specifying global options<label id="global-options"><p>
 
 Global options may be specified in a group with the name <tt/GLOBAL/. The
 following attributes are recognized:
@@ -277,14 +277,16 @@ following attributes are recognized:
   is ignored.
 
 
+  <label id="OUTPUTNAME">
   <tag><tt>OUTPUTNAME</tt></tag>
   The attribute is followed by string value, which gives the name of the
   output file to write. If it is present, specification of an output file on
   the command line using the <tt><ref id="option-o" name="-o"></tt> option is
   not allowed.
 
-  If no output name is specified, the name of the input file with the
-  extension replaced by ".dis" is used.
+  The default is to use <tt/stdout/ for output, so without this attribute or
+  the corresponding command line option <tt/<ref id="option-o" name="-o">/
+  the output will go to the terminal.
 
 
   <tag><tt>PAGELENGTH</tt></tag>

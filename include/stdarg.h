@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -42,7 +42,9 @@ typedef unsigned char* va_list;
 
 #define va_start(ap, fix)      	ap = ((va_list)&(fix))
 #define va_arg(ap,type)	       	(*(type*)(ap -= ((sizeof (type) + 1) & ~1)))
+#if __CC65_STD__ >= __CC65_STD_C99__
 #define va_copy(dest, src)	((dest)=(src))
+#endif
 #define va_end(ap)
 
 

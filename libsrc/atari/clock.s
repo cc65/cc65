@@ -1,13 +1,12 @@
 ;
-; Ullrich von Bassewitz, 25.07.2000
-;
-; Implemented using information from Sidney Cadot <sidney@janis.pds.twi.tudelft.nl>
+; Piotr Fusik, 04.11.2001
+; originally by Ullrich von Bassewitz and Sidney Cadot
 ;
 ; clock_t clock (void);
 ; unsigned _clocks_per_sec (void);
 ;
 
-      	.export	       	_clock, __clocks_per_sec
+	.export		_clock, __clocks_per_sec
 	.importzp	sreg
 
 	.include	"atari.inc"
@@ -15,15 +14,15 @@
 
 .proc	_clock
 
-	lda	#0  	      	; Byte 3 is always zero
-       	sta    	sreg+1
-	php			; Save current I flag value
-	sei			; Disable interrupts
-	lda	RTCLOK		; Read clock
+	ldx	#5		; Synchronize with Antic, so the interrupt won't change RTCLOK
+	stx	WSYNC		; while we're reading it. The synchronization is done same as
+@L1:	dex			; in SETVBLV function in Atari OS.
+	bne	@L1
+	stx	sreg+1		; Byte 3 is always zero
+	lda	RTCLOK+2
 	ldx	RTCLOK+1
-       	ldy	RTCLOK+2
-	plp	    		; Restore old I bit
-       	sty	sreg
+	ldy	RTCLOK
+	sty	sreg
 	rts
 
 .endproc
@@ -31,13 +30,14 @@
 
 .proc	__clocks_per_sec
 
-	lda	#50		; Assume PAL
-	ldx	PAL		; use hw register, PALNTS is only supported on XL/XE ROM
-	beq	@L1
-	ldx	#0
+	lda	PAL		; use hw register, PALNTS is only supported on XL/XE ROM
+	and	#$0e
+	bne	@NTSC
+	tax
+	lda	#50
+	rts
+@NTSC:	ldx	#0
 	lda	#60
-@L1:	rts
+	rts
 
 .endproc
-
-

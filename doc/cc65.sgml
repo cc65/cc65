@@ -65,7 +65,7 @@ Short options:
   -O			Optimize code
   -Oi			Optimize code, inline more code
   -Or			Enable register variables
-  -Os			Inline some known functions
+  -Os	    		Inline some known functions
   -T			Include source as comment
   -V			Print the compiler version number
   -W			Suppress warnings
@@ -93,10 +93,7 @@ Here is a description of all the command line options:
 
   This option disables any compiler exensions. Have a look at section 5
   for a discussion of compiler extensions. In addition, the macro
-  <verb>
-       	__STRICT_ANSI__
-  </verb>
-  is defined, when using one of these options.
+  <tt/__STRICT_ANSI__/ is defined, when using one of these options.
 
 
   <tag><tt>--cpu CPU</tt></tag>
@@ -123,7 +120,7 @@ Here is a description of all the command line options:
 
   <tag><tt>-g, --debug-info</tt></tag>
 
-  This will cause the compiler to insert a .DEBUGINFO command into the
+  This will cause the compiler to insert a <tt/.DEBUGINFO/ command into the
   generated assembler code. This will cause the assembler to include all
   symbols in a special section in the object file.
 
@@ -139,8 +136,8 @@ Here is a description of all the command line options:
   6502 has no provisions for sign extending characters (which is needed on
   almost any load operation), this will make the code larger and slower. A
   better way is to declare characters explicitly as "signed" if needed.
-  You can also use "#pragma signedchars" for better control of this option
-  (see section 7).
+  You can also use <tt/#pragma signedchars/ for better control of this option
+  (see section <ref id="pragmas" name="#pragmas">).
 
 
   <tag><tt>-t target, --target target</tt></tag>
@@ -149,17 +146,16 @@ Here is a description of all the command line options:
   determines things like the character set that is used for strings and
   character constants. The following target systems are supported:
 
-  	none
-     	c64
- 	c128
- 	ace	 	(no library support)
- 	plus4
-       	cbm610
- 	pet	 	(all CBM PET systems except the 2001)
- 	nes	 	(Nintendo Entertainment System)
- 	apple2
- 	geos
-
+  <itemize>
+  <item>none
+  <item>c64
+  <item>c128
+  <item>plus4
+  <item>cbm610 (all CBM series-II computers with 80 column video)
+  <item>pet (all CBM PET systems except the 2001)
+  <item>apple2
+  <item>geos
+  </itemize>
 
   <tag><tt>-v, --verbose</tt></tag>
 
@@ -172,31 +168,35 @@ Here is a description of all the command line options:
   Use static storage for local variables instead of storage on the stack.
   Since the stack is emulated in software, this gives shorter and usually
   faster code, but the code is no longer reentrant. The difference between
-  -Cl and declaring local variables as static yourself is, that
+  <tt/-Cl/ and declaring local variables as static yourself is, that
   initializer code is executed each time, the function is entered. So when
   using
 
+  <tscreen><verb>
    	void f (void)
    	{
    	    unsigned a = 1;
    	    ...
    	}
+  </verb></tscreen>
 
   the variable a will always have the value 1 when entering the function
-  and using -Cl, while in
+  and using <tt/-Cl/, while in
 
+  <tscreen><verb>
    	void f (void)
    	{
    	    static unsigned a = 1;
    	    ....
    	}
+  </verb></tscreen>
 
   the variable a will have the value 1 only the first time, the function
   is entered, and will keep the old value from one call of the function to
   the next.
 
-  You may also use #pragma staticlocals to change this setting in your
-  sources (see section 7).
+  You may also use <tt/#pragma staticlocals/ to change this setting in your
+  sources (see section <ref id="pragmas" name="#pragmas">).
 
 
   <tag><tt>-I dir, --include-dir dir</tt></tag>
@@ -216,32 +216,35 @@ Here is a description of all the command line options:
 
   Enable an optimizer run over the produced code.
 
-  Using -Oi, the code generator will inline some code where otherwise a
+  Using <tt/-Oi/, the code generator will inline some code where otherwise a
   runtime functions would have been called, even if the generated code is
-  larger. This will not only remove the overhead for a function call, but
-  will make the code visible for the optimizer.
+  larger. This will not only remove the overhead for a function call, but will
+  make the code visible for the optimizer.
 
-  -Or will make the compiler honor the "register" keyword. Local variables
-  may be placed in registers (which are actually zero page locations).
-  There is some overhead involved with register variables, since the old
-  contents of the registers must be saved and restored. In addition, the
-  current implementation does not make good use of register variables, so
-  using -Or may make your program even slower and larger. Use with care!
+  <tt/-Or/ will make the compiler honor the <tt/register/ keyword. Local
+  variables may be placed in registers (which are actually zero page
+  locations). There is some overhead involved with register variables, since
+  the old contents of the registers must be saved and restored. In addition,
+  the current implementation does not make good use of register variables, so
+  using <tt/-Or/ may make your program even slower and larger. Use with care!
 
-  Using -Os will force the compiler to inline some known functions from
+  Using <tt/-Os/ will force the compiler to inline some known functions from
   the C library like strlen. Note: This has two consequences:
-
-    * You may not use names of standard C functions in your own code. If
-      you do that, your program is not standard compliant anyway, but
-      using -Os will actually break things.
-
-    * The inlined string and memory functions will not handle strings or
-      memory areas larger than 255 bytes. Similar, the inlined is..()
-      functions will not work with values outside char range.
-
-  It is possible to concatenate the modifiers for -O. For example, to
+  <p>
+  <itemize>
+  <item>You may not use names of standard C functions in your own code. If you
+     	do that, your program is not standard compliant anyway, but using
+     	<tt/-Os/ will actually break things.
+     	<p>
+  <item>The inlined string and memory functions will not handle strings or
+     	memory areas larger than 255 bytes. Similar, the inlined <tt/is..()/
+     	functions will not work with values outside char range.
+     	<p>
+  </itemize>
+  <p>
+  It is possible to concatenate the modifiers for <tt/-O/. For example, to
   enable register variables and inlining of known functions, you may use
-  -Ors.
+  <tt/-Ors/.
 
 
   <tag><tt>-T</tt></tag>
@@ -273,8 +276,8 @@ the same base name, but with the extension replaced by ".s". The output
 file contains assembler code suitable for the use with the ca65 macro
 assembler.
 
-In addition to the paths named in the -I option on the command line, the
-directory named in the environment variable CC65_INC is added to the
+In addition to the paths named in the <tt/-I/ option on the command line, the
+directory named in the environment variable <tt/CC65_INC/ is added to the
 search path for include files on startup.
 
 
@@ -288,37 +291,44 @@ and the one defined by the ISO standard:
 
 <item>	The compiler allows single line comments that start with //. This
 	feature is disabled in strict ANSI mode.
-
+	<p>
 <item>	The compiler allows unnamed parameters in parameter lists. The
 	compiler will not issue warnings about unused parameters that don't
 	have a name. This feature is disabled in strict ANSI mode.
-
-<item>	The compiler has some additional keywords:<p>
-
-       	<tt/asm/, <tt/__asm__/, <tt/fastcall/, <tt/__fastcall__/, <tt/__AX__/,
-	<tt/__EAX__/, <tt/__func__/, <tt/__attribute__/
 	<p>
-
+<item>	The compiler has some additional keywords:
+	<p>
+	<itemize>
+ 	<item><tt/asm/
+	<item><tt/__asm__/
+	<item><tt/fastcall/
+	<item><tt/__fastcall__/
+	<item><tt/__AX__/
+	<item><tt/__EAX__/
+	<item><tt/__func__/
+	<item><tt/__attribute__/
+	</itemize>
+	<p>
 	The keywords without the underlines are disabled in strict ANSI mode.
-
+	<p>
 <item>	The datatypes "float" and "double" are not available.
-
+	<p>
 <item>	The compiler does not support bit fields.
-
+	<p>
 <item>	Initialization of local variables is only possible for scalar data
 	types (that is, not for arrays and structs).
-
+	<p>
 <item>	Because of the "wrong" order of the parameters on the stack, there is
 	an additional macro needed to access parameters in a variable
 	parameter list in a C function.
-
+	<p>
 <item>	Functions may not return structs. However, struct assignment *is*
 	possible.
-
+	<p>
 <item>	Part of the C library is available only with fastcall calling
 	conventions (see below). This means, that you may not mix pointers to
 	those functions with pointers to user written functions.
-
+	<p>
 </itemize>
 
 There may be some more minor differences, I'm currently not aware off. The
@@ -334,48 +344,42 @@ This cc65 version has some extensions to the ISO C standard.
 <itemize>
 
 <item>	The compiler allows // comments (like in C++ and in the proposed C9x
-	standard). This feature is disabled by <tt/-A/.
+     	standard). This feature is disabled by <tt/-A/.
 
 <item>	The compiler allows to insert assembler statements into the output
-	file. The syntax is
+     	file. The syntax is
 	<p>
-
        	<tt/asm (&lt;string literal&gt;) ;/
-	<p>
-
-	or
-	<p>
-
+     	<p>
+     	or
+     	<p>
        	<tt/__asm__ (&lt;string literal&gt;) ;/
-	<p>
+     	<p>
 
-	The first form is in the user namespace and is disabled if the <tt/-A/
-	switch is given.
+     	The first form is in the user namespace and is disabled if the <tt/-A/
+     	switch is given.
 
-	The given string is inserted literally into the output file, and a
-	newline is appended. The statements in this string are not checked by
-	the compiler, so be careful!
+     	The given string is inserted literally into the output file, and a
+     	newline is appended. The statements in this string are not checked by
+     	the compiler, so be careful!
 
-	The asm statement may be used inside a function and on global file
-	level.
+     	The asm statement may be used inside a function and on global file
+     	level.
 
 <item>	There is a special calling convention named "fastcall". This calling
-	convention is currently only usable for functions written in
-	assembler. The syntax for a function declaration using fastcall is
+     	convention is currently only usable for functions written in
+     	assembler. The syntax for a function declaration using fastcall is
+     	<p>
+	<tt/&lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)/
 	<p>
-       	    &lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)
+     	or
 	<p>
-
-	or
-	<p>
-	    &lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)
+	<tt/&lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)/
 	<p>
 	An example would be
-
-	<tscreen><verb>
-	    void __fastcall__ f (unsigned char c)
-	</verb></tscreen>
-
+	<p>
+       	<tt/void __fastcall__ f (unsigned char c)/
+	<p>
 	The first form of the fastcall keyword is in the user namespace and is
 	therefore disabled in strict ANSI mode.
 
@@ -453,8 +457,7 @@ The compiler defines several macros at startup:
   <tag><tt>__ATARI__</tt></tag>
 
   This macro is defined if the target is one of the Atari computers
-  (400/800/130XL/800XL). Note that there is no runtime and C library support
-  for atari systems.
+  (400/800/130XL/800XL).
 
   <tag><tt>__APPLE2__</tt></tag>
 
@@ -474,29 +477,29 @@ The compiler defines several macros at startup:
 
   <tag><tt>__STRICT_ANSI__</tt></tag>
 
-  This macro is defined to 1 if the -A compiler option was given, and
+  This macro is defined to 1 if the <tt/-A/ compiler option was given, and
   undefined otherwise.
 
   <tag><tt>__OPT__</tt></tag>
 
-  Is defined if the compiler was called with the -O command line option.
+  Is defined if the compiler was called with the <tt/-O/ command line option.
 
   <tag><tt>__OPT_i__</tt></tag>
 
-  Is defined if the compiler was called with the -Oi command line option.
+  Is defined if the compiler was called with the <tt/-Oi/ command line option.
 
   <tag><tt>__OPT_r__</tt></tag>
 
-  Is defined if the compiler was called with the -Or command line option.
+  Is defined if the compiler was called with the <tt/-Or/ command line option.
 
   <tag><tt>__OPT_s__</tt></tag>
 
-  Is defined if the compiler was called with the -Os command line option.
+  Is defined if the compiler was called with the <tt/-Os/ command line option.
 
 </descrip>
 
 
-<sect>#pragmas<p>
+<sect>#pragmas<label id="pragmas"><p>
 
 The compiler understands some pragmas that may be used to change code
 generation and other stuff.
@@ -518,8 +521,9 @@ generation and other stuff.
   uninitialized variables do not have the value zero.
 
   Example:
-
+  <tscreen><verb>
   	#pragma bssseg ("MyBSS")
+  </verb></tscreen>
 
 
   <tag><tt>#pragma codeseg (&lt;name&gt;)</tt></tag>
@@ -533,8 +537,9 @@ generation and other stuff.
   configuration file.
 
   Example:
-
+  <tscreen><verb>
   	#pragma bssseg ("MyCODE")
+  </verb></tscreen>
 
 
   <tag><tt>#pragma dataseg (&lt;name&gt;)</tt></tag>
@@ -548,8 +553,9 @@ generation and other stuff.
   configuration file.
 
   Example:
-
+  <tscreen><verb>
   	#pragma bssseg ("MyDATA")
+  </verb></tscreen>
 
 
   <tag><tt>#pragma rodataseg (&lt;name&gt;)</tt></tag>
@@ -563,8 +569,9 @@ generation and other stuff.
   configuration file.
 
   Example:
-
+  <tscreen><verb>
 	#pragma bssseg ("MyRODATA")
+  </verb></tscreen>
 
 
   <tag><tt>#pragma regvaraddr (&lt;const int&gt;)</tt></tag>
@@ -582,10 +589,11 @@ generation and other stuff.
   register variables. So be careful with this #pragma.
 
   Example:
-
+  <tscreen><verb>
    	#pragma regvaraddr(1)  	/* Allow taking the address
    			       	 * of register variables
    			       	 */
+  </verb></tscreen>
 
 
   <tag><tt>#pragma signedchars (&lt;const int&gt;)</tt></tag>
@@ -593,15 +601,16 @@ generation and other stuff.
   Changed the signedness of the default character type. If the argument
   is not zero, default characters are signed, otherwise characters are
   unsigned. The compiler default is to make characters unsigned since this
-  creates a lot better code.
+  creates a lot better code. This default may be overridden by the
+  <tt/--signed-chars/ command line option.
 
 
   <tag><tt>#pragma staticlocals (&lt;const int&gt;)</tt></tag>
 
   Use variables in the bss segment instead of variables on the stack. This
-  pragma changes the default set by the compiler option -Cl. If the argument
-  is not zero, local variables are allocated in the BSS segment, leading to
-  shorter and in most cases faster, but non-reentrant code.
+  pragma changes the default set by the compiler option <tt/-Cl/. If the
+  argument is not zero, local variables are allocated in the BSS segment,
+  leading to shorter and in most cases faster, but non-reentrant code.
 
 
   <tag><tt>#pragma zpsym (&lt;name&gt;)</tt></tag>
@@ -611,9 +620,10 @@ generation and other stuff.
   The compiler will create a matching import declaration for the assembler.
 
   Example:
-
-	extern int foo;
-	#pragma zpsym ("foo");	/* foo is in the zeropage */
+  <tscreen><verb>
+      	extern int foo;
+      	#pragma zpsym ("foo");	/* foo is in the zeropage */
+  </verb></tscreen>
 
 </descrip>
 

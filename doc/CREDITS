@@ -56,6 +56,11 @@ More special thanks to:
     hardware or embedded microcontroller applications, you should have
     a look at their web site at www.msd.com.
 
+  * Mirco Miranda <mircomir@libero.it>
+
+    Miroc contributed Makefile additions, docs and patches to compile cc65
+    cleanly under OS/2 using the EMX toolkit.
+
 
 
 Thanks to

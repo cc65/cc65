@@ -130,8 +130,17 @@ static const FuncInfo FuncInfoTable[] = {
     { "shreax3",        REG_AX,         REG_AX          },
     { "staspidx",       REG_A | REG_Y,  REG_Y           },
     { "tosicmp",   	REG_AX,		REG_AXY     	},
+    { "tosdiva0",       REG_AX,	       	REG_AXY         },
+    { "tosdivax",       REG_AX,	       	REG_AXY         },
+    { "tosdiveax",      REG_AX,	       	REG_AXY         },
+    { "tosmula0",       REG_AX,	       	REG_AXY         },
+    { "tosmulax",       REG_AX,	       	REG_AXY         },
+    { "tosmuleax",      REG_AX,	       	REG_AXY         },
     { "tosshreax",      REG_AX,	       	REG_AXY         },
-};
+    { "tosumula0",      REG_AX,	       	REG_AXY         },
+    { "tosumulax",      REG_AX,	       	REG_AXY         },
+    { "tosumuleax",     REG_AX,	       	REG_AXY         },
+};	     
 #define FuncInfoCount	(sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
 /* Table with names of zero page locations used by the compiler */

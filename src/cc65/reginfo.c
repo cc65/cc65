@@ -70,11 +70,13 @@ RegInfo* NewRegInfo (const RegContents* RC)
 
     /* Initialize the registers */
     if (RC) {
-	RI->In  = *RC;
-	RI->Out	= *RC;
+	RI->In   = *RC;
+	RI->Out	 = *RC;
+	RI->Out2 = *RC;
     } else {
 	RC_Invalidate (&RI->In);
 	RC_Invalidate (&RI->Out);
+	RC_Invalidate (&RI->Out2);
     }
 
     /* Return the new struct */

@@ -317,7 +317,7 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	} else {
 	    RC_Invalidate (&E->RI->In);
 	}
-	E->RI->Out = E->RI->In;
+       	E->RI->Out2 = E->RI->Out = E->RI->In;
     }
 
     /* Get pointers to the register contents */

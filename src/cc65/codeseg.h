@@ -149,6 +149,11 @@ INLINE struct CodeEntry* CS_GetEntry (CodeSeg* S, unsigned Index)
 #  define CS_GetEntry(S, Index)	CollAt(&(S)->Entries, (Index))
 #endif
 
+struct CodeEntry* CS_GetPrevEntry (CodeSeg* S, unsigned Index);
+/* Get the code entry preceeding the one with the index Index. If there is no
+ * preceeding code entry, return NULL.
+ */
+
 struct CodeEntry* CS_GetNextEntry (CodeSeg* S, unsigned Index);
 /* Get the code entry following the one with the index Index. If there is no
  * following code entry, return NULL.

@@ -62,8 +62,9 @@ struct RegContents {
 /* Register change info */
 typedef struct RegInfo RegInfo;
 struct RegInfo {
-    RegContents	In;                     /* Incoming register values */
-    RegContents Out;                    /* Outgoing register values */
+    RegContents	In;             /* Incoming register values */
+    RegContents Out;            /* Outgoing register values */
+    RegContents Out2;		/* Alternative outgoing reg values for branches */
 };
 
 

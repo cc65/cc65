@@ -586,6 +586,22 @@ void CS_MoveEntries (CodeSeg* S, unsigned Start, unsigned Count, unsigned NewPos
 
 
 
+struct CodeEntry* CS_GetPrevEntry (CodeSeg* S, unsigned Index)
+/* Get the code entry preceeding the one with the index Index. If there is no
+ * preceeding code entry, return NULL.
+ */
+{
+    if (Index == 0) {
+   	/* This is the first entry */
+   	return 0;
+    } else {
+   	/* Previous entry available */
+       	return CollAtUnchecked (&S->Entries, Index-1);
+    }
+}
+
+
+
 struct CodeEntry* CS_GetNextEntry (CodeSeg* S, unsigned Index)
 /* Get the code entry following the one with the index Index. If there is no
  * following code entry, return NULL.
@@ -1032,6 +1048,8 @@ void CS_GenRegInfo (CodeSeg* S)
     WasJump = 0;
     for (I = 0; I < CS_GetEntryCount (S); ++I) {
 
+	CodeEntry* P;
+
      	/* Get the next instruction */
      	CodeEntry* E = CollAtUnchecked (&S->Entries, I);
 
@@ -1053,7 +1071,7 @@ void CS_GenRegInfo (CodeSeg* S)
 	     	/* Preceeding insn was an unconditional branch */
 	     	CodeEntry* J = CL_GetRef(Label, 0);
 		if (J->RI) {
-		    Regs = J->RI->Out;
+		    Regs = J->RI->Out2;
 		} else {
 		    RC_Invalidate (&Regs);
 		}
@@ -1071,13 +1089,13 @@ void CS_GenRegInfo (CodeSeg* S)
 		    RC_Invalidate (&Regs);
 		    break;
 		}
-		if (J->RI->Out.RegA != Regs.RegA) {
+		if (J->RI->Out2.RegA != Regs.RegA) {
 		    Regs.RegA = -1;
 		}
-		if (J->RI->Out.RegX != Regs.RegX) {
+		if (J->RI->Out2.RegX != Regs.RegX) {
 		    Regs.RegX = -1;
 		}
-		if (J->RI->Out.RegY != Regs.RegY) {
+		if (J->RI->Out2.RegY != Regs.RegY) {
 		    Regs.RegY = -1;
 		}
 		++Entry;
@@ -1091,11 +1109,135 @@ void CS_GenRegInfo (CodeSeg* S)
      	/* Generate register info for this instruction */
         CE_GenRegInfo (E, CurrentRegs);
 
+	/* Remember for the next insn if this insn was an uncondition branch */
+	WasJump = (E->Info & OF_UBRA) != 0;
+
      	/* Output registers for this insn are input for the next */
      	CurrentRegs = &E->RI->Out;
 
-	/* Remember for the next insn if this insn was an uncondition branch */
-	WasJump = (E->Info & OF_UBRA) != 0;
+	/* If this insn is a branch on zero flag, we may have more info on
+	 * register contents for one of both flow directions, but only if
+	 * there is a previous instruction.
+	 */
+	if ((E->Info & OF_ZBRA) != 0 && (P = CS_GetPrevEntry (S, I)) != 0) {
+
+	    /* Get the branch condition */
+	    bc_t BC = GetBranchCond (E->OPC);
+
+	    /* Check the previous instruction */
+	    switch (P->OPC) {
+
+		case OP65_ADC:
+		case OP65_AND:
+		case OP65_DEA:
+		case OP65_EOR:
+		case OP65_INA:
+		case OP65_LDA:
+		case OP65_ORA:
+		case OP65_PLA:
+		case OP65_SBC:
+		    /* A is zero in one execution flow direction */
+		    if (BC == BC_EQ) {
+       	       	       	E->RI->Out2.RegA = 0;
+		    } else {
+			E->RI->Out.RegA = 0;
+		    }
+	 	    break;
+
+	 	case OP65_CMP:
+	 	    /* If this is an immidiate compare, the A register has
+	 	     * the value of the compare later.
+	 	     */
+	 	    if (CE_KnownImm (P)) {
+	 		if (BC == BC_EQ) {
+	 		    E->RI->Out2.RegA = (unsigned char)P->Num;
+	 		} else {
+	 		    E->RI->Out.RegA = (unsigned char)P->Num;
+	 	       	}
+	 	    }
+	 	    break;
+
+	 	case OP65_CPX:
+	 	    /* If this is an immidiate compare, the X register has
+	 	     * the value of the compare later.
+	 	     */
+	 	    if (CE_KnownImm (P)) {
+	 		if (BC == BC_EQ) {
+	 		    E->RI->Out2.RegX = (unsigned char)P->Num;
+	 		} else {
+	 		    E->RI->Out.RegX = (unsigned char)P->Num;
+	 		}
+	 	    }
+	 	    break;
+
+	 	case OP65_CPY:
+	 	    /* If this is an immidiate compare, the Y register has
+	 	     * the value of the compare later.
+	 	     */
+	 	    if (CE_KnownImm (P)) {
+	 	    	if (BC == BC_EQ) {
+	 	    	    E->RI->Out2.RegY = (unsigned char)P->Num;
+	 	    	} else {
+	 	    	    E->RI->Out.RegY = (unsigned char)P->Num;
+	 	    	}
+	 	    }
+	 	    break;
+
+		case OP65_DEX:
+		case OP65_INX:
+		case OP65_LDX:
+		case OP65_PLX:
+		    /* X is zero in one execution flow direction */
+		    if (BC == BC_EQ) {
+       	       	       	E->RI->Out2.RegX = 0;
+		    } else {
+			E->RI->Out.RegX = 0;
+		    }
+	 	    break;
+
+		case OP65_DEY:
+		case OP65_INY:
+		case OP65_LDY:
+		case OP65_PLY:
+		    /* X is zero in one execution flow direction */
+		    if (BC == BC_EQ) {
+       	       	       	E->RI->Out2.RegY = 0;
+		    } else {
+			E->RI->Out.RegY = 0;
+		    }
+	 	    break;
+
+		case OP65_TAX:
+		case OP65_TXA:
+		    /* If the branch is a beq, both A and X are zero at the
+		     * branch target, otherwise they are zero at the next
+		     * insn.
+		     */
+		    if (BC == BC_EQ) {
+		     	E->RI->Out2.RegA = E->RI->Out2.RegX = 0;
+		    } else {
+		     	E->RI->Out.RegA = E->RI->Out.RegX = 0;
+		    }
+		    break;
+
+		case OP65_TAY:
+		case OP65_TYA:
+		    /* If the branch is a beq, both A and Y are zero at the
+		     * branch target, otherwise they are zero at the next
+		     * insn.
+		     */
+		    if (BC == BC_EQ) {
+		     	E->RI->Out2.RegA = E->RI->Out2.RegY = 0;
+		    } else {
+		     	E->RI->Out.RegA = E->RI->Out.RegY = 0;
+		    }
+		    break;
+
+	 	default:
+	 	    break;
+
+	    }
+	}
     }
 }
 

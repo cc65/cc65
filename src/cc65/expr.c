@@ -644,15 +644,15 @@ static unsigned FunctionParamList (FuncDesc* Func)
       	} else {
 	    unsigned ArgSize = sizeofarg (Flags);
 	    if (FrameSize > 0) {
-		/* We have the space already allocated, store in the frame */
-		CHECK (FrameSize >= ArgSize);
-		FrameSize -= ArgSize;
-		FrameOffs -= ArgSize;
-		/* Store */
-		g_putlocal (Flags | CF_NOKEEP, FrameOffs, lval.e_const);
+	    	/* We have the space already allocated, store in the frame */
+	    	CHECK (FrameSize >= ArgSize);
+	    	FrameSize -= ArgSize;
+	    	FrameOffs -= ArgSize;
+	    	/* Store */
+	    	g_putlocal (Flags | CF_NOKEEP, FrameOffs, lval.e_const);
 	    } else {
 	    	/* Push the argument */
-		g_push (Flags, lval.e_const);
+	    	g_push (Flags, lval.e_const);
 	    }
 
 	    /* Calculate total parameter size */
@@ -674,8 +674,15 @@ static unsigned FunctionParamList (FuncDesc* Func)
       	Error ("Too few arguments in function call");
     }
 
-    /* Return the size of all parameters pushed onto the stack */
-    return ParamSize;
+    /* The function returns the size of all parameters pushed onto the stack.
+     * However, if there are parameters missing (which is an error and was 
+     * flagged by the compiler) AND a stack frame was preallocated above,
+     * we would loose track of the stackpointer and generate an internal error
+     * later. So we correct the value by the parameters that should have been
+     * pushed to avoid an internal compiler error. Since an error was 
+     * generated before, no code will be output anyway.
+     */
+    return ParamSize + FrameSize;
 }
 
 

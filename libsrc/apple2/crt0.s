@@ -4,7 +4,7 @@
 ; This must be the *first* file on the linker command line
 ;
 
-	.export		_exit
+	.export		_exit, __Exit
 	.import	   	initlib, donelib
 	.import	   	zerobss
        	.import	       	__STARTUP_LOAD__, __BSS_LOAD__	; Linker generated
@@ -36,16 +36,32 @@
 ; Save the zero page locations we need
 
        	ldx	#zpspace-1
-L1:	lda	sp,x
+:	lda	sp,x
    	sta	zpsave,x
 	dex
-       	bpl	L1
+       	bpl	:-
 
+; Save the original RESET vector
+
+	ldx	#$02
+:	lda	SOFTEV,x
+	sta	rvsave,x
+	dex
+	bpl	:-
+
+; ProDOS TechRefMan, chapter 5.3.5:
+; "Your system program should place in the RESET vector the address of a
+;  routine that ... closes the files."
+
+	ldx	#<_exit
+	lda	#>_exit
+	jsr	reset		; Setup RESET vector
+		
 ; Clear the BSS data
 
 	jsr	zerobss
 
-; Save system stuff and setup the stack
+; Setup the stack
 
 	lda    	HIMEM
 	sta	sp
@@ -60,17 +76,31 @@ L1:	lda	sp,x
 
 	jsr	callmain
 
-; Call module destructors. This is also the _exit entry.
+; Avoid re-entrance of donelib. This is also the _exit entry
 
-_exit:	jsr	donelib
+_exit:	ldx	#<__Exit
+	lda	#>__Exit
+	jsr	reset		; Setup RESET vector
+
+; Call module destructors
+
+	jsr	donelib
+
+; Restore the original RESET vector. This is also the __Exit entry
+
+__Exit:	ldx	#$02
+:	lda	rvsave,x
+	sta	SOFTEV,x
+	dex
+	bpl	:-
 
 ; Copy back the zero page stuff
 
 	ldx	#zpspace-1
-L2:	lda	zpsave,x
+:	lda	zpsave,x
 	sta	sp,x
 	dex
-       	bpl	L2
+       	bpl	:-
 
 ; ProDOS TechRefMan, chapter 5.2.1:
 ; "System programs should set the stack pointer to $FF at the warm-start
@@ -84,8 +114,19 @@ L2:	lda	zpsave,x
 	jmp	DOSWARM
 
 ; ------------------------------------------------------------------------
+; Setup RESET vector
+
+reset:	stx	SOFTEV
+	sta	SOFTEV+1
+	eor	#$A5
+	sta	PWREDUP
+	rts
+
+; ------------------------------------------------------------------------
 ; Data
 
 .data
 
 zpsave:	.res	zpspace
+
+rvsave:	.res	3

@@ -307,10 +307,18 @@ int ED_IsConst (const ExprDesc* Expr);
  * similar.
  */
 
-int ED_IsConstAbs (const ExprDesc* Expr);
+#if defined(HAVE_INLINE)
+INLINE int ED_IsConstAbs (const ExprDesc* Expr)
 /* Return true if the expression denotes a constant absolute value. This can be
  * a numeric constant, cast to any type.
  */
+{
+    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) == (E_LOC_ABS|E_RTYPE_RVAL);
+}
+#else
+#  define ED_IsConstAbs(E)      \
+        (((E)->Flags & (E_MASK_LOC|E_MASK_RTYPE)) == (E_LOC_ABS|E_RTYPE_RVAL))
+#endif
 
 int ED_IsConstAbsInt (const ExprDesc* Expr);
 /* Return true if the expression is a constant (numeric) integer. */

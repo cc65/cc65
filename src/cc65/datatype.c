@@ -57,6 +57,7 @@
 
 
 /* Predefined type strings */
+type type_schar[]       = { T_SCHAR,   	T_END };
 type type_uchar[]       = { T_UCHAR,	T_END };
 type type_int[]         = { T_INT,	T_END };
 type type_uint[]        = { T_UINT,	T_END };
@@ -773,6 +774,26 @@ type* GetElementType (type* T)
 {
     CHECK (IsTypeArray (T));
     return T + DECODE_SIZE + 1;
+}
+
+
+
+type* IntPromotion (type* T)
+/* Apply the integer promotions to T and return the result. The returned type
+ * string may be T if there is no need to change it.
+ */
+{
+    /* We must have an int to apply int promotions */
+    PRECONDITION (IsClassInt (T));
+
+    /* An integer can represent all values from either signed or unsigned char,
+     * so convert chars to int and leave all other types alone.
+     */
+    if (IsTypeChar (T)) {
+        return type_int;
+    } else {
+        return T;
+    }
 }
 
 

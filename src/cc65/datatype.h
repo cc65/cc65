@@ -161,6 +161,7 @@ typedef unsigned short type;
 #define SIZEOF_PTR      2
 
 /* Predefined type strings */
+extern type type_schar[];
 extern type type_uchar[];
 extern type type_int[];
 extern type type_uint[];
@@ -489,6 +490,11 @@ long GetElementCount (const type* T);
 
 type* GetElementType (type* T);
 /* Return the element type of the given array type. */
+
+type* IntPromotion (type* T);
+/* Apply the integer promotions to T and return the result. The returned type
+ * string may be T if there is no need to change it.
+ */
 
 
 

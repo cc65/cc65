@@ -195,6 +195,12 @@ void TypeConversion (ExprDesc* Expr, type* NewType)
        	Error ("Illegal type");
     }
 
+    /* If both types are equal, no conversion is needed */
+    if (TypeCmp (Expr->Type, NewType) >= TC_EQUAL) {
+        /* We're already done */
+        return;
+    }
+
     /* Check for conversion problems */
     if (IsClassInt (NewType)) {
 
@@ -202,9 +208,15 @@ void TypeConversion (ExprDesc* Expr, type* NewType)
        	if (IsClassPtr (Expr->Type)) {
      	    /* Pointer -> int conversion */
      	    Warning ("Converting pointer to integer without a cast");
-       	} else if (!IsClassInt (Expr->Type)) {
+       	} else if (!IsClassInt (Expr->Type) && !IsClassFloat (Expr->Type)) {
      	    Error ("Incompatible types");
        	}
+
+    } else if (IsClassFloat (NewType)) {
+
+        if (!IsClassFloat (Expr->Type) && !IsClassInt (Expr->Type)) {
+            Error ("Incompatible types");
+        }
 
     } else if (IsClassPtr (NewType)) {
 
@@ -213,40 +225,40 @@ void TypeConversion (ExprDesc* Expr, type* NewType)
      	    /* Pointer to pointer assignment is valid, if:
      	     *   - both point to the same types, or
      	     *   - the rhs pointer is a void pointer, or
-	     *   - the lhs pointer is a void pointer.
+    	     *   - the lhs pointer is a void pointer.
      	     */
-	    if (!IsTypeVoid (Indirect (NewType)) && !IsTypeVoid (Indirect (Expr->Type))) {
-	 	/* Compare the types */
-	 	switch (TypeCmp (NewType, Expr->Type)) {
+    	    if (!IsTypeVoid (Indirect (NewType)) && !IsTypeVoid (Indirect (Expr->Type))) {
+    	 	/* Compare the types */
+    	 	switch (TypeCmp (NewType, Expr->Type)) {
 
-	 	    case TC_INCOMPATIBLE:
-	 		Error ("Incompatible pointer types");
-	 		break;
+    	 	    case TC_INCOMPATIBLE:
+    	 	 	Error ("Incompatible pointer types");
+    	 	 	break;
 
-	 	    case TC_QUAL_DIFF:
-	 		Error ("Pointer types differ in type qualifiers");
-	 		break;
+    	 	    case TC_QUAL_DIFF:
+    	 	 	Error ("Pointer types differ in type qualifiers");
+    	 	 	break;
 
-	 	    default:
-	 		/* Ok */
-	 		break;
-	 	}
-	    }
+    	 	    default:
+    	 	 	/* Ok */
+    	 	 	break;
+    	 	}
+    	    }
      	} else if (IsClassInt (Expr->Type)) {
      	    /* Int to pointer assignment is valid only for constant zero */
      	    if (!ED_IsConstAbsInt (Expr) || Expr->IVal != 0) {
      	       	Warning ("Converting integer to pointer without a cast");
      	    }
-	} else if (IsTypeFuncPtr (NewType) && IsTypeFunc(Expr->Type)) {
-	    /* Assignment of function to function pointer is allowed, provided
-	     * that both functions have the same parameter list.
-	     */
-	    if (TypeCmp (Indirect (NewType), Expr->Type) < TC_EQUAL) {
-	 	Error ("Incompatible types");
-	    }
+    	} else if (IsTypeFuncPtr (NewType) && IsTypeFunc(Expr->Type)) {
+    	    /* Assignment of function to function pointer is allowed, provided
+    	     * that both functions have the same parameter list.
+    	     */
+    	    if (TypeCmp (Indirect (NewType), Expr->Type) < TC_EQUAL) {
+    	 	Error ("Incompatible types");
+    	    }
      	} else {
-	    Error ("Incompatible types");
-	}
+    	    Error ("Incompatible types");
+    	}
 
     } else {
 

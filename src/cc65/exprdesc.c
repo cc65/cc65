@@ -192,7 +192,7 @@ ExprDesc* ED_MakeLValExpr (ExprDesc* Expr)
     Expr->Flags |= (E_LOC_EXPR | E_RTYPE_LVAL);
     Expr->Name  = 0;
     Expr->IVal  = 0;    /* No offset */
-    Expr->FVal  = 0.0; 
+    Expr->FVal  = 0.0;
     return Expr;
 }
 
@@ -205,16 +205,6 @@ int ED_IsConst (const ExprDesc* Expr)
  */
 {
     return ED_IsRVal (Expr) && (Expr->Flags & E_LOC_CONST) != 0;
-}
-
-
-
-int ED_IsConstAbs (const ExprDesc* Expr)
-/* Return true if the expression denotes a constant absolute value. This can be
- * a numeric constant, cast to any type.
- */
-{
-    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) == (E_LOC_ABS|E_RTYPE_RVAL);
 }
 
 

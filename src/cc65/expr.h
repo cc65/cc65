@@ -39,9 +39,6 @@ void Store (ExprDesc* Expr, const type* StoreType);
  * is NULL, use lval->Type instead.
  */
 
-void hie0 (ExprDesc* Expr);
-/* Parse comma operator. */
-
 int evalexpr (unsigned flags, void (*Func) (ExprDesc*), ExprDesc* Expr);
 /* Will evaluate an expression via the given function. If the result is a
  * constant, 0 is returned and the value is put in the lval struct. If the
@@ -76,8 +73,14 @@ void ConstAbsIntExpr (void (*Func) (ExprDesc*), ExprDesc* Expr);
 void hie10 (ExprDesc* lval);
 /* Handle ++, --, !, unary - etc. */
 
+void hie8 (ExprDesc* Expr);
+/* Process + and - binary operators. */
+
 void hie1 (ExprDesc* lval);
 /* Parse first level of expression hierarchy. */
+
+void hie0 (ExprDesc* Expr);
+/* Parse comma operator. */
 
 void DefineData (ExprDesc* lval);
 /* Output a data definition for the given expression */

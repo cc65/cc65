@@ -88,7 +88,9 @@ void __fastcall__ tgi_done (void);
 /* End graphics mode, switch back to text mode. Will NOT unload the driver! */
 
 unsigned char __fastcall__ tgi_geterror (void);
-/* Return the error code for the last operation. */
+/* Return the error code for the last operation. This will also clear the
+ * error.
+ */
 
 void __fastcall__ tgi_clear (void);
 /* Clear the screen */
@@ -140,7 +142,7 @@ void __fastcall__ tgi_lineto (int x2, int y2);
  * new end point.
  */
 
-void __fastcall__ tgi_circle (int x, int y, unsigned radius);
+void __fastcall__ tgi_circle (int x, int y, unsigned char radius);
 /* Draw a circle in the current drawing color */
 
 void __fastcall__ tgi_outtext (int x, int y, const char* text);

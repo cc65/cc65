@@ -62,7 +62,7 @@ typedef struct {
     void*               install;        /* INSTALL routine */
     void*               deinstall;      /* DEINSTALL routine */
     void*               init;           /* INIT routine */
-    void*               post;           /* POST routine */
+    void*               done;           /* DONE routine */
     void*               control;        /* CONTROL routine */
     void*               clear;          /* CLEAR routine */
     void*               setcolor;       /* SETCOLOR routine */
@@ -79,6 +79,7 @@ typedef struct {
 /* TGI kernel variables */
 extern tgi_drv_header	tgi_drv;	/* Pointer to driver */
 extern unsigned char	tgi_error;	/* Last error code */
+extern unsigned char    tgi_mode;       /* Graphics mode or zero */
 
 
 
@@ -98,3 +99,4 @@ const char* __fastcall__ tgi_map_mode (unsigned char mode);
 
 
 
+                                                

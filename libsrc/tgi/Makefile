@@ -14,17 +14,21 @@
 C_OBJS =
 
 S_OBJS =	tgi-kernel.o	\
+                tgi_bar.o       \
                 tgi_circle.o    \
                 tgi_clear.o     \
                 tgi_done.o      \
                 tgi_geterror.o  \
                 tgi_getmaxx.o   \
                 tgi_getmaxy.o   \
+                tgi_getpixel.o  \
                 tgi_getxres.o   \
                 tgi_getyres.o   \
                 tgi_init.o      \
                 tgi_line.o      \
 		tgi_map_mode.o  \
+                tgi_setcolor.o  \
+                tgi_setpixel.o  \
                 tgi_unload.o
 
 

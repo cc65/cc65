@@ -48,7 +48,7 @@ TGI_HDR_JUMPTAB         = 16
 TGI_HDR_INSTALL         = TGI_HDR_JUMPTAB+0     ; INSTALL routine
 TGI_HDR_DEINSTALL       = TGI_HDR_JUMPTAB+2     ; DEINSTALL routine
 TGI_HDR_INIT            = TGI_HDR_JUMPTAB+4     ; INIT routine
-TGI_HDR_POST            = TGI_HDR_JUMPTAB+6     ; POST routine
+TGI_HDR_DONE            = TGI_HDR_JUMPTAB+6     ; DONE routine
 TGI_HDR_CONTROL         = TGI_HDR_JUMPTAB+8     ; CONTROL routine
 TGI_HDR_CLEAR           = TGI_HDR_JUMPTAB+10    ; CLEAR routine
 TGI_HDR_SETCOLOR        = TGI_HDR_JUMPTAB+12    ; SETCOLOR routine
@@ -65,6 +65,7 @@ TGI_HDR_JUMPCOUNT       = 12            ; Number of jump vectors
 
 	.global	_tgi_drv      		; Pointer to driver
 	.global	_tgi_error    		; Last error code
+        .global _tgi_mode               ; Graphics mode or zero
 
 ;------------------------------------------------------------------------------
 ; Driver entry points
@@ -72,7 +73,7 @@ TGI_HDR_JUMPCOUNT       = 12            ; Number of jump vectors
         .global tgi_install
         .global tgi_deinstall
         .global tgi_init
-        .global tgi_post
+        .global tgi_done
         .global tgi_control
         .global tgi_clear
         .global tgi_setcolor

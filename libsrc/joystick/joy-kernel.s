@@ -4,10 +4,10 @@
 ; Common functions of the joystick API.
 ;
 
-        .export         _joy_install, _joy_uninstall, _joy_masks
         .export         joy_clear_ptr
 
         .importzp       ptr1
+       	.interruptor    joy_irq		; Export as IRQ handler
 
         .include        "joy-kernel.inc"
         .include        "joy-error.inc"

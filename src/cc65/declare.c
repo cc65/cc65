@@ -845,7 +845,6 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
      	       	Error ("Identifier expected");
      	    }
      	    D->Ident[0] = '\0';
-     	    return;
      	}
     }
 

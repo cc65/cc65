@@ -8,6 +8,7 @@ for the 6502 out there. He built the grounds for this cc65 and some other cc65
 implementations and a lot of his code is still in the current compiler.
 
 
+
 More special thanks to:
 
   * Keith W. Gerdes <kwg@freebird.ghofn.org>
@@ -36,6 +37,13 @@ More special thanks to:
   * Maciej Witkowiak <ytm@friko.onet.pl>
 
     Maciej is responsible for the GEOS support.
+
+  * MicroSystems Development Technologies Inc. located in San Jose,
+    California payed me for the addition of several assembler features,
+    which went also into the freeware version. These guys are selling
+    nice hardware devices like EPROM emulators. If you are developing
+    hardware or embedded microcontroller applications, you should have
+    a look at their web site at www.msd.com.
 
 
 

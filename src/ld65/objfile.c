@@ -38,8 +38,10 @@
 #include <time.h>
 #include <sys/stat.h>
 
-#include "../common/xmalloc.h"
-
+/* common */
+#include "xmalloc.h"
+	  
+/* ld65 */
 #include "dbgsyms.h"
 #include "error.h"
 #include "exports.h"
@@ -105,7 +107,7 @@ void ObjReadFiles (FILE* F, ObjData* O)
 {
     unsigned I;
 
-    O->FileCount  = Read8 (F);
+    O->FileCount  = Read16 (F);
     O->Files      = xmalloc (O->FileCount * sizeof (char*));
     for (I = 0; I < O->FileCount; ++I) {
        	/* Skip MTime and size */

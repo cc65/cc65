@@ -361,7 +361,7 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
     printf ("  Files:\n");
 
     /* Read the number of files and print it */
-    Count = Read8 (F);
+    Count = Read16 (F);
     printf ("    Count:%27u\n", Count);
 
     /* Read and print all files */

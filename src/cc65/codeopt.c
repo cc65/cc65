@@ -1,3 +1,4 @@
+
 /*****************************************************************************/
 /*                                                                           */
 /*				   codeopt.c				     */
@@ -552,7 +553,7 @@ static unsigned OptAdd1 (CodeSeg* S)
  *
  * and replace it by:
  *
- *      ldy     xxx
+ *      ldy     xxx-2
  *      clc
  *      adc     (sp),y
  *      bcc     L
@@ -576,6 +577,7 @@ static unsigned OptAdd1 (CodeSeg* S)
 	    strcmp (E->Arg, "pushax") == 0                   &&
        	    CS_GetEntries (S, L, I+1, 5)   	             &&
        	    L[0]->OPC == OP65_LDY                            &&
+	    CE_KnownImm (L[0])                               &&
 	    !CE_HasLabel (L[0])                              &&
 	    L[1]->OPC == OP65_LDX                            &&
 	    CE_KnownImm (L[1])                               &&
@@ -589,9 +591,15 @@ static unsigned OptAdd1 (CodeSeg* S)
 
 	    CodeEntry* X;
 	    CodeLabel* Label;
+	    char Buf [16];
 
 	    /* Remove the call to pushax */
 	    CS_DelEntry (S, I);
+
+	    /* Correct the stack offset (needed since pushax was removed) */
+	    L[0]->Num -= 2;
+	    xsprintf (Buf, sizeof (Buf), "$%02lX", L[0]->Num);
+	    CE_SetArg (L[0], Buf);
 
 	    /* Add the clc . */
 	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[3]->LI);

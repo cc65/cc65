@@ -27,7 +27,8 @@ SGML  =	apple2.sgml	\
 	intro.sgml	\
 	ld65.sgml   	\
 	library.sgml    \
-        plus4.sgml
+        plus4.sgml      \
+        vic20.sgml
 
 TXT   =	$(SGML:.sgml=.txt)
 HTML  = $(SGML:.sgml=.html)

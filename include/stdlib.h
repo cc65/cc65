@@ -57,7 +57,8 @@ void* __fastcall__ malloc (size_t size);
 void* __fastcall__ calloc (size_t count, size_t size);
 void* __fastcall__ realloc (void* block, size_t size);
 void __fastcall__ free (void* block);
-void __fastcall__ _hadd (void* mem, size_t size);	/* Non-standard */
+/* Non standard functions */
+void __fastcall__ _heapadd (void* mem, size_t size);	
 
 /* Random numbers */
 #define	RAND_MAX   	0x7FFF
@@ -75,7 +76,7 @@ int __fastcall__ atexit (void (*exitfunc) (void));
 void* bsearch (const void* key, const void* base, size_t n,
 	       size_t size, int (*cmp) (const void*, const void*));
 div_t __fastcall__ div (int numer, int denom);
-void __fastcall__ exit (int ret);                            
+void __fastcall__ exit (int ret);
 char* __fastcall__ getenv (const char* name);
 void qsort (void* base, size_t count, size_t size,
 	    int (*compare) (const void*, const void*));

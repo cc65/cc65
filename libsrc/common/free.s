@@ -61,7 +61,7 @@
 
 	.importzp     	ptr1, ptr2, ptr3, ptr4
 	.import		__hptr, __hfirst, __hlast, __hend
-	.export		_free, hadd
+	.export		_free, heapadd
 
 	.macpack	generic
 
@@ -107,9 +107,9 @@ _free: 	sta    	ptr2
 	lda	ptr2+1
 	adc	ptr1+1
 	cpy	__hptr
-	bne	hadd			; Add to free list
+	bne	heapadd			; Add to free list
 	cmp	__hptr+1
-       	bne    	hadd
+       	bne    	heapadd
 
 ; The pointer is located at the heap top. Lower the heap top pointer to
 ; release the block.
@@ -278,7 +278,8 @@ _free: 	sta    	ptr2
 
 ; Check if the free list is empty, storing _hfirst into ptr3 for later
 
-hadd:	lda    	__hfirst
+heapadd:
+	lda    	__hfirst
 	sta	ptr3
 	lda    	__hfirst+1
   	sta	ptr3+1
@@ -287,7 +288,7 @@ hadd:	lda    	__hfirst
 
 ; The free list is empty, so this is the first and only block. A contains
 ; zero if we come here.
-		       
+
 	ldy	#next-1
 @L2:	iny   	       		; f->next = f->prev = 0;
     	sta   	(ptr2),y

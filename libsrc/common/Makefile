@@ -52,8 +52,8 @@ C_OBJS =	_afailed.o	\
 S_OBJS = 	_fdesc.o 	\
 	 	_file.o  	\
 		_fopen.o	\
-	 	_hadd.o	 	\
 	 	_heap.o	 	\
+       	       	_heapadd.o 	\
 	 	_oserror.o	\
 		_printf.o	\
 		_swap.o		\

@@ -3,14 +3,14 @@
 ;
 ; Add a block to the heap free list
 ;
-; void __fastcall__ _hadd (void* mem, size_t size);
+; void __fastcall__ _heapadd (void* mem, size_t size);
 ;
 ;
 
 	.importzp    	ptr1, ptr2
 	.import	       	popax
-	.import		hadd
-       	.export	     	_hadd
+	.import		heapadd
+       	.export	     	_heapadd
 
        	.macpack	generic
 
@@ -25,7 +25,8 @@ min_size	= 6
 
 ; Code
 
-_hadd:	sta	ptr1	    	; Store size in ptr1
+_heapadd:
+	sta	ptr1	    	; Store size in ptr1
 	stx	ptr1+1
 	jsr	popax		; Get the block pointer
        	sta    	ptr2
@@ -53,7 +54,7 @@ _hadd:	sta	ptr1	    	; Store size in ptr1
 
 ; Call the internal function since variables are now setup correctly
 
-	jmp	hadd
+	jmp	heapadd
 
 
 

@@ -62,7 +62,7 @@ static int doif (void)
     NextToken ();
 
     /* Generate a jump label and parse the condition */
-    flab1 = GetLabel ();
+    flab1 = GetLocalLabel ();
     test (flab1, 0);
 
     /* Parse the if body */
@@ -87,7 +87,7 @@ static int doif (void)
      	 * clause, since the jump is never reached.
      	 */
      	if (!gotbreak) {
-     	    flab2 = GetLabel ();
+     	    flab2 = GetLocalLabel ();
      	    g_jump (flab2);
      	} else {
      	    /* Mark the label as unused */
@@ -115,8 +115,8 @@ static void dowhile (char wtype)
     int lab;
 
     NextToken ();
-    loop = GetLabel ();
-    lab = GetLabel ();
+    loop = GetLocalLabel ();
+    lab = GetLocalLabel ();
     AddLoop (oursp, loop, lab, 0, 0);
     g_defloclabel (loop);
     if (wtype == 'w') {
@@ -269,7 +269,7 @@ static void cascadeswitch (struct expent* eval)
 
 
     /* Create a loop so we may break out, init labels */
-    ExitLab = GetLabel ();
+    ExitLab = GetLocalLabel ();
     AddLoop (oursp, 0, ExitLab, 0, 0);
 
     /* Setup some variables needed in the loop  below */
@@ -290,7 +290,7 @@ static void cascadeswitch (struct expent* eval)
 	    if (!HaveBreak) {
 		/* Define a label for the code */
 		if (CodeLab == 0) {
-		    CodeLab = GetLabel ();
+		    CodeLab = GetLocalLabel ();
 		}
 		g_jump (CodeLab);
 	    }
@@ -363,13 +363,13 @@ static void cascadeswitch (struct expent* eval)
 		    if (curtok == TOK_CASE) {
 			/* Create a code label if needed */
 		    	if (CodeLab == 0) {
-			    CodeLab = GetLabel ();
+			    CodeLab = GetLocalLabel ();
 			}
 			g_falsejump (CF_NONE, CodeLab);
 		    } else if (curtok != TOK_DEFAULT) {
 		  	/* No case follows, jump to next selector */
 		  	if (NextLab == 0) {
-		  	    NextLab = GetLabel ();
+		  	    NextLab = GetLocalLabel ();
 		  	}
 		  	g_truejump (CF_NONE, NextLab);
 		    }
@@ -385,7 +385,7 @@ static void cascadeswitch (struct expent* eval)
 		    /* Handle the pathologic case: DEFAULT followed by CASE */
 		    if (curtok == TOK_CASE) {
 		  	if (CodeLab == 0) {
-		  	    CodeLab = GetLabel ();
+		  	    CodeLab = GetLocalLabel ();
 		  	}
 		  	g_jump (CodeLab);
 		    }
@@ -460,19 +460,19 @@ static void tableswitch (struct expent* eval)
     HaveBreak = 0;  		/* Keep gcc silent */
     HaveDefault = 0;		/* No default case until now */
     dlabel = 0;	     	   	/* init */
-    lab = GetLabel ();		/* get exit */
+    lab = GetLocalLabel ();	/* get exit */
     p = swtab;
     AddLoop (oursp, 0, lab, 0, 0);
 
     /* Jump behind the code for the CASE labels */
-    g_jump (lcase = GetLabel ());
+    g_jump (lcase = GetLocalLabel ());
     lcount = 0;
     while (curtok != TOK_RCURLY) {
     	if (curtok == TOK_CASE || curtok == TOK_DEFAULT) {
 	    if (lcount >= CASE_MAX) {
        	       	Fatal ("Too many case labels");
      	    }
-    	    label = GetLabel ();
+    	    label = GetLocalLabel ();
     	    do {
     	    	if (curtok == TOK_CASE) {
        	    	    NextToken ();
@@ -581,10 +581,10 @@ static void dofor (void)
     struct expent lval3;
 
     NextToken ();
-    loop = GetLabel ();
-    lab = GetLabel ();
-    linc = GetLabel ();
-    lstat = GetLabel ();
+    loop = GetLocalLabel ();
+    lab = GetLocalLabel ();
+    linc = GetLocalLabel ();
+    lstat = GetLocalLabel ();
     AddLoop (oursp, loop, lab, linc, lstat);
     ConsumeLParen ();
     if (curtok != TOK_SEMI) {	/* exp1 */

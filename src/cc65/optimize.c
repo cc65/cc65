@@ -910,8 +910,8 @@ static void CreateLabelList (void)
 
     /* Get the next label number. This is also the current label count.
      * Make some room for more labels when optimizing code.
-     */
-    LabelCount = GetLabel () + 100;
+     */				   
+    LabelCount = GetLocalLabel () + 100;
 
     /* Allocate memory for the array and clear it */
     Labels = xmalloc (LabelCount * sizeof (Line*));

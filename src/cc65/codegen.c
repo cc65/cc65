@@ -581,7 +581,7 @@ void g_save_regvars (int RegOffs, unsigned Bytes)
     } else {
 
      	/* More than two bytes - loop */
-     	unsigned Label = GetLabel ();
+     	unsigned Label = GetLocalLabel ();
      	g_space (Bytes);
      	ldyconst (Bytes - 1);
      	ldxconst (Bytes);
@@ -626,7 +626,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
     } else {
 
      	/* More than two bytes - loop */
-     	unsigned Label = GetLabel ();
+     	unsigned Label = GetLocalLabel ();
      	ldyconst (StackOffs+Bytes-1);
      	ldxconst (Bytes);
      	g_defloclabel (Label);
@@ -1693,7 +1693,7 @@ void g_addeqstatic (unsigned flags, unsigned long label, unsigned offs,
        	case CF_INT:
        	    if (flags & CF_CONST) {
      		if (val == 1) {
-     		    label = GetLabel ();
+     		    label = GetLocalLabel ();
      		    AddCodeLine ("\tinc\t%s", lbuf);
      		    AddCodeLine ("\tbne\tL%04X", (int)label);
      		    AddCodeLine ("\tinc\t%s+1", lbuf);
@@ -1706,7 +1706,7 @@ void g_addeqstatic (unsigned flags, unsigned long label, unsigned offs,
      		    AddCodeLine ("\tadc\t%s", lbuf);
      		    AddCodeLine ("\tsta\t%s", lbuf);
      		    if (val < 0x100) {
-     		       	label = GetLabel ();
+     		       	label = GetLocalLabel ();
      		       	AddCodeLine ("\tbcc\tL%04X", (int)label);
      		       	AddCodeLine ("\tinc\t%s+1", lbuf);
        		       	g_defloclabel (label);
@@ -1954,7 +1954,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, unsigned offs,
 	  	AddCodeLine ("\tsbc\t#$%02X", (unsigned char)val);
 	  	AddCodeLine ("\tsta\t%s", lbuf);
 	   	if (val < 0x100) {
-	  	    label = GetLabel ();
+	  	    label = GetLocalLabel ();
 	  	    AddCodeLine ("\tbcs\tL%04X", (unsigned)label);
 		    AddCodeLine ("\tdec\t%s+1", lbuf);
 		    g_defloclabel (label);
@@ -3927,7 +3927,7 @@ void g_strlen (unsigned flags, unsigned long val, unsigned offs)
 /* Inline the strlen() function */
 {
     /* We need a label in both cases */
-    unsigned label = GetLabel ();
+    unsigned label = GetLocalLabel ();
 
     /* Two different encodings */
     if (flags & CF_CONST) {

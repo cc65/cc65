@@ -229,7 +229,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		g_usebss ();
 
 		/* Define the variable label */
-		SymData = GetLabel ();
+		SymData = GetLocalLabel ();
 		g_defloclabel (SymData);
 
 		/* Reserve space for the data */
@@ -279,7 +279,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		}
 
 	      	/* Define the variable label */
-	      	SymData = GetLabel ();
+	      	SymData = GetLocalLabel ();
 	      	g_defloclabel (SymData);
 
 	      	/* Skip the '=' */
@@ -297,7 +297,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		g_usebss ();
 
 		/* Define the variable label */
-		SymData = GetLabel ();
+		SymData = GetLocalLabel ();
 		g_defloclabel (SymData);
 
 		/* Reserve space for the data */

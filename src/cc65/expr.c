@@ -675,11 +675,11 @@ static unsigned FunctionParamList (FuncDesc* Func)
     }
 
     /* The function returns the size of all parameters pushed onto the stack.
-     * However, if there are parameters missing (which is an error and was 
+     * However, if there are parameters missing (which is an error and was
      * flagged by the compiler) AND a stack frame was preallocated above,
      * we would loose track of the stackpointer and generate an internal error
      * later. So we correct the value by the parameters that should have been
-     * pushed to avoid an internal compiler error. Since an error was 
+     * pushed to avoid an internal compiler error. Since an error was
      * generated before, no code will be output anyway.
      */
     return ParamSize + FrameSize;
@@ -2397,7 +2397,7 @@ static int hieAnd (struct expent* lval, unsigned TrueLab, int* BoolOp)
        	*BoolOp = 1;
 
        	/* Get a label that we will use for false expressions */
-       	lab = GetLabel ();
+       	lab = GetLocalLabel ();
 
        	/* If the expr hasn't set condition codes, set the force-test flag */
        	if ((lval->e_test & E_CC) == 0) {
@@ -2456,7 +2456,7 @@ static int hieOr (struct expent *lval)
     unsigned DoneLab;
 
     /* Get a label */
-    TrueLab = GetLabel ();
+    TrueLab = GetLocalLabel ();
 
     /* Call the next level parser */
     k = hieAnd (lval, TrueLab, &BoolOp);
@@ -2516,7 +2516,7 @@ static int hieOr (struct expent *lval)
 
     /* If we really had boolean ops, generate the end sequence */
     if (BoolOp) {
-    	DoneLab = GetLabel ();
+    	DoneLab = GetLocalLabel ();
     	g_getimmed (CF_INT | CF_CONST, 0, 0);	/* Load FALSE */
        	g_falsejump (CF_NONE, DoneLab);
     	g_defloclabel (TrueLab);
@@ -2552,12 +2552,12 @@ static int hieQuest (struct expent *lval)
     	    lval->e_test |= E_FORCETEST;
     	}
     	exprhs (CF_NONE, k, lval);
-    	labf = GetLabel ();
+    	labf = GetLocalLabel ();
     	g_falsejump (CF_NONE, labf);
 
     	/* Parse second and third expression */
     	expression1 (&lval2);
-    	labt = GetLabel ();
+    	labt = GetLocalLabel ();
     	ConsumeColon ();
     	g_jump (labt);
     	g_defloclabel (labf);
@@ -2587,7 +2587,7 @@ static int hieQuest (struct expent *lval)
 	    /* Setup a new label so that the expr3 code will jump around
 	     * the type cast code for expr2.
 	     */
-       	    labf = GetLabel ();	  	/* Get new label */
+       	    labf = GetLocalLabel (); 	/* Get new label */
 	    Mark1 = GetCodePos ();	/* Remember current position */
 	    g_jump (labf);	    	/* Jump around code */
 

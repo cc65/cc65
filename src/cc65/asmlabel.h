@@ -44,8 +44,14 @@
 
 
 
-unsigned GetLabel (void);
+unsigned GetLocalLabel (void);
 /* Get an unused assembler label. Will never return zero. */
+
+const char* LocalLabelName (unsigned L);
+/* Make a label name from the given label number. The label name will be
+ * created in static storage and overwritten when calling the function
+ * again.
+ */
 
 
 

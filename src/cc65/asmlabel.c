@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,22 +33,38 @@
 
 
 
+#include <stdio.h>
+
+/* cc65 */
 #include "asmlabel.h"
 
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*	  			     Code				     */
 /*****************************************************************************/
 
 
 
-unsigned GetLabel (void)
+unsigned GetLocalLabel (void)
 /* Get an unused label. Will never return zero. */
 {
     /* Number to generate unique labels */
     static unsigned NextLabel = 0;
     return ++NextLabel;
+}
+
+
+
+const char* LocalLabelName (unsigned L)
+/* Make a label name from the given label number. The label name will be
+ * created in static storage and overwritten when calling the function
+ * again.
+ */
+{		 
+    static char Buf[64];
+    sprintf (Buf, "L%04X", L);
+    return Buf;
 }
 
 

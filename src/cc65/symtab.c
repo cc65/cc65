@@ -618,7 +618,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
      	Entry = NewSymEntry (Name, SC_LABEL | Flags);
 
      	/* Set a new label number */
-     	Entry->V.Label = GetLabel ();
+     	Entry->V.Label = GetLocalLabel ();
 
      	/* Add the entry to the label table */
      	AddSymEntry (LabelTab, Entry);

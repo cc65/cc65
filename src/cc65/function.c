@@ -91,7 +91,7 @@ static Function* NewFunction (struct SymEntry* Sym)
     F->ReturnType = Sym->Type + 1 + DECODE_SIZE;
     F->Desc   	  = (FuncDesc*) DecodePtr (Sym->Type + 1);
     F->Reserved	  = 0;
-    F->RetLab	  = GetLabel ();
+    F->RetLab	  = GetLocalLabel ();
     F->TopLevelSP = 0;
 
     /* Return the new structure */

@@ -72,7 +72,7 @@ void InitLiteralPool (void)
 /* Initialize the literal pool */
 {
     /* Get the pool label */
-    LiteralPoolLabel = GetLabel ();
+    LiteralPoolLabel = GetLocalLabel ();
 }
 
 

@@ -1,7 +1,6 @@
 /*
   GEOS structs
 
-  ported to small C on 25-27.10.1999
   by Maciej 'YTM/Elysium' Witkowiak
 */
 
@@ -11,7 +10,7 @@
    e.g. if you have menu defined as TopMenu and you want to change the number of
    menu items use:
     ((struct menu*)&TopMenu)->number=newNumber;
-   This will translate into single lda/sta pair
+   This will be translated into single lda/sta pair
 */
 
 #ifndef _GSTRUCT_H

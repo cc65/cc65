@@ -2,14 +2,13 @@
   GEOS dialog box functions
 
   by Maciej 'YTM/Elysium' Witkowiak
-  26.12.1999, 10.03.2000, 17.8.2003
 */
 
 #ifndef	_GDLGBOX_H
 #define _GDLGBOX_H
 
 char __fastcall__ DoDlgBox(const char *dboxstring);
-char __fastcall__ RstrFrmDialogue(void);
+char RstrFrmDialogue(void);
 
 /* These are custom, predefined dialog boxes, I'm sure you'll find them usable
    Most of them show 2 lines of text 						*/
@@ -109,4 +108,3 @@ typedef void dlgBoxStr;
 #define	OFF_DB_1STCMD	7
 
 #endif
-		  

@@ -1,7 +1,6 @@
 /*
   GEOS filesystem functions
 
-  ported to small C on 25.12.1999
   by Maciej 'YTM/Elysium' Witkowiak
 */
 
@@ -12,8 +11,8 @@
 #include <geos/gstruct.h>
 #endif
 
-struct filehandle *__fastcall__ Get1stDirEntry(void);
-struct filehandle *__fastcall__ GetNxtDirEntry(void);
+struct filehandle *Get1stDirEntry(void);
+struct filehandle *GetNxtDirEntry(void);
 
 char __fastcall__ FindFTypes(char *buffer, char ftype, char fmaxnum, const char *classtxt);
 
@@ -26,22 +25,22 @@ char __fastcall__ FreeFile(struct tr_se myTable[]);
 char __fastcall__ DeleteFile(const char *fname);
 char __fastcall__ RenameFile(const char *source, const char *target);
 
-char __fastcall__ ReadByte(void);
+char ReadByte(void);
 
 char __fastcall__ FollowChain(struct tr_se *startTrSe, char *buffer);
 char __fastcall__ GetFHdrInfo(struct filehandle *myFile);
 
 char __fastcall__ OpenRecordFile(const char *fname);
-char __fastcall__ CloseRecordFile(void);
-char __fastcall__ NextRecord(void);
-char __fastcall__ PreviousRecord(void);
+char CloseRecordFile(void);
+char NextRecord(void);
+char PreviousRecord(void);
 char __fastcall__ PointRecord(char);
-char __fastcall__ DeleteRecord(void);
-char __fastcall__ InsertRecord(void);
-char __fastcall__ AppendRecord(void);
+char DeleteRecord(void);
+char InsertRecord(void);
+char AppendRecord(void);
 char __fastcall__ ReadRecord(char *buffer, unsigned flength);
 char __fastcall__ WriteRecord(const char *buffer, unsigned flength);
-char __fastcall__ UpdateRecordFile(void);
+char UpdateRecordFile(void);
 
 /* GEOS filetypes */
 #define	NOT_GEOS	0
@@ -72,7 +71,7 @@ char __fastcall__ UpdateRecordFile(void);
 #define	REL		4
 #define	CBM		5
 /* directory offsets */
-/* offsets in dir entry */
+/* offsets in dir entry i.e. index dirEntryBuf with these */
 #define	FRST_FILE_ENTRY	2
 #define	OFF_CFILE_TYPE	0
 #define	OFF_DE_TR_SC	1
@@ -83,7 +82,7 @@ char __fastcall__ UpdateRecordFile(void);
 #define	OFF_YEAR	23
 #define	OFF_SIZE	28
 #define	OFF_NXT_FILE	32
-/* offsets in file header */
+/* offsets in file header i.e. index fileHeader with these */
 #define	O_GHIC_WIDTH	2
 #define	O_GHIC_HEIGHT	3
 #define	O_GHIC_PIC	4
@@ -98,6 +97,6 @@ char __fastcall__ UpdateRecordFile(void);
 #define	O_GH_AUTHOR	97
 #define	O_GHP_DISK	97
 #define	O_GHP_FNAME	117
-#define	O_GHINFO_TXT	0xa0
+#define	O_GHINFO_TXT	160
 
 #endif

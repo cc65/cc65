@@ -1,8 +1,7 @@
 /*
   GEOS menu and icon functions
 
-  ported to small C on 27.10.1999
-  by Maciej 'YTM/Alliance' Witkowiak
+  by Maciej 'YTM/Elysium' Witkowiak
 */
 
 #ifndef	_GMENU_H
@@ -13,11 +12,11 @@
 #endif
 
 void __fastcall__ DoMenu(struct menu *myMenu);
-void __fastcall__ ReDoMenu(void);
-void __fastcall__ RecoverMenu(void);
-void __fastcall__ RecoverAllMenus(void);
-void __fastcall__ DoPreviousMenu(void);
-void __fastcall__ GotoFirstMenu(void);
+void ReDoMenu(void);
+void RecoverMenu(void);
+void RecoverAllMenus(void);
+void DoPreviousMenu(void);
+void GotoFirstMenu(void);
 
 void __fastcall__ DoIcons(struct icontab *myIconTab);
 

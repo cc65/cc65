@@ -1,7 +1,6 @@
 /*
   GEOS processes (~multitasking) functions
 
-  ported to small C on 27.10.1999
   by Maciej 'YTM/Elysium' Witkowiak
 */
 

@@ -1,7 +1,6 @@
 /*
   GEOS functions from disk driver
 
-  ported to small C on 21.12.1999
   by Maciej 'YTM/Elysium' Witkowiak
 */
 
@@ -21,11 +20,11 @@ char __fastcall__ ReadBlock(struct tr_se *myTrSe, char *buffer);
 char __fastcall__ WriteBlock(struct tr_se *myTrSe, const char *buffer);
 char __fastcall__ VerWriteBlock(struct tr_se *myTrSe, const char *buffer);
 
-unsigned __fastcall__ CalcBlksFree(void);
-char __fastcall__ ChkDkGEOS(void);
-char __fastcall__ SetGEOSDisk(void);
-char __fastcall__ NewDisk(void);
-char __fastcall__ OpenDisk(void);
+unsigned CalcBlksFree(void);
+char ChkDkGEOS(void);
+char SetGEOSDisk(void);
+char NewDisk(void);
+char OpenDisk(void);
 
 char __fastcall__ FindBAMBit(struct tr_se *myTrSe);
 char __fastcall__ BlkAlloc(struct tr_se output[], unsigned length);
@@ -35,23 +34,23 @@ char __fastcall__ FreeBlock(struct tr_se *myTrSe);
 struct tr_se __fastcall__ SetNextFree(struct tr_se *myTrSe);
 // above needs (unsigned) casts on both sides of '='
 
-char __fastcall__ GetDirHead(void);
-char __fastcall__ PutDirHead(void);
+char GetDirHead(void);
+char PutDirHead(void);
 void __fastcall__ GetPtrCurDkNm(char *name);
 
-void __fastcall__ EnterTurbo(void);
-void __fastcall__ ExitTurbo(void);
-void __fastcall__ PurgeTurbo(void);
+void EnterTurbo(void);
+void ExitTurbo(void);
+void PurgeTurbo(void);
 
 char __fastcall__ ChangeDiskDevice(char newdev);
 
-/* disk header offsets	*/
+/* disk header offsets i.e. index curDirHead with these	*/
 #define	OFF_TO_BAM	4
 #define	OFF_DISK_NAME	144
 #define	OFF_GS_DTYPE	189
 #define	OFF_OP_TR_SC	171
 #define	OFF_GS_ID	173
-/* disk errors */
+/* disk errors reported in oserrno */
 #define	ANY_FAULT	0xf0
 #define G_EOF		0
 #define	NO_BLOCKS	1

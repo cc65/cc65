@@ -1,29 +1,28 @@
 /*
   GEOS system functions
 
-  ported to small C on 27.10.1999
   by Maciej 'YTM/Elysium' Witkowiak
 */
 
 #ifndef	_GSYS_H
 #define _GSYS_H
 
-void __fastcall__ FirstInit(void);
-void __fastcall__ InitForIO(void);
-void __fastcall__ DoneWithIO(void);
-void __fastcall__ MainLoop(void);
-void __fastcall__ EnterDeskTop(void);
-void __fastcall__ ToBASIC(void);
-void __fastcall__ Panic(void);
+void FirstInit(void);
+void InitForIO(void);
+void DoneWithIO(void);
+void MainLoop(void);
+void EnterDeskTop(void);
+void ToBASIC(void);
+void Panic(void);
 
 void __fastcall__ CallRoutine(void *myRoutine);
 
-unsigned __fastcall__ GetSerialNumber(void);
-char __fastcall__ GetRandom(void);
+unsigned GetSerialNumber(void);
+char GetRandom(void);
 
 void __fastcall__ SetDevice(char newdev);
 
-char __fastcall__ get_ostype(void);
+char get_ostype(void);
 
 /* possible return values of get_ostype, machine and version flags will
    be combined with OR */
@@ -36,7 +35,7 @@ char __fastcall__ get_ostype(void);
 #define GEOS_V20	0x20
 #define WHEELS		0x40	/* only Wheels? */
 
-char __fastcall__ get_tv(void);
+char get_tv(void);
 
 /* possible return values of get_tv, these flags will be combined
    note that columns state can be changed during runtime and get_tv

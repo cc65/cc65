@@ -1,9 +1,7 @@
 /*
   GEOS memory and string functions
 
-  ported to small C on 27.10.1999
   by Maciej 'YTM/Elysium' Witkowiak
-  04.04.2003 - updates
 */
 
 #ifndef	_GMEMORY_H

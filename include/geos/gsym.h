@@ -1,8 +1,7 @@
 /*
-  GEOS constants reassembled 4-2-99
-  ported to small C 26.8.99, 25-26.10.99
-  Maciej 'YTM/Elysium' Witkowiak
-  ytm@elysium.pl
+  GEOS system addresses and locations
+
+  reassembled by Maciej 'YTM/Elysium' Witkowiak
 */
 
 #ifndef _GSYM_H

@@ -1,7 +1,6 @@
 /*
-  GEOS constants, 4-2-99, 18-3-99
+  GEOS constants
 
-  small C version: 25-27.10.99
   reassembled by Maciej 'YTM/Elysium' Witkowiak
 */
 

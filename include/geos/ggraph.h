@@ -1,9 +1,7 @@
 /*
   GEOS graphic (non icon/menu/sprite) functions
 
-  ported to small C on 29.10.1999
   by Maciej 'YTM/Elysium' Witkowiak
-  10,11.03.2000 - updates
 */
 
 #ifndef	_GGRAPH_H
@@ -24,11 +22,11 @@ void __fastcall__ RecoverLine(char y, unsigned xstart, unsigned xend);
 void __fastcall__ VerticalLine(char pattern, char ystart, char yend, unsigned x);
 
 void __fastcall__ InitDrawWindow(struct window *myRectangle);
-void __fastcall__ Rectangle(void);
+void Rectangle(void);
 void __fastcall__ FrameRectangle(char pattern);
-void __fastcall__ InvertRectangle(void);
-void __fastcall__ ImprintRectangle(void);
-void __fastcall__ RecoverRectangle(void);
+void InvertRectangle(void);
+void ImprintRectangle(void);
+void RecoverRectangle(void);
 
 void __fastcall__ DrawLine(char mode, struct window *topBotCoords);
 
@@ -41,7 +39,7 @@ void __fastcall__ PutDecimal(char style, unsigned value, char y, unsigned x);
 
 char __fastcall__ GetCharWidth(char character);
 void __fastcall__ LoadCharSet(struct fontdesc *myFont);
-void __fastcall__ UseSystemFont(void);
+void UseSystemFont(void);
 
 void __fastcall__ BitmapUp(struct iconpic *myIcon);
 void __fastcall__ BitmapClip(char skipl, char skipr, unsigned skiptop,
@@ -87,7 +85,7 @@ void __fastcall__ GraphicsString(char *myGfxString);
 #define COLOR_LIGHTGREEN     	0x0D
 #define COLOR_LIGHTBLUE      	0x0E
 #define COLOR_GRAY3  	       	0x0F
-/* VIC memory banks */
+/* VIC memory banks - lowest 2 bits of cia2base+0 */
 #define	GRBANK0		3
 #define	GRBANK1		2
 #define	GRBANK2		1
@@ -160,7 +158,7 @@ void __fastcall__ GraphicsString(char *myGfxString);
 #define	ST_WR_BACK	0x40
 #define	ST_WR_FORE	0x80
 /* PutDecimal parameters */
-/* leading 0s? */
+/* leading zeros? */
 #define	SET_NOSURPRESS	0
 #define	SET_SURPRESS	0x40
 /* justification */

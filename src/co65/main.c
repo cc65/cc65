@@ -322,13 +322,16 @@ static void Convert (void)
     if (D->Header.mode != O65_MODE_CC65) {
         Error ("Cannot convert o65 files of this type");
     }
-
-    printf ("Textsize:   %lu\n", D->Header.tlen);
-    printf ("Datasize:   %lu\n", D->Header.dlen);
-    printf ("Imports:    %u\n", CollCount (&D->Imports));
-    printf ("Exports:    %u\n", CollCount (&D->Exports));
-    printf ("Textrelocs: %u\n", CollCount (&D->TextReloc));
-    printf ("Datarelocs: %u\n", CollCount (&D->DataReloc));
+                     
+    /* Output statistics */
+    Print (stdout, 1, "Size of text segment:               %5lu\n", D->Header.tlen);
+    Print (stdout, 1, "Size of data segment:               %5lu\n", D->Header.dlen);
+    Print (stdout, 1, "Size of bss segment:                %5lu\n", D->Header.blen);
+    Print (stdout, 1, "Size of zeropage segment:           %5lu\n", D->Header.zlen);
+    Print (stdout, 1, "Number of imports:                  %5u\n", CollCount (&D->Imports));
+    Print (stdout, 1, "Number of exports:                  %5u\n", CollCount (&D->Exports));
+    Print (stdout, 1, "Number of text segment relocations: %5u\n", CollCount (&D->TextReloc));
+    Print (stdout, 1, "Number of data segment relocations: %5u\n", CollCount (&D->DataReloc));
 
     /* Open the output file */
     F = fopen (OutFilename, "wb");

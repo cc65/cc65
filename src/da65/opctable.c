@@ -49,7 +49,7 @@
 const OpcDesc OpcTable[256] = {
     {   /* $00 */
     	"brk",
-    	2,
+    	1,
     	0,
     	CPU_ALL,
 	OH_Implicit

@@ -96,7 +96,7 @@ int blocks,rest;
 			if (bytes==0)
 				AbEnd("couldn't read %s:%s\n",argv[i],strerror(errno));
 			blocks = bytes / 254;
-			rest = bytes % 254 + 2;
+			rest = bytes % 254 + 1;
 			if (rest>255) rest=255;
 			vlirtabt[j]=blocks+1; vlirtabs[j]=rest;
 			fwrite(buffer,1,(blocks+1)*254,outCVT);

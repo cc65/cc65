@@ -63,6 +63,7 @@ S_OBJS = 	_cwd.o          \
 		_fopen.o	\
 	 	_heap.o	 	\
        	       	_heapadd.o 	\
+                _heapblocksize.o\
                 _heapmaxavail.o \
                 _heapmemavail.o \
 	 	_oserror.o	\

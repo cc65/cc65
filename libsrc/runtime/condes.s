@@ -12,14 +12,10 @@
 ; destructor tables, they must be called from the platform specific startup
 ; code.
 
-;
-; The function does also export jmpvec as general purpose jump vector that
-; lies in the data segment so it's address may be patched at runtime.
-;
 
        	.export	initlib, donelib, condes
-       	.export	jmpvec
 
+        .import jmpvec
        	.import	__CONSTRUCTOR_TABLE__, __CONSTRUCTOR_COUNT__
 	.import	__DESTRUCTOR_TABLE__, __DESTRUCTOR_COUNT__
 
@@ -97,7 +93,5 @@ index:	.byte	0
 
 getbyt:	lda	$FFFF,y
 	rts
-
-jmpvec:	jmp	$FFFF
 
 

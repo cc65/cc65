@@ -35,8 +35,11 @@
 
 #include <string.h>
 
-#include "../common/xmalloc.h"
-
+/* common */
+#include "check.h"
+#include "xmalloc.h"
+		  
+/* ar65 */
 #include "error.h"
 #include "objdata.h"
 

@@ -264,7 +264,7 @@ function.
 <sect1><tt/o65.h/<label id="o65.h"><p>
 
 The <tt/o65.h/ header file contains structure and constant definitions that
-may be used when dealing with files in <htmlurl 
+may be used when dealing with files in <htmlurl
 url="http://www.6502.org/users/andre/o65/fileformat.html" name="o65 format">.
 It does not declare any functions.
 
@@ -3491,7 +3491,7 @@ the end of s1.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
-<item>If copying takes place between objects that overlap, the behavior
+<item>If copying takes place between objects that overlap, the behaviour
 is undefined.
 </itemize>
 <tag/Availability/ISO 9899
@@ -3595,7 +3595,7 @@ be used in presence of a prototype.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
-<item>If copying takes place between objects that overlap, the behavior
+<item>If copying takes place between objects that overlap, the behaviour
 is undefined.
 </itemize>
 <tag/Availability/ISO 9899
@@ -3783,7 +3783,7 @@ character is appended to the result, even if not all of s2 is appended to s1.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
-<item>If copying takes place between objects that overlap, the behavior
+<item>If copying takes place between objects that overlap, the behaviour
 is undefined.
 </itemize>
 <tag/Availability/ISO 9899
@@ -3839,7 +3839,7 @@ written. The function will always return <tt/s1/.
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype. If there is no null byte in the first <tt/n/
 bytes of the array pointed to by <tt/s2/, the result is not null-terminated.
-<item>If copying takes place between objects that overlap, the behavior is
+<item>If copying takes place between objects that overlap, the behaviour is
 undefined.
 </itemize>
 <tag/Availability/ISO 9899

@@ -43,7 +43,6 @@
 
 
 
-unsigned char Target		= TGT_NONE; /* Target system */
 unsigned char ANSI   	       	= 0;   	    /* Strict ANSI flag */
 unsigned char WriteableStrings	= 0;   	    /* Literal strings are r/w */
 unsigned char NoWarn		= 0;   	    /* Suppress warnings */

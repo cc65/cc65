@@ -37,10 +37,10 @@
 
 /* common */
 #include "check.h"
+#include "tgttrans.h"
 
 /* cc65 */
 #include "asmlabel.h"
-#include "ctrans.h"
 #include "codegen.h"
 #include "error.h"
 #include "global.h"
@@ -75,7 +75,7 @@ void TranslateLiteralPool (unsigned Offs)
  */
 {
     while (Offs < LiteralOffs) {
-     	LiteralPool[Offs] = ctrans (LiteralPool[Offs]);
+     	LiteralPool[Offs] = TgtTranslateChar (LiteralPool[Offs]);
 	++Offs;
     }
 }

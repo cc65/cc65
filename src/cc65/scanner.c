@@ -11,8 +11,11 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
+	  
+/* common */
+#include "tgttrans.h"
 
-#include "ctrans.h"
+/* cc65 */
 #include "datatype.h"
 #include "error.h"
 #include "function.h"
@@ -323,8 +326,12 @@ static void CharConst (void)
 
     /* Setup values and attributes */
     nxttok  = TOK_CCONST;
-    nxtval  = SignExtendChar (ctrans (C)); 	/* Translate into target charset */
-    nxttype = type_int;	       			/* Character constants have type int */
+
+    /* Translate into target charset */
+    nxtval  = SignExtendChar (TgtTranslateChar (C));
+
+    /* Character constants have type int */
+    nxttype = type_int;	       			
 }
 
 

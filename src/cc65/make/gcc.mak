@@ -19,7 +19,6 @@ OBJS =	anonname.o	\
 	codegen.o	\
 	compile.o	\
 	cpu.o		\
-	ctrans.o       	\
 	datatype.o	\
 	declare.o      	\
 	error.o	 	\

@@ -43,6 +43,7 @@
 #include "abend.h"
 #include "cmdline.h"
 #include "fname.h"
+#include "target.h"
 #include "version.h"
 #include "xmalloc.h"
 
@@ -58,29 +59,6 @@
 #include "optimize.h"
 #include "scanner.h"
 #include "segname.h"
-
-
-
-/*****************************************************************************/
-/*		  		     data				     */
-/*****************************************************************************/
-
-
-
-/* Names of the target systems sorted by target name */
-static const char* TargetNames [] = {
-    "none",
-    "atari",
-    "c64",
-    "c128",
-    "ace",
-    "plus4",
-    "cbm610",
-    "pet",
-    "nes",
-    "apple2",
-    "geos",
-};
 
 
 
@@ -144,35 +122,10 @@ static void cbmsys (const char* sys)
 
 
 
-static int MapSys (const char* Name)
-/* Map a target name to a system code. Return -1 in case of an error */
-{
-    unsigned I;
-
-    /* Check for a numeric target */
-    if (isdigit (*Name)) {
-	int Target = atoi (Name);
-	if (Target >= 0 && Target < TGT_COUNT) {
-	    return Target;
-	}
-    }
-
-    /* Check for a target string */
-    for (I = 0; I < TGT_COUNT; ++I) {
-	if (strcmp (TargetNames [I], Name) == 0) {
-	    return I;
-	}
-    }
-    /* Not found */
-    return -1;
-}
-
-
-
 static void SetSys (const char* Sys)
 /* Define a target system */
 {
-    switch (Target = MapSys (Sys)) {
+    switch (Target = FindTarget (Sys)) {
 
 	case TGT_NONE:
 	    break;
@@ -585,7 +538,7 @@ int main (int argc, char* argv[])
 	       			break;
 	       		    case 's':
 	       		       	InlineStdFuncs = 1;
-	       			break;
+	       	   		break;
 	       		}
 	       	    }
 	       	    break;
@@ -621,6 +574,11 @@ int main (int argc, char* argv[])
     /* Did we have a file spec on the command line? */
     if (InputFile == 0) {
 	AbEnd ("No input files");
+    }
+
+    /* If we did not have a target system given, use the "none" target */
+    if (Target == TGT_UNKNOWN) {
+	Target = TGT_NONE;
     }
 
     /* Open the input file */

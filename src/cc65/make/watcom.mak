@@ -74,7 +74,6 @@ OBJS =	anonname.obj	\
 	codegen.obj	\
 	compile.obj	\
 	cpu.obj	 	\
-	ctrans.obj	\
 	datatype.obj	\
 	declare.obj	\
 	error.obj	\
@@ -133,7 +132,6 @@ FILE asmline.obj
 FILE codegen.obj
 FILE compile.obj
 FILE cpu.obj
-FILE ctrans.obj
 FILE datatype.obj
 FILE declare.obj
 FILE error.obj

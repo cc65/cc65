@@ -44,23 +44,6 @@
 
 
 
-/* Supported systems */
-#define TGT_NONE	0
-#define TGT_ATARI	1
-#define TGT_C64		2
-#define TGT_C128	3
-#define TGT_ACE		4
-#define TGT_PLUS4	5
-#define TGT_CBM610	6
-#define TGT_PET		7
-#define TGT_NES		8
-#define TGT_APPLE2	9
-#define TGT_GEOS       10
-#define TGT_COUNT      11
-
-
-
-extern unsigned char	Target;			/* Target system */
 extern unsigned char	ANSI;			/* Strict ANSI flag */
 extern unsigned char	WriteableStrings;	/* Literal strings are r/w */
 extern unsigned char	NoWarn;			/* Suppress warnings */

@@ -52,14 +52,6 @@ enum {
     lfLabel	= lfUseLabel|lfGenLabel /* Generate and use a label */
 };
 
-/* Constants for the CPU type */
-enum {
-    cpu6502	= 0x01,
-    cpu65C02	= 0x02,
-    cpu65816	= 0x04,
-    cpuAll	= 0x07,
-};
-
 /* Forward/typedef for struct OpcDesc */
 typedef struct OpcDesc OpcDesc;
 

@@ -133,11 +133,13 @@ void DefLabel (const char* Name)
 void OneDataByte (void)
 /* Output a .byte line with the current code byte */
 {
+    unsigned char B = GetCodeByte ();
+
     if (Pass > 1) {
 	Indent (MIndent);
 	Output (".byte");
 	Indent (AIndent);
-	Output ("$%02X", GetCodeByte());
+	Output ("$%02X", B);
 	LineFeed ();
     }
 }
@@ -153,3 +155,4 @@ void SeparatorLine (void)
 
 
 
+			  

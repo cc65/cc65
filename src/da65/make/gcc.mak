@@ -10,14 +10,16 @@ CC=gcc
 LDFLAGS=
 
 OBJS = 	attrtab.o	\
-	code.o		\
-	cpu.o		\
-	error.o		\
-	global.o	\
+	code.o	 	\
+	config.o	\
+	cpu.o	 	\
+	error.o	 	\
+	global.o 	\
   	handler.o	\
-	main.o		\
+	main.o	 	\
   	opctable.o	\
-	output.o	
+	output.o 	\
+	scanner.o
 
 LIBS = $(COMMON)/common.a
 

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     cpu.h				     */
+/*				   config.h				     */
 /*                                                                           */
-/*			     CPU type definitions			     */
+/*		   Disassembler configuration file handling		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,43 +33,23 @@
 
 
 
-#ifndef CPU_H
-#define CPU_H
+#ifndef CONFIG_H
+#define CONFIG_H
 
 
 
 /*****************************************************************************/
-/*	     	    		     Data				     */
+/*     	       	       	       	     Code     				     */
 /*****************************************************************************/
 
 
 
-/* Supported CPUs */
-typedef enum CPUType {
-    CPU_6502	= 0x01,
-    CPU_65C02	= 0x02,
-    CPU_65816  	= 0x04,
-    CPU_ALL	= 0x07
-} CPUType;
-
-/* Current CPU */
-extern CPUType	CPU;
+void CfgRead (void);					 
+/* Read the configuration if a configuration file exists */
 
 
 
-/*****************************************************************************/
-/*				     Code				     */
-/*****************************************************************************/
-
-
-
-void SetCPU (CPUType NewCPU);
-/* Set a new CPU */
-
-
-
-/* End of cpu.h */
-
+/* End of config.h */
 #endif
 
 

@@ -134,7 +134,7 @@ void AddLabel (unsigned Addr, const char* Name)
     }
 
     /* Create a new label */
-    SymTab[Addr] = xstrdup (Name);	   
+    SymTab[Addr] = xstrdup (Name);
 }
 
 

@@ -48,11 +48,11 @@ const char* InFile     	      = 0;      /* Name of input file */
 const char* OutFile    	      = 0;      /* Name of output file */
 
 /* Default extensions */
-const char ObjExt[]    	      = ".o";  	/* Default object extension */
-const char ListExt[]   	      = ".lst"; /* Default listing extension */
+const char OutExt[]	      = ".dis";	/* Output file extension */
+const char CfgExt[]    	      = ".cfg";	/* Config file extension */
 
 /* Flags and other command line stuff */
-unsigned char Verbose	      = 2;	/* Verbosity of the output file */
+unsigned char Verbosity	      = 2;	/* Verbosity of the output file */
 
 /* Stuff needed by many routines */
 unsigned Pass		      = 0;	/* Disassembler pass */

@@ -49,11 +49,11 @@ extern const char*	InFile;		/* Name of input file */
 extern const char*	OutFile;	/* Name of output file */
 
 /* Default extensions */
-extern const char      	ObjExt[];      	/* Default object extension */
-extern const char	ListExt[]; 	/* Default listing extension */
+extern const char	OutExt[];	/* Output file extension */
+extern const char 	CfgExt[];	/* Config file extension */
 
 /* Flags and other command line stuff */
-extern unsigned char	Verbose;	/* Verbosity of the output file */
+extern unsigned char   	Verbosity;	/* Verbosity of the output file */
 
 /* Stuff needed by many routines */
 extern unsigned 	Pass;		/* Disassembler pass */

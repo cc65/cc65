@@ -48,10 +48,12 @@
 /* da65 */
 #include "attrtab.h"
 #include "code.h"
+#include "config.h"
 #include "cpu.h"
 #include "global.h"
 #include "opctable.h"
 #include "output.h"
+#include "scanner.h"
 
 
 
@@ -151,7 +153,7 @@ static void OptPageLength (const char* Opt, const char* Arg)
 static void OptVerbose (const char* Opt, const char* Arg)
 /* Increase verbosity */
 {
-    ++Verbose;
+    ++Verbosity;
 }
 
 
@@ -172,9 +174,6 @@ static void OneOpcode (unsigned RemainingBytes)
     /* Get the current PC */
     unsigned PC = GetPC ();
 
-    /* Get the attribute for the current address */
-    unsigned char Style = GetStyle (PC);
-
     /* Get the opcode from the current address */
     unsigned char OPC = PeekCodeByte ();
 
@@ -187,20 +186,42 @@ static void OneOpcode (unsigned RemainingBytes)
     	DefLabel (Label);
     }
 
-    /* Check if we have enough bytes remaining for the code at this address. */
-    if (D->Size > RemainingBytes) {
-	OneDataByte ();
-	return;
+    /* Check...
+     *   - ...if we have enough bytes remaining for the code at this address.
+     *   - ...if the current instruction is valid for the given CPU.
+     *   - ...if there is no label somewhere between the instruction bytes.
+     * If any of these conditions is true, switch to data mode.
+     */
+    if (GetStyle (PC) == atDefault) {
+	if (D->Size > RemainingBytes) {
+	    MarkAddr (PC, atIllegal);
+       	} else if ((D->CPU & CPU) != CPU) {
+	    MarkAddr (PC, atIllegal);
+	} else {
+	    unsigned I;
+	    for (I = 1; I < D->Size; ++I) {
+		if (HaveLabel (PC+I)) {
+     		    MarkAddr (PC, atIllegal);
+		    break;
+		}
+	    }
+	}
     }
 
-    /* Also check if there are any labels that point into this instruction.
-     * If so, disassemble one byte as data.
-     */
-    /* ### */
-
     /* Disassemble the line */
-    GetCodeByte ();
-    D->Handler (D);
+    switch (GetStyle (PC)) {
+
+	case atDefault:
+	case atCode:
+	    GetCodeByte ();
+	    D->Handler (D);
+	    break;
+
+	default:
+	    OneDataByte ();
+	    break;
+
+    }
 }
 
 
@@ -309,9 +330,17 @@ int main (int argc, char* argv [])
      	AbEnd ("No input file");
     }
 
+    /* Make the config file name from the input file if none was given */
+    if (!CfgAvail ()) {
+	CfgSetName (MakeFilename (InFile, CfgExt));
+    }
+
+    /* Try to read the configuration file */
+    CfgRead ();
+
     /* Make the output file name from the input file name if none was given */
     if (OutFile == 0) {
-	OutFile = MakeFilename (InFile, ".dis");
+	OutFile = MakeFilename (InFile, OutExt);
     }
 
     /* Load the input file */

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -139,6 +139,10 @@ static void SetSys (const char* Sys)
 
 	case TGT_NONE:
 	    break;
+
+        case TGT_MODULE:
+            AbEnd ("Cannot use `module' as a target for the compiler");
+            break;
 
 	case TGT_ATARI:
     	    DefineNumericMacro ("__ATARI__", 1);
@@ -705,7 +709,7 @@ int main (int argc, char* argv[])
 	       		  	break;
 	       		    case 's':
 	       		       	InlineStdFuncs = 1;
-	       	   	  	break;
+	       	    	  	break;
 	       		}
 	       	    }
 	       	    break;

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -298,7 +298,9 @@ static void OptTarget (const char* Opt attribute ((unused)), const char* Arg)
     /* Map the target name to a target id */
     Target = FindTarget (Arg);
     if (Target == TGT_UNKNOWN) {
-	AbEnd ("Invalid target name: `%s'", Arg);
+     	AbEnd ("Invalid target name: `%s'", Arg);
+    } else if (Target == TGT_MODULE) {
+        AbEnd ("Cannot use `module' as a target for the assembler");
     }
 }
 

@@ -77,7 +77,7 @@ static void Usage (void)
 int main (int argc, char* argv [])
 /* Assembler main program */
 {
-    int I;
+    unsigned I;
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "ar65");

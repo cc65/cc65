@@ -70,7 +70,8 @@ static const char*	LibName = 0;
 /* The library header */
 static LibHeader       	Header = {
     LIB_MAGIC,
-    LIB_VERSION
+    LIB_VERSION,
+    0, 0
 };
 
 

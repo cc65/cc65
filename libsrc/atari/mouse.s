@@ -1,6 +1,6 @@
 ;--------------------------------------------------------------------
 ; Atari 8-bit mouse routines -- 05/07/2000 Freddy Offenga
-; Some changes by Christian Groessler
+; Some changes by Christian Groessler, Ullrich von Bassewitz
 ;
 ; The following devices are supported:
 ; - Atari trak-ball
@@ -11,12 +11,13 @@
 ; drawn in player 0 during the vertical blank
 ;--------------------------------------------------------------------
 
-	.export	_mouse_init, _mouse_done, _mouse_box
-	.export _mouse_show, _mouse_hide, _mouse_move
-	.export _mouse_buttons
+	.export		_mouse_init, _mouse_done, _mouse_box
+	.export 	_mouse_show, _mouse_hide, _mouse_move
+	.export 	_mouse_buttons, _mouse_pos, _mouse_info
 	.constructor	initmouse,27
 
-	.import popa,popax
+	.import 	popa,popax
+	.importzp	ptr1
 
 	.include "atari.inc"
 
@@ -51,7 +52,7 @@ initmouse:
 	sta	APPMHI
 	stx	APPMHI+1
 	rts
-	
+
 
 ;--------------------------------------------------------------------
 ; Initialize mouse routines
@@ -184,8 +185,7 @@ _mouse_move:
 ; void mouse_show(void)
 
 _mouse_show:
-	lda	#1
-	sta	mouse_on
+	inc	mouse_on
 	rts
 
 ;--------------------------------------------------------------------
@@ -193,37 +193,80 @@ _mouse_show:
 ; void mouse_hide(void)
 
 _mouse_hide:
-	lda	#0
-	sta	mouse_on
-	rts
+	lda     mouse_on
+	beq	@L1
+	dec	mouse_on
+@L1:	rts
 
 ;--------------------------------------------------------------------
 ; Ask mouse button
 ; unsigned char mouse_buttons(void)
 
 _mouse_buttons:
-	ldx	port_nr
-	lda	STRIG0,x
-	bne	nobut
-;	lda	#14
+    	ldx	port_nr
+    	lda	STRIG0,x
+    	bne	nobut
+;   	lda	#14
 ;???	sta	COLOR1
-	ldx	#0
-	lda	#1
-	rts
+    	ldx	#0
+    	lda	#1
+    	rts
 nobut:	ldx	#0
-	txa
-	rts
+    	txa
+    	rts
+
+;--------------------------------------------------------------------
+; Get the mouse position
+; void mouse_pos (struct mouse_pos* pos);
+
+_mouse_pos:
+	sta	ptr1
+	stx	ptr1+1			; Store argument pointer
+	ldy	#0
+	lda	mousex			; X position
+	sta	(ptr1),y
+	lda	#0
+	iny
+	sta	(ptr1),y
+	lda	mousey			; Y position
+	iny
+	sta	(ptr1),y
+	lda	#0
+	iny
+	sta	(ptr1),y
+    	rts
+
+;--------------------------------------------------------------------
+; Get the mouse position and button information
+; void mouse_info (struct mouse_info* info);
+
+_mouse_info:
+
+; We're cheating here to keep the code smaller: The first fields of the
+; mouse_info struct are identical to the mouse_pos struct, so we will just
+; call _mouse_pos to initialize the struct pointer and fill the position
+; fields.
+
+        jsr	_mouse_pos
+
+; Fill in the button state
+
+	jsr     _mouse_buttons		; Will not touch ptr1
+	ldy	#4
+	sta	(ptr1),y
+
+      	rts
 
 ;--------------------------------------------------------------------
 ; Atari trak-ball check, A,Y = 4-bit port value
 
 trak_check:
-	eor	oldval
-	and	#%00001000
-	beq	horiz
+    	eor	oldval
+    	and	#%00001000
+    	beq	horiz
 
-	tya
-	and	#%00000100
+    	tya
+    	and	#%00000100
 	beq	mmup
 
 	inc	mousey
@@ -421,7 +464,7 @@ pminit:	lda	mouse_pm0
 	sta	mpatch1+2
 	sta	mpatch2+2
 	sta	mpatch3+2
-	
+
 	ldx	#0
 	txa
 mpatch1:

@@ -15,6 +15,11 @@
 	.export		_exit
 
 ; ------------------------------------------------------------------------
+; Create an empty GEOSZP segment to avoid linker warnings
+
+.segment	"GEOSZP", zeropage
+
+; ------------------------------------------------------------------------
 ; Create an empty LOWCODE segment to avoid linker warnings
 
 .segment        "LOWCODE"

@@ -16,7 +16,7 @@
 %.tgi:	%.o ../../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
-S_OBJS	= crt0.o oserror.o oserrlist.o randomize.o fio_module.o
+S_OBJS	= crt0.o geoszp.o oserror.o oserrlist.o randomize.o fio_module.o tgi_mode_table.o
 
 #--------------------------------------------------------------------------
 # Drivers
@@ -25,7 +25,7 @@ EMDS = geos-vdc.emd
 
 JOYS = geos-stdjoy.joy
 
-TGIS =
+TGIS = geos-tgi.tgi
 
 all: $(S_OBJS) $(EMDS) $(JOYS) $(TGIS)
 

@@ -10,6 +10,8 @@
 	.include 	"../inc/geossym.inc"
 
 	.export		xsize, ysize
+	.importzp	cursor_r, cursor_c
+	.import		_cursor
 	.constructor	initscrsize
 
 .code
@@ -23,7 +25,12 @@ L1:	lda	#40		; 40 columns (more or less)
 	sta	xsize
 	lda	#24		; something like that for Y size
 	sta	ysize
-	rts
+	ldx	#1
+	stx	cursor_r
+	dex
+	stx	cursor_c
+	txa
+	jmp	_cursor		; home and update cursor
 
 .bss
 

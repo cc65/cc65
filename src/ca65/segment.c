@@ -314,24 +314,24 @@ void SegCheck (void)
      	       	   	if (Abs) {
      	       	   	    /* Absolute value */
      	       	   	    if (Val > 255) {
-     	       	       	     	PError (&F->Pos, "Range error");
+     	       	       	     	PError (&F->Pos, "Range error (%ld not in [0..255])", Val);
      	       	   	    }
      	       	   	} else {
      	     	   	    /* PC relative value */
      	     	   	    if (Val < -128 || Val > 127) {
-     	     	       	     	PError (&F->Pos, "Range error");
+     	       	       	     	PError (&F->Pos, "Range error (%ld not in [-128..127])", Val);
      	     	   	    }
      	     	   	}
      	       	    } else if (F->Len == 2) {
      	     	    	if (Abs) {
      	     	   	    /* Absolute value */
      	     	   	    if (Val > 65535) {
-     	       	       	     	PError (&F->Pos, "Range error");
+     	       	       	     	PError (&F->Pos, "Range error (%ld not in [0..65535])", Val);
      	     	   	    }
      	     	   	} else {
      	     	   	    /* PC relative value */
      	     	   	    if (Val < -32768 || Val > 32767) {
-     	     	       	     	PError (&F->Pos, "Range error");
+     	       	       	     	PError (&F->Pos, "Range error (%ld not in [-32768..32767])", Val);
      	       		    }
      	     		}
      	     	    }

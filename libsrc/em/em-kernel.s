@@ -4,8 +4,7 @@
 ; Common functions of the extended memory API.
 ;
 
-        .export         _em_install, _em_deinstall
-
+        .export         em_clear_ptr
         .import         return0
         .importzp       ptr1
 
@@ -24,7 +23,7 @@ _em_drv:        .res    2      		; Pointer to driver
 .data
 emd_vectors:
 emd_install:   	jmp     return0
-emd_deinstall: 	jmp     return0
+emd_uninstall: 	jmp     return0
 emd_pagecount:  jmp     return0
 emd_map:        jmp     return0
 emd_use:        jmp     return0
@@ -86,23 +85,19 @@ set:    sta     emd_vectors,x
         rts
 
 ;----------------------------------------------------------------------------
-; void __fastcall__ em_deinstall (void);
-; /* Deinstall the driver before unloading it */
+; unsigned char __fastcall__ em_uninstall (void);
+; /* Uninstall the currently loaded driver and return an error code.
+;  * Note: This call does not free allocated memory.
+;  */
 
-_em_deinstall:
-        jsr     emd_deinstall           ; Call driver routine
+_em_uninstall:
+        jsr     emd_uninstall           ; Call driver routine
 
-; Point all jump vectors to return0
+em_clear_ptr:                           ; External entry point
+        lda     #0
+        sta     _em_drv
+        sta     _em_drv+1               ; Clear the driver pointer
 
-        ldx     #0
-@L1:    inx                             ; Skip JMP opcode
-        lda     #<return0
-        jsr     set
-        lda     #>return0
-        jsr     set
-        cpx     #(EMD_HDR_JUMPCOUNT*3)
-        bne     @L1
-
-        rts
-
+        tax
+        rts                             ; Return zero
 

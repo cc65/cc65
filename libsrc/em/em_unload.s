@@ -5,6 +5,8 @@
 ; /* Unload the currently loaded driver. */
 
 
+        .import         em_clear_ptr
+
         .include        "em-kernel.inc"
         .include        "em-error.inc"
         .include        "modload.inc"
@@ -14,18 +16,13 @@ _em_unload:
 	ora	_em_drv+1
        	beq    	no_driver		; No driver
 
-	jsr	_em_deinstall		; Deinstall the driver
+	jsr	emd_uninstall		; Deinstall the driver
 
         lda     _em_drv
         ldx     _em_drv+1
         jsr     _mod_free               ; Free the driver
 
-        lda     #0
-        sta     _em_drv
-        sta     _em_drv+1               ; Clear the driver pointer
-
-        tax
-        rts                             ; Return zero
+        jmp     em_clear_ptr            ; Clear the driver pointer, return zero
 
 no_driver:
 	tax				; X = 0

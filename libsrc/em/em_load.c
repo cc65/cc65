@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,7 +51,7 @@ unsigned char __fastcall__ em_load_driver (const char* name)
 
     /* Check if we do already have a driver loaded. If so, remove it. */
     if (em_drv != 0) {
-        em_deinstall ();
+        em_uninstall ();
     }
 
     /* Now open the file */

@@ -116,7 +116,6 @@ OBJS = 	add.o		\
        	lsub.o		\
        	lsubeq.o	\
        	lsubeqsp.o	\
-       	lswap.o		\
        	lt.o  		\
        	ltest.o		\
        	ludiv.o		\
@@ -193,7 +192,7 @@ OBJS = 	add.o		\
        	ult.o		\
        	umod.o		\
        	xor.o           \
-        zeropage.o      
+        zeropage.o
 
 all:   	$(OBJS)
 

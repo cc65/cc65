@@ -80,7 +80,7 @@ SegDef* DupSegDef (const SegDef* Def)
 
 
 
-const char* SetTypeToStr (unsigned char Type)
+const char* SegTypeToStr (unsigned char Type)
 /* Map a segment type into a string */
 {
     switch (Type) {

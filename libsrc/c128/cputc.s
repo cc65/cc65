@@ -48,7 +48,7 @@ putchar	= $CC2F
 ; Module constructor/destructor
 
 initcputc:
-	lda	#$80
+	lda	#$C0
         .byte   $2C
 donecputc:
         lda     #$00

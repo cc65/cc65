@@ -1755,9 +1755,11 @@ Here's a list of all control commands and a description, what they do:
   <tt/.CONDES/ is followed by the type, which may be <tt/constructor/,
   <tt/destructor/ or a numeric value between 0 and 6 (where 0 is the same as
   specifiying <tt/constructor/ and 1 is equal to specifying <tt/destructor/).
-  The <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> and <tt><ref
-  id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> commands are actually shortcuts
-  for <tt/.CONDES/ with a type of <tt/constructor/ resp. <tt/destructor/.
+  The <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
+  id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
+  name=".INTERRUPTORCONSTRUCTOR"></tt>commands are actually shortcuts
+  for <tt/.CONDES/ with a type of <tt/constructor/ resp. <tt/destructor/ or
+  <tt/interruptor/.
 
   After the type, an optional priority may be specified. Higher numeric values
   mean higher priority. If no priority is given, the default priority of 7 is
@@ -1771,10 +1773,11 @@ Here's a list of all control commands and a description, what they do:
 	.condes	      	ModInit, 0, 16
   </verb></tscreen>
 
-  See the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> and <tt><ref
-  id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> commands and the separate section
-  <ref id="condes" name="Module constructors/destructors"> explaining the
-  feature in more detail.
+  See the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
+  id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
+  name=".INTERRUPTOR"></tt>commands and the separate section <ref id="condes"
+  name="Module constructors/destructors"> explaining the feature in more 
+  detail.
 
 
 <sect1><tt>.CONSTRUCTOR</tt><label id=".CONSTRUCTOR"><p>
@@ -2529,6 +2532,36 @@ Here's a list of all control commands and a description, what they do:
   <tscreen><verb>
    	.include	"subs.inc"
   </verb></tscreen>
+
+
+<sect1><tt>.INTERRUPTOR</tt><label id=".INTERRUPTOR"><p>
+
+  Export a symbol and mark it as an interruptor. This may be used together
+  with the linker to build a table of interruptor subroutines that are called 
+  in an interrupt.
+
+  Note: The linker has a feature to build a table of marked routines, but it
+  is your code that must call these routines, so just declaring a symbol as
+  interruptor does nothing by itself.
+
+  An interruptor is always exported as an absolute (16 bit) symbol. You don't
+  need to use an additional <tt/.export/ statement, this is implied by
+  <tt/.interruptor/. It may have an optional priority that is separated by a
+  comma. Higher numeric values mean a higher priority. If no priority is
+  given, the default priority of 7 is used. Be careful when assigning
+  priorities to your own module constructors so they won't interfere with the
+  ones in the cc65 library.
+
+  Example:
+
+  <tscreen><verb>
+   	.interruptor    IrqHandler
+	.interruptor    Handler, 16
+  </verb></tscreen>
+
+  See the <tt><ref id=".CONDES" name=".CONDES"></tt> command and the separate 
+  section <ref id="condes" name="Module constructors/destructors"> explaining
+  the feature in more detail.
 
 
 <sect1><tt>.LINECONT</tt><label id=".LINECONT"><p>
@@ -3713,14 +3746,16 @@ below uses examples from the C libraries. However, the feature may also be
 useful for assembler programs.
 
 
-<sect1>Module overview<p>
+<sect1>Overview<p>
 
-Using the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> and <tt><ref
-id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> keywords it it possible to export
-functions in a special way. The linker is able to generate tables with all
-functions of a specific type. Such a table will <em>only</em> include symbols
-from object files that are linked into a specific executable. This may be used
-to add initialization and cleanup code for library modules.
+Using the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
+id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
+name=".INTERRUPTOR"></tt>keywords it it possible to export functions in a
+special way. The linker is able to generate tables with all functions of a
+specific type. Such a table will <em>only</em> include symbols from object
+files that are linked into a specific executable. This may be used to add
+initialization and cleanup code for library modules, or a table of interrupt
+handler functions.
 
 The C heap functions are an example where module initialization code is used.
 All heap functions (<tt>malloc</tt>, <tt>free</tt>, ...) work with a few
@@ -3761,36 +3796,35 @@ two bytes in the table (a pointer to the function).
 
 <sect1>Calling order<p>
 
-Both, constructors and destructors are sorted in increasing priority order by
-the linker when using one of the builtin linker configurations, so the
-functions with lower priorities come first and are followed by those with
-higher priorities. The C library runtime subroutine that walks over the
-constructor and destructor tables calls the functions starting from the top of
-the table - which means that functions with a high priority are called first.
+The symbols are sorted in increasing priority order by the linker when using
+one of the builtin linker configurations, so the functions with lower
+priorities come first and are followed by those with higher priorities. The C
+library runtime subroutine that walks over the function tables calls the
+functions starting from the top of the table - which means that functions with
+a high priority are called first.
 
-So when using the C runtime, both constructors and destructors are called with
-high priority functions first, followed by low priority functions.
+So when using the C runtime, functions are called with high priority functions
+first, followed by low priority functions.
 
 
 <sect1>Pitfalls<p>
 
-When creating and using module constructors and destructors, please take care
-of the following:
+When using these special symbols, please take care of the following:
 
 <itemize>
 
-<item>
+<item> 
 The linker will only generate function tables, it will not generate code to
 call these functions. If you're using the feature in some other than the
 existing C environments, you have to write code to call all functions in a
-linker generated table yourself. See the <tt>condes</tt> module in the C
-runtime for an example on how to do this.
+linker generated table yourself. See the <tt>/condes/ and <tt/callirq/ modules
+in the C runtime for an example on how to do this.
 
 <item>
 The linker will only add addresses of functions that are in modules linked to
 the executable. This means that you have to be careful where to place the
-condes functions. If initialization is needed for a group of functions, be
-sure to place the initialization function into a module that is linked in
+condes functions. If initialization or an irq handler is needed for a group of
+functions, be sure to place the function into a module that is linked in
 regardless of which function is called by the user.
 
 <item>
@@ -3805,11 +3839,12 @@ does depend on other initialization or cleanup code, you have to choose the
 priority for the functions accordingly.
 
 <item>
-Besides the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> and <tt><ref
-id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> statements, there is also a more
-generic command: <tt><ref id=".CONDES" name=".CONDES"></tt>. This allows to
-specify an additional type. Predefined types are 0 (constructor) and 1
-(destructor). The linker generates a separate table for each type on request.
+Besides the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt>, <tt><ref
+id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> and <tt><ref id=".INTERRUPTOR"
+name=".INTERRUPTOR"></tt>statements, there is also a more generic command:
+<tt><ref id=".CONDES" name=".CONDES"></tt>. This allows to specify an
+additional type. Predefined types are 0 (constructor), 1 (destructor) and 2
+(interruptor). The linker generates a separate table for each type on request.
 
 </itemize>
 

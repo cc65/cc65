@@ -44,7 +44,7 @@ apple2lib:
 	    CC=$(CC) \
 	    LD=$(LD) \
 	    AFLAGS="-t apple2 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t apple2 -I../../include" \
+	    CFLAGS="-Osir -g -T -t apple2 --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a apple2.lib $$i/*.o;\
 	done
@@ -60,7 +60,7 @@ atarilib:
 	    CC=$(CC) \
 	    LD=$(LD) \
 	    AFLAGS="-t atari -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t atari -I../../include" \
+	    CFLAGS="-Osir -g -T -t atari --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a atari.lib $$i/*.o;\
 	done
@@ -75,7 +75,7 @@ atmoslib:
 	    CC=$(CC) \
 	    LD=$(LD) \
 	    AFLAGS="-t atmos -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t atmos -I../../include" \
+	    CFLAGS="-Osir -g -T -t atmos --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a atmos.lib $$i/*.o;\
 	done
@@ -90,7 +90,7 @@ vic20lib:
 	    CC=$(CC) \
 	    LD=$(LD) \
 	    AFLAGS="-t vic20 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t vic20 -I../../include" \
+	    CFLAGS="-Osir -g -T -t vic20 --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a vic20.lib $$i/*.o;\
 	done
@@ -106,7 +106,7 @@ c16lib:
 	    CC=$(CC) \
 	    LD=$(LD) \
 	    AFLAGS="-t c16 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t c16 -I../../include" \
+	    CFLAGS="-Osir -g -T -t c16 --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a c16.lib $$i/*.o;\
 	done
@@ -121,8 +121,8 @@ c64lib:
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
-	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
 	    AFLAGS="-t c64 -I../../asminc" \
+	    CFLAGS="-Osir -g -T -t c64 --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a c64.lib $$i/*.o;\
 	done
@@ -140,7 +140,7 @@ c128lib:
 	    CC=$(CC) \
 	    LD=$(LD) \
 	    AFLAGS="-t c128 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t c128 -I../../include" \
+	    CFLAGS="-Osir -g -T -t c128 --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a c128.lib $$i/*.o;\
 	done
@@ -159,7 +159,7 @@ cbm510lib:
 	    AS=$(AS) \
 	    LD=$(LD) \
 	    AFLAGS="-t cbm510 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t cbm510 -I../../include" \
+	    CFLAGS="-Osir -g -T -t cbm510 --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a cbm510.lib $$i/*.o;\
 	done
@@ -176,7 +176,7 @@ cbm610lib:
 	    AS=$(AS) \
 	    LD=$(LD) \
 	    AFLAGS="-t cbm610 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t cbm610 -I../../include" \
+	    CFLAGS="-Osir -g -T -t cbm610 --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a cbm610.lib $$i/*.o;\
 	done
@@ -192,7 +192,7 @@ geoslib:
 	AR=../$(AR) \
        	LD=../$(LD) \
 	AFLAGS="-t geos -I../../../asminc" \
-	CFLAGS="-Osir -g -T -t geos -I../../../include" \
+	CFLAGS="-Osir -g -T -t geos --forget-inc-paths -I. -I../../../include" \
 	$(MAKE) -C geos || exit 1
 	for i in em joystick tgi conio common runtime; do \
 	    CC=$(CC) \
@@ -200,7 +200,7 @@ geoslib:
 	    LD=$(LD) \
 	    AR=$(AR) \
 	    AFLAGS="-t geos -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t geos -I../../include" \
+	    CFLAGS="-Osir -g -T -t geos --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    for objfile in $$i/*.o; do \
 	        if [ -f geos/$$objfile ]; then \
@@ -223,7 +223,7 @@ neslib:
 	    AS=$(AS) \
 	    LD=$(LD) \
 	    AFLAGS="-t nes -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t nes -I../../include" \
+	    CFLAGS="-Osir -g -T -t nes --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a nes.lib $$i/*.o;\
 	done
@@ -238,7 +238,7 @@ petlib:
 	    AS=$(AS) \
 	    LD=$(LD) \
 	    AFLAGS="-t pet -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t pet -I../../include" \
+	    CFLAGS="-Osir -g -T -t pet --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a pet.lib $$i/*.o;\
 	done
@@ -253,7 +253,7 @@ plus4lib:
 	    AS=$(AS) \
 	    LD=$(LD) \
 	    AFLAGS="-t plus4 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t plus4 -I../../include" \
+	    CFLAGS="-Osir -g -T -t plus4 --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a plus4.lib $$i/*.o;\
 	done

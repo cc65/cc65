@@ -68,33 +68,32 @@
 static void Usage (void)
 /* Print usage information and exit */
 {
-    fprintf (stderr,
-    	     "Usage: %s [options] file\n"
-    	     "Short options:\n"
-       	     "  -V\t\t\tPrint the version number\n"
-       	     "  -g\t\t\tAdd debug info to object file\n"
-       	     "  -h\t\t\tHelp (this text)\n"
-             "  -m model\t\tOverride the o65 model\n"
-             "  -n\t\t\tDon't generate an output file\n"
-       	     "  -o name\t\tName the output file\n"
-       	     "  -v\t\t\tIncrease verbosity\n"
-	     "\n"
-	     "Long options:\n"
-             "  --bss-label name\tDefine and export a BSS segment label\n"
-	     "  --bss-name seg\tSet the name of the BSS segment\n"
-             "  --code-label name\tDefine and export a CODE segment label\n"
-       	     "  --code-name seg\tSet the name of the CODE segment\n"
-             "  --data-label name\tDefine and export a DATA segment label\n"
-       	     "  --data-name seg\tSet the name of the DATA segment\n"
-       	     "  --debug-info\t\tAdd debug info to object file\n"
-	     "  --help\t\tHelp (this text)\n"
-             "  --no-output\t\tDon't generate an output file\n"
-             "  --o65-model model\tOverride the o65 model\n"
-       	     "  --verbose\t\tIncrease verbosity\n"
-       	     "  --version\t\tPrint the version number\n"
-             "  --zeropage-label name\tDefine and export a ZEROPAGE segment label\n"
-       	     "  --zeropage-name seg\tSet the name of the ZEROPAGE segment\n",
-    	     ProgName);
+    printf ("Usage: %s [options] file\n"
+            "Short options:\n"
+            "  -V\t\t\tPrint the version number\n"
+            "  -g\t\t\tAdd debug info to object file\n"
+            "  -h\t\t\tHelp (this text)\n"
+            "  -m model\t\tOverride the o65 model\n"
+            "  -n\t\t\tDon't generate an output file\n"
+            "  -o name\t\tName the output file\n"
+            "  -v\t\t\tIncrease verbosity\n"
+            "\n"
+            "Long options:\n"
+            "  --bss-label name\tDefine and export a BSS segment label\n"
+            "  --bss-name seg\tSet the name of the BSS segment\n"
+            "  --code-label name\tDefine and export a CODE segment label\n"
+            "  --code-name seg\tSet the name of the CODE segment\n"
+            "  --data-label name\tDefine and export a DATA segment label\n"
+            "  --data-name seg\tSet the name of the DATA segment\n"
+            "  --debug-info\t\tAdd debug info to object file\n"
+            "  --help\t\tHelp (this text)\n"
+            "  --no-output\t\tDon't generate an output file\n"
+            "  --o65-model model\tOverride the o65 model\n"
+            "  --verbose\t\tIncrease verbosity\n"
+            "  --version\t\tPrint the version number\n"
+            "  --zeropage-label name\tDefine and export a ZEROPAGE segment label\n"
+            "  --zeropage-name seg\tSet the name of the ZEROPAGE segment\n",
+            ProgName);
 }
 
 

@@ -89,37 +89,36 @@ static unsigned		LibFiles   = 0; /* Count of library files linked */
 static void Usage (void)
 /* Print usage information and exit */
 {
-    fprintf (stderr,
-	     "Usage: %s [options] module ...\n"
-    	     "Short options:\n"
-       	     "  -C name\t\tUse linker config file\n"
-             "  -L path\t\tSpecify a library search path\n"
-       	     "  -Ln name\t\tCreate a VICE label file\n"
-       	     "  -S addr\t\tSet the default start address\n"
-       	     "  -V\t\t\tPrint the linker version\n"
-       	     "  -h\t\t\tHelp (this text)\n"
-       	     "  -m name\t\tCreate a map file\n"
-       	     "  -o name\t\tName the default output file\n"
-       	     "  -t sys\t\tSet the target system\n"
-       	     "  -v\t\t\tVerbose mode\n"
-       	     "  -vm\t\t\tVerbose map file\n"
-	     "\n"
-	     "Long options:\n"
-             "  --cfg-path path\tSpecify a config file search path\n"
-       	     "  --config name\t\tUse linker config file\n"
-       	     "  --dbgfile name\tGenerate debug information\n"
-             "  --dump-config name\tDump a builtin configuration\n"
-	     "  --help\t\tHelp (this text)\n"
-             "  --lib file\t\tLink this library\n"
-             "  --lib-path path\tSpecify a library search path\n"
-	     "  --mapfile name\tCreate a map file\n"
-             "  --module-id id\tSpecify a module id\n"
-             "  --obj file\t\tLink this object file\n"
-             "  --obj-path path\tSpecify an object file search path\n"
-       	     "  --start-addr addr\tSet the default start address\n"
-       	     "  --target sys\t\tSet the target system\n"
-       	     "  --version\t\tPrint the linker version\n",
-	     ProgName);
+    printf ("Usage: %s [options] module ...\n"
+            "Short options:\n"
+            "  -C name\t\tUse linker config file\n"
+            "  -L path\t\tSpecify a library search path\n"
+            "  -Ln name\t\tCreate a VICE label file\n"
+            "  -S addr\t\tSet the default start address\n"
+            "  -V\t\t\tPrint the linker version\n"
+            "  -h\t\t\tHelp (this text)\n"
+            "  -m name\t\tCreate a map file\n"
+            "  -o name\t\tName the default output file\n"
+            "  -t sys\t\tSet the target system\n"
+            "  -v\t\t\tVerbose mode\n"
+            "  -vm\t\t\tVerbose map file\n"
+            "\n"
+            "Long options:\n"
+            "  --cfg-path path\tSpecify a config file search path\n"
+            "  --config name\t\tUse linker config file\n"
+            "  --dbgfile name\tGenerate debug information\n"
+            "  --dump-config name\tDump a builtin configuration\n"
+            "  --help\t\tHelp (this text)\n"
+            "  --lib file\t\tLink this library\n"
+            "  --lib-path path\tSpecify a library search path\n"
+            "  --mapfile name\tCreate a map file\n"
+            "  --module-id id\tSpecify a module id\n"
+            "  --obj file\t\tLink this object file\n"
+            "  --obj-path path\tSpecify an object file search path\n"
+            "  --start-addr addr\tSet the default start address\n"
+            "  --target sys\t\tSet the target system\n"
+            "  --version\t\tPrint the linker version\n",
+            ProgName);
 }
 
 
@@ -529,7 +528,7 @@ int main (int argc, char* argv [])
         }
         Error ("Cannot generate output due to memory area overflow%s",
                (MemoryAreaOverflows > 1)? "s" : "");
-    }                                             
+    }
 
     /* Create the output file */
     CfgWriteTarget ();

@@ -69,31 +69,30 @@
 static void Usage (void)
 /* Print usage information and exit */
 {
-    fprintf (stderr,
-    	     "Usage: %s [options] [inputfile]\n"
-    	     "Short options:\n"
-       	     "  -g\t\t\tAdd debug info to object file\n"
-       	     "  -h\t\t\tHelp (this text)\n"
-             "  -i name\t\tSpecify an info file\n"
-       	     "  -o name\t\tName the output file\n"
-       	     "  -v\t\t\tIncrease verbosity\n"
-       	     "  -F\t\t\tAdd formfeeds to the output\n"
-	     "  -S addr\t\tSet the start/load address\n"
-       	     "  -V\t\t\tPrint the disassembler version\n"
-	     "\n"
-	     "Long options:\n"
-             "  --comments n\t\tSet the comment level for the output\n"
-       	     "  --cpu type\t\tSet cpu type\n"
-       	     "  --debug-info\t\tAdd debug info to object file\n"
-	     "  --formfeeds\t\tAdd formfeeds to the output\n"
-	     "  --help\t\tHelp (this text)\n"
-             "  --hexoffs\t\tUse hexadecimal label offsets\n"
-             "  --info name\t\tSpecify an info file\n"
-       	     "  --pagelength n\tSet the page length for the listing\n"
-       	     "  --start-addr addr\tSet the start/load address\n"
-       	     "  --verbose\t\tIncrease verbosity\n"
-       	     "  --version\t\tPrint the disassembler version\n",
-    	     ProgName);
+    printf ("Usage: %s [options] [inputfile]\n"
+            "Short options:\n"
+            "  -g\t\t\tAdd debug info to object file\n"
+            "  -h\t\t\tHelp (this text)\n"
+            "  -i name\t\tSpecify an info file\n"
+            "  -o name\t\tName the output file\n"
+            "  -v\t\t\tIncrease verbosity\n"
+            "  -F\t\t\tAdd formfeeds to the output\n"
+            "  -S addr\t\tSet the start/load address\n"
+            "  -V\t\t\tPrint the disassembler version\n"
+            "\n"
+            "Long options:\n"
+            "  --comments n\t\tSet the comment level for the output\n"
+            "  --cpu type\t\tSet cpu type\n"
+            "  --debug-info\t\tAdd debug info to object file\n"
+            "  --formfeeds\t\tAdd formfeeds to the output\n"
+            "  --help\t\tHelp (this text)\n"
+            "  --hexoffs\t\tUse hexadecimal label offsets\n"
+            "  --info name\t\tSpecify an info file\n"
+            "  --pagelength n\tSet the page length for the listing\n"
+            "  --start-addr addr\tSet the start/load address\n"
+            "  --verbose\t\tIncrease verbosity\n"
+            "  --version\t\tPrint the disassembler version\n",
+            ProgName);
 }
 
 

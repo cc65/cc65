@@ -38,7 +38,7 @@ FILE *outCVT, *input;
 unsigned char *buffer;
 unsigned char vlirtabt[127];
 unsigned char vlirtabs[127];
-int i,j,lastarg;         
+int i,j,lastarg;
 unsigned l;
 int bytes;
 int blocks,rest;
@@ -213,15 +213,15 @@ void openVFile (void) {
 }
 
 void printUsage (void) {
-    fprintf(stderr, "Usage: %s [options] file\n"
-	    "Options:\n"
-	    "\t-h, -?\t\tthis help\n"
-	    "\t-f\t\tforce writting files\n"
-	    "\t-o name\t\tname C output file\n"
-	    "\t-s name\t\tname asm output file\n"
-	    "\t-l name\t\tname ld65 config output file (for vlir)\n"
-	    "Or as VLIR linker: %s -vlir output.cvt header [vlir0] ... [blank] ... [vlir_n]\n",
-	    ProgName,ProgName);
+    printf("Usage: %s [options] file\n"
+           "Options:\n"
+           "\t-h, -?\t\tthis help\n"
+           "\t-f\t\tforce writting files\n"
+           "\t-o name\t\tname C output file\n"
+           "\t-s name\t\tname asm output file\n"
+           "\t-l name\t\tname ld65 config output file (for vlir)\n"
+           "Or as VLIR linker: %s -vlir output.cvt header [vlir0] ... [blank] ... [vlir_n]\n",
+           ProgName,ProgName);
 }
 
 int findToken (const char **tokenTbl, const char *token) {

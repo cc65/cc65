@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2002-2005 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -70,25 +70,24 @@
 
 static void Usage (void)
 {
-    fprintf (stderr,
-	     "Usage: %s [options] file\n"
-	     "Short options:\n"
-       	     "  -C name\t\tUse simulator config file\n"
-             "  -L dir\t\tSet a chip directory search path\n"
-       	     "  -V\t\t\tPrint the simulator version number\n"
-       	     "  -d\t\t\tDebug mode\n"
-       	     "  -h\t\t\tHelp (this text)\n"
-       	     "  -v\t\t\tIncrease verbosity\n"
-  	     "\n"
-  	     "Long options:\n"
-             "  --chipdir dir\t\tSet a chip directory search path\n"
-       	     "  --config name\t\tUse simulator config file\n"
-       	     "  --cpu type\t\tSet cpu type\n"
-       	     "  --debug\t\tDebug mode\n"
-	     "  --help\t\tHelp (this text)\n"
-       	     "  --verbose\t\tIncrease verbosity\n"
-       	     "  --version\t\tPrint the simulator version number\n",
-	     ProgName);
+    printf ("Usage: %s [options] file\n"
+            "Short options:\n"
+            "  -C name\t\tUse simulator config file\n"
+            "  -L dir\t\tSet a chip directory search path\n"
+            "  -V\t\t\tPrint the simulator version number\n"
+            "  -d\t\t\tDebug mode\n"
+            "  -h\t\t\tHelp (this text)\n"
+            "  -v\t\t\tIncrease verbosity\n"
+            "\n"
+            "Long options:\n"
+            "  --chipdir dir\t\tSet a chip directory search path\n"
+            "  --config name\t\tUse simulator config file\n"
+            "  --cpu type\t\tSet cpu type\n"
+            "  --debug\t\tDebug mode\n"
+            "  --help\t\tHelp (this text)\n"
+            "  --verbose\t\tIncrease verbosity\n"
+            "  --version\t\tPrint the simulator version number\n",
+            ProgName);
 }
 
 

@@ -60,15 +60,14 @@
 static void Usage (void)
 /* Print usage information and exit */
 {
-    fprintf (stderr,
-	     "Usage: %s <operation> lib file|module ...\n"
-	     "Operation is one of:\n"
-	     "\ta\tAdd modules\n"
-	     "\td\tDelete modules\n"
-	     "\tl\tList library contents\n"
-	     "\tx\tExtract modules\n"
-	     "\tV\tPrint the archiver version\n",
-	     ProgName);
+    printf ("Usage: %s <operation> lib file|module ...\n"
+            "Operation is one of:\n"
+            "\ta\tAdd modules\n"
+            "\td\tDelete modules\n"
+            "\tl\tList library contents\n"
+            "\tx\tExtract modules\n"
+            "\tV\tPrint the archiver version\n",
+            ProgName);
     exit (EXIT_FAILURE);
 }
 

@@ -1,11 +1,8 @@
 List of known bugs that will not get fixed before any new major release:
 
   * The compiler does not detect if part of an expression evaluated
-    with && or || is constant. For preprocessor evaluation, special 
+    with && or || is constant. For preprocessor evaluation, special
     routines are used, so this is not true for the preprocessor.
-
-  * Initialization of local variables with compound data types is not
-    possible.
 
   * The assembler/linker do not have special handling for the "jump indirect"
     bug of the NMOS 6502 CPUs. This bug will cause the CPU to behave

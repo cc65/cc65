@@ -50,11 +50,6 @@ Head:   .word   @Next
  	lda	#14
  	jsr	BSOUT
 
-; Set the bank for the file name our execution bank
-
-        lda     #0
-        sta     FNAM_BANK
-
 ; Before doing anything else, we have to setup our banking configuration.
 ; Otherwise just the lowest 16K are actually RAM. Writing through the ROM
 ; to the underlying RAM works, but it is bad style.
@@ -92,6 +87,13 @@ L1:	lda    	sp,x
 ; Call module constructors
 
 	jsr	initlib
+
+; Set the bank for the file name to our execution bank. We must do this, 
+; *after* calling constructors, because some of them may depend on the 
+; original value of this register.
+
+        lda     #0
+        sta     FNAM_BANK
 
 ; If we have IRQ functions, chain our stub into the IRQ vector
 

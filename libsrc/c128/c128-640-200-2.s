@@ -81,7 +81,6 @@ pages:	.byte   1                       ; Number of screens available
         .word   GETDEFPALETTE
         .word   SETPIXEL
         .word   GETPIXEL
-        .word   HORLINE
         .word   LINE
         .word   BAR
         .word   CIRCLE
@@ -576,122 +575,6 @@ GETPIXEL:
         rts
 
 ; ------------------------------------------------------------------------
-; HORLINE: Draw a horizontal line from X1/Y to X2/Y, where X1 = ptr1,
-; Y = ptr2 and X2 = ptr3, using the current drawing color.
-;
-; This is a special line drawing entry used when the line is know to be
-; horizontal, for example by the BAR emulation routine. If the driver does
-; not have special code for horizontal lines, it may just copy Y to Y2 and
-; proceed with the generic line drawing code.
-;
-; Note: Line coordinates will always be sorted (Y1 <= X2) and clipped.
-;
-; Must set an error code: NO
-;
-
-HORLINE:
-	lda X1
-	pha
-	lda X1+1
-	pha
-	jsr CALC		; get data for LEFT
-	lda BITMASKL,x		; remember left address and bitmask
-	pha
-	lda ADDR
-	pha
-	lda ADDR+1
-	pha
-
-	lda X2
-	sta X1
-	lda X2+1
-	sta X1+1
-	jsr CALC		; get data for RIGHT
-	lda BITMASKR,x
-	sta TEMP3
-
-	pla			; recall data for LEFT
-	sta X1+1
-	pla
-	sta X1			; put left address into X1
-	pla
-
-	cmp #%11111111		; if left bit <> 0
-	beq @L1
-	sta TEMP2		; do left byte only...
-	lda X1
-	ldy X1+1
-	jsr VDCSetSourceAddr
-	jsr VDCReadByte
-	sta TEMP
-	eor BITMASK
-	and TEMP2
-	eor TEMP
-	pha
-	lda X1
-	ldy X1+1
-	jsr VDCSetSourceAddr
-	pla
-	jsr VDCWriteByte
-	inc X1			; ... and proceed
-	bne @L1
-	inc X1+1
-
-	; do right byte (if Y2=0 ++ADDR and skip)
-@L1:	lda TEMP3
-	cmp #%11111111		; if right bit <> 7
-	bne @L11
-	inc ADDR		; right bit = 7 - the next one is the last
-	bne @L10
-	inc ADDR+1
-@L10:	bne @L2
-
-@L11:	lda ADDR		; do right byte only...
-	ldy ADDR+1
-	jsr VDCSetSourceAddr
-	jsr VDCReadByte
-	sta TEMP
-	eor BITMASK
-	and TEMP3
-	eor TEMP
-	pha
-	lda ADDR
-	ldy ADDR+1
-	jsr VDCSetSourceAddr
-	pla
-	jsr VDCWriteByte
-
-@L2:				; do the fill in the middle
-	lda ADDR		; calculate offset in full bytes
-	sec
-	sbc X1
-	beq @L3			; if equal - there are no more bytes
-	sta ADDR
-
-	lda X1			; setup for the left side
-	ldy X1+1
-	jsr VDCSetSourceAddr
-	lda BITMASK		; get color
-	jsr VDCWriteByte	; put 1st value
-	ldx ADDR
-	dex
-	beq @L3			; 1 byte already written
-
-	stx ADDR		; if there are more bytes - fill them...
-	ldx #VDC_VSCROLL
-	lda #0
-	jsr VDCWriteReg		; setup for fill
-	ldx #VDC_COUNT
-	lda ADDR
-	jsr VDCWriteReg		; ... fill them NOW!
-
-@L3:	pla
-	sta X1+1
-	pla
-	sta X1
-	rts
-
-; ------------------------------------------------------------------------
 ; LINE: Draw a line from X1/Y1 to X2/Y2, where X1/Y1 = ptr1/ptr2 and
 ; X2/Y2 = ptr3/ptr4 using the current drawing color.
 ;
@@ -908,19 +791,126 @@ LINE:
 
 BAR:
 	inc	Y2
-	bne	@L0
+	bne	HORLINE
 	inc	Y2+1
-@L0:	jsr	HORLINE
+
+; Original code for a horizontal line
+
+HORLINE:
+  	lda X1
+  	pha
+  	lda X1+1
+  	pha
+  	jsr CALC		; get data for LEFT
+  	lda BITMASKL,x		; remember left address and bitmask
+  	pha
+  	lda ADDR
+  	pha
+  	lda ADDR+1
+  	pha
+
+  	lda X2
+  	sta X1
+  	lda X2+1
+  	sta X1+1
+  	jsr CALC		; get data for RIGHT
+  	lda BITMASKR,x
+  	sta TEMP3
+
+  	pla			; recall data for LEFT
+  	sta X1+1
+  	pla
+  	sta X1			; put left address into X1
+  	pla
+
+  	cmp #%11111111		; if left bit <> 0
+  	beq @L1
+  	sta TEMP2		; do left byte only...
+  	lda X1
+  	ldy X1+1
+  	jsr VDCSetSourceAddr
+  	jsr VDCReadByte
+  	sta TEMP
+  	eor BITMASK
+  	and TEMP2
+  	eor TEMP
+  	pha
+  	lda X1
+  	ldy X1+1
+  	jsr VDCSetSourceAddr
+  	pla
+  	jsr VDCWriteByte
+  	inc X1			; ... and proceed
+  	bne @L1
+  	inc X1+1
+
+  	; do right byte (if Y2=0 ++ADDR and skip)
+@L1:	lda TEMP3
+  	cmp #%11111111		; if right bit <> 7
+  	bne @L11
+  	inc ADDR		; right bit = 7 - the next one is the last
+  	bne @L10
+	inc ADDR+1
+@L10:	bne @L2
+
+@L11:	lda ADDR		; do right byte only...
+	ldy ADDR+1
+	jsr VDCSetSourceAddr
+	jsr VDCReadByte
+	sta TEMP
+	eor BITMASK
+	and TEMP3
+	eor TEMP
+	pha
+	lda ADDR
+	ldy ADDR+1
+	jsr VDCSetSourceAddr
+	pla
+	jsr VDCWriteByte
+
+@L2:				; do the fill in the middle
+	lda ADDR		; calculate offset in full bytes
+	sec
+	sbc X1
+	beq @L3			; if equal - there are no more bytes
+	sta ADDR
+
+	lda X1			; setup for the left side
+	ldy X1+1
+	jsr VDCSetSourceAddr
+	lda BITMASK		; get color
+	jsr VDCWriteByte	; put 1st value
+	ldx ADDR
+	dex
+	beq @L3			; 1 byte already written
+
+	stx ADDR		; if there are more bytes - fill them...
+	ldx #VDC_VSCROLL
+	lda #0
+	jsr VDCWriteReg		; setup for fill
+	ldx #VDC_COUNT
+	lda ADDR
+	jsr VDCWriteReg		; ... fill them NOW!
+
+@L3:	pla
+	sta X1+1
+	pla
+	sta X1
+
+; End of horizontal line code
+
 	inc	Y1
-	bne	@L1
+	bne	@L4
 	inc	Y1+1
-@L1:	lda	Y1
+@L4:	lda	Y1
 	cmp	Y2
-	bne	@L0
+	bne	@L5
 	lda	Y1+1
 	cmp	Y2+1
-	bne	@L0
+	bne	@L5
 	rts
+
+@L5:	jmp	HORLINE
 
 ; ------------------------------------------------------------------------
 ; CIRCLE: Draw a circle around the center X1/Y1 (= ptr1/ptr2) with the

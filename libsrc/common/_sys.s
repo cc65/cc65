@@ -27,7 +27,7 @@ __sys:	sta	ptr1
         php
 
 ; Get the flags, keep the state of bit 4 and 5 using the other flags from
-; the flags value pased by the caller. Push the new flags and push A.
+; the flags value passed by the caller. Push the new flags and push A.
 
  	dey
         php

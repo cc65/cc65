@@ -3987,7 +3987,7 @@ static Line* OptOneBlock (Line* L)
 	    A = 7;
 	    X = 0;
 	    Y = 1;
-	} else if (LineFullMatch (L, "\tjsr\tpusha")) {
+	} else if (CPU == CPU_65C02 && LineFullMatch (L, "\tjsr\tpusha")) {
 	    /* We know about this function */
 	    Y = 0;
 	} else if (LineFullMatch (L, "\tjsr\tpusha0")) {

@@ -33,6 +33,7 @@ all:
 
 apple2lib:
 	export CFLAGS="-Osir -g -t apple2 -I../../include";\
+	export AFLAGS="-t apple2";\
 	for i in apple2 common runtime conio dbg; do \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -46,6 +47,7 @@ apple2lib:
 
 atarilib:
 	export CFLAGS="-Osir -g -t atari -I../../include";\
+       	export AFLAGS="-t atari";\
 	for i in atari common runtime conio dbg; do \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -59,6 +61,7 @@ atarilib:
 
 c64lib:
 	export CFLAGS="-Osir -g -t c64 -I../../include";\
+       	export AFLAGS="-t c64";\
 	for i in c64 cbm common runtime conio dbg; do \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -72,6 +75,7 @@ c64lib:
 
 c128lib:
 	export CFLAGS="-Osir -g -t c128 -I../../include";\
+       	export AFLAGS="-t c128";\
 	for i in c128 cbm common runtime conio dbg; do \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -85,6 +89,7 @@ c128lib:
 
 cbm610lib:
 	export CFLAGS="-Osir -g -t cbm610 -I../../include";\
+       	export AFLAGS="-t cbm610";\
 	for i in cbm610 cbm common runtime conio dbg; do \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -98,6 +103,7 @@ cbm610lib:
 
 geoslib:
 	export CFLAGS="-Osir -g -t geos -I../../include";\
+       	export AFLAGS="-t geos";\
        	for i in geos common runtime; do \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -110,6 +116,7 @@ geoslib:
 
 petlib:
 	export CFLAGS="-Osir -g -t pet -I../../include";\
+       	export AFLAGS="-t pet";\
 	for i in pet cbm common runtime conio dbg; do \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -123,6 +130,7 @@ petlib:
 
 plus4lib:
 	export CFLAGS="-Osir -g -t plus4 -I../../include";\
+       	export AFLAGS="-t plus4";\
 	for i in plus4 cbm common runtime conio dbg; do \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -147,3 +155,4 @@ zap:	clean
 
 
 
+			       

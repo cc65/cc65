@@ -176,7 +176,9 @@ CIA2_CRB	= $DD0F
 ; I/O: MMU
 
 MMU_CR		= $FF00
-CC65_MMU_CFG	= $0E	; Bank 0 with kernal ROM
+MMU_CFG_CC65    = %00001110	; Bank 0 with kernal ROM
+MMU_CFG_RAM0	= %00111111	; Bank 0 full RAM
+
 
 ; ---------------------------------------------------------------------------
 ; Super CPU

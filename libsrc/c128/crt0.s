@@ -61,7 +61,7 @@ Head:   .word   @Next
 
 	lda	MMU_CR	 	; Get current memory configuration...
        	pha		 	; ...and save it for later
-       	lda    	#CC65_MMU_CFG	; Bank0 with kernal ROM
+       	lda    	#MMU_CFG_CC65	; Bank0 with kernal ROM
     	sta	MMU_CR
 
 ; Save the zero page locations we need
@@ -178,7 +178,7 @@ IRQStub:
 	cld    	       		   	; Just to be sure
 	lda     MMU_CR 		   	; Get old register value
 	pha    	       		   	; And save on stack
-	lda     #CC65_MMU_CFG	   	; Bank 0 with kernal ROM
+	lda     #MMU_CFG_CC65		; Bank 0 with kernal ROM
 	sta    	MMU_CR
 	ldy 	#<(__IRQFUNC_COUNT__*2)
        	lda    	#<__IRQFUNC_TABLE__

@@ -541,7 +541,7 @@ _rs232_status:
 .segment       	"LOWCODE"
 
 NmiHandler:
-	lda	#CC65_MMU_CFG		;(2)
+	lda	#MMU_CFG_CC65		;(2)
      	sta	MMU_CR 			;(4)
        	lda    	ACIA+RegStatus       	;(4) ;status ;check for byte received
      	and 	#$08           		;(2)

@@ -96,7 +96,7 @@ HashNode* HT_Find (const HashTable* T, const void* Key)
          * if it is not really necessary.
          */
         if (N->Hash == Hash &&
-            T->Func->Compare (Key, T->Func->GetIndex (N->Entry))) {
+            T->Func->Compare (Key, T->Func->GetKey (N->Entry))) {
             /* Found */
             break;
         }
@@ -133,8 +133,8 @@ void HT_Insert (HashTable* T, HashNode* N)
         HT_Alloc (T);
     }
 
-    /* Generate the hash for the node contents */
-    N->Hash = T->Func->GenHash (T->Func->GetIndex (N->Entry));
+    /* Generate the hash over the node key. */
+    N->Hash = T->Func->GenHash (T->Func->GetKey (N->Entry));
 
     /* Calculate the reduced hash */
     RHash = N->Hash % T->Slots;
@@ -142,6 +142,9 @@ void HT_Insert (HashTable* T, HashNode* N)
     /* Insert the entry into the correct chain */
     N->Next = T->Table[RHash];
     T->Table[RHash] = N;
+
+    /* Set the owner */
+    N->Owner = T;
 
     /* One more entry */
     ++T->Count;

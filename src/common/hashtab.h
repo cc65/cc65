@@ -59,7 +59,7 @@ struct HashNode {
     void*               Entry;          /* Pointer to user entry data */
 };
 
-#define STATIC_HASHNODE_INITIALIZER(Entry)      { 0, 0, 0, Entry }
+#define STATIC_HASHNODE_INITIALIZER(Entry) { 0, 0, 0, Entry }
 
 /* Hash table functions */
 typedef struct HashFunctions HashFunctions;
@@ -68,8 +68,8 @@ struct HashFunctions {
     unsigned (*GenHash) (const void* Key);
     /* Generate the hash over a key. */
 
-    const void* (*GetIndex) (void* Entry);
-    /* Given a pointer to the user entry data, return a pointer to the index */
+    const void* (*GetKey) (void* Entry);
+    /* Given a pointer to the user entry data, return a pointer to the key */
 
     HashNode* (*GetHashNode) (void* Entry);
     /* Given a pointer to the user entry data, return a pointer to the hash node */
@@ -99,7 +99,7 @@ struct HashTable {
 
 #if defined(HAVE_INLINE)
 INLINE void InitHashNode (HashNode* N, void* Entry)
-/* Initialize a hash node */
+/* Initialize a hash node. */
 {
     N->Next     = 0;
     N->Owner    = 0;

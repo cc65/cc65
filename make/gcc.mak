@@ -1,5 +1,7 @@
 #
-# Main gcc Makefile
+# Main gcc Makefile.                                         
+'
+# This makefile is maintained by Greg King, gngking@erols.com
 #
 
 # Install prefix and directories

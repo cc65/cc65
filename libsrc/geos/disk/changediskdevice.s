@@ -6,6 +6,7 @@
 
 ; char ChangeDiskDevice (char newDriveNumber);
 
+	    .import __oserror
 	    .export _ChangeDiskDevice
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 	
 _ChangeDiskDevice:
 	jsr ChangeDiskDevice
-	stx errno
+	stx __oserror
 	txa
 	rts

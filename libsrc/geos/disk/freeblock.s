@@ -6,7 +6,7 @@
 
 ; char FreeBlock (struct tr_se *TS);
 
-	    .import gettrse
+	    .import gettrse, __oserror
 	    .export _FreeBlock
 
 	    .include "../inc/jumptab.inc"
@@ -17,6 +17,6 @@ _FreeBlock:
 	sta r6L
 	stx r6H
 	jsr FreeBlock
-	stx errno
+	stx __oserror
 	txa
 	rts

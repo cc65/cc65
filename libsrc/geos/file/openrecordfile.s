@@ -6,6 +6,7 @@
 
 ; char OpenRecordFile  (char *myName);
 
+	    .import __oserror
 	    .export _OpenRecordFile
 
 	    .include "../inc/jumptab.inc"
@@ -15,6 +16,6 @@ _OpenRecordFile:
 	sta r0L
 	stx r0H
 	jsr OpenRecordFile
-	stx errno
+	stx __oserror
 	txa
 	rts

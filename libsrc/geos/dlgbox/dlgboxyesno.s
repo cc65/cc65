@@ -7,10 +7,9 @@
 ; char DlgBoxYesNo       (char *line1,char *line2);
 
 	    .export _DlgBoxYesNo
-	    .import DB_get2lines
+	    .import DB_get2lines, _DoDlgBox
 	    .importzp ptr3, ptr4
 
-	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
 	    .include "../inc/const.inc"
 
@@ -18,11 +17,7 @@ _DlgBoxYesNo:
 	    jsr DB_get2lines
 	    lda #<paramStrYesNo
 	    ldx #>paramStrYesNo
-	    sta r0L
-	    stx r0H
-	    jsr DoDlgBox
-	    lda r0L
-	    rts
+	    jmp _DoDlgBox
 
 paramStrYesNo:
 	    .byte DEF_DB_POS | 1

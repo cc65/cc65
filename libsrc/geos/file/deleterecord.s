@@ -6,6 +6,7 @@
 
 ; char DeleteRecord  (void);
 
+	    .import __oserror
 	    .export _DeleteRecord
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 	
 _DeleteRecord:
 	jsr DeleteRecord
-	stx errno
+	stx __oserror
 	txa
 	rts

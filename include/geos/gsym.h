@@ -119,9 +119,6 @@
 #define	STATUS		*(char*)0x90
 #define	curDevice	*(char*)0xba
 
-/* Here's my own errno location, I hope this won't confilct with anything... */
-#define errno		*(char*)0x91
-
 #define	irqvec		*(unsigned int*)0x0314
 #define	bkvec		*(unsigned int*)0x0316
 #define	nmivec		*(unsigned int*)0x0318

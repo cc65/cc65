@@ -6,7 +6,7 @@
 
 ; char BlkAlloc (struct tr_se output[], int length);
 
-	    .import popax
+	    .import popax, __oserror
 	    .export _BlkAlloc
 
 	    .include "../inc/jumptab.inc"
@@ -19,6 +19,6 @@ _BlkAlloc:
 	sta r4L
 	stx r4H
 	jsr BlkAlloc
-	stx errno
+	stx __oserror
 	txa
 	rts

@@ -6,6 +6,7 @@
 
 ; char WriteBuff (struct tr_se*);
 
+	    .import __oserror
 	    .import gettrse
 	    .export _WriteBuff
 
@@ -17,6 +18,6 @@ _WriteBuff:
 	sta r1L
 	stx r1H
 	jsr WriteBuff
-	stx errno
+	stx __oserror
 	txa
 	rts

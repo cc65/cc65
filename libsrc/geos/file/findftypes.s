@@ -7,7 +7,7 @@
 ; char FindFTypes  (char *buffer, char fileType, char fileMax, char *Class);
 
 	    .export _FindFTypes
-	    .import popax, popa
+	    .import popax, popa, __oserror
 
 	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
@@ -24,7 +24,7 @@ _FindFTypes:
 	sta r6L
 	stx r6H
 	jsr FindFTypes
-	stx errno
+	stx __oserror
 ; return (fileMax - r7H)
 	lda tmpFileMax
 	sec

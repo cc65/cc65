@@ -6,6 +6,7 @@
 
 ; char InsertRecord  (void);
 
+	    .import __oserror
 	    .export _InsertRecord
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 	
 _InsertRecord:
 	jsr InsertRecord
-	stx errno
+	stx __oserror
 	txa
 	rts

@@ -6,6 +6,7 @@
 
 ; char SaveFile  (struct fileheader *myHeader);
 
+	    .import __oserror
 	    .export _SaveFile
 
 	    .include "../inc/jumptab.inc"
@@ -15,6 +16,6 @@ _SaveFile:
 	sta r9L
 	stx r9H
 	jsr SaveFile
-	stx errno
+	stx __oserror
 	txa
 	rts

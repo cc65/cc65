@@ -6,6 +6,7 @@
 
 ; char PutDirHead (void);
 
+	    .import __oserror
 	    .export _PutDirHead
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 	
 _PutDirHead:
 	jsr PutDirHead
-	stx errno
+	stx __oserror
 	txa
 	rts

@@ -6,6 +6,7 @@
 
 ; char PointRecord  (char recordNum);
 
+	    .import __oserror
 	    .export _PointRecord
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 	
 _PointRecord:
 	jsr PointRecord
-	stx errno
+	stx __oserror
 	txa
 	rts

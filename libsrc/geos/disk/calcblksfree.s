@@ -6,6 +6,7 @@
 
 ; int CalcBlksFree (void);
 
+	    .import __oserror
 	    .export _CalcBlksFree
 
 	    .include "../inc/jumptab.inc"
@@ -13,7 +14,7 @@
 	
 _CalcBlksFree:
 	jsr CalcBlksFree
-	stx errno
+	stx __oserror
 	lda r4L
 	ldx r4H
 	rts

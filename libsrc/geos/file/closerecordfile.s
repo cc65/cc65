@@ -6,6 +6,7 @@
 
 ; char CloseRecordFile  (void);
 
+	    .import __oserror
 	    .export _CloseRecordFile
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 	
 _CloseRecordFile:
 	jsr CloseRecordFile
-	stx errno
+	stx __oserror
 	txa
 	rts

@@ -6,6 +6,7 @@
 
 ; struct tr_se SetNextFree (struct tr_se *startTS);
 
+	    .import __oserror
 	    .import gettrse
 	    .export _SetNextFree
 
@@ -17,7 +18,7 @@ _SetNextFree:
 	sta r3L
 	stx r3H
 	jsr SetNextFree
-	stx errno
+	stx __oserror
 	lda r3L
 	ldx r3H
 	rts

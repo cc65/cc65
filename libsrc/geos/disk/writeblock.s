@@ -6,7 +6,7 @@
 
 ; char WriteBlock (struct tr_se *myTS, char *buffer);
 
-	    .import popax
+	    .import popax, __oserror
 	    .import gettrse
 	    .export _WriteBlock
 
@@ -21,6 +21,6 @@ _WriteBlock:
 	sta r1L
 	stx r1H
 	jsr WriteBlock
-	stx errno
+	stx __oserror
 	txa
 	rts

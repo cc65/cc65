@@ -6,7 +6,7 @@
 
 ; char NxtBlkAlloc (struct tr_se *startTS, struct tr_se output[], int length );
 
-	    .import popax
+	    .import popax, __oserror
 	    .import gettrse
 	    .importzp ptr4
 	    .export _NxtBlkAlloc
@@ -25,6 +25,6 @@ _NxtBlkAlloc:
 	sta r3L
 	stx r3H
 	jsr NxtBlkAlloc
-	stx errno
+	stx __oserror
 	txa
 	rts

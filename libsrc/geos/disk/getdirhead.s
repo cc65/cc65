@@ -6,6 +6,7 @@
 
 ; char GetDirHead (void);
 
+	    .import __oserror
 	    .export _GetDirHead
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 	
 _GetDirHead:
 	jsr GetDirHead
-	stx errno
+	stx __oserror
 	txa
 	rts

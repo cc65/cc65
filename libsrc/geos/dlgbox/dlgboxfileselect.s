@@ -8,6 +8,7 @@
 
 		.export _DlgBoxFileSelect
 		.import popa, popax
+		.import _DoDlgBox
 
 		.include "../inc/jumptab.inc"
 		.include "../inc/geossym.inc"
@@ -15,13 +16,6 @@
 		.include "../inc/geosmac.ca65.inc"
 
 _DlgBoxFileSelect:
-;	    sta r5L
-;	    stx r5H
-;	    jsr popa
-;	    sta r7L
-;	    jsr popax
-;	    sta r10L
-;	    stx r10H
 
 	        sta tmp_r5
 	        stx tmp_r5+1
@@ -38,10 +32,7 @@ DB_FS_reload:
 
 		lda #<paramStrFileSelect
 		ldx #>paramStrFileSelect
-		sta r0L
-		stx r0H
-		jsr DoDlgBox
-		lda r0L
+		jsr _DoDlgBox
 		cmp #DISK
 		bne DB_FS_Fin
 		jsr OpenDisk

@@ -7,7 +7,7 @@
 ; char ReadRecord  (char *buffer, int length);
 
 	    .export _ReadRecord
-	    .import popax
+	    .import popax, __oserror
 
 	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
@@ -19,6 +19,6 @@ _ReadRecord:
 	sta r7L
 	stx r7H
 	jsr ReadRecord
-	stx errno
+	stx __oserror
 	txa
 	rts

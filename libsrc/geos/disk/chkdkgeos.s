@@ -6,6 +6,7 @@
 
 ; char ChkDkGEOS (void);
 
+	    .import __oserror
 	    .export _ChkDkGEOS
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 	
 _ChkDkGEOS:
 	jsr ChkDkGEOS
-	stx errno
+	stx __oserror
 	lda isGEOS
 	rts

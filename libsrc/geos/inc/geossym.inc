@@ -120,8 +120,6 @@ TURBO_DD00_CPY		=	$8f	; from 1541 turbo
 STATUS			=	$90
 curDevice		=	$ba
 ;
-errno			=	$91	; custom error return code
-;
 irqvec			=	$0314
 bkvec			=	$0316
 nmivec			=	$0318

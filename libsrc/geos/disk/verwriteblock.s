@@ -6,7 +6,7 @@
 
 ; char VerWriteBlock (struct tr_se *myTS, char *buffer);
 
-	    .import popax
+	    .import popax, __oserror
 	    .import gettrse
 	    .export _VerWriteBlock
 
@@ -21,6 +21,6 @@ _VerWriteBlock:
 	sta r1L
 	stx r1H
 	jsr VerWriteBlock
-	stx errno
+	stx __oserror
 	txa
 	rts

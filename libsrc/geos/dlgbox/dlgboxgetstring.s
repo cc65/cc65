@@ -7,11 +7,10 @@
 ; char DlgBoxGetString       (char *string, char strlen, char *line1,char *line2);
 
 	    .export _DlgBoxGetString
-	    .import DB_get2lines
+	    .import DB_get2lines, _DoDlgBox
 	    .importzp ptr2, ptr3, ptr4
 	    .import popa, popax
-	    
-	    .include "../inc/jumptab.inc"
+
 	    .include "../inc/geossym.inc"
 	    .include "../inc/const.inc"
 
@@ -24,11 +23,7 @@ _DlgBoxGetString:
 	    stx ptr2+1
 	    lda #<paramStrGetString
 	    ldx #>paramStrGetString
-	    sta r0L
-	    stx r0H
-	    jsr DoDlgBox
-	    lda r0L
-	    rts
+	    jmp _DoDlgBox
 
 paramStrGetString:
 	    .byte DEF_DB_POS | 1

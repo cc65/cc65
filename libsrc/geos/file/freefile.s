@@ -6,6 +6,7 @@
 
 ; char FreeFile  (struct trse myTrSe[]);
 
+	    .import __oserror
 	    .export _FreeFile
 
 	    .include "../inc/jumptab.inc"
@@ -15,6 +16,6 @@ _FreeFile:
 	sta r9L
 	stx r9H
 	jsr FreeFile
-	stx errno
+	stx __oserror
 	txa
 	rts

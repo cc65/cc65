@@ -6,6 +6,7 @@
 
 ; char DeleteFile  (char *myName);
 
+	    .import __oserror
 	    .export _DeleteFile
 
 	    .include "../inc/jumptab.inc"
@@ -15,6 +16,6 @@ _DeleteFile:
 	sta r0L
 	stx r0H
 	jsr DeleteFile
-	stx errno
+	stx __oserror
 	txa
 	rts

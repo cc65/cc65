@@ -6,6 +6,7 @@
 
 ; char GetFHdrInfo  (struct filehandle *myFile);
 
+	    .import __oserror
 	    .export _GetFHdrInfo
 
 	    .include "../inc/jumptab.inc"
@@ -15,6 +16,6 @@ _GetFHdrInfo:
 	sta r9L
 	stx r9H
 	jsr GetFHdrInfo
-	stx errno
+	stx __oserror
 	txa
 	rts

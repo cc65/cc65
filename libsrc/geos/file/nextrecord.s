@@ -6,6 +6,7 @@
 
 ; char NextRecord  (void);
 
+	    .import __oserror
 	    .export _NextRecord
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 	
 _NextRecord:
 	jsr NextRecord
-	stx errno
+	stx __oserror
 	txa
 	rts

@@ -6,6 +6,7 @@
 
 ; char UpdateRecordFile  (void);
 
+	    .import __oserror
 	    .export _UpdateRecordFile
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 
 _UpdateRecordFile:
 	jsr UpdateRecordFile
-	stx errno
+	stx __oserror
 	txa
 	rts

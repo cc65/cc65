@@ -6,7 +6,7 @@
 
 ; char ReadBlock (struct tr_se myTS, char *buffer);
 
-	    .import popax
+	    .import popax, __oserror
 	    .import gettrse
 	    .export _ReadBlock
 
@@ -21,6 +21,6 @@ _ReadBlock:
 	sta r1L
 	stx r1H
 	jsr ReadBlock
-	stx errno
+	stx __oserror
 	txa
 	rts

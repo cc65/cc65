@@ -7,7 +7,7 @@
 ; char FollowChain  (struct tr_se *myTrSe, char *buffer);
 
 	    .export _FollowChain
-	    .import popax
+	    .import popax, __oserror
 	    .import gettrse
 
 	    .include "../inc/jumptab.inc"
@@ -21,6 +21,6 @@ _FollowChain:
 	sta r1L
 	stx r1H
 	jsr FollowChain
-	stx errno
+	stx __oserror
 	txa
 	rts

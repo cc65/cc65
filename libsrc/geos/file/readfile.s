@@ -7,7 +7,7 @@
 ; char ReadFile  (struct tr_se *myTS, char *buffer, int length);
 
 	    .export _ReadFile
-	    .import popax
+	    .import popax, __oserror
 	    .import gettrse
 
 	    .include "../inc/jumptab.inc"
@@ -24,6 +24,6 @@ _ReadFile:
 	sta r1L
 	stx r1H
 	jsr ReadFile
-	stx errno
+	stx __oserror
 	txa
 	rts

@@ -6,7 +6,7 @@
 
 ; char PutBlock (struct tr_se *myTS, char *buffer);
 
-	    .import popax
+	    .import popax, __oserror
 	    .import gettrse
 	    .export _PutBlock
 
@@ -21,6 +21,6 @@ _PutBlock:
 	sta r1L
 	stx r1H
 	jsr PutBlock
-	stx errno
+	stx __oserror
 	txa
 	rts

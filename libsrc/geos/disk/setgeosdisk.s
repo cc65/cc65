@@ -6,6 +6,7 @@
 
 ; char SetGEOSDisk (void);
 
+	    .import __oserror
 	    .export _SetGEOSDisk
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 
 _SetGEOSDisk:
 	jsr SetGEOSDisk
-	stx errno
+	stx __oserror
 	txa
 	rts

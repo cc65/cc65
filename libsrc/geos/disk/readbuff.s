@@ -6,6 +6,7 @@
 
 ; char ReadBuff  (struct tr_se);
 
+	    .import __oserror
 	    .import gettrse
 	    .export _ReadBuff
 
@@ -17,6 +18,6 @@ _ReadBuff:
 	sta r1L
 	stx r1H
 	jsr ReadBuff
-	stx errno
+	stx __oserror
 	txa
 	rts

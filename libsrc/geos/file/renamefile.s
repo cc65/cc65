@@ -7,7 +7,7 @@
 ; char RenameFile  (char *source, char *target);
 
 	    .export _RenameFile
-	    .import popax
+	    .import popax, __oserror
 
 	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
@@ -19,6 +19,6 @@ _RenameFile:
 	sta r6L
 	stx r6H
 	jsr RenameFile
-	stx errno
+	stx __oserror
 	txa
 	rts

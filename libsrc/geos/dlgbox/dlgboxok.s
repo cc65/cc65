@@ -7,10 +7,9 @@
 ; char DlgBoxOk       (char *line1,char *line2);
 
 	    .export _DlgBoxOk
-	    .import DB_get2lines
+	    .import DB_get2lines, _DoDlgBox
 	    .importzp ptr3, ptr4
 
-	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
 	    .include "../inc/const.inc"
 
@@ -18,11 +17,7 @@ _DlgBoxOk:
 	    jsr DB_get2lines
 	    lda #<paramStrOk
 	    ldx #>paramStrOk
-	    sta r0L
-	    stx r0H
-	    jsr DoDlgBox
-	    lda r0L
-	    rts
+	    jmp _DoDlgBox
 
 paramStrOk:
 	    .byte DEF_DB_POS | 1

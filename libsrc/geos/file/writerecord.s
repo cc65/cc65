@@ -7,7 +7,7 @@
 ; char WriteRecord  (char *buffer, int length);
 
 	    .export _WriteRecord
-	    .import popax
+	    .import popax, __oserror
 
 	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
@@ -19,6 +19,6 @@ _WriteRecord:
 	sta r7L
 	stx r7H
 	jsr WriteRecord
-	stx errno
+	stx __oserror
 	txa
 	rts

@@ -6,6 +6,7 @@
 
 ; char FindFile  (char *myName);
 
+	    .import __oserror
 	    .export _FindFile
 
 	    .include "../inc/jumptab.inc"
@@ -15,6 +16,6 @@ _FindFile:
 	sta r6L
 	stx r6H
 	jsr FindFile
-	stx errno
+	stx __oserror
 	txa
 	rts

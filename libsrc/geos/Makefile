@@ -4,10 +4,10 @@
 #
 # Maciej 'YTM/Elysium' Witkowiak
 
-OBJ_DIRS=disk dlgbox file graph menuicon memory mousesprite process system
+OBJ_DIRS=devel disk dlgbox file graph menuicon memory mousesprite process system
 
 all:
-	@for i in devel $(OBJ_DIRS); do $(MAKE) -C $$i; done
+	@for i in $(OBJ_DIRS); do $(MAKE) -C $$i; done
 	@mv devel/crt0.o ../geos.o
 	@for i in $(OBJ_DIRS); do $(AR) a ../geos.lib $$i/*.o; done
 

@@ -9,7 +9,7 @@
 ; sectnum_t - 16bit
 ;
 
-	.import		dio_params
+	.import		dio_params, __oserror
  	.export		_dio_write_verify
 	.include "../inc/geossym.inc"
 	.include "../inc/jumptab.inc"
@@ -18,7 +18,7 @@
 
 	jsr dio_params
 	jsr VerWriteBlock
-	stx errno
+	stx __oserror
 	txa
 	rts
 

@@ -6,7 +6,7 @@
 
 ; char GetBlock (struct tr_se *myTS, char *buffer);
 
-	    .import popax
+	    .import popax, __oserror
 	    .import gettrse
 	    .export _GetBlock
 
@@ -21,6 +21,6 @@ _GetBlock:
 	sta r1L
 	stx r1H
 	jsr GetBlock
-	stx errno
+	stx __oserror
 	txa
 	rts

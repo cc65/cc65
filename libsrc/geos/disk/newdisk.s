@@ -6,6 +6,7 @@
 
 ; char NewDisk (void);
 
+	    .import __oserror
 	    .export _NewDisk
 
 	    .include "../inc/jumptab.inc"
@@ -13,6 +14,6 @@
 	
 _NewDisk:
 	jsr NewDisk
-	stx errno
+	stx __oserror
 	txa
 	rts

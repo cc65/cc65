@@ -70,7 +70,7 @@ struct Declaration {
     type      	Type [MAXTYPELEN];	/* The type */
 
     /* Working variables */
-    type* 	T;			/* Used to build Type */
+    unsigned	Index;			/* Used to build Type */
 };
 
 /* Modes for ParseDecl */
@@ -102,7 +102,7 @@ void CheckEmptyDecl (const DeclSpec* D);
  */
 
 unsigned ParseInit (type* T);
-/* Parse initialization of variables. Return the number of initialized data 
+/* Parse initialization of variables. Return the number of initialized data
  * bytes.
  */
 

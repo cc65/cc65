@@ -143,9 +143,9 @@ static void optionalsigned (void)
 static void InitDeclSpec (DeclSpec* D)
 /* Initialize the DeclSpec struct for use */
 {
-    D->StorageClass   	= 0;
-    D->Type[0]	    	= T_END;
-    D->Flags 	    	= 0;
+    D->StorageClass     = 0;
+    D->Type[0]          = T_END;
+    D->Flags            = 0;
 }
 
 
@@ -153,9 +153,43 @@ static void InitDeclSpec (DeclSpec* D)
 static void InitDeclaration (Declaration* D)
 /* Initialize the Declaration struct for use */
 {
-    D->Ident[0]		= '\0';
-    D->Type[0]	 	= T_END;
-    D->T		= D->Type;
+    D->Ident[0] = '\0';
+    D->Type[0]  = T_END;
+    D->Index    = 0;
+}
+
+
+
+static void NeedTypeSpace (Declaration* D, unsigned Count)
+/* Check if there is enough space for Count type specifiers within D */
+{
+    if (D->Index + Count >= MAXTYPELEN) {
+   	/* We must call Fatal() here, since calling Error() will try to
+   	 * continue, and the declaration type is not correctly terminated
+   	 * in case we come here.
+   	 */
+   	Fatal ("Too many type specifiers");
+    }
+}
+
+
+
+static void AddTypeToDeclaration (Declaration* D, type T)
+/* Add a type specifier to the type of a declaration */
+{
+    NeedTypeSpace (D, 1);
+    D->Type[D->Index++] = T;
+}
+
+
+
+static void AddEncodeToDeclaration (Declaration* D, type T, unsigned long Val)
+/* Add a type plus encoding to the type of a declaration */
+{
+    NeedTypeSpace (D, DECODE_SIZE+1);
+    D->Type[D->Index++] = T;
+    Encode (D->Type + D->Index, Val);
+    D->Index += DECODE_SIZE;
 }
 
 
@@ -441,7 +475,7 @@ static void ParseTypeSpec (DeclSpec* D, int Default)
        		case TOK_CHAR:
     		    NextToken ();
 		    D->Type[0] = T_SCHAR;
-		    D->Type[1] = T_END;
+	     	    D->Type[1] = T_END;
     		    break;
 
     		case TOK_SHORT:
@@ -938,7 +972,8 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
         /* Parse the type, the pointer points to */
        	Decl (Spec, D, Mode);
 
-       	*D->T++ = T;
+	/* Add the type */
+	AddTypeToDeclaration (D, T);
        	return;
     }
 
@@ -946,7 +981,7 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     if (CurTok.Tok == TOK_FASTCALL || CurTok.Tok == TOK_NEAR || CurTok.Tok == TOK_FAR) {
 
 	/* Remember the current type pointer */
-	type* T = D->T;
+	type* T = D->Type + D->Index;
 
 	/* Read the flags */
 	unsigned Flags = FunctionModifierFlags ();
@@ -995,14 +1030,16 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 
     while (CurTok.Tok == TOK_LBRACK || CurTok.Tok == TOK_LPAREN) {
        	if (CurTok.Tok == TOK_LPAREN) {
+
        	    /* Function declaration */
 	    FuncDesc* F;
        	    NextToken ();
+
 	    /* Parse the function declaration */
        	    F = ParseFuncDecl (Spec);
-	    *D->T++ = T_FUNC;
-	    EncodePtr (D->T, F);
-	    D->T += DECODE_SIZE;
+
+	    /* Add the function type. Be sure to bounds check the type buffer */
+	    AddEncodeToDeclaration (D, T_FUNC, (unsigned long) F);
        	} else {
 	    /* Array declaration */
        	    long Size = UNSPECIFIED;
@@ -1022,9 +1059,9 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
        	       	Size = lval.ConstVal;
        	    }
        	    ConsumeRBrack ();
-       	    *D->T++ = T_ARRAY;
-       	    Encode (D->T, Size);
-       	    D->T += DECODE_SIZE;
+
+	    /* Add the type */
+	    AddEncodeToDeclaration (D, T_ARRAY, Size);
        	}
     }
 }
@@ -1069,7 +1106,8 @@ void ParseDecl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
     Decl (Spec, D, Mode);
 
     /* Add the base type. */
-    TypeCpy (D->T, Spec->Type);
+    NeedTypeSpace (D, TypeLen (Spec->Type) + 1);	/* Bounds check */
+    TypeCpy (D->Type + D->Index, Spec->Type);
 
     /* Check the size of the generated type */
     if (!IsTypeFunc (D->Type) && !IsTypeVoid (D->Type) && SizeOf (D->Type) >= 0x10000) {

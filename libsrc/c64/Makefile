@@ -11,6 +11,9 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
+%.emd:	%.o ../runtime/zeropage.o
+	@$(LD) -t module -o $@ $^
+
 %.tgi:	%.o ../runtime/zeropage.o
 	@$(LD) -t module -o $@ $^
 
@@ -32,16 +35,17 @@ OBJS = 	_scrsize.o     	 	\
 
 TGIS =	c64-320-200-2.tgi
 
+EMDS =	c64-georam.emd
 
 #--------------------------------------------------------------------------
 # Targets
 
-all:	$(OBJS) $(TGIS)
+all: 	$(OBJS) $(EMDS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 
 clean:
-	@rm -f $(OBJS) $(TGIS:.tgi=.o)
+	@rm -f $(OBJS) $(EMDS:.emd=.o) $(TGIS:.tgi=.o) 
 

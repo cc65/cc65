@@ -436,7 +436,7 @@ void AddCodeEntry (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
 	    break;
 
 	default:
-	    E = ParseInsn (S, LI, L);		  
+	    E = ParseInsn (S, LI, L);
 	    break;
     }
 
@@ -949,12 +949,7 @@ void OutputCodeSeg (const CodeSeg* S, FILE* F)
 	if (E->LI != LI) {
 	    LI = E->LI;
 	    if (AddSource) {
-		/* Skip spaces to make the output somewhat more readable */
-		const char* Line = LI->Line;
-		while (IsBlank (*Line)) {
-		    ++Line;
-		}
-		fprintf (F, ";\n; %s\n;\n", Line);
+		fprintf (F, ";\n; %s\n;\n", LI->Line);
 	    }
 	}
 	/* Output the code */

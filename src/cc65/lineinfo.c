@@ -36,10 +36,12 @@
 #include <string.h>
 
 /* common */
+#include "chartype.h"
 #include "check.h"
 #include "xmalloc.h"
 
 /* cc65 */
+#include "global.h"
 #include "input.h"
 #include "lineinfo.h"
 
@@ -65,17 +67,38 @@ static LineInfo* CurLineInfo = 0;
 static LineInfo* NewLineInfo (struct IFile* F, unsigned LineNum, const char* Line)
 /* Create and return a new line info. Ref count will be 1. */
 {
+    unsigned  Len;
+    LineInfo* LI;
+    char*     S;
+
+    /* Skip leading spaces in Line */
+    while (IsBlank (*Line)) {
+    	++Line;
+    }
+
     /* Calculate the length of the line */
-    unsigned Len = strlen (Line);
+    Len = strlen (Line);
 
     /* Allocate memory */
-    LineInfo* LI = xmalloc (sizeof (LineInfo) + Len);
+    LI = xmalloc (sizeof (LineInfo) + Len);
 
     /* Initialize the fields */
     LI->RefCount  = 1;
     LI->InputFile = F;
     LI->LineNum   = LineNum;
     memcpy (LI->Line, Line, Len+1);
+
+    /* Replace tabs by spaces in the given line since tabs will give rather
+     * arbitrary results when used in the output later, and if we do it here,
+     * we won't need another copy.
+     */
+    S = LI->Line;
+    while (*S) {
+	if (*S == '\t') {
+	    *S = ' ';
+	}
+	++S;
+    }
 
     /* Return the new struct */
     return LI;
@@ -131,6 +154,13 @@ void UpdateLineInfo (struct IFile* F, unsigned LineNum, const char* Line)
     /* If a current line info exists, release it */
     if (CurLineInfo) {
 	ReleaseLineInfo (CurLineInfo);
+    }
+
+    /* If we have intermixed assembly switched off, use an empty line instead
+     * of the supplied one to save some memory.
+     */
+    if (!AddSource) {
+	Line = "";
     }
 
     /* Create a new line info */

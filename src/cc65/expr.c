@@ -3128,9 +3128,6 @@ void test (unsigned label, int cond)
     /* Load the value into the primary register */
     exprhs (CF_FORCECHAR, k, &lval);
 
-    /* Check for the closing brace */
-    ConsumeRParen ();
-
     /* Generate the jump */
     if (cond) {
      	g_truejump (CF_NONE, label);
@@ -3143,6 +3140,9 @@ void test (unsigned label, int cond)
             g_falsejump (CF_NONE, label);
 	}
     }
+
+    /* Check for the closing brace */
+    ConsumeRParen ();
 }
 
 

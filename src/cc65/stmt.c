@@ -46,32 +46,37 @@
 
 
 /*****************************************************************************/
+/*				   Forwards                                  */
+/*****************************************************************************/
+
+
+
+/*****************************************************************************/
 /*	  	  		     Code		     		     */
 /*****************************************************************************/
 
 
 
-static int DoIf (void)
+static int IfStatement (void)
 /* Handle an 'if' statement */
 {
-    int flab1;
-    int flab2;
-    int gotbreak;
+    unsigned Label1;
+    int GotBreak;
 
     /* Skip the if */
     NextToken ();
 
     /* Generate a jump label and parse the condition */
-    flab1 = GetLocalLabel ();
-    test (flab1, 0);
+    Label1 = GetLocalLabel ();
+    test (Label1, 0);
 
     /* Parse the if body */
-    gotbreak = Statement ();
+    GotBreak = Statement ();
 
     /* Else clause present? */
     if (CurTok.Tok != TOK_ELSE) {
 
-      	g_defcodelabel (flab1);
+      	g_defcodelabel (Label1);
      	/* Since there's no else clause, we're not sure, if the a break
      	 * statement is really executed.
      	 */
@@ -79,36 +84,30 @@ static int DoIf (void)
 
     } else {
 
-     	/* Skip the else */
+	/* Generate a jump around the else branch */
+     	unsigned Label2 = GetLocalLabel ();
+	g_jump (Label2);
+
+	/* Skip the else */
      	NextToken ();
 
-     	/* If we had some sort of break statement at the end of the if clause,
-     	 * there's no need to generate an additional jump around the else
-     	 * clause, since the jump is never reached.
-     	 */
-     	if (!gotbreak) {
-     	    flab2 = GetLocalLabel ();
-     	    g_jump (flab2);
-     	} else {
-     	    /* Mark the label as unused */
-     	    flab2 = 0;
-     	}
-     	g_defcodelabel (flab1);
-     	gotbreak &= Statement ();
+	/* Define the target for the first test */
+	g_defcodelabel (Label1);
+
+	/* Total break only if both branches had a break. */
+     	GotBreak &= Statement ();
 
      	/* Generate the label for the else clause */
-     	if (flab2) {
-     	    g_defcodelabel (flab2);
-     	}
+	g_defcodelabel (Label2);
 
      	/* Done */
-     	return gotbreak;
+     	return GotBreak;
     }
 }
 
 
 
-static void DoDo (void)
+static void DoStatement (void)
 /* Handle the 'do' statement */
 {
     /* Get the loop control labels */
@@ -141,7 +140,7 @@ static void DoDo (void)
 
 
 
-static void DoWhile (void)
+static void WhileStatement (void)
 /* Handle the 'while' statement */
 {
     /* Get the loop control labels */
@@ -184,7 +183,7 @@ static void DoWhile (void)
 
 
 
-static void DoReturn (void)
+static void ReturnStatement (void)
 /* Handle the 'return' statement */
 {
     struct expent lval;
@@ -215,7 +214,7 @@ static void DoReturn (void)
 
 
 
-static void DoBreak (void)
+static void BreakStatement (void)
 /* Handle the 'break' statement */
 {
     LoopDesc* L;
@@ -242,7 +241,7 @@ static void DoBreak (void)
 
 
 
-static void DoContinue (void)
+static void ContinueStatement (void)
 /* Handle the 'continue' statement */
 {
     LoopDesc* L;
@@ -284,8 +283,8 @@ static void DoContinue (void)
 static void CascadeSwitch (struct expent* eval)
 /* Handle a switch statement for chars with a cmp cascade for the selector */
 {
-    unsigned ExitLab;  		/* Exit label */
-    unsigned NextLab;  		/* Next case label */
+    unsigned ExitLab;  	     	/* Exit label */
+    unsigned NextLab;  	     	/* Next case label */
     unsigned CodeLab;		/* Label that starts the actual selector code */
     int HaveBreak;   		/* Remember if we exited with break */
     int HaveDefault;		/* Remember if we had a default label */
@@ -352,29 +351,29 @@ static void CascadeSwitch (struct expent* eval)
 			case T_SCHAR:
 			    /* Signed char */
 			    if (Val < -128 || Val > 127) {
-			  	Error ("Range error");
-			    }
-			    break;
+		     	  	Error ("Range error");
+		     	    }
+		     	    break;
 
-			case T_UCHAR:
-		  	    if (Val < 0 || Val > 255) {
-			  	Error ("Range error");
-			    }
-			    break;
+		     	case T_UCHAR:
+		     	    if (Val < 0 || Val > 255) {
+		     	  	Error ("Range error");
+		     	    }
+		     	    break;
 
-			case T_INT:
-			    if (Val < -32768 || Val > 32767) {
-			  	Error ("Range error");
-			    }
-		   	    break;
+		     	case T_INT:
+		     	    if (Val < -32768 || Val > 32767) {
+		     	  	Error ("Range error");
+		     	    }
+		     	    break;
 
-		    	case T_UINT:
-		  	    if (Val < 0 || Val > 65535) {
-			  	Error ("Range error");
-		  	    }
-			    break;
+		     	case T_UINT:
+		     	    if (Val < 0 || Val > 65535) {
+		     	  	Error ("Range error");
+		     	    }
+		     	    break;
 
-			default:
+		     	default:
 		     	    Internal ("Invalid type: %02X", *eval->e_tptr & 0xFF);
 		    }
 
@@ -385,17 +384,17 @@ static void CascadeSwitch (struct expent* eval)
 		     * the condition is true.
 		     */
 		    if (CurTok.Tok == TOK_CASE) {
-			/* Create a code label if needed */
-		    	if (CodeLab == 0) {
-			    CodeLab = GetLocalLabel ();
-			}
-			g_falsejump (CF_NONE, CodeLab);
+		     	/* Create a code label if needed */
+		     	if (CodeLab == 0) {
+		     	    CodeLab = GetLocalLabel ();
+		     	}
+		     	g_falsejump (CF_NONE, CodeLab);
 		    } else if (CurTok.Tok != TOK_DEFAULT) {
 		  	/* No case follows, jump to next selector */
 		  	if (NextLab == 0) {
 		  	    NextLab = GetLocalLabel ();
 		  	}
-		  	g_truejump (CF_NONE, NextLab);
+		     	g_truejump (CF_NONE, NextLab);
 		    }
 
 		    /* Skip the colon */
@@ -475,7 +474,7 @@ static void TableSwitch (struct expent* eval)
     int lcount;	     	       	/* Label count */
     int HaveBreak;  		/* Last statement has a break */
     int HaveDefault;		/* Remember if we had a default label */
-    unsigned Flags; 		/* Code generator flags */
+    unsigned Flags;  		/* Code generator flags */
     struct expent lval;		/* Case label expression */
     struct swent *p;
     struct swent *swtab;
@@ -569,7 +568,7 @@ static void TableSwitch (struct expent* eval)
 
 
 
-static void DoSwitch (void)
+static void SwitchStatement (void)
 /* Handle a 'switch' statement */
 {
     struct expent eval;	       	/* Switch statement expression */
@@ -595,98 +594,122 @@ static void DoSwitch (void)
 
 
 
-static void DoFor (void)
+static void ForStatement (void)
 /* Handle a 'for' statement */
 {
-    int loop;
-    int lab;
-    int linc;
-    int lstat;
     struct expent lval1;
     struct expent lval2;
     struct expent lval3;
 
+    /* Get several local labels needed later */
+    unsigned TestLabel = GetLocalLabel ();
+    unsigned lab       = GetLocalLabel ();
+    unsigned IncLabel  = GetLocalLabel ();
+    unsigned lstat     = GetLocalLabel ();
+
+    /* Skip the FOR token */
     NextToken ();
-    loop = GetLocalLabel ();
-    lab = GetLocalLabel ();
-    linc = GetLocalLabel ();
-    lstat = GetLocalLabel ();
-    AddLoop (oursp, loop, lab, linc, lstat);
+
+    /* Add the loop to the loop stack */
+    AddLoop (oursp, TestLabel, lab, IncLabel, lstat);
+
+    /* Skip the opening paren */
     ConsumeLParen ();
-    if (CurTok.Tok != TOK_SEMI) {	/* exp1 */
+
+    /* Parse the initializer expression */
+    if (CurTok.Tok != TOK_SEMI) {
 	expression (&lval1);
     }
     ConsumeSemi ();
-    g_defcodelabel (loop);
-    if (CurTok.Tok != TOK_SEMI) { 	/* exp2 */
-	boolexpr (&lval2);
-	g_truejump (CF_NONE, lstat);
-	g_jump (lab);
+
+    /* Label for the test expressions */
+    g_defcodelabel (TestLabel);
+
+    /* Parse the text expression */
+    if (CurTok.Tok != TOK_SEMI) {
+    	boolexpr (&lval2);
+    	g_truejump (CF_NONE, lstat);
+    	g_jump (lab);
     } else {
-	g_jump (lstat);
+    	g_jump (lstat);
     }
     ConsumeSemi ();
-    g_defcodelabel (linc);
-    if (CurTok.Tok != TOK_RPAREN) {	/* exp3 */
+
+    /* Label for the increment expression */
+    g_defcodelabel (IncLabel);
+
+    /* Parse the increment expression */
+    if (CurTok.Tok != TOK_RPAREN) {
     	expression (&lval3);
     }
+
+    /* Jump to the test */
+    g_jump (TestLabel);
+
+    /* Skip the closing paren */
     ConsumeRParen ();
-    g_jump (loop);
+
+    /* Loop body */
     g_defcodelabel (lstat);
     Statement ();
-    g_jump (linc);
+
+    /* Jump back to the increment expression */
+    g_jump (IncLabel);
+
+    /* Declare the break label */
     g_defcodelabel (lab);
+
+    /* Remove the loop from the loop stack */
     DelLoop ();
 }
 
 
 
 static int CompoundStatement (void)
-/* Compound statement. Allow any number of statements inside braces. */
+/* Compound statement. Allow any number of statements inside braces. The
+ * function returns true if the last statement was a break or return.
+ */
 {
-    int isbrk;
-    int oldsp;
-
-    /* eat LCURLY */
-    NextToken ();
+    int GotBreak;
 
     /* Remember the stack at block entry */
-    oldsp = oursp;
+    int OldStack = oursp;
 
     /* Enter a new lexical level */
     EnterBlockLevel ();
+
+    /* Skip the rcurly */
+    NextToken ();
 
     /* Parse local variable declarations if any */
     DeclareLocals ();
 
     /* Now process statements in this block */
-    isbrk = 0;
+    GotBreak = 0;
     while (CurTok.Tok != TOK_RCURLY) {
      	if (CurTok.Tok != TOK_CEOF) {
-     	    isbrk = Statement ();
+     	    GotBreak = Statement ();
      	} else {
      	    break;
      	}
     }
 
+    /* Clean up the stack. */
+    if (!GotBreak) {
+	g_space (oursp - OldStack);
+    }
+    oursp = OldStack;
+
+    /* Skip the closing brace */
+    ConsumeRCurly ();
+
     /* Emit references to imports/exports for this block */
     EmitExternals ();
-
-    /* Clean up the stack. */
-    if (isbrk) {
-	oursp = oldsp;
-    } else {
-	g_space (oursp - oldsp);
-	oursp = oldsp;
-    }
 
     /* Leave the lexical level */
     LeaveBlockLevel ();
 
-    /* Eat closing brace */
-    ConsumeRCurly ();
-
-    return isbrk;
+    return GotBreak;
 }
 
 
@@ -698,7 +721,7 @@ int Statement (void)
 {
     struct expent lval;
 
-    /* */
+    /* Check for a label */
     if (CurTok.Tok == TOK_IDENT && NextTok.Tok == TOK_COLON) {
 
 	/* Special handling for a label */
@@ -709,44 +732,44 @@ int Statement (void)
      	switch (CurTok.Tok) {
 
      	    case TOK_LCURLY:
-     	    	return CompoundStatement ();
+	        return CompoundStatement ();
 
      	    case TOK_IF:
-     	    	return DoIf ();
+     	    	return IfStatement ();
 
      	    case TOK_WHILE:
-     	    	DoWhile ();
+     	    	WhileStatement ();
 	    	break;
 
 	    case TOK_DO:
-	    	DoDo ();
+	    	DoStatement ();
 	    	break;
 
 	    case TOK_SWITCH:
-	    	DoSwitch ();
+	    	SwitchStatement ();
 	    	break;
 
 	    case TOK_RETURN:
-	    	DoReturn ();
+	    	ReturnStatement ();
 	    	ConsumeSemi ();
 	    	return 1;
 
 	    case TOK_BREAK:
-		DoBreak ();
+		BreakStatement ();
 		ConsumeSemi ();
 		return 1;
 
 	    case TOK_CONTINUE:
-		DoContinue ();
+		ContinueStatement ();
 		ConsumeSemi ();
 		return 1;
 
 	    case TOK_FOR:
-		DoFor ();
+		ForStatement ();
 		break;
 
 	    case TOK_GOTO:
-		DoGoto ();
+		GotoStatement ();
 		ConsumeSemi ();
 		return 1;
 

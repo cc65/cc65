@@ -47,7 +47,7 @@
 
 
 
-void DoGoto (void)
+void GotoStatement (void)
 /* Process a goto statement. */
 {
     /* Eat the "goto" */

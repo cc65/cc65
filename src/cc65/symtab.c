@@ -528,7 +528,7 @@ static void AddSymEntry (SymTable* T, SymEntry* S)
 	/* First symbol */
 	T->SymHead = S;
     }
-    T->SymCount++;
+    ++T->SymCount;
 
     /* Insert the symbol into the hash chain */
     S->NextHash  = T->Tab[Hash];
@@ -637,6 +637,9 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
      	/* Set a new label number */
      	Entry->V.Label = GetLocalLabel ();
 
+        /* Generate the assembler name of the label */
+        Entry->AsmName = xstrdup (LocalLabelName (Entry->V.Label));
+
      	/* Add the entry to the label table */
      	AddSymEntry (LabelTab, Entry);
 
@@ -671,7 +674,9 @@ SymEntry* AddLocalSym (const char* Name, const type* Type, unsigned Flags, int O
             Entry->V.R.RegOffs  = Offs;
             Entry->V.R.SaveOffs = oursp;        /* ### Cleaner! */
         } else if ((Flags & SC_STATIC) == SC_STATIC) {
+            /* Generate the assembler name from the label number */
             Entry->V.Label = Offs;
+            Entry->AsmName = xstrdup (LocalLabelName (Entry->V.Label));
         } else if ((Flags & SC_STRUCTFIELD) == SC_STRUCTFIELD) {
             Entry->V.Offs = Offs;
         } else {
@@ -761,6 +766,8 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
 
     } else {
 
+        unsigned Len;
+
 	/* Create a new entry */
      	Entry = NewSymEntry (Name, Flags);
 
@@ -774,6 +781,12 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
 	    Entry->V.F.Func = GetFuncDesc (Entry->Type);
 	    Entry->V.F.Seg  = 0;
 	}
+
+        /* Add the assembler name of the symbol */
+        Len = strlen (Name);
+        Entry->AsmName = xmalloc (Len + 2);
+        Entry->AsmName[0] = '_';
+        memcpy (Entry->AsmName+1, Name, Len+1);
 
      	/* Add the entry to the symbol table */
      	AddSymEntry (Tab, Entry);

@@ -89,6 +89,7 @@ typedef enum token_t {
     TOK_MINUS,
     TOK_MUL_ASSIGN,
     TOK_STAR,
+    TOK_MUL = TOK_STAR,		/* Alias */
     TOK_DIV_ASSIGN,
     TOK_DIV,
     TOK_BOOL_AND,
@@ -101,8 +102,6 @@ typedef enum token_t {
     TOK_OR,
     TOK_EQ,
     TOK_ASSIGN,
-    TOK_SHL_ASSIGN,
-    TOK_SHL,
 
     /* Inequalities */
     TOK_LE,
@@ -110,6 +109,8 @@ typedef enum token_t {
     TOK_GE,
     TOK_GT,
 
+    TOK_SHL_ASSIGN,
+    TOK_SHL,
     TOK_SHR_ASSIGN,
     TOK_SHR,
     TOK_XOR_ASSIGN,
@@ -148,7 +149,7 @@ typedef enum token_t {
 typedef struct Token_ Token;
 struct Token_ {
     token_t	Tok;		/* The token itself */
-    long	IVal;		/* The integer attribute */ 
+    long	IVal;		/* The integer attribute */
     double	FVal;		/* The float attribute */
     ident	Ident;		/* Identifier if IDENT */
     unsigned	Pos;		/* Source line where the token comes from */

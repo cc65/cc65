@@ -67,8 +67,8 @@
 
 
 static ExprNode* UnaryExpr (void);
-ExprNode* Expr1 (void);
-ExprNode* Expr0 (void);
+ExprNode* AssignExpr (void);
+ExprNode* Expression (void);
 
 
 
@@ -85,7 +85,7 @@ static int IsTypeExpr (void)
 {
     SymEntry* Entry;
 
-    return curtok == TOK_LPAREN && (
+    return CurTok.Tok == TOK_LPAREN && (
        	    (nxttok >= TOK_FIRSTTYPE && nxttok <= TOK_LASTTYPE) ||
 	    (nxttok == TOK_CONST)                           	||
        	    (nxttok  == TOK_IDENT 			      	&&
@@ -140,7 +140,7 @@ ExprNode* DoAsm (void)
     N = AllocExprNode (NT_ASM, type_void, RVALUE);
 
     /* String literal */
-    if (curtok != TOK_SCONST) {
+    if (CurTok.Tok != TOK_SCONST) {
 
        	/* Print an error */
      	Error (ERR_STRLIT_EXPECTED);
@@ -181,15 +181,15 @@ static ExprNode* Primary (void)
     /* Process a parenthesized subexpression. In this case we don't need to
      * allocate a new node ourselves.
      */
-    if (curtok == TOK_LPAREN) {
+    if (CurTok.Tok == TOK_LPAREN) {
        	NextToken ();
-       	N = Expr0 ();
+       	N = Expression ();
        	ConsumeRParen ();
        	return N;
     }
 
     /* Check for an integer or character constant */
-    if (curtok == TOK_ICONST || curtok == TOK_CCONST) {
+    if (CurTok.Tok == TOK_ICONST || CurTok.Tok == TOK_CCONST) {
 
 	/* Create the new node */
 	N = AllocExprNode (NT_CONST, CurTok.Type, RVALUE);
@@ -201,7 +201,7 @@ static ExprNode* Primary (void)
     }
 
     /* Check for a float constant */
-    if (curtok == TOK_FCONST) {
+    if (CurTok.Tok == TOK_FCONST) {
 
 	/* Create the new node */
 	N = AllocExprNode (NT_CONST, CurTok.Type, RVALUE);
@@ -227,7 +227,7 @@ static ExprNode* Primary (void)
     }
 
     /* Identifier? */
-    if (curtok == TOK_IDENT) {
+    if (CurTok.Tok == TOK_IDENT) {
 
 	/* Identifier */
 	SymEntry* Sym;
@@ -283,7 +283,7 @@ static ExprNode* Primary (void)
 	    /* IDENT is either an auto-declared function or an undefined
 	     * variable.
 	     */
-	    if (curtok == TOK_LPAREN) {
+	    if (CurTok.Tok == TOK_LPAREN) {
 
 	     	/* Warn about the use of a function without prototype */
 	     	Warning (WARN_FUNC_WITHOUT_PROTO);
@@ -310,38 +310,38 @@ static ExprNode* Primary (void)
 
 	}
 
-    } else if (curtok == TOK_SCONST) {
+    } else if (CurTok.Tok == TOK_SCONST) {
 
 	/* String literal */
 	N = AllocExprNode (NT_CONST, GetCharArrayType (strlen (GetLiteral (curval))), RVALUE);
        	N->V.I = curval;
 
-    } else if (curtok == TOK_ASM) {
+    } else if (CurTok.Tok == TOK_ASM) {
 
 	/* ASM statement? */
 	N = DoAsm ();
 
-    } else if (curtok == TOK_A) {
+    } else if (CurTok.Tok == TOK_A) {
 
 	/* A register */
 	N = AllocExprNode (NT_REG_A, type_uchar, LVALUE);
 
-    } else if (curtok == TOK_X) {
+    } else if (CurTok.Tok == TOK_X) {
 
 	/* X register */
        	N = AllocExprNode (NT_REG_X, type_uchar, LVALUE);
 
-    } else if (curtok == TOK_Y) {
+    } else if (CurTok.Tok == TOK_Y) {
 
 	/* Y register */
        	N = AllocExprNode (NT_REG_Y, type_uchar, LVALUE);
 
-    } else if (curtok == TOK_AX) {
+    } else if (CurTok.Tok == TOK_AX) {
 
 	/* AX pseudo register */
        	N = AllocExprNode (NT_REG_AX, type_uint, LVALUE);
 
-    } else if (curtok == TOK_EAX) {
+    } else if (CurTok.Tok == TOK_EAX) {
 
 	/* EAX pseudo register */
        	N = AllocExprNode (NT_REG_EAX, type_ulong, LVALUE);
@@ -372,7 +372,7 @@ static ExprNode* DoArray (ExprNode* Left)
     NextToken ();
 
     /* Get the index */
-    Right = Expr0 ();
+    Right = Expression ();
 
     /* Check the types.	As special "C" feature, accept a reversal of base and
      * index types:
@@ -451,7 +451,7 @@ static ExprNode* DoStruct (ExprNode* Left)
 
     /* Type check */
     StructType = Left->Type;
-    if (curtok == TOK_PTR_REF) {
+    if (CurTok.Tok == TOK_PTR_REF) {
 	NT = NT_STRUCTPTR_ACCESS;
 	if (!IsTypePtr (StructType)) {
 	    Error (ERR_STRUCT_PTR_EXPECTED);
@@ -468,7 +468,7 @@ static ExprNode* DoStruct (ExprNode* Left)
 
     /* Skip the token and check for an identifier */
     NextToken ();
-    if (curtok != TOK_IDENT) {
+    if (CurTok.Tok != TOK_IDENT) {
     	/* Print an error */
     	Error (ERR_IDENT_EXPECTED);
     	/* Return an integer expression instead */
@@ -552,7 +552,7 @@ static ExprNode* DoFunctionCall (ExprNode* Left)
     ParamSize  = 0;
     ParamCount = 0;
     Ellipsis   = 0;
-    while (curtok != TOK_RPAREN) {
+    while (CurTok.Tok != TOK_RPAREN) {
 
 	/* Count arguments */
 	++ParamCount;
@@ -580,12 +580,12 @@ static ExprNode* DoFunctionCall (ExprNode* Left)
      	}
 
        	/* Get the parameter value expression tree and add it to the parameter
-	 * list. (### check expr level)
+	 * list.
 	 */
-	AppendItem (Root, Expr1 ());
+	AppendItem (Root, AssignExpr ());
 
 	/* Check for end of argument list */
-     	if (curtok != TOK_COMMA) {
+     	if (CurTok.Tok != TOK_COMMA) {
      	    break;
 	}
      	NextToken ();
@@ -611,7 +611,7 @@ static ExprNode* DoPostIncDec (ExprNode* Left)
     ExprNode* Root;
 
     /* Determine the type of the node */
-    nodetype_t NT = (curtok == TOK_INC)? NT_POST_INC : NT_POST_DEC;
+    nodetype_t NT = (CurTok.Tok == TOK_INC)? NT_POST_INC : NT_POST_DEC;
 
     /* Skip the operator token */
     NextToken ();
@@ -646,12 +646,12 @@ static ExprNode* PostfixExpr (void)
     ExprNode* Root = Primary ();
 
     /* */
-    while (curtok == TOK_LBRACK || curtok == TOK_LPAREN  ||
-	   curtok == TOK_DOT    || curtok == TOK_PTR_REF ||
-	   curtok == TOK_INC    || curtok == TOK_DEC) {
+    while (CurTok.Tok == TOK_LBRACK || CurTok.Tok == TOK_LPAREN  ||
+	   CurTok.Tok == TOK_DOT    || CurTok.Tok == TOK_PTR_REF ||
+	   CurTok.Tok == TOK_INC    || CurTok.Tok == TOK_DEC) {
 
 	/* This is for us */
-	switch (curtok) {
+	switch (CurTok.Tok) {
 
 	    case TOK_LBRACK:
 		Root = DoArray (Root);
@@ -690,7 +690,7 @@ static ExprNode* DoPreIncDec (void)
     ExprNode* Root;
 
     /* Determine the type of the node */
-    nodetype_t NT = (curtok == TOK_INC)? NT_PRE_INC : NT_PRE_DEC;
+    nodetype_t NT = (CurTok.Tok == TOK_INC)? NT_PRE_INC : NT_PRE_DEC;
 
     /* Skip the operator token */
     NextToken ();
@@ -729,7 +729,7 @@ static ExprNode* DoUnaryPlusMinus (void)
     ExprNode* Root;
 
     /* Remember the current token for later, then skip it */
-    token_t Tok = curtok;
+    token_t Tok = CurTok.Tok;
     NextToken ();
 
     /* Get the operand */
@@ -1014,14 +1014,14 @@ static ExprNode* DoTypeCast (void)
 static ExprNode* UnaryExpr (void)
 {
     /* */
-    if (curtok == TOK_INC    || curtok == TOK_DEC      ||
-       	curtok == TOK_PLUS   || curtok == TOK_MINUS    ||
-       	curtok == TOK_COMP   || curtok == TOK_BOOL_NOT ||
-       	curtok == TOK_AND    || curtok == TOK_STAR     ||
-       	curtok == TOK_SIZEOF || IsTypeExpr ()) {
+    if (CurTok.Tok == TOK_INC    || CurTok.Tok == TOK_DEC      ||
+       	CurTok.Tok == TOK_PLUS   || CurTok.Tok == TOK_MINUS    ||
+       	CurTok.Tok == TOK_COMP   || CurTok.Tok == TOK_BOOL_NOT ||
+       	CurTok.Tok == TOK_AND    || CurTok.Tok == TOK_STAR     ||
+       	CurTok.Tok == TOK_SIZEOF || IsTypeExpr ()) {
 
      	/* Check the token */
-       	switch (curtok) {
+       	switch (CurTok.Tok) {
 
      	    case TOK_INC:
      	    case TOK_DEC:
@@ -1059,3 +1059,341 @@ static ExprNode* UnaryExpr (void)
 
     }
 }
+
+
+
+static ExprNode* MultExpr (void)
+/* Handle multiplicative expressions: '*' '/' and '%' */
+{
+    /* Get the left leave */
+    ExprNode* Root = UnaryExpr ();
+
+    /* Check if this is for us */
+    while (CurTok.Tok == TOK_MUL || CurTok.Tok == TOK_DIV || CurTok.Tok == TOK_MOD) {
+
+     	switch (CurTok.Tok) {
+
+     	    case TOK_MUL:
+		break;
+
+     	    case TOK_DIV:
+		break;
+
+     	    case TOK_MOD:
+		break;
+
+     	    default:
+     		Internal ("Unexpected token");
+     	}
+
+    }
+
+    /* Return the resulting expression */
+    return Root;
+}
+
+
+
+static ExprNode* AddExpr (void)
+/* Handle additive expressions: '+' and '-' */
+{
+    /* Get the left leave */
+    ExprNode* Root = MultExpr ();
+
+    /* Check if this is for us */
+    while (CurTok.Tok == TOK_PLUS || CurTok.Tok == TOK_MINUS) {
+
+     	switch (CurTok.Tok) {
+
+     	    case TOK_PLUS:
+		break;
+
+     	    case TOK_MINUS:
+		break;
+
+     	    default:
+     		Internal ("Unexpected token");
+     	}
+
+    }
+
+    /* Return the resulting expression */
+    return Root;
+}
+
+
+
+static ExprNode* ShiftExpr (void)
+/* Handle shift expressions: '<<' and '>>' */
+{
+    /* Get the left leave */
+    ExprNode* Root = AddExpr ();
+
+    /* Check if this is for us */
+    while (CurTok.Tok == TOK_SHL || CurTok.Tok == TOK_SHR) {
+
+     	switch (CurTok.Tok) {
+
+     	    case TOK_SHL:
+		break;
+
+     	    case TOK_SHR:
+		break;
+
+     	    default:
+     		Internal ("Unexpected token");
+     	}
+
+    }
+
+    /* Return the resulting expression */
+    return Root;
+}
+
+
+
+static ExprNode* RelationalExpr (void)
+/* Handle relational expressions: '<=', '<', '>=' and '>' */
+{
+    /* Get the left leave */
+    ExprNode* Root = ShiftExpr ();
+
+    /* Check if this is for us */
+    while (CurTok.Tok == TOK_LE || CurTok.Tok == TOK_LT ||
+	   CurTok.Tok == TOK_GE || CurTok.Tok == TOK_GT) {
+
+     	switch (CurTok.Tok) {
+
+     	    case TOK_LE:
+		break;
+
+     	    case TOK_LT:
+		break;
+
+     	    case TOK_GE:
+		break;
+
+     	    case TOK_GT:
+		break;
+
+     	    default:
+     		Internal ("Unexpected token");
+     	}
+
+    }
+
+    /* Return the resulting expression */
+    return Root;
+}
+
+
+
+static ExprNode* EqualityExpr (void)
+/* Handle equality expressions: '==' and '!=' */
+{
+    /* Get the left leave */
+    ExprNode* Root = RelationalExpr ();
+
+    /* Check if this is for us */
+    while (CurTok.Tok == TOK_EQ || CurTok.Tok == TOK_NE) {
+
+     	switch (CurTok.Tok) {
+
+     	    case TOK_EQ:
+		break;
+
+     	    case TOK_NE:
+		break;
+
+     	    default:
+     		Internal ("Unexpected token");
+     	}
+
+    }
+
+    /* Return the resulting expression */
+    return Root;
+}
+
+
+
+static ExprNode* AndExpr (void)
+/* Handle and expressions: '&' */
+{
+    /* Get the left leave */
+    ExprNode* Root = EqualityExpr ();
+
+    /* Check if this is for us */
+    while (CurTok.Tok == TOK_AND) {
+
+     	switch (CurTok.Tok) {
+
+     	    case TOK_AND:
+		break;
+
+     	    default:
+     		Internal ("Unexpected token");
+     	}
+
+    }
+
+    /* Return the resulting expression */
+    return Root;
+}
+
+
+
+static ExprNode* XorExpr (void)
+/* Handle xor expressions: '^' */
+{
+    /* Get the left leave */
+    ExprNode* Root = AndExpr ();
+
+    /* Check if this is for us */
+    while (CurTok.Tok == TOK_XOR) {
+
+     	switch (CurTok.Tok) {
+
+     	    case TOK_XOR:
+		break;
+
+     	    default:
+     		Internal ("Unexpected token");
+     	}
+
+    }
+
+    /* Return the resulting expression */
+    return Root;
+}
+
+
+
+static ExprNode* OrExpr (void)
+/* Handle or expressions: '|' */
+{
+    /* Get the left leave */
+    ExprNode* Root = XorExpr ();
+
+    /* Check if this is for us */
+    while (CurTok.Tok == TOK_OR) {
+
+     	switch (CurTok.Tok) {
+
+     	    case TOK_OR:
+		break;
+
+     	    default:
+     		Internal ("Unexpected token");
+     	}
+
+    }
+
+    /* Return the resulting expression */
+    return Root;
+}
+
+
+
+static ExprNode* BoolAndExpr (void)
+/* Handle boolean and expressions: '&&' */
+{
+    /* Get the left leave */
+    ExprNode* Root = OrExpr ();
+
+    /* Check if this is for us */
+    while (CurTok.Tok == TOK_BOOL_AND) {
+
+     	switch (CurTok.Tok) {
+
+     	    case TOK_BOOL_AND:
+		break;
+
+     	    default:
+     		Internal ("Unexpected token");
+     	}
+
+    }
+
+    /* Return the resulting expression */
+    return Root;
+}
+
+
+
+static ExprNode* BoolOrExpr (void)
+/* Handle boolean or expressions: '||' */
+{
+    /* Get the left leave */
+    ExprNode* Root = BoolAndExpr ();
+
+    /* Check if this is for us */
+    while (CurTok.Tok == TOK_BOOL_OR) {
+
+     	switch (CurTok.Tok) {
+
+     	    case TOK_BOOL_OR:
+		break;
+
+     	    default:
+     		Internal ("Unexpected token");
+     	}
+
+    }
+
+    /* Return the resulting expression */
+    return Root;
+}
+
+
+
+static ExprNode* ConditionalExpr (void)
+/* Handle the ternary operator: ':?' */
+{
+    /* Get the left leave */
+    ExprNode* Cond = BoolOrExpr ();
+
+    /* Check if this is for us */
+    if (CurTok.Tok == TOK_QUEST) {
+
+	ExprNode* Expr1;
+	ExprNode* Expr2;
+	ExprNode* Root;
+	type*	  Type;
+
+
+	/* Skip the token */
+	NextToken ();
+
+	/* Get the first expression */
+	Expr1 = Expression ();
+
+	/* Colon must follow */
+	ConsumeColon ();
+
+	/* Get the second expression */
+	Expr2 = ConditionalExpr ();
+
+	/* Get the common type of the two expressions */
+	Type = CommonType (Expr1->Type, Expr2->Type);
+
+	/* Create a new ternary token node */
+	Root = AllocExprNode (NT_TERNARY, Type, RVALUE);
+	AppendItem (Root, Cond);
+	AppendItem (Root, Expr1);
+	AppendItem (Root, Expr2);
+				 
+	/* Return the result */
+	return Root;
+
+    } else {
+
+	/* Just return the lower level expression */
+	return Cond;
+
+    }
+}
+
+
+
+

@@ -99,6 +99,8 @@ typedef enum {
     NT_OR,     	       	       	/* | */
     NT_XOR,    	       	       	/* ^ */
 
+    NT_TERNARY,			/* ?: */
+
     NT_ASSIGN, 	       	       	/* = */
     NT_PLUS_ASSIGN,    	       	/* += */
     NT_MINUS_ASSIGN,   	       	/* -= */
@@ -124,8 +126,6 @@ typedef enum {
     NT_LE,     	       	       	/* <= */
     NT_GT,     	       	       	/* > */
     NT_GE,     	       	       	/* >= */
-
-    NT_DEREF,  	       	       	/* * and others */
 
     NT_COUNT   	       	       	/* Operation count */
 } nodetype_t;

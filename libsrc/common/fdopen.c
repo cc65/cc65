@@ -1,5 +1,5 @@
 /*
- * fopen.c
+ * fdopen.c
  *
  * Ullrich von Bassewitz, 17.06.1998
  */

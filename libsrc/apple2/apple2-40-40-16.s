@@ -24,6 +24,13 @@ CLRTOP		= $F836
 SETCOL		= $F864
 SCRN		= $F871
 SETGR		= $FB40
+VTABZ		= $FC24
+
+; ------------------------------------------------------------------------
+; ROM entry points
+
+COUT   	:=	$FDED	; Vector to user output routine
+TEXT    :=	$F399	; Return to text screen
 
 ; ------------------------------------------------------------------------
 ; Header. Includes jump table and constants.

@@ -26,7 +26,8 @@
 #--------------------------------------------------------------------------
 # Object files
 
-OBJS=  	chline.o	\
+OBJS=  	_scrsize.o	\
+	chline.o	\
      	cputc.o		\
      	cvline.o	\
 	textframe.o

@@ -10,7 +10,7 @@
 	.export		_gotoxy, cputdirect
 	.export		newline, putchar
 
-	.import		popa
+	.import		popa, SETWND, BASCALC
 
 	.include	"../apple2/apple2.inc"
 
@@ -19,6 +19,8 @@ initconio:
 	lda	#$FF		; Normal character display mode
 	sta	INVFLG
 	sta	SETALTCHAR	; Switch in alternate charset
+	lda	#$00
+	jsr	SETWND		; Reset text window to full screen
 	rts
 
 ; Plot a character - also used as internal function
@@ -82,19 +84,19 @@ newline:
 	pha
 	inc	CV
 	lda	CV
-	cmp	WNDBTM
+	cmp	#24
 	bne	L2
 	lda	#$00
 	sta	CV
 L2:
-	jsr	VTABZ
+	jsr	BASCALC
 	pla
 	sta	CH
 	rts
 
 _gotoxy:
 	sta	CV		; Store Y
-	jsr	VTABZ
+	jsr	BASCALC
 	jsr	popa		; Get X
 	sta	CH		; Store X
 	rts

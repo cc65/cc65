@@ -4,7 +4,6 @@
 	;; void clrscr (void);
 
 	.export		_clrscr
+	.import		HOME
 
-	.include	"apple2.inc"
-
-_clrscr = HOME
+_clrscr := HOME

@@ -7,12 +7,8 @@
 	;;
 
 	.export		_write
-
-	.import		popax
-
+	.import		popax, COUT
 	.importzp	ptr1, ptr2, ptr3
-
-	.include	"apple2.inc"
 
 .proc   _write
 

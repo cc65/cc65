@@ -21,6 +21,11 @@
 OFFS            = 10
 
 ; ------------------------------------------------------------------------
+; ROM entry points
+
+PREAD  	:=  	$FB1E	; Read paddle in X, return AD conv. value in Y
+
+; ------------------------------------------------------------------------
 ; Header. Includes jump table
 
 .segment        "JUMPTABLE"

@@ -7,10 +7,8 @@
 ;
 
    	.export	      	_read
-	.import	      	popax, _cputc
+	.import	      	popax, _cputc, RDKEY
 	.importzp     	ptr1, ptr2, ptr3
-
-	.include       	"apple2.inc"
 
 _read:	jsr	popax 		; get count
      	sta	ptr2

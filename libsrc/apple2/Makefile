@@ -14,13 +14,13 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-%.emd:	%.o ../runtime/zeropage.o
+%.emd:	%.o ../runtime/zeropage.o rom.o
 	@$(LD) -t module -o $@ $^
 
-%.joy:	%.o ../runtime/zeropage.o
+%.joy:	%.o ../runtime/zeropage.o rom.o
 	@$(LD) -t module -o $@ $^
 
-%.tgi:	%.o ../runtime/zeropage.o
+%.tgi:	%.o ../runtime/zeropage.o rom.o
 	@$(LD) -t module -o $@ $^
 
 #--------------------------------------------------------------------------
@@ -45,8 +45,15 @@ OBJS=	_scrsize.o	\
         mainargs.o      \
         oserrlist.o     \
         randomize.o     \
+        rbascalc.o      \
+        rcout.o         \
      	read.o		\
      	revers.o	\
+        rhome.o         \
+        rom.o           \
+        rpread.o        \
+        rrdkey.o        \
+        rsetwnd.o       \
         systime.o       \
         sysuname.o      \
         tgi_mode_table.o\

@@ -6,10 +6,13 @@
 
 	.export	      	screensize
 
+        .include        "../apple2/apple2.inc"
+
 .proc   screensize
 
-	ldx	#40
+	ldx	WNDWDTH
 	ldy	#24
         rts
 
 .endproc
+

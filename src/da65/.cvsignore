@@ -1,6 +1,7 @@
 .kdbgrc.da65
 .depend
 da65
+opctest
 *.asm
 *.cfg
 *.dis

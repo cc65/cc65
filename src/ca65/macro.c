@@ -617,7 +617,7 @@ static void StartExpClassic (Macro* M)
 
 	/* Read tokens for one parameter, accept empty params */
 	Last = 0;
-	while (!TokIsSep (Tok)) {
+	while (Tok != TOK_COMMA && Tok != TOK_SEP) {
 
 	    TokNode* T;
 

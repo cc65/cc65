@@ -287,7 +287,7 @@ static void AddOpLow (StackOpData* D, opc_t OPC)
     InsertEntry (D, X, D->IP++);
 }
 
-
+            
 
 static void AddOpHigh (StackOpData* D, opc_t OPC)
 /* Add an op for the high byte of an operator. Special cases (constant values
@@ -552,9 +552,10 @@ static unsigned Opt_tosorax (StackOpData* D)
     if (RegValIsKnown (D->PushEntry->RI->In.RegX) &&
         RegValIsKnown (D->OpEntry->RI->In.RegX)) {
      	/* Both values known, precalculate the result */
-	const char* Arg = MakeHexArg (D->PushEntry->RI->In.RegX | D->OpEntry->RI->In.RegX);
-       	X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
-	InsertEntry (D, X, D->IP++);
+        unsigned char Result = D->PushEntry->RI->In.RegX | D->OpEntry->RI->In.RegX;
+        const char* Arg = MakeHexArg (Result);
+        X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, D->OpEntry->LI);
+        InsertEntry (D, X, D->IP++);
     } else if (D->PushEntry->RI->In.RegX != 0) {
      	/* High byte is unknown */
         AddOpHigh (D, OP65_ORA);

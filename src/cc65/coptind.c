@@ -1315,6 +1315,9 @@ unsigned OptPrecalc (CodeSeg* S)
        	/* Get a pointer to the output registers of the insn */
        	const RegContents* Out = &E->RI->Out;
 
+        /* Argument for LDA and flag */
+        const char* Arg = 0;
+
         /* Handle the different instructions */
         switch (E->OPC) {
 
@@ -1328,25 +1331,49 @@ unsigned OptPrecalc (CodeSeg* S)
                 /* FALLTHROUGH */
 
             case OP65_ADC:
-            case OP65_AND:
             case OP65_ASL:
             case OP65_EOR:
             case OP65_LSR:
-            case OP65_ORA:
             case OP65_SBC:
                 if (RegValIsKnown (Out->RegA)) {
                     /* Accu AND zp with known contents */
-                    const char* Arg = MakeHexArg (Out->RegA);
-                    CodeEntry* X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
-                    CS_InsertEntry (S, X, I+1);
+                    Arg = MakeHexArg (Out->RegA);
+                }
+                break;
+
+            case OP65_AND:
+                if (CE_KnownImm (E) && E->Num == 0xFF) {
+                    /* AND with 0xFF, remove */
                     CS_DelEntry (S, I);
                     ++Changes;
+                } else if (RegValIsKnown (Out->RegA)) {
+                    /* Accu AND zp with known contents */
+                    Arg = MakeHexArg (Out->RegA);
+                }
+                break;
+
+            case OP65_ORA:
+                if (CE_KnownImm (E) && E->Num == 0x00) {
+                    /* ORA with zero, remove */
+                    CS_DelEntry (S, I);
+                    ++Changes;
+                } else if (RegValIsKnown (Out->RegA)) {
+                    /* Accu AND zp with known contents */
+                    Arg = MakeHexArg (Out->RegA);
                 }
                 break;
 
             default:
                 break;
 
+        }
+
+        /* Check if we have to replace the insn by LDA */
+        if (Arg) {
+            CodeEntry* X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, E->LI);
+            CS_InsertEntry (S, X, I+1);
+            CS_DelEntry (S, I);
+            ++Changes;
         }
 
 	/* Next entry */

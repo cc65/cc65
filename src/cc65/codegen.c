@@ -2772,7 +2772,7 @@ void g_or (unsigned flags, unsigned long val)
 
       	    case CF_CHAR:
       		if (flags & CF_FORCECHAR) {
-     		    if ((val & 0xFF) != 0xFF) {
+     		    if ((val & 0xFF) != 0) {
        	       	        AddCodeLine ("ora #$%02X", (unsigned char)val);
      		    }
       		    return;
@@ -2780,15 +2780,25 @@ void g_or (unsigned flags, unsigned long val)
      		/* FALLTHROUGH */
 
 	    case CF_INT:
-		if (val <= 0xFF) {
-		    AddCodeLine ("ora #$%02X", (unsigned char)val);
+		if (val <= 0xFF) {       
+                    if ((val & 0xFF) != 0) {
+		        AddCodeLine ("ora #$%02X", (unsigned char)val);
+                    }
 		    return;
-     		}
+     		} else if ((val & 0xFF00) == 0xFF00) {
+                    if ((val & 0xFF) != 0) {
+		        AddCodeLine ("ora #$%02X", (unsigned char)val);
+                    }
+                    ldxconst (0xFF);
+                    return;
+                }
 		break;
 
 	    case CF_LONG:
 		if (val <= 0xFF) {
-		    AddCodeLine ("ora #$%02X", (unsigned char)val);
+                    if ((val & 0xFF) != 0) {
+                        AddCodeLine ("ora #$%02X", (unsigned char)val);
+                    }
 		    return;
 		}
 		break;
@@ -2881,68 +2891,70 @@ void g_xor (unsigned flags, unsigned long val)
 
 
 
-void g_and (unsigned flags, unsigned long val)
+void g_and (unsigned Flags, unsigned long Val)
 /* Primary = TOS & Primary */
 {
     static char* ops [12] = {
-     	0,	     	"tosanda0",	"tosandax",
-     	0,	     	"tosanda0",	"tosandax",
-      	0,	     	0,		"tosandeax",
-     	0,	     	0,		"tosandeax",
+     	0,	      	"tosanda0",	"tosandax",
+     	0,	      	"tosanda0",	"tosandax",
+      	0,	      	0,  		"tosandeax",
+     	0,	      	0,  		"tosandeax",
     };
-
+                    
     /* If the right hand side is const, the lhs is not on stack but still
      * in the primary register.
      */
-    if (flags & CF_CONST) {
+    if (Flags & CF_CONST) {
 
-     	switch (flags & CF_TYPE) {
+     	switch (Flags & CF_TYPE) {
 
      	    case CF_CHAR:
-     		if (flags & CF_FORCECHAR) {
-     		    AddCodeLine ("and #$%02X", (unsigned char)val);
-     		    return;
-     		}
-     		/* FALLTHROUGH */
+     		if (Flags & CF_FORCECHAR) {
+                    if ((Val & 0xFF) != 0xFF) {
+                        AddCodeLine ("and #$%02X", (unsigned char)Val);
+                    }
+     	       	    return;
+     	       	}
+     	       	/* FALLTHROUGH */
      	    case CF_INT:
-		if ((val & 0xFFFF) != 0xFFFF) {
-       	       	    if (val <= 0xFF) {
-		    	ldxconst (0);
-		    	if (val == 0) {
-		    	    ldaconst (0);
-		    	} else if (val != 0xFF) {
-		       	    AddCodeLine ("and #$%02X", (unsigned char)val);
-		    	}
-		    } else if ((val & 0xFF00) == 0xFF00) {
-		    	AddCodeLine ("and #$%02X", (unsigned char)val);
-		    } else if ((val & 0x00FF) == 0x0000) {
-			AddCodeLine ("txa");
-			AddCodeLine ("and #$%02X", (unsigned char)(val >> 8));
-			AddCodeLine ("tax");
-			ldaconst (0);
+     	       	if ((Val & 0xFFFF) != 0xFFFF) {
+       	       	    if (Val <= 0xFF) {
+     	       	     	ldxconst (0);
+     	       	     	if (Val == 0) {
+     	       	     	    ldaconst (0);
+     	       	     	} else if (Val != 0xFF) {
+     	       	       	    AddCodeLine ("and #$%02X", (unsigned char)Val);
+     	       	     	}
+     	       	    } else if ((Val & 0xFF00) == 0xFF00) {
+     	       	     	AddCodeLine ("and #$%02X", (unsigned char)Val);
+     	       	    } else if ((Val & 0x00FF) == 0x0000) {
+     	       	     	AddCodeLine ("txa");
+     	       	     	AddCodeLine ("and #$%02X", (unsigned char)(Val >> 8));
+     		     	AddCodeLine ("tax");
+     		     	ldaconst (0);
      		    } else {
-			AddCodeLine ("tay");
-			AddCodeLine ("txa");
-			AddCodeLine ("and #$%02X", (unsigned char)(val >> 8));
-			AddCodeLine ("tax");
-			AddCodeLine ("tya");
-			if ((val & 0x00FF) != 0x00FF) {
-		       	    AddCodeLine ("and #$%02X", (unsigned char)val);
-			}
-		    }
-		}
+     		     	AddCodeLine ("tay");
+     		     	AddCodeLine ("txa");
+     		     	AddCodeLine ("and #$%02X", (unsigned char)(Val >> 8));
+     		     	AddCodeLine ("tax");
+     		     	AddCodeLine ("tya");
+     		     	if ((Val & 0x00FF) != 0x00FF) {
+     		       	    AddCodeLine ("and #$%02X", (unsigned char)Val);
+     		     	}
+     		    }
+     		}
 		return;
 
 	    case CF_LONG:
-		if (val <= 0xFF) {
+		if (Val <= 0xFF) {
 		    ldxconst (0);
 		    AddCodeLine ("stx sreg+1");
 	     	    AddCodeLine ("stx sreg");
-		    if ((val & 0xFF) != 0xFF) {
-		     	 AddCodeLine ("and #$%02X", (unsigned char)val);
+		    if ((Val & 0xFF) != 0xFF) {
+		     	 AddCodeLine ("and #$%02X", (unsigned char)Val);
 		    }
 		    return;
-		} else if (val == 0xFF00) {
+		} else if (Val == 0xFF00) {
 		    ldaconst (0);
 		    AddCodeLine ("sta sreg+1");
 		    AddCodeLine ("sta sreg");
@@ -2951,19 +2963,19 @@ void g_and (unsigned flags, unsigned long val)
 		break;
 
 	    default:
-		typeerror (flags);
+		typeerror (Flags);
 	}
 
      	/* If we go here, we didn't emit code. Push the lhs on stack and fall
       	 * into the normal, non-optimized stuff. Note: The standard stuff will
          * always work with ints.
      	 */
-        flags &= ~CF_FORCECHAR;
-       	g_push (flags & ~CF_CONST, 0);
+        Flags &= ~CF_FORCECHAR;
+       	g_push (Flags & ~CF_CONST, 0);
     }
-
+                              
     /* Use long way over the stack */
-    oper (flags, val, ops);
+    oper (Flags, Val, ops);
 }
 
 

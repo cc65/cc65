@@ -202,8 +202,8 @@ found:	rts
 	ldy	#15
 	lda	#0
 loop:	sta	ICHID,x
-	dey
 	inx
+	dey
 	bne	loop
 	rts
 

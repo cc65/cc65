@@ -90,6 +90,9 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="c128.html" name="c128.html"></tag>
   Topics specific to the Commodore 128.
 
+  <tag><htmlurl url="c16.html" name="c16.html"></tag>
+  Topics specific to the Commodore 16/116.
+
   <tag><htmlurl url="c64.html" name="c64.html"></tag>
   Topics specific to the Commodore 64.
 

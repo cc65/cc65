@@ -5,13 +5,14 @@
 
 # Default for the compiler lib search path as compiler define
 
-SGML  =	ar65.sgml	\
+SGML  =	ar65.sgml 	\
         atari.sgml      \
         c128.sgml       \
+        c16.sgml        \
         c64.sgml        \
-	ca65.sgml	\
+	ca65.sgml 	\
 	ca65html.sgml	\
-	cc65.sgml	\
+	cc65.sgml 	\
 	cl65.sgml   	\
         co65.sgml       \
 	coding.sgml	\

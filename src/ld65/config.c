@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -823,7 +823,6 @@ static void ParseO65 (void)
 
     /* Remember the attributes read */
     unsigned OS = 0;            /* Initialize to keep gcc happy */
-    unsigned ID = 0;            /* Dito */
     unsigned Version = 0;
 
     /* Read the attributes */
@@ -920,7 +919,7 @@ static void ParseO65 (void)
                 /* We're expecting a number in the 0..$FFFF range*/
                 CfgAssureInt ();
                 CfgRangeCheck (0, 0xFFFF);
-                ID = (unsigned) CfgIVal;
+                ModuleId = (unsigned) CfgIVal;
                 break;
 
             case CFGTOK_VERSION:
@@ -957,7 +956,7 @@ static void ParseO65 (void)
     }
 
     /* Set the O65 operating system to use */
-    O65SetOS (O65FmtDesc, OS, Version, ID);
+    O65SetOS (O65FmtDesc, OS, Version, ModuleId);
 }
 
 

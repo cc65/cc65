@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2001 Ullrich von Bassewitz					     */
+/* (C) 1998-2002 Ullrich von Bassewitz					     */
 /*		 Wacholderweg 14					     */
 /*		 D-70597 Stuttgart					     */
 /* EMail:	 uz@musoftware.de					     */
@@ -105,6 +105,7 @@ static void Usage (void)
        	     "  --config name\tUse linker config file\n"
 	     "  --help\t\tHelp (this text)\n"
 	     "  --mapfile name\tCreate a map file\n"
+             "  --module-id id\tSpecify a module id\n"
        	     "  --start-addr addr\tSet the default start address\n"
        	     "  --target sys\t\tSet the target system\n"
        	     "  --version\t\tPrint the linker version\n",
@@ -253,6 +254,18 @@ static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptModuleId (const char* Opt, const char* Arg)
+/* Specify a module id */
+{
+    unsigned long Id = CvtNumber (Opt, Arg);
+    if (Id > 0xFFFFUL) {
+        Error ("Range error in module id");
+    }
+    ModuleId = (unsigned) Id;
+}
+
+
+
 static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
 {
@@ -299,9 +312,10 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
        	{ "--config",  	       	1,     	OptConfig    	    	},
-	{ "--dbgfile",          1,      OptDbgFile              },
-	{ "--help",	       	0,     	OptHelp	     	    	},
-	{ "--mapfile",		1,	OptMapFile	    	},
+     	{ "--dbgfile",          1,      OptDbgFile              },
+     	{ "--help",	       	0,     	OptHelp	     	    	},
+     	{ "--mapfile",		1,	OptMapFile	    	},
+       	{ "--module-id",        1,     	OptModuleId             },
 	{ "--start-addr",	1,	OptStartAddr	    	},
 	{ "--target",		1,	OptTarget    	    	},
 	{ "--version",	       	0,  	OptVersion   	    	},

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -45,6 +45,7 @@
 
 const char* OutputName	    = "a.out"; 	/* Name of output file */
 
+unsigned ModuleId           = 0;        /* Id for o65 module */
 unsigned long StartAddr	    = 0x200;	/* Start address */
 
 unsigned char VerboseMap    = 0;	/* Verbose map file */

@@ -13,8 +13,8 @@
 	.endmacro
 
 	.macro		LoadW dest, value
-	LoadB dest+1, >value
-	LoadB dest+0, <value
+	LoadB dest+1, >(value)
+	LoadB dest+0, <(value)
 	.endmacro
 
 	.macro		MoveB source, dest
@@ -48,21 +48,18 @@
 	.macro		AddVB value, dest
 	lda dest
 	clc
-	adc #value
+	adc #(value)
 	sta dest
 	.endmacro
 
 	.macro		AddVW value, dest
 .local Skip
-	clc
-	lda #<value
-	adc dest+0
-	sta dest+0
-	.if (>value)=0
+	AddVB <(value), dest+0
+	.if (>(value))=0
 	    bcc Skip
 	    inc dest+1
 	.else
-	    lda #>value
+	    lda #>(value)
 	    adc dest+1
 	    sta dest+1
 	.endif
@@ -90,10 +87,10 @@ Skip:
 	.macro		SubVW value, dest
 	sec
 	lda dest+0
-	sbc #<value
+	sbc #<(value)
 	sta dest+0
 	lda dest+1
-	sbc #>value
+	sbc #>(value)
 	sta dest+1
 	.endmacro
 
@@ -104,7 +101,7 @@ Skip:
 
 	.macro		CmpBI source, immed
 	lda source
-	cmp #immed
+	cmp #(immed)
 	.endmacro
 
 	.macro		CmpW source, dest
@@ -117,9 +114,9 @@ Skip:
 
 	.macro		CmpWI source, immed
 .local Skip
-	CmpBI source+1, >immed
+	CmpBI source+1, >(immed)
 	bne Skip
-	CmpBI source+0, <immed
+	CmpBI source+0, <(immed)
 Skip:
 	.endmacro
 
@@ -240,12 +237,12 @@ Skip:	pla
 
 	.macro		addv value
 	clc
-	adc #value
+	adc #(value)
 	.endmacro
 
 	.macro		subv value
 	sec
-	sbc #value
+	sbc #(value)
 	.endmacro
 
 	.macro		bnex addr

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -69,21 +69,6 @@ typedef struct {
 
 /* EM kernel variables */
 extern em_drv_header*  	em_drv;       	/* Pointer to driver */
-
-
-
-
-/*****************************************************************************/
-/* 	      	       	      	   Functions	     			     */
-/*****************************************************************************/
-
-
-
-unsigned char __fastcall__ em_install (void* driver);
-/* Install the driver once it is loaded, return an error code. */
-
-void __fastcall__ em_deinstall (void);
-/* Deinstall the driver before unloading it */
 
 
 

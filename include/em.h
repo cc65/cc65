@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -76,10 +76,18 @@ struct em_copy {
 
 
 unsigned char __fastcall__ em_load_driver (const char* driver);
-/* Load an extended memory driver and return an error code */
+/* Load and install an extended memory driver. Return an error code. */
 
 unsigned char __fastcall__ em_unload (void);
-/* Unload the currently loaded driver. */
+/* Uninstall, then unload the currently loaded driver. */
+
+unsigned char __fastcall__ em_install (void* driver);
+/* Install an already loaded driver. Return an error code. */
+
+unsigned char __fastcall__ em_uninstall (void);
+/* Uninstall the currently loaded driver and return an error code.
+ * Note: This call does not free allocated memory.
+ */
 
 unsigned __fastcall__ em_pagecount (void);
 /* Return the total number of 256 byte pages available in extended memory. */
@@ -91,7 +99,7 @@ void* __fastcall__ em_map (unsigned page);
  */
 
 void* __fastcall__ em_use (unsigned page);
-/* Tell the driver that the memory window is associated with a given page. 
+/* Tell the driver that the memory window is associated with a given page.
  * This call is very similar to em_map. The difference is that the driver
  * does not necessarily transfer the current contents of the extended
  * memory into the returned window. If you're going to just write to the
@@ -119,7 +127,7 @@ void __fastcall__ em_copyto (const struct em_copy* copy_data);
 
 
 
-/* End of em.h */
+/* End of em.h */               
 #endif
 
 

@@ -305,7 +305,7 @@ BreakPoint* DbgIsBreak (unsigned Addr);
 
 
 
-static void DrawFrame (FrameDesc* F, char Active)
+static void DrawFrame (register FrameDesc* F, char Active)
 /* Draw one window frame */
 {
     TextDesc* T;
@@ -386,7 +386,7 @@ static void ActivateFrame (int Num, unsigned char Clear)
 /* Activate a new frame, deactivate the old one */
 {
     unsigned char y;
-    FrameDesc* F;
+    register FrameDesc* F;
 
     if (ActiveFrame != Num) {
 
@@ -400,9 +400,9 @@ static void ActivateFrame (int Num, unsigned char Clear)
        	    F = Frames [ActiveFrame];
 	    /* Clear the frame if requested */
 	    if (Clear) {
-	    	for (y = F->fd_y1+1; y < F->fd_y2; ++y) {
-	    	    cclearxy (F->fd_x1+1, y, F->fd_width);
-	    	}
+	     	for (y = F->fd_y1+1; y < F->fd_y2; ++y) {
+	     	    cclearxy (F->fd_x1+1, y, F->fd_width);
+	     	}
 	    }
     	    DrawFrame (F, 1);
     	}
@@ -416,7 +416,7 @@ static void ActivateFrame (int Num, unsigned char Clear)
 
 
 /*****************************************************************************/
-/*	    	  		  Prompt line				     */
+/*	     	  		  Prompt line				     */
 /*****************************************************************************/
 
 
@@ -621,7 +621,7 @@ static void DbgSetTmpBreak (unsigned Addr)
 static void DbgToggleUserBreak (unsigned Addr)
 /* Set a breakpoint */
 {
-    BreakPoint* B = DbgIsBreak (Addr);
+    register BreakPoint* B = DbgIsBreak (Addr);
 
     if (B) {
 	/* We have a breakpoint, remove it */
@@ -634,13 +634,13 @@ static void DbgToggleUserBreak (unsigned Addr)
 	} else {
 	    /* Test if we can set a breakpoint at that address */
 	    if (!DbgIsRAM (Addr)) {
-	    	BreakInRomError ();
+	     	BreakInRomError ();
 	    } else {
-	    	/* Set the breakpoint */
-	    	B = DbgGetBreakSlot ();
-	    	B->bk_addr = Addr;
-	    	B->bk_use  = BRK_USER;
-	    	++DbgBreakCount;
+	     	/* Set the breakpoint */
+	     	B = DbgGetBreakSlot ();
+	     	B->bk_addr = Addr;
+	     	B->bk_use  = BRK_USER;
+	     	++DbgBreakCount;
 	    }
 	}
     }
@@ -658,7 +658,7 @@ static void DbgResetTmpBreaks (void)
     	if (B->bk_use == BRK_TMP) {
     	    B->bk_use = BRK_EMPTY;
     	}
-	++B;
+    	++B;
     }
 }
 
@@ -673,11 +673,11 @@ static unsigned char DbgTmpBreaksOk (void)
     BreakPoint* B = DbgBreaks;
     for (i = 0; i < MAX_USERBREAKS; ++i) {
        	if (B->bk_use == BRK_TMP && !DbgIsRAM (B->bk_addr)) {
-	    BreakInRomError ();
-	    DbgResetTmpBreaks ();
-	    return 0;
+    	    BreakInRomError ();
+    	    DbgResetTmpBreaks ();
+    	    return 0;
     	}
-	++B;
+    	++B;
     }
     return 1;
 }
@@ -685,7 +685,7 @@ static unsigned char DbgTmpBreaksOk (void)
 
 
 /*****************************************************************************/
-/*	    	       	    Assembler window stuff	 		     */
+/*  	    	       	    Assembler window stuff	 		     */
 /*****************************************************************************/
 
 
@@ -708,17 +708,17 @@ static unsigned AsmBack (unsigned mem, unsigned char lines)
      	    adr [in] = cur;
      	    in = (in + 1) & 0x1F;
        	    if (cur >= mem) {
-	    	if (cur == mem || offs == 12) {
-	    	    /* Found */
-	    	    return adr [(in - lines - 1) & 0x1F];
-	     	} else {
-	     	    /* The requested address is inside an instruction, go back
-	    	     * one more byte and try again.
-	    	     */
+    	    	if (cur == mem || offs == 12) {
+    	    	    /* Found */
+    	    	    return adr [(in - lines - 1) & 0x1F];
+    	     	} else {
+    	     	    /* The requested address is inside an instruction, go back
+    	    	     * one more byte and try again.
+    	    	     */
        	     	    ++offs;
-	     	    break;
-	     	}
-	    }
+    	     	    break;
+    	     	}
+    	    }
      	}
     }
 }
@@ -736,22 +736,22 @@ static unsigned UpdateAsm (void)
     unsigned      m = AsmBack (AsmAddr, 2);
 
     for (y = AsmFrame.fd_y1+1; y < AsmFrame.fd_y2; ++y) {
-	len = DbgDisAsm (m, buf, width);
+    	len = DbgDisAsm (m, buf, width);
        	if (m == brk_pc) {
- 	    buf [4] = '-';
-	    buf [5] = '>';
-	}
-	if (DbgIsBreak (m)) {
-	    buf [5] = '*';
-	}
-	if (m == AsmAddr) {
-	    revers (1);
-	    cputsxy (1, y, buf);
-	    revers (0);
-	} else {
-	    cputsxy (1, y, buf);
-	}
-   	m += len;
+    	    buf [4] = '-';
+    	    buf [5] = '>';
+    	}
+    	if (DbgIsBreak (m)) {
+    	    buf [5] = '*';
+    	}
+    	if (m == AsmAddr) {
+    	    revers (1);
+    	    cputsxy (1, y, buf);
+    	    revers (0);
+    	} else {
+    	    cputsxy (1, y, buf);
+    	}
+    	m += len;
     }
     return m;
 }
@@ -771,33 +771,33 @@ static void AsmFollow (void)
 {
     switch (*(unsigned char*) AsmAddr) {
 
-	case OPC_JMP:
-	case OPC_JSR:
+    	case OPC_JMP:
+    	case OPC_JSR:
        	    AsmAddr = AsmArg16 ();
-	    break;
+    	    break;
 
         case OPC_JMPIND:
-	    AsmAddr = *(unsigned*)AsmArg16 ();
-	    break;
+    	    AsmAddr = *(unsigned*)AsmArg16 ();
+    	    break;
 
- 	case OPC_BPL:
- 	case OPC_BMI:
- 	case OPC_BVC:
- 	case OPC_BVS:
- 	case OPC_BCC:
- 	case OPC_BCS:
- 	case OPC_BNE:
- 	case OPC_BEQ:
+    	case OPC_BPL:
+    	case OPC_BMI:
+    	case OPC_BVC:
+    	case OPC_BVS:
+    	case OPC_BCC:
+    	case OPC_BCS:
+    	case OPC_BNE:
+    	case OPC_BEQ:
        	    AsmAddr = AsmAddr + 2 + *(signed char*)(AsmAddr+1);
-	    break;
+    	    break;
 
         case OPC_RTS:
-	    AsmAddr = (*(unsigned*) (DbgSP + 0x101) + 1);
-	    break;
+    	    AsmAddr = (*(unsigned*) (DbgSP + 0x101) + 1);
+    	    break;
 
         case OPC_RTI:
-	    AsmAddr = *(unsigned*) (DbgSP + 0x102);
-	    break;
+    	    AsmAddr = *(unsigned*) (DbgSP + 0x102);
+    	    break;
 
     }
 }
@@ -832,23 +832,23 @@ static char AsmHandler (void)
     	/* Update the window contents */
     	Last = UpdateAsm ();
 
-	/* Read and handle input */
-	switch (c = GetKeyUpdate ()) {
+    	/* Read and handle input */
+    	switch (c = GetKeyUpdate ()) {
 
-	    case  '+':
-	       	AsmAddr = Last;
-	       	break;
+    	    case  '+':
+    	       	AsmAddr = Last;
+    	       	break;
 
-	    case '-':
-	       	AsmAddr = AsmBack (AsmAddr, AsmFrame.fd_height);
-	       	break;
+    	    case '-':
+    	       	AsmAddr = AsmBack (AsmAddr, AsmFrame.fd_height);
+    	       	break;
 
-	    case 't':
+    	    case 't':
 #ifdef CH_F2
       	    case CH_F2:
 #endif
-	    	DbgToggleUserBreak (AsmAddr);
-	    	break;
+    	    	DbgToggleUserBreak (AsmAddr);
+    	    	break;
 
       	    case 'f':
       		AsmFollow ();
@@ -929,7 +929,7 @@ static char RegHandler (void)
 
 
 /*****************************************************************************/
-/*	       	       	       Stack window stuff			     */
+/*  	       	       	       Stack window stuff			     */
 /*****************************************************************************/
 
 
@@ -943,10 +943,10 @@ static unsigned UpdateStack (void)
     unsigned char y;
 
     for (y = StackFrame.fd_y2-1; y > StackFrame.fd_y1; --y) {
-	gotoxy (x1, y);
-	cputhex8 (mem);
-	gotoxy (x2, y);
-	cputhex8 (* (unsigned char*) (mem + 0x100));
+    	gotoxy (x1, y);
+    	cputhex8 (mem);
+    	gotoxy (x2, y);
+    	cputhex8 (* (unsigned char*) (mem + 0x100));
        	++mem;
     }
     return mem;
@@ -979,35 +979,35 @@ static char StackHandler (void)
 
     while (1) {
 
-	/* Read and handle input */
-	switch (c = GetKeyUpdate ()) {
+    	/* Read and handle input */
+    	switch (c = GetKeyUpdate ()) {
 
-	    case  '+':
+    	    case  '+':
        	        StackAddr += BytesPerPage;
-	    	break;
+    	    	break;
 
-	    case '-':
-	    	StackAddr -= BytesPerPage;
-	    	break;
+    	    case '-':
+    	    	StackAddr -= BytesPerPage;
+    	    	break;
 
-	    case 'o':
-	    	StackHome ();
-	    	break;
+    	    case 'o':
+    	    	StackHome ();
+    	    	break;
 
-	    case CH_CURS_UP:
-		--StackAddr;
-		break;
+    	    case CH_CURS_UP:
+    		--StackAddr;
+    		break;
 
-	    case CH_CURS_DOWN:
-	       	++StackAddr;
-	     	break;
+    	    case CH_CURS_DOWN:
+    	       	++StackAddr;
+    	     	break;
 
-	    default:
-	     	return c;
+    	    default:
+    	     	return c;
 
-	}
+    	}
 
-	/* Update the window contents */
+    	/* Update the window contents */
        	UpdateStack ();
     }
 }
@@ -1028,9 +1028,9 @@ static unsigned UpdateCStack (void)
     unsigned char y;
 
     for (y = CStackFrame.fd_y2-1; y > CStackFrame.fd_y1; --y) {
-	gotoxy (x, y);
-	cputhex16 (* (unsigned*)mem);
-	mem += 2;
+    	gotoxy (x, y);
+    	cputhex16 (* (unsigned*)mem);
+    	mem += 2;
     }
     cputsxy (CStackFrame.fd_x1+1, CStackFrame.fd_y2-1, "->");
     return mem;
@@ -1063,35 +1063,35 @@ static char CStackHandler (void)
 
     while (1) {
 
-	/* Read and handle input */
-	switch (c = GetKeyUpdate ()) {
+    	/* Read and handle input */
+    	switch (c = GetKeyUpdate ()) {
 
-	    case  '+':
+    	    case  '+':
        	        CStackAddr += BytesPerPage;
-		break;
+    		break;
 
-	    case '-':
-	       	CStackAddr -= BytesPerPage;
-		break;
+    	    case '-':
+    	       	CStackAddr -= BytesPerPage;
+    		break;
 
-	    case 'o':
-		CStackHome ();
-		break;
+    	    case 'o':
+    		CStackHome ();
+    		break;
 
-	    case CH_CURS_UP:
-		CStackAddr -= 2;
-		break;
+    	    case CH_CURS_UP:
+    		CStackAddr -= 2;
+    		break;
 
-	    case CH_CURS_DOWN:
-	     	CStackAddr += 2;
-	     	break;
+    	    case CH_CURS_DOWN:
+    	     	CStackAddr += 2;
+    	     	break;
 
-	    default:
-	     	return c;
+    	    default:
+    	     	return c;
 
-	}
+    	}
 
-	/* Update the window contents */
+    	/* Update the window contents */
        	UpdateCStack ();
     }
 }
@@ -1099,7 +1099,7 @@ static char CStackHandler (void)
 
 
 /*****************************************************************************/
-/*	       	      	       Dump window stuff			     */
+/*  	       	      	       Dump window stuff			     */
 /*****************************************************************************/
 
 
@@ -1114,8 +1114,8 @@ static unsigned UpdateDump (void)
     unsigned char* p = (unsigned char*) mem;
 
     for (y = DumpFrame.fd_y1+1; y < DumpFrame.fd_y2; ++y) {
-	cputsxy (x, y, DbgMemDump (mem, Buf, DUMP_BYTES));
-	mem += DUMP_BYTES;
+    	cputsxy (x, y, DbgMemDump (mem, Buf, DUMP_BYTES));
+    	mem += DUMP_BYTES;
     }
     return mem;
 }
@@ -1138,37 +1138,37 @@ static char DumpHandler (void)
 
     while (1) {
 
-	/* Read and handle input */
-	switch (c = GetKeyUpdate ()) {
+    	/* Read and handle input */
+    	switch (c = GetKeyUpdate ()) {
 
-	    case  '+':
-	        DumpAddr += BytesPerPage;
-		break;
+    	    case  '+':
+    	        DumpAddr += BytesPerPage;
+    		break;
 
-	    case '-':
+    	    case '-':
     		DumpAddr -= BytesPerPage;
-		break;
+    		break;
 
-	    case 'g':
-		InputGoto (&DumpAddr);
-		break;
+    	    case 'g':
+    		InputGoto (&DumpAddr);
+    		break;
 
-	    case 'o':
-		DumpHome ();
-	     	break;
+    	    case 'o':
+    		DumpHome ();
+    	     	break;
 
-	    case CH_CURS_UP:
-		DumpAddr -= 8;
-		break;
+    	    case CH_CURS_UP:
+    		DumpAddr -= 8;
+    		break;
 
-	    case CH_CURS_DOWN:
-		DumpAddr += 8;
-		break;
+    	    case CH_CURS_DOWN:
+    		DumpAddr += 8;
+    		break;
 
-	    default:
-	     	return c;
+    	    default:
+    	     	return c;
 
-	}
+    	}
 
     	/* Update the window contents */
        	UpdateDump ();
@@ -1178,7 +1178,7 @@ static char DumpHandler (void)
 
 
 /*****************************************************************************/
-/*	       	      	       Help window stuff			     */
+/*  	       	      	       Help window stuff			     */
 /*****************************************************************************/
 
 
@@ -1206,7 +1206,7 @@ static char HelpHandler (void)
 
 
 /*****************************************************************************/
-/*		      	     	  Singlestep  				     */
+/*  		      	     	  Singlestep  				     */
 /*****************************************************************************/
 
 
@@ -1242,49 +1242,49 @@ static void SingleStep (char StepInto)
     switch (*(unsigned char*) brk_pc) {
 
         case OPC_JMP:
- 	    /* Set breakpoint at target */
- 	    DbgSetTmpBreak (GetArg16 ());
- 	    return;
+    	    /* Set breakpoint at target */
+    	    DbgSetTmpBreak (GetArg16 ());
+    	    return;
 
     	case OPC_JMPIND:
- 	    /* Indirect jump, ignore CPU error when crossing page */
- 	    DbgSetTmpBreak (*(unsigned*)GetArg16 ());
- 	    return;
+    	    /* Indirect jump, ignore CPU error when crossing page */
+    	    DbgSetTmpBreak (*(unsigned*)GetArg16 ());
+    	    return;
 
- 	case OPC_BPL:
- 	case OPC_BMI:
- 	case OPC_BVC:
- 	case OPC_BVS:
- 	case OPC_BCC:
- 	case OPC_BCS:
- 	case OPC_BNE:
- 	case OPC_BEQ:
-	    /* Be sure not to set the breakpoint twice if this is a jump to
-	     * the following instruction.
-	     */
-	    Offs = *(signed char*)(brk_pc+1);
-	    if (Offs) {
-	     	DbgSetTmpBreak (brk_pc + Offs + 2);
-	    }
- 	    break;
+    	case OPC_BPL:
+    	case OPC_BMI:
+    	case OPC_BVC:
+    	case OPC_BVS:
+    	case OPC_BCC:
+    	case OPC_BCS:
+    	case OPC_BNE:
+    	case OPC_BEQ:
+    	    /* Be sure not to set the breakpoint twice if this is a jump to
+    	     * the following instruction.
+    	     */
+    	    Offs = *(signed char*)(brk_pc+1);
+    	    if (Offs) {
+    	     	DbgSetTmpBreak (brk_pc + Offs + 2);
+    	    }
+    	    break;
 
         case OPC_RTS:
- 	    /* Set a breakpoint at the return target */
-	    SetRTSBreak ();
- 	    return;
+    	    /* Set a breakpoint at the return target */
+    	    SetRTSBreak ();
+    	    return;
 
         case OPC_RTI:
-	    /* Set a breakpoint at the return target */
-	    DbgSetTmpBreak (GetStack16 (1));
-	    return;
+    	    /* Set a breakpoint at the return target */
+    	    DbgSetTmpBreak (GetStack16 (1));
+    	    return;
 
         case OPC_JSR:
-	    if (StepInto) {
-	    	/* Set breakpoint at target */
-	    	DbgSetTmpBreak (GetArg16 ());
-	    	return;
-	    }
-	    break;
+    	    if (StepInto) {
+    	    	/* Set breakpoint at target */
+    	    	DbgSetTmpBreak (GetArg16 ());
+    	    	return;
+    	    }
+    	    break;
     }
 
     /* Place a breakpoint behind the instruction */
@@ -1294,7 +1294,7 @@ static void SingleStep (char StepInto)
 
 
 /*****************************************************************************/
-/*	    	    	  High level window handling			     */
+/*  	    	    	  High level window handling			     */
 /*****************************************************************************/
 
 
@@ -1378,7 +1378,7 @@ static char GetKeyUpdate (void)
 
 
 /*****************************************************************************/
-/*	       	      	 Externally visible functions			     */
+/*  	       	      	 Externally visible functions			     */
 /*****************************************************************************/
 
 
@@ -1392,15 +1392,15 @@ void DbgEntry (void)
 
     /* If this is the first call, setup the display */
     if (FirstTime) {
-	FirstTime = 0;
+    	FirstTime = 0;
 
-	/* Draw the window, default active frame is ASM frame */
-	RedrawStatic (WIN_ASM);
-	InitAsm ();
-	InitReg ();
-	InitStack ();
-	InitCStack ();
-	UpdateDump ();
+    	/* Draw the window, default active frame is ASM frame */
+    	RedrawStatic (WIN_ASM);
+    	InitAsm ();
+    	InitReg ();
+    	InitStack ();
+    	InitCStack ();
+    	UpdateDump ();
     }
 
     /* Only initialize variables here, don't do a display update. The actual
@@ -1415,24 +1415,24 @@ void DbgEntry (void)
     done = 0;
     while (!done) {
     	c = Frames [ActiveFrame]->fd_func ();
-	switch (c) {
+    	switch (c) {
 
-	    case '1':
-	    case '2':
-	    case '3':
-	    case '4':
-	    case '5':
-	    	ActivateFrame (c - '1', 0);
-	    	break;
+    	    case '1':
+    	    case '2':
+    	    case '3':
+    	    case '4':
+    	    case '5':
+    	    	ActivateFrame (c - '1', 0);
+    	    	break;
 
-	    case '?':
+    	    case '?':
 #ifdef CH_F1
        	    case CH_F1:
 #endif
        	    	HelpHandler ();
        	    	break;
 
-	    case 'u':
+    	    case 'u':
 #ifdef CH_F3
        	    case CH_F3:
 #endif
@@ -1441,7 +1441,7 @@ void DbgEntry (void)
       	    	done = 1;
       	    	break;
 
-	    case 'h':
+    	    case 'h':
 #ifdef CH_F4
       	    case CH_F4:
 #endif
@@ -1463,7 +1463,7 @@ void DbgEntry (void)
       	    	}
       	    	break;
 
-	    case '\n':
+    	    case '\n':
 #ifdef CH_F8
       	    case CH_F8:
 #endif
@@ -1500,3 +1500,4 @@ void DbgEntry (void)
 }
 
 
+    

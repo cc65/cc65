@@ -7,8 +7,7 @@
 	.export		_abs
 	.import		negax
 
-_abs:	dex
-	inx     	     	; test hi byte
+_abs:	cpx     #$00            ; test hi byte
 	bpl	L1
 	jmp	negax	     	; Negate if negative
 L1:	rts

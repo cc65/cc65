@@ -348,7 +348,7 @@ Available operators sorted by precedence:
 <tscreen><verb>
     Op 	        Description  		     	      	Precedence
   -------------------------------------------------------------------
-    .CONCAT    	Builtin function	     		0
+    .CONCAT     Builtin function                        0
     .LEFT      	Builtin function	     		0
     .MID       	Builtin function	     		0
     .RIGHT     	Builtin function	     		0
@@ -369,8 +369,8 @@ Available operators sorted by precedence:
     -  	       	Unary minus		     		1
     ~  	       	Unary bitwise not	     		1
     .BITNOT    	Unary bitwise not      	       	       	1
-    &lt;       	Low byte operator	     		1
-    &gt;       	High byte operator	     		1
+    &lt;	Low byte operator	     		1
+    &gt;	High byte operator	     		1
 
     *  	       	Multiplication		     		2
     /  	       	Division		     		2
@@ -526,7 +526,7 @@ use symbols and labels, giving a lot of flexibility.
     prefer the "cheap" local labels). Nevertheless, unnamed labels are
     convenient in some situations, so it's your decision.
 
-  - Using macros to define labels and constants
+<tag/Using macros to define labels and constants/
 
     While there are drawbacks with this approach, it may be handy in some
     situations. Using <tt/.DEFINE/, it is possible to define symbols or
@@ -567,7 +567,7 @@ Here's a list of all control commands and a description, what they do:
 
 <descrip>
 
-<tag><tt>.A16</tt></tag>
+<tag><tt><idx>.A16</idx></tt></tag>
 
   Valid only in 65816 mode. Switch the accumulator to 16 bit.
 
@@ -577,7 +577,7 @@ Here's a list of all control commands and a description, what they do:
   See also: <tt/.SMART/
 
 
-<tag><tt>.A8</tt></tag>
+<tag><tt><idx>.A8</idx></tt></tag>
 
   Valid only in 65816 mode. Switch the accumulator to 8 bit.
 
@@ -587,7 +587,7 @@ Here's a list of all control commands and a description, what they do:
   See also: <tt/.SMART/
 
 
-<tag><tt>.ADDR</tt></tag>
+<tag><tt><idx>.ADDR</idx></tt></tag>
 
   Define word sized data. In 6502 mode, this is an alias for <tt/.WORD/ and
   may be used for better readability if the data words are address values.
@@ -602,7 +602,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.ALIGN</tt></tag>
+<tag><tt><idx>.ALIGN</idx></tt></tag>
 
   Align data to a given boundary. The command expects a constant integer
   argument that must be a power of two, plus an optional second argument
@@ -621,7 +621,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.ASCIIZ</tt></tag>
+<tag><tt><idx>.ASCIIZ</idx></tt></tag>
 
   Define a string with a trailing zero.
 
@@ -636,7 +636,7 @@ Here's a list of all control commands and a description, what they do:
   the binary zero is only appended once (after the last one).
 
 
-<tag><tt>.AUTOIMPORT</tt></tag>
+<tag><tt><idx>.AUTOIMPORT</idx></tt></tag>
 
   Is followd by a plus or a minus character. When switched on (using a
   +), undefined symbols are automatically marked as import instead of
@@ -661,7 +661,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.BLANK</tt></tag>
+<tag><tt><idx>.BLANK</idx></tt></tag>
 
   Builtin function. The function evaluates its argument in braces and
   yields "false" if the argument is non blank (there is an argument), and
@@ -673,7 +673,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.BSS</tt></tag>
+<tag><tt><idx>.BSS</idx></tt></tag>
 
   Switch to the BSS segment. The name of the BSS segment is always "BSS",
   so this is a shortcut for
@@ -685,7 +685,7 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt/.SEGMENT/ command.
 
 
-<tag><tt>.BYTE</tt></tag>
+<tag><tt><idx>.BYTE</idx></tt></tag>
 
   Define byte sized data. Must be followed by a sequence of (byte ranged)
   expressions or strings.
@@ -697,7 +697,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.CASE</tt></tag>
+<tag><tt><idx>.CASE</idx></tt></tag>
 
   Switch on or off case sensitivity on identifiers. The default is off
   (that is, identifiers are case sensitive), but may be changed by the
@@ -712,7 +712,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.CODE</tt></tag>
+<tag><tt><idx>.CODE</idx></tt></tag>
 
   Switch to the CODE segment. The name of the CODE segment is always
   "CODE", so this is a shortcut for
@@ -724,7 +724,7 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt/.SEGMENT/ command.
 
 
-<tag><tt>.CONCAT</tt></tag>
+<tag><tt><idx>.CONCAT</idx></tt></tag>
 
   Builtin function. The function allows to concatenate a list of string
   constants separated by commas. The result is a string constant that
@@ -746,7 +746,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.CONST</tt></tag>
+<tag><tt><idx>.CONST</idx></tt></tag>
 
   Builtin function. The function evaluates its argument in braces and
   yields "true" if the argument is a constant expression (that is, an
@@ -758,7 +758,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.CPU</tt></tag>
+<tag><tt><idx>.CPU</idx></tt></tag>
 
   Reading this pseudo variable will give a constant integer value that
   tells which instruction set is currently enabled. Possible values are:
@@ -788,7 +788,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.DATA</tt></tag>
+<tag><tt><idx>.DATA</idx></tt></tag>
 
   Switch to the DATA segment. The name of the DATA segment is always
   "DATA", so this is a shortcut for
@@ -800,7 +800,7 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt/.SEGMENT/ command.
 
 
-<tag><tt>.DBYT</tt></tag>
+<tag><tt><idx>.DBYT</idx></tt></tag>
 
   Define word sized data with the hi and lo bytes swapped (use <tt/.WORD/ to
   create word sized data in native 65XX format). Must be followed by a
@@ -821,7 +821,7 @@ Here's a list of all control commands and a description, what they do:
   into the current segment in that order.
 
 
-<tag><tt>.DEBUGINFO</tt></tag>
+<tag><tt><idx>.DEBUGINFO</idx></tt></tag>
 
   Switch on or off debug info generation. The default is off (that is,
   the object file will not contain debug infos), but may be changed by the
@@ -836,7 +836,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.DEFINE</tt></tag>
+<tag><tt><idx>.DEFINE</idx></tt></tag>
 
   Start a define style macro definition. The command is followed by an
   identifier (the macro name) and optionally by a list of formal arguments
@@ -844,7 +844,7 @@ Here's a list of all control commands and a description, what they do:
   See separate section about macros.
 
 
-<tag><tt>.DEF, .DEFINED</tt></tag>
+<tag><tt><idx>.DEF,</idx> <idx>.DEFINED</idx></tt></tag>
 
   Builtin function. The function expects an identifier as argument in
   braces. The argument is evaluated, and the function yields "true" if the
@@ -857,7 +857,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.DWORD</tt></tag>
+<tag><tt><idx>.DWORD</idx></tt></tag>
 
   Define dword sized data (4 bytes) Must be followed by a sequence of
   expressions.
@@ -869,38 +869,43 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.ELSE</tt></tag>
+<tag><tt><idx>.ELSE</idx></tt></tag>
 
   Conditional assembly: Reverse the current condition.
 
 
-<tag><tt>.ELSEIF</tt></tag>
+<tag><tt><idx>.ELSEIF</idx></tt></tag>
 
   Conditional assembly: Reverse current condition and test a new one.
 
 
-<tag><tt>.END</tt></tag>
+<tag><tt><idx>.END</idx></tt></tag>
 
   Forced end of assembly. Assembly stops at this point, even if the command
   is read from an include file.
 
 
-<tag><tt>.ENDIF</tt></tag>
+<tag><tt><idx>.ENDIF</idx></tt></tag>
 
   Conditional assembly: Close a <tt/.IF.../ or <tt/.ELSE/ branch.
 
 
-<tag><tt>.ENDMAC, .ENDMACRO</tt></tag>
+<tag><tt><idx>.ENDMAC,</idx> <idx>.ENDMACRO</idx></tt></tag>
 
   End of macro definition (see separate section).
 
 
-<tag><tt>.ENDPROC</tt></tag>
+<tag><tt><idx>.ENDPROC</idx></tt></tag>
 
   End of local lexical level (see <tt/.PROC/).
 
 
-<tag><tt>.ERROR</tt></tag>
+<tag><tt><idx>.ENDREP,</idx> <idx>.ENDREPEAT</idx></tt></tag>
+
+  End a <tt/.REPEAT/ block. See the <tt/.REPEAT/ command.
+
+
+<tag><tt><idx>.ERROR</idx></tt></tag>
 
   Force an assembly error. The assembler will output an error message
   preceeded by "User error" and will <em/not/ produce an object file.
@@ -923,13 +928,13 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt/.WARNING/ and <tt/.OUT/ directives.
 
 
-<tag><tt>.EXITMAC, .EXITMACRO</tt></tag>
+<tag><tt><idx>.EXITMAC,</idx> <idx>.EXITMACRO</idx></tt></tag>
 
   Abort a macro expansion immidiately. This command is often useful in
   recursive macros. See separate chapter about macros.
 
 
-<tag><tt>.EXPORT</tt></tag>
+<tag><tt><idx>.EXPORT</idx></tt></tag>
 
   Make symbols accessible from other modules. Must be followed by a comma
   separated list of symbols to export.
@@ -941,7 +946,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.EXPORTZP</tt></tag>
+<tag><tt><idx>.EXPORTZP</idx></tt></tag>
 
   Make symbols accessible from other modules. Must be followed by a comma
   separated list of symbols to export. The exported symbols are explicitly
@@ -954,7 +959,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.FARADDR</tt></tag>
+<tag><tt><idx>.FARADDR</idx></tt></tag>
 
   Define far (24 bit) address data. The command must be followed by a
   sequence of (not necessarily constant) expressions.
@@ -966,7 +971,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.FEATURE</tt></tag>
+<tag><tt><idx>.FEATURE</idx></tt></tag>
 
   This directive may be used to enable one or more compatibility features
   of the assembler. While the use of <tt/.FEATURE/ should be avoided when
@@ -984,29 +989,29 @@ Here's a list of all control commands and a description, what they do:
 
   <descrip>
 
-  <tag><tt>dollar_is_pc</tt></tag>
+  <tag><tt<idx>>dollar_is_pc</idx></tt></tag>
 
     The dollar sign may be used as an alias for the star (`*'), which
     gives the value of the current PC in expressions.
     Note: Assignment to the pseudo variable is not allowed.
 
-  <tag><tt>labels_without_colons</tt></tag>
+  <tag><tt<idx>>labels_without_colons</idx></tt></tag>
 
     Allow labels without a trailing colon. These labels are only accepted,
     if they start at the beginning of a line (no leading white space).
 
-  <tag><tt>loose_string_term</tt></tag>
+  <tag><tt<idx>>loose_string_term</idx></tt></tag>
 
     Accept single quotes as well as double quotes as terminators for string
     constants.
 
-  <tag><tt>at_in_identifiers</tt></tag>
+  <tag><tt<idx>>at_in_identifiers</idx></tt></tag>
 
     Accept the at character (`@') as a valid character in identifiers. The
     at character is not allowed to start an identifier, even with this
     feature enabled.
 
-  <tag><tt>dollar_in_identifiers</tt></tag>
+  <tag><tt<idx>>dollar_in_identifiers</idx></tt></tag>
 
     Accept the dollar sign (`&dollar;') as a valid character in identifiers. The
     at character is not allowed to start an identifier, even with this
@@ -1015,7 +1020,7 @@ Here's a list of all control commands and a description, what they do:
   </descrip>
 
 
-<tag><tt>.FILEOPT, .FOPT</tt></tag>
+<tag><tt><idx>.FILEOPT,</idx> <idx>.FOPT</idx></tt></tag>
 
   Insert an option string into the object file. There are two forms of
   this command, one specifies the option by a keyword, the second
@@ -1045,7 +1050,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.GLOBAL</tt></tag>
+<tag><tt><idx>.GLOBAL</idx></tt></tag>
 
   Declare symbols as global. Must be followed by a comma separated list
   of symbols to declare. Symbols from the list, that are defined somewhere
@@ -1060,7 +1065,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.GLOBALZP</tt></tag>
+<tag><tt><idx>.GLOBALZP</idx></tt></tag>
 
   Declare symbols as global. Must be followed by a comma separated list
   of symbols to declare. Symbols from the list, that are defined
@@ -1076,7 +1081,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.I16</tt></tag>
+<tag><tt><idx>.I16</idx></tt></tag>
 
   Valid only in 65816 mode. Switch the index registers to 16 bit.
 
@@ -1086,7 +1091,7 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt/.SMART/ command.
 
 
-<tag><tt>.I8</tt></tag>
+<tag><tt><idx>.I8</idx></tt></tag>
 
   Valid only in 65816 mode. Switch the index registers to 8 bit.
 
@@ -1096,7 +1101,7 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt/.SMART/ command.
 
 
-<tag><tt>.IF</tt></tag>
+<tag><tt><idx>.IF</idx></tt></tag>
 
   Conditional assembly: Evalute an expression and switch assembler output
   on or off depending on the expression. The expression must be a constant
@@ -1106,7 +1111,7 @@ Here's a list of all control commands and a description, what they do:
   to TRUE.
 
 
-<tag><tt>.IFBLANK</tt></tag>
+<tag><tt><idx>.IFBLANK</idx></tt></tag>
 
   Conditional assembly: Check if there are any remaining tokens in this
   line, and evaluate to FALSE if this is the case, and to TRUE otherwise.
@@ -1132,7 +1137,7 @@ Here's a list of all control commands and a description, what they do:
   See also: <tt/.BLANK/
 
 
-<tag><tt>.IFCONST</tt></tag>
+<tag><tt><idx>.IFCONST</idx></tt></tag>
 
   Conditional assembly: Evaluate an expression and switch assembler output
   on or off depending on the constness of the expression.
@@ -1144,7 +1149,7 @@ Here's a list of all control commands and a description, what they do:
   See also: <tt/.CONST/
 
 
-<tag><tt>.IFDEF</tt></tag>
+<tag><tt><idx>.IFDEF</idx></tt></tag>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
   a symbol name. The condition is true if the the given symbol is already
@@ -1153,7 +1158,7 @@ Here's a list of all control commands and a description, what they do:
   See also: <tt/.DEFINED/
 
 
-<tag><tt>.IFNBLANK</tt></tag>
+<tag><tt><idx>.IFNBLANK</idx></tt></tag>
 
   Conditional assembly: Check if there are any remaining tokens in this
   line, and evaluate to TRUE if this is the case, and to FALSE otherwise.
@@ -1178,7 +1183,7 @@ Here's a list of all control commands and a description, what they do:
   See also: <tt/.BLANK/
 
 
-<tag><tt>.IFNDEF</tt></tag>
+<tag><tt><idx>.IFNDEF</idx></tt></tag>
 
   Conditional assembly: Check if a symbol is defined. Must be followed by
   a symbol name. The condition is true if the the given symbol is not
@@ -1187,7 +1192,7 @@ Here's a list of all control commands and a description, what they do:
   See also: <tt/.DEFINED/
 
 
-<tag><tt>.IFNREF</tt></tag>
+<tag><tt><idx>.IFNREF</idx></tt></tag>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
   by a symbol name. The condition is true if if the the given symbol was
@@ -1196,25 +1201,25 @@ Here's a list of all control commands and a description, what they do:
   See also: <tt/.REFERENCED/
 
 
-<tag><tt>.IFP02</tt></tag>
+<tag><tt><idx>.IFP02</idx></tt></tag>
 
   Conditional assembly: Check if the assembler is currently in 6502 mode
   (see <tt/.P02/ command).
 
 
-<tag><tt>.IFP816</tt></tag>
+<tag><tt><idx>.IFP816</idx></tt></tag>
 
   Conditional assembly: Check if the assembler is currently in 65816 mode
   (see <tt/.P816/ command).
 
 
-<tag><tt>.IFPC02</tt></tag>
+<tag><tt><idx>.IFPC02</idx></tt></tag>
 
   Conditional assembly: Check if the assembler is currently in 65C02 mode
   (see <tt/.PC02/ command).
 
 
-<tag><tt>.IFREF</tt></tag>
+<tag><tt><idx>.IFREF</idx></tt></tag>
 
   Conditional assembly: Check if a symbol is referenced. Must be followed
   by a symbol name. The condition is true if if the the given symbol was
@@ -1236,7 +1241,7 @@ Here's a list of all control commands and a description, what they do:
   See also: <tt/.REFERENCED/
 
 
-<tag><tt>.IMPORT</tt></tag>
+<tag><tt><idx>.IMPORT</idx></tt></tag>
 
   Import a symbol from another module. The command is followed by a comma
   separated list of symbols to import.
@@ -1248,7 +1253,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.IMPORTZP</tt></tag>
+<tag><tt><idx>.IMPORTZP</idx></tt></tag>
 
   Import a symbol from another module. The command is followed by a comma
   separated list of symbols to import. The symbols are explicitly imported
@@ -1261,7 +1266,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.INCBIN</tt></tag>
+<tag><tt><idx>.INCBIN</idx></tt></tag>
 
   Include a file as binary data. The command expects a string argument
   that is the name of a file to include literally in the current segment.
@@ -1273,7 +1278,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.INCLUDE</tt></tag>
+<tag><tt><idx>.INCLUDE</idx></tt></tag>
 
   Include another file. Include files may be nested up to a depth of 16.
 
@@ -1284,7 +1289,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.LEFT</tt></tag>
+<tag><tt><idx>.LEFT</idx></tt></tag>
 
   Builtin function. Extracts the left part of a given token list.
 
@@ -1318,7 +1323,7 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt/.MID/ and <tt/.RIGHT/ builtin functions.
 
 
-<tag><tt>.LINECONT</tt></tag>
+<tag><tt><idx>.LINECONT</idx></tt></tag>
 
   Switch on or off line continuations using the backslash character
   before a newline. The option is off by default.
@@ -1338,7 +1343,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.LIST</tt></tag>
+<tag><tt><idx>.LIST</idx></tt></tag>
 
   Enable output to the listing. The command must be followed by a boolean
   switch ("on", "off", "+" or "-") and will enable or disable listing
@@ -1356,7 +1361,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.LISTBYTES</tt></tag>
+<tag><tt><idx>.LISTBYTES</idx></tt></tag>
 
   Set, how many bytes are shown in the listing for one source line. The
   default is 12, so the listing will show only the first 12 bytes for any
@@ -1373,7 +1378,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.LOCAL</tt></tag>
+<tag><tt><idx>.LOCAL</idx></tt></tag>
 
   This command may only be used inside a macro definition. It declares a
   list of identifiers as local to the macro expansion.
@@ -1392,7 +1397,7 @@ Here's a list of all control commands and a description, what they do:
   You get an error when using <tt/.LOCAL/ outside a macro.
 
 
-<tag><tt>.LOCALCHAR</tt></tag>
+<tag><tt><idx>.LOCALCHAR</idx></tt></tag>
 
   Defines the character that start "cheap" local labels. You may use one
   of '@' and '?' as start character. The default is '@'.
@@ -1416,7 +1421,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.MACPACK</tt></tag>
+<tag><tt><idx>.MACPACK</idx></tt></tag>
 
   Insert a predefined macro package. The command is followed by an
   identifier specifying the macro package to insert. Available macro
@@ -1440,7 +1445,7 @@ Here's a list of all control commands and a description, what they do:
   See separate section about macros packages.
 
 
-<tag><tt>.MAC, .MACRO</tt></tag>
+<tag><tt><idx>.MAC,</idx> <idx>.MACRO</idx></tt></tag>
 
   Start a classic macro definition. The command is followed by an identifier
   (the macro name) and optionally by a comma separated list of identifiers
@@ -1448,7 +1453,7 @@ Here's a list of all control commands and a description, what they do:
   See separate section about macros.
 
 
-<tag><tt>.MATCH</tt></tag>
+<tag><tt><idx>.MATCH</idx></tt></tag>
 
   Builtin function. Matches two token lists against each other. This is
   most useful within macros, since macros are not stored as strings, but
@@ -1500,7 +1505,7 @@ Here's a list of all control commands and a description, what they do:
   reserved keyword "A".
 
 
-<tag><tt>.MID</tt></tag>
+<tag><tt><idx>.MID</idx></tt></tag>
 
   Builtin function. Takes a starting index, a count and a token list as
   arguments. Will return part of the token list.
@@ -1537,7 +1542,7 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt/.LEFT/ and <tt/.RIGHT/ builtin functions.
 
 
-<tag><tt>.ORG</tt></tag>
+<tag><tt><idx>.ORG</idx></tt></tag>
 
   Start a section of absolute code. The command is followed by a constant
   expression that gives the new PC counter location for which the code is
@@ -1552,7 +1557,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.OUT</tt></tag>
+<tag><tt><idx>.OUT</idx></tt></tag>
 
   Output a string to the console without producing an error. This command
   is similiar to <tt/.ERROR/, however, it does not force an assembler error
@@ -1567,20 +1572,20 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt/.WARNING/ and <tt/.ERROR/ directives.
 
 
-<tag><tt>.P02</tt></tag>
+<tag><tt><idx>.P02</idx></tt></tag>
 
   Enable the 6502 instruction set, disable 65C02 and 65816 instructions.
   This is the default if not overridden by the <tt/--cpu/ command line
   option.
 
 
-<tag><tt>.P816</tt></tag>
+<tag><tt><idx>.P816</idx></tt></tag>
 
   Enable the 65816 instruction set. This is a superset of the 65C02 and
   6502 instruction sets.
 
 
-<tag><tt>.PAGELEN, .PAGELENGTH</tt></tag>
+<tag><tt><idx>.PAGELEN,</idx> <idx>.PAGELENGTH</idx></tt></tag>
 
   Set the page length for the listing. Must be followed by an integer
   constant. The value may be "unlimited", or in the range 32 to 127. The
@@ -1599,7 +1604,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.PARAMCOUNT</tt></tag>
+<tag><tt><idx>.PARAMCOUNT</idx></tt></tag>
 
   This builtin pseudo variable is only available in macros. It is replaced
   by the actual number of parameters that were given in the macro
@@ -1617,13 +1622,13 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.PC02</tt></tag>
+<tag><tt><idx>.PC02</idx></tt></tag>
 
   Enable the 65C02 instructions set. This instruction set includes all
   6502 instructions.
 
 
-<tag><tt>.PROC</tt></tag>
+<tag><tt><idx>.PROC</idx></tt></tag>
 
   Start a nested lexical level. All new symbols from now on are in the
   local lexical level and are not accessible from outside. Symbols defined
@@ -1656,7 +1661,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.REF, .REFERENCED</tt></tag>
+<tag><tt><idx>.REF,</idx> <idx>.REFERENCED</idx></tt></tag>
 
   Builtin function. The function expects an identifier as argument in
   braces. The argument is evaluated, and the function yields "true" if the
@@ -1669,12 +1674,39 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.RELOC</tt></tag>
+<tag><tt><idx>.REPEAT</idx></tt></tag>
+
+  Repeat all commands between <tt/.REPEAT/ and <tt/.ENDREPEAT/ a constant
+  number of times. The command is followed by a constant expression that tells
+  how many times the commands in the body should get repeated. Optionally, a
+  comma and an identifier may be specified. If this identifier is found in
+  the body of the repeat statement, it is replaced by the current repeat
+  count (starting with zero for the first time the body is repeated).
+
+  <tt/.REPEAT/ statements may be nested. If you use the same repeat count
+  identifier for a nested <tt/.REPEAT/ statement, the one from the inner
+  level will be used, not the one from the outer level.
+
+  Example:
+
+  The following macro will emit a string that is "encrypted" in that all
+  characters of the string are XORed by the value $55.
+
+  <tscreen><verb>
+	.macro	Crypt	Arg
+		.repeat	strlen(Arg), I
+		.byte	strat(Arg, I) .xor $55
+		.endrep
+	.endmacro
+  </verb></tscreen>
+
+
+<tag><tt><idx>.RELOC</idx></tt></tag>
 
   Switch back to relocatable mode. See the <tt/.ORG/ command.
 
 
-<tag><tt>.RES</tt></tag>
+<tag><tt><idx>.RES</idx></tt></tag>
 
   Reserve storage. The command is followed by one or two constant
   expressions. The first one is mandatory and defines, how many bytes of
@@ -1691,7 +1723,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.RIGHT</tt></tag>
+<tag><tt><idx>.RIGHT</idx></tt></tag>
 
   Builtin function. Extracts the right part of a given token list.
 
@@ -1707,7 +1739,7 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt/.LEFT/ and <tt/.MID/ builtin functions.
 
 
-<tag><tt>.RODATA</tt></tag>
+<tag><tt><idx>.RODATA</idx></tt></tag>
 
   Switch to the RODATA segment. The name of the RODATA segment is always
   "RODATA", so this is a shortcut for
@@ -1720,7 +1752,7 @@ Here's a list of all control commands and a description, what they do:
   readonly data like string constants. See also the <tt/.SEGMENT/ command.
 
 
-<tag><tt>.SEGMENT</tt></tag>
+<tag><tt><idx>.SEGMENT</idx></tt></tag>
 
   Switch to another segment. Code and data is always emitted into a
   segment, that is, a named section of data. The default segment is
@@ -1758,7 +1790,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.SMART</tt></tag>
+<tag><tt><idx>.SMART</idx></tt></tag>
 
   Switch on or off smart mode. The command must be followed by a '+' or
   '-' character to switch the option on or off respectively. The default
@@ -1781,7 +1813,25 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.STRING</tt></tag>
+<tag><tt><idx>.STRAT</idx></tt></tag>
+
+  Builtin function. The function accepts a string and an index as
+  arguments and returns the value of the character at the given position
+  as an integer value. The index is zero based.
+
+  Example:
+
+  <tscreen><verb>
+       	.macro	M    	Arg
+		; Check if the argument string starts with '#'
+		.if (.strat (Arg, 0) = '#')
+		...
+		.endif
+       	.endmacro
+  </verb></tscreen>
+
+
+<tag><tt><idx>.STRING</idx></tt></tag>
 
   Builtin function. The function accepts an argument in braces and
   converts this argument into a string constant. The argument may be an
@@ -1800,7 +1850,24 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.TCOUNT</tt></tag>
+<tag><tt><idx>.STRLEN</idx></tt></tag>
+
+  Builtin function. The function accepts a string argument in braces and
+  eveluates to the length of the string.
+
+  Example:
+
+  The following macro encodes a string as a pascal style string with
+  a leading length byte.
+
+  <tscreen><verb>
+       	.macro	PString	Arg
+		.byte	.strlen(Arg), Arg
+       	.endmacro
+  </verb></tscreen>
+
+
+<tag><tt><idx>.TCOUNT</idx></tt></tag>
 
   Builtin function. The function accepts a token list in braces. The
   function result is the number of tokens given as argument.
@@ -1824,13 +1891,13 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.WARNING</tt></tag>
+<tag><tt><idx>.WARNING</idx></tt></tag>
 
   Force an assembly warning. The assembler will output a warning message
   preceeded by "User warning". This warning will always be output, even
   if other warnings are disabled with the <tt/-W0/ command line option.
 
-  This command may be used to output possible problems when assembling 
+  This command may be used to output possible problems when assembling
   the source file.
 
   Example:
@@ -1852,7 +1919,7 @@ Here's a list of all control commands and a description, what they do:
   See also the <tt/.ERROR/ and <tt/.OUT/ directives.
 
 
-<tag><tt>.WORD</tt></tag>
+<tag><tt><idx>.WORD</idx></tt></tag>
 
   Define word sized data. Must be followed by a sequence of (word ranged,
   but not necessarily constant) expressions.
@@ -1864,7 +1931,7 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<tag><tt>.ZEROPAGE</tt></tag>
+<tag><tt><idx>.ZEROPAGE</idx></tt></tag>
 
   Switch to the ZEROPAGE segment and mark it as direct (zeropage) segment.
   The name of the ZEROPAGE segment is always "ZEROPAGE", so this is a
@@ -2192,25 +2259,25 @@ with just one command. Available macro packages are:
 
 <descrip>
 
-<tag><tt>generic</tt></tag>
+<tag><tt><idx>generic</idx></tt></tag>
 
   This macro package defines macros that are useful in almost any program.
   Currently, two macros are defined:
 
   <tscreen><verb>
    	.macro  add     Arg
-   	    	clc
-   	    	adc     Arg
+   	     	clc
+   	     	adc     Arg
    	.endmacro
 
    	.macro  sub     Arg
-   	    	sec
-   	    	sbc     Arg
+   	     	sec
+   	     	sbc     Arg
    	.endmacro
   </verb></tscreen>
 
 
-<tag><tt>longbranch</tt></tag>
+<tag><tt><idx>longbranch</idx></tt></tag>
 
   This macro package defines long conditional jumps. They are named like the
   short counterpart but with the 'b' replaced by a 'j'. Here is a sample
@@ -2248,7 +2315,7 @@ with just one command. Available macro packages are:
 If you have problems using the assembler, if you find any bugs, or if
 you're doing something interesting with the assembler, I would be glad to
 hear from you. Feel free to contact me by email
-(<htmlurl url="uz@musoftware.de" name="uz@musoftware.de">).
+(<htmlurl url="uz@cc65.org" name="uz@cc65.org">).
 
 
 
@@ -2277,6 +2344,7 @@ freely, subject to the following restrictions:
 <item>	This notice may not be removed or altered from any source
 	distribution.
 </enum>
+
 
 
 </article>

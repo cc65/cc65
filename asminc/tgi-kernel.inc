@@ -129,7 +129,6 @@ TGI_TEXT_VERTICAL       = 1
 ;------------------------------------------------------------------------------
 ; ASM functions
 
-        .global tgi_emu_bar
         .global tgi_getset
         .global tgi_inv_arg
         .global tgi_inv_drv

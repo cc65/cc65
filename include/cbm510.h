@@ -95,6 +95,21 @@ unsigned __fastcall__ peekwsys (unsigned addr);
 void __fastcall__ pokebsys (unsigned addr, unsigned char val);
 void __fastcall__ pokewsys (unsigned addr, unsigned val);
 
+#if defined(__OPT_i__) && defined(__OPT_s__)
+#define peekbsys(addr)          \
+        __AX__ = (addr),        \
+        asm ("sta ptr1"),       \
+        asm ("stx ptr1+1"),     \
+        asm ("ldx $01"),        \
+        asm ("lda #$0F"),       \
+        asm ("sta $01"),        \
+        asm ("ldy #$00"),       \
+        asm ("lda (ptr1),y"),   \
+        asm ("stx $01"),        \
+        asm ("ldx #$00"),       \
+        __AX__
+#endif
+
 
 
 /* Define hardware */

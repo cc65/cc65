@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -75,11 +75,39 @@
 
 
 
-/* Special routines to write bytes and words in the system bank */
+/* Special routines to read/write bytes and words in the system bank */
 unsigned char __fastcall__ peekbsys (unsigned addr);
 unsigned __fastcall__ peekwsys (unsigned addr);
 void __fastcall__ pokebsys (unsigned addr, unsigned char val);
 void __fastcall__ pokewsys (unsigned addr, unsigned val);
+
+#if defined(__OPT_i__) && defined(__OPT_s__)
+#define peekbsys(addr)          \
+        __AX__ = (addr),        \
+        asm ("sta ptr1"),       \
+        asm ("stx ptr1+1"),     \
+        asm ("ldx $01"),        \
+        asm ("lda #$0F"),       \
+        asm ("sta $01"),        \
+        asm ("ldy #$00"),       \
+        asm ("lda (ptr1),y"),   \
+        asm ("stx $01"),        \
+        asm ("ldx #$00"),       \
+        __AX__
+
+#define pokebsys(addr,val)      \
+        __AX__ = (addr),        \
+        asm ("sta ptr1"),       \
+        asm ("stx ptr1+1"),     \
+        __AX__ = (val),         \
+        asm ("ldx $01"),        \
+        asm ("ldy #$0F"),       \
+        asm ("sty $01"),        \
+        asm ("ldy #$00"),       \
+        asm ("sta (ptr1),y"),   \
+        asm ("stx $01")
+
+#endif
 
 
 

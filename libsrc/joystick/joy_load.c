@@ -51,7 +51,7 @@ unsigned char __fastcall__ joy_load_driver (const char* name)
 
     /* Check if we do already have a driver loaded. If so, remove it. */
     if (joy_drv != 0) {
-        joy_deinstall ();
+        joy_uninstall ();
     }
 
     /* Now open the file */

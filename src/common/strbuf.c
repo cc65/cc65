@@ -342,7 +342,7 @@ void SB_VPrintf (StrBuf* S, const char* Format, va_list ap)
      * an allocation. If not, we have to reallocate and try again.
      */
     va_copy (tmp, ap);
-    SizeNeeded = xvsnprintf (S->Buf, S->Allocated, Format, ap);
+    SizeNeeded = xvsnprintf (S->Buf, S->Allocated, Format, tmp);
     va_end (tmp);
 
     /* Check the result, the xvsnprintf function should not fail */

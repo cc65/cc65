@@ -378,7 +378,7 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
         }
         /* Optional field width */
         if (F == '*') {
-            P.Width = va_arg (ap, int);
+            P.Width = va_arg (P.ap, int);
             /* A negative field width argument is taken as a - flag followed
              * by a positive field width.
              */
@@ -405,13 +405,14 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
             F = *Format++;
             P.Flags |= fPrec;
             if (F == '*') {
-                P.Prec = va_arg (ap, int);
+                P.Prec = va_arg (P.ap, int);
                 /* A negative precision argument is taken as if the precision
                  * were omitted.
                  */
                 if (P.Prec < 0) {
                     P.Flags &= ~fPrec;
                 }
+                F = *Format++;          /* Skip the '*' */
             } else if (IsDigit (F)) {
                 P.Prec = F - '0';
                 while (1) {
@@ -425,8 +426,11 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
                 /* A negative precision argument is taken as if the precision
                  * were omitted.
                  */
+                F = *Format++;          /* Skip the minus */
                 while (IsDigit (F = *Format++)) ;
                 P.Flags &= ~fPrec;
+            } else {
+                P.Prec = 0;
             }
         }
 
@@ -486,7 +490,7 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
         }
         /* If a precision is specified, the 0 flag is ignored */
         if (P.Flags & fPrec) {
-            P.Flags &= fZero;
+            P.Flags &= ~fZero;
         }
 
         /* Conversion specifier */
@@ -519,13 +523,13 @@ int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
                 break;
 
             case 'c':
-                SBuf[0] = (char) va_arg (ap, int);
+                SBuf[0] = (char) va_arg (P.ap, int);
                 SBuf[1] = '\0';
                 FormatStr (&P, SBuf);
                 break;
 
             case 's':
-                SPtr = va_arg (ap, const char*);
+                SPtr = va_arg (P.ap, const char*);
                 CHECK (SPtr != 0);
                 FormatStr (&P, SPtr);
                 break;

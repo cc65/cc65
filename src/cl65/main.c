@@ -370,7 +370,7 @@ static void Link (void)
     	CmdAddArg (&LD65, OutputName);
 
     } else if (FirstInput && FindExt (FirstInput)) {  /* Only if ext present! */
-                                                         
+
         const char* Extension = Module? MODULE_EXT : "";
     	char* Output = MakeFilename (FirstInput, Extension);
     	CmdAddArg (&LD65, "-o");
@@ -548,7 +548,7 @@ static void Usage (void)
     fprintf (stderr,
 	     "Usage: %s [options] file\n"
        	     "Short options:\n"
-       	     "  -c\t\t\tCompiler and assemble but don't link\n"
+       	     "  -c\t\t\tCompile and assemble but don't link\n"
        	     "  -d\t\t\tDebug mode\n"
        	     "  -g\t\t\tAdd debug info\n"
        	     "  -h\t\t\tHelp (this text)\n"

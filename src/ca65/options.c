@@ -43,6 +43,7 @@
 #include "error.h"
 #include "objfile.h"
 #include "options.h"
+#include "spool.h"
 
 
 
@@ -65,7 +66,7 @@ static unsigned		OptCount = 0;
 
 
 
-static Option* NewOption (unsigned char Type)
+static Option* NewOption (unsigned char Type, unsigned long Val)
 /* Create a new option, insert it into the list and return it */
 {
     Option* Opt;
@@ -76,7 +77,7 @@ static Option* NewOption (unsigned char Type)
     /* Initialize fields */
     Opt->Next  = 0;
     Opt->Type  = Type;
-    Opt->V.Str = 0;
+    Opt->Val   = Val;
 
     /* Insert it into the list */
     if (OptRoot == 0) {
@@ -98,14 +99,7 @@ static Option* NewOption (unsigned char Type)
 void OptStr (unsigned char Type, const char* Text)
 /* Add a string option */
 {
-    Option* O;
-
-    /* String must have less than 255 bytes */
-    if (strlen (Text) > 255) {
-	Fatal (FAT_STRING_TOO_LONG);
-    }
-    O        = NewOption (Type);
-    O->V.Str = xstrdup (Text);
+    NewOption (Type, GetStringId (Text));
 }
 
 
@@ -113,7 +107,7 @@ void OptStr (unsigned char Type, const char* Text)
 void OptComment (const char* Comment)
 /* Add a comment */
 {
-    OptStr (OPT_COMMENT, Comment);
+    NewOption (OPT_COMMENT, GetStringId (Comment));
 }
 
 
@@ -121,7 +115,7 @@ void OptComment (const char* Comment)
 void OptAuthor (const char* Author)
 /* Add an author statement */
 {
-    OptStr (OPT_AUTHOR, Author);
+    NewOption (OPT_AUTHOR, GetStringId (Author));
 }
 
 
@@ -129,7 +123,7 @@ void OptAuthor (const char* Author)
 void OptTranslator (const char* Translator)
 /* Add a translator option */
 {
-    OptStr (OPT_TRANSLATOR, Translator);
+    NewOption (OPT_TRANSLATOR, GetStringId (Translator));
 }
 
 
@@ -137,7 +131,7 @@ void OptTranslator (const char* Translator)
 void OptCompiler (const char* Compiler)
 /* Add a compiler option */
 {
-    OptStr (OPT_COMPILER, Compiler);
+    NewOption (OPT_COMPILER, GetStringId (Compiler));
 }
 
 
@@ -145,7 +139,7 @@ void OptCompiler (const char* Compiler)
 void OptOS (const char* OS)
 /* Add an operating system option */
 {
-    OptStr (OPT_OS, OS);
+    NewOption (OPT_OS, GetStringId (OS));
 }
 
 
@@ -153,8 +147,7 @@ void OptOS (const char* OS)
 void OptDateTime (unsigned long DateTime)
 /* Add a date/time option */
 {
-    Option* O = NewOption (OPT_DATETIME);
-    O->V.Val = DateTime;
+    NewOption (OPT_DATETIME, DateTime);
 }
 
 
@@ -174,24 +167,9 @@ void WriteOptions (void)
     O = OptRoot;
     while (O) {
 
-	/* Write the type of the option */
+	/* Write the type of the option, then the value */
 	ObjWrite8 (O->Type);
-
-	/* Write the argument */
-	switch (O->Type & OPT_ARGMASK) {
-
-	    case OPT_ARGSTR:
-	       	ObjWriteStr (O->V.Str);
-	       	break;
-
-	    case OPT_ARGNUM:
-	       	ObjWrite32 (O->V.Val);
-	       	break;
-
-	    default:
-	       	Internal ("Invalid option type: $%02X", O->Type & 0xFF);
-
-	}
+        ObjWriteVar (O->Val);
 
 	/* Next option */
 	O = O->Next;

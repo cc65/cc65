@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -60,14 +60,11 @@
 
 
 /* Structure to encode options */
-typedef struct Option_ Option;
-struct Option_ {
-    Option*	     	Next;		/* For list of options */
+typedef struct Option Option;
+struct Option {
+    Option*  	     	Next;		/* For list of options */
     unsigned char    	Type;		/* Type of option */
-    union {
-  	const char*    	Str;		/* String attribute */
-	unsigned long	Val;		/* Value attribute */
-    } V;
+    unsigned long	Val;		/* Value attribute or string index */
 };
 
 

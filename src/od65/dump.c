@@ -370,49 +370,47 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
     /* Read and print all options */
     for (I = 0; I < Count; ++I) {
 
-	unsigned long ArgNum;
-	char*  	      ArgStr;
-	unsigned      ArgLen;
+    	const char*   ArgStr;                      
+    	unsigned      ArgLen;
 
-	/* Read the type of the option */
-	unsigned char Type = Read8 (F);
+    	/* Read the type of the option and the value */
+    	unsigned char Type = Read8 (F);
+        unsigned long Val  = ReadVar (F);
 
        	/* Get the type of the argument */
-	unsigned char ArgType = Type & OPT_ARGMASK;
+    	unsigned char ArgType = Type & OPT_ARGMASK;
 
- 	/* Determine which option follows */
-	const char* TypeDesc;
-	switch (Type) {
+    	/* Determine which option follows */
+    	const char* TypeDesc;
+    	switch (Type) {
        	    case OPT_COMMENT:  	TypeDesc = "OPT_COMMENT";	break;
-	    case OPT_AUTHOR:  	TypeDesc = "OPT_AUTHOR";	break;
-	    case OPT_TRANSLATOR:TypeDesc = "OPT_TRANSLATOR";	break;
-	    case OPT_COMPILER:	TypeDesc = "OPT_COMPILER";	break;
-	    case OPT_OS:      	TypeDesc = "OPT_OS";		break;
-	    case OPT_DATETIME:	TypeDesc = "OPT_DATETIME";	break;
-	    default:	      	TypeDesc = "OPT_UNKNOWN";	break;
-	}
+    	    case OPT_AUTHOR:  	TypeDesc = "OPT_AUTHOR";	break;
+    	    case OPT_TRANSLATOR:TypeDesc = "OPT_TRANSLATOR";	break;
+    	    case OPT_COMPILER:	TypeDesc = "OPT_COMPILER";	break;
+    	    case OPT_OS:      	TypeDesc = "OPT_OS";		break;
+    	    case OPT_DATETIME:	TypeDesc = "OPT_DATETIME";	break;
+    	    default:	      	TypeDesc = "OPT_UNKNOWN";	break;
+    	}
 
-	/* Print the header */
-	printf ("    Index:%27u\n", I);
+    	/* Print the header */
+    	printf ("    Index:%27u\n", I);
 
-	/* Print the data */
-	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
-	switch (ArgType) {
+    	/* Print the data */
+    	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
+    	switch (ArgType) {
 
-	    case OPT_ARGSTR:
-	     	ArgStr = ReadStr (F);
-	    	ArgLen = strlen (ArgStr);
-	     	printf ("      Data:%*s\"%s\"\n", 24-ArgLen, "", ArgStr);
-	     	xfree (ArgStr);
-	     	break;
+    	    case OPT_ARGSTR:
+    	     	ArgStr = GetString (&StrPool, Val);
+    	    	ArgLen = strlen (ArgStr);
+    	     	printf ("      Data:%*s\"%s\"\n", 24-ArgLen, "", ArgStr);
+    	     	break;
 
-	    case OPT_ARGNUM:
-	     	ArgNum = Read32 (F);
-	     	printf ("      Data:%26lu", ArgNum);
-		if (Type == OPT_DATETIME) {
-		    /* Print the time as a string */
-   		    printf ("  (%s)", TimeToStr (ArgNum));
-		}
+    	    case OPT_ARGNUM:
+    	     	printf ("      Data:%26lu", Val);
+    		if (Type == OPT_DATETIME) {
+    		    /* Print the time as a string */
+    		    printf ("  (%s)", TimeToStr (Val));
+    		}
 		printf ("\n");
 	     	break;
 
@@ -513,7 +511,7 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 
     /* Read and print all segments */
     for (I = 0; I < Count; ++I) {
-                                    
+
 	/* Read the data for one segments */
 	char*	      Name  = ReadStr (F);
 	unsigned      Len   = strlen (Name);

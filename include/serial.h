@@ -103,6 +103,7 @@
 #define SER_ERR_NO_DATA	       	0x06   	/* Nothing to read */
 #define SER_ERR_OVERFLOW       	0x07   	/* No room in send buffer */
 #define SER_ERR_INIT_FAILED     0x08   	/* Initialization failed */
+#define SER_ERR_INV_IOCTL       0x09    /* IOCTL not supported */
 
 /* Struct containing parameters for the serial port */
 struct ser_params {
@@ -156,6 +157,9 @@ unsigned char __fastcall__ ser_unpause (void);
 
 unsigned char __fastcall__ ser_status (unsigned char* status);
 /* Return the serial port status. */
+
+unsigned char __fastcall__ ser_ioctl (unsigned char code, void* data);
+/* Driver specific entry. */
 
 
 

@@ -5,7 +5,6 @@
 ;
 
 	.export		tosicmp
-	.import		incsp2
 	.importzp	sp, sreg
 
 

@@ -50,26 +50,15 @@ parmok: jsr     popax           ; Get flags
         bcs     nofile
         stx     tmp2
 
-; Check the flags. We cannot have:
-;
-;  - both, read and write flags set
-;  - the append flag set
-;
+; Check the flags. We cannot have both, read and write flags set, and we cannot
+; open a file for writing without creating it.
 
         lda     tmp3
-        and     #O_RDWR
-        beq     invflags        ; Neither read nor write
-        cmp     #O_RDWR
-        beq     invflags        ; Jump if both set
-        cmp     #O_RDONLY
-        beq     doread
-
-; Write bit is set. We cannot open a file for writing without creating it,
-; so check for the O_CREAT bit.
-
-        lda     tmp3
-        and     #O_CREAT
-        beq     invflags
+        and     #(O_RDWR | O_CREAT)
+        cmp     #O_RDONLY       ; Open for reading?
+        beq     doread          ; Yes: Branch
+        cmp     #(O_WRONLY | O_CREAT)   ; Open for writing?
+        bne     invflags        ; No: Invalid open mode
 
 ; If O_TRUNC is set, scratch the file, but ignore any errors
 
@@ -78,10 +67,15 @@ parmok: jsr     popax           ; Get flags
         beq     notrunc
         jsr     scratch
 
-; Complete the the file name
+; Complete the the file name. Check for append mode here.
 
 notrunc:
-        lda     #'w'
+        lda     tmp3            ; Get the mode again
+        ldx     #'a'
+        and     #O_APPEND       ; Append mode?
+        bne     append          ; Branch if yes
+        ldx     #'w'
+append: txa
         jsr     fncomplete
 
 ; Setup the real open flags

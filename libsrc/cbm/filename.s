@@ -85,13 +85,13 @@ namecheck:
         bpl     namecheck
         tax
         lda     __ctype,x
-        and     #(CT_LOWER|CT_DIGIT)
+        and     #CT_ALNUM
         beq     invalidname
 
 ; Check the maximum length, store the character
 
 nameok: ldx     fnlen
-        cpx     #14             ; Maximum length reached?
+        cpx     #16             ; Maximum length reached?
         bcs     invalidname
         lda     (ptr1),y        ; Reload char
         sta     fnbuf,x         ; Store into buffer
@@ -158,8 +158,8 @@ fnunit: .res    1
 fnlen:  .res    1
 
 .data
-fncmd:  .byte   's'             ; Use as scratch command
-fnbuf:  .res    20
+fncmd:  .byte   's'     ; Use as scratch command
+fnbuf:  .res    22      ; 0:0123456789012345,t,m
 
 .rodata
 ; Characters that are ok in filenames besides digits and letters

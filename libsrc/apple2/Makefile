@@ -37,6 +37,7 @@ OBJS=	_scrsize.o	\
 	crt0.o		\
 	ctype.o		\
 	cvline.o	\
+        getenv.o        \                
         joy_stddrv.o    \
 	kbhit.o		\
         mainargs.o      \

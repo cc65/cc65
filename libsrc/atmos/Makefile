@@ -30,6 +30,7 @@ S_OBJS  =       _scrsize.o      \
                 crt0.o          \
                 ctype.o         \
                 cvline.o        \
+                getenv.o        \
                 gotox.o         \
                 gotoxy.o        \
                 gotoy.o         \
@@ -39,7 +40,7 @@ S_OBJS  =       _scrsize.o      \
                 systime.o       \
                 wherex.o        \
                 wherey.o        \
-                write.o         
+                write.o
 
 #--------------------------------------------------------------------------
 # Targets

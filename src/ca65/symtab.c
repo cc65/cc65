@@ -50,6 +50,7 @@
 #include "objfile.h"
 #include "scanner.h"
 #include "segment.h"
+#include "sizeof.h"
 #include "spool.h"
 #include "symtab.h"
 
@@ -109,6 +110,7 @@ static SymTable* NewSymTable (SymTable* Parent, const char* Name)
     S->Left         = 0;
     S->Right        = 0;
     S->Childs       = 0;
+    S->SegRanges    = AUTO_COLLECTION_INITIALIZER;
     S->Flags        = ST_NONE;
     S->AddrSize     = ADDR_SIZE_DEFAULT;
     S->Type         = ST_UNDEF;
@@ -195,6 +197,16 @@ void SymEnterLevel (const char* ScopeName, unsigned char Type, unsigned char Add
     CurrentScope->Flags    |= ST_DEFINED;
     CurrentScope->AddrSize = AddrSize;
     CurrentScope->Type     = Type;
+
+    /* If this is a scope that allows to emit data into segments, add segment
+     * ranges for all currently existing segments. Doing this for just a few
+     * scope types is not really necessary but an optimization, because it
+     * does not allocate memory for useless data (unhandled types here don't
+     * occupy space in any segment).
+     */
+    if (CurrentScope->Type <= ST_SCOPE_HAS_DATA) {
+        AddSegRanges (&CurrentScope->SegRanges);
+    }
 }
 
 
@@ -202,6 +214,21 @@ void SymEnterLevel (const char* ScopeName, unsigned char Type, unsigned char Add
 void SymLeaveLevel (void)
 /* Leave the current lexical level */
 {
+    /* Close the segment ranges. We don't care about the scope type here,
+     * since types without segment ranges will just have an empty list.
+     */
+    CloseSegRanges (&CurrentScope->SegRanges);
+
+    /* If we have segment ranges, the first one is the segment that was
+     * active, when the scope was opened. Set the size of the scope to the
+     * number of data bytes emitted into this segment.
+     */
+    if (CollCount (&CurrentScope->SegRanges) > 0) {                                       
+        const SegRange* R = CollAtUnchecked (&CurrentScope->SegRanges, 0);
+        DefSizeOfScope (CurrentScope, GetSegRangeSize (R));
+    }
+
+    /* Leave the scope */
     CurrentScope = CurrentScope->Parent;
 }
 

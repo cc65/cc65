@@ -708,7 +708,7 @@ static void DoEnd (void)
 static void DoEndProc (void)
 /* Leave a lexical level */
 {
-    if (CurrentScope == RootScope || GetCurrentSymTabType () != ST_PROC) {
+    if (GetCurrentSymTabType () != ST_PROC) {
         /* No local scope */
         ErrorSkip ("No open .PROC");
     } else {
@@ -721,7 +721,7 @@ static void DoEndProc (void)
 static void DoEndScope (void)
 /* Leave a lexical level */
 {
-    if (CurrentScope == RootScope || GetCurrentSymTabType () != ST_SCOPE) {
+    if ( GetCurrentSymTabType () != ST_SCOPE) {
         /* No local scope */
         ErrorSkip ("No open .SCOPE");
     } else {
@@ -1508,7 +1508,7 @@ static void DoSunPlus (void)
 
 static void DoTag (void)
 /* Allocate space for a struct */
-{                                           
+{
     SymEntry* SizeSym;
     long Size;
 

@@ -91,7 +91,7 @@ static Segment CodeSeg     = SEG (&CodeSegDef,     0, &RODataSeg);
 static unsigned SegmentCount = 6;
 
 /* List of all segments */
-static Segment* SegmentList = &CodeSeg;
+Segment* SegmentList = &CodeSeg;
 static Segment* SegmentLast = &NullSeg;
 
 /* Currently active segment */

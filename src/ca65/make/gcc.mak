@@ -38,6 +38,7 @@ OBJS =  anonname.o      \
 	repeat.o	\
         scanner.o	\
         segment.o       \
+        segrange.o      \
         sizeof.o        \
         spool.o         \
         struct.o        \

@@ -78,6 +78,9 @@ extern SegDef BssSegDef;
 extern SegDef RODataSegDef;
 extern SegDef CodeSegDef;
 
+/* List of all segments */
+extern Segment* SegmentList;
+
 /* Currently active segment */
 extern Segment* ActiveSeg;
 

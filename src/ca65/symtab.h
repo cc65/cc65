@@ -45,6 +45,7 @@
 #include "inline.h"
 
 /* ca65 */
+#include "segrange.h"
 #include "symentry.h"
 
 
@@ -60,12 +61,15 @@
 #define ST_DEFINED      0x01            /* Scope has been defined */
 
 /* Symbol table types */
-#define ST_GLOBAL       0x00            /* Root level */
-#define ST_PROC         0x01            /* .PROC */
-#define ST_SCOPE        0x02            /* .SCOPE */
-#define ST_STRUCT       0x03            /* .STRUCT/.UNION */
-#define ST_ENUM         0x04            /* .ENUM */
-#define ST_UNDEF        0xFF
+enum {
+    ST_GLOBAL,                          /* Root level */
+    ST_PROC,                            /* .PROC */
+    ST_SCOPE,                           /* .SCOPE */
+    ST_SCOPE_HAS_DATA = ST_SCOPE,       /* Last scope that contains data */
+    ST_STRUCT,                          /* .STRUCT/.UNION */
+    ST_ENUM,                            /* .ENUM */
+    ST_UNDEF    = 0xFF
+};
 
 /* A symbol table */
 typedef struct SymTable SymTable;
@@ -74,12 +78,13 @@ struct SymTable {
     SymTable*           Right;          /* Pointer to greater entry */
     SymTable*          	Parent;   	/* Link to enclosing scope if any */
     SymTable*           Childs;         /* Pointer to child scopes */
+    Collection          SegRanges;      /* Segment ranges for this scope */
     unsigned short      Flags;          /* Symbol table flags */
-    unsigned char	AddrSize;       /* Address size */
+    unsigned char    	AddrSize;       /* Address size */
     unsigned char       Type;           /* Type of the scope */
     unsigned            Level;          /* Lexical level */
     unsigned   	     	TableSlots;	/* Number of hash table slots */
-    unsigned   	    	TableEntries;	/* Number of entries in the table */
+    unsigned   	     	TableEntries;	/* Number of entries in the table */
     unsigned            Name;           /* Name of the scope */
     SymEntry*  	       	Table[1];   	/* Dynamic allocation */
 };
@@ -165,7 +170,6 @@ void WriteDbgSyms (void);
 /* End of symtab.h */
 
 #endif
-
 
 
 

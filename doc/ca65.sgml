@@ -83,7 +83,8 @@ Short options:
   -i	 		Ignore case of symbols
   -l	 		Create a listing if assembly was ok
   -o name		Name the output file
-  -s	 		Enable smart mode
+  -s	 		Enable smart mode    
+  -t sys                Set the target system
   -v	 		Increase verbosity
   -D name[=value]	Define a symbol
   -I dir 		Set an include directory search path
@@ -95,12 +96,14 @@ Long options:
   --auto-import		Mark unresolved symbols as import
   --cpu type		Set cpu type
   --debug-info		Add debug info to object file
+  --feature name        Set an emulation feature
   --help      		Help (this text)
   --ignore-case		Ignore case of symbols
   --include-dir dir	Set an include directory search path
   --listing  		Create a listing if assembly was ok
   --pagelength n	Set the page length for the listing
   --smart    		Enable smart mode
+  --target sys          Set the target system
   --verbose  		Increase verbosity
   --version   		Print the assembler version
 ---------------------------------------------------------------------------
@@ -118,6 +121,17 @@ Here is a description of all the command line options:
  	6502, 65C02, 65816 and sunplus
 
   (the latter is not available in the freeware version).
+
+
+  <tag><tt>--feature name</tt></tag>
+
+  Enable an emulation feature. This is identical as using <tt/.FEATURE/
+  in the source with two exceptions: Feature names must be lower case, and
+  each feature must be specified by using an extra <tt/--feature/ option,
+  comma separated lists are not allowed.
+
+  See the discussion of the <tt/.FEATURE/ command for a list of emulation 
+  features.
 
 
   <tag><tt>-g, --debug-info</tt></tag>
@@ -175,6 +189,15 @@ Here is a description of all the command line options:
   lead to false results in some cases. If in doubt, use the .ixx and .axx
   instructions to tell the assembler about the current settings. Smart
   mode is off by default.
+
+
+  <tag><tt>-t sys, --target sys</tt></tag>
+
+  Set the target system. This will enable translation of character strings
+  and character constants into the character set of the target platform.
+  The default for the target system is "none", which means that no translation
+  will take place. The assembler supports the same target systems as the 
+  compiler, see there for a list.
 
 
   <tag><tt>-v, --verbose</tt></tag>
@@ -985,33 +1008,41 @@ Here's a list of all control commands and a description, what they do:
 
   <descrip>
 
-  <tag><tt<idx>>dollar_is_pc</idx></tt></tag>
+  <tag><tt><idx>dollar_is_pc</idx></tt></tag>
 
     The dollar sign may be used as an alias for the star (`*'), which
     gives the value of the current PC in expressions.
     Note: Assignment to the pseudo variable is not allowed.
 
-  <tag><tt<idx>>labels_without_colons</idx></tt></tag>
+  <tag><tt><idx>labels_without_colons</idx></tt></tag>
 
     Allow labels without a trailing colon. These labels are only accepted,
     if they start at the beginning of a line (no leading white space).
 
-  <tag><tt<idx>>loose_string_term</idx></tt></tag>
+  <tag><tt><idx>loose_string_term</idx></tt></tag>
 
     Accept single quotes as well as double quotes as terminators for string
     constants.
 
-  <tag><tt<idx>>at_in_identifiers</idx></tt></tag>
+  <tag><tt><idx>at_in_identifiers</idx></tt></tag>
 
     Accept the at character (`@') as a valid character in identifiers. The
     at character is not allowed to start an identifier, even with this
     feature enabled.
 
-  <tag><tt<idx>>dollar_in_identifiers</idx></tt></tag>
+  <tag><tt><idx>dollar_in_identifiers</idx></tt></tag>
 
     Accept the dollar sign (`&dollar;') as a valid character in identifiers. The
     at character is not allowed to start an identifier, even with this
     feature enabled.
+
+  <tag><tt><idx>pc_assignment</idx></tt></tag>
+
+    Allow assignments to the PC symbol (`*' or `&dollar;' if dollar_is_pc is
+    enabled). Such an assignment is handled identical to the <tt/.ORG/
+    command (which is usually not needed, so just removing the lines with
+    the assignments may also be an option when porting code written for older
+    assemblers).
 
   </descrip>
 

@@ -92,7 +92,7 @@ Long options:
 
   -m name
   --mapfile name
-	      
+
   This option (which needs an argument that will used as a filename for
   the generated map file) will cause the linker to generate a map file.
   The map file does contain a detailed overview over the modules used, the
@@ -169,6 +169,7 @@ Long options:
 
 
   -S addr
+  --start-addr addr
 
   Using -S you may define the default starting address. If and how this
   address is used depends on the config file in use. For the builtin

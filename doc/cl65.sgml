@@ -58,6 +58,7 @@ Long options:
   --asm-include-dir dir	Set an assembler include directory
   --debug      		Debug mode
   --debug-info 		Add debug info
+  --feature name        Set an emulation feature
   --help       		Help (this text)
   --include-dir dir	Set a compiler include directory path
   --mapfile name	Create a map file

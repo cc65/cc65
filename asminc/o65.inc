@@ -120,7 +120,8 @@ O65_OPT_TIMESTAMP      	=       4
 ; Operating system codes for O65_OPT_OS
 O65_OS_OSA65   	       	=       1
 O65_OS_LUNIX   	       	=       2
-O65_OS_CC65_MODULE      =       3
+O65_OS_CC65             =       3
+O65_OS_OPENCBM          =       4
 
 ; Load errors
 O65_LOAD_OK             =       0       ; Module load successful

@@ -97,17 +97,6 @@ Functions that are limited in any way:
     See newvers.txt for a discussion of the problem.
 
 
-  * The character classification functions (is...)
-
-    These functions have unexpected results when called with arguments that
-    are not really chars (are outside the 0..255 range).
-
-
-  * The strerror function
-
-    The function will return "error #n" where n is the error number.
-
-
   * strcspn/strpbrk/strspn
 
     These functions have a length limitation of 256 for the second string
@@ -121,6 +110,20 @@ Functions that are limited in any way:
 
   * There is no other locale than the "C" locale. The native locale is
     identical to the "C" locale.
+
+
+In addition to these limitations, some more functions are limited if inlined
+versions are requested by using -Os:
+
+  * The strlen function only works for strings with a maximum length of
+    255 characters.
+
+  * The isxxx character classification functions from <ctype.h> will give
+    unpredictable results if the argument is not in character range
+    (0..255). This limitation may be removed by #undef'ing the function
+    name (when using -Os, the functions are actually macros that expand to
+    inline assembler code, but the real functions are still available if
+    the macro definition is removed).
 
 
 
@@ -232,4 +235,4 @@ freely, subject to the following restrictions:
 
 
 
-	       
+

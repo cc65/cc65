@@ -703,7 +703,7 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
     	    unsigned Size  = Decode (Type + 1);
     	    unsigned ESize = Decode (EType + 1);
 
-    	    if ((Size != 0 && ESize != 0) ||
+    	    if ((Size != 0 && ESize != 0 && Size != ESize) ||
     	  	TypeCmp (Type+DECODE_SIZE+1, EType+DECODE_SIZE+1) < TC_EQUAL) {
     	  	/* Types not identical: Conflicting types */
     	  	Error ("Conflicting types for `%s'", Name);

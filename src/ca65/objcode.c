@@ -83,12 +83,12 @@ struct Segment {
     { prev, 0, 0, num, 0, 0, segdef }
 
 /* Definitions for predefined segments */
-SegDef NullSegDef     = STATIC_SEGDEF_INITIALIZER ("NULL",     SEGTYPE_ABS);
-SegDef ZeropageSegDef = STATIC_SEGDEF_INITIALIZER ("ZEROPAGE", SEGTYPE_ZP);
-SegDef DataSegDef     = STATIC_SEGDEF_INITIALIZER ("DATA",     SEGTYPE_ABS);
-SegDef BssSegDef      = STATIC_SEGDEF_INITIALIZER ("BSS",      SEGTYPE_ABS);
-SegDef RODataSegDef   = STATIC_SEGDEF_INITIALIZER ("RODATA",   SEGTYPE_ABS);
-SegDef CodeSegDef     = STATIC_SEGDEF_INITIALIZER ("CODE",     SEGTYPE_ABS);
+SegDef NullSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_NULL,     SEGTYPE_ABS);
+SegDef ZeropageSegDef = STATIC_SEGDEF_INITIALIZER (SEGNAME_ZEROPAGE, SEGTYPE_ZP);
+SegDef DataSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_DATA,     SEGTYPE_ABS);
+SegDef BssSegDef      = STATIC_SEGDEF_INITIALIZER (SEGNAME_BSS,      SEGTYPE_ABS);
+SegDef RODataSegDef   = STATIC_SEGDEF_INITIALIZER (SEGNAME_RODATA,   SEGTYPE_ABS);
+SegDef CodeSegDef     = STATIC_SEGDEF_INITIALIZER (SEGNAME_CODE,     SEGTYPE_ABS);
 
 /* Predefined segments */
 static Segment NullSeg     = SEG (&NullSegDef,     5, NULL);

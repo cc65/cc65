@@ -675,9 +675,8 @@ static void FunctionCall (ExprDesc* Expr)
 	    PtrOffs = StackPtr;
 	}
 
-    /* Check for known standard functions and inline them if requested */
-    } else if (IS_Get (&InlineStdFuncs) &&
-               (StdFunc = FindStdFunc ((const char*) Expr->Name)) >= 0) {
+    /* Check for known standard functions and inline them */
+    } else if ((StdFunc = FindStdFunc ((const char*) Expr->Name)) >= 0) {
 
 	/* Inline this function */
        	HandleStdFunc (StdFunc, Func, Expr);

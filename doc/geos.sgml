@@ -1245,7 +1245,12 @@ This function returns a random number. It can be also read from <tt/random/ e.g.
 a=random;
 </verb></tscreen>
 but by calling this function you are sure that the results will be always different.
-<tt/random/ is updated once a frame (50Hz PAL) and on every call to <tt/GetRandom/
+<tt/random/ is updated once a frame (50Hz PAL) and on every call to <tt/GetRandom/.
+<p>
+Note that it is not the same as <tt/rand/ function from the standard library. <tt/GetRandom/
+will give you unpredictable results (if IRQs will occur between calls to it) while
+<tt/rand/ conforms to the standard and for given seed (<tt/srand/) it always returns with the
+same sequence of values.
 
 <sect2>SetDevice
 <p>

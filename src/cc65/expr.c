@@ -726,8 +726,8 @@ static void FunctionCall (int k, ExprDesc* lval)
     IsFuncPtr = IsTypeFuncPtr (lval->Type);
     if (IsFuncPtr) {
 
-	/* Check wether it's a fastcall function */
-	IsFastCall = IsFastCallFunc (lval->Type + 1);
+	/* Check wether it's a fastcall function that has parameters */
+	IsFastCall = IsFastCallFunc (lval->Type + 1) && (Func->ParamCount > 0);
 
 	/* Things may be difficult, depending on where the function pointer
 	 * resides. If the function pointer is an expression of some sort
@@ -797,7 +797,7 @@ static void FunctionCall (int k, ExprDesc* lval)
 	    }
 
 	    /* Call the function */
-	    g_callind (TypeOf (lval->Type), ParamSize, PtrOffs);
+	    g_callind (TypeOf (lval->Type+1), ParamSize, PtrOffs);
 
      	} else {
 

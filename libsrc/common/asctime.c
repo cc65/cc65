@@ -46,33 +46,10 @@
 
 char* __fastcall__ asctime (const struct tm* timep)
 {
-    static const char days[7][4]  = {
-        "Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"
-    };
-    static const char months[12][4] = {
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
-    };
     static char buf[26];
 
-    /* Create a copy of the given data and make sure it is valid */
-    struct tm t;
-    t = *timep;
-    mktime (&t);
-
-    /* Format into given buffer */
-    sprintf(buf,
-            "%s %s%3d %02d:%02d:%02d %d\n",
-     	    days[t.tm_wday],
-            months[t.tm_mon],
-            t.tm_mday,
-     	    t.tm_hour,
-            t.tm_min,
-            t.tm_sec,
-            t.tm_year + 1900);
-
-    /* Return the result */
-    return buf;
+    /* Format into given buffer and return the result */
+    return strftime (buf, sizeof (buf), "%c\n", timep)? buf : 0;
 }
 
 

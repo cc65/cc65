@@ -133,7 +133,7 @@ static int AllocRegVar (const SymEntry* Sym, const type* tarray)
 
 
 
-static unsigned ParseAutoDecl (Declaration* Decl, unsigned Size, unsigned* SC)
+static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
 /* Parse the declaration of an auto variable. The function returns the symbol
  * data, which is the offset for variables on the stack, and the label for
  * static variables.
@@ -145,6 +145,9 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned Size, unsigned* SC)
 
     /* Determine if this is a compound variable */
     int IsCompound = IsClassStruct (Decl->Type) || IsTypeArray (Decl->Type);
+
+    /* Get the size of the variable */
+    unsigned Size = SizeOf (Decl->Type);
 
     /* Check if this is a variable on the stack or in static memory */
     if (StaticLocals == 0) {
@@ -287,18 +290,26 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned Size, unsigned* SC)
         }
     }
 
+    /* Cannot allocate a variable of zero size */
+    if (Size == 0) {
+        Error ("Variable `%s' has unknown size", Decl->Ident);
+    }
+
     /* Return the symbol data */
     return SymData;
 }
 
 
 
-static unsigned ParseStaticDecl (Declaration* Decl, unsigned Size, unsigned* SC)
+static unsigned ParseStaticDecl (Declaration* Decl, unsigned* SC)
 /* Parse the declaration of a static variable. The function returns the symbol
  * data, which is the asm label of the variable.
  */
 {
     unsigned SymData;
+
+    /* Get the size of the variable */
+    unsigned Size = SizeOf (Decl->Type);
 
     /* Static data */
     if (CurTok.Tok == TOK_ASSIGN) {
@@ -342,6 +353,11 @@ static unsigned ParseStaticDecl (Declaration* Decl, unsigned Size, unsigned* SC)
 
     }
 
+    /* Cannot allocate a variable of zero size */
+    if (Size == 0) {
+        Error ("Variable `%s' has unknown size", Decl->Ident);
+    }
+
     /* Return the symbol data */
     return SymData;
 }
@@ -352,7 +368,6 @@ static void ParseOneDecl (const DeclSpec* Spec)
 /* Parse one variable declaration */
 {
     unsigned    SC;      	/* Storage class for symbol */
-    unsigned    Size;           /* Size of the data object */
     unsigned    SymData = 0;    /* Symbol data (offset, label name, ...) */
     Declaration Decl;		/* Declaration data structure */
 
@@ -382,27 +397,18 @@ static void ParseOneDecl (const DeclSpec* Spec)
     /* Handle anything that needs storage (no functions, no typdefs) */
     if ((SC & SC_FUNC) != SC_FUNC && (SC & SC_TYPEDEF) != SC_TYPEDEF) {
 
-        /* Get the size of the variable */
-        Size = SizeOf (Decl.Type);
-
         /* */
        	if (SC & (SC_AUTO | SC_REGISTER)) {
 
             /* Auto variable */
-            SymData = ParseAutoDecl (&Decl, Size, &SC);
+            SymData = ParseAutoDecl (&Decl, &SC);
 
 	} else if ((SC & SC_STATIC) == SC_STATIC) {
 
             /* Static variable */
-            SymData = ParseStaticDecl (&Decl, Size, &SC);
+            SymData = ParseStaticDecl (&Decl, &SC);
 
        	}
-
-	/* Cannot allocate a variable of zero size */
-	if (Size == 0) {
-	    Error ("Variable `%s' has unknown size", Decl.Ident);
-	    return;
-	}
     }
 
     /* If the symbol is not marked as external, it will be defined */

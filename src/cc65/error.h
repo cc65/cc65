@@ -37,6 +37,11 @@
 #define ERROR_H
 
 
+		   
+/* common */
+#include "attrib.h"
+
+
 
 /*****************************************************************************/
 /*	  			     Data		     		     */
@@ -197,7 +202,7 @@ void PPError (unsigned ErrNum, ...);
 void Fatal (unsigned FatNum, ...);
 /* Print a message about a fatal error and die */
 
-void Internal (char* Format, ...);
+void Internal (char* Format, ...) attribute ((noreturn));
 /* Print a message about an internal compiler error and die. */
 
 void ErrorReport (void);

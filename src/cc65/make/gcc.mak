@@ -24,8 +24,8 @@ OBJS =	anonname.o	\
 	declare.o      	\
 	error.o	 	\
 	expr.o	 	\
+	exprheap.o     	\
 	exprnode.o	\
-	exprtree.o	\
 	funcdesc.o	\
 	function.o     	\
 	global.o 	\
@@ -70,7 +70,7 @@ cc65:	$(OBJS)
 
 clean:
 	rm -f *~ core *.map
-			 
+
 zap:	clean
 	rm -f *.o $(EXECS) .depend
 

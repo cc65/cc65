@@ -38,16 +38,21 @@
 
 
 
+/* common */
+#include "coll.h"
+
+/* cc65 */
 #include "datatype.h"
 
 
 
 /*****************************************************************************/
-/*				   Forwards				     */
+/*				   Forwards			   	     */
 /*****************************************************************************/
 
 
 
+struct ExprHeap;
 struct SymEntry;
 
 
@@ -64,9 +69,7 @@ typedef enum {
 
     NT_SYM,     	       	/* Symbol */
     NT_CONST,  	       	       	/* A constant of some sort */
-
-    NT_ICAST,  	       	       	/* Implicit type cast */
-    NT_ECAST,  	       	       	/* Explicit type cast */
+    NT_ASM,			/* Inline assembler */
 
     NT_REG_A,  	       	       	/* A register */
     NT_REG_X,  	       	       	/* X register */
@@ -74,9 +77,12 @@ typedef enum {
     NT_REG_AX, 	       	       	/* AX register */
     NT_REG_EAX,	       	       	/* EAX register */
 
-    NT_CALLFUNC,       	       	/* Function call */
-    NT_PUSH,   	       	       	/* Push the value onto the stack */
-    NT_POP,    	       	       	/* Pop the value from the stack */
+    NT_ARRAY_SUBSCRIPT,		/* Array subscript */
+    NT_STRUCT_ACCESS,		/* Access of a struct field */
+    NT_STRUCTPTR_ACCESS,       	/* Access via struct ptr */
+    NT_FUNCTION_CALL,		/* Call a function */
+
+    NT_UNARY_MINUS,
 
     NT_NOT,    	       	       	/* ~ */
     NT_PLUS,   	       	       	/* + */
@@ -127,35 +133,78 @@ typedef enum {
 typedef struct ExprNode ExprNode;
 struct ExprNode {
 
-    ExprNode*	    		Left; 	/* Left and right leaves */
-    ExprNode*	    		Right;
+    /* Management data */
+    union {
+	struct ExprHeap*       	Owner; 	/* Heap, this node is in */
+	struct ExprNode*	Next;	/* Next in free list */
+    } MData;
 
+    Collection			List;	/* List of subexpressions */
     nodetype_t	    		NT;    	/* Node type */
-    type* 	    		Type;	/* Resulting type */
-    int				LValue;	/* True if this is an lvalue */
+    type*  	    		Type;	/* Resulting type */
+    int	   			LValue;	/* True if this is an lvalue */
 
     union {
-	/* Branch data */
-	ExprNode*		Test;	/* Third expr for ternary op */
-
-	/* Leave data */
        	long	    		I;	/* Constant int value if any */
        	double	    		F;	/* Constant float value if any */
-       	struct SymEntry*	Sym;	/* Symbol table entry if any */
     } V;
+};
 
+
+
+/* Predefined indices for node items in List */
+enum {
+    IDX_LEFT	= 0,
+    IDX_RIGHT	= 1,
+    IDX_SYM	= 0
+};
+
+/* Some other constants for better readability */
+enum {
+    RVALUE	= 0,
+    LVALUE	= 1
 };
 
 
 
 /*****************************************************************************/
-/*	      	  		     Code	     			     */
+/*	       	     		     Code	      			     */
 /*****************************************************************************/
 
 
 
-void InitExprNode (ExprNode* E);
+ExprNode* InitExprNode (ExprNode* E, nodetype_t NT, type* Type,
+			int LValue, struct ExprHeap* Owner);
 /* Initialize a new expression node */
+
+void* GetItem (ExprNode* N, unsigned Index);
+/* Return one of the items from the nodes item list */
+
+void AppendItem (ExprNode* N, void* Item);
+/* Append an item to the nodes item list */
+
+void SetItem (ExprNode* N, void* Item, unsigned Index);
+/* Set a specific node item. The item list is filled with null pointers as
+ * needed.
+ */
+
+ExprNode* GetLeftNode (ExprNode* N);
+/* Get the left sub-node from the list */
+
+void SetLeftNode (ExprNode* Root, ExprNode* Left);
+/* Set the left node in Root */
+
+ExprNode* GetRightNode (ExprNode* N);
+/* Get the right sub-node from the list */
+
+void SetRightNode (ExprNode* Root, ExprNode* Right);
+/* Set the right node in Root */
+
+struct SymEntry* GetNodeSym (ExprNode* N);
+/* Get the symbol entry for a NT_SYM node */
+
+void SetNodeSym (ExprNode* N, struct SymEntry* Sym);
+/* Set the symbol entry in a NT_SYM node */
 
 
 

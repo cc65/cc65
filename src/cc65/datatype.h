@@ -40,6 +40,9 @@
 
 #include <stdio.h>
 
+/* common */
+#include "attrib.h"
+
 
 
 /*****************************************************************************/
@@ -223,67 +226,76 @@ type* Indirect (type* Type);
  * given type points to.
  */
 
-int IsTypeChar (const type* T);
+int IsTypeChar (const type* T) attribute ((const));
 /* Return true if this is a character type */
 
-int IsTypeInt (const type* T);
+int IsTypeInt (const type* T) attribute ((const));
 /* Return true if this is an int type (signed or unsigned) */
 
-int IsTypeLong (const type* T);
+int IsTypeLong (const type* T) attribute ((const));
 /* Return true if this is a long type (signed or unsigned) */
 
-int IsTypePtr (const type* Type);
+int IsTypeFloat (const type* T) attribute ((const));
+/* Return true if this is a float type */
+
+int IsTypeDouble (const type* T) attribute ((const));
+/* Return true if this is a double type */
+
+int IsTypePtr (const type* Type) attribute ((const));
 /* Return true if this is a pointer type */
 
-int IsTypeArray (const type* Type);
+int IsTypeArray (const type* Type) attribute ((const));
 /* Return true if this is an array type */
 
-int IsTypeVoid (const type* Type);
+int IsTypeVoid (const type* Type) attribute ((const));
 /* Return true if this is a void type */
 
-int IsTypeFunc (const type* Type);
+int IsTypeFunc (const type* Type) attribute ((const));
 /* Return true if this is a function class */
 
-int IsClassInt (const type* Type);
+int IsClassInt (const type* Type) attribute ((const));
 /* Return true if this is an integer type */
 
-int IsClassPtr (const type* Type);
+int IsClassFloat (const type* Type) attribute ((const));
+/* Return true if this is a float type */
+
+int IsClassPtr (const type* Type) attribute ((const));
 /* Return true if this is a pointer type */
 
-int IsClassStruct (const type* Type);
+int IsClassStruct (const type* Type) attribute ((const));
 /* Return true if this is a struct type */
 
-int IsSignUnsigned (const type* Type);
+int IsSignUnsigned (const type* Type) attribute ((const));
 /* Return true if this is an unsigned type */
 
-int IsQualConst (const type* T);
+int IsQualConst (const type* T) attribute ((const));
 /* Return true if the given type has a const memory image */
 
-int IsQualVolatile (const type* T);
+int IsQualVolatile (const type* T) attribute ((const));
 /* Return true if the given type has a volatile type qualifier */
 
-int IsFastCallFunc (const type* T);
+int IsFastCallFunc (const type* T) attribute ((const));
 /* Return true if this is a function type with __fastcall__ calling conventions */
 
-int IsTypeFuncPtr (const type* T);
+int IsTypeFuncPtr (const type* T) attribute ((const));
 /* Return true if this is a function pointer */
 
-type GetType (const type* T);
+type GetType (const type* T) attribute ((const));
 /* Get the raw type */
 
-type GetClass (const type* T);
+type GetClass (const type* T) attribute ((const));
 /* Get the class of a type string */
 
-type GetSignedness (const type* T);
+type GetSignedness (const type* T) attribute ((const));
 /* Get the sign of a type */
 
-type GetSizeModifier (const type* T);
+type GetSizeModifier (const type* T) attribute ((const));
 /* Get the size modifier of a type */
 
-type GetQualifier (const type* T);
+type GetQualifier (const type* T) attribute ((const));
 /* Get the qualifier from the given type string */
 
-struct FuncDesc* GetFuncDesc (const type* T);
+struct FuncDesc* GetFuncDesc (const type* T) attribute ((const));
 /* Get the FuncDesc pointer from a function or pointer-to-function type */
 
 

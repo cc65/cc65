@@ -73,14 +73,14 @@ OBJS =	anonname.obj	\
 	asmline.obj	\
 	codegen.obj	\
 	compile.obj	\
-	cpu.obj		\
+	cpu.obj	 	\
 	ctrans.obj	\
 	datatype.obj	\
 	declare.obj	\
 	error.obj	\
 	expr.obj 	\
+	exprheap.obj   	\
 	exprnode.obj	\
-	exprtree.obj	\
 	funcdesc.obj	\
 	function.obj	\
 	global.obj	\
@@ -138,8 +138,8 @@ FILE datatype.obj
 FILE declare.obj
 FILE error.obj
 FILE expr.obj
+FILE exprheap.obj
 FILE exprnode.obj
-FILE exprtree.obj
 FILE funcdesc.obj
 FILE function.obj
 FILE global.obj

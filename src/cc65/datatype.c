@@ -511,6 +511,22 @@ int IsTypeLong (const type* T)
 
 
 
+int IsTypeFloat (const type* T)
+/* Return true if this is a float type */
+{
+    return (T[0] & T_MASK_TYPE) == T_TYPE_FLOAT;
+}
+
+
+
+int IsTypeDouble (const type* T)
+/* Return true if this is a double type */
+{
+    return (T[0] & T_MASK_TYPE) == T_TYPE_DOUBLE;
+}
+
+
+
 int IsTypePtr (const type* T)
 /* Return true if this is a pointer type */
 {
@@ -547,6 +563,14 @@ int IsClassInt (const type* T)
 /* Return true if this is an integer type */
 {
     return (T[0] & T_MASK_CLASS) == T_CLASS_INT;
+}
+
+
+
+int IsClassFloat (const type* T)
+/* Return true if this is a float type */
+{
+    return (T[0] & T_MASK_CLASS) == T_CLASS_FLOAT;
 }
 
 

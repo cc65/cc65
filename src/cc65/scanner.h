@@ -129,7 +129,7 @@ typedef enum token_t {
     TOK_FASTCALL,
     TOK_A,
     TOK_X,
-    TOK_Y,	  
+    TOK_Y,
     TOK_AX,
     TOK_EAX,
 
@@ -148,10 +148,11 @@ typedef enum token_t {
 typedef struct Token_ Token;
 struct Token_ {
     token_t	Tok;		/* The token itself */
-    long	IVal;		/* The integer attribute */
+    long	IVal;		/* The integer attribute */ 
+    double	FVal;		/* The float attribute */
     ident	Ident;		/* Identifier if IDENT */
     unsigned	Pos;		/* Source line where the token comes from */
-    type*	IType;		/* Type if integer constant */
+    type*      	Type;		/* Type if integer or float constant */
 };
 
 extern Token CurTok;		/* The current token */
@@ -161,12 +162,12 @@ extern Token NextTok;		/* The next token */
 #define curtok 	CurTok.Tok
 #define curval 	CurTok.IVal
 #define curpos 	CurTok.Pos
-#define curtype	CurTok.IType
+#define curtype	CurTok.Type
 
 #define nxttok 	NextTok.Tok
 #define nxtval 	NextTok.IVal
 #define nxtpos 	NextTok.Pos
-#define nxttype	NextTok.IType
+#define nxttype	NextTok.Type
 
 
 

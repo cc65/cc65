@@ -56,13 +56,13 @@ in the linker configuration to have the linker remove it.
 <sect>Memory layout<p>
 
 In the standard setup, cc65 generated programs use the memory from
-&dollar;800 to &dollar;8E00, so 33.5K of memory (including the stack) is
+&dollar;800 to &dollar;9600, so 35.5K of memory (including the stack) is
 available. ROM calls are possible without further precautions.
 
 Special locations:
 
 <descrip>
-  <tag/Stack/          
+  <tag/Stack/
   The C runtime stack is located at HIMEM and grows downwards, regardless of
   how your linker config file is setup.
 

@@ -55,6 +55,7 @@ Short options:
   -V                    Print the disassembler version
 
 Long options:
+  --comments n          Set the comment level for the output
   --cpu type            Set cpu type
   --debug-info          Add debug info to object file
   --formfeeds           Add formfeeds to the output
@@ -73,6 +74,14 @@ Long options:
 Here is a description of all the command line options:
 
 <descrip>
+
+  <label id="option--comments">
+  <tag><tt>--comments n</tt></tag>
+
+  Set the comment level for the output. Valid arguments are 0..4. Greater
+  values will increase the level of additional information written to the 
+  output file in form of comments.
+
 
   <label id="option--cpu">
   <tag><tt>--cpu type</tt></tag>
@@ -146,7 +155,7 @@ Here is a description of all the command line options:
 
   <tag><tt>-v, --verbose</tt></tag>
 
-  Increase the assembler verbosity. Usually only needed for debugging
+  Increase the disassembler verbosity. Usually only needed for debugging
   purposes. You may use this option more than one time for even more
   verbose output.
 
@@ -231,6 +240,20 @@ following attributes are recognized:
 
 <descrip>
 
+  <tag><tt>COMMENTS</tt></tag>
+
+  This attribute may be used instead of the <tt><ref id="option--comments"
+  name="--comments"></tt> option on the command line. It takes a numerical
+  parameter between 0 and 4. Higher values increase the amount of information
+  written to the output file in form of comments.
+
+
+  <tag><tt>CPU</tt></tag>
+
+  This attribute may be used instead of the <tt><ref id="option--cpu"
+  name="--cpu"></tt> option on the command line. It takes a string parameter.
+
+
   <tag><tt>INPUTNAME</tt></tag>
 
   The attribute is followed by a string value, which gives the name of the
@@ -265,12 +288,6 @@ following attributes are recognized:
   the input file (this assumes that the input file is a ROM that contains the
   reset and irq vectors).
 
-
-  <tag><tt>CPU</tt></tag>
-
-  This attribute may be used instead of the <tt><ref id="option--cpu"
-  name="--cpu"></tt> option on the command line. It takes a string parameter.
-
 </descrip>
 
 
@@ -304,6 +321,11 @@ following attributes are recognized:
 
     <tag><tt>BYTETABLE</tt></tag>
     The range consists of data and is disassembled as a byte table.
+
+    <tag><tt>DBYTETABLE</tt></tag>
+    The range consists of data and is disassembled as a table of dbytes
+    (double byte values, 16 bit values with the low byte containing the
+    most significant byte of the 16 bit value).
 
     <tag><tt>WORDTABLE</tt></tag>
     The range consists of data and is disassembled as a table of words

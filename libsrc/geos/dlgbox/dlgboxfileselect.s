@@ -1,6 +1,6 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
 ; 25.12.99
 
@@ -14,6 +14,8 @@
 		.include "../inc/geossym.inc"
 		.include "../inc/const.inc"
 		.include "../inc/geosmac.ca65.inc"
+
+.code
 
 _DlgBoxFileSelect:
 
@@ -40,6 +42,8 @@ DB_FS_reload:
 		beq DB_FS_reload
 DB_FS_Fin:  	rts
 
+.rodata
+
 paramStrFileSelect:
 		.byte DEF_DB_POS | 1
 		.byte DBGETFILES, 4, 4
@@ -48,6 +52,8 @@ paramStrFileSelect:
 		.byte CANCEL, DBI_X_2, DBI_Y_0+64+3
 		.byte NULL
 
-tmp_r5:		.word 0
-tmp_r7L:	.byte 0
-tmp_r10:	.word 0
+.bss
+
+tmp_r5:		.res 2
+tmp_r7L:	.res 1
+tmp_r10:	.res 2

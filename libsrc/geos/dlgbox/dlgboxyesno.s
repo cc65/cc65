@@ -1,6 +1,6 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
 ; 25.12.99
 
@@ -13,11 +13,15 @@
 	    .include "../inc/geossym.inc"
 	    .include "../inc/const.inc"
 
+.code
+
 _DlgBoxYesNo:
 	    jsr DB_get2lines
 	    lda #<paramStrYesNo
 	    ldx #>paramStrYesNo
 	    jmp _DoDlgBox
+
+.rodata
 
 paramStrYesNo:
 	    .byte DEF_DB_POS | 1

@@ -11,6 +11,8 @@
 
 	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
+
+.code
 	
 _FindFTypes:
 	sta r10L
@@ -31,4 +33,6 @@ _FindFTypes:
 	sbc r7H
 	rts
 
-tmpFileMax:	.byte 0
+.bss
+
+tmpFileMax:	.res 1

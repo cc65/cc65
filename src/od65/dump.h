@@ -57,6 +57,9 @@ void DumpObjOptions (FILE* F, unsigned long Offset);
 void DumpObjFiles (FILE* F, unsigned long Offset);
 /* Dump the source files */
 
+void DumpObjSegments (FILE* F, unsigned long Offset);
+/* Dump the segments in the object file */
+
 
 
 /* End of dump.h */

@@ -79,7 +79,8 @@ static void Usage (void)
 	     "Long options:\n"
 	     "  --dump-files\t\tDump the source files\n"
 	     "  --dump-header\t\tDump the object file header\n"
-	     "  --dump-options\t\tDump object file options\n"
+	     "  --dump-options\tDump object file options\n"
+	     "  --dump-segments\tDump the segments in the file\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --version\t\tPrint the version number and exit\n",
     	     ProgName);
@@ -107,6 +108,14 @@ static void OptDumpOptions (const char* Opt, const char* Arg)
 /* Dump the object file options */
 {
     What |= D_OPTIONS;
+}
+
+
+
+static void OptDumpSegments (const char* Opt, const char* Arg)
+/* Dump the segments in the object file */
+{
+    What |= D_SEGMENTS;
 }
 
 
@@ -169,6 +178,9 @@ static void DumpFile (const char* Name)
 	}
 	if (What & D_FILES) {
 	    DumpObjFiles (F, 0);
+	}	      
+	if (What & D_SEGMENTS) {
+	    DumpObjSegments (F, 0);
 	}
     }
 
@@ -186,6 +198,7 @@ int main (int argc, char* argv [])
 	{ "--dump-files",	0,	OptDumpFiles		},
 	{ "--dump-header",	0,	OptDumpHeader		},
 	{ "--dump-options",	0,	OptDumpOptions		},
+	{ "--dump-segments",	0,	OptDumpSegments		},
 	{ "--help",		0,	OptHelp			},
 	{ "--version",	       	0,	OptVersion		},
     };
@@ -206,15 +219,15 @@ int main (int argc, char* argv [])
        	if (Arg [0] == '-') {
        	    switch (Arg [1]) {
 
-		case '-':
-		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-		    break;
+	 	case '-':
+	 	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+	 	    break;
 
-		case 'h':
-		    OptHelp (Arg, 0);
-		    break;
+	 	case 'h':
+	 	    OptHelp (Arg, 0);
+	 	    break;
 
-		case 'H':
+	 	case 'H':
 		    OptDumpHeader (Arg, 0);
 		    break;
 

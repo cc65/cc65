@@ -36,8 +36,11 @@
 #include <time.h>
 
 /* common */
+#include "exprdefs.h"
+#include "filepos.h"
 #include "objdefs.h"
 #include "optdefs.h"
+#include "segdefs.h"
 #include "xmalloc.h"
 
 /* od65 */
@@ -59,8 +62,8 @@ static void DumpObjHeaderSection (const char* Name,
 /* Dump a header section */
 {
     printf ("    %s:\n", Name);
-    printf ("      Offset:                %8lu\n", Offset);
-    printf ("      Size:                  %8lu\n", Size);
+    printf ("      Offset:%24lu\n", Offset);
+    printf ("      Size:  %24lu\n", Size);
 }
 
 
@@ -84,6 +87,125 @@ static char* TimeToStr (unsigned long Time)
 
 
 
+static void SkipExpr (FILE* F)
+/* Skip an expression from the given file */
+{
+    /* Read the node tag and handle NULL nodes */
+    unsigned char Op = Read8 (F);
+    if (Op == EXPR_NULL) {
+     	return;
+    }
+
+    /* Check the tag and handle the different expression types */
+    if (EXPR_IS_LEAF (Op)) {
+	switch (Op) {
+
+	    case EXPR_LITERAL:
+	   	(void) Read32Signed (F);
+	   	break;
+
+	    case EXPR_SYMBOL:
+	   	/* Read the import number */
+	   	(void) Read16 (F);
+	   	break;
+
+	    case EXPR_SEGMENT:
+	   	/* Read the segment number */
+	   	(void) Read8 (F);
+	   	break;
+
+	    default:
+	   	Error ("Invalid expression op: %02X", Op);
+
+	}
+
+    } else {
+
+    	/* Not a leaf node */
+       	SkipExpr (F);
+	SkipExpr (F);
+
+    }
+}
+
+
+
+static unsigned SkipFragment (FILE* F)
+/* Skip a fragment from the given file and return the size */
+{
+    FilePos Pos;
+    unsigned long Size;
+
+    /* Read the fragment type */
+    unsigned char Type = Read8 (F);
+
+    /* Handle the different fragment types */
+    switch (Type) {
+
+	case FRAG_LITERAL8:
+       	    Size = Read8 (F);
+	    break;
+
+	case FRAG_LITERAL16:
+	    Size = Read16 (F);
+	    break;
+
+	case FRAG_LITERAL24:
+	    Size = Read24 (F);
+	    break;
+
+	case FRAG_LITERAL32:
+	    Size = Read32 (F);
+	    break;
+
+	case FRAG_EXPR8:
+	case FRAG_EXPR16:
+	case FRAG_EXPR24:
+	case FRAG_EXPR32:
+	case FRAG_SEXPR8:
+	case FRAG_SEXPR16:
+	case FRAG_SEXPR24:
+	case FRAG_SEXPR32:
+	    Size = Type & FRAG_BYTEMASK;
+	    break;
+
+	case FRAG_FILL:
+	    Size = Read16 (F);
+	    break;
+
+	default:
+	    Error ("Unknown fragment type: 0x%02X", Type);
+	    /* NOTREACHED */
+	    return 0;
+    }
+
+
+
+    /* Now read the fragment data */
+    switch (Type & FRAG_TYPEMASK) {
+
+	case FRAG_LITERAL:
+	    /* Literal data */
+	    FileSeek (F, ftell (F) + Size);
+	    break;
+
+	case FRAG_EXPR:
+	case FRAG_SEXPR:
+	    /* An expression */
+	    SkipExpr (F);
+	    break;
+
+    }
+
+    /* Skip the file position of the fragment */
+    ReadFilePos (F, &Pos);
+
+    /* Return the size */
+    return Size;
+}
+
+
+
 void DumpObjHeader (FILE* F, unsigned long Offset)
 /* Dump the header of the given object file */
 {
@@ -101,13 +223,13 @@ void DumpObjHeader (FILE* F, unsigned long Offset)
     printf ("  Header:\n");
 
     /* Magic */
-    printf ("    Magic:                 0x%08lX\n", H.Magic);
+    printf ("    Magic:%17s0x%08lX\n", "", H.Magic);
 
     /* Version */
-    printf ("    Version:               %10u\n", H.Version);
+    printf ("    Version:%25u\n", H.Version);
 
     /* Flags */
-    printf ("    Flags:                     0x%04X (", H.Flags);
+    printf ("    Flags:%21s0x%04X  (", "", H.Flags);
     if (H.Flags & OBJ_FLAGS_DBGINFO) {
     	printf ("OBJ_FLAGS_DBGINFO");
     }
@@ -174,19 +296,19 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 	const char* TypeDesc;
 	switch (Type) {
        	    case OPT_COMMENT:  	TypeDesc = "OPT_COMMENT";	break;
-	    case OPT_AUTHOR: 	TypeDesc = "OPT_AUTHOR";	break;
+	    case OPT_AUTHOR:  	TypeDesc = "OPT_AUTHOR";	break;
 	    case OPT_TRANSLATOR:TypeDesc = "OPT_TRANSLATOR";	break;
 	    case OPT_COMPILER:	TypeDesc = "OPT_COMPILER";	break;
-	    case OPT_OS:     	TypeDesc = "OPT_OS";		break;
+	    case OPT_OS:      	TypeDesc = "OPT_OS";		break;
 	    case OPT_DATETIME:	TypeDesc = "OPT_DATETIME";	break;
-	    default:	     	TypeDesc = "OPT_UNKNOWN";	break;
+	    default:	      	TypeDesc = "OPT_UNKNOWN";	break;
 	}
 
 	/* Print the header */
-	printf ("    Option %u:\n", I);
+	printf ("    Index:%27u\n", I);
 
 	/* Print the data */
-	printf ("      Type:                      0x%02X (%s)\n", Type, TypeDesc);
+	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
 	switch (ArgType) {
 
 	    case OPT_ARGSTR:
@@ -201,7 +323,7 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 	     	printf ("      Data:%26lu", ArgNum);
 		if (Type == OPT_DATETIME) {
 		    /* Print the time as a string */
-   		    printf (" (%s)", TimeToStr (ArgNum));
+   		    printf ("  (%s)", TimeToStr (ArgNum));
 		}
 		printf ("\n");
 	     	break;
@@ -251,15 +373,90 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
 	unsigned      Len   = strlen (Name);
 
 	/* Print the header */
-	printf ("    File %u:\n", I);
+	printf ("    Index:%27u\n", I);
 
 	/* Print the data */
-	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name); 
+	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
        	printf ("      Size:%26lu\n", Size);
-	printf ("      Modification time:%13lu (%s)\n", MTime, TimeToStr (MTime));
+	printf ("      Modification time:%13lu  (%s)\n", MTime, TimeToStr (MTime));
 
 	/* Free the Name */
 	xfree (Name);
+    }
+}
+
+
+
+void DumpObjSegments (FILE* F, unsigned long Offset)
+/* Dump the segments in the object file */
+{
+    ObjHeader H;
+    unsigned Count;
+    unsigned I;
+    unsigned FragCount;
+
+    /* Seek to the header position */
+    FileSeek (F, Offset);
+
+    /* Read the header */
+    ReadObjHeader (F, &H);
+
+    /* Seek to the start of the options */
+    FileSeek (F, Offset + H.SegOffs);
+
+    /* Output a header */
+    printf ("  Segments:\n");
+
+    /* Read the number of files and print it */
+    Count = Read8 (F);
+    printf ("    Count:%27u\n", Count);
+
+    /* Read and print all options */
+    for (I = 0; I < Count; ++I) {
+
+	/* Read the data for one segments */
+	char*	      Name  = ReadMallocedStr (F);
+	unsigned      Len   = strlen (Name);
+	unsigned long Size  = Read32 (F);
+	unsigned      Align = (1U << Read8 (F));
+	unsigned char Type  = Read8 (F);
+
+	/* Get the description for the type */
+	const char* TypeDesc;
+	switch (Type) {
+	    case SEGTYPE_DEFAULT:	TypeDesc = "SEGTYPE_DEFAULT";	break;
+	    case SEGTYPE_ABS:  		TypeDesc = "SEGTYPE_ABS";	break;
+	    case SEGTYPE_ZP:   		TypeDesc = "SEGTYPE_ZP";	break;
+	    case SEGTYPE_FAR:  		TypeDesc = "SEGTYPE_FAR";	break;
+	    default:	       		TypeDesc = "SEGTYPE_UNKNOWN";	break;
+	}
+
+	/* Print the header */
+	printf ("    Index:%27u\n", I);
+
+	/* Print the data */
+	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
+       	printf ("      Size:%26lu\n", Size);
+	printf ("      Alignment:%21u\n", Align);
+	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
+
+	/* Free the Name */
+	xfree (Name);
+
+	/* Skip the fragments for this segment, counting them */
+	FragCount = 0;
+	while (Size > 0) {
+	    unsigned FragSize = SkipFragment (F);
+	    if (FragSize > Size) {
+	    	/* OOPS - file data invalid */
+	    	Error ("Invalid fragment data - file corrupt!");
+	    }
+	    Size -= FragSize;
+	    ++FragCount;
+	}
+
+	/* Print the fragment count */
+       	printf ("      Fragment count:%16u\n", FragCount);
     }
 }
 

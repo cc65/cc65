@@ -18,14 +18,14 @@ tossubax:
 	sta	ptr1
 	stx	ptr1+1
 .ifpc02
-      	lda	(sp),y		; Get lo byte
+       	lda    	(sp)		; Get lo byte
       	ldy	#1		; Hi index
 .else
       	ldy	#0
       	lda	(sp),y		; Lo byte
       	iny			; Hi index
 .endif
-	sec			   
+	sec
 	sbc	ptr1
 	sta	ptr1		; save lo byte
 	lda	(sp),y

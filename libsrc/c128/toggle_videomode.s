@@ -9,5 +9,11 @@
 
 	.include	"c128.inc"
 
-	_toggle_videomode = SWAPPER
+.proc   _toggle_videomode 
+
+        jsr     SWAPPER                 ; Toggle the mode
+ 	lda     #14
+ 	jmp     BSOUT                   ; Switch to lower case chars
+
+.endproc
 

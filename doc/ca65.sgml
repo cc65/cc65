@@ -440,24 +440,10 @@ Available operators sorted by precedence:
 <tscreen><verb>
     Op 	        Description  		     	      	Precedence
   -------------------------------------------------------------------
-    .CONCAT     Builtin function                        0
-    .LEFT      	Builtin function	     	     	0
-    .MID       	Builtin function	     	     	0
-    .RIGHT     	Builtin function	     	     	0
-    .STRING    	Builtin function	     	     	0
+                Builtin string functions                0
 
-    *	       	Builtin pseudo variable (r/o)	      	1
-    .BLANK     	Builtin function	     	     	1
-    .CONST     	Builtin function	     	     	1
-    .CPU       	Builtin pseudo variable (r/o)	     	1
-    .DEFINED   	Builtin function	     	     	1
-    .MATCH     	Builtin function	     	     	1
-    .TCOUNT    	Builtin function	     	     	1
-    .TIME    	Builtin function	     	     	1
-    .VERSION    Builtin function                        1
-    .XMATCH    	Builtin function	     	     	1
-    .PARAMCOUNT Builtin pseudo variable	(r/o)	      	1
-    .REFERENCED Builtin function	     	       	1
+                Builtin pseudo variables                1
+                Builtin pseudo functions       	       	1
     +  	       	Unary plus   		     	     	1
     -  	       	Unary minus  		     	     	1
     ~  	       	Unary bitwise not	     	     	1
@@ -504,15 +490,6 @@ Available operators sorted by precedence:
 
 To force a specific order of evaluation, braces may be used as usual.
 
-Some of the pseudo variables mentioned above need some more explanation:
-
-<tscreen><verb>
-  *	       	This symbol is replaced by the value of the program
-	       	counter at start of the current instruction. Note, that
-	       	'*' yields a rvalue, that means, you cannot assign to it.
-       	       	Use .ORG to set the program counter in sections with
-	       	absolute code.
-</verb></tscreen>
 <p>
 
 
@@ -936,12 +913,536 @@ if you want to access the "other" symbol <tt/bar/, you would have to write:
 
 
 
+<sect>Pseudo variables<label id="pseudo-variables"><p>
+
+Pseudo variables are readable in all cases, and in some special cases also
+writable.
+
+<sect1><tt>*</tt><p>
+
+  Reading this pseudo variable will return the program counter at the start
+  of the current input line.
+
+  Assignment to this variable is possible when <tt/<ref id=".FEATURE"
+  name=".FEATURE pc_assignment">/ is used. Note: You should not use
+  assignments to <tt/*/, use <tt/<ref id=".ORG" name=".ORG">/ instead.
+
+
+<sect1><tt>.CPU</tt><label id=".CPU"><p>
+
+  Reading this pseudo variable will give a constant integer value that
+  tells which CPU is currently enabled. It can also tell which instruction
+  set the CPU is able to translate. The value read from the pseudo variable
+  should be further examined by using one of the constants defined by the
+  "cpu" macro package (see <tt/<ref id=".MACPACK" name=".MACPACK">/).
+
+  It may be used to replace the .IFPxx pseudo instructions or to construct
+  even more complex expressions.
+
+  Example:
+
+  <tscreen><verb>
+        .macpack        cpu
+       	.if	(.cpu .bitand CPU_ISET_65816)
+  	 	phx
+  	 	phy
+  	.else
+  	 	txa
+  	 	pha
+  	 	tya
+  	 	pha
+  	.endif
+  </verb></tscreen>
+
+
+<sect1><tt>.PARAMCOUNT</tt><label id=".PARAMCOUNT"><p>
+
+  This builtin pseudo variable is only available in macros. It is replaced by
+  the actual number of parameters that were given in the macro invocation.
+
+  Example:
+
+  <tscreen><verb>
+	.macro	foo	arg1, arg2, arg3
+	.if	.paramcount <> 3
+   	.error	"Too few parameters for macro foo"
+	.endif
+	...
+ 	.endmacro
+  </verb></tscreen>
+
+  See section <ref id="macros" name="Macros">.
+
+
+<sect1><tt>.TIME</tt><label id=".TIME"><p>
+
+  Reading this pseudo variable will give a constant integer value that
+  represents the current time in POSIX standard (as seconds since the
+  Epoch).
+
+  It may be used to encode the time of translation somewhere in the created
+  code.
+
+  Example:
+
+  <tscreen><verb>
+        .dword  .time   ; Place time here
+  </verb></tscreen>
+
+
+<sect1><tt>.VERSION</tt><label id=".VERSION"><p>
+
+  Reading this pseudo variable will give the assembler version according to
+  the following formula:
+
+        VER_MAJOR*$100 + VER_MINOR*$10 + VER_PATCH
+
+  It may be used to encode the assembler version or check the assembler for
+  special features not available with older versions.
+
+  Example:
+
+  Version 2.11.1 of the assembler will return $2B1 as numerical constant when
+  reading the pseudo variable <tt/.VERSION/.
 
 
 
-<sect>Control commands<label id="control-commands">
+<sect>Pseudo functions<label id="pseudo-functions"><p>
 
-<p>
+Pseudo functions expect their arguments in parenthesis, and they have a result,
+either a string or an expression.
+
+
+<sect1><tt>.BANKBYTE</tt><label id=".BANKBYTE"><p>
+
+  The function returns the bank byte (that is, bits 16-23) of its argument.
+  It works identical to the '^' operator.
+
+  See: <tt><ref id=".HIBYTE" name=".HIBYTE"></tt>,
+       <tt><ref id=".LOBYTE" name=".LOBYTE"></tt>
+
+
+<sect1><tt>.BLANK</tt><label id=".BLANK"><p>
+
+  Builtin function. The function evaluates its argument in braces and
+  yields "false" if the argument is non blank (there is an argument), and
+  "true" if there is no argument. As an example, the <tt/.IFBLANK/ statement
+  may be replaced by
+
+  <tscreen><verb>
+	.if	.blank(arg)
+  </verb></tscreen>
+
+
+<sect1><tt>.CONCAT</tt><label id=".CONCAT"><p>
+
+  Builtin string function. The function allows to concatenate a list of string
+  constants separated by commas. The result is a string constant that is the
+  concatentation of all arguments. This function is most useful in macros and
+  when used together with the <tt/.STRING/ builtin function. The function may
+  be used in any case where a string constant is expected.
+
+  Example:
+
+  <tscreen><verb>
+	.include 	.concat ("myheader", ".", "inc")
+  </verb></tscreen>
+
+  This is the same as the command
+
+  <tscreen><verb>
+	.include 	"myheader.inc"
+  </verb></tscreen>
+
+
+<sect1><tt>.CONST</tt><label id=".CONST"><p>
+
+  Builtin function. The function evaluates its argument in braces and
+  yields "true" if the argument is a constant expression (that is, an
+  expression that yields a constant value at assembly time) and "false"
+  otherwise. As an example, the .IFCONST statement may be replaced by
+
+  <tscreen><verb>
+      	.if	.const(a + 3)
+  </verb></tscreen>
+
+
+<sect1><tt>.HIBYTE</tt><label id=".HIBYTE"><p>
+
+  The function returns the high byte (that is, bits 8-15) of its argument.
+  It works identical to the '>' operator.
+
+  See: <tt><ref id=".LOBYTE" name=".LOBYTE"></tt>,
+       <tt><ref id=".BANKBYTE" name=".BANKBYTE"></tt>
+
+
+<sect1><tt>.HIWORD</tt><label id=".HIWORD"><p>
+
+  The function returns the high word (that is, bits 16-31) of its argument.
+
+  See: <tt><ref id=".LOWORD" name=".LOWORD"></tt>
+
+
+<sect1><tt>.LEFT</tt><label id=".LEFT"><p>
+
+  Builtin function. Extracts the left part of a given token list.
+
+  Syntax:
+
+  <tscreen><verb>
+       	.LEFT (&lt;int expr&gt;, &lt;token list&gt;)
+  </verb></tscreen>
+
+  The first integer expression gives the number of tokens to extract from
+  the token list. The second argument is the token list itself.
+
+  Example:
+
+  To check in a macro if the given argument has a '#' as first token
+  (immidiate addressing mode), use something like this:
+
+  <tscreen><verb>
+    	.macro 	ldax	arg
+    	       	...
+    	       	.if (.match (.left (1, arg), #))
+
+    	       	; ldax called with immidiate operand
+    	       	...
+
+    	       	.endif
+    	       	...
+       	.endmacro
+  </verb></tscreen>
+
+  See also the <tt><ref id=".MID" name=".MID"></tt> and <tt><ref id=".RIGHT"
+  name=".RIGHT"></tt> builtin functions.
+
+
+<sect1><tt>.LOBYTE</tt><label id=".LOBYTE"><p>
+
+  The function returns the low byte (that is, bits 0-7) of its argument.
+  It works identical to the '<' operator.
+
+  See: <tt><ref id=".HIBYTE" name=".HIBYTE"></tt>,
+       <tt><ref id=".BANKBYTE" name=".BANKBYTE"></tt>
+
+
+<sect1><tt>.LOWORD</tt><label id=".LOWORD"><p>
+
+  The function returns the low word (that is, bits 0-15) of its argument.
+
+  See: <tt><ref id=".HIWORD" name=".HIWORD"></tt>
+
+
+<sect1><tt>.MATCH</tt><label id=".MATCH"><p>
+
+  Builtin function. Matches two token lists against each other. This is
+  most useful within macros, since macros are not stored as strings, but
+  as lists of tokens.
+
+  The syntax is
+
+  <tscreen><verb>
+       	.MATCH(&lt;token list #1&gt;, &lt;token list #2&gt;)
+  </verb></tscreen>
+
+  Both token list may contain arbitrary tokens with the exception of the
+  terminator token (comma resp. right parenthesis) and
+
+  <itemize>
+  <item>end-of-line
+  <item>end-of-file
+  </itemize>
+
+  Often a macro parameter is used for any of the token lists.
+
+  Please note that the function does only compare tokens, not token
+  attributes. So any number is equal to any other number, regardless of the
+  actual value. The same is true for strings. If you need to compare tokens
+  <em/and/ token attributes, use the <tt><ref id=".XMATCH"
+  name=".XMATCH"></tt> function.
+
+  Example:
+
+  Assume the macro <tt/ASR/, that will shift right the accumulator by one,
+  while honoring the sign bit. The builtin processor instructions will allow
+  an optional "A" for accu addressing for instructions like <tt/ROL/ and
+  <tt/ROR/. We will use the <tt><ref id=".MATCH" name=".MATCH"></tt> function
+  to check for this and print and error for invalid calls.
+
+  <tscreen><verb>
+  	.macro	asr 	arg
+
+       	       	.if (.not .blank(arg)) .and (.not .match (arg, a))
+    	    	.error "Syntax error"
+    	    	.endif
+
+    	    	cmp 	#$80		; Bit 7 into carry
+    	    	lsr 	a		; Shift carry into bit 7
+
+    	.endmacro
+  </verb></tscreen>
+
+  The macro will only accept no arguments, or one argument that must be the
+  reserved keyword "A".
+
+  See: <tt><ref id=".XMATCH" name=".XMATCH"></tt>
+
+
+<sect1><tt>.MID</tt><label id=".MID"><p>
+
+  Builtin function. Takes a starting index, a count and a token list as
+  arguments. Will return part of the token list.
+
+  Syntax:
+
+  <tscreen><verb>
+       	.MID (&lt;int expr&gt;, &lt;int expr&gt;, &lt;token list&gt;)
+  </verb></tscreen>
+
+  The first integer expression gives the starting token in the list (the
+  first token has index 0). The second integer expression gives the number
+  of tokens to extract from the token list. The third argument is the
+  token list itself.
+
+  Example:
+
+  To check in a macro if the given argument has a '<tt/#/' as first token
+  (immidiate addressing mode), use something like this:
+
+    <tscreen><verb>
+  	.macro	ldax	arg
+    		...
+    		.if (.match (.mid (0, 1, arg), #))
+
+    		; ldax called with immidiate operand
+    		...
+
+    		.endif
+    		...
+       	.endmacro
+  </verb></tscreen>
+
+  See also the <tt><ref id=".LEFT" name=".LEFT"></tt> and <tt><ref id=".RIGHT"
+  name=".RIGHT"></tt> builtin functions.
+
+
+<sect1><tt>.REF, .REFERENCED</tt><label id=".REFERENCED"><p>
+
+  Builtin function. The function expects an identifier as argument in braces.
+  The argument is evaluated, and the function yields "true" if the identifier
+  is a symbol that has already been referenced somewhere in the source file up
+  to the current position. Otherwise the function yields false. As an example,
+  the <tt><ref id=".IFREF" name=".IFREF"></tt> statement may be replaced by
+
+  <tscreen><verb>
+	.if	.referenced(a)
+  </verb></tscreen>
+
+  See: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
+
+
+<sect1><tt>.RIGHT</tt><label id=".RIGHT"><p>
+
+  Builtin function. Extracts the right part of a given token list.
+
+  Syntax:
+
+  <tscreen><verb>
+       	.RIGHT (&lt;int expr&gt;, &lt;token list&gt;)
+  </verb></tscreen>
+
+  The first integer expression gives the number of tokens to extract from
+  the token list. The second argument is the token list itself.
+
+  See also the <tt><ref id=".LEFT" name=".LEFT"></tt> and <tt><ref id=".MID"
+  name=".MID"></tt> builtin functions.
+
+
+<sect1><tt>.SIZEOF</tt><label id=".SIZEOF"><p>
+
+  <tt/.SIZEOF/ is a pseudo function that returns the size of its argument. The
+  argument can be a struct/union, a struct member, a procedure, or a label. In
+  case of a procedure or label, its size is defined by the amount of data
+  placed in the segment where the label is relative to. If a line of code
+  switches segments (for example in a macro) data placed in other segments
+  does not count for the size.
+
+  Please note that a symbol or scope must exist, before it is used together with
+  <tt/.SIZEOF/ (this may get relaxed later, but will always be true for scopes).
+  A scope has preference over a symbol with the same name, so if the last part
+  of a name represents both, a scope and a symbol, the scope is choosen over the
+  symbol.
+
+  After the following code:
+
+  <tscreen><verb>
+        .struct Point                   ; Struct size = 4
+                xcoord  .word
+                xcoord  .word
+        .endstruct
+
+        P:      .tag    Point           ; Declare a point
+        @P:     .tag    Point           ; Declare another point
+
+        .code
+        .proc   Code
+                nop
+                .proc   Inner
+                        nop
+                .endproc
+                nop
+        .endproc
+
+        .proc   Data
+        .data                           ; Segment switch!!!
+                .res    4
+        .endproc
+  </verb></tscreen>
+
+  <descrip>
+    <tag><tt/.sizeof(Point)/</tag>
+    will have the value 4, because this is the size of struct <tt/Point/.
+
+    <tag><tt/.sizeof(Point::xcoord)/</tag>
+    will have the value 2, because this is the size of the member <tt/xcoord/
+    in struct <tt/Point/.
+
+    <tag><tt/.sizeof(P)/</tag>
+    will have the value 4, this is the size of the data declared on the same
+    source line as the label <tt/P/, which is in the same segment that <tt/P/
+    is relative to.
+
+    <tag><tt/.sizeof(@P)/</tag>
+    will have the value 4, see above. The example demonstrates that <tt/.SIZEOF/
+    does also work for cheap local symbols.
+
+    <tag><tt/.sizeof(Code)/</tag>
+    will have the value 3, since this is amount of data emitted into the code
+    segment, the segment that was active when <tt/Code/ was entered. Note that
+    this value includes the amount of data emitted in child scopes (in this
+    case <tt/Code::Inner/).
+
+    <tag><tt/.sizeof(Code::Inner)/</tag>
+    will have the value 1 as expected.
+
+    <tag><tt/.sizeof(Data)/</tag>
+    will have the value 0. Data is emitted within the scope <tt/Data/, but since
+    the segment is switched after entry, this data is emitted into another
+    segment.
+  </descrip>
+
+
+<sect1><tt>.STRAT</tt><label id=".STRAT"><p>
+
+  Builtin function. The function accepts a string and an index as
+  arguments and returns the value of the character at the given position
+  as an integer value. The index is zero based.
+
+  Example:
+
+  <tscreen><verb>
+       	.macro	M    	Arg
+		; Check if the argument string starts with '#'
+		.if (.strat (Arg, 0) = '#')
+		...
+		.endif
+       	.endmacro
+  </verb></tscreen>
+
+
+<sect1><tt>.STRING</tt><label id=".STRING"><p>
+
+  Builtin function. The function accepts an argument in braces and converts
+  this argument into a string constant. The argument may be an identifier, or
+  a constant numeric value.
+
+  Since you can use a string in the first place, the use of the function may
+  not be obvious. However, it is useful in macros, or more complex setups.
+
+  Example:
+
+  <tscreen><verb>
+       	; Emulate other assemblers:
+       	.macro	section	name
+       		.segment	.string(name)
+       	.endmacro
+  </verb></tscreen>
+
+
+<sect1><tt>.STRLEN</tt><label id=".STRLEN"><p>
+
+  Builtin function. The function accepts a string argument in braces and
+  eveluates to the length of the string.
+
+  Example:
+
+  The following macro encodes a string as a pascal style string with
+  a leading length byte.
+
+  <tscreen><verb>
+       	.macro	PString	Arg
+		.byte	.strlen(Arg), Arg
+       	.endmacro
+  </verb></tscreen>
+
+
+<sect1><tt>.TCOUNT</tt><label id=".TCOUNT"><p>
+
+  Builtin function. The function accepts a token list in braces. The
+  function result is the number of tokens given as argument.
+
+  Example:
+
+  The <tt/ldax/ macro accepts the '#' token to denote immidiate addressing (as
+  with the normal 6502 instructions). To translate it into two separate 8 bit
+  load instructions, the '#' token has to get stripped from the argument:
+
+  <tscreen><verb>
+    	.macro	ldax	arg
+    	   	.if (.match (.mid (0, 1, arg), #))
+    	   	; ldax called with immidiate operand
+	   	lda	#<(.right (.tcount (arg)-1, arg))
+	   	ldx	#>(.right (.tcount (arg)-1, arg))
+	   	.else
+	   	...
+    	   	.endif
+       	.endmacro
+  </verb></tscreen>
+
+
+<sect1><tt>.XMATCH</tt><label id=".XMATCH"><p>
+
+  Builtin function. Matches two token lists against each other. This is
+  most useful within macros, since macros are not stored as strings, but
+  as lists of tokens.
+
+  The syntax is
+
+  <tscreen><verb>
+       	.XMATCH(&lt;token list #1&gt;, &lt;token list #2&gt;)
+  </verb></tscreen>
+
+  Both token list may contain arbitrary tokens with the exception of the
+  terminator token (comma resp. right parenthesis) and
+
+  <itemize>
+  <item>end-of-line
+  <item>end-of-file
+  </itemize>
+
+  Often a macro parameter is used for any of the token lists.
+
+  The function compares tokens <em/and/ token values. If you need a function
+  that just compares the type of tokens, have a look at the <tt><ref
+  id=".MATCH" name=".MATCH"></tt> function.
+
+  See: <tt><ref id=".MATCH" name=".MATCH"></tt>
+
+
+
+<sect>Control commands<label id="control-commands"><p>
+
 Here's a list of all control commands and a description, what they do:
 
 
@@ -1064,18 +1565,6 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<sect1><tt>.BLANK</tt><label id=".BLANK"><p>
-
-  Builtin function. The function evaluates its argument in braces and
-  yields "false" if the argument is non blank (there is an argument), and
-  "true" if there is no argument. As an example, the <tt/.IFBLANK/ statement
-  may be replaced by
-
-  <tscreen><verb>
-	.if	.blank(arg)
-  </verb></tscreen>
-
-
 <sect1><tt>.BSS</tt><label id=".BSS"><p>
 
   Switch to the BSS segment. The name of the BSS segment is always "BSS",
@@ -1183,40 +1672,6 @@ Here's a list of all control commands and a description, what they do:
   feature in more detail.
 
 
-<sect1><tt>.CONCAT</tt><label id=".CONCAT"><p>
-
-  Builtin function. The function allows to concatenate a list of string
-  constants separated by commas. The result is a string constant that
-  is the concatentation of all arguments. This function is most useful
-  in macros and when used together with the <tt/.STRING/ builtin function.
-  The function may be used in any case where a string constant is
-  expected.
-
-  Example:
-
-  <tscreen><verb>
-	.include 	.concat ("myheader", ".", "inc")
-  </verb></tscreen>
-
-  This is the same as the command
-
-  <tscreen><verb>
-	.include 	"myheader.inc"
-  </verb></tscreen>
-
-
-<sect1><tt>.CONST</tt><label id=".CONST"><p>
-
-  Builtin function. The function evaluates its argument in braces and
-  yields "true" if the argument is a constant expression (that is, an
-  expression that yields a constant value at assembly time) and "false"
-  otherwise. As an example, the .IFCONST statement may be replaced by
-
-  <tscreen><verb>
-      	.if	.const(a + 3)
-  </verb></tscreen>
-
-
 <sect1><tt>.CONSTRUCTOR</tt><label id=".CONSTRUCTOR"><p>
 
   Export a symbol and mark it as a module constructor. This may be used
@@ -1246,33 +1701,6 @@ Here's a list of all control commands and a description, what they do:
   id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> commands and the separate section
   <ref id="condes" name="Module constructors/destructors"> explaining the
   feature in more detail.
-
-
-<sect1><tt>.CPU</tt><label id=".CPU"><p>
-
-  Reading this pseudo variable will give a constant integer value that
-  tells which CPU is currently enabled. It can also tell which instruction
-  set the CPU is able to translate. The value read from the pseudo variable
-  should be further examined by using one of the constants defined by the
-  "cpu" macro package (see <tt/<ref id=".MACPACK" name=".MACPACK">/).
-
-  It may be used to replace the .IFPxx pseudo instructions or to construct
-  even more complex expressions.
-
-  Example:
-
-  <tscreen><verb>
-        .macpack        cpu
-       	.if	(.cpu .bitand CPU_ISET_65816)
-  	 	phx
-  	 	phy
-  	.else
-  	 	txa
-  	 	pha
-  	 	tya
-  	 	pha
-  	.endif
-  </verb></tscreen>
 
 
 <sect1><tt>.DATA</tt><label id=".DATA"><p>
@@ -1436,8 +1864,9 @@ Here's a list of all control commands and a description, what they do:
 
 <sect1><tt>.ENDSTRUCT</tt><label id=".ENDSTRUCT"><p>
 
-  Ends a struct definition. See the section named <ref id="structs"
-  name="Structs and unions">.
+  Ends a struct definition. See the <tt/<ref id=".STRUCT" name=".STRUCT">/
+  command and the separate section named <ref id="structs" name="&quot;Structs
+  and unions&quot;">.
 
 
 <sect1><tt>.ENUM</tt><label id=".ENUM"><p>
@@ -1973,41 +2402,6 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
 
-<sect1><tt>.LEFT</tt><label id=".LEFT"><p>
-
-  Builtin function. Extracts the left part of a given token list.
-
-  Syntax:
-
-  <tscreen><verb>
-       	.LEFT (&lt;int expr&gt;, &lt;token list&gt;)
-  </verb></tscreen>
-
-  The first integer expression gives the number of tokens to extract from
-  the token list. The second argument is the token list itself.
-
-  Example:
-
-  To check in a macro if the given argument has a '#' as first token
-  (immidiate addressing mode), use something like this:
-
-  <tscreen><verb>
-    	.macro 	ldax	arg
-    	       	...
-    	       	.if (.match (.left (1, arg), #))
-
-    	       	; ldax called with immidiate operand
-    	       	...
-
-    	       	.endif
-    	       	...
-       	.endmacro
-  </verb></tscreen>
-
-  See also the <tt><ref id=".MID" name=".MID"></tt> and <tt><ref id=".RIGHT"
-  name=".RIGHT"></tt> builtin functions.
-
-
 <sect1><tt>.LINECONT</tt><label id=".LINECONT"><p>
 
   Switch on or off line continuations using the backslash character
@@ -2146,99 +2540,6 @@ Here's a list of all control commands and a description, what they do:
   See section <ref id="macros" name="Macros">.
 
 
-<sect1><tt>.MATCH</tt><label id=".MATCH"><p>
-
-  Builtin function. Matches two token lists against each other. This is
-  most useful within macros, since macros are not stored as strings, but
-  as lists of tokens.
-
-  The syntax is
-
-  <tscreen><verb>
-       	.MATCH(&lt;token list #1&gt;, &lt;token list #2&gt;)
-  </verb></tscreen>
-
-  Both token list may contain arbitrary tokens with the exception of the
-  terminator token (comma resp. right parenthesis) and
-
-  <itemize>
-  <item>end-of-line
-  <item>end-of-file
-  </itemize>
-
-  Often a macro parameter is used for any of the token lists.
-
-  Please note that the function does only compare tokens, not token
-  attributes. So any number is equal to any other number, regardless of the
-  actual value. The same is true for strings. If you need to compare tokens
-  <em/and/ token attributes, use the <tt><ref id=".XMATCH"
-  name=".XMATCH"></tt> function.
-
-  Example:
-
-  Assume the macro <tt/ASR/, that will shift right the accumulator by one,
-  while honoring the sign bit. The builtin processor instructions will allow
-  an optional "A" for accu addressing for instructions like <tt/ROL/ and
-  <tt/ROR/. We will use the <tt><ref id=".MATCH" name=".MATCH"></tt> function
-  to check for this and print and error for invalid calls.
-
-  <tscreen><verb>
-  	.macro	asr 	arg
-
-       	       	.if (.not .blank(arg)) .and (.not .match (arg, a))
-    	    	.error "Syntax error"
-    	    	.endif
-
-    	    	cmp 	#$80		; Bit 7 into carry
-    	    	lsr 	a		; Shift carry into bit 7
-
-    	.endmacro
-  </verb></tscreen>
-
-  The macro will only accept no arguments, or one argument that must be the
-  reserved keyword "A".
-
-  See: <tt><ref id=".XMATCH" name=".XMATCH"></tt>
-
-
-<sect1><tt>.MID</tt><label id=".MID"><p>
-
-  Builtin function. Takes a starting index, a count and a token list as
-  arguments. Will return part of the token list.
-
-  Syntax:
-
-  <tscreen><verb>
-       	.MID (&lt;int expr&gt;, &lt;int expr&gt;, &lt;token list&gt;)
-  </verb></tscreen>
-
-  The first integer expression gives the starting token in the list (the
-  first token has index 0). The second integer expression gives the number
-  of tokens to extract from the token list. The third argument is the
-  token list itself.
-
-  Example:
-
-  To check in a macro if the given argument has a '<tt/#/' as first token
-  (immidiate addressing mode), use something like this:
-
-    <tscreen><verb>
-  	.macro	ldax	arg
-    		...
-    		.if (.match (.mid (0, 1, arg), #))
-
-    		; ldax called with immidiate operand
-    		...
-
-    		.endif
-    		...
-       	.endmacro
-  </verb></tscreen>
-
-  See also the <tt><ref id=".LEFT" name=".LEFT"></tt> and <tt><ref id=".RIGHT"
-  name=".RIGHT"></tt> builtin functions.
-
-
 <sect1><tt>.ORG</tt><label id=".ORG"><p>
 
   Start a section of absolute code. The command is followed by a constant
@@ -2311,25 +2612,6 @@ Here's a list of all control commands and a description, what they do:
 
 	.pagelength	unlimited	; Unlimited page length
   </verb></tscreen>
-
-
-<sect1><tt>.PARAMCOUNT</tt><label id=".PARAMCOUNT"><p>
-
-  This builtin pseudo variable is only available in macros. It is replaced by
-  the actual number of parameters that were given in the macro invocation.
-
-  Example:
-
-  <tscreen><verb>
-	.macro	foo	arg1, arg2, arg3
-	.if	.paramcount <> 3
-   	.error	"Too few parameters for macro foo"
-	.endif
-	...
- 	.endmacro
-  </verb></tscreen>
-
-  See section <ref id="macros" name="Macros">.
 
 
 <sect1><tt>.PC02</tt><label id=".PC02"><p>
@@ -2415,21 +2697,6 @@ Here's a list of all control commands and a description, what they do:
   See: <tt><ref id=".POPSEG" name=".POPSEG"></tt>
 
 
-<sect1><tt>.REF, .REFERENCED</tt><label id=".REFERENCED"><p>
-
-  Builtin function. The function expects an identifier as argument in braces.
-  The argument is evaluated, and the function yields "true" if the identifier
-  is a symbol that has already been referenced somewhere in the source file up
-  to the current position. Otherwise the function yields false. As an example,
-  the <tt><ref id=".IFREF" name=".IFREF"></tt> statement may be replaced by
-
-  <tscreen><verb>
-	.if	.referenced(a)
-  </verb></tscreen>
-
-  See: <tt><ref id=".DEFINED" name=".DEFINED"></tt>
-
-
 <sect1><tt>.REPEAT</tt><label id=".REPEAT"><p>
 
   Repeat all commands between <tt/.REPEAT/ and <tt><ref id=".ENDREPEAT"
@@ -2481,23 +2748,6 @@ Here's a list of all control commands and a description, what they do:
 	; Reserve 12 bytes of memory with value $AA
      	.res	12, $AA
   </verb></tscreen>
-
-
-<sect1><tt>.RIGHT</tt><label id=".RIGHT"><p>
-
-  Builtin function. Extracts the right part of a given token list.
-
-  Syntax:
-
-  <tscreen><verb>
-       	.RIGHT (&lt;int expr&gt;, &lt;token list&gt;)
-  </verb></tscreen>
-
-  The first integer expression gives the number of tokens to extract from
-  the token list. The second argument is the token list itself.
-
-  See also the <tt><ref id=".LEFT" name=".LEFT"></tt> and <tt><ref id=".MID"
-  name=".MID"></tt> builtin functions.
 
 
 <sect1><tt>.RODATA</tt><label id=".RODATA"><p>
@@ -2610,80 +2860,6 @@ Here's a list of all control commands and a description, what they do:
        <tt><ref id=".PSC02" name=".PSC02"></tt>
 
 
-<sect1><tt>.SIZEOF</tt><label id=".SIZEOF"><p>
-
-  <tt/.SIZEOF/ is a pseudo function that returns the size of its argument. The
-  argument can be a struct/union, a struct member, a procedure, or a label. In
-  case of a procedure or label, its size is defined by the amount of data
-  placed in the segment where the label is relative to. If a line of code
-  switches segments (for example in a macro) data placed in other segments
-  does not count for the size.
-
-  Please note that a symbol or scope must exist, before it is used together with
-  <tt/.SIZEOF/ (this may get relaxed later, but will always be true for scopes).
-  A scope has preference over a symbol with the same name, so if the last part
-  of a name represents both, a scope and a symbol, the scope is choosen over the
-  symbol.
-
-  After the following code:
-
-  <tscreen><verb>
-        .struct Point                   ; Struct size = 4
-                xcoord  .word
-                xcoord  .word
-        .endstruct
-
-        P:      .tag    Point           ; Declare a point
-        @P:     .tag    Point           ; Declare another point
-
-        .code
-        .proc   Code
-                nop
-                .proc   Inner
-                        nop
-                .endproc
-                nop
-        .endproc
-
-        .proc   Data
-        .data                           ; Segment switch!!!
-                .res    4
-        .endproc
-  </verb></tscreen>
-
-  <descrip>
-    <tag><tt/.sizeof(Point)/</tag>
-    will have the value 4, because this is the size of struct <tt/Point/.
-
-    <tag><tt/.sizeof(Point::xcoord)/</tag>
-    will have the value 2, because this is the size of the member <tt/xcoord/
-    in struct <tt/Point/.
-
-    <tag><tt/.sizeof(P)/</tag>
-    will have the value 4, this is the size of the data declared on the same
-    source line as the label <tt/P/, which is in the same segment that <tt/P/
-    is relative to.
-
-    <tag><tt/.sizeof(@P)/</tag>
-    will have the value 4, see above. The example demonstrates that <tt/.SIZEOF/
-    does also work for cheap local symbols.
-
-    <tag><tt/.sizeof(Code)/</tag>
-    will have the value 3, since this is amount of data emitted into the code
-    segment, the segment that was active when <tt/Code/ was entered. Note that
-    this value includes the amount of data emitted in child scopes (in this
-    case <tt/Code::Inner/).
-
-    <tag><tt/.sizeof(Code::Inner)/</tag>
-    will have the value 1 as expected.
-
-    <tag><tt/.sizeof(Data)/</tag>
-    will have the value 0. Data is emitted within the scope <tt/Data/, but since
-    the segment is switched after entry, this data is emitted into another
-    segment.
-  </descrip>
-
-
 <sect1><tt>.SMART</tt><label id=".SMART"><p>
 
   Switch on or off smart mode. The command must be followed by a '+' or
@@ -2720,64 +2896,12 @@ Here's a list of all control commands and a description, what they do:
        <tt><ref id=".I8" name=".I8"></tt>
 
 
-<sect1><tt>.STRAT</tt><label id=".STRAT"><p>
-
-  Builtin function. The function accepts a string and an index as
-  arguments and returns the value of the character at the given position
-  as an integer value. The index is zero based.
-
-  Example:
-
-  <tscreen><verb>
-       	.macro	M    	Arg
-		; Check if the argument string starts with '#'
-		.if (.strat (Arg, 0) = '#')
-		...
-		.endif
-       	.endmacro
-  </verb></tscreen>
-
-
-<sect1><tt>.STRING</tt><label id=".STRING"><p>
-
-  Builtin function. The function accepts an argument in braces and converts
-  this argument into a string constant. The argument may be an identifier, or
-  a constant numeric value.
-
-  Since you can use a string in the first place, the use of the function may
-  not be obvious. However, it is useful in macros, or more complex setups.
-
-  Example:
-
-  <tscreen><verb>
-       	; Emulate other assemblers:
-       	.macro	section	name
-       		.segment	.string(name)
-       	.endmacro
-  </verb></tscreen>
-
-
-<sect1><tt>.STRLEN</tt><label id=".STRLEN"><p>
-
-  Builtin function. The function accepts a string argument in braces and
-  eveluates to the length of the string.
-
-  Example:
-
-  The following macro encodes a string as a pascal style string with
-  a leading length byte.
-
-  <tscreen><verb>
-       	.macro	PString	Arg
-		.byte	.strlen(Arg), Arg
-       	.endmacro
-  </verb></tscreen>
-
-
 <sect1><tt>.STRUCT</tt><label id=".STRUCT"><p>
 
-  Starts a struct definition. See the section named <ref id="structs"
-  name="Structs and unions">.
+  Starts a struct definition. Structs are covered in a separate section named
+  <ref id="structs" name="&quot;Structs and unions&quot;">.
+
+  See: <tt><ref id=".ENDSTRUCT" name=".ENDSTRUCT"></tt>
 
 
 <sect1><tt>.SUNPLUS</tt><label id=".SUNPLUS"><p>
@@ -2806,62 +2930,6 @@ Here's a list of all control commands and a description, what they do:
         .bss
                 .tag    Point           ; Allocate 4 bytes
   </verb></tscreen>
-
-
-<sect1><tt>.TCOUNT</tt><label id=".TCOUNT"><p>
-
-  Builtin function. The function accepts a token list in braces. The
-  function result is the number of tokens given as argument.
-
-  Example:
-
-  The <tt/ldax/ macro accepts the '#' token to denote immidiate addressing (as
-  with the normal 6502 instructions). To translate it into two separate 8 bit
-  load instructions, the '#' token has to get stripped from the argument:
-
-  <tscreen><verb>
-    	.macro	ldax	arg
-    	   	.if (.match (.mid (0, 1, arg), #))
-    	   	; ldax called with immidiate operand
-	   	lda	#<(.right (.tcount (arg)-1, arg))
-	   	ldx	#>(.right (.tcount (arg)-1, arg))
-	   	.else
-	   	...
-    	   	.endif
-       	.endmacro
-  </verb></tscreen>
-
-
-<sect1><tt>.TIME</tt><label id=".TIME"><p>
-
-  Reading this pseudo variable will give a constant integer value that
-  represents the current time in POSIX standard (as seconds since the
-  Epoch).
-
-  It may be used to encode the time of translation somewhere in the created
-  code.
-
-  Example:
-
-  <tscreen><verb>
-        .dword  .time   ; Place time here
-  </verb></tscreen>
-
-
-<sect1><tt>.VERSION</tt><label id=".VERSION"><p>
-
-  Reading this pseudo variable will give the assembler version according to
-  the following formula:
-
-        VER_MAJOR*$100 + VER_MINOR*$10 + VER_PATCH
-
-  It may be used to encode the assembler version or check the assembler for
-  special features not available with older versions.
-
-  Example:
-
-  Version 2.11.1 of the assembler will return $2B1 as numerical constant when
-  reading the pseudo variable <tt/.VERSION/.
 
 
 <sect1><tt>.WARNING</tt><label id=".WARNING"><p>
@@ -2904,35 +2972,6 @@ Here's a list of all control commands and a description, what they do:
   <tscreen><verb>
   	.word  	$0D00, $AF13, _Clear
   </verb></tscreen>
-
-
-<sect1><tt>.XMATCH</tt><label id=".XMATCH"><p>
-
-  Builtin function. Matches two token lists against each other. This is
-  most useful within macros, since macros are not stored as strings, but
-  as lists of tokens.
-
-  The syntax is
-
-  <tscreen><verb>
-       	.XMATCH(&lt;token list #1&gt;, &lt;token list #2&gt;)
-  </verb></tscreen>
-
-  Both token list may contain arbitrary tokens with the exception of the
-  terminator token (comma resp. right parenthesis) and
-
-  <itemize>
-  <item>end-of-line
-  <item>end-of-file
-  </itemize>
-
-  Often a macro parameter is used for any of the token lists.
-
-  The function compares tokens <em/and/ token values. If you need a function
-  that just compares the type of tokens, have a look at the <tt><ref
-  id=".MATCH" name=".MATCH"></tt> function.
-
-  See: <tt><ref id=".MATCH" name=".MATCH"></tt>
 
 
 <sect1><tt>.ZEROPAGE</tt><label id=".ZEROPAGE"><p>
@@ -3445,7 +3484,7 @@ CPUs (the latter two are upwards compatible to the 65SC02).
 Structs and unions are special forms of <ref id="scopes" name="scopes">.  They
 are to some degree comparable to their C counterparts. Both have a list of
 members. Each member allocates storage and may optionally have a name, which,
-in case of a struct, is the offset from the beginning and, in case of a union
+in case of a struct, is the offset from the beginning and, in case of a union,
 is always zero.
 
 Here is an example for a very simple struct with two members and a total size
@@ -3488,13 +3527,26 @@ already defined structs or unions in structs:
 
       .struct Circle
               Origin  .tag    Point
-              Radius  .word
+              Radius  .byte
       .endstruct
 </verb></tscreen>
 
 Space for a struct or union may be allocated using the <ref id=".TAG"
 name=".TAG"> directive.
 
+<tscreen><verb>
+        C:      .tag    Circle
+</verb></tscreen>
+
+Currently, members are just offsets from the start of the struct or union. To
+access a field of a struct, the member offset has to be added to the address
+of the struct itself:
+
+<tscreen><verb>
+        lda     C+Circle::Radius        ; Load circle radius into A
+</verb></tscreen>
+
+This may change in a future version of the assembler.
 
 
 <sect>Module constructors/destructors<label id="condes"><p>

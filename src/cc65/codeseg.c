@@ -889,6 +889,16 @@ void DelCodeSegAfter (CodeSeg* S, unsigned Last)
 
 	/* Check if this entry has a label reference */
 	if (E->JumpTo) {
+	    /* If the label is a label in the label pool and this is the last
+	     * reference to the label, remove the label from the pool.
+	     */
+	    CodeLabel* L = E->JumpTo;
+	    int Index = CollIndex (&S->Labels, L);
+	    if (Index >= 0 && CollCount (&L->JumpFrom) == 1) {
+		/* Delete it from the pool */
+		CollDelete (&S->Labels, Index);
+	    }
+
 	    /* Remove the reference to the label */
 	    RemoveCodeLabelRef (S, E);
 	}

@@ -79,7 +79,7 @@ struct FuncDesc {
 FuncDesc* NewFuncDesc (void);
 /* Create a new symbol table with the given name */
 
-void FreeFuncDesc (FuncDesc* E);
+void FreeFuncDesc (FuncDesc* D);
 /* Free a function descriptor */
 
 

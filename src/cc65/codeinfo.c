@@ -42,7 +42,9 @@
 /* cc65 */
 #include "codeent.h"
 #include "codeseg.h"
+#include "datatype.h"
 #include "error.h"
+#include "symtab.h"
 #include "codeinfo.h"
 
 
@@ -132,20 +134,63 @@ void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
  * load all registers.
  */
 {
-    /* Search for the function */
-    const FuncInfo* Info = bsearch (Name, FuncInfoTable, FuncInfoCount,
-	     		  	    sizeof(FuncInfo), CompareFuncInfo);
+    /* If the function name starts with an underline, it is an external
+     * function. Search for it in the symbol table. If the function does
+     * not start with an underline, it may be a runtime support function.
+     * Search for it in the list of builtin functions.
+     */
+    if (Name[0] == '_') {
 
-    /* Do we know the function? */
-    if (Info) {
-	/* Use the information we have */
-       	*Use = Info->Use;
-	*Chg = Info->Chg;
+     	/* Search in the symbol table, skip the leading underscore */
+     	SymEntry* E = FindSym (Name+1);
+
+     	/* Did we find it in the top level table? */
+     	if (E && E->Owner->PrevTab == 0 && IsTypeFunc (E->Type)) {
+
+     	    /* A function may use the A or A/X registers if it is a fastcall
+     	     * function. Otherwise it does not use any registers passed by
+     	     * the caller. However, we assume that any function will destroy
+     	     * all registers.
+     	     */
+     	    FuncDesc* D = E->V.F.Func;
+     	    if ((D->Flags & FD_FASTCALL) != 0 && D->ParamCount > 0) {
+     		/* Will use registers depending on the last param */
+     		SymEntry* LastParam = D->SymTab->SymTail;
+     		if (SizeOf (LastParam->Type) == 1) {
+     		    *Use = REG_A;
+     		} else {
+     		    *Use = REG_AX;
+     		}
+     	    } else {
+     		/* Will not use any registers */
+     		*Use = REG_NONE;
+     	    }
+
+     	    /* Will destroy all registers */
+     	    *Chg = REG_AXY;
+
+     	    /* Done */
+     	    return;
+     	}
+
     } else {
-	/* Assume all registers used */
-	*Use = REG_AXY;
-	*Chg = REG_AXY;
+
+	/* Search for the function in the list of builtin functions */
+	const FuncInfo* Info = bsearch (Name, FuncInfoTable, FuncInfoCount,
+					sizeof(FuncInfo), CompareFuncInfo);
+
+	/* Do we know the function? */
+	if (Info) {
+	    /* Use the information we have */
+	    *Use = Info->Use;
+	    *Chg = Info->Chg;
+	    return;
+	}
     }
+
+    /* Function not found - assume all registers used */
+    *Use = REG_AXY;
+    *Chg = REG_AXY;
 }
 
 

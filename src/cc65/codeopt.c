@@ -243,7 +243,7 @@ static int IsLocalLoad16 (CodeSeg* S, unsigned Index,
 	    L[3]->OPC == OPC_DEY                      &&
 	    !CodeEntryHasLabel (L[3])                 &&
 	    IsSpLoad (L[4])                           &&
-	    !CodeEntryHasLabel (L[4]));		      
+	    !CodeEntryHasLabel (L[4]));
 }
 
 
@@ -409,6 +409,196 @@ static unsigned OptBoolTransforms (CodeSeg* S)
 	}
 
 NextEntry:
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*			     Optimize subtractions                           */
+/*****************************************************************************/
+
+
+
+static unsigned OptSub1 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *  	sbc     ...
+ *      bcs     L
+ *  	dex
+ * L:
+ *
+ * and remove the handling of the high byte if X is not used later.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[3];
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (E->OPC == OPC_SBC 	  		           &&
+	    GetCodeEntries (S, L, I+1, 3) 	           &&
+       	    (L[0]->OPC == OPC_BCS || L[0]->OPC == OPC_JCS) &&
+	    L[0]->JumpTo != 0                              &&
+	    !CodeEntryHasLabel (L[0])                      &&
+	    L[1]->OPC == OPC_DEX       	       	           &&
+	    !CodeEntryHasLabel (L[1])                      &&
+	    L[0]->JumpTo->Owner == L[2]                    &&
+	    !RegXUsed (S, I+3)) {
+
+	    /* Remove the bcs/dex */
+	    DelCodeEntries (S, I+1, 2);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+static unsigned OptSub2 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *  	lda     xx
+ *      sec
+ *  	sta     tmp1
+ *      lda     yy
+ *      sbc     tmp1
+ *      sta     yy
+ *
+ * and replace it by
+ *
+ *      sec
+ *      lda     yy
+ *     	sbc     xx
+ *      sta     yy
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[5];
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (E->OPC == OPC_LDA 	  		           &&
+	    GetCodeEntries (S, L, I+1, 5) 	           &&
+       	    L[0]->OPC == OPC_SEC                           &&
+	    !CodeEntryHasLabel (L[0])                      &&
+       	    L[1]->OPC == OPC_STA       	       	           &&
+	    strcmp (L[1]->Arg, "tmp1") == 0                &&
+	    !CodeEntryHasLabel (L[1])                      &&
+	    L[2]->OPC == OPC_LDA                           &&
+       	    !CodeEntryHasLabel (L[2])                      &&
+	    L[3]->OPC == OPC_SBC                           &&
+	    strcmp (L[3]->Arg, "tmp1") == 0                &&
+       	    !CodeEntryHasLabel (L[3])                      &&
+	    L[4]->OPC == OPC_STA                           &&
+	    strcmp (L[4]->Arg, L[2]->Arg) == 0             &&
+       	    !CodeEntryHasLabel (L[4])) {
+
+	    /* Remove the store to tmp1 */
+	    DelCodeEntry (S, I+2);
+
+	    /* Remove the subtraction */
+	    DelCodeEntry (S, I+3);
+
+	    /* Move the lda to the position of the subtraction and change the
+	     * op to SBC.
+	     */
+	    MoveCodeEntry (S, I, I+3);
+	    ReplaceOPC (E, OPC_SBC);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*			      Optimize additions                             */
+/*****************************************************************************/
+
+
+
+static unsigned OptAdd1 (CodeSeg* S)
+/* Search for the sequence
+ *
+ *  	adc     ...
+ *      bcc     L
+ *  	inx
+ * L:
+ *
+ * and remove the handling of the high byte if X is not used later.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* L[3];
+
+      	/* Get next entry */
+       	CodeEntry* E = GetCodeEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (E->OPC == OPC_ADC 	  		           &&
+	    GetCodeEntries (S, L, I+1, 3) 	           &&
+       	    (L[0]->OPC == OPC_BCC || L[0]->OPC == OPC_JCC) &&
+	    L[0]->JumpTo != 0                              &&
+	    !CodeEntryHasLabel (L[0])                      &&
+	    L[1]->OPC == OPC_INX       	       	           &&
+	    !CodeEntryHasLabel (L[1])                      &&
+	    L[0]->JumpTo->Owner == L[2]                    &&
+	    !RegXUsed (S, I+3)) {
+
+	    /* Remove the bcs/dex */
+	    DelCodeEntries (S, I+1, 2);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
 	/* Next entry */
 	++I;
 
@@ -1007,6 +1197,11 @@ struct OptFunc {
 
 /* Table with optimizer steps -  are called in this order */
 static OptFunc OptFuncs [] = {
+    /* Optimize subtractions */
+    { OptSub1, 	            "OptSub1", 	       	        0      	},
+    { OptSub2, 	            "OptSub2", 	       	        0      	},
+    /* Optimize additions */
+    { OptAdd1,         	    "OptAdd1",  		0      	},
     /* Optimize jump cascades */
     { OptJumpCascades, 	    "OptJumpCascades",		0      	},
     /* Remove dead jumps */
@@ -1025,21 +1220,15 @@ static OptFunc OptFuncs [] = {
     { OptBoolTransforms,    "OptBoolTransforms",	0	},
     /* Optimize calls to nega */
     { OptNegA1,	       	    "OptNegA1",			0	},
-    /* Optimize calls to nega */
     { OptNegA2,	       	    "OptNegA2",			0	},
     /* Optimize calls to negax */
     { OptNegAX1,       	    "OptNegAX1",		0	},
-    /* Optimize calls to negax */
     { OptNegAX2,       	    "OptNegAX2",       	       	0      	},
-    /* Optimize calls to negax */
     { OptNegAX3,       	    "OptNegAX3",       	       	0      	},
     /* Optimize compares */
     { OptCmp1,              "OptCmp1",                  0       },
-    /* Optimize compares */
     { OptCmp2,              "OptCmp2",                  0       },
-    /* Optimize compares */
     { OptCmp3,              "OptCmp3",                  0       },
-    /* Optimize compares */
     { OptCmp4,              "OptCmp4",                  0       },
     /* Remove unused loads */
     { OptUnusedLoads,	    "OptUnusedLoads",		0	},

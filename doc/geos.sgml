@@ -437,7 +437,7 @@ handler code to have the screen clean.
 This one jumps back to the topmost menu. If there is only menu and submenu it works the
 same as <tt/DoPreviousMenu/.
 
-<sect2>Icons
+<sect2>Icon Functions
 <p>
 Icons are working similar to menus except the fact that there is only one level. Icons are
 defined as a screen area filled with a bitmap, but if you would setup icons and erase the
@@ -1168,7 +1168,7 @@ You can force to sleep not only the main application routine, but also processes
 that the maximum number of sleeping functions is 20. If it would be larger it will overwrite
 parameters of already sleeping functions in GEOS kernal data space, leading to crash.
 
-<sect1>System
+<sect1>System Functions
 
 <sect2>FirstInit
 <p>
@@ -1283,7 +1283,7 @@ GEOS data space ($8000-$8fff), so you can use their fields directly in optimized
 Please see <tt/gsym.h/ and find them. All structures are defined in <tt/gstruct.h/ and you may
 find also some comments there.
 
-<sect1>Graphics
+<sect1>Graphics Structures
 
 <sect2>pixel
 <p>
@@ -1358,7 +1358,7 @@ fixed area using <tt/GetFHdrInfo/. (note that <tt/fileHeader/ is a place in memo
 <tt/fileheader/ is a structure).
 You will also need own fileheader for <tt/SaveFile/.
 
-<sect1>System
+<sect1>System Structures
 
 <sect2>s_date
 <p>

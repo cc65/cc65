@@ -2637,7 +2637,7 @@ below uses examples from the C libraries. However, the feature may also be
 useful for assembler programs.
 
 
-<sect1>Overview<p>
+<sect1>Module overview<p>
 
 Using the <tt><ref id=".CONSTRUCTOR" name=".CONSTRUCTOR"></tt> and <tt><ref
 id=".DESTRUCTOR" name=".DESTRUCTOR"></tt> keywords it it possible to export

@@ -105,3 +105,5 @@ XDRAW   = $F65D         ; Draws a shape by inverting the existing
 
 SETHCOL = $F6EC         ; Set the hi-res color to (X), where (X)
                         ; must be between 0 and 7.
+
+PREAD   = $FB1E         ; Read paddle in X, return AD conv. value in Y

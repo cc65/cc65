@@ -38,7 +38,7 @@ all:
 # Apple ][
 
 apple2lib:
-	for i in apple2 common runtime conio dbg em tgi; do \
+	for i in apple2 common runtime conio dbg em joystick tgi; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
@@ -115,7 +115,7 @@ c16lib:
 # C64
 
 c64lib:
-	for i in c64 cbm common runtime conio dbg em joystick tgi; do \
+	for i in c64 cbm common runtime conio dbg em joystick serial tgi; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
@@ -169,7 +169,7 @@ cbm510lib:
 # PET-II series
 
 cbm610lib:
-	for i in cbm610 cbm common runtime conio dbg em; do \
+	for i in cbm610 cbm common runtime conio dbg em joystick tgi; do \
      	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \
@@ -216,7 +216,7 @@ geoslib:
 # NES
 
 neslib:
-	for i in nes common runtime conio em tgi; do \
+	for i in nes common runtime conio em joystick tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \
@@ -231,7 +231,7 @@ neslib:
 # CBM PET machines
 
 petlib:
-	for i in pet cbm common runtime conio dbg em tgi; do \
+	for i in pet cbm common runtime conio dbg em joystick tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \
@@ -264,14 +264,15 @@ plus4lib:
 .PHONY: clean
 clean:
 	@for i in cbm common conio dbg em joystick runtime tgi $(ALLTARGETS); do\
-       	   $(MAKE) -C $$i clean;						\
+       	   $(MAKE) -C $$i clean;			      			\
 	done
 
 .PHONY: zap
 zap:	clean
 	@for i in cbm common conio dbg em joystick runtime tgi $(ALLTARGETS); do\
-	   $(MAKE) -C $$i zap;     	    	       	  	   		\
+	   $(MAKE) -C $$i zap;     	    	       	      	   		\
 	done
 	@rm -f *.o *.emd *.joy *.lib *.tgi
 
 
+							      

@@ -29,7 +29,6 @@ puts.s
 qsort.s
 realloc.s
 rewind.s
-sprintf.s
 strtok.s
 strxfrm.s
 vcprintf.s

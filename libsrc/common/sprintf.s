@@ -1,11 +1,11 @@
 ;
-; int fprintf (FILE* f, const char* Format, ...);
+; int sprintf (char* buf, const char* Format, ...);
 ;
 ; Ullrich von Bassewitz, 1.12.2000
 ;
 
-	.export	      	_fprintf
-	.import		pushax, addysp, subysp, _vfprintf
+	.export	      	_sprintf
+	.import		pushax, addysp, subysp, _vsprintf
 	.importzp	sp, ptr1
 
 	.macpack	generic
@@ -15,7 +15,7 @@
 
 .bss
 
-ParamSize: 	.res  	1		; Number of parameter bytes
+ParamSize: 	.res  	1 		; Number of parameter bytes
 
 ; ----------------------------------------------------------------------------
 ; Code
@@ -23,10 +23,10 @@ ParamSize: 	.res  	1		; Number of parameter bytes
 .code
 
 
-_fprintf:
-  	sty	ParamSize		; Number of param bytes passed in Y
+_sprintf:
+  	sty	ParamSize 		; Number of param bytes passed in Y
 
-; We have to push f and format, both in the order they already have on stack.
+; We have to push buf and format, both in the order they already have on stack.
 ; To make this somewhat more efficient, we will create space on the stack and
 ; the do a copy of the complete block instead of pushing each parameter
 ; separately. Since the size of the arguments passed is the same as the size
@@ -46,7 +46,7 @@ _fprintf:
 	inx
 @L1:	stx	ptr1+1
 
-; Now copy both, f and format
+; Now copy both, buf and format
 
 	ldy	#4-1
 @L2:	lda	(ptr1),y
@@ -54,16 +54,17 @@ _fprintf:
 	dey
 	bpl	@L2
 
-; Load va_list (last and __fastcall__ parameter to vfprintf)
+; Push va_list (last parameter to vsprintf)
 
 	lda    	ptr1
 	ldx    	ptr1+1
+	jsr	pushax
 
 ; Call vfprintf
 
-	jsr	_vfprintf
+	jsr	_vsprintf
 
-; Cleanup the stack. We will return what we got from vfprintf
+; Cleanup the stack. We will return what we got from vsprintf
 
 	ldy	ParamSize
 	jmp	addysp

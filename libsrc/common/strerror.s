@@ -15,12 +15,19 @@ _strerror:
        	bne    	@L1  		; Jump if invalid error
 	cmp    	#EMAX		; Valid error code (map EUNKNOWN to 0)?
     	bcc    	@L2  		; Jump if ok
-@L1:	lda	#$00		; "Unknown error"
-@L2:	asl	a		; * 2
-	tay
+
+; The given error code is invalid
+
+@L1:    lda     #<EINVAL
+        sta     __errno
+        lda     #>EINVAL        ; = 0
+        sta     __errno+1
+;       lda	#$00		; A contains zero: "Unknown error"
 
 ; Load the pointer to the error message and return
 
+@L2:	asl	a		; * 2
+	tay
        	ldx	__sys_errlist+1,y
 	lda	__sys_errlist,y
 	rts

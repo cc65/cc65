@@ -176,8 +176,8 @@ configuration.
   graphics drivers!
 
   <tag><tt/c64-ramcart.emd/</tag>
-  A driver for the RamCart 64/128. Will test the hardware for the available
-  RAM.
+  A driver for the RamCart 64/128 written and contributed by Maciej Witkowiak.
+  Will test the hardware for the available RAM.
 
   <tag><tt/c64-reu.emd/</tag>
   A driver for the CBM REUs. The driver will determine from the connected REU
@@ -186,9 +186,10 @@ configuration.
   it has better knowledge about the hardware than the driver.
 
   <tag><tt/c64-vdc.emd/</tag>
-  A driver for the VDC memory of the C128. Can be used if the program is
-  running in C64 mode of the C128. Autodetects the amount of memory available
-  (16 or 64K) and offers 64 or 256 pages of 256 bytes each.
+  A driver for the VDC memory of the C128. Written and contributed by Maciej
+  WitkowiakCan be used if the program is running in C64 mode of the C128.
+  Autodetects the amount of memory available (16 or 64K) and offers 64 or 256
+  pages of 256 bytes each.
 
 </descrip><p>
 
@@ -198,16 +199,16 @@ configuration.
 <descrip>
 
   <tag><tt/c64-hitjoy.joy/</tag>
-  Driver for the Digital Excess & Hitmen adapter. See
+  Driver for the Digital Excess & Hitmen adapter contributed by Groepaz. See
   <htmlurl url="http://www.digitalexcess.de/downloads/productions.php"
   name="http://www.digitalexcess.de/downloads/productions.php"> on
   instructions how to build one. Up to four joysticks are supported.
 
   <tag><tt/c64-ptvjoy.joy/</tag>
-  Driver for the Protovision 4-player adapter. See
+  Driver for the Protovision 4-player adapter contributed by Groepaz. See
   <htmlurl url="http://www.protovision-online.de/hardw/hardwstart.htm"
-  name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices
-  and building instructions. Up to four joysticks are supported.
+  name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
+  building instructions. Up to four joysticks are supported.
 
   <tag><tt/c64-stdjoy.joy/</tag>
   Supports up to two standard joysticks connected to the joysticks port of

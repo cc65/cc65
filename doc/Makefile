@@ -92,6 +92,9 @@ coding.html:	coding.sgml
 funcref.html:	funcref.sgml
 	sgml2html --split=2 $<
 
+index.html:    	index.sgml
+	sgml2html --split=0 $<
+
 # ------------------------------------------------------------------------------
 # Make the dependencies
 

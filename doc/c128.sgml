@@ -166,14 +166,16 @@ memory drivers using the VDC memory!
 
 <descrip>
   <tag><tt/c128-vdc.tgi/</tag>
-  This driver uses the 80 column display and features a resolution of 640*200
-  with two colors and an adjustable palette (that means that the two colors
-  can be choosen out of the 16 VDC colors).
+  This driver was written by Maciej Witkowiak. It uses the 80 column display
+  and features a resolution of 640*200 with two colors and an adjustable
+  palette (that means that the two colors can be choosen out of the 16 VDC
+  colors).
 
   <tag><tt/c128-vdc2.tgi/</tag>
-  This driver uses the 80 column display and features a resolution of 640*480
-  with two colors and an adjustable palette (that means that the two colors
-  can be choosen out of the 16 VDC colors).
+  This driver was written by Maciej Witkowiak. This driver uses the 80 column
+  display and features a resolution of 640*480 with two colors and an
+  adjustable palette (that means that the two colors can be choosen out of the
+  16 VDC colors).
 </descrip><p>
 
 
@@ -191,8 +193,8 @@ memory drivers using the VDC memory!
   excluded, so this driver supports 251 pages of 256 bytes each.
 
   <tag><tt/c128-ramcart.emd/</tag>
-  A driver for the RamCart 64/128. Will test the hardware for the available
-  RAM.
+  A driver for the RamCart 64/128 written and contributed by Maciej Witkowiak.
+  Will test the hardware for the available RAM.
 
   <tag><tt/c128-reu.emd/</tag>
   A driver for the CBM REUs. The driver will determine from the connected REU
@@ -201,9 +203,10 @@ memory drivers using the VDC memory!
   it has better knowledge about the hardware than the driver.
 
   <tag><tt/c128-vdc.emd/</tag>
-  A driver for the VDC memory of the C128. Autodetects the amount of memory
-  available (16 or 64K) and offers 64 or 256 pages of 256 bytes each. Note:
-  This driver is incompatible with any of the graphics drivers using the VDC!
+  A driver for the VDC memory of the C128 written and contributed by Maciej
+  Witkowiak. Autodetects the amount of memory available (16 or 64K) and offers
+  64 or 256 pages of 256 bytes each. Note: This driver is incompatible with
+  any of the graphics drivers using the VDC!
 
 </descrip><p>
 
@@ -213,10 +216,11 @@ memory drivers using the VDC memory!
 <descrip>
 
   <tag><tt/c128-ptvjoy.joy/</tag>
-  Driver for the Protovision 4-player adapter. See
-  <htmlurl url="http://www.protovision-online.de/hardw/hardwstart.htm"
-  name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices
-  and building instructions. Up to four joysticks are supported.
+  Driver for the Protovision 4-player adapter originally written by Groepaz
+  for the C64 and converted for the C128 by me. See <htmlurl
+  url="http://www.protovision-online.de/hardw/hardwstart.htm"
+  name="http://www.protovision-online.de/hardw/hardwstart.htm"> for prices and
+  building instructions. Up to four joysticks are supported.
 
   <tag><tt/c128-stdjoy.joy/</tag>
   Supports up to two joysticks connected to the standard joysticks port of

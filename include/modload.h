@@ -72,14 +72,14 @@ struct mod_ctrl {
 
 
 
-unsigned char mod_load (struct mod_ctrl* ctrl);
+unsigned char __fastcall__ mod_load (struct mod_ctrl* ctrl);
 /* Load a module into memory and relocate it. The function will return an
  * error code (see below). If MLOAD_OK is returned, the outgoing fields in
  * the passed mod_ctrl struct contain information about the module just
  * loaded.
  */
 
-void mod_free (void* module);
+void __fastcall__ mod_free (void* module);
 /* Free a loaded module. Note: The given pointer is the pointer to the
  * module memory, not a pointer to a control structure.
  */

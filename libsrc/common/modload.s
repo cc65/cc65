@@ -76,10 +76,10 @@ Read:   jmp     $FFFF                   ; Jump to read routine
 
 .rodata
 ExpectedHdr:
-        .byte   $01, $00                ; non C64 marker
-        .byte   $6F, $36, $35           ; Magic ("o65")
-        .byte   $00                     ; Version
-        .word   O65_CPU_6502|O65_RELOC_BYTE|O65_SIZE_16BIT|O65_FTYPE_EXE|O65_ADDR_SIMPLE|O65_ALIGN_1
+        .byte   O65_MARKER_0, O65_MARKER_1              ; non C64 marker
+        .byte   O65_MAGIC_0, O65_MAGIC_1, O65_MAGIC_2   ; Magic ("o65")
+        .byte   O65_VERSION                             ; Version
+        .word   O65_MODE_CC65                           ; Mode word
 
 ExpectedHdrSize = * - ExpectedHdr
 

@@ -57,14 +57,14 @@ static unsigned ArgCount = 0;
 
 
 
-void InitCmdLine (char* aArgVec[], unsigned aArgCount)
+void InitCmdLine (unsigned aArgCount, char* aArgVec[])
 /* Initialize command line parsing. aArgVec is the argument array terminated by
  * a NULL pointer (as usual), ArgCount is the number of valid arguments in the
  * array. Both arguments are remembered in static storage.
  */
 {
-    ArgVec   = aArgVec;
     ArgCount = aArgCount;
+    ArgVec   = aArgVec;
 }
 
 
@@ -134,6 +134,8 @@ void LongOption (int* ArgNum, const LongOpt* OptTab, unsigned OptCount)
 	    } else {
 		OptTab->Func (Opt, 0);
 	    }
+	    /* Done */
+	    return;
 	}
 
 	/* Next table entry */

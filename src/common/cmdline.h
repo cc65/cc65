@@ -47,7 +47,7 @@
 /* Structure defining a long option */
 typedef struct LongOpt	LongOpt;
 struct LongOpt {
-    const char*	Option;	     
+    const char*	Option;
     unsigned	ArgCount;
     void 	(*Func) (const char* Opt, const char* Arg);
 };
@@ -60,7 +60,7 @@ struct LongOpt {
 
 
 
-void InitCmdLine (char* aArgVec[], unsigned aArgCount);
+void InitCmdLine (unsigned aArgCount, char* aArgVec[]);
 /* Initialize command line parsing. aArgVec is the argument array terminated by
  * a NULL pointer (as usual), ArgCount is the number of valid arguments in the
  * array. Both arguments are remembered in static storage.

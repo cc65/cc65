@@ -5,6 +5,7 @@
 ; void cputc (char c);
 ;
 
+	.constructor	initconio
    	.export		_cputcxy, _cputc
 	.export		_gotoxy, cputdirect
 	.export		newline, putchar
@@ -12,6 +13,11 @@
 	.import		popa
 
 	.include	"apple2.inc"
+
+initconio:
+	lda	#$FF		; Normal character display mode
+	sta	INVFLG
+	rts
 
 ; Plot a character - also used as internal function
 
@@ -30,13 +36,16 @@ _cputc:
 L1:
 	cmp	#$0A		; Test for \n = line feed
 	beq	newline
+	ora	#$80		; Turn on high bit
+	cmp	#$E0		; Test for lowercase
+	bmi	cputdirect
+	and	#$DF		; Convert to uppercase
 
 cputdirect:
 	jsr	putchar
-	;; Bump to next column
-	inc	CH
+	inc	CH		; Bump to next column
 	lda	CH
-	cmp	MAX_X
+	cmp	WNDWDTH
 	bne	return
 	lda	#$00
 	sta	CH
@@ -44,20 +53,9 @@ return:
 	rts
 
 putchar:	
-	ora	#$80		; Turn on high bit
-	and	TEXTTYP		; Apply normal, inverse, flash
+	and	INVFLG		; Apply normal, inverse, flash
 	ldy	CH
-	ldx	RD80COL		; In 80 column mode?
-	bpl	col40		; No, in 40 cols
-	pha
-	tya
-	lsr			; Div by 2
-	tay
-	pla
-	bcs	col40		; odd cols go in 40 col memory
-	sta	PG2ON
-col40:	sta	(BASL),Y
-	sta	PG2OFF
+	sta	(BASL),Y
 	rts
 
 newline:
@@ -65,7 +63,7 @@ newline:
 	pha
 	inc	CV
 	lda	CV
-	cmp	MAX_Y
+	cmp	WNDBTM
 	bne	L2
 	lda	#$00
 	sta	CV
@@ -81,5 +79,3 @@ _gotoxy:
 	jsr	popa		; Get X
 	sta	CH		; Store X
 	rts
-
-

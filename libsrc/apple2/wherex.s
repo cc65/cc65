@@ -10,7 +10,7 @@
 .proc   _wherex
 
 	lda    	CH
-        ldx     #0
+        ldx     #$00
 	rts
 
 .endproc

@@ -101,7 +101,7 @@ READJOY:
 
 ; Read joystick
 
-        lda     OPEN_APPLE,x    ; Check fire button
+        lda     BUTN0,x		; Check fire button
         and     #$80            ; BTN 0 0 0 0 0 0 0
 
         pha
@@ -122,7 +122,7 @@ READJOY:
         ror     a               ; DOWN /UP RIGHT /LEFT BTN 0 0 0
         eor     #%01010000      ; DOWN UP RIGHT LEFT BTN 0 0 0
 
-        ldx     #0              ; fix X
+        ldx     #$00		; fix X
         rts
 
 

@@ -37,6 +37,7 @@ OBJS=	_scrsize.o	\
      	crt0.o		\
      	ctype.o		\
      	cvline.o	\
+	dosdetect.o	\
         get_ostype.o    \
         getenv.o        \
         joy_stddrv.o    \

@@ -10,7 +10,7 @@
 .proc   _wherey
 
 	lda	CV
-        ldx     #0
+        ldx     #$00
 	rts
 
 .endproc

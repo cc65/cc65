@@ -27,7 +27,7 @@
 L1:	lda	ptr2
 	ora	ptr2+1		; count zero?
 	beq	L9
-	ldy	#0
+	ldy	#$00
 	lda	(ptr1),y
 	cmp	#$0A		; Check for \n = Crtl-j
 	bne	rawout

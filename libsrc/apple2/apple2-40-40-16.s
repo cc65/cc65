@@ -118,8 +118,8 @@ AY:		.res	1
 
 .rodata
 
-DEFPALETTE:	.byte	$0, $f, $1, $e, $3, $4, $2, $d
-		.byte	$9, $8, $b, $5, $a, $c, $6, $7
+DEFPALETTE:	.byte	$00, $0F, $01, $0E, $03, $04, $02, $0D
+		.byte	$09, $08, $0B, $05, $0A, $0C, $06, $07
 
 .code
 
@@ -322,7 +322,7 @@ GETPIXEL:
 	lda	X1
 	ldy	Y1
 	jsr	SCRN
-	ldx	#0
+	ldx	#$00
 	rts
 
 ; ------------------------------------------------------------------------
@@ -363,11 +363,11 @@ LINE:
 	bcc	@L0243
 	beq	@L0243
 	; dx = 1;
-	lda	#1
+	lda	#$01
 	bne	@L0244
 	; else
 	; dx = -1;
-@L0243:	lda	#$ff
+@L0243:	lda	#$FF
 @L0244:	sta	DX
 	; if (y2>y1)
 	ldx	#Y2
@@ -377,14 +377,14 @@ LINE:
 	bcc	@L024A
 	beq	@L024A
 	; dy = 1;
-	lda	#1
+	lda	#$01
 	bne	@L024B
 	; else
 	; dy = -1;
-@L024A:	lda	#$ff
+@L024A:	lda	#$FF
 @L024B:	sta	DY
 	; err = ay = 0;
-	lda	#0
+	lda	#$00
 	sta	ERR
 	sta	ERR+1
 	sta	AY
@@ -408,7 +408,7 @@ LINE:
 	lda	DX
 	sta	AY
 	; dx = dy = 0;
-	lda	#0
+	lda	#$00
 	sta	DX
 	sta	DY
 	; ny = - ny;
@@ -444,7 +444,7 @@ LINE:
 	adc	NX+1
 	sta	UB+1
 	;    x1 = x1 + dx
-	ldx	#0
+	ldx	#$00
 	lda	DX
 	bpl	@L027B
 	dex
@@ -454,7 +454,7 @@ LINE:
 	adc	X1+1
 	sta	X1+1
 	;   y1 = y1 + ay
-	ldx	#0
+	ldx	#$00
 	lda	AY
 	bpl	@L027E
 	dex
@@ -481,7 +481,7 @@ LINE:
 	jmp	@L0312
 	; } else { x1 = x1 + ay
 @L027F:
-	ldx	#0
+	ldx	#$00
 	lda	AY
 	bpl	@L0288
 	dex
@@ -491,7 +491,7 @@ LINE:
 	adc	X1+1
 	sta	X1+1
 	;	y1 = y1 + dy
-	ldx	#0
+	ldx	#$00
 	lda	DY
 	bpl	@L028B
 	dex
@@ -509,7 +509,7 @@ LINE:
 	; } (--count)
 	sec
 	lda	COUNT
-	sbc	#1
+	sbc	#$01
 	sta	COUNT
 	bcc	@L0260
 	jmp	@L0166
@@ -559,7 +559,7 @@ CIRCLE:
 
 @L1:	sta	XX
 	; x = r;
-	lda	#0
+	lda	#$00
 	sta	XX+1
 	sta	YY
 	sta	YY+1
@@ -680,7 +680,7 @@ CIRCLE:
 	adc	YY+1
 	tax
 	tya
-	add	#1
+	add	#$01
 	bcc	@L0143
 	inx
 @L0143: sta	OGora
@@ -698,7 +698,7 @@ CIRCLE:
 	sbc	XX+1
 	tax
 	tya
-	add	#1
+	add	#$01
 	bcc	@L0146
 	inx
 @L0146: sta	OUkos
@@ -721,7 +721,7 @@ CIRCLE:
 	bpl	@L0149
 	; { --x;
 	lda	XX
-	sub	#1
+	sub	#$01
 	sta	XX
 	bcs	@L014E
 	dec	XX+1
@@ -761,7 +761,7 @@ OUTTEXT:
 	sta	CH
 	lda	ptr2
 	jsr	VTABZ
-	ldy	#0
+	ldy	#$00
 @L1:	lda	(ptr3),y
 	ora	#$80
 	jsr	COUT
@@ -775,16 +775,16 @@ OUTTEXT:
 
 abs:
 	; a/y := abs(a/y)
-	cpy	#0
+	cpy	#$00
 	bpl	absend
 	; negay
 neg:	clc
-	eor	#$ff
-	adc	#1
+	eor	#$FF
+	adc	#$01
 	pha
 	tya
-	eor	#$ff
-	adc	#0
+	eor	#$FF
+	adc	#$00
 	tay
 	pla
 absend:	rts
@@ -793,9 +793,9 @@ icmp:
 	; compare a/y to zp,x
 	sta	TEMP		; TEMP/TEMP2 - arg2
 	sty	TEMP2
-	lda	$0,x
+	lda	$00,x
 	pha
-	lda	$1,x
+	lda	$01,x
 	tay
 	pla
 	tax
@@ -805,10 +805,10 @@ icmp:
 	bne	@L4
 	cpx	TEMP
 	beq	@L3
-	adc	#$ff
+	adc	#$FF
 	ora	#$01
 @L3:	rts
 @L4:	bvc	@L3
-	eor	#$ff
+	eor	#$FF
 	ora	#$01
 	rts

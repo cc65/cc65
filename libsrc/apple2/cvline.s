@@ -5,7 +5,7 @@
 ; void cvline (unsigned char length);
 ;
 
-    	.export		_cvlinexy, _cvline
+	.export 	_cvlinexy, _cvline, cvlinedirect
 	.import		popa, _gotoxy, putchar, newline
 	.importzp	tmp1
 
@@ -16,15 +16,15 @@ _cvlinexy:
    	pla			; Restore the length and run into _cvline
 
 _cvline:
-   	cmp	#0		; Is the length zero?
+	ldx	#'!' | $80	; Vertical line, screen code
+
+cvlinedirect:
+	cmp	#$00		; Is the length zero?
    	beq	L9  		; Jump if done
     	sta	tmp1
-L1:	lda	#$7C 		; Vertical bar
+L1:	txa			; Screen code
    	jsr	putchar		; Write, no cursor advance
    	jsr	newline		; Advance cursor to next line
 	dec	tmp1
 	bne	L1
 L9:	rts
-
-
-

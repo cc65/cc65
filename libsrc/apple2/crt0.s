@@ -6,7 +6,7 @@
 
 	.export		_exit
 	.import	   	initlib, donelib
-	.import	   	zerobss, push0
+	.import	   	zerobss
        	.import	       	__STARTUP_LOAD__, __BSS_LOAD__	; Linker generated
 	.import		callmain
 
@@ -26,9 +26,18 @@
 
 .segment       	"STARTUP"
 
+; ProDOS TechRefMan, chapter 5.2.1:
+; "For maximum interrupt efficiency, a system program should not use more
+;  than the upper 3/4 of the stack."
+
+	ldx	#$FF
+	txs	       		; Init stack pointer
+
+; Save the zero page locations we need
+
        	ldx	#zpspace-1
 L1:	lda	sp,x
-   	sta	zpsave,x    	; Save the zero page locations we need
+   	sta	zpsave,x
 	dex
        	bpl	L1
 
@@ -38,26 +47,14 @@ L1:	lda	sp,x
 
 ; Save system stuff and setup the stack
 
-       	tsx
-       	stx    	spsave 	    	; Save the system stack ptr
-
-	lda    	MEMSIZE
+	lda    	HIMEM
 	sta	sp
-	lda	MEMSIZE+1
+	lda	HIMEM+1
        	sta	sp+1   	    	; Set argument stack ptr
 
 ; Call module constructors
 
 	jsr	initlib
-
-; Initialize conio stuff
-
-	lda	#$ff
-	sta	TEXTTYP
-
-; Set up to use Apple ROM $C000-$CFFF
-
-	;; 	sta    	USEROM
 
 ; Push arguments and call main()
 
@@ -67,14 +64,6 @@ L1:	lda	sp,x
 
 _exit:	jsr	donelib
 
-; Restore system stuff
-
-	lda	#$ff  	    	; Reset text mode
-	sta	TEXTTYP
-
-	ldx	spsave
-	txs	       		; Restore stack pointer
-
 ; Copy back the zero page stuff
 
 	ldx	#zpspace-1
@@ -83,9 +72,16 @@ L2:	lda	zpsave,x
 	dex
        	bpl	L2
 
-; Reset changed vectors, back to basic
+; ProDOS TechRefMan, chapter 5.2.1:
+; "System programs should set the stack pointer to $FF at the warm-start
+;  entry point."
 
-	jmp	RESTOR
+	ldx	#$FF
+	txs			; Re-init stack pointer
+
+; Back to DOS
+
+	jmp	DOSWARM
 
 ; ------------------------------------------------------------------------
 ; Data
@@ -93,7 +89,3 @@ L2:	lda	zpsave,x
 .data
 
 zpsave:	.res	zpspace
-
-.bss
-
-spsave:	.res	1

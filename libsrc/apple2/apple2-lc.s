@@ -21,7 +21,7 @@
 
 ; Driver signature
 
-	.byte	$65, $6d, $64		; "emd"
+	.byte	$65, $6D, $64		; "emd"
        	.byte  	EMD_API_VERSION         ; EM API version number
 
 ; Jump table.
@@ -67,7 +67,7 @@ INSTALL:
         lda     #$FF
         sta     curpage                 ; Invalidate the current page
 	lda	#EM_ERR_OK
-	ldx	#0
+	ldx	#$00
 ;  	rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
@@ -143,7 +143,7 @@ COMMIT: lda	curpage			; Get the current page
 ; Transfer one page. Y must be zero on entry
 
 transfer:
-	ldx	#0
+	ldx	#$00
 	lda	ptr2+1
 	cmp	#>BASE
 	bcc	@L1

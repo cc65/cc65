@@ -10,8 +10,8 @@
 
 .proc   screensize
 
-        ldx     MAX_X
-        ldy     MAX_Y
+	ldx	WNDWDTH
+	ldy	WNDBTM
         rts
 
 .endproc

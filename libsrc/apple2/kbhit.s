@@ -11,8 +11,8 @@
 	.include "apple2.inc"
 
 _kbhit:
-	bit	KEY_STROBE	; Reading strobe checks for keypress
-	bmi	L1		; if KEY_STROBE > 127 key was pressed
+	bit	KBD		; Reading keyboard checks for keypress
+	bmi	L1		; if KBD > 127 key was pressed
 	jmp	return0
 L1:
 	jmp	return1

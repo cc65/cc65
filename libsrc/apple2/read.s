@@ -19,7 +19,7 @@ _read:	jsr	popax 		; get count
      	sta	ptr1
      	stx	ptr1+1
      	jsr	popax 		; get fd and discard it
-   	lda	#0
+   	lda	#$00
    	sta	ptr3
    	sta	ptr3+1		; set count
 
@@ -27,11 +27,11 @@ L1:    	lda	ptr2
    	ora	ptr2+1		; count zero?
    	beq	L9
    	jsr	RDKEY
-	and	#$7f		; clear high bit.
+	and	#$7F		; clear high bit.
 	pha
 	jsr	_cputc
 	pla
-	ldy	#0		; offset into string
+	ldy	#$00		; offset into string
    	sta	(ptr1),y	; save char
    	inc	ptr1
    	bne	L2

@@ -35,7 +35,7 @@ FNAM_LEN = $280
 FNAM = $281
 MAXARGS	 = BASIC_BUF_LEN - 2	; (don't count REM and terminating '\0')
 
-REM	 = $b2			; BASIC token-code
+REM	 = $B2			; BASIC token-code
 NAME_LEN = 15			; maximum length of command-name
 
 ; Get possible command-line arguments.
@@ -63,13 +63,13 @@ L1:	dey
 
 ; Find the "rem" token.
 ;
-	ldx	#0
+	ldx	#$00
 L2:	lda	BASIC_BUF,x
 	beq	done		; no "rem," no args.
 	inx
 	cmp	#REM
 	bne	L2
-	ldy	#1 * 2
+	ldy	#$01 * 2
 
 ; Find the next argument.
 ;

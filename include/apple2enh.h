@@ -1,13 +1,12 @@
 /*****************************************************************************/
 /*									     */
-/*				   apple2.h				     */
+/*				  apple2enh.h				     */
 /*									     */
-/*		     Apple ][ system specific definitions		     */
+/*		 enhanced Apple //e system specific definitions		     */
 /*									     */
 /*									     */
 /*									     */
-/* (C) 2000  Kevin Ruland, <kevin@rodin.wustl.edu>			     */
-/* (C) 2003  Ullrich von Bassewitz, <uz@cc65.org>			     */
+/* (C) 2004  Oliver Schmidt, <ol.sc@web.de>                                  */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -31,21 +30,14 @@
 
 
 
-#ifndef _APPLE2_H
-#define _APPLE2_H
+#ifndef _APPLE2ENH_H
+#define _APPLE2ENH_H
 
 
 
 /* Check for errors */
-#if !defined(__APPLE2__)
-#  error This module may only be used when compiling for the Apple ][!
-#endif
-
-
-
-/* Load the system specific files here, if needed */
-#if defined(__APPLE2ENH__) && !defined(_APPLEENH_H)
-#  include <apple2enh.h>
+#if !defined(__APPLE2ENH__)
+#  error This module may only be used when compiling for the enhanced Apple //e!
 #endif
 
 
@@ -56,37 +48,26 @@
 
 
 
-/* Color Defines
- * Since Apple2 does not support color text these defines are only
- * used to get the library to compile correctly.  They should not be used
- * in user code
- */
-#define COLOR_BLACK	0x00
-#define COLOR_WHITE	0x01
-
 /* Characters codes */
-#define CH_ESC		0x1B
-#define CH_CURS_LEFT	0x08
-#define CH_CURS_RIGHT	0x15
+#define CH_DEL		0x7F
+#define CH_CURS_UP	0x0B
+#define CH_CURS_DOWN	0x0A
 
-#define CH_ULCORNER	'+'
-#define CH_URCORNER	'+'
-#define CH_LLCORNER	'+'
-#define CH_LRCORNER	'+'
-#define CH_TTEE 	'+'
-#define CH_BTEE 	'+'
-#define CH_LTEE 	'+'
-#define CH_RTEE 	'+'
-#define CH_CROSS	'+'
+/* These are defined to be OpenApple + NumberKey */
+#define CH_F1		0xB1
+#define CH_F2		0xB2
+#define CH_F3		0xB3
+#define CH_F4		0xB4
+#define CH_F5		0xB5
+#define CH_F6		0xB6
+#define CH_F7		0xB7
+#define CH_F8		0xB8
+#define CH_F9		0xB9
+#define CH_F10		0xB0
 
-/* Return codes for get_ostype */
-#define APPLE_IIPLAIN  0x01		/* Plain Apple ][ */
-#define APPLE_IIPLUS   0x02		/* Apple ][+ */
-#define APPLE_IIIEM    0x03		/* Apple /// in emulation mode */
-#define APPLE_IIE      0x04		/* Apple //e */
-#define APPLE_IIEENH   0x05		/* Enhanced Apple //e */
-#define APPLE_IIECARD  0x06		/* Apple //e Option Card */
-#define APPLE_IIC      0x07		/* Apple //c */
+/* Styles for _textframe */
+#define _TEXTFRAME_WIDE	0x00
+#define _TEXTFRAME_TALL	0x04
 
 
 
@@ -96,10 +77,18 @@
 
 
 
-unsigned char get_ostype (void);
-/* Get the machine type. Returns one of the APPLE_xxx codes. */
+void __fastcall__ _textframe (unsigned char width, unsigned char height,
+			      unsigned char style);
+/* Output a frame on the text screen with the given width and height
+ * starting at the current cursor position and using the given style
+ */
+
+void __fastcall__ _textframexy (unsigned char x, unsigned char y,
+				unsigned char width, unsigned char height,
+				unsigned char style);
+/* Same as "gotoxy (x, y); _textframe (width, height, style);" */
 
 
 
-/* End of apple2.h */
+/* End of apple2enh.h */
 #endif

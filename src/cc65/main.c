@@ -117,6 +117,7 @@ static void Usage (void)
 	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
        	     "  --signed-chars\tDefault characters are signed\n"
+       	     "  --static-locals\tMake local variables static\n"
        	     "  --target sys\t\tSet the target system\n"
        	     "  --verbose\t\tIncrease verbosity\n"
        	     "  --version\t\tPrint the compiler version number\n",
@@ -330,6 +331,14 @@ static void OptSignedChars (const char* Opt, const char* Arg)
 
 
 
+static void OptStaticLocals (const char* Opt, const char* Arg)
+/* Place local variables in static storage */
+{
+    StaticLocals = 1;
+}
+
+
+
 static void OptTarget (const char* Opt, const char* Arg)
 /* Set the target system */
 {
@@ -363,13 +372,14 @@ int main (int argc, char* argv[])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-	{ "--add-source",	0,	OptAddSource		},
+	{ "--add-source",	0,    	OptAddSource		},
 	{ "--ansi",   	 	0,	OptAnsi			},
         { "--cpu",     	       	1,	OptCPU 			},
 	{ "--debug-info",      	0,	OptDebugInfo		},
 	{ "--help",	 	0,	OptHelp			},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
 	{ "--signed-chars",	0,	OptSignedChars		},
+       	{ "--static-locals",   	0,	OptStaticLocals		},
 	{ "--target",	 	1,  	OptTarget		},
 	{ "--verbose",	       	0,	OptVerbose		},
 	{ "--version",	       	0,	OptVersion		},
@@ -440,8 +450,11 @@ int main (int argc, char* argv[])
 		    while (*P) {
 		    	switch (*P++) {
 		    	    case 'l':
-		    	     	LocalsAreStatic = 1;
+		    	     	OptStaticLocals (Arg, 0);
 		    	     	break;
+			    default:
+				UnknownOption (Arg);
+				break;
 		    	}
 		    }
 		    break;

@@ -180,7 +180,7 @@ void DoPragma (void)
 	    break;
 
 	case PR_STATICLOCALS:
-	    FlagPragma (&LocalsAreStatic);
+	    FlagPragma (&StaticLocals);
 	    break;
 
 	case PR_ZPSYM:

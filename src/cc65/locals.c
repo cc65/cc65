@@ -245,7 +245,7 @@ void DeclareLocals (void)
       	      	if (SymbolSC & (SC_AUTO | SC_REGISTER)) {
 
     	     	    /* Auto variable */
-	    	    if (LocalsAreStatic == 0) {
+	    	    if (StaticLocals == 0) {
 
 			/* Change SC in case it was register */
        	       	       	SymbolSC = (SymbolSC & ~SC_REGISTER) | SC_AUTO;

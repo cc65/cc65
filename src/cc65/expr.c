@@ -2030,7 +2030,8 @@ static void parseadd (int k, ExprDesc* lval)
     if (k == 0 && (lval->Flags & E_MCONST) != 0) {
 
     	/* The left hand side is a constant. Good. Get rhs */
-       	if (evalexpr (CF_NONE, hie9, &lval2) == 0) {
+	k = hie9 (&lval2);
+       	if (k == 0 && lval2.Flags == E_MCONST) {
 
        	    /* Right hand side is also constant. Get the rhs type */
     	    rhst = lval2.Type;
@@ -2059,31 +2060,85 @@ static void parseadd (int k, ExprDesc* lval)
 
     	} else {
 
-    	    /* lhs is constant, rhs is not. Get the rhs type. */
+	    /* lhs is a constant and rhs is not constant. Load rhs into
+	     * the primary.
+	     */
+	    exprhs (CF_NONE, k, &lval2);
+
+       	    /* Beware: The check above (for lhs) lets not only pass numeric
+	     * constants, but also constant addresses (labels), maybe even
+	     * with an offset. We have to check for that here.
+	     */
+
+    	    /* First, get the rhs type. */
     	    rhst = lval2.Type;
+
+	    /* Setup flags */
+	    if (lval->Flags == E_MCONST) {
+	    	/* A numerical constant */
+	    	flags |= CF_CONST;
+	    } else {
+	    	/* Constant address label */
+	    	flags |= GlobalModeFlags (lval->Flags) | CF_CONSTADDR;
+	    }
 
     	    /* Check for pointer arithmetic */
     	    if (IsClassPtr (lhst) && IsClassInt (rhst)) {
     	    	/* Left is pointer, right is int, must scale rhs */
     	    	g_scale (CF_INT, PSizeOf (lhst));
     	    	/* Operate on pointers, result type is a pointer */
-      	    	flags = CF_PTR;
+      	    	flags |= CF_PTR;
+		/* Generate the code for the add */
+		if (lval->Flags == E_MCONST) {
+		    /* Numeric constant */
+		    g_inc (flags, lval->ConstVal);
+		} else {
+		    /* Constant address */
+		    g_addaddr_static (flags, lval->Name, lval->ConstVal);
+		}
     	    } else if (IsClassInt (lhst) && IsClassPtr (rhst)) {
-    	      	/* Left is int, right is pointer, must scale lhs */
-       	       	lval->ConstVal *= PSizeOf (rhst);
-    	      	/* Operate on pointers, result type is a pointer */
-    	      	flags = CF_PTR;
-    	      	lval->Type = lval2.Type;
+
+    	      	/* Left is int, right is pointer, must scale lhs. */
+		unsigned ScaleFactor = PSizeOf (rhst);
+
+       	       	/* Operate on pointers, result type is a pointer */
+		flags |= CF_PTR;
+		lval->Type = lval2.Type;
+
+		/* Since we do already have rhs in the primary, if lhs is
+		 * not a numeric constant, and the scale factor is not one
+		 * (no scaling), we must take the long way over the stack.
+		 */
+		if (lval->Flags == E_MCONST) {
+		    /* Numeric constant, scale lhs */
+		    lval->ConstVal *= ScaleFactor;
+		    /* Generate the code for the add */
+		    g_inc (flags, lval->ConstVal);
+		} else if (ScaleFactor == 1) {
+		    /* Constant address but no need to scale */
+		    g_addaddr_static (flags, lval->Name, lval->ConstVal);
+		} else {
+		    /* Constant address that must be scaled */
+       	       	    g_push (TypeOf (lval2.Type), 0);   	/* rhs --> stack */
+		    g_getimmed (flags, lval->Name, lval->ConstVal);
+		    g_scale (CF_PTR, ScaleFactor);
+		    g_add (CF_PTR, 0);
+		}
        	    } else if (IsClassInt (lhst) && IsClassInt (rhst)) {
     	      	/* Integer addition */
-       	       	flags = typeadjust (lval, &lval2, 1);
+       	       	flags |= typeadjust (lval, &lval2, 1);
+		/* Generate the code for the add */
+		if (lval->Flags == E_MCONST) {
+		    /* Numeric constant */
+		    g_inc (flags, lval->ConstVal);
+		} else {
+		    /* Constant address */
+		    g_addaddr_static (flags, lval->Name, lval->ConstVal);
+		}
     	    } else {
        	       	/* OOPS */
     	    	Error ("Invalid operands for binary operator `+'");
        	    }
-
-    	    /* Generate code for the add */
-    	    g_inc (flags | CF_CONST, lval->ConstVal);
 
     	    /* Result is in primary register */
     	    lval->Flags = E_MEXPR;

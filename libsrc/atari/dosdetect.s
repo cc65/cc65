@@ -14,8 +14,10 @@ detect:	lda	#ATARIDOS
 	sta	__dos_type	; set default
 
 	lda	DOS
-	cmp	#$53		; "S" (SpartaDOS)
+	cmp	#'S'		; SpartaDOS
 	beq	spdos
+	cmp	#'M'		; MyDOS
+	beq	mydos
 
 	ldy	#COMTAB
 	lda	#$4C
@@ -36,6 +38,10 @@ detect:	lda	#ATARIDOS
 spdos:	lda	#SPARTADOS
 	sta	__dos_type
 done:	rts
+
+mydos:	lda	#MYDOS
+	sta	__dos_type
+	rts
 
 	.bss
 

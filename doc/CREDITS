@@ -23,7 +23,7 @@ More special thanks to:
     C library while doing so.
 
   * Christian Groessler <cpg@aladdin.de>
-    Mark Keates <markk@dendrite.co.uk>
+    Mark Keates <Mark.Keates@dendrite.com>
     Freddy Offenga <taf_offenga@yahoo.com>
     David Lloyd <dmlloyd@atari-central.com>
 
@@ -92,7 +92,7 @@ More special thanks to:
 
   * Piotr Fusik <P.Fusik@elka.pw.edu.pl>
 
-    for the zlib routines, lots of bug reports, code snippets and 
+    for the zlib routines, lots of bug reports, code snippets and
     suggestions.
 
   * Josef Soucek <josef.soucek@ct.cz>

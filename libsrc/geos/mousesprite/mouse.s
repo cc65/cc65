@@ -37,11 +37,19 @@ _mouse_init:
 	sta	mouseLeft+1
 	lda	#199
 	sta	mouseBottom
-	lda	#<319
-	sta	mouseRight
-	lda	#>319
-	sta	mouseRight+1
+	lda	graphMode
+	bpl	_mse_screen320
 
+	lda	#<639			; 80 columns on C128
+	ldx	#>639
+	bne 	_mse_storex
+_mse_screen320:
+	lda	#<319			; 40 columns on C64/C128
+	ldx	#>319
+_mse_storex:
+	sta	mouseRight
+	stx	mouseRight+1
+_mse_initend:
 	lda 	#0
 ; --------------------------------------------------------------------------
 ;

@@ -67,24 +67,90 @@ machines, you have to install at least one of the library packages.
 
 
 ###############################################################################
-#		     	       VIC20 subpackage	  			      #
+#		     	      Apple ][ subpackage     			      #
 ###############################################################################
 
-%package vic20
+%package apple2
 Requires: %{name} = %{version}
 Copyright: Freeware
-Summary: VIC20 specific libraries and headers for the cc65 compiler.
+Summary: Apple ][ specific libraries and headers for the cc65 compiler.
 Group: Development/Languages
 
-%description vic20
+%description apple2
 This package contains the header files and libraries needed to write
-programs for the Commodore VIC20 using the cc65 crosscompiler.
+programs for the Apple ][ using the cc65 crosscompiler.
 
-%files vic20
-%attr(644,root,root) 		/usr/lib/cc65/lib/vic20.lib
-%attr(644,root,root) 		/usr/lib/cc65/lib/vic20.o
-%attr(644,root,root) 		/usr/lib/cc65/joy/vic20-*.joy
-%doc src/ld65/cfg/vic20.cfg
+%files apple2
+%attr(644,root,root)		/usr/lib/cc65/lib/apple2.lib
+%attr(644,root,root)		/usr/lib/cc65/lib/apple2.o
+%attr(644,root,root) 		/usr/lib/cc65/joy/apple2-*.joy
+%doc src/ld65/cfg/apple2.cfg
+
+
+
+###############################################################################
+#	   	      	       Atari subpackage	 	    		      #
+###############################################################################
+
+%package atari
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: Atari specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description atari
+This package contains the header files and libraries needed to write
+programs for the 8 bit Atari machines using the cc65 crosscompiler.
+
+%files atari
+%attr(644,root,root)  		/usr/lib/cc65/lib/atari.lib
+%attr(644,root,root)  		/usr/lib/cc65/lib/atari.o
+%doc src/ld65/cfg/atari.cfg
+
+
+
+###############################################################################
+#                            Oric Atmos subpackage                            #
+###############################################################################
+
+%package atmos
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: Oric Atmos specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description atmos
+This package contains the header files and libraries needed to write
+programs for the Oric Atmos using the cc65 crosscompiler.
+
+%files atmos
+%attr(644,root,root)		/usr/lib/cc65/lib/atmos.lib
+%attr(644,root,root)		/usr/lib/cc65/lib/atmos.o
+%doc src/ld65/cfg/atmos.cfg
+
+
+
+###############################################################################
+#		     		C128 subpackage	 			      #
+###############################################################################
+
+%package c128
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: C128 specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description c128
+This package contains the header files and libraries needed to write
+programs for the Commodore C128 using the cc65 crosscompiler.
+
+%files c128
+%attr(644,root,root) 		/usr/lib/cc65/lib/c128.lib
+%attr(644,root,root) 		/usr/lib/cc65/lib/c128.o
+%attr(644,root,root) 		/usr/lib/cc65/emd/c128-*.emd
+%attr(644,root,root) 		/usr/lib/cc65/joy/c128-*.joy
+%attr(644,root,root) 		/usr/lib/cc65/tgi/c128-*.tgi
+%doc src/ld65/cfg/c128.cfg
 
 
 
@@ -135,96 +201,6 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 
 
 ###############################################################################
-#		     		C128 subpackage	 			      #
-###############################################################################
-
-%package c128
-Requires: %{name} = %{version}
-Copyright: Freeware
-Summary: C128 specific libraries and headers for the cc65 compiler.
-Group: Development/Languages
-
-%description c128
-This package contains the header files and libraries needed to write
-programs for the Commodore C128 using the cc65 crosscompiler.
-
-%files c128
-%attr(644,root,root) 		/usr/lib/cc65/lib/c128.lib
-%attr(644,root,root) 		/usr/lib/cc65/lib/c128.o
-%attr(644,root,root) 		/usr/lib/cc65/emd/c128-*.emd
-%attr(644,root,root) 		/usr/lib/cc65/joy/c128-*.joy
-%attr(644,root,root) 		/usr/lib/cc65/tgi/c128-*.tgi
-%doc src/ld65/cfg/c128.cfg
-
-
-
-###############################################################################
-#	   	      	       Atari subpackage	 	    		      #
-###############################################################################
-
-%package atari
-Requires: %{name} = %{version}
-Copyright: Freeware
-Summary: Atari specific libraries and headers for the cc65 compiler.
-Group: Development/Languages
-
-%description atari
-This package contains the header files and libraries needed to write
-programs for the 8 bit Atari machines using the cc65 crosscompiler.
-
-%files atari
-%attr(644,root,root)  		/usr/lib/cc65/lib/atari.lib
-%attr(644,root,root)  		/usr/lib/cc65/lib/atari.o
-%doc src/ld65/cfg/atari.cfg
-
-
-
-###############################################################################
-#		       	       Plus/4 subpackage 	    		      #
-###############################################################################
-
-%package plus4
-Requires: %{name} = %{version}
-Copyright: Freeware
-Summary: Plus/4 specific libraries and headers for the cc65 compiler.
-Group: Development/Languages
-
-%description plus4
-This package contains the header files and libraries needed to write
-programs for the Commodore Plus/4 and C16/116 using the cc65
-crosscompiler.
-
-%files plus4
-%attr(644,root,root)   		/usr/lib/cc65/lib/plus4.lib
-%attr(644,root,root)   		/usr/lib/cc65/lib/plus4.o
-%attr(644,root,root) 		/usr/lib/cc65/joy/plus4-*.joy
-%doc src/ld65/cfg/plus4.cfg
-
-
-
-###############################################################################
-#		       		PET subpackage	       		       	      #
-###############################################################################
-
-%package pet
-Requires: %{name} = %{version}
-Copyright: Freeware
-Summary: PET specific libraries and headers for the cc65 compiler.
-Group: Development/Languages
-
-%description pet
-This package contains the header files and libraries needed to write
-programs for the Commodore PET family of computers using the cc65
-crosscompiler.
-
-%files pet
-%attr(644,root,root)		/usr/lib/cc65/lib/pet.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/pet.o
-%doc src/ld65/cfg/pet.cfg
-
-
-
-###############################################################################
 #		       	       CBM510 subpackage       			      #
 ###############################################################################
 
@@ -269,49 +245,6 @@ the cc65 crosscompiler.
 
 
 ###############################################################################
-#		     	      Apple ][ subpackage     			      #
-###############################################################################
-
-%package apple2
-Requires: %{name} = %{version}
-Copyright: Freeware
-Summary: Apple ][ specific libraries and headers for the cc65 compiler.
-Group: Development/Languages
-
-%description apple2
-This package contains the header files and libraries needed to write
-programs for the Apple ][ using the cc65 crosscompiler.
-
-%files apple2
-%attr(644,root,root)		/usr/lib/cc65/lib/apple2.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/apple2.o
-%attr(644,root,root) 		/usr/lib/cc65/joy/apple2-*.joy
-%doc src/ld65/cfg/apple2.cfg
-
-
-
-###############################################################################
-#                            Oric Atmos subpackage                            #
-###############################################################################
-
-%package atmos
-Requires: %{name} = %{version}
-Copyright: Freeware
-Summary: Oric Atmos specific libraries and headers for the cc65 compiler.
-Group: Development/Languages
-
-%description atmos
-This package contains the header files and libraries needed to write
-programs for the Oric Atmos using the cc65 crosscompiler.
-
-%files atmos
-%attr(644,root,root)		/usr/lib/cc65/lib/atmos.lib
-%attr(644,root,root)		/usr/lib/cc65/lib/atmos.o
-%doc src/ld65/cfg/atmos.cfg
-
-
-
-###############################################################################
 #		 		GEOS subpackage	 			      #
 ###############################################################################
 
@@ -332,6 +265,95 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 %attr(755,root,root) %dir	/usr/lib/cc65/include/geos
 %attr(644,root,root)   		/usr/lib/cc65/include/geos/*.h
 %doc src/ld65/cfg/geos.cfg
+
+
+
+###############################################################################
+#		       		NES subpackage	       		       	      #
+###############################################################################
+
+%package nes
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: NES specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description nes
+This package contains the header files and libraries needed to write
+programs for the Nintendo Entertainment System using the cc65
+crosscompiler.
+
+%files nes
+%attr(644,root,root)		/usr/lib/cc65/lib/nes.lib
+%attr(644,root,root)		/usr/lib/cc65/lib/nes.o
+%doc src/ld65/cfg/nes.cfg
+
+
+
+###############################################################################
+#		       		PET subpackage	       		       	      #
+###############################################################################
+
+%package pet
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: PET specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description pet
+This package contains the header files and libraries needed to write
+programs for the Commodore PET family of computers using the cc65
+crosscompiler.
+
+%files pet
+%attr(644,root,root)		/usr/lib/cc65/lib/pet.lib
+%attr(644,root,root)		/usr/lib/cc65/lib/pet.o
+%doc src/ld65/cfg/pet.cfg
+
+
+
+###############################################################################
+#		       	       Plus/4 subpackage 	    		      #
+###############################################################################
+
+%package plus4
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: Plus/4 specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description plus4
+This package contains the header files and libraries needed to write
+programs for the Commodore Plus/4 and C16/116 using the cc65
+crosscompiler.
+
+%files plus4
+%attr(644,root,root)   		/usr/lib/cc65/lib/plus4.lib
+%attr(644,root,root)   		/usr/lib/cc65/lib/plus4.o
+%attr(644,root,root) 		/usr/lib/cc65/joy/plus4-*.joy
+%doc src/ld65/cfg/plus4.cfg
+
+
+
+###############################################################################
+#		     	       VIC20 subpackage	  			      #
+###############################################################################
+
+%package vic20
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: VIC20 specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description vic20
+This package contains the header files and libraries needed to write
+programs for the Commodore VIC20 using the cc65 crosscompiler.
+
+%files vic20
+%attr(644,root,root) 		/usr/lib/cc65/lib/vic20.lib
+%attr(644,root,root) 		/usr/lib/cc65/lib/vic20.o
+%attr(644,root,root) 		/usr/lib/cc65/joy/vic20-*.joy
+%doc src/ld65/cfg/vic20.cfg
 
 
 
@@ -390,7 +412,8 @@ install -m 644 libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi
 
 %changelog
 * Fri May 02 2003 Ullrich von Bassewitz <uz@cc65.org>
-The Apple ][ has a joystick driver.
+- The Apple ][ has a joystick driver.
+- Added the NES subpackage.
 
 * Mon Apr 14 2003 Ullrich von Bassewitz <uz@cc65.org>
 Added a subpackage for the Oric Atmos.

@@ -751,7 +751,7 @@ static ExprNode* FuncXMatch (void)
 
 static ExprNode* Function (ExprNode* (*F) (void))
 /* Handle builtin functions */
-{            
+{
     ExprNode* E;
 
     /* Skip the keyword */
@@ -809,6 +809,11 @@ static ExprNode* Factor (void)
 	    N = ULabRef (IVal);
 	    NextTok ();
 	    break;
+
+        case TOK_PLUS:
+            NextTok ();
+            N = Factor ();
+            break;
 
 	case TOK_MINUS:
 	    NextTok ();

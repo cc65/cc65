@@ -62,6 +62,27 @@
 
 
 
+static void CS_PrintFunctionHeader (const CodeSeg* S, FILE* F)
+/* Print a comment with the function signature to the given file */
+{
+    /* Get the associated function */
+    const SymEntry* Func = S->Func;
+
+    /* If this is a global code segment, do nothing */
+    if (Func) {
+        fprintf (F,
+                 "; ---------------------------------------------------------------\n"
+                 "; ");
+        PrintFuncSig (F, Func->Name, Func->Type);
+        fprintf (F,
+                 "\n"
+                 "; ---------------------------------------------------------------\n"
+                 "\n");
+    }
+}
+
+
+
 static void CS_MoveLabelsToEntry (CodeSeg* S, CodeEntry* E)
 /* Move all labels from the label pool to the given entry and remove them
  * from the pool.
@@ -748,7 +769,7 @@ int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count)
 	    return 1;
 	}
     }
-    
+
     /* No label in the complete range */
     return 0;
 }
@@ -859,7 +880,7 @@ void CS_MergeLabels (CodeSeg* S)
 		    CodeEntry* E = CL_GetRef (X, J);
 		    /* And remove the reference */
 		    E->JumpTo = 0;
-		}
+	   	}
 
 		/* Print some debugging output */
       		if (Debug) {
@@ -1072,6 +1093,41 @@ void CS_DelCodeAfter (CodeSeg* S, unsigned Last)
 
 
 
+void CS_OutputPrologue (const CodeSeg* S, FILE* F)
+/* If the given code segment is a code segment for a function, output the
+ * assembler prologue into the file. That is: Output a comment header, switch
+ * to the correct segment and enter the local function scope. If the code
+ * segment is global, do nothing.
+ */
+{
+    /* Get the function associated with the code segment */
+    SymEntry* Func = S->Func;
+
+    /* If the code segment is associated with a function, print a function
+     * header and enter a local scope. Be sure to switch to the correct
+     * segment before outputing the function label.
+     */
+    if (Func) {
+       	CS_PrintFunctionHeader (S, F);
+        fprintf (F, ".segment\t\"%s\"\n\n.proc\t_%s\n\n", S->SegName, Func->Name);
+    }
+
+}
+
+
+
+void CS_OutputEpilogue (const CodeSeg* S, FILE* F)
+/* If the given code segment is a code segment for a function, output the
+ * assembler epilogue into the file. That is: Close the local function scope.
+ */
+{
+    if (S->Func) {
+	fprintf (F, "\n.endproc\n\n");
+    }
+}
+
+
+
 void CS_Output (const CodeSeg* S, FILE* F)
 /* Output the code segment data to a file */
 {
@@ -1088,11 +1144,6 @@ void CS_Output (const CodeSeg* S, FILE* F)
 
     /* Output the segment directive */
     fprintf (F, ".segment\t\"%s\"\n\n", S->SegName);
-
-    /* If this is a segment for a function, enter a function */
-    if (S->Func) {
-	fprintf (F, ".proc\t_%s\n\n", S->Func->Name);
-    }
 
     /* Output all entries, prepended by the line information if it has changed */
     LI = 0;
@@ -1125,11 +1176,6 @@ void CS_Output (const CodeSeg* S, FILE* F)
     /* If debug info is enabled, terminate the last line number information */
     if (DebugInfo) {
 	fprintf (F, "\t.dbg\tline\n");
-    }
-
-    /* If this is a segment for a function, leave the function */
-    if (S->Func) {
-	fprintf (F, "\n.endproc\n\n");
     }
 }
 

@@ -244,28 +244,11 @@ void AddDataLine (const char* Format, ...)
 
 
 
-static void PrintFunctionHeader (const SymEntry* Entry, FILE* F)
-{
-    /* Print a comment with the function signature */
-    fprintf (F,
-    	     "; ---------------------------------------------------------------\n"
-    	     "; ");
-    PrintFuncSig (F, Entry->Name, Entry->Type);
-    fprintf (F,
-       	     "\n"
-	     "; ---------------------------------------------------------------\n"
- 	     "\n");
-}
-
-
-
 void OutputSegments (const Segments* S, FILE* F)
 /* Output the given segments to the file */
 {
-    /* If the code segment is associated with a function, print a function header */
-    if (S->Code->Func) {
-       	PrintFunctionHeader (S->Code->Func, F);
-    }
+    /* Output the function prologue if the segments came from a function */
+    CS_OutputPrologue (S->Code, F);
 
     /* Output the text segment */
     TS_Output (S->Text, F);
@@ -277,6 +260,9 @@ void OutputSegments (const Segments* S, FILE* F)
 
     /* Output the code segment */
     CS_Output (S->Code, F);
+
+    /* Output the code segment epiloque */
+    CS_OutputEpilogue (S->Code, F);
 }
 
 

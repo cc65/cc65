@@ -216,6 +216,18 @@ void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L);
 void CS_DelCodeAfter (CodeSeg* S, unsigned Last);
 /* Delete all entries including the given one */
 
+void CS_OutputPrologue (const CodeSeg* S, FILE* F);
+/* If the given code segment is a code segment for a function, output the
+ * assembler prologue into the file. That is: Output a comment header, switch
+ * to the correct segment and enter the local function scope. If the code
+ * segment is global, do nothing.
+ */
+
+void CS_OutputEpilogue (const CodeSeg* S, FILE* F);
+/* If the given code segment is a code segment for a function, output the
+ * assembler epilogue into the file. That is: Close the local function scope.
+ */
+
 void CS_Output (const CodeSeg* S, FILE* F);
 /* Output the code segment data to a file */
 

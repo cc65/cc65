@@ -67,8 +67,6 @@
             IOCTL       .addr
 	    IRQ	     	.addr
 	.endstruct
-        XPOS            .word           ; Mouse X position
-        YPOS            .word           ; Mouse Y position
         CALLBACKS .struct               ; Jump instructions
                         .byte           ; JMP opcode
             CHIDE       .addr           ; Jump address

@@ -23,7 +23,8 @@ OBJS =	_scrsize.o	\
 	kbhit.o		\
         kernal.o        \
         randomize.o     \
-	readjoy.o
+	readjoy.o       \
+        revers.o        
 
 all:	$(OBJS)
 

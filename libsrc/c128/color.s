@@ -12,7 +12,11 @@
 
 
 _textcolor:
-	ldx	CHARCOLOR	; get old value
+	bit	MODE		; Check 80/40 column mode
+	bpl	@L1		; Jump if 40 columns
+	tax
+	lda	$CE5C,x		; Translate VIC color -> VDC color
+@L1:	ldx	CHARCOLOR	; get old value
  	sta	CHARCOLOR	; set new value
 	txa
 	rts

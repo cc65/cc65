@@ -10,6 +10,7 @@ MEMSIZE	 	= $34		; Size of memory installed
 TIME            = $8D           ; 60HZ clock
 ST     	       	= $96  	       	; IEC status byte
 KEY_COUNT      	= $9E  	       	; Number of keys in input buffer
+RVS		= $9F		; Reverse flag
 CURS_FLAG	= $A7  	       	; 1 = cursor off
 CURS_BLINK	= $A8  	       	; Blink counter
 CURS_CHAR	= $A9  	       	; Character under the cursor
@@ -29,7 +30,7 @@ KEY_BUF		= $26F 	       	; Keyboard buffer
 ;----------------------------------------------------------------------------
 ; PET ROM type detection
 
-PET_DETECT      = $FFFB
+PET_DETECT      = $FFFB			      
 PET_2000        = $CA
 PET_3000        = $FC
 PET_4000        = $FD

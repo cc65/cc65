@@ -13,10 +13,10 @@ FNAM_LEN	= $B7		; Length of filename
 SECADR		= $B9		; Secondary address
 DEVNUM		= $BA		; Device number
 KEY_COUNT      	= $C6		; Number of keys in input buffer
+RVS             = $C7           ; Reverse flag
 CURS_FLAG	= $CC		; 1 = cursor off
 CURS_BLINK	= $CD		; Blink counter
 CURS_CHAR	= $CE		; Character under the cursor
-CURS_COLOR      = $287		; Color under the cursor
 CURS_STATE	= $CF		; Cursor blink state
 SCREEN_PTR	= $D1		; Pointer to current char in text screen
 CURS_X		= $D3		; Cursor column
@@ -24,6 +24,7 @@ CURS_Y		= $D6		; Cursor row
 CRAM_PTR	= $F3		; Pointer to current char in color RAM
 
 CHARCOLOR       = $286
+CURS_COLOR      = $287		; Color under the cursor
 PALFLAG		= $2A6		; $01 = PAL, $00 = NTSC
 
 

@@ -46,6 +46,7 @@ OBJS =	_scrsize.o	\
         kuntlk.o        \
         randomize.o     \
 	readjoy.o	\
+        revers.o        \
 	tgi_mode_table.o
 
 all:	$(OBJS)

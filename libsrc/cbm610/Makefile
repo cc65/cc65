@@ -40,6 +40,7 @@ OBJS =	_scrsize.o	\
 	peeksys.o	\
 	pokesys.o	\
         randomize.o     \
+	revers.o	\
 	rs232.o
 
 #--------------------------------------------------------------------------

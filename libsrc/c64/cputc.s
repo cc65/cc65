@@ -8,7 +8,7 @@
     	.export	       	_cputcxy, _cputc, cputdirect, putchar
 	.export		newline, plot
 	.import		popa, _gotoxy
-	.import		xsize, revers
+	.import		xsize
         .import         PLOT
 
 	.include	"c64.inc"
@@ -98,7 +98,7 @@ plot:	ldy	CURS_X
 ; position in Y
 
 putchar:
-    	ora	revers	  	; Set revers bit
+    	ora	RVS             ; Set revers bit
        	ldy    	CURS_X
 	sta	(SCREEN_PTR),y	; Set char
 	lda	CHARCOLOR

@@ -8,10 +8,10 @@
     	.export	       	_cputcxy, _cputc, cputdirect, putchar
 	.export		newline, plot
 	.import		popa, _gotoxy
-	.import		xsize, revers
+	.import		xsize
 
 	.include	"pet.inc"
-	.include	"../cbm/cbm.inc"
+;	.include	"../cbm/cbm.inc"
 
 _cputcxy:
 	pha	    	    	; Save C
@@ -98,7 +98,7 @@ plot:	ldy	CURS_Y
 ; position in Y
 
 putchar:
-    	ora	revers	  	; Set revers bit
+    	ora	RVS		; Set revers bit
        	ldy    	CURS_X
 	sta	(SCREEN_PTR),y	; Set char
 	rts

@@ -32,7 +32,8 @@ OBJS =	_scrsize.o	\
         kreadst.o       \
         ksetlfs.o       \
         ksetnam.o       \
-        randomize.o
+        randomize.o	\
+	revers.o	
 
 all:	$(OBJS)
 

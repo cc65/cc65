@@ -23,7 +23,8 @@ OBJS =	_scrsize.o	\
         kernal.o        \
         kplot.o         \
         randomize.o     \
-	readjoy.o
+	readjoy.o	\
+	revers.o	
 
 all:	$(OBJS)
 

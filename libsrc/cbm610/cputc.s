@@ -12,7 +12,7 @@
         .import         PLOT
 	.import		_gotoxy
 	.import	     	popa
-	.import	     	xsize, revers
+	.import	     	xsize
 
 	.include     	"cbm610.inc"
 
@@ -94,7 +94,7 @@ putchar:
 	ldx	IndReg
 	ldy	#$0F
 	sty	IndReg
-    	ora	revers	    	; Set revers bit
+    	ora	RVS		; Set revers bit
        	ldy    	CURS_X
 	sta	(CharPtr),y 	; Set char
 	stx	IndReg

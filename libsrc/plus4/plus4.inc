@@ -15,6 +15,7 @@ SECADR		= $AD	     	; Secondary address
 DEVNUM		= $AE	     	; Device number
 FNAM_ADR        = $AF           ; Pointer to filename for OPEN
 KEY_COUNT      	= $EF 	     	; Number of keys in input buffer
+RVS             = $C2           ; Reverse flag
 CURS_X		= $CA  		; Cursor column
 CURS_Y		= $CD  		; Cursor row
 SCREEN_PTR	= $C8  		; Pointer to current char in text screen

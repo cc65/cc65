@@ -16,6 +16,7 @@ FNAM_LO	       	= $BB  	       	; Address of filename
 FNAM_HI	  	= $BC
 FNAM_BANK      	= $C7  	       	; Bank for filename
 KEY_COUNT      	= $D0  	       	; Number of keys in input buffer
+FKEY_COUNT     	= $D1  	       	; Characters for function key
 MODE   	       	= $D7  	       	; 40/80 column mode flag
 CURS_X 	       	= $EC  	       	; Cursor column
 CURS_Y 	       	= $EB  	       	; Cursor row
@@ -23,7 +24,7 @@ SCREEN_PTR     	= $E0  	       	; Pointer to current char in text screen
 CRAM_PTR       	= $E2  	       	; Pointer to current char in color RAM
 
 CHARCOLOR       = $F1
-FKEY_COUNT     	= $D1  	       	; Characters for function key
+RVS             = $F3           ; Reverse output flag
 FETCH           = $2A2          ; Fetch subroutine in RAM
 FETVEC          = $2AA          ; Vector patch location for FETCH
 STASH           = $2AF          ; Stash routine in RAM
@@ -41,6 +42,7 @@ CURS_ON		= $CD6F
 CURS_OFF        = $CD9F
 CLRSCR		= $C142
 KBDREAD		= $C006
+PRINT		= $C00C
 
 ; Extended jump table
 SETBNK          = $FF68

@@ -56,7 +56,6 @@ S_OBJS =	c_acptr.o	\
                 oserrlist.o     \
 		oserror.o	\
                 read.o          \
-		revers.o	\
                 rwcommon.o      \
                 scratch.o       \
                 sysremove.o     \

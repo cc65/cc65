@@ -38,6 +38,7 @@ OBJS = 	_scrsize.o     	 	\
        	mouse.o	       	 	\
         randomize.o             \
        	readjoy.o      	 	\
+        revers.o                \
        	rs232.o	       	 	\
         tgi_mode_table.o
 

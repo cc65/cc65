@@ -11,7 +11,7 @@
 	@$(AS) -o $@ $(AFLAGS) $<
 
 C_OBJS	= _afailed.o abort.o perror.o
-S_OBJS	= copydata.o memcpy.o memset.o rand.o
+S_OBJS	= copydata.o memcpy.o memset.o
 
 all: $(C_OBJS) $(S_OBJS)
 

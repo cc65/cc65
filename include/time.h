@@ -53,22 +53,29 @@ struct tm {
     int tm_min;
     int tm_hour;
     int tm_mday;
-    int tm_mon;		  
+    int tm_mon;
     int tm_year;
     int tm_wday;
     int tm_yday;
     int tm_isdst;
 };
 
+#if defined(__CBM__)
+#  if defined(__CBM610__)
 /* The 610 gets its clock from the AC current */
-#ifdef __CBM__
-#  ifdef __CBM610__
 #    define CLK_TCK    	       	50 	/* POSIX */
 #    define CLOCKS_PER_SEC	50	/* ANSI */
 #  else
 #    define CLK_TCK	  	60	/* POSIX */
 #    define CLOCKS_PER_SEC	60     	/* ANSI */
 #  endif
+#endif
+
+#if defined(__ATARI__)
+/* The clock depends on the video standard, so read it at runtime */
+unsigned _clocks_per_sec (void);
+#  define CLK_TCK		_clocks_per_sec()
+#  define CLOCKS_PER_SEC	_clocks_per_sec()
 #endif
 
 

@@ -61,20 +61,15 @@
         bcs     error
         bcc     @L2
 
-; Read the IEEE488 status
-
-@L0:    jsr     READST
-        cmp     #0
-        bne     error5
-
 ; Output the next character from the buffer
 
-        ldy     #0
+@L0:    ldy     #0
         lda     (ptr2),y
         inc     ptr2
         bne     @L1
         inc     ptr2+1          ; A = *buf++;
 @L1:    jsr     BSOUT
+        bcs     error           ; Bail out on errors
 
 ; Count characters written
 

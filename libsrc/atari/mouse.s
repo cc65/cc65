@@ -16,7 +16,7 @@
 	.export 	_mouse_buttons, _mouse_pos, _mouse_info
 	.constructor	initmouse,27
 
-	.import 	popa,popax
+	.import 	popax
 	.importzp	ptr1
 
 	.include "atari.inc"
@@ -56,15 +56,10 @@ initmouse:
 
 ;--------------------------------------------------------------------
 ; Initialize mouse routines
-; void __fastcall__ mouse_init (unsigned char port, unsigned char type);
+; void __fastcall__ mouse_init (unsigned char type);
 
 _mouse_init:
-	pha			; remember mouse type
-	jsr	popa
-	sta	port_nr
-	pla			; get mouse type again
-
-	cmp	#MAX_TYPE+1
+	cmp	#MAX_TYPE+1	; Check for a valid type
 	bcc	setup
 
 ifail:	lda	#0		; init. failed
@@ -203,16 +198,14 @@ _mouse_hide:
 ; unsigned char mouse_buttons(void)
 
 _mouse_buttons:
-    	ldx	port_nr
-    	lda	STRIG0,x
+    	ldx	#0
+    	lda	STRIG0
     	bne	nobut
 ;   	lda	#14
 ;???	sta	COLOR1
-    	ldx	#0
     	lda	#1
     	rts
-nobut:	ldx	#0
-    	txa
+nobut:	txa
     	rts
 
 ;--------------------------------------------------------------------
@@ -379,28 +372,15 @@ nyami:	tya
 t1_vec: tya
 	pha
 	txa
-	pha
+	pha	
 
 .ifdef DEBUG
 	lda	RANDOM
 	sta	COLBK		; debug
 .endif
 
-	lda	port_nr
-	lsr			; even number 0/2
+	lda	PORTA
 	tay
-	lda	PORTA,y
-	ldy	port_nr
-	cpy	#0
-	beq	oddp
-	cpy	#2
-	beq	oddp
-
-        lsr
-	lsr
-	lsr
-	lsr
-oddp:	tay
 
 mouse_vec:
         jsr     st_check        ; will be modified; won't be ROMmable
@@ -591,8 +571,6 @@ dumy:	.res 1
 omy:	.res 1		; old y pos
 
 mouse_off:
-	.res 1
-port_nr:
 	.res 1
 mouse_pm0:
 	.res 1

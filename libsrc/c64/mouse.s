@@ -12,7 +12,7 @@
 	.export		_mouse_buttons, _mouse_info
 
 	.import		_readjoy
-       	.import	       	popa, popax, addysp1
+       	.import	       	popax, addysp1
    	.importzp   	ptr1, sp, sreg
 
    	.include    	"c64.inc"
@@ -35,13 +35,10 @@ XCORR		= SPRITE_WIDTH
 
 ; --------------------------------------------------------------------------
 ;
-; unsigned char __fastcall__ mouse_init (unsigned char port,
-;					 unsigned char type);
+; unsigned char __fastcall__ mouse_init (unsigned char type);
 ;
 
 _mouse_init:
-	jsr	popa			; Ignore type and port
-
        	lda    	OldIRQ+1		; Already initialized?
        	bne    	AlreadyInitialized	; Jump if yes
 

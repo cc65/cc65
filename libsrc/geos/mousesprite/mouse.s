@@ -5,14 +5,14 @@
 ;
 ; Wrapper for GEOS standard input device interface
 ;
-
+					 
    	.export	    	_mouse_init, _mouse_done
    	.export	    	_mouse_hide, _mouse_show
    	.export	    	_mouse_box
    	.export		_mouse_pos, _mouse_info
    	.export	    	_mouse_move, _mouse_buttons
 
-       	.import	       	popa, popsreg, addysp1
+       	.import	       	popsreg, addysp1
    	.importzp   	sp, sreg, ptr1
 
 	.include "../inc/const.inc"
@@ -24,13 +24,10 @@
 
 ; --------------------------------------------------------------------------
 ;
-; unsigned char __fastcall__ mouse_init (unsigned char port,
-;			    	      	 unsigned char type);
+; unsigned char __fastcall__ mouse_init (unsigned char type);
 ;
 
 _mouse_init:
-	jsr	popa  	    	      	; ignore all parameters
-
 	jsr	StartMouseMode
 	jsr	MouseOff
 

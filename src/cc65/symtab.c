@@ -584,8 +584,11 @@ SymEntry* AddStructSym (const char* Name, unsigned Size, SymTable* Tab)
 SymEntry* AddConstSym (const char* Name, const type* Type, unsigned Flags, long Val)
 /* Add an constant symbol to the symbol table and return it */
 {
+    /* Enums must be inserted in the global symbol table */
+    SymTable* Tab = ((Flags & SC_ENUM) == SC_ENUM)? SymTab0 : SymTab;
+
     /* Do we have an entry with this name already? */
-    SymEntry* Entry = FindSymInTable (SymTab, Name, HashStr (Name));
+    SymEntry* Entry = FindSymInTable (Tab, Name, HashStr (Name));
     if (Entry) {
 	if ((Entry->Flags & SC_CONST) != SC_CONST) {
 	    Error ("Symbol `%s' is already different kind", Name);
@@ -605,7 +608,7 @@ SymEntry* AddConstSym (const char* Name, const type* Type, unsigned Flags, long 
     Entry->V.ConstVal = Val;
 
     /* Add the entry to the symbol table */
-    AddSymEntry (SymTab, Entry);
+    AddSymEntry (Tab, Entry);
 
     /* Return the entry */
     return Entry;
@@ -727,7 +730,7 @@ SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
 		return Entry;
     	    } else {
     	  	/* Check if we have a size in the existing definition */
-    	  	if (ESize == UNSPECIFIED) {                           
+    	  	if (ESize == UNSPECIFIED) {
     	  	    /* Existing, size not given, use size from new def */
     	  	    Encode (EType + 1, Size);
     	  	}

@@ -229,7 +229,7 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__SUPERVISION__", 1);
             break;
 
-        case TGT_SUPERVISION:
+        case TGT_LYNX:
             DefineNumericMacro ("__LYNX__", 1);
             break;
 
@@ -730,7 +730,7 @@ int main (int argc, char* argv[])
 
     /* Initialize the default segment names */
     InitSegNames ();
-                                       
+
     /* Initialize the include search paths */
     InitIncludePaths ();
 

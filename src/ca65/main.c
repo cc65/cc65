@@ -168,7 +168,7 @@ static void CBMSystem (const char* Sys)
 }
 
 
-                     
+
 static void SetSys (const char* Sys)
 /* Define a target system */
 {
@@ -254,6 +254,10 @@ static void SetSys (const char* Sys)
             NewSymbol ("__SUPERVISION__", 1);
             break;
 
+        case TGT_LYNX:
+            NewSymbol ("__LYNX__", 1);
+            break;
+
      	default:
             AbEnd ("Invalid target name: `%s'", Sys);
 
@@ -310,7 +314,7 @@ static void DefineSymbol (const char* Def)
     	    }
        	}
     }
-                     
+
     /* Define the new symbol */
     NewSymbol (SymName, Val);
 }

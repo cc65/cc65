@@ -312,11 +312,12 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
 
     } else if (IsDigit (Name[0]) || Name[0] == '$') {
 
-        /* A call to a numeric address. Assume that all CPU registers get
-         * used, but no memory contents are changed.
+        /* A call to a numeric address. Assume that anything gets used and
+         * destroyed. This is not a real problem, since numeric addresses
+         * are used mostly in inline assembly anyway.
          */
-        *Use = REG_AXY;
-        *Chg = REG_AXY;
+        *Use = REG_ALL;
+        *Chg = REG_ALL;
         return;
 
     } else {

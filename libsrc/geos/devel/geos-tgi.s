@@ -2,10 +2,6 @@
 ; Graphics driver for the 320x200x2 or 640x200x2 mode on GEOS 64/128
 ; Maciej 'YTM/Elysium' Witkowiak <ytm@elysium.pl>
 ; 28-31.12.2002
-;
-; - not tested OutText
-; - not tested on VDC
-; - erratic Circle when needs to clip
 
 	.include 	"zeropage.inc"
 
@@ -425,10 +421,9 @@ SETDRAWPAGE:
 SETCOLOR:
         tax
         beq     @L1
-        inx
-@L1:    stx     BITMASK
-	txa			; need to have either 0 or 1
-	jmp	SetPattern
+        lda	#1
+@L1:    sta     BITMASK
+	jmp	SetPattern	; need to have either 0 or 1
 
 ; ------------------------------------------------------------------------
 ; SETPALETTE: Set the palette (not available with all drivers/hardware).
@@ -515,25 +510,25 @@ SETPIXELCLIP:
 	bmi	@finito		; y<0
 	lda	X1+1
 	bmi	@finito		; x<0
-	lda	xres
-	ldx	xres+1
-	sta	ADDR
-	stx	ADDR+1
-	ldx	#ADDR
 	lda	X1
-	ldy	X1+1
-	jsr	icmp		; if (xres<x1)
-	bcs	@cont		; !(xres<x1)
-@finito:rts
-@cont:	lda	yres
-	ldx	yres+1
+	ldx	X1+1
 	sta	ADDR
 	stx	ADDR+1
 	ldx	#ADDR
+	lda	xres
+	ldy	xres+1
+	jsr	icmp		; ( x < xres ) ...
+	bcs	@finito
 	lda	Y1
-	ldy	Y1+1
-	jsr	icmp		; if (yres<y1)
-	bcc	@finito
+	ldx	Y1+1
+	sta	ADDR
+	stx	ADDR+1
+	ldx	#ADDR
+	lda	yres
+	ldy	yres+1
+	jsr	icmp		; ... && ( y < yres )
+	bcc	SETPIXEL
+@finito:rts
 
 SETPIXEL:
 	lda	X1

@@ -806,7 +806,7 @@ the format specifier before passing the assembly code line to the backend.
   <item><tt/%b/ - Numerical 8 bit value
   <item><tt/%w/ - Numerical 16 bit value
   <item><tt/%l/ - Numerical 32 bit value
-  <item><tt/%v/ - Assembler name of a (global) variable
+  <item><tt/%v/ - Assembler name of a (global) variable or function
   <item><tt/%o/ - Stack offset of a (local) variable
   <item><tt/%%/ - The % sign itself
 </itemize><p>
@@ -835,16 +835,19 @@ Or, to access a struct member of a static variable:
 <p>
 
 Note: Do not embedd the assembler labels that are used as names of global
-variables into your asm statements. Code like this
+variables or functions into your asm statements. Code like this
 
 <tscreen><verb>
         int foo;
+        int bar () { return 1; }
        	__asm__ ("lda _foo");   /* DON'T DO THAT! */
+        ...
+        __asm__ ("jsr _bar");   /* DON'T DO THAT EITHER! */
 </verb></tscreen>
 <p>
 
-may stop working if the way, the compiler generates variable names is changed
-in a future version.
+may stop working if the way, the compiler generates these names is changed in
+a future version.
 <p>
 
 

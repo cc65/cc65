@@ -113,8 +113,8 @@ Systems:
 --------
 
 Supported systems at this time are: C64, C128, Plus/4, CBM 600/700, the newer
-PET machines (not 2001), and the Apple ][ (thanks to Kevin Ruland, who did the
-port).
+PET machines (not 2001), Atari 8bit, and the Apple ][ (thanks to Kevin Ruland,
+who did the port).
 
 C64:  	The program runs in a memory configuration, where only the kernal ROM
       	is enabled. The text screen is expected at the usual place ($400), so
@@ -138,9 +138,26 @@ PET:  	The startup code will adjust the upper memory limit to the installed
       	$8000, so on a 8032 or similar machine, 31K of memory are available to
       	the program.
 
-APPLE2:	The program starts at $800, and of RAM is $8E00, so 33.5K of memory
+APPLE2:	The program starts at $800, end of RAM is $8E00, so 33.5K of memory
 	(including stack) are available.
 
+Atari:  The startup code will adjust the upper memory limit to the installed
+        memory, considering future graphics memory usage (which is allocated
+        at top of RAM). The programmer can specify which graphics mode is
+        about to be used by defining a variable _graphmode_used, unsigned
+        char, to the mode value (mode values like Atari DOS, 0-31).
+	(Please note that graphics mode selection isn't supported in the
+	Atari runtime lib yet!)
+	In the default case the upper memory limit will be $8035 (with Basic
+        cartridge) and $A035 (without cartridge). This is the default which
+        leaves room for the biggest possible graphics mode. If only standard
+        text mode is used (_graphmode_used = 0), the values are $9C1F (with
+        Basic) and $BC1F (no cartridge).
+	The program starts at $1F00 (to leave room for DOS), and the free
+        memory values are $6135 (24K, Basic, default mode), $8135 (32K, no 
+        Basic, default mode), $7D1F (31K, Basic, mode 0) and $9D1F (39K,
+        no Basic, mode 0).
+	These values are for a 48K or 64K machine.
 
 Note: The above numbers do not mean that the remaining memory is unusable.
 However, it is not linear memory and must be accessed by other, nonportable

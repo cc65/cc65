@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -61,6 +61,9 @@ void TgtTranslateBuf (void* Buf, unsigned Len);
 /* Translate a buffer of the given length from the source character set into
  * the target system character set.
  */
+
+void TgtTranslateSet (unsigned Index, unsigned char C);
+/* Set the translation code for the given character */
 
 
 

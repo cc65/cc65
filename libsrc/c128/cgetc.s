@@ -21,6 +21,7 @@ _cgetc:	lda	KEY_COUNT 	; Get number of characters
 
 	lda	cursor
        	beq	L1
+        jsr     CURS_SET        ; Set cursor to current position
 	jsr	CURS_ON
 	jmp	L2
 L1:    	lda	#$01

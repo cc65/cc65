@@ -39,11 +39,13 @@ FKEY_TEXT	= $100A		; Function key texts
 ; Kernal routines
 
 ; Direct entries
+CURS_SET	= $CD57
 CURS_ON		= $CD6F
 CURS_OFF        = $CD9F
 CLRSCR		= $C142
 KBDREAD		= $C006
-PRINT		= $C00C
+NEWLINE		= $C363
+PRINT		= $C322
 
 ; Extended jump table
 SETBNK          = $FF68

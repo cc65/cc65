@@ -87,10 +87,10 @@ void NeedArg (const char* Opt)
 
 
 
-void InvSym (const char* Def)
-/* Print an error about an invalid symbol definition and die */
+void InvDef (const char* Def)
+/* Print an error about an invalid definition and die */
 {
-    fprintf (stderr, "Invalid symbol definition: `%s'\n", Def);
+    fprintf (stderr, "Invalid definition: `%s'\n", Def);
     exit (EXIT_FAILURE);
 }
 

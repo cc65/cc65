@@ -72,8 +72,8 @@ void UnknownOption (const char* Opt);
 void NeedArg (const char* Opt);
 /* Print an error about a missing option argument and exit. */
 
-void InvSym (const char* Def);
-/* Print an error about an invalid symbol definition and die */
+void InvDef (const char* Def);
+/* Print an error about an invalid definition and die */
 
 const char* GetArg (int* ArgNum, unsigned Len);
 /* Get an argument for a short option. The argument may be appended to the

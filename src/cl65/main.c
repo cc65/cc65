@@ -58,6 +58,7 @@
 #include "cmdline.h"
 #include "filetype.h"
 #include "fname.h"
+#include "mmodel.h"
 #include "strbuf.h"
 #include "target.h"
 #include "version.h"
@@ -596,6 +597,7 @@ static void Usage (void)
        	     "  -h\t\t\tHelp (this text)\n"
        	     "  -l\t\t\tCreate an assembler listing\n"
        	     "  -m name\t\tCreate a map file\n"
+             "  -mm model\t\tSet the memory model\n"
        	     "  -o name\t\tName the output file\n"
              "  -r\t\t\tEnable register variables\n"
        	     "  -t sys\t\tSet the target system\n"
@@ -644,6 +646,7 @@ static void Usage (void)
              "  --lib-path path\tSpecify a library search path\n"
        	     "  --listing\t\tCreate an assembler listing\n"
 	     "  --mapfile name\tCreate a map file\n"
+             "  --memory-model model\tSet the memory model\n"
              "  --module\t\tLink as a module\n"
              "  --module-id id\tSpecify a module id for the linker\n"
              "  --o65-model model\tOverride the o65 model\n"
@@ -895,6 +898,21 @@ static void OptMapFile (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptMemoryModel (const char* Opt attribute ((unused)), const char* Arg)
+/* Set the memory model */
+{
+    mmodel_t MemoryModel = FindMemoryModel (Arg);
+    if (MemoryModel == MMODEL_UNKNOWN) {
+        Error ("Unknown memory model: %s", Arg);
+    } else if (MemoryModel == MMODEL_HUGE) {
+        Error ("Unsupported memory model: %s", Arg);
+    } else {
+        CmdAddArg2 (&CA65, "-mm", Arg);
+    }
+}
+
+
+
 static void OptModule (const char* Opt attribute ((unused)),
                        const char* Arg attribute ((unused)))
 /* Link as a module */
@@ -1022,7 +1040,7 @@ static void OptVersion (const char* Opt attribute ((unused)),
  	     VER_MAJOR, VER_MINOR, VER_PATCH);
 }
 
-        
+
 
 static void OptZeropageLabel (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --zeropage-label option */
@@ -1071,6 +1089,7 @@ int main (int argc, char* argv [])
        	{ "--lib-path",	       	1,     	OptLibPath              },
 	{ "--listing",	      	0,	OptListing		},
 	{ "--mapfile",	      	1,	OptMapFile		},
+        { "--memory-model",     1,      OptMemoryModel          },
         { "--module",           0,      OptModule               },
         { "--module-id",        1,      OptModuleId             },
         { "--o65-model",        1,      OptO65Model             },

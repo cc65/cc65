@@ -75,8 +75,12 @@ static unsigned	       	ImpOpen  = 0;		/* Count of open imports */
 static unsigned	       	ExpCount = 0;	   	/* Export count */
 static Export**	       	ExpPool  = 0;	  	/* Exports array */
 
+/* Defines for the flags in Import */
+#define IMP_INLIST      0x0001U                 /* Import is in exports list */
+
 /* Defines for the flags in Export */
-#define EXP_USERMARK   	0x0001
+#define EXP_INLIST      0x0001U                 /* Export is in exports list */
+#define EXP_USERMARK   	0x0002U                 /* User setable flag */
 
 
 
@@ -102,6 +106,7 @@ static Import* NewImport (unsigned char Type, ObjData* Obj)
     I->Obj	= Obj;
     I->Exp      = 0;
     I->Name     = INVALID_STRING_ID;
+    I->Flags    = 0;
     I->Type	= Type;
 
     /* Return the new structure */
@@ -157,6 +162,24 @@ void InsertImport (Import* I)
        	/* This is a dummy export */
     	++ImpOpen;
     }
+
+    /* Mark the import so we know it's in the list */
+    I->Flags |= IMP_INLIST;
+}
+
+
+
+void FreeImport (Import* I)
+/* Free an import. NOTE: This won't remove the import from the exports table,
+ * so it may only be called for unused imports (imports from modules that
+ * aren't referenced).
+ */
+{
+    /* Safety */
+    PRECONDITION ((I->Flags & IMP_INLIST) == 0);
+
+    /* Free the struct */
+    xfree (I);
 }
 
 
@@ -217,6 +240,24 @@ static Export* NewExport (unsigned char Type, unsigned Name, ObjData* Obj)
 
 
 
+void FreeExport (Export* E)
+/* Free an export. NOTE: This won't remove the export from the exports table,
+ * so it may only be called for unused exports (exports from modules that
+ * aren't referenced).
+ */
+{
+    /* Safety */
+    PRECONDITION ((E->Flags & EXP_INLIST) == 0);
+
+    /* Free the export expression */
+    FreeExpr (E->Expr);
+
+    /* Free the struct */
+    xfree (E);
+}
+
+
+
 void InsertExport (Export* E)
 /* Insert an exported identifier and check if it's already in the list */
 {
@@ -224,6 +265,9 @@ void InsertExport (Export* E)
     Export* Last;
     Import* Imp;
     unsigned Hash;
+
+    /* Mark the export as inserted */
+    E->Flags |= EXP_INLIST;
 
     /* Insert the export into any condes tables if needed */
     if (IS_EXP_CONDES (E->Type)) {
@@ -243,35 +287,37 @@ void InsertExport (Export* E)
       	Last = 0;
       	L = HashTab[Hash];
       	do {
-      	    if (L->Name == E->Name) {
+       	    if (L->Name == E->Name) {
       	       	/* This may be an unresolved external */
       	       	if (L->Expr == 0) {
 
-      	       	    /* This *is* an unresolved external */
+      	       	    /* This *is* an unresolved external. Use the actual export
+                     * in E instead of the dummy one in L.
+                     */
       	       	    E->Next     = L->Next;
       	       	    E->ImpCount = L->ImpCount;
       	       	    E->ImpList  = L->ImpList;
-      	   	    if (Last) {
-      	   	       	Last->Next = E;
-      	   	    } else {
+      	      	    if (Last) {
+      	      	       	Last->Next = E;
+      	      	    } else {
       	      	       	HashTab[Hash] = E;
-      	   	    }
+      	      	    }
        	       	    ImpOpen -= E->ImpCount;	/* Decrease open imports now */
-      	   	    xfree (L);
-      	   	    /* We must run through the import list and change the
+      	      	    xfree (L);
+      	      	    /* We must run through the import list and change the
       	       	     * export pointer now.
-      	   	     */
-      	   	    Imp = E->ImpList;
-      	   	    while (Imp) {
-      	   	   	Imp->Exp = E;
-      	   	   	Imp = Imp->Next;
-      	   	    }
-      	   	} else {
-      	   	    /* Duplicate entry, ignore it */
-       	   	    Warning ("Duplicate external identifier: `%s'", 
+      	      	     */
+      	      	    Imp = E->ImpList;
+      	      	    while (Imp) {
+      	      	   	Imp->Exp = E;
+      	      	   	Imp = Imp->Next;
+      	      	    }
+      	      	} else {
+      	      	    /* Duplicate entry, ignore it */
+       	      	    Warning ("Duplicate external identifier: `%s'",
                              GetString (L->Name));
-      		}
-      		return;
+      	      	}
+      	      	return;
       	    }
       	    Last = L;
       	    L = L->Next;
@@ -491,15 +537,15 @@ static void CheckSymType (const Export* E)
 	      	/* User defined export */
 	      	Warning ("Type mismatch for `%s', export in "
 			 "%s(%lu), import in %s(%lu)",
-			 GetString (E->Name), 
+			 GetString (E->Name),
                          GetSourceFileName (E->Obj, Imp->Pos.Name),
-    			 E->Pos.Line, 
+    			 E->Pos.Line,
                          GetSourceFileName (Imp->Obj, Imp->Pos.Name),
 		   	 Imp->Pos.Line);
 	    } else {
 		/* Export created by the linker */
 		Warning ("Type mismatch for `%s', imported from %s(%lu)",
-			 GetString (E->Name), 
+			 GetString (E->Name),
                          GetSourceFileName (Imp->Obj, Imp->Pos.Name),
 			 Imp->Pos.Line);
 	    }
@@ -557,7 +603,7 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
 static int CmpExpName (const void* K1, const void* K2)
 /* Compare function for qsort */
 {
-    return strcmp (GetString ((*(Export**)K1)->Name), 
+    return strcmp (GetString ((*(Export**)K1)->Name),
                    GetString ((*(Export**)K2)->Name));
 }
 
@@ -728,11 +774,11 @@ void CircularRefError (const Export* E)
 /* Print an error about a circular reference using to define the given export */
 {
     Error ("Circular reference for symbol `%s', %s(%lu)",
-	   GetString (E->Name), 
+	   GetString (E->Name),
            GetSourceFileName (E->Obj, E->Pos.Name),
            E->Pos.Line);
 }
 
 
 
-           
+

@@ -51,8 +51,9 @@
 #include "fileio.h"
 #include "lineinfo.h"
 #include "objdata.h"
-#include "segments.h"
 #include "objfile.h"
+#include "segments.h"
+#include "spool.h"
 
 
 
@@ -62,15 +63,15 @@
 
 
 
-static const char* GetModule (const char* Name)
-/* Get a module name from the file name */
+static unsigned GetModule (const char* Name)
+/* Get a module name index from the file name */
 {
     /* Make a module name from the file name */
     const char* Module = FindName (Name);
     if (*Module == 0) {
 	Error ("Cannot make module name from `%s'", Name);
     }
-    return Module;
+    return GetStringId (Module);
 }
 
 
@@ -216,8 +217,7 @@ void ObjAdd (FILE* Obj, const char* Name)
     ObjReadHeader (Obj, &O->Header, Name);
 
     /* Initialize the object module data structure */
-    O->Name  = xstrdup (GetModule (Name));
-    O->Flags = OBJ_HAVEDATA;
+    O->Name  = GetModule (Name);
 
     /* Read the string pool from the object file */
     fseek (Obj, O->Header.StrPoolOffs, SEEK_SET);
@@ -251,7 +251,7 @@ void ObjAdd (FILE* Obj, const char* Name)
     ObjReadSections (Obj, O);
 
     /* Mark this object file as needed */
-    O->Flags |= OBJ_REF | OBJ_HAVEDATA;
+    O->Flags |= OBJ_REF;
 
     /* Done, close the file (we read it only, so no error check) */
     fclose (Obj);
@@ -260,6 +260,9 @@ void ObjAdd (FILE* Obj, const char* Name)
      * string pool.
      */
     FreeObjStrings (O);
+
+    /* Insert the object into the list of all used object files */
+    InsertObjData (O);
 }
 
 

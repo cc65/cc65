@@ -49,9 +49,10 @@
 #include "error.h"
 #include "exports.h"
 #include "fileio.h"
+#include "library.h"
 #include "objdata.h"
 #include "objfile.h"
-#include "library.h"
+#include "spool.h"
 
 
 
@@ -63,19 +64,18 @@
 
 /* Library data */
 static FILE*		Lib		= 0;
-static char*		LibName		= 0;
 static unsigned		ModuleCount	= 0;
 static ObjData**	Index		= 0;
 
 
 
 /*****************************************************************************/
-/*			 Reading file data structures			     */
+/*	       		 Reading file data structures			     */
 /*****************************************************************************/
 
 
 
-static void LibReadObjHeader (ObjData* O)
+static void LibReadObjHeader (ObjData* O, const char* LibName)
 /* Read the header of the object file checking the signature */
 {
     O->Header.Magic = Read32 (Lib);
@@ -117,10 +117,14 @@ static ObjData* ReadIndexEntry (void)
     /* Create a new entry and insert it into the list */
     ObjData* O	= NewObjData ();
 
-    /* Module name/flags/MTime/Start/Size */
-    O->Name    	= ReadStr (Lib);
+    /* Module name */
+    char* Name = ReadStr (Lib);
+    O->Name = GetStringId (Name);
+    xfree (Name);
+
+    /* Module flags/MTime/Start/Size */
     O->Flags	= Read16 (Lib);
-    Read32 (Lib);			/* Skip MTime */
+    O->MTime    = Read32 (Lib);      
     O->Start	= Read32 (Lib);
     Read32 (Lib);			/* Skip Size */
 
@@ -208,13 +212,14 @@ void LibAdd (FILE* F, const char* Name)
  * be satisfied.
  */
 {
-    int Add;
+    unsigned LibName;
+    int HaveAdditions;
     unsigned I;
     LibHeader Header;
 
     /* Store the parameters, so they're visible for other routines */
     Lib     = F;
-    LibName = xstrdup (Name);
+    LibName = GetStringId (Name);
 
     /* Read the remaining header fields (magic is already read) */
     Header.Magic   = LIB_MAGIC;
@@ -235,27 +240,31 @@ void LibAdd (FILE* F, const char* Name)
      * were added.
      */
     do {
-	Add = 0;
-	for (I = 0; I < ModuleCount; ++I) {
- 	    ObjData* O = Index [I];
- 	    if ((O->Flags & OBJ_REF) == 0) {
- 		LibCheckExports (O);
- 		if (O->Flags & OBJ_REF) {
- 		    /* The routine added the file */
- 		    Add = 1;
- 		}
- 	    }
- 	}
-    } while (Add);
+    	HaveAdditions = 0;
+    	for (I = 0; I < ModuleCount; ++I) {
+    	    ObjData* O = Index [I];
+    	    if ((O->Flags & OBJ_REF) == 0) {
+    		LibCheckExports (O);
+    		if (O->Flags & OBJ_REF) {
+    		    /* The routine added the file */
+    		    HaveAdditions = 1;
+    		}
+    	    }
+    	}
+    } while (HaveAdditions);
 
     /* Add the files list and sections for all requested modules */
     for (I = 0; I < ModuleCount; ++I) {
+
+        /* Get the object data */
  	ObjData* O = Index [I];
+
+        /* Is this object file referenced? */
  	if (O->Flags & OBJ_REF) {
 
  	    /* Seek to the start of the object file and read the header */
  	    fseek (Lib, O->Start, SEEK_SET);
- 	    LibReadObjHeader (O);
+ 	    LibReadObjHeader (O, Name);
 
  	    /* Seek to the start of the files list and read the files list */
  	    fseek (Lib, O->Start + O->Header.FileOffs, SEEK_SET);
@@ -276,24 +285,29 @@ void LibAdd (FILE* F, const char* Name)
  	    fseek (Lib, O->Start + O->Header.SegOffs, SEEK_SET);
  	    ObjReadSections (Lib, O);
 
-	    /* We have the data now */
- 	    O->Flags |= OBJ_HAVEDATA;
- 	}
+            /* Add a pointer to the library name */
+            O->LibName = LibName;
 
-        /* All references to strings are now resolved, so we can delete
-         * the module string pool.
-         */
-        FreeObjStrings (O);
+            /* All references to strings are now resolved, so we can delete
+             * the module string pool.
+             */
+            FreeObjStrings (O);
 
- 	/* Add a pointer to the library name */
- 	O->LibName = LibName;
+            /* Insert the object into the list of all used object files */
+            InsertObjData (O);
+
+        } else {
+
+            /* Unreferenced object file, remove it */
+            FreeObjData (O);
+
+        }
     }
 
     /* Done. Close the file, release allocated memory */
     fclose (F);
     xfree (Index);
     Lib		= 0;
-    LibName	= 0;
     ModuleCount = 0;
     Index	= 0;
 }

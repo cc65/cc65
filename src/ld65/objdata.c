@@ -41,6 +41,7 @@
 
 /* ld65 */
 #include "error.h"
+#include "exports.h"
 #include "fileinfo.h"
 #include "objdata.h"
 #include "spool.h"
@@ -53,11 +54,8 @@
 
 
 
-/* Object data list management */
-unsigned    	ObjCount = 0;	/* Count of object files in the list */
-ObjData*    	ObjRoot  = 0;	/* List of object files */
-ObjData*    	ObjLast  = 0;	/* Last entry in list */
-ObjData**      	ObjPool  = 0;	/* Object files as array */
+/* Collection containing used ObjData objects */
+Collection       ObjDataList = STATIC_COLLECTION_INITIALIZER;
 
 
 
@@ -75,8 +73,9 @@ ObjData* NewObjData (void)
 
     /* Initialize the data */
     O->Next        	= 0;
-    O->Name  	   	= 0;
-    O->LibName    	= 0;
+    O->Name  	   	= INVALID_STRING_ID;
+    O->LibName    	= INVALID_STRING_ID;
+    O->MTime            = 0;
     O->Flags   	   	= 0;
     O->Start	   	= 0;
     O->ExportCount 	= 0;
@@ -90,20 +89,29 @@ ObjData* NewObjData (void)
     O->StringCount      = 0;
     O->Strings          = 0;
 
-    /* Link it into the list */
-    if (ObjLast) {
-     	ObjLast->Next = O;
-     	ObjLast       = O;
-    } else {
-     	/* First entry */
-     	ObjRoot = ObjLast = O;
-    }
-
-    /* One object file more now */
-    ++ObjCount;
-
     /* Return the new entry */
     return O;
+}
+
+
+
+void FreeObjData (ObjData* O)
+/* Free an ObjData object. NOTE: This function works only for unused object
+ * data, that is, ObjData objects that aren't used because they aren't
+ * referenced.
+ */
+{
+    /* Unused ObjData do only have the string pool, Exports and Imports. */
+    while (O->ExportCount) {
+        FreeExport (O->Exports[--O->ExportCount]);
+    }
+    xfree (O->Exports);
+    while (O->ImportCount) {
+        FreeImport (O->Imports[--O->ImportCount]);
+    }
+    xfree (O->Imports);
+    FreeObjStrings (O);
+    xfree (O);
 }
 
 
@@ -118,6 +126,14 @@ void FreeObjStrings (ObjData* O)
     }
     xfree (O->Strings);
     O->Strings = 0;
+}
+
+
+
+void InsertObjData (ObjData* O)
+/* Insert the ObjData object into the collection of used ObjData objects. */
+{
+    CollAppend (&ObjDataList, O);
 }
 
 
@@ -153,7 +169,7 @@ const char* GetObjFileName (const ObjData* O)
  * file is NULL.
  */
 {
-    return O? O->Name : "[linker generated]";
+    return O? GetString (O->Name) : "[linker generated]";
 }
 
 

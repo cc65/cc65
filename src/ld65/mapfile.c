@@ -60,7 +60,6 @@
 void CreateMapFile (void)
 /* Create a map file */
 {
-    ObjData* O;
     unsigned I;
 
     /* Open the map file */
@@ -72,28 +71,30 @@ void CreateMapFile (void)
     /* Write a modules list */
     fprintf (F, "Modules list:\n"
      	       	"-------------\n");
-    O = ObjRoot;
-    while (O) {
-     	if (O->Flags & OBJ_HAVEDATA) {
-     	    /* We've linked this module */
-     	    if (O->LibName) {
-     	       	/* The file is from a library */
-     	       	fprintf (F, "%s(%s):\n", O->LibName, GetObjFileName (O));
-     	    } else {
-     	       	fprintf (F, "%s:\n", GetObjFileName (O));
-     	    }
-     	    for (I = 0; I < O->SectionCount; ++I) {
-     		const Section* S = O->Sections [I];
-     		/* Don't include zero sized sections if not explicitly
-     	      	 * requested
-     		 */
-     		if (VerboseMap || S->Size > 0) {
-       	       	    fprintf (F, "    %-15s   Offs = %06lX   Size = %06lX\n",
-     			     GetString (S->Seg->Name), S->Offs, S->Size);
-     		}
-     	    }
-     	}
-     	O = O->Next;
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
+
+        unsigned J;
+
+        /* Get the object file */
+        const ObjData* O = CollConstAt (&ObjDataList, I);
+
+        /* Output the data */
+        if (O->LibName != INVALID_STRING_ID) {
+            /* The file is from a library */
+            fprintf (F, "%s(%s):\n", GetString (O->LibName), GetObjFileName (O));
+        } else {
+            fprintf (F, "%s:\n", GetObjFileName (O));
+        }
+        for (J = 0; J < O->SectionCount; ++J) {
+            const Section* S = O->Sections [J];
+            /* Don't include zero sized sections if not explicitly
+             * requested
+             */
+            if (VerboseMap || S->Size > 0) {
+                fprintf (F, "    %-15s   Offs = %06lX   Size = %06lX\n",
+                         GetString (S->Seg->Name), S->Offs, S->Size);
+            }
+        }
     }
 
     /* Write the segment list */
@@ -125,7 +126,7 @@ void CreateMapFile (void)
 void CreateLabelFile (void)
 /* Create a label file */
 {
-    ObjData* O;
+    unsigned I;
 
     /* Open the label file */
     FILE* F = fopen (LabelFileName, "w");
@@ -136,15 +137,14 @@ void CreateLabelFile (void)
     /* Print the labels for the export symbols */
     PrintExportLabels (F);
 
-    /* Print debug symbols from all modules we have linked into the output file */
-    O = ObjRoot;
-    while (O) {
-     	if (O->Flags & OBJ_HAVEDATA) {
-     	    /* We've linked this module */
-	    PrintDbgSymLabels (O, F);
+    /* Create labels from all modules we have linked into the output file */
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
-     	}
-     	O = O->Next;
+        /* Get the object file */
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Output the labels */
+	PrintDbgSymLabels (O, F);
     }
 
     /* If we should mark write protected areas as such, do it */
@@ -174,7 +174,7 @@ void CreateLabelFile (void)
 void CreateDbgFile (void)
 /* Create a debug info file */
 {
-    ObjData* O;
+    unsigned I;
 
     /* Open the debug info file */
     FILE* F = fopen (DbgFileName, "w");
@@ -183,14 +183,13 @@ void CreateDbgFile (void)
     }
 
     /* Print line infos from all modules we have linked into the output file */
-    O = ObjRoot;
-    while (O) {
-     	if (O->Flags & OBJ_HAVEDATA) {
-     	    /* We've linked this module */
-	    PrintDbgInfo (O, F);
+    for (I = 0; I < CollCount (&ObjDataList); ++I) {
 
-     	}
-     	O = O->Next;
+        /* Get the object file */
+        ObjData* O = CollAtUnchecked (&ObjDataList, I);
+
+        /* Output debug info */
+	PrintDbgInfo (O, F);
     }
 
     /* Close the file */

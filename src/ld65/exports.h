@@ -65,6 +65,7 @@ struct Import {
     FilePos  		Pos;		/* File position of reference */
     struct Export*	Exp;		/* Matching export for this import */
     unsigned            Name;		/* Name if not in table */
+    unsigned char       Flags;          /* Generic flags */
     unsigned char    	Type;		/* Type of import */
 };
 
@@ -103,11 +104,23 @@ typedef int (*ExpCheckFunc) (unsigned Name, void* Data);
 
 
 
+void FreeImport (Import* I);
+/* Free an import. NOTE: This won't remove the import from the exports table,
+ * so it may only be called for unused imports (imports from modules that
+ * aren't referenced).
+ */
+
 Import* ReadImport (FILE* F, ObjData* Obj);
 /* Read an import from a file and insert it into the table */
 
 void InsertImport (Import* I);
 /* Insert an import into the table */
+
+void FreeExport (Export* E);
+/* Free an export. NOTE: This won't remove the export from the exports table,
+ * so it may only be called for unused exports (exports from modules that
+ * aren't referenced).
+ */
 
 Export* ReadExport (FILE* F, ObjData* Obj);
 /* Read an export from a file */

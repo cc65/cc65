@@ -39,6 +39,7 @@
 
 
 /* common */
+#include "coll.h"
 #include "objdefs.h"
 
 
@@ -51,16 +52,14 @@
 
 /* Values for the Flags field */
 #define	OBJ_REF		0x0001 	       	/* We have a reference to this file */
-#define OBJ_HAVEDATA	0x0002		/* We have this object file already */
-#define OBJ_MARKED     	0x0004 		/* Generic marker bit */
-
 
 /* Internal structure holding object file data */
 typedef struct ObjData ObjData;
 struct ObjData {
-    ObjData*	     	Next; 		/* Linked list of all objects */
-    char*   	     	Name; 		/* Module name */
-    char*      	       	LibName;	/* Name of library */
+    ObjData*	     	Next;  		/* Linked list of all objects */
+    unsigned            Name;  		/* Module name */
+    unsigned            LibName;	/* Name of library */
+    unsigned long       MTime;          /* Time of last modification */
     ObjHeader	 	Header;		/* Header of file */
     unsigned long	Start;		/* Start offset of data in library */
     unsigned 	     	Flags;
@@ -82,15 +81,13 @@ struct ObjData {
 
 
 
-/* Object data list management */
-extern unsigned		ObjCount;	/* Count of files in the list */
-extern ObjData*		ObjRoot;	/* List of object files */
-extern ObjData*		ObjLast;	/* Last entry in list */
+/* Collection containing used ObjData objects */
+extern Collection       ObjDataList;
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Code		  	   	     */
+/*     	      	    	      	     Code		  	   	     */
 /*****************************************************************************/
 
 
@@ -98,10 +95,19 @@ extern ObjData*		ObjLast;	/* Last entry in list */
 ObjData* NewObjData (void);
 /* Allocate a new structure on the heap, insert it into the list, return it */
 
+void FreeObjData (ObjData* O);
+/* Free an ObjData object. NOTE: This function works only for unused object
+ * data, that is, ObjData objects that aren't used because they aren't
+ * referenced.
+ */
+
 void FreeObjStrings (ObjData* O);
 /* Free the module string data. Used once the object file is loaded completely
  * when all strings are converted to global strings.
  */
+
+void InsertObjData (ObjData* O);
+/* Insert the ObjData object into the collection of used ObjData objects. */
 
 const char* GetObjString (const ObjData* O, unsigned Index);
 /* Get a string from the object file string table. Abort if the string index

@@ -34,10 +34,7 @@ extern unsigned char Preprocessing;
 
 
 
-int searchtok (const char *sym, const struct tok_elt* toks);
-/* Search a token in a table */
-
-void preprocess (void);
+void Preprocess (void);
 /* Preprocess a line */
 
 

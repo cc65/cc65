@@ -800,7 +800,7 @@ static int primary (struct expent* lval)
 	     * and returning int.
 	     */
 	    Warning (WARN_FUNC_WITHOUT_PROTO);
-	    Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_EXTERN | SC_REF);
+	    Sym = AddGlobalSym (Ident, GetImplicitFuncType(), SC_EXTERN | SC_REF | SC_FUNC);
 	    lval->e_tptr  = Sym->Type;
 	    lval->e_flags = E_MGLOBAL | E_MCONST | E_TGLAB;
        	    lval->e_name  = (unsigned long) Sym->Name;

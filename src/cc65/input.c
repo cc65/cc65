@@ -49,7 +49,7 @@
 
 
 /*****************************************************************************/
-/*	       	     	     	     Data		     		     */
+/*	       	      	     	     Data		     		     */
 /*****************************************************************************/
 
 
@@ -57,32 +57,39 @@
 /* Input line stuff */
 static char LineBuf [LINESIZE];
 char* line = LineBuf;
-char* lptr = LineBuf;
+const char* lptr = LineBuf;
+
+/* Current and next input character */
+char CurC  = '\0';
+char NextC = '\0';
 
 /* Maximum count of nested includes */
-#define MAX_INC_NESTING 	20
+#define MAX_INC_NESTING 	16
 
 /* Struct that describes an input file */
 typedef struct IFile IFile;
 struct IFile {
-    IFile*	Next;	 	/* Next file in single linked list 	*/
+    IFile*	Next; 	 	/* Next file in single linked list 	*/
     IFile*	Active;		/* Next file in list of active includes */
     unsigned	Index;	 	/* File index 				*/
-    unsigned	Line;	 	/* Line number for this file 		*/
-    FILE*	F;	 	/* Input file stream 			*/
+    unsigned	Line; 	 	/* Line number for this file 		*/
+    FILE*	F;    	 	/* Input file stream 			*/
     char       	Name[1]; 	/* Name of file (dynamically allocated) */
 };
 
+/* Main file input data */
+static const IFile* MainFile = 0;
+
 /* List of input files */
 static unsigned IFileTotal = 0;	/* Total number of files 		*/
-static IFile*	IFileList  = 0;	/* Single linked list of all files 	*/
+static IFile*  	IFileList  = 0;	/* Single linked list of all files 	*/
 static unsigned IFileCount = 0; /* Number of active input files 	*/
-static IFile*   Input	   = 0; /* Single linked list of active files	*/
+static IFile*   Input 	   = 0; /* Single linked list of active files	*/
 
 
 
 /*****************************************************************************/
-/*		      		 struct IFile				     */
+/*	       	      		 struct IFile				     */
 /*****************************************************************************/
 
 
@@ -108,6 +115,7 @@ static IFile* NewIFile (const char* Name, FILE* F)
     IF->Active	= Input;
     Input	= IF;
     ++IFileCount;
+    ++IFileTotal;
 
     /* Return the new struct */
     return IF;
@@ -132,7 +140,7 @@ void OpenMainFile (const char* Name)
     }
 
     /* Setup a new IFile structure */
-    NewIFile (Name, F);
+    MainFile = NewIFile (Name, F);
 }
 
 
@@ -187,6 +195,55 @@ static void CloseIncludeFile (void)
 
     /* Make this file inactive and the last one active again */
     Input = Input->Active;
+
+    /* Adjust the counter */
+    --IFileCount;
+}
+
+
+
+void ClearLine (void)
+/* Clear the current input line */
+{
+    line[0] = '\0';
+    lptr    = line;
+    CurC    = '\0';
+    NextC   = '\0';
+}
+
+
+
+void InitLine (const char* Buf)
+/* Initialize lptr from Buf and read CurC and NextC from the new input line */
+{
+    lptr = Buf;
+    CurC = lptr[0];
+    if (CurC != '\0') {
+	NextC = lptr[1];
+    } else {
+	NextC = '\0';
+    }
+}
+
+
+
+void NextChar (void)
+/* Read the next character from the input stream and make CurC and NextC
+ * valid. If end of line is reached, both are set to NUL, no more lines
+ * are read by this function.
+ */
+{
+    if (lptr[0] != '\0') {
+	++lptr;
+       	CurC = lptr[0];
+	if (CurC != '\0') {
+	    NextC = lptr[1];
+	} else {
+	    NextC = '\0';
+	}
+    } else {
+	CurC = NextC = '\0';
+    }
 }
 
 
@@ -255,17 +312,11 @@ int NextLine (void)
       	}
     }
 
-    /* Got a line */
+    /* Got a line. Initialize the current and next characters. */
+    InitLine (line);
+
+    /* Done */
     return 1;
-}
-
-
-
-void ClearLine (void)
-/* Clear the current input line */
-{
-    line [0] = '\0';
-    lptr = line;
 }
 
 
@@ -274,7 +325,11 @@ const char* GetCurrentFile (void)
 /* Return the name of the current input file */
 {
     if (Input == 0) {
-      	return "(outside file scope)";
+	if (MainFile) {
+	    return MainFile->Name;
+	} else {
+      	    return "(outside file scope)";
+	}
     } else {
       	return Input->Name;
     }
@@ -286,42 +341,6 @@ unsigned GetCurrentLine (void)
 /* Return the line number in the current input file */
 {
     return Input? Input->Line : 0;
-}
-
-
-
-int nch (void)
-/* Get the next char in input stream (the one behind the current one) */
-{
-    if (*lptr == '\0') {
-    	return 0;
-    } else {
-    	return lptr[1] & 0xFF;
-    }
-}
-
-
-
-int cgch (void)
-/* Get the current character in the input stream and advance line
- * pointer (unless already at end of line).
- */
-{
-    if (*lptr == '\0') {
-   	return (0);
-    } else {
-   	return (*lptr++ & 0xFF);
-    }
-}
-
-
-
-int gch (void)
-/* Get the current character in the input stream and advance line
- * pointer (no end of line check is performed).
- */
-{
-    return (*lptr++ & 0xFF);
 }
 
 

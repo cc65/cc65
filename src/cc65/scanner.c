@@ -43,7 +43,7 @@ Token NextTok;		/* The next token */
 #define TT_EXT	1 		/* cc65 extension */
 
 /* Token table */
-static struct Keyword {
+static const struct Keyword {
     char*    	    Key;    	/* Keyword name */
     unsigned char   Tok;    	/* The token */
     unsigned char   Type;      	/* Token type */
@@ -114,7 +114,7 @@ static int CmpKey (const void* Key, const void* Elem)
 
 
 
-static int FindKey (char* Key)
+static int FindKey (const char* Key)
 /* Find a keyword and return the token. Return IDENT if the token is not a
  * keyword.
  */
@@ -129,21 +129,21 @@ static int FindKey (char* Key)
 }
 
 
-
-static int skipwhite (void)
+			  
+static int SkipWhite (void)
 /* Skip white space in the input stream, reading and preprocessing new lines
  * if necessary. Return 0 if end of file is reached, return 1 otherwise.
  */
 {
     while (1) {
-       	while (*lptr == 0) {
+       	while (CurC == 0) {
 	    if (NextLine () == 0) {
 	     	return 0;
      	    }
-	    preprocess ();
+	    Preprocess ();
      	}
-	if (*lptr == ' ' || *lptr == '\r') {
-    	    ++lptr;
+	if (CurC == ' ' || CurC == '\r') {
+    	    NextChar ();
 	} else {
     	    return 1;
 	}
@@ -152,27 +152,27 @@ static int skipwhite (void)
 
 
 
-void symname (char *s)
+void SymName (char* s)
 /* Get symbol from input stream */
 {
     unsigned k = 0;
     do {
-     	if (k != MAX_IDENTLEN) {
-     	    ++k;
-     	    *s++ = *lptr;
+       	if (k != MAX_IDENTLEN) {
+       	    ++k;
+       	    *s++ = CurC;
      	}
-     	++lptr;
-    } while (IsIdent (*lptr) || isdigit (*lptr));
+       	NextChar ();
+    } while (IsIdent (CurC) || isdigit (CurC));
     *s = '\0';
 }
 
 
 
-int issym (char *s)
+int IsSym (char *s)
 /* Get symbol from input stream or return 0 if not a symbol. */
 {
-    if (IsIdent (*lptr)) {
-     	symname (s);
+    if (IsIdent (CurC)) {
+     	SymName (s);
      	return 1;
     } else {
      	return 0;
@@ -181,11 +181,11 @@ int issym (char *s)
 
 
 
-static void unknown (unsigned char c)
+static void unknown (char C)
 /* Error message for unknown character */
 {
-    Error (ERR_INVALID_CHAR, c);
-    gch ();			/* Skip */
+    Error (ERR_INVALID_CHAR, C);
+    NextChar (); 			/* Skip */
 }
 
 
@@ -209,7 +209,7 @@ static void SetTok (int tok)
 /* set nxttok and bump line ptr */
 {
     nxttok = tok;
-    ++lptr;
+    NextChar ();
 }
 
 
@@ -226,63 +226,73 @@ static int SignExtendChar (int C)
 
 
 
-static int parsechar (int c)
+static int ParseChar (void)
 /* Parse a character. Converts \n into EOL, etc. */
 {
     int i;
-    int val;
+    unsigned val;
+    int C;
 
     /* Check for escape chars */
-    if (c == '\\') {
-	switch (c = gch ()) {
+    if (CurC == '\\') {
+	NextChar ();
+	switch (CurC) {
 	    case 'b':
-	   	c = '\b';
+	       	C = '\b';
 	   	break;
-	    case 'f':
-	   	c = '\f';
+     	    case 'f':
+	   	C = '\f';
 		break;
 	    case 'r':
-		c = '\r';
+		C = '\r';
 		break;
 	    case 'n':
-		c = '\n';
+		C = '\n';
 		break;
 	    case 't':
-		c = '\t';
+		C = '\t';
 		break;
 	    case '\"':
-		c = '\"';
+		C = '\"';
 		break;
 	    case '\'':
-		c = '\'';
+		C = '\'';
 		break;
 	    case '\\':
-		c = '\\';
+		C = '\\';
 		break;
 	    case 'x':
 	    case 'X':
 		/* Hex character constant */
-		val = hexval (gch ()) << 4;
-       	       	c = val | hexval (gch ()); 	/* Do not translate */
+		NextChar ();
+		val = hexval (CurC) << 4;
+		NextChar ();
+       	       	C = val | hexval (CurC); 	/* Do not translate */
 		break;
 	    case '0':
 	    case '1':
 		/* Octal constant */
 		i = 0;
-		val = c - '0';
-		while ((c = *lptr) >= '0' && c <= '7' && i++ < 4) {
-		    val = (val << 3) | (c - '0');
-		    gch ();
-		}
-		c = val;	     	/* Do not translate */
+     		C = CurC - '0';
+       	       	while (NextC >= '0' && NextC <= '7' && i++ < 4) {
+     		    NextChar ();
+     	       	    C = (C << 3) | (CurC - '0');
+     		}
+     		break;
+     	    default:
+     		Error (ERR_ILLEGAL_CHARCONST);
+		C = ' ';
 		break;
-	    default:
-		Error (ERR_ILLEGAL_CHARCONST);
-	}
+     	}
+    } else {
+     	C = CurC;
     }
 
+    /* Skip the character read */
+    NextChar ();
+
     /* Do correct sign extension */
-    return SignExtendChar (c);
+    return SignExtendChar (C);
 }
 
 
@@ -290,22 +300,25 @@ static int parsechar (int c)
 static void CharConst (void)
 /* Parse a character constant. */
 {
-    int c;
+    int C;
 
     /* Skip the quote */
-    ++lptr;
+    NextChar ();
 
     /* Get character */
-    c = parsechar (cgch ());
+    C = ParseChar ();
 
     /* Check for closing quote */
-    if (cgch () != '\'') {
+    if (CurC != '\'') {
        	Error (ERR_QUOTE_EXPECTED);
+    } else {
+	/* Skip the quote */
+	NextChar ();
     }
 
     /* Setup values and attributes */
     nxttok  = TOK_CCONST;
-    nxtval  = SignExtendChar (ctrans (c)); 	/* Translate into target charset */
+    nxtval  = SignExtendChar (ctrans (C)); 	/* Translate into target charset */
     nxttype = type_int;	       			/* Character constants have type int */
 }
 
@@ -318,24 +331,24 @@ static void StringConst (void)
     nxttok = TOK_SCONST;
 
     /* Be sure to concatenate strings */
-    while (*lptr == '\"') {
+    while (CurC == '\"') {
 
 	/* Skip the quote char */
-	++lptr;
+	NextChar ();
 
-	while (*lptr != '\"') {
-	    if (*lptr == 0) {
+	while (CurC != '\"') {
+	    if (CurC == '\0') {
 	     	Error (ERR_UNEXPECTED_NEWLINE);
 	     	break;
 	    }
-	    AddLiteralChar (parsechar (gch()));
+	    AddLiteralChar (ParseChar ());
 	}
 
 	/* Skip closing quote char if there was one */
-	cgch ();
+	NextChar ();
 
 	/* Skip white space, read new input */
-	skipwhite ();
+	SkipWhite ();
 
     }
 
@@ -348,7 +361,6 @@ static void StringConst (void)
 void NextToken (void)
 /* Get next token from input stream */
 {
-    char c;
     ident token;
 
     /* Current token is the lookahead token */
@@ -358,15 +370,14 @@ void NextToken (void)
     NextTok.Pos = GetCurrentLine();
 
     /* Skip spaces and read the next line if needed */
-    if (skipwhite () == 0) {
+    if (SkipWhite () == 0) {
 	/* End of file reached */
 	nxttok = TOK_CEOF;
 	return;
     }
 
     /* Determine the next token from the lookahead */
-    c = *lptr;
-    if (isdigit (c)) {
+    if (isdigit (CurC)) {
 
      	/* A number */
    	int HaveSuffix;		/* True if we have a type suffix */
@@ -378,49 +389,48 @@ void NextToken (void)
      	base  = 10;
      	types = IT_INT | IT_LONG | IT_ULONG;
 
-       	if (c == '0') {
+       	if (CurC == '0') {
      	    /* Octal or hex constants may also be of type unsigned int */
      	    types = IT_INT | IT_UINT | IT_LONG | IT_ULONG;
      	    /* gobble 0 and examin next char */
-     	    if (toupper (*++lptr) == 'X') {
+	    NextChar ();
+     	    if (toupper (CurC) == 'X') {
      	     	base = 16;
      	    	nxttype = type_uint;
-     	     	++lptr;	     		/* gobble "x" */
+       	       	NextChar ();	/* gobble "x" */
      	    } else {
      	     	base = 8;
      	    }
      	}
      	while (1) {
-     	    c = *lptr;
-     	    if (isdigit (c)) {
-     	     	k = k * base + (c - '0');
-     	    } else if (base == 16 && isxdigit (c)) {
-     	     	k = (k << 4) + hexval (c);
+     	    if (isdigit (CurC)) {
+     	     	k = k * base + (CurC - '0');
+     	    } else if (base == 16 && isxdigit (CurC)) {
+     	     	k = (k << 4) + hexval (CurC);
      	    } else {
      	     	break; 	      	/* not digit */
      	    }
-       	    ++lptr;   		/* gobble char */
+       	    NextChar ();	/* gobble char */
      	}
 
      	/* Check for a suffix */
 	HaveSuffix = 1;
-     	c = toupper (*lptr);
-     	if (c == 'U') {
+     	if (CurC == 'u' || CurC == 'U') {
      	    /* Unsigned type */
-     	    ++lptr;
-     	    if (toupper (*lptr) != 'L') {
+	    NextChar ();
+     	    if (toupper (CurC) != 'L') {
      	    	types = IT_UINT | IT_ULONG;
      	    } else {
-     	    	++lptr;
+     	    	NextChar ();
      	    	types = IT_ULONG;
      	    }
-     	} else if (c == 'L') {
+     	} else if (CurC == 'l' || CurC == 'L') {
      	    /* Long type */
-     	    ++lptr;
-     	    if (toupper (*lptr) != 'U') {
+       	    NextChar ();
+     	    if (toupper (CurC) != 'U') {
      	    	types = IT_LONG | IT_ULONG;
      	    } else {
-     	    	++lptr;
+     	    	NextChar ();
      	    	types = IT_ULONG;
      	    }
      	} else {
@@ -465,7 +475,7 @@ void NextToken (void)
      	return;
     }
 
-    if (issym (token)) {
+    if (IsSym (token)) {
 
      	/* Check for a keyword */
      	if ((nxttok = FindKey (token)) != TOK_IDENT) {
@@ -506,10 +516,11 @@ void NextToken (void)
     }
 
     /* Monstrous switch statement ahead... */
-    switch (c) {
+    switch (CurC) {
 
     	case '!':
-    	    if (*++lptr == '=') {
+	    NextChar ();
+    	    if (CurC == '=') {
     		SetTok (TOK_NE);
     	    } else {
     		nxttok = TOK_BOOL_NOT;
@@ -521,7 +532,8 @@ void NextToken (void)
     	    break;
 
     	case '%':
-    	    if (*++lptr == '=') {
+	    NextChar ();
+    	    if (CurC == '=') {
     		SetTok (TOK_MOD_ASSIGN);
     	    } else {
     		nxttok = TOK_MOD;
@@ -529,7 +541,8 @@ void NextToken (void)
     	    break;
 
     	case '&':
-    	    switch (*++lptr) {
+	    NextChar ();
+    	    switch (CurC) {
     		case '&':
     		    SetTok (TOK_BOOL_AND);
     		    break;
@@ -554,7 +567,8 @@ void NextToken (void)
     	    break;
 
     	case '*':
-    	    if (*++lptr == '=') {
+	    NextChar ();
+    	    if (CurC == '=') {
     		SetTok (TOK_MUL_ASSIGN);
     	    } else {
     		nxttok = TOK_STAR;
@@ -562,7 +576,8 @@ void NextToken (void)
     	    break;
 
     	case '+':
-    	    switch (*++lptr) {
+	    NextChar ();
+    	    switch (CurC) {
     	    	case '+':
     		    SetTok (TOK_INC);
     		    break;
@@ -579,7 +594,8 @@ void NextToken (void)
     	    break;
 
     	case '-':
-    	    switch (*++lptr) {
+	    NextChar ();
+    	    switch (CurC) {
     	      	case '-':
     		    SetTok (TOK_DEC);
     		    break;
@@ -595,11 +611,13 @@ void NextToken (void)
     	    break;
 
     	case '.':
-    	    if (*++lptr == '.') {
-    		if (*++lptr == '.') {
+	    NextChar ();
+       	    if (CurC == '.') {
+		NextChar ();
+    		if (CurC == '.') {
     		    SetTok (TOK_ELLIPSIS);
     		} else {
-    		    unknown (*lptr);
+    		    unknown (CurC);
     		}
     	    } else {
     		nxttok = TOK_DOT;
@@ -607,7 +625,8 @@ void NextToken (void)
     	    break;
 
     	case '/':
-    	    if (*++lptr == '=') {
+	    NextChar ();
+    	    if (CurC == '=') {
     		SetTok (TOK_DIV_ASSIGN);
     	    } else {
     	     	nxttok = TOK_DIV;
@@ -623,12 +642,14 @@ void NextToken (void)
     	    break;
 
     	case '<':
-    	    switch (*++lptr) {
+	    NextChar ();
+    	    switch (CurC) {
     		case '=':
     	      	    SetTok (TOK_LE);
     	    	    break;
     		case '<':
-    		    if (*++lptr == '=') {
+		    NextChar ();
+    		    if (CurC == '=') {
     		    	SetTok (TOK_SHL_ASSIGN);
     		    } else {
     		    	nxttok = TOK_SHL;
@@ -640,7 +661,8 @@ void NextToken (void)
     	    break;
 
     	case '=':
-    	    if (*++lptr == '=') {
+	    NextChar ();
+       	    if (CurC == '=') {
     		SetTok (TOK_EQ);
     	    } else {
     		nxttok = TOK_ASSIGN;
@@ -648,12 +670,14 @@ void NextToken (void)
     	    break;
 
     	case '>':
-    	    switch (*++lptr) {
+	    NextChar ();
+    	    switch (CurC) {
     		case '=':
     		    SetTok (TOK_GE);
     		    break;
     		case '>':
-    		    if (*++lptr == '=') {
+		    NextChar ();
+    		    if (CurC == '=') {
     		    	SetTok (TOK_SHR_ASSIGN);
     		    } else {
     	     	    	nxttok = TOK_SHR;
@@ -677,7 +701,8 @@ void NextToken (void)
     	    break;
 
     	case '^':
-    	    if (*++lptr == '=') {
+	    NextChar ();
+    	    if (CurC == '=') {
     		SetTok (TOK_XOR_ASSIGN);
     	    } else {
     		nxttok = TOK_XOR;
@@ -689,7 +714,8 @@ void NextToken (void)
     	    break;
 
         case '|':
-    	    switch (*++lptr) {
+	    NextChar ();
+    	    switch (CurC) {
     		case '|':
     		    SetTok (TOK_BOOL_OR);
     		    break;
@@ -710,8 +736,11 @@ void NextToken (void)
     	    break;
 
         case '#':
-	    while (*++lptr == ' ') ;	/* Skip it and following whitespace */
-	    if (!issym (token) || strcmp (token, "pragma") != 0) {
+	    /* Skip it and following whitespace */
+	    do {
+	    	NextChar ();
+	    } while (CurC == ' ');
+	    if (!IsSym (token) || strcmp (token, "pragma") != 0) {
 	      	/* OOPS - should not happen */
 	      	Error (ERR_CPP_DIRECTIVE_EXPECTED);
 	    }
@@ -719,7 +748,7 @@ void NextToken (void)
 	    break;
 
     	default:
-       	    unknown (c);
+       	    unknown (CurC);
 
     }
 

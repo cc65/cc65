@@ -29,7 +29,8 @@
 
 
 
-static int Pass1 (char* from, char* to);
+static int Pass1 (const char* From, char* To);
+/* Preprocessor pass 1. Remove whitespace and comments. */
 
 
 
@@ -43,7 +44,7 @@ static int Pass1 (char* from, char* to);
 unsigned char Preprocessing = 0;
 
 /* Management data for #if */
-#define N_IFDEF		16
+#define N_IFDEF	    	16
 static int i_ifdef = -1;
 static char s_ifdef[N_IFDEF];
 
@@ -81,63 +82,76 @@ static void keepstr (const char* S)
 
 
 
-static void comment (void)
-/* Remove comment from line. */
+static void Comment (void)
+/* Remove a C comment from line. */
 {
+    /* Remember the current line number, so we can output better error
+     * messages if the comment is not terminated in the current file.
+     */
     unsigned StartingLine = GetCurrentLine();
 
-    gch ();
-    gch ();
-    while (*lptr != '*' || nch () != '/') {
-    	if (*lptr == '\0') {
+    /* Skip the start of comment chars */
+    NextChar ();
+    NextChar ();
+
+    /* Skip the comment */
+    while (CurC != '*' || NextC != '/') {
+    	if (CurC == '\0') {
     	    if (NextLine () == 0) {
     		PPError (ERR_EOF_IN_COMMENT, StartingLine);
     	    	return;
     	    }
 	} else {
-	    if (*lptr == '/' && nch() == '*') {
+	    if (CurC == '/' && NextC == '*') {
 		PPWarning (WARN_NESTED_COMMENT);
 	    }
-	    ++lptr;
+	    NextChar ();
 	}
     }
-    gch ();
-    gch ();
+
+    /* Skip the end of comment chars */
+    NextChar ();
+    NextChar ();
 }
 
 
 
-static void skipblank (void)
+static void SkipBlank (void)
 /* Skip blanks and tabs in the input stream. */
 {
-    while (IsBlank (*lptr)) {
-	++lptr;
+    while (IsBlank (CurC)) {
+	NextChar ();
     }
 }
 
 
 
-static char* CopyQuotedString (int Quote, char* Target)
-/* Copy a single or double quoted string from lptr to Target. Return the
+static char* CopyQuotedString (char* Target)
+/* Copy a single or double quoted string from the input to Target. Return the
  * new target pointer. Target will not be terminated after the copy.
  */
 {
-    /* Copy the starting quote */
-    *Target++ = gch();
+    /* Remember the quote character, copy it to the target buffer and skip it */
+    char Quote = CurC;
+    *Target++  = CurC;
+    NextChar ();
 
     /* Copy the characters inside the string */
-    while (*lptr != '\0' && *lptr != Quote) {
+    while (CurC != '\0' && CurC != Quote) {
        	/* Keep an escaped char */
- 	if (*lptr == '\\') {
- 	    *Target++ = gch();
+ 	if (CurC == '\\') {
+ 	    *Target++ = CurC;
+	    NextChar ();
  	}
  	/* Copy the character */
- 	*Target++ = cgch();
+ 	*Target++ = CurC;
+	NextChar ();
     }
 
     /* If we had a terminating quote, copy it */
-    if (*lptr) {
- 	*Target++ = gch();
+    if (CurC != '\0') {
+ 	*Target++ = CurC;
+	NextChar ();
     }
 
     /* Return the new target pointer */
@@ -152,12 +166,12 @@ static char* CopyQuotedString (int Quote, char* Target)
 
 
 
-static int macname (char *sname)
+static int MacName (char* Ident)
 /* Get macro symbol name.  If error, print message and clear line. */
 {
-    if (issym (sname) == 0) {
+    if (IsSym (Ident) == 0) {
 	PPError (ERR_IDENT_EXPECTED);
-     	ClearLine ();					     
+     	ClearLine ();
 	return 0;
     } else {
     	return 1;
@@ -169,20 +183,19 @@ static int macname (char *sname)
 static void ExpandMacroArgs (Macro* M)
 /* Preprocessor pass 2.  Perform macro substitution. */
 {
-    int		C;
     ident	Ident;
     const char* Replacement;
-    char*	SavePtr;
+    const char*	SavePtr;
 
     /* Save the current line pointer and setup the new ones */
     SavePtr = lptr;
-    lptr    = M->Replacement;
+    InitLine (M->Replacement);
 
     /* Copy the macro replacement checking for parameters to replace */
-    while ((C = *lptr) != '\0') {
+    while (CurC != '\0') {
 	/* If the next token is an identifier, check for a macro arg */
-     	if (IsIdent (C)) {
-     	    symname (Ident);
+     	if (IsIdent (CurC)) {
+     	    SymName (Ident);
 	    Replacement = FindMacroArg (M, Ident);
 	    if (Replacement) {
 		/* Macro arg, keep the replacement */
@@ -191,9 +204,9 @@ static void ExpandMacroArgs (Macro* M)
 		/* No macro argument, keep the original identifier */
      	    	keepstr (Ident);
      	    }
-     	} else if (C == '#' && IsIdent (nch ())) {
-     	    ++lptr;
-     	    symname (Ident);
+     	} else if (CurC == '#' && IsIdent (NextC)) {
+       	    NextChar ();
+     	    SymName (Ident);
 	    Replacement = FindMacroArg (M, Ident);
        	    if (Replacement) {
      	    	keepch ('\"');
@@ -203,15 +216,16 @@ static void ExpandMacroArgs (Macro* M)
      	    	keepch ('#');
      	    	keepstr (Ident);
      	    }
-     	} else if (IsQuoteChar(C)) {
-     	    mptr = CopyQuotedString (C, mptr);
+     	} else if (IsQuoteChar (CurC)) {
+     	    mptr = CopyQuotedString (mptr);
      	} else {
-     	    *mptr++ = *lptr++;
+     	    *mptr++ = CurC;
+	    NextChar ();
      	}
     }
 
     /* Reset the line pointer */
-    lptr = SavePtr;
+    InitLine (SavePtr);
 }
 
 
@@ -219,22 +233,21 @@ static void ExpandMacroArgs (Macro* M)
 static int MacroCall (Macro* M)
 /* Process a function like macro */
 {
-    unsigned 	ArgCount;      	/* Macro argument count */
+    unsigned  	ArgCount;      	/* Macro argument count */
     unsigned 	ParCount;       /* Number of open parenthesis */
     char     	Buf[LINESIZE];	/* Argument buffer */
-    char	C;
     const char* ArgStart;
     char*    	B;
 
     /* Expect an argument list */
-    skipblank ();
-    if (*lptr != '(') {
+    SkipBlank ();
+    if (CurC != '(') {
      	PPError (ERR_ILLEGAL_MACRO_CALL);
      	return 0;
     }
 
     /* Eat the left paren */
-    ++lptr;
+    NextChar ();
 
     /* Read the actual macro arguments and store pointers to these arguments
      * into the array of actual arguments in the macro definition.
@@ -244,52 +257,59 @@ static int MacroCall (Macro* M)
     ArgStart = Buf;
     B 	     = Buf;
     while (1) {
-     	C = *lptr;
-     	if (C == '(') {
-     	    *B++ = gch ();
+       	if (CurC == '(') {
+	    /* Nested parenthesis */
+     	    *B++ = CurC;
+	    NextChar ();
      	    ++ParCount;
-     	} else if (IsQuoteChar(C)) {
-    	    B = CopyQuotedString (C, B);
-     	} else if (C == ',' || C == ')') {
+     	} else if (IsQuoteChar (CurC)) {
+    	    B = CopyQuotedString (B);
+     	} else if (CurC == ',' || CurC == ')') {
      	    if (ParCount == 0) {
-	 	/* End of actual argument */
-     	       	gch ();
+	    	/* End of actual argument */
      	       	*B++ = '\0';
-		while (IsBlank(*ArgStart)) {
-		    ++ArgStart;
-		}
+	    	while (IsBlank(*ArgStart)) {
+	    	    ++ArgStart;
+	    	}
     	      	if (ArgCount < M->ArgCount) {
     	      	    M->ActualArgs[ArgCount++] = ArgStart;
-       	       	} else if (C != ')' || *ArgStart != '\0' || M->ArgCount > 0) {
-		    /* Be sure not to count the single empty argument for a
-		     * macro that does not have arguments.
-		     */
+       	       	} else if (CurC != ')' || *ArgStart != '\0' || M->ArgCount > 0) {
+	    	    /* Be sure not to count the single empty argument for a
+	    	     * macro that does not have arguments.
+	    	     */
     	      	    ++ArgCount;
+	    	}
+
+		/* Check for end of macro param list */
+		if (CurC == ')') {
+		    NextChar ();
+		    break;
 		}
 
-       	       	/* Start the next one */
+       	       	/* Start the next param */
      	       	ArgStart = B;
-     	       	if (C == ')') {
-     	       	    break;
-     	       	}
+		NextChar ();
      	    } else {
-     	       	*B++ = gch ();
-     	       	if (C == ')') {
+	    	/* Comma or right paren inside nested parenthesis */
+     	       	if (CurC == ')') {
      	       	    --ParCount;
      	       	}
+     	       	*B++ = CurC;
+	    	NextChar ();
      	    }
-     	} else if (IsBlank (C)) {
+     	} else if (IsBlank (CurC)) {
 	    /* Squeeze runs of blanks */
      	    *B++ = ' ';
-     	    skipblank ();
-     	} else if (C == '\0') {
+     	    SkipBlank ();
+     	} else if (CurC == '\0') {
 	    /* End of line inside macro argument list - read next line */
      	    if (NextLine () == 0) {
      	       	return 0;
      	    }
      	} else {
 	    /* Just copy the character */
-     	    *B++ = *lptr++;
+     	    *B++ = CurC;
+	    NextChar ();
      	}
     }
 
@@ -331,14 +351,14 @@ static void ExpandMacro (Macro* M)
 static void addmac (void)
 /* Add a macro to the macro table. */
 {
-    char*	saveptr;
-    ident	Ident;
-    char 	Buf[LINESIZE];
-    Macro* 	M;
+    char*   	saveptr;
+    ident   	Ident;
+    char    	Buf[LINESIZE];
+    Macro*  	M;
 
     /* Read the macro name */
-    skipblank ();
-    if (!macname (Ident)) {
+    SkipBlank ();
+    if (!MacName (Ident)) {
     	return;
     }
 
@@ -346,34 +366,36 @@ static void addmac (void)
     M = NewMacro (Ident);
 
     /* Check if this is a function like macro */
-    if (*lptr == '(') {
+    if (CurC == '(') {
 
     	/* Skip the left paren */
-    	gch ();
+    	NextChar ();
 
        	/* Set the marker that this is a function like macro */
 	M->ArgCount = 0;
 
 	/* Read the formal parameter list */
      	while (1) {
-     	    skipblank ();
-     	    if (*lptr == ')')
+     	    SkipBlank ();
+     	    if (CurC == ')')
      	    	break;
-     	    if (macname (Ident) == 0) {
+     	    if (MacName (Ident) == 0) {
      	    	return;
      	    }
 	    AddMacroArg (M, Ident);
-     	    skipblank ();
-     	    if (*lptr != ',')
+     	    SkipBlank ();
+     	    if (CurC != ',')
      	    	break;
-     	    gch ();
+     	    NextChar ();
      	}
-     	if (*lptr != ')') {
+
+	/* Check for a right paren and eat it if we find one */
+     	if (CurC != ')') {
        	    PPError (ERR_RPAREN_EXPECTED);
      	    ClearLine ();
      	    return;
      	}
-     	gch ();
+     	NextChar ();
     }
 
     /* Insert the macro into the macro table and allocate the ActualArgs array */
@@ -382,7 +404,7 @@ static void addmac (void)
     /* Remove whitespace and comments from the line, store the preprocessed
      * line into Buf.
      */
-    skipblank ();
+    SkipBlank ();
     saveptr = mptr;
     Pass1 (lptr, Buf);
     mptr = saveptr;
@@ -399,59 +421,63 @@ static void addmac (void)
 
 
 
-static int Pass1 (char* from, char* to)
-/* Preprocessor pass 1.  Remove whitespace and comments. */
+static int Pass1 (const char* From, char* To)
+/* Preprocessor pass 1. Remove whitespace and comments. */
 {
-    int 	c;
-    int 	done;
-    ident	Ident;
-    int 	HaveParen;
+    int     	done;
+    ident   	Ident;
+    int     	HaveParen;
 
-    lptr = from;
-    mptr = to;
+    /* Initialize reading from "From" */
+    InitLine (From);
+
+    /* Target is "To" */
+    mptr = To;
+
+    /* Loop removing ws and comments */
     done = 1;
-    while ((c = *lptr) != 0) {
-     	if (IsBlank (c)) {
+    while (CurC != '\0') {
+     	if (IsBlank (CurC)) {
      	    keepch (' ');
-     	    skipblank ();
-       	} else if (IsIdent (c)) {
-     	    symname (Ident);
+     	    SkipBlank ();
+       	} else if (IsIdent (CurC)) {
+     	    SymName (Ident);
      	    if (Preprocessing && strcmp(Ident, "defined") == 0) {
-     	   	/* Handle the "defined" operator */
-     	   	skipblank();
-     	   	HaveParen = 0;
-     	   	if (*lptr == '(') {
-     	   	    HaveParen = 1;
-     	   	    ++lptr;
-     	   	    skipblank();
-     	   	}
-     	   	if (!IsIdent(c)) {
-     	   	    PPError (ERR_IDENT_EXPECTED);
-     	   	    *mptr++ = '0';
-     	   	} else {
-     	   	    symname (Ident);
-     	   	    *mptr++ = IsMacro(Ident)? '1' : '0';
-     	   	    if (HaveParen) {
-     	   	  	skipblank();
-     	   	  	if (*lptr != ')') {
-     	   	  	    PPError (ERR_RPAREN_EXPECTED);
-	   	  	} else {
-	   	  	    ++lptr;
-	   	  	}
-	   	    }
-    	   	}
+     	    	/* Handle the "defined" operator */
+     	    	SkipBlank();
+     	    	HaveParen = 0;
+     	    	if (CurC == '(') {
+     	    	    HaveParen = 1;
+     	    	    NextChar ();
+     	    	    SkipBlank();
+     	    	}
+     	    	if (!IsIdent (CurC)) {
+     	    	    PPError (ERR_IDENT_EXPECTED);
+     	    	    *mptr++ = '0';
+     	    	} else {
+     	    	    SymName (Ident);
+     	    	    *mptr++ = IsMacro (Ident)? '1' : '0';
+     	    	    if (HaveParen) {
+     	    	       	SkipBlank();
+     	    	       	if (CurC != ')') {
+     	    	       	    PPError (ERR_RPAREN_EXPECTED);
+	    	       	} else {
+	    	       	    NextChar ();
+	    	       	}
+	    	    }
+    	    	}
 	    } else {
-	   	if (MaybeMacro(c)) {
-	   	    done = 0;
-	   	}
-	   	keepstr (Ident);
+	    	if (MaybeMacro (Ident[0])) {
+	    	    done = 0;
+	    	}
+	    	keepstr (Ident);
 	    }
-	} else if (IsQuoteChar(c)) {
-	    mptr = CopyQuotedString (c, mptr);
-	} else if (c == '/' && nch () == '*') {
+	} else if (IsQuoteChar (CurC)) {
+	    mptr = CopyQuotedString (mptr);
+	} else if (CurC == '/' && NextC == '*') {
 	    keepch (' ');
-     	    comment ();
-     	} else if (ANSI == 0 && c == '/' && nch () == '/') {
+     	    Comment ();
+     	} else if (ANSI == 0 && CurC == '/' && NextC == '/') {
      	    keepch (' ');
 	    /* Beware: Because line continuation chars are handled when reading
 	     * lines, we may only skip til the end of the source line, which
@@ -459,13 +485,14 @@ static int Pass1 (char* from, char* to)
 	     * source line is denoted by a lf (\n) character.
 	     */
 	    do {
-		++lptr;
-	    } while (*lptr != '\n' && *lptr != '\0');
-	    if (*lptr == '\n') {
-		++lptr;
+	       	NextChar ();
+	    } while (CurC != '\n' && CurC != '\0');
+	    if (CurC == '\n') {
+	    	NextChar ();
 	    }
      	} else {
-     	    *mptr++ = *lptr++;
+     	    *mptr++ = CurC;
+	    NextChar ();
      	}
     }
     keepch ('\0');
@@ -474,32 +501,37 @@ static int Pass1 (char* from, char* to)
 
 
 
-static int Pass2 (char *from, char *to)
+static int Pass2 (const char* From, char* To)
 /* Preprocessor pass 2.  Perform macro substitution. */
 {
-    int    	C;
-    int    	no_chg;
-    ident	Ident;
-    Macro* 	M;
+    int     	no_chg;
+    ident   	Ident;
+    Macro*  	M;
 
-    lptr = from;
-    mptr = to;
+    /* Initialize reading from "From" */
+    InitLine (From);
+
+    /* Target is "To" */
+    mptr = To;
+
+    /* Loop substituting macros */
     no_chg = 1;
-    while ((C = *lptr) != '\0') {
+    while (CurC != '\0') {
 	/* If we have an identifier, check if it's a macro */
-     	if (IsIdent (C)) {
-     	    symname (Ident);
+     	if (IsIdent (CurC)) {
+     	    SymName (Ident);
      	    M = FindMacro (Ident);
 	    if (M) {
-		ExpandMacro (M);
-		no_chg = 0;
+	    	ExpandMacro (M);
+	    	no_chg = 0;
 	    } else {
-		keepstr (Ident);
+	    	keepstr (Ident);
 	    }
-     	} else if (IsQuoteChar(C)) {
-     	    mptr = CopyQuotedString (C, mptr);
+     	} else if (IsQuoteChar(CurC)) {
+     	    mptr = CopyQuotedString (mptr);
      	} else {
-     	    *mptr++ = *lptr++;
+     	    *mptr++ = CurC;
+	    NextChar ();
      	}
     }
     return no_chg;
@@ -512,7 +544,6 @@ static void xlateline (void)
 {
     int cnt;
     int Done;
-    char *p;
 
     Done = Pass1 (line, mline);
     if (ExpandMacros == 0) {
@@ -521,7 +552,8 @@ static void xlateline (void)
     }
     cnt = 5;
     do {
-	p = line;
+	/* Swap mline and line */
+       	char* p = line;
 	line = mline;
     	mline = p;
 	if (Done)
@@ -529,7 +561,9 @@ static void xlateline (void)
 	Done = Pass2 (line, mline);
 	keepch ('\0');
     } while (--cnt);
-    lptr = line;
+
+    /* Reinitialize line parsing */
+    InitLine (line);
 }
 
 
@@ -539,8 +573,8 @@ static void doundef (void)
 {
     ident Ident;
 
-    skipblank ();
-    if (macname (Ident)) {
+    SkipBlank ();
+    if (MacName (Ident)) {
 	UndefineMacro (Ident);
     }
 }
@@ -574,11 +608,18 @@ static int doiff (int skip)
     Token sv2 = NextTok;
 
     /* Remove the #if from the line and add two semicolons as sentinels */
-    skipblank ();
+    SkipBlank ();
     S = line;
-    while ((*S++ = *lptr++) != '\0') ;
-    strcpy (S-1, ";;");
-    lptr = line;
+    while (CurC != '\0') {
+	*S++ = CurC;
+	NextChar ();
+    }
+    *S++ = ';';
+    *S++ = ';';
+    *S   = '\0';
+
+    /* Start over parsing from line */
+    InitLine (line);
 
     /* Switch into special preprocessing mode */
     Preprocessing = 1;
@@ -611,8 +652,8 @@ static int doifdef (int skip, int flag)
 {
     ident Ident;
 
-    skipblank ();
-    if (macname (Ident) == 0) {
+    SkipBlank ();
+    if (MacName (Ident) == 0) {
        	return 0;
     } else {
 	return setmflag (skip, flag, IsMacro(Ident));
@@ -624,60 +665,57 @@ static int doifdef (int skip, int flag)
 static void doinclude (void)
 /* Open an include file. */
 {
-    unsigned 	Length;
-    char*   	End;
-    char*   	Name;
     char    	RTerm;
     unsigned	DirSpec;
 
 
     /* Skip blanks */
-    mptr = mline;
-    skipblank ();
+    SkipBlank ();
 
     /* Get the next char and check for a valid file name terminator. Setup
      * the include directory spec (SYS/USR) by looking at the terminator.
      */
-    switch (cgch()) {
+    switch (CurC) {
 
-	case '\"':
-	    RTerm   = '\"';
-	    DirSpec = INC_USER;
-	    break;
+       	case '\"':
+       	    RTerm   = '\"';
+       	    DirSpec = INC_USER;
+       	    break;
 
-	case '<':
-	    RTerm   = '>';
-	    DirSpec = INC_SYS;
-	    break;
+       	case '<':
+       	    RTerm   = '>';
+       	    DirSpec = INC_SYS;
+       	    break;
 
-	default:
-	    PPError (ERR_INCLUDE_LTERM_EXPECTED);
-	    goto Done;
+       	default:
+       	    PPError (ERR_INCLUDE_LTERM_EXPECTED);
+       	    goto Done;
     }
+    NextChar ();
 
-    /* Search for the right terminator */
-    End = strchr (lptr, RTerm);
-    if (End == 0) {
- 	/* No terminator found */
-     	PPError (ERR_INCLUDE_RTERM_EXPECTED);
-    	goto Done;
+    /* Copy the filename into mline. Since mline has the same size as the
+     * input line, we don't need to check for an overflow here.
+     */
+    mptr = mline;
+    while (CurC != '\0' && CurC != RTerm) {
+	*mptr++ = CurC;
+	NextChar ();
     }
+    *mptr = '\0';
 
-    /* Create a temp copy of the filename */
-    Length = End - lptr;
-    Name = xmalloc (Length + 1);
-    memcpy (Name, lptr, Length);
-    Name[Length] = '\0';
+    /* Check if we got a terminator */
+    if (CurC != RTerm) {
+       	/* No terminator found */
+       	PPError (ERR_INCLUDE_RTERM_EXPECTED);
+       	goto Done;
+    }
 
     /* Open the include file */
-    OpenIncludeFile (Name, DirSpec);
-
-    /* Delete the temp filename copy */
-    xfree (Name);
+    OpenIncludeFile (mline, DirSpec);
 
 Done:
-    /* Clear the remaining line so the next input will come from the new 
-     * file (if open) 
+    /* Clear the remaining line so the next input will come from the new
+     * file (if open)
      */
     ClearLine ();
 }
@@ -687,8 +725,8 @@ Done:
 static void doerror (void)
 /* Print an error */
 {
-    skipblank ();
-    if (*lptr == '\0') {
+    SkipBlank ();
+    if (CurC == '\0') {
  	PPError (ERR_INVALID_USER_ERROR);
     } else {
         PPError (ERR_USER_ERROR, lptr);
@@ -704,38 +742,38 @@ static void doerror (void)
 
 /* stuff used to bum the keyword dispatching stuff */
 enum {
-    D_DEFINE,
-    D_ELSE,
-    D_ENDIF,
-    D_ERROR,
-    D_IF,
-    D_IFDEF,
-    D_IFNDEF,
-    D_INCLUDE,
-    D_LINE,
-    D_PRAGMA,
-    D_UNDEF,
-    D_ILLEGAL,
+    PP_DEFINE,
+    PP_ELSE,
+    PP_ENDIF,
+    PP_ERROR,
+    PP_IF,
+    PP_IFDEF,
+    PP_IFNDEF,
+    PP_INCLUDE,
+    PP_LINE,
+    PP_PRAGMA,
+    PP_UNDEF,
+    PP_ILLEGAL,
 };
 
 static const struct tok_elt pre_toks[] = {
-    {	"define",	D_DEFINE	},
-    {	"else",		D_ELSE		},
-    {	"endif",	D_ENDIF		},
-    {	"error",	D_ERROR		},
-    {	"if",		D_IF		},
-    {	"ifdef",	D_IFDEF		},
-    {	"ifndef",	D_IFNDEF	},
-    {	"include", 	D_INCLUDE	},
-    {   "line",		D_LINE		},
-    {	"pragma",	D_PRAGMA	},
-    {	"undef",	D_UNDEF		},
-    {	0,		D_ILLEGAL	}
+    {  	"define",      	PP_DEFINE	},
+    {  	"else",	       	PP_ELSE		},
+    {  	"endif",       	PP_ENDIF	},
+    {  	"error",       	PP_ERROR	},
+    {  	"if",  	       	PP_IF		},
+    {  	"ifdef",       	PP_IFDEF	},
+    {  	"ifndef",      	PP_IFNDEF	},
+    {  	"include",     	PP_INCLUDE	},
+    {   "line",	       	PP_LINE		},
+    {  	"pragma",      	PP_PRAGMA	},
+    {  	"undef",       	PP_UNDEF	},
+    {  	0,     	       	PP_ILLEGAL	}
 };
 
 
 
-int searchtok (const char *sym, const struct tok_elt *toks)
+static int searchtok (const char *sym, const struct tok_elt *toks)
 /* Search a token in a table */
 {
     while (toks->toknam && strcmp (toks->toknam, sym))
@@ -745,123 +783,119 @@ int searchtok (const char *sym, const struct tok_elt *toks)
 
 
 
-void preprocess (void)
+void Preprocess (void)
 /* Preprocess a line */
 {
-    int 	c;
     int 	Skip;
-    ident	sname;
-
-    /* Process compiler directives, skip empty lines */
-    lptr = line;
+    ident	Directive;
 
     /* Skip white space at the beginning of the line */
-    skipblank ();
+    SkipBlank ();
 
     /* Check for stuff to skip */
     Skip = 0;
-    while ((c = *lptr) == '\0' || c == '#' || Skip) {
+    while (CurC == '\0' || CurC == '#' || Skip) {
 
-  	/* Check for preprocessor lines lines */
-       	if (c == '#') {
-    	    ++lptr;
-    	    skipblank ();
-    	    if (*lptr == '\0') {
-    	   	/* ignore the empty preprocessor directive */
-    	   	continue;
-    	    }
-    	    if (!issym (sname)) {
-    	    	PPError (ERR_CPP_DIRECTIVE_EXPECTED);
-    	    	ClearLine ();
-    	    } else {
-       	       	switch (searchtok (sname, pre_toks)) {
+       	/* Check for preprocessor lines lines */
+       	if (CurC == '#') {
+       	    NextChar ();
+       	    SkipBlank ();
+       	    if (CurC == '\0') {
+       	    	/* Ignore the empty preprocessor directive */
+       	    	continue;
+       	    }
+       	    if (!IsSym (Directive)) {
+       	    	PPError (ERR_CPP_DIRECTIVE_EXPECTED);
+       	    	ClearLine ();
+       	    } else {
+       	       	switch (searchtok (Directive, pre_toks)) {
 
-    	    	    case D_DEFINE:
-    	    		if (!Skip) {
-    	    		    addmac ();
-    	    		}
-    	    		break;
+       	       	    case PP_DEFINE:
+       	    	    	if (!Skip) {
+       	    	    	    addmac ();
+       	    	    	}
+       	    	    	break;
 
-    		    case D_ELSE:
-    			if (s_ifdef[i_ifdef] & 2) {
-    			    if (s_ifdef[i_ifdef] & 4) {
-    			     	Skip = !Skip;
-    			    }
-    		    	    s_ifdef[i_ifdef] ^= 2;
-    			} else {
-    			    PPError (ERR_UNEXPECTED_CPP_ELSE);
-    			}
-    			break;
+       	       	    case PP_ELSE:
+       	    	    	if (s_ifdef[i_ifdef] & 2) {
+       	    	    	    if (s_ifdef[i_ifdef] & 4) {
+       	    	    	     	Skip = !Skip;
+       	    	    	    }
+       	    	    	    s_ifdef[i_ifdef] ^= 2;
+       	    	    	} else {
+       	    	    	    PPError (ERR_UNEXPECTED_CPP_ELSE);
+       	    	    	}
+       	    	    	break;
 
-    		    case D_ENDIF:
-    			if (i_ifdef >= 0) {
-    		     	    Skip = s_ifdef[i_ifdef--] & 1;
-    			} else {
-    			    PPError (ERR_UNEXPECTED_CPP_ENDIF);
-    			}
-    			break;
+       	       	    case PP_ENDIF:
+       	    	    	if (i_ifdef >= 0) {
+       	    	     	    Skip = s_ifdef[i_ifdef--] & 1;
+       	    	    	} else {
+       	    	    	    PPError (ERR_UNEXPECTED_CPP_ENDIF);
+       	    	    	}
+       	    	    	break;
 
-       	       	    case D_ERROR:
-			if (!Skip) {
-	    		    doerror ();
-			}
-    	    		break;
+       	       	    case PP_ERROR:
+       	    	    	if (!Skip) {
+       	    	    	    doerror ();
+	    	    	}
+    	    	    	break;
 
-    		    case D_IF:
-    	   		Skip = doiff (Skip);
-    	   		break;
+       	       	    case PP_IF:
+    	    	    	Skip = doiff (Skip);
+    	    	    	break;
 
-    	   	    case D_IFDEF:
-    	   		Skip = doifdef (Skip, 1);
-    	   		break;
+       	       	    case PP_IFDEF:
+    	    	    	Skip = doifdef (Skip, 1);
+    	    	    	break;
 
-    	   	    case D_IFNDEF:
-    	   		Skip = doifdef (Skip, 0);
-    	   		break;
+       	       	    case PP_IFNDEF:
+    	    	    	Skip = doifdef (Skip, 0);
+    	    	    	break;
 
-    	    	    case D_INCLUDE:
-    	    		if (!Skip) {
-    	    		    doinclude ();
-    	    		}
-    	    		break;
+       	       	    case PP_INCLUDE:
+    	    	    	if (!Skip) {
+    	    	    	    doinclude ();
+    	    	    	}
+    	    	    	break;
 
-		    case D_LINE:
-			/* Not allowed in strict ANSI mode */
-			if (ANSI) {
-			    PPError (ERR_CPP_DIRECTIVE_EXPECTED);
-			    ClearLine ();
-			}
-			break;
+       	       	    case PP_LINE:
+	    	    	/* Not allowed in strict ANSI mode */
+	    	    	if (ANSI) {
+	    	    	    PPError (ERR_CPP_DIRECTIVE_EXPECTED);
+	    	    	    ClearLine ();
+	    	    	}
+	    	    	break;
 
-    		    case D_PRAGMA:
-			if (!Skip) {
-			    /* Don't expand macros in this line */
-			    ExpandMacros = 0;
-    			    /* #pragma is handled on the scanner level */
-			    goto Done;
-			}
-    			break;
+       	       	    case PP_PRAGMA:
+	    	    	if (!Skip) {
+	    	    	    /* Don't expand macros in this line */
+	    	    	    ExpandMacros = 0;
+    	    	    	    /* #pragma is handled on the scanner level */
+	    	    	    goto Done;
+	    	    	}
+    	    	    	break;
 
-    	    	    case D_UNDEF:
-    	    		if (!Skip) {
-    	    		    doundef ();
-    	    		}
-    	    		break;
+       	       	    case PP_UNDEF:
+    	    	    	if (!Skip) {
+    	    	    	    doundef ();
+    	    	    	}
+    	    	    	break;
 
-    		    default:
-    			PPError (ERR_CPP_DIRECTIVE_EXPECTED);
-    	    		ClearLine ();
-    		}
+    	    	    default:
+    	    	    	PPError (ERR_CPP_DIRECTIVE_EXPECTED);
+    	    	    	ClearLine ();
+    	    	}
 	    }
 
     	}
     	if (NextLine () == 0) {
     	    if (i_ifdef >= 0) {
-    		PPError (ERR_CPP_ENDIF_EXPECTED);
+    	    	PPError (ERR_CPP_ENDIF_EXPECTED);
     	    }
     	    return;
     	}
-  	skipblank ();
+  	SkipBlank ();
     }
 
 Done:

@@ -50,7 +50,11 @@
 
 /* Input line stuff */
 extern char* line;
-extern char* lptr;
+extern const char* lptr;		/* ### Remove this */
+
+/* Current and next input character */
+extern char CurC;
+extern char NextC;
 
 
 
@@ -66,32 +70,26 @@ void OpenMainFile (const char* Name);
 void OpenIncludeFile (const char* Name, unsigned DirSpec);
 /* Open an include file and insert it into the tables. */
 
-int NextLine (void);
-/* Get a line from the current input. Returns 0 on end of file. */
-
 void ClearLine (void);
 /* Clear the current input line */
+
+void InitLine (const char* Buf);
+/* Initialize lptr from Buf and read CurC and NextC from the new input line */
+
+void NextChar (void);
+/* Read the next character from the input stream and make CurC and NextC
+ * valid. If end of line is reached, both are set to NUL, no more lines
+ * are read by this function.
+ */
+
+int NextLine (void);
+/* Get a line from the current input. Returns 0 on end of file. */
 
 const char* GetCurrentFile (void);
 /* Return the name of the current input file */
 
 unsigned GetCurrentLine (void);
 /* Return the line number in the current input file */
-
-int nch (void);
-/* Get the next char in input stream (the one behind the current one) */
-
-int cgch (void);
-/* Get the current character in the input stream and advance line
- * pointer (unless already at end of line).
- */
-
-int gch (void);
-/* Get the current character in the input stream and advance line
- * pointer (no end of line check is performed).
- */
-
-
 
 
 

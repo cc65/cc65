@@ -172,13 +172,13 @@ extern Token NextTok;		/* The next token */
 
 
 
-void symname (char* s);
+void SymName (char* s);
 /* Get symbol from input stream */
 
-int issym (char* s);
+int IsSym (char* s);
 /* Get symbol from input stream or return 0 if not a symbol. */
 
-void NextToken (void);		      
+void NextToken (void);
 /* Get next token from input stream */
 
 void Consume (token_t Token, unsigned ErrNum);

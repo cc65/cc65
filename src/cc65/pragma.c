@@ -40,7 +40,6 @@
 #include "error.h"
 #include "litpool.h"
 #include "symtab.h"
-#include "preproc.h"
 #include "scanner.h"
 #include "codegen.h"
 #include "expr.h"
@@ -55,7 +54,7 @@
 
 
 /* Tokens for the #pragmas */
-enum {
+typedef enum {
     PR_BSSSEG,
     PR_CODESEG,
     PR_DATASEG,
@@ -65,13 +64,51 @@ enum {
     PR_STATICLOCALS,
     PR_ZPSYM,
     PR_ILLEGAL
+} pragma_t;
+
+/* Pragma table */
+static const struct Pragma {
+    const char*	Key;		/* Keyword */
+    pragma_t	Tok;		/* Token */
+} Pragmas[] = {
+    { 	"bssseg",       PR_BSSSEG	},
+    {   "codeseg",    	PR_CODESEG	},
+    {   "dataseg",    	PR_DATASEG	},
+    {   "regvaraddr", 	PR_REGVARADDR	},
+    {   "rodataseg",  	PR_RODATASEG	},
+    {	"signedchars",	PR_SIGNEDCHARS	},
+    {	"staticlocals",	PR_STATICLOCALS	},
+    {   "zpsym",       	PR_ZPSYM  	},
 };
 
+/* Number of pragmas */
+#define PRAGMA_COUNT	(sizeof(Pragmas) / sizeof(Pragmas[0]))
+
 
 
 /*****************************************************************************/
-/*    	      	     	   	     code  				     */
+/*    	      	     	   	     Code  				     */
 /*****************************************************************************/
+
+
+
+static int CmpKey (const void* Key, const void* Elem)
+/* Compare function for bsearch */
+{
+    return strcmp ((const char*) Key, ((const struct Pragma*) Elem)->Key);
+}
+
+
+
+static pragma_t FindPragma (const char* Key)
+/* Find a pragma and return the token. Return PR_ILLEGAL if the keyword is
+ * not a valid pragma.
+ */
+{
+    struct Pragma* P;
+    P = bsearch (Key, Pragmas, PRAGMA_COUNT, sizeof (Pragmas[0]), CmpKey);
+    return P? P->Tok : PR_ILLEGAL;
+}
 
 
 
@@ -113,19 +150,7 @@ static void FlagPragma (unsigned char* Flag)
 void DoPragma (void)
 /* Handle pragmas */
 {
-    static const struct tok_elt Pragmas [] = {
-      	{ 	"bssseg",       PR_BSSSEG	},
-       	{       "codeseg",    	PR_CODESEG	},
-      	{       "dataseg",    	PR_DATASEG	},
-       	{       "regvaraddr", 	PR_REGVARADDR	},
-      	{       "rodataseg",  	PR_RODATASEG	},
-	{	"signedchars",	PR_SIGNEDCHARS	},
-	{	"staticlocals",	PR_STATICLOCALS	},
-      	{       "zpsym",       	PR_ZPSYM  	},
-      	{       0,     	      	PR_ILLEGAL	},
-    };
-
-    int Pragma;
+    pragma_t Pragma;
 
     /* Skip the token itself */
     NextToken ();
@@ -137,7 +162,7 @@ void DoPragma (void)
     }
 
     /* Do we know this pragma? */
-    Pragma = searchtok (CurTok.Ident, Pragmas);
+    Pragma = FindPragma (CurTok.Ident);
     if (Pragma == PR_ILLEGAL) {
 	/* According to the ANSI standard, we're not allowed to generate errors
 	 * for unknown pragmas, however, we're allowed to warn - and we will

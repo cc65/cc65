@@ -19,26 +19,36 @@
 
 
 /*****************************************************************************/
-/*			      SetJmp return codes			     */
+/*		      	      SetJmp return codes			     */
 /*****************************************************************************/
 
 
 
-#define RC_OK		0	     	/* Regular call */
-#define RC_EOF	  	1		/* EOF reached */
-#define RC_NOCONV 	2		/* No conversion possible */
+#define RC_OK	      	0	     	/* Regular call */
+#define RC_EOF	      	1	 	/* EOF reached */
+#define RC_NOCONV     	2	 	/* No conversion possible */
 
 
 
 /*****************************************************************************/
-/*  		  		     Data				     */
+/*  		      		     Data				     */
 /*****************************************************************************/
 
 
 
-static jmp_buf	JumpBuf;	/* Label that is used in case of EOF */
-static char    	C;     	      	/* Character from input */
-static unsigned	Width;      	/* Maximum field width */
+static struct indesc*	D;		/* Copy of function argument */
+static va_list		ap;	 	/* Copy of function argument */
+static jmp_buf 		JumpBuf; 	/* Label that is used in case of EOF */
+static char    		C;     	      	/* Character from input */
+static unsigned		Width;      	/* Maximum field width */
+static long    	  	IntVal;	 	/* Converted int value */
+static unsigned		Conversions;	/* Number of conversions */
+
+/* Flags */
+static unsigned char	Positive;  	/* Flag for positive value */
+static unsigned char 	NoAssign;	/* Supppress assigment */
+static unsigned char	IsShort;    	/* Short type */
+static unsigned char	IsLong;     	/* Long type */
 
 
 
@@ -54,39 +64,39 @@ static unsigned	Width;      	/* Maximum field width */
 
 
 
-static void ReadChar (struct indesc* d)
+static void ReadChar (void)
 /* Get an input character, count characters */
 {
-    C = d->fin (d);
-    ++d->ccount;
+    C = D->fin (D);
+    ++D->ccount;
 }
 
 
 
-static void SkipWhite (struct indesc* d)
+static void SkipWhite (void)
 /* Skip white space in the input and return the first non white character */
 {
     while (isspace (C)) {
-	ReadChar (d);
+	ReadChar ();
     }
 }
 
 
 
-static unsigned char ReadSign (struct indesc* d)
-/* Read an optional sign and skip it. Return 1 if the value is positive,
- * return 0 otherwise.
+static void ReadSign (void)
+/* Read an optional sign and skip it. Store 1 in Positive if the value is
+ * positive, store 0 otherwise.
  */
 {
     switch (C) {
       	case '-':
-       	    ReadChar (d);
-      	    return 0;
+       	    ReadChar ();
+      	    Positive = 0;
       	case '+':
-      	    ReadChar (d);
+      	    ReadChar ();
       	    /* FALLTHROUGH */
       	default:
-      	    return 1;
+      	    Positive = 1;
     }
 }
 
@@ -105,51 +115,71 @@ static unsigned char HexVal (char C)
 
 
 
-static unsigned long ReadInt (struct indesc* d, unsigned char Base)
-/* Read an integer */
+static void ReadInt (unsigned char Base)
+/* Read an integer and store it into IntVal */
 {
-    unsigned long V = 0;
-
     /* Value must start with a digit */
     if (!isdigit (C)) {
 	longjmp (JumpBuf, RC_NOCONV);
     }
 
     /* Read the value */
+    IntVal = 0;
     while (isxdigit (C) && Width-- > 0) {
 	printf ("ReadInt: '%c'\n", C);
-       	V = V * Base + HexVal (C);
-	ReadChar (d);
+       	IntVal = IntVal * Base + HexVal (C);
+	ReadChar ();
     }
 
-    /* Return the read value */
-    return V;
+    /* One more conversion */
+    ++Conversions;
 }
 
 
 
-int _scanf (struct indesc* d, const char* format, va_list ap)
+static void AssignInt (void)
+/* Assign the integer value in Val to the next argument. The function makes
+ * several non portable assumptions to reduce code size:
+ *   - int and unsigned types have the same representation
+ *   - short and int have the same representation.
+ *   - all pointer types have the same representation.
+ */
+{
+    if (!NoAssign) {
+	/* Get the next argument pointer */
+	void* P = va_arg (ap, void*);
+
+	/* Assign to the converted value */
+	if (IsLong) {
+	    *(long*)P = IntVal;
+	} else {
+	    *(int*)P = (int) IntVal;
+	}
+    }
+}
+
+
+
+int _scanf (struct indesc* D_, const char* format, va_list ap_)
 /* This is the routine used to do the actual work. It is called from several
  * types of wrappers to implement the actual ISO xxscanf functions.
  */
 {
-    unsigned	Conversions;	/* Number of conversions */
+    char   	  F;   	     	/* Character from format string */
+    unsigned char Result;    	/* setjmp result */
+    char*	  S;
+    unsigned char Base;		/* Integer base in %i */
 
-    char 	  F;   		/* Character from format string */
-    unsigned char NoAssign;   	/* Supppress assigment */
-    unsigned char IsShort;    	/* Short type */
-    unsigned char IsLong;     	/* Long type */
-    unsigned char Positive;	/* Flag for positive value */
-    unsigned char Result;	/* setjmp result */
-
-    /* Variables that hold intermediate values */
-    void*	  P;
-    long	  L;
-
+    /* Place copies of the arguments into global variables. This is not very
+     * nice, but on a 6502 platform it gives better code, since the values
+     * do not have to be passed as parameters.
+     */
+    D 	= D_;
+    ap	= ap_;
 
     /* Initialize variables */
     Conversions = 0;
-    d->ccount   = 0;
+    D->ccount   = 0;
 
     /* Set up the jump label. The get() routine will use this label when EOF
      * is reached.
@@ -160,7 +190,7 @@ int _scanf (struct indesc* d, const char* format, va_list ap)
 
 Again:
        	/* Get the next input character */
-	ReadChar (d);
+	ReadChar ();
 
 	/* Walk over the format string */
       	while (F = *format++) {
@@ -180,7 +210,7 @@ Again:
 		     * any amount of whitespace including none(!). So this
 		     * match will never fail.
 		     */
-		    SkipWhite (d);
+		    SkipWhite ();
 		    continue;
 
 		} else if (F != C) {
@@ -235,80 +265,64 @@ FlagsDone:
 		printf ("F = '%c'\n", F);
     		switch (F) {
 
-    		    case 'D':
+     		    case 'D':
     		    	IsLong = 1;
     	      	    case 'd':
       	      	    	/* Optionally signed decimal integer */
-			SkipWhite (d);
-      	      	    	Positive = ReadSign (d);
-      	      	    	L = ReadInt (d, 10);
+		  	SkipWhite ();
+      	      	    	ReadSign ();
+      	      	    	ReadInt (10);
 	      	    	if (!Positive) {
-	      	    	    L = -L;
+	      	    	    IntVal = -IntVal;
 	      	    	}
-	      	    	if (!NoAssign) {
-	      	    	    /* All pointers have the same size, so save some
-	      	    	     * code here.
-	      	    	     */
-	      	    	    P =	va_arg (ap, void*);
-	      	    	    if (IsLong) {
-	      			*(long*)P = L;
-	      		    } else {
-	      			*(int*)P = (int) L;
-	      		    }
-	      		}
-      	      		break;
+			AssignInt ();
+      	      	  	break;
 
       	      	    case 'i':
       	      	   	/* Optionally signed integer with a base */
-      	      		break;
+			SkipWhite ();
+			ReadSign ();
+			if (C == '0') {
+			    ReadChar ();
+			    switch (C) {
+			 	case 'x':
+			 	case 'X':
+			 	    Base = 16;
+			 	    ReadChar();
+			 	    break;
+			 	default:
+			 	    Base = 8;
+			    }
+			} else {
+			    Base = 10;
+			}
+			ReadInt (Base);
+			if (!Positive) {
+			    IntVal = -IntVal;
+			}
+			AssignInt ();
+      	      	  	break;
 
       	      	    case 'o':
-      	      		/* Unsigned octal integer */
-      	      	    	L = ReadInt (d, 8);
-	      	    	if (!NoAssign) {
-	      	    	    /* All pointers have the same size, so save some
-	      	    	     * code here.
-	      	    	     */
-	      	    	    P =	va_arg (ap, void*);
-	      	    	    if (IsLong) {
-	      			*(long*)P = L;
-	      		    } else {
-	      			*(int*)P = (int) L;
-	      		    }
-	      		}
+      	      	  	/* Unsigned octal integer */
+			SkipWhite ();
+      	      	    	ReadInt (8);
+			AssignInt ();
       	      		break;
 
       	      	    case 'u':
     	      		/* Unsigned decimal integer */
-      	      	    	L = ReadInt (d, 10);
-	      	    	if (!NoAssign) {
-	      	    	    /* All pointers have the same size, so save some
-	      	    	     * code here.
-	      	    	     */
-	      	    	    P =	va_arg (ap, void*);
-	      	    	    if (IsLong) {
-	      			*(long*)P = L;
-	      		    } else {
-	      			*(int*)P = (int) L;
-	      		    }
-	      		}
+			SkipWhite ();
+      	      	    	ReadInt (10);
+			AssignInt ();
     	      		break;
 
 	      	    case 'x':
 	      	    case 'X':
 	      		/* Unsigned hexadecimal integer */
-      	      	    	L = ReadInt (d, 16);
-	      	    	if (!NoAssign) {
-	      	    	    /* All pointers have the same size, so save some
-	      	    	     * code here.
-	      	    	     */
-	      	    	    P =	va_arg (ap, void*);
-	      	    	    if (IsLong) {
-	      			*(long*)P = L;
-	      	     	    } else {
-	      			*(int*)P = (int) L;
-	      		    }
-	      		}
+			SkipWhite ();
+      	      	    	ReadInt (16);
+			AssignInt ();
 	      		break;
 
 	      	    case 'E':
@@ -320,6 +334,14 @@ FlagsDone:
 
 	      	    case 's':
 	      		/* Whitespace terminated string */
+			SkipWhite ();
+			S = NoAssign? 0 : va_arg (ap, char*);
+			while (C && !isspace (C) && Width--) {
+			    if (S) {
+			     	*S++ = C;
+			    }
+			    ReadChar ();
+			}
 			break;
 
 		    case 'c':
@@ -330,12 +352,15 @@ FlagsDone:
 			/* String using characters from a set */
 			break;
 
-		    case 'p':
-			/* Pointer */
-			break;
+     		    case 'p':
+     			/* Pointer */
+     			break;
 
-		    case 'n':
-			/* Store characters consumed so far */
+     		    case 'n':
+     			/* Store characters consumed so far */
+			IntVal = D->ccount;
+			IsLong = 0;
+			AssignInt ();
 			break;
 
 		    default:
@@ -354,7 +379,7 @@ FlagsDone:
     } else if (Result == RC_EOF) {
 
 	/* Jump via JumpBuf means EOF on input */
-	if (d->ccount == 0) {
+	if (D->ccount == 0) {
 	    /* Special case: error */
 	    return -1;
 	}

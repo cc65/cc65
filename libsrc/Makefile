@@ -50,7 +50,7 @@ atarilib:
 	for i in atari common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-	    CFLAGS="-Osir -g -t atari -I../../include" \
+     	    CFLAGS="-Osir -g -t atari -I../../include" \
 	    AFLAGS="-t atari" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -66,7 +66,7 @@ c64lib:
 	for i in c64 cbm common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-	    CFLAGS="-Osir -g -t c64 -I../../include" \
+       	    CFLAGS="-Osir -g -t c64 -I../../include" \
 	    AFLAGS="-t c64" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -111,7 +111,13 @@ cbm610lib:
 # GEOS on the C64/128
 
 geoslib:
-	for i in geos common runtime; do \
+	CC=$(CC) \
+	AS=../$(AS) \
+	AR=../$(AR) \
+	CFLAGS="-Osir -g -t geos -I../../include" \
+	AFLAGS="-t geos" \
+	$(MAKE) -C geos || exit 1
+	for i in common runtime; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    AR=$(AR) \

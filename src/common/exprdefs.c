@@ -66,6 +66,10 @@ static void InternalDumpExpr (const ExprNode* Expr)
        	    printf (" SYM");
 	    break;
 
+	case EXPR_SECTION:
+	    printf (" SEC");
+	    break;
+
 	case EXPR_SEGMENT:
 	    printf (" SEG");
 	    break;
@@ -156,7 +160,7 @@ static void InternalDumpExpr (const ExprNode* Expr)
 
 	case EXPR_BAND:
 	    printf (" BOOL_AND");
-	    break;
+	    break;       
 
 	case EXPR_BOR:
 	    printf (" BOOL_OR");
@@ -164,7 +168,7 @@ static void InternalDumpExpr (const ExprNode* Expr)
 
 	case EXPR_BXOR:
 	    printf (" BOOL_XOR");
-	    break;	 
+	    break;
 
 	case EXPR_BNOT:
     	    printf (" BOOL_NOT");

@@ -83,6 +83,11 @@ static long Member (long AllocSize)
         AllocSize *= Multiplicator;
     }
 
+    /* Check the size for a reasonable value */
+    if (AllocSize >= 0x10000) {
+        Error ("Range error");
+    }
+
     /* Return the size */
     return AllocSize;
 }
@@ -99,13 +104,7 @@ static long DoStructInternal (long Offs, unsigned Type)
      * is started.
      */
     int Anon = (Tok != TOK_IDENT);
-    if (Anon) {
-        unsigned char T = GetCurrentSymTabType ();
-        if (T != ST_STRUCT) {
-            ErrorSkip ("Struct/union needs a name");
-            return 0;
-        }
-    } else {
+    if (!Anon) {
         /* Enter a new scope, then skip the name */
         SymEnterLevel (SVal, ST_STRUCT, ADDR_SIZE_ABS);
         NextTok ();
@@ -178,10 +177,8 @@ static long DoStructInternal (long Offs, unsigned Type)
                     Error ("Not a struct/union");
                 } else {
                     SymEntry* SizeSym = GetSizeOfScope (Struct);
-                    if (!SymIsDef (SizeSym)) {
+                    if (!SymIsDef (SizeSym) || !SymIsConst (SizeSym, &MemberSize)) {
                         Error ("Size of struct/union is unknown");
-                    } else {
-                        MemberSize = GetSymVal (SizeSym);
                     }
                 }
                 MemberSize *= Member (MemberSize);

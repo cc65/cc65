@@ -38,13 +38,17 @@
 
 
 
+#include "attrib.h"
+
+
+
 /*****************************************************************************/
-/*     	       	       	       	     Code				     */
+/*     	       	       	       	     Code	    			     */
 /*****************************************************************************/
 
 
 
-unsigned HashStr (const char* S);
+unsigned HashStr (const char* S) attribute ((const));
 /* Return a hash value for the given string */
 
 

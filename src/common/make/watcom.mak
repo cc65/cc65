@@ -69,6 +69,7 @@ OBJS =	abend.obj	\
 	bitops.obj	\
 	check.obj	\
 	cmdline.obj	\
+	coll.obj	\
 	exprdefs.obj	\
 	fname.obj	\
 	hashstr.obj	\

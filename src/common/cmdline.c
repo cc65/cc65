@@ -95,7 +95,7 @@ void InitCmdLine (unsigned aArgCount, char* aArgVec[], const char* aProgName)
 
 
 void UnknownOption (const char* Opt)
-/* Print an error about an unknown option. */
+/* Print an error about an unknown option and die. */
 {
     AbEnd ("Unknown option: %s\n", Opt);
 }

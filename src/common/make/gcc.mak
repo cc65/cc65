@@ -13,6 +13,7 @@ OBJS =	abend.o		\
 	bitops.o	\
 	check.o		\
 	cmdline.o	\
+	coll.o		\
 	exprdefs.o	\
 	fname.o		\
 	hashstr.o	\
@@ -53,4 +54,4 @@ depend dep:	$(OBJS:.o=.c)
 	$(CC) -MM $^ > .depend
 
 
-			 
+

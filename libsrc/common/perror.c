@@ -13,11 +13,16 @@
 
 
 void perror (const char* msg)
-{			  
-    if (msg) {		      
-        fprintf (stderr, "%s: ", msg);
+{
+    /* Fetch the message that corresponds to errno */
+    const char* errormsg = strerror (errno);
+
+    /* Different output depending on msg */
+    if (msg) {
+        fprintf (stderr, "%s: %s\n", msg, errormsg);
+    } else {
+        fprintf (stderr, "%s\n", errormsg);
     }
-    fprintf (stderr, "%s\n", strerror (errno));
 }
 
 

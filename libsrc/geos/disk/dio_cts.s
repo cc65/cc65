@@ -69,7 +69,9 @@
 	cmp	#DRV_1581
 	beq	dio_cts1581
 
-; unknown device, return what you have got
+	lda	#DEV_NOT_FOUND	; unknown device
+	ldx	#0
+	beq	ret
 
 dio_ctsend:
 	ldy 	#1

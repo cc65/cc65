@@ -66,7 +66,9 @@
 	cmp	#DRV_1581
 	beq	dio_stc1581
 
-;	...
+	lda	#DEV_NOT_FOUND	; unknown device
+	ldx	#0
+	beq	_ret
 
 dio_stcend:
 	ldy	#diopp_track

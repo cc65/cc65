@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -167,6 +167,7 @@ void g_preamble (void)
     /* If we're producing code for some other CPU, switch the command set */
     switch (CPU) {
         case CPU_6502:      AddTextLine ("\t.setcpu\t\t\"6502\"");      break;
+        case CPU_6502X:     AddTextLine ("\t.setcpu\t\t\"6502X\"");     break;
         case CPU_65SC02:    AddTextLine ("\t.setcpu\t\t\"65SC02\"");    break;
         case CPU_65C02:     AddTextLine ("\t.setcpu\t\t\"65C02\"");     break;
         case CPU_65816:     AddTextLine ("\t.setcpu\t\t\"65816\"");     break;

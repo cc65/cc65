@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -186,15 +186,17 @@ static char MacCBM[] =
 /* CPU defines */
 static char MacCPU[] =
     "CPU_ISET_6502      = $01\n"
-    "CPU_ISET_65SC02    = $02\n"
-    "CPU_ISET_65C02     = $04\n"
-    "CPU_ISET_65816     = $08\n"
-    "CPU_ISET_SUNPLUS   = $10\n"
-    "CPU_6502           = $01\n"
-    "CPU_65SC02         = $03\n"
-    "CPU_65C02          = $07\n"
-    "CPU_65816          = $0F\n"
-    "CPU_SUNPLUS        = $10\n";
+    "CPU_ISET_6502X     = $02\n"
+    "CPU_ISET_65SC02    = $04\n"
+    "CPU_ISET_65C02     = $08\n"
+    "CPU_ISET_65816     = $10\n"
+    "CPU_ISET_SUNPLUS   = $20\n"
+    "CPU_6502           = CPU_ISET_6502\n"
+    "CPU_6502X          = CPU_ISET_6502|CPU_ISET_6502X\n"
+    "CPU_65SC02         = CPU_ISET_6502|CPU_ISET_65SC02\n"
+    "CPU_65C02          = CPU_ISET_6502|CPU_ISET_65SC02|CPU_ISET_65C02\n"
+    "CPU_65816          = CPU_ISET_6502|CPU_ISET_65SC02|CPU_ISET_65816\n"
+    "CPU_SUNPLUS        = CPU_ISET_SUNPLUS\n";
 
 
 

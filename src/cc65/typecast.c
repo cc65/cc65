@@ -172,8 +172,8 @@ int TypeCast (ExprDesc* lval)
                     /* Load the value into the primary */
                     exprhs (CF_NONE, k, lval);
 
-                    /* Emit typecast code. ### CHARS */
-                    g_typecast (TypeOf (OldType), TypeOf (NewType));
+                    /* Emit typecast code. */
+                    g_typecast (TypeOf (OldType), TypeOf (NewType) | CF_FORCECHAR);
 
                     /* Value is now in primary */
                     lval->Flags = E_MEXPR;
@@ -190,7 +190,7 @@ int TypeCast (ExprDesc* lval)
             exprhs (CF_NONE, k, lval);
 
             /* Emit typecast code */
-            g_typecast (TypeOf (OldType), TypeOf (NewType));
+            g_typecast (TypeOf (OldType), TypeOf (NewType) | CF_FORCECHAR);
 
             /* Value is now in primary */
             lval->Flags = E_MEXPR;

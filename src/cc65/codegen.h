@@ -186,7 +186,10 @@ void g_toslong (unsigned flags);
 void g_tosint (unsigned flags);
 /* Make sure, the value on TOS is an int. Convert if necessary */
 
-void g_reglong (unsigned flags);
+void g_regint (unsigned Flags);
+/* Make sure, the value in the primary register an int. Convert if necessary */
+
+void g_reglong (unsigned Flags);
 /* Make sure, the value in the primary register a long. Convert if necessary */
 
 unsigned g_typeadjust (unsigned lhs, unsigned rhs);

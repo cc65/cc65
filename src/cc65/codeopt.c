@@ -334,6 +334,70 @@ static unsigned OptShift3 (CodeSeg* S)
 
 
 /*****************************************************************************/
+/*                              Optimize loads                               */
+/*****************************************************************************/
+
+
+
+static unsigned OptLoad1 (CodeSeg* S)
+/* Search for a call to ldaxysp where X is not used later and replace it by
+ * a load of just the A register.
+ */
+{
+    unsigned I;
+    unsigned Changes = 0;
+
+    /* Generate register info */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+     	CodeEntry* E;
+
+      	/* Get next entry */
+       	E = CS_GetEntry (S, I);
+
+     	/* Check for the sequence */
+       	if (CE_IsCallTo (E, "ldaxysp")          &&
+            RegValIsKnown (E->RI->In.RegY)      &&
+            !RegXUsed (S, I+1)) {
+
+            CodeEntry* X;
+
+            /* Reload the Y register */
+            const char* Arg = MakeHexArg (E->RI->In.RegY - 1);
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
+            CS_InsertEntry (S, X, I+1);
+
+            /* Load from stack */
+            X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, E->LI);
+            CS_InsertEntry (S, X, I+2);
+
+            /* Now remove the call to the subroutine */
+	    CS_DelEntry (S, I);
+
+	    /* Remember, we had changes */
+            ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free the register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
 /*		       Optimize stores through pointers                      */
 /*****************************************************************************/
 
@@ -1355,6 +1419,7 @@ static OptFunc DOptDecouple     = { OptDecouple,     "OptDecouple",     100, 0, 
 static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",       0, 0, 0, 0, 0, 0 };
 static OptFunc DOptJumpCascades	= { OptJumpCascades, "OptJumpCascades", 100, 0, 0, 0, 0, 0 };
 static OptFunc DOptJumpTarget  	= { OptJumpTarget,   "OptJumpTarget",   100, 0, 0, 0, 0, 0 };
+static OptFunc DOptLoad1        = { OptLoad1,        "OptLoad1",        100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",         	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTSJumps1    = { OptRTSJumps1,    "OptRTSJumps1",   	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptRTSJumps2    = { OptRTSJumps2,    "OptRTSJumps2",   	100, 0, 0, 0, 0, 0 };
@@ -1415,6 +1480,7 @@ static OptFunc* OptFuncs[] = {
     &DOptDupLoads,
     &DOptJumpCascades,
     &DOptJumpTarget,
+    &DOptLoad1,
     &DOptNegA1,
     &DOptNegA2,
     &DOptNegAX1,
@@ -1629,7 +1695,7 @@ static void WriteOptStats (const char* Name)
     		 O->Name,
 		 O->TotalRuns,
       	       	 O->LastRuns,
-		 O->TotalChanges,
+	       	 O->TotalChanges,
 		 O->LastChanges);
     }
 
@@ -1759,6 +1825,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptCmp6, 1);
        	C += RunOptFunc (S, &DOptCmp7, 1);
        	C += RunOptFunc (S, &DOptTest1, 1);
+        C += RunOptFunc (S, &DOptLoad1, 1);
        	C += RunOptFunc (S, &DOptUnusedLoads, 1);
        	C += RunOptFunc (S, &DOptUnusedStores, 1);
        	C += RunOptFunc (S, &DOptDupLoads, 1);

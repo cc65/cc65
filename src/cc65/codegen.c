@@ -450,7 +450,7 @@ void g_leave (void)
 {
     /* How many bytes of locals do we have to drop? */
     int k = -oursp;
-                                  
+
     /* If we didn't have a variable argument list, don't call leave */
     if (funcargs >= 0) {
 
@@ -1131,18 +1131,81 @@ void g_tosint (unsigned flags)
 
 
 
-void g_reglong (unsigned flags)
-/* Make sure, the value in the primary register a long. Convert if necessary */
+void g_regint (unsigned Flags)
+/* Make sure, the value in the primary register an int. Convert if necessary */
 {
-    switch (flags & CF_TYPE) {
+    unsigned L;
+
+    switch (Flags & CF_TYPE) {
 
 	case CF_CHAR:
+            if (Flags & CF_FORCECHAR) {
+                /* Conversion is from char */
+                if (Flags & CF_UNSIGNED) {
+                    AddCodeLine ("ldx #$00");
+                } else {
+                    L = GetLocalLabel();
+                    AddCodeLine ("ldx #$00");
+                    AddCodeLine ("cmp #$80");
+                    AddCodeLine ("bcc %s", LocalLabelName (L));
+                    AddCodeLine ("dex");
+                    g_defcodelabel (L);
+                }
+            }
+            /* FALLTHROUGH */
+
 	case CF_INT:
-	    if (flags & CF_UNSIGNED) {
+	case CF_LONG:
+	    break;
+
+	default:
+	    typeerror (Flags);
+    }
+}
+
+
+
+void g_reglong (unsigned Flags)
+/* Make sure, the value in the primary register a long. Convert if necessary */
+{
+    unsigned L;
+
+    switch (Flags & CF_TYPE) {
+
+	case CF_CHAR:
+            if (Flags & CF_FORCECHAR) {
+                /* Conversion is from char */
+                if (Flags & CF_UNSIGNED) {
+                    if (CodeSizeFactor >= 200) {
+                        AddCodeLine ("ldx #$00");
+                        AddCodeLine ("stx sreg");
+                        AddCodeLine ("stx sreg+1");
+                    } else {
+                        AddCodeLine ("jsr aulong");
+                    }
+                } else {
+                    if (CodeSizeFactor >= 366) {
+                        L = GetLocalLabel();
+                        AddCodeLine ("ldx #$00");
+                        AddCodeLine ("cmp #$80");
+                        AddCodeLine ("bcc %s", LocalLabelName (L));
+                        AddCodeLine ("dex");
+                        g_defcodelabel (L);
+                        AddCodeLine ("stx sreg");
+                        AddCodeLine ("stx sreg+1");
+                    } else {
+                        AddCodeLine ("jsr along");
+                    }
+                }
+            }
+            /* FALLTHROUGH */
+
+	case CF_INT:
+	    if (Flags & CF_UNSIGNED) {
 	    	if (CodeSizeFactor >= 200) {
 	    	    ldyconst (0);
 	    	    AddCodeLine ("sty sreg");
-		    AddCodeLine ("sty sreg+1");
+	  	    AddCodeLine ("sty sreg+1");
 	    	} else {
 	       	    AddCodeLine ("jsr axulong");
 	    	}
@@ -1155,7 +1218,7 @@ void g_reglong (unsigned flags)
 	    break;
 
 	default:
-	    typeerror (flags);
+	    typeerror (Flags);
     }
 }
 
@@ -1223,9 +1286,14 @@ unsigned g_typecast (unsigned lhs, unsigned rhs)
     rtype = rhs & CF_TYPE;
 
     /* Check if a conversion is needed */
-    if (ltype == CF_LONG && rtype != CF_LONG && (rhs & CF_CONST) == 0) {
-	/* We must promote the primary register to long */
-	g_reglong (rhs);
+    if ((rhs & CF_CONST) == 0) {
+        if (ltype == CF_LONG && rtype != CF_LONG) {
+            /* We must promote the primary register to long */
+            g_reglong (rhs);
+        } else if (ltype == CF_INT && rtype != CF_INT) {
+            /* We must promote the primary register to int */
+            g_regint (rhs);
+        }
     }
 
     /* Do not need any other action. If the left type is int, and the primary

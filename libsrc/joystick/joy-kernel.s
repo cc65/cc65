@@ -4,8 +4,9 @@
 ; Common functions of the joystick API.
 ;
 
-        .export         _joy_install, _joy_deinstall, _joy_masks
-
+        .export         _joy_install, _joy_uninstall, _joy_masks
+        .export         joy_clear_ptr
+              
         .importzp       ptr1
 
         .include        "joy-kernel.inc"
@@ -25,7 +26,7 @@ _joy_masks:     .res    JOY_MASK_COUNT
 .data
 joy_vectors:
 joy_install:   	jmp     $0000
-joy_deinstall: 	jmp     $0000
+joy_uninstall: 	jmp     $0000
 joy_count:      jmp     $0000
 joy_read:       jmp     $0000
 
@@ -42,9 +43,9 @@ joy_sig_len     = * - joy_sig
 
 _joy_install:
        	sta     _joy_drv
-  	sta	ptr1
-  	stx     _joy_drv+1
-  	stx    	ptr1+1
+      	sta	ptr1
+      	stx     _joy_drv+1
+      	stx    	ptr1+1
 
 ; Check the driver signature
 
@@ -93,8 +94,19 @@ set:    sta     joy_vectors,x
         rts
 
 ;----------------------------------------------------------------------------
-; void __fastcall__ joy_deinstall (void);
-; /* Deinstall the driver before unloading it */
+; unsigned char __fastcall__ joy_uninstall (void);
+; /* Uninstall the currently loaded driver. Note: This call does not free
+;  * allocated memory.
+;  */
 
-_joy_deinstall  = joy_deinstall           ; Call driver routine
+_joy_uninstall:
+        jsr     joy_uninstall           ; Call the driver routine
+
+joy_clear_ptr:                          ; External entry point
+        lda     #0
+        sta     _joy_drv
+        sta     _joy_drv+1              ; Clear the driver pointer
+
+        tax                             ; Return zero
+        rts
 

@@ -58,7 +58,7 @@ typedef struct {
 
     /* Jump vectors. Note that these are not C callable */
     void*               install;        /* INSTALL routine */
-    void*               deinstall;      /* DEINSTALL routine */
+    void*               uninstall;      /* UNINSTALL routine */
     void*               count;          /* COUNT routine */
     void*               read;           /* READ routine */
 
@@ -68,21 +68,6 @@ typedef struct {
 
 /* EM kernel variables */
 extern joy_drv_header* 	joy_drv;       	/* Pointer to driver */
-
-
-
-
-/*****************************************************************************/
-/* 	      	       	      	   Functions	     			     */
-/*****************************************************************************/
-
-
-
-unsigned char __fastcall__ joy_install (void* driver);
-/* Install the driver once it is loaded, return an error code. */
-
-void __fastcall__ joy_deinstall (void);
-/* Deinstall the driver before unloading it */
 
 
 

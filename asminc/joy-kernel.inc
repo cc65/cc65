@@ -47,7 +47,7 @@ JOY_MASK_COUNT          = 8                     ; Size of the array
 
 JOY_HDR_JUMPTAB         = 12
 JOY_HDR_INSTALL         = JOY_HDR_JUMPTAB+0     ; INSTALL routine
-JOY_HDR_DEINSTALL       = JOY_HDR_JUMPTAB+2     ; DEINSTALL routine
+JOY_HDR_UNINSTALL       = JOY_HDR_JUMPTAB+2     ; UNINSTALL routine
 JOY_HDR_COUNT           = JOY_HDR_JUMPTAB+4     ; COUNT routine
 JOY_HDR_READ            = JOY_HDR_JUMPTAB+6     ; READ routine
 
@@ -62,7 +62,7 @@ JOY_HDR_JUMPCOUNT       = 4                     ; Number of jump vectors
 ; Driver entry points
 
         .global joy_install
-        .global joy_deinstall
+        .global joy_uninstall
         .global joy_count
         .global joy_read
 
@@ -70,7 +70,8 @@ JOY_HDR_JUMPCOUNT       = 4                     ; Number of jump vectors
 ; ASM functions
 
        	.global	_joy_install
-       	.global _joy_deinstall
+       	.global _joy_uninstall
        	.global	_joy_count
        	.global	_joy_read
 
+                       

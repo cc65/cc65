@@ -84,10 +84,18 @@ extern const char joy_stddrv[];
 
 
 unsigned char __fastcall__ joy_load_driver (const char* driver);
-/* Load a joystick driver and return an error code */
+/* Load and install a joystick driver. Return an error code. */
 
 unsigned char __fastcall__ joy_unload (void);
-/* Unload the currently loaded driver. */
+/* Uninstall, then unload the currently loaded driver. */
+
+unsigned char __fastcall__ joy_install (void* driver);
+/* Install an already loaded driver. */
+
+unsigned char __fastcall__ joy_uninstall (void);
+/* Uninstall the currently loaded driver. Note: This call does not free
+ * allocated memory.
+ */
 
 unsigned char __fastcall__ joy_count (void);
 /* Return the number of joysticks supported by the driver */

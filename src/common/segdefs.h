@@ -50,6 +50,14 @@
 #define SEGTYPE_ZP	2
 #define SEGTYPE_FAR	3
 
+/* Default segment names */
+#define SEGNAME_NULL    "NULL"
+#define SEGNAME_ZP      "ZEROPAGE"
+#define SEGNAME_DATA    "DATA"
+#define SEGNAME_BSS     "BSS"
+#define SEGNAME_RODATA  "RODATA"
+#define SEGNAME_CODE    "CODE"
+
 /* Fragment types in the object file */
 #define FRAG_TYPEMASK	0x38		/* Mask the type of the fragment */
 #define FRAG_BYTEMASK   0x07		/* Mask for byte count */

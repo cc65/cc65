@@ -350,6 +350,7 @@ static int istypeexpr (void)
     return CurTok.Tok == TOK_LPAREN && (
        	   (NextTok.Tok >= TOK_FIRSTTYPE && NextTok.Tok <= TOK_LASTTYPE) ||
 	   (NextTok.Tok == TOK_CONST)                           	 ||
+           (NextTok.Tok == TOK_VOLATILE)                                 ||
        	   (NextTok.Tok  == TOK_IDENT 			      	         &&
 	   (Entry = FindSym (NextTok.Ident)) != 0  		         &&
 	   SymIsTypeDef (Entry)));

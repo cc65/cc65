@@ -187,7 +187,9 @@ struct DataSeg* GetDataSeg (void)
 	case SEG_BSS:	  return CS->BSS;
 	case SEG_DATA:	  return CS->Data;
 	case SEG_RODATA:  return CS->ROData;
-	default:	  FAIL ("Invalid data segment");
+	default:	  
+	    FAIL ("Invalid data segment");
+	    return 0;
     }
 }
 

@@ -79,6 +79,7 @@ OBJS = 	condasm.obj	\
 	incpath.obj	\
        	instr.obj	\
 	istack.obj	\
+	lineinfo.obj	\
 	listing.obj	\
 	macpack.obj	\
 	macro.obj	\
@@ -126,6 +127,7 @@ FILE global.obj
 FILE incpath.obj
 FILE instr.obj
 FILE istack.obj
+FILE lineinfo.obj
 FILE listing.obj
 FILE macpack.obj
 FILE macro.obj

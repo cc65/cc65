@@ -120,10 +120,12 @@ FILE error.obj
 FILE exports.obj
 FILE expr.obj
 FILE extsyms.obj
+FILE fileinfo.obj
 FILE fileio.obj
 FILE fragment.obj
 FILE global.obj
-FILE library.obj
+FILE library.obj 
+FILE lineinfo.obj
 FILE main.obj
 FILE mapfile.obj
 FILE o65.obj

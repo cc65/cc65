@@ -68,41 +68,49 @@ CCCFG	= $(CCCFG) -i=..\common
 # All library OBJ files
 
 OBJS =	anonname.obj	\
-	asmcode.obj	\
+     	asmcode.obj	\
 	asmlabel.obj	\
-	asmline.obj	\
+	codeent.obj	\
 	codegen.obj	\
+	codelab.obj	\
+	codeinfo.obj	\
+	codeopt.obj	\
+	codeseg.obj	\
 	compile.obj	\
-	cpu.obj	 	\
+	coptind.obj	\
+	cpu.obj		\
+	dataseg.obj	\
 	datatype.obj	\
 	declare.obj	\
 	declattr.obj	\
 	error.obj	\
-	expr.obj 	\
-	exprheap.obj   	\
+	expr.obj	\
+	exprheap.obj	\
 	exprnode.obj	\
 	funcdesc.obj	\
 	function.obj	\
 	global.obj	\
 	goto.obj	\
 	ident.obj	\
-	incpath.obj    	\
+	incpath.obj	\
 	input.obj	\
+	lineinfo.obj	\
 	litpool.obj	\
 	locals.obj	\
 	loop.obj	\
 	macrotab.obj	\
 	main.obj	\
-	optimize.obj	\
-	pragma.obj	\
+	opcodes.obj	\
 	preproc.obj	\
-	stmt.obj	\
-	scanner.obj	\
-	segname.obj	\
-	stdfunc.obj	\
-	symentry.obj	\
-	symtab.obj	\
-	typecmp.obj	\
+	pragma.obj	\
+    	scanner.obj	\
+	segments.obj	\
+    	stdfunc.obj	\
+    	stmt.obj	\
+    	symentry.obj	\
+    	symtab.obj	\
+	textseg.obj	\
+    	typecmp.obj	\
 	util.obj
 
 LIBS = ..\common\common.lib
@@ -129,10 +137,16 @@ NAME $<
 FILE anonname.obj
 FILE asmcode.obj
 FILE asmlabel.obj
-FILE asmline.obj
+FILE codeent.obj
 FILE codegen.obj
+FILE codelab.obj
+FILE codeinfo.obj
+FILE codeopt.obj
+FILE codeseg.obj
 FILE compile.obj
+FILE coptind.obj
 FILE cpu.obj
+FILE dataseg.obj
 FILE datatype.obj
 FILE declare.obj
 FILE declattr.obj
@@ -147,20 +161,22 @@ FILE goto.obj
 FILE ident.obj
 FILE incpath.obj
 FILE input.obj
+FILE lineinfo.obj
 FILE litpool.obj
 FILE locals.obj
 FILE loop.obj
 FILE macrotab.obj
 FILE main.obj
-FILE optimize.obj
-FILE pragma.obj
+FILE opcodes.obj
 FILE preproc.obj
-FILE stmt.obj
+FILE pragma.obj
 FILE scanner.obj
-FILE segname.obj
+FILE segments.obj
 FILE stdfunc.obj
+FILE stmt.obj
 FILE symentry.obj
 FILE symtab.obj
+FILE textseg.obj
 FILE typecmp.obj
 FILE util.obj
 LIBRARY ..\common\common.lib

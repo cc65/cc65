@@ -33,6 +33,9 @@
 
 
 
+/* common */
+#include "shift.h"
+
 /* cc65 */
 #include "codegen.h"
 #include "datatype.h"
@@ -144,16 +147,8 @@ static int DoConversion (ExprDesc* Expr, int k, type* NewType)
                 /* If the new type is signed, sign extend the value */
                 if (!IsSignUnsigned (NewType)) {
                     if (Expr->ConstVal & (0x01UL << (NewBits-1))) {
-                        /* Beware: NewBits may be 32, in which case a shift
-                         * creates undefined behaviour if a long does also
-                         * have 32 bits. So apply a somewhat complex special
-                         * handling.
-                         */
-                        unsigned long SignBits = ~0UL;
-                        SignBits <<= (NewBits / 2);
-                        NewBits -= (NewBits / 2);
-                        SignBits <<= NewBits;
-                        Expr->ConstVal |= SignBits;
+                        /* Beware: Use the safe shift routine here. */
+                        Expr->ConstVal |= shl_l (~0UL, NewBits);
                     }
                 }
             }
@@ -304,3 +299,4 @@ int TypeCast (ExprDesc* Expr)
 
 
 
+                  

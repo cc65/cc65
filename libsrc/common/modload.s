@@ -37,7 +37,7 @@
         .include        "modload.inc"
 
         .import         pushax, pusha0, push0, push1, decax1
-        .import         _malloc, _free, _memset
+        .import         _malloc, _free, _bzero
         .import         __ZP_START__    ; Linker generated
         .importzp       sp, ptr1, tmp1, regbank
 
@@ -68,21 +68,16 @@ Header:         .res    O65_HDR_SIZE    ; The o65 header
 ; Input
 InputByte       = Header                ; Byte read from input
 
-; Segment addresses. Since the ld65 linker uses a relocation base address
-; of zero for all segments, the addresses of the segments are also the
-; relocation values.
-CodeAddr        = Module                ; Address of code seg
-DataAddr        = Header + 1            ; Address of data seg
-BssAddr         = Header + 3            ; Address of bss seg
-
 .data
-Read:           jmp     $FFFF           ; Jump to read routine
+Read:   jmp     $FFFF                   ; Jump to read routine
 
 .rodata
-ExpectedHdr:    .byte   $01, $00        ; non C64 marker
-                .byte   $6F, $36, $35   ; Magic ("o65")
-                .byte   $00             ; Version
-                .word   $0000           ; Mode word
+ExpectedHdr:
+        .byte   $01, $00                ; non C64 marker
+        .byte   $6F, $36, $35           ; Magic ("o65")
+        .byte   $00                     ; Version
+        .word   O65_CPU_6502|O65_RELOC_BYTE|O65_SIZE_16BIT|O65_FTYPE_EXE|O65_ADDR_SIMPLE|O65_ALIGN_1
+
 ExpectedHdrSize = * - ExpectedHdr
 
 
@@ -109,37 +104,33 @@ RestoreRegBank:
         rts
 
 ;------------------------------------------------------------------------------
-; GetReloc: Return a relocation value based on the segment in A
+; GetReloc: Return a relocation value based on the segment in A.
+; The routine uses some knowledge about the values to make the code shorter.
 
 .code
 GetReloc:
         cmp     #O65_SEGID_TEXT
-        bne     @L1
-        lda     CodeAddr
-        ldx     CodeAddr+1
+        bcc     FormatError
+        cmp     #O65_SEGID_ZP
+        beq     @L1
+        bcs     FormatError
+
+; Text, data and bss segment
+
+        lda     Module
+        ldx     Module+1                ; Return start address of buffer
         rts
 
-@L1:    cmp     #O65_SEGID_DATA
-        bne     @L2
-        lda     DataAddr
-        ldx     DataAddr+1
-        rts
+; Zero page relocation
 
-@L2:    cmp     #O65_SEGID_BSS
-        bne     @L3
-        lda     BssAddr
-        ldx     BssAddr+1
-        rts
-
-@L3:    cmp     #O65_SEGID_ZP
-        bne     FormatError
-        lda     #<__ZP_START__
+@L1:    lda     #<__ZP_START__
         ldx     #>__ZP_START__
         rts
 
 ;------------------------------------------------------------------------------
 ; FormatError: Bail out with an o65 format error
-
+                            
+.code
 FormatError:
         lda     #MLOAD_ERR_FMT
 ;       bne     CleanupAndExit          ; Branch always
@@ -271,10 +262,8 @@ Loop:   jsr     ReadByte                ; Read byte from relocation table
 RelocLow:
         ldy     #0
         clc
-        lda     (TPtr),y
-        adc     ptr1
-        sta     (TPtr),y
-        jmp     Loop
+        lda     ptr1
+        bcc     AddCommon
 
 ; Relocate a high byte
 
@@ -283,8 +272,10 @@ RelocHigh:
         ldy     #0
         clc
         adc     ptr1                    ; We just need the carry
-AddHigh:lda     (TPtr),y
-        adc     ptr1+1
+AddHigh:
+        lda     ptr1+1
+AddCommon:
+        adc     (TPtr),y
         sta     (TPtr),y
         jmp     Loop                    ; Done, next entry
 
@@ -293,8 +284,8 @@ AddHigh:lda     (TPtr),y
 RelocWord:
         ldy     #0
         clc
-        lda     (TPtr),y
-        adc     ptr1
+        lda     ptr1
+        adc     (TPtr),y
         sta     (TPtr),y
         iny
         bne     AddHigh                 ; Branch always (add high byte)
@@ -334,7 +325,7 @@ _mod_load:
         lda     (Ctrl),y
         sta     Read+1
         iny
-        lda     (Ctrl),y     
+        lda     (Ctrl),y
         sta     Read+2
 
 ; Read the o65 header: C->read (C, &H, sizeof (H))
@@ -350,31 +341,89 @@ _mod_load:
 ; We read the o65 header successfully. Validate it.
 
         ldy     #ExpectedHdrSize-1
-@L3:    lda     Header,y
+ValidateHeader:
+        lda     Header,y
         cmp     ExpectedHdr,y
-        beq     @L4
-        lda     #MLOAD_ERR_HDR
-        jmp     CleanupAndExit
-@L4:    dey
-        bpl     @L3
+        bne     HeaderError
+        dey
+        bpl     ValidateHeader
 
-; Header is ok as far as we can say now. Read and skip all options. We may
-; add a check here for the OS option later.
+; Header is ok as far as we can say now. Read all options, check for the
+; OS option and ignore all others. The OS option contains a version number
+; and the module id as additional data.
 
-Opt:    jsr     ReadByte
+        iny                             ; Y = $00
+        sty     TPtr+1                  ; Flag for OS option read
+Opt:    jsr     ReadByte                ; Read the length byte
         beq     OptDone                 ; Jump if done
         sta     TPtr                    ; Use TPtr as a counter
-OneOpt: dec     TPtr
+
+; An option has a length of at least 2 bytes
+
+        cmp     #2
+        bcc     HeaderError             ; Must be 2 bytes total at least
+
+; Check for the OS option
+
+        dec     TPtr
+        jsr     ReadByte                ; Get the option type
+        cmp     #O65_OPT_OS             ; OS option?
+        bne     SkipOpt                 ; No: Skip
+
+        lda     TPtr                    ; Get remaining length+1
+        cmp     #5                      ; CC65 has 6 bytes total
+        bne     OSError
+
+        jsr     ReadByte                ; Get the operating system
+        cmp     #O65_OS_CC65_MODULE
+        bne     OSError                 ; Wrong operating system
+
+        jsr     ReadByte                ; Get the version number, expect zero
+        bne     OSError                 ; Wrong version
+
+        jsr     ReadByte                ; Get low byte of id
+        ldy     #MODCTRL_MODULE_ID
+        sta     (Ctrl),y
+        jsr     ReadByte
+        ldy     #MODCTRL_MODULE_ID+1
+        sta     (Ctrl),y
+
+        inc     TPtr+1                  ; Remember that we got the OS
+
+        jmp     Opt
+
+; Skip one option
+
+SkipOpt:
+        dec     TPtr
         beq     Opt                     ; Next option
         jsr     ReadByte                ; Skip one byte
-        jmp     OneOpt
+        jmp     SkipOpt
+
+; Operating system error
+
+OSError:
+        lda     #MLOAD_ERR_OS
+        jmp     CleanupAndExit
+
+; Options done, check that we got the OS option
+
 OptDone:
+        lda     TPtr+1
+        bne     CalcSizes
+
+; Entry point for header errors
+
+HeaderError:
+        lda     #MLOAD_ERR_HDR
+        jmp     CleanupAndExit
 
 ; Skipped all options. Calculate the size of text+data and of text+data+bss
 ; (the latter is the size of the memory block we need). We will store the
 ; total module size also into the control structure for evaluation by the
 ; caller
 
+CalcSizes:
         lda     Header + O65_HDR_TLEN
         add     Header + O65_HDR_DLEN
         sta     TPtr
@@ -393,12 +442,20 @@ OptDone:
         tax
         pla                             ; Restore low byte of total size
 
-; Total memory size is now in a/x. Allocate memory, check if we got it.
+; Total memory size is now in a/x. Allocate memory and remember the result,
+; both, locally and in the control structure so it the caller can access
+; the memory block. After that, check if we got the requested memory.
 
         jsr     _malloc
         sta     Module
         stx     Module+1
-        ora     Module+1
+
+        ldy     #MODCTRL_MODULE
+        sta     (Ctrl),y
+        txa
+        iny
+        sta     (Ctrl),y
+        ora     Module
         bne     GotMem
 
 ; Could not allocate memory
@@ -406,39 +463,26 @@ OptDone:
         lda     #MLOAD_ERR_MEM
         jmp     CleanupAndExit
 
-; We got the memory block. Place a pointer to the memory block also in the
-; module control structure.
-
-GotMem: lda     Module                  ; Ctrl->module = Module;
-        ldy     #MODCTRL_MODULE
-        sta     (Ctrl),y
-        txa
-        iny
-        sta     (Ctrl),y
-
-; Calculate the start addresses of the segments. Since the linker uses a
-; base address of zero for all segments, the load addresses are also the
-; relocation values for the segments.
-
-        lda     Module
-        add     Header + O65_HDR_TLEN
-        sta     DataAddr
-        lda     Module + 1
-        adc     Header + O65_HDR_TLEN + 1
-        sta     DataAddr + 1
+; Control structure is complete now. Clear the bss segment.
+; bzero (bss_addr, bss_size)
 
         lda     Module
         add     TPtr
-        sta     BssAddr
+        pha
         lda     Module+1
-        add     TPtr+1
-        sta     BssAddr + 1
+        adc     TPtr+1                  ; Module + tlen + dlen
+        tax
+        pla
+        jsr     pushax
+        lda     Header + O65_HDR_BLEN
+        ldx     Header + O65_HDR_BLEN+1
+        jsr     _bzero                  ; bzero (bss, bss_size);
 
-; Control structure is complete now. Load code and data segment into memory.
-; The sum of the sizes of code+data segment is still in TPtr.
+; Load code and data segment into memory. The sum of the sizes of
+; code+data segment is still in TPtr.
 ; C->read (C, C->module, H.tlen + H.dlen)
 
-        jsr     PushCtrl
+GotMem: jsr     PushCtrl
         lda     Module
         ldx     Module+1
         jsr     pushax
@@ -472,18 +516,8 @@ Reloc:  lda     Module
         lda     Module + 1
         adc     Header + O65_HDR_TLEN + 1
         tax
-        pla                             ; Date segment address in a/x
+        pla                             ; Data segment address in a/x
         jsr     RelocSeg
-
-; Clear the bss segment: memset (bss_addr, 0, bss_size)
-
-        lda     BssAddr
-        ldx     BssAddr + 1
-        jsr     pushax
-        jsr     push0
-        lda     Header + O65_HDR_BLEN
-        ldx     Header + O65_HDR_BLEN+1
-        jsr     _memset                 ; memset (bss, 0, bss_size);
 
 ; We're done. Restore the register bank and return a success code
 

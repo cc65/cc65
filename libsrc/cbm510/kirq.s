@@ -5,7 +5,7 @@
 ;
 
  	.export	  	irq, nmi, k_irq, k_nmi
- 	.import		k_scnkey, k_udtim, k_rs232
+ 	.import		SCNKEY, UDTIM, k_rs232
 	.import		condes
 	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
  	.importzp     	tpi1
@@ -83,8 +83,8 @@ k_irq:
 
 ; Call replacement kernal IRQ routines
 
-@L1:	jsr     k_scnkey      		; Poll the keyboard
-        jsr	k_udtim	      		; Bump the time
+@L1:	jsr     SCNKEY                  ; Poll the keyboard
+        jsr	UDTIM                   ; Bump the time
 
 ; -------------------------------------------------------------------------
 ; UART interrupt

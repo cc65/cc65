@@ -406,7 +406,7 @@ static void DoEndProc (void)
 
 
 static void DoError (void)
-/* Use error */
+/* User error */
 {
     if (Tok != TOK_STRCON) {
  	ErrorSkip (ERR_STRCON_EXPECTED);

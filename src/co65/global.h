@@ -65,6 +65,7 @@ extern const char*      ZeropageLabel;      /* Label for the zeropage segment */
 
 /* Flags */
 extern unsigned char    DebugInfo;          /* Enable debug info */
+extern unsigned char    NoOutput;           /* Suppress the actual conversion */
 
 
 

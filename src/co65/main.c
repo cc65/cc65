@@ -75,6 +75,7 @@ static void Usage (void)
        	     "  -g\t\t\tAdd debug info to object file\n"
        	     "  -h\t\t\tHelp (this text)\n"
              "  -m model\t\tOverride the o65 model\n"
+             "  -n\t\t\tDon't generate an output file\n"
        	     "  -o name\t\tName the output file\n"
        	     "  -v\t\t\tIncrease verbosity\n"
 	     "\n"
@@ -87,6 +88,7 @@ static void Usage (void)
        	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
 	     "  --help\t\tHelp (this text)\n"
+             "  --no-output\t\tDon't generate an output file\n"
              "  --o65-model model\tOverride the o65 model\n"
        	     "  --verbose\t\tIncrease verbosity\n"
        	     "  --version\t\tPrint the version number\n"
@@ -228,6 +230,15 @@ static void OptHelp (const char* Opt attribute ((unused)),
 
 
 
+static void OptNoOutput (const char* Opt attribute ((unused)),
+	       	         const char* Arg attribute ((unused)))
+/* Handle the --no-output option */
+{
+    NoOutput = 1;
+}
+
+
+
 static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --o65-model option */
 {
@@ -314,6 +325,7 @@ int main (int argc, char* argv [])
        	{ "--debug",           	0,     	OptDebug 		},
 	{ "--debug-info",      	0, 	OptDebugInfo 		},
 	{ "--help",    	  	0,	OptHelp			},
+       	{ "--no-output",        0,     	OptNoOutput             },
         { "--o65-model",        1,      OptO65Model             },
 	{ "--verbose", 	       	0,	OptVerbose		},
 	{ "--version", 	       	0,	OptVersion		},
@@ -351,6 +363,10 @@ int main (int argc, char* argv [])
 
                 case 'm':
                     OptO65Model (Arg, GetArg (&I, 2));
+                    break;
+
+                case 'n':
+                    OptNoOutput (Arg, 0);
                     break;
 
        	        case 'o':

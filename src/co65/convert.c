@@ -396,7 +396,7 @@ void Convert (const O65Data* D, const char* OutputFile)
                         case O65_OS_CC65_MODULE:
                             if (Model != O65_MODEL_NONE &&
                                 Model != O65_MODEL_CC65_MODULE) {
-                                Warning ("Wrong o65 model");
+                                Warning ("Wrong o65 model for input file specified");
                             } else {
                                 Model = O65_MODEL_CC65_MODULE;
                             }
@@ -430,7 +430,12 @@ void Convert (const O65Data* D, const char* OutputFile)
         }
     }
 
-    /* Open the output file */
+    /* If we shouldn't generate output, we're done here */
+    if (NoOutput) {
+        return;
+    }
+
+    /* Open the output file */                                                    
     F = fopen (OutputFile, "wb");
     if (F == 0) {
         Error ("Cannot open `%s': %s", OutputFile, strerror (errno));

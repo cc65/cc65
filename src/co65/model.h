@@ -48,6 +48,8 @@
 typedef enum {
     O65_MODEL_INVALID = -1,     /* Invalid model */
     O65_MODEL_NONE,             /* No model given */
+    O65_MODEL_OSA65,            /* Not implemented */
+    O65_MODEL_LUNIX,            /* Not implemented */
     O65_MODEL_CC65_MODULE,
 
     O65_MODEL_COUNT             /* Number of available models */

@@ -199,7 +199,7 @@ static int IsEasyConst (const ExprNode* E, long* Val)
 static ExprNode* LoByte (ExprNode* Operand)
 /* Return the low byte of the given expression */
 {
-    ExprNode* Expr;       
+    ExprNode* Expr;
     long      Val;
 
     /* Special handling for const expressions */
@@ -1545,11 +1545,7 @@ ExprNode* GenByteExpr (ExprNode* Expr)
 /* Force the given expression into a byte and return the result */
 {
     /* Use the low byte operator to force the expression into byte size */
-    ExprNode* Root = NewExprNode (EXPR_BYTE0);
-    Root->Left  = Expr;
-
-    /* Return the result */
-    return Root;
+    return LoByte (Expr);
 }
 
 
@@ -1557,13 +1553,8 @@ ExprNode* GenByteExpr (ExprNode* Expr)
 ExprNode* GenWordExpr (ExprNode* Expr)
 /* Force the given expression into a word and return the result. */
 {
-    /* AND the expression by $FFFF to force it into word size */
-    ExprNode* Root = NewExprNode (EXPR_AND);
-    Root->Left  = Expr;
-    Root->Right	= GenLiteralExpr (0xFFFF);
-
-    /* Return the result */
-    return Root;
+    /* Use the low byte operator to force the expression into word size */
+    return LoWord (Expr);
 }
 
 

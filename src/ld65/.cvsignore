@@ -4,6 +4,7 @@ ld65
 *.map
 *.s
 apple2.inc
+apple2enh.inc
 atari.inc
 atmos.inc
 bbc.inc
@@ -13,7 +14,8 @@ c64.inc
 cbm510.inc
 cbm610.inc
 geos.inc
-lunix.inc
+lunix.inc    
+lynx.inc
 module.inc
 nes.inc
 none.inc

@@ -5,7 +5,7 @@
 # Library dir
 COMMON	= ../common
 
-# The linker library search path. Default is "/usr/lib/cc65/lib/" if nothing 
+# The linker library search path. Default is "/usr/lib/cc65/lib/" if nothing
 # is defined. You may use CC65_LIB=foo on the command line to override it.
 CC65_LIB = \"/usr/lib/cc65/lib/\"
 
@@ -65,6 +65,7 @@ INCS =	apple2.inc	\
 	cbm610.inc	\
 	geos.inc	\
 	lunix.inc	\
+	lynx.inc	\
         module.inc      \
 	nes.inc		\
 	none.inc	\
@@ -152,6 +153,9 @@ geos.inc:	cfg/geos.cfg
 
 lunix.inc:	cfg/lunix.cfg
 	@$(CVT) $< $@ CfgLunix
+
+lynx.inc:	cfg/lynx.cfg
+	@$(CVT) $< $@ CfgLynx
 
 module.inc:	cfg/module.cfg
 	@$(CVT) $< $@ CfgModule

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -64,6 +64,7 @@ static const char CfgEmpty[] = "";
 #include "cbm610.inc"
 #include "geos.inc"
 #include "lunix.inc"
+#include "lynx.inc"
 #include "module.inc"
 #include "nes.inc"
 #include "none.inc"
@@ -79,9 +80,9 @@ static const char CfgEmpty[] = "";
 /*****************************************************************************/
 
 
-                                          
+
 /* Target configurations for all systems */
-const TargetDesc Targets [TGT_COUNT] = {
+const TargetDesc Targets[TGT_COUNT] = {
     {  	BINFMT_BINARY,  CfgNone         },
     {  	BINFMT_O65,     CfgModule       },
     {  	BINFMT_BINARY,	CfgAtari        },
@@ -102,6 +103,7 @@ const TargetDesc Targets [TGT_COUNT] = {
     {  	BINFMT_BINARY,	CfgAtmos        },
     {  	BINFMT_BINARY, 	CfgNES          },
     {  	BINFMT_BINARY, 	CfgSupervision  },
+    {  	BINFMT_BINARY,	CfgLynx         },
 };
 
 

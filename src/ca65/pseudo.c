@@ -66,6 +66,7 @@
 #include "options.h"
 #include "pseudo.h"
 #include "repeat.h"
+#include "segment.h"
 #include "spool.h"
 #include "symtab.h"
 

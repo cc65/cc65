@@ -47,15 +47,16 @@
 
 /* ca65 */
 #include "error.h"
+#include "expr.h"
 #include "global.h"
 #include "instr.h"
 #include "nexttok.h"
-#include "objcode.h"
+/* #include "objcode.h" */
 #include "objfile.h"
+#include "segment.h"
 #include "symtab.h"
 #include "toklist.h"
 #include "ulabel.h"
-#include "expr.h"
 
 
 

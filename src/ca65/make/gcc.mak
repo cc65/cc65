@@ -35,6 +35,7 @@ OBJS =  asserts.o       \
         pseudo.o       	\
 	repeat.o	\
         scanner.o	\
+        segment.o       \
         spool.o         \
         symtab.o	\
        	toklist.o      	\

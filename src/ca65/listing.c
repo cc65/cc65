@@ -48,8 +48,8 @@
 #include "error.h"
 #include "filetab.h"
 #include "global.h"
-#include "objcode.h"
 #include "listing.h"
+#include "segment.h"
 
 
 

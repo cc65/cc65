@@ -70,6 +70,7 @@
 #define SF_ABS		0x0040 		/* Declared as absolute symbol */
 #define SF_LABEL        0x0080          /* Used as a label */
 #define SF_FORCED       0x0100          /* Forced import, SF_IMPORT also set */
+#define SF_FINALIZED    0x0200          /* Symbol is finalized */
 #define SF_INDEXED	0x0800		/* Index is valid */
 #define SF_CONST    	0x1000		/* The symbol has a constant value */
 #define SF_MULTDEF     	0x2000		/* Multiply defined symbol */
@@ -369,8 +370,7 @@ void SymEnterLevel (void)
        	RootTab = SymTab = NewSymTable (MAIN_HASHTAB_SIZE);
     } else {
        	/* Create a local symbol table */
-       	SymTable* LocalSyms;
-	LocalSyms = NewSymTable (SUB_HASHTAB_SIZE);
+       	SymTable* LocalSyms = NewSymTable (SUB_HASHTAB_SIZE);
 	LocalSyms->BackLink = SymTab;
        	SymTab = LocalSyms;
     }
@@ -820,12 +820,13 @@ void SymFinalize (SymEntry* S)
 {
     /* Resolve trampoline entries */
     if (S->Flags & SF_TRAMPOLINE) {
-	S = S->V.Sym;
+     	S = S->V.Sym;
     }
 
     /* Check if we have an expression */
-    if (SymHasExpr (S)) {
+    if ((S->Flags & SF_FINALIZED) == 0 && SymHasExpr (S)) {
 	S->V.Expr = FinalizeExpr (S->V.Expr);
+        S->Flags |= SF_FINALIZED;
     }
 }
 

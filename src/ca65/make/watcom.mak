@@ -68,6 +68,7 @@ OBJS = 	asserts.obj     \
 	pseudo.obj	\
 	repeat.obj	\
 	scanner.obj	\
+        segment.obj     \
         spool.obj       \
 	symtab.obj	\
 	toklist.obj	\

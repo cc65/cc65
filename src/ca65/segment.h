@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  fragment.c				     */
+/*				   segment.h				     */
 /*                                                                           */
-/*		  Data fragments for the ca65 crossassembler		     */
+/*                   Segments for the ca65 macroassembler                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,42 +33,92 @@
 
 
 
+#ifndef SEGMENT_H
+#define SEGMENT_H
+
+
+
 /* common */
-#include "xmalloc.h"
+#include "fragdefs.h"
+#include "segdefs.h"
 
 /* ca65 */
 #include "fragment.h"
-#include "lineinfo.h"
-#include "scanner.h"
 
 
 
 /*****************************************************************************/
-/*                                   Code                                    */
+/*				     Data				     */
 /*****************************************************************************/
 
 
 
-Fragment* NewFragment (unsigned char Type, unsigned short Len)
-/* Create, initialize and return a new fragment. The fragment will be inserted
- * into the current segment.
+/* Are we in absolute mode or in relocatable mode? */
+extern int 	RelocMode;
+
+/* Definitions for predefined segments */
+extern SegDef NullSegDef;
+extern SegDef ZeropageSegDef;
+extern SegDef DataSegDef;
+extern SegDef BssSegDef;
+extern SegDef RODataSegDef;
+extern SegDef CodeSegDef;
+
+
+
+/*****************************************************************************/
+/*     	      	      	   	     Code				     */
+/*****************************************************************************/
+
+
+
+Fragment* GenFragment (unsigned char Type, unsigned short Len);
+/* Generate a new fragment, add it to the current segment and return it. */
+
+void UseSeg (const SegDef* D);
+/* Use the given segment */
+
+const SegDef* GetCurrentSeg (void);
+/* Get a pointer to the segment defininition of the current segment */
+
+unsigned GetSegNum (void);
+/* Get the number of the current segment */
+
+void SegAlign (unsigned Power, int Val);
+/* Align the PC segment to 2^Power. If Val is -1, emit fill fragments (the
+ * actual fill value will be determined by the linker), otherwise use the
+ * given value.
  */
-{
-    /* Create a new fragment */
-    Fragment* F = xmalloc (sizeof (*F));
 
-    /* Initialize it */
-    F->Next 	= 0;
-    F->LineList = 0;
-    F->Pos  	= CurPos;
-    F->LI       = UseLineInfo (CurLineInfo);
-    F->Len  	= Len;
-    F->Type 	= Type;
+int IsZPSeg (void);
+/* Return true if the current segment is a zeropage segment */
 
-    /* And return it */
-    return F;
-}
+int IsFarSeg (void);
+/* Return true if the current segment is a far segment */
 
+unsigned GetSegType (unsigned SegNum);
+/* Return the type of the segment with the given number */
+
+unsigned long GetPC (void);
+/* Get the program counter of the current segment */
+
+void SetAbsPC (unsigned long AbsPC);
+/* Set the program counter in absolute mode */
+
+void SegCheck (void);
+/* Check the segments for range and other errors */
+
+void SegDump (void);
+/* Dump the contents of all segments */
+
+void WriteSegments (void);
+/* Write the segment data to the object file */
+
+
+
+/* End of segment.h */
+
+#endif
 
 
 

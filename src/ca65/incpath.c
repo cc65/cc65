@@ -35,7 +35,14 @@
 
 #include <stdio.h>
 #include <string.h>
-#include <unistd.h>
+#if defined(_MSC_VER)
+/* Microsoft compiler */
+#  include <io.h>
+#  define R_OK	4
+#else
+/* Anyone else */
+#  include <unistd.h>
+#endif
 
 #include "mem.h"
 #include "incpath.h"

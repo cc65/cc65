@@ -747,15 +747,25 @@ Again:
 	    /* Dot keyword, search for it */
 	    Tok = FindDotKeyword ();
 	    if (Tok == TOK_NONE) {
+
 	    	/* Not found */
-		if (LeadingDotInIdents) {
-		    /* An identifier with a dot */
-		    Tok = TOK_IDENT;
-		} else {
+		if (!LeadingDotInIdents) {
 		    /* Invalid pseudo instruction */
 		    Error ("`%s' is not a recognized control command", SVal);
 		    goto Again;
 		}
+
+		/* An identifier with a dot. Check if it's a define style
+		 * macro.
+		 */
+       	       	if (IsDefine (SVal)) {
+ 		    /* This is a define style macro - expand it */
+		    MacExpandStart ();
+		    goto Restart;
+		}
+
+		/* Just an identifier with a dot */
+		Tok = TOK_IDENT;
 	    }
 
 	}
@@ -786,16 +796,18 @@ Again:
     	/* Read the identifier */
     	ReadIdent (0);
 
-       	/* Check for special names */
+       	/* Check for special names. Bail out if we have identified the type of
+	 * the token. Go on if the token is an identifier.
+	 */
         if (SVal[1] == '\0') {
     	    switch (toupper (SVal [0])) {
 
-    	    	case 'A':
+    	     	case 'A':
                     if (C == ':') {
                         NextChar ();
                         Tok = TOK_OVERRIDE_ABS;
                     } else {
-    	    	        Tok = TOK_A;
+    	     	        Tok = TOK_A;
                     }
     	            return;
 
@@ -803,35 +815,32 @@ Again:
                     if (C == ':') {
                         NextChar ();
                         Tok = TOK_OVERRIDE_FAR;
-                    } else {
-                        Tok = TOK_IDENT;
+			return;
                     }
-                    return;
+		    break;
 
 	        case 'S':
-	    	    Tok = TOK_S;
-	    	    return;
+	     	    Tok = TOK_S;
+	     	    return;
 
     	     	case 'X':
-    	    	    Tok = TOK_X;
-	    	    return;
+    	     	    Tok = TOK_X;
+	     	    return;
 
  	      	case 'Y':
-	    	    Tok = TOK_Y;
-	    	    return;
+	     	    Tok = TOK_Y;
+	     	    return;
 
                 case 'Z':
                     if (C == ':') {
                         NextChar ();
                         Tok = TOK_OVERRIDE_ZP;
-                    } else {
-                        Tok = TOK_IDENT;
+			return;
                     }
-                    return;
+                    break;
 
 	      	default:
-	    	    Tok = TOK_IDENT;
-	    	    return;
+	     	    break;
    	    }
 	}
 

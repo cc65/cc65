@@ -88,7 +88,6 @@ OBJS = 	add.o		\
        	ldauisp.o	\
        	ldaxi.o		\
        	ldaxsp.o	\
-       	ldeax.o		\
        	ldeaxi.o	\
 	ldeaxysp.o	\
        	ldec.o		\

@@ -92,7 +92,7 @@ void CfgWarning (const char* Format, ...)
     xvsprintf (Buf, sizeof (Buf), Format, ap);
     va_end (ap);
 
-    Warning ("%s(%u): %s", CfgName, CfgErrorLine, Buf);
+    Warning ("%s(%u): %s", CfgGetName(), CfgErrorLine, Buf);
 }
 
 
@@ -107,7 +107,7 @@ void CfgError (const char* Format, ...)
     xvsprintf (Buf, sizeof (Buf), Format, ap);
     va_end (ap);
 
-    Error ("%s(%u): %s", CfgName, CfgErrorLine, Buf);
+    Error ("%s(%u): %s", CfgGetName(), CfgErrorLine, Buf);
 }
 
 
@@ -125,7 +125,7 @@ static void NextChar (void)
 	/* Read from buffer */
 	C = (unsigned char)(*CfgBuf);
 	if (C == 0) {
-	    C = EOF;
+     	    C = EOF;
 	} else {
 	    ++CfgBuf;
 	}
@@ -254,7 +254,7 @@ Again:
         case ':':
 	    NextChar ();
 	    CfgTok = CFGTOK_COLON;
-	    break;
+     	    break;
 
         case '\"':
 	    NextChar ();
@@ -297,7 +297,7 @@ Again:
 		    	CfgSVal [0] = '\0';
 		    }
 		    CfgTok = CFGTOK_STRCON;
-		    break;
+     		    break;
 
 	        case 'S':
 		    NextChar ();
@@ -426,7 +426,7 @@ void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name)
 
        	/* Linear search */
 	for (I = 0; I < Size; ++I) {
-	    if (strcmp (CfgSVal, Table [I].Ident) == 0) {
+     	    if (strcmp (CfgSVal, Table [I].Ident) == 0) {
 	    	CfgTok = Table [I].Tok;
 	    	return;
 	    }
@@ -475,7 +475,13 @@ void CfgSetName (const char* Name)
 const char* CfgGetName (void)
 /* Get the name of the config file */
 {
-    return CfgName? CfgName : "";
+    if (CfgName) {
+	return CfgName;
+    } else if (CfgBuf) {
+	return "[builtin config]";
+    } else {
+	return "";
+    }
 }
 
 
@@ -514,7 +520,7 @@ void CfgOpenInput (void)
 
     /* Initialize variables */
     C         = ' ';
-    InputLine = 1;
+    InputLine = 1;		
     InputCol  = 0;
 
     /* Start the ball rolling ... */
@@ -535,4 +541,4 @@ void CfgCloseInput (void)
 
 
 
-			  
+

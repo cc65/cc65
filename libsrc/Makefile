@@ -68,7 +68,7 @@ atarilib:
 # Oric Atmos
 
 atmoslib:
-	for i in atmos common runtime em joystick tgi; do \
+	for i in atmos common conio runtime em joystick tgi; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \

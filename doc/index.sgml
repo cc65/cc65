@@ -31,7 +31,7 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="cl65.html" name="cl65.html"></tag>
   Describes the cl65 compile & link utility.
 
-  <tag><htmlurl url="coding.txt" name="coding.txt"></tag>
+  <tag><htmlurl url="coding.html" name="coding.html"></tag>
   Containes hints on creating the most effective code with cc65.
 
   <tag><htmlurl url="compile.txt" name="compile.txt"></tag>
@@ -40,11 +40,14 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="debugging.txt" name="debugging.txt"></tag>
   Debug programs using the VICE emulator.
 
+  <tag><htmlurl url="dio.html" name="dio.html"></tag>
+  Low level disk I/O API.
+
   <tag><htmlurl url="geos.html" name="geos.html"></tag>
   GEOSLib manual in several formats.
 
   <tag><htmlurl url="grc.txt" name="grc.txt"></tag>
-  grc.txt	- Describes the GEOS resource compiler (grc).
+  Describes the GEOS resource compiler (grc).
 
   <tag><htmlurl url="index.html" name="index.html"></tag>
   This file.

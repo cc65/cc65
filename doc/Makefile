@@ -8,11 +8,12 @@
 SGML  =	ar65.sgml	\
 	ca65.sgml	\
 	cc65.sgml	\
-	cl65.sgml	\
-	dio.sgml	\
-	geos.sgml	\
-	index.sgml	\
-	ld65.sgml	\
+	cl65.sgml   	\
+	coding.sgml	\
+	dio.sgml    	\
+	geos.sgml   	\
+	index.sgml  	\
+	ld65.sgml   	\
 	library.sgml
 
 TXT   =	$(SGML:.sgml=.txt)

@@ -8,10 +8,10 @@
 
 
 ; Error codes returned by all functions
-.enum
-    TV_NTSC     
-    TV_PAL
-    TV_OTHER
+.enum TV
+    NTSC
+    PAL
+    OTHER
 .endenum
 
 

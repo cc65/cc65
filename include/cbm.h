@@ -105,6 +105,7 @@ extern unsigned char _filetype;         /* Default 'u' */
 #define CH_DEL			 20
 #define CH_INS			148
 #define CH_ESC			 95
+#define CH_ENTER                '\n'
 
 
 

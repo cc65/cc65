@@ -26,7 +26,10 @@ _read:	jsr	popax 		; get count
 L1:    	lda	ptr2
    	ora	ptr2+1		; count zero?
    	beq	L9
-   	jsr	BASIN
+	dec	ptr2
+	bne	L1a
+	dec	ptr2+1
+L1a:   	jsr	BASIN
    	ldy	#0
    	sta	(ptr1),y	; save char
    	inc	ptr1

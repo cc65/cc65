@@ -8,6 +8,7 @@
 	.import		initlib, donelib
        	.import	       	zerobss, push0
 	.import	     	_main
+	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 
 	.include     	"c64.inc"
 	.include     	"../cbm/cbm.inc"
@@ -85,9 +86,9 @@ L1:	lda	sp,x
        	ora	#$06		; Enable kernal+I/O, disable basic
 	sta	$01
 
-	lda    	#<$D000
+	lda    	#<(__RAM_START__ + __RAM_SIZE__)
 	sta	sp
-	lda	#>$D000
+	lda	#>(__RAM_START__ + __RAM_SIZE__)
        	sta	sp+1   		; Set argument stack ptr
 
 ; Call module constructors

@@ -44,8 +44,7 @@
 
 
 
-typedef enum attr_t attr_t;
-enum attr_t {
+typedef enum attr_t {
 
     /* Styles */
     atDefault	= 0x00,		/* Default style */
@@ -65,7 +64,7 @@ enum attr_t {
 
     atStyleMask = 0x0F,		/* Output style */
     atLabelMask = 0x30		/* Label information */
-};
+} attr_t;
 
 
 

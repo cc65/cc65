@@ -81,22 +81,19 @@ struct mouse_info {
 
 
 
-unsigned char __fastcall__ mouse_init (unsigned char port,
-		  		       unsigned char type);
+unsigned char __fastcall__ mouse_init (unsigned char type);
 /* Setup the mouse interrupt handler. The mouse routines will use a predefined
- * system resource for the mouse cursor:
- *     C64:      Sprite #0
- *     C128:     Sprite #0
- *     GEOS:     Sprite #0
- *     Atari:    PM #0
- * However, the mouse routines will not initialize this cursor or set a 
+ * system resource for the mouse port and mouse cursor:
+ *     C64:      Port #0, Sprite #0
+ *     C128:     Port #0, Sprite #0
+ *     GEOS:     System defined port, Sprite #0
+ *     Atari:    Port #0, PM #0
+ * However, the mouse routines will not initialize this cursor or set a
  * specific shape - this is platform dependent and up to the user program.
- * The mouse cursor is moved if the mouse is moved (provided that the mouse 
+ * The mouse cursor is moved if the mouse is moved (provided that the mouse
  * cursor is visible), and switched on and off in the show and hide functions.
- * The port parameter gives the joystick port used for the mouse and is only
- * needed to read the mouse button state.
  * The type parameter is needed on some systems to determine the type of
- * the mouse connected to the given port.
+ * the mouse connected to the given port, on others it is ignored.
  * After calling this function, the mouse is invisble, the cursor is placed
  * at 0/0 (upper left corner), and the bounding box is reset to cover the
  * whole screen. Call mouse_show once to make the mouse cursor visible.

@@ -19,6 +19,7 @@ OBJS =	abend.o		\
 	filepos.o	\
 	fname.o		\
 	hashstr.o	\
+	print.o		\
 	target.o	\
 	tgttrans.o	\
 	xmalloc.o	\

@@ -61,7 +61,7 @@ CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
 .c.obj:
   $(CC) $(CCCFG) $<
 
-			 
+
 # ------------------------------------------------------------------------------
 # All library OBJ files
 
@@ -75,9 +75,10 @@ OBJS =	abend.obj	\
 	filepos.obj	\
 	fname.obj	\
 	hashstr.obj	\
-	wildargv.obj	\
+	print.obj	\
 	target.obj	\
 	tgttrans.obj	\
+	wildargv.obj	\
 	xmalloc.obj	\
 	xsprintf.obj
 

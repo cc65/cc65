@@ -69,7 +69,7 @@ pages:	.byte   1                       ; Number of screens available
 ; primitives - for example ploting a line by using calls to SETPIXEL.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   INIT
         .word   DONE
 	.word	GETERROR
@@ -263,19 +263,19 @@ settestadr2:
 	jmp	VDCSetSourceAddr
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory. May
+; UNINSTALL routine. Is called before the driver is removed from memory. May
 ; clean up anything done by INSTALL but is probably empty most of the time.
 ;
 ; Must set an error code: NO
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 
 ; ------------------------------------------------------------------------
 ; INIT: Changes an already installed device from text mode to graphics
-; mode. The number of the graphics mode is passed to the function in A.
+; mode.
 ; Note that INIT/DONE may be called multiple times while the driver
 ; is loaded, while INSTALL is only called once, so any code that is needed
 ; to initializes variables and so on must go here. Setting palette and
@@ -375,7 +375,7 @@ CONTROL:
 ; Must set an error code: NO
 ;
 
-CLEAR:  
+CLEAR:
 	lda	#0
 	ldy	SCRBASE
 	jsr	VDCSetSourceAddr
@@ -838,7 +838,7 @@ LINE:
 	ldx	PB+1
 	jmp	@L025B
 	; } else { x1 = x1 + ay
-@L017B:	
+@L017B:
 	lda	X1
 	clc
 	adc	AY
@@ -909,7 +909,7 @@ BAR:
 ; Must set an error code: NO
 ;
 
-CIRCLE: 
+CIRCLE:
 	lda     RADIUS
         bne     @L1
         jmp     SETPIXELCLIP    ; Plot as a point

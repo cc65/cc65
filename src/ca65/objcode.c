@@ -633,13 +633,20 @@ void Emit3b (unsigned char OPC, ExprNode* Expr, ExprNode* Bank)
 
 
 
+void EmitSigned (ExprNode* Expr, unsigned Size)
+/* Emit a signed expression with the given size */
+{
+    Fragment* F = NewFragment (FRAG_SEXPR, Size);
+    F->V.Expr = Expr;
+}
+
+
+
 void EmitPCRel (unsigned char OPC, ExprNode* Expr, unsigned Size)
 /* Emit an opcode with a PC relative argument of one or two bytes */
 {
-    Fragment* F;
     Emit0 (OPC);
-    F = NewFragment (FRAG_SEXPR, Size);
-    F->V.Expr = Expr;
+    EmitSigned (Expr, Size);
 }
 
 

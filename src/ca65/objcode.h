@@ -133,6 +133,9 @@ void Emit3 (unsigned char OPC, ExprNode* Expr);
 void Emit3b (unsigned char OPC, ExprNode* Expr, ExprNode* Bank);
 /* Emit an instruction with a three byte argument and separate bank */
 
+void EmitSigned (ExprNode* Expr, unsigned Size);
+/* Emit a signed expression with the given size */
+
 void EmitPCRel (unsigned char OPC, ExprNode* Expr, unsigned Size);
 /* Emit an opcode with a PC relative argument of one or two bytes */
 

@@ -1065,7 +1065,7 @@ unsigned OptStoreLoad (CodeSeg* S)
 
 
 
-unsigned OptTransfers (CodeSeg* S)
+unsigned OptTransfers1 (CodeSeg* S)
 /* Remove transfers from one register to another and back */
 {
     unsigned Changes = 0;
@@ -1081,9 +1081,7 @@ unsigned OptTransfers (CodeSeg* S)
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
-	/* Check if it is a store instruction followed by a load from the
-	 * same address which is itself not followed by a conditional branch.
-	 */
+	/* Check if we have two transfer instructions */
        	if ((E->Info & OF_XFR) != 0                 &&
 	    (N = CS_GetNextEntry (S, I)) != 0  	    &&
 	    !CE_HasLabel (N)                        &&
@@ -1127,6 +1125,82 @@ NextEntry:
 	/* Next entry */
 	++I;
 
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptTransfers2 (CodeSeg* S)
+/* Replace loads followed by a register transfer by a load with the second
+ * register if possible.
+ */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* N;
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if we have a load followed by a transfer where the loaded
+         * register is not used later.
+         */
+       	if ((E->Info & OF_LOAD) != 0                &&
+       	    (N = CS_GetNextEntry (S, I)) != 0  	    &&
+	    !CE_HasLabel (N)                        &&
+       	    (N->Info & OF_XFR) != 0                 &&
+            GetRegInfo (S, I+2, E->Chg) != E->Chg) {
+
+            CodeEntry* X = 0;
+
+            if (E->OPC == OP65_LDA && N->OPC == OP65_TAX) {
+                /* LDA/TAX - check for the right addressing modes */
+                if (E->AM == AM65_IMM ||
+                    E->AM == AM65_ZP  ||
+                    E->AM == AM65_ABS ||
+                    E->AM == AM65_ABSY) {
+                    /* Replace */
+                    X = NewCodeEntry (OP65_LDX, E->AM, E->Arg, 0, N->LI);
+                }
+            } else if (E->OPC == OP65_LDA && N->OPC == OP65_TAY) {
+                /* LDA/TAY - check for the right addressing modes */
+                if (E->AM == AM65_IMM ||
+                    E->AM == AM65_ZP  ||
+                    E->AM == AM65_ZPX ||
+                    E->AM == AM65_ABS ||
+                    E->AM == AM65_ABSX) {
+                    /* Replace */
+                    X = NewCodeEntry (OP65_LDY, E->AM, E->Arg, 0, N->LI);
+                }
+            } else if (E->OPC == OP65_LDY && N->OPC == OP65_TYA) {
+                /* LDY/TYA. LDA supports all addressing modes LDY does */
+                X = NewCodeEntry (OP65_LDA, E->AM, E->Arg, 0, N->LI);
+            } else if (E->OPC == OP65_LDX && N->OPC == OP65_TXA) {
+                /* LDX/TXA. LDA doesn't support zp,y, so we must map it to
+                 * abs,y instead.
+                 */
+                am_t AM = (E->AM == AM65_ZPY)? AM65_ABSY : E->AM;
+                X = NewCodeEntry (OP65_LDA, AM, E->Arg, 0, N->LI);
+            }
+
+            /* If we have a load entry, add it and remove the old stuff */
+            if (X) {
+                CS_InsertEntry (S, X, I+2);
+                CS_DelEntries (S, I, 2);
+                ++Changes;
+                --I;    /* Correct for one entry less */
+            }
+	}
+
+	/* Next entry */
+	++I;
     }
 
     /* Return the number of changes made */
@@ -1264,7 +1338,6 @@ unsigned OptPrecalc (CodeSeg* S)
                     } else if (E->AM == AM65_ZP) {
                         int R = ZPRegVal (E->Use, In);
                         if (RegValIsKnown (R)) {
-                            printf ("A: %02X  tmp1: %02X\n", In->RegA, R);
                             /* Accu EOR zp with known contents */
                             Arg = MakeHexArg (In->RegA ^ R);
                         }

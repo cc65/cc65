@@ -1542,7 +1542,8 @@ static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",      0, 0, 
 static OptFunc DOptSub1	       	= { OptSub1,   	     "OptSub1",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptSub2	       	= { OptSub2,   	     "OptSub2",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptTest1       	= { OptTest1,  	     "OptTest1",       	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptTransfers   	= { OptTransfers,    "OptTransfers",      0, 0, 0, 0, 0, 0 };
+static OptFunc DOptTransfers1  	= { OptTransfers1,   "OptTransfers1",     0, 0, 0, 0, 0, 0 };
+static OptFunc DOptTransfers2  	= { OptTransfers2,   "OptTransfers2",    60, 0, 0, 0, 0, 0 };
 static OptFunc DOptUnusedLoads 	= { OptUnusedLoads,  "OptUnusedLoads",    0, 0, 0, 0, 0, 0 };
 static OptFunc DOptUnusedStores	= { OptUnusedStores, "OptUnusedStores",   0, 0, 0, 0, 0, 0 };
 
@@ -1610,7 +1611,8 @@ static OptFunc* OptFuncs[] = {
     &DOptSub1,
     &DOptSub2,
     &DOptTest1,
-    &DOptTransfers,
+    &DOptTransfers1,
+    &DOptTransfers2,
     &DOptUnusedLoads,
     &DOptUnusedStores,
 };
@@ -1781,15 +1783,15 @@ static void WriteOptStats (const char* Name)
 
     /* Write a header */
     fprintf (F,
-	     "; Optimizer           Total  Last   Total  Last\n"
-       	     ";   Step              Runs   Runs    Chg   Chg\n");
+	     "; Optimizer               Total      Last       Total      Last\n"
+       	     ";   Step                  Runs       Runs        Chg       Chg\n");        
 
 
     /* Write the data */
     for (I = 0; I < OPTFUNC_COUNT; ++I) {
     	const OptFunc* O = OptFuncs[I];
     	fprintf (F,
-       	       	 "%-20s %6lu %6lu %6lu %6lu\n",
+       	       	 "%-20s %10lu %10lu %10lu %10lu\n",
     		 O->Name,
 		 O->TotalRuns,
       	       	 O->LastRuns,
@@ -1934,7 +1936,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
        	C += RunOptFunc (S, &DOptUnusedStores, 1);
        	C += RunOptFunc (S, &DOptDupLoads, 1);
        	C += RunOptFunc (S, &DOptStoreLoad, 1);
-       	C += RunOptFunc (S, &DOptTransfers, 1);
+       	C += RunOptFunc (S, &DOptTransfers1, 1);
         C += RunOptFunc (S, &DOptPushPop, 1);
 
 	Changes += C;
@@ -1981,6 +1983,7 @@ static unsigned RunOptGroup5 (CodeSeg* S)
     Changes += RunOptFunc (S, &DOptPush1, 1);
     Changes += RunOptFunc (S, &DOptPush2, 1);
     Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+    Changes += RunOptFunc (S, &DOptTransfers2, 1);
 
     /* Return the number of changes */
     return Changes;

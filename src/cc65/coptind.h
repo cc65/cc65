@@ -102,8 +102,13 @@ unsigned OptDupLoads (CodeSeg* S);
 unsigned OptStoreLoad (CodeSeg* S);
 /* Remove a store followed by a load from the same location. */
 
-unsigned OptTransfers (CodeSeg* S);
+unsigned OptTransfers1 (CodeSeg* S);
 /* Remove transfers from one register to another and back */
+
+unsigned OptTransfers2 (CodeSeg* S);
+/* Replace loads followed by a register transfer by a load with the second
+ * register if possible.
+ */
 
 unsigned OptPushPop (CodeSeg* S);
 /* Remove a PHA/PLA sequence were A is not used later */

@@ -45,7 +45,7 @@
 
 
 #define VER_MAJOR	2U
-#define VER_MINOR	9U
+#define VER_MINOR	10U
 #define VER_PATCH	5U
 
 #define VERSION         ((VER_MAJOR * 0x100) + (VER_MINOR * 0x10) + VER_PATCH)

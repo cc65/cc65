@@ -1,5 +1,6 @@
+# -*- makefile -*-
 #
-# makefile for CC65 runtime library
+# makefile for CC65's console library
 #
 
 .SUFFIXES: .o .s .c
@@ -27,15 +28,26 @@ CFLAGS	= -Osir -g -T -t $(SYS) --forget-inc-paths -I . -I ../../include
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
 #--------------------------------------------------------------------------
+# Rules to help us see what code the compiler and assembler make.
+
+#%.s :	%.c
+#	@$(CC) $(CFLAGS) -S $<
+
+%.lst :	%.s
+	@$(AS) $(AFLAGS) -l -o /dev/null $<
+
+#--------------------------------------------------------------------------
 # Object files
 
 OBJS =	_cursor.o	\
         cprintf.o 	\
 	cputhex.o	\
 	cputs.o		\
+	cscanf.o	\
 	cursor.o	\
 	scrsize.o       \
-        vcprintf.o
+        vcprintf.o	\
+	vcscanf.o
 
 #--------------------------------------------------------------------------
 # Targets
@@ -45,7 +57,7 @@ OBJS =	_cursor.o	\
 all:  	$(OBJS)
 
 clean:
-	@$(RM) *~ $(OBJS)
+	@$(RM) *~ *.lst $(OBJS)
 
 zap:	clean
 

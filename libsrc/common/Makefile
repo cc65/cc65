@@ -148,6 +148,7 @@ S_OBJS = 	_cwd.o          \
 		tolower.o	\
 		toupper.o	\
                 uname.o         \
+                ungetc.o        \
                 unlink.o        \
                 utscopy.o       \
 		vfprintf.o	\

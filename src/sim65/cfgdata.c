@@ -40,6 +40,7 @@
 #include "xmalloc.h"
 
 /* sim65 */
+#include "error.h"
 #include "scanner.h"
 #include "cfgdata.h"
 
@@ -87,6 +88,19 @@ void FreeCfgData (CfgData* D)
 
 
 
+void CfgDataCheckType (const CfgData* D, unsigned Type)
+/* Check the config data type and print an error message if it has the wrong
+ * type.
+ */
+{
+    if (D->Type != Type) {
+        Error ("%s(%u): Attribute `%s' has invalid type",
+               CfgGetName (), D->Line, D->Attr);
+    }
+}
+
+
+
 int CfgDataFind (const Collection* Attributes, const char* AttrName)
 /* Find the attribute with the given name and return its index. Return -1 if
  * the attribute was not found.
@@ -108,7 +122,7 @@ int CfgDataFind (const Collection* Attributes, const char* AttrName)
     }
 
     /* Not found */
-    return -1;         
+    return -1;
 }
 
 

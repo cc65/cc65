@@ -10,7 +10,8 @@ CC	= gcc
 EBIND	= emxbind
 LDFLAGS	=
 
-OBJS = 	cfgdata.o       \
+OBJS = 	addrspace.o     \
+        cfgdata.o       \
         chip.o          \
         chippath.o      \
         config.o        \
@@ -18,6 +19,7 @@ OBJS = 	cfgdata.o       \
 	cputype.o     	\
         error.o         \
 	global.o      	\
+        location.o      \
 	main.o          \
         memory.o        \
         scanner.o

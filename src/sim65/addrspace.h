@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.h				     */
+/*                                addrspace.h                                */
 /*                                                                           */
-/*                 Global variables for the sim65 6502 simulator             */
+/*                 CPU address space for the 6502 simulator                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,22 +33,64 @@
 
 
 
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#ifndef ADDRSPACE_H
+#define ADDRSPACE_H
 
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*     		    		     Data				     */
 /*****************************************************************************/
 
 
 
-extern unsigned char	Debug;			/* Debug mode */
+/* Forwards */
+struct CPUData;
+struct ChipInstance;
+
+/* Forwards */
+typedef struct AddressSpace AddressSpace;
+struct AddressSpace {
+
+    struct CPU*                 CPU;      /* Backpointer to CPU */
+    unsigned                    Size;     /* Address space size */
+    struct ChipInstance*        Data[1];  /* Pointer to chips, dynamically! */
+
+};
 
 
 
-/* End of global.h */
+/*****************************************************************************/
+/*     	     	    	   	     Code				     */
+/*****************************************************************************/
+
+
+
+AddressSpace* NewAddressSpace (unsigned Size);
+/* Allocate a new address space and return it */
+
+void ASWrite (AddressSpace* AS, unsigned Addr, unsigned char Val);
+/* Write a byte to a given location */
+
+unsigned char ASRead (AddressSpace* AS, unsigned Addr);
+/* Read a byte from a location */
+
+void ASWriteCtrl (AddressSpace* AS, unsigned Addr, unsigned char Val);
+/* Write a byte to a given location */
+
+unsigned char ASReadCtrl (AddressSpace* AS, unsigned Addr);
+/* Read a byte from a location */
+
+void ASAssignChip (AddressSpace* AS, struct ChipInstance* CI,
+                   unsigned Addr, unsigned Range);
+/* Assign a chip instance to memory locations */
+
+struct ChipInstance* ASGetChip (const AddressSpace* AS, unsigned Addr);
+/* Get the chip that is located at the given address (may return NULL). */
+
+
+
+/* End of addrspace.h */
 
 #endif
 

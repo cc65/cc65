@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -54,6 +54,7 @@
 
 
 /* Forwards */
+struct AddressSpace;
 struct CfgData;
 typedef struct ChipInstance ChipInstance;
 typedef struct Chip Chip;
@@ -61,17 +62,18 @@ typedef struct ChipLibrary ChipLibrary;
 
 /* One instance of a chip */
 struct ChipInstance {
-    Chip*               C;              /* Pointer to corresponding chip */
-    unsigned            Addr;           /* Start address of range */
-    unsigned            Size;           /* Size of range */
-    void*               Data;           /* Chip instance data */
+    Chip*                   C;          /* Pointer to corresponding chip */
+    struct AddressSpace*    AS;         /* Pointer to address space */
+    unsigned                Addr;       /* Start address of range */
+    unsigned                Size;       /* Size of range */
+    void*                   Data;       /* Chip instance data */
 };
 
 /* Chip structure */
 struct Chip {
-    struct ChipLibrary* Library;        /* Pointer to library data structure */
-    const ChipData*     Data;           /* Chip data as given by the library */
-    Collection          Instances;      /* Pointer to chip instances */
+    struct ChipLibrary*     Lib;        /* Pointer to library data structure */
+    const ChipData*         Data;       /* Chip data as given by the library */
+    Collection              Instances;  /* Pointer to chip instances */
 };
 
 /* ChipLibrary structure */

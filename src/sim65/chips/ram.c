@@ -148,6 +148,8 @@ static int InitChip (const struct SimData* Data)
 static void* InitInstance (unsigned Addr, unsigned Range, void* CfgInfo)
 /* Initialize a new chip instance */
 {
+    long Val;
+
     /* Allocate a new instance structure */
     InstanceData* D = Sim->Malloc (sizeof (InstanceData));
 
@@ -157,9 +159,22 @@ static void* InitInstance (unsigned Addr, unsigned Range, void* CfgInfo)
     D->MemAttr  = Sim->Malloc (Range * sizeof (D->MemAttr[0]));
     D->Mem      = Sim->Malloc (Range * sizeof (D->Mem[0]));
 
-    /* Clear the RAM and attribute memory */
+    /* Check if a value is given that should be used to clear the RAM.
+     * Otherwise use random values.
+     */
+    if (Sim->GetCfgNum (CfgInfo, "fill", &Val) == 0) {
+        /* No "fill" attribute */
+        unsigned I;
+        for (I = 0; I < Range; ++I) {
+            D->Mem[I] = (unsigned char) rand ();
+        }
+    } else {
+        /* Got a "fill" attribute */
+        memset (D->Mem, (int) Val, Range);
+    }
+
+    /* Clear the attribute memory */
     memset (D->MemAttr, 0, Range * sizeof (D->MemAttr[0]));
-    memset (D->Mem, 0, Range * sizeof (D->Mem[0]));
 
     /* Done, return the instance data */
     return D;

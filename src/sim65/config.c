@@ -51,114 +51,9 @@
 #include "error.h"
 #include "global.h"
 #include "memory.h"
+#include "location.h"
 #include "scanner.h"
 #include "config.h"
-
-
-
-/*****************************************************************************/
-/*                                   Data                                    */
-/*****************************************************************************/
-
-
-
-/* List of all memory locations */
-static Collection Locations;
-
-/* One memory location */
-typedef struct Location Location;
-struct Location {
-    unsigned    Start;          /* Start of memory location */
-    unsigned    End;            /* End memory location */
-    Collection  Attributes;     /* Attributes given */
-    unsigned    Line;           /* Line in config file */
-    unsigned    Col;            /* Column in config file */
-};
-
-
-
-/*****************************************************************************/
-/*		      		struct CfgData		       		     */
-/*****************************************************************************/
-
-
-
-static void CfgDataCheckType (const CfgData* D, unsigned Type)
-/* Check the config data type */
-{
-    if (D->Type != Type) {
-        Error ("%s(%u): Attribute `%s' has invalid type",
-               CfgGetName (), D->Line, D->Attr);
-    }
-}
-
-
-
-/*****************************************************************************/
-/*                              struct Location                              */
-/*****************************************************************************/
-
-
-
-static Location* NewLocation (unsigned long Start, unsigned long End)
-/* Create a new location, initialize and return it */
-{
-    /* Allocate memory */
-    Location* L = xmalloc (sizeof (Location));
-
-    /* Initialize the fields */
-    L->Start      = Start;
-    L->End        = End;
-    L->Attributes = EmptyCollection;
-    L->Line       = CfgErrorLine;
-    L->Col        = CfgErrorCol;
-
-    /* Return the new struct */
-    return L;
-}
-
-
-
-static int CmpLocations (void* Data attribute ((unused)),
-		         const void* lhs, const void* rhs)
-/* Compare function for CollSort */
-{
-    /* Cast the object pointers */
-    const Location* Left  = (const Location*) rhs;
-    const Location* Right = (const Location*) lhs;
-
-    /* Do the compare */
-    if (Left->Start < Right->Start) {
-        return 1;
-    } else if (Left->Start > Right->Start) {
-        return -1;
-    } else {
-        return 0;
-    }
-}
-
-
-
-static int LocationGetAttr (const Location* L, const char* AttrName)
-/* Find the attribute with the given name and return it. Call Error() if the
- * attribute was not found.
- */
-{
-    int I = CfgDataFind (&L->Attributes, AttrName);
-    if (I < 0) {
-        Error ("%s(%u): Attribute `%s' missing", CfgGetName(), L->Line, AttrName);
-    }
-    return I;
-}
-
-
-
-static int LocationIsMirror (const Location* L)
-/* Return true if the given location is a mirror of another one. */
-{
-    /* Find the "mirror" attribute */
-    return (CfgDataFind (&L->Attributes, "mirror") >= 0);
-}
 
 
 
@@ -172,7 +67,6 @@ static void ParseMemory (void)
 /* Parse a MEMORY section */
 {
     unsigned I;
-    const Location* Last;
 
 
     while (CfgTok == CFGTOK_INTCON) {
@@ -245,37 +139,10 @@ static void ParseMemory (void)
     }
 
     /* Sort all memory locations */
-    CollSort (&Locations, CmpLocations, 0);
+    LocationSort (&Locations);
 
-    /* Check for overlaps and other problems */
-    Last = 0;
-    for (I = 0; I < CollCount (&Locations); ++I) {
-
-        /* Get this location */
-        const Location* L = CollAtUnchecked (&Locations, I);
-
-        /* Check for an overlap with the following location */
-        if (Last && Last->End >= L->Start) {
-            Error ("%s(%u): Address range overlap (overlapping entry is in line %u)",
-                   CfgGetName(), L->Line, Last->Line);
-        }
-
-        /* If the location is a mirror, it must not have other attributes,
-         * and the mirror attribute must be an integer.
-         */
-        if (LocationIsMirror (L)) {
-            const CfgData* D;
-            if (CollCount (&L->Attributes) > 1) {
-                Error ("%s(%u): Location at address $%06X is a mirror "
-                       "but has attributes", CfgGetName(), L->Line, L->Start);
-            }
-            D = CollConstAt (&L->Attributes, 0);
-            CfgDataCheckType (D, CfgDataNumber);
-        }
-
-        /* Remember this entry */
-        Last = L;
-    }
+    /* Check the locations for overlaps and other problems */
+    LocationCheck (&Locations);
 
     /* Now create the chip instances. Since we can only mirror existing chips,
      * we will first create all real chips and the mirrors in a second run.

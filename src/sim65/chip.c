@@ -246,7 +246,7 @@ static Chip* NewChip (ChipLibrary* Library, const ChipData* Data)
     Chip* C = xmalloc (sizeof (Chip));
 
     /* Initialize the fields */
-    C->Library   = Library;
+    C->Lib       = Library;
     C->Data      = Data;
     C->Instances = EmptyCollection;
 
@@ -275,6 +275,7 @@ ChipInstance* NewChipInstance (const char* ChipName, unsigned Addr,
 
     /* Initialize the fields */
     CI->C    = C;
+    CI->AS   = 0;
     CI->Addr = Addr;
     CI->Size = Size;
     CI->Data = C->Data->InitInstance (Addr, Size, Attributes);

@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.h				     */
+/*                                location.h                                 */
 /*                                                                           */
-/*                 Global variables for the sim65 6502 simulator             */
+/*                        Memory location description                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,25 +33,65 @@
 
 
 
-#ifndef GLOBAL_H
-#define GLOBAL_H
+#ifndef LOCATION_H
+#define LOCATION_H
+
+
+
+/* common.h */
+#include "coll.h"
 
 
 
 /*****************************************************************************/
-/*				     Data				     */
+/*                                     Data                                  */
 /*****************************************************************************/
 
 
 
-extern unsigned char	Debug;			/* Debug mode */
+/* List of all memory locations */
+extern Collection Locations;
+
+/* One memory location */
+typedef struct Location Location;
+struct Location {
+    unsigned    Start;          /* Start of memory location */
+    unsigned    End;            /* End memory location */
+    Collection  Attributes;     /* Attributes given */
+    unsigned    Line;           /* Line in config file */
+    unsigned    Col;            /* Column in config file */
+};
 
 
 
-/* End of global.h */
+/*****************************************************************************/
+/*     	      	    		     Code		  		     */
+/*****************************************************************************/
+
+
+
+Location* NewLocation (unsigned long Start, unsigned long End);
+/* Create a new location, initialize and return it */
+
+int LocationGetAttr (const Location* L, const char* AttrName);
+/* Find the attribute with the given name and return it. Call Error() if the
+ * attribute was not found.
+ */
+
+int LocationIsMirror (const Location* L);
+/* Return true if the given location is a mirror of another one. */
+
+void LocationSort (Collection* Locations);
+/* Sort all locations by address */
+
+void LocationCheck (const Collection* Locations);
+/* Check all locations for problems */
+
+
+
+/* End of location.h */
 
 #endif
-
 
 
 

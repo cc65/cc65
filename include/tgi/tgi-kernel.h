@@ -44,47 +44,8 @@
 
 
 
-/* A structure that describes the header of a graphics driver loaded into
- * memory.
- */
-typedef struct {
-
-    /* Data that describes the capabilities of the driver */
-    char                id[3];          /* Contains 0x74, 0x67, 0x69 ("tgi") */
-    unsigned char       version;        /* Interface version */
-    unsigned            xres;           /* X resolution */
-    unsigned            yres;           /* Y resolution */
-    unsigned char       colorcount;     /* Number of available colors */
-    unsigned char       pagecount;      /* Number of screens available */
-    unsigned char       res[6];         /* Reserved for extensions */
-
-    /* Jump vectors. Note that these are not C callable */
-    void*               install;        /* INSTALL routine */
-    void*               uninstall;      /* UNINSTALL routine */
-    void*               init;           /* INIT routine */
-    void*               done;           /* DONE routine */
-    void*		geterror;	/* GETERROR routine */
-    void*               control;        /* CONTROL routine */
-    void*               clear;          /* CLEAR routine */
-    void*               setviewpage;    /* SETVIEWPAGE routine */
-    void*               setdrawpage;    /* SETDRAWPAGE routine */
-    void*               setcolor;       /* SETCOLOR routine */
-    void*               setpalette;     /* SETPALETTE routine */
-    void*               getpalette;     /* GETPALETTE routine */
-    void*               getdefpalette;  /* GETDEFPALETTE routine */
-    void*               setpixel;       /* SETPIXEL routine */
-    void*               getpixel;       /* GETPIXEL routine */
-    void*               line;           /* LINE routine */
-    void*               bar;            /* BAR routine */
-    void*               circle;         /* CIRCLE routine */
-    void*               irq;            /* IRQ routine */
-
-} tgi_drv_header;
-
-
-
 /* TGI kernel variables */
-extern tgi_drv_header*	tgi_drv;       	/* Pointer to driver */
+extern void*   	        tgi_drv;       	/* Pointer to driver */
 extern unsigned char  	tgi_error;     	/* Last error code */
 extern unsigned char    tgi_gmode;      /* Flag: Graphics mode active */
 extern int              tgi_curx;       /* Current drawing cursor X */

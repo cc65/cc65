@@ -308,12 +308,11 @@ easy to see, that - apart from the additional code that is needed to save and
 restore the values - you need to make heavy use of a variable to justify the
 overhead.
 
-An exception are pointers, especially char pointers. The optimizer has code to
-detect and transform the most common pointer operations if the pointer
-variable is a register variable. Declaring heavily used character pointers as
-register may give significant gains in speed and size.
+As a general rule: Use register variables only for pointers that are
+dereferenced several times in your function, or for heavily used induction
+variables in a loop (with several 100 accesses).
 
-And remember: Register variables must be enabled with <tt/-Or/.
+And remember: Register variables must be enabled with <tt/-r/ or <tt/-Or/.
 
 
 

@@ -61,11 +61,15 @@
 /* Code segment structure */
 typedef struct CodeSeg CodeSeg;
 struct CodeSeg {
+    CodeSeg*	Next;				/* Pointer to next CodeSeg */
     char*	Name;	  			/* Segment name */
     Collection	Entries;			/* List of code entries */
     Collection	Labels;				/* Labels for next insn */
     CodeLabel* 	LabelHash [CS_LABEL_HASH_SIZE];	/* Label hash table */
 };
+
+/* Pointer to current code segment */
+extern CodeSeg* CS;
 
 
 
@@ -80,6 +84,12 @@ CodeSeg* NewCodeSeg (const char* Name);
 
 void FreeCodeSeg (CodeSeg* S);
 /* Free a code segment including all code entries */
+
+void PushCodeSeg (CodeSeg* S);
+/* Push the given code segment onto the stack */
+
+CodeSeg* PopCodeSeg (void);
+/* Remove the current code segment from the stack and return it */
 
 void AddCodeSegLine (CodeSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
 /* Add a line to the given code segment */
@@ -109,7 +119,7 @@ void MergeCodeLabels (CodeSeg* S);
 
 unsigned GetCodeSegEntries (const CodeSeg* S);
 /* Return the number of entries for the given code segment */
-				
+
 
 
 /* End of codeseg.h */

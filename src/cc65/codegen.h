@@ -38,12 +38,6 @@
 
 
 
-/* ##### */
-#include "dataseg.h"
-#include "codeseg.h"
-
-
-
 /*****************************************************************************/
 /*   			    	     data				     */
 /*****************************************************************************/
@@ -85,10 +79,6 @@
 
 /* Compiler relative stackpointer */
 extern int oursp;
-
-/* Segments */
-extern DataSeg* DS;
-extern CodeSeg* CS;
 
 
 

@@ -54,8 +54,13 @@
 
 typedef struct DataSeg DataSeg;
 struct DataSeg {
+    DataSeg*		Next;	       	/* Pointer to next DataSeg */
+    char*		Name;		/* Segment name */
     Collection 	       	Lines;	       	/* List of code lines */
 };
+
+/* Pointer to current data segment */
+extern DataSeg* DS;
 
 
 
@@ -65,11 +70,17 @@ struct DataSeg {
 
 
 
-DataSeg* NewDataSeg (void);
+DataSeg* NewDataSeg (const char* Name);
 /* Create a new data segment, initialize and return it */
 
 void FreeDataSeg (DataSeg* S);
 /* Free a data segment including all line entries */
+
+void PushDataSeg (DataSeg* S);
+/* Push the given data segment onto the stack */
+
+DataSeg* PopDataSeg (void);
+/* Remove the current data segment from the stack and return it */
 
 void AppendDataSeg (DataSeg* Target, const DataSeg* Source);
 /* Append the data from Source to Target. */

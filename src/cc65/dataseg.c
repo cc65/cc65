@@ -34,6 +34,7 @@
 
 
 /* common */
+#include "check.h"
 #include "xmalloc.h"
 #include "xsprintf.h"
 
@@ -43,18 +44,31 @@
 
 
 /*****************************************************************************/
+/*  	       	 	  	     Data				     */
+/*****************************************************************************/
+
+
+
+/* Pointer to current data segment */
+DataSeg* DS = 0;
+
+
+
+/*****************************************************************************/
 /*     	       	       	  	     Code				     */
 /*****************************************************************************/
 
 
 
-DataSeg* NewDataSeg (void)
+DataSeg* NewDataSeg (const char* Name)
 /* Create a new data segment, initialize and return it */
 {
     /* Allocate memory */
     DataSeg* S = xmalloc (sizeof (DataSeg));
 
     /* Initialize the fields */
+    S->Next = 0;
+    S->Name = xstrdup (Name);
     InitCollection (&S->Lines);
 
     /* Return the new struct */
@@ -67,6 +81,9 @@ void FreeDataSeg (DataSeg* S)
 /* Free a data segment including all line entries */
 {
     unsigned I, Count;
+			     
+    /* Free the name */
+    xfree (S->Name);
 
     /* Free the lines */
     Count = CollCount (&S->Lines);
@@ -79,6 +96,34 @@ void FreeDataSeg (DataSeg* S)
 
     /* Free the struct */
     xfree (S);
+}
+
+
+
+void PushDataSeg (DataSeg* S)
+/* Push the given data segment onto the stack */
+{
+    /* Push */
+    S->Next = DS;
+    DS	    = S;
+}
+
+
+
+DataSeg* PopDataSeg (void)
+/* Remove the current data segment from the stack and return it */
+{
+    /* Remember the current data segment */
+    DataSeg* S = DS;
+
+    /* Cannot pop on empty stack */
+    PRECONDITION (S != 0);
+
+    /* Pop */
+    DS = S->Next;
+
+    /* Return the popped data segment */
+    return S;
 }
 
 

@@ -55,7 +55,18 @@
 
 
 /*****************************************************************************/
-/*     	       	      	       	     Code				     */
+/*  	       	 	  	     Data				     */
+/*****************************************************************************/
+
+
+
+/* Pointer to current code segment */
+CodeSeg* CS = 0;
+
+
+
+/*****************************************************************************/
+/*		      Functions for parsing instructions		     */
 /*****************************************************************************/
 
 
@@ -292,6 +303,12 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 
 
 
+/*****************************************************************************/
+/*     	       	      	       	     Code				     */
+/*****************************************************************************/
+
+
+
 CodeSeg* NewCodeSeg (const char* Name)
 /* Create a new code segment, initialize and return it */
 {
@@ -301,6 +318,7 @@ CodeSeg* NewCodeSeg (const char* Name)
     CodeSeg* S = xmalloc (sizeof (CodeSeg));
 
     /* Initialize the fields */
+    S->Next = 0;
     S->Name = xstrdup (Name);
     InitCollection (&S->Entries);
     InitCollection (&S->Labels);
@@ -344,6 +362,33 @@ void FreeCodeSeg (CodeSeg* S)
 
     /* Free the struct */
     xfree (S);
+}
+
+
+
+void PushCodeSeg (CodeSeg* S)
+/* Push the given code segment onto the stack */
+{
+    S->Next = CS;
+    CS	    = S;
+}
+
+
+
+CodeSeg* PopCodeSeg (void)
+/* Remove the current code segment from the stack and return it */
+{
+    /* Remember the current code segment */
+    CodeSeg* S = CS;
+
+    /* Cannot pop on empty stack */
+    PRECONDITION (S != 0);
+
+    /* Pop */
+    CS = S->Next;
+
+    /* Return the popped code segment */
+    return S;
 }
 
 

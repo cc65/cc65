@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,16 +33,11 @@
 
 
 
-/* common */
-#include "check.h"
-
 /* b6502 */
 #include "codeseg.h"
 #include "dataseg.h"
 
 /* cc65 */
-#include "codegen.h"
-#include "global.h"
 #include "asmcode.h"
 
 

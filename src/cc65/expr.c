@@ -17,6 +17,7 @@
 /* cc65 */
 #include "asmcode.h"
 #include "asmlabel.h"
+#include "asmstmt.h"
 #include "codegen.h"
 #include "datatype.h"
 #include "declare.h"
@@ -758,59 +759,6 @@ static void CallFunction (ExprDesc* lval)
 
 
 
-void doasm (void)
-/* This function parses ASM statements. The syntax of the ASM directive
- * looks like the one defined for C++ (C has no ASM directive), that is,
- * a string literal in parenthesis.
- */
-{
-    /* Skip the ASM */
-    NextToken ();
-
-    /* Need left parenthesis */
-    ConsumeLParen ();
-
-    /* String literal */
-    if (CurTok.Tok != TOK_SCONST) {
-     	Error ("String literal expected");
-    } else {
-
-	/* The string literal may consist of more than one line of assembler
-	 * code. Separate the single lines and output the code.
-	 */
-	const char* S = GetLiteral (CurTok.IVal);
-	while (*S) {
-
-	    /* Allow lines up to 256 bytes */
-	    const char* E = strchr (S, '\n');
-	    if (E) {
-		/* Found a newline */
-		g_asmcode (S, E-S);
-		S = E+1;
-	    } else {
-		int Len = strlen (S);
-		g_asmcode (S, Len);
-		S += Len;
-	    }
-	}
-
-     	/* Reset the string pointer, effectivly clearing the string from the
-     	 * string table. Since we're working with one token lookahead, this
-     	 * will fail if the next token is also a string token, but that's a
-     	 * syntax error anyway, because we expect a right paren.
-     	 */
-     	ResetLiteralPoolOffs (CurTok.IVal);
-    }
-
-    /* Skip the string token */
-    NextToken ();
-
-    /* Closing paren needed */
-    ConsumeRParen ();
-}
-
-
-
 static int primary (ExprDesc* lval)
 /* This is the lowest level of the expression parser. */
 {
@@ -977,7 +925,7 @@ static int primary (ExprDesc* lval)
 
     /* ASM statement? */
     if (CurTok.Tok == TOK_ASM) {
-	doasm ();
+	AsmStatement ();
 	lval->Type  = type_void;
 	lval->Flags = E_MEXPR;
 	lval->ConstVal = 0;

@@ -25,6 +25,7 @@ LDFLAGS=
 OBJS =	anonname.o	\
      	asmcode.o 	\
 	asmlabel.o	\
+	asmstmt.o	\
 	codeent.o	\
 	codegen.o 	\
 	codelab.o	\

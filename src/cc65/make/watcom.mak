@@ -70,6 +70,7 @@ CCCFG	= $(CCCFG) -i=..\common
 OBJS =	anonname.obj	\
      	asmcode.obj	\
 	asmlabel.obj	\
+	asmstmt.obj	\
 	codeent.obj	\
 	codegen.obj	\
 	codelab.obj	\
@@ -138,6 +139,7 @@ NAME $<
 FILE anonname.obj
 FILE asmcode.obj
 FILE asmlabel.obj
+FILE asmstmt.obj
 FILE codeent.obj
 FILE codegen.obj
 FILE codelab.obj

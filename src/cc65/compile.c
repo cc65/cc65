@@ -40,6 +40,7 @@
 
 /* cc65 */
 #include "asmlabel.h"
+#include "asmstmt.h"
 #include "codegen.h"
 #include "declare.h"
 #include "error.h"
@@ -87,7 +88,7 @@ static void Parse (void)
 
 	/* Check for an ASM statement (which is allowed also on global level) */
 	if (CurTok.Tok == TOK_ASM) {
-	    doasm ();
+	    AsmStatement ();
 	    ConsumeSemi ();
 	    continue;
 	}

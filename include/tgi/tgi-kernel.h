@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2002-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -77,6 +77,7 @@ typedef struct {
     void*               line;           /* LINE routine */
     void*               bar;            /* BAR routine */
     void*               circle;         /* CIRCLE routine */
+    void*               irq;            /* IRQ routine */
 
 } tgi_drv_header;
 

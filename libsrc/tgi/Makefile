@@ -41,6 +41,7 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_getyres.o           \
                 tgi_gotoxy.o            \
                 tgi_init.o              \
+                tgi_ioctl.o             \
                 tgi_line.o              \
                 tgi_linepop.o           \
                 tgi_lineto.o            \

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/* (C) 2002-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -207,6 +207,12 @@ void __fastcall__ tgi_outtext (const char* s);
 void __fastcall__ tgi_outtextxy (int x, int y, const char* s);
 /* Output text at the given cursor position. The graphics cursor is moved to
  * the end of the text.
+ */
+
+unsigned __fastcall__ tgi_ioctl (unsigned char code, unsigned val);
+/* Call the driver specific control function. What this function does for
+ * a specific code depends on the driver. The driver will set an error
+ * for unknown codes or values.
  */
 
 

@@ -6,7 +6,7 @@
 ;/*                                                                           */
 ;/*                                                                           */
 ;/*                                                                           */
-;/* (C) 2003      Ullrich von Bassewitz                                       */
+;/* (C) 2003-2004 Ullrich von Bassewitz                                       */
 ;/*               Römerstraße 52                                              */
 ;/*               D-70794 Filderstadt                                         */
 ;/* EMail:        uz@cc65.org                                                 */
@@ -75,8 +75,20 @@
                         .byte
             CSHOW       .addr
                         .byte
-            CMOVE       .addr
+            CMOVEX      .addr
+                        .byte
+            CMOVEY      .addr
         .endstruct
+.endstruct
+
+;------------------------------------------------------------------------------
+; The mouse callback structure
+
+.struct	MOUSE_CALLBACKS
+	HIDE	.addr			; Hide the mouse cursor
+	SHOW	.addr			; Show the mouse cursor
+       	MOVEX	.addr			; Move the mouse cursor
+        MOVEY   .addr                   ; Dito for Y
 .endstruct
 
 ;------------------------------------------------------------------------------
@@ -113,7 +125,6 @@ MOUSE_BTN_RIGHT         = $01
 ;------------------------------------------------------------------------------
 ; C callable functions
 
-        .global _mouse_set_callbacks
         .global _mouse_load_driver
         .global _mouse_unload
         .global _mouse_install

@@ -24,7 +24,8 @@ S_OBJS =        mouse-kernel.o  \
                 mouse_info.o    \
                 mouse_ioctl.o   \
                 mouse_pos.o     \
-                mouse_show.o
+                mouse_show.o    \
+                mouse_unload.o
 
 #--------------------------------------------------------------------------
 # Targets

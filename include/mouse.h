@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2003      Ullrich von Bassewitz                                       */
+/* (C) 2003-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -82,11 +82,19 @@ struct mouse_callbacks {
     void (*show) (void);
     /* Show the mouse cursor */
 
-    void (*move) (void);
-    /* Move the mouse cursor. This function is called, even when the cursor
-     * is currently invisible.
+    void (*movex) (void);
+    /* Move the mouse cursor to the new X coordinate. This function is called,
+     * even when the cursor is currently invisible.
+     */
+
+    void (*movey) (void);
+    /* Move the mouse cursor to the new Y coordinate. This function is called,
+     * even when the cursor is currently invisible.
      */
 };
+
+/* The default mouse callbacks */
+extern const struct mouse_callbacks mouse_def_callbacks;
 
 
 
@@ -96,20 +104,15 @@ struct mouse_callbacks {
 
 
 
-void __fastcall__ mouse_set_callbacks (const struct mouse_callbacks* c);
-/* Sets the callbacks to be used by the driver. NOTE: The function will just
- * remember the pointer, it will not copy the contents of the passed struct.
- * The latter is done in mouse_install. This means that the struct must be
- * valid at least until mouse_install is called. Do not use a local variable!
- */
-
-unsigned char __fastcall__ mouse_load_driver (const char* driver);
+unsigned char __fastcall__ mouse_load_driver (const struct mouse_callbacks* c,
+                                              const char* driver);
 /* Load and install a mouse driver, return an error code. */
 
 unsigned char __fastcall__ mouse_unload (void);
 /* Uninstall, then unload the currently loaded driver. */
 
-unsigned char __fastcall__ mouse_install (void* driver);
+unsigned char __fastcall__ mouse_install (const struct mouse_callbacks* c,
+                                          void* driver);
 /* Install an already loaded driver. Returns an error code. */
 
 unsigned char __fastcall__ mouse_uninstall (void);

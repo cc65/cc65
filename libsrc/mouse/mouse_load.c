@@ -42,7 +42,13 @@
 
 
 
-unsigned char __fastcall__ mouse_load_driver (const char* name)
+/* Use static local variables, since the module is not reentrant anyway */
+#pragma staticlocals (on);
+
+
+
+unsigned char __fastcall__ mouse_load_driver (const struct mouse_callbacks* c,
+                                              const char* name)
 /* Load a mouse driver and return an error code */
 {
     static struct mod_ctrl ctrl = {
@@ -69,7 +75,7 @@ unsigned char __fastcall__ mouse_load_driver (const char* name)
         if (Res == MLOAD_OK) {
 
             /* Check the driver signature, install the driver */
-            return mouse_install (ctrl.module);
+            return mouse_install (c, ctrl.module);
 
         }
     }

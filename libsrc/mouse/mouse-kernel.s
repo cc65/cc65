@@ -4,8 +4,8 @@
 ; Common functions of the mouse driver API.
 ;
 
-        .import         return0
-        .importzp       ptr1
+        .import         return0, popsreg, incsp2
+        .importzp       sreg, ptr1, tmp1, tmp2
        	.condes	       	mouse_irq, 2		; Export as IRQ handler
 
         .include        "mouse-kernel.inc"
@@ -42,15 +42,14 @@ mouse_sig:      .byte   $6d, $6f, $75, MOUSE_API_VERSION    ; "mou", version
 
 
 ;----------------------------------------------------------------------------
-; unsigned char __fastcall__ mouse_install (void* driver);
+; unsigned char __fastcall__ mouse_install (const struct mouse_callbacks* c,
+;                                           void* driver);
 ; /* Install an already loaded driver. Returns an error code. */
-
-
 
 _mouse_install:
        	sta     _mouse_drv
   	sta	ptr1
-  	stx     _mouse_drv+1
+   	stx     _mouse_drv+1
   	stx    	ptr1+1
 
 ; Check the driver signature
@@ -72,32 +71,60 @@ _mouse_install:
         ldy     #MOUSE_HDR::JUMPTAB
         ldx     #0
 @L1:    inx                             ; Skip the JMP opcode
-        jsr     copy                    ; Copy one byte
-        jsr     copy                    ; Copy one byte
+        jsr     copyjv                  ; Copy one byte
+        jsr     copyjv                  ; Copy one byte
         cpy     #(MOUSE_HDR::JUMPTAB + .sizeof(MOUSE_HDR::JUMPTAB))
         bne     @L1
 
-        jsr     mouse_install           ; Call driver install routine
+; Copy the callback vectors into the driver space
+
+        jsr     popsreg
+        ldy     #(MOUSE_HDR::CALLBACKS + .sizeof(MOUSE_HDR::CALLBACKS) - 1)
+        sty     tmp2
+        ldy     #.sizeof(MOUSE_CALLBACKS)-1
+        sty     tmp1
+
+@L2:    jsr     copycb
+        jsr     copycb
+        dec     tmp2                    ; Skip opcode byte
+        ldy     tmp1
+        bpl     @L2
+
+; Call driver install routine
+
+        jsr     mouse_install
+
+; Install the IRQ vector if the driver needs it. A/X contains the error code
+; from mouse_install, so don't use it.
 
         ldy     mouse_irq+2             ; Check high byte of IRQ vector
-        beq     @L2                     ; Jump if vector invalid
-	ldy	#$4C			; Jump opcode
+        beq     @L3                     ; Jump if vector invalid
+   	ldy	#$4C			; Jump opcode
        	sty    	mouse_irq               ; Activate IRQ routine
-@L2:    rts
+@L3:    rts
 
-; Driver signature invalid
+; Driver signature invalid. One word is still on the stack
 
 inv_drv:
         lda     #MOUSE_ERR_INV_DRIVER
         ldx     #0
-        rts
+        jmp     incsp2
 
 ; Copy one byte from the jump vectors
 
-copy:   lda     (ptr1),y
+copyjv: lda     (ptr1),y
         sta     mouse_vectors,x
         iny
         inx
+        rts
+
+; Copy one byte from the callback vectors
+
+copycb: lda     (sreg),y
+        dec     tmp1
+        ldy     tmp2
+        sta     (ptr1),y
+        dec     tmp2
         rts
 
 ;----------------------------------------------------------------------------

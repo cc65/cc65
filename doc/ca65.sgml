@@ -446,7 +446,7 @@ Available operators sorted by precedence:
     &lt;	   Low byte operator	     	     	   1
     &gt;	   High byte operator	     	     	   1
 
-    *  	       	Multiplication		     	     	2
+    *  	       	Multiplication		     	     	2   
     /  	       	Division     		     	     	2
     .MOD       	Modulo operation	     	     	2
     &amp;      	    Bitwise and	 	     	     	    2
@@ -506,14 +506,23 @@ use symbols and labels, giving a lot of flexibility.
 
 <sect1>Numeric constants<p>
 
-Numeric constants are defined using the equal sign. After doing
+Numeric constants are defined using the equal sign or the label assignment
+operator. After doing
 
 <tscreen><verb>
       two = 2
 </verb></tscreen>
 
 may use the symbol "two" in every place where a number is expected, and it is
-evaluated to the value 2 in this context. An example would be
+evaluated to the value 2 in this context. The label assignment operator causes
+the same, but causes the symbol to be marked as a label, which may cause a
+different handling in the debugger:
+
+<tscreen><verb>
+      io := $d000
+</verb></tscreen>
+
+The right side can of course be an expression:
 
 <tscreen><verb>
       four = two * two

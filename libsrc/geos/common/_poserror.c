@@ -11,7 +11,11 @@
 
 void __fastcall__ _poserror (const char* msg)
 {
+    const char *errmsg = _stroserror(_oserror);
 
-    DlgBoxOk(msg,_stroserror(_oserror));
-
+    if (msg && *msg) {
+	DlgBoxOk(msg, errmsg);
+    } else {
+	DlgBoxOk("", errmsg);
+    }
 }

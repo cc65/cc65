@@ -11,7 +11,11 @@
 
 void __fastcall__ perror(const char* msg)
 {
+    const char *errmsg = strerror(errno);
 
-    DlgBoxOk(msg,strerror(errno));
-
+    if (msg && *msg) {
+	DlgBoxOk(msg, errmsg);
+    } else {
+	DlgBoxOk("", errmsg);
+    }
 }

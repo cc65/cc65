@@ -25,7 +25,7 @@ static unsigned char amode_to_bmode (const char* mode)
             binmode = O_RDONLY;
             break;
         case 'a':
-            binmode = O_WRONLY | O_APPEND;
+            binmode = O_WRONLY | O_CREAT | O_APPEND;
             break;
        default:
             return 0;  /* invalid char */

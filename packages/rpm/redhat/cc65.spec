@@ -85,6 +85,27 @@ programs for the Commodore VIC20 using the cc65 crosscompiler.
 
 
 ###############################################################################
+#      	       	       	       	 C16 subpackage				      #
+###############################################################################
+
+%package c16
+Requires: cc65 = %{version}
+Copyright: Freeware
+Summary: C16/116 specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description c16
+This package contains the header files and libraries needed to write
+programs for the Commodore C16/116 using the cc65 crosscompiler.
+
+%files c16
+%attr(644,root,root) 		/usr/lib/cc65/lib/c16.lib
+%attr(644,root,root) 		/usr/lib/cc65/lib/c16.o
+%doc src/ld65/cfg/c16.cfg
+
+
+
+###############################################################################
 #		     		C64 subpackage				      #
 ###############################################################################
 
@@ -330,6 +351,9 @@ install -m 644 asminc/*.inc $RPM_BUILD_ROOT/usr/lib/cc65/asminc
 
 
 %changelog
+* Fri Nov 22 2002 Ullrich von Bassewitz <uz@cc65.org>
+Added the C16 subpackage.
+
 * Wed Nov 20 2002 Ullrich von Bassewitz <uz@cc65.org>
 Added TGI stuff.
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -42,6 +42,7 @@
 /* common */
 #include "abend.h"
 #include "cmdline.h"
+#include "cpu.h"
 #include "fname.h"
 #include "print.h"
 #include "version.h"
@@ -50,7 +51,6 @@
 #include "attrtab.h"
 #include "code.h"
 #include "config.h"
-#include "cpu.h"
 #include "data.h"
 #include "error.h"
 #include "global.h"
@@ -82,6 +82,7 @@ static void Usage (void)
 	     "\n"
 	     "Long options:\n"
        	     "  --cpu type\t\tSet cpu type\n"
+       	     "  --debug-info\t\tAdd debug info to object file\n"
 	     "  --formfeeds\t\tAdd formfeeds to the output\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --pagelength n\tSet the page length for the listing\n"
@@ -120,25 +121,21 @@ static unsigned long CvtNumber (const char* Arg, const char* Number)
 
 
 
-static void OptCPU (const char* Opt, const char* Arg)
+static void OptCPU (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --cpu option */
 {
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
-    if (strcmp (Arg, "6502") == 0) {
-	SetCPU (CPU_6502);
-    } else if (strcmp (Arg, "65C02") == 0) {
-	SetCPU (CPU_65C02);
-    } else if (strcmp (Arg, "65816") == 0) {
-	SetCPU (CPU_65816);
-#ifdef SUNPLUS
-    } else if (strcmp (Arg, "sunplus") == 0) {
-	SetCPU (CPU_SUNPLUS);
-#endif
-    } else {
-	AbEnd ("Invalid CPU: `%s'", Arg);
-    }
+    /* Find the CPU from the given name */
+    CPU = FindCPU (Arg);
+    SetOpcTable (CPU);
+}
+
+
+
+static void OptDebugInfo (const char* Opt attribute ((unused)),
+		    	  const char* Arg attribute ((unused)))
+/* Add debug info to the object file */
+{
+    DebugInfo = 1;
 }
 
 
@@ -257,7 +254,7 @@ static void OneOpcode (unsigned RemainingBytes)
 
 	case atDWordTab:
 	    DWordTable ();
-	    break;	
+	    break;
 
 	case atAddrTab:
 	    AddrTable ();
@@ -307,6 +304,7 @@ static void Disassemble (void)
     /* Pass 2 */
     Pass = 2;
     ResetCode ();
+    OutputSettings ();
     DefOutOfRangeLabels ();
     OnePass ();
 }
@@ -319,6 +317,7 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
         { "--cpu",     	       	1,	OptCPU 			},
+       	{ "--debug-info",      	0,     	OptDebugInfo            },
 	{ "--formfeeds",  	0,	OptFormFeeds		},
       	{ "--help",    	  	0,	OptHelp			},
       	{ "--pagelength",      	1,	OptPageLength		},
@@ -345,6 +344,10 @@ int main (int argc, char* argv [])
 
 		case '-':
 		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+		    break;
+
+		case 'g':
+		    OptDebugInfo (Arg, 0);
 		    break;
 
 		case 'h':
@@ -403,6 +406,11 @@ int main (int argc, char* argv [])
     /* Make the output file name from the input file name if none was given */
     if (OutFile == 0) {
 	OutFile = MakeFilename (InFile, OutExt);
+    }
+
+    /* If no CPU given, use the default CPU */
+    if (CPU == CPU_UNKNOWN) {
+        CPU = CPU_6502;
     }
 
     /* Load the input file */

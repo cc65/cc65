@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -53,6 +53,7 @@ extern const char	OutExt[];	/* Output file extension */
 extern const char 	CfgExt[];	/* Config file extension */
 
 /* Flags and other command line stuff */
+extern unsigned char    DebugInfo;      /* Add debug info to the object file */
 extern unsigned char	FormFeeds;	/* Add form feeds to the output? */
 extern unsigned char	PassCount;	/* How many passed do we do? */
 extern unsigned long	StartAddr;	/* Start/load address of the program */

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -40,6 +40,7 @@
 #include <errno.h>
 
 /* common */
+#include "cpu.h"
 #include "print.h"
 #include "version.h"
 
@@ -74,7 +75,7 @@ static void PageHeader (void)
 /* Print a page header */
 {
     fprintf (F,
-       	     "; da65 V%u.%u.%u - (C) Copyright 2000 Ullrich von Bassewitz\n"
+       	     "; da65 V%u.%u.%u - (C) Copyright 2000-2003 Ullrich von Bassewitz\n"
     	     "; Input file: %s\n"
     	     "; Page:       %u\n\n",
        	     VER_MAJOR, VER_MINOR, VER_PATCH,
@@ -264,6 +265,20 @@ void LineComment (unsigned PC, unsigned Count)
 	    }
 	}
     }
+}
+
+
+
+void OutputSettings (void)
+/* Output CPU and other settings */
+{
+    LineFeed ();
+    Indent (MIndent);
+    Output (".setcpu");
+    Indent (AIndent);
+    Output ("\"%s\"", CPUNames[CPU]);
+    LineFeed ();
+    LineFeed ();
 }
 
 

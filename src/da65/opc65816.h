@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     cpu.c				     */
+/*				   opc65816.h				     */
 /*                                                                           */
-/*			     CPU type definitions			     */
+/*                       65816 opcode description table                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2003      Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,34 +33,28 @@
 
 
 
-#include "cpu.h"
+#ifndef OPC65816_H
+#define OPC65816_H
+
+
+
+#include "opcdesc.h"
 
 
 
 /*****************************************************************************/
-/*	   	    		     Data				     */
+/*				     Data				     */
 /*****************************************************************************/
 
 
 
-/* Current CPU */
-CPUType	CPU = CPU_6502;
+/* Descriptions for all opcodes */
+extern const OpcDesc OpcTable_65816[256];
 
 
 
-/*****************************************************************************/
-/*				     Code				     */
-/*****************************************************************************/
-
-
-
-void SetCPU (CPUType NewCPU)
-/* Set a new CPU */	    
-{
-    CPU = NewCPU;
-}
-
-
+/* End of opc65816.h */
+#endif
 
 
 

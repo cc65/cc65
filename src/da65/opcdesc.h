@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     cpu.h				     */
+/*				   opcdesc.h				     */
 /*                                                                           */
-/*			     CPU type definitions			     */
+/*                  Disassembler description for one opcode                  */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,43 +33,43 @@
 
 
 
-#ifndef CPU_H
-#define CPU_H
+#ifndef OPCDESC_H
+#define OPCDESC_H
 
 
 
 /*****************************************************************************/
-/*	     	    		     Data				     */
+/*				     Data				     */
 /*****************************************************************************/
 
 
 
-/* Supported CPUs */
-typedef enum CPUType {
-    CPU_6502	= 0x01,
-    CPU_65C02	= 0x02,
-    CPU_65816  	= 0x04,
-    CPU_ALL	= 0x07
-} CPUType;
+/* Constants for LabelFlag */
+enum {
+    lfNoLabel	= 0x00,			/* Don't use a label */
+    lfGenLabel 	= 0x01,			/* Generate a label */
+    lfUseLabel	= 0x02,			/* Use a label if there is one */
+    lfLabel	= lfUseLabel|lfGenLabel /* Generate and use a label */
+};
 
-/* Current CPU */
-extern CPUType	CPU;
+/* Forward/typedef for struct OpcDesc */
+typedef struct OpcDesc OpcDesc;
+
+/* Type of pointer to a function that handles opcode output */
+typedef void (*OpcHandler) (const OpcDesc*);
+
+/* Description for one opcode */
+struct OpcDesc {
+    char       	       	Mnemo [5]; 	/* Mnemonic */
+    unsigned char     	Size;		/* Size of this command */
+    unsigned char     	LabelFlag;	/* Generate/use label? */
+    unsigned char     	CPU;		/* Available for which CPU? */
+    OpcHandler		Handler;	/* Handler routine */
+};
 
 
 
-/*****************************************************************************/
-/*				     Code				     */
-/*****************************************************************************/
-
-
-
-void SetCPU (CPUType NewCPU);
-/* Set a new CPU */
-
-
-
-/* End of cpu.h */
-
+/* End of opcdesc.h */
 #endif
 
 

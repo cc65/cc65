@@ -13,12 +13,15 @@ LDFLAGS=
 OBJS = 	attrtab.o	\
 	code.o	 	\
 	config.o	\
-	cpu.o	 	\
 	data.o		\
 	error.o	 	\
 	global.o 	\
   	handler.o	\
 	main.o	 	\
+        opc6502.o       \
+        opc65816.o      \
+        opc65c02.o      \
+        opc65sc02.o     \
   	opctable.o	\
 	output.o 	\
 	scanner.o

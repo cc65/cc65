@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.c				     */
+/*				   opc65c02.h				     */
 /*                                                                           */
-/*		  Global variables for the da65 disassembler		     */
+/*                       65C02 opcode description table                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,40 +33,28 @@
 
 
 
-#include "global.h"
+#ifndef OPC65C02_H
+#define OPC65C02_H
+
+
+
+#include "opcdesc.h"
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Data				     */
+/*	      			     Data				     */
 /*****************************************************************************/
 
 
 
-/* File names */
-const char* InFile     	      = 0;      /* Name of input file */
-const char* OutFile    	      = 0;      /* Name of output file */
+/* Descriptions for all opcodes */
+extern const OpcDesc OpcTable_65C02[256];
 
-/* Default extensions */
-const char OutExt[]	      = ".dis";	/* Output file extension */
-const char CfgExt[]    	      = ".cfg";	/* Config file extension */
 
-/* Flags and other command line stuff */
-unsigned char DebugInfo       = 0;      /* Add debug info to the object file */
-unsigned char FormFeeds	      = 0;	/* Add form feeds to the output? */
-unsigned char PassCount	      = 2;	/* How many passed do we do? */
-unsigned long StartAddr	      = 0xC000;	/* Start/load address of the program */
 
-/* Stuff needed by many routines */
-unsigned char Pass	      = 0;	/* Disassembler pass */
-
-/* Page formatting */
-unsigned PageLength    	      = 0;	/* Length of a listing page */
-unsigned MIndent	      = 9;	/* Mnemonic indent */
-unsigned AIndent	      = 17;	/* Argument indent */
-unsigned CIndent	      = 49;	/* Comment indent */
-unsigned TIndent	      = 81;	/* Text bytes indent */
-unsigned BytesPerLine	      = 8;	/* Max. number of data bytes per line */
+/* End of opc65c02.h */
+#endif
 
 
 

@@ -1,4 +1,4 @@
-;	
+;
 ; Randum number generator
 ;
 ; Written and donated by Sidney Cadot - sidney@ch.twi.tudelft.nl
@@ -21,9 +21,11 @@
 
       	.export		_rand, _srand
 
-.bss
+.data
 
-rand:  	.res	4		; Seed
+; The seed. When srand() is not called, the C standard says that that rand()
+; should behave as if srand() was called with an argument of 1 before.
+rand:  	.dword   1
 
 .code
 
@@ -51,7 +53,7 @@ _rand:	clc
  	lda     rand+3
 	adc     #$31
 	sta     rand+3
-	pla			; return bit 8-22 in (X,A)
+	pla	 		; return bit 8-22 in (X,A)
 	rts
 
 _srand:	sta	rand+0		; Store the seed
@@ -60,4 +62,5 @@ _srand:	sta	rand+0		; Store the seed
 	sta     rand+2          ; Set MSW to zero
 	sta     rand+3
 	rts
+
 

@@ -1483,7 +1483,7 @@ static void unaryop (int tok, struct expent* lval)
 
     NextToken ();
     k = hie10 (lval);
-    if (k == 0 && lval->e_flags == E_MCONST) {
+    if (k == 0 && (lval->e_flags & E_MCONST) != 0) {
     	/* Value is constant */
 	switch (tok) {
 	    case TOK_MINUS: lval->e_const = -lval->e_const;	break;
@@ -1985,7 +1985,7 @@ static void parseadd (int k, struct expent* lval)
     flags = 0;
 
     /* Check for constness on both sides */
-    if (k == 0 && lval->e_flags == E_MCONST) {
+    if (k == 0 && (lval->e_flags & E_MCONST) != 0) {
 
     	/* The left hand side is a constant. Good. Get rhs */
        	if (evalexpr (CF_NONE, hie9, &lval2) == 0) {
@@ -2013,7 +2013,7 @@ static void parseadd (int k, struct expent* lval)
     	    }
 
        	    /* Result is constant, condition codes not set */
-       	    lval->e_test = E_MCONST;
+       	    lval->e_test &= ~E_CC;
 
     	} else {
 
@@ -2170,7 +2170,7 @@ static void parsesub (int k, struct expent* lval)
        	rhst = lval2.e_tptr;
 
     	/* Check left hand side */
-    	if (k == 0 && lval->e_flags == E_MCONST) {
+    	if (k == 0 && (lval->e_flags & E_MCONST) != 0) {
 
     	    /* Both sides are constant, remove generated code */
       	    RemoveCode (Mark1);
@@ -2200,7 +2200,7 @@ static void parsesub (int k, struct expent* lval)
     	    }
 
     	    /* Result is constant, condition codes not set */
-    	    lval->e_flags = E_MCONST;
+    	    /* lval->e_flags = E_MCONST; ### */
     	    lval->e_test &= ~E_CC;
 
     	} else {

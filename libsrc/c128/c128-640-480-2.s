@@ -694,63 +694,70 @@ HORLINE:
 ;
 
 LINE:
-	; if (x2>x1) {
-	ldx	#X1
-	lda	X2
-	ldy	X2+1
-	jsr	icmp
-	bcc	@L0137
-	beq	@L0137
-	;  x2<->x1 }
-	lda	X1
-	ldx	X2
-	sta	X2
-	stx	X1
-	lda	X1+1
-	ldx	X2+1
-	sta	X2+1
-	stx	X1+1
-@L0137:	; if (y2>y1) {
-	ldx	#Y1
-	lda	Y2
-	ldy	Y2+1
-	jsr	icmp
-	bcc	@L013F
-	bne	@nequal
-	jmp	HORLINE		; x1/x2 are sorted, y1==y2 - do faster horizontal line draw
-@nequal:
-	; y2<->y1 }
-	lda	Y1
-	ldx	Y2
-	sta	Y2
-	stx	Y1
-	lda	Y1+1
-	ldx	Y2+1
-	sta	Y2+1
-	stx	Y1+1
-@L013F:
-	; nx = x2 - x1
+	; nx = abs(x2 - x1)
 	lda	X2
 	sec
 	sbc	X1
 	sta	NX
 	lda	X2+1
 	sbc	X1+1
-	sta	NX+1
-	; ny = y2 - y1
+	tay
+	lda	NX
+	jsr	abs
+	sta	NX
+	sty	NX+1
+	; ny = abs(y2 - y1)
 	lda	Y2
 	sec
 	sbc	Y1
 	sta	NY
 	lda	Y2+1
 	sbc	Y1+1
-	sta	NY+1
+	tay
+	lda	NY
+	jsr	abs
+	sta	NY
+	sty	NY+1
+	; if (x2>x1)
+	ldx	#X2
+	lda	X1
+	ldy	X1+1
+	jsr	icmp
+	bcc	@L0243
+	beq	@L0243
+	; dx = 1;
+	lda	#1
+	bne	@L0244
+	; else
+	; dx = -1;
+@L0243:	lda	#$ff
+@L0244:	sta	DX
+	; if (y2>y1)
+	ldx	#Y2
+	lda	Y1
+	ldy	Y1+1
+	jsr	icmp
+	bcc	@L024A
+	beq	@L024A
+	; dy = 1;
+	lda	#1
+	bne	@L024B
+	; else
+	; dy = -1;
+@L024A:	lda	#$ff
+@L024B:	sta	DY
+	; err = ay = 0;
+	lda	#0
+	sta	ERR
+	sta	ERR+1
+	sta	AY
+
 	; if (nx<ny) {
 	ldx	#NX
 	lda	NY
 	ldy	NY+1
 	jsr	icmp
-	bcs	@L041B
+	bcs	@L0255
 	;  nx <-> ny
 	lda	NX
 	ldx	NY
@@ -760,21 +767,19 @@ LINE:
 	ldx	NY+1
 	sta	NY+1
 	stx	NX+1
-	; dx = dy = 0; ax = ay = 1 }
-	ldy	#1
-	sty	AY
-	dey
-	beq	@L025A
-	; else { dx = dy = 1; ax = ay = 0 }
-@L041B:	ldy	#0
-	sty	AY
-	iny
-@L025A:	sty	DX
-	sty	DY
-	; err = 0
+	; ay = dx
+	lda	DX
+	sta	AY
+	; dx = dy = 0;
 	lda	#0
-	sta	ERR
-	sta	ERR+1
+	sta	DX
+	sta	DY
+	; ny = - ny;
+@L0255:	lda	NY
+	ldy	NY+1
+	jsr	neg
+	sta	NY
+	sty	NY+1
 	; for (count=nx;count>0;--count) {
 	lda	NX
 	ldx	NX+1
@@ -786,13 +791,13 @@ LINE:
 	rts
 	;    setpixel(X1,Y1)
 @L0167:	jsr	SETPIXELCLIP
-	;    pb = err - ny
+	;    pb = err + ny
 	lda	ERR
-	sec
-	sbc	NY
+	clc
+	adc	NY
 	sta	PB
 	lda	ERR+1
-	sbc	NY+1
+	adc	NY+1
 	sta	PB+1
 	tax
 	;    ub = pb + nx
@@ -804,21 +809,27 @@ LINE:
 	adc	NX+1
 	sta	UB+1
 	;    x1 = x1 + dx
-	lda	X1
-	clc
-	adc	DX
+	ldx	#0
+	lda	DX
+	bpl	@L027B
+	dex
+@L027B:	clc
+	adc	X1
 	sta	X1
-	bcc	@L0254
-	inc	X1+1
+	txa
+	adc	X1+1
+	sta	X1+1
 	;   y1 = y1 + ay
-@L0254:
-	lda	Y1
-	clc
-	adc	AY
+	ldx	#0
+	lda	AY
+	bpl	@L027E
+	dex
+@L027E:	clc
+	adc	Y1
 	sta	Y1
-	bcc	@L0255
-	inc	Y1+1
-@L0255:
+	txa
+	adc	Y1+1
+	sta	Y1+1
 	; if (abs(pb)<abs(ub)) {
 	lda	PB
 	ldy	PB+1
@@ -830,32 +841,38 @@ LINE:
 	jsr	abs
 	ldx	#TEMP3
 	jsr	icmp
-	bpl	@L017B
+	bpl	@L027F
 	;   err = pb
 	lda	PB
 	ldx	PB+1
-	jmp	@L025B
+	jmp	@L0312
 	; } else { x1 = x1 + ay
-@L017B:
-	lda	X1
-	clc
-	adc	AY
+@L027F:
+	ldx	#0
+	lda	AY
+	bpl	@L0288
+	dex
+@L0288:	clc
+	adc	X1
 	sta	X1
-	bcc	@L0256
-	inc	X1+1
+	txa
+	adc	X1+1
+	sta	X1+1
 	;	y1 = y1 + dy
-@L0256:
-	lda	Y1
-	clc
-	adc	DY
+	ldx	#0
+	lda	DY
+	bpl	@L028B
+	dex
+@L028B:	clc
+	adc	Y1
 	sta	Y1
-	bcc	@L0257
-	inc	Y1+1
+	txa
+	adc	Y1+1
+	sta	Y1+1
 	;	err = ub }
-@L0257:
 	lda	UB
 	ldx	UB+1
-@L025B:
+@L0312:
 	sta	ERR
 	stx	ERR+1
 	; } (--count)
@@ -1208,9 +1225,9 @@ abs:
 	; a/y := abs(a/y)
 	dey
 	iny
-	bpl	@L1
+	bpl	absend
 	; negay
-	clc
+neg:	clc
 	eor	#$ff
 	adc	#1
 	pha
@@ -1219,7 +1236,7 @@ abs:
 	adc	#0
 	tay
 	pla
-@L1:	rts
+absend:	rts
 
 icmp:
 	; compare a/y to zp,x

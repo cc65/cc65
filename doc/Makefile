@@ -23,7 +23,8 @@ SGML  =	ar65.sgml	\
 	index.sgml  	\
 	intro.sgml	\
 	ld65.sgml   	\
-	library.sgml
+	library.sgml    \
+        plus4.sgml
 
 TXT   =	$(SGML:.sgml=.txt)
 HTML  = $(SGML:.sgml=.html)

@@ -126,7 +126,7 @@ c64lib:
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv c64/crt0.o c64.o
-	cp c64/*.tgi .
+	cp c64/c64-320-200-2.tgi c64-hi.tgi
 	for i in c64 cbm common runtime conio dbg tgi; do \
 	    $(AR) a c64.lib $$i/*.o;\
 	done

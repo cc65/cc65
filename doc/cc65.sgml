@@ -615,13 +615,13 @@ generation and other stuff.
 
     <itemize>
     <item>The character index is actually the code of the character in the
-    	  C source, so character mappings do always depend on the source
-	  character set. This means that <tt/#pragma charmap/ is not portable
-	  - it depends on the build environment.
+      	  C source, so character mappings do always depend on the source
+      	  character set. This means that <tt/#pragma charmap/ is not portable
+      	  - it depends on the build environment.
     <item>While it is possible to use character literals as indices, the
-    	  result may be somewhat unexpected, since character literals are
-	  itself translated. For this reason I would suggest to avoid
-	  character literals and use numeric character codes instead.
+      	  result may be somewhat unexpected, since character literals are
+      	  itself translated. For this reason I would suggest to avoid
+      	  character literals and use numeric character codes instead.
     </itemize>
 
   Example:
@@ -631,7 +631,7 @@ generation and other stuff.
   </verb></tscreen>
 
 
-<sect1><tt>#pragma checkstack (&lt;const int&gt;)</tt><label
+<sect1><tt>#pragma checkstack (on|off)</tt><label
 id="pragma-checkstack"><p>
 
   Tells the compiler to insert calls to a stack checking subroutine to detect
@@ -640,7 +640,7 @@ id="pragma-checkstack"><p>
   program and switch it off for the release version. If a stack overflow is
   detected, the program is aborted.
 
-  If the argument is zero, stack checks are disabled (the default), otherwise
+  If the argument is "off", stack checks are disabled (the default), otherwise
   they're enabled.
 
 
@@ -692,12 +692,12 @@ id="pragma-checkstack"><p>
   </verb></tscreen>
 
 
-<sect1><tt>#pragma regvaraddr (&lt;const int&gt;)</tt><p>
+<sect1><tt>#pragma regvaraddr (on|off)</tt><p>
 
   The compiler does not allow to take the address of register variables.
   The regvaraddr pragma changes this. Taking the address of a register
-  variable is allowed after using this pragma, if the argument is not
-  zero. Using an argument of zero changes back to the default behaviour.
+  variable is allowed after using this pragma with "on" as argument.
+  Using "off" as an argument switches back to the default behaviour.
 
   Beware: The C standard does not allow taking the address of a variable
   declared as register. So your programs become non-portable if you use
@@ -714,22 +714,21 @@ id="pragma-checkstack"><p>
   </verb></tscreen>
 
 
-<sect1><tt>#pragma signedchars (&lt;const int&gt;)</tt><label
-id="pragma-signedchars"><p>
+<sect1><tt>#pragma signedchars (on|off)</tt><label id="pragma-signedchars"><p>
 
-  Changes the signedness of the default character type. If the argument
-  is not zero, default characters are signed, otherwise characters are
-  unsigned. The compiler default is to make characters unsigned since this
-  creates a lot better code. This default may be overridden by the
-  <tt/--signed-chars/ command line option.
+  Changes the signedness of the default character type. If the argument is
+  "on", default characters are signed, otherwise characters are unsigned.
+  The compiler default is to make characters unsigned since this creates a
+  lot better code. This default may be overridden by the <tt/--signed-chars/
+  command line option.
 
 
-<sect1><tt>#pragma staticlocals (&lt;const int&gt;)</tt><label
+<sect1><tt>#pragma staticlocals (on|off)</tt><label
 id="pragma-staticlocals"<p>
 
   Use variables in the bss segment instead of variables on the stack. This
   pragma changes the default set by the compiler option <tt/-Cl/. If the
-  argument is not zero, local variables are allocated in the BSS segment,
+  argument is "on", local variables are allocated in the BSS segment,
   leading to shorter and in most cases faster, but non-reentrant code.
 
 
@@ -820,6 +819,18 @@ Or, to access a struct member of a static variable:
 </verb></tscreen>
 <p>
 
+Note: Do not embedd the assembler labels that are used as names of global
+variables into your asm statements. Code like this
+
+<tscreen><verb>
+        int foo;
+       	__asm__ ("lda _foo");   /* DON'T DO THAT! */
+</verb></tscreen>
+<p>
+
+may stop working if the way, the compiler generates variable names is changed
+in a future version.
+<p>
 
 
 <sect>Bugs/Feedback<p>

@@ -165,7 +165,6 @@ void AddSearchPath (const char* NewPath, unsigned Where)
             if (Where & Mask) {
                 SearchPaths[I] = Add (SearchPaths[I], NewPath);
             }
-            ++I;
         }
     }
 }
@@ -195,7 +194,6 @@ char* SearchFile (const char* Name, unsigned Where)
                 return Path;
             }
         }
-        ++I;
     }
     return 0;
 }

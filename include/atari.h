@@ -171,5 +171,20 @@ extern unsigned int get_ostype(void); /* get ROM version */
 #include <_antic.h>
 #define ANTIC (*(struct __antic*)0xD400)
 
+/* device control block */
+struct __dcb {
+    unsigned char device;     /* device id */
+    unsigned char unit;       /* unix number */
+    unsigned char command;    /* command */
+    unsigned char status;     /* command type / status return */
+    void          *buffer;    /* pointer to buffer */
+    unsigned char timeout;    /* device timeout in seconds */
+    unsigned char unused;
+    unsigned int  xfersize;   /* # of bytes to transfer */
+    unsigned char aux1;       /* 1st command auxiliary byte */
+    unsigned char aux2;       /* 2nd command auxiliary byte */
+};
+#define DCB (*(struct __dcb *)0x300)
+
 /* End of atari.h */
 #endif /* #ifndef _ATARI_H */

@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				 target.c				     */
+/*				 tgtcfg.c				     */
 /*                                                                           */
-/*		   Target system support for the ld65 linker		     */
+/*		 Target machine configurations the ld65 linker		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -32,18 +32,9 @@
 /*****************************************************************************/
 
 
-
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <errno.h>
-
-#include "error.h"
-#include "global.h"
+		   
 #include "binfmt.h"
-#include "scanner.h"
-#include "config.h"
-#include "target.h"
+#include "tgtcfg.h"
 
 
 
@@ -221,131 +212,22 @@ static const char CfgGeos [] =
 
 
 
-/* Supported systems */
-#define TGT_NONE   	 0
-#define TGT_ATARI  	 1 		/* Atari 8 bit machines */
-#define TGT_C64	   	 2
-#define TGT_C128   	 3
-#define TGT_ACE	   	 4
-#define TGT_PLUS4  	 5
-#define TGT_CBM610 	 6 		/* CBM 600/700 family */
-#define TGT_PET	   	 7 	   	/* CBM PET family */
-#define TGT_NES	   	 8 		/* Nintendo Entertainment System */
-#define TGT_LUNIX	 9
-#define TGT_OSA65	10
-#define TGT_APPLE2	11
-#define TGT_GEOS	12
-#define TGT_COUNT  	13 		/* Count of supported systems */
-
-
-
-/* Structure describing a target */
-typedef struct TargetCfg_ TargetCfg;
-struct TargetCfg_ {
-    const char*	   	Name;		/* Name of the system */
-    unsigned char      	BinFmt;		/* Default binary format for the target */
-    const char*	   	Cfg;		/* Pointer to configuration */
+/* Target configurations for all systems */
+const TargetDesc Targets [TGT_COUNT] = {
+    {  	BINFMT_BINARY,  CfgNone 	},
+    {  	BINFMT_BINARY,	CfgAtari	},
+    {  	BINFMT_BINARY,	CfgC64 		},
+    {  	BINFMT_BINARY,	CfgC128		},
+    {  	BINFMT_BINARY,	CfgAce		},
+    {  	BINFMT_BINARY,	CfgPlus4	},
+    {  	BINFMT_BINARY,  CfgCBM610	},
+    {  	BINFMT_BINARY,	CfgPET		},
+    {  	BINFMT_BINARY,	CfgNES 	       	},
+    {   BINFMT_O65,     CfgLunix	},
+    {   BINFMT_O65,	CfgOSA65	},
+    {   BINFMT_BINARY,	CfgApple2	},
+    {   BINFMT_BINARY,  CfgGeos		},
 };
-
-static const TargetCfg Targets [TGT_COUNT] = {
-    {  	"none",	  BINFMT_BINARY,   	CfgNone 	},
-    {  	"atari",  BINFMT_BINARY,	CfgAtari	},
-    {  	"c64",    BINFMT_BINARY,	CfgC64 		},
-    {  	"c128",   BINFMT_BINARY,	CfgC128		},
-    {  	"ace",    BINFMT_BINARY,	CfgAce		},
-    {  	"plus4",  BINFMT_BINARY,	CfgPlus4	},
-    {  	"cbm610", BINFMT_BINARY,   	CfgCBM610	},
-    {  	"pet", 	  BINFMT_BINARY,	CfgPET		},
-    {  	"nes", 	  BINFMT_BINARY,	CfgNES 	       	},
-    {   "lunix",  BINFMT_O65,           CfgLunix	},
-    {   "osa65",  BINFMT_O65,		CfgOSA65	},
-    {   "apple2", BINFMT_BINARY,	CfgApple2	},
-    {   "geos",	  BINFMT_BINARY,       	CfgGeos		},
-};
-
-/* Selected target system type */
-static const TargetCfg* Target;
-
-
-
-/*****************************************************************************/
-/*     	      	    	 	     Code			 	     */
-/*****************************************************************************/
-
-
-
-static int StrICmp (const char* S1, const char* S2)
-/* Compare two strings case insensitive */
-{
-    int Diff = 0;
-    while (1) {
-	Diff = tolower (*S1) - tolower (*S2);
-	if (Diff != 0 || *S1 == '\0') {
-	    return Diff;
-	}
-    	++S1;
-	++S2;
-    }
-}
-
-
-
-static int TgtMap (const char* Name)
-/* Map a target name to a system code. Return -1 in case of an error */
-{
-    unsigned I;
-
-    /* Check for a numeric target */
-    if (isdigit (*Name)) {
- 	int Target = atoi (Name);
- 	if (Target >= 0 && Target < TGT_COUNT) {
- 	    return Target;
-      	}
-    }
-
-    /* Check for a target string */
-    for (I = 0; I < TGT_COUNT; ++I) {
-       	if (StrICmp (Targets [I].Name, Name) == 0) {
- 	    return I;
- 	}
-    }
-
-    /* Not found */
-    return -1;
-}
-
-
-
-void TgtSet (const char* T)
-/* Set the target system, initialize internal stuff for this target */
-{
-    /* Map the target to a number */
-    int TgtNum = TgtMap (T);
-    if (TgtNum == -1) {
-	Error ("Invalid target system: %s", T);
-    }
-    Target = &Targets [TgtNum];
-
-    /* Set the target data */
-    DefaultBinFmt = Target->BinFmt;
-    CfgSetBuf (Target->Cfg);
-}
-
-
-
-void TgtPrintList (FILE* F)
-/* Print a list of the available target systems */
-{
-    unsigned I;
-
-    /* Print a header */
-    fprintf (F, "Available targets:\n");
-
-    /* Print a list of the target systems */
-    for (I = 0; I < TGT_COUNT; ++I) {
-	fprintf (F, "  %s\n", Targets [I].Name);
-    }
-}
 
 
 

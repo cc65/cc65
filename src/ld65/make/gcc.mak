@@ -29,7 +29,7 @@ OBJS = 	bin.o		\
 	objfile.o	\
 	scanner.o	\
 	segments.o	\
-	target.o
+	tgtcfg.o	
 
 LIBS = $(COMMON)/common.a
 

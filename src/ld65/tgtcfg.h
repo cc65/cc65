@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				 target.h				     */
+/*				 tgtcfg.h				     */
 /*                                                                           */
-/*		   Target system support for the ld65 linker		     */
+/*		 Target machine configurations the ld65 linker		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,30 +33,35 @@
 
 
 
-#ifndef TARGET_H
-#define TARGET_H
+#ifndef TGTCFG_H
+#define TGTCFG_H
 
 
 
-#include <stdio.h>
+/* common */
+#include "target.h"
 
 
 
 /*****************************************************************************/
-/*     	      	    		     Code				     */
+/*			     Target configurations			     */
 /*****************************************************************************/
 
 
 
-void TgtSet (const char* T);
-/* Set the target system, initialize internal stuff for this target */
+/* Structure describing a target */
+typedef struct TargetDesc TargetDesc;
+struct TargetDesc {
+    unsigned char      	BinFmt;	/* Default binary format for the target */
+    const char*	   	Cfg;	/* Pointer to configuration */
+};
 
-void TgtPrintList (FILE* F);
-/* Print a list of the available target systems */
+/* Target configurations for all systems */
+extern const TargetDesc Targets [TGT_COUNT];
 
 
 
-/* End of target.h */
+/* End of tgtcfg.h */
 
 #endif
 

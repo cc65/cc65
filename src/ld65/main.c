@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998	Ullrich von Bassewitz					     */
-/*		Wacholderweg 14						     */
-/*		D-70597 Stuttgart					     */
-/* EMail:	uz@musoftware.de					     */
+/* (C) 1998-2000 Ullrich von Bassewitz					     */
+/*		 Wacholderweg 14					     */
+/*		 D-70597 Stuttgart					     */
+/* EMail:	 uz@musoftware.de					     */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -38,23 +38,27 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../common/cmdline.h"
-#include "../common/libdefs.h"
-#include "../common/objdefs.h"
-#include "../common/version.h"
-#include "../common/xmalloc.h"
-
-#include "global.h"
-#include "error.h"
+/* common */
+#include "cmdline.h"
+#include "libdefs.h"
+#include "objdefs.h"
 #include "target.h"
-#include "fileio.h"
-#include "scanner.h"
+#include "version.h"
+#include "xmalloc.h"
+
+/* ld65 */
+#include "binfmt.h"
 #include "config.h"
-#include "objfile.h"
-#include "library.h"
+#include "error.h"
 #include "exports.h"
-#include "segments.h"
+#include "fileio.h"
+#include "global.h"
+#include "library.h"
 #include "mapfile.h"
+#include "objfile.h"
+#include "scanner.h"
+#include "segments.h"
+#include "tgtcfg.h"
 
 
 
@@ -86,7 +90,7 @@ static void Usage (void)
        	     "  -h\t\t\tHelp (this text)\n"
        	     "  -m name\t\tCreate a map file\n"
        	     "  -o name\t\tName the default output file\n"
-       	     "  -t type\t\tType of target system\n"
+       	     "  -t sys\t\tSet the target system\n"
        	     "  -v\t\t\tVerbose mode\n"
        	     "  -vm\t\t\tVerbose map file\n"
        	     "  -C name\t\tUse linker config file\n"
@@ -97,6 +101,8 @@ static void Usage (void)
 	     "\n"
 	     "Long options:\n"
 	     "  --help\t\tHelp (this text)\n"
+	     "  --mapfile name\tCreate a map file\n"
+       	     "  --target sys\t\tSet the target system\n"
        	     "  --version\t\tPrint the linker version\n",
 	     ProgName);
 }
@@ -207,11 +213,51 @@ static void LinkFile (const char* Name)
 
 
 
+static void OptConfig (const char* Opt, const char* Arg)
+/* Define the config file */
+{
+    if (CfgAvail ()) {
+	Error ("Cannot use -C/-t twice");
+    }
+    CfgSetName (Arg);
+}
+
+
+
 static void OptHelp (const char* Opt, const char* Arg)
 /* Print usage information and exit */
 {
     Usage ();
     exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptMapFile (const char* Opt, const char* Arg)
+/* Give the name of the map file */
+{
+    MapFileName = Arg;
+}
+
+
+
+static void OptTarget (const char* Opt, const char* Arg)
+/* Set the target system */
+{
+    const TargetDesc* D;
+
+    /* Map the target name to a target id */
+    Target = FindTarget (Arg);
+    if (Target == TGT_UNKNOWN) {
+       	Error ("Invalid target name: `%s'", Arg);
+    }
+
+    /* Get the target description record */
+    D = &Targets[Target];
+
+    /* Set the target data */
+    DefaultBinFmt = D->BinFmt;
+    CfgSetBuf (D->Cfg);
 }
 
 
@@ -231,8 +277,11 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-       	{ "--help",	       	0,     	OptHelp			},
-	{ "--version",	       	0,	OptVersion		},
+       	{ "--config",  	       	1,     	OptConfig    		},
+       	{ "--help",	       	0,     	OptHelp	     		},
+	{ "--mapfile",		1,	OptMapFile		},
+	{ "--target",		1,	OptTarget    		},
+	{ "--version",	       	0,  	OptVersion   		},
     };
 
     int I;
@@ -255,7 +304,7 @@ int main (int argc, char* argv [])
     /* Check the parameters */
     I = 1;
     while (I < argc) {
-     
+
 	/* Get the argument */
 	const char* Arg = argv [I];
 
@@ -266,37 +315,34 @@ int main (int argc, char* argv [])
 	    switch (Arg [1]) {
 
 		case '-':
-		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
-		    break;
+	       	    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
+	       	    break;
 
-		case 'm':
-		    MapFileName = GetArg (&I, 2);
-		    break;
+	       	case 'm':
+	       	    OptMapFile (Arg, GetArg (&I, 2));
+	       	    break;
 
-		case 'o':
-		    OutputName = GetArg (&I, 2);
-		    break;
+	       	case 'o':
+	       	    OutputName = GetArg (&I, 2);
+	       	    break;
 
-		case 't':
-		    if (CfgAvail ()) {
-			Error ("Cannot use -C/-t twice");
-		    }
-		    TgtSet (GetArg (&I, 2));
-		    break;
+	       	case 't':
+	       	    if (CfgAvail ()) {
+	       		Error ("Cannot use -C/-t twice");
+	       	    }
+	       	    OptTarget (Arg, GetArg (&I, 2));
+	       	    break;
 
-		case 'v':
-		    switch (Arg [2]) {
-		      	case 'm':   VerboseMap = 1;	break;
+	       	case 'v':
+	       	    switch (Arg [2]) {
+	       	      	case 'm':   VerboseMap = 1;	break;
     		      	case '\0':  ++Verbose;		break;
 		      	default:    UnknownOption (Arg);
 		    }
 		    break;
 
 		case 'C':
-		    if (CfgAvail ()) {
-		      	Error ("Cannot use -C/-t twice");
-		    }
-		    CfgSetName (GetArg (&I, 2));
+		    OptConfig (Arg, GetArg (&I, 2));
 		    break;
 
 		case 'L':
@@ -315,9 +361,9 @@ int main (int argc, char* argv [])
 		    OptVersion (Arg, 0);
 		    break;
 
-		default:
-		    UnknownOption (Arg);
-		    break;
+	       	default:
+	       	    UnknownOption (Arg);
+	       	    break;
 	    }
 
 	} else {
@@ -333,14 +379,12 @@ int main (int argc, char* argv [])
 
     /* Check if we had any object files */
     if (ObjFiles == 0) {
-	fprintf (stderr, "No object files to link\n");
-	exit (EXIT_FAILURE);
+	Error ("No object files to link");
     }
 
     /* Check if we have a valid configuration */
     if (!CfgAvail ()) {
-	fprintf (stderr, "Memory configuration missing\n");
-	exit (EXIT_FAILURE);
+       	Error ("Memory configuration missing");
     }
 
     /* Read the config file */

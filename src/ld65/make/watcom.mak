@@ -85,7 +85,7 @@ OBJS =	bin.obj		\
 	objfile.obj	\
 	scanner.obj	\
 	segments.obj	\
-	target.obj
+	tgtcfg.obj
 
 LIBS = ..\common\common.lib
 
@@ -93,16 +93,16 @@ LIBS = ..\common\common.lib
 # ------------------------------------------------------------------------------
 # Main targets
 
-all:		ld65
+all:	      	ld65
 
-ld65:		ld65.exe
+ld65:	      	ld65.exe
 
 
 # ------------------------------------------------------------------------------
 # Other targets
 
 
-ld65.exe:	$(OBJS) $(LIBS)
+ld65.exe:     	$(OBJS) $(LIBS)
 	$(LD) system $(SYSTEM) @&&|
 DEBUG ALL
 OPTION QUIET
@@ -125,7 +125,7 @@ FILE objdata.obj
 FILE objfile.obj
 FILE scanner.obj
 FILE segments.obj
-FILE target.obj
+FILE tgtcfg.obj
 LIBRARY ..\common\common.lib
 |
 

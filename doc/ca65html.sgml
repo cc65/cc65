@@ -101,7 +101,7 @@ Here is a description of all the command line options:
   HTML (for example by use of <tt/c2html/), has the name <tt/file.c.html/, and
   lives in the same directory as the assembler file. If the <tt/.dbg/
   directive specifies a line, a link to the correct line in the C file is
-  generated, using a label in the form <tt/linexxx>/, as it is created by
+  generated, using a label in the form <tt/linexxx/, as it is created by
   <tt/c2html/ by use of the <tt/-n/ option.
 
 
@@ -217,21 +217,21 @@ Here is a description of all the command line options:
 
 <sect1>Cross links<p>
 
-Since <tt/ca65html/ is able to generate links between modules, the best way to
-use it is to supply all modules to it in one run, instead of running each file
+Since ca65html is able to generate links between modules, the best way to use
+it is to supply all modules to it in one run, instead of running each file
 separately through it.
 
 
 <sect1>Include files<p>
 
-For now, <tt/ca65html/ will not read files included with <tt/.include/.
-Specifying the include files as normal input files on the command line works
-in many cases.
+For now, ca65html will not read files included with <tt/.include/. Specifying
+the include files as normal input files on the command line works in many
+cases.
 
 
 <sect1>Conversion errors<p>
 
-Since <tt/ca65html/ does not really parse the input, but does most of its work
+Since ca65html does not really parse the input, but does most of its work
 applying text patterns, it doesn't know anything about scoping and advanced
 features of the assembler. This means that it may miss a label may choose the
 wrong color for an item in rare cases. Since it's just a tool for displaying

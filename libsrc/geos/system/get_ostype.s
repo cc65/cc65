@@ -28,7 +28,7 @@ geos10:
 	    rts
 
 _get_tv:
-	    jsr get_ostype
+	    jsr _get_ostype
 	    bpl only40			; C64 with 40 columns only
 	    lda graphMode
 	    bpl only40			; C128 but currently on 40 columns

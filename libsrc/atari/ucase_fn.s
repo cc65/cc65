@@ -85,6 +85,7 @@ loop2:	lda	(ptr4),y
 
 	inc	tmp3		; no, prepend "D:"
 	inc	tmp3		; adjust stack size used
+	inc	tmp3
 	ldy	#3
 	jsr	subysp		; adjust stack pointer
 	ldy	#2

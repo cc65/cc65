@@ -94,7 +94,7 @@ _tgi_install:
 @L1:    inx                             ; Skip JMP opcode
         jsr     copy                    ; Copy one byte
         jsr     copy                    ; Copy one byte
-        cpx     #(TGI_HDR::JUMPTAB + .sizeof(TGI_HDR::JUMPTAB))
+        cpy     #(TGI_HDR::JUMPTAB + .sizeof(TGI_HDR::JUMPTAB))
         bne     @L1
 
 ; Call the driver install routine. It may update header variables, so we copy

@@ -1,5 +1,5 @@
 ;
-; Freddy Offenga & Christian Groessler, June 2004
+; Freddy Offenga & Christian Groessler, December 2004
 ;
 ; function to get default device: char *_getdefdev(void);
 ;
@@ -17,11 +17,18 @@
 	.include	"atari.inc"
 	.import		__dos_type
 	.export		__getdefdev		; get default device (e.g. "D1:")
+.ifdef	DYNAMIC_DD
+	.export		__defdev
+.endif
 
 ; Get default device (LBUF will be destroyed!!)
 
 __getdefdev:
 
+.ifdef	DEFAULT_DEVICE
+	lda	#'0'+DEFAULT_DEVICE
+	sta	__defdev+1
+.endif
 	lda	__dos_type	; which DOS?
 	cmp	#ATARIDOS
 	beq	finish
@@ -62,21 +69,21 @@ crvec:	jsr	$FFFF		; will be set to crunch vector
 
 	ldy	#COMFNAM	;  COMFNAM is always "Dn:"
 	lda	(DOSVEC),y
-	sta	defdev
+	sta	__defdev
 	iny
 	lda	(DOSVEC),y
-	sta	defdev+1
+	sta	__defdev+1
 
 ; Return pointer to default device
 
-finish:	lda	#<defdev
-	ldx	#>defdev
+finish:	lda	#<__defdev
+	ldx	#>__defdev
 	rts
 
 	.data
 
 ; Default device
 
-defdev:
+__defdev:
 	.byte	"D1:", 0
 

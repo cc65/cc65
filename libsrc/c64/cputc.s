@@ -6,7 +6,7 @@
 ;
 
     	.export	       	_cputcxy, _cputc, cputdirect, putchar
-	.export		plot
+	.export		newline, plot
 	.import		popa, _gotoxy
 	.import		xsize, revers
 

@@ -74,12 +74,14 @@ OBJS =	abend.obj	\
 	fname.obj	\
 	hashstr.obj	\
 	wildargv.obj	\
+	target.obj	\
+	tgttrans.obj	\
 	xmalloc.obj	\
 	xsprintf.obj
 
 
 .PRECIOUS $(OBJS:.obj=.cc) $(LIB)
-
+			 
 # ------------------------------------------------------------------------------
 # Main targets
 

@@ -17,6 +17,8 @@ OBJS =	abend.o		\
 	exprdefs.o	\
 	fname.o		\
 	hashstr.o	\
+	target.o	\
+	tgttrans.o	\
 	xmalloc.o	\
 	xsprintf.o
 
@@ -52,6 +54,7 @@ zap:	clean
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
 	$(CC) -MM $^ > .depend
+
 
 
 

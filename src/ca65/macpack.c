@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -183,6 +183,18 @@ static char MacCBM[] =
     "        .endrepeat\n"
     ".endmacro\n";
 
+/* CPU defines */
+static char MacCPU[] =
+    "CPU_ISET_6502      = $01\n"
+    "CPU_ISET_65SC02    = $02\n"
+    "CPU_ISET_65C02     = $04\n"
+    "CPU_ISET_65816     = $08\n"
+    "CPU_ISET_SUNPLUS   = $10\n"
+    "CPU_6502           = $01\n"
+    "CPU_65SC02         = $03\n"
+    "CPU_65C02          = $07\n"
+    "CPU_65816          = $0F\n"
+    "CPU_SUNPLUS        = $10\n";
 
 
 
@@ -190,7 +202,8 @@ static char MacCBM[] =
 static char* MacPackages [] = {
     MacGeneric,
     MacLongBranch,
-    MacCBM
+    MacCBM,
+    MacCPU
 };
 
 

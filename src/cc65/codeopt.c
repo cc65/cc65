@@ -673,20 +673,6 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
  *      ldy
  *     	ldx     #$00
  *      lda     (ptr1),y
- *
- *      adc    	xxx
- *      sta     ptr1
- *      pha
- *      txa
- *      iny
- *      adc     yyy
- *      sta     ptr1+1
- *      tax
- *      pla
- *      ldy
- *      ldx     #$00
- *      lda     (ptr1),y
- *  	jsr    	ldauidx
  */
 {
     unsigned Changes = 0;
@@ -799,7 +785,8 @@ static unsigned OptPtrLoad3 (CodeSeg* S)
 	    CE_KnownImm (L[6])                               &&
 	    L[6]->Num == 0                                   &&
        	    CE_IsCallTo (L[7], "ldauidx")                    &&
-       	    !CS_RangeHasLabel (S, I+1, 7)                    &&
+       	    !CS_RangeHasLabel (S, I+1, 5)                    &&
+            !CE_HasLabel (L[7])                              &&
 	    /* Check the label last because this is quite costly */
 	    (Len = strlen (L[0]->Arg)) > 3                   &&
 	    L[0]->Arg[0] == '<'                              &&

@@ -42,14 +42,15 @@
 #include "check.h"
 #include "bitops.h"
 #include "xmalloc.h"
-	  
+
 /* ld65 */
-#include "error.h"
-#include "global.h"
 #include "bin.h"
-#include "o65.h"
 #include "binfmt.h"
+#include "condes.h"
+#include "error.h"
 #include "exports.h"
+#include "global.h"
+#include "o65.h"
 #include "scanner.h"
 #include "config.h"
 
@@ -116,6 +117,141 @@ static unsigned O65Attr	= 0;
 
 
 /*****************************************************************************/
+/*				   Forwards				     */
+/*****************************************************************************/
+
+
+
+static File* NewFile (const char* Name);
+/* Create a new file descriptor and insert it into the list */
+
+
+
+/*****************************************************************************/
+/*				List management				     */
+/*****************************************************************************/
+
+
+
+static File* FindFile (const char* Name)
+/* Find a file with a given name. */
+{
+    File* F = FileList;
+    while (F) {
+ 	if (strcmp (F->Name, Name) == 0) {
+ 	    return F;
+ 	}
+ 	F = F->Next;
+    }
+    return 0;
+}
+
+
+
+static File* GetFile (const char* Name)
+/* Get a file entry with the given name. Create a new one if needed. */
+{
+    File* F = FindFile (Name);
+    if (F == 0) {
+	/* Create a new one */
+	F = NewFile (Name);
+    }
+    return F;
+}
+
+
+
+static void FileInsert (File* F, Memory* M)
+/* Insert the memory area into the files list */
+{
+    M->F = F;
+    if (F->MemList == 0) {
+	/* First entry */
+	F->MemList = M;
+    } else {
+	F->MemLast->FNext = M;
+    }
+    F->MemLast = M;
+}
+
+
+
+static Memory* CfgFindMemory (const char* Name)
+/* Find the memory are with the given name. Return NULL if not found */
+{
+    Memory* M = MemoryList;
+    while (M) {
+       	if (strcmp (M->Name, Name) == 0) {
+       	    return M;
+       	}
+       	M = M->Next;
+    }
+    return 0;
+}
+
+
+
+static Memory* CfgGetMemory (const char* Name)
+/* Find the memory are with the given name. Print an error on an invalid name */
+{
+    Memory* M = CfgFindMemory (Name);
+    if (M == 0) {
+ 	CfgError ("Invalid memory area `%s'", Name);
+    }
+    return M;
+}
+
+
+
+static SegDesc* CfgFindSegDesc (const char* Name)
+/* Find the segment descriptor with the given name, return NULL if not found. */
+{
+    SegDesc* S = SegDescList;
+    while (S) {
+     	if (strcmp (S->Name, Name) == 0) {
+    	    /* Found */
+    	    return S;
+       	}
+     	S = S->Next;
+    }
+
+    /* Not found */
+    return 0;
+}
+
+
+
+static void SegDescInsert (SegDesc* S)
+/* Insert a segment descriptor into the list of segment descriptors */
+{
+    /* Insert the struct into the list */
+    S->Next = SegDescList;
+    SegDescList = S;
+    ++SegDescCount;
+}
+
+
+
+static void MemoryInsert (Memory* M, SegDesc* S)
+/* Insert the segment descriptor into the memory area list */
+{
+    /* Create a new node for the entry */
+    MemListNode* N = xmalloc (sizeof (MemListNode));
+    N->Seg  = S;
+    N->Next = 0;
+
+    if (M->SegLast == 0) {
+       	/* First entry */
+       	M->SegList = N;
+    } else {
+ 	M->SegLast->Next = N;
+    }
+    M->SegLast = N;
+}
+
+
+
+/*****************************************************************************/
 /*			   Constructors/Destructors			     */
 /*****************************************************************************/
 
@@ -156,13 +292,9 @@ static Memory* NewMemory (const char* Name)
     unsigned Len = strlen (Name);
 
     /* Check for duplicate names */
-    Memory* M =	MemoryList;
-    while (M) {
-    	if (strcmp (M->Name, Name) == 0) {
-       	    CfgError ("Memory area `%s' defined twice", Name);
-	    break;
-       	}
-    	M = M->Next;
+    Memory* M =	CfgFindMemory (Name);
+    if (M) {
+	CfgError ("Memory area `%s' defined twice", Name);
     }
 
     /* Allocate memory */
@@ -208,13 +340,9 @@ static SegDesc* NewSegDesc (const char* Name)
     unsigned Len = strlen (Name);
 
     /* Check for duplicate names */
-    SegDesc* S = SegDescList;
-    while (S) {
-     	if (strcmp (S->Name, Name) == 0) {
-       	    CfgError ("Segment `%s' defined twice", Name);
-	    break;
-       	}
-     	S = S->Next;
+    SegDesc* S = CfgFindSegDesc (Name);
+    if (S) {
+	CfgError ("Segment `%s' defined twice", Name);
     }
 
     /* Verify that the given segment does really exist */
@@ -278,49 +406,6 @@ static void AttrCheck (unsigned Attr, unsigned Mask, const char* Name)
 
 
 
-static File* FindFile (const char* Name)
-/* Find a file with a given name. */
-{
-    File* F = FileList;
-    while (F) {
- 	if (strcmp (F->Name, Name) == 0) {
- 	    return F;
- 	}
- 	F = F->Next;
-    }
-    return 0;
-}
-
-
-
-static File* GetFile (const char* Name)
-/* Get a file entry with the given name. Create a new one if needed. */
-{
-    File* F = FindFile (Name);
-    if (F == 0) {
-	/* Create a new one */
-	F = NewFile (Name);
-    }
-    return F;
-}
-
-
-
-static void FileInsert (File* F, Memory* M)
-/* Insert the memory area into the files list */
-{
-    M->F = F;
-    if (F->MemList == 0) {
-	/* First entry */
-	F->MemList = M;
-    } else {
-	F->MemLast->FNext = M;
-    }
-    F->MemLast = M;
-}
-
-
-
 static void ParseMemory (void)
 /* Parse a MEMORY section */
 {
@@ -351,7 +436,7 @@ static void ParseMemory (void)
 	while (CfgTok == CFGTOK_IDENT) {
 
 	    /* Map the identifier to a token */
-	    unsigned AttrTok;
+	    cfgtok_t AttrTok;
 	    CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
 	    AttrTok = CfgTok;
 
@@ -477,7 +562,7 @@ static void ParseFiles (void)
 	while (CfgTok == CFGTOK_IDENT) {
 
 	    /* Map the identifier to a token */
-	    unsigned AttrTok;
+	    cfgtok_t AttrTok;
 	    CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
 	    AttrTok = CfgTok;
 
@@ -528,63 +613,6 @@ static void ParseFiles (void)
 
 
 
-static Memory* CfgFindMemory (const char* Name)
-/* Find the memory are with the given name. Return NULL if not found */
-{
-    Memory* M = MemoryList;
-    while (M) {
-       	if (strcmp (M->Name, Name) == 0) {
-       	    return M;
-       	}
-       	M = M->Next;
-    }
-    return 0;
-}
-
-
-
-static Memory* CfgGetMemory (const char* Name)
-/* Find the memory are with the given name. Print an error on an invalid name */
-{
-    Memory* M = CfgFindMemory (Name);
-    if (M == 0) {
- 	CfgError ("Invalid memory area `%s'", Name);
-    }
-    return M;
-}
-
-
-
-static void SegDescInsert (SegDesc* S)
-/* Insert a segment descriptor into the list of segment descriptors */
-{
-    /* Insert the struct into the list */
-    S->Next = SegDescList;
-    SegDescList = S;
-    ++SegDescCount;
-}
-
-
-
-static void MemoryInsert (Memory* M, SegDesc* S)
-/* Insert the segment descriptor into the memory area list */
-{
-    /* Create a new node for the entry */
-    MemListNode* N = xmalloc (sizeof (MemListNode));
-    N->Seg  = S;
-    N->Next = 0;
-
-    if (M->SegLast == 0) {
-       	/* First entry */
-       	M->SegList = N;
-    } else {
- 	M->SegLast->Next = N;
-    }
-    M->SegLast = N;
-}
-
-
-
 static void ParseSegments (void)
 /* Parse a SEGMENTS section */
 {
@@ -623,7 +651,7 @@ static void ParseSegments (void)
 	while (CfgTok == CFGTOK_IDENT) {
 
 	    /* Map the identifier to a token */
-	    unsigned AttrTok;
+	    cfgtok_t AttrTok;
 	    CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
 	    AttrTok = CfgTok;
 
@@ -649,9 +677,11 @@ static void ParseSegments (void)
        		    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
 		    switch (CfgTok) {
        	       	       	case CFGTOK_RO:	   S->Flags |= SF_RO;               break;
+			case CFGTOK_RW:	   /* Default */		    break;
 		     	case CFGTOK_BSS:   S->Flags |= SF_BSS;              break;
 		     	case CFGTOK_ZP:	   S->Flags |= (SF_BSS | SF_ZP);    break;
 		     	case CFGTOK_WPROT: S->Flags |= (SF_RO | SF_WPROT);  break;
+		     	default:	   Internal ("Unexpected token: %d", CfgTok);
 		    }
 		    break;
 
@@ -788,7 +818,7 @@ static void ParseO65 (void)
     while (CfgTok == CFGTOK_IDENT) {
 
 	/* Map the identifier to a token */
-	unsigned AttrTok;
+	cfgtok_t AttrTok;
        	CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
 	AttrTok = CfgTok;
 
@@ -843,7 +873,7 @@ static void ParseO65 (void)
 	    	     	break;
 
 	    	    default:
-	    	     	Error ("Unexpected type token");
+	    	     	CfgError ("Unexpected type token");
 	    	}
 	    	break;
 
@@ -863,7 +893,7 @@ static void ParseO65 (void)
 			break;
 
 		    default:
-			Error ("Unexpected OS token");
+			CfgError ("Unexpected OS token");
 		}
 		break;
 
@@ -892,7 +922,7 @@ static void ParseFormats (void)
     while (CfgTok == CFGTOK_IDENT) {
 
 	/* Map the identifier to a token */
-	unsigned FormatTok;
+	cfgtok_t FormatTok;
        	CfgSpecialToken (Formats, ENTRY_COUNT (Formats), "Format");
 	FormatTok = CfgTok;
 
@@ -922,16 +952,165 @@ static void ParseFormats (void)
 
 
 
+static void ParseConDes (void)
+/* Parse the CONDES feature */
+{
+    static const IdentTok Attributes [] = {
+       	{   "SEGMENT",		CFGTOK_SEGMENT		},
+	{   "LABEL",  		CFGTOK_LABEL  		},
+	{   "TYPE",		CFGTOK_TYPE   		},
+    };
+
+    static const IdentTok Types [] = {
+       	{   "CONSTRUCTOR",	CFGTOK_CONSTRUCTOR	},
+	{   "DESTRUCTOR",      	CFGTOK_DESTRUCTOR	},
+    };
+
+    /* Attribute values. */
+    char SegName[sizeof (CfgSVal)];
+    char Label[sizeof (CfgSVal)];
+    int Type = -1;	/* Initialize to avoid gcc warnings */
+
+    /* Bitmask to remember the attributes we got already */
+    enum {
+	atNone		= 0x0000,
+	atSegName	= 0x0001,
+	atLabel		= 0x0002,
+	atType		= 0x0004
+    };
+    unsigned AttrFlags = atNone;
+
+    /* Parse the attributes */
+    while (1) {
+
+	/* Map the identifier to a token */
+	cfgtok_t AttrTok;
+       	CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+	AttrTok = CfgTok;
+
+	/* An optional assignment follows */
+	CfgNextTok ();
+	CfgOptionalAssign ();
+
+	/* Check which attribute was given */
+	switch (AttrTok) {
+
+	    case CFGTOK_SEGMENT:
+	  	/* Don't allow this twice */
+		FlagAttr (&AttrFlags, atSegName, "SEGMENT");
+	      	/* We expect an identifier */
+		CfgAssureIdent ();
+		/* Remember the value for later */
+		strcpy (SegName, CfgSVal);
+	    	break;
+
+	    case CFGTOK_LABEL:
+	       	/* Don't allow this twice */
+		FlagAttr (&AttrFlags, atLabel, "LABEL");
+	      	/* We expect an identifier */
+		CfgAssureIdent ();
+		/* Remember the value for later */
+		strcpy (Label, CfgSVal);
+		break;
+
+
+	    case CFGTOK_TYPE:
+	  	/* Don't allow this twice */
+		FlagAttr (&AttrFlags, atType, "TYPE");
+		/* The type may be given as id or numerical */
+		if (CfgTok == CFGTOK_INTCON) {
+		    CfgRangeCheck (CD_TYPE_MIN, CD_TYPE_MAX);
+		    Type = (int) CfgIVal;
+		} else {
+		    CfgSpecialToken (Types, ENTRY_COUNT (Types), "Type");
+		    switch (CfgTok) {
+		     	case CFGTOK_CONSTRUCTOR: Type = CD_TYPE_CON;	break;
+		     	case CFGTOK_DESTRUCTOR:	 Type = CD_TYPE_DES;	break;
+		     	default: FAIL ("Unexpected type token");
+		    }
+		}
+		break;
+
+	    default:
+		FAIL ("Unexpected attribute token");
+
+	}
+
+       	/* Skip the attribute value */
+	CfgNextTok ();
+
+	/* Semicolon ends the ConDes decl, otherwise accept an optional comma */
+	if (CfgTok == CFGTOK_SEMI) {
+	    break;
+	} else if (CfgTok == CFGTOK_COMMA) {
+	    CfgNextTok ();
+	}
+    }
+
+    /* Check if we have all mandatory attributes */
+    AttrCheck (AttrFlags, atSegName, "SEGMENT");
+    AttrCheck (AttrFlags, atLabel, "LABEL");
+    AttrCheck (AttrFlags, atType, "TYPE");
+
+    /* Check if the condes has already attributes defined */
+    if (ConDesHasSegName(Type) || ConDesHasLabel(Type)) {
+	CfgError ("CONDES attributes for type %d are already defined", Type);
+    }
+
+    /* Define the attributes */
+    ConDesSetSegName (Type, SegName);
+    ConDesSetLabel (Type, Label);
+}
+
+
+
+static void ParseFeatures (void)
+/* Parse a features section */
+{
+    static const IdentTok Features [] = {
+       	{   "CONDES",  	CFGTOK_CONDES	},
+    };
+
+    while (CfgTok == CFGTOK_IDENT) {
+
+	/* Map the identifier to a token */
+	cfgtok_t FeatureTok;
+       	CfgSpecialToken (Features, ENTRY_COUNT (Features), "Feature");
+       	FeatureTok = CfgTok;
+
+	/* Skip the name and the following colon */
+	CfgNextTok ();
+	CfgConsumeColon ();
+
+	/* Parse the format options */
+	switch (FeatureTok) {
+
+	    case CFGTOK_CONDES:
+		ParseConDes ();
+		break;
+
+	    default:
+		Error ("Unexpected feature token");
+	}
+
+	/* Skip the semicolon */
+	CfgConsumeSemi ();
+    }
+}
+
+
+
 static void ParseConfig (void)
 /* Parse the config file */
 {
     static const IdentTok BlockNames [] = {
-	{   "MEMORY",  	CFGTOK_MEMORY    },
-	{   "FILES",    CFGTOK_FILES     },
-        {   "SEGMENTS", CFGTOK_SEGMENTS  },
-	{   "FORMATS", 	CFGTOK_FORMATS   },
+	{   "MEMORY",  	CFGTOK_MEMORY	},
+	{   "FILES",    CFGTOK_FILES    },
+        {   "SEGMENTS", CFGTOK_SEGMENTS },
+	{   "FORMATS", 	CFGTOK_FORMATS  },
+	{   "FEATURES", CFGTOK_FEATURES	},
     };
-    unsigned BlockTok;
+    cfgtok_t BlockTok;
 
     do {
 
@@ -947,23 +1126,27 @@ static void ParseConfig (void)
 	switch (BlockTok) {
 
 	    case CFGTOK_MEMORY:
-		ParseMemory ();
-		break;
+	     	ParseMemory ();
+	     	break;
 
 	    case CFGTOK_FILES:
-		ParseFiles ();
-		break;
+	     	ParseFiles ();
+	     	break;
 
 	    case CFGTOK_SEGMENTS:
-		ParseSegments ();
-		break;
+	     	ParseSegments ();
+	     	break;
 
 	    case CFGTOK_FORMATS:
-		ParseFormats ();
+	     	ParseFormats ();
+	     	break;
+
+	    case CFGTOK_FEATURES:
+		ParseFeatures ();
 		break;
 
 	    default:
-		FAIL ("Unexpected block token");
+	     	FAIL ("Unexpected block token");
 
 	}
 

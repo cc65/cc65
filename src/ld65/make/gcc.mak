@@ -19,6 +19,7 @@ CVT=cfg/cvt-cfg.pl
 
 OBJS = 	bin.o		\
 	binfmt.o	\
+	condes.o	\
 	config.o	\
 	dbgsyms.o	\
 	error.o		\
@@ -28,7 +29,6 @@ OBJS = 	bin.o		\
 	fileio.o	\
 	fragment.o	\
 	global.o        \
-	initfunc.o	\
 	library.o	\
 	main.o	       	\
 	mapfile.o	\

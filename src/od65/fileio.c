@@ -179,8 +179,11 @@ FilePos* ReadFilePos (FILE* F, FilePos* Pos)
 void* ReadData (FILE* F, void* Data, unsigned Size)
 /* Read data from the file */
 {
-    if (fread (Data, 1, Size, F) != Size) {
-	Error ("Read error (file corrupt?)");
+    /* Accept zero sized reads */
+    if (Size > 0) {
+	if (fread (Data, 1, Size, F) != Size) {
+	    Error ("Read error (file corrupt?)");
+	}	   
     }
     return Data;
 }

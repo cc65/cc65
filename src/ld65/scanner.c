@@ -56,7 +56,7 @@
 
 
 /* Current token and attributes */
-unsigned        CfgTok;
+cfgtok_t	CfgTok;
 char   	       	CfgSVal [CFG_MAX_IDENT_LEN+1];
 unsigned long   CfgIVal;
 
@@ -322,7 +322,7 @@ Again:
 
 
 
-void CfgConsume (unsigned T, const char* Msg)
+void CfgConsume (cfgtok_t T, const char* Msg)
 /* Skip a token, print an error message if not found */
 {
     if (CfgTok != T) {
@@ -535,3 +535,4 @@ void CfgCloseInput (void)
 
 
 
+			  

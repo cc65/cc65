@@ -34,10 +34,13 @@
 
 
 #include <stdio.h>
-
-#include "../common/xmalloc.h"
-#include "../common/xsprintf.h"
-
+#include <string.h>
+	  
+/* common */
+#include "xmalloc.h"
+#include "xsprintf.h"
+	  
+/* cc65 */
 #include "error.h"
 #include "asmline.h"
 

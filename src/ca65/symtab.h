@@ -86,9 +86,9 @@ void SymGlobal (const char* Name, int ZP);
  * either imported or exported.
  */
 
-void SymInitializer (const char* Name, unsigned InitVal);
-/* Mark the given symbol as an initializer. This will also mark the symbol as
- * an export. Initializers may never be zero page symbols.
+void SymConDes (const char* Name, unsigned Type, unsigned Prio);
+/* Mark the given symbol as a module constructor/destructor. This will also
+ * mark the symbol as an export. Initializers may never be zero page symbols.
  */
 
 int SymIsConst (SymEntry* Sym);

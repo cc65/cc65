@@ -33,6 +33,8 @@
 
 
 
+#include <string.h>
+
 /* ca65 */
 #include "error.h"
 #include "expr.h"

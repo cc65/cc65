@@ -33,6 +33,8 @@
 
 
 
+#include <string.h>
+
 /* common */
 #include "xmalloc.h"
 
@@ -106,7 +108,7 @@ static void RepeatTokenCheck (TokList* L)
 /* Called each time a token from a repeat token list is set. Is used to check
  * for and replace identifiers that are the repeat counter.
  */
-{		  
+{
     if (Tok == TOK_IDENT && L->Data != 0 && strcmp (SVal, L->Data) == 0) {
  	/* Must replace by the repeat counter */
  	Tok  = TOK_INTCON;

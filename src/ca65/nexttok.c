@@ -34,10 +34,11 @@
 
 
 #include <stdio.h>
+#include <string.h>
 
 /* common */
 #include "check.h"
-		   
+
 /* ca65 */
 #include "error.h"
 #include "expr.h"

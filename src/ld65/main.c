@@ -48,6 +48,7 @@
 
 /* ld65 */
 #include "binfmt.h"
+#include "condes.h"
 #include "config.h"
 #include "error.h"
 #include "exports.h"
@@ -404,6 +405,9 @@ int main (int argc, char* argv [])
     /* Read the config file */
     CfgRead ();
 
+    /* Create the condes tables if requested */
+    ConDesCreate ();
+
     /* Assign start addresses for the segments, define linker symbols */
     CfgAssignSegments ();
 
@@ -424,6 +428,7 @@ int main (int argc, char* argv [])
     /* Dump the data for debugging */
     if (Verbose > 1) {
 	SegDump ();
+	ConDesDump ();
     }
 
     /* Return an apropriate exit code */

@@ -34,6 +34,7 @@
 
 
 #include <stdio.h>
+#include <string.h>
 #if defined(_MSC_VER)
 /* Microsoft compiler */
 #  include <io.h>

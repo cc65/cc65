@@ -45,10 +45,10 @@
 #include "xmalloc.h"
 
 /* ld65 */
-#include "global.h"
+#include "condes.h"
 #include "error.h"
 #include "fileio.h"
-#include "initfunc.h"
+#include "global.h"
 #include "objdata.h"
 #include "expr.h"
 #include "exports.h"
@@ -202,17 +202,18 @@ static Export* NewExport (unsigned char Type, const char* Name, ObjData* Obj)
 
     /* Initialize the fields */
     E->Next     = 0;
-    E->Flags  	= 0;
+    E->Flags   	= 0;
     E->Obj      = Obj;
     E->ImpCount = 0;
     E->ImpList  = 0;
     E->Expr    	= 0;
     E->Type    	= Type;
+    memset (E->ConDes, 0, sizeof (E->ConDes));
     if (Name) {
         E->Name = xstrdup (Name);
     } else {
-	/* Name will get added later */
-	E->Name = 0;
+       	/* Name will get added later */
+       	E->Name = 0;
     }
 
     /* Return the new entry */
@@ -229,9 +230,9 @@ void InsertExport (Export* E)
     Import* Imp;
     unsigned HashVal;
 
-    /* If this is an initializer, insert it into the initializer list */
-    if (IS_EXP_INIT (E->Type)) {
-	AddInitFunc (E);
+    /* Insert the export into any condes tables if needed */
+    if (IS_EXP_CONDES (E->Type)) {
+       	ConDesAddExport (E);
     }
 
     /* Create a hash value for the given name */
@@ -272,7 +273,7 @@ void InsertExport (Export* E)
       	   	    }
       	   	} else {
       	   	    /* Duplicate entry, ignore it */
-      	   	    Warning ("Duplicate external identifier: `%s'", L->Name);
+       	   	    Warning ("Duplicate external identifier: `%s'", L->Name);
       		}
       		return;
       	    }
@@ -293,6 +294,7 @@ Export* ReadExport (FILE* F, ObjData* O)
 /* Read an export from a file */
 {
     unsigned char Type;
+    unsigned      ConDesCount;
     Export* E;
 
     /* Read the type */
@@ -300,6 +302,29 @@ Export* ReadExport (FILE* F, ObjData* O)
 
     /* Create a new export without a name */
     E = NewExport (Type, 0, O);
+
+    /* Read the constructor/destructor decls if we have any */
+    ConDesCount = GET_EXP_CONDES_COUNT (Type);
+    if (ConDesCount > 0) {
+
+	unsigned char ConDes[CD_TYPE_COUNT];
+	unsigned I;
+
+	/* Read the data into temp storage */
+	ReadData (F, ConDes, ConDesCount);
+
+	/* Re-order the data. In the file, each decl is encoded into a byte
+	 * which contains the type and the priority. In memory, we will use
+	 * an array of types which contain the priority. This array was
+	 * cleared by the constructor (NewExport), so we must only set the
+	 * fields that contain values.
+	 */
+	for (I = 0; I < ConDesCount; ++I) {
+	    unsigned ConDesType = CD_GET_TYPE (ConDes[I]);
+	    unsigned ConDesPrio = CD_GET_PRIO (ConDes[I]);
+	    E->ConDes[ConDesType] = ConDesPrio;
+	}
+    }
 
     /* Read the name */
     E->Name = ReadStr (F);
@@ -562,7 +587,7 @@ void PrintExportMap (FILE* F)
 	      	     GetExportVal (E),
 	      	     E->ImpCount? 'R' : ' ',
 	      	     IS_EXP_ZP (E->Type)? 'Z' : ' ',
-		     IS_EXP_INIT (E->Type)? 'I' : ' ');
+		     IS_EXP_CONDES (E->Type)? 'I' : ' ');
 	    if (++Count == 2) {
 	      	Count = 0;
 	      	fprintf (F, "\n");

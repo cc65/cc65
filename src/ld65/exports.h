@@ -41,6 +41,7 @@
 #include <stdio.h>
 
 /* common */
+#include "cddefs.h"
 #include "exprdefs.h"
 #include "filepos.h"
 
@@ -81,7 +82,8 @@ struct Export {
     Import*  		ImpList;	/* List of imports for this symbol */
     FilePos  		Pos;		/* File position of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
-    unsigned char	Type;		/* Type of export */
+    unsigned char	Type;		/* Type of export */		  
+    unsigned char	ConDes[CD_TYPE_COUNT];	/* Constructor/destructor decls */
     char*      	       	Name;		/* Name - dynamically allocated */
 };
 
@@ -157,7 +159,7 @@ void CircularRefError (const Export* E);
 /* Print an error about a circular reference using to define the given export */
 
 
-	     
+
 /* End of exports.h */
 
 #endif

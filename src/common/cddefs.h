@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  initfunc.c				     */
+/*				   cddefs.h				     */
 /*                                                                           */
-/*			Init/cleanup function handling			     */
+/*	       	Definitions for module constructor/destructors		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000     Ullrich von Bassewitz                                        */
+/*              Wacholderweg 14                                              */
+/*              D-70597 Stuttgart                                            */
+/* EMail:       uz@musoftware.de                                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,47 +33,48 @@
 
 
 
-/* common */
-#include "coll.h"
-
-/* ld65 */
-#include "exports.h"
-#include "segments.h"
-#include "initfunc.h"
+#ifndef CDDEFS_H
+#define CDDEFS_H
 
 
 
 /*****************************************************************************/
-/*		 		     Data				     */
+/*     	       	    		     Data				     */
 /*****************************************************************************/
 
 
 
-/* List of all exports that are also initializers/cleanup functions */
-static Collection   InitFunctions	= STATIC_COLLECTION_INITIALIZER;
-static Collection   CleanupFunctions	= STATIC_COLLECTION_INITIALIZER;
+/* ConDes types. Count is only 7 because we want to encode 0..count in 3 bits */
+#define	CD_TYPE_COUNT  	7		/* Number of table types */
+#define CD_TYPE_MIN    	0		/* Minimum numeric type value */
+#define CD_TYPE_MAX    	6		/* Maximum numeric type value */
+
+/* ConDes priorities, zero is no valid priority and used to mark an empty
+ * (missing) decl for this type throughout the code.
+ */
+#define CD_PRIO_NONE	0		/* No priority (no decl) */
+#define CD_PRIO_MIN    	1		/* Lowest priority */
+#define CD_PRIO_DEF	7		/* Default priority */
+#define CD_PRIO_MAX	32		/* Highest priority */
+
+/* Predefined types */
+#define CD_TYPE_CON	0 		/* Constructor */
+#define CD_TYPE_DES	1		/* Destructor */
+
+/* When part of an export in an object file, type and priority are encoded in
+ * one byte. In this case, the following macros access the fields:
+ */
+#define CD_GET_TYPE(v) 	       	(((v) >> 5) & 0x07)
+#define CD_GET_PRIO(v)	       	(((v) & 0x1F) + 1)
+
+/* Macro to build the byte value: */
+#define CD_BUILD(type,prio)    	((((type) & 0x07) << 5) | (((prio) - 1) & 0x1F))
 
 
 
-/*****************************************************************************/
-/*     	       	     	   	     Code  	      	  	  	     */
-/*****************************************************************************/
+/* End of cddefs.h */
 
-
-
-void AddInitFunc (Export* E)
-/* Add the given export to the list of initializers */
-{
-    CollAppend (&InitFunctions, E);
-}
-
-
-
-void AddCleanupFunc (Export* E)
-/* Add the given export to the list of cleanup functions */
-{
-    CollAppend (&CleanupFunctions, E);
-}
+#endif
 
 
 

@@ -33,6 +33,8 @@
 
 
 
+#include <string.h>
+
 /* common */
 #include "check.h"
 #include "hashstr.h"

@@ -33,6 +33,8 @@
 
 
 
+#include <string.h>
+
 /* cc65 */
 #include "error.h"
 #include "scanner.h"
@@ -125,7 +127,7 @@ void ParseAttribute (const Declaration* D, DeclAttr* A)
 /* Parse an additional __attribute__ modifier */
 {
     ident    AttrName;
-    attrib_t AttrType;		     
+    attrib_t AttrType;
 
     /* Initialize the attribute description with "no attribute" */
     A->AttrType = atNone;

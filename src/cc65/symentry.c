@@ -33,8 +33,12 @@
 
 
 
-#include "../common/xmalloc.h"
-
+#include <string.h>
+		   
+/* common */
+#include "xmalloc.h"
+	  
+/* cc65 */
 #include "symentry.h"
 
 
@@ -43,7 +47,7 @@
 /*	       	  	  	     Code				     */
 /*****************************************************************************/
 
-
+	  
 
 SymEntry* NewSymEntry (const char* Name, unsigned Flags)
 /* Create a new symbol table with the given name */

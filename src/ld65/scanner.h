@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -45,67 +45,77 @@
 
 
 /* Config file tokens */
-#define	CFGTOK_NONE		0
-#define CFGTOK_INTCON		1
-#define CFGTOK_STRCON		2
-#define CFGTOK_IDENT		3
-#define CFGTOK_LCURLY		4
-#define CFGTOK_RCURLY		5
-#define CFGTOK_SEMI		6
-#define CFGTOK_COMMA		7
-#define CFGTOK_EQ		8
-#define CFGTOK_COLON  	 	9
-#define CFGTOK_DOT		10
-#define CFGTOK_EOF		11
+typedef enum {
+    CFGTOK_NONE,
+    CFGTOK_INTCON,
+    CFGTOK_STRCON,
+    CFGTOK_IDENT,
+    CFGTOK_LCURLY,
+    CFGTOK_RCURLY,
+    CFGTOK_SEMI,
+    CFGTOK_COMMA,
+    CFGTOK_EQ,
+    CFGTOK_COLON,
+    CFGTOK_DOT,
+    CFGTOK_EOF,
 
-/* Special identifiers */
-#define CFGTOK_MEMORY          	20
-#define CFGTOK_FILES      	21
-#define CFGTOK_SEGMENTS   	22
-#define CFGTOK_FORMATS		23
+    /* Special identifiers */
+    CFGTOK_MEMORY,
+    CFGTOK_FILES,
+    CFGTOK_SEGMENTS,
+    CFGTOK_FORMATS,
+    CFGTOK_FEATURES,
 
-#define CFGTOK_START		30
-#define CFGTOK_SIZE		31
-#define CFGTOK_TYPE 		32
-#define CFGTOK_FILE   		33
-#define CFGTOK_DEFINE 		34
-#define CFGTOK_FILL		35
-#define CFGTOK_FILLVAL		36
-#define CFGTOK_EXPORT 		37
-#define CFGTOK_IMPORT		38
-#define CFGTOK_OS      	       	39
-#define CFGTOK_FORMAT		40
+    CFGTOK_START,
+    CFGTOK_SIZE,
+    CFGTOK_TYPE,
+    CFGTOK_FILE,
+    CFGTOK_DEFINE,
+    CFGTOK_FILL,
+    CFGTOK_FILLVAL,
+    CFGTOK_EXPORT,
+    CFGTOK_IMPORT,
+    CFGTOK_OS,
+    CFGTOK_FORMAT,
 
-#define CFGTOK_LOAD   		50
-#define CFGTOK_RUN     	       	51
-#define CFGTOK_ALIGN   		52
-#define CFGTOK_OFFSET  		53
+    CFGTOK_LOAD,
+    CFGTOK_RUN,
+    CFGTOK_ALIGN,
+    CFGTOK_OFFSET,
 
-#define CFGTOK_RO      	       	60
-#define CFGTOK_RW      	       	61
-#define CFGTOK_BSS     	       	62
-#define CFGTOK_ZP		63
-#define CFGTOK_WPROT		64
+    CFGTOK_RO,
+    CFGTOK_RW,
+    CFGTOK_BSS,
+    CFGTOK_ZP,
+    CFGTOK_WPROT,
 
-#define CFGTOK_O65     	       	70
-#define CFGTOK_BIN     	       	71
+    CFGTOK_O65,
+    CFGTOK_BIN,
 
-#define CFGTOK_SMALL		80
-#define CFGTOK_LARGE		81
+    CFGTOK_SMALL,
+    CFGTOK_LARGE,
 
-#define CFGTOK_TRUE   		90
-#define CFGTOK_FALSE  		91
+    CFGTOK_TRUE,
+    CFGTOK_FALSE,
 
-#define CFGTOK_LUNIX		100
-#define CFGTOK_OSA65		101
+    CFGTOK_LUNIX,
+    CFGTOK_OSA65,
+
+    CFGTOK_CONDES,
+    CFGTOK_SEGMENT,
+    CFGTOK_LABEL,
+    CFGTOK_CONSTRUCTOR,
+    CFGTOK_DESTRUCTOR
+
+} cfgtok_t;
 
 
 
 /* Mapping table entry, special identifier --> token */
 typedef struct IdentTok_ IdentTok;
 struct IdentTok_ {
-    const char*	 	Ident;	     	/* Identifier */
-    unsigned	 	Tok;	     	/* Token for identifier */
+    const char*	Ident;	     	/* Identifier */
+    cfgtok_t	Tok;	     	/* Token for identifier */
 };
 #define ENTRY_COUNT(s) 	(sizeof (s) / sizeof (s [0]))
 
@@ -113,7 +123,7 @@ struct IdentTok_ {
 
 /* Current token and attributes */
 #define CFG_MAX_IDENT_LEN  255
-extern unsigned		CfgTok;
+extern cfgtok_t		CfgTok;
 extern char    	       	CfgSVal [CFG_MAX_IDENT_LEN+1];
 extern unsigned long	CfgIVal;
 
@@ -138,7 +148,7 @@ void CfgError (const char* Format, ...) attribute((format(printf,1,2)));
 void CfgNextTok (void);
 /* Read the next token from the input stream */
 
-void CfgConsume (unsigned T, const char* Msg);
+void CfgConsume (cfgtok_t T, const char* Msg);
 /* Skip a token, print an error message if not found */
 
 void CfgConsumeSemi (void);
@@ -196,4 +206,4 @@ void CfgCloseInput (void);
 
 
 
-				       
+

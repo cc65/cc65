@@ -58,28 +58,26 @@
 
 /* Export size */
 #define EXP_ABS	       	0x00		/* Export as normal value */
-#define EXP_ZP 	      	0x20		/* Export as zero page value */
-#define EXP_MASK_SIZE 	0x20		/* Size mask */
+#define EXP_ZP 	       	0x08   	       	/* Export as zero page value */
+#define EXP_MASK_SIZE 	0x08		/* Size mask */
 
 #define IS_EXP_ABS(x)  	(((x) & EXP_MASK_SIZE) == EXP_ABS)
 #define IS_EXP_ZP(x)  	(((x) & EXP_MASK_SIZE) == EXP_ZP)
 
 /* Export value type */
 #define EXP_CONST     	0x00		/* Mask bit for const values */
-#define EXP_EXPR      	0x40   	 	/* Mask bit for expr values */
-#define EXP_MASK_VAL  	0x40		/* Value mask */
+#define EXP_EXPR      	0x10   	 	/* Mask bit for expr values */
+#define EXP_MASK_VAL  	0x10		/* Value mask */
 
 #define IS_EXP_CONST(x)	(((x) & EXP_MASK_VAL) == EXP_CONST)
 #define IS_EXP_EXPR(x) 	(((x) & EXP_MASK_VAL) == EXP_EXPR)
 
-/* Export initializer flag */
-#define EXP_INIT_MIN	0x01		/* Minimum value */
-#define EXP_INIT_MAX	0x1F		/* Maximum value */
-#define EXP_INIT_DEF	0x18		/* Default value */
-#define EXP_MASK_INIT 	0x1F		/* Initializer value mask */
+/* Number of module constructor/destructor declarations for an export */
+#define EXP_CONDES_MASK	0x07
 
-#define IS_EXP_INIT(x)		(((x) & EXP_MASK_INIT) != 0)
-#define GET_EXP_INIT_VAL(x)	((x) & EXP_MASK_INIT)
+#define IS_EXP_CONDES(x)	(((x) & EXP_CONDES_MASK) != 0)
+#define GET_EXP_CONDES_COUNT(x)	((x) & EXP_CONDES_MASK)
+#define INC_EXP_CONDES_COUNT(x) ((x)++)
 
 
 

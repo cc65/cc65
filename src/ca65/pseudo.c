@@ -41,6 +41,7 @@
 
 /* common */
 #include "bitops.h"
+#include "cddefs.h"
 #include "check.h"
 #include "symdefs.h"
 #include "tgttrans.h"
@@ -169,6 +170,32 @@ static long IntArg (long Min, long Max)
 	}
 	return Val;
     }
+}
+
+
+
+static void ConDes (const char* Name, unsigned Type)
+/* Parse remaining line for constructor/destructor of the remaining type */
+{
+    long Prio;
+
+    /* Optional constructor priority */
+    if (Tok == TOK_COMMA) {
+    	/* Priority value follows */
+    	NextTok ();
+    	Prio = ConstExpression ();
+    	if (Prio < CD_PRIO_MIN || Prio > CD_PRIO_MAX) {
+    	    /* Value out of range */
+    	    Error (ERR_RANGE);
+    	    return;
+    	}
+    } else {
+    	/* Use the default priority value */
+    	Prio = CD_PRIO_DEF;
+    }
+
+    /* Define the symbol */
+    SymConDes (Name, Type, (unsigned) Prio);
 }
 
 
@@ -320,7 +347,7 @@ static void DoByte (void)
 	    NextTok ();
 	    /* Do smart handling of dangling comma */
 	    if (Tok == TOK_SEP) {
-		Error (ERR_UNEXPECTED_EOL);
+	     	Error (ERR_UNEXPECTED_EOL);
 	 	break;
 	    }
 	}
@@ -342,6 +369,76 @@ static void DoCode (void)
 /* Switch to the code segment */
 {
     UseCodeSeg ();
+}
+
+
+
+static void DoConDes (void)
+/* Export a symbol as constructor/destructor */
+{
+    static const char* Keys[] = {
+       	"CONSTRUCTOR",
+	"DESTRUCTOR",
+    };
+    char Name [sizeof (SVal)];
+    long Type;
+
+    /* Symbol name follows */
+    if (Tok != TOK_IDENT) {
+    	ErrorSkip (ERR_IDENT_EXPECTED);
+    	return;
+    }
+    strcpy (Name, SVal);
+    NextTok ();
+
+    /* Type follows. May be encoded as identifier or numerical */
+    ConsumeComma ();
+    if (Tok == TOK_IDENT) {
+
+	/* Map the following keyword to a number, then skip it */
+	Type = GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]));
+	NextTok ();
+
+	/* Check if we got a valid keyword */
+	if (Type < 0) {
+	    Error (ERR_SYNTAX);
+	    SkipUntilSep ();
+	    return;
+	}
+
+    } else {
+
+	/* Read the type as numerical value */
+       	Type = ConstExpression ();
+    	if (Type < CD_TYPE_MIN || Type > CD_TYPE_MAX) {
+    	    /* Value out of range */
+    	    Error (ERR_RANGE);
+    	    return;
+    	}
+
+    }
+
+    /* Parse the remainder of the line and export the symbol */
+    ConDes (Name, (unsigned) Type);
+}
+
+
+
+static void DoConstructor (void)
+/* Export a symbol as constructor */
+{
+    char Name [sizeof (SVal)];
+
+    /* Symbol name follows */
+    if (Tok != TOK_IDENT) {
+    	ErrorSkip (ERR_IDENT_EXPECTED);
+    	return;
+    }
+    strcpy (Name, SVal);
+    NextTok ();
+
+    /* Parse the remainder of the line and export the symbol */
+    ConDes (Name, CD_TYPE_CON);
 }
 
 
@@ -418,6 +515,25 @@ static void DoDefine (void)
 /* Define a one line macro */
 {
     MacDef (MAC_STYLE_DEFINE);
+}
+
+
+
+static void DoDestructor (void)
+/* Export a symbol as destructor */
+{
+    char Name [sizeof (SVal)];
+
+    /* Symbol name follows */
+    if (Tok != TOK_IDENT) {
+    	ErrorSkip (ERR_IDENT_EXPECTED);
+    	return;
+    }
+    strcpy (Name, SVal);
+    NextTok ();
+
+    /* Parse the remainder of the line and export the symbol */
+    ConDes (Name, CD_TYPE_DES);
 }
 
 
@@ -732,41 +848,6 @@ static void DoInclude (void)
     	NextTok ();
     	NewInputFile (Name);
     }
-}
-
-
-
-static void DoInitializer (void)
-/* Export a symbol as initializer */
-{
-    char Name [sizeof (SVal)];
-    long Val;
-
-    /* Symbol name follows */
-    if (Tok != TOK_IDENT) {
-    	ErrorSkip (ERR_IDENT_EXPECTED);
-    	return;
-    }
-    strcpy (Name, SVal);
-    NextTok ();
-
-    /* Optional initializer value */
-    if (Tok == TOK_COMMA) {
-    	/* Initializer value follows */
-    	NextTok ();
-    	Val = ConstExpression ();
-    	if (Val < EXP_INIT_MIN || Val > EXP_INIT_MAX) {
-    	    /* Value out of range */
-    	    Error (ERR_RANGE);
-    	    return;
-    	}
-    } else {
-    	/* Use the default initializer value */
-    	Val = EXP_INIT_DEF;
-    }
-
-    /* Define the symbol */
-    SymInitializer (Name, (unsigned) Val);
 }
 
 
@@ -1171,7 +1252,9 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,       	DoCase		},
     { ccNone,		DoCode		},
     { ccNone,		DoUnexpected,	},	/* .CONCAT */
+    { ccNone,		DoConDes	},
     { ccNone,		DoUnexpected	},	/* .CONST */
+    { ccNone,		DoConstructor	},
     { ccNone,		DoUnexpected	},	/* .CPU */
     { ccNone,		DoData		},
     { ccNone,		DoDbg,		},
@@ -1179,6 +1262,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,        	DoDebugInfo	},
     { ccNone,		DoDefine	},
     { ccNone,		DoUnexpected	},	/* .DEFINED */
+    { ccNone,		DoDestructor	},
     { ccNone,		DoDWord		},
     { ccKeepToken,	DoConditionals	},	/* .ELSE */
     { ccKeepToken,	DoConditionals	},	/* .ELSEIF */
@@ -1215,7 +1299,6 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoImportZP	},
     { ccNone,		DoIncBin	},
     { ccNone,      	DoInclude	},
-    { ccNone,		DoInitializer	},
     { ccNone,		DoInvalid	},	/* .LEFT */
     { ccNone,		DoLineCont	},
     { ccNone,		DoList		},

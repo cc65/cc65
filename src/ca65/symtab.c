@@ -36,6 +36,7 @@
 #include <string.h>
 
 /* common */
+#include "cddefs.h"
 #include "check.h"
 #include "hashstr.h"
 #include "symdefs.h"
@@ -63,9 +64,8 @@
 #define SF_EXPORT      	0x0004		/* Export this symbol */
 #define SF_IMPORT   	0x0008		/* Import this symbol */
 #define SF_GLOBAL	0x0010		/* Global symbol */
-#define SF_INITIALIZER	0x0020		/* Exported initializer */
-#define SF_ZP  	       	0x0040		/* Declared as zeropage symbol */
-#define SF_ABS		0x0080 		/* Declared as absolute symbol */
+#define SF_ZP  	       	0x0020		/* Declared as zeropage symbol */
+#define SF_ABS		0x0040 		/* Declared as absolute symbol */
 #define SF_INDEXED	0x0800		/* Index is valid */
 #define SF_CONST    	0x1000		/* The symbol has a constant value */
 #define SF_MULTDEF     	0x2000		/* Multiply defined symbol */
@@ -97,15 +97,16 @@ struct SymEntry {
 	long	    	    Val;  	/* Value (if CONST set) */
 	SymEntry*  	    Sym;	/* Symbol (if trampoline entry) */
     } V;
-    unsigned char  	    InitVal;	/* Initializer value */
+    unsigned char      	    ConDesPrio[CD_TYPE_COUNT];	/* ConDes priorities... */
+					/* ...actually value+1 (used as flag) */
     char       	       	    Name [1];	/* Dynamic allocation */
 };
 
 
 
 /* Definitions for the hash table */
-#define MAIN_HASHTAB_SIZE   	213
-#define SUB_HASHTAB_SIZE    	53
+#define MAIN_HASHTAB_SIZE    	213
+#define SUB_HASHTAB_SIZE     	53
 typedef struct SymTable SymTable;
 struct SymTable {
     unsigned   	     	TableSlots;	/* Number of hash table slots */
@@ -140,7 +141,7 @@ static unsigned     	ExportCount = 0;/* Counter for export symbols */
 
 static int IsLocal (const char* Name)
 /* Return true if Name is the name of a local symbol */
-{	       
+{
     return (*Name == LocalStart);
 }
 
@@ -166,7 +167,7 @@ static SymEntry* NewSymEntry (const char* Name)
     S->Pos	= CurPos;
     S->Flags	= 0;
     S->V.Expr	= 0;
-    S->InitVal	= 0;
+    memset (S->ConDesPrio, 0, sizeof (S->ConDesPrio));
     memcpy (S->Name, Name, Len+1);
 
     /* Insert it into the list of all entries */
@@ -579,15 +580,16 @@ void SymGlobal (const char* Name, int ZP)
 
 
 
-void SymInitializer (const char* Name, unsigned InitVal)
-/* Mark the given symbol as an initializer. This will also mark the symbol as
- * an export. Initializers may never be zero page symbols.
+void SymConDes (const char* Name, unsigned Type, unsigned Prio)
+/* Mark the given symbol as a module constructor/destructor. This will also
+ * mark the symbol as an export. Initializers may never be zero page symbols.
  */
 {
     SymEntry* S;
 
-    /* Check the InitVal parameter */
-    CHECK (InitVal >= EXP_INIT_MIN && InitVal <= EXP_INIT_MAX);
+    /* Check the parameters */
+    CHECK (Type >= CD_TYPE_MIN && Type <= CD_TYPE_MAX);
+    CHECK (Prio >= CD_PRIO_MIN && Prio <= CD_PRIO_MAX);
 
     /* Don't accept local symbols */
     if (IsLocal (Name)) {
@@ -613,18 +615,18 @@ void SymInitializer (const char* Name, unsigned InitVal)
 	Error (ERR_SYM_REDECL_MISMATCH);
     }
 
-    /* If the symbol was already declared as an initializer, check if the new
-     * initializer value is the same as the old one.
+    /* If the symbol was already declared as a condes, check if the new
+     * priority value is the same as the old one.
      */
-    if (S->Flags & SF_INITIALIZER) {
-	if (S->InitVal != InitVal) {
+    if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
+	if (S->ConDesPrio[Type] != Prio) {
 	    Error (ERR_SYM_REDECL_MISMATCH);
 	}
     }
-    S->InitVal = InitVal;
+    S->ConDesPrio[Type] = Prio;
 
     /* Set the symbol data */
-    S->Flags |= SF_EXPORT | SF_INITIALIZER | SF_REFERENCED;
+    S->Flags |= SF_EXPORT | SF_REFERENCED;
 }
 
 
@@ -1064,6 +1066,7 @@ void WriteExports (void)
 /* Write the exports list to the object file */
 {
     SymEntry* S;
+    unsigned Type;
 
     /* Tell the object file module that we're about to start the exports */
     ObjStartExports ();
@@ -1086,13 +1089,25 @@ void WriteExports (void)
 	    /* Add zeropage/abs bits */
 	    ExprMask |= (S->Flags & SF_ZP)? EXP_ZP : EXP_ABS;
 
-	    /* Add the initializer bits */
-	    if (S->Flags & SF_INITIALIZER) {
-	     	ExprMask |= S->InitVal;
+	    /* Count the number of ConDes types */
+	    for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
+	    	if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
+	    	    INC_EXP_CONDES_COUNT (ExprMask);
+	    	}
 	    }
 
 	    /* Write the type */
 	    ObjWrite8 (ExprMask);
+
+	    /* Write any ConDes declarations */
+	    if (GET_EXP_CONDES_COUNT (ExprMask) > 0) {
+		for (Type = 0; Type < CD_TYPE_COUNT; ++Type) {
+		    unsigned char Prio = S->ConDesPrio[Type];
+		    if (Prio != CD_PRIO_NONE) {
+			ObjWrite8 (CD_BUILD (Type, Prio));
+		    }
+		}
+	    }
 
 	    /* Write the name */
        	    ObjWriteStr (S->Name);
@@ -1157,11 +1172,6 @@ void WriteDbgSyms (void)
 
 		/* Add zeropage/abs bits */
 		ExprMask |= (S->Flags & SF_ZP)? EXP_ZP : EXP_ABS;
-
-		/* Add the initializer bits */
-		if (S->Flags & SF_INITIALIZER) {
-		    ExprMask |= S->InitVal;
-		}
 
 		/* Write the type */
 		ObjWrite8 (ExprMask);

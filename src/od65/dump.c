@@ -37,6 +37,7 @@
 #include <time.h>
 
 /* common */
+#include "cddefs.h"
 #include "exprdefs.h"
 #include "filepos.h"
 #include "objdefs.h"
@@ -196,24 +197,42 @@ static unsigned SkipFragment (FILE* F)
 
 
 
-static const char* GetExportFlags (unsigned Flags)
+static const char* GetExportFlags (unsigned Flags, const unsigned char* ConDes)
 /* Get the export flags as a (static) string */
 {
     /* Static buffer */
-    static char TypeDesc[128];
+    static char TypeDesc[256];
+    static char* T;
 
-    /* Get the flags */
+    unsigned Count;
+    unsigned I;
+
+    /* Adressing mode */
     TypeDesc[0] = '\0';
     switch (Flags & EXP_MASK_SIZE) {
- 	case EXP_ABS:   strcat (TypeDesc, "EXP_ABS");		break;
- 	case EXP_ZP:	strcat (TypeDesc, "EXP_ZP");		break;
+       	case EXP_ABS:   strcat (TypeDesc, "EXP_ABS");		break;
+       	case EXP_ZP:  	strcat (TypeDesc, "EXP_ZP");		break;
     }
+
+    /* Type of expression */
     switch (Flags & EXP_MASK_VAL) {
- 	case EXP_CONST:	strcat (TypeDesc, ",EXP_CONST");	break;
- 	case EXP_EXPR:	strcat (TypeDesc, ",EXP_EXPR");		break;
+       	case EXP_CONST:	strcat (TypeDesc, ",EXP_CONST");	break;
+       	case EXP_EXPR:	strcat (TypeDesc, ",EXP_EXPR");		break;
     }
-    if (IS_EXP_INIT (Flags)) {
-	sprintf (TypeDesc+strlen(TypeDesc), ",EXP_INIT=%u", GET_EXP_INIT_VAL(Flags));
+
+    /* Constructor/destructor declarations */
+    T = TypeDesc + strlen (TypeDesc);
+    Count = GET_EXP_CONDES_COUNT (Flags);
+    if (Count > 0) {
+	T += sprintf (T, ",EXP_CONDES=");
+	for (I = 0; I < Count; ++I) {
+	    unsigned Type = CD_GET_TYPE (ConDes[I]);
+	    unsigned Prio = CD_GET_PRIO (ConDes[I]);
+	    if (I > 0) {
+		*T++ = ',';
+	    }
+       	    T += sprintf (T, "[%u,%u]", Type, Prio);
+	}
     }
 
     /* Return the result */
@@ -537,10 +556,10 @@ void DumpObjImports (FILE* F, unsigned long Offset)
 void DumpObjExports (FILE* F, unsigned long Offset)
 /* Dump the exports in the object file */
 {
-    ObjHeader H;
-    unsigned  Count;
-    unsigned  I;
-    FilePos   Pos;
+    ObjHeader 	  H;
+    unsigned  	  Count;
+    unsigned  	  I;
+    FilePos   	  Pos;
 
     /* Seek to the header position */
     FileSeek (F, Offset);
@@ -563,12 +582,18 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 
 	unsigned long 	Value = 0;
 	int 		HaveValue;
+	unsigned char	Type;
+	unsigned char	ConDes [CD_TYPE_COUNT];
+	char* 		Name;
+	unsigned	Len;
+
 
        	/* Read the data for one export */
-       	unsigned char Type  = Read8 (F);
-	char* 	      Name  = ReadStr (F);
-	unsigned      Len   = strlen (Name);
-	if (Type & EXP_EXPR) {
+       	Type  = Read8 (F);
+	ReadData (F, ConDes, GET_EXP_CONDES_COUNT (Type));
+	Name  = ReadStr (F);
+	Len   = strlen (Name);
+       	if (IS_EXP_EXPR (Type)) {
 	    SkipExpr (F);
 	    HaveValue = 0;
 	} else {
@@ -581,7 +606,7 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 	printf ("    Index:%27u\n", I);
 
 	/* Print the data */
-       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type));
+       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type, ConDes));
 	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
 	if (HaveValue) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
@@ -630,12 +655,17 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 
 	unsigned long 	Value = 0;
 	int 	   	HaveValue;
+	unsigned char	Type;
+	unsigned char	ConDes [CD_TYPE_COUNT];
+	char* 		Name;
+	unsigned	Len;
 
        	/* Read the data for one symbol */
-       	unsigned char Type  = Read8 (F);
-	char* 	      Name  = ReadStr (F);
-	unsigned      Len   = strlen (Name);
-	if (Type & EXP_EXPR) {
+       	Type  = Read8 (F);
+	ReadData (F, ConDes, GET_EXP_CONDES_COUNT (Type));
+	Name  = ReadStr (F);
+	Len   = strlen (Name);
+	if (IS_EXP_EXPR (Type)) {
 	    SkipExpr (F);
 	    HaveValue = 0;
 	} else {
@@ -648,7 +678,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	printf ("    Index:%27u\n", I);
 
 	/* Print the data */
-       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type));
+       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type, ConDes));
 	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
 	if (HaveValue) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);

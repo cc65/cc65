@@ -33,6 +33,8 @@
 
 
 
+#include <string.h>
+
 /* common */
 #include "optdefs.h"
 #include "xmalloc.h"

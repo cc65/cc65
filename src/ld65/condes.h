@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  initfunc.h				     */
+/*				   condes.h				     */
 /*                                                                           */
-/*			Init/cleanup function handling			     */
+/*		     Module constructor/destructor support		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,13 +33,13 @@
 
 
 
-#ifndef INITFUNC_H
-#define INITFUNC_H
+#ifndef CONDES_H
+#define CONDES_H
 
 
 
 /*****************************************************************************/
-/*				   Forwards				     */
+/*	      	  		   Forwards				     */
 /*****************************************************************************/
 
 
@@ -54,15 +54,36 @@ struct Export;
 
 
 
-void AddInitFunc (struct Export* E);
-/* Add the given export to the list of initializers */
+void ConDesAddExport (struct Export* E);
+/* Add the given export to the list of constructors/destructor */
 
-void AddCleanupFunc (struct Export* E);
-/* Add the given export to the list of cleanup functions */
+void ConDesSetSegName (unsigned Type, const char* SegName);
+/* Set the segment name where the table should go */
+
+void ConDesSetLabel (unsigned Type, const char* Name);
+/* Set the label for the given ConDes type */
+
+const char* ConDesGetSegName (unsigned Type);
+/* Return the segment name for the given ConDes type */
+
+const char* ConDesGetLabel (unsigned Type);
+/* Return the label for the given ConDes type */
+
+int ConDesHasSegName (unsigned Type);
+/* Return true if a segment name is already defined for this ConDes type */
+
+int ConDesHasLabel (unsigned Type);
+/* Return true if a label is already defined for this ConDes type */
+
+void ConDesCreate (void);
+/* Create the condes tables if requested */
+
+void ConDesDump (void);
+/* Dump ConDes data to stdout for debugging */
 
 
 
-/* End of initfunc.h */
+/* End of condes.h */
 
 #endif
 

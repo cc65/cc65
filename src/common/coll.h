@@ -113,10 +113,13 @@ void CollReplace (Collection* C, void* Item, unsigned Index);
  * just the pointer will et replaced.
  */
 
-void CollSort (Collection* C, int (*Compare) (const void*, const void*));
-/* Sort the collection using the given compare function.
- * BEWARE: The function uses qsort internally, so the Compare function does
- * actually get pointers to the object pointers, not just object pointers!
+void CollSort (Collection* C,
+	       int (*Compare) (void*, const void*, const void*),
+	       void* Data);
+/* Sort the collection using the given compare function. The data pointer is
+ * passed as *first* element to the compare function, it's not used by the
+ * sort function itself. The other two pointer passed to the Compare function
+ * are pointers to objects.
  */
 
 

@@ -70,7 +70,7 @@ struct CodeSeg {
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code				     */
+/*     	       	      	  	     Code      				     */
 /*****************************************************************************/
 
 
@@ -87,6 +87,12 @@ void AddCodeSegLine (CodeSeg* S, const char* Format, ...) attribute ((format(pri
 void AddCodeSegLabel (CodeSeg* S, const char* Name);
 /* Add a label for the next instruction to follow */
 
+void AddCodeSegHint (CodeSeg* S, unsigned Hint);
+/* Add a hint for the preceeding instruction */
+
+void DelCodeSegAfter (CodeSeg* S, unsigned Last);
+/* Delete all entries after the given one */
+
 void OutputCodeSeg (FILE* F, const CodeSeg* S);
 /* Output the code segment data to a file */
 
@@ -97,6 +103,9 @@ void MergeCodeLabels (CodeSeg* S);
 /* Merge code labels. That means: For each instruction, remove all labels but
  * one and adjust the code entries accordingly.
  */
+
+unsigned GetCodeSegEntries (const CodeSeg* S);
+/* Return the number of entries for the given code segment */
 
 
 

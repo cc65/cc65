@@ -378,13 +378,16 @@ int NextLine (void)
 	    --Len;
 	}
       	line [Len] = '\0';
-
-	/* Output the source line in the generated assembler file
-	 * if requested.
-	 */
-	if (AddSource && line[Start] != '\0') {
-	    AddCodeLine ("; %s", line+Start);
-	}
+	    
+#if 0 
+	/* ######### */
+      	/* Output the source line in the generated assembler file
+      	 * if requested.
+      	 */
+      	if (AddSource && line[Start] != '\0') {
+      	    AddCodeLine ("; %s", line+Start);
+      	}
+#endif
 
 	/* Check if we have a line continuation character at the end. If not,
 	 * we're done.

@@ -36,46 +36,27 @@
 /* common */
 #include "check.h"
 
+/* b6502 */
+#include "codeseg.h"
+#include "dataseg.h"
+
 /* cc65 */
-#include "asmline.h"
+#include "codegen.h"
 #include "global.h"
 #include "asmcode.h"
 
 
 
 /*****************************************************************************/
-/*	       		   	     Code   				     */
+/*	       		    	     Code   				     */
 /*****************************************************************************/
-
-
-
-void AddCodeLine (const char* Format, ...)
-/* Add a new line of code to the output */
-{
-    va_list ap;
-    va_start (ap, Format);
-    NewCodeLine (Format, ap);
-    va_end (ap);
-}
 
 
 
 void AddCodeHint (const char* Hint)
 /* Add an optimizer hint */
 {
-    AddCodeLine ("+%s", Hint);
-}
-
-
-
-void AddEmptyLine (void)
-/* Add an empty line for formatting purposes */
-{
-    /* Use a somewhat weird construct to avoid that gcc complains about
-     * an empty format string.
-     */
-    static const char EmptyLine[] = "";
-    AddCodeLine (EmptyLine);
+    /* ### AddCodeLine ("+%s", Hint); */
 }
 
 
@@ -83,10 +64,12 @@ void AddEmptyLine (void)
 CodeMark GetCodePos (void)
 /* Get a marker pointing to the current output position */
 {
-    /* This function should never be called without any code output */
-    CHECK (LastLine != 0);
+    unsigned EntryCount = GetCodeSegEntries (CS);
 
-    return LastLine;
+    /* This function should never be called without any code output */
+    CHECK (EntryCount > 0);
+
+    return EntryCount;
 }
 
 
@@ -94,9 +77,7 @@ CodeMark GetCodePos (void)
 void RemoveCode (CodeMark M)
 /* Remove all code after the given code marker */
 {
-    while (LastLine != M) {
-	FreeCodeLine (LastLine);
-    }
+    DelCodeSegAfter (CS, M);
 }
 
 
@@ -104,18 +85,9 @@ void RemoveCode (CodeMark M)
 void WriteOutput (FILE* F)
 /* Write the final output to a file */
 {
-    Line* L = FirstLine;
-    while (L) {
-     	/* Don't write optimizer hints if not requested to do so */
-     	if (L->Line[0] == '+') {
-     	    if (Debug) {
-     	        fprintf (F, ";%s\n", L->Line);
-     	    }
-     	} else {
-     	    fprintf (F, "%s\n", L->Line);
-     	}
-     	L = L->Next;
-    }
+    OutputDataSeg (F, DS);
+    MergeCodeLabels (CS);
+    OutputCodeSeg (F, CS);
 }
 
 

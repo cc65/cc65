@@ -820,8 +820,6 @@ void EmitExternals (void)
 {
     SymEntry* Entry;
 
-    AddEmptyLine ();
-
     Entry = SymTab->SymHead;
     while (Entry) {
 	unsigned Flags = Entry->Flags;

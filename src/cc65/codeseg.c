@@ -46,6 +46,7 @@
 
 /* b6502 */
 #include "codeent.h"
+#include "codeinfo.h"
 #include "error.h"
 #include "codeseg.h"
 
@@ -54,6 +55,22 @@
 /*****************************************************************************/
 /*     	       	      	       	     Code				     */
 /*****************************************************************************/
+
+
+
+static CodeLabel* NewCodeSegLabel (CodeSeg* S, const char* Name, unsigned Hash)
+/* Create a new label and insert it into the label hash table */
+{
+    /* Not found - create a new one */
+    CodeLabel* L = NewCodeLabel (Name, Hash);
+
+    /* Enter the label into the hash table */
+    L->Next = S->LabelHash[L->Hash];
+    S->LabelHash[L->Hash] = L;
+
+    /* Return the new label */
+    return L;
+}
 
 
 
@@ -98,7 +115,7 @@ static const char* ReadToken (const char* L, const char* Term,
 
 
 
-static CodeEntry* ParseInsn (const char* L)
+static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 /* Parse an instruction nnd generate a code entry from it. If the line contains
  * errors, output an error message and return NULL.
  * For simplicity, we don't accept the broad range of input a "real" assembler
@@ -112,6 +129,7 @@ static CodeEntry* ParseInsn (const char* L)
     char     		Expr[64];
     char     	   	Reg;
     CodeEntry*		E;
+    CodeLabel*		Label;
 
     /* Mnemonic */
     L = ReadToken (L, " \t", Mnemo, sizeof (Mnemo));
@@ -131,6 +149,11 @@ static CodeEntry* ParseInsn (const char* L)
     /* Get the addressing mode */
     Expr[0] = '\0';
     switch (*L) {
+
+	case '\0':
+	    /* Implicit */
+	    AM = AM_IMP;
+	    break;
 
 	case '#':
 	    /* Immidiate */
@@ -195,7 +218,7 @@ static CodeEntry* ParseInsn (const char* L)
        	case 'A':
 	    /* Accumulator? */
 	    if (L[1] == '\0') {
-	     	AM = AM_IMP;
+	     	AM = AM_ACC;
 	     	break;
 	    }
 	    /* FALLTHROUGH */
@@ -216,27 +239,46 @@ static CodeEntry* ParseInsn (const char* L)
 	      	    Reg = toupper (*L);
 		    L = SkipSpace (L+1);
 		    if (Reg == 'X') {
-		   	AM = AM_ABSX;
+		     	AM = AM_ABSX;
 		    } else if (Reg == 'Y') {
-		   	AM = AM_ABSY;
+		     	AM = AM_ABSY;
 		    } else {
 		     	Error ("ASM code error: syntax error");
-		   	return 0;
+		     	return 0;
 		    }
 		    if (*L != '\0') {
-		   	Error ("ASM code error: syntax error");
-		   	return 0;
-		    }
-		}
+	    	     	Error ("ASM code error: syntax error");
+	    	     	return 0;
+	    	    }
+	    	}
 	    }
 	    break;
 
     }
 
+    /* If the instruction is a branch, check for the label and generate it
+     * if it does not exist.
+     */
+    Label = 0;
+    if ((OPC->Info & CI_MASK_BRA) == CI_BRA) {
+
+	unsigned Hash;
+
+	/* ### Check for local labels here */
+	CHECK (AM == AM_ABS);
+	AM = AM_BRA;
+	Hash = HashStr (Expr) % CS_LABEL_HASH_SIZE;
+	Label = FindCodeLabel (S, Expr, Hash);
+	if (Label == 0) {
+	    /* Generate a new label */
+	    Label = NewCodeSegLabel (S, Expr, Hash);
+	}
+    }
+
     /* We do now have the addressing mode in AM. Allocate a new CodeEntry
      * structure and initialize it.
      */
-    E = NewCodeEntry (OPC, AM);
+    E = NewCodeEntry (OPC, AM, Label);
     if (Expr[0] != '\0') {
 	/* We have an additional expression */
 	E->Arg.Expr = xstrdup (Expr);
@@ -309,6 +351,7 @@ void AddCodeSegLine (CodeSeg* S, const char* Format, ...)
 {
     const char* L;
     CodeEntry*  E;
+    char	Token[64];
 
     /* Format the line */
     va_list ap;
@@ -334,11 +377,12 @@ void AddCodeSegLine (CodeSeg* S, const char* Format, ...)
 
 	case '.':
 	    /* Control instruction */
-     	    Error ("ASM code error: Pseudo instructions not supported");
+	    ReadToken (L, " \t", Token, sizeof (Token));
+     	    Error ("ASM code error: Pseudo instruction `%s' not supported", Token);
 	    break;
 
 	default:
-	    E = ParseInsn (L);
+	    E = ParseInsn (S, L);
 	    break;
     }
 
@@ -376,15 +420,53 @@ void AddCodeSegLabel (CodeSeg* S, const char* Name)
     	CHECK (L->Owner == 0);
     } else {
     	/* Not found - create a new one */
-    	L = NewCodeLabel (Name, Hash);
-
-    	/* Enter the label into the hash table */
-    	L->Next = S->LabelHash[L->Hash];
-    	S->LabelHash[L->Hash] = L;
+    	L = NewCodeSegLabel (S, Name, Hash);
     }
 
     /* We do now have a valid label. Remember it for later */
     CollAppend (&S->Labels, L);
+}
+
+
+
+void AddCodeSegHint (CodeSeg* S, unsigned Hint)
+/* Add a hint for the preceeding instruction */
+{
+    CodeEntry* E;
+
+    /* Get the number of entries in this segment */
+    unsigned EntryCount = CollCount (&S->Entries);
+
+    /* Must have at least one entry */
+    CHECK (EntryCount > 0);
+
+    /* Get the last entry */
+    E = CollAt (&S->Entries, EntryCount-1);
+
+    /* Add the hint */
+    E->Hints |= Hint;
+}
+
+
+
+void DelCodeSegAfter (CodeSeg* S, unsigned Last)
+/* Delete all entries after the given one */
+{
+    unsigned I;
+
+    /* Get the number of entries in this segment */
+    unsigned Count = CollCount (&S->Entries);
+
+    /* ### We need some more cleanup here wrt labels */
+
+    /* Remove all entries after the given one */
+    for (I = Count-1; I > Last; --I) {
+	FreeCodeEntry (CollAt (&S->Entries, I));
+	CollDelete (&S->Entries, I);
+    }
+
+    /* Delete all waiting labels */
+    CollDeleteAll (&S->Labels);
 }
 
 
@@ -396,6 +478,9 @@ void OutputCodeSeg (FILE* F, const CodeSeg* S)
 
     /* Get the number of entries in this segment */
     unsigned Count = CollCount (&S->Entries);
+
+    /* Output the segment directive */
+    fprintf (F, ".segment\t\"%s\"\n", S->Name);
 
     /* Output all entries */
     for (I = 0; I < Count; ++I) {
@@ -441,13 +526,17 @@ void MergeCodeLabels (CodeSeg* S)
 	/* Get a pointer to the next entry */
 	CodeEntry* E = CollAt (&S->Entries, I);
 
-	/* If this entry has one or zero labels, continue with the next one */
+	/* If this entry has zero labels, continue with the next one */
 	unsigned LabelCount = CollCount (&E->Labels);
-	if (LabelCount <= 1) {
+	if (LabelCount == 0) {
 	    continue;
 	}
 
-	/* We have more than one label. Use the first one as reference label */
+	/* We have at least one label. Use the first one as reference label.
+	 * We don't have a notification for global labels for now, and using
+	 * the first one will also keep the global function labels, since these
+	 * are inserted at position 0.
+	 */
 	RefLab = CollAt (&E->Labels, 0);
 
 	/* Walk through the remaining labels and change references to these
@@ -466,13 +555,13 @@ void MergeCodeLabels (CodeSeg* S)
 	    unsigned RefCount = CollCount (&L->JumpFrom);
 	    for (K = 0; K < RefCount; ++K) {
 
-		/* Get the next instrcuction that references this label */
+	 	/* Get the next instrcuction that references this label */
 	 	CodeEntry* E = CollAt (&L->JumpFrom, K);
 
-		/* Change the reference */
-		CHECK (E->JumpTo == L);
-		E->JumpTo = RefLab;
-		CollAppend (&RefLab->JumpFrom, E);
+	 	/* Change the reference */
+	 	CHECK (E->JumpTo == L);
+	 	E->JumpTo = RefLab;
+	 	CollAppend (&RefLab->JumpFrom, E);
 
 	    }
 
@@ -483,8 +572,28 @@ void MergeCodeLabels (CodeSeg* S)
 	    CollDelete (&E->Labels, J);
 
      	}
+
+	/* The reference label is the only remaining label. Check if there
+	 * are any references to this label, and delete it if this is not
+	 * the case.
+	 */
+	if (CollCount (&RefLab->JumpFrom) == 0) {
+	    /* Delete the label */
+	    FreeCodeLabel (RefLab);
+	    /* Remove it from the list */
+	    CollDelete (&E->Labels, 0);
+	}
     }
 }
+
+
+
+unsigned GetCodeSegEntries (const CodeSeg* S)
+/* Return the number of entries for the given code segment */
+{
+    return CollCount (&S->Entries);
+}
+
 
 
 

@@ -55,13 +55,16 @@
 #define CI_USE_A	0x0001U		/* Use the A register */
 #define CI_USE_X	0x0002U		/* Use the X register */
 #define CI_USE_Y	0x0004U		/* Use the Y register */
-#define CI_MASK_USE	0x00FFU		/* Extract usage info */
+#define CI_MASK_USE    	0x000FU		/* Extract usage info */
 
 #define CI_CHG_NONE	0x0000U		/* Change nothing */
-#define CI_CHG_A	0x0100U		/* Change the A register */
-#define CI_CHG_X	0x0200U		/* Change the X register */
-#define CI_CHG_Y	0x0400U		/* Change the Y register */
-#define CI_MASK_CHG	0xFF00U		/* Extract change info */
+#define CI_CHG_A	0x0010U		/* Change the A register */
+#define CI_CHG_X	0x0020U		/* Change the X register */
+#define CI_CHG_Y	0x0040U		/* Change the Y register */
+#define CI_MASK_CHG	0x00F0U		/* Extract change info */
+			     
+#define CI_BRA		0x0100U		/* Instruction is a branch */
+#define CI_MASK_BRA	0x0100U		/* Extract branch info */	
 
 #define CI_NONE		0x0000U		/* Nothing used/changed */
 

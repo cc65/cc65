@@ -57,17 +57,17 @@ static const OPCDesc OPCTable[OPC_COUNT] = {
     { "adc", OPC_ADC, CI_USE_A | CI_CHG_A 	},
     { "and", OPC_AND, CI_USE_A | CI_CHG_A   	},
     { "asl", OPC_ASL, CI_USE_A | CI_CHG_A 	},
-    { "bcc", OPC_BCC, CI_CHG_NONE	  	},
-    { "bcs", OPC_BCS, CI_CHG_NONE	  	},
-    { "beq", OPC_BEQ, CI_CHG_NONE	  	},
+    { "bcc", OPC_BCC, CI_BRA		  	},
+    { "bcs", OPC_BCS, CI_BRA		  	},
+    { "beq", OPC_BEQ, CI_BRA		  	},
     { "bit", OPC_BIT, CI_USE_A 			},
-    { "bmi", OPC_BMI, CI_CHG_NONE	   	},
-    { "bne", OPC_BNE, CI_CHG_NONE	  	},
-    { "bpl", OPC_BPL, CI_CHG_NONE	  	},
-    { "bra", OPC_BRA, CI_CHG_NONE	  	},
-    { "brk", OPC_BRK, CI_CHG_NONE	  	},
-    { "bvc", OPC_BVC, CI_CHG_NONE	  	},
-    { "bvs", OPC_BVS, CI_CHG_NONE	  	},
+    { "bmi", OPC_BMI, CI_BRA		   	},
+    { "bne", OPC_BNE, CI_BRA		  	},
+    { "bpl", OPC_BPL, CI_BRA		  	},
+    { "bra", OPC_BRA, CI_BRA		  	},
+    { "brk", OPC_BRK, CI_BRA		  	},
+    { "bvc", OPC_BVC, CI_BRA		  	},
+    { "bvs", OPC_BVS, CI_BRA		  	},
     { "clc", OPC_CLC, CI_CHG_NONE	  	},
     { "cld", OPC_CLD, CI_CHG_NONE	 	},
     { "cli", OPC_CLI, CI_CHG_NONE	 	},
@@ -84,8 +84,8 @@ static const OPCDesc OPCTable[OPC_COUNT] = {
     { "inc", OPC_INC, CI_NONE		 	},
     { "inx", OPC_INX, CI_USE_X | CI_CHG_X   	},
     { "iny", OPC_INY, CI_USE_Y | CI_CHG_Y  	},
-    { "jmp", OPC_JMP, CI_NONE		   	},
-    { "jsr", OPC_JSR, CI_NONE		   	},
+    { "jmp", OPC_JMP, CI_BRA   		 	},
+    { "jsr", OPC_JSR, CI_BRA	 		},
     { "lda", OPC_LDA, CI_CHG_A		   	},
     { "ldx", OPC_LDX, CI_CHG_X		   	},
     { "ldy", OPC_LDY, CI_CHG_Y		   	},
@@ -173,6 +173,7 @@ unsigned GetInsnSize (opc_t OPC, am_t AM)
      */
     switch (AM) {
 	case AM_IMP:	  return 1;
+	case AM_ACC:	  return 1;
 	case AM_IMM:	  return 2;
 	case AM_ZP:	  return 2;
 	case AM_ZPX:	  return 2;
@@ -201,4 +202,4 @@ const OPCDesc* GetOPCDesc (opc_t OPC)
 
 
 
-			  
+

@@ -744,7 +744,11 @@ void doasm (void)
  * looks like the one defined for C++ (C has no ASM directive), that is,
  * a string literal in parenthesis.
  */
-{
+{				    
+    /* ########## */
+    Error ("Currently unavailable");
+		    
+#if 0
     /* Skip the ASM */
     NextToken ();
 
@@ -771,6 +775,7 @@ void doasm (void)
 
     /* Closing paren needed */
     ConsumeRParen ();
+#endif
 }
 
 

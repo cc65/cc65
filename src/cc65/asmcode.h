@@ -52,7 +52,7 @@
 
 
 /* Marker for an assembler code position */
-typedef struct Line* CodeMark;
+typedef unsigned CodeMark;
 
 
 
@@ -62,14 +62,8 @@ typedef struct Line* CodeMark;
 
 
 
-void AddCodeLine (const char* Format, ...) attribute ((format(printf,1,2)));
-/* Add a new line of code to the output */
-
 void AddCodeHint (const char* Hint);
 /* Add an optimizer hint */
-
-void AddEmptyLine (void);
-/* Add an empty line for formatting purposes */
 
 CodeMark GetCodePos (void);
 /* Get a marker pointing to the current output position */

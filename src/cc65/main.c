@@ -58,7 +58,7 @@
 #include "incpath.h"
 #include "input.h"
 #include "macrotab.h"
-#include "optimize.h"
+/* #include "optimize.h" */
 #include "scanner.h"
 #include "segname.h"
 
@@ -567,10 +567,12 @@ int main (int argc, char* argv[])
 		    Optimize = 1;
 	    	    P = Arg + 2;
 		    while (*P) {
-		    	switch (*P++) {
-		    	    case 'f':
-		    	     	sscanf (P, "%lx", (long*) &OptDisable);
+		    	switch (*P++) {			   
+#if 0
+     		    	    case 'f':
+     		    	     	sscanf (P, "%lx", (long*) &OptDisable);
 		    	     	break;
+#endif
 	       	    	    case 'i':
 	       	    	     	FavourSize = 0;
 				CodeSizeFactor = 200;
@@ -637,10 +639,12 @@ int main (int argc, char* argv[])
 
 	FILE* F;
 
-	/* Optimize the output if requested */
-	if (Optimize) {
-	    OptDoOpt ();
-	}
+#if 0
+     	/* Optimize the output if requested */
+     	if (Optimize) {
+     	    OptDoOpt ();
+     	}
+#endif
 
 	/* Open the file */
 	F = fopen (OutputFile, "w");

@@ -116,24 +116,25 @@ typedef enum {
 
 /* Addressing modes (bitmapped). */
 typedef enum {
-    AM_IMP	= 0x0001,      	/* implicit + accumulator */
-    AM_IMM	= 0x0002,	/* immidiate */
-    AM_ZP      	= 0x0004, 	/* zeropage */
-    AM_ZPX 	= 0x0008,	/* zeropage,X */
-    AM_ABS 	= 0x0010,	/* absolute */
-    AM_ABSX	= 0x0020,      	/* absolute,X */
-    AM_ABSY    	= 0x0040,	/* absolute,Y */
-    AM_ZPX_IND	= 0x0080,	/* (zeropage,x) */
-    AM_ZP_INDY	= 0x0100,	/* (zeropage),y */
-    AM_ZP_IND	= 0x0200,	/* (zeropage) */
-    AM_BRA	= 0x0400	/* branch */
+    AM_IMP	= 0x0001,      	/* implicit */
+    AM_ACC	= 0x0002,	/* accumulator */
+    AM_IMM	= 0x0004,	/* immidiate */
+    AM_ZP      	= 0x0008, 	/* zeropage */
+    AM_ZPX 	= 0x0010,	/* zeropage,X */
+    AM_ABS 	= 0x0020,	/* absolute */
+    AM_ABSX	= 0x0040,      	/* absolute,X */
+    AM_ABSY    	= 0x0080,	/* absolute,Y */
+    AM_ZPX_IND	= 0x0100,	/* (zeropage,x) */
+    AM_ZP_INDY	= 0x0200,	/* (zeropage),y */
+    AM_ZP_IND	= 0x0400,	/* (zeropage) */
+    AM_BRA	= 0x0800	/* branch */
 } am_t;
 
 /* Opcode description */
 typedef struct {
     char    	Mnemo[4];	/* Mnemonic */
     opc_t   	OPC;   		/* Opcode */
-    unsigned	Usage;		/* Usage flags */
+    unsigned   	Info;		/* Usage flags */
 } OPCDesc;
 
 
@@ -154,7 +155,7 @@ unsigned GetInsnSize (opc_t OPC, am_t AM);
 
 const OPCDesc* GetOPCDesc (opc_t OPC);
 /* Get an opcode description */
-
+		    
 
 
 /* End of opcodes.h */

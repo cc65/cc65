@@ -26,7 +26,6 @@ LDFLAGS=
 OBJS =	anonname.o	\
      	asmcode.o 	\
 	asmlabel.o	\
-	asmline.o 	\
 	codegen.o 	\
 	compile.o 	\
 	cpu.o	  	\
@@ -49,7 +48,6 @@ OBJS =	anonname.o	\
 	loop.o		\
 	macrotab.o	\
 	main.o		\
-	optimize.o     	\
 	preproc.o      	\
 	pragma.o       	\
 	scanner.o      	\
@@ -61,8 +59,8 @@ OBJS =	anonname.o	\
 	typecmp.o	\
 	util.o
 
-LIBS = 	$(COMMON)/common.a	\
-     	$(B6502)/b6502.a
+LIBS =	$(B6502)/b6502.a	\
+	$(COMMON)/common.a	
 
 
 # ------------------------------------------------------------------------------

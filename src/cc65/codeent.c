@@ -34,10 +34,14 @@
 
 
 /* common */
+#include "check.h"
 #include "xmalloc.h"
 
-/* b6502 */
+/* cc65 */
 #include "error.h"
+
+/* b6502 */
+#include "codeinfo.h"
 #include "label.h"
 #include "opcodes.h"
 #include "codeent.h"
@@ -56,7 +60,7 @@
 
 
 
-CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM)
+CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, CodeLabel* JumpTo)
 /* Create a new code entry, initialize and return it */
 {
     /* Allocate memory */
@@ -69,9 +73,14 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM)
     E->Hints	= 0;
     E->Arg.Num	= 0;
     E->Flags	= 0;
-    E->Usage	= D->Usage;
-    E->JumpTo	= 0;
+    E->Usage	= D->Info & (CI_MASK_USE | CI_MASK_CHG);
+    E->JumpTo	= JumpTo;
     InitCollection (&E->Labels);
+
+    /* If we have a label given, add this entry to the label */
+    if (JumpTo) {
+	CollAppend (&JumpTo->JumpFrom, E);
+    }
 
     /* Return the initialized struct */
     return E;
@@ -115,7 +124,12 @@ void OutputCodeEntry (FILE* F, const CodeEntry* E)
     switch (E->AM) {
 
 	case AM_IMP:
-	    /* implicit + accumulator */
+	    /* implicit */
+	    break;
+
+	case AM_ACC:
+	    /* accumulator */
+	    fprintf (F, "\ta");
 	    break;
 
 	case AM_IMM:
@@ -125,8 +139,7 @@ void OutputCodeEntry (FILE* F, const CodeEntry* E)
 
 	case AM_ZP:
 	case AM_ABS:
-	case AM_BRA:
-	    /* zeropage, absolute and branch */
+	    /* zeropage and absolute */
 	    fprintf (F, "\t%s", E->Arg.Expr);
 	    break;
 
@@ -154,6 +167,12 @@ void OutputCodeEntry (FILE* F, const CodeEntry* E)
 	case AM_ZP_IND:
 	    /* (zeropage) */
        	    fprintf (F, "\t(%s)", E->Arg.Expr);
+	    break;
+
+	case AM_BRA:
+	    /* branch */
+	    CHECK (E->JumpTo != 0);
+	    fprintf (F, "\t%s", E->JumpTo->Name);
 	    break;
 
 	default:

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2001 llrich von Bassewitz                                        */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -35,6 +35,12 @@
 
 #ifndef CODEGEN_H
 #define CODEGEN_H
+
+
+		    
+/* ##### */
+#include "dataseg.h"
+#include "codeseg.h"
 
 
 
@@ -79,6 +85,10 @@
 
 /* Compiler relative stackpointer */
 extern int oursp;
+
+/* Segments */
+extern DataSeg* DS;
+extern CodeSeg* CS;
 
 
 

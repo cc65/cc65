@@ -5,9 +5,9 @@
 ;
 
     	.export	 	_screensize
-	.export		xsize, ysize
 
 	.import	 	popax
+	.import		xsize, ysize
 	.importzp	ptr1, ptr2
 
 .proc	_screensize
@@ -26,13 +26,5 @@
 	sta	(ptr1),y
    	rts
 
-.endproc	
-
-
-.bss
-
-xsize:	.res	1
-ysize:	.res	1
-
-
+.endproc
 

@@ -5,7 +5,7 @@
 ;
 
 	.export		_cursor
-	.export		cursor
+	.import		cursor
 
 
 .proc	_cursor
@@ -17,10 +17,4 @@
 	rts
 
 .endproc
-
-
-.bss
-
-cursor:	.res	1
-
 

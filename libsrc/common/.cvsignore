@@ -35,6 +35,5 @@ sprintf.s
 strtok.s
 strxfrm.s
 vcprintf.s
-vfprintf.s
 vprintf.s
 vsprintf.s

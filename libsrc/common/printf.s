@@ -60,11 +60,10 @@ _printf:
 	lda	(ptr1),y
 	jsr	pushax
 
-; Push va_list (last parameter to vfprintf)
+; Load va_list (last and __fastcall__ parameter to vfprintf)
 
 	lda    	ptr1
 	ldx    	ptr1+1
-	jsr	pushax
 
 ; Call vfprintf
 

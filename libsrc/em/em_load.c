@@ -41,14 +41,6 @@
 
 
 
-unsigned char __fastcall__ em_load (unsigned char driver)
-/* Load the extended memory driver and return an error code. */
-{
-    return EM_ERR_NO_DRIVER;
-}
-
-
-
 unsigned char __fastcall__ em_load_driver (const char* name)
 /* Load an extended memory driver and return an error code */
 {

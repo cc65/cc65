@@ -47,9 +47,6 @@
 /* Size of an extended memory page */
 #define EM_PAGE_SIZE          256
 
-/* Driver constants */
-#define EM_DRV_DETECT           0
-
 /* Error codes */
 #define EM_ERR_OK               0       /* No error */
 #define EM_ERR_NO_DRIVER        1       /* No driver available */
@@ -73,9 +70,6 @@ struct em_copy {
 /*****************************************************************************/
 
 
-
-unsigned char __fastcall__ em_load (unsigned char driver);
-/* Load the extended memory driver and return an error code. */
 
 unsigned char __fastcall__ em_load_driver (const char* driver);
 /* Load an extended memory driver and return an error code */

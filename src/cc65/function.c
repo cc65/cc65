@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -368,6 +368,22 @@ void NewFunc (SymEntry* Func)
 
     /* Allocate code and data segments for this function */
     Func->V.F.Seg = PushSegments (Func);
+
+    /* Special handling for main() */
+    if (strcmp (Func->Name, "main") == 0) {
+        /* Main cannot be a fastcall function */
+        if (IsFastCallFunc (Func->Type)) {
+            Error ("`main' cannot be declared as __fastcall__");
+        }
+
+        /* If main() takes parameters, generate a forced import to a function
+         * that will setup these parameters. This way, programs that do not
+         * need the additional code will not get it.
+         */
+        if (D->ParamCount > 0 || (D->Flags & FD_VARIADIC) != 0) {
+            g_importmainargs ();
+        }
+    }
 
     /* If this is a fastcall function, push the last parameter onto the stack */
     if (IsFastCallFunc (Func->Type) && D->ParamCount > 0) {

@@ -155,6 +155,9 @@ void g_defexport (const char* Name, int ZP);
 void g_defimport (const char* Name, int ZP);
 /* Import the given label */
 
+void g_importmainargs (void);
+/* Forced import of a special symbol that handles arguments to main */
+
 
 
 /*****************************************************************************/

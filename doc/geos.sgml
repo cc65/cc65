@@ -499,6 +499,7 @@ GEOS application.
 <p>
 These function show two lines of text in standard-sized DialogBox. You can read the code of
 pressed icon from return value. E.g. for <tt/DlgBoxYesNo/ it can only be <tt/YES/ or <tt/NO/.
+You can pass an empty string or NULL to get a blank line.
 
 <sect3>DlgBoxGetString
 <p>

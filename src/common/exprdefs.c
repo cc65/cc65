@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -171,14 +171,6 @@ static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym
 	case EXPR_BOOLNOT:
     	    printf (" BOOL_NOT");
 	    break;
-
-        case EXPR_FORCEWORD:
-            printf (" FORCE_WORD");
-            break;
-
-        case EXPR_FORCEFAR:
-            printf (" FORCE_FAR");
-            break;
 
        	case EXPR_BYTE0:
 	    printf (" BYTE0");

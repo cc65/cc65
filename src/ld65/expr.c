@@ -357,11 +357,6 @@ long GetExprVal (ExprNode* Expr)
 	case EXPR_BOOLNOT:
        	    return !GetExprVal (Expr->Left);
 
-        case EXPR_FORCEWORD:
-        case EXPR_FORCEFAR:
-            /* These two have no effect on the expression result */
-            return GetExprVal (Expr->Left);
-
        	case EXPR_BYTE0:
 	    return GetExprVal (Expr->Left) & 0xFF;
 
@@ -380,7 +375,7 @@ long GetExprVal (ExprNode* Expr)
        	case EXPR_WORD1:
 	    return (GetExprVal (Expr->Left) >> 16) & 0xFFFF;
 
-        default:                                         
+        default:
        	    Internal ("Unknown expression Op type: %u", Expr->Op);
       	    /* NOTREACHED */
     	    return 0;

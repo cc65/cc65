@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -87,8 +87,6 @@
 #define EXPR_NOT       	       	(EXPR_UNARYNODE | 0x02)
 #define EXPR_SWAP      	       	(EXPR_UNARYNODE | 0x03)
 #define EXPR_BOOLNOT		(EXPR_UNARYNODE | 0x04)
-#define EXPR_FORCEWORD		(EXPR_UNARYNODE | 0x05)
-#define EXPR_FORCEFAR		(EXPR_UNARYNODE | 0x06)
 
 #define EXPR_BYTE0            	(EXPR_UNARYNODE | 0x08)
 #define EXPR_BYTE1            	(EXPR_UNARYNODE | 0x09)

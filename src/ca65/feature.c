@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -57,6 +57,7 @@ static const char* FeatureKeys[FEAT_COUNT] = {
     "dollar_in_identifiers",
     "leading_dot_in_identifiers",
     "pc_assignment",
+    "missing_char_term",
 };
 
 
@@ -107,6 +108,7 @@ feature_t SetFeature (const char* Key)
      	case FEAT_DOLLAR_IN_IDENTIFIERS:      DollarInIdents	= 1;	break;
        	case FEAT_LEADING_DOT_IN_IDENTIFIERS: LeadingDotInIdents= 1;    break;
      	case FEAT_PC_ASSIGNMENT:	      PCAssignment	= 1;	break;
+        case FEAT_MISSING_CHAR_TERM:          MissingCharTerm   = 1;    break;
 	default:     			 /* Keep gcc silent */	        break;
     }
 

@@ -908,7 +908,7 @@ if you want to access the "other" symbol <tt/bar/, you would have to write:
         .endscope
 </verb></tscreen>
 
-       
+
 <sect>Address sizes<label id="address-sizes"><p>
 
 
@@ -2074,6 +2074,16 @@ Here's a list of all control commands and a description, what they do:
     id=".ORG" name=".ORG"></tt> command (which is usually not needed, so just
     removing the lines with the assignments may also be an option when porting
     code written for older assemblers).
+
+  <tag><tt>missing_char_term</tt></tag>
+
+    Accept single quoted character constants where the terminating quote is
+    missing.
+    <tscreen><verb>
+        lda     #'a
+    </verb></tscreen>
+    <bf/Note:/ This does not work in conjunction with <tt/.FEATURE
+    loose_string_term/, since in this case the input would be ambigous.
 
   </descrip>
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -54,6 +54,7 @@ typedef enum {
     FEAT_DOLLAR_IN_IDENTIFIERS,
     FEAT_LEADING_DOT_IN_IDENTIFIERS,
     FEAT_PC_ASSIGNMENT,
+    FEAT_MISSING_CHAR_TERM,
 
     /* Special value: Number of features available */
     FEAT_COUNT

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -469,8 +469,8 @@ static void NextChar (void)
       	    /* End of current line reached, read next line */
       	    if (fgets (IFile->Line, sizeof (IFile->Line), IFile->F) == 0) {
       	       	/* End of file. Add an empty line to the listing. This is a
-      		 * small hack needed to keep the PC output in sync.
-      		 */
+      	    	 * small hack needed to keep the PC output in sync.
+      	    	 */
       	      	NewListingLine ("", IFile->Pos.Name, ICount);
       	       	C = EOF;
       	       	return;
@@ -617,7 +617,7 @@ static unsigned ReadStringConst (int StringTerm)
 
     /* Return the length of the string */
     return I;
-}
+}               
 
 
 
@@ -1043,7 +1043,7 @@ CharAgain:
 	    } else {
 		/* Always a character constant */
 	     	NextChar ();
-	     	if (C == '\n' || C == EOF) {
+	     	if (C == EOF || IsControl (C)) {
 	     	    Error ("Illegal character constant");
 	     	    goto CharAgain;
 	     	}
@@ -1051,7 +1051,9 @@ CharAgain:
 	     	Tok = TOK_CHARCON;
 	     	NextChar ();
 	     	if (C != '\'') {
-	     	    Error ("Illegal character constant");
+                    if (!MissingCharTerm) {
+                        Error ("Illegal character constant");
+                    }
 	     	} else {
 	     	    NextChar ();
 	     	}

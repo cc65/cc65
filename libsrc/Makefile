@@ -69,6 +69,7 @@ atarilib:
 	    $(AR) a atari.lib $$i/*.o;\
 	done
 	mv atari/crt0.o atari.o
+	cp atari/*.joy .
 
 #-----------------------------------------------------------------------------
 # Oric Atmos

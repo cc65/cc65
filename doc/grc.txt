@@ -7,7 +7,7 @@
     <ytm@elysium.pl>
 
     VII 2000
-    VI  2002
+    VI,VII 2002
 
 
 
@@ -33,6 +33,9 @@ file. Assembler source should be processed with ca65 and linked as first object
 (read Building process below). VLIR structure is currently supported only for
 project written entirely in assembler.
 
+grc can be also used as a handy VLIR linker used to build VLIR-structured .cvt
+file out of prepared binary chains.
+
 2. Usage
 --------
 
@@ -42,6 +45,9 @@ grc accepts following options:
     -s name	name S output file
     -l name     name ld65 output file
     -h		help
+
+when used as VLIR linker the correct syntax is:
+ grc -vlir output.cvt header.bin vlir0.bin vlir1.bin...
 
 Default output names are made from input name with extension replaced by '.h'
 and '.s'. grc will not overwrite existing files unless forced to do so.
@@ -149,8 +155,8 @@ denotes empty chains. In this example chains #1 and #3 are missing.
 The names between brackets are names of binaries containing code for each VLIR
 part. They matter only for generated ld65 configuration file and will be the
 names of resulting binary files after linking. Each one will contain one VLIR
-chain and they will have to be put together into VLIR .cvt by vlink utility in
-correct order.
+chain and they will have to be put together into VLIR .cvt by grc in VLIR linker
+modey in correct order.
 The 'headname' will be the name for binary which will contain only GEOS .cvt
 header made out of compiling .s header file generated also by grc.
 At the end of resulting ld65 config file (.cfg) in comments there will be
@@ -291,7 +297,7 @@ The last step is to put them together in the right order, order of arguments
 is important this time. As suggested in comments at the end of cvthead.cfg
 we do:
 
-$ vlink output.cvt vlir-head.bin vlir-0.bin vlir-1.bin vlir-2.bin
+$ grc -vlir output.cvt vlir-head.bin vlir-0.bin vlir-1.bin vlir-2.bin
 
 This is the end. The file 'output.cvt' can be unconverted under GEOS.
 Note that the switch '-t geos' wasn't present at any stage of this process.

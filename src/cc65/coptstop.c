@@ -69,6 +69,7 @@ static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add)
     for (I = Push + 1; I < Add; ++I) {
     	CodeEntry* E = CS_GetEntry (S, I);
     	if ((E->Info & OF_BRA) != 0 ||
+	    E->OPC == OP65_JSR      ||
     	    (E->Use & REG_SP) != 0  ||
     	    CE_HasLabel (E)) {
     	    /* A jump or stack pointer usage - bail out */
@@ -176,6 +177,7 @@ static unsigned Opt_staspidx (CodeSeg* S, unsigned Push, unsigned Store)
     for (I = Push + 1; I < Store; ++I) {
     	CodeEntry* E = CS_GetEntry (S, I);
     	if ((E->Info & OF_BRA) != 0 ||
+	    E->OPC == OP65_JSR      ||
     	    (E->Use & REG_SP) != 0  ||
     	    CE_HasLabel (E)) {
     	    /* A jump or stack pointer usage - bail out */

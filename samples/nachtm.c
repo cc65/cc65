@@ -13,6 +13,7 @@
 
 
 #include <stdio.h>
+#include <string.h>
 #include <time.h>
 #include <conio.h>
 #include <cbm.h>
@@ -857,15 +858,6 @@ static unsigned Voice3 [] = {
 
 
 
-/* Screen sizes */
-#ifdef __CBM610__
-#  define MAX_X	80
-#else
-#  define MAX_X 40
-#endif
-
-
-
 #if defined(__C64__) || defined(__CBM510__)
 static unsigned long FreqTab [12] = {
 #ifndef NTSC
@@ -917,6 +909,9 @@ static VoiceCtrl* V [3] = {
     &V1, &V2, &V3
 };
 
+/* Screen dimensions */
+static unsigned char XSize, YSize;
+
 /* Variable that contains the time of the next clock tick to play a note */
 static unsigned char NextClock;
 
@@ -934,7 +929,7 @@ static unsigned char Done;
 
 
 /*****************************************************************************/
-/*			   	     Code    	       			     */
+/*	    		   	     Code    	       			     */
 /*****************************************************************************/
 
 
@@ -943,7 +938,7 @@ static void MakeTeeLine (unsigned char Y)
 /* Make a divider line */
 {
     cputcxy (0, Y, CH_LTEE);
-    chline (MAX_X - 2);
+    chline (XSize - 2);
     cputc (CH_RTEE);
 }
 
@@ -953,27 +948,27 @@ static void MakeNiceScreen (void)
 /* Make a nice screen */
 {
     typedef struct {
-     	unsigned char  	X;
      	unsigned char  	Y;
      	char*	       	Msg;
     } TextDesc;
     static TextDesc Text [] = {
-       	{  (MAX_X / 2) - 11,  2, "Wolfgang Amadeus Mozart"     	},
-        {  (MAX_X / 2) - 12,  4, "\"Eine kleine Nachtmusik\""	},
-       	{  (MAX_X / 2) -  4,  5, "(KV 525)"	      	  	},
-        {  (MAX_X / 2) - 14,  9, "Ported to the SID in 1987 by" },
-       	{  (MAX_X / 2) - 10, 11, "Joachim von Bassewitz"  	},
-       	{  (MAX_X / 2) - 13, 12, "(joachim@von-bassewitz.de)"	},
-       	{  (MAX_X / 2) -  1, 13, "and"	      		  	},
-       	{  (MAX_X / 2) - 10, 14, "Ullrich von Bassewitz"  	},
-        {  (MAX_X / 2) - 13, 15, "(ullrich@von-bassewitz.de)"	},
-       	{  (MAX_X / 2) -  9, 18, "C Implementation by"	  	},
-       	{  (MAX_X / 2) - 10, 19, "Ullrich von Bassewitz"  	},
-        {  (MAX_X / 2) - 11, 23, "Press any key to quit..."	},
+       	{   2, "Wolfgang Amadeus Mozart"     	},
+        {   4, "\"Eine kleine Nachtmusik\""	},
+       	{   5, "(KV 525)"	      	  	},
+        {   9, "Ported to the SID in 1987 by" },
+       	{  11, "Joachim von Bassewitz"  	},
+       	{  12, "(joachim@von-bassewitz.de)"	},
+       	{  13, "and"	      		  	},
+       	{  14, "Ullrich von Bassewitz"  	},
+        {  15, "(ullrich@von-bassewitz.de)"	},
+       	{  18, "C Implementation by"	  	},
+       	{  19, "Ullrich von Bassewitz"  	},
+        {  23, "Press any key to quit..."	},
     };
 
-    TextDesc* T;
+    register const TextDesc* T;
     unsigned char I;
+    unsigned char X;
 
     /* Clear the screen hide the cursor, set colors */
 #ifdef __CBM610__
@@ -988,28 +983,34 @@ static void MakeNiceScreen (void)
 
     /* Top line */
     cputcxy (0, 0, CH_ULCORNER);
-    chline (MAX_X - 2);
+    chline (XSize - 2);
     cputc (CH_URCORNER);
+    cgetc ();
 
     /* Left line */
     cvlinexy (0, 1, 23);
+    cgetc ();
 
     /* Bottom line */
     cputc (CH_LLCORNER);
-    chline (MAX_X - 2);
+    chline (XSize - 2);
     cputc (CH_LRCORNER);
+    cgetc ();
 
     /* Right line */
-    cvlinexy (MAX_X - 1, 1, 23);
+    cvlinexy (XSize - 1, 1, 23);
+    cgetc ();
 
     /* Several divider lines */
     MakeTeeLine (7);
     MakeTeeLine (22);
+    cgetc ();
 
     /* Write something into the frame */
     for (I = 0, T = Text; I < sizeof (Text) / sizeof (Text [0]); ++I) {
-	cputsxy (T->X, T->Y, T->Msg);
-	++T;
+        X = (XSize - strlen (T->Msg)) / 2;
+     	cputsxy (X, T->Y, T->Msg);
+     	++T;
     }
 }
 
@@ -1059,12 +1060,15 @@ int main (void)
     unsigned char       I;
     unsigned char       Tone;
     unsigned char       Octave;
-    unsigned		Val;
+    unsigned	 	Val;
     struct __sid_voice*	Voice;
     VoiceCtrl*	        VC;
 
     /* Initialize the debugger */
     DbgInit (0);
+
+    /* Get the screen dimensions */
+    screensize (&XSize, &YSize);
 
     /* Make a nice screen */
     MakeNiceScreen ();

@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1999-2000 Ullrich von Bassewitz					     */
+/* (C) 1999-2001 Ullrich von Bassewitz					     */
 /*		 Wacholderweg 14					     */
 /*		 D-70597 Stuttgart					     */
 /* EMail:	 uz@musoftware.de					     */
@@ -545,6 +545,7 @@ static void Usage (void)
        	     "  -Or\t\t\tOptimize code, honour the register keyword\n"
        	     "  -Os\t\t\tOptimize code, inline known C funtions\n"
        	     "  -S\t\t\tCompile but don't assemble and link\n"
+       	     "  -T\t\t\tInclude source as comment\n"
        	     "  -V\t\t\tPrint the version number\n"
        	     "  -W\t\t\tSuppress warnings\n"
        	     "  -c\t\t\tCompiler and assemble but don't link\n"
@@ -559,9 +560,16 @@ static void Usage (void)
        	     "  -vm\t\t\tVerbose map file\n"
 	     "\n"
 	     "Long options:\n"
+       	     "  --add-source\t\tInclude source as comment\n"
        	     "  --ansi\t\tStrict ANSI mode\n"
 	     "  --asm-include-dir dir\tSet an assembler include directory\n"
+	     "  --bss-name seg\tSet the name of the BSS segment\n"
+       	     "  --check-stack\t\tGenerate stack overflow checks\n"
+       	     "  --code-name seg\tSet the name of the CODE segment\n"
+	     "  --codesize x\t\tAccept larger code by factor x\n"
        	     "  --cpu type\t\tSet cpu type\n"
+	     "  --create-dep\t\tCreate a make dependency file\n"
+       	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug\t\tDebug mode\n"
        	     "  --debug-info\t\tAdd debug info\n"
 	     "  --feature name\tSet an emulation feature\n"
@@ -569,11 +577,22 @@ static void Usage (void)
        	     "  --include-dir dir\tSet a compiler include directory path\n"
        	     "  --listing\t\tCreate an assembler listing\n"
 	     "  --mapfile name\tCreate a map file\n"
+       	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
+       	     "  --signed-chars\tDefault characters are signed\n"
        	     "  --start-addr addr\tSet the default start address\n"
+       	     "  --static-locals\tMake local variables static\n"
        	     "  --target sys\t\tSet the target system\n"
        	     "  --version\t\tPrint the version number\n"
        	     "  --verbose\t\tVerbose mode\n",
     	     ProgName);
+}
+
+
+
+static void OptAddSource (const char* Opt, const char* Arg)
+/* Strict source code as comments to the generated asm code */
+{
+    CmdAddArg (&CC65, "-T");
 }
 
 
@@ -595,6 +614,41 @@ static void OptAsmIncludeDir (const char* Opt, const char* Arg)
 
 
 
+static void OptBssName (const char* Opt, const char* Arg)
+/* Handle the --bss-name option */
+{
+    CmdAddArg (&CC65, "--bss-name");
+    CmdAddArg (&CC65, Arg);
+}
+
+
+
+static void OptCheckStack (const char* Opt, const char* Arg)
+/* Handle the --check-stack option */
+{
+    CmdAddArg (&CC65, "--check-stack");
+}
+
+
+
+static void OptCodeName (const char* Opt, const char* Arg)
+/* Handle the --code-name option */
+{
+    CmdAddArg (&CC65, "--code-name");
+    CmdAddArg (&CC65, Arg);
+}
+
+
+
+static void OptCodeSize (const char* Opt, const char* Arg)
+/* Handle the --codesize option */
+{
+    CmdAddArg (&CC65, "--codesize");
+    CmdAddArg (&CC65, Arg);
+}
+
+
+
 static void OptCPU (const char* Opt, const char* Arg)
 /* Handle the --cpu option */
 {
@@ -602,7 +656,24 @@ static void OptCPU (const char* Opt, const char* Arg)
     CmdAddArg (&CA65, "--cpu");
     CmdAddArg (&CA65, Arg);
     CmdAddArg (&CC65, "--cpu");
-    CmdAddArg (&CA65, Arg);
+    CmdAddArg (&CC65, Arg);
+}
+
+
+
+static void OptCreateDep (const char* Opt, const char* Arg)
+/* Handle the --create-dep option */
+{
+    CmdAddArg (&CC65, "--create-dep");
+}
+
+
+
+static void OptDataName (const char* Opt, const char* Arg)
+/* Handle the --data-name option */
+{
+    CmdAddArg (&CC65, "--data-name");
+    CmdAddArg (&CC65, Arg);
 }
 
 
@@ -669,11 +740,36 @@ static void OptMapFile (const char* Opt, const char* Arg)
 
 
 
+static void OptRodataName (const char* Opt, const char* Arg)
+/* Handle the --rodata-name option */
+{
+    CmdAddArg (&CC65, "--rodata-name");
+    CmdAddArg (&CC65, Arg);
+}
+
+
+
+static void OptSignedChars (const char* Opt, const char* Arg)
+/* Make default characters signed */
+{
+    CmdAddArg (&CC65, "-j");
+}
+
+
+
 static void OptStartAddr (const char* Opt, const char* Arg)
 /* Set the default start address */
 {
     CmdAddArg (&LD65, "-S");
     CmdAddArg (&LD65, Arg);
+}
+
+
+
+static void OptStaticLocals (const char* Opt, const char* Arg)
+/* Place local variables in static storage */
+{
+    CmdAddArg (&CC65, "-Cl");
 }
 
 
@@ -714,20 +810,30 @@ int main (int argc, char* argv [])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
+	{ "--add-source",	0,    	OptAddSource 		},
 	{ "--ansi",		0,	OptAnsi			},
 	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
+	{ "--bss-name",	 	1, 	OptBssName   		},
+       	{ "--check-stack",	0,     	OptCheckStack		},
+	{ "--code-name", 	1, 	OptCodeName  		},
+	{ "--codesize",	 	1,	OptCodeSize		},
         { "--cpu",     	       	1, 	OptCPU 			},
-	{ "--debug",		0,	OptDebug		},
-	{ "--debug-info",	0,	OptDebugInfo		},
-	{ "--feature",	  	1,	OptFeature		},
-	{ "--help",	  	0,	OptHelp			},
-	{ "--include-dir",	1,	OptIncludeDir		},
-	{ "--listing",		0,	OptListing		},
-	{ "--mapfile",	  	1,	OptMapFile		},
-	{ "--start-addr", 	1,	OptStartAddr		},
-	{ "--target",	  	1,	OptTarget		},
-	{ "--verbose",	  	0,	OptVerbose		},
-	{ "--version",	  	0,	OptVersion		},
+	{ "--create-dep",    	0,	OptCreateDep 		},
+	{ "--data-name",     	1, 	OptDataName  		},
+	{ "--debug",	     	0,	OptDebug		},
+	{ "--debug-info",    	0,	OptDebugInfo		},
+	{ "--feature",	     	1,	OptFeature		},
+	{ "--help",	     	0,	OptHelp			},
+	{ "--include-dir",   	1,	OptIncludeDir		},
+	{ "--listing",	     	0,	OptListing		},
+	{ "--mapfile",	     	1,	OptMapFile		},
+	{ "--rodata-name",	1, 	OptRodataName		},
+	{ "--signed-chars",	0, 	OptSignedChars	       	},
+	{ "--start-addr",    	1,	OptStartAddr		},
+       	{ "--static-locals",   	0, 	OptStaticLocals	       	},
+	{ "--target",	     	1,	OptTarget		},
+	{ "--verbose",	     	0,	OptVerbose		},
+	{ "--version",	     	0,	OptVersion		},
     };
 
     unsigned I;
@@ -768,7 +874,7 @@ int main (int argc, char* argv [])
 		case 'C':
 	   	    if (Arg[2] == 'l' && Arg[3] == '\0') {
 			/* Make local variables static */
-			CmdAddArg (&CC65, "-Cl");
+			OptStaticLocals (Arg, 0);
 		    } else {
 		     	/* Specify linker config file */
 		     	LinkerConfig = GetArg (&I, 2);
@@ -808,7 +914,7 @@ int main (int argc, char* argv [])
 
 	   	case 'T':
 		    /* Include source as comment (compiler) */
-		    CmdAddArg (&CC65, "-T");
+		    OptAddSource (Arg, 0);
 		    break;
 
 		case 'V':
@@ -842,6 +948,11 @@ int main (int argc, char* argv [])
 		case '?':
 		    /* Print help - cl65 */
 	     	    OptHelp (Arg, 0);
+		    break;
+
+	   	case 'j':
+		    /* Default characters are signed */
+		    OptSignedChars (Arg, 0);
 		    break;
 
 	   	case 'l':

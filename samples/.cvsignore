@@ -3,7 +3,9 @@ mousedemo
 nachtm
 plasma
 sieve
+tgidemo
 *.map
 *.d64
 *.s
 *.lbl
+*.tgi       

@@ -32,25 +32,28 @@ C1541  	= c1541
 # --------------------------------------------------------------------------
 # Rules how to make each one of the binaries
 
-EXELIST=hello mousedemo nachtm plasma sieve
+EXELIST=hello mousedemo nachtm plasma sieve tgidemo
 
 .PHONY:	all
 all:   	$(EXELIST)
 
-hello: 	$(CRT0) hello.o $(CLIB)
+hello: 		$(CRT0) hello.o $(CLIB)
 	@$(LD) -t $(SYS) -m hello.map -Ln hello.lbl -o $@ $^
 
 mousedemo:     	$(CRT0) mousedemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m mousedemo.map -Ln mousedemo.lbl -o $@ $^
 
-nachtm:	$(CRT0) nachtm.o $(CLIB)
-	@$(LD) -t $(SYS) -m nachtm.map -Ln nachtm.lbl -o $@ $^
+nachtm:		$(CRT0) nachtm.o $(CLIB)
+	@$(LD) -t $(SYS) -vm -m nachtm.map -Ln nachtm.lbl -o $@ $^
 
-plasma:	$(CRT0) plasma.o $(CLIB)
-	@$(LD) -t $(SYS) -m nachtm.map -Ln nachtm.lbl -o $@ $^
+plasma:		$(CRT0) plasma.o $(CLIB)
+	@$(LD) -t $(SYS) -m plasma.map -Ln nachtm.lbl -o $@ $^
 
-sieve: 	$(CRT0) sieve.o $(CLIB)
+sieve: 		$(CRT0) sieve.o $(CLIB)
 	@$(LD) -t $(SYS) -m sieve.map -Ln sieve.lbl -o $@ $^
+
+tgidemo:	$(CRT0) tgidemo.o $(CLIB)
+	@$(LD) -t $(SYS) -m tgidemo.map -Ln tgidemo.lbl -o $@ $^
 
 
 # --------------------------------------------------------------------------

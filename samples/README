@@ -51,5 +51,10 @@ Description:	Implements the "Sieve of Eratosthenes" as a way to find all
 		a benchmark program.
 Platforms:	All systems with conio and clock support:
 		Atari, C64, C128, CBM510, CBM610, PET, Plus/4
-
+-----------------------------------------------------------------------------
+Name:           tgidemo
+Description:	Shows some of the graphics capabilities of the "tiny graphics
+		interface".
+Platforms:	Runs on all platforms that have TGI support:
+		C64
 

@@ -67,6 +67,14 @@ O65_SIZE_32BIT          =       $2000   ; All size words are 32bit
 O65_SIZE_16BIT          =       $0000   ; All size words are 16bit
 O65_SIZE_MASK           =       $2000   ; Mask to extract size
 
+O65_FTYPE_OBJ           =       $1000   ; Object file
+O65_FTYPE_EXE           =       $0000   ; Executable file
+O65_FTYPE_MASK          =       $1000   ; Mask to extract type
+
+O65_ADDR_SIMPLE         =       $0800   ; Simple addressing
+O65_ADDR_DEFAULT        =       $0000   ; Default addressing
+O65_ADDR_MASK           =       $0800   ; Mask to extract addressing
+
 O65_ALIGN_1             =       $0000   ; Bytewise alignment
 O65_ALIGN_2             =       $0001   ; Align words
 O65_ALIGN_4             =       $0002   ; Align longwords

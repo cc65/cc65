@@ -104,26 +104,36 @@ unsigned char __fastcall__ cbm_k_open (void);
 void __fastcall__ cbm_k_close (unsigned char FN);
 unsigned char __fastcall__ cbm_k_readst (void);
 unsigned char __fastcall__ cbm_k_chkin (unsigned char FN);
+unsigned char __fastcall__ cbm_k_ckout (unsigned char FN);
 unsigned char __fastcall__ cbm_k_basin (void);
+void __fastcall__ cbm_k_bsout (unsigned char C);
 void __fastcall__ cbm_k_clrch (void);
 
-/* BASIC-like functions */
-unsigned char cbm_load(const char* name, unsigned char device, unsigned int addr);
-/* Loads file "name" from given device to given address or to the load address
- * of the file if addr is 0 (like load"name",8,1 in BASIC)
- * Returns 0 if loading was successful otherwise an errorcode (see table below).
+/* BASIC-like functions
+ *
+ * All cbm_* IO functions set extern unsigned char _oserror in case
+ * of an error. For the meaning of the errorcode see the table below.
+ */
+unsigned char cbm_load(const char* name, unsigned char device,
+                       unsigned int addr);
+/* Loads file "name" from given device to given address or to the load
+ * address of the file if addr is 0 (like load"name",8,1 in BASIC)
+ * Returns 0 if loading was successful otherwise an errorcode (see table
+ * below).
  */
 
 unsigned char cbm_save(const char* name, unsigned char device,
-                      unsigned int start, unsigned int end);
+                       unsigned int start, unsigned int end);
 /* Saves a memory area from start to end-1 to a file.
- * Returns 0 if saving was successful, otherwise an errorcode (see table below).
+ * Returns 0 if saving was successful, otherwise an errorcode (see table
+ * below).
  */
 
 unsigned char cbm_open(unsigned char lfn, unsigned char device,
                        unsigned char sec_addr, const char* name);
 /* Opens a file. Works just like the BASIC command.
- * Returns 0 if opening was successful, otherwise an errorcode (see table below).
+ * Returns 0 if opening was successful, otherwise an errorcode (see table
+ * below).
  */
 
 void __fastcall__ cbm_close (unsigned char lfn);
@@ -131,8 +141,15 @@ void __fastcall__ cbm_close (unsigned char lfn);
 
 int cbm_read(unsigned char lfn, void* buffer, unsigned int size);
 /* Reads up to "size" bytes from a file to "buffer".
- * Returns the number of actually read bytes, 0 if there are no bytes left (EOF)
- * or -1 in case of an error. _oserror contains an errorcode then (see table below).
+ * Returns the number of actually read bytes, 0 if there are no bytes left
+ * (EOF) or -1 in case of an error. _oserror contains an errorcode then (see
+ * table below).
+ */
+
+int cbm_write(unsigned char lfn, void* buffer, unsigned int size);
+/* Writes up to "size" bytes from "buffer" to a file.
+ * Returns the number of actually written bytes or -1 in case of an error.
+ * _oserror contains an errorcode then (see table below).
  */
 
 /* Errorcodes of cbm_* I/O functions:

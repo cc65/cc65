@@ -11,14 +11,6 @@
 _cbm_k_ckout:
 	tax
        	jsr    	CKOUT
-	ldx	#0
-	bcc	@Ok
-	inx
-	rts
-@Ok:	txa
-	rts
-
-
-
-
-
+	bcs	@NotOk
+	lda     #0
+@NotOk:	rts

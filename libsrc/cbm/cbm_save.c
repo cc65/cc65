@@ -9,6 +9,8 @@
 
 #include <cbm.h>
 
+extern unsigned char _oserror;
+
 /* saves a memory area from start to end-1 to a file.
  */
 unsigned char cbm_save(const char* name, unsigned char device,
@@ -16,5 +18,5 @@ unsigned char cbm_save(const char* name, unsigned char device,
 {
     cbm_k_setlfs(0, device, 0);
     cbm_k_setnam(name);
-    return cbm_k_save(start, end);
+    return _oserror = cbm_k_save(start, end);
 }

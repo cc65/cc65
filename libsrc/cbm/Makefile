@@ -11,7 +11,7 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-C_OBJS = cbm_load.o cbm_save.o cbm_open.o cbm_read.o
+C_OBJS = cbm_load.o cbm_save.o cbm_open.o cbm_read.o cbm_write.o
 
 S_OBJS = ctype.o getenv.o gotoxy.o gotox.o gotoy.o where.o\
 	 clock.o chline.o cvline.o cclear.o revers.o\

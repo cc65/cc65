@@ -337,6 +337,27 @@ crosscompiler.
 
 
 ###############################################################################
+#                           Supervision subpackage                            #
+###############################################################################
+
+%package supervision
+Requires: %{name} = %{version}
+Copyright: Freeware
+Summary: Supervision specific libraries and headers for the cc65 compiler.
+Group: Development/Languages
+
+%description supervision
+This package contains the header files and libraries needed to write
+programs for the Supervision Game console using the cc65 crosscompiler.
+
+%files supervision
+%attr(644,root,root)		/usr/lib/cc65/lib/supervision.lib
+%attr(644,root,root)		/usr/lib/cc65/lib/supervision.o
+%doc src/ld65/cfg/supervision.cfg
+
+
+
+###############################################################################
 #		     	       VIC20 subpackage	  			      #
 ###############################################################################
 
@@ -413,8 +434,11 @@ rm -rf $RPM_BUILD_ROOT
 
 
 %changelog
+* Fri Oct 10 2003 Ullrich von Bassewitz <uz@cc65.org>
+- Added the Supervision subpackage.
+
 * Thu Oct 02 2003 Ullrich von Bassewitz <uz@cc65.org>
-- Better cleanup
+- Better cleanup.
 
 * Thu Jun 12 2003 Ullrich von Bassewitz <uz@cc65.org>
 - Added subdirectories of include/

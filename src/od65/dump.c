@@ -434,7 +434,7 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 	/* Read the data for one segments */
         unsigned long DataSize  = Read32 (F);
         unsigned long NextSeg   = ftell (F) + DataSize;
-	char*	      Name      = ReadStr (F);
+       	const char*   Name      = GetString (&StrPool, ReadVar (F));
 	unsigned      Len       = strlen (Name);
 	unsigned long Size      = Read32 (F);
 	unsigned      Align     = (1U << Read8 (F));
@@ -444,10 +444,10 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 	/* Get the description for the type */
 	const char* TypeDesc;
 	switch (Type) {
-	    case SEGTYPE_DEFAULT:	TypeDesc = "SEGTYPE_DEFAULT";	break;
-	    case SEGTYPE_ABS:  		TypeDesc = "SEGTYPE_ABS";	break;
-	    case SEGTYPE_ZP:   		TypeDesc = "SEGTYPE_ZP";	break;
-	    case SEGTYPE_FAR:  		TypeDesc = "SEGTYPE_FAR";	break;
+	    case SEGTYPE_DEFAULT: 	TypeDesc = "SEGTYPE_DEFAULT";	break;
+	    case SEGTYPE_ABS:  	  	TypeDesc = "SEGTYPE_ABS";	break;
+	    case SEGTYPE_ZP:   	  	TypeDesc = "SEGTYPE_ZP";	break;
+	    case SEGTYPE_FAR:  	  	TypeDesc = "SEGTYPE_FAR";	break;
 	    default:  	       	   	TypeDesc = "SEGTYPE_UNKNOWN";	break;
 	}
 
@@ -460,9 +460,6 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 	printf ("      Alignment:%21u\n", Align);
 	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
        	printf ("      Fragment count:%16lu\n", FragCount);
-
-	/* Free the Name */
-	xfree (Name);
 
         /* Seek to the end of the segment data (start of next) */
         FileSetPos (F, NextSeg);
@@ -649,7 +646,7 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
        	/* Read the data for one symbol */
        	Type  = Read8 (F);
 	ReadData (F, ConDes, GET_EXP_CONDES_COUNT (Type));
-	Name  = GetString (&StrPool, ReadVar (F));
+       	Name  = GetString (&StrPool, ReadVar (F));
 	Len   = strlen (Name);
 	if (IS_EXP_EXPR (Type)) {
 	    SkipExpr (F);
@@ -763,7 +760,7 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
        	/* Read the data for one segments */
         unsigned long DataSize = Read32 (F);
         unsigned long NextSeg  = ftell (F) + DataSize;
-	char*	      Name     = ReadStr (F);
+	const char*   Name     = GetString (&StrPool, ReadVar (F));
 	unsigned      Len      = strlen (Name);
 	unsigned long Size     = Read32 (F);
 
@@ -775,12 +772,9 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
 	/* Print the size for this segment */
 	printf ("    %s:%*s%6lu\n", Name, 24-Len, "", Size);
 
-	/* Free the Name */
-	xfree (Name);
-
         /* Seek to the end of the segment data (start of next) */
         FileSetPos (F, NextSeg);
-    }                               
+    }
 
     /* Destroy the string pool */
     DestroyStrPool (&StrPool);

@@ -44,6 +44,7 @@
 #include "xmalloc.h"
 
 /* cc65 */
+#include "codeent.h"
 #include "codeseg.h"
 #include "dataseg.h"
 #include "textseg.h"
@@ -219,11 +220,11 @@ void AddCodeLine (const char* Format, ...)
 
 
 
-void AddCode (struct CodeEntry* E)
+void AddCode (opc_t OPC, am_t AM, const char* Arg, struct CodeLabel* JumpTo)
 /* Add a code entry to the current code segment */
 {
     CHECK (CS != 0);
-    CS_AddEntry (CS->Code, E, CurTok.LI);
+    CS_AddEntry (CS->Code, NewCodeEntry (OPC, AM, Arg, JumpTo, CurTok.LI));
 }
 
 

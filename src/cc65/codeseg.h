@@ -94,7 +94,7 @@ struct CodeSeg {
 CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func);
 /* Create a new code segment, initialize and return it */
 
-void CS_AddEntry (CodeSeg* S, struct CodeEntry* E, LineInfo* LI);
+void CS_AddEntry (CodeSeg* S, struct CodeEntry* E);
 /* Add an entry to the given code segment */
 
 void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap) attribute ((format(printf,3,0)));

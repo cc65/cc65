@@ -60,105 +60,112 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
     /* Opcodes for the virtual stack machine */
     {   OPC_CALL,     	                        /* opcode */
        	"call",       	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,      	                        /* chg */
        	OF_CPU_VM | OF_CALL                     /* flags */
     },
     {   OPC_ENTER,     	                        /* opcode */
        	"enter",       	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_Y,      	                        /* use */
        	REG_AXY,       	                        /* chg */
        	OF_CPU_VM      	       	                /* flags */
     },
     {   OPC_JMP,     	                        /* opcode */
        	"jump",    	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM | OF_UBRA  	 		/* flags */
     },
     {   OPC_LDA,      	                        /* opcode */
        	"lda",       	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_A, 	       	                        /* chg */
        	OF_CPU_VM | OF_LOAD   	       	        /* flags */
     },
     {   OPC_LDAX,      	                        /* opcode */
        	"ldax",      	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_AX,	       	                        /* chg */
        	OF_CPU_VM | OF_LOAD	 		/* flags */
     },
     {   OPC_LDEAX,     	                        /* opcode */
        	"ldeax",     	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_EAX,                                /* chg */
 	OF_CPU_VM | OF_LOAD   	 		/* flags */
     },
     {   OPC_LEA,     	                        /* opcode */
        	"lea",    	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_AX,                                 /* chg */
 	OF_CPU_VM 	  	 		/* flags */
     },
     {   OPC_LEAVE,     	                        /* opcode */
        	"leave",    	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	  	 		/* flags */
     },
     {   OPC_PHA,     	                        /* opcode */
        	"pha",     	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_A,      	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	   	 		/* flags */
     },
     {   OPC_PHAX,      	                        /* opcode */
        	"phax",     	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_AX,      	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	  	 		/* flags */
     },
     {   OPC_PHEAX,     	                        /* opcode */
        	"pheax",     	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_EAX,       	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	  	 		/* flags */
     },
+    {   OPC_RET,     	                        /* opcode */
+       	"ret",     	                        /* mnemonic */
+       	1,     	       	                        /* size */
+       	REG_NONE,      	                        /* use */
+       	REG_NONE,                               /* chg */
+	OF_CPU_VM | OF_RET  	 		/* flags */
+    },
     {   OPC_SPACE,     	                        /* opcode */
        	"space",     	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	  	 		/* flags */
     },
     {   OPC_STA,     	                        /* opcode */
        	"sta",     	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_A,       	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	  	 		/* flags */
     },
     {   OPC_STAX,     	                        /* opcode */
        	"stax",     	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_AX,       	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	  	 		/* flags */
     },
     {   OPC_STEAX,     	                        /* opcode */
        	"steax",    	                        /* mnemonic */
-       	0,     	       	                        /* size */
+       	1,     	       	                        /* size */
        	REG_EAX,       	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	  	 		/* flags */

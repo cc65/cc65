@@ -944,7 +944,7 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 {
     Offs -= oursp;
     CheckLocalOffs (Offs);
-			      
+
     if (Flags & CF_CONST) {
 	g_getimmed (Flags, Val, Offs);
     }
@@ -960,7 +960,7 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
      	    break;
 
      	case CF_LONG:
-	    AddCode (OPC_STAEAX, AM_STACK, WordToStr (Offs), 0);
+	    AddCode (OPC_STEAX, AM_STACK, WordToStr (Offs), 0);
      	    break;
 
        	default:

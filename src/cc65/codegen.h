@@ -295,20 +295,6 @@ void g_addstatic (unsigned flags, unsigned long label, unsigned offs);
 
 
 /*****************************************************************************/
-/*	       Compares of ax with a variable with fixed address	     */
-/*****************************************************************************/
-
-
-
-void g_cmplocal (unsigned flags, int offs);
-/* Compare a local variable to ax */
-
-void g_cmpstatic (unsigned flags, unsigned label, unsigned offs);
-/* Compare a static variable to ax */
-
-
-
-/*****************************************************************************/
 /*			     Special op= functions	       	    	     */
 /*****************************************************************************/
 

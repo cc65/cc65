@@ -296,7 +296,7 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
     	}
 
 	/* If the instruction is an RTS or RTI, we're done */
-	if (E->OPC == OP65_RTS || E->OPC == OP65_RTI) {
+       	if ((E->Info & OF_RET) != 0) {
 	    break;
 	}
 
@@ -336,7 +336,7 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
 		}
 		if (Index < 0) {
 		    Index = CS_GetEntryIndex (S, E);
-		}	       
+		}
        	       	if ((E = CS_GetEntry (S, ++Index)) == 0) {
 		    Internal ("GetRegInfo2: No next entry!");
 		}

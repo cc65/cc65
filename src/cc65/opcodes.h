@@ -64,6 +64,7 @@ typedef enum {
     OPC_PHA,
     OPC_PHAX,
     OPC_PHEAX,
+    OPC_RET,
     OPC_SPACE,
     OPC_STA,
     OPC_STAX,

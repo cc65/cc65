@@ -82,11 +82,11 @@ void UnknownOption (const char* Opt) attribute ((noreturn));
 
 void NeedArg (const char* Opt) attribute ((noreturn));
 /* Print an error about a missing option argument and exit. */
-			 
+
 void InvDef (const char* Def) attribute ((noreturn));
 /* Print an error about an invalid definition and die */
 
-const char* GetArg (int* ArgNum, unsigned Len);
+const char* GetArg (unsigned* ArgNum, unsigned Len);
 /* Get an argument for a short option. The argument may be appended to the
  * option itself or may be separate. Len is the length of the option string.
  */

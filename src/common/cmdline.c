@@ -261,7 +261,7 @@ void InvDef (const char* Def)
 
 
 
-const char* GetArg (int* ArgNum, unsigned Len)
+const char* GetArg (unsigned* ArgNum, unsigned Len)
 /* Get an argument for a short option. The argument may be appended to the
  * option itself or may be separate. Len is the length of the option string.
  */

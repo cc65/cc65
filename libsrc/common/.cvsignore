@@ -24,7 +24,6 @@ locale.s
 localtime.s
 mktime.s
 perror.s
-putchar.s
 puts.s
 qsort.s
 realloc.s

@@ -42,7 +42,6 @@ C_OBJS =	_afailed.o	\
                 localtime.o     \
                 mktime.o        \
 		perror.o	\
-		putchar.o	\
 		puts.o 		\
 		qsort.o		\
 		realloc.o	\
@@ -117,6 +116,7 @@ S_OBJS = 	_cwd.o          \
 		modload.o       \
                 oserrcheck.o    \
 		printf.o      	\
+		putchar.o	\
 	 	rand.o	      	\
                 raise.o         \
                 remove.o        \

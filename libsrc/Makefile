@@ -155,7 +155,8 @@ c64lib:
 	mv c64/crt0.o c64.o
 	cp c64/*.emd .
 	cp c64/*.joy .
-	cp c64/*.mou .
+	cp c64/c64-1351.mou .
+	cp c64/c64-joymouse.mou c64-joy.mou
 	cp c64/*.ser .
 	cp c64/c64-320-200-2.tgi c64-hi.tgi
 
@@ -171,15 +172,16 @@ c128lib:
 	    CFLAGS="-Osir -g -T -t c128 --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a c128.lib $$i/*.o;\
-  	done
+	done
 	mv c128/crt0.o c128.o
 	cp c128/*.emd .
 	cp c128/*.joy .
-	cp c128/*.mou .
+	cp c128/c128-1351.mou .
+	cp c128/c128-joymouse.mou c128-joy.mou
 	cp c128/*.ser .
 	cp c128/c128-640-200-2.tgi c128-vdc.tgi
 	cp c128/c128-640-480-2.tgi c128-vdc2.tgi
-		       
+
 #-----------------------------------------------------------------------------
 # Commdore P500 / CBM 5x0
 

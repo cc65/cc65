@@ -15,7 +15,7 @@
 	.import		initlib, donelib, callmain
        	.import	       	zerobss, pushax
 	.import		_main, __filetab, getfd
-	.import		__CODE_LOAD__, __BSS_LOAD__
+	.import		__LOWCODE_LOAD__, __BSS_LOAD__
 .ifdef	DYNAMIC_DD
 	.import		__getdefdev
 .endif
@@ -29,13 +29,13 @@
 
 	.segment "EXEHDR"
 	.word	$FFFF
-	.word	__CODE_LOAD__
+	.word	__LOWCODE_LOAD__
 	.word	__BSS_LOAD__ - 1
 
 ; ------------------------------------------------------------------------
 ; Actual code
 
-.code
+	.segment	"LOWCODE"
 
 	rts	; fix for SpartaDOS / OS/A+
 		; they first call the entry point from AUTOSTRT and
@@ -184,4 +184,4 @@ old_lmargin:	.res	1
 	.segment "AUTOSTRT"
 	.word	$02E0
 	.word	$02E1
-	.word	__CODE_LOAD__ + 1
+	.word	__LOWCODE_LOAD__ + 1

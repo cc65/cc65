@@ -123,7 +123,7 @@ c64lib:
 # C128
 
 c128lib:
-	for i in c128 cbm common runtime conio dbg em joystick tgi zlib; do \
+	for i in c128 cbm common runtime conio dbg em joystick serial tgi zlib; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
@@ -135,6 +135,7 @@ c128lib:
 	mv c128/crt0.o c128.o
 	cp c128/*.emd .
 	cp c128/*.joy .
+	cp c128/*.ser .
 	cp c128/c128-640-200-2.tgi c128-vdc.tgi
 	cp c128/c128-640-480-2.tgi c128-vdc2.tgi
 

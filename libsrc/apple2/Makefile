@@ -47,7 +47,8 @@ OBJS=	_scrsize.o	\
 	revers.o	\
         systime.o       \
         sysuname.o      \
-	where.o		\
+	wherex.o       	\
+       	wherey.o	\
 	write.o
 
 #--------------------------------------------------------------------------

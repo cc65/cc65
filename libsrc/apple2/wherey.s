@@ -1,18 +1,17 @@
 
 	;; Keivn Ruland
 	;;
-	;; unsigned char wherex( void );
 	;; unsigned char wherey( void );
 
-	.export		_wherex, _wherey
+	.export	       	_wherey
 
 	.include	"apple2.inc"
 
-_wherex:
-	lda	CH
+.proc   _wherey
+
+	lda	CV
+        ldx     #0
 	rts
 
-_wherey:
-	lda	CV
-	rts
-	
+.endproc
+

@@ -4,9 +4,9 @@
 ; Common functions of the serial drivers
 ;
 
-        .export         ser_clear_ptr
         .import         return0
         .importzp       ptr1
+	.condes		ser_irq, 2		; Export as IRQ handler
 
         .include        "ser-kernel.inc"
         .include        "ser-error.inc"
@@ -30,6 +30,7 @@ ser_get:        jmp     return0
 ser_put:        jmp     return0
 ser_status:     jmp     return0
 ser_ioctl:      jmp     return0
+ser_irq:	.byte	$60, $00, $00	; RTS plus two dummy bytes
 
 ; Driver header signature
 .rodata
@@ -66,7 +67,13 @@ _ser_install:
         cpy     #(SER_HDR::JUMPTAB + .sizeof(SER_HDR::JUMPTAB))
         bne     @L1
 
-        jmp     ser_install             ; Call driver install routine
+        jsr     ser_install             ; Call driver install routine
+
+        lda     ser_irq+2               ; Check high byte of IRQ vector
+        beq     @L2                     ; Jump if vector invalid
+	lda	#$4C			; Jump opcode
+	sta	ser_irq			; Activate IRQ routine
+@L2:    rts
 
 ; Driver signature invalid
 
@@ -92,7 +99,9 @@ copy:   lda     (ptr1),y
 _ser_uninstall:
         jsr     ser_uninstall           ; Call driver routine
 
-ser_clear_ptr:                          ; External entry point
+	lda	#$60			; RTS opcode
+	sta	ser_irq			; Disable IRQ entry point
+
         lda     #0
         sta     _ser_drv
         sta     _ser_drv+1              ; Clear the driver pointer

@@ -47,6 +47,7 @@
         .word   PUT
         .word   STATUS
         .word   IOCTL
+	.word	IRQ
 
 ;----------------------------------------------------------------------------
 ; I/O definitions
@@ -56,7 +57,6 @@ ACIA_DATA       = ACIA+0        ; Data register
 ACIA_STATUS     = ACIA+1        ; Status register
 ACIA_CMD        = ACIA+2        ; Command register
 ACIA_CTRL       = ACIA+3        ; Control register
-ACIA_CLOCK      = ACIA+7        ; Turbo232 external baud-rate generator
 
 ;----------------------------------------------------------------------------
 ;
@@ -396,6 +396,12 @@ STATUS: lda    	ACIA_STATUS
 IOCTL:  lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
         ldx     #>SER_ERR_INV_IOCTL
         rts
+
+;----------------------------------------------------------------------------
+; IRQ: Not used on the C128
+;
+
+IRQ     = $0000
 
 ;----------------------------------------------------------------------------
 ;

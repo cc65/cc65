@@ -17,16 +17,20 @@ _ser_unload:
 	ora	_ser_drv+1
        	beq    	no_driver		; No driver
 
-	jsr	ser_uninstall		; Deinstall the driver
+	lda	_ser_drv
+	pha
+	lda	_ser_drv+1
+	pha				; Save pointer to driver
 
-        lda     _ser_drv
-        ldx     _ser_drv+1
-        jsr     _mod_free               ; Free the driver
-
-        jmp     ser_clear_ptr           ; Clear the driver pointer, return zero
+       	jsr    	_ser_uninstall		; Deinstall the driver
+		 
+	pla
+	tax	
+	pla				; Get pointer to driver
+        jmp	_mod_free               ; Free the driver
 
 no_driver:
-	tax				; X = 0
-	lda	#SER_ERR_NO_DRIVER
+       	tax				; X = 0
+	lda	#<SER_ERR_NO_DRIVER
 	rts
 

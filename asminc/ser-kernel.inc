@@ -48,6 +48,7 @@
             PUT         .word   ; PUT routine
             STATUS      .word   ; STATUS routine
             IOCTL       .word   ; IOCTL routine
+	    IRQ		.word	; IRQ routine
         .endstruct
 .endstruct
 
@@ -138,7 +139,7 @@ SER_STATUS_DSR 	       	=       $40	; NOT data set ready
         .global ser_put
         .global ser_status
         .global ser_ioctl
-
+	.global	ser_irq
 
 ;------------------------------------------------------------------------------
 ; ASM functions

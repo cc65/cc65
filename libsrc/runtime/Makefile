@@ -33,6 +33,7 @@ OBJS = 	add.o		\
        	bpushbsp.o	\
        	call.o		\
        	compl.o		\
+	condes.o	\
 	decax1.o	\
 	decax2.o	\
 	decaxy.o	\

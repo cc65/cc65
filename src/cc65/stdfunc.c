@@ -45,6 +45,7 @@
 #include "error.h"
 #include "funcdesc.h"
 #include "global.h"
+#include "litpool.h"
 #include "scanner.h"
 #include "stdfunc.h"
 
@@ -181,7 +182,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)),
         /* Push the argument */
         g_push (Flags, Arg.ConstVal);
         ParamSize += SizeOf (Arg2Type);
-    }               
+    }
     ConsumeComma ();
 
     /* Argument #3. Since memset is a fastcall function, we must load the
@@ -207,42 +208,86 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
                             ExprDesc* lval attribute ((unused)))
 /* Handle the strlen function */
 {
-    ExprDesc pval;
-    static type ArgType[] = { T_PTR, T_SCHAR, T_END };
+    static type ParamType[] = { T_PTR, T_SCHAR, T_END };
 
+    ExprDesc Param;
+    unsigned CodeFlags;
+    unsigned long ParamName;
 
     /* Fetch the parameter */
-    int k = hie1 (&pval);
-
-    /* Check if the parameter is a const address */
-    unsigned flags = 0;
-    unsigned pflags = pval.Flags & ~E_MCTYPE;
-    if (pflags == E_MCONST) {
-    	/* Constant numeric address */
-    	flags |= CF_CONST | CF_ABSOLUTE;
-    } else if (k == 0 && ((pflags & E_MGLOBAL) != 0 || pval.Flags == E_MEOFFS)) {
-    	/* Global array with or without offset */
-    	flags |= CF_CONST;
-    	if (pval.Flags & E_TGLAB) {
-    	    /* External linkage */
-    	    flags |= CF_EXTERNAL;
-    	} else {
-    	    flags |= CF_STATIC;
-    	}
-    } else {
-    	/* Not const, load parameter into primary */
-     	exprhs (CF_NONE, k, &pval);
-    }
+    int k = hie1 (InitExprDesc (&Param));
 
     /* Setup the argument type string */
-    ArgType[1] = GetDefaultChar () | T_QUAL_CONST;
+    ParamType[1] = GetDefaultChar () | T_QUAL_CONST;
 
     /* Convert the parameter type to the type needed, check for mismatches */
-    assignadjust (ArgType, &pval);
+    assignadjust (ParamType, &Param);
+
+    /* Check if the parameter is a constant array of some type, or a numeric
+     * address cast to a pointer.
+     */
+    CodeFlags = 0;
+    ParamName = Param.Name;
+    if ((IsTypeArray (Param.Type) && (Param.Flags & E_MCONST) != 0) ||
+        (IsTypePtr (Param.Type) && Param.Flags == (E_MCONST | E_TCONST))) {
+
+        /* Check which type of constant it is */
+        switch (Param.Flags & E_MCTYPE) {
+
+            case E_TCONST:
+                /* Numerical address */
+                CodeFlags |= CF_CONST | CF_ABSOLUTE;
+                break;
+
+            case E_TREGISTER:
+                /* Register variable */
+                CodeFlags |= CF_CONST | CF_REGVAR;
+                break;
+
+            case E_TGLAB:
+                /* Global label */
+                CodeFlags |= CF_CONST | CF_EXTERNAL;
+                break;
+
+            case E_TLLAB:
+                /* Local symbol */
+                CodeFlags |= CF_CONST | CF_STATIC;
+                break;
+
+            case E_TLIT:
+                /* A literal of some kind. If string literals are read only,
+                 * we can calculate the length of the string and remove it
+                 * from the literal pool. Otherwise we have to calculate the
+                 * length at runtime.
+                 */
+                if (!WriteableStrings) {
+                    /* String literals are const */
+                    ExprDesc Length;
+                    MakeConstIntExpr (&Length, strlen (GetLiteral (Param.ConstVal)));
+                    ResetLiteralPoolOffs (Param.ConstVal);
+                    exprhs (CF_NONE, 0, &Length);
+                    goto ExitPoint;
+                } else {
+                    CodeFlags |= CF_CONST | CF_STATIC;
+                    ParamName = LiteralPoolLabel;
+                }
+                break;
+
+            default:
+                Internal ("Unknown constant type: %04X", Param.Flags);
+        }
+
+    } else {
+
+     	/* Not an array with a constant address. Load parameter into primary */
+     	exprhs (CF_NONE, k, &Param);
+
+    }
 
     /* Generate the strlen code */
-    g_strlen (flags, pval.Name, pval.ConstVal);
+    g_strlen (CodeFlags, ParamName, Param.ConstVal);
 
+ExitPoint:
     /* We expect the closing brace */
     ConsumeRParen ();
 }

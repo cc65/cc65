@@ -38,13 +38,18 @@
 
 
 
+#include <string.h>
+
+/* common */
+#include "inline.h"
+
 /* cc65 */
 #include "datatype.h"
 
 
 
 /*****************************************************************************/
-/*				     Data                                    */
+/*  				     Data                                    */
 /*****************************************************************************/
 
 
@@ -83,10 +88,20 @@ struct ExprDesc {
 
 
 /*****************************************************************************/
-/*				     Code                                    */
+/*		   		     Code                                    */
 /*****************************************************************************/
 
 
+
+#if defined(HAVE_INLINE)
+INLINE ExprDesc* InitExprDesc (ExprDesc* Expr)
+/* Initialize an ExprDesc */
+{
+    return memset (Expr, 0, sizeof (*Expr));
+}
+#else
+#  define InitExprDesc(E)       memset ((E), 0, sizeof (*(E)))
+#endif
 
 void MakeConstIntExpr (ExprDesc* Expr, long Value);
 /* Make Expr a constant integer expression with the given value */

@@ -88,9 +88,6 @@ int hie10 (ExprDesc* lval);
 int hie1 (ExprDesc* lval);
 /* Parse first level of expression hierarchy. */
 
-int hie0 (ExprDesc* lval);
-/* Parse comma operator (highest level of expression hierarchy) */
-
 void DefineData (ExprDesc* lval);
 /* Output a data definition for the given expression */
 

@@ -8,7 +8,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 /* common */
 #include "check.h"
@@ -86,6 +85,9 @@ static GenDesc GenOASGN  = { TOK_OR_ASSIGN,	GEN_NOPUSH,     g_or  };
 /*****************************************************************************/
 
 
+
+static int hie0 (ExprDesc *lval);
+/* Parse comma operator. */
 
 static int expr (int (*func) (ExprDesc*), ExprDesc *lval);
 /* Expression parser; func is either hie0 or hie1. */
@@ -183,7 +185,7 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
     }
     flags = g_typeadjust (ltype, rtype);
 
-    /* Set the type of the result */            
+    /* Set the type of the result */
     lhs->Type = promoteint (lhst, rhst);
 
     /* Return the code generator flags */
@@ -465,7 +467,7 @@ void ConstSubExpr (int (*F) (ExprDesc*), ExprDesc* Expr)
  * from this input error.
  */
 {
-    memset (Expr, 0, sizeof (*Expr));
+    InitExprDesc (Expr);
     if (F (Expr) != 0 || Expr->Flags != E_MCONST) {
        	Error ("Constant expression expected");
        	/* To avoid any compiler errors, make the expression a valid const */
@@ -858,7 +860,7 @@ static int primary (ExprDesc* lval)
      */
     if (CurTok.Tok == TOK_LPAREN) {
     	NextToken ();
-    	memset (lval, 0, sizeof (*lval));	/* Remove any attributes */
+    	InitExprDesc (lval);            /* Remove any attributes */
     	k = hie0 (lval);
        	ConsumeRParen ();
     	return k;
@@ -915,7 +917,7 @@ static int primary (ExprDesc* lval)
 	    /* Check for legal symbol types */
        	    if ((Sym->Flags & SC_CONST) == SC_CONST) {
 	   	/* Enum or some other numeric constant */
-	       	lval->Flags = E_MCONST;
+	       	lval->Flags = E_MCONST | E_TCONST;
 	    	lval->ConstVal = Sym->V.ConstVal;
 	       	return 0;
 	    } else if ((Sym->Flags & SC_FUNC) == SC_FUNC) {
@@ -1232,7 +1234,7 @@ static int arrayref (int k, ExprDesc* lval)
 	    	if (rflags == E_MLOCAL) {
 	    	    g_addlocal (flags, lval2.ConstVal);
 	    	} else {
-		    flags |= GlobalModeFlags (lval2.Flags);
+	   	    flags |= GlobalModeFlags (lval2.Flags);
 	    	    g_addstatic (flags, lval2.Name, lval2.ConstVal);
 	    	}
 	    } else {
@@ -1241,20 +1243,20 @@ static int arrayref (int k, ExprDesc* lval)
 	     	    g_inc (CF_INT | CF_UNSIGNED, lval->ConstVal);
 	     	} else if (lflags == E_MLOCAL) {
 	       	    /* Base address is a local variable address */
-		    if (IsTypeArray (tptr1)) {
+	   	    if (IsTypeArray (tptr1)) {
 	     	        g_addaddr_local (CF_INT, lval->ConstVal);
-		    } else {
+	   	    } else {
 	   		g_addlocal (CF_PTR, lval->ConstVal);
-		    }
+	   	    }
 	     	} else {
 	     	    /* Base address is a static variable address */
 	     	    unsigned flags = CF_INT;
-		    flags |= GlobalModeFlags (lval->Flags);
-		    if (IsTypeArray (tptr1)) {
+	   	    flags |= GlobalModeFlags (lval->Flags);
+	   	    if (IsTypeArray (tptr1)) {
 	     	        g_addaddr_static (flags, lval->Name, lval->ConstVal);
-		    } else {
-			g_addstatic (flags, lval->Name, lval->ConstVal);
-		    }
+	   	    } else {
+	   		g_addstatic (flags, lval->Name, lval->ConstVal);
+	   	    }
 	     	}
 	    }
 	}
@@ -3003,7 +3005,7 @@ int hie1 (ExprDesc* lval)
 
 
 
-int hie0 (ExprDesc *lval)
+static int hie0 (ExprDesc *lval)
 /* Parse comma operator. */
 {
     int k;
@@ -3069,7 +3071,7 @@ void expression1 (ExprDesc* lval)
  * the primary register
  */
 {
-    memset (lval, 0, sizeof (*lval));
+    InitExprDesc (lval);
     exprhs (CF_NONE, expr (hie1, lval), lval);
 }
 
@@ -3078,7 +3080,7 @@ void expression1 (ExprDesc* lval)
 void expression (ExprDesc* lval)
 /* Evaluate an expression and put it into the primary register */
 {
-    memset (lval, 0, sizeof (*lval));
+    InitExprDesc (lval);
     exprhs (CF_NONE, expr (hie0, lval), lval);
 }
 
@@ -3087,7 +3089,7 @@ void expression (ExprDesc* lval)
 void ConstExpr (ExprDesc* lval)
 /* Get a constant value */
 {
-    memset (lval, 0, sizeof (*lval));
+    InitExprDesc (lval);
     if (expr (hie1, lval) != 0 || (lval->Flags & E_MCONST) == 0) {
      	Error ("Constant expression expected");
      	/* To avoid any compiler errors, make the expression a valid const */
@@ -3100,7 +3102,7 @@ void ConstExpr (ExprDesc* lval)
 void ConstIntExpr (ExprDesc* Val)
 /* Get a constant int value */
 {
-    memset (Val, 0, sizeof (*Val));
+    InitExprDesc (Val);
     if (expr (hie1, Val) != 0        ||
 	(Val->Flags & E_MCONST) == 0 ||
 	!IsClassInt (Val->Type)) {
@@ -3134,8 +3136,7 @@ void Test (unsigned Label, int Invert)
     ExprDesc lval;
 
     /* Evaluate the expression */
-    memset (&lval, 0, sizeof (lval));
-    k = expr (hie0, &lval);
+    k = expr (hie0, InitExprDesc (&lval));
 
     /* Check for a boolean expression */
     CheckBoolExpr (&lval);

@@ -1,7 +1,7 @@
 ;
-; Christian Groessler, June 2004
+; Christian Groessler, July 2004
 ;
-; unsigned char _get_tv(void)
+; unsigned char get_tv(void)
 ;
 ; returns the TV system the machine is using
 ; 0 - NTSC
@@ -10,9 +10,9 @@
 
 
 	.include	"atari.inc"
-	.export		__get_tv
+	.export		_get_tv
 
-.proc	__get_tv
+.proc	_get_tv
 
 	lda	PAL		; use hw register, PALNTS is only supported on XL/XE ROM
 	ldx	#0

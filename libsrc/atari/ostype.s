@@ -1,8 +1,8 @@
 ;
-; Christian Groessler, June 2004
+; Christian Groessler, July 2004
 ; from Freddy Offenga's rominfo.c
 ;
-; unsigned char _get_ostype(void)
+; unsigned char get_ostype(void)
 ;
 ; x x x x x x x x   -	8 bit flag
 ; | | | | | | | |
@@ -38,9 +38,9 @@
 ;		101 - unassigned (up to 111)
 ;
 
-	.export		__get_ostype
+	.export		_get_ostype
 
-.proc	__get_ostype
+.proc	_get_ostype
 
 	lda	$fcd8
 	cmp	#$a2

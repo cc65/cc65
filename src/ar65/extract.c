@@ -58,7 +58,7 @@ void ExtractObjFiles (int argc, char* argv [])
     	Error ("No library name given");
     }
     if (argc <= 1) {
-    	Error ("No object files to add");
+    	Error ("No object files to extract");
     }
 
     /* Open the library, read the index */

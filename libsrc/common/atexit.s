@@ -9,6 +9,8 @@
       	.export		_atexit, doatexit
 	.import		__errno, jmpvec
 
+	.include	"errno.inc"
+
 .bss
 ecount:	.byte	0		; Really an index, inc'ed by 2
 efunc: 	.word  	0,0,0,0,0	; 5 exit functions
@@ -39,17 +41,19 @@ _atexit:
 
 ; Error, no space left
 
-E0:	lda	#$FF
-       	sta    	__errno		; Use -1 until codes are defined ###
-	sta	__errno+1
-	tax
+E0:	lda	#ENOSPC		; No space left
+	sta	__errno
+	ldx	#$00
+	stx	__errno+1
+	dex
+	txa
 	rts
 
 ; Function called from exit
 
 doatexit:
-	ldy	ecount		; get index
-	beq	L9		; jump if done
+	ldy	ecount	 	; get index
+	beq	L9	 	; jump if done
 	dey
 	lda	efunc,y
    	sta	jmpvec+2

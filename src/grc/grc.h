@@ -65,3 +65,6 @@ char *progName;
 char *outputCName=NULL, *outputSName=NULL;
 FILE *outputCFile, *outputSFile;
 int CFnum=0, SFnum=0;
+int forceFlag=0;
+char outputCMode[2]="w";
+char outputSMode[2]="w";

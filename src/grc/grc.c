@@ -15,7 +15,6 @@
  - more or less comments? it was hard to code, should be even harder to
    understand =D
  - add loadable icons feature (binary - 63 bytes)
- - counted menusize is most possibly wrong (const offsets, not sure about text)
 */
 
 /* - err, maybe free allocated memory, huh? (who cares, it's just a little prog...)
@@ -61,21 +60,32 @@ void printSHeader (void) {
 }
 
 void openCFile (void) {
-    if ((outputCFile = fopen (outputCName,"a"))==0) 
+    if ((CFnum==0) && (forceFlag==0)) {
+	/* test if file exists already and no forcing*/
+	if ((outputCFile = fopen (outputCName,"r"))!=0)
+	    Error("file %s already exists, no forcing, aborting\n", outputCName);
+	}
+    if ((outputCFile = fopen (outputCName,outputCMode))==0) 
 	Error("can't open file %s for writting: %s\n",outputCName,strerror (errno));
-    if (CFnum==0) { printCHeader(); CFnum++; }
+    if (CFnum==0) { outputCMode[0]='a'; printCHeader(); CFnum++; }
 }
 
 void openSFile (void) {
-    if ((outputSFile = fopen (outputSName,"a"))==0) 
+    if ((SFnum==0) && (forceFlag==0)) {
+	/* test if file exists already and no forcing*/
+	if ((outputSFile = fopen (outputSName,"r"))!=0)
+	    Error("file %s already exists, no forcing, aborting\n", outputSName);
+	}
+    if ((outputSFile = fopen (outputSName,outputSMode))==0) 
 	Error("can't open file %s for writting: %s\n",outputSName,strerror (errno));
-    if (SFnum==0) { printSHeader(); SFnum++; }
+    if (SFnum==0) { outputSMode[0]='a'; printSHeader(); SFnum++; }
 }
 
 void printUsage (void) {
     fprintf(stderr, "Usage: %s [options] file\n"
 	    "Options:\n"
 	    "\t-h, -?\t\tthis help\n"
+	    "\t-f\t\tforce writting files\n"
 	    "\t-o name\t\tname C output file\n"
 	    "\t-s name\t\tname asm output file\n",
 	    progName);
@@ -197,14 +207,14 @@ struct menuitem *curItem, *newItem;
 		};
 	} else {
 	/* menu is VERTICAL, ysize=item*15, count largest xsize of all items +~8? */
-	    myMenu.bot=myMenu.top+(15*item);
+	    myMenu.bot=myMenu.top+(14*item)-1;
 	    for (a=0;a!=item;a++) {
 		tmpsize=getNameSize(curItem->name);
 		size = (size > tmpsize) ? size : tmpsize;
 		curItem=curItem->next;
 		};
 	};
-    myMenu.right=myMenu.left+size;
+    myMenu.right=myMenu.left+size-1;
 
     curItem=myMenu.item;
     for (a=0;a!=item;a++) {
@@ -449,6 +459,9 @@ char *p, *tmp;
 	const char *arg = argv[i];
 	if (arg[0] == '-') {
 	    switch (arg[1]) {
+		case 'f':
+		    forceFlag=1;
+		    break;
 		case 'o':
 		    outputCName=argv[++i];
 		    break;
@@ -474,14 +487,14 @@ char *p, *tmp;
 	    if (outputCName==NULL) {
 		outputCName = malloc(strlen(arg));
 		strcpy (outputCName, tmp);
-		strcat (outputCName, ".hh");
+		strcat (outputCName, ".h");
 	    }
 
 
 	    if (outputSName==NULL) {
 		outputSName = malloc(strlen(arg));
 		strcpy (outputSName, tmp);
-		strcat (outputSName, ".ss");
+		strcat (outputSName, ".s");
 	    }
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -53,6 +53,9 @@ char* StrCopy (char* Dest, size_t DestSize, const char* Source);
  * constrast to strncpy, the resulting string will always be NUL terminated.
  * The function returns the pointer to the destintation buffer.
  */
+
+int StrCaseCmp (const char* S1, const char* S2);
+/* Compare two strings ignoring case */
 
 
 

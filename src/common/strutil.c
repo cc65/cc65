@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -34,6 +34,7 @@
 
 
 #include <string.h>
+#include <ctype.h>
 
 /* common */
 #include "strutil.h"
@@ -64,3 +65,16 @@ char* StrCopy (char* Dest, size_t DestSize, const char* Source)
 
 
 
+int StrCaseCmp (const char* S1, const char* S2)
+/* Compare two strings ignoring case */        
+{
+    int Diff;
+    while ((Diff = toupper (*S1) - toupper (*S2)) == 0 && *S1) {
+        ++S1;
+        ++S2;
+    }
+    return Diff;
+}
+
+
+                  

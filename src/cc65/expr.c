@@ -2838,15 +2838,16 @@ static void addsubeq (GenDesc* Gen, ExprDesc *lval, int k)
 /* Process the += and -= operators */
 {
     ExprDesc lval2;
-    unsigned flags;
+    unsigned lflags;
+    unsigned rflags;
     int MustScale;
 
 
+    /* We must have an lvalue */
     if (k == 0) {
      	Error ("Invalid lvalue in assignment");
      	return;
     }
-
 
     /* We're currently only able to handle some adressing modes */
     if ((lval->Flags & E_MGLOBAL) == 0 && 	/* Global address? */
@@ -2863,58 +2864,64 @@ static void addsubeq (GenDesc* Gen, ExprDesc *lval, int k)
     /* Check if we have a pointer expression and must scale rhs */
     MustScale = (lval->Type [0] == T_PTR);
 
-    /* Determine the code generator flags */
-    flags = TypeOf (lval->Type) | CF_FORCECHAR;
+    /* Initialize the code generator flags */
+    lflags = 0;
+    rflags = 0;
 
     /* Evaluate the rhs */
     if (evalexpr (CF_NONE, hie1, &lval2) == 0) {
-	/* The resulting value is a constant. */
+    	/* The resulting value is a constant. */
        	if (MustScale) {
-	    /* lhs is a pointer, scale rhs */
-	    lval2.ConstVal *= SizeOf (lval->Type+1);
-	}
-	flags |= CF_CONST;
+    	    /* lhs is a pointer, scale rhs */
+    	    lval2.ConstVal *= SizeOf (lval->Type+1);
+    	}
+     	rflags |= CF_CONST;
+	lflags |= CF_CONST;
     } else {
-	/* rhs is not constant and already in the primary register */
+     	/* rhs is not constant and already in the primary register */
        	if (MustScale) {
- 	    /* lhs is a pointer, scale rhs */
+     	    /* lhs is a pointer, scale rhs */
        	    g_scale (TypeOf (lval2.Type), SizeOf (lval->Type+1));
-	}
+     	}
     }
 
+    /* Setup the code generator flags */
+    lflags |= TypeOf (lval->Type) | CF_FORCECHAR;
+    rflags |= TypeOf (lval2.Type);
+
     /* Adjust the rhs to the lhs */
-    g_typeadjust (flags, TypeOf (lval2.Type));
+    g_typeadjust (lflags, rflags);
 
     /* Output apropriate code */
     if (lval->Flags & E_MGLOBAL) {
 	/* Static variable */
-	flags |= GlobalModeFlags (lval->Flags);
+	lflags |= GlobalModeFlags (lval->Flags);
 	if (Gen->Tok == TOK_PLUS_ASSIGN) {
-	    g_addeqstatic (flags, lval->Name, lval->ConstVal, lval2.ConstVal);
+	    g_addeqstatic (lflags, lval->Name, lval->ConstVal, lval2.ConstVal);
 	} else {
-       	    g_subeqstatic (flags, lval->Name, lval->ConstVal, lval2.ConstVal);
+       	    g_subeqstatic (lflags, lval->Name, lval->ConstVal, lval2.ConstVal);
 	}
     } else if (lval->Flags & E_MLOCAL) {
 	/* ref to localvar */
 	if (Gen->Tok == TOK_PLUS_ASSIGN) {
-    	    g_addeqlocal (flags, lval->ConstVal, lval2.ConstVal);
+    	    g_addeqlocal (lflags, lval->ConstVal, lval2.ConstVal);
 	} else {
-	    g_subeqlocal (flags, lval->ConstVal, lval2.ConstVal);
+	    g_subeqlocal (lflags, lval->ConstVal, lval2.ConstVal);
 	}
     } else if (lval->Flags & E_MCONST) {
 	/* ref to absolute address */
-	flags |= CF_ABSOLUTE;
+	lflags |= CF_ABSOLUTE;
 	if (Gen->Tok == TOK_PLUS_ASSIGN) {
-	    g_addeqstatic (flags, lval->ConstVal, 0, lval2.ConstVal);
+	    g_addeqstatic (lflags, lval->ConstVal, 0, lval2.ConstVal);
 	} else {
-       	    g_subeqstatic (flags, lval->ConstVal, 0, lval2.ConstVal);
+       	    g_subeqstatic (lflags, lval->ConstVal, 0, lval2.ConstVal);
 	}
     } else if (lval->Flags & E_MEXPR) {
        	/* Address in a/x. */
 	if (Gen->Tok == TOK_PLUS_ASSIGN) {
-       	    g_addeqind (flags, lval->ConstVal, lval2.ConstVal);
+       	    g_addeqind (lflags, lval->ConstVal, lval2.ConstVal);
 	} else {
-       	    g_subeqind (flags, lval->ConstVal, lval2.ConstVal);
+       	    g_subeqind (lflags, lval->ConstVal, lval2.ConstVal);
 	}
     } else {
        	Internal ("Invalid addressing mode");

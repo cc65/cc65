@@ -593,7 +593,41 @@ generation and other stuff.
 
   Example:
   <tscreen><verb>
-      	#pragma bssseg ("MyBSS")
+       	#pragma bssseg ("MyBSS")
+  </verb></tscreen>
+
+
+<sect1><tt>#pragma charmap (&lt;index&gt;, &lt;code&gt;)</tt><p>
+
+  Each literal string and each literal character in the source is translated
+  by use of a translation table. This translation table is preset when the
+  compiler is started depending on the target system, for example to map
+  ISO-8859-1 characters into PETSCII if the target is a commodore machine.
+
+  This pragma allows to change entries in the translation table, so the
+  translation for individual characters, or even the complete table may be
+  adjusted.
+
+  Both arguments are assumed to be unsigned characters with a valid range of
+  1-255.
+
+  Beware of two pitfalls:
+
+    <itemize>
+    <item>The character index is actually the code of the character in the
+    	  C source, so character mappings do always depend on the source
+	  character set. This means that <tt/#pragma charmap/ is not portable
+	  - it depends on the build environment.
+    <item>While it is possible to use character literals as indices, the
+    	  result may be somewhat unexpected, since character literals are
+	  itself translated. For this reason I would suggest to avoid
+	  character literals and use numeric character codes instead.
+    </itemize>
+
+  Example:
+  <tscreen><verb>
+        /* Use a space wherever an 'a' occurs in ISO-8859-1 source */
+       	#pragma charmap (0x61, 0x20);
   </verb></tscreen>
 
 

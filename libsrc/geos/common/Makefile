@@ -11,7 +11,7 @@
 	@$(AS) -o $@ $(AFLAGS) $<
 
 C_OBJS	= _afailed.o abort.o perror.o
-S_OBJS	= copydata.o memcpy.o memset.o zerobss.o
+S_OBJS	= _sys.o atexit.o copydata.o memcpy.o memset.o zerobss.o
 
 all: $(C_OBJS) $(S_OBJS)
 

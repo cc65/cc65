@@ -1609,29 +1609,37 @@ int hie10 (ExprDesc* lval)
      	case TOK_BOOL_NOT:
      	    NextToken ();
     	    if (evalexpr (CF_NONE, hie10, lval) == 0) {
-    	     	/* Constant expression */
-    	   	lval->ConstVal = !lval->ConstVal;
+    	       	/* Constant expression */
+    	       	lval->ConstVal = !lval->ConstVal;
     	    } else {
-    	   	g_bneg (TypeOf (lval->Type));
-    	   	lval->Test |= E_CC;			/* bneg will set cc */
-    	   	lval->Flags = E_MEXPR;	 	/* say it's an expr */
+    	       	g_bneg (TypeOf (lval->Type));
+    	       	lval->Test |= E_CC;			/* bneg will set cc */
+    	       	lval->Flags = E_MEXPR;	 	/* say it's an expr */
     	    }
      	    return 0;  	      	     		/* expr not storable */
 
      	case TOK_STAR:
      	    NextToken ();
     	    if (evalexpr (CF_NONE, hie10, lval) != 0) {
-    	     	/* Expression is not const, indirect value loaded into primary */
-	     	lval->Flags = E_MEXPR;
-	     	lval->ConstVal = 0;		/* Offset is zero now */
+    	       	/* Expression is not const, indirect value loaded into primary */
+	       	lval->Flags = E_MEXPR;
+	       	lval->ConstVal = 0;		/* Offset is zero now */
     	    }
-	    t = lval->Type;
-       	    if (IsClassPtr (t)) {
-       	       	lval->Type = Indirect (t);
-     	    } else {
-     	     	Error ("Illegal indirection");
-     	    }
-     	    return 1;
+            /* If the expression is already a pointer to function, the
+             * additional dereferencing operator must be ignored.
+             */
+            if (IsTypeFuncPtr (lval->Type)) {               
+                /* Expression not storable */
+                return 0;
+            } else {
+                if (IsClassPtr (lval->Type)) {                
+                    lval->Type = Indirect (lval->Type);
+                } else {
+                    Error ("Illegal indirection");
+                }
+                return 1;
+            }
+            break;
 
      	case TOK_AND:
      	    NextToken ();
@@ -1640,32 +1648,32 @@ int hie10 (ExprDesc* lval)
 	     * applied to functions, even if they're no lvalues.
 	     */
      	    if (k == 0 && !IsTypeFunc (lval->Type)) {
-	    	/* Allow the & operator with an array */
-	     	if (!IsTypeArray (lval->Type)) {
-     	     	    Error ("Illegal address");
-	     	}
+	       	/* Allow the & operator with an array */
+	       	if (!IsTypeArray (lval->Type)) {
+     	       	    Error ("Illegal address");
+	       	}
      	    } else {
-	     	t = TypeAlloc (TypeLen (lval->Type) + 2);
-	     	t [0] = T_PTR;
-	     	TypeCpy (t + 1, lval->Type);
-	     	lval->Type = t;
+	       	t = TypeAlloc (TypeLen (lval->Type) + 2);
+	       	t [0] = T_PTR;
+	       	TypeCpy (t + 1, lval->Type);
+	       	lval->Type = t;
 	    }
      	    return 0;
 
      	case TOK_SIZEOF:
      	    NextToken ();
        	    if (istypeexpr ()) {
-    		type Type[MAXTYPELEN];
-     	     	NextToken ();
-		lval->ConstVal = CheckedSizeOf (ParseType (Type));
-     	     	ConsumeRParen ();
+    	       	type Type[MAXTYPELEN];
+     	       	NextToken ();
+	       	lval->ConstVal = CheckedSizeOf (ParseType (Type));
+     	       	ConsumeRParen ();
      	    } else {
-    	   	/* Remember the output queue pointer */
-    	    	CodeMark Mark = GetCodePos ();
-     	     	hie10 (lval);
+    	       	/* Remember the output queue pointer */
+    	       	CodeMark Mark = GetCodePos ();
+     	       	hie10 (lval);
      	       	lval->ConstVal = CheckedSizeOf (lval->Type);
-    	   	/* Remove any generated code */
-    	   	RemoveCode (Mark);
+    	       	/* Remove any generated code */
+    	       	RemoveCode (Mark);
      	    }
      	    lval->Flags = E_MCONST | E_TCONST;
      	    lval->Type = type_uint;
@@ -1674,8 +1682,8 @@ int hie10 (ExprDesc* lval)
 
      	default:
        	    if (istypeexpr ()) {
-     	     	/* A cast */
-    	     	return TypeCast (lval);
+     	       	/* A cast */
+    	       	return TypeCast (lval);
      	    }
     }
 
@@ -1699,7 +1707,7 @@ int hie10 (ExprDesc* lval)
 static int hie_internal (const GenDesc** ops,  	/* List of generators */
        	                 ExprDesc* lval,	/* parent expr's lval */
        	                 int (*hienext) (ExprDesc*),
-	     	       	 int* UsedGen) 		/* next higher level */
+	       	       	 int* UsedGen) 		/* next higher level */
 /* Helper function */
 {
     int k;

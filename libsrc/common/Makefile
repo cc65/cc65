@@ -44,7 +44,6 @@ C_OBJS =	_afailed.o	\
 		fputc.o		\
 		fputs.o		\
 		freopen.o	\
-                fscanf.o        \
 		fseek.o		\
 		fsetpos.o	\
 		ftell.o		\
@@ -100,6 +99,7 @@ S_OBJS = 	_cwd.o          \
 		fprintf.o	\
 		fread.o		\
 		free.o		\
+                fscanf.o        \
 		fwrite.o	\
 		getcpu.o	\
                 getcwd.o        \

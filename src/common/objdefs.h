@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,10 +46,10 @@
 
 /* Defines for magic and version */
 #define OBJ_MAGIC	0x616E7A55
-#define OBJ_VERSION	0x0009
+#define OBJ_VERSION	0x000A
 
 /* Size of an object file header */
-#define	OBJ_HDR_SIZE	64
+#define	OBJ_HDR_SIZE	72
 
 /* Flag bits */
 #define OBJ_FLAGS_DBGINFO	0x0001	/* File has debug info */
@@ -57,8 +57,8 @@
 
 
 /* Header structure */
-typedef struct ObjHeader_ ObjHeader;
-struct ObjHeader_ {
+typedef struct ObjHeader ObjHeader;
+struct ObjHeader {
     unsigned long     	Magic;		/* 32: Magic number */
     unsigned 	  	Version;   	/* 16: Version number */
     unsigned	  	Flags;	   	/* 16: flags */
@@ -76,6 +76,8 @@ struct ObjHeader_ {
     unsigned long	DbgSymSize;	/* 32: Size of debug symbols */
     unsigned long       LineInfoOffs;   /* 32: Offset to list of line infos */
     unsigned long       LineInfoSize;   /* 32: Size of line infos */
+    unsigned long       StrPoolOffs;    /* 32: Offset to string pool */
+    unsigned long       StrPoolSize;    /* 32: Size of string pool */
 };
 
 

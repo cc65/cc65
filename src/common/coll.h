@@ -66,7 +66,7 @@ extern const Collection EmptyCollection;
 #define STATIC_COLLECTION_INITIALIZER	{ 0, 0, 0 }
 
 /* Initializer for auto collections */
-#define AUTO_COLLECTION_INITIALIZER     EmptyCollection;
+#define AUTO_COLLECTION_INITIALIZER     EmptyCollection
 
 
 
@@ -285,4 +285,4 @@ void CollSort (Collection* C,
 
 
 
-	      
+

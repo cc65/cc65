@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2001 Ullrich von Bassewitz					     */
-/*		 Wacholderweg 14        				     */
-/*		 D-70597 Stuttgart					     */
-/* EMail:	 uz@cc65.org     					     */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -47,7 +47,7 @@
 
 /* common */
 #include "xmalloc.h"
-					
+
 /* ar65 */
 #include "error.h"
 #include "objdata.h"
@@ -109,6 +109,8 @@ void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     H->DbgSymSize   = Read32 (Obj);
     H->LineInfoOffs = Read32 (Obj);
     H->LineInfoSize = Read32 (Obj);
+    H->StrPoolOffs  = Read32 (Obj);
+    H->StrPoolSize  = Read32 (Obj);
 }
 
 
@@ -133,6 +135,8 @@ void ObjWriteHeader (FILE* Obj, ObjHeader* H)
     Write32 (Obj, H->DbgSymSize);
     Write32 (Obj, H->LineInfoOffs);
     Write32 (Obj, H->LineInfoSize);
+    Write32 (Obj, H->StrPoolOffs);
+    Write32 (Obj, H->StrPoolSize);
 }
 
 
@@ -144,6 +148,7 @@ void ObjAdd (const char* Name)
     const char* Module;
     ObjHeader H;
     ObjData* O;
+    unsigned I;
 
     /* Open the object file */
     FILE* Obj = fopen (Name, "rb");
@@ -191,6 +196,14 @@ void ObjAdd (const char* Name)
     fseek (Obj, H.ExportOffs, SEEK_SET);
     ReadData (Obj, O->Exports, O->ExportSize);
 
+    /* Read the string pool */
+    fseek (Obj, H.StrPoolOffs, SEEK_SET);
+    O->StringCount = ReadVar (Obj);
+    O->Strings     = xmalloc (O->StringCount * sizeof (char*));
+    for (I = 0; I < O->StringCount; ++I) {
+        O->Strings[I] = ReadStr (Obj);    
+    }
+
     /* Skip the object file header */
     O->Start = ftell (NewLib);
     fseek (NewLib, OBJ_HDR_SIZE, SEEK_CUR);
@@ -211,8 +224,9 @@ void ObjAdd (const char* Name)
     O->Size = ftell (NewLib) - O->Start;
 
     /* Clear the remaining header fields */
-    H.ImportOffs = H.ImportSize = 0;
-    H.ExportOffs = H.ExportSize = 0;
+    H.ImportOffs  = H.ImportSize  = 0;
+    H.ExportOffs  = H.ExportSize  = 0;
+    H.StrPoolOffs = H.StrPoolSize = 0;
 
     /* Seek back and write the updated header */
     fseek (NewLib, O->Start, SEEK_SET);
@@ -232,10 +246,12 @@ void ObjExtract (const char* Name)
 {
     unsigned long ImportStart;
     unsigned long ExportStart;
+    unsigned long StrPoolStart;
+    unsigned long StrPoolSize;
     struct utimbuf U;
     ObjHeader H;
     FILE* Obj;
-
+    unsigned I;
 
     /* Make a module name from the file name */
     const char* Module = GetModule (Name);
@@ -263,15 +279,25 @@ void ObjExtract (const char* Name)
     ExportStart = ftell (Obj);
     WriteData (Obj, O->Exports, O->ExportSize);
 
+    /* Write the string pool */
+    StrPoolStart = ftell (Obj);
+    WriteVar (Obj, O->StringCount);
+    for (I = 0; I < O->StringCount; ++I) {
+        WriteStr (Obj, O->Strings[I]);
+    }                             
+    StrPoolSize = ftell (Obj) - StrPoolStart;
+
     /* Seek back and read the header */
     fseek (Obj, 0, SEEK_SET);
     ObjReadHeader (Obj, &H, Name);
 
     /* Update the header fields */
-    H.ImportOffs = ImportStart;
-    H.ImportSize = O->ImportSize;
-    H.ExportOffs = ExportStart;
-    H.ExportSize = O->ExportSize;
+    H.ImportOffs  = ImportStart;
+    H.ImportSize  = O->ImportSize;
+    H.ExportOffs  = ExportStart;
+    H.ExportSize  = O->ExportSize;
+    H.StrPoolOffs = StrPoolStart;
+    H.StrPoolSize = StrPoolSize;
 
     /* Write the changed header */
     fseek (Obj, 0, SEEK_SET);

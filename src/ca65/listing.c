@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -221,11 +221,12 @@ static void PrintPageHeader (FILE* F, const ListLine* L)
 {
     /* Print the header on the new page */
     fprintf (F,
-	     "ca65 V%u.%u.%u - (C) Copyright 1998-2000 Ullrich von Bassewitz\n"
+	     "ca65 V%u.%u.%u - %s\n"
     	     "Main file   : %s\n"
     	     "Current file: %s\n"
 	     "\n",
      	     VER_MAJOR, VER_MINOR, VER_PATCH,
+             Copyright,
 	     InFile,
 	     GetFileName (L->File));
 

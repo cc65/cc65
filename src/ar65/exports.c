@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,7 +38,7 @@
 /* common */
 #include "hashstr.h"
 #include "xmalloc.h"
-	  
+
 /* ar65 */
 #include "error.h"
 #include "objdata.h"
@@ -53,8 +53,8 @@
 
 
 /* A hash table entry */
-typedef struct HashEntry_ HashEntry;
-struct HashEntry_ {
+typedef struct HashEntry HashEntry;
+struct HashEntry {
     HashEntry* 		Next;		/* Next in list */
     unsigned		Module;	       	/* Module index */
     char		Name [1];	/* Name of identifier */
@@ -146,7 +146,6 @@ int ExpFind (const char* Name)
     /* Not found */
     return -1;
 }
-
 
 
 

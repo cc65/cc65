@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -71,6 +71,9 @@ extern unsigned char    AtInIdents;    	    /* Allow '@' in identifiers */
 extern unsigned char   	DollarInIdents;	    /* Allow '$' in identifiers */
 extern unsigned char    LeadingDotInIdents; /* Allow '.' to start an identifier */
 extern unsigned char   	PCAssignment;  	    /* Allow "* = $XXX" or "$ = $XXX" */
+
+/* Misc stuff */
+extern const char       Copyright[];        /* Copyright string */
 
 
 

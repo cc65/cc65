@@ -60,15 +60,25 @@
 
 
 
-/* Opaque entry */
-typedef struct StrPoolEntry StrPoolEntry;
+/* Opaque string pool entry */
+typedef struct StringPoolEntry StringPoolEntry;
 
-typedef struct StrPool StrPool;
-struct StrPool {
-    StrPoolEntry*   Tab[211];   /* Entry hash table */
-    Collection      Entries;    /* Entries sorted by number */
-    unsigned        TotalSize;  /* Total size of all string data */
+/* A string pool */
+typedef struct StringPool StringPool;
+struct StringPool {
+    Collection        Entries;    /* Entries sorted by number */
+    unsigned          TotalSize;  /* Total size of all string data */
+    StringPoolEntry*  Tab[211];   /* Entry hash table */
 };
+
+/* A string pool initializer. We do only initialize the first field, all
+ * others will get zeroed out by the compiler.
+ */
+#define STATIC_STRINGPOOL_INITIALIZER {         \
+    STATIC_COLLECTION_INITIALIZER,              \
+    0,                                          \
+    { 0 }                                       \
+}
 
 
 
@@ -78,39 +88,34 @@ struct StrPool {
 
 
 
-StrPool* InitStrPool (StrPool* P);
+StringPool* InitStringPool (StringPool* P);
 /* Initialize a string pool */
 
-void DoneStrPool (StrPool* P);
+void DoneStringPool (StringPool* P);
 /* Free the data of a string pool (but not the data itself) */
 
-StrPool* NewStrPool (void);
+StringPool* NewStringPool (void);
 /* Allocate, initialize and return a new string pool */
 
-void FreeStrPool (StrPool* P);
+void FreeStringPool (StringPool* P);
 /* Free a string pool */
 
-void SP_Use (char* Buffer, unsigned Size);
-/* Delete existing data and use the data from Buffer instead. Buffer must be
- * allocated on the heap and will be freed using xfree() if necessary.
- */
-
-const char* SP_Get (const StrPool* P, unsigned Index);
+const char* SP_Get (const StringPool* P, unsigned Index);
 /* Return a string from the pool. Index must exist, otherwise FAIL is called. */
 
-unsigned SP_Add (StrPool* P, const char* S);
+unsigned SP_Add (StringPool* P, const char* S);
 /* Add a string to the buffer and return the index. If the string does already
  * exist in the pool, SP_Add will just return the index of the existing string.
  */
 
 #if defined(HAVE_INLINE)
-INLINE unsigned SB_GetCount (const StrPool* P)
+INLINE unsigned SP_GetCount (const StringPool* P)
 /* Return the number of strings in the pool */
 {
     return CollCount (&P->Entries);
 }
 #else
-#  define SB_GetCount(P)        CollCount (&(P)->Entries)
+#  define SP_GetCount(P)        CollCount (&(P)->Entries)
 #endif
 
 

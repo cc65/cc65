@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -63,9 +63,25 @@ static FILE* F = 0;
 
 /* Header structure */
 static ObjHeader Header = {
-    OBJ_MAGIC,
-    OBJ_VERSION,
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+    OBJ_MAGIC,          /* 32: Magic number */
+    OBJ_VERSION,        /* 16: Version number */
+    0,                  /* 16: flags */
+    0,                  /* 32: Offset to option table */
+    0,                  /* 32: Size of options */
+    0,                  /* 32: Offset to file table */
+    0,                  /* 32: Size of files */
+    0,                  /* 32: Offset to segment table */
+    0,                  /* 32: Size of segment table */
+    0,                  /* 32: Offset to import list */
+    0,                  /* 32: Size of import list */
+    0,                  /* 32: Offset to export list */
+    0,                  /* 32: Size of export list */
+    0,                  /* 32: Offset to list of debug symbols */
+    0,                  /* 32: Size of debug symbols */
+    0,                  /* 32: Offset to list of line infos */
+    0,                  /* 32: Size of line infos */
+    0,                  /* 32: Offset to string pool */
+    0                   /* 32: Size of string pool */
 };
 
 
@@ -116,6 +132,8 @@ static void ObjWriteHeader (void)
     ObjWrite32 (Header.DbgSymSize);
     ObjWrite32 (Header.LineInfoOffs);
     ObjWrite32 (Header.LineInfoSize);
+    ObjWrite32 (Header.StrPoolOffs);
+    ObjWrite32 (Header.StrPoolSize);
 }
 
 
@@ -382,6 +400,22 @@ void ObjEndLineInfos (void)
 /* Mark the end of the line info section */
 {
     Header.LineInfoSize = ftell (F) - Header.LineInfoOffs;
+}
+
+
+
+void ObjStartStrPool (void)
+/* Mark the start of the string pool section */
+{
+    Header.StrPoolOffs = ftell (F);
+}
+
+
+
+void ObjEndStrPool (void)
+/* Mark the end of the string pool section */
+{
+    Header.StrPoolSize = ftell (F) - Header.StrPoolOffs;
 }
 
 

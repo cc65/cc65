@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -65,7 +65,7 @@ struct Import {
     FilePos  		Pos;		/* File position of reference */
     union {
 	struct Export*	Exp;		/* Matching export for this import */
-	char*  	        Name;		/* Name if not in table */
+       	const char*    	Name;		/* Name if not in table */
     } V;
     unsigned char    	Type;		/* Type of import */
 };
@@ -84,7 +84,7 @@ struct Export {
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned char	Type;		/* Type of export */
     unsigned char	ConDes[CD_TYPE_COUNT];	/* Constructor/destructor decls */
-    char*      	       	Name;		/* Name - dynamically allocated */
+    const char*        	Name;  	       	/* Name */
 };
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -65,6 +65,7 @@
 #include "options.h"
 #include "pseudo.h"
 #include "scanner.h"
+#include "spool.h"
 #include "symtab.h"
 #include "ulabel.h"
 
@@ -320,8 +321,8 @@ static void OptVersion (const char* Opt attribute ((unused)),
 /* Print the assembler version */
 {
     fprintf (stderr,
-       	     "ca65 V%u.%u.%u - (C) Copyright 1998-2000 Ullrich von Bassewitz\n",
-       	     VER_MAJOR, VER_MINOR, VER_PATCH);
+       	     "ca65 V%u.%u.%u - %s\n",
+       	     VER_MAJOR, VER_MINOR, VER_PATCH, Copyright);
 }
 
 
@@ -480,6 +481,9 @@ static void CreateObjFile (void)
     /* Write line infos if requested */
     WriteLineInfo ();
 
+    /* Write the string pool */
+    WriteStrPool ();
+
     /* Write an updated header and close the file */
     ObjClose ();
 }
@@ -610,7 +614,7 @@ int main (int argc, char* argv [])
     }
 
     /* If no CPU given, use the default CPU for the target */
-    if (GetCPU () == CPU_UNKNOWN) { 
+    if (GetCPU () == CPU_UNKNOWN) {
         if (Target != TGT_UNKNOWN) {
             SetCPU (DefaultCPU[Target]);
         } else {

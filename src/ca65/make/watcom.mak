@@ -67,6 +67,7 @@ OBJS = 	condasm.obj	\
 	pseudo.obj	\
 	repeat.obj	\
 	scanner.obj	\
+        spool.obj       \
 	symtab.obj	\
 	toklist.obj	\
 	ulabel.obj

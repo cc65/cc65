@@ -26,6 +26,7 @@ OBJS =	abend.o		\
         segdefs.o       \
         segnames.o      \
 	strbuf.o	\
+        strpool.o       \
 	strutil.o	\
 	target.o	\
 	tgttrans.o	\

@@ -6,9 +6,9 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*									     */
 /*									     */
@@ -86,7 +86,8 @@ static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
 {
     H->Version	  = Read16 (Obj);
     if (H->Version != OBJ_VERSION) {
-       	Error ("Object file `%s' has wrong version", Name);
+       	Error ("Object file `%s' has wrong version, expected %08X, got %08X",
+               Name, OBJ_VERSION, H->Version);
     }
     H->Flags	    = Read16 (Obj);
     H->OptionOffs   = Read32 (Obj);
@@ -103,6 +104,8 @@ static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     H->DbgSymSize   = Read32 (Obj);
     H->LineInfoOffs = Read32 (Obj);
     H->LineInfoSize = Read32 (Obj);
+    H->StrPoolOffs  = Read32 (Obj);
+    H->StrPoolSize  = Read32 (Obj);
 }
 
 
@@ -179,6 +182,19 @@ void ObjReadLineInfos (FILE* F, ObjData* O)
 
 
 
+void ObjReadStrPool (FILE* F, ObjData* O)
+/* Read the string pool from a file at the current position */
+{
+    unsigned I;
+    O->StringCount = ReadVar (F);
+    O->Strings     = xmalloc (O->StringCount * sizeof (char*));
+    for (I = 0; I < O->StringCount; ++I) {
+        O->Strings[I] = ReadStr (F);
+    }
+}
+
+
+
 void ObjReadSections (FILE* F, ObjData* O)
 /* Read the section data from a file at the current position */
 {
@@ -208,6 +224,10 @@ void ObjAdd (FILE* Obj, const char* Name)
     /* Initialize the object module data structure */
     O->Name  = xstrdup (GetModule (Name));
     O->Flags = OBJ_HAVEDATA;
+
+    /* Read the string pool from the object file */
+    fseek (Obj, O->Header.StrPoolOffs, SEEK_SET);
+    ObjReadStrPool (Obj, O);
 
     /* Read the files list from the object file */
     fseek (Obj, O->Header.FileOffs, SEEK_SET);

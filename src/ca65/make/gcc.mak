@@ -34,6 +34,7 @@ OBJS =  condasm.o	\
         pseudo.o       	\
 	repeat.o	\
         scanner.o	\
+        spool.o         \
         symtab.o	\
        	toklist.o      	\
 	ulabel.o

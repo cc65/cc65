@@ -468,7 +468,7 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 
 	    case EXPR_SYMBOL:
 	   	/* Read the import number */
-	   	Expr->V.ImpNum = Read16 (F);
+	   	Expr->V.ImpNum = ReadVar (F);
 	   	break;
 
 	    case EXPR_SECTION:
@@ -485,7 +485,7 @@ ExprNode* ReadExpr (FILE* F, ObjData* O)
 
     	/* Not a leaf node */
     	Expr->Left = ReadExpr (F, O);
-	Expr->Right = ReadExpr (F, O);
+	Expr->Right = ReadExpr (F, O);  
 
     }
 

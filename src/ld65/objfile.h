@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -42,7 +42,7 @@
 
 /* common */
 #include "objdefs.h"
-	  
+
 /* ld65 */
 #include "objdata.h"
 
@@ -68,6 +68,9 @@ void ObjReadDbgSyms (FILE* F, ObjData* O);
 
 void ObjReadLineInfos (FILE* F, ObjData* O);
 /* Read the line infos from a file at the current position */
+
+void ObjReadStrPool (FILE* F, ObjData* O);
+/* Read the string pool from a file at the current position */
 
 void ObjReadSections (FILE* F, ObjData* O);
 /* Read the section data from a file at the current position */

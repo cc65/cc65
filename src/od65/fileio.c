@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -211,6 +211,22 @@ void ReadObjHeader (FILE* F, ObjHeader* H)
     H->DbgSymSize   = Read32 (F);
     H->LineInfoOffs = Read32 (F);
     H->LineInfoSize = Read32 (F);
+    H->StrPoolOffs  = Read32 (F);
+    H->StrPoolSize  = Read32 (F);
+}
+
+
+
+void ReadStrPool (FILE* F, Collection* C)
+/* Read a string pool from the current position into C. */
+{
+    /* The number of strings is the first item */
+    unsigned long Count = ReadVar (F);
+
+    /* Read all the strings into C */
+    while (Count--) {
+        CollAppend (C, ReadStr (F));
+    }
 }
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -63,8 +63,8 @@ struct DbgSym {
     ObjData*   		Obj;	    	/* Object file that exports the name */
     FilePos    		Pos;		/* File position of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
+    const char*        	Name;  	       	/* Name */
     unsigned char	Type;		/* Type of symbol */
-    char*      	       	Name;		/* Name - dynamically allocated */
 };
 
 

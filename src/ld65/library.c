@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2001 Ullrich von Bassewitz					     */
-/*		 Wacholderweg 14					     */
-/*		 D-70597 Stuttgart					     */
-/* EMail:	 uz@cc65.org    					     */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -103,6 +103,8 @@ static void LibReadObjHeader (ObjData* O)
     O->Header.DbgSymSize   = Read32 (Lib);
     O->Header.LineInfoOffs = Read32 (Lib);
     O->Header.LineInfoSize = Read32 (Lib);
+    O->Header.StrPoolOffs  = Read32 (Lib);
+    O->Header.StrPoolSize  = Read32 (Lib);
 }
 
 
@@ -122,20 +124,23 @@ static ObjData* ReadIndexEntry (void)
     O->Start	= Read32 (Lib);
     Read32 (Lib);			/* Skip Size */
 
+    /* Read the string pool */
+    ObjReadStrPool (Lib, O);
+
     /* Skip the export size, then read the exports */
-    Read16 (Lib);
+    (void) ReadVar (Lib);
     O->ExportCount = ReadVar (Lib);
     O->Exports = xmalloc (O->ExportCount * sizeof (Export*));
     for (I = 0; I < O->ExportCount; ++I) {
-	O->Exports [I] = ReadExport (Lib, O);
+ 	O->Exports[I] = ReadExport (Lib, O);
     }
 
     /* Skip the import size, then read the imports */
-    Read16 (Lib);
+    (void) ReadVar (Lib);
     O->ImportCount = ReadVar (Lib);
     O->Imports = xmalloc (O->ImportCount * sizeof (Import*));
     for (I = 0; I < O->ImportCount; ++I) {
-	O->Imports [I] = ReadImport (Lib, O);
+       	O->Imports[I] = ReadImport (Lib, O);
     }
 
     /* Done */
@@ -150,19 +155,19 @@ static void ReadIndex (void)
     unsigned I;
 
     /* Read the object file count and allocate memory */
-    ModuleCount = Read16 (Lib);
+    ModuleCount = ReadVar (Lib);
     Index = xmalloc (ModuleCount * sizeof (ObjData*));
 
     /* Read all entries in the index */
     for (I = 0; I < ModuleCount; ++I) {
-	Index [I] = ReadIndexEntry ();
+       	Index[I] = ReadIndexEntry ();
     }
 }
 
 
 
 /*****************************************************************************/
-/*			       High level stuff				     */
+/*	   		       High level stuff				     */
 /*****************************************************************************/
 
 
@@ -176,7 +181,7 @@ static void LibCheckExports (ObjData* O)
 
     /* Check all exports */
     for (I = 0; I < O->ExportCount; ++I) {
-	if (IsUnresolved (O->Exports [I]->Name)) {
+	if (IsUnresolved (O->Exports[I]->Name)) {
 	    /* We need this module */
 	    O->Flags |= OBJ_REF;
 	    break;
@@ -187,11 +192,11 @@ static void LibCheckExports (ObjData* O)
     if (O->Flags & OBJ_REF) {
 	/* Insert the exports */
 	for (I = 0; I < O->ExportCount; ++I) {
-	    InsertExport (O->Exports [I]);
+	    InsertExport (O->Exports[I]);
 	}
  	/* Insert the imports */
-	for (I = 0; I < O->ImportCount; ++I) {
-	    InsertImport (O->Imports [I]);
+ 	for (I = 0; I < O->ImportCount; ++I) {
+	    InsertImport (O->Imports[I]);
 	}
     }
 }
@@ -215,7 +220,7 @@ void LibAdd (FILE* F, const char* Name)
     Header.Magic   = LIB_MAGIC;
     Header.Version = Read16 (Lib);
     if (Header.Version != LIB_VERSION) {
-	Error ("Wrong data version in `%s'", Name);
+       	Error ("Wrong data version in `%s'", Name);
     }
     Header.Flags   = Read16 (Lib);
     Header.IndexOffs = Read32 (Lib);
@@ -258,7 +263,7 @@ void LibAdd (FILE* F, const char* Name)
 
  	    /* Seek to the start of the debug info and read the debug info */
  	    fseek (Lib, O->Start + O->Header.DbgSymOffs, SEEK_SET);
- 	    ObjReadDbgSyms (Lib, O);
+       	    ObjReadDbgSyms (Lib, O);
 
 	    /* Seek to the start of the line infos and read them */
 	    fseek (Lib, O->Start + O->Header.LineInfoOffs, SEEK_SET);

@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -76,6 +76,8 @@ struct ObjData {
     struct DbgSym**   	DbgSyms;       	/* List of debug symbols */
     unsigned            LineInfoCount;  /* Count of additional line infos */
     struct LineInfo**   LineInfos;      /* List of additional line infos */
+    unsigned            StringCount;    /* Count of strings */
+    char**              Strings;        /* List of strings used */
 };
 
 
@@ -96,8 +98,10 @@ extern ObjData*		ObjLast;	/* Last entry in list */
 ObjData* NewObjData (void);
 /* Allocate a new structure on the heap, insert it into the list, return it */
 
-void FreeObjData (ObjData* O);
-/* Free a complete struct */
+const char* GetObjString (const ObjData* O, unsigned long Index);
+/* Get a string from the object file string table. Abort if the string index
+ * is invalid.
+ */
 
 const char* GetObjFileName (const ObjData* O);
 /* Get the name of the object file. Return "[linker generated]" if the object

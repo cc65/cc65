@@ -48,6 +48,7 @@
 #include "expr.h"
 #include "objfile.h"
 #include "scanner.h"
+#include "spool.h"
 #include "symtab.h"
 
 
@@ -1137,7 +1138,7 @@ void WriteImports (void)
      	    } else {
      		ObjWrite8 (IMP_ABS);
      	    }
-       	    ObjWriteStr (S->Name);
+       	    ObjWriteVar (GetStringId (S->Name));
      	    ObjWritePos (&S->Pos);
      	}
      	S = S->List;
@@ -1214,7 +1215,7 @@ void WriteExports (void)
 	    }
 
 	    /* Write the name */
-       	    ObjWriteStr (S->Name);
+       	    ObjWriteVar (GetStringId (S->Name));
 
 	    /* Write the value */
 	    if ((ExprMask & EXP_MASK_VAL) == EXP_CONST) {
@@ -1278,7 +1279,7 @@ void WriteDbgSyms (void)
 		ObjWrite8 (ExprMask);
 
 		/* Write the name */
-		ObjWriteStr (S->Name);
+       	       	ObjWriteVar (GetStringId (S->Name));
 
 		/* Write the value */
 		if ((ExprMask & EXP_MASK_VAL) == EXP_CONST) {

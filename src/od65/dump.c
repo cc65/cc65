@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -38,6 +38,7 @@
 
 /* common */
 #include "cddefs.h"
+#include "coll.h"
 #include "exprdefs.h"
 #include "filepos.h"
 #include "objdefs.h"
@@ -54,8 +55,36 @@
 
 
 /*****************************************************************************/
-/*    		    		     Code   				     */
+/*    		    	    	     Code   				     */
 /*****************************************************************************/
+
+
+
+static void DestroyStrPool (Collection* C)
+/* Free all strings in the given pool plus the item pointers. Note: The
+ * collection may not be reused later.
+ */
+{
+    unsigned I;
+    for (I = 0; I < CollCount (C); ++I) {
+        xfree (CollAtUnchecked (C, I));
+    }
+    DoneCollection (C);
+}
+
+
+
+static const char* GetString (const Collection* C, unsigned Index)
+/* Get a string from a collection. In fact, this function calls CollConstAt,
+ * but will print a somewhat more readable error message if the index is out
+ * of bounds.
+ */
+{
+    if (Index >= CollCount (C)) {
+        Error ("Invalid string index (%u) - file corrupt!", Index);
+    }
+    return CollConstAt (C, Index);
+}
 
 
 
@@ -109,7 +138,7 @@ static void SkipExpr (FILE* F)
 
 	    case EXPR_SYMBOL:
 	   	/* Read the import number */
-	   	(void) Read16 (F);
+	   	(void) ReadVar (F);
 	   	break;
 
 	    case EXPR_SECTION:
@@ -141,6 +170,10 @@ static unsigned SkipFragment (FILE* F)
 
     /* Read the fragment type */
     unsigned char Type = Read8 (F);
+
+    /* Extract the check mask */
+    unsigned char Check = Type & FRAG_CHECKMASK;
+    Type &= ~FRAG_CHECKMASK;
 
     /* Handle the different fragment types */
     switch (Type) {
@@ -186,6 +219,14 @@ static unsigned SkipFragment (FILE* F)
 	    SkipExpr (F);
 	    break;
 
+    }
+
+    /* Skip the check expression if we have one */
+    if (Check & FRAG_CHECK_WARN) {
+        SkipExpr (F);
+    }
+    if (Check & FRAG_CHECK_ERROR) {
+        SkipExpr (F);
     }
 
     /* Skip the file position of the fragment */
@@ -290,6 +331,12 @@ void DumpObjHeader (FILE* F, unsigned long Offset)
 
     /* Debug symbols */
     DumpObjHeaderSection ("Debug symbols", H.DbgSymOffs, H.DbgSymSize);
+
+    /* Line infos */
+    DumpObjHeaderSection ("Line infos", H.LineInfoOffs, H.LineInfoSize);
+
+    /* String pool */
+    DumpObjHeaderSection ("String pool", H.StrPoolOffs, H.StrPoolSize);
 }
 
 
@@ -297,15 +344,18 @@ void DumpObjHeader (FILE* F, unsigned long Offset)
 void DumpObjOptions (FILE* F, unsigned long Offset)
 /* Dump the file options */
 {
-    ObjHeader H;
-    unsigned Count;
-    unsigned I;
+    ObjHeader  H;
+    Collection StrPool = AUTO_COLLECTION_INITIALIZER;
+    unsigned   Count;
+    unsigned   I;
 
-    /* Seek to the header position */
+    /* Seek to the header position and read the header */
     FileSeek (F, Offset);
-
-    /* Read the header */
     ReadObjHeader (F, &H);
+
+    /* Seek to the start of the string pool and read it */
+    FileSeek (F, Offset + H.StrPoolOffs);
+    ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the options */
     FileSeek (F, Offset + H.OptionOffs);
@@ -374,6 +424,9 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 	     	break;
 	}
     }
+
+    /* Destroy the string pool */
+    DestroyStrPool (&StrPool);
 }
 
 
@@ -381,15 +434,18 @@ void DumpObjOptions (FILE* F, unsigned long Offset)
 void DumpObjFiles (FILE* F, unsigned long Offset)
 /* Dump the source files */
 {
-    ObjHeader H;
-    unsigned Count;
-    unsigned I;
+    ObjHeader  H;
+    Collection StrPool = AUTO_COLLECTION_INITIALIZER;
+    unsigned   Count;
+    unsigned   I;
 
-    /* Seek to the header position */
+    /* Seek to the header position and read the header */
     FileSeek (F, Offset);
-
-    /* Read the header */
     ReadObjHeader (F, &H);
+
+    /* Seek to the start of the string pool and read it */
+    FileSeek (F, Offset + H.StrPoolOffs);
+    ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the source files */
     FileSeek (F, Offset + H.FileOffs);
@@ -421,6 +477,9 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
 	/* Free the Name */
 	xfree (Name);
     }
+
+    /* Destroy the string pool */
+    DestroyStrPool (&StrPool);
 }
 
 
@@ -428,16 +487,19 @@ void DumpObjFiles (FILE* F, unsigned long Offset)
 void DumpObjSegments (FILE* F, unsigned long Offset)
 /* Dump the segments in the object file */
 {
-    ObjHeader H;
-    unsigned Count;
-    unsigned I;
-    unsigned FragCount;
+    ObjHeader  H;
+    Collection StrPool = AUTO_COLLECTION_INITIALIZER;
+    unsigned   Count;
+    unsigned   I;
+    unsigned   FragCount;
 
-    /* Seek to the header position */
+    /* Seek to the header position and read the header */
     FileSeek (F, Offset);
-
-    /* Read the header */
     ReadObjHeader (F, &H);
+
+    /* Seek to the start of the string pool and read it */
+    FileSeek (F, Offset + H.StrPoolOffs);
+    ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the segments */
     FileSeek (F, Offset + H.SegOffs);
@@ -451,7 +513,7 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 
     /* Read and print all segments */
     for (I = 0; I < Count; ++I) {
-
+                                    
 	/* Read the data for one segments */
 	char*	      Name  = ReadStr (F);
 	unsigned      Len   = strlen (Name);
@@ -486,8 +548,8 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 	while (Size > 0) {
 	    unsigned FragSize = SkipFragment (F);
 	    if (FragSize > Size) {
-	    	/* OOPS - file data invalid */
-	    	Error ("Invalid fragment data - file corrupt!");
+	       	/* OOPS - file data invalid */
+	       	Error ("Invalid fragment data - file corrupt!");
 	    }
 	    Size -= FragSize;
 	    ++FragCount;
@@ -496,6 +558,9 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 	/* Print the fragment count */
        	printf ("      Fragment count:%16u\n", FragCount);
     }
+
+    /* Destroy the string pool */
+    DestroyStrPool (&StrPool);
 }
 
 
@@ -503,16 +568,19 @@ void DumpObjSegments (FILE* F, unsigned long Offset)
 void DumpObjImports (FILE* F, unsigned long Offset)
 /* Dump the imports in the object file */
 {
-    ObjHeader H;
-    unsigned  Count;
-    unsigned  I;
-    FilePos   Pos;
+    ObjHeader  H;
+    Collection StrPool = AUTO_COLLECTION_INITIALIZER;
+    unsigned   Count;
+    unsigned   I;
+    FilePos    Pos;
 
-    /* Seek to the header position */
+    /* Seek to the header position and read the header */
     FileSeek (F, Offset);
-
-    /* Read the header */
     ReadObjHeader (F, &H);
+
+    /* Seek to the start of the string pool and read it */
+    FileSeek (F, Offset + H.StrPoolOffs);
+    ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the imports */
     FileSeek (F, Offset + H.ImportOffs);
@@ -531,7 +599,7 @@ void DumpObjImports (FILE* F, unsigned long Offset)
 
        	/* Read the data for one import */
        	unsigned char Type  = Read8 (F);
-	char* 	      Name  = ReadStr (F);
+       	const char*   Name  = GetString (&StrPool, ReadVar (F));
 	unsigned      Len   = strlen (Name);
 	ReadFilePos (F, &Pos);
 
@@ -548,10 +616,10 @@ void DumpObjImports (FILE* F, unsigned long Offset)
 	/* Print the data */
        	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
 	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
-
-	/* Free the Name */
-	xfree (Name);
     }
+
+    /* Destroy the string pool */
+    DestroyStrPool (&StrPool);
 }
 
 
@@ -559,16 +627,19 @@ void DumpObjImports (FILE* F, unsigned long Offset)
 void DumpObjExports (FILE* F, unsigned long Offset)
 /* Dump the exports in the object file */
 {
-    ObjHeader 	  H;
-    unsigned  	  Count;
-    unsigned  	  I;
-    FilePos   	  Pos;
+    ObjHeader 	H;
+    Collection  StrPool = AUTO_COLLECTION_INITIALIZER;
+    unsigned   	Count;
+    unsigned   	I;
+    FilePos    	Pos;
 
-    /* Seek to the header position */
+    /* Seek to the header position and read the header */
     FileSeek (F, Offset);
-
-    /* Read the header */
     ReadObjHeader (F, &H);
+
+    /* Seek to the start of the string pool and read it */
+    FileSeek (F, Offset + H.StrPoolOffs);
+    ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the exports */
     FileSeek (F, Offset + H.ExportOffs);
@@ -584,17 +655,17 @@ void DumpObjExports (FILE* F, unsigned long Offset)
     for (I = 0; I < Count; ++I) {
 
 	unsigned long 	Value = 0;
-	int 		HaveValue;
+	int    		HaveValue;
 	unsigned char	Type;
 	unsigned char	ConDes [CD_TYPE_COUNT];
-	char* 		Name;
+       	const char*    	Name;
 	unsigned	Len;
 
 
        	/* Read the data for one export */
        	Type  = Read8 (F);
 	ReadData (F, ConDes, GET_EXP_CONDES_COUNT (Type));
-	Name  = ReadStr (F);
+       	Name  = GetString (&StrPool, ReadVar (F));
 	Len   = strlen (Name);
        	if (IS_EXP_EXPR (Type)) {
 	    SkipExpr (F);
@@ -614,10 +685,10 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 	if (HaveValue) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
 	}
-
-	/* Free the Name */
-	xfree (Name);
     }
+
+    /* Destroy the string pool */
+    DestroyStrPool (&StrPool);
 }
 
 
@@ -625,16 +696,19 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 /* Dump the debug symbols from an object file */
 {
-    ObjHeader H;
-    unsigned  Count;
-    unsigned  I;
-    FilePos   Pos;
+    ObjHeader   H;
+    Collection  StrPool = AUTO_COLLECTION_INITIALIZER;
+    unsigned    Count;
+    unsigned    I;
+    FilePos     Pos;
 
-    /* Seek to the header position */
+    /* Seek to the header position and read the header */
     FileSeek (F, Offset);
-
-    /* Read the header */
     ReadObjHeader (F, &H);
+
+    /* Seek to the start of the string pool and read it */
+    FileSeek (F, Offset + H.StrPoolOffs);
+    ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the debug syms */
     FileSeek (F, Offset + H.DbgSymOffs);
@@ -660,13 +734,13 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	int 	   	HaveValue;
 	unsigned char	Type;
 	unsigned char	ConDes [CD_TYPE_COUNT];
-	char* 		Name;
+       	const char*    	Name;
 	unsigned	Len;
 
        	/* Read the data for one symbol */
        	Type  = Read8 (F);
 	ReadData (F, ConDes, GET_EXP_CONDES_COUNT (Type));
-	Name  = ReadStr (F);
+	Name  = GetString (&StrPool, ReadVar (F));
 	Len   = strlen (Name);
 	if (IS_EXP_EXPR (Type)) {
 	    SkipExpr (F);
@@ -686,10 +760,10 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	if (HaveValue) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
 	}
-
-	/* Free the Name */
-	xfree (Name);
     }
+
+    /* Destroy the string pool */
+    DestroyStrPool (&StrPool);
 }
 
 
@@ -697,15 +771,18 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 void DumpObjLineInfo (FILE* F, unsigned long Offset)
 /* Dump the line info from an object file */
 {
-    ObjHeader H;
-    unsigned  Count;
-    unsigned  I;
+    ObjHeader   H;
+    Collection  StrPool = AUTO_COLLECTION_INITIALIZER;
+    unsigned    Count;
+    unsigned    I;
 
-    /* Seek to the header position */
+    /* Seek to the header position and read the header */
     FileSeek (F, Offset);
-
-    /* Read the header */
     ReadObjHeader (F, &H);
+
+    /* Seek to the start of the string pool and read it */
+    FileSeek (F, Offset + H.StrPoolOffs);
+    ReadStrPool (F, &StrPool);
 
     /* Seek to the start of line infos */
     FileSeek (F, Offset + H.LineInfoOffs);
@@ -740,6 +817,9 @@ void DumpObjLineInfo (FILE* F, unsigned long Offset)
        	printf ("      Col:%27u\n", Pos.Col);
        	printf ("      Name:%26u\n", Pos.Name);
     }
+
+    /* Destroy the string pool */
+    DestroyStrPool (&StrPool);
 }
 
 
@@ -747,14 +827,17 @@ void DumpObjLineInfo (FILE* F, unsigned long Offset)
 void DumpObjSegSize (FILE* F, unsigned long Offset)
 /* Dump the sizes of the segment in the object file */
 {
-    ObjHeader H;
-    unsigned Count;
+    ObjHeader   H;
+    Collection  StrPool = AUTO_COLLECTION_INITIALIZER;
+    unsigned    Count;
 
-    /* Seek to the header position */
+    /* Seek to the header position and read the header */
     FileSeek (F, Offset);
-
-    /* Read the header */
     ReadObjHeader (F, &H);
+
+    /* Seek to the start of the string pool and read it */
+    FileSeek (F, Offset + H.StrPoolOffs);
+    ReadStrPool (F, &StrPool);
 
     /* Seek to the start of the segments */
     FileSeek (F, Offset + H.SegOffs);
@@ -793,6 +876,9 @@ void DumpObjSegSize (FILE* F, unsigned long Offset)
 	    Size -= FragSize;
 	}
     }
+
+    /* Destroy the string pool */
+    DestroyStrPool (&StrPool);
 }
 
 

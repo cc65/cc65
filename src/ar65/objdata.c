@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -72,17 +72,19 @@ ObjData* NewObjData (void)
     ObjData* O = xmalloc (sizeof (ObjData));
 
     /* Initialize the data */
-    O->Next       = 0;
-    O->Name  	  = 0;
-    O->Index	  = ~0;
-    O->Flags   	  = 0;
-    O->MTime 	  = 0;
-    O->Start	  = 0;
-    O->Size 	  = 0;
-    O->ImportSize = 0;
-    O->Imports    = 0;
-    O->ExportSize = 0;
-    O->Exports    = 0;
+    O->Next        = 0;
+    O->Name  	   = 0;
+    O->Index	   = ~0;
+    O->Flags   	   = 0;
+    O->MTime 	   = 0;
+    O->Start	   = 0;
+    O->Size 	   = 0;
+    O->StringCount = 0;
+    O->Strings     = 0;
+    O->ImportSize  = 0;
+    O->Imports     = 0;
+    O->ExportSize  = 0;
+    O->Exports     = 0;
 
     /* Link it into the list */
     if (ObjLast) {
@@ -105,9 +107,15 @@ ObjData* NewObjData (void)
 void FreeObjData (ObjData* O)
 /* Free a complete struct */
 {
+    unsigned I;
+
     xfree (O->Name);
     xfree (O->Imports);
     xfree (O->Exports);
+    for (I = 0; I < O->StringCount; ++I) {
+        xfree (O->Strings[I]);
+    }
+    xfree (O->Strings);
     xfree (O);
 }
 
@@ -189,7 +197,7 @@ void MakeObjPool (void)
 
 	/* Set the pool pointer */
 	ObjPool [Index] = O;
-									     
+
      	/* Next object */
      	++Index;
      	O = O->Next;
@@ -206,6 +214,16 @@ const char* GetObjName (unsigned Index)
 }
 
 
+
+const char* GetObjString (const ObjData* O, unsigned Index)
+/* Get a string from the string pool of an object file */
+{
+    if (Index >= O->StringCount) {
+        Error ("Invalid string index (%u) in module `%s'",
+               Index, GetObjName (O->Index));
+    }
+    return O->Strings[Index];
+}
 
 
 

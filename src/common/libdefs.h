@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   libdefs.h   	       	       	       	     */
+/*			      	   libdefs.h   	       	       	       	     */
 /*                                                                           */
 /*			   Library file definitions			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,7 +46,7 @@
 
 /* Defines for magic and version */
 #define LIB_MAGIC	0x7A55616E
-#define LIB_VERSION	0x0009
+#define LIB_VERSION	0x000A
 
 /* Size of an library file header */
 #define	LIB_HDR_SIZE  	12
@@ -54,8 +54,8 @@
 
 
 /* Header structure for the library */
-typedef struct LibHeader_ LibHeader;
-struct LibHeader_ {
+typedef struct LibHeader LibHeader;
+struct LibHeader {
     unsigned long     	Magic;		/* 32: Magic number */
     unsigned 		Version;	/* 16: Version number */
     unsigned	       	Flags;		/* 16: flags */

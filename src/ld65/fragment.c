@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -52,16 +52,18 @@ Fragment* NewFragment (unsigned char Type, unsigned long Size, Section* S)
 /* Create a new fragment and insert it into the section S */
 {
     /* Allocate memory */
-    Fragment* F = xmalloc (sizeof (Fragment) - 1 + Size);  	/* Portable? */
+    Fragment* F = xmalloc (sizeof (Fragment) - 1 + Size);    
 
     /* Initialize the data */
-    F->Next = 0;
-    F->Obj  = 0;
-    F->Size = Size;
-    F->Expr = 0;
+    F->Next      = 0;
+    F->Obj       = 0;
+    F->Size      = Size;
+    F->Expr      = 0;
     InitFilePos (&F->Pos);
-    F->LI   = 0;
-    F->Type = Type;
+    F->LI        = 0;
+    F->WarnExpr  = 0;
+    F->ErrorExpr = 0;
+    F->Type      = Type;
 
     /* Insert the code fragment into the section */
     if (S->FragRoot == 0) {

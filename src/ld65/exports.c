@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -114,7 +114,7 @@ void InsertImport (Import* I)
     unsigned HashVal;
 
     /* As long as the import is not inserted, V.Name is valid */
-    char* Name = I->V.Name;
+    const char* Name = I->V.Name;
 
     /* Create a hash value for the given name */
     HashVal = HashStr (Name) % HASHTAB_SIZE;
@@ -134,8 +134,8 @@ void InsertImport (Import* I)
     	    if (E->Next == 0) {
     	  	/* End of list an entry not found, insert a dummy */
     	  	E->Next = NewExport (0, Name, 0);
-    	  	E = E->Next;		/* Point to dummy */
-		++ExpCount;		/* One export more */
+    	  	E = E->Next;   		/* Point to dummy */
+		++ExpCount;    		/* One export more */
        	  	break;
     	    } else {
     	  	E = E->Next;
@@ -150,14 +150,11 @@ void InsertImport (Import* I)
     I->Next    = E->ImpList;
     E->ImpList = I;
     E->ImpCount++;
-    ++ImpCount;	   		/* Total import count */
+    ++ImpCount;	   	       	/* Total import count */
     if (E->Expr == 0) {
        	/* This is a dummy export */
     	++ImpOpen;
     }
-
-    /* Now free the name since it's no longer needed */
-    xfree (Name);
 }
 
 
@@ -178,7 +175,7 @@ Import* ReadImport (FILE* F, ObjData* Obj)
     I = NewImport (Type, Obj);
 
     /* Read the name */
-    I->V.Name = ReadStr (F);
+    I->V.Name = GetObjString (Obj, ReadVar (F));
 
     /* Read the file position */
     ReadFilePos (F, &I->Pos);
@@ -328,7 +325,7 @@ Export* ReadExport (FILE* F, ObjData* O)
     }
 
     /* Read the name */
-    E->Name = ReadStr (F);
+    E->Name = GetObjString (O, ReadVar (F));
 
     /* Read the value */
     if (IS_EXP_EXPR (Type)) {

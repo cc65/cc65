@@ -1603,7 +1603,7 @@ void WriteExpr (ExprNode* Expr)
         case EXPR_SYMBOL:
 	    /* Maybe we should use a code here? */
 	    CHECK (SymIsImport (Expr->V.Sym));	/* Safety */
-	    ObjWrite16 (GetSymIndex (Expr->V.Sym));
+	    ObjWriteVar (GetSymIndex (Expr->V.Sym));
 	    break;
 
         case EXPR_SECTION:

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -71,7 +71,8 @@ static const char*	LibName = 0;
 static LibHeader       	Header = {
     LIB_MAGIC,
     LIB_VERSION,
-    0, 0
+    0,
+    0
 };
 
 
@@ -106,6 +107,8 @@ static void ReadHeader (void)
 static void ReadIndexEntry (void)
 /* Read one entry in the index */
 {
+    unsigned I;
+
     /* Create a new entry and insert it into the list */
     ObjData* O 	= NewObjData ();
 
@@ -116,13 +119,20 @@ static void ReadIndexEntry (void)
     O->Start    = Read32 (Lib);
     O->Size     = Read32 (Lib);
 
+    /* Strings */
+    O->StringCount = ReadVar (Lib);
+    O->Strings     = xmalloc (O->StringCount * sizeof (char*));
+    for (I = 0; I < O->StringCount; ++I) {
+        O->Strings[I] = ReadStr (Lib);
+    }
+
     /* Exports */
-    O->ExportSize = Read16 (Lib);
+    O->ExportSize = ReadVar (Lib);
     O->Exports    = xmalloc (O->ExportSize);
     ReadData (Lib, O->Exports, O->ExportSize);
 
     /* Imports */
-    O->ImportSize = Read16 (Lib);
+    O->ImportSize = ReadVar (Lib);
     O->Imports    = xmalloc (O->ImportSize);
     ReadData (Lib, O->Imports, O->ImportSize);
 }
@@ -138,7 +148,7 @@ static void ReadIndex (void)
     fseek (Lib, Header.IndexOffs, SEEK_SET);
 
     /* Read the object file count and calculate the cross ref size */
-    Count = Read16 (Lib);
+    Count = ReadVar (Lib);
 
     /* Read all entries in the index */
     while (Count--) {
@@ -172,6 +182,8 @@ static void WriteHeader (void)
 static void WriteIndexEntry (ObjData* O)
 /* Write one index entry */
 {
+    unsigned I;
+
     /* Module name/flags/MTime/start/size */
     WriteStr (NewLib, O->Name);
     Write16  (NewLib, O->Flags & ~OBJ_HAVEDATA);
@@ -179,12 +191,18 @@ static void WriteIndexEntry (ObjData* O)
     Write32  (NewLib, O->Start);
     Write32  (NewLib, O->Size);
 
+    /* Strings */
+    WriteVar (NewLib, O->StringCount);
+    for (I = 0; I < O->StringCount; ++I) {
+        WriteStr (NewLib, O->Strings[I]);
+    }
+
     /* Exports */
-    Write16 (NewLib, O->ExportSize);
+    WriteVar (NewLib, O->ExportSize);
     WriteData (NewLib, O->Exports, O->ExportSize);
 
     /* Imports */
-    Write16 (NewLib, O->ImportSize);
+    WriteVar (NewLib, O->ImportSize);
     WriteData (NewLib, O->Imports, O->ImportSize);
 }
 
@@ -202,7 +220,7 @@ static void WriteIndex (void)
     Header.IndexOffs = ftell (NewLib);
 
     /* Write the object file count */
-    Write16 (NewLib, ObjCount);
+    WriteVar (NewLib, ObjCount);
 
     /* Write the object files */
     O = ObjRoot;
@@ -348,8 +366,8 @@ static void SkipExpr (unsigned char** Buf)
       	    return;
 
         case EXPR_SYMBOL:
-      	    /* 16 bit symbol index */
-      	    *Buf += 2;
+      	    /* Variable seized symbol index */
+      	    (void) GetVar (Buf);
       	    return;
 
         case EXPR_SECTION:
@@ -359,8 +377,8 @@ static void SkipExpr (unsigned char** Buf)
     }
 
     /* What's left are unary and binary nodes */
-    SkipExpr (Buf);    		/* Skip left */
-    SkipExpr (Buf);		/* Skip right */
+    SkipExpr (Buf);    	       	/* Skip left */
+    SkipExpr (Buf); 	       	/* Skip right */
 }
 
 
@@ -391,8 +409,7 @@ static void LibCheckExports (ObjData* O)
     while (Count--) {
 
 	unsigned char	Tag;
-	unsigned	Len;
-	char*		Name;
+	const char*     Name;
 
       	/* Get the export tag */
       	Tag = *Exports++;
@@ -400,12 +417,8 @@ static void LibCheckExports (ObjData* O)
 	/* condes decls may follow */
 	Exports += GET_EXP_CONDES_COUNT (Tag);
 
-       	/* Next thing is name of symbol */
-     	Len = GetVar (&Exports);
-	Name = xmalloc (Len + 1);
-     	memcpy (Name, Exports, Len);
-     	Name [Len] = '\0';
-     	Exports += Len;
+       	/* Next thing is index of name of symbol */
+        Name = GetObjString (O, GetVar (&Exports));
 
      	/* Skip value of symbol */
      	if (Tag & EXP_EXPR) {
@@ -422,9 +435,6 @@ static void LibCheckExports (ObjData* O)
       	/* Insert the name into the hash table */
 	Print (stdout, 1, "  %s\n", Name);
      	ExpInsert (Name, O->Index);
-
-	/* Free the name */
-	xfree (Name);
     }
 }
 

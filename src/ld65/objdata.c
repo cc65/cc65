@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -86,6 +86,8 @@ ObjData* NewObjData (void)
     O->DbgSyms		= 0;
     O->LineInfoCount    = 0;
     O->LineInfos        = 0;
+    O->StringCount      = 0;
+    O->Strings          = 0;
 
     /* Link it into the list */
     if (ObjLast) {
@@ -105,15 +107,16 @@ ObjData* NewObjData (void)
 
 
 
-void FreeObjData (ObjData* O)
-/* Free a complete struct */
+const char* GetObjString (const ObjData* O, unsigned long Index)
+/* Get a string from the object file string table. Abort if the string index
+ * is invalid.
+ */
 {
-    xfree (O->Name);
-    xfree (O->Imports);
-    xfree (O->Exports);
-    xfree (O->DbgSyms);
-    xfree (O->LineInfos);
-    xfree (O);
+    if (Index >= O->StringCount) {
+       	Error ("Invalid string index (%lu) in module `%s'",
+	       Index, GetObjFileName (O));
+    }
+    return O->Strings[Index];
 }
 
 

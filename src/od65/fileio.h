@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,6 +41,7 @@
 #include <stdio.h>
 
 /* common */
+#include "coll.h"
 #include "filepos.h"
 #include "objdefs.h"
 
@@ -84,6 +85,9 @@ void* ReadData (FILE* F, void* Data, unsigned Size);
 
 void ReadObjHeader (FILE* F, ObjHeader* Header);
 /* Read an object file header from the file */
+
+void ReadStrPool (FILE* F, Collection* C);
+/* Read a string pool from the current position into C. */
 
 
 

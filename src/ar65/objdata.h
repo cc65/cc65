@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -50,19 +50,21 @@
 
 
 /* Internal structure holding object file data */
-typedef struct ObjData_ ObjData;
-struct ObjData_ {
-    ObjData*	     	Next;		/* Linked list of all objects */
-    char*   	     	Name;		/* Module name */
-    unsigned		Index;		/* Module index */
-    unsigned 	     	Flags;
+typedef struct ObjData ObjData;
+struct ObjData {
+    ObjData*  	     	Next;		/* Linked list of all objects */
+    char*     	     	Name;		/* Module name */
+    unsigned  		Index;		/* Module index */
+    unsigned  	     	Flags;
     unsigned long    	MTime;		/* Modifiation time of object file */
     unsigned long	Start;		/* Start offset of data in library */
     unsigned long	Size;		/* Size of data in library */
+    unsigned            StringCount;    /* Number of strings */
+    char**              Strings;        /* Strings from the object file */
     unsigned long      	ImportSize;    	/* Size of imports */
-    void*    	 	Imports;       	/* Imports as raw data */
+    void*     	 	Imports;       	/* Imports as raw data */
     unsigned long	ExportSize;	/* Size of exports */
-    void*		Exports;       	/* Exports as raw data */
+    void*     		Exports;       	/* Exports as raw data */
 };
 
 
@@ -100,6 +102,9 @@ void MakeObjPool (void);
 
 const char* GetObjName (unsigned Index);
 /* Get the name of a module by index */
+
+const char* GetObjString (const ObjData* O, unsigned Index);
+/* Get a string from the string pool of an object file */
 
 
 

@@ -578,7 +578,6 @@ static Fragment* NewFragment (unsigned char Type, unsigned short Len)
 void Emit0 (unsigned char OPC)
 /* Emit an instruction with a zero sized operand */
 {
-    /* First fragment, wrong type or out of space, create new one */
     Fragment* F = NewFragment (FRAG_LITERAL, 1);
     F->V.Data [0] = OPC;
 }

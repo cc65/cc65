@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -69,6 +69,8 @@ struct Fragment {
     struct ExprNode*	Expr;		/* Expression if FRAG_EXPR */
     FilePos  		Pos;		/* File position in source */
     struct LineInfo*    LI;             /* Additional line info */
+    struct ExprNode*    WarnExpr;       /* Print warning if expr true */
+    struct ExprNode*    ErrorExpr;      /* Print error if expr true */
     unsigned char    	Type;  		/* Type of fragment */
     unsigned char      	LitBuf [1]; 	/* Dynamically alloc'ed literal buffer */
 };

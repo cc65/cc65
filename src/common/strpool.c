@@ -60,8 +60,8 @@
 
 
 /* A string pool entry */
-struct StrPoolEntry {
-    StrPoolEntry*       Next;   /* Pointer to next entry in hash chain */
+struct StringPoolEntry {
+    StringPoolEntry*    Next;   /* Pointer to next entry in hash chain */
     unsigned            Hash;   /* Full hash value */
     unsigned            Id;     /* The numeric string id */
     unsigned            Len;    /* Length of the string (excluding terminator) */
@@ -71,19 +71,19 @@ struct StrPoolEntry {
 
 
 /*****************************************************************************/
-/*                            struct StrPoolEntry                            */
+/*                          struct StringPoolEntry                           */
 /*****************************************************************************/
 
 
 
-static StrPoolEntry* NewStrPoolEntry (const char* S, unsigned Hash, unsigned Id)
+static StringPoolEntry* NewStringPoolEntry (const char* S, unsigned Hash, unsigned Id)
 /* Create a new string pool entry and return it. */
 {
     /* Get the length of the string */
     unsigned Len = strlen (S);
 
     /* Allocate memory */
-    StrPoolEntry* E = xmalloc (sizeof (StrPoolEntry) + Len);
+    StringPoolEntry* E = xmalloc (sizeof (StringPoolEntry) + Len);
 
     /* Initialize the fields */
     E->Next = 0;
@@ -104,7 +104,7 @@ static StrPoolEntry* NewStrPoolEntry (const char* S, unsigned Hash, unsigned Id)
 
 
 
-StrPool* InitStrPool (StrPool* P)
+StringPool* InitStringPool (StringPool* P)
 /* Initialize a string pool */
 {
     unsigned I;
@@ -122,7 +122,7 @@ StrPool* InitStrPool (StrPool* P)
 
 
 
-void DoneStrPool (StrPool* P)
+void DoneStringPool (StringPool* P)
 /* Free the data of a string pool (but not the data itself) */
 {
     unsigned I;
@@ -144,20 +144,20 @@ void DoneStrPool (StrPool* P)
 
 
 
-StrPool* NewStrPool (void)
+StringPool* NewStringPool (void)
 /* Allocate, initialize and return a new string pool */
 {
     /* Allocate memory, initialize and return it */
-    return InitStrPool (xmalloc (sizeof (StrPool)));
+    return InitStringPool (xmalloc (sizeof (StringPool)));
 }
 
 
 
-void FreeStrPool (StrPool* P)
+void FreeStringPool (StringPool* P)
 /* Free a string pool */
 {
     /* Free all entries */
-    DoneStrPool (P);
+    DoneStringPool (P);
 
     /* Free the string pool itself */
     xfree (P);
@@ -165,11 +165,11 @@ void FreeStrPool (StrPool* P)
 
 
 
-const char* SP_Get (const StrPool* P, unsigned Index)
+const char* SP_Get (const StringPool* P, unsigned Index)
 /* Return a string from the pool. Index must exist, otherwise FAIL is called. */
 {
     /* Get the collection entry */
-    const StrPoolEntry* E = CollConstAt (&P->Entries, Index);
+    const StringPoolEntry* E = CollConstAt (&P->Entries, Index);
 
     /* Return the string from the entry */
     return E->S;
@@ -177,7 +177,7 @@ const char* SP_Get (const StrPool* P, unsigned Index)
 
 
 
-unsigned SP_Add (StrPool* P, const char* S)
+unsigned SP_Add (StringPool* P, const char* S)
 /* Add a string to the buffer and return the index. If the string does already
  * exist in the pool, SP_Add will just return the index of the existing string.
  */
@@ -189,7 +189,7 @@ unsigned SP_Add (StrPool* P, const char* S)
     unsigned RHash = Hash % (sizeof (P->Tab)/sizeof (P->Tab[0]));
 
     /* Search for an existing entry */
-    StrPoolEntry* E = P->Tab[RHash];
+    StringPoolEntry* E = P->Tab[RHash];
     while (E) {
         if (E->Hash == Hash && strcmp (E->S, S) == 0) {
             /* Found, return the id of the existing string */
@@ -199,7 +199,7 @@ unsigned SP_Add (StrPool* P, const char* S)
     }
 
     /* We didn't find the entry, so create a new one */
-    E = NewStrPoolEntry (S, Hash, CollCount (&P->Entries));
+    E = NewStringPoolEntry (S, Hash, CollCount (&P->Entries));
 
     /* Insert the new entry into the entry collection */
     CollAppend (&P->Entries, E);
@@ -213,53 +213,6 @@ unsigned SP_Add (StrPool* P, const char* S)
 
     /* Return the id of the entry */
     return E->Id;
-}
-
-
-
-unsigned SP_AddBuf (StrPool* P, const void* Buffer, unsigned Size)
-/* Add strings from a string buffer. Buffer must contain a list of zero
- * terminated strings. These strings are added to the pool, starting with
- * the current index. The number of strings added is returned.
- * Beware: The function will do only loose range checking for the buffer
- * limits, so a SEGV may occur if the last string in the buffer is not
- * correctly terminated.
- */
-{
-    /* Cast the buffer pointer to something useful */
-    const char* Buf = Buffer;
-
-    /* Remember the current number of strings in the buffer. */
-    unsigned OldCount = SB_GetCount (P);
-
-    /* Add all strings from the buffer */
-    while (Size) {
-
-        /* Add the next entry */
-        unsigned Id = SP_Add (P, Buf);
-
-        /* Get the entry from the id */
-        const StrPoolEntry* E = CollConstAt (&P->Entries, Id);
-
-        /* Skip this string */
-        Buf  += E->Len + 1;
-        Size -= E->Len + 1;
-    }
-
-    /* Return the number of strings added */
-    return SB_GetCount (P) - OldCount;
-}
-
-
-
-void SP_Build (StrPool* P, const void* Buffer, unsigned Size)
-/* Delete existing data and use the data from Buffer instead. */
-{
-    /* Delete old data */
-    DoneStrPool (P);
-
-    /* Add the buffer data */
-    SP_AddBuf (P, Buffer, Size);
 }
 
 

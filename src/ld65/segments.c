@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -259,6 +259,10 @@ Section* ReadSection (FILE* F, ObjData* O)
     	/* Read the fragment type */
     	unsigned char Type = Read8 (F);
 
+        /* Extract the check mask from the type */
+        unsigned char Check = Type & FRAG_CHECKMASK;
+        Type &= ~FRAG_CHECKMASK;
+
     	/* Handle the different fragment types */
 	switch (Type) {
 
@@ -304,6 +308,14 @@ Section* ReadSection (FILE* F, ObjData* O)
 	    	break;
 
 	}
+
+        /* A check expression may follow */
+        if (Check & FRAG_CHECK_WARN) {
+            Frag->WarnExpr = ReadExpr (F, O);
+        }
+        if (Check & FRAG_CHECK_ERROR) {
+            Frag->ErrorExpr = ReadExpr (F, O);
+        }
 
 	/* Read the file position of the fragment */
 	ReadFilePos (F, &Frag->Pos);
@@ -506,7 +518,12 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 	/* Loop over all fragments in this section */
 	Frag = Sec->FragRoot;
 	while (Frag) {
+                                      
+            /* Do fragment alignment checks */
 
+
+
+            /* Output fragment data */
 	    switch (Frag->Type) {
 
 		case FRAG_LITERAL:
@@ -525,7 +542,7 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 			case SEG_EXPR_RANGE_ERROR:
 			    Error ("Range error in module `%s', line %lu",
 			    	   GetSourceFileName (Frag->Obj, Frag->Pos.Name),
-				   Frag->Pos.Line);
+			 	   Frag->Pos.Line);
 			    break;
 
 			case SEG_EXPR_TOO_COMPLEX:

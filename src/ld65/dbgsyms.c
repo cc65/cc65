@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -80,8 +80,8 @@ static DbgSym* NewDbgSym (unsigned char Type, ObjData* O)
     D->Flags	= 0;
     D->Obj      = O;
     D->Expr    	= 0;
-    D->Type    	= Type;
     D->Name	= 0;
+    D->Type    	= Type;
 
     /* Return the new entry */
     return D;
@@ -148,7 +148,7 @@ DbgSym* ReadDbgSym (FILE* F, ObjData* O)
     D = NewDbgSym (Type, O);
 
     /* Read and assign the name */
-    D->Name = ReadStr (F);
+    D->Name = GetObjString (O, ReadVar (F));
 
     /* Read the value */
     if (IS_EXP_EXPR (Type)) {

@@ -55,6 +55,11 @@ Special locations:
 
   <tag/Stack/
   The C runtime stack is located at &dollar;CFFF and growing downwards.
+
+  <tag/Heap/
+  The C heap is located at the end of the program and grows towards the C
+  runtime stack.
+  
 </descrip><p>
 
 

@@ -466,6 +466,8 @@ static void NextChar (void)
       	/* Check for end of line, read the next line if needed */
        	while (IFile->Line [IFile->Pos.Col] == '\0') {
 
+            unsigned Len, Removed;
+
       	    /* End of current line reached, read next line */
       	    if (fgets (IFile->Line, sizeof (IFile->Line), IFile->F) == 0) {
       	       	/* End of file. Add an empty line to the listing. This is a
@@ -475,6 +477,22 @@ static void NextChar (void)
       	       	C = EOF;
       	       	return;
       	    }
+
+            /* For better handling of files with unusual line endings (DOS
+             * files that are accidently translated on Unix for example),
+             * first remove all whitespace at the end, then add a single 
+             * newline.
+             */
+            Len = strlen (IFile->Line);
+            Removed = 0;
+            while (Len > 0 && IsSpace (IFile->Line[Len-1])) {
+                ++Removed;
+                --Len;
+            }
+            if (Removed) {
+                IFile->Line[Len+0] = '\n';
+                IFile->Line[Len+1] = '\0';
+            }
 
       	    /* One more line */
       	    IFile->Pos.Line++;

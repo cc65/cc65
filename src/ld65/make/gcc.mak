@@ -42,7 +42,7 @@ OBJS = 	bin.o		\
 	scanner.o	\
 	segments.o	\
 	tgtcfg.o
- 			 
+
 # -----------------------------------------------------------------------------
 # List of all config includes
 
@@ -51,6 +51,7 @@ INCS =	apple2.inc	\
 	bbc.inc		\
 	c64.inc		\
 	c128.inc	\
+	cbm510.inc	\
 	cbm610.inc	\
 	geos.inc	\
 	none.inc	\
@@ -114,6 +115,9 @@ c64.inc:     	cfg/c64.cfg
 
 c128.inc:     	cfg/c128.cfg
 	@$(CVT) $< $@ CfgC128
+
+cbm510.inc:	cfg/cbm510.cfg
+	@$(CVT) $< $@ CfgCBM510
 
 cbm610.inc:	cfg/cbm610.cfg
 	@$(CVT) $< $@ CfgCBM610

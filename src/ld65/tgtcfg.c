@@ -53,16 +53,17 @@ static const char CfgEmpty[] = "";
 #include "bbc.inc"
 #include "c128.inc"
 #include "c64.inc"
+#include "cbm510.inc"
 #include "cbm610.inc"
 #include "geos.inc"
 #include "none.inc"
 #include "pet.inc"
 #include "plus4.inc"
-		  
+
 
 
 /*****************************************************************************/
-/*     	      	    		     Data     	 			     */
+/*     	      	    	       	     Data     	 			     */
 /*****************************************************************************/
 
 
@@ -75,6 +76,7 @@ const TargetDesc Targets [TGT_COUNT] = {
     {  	BINFMT_BINARY,	CfgC128		},
     {  	BINFMT_BINARY,	CfgEmpty	},    	/* Ace */
     {  	BINFMT_BINARY,	CfgPlus4	},
+    {  	BINFMT_BINARY,  CfgCBM510	},
     {  	BINFMT_BINARY,  CfgCBM610	},
     {  	BINFMT_BINARY,	CfgPET		},
     {  	BINFMT_BINARY, 	CfgBBC		},

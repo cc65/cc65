@@ -1,5 +1,6 @@
 .depend
-ld65
+ld65	  
+.kdbgrc.ld65
 *.map
 *.s
 apple2.inc
@@ -7,6 +8,7 @@ atari.inc
 bbc.inc
 c128.inc
 c64.inc
+cbm510.inc
 cbm610.inc
 geos.inc
 none.inc

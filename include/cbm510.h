@@ -45,6 +45,12 @@
 
 
 
+/*****************************************************************************/
+/*                                   Data				     */
+/*****************************************************************************/
+
+
+
 /* Additional key defines */
 #define CH_F1			224
 #define CH_F2			225
@@ -67,8 +73,6 @@
 #define CH_F19			242
 #define CH_F20			243
 
-
-
 /* Color defines */
 #define COLOR_BLACK  	       	0x00
 #define COLOR_WHITE  	       	0x01
@@ -88,31 +92,6 @@
 #define COLOR_LIGHTBLUE      	0x0E
 #define COLOR_GRAY3  	       	0x0F
 
-
-
-/* Special routines to read/write bytes and words in the system bank */
-unsigned char __fastcall__ peekbsys (unsigned addr);
-unsigned __fastcall__ peekwsys (unsigned addr);
-void __fastcall__ pokebsys (unsigned addr, unsigned char val);
-void __fastcall__ pokewsys (unsigned addr, unsigned val);
-
-#if defined(__OPT_i__) && defined(__OPT_s__)
-#define peekbsys(addr)          \
-        __AX__ = (addr),        \
-        asm ("sta ptr1"),       \
-        asm ("stx ptr1+1"),     \
-        asm ("ldx $01"),        \
-        asm ("lda #$0F"),       \
-        asm ("sta $01"),        \
-        asm ("ldy #$00"),       \
-        asm ("lda (ptr1),y"),   \
-        asm ("stx $01"),        \
-        asm ("ldx #$00"),       \
-        __AX__
-#endif
-
-
-
 /* Define hardware */
 #include <_vic2.h>
 #define VIC    	(*(struct __vic2*)0xD800)
@@ -129,6 +108,35 @@ void __fastcall__ pokewsys (unsigned addr, unsigned val);
 #include <_6525.h>
 #define TPI1	(*(struct __6525*)0xDE00)
 #define TPI2	(*(struct __6525*)0xDF00)
+
+
+
+/*****************************************************************************/
+/*                                   Code				     */
+/*****************************************************************************/
+
+
+
+/* Special routines to read/write bytes and words in the system bank */
+unsigned char __fastcall__ peekbsys (unsigned addr);
+unsigned __fastcall__ peekwsys (unsigned addr);
+void __fastcall__ pokebsys (unsigned addr, unsigned char val);
+void __fastcall__ pokewsys (unsigned addr, unsigned val);
+
+#if defined(__OPT_i__) && (__OPT_i__ >= 600)
+#define peekbsys(addr)          \
+        __AX__ = (addr),        \
+        asm ("sta ptr1"),       \
+        asm ("stx ptr1+1"),     \
+        asm ("ldx $01"),        \
+        asm ("lda #$0F"),       \
+        asm ("sta $01"),        \
+        asm ("ldy #$00"),       \
+        asm ("lda (ptr1),y"),   \
+        asm ("stx $01"),        \
+        asm ("ldx #$00"),       \
+        __AX__
+#endif
 
 
 

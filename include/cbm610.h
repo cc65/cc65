@@ -108,7 +108,7 @@ unsigned __fastcall__ peekwsys (unsigned addr);
 void __fastcall__ pokebsys (unsigned addr, unsigned char val);
 void __fastcall__ pokewsys (unsigned addr, unsigned val);
 
-#if defined(__OPT_i__) && defined(__OPT_s__)
+#if defined(__OPT_i__) && (__OPT_i__ >= 600)
 #define peekbsys(addr)          \
         __AX__ = (addr),        \
         asm ("sta ptr1"),       \

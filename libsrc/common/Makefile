@@ -57,15 +57,14 @@ S_OBJS = 	_fdesc.o 	\
                 _heapmaxavail.o \
                 _heapmemavail.o \
 	 	_oserror.o	\
-		_printf.o	\
-		_swap.o		\
-	 	_sys.o		\
-		abs.o		\
-		atexit.o	\
-		atoi.o		\
-		calloc.o	\
+		_printf.o 	\
+		_swap.o	  	\
+	 	_sys.o	  	\
+		abs.o	  	\
+		atexit.o  	\
+		atoi.o	  	\
+		calloc.o  	\
 		copydata.o	\
-		cprintf.o	\
                 ctime.o         \
                 divt.o          \
 		errno.o		\
@@ -128,7 +127,6 @@ S_OBJS = 	_fdesc.o 	\
                 time.o          \
 		tolower.o	\
 		toupper.o	\
-		vcprintf.o	\
 		vfprintf.o	\
 		vsprintf.o	\
 		zerobss.o

@@ -80,7 +80,7 @@ development:
 
 
 <sect1>Command line option overview<p>
- 
+
 The assembler accepts the following options:
 
 <tscreen><verb>
@@ -1075,14 +1075,20 @@ either a string or an expression.
 
 <sect1><tt>.BLANK</tt><label id=".BLANK"><p>
 
-  Builtin function. The function evaluates its argument in braces and
-  yields "false" if the argument is non blank (there is an argument), and
-  "true" if there is no argument. As an example, the <tt/.IFBLANK/ statement
-  may be replaced by
+  Builtin function. The function evaluates its argument in braces and yields
+  "false" if the argument is non blank (there is an argument), and "true" if
+  there is no argument.  The token list that makes up the function argument
+  may optionally be enclosed in curly braces. This allows the inclusion of
+  tokens that would otherwise terminate the list (the closing right
+  parenthesis). The curly braces are not considered part of the list, a list
+  just consisting of curly braces is considered to be empty.
+
+  As an example, the <tt/.IFBLANK/ statement may be replaced by
 
   <tscreen><verb>
-	.if	.blank(arg)
+  	.if	.blank({arg})
   </verb></tscreen>
+
 
 
 <sect1><tt>.CONCAT</tt><label id=".CONCAT"><p>
@@ -1145,7 +1151,10 @@ either a string or an expression.
   </verb></tscreen>
 
   The first integer expression gives the number of tokens to extract from
-  the token list. The second argument is the token list itself.
+  the token list. The second argument is the token list itself. The token
+  list may optionally be enclosed into curly braces. This allows the
+  inclusion of tokens that would otherwise terminate the list (the closing
+  right paren in the given case).
 
   Example:
 
@@ -1155,7 +1164,7 @@ either a string or an expression.
   <tscreen><verb>
     	.macro 	ldax	arg
     	       	...
-    	       	.if (.match (.left (1, arg), #))
+    	       	.if (.match (.left (1, {arg}), #))
 
     	       	; ldax called with immidiate operand
     	       	...
@@ -1205,7 +1214,10 @@ either a string or an expression.
   <item>end-of-file
   </itemize>
 
-  Often a macro parameter is used for any of the token lists.
+  The token lists may optionally be enclosed into curly braces. This allows
+  the inclusion of tokens that would otherwise terminate the list (the closing
+  right paren in the given case). Often a macro parameter is used for any of
+  the token lists.
 
   Please note that the function does only compare tokens, not token
   attributes. So any number is equal to any other number, regardless of the
@@ -1224,7 +1236,7 @@ either a string or an expression.
   <tscreen><verb>
   	.macro	asr 	arg
 
-       	       	.if (.not .blank(arg)) .and (.not .match (arg, a))
+       	       	.if (.not .blank(arg)) .and (.not .match ({arg}, a))
     	    	.error "Syntax error"
     	    	.endif
 
@@ -1251,10 +1263,12 @@ either a string or an expression.
        	.MID (&lt;int expr&gt;, &lt;int expr&gt;, &lt;token list&gt;)
   </verb></tscreen>
 
-  The first integer expression gives the starting token in the list (the
-  first token has index 0). The second integer expression gives the number
-  of tokens to extract from the token list. The third argument is the
-  token list itself.
+  The first integer expression gives the starting token in the list (the first
+  token has index 0). The second integer expression gives the number of tokens
+  to extract from the token list. The third argument is the token list itself.
+  The token list may optionally be enclosed into curly braces. This allows the
+  inclusion of tokens that would otherwise terminate the list (the closing
+  right paren in the given case).
 
   Example:
 
@@ -1264,7 +1278,7 @@ either a string or an expression.
     <tscreen><verb>
   	.macro	ldax	arg
     		...
-    		.if (.match (.mid (0, 1, arg), #))
+    		.if (.match (.mid (0, 1, {arg}), #))
 
     		; ldax called with immidiate operand
     		...
@@ -1303,8 +1317,11 @@ either a string or an expression.
        	.RIGHT (&lt;int expr&gt;, &lt;token list&gt;)
   </verb></tscreen>
 
-  The first integer expression gives the number of tokens to extract from
-  the token list. The second argument is the token list itself.
+  The first integer expression gives the number of tokens to extract from the
+  token list. The second argument is the token list itself.  The token list
+  may optionally be enclosed into curly braces. This allows the inclusion of
+  tokens that would otherwise terminate the list (the closing right paren in
+  the given case).
 
   See also the <tt><ref id=".LEFT" name=".LEFT"></tt> and <tt><ref id=".MID"
   name=".MID"></tt> builtin functions.
@@ -1440,8 +1457,12 @@ either a string or an expression.
 
 <sect1><tt>.TCOUNT</tt><label id=".TCOUNT"><p>
 
-  Builtin function. The function accepts a token list in braces. The
-  function result is the number of tokens given as argument.
+  Builtin function. The function accepts a token list in braces. The function
+  result is the number of tokens given as argument. The token list may
+  optionally be enclosed into curly braces which are not considered part of
+  the list and not counted. Enclosement in curly braces allows the inclusion
+  of tokens that would otherwise terminate the list (the closing right paren
+  in the given case).
 
   Example:
 
@@ -1451,10 +1472,10 @@ either a string or an expression.
 
   <tscreen><verb>
     	.macro	ldax	arg
-    	   	.if (.match (.mid (0, 1, arg), #))
+    	   	.if (.match (.mid (0, 1, {arg}), #))
     	   	; ldax called with immidiate operand
-	   	lda	#<(.right (.tcount (arg)-1, arg))
-	   	ldx	#>(.right (.tcount (arg)-1, arg))
+	   	lda	#<(.right (.tcount ({arg})-1, {arg}))
+	   	ldx	#>(.right (.tcount ({arg})-1, {arg}))
 	   	.else
 	   	...
     	   	.endif
@@ -1482,7 +1503,10 @@ either a string or an expression.
   <item>end-of-file
   </itemize>
 
-  Often a macro parameter is used for any of the token lists.
+  The token lists may optionally be enclosed into curly braces. This allows
+  the inclusion of tokens that would otherwise terminate the list (the closing
+  right paren in the given case). Often a macro parameter is used for any of
+  the token lists.
 
   The function compares tokens <em/and/ token values. If you need a function
   that just compares the type of tokens, have a look at the <tt><ref
@@ -3194,6 +3218,26 @@ parameters:
   	ldaxy	1,2,3  	       	; .PARAMCOUNT = 3
 </verb></tscreen>
 
+Macro parameters may optionally be enclosed into curly braces. This allows the
+inclusion of tokens that would otherwise terminate the parameter (the comma in
+case of a macro parameter).
+
+<tscreen><verb>
+        .macro  foo     arg1, arg2
+                ...
+        .endmacro
+
+                foo     ($00,x)         ; Two parameters passed
+                foo     {($00,x)}       ; One parameter passed
+</verb></tscreen>
+
+In the first case, the macro is called with two parameters: '<tt/(&dollar;00/'
+and 'x)'. The comma is not passed to the macro, since it is part of the
+calling sequence, not the parameters.
+
+In the second case, '(&dollar;00,x)' is passed to the macro, this time
+including the comma.
+
 
 <sect1>Detecting parameter types<p>
 
@@ -3205,14 +3249,14 @@ functions will allow you to do exactly this:
 
 <tscreen><verb>
         .macro  ldax    arg
-                .if (.match (.left (1, arg), #))
+                .if (.match (.left (1, {arg}), #))
                     ; immediate mode
-                    lda     #<(.right (.tcount (arg)-1, arg))
-                    ldx     #>(.right (.tcount (arg)-1, arg))
+                    lda     #<(.right (.tcount ({arg})-1, {arg}))
+                    ldx     #>(.right (.tcount ({arg})-1, {arg}))
                 .else
                     ; assume absolute or zero page
                     lda     arg
-                    ldx     1+(arg)
+                    ldx     1+({arg})
                 .endif
         .endmacro
 </verb></tscreen>
@@ -3220,7 +3264,12 @@ functions will allow you to do exactly this:
 Using the <tt/<ref id=".MATCH" name=".MATCH">/ function, the macro is able to
 check if its argument begins with a hash mark. If so, two immediate loads are
 emitted, Otherwise a load from an absolute zero page memory location is
-assumed. So this macro can be used as
+assumed. Please note how the curly braces are used to enclose parameters to
+pseudo functions handling token lists. This is necessary, because the token
+lists may include commas or parens, which would be treated by the assembler
+as end-of-list.
+
+The macro can be used as
 
 <tscreen><verb>
         foo:    .word   $5678

@@ -39,6 +39,8 @@
 #include <errno.h>
 #include <ctype.h>
 
+#include "../common/xsprintf.h"
+
 #include "global.h"
 #include "error.h"
 #include "scanner.h"
@@ -65,7 +67,7 @@ static const char*     	CfgName		= 0;
 static const char*      CfgBuf 		= 0;
 
 /* Other input stuff */
-static int     	       	C  	     	= ' ';
+static int     	       	C      	     	= ' ';
 static unsigned	       	InputLine    	= 1;
 static unsigned	       	InputCol     	= 0;
 static FILE*   	       	InputFile    	= 0;
@@ -73,7 +75,7 @@ static FILE*   	       	InputFile    	= 0;
 
 
 /*****************************************************************************/
-/*		    	   	Error handling				     */
+/*		    	       	Error handling				     */
 /*****************************************************************************/
 
 
@@ -82,13 +84,12 @@ void CfgWarning (const char* Format, ...)
 /* Print a warning message adding file name and line number of the config file */
 {
     char Buf [512];
-    va_list ap;
+    va_list ap;	
+
     va_start (ap, Format);
-#ifdef __WATCOMC__
-    _vbprintf (Buf, sizeof (Buf), Format, ap);
-#else
-    vsnprintf (Buf, sizeof (Buf), Format, ap);
-#endif
+    xvsprintf (Buf, sizeof (Buf), Format, ap);
+    va_end (ap);
+
     Warning ("%s(%u): %s", CfgName, CfgErrorLine, Buf);
 }
 
@@ -99,12 +100,11 @@ void CfgError (const char* Format, ...)
 {
     char Buf [512];
     va_list ap;
+
     va_start (ap, Format);
-#ifdef __WATCOMC__
-    _vbprintf (Buf, sizeof (Buf), Format, ap);
-#else
-    vsnprintf (Buf, sizeof (Buf), Format, ap);
-#endif
+    xvsprintf (Buf, sizeof (Buf), Format, ap);
+    va_end (ap);
+
     Error ("%s(%u): %s", CfgName, CfgErrorLine, Buf);
 }
 

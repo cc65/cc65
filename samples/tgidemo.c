@@ -71,7 +71,7 @@ static void CheckError (const char* S)
 }
 
 
-void DoWarning (void)
+static void DoWarning (void)
 /* Warn the user that the TGI driver is needed for this program */
 {
     printf ("Warning: This program needs the TGI\n"
@@ -143,7 +143,7 @@ static void DoDiagram (void)
     unsigned X;
 
     tgi_setpalette (Palette);
-    tgi_setcolor (1);  
+    tgi_setcolor (1);
     tgi_line (10, 10, 10, 190);
     tgi_lineto (310, 190);
     tgi_line (8, 12, 10, 10);

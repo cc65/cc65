@@ -11,9 +11,22 @@ export AS = ../../src/ca65/ca65
 # Define used within this makefile
 AR = ../src/ar65/ar65
 
+# List of all targets
+ALLTARGETS =	apple2lib	\
+		atarilib	\
+		c64lib		\
+		c128lib		\
+		cbm610lib	\
+		geoslib		\
+		petlib		\
+		plus4lib
+
 #-----------------------------------------------------------------------------
 
-all :  	apple2lib c64lib c128lib cbm610lib geoslib petlib plus4lib
+all:
+	for tgt in $(ALLTARGETS); do		\
+	    $(MAKE) clean $$tgt;		\
+	done
 
 #-----------------------------------------------------------------------------
 # Apple ][

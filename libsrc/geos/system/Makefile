@@ -7,6 +7,9 @@
 %.o:	%.s
 	@$(AS) -o $@ $(AFLAGS) $<
 
+%.o:   	%.c
+	@$(CC) $(CFLAGS) $<
+	@$(AS) -g -o $@ $(AFLAGS) $(*).s
 
 S_OBJS  =       ctype.o                 \
                 callroutine.o           \
@@ -19,10 +22,11 @@ S_OBJS  =       ctype.o                 \
                 mainloop.o              \
                 panic.o                 \
                 tobasic.o               \
-                setdevice.o             \
-                systime.o
+                setdevice.o
 
-all: $(S_OBJS)
+C_OBJS	=	systime.o
+
+all: $(C_OBJS) $(S_OBJS)
 
 clean:
-	@rm -f *.~ $(S_OBJS) core
+	@rm -f *.~ $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS) core

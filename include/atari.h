@@ -156,14 +156,14 @@ extern unsigned int get_ostype(void); /* get ROM version */
 
 /* Define hardware */
 #include <_gtia.h>
-#define GTIA (*(struct __gtia_write*)0xD000)
-#define GTIA (*(struct __gtia_read*)0xD000)
+#define GTIA_READ  (*(struct __gtia_read*)0xD000)
+#define GTIA_WRITE (*(struct __gtia_write*)0xD000)
 
 #include <_pbi.h>
 
 #include <_pokey.h>
-#define POKEY (*(struct __pokey_write*)0xD200)
-#define POKEY (*(struct __pokey_read*)0xD200)
+#define POKEY_READ  (*(struct __pokey_read*)0xD200)
+#define POKEY_WRITE (*(struct __pokey_write*)0xD200)
 
 #include <_pia.h>
 #define PIA (*(struct __pia*)0xD300)

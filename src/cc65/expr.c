@@ -3016,9 +3016,6 @@ static void Assignment (ExprDesc* lval)
 	if (k) {
 	    /* Get the address */
 	    exprhs (0, 0, &lval2);
-	} else {
-	    /* We need an lvalue */
-	    Error ("Invalid lvalue in assignment");
 	}
 
 	/* Push the address (or whatever is in ax in case of errors) */

@@ -3,8 +3,9 @@
 ;
 ; Original C code by Marc 'BlackJack' Rintsch, 25.03.2001
 ;
-; int cbm_write(unsigned char lfn, void* buffer, unsigned int size) {
-;
+; int __fastcall__ cbm_write(unsigned char lfn, void* buffer, unsigned int size) 
+; {
+; 
 ;     static unsigned int byteswritten;
 ;
 ;     /* if we can't change to the outputchannel #lfn then return an error */

@@ -118,8 +118,8 @@ void __fastcall__ cbm_k_clrch (void);
 
 
 
-unsigned int cbm_load(const char* name, unsigned char device,
-                      const char* data);
+unsigned int cbm_load (const char* name, unsigned char device,
+                       const char* data);
 /* Loads file "name" from given device to given address or to the load
  * address of the file if "data" is the null pointer (like load"name",8,1
  * in BASIC).
@@ -127,7 +127,7 @@ unsigned int cbm_load(const char* name, unsigned char device,
  * otherwise 0. "_oserror" contains an errorcode then (see table below).
  */
 
-unsigned char cbm_save(const char* name, unsigned char device,
+unsigned char cbm_save (const char* name, unsigned char device,
                        unsigned char* data, unsigned int size);
 /* Saves "size" bytes starting at "data" to a file.
  * Returns 0 if saving was successful, otherwise an errorcode (see table
@@ -153,12 +153,12 @@ int __fastcall__ cbm_read (unsigned char lfn, void* buffer, unsigned int size);
  * table below).
  */
 
-int cbm_write(unsigned char lfn, void* buffer, unsigned int size);
+int __fastcall__ cbm_write (unsigned char lfn, void* buffer, unsigned int size);
 /* Writes up to "size" bytes from "buffer" to a file.
  * Returns the number of actually written bytes or -1 in case of an error.
  * _oserror contains an errorcode then (see table below).
  */
-
+                 
 /* Errorcodes of cbm_* I/O functions:
  *
  * errorcode	BASIC error

@@ -47,6 +47,7 @@
 /* Graphics modes. Zero may not be used as a mode number. */
 #define TGI_MODE_320_200_2      1U      /* 320x200, 2 colors (b/w) */
 #define TGI_MODE_160_200_4      2U      /* 160x200, 4 colors */
+#define TGI_MODE_640_200_2	3U	/* 640x200, 2 colors (b/w) */
 
 
 

@@ -99,10 +99,20 @@ _tgi_setup:
         lda     #>tgi_emu_bar
         sta     tgi_bar+2
 
+@L2:    lda	ptr1
+	pha
+	lda	ptr1+1
+	pha
+	jsr     tgi_install             ; Call driver install routine
+        pla                             ; (may update variables)
+	sta	ptr1+1			; (may modify ptr1 so it is preserved)
+	pla
+	sta	ptr1
+
 ; Copy variables. Beware: We are using internal knowledge about variable
 ; layout here!
 
-@L2:    ldy     #TGI_HDR_XRES
+        ldy     #TGI_HDR_XRES
         ldx     #0
 @L3:    lda     (ptr1),y
         sta     tgi_driver_vars,x
@@ -119,7 +129,7 @@ _tgi_setup:
         dex
         bpl     @L4
 
-        jmp     tgi_install             ; Call driver install routine
+	rts
 
 ;----------------------------------------------------------------------------
 ; Load the pointer to the tgi driver into ptr1.

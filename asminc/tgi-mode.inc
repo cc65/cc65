@@ -36,6 +36,7 @@
 ; Graphics modes. Zero may not be used as a mode number.
 TGI_MODE_320_200_2              = 1      ; 320x200, 2 colors (b/w)
 TGI_MODE_160_200_4              = 2      ; 160x200, 4 colors
+TGI_MODE_640_200_2		= 3	 ; 640x200, 2 colors (b/w)
 
 
 

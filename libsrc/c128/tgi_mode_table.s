@@ -17,7 +17,5 @@
 .rodata
 
 _tgi_mode_table:
-        .byte   TGI_MODE_320_200_2, "c128-320-200-2.tgi", 0
+	.byte	TGI_MODE_640_200_2, "c128-vdc.tgi", 0
         .byte   0       ; End marker
-
-

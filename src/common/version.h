@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998	Ullrich von Bassewitz					     */
-/*		Wacholderweg 14						     */
-/*		D-70597 Stuttgart					     */
-/* EMail:	uz@musoftware.de					     */
+/* (C) 1998-2000 Ullrich von Bassewitz					     */
+/*		 Wacholderweg 14					     */
+/*		 D-70597 Stuttgart					     */
+/* EMail:	 uz@musoftware.de					     */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -45,8 +45,8 @@
 
 
 #define VER_MAJOR	2U
-#define VER_MINOR	4U
-#define VER_PATCH	9U
+#define VER_MINOR	5U
+#define VER_PATCH	0U
 
 
 

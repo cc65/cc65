@@ -735,6 +735,14 @@ static void DoInclude (void)
 
 
 
+static void DoInitializer (void)
+/* Export a symbol as initializer */
+{
+    ExportImport (SymInitializer, 0);
+}
+
+
+
 static void DoInvalid (void)
 /* Handle a token that is invalid here, since it should have been handled on
  * a much lower level of the expression hierarchy. Getting this sort of token
@@ -1179,6 +1187,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoImportZP	},
     { ccNone,		DoIncBin	},
     { ccNone,      	DoInclude	},
+    { ccNone,		DoInitializer	},
     { ccNone,		DoInvalid	},	/* .LEFT */
     { ccNone,		DoLineCont	},
     { ccNone,		DoList		},

@@ -63,8 +63,9 @@
 #define SF_EXPORT      	0x0004		/* Export this symbol */
 #define SF_IMPORT   	0x0008		/* Import this symbol */
 #define SF_GLOBAL	0x0010		/* Global symbol */
-#define SF_ZP  	       	0x0020		/* Declared as zeropage symbol */
-#define SF_ABS		0x0040 		/* Declared as absolute symbol */
+#define SF_INITIALIZER	0x0020		/* Exported initializer */
+#define SF_ZP  	       	0x0040		/* Declared as zeropage symbol */
+#define SF_ABS		0x0080 		/* Declared as absolute symbol */
 #define SF_INDEXED	0x0800		/* Index is valid */
 #define SF_CONST    	0x1000		/* The symbol has a constant value */
 #define SF_MULTDEF     	0x2000		/* Multiply defined symbol */
@@ -80,8 +81,6 @@
 #define SF_EXPVAL	(SF_EXPORT)
 #define SF_DBGINFOMASK	(SF_TRAMPOLINE | SF_DEFINED | SF_EXPORT | SF_IMPORT)
 #define SF_DBGINFOVAL 	(SF_DEFINED)
-
-
 
 /* Structure of a symbol table entry */
 struct SymEntry_ {
@@ -113,6 +112,12 @@ struct SymTable_ {
     SymTable*       	BackLink;   	/* Link to enclosing scope if any */
     SymEntry*	    	Table [1];  	/* Dynamic allocation */
 };
+
+
+
+/* Arguments for SymFind */
+#define SF_FIND_EXISTING 	0
+#define SF_ALLOC_NEW		1
 
 
 
@@ -354,10 +359,8 @@ static SymEntry* SymFindAny (SymTable* Tab, const char* Name)
 static SymEntry* SymRefInternal (SymTable* Table, const char* Name)
 /* Search for the symbol in the given table and return it */
 {
-    SymEntry* S;
-
     /* Try to find the symbol, create a new one if the symbol does not exist */
-    S = SymFind (Table, Name, 1);
+    SymEntry* S = SymFind (Table, Name, SF_ALLOC_NEW);
 
     /* Mark the symbol as referenced */
     S->Flags |= SF_REFERENCED;
@@ -396,10 +399,8 @@ void SymLeaveLevel (void)
 void SymDef (const char* Name, ExprNode* Expr, int ZP)
 /* Define a new symbol */
 {
-    SymEntry* S;
-
     /* Do we have such a symbol? */
-    S = SymFind (SymTab, Name, 1);
+    SymEntry* S = SymFind (SymTab, Name, SF_ALLOC_NEW);
     if (S->Flags & SF_IMPORT) {
        	/* Defined symbol is marked as imported external symbol */
        	Error (ERR_SYM_ALREADY_IMPORT);
@@ -473,7 +474,7 @@ void SymImport (const char* Name, int ZP)
     }
 
     /* Do we have such a symbol? */
-    S = SymFind (SymTab, Name, 1);
+    S = SymFind (SymTab, Name, SF_ALLOC_NEW);
     if (S->Flags & SF_DEFINED) {
      	Error (ERR_SYM_ALREADY_DEFINED, Name);
      	S->Flags |= SF_MULTDEF;
@@ -516,7 +517,7 @@ void SymExport (const char* Name, int ZP)
     }
 
     /* Do we have such a symbol? */
-    S = SymFind (SymTab, Name, 1);
+    S = SymFind (SymTab, Name, SF_ALLOC_NEW);
     if (S->Flags & SF_IMPORT) {
      	/* The symbol is already marked as imported external symbol */
      	Error (ERR_SYM_ALREADY_IMPORT);
@@ -556,7 +557,7 @@ void SymGlobal (const char* Name, int ZP)
     }
 
     /* Search for this symbol, create a new entry if needed */
-    S = SymFind (SymTab, Name, 1);
+    S = SymFind (SymTab, Name, SF_ALLOC_NEW);
 
     /* If the symbol is already marked as import or export, check the
      * size of the definition, then bail out. */
@@ -572,6 +573,49 @@ void SymGlobal (const char* Name, int ZP)
     if (ZP) {
      	S->Flags |= SF_ZP;
     }
+}
+
+
+
+void SymInitializer (const char* Name, int ZP)
+/* Mark the given symbol as an initializer. This will also mark the symbol as
+ * an export. Initializers may never be zero page symbols, the ZP parameter
+ * is supplied to make the prototype the same as the other functions (this
+ * is used in pseudo.c). Passing something else but zero as ZP argument will
+ * trigger an internal error.
+ */
+{
+    SymEntry* S;
+
+    /* Check the ZP parameter */
+    CHECK (ZP == 0);
+
+    /* Don't accept local symbols */
+    if (IsLocal (Name)) {
+     	Error (ERR_ILLEGAL_LOCAL_USE);
+     	return;
+    }
+
+    /* Do we have such a symbol? */
+    S = SymFind (SymTab, Name, SF_ALLOC_NEW);
+    if (S->Flags & SF_IMPORT) {
+     	/* The symbol is already marked as imported external symbol */
+     	Error (ERR_SYM_ALREADY_IMPORT);
+     	return;
+    }
+
+    /* If the symbol is marked as global, check the symbol size, then do
+     * silently remove the global flag
+     */
+    if (S->Flags & SF_GLOBAL) {
+       	if ((S->Flags & SF_ZP) != 0) {
+     	    Error (ERR_SYM_REDECL_MISMATCH);
+     	}
+        S->Flags &= ~SF_GLOBAL;
+    }
+
+    /* Set the symbol data */
+    S->Flags |= SF_EXPORT | SF_INITIALIZER | SF_REFERENCED;
 }
 
 
@@ -1030,20 +1074,30 @@ void WriteExports (void)
 	    /* Check if the symbol is const */
 	    ExprMask = (SymIsConst (S))? EXP_CONST : EXP_EXPR;
 
-	    /* Write the type */
-	    if (S->Flags & SF_ZP) {
-		ObjWrite8 (EXP_ZP | ExprMask);
-	    } else {
-		ObjWrite8 (EXP_ABS | ExprMask);
+	    /* Add zeropage/abs bits */
+	    ExprMask |= (S->Flags & SF_ZP)? EXP_ZP : EXP_ABS;
+
+	    /* Add the initializer bits */
+	    if (S->Flags & SF_INITIALIZER) {
+	     	ExprMask |= EXP_INITIALIZER;
 	    }
+
+	    /* Write the type */
+	    ObjWrite8 (ExprMask);
+
+	    /* Write the name */
        	    ObjWriteStr (S->Name);
-	    if (ExprMask == EXP_CONST) {
+
+	    /* Write the value */
+	    if ((ExprMask & EXP_MASK_VAL) == EXP_CONST) {
 	     	/* Constant value */
 	     	ObjWrite32 (S->V.Val);
 	    } else {
 	     	/* Expression involved */
 	        WriteExpr (S->V.Expr);
             }
+
+	    /* Write the source file position */
 	    ObjWritePos (&S->Pos);
 	}
      	S = S->List;

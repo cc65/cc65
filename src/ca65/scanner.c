@@ -182,6 +182,7 @@ struct DotKeyword {
     { "IMPORTZP",	TOK_IMPORTZP	},
     { "INCBIN",		TOK_INCBIN	},
     { "INCLUDE",    	TOK_INCLUDE 	},
+    { "INITIALIZER",	TOK_INITIALIZER },
     { "LEFT",		TOK_LEFT	},
     { "LINECONT",	TOK_LINECONT	},
     { "LIST",		TOK_LIST	},

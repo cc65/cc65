@@ -33,6 +33,7 @@
 
 
 
+#include <string.h>
 #include <time.h>
 
 /* common */
@@ -536,7 +537,7 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 
 	unsigned long 	Value = 0;
 	int 		HaveValue;
- 	const char* 	TypeDesc;
+ 	char    	TypeDesc[128];
 
        	/* Read the data for one export */
        	unsigned char Type  = Read8 (F);
@@ -552,12 +553,17 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 	ReadFilePos (F, &Pos);
 
 	/* Get a description for the type */
-	switch (Type) {
-	    case EXP_ABS|EXP_CONST:	TypeDesc = "EXP_ABS,EXP_CONST";	break;
-	    case EXP_ZP|EXP_CONST:	TypeDesc = "EXP_ZP,EXP_CONST";	break;
-	    case EXP_ABS|EXP_EXPR:	TypeDesc = "EXP_ABS,EXP_EXPR";	break;
-       	    case EXP_ZP|EXP_EXPR:	TypeDesc = "EXP_ZP,EXP_EXPR";	break;
-	    default:			TypeDesc = "EXP_UNKNOWN";	break;
+	TypeDesc[0] = '\0';
+	switch (Type & EXP_MASK_SIZE) {
+	    case EXP_ABS:      	strcat (TypeDesc, "EXP_ABS");		break;
+	    case EXP_ZP:	strcat (TypeDesc, "EXP_ZP");		break;
+	}
+	switch (Type & EXP_MASK_VAL) {
+	    case EXP_CONST:	strcat (TypeDesc, ",EXP_CONST");	break;
+	    case EXP_EXPR:	strcat (TypeDesc, ",EXP_EXPR");		break;
+	}
+	if (Type & EXP_INITIALIZER) {
+	    strcat (TypeDesc, ",EXP_INITIALIZER");
 	}
 
 	/* Print the header */

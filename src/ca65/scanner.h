@@ -165,6 +165,7 @@ enum Token {
     TOK_IMPORTZP,
     TOK_INCBIN,
     TOK_INCLUDE,
+    TOK_INITIALIZER,
     TOK_LEFT,
     TOK_LINECONT,
     TOK_LIST,

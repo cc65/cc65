@@ -42,7 +42,7 @@
 
 /* common */
 #include "exprdefs.h"
-	  
+
 /* ca65 */
 #include "symentry.h"
 
@@ -84,6 +84,14 @@ void SymExport (const char* Name, int ZP);
 void SymGlobal (const char* Name, int ZP);
 /* Mark the given symbol as a global symbol, that is, as a symbol that is
  * either imported or exported.
+ */
+
+void SymInitializer (const char* Name, int ZP);
+/* Mark the given symbol as an initializer. This will also mark the symbol as
+ * an export. Initializers may never be zero page symbols, the ZP parameter
+ * is supplied to make the prototype the same as the other functions (this
+ * is used in pseudo.c). Passing something else but zero as ZP argument will
+ * trigger an internal error.
  */
 
 int SymIsConst (SymEntry* Sym);
@@ -145,4 +153,4 @@ void WriteDbgSyms (void);
 
 
 
-	  
+

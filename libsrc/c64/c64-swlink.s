@@ -251,7 +251,7 @@ PARAMS:
 	sta	ACIA_CTRL
 
 ; Set the value for the command register. We remember the base value in
-; RtsOff, since we will have to manipulate ACIT_CMD often.
+; RtsOff, since we will have to manipulate ACIA_CMD often.
 
         ldy	#SER_PARAMS_PARITY	; Parity
         lda     (ptr1),y
@@ -259,14 +259,14 @@ PARAMS:
         lda     ParityTable,y
 	ora	#%00000001		; DTR active
 	sta	RtsOff
-	ora	#%00010000		; Enable receive interrupts
-	sta	ACIA_CMD
+       	ora    	#%00001000		; Enable receive interrupts
+       	sta	ACIA_CMD
 
 ; Done
 
         lda     #<SER_ERR_OK
         tax                             ; A is zero
-      	rts
+       	rts
 
 ; Invalid parameter
 

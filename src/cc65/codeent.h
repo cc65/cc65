@@ -87,13 +87,13 @@ struct CodeEntry {
 
 
 CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
-			 CodeLabel* JumpTo, LineInfo* LI);
+	       		 CodeLabel* JumpTo, LineInfo* LI);
 /* Create a new code entry, initialize and return it */
 
 void FreeCodeEntry (CodeEntry* E);
 /* Free the given code entry */
 
-void ReplaceOPC (CodeEntry* E, opc_t OPC);
+void CE_ReplaceOPC (CodeEntry* E, opc_t OPC);
 /* Replace the opcode of the instruction. This will also replace related info,
  * Size, Use and Chg, but it will NOT update any arguments or labels.
  */
@@ -101,76 +101,76 @@ void ReplaceOPC (CodeEntry* E, opc_t OPC);
 int CodeEntriesAreEqual (const CodeEntry* E1, const CodeEntry* E2);
 /* Check if both code entries are equal */
 
-void AttachCodeLabel (CodeEntry* E, CodeLabel* L);
+void CE_AttachLabel (CodeEntry* E, CodeLabel* L);
 /* Attach the label to the entry */
 
 #if defined(HAVE_INLINE)
-INLINE int CodeEntryHasLabel (const CodeEntry* E)
+INLINE int CE_HasLabel (const CodeEntry* E)
 /* Check if the given code entry has labels attached */
 {
     return (CollCount (&E->Labels) > 0);
 }
 #else
-#  define CodeEntryHasLabel(E)	(CollCount (&(E)->Labels) > 0)
+#  define CE_HasLabel(E)	(CollCount (&(E)->Labels) > 0)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned GetCodeLabelCount (const CodeEntry* E)
+INLINE unsigned CE_GetLabelCount (const CodeEntry* E)
 /* Get the number of labels attached to this entry */
 {
     return CollCount (&E->Labels);
 }
 #else
-#  define GetCodeLabelCount(E)	CollCount (&(E)->Labels)
+#  define CE_GetLabelCount(E)	CollCount (&(E)->Labels)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE CodeLabel* GetCodeLabel (CodeEntry* E, unsigned Index)
+INLINE CodeLabel* CE_GetLabel (CodeEntry* E, unsigned Index)
 /* Get a label from this code entry */
 {
     return CollAt (&E->Labels, Index);
 }
 #else
-#  define GetCodeLabel(E, Index)	CollAt (&(E)->Labels, (Index))
+#  define CE_GetLabel(E, Index)	CollAt (&(E)->Labels, (Index))
 #endif
 
-void MoveCodeLabel (CodeLabel* L, CodeEntry* E);
+void CE_MoveLabel (CodeLabel* L, CodeEntry* E);
 /* Move the code label L from it's former owner to the code entry E. */
 
 #if defined(HAVE_INLINE)
-INLINE int CodeEntryHasMark (const CodeEntry* E)
+INLINE int CE_HasMark (const CodeEntry* E)
 /* Return true if the given code entry has the CEF_USERMARK flag set */
 {
     return (E->Flags & CEF_USERMARK) != 0;
 }
 #else
-#  define CodeEntryHasMark(E)	(((E)->Flags & CEF_USERMARK) != 0)
+#  define CE_HasMark(E)	(((E)->Flags & CEF_USERMARK) != 0)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE void CodeEntrySetMark (CodeEntry* E)
+INLINE void CE_SetMark (CodeEntry* E)
 /* Set the CEF_USERMARK flag for the given entry */
 {
     E->Flags |= CEF_USERMARK;
 }
 #else
-#  define CodeEntrySetMark(E)	((E)->Flags |= CEF_USERMARK)
+#  define CE_SetMark(E)	((E)->Flags |= CEF_USERMARK)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE void CodeEntryResetMark (CodeEntry* E)
+INLINE void CE_ResetMark (CodeEntry* E)
 /* Reset the CEF_USERMARK flag for the given entry */
 {
     E->Flags &= ~CEF_USERMARK;
 }
 #else
-#  define CodeEntryResetMark(E)	((E)->Flags &= ~CEF_USERMARK)
+#  define CE_ResetMark(E)	((E)->Flags &= ~CEF_USERMARK)
 #endif
 
-void CodeEntrySetArg (CodeEntry* E, const char* Arg);
+void CE_SetArg (CodeEntry* E, const char* Arg);
 /* Set a new argument for the given code entry. An old string is deleted. */
 
-void OutputCodeEntry (const CodeEntry* E, FILE* F);
+void CE_Output (const CodeEntry* E, FILE* F);
 /* Output the code entry to a file */
 
 
@@ -180,3 +180,4 @@ void OutputCodeEntry (const CodeEntry* E, FILE* F);
 
 
 
+	 

@@ -161,17 +161,17 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
     CodeLabel* L;
 
     /* Get the entry */
-    CodeEntry* E = GetCodeEntry (S, I);
+    CodeEntry* E = CS_GetEntry (S, I);
 
     /* Replace the conditional branch */
     switch (Cond) {
 
 	case CMP_EQ:
-	    ReplaceOPC (E, OP65_JEQ);
+	    CE_ReplaceOPC (E, OP65_JEQ);
 	    break;
 
 	case CMP_NE:
-	    ReplaceOPC (E, OP65_JNE);
+	    CE_ReplaceOPC (E, OP65_JNE);
 	    break;
 
 	case CMP_GT:
@@ -180,33 +180,33 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 	     *     jpl Target
 	     * @L: ...
 	     */
-	    if ((N = GetNextCodeEntry (S, I)) == 0) {
+	    if ((N = CS_GetNextEntry (S, I)) == 0) {
 		/* No such entry */
 		Internal ("Invalid program flow");
 	    }
-	    L = GenCodeLabel (S, N);
+	    L = CS_GenLabel (S, N);
 	    N = NewCodeEntry (OP65_BEQ, AM65_BRA, L->Name, L, E->LI);
-	    InsertCodeEntry (S, N, I);
-	    ReplaceOPC (E, OP65_JPL);
+	    CS_InsertEntry (S, N, I);
+	    CE_ReplaceOPC (E, OP65_JPL);
 	    break;
 
 	case CMP_GE:
-	    ReplaceOPC (E, OP65_JPL);
+	    CE_ReplaceOPC (E, OP65_JPL);
 	    break;
 
 	case CMP_LT:
-	    ReplaceOPC (E, OP65_JMI);
+	    CE_ReplaceOPC (E, OP65_JMI);
 	    break;
 
 	case CMP_LE:
 	    /* Replace by
-	     *	   jmi Target
+	     * 	   jmi Target
 	     *     jeq Target
 	     */
-	    ReplaceOPC (E, OP65_JMI);
+	    CE_ReplaceOPC (E, OP65_JMI);
 	    L = E->JumpTo;
 	    N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
-	    InsertCodeEntry (S, N, I+1);
+	    CS_InsertEntry (S, N, I+1);
 	    break;
 
 	case CMP_UGT:
@@ -215,33 +215,33 @@ static void ReplaceCmp (CodeSeg* S, unsigned I, cmp_t Cond)
 	     *     jcs Target
 	     * @L: ...
 	     */
-	    if ((N = GetNextCodeEntry (S, I)) == 0) {
-		/* No such entry */
-		Internal ("Invalid program flow");
+	    if ((N = CS_GetNextEntry (S, I)) == 0) {
+	       	/* No such entry */
+	       	Internal ("Invalid program flow");
 	    }
-	    L = GenCodeLabel (S, N);
+	    L = CS_GenLabel (S, N);
 	    N = NewCodeEntry (OP65_BEQ, AM65_BRA, L->Name, L, E->LI);
-	    InsertCodeEntry (S, N, I);
-	    ReplaceOPC (E, OP65_JCS);
+	    CS_InsertEntry (S, N, I);
+	    CE_ReplaceOPC (E, OP65_JCS);
 	    break;
 
 	case CMP_UGE:
-	    ReplaceOPC (E, OP65_JCS);
+	    CE_ReplaceOPC (E, OP65_JCS);
 	    break;
 
 	case CMP_ULT:
-	    ReplaceOPC (E, OP65_JCC);
+	    CE_ReplaceOPC (E, OP65_JCC);
 	    break;
 
 	case CMP_ULE:
 	    /* Replace by
-	     *	   jcc Target
+	     * 	   jcc Target
 	     *     jeq Target
 	     */
-	    ReplaceOPC (E, OP65_JCC);
+	    CE_ReplaceOPC (E, OP65_JCC);
 	    L = E->JumpTo;
 	    N = NewCodeEntry (OP65_JEQ, AM65_BRA, L->Name, L, E->LI);
-	    InsertCodeEntry (S, N, I+1);
+	    CS_InsertEntry (S, N, I+1);
 	    break;
 
 	default:
@@ -281,7 +281,7 @@ static int IsSpLoad (const CodeEntry* E)
 
 
 static int IsLocalLoad16 (CodeSeg* S, unsigned Index,
-		     	  CodeEntry** L, unsigned Count)
+	       	     	  CodeEntry** L, unsigned Count)
 /* Check if a 16 bit load of a local variable follows:
  *
  *      ldy     #$xx
@@ -298,21 +298,21 @@ static int IsLocalLoad16 (CodeSeg* S, unsigned Index,
     CHECK (Count >= 5);
 
     /* Read the first entry */
-    L[0] = GetCodeEntry (S, Index);
+    L[0] = CS_GetEntry (S, Index);
 
     /* Check for the sequence */
-    return (L[0]->OPC == OP65_LDY                     &&
-	    L[0]->AM == AM65_IMM                      &&
-	    (L[0]->Flags & CEF_NUMARG) != 0           &&
-       	    GetCodeEntries (S, L+1, Index+1, Count-1) &&
-       	    IsSpLoad (L[1])                           &&
-	    !CodeEntryHasLabel (L[1])                 &&
-	    L[2]->OPC == OP65_TAX                     &&
-	    !CodeEntryHasLabel (L[2])                 &&
-	    L[3]->OPC == OP65_DEY                     &&
-	    !CodeEntryHasLabel (L[3])                 &&
-	    IsSpLoad (L[4])                           &&
-	    !CodeEntryHasLabel (L[4]));
+    return (L[0]->OPC == OP65_LDY                        &&
+	    L[0]->AM == AM65_IMM                         &&
+	    (L[0]->Flags & CEF_NUMARG) != 0              &&
+       	    CS_GetEntries (S, L+1, Index+1, Count-1)     &&
+       	    IsSpLoad (L[1])                              &&
+	    !CE_HasLabel (L[1])                          &&
+	    L[2]->OPC == OP65_TAX                        &&
+	    !CE_HasLabel (L[2])                          &&
+	    L[3]->OPC == OP65_DEY                        &&
+	    !CE_HasLabel (L[3])                          &&
+	    IsSpLoad (L[4])                              &&
+	    !CE_HasLabel (L[4]));
 }
 
 
@@ -326,12 +326,12 @@ static int IsImmCmp16 (CodeSeg* S, CodeEntry** L)
     return (L[0]->OPC == OP65_CPX                              &&
 	    L[0]->AM == AM65_IMM                               &&
 	    (L[0]->Flags & CEF_NUMARG) != 0                    &&
-	    !CodeEntryHasLabel (L[0])                          &&
+	    !CE_HasLabel (L[0])                                &&
 	    (L[1]->OPC == OP65_JNE || L[1]->OPC == OP65_BNE)   &&
        	    L[1]->JumpTo != 0                                  &&
-	    !CodeEntryHasLabel (L[1])                          &&
+	    !CE_HasLabel (L[1])                                &&
        	    L[2]->OPC == OP65_CMP                              &&
-	    L[2]->AM == AM65_IMM                                 &&
+	    L[2]->AM == AM65_IMM                               &&
 	    (L[2]->Flags & CEF_NUMARG) != 0                    &&
 	    (L[3]->Info & OF_ZBRA) != 0                        &&
 	    L[3]->JumpTo != 0                                  &&
@@ -355,18 +355,18 @@ static unsigned OptBoolTransforms (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* N;
 	cmp_t Cond;
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check for a boolean transformer */
 	if (E->OPC == OP65_JSR                           &&
 	    (Cond = FindBoolCmpCond (E->Arg)) != CMP_INV &&
-	    (N = GetNextCodeEntry (S, I)) != 0           &&
+	    (N = CS_GetNextEntry (S, I)) != 0        &&
 	    (N->Info & OF_ZBRA) != 0) {
 
 	    /* Make the boolean transformer unnecessary by changing the
@@ -384,7 +384,7 @@ static unsigned OptBoolTransforms (CodeSeg* S)
 	    ReplaceCmp (S, I+1, Cond);
 
 	    /* Remove the call to the bool transformer */
-	    DelCodeEntry (S, I);
+	    CS_DelEntry (S, I);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -423,26 +423,26 @@ static unsigned OptSub1 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[3];
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
        	if (E->OPC == OP65_SBC 	  		             &&
-	    GetCodeEntries (S, L, I+1, 3) 	             &&
+	    CS_GetEntries (S, L, I+1, 3) 	             &&
        	    (L[0]->OPC == OP65_BCS || L[0]->OPC == OP65_JCS) &&
 	    L[0]->JumpTo != 0                                &&
-	    !CodeEntryHasLabel (L[0])                        &&
+	    !CE_HasLabel (L[0])                              &&
 	    L[1]->OPC == OP65_DEX       	       	     &&
-	    !CodeEntryHasLabel (L[1])                        &&
+	    !CE_HasLabel (L[1])                              &&
 	    L[0]->JumpTo->Owner == L[2]                      &&
 	    !RegXUsed (S, I+3)) {
 
 	    /* Remove the bcs/dex */
-	    DelCodeEntries (S, I+1, 2);
+	    CS_DelEntries (S, I+1, 2);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -482,47 +482,47 @@ static unsigned OptSub2 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[5];
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
        	if (E->OPC == OP65_LDA 	      		           &&
-	    GetCodeEntries (S, L, I+1, 5) 	           &&
+	    CS_GetEntries (S, L, I+1, 5) 	           &&
        	    L[0]->OPC == OP65_SEC                          &&
-	    !CodeEntryHasLabel (L[0])                      &&
+	    !CE_HasLabel (L[0])                            &&
        	    L[1]->OPC == OP65_STA       	       	   &&
 	    strcmp (L[1]->Arg, "tmp1") == 0                &&
-	    !CodeEntryHasLabel (L[1])                      &&
+	    !CE_HasLabel (L[1])                            &&
 	    L[2]->OPC == OP65_LDA                          &&
-       	    !CodeEntryHasLabel (L[2])                      &&
+       	    !CE_HasLabel (L[2])                            &&
 	    L[3]->OPC == OP65_SBC                          &&
 	    strcmp (L[3]->Arg, "tmp1") == 0                &&
-       	    !CodeEntryHasLabel (L[3])                      &&
+       	    !CE_HasLabel (L[3])                            &&
 	    L[4]->OPC == OP65_STA                          &&
 	    strcmp (L[4]->Arg, L[2]->Arg) == 0             &&
-       	    !CodeEntryHasLabel (L[4])) {
+       	    !CE_HasLabel (L[4])) {
 
 	    /* Remove the store to tmp1 */
-	    DelCodeEntry (S, I+2);
+	    CS_DelEntry (S, I+2);
 
 	    /* Remove the subtraction */
-	    DelCodeEntry (S, I+3);
+	    CS_DelEntry (S, I+3);
 
 	    /* Move the lda to the position of the subtraction and change the
 	     * op to SBC.
 	     */
-	    MoveCodeEntry (S, I, I+3);
-	    ReplaceOPC (E, OP65_SBC);
+	    CS_MoveEntry (S, I, I+3);
+	    CE_ReplaceOPC (E, OP65_SBC);
 
 	    /* If the sequence head had a label, move this label back to the
 	     * head.
 	     */
-	    if (CodeEntryHasLabel (E)) {
-		MoveCodeLabels (S, E, L[0]);
+	    if (CE_HasLabel (E)) {
+		CS_MoveLabels (S, E, L[0]);
 	    }
 
 	    /* Remember, we had changes */
@@ -562,26 +562,26 @@ static unsigned OptAdd1 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[3];
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
        	if (E->OPC == OP65_ADC 	  	     	             &&
-	    GetCodeEntries (S, L, I+1, 3)    	             &&
+	    CS_GetEntries (S, L, I+1, 3)   	             &&
        	    (L[0]->OPC == OP65_BCC || L[0]->OPC == OP65_JCC) &&
 	    L[0]->JumpTo != 0                                &&
-	    !CodeEntryHasLabel (L[0])                        &&
+	    !CE_HasLabel (L[0])                              &&
 	    L[1]->OPC == OP65_INX            	       	     &&
-	    !CodeEntryHasLabel (L[1])                        &&
+	    !CE_HasLabel (L[1])                              &&
 	    L[0]->JumpTo->Owner == L[2]                      &&
 	    !RegXUsed (S, I+3)) {
 
 	    /* Remove the bcs/dex */
-	    DelCodeEntries (S, I+1, 2);
+	    CS_DelEntries (S, I+1, 2);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -622,28 +622,28 @@ static unsigned OptCmp1 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[2];
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
        	if (E->OPC == OP65_STX 	  		&&
-	    GetCodeEntries (S, L, I+1, 2)	&&
+	    CS_GetEntries (S, L, I+1, 2)	&&
        	    L[0]->OPC == OP65_STX		&&
 	    strcmp (L[0]->Arg, "tmp1") == 0     &&
-	    !CodeEntryHasLabel (L[0])           &&
+	    !CE_HasLabel (L[0])                 &&
 	    L[1]->OPC == OP65_ORA	    	&&
 	    strcmp (L[1]->Arg, "tmp1") == 0     &&
-	    !CodeEntryHasLabel (L[1])) {
+	    !CE_HasLabel (L[1])) {
 
 	    /* Remove the remaining instructions */
-	    DelCodeEntries (S, I+1, 2);
+	    CS_DelEntries (S, I+1, 2);
 
 	    /* Insert the ora instead */
-	    InsertCodeEntry (S, NewCodeEntry (OP65_ORA, E->AM, E->Arg, 0, E->LI), I+1);
+	    CS_InsertEntry (S, NewCodeEntry (OP65_ORA, E->AM, E->Arg, 0, E->LI), I+1);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -675,23 +675,23 @@ static unsigned OptCmp2 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[2];
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
        	if ((E->OPC == OP65_LDA || IsBitOp (E))	  &&
-	    GetCodeEntries (S, L, I+1, 2)      	  &&
+	    CS_GetEntries (S, L, I+1, 2)   	  &&
        	    IsCmpToZero (L[0])                    &&
-	    !CodeEntryHasLabel (L[0])             &&
+	    !CE_HasLabel (L[0])                   &&
        	    (L[1]->Info & OF_FBRA) != 0           &&
-	    !CodeEntryHasLabel (L[1])) {
+	    !CE_HasLabel (L[1])) {
 
 	    /* Remove the compare */
-	    DelCodeEntry (S, I+1);
+	    CS_DelEntry (S, I+1);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -734,40 +734,40 @@ static unsigned OptCmp3 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[5];
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
        	if (E->OPC == OP65_LDA               &&
-	    GetCodeEntries (S, L, I+1, 5)    &&
+	    CS_GetEntries (S, L, I+1, 5) &&
 	    L[0]->OPC == OP65_LDX            &&
-	    !CodeEntryHasLabel (L[0])        &&
+	    !CE_HasLabel (L[0])              &&
 	    IsImmCmp16 (S, L+1)) {
 
 	    if (L[1]->Num == 0 && L[3]->Num == 0) {
 		/* The value is zero, we may use the simple code version. */
-		ReplaceOPC (L[0], OP65_ORA);
-		DelCodeEntries (S, I+2, 3);
+		CE_ReplaceOPC (L[0], OP65_ORA);
+		CS_DelEntries (S, I+2, 3);
        	    } else {
 		/* Move the lda instruction after the first branch. This will
 		 * improve speed, since the load is delayed after the first
 		 * test.
 		 */
-		MoveCodeEntry (S, I, I+4);
+		CS_MoveEntry (S, I, I+4);
 
 		/* We will replace the ldx/cpx by lda/cmp */
-		ReplaceOPC (L[0], OP65_LDA);
-		ReplaceOPC (L[1], OP65_CMP);
+		CE_ReplaceOPC (L[0], OP65_LDA);
+		CE_ReplaceOPC (L[1], OP65_CMP);
 
 		/* Beware: If the first LDA instruction had a label, we have
 		 * to move this label to the top of the sequence again.
 		 */
-		if (CodeEntryHasLabel (E)) {
-		    MoveCodeLabels (S, E, L[0]);
+		if (CE_HasLabel (E)) {
+		    CS_MoveLabels (S, E, L[0]);
 		}
 
 	    }
@@ -804,7 +804,7 @@ static unsigned OptCmp4 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[9];
 
@@ -820,9 +820,9 @@ static unsigned OptCmp4 (CodeSeg* S)
 		 *      ora    	(sp),y
 		 *      jne/jeq ...
 		 */
-		ReplaceOPC (L[4], OP65_ORA);
-		DelCodeEntries (S, I+5, 3);   /* cpx/bne/cmp */
-		DelCodeEntry (S, I+2);        /* tax */
+		CE_ReplaceOPC (L[4], OP65_ORA);
+		CS_DelEntries (S, I+5, 3);   /* cpx/bne/cmp */
+		CS_DelEntry (S, I+2);        /* tax */
 
        	    } else {
 
@@ -838,10 +838,10 @@ static unsigned OptCmp4 (CodeSeg* S)
 		 *   	cmp	#b
 		 *      jne/jeq ...
 		 */
-       	       	DelCodeEntry (S, I+2);         /* tax */
-		ReplaceOPC (L[5], OP65_CMP);   /* cpx -> cmp */
-		MoveCodeEntry (S, I+4, I+2);   /* cmp */
-		MoveCodeEntry (S, I+5, I+3);   /* bne */
+       	       	CS_DelEntry (S, I+2);             /* tax */
+		CE_ReplaceOPC (L[5], OP65_CMP);   /* cpx -> cmp */
+		CS_MoveEntry (S, I+4, I+2);       /* cmp */
+		CS_MoveEntry (S, I+5, I+3);       /* bne */
 
 	    }
 
@@ -870,20 +870,20 @@ static unsigned OptCmp5 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* N;
 	cmp_t Cond;
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
        	if (E->OPC == OP65_JSR 	  		        &&
 	    (Cond = FindTosCmpCond (E->Arg)) != CMP_INV	&&
-	    (N = GetNextCodeEntry (S, I)) != 0	        &&
+	    (N = CS_GetNextEntry (S, I)) != 0           &&
 	    (N->Info & OF_ZBRA) != 0                    &&
-       	    !CodeEntryHasLabel (N)) {
+       	    !CE_HasLabel (N)) {
 
        	    /* The tos... functions will return a boolean value in a/x and
 	     * the Z flag says if this value is zero or not. We will call
@@ -899,8 +899,8 @@ static unsigned OptCmp5 (CodeSeg* S)
 
 	    /* Replace the subroutine call. */
 	    E = NewCodeEntry (OP65_JSR, AM65_ABS, "tosicmp", 0, E->LI);
-	    InsertCodeEntry (S, E, I+1);
-	    DelCodeEntry (S, I);
+	    CS_InsertEntry (S, E, I+1);
+	    CS_DelEntry (S, I);
 
 	    /* Replace the conditional branch */
 	    ReplaceCmp (S, I+1, Cond);
@@ -941,26 +941,26 @@ static unsigned OptNegA1 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[2];
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for a ldx */
        	if (E->OPC == OP65_LDX 			&&
 	    E->AM == AM65_IMM	    		&&
 	    (E->Flags & CEF_NUMARG) != 0	&&
 	    E->Num == 0	   			&&
-	    GetCodeEntries (S, L, I+1, 2)	&&
+	    CS_GetEntries (S, L, I+1, 2)	&&
 	    L[0]->OPC == OP65_LDA		&&
 	    (L[0]->Use & REG_X) == 0	    	&&
 	    L[1]->OPC == OP65_JSR	    	&&
 	    strcmp (L[1]->Arg, "bnega") == 0) {
 
 	    /* Remove the ldx instruction */
-	    DelCodeEntry (S, I);
+	    CS_DelEntry (S, I);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -992,26 +992,26 @@ static unsigned OptNegA2 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[2];
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
        	if (E->OPC == OP65_LDA  	  	&&
-	    GetCodeEntries (S, L, I+1, 2)	&&
+	    CS_GetEntries (S, L, I+1, 2)	&&
        	    L[0]->OPC == OP65_JSR  	    	&&
 	    strcmp (L[0]->Arg, "bnega") == 0	&&
-	    !CodeEntryHasLabel (L[0])		&&
+	    !CE_HasLabel (L[0])		        &&
 	    (L[1]->Info & OF_ZBRA) != 0) {
 
 	    /* Invert the branch */
-	    ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));
+	    CE_ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));
 
 	    /* Delete the subroutine call */
-	    DelCodeEntry (S, I+1);
+	    CS_DelEntry (S, I+1);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -1057,39 +1057,39 @@ static unsigned OptNegAX1 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[5];
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
        	if (E->OPC == OP65_LDA  	      	&&
 	    E->AM == AM65_ZP_INDY	      	&&
-	    GetCodeEntries (S, L, I+1, 5)	&&
+	    CS_GetEntries (S, L, I+1, 5)	&&
 	    L[0]->OPC == OP65_TAX    		&&
 	    L[1]->OPC == OP65_DEY    		&&
 	    L[2]->OPC == OP65_LDA    		&&
 	    L[2]->AM == AM65_ZP_INDY  		&&
 	    strcmp (L[2]->Arg, E->Arg) == 0	&&
-	    !CodeEntryHasLabel (L[2])		&&
+	    !CE_HasLabel (L[2])		        &&
 	    L[3]->OPC == OP65_JSR    		&&
 	    strcmp (L[3]->Arg, "bnegax") == 0	&&
-	    !CodeEntryHasLabel (L[3])		&&
+	    !CE_HasLabel (L[3])		        &&
        	    (L[4]->Info & OF_ZBRA) != 0) {
 
 	    /* lda --> ora */
-	    ReplaceOPC (L[2], OP65_ORA);
+	    CE_ReplaceOPC (L[2], OP65_ORA);
 
 	    /* Invert the branch */
-	    ReplaceOPC (L[4], GetInverseBranch (L[4]->OPC));
+	    CE_ReplaceOPC (L[4], GetInverseBranch (L[4]->OPC));
 
 	    /* Delete the entries no longer needed. Beware: Deleting entries
 	     * will change the indices.
 	     */
-       	    DelCodeEntry (S, I+4);	    	/* jsr bnegax */
-	    DelCodeEntry (S, I+1);	    	/* tax */
+       	    CS_DelEntry (S, I+4);	    	/* jsr bnegax */
+	    CS_DelEntry (S, I+1);	    	/* tax */
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -1126,31 +1126,31 @@ static unsigned OptNegAX2 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[3];
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
        	if (E->OPC == OP65_LDA  	      	&&
-       	    GetCodeEntries (S, L, I+1, 3)	&&
+       	    CS_GetEntries (S, L, I+1, 3)	&&
 	    L[0]->OPC == OP65_LDX       	&&
-	    !CodeEntryHasLabel (L[0]) 		&&
+	    !CE_HasLabel (L[0]) 		&&
        	    L[1]->OPC == OP65_JSR      		&&
 	    strcmp (L[1]->Arg, "bnegax") == 0	&&
-	    !CodeEntryHasLabel (L[1]) 		&&
+	    !CE_HasLabel (L[1]) 		&&
        	    (L[2]->Info & OF_ZBRA) != 0) {
 
 	    /* ldx --> ora */
-	    ReplaceOPC (L[0], OP65_ORA);
+	    CE_ReplaceOPC (L[0], OP65_ORA);
 
 	    /* Invert the branch */
-       	    ReplaceOPC (L[2], GetInverseBranch (L[2]->OPC));
+       	    CE_ReplaceOPC (L[2], GetInverseBranch (L[2]->OPC));
 
 	    /* Delete the subroutine call */
-       	    DelCodeEntry (S, I+2);
+       	    CS_DelEntry (S, I+2);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -1186,20 +1186,20 @@ static unsigned OptNegAX3 (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* L[2];
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
        	if (E->OPC == OP65_JSR  	      	&&
 	    E->Arg[0] == '_'	       	       	&&
-       	    GetCodeEntries (S, L, I+1, 2)      	&&
+       	    CS_GetEntries (S, L, I+1, 2)   	&&
        	    L[0]->OPC == OP65_JSR              	&&
 	    strncmp (L[0]->Arg,"bnega",5) == 0 	&&
-	    !CodeEntryHasLabel (L[0]) 	       	&&
+	    !CE_HasLabel (L[0]) 	       	&&
        	    (L[1]->Info & OF_ZBRA) != 0) {
 
 	    CodeEntry* X;
@@ -1211,20 +1211,20 @@ static unsigned OptNegAX3 (CodeSeg* S)
 	    if (ByteSized) {
 		/* Test bytes */
 		X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, L[0]->LI);
-		InsertCodeEntry (S, X, I+2);
+		CS_InsertEntry (S, X, I+2);
 	    } else {
 		/* Test words */
 		X = NewCodeEntry (OP65_STX, AM65_ZP, "tmp1", 0, L[0]->LI);
-		InsertCodeEntry (S, X, I+2);
+		CS_InsertEntry (S, X, I+2);
 		X = NewCodeEntry (OP65_ORA, AM65_ZP, "tmp1", 0, L[0]->LI);
-		InsertCodeEntry (S, X, I+3);
+		CS_InsertEntry (S, X, I+3);
 	    }
 
 	    /* Delete the subroutine call */
-	    DelCodeEntry (S, I+1);
+	    CS_DelEntry (S, I+1);
 
 	    /* Invert the branch */
-       	    ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));
+       	    CE_ReplaceOPC (L[1], GetInverseBranch (L[1]->OPC));
 
 	    /* Remember, we had changes */
 	    ++Changes;

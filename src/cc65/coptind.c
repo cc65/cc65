@@ -57,10 +57,10 @@ unsigned OptRTSJumps (CodeSeg* S)
 
     /* Walk over all entries minus the last one */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	/* Get the next entry */
-	CodeEntry* E = GetCodeEntry (S, I);
+	CodeEntry* E = CS_GetEntry (S, I);
 
        	/* Check if it's an unconditional branch to a local target */
        	if ((E->Info & OF_UBRA) != 0 		&&
@@ -69,10 +69,10 @@ unsigned OptRTSJumps (CodeSeg* S)
 
 	    /* Insert an RTS instruction */
 	    CodeEntry* X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, E->LI);
-	    InsertCodeEntry (S, X, I+1);
+	    CS_InsertEntry (S, X, I+1);
 
 	    /* Delete the jump */
-	    DelCodeEntry (S, I);
+	    CS_DelEntry (S, I);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -104,7 +104,7 @@ unsigned OptDeadJumps (CodeSeg* S)
     unsigned I;
 
     /* Get the number of entries, bail out if we have less than two entries */
-    unsigned Count = GetCodeEntryCount (S);
+    unsigned Count = CS_GetEntryCount (S);
     if (Count < 2) {
      	return 0;
     }
@@ -114,15 +114,15 @@ unsigned OptDeadJumps (CodeSeg* S)
     while (I < Count-1) {
 
 	/* Get the next entry */
-	E = GetCodeEntry (S, I);
+	E = CS_GetEntry (S, I);
 
 	/* Check if it's a branch, if it has a local target, and if the target
 	 * is the next instruction.
 	 */
-	if (E->AM == AM65_BRA && E->JumpTo && E->JumpTo->Owner == GetCodeEntry (S, I+1)) {
+	if (E->AM == AM65_BRA && E->JumpTo && E->JumpTo->Owner == CS_GetEntry (S, I+1)) {
 
 	    /* Delete the dead jump */
-	    DelCodeEntry (S, I);
+	    CS_DelEntry (S, I);
 
 	    /* Keep the number of entries updated */
 	    --Count;
@@ -159,7 +159,7 @@ unsigned OptDeadCode (CodeSeg* S)
     unsigned I;
 
     /* Get the number of entries, bail out if we have less than two entries */
-    unsigned Count = GetCodeEntryCount (S);
+    unsigned Count = CS_GetEntryCount (S);
     if (Count < 2) {
      	return 0;
     }
@@ -171,17 +171,17 @@ unsigned OptDeadCode (CodeSeg* S)
 	CodeEntry* N;
 
  	/* Get this entry */
- 	CodeEntry* E = GetCodeEntry (S, I);
+ 	CodeEntry* E = CS_GetEntry (S, I);
 
        	/* Check if it's an unconditional branch, and if the next entry has
  	 * no labels attached
  	 */
-       	if ((E->Info & OF_DEAD) != 0 		&&
-	    (N = GetNextCodeEntry (S, I)) != 0	&&
-	    !CodeEntryHasLabel (N)) {
+       	if ((E->Info & OF_DEAD) != 0   	       &&
+	    (N = CS_GetNextEntry (S, I)) != 0  &&
+	    !CE_HasLabel (N)) {
 
  	    /* Delete the next entry */
- 	    DelCodeEntry (S, I+1);
+ 	    CS_DelEntry (S, I+1);
 
  	    /* Keep the number of entries updated */
  	    --Count;
@@ -221,13 +221,13 @@ unsigned OptJumpCascades (CodeSeg* S)
 
     /* Walk over all entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* N;
 	CodeLabel* OldLabel;
 
 	/* Get this entry */
-	CodeEntry* E = GetCodeEntry (S, I);
+	CodeEntry* E = CS_GetEntry (S, I);
 
        	/* Check if it's a branch, if it has a jump label, if this jump
 	 * label is not attached to the instruction itself, and if the
@@ -244,18 +244,18 @@ unsigned OptJumpCascades (CodeSeg* S)
 	     */
 	    if ((N->Info & OF_UBRA) != 0 ||
        	       	((E->Info & OF_CBRA) != 0 &&
-		 GetBranchCond (E->OPC)  == GetBranchCond (N->OPC))) {
+	    	 GetBranchCond (E->OPC)  == GetBranchCond (N->OPC))) {
 
 	     	/* This is a jump cascade and we may jump to the final target.
-		 * Insert a new instruction, then remove the old one
+	    	 * Insert a new instruction, then remove the old one
 	     	 */
-		CodeEntry* X = NewCodeEntry (E->OPC, E->AM, N->Arg, N->JumpTo, E->LI);
+	    	CodeEntry* X = NewCodeEntry (E->OPC, E->AM, N->Arg, N->JumpTo, E->LI);
 
-		/* Insert it behind E */
-		InsertCodeEntry (S, X, I+1);
+	    	/* Insert it behind E */
+	    	CS_InsertEntry (S, X, I+1);
 
-		/* Remove E */
-		DelCodeEntry (S, I);
+	    	/* Remove E */
+	    	CS_DelEntry (S, I);
 
 	     	/* Remember, we had changes */
 	     	++Changes;
@@ -272,32 +272,32 @@ unsigned OptJumpCascades (CodeSeg* S)
 	     */
 	    if ((E->Info & OF_CBRA) != 0 && (N->Info & OF_CBRA) != 0) {
 
-		CodeEntry* X;	/* Instruction behind N */
-		CodeLabel* LX;	/* Label attached to X */
+	    	CodeEntry* X;	/* Instruction behind N */
+	    	CodeLabel* LX;	/* Label attached to X */
 
-		/* Get the branch conditions of both branches */
-		bc_t BC1 = GetBranchCond (E->OPC);
-		bc_t BC2 = GetBranchCond (N->OPC);
+	    	/* Get the branch conditions of both branches */
+	    	bc_t BC1 = GetBranchCond (E->OPC);
+	    	bc_t BC2 = GetBranchCond (N->OPC);
 
-		/* Check the branch conditions */
-		if (BC1 != GetInverseCond (BC2)) {
-		    /* Condition not met */
-		    goto NextEntry;
-		}
+	    	/* Check the branch conditions */
+	    	if (BC1 != GetInverseCond (BC2)) {
+	    	    /* Condition not met */
+	    	    goto NextEntry;
+	    	}
 
-		/* We may jump behind this conditional branch. Get the
-		 * pointer to the next instruction
-		 */
-		if ((X = GetNextCodeEntry (S, GetCodeEntryIndex (S, N))) == 0) {
-		    /* N is the last entry, bail out */
-		    goto NextEntry;
-		}
+	    	/* We may jump behind this conditional branch. Get the
+	    	 * pointer to the next instruction
+	    	 */
+	    	if ((X = CS_GetNextEntry (S, CS_GetEntryIndex (S, N))) == 0) {
+	    	    /* N is the last entry, bail out */
+	    	    goto NextEntry;
+	    	}
 
-		/* Get the label attached to X, create a new one if needed */
-		LX = GenCodeLabel (S, X);
+	    	/* Get the label attached to X, create a new one if needed */
+	    	LX = CS_GenLabel (S, X);
 
-		/* Move the reference from E to the new label */
-		MoveCodeLabelRef (S, E, LX);
+	    	/* Move the reference from E to the new label */
+	    	CS_MoveLabelRef (S, E, LX);
 
 	     	/* Remember, we had changes */
 	     	++Changes;
@@ -336,7 +336,7 @@ unsigned OptRTS (CodeSeg* S)
     unsigned I;
 
     /* Get the number of entries, bail out if we have less than 2 entries */
-    unsigned Count = GetCodeEntryCount (S);
+    unsigned Count = CS_GetEntryCount (S);
     if (Count < 2) {
      	return 0;
     }
@@ -348,16 +348,16 @@ unsigned OptRTS (CodeSeg* S)
 	CodeEntry* N;
 
 	/* Get this entry */
-	CodeEntry* E = GetCodeEntry (S, I);
+	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if it's a subroutine call and if the following insn is RTS */
-	if (E->OPC == OP65_JSR         	       	&&
-	    (N = GetNextCodeEntry (S, I)) != 0	&&
+	if (E->OPC == OP65_JSR         	       	  &&
+	    (N = CS_GetNextEntry (S, I)) != 0 &&
 	    N->OPC == OP65_RTS) {
 
 	    /* Change the jsr to a jmp and use the additional info for a jump */
        	    E->AM = AM65_BRA;
-	    ReplaceOPC (E, OP65_JMP);
+	    CE_ReplaceOPC (E, OP65_JMP);
 
        	    /* Remember, we had changes */
 	    ++Changes;
@@ -398,7 +398,7 @@ unsigned OptJumpTarget (CodeSeg* S)
     unsigned I;
 
     /* Get the number of entries, bail out if we have not enough */
-    unsigned Count = GetCodeEntryCount (S);
+    unsigned Count = CS_GetEntryCount (S);
     if (Count < 3) {
      	return 0;
     }
@@ -408,7 +408,7 @@ unsigned OptJumpTarget (CodeSeg* S)
     while (I < Count-1) {
 
       	/* Get next entry */
-       	E2 = GetCodeEntry (S, I+1);
+       	E2 = CS_GetEntry (S, I+1);
 
 	/* Check if we have a jump or branch, and a matching label */
        	if ((E2->Info & OF_UBRA) != 0 && E2->JumpTo) {
@@ -417,15 +417,15 @@ unsigned OptJumpTarget (CodeSeg* S)
 	    T2 = E2->JumpTo->Owner;
 
 	    /* Get the entry preceeding this one (if possible) */
-	    TI = GetCodeEntryIndex (S, T2);
+	    TI = CS_GetEntryIndex (S, T2);
 	    if (TI == 0) {
 	       	/* There is no entry before this one */
 	       	goto NextEntry;
 	    }
-	    T1 = GetCodeEntry (S, TI-1);
+	    T1 = CS_GetEntry (S, TI-1);
 
 	    /* Get the entry preceeding the jump */
-	    E1 = GetCodeEntry (S, I);
+	    E1 = CS_GetEntry (S, I);
 
 	    /* Check if both preceeding instructions are identical */
 	    if (!CodeEntriesAreEqual (E1, T1)) {
@@ -437,20 +437,20 @@ unsigned OptJumpTarget (CodeSeg* S)
 	     * This routine will create a new label if the instruction does
 	     * not already have one.
 	     */
-      	    TL1 = GenCodeLabel (S, T1);
+      	    TL1 = CS_GenLabel (S, T1);
 
 	    /* Change the jump target to point to this new label */
-	    MoveCodeLabelRef (S, E2, TL1);
+	    CS_MoveLabelRef (S, E2, TL1);
 
 	    /* If the instruction preceeding the jump has labels attached,
 	     * move references to this label to the new label.
 	     */
-	    if (CodeEntryHasLabel (E1)) {
-	    	MoveCodeLabels (S, E1, T1);
+	    if (CE_HasLabel (E1)) {
+	       	CS_MoveLabels (S, E1, T1);
 	    }
 
 	    /* Remove the entry preceeding the jump */
-	    DelCodeEntry (S, I);
+	    CS_DelEntry (S, I);
 	    --Count;
 
        	    /* Remember, we had changes */
@@ -471,7 +471,7 @@ NextEntry:
 
 
 /*****************************************************************************/
-/*		 	 Optimize conditional branches			     */
+/*		   	 Optimize conditional branches			     */
 /*****************************************************************************/
 
 
@@ -493,7 +493,7 @@ unsigned OptCondBranches (CodeSeg* S)
     unsigned I;
 
     /* Get the number of entries, bail out if we have not enough */
-    unsigned Count = GetCodeEntryCount (S);
+    unsigned Count = CS_GetEntryCount (S);
     if (Count < 2) {
      	return 0;
     }
@@ -506,39 +506,39 @@ unsigned OptCondBranches (CodeSeg* S)
 	CodeLabel* L;
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if it's a register load */
-       	if ((E->Info & OF_LOAD) != 0   		&&  /* It's a load instruction */
-	    E->AM == AM65_IMM 	       		&&  /* ..with immidiate addressing */
-	    (E->Flags & CEF_NUMARG) != 0	&&  /* ..and a numeric argument. */
-	    (N = GetNextCodeEntry (S, I)) != 0	&&  /* There is a following entry */
-       	    (N->Info & OF_CBRA) != 0		&&  /* ..which is a conditional branch */
-	    !CodeEntryHasLabel (N)) {		    /* ..and does not have a label */
+       	if ((E->Info & OF_LOAD) != 0   	       	  &&  /* It's a load instruction */
+	    E->AM == AM65_IMM 	       		  &&  /* ..with immidiate addressing */
+	    (E->Flags & CEF_NUMARG) != 0	  &&  /* ..and a numeric argument. */
+	    (N = CS_GetNextEntry (S, I)) != 0     &&  /* There is a following entry */
+       	    (N->Info & OF_CBRA) != 0		  &&  /* ..which is a conditional branch */
+	    !CE_HasLabel (N)) {		      /* ..and does not have a label */
 
 	    /* Get the branch condition */
 	    bc_t BC = GetBranchCond (N->OPC);
 
 	    /* Check the argument against the branch condition */
-       	    if ((BC == BC_EQ && E->Num != 0) 		||
-	       	(BC == BC_NE && E->Num == 0)		||
+       	    if ((BC == BC_EQ && E->Num != 0) 	    	||
+	       	(BC == BC_NE && E->Num == 0)	    	||
 	       	(BC == BC_PL && (E->Num & 0x80) != 0)	||
 	    	(BC == BC_MI && (E->Num & 0x80) == 0)) {
 
 	    	/* Remove the conditional branch */
-	    	DelCodeEntry (S, I+1);
+	    	CS_DelEntry (S, I+1);
 	    	--Count;
 
 	    	/* Remember, we had changes */
 	    	++Changes;
 
-     	    } else if ((BC == BC_EQ && E->Num == 0)		||
-     	    	       (BC == BC_NE && E->Num != 0)		||
+     	    } else if ((BC == BC_EQ && E->Num == 0) 		||
+     	    	       (BC == BC_NE && E->Num != 0) 		||
      	    	       (BC == BC_PL && (E->Num & 0x80) == 0)	||
      	    	       (BC == BC_MI && (E->Num & 0x80) != 0)) {
 
      		/* The branch is always taken, replace it by a jump */
-     		ReplaceOPC (N, OP65_JMP);
+     		CE_ReplaceOPC (N, OP65_JMP);
 
      		/* Remember, we had changes */
      		++Changes;
@@ -546,20 +546,20 @@ unsigned OptCondBranches (CodeSeg* S)
 
 	}
 
-      	if ((E->Info & OF_CBRA) != 0	     	&&  /* It's a conditional branch */
-      	    (L = E->JumpTo) != 0	     	&&  /* ..referencing a local label */
-       	    (N = GetNextCodeEntry (S, I)) != 0	&&  /* There is a following entry */
-      	    (N->Info & OF_UBRA) != 0	     	&&  /* ..which is an uncond branch, */
-      	    !CodeEntryHasLabel (N)	     	&&  /* ..has no label attached */
-      	    L->Owner == GetNextCodeEntry (S, I+1)) {/* ..and jump target follows */
+      	if ((E->Info & OF_CBRA) != 0	     	  &&  /* It's a conditional branch */
+      	    (L = E->JumpTo) != 0	     	  &&  /* ..referencing a local label */
+       	    (N = CS_GetNextEntry (S, I)) != 0     &&  /* There is a following entry */
+      	    (N->Info & OF_UBRA) != 0	     	  &&  /* ..which is an uncond branch, */
+      	    !CE_HasLabel (N) 	     	          &&  /* ..has no label attached */
+      	    L->Owner == CS_GetNextEntry (S, I+1)) {/* ..and jump target follows */
 
       	    /* Replace the jump by a conditional branch with the inverse branch
       	     * condition than the branch around it.
       	     */
-      	    ReplaceOPC (N, GetInverseBranch (E->OPC));
+      	    CE_ReplaceOPC (N, GetInverseBranch (E->OPC));
 
       	    /* Remove the conditional branch */
-      	    DelCodeEntry (S, I);
+      	    CS_DelEntry (S, I);
       	    --Count;
 
       	    /* Remember, we had changes */
@@ -579,7 +579,7 @@ unsigned OptCondBranches (CodeSeg* S)
 
 
 /*****************************************************************************/
-/*			      Remove unused loads			     */
+/*			      Remove unused loads     			     */
 /*****************************************************************************/
 
 
@@ -591,16 +591,16 @@ unsigned OptUnusedLoads (CodeSeg* S)
 
     /* Walk over the entries */
     unsigned I = 0;
-    while (I < GetCodeEntryCount (S)) {
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* N;
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if it's a register load or transfer insn */
 	if ((E->Info & (OF_LOAD | OF_XFR)) != 0    &&
-	    (N = GetNextCodeEntry (S, I)) != 0     &&
+	    (N = CS_GetNextEntry (S, I)) != 0      &&
 	    (N->Info & OF_FBRA) == 0) {
 
 	    /* Check which sort of load or transfer it is */
@@ -613,14 +613,14 @@ unsigned OptUnusedLoads (CodeSeg* S)
        	       	case OP65_LDX:  R = REG_X;	break;
 		case OP65_TAY:
 		case OP65_LDY:	R = REG_Y;	break;
-		default:     	goto NextEntry;		/* OOPS */
+		default:     	goto NextEntry;	      	/* OOPS */
 	    }
 
 	    /* Get register usage and check if the register value is used later */
 	    if ((GetRegInfo (S, I+1) & R) == 0) {
 
 		/* Register value is not used, remove the load */
-		DelCodeEntry (S, I);
+		CS_DelEntry (S, I);
 
 		/* Remember, we had changes */
 		++Changes;
@@ -641,7 +641,7 @@ NextEntry:
 
 
 /*****************************************************************************/
-/*		       	     Optimize branch types			     */
+/*		       	     Optimize branch types 			     */
 /*****************************************************************************/
 
 
@@ -653,14 +653,14 @@ unsigned OptBranchDist (CodeSeg* S)
     unsigned I;
 
     /* Get the number of entries, bail out if we have not enough */
-    unsigned Count = GetCodeEntryCount (S);
+    unsigned Count = CS_GetEntryCount (S);
 
     /* Walk over the entries */
     I = 0;
     while (I < Count) {
 
       	/* Get next entry */
-       	CodeEntry* E = GetCodeEntry (S, I);
+       	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if it's a conditional branch to a local label. */
        	if ((E->Info & OF_CBRA) != 0) {
@@ -669,7 +669,7 @@ unsigned OptBranchDist (CodeSeg* S)
 	    if (E->JumpTo != 0) {
 
 		/* Get the index of the branch target */
-		unsigned TI = GetCodeEntryIndex (S, E->JumpTo->Owner);
+		unsigned TI = CS_GetEntryIndex (S, E->JumpTo->Owner);
 
 		/* Determine the branch distance */
 		int Distance = 0;
@@ -677,14 +677,14 @@ unsigned OptBranchDist (CodeSeg* S)
 		    /* Forward branch */
 		    unsigned J = I;
 		    while (J < TI) {
-			CodeEntry* N = GetCodeEntry (S, J++);
+			CodeEntry* N = CS_GetEntry (S, J++);
 			Distance += N->Size;
 		    }
 		} else {
 		    /* Backward branch */
 		    unsigned J = TI;
 		    while (J < I) {
-			CodeEntry* N = GetCodeEntry (S, J++);
+			CodeEntry* N = CS_GetEntry (S, J++);
 			Distance += N->Size;
 		    }
 		}
@@ -692,18 +692,18 @@ unsigned OptBranchDist (CodeSeg* S)
 		/* Make the branch short/long according to distance */
 		if ((E->Info & OF_LBRA) == 0 && Distance > 120) {
 		    /* Short branch but long distance */
-		    ReplaceOPC (E, MakeLongBranch (E->OPC));
+		    CE_ReplaceOPC (E, MakeLongBranch (E->OPC));
 		    ++Changes;
 		} else if ((E->Info & OF_LBRA) != 0 && Distance < 120) {
 		    /* Long branch but short distance */
-		    ReplaceOPC (E, MakeShortBranch (E->OPC));
+		    CE_ReplaceOPC (E, MakeShortBranch (E->OPC));
 		    ++Changes;
 		}
 
 	    } else if ((E->Info & OF_LBRA) == 0) {
 
 		/* Short branch to external symbol - make it long */
-		ReplaceOPC (E, MakeLongBranch (E->OPC));
+		CE_ReplaceOPC (E, MakeLongBranch (E->OPC));
 		++Changes;
 
 	    }
@@ -717,10 +717,6 @@ unsigned OptBranchDist (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-
-
 
 
 

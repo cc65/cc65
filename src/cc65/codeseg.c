@@ -62,12 +62,12 @@
 
 
 
-static void MoveLabelsToPool (CodeSeg* S, CodeEntry* E)
+static void CS_MoveLabelsToPool (CodeSeg* S, CodeEntry* E)
 /* Move the labels of the code entry E to the label pool of the code segment */
 {
-    unsigned LabelCount = GetCodeLabelCount (E);
+    unsigned LabelCount = CE_GetLabelCount (E);
     while (LabelCount--) {
-	CodeLabel* L = GetCodeLabel (E, LabelCount);
+	CodeLabel* L = CE_GetLabel (E, LabelCount);
 	L->Owner = 0;
 	CollAppend (&S->Labels, L);
     }
@@ -76,7 +76,7 @@ static void MoveLabelsToPool (CodeSeg* S, CodeEntry* E)
 
 
 
-static CodeLabel* FindCodeLabel (CodeSeg* S, const char* Name, unsigned Hash)
+static CodeLabel* CS_FindLabel (CodeSeg* S, const char* Name, unsigned Hash)
 /* Find the label with the given name. Return the label or NULL if not found */
 {
     /* Get the first hash chain entry */
@@ -95,10 +95,10 @@ static CodeLabel* FindCodeLabel (CodeSeg* S, const char* Name, unsigned Hash)
 
 
 
-static CodeLabel* NewCodeSegLabel (CodeSeg* S, const char* Name, unsigned Hash)
+static CodeLabel* CS_NewCodeLabel (CodeSeg* S, const char* Name, unsigned Hash)
 /* Create a new label and insert it into the label hash table */
 {
-    /* Not found - create a new one */
+    /* Create a new label */
     CodeLabel* L = NewCodeLabel (Name, Hash);
 
     /* Enter the label into the hash table */
@@ -111,7 +111,7 @@ static CodeLabel* NewCodeSegLabel (CodeSeg* S, const char* Name, unsigned Hash)
 
 
 
-static void RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
+static void CS_RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
 /* Remove the given code label from the hash list */
 {
     /* Get the first entry in the hash chain */
@@ -194,9 +194,9 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 {
     char       		Mnemo[16];
     const OPCDesc*	OPC;
-    am_t     		AM = 0;		/* Initialize to keep gcc silent */
-    char     		Arg[64];
-    char     	   	Reg;
+    am_t      		AM = 0;		/* Initialize to keep gcc silent */
+    char      		Arg[64];
+    char      	   	Reg;
     CodeEntry*	     	E;
     CodeLabel*		Label;
 
@@ -254,7 +254,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	     	    return 0;
 	     	}
 	     	L = SkipSpace (L+1);
-	     	if (*L != '\0') {
+	      	if (*L != '\0') {
 	     	    Error ("ASM code error: syntax error");
 	     	    return 0;
 	     	}
@@ -297,7 +297,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 	    L = ReadToken (L, ",", Arg, sizeof (Arg));
 	    if (*L == '\0') {
 	     	/* Absolute, zeropage or branch */
-		if ((OPC->Info & OF_BRA) != 0) {
+	      	if ((OPC->Info & OF_BRA) != 0) {
 		    /* Branch */
 		    AM = AM65_BRA;
 		} else if (IsZPName (Arg)) {
@@ -344,12 +344,12 @@ static CodeEntry* ParseInsn (CodeSeg* S, LineInfo* LI, const char* L)
 
 	/* Generate the hash over the label, then search for the label */
 	unsigned Hash = HashStr (Arg) % CS_LABEL_HASH_SIZE;
-	Label = FindCodeLabel (S, Arg, Hash);
+	Label = CS_FindLabel (S, Arg, Hash);
 
 	/* If we don't have the label, it's a forward ref - create it */
 	if (Label == 0) {
 	    /* Generate a new label */
-	    Label = NewCodeSegLabel (S, Arg, Hash);
+	    Label = CS_NewCodeLabel (S, Arg, Hash);
 	}
     }
 
@@ -402,12 +402,36 @@ CodeSeg* NewCodeSeg (const char* SegName, SymEntry* Func)
 
 
 
-void AddCodeEntry (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
+void CS_AddEntry (CodeSeg* S, struct CodeEntry* E, LineInfo* LI)
+/* Add an entry to the given code segment */
+{
+    /* Transfer the labels if we have any */
+    unsigned I;
+    unsigned LabelCount = CollCount (&S->Labels);
+    for (I = 0; I < LabelCount; ++I) {
+
+	/* Get the label */
+	CodeLabel* L = CollAt (&S->Labels, I);
+
+	/* Attach it to the entry */
+	CE_AttachLabel (E, L);
+    }
+
+    /* Delete the transfered labels */
+    CollDeleteAll (&S->Labels);
+
+    /* Add the entry to the list of code entries in this segment */
+    CollAppend (&S->Entries, E);
+}
+
+
+
+void CS_AddEntryLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
 /* Add a line to the given code segment */
 {
     const char* L;
     CodeEntry*  E;
-    char	Token[64];
+    char   	Token[64];
 
     /* Format the line */
     char Buf [256];
@@ -417,7 +441,7 @@ void AddCodeEntry (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
     L = SkipSpace (Buf);
 
     /* Check which type of instruction we have */
-    E = 0;	/* Assume no insn created */
+    E = 0; 	/* Assume no insn created */
     switch (*L) {
 
     	case '\0':
@@ -441,31 +465,13 @@ void AddCodeEntry (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap)
 
     /* If we have a code entry, transfer the labels and insert it */
     if (E) {
-
-	/* Transfer the labels if we have any */
-	unsigned I;
-	unsigned LabelCount = CollCount (&S->Labels);
-	for (I = 0; I < LabelCount; ++I) {
-
-	    /* Get the label */
-	    CodeLabel* L = CollAt (&S->Labels, I);
-
-	    /* Attach it to the entry */
-	    AttachCodeLabel (E, L);
-	}
-
-	/* Delete the transfered labels */
-	CollDeleteAll (&S->Labels);
-
-	/* Add the entry to the list of code entries in this segment */
-      	CollAppend (&S->Entries, E);
-
+	CS_AddEntry (S, E, LI);
     }
 }
 
 
 
-void InsertCodeEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index)
+void CS_InsertEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index)
 /* Insert the code entry at the index given. Following code entries will be
  * moved to slots with higher indices.
  */
@@ -476,14 +482,14 @@ void InsertCodeEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index)
 
 
 
-void DelCodeEntry (CodeSeg* S, unsigned Index)
+void CS_DelEntry (CodeSeg* S, unsigned Index)
 /* Delete an entry from the code segment. This includes moving any associated
  * labels, removing references to labels and even removing the referenced labels
  * if the reference count drops to zero.
  */
 {
     /* Get the code entry for the given index */
-    CodeEntry* E = GetCodeEntry (S, Index);
+    CodeEntry* E = CS_GetEntry (S, Index);
 
     /* If the entry has a labels, we have to move this label to the next insn.
      * If there is no next insn, move the label into the code segement label
@@ -491,24 +497,24 @@ void DelCodeEntry (CodeSeg* S, unsigned Index)
      * insn may already have a label. In that case change all reference to
      * this label and delete the label instead of moving it.
      */
-    unsigned Count = GetCodeLabelCount (E);
+    unsigned Count = CE_GetLabelCount (E);
     if (Count > 0) {
 
      	/* The instruction has labels attached. Check if there is a next
      	 * instruction.
      	 */
-     	if (Index == GetCodeEntryCount (S)-1) {
+     	if (Index == CS_GetEntryCount (S)-1) {
 
      	    /* No next instruction, move to the codeseg label pool */
-     	    MoveLabelsToPool (S, E);
+     	    CS_MoveLabelsToPool (S, E);
 
      	} else {
 
      	    /* There is a next insn, get it */
-     	    CodeEntry* N = GetCodeEntry (S, Index+1);
+     	    CodeEntry* N = CS_GetEntry (S, Index+1);
 
      	    /* Move labels to the next entry */
-     	    MoveCodeLabels (S, E, N);
+     	    CS_MoveLabels (S, E, N);
 
      	}
     }
@@ -518,7 +524,7 @@ void DelCodeEntry (CodeSeg* S, unsigned Index)
      */
     if (E->JumpTo) {
        	/* Remove the reference */
-       	RemoveCodeLabelRef (S, E);
+       	CS_RemoveLabelRef (S, E);
     }
 
     /* Delete the pointer to the insn */
@@ -530,7 +536,7 @@ void DelCodeEntry (CodeSeg* S, unsigned Index)
 
 
 
-void DelCodeEntries (CodeSeg* S, unsigned Start, unsigned Count)
+void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count)
 /* Delete a range of code entries. This includes removing references to labels,
  * labels attached to the entries and so on.
  */
@@ -539,19 +545,19 @@ void DelCodeEntries (CodeSeg* S, unsigned Start, unsigned Count)
      * memory moving.
      */
     while (Count--) {
-	DelCodeEntry (S, Start + Count);
+	CS_DelEntry (S, Start + Count);
     }
 }
 
 
 
-void MoveCodeEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos)
+void CS_MoveEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos)
 /* Move an entry from one position to another. OldPos is the current position
  * of the entry, NewPos is the new position of the entry.
  */
 {
     /* Get the code entry and remove it from the collection */
-    CodeEntry* E = GetCodeEntry (S, OldPos);
+    CodeEntry* E = CS_GetEntry (S, OldPos);
     CollDelete (&S->Entries, OldPos);
 
     /* Correct NewPos if needed */
@@ -566,7 +572,7 @@ void MoveCodeEntry (CodeSeg* S, unsigned OldPos, unsigned NewPos)
 
 
 
-struct CodeEntry* GetNextCodeEntry (CodeSeg* S, unsigned Index)
+struct CodeEntry* CS_GetNextEntry (CodeSeg* S, unsigned Index)
 /* Get the code entry following the one with the index Index. If there is no
  * following code entry, return NULL.
  */
@@ -582,8 +588,8 @@ struct CodeEntry* GetNextCodeEntry (CodeSeg* S, unsigned Index)
 
 
 
-int GetCodeEntries (CodeSeg* S, struct CodeEntry** List,
-       		    unsigned Start, unsigned Count)
+int CS_GetEntries (CodeSeg* S, struct CodeEntry** List,
+       	       	   unsigned Start, unsigned Count)
 /* Get Count code entries into List starting at index start. Return true if
  * we got the lines, return false if not enough lines were available.
  */
@@ -604,7 +610,7 @@ int GetCodeEntries (CodeSeg* S, struct CodeEntry** List,
 
 
 
-unsigned GetCodeEntryIndex (CodeSeg* S, struct CodeEntry* E)
+unsigned CS_GetEntryIndex (CodeSeg* S, struct CodeEntry* E)
 /* Return the index of a code entry */
 {
     int Index = CollIndex (&S->Entries, E);
@@ -614,14 +620,14 @@ unsigned GetCodeEntryIndex (CodeSeg* S, struct CodeEntry* E)
 
 
 
-void AddCodeLabel (CodeSeg* S, const char* Name)
+CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
 /* Add a code label for the next instruction to follow */
 {
     /* Calculate the hash from the name */
     unsigned Hash = HashStr (Name) % CS_LABEL_HASH_SIZE;
 
     /* Try to find the code label if it does already exist */
-    CodeLabel* L = FindCodeLabel (S, Name, Hash);
+    CodeLabel* L = CS_FindLabel (S, Name, Hash);
 
     /* Did we find it? */
     if (L) {
@@ -629,7 +635,7 @@ void AddCodeLabel (CodeSeg* S, const char* Name)
      	CHECK (L->Owner == 0);
     } else {
      	/* Not found - create a new one */
-     	L = NewCodeSegLabel (S, Name, Hash);
+     	L = CS_NewCodeLabel (S, Name, Hash);
     }
 
     /* Safety. This call is quite costly, but safety is better */
@@ -639,21 +645,24 @@ void AddCodeLabel (CodeSeg* S, const char* Name)
 
     /* We do now have a valid label. Remember it for later */
     CollAppend (&S->Labels, L);
+
+    /* Return the label */
+    return L;
 }
 
 
 
-CodeLabel* GenCodeLabel (CodeSeg* S, struct CodeEntry* E)
+CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E)
 /* If the code entry E does already have a label, return it. Otherwise
  * create a new label, attach it to E and return it.
  */
 {
     CodeLabel* L;
 
-    if (CodeEntryHasLabel (E)) {
+    if (CE_HasLabel (E)) {
 
 	/* Get the label from this entry */
-	L = GetCodeLabel (E, 0);
+	L = CE_GetLabel (E, 0);
 
     } else {
 
@@ -664,10 +673,10 @@ CodeLabel* GenCodeLabel (CodeSeg* S, struct CodeEntry* E)
 	unsigned Hash = HashStr (Name) % CS_LABEL_HASH_SIZE;
 
 	/* Create a new label */
-	L = NewCodeSegLabel (S, Name, Hash);
+	L = CS_NewCodeLabel (S, Name, Hash);
 
 	/* Attach this label to the code entry */
-	AttachCodeLabel (E, L);
+	CE_AttachLabel (E, L);
 
     }
 
@@ -677,13 +686,13 @@ CodeLabel* GenCodeLabel (CodeSeg* S, struct CodeEntry* E)
 
 
 
-void DelCodeLabel (CodeSeg* S, CodeLabel* L)
+void CS_DelLabel (CodeSeg* S, CodeLabel* L)
 /* Remove references from this label and delete it. */
 {
     unsigned Count, I;
 
     /* First, remove the label from the hash chain */
-    RemoveLabelFromHash (S, L);
+    CS_RemoveLabelFromHash (S, L);
 
     /* Remove references from insns jumping to this label */
     Count = CollCount (&L->JumpFrom);
@@ -701,7 +710,7 @@ void DelCodeLabel (CodeSeg* S, CodeLabel* L)
      * errors to slip through.
      */
     if (L->Owner) {
-     	CollDeleteItem (&L->Owner->Labels, L);
+       	CollDeleteItem (&L->Owner->Labels, L);
     }
 
     /* All references removed, delete the label itself */
@@ -710,7 +719,7 @@ void DelCodeLabel (CodeSeg* S, CodeLabel* L)
 
 
 
-void MergeCodeLabels (CodeSeg* S)
+void CS_MergeLabels (CodeSeg* S)
 /* Merge code labels. That means: For each instruction, remove all labels but
  * one and adjust references accordingly.
  */
@@ -718,23 +727,22 @@ void MergeCodeLabels (CodeSeg* S)
     unsigned I;
 
     /* Walk over all code entries */
-    unsigned EntryCount = GetCodeEntryCount (S);
-    for (I = 0; I < EntryCount; ++I) {
+    for (I = 0; I < CS_GetEntryCount (S); ++I) {
 
        	CodeLabel* RefLab;
-	unsigned   J;
+       	unsigned   J;
 
 	/* Get a pointer to the next entry */
-	CodeEntry* E = GetCodeEntry (S, I);
+	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* If this entry has zero labels, continue with the next one */
-    	unsigned LabelCount = GetCodeLabelCount (E);
+    	unsigned LabelCount = CE_GetLabelCount (E);
     	if (LabelCount == 0) {
     	    continue;
     	}
 
     	/* We have at least one label. Use the first one as reference label. */
-    	RefLab = GetCodeLabel (E, 0);
+    	RefLab = CE_GetLabel (E, 0);
 
     	/* Walk through the remaining labels and change references to these
     	 * labels to a reference to the one and only label. Delete the labels
@@ -744,13 +752,13 @@ void MergeCodeLabels (CodeSeg* S)
       	for (J = LabelCount-1; J >= 1; --J) {
 
     	    /* Get the next label */
-    	    CodeLabel* L = GetCodeLabel (E, J);
+    	    CodeLabel* L = CE_GetLabel (E, J);
 
 	    /* Move all references from this label to the reference label */
-     	    MoveLabelRefs (L, RefLab);
+     	    CL_MoveRefs (L, RefLab);
 
        	    /* Remove the label completely. */
-       	    DelCodeLabel (S, L);
+       	    CS_DelLabel (S, L);
      	}
 
     	/* The reference label is the only remaining label. Check if there
@@ -759,14 +767,14 @@ void MergeCodeLabels (CodeSeg* S)
 	 */
        	if (CollCount (&RefLab->JumpFrom) == 0) {
      	    /* Delete the label */
-       	    DelCodeLabel (S, RefLab);
+       	    CS_DelLabel (S, RefLab);
      	}
     }
 }
 
 
 
-void MoveCodeLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
+void CS_MoveLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
 /* Move all labels from Old to New. The routine will move the labels itself
  * if New does not have any labels, and move references if there is at least
  * a label for new. If references are moved, the old label is deleted
@@ -774,23 +782,23 @@ void MoveCodeLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
  */
 {
     /* Get the number of labels to move */
-    unsigned OldLabelCount = GetCodeLabelCount (Old);
+    unsigned OldLabelCount = CE_GetLabelCount (Old);
 
     /* Does the new entry have itself a label? */
-    if (CodeEntryHasLabel (New)) {
+    if (CE_HasLabel (New)) {
 
 	/* The new entry does already have a label - move references */
-	CodeLabel* NewLabel = GetCodeLabel (New, 0);
+	CodeLabel* NewLabel = CE_GetLabel (New, 0);
 	while (OldLabelCount--) {
 
 	    /* Get the next label */
-	    CodeLabel* OldLabel = GetCodeLabel (Old, OldLabelCount);
+	    CodeLabel* OldLabel = CE_GetLabel (Old, OldLabelCount);
 
 	    /* Move references */
-	    MoveLabelRefs (OldLabel, NewLabel);
+	    CL_MoveRefs (OldLabel, NewLabel);
 
 	    /* Delete the label */
-	    DelCodeLabel (S, OldLabel);
+	    CS_DelLabel (S, OldLabel);
 
      	}
 
@@ -800,7 +808,7 @@ void MoveCodeLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
 	while (OldLabelCount--) {
 
 	    /* Move the label to the new entry */
-	    MoveCodeLabel (GetCodeLabel (Old, OldLabelCount), New);
+	    CE_MoveLabel (CE_GetLabel (Old, OldLabelCount), New);
 
 	}
 
@@ -809,7 +817,7 @@ void MoveCodeLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New)
 
 
 
-void RemoveCodeLabelRef (CodeSeg* S, struct CodeEntry* E)
+void CS_RemoveLabelRef (CodeSeg* S, struct CodeEntry* E)
 /* Remove the reference between E and the label it jumps to. The reference
  * will be removed on both sides and E->JumpTo will be 0 after that. If
  * the reference was the only one for the label, the label will get
@@ -828,13 +836,13 @@ void RemoveCodeLabelRef (CodeSeg* S, struct CodeEntry* E)
 
     /* If there are no more references, delete the label */
     if (CollCount (&L->JumpFrom) == 0) {
-       	DelCodeLabel (S, L);
+       	CS_DelLabel (S, L);
     }
 }
 
 
 
-void MoveCodeLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L)
+void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L)
 /* Change the reference of E to L instead of the current one. If this
  * was the only reference to the old label, the old label will get
  * deleted.
@@ -847,19 +855,19 @@ void MoveCodeLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L)
     PRECONDITION (OldLabel != 0);
 
     /* Remove the reference to our label */
-    RemoveCodeLabelRef (S, E);
+    CS_RemoveLabelRef (S, E);
 
     /* Use the new label */
-    AddLabelRef (L, E);
+    CL_AddRef (L, E);
 }
 
 
 
-void DelCodeSegAfter (CodeSeg* S, unsigned Last)
+void CS_DelCodeAfter (CodeSeg* S, unsigned Last)
 /* Delete all entries including the given one */
 {
     /* Get the number of entries in this segment */
-    unsigned Count = GetCodeEntryCount (S);
+    unsigned Count = CS_GetEntryCount (S);
 
     /* First pass: Delete all references to labels. If the reference count
      * for a label drops to zero, delete it.
@@ -867,23 +875,23 @@ void DelCodeSegAfter (CodeSeg* S, unsigned Last)
     unsigned C = Count;
     while (Last < C--) {
 
-	/* Get the next entry */
-	CodeEntry* E = GetCodeEntry (S, C);
+       	/* Get the next entry */
+       	CodeEntry* E = CS_GetEntry (S, C);
 
-	/* Check if this entry has a label reference */
-	if (E->JumpTo) {
-	    /* If the label is a label in the label pool and this is the last
-	     * reference to the label, remove the label from the pool.
-	     */
-	    CodeLabel* L = E->JumpTo;
-	    int Index = CollIndex (&S->Labels, L);
-	    if (Index >= 0 && CollCount (&L->JumpFrom) == 1) {
-		/* Delete it from the pool */
-		CollDelete (&S->Labels, Index);
-	    }
+       	/* Check if this entry has a label reference */
+       	if (E->JumpTo) {
+       	    /* If the label is a label in the label pool and this is the last
+       	     * reference to the label, remove the label from the pool.
+       	     */
+       	    CodeLabel* L = E->JumpTo;
+       	    int Index = CollIndex (&S->Labels, L);
+       	    if (Index >= 0 && CollCount (&L->JumpFrom) == 1) {
+       	     	/* Delete it from the pool */
+       	     	CollDelete (&S->Labels, Index);
+       	    }
 
 	    /* Remove the reference to the label */
-	    RemoveCodeLabelRef (S, E);
+	    CS_RemoveLabelRef (S, E);
 	}
 
     }
@@ -897,12 +905,12 @@ void DelCodeSegAfter (CodeSeg* S, unsigned Last)
     while (Last < C--) {
 
     	/* Get the next entry */
-    	CodeEntry* E = GetCodeEntry (S, C);
+    	CodeEntry* E = CS_GetEntry (S, C);
 
     	/* Check if this entry has a label attached */
-    	if (CodeEntryHasLabel (E)) {
+    	if (CE_HasLabel (E)) {
 	    /* Move the labels to the pool and clear the owner pointer */
-	    MoveLabelsToPool (S, E);
+	    CS_MoveLabelsToPool (S, E);
 	}
 
 	/* Delete the pointer to the entry */
@@ -915,14 +923,14 @@ void DelCodeSegAfter (CodeSeg* S, unsigned Last)
 
 
 
-void OutputCodeSeg (const CodeSeg* S, FILE* F)
+void CS_Output (const CodeSeg* S, FILE* F)
 /* Output the code segment data to a file */
 {
     unsigned I;
     const LineInfo* LI;
 
     /* Get the number of entries in this segment */
-    unsigned Count = GetCodeEntryCount (S);
+    unsigned Count = CS_GetEntryCount (S);
 
     /* If the code segment is empty, bail out here */
     if (Count == 0) {
@@ -952,17 +960,17 @@ void OutputCodeSeg (const CodeSeg* S, FILE* F)
 
 	    /* Add the source line as a comment */
 	    if (AddSource) {
-		fprintf (F, ";\n; %s\n;\n", LI->Line);
+	       	fprintf (F, ";\n; %s\n;\n", LI->Line);
 	    }
 
 	    /* Add line debug info */
 	    if (DebugInfo) {
-		fprintf (F, "\t.dbg\tline, \"%s\", %u\n",
-			 GetInputName (LI), GetInputLine (LI));
+	       	fprintf (F, "\t.dbg\tline, \"%s\", %u\n",
+	       	     	 GetInputName (LI), GetInputLine (LI));
 	    }
 	}
 	/* Output the code */
-	OutputCodeEntry (E, F);
+	CE_Output (E, F);
     }
 
     /* If debug info is enabled, terminate the last line number information */
@@ -975,9 +983,6 @@ void OutputCodeSeg (const CodeSeg* S, FILE* F)
 	fprintf (F, "\n.endproc\n\n");
     }
 }
-
-
-
 
 
 

@@ -256,12 +256,12 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
 	/* Check if we have already visited the current code entry. If so,
 	 * bail out.
 	 */
-	if (CodeEntryHasMark (E)) {
+	if (CE_HasMark (E)) {
 	    break;
 	}
 
 	/* Mark this entry as already visited */
-	CodeEntrySetMark (E);
+	CE_SetMark (E);
 	CollAppend (Visited, E);
 
 	/* Evaluate the used registers */
@@ -335,9 +335,9 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
 		    return REG_AXY;
 		}
 		if (Index < 0) {
-		    Index = GetCodeEntryIndex (S, E);
-		}
-       	       	if ((E = GetCodeEntry (S, ++Index)) == 0) {
+		    Index = CS_GetEntryIndex (S, E);
+		}	       
+       	       	if ((E = CS_GetEntry (S, ++Index)) == 0) {
 		    Internal ("GetRegInfo2: No next entry!");
 		}
 		U2 = GetRegInfo2 (S, E, Index, Visited, Used, Unused);
@@ -352,9 +352,9 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
 
 	    /* Just go to the next instruction */
 	    if (Index < 0) {
-	     	Index = GetCodeEntryIndex (S, E);
+	     	Index = CS_GetEntryIndex (S, E);
 	    }
-	    E = GetCodeEntry (S, ++Index);
+	    E = CS_GetEntry (S, ++Index);
 	    if (E == 0) {
 	     	/* No next entry */
 	     	Internal ("GetRegInfo2: No next entry!");
@@ -371,8 +371,8 @@ static unsigned char GetRegInfo2 (CodeSeg* S,
 
 
 static unsigned char GetRegInfo1 (CodeSeg* S,
-		  		  CodeEntry* E,
-		  		  int Index,
+		   		  CodeEntry* E,
+		   		  int Index,
 		     		  Collection* Visited,
 		     		  unsigned char Used,
 		     		  unsigned char Unused)
@@ -388,7 +388,7 @@ static unsigned char GetRegInfo1 (CodeSeg* S,
     unsigned NewCount = CollCount (Visited);
     while (NewCount-- > Count) {
 	CodeEntry* E = CollAt (Visited, NewCount);
-	CodeEntryResetMark (E);
+	CE_ResetMark (E);
 	CollDelete (Visited, NewCount);
     }
 
@@ -408,11 +408,11 @@ unsigned char GetRegInfo (struct CodeSeg* S, unsigned Index)
     unsigned char   R;
 
     /* Get the code entry for the given index */
-    if (Index >= GetCodeEntryCount (S)) {
+    if (Index >= CS_GetEntryCount (S)) {
 	/* There is no such code entry */
 	return REG_NONE;
     }
-    E = GetCodeEntry (S, Index);
+    E = CS_GetEntry (S, Index);
 
     /* Initialize the data structure used to collection information */
     InitCollection (&Visited);
@@ -450,6 +450,7 @@ int RegYUsed (struct CodeSeg* S, unsigned Index)
 {
     return (GetRegInfo (S, Index) & REG_Y) != 0;
 }
+
 
 
 

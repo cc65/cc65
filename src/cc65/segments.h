@@ -46,11 +46,12 @@
 
 
 /*****************************************************************************/
-/*		  		   Forwards				     */
+/*	      	  		   Forwards				     */
 /*****************************************************************************/
 
 
-
+	      
+struct CodeEntry;
 struct CodeSeg;
 struct DataSeg;
 struct TextSeg;
@@ -121,6 +122,9 @@ void AddTextLine (const char* Format, ...) attribute ((format (printf, 1, 2)));
 
 void AddCodeLine (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Add a line of code to the current code segment */
+
+void AddCode (struct CodeEntry* E);
+/* Add a code entry to the current code segment */
 
 void AddDataLine (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Add a line of data to the current data segment */

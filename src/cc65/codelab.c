@@ -83,7 +83,7 @@ void FreeCodeLabel (CodeLabel* L)
 
 
 
-void AddLabelRef (CodeLabel* L, struct CodeEntry* E)
+void CL_AddRef (CodeLabel* L, struct CodeEntry* E)
 /* Let the CodeEntry E reference the label L */
 {
     /* The insn at E jumps to this label */
@@ -95,7 +95,7 @@ void AddLabelRef (CodeLabel* L, struct CodeEntry* E)
 
 
 
-void MoveLabelRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
+void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
 /* Move all references to OldLabel to point to NewLabel. OldLabel will have no
  * more references on return.
  */
@@ -109,7 +109,7 @@ void MoveLabelRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
 
 	/* Change the reference to the new label */
 	CHECK (E->JumpTo == OldLabel);
-	AddLabelRef (NewLabel, E);
+	CL_AddRef (NewLabel, E);
 
     }
 
@@ -119,7 +119,7 @@ void MoveLabelRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
 
 
 
-void OutputCodeLabel (const CodeLabel* L, FILE* F)
+void CL_Output (const CodeLabel* L, FILE* F)
 /* Output the code label to a file */
 {
     fprintf (F, "%s:", L->Name);

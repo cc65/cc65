@@ -187,7 +187,7 @@ struct DataSeg* GetDataSeg (void)
 	case SEG_BSS:	  return CS->BSS;
 	case SEG_DATA:	  return CS->Data;
 	case SEG_RODATA:  return CS->ROData;
-	default:	  
+	default:
 	    FAIL ("Invalid data segment");
 	    return 0;
     }
@@ -213,8 +213,17 @@ void AddCodeLine (const char* Format, ...)
     va_list ap;
     va_start (ap, Format);
     CHECK (CS != 0);
-    AddCodeEntry (CS->Code, CurTok.LI, Format, ap);
+    CS_AddEntryLine (CS->Code, CurTok.LI, Format, ap);
     va_end (ap);
+}
+
+
+
+void AddCode (struct CodeEntry* E)
+/* Add a code entry to the current code segment */
+{
+    CHECK (CS != 0);
+    CS_AddEntry (CS->Code, E, CurTok.LI);
 }
 
 
@@ -251,7 +260,7 @@ void OutputSegments (const Segments* S, FILE* F)
 {
     /* If the code segment is associated with a function, print a function header */
     if (S->Code->Func) {
-	PrintFunctionHeader (S->Code->Func, F);
+       	PrintFunctionHeader (S->Code->Func, F);
     }
 
     /* Output the text segment */
@@ -263,7 +272,7 @@ void OutputSegments (const Segments* S, FILE* F)
     OutputDataSeg (S->BSS, F);
 
     /* Output the code segment */
-    OutputCodeSeg (S->Code, F);
+    CS_Output (S->Code, F);
 }
 
 

@@ -80,21 +80,21 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
 	OF_CPU_VM | OF_UBRA  	 		/* flags */
     },
     {   OPC_LDA,      	                        /* opcode */
-       	"loada",       	                        /* mnemonic */
+       	"lda",       	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_A, 	       	                        /* chg */
        	OF_CPU_VM | OF_LOAD   	       	        /* flags */
     },
     {   OPC_LDAX,      	                        /* opcode */
-       	"loadax",      	                        /* mnemonic */
+       	"ldax",      	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_AX,	       	                        /* chg */
        	OF_CPU_VM | OF_LOAD	 		/* flags */
     },
     {   OPC_LDEAX,     	                        /* opcode */
-       	"loadeax",     	                        /* mnemonic */
+       	"ldeax",     	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_NONE,      	                        /* use */
        	REG_EAX,                                /* chg */
@@ -115,21 +115,21 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
 	OF_CPU_VM 	  	 		/* flags */
     },
     {   OPC_PHA,     	                        /* opcode */
-       	"pusha",     	                        /* mnemonic */
+       	"pha",     	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_A,      	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	   	 		/* flags */
     },
     {   OPC_PHAX,      	                        /* opcode */
-       	"pushax",     	                        /* mnemonic */
+       	"phax",     	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_AX,      	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	  	 		/* flags */
     },
     {   OPC_PHEAX,     	                        /* opcode */
-       	"pusheax",     	                        /* mnemonic */
+       	"pheax",     	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_EAX,       	                        /* use */
        	REG_NONE,                               /* chg */
@@ -143,21 +143,21 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
 	OF_CPU_VM 	  	 		/* flags */
     },
     {   OPC_STA,     	                        /* opcode */
-       	"storea",     	                        /* mnemonic */
+       	"sta",     	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_A,       	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	  	 		/* flags */
     },
     {   OPC_STAX,     	                        /* opcode */
-       	"storeax",     	                        /* mnemonic */
+       	"stax",     	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_AX,       	                        /* use */
        	REG_NONE,                               /* chg */
 	OF_CPU_VM 	  	 		/* flags */
     },
     {   OPC_STEAX,     	                        /* opcode */
-       	"storeeax",    	                        /* mnemonic */
+       	"steax",    	                        /* mnemonic */
        	0,     	       	                        /* size */
        	REG_EAX,       	                        /* use */
        	REG_NONE,                               /* chg */

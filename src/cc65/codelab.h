@@ -85,15 +85,15 @@ CodeLabel* NewCodeLabel (const char* Name, unsigned Hash);
 void FreeCodeLabel (CodeLabel* L);
 /* Free the given code label */
 
-void AddLabelRef (CodeLabel* L, struct CodeEntry* E);
+void CL_AddRef (CodeLabel* L, struct CodeEntry* E);
 /* Let the CodeEntry E reference the label L */
 
-void MoveLabelRefs (CodeLabel* OldLabel, CodeLabel* NewLabel);
+void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel);
 /* Move all references to OldLabel to point to NewLabel. OldLabel will have no
  * more references on return.
  */
 
-void OutputCodeLabel (const CodeLabel* L, FILE* F);
+void CL_Output (const CodeLabel* L, FILE* F);
 /* Output the code label to a file */
 
 

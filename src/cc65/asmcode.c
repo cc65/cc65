@@ -47,7 +47,7 @@
 
 
 /*****************************************************************************/
-/*	       		    	     Code   				     */
+/*  	       		    	     Code   				     */
 /*****************************************************************************/
 
 
@@ -55,7 +55,7 @@
 CodeMark GetCodePos (void)
 /* Get a marker pointing to the current output position */
 {
-    return GetCodeEntryCount (CS->Code);
+    return CS_GetEntryCount (CS->Code);
 }
 
 
@@ -63,7 +63,7 @@ CodeMark GetCodePos (void)
 void RemoveCode (CodeMark M)
 /* Remove all code after the given code marker */
 {
-    DelCodeSegAfter (CS->Code, M);
+    CS_DelCodeAfter (CS->Code, M);
 }
 
 
@@ -75,7 +75,7 @@ void WriteOutput (FILE* F)
     SymEntry* Entry;
 
     /* Output the global data segment */
-    CHECK (GetCodeEntryCount (CS->Code) == 0);
+    CHECK (CS_GetEntryCount (CS->Code) == 0);
     OutputSegments (CS, F);
 
     /* Output all global or referenced functions */
@@ -83,14 +83,14 @@ void WriteOutput (FILE* F)
     Entry  = SymTab->SymHead;
     while (Entry) {
        	if (IsTypeFunc (Entry->Type) 	  	&&
-	    (Entry->Flags & SC_DEF) != 0  	&&
-	    (Entry->Flags & (SC_REF | SC_EXTERN)) != 0) {
-	    /* Function which is defined and referenced or extern */
-	    MergeCodeLabels (Entry->V.F.Seg->Code);
-	    RunOpt (Entry->V.F.Seg->Code);
-	    OutputSegments (Entry->V.F.Seg, F);
-     	}
-	Entry = Entry->NextSym;
+       	    (Entry->Flags & SC_DEF) != 0  	&&
+       	    (Entry->Flags & (SC_REF | SC_EXTERN)) != 0) {
+       	    /* Function which is defined and referenced or extern */
+       	    CS_MergeLabels (Entry->V.F.Seg->Code);
+       	    RunOpt (Entry->V.F.Seg->Code);
+       	    OutputSegments (Entry->V.F.Seg, F);
+       	}
+       	Entry = Entry->NextSym;
     }
 }
 

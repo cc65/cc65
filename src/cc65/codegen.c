@@ -331,7 +331,7 @@ static unsigned MakeByteOffs (unsigned Flags, unsigned Offs)
 void g_defcodelabel (unsigned label)
 /* Define a local code label */
 {
-    AddCodeLabel (CS->Code, LocalLabelName (label));
+    CS_AddLabel (CS->Code, LocalLabelName (label));
 }
 
 

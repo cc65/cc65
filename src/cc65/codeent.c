@@ -211,7 +211,7 @@ void FreeCodeEntry (CodeEntry* E)
 
 
 
-void ReplaceOPC (CodeEntry* E, opc_t OPC)
+void CE_ReplaceOPC (CodeEntry* E, opc_t OPC)
 /* Replace the opcode of the instruction. This will also replace related info,
  * Size, Use and Chg, but it will NOT update any arguments or labels.
  */
@@ -236,7 +236,7 @@ int CodeEntriesAreEqual (const CodeEntry* E1, const CodeEntry* E2)
 
 
 
-void AttachCodeLabel (CodeEntry* E, CodeLabel* L)
+void CE_AttachLabel (CodeEntry* E, CodeLabel* L)
 /* Attach the label to the entry */
 {
     /* Add it to the entries label list */
@@ -248,7 +248,7 @@ void AttachCodeLabel (CodeEntry* E, CodeLabel* L)
 
 
 
-void MoveCodeLabel (CodeLabel* L, CodeEntry* E)
+void CE_MoveLabel (CodeLabel* L, CodeEntry* E)
 /* Move the code label L from it's former owner to the code entry E. */
 {
     /* Delete the label from the owner */
@@ -261,7 +261,7 @@ void MoveCodeLabel (CodeLabel* L, CodeEntry* E)
 
 
 
-void CodeEntrySetArg (CodeEntry* E, const char* Arg)
+void CE_SetArg (CodeEntry* E, const char* Arg)
 /* Set a new argument for the given code entry. An old string is deleted. */
 {
     /* Free the old argument */
@@ -273,7 +273,7 @@ void CodeEntrySetArg (CodeEntry* E, const char* Arg)
 
 
 
-void OutputCodeEntry (const CodeEntry* E, FILE* F)
+void CE_Output (const CodeEntry* E, FILE* F)
 /* Output the code entry to a file */
 {
     const OPCDesc* D;
@@ -284,7 +284,7 @@ void OutputCodeEntry (const CodeEntry* E, FILE* F)
     unsigned LabelCount = CollCount (&E->Labels);
     unsigned I;
     for (I = 0; I < LabelCount; ++I) {
-    	OutputCodeLabel (CollConstAt (&E->Labels, I), F);
+    	CL_Output (CollConstAt (&E->Labels, I), F);
     }
 
     /* Get the opcode description */
@@ -375,3 +375,4 @@ void OutputCodeEntry (const CodeEntry* E, FILE* F)
 
 
 
+	

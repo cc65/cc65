@@ -49,6 +49,7 @@
 
 
 /* common */
+#include "coll.h"
 #include "filepos.h"
 
 /* ca65 */
@@ -67,16 +68,13 @@
  */
 typedef struct LineInfo LineInfo;
 struct LineInfo {
-    LineInfo*       Next;                 /* Pointer to next info in list */
     unsigned   	    Usage;                /* Usage counter */
     unsigned        Index;                /* Index */
     FilePos         Pos;                  /* File position */
 };
 
-/* Linked list of all line infos */
-extern LineInfo* LineInfoRoot;
-extern LineInfo* LineInfoLast;
-extern unsigned  LineInfoCount;
+/* Collection containing all line infos */
+extern Collection LineInfoColl;
 extern unsigned  LineInfoValid;           /* Valid, that is, used entries */
 
 /* Global pointer to last line info or NULL if not active */

@@ -59,10 +59,8 @@
 
 
 
-/* Linked list of all line infos */
-LineInfo* LineInfoRoot  = 0;
-LineInfo* LineInfoLast  = 0;
-unsigned  LineInfoCount = 0;
+/* Collection containing all line infos */
+Collection LineInfoColl = STATIC_COLLECTION_INITIALIZER;
 unsigned  LineInfoValid = 0;              /* Valid, that is, used entries */
 
 /* Static pointer to last line info or NULL if not active */
@@ -71,7 +69,7 @@ LineInfo* CurLineInfo   = 0;
 
 
 /*****************************************************************************/
-/*     	       	      	      	     Code			     	     */
+/*     	       	       	      	     Code			     	     */
 /*****************************************************************************/
 
 
@@ -83,23 +81,14 @@ static LineInfo* NewLineInfo (unsigned FileIndex, unsigned long LineNum)
     LineInfo* LI = xmalloc (sizeof (LineInfo));
 
     /* Initialize the fields */
-    LI->Next     = 0;
     LI->Usage    = 0;
     LI->Index    = 0;           /* Currently invalid */
     LI->Pos.Line = LineNum;
     LI->Pos.Col  = 0;
     LI->Pos.Name = FileIndex;
 
-    /* Insert this structure into the line info list */
-    if (LineInfoLast == 0) {
-	LineInfoRoot = LI;
-    } else {
-	LineInfoLast->Next = LI;
-    }
-    LineInfoLast = LI;
-
-    /* Count the line infos */
-    ++LineInfoCount;
+    /* Insert this structure into the collection */
+    CollAppend (&LineInfoColl, LI);
 
     /* Return the new struct */
     return LI;
@@ -113,7 +102,10 @@ LineInfo* UseLineInfo (LineInfo* LI)
  */
 {
     if (LI) {
-	++LI->Usage;
+	if (LI->Usage++ == 0) {
+	    /* One more valid line info */
+	    ++LineInfoValid;
+	}
     }
     return LI;
 }
@@ -137,19 +129,45 @@ void ClearLineInfo (void)
 
 
 
-void MakeLineInfoIndex (void)
-/* Walk over the line info list and make an index of all entries ignoring
- * those with a usage count of zero.
- */
+static int CmpLineInfo (void* Data, const void* LI1_, const void* LI2_)
+/* Compare function for the sort */
 {
-    LineInfo* LI  = LineInfoRoot;
-    LineInfoValid = 0;
-    while (LI) {
-	if (LI->Usage) {
-	    LI->Index = LineInfoValid++;
+    /* Cast the pointers */
+    const LineInfo* LI1 = LI1_;
+    const LineInfo* LI2 = LI2_;
+
+    /* Unreferenced line infos are always larger, otherwise sort by file,
+     * then by line.
+     */
+    if ((LI1->Usage == 0) == (LI2->Usage == 0)) {
+	/* Both are either referenced or unreferenced */
+       	if (LI1->Pos.Name< LI2->Pos.Name) {
+	    return -1;
+	} else if (LI1->Pos.Name > LI2->Pos.Name) {
+	    return 1;
+	} else if (LI1->Pos.Line < LI2->Pos.Line) {
+	    return -1;
+	} else if (LI1->Pos.Line > LI2->Pos.Line) {
+	    return 1;
+	} else {
+	    return 0;
 	}
-	LI = LI->Next;
+    } else {
+	if (LI1->Usage > 0) {
+	    return -1;
+	} else {
+	    return 1;
+	}
     }
+}
+
+
+
+void MakeLineInfoIndex (void)
+/* Sort the line infos and drop all unreferenced ones */
+{
+    /* Sort the collection */
+    CollSort (&LineInfoColl, CmpLineInfo, 0);
 }
 
 
@@ -157,25 +175,26 @@ void MakeLineInfoIndex (void)
 void WriteLineInfo (void)
 /* Write a list of all line infos to the object file. */
 {
-    LineInfo* LI;
-
     /* Tell the object file module that we're about to write line infos */
     ObjStartLineInfos ();
 
     /* Check if debug info is requested */
     if (DbgSyms) {
 
+	unsigned I;
+
 	/* Write the line info count to the list */
        	ObjWriteVar (LineInfoValid);
 
-       	/* Walk through list and write all line infos that have references */
-	LI = LineInfoRoot;
-	while (LI) {
-	    if (LI->Usage) {
-		/* Write the source file position */
-		ObjWritePos (&LI->Pos);
-	    }
-	    LI = LI->Next;
+       	/* Walk through list and write all line infos that have references.
+	 * Because of the sort, this are exactly the first LineInfoValid
+	 * ones.
+	 */
+	for (I = 0; I < LineInfoValid; ++I) {
+	    /* Get a pointer to this line info */
+	    LineInfo* LI = CollAtUnchecked (&LineInfoColl, I);
+	    /* Write the source file position */
+	    ObjWritePos (&LI->Pos);
 	}
 
     } else {

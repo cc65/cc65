@@ -144,6 +144,8 @@ static const FuncInfo FuncInfoTable[] = {
     { "staspidx",       REG_A | REG_Y,        REG_Y | REG_TMP1 | REG_PTR1    },
     { "stax0sp",        REG_AX,               REG_Y			     },
     { "staxysp",        REG_AXY,              REG_Y			     },
+    { "tosadda0",       REG_A,                REG_AXY                        },
+    { "tosaddax",       REG_AX,               REG_AXY                        },
     { "tosicmp",       	REG_AX,	       	      REG_AXY | REG_SREG	     },
     { "tosdiva0",       REG_AX,	       	      REG_ALL			     },
     { "tosdivax",       REG_AX,	       	      REG_ALL			     },
@@ -164,20 +166,22 @@ static const ZPInfo ZPInfoTable[] = {
     {   0, "ptr1+1",    REG_PTR1_HI, 	REG_PTR1        },
     {  	0, "ptr2",      REG_PTR2_LO, 	REG_PTR2        },
     {   0, "ptr2+1",    REG_PTR2_HI, 	REG_PTR2        },
-    {  	4, "ptr3",      REG_NONE, 	REG_NONE        },
-    {  	4, "ptr4",      REG_NONE, 	REG_NONE        },
-    {   7, "regbank",   REG_NONE, 	REG_NONE        },
+    {  	4, "ptr3",      REG_NONE,    	REG_NONE        },
+    {  	4, "ptr4",      REG_NONE,    	REG_NONE        },
+    {   7, "regbank",   REG_NONE,    	REG_NONE        },
     {   0, "regsave",   REG_SAVE_LO, 	REG_SAVE        },
     {   0, "regsave+1", REG_SAVE_HI, 	REG_SAVE        },
-    {   2, "sp",        REG_NONE, 	REG_NONE        },
+    {   0, "sp",        REG_SP_LO,     	REG_SP          },
+    {   0, "sp+1",      REG_SP_HI,      REG_SP          },
     {   0, "sreg",      REG_SREG_LO, 	REG_SREG        },
     {	0, "sreg+1",    REG_SREG_HI, 	REG_SREG        },
-    {   0, "tmp1",      REG_TMP1, 	REG_TMP1        },
-    {   0, "tmp2",      REG_NONE, 	REG_NONE        },
-    {   0, "tmp3",      REG_NONE, 	REG_NONE        },
-    {   0, "tmp4",      REG_NONE, 	REG_NONE        },
+    {   0, "tmp1",      REG_TMP1,    	REG_TMP1        },
+    {   0, "tmp2",      REG_NONE,    	REG_NONE        },
+    {   0, "tmp3",      REG_NONE,    	REG_NONE        },
+    {   0, "tmp4",      REG_NONE,    	REG_NONE        },
 };
 #define ZPInfoCount    	(sizeof(ZPInfoTable) / sizeof(ZPInfoTable[0]))
+
 
 
 /*****************************************************************************/
@@ -395,7 +399,7 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 		unsigned U2;
 
 		U1 = GetRegInfo2 (S, E->JumpTo->Owner, -1, Visited, Used, Unused, Wanted);
-		if (U1 == REG_AXY) {
+		if (U1 == REG_ALL) {
 		    /* All registers used, no need for second call */
 		    return REG_AXY;
 		}
@@ -434,7 +438,7 @@ static unsigned GetRegInfo2 (CodeSeg* S,
 }
 
 
-
+				 
 static unsigned GetRegInfo1 (CodeSeg* S,
 		      	     CodeEntry* E,
 		   	     int Index,

@@ -34,6 +34,7 @@ OBJS =	anonname.o	\
 	codeseg.o	\
 	compile.o 	\
 	coptind.o	\
+	coptstop.o	\
 	cpu.o	  	\
 	dataseg.o	\
 	datatype.o	\
@@ -105,3 +106,4 @@ depend dep:	$(OBJS:.o=.c)
 	$(CC) -I$(COMMON) -MM $^ > .depend
 
 
+			 

@@ -68,17 +68,21 @@ struct CodeSeg;
 #define REG_SREG_HI     0x0200U
 #define REG_SAVE_LO     0x0400U
 #define REG_SAVE_HI     0x0800U
+#define REG_SP_LO       0x1000U
+#define REG_SP_HI       0x2000U
+
 
 /* Combined register defines */
 #define REG_PTR1        (REG_PTR1_LO | REG_PTR1_HI)
 #define REG_PTR2        (REG_PTR2_LO | REG_PTR2_HI)
 #define REG_SREG        (REG_SREG_LO | REG_SREG_HI)
 #define REG_SAVE        (REG_SAVE_LO | REG_SAVE_HI)
+#define REG_SP          (REG_SP_LO | REG_SP_HI)
 #define	REG_AX		(REG_A | REG_X)
 #define REG_AY          (REG_A | REG_Y)
 #define REG_XY		(REG_X | REG_Y)
 #define REG_AXY		(REG_AX | REG_Y)
-#define REG_EAX         (REG_AX | REG_SREG)
+#define REG_EAX         (REG_AX | REG_SREG)    
 #define REG_EAXY        (REG_EAX | REG_Y)
 #define REG_ZP          0xFFF8U
 #define REG_ALL         0xFFFFU

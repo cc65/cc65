@@ -79,6 +79,7 @@ OBJS =	anonname.obj	\
 	codeseg.obj	\
 	compile.obj	\
 	coptind.obj	\
+	coptstop.obj	\
 	cpu.obj		\
 	dataseg.obj	\
 	datatype.obj	\
@@ -148,6 +149,7 @@ FILE codeopt.obj
 FILE codeseg.obj
 FILE compile.obj
 FILE coptind.obj
+FILE coptstop.obj
 FILE cpu.obj
 FILE dataseg.obj
 FILE datatype.obj

@@ -1,7 +1,7 @@
 ;
 ; Christian Groessler, May-2000
 ;
-; int close(int fd);
+; int __fastcall__ close(int fd);
 ;
 
 	.include "atari.inc"
@@ -13,11 +13,6 @@
 	jsr	fdtoiocb_down		; get iocb index into X and decr. usage count
 	bmi	inverr
 	bne	ok			; not last one -> don't close yet
-;	asl	a
-;	asl	a
-;	asl	a
-;	asl	a
-;	tax
 	lda	#CLOSE
 	sta	ICCOM,x
 	jsr	CIOV

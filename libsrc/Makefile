@@ -35,7 +35,7 @@ apple2lib:
 	for i in apple2 common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-	    CFLAGS="-Osir -g -t apple2 -I../../include" \
+	    CFLAGS="-Osir -g -T -t apple2 -I../../include" \
 	    AFLAGS="-t apple2" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -51,7 +51,7 @@ atarilib:
 	for i in atari common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-     	    CFLAGS="-Osir -g -t atari -I../../include" \
+     	    CFLAGS="-Osir -g -T -t atari -I../../include" \
 	    AFLAGS="-t atari" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -67,7 +67,7 @@ c64lib:
 	for i in c64 cbm common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-       	    CFLAGS="-Osir -g -t c64 -I../../include" \
+       	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
 	    AFLAGS="-t c64" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -83,7 +83,7 @@ c128lib:
 	for i in c128 cbm common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-	    CFLAGS="-Osir -g -t c128 -I../../include" \
+	    CFLAGS="-Osir -g -T -t c128 -I../../include" \
 	    AFLAGS="-t c128" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -93,29 +93,13 @@ c128lib:
 	done
 
 #-----------------------------------------------------------------------------
-# PET-II series
-
-cbm610lib:
-	for i in cbm610 cbm common runtime conio dbg; do \
-	    CC=$(CC) \
-	    AS=$(AS) \
-	    CFLAGS="-Osir -g -t cbm610 -I../../include" \
-	    AFLAGS="-t cbm610" \
-	    $(MAKE) -C $$i || exit 1; \
-	done
-	mv cbm610/crt0.o cbm610.o
-	for i in cbm610 cbm common runtime conio dbg; do \
-	    $(AR) a cbm610.lib $$i/*.o;\
-	done
-
-#-----------------------------------------------------------------------------
 # Commdore P500 / CBM 5x0
 
 cbm510lib:
 	for i in cbm510 cbm common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-	    CFLAGS="-Osir -g -t cbm510 -I../../include" \
+	    CFLAGS="-Osir -g -T -t cbm510 -I../../include" \
 	    AFLAGS="-t cbm510" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -125,20 +109,36 @@ cbm510lib:
 	done
 
 #-----------------------------------------------------------------------------
+# PET-II series
+
+cbm610lib:
+	for i in cbm610 cbm common runtime conio dbg; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -T -t cbm610 -I../../include" \
+	    AFLAGS="-t cbm610" \
+	    $(MAKE) -C $$i || exit 1; \
+	done
+	mv cbm610/crt0.o cbm610.o
+	for i in cbm610 cbm common runtime conio dbg; do \
+	    $(AR) a cbm610.lib $$i/*.o;\
+	done
+
+#-----------------------------------------------------------------------------
 # GEOS on the C64/128
 
 geoslib:
 	CC=../$(CC) \
 	AS=../$(AS) \
 	AR=../$(AR) \
-	CFLAGS="-Osir -g -t geos -I../../include" \
+	CFLAGS="-Osir -g -T -t geos -I../../include" \
 	AFLAGS="-t geos" \
 	$(MAKE) -C geos || exit 1
 	for i in common runtime; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    AR=$(AR) \
-	    CFLAGS="-Osir -g -t geos -I../../include" \
+	    CFLAGS="-Osir -g -T -t geos -I../../include" \
 	    AFLAGS="-t geos" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -159,7 +159,7 @@ petlib:
 	for i in pet cbm common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-	    CFLAGS="-Osir -g -t pet -I../../include" \
+	    CFLAGS="-Osir -g -T -t pet -I../../include" \
 	    AFLAGS="-t pet" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
@@ -175,7 +175,7 @@ plus4lib:
 	for i in plus4 cbm common runtime conio dbg; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
-	    CFLAGS="-Osir -g -t plus4 -I../../include" \
+	    CFLAGS="-Osir -g -T -t plus4 -I../../include" \
 	    AFLAGS="-t plus4" \
 	    $(MAKE) -C $$i || exit 1; \
 	done

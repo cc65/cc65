@@ -82,12 +82,17 @@ struct mouse_info {
 
 
 unsigned char __fastcall__ mouse_init (unsigned char port,
-		  		       unsigned char sprite,
 		  		       unsigned char type);
-/* Setup the mouse interrupt handler. If the sprite value is != zero, the
- * mouse routines will manage the sprite with this number. That means, it
- * is moved if the mouse is moved (provided that the mouse cursor is visible),
- * and switched on and off in the show and hide functions.
+/* Setup the mouse interrupt handler. The mouse routines will use a predefined
+ * system resource for the mouse cursor:
+ *     C64:      Sprite #0
+ *     C128:     Sprite #0
+ *     GEOS:     Sprite #0
+ *     Atari:    PM #0
+ * However, the mouse routines will not initialize this cursor or set a 
+ * specific shape - this is platform dependent and up to the user program.
+ * The mouse cursor is moved if the mouse is moved (provided that the mouse 
+ * cursor is visible), and switched on and off in the show and hide functions.
  * The port parameter gives the joystick port used for the mouse and is only
  * needed to read the mouse button state.
  * The type parameter is needed on some systems to determine the type of
@@ -154,6 +159,9 @@ void __fastcall__ mouse_info (struct mouse_info* info);
 /* Return the state of the mouse buttons and the position of the mouse */
 
 
+
 /* End of mouse.h */
 #endif
+
+
 

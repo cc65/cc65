@@ -56,11 +56,10 @@ initmouse:
 
 ;--------------------------------------------------------------------
 ; Initialize mouse routines
-; void __fastcall__ mouse_init (unsigned char port, unsigned char sprite, unsigned char type);
+; void __fastcall__ mouse_init (unsigned char port, unsigned char type);
 
 _mouse_init:
 	pha			; remember mouse type
-	jsr	popa		; ignore sprite / pm for now
 	jsr	popa
 	sta	port_nr
 	pla			; get mouse type again

@@ -12,7 +12,7 @@
    	.export		_mouse_pos, _mouse_info
    	.export	    	_mouse_move, _mouse_buttons
 
-       	.import	       	popax, popsreg, addysp1
+       	.import	       	popa, popsreg, addysp1
    	.importzp   	sp, sreg, ptr1
 
 	.include "../inc/const.inc"
@@ -25,12 +25,11 @@
 ; --------------------------------------------------------------------------
 ;
 ; unsigned char __fastcall__ mouse_init (unsigned char port,
-;					 unsigned char sprite,
-;					 unsigned char type);
+;			    	      	 unsigned char type);
 ;
 
 _mouse_init:
-	jsr	popax			; ignore all parameters
+	jsr	popa  	    	      	; ignore all parameters
 
 	jsr	StartMouseMode
 	jsr	MouseOff

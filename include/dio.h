@@ -49,10 +49,8 @@ typedef struct {
 #define _dio_query_sectsize(x) ((_sectsize_t)256)
 #endif
 
-extern _dhandle_t    __fastcall__ _dio_open  (_driveid_t drive_id);
-extern unsigned char __fastcall__ _dio_close (_dhandle_t handle);
-extern unsigned char __fastcall__ _dio_format(_dhandle_t handle,
-                                              unsigned int format);
+extern _dhandle_t    __fastcall__ _dio_open(_driveid_t drive_id);
+extern unsigned char __fastcall__ _dio_close(_dhandle_t handle);
 extern unsigned char __fastcall__ _dio_read(_dhandle_t handle,
                                             _sectnum_t sect_num,
                                             void *buffer);

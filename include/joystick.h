@@ -65,26 +65,12 @@
 /* Array of masks used to check the return value of joy_read for a state */
 extern const unsigned char joy_masks[8];
 
-
-
-/* Result codes of the function. The actual code is a bitwise or
- * of one or more of the following values.
- */
-#if 0
-#if defined(__VIC20__)
-#  define JOY_UP        0x02
-#  define JOY_DOWN      0x04
-#  define JOY_LEFT      0x08
-#  define JOY_RIGHT     0x80
-#  define JOY_FIRE      0x10
-#else
-#  define JOY_UP       	0x01
-#  define JOY_DOWN	0x02
-#  define JOY_LEFT	0x04
-#  define JOY_RIGHT	0x08
-#  define JOY_FIRE	0x10
-#endif
-#endif
+/* Macros that evaluate the return code of joy_read */
+#define JOY_BTN_UP(v)           ((v) & joy_masks[JOY_UP])
+#define JOY_BTN_DOWN(v)         ((v) & joy_masks[JOY_DOWN])
+#define JOY_BTN_LEFT(v)         ((v) & joy_masks[JOY_LEFT])
+#define JOY_BTN_RIGHT(v)        ((v) & joy_masks[JOY_RIGHT])
+#define JOY_BTN_FIRE(v)         ((v) & joy_masks[JOY_FIRE])
 
 
 

@@ -79,8 +79,14 @@ O65Desc* NewO65Desc (void);
 void FreeO65Desc (O65Desc* D);
 /* Delete the descriptor struct with cleanup */
 
-void O65Set816 (O65Desc* D);
+void O65Set6502 (O65Desc* D);
+/* Enable 6502 mode */
+
+void O65Set65816 (O65Desc* D);	   
 /* Enable 816 mode */
+
+void O65SetSmallModel (O65Desc* D);
+/* Enable a small memory model executable */
 
 void O65SetLargeModel (O65Desc* D);
 /* Enable a large memory model executable */

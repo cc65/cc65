@@ -54,6 +54,7 @@ INCS =	apple2.inc	\
 	cbm510.inc	\
 	cbm610.inc	\
 	geos.inc	\
+	lunix.inc	\
 	none.inc	\
 	pet.inc		\
 	plus4.inc
@@ -124,6 +125,9 @@ cbm610.inc:	cfg/cbm610.cfg
 
 geos.inc:	cfg/geos.cfg
 	@$(CVT) $< $@ CfgGeos
+
+lunix.inc:	cfg/lunix.cfg
+	@$(CVT) $< $@ CfgLunix
 
 none.inc:	cfg/none.cfg
 	@$(CVT) $< $@ CfgNone

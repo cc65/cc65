@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -56,6 +56,7 @@ static const char CfgEmpty[] = "";
 #include "cbm510.inc"
 #include "cbm610.inc"
 #include "geos.inc"
+#include "lunix.inc"
 #include "none.inc"
 #include "pet.inc"
 #include "plus4.inc"
@@ -82,6 +83,7 @@ const TargetDesc Targets [TGT_COUNT] = {
     {  	BINFMT_BINARY, 	CfgBBC		},
     {   BINFMT_BINARY,	CfgApple2	},
     {   BINFMT_BINARY,  CfgGeos		},
+    {   BINFMT_O65,     CfgLunix        },
 };
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1999-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -35,9 +35,11 @@
 
 #include <string.h>
 
-#include "../common/hashstr.h"
-#include "../common/xmalloc.h"
+/* common */
+#include "hashstr.h"
+#include "xmalloc.h"
 
+/* ld65 */
 #include "error.h"
 #include "extsyms.h"
 
@@ -50,17 +52,17 @@
 
 
 /* Structure holding an external symbol */
-struct ExtSym_ {
-    ExtSym*	List;		/* Next entry in list of all symbols */
+struct ExtSym {
+    ExtSym*  	List;		/* Next entry in list of all symbols */
     ExtSym*    	Next;  		/* Next entry in hash list */
     unsigned   	Flags;		/* Generic flags */
-    unsigned	Num;		/* Number of external symbol */
+    unsigned 	Num;		/* Number of external symbol */
     char       	Name [1];	/* Name - dynamically allocated */
 };
 
 /* External symbol table structure */
 #define HASHTAB_SIZE  	53
-struct ExtSymTab_ {
+struct ExtSymTab {
     ExtSym*	Root;  		/* List of symbols */
     ExtSym*	Last;		/* Pointer to last symbol */
     unsigned	Count;		/* Number of symbols */
@@ -109,7 +111,7 @@ ExtSym* NewExtSym (ExtSymTab* Tab, const char* Name)
        	Tab->Last->List = E;
     }
     Tab->Last = E;
-    Tab->Count++;
+    ++Tab->Count;
 
     /* Insert the symbol into the hash table */
     E->Next = Tab->HashTab [Hash];
@@ -120,7 +122,7 @@ ExtSym* NewExtSym (ExtSymTab* Tab, const char* Name)
 }
 
 
-	 
+
 static void FreeExtSym (ExtSym* E)
 /* Free an external symbol structure. Will not unlink the entry, so internal
  * use only.
@@ -230,7 +232,7 @@ const char* ExtSymName (const ExtSym* E)
 const ExtSym* ExtSymNext (const ExtSym* E)
 /* Return the next symbol in the list */
 {
-    return E->Next;
+    return E->List;
 }
 
 

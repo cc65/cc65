@@ -185,6 +185,10 @@ static void SetSys (const char* Sys)
      	    DefineNumericMacro ("__GEOS__", 1);
      	    break;
 
+	case TGT_LUNIX:
+	    DefineNumericMacro ("__LUNIX__", 1);
+	    break;
+
      	default:
        	    AbEnd ("Unknown target system type");
     }

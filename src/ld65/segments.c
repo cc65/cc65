@@ -530,8 +530,14 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 
 			case SEG_EXPR_TOO_COMPLEX:
 			    Error ("Expression too complex in module `%s', line %lu",
-			    	   GetSourceFileName (Frag->Obj, Frag->Pos.Name),
-				   Frag->Pos.Line);
+			     	   GetSourceFileName (Frag->Obj, Frag->Pos.Name),
+			     	   Frag->Pos.Line);
+			    break;
+
+			case SEG_EXPR_INVALID:
+			    Error ("Invalid expression in module `%s', line %lu",
+			     	   GetSourceFileName (Frag->Obj, Frag->Pos.Name),
+			     	   Frag->Pos.Line);
 			    break;
 
 			default:

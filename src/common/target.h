@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -59,6 +59,7 @@ typedef enum {
     TGT_BBC,
     TGT_APPLE2,
     TGT_GEOS,
+    TGT_LUNIX,
     TGT_COUNT			/* Number of target systems */
 } target_t;
 

@@ -62,8 +62,19 @@
 
 
 /* Header mode bits */
+#define MF_CPU_65816    0x8000		/* Executable is for 65816 */
+#define MF_CPU_6502     0x0000          /* Executable is for the 6502 */
+#define MF_CPU_MASK     0x8000          /* Mask to extract CPU type */
+
 #define MF_SIZE_32BIT	0x2000		/* All size words are 32bit */
-#define MF_CPU_816     	0x8000		/* Executable is for 65816 */
+#define MF_SIZE_16BIT   0x0000          /* All size words are 16bit */
+#define MF_SIZE_MASK    0x2000          /* Mask to extract size */
+
+#define MF_ALIGN_1      0x0000          /* Bytewise alignment */
+#define MF_ALIGN_2      0x0001          /* Align words */
+#define MF_ALIGN_4      0x0002          /* Align longwords */
+#define MF_ALIGN_256    0x0003          /* Align pages (256 bytes) */
+#define MF_ALIGN_MASK   0x0003 	       	/* Mask to extract alignment */
 
 /* The four o65 segment types. Note: These values are identical to the values
  * needed for the segmentID in the o65 spec.
@@ -81,6 +92,7 @@
 #define O65RELOC_LOW	0x20
 #define O65RELOC_SEGADR	0xc0
 #define O65RELOC_SEG	0xa0
+#define O65RELOC_MASK   0xc0
 
 /* O65 executable file header */
 typedef struct O65Header O65Header;
@@ -122,7 +134,7 @@ struct O65Desc {
     O65Option*	    Options;		/* List of file options */
     ExtSymTab*	    Exports;		/* Table with exported symbols */
     ExtSymTab*	    Imports;		/* Table with imported symbols */
-    unsigned  	    Undef;		/* Count of undefined symbols */
+    unsigned   	    Undef;		/* Count of undefined symbols */
     FILE*     	    F;			/* The file we're writing to */
     char*     	    Filename;		/* Name of the output file */
     O65RelocTab*    TextReloc;		/* Relocation table for text segment */
@@ -156,7 +168,7 @@ struct ExprDesc {
 
 
 /*****************************************************************************/
-/*	       	    	       Helper functions				     */
+/*  	       	    	       Helper functions				     */
 /*****************************************************************************/
 
 
@@ -165,9 +177,9 @@ static void WriteSize (const O65Desc* D, unsigned long Val)
 /* Write a "size" word to the file */
 {
     if (D->Header.Mode & MF_SIZE_32BIT) {
-	Write32 (D->F, Val);
+    	Write32 (D->F, Val);
     } else {
-	Write16 (D->F, (unsigned) Val);
+    	Write16 (D->F, (unsigned) Val);
     }
 }
 
@@ -183,20 +195,64 @@ static unsigned O65SegType (const SegDesc* S)
      * to check SF_ZP first.
      */
     if (S->Flags & SF_RO) {
-	return O65SEG_TEXT;
+    	return O65SEG_TEXT;
     } else if (S->Flags & SF_ZP) {
-	return O65SEG_ZP;
+    	return O65SEG_ZP;
     } else if (S->Flags & SF_BSS) {
-	return O65SEG_BSS;
+    	return O65SEG_BSS;
     } else {
-	return O65SEG_DATA;
+    	return O65SEG_DATA;
     }
 }
 
 
 
+static const SegDesc* FindSeg (SegDesc** const List, unsigned Count, const Segment* S)
+/* Search for a segment in the given list of segment descriptors and return
+ * the descriptor for a segment if we found it, and NULL if not.
+ */
+{
+    unsigned I;
+
+    for (I = 0; I < Count; ++I) {
+     	if (List[I]->Seg == S) {
+	    /* Found */
+     	    return List[I];
+     	}
+    }
+
+    /* Not found */
+    return 0;
+}
+
+
+
+static const SegDesc* O65FindSeg (const O65Desc* D, const Segment* S)
+/* Search for a segment in the segment lists and return it's segment descriptor */
+{
+    const SegDesc* SD;
+
+    if ((SD = FindSeg (D->TextSeg, D->TextCount, S)) != 0) {
+     	return SD;
+    }
+    if ((SD = FindSeg (D->DataSeg, D->DataCount, S)) != 0) {
+     	return SD;
+    }
+    if ((SD = FindSeg (D->BssSeg, D->BssCount, S)) != 0) {
+     	return SD;
+    }
+    if ((SD = FindSeg (D->ZPSeg, D->ZPCount, S)) != 0) {
+     	return SD;
+    }
+
+    /* Not found */
+    return 0;
+}
+
+
+
 /*****************************************************************************/
-/*		  	      Expression handling			     */
+/*  	 	     	      Expression handling			     */
 /*****************************************************************************/
 
 
@@ -251,7 +307,7 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
     	        /* We cannot handle more than one segment reference in o65 */
     		D->TooComplex = 1;
     	    } else {
-    		/* Remember the segment reference */
+    	 	/* Remember the segment reference */
     		D->SegRef = GetExprSection (Expr);
     	    }
     	    break;
@@ -456,8 +512,8 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     Offs += D->SegSize;	   	/* Calulate full offset */
     Diff = ((long) Offs) - D->LastOffs;
     while (Diff > 0xFE) {
-    	O65RelocPutByte (D->CurReloc, 0xFF);
-    	Diff -= 0xFE;
+       	O65RelocPutByte (D->CurReloc, 0xFF);
+       	Diff -= 0xFE;
     }
     O65RelocPutByte (D->CurReloc, (unsigned char) Diff);
 
@@ -467,9 +523,9 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     /* Determine the expression to relocate */
     Expr = E;
     if (E->Op == EXPR_BYTE0 || E->Op == EXPR_BYTE1 ||
-	E->Op == EXPR_BYTE2 || E->Op == EXPR_BYTE3 ||
-	E->Op == EXPR_WORD0 || E->Op == EXPR_WORD1) {
-      	/* Use the real expression */
+       	E->Op == EXPR_BYTE2 || E->Op == EXPR_BYTE3 ||
+       	E->Op == EXPR_WORD0 || E->Op == EXPR_WORD1) {
+       	/* Use the real expression */
        	Expr = E->Left;
     }
 
@@ -485,12 +541,12 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
 
     /* We cannot handle both, an imported symbol and a segment ref */
     if (ED.SegRef != 0 && ED.ExtRef != 0) {
-     	ED.TooComplex = 1;
+       	ED.TooComplex = 1;
     }
 
     /* Bail out if we cannot handle the expression */
     if (ED.TooComplex) {
-	return SEG_EXPR_TOO_COMPLEX;
+       	return SEG_EXPR_TOO_COMPLEX;
     }
 
     /* Safety: Check that we are really referencing a symbol or a segment */
@@ -499,12 +555,12 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     /* Write out the offset that goes into the segment. */
     BinVal = ED.Val;
     switch (E->Op) {
-	case EXPR_BYTE0:    BinVal &= 0xFF;			break;
-	case EXPR_BYTE1:    BinVal = (BinVal >>  8) & 0xFF;	break;
-	case EXPR_BYTE2:    BinVal = (BinVal >> 16) & 0xFF;	break;
-	case EXPR_BYTE3:    BinVal = (BinVal >> 24) & 0xFF;	break;
-	case EXPR_WORD0:    BinVal &= 0xFFFF;			break;
-	case EXPR_WORD1:    BinVal = (BinVal >> 16) & 0xFFFF;	break;
+       	case EXPR_BYTE0:    BinVal &= 0xFF;			break;
+       	case EXPR_BYTE1:    BinVal = (BinVal >>  8) & 0xFF;	break;
+       	case EXPR_BYTE2:    BinVal = (BinVal >> 16) & 0xFF;	break;
+       	case EXPR_BYTE3:    BinVal = (BinVal >> 24) & 0xFF;	break;
+       	case EXPR_WORD0:    BinVal &= 0xFFFF;			break;
+       	case EXPR_WORD1:    BinVal = (BinVal >> 16) & 0xFFFF;	break;
     }
     WriteVal (D->F, BinVal, Size);
 
@@ -512,46 +568,66 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
      * information gathered about the expression.
      */
     if (E->Op == EXPR_BYTE0) {
-	RelocType = O65RELOC_LOW;
+       	RelocType = O65RELOC_LOW;
     } else if (E->Op == EXPR_BYTE1) {
-	RelocType = O65RELOC_HIGH;
+       	RelocType = O65RELOC_HIGH;
+    } else if (E->Op == EXPR_BYTE2) {
+       	RelocType = O65RELOC_SEG;
     } else {
-	switch (Size) {
+       	switch (Size) {
 
-	    case 1:
-		RelocType = O65RELOC_LOW;
-		break;
+       	    case 1:
+       		RelocType = O65RELOC_LOW;
+       		break;
 
-	    case 2:
-	       	RelocType = O65RELOC_WORD;
-		break;
+       	    case 2:
+       	       	RelocType = O65RELOC_WORD;
+       		break;
 
-	    case 3:
-		RelocType = O65RELOC_SEGADR;
-		break;
+       	    case 3:
+       		RelocType = O65RELOC_SEGADR;
+       		break;
 
-	    case 4:
-		/* 4 byte expression not supported by o65 */
-		return SEG_EXPR_TOO_COMPLEX;
+       	    case 4:
+       		/* 4 byte expression not supported by o65 */
+       		return SEG_EXPR_TOO_COMPLEX;
 
-	    default:
-	 	Internal ("O65WriteExpr: Invalid expression size: %u", Size);
-    		RelocType = 0;	  	/* Avoid gcc warnings */
-	}
+       	    default:
+       	 	Internal ("O65WriteExpr: Invalid expression size: %u", Size);
+       		RelocType = 0;	  	/* Avoid gcc warnings */
+       	}
     }
 
     /* Determine which segment we're referencing */
     if (ED.ExtRef) {
-	/* Imported symbol */
-	RelocType |= O65SEG_UNDEF;
+       	/* Imported symbol */
+       	RelocType |= O65SEG_UNDEF;
        	O65RelocPutByte (D->CurReloc, RelocType);
        	/* Put the number of the imported symbol into the table */
        	O65RelocPutWord (D->CurReloc, ExtSymNum (ED.ExtRef));
     } else {
-	/* Segment reference */
+       	/* Segment reference. Search for the segment and map it to it's
+	 * o65 segmentID
+	 */
+       	const SegDesc* Seg = O65FindSeg (D, ED.SegRef->Seg);
+	if (Seg == 0) {
+	    /* For some reason, we didn't find this segment in the list of
+	     * segments written to the o65 file.
+	     */
+	    return SEG_EXPR_INVALID;
+	}
+	RelocType |= O65SegType (Seg);
+	O65RelocPutByte (D->CurReloc, RelocType);
 
-
-
+	/* Output additional data if needed */
+	switch (RelocType & O65RELOC_MASK) {
+	    case O65RELOC_HIGH:
+	        O65RelocPutByte (D->CurReloc, ED.Val & 0xFF);
+	        break;
+	    case O65RELOC_SEG:
+	        O65RelocPutWord (D->CurReloc, ED.Val & 0xFFFF);
+	        break;
+	}
     }
 
     /* Success */
@@ -580,26 +656,26 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
 	Print (stdout, 1, "    Writing `%s'\n", S->Name);
 
 	/* Write this segment */
-	if (DoWrite) {
-	    RelocLineInfo (S->Seg);
+       	if (DoWrite) {
+       	    RelocLineInfo (S->Seg);
        	    SegWrite (D->F, S->Seg, O65WriteExpr, D);
-      	}
+       	}
 
-	/* Mark the segment as dumped */
-	S->Seg->Dumped = 1;
+       	/* Mark the segment as dumped */
+       	S->Seg->Dumped = 1;
 
-	/* Calculate the total size */
-	D->SegSize += S->Seg->Size;
+       	/* Calculate the total size */
+       	D->SegSize += S->Seg->Size;
     }
 
-    /* Terminate the relocation table for the this segment */
+    /* Terminate the relocation table for this segment */
     if (D->CurReloc) {
         O65RelocPutByte (D->CurReloc, 0);
     }
 
     /* Check the size of the segment for overflow */
-    if ((D->Header.Mode & MF_SIZE_32BIT) == 0 && D->SegSize > 0xFFFF) {
-     	Error ("Segment overflow in file `%s'", D->Filename);
+    if ((D->Header.Mode & MF_SIZE_MASK) == MF_SIZE_16BIT && D->SegSize > 0xFFFF) {
+       	Error ("Segment overflow in file `%s'", D->Filename);
     }
 
 }
@@ -711,7 +787,9 @@ static void O65WriteDataReloc (O65Desc* D)
 static void O65WriteExports (O65Desc* D)
 /* Write the list of exports */
 {
-    /* For now... */
+    /* Since ld65 creates exectutables, not object files, we do not have
+     * exports. This may change if we support writing shared libraries...
+     */
     WriteSize (D, 0);
 }
 
@@ -796,10 +874,26 @@ void FreeO65Desc (O65Desc* D)
 
 
 
-void O65Set816 (O65Desc* D)
+void O65Set6502 (O65Desc* D)
+/* Enable 6502 mode */
+{
+    D->Header.Mode = (D->Header.Mode & ~MF_CPU_MASK) | MF_CPU_6502;
+}
+
+
+
+void O65Set65816 (O65Desc* D)
 /* Enable 816 mode */
 {
-    D->Header.Mode |= MF_CPU_816;
+    D->Header.Mode = (D->Header.Mode & ~MF_CPU_MASK) | MF_CPU_65816;
+}
+
+
+
+void O65SetSmallModel (O65Desc* D)
+/* Enable a small memory model executable */
+{
+    D->Header.Mode = (D->Header.Mode & ~MF_SIZE_MASK) | MF_SIZE_16BIT;
 }
 
 
@@ -807,7 +901,7 @@ void O65Set816 (O65Desc* D)
 void O65SetLargeModel (O65Desc* D)
 /* Enable a large memory model executable */
 {
-    D->Header.Mode |= MF_SIZE_32BIT;
+    D->Header.Mode = (D->Header.Mode & ~MF_SIZE_MASK) | MF_SIZE_32BIT;
 }
 
 
@@ -816,14 +910,14 @@ void O65SetAlignment (O65Desc* D, unsigned Align)
 /* Set the executable alignment */
 {
     /* Remove all alignment bits from the mode word */
-    D->Header.Mode &= ~0x0003;
+    D->Header.Mode &= ~MF_ALIGN_MASK;
 
     /* Set the alignment bits */
     switch (Align) {
-	case 1:	  			  break;
-    	case 2:   D->Header.Mode |= 0x01; break;
-	case 4:   D->Header.Mode |= 0x02; break;
-        case 256: D->Header.Mode |= 0x03; break;
+	case 1:	  D->Header.Mode |= MF_ALIGN_1;   break;
+    	case 2:   D->Header.Mode |= MF_ALIGN_2;   break;
+	case 4:   D->Header.Mode |= MF_ALIGN_4;   break;
+        case 256: D->Header.Mode |= MF_ALIGN_256; break;
         default:  Error ("Invalid alignment for O65 format: %u", Align);
     }
 }
@@ -917,7 +1011,7 @@ static void O65SetupSegments (O65Desc* D, Memory* M)
     D->BssCount  = 0;
     D->ZPCount   = 0;
 
-    /* Walk through the memory list and count the segment types */
+    /* Walk through the segment list and count the segment types */
     N = M->SegList;
     while (N) {
 

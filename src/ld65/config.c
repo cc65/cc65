@@ -866,7 +866,7 @@ static void ParseO65 (void)
 		switch (CfgTok) {
 
 		    case CFGTOK_SMALL:
-			/* Default, nothing to do */
+		        O65SetSmallModel (O65FmtDesc);
 		     	break;
 
 		    case CFGTOK_LARGE:

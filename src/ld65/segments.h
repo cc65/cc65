@@ -89,9 +89,10 @@ struct Section {
 /* Prototype for a function that is used to write expressions to the target
  * file (used in SegWrite). It returns one of the following values:
  */
-#define SEG_EXPR_OK		0	/* Ok */
-#define SEG_EXPR_RANGE_ERROR	1	/* Range error */
-#define SEG_EXPR_TOO_COMPLEX	2	/* Expression too complex */
+#define SEG_EXPR_OK		0U	/* Ok */
+#define SEG_EXPR_RANGE_ERROR	1U 	/* Range error */
+#define SEG_EXPR_TOO_COMPLEX	2U 	/* Expression too complex */
+#define SEG_EXPR_INVALID        3U      /* Expression is invalid (e.g. unmapped segment) */
 
 typedef unsigned (*SegWriteFunc) (ExprNode* E, 	      /* The expression to write */
 	  			  int Signed,  	      /* Signed expression? */

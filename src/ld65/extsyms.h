@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1999-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -45,10 +45,10 @@
 
 
 /* Forward decl for structure holding an external symbol */
-typedef struct ExtSym_ ExtSym;
+typedef struct ExtSym ExtSym;
 
 /* External symbol table structure */
-typedef struct ExtSymTab_ ExtSymTab;
+typedef struct ExtSymTab ExtSymTab;
 
 
 
@@ -94,6 +94,7 @@ const ExtSym* ExtSymNext (const ExtSym* E);
 /* End of extsyms.h */
 
 #endif
+
 
 
 

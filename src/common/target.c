@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -60,10 +60,11 @@ const char* TargetNames [TGT_COUNT] = {
     "plus4",
     "cbm510",
     "cbm610",
-    "pet",
+    "pet", 
     "bbc",
     "apple2",
     "geos",
+    "lunix"
 };
 
 
@@ -101,4 +102,4 @@ target_t FindTarget (const char* Name)
 }
 
 
-	     
+

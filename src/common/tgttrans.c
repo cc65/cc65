@@ -112,6 +112,7 @@ void TgtTranslateInit (void)
 	case TGT_BBC:				break;
 	case TGT_APPLE2:			break;
 	case TGT_GEOS:				break;
+	case TGT_LUNIX:         Tab = CTPET;    break;
 	default:
 	    AbEnd ("Internal error: Target system unknown (%d)", Target);
     }
@@ -154,7 +155,7 @@ char* TgtTranslateStr (char* S)
 void TgtTranslateBuf (void* Buf, unsigned Len)
 /* Translate a buffer of the given length from the source character set into
  * the target system character set.
- */
+ */						      
 {
     /* Translate */
     if (Tab) {

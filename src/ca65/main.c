@@ -378,7 +378,6 @@ static void OneLine (void)
     Segment*      Seg   = 0;
     unsigned long PC    = 0;
     SymEntry*     Sym   = 0;
-    int           Done  = 0;
     int           Macro = 0;
     int           Instr = -1;
 
@@ -436,7 +435,8 @@ static void OneLine (void)
             /* Define the symbol with the expression following the '=' */
             SymDef (Sym, Expression(), ADDR_SIZE_DEFAULT, Flags);
             /* Don't allow anything after a symbol definition */
-            Done = 1;
+            ConsumeSep ();
+            return;
         } else {
             /* A label. Remember the current segment, so we can later
              * determine the size of the data stored under the label.
@@ -463,49 +463,63 @@ static void OneLine (void)
                 /* Skip the colon */
                 NextTok ();
             }
+
+            /* If we come here, a new identifier may be waiting, which may
+             * be a macro or instruction.
+             */
+            if (Tok == TOK_IDENT) {
+                if (!UbiquitousIdents) {
+                    /* Macros and symbols cannot use instruction names */
+                    Instr = FindInstruction (SVal);
+                    if (Instr < 0) {
+                        Macro = IsMacro (SVal);
+                    }
+                } else {
+                    /* Macros and symbols may use the names of instructions */
+                    Macro = IsMacro (SVal);
+                }
+            }
         }
     }
 
-    if (!Done) {
-
-     	if (Tok >= TOK_FIRSTPSEUDO && Tok <= TOK_LASTPSEUDO) {
-     	    /* A control command */
-     	    HandlePseudo ();
-     	} else if (Macro) {
-     	    /* A macro expansion */
-     	    MacExpandStart ();
-     	} else if (Instr >= 0 ||
-                   (UbiquitousIdents && ((Instr = FindInstruction (SVal)) >= 0))) {
-     	    /* A mnemonic - assemble one instruction */
-     	    HandleInstruction (Instr);
-     	} else if (PCAssignment && (Tok == TOK_STAR || Tok == TOK_PC)) {
-	    NextTok ();
-	    if (Tok != TOK_EQ) {
-		Error ("`=' expected");
-      		SkipUntilSep ();
-      	    } else {
-      		/* Skip the equal sign */
-      		NextTok ();
-      		/* Enter absolute mode */
-      		DoPCAssign ();
-      	    }
-      	}
-
-        /* If we have defined a label, remember its size. Sym is also set by
-         * a symbol assignment, but in this case Done is false, so we don't
-         * come here.
-         */
-        if (Sym) {
-            unsigned long Size;
-            if (Seg == ActiveSeg) {
-                /* Same segment */
-                Size = GetPC () - PC;
-            } else {
-                /* The line has switched the segment */
-                Size = 0;
-            }
-            DefSizeOfSymbol (Sym, Size);
+    /* We've handled a possible label, now handle the remainder of the line */
+    if (Tok >= TOK_FIRSTPSEUDO && Tok <= TOK_LASTPSEUDO) {
+        /* A control command */
+        HandlePseudo ();
+    } else if (Macro) {
+        /* A macro expansion */
+        MacExpandStart ();
+    } else if (Instr >= 0 ||
+               (UbiquitousIdents && ((Instr = FindInstruction (SVal)) >= 0))) {
+        /* A mnemonic - assemble one instruction */
+        HandleInstruction (Instr);
+    } else if (PCAssignment && (Tok == TOK_STAR || Tok == TOK_PC)) {
+        NextTok ();
+        if (Tok != TOK_EQ) {
+            Error ("`=' expected");
+            SkipUntilSep ();
+        } else {
+            /* Skip the equal sign */
+            NextTok ();
+            /* Enter absolute mode */
+            DoPCAssign ();
         }
+    }
+
+    /* If we have defined a label, remember its size. Sym is also set by
+     * a symbol assignment, but in this case Done is false, so we don't
+     * come here.
+     */
+    if (Sym) {
+        unsigned long Size;
+        if (Seg == ActiveSeg) {
+            /* Same segment */
+            Size = GetPC () - PC;
+        } else {
+            /* The line has switched the segment */
+            Size = 0;
+        }
+        DefSizeOfSymbol (Sym, Size);
     }
 
     /* Line separator must come here */
@@ -582,7 +596,7 @@ int main (int argc, char* argv [])
 	{ "--listing", 	       	0,	OptListing		},
         { "--memory-model",     1,      OptMemoryModel          },
 	{ "--pagelength",      	1,	OptPageLength		},
-	{ "--smart",   	       	0,	OptSmart		},
+    	{ "--smart",   	       	0,	OptSmart		},
 	{ "--target",  		1,	OptTarget		},
 	{ "--verbose", 	       	0,	OptVerbose		},
 	{ "--version", 	       	0,	OptVersion		},

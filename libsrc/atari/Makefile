@@ -80,7 +80,8 @@ OBJS =	_scrsize.o   \
         systime.o    \
 	tvtype.o     \
 	ucase_fn.o   \
-	where.o      \
+	wherex.o     \
+	wherey.o     \
 	write.o
 
 

@@ -46,8 +46,9 @@
 #include "expr.h"
 #include "function.h"
 #include "global.h"
-#include "symtab.h"
 #include "locals.h"
+#include "symtab.h"
+#include "typeconv.h"
 
 
 
@@ -62,7 +63,6 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
  * symbol data, which is the offset of the variable in the register bank.
  */
 {
-    unsigned Flags;
     unsigned InitLabel;
 
     /* Determine if this is a compound variable */
@@ -95,8 +95,8 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
 
             /* Parse the initialization generating a memory image of the
              * data in the RODATA segment. The function does return the size
-             * of the initialization data, which may be greater than the 
-             * actual size of the type, if the type is a structure with a 
+             * of the initialization data, which may be greater than the
+             * actual size of the type, if the type is a structure with a
              * flexible array member that has been initialized. Since we must
              * know the size of the data in advance for register variables,
              * we cannot allow that here.
@@ -110,27 +110,17 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
 
         } else {
 
-            /* Setup the type flags for the assignment */
-            Flags = CF_NONE;
-            if (Size == SIZEOF_CHAR) {
-                Flags |= CF_FORCECHAR;
-            }
+            /* Parse the expression */
+            int k = hie1 (InitExprDesc (&lval));
 
-            /* Get the expression into the primary */
-            if (evalexpr (Flags, hie1, &lval) == 0) {
-                /* Constant expression. Adjust the types */
-                assignadjust (Decl->Type, &lval);
-                Flags |= CF_CONST;
-                /* Load it into the primary */
-                exprhs (Flags, 0, &lval);
-            } else {
-                /* Expression is not constant and in the primary */
-                assignadjust (Decl->Type, &lval);
-            }
+            /* Convert it to the target type */
+            k = TypeConversion (&lval, k, Decl->Type);
+
+            /* Load the value into the primary */
+            exprhs (CF_NONE, k, &lval);
 
             /* Store the value into the variable */
-            Flags |= CF_REGVAR;
-            g_putstatic (Flags | TypeOf (Decl->Type), Reg, 0);
+            g_putstatic (CF_REGVAR | TypeOf (Decl->Type), Reg, 0);
 
         }
 
@@ -210,20 +200,28 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
 
             } else {
 
+                int k;
+
                 /* Allocate previously reserved local space */
                 F_AllocLocalSpace (CurrentFunc);
 
                 /* Setup the type flags for the assignment */
                 Flags = (Size == SIZEOF_CHAR)? CF_FORCECHAR : CF_NONE;
 
-                /* Get the expression into the primary */
-                if (evalexpr (Flags, hie1, &lval) == 0) {
-                    /* Constant expression. Adjust the types */
-                    assignadjust (Decl->Type, &lval);
-                    Flags |= CF_CONST;
+                /* Parse the expression */
+                k = hie1 (InitExprDesc (&lval));
+
+                /* Convert it to the target type */
+                k = TypeConversion (&lval, k, Decl->Type);
+
+                /* If the value is not const, load it into the primary.
+                 * Otherwise pass the information to the code generator.
+                 */
+                if (k != 0 || lval.Flags != E_MCONST) {
+                    exprhs (CF_NONE, k, &lval);
+                    k = 0;
                 } else {
-                    /* Expression is not constant and in the primary */
-                    assignadjust (Decl->Type, &lval);
+                    Flags |= CF_CONST;
                 }
 
                 /* Push the value */
@@ -286,24 +284,17 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
 
             } else {
 
-                /* Setup the type flags for the assignment */
-                Flags = (Size == SIZEOF_CHAR)? CF_FORCECHAR : CF_NONE;
+                /* Parse the expression */
+                int k = hie1 (InitExprDesc (&lval));
 
-                /* Get the expression into the primary */
-                if (evalexpr (Flags, hie1, &lval) == 0) {
-                    /* Constant expression. Adjust the types */
-                    assignadjust (Decl->Type, &lval);
-                    Flags |= CF_CONST;
-                    /* Load it into the primary */
-                    exprhs (Flags, 0, &lval);
-                } else {
-                    /* Expression is not constant and in the primary */
-                    assignadjust (Decl->Type, &lval);
-                }
+                /* Convert it to the target type */
+                k = TypeConversion (&lval, k, Decl->Type);
+
+                /* Load the value into the primary */
+                exprhs (CF_NONE, k, &lval);
 
                 /* Store the value into the variable */
-                g_putstatic (Flags | TypeOf (Decl->Type), SymData, 0);
-
+                g_putstatic (TypeOf (Decl->Type), SymData, 0);
             }
 
             /* Mark the variable as referenced */

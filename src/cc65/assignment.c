@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -39,6 +39,7 @@
 #include "error.h"
 #include "expr.h"
 #include "typecmp.h"
+#include "typeconv.h"
 #include "assignment.h"
 
 
@@ -49,7 +50,7 @@
 
 
 
-void Assignment (ExprDesc* lval)
+int Assignment (ExprDesc* lval)
 /* Parse an assignment */
 {
     int k;
@@ -86,7 +87,7 @@ void Assignment (ExprDesc* lval)
         if (UseReg) {
             PushAddr (lval);
         } else {
-	    exprhs (0, 0, lval);
+    	    exprhs (0, 0, lval);
             g_push (CF_PTR | CF_UNSIGNED, 0);
         }
 
@@ -147,27 +148,26 @@ void Assignment (ExprDesc* lval)
 
     } else {
 
-	/* Get the address on stack if needed */
-	PushAddr (lval);
+    	/* Get the address on stack if needed */
+    	PushAddr (lval);
 
-     	/* Get the expression on the right of the '=' into the primary */
-     	if (evalexpr (CF_NONE, hie1, &lval2) == 0) {
-     	    /* Constant expression. Adjust the types */
-     	    assignadjust (ltype, &lval2);
-     	    /* Put the value into the primary register */
-     	    exprhs (CF_NONE, 0, &lval2);
-     	} else {
-     	    /* Expression is not constant and already in the primary */
-     	    assignadjust (ltype, &lval2);
-     	}
+	/* Read the expression on the right side of the '=' */
+	k = hie1 (&lval2);
+
+	/* Do type conversion if necessary */
+	k = TypeConversion (&lval2, k, ltype);
+
+	/* If necessary, load the value into the primary register */
+	exprhs (CF_NONE, k, &lval2);
 
      	/* Generate a store instruction */
      	Store (lval, 0);
 
     }
 
-    /* Value is still in primary */
+    /* Value is still in primary and not an lvalue */
     lval->Flags = E_MEXPR;
+    return 0;
 }
 
 

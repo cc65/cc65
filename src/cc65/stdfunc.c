@@ -48,6 +48,7 @@
 #include "litpool.h"
 #include "scanner.h"
 #include "stdfunc.h"
+#include "typeconv.h"
 
 
 
@@ -106,35 +107,36 @@ static struct StdFuncDesc* FindFunc (const char* Name)
 
 
 
-static unsigned ParseArg (type* Type, ExprDesc* pval)
+static unsigned ParseArg (type* Type, ExprDesc* Arg)
 /* Parse one argument but do not push it onto the stack. Return the code
  * generator flags needed to do the actual push.
  */
 {
-    unsigned CFlags;
-    unsigned Flags;
-
-    /* Do some optimization: If we have a constant value to push,
-     * use a special function that may optimize.
-     */
-    CFlags = CF_NONE;
-    if (CheckedSizeOf (Type) == 1) {
-        CFlags = CF_FORCECHAR;
-    }
-    Flags = CF_NONE;
-    if (evalexpr (CFlags, hie1, pval) == 0) {
-        /* A constant value */
-        Flags |= CF_CONST;
-    }
-
-    /* Promote the argument if needed */
-    assignadjust (Type, pval);
-
     /* We have a prototype, so chars may be pushed as chars */
-    Flags |= CF_FORCECHAR;
+    unsigned Flags = CF_FORCECHAR;
+
+    /* Read the expression we're going to pass to the function */
+    int k = hie1 (InitExprDesc (Arg));
+
+    /* Convert this expression to the expected type */
+    k = TypeConversion (Arg, k, Type);
+
+    /* If the value is not a constant, load it into the primary */
+    if (k != 0 || Arg->Flags != E_MCONST) {
+
+        /* Load into the primary */
+        exprhs (CF_NONE, k, Arg);
+        k = 0;
+
+    } else {
+
+        /* Remember that we have a constant value */
+        Flags |= CF_CONST;
+
+    }
 
     /* Use the type of the argument for the push */
-    return (Flags | TypeOf (pval->Type));
+    return (Flags | TypeOf (Arg->Type));
 }
 
 
@@ -208,20 +210,17 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
                             ExprDesc* lval attribute ((unused)))
 /* Handle the strlen function */
 {
-    static type ParamType[] = { T_PTR, T_SCHAR, T_END };
-
-    ExprDesc Param;
-    unsigned CodeFlags;
+    static type   ParamType[] = { T_PTR, T_SCHAR, T_END };
+    int           k;
+    ExprDesc      Param;
+    unsigned      CodeFlags;
     unsigned long ParamName;
-
-    /* Fetch the parameter */
-    int k = hie1 (InitExprDesc (&Param));
 
     /* Setup the argument type string */
     ParamType[1] = GetDefaultChar () | T_QUAL_CONST;
 
-    /* Convert the parameter type to the type needed, check for mismatches */
-    assignadjust (ParamType, &Param);
+    /* Fetch the parameter and convert it to the type needed */
+    k = TypeConversion (&Param, hie1 (InitExprDesc (&Param)), ParamType);
 
     /* Check if the parameter is a constant array of some type, or a numeric
      * address cast to a pointer.

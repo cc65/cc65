@@ -103,8 +103,8 @@ OBJS =	anonname.obj	\
     	symentry.obj	\
     	symtab.obj	\
 	textseg.obj	\
-        typecast.obj    \
     	typecmp.obj	\
+        typeconv.obj    \
 	util.obj
 
 LIBS = ..\common\common.lib

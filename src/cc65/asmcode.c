@@ -85,7 +85,7 @@ void WriteOutput (FILE* F)
     SymEntry* Entry;
 
     /* Output the global data segment */
-    CHECK (CS_GetEntryCount (CS->Code) == 0);
+    CHECK (!HaveGlobalCode ());
     OutputSegments (CS, F);
 
     /* Output all global or referenced functions */

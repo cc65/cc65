@@ -132,6 +132,12 @@ void AddCode (opc_t OPC, am_t AM, const char* Arg, struct CodeLabel* JumpTo);
 void AddDataLine (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Add a line of data to the current data segment */
 
+int HaveGlobalCode (void);
+/* Return true if the global code segment contains entries (which is an error) */
+
+void RemoveGlobalCode (void);
+/* Remove all code from the global code segment. Used for error recovery. */
+
 void OutputSegments (const Segments* S, FILE* F);
 /* Output the given segments to the file */
 

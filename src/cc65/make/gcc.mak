@@ -82,8 +82,8 @@ OBJS =	anonname.o	\
     	symentry.o	\
     	symtab.o       	\
 	textseg.o	\
-        typecast.o      \
     	typecmp.o	\
+        typeconv.o      \
     	util.o
 
 LIBS =	$(COMMON)/common.a

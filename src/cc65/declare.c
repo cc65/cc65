@@ -44,6 +44,7 @@
 #include "anonname.h"
 #include "codegen.h"
 #include "datatype.h"
+#include "declare.h"
 #include "declattr.h"
 #include "error.h"
 #include "expr.h"
@@ -54,7 +55,7 @@
 #include "pragma.h"
 #include "scanner.h"
 #include "symtab.h"
-#include "declare.h"
+#include "typeconv.h"
 
 
 
@@ -1076,18 +1077,10 @@ static void ClosingCurlyBraces (unsigned BracesExpected)
 static unsigned ParseScalarInit (type* T)
 /* Parse initializaton for scalar data types. Return the number of data bytes. */
 {
-    static const unsigned long Masks[] = {
-        0x000000FFUL, 0x0000FFFFUL, 0x00FFFFFFUL, 0xFFFFFFFFUL
-    };
-    unsigned BraceCount;
     ExprDesc ED;
 
-    /* Get the size of the expected type */
-    unsigned Size = SizeOf (T);
-    CHECK (Size > 0 && Size <= sizeof(Masks)/sizeof(Masks[0]));
-
     /* Optional opening brace */
-    BraceCount = OpeningCurlyBraces (0);
+    unsigned BraceCount = OpeningCurlyBraces (0);
 
     /* We warn if an initializer for a scalar contains braces, because this is
      * quite unusual and often a sign for some problem in the input.
@@ -1096,13 +1089,9 @@ static unsigned ParseScalarInit (type* T)
         Warning ("Braces around scalar initializer");
     }
 
-    /* Expression */
+    /* Get the expression and convert it to the target type */
     ConstExpr (&ED);
-    if ((ED.Flags & E_MCTYPE) == E_TCONST) {
-        /* Make the const value the correct size */
-        ED.ConstVal &= Masks[Size-1];
-    }
-    assignadjust (T, &ED);
+    TypeConversion (&ED, 0, T);
 
     /* Output the data */
     DefineData (&ED);
@@ -1111,7 +1100,7 @@ static unsigned ParseScalarInit (type* T)
     ClosingCurlyBraces (BraceCount);
 
     /* Done */
-    return Size;
+    return SizeOf (T);
 }
 
 
@@ -1129,7 +1118,7 @@ static unsigned ParsePointerInit (type* T)
         /* Make the const value the correct size */
         ED.ConstVal &= 0xFFFF;
     }
-    assignadjust (T, &ED);
+    TypeConversion (&ED, 0, T);
 
     /* Output the data */
     DefineData (&ED);
@@ -1406,7 +1395,19 @@ static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers)
 unsigned ParseInit (type* T)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
-    return ParseInitInternal (T, !ANSI);
+    /* Parse the initialization */
+    unsigned Size = ParseInitInternal (T, !ANSI);
+
+    /* The initialization may not generate code on global level, because code
+     * outside function scope will never get executed.
+     */
+    if (HaveGlobalCode ()) {
+        Error ("Non constant initializers");
+        RemoveGlobalCode ();
+    }
+
+    /* Return the size needed for the initialization */
+    return Size;
 }
 
 

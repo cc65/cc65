@@ -1,14 +1,14 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                typecast.h                                 */
+/*                                typeconv.h                                 */
 /*                                                                           */
-/*                             Handle type casts                             */
+/*                          Handle type conversions                          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -33,11 +33,11 @@
 
 
 
-#ifndef TYPECAST_H
-#define TYPECAST_H
+#ifndef TYPECONV_H
+#define TYPECONV_H
 
 
-                     
+
 /* cc65 */
 #include "exprdesc.h"
 
@@ -49,14 +49,20 @@
 
 
 
-int TypeCast (ExprDesc* lval);
+int TypeConversion (ExprDesc* Expr, int k, type* NewType);
+/* Do an automatic conversion of the given expression to the new type. Output
+ * warnings or errors where this automatic conversion is suspicious or
+ * impossible.
+ */
+
+int TypeCast (ExprDesc* Expr);
 /* Handle an explicit cast. The function returns true if the resulting
  * expression is an lvalue and false if not.
  */
 
 
 
-/* End of typecast.h */
+/* End of typeconv.h */
 #endif
 
 

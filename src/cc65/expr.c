@@ -31,8 +31,8 @@
 #include "scanner.h"
 #include "stdfunc.h"
 #include "symtab.h"
-#include "typecast.h"
 #include "typecmp.h"
+#include "typeconv.h"
 #include "expr.h"
 
 
@@ -87,7 +87,7 @@ static GenDesc GenOASGN  = { TOK_OR_ASSIGN,	GEN_NOPUSH,     g_or  };
 
 
 
-static int hie0 (ExprDesc *lval);
+int hie0 (ExprDesc *lval);
 /* Parse comma operator. */
 
 static int expr (int (*func) (ExprDesc*), ExprDesc *lval);
@@ -191,94 +191,6 @@ static unsigned typeadjust (ExprDesc* lhs, ExprDesc* rhs, int NoPush)
 
     /* Return the code generator flags */
     return flags;
-}
-
-
-
-unsigned assignadjust (type* lhst, ExprDesc* rhs)
-/* Adjust the type of the right hand expression so that it can be assigned to
- * the type on the left hand side. This function is used for assignment and
- * for converting parameters in a function call. It returns the code generator
- * flags for the operation. The type string of the right hand side will be
- * set to the type of the left hand side.
- */
-{
-    /* Get the type of the right hand side. Treat function types as
-     * pointer-to-function
-     */
-    type* rhst = rhs->Type;
-    if (IsTypeFunc (rhst)) {
-	rhst = PointerTo (rhst);
-    }
-
-    /* After calling this function, rhs will have the type of the lhs */
-    rhs->Type = lhst;
-
-    /* First, do some type checking */
-    if (IsTypeVoid (lhst) || IsTypeVoid (rhst)) {
-    	/* If one of the sides are of type void, output a more apropriate
-    	 * error message.
-    	 */
-       	Error ("Illegal type");
-    } else if (IsClassInt (lhst)) {
-       	if (IsClassPtr (rhst)) {
-     	    /* Pointer -> int conversion */
-     	    Warning ("Converting pointer to integer without a cast");
-       	} else if (IsClassInt (rhst)) {
-   	    /* Convert the rhs to the type of the lhs. */
-   	    unsigned flags = TypeOf (rhst);
-       	    if (rhs->Flags == E_MCONST) {
-   	 	flags |= CF_CONST;
-   	    }
-       	    return g_typecast (TypeOf (lhst), flags);
-     	} else {
-     	    Error ("Incompatible types");
-        }
-    } else if (IsClassPtr (lhst)) {
-     	if (IsClassPtr (rhst)) {
-     	    /* Pointer to pointer assignment is valid, if:
-     	     *   - both point to the same types, or
-     	     *   - the rhs pointer is a void pointer, or
-	     *   - the lhs pointer is a void pointer.
-     	     */
-	    if (!IsTypeVoid (Indirect (lhst)) && !IsTypeVoid (Indirect (rhst))) {
-	 	/* Compare the types */
-	 	switch (TypeCmp (lhst, rhst)) {
-
-	 	    case TC_INCOMPATIBLE:
-	 		Error ("Incompatible pointer types");
-	 		break;
-
-	 	    case TC_QUAL_DIFF:
-	 		Error ("Pointer types differ in type qualifiers");
-	 		break;
-
-	 	    default:
-	 		/* Ok */
-	 		break;
-	 	}
-	    }
-     	} else if (IsClassInt (rhst)) {
-     	    /* Int to pointer assignment is valid only for constant zero */
-     	    if (rhs->Flags != E_MCONST || rhs->ConstVal != 0) {
-     	       	Warning ("Converting integer to pointer without a cast");
-     	    }
-	} else if (IsTypeFuncPtr (lhst) && IsTypeFunc(rhst)) {
-	    /* Assignment of function to function pointer is allowed, provided
-	     * that both functions have the same parameter list.
-	     */
-	    if (TypeCmp (Indirect (lhst), rhst) < TC_EQUAL) {
-	 	Error ("Incompatible types");
-	    }
-     	} else {
-	    Error ("Incompatible types");
-	}
-    } else {
-	Error ("Incompatible types");
-    }
-
-    /* Return an int value in all cases where the operands are not both ints */
-    return CF_INT;
 }
 
 
@@ -655,8 +567,8 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	 * convert the actual argument to the type needed.
 	 */
        	if (!Ellipsis) {
-	    /* Promote the argument if needed */
-       	    assignadjust (Param->Type, &lval);
+	    /* Convert the argument to the parameter type if needed */
+            TypeConversion (&lval, 0, Param->Type);
 
 	    /* If we have a prototype, chars may be pushed as chars */
 	    Flags |= CF_FORCECHAR;
@@ -3022,12 +2934,10 @@ int hie1 (ExprDesc* lval)
 
 
 
-static int hie0 (ExprDesc *lval)
+int hie0 (ExprDesc *lval)
 /* Parse comma operator. */
 {
-    int k;
-
-    k = hie1 (lval);
+    int k = hie1 (lval);
     while (CurTok.Tok == TOK_COMMA) {
     	NextToken ();
      	k = hie1 (lval);

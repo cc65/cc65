@@ -58,6 +58,7 @@
 #include "swstmt.h"
 #include "symtab.h"
 #include "stmt.h"
+#include "typeconv.h"
 
 
 
@@ -89,13 +90,13 @@ static void CheckSemi (int* PendingToken)
  * error message if not found (plus some error recovery). If PendingToken is
  * NULL, it will the skip the token, otherwise it will store one to
  * PendingToken.
- * This function is a special version of CheckTok with the addition of the 
+ * This function is a special version of CheckTok with the addition of the
  * error recovery.
  */
 {
     int HaveToken = (CurTok.Tok == TOK_SEMI);
     if (!HaveToken) {
-   	Error ("`;' expected");                                  
+   	Error ("`;' expected");
         /* Try to be smart about errors */
         if (CurTok.Tok == TOK_COLON || CurTok.Tok == TOK_COMMA) {
             HaveToken = 1;
@@ -256,7 +257,8 @@ static void WhileStatement (void)
 static void ReturnStatement (void)
 /* Handle the 'return' statement */
 {
-    ExprDesc lval;
+    ExprDesc Expr;
+    int k;
 
     NextToken ();
     if (CurTok.Tok != TOK_SEMI) {
@@ -266,12 +268,17 @@ static void ReturnStatement (void)
        	    Error ("Returning a value in function with return type void");
        	}
 
-	/* Evaluate the return expression. Result will be in primary */
-	expression (&lval);
+	/* Evaluate the return expression */
+	k = hie0 (InitExprDesc (&Expr));
 
-    	/* Convert the return value to the type of the function result */
+	/* Ignore the return expression if the function returns void */
     	if (!F_HasVoidReturn (CurrentFunc)) {
-       	    assignadjust (F_GetReturnType (CurrentFunc), &lval);
+
+	    /* Convert the return value to the type of the function result */
+	    TypeConversion (&Expr, k, F_GetReturnType (CurrentFunc));
+
+	    /* Load the value into the primary */
+	    exprhs (CF_NONE, k, &Expr);
     	}
 
     } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {

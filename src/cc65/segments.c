@@ -224,6 +224,22 @@ void AddDataLine (const char* Format, ...)
 
 
 
+int HaveGlobalCode (void)
+/* Return true if the global code segment contains entries (which is an error) */
+{
+    return (CS_GetEntryCount (GS->Code) > 0);
+}
+
+
+
+void RemoveGlobalCode (void)
+/* Remove all code from the global code segment. Used for error recovery. */
+{
+    CS_DelEntries (GS->Code, 0, CS_GetEntryCount (GS->Code));
+}
+
+
+
 void OutputSegments (const Segments* S, FILE* F)
 /* Output the given segments to the file */
 {

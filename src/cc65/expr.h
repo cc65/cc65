@@ -42,13 +42,6 @@ void CheckBoolExpr (ExprDesc* lval);
  * if not.
  */
 
-unsigned assignadjust (type* lhst, ExprDesc* rhs);
-/* Adjust the type of the right hand expression so that it can be assigned to
- * the type on the left hand side. This function is used for assignment and
- * for converting parameters in a function call. It returns the code generator
- * flags for the operation.
- */
-
 void exprhs (unsigned flags, int k, ExprDesc *lval);
 /* Put the result of an expression into the primary register */
 
@@ -58,13 +51,8 @@ void Store (ExprDesc* lval, const type* StoreType);
  * is NULL, use lval->Type instead.
  */
 
-void expression1 (ExprDesc* lval);
-/* Evaluate an expression on level 1 (no comma operator) and put it into
- * the primary register
- */
-
-void expression (ExprDesc* lval);
-/* Evaluate an expression and put it into the primary register */
+int hie0 (ExprDesc *lval);
+/* Parse comma operator. */
 
 int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval);
 /* Will evaluate an expression via the given function. If the result is a
@@ -72,6 +60,14 @@ int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval);
  * result is not constant, exprhs is called to bring the value into the
  * primary register and 1 is returned.
  */
+
+void expression1 (ExprDesc* lval);
+/* Evaluate an expression on level 1 (no comma operator) and put it into
+ * the primary register
+ */
+
+void expression (ExprDesc* lval);
+/* Evaluate an expression and put it into the primary register */
 
 void ConstExpr (ExprDesc* lval);
 /* Get a constant value */

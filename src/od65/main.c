@@ -184,7 +184,7 @@ static void DumpFile (const char* Name)
     if (Magic != OBJ_MAGIC) {
 
 	/* Unknown format */
-       	printf ("%s: (no x65 object file)\n", Name);
+       	printf ("%s: (no xo65 object file)\n", Name);
 
     } else if (What == 0) {
 

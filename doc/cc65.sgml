@@ -327,42 +327,39 @@ and the one defined by the ISO standard:
 <itemize>
 
 <item>	The compiler allows single line comments that start with //. This
-	feature is disabled in strict ANSI mode.
-	<p>
+      	feature is disabled in strict ANSI mode.
+      	<p>
 <item>	The compiler allows unnamed parameters in parameter lists. The
-	compiler will not issue warnings about unused parameters that don't
-	have a name. This feature is disabled in strict ANSI mode.
-	<p>
+      	compiler will not issue warnings about unused parameters that don't
+      	have a name. This feature is disabled in strict ANSI mode.
+      	<p>
 <item>	The compiler has some additional keywords:
-	<p>
-	<itemize>
- 	<item><tt/asm/
-	<item><tt/__asm__/
-	<item><tt/fastcall/
-	<item><tt/__fastcall__/
-	<item><tt/__AX__/
-	<item><tt/__EAX__/
-	<item><tt/__func__/
-	<item><tt/__attribute__/
-	</itemize>
-	<p>
-	The keywords without the underlines are disabled in strict ANSI mode.
-	<p>
+      	<p>
+      	<itemize>
+      	<item><tt/asm/
+      	<item><tt/__asm__/
+      	<item><tt/fastcall/
+      	<item><tt/__fastcall__/
+      	<item><tt/__AX__/
+      	<item><tt/__EAX__/
+      	<item><tt/__func__/
+      	<item><tt/__attribute__/
+      	</itemize>
+      	<p>
+      	The keywords without the underlines are disabled in strict ANSI mode.
+      	<p>
 <item>	The datatypes "float" and "double" are not available.
-	<p>
+      	<p>
 <item>	The compiler does not support bit fields.
-	<p>
-<item>	Initialization of local variables is only possible for scalar data
-	types (that is, not for arrays and structs).
-	<p>
+      	<p>
 <item>	Because of the "wrong" order of the parameters on the stack, there is
-	an additional macro needed to access parameters in a variable
-	parameter list in a C function.
-	<p>
+      	an additional macro needed to access parameters in a variable
+      	parameter list in a C function.
+      	<p>
 <item>	Functions may not return structs (or unions), and structs may not be
-	passed as parameters by value. However, struct assignment *is*
-	possible.
-	<p>
+      	passed as parameters by value. However, struct assignment *is*
+      	possible.
+      	<p>
 <item>	Part of the C library is available only with fastcall calling
 	conventions (see below). This means, that you may not mix pointers to
 	those functions with pointers to user written functions.

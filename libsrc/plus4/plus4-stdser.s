@@ -342,7 +342,7 @@ STATUS: lda    	ACIA_STATUS
 
 IOCTL:  lda     #<SER_ERR_INV_IOCTL     ; We don't support ioclts for now
         ldx     #>SER_ERR_INV_IOCTL
-;       rts				; Run into IRQ instead
+        rts				; Run into IRQ instead
 
 ;----------------------------------------------------------------------------
 ; IRQ: Called from the builtin runtime IRQ handler as a subroutine. All

@@ -93,17 +93,17 @@ The functions listed below are special for the Atari. See the <htmlurl
 url="funcref.html" name="function reference"> for declaration and usage.
 
 <itemize>
-<item>_gtia_mkcolor
 <item>get_ostype
 <item>get_tv
-<item>getcolor
-<item>getdefdev
-<item>graphics
-<item>rest_vecs
-<item>save_vecs
-<item>scroll
-<item>setcolor
-<item>setcolor_low
+<item>_gtia_mkcolor
+<item>_getcolor
+<item>_getdefdev
+<item>_graphics
+<item>_rest_vecs
+<item>_save_vecs
+<item>_scroll
+<item>_setcolor
+<item>_setcolor_low
 </itemize>
 
 

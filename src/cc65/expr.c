@@ -413,54 +413,54 @@ void CheckBoolExpr (ExprDesc* lval)
 
 
 
-void exprhs (unsigned flags, int k, ExprDesc* lval)
+void exprhs (unsigned Flags, int k, ExprDesc* Expr)
 /* Put the result of an expression into the primary register */
 {
     int f;
 
-    f = lval->Flags;
+    f = Expr->Flags;
     if (k) {
        	/* Dereferenced lvalue */
-       	flags |= TypeOf (lval->Type);
-     	if (lval->Test & E_FORCETEST) {
-     	    flags |= CF_TEST;
-     	    lval->Test &= ~E_FORCETEST;
+       	Flags |= TypeOf (Expr->Type);
+     	if (Expr->Test & E_FORCETEST) {
+     	    Flags |= CF_TEST;
+     	    Expr->Test &= ~E_FORCETEST;
      	}
-       	if (f & E_MGLOBAL) {	
-	    /* Reference to a global variable */
-     	    flags |= GlobalModeFlags (f);
-       	    g_getstatic (flags, lval->Name, lval->ConstVal);
+       	if (f & E_MGLOBAL) {
+     	    /* Reference to a global variable */
+     	    Flags |= GlobalModeFlags (f);
+       	    g_getstatic (Flags, Expr->Name, Expr->ConstVal);
        	} else if (f & E_MLOCAL) {
      	    /* Reference to a local variable */
-       	    g_getlocal (flags, lval->ConstVal);
+       	    g_getlocal (Flags, Expr->ConstVal);
      	} else if (f & E_MCONST) {
      	    /* Reference to an absolute address */
-     	    g_getstatic (flags | CF_ABSOLUTE, lval->ConstVal, 0);
+     	    g_getstatic (Flags | CF_ABSOLUTE, Expr->ConstVal, 0);
      	} else if (f == E_MEOFFS) {
-	    /* Reference to address in primary with offset in lval */
-     	    g_getind (flags, lval->ConstVal);
+     	    /* Reference to address in primary with offset in Expr */
+     	    g_getind (Flags, Expr->ConstVal);
      	} else if (f != E_MREG) {
-	    /* Reference with address in primary */
-     	    g_getind (flags, 0);
+     	    /* Reference with address in primary */
+     	    g_getind (Flags, 0);
      	}
     } else {
-	/* An rvalue */
-	if (f == E_MEOFFS) {
-	    /* reference not storable */
-	    flags |= TypeOf (lval->Type);
-	    g_inc (flags | CF_CONST, lval->ConstVal);
-	} else if ((f & E_MEXPR) == 0) {
-	    /* Constant of some sort, load it into the primary */
-	    LoadConstant (flags, lval);
-	}
+     	/* An rvalue */
+     	if (f == E_MEOFFS) {
+     	    /* reference not storable */
+     	    Flags |= TypeOf (Expr->Type);
+     	    g_inc (Flags | CF_CONST, Expr->ConstVal);
+     	} else if ((f & E_MEXPR) == 0) {
+     	    /* Constant of some sort, load it into the primary */
+     	    LoadConstant (Flags, Expr);
+     	}
     }
 
     /* Are we testing this value? */
-    if (lval->Test & E_FORCETEST) {
+    if (Expr->Test & E_FORCETEST) {
         /* Yes, force a test */
-     	flags |= TypeOf (lval->Type);
-       	g_test (flags);
-       	lval->Test &= ~E_FORCETEST;
+     	Flags |= TypeOf (Expr->Type);
+       	g_test (Flags);
+       	Expr->Test &= ~E_FORCETEST;
     }
 }
 
@@ -2582,15 +2582,17 @@ static int hieOr (ExprDesc *lval)
 
 
 
-static int hieQuest (ExprDesc *lval)
-/* Parse "lvalue ? exp : exp" */
+static int hieQuest (ExprDesc* lval)
+/* Parse the ternary operator */
 {
-    int k1, k2, k3;
-    int labf;
-    int labt;
-    ExprDesc lval2;            	/* Expression 2 */
-    ExprDesc lval3;            	/* Expression 3 */
-    type* rtype;   	       	/* Type of result */
+    int         k1, k2, k3;
+    int         labf;
+    int         labt;
+    ExprDesc 	Expr2;          /* Expression 2 */
+    ExprDesc 	Expr3;          /* Expression 3 */
+    int         Expr2IsNULL;    /* Expression 2 is a NULL pointer */
+    int         Expr3IsNULL;    /* Expression 3 is a NULL pointer */
+    type* 	ResultType;     /* Type of result */
 
 
     k1 = Preprocessing? hieOrPP (lval) : hieOr (lval);
@@ -2604,25 +2606,33 @@ static int hieQuest (ExprDesc *lval)
     	labf = GetLocalLabel ();
     	g_falsejump (CF_NONE, labf);
 
-    	/* Parse second expression */
-        k2 = expr (hie1, &lval2);
-        if (!IsTypeVoid (lval2.Type)) {
+    	/* Parse second expression. Remember for later if it is a NULL pointer
+         * expression, then load it into the primary.
+         */
+        k2 = expr (hie1, &Expr2);
+        Expr2IsNULL = IsNullPtr (&Expr2);
+        if (!IsTypeVoid (Expr2.Type)) {
             /* Load it into the primary */
-            exprhs (CF_NONE, k2, &lval2);
-	    lval2.Flags = E_MEXPR;
+            exprhs (CF_NONE, k2, &Expr2);
+	    Expr2.Flags = E_MEXPR;
 	    k2 = 0;
         }
     	labt = GetLocalLabel ();
     	ConsumeColon ();
     	g_jump (labt);
 
-        /* Parse the third expression */
+        /* Jump here if the first expression was false */
     	g_defcodelabel (labf);
-        k3 = expr (hie1, &lval3);
-        if (!IsTypeVoid (lval3.Type)) {
+
+    	/* Parse second expression. Remember for later if it is a NULL pointer
+         * expression, then load it into the primary.
+         */
+        k3 = expr (hie1, &Expr3);
+        Expr3IsNULL = IsNullPtr (&Expr3);
+        if (!IsTypeVoid (Expr3.Type)) {
             /* Load it into the primary */
-            exprhs (CF_NONE, k3, &lval3);
-	    lval3.Flags = E_MEXPR;
+            exprhs (CF_NONE, k3, &Expr3);
+	    Expr3.Flags = E_MEXPR;
 	    k3 = 0;
         }
 
@@ -2639,13 +2649,13 @@ static int hieQuest (ExprDesc *lval)
          *     type void.
 	 *   - all other cases are flagged by an error.
 	 */
-	if (IsClassInt (lval2.Type) && IsClassInt (lval3.Type)) {
+	if (IsClassInt (Expr2.Type) && IsClassInt (Expr3.Type)) {
 
 	    /* Get common type */
-	    rtype = promoteint (lval2.Type, lval3.Type);
+	    ResultType = promoteint (Expr2.Type, Expr3.Type);
 
 	    /* Convert the third expression to this type if needed */
-	    TypeConversion (&lval3, k3, rtype);
+	    TypeConversion (&Expr3, k3, ResultType);
 
 	    /* Setup a new label so that the expr3 code will jump around
 	     * the type cast code for expr2.
@@ -2657,31 +2667,31 @@ static int hieQuest (ExprDesc *lval)
     	    g_defcodelabel (labt);
 
 	    /* Create the typecast code for expr2 */
-    	    TypeConversion (&lval2, k2, rtype);
+    	    TypeConversion (&Expr2, k2, ResultType);
 
 	    /* Jump here around the typecase code. */
 	    g_defcodelabel (labf);
 	    labt = 0;	       	/* Mark other label as invalid */
 
-	} else if (IsClassPtr (lval2.Type) && IsClassPtr (lval3.Type)) {
+	} else if (IsClassPtr (Expr2.Type) && IsClassPtr (Expr3.Type)) {
 	    /* Must point to same type */
-	    if (TypeCmp (Indirect (lval2.Type), Indirect (lval3.Type)) < TC_EQUAL) {
+	    if (TypeCmp (Indirect (Expr2.Type), Indirect (Expr3.Type)) < TC_EQUAL) {
 	      	Error ("Incompatible pointer types");
 	    }
 	    /* Result has the common type */
-	    rtype = lval2.Type;
-	} else if (IsClassPtr (lval2.Type) && IsNullPtr (&lval3)) {
+	    ResultType = Expr2.Type;
+	} else if (IsClassPtr (Expr2.Type) && Expr3IsNULL) {
 	    /* Result type is pointer, no cast needed */
-	    rtype = lval2.Type;
-	} else if (IsNullPtr (&lval2) && IsClassPtr (lval3.Type)) {
+	    ResultType = Expr2.Type;
+	} else if (Expr2IsNULL && IsClassPtr (Expr3.Type)) {
 	    /* Result type is pointer, no cast needed */
-	    rtype = lval3.Type;
-        } else if (IsTypeVoid (lval2.Type) && IsTypeVoid (lval3.Type)) {
+	    ResultType = Expr3.Type;
+        } else if (IsTypeVoid (Expr2.Type) && IsTypeVoid (Expr3.Type)) {
             /* Result type is void */
-            rtype = lval3.Type;
+            ResultType = Expr3.Type;
       	} else {
       	    Error ("Incompatible types");
-      	    rtype = lval2.Type;	 	/* Doesn't matter here */
+      	    ResultType = Expr2.Type;		/* Doesn't matter here */
       	}
 
       	/* If we don't have the label defined until now, do it */
@@ -2691,7 +2701,7 @@ static int hieQuest (ExprDesc *lval)
 
       	/* Setup the target expression */
        	lval->Flags = E_MEXPR;
-      	lval->Type = rtype;
+      	lval->Type  = ResultType;
       	k1 = 0;
     }
     return k1;
@@ -2827,8 +2837,6 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *lval, int k)
     } else {
      	/* Not constant, load into the primary */
         exprhs (CF_NONE, k, &lval2);
-	lval2.Flags = E_MEXPR;
-	k = 0;
        	if (MustScale) {
      	    /* lhs is a pointer, scale rhs */
        	    g_scale (TypeOf (lval2.Type), CheckedSizeOf (lval->Type+1));
@@ -2840,7 +2848,7 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *lval, int k)
     rflags |= TypeOf (lval2.Type);
 
     /* Convert the type of the lhs to that of the rhs */
-    TypeConversion (&lval2, k, lval->Type);
+    g_typecast (lflags, rflags);
 
     /* Output apropriate code */
     if (lval->Flags & E_MGLOBAL) {

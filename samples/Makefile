@@ -49,11 +49,14 @@ gunzip65:      	$(CRT0) gunzip65.o $(CLIB)
 hello: 	       	$(CRT0) hello.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
+mandelbrot:     	$(CRT0) mandelbrot.o $(CLIB)
+	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
+
 mousedemo:     	$(CRT0) mousedemo.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
 
 nachtm:	       	$(CRT0) nachtm.o $(CLIB)
-	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^
+	@$(LD) -t $(SYS) -m $(basename $@).map -Ln $(basename $@).lbl -o $@ $^
 
 plasma:	       	$(CRT0) plasma.o $(CLIB)
 	@$(LD) -t $(SYS) -m $(basename $@).map -o $@ $^

@@ -47,6 +47,14 @@ Platforms:	Runs on all platforms that support conio, which means:
 		Apple ][, Atari, C16, C64, C128, CBM510, CBM610, PET, Plus/4
 
 -----------------------------------------------------------------------------
+Name:           mandelbrot
+Description:	A mandelbrot demo using integer arithmetic. The demo was 
+                written by groepaz/hitmen and converted to cc65 using TGI 
+                graphics by Stephan Haubenthal.
+Platforms:	All systems with TGI support. You may have to change the
+                driver/resolution definition in the source.
+
+-----------------------------------------------------------------------------
 Name:           mousedemo
 Description:	Shows how to use the mouse.
 Platforms:	All systems with mouse and conio support:

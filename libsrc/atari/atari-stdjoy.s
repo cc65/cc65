@@ -81,9 +81,14 @@ UNINSTALL:
 ;
 
 COUNT:
-        lda     #<JOY_COUNT
-        ldx     #>JOY_COUNT
-        rts
+	lda	#JOY_COUNT
+	ldx	$fcd8
+	cpx	#$a2
+	beq	_400800
+	lsr	a		; XL and newer machines only have 2 ports
+_400800:
+	ldx	#0
+	rts
 
 ; ------------------------------------------------------------------------
 ; READ: Read a particular joystick passed in A.

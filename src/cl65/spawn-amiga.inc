@@ -31,8 +31,18 @@
 
 
 
-#include <stdio.h>
-#include <clib/dos_protos.h>
+/*****************************************************************************/
+/* 		    		     Data 				     */
+/*****************************************************************************/
+
+
+
+/* Mode argument for spawn. This value is ignored by the function and only
+ * provided for DOS/Windows compatibility.
+ */
+#ifndef P_WAIT
+#define P_WAIT	0
+#endif
 
 
 
@@ -64,7 +74,7 @@ int spawnvp (int Mode attribute ((unused)),
     SB_Terminate (&Command);
 
     /* Invoke the shell to execute the command */
-    Status = System (SB_GetConstBuf (&Command), TAG_END)
+    Status = system (SB_GetConstBuf (&Command));
 
     /* Free the string buf data */
     DoneStrBuf (&Command);

@@ -71,16 +71,6 @@ void FreeCaseNode (CaseNode* N);
 /* Delete a case node plus all sub nodes */
 
 #if defined(HAVE_INLINE)
-INLINE unsigned CN_GetSubNodeCount (const CaseNode* N)
-/* Return the number of subnodes in N */
-{
-    return N->Nodes? CollCount (N->Nodes) : 0;
-}
-#else
-#  define CN_GetSubNodeCount(N) ((N)->Nodes? CollCount (&(N)->Nodes) : 0)
-#endif
-
-#if defined(HAVE_INLINE)
 INLINE CaseNode* CN_GetSubNode (CaseNode* N, unsigned Index)
 /* Get a sub node of the given node */
 {

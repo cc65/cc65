@@ -96,7 +96,7 @@ HashNode* HT_Find (const HashTable* T, const void* Key)
          * if it is not really necessary.
          */
         if (N->Hash == Hash &&
-            T->Func->Compare (Key, T->Func->GetKey (N->Entry))) {
+            T->Func->Compare (Key, T->Func->GetKey (N->Entry)) == 0) {
             /* Found */
             break;
         }

@@ -75,7 +75,10 @@ struct HashFunctions {
     /* Given a pointer to the user entry data, return a pointer to the hash node */
 
     int (*Compare) (const void* Key1, const void* Key2);
-    /* Compare two keys for equality */
+    /* Compare two keys. The function must return a value less than zero if
+     * Key1 is smaller than Key2, zero if both are equal, and a value greater
+     * than zero if Key1 is greater then Key2.
+     */
 };
 
 /* Hash table */

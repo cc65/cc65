@@ -68,7 +68,7 @@ __sprsys:   .res    1
 ; ------------------------------------------------------------------------
 ; Actual code
 
-	.code
+	.segment "STARTUP"
 
 ; set up system
 

@@ -123,7 +123,7 @@ static void GlobalSection (void)
 	    case INFOTOK_PAGELENGTH:
 		InfoNextTok ();
 		InfoAssureInt ();
-		if (InfoIVal != -1) {
+		if (InfoIVal != 0) {
 		    InfoRangeCheck (MIN_PAGE_LEN, MAX_PAGE_LEN);
 		}
 		PageLength = InfoIVal;

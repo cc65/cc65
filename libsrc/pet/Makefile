@@ -27,6 +27,7 @@ OBJS =	_scrsize.o	\
         kclose.o        \
         kernal.o        \
         kopen.o         \
+        kplot.o         \
         krdtim.o        \
         kreadst.o       \
         ksetlfs.o       \

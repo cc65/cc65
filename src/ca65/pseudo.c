@@ -293,14 +293,20 @@ static void DoAlign (void)
 static void DoASCIIZ (void)
 /* Define text with a zero terminator */
 {
+    unsigned Len;
+
     while (1) {
+	/* Must have a string constant */
 	if (Tok != TOK_STRCON) {
 	    ErrorSkip (ERR_STRCON_EXPECTED);
 	    return;
 	}
+
+	/* Get the length of the string constant */
+	Len = strlen (SVal);
+
 	/* Translate into target charset and emit */
-	TgtTranslateStr (SVal);
-       	EmitData ((unsigned char*) SVal, strlen (SVal));
+       	EmitData ((unsigned char*) TgtTranslateBuf (SVal, Len), Len);
 	NextTok ();
 	if (Tok == TOK_COMMA) {
 	    NextTok ();
@@ -335,8 +341,8 @@ static void DoByte (void)
     while (1) {
 	if (Tok == TOK_STRCON) {
 	    /* A string, translate into target charset and emit */
-	    TgtTranslateStr (SVal);
-       	    EmitData ((unsigned char*) SVal, strlen (SVal));
+	    unsigned Len = strlen (SVal);
+	    EmitData ((unsigned char*) TgtTranslateBuf (SVal, Len), Len);
 	    NextTok ();
 	} else {
 	    EmitByte (Expression ());

@@ -74,10 +74,7 @@ void TranslateLiteralPool (unsigned Offs)
  * charset.
  */
 {
-    while (Offs < LiteralOffs) {
-     	LiteralPool[Offs] = TgtTranslateChar (LiteralPool[Offs]);
-	++Offs;
-    }
+    TgtTranslateBuf (LiteralPool + Offs, LiteralOffs - Offs);
 }
 
 

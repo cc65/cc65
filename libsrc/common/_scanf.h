@@ -15,8 +15,10 @@
 /* Forward */
 struct indesc;
 
-/* Type of the function that is called to input data */
-typedef void (*infunc) (struct indesc* desc, const char* buf, unsigned count);
+/* Type of the function that is called to input data. The function will
+ * return EOF if no more data is available.
+ */
+typedef char (*infunc) (struct indesc* desc);
 
 
 
@@ -25,11 +27,14 @@ typedef void (*infunc) (struct indesc* desc, const char* buf, unsigned count);
  * level, so check this when altering the structure.
  */
 struct indesc {
-    char*      	buf;		/* Pointer to input buffer */
-    unsigned	size;		/* Size of input buffer */
-    unsigned	fill;		/* Fill mark of input buffer */
-    unsigned	ridx;		/* Read index of input buffer */
-    infunc	fin;		/* Pointer to input routine */
+    infunc	    fin;	/* Pointer to input routine */
+    unsigned	    ccount;	/* Number of chars read */
+
+    /* Fields used outside from _scanf */
+    char*      	    buf; 	/* Pointer to input buffer */
+    unsigned	    size;	/* Size of input buffer */
+    unsigned	    fill;	/* Fill mark of input buffer */
+    unsigned	    ridx;	/* Read index of input buffer */
 };
 
 
@@ -44,3 +49,4 @@ int _scanf (struct indesc* d, const char* format, va_list ap);
 
 
 
+	     

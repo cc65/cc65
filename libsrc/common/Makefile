@@ -14,6 +14,7 @@
 C_OBJS =	_afailed.o	\
 		_fopen.o	\
 		_hextab.o	\
+		_scanf.o	\
 		abort.o		\
 		bsearch.o	\
 		calloc.o	\

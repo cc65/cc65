@@ -48,86 +48,86 @@
 
 
 /*****************************************************************************/
-/*  	       	     	  	     Data				     */
+/*  	       	     	       	     Data				     */
 /*****************************************************************************/
 
 
 
 /* Mapper table, mnemonic --> opcode */
 static const OPCDesc OPCTable[OPC_COUNT] = {
-    { "adc", OPC_ADC, 0, CI_USE_A | CI_CHG_A 	},
-    { "and", OPC_AND, 0, CI_USE_A | CI_CHG_A   	},
-    { "asl", OPC_ASL, 0, CI_USE_A | CI_CHG_A 	},
-    { "bcc", OPC_BCC, 2, CI_BRA		  	},
-    { "bcs", OPC_BCS, 2, CI_BRA		  	},
-    { "beq", OPC_BEQ, 2, CI_BRA		  	},
-    { "bit", OPC_BIT, 0, CI_USE_A      	       	},
-    { "bmi", OPC_BMI, 2, CI_BRA		   	},
-    { "bne", OPC_BNE, 2, CI_BRA		  	},
-    { "bpl", OPC_BPL, 2, CI_BRA		  	},
-    { "bra", OPC_BRA, 2, CI_BRA		  	},
-    { "brk", OPC_BRK, 1, CI_NONE	  	},
-    { "bvc", OPC_BVC, 2, CI_BRA		  	},
-    { "bvs", OPC_BVS, 2, CI_BRA		  	},
-    { "clc", OPC_CLC, 1, CI_CHG_NONE	  	},
-    { "cld", OPC_CLD, 1, CI_CHG_NONE	 	},
-    { "cli", OPC_CLI, 1, CI_CHG_NONE	 	},
-    { "clv", OPC_CLV, 1, CI_CHG_NONE	 	},
-    { "cmp", OPC_CMP, 0, CI_USE_A      	       	},
-    { "cpx", OPC_CPX, 0, CI_USE_X      	       	},
-    { "cpy", OPC_CPY, 0, CI_USE_Y      	       	},
-    { "dea", OPC_DEA, 1, CI_USE_A | CI_CHG_A   	},
-    { "dec", OPC_DEC, 0, CI_NONE       	       	},
-    { "dex", OPC_DEX, 1, CI_USE_X | CI_CHG_X   	},
-    { "dey", OPC_DEY, 1, CI_USE_Y | CI_CHG_Y   	},
-    { "eor", OPC_EOR, 0, CI_USE_A | CI_CHG_A   	},
-    { "ina", OPC_INA, 1, CI_USE_A | CI_CHG_A	},
-    { "inc", OPC_INC, 0, CI_NONE       	       	},
-    { "inx", OPC_INX, 1, CI_USE_X | CI_CHG_X   	},
-    { "iny", OPC_INY, 1, CI_USE_Y | CI_CHG_Y  	},
-    { "jcc", OPC_JCC, 5, CI_BRA		  	},
-    { "jcs", OPC_JCS, 5, CI_BRA		  	},
-    { "jeq", OPC_JEQ, 5, CI_BRA		  	},
-    { "jmi", OPC_JMI, 5, CI_BRA		   	},
-    { "jmp", OPC_JMP, 3, CI_BRA        	       	},
-    { "jne", OPC_JNE, 5, CI_BRA		  	},
-    { "jpl", OPC_JPL, 5, CI_BRA		  	},
-    { "jsr", OPC_JSR, 3, CI_NONE		},
-    { "jvc", OPC_JVC, 5, CI_BRA		  	},
-    { "jvs", OPC_JVS, 5, CI_BRA		  	},
-    { "lda", OPC_LDA, 0, CI_CHG_A      	       	},
-    { "ldx", OPC_LDX, 0, CI_CHG_X      	       	},
-    { "ldy", OPC_LDY, 0, CI_CHG_Y      	       	},
-    { "lsr", OPC_LSR, 0, CI_USE_A | CI_CHG_A	},
-    { "nop", OPC_NOP, 1, CI_NONE       	       	},
-    { "ora", OPC_ORA, 0, CI_USE_A | CI_CHG_A	},
-    { "pha", OPC_PHA, 1, CI_USE_A      	       	},
-    { "php", OPC_PHP, 1, CI_NONE       	       	},
-    { "phx", OPC_PHX, 1, CI_USE_X      	       	},
-    { "phy", OPC_PHY, 1, CI_USE_Y      	       	},
-    { "pla", OPC_PLA, 1, CI_CHG_A      	       	},
-    { "plp", OPC_PLP, 1, CI_NONE       	       	},
-    { "plx", OPC_PLX, 1, CI_CHG_X      	       	},
-    { "ply", OPC_PLY, 1, CI_CHG_Y      	       	},
-    { "rol", OPC_ROL, 0, CI_USE_A | CI_CHG_A	},
-    { "ror", OPC_ROR, 0, CI_USE_A | CI_CHG_A	},
-    { "rti", OPC_RTI, 1, CI_NONE       	       	},
-    { "rts", OPC_RTS, 1, CI_NONE       	       	},
-    { "sbc", OPC_SBC, 0, CI_USE_A | CI_CHG_A	},
-    { "sec", OPC_SEC, 1, CI_NONE       	       	},
-    { "sed", OPC_SED, 1, CI_NONE       	       	},
-    { "sei", OPC_SEI, 1, CI_NONE       	       	},
-    { "sta", OPC_STA, 0, CI_USE_A      	       	},
-    { "stx", OPC_STX, 0, CI_USE_X      	       	},
-    { "sty", OPC_STY, 0, CI_USE_Y      	       	},
-    { "tax", OPC_TAX, 1, CI_USE_A | CI_CHG_X   	},
-    { "tay", OPC_TAY, 1, CI_USE_A | CI_CHG_Y   	},
-    { "trb", OPC_TRB, 0, CI_USE_A      	       	},
-    { "tsb", OPC_TSB, 0, CI_USE_A      	       	},
-    { "tsx", OPC_TSX, 1, CI_CHG_X      	       	},
-    { "txa", OPC_TXA, 1, CI_USE_X | CI_CHG_A   	},
-    { "txs", OPC_TXS, 1, CI_USE_X      	       	},
-    { "tya", OPC_TYA, 1, CI_USE_Y | CI_CHG_A   	}
+    { OPC_ADC, "adc", 0, REG_A,	   REG_A,    OF_NONE	},
+    { OPC_AND, "and", 0, REG_A,    REG_A,    OF_NONE	},
+    { OPC_ASL, "asl", 0, REG_A,    REG_A,    OF_NONE	},
+    { OPC_BCC, "bcc", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_BCS, "bcs", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_BEQ, "beq", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_BIT, "bit", 0, REG_A,    REG_NONE, OF_NONE	},
+    { OPC_BMI, "bmi", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_BNE, "bne", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_BPL, "bpl", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_BRA, "bra", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_BRK, "brk", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_BVC, "bvc", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_BVS, "bvs", 2, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_CLC, "clc", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_CLD, "cld", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_CLI, "cli", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_CLV, "clv", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_CMP, "cmp", 0, REG_A,    REG_NONE, OF_NONE	},
+    { OPC_CPX, "cpx", 0, REG_X,    REG_NONE, OF_NONE	},
+    { OPC_CPY, "cpy", 0, REG_Y,    REG_NONE, OF_NONE	},
+    { OPC_DEA, "dea", 1, REG_A,    REG_A,    OF_NONE	},
+    { OPC_DEC, "dec", 0, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_DEX, "dex", 1, REG_X,    REG_X,    OF_NONE	},
+    { OPC_DEY, "dey", 1, REG_Y,    REG_Y,    OF_NONE	},
+    { OPC_EOR, "eor", 0, REG_A,    REG_A,    OF_NONE	},
+    { OPC_INA, "ina", 1, REG_A,    REG_A,    OF_NONE	},
+    { OPC_INC, "inc", 0, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_INX, "inx", 1, REG_X,    REG_X,    OF_NONE	},
+    { OPC_INY, "iny", 1, REG_Y,    REG_Y,    OF_NONE	},
+    { OPC_JCC, "jcc", 5, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_JCS, "jcs", 5, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_JEQ, "jeq", 5, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_JMI, "jmi", 5, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_JMP, "jmp", 3, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_JNE, "jne", 5, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_JPL, "jpl", 5, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_JSR, "jsr", 3, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_JVC, "jvc", 5, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_JVS, "jvs", 5, REG_NONE, REG_NONE, OF_BRA	},
+    { OPC_LDA, "lda", 0, REG_NONE, REG_A,    OF_NONE	},
+    { OPC_LDX, "ldx", 0, REG_NONE, REG_X,    OF_NONE	},
+    { OPC_LDY, "ldy", 0, REG_NONE, REG_Y,    OF_NONE	},
+    { OPC_LSR, "lsr", 0, REG_A,    REG_A,    OF_NONE	},
+    { OPC_NOP, "nop", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_ORA, "ora", 0, REG_A,    REG_A,    OF_NONE	},
+    { OPC_PHA, "pha", 1, REG_A,    REG_NONE, OF_NONE	},
+    { OPC_PHP, "php", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_PHX, "phx", 1, REG_X,    REG_NONE, OF_NONE	},
+    { OPC_PHY, "phy", 1, REG_Y,    REG_NONE, OF_NONE	},
+    { OPC_PLA, "pla", 1, REG_NONE, REG_A,    OF_NONE	},
+    { OPC_PLP, "plp", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_PLX, "plx", 1, REG_NONE, REG_X,    OF_NONE	},
+    { OPC_PLY, "ply", 1, REG_NONE, REG_Y,    OF_NONE	},
+    { OPC_ROL, "rol", 0, REG_A,    REG_A,    OF_NONE	},
+    { OPC_ROR, "ror", 0, REG_A,    REG_A,    OF_NONE	},
+    { OPC_RTI, "rti", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_RTS, "rts", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_SBC, "sbc", 0, REG_A,    REG_A,    OF_NONE	},
+    { OPC_SEC, "sec", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_SED, "sed", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_SEI, "sei", 1, REG_NONE, REG_NONE, OF_NONE	},
+    { OPC_STA, "sta", 0, REG_A,    REG_NONE, OF_NONE	},
+    { OPC_STX, "stx", 0, REG_X,    REG_NONE, OF_NONE	},
+    { OPC_STY, "sty", 0, REG_Y,    REG_NONE, OF_NONE	},
+    { OPC_TAX, "tax", 1, REG_A,    REG_X,    OF_NONE	},
+    { OPC_TAY, "tay", 1, REG_A,    REG_Y,    OF_NONE	},
+    { OPC_TRB, "trb", 0, REG_A,    REG_NONE, OF_NONE	},
+    { OPC_TSB, "tsb", 0, REG_A,    REG_NONE, OF_NONE	},
+    { OPC_TSX, "tsx", 1, REG_NONE, REG_X,    OF_NONE	},
+    { OPC_TXA, "txa", 1, REG_X,    REG_A,    OF_NONE	},
+    { OPC_TXS, "txs", 1, REG_X,    REG_NONE, OF_NONE	},
+    { OPC_TYA, "tya", 1, REG_A,    REG_A,    OF_NONE	},
 };
 
 
@@ -214,20 +214,20 @@ const OPCDesc* GetOPCDesc (opc_t OPC)
 
 
 
-unsigned GetAMUseInfo (am_t AM)
+unsigned char GetAMUseInfo (am_t AM)
 /* Get usage info for the given addressing mode (addressing modes that use
- * index registers return CI_USE... info for these registers).
+ * index registers return REG_r info for these registers).
  */
 {
     /* Check the addressing mode. */
     switch (AM) {
-	case AM_ACC:	  return CI_USE_A;
-	case AM_ZPX:	  return CI_USE_X;
-	case AM_ABSX:	  return CI_USE_X;
-	case AM_ABSY:	  return CI_USE_Y;
-	case AM_ZPX_IND:  return CI_USE_X;
-	case AM_ZP_INDY:  return CI_USE_Y;
-	default:	  return CI_USE_NONE;
+       	case AM_ACC:   	  return REG_A;
+       	case AM_ZPX:   	  return REG_X;
+       	case AM_ABSX:  	  return REG_X;
+       	case AM_ABSY:  	  return REG_Y;
+       	case AM_ZPX_IND:  return REG_X;
+       	case AM_ZP_INDY:  return REG_Y;
+       	default:       	  return REG_NONE;
     }
 }
 

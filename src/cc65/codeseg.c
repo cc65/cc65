@@ -260,7 +260,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
      * if it does not exist. Ignore anything but local labels here.
      */
     Label = 0;
-    if ((OPC->Info & CI_MASK_BRA) == CI_BRA && Arg[0] == 'L') {
+    if ((OPC->Info & OF_BRA) != 0 && Arg[0] == 'L') {
 
 	unsigned Hash;
 

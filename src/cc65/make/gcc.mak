@@ -28,6 +28,7 @@ OBJS =	anonname.o	\
 	codeent.o	\
 	codegen.o 	\
 	codelab.o	\
+	codeinfo.o	\
 	codeopt.o	\
 	codeseg.o	\
 	compile.o 	\
@@ -41,7 +42,6 @@ OBJS =	anonname.o	\
 	exprheap.o     	\
 	exprnode.o	\
 	funcdesc.o	\
-	funcinfo.o	\
 	function.o     	\
 	global.o 	\
 	goto.o	   	\

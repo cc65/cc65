@@ -69,7 +69,8 @@ struct CodeEntry {
     char*      	       	Arg;   	       	/* Argument as string */
     unsigned    	Num;		/* Numeric argument */
     unsigned short  	Flags;		/* Flags */
-    unsigned short  	Info;  	       	/* Register usage info for this entry */
+    unsigned char	Use;		/* Registers used */
+    unsigned char	Chg;		/* Registers changed/destroyed */
     CodeLabel*	  	JumpTo;		/* Jump label */
     Collection	  	Labels;		/* Labels for this instruction */
 };

@@ -40,7 +40,6 @@
 /* cc65 */
 #include "codeinfo.h"
 #include "error.h"
-#include "funcinfo.h"
 #include "global.h"
 #include "codelab.h"
 #include "opcodes.h"
@@ -74,13 +73,14 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* 
     E->Arg  	= (Arg && Arg[0] != '\0')? xstrdup (Arg) : 0;
     E->Num  	= 0;
     E->Flags	= 0;
-    E->Info    	= D->Info;
+    E->Use	= D->Use;
+    E->Chg	= D->Chg;
     if (E->OPC == OPC_JSR && E->Arg) {
 	/* A subroutine call */
-     	E->Info |= GetFuncInfo (E->Arg);
+     	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
     } else {
 	/* Some other instruction */
-     	E->Info |= GetAMUseInfo (AM);
+     	E->Use |= GetAMUseInfo (AM);
     }
     E->JumpTo	= JumpTo;
     InitCollection (&E->Labels);
@@ -203,12 +203,12 @@ void OutputCodeEntry (const CodeEntry* E, FILE* F)
   	Chars += fprintf (F,
   			  "%*s; USE: %c%c%c CHG: %c%c%c",
   			  30-Chars, "",
-  			  (E->Info & CI_USE_A)? 'A' : '_',
-  			  (E->Info & CI_USE_X)? 'X' : '_',
-  			  (E->Info & CI_USE_Y)? 'Y' : '_',
-  			  (E->Info & CI_CHG_A)? 'A' : '_',
-  			  (E->Info & CI_CHG_X)? 'X' : '_',
-  			  (E->Info & CI_CHG_Y)? 'Y' : '_');
+       	       	       	  (E->Use & REG_A)? 'A' : '_',
+       	       	       	  (E->Use & REG_X)? 'X' : '_',
+       	       	       	  (E->Use & REG_Y)? 'Y' : '_',
+       	       	       	  (E->Chg & REG_A)? 'A' : '_',
+       	       	       	  (E->Chg & REG_X)? 'X' : '_',
+       	       	       	  (E->Chg & REG_Y)? 'Y' : '_');
 //    }
 
     /* Terminate the line */

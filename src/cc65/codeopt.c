@@ -210,11 +210,9 @@ static void OptJumpCascades (CodeSeg* S)
 		DelCodeLabel (S, OldLabel);
 	    }
 
-	    /* Remove usage information from the entry and use the usage
-	     * information from the new instruction instead.
-	     */
-	    E->Info &= ~(CI_MASK_USE | CI_MASK_CHG);
-	    E->Info |= N->Info & ~(CI_MASK_USE | CI_MASK_CHG);
+	    /* Use the usage information from the new instruction */
+	    E->Use = N->Use;
+	    E->Chg = N->Chg;
 
 	    /* Use the new label */
 	    AddLabelRef (NewLabel, E);

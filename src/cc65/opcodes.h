@@ -125,31 +125,37 @@ typedef enum {
 /* Addressing modes (bitmapped). */
 typedef enum {
     AM_IMP	= 0x0001,      	/* implicit */
-    AM_ACC	= 0x0002,	/* accumulator */
-    AM_IMM	= 0x0004,	/* immidiate */
-    AM_ZP      	= 0x0008, 	/* zeropage */
-    AM_ZPX 	= 0x0010,	/* zeropage,X */
-    AM_ABS 	= 0x0020,	/* absolute */
+    AM_ACC	= 0x0002,      	/* accumulator */
+    AM_IMM	= 0x0004,      	/* immidiate */
+    AM_ZP      	= 0x0008,      	/* zeropage */
+    AM_ZPX 	= 0x0010,      	/* zeropage,X */
+    AM_ABS 	= 0x0020,      	/* absolute */
     AM_ABSX	= 0x0040,      	/* absolute,X */
-    AM_ABSY    	= 0x0080,	/* absolute,Y */
-    AM_ZPX_IND	= 0x0100,	/* (zeropage,x) */
-    AM_ZP_INDY	= 0x0200,	/* (zeropage),y */
-    AM_ZP_IND	= 0x0400,	/* (zeropage) */
-    AM_BRA	= 0x0800	/* branch */
+    AM_ABSY    	= 0x0080,      	/* absolute,Y */
+    AM_ZPX_IND	= 0x0100,      	/* (zeropage,x) */
+    AM_ZP_INDY	= 0x0200,      	/* (zeropage),y */
+    AM_ZP_IND	= 0x0400,      	/* (zeropage) */
+    AM_BRA	= 0x0800       	/* branch */
 } am_t;
+
+/* Opcode info */
+#define OF_NONE	0x0000U		/* No additional information */
+#define OF_BRA 	0x0001U		/* Operation is a jump/branch */
 
 /* Opcode description */
 typedef struct {
-    char    	Mnemo[4];	/* Mnemonic */
-    opc_t   	OPC;   		/* Opcode */
-    unsigned	Size;		/* Size, 0 means "check addressing mode" */
-    unsigned   	Info;		/* Usage flags */
+    opc_t   	    OPC;       	/* Opcode */
+    char       	    Mnemo[4];	/* Mnemonic */
+    unsigned char   Size;      	/* Size, 0 means "check addressing mode" */
+    unsigned char   Use;	/* Registers used by this insn */
+    unsigned char   Chg;	/* Registers changed/destroyed by this insn */
+    unsigned char   Info;	/* Additional information */
 } OPCDesc;
 
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code				     */
+/*     	       	      	  	     Code		    		     */
 /*****************************************************************************/
 
 
@@ -165,9 +171,9 @@ unsigned GetInsnSize (opc_t OPC, am_t AM);
 const OPCDesc* GetOPCDesc (opc_t OPC);
 /* Get an opcode description */
 
-unsigned GetAMUseInfo (am_t AM);
+unsigned char GetAMUseInfo (am_t AM);
 /* Get usage info for the given addressing mode (addressing modes that use
- * index registers return CI_USE... info for these registers).
+ * index registers return REG_r info for these registers).
  */
 
 opc_t GetInverseBranch (opc_t OPC);

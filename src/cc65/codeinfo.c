@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  codeinfo.h				     */
+/*				  codeinfo.c				     */
 /*                                                                           */
 /*		    Additional information about 6502 code		     */
 /*                                                                           */
@@ -33,49 +33,105 @@
 
 
 
-#ifndef CODEINFO_H
-#define CODEINFO_H
+#include <stdlib.h>
+#include <string.h>
+
+/* cc65 */
+#include "codeinfo.h"
 
 
 
 /*****************************************************************************/
-/*  	       	 	  	     Data				     */
+/*     	       	      	  	     Data				     */
 /*****************************************************************************/
 
 
 
-/* Defines for registers. */
-#define REG_NONE	0x00U
-#define REG_A		0x01U
-#define REG_X		0x02U
-#define REG_Y		0x04U
-#define REG_SREG_LO	0x08U
-#define REG_SREG_HI	0x10U
-#define REG_TMP1	0x20U
-#define REG_PTR1_LO	0x40U
-#define REG_PTR1_HI	0x80U
-#define	REG_AX		(REG_A | REG_X)
-#define REG_XY		(REG_X | REG_Y)
-#define REG_AXY		(REG_A | REG_X | REG_Y)
+/* Table listing the function names and code info values for known internally
+ * used functions. This table should get auto-generated in the future.
+ */
+typedef struct FuncInfo FuncInfo;
+struct FuncInfo {
+    const char*	    Name;	/* Function name */
+    unsigned char   Use;	/* Register usage */
+    unsigned char   Chg;	/* Changed/destroyed registers */
+};
+
+static const FuncInfo FuncInfoTable[] = {
+    { "booleq",		REG_NONE,    	REG_AX	},
+    { "boolge",		REG_NONE,	REG_AX	},
+    { "boolgt",		REG_NONE,	REG_AX	},
+    { "boolle",		REG_NONE,	REG_AX	},
+    { "boollt",		REG_NONE,	REG_AX	},
+    { "boolne",		REG_NONE,	REG_AX	},
+    { "booluge",   	REG_NONE,	REG_AX	},
+    { "boolugt",   	REG_NONE,	REG_AX	},
+    { "boolule",   	REG_NONE,	REG_AX	},
+    { "boolult",   	REG_NONE,	REG_AX	},
+    { "decax1",     	REG_AX,		REG_AX  },
+    { "decax2",     	REG_AX,		REG_AX  },
+    { "decax3",     	REG_AX,		REG_AX  },
+    { "decax4",     	REG_AX,		REG_AX  },
+    { "decax5",     	REG_AX,		REG_AX  },
+    { "decax6",     	REG_AX,		REG_AX  },
+    { "decax7",     	REG_AX,		REG_AX  },
+    { "decax8",     	REG_AX,		REG_AX  },
+    { "decaxy",	   	REG_AXY,	REG_AX	},
+    { "decsp2",    	REG_NONE,	REG_A	},
+    { "decsp3",    	REG_NONE,	REG_A	},
+    { "decsp4",    	REG_NONE,	REG_A	},
+    { "decsp5",    	REG_NONE,	REG_A	},
+    { "decsp6",    	REG_NONE,	REG_A	},
+    { "decsp7",    	REG_NONE,	REG_A	},
+    { "decsp8",    	REG_NONE,	REG_A	},
+    { "ldax0sp",   	REG_Y,		REG_AX	},
+    { "ldaxysp",   	REG_Y,		REG_AX 	},
+    { "pusha",	   	REG_A,		REG_Y	},
+    { "pusha0",	       	REG_A,		REG_XY	},
+    { "pushax",	   	REG_AX,		REG_Y	},
+    { "pushw0sp",  	REG_NONE,	REG_AXY	},
+    { "pushwysp",  	REG_Y,		REG_AXY	},
+    { "tosicmp",   	REG_AX,		REG_AXY },
+};
+#define FuncInfoCount	(sizeof(FuncInfoTable) / sizeof(FuncInfoTable[0]))
 
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code				     */
+/*     	       	      	  	     Code 		 		     */
 /*****************************************************************************/
 
 
 
-void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg);
+static int CompareFuncInfo (const void* Key, const void* Info)
+/* Compare function for bsearch */
+{
+    return strcmp (Key, ((const	FuncInfo*) Info)->Name);
+}
+
+
+
+void GetFuncInfo (const char* Name, unsigned char* Use, unsigned char* Chg)
 /* For the given function, lookup register information and combine it with
  * the information already in place. If the function is unknown, assume it
  * will use all registers and load all registers.
+ * See codeinfo.h for possible flags.
  */
+{
+    /* Search for the function */
+    const FuncInfo* Info = bsearch (Name, FuncInfoTable, FuncInfoCount,
+			  	    sizeof(FuncInfo), CompareFuncInfo);
 
-
-
-/* End of codeinfo.h */
-#endif
+    /* Do we know the function? */
+    if (Info) {
+	/* Use the information we have */
+	*Use |= Info->Use;
+	*Chg |= Info->Chg;
+    } else {
+	*Use |= REG_AXY;
+	*Chg |= REG_AXY;
+    }
+}
 
 
 

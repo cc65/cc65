@@ -23,7 +23,7 @@ S_OBJS	= crt0.o oserror.o oserrlist.o randomize.o fio_module.o
 
 EMDS = geos-vdc.emd
 
-JOYS =
+JOYS = geos-stdjoy.joy
 
 TGIS =
 

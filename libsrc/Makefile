@@ -207,6 +207,7 @@ geoslib:
 	    done \
 	done
 	cp geos/devel/*.emd .
+	cp geos/devel/*.joy .
 
 #-----------------------------------------------------------------------------
 # CBM PET machines

@@ -3,8 +3,8 @@
 <article>
 
 <title>cc65 compiler intro
-<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org"> and CyberX
-<date>06.13.2002
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org"> and CbmNut <htmlurl url="mailto:cbmnut@hushmail.com" name="cbmnut@hushmail.com">
+<date>07.13.2002
 
 <abstract>
 How to use the cc65 C compiler - an introduction.
@@ -238,7 +238,9 @@ url="cl65.html" name="cl65.html">.
 Depending on the target, the compiler chooses several methods of making a
 program available for execution.  Here we list sample emulators and
 instructions for running the program.  Unless noted, similar instructions
-would also apply to a real machine.
+would also apply to a real machine.  One word of advice: we suggest you clear
+the screen at the start, and wait for a keypress at the end of your program,
+as each target varies in it's start and exit conditions.
 
 <sect1>Apple<p>
 
@@ -247,8 +249,7 @@ would also apply to a real machine.
 computer, with sound, video, joysticks, serial port, and disk images. Roms and
 dos disk included. Includes monitor. Only for Windows. The package comes with
 roms and dos3.3 disk (called master.dsk), however you will need a2tools
-(available at <url url="http://hotel04.ausys.se/pausch/apple2/#a2tools">) and
-applehdr (included in the Apple package at util/apple/)
+(available at <url url="http://hotel04.ausys.se/pausch/apple2/#a2tools">).
 
 Compile the tutorial with
 
@@ -277,10 +278,9 @@ click the big Apple logo to boot the system.  Then type this on the Apple:
 BRUN TEST
 </verb></tscreen>
 
-You will see the "Hello, World!" appear on the same line.  We suggest you
-clear the screen first in your programs. Thanks to Oliver Schmidt, <htmlurl
-url="mailto:oliver@jantzer-schmidt.de" name="oliver@jantzer-schmidt.de"> for
-his help in completing this section.
+You will see the "Hello, World!" appear on the same line.  Thanks to Oliver
+Schmidt, <htmlurl url="mailto:oliver@jantzer-schmidt.de"
+name="oliver@jantzer-schmidt.de"> for his help in completing this section.
 
 <sect1>Atari<p>
 
@@ -289,8 +289,7 @@ his help in completing this section.
 400/800/65XE/130XE/800XL/1200XL/5200, with stereo sound, disk images, scanline
 exact NTSC/PAL video, joysticks, mouse, cartridges and ram expansions.
 Includes monitor. Unfortunately only for Windows. You will need the emulator,
-atarixl.rom or atariosb.rom/ataribas.rom
-and dos25.xfd files (not supplied).
+atarixl.rom or atariosb.rom/ataribas.rom and dos25.xfd files (not supplied).
 
 Compile the tutorial with
 
@@ -298,10 +297,10 @@ Compile the tutorial with
 cl65 -O -t atari hello.c text.s
 </verb></tscreen>
 
-Start the emulator, choose File>Autoboot image or File>Load executable, and point
-to the hello executable.  It is customary to rename executables of this type to
-hello.xex.  The file has a 7 byte header meant to be loaded directly from Atari
-DOS 2/2.5 or compatibles.
+Start the emulator, choose File>Autoboot image or File>Load executable, and
+point to the hello executable.  It is customary to rename executables of this
+type to hello.xex.  The file has a 7 byte header meant to be loaded directly
+from Atari DOS 2/2.5 or compatibles.
 
 On a real Atari, you would need a disk drive and Atari Dos 2.5 or compatible.
 Turn on the computer, type
@@ -316,10 +315,11 @@ and enter HELLO.
 The emulation also supports this method.  Look at Atari>Settings and check
 Enable H: Patch for Hard Disk Devices, then Atari>Hard disks and set the path
 of H1: to your executables directory, then use H0:HELLO.XEX in the above
-proceedure to access your hardrive directly.
+proceedure (after pressing L) to access your hardrive directly.
 
-<bf>Note:</bf> There is no delay after the program exits.  Your C program
-should wait for a keypress if you want to see any output.
+<bf>Note:</bf> There is no delay after the program exits, as you are returned
+to the DOS menu.  Your C program should wait for a keypress if you want to see
+any output.
 
 <sect1>Commodore<p>
 
@@ -357,7 +357,10 @@ on PET/CBM II/C128, then type
 RUN
 </verb></tscreen>
 
-We need your help! Recommended emulators and instructions for other machines
+The output will appear on a separate line, and you will be returned to a BASIC
+prompt.
+
+We need your help! Recommended emulators and instructions for other targets
 are missing. We suggest an emulator with good compatibility. Also, being able
 to run all computers in the target series is good for target compatibility
 testing. A machine language monitor is almost essential for debugging, but a
@@ -366,6 +369,3 @@ native debugger could be used as well.
 Finally, emulators which run on Unix/Windows would help reach a wider audience.
 
 </article>
-
-
-

@@ -719,7 +719,7 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 		    E->AM != AM65_ZPY) {
 		    /* Use the A register instead */
        		    CE_ReplaceOPC (E, OP65_STA);
-		}				
+		}
 	        break;
 
 	    case OP65_STY:
@@ -803,6 +803,9 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 	}
 
     }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

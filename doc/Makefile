@@ -7,6 +7,7 @@
 
 SGML  =	ar65.sgml	\
         atari.sgml      \
+        c128.sgml       \
         c64.sgml        \
 	ca65.sgml	\
 	ca65html.sgml	\

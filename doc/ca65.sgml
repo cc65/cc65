@@ -909,7 +909,58 @@ if you want to access the "other" symbol <tt/bar/, you would have to write:
 </verb></tscreen>
 
 
-<sect>Address sizes<label id="address-sizes"><p>
+<sect>Address sizes and memory models<label id="address-sizes"><p>
+
+<sect1>Address sizes<p>
+
+ca65 assigns each segment and each symbol an address size. This is true, even
+if the symbol is not used as an address. You may also think of a value range
+of the symbol instead of an address size.
+
+Possible address sizes are:
+
+<itemize>
+<item>Zeropage or direct (8 bits)
+<item>Absolute (16 bits)
+<item>Far (24 bits)
+<item>Long (32 bits)
+<itemize>
+
+Since the assembler uses default address sizes for the segments and symbols,
+it is usually not necessary to override the default behaviour. In cases, where
+it is necessary, the following keywords may be used to specify address sizes:
+
+<itemize>
+<item>DIRECT, ZEROPAGE or ZP for zeropage addressing (8 bits).
+<item>ABSOLUTE, ABS or NEAR for absolute addressing (16 bits).
+<item>FAR for far addressing (24 bits).
+<item>LONG or DWORD for long addressing (32 bits).
+<itemize>
+
+
+<sect1>Address sizes of segments<p>
+
+The assembler assigns an address size to each segment. Since the
+representation of a label within this segment is "segment start + offset",
+labels will inherit the address size of the segment they are declared in.
+
+The address size of a segment may be changed, by using an optional address
+size modifier. See the <tt/<ref id=".SEGMENT" name="segment directive">/ for
+an explanation on how this is done.
+
+
+<sect1>Address sizes of symbols<p>
+
+
+
+
+<sect1>Memory models<p>
+
+The default address size of a segment depends on the memory model used. Since
+labels inherit the address size from the segment they are declared in,
+changing the memory model is an easy way to change the address size of many
+symbols at once.
+
 
 
 
@@ -2025,27 +2076,6 @@ Here's a list of all control commands and a description, what they do:
 
   <descrip>
 
-  <tag><tt>dollar_is_pc</tt></tag>
-
-    The dollar sign may be used as an alias for the star (`*'), which
-    gives the value of the current PC in expressions.
-    Note: Assignment to the pseudo variable is not allowed.
-
-  <tag><tt>labels_without_colons</tt></tag>
-
-    Allow labels without a trailing colon. These labels are only accepted,
-    if they start at the beginning of a line (no leading white space).
-
-  <tag><tt>loose_string_term</tt></tag>
-
-    Accept single quotes as well as double quotes as terminators for string
-    constants.
-
-  <tag><tt>loose_char_term</tt></tag>
-
-    Accept single quotes as well as double quotes as terminators for char
-    constants.
-
   <tag><tt>at_in_identifiers</tt></tag>
 
     Accept the at character (`@') as a valid character in identifiers. The
@@ -2058,6 +2088,17 @@ Here's a list of all control commands and a description, what they do:
     at character is not allowed to start an identifier, even with this
     feature enabled.
 
+  <tag><tt>dollar_is_pc</tt></tag>
+
+    The dollar sign may be used as an alias for the star (`*'), which
+    gives the value of the current PC in expressions.
+    Note: Assignment to the pseudo variable is not allowed.
+
+  <tag><tt>labels_without_colons</tt></tag>
+
+    Allow labels without a trailing colon. These labels are only accepted,
+    if they start at the beginning of a line (no leading white space).
+
   <tag><tt>leading_dot_in_identifiers</tt></tag>
 
     Accept the dot (`.') as the first character of an identifier. This may be
@@ -2067,13 +2108,15 @@ Here's a list of all control commands and a description, what they do:
     overridden. When using this feature, you may also get into trouble if
     later versions of the assembler define new keywords starting with a dot.
 
-  <tag><tt>pc_assignment</tt></tag>
+  <tag><tt>loose_char_term</tt></tag>
 
-    Allow assignments to the PC symbol (`*' or `&dollar;' if <tt/dollar_is_pc/
-    is enabled). Such an assignment is handled identical to the <tt><ref
-    id=".ORG" name=".ORG"></tt> command (which is usually not needed, so just
-    removing the lines with the assignments may also be an option when porting
-    code written for older assemblers).
+    Accept single quotes as well as double quotes as terminators for char
+    constants.
+
+  <tag><tt>loose_string_term</tt></tag>
+
+    Accept single quotes as well as double quotes as terminators for string
+    constants.
 
   <tag><tt>missing_char_term</tt></tag>
 
@@ -2084,6 +2127,21 @@ Here's a list of all control commands and a description, what they do:
     </verb></tscreen>
     <bf/Note:/ This does not work in conjunction with <tt/.FEATURE
     loose_string_term/, since in this case the input would be ambigous.
+
+  <tag><tt>pc_assignment</tt></tag>
+
+    Allow assignments to the PC symbol (`*' or `&dollar;' if <tt/dollar_is_pc/
+    is enabled). Such an assignment is handled identical to the <tt><ref
+    id=".ORG" name=".ORG"></tt> command (which is usually not needed, so just
+    removing the lines with the assignments may also be an option when porting
+    code written for older assemblers).
+
+  <tag><tt>ubiquitous_idents</tt></tag>
+
+    Allow the use of instructions names as names for macros and symbols. This
+    makes it possible to "overload" instructions by defining a macro with the
+    same name. This does also make it possible to introduce hard to find errors
+    in your code, so be careful!
 
   </descrip>
 
@@ -2823,33 +2881,35 @@ Here's a list of all control commands and a description, what they do:
   (and up to 65534 per executable). There are shortcut commands for
   the most common segments ("CODE", "DATA" and "BSS").
 
-  The command is followed by a string containing the segment name (there
-  are some constraints for the name - as a rule of thumb use only those
-  segment names that would also be valid identifiers). There may also be
-  an optional attribute separated by a comma. Valid attributes are
-  "<tt/zeropage/" and "<tt/absolute/".
+  The command is followed by a string containing the segment name (there are
+  some constraints for the name - as a rule of thumb use only those segment
+  names that would also be valid identifiers). There may also be an optional
+  address size separated by a colon. See the section covering <tt/<ref
+  id="address-sizes" name="address sizes">/ for more information.
 
-  When specifying a segment for the first time, "absolute" is the
-  default. For all other uses, the attribute specified the first time
-  is the default.
+  The default address size for a segment depends on the memory model specified
+  on the command line. The default is "absolute", which means that you don't
+  have to use an address size modifier in most cases.
 
-  "absolute" means that this is a segment with absolute addressing. That
-  is, the segment will reside somewhere in core memory outside the zero
-  page. "zeropage" means the opposite: The segment will be placed in the
-  zero page and direct (short) addressing is possible for data in this
-  segment.
+  "absolute" means that the is a segment with 16 bit (absolute) addressing.
+  That is, the segment will reside somewhere in core memory outside the zero
+  page. "zeropage" (8 bit) means that the segment will be placed in the zero
+  page and direct (short) addressing is possible for data in this segment.
 
   Beware: Only labels in a segment with the zeropage attribute are marked
   as reachable by short addressing. The `*' (PC counter) operator will
   work as in other segments and will create absolute variable values.
 
-  Example:
+  Please note that a segment cannot have two different address sizes. A
+  segment specified as zeropage cannot be declared as being absolute later.
+
+  Examples:
 
   <tscreen><verb>
        	.segment "ROM2"			; Switch to ROM2 segment
-	.segment "ZP2", zeropage	; New direct segment
- 	.segment "ZP2"			; Ok, will use last attribute
-	.segment "ZP2", absolute	; Error, redecl mismatch
+	.segment "ZP2": zeropage	; New direct segment
+ 	.segment "ZP2" 			; Ok, will use last attribute
+	.segment "ZP2": absolute	; Error, redecl mismatch
   </verb></tscreen>
 
   See: <tt><ref id=".BSS" name=".BSS"></tt>, <tt><ref id=".CODE"

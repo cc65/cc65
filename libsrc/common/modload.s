@@ -68,7 +68,10 @@ Header:         .res    O65_HDR_SIZE    ; The o65 header
 ; Input
 InputByte       = Header                ; Byte read from input
 
-.data
+; Relocation
+RelocVal        = Header + 1            ; Relocation value
+
+.data      
 Read:   jmp     $FFFF                   ; Jump to read routine
 
 .rodata
@@ -129,7 +132,7 @@ GetReloc:
 
 ;------------------------------------------------------------------------------
 ; FormatError: Bail out with an o65 format error
-                            
+
 .code
 FormatError:
         lda     #MLOAD_ERR_FMT
@@ -240,8 +243,8 @@ Loop:   jsr     ReadByte                ; Read byte from relocation table
 @L2:    jsr     ReadByte
         and     #O65_SEGID_MASK
         jsr     GetReloc
-        sta     ptr1
-        stx     ptr1+1
+        sta     RelocVal
+        stx     RelocVal+1
 
 ; Get the relocation byte again, this time extract the relocation type.
 
@@ -262,7 +265,7 @@ Loop:   jsr     ReadByte                ; Read byte from relocation table
 RelocLow:
         ldy     #0
         clc
-        lda     ptr1
+        lda     RelocVal
         bcc     AddCommon
 
 ; Relocate a high byte
@@ -271,9 +274,9 @@ RelocHigh:
         jsr     ReadByte                ; Read low byte from relocation table
         ldy     #0
         clc
-        adc     ptr1                    ; We just need the carry
+        adc     RelocVal                ; We just need the carry
 AddHigh:
-        lda     ptr1+1
+        lda     RelocVal+1
 AddCommon:
         adc     (TPtr),y
         sta     (TPtr),y
@@ -284,7 +287,7 @@ AddCommon:
 RelocWord:
         ldy     #0
         clc
-        lda     ptr1
+        lda     RelocVal
         adc     (TPtr),y
         sta     (TPtr),y
         iny

@@ -23,6 +23,8 @@ all:
 	make -f make\watcom.mak
 	cd ..\ld65
 	make -f make\watcom.mak
+	cd ..\od65
+	make -f make\watcom.mak
 	cd ..
 
 dos:
@@ -39,6 +41,8 @@ dos:
 	cd ..\grc
        	make -DTARGET=DOS32 -f make\watcom.mak
 	cd ..\ld65
+       	make -DTARGET=DOS32 -f make\watcom.mak
+	cd ..\od65
        	make -DTARGET=DOS32 -f make\watcom.mak
 	cd ..
 
@@ -57,6 +61,8 @@ clean:
 	make -f make\watcom.mak clean
 	cd ..\ld65
 	make -f make\watcom.mak clean
+	cd ..\od65
+	make -f make\watcom.mak clean
 	cd ..
 
 strip:
@@ -71,6 +77,8 @@ strip:
 	@cd ..\grc
 	@-make -f make\watcom.mak strip
 	@cd ..\ld65
+	@-make -f make\watcom.mak strip
+	@cd ..\od65
 	@-make -f make\watcom.mak strip
 	@cd ..
 

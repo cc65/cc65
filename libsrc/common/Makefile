@@ -67,7 +67,6 @@ C_OBJS =	_afailed.o	\
 		strtok.o	\
                 system.o        \
                 timezone.o      \
-                vfscanf.o       \
                 vscanf.o        \
                 vsscanf.o
 
@@ -169,6 +168,7 @@ S_OBJS = 	_cwd.o          \
                 unlink.o        \
                 utscopy.o       \
 		vfprintf.o	\
+                vfscanf.o       \
 		vprintf.o       \
 		vsprintf.o	\
 		zerobss.o

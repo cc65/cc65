@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -59,6 +59,7 @@
 
 
 /* Bits for the Flags value in SymEntry */
+#define SF_NONE         0x0000          /* Empty flag set */
 #define SF_USER		0x0001		/* User bit */
 #define SF_TRAMPOLINE  	0x0002		/* Trampoline entry */
 #define SF_EXPORT      	0x0004		/* Export this symbol */
@@ -67,6 +68,7 @@
 #define SF_ZP  	       	0x0020		/* Declared as zeropage symbol */
 #define SF_ABS		0x0040 		/* Declared as absolute symbol */
 #define SF_LABEL        0x0080          /* Used as a label */
+#define SF_FORCED       0x0100          /* Forced import, SF_IMPORT also set */
 #define SF_INDEXED	0x0800		/* Index is valid */
 #define SF_CONST    	0x1000		/* The symbol has a constant value */
 #define SF_MULTDEF     	0x2000		/* Multiply defined symbol */
@@ -76,8 +78,6 @@
 /* Combined stuff */
 #define SF_UNDEFMASK	(SF_REFERENCED | SF_DEFINED | SF_IMPORT)
 #define SF_UNDEFVAL	(SF_REFERENCED)
-#define SF_IMPMASK	(SF_TRAMPOLINE | SF_IMPORT | SF_REFERENCED)
-#define SF_IMPVAL	(SF_IMPORT | SF_REFERENCED)
 #define SF_EXPMASK	(SF_TRAMPOLINE | SF_EXPORT)
 #define SF_EXPVAL	(SF_EXPORT)
 #define SF_DBGINFOMASK	(SF_TRAMPOLINE | SF_DEFINED | SF_EXPORT | SF_IMPORT)
@@ -462,7 +462,7 @@ SymEntry* SymRef (const char* Name, int Scope)
 
 
 
-void SymImport (const char* Name, int ZP)
+static void SymImportInternal (const char* Name, unsigned Flags)
 /* Mark the given symbol as an imported symbol */
 {
     SymEntry* S;
@@ -486,26 +486,47 @@ void SymImport (const char* Name, int ZP)
      	return;
     }
 
-    /* If the symbol is marked as global, check the symbol size, then do
+    /* If the symbol is marked as global, check the symbol flags, then do
      * silently remove the global flag
      */
     if (S->Flags & SF_GLOBAL) {
-     	if ((ZP != 0) != ((S->Flags & SF_ZP) != 0)) {
+     	if ((Flags & (SF_ZP | SF_FORCED)) != (S->Flags & (SF_ZP | SF_FORCED))) {
      	    Error (ERR_SYM_REDECL_MISMATCH, Name);
      	}
         S->Flags &= ~SF_GLOBAL;
     }
 
     /* Set the symbol data */
-    S->Flags |= SF_IMPORT;
-    if (ZP) {
-     	S->Flags |= SF_ZP;
-    }
+    S->Flags |= (SF_IMPORT | Flags);
 }
 
 
 
-void SymExport (const char* Name, int ZP)
+void SymImport (const char* Name)
+/* Mark the given symbol as an imported symbol */
+{
+    SymImportInternal (Name, SF_NONE);
+}
+
+
+
+void SymImportZP (const char* Name)
+/* Mark the given symbol as a forced imported symbol */
+{
+    SymImportInternal (Name, SF_ZP);
+}
+
+
+
+void SymImportForced (const char* Name)
+/* Mark the given symbol as a forced imported symbol */
+{
+    SymImportInternal (Name, SF_FORCED);
+}
+
+
+
+static void SymExportInternal (const char* Name, unsigned Flags)
 /* Mark the given symbol as an exported symbol */
 {
     SymEntry* S;
@@ -528,22 +549,35 @@ void SymExport (const char* Name, int ZP)
      * silently remove the global flag
      */
     if (S->Flags & SF_GLOBAL) {
-     	if ((ZP != 0) != ((S->Flags & SF_ZP) != 0)) {
+       	if ((Flags & SF_ZP) != (S->Flags & SF_ZP)) {
      	    Error (ERR_SYM_REDECL_MISMATCH, Name);
      	}
         S->Flags &= ~SF_GLOBAL;
     }
 
     /* Set the symbol data */
-    S->Flags |= SF_EXPORT | SF_REFERENCED;
-    if (ZP) {
-     	S->Flags |= SF_ZP;
-    }
+    S->Flags |= (SF_EXPORT | SF_REFERENCED | Flags);
 }
 
 
 
-void SymGlobal (const char* Name, int ZP)
+void SymExport (const char* Name)
+/* Mark the given symbol as an exported symbol */
+{
+    SymExportInternal (Name, SF_NONE);
+}
+
+
+
+void SymExportZP (const char* Name)
+/* Mark the given symbol as an exported zeropage symbol */
+{
+    SymExportInternal (Name, SF_ZP);
+}
+
+
+
+static void SymGlobalInternal (const char* Name, unsigned Flags)
 /* Mark the given symbol as a global symbol, that is, as a symbol that is
  * either imported or exported.
  */
@@ -562,17 +596,34 @@ void SymGlobal (const char* Name, int ZP)
     /* If the symbol is already marked as import or export, check the
      * size of the definition, then bail out. */
     if (S->Flags & SF_IMPORT || S->Flags & SF_EXPORT) {
-     	if ((ZP != 0) != ((S->Flags & SF_ZP) != 0)) {
+       	if ((Flags & SF_ZP) != (S->Flags & SF_ZP)) {
      	    Error (ERR_SYM_REDECL_MISMATCH, Name);
      	}
      	return;
     }
 
     /* Mark the symbol */
-    S->Flags |= SF_GLOBAL;
-    if (ZP) {
-     	S->Flags |= SF_ZP;
-    }
+    S->Flags |= (SF_GLOBAL | Flags);
+}
+
+
+
+void SymGlobal (const char* Name)
+/* Mark the given symbol as a global symbol, that is, as a symbol that is
+ * either imported or exported.
+ */
+{
+    SymGlobalInternal (Name, SF_NONE);
+}
+
+
+
+void SymGlobalZP (const char* Name)
+/* Mark the given symbol as a global zeropage symbol, that is, as a symbol
+ * that is either imported or exported.
+ */
+{
+    SymGlobalInternal (Name, SF_ZP);
 }
 
 
@@ -1005,7 +1056,7 @@ void SymCheck (void)
 		PWarning (&S->Pos, WARN_SYM_NOT_REFERENCED, S->Name);
 	    }
 	    if (S->Flags & SF_IMPORT) {
-		if ((S->Flags & SF_REFERENCED) == 0) {
+		if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
 		    /* Imported symbol is not referenced */
 		    PWarning (&S->Pos, WARN_IMPORT_NOT_REFERENCED, S->Name);
 		} else {
@@ -1063,10 +1114,18 @@ void WriteImports (void)
     /* Write the import count to the list */
     ObjWriteVar (ImportCount);
 
-    /* Walk throught list and write all imports to the file */
+    /* Walk throught list and write all valid imports to the file. An import
+     * is considered valid, if it is either referenced, or the forced bit is
+     * set. Otherwise, the import is ignored (no need to link in something
+     * that isn't used).
+     */
     S = SymList;
     while (S) {
-     	if ((S->Flags & SF_IMPMASK) == SF_IMPVAL) {
+        printf ("%s: %04X - ", S->Name, S->Flags);
+        if ((S->Flags & (SF_TRAMPOLINE | SF_IMPORT)) == SF_IMPORT &&
+            (S->Flags & (SF_REFERENCED | SF_FORCED)) != 0) {
+
+            printf ("imported\n");
      	    if (S->Flags & SF_ZP) {
      		ObjWrite8 (IMP_ZP);
      	    } else {
@@ -1074,7 +1133,9 @@ void WriteImports (void)
      	    }
        	    ObjWriteStr (S->Name);
      	    ObjWritePos (&S->Pos);
-     	}
+     	} else {
+            printf ("ignored\n");
+        }
      	S = S->List;
     }
 

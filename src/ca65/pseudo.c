@@ -140,7 +140,7 @@ static void SetBoolOption (unsigned char* Flag)
 
 
 
-static void ExportImport (void (*SymFunc) (const char*, int), int ZP)
+static void ExportImport (void (*SymFunc) (const char*))
 /* Export or import symbols */
 {
     while (1) {
@@ -148,7 +148,7 @@ static void ExportImport (void (*SymFunc) (const char*, int), int ZP)
        	    ErrorSkip (ERR_IDENT_EXPECTED);
      	    break;
      	}
-     	SymFunc (SVal, ZP);
+     	SymFunc (SVal);
      	NextTok ();
      	if (Tok == TOK_COMMA) {
      	    NextTok ();
@@ -640,7 +640,7 @@ static void DoExitMacro (void)
 static void DoExport (void)
 /* Export a symbol */
 {
-    ExportImport (SymExport, 0);
+    ExportImport (SymExport);
 }
 
 
@@ -648,7 +648,7 @@ static void DoExport (void)
 static void DoExportZP (void)
 /* Export a zeropage symbol */
 {
-    ExportImport (SymExport, 1);
+    ExportImport (SymExportZP);
 }
 
 
@@ -791,10 +791,18 @@ static void DoFileOpt (void)
 
 
 
+static void DoForceImport (void)
+/* Do a forced import on a symbol */
+{
+    ExportImport (SymImportForced);
+}
+
+
+
 static void DoGlobal (void)
 /* Declare a global symbol */
 {
-    ExportImport (SymGlobal, 0);
+    ExportImport (SymGlobal);
 }
 
 
@@ -802,7 +810,7 @@ static void DoGlobal (void)
 static void DoGlobalZP (void)
 /* Declare a global zeropage symbol */
 {
-    ExportImport (SymGlobal, 1);
+    ExportImport (SymGlobalZP);
 }
 
 
@@ -836,7 +844,7 @@ static void DoI8 (void)
 static void DoImport (void)
 /* Import a symbol */
 {
-    ExportImport (SymImport, 0);
+    ExportImport (SymImport);
 }
 
 
@@ -844,7 +852,7 @@ static void DoImport (void)
 static void DoImportZP (void)
 /* Import a zero page symbol */
 {
-    ExportImport (SymImport, 1);
+    ExportImport (SymImportZP);
 }
 
 
@@ -1435,6 +1443,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,        	DoFarAddr	},
     { ccNone,		DoFeature	},
     { ccNone,		DoFileOpt	},
+    { ccNone,           DoForceImport   },
     { ccNone,		DoUnexpected	},	/* .FORCEWORD */
     { ccNone,		DoGlobal	},
     { ccNone,		DoGlobalZP	},

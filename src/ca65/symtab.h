@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -85,15 +85,29 @@ int SymIsDef (const char* Name, int Scope);
 int SymIsRef (const char* Name, int Scope);
 /* Return true if the given symbol has been referenced */
 
-void SymImport (const char* Name, int ZP);
+void SymImport (const char* Name);
 /* Mark the given symbol as an imported symbol */
 
-void SymExport (const char* Name, int ZP);
+void SymImportZP (const char* Name);
+/* Mark the given symbol as a imported zeropage symbol */
+
+void SymImportForced (const char* Name);
+/* Mark the given symbol as a forced imported symbol */
+
+void SymExport (const char* Name);
 /* Mark the given symbol as an exported symbol */
 
-void SymGlobal (const char* Name, int ZP);
+void SymExportZP (const char* Name);
+/* Mark the given symbol as an exported zeropage symbol */
+
+void SymGlobal (const char* Name);
 /* Mark the given symbol as a global symbol, that is, as a symbol that is
  * either imported or exported.
+ */
+                                
+void SymGlobalZP (const char* Name);
+/* Mark the given symbol as a global zeropage symbol, that is, as a symbol
+ * that is either imported or exported.
  */
 
 void SymConDes (const char* Name, unsigned Type, unsigned Prio);

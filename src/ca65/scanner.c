@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -167,6 +167,7 @@ struct DotKeyword {
     { ".FEATURE",	TOK_FEATURE	},
     { ".FILEOPT",	TOK_FILEOPT	},
     { ".FOPT",  	TOK_FILEOPT	},
+    { ".FORCEIMPORT",   TOK_FORCEIMPORT },
     { ".FORCEWORD",	TOK_FORCEWORD	},
     { ".GLOBAL",	TOK_GLOBAL	},
     { ".GLOBALZP",	TOK_GLOBALZP	},

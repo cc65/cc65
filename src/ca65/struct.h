@@ -54,7 +54,7 @@ struct SymTable;
 
 
 
-long GetStructSize (SymTable* Struct);
+long GetStructSize (struct SymTable* Struct);
 /* Get the size of a struct */
 
 void DoStruct (void);

@@ -68,7 +68,8 @@ const char* TargetNames [TGT_COUNT] = {
     "apple2",
     "geos",
     "lunix",
-    "atmos"
+    "atmos",
+    "nes",
 };
 
 
@@ -92,6 +93,7 @@ const cpu_t DefaultCPU[TGT_COUNT] = {
     CPU_6502,           /* geos */
     CPU_6502,           /* lunix */
     CPU_6502,           /* atmos */
+    CPU_6502,           /* nes */
 };
 
 

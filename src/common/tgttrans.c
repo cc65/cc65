@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -157,6 +157,7 @@ void TgtTranslateInit (void)
 	case TGT_GEOS:		memcpy (Tab, CTNone, sizeof (Tab));  	break;
 	case TGT_LUNIX:		memcpy (Tab, CTNone, sizeof (Tab));  	break;
        	case TGT_ATMOS:		memcpy (Tab, CTNone, sizeof (Tab));  	break;
+       	case TGT_NES:		memcpy (Tab, CTNone, sizeof (Tab));  	break;
 	default:
 	    AbEnd ("Internal error: Target system unknown (%d)", Target);
     }
@@ -218,3 +219,4 @@ void TgtTranslateSet (unsigned Index, unsigned char C)
 
 
 
+                    

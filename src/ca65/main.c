@@ -73,6 +73,7 @@ static void Usage (void)
     	     "Usage: %s [options] file\n"
     	     "Short options:\n"
        	     "  -g\t\t\tAdd debug info to object file\n"
+       	     "  -h\t\t\tHelp (this text)\n"
        	     "  -i\t\t\tIgnore case of symbols\n"
        	     "  -l\t\t\tCreate a listing if assembly was ok\n"
        	     "  -o name\t\tName the output file\n"
@@ -472,6 +473,10 @@ int main (int argc, char* argv [])
        		case 'g':
        		    OptDebugInfo (Arg, 0);
        		    break;
+
+		case 'h':
+		    OptHelp (Arg, 0);
+		    break;
 
        	        case 'i':
        		    OptIgnoreCase (Arg, 0);

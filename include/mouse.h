@@ -39,7 +39,7 @@
 
 
 /* Define __MOUSE__ for systems that support a mouse */
-#if defined(__ATARI__) || defined(__C64__) || defined(__C128__) || defined(__CBM510__)
+#if defined(__ATARI__) || defined(__C64__) || defined(__C128__) || defined(__CBM510__) || defined(__GEOS__)
 #  define __MOUSE__
 #else
 #  error The target system does not support a mouse!

@@ -89,6 +89,9 @@ static GenDesc GenOASGN  = { TOK_OR_ASSIGN,	GEN_NOPUSH,     g_or  };
 static int hie10 (ExprDesc* lval);
 /* Handle ++, --, !, unary - etc. */
 
+static int expr (int (*func) (ExprDesc*), ExprDesc *lval);
+/* Expression parser; func is either hie0 or hie1. */
+
 
 
 /*****************************************************************************/
@@ -1595,26 +1598,24 @@ static int typecast (ExprDesc* lval)
 	if (IsClassInt (Type)) {
 
 	    /* Get the current and new size of the value */
-	    unsigned OldSize = CheckedSizeOf (lval->Type);
-	    unsigned NewSize = CheckedSizeOf (Type);
-	    unsigned OldBits = OldSize * 8;
-	    unsigned NewBits = NewSize * 8;
+	    unsigned OldBits = CheckedSizeOf (lval->Type) * 8;
+	    unsigned NewBits = CheckedSizeOf (Type)       * 8;
 
 	    /* Check if the new datatype will have a smaller range */
-	    if (NewSize < OldSize) {
+       	    if (NewBits <= OldBits) {
 
 	     	/* Cut the value to the new size */
 	     	lval->ConstVal &= (0xFFFFFFFFUL >> (32 - NewBits));
 
-	   	/* If the new value is signed, sign extend the value */
+	   	/* If the new type is signed, sign extend the value */
 	   	if (!IsSignUnsigned (Type)) {
 	   	    lval->ConstVal |= ((~0L) << NewBits);
 	   	}
 
-	    } else if (NewSize > OldSize) {
+	    } else {
 
 	   	/* Sign extend the value if needed */
-	     	if (!IsSignUnsigned (Type) && !IsSignUnsigned (lval->Type)) {
+	     	if (!IsSignUnsigned (lval->Type) && !IsSignUnsigned (Type)) {
 	     	    if (lval->ConstVal & (0x01UL << (OldBits-1))) {
 	     	   	lval->ConstVal |= ((~0L) << OldBits);
 	     	    }
@@ -1636,8 +1637,8 @@ static int typecast (ExprDesc* lval)
 	   	/* Load the value into the primary */
 	   	exprhs (CF_NONE, k, lval);
 
-	   	/* Mark the lhs as const to avoid a manipulation of TOS */
-	   	g_typecast (TypeOf (Type) | CF_CONST, TypeOf (lval->Type));
+       	       	/* Emit typecast code */
+	   	g_typecast (TypeOf (Type), TypeOf (lval->Type));
 
 	   	/* Value is now in primary */
 	   	lval->Flags = E_MEXPR;
@@ -2737,13 +2738,25 @@ static int hieQuest (ExprDesc *lval)
     	labf = GetLocalLabel ();
     	g_falsejump (CF_NONE, labf);
 
-    	/* Parse second and third expression */
-    	expression1 (&lval2);
+    	/* Parse second expression */
+        k = expr (hie1, &lval2);
+ 	type2 = lval2.Type;
+        if (!IsTypeVoid (lval2.Type)) {
+            /* Load it into the primary */
+            exprhs (CF_NONE, k, &lval2);
+        }
     	labt = GetLocalLabel ();
     	ConsumeColon ();
     	g_jump (labt);
+
+        /* Parse the third expression */
     	g_defcodelabel (labf);
-    	expression1 (&lval3);
+        k = expr (hie1, &lval3);
+	type3 = lval3.Type;
+        if (!IsTypeVoid (lval3.Type)) {
+            /* Load it into the primary */
+            exprhs (CF_NONE, k, &lval2);
+        }
 
     	/* Check if any conversions are needed, if so, do them.
     	 * Conversion rules for ?: expression are:
@@ -2754,10 +2767,10 @@ static int hieQuest (ExprDesc *lval)
     	 *   - if one of the expressions is a pointer and the other is
     	 *     a zero constant, the resulting type is that of the pointer
 	 *     type.
+         *   - if both expressions are void expressions, the result is of
+         *     type void.
 	 *   - all other cases are flagged by an error.
 	 */
- 	type2 = lval2.Type;
-	type3 = lval3.Type;
 	if (IsClassInt (type2) && IsClassInt (type3)) {
 
 	    /* Get common type */
@@ -2797,6 +2810,9 @@ static int hieQuest (ExprDesc *lval)
 	} else if (IsNullPtr (&lval2) && IsClassPtr (type3)) {
 	    /* Result type is pointer, no cast needed */
 	    rtype = lval3.Type;
+        } else if (IsTypeVoid (type2) && IsTypeVoid (type3)) {
+            /* Result type is void */
+            rtype = lval3.Type;
 	} else {
 	    Error ("Incompatible types");
 	    rtype = lval2.Type;	 	/* Doesn't matter here */
@@ -3047,7 +3063,12 @@ static void Assignment (ExprDesc* lval)
 	PushAddr (lval);
 
      	/* No struct, setup flags for the load */
+#if 0
+        /* Generates wrong code!!! ### */
      	flags = CheckedSizeOf (ltype) == 1? CF_FORCECHAR : CF_NONE;
+#else
+        flags = CF_NONE;
+#endif
 
      	/* Get the expression on the right of the '=' into the primary */
      	if (evalexpr (flags, hie1, &lval2) == 0) {
@@ -3178,7 +3199,7 @@ int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval)
 
 
 
-int expr (int (*func) (ExprDesc*), ExprDesc *lval)
+static int expr (int (*func) (ExprDesc*), ExprDesc *lval)
 /* Expression parser; func is either hie0 or hie1. */
 {
     int k;

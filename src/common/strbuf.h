@@ -286,7 +286,7 @@ void SB_Copy (StrBuf* Target, const StrBuf* Source);
 /* Copy Source to Target, discarding the old contents of Target */
 #endif
 
-void SB_AppendChar (StrBuf* B, char C);
+void SB_AppendChar (StrBuf* B, int C);
 /* Append a character to a string buffer */
 
 void SB_AppendBuf (StrBuf* B, const char* S, unsigned Size);

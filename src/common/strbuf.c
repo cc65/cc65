@@ -195,14 +195,14 @@ void SB_Copy (StrBuf* Target, const StrBuf* Source)
 
 
 
-void SB_AppendChar (StrBuf* B, char C)
+void SB_AppendChar (StrBuf* B, int C)
 /* Append a character to a string buffer */
 {
     unsigned NewLen = B->Len + 1;
     if (NewLen > B->Allocated) {
 	SB_Realloc (B, NewLen);
     }
-    B->Buf[B->Len] = C;
+    B->Buf[B->Len] = (char) C;            
     B->Len = NewLen;
 }
 
@@ -286,7 +286,7 @@ void SB_Slice (StrBuf* Target, const StrBuf* Source, unsigned Start, unsigned Le
 void SB_Move (StrBuf* Target, StrBuf* Source)
 /* Move the complete contents of Source to target. This will delete the old
  * contents of Target, and Source will be empty after the call.
- */                                          
+ */
 {
     /* Free the target string */
     if (Target->Buf) {

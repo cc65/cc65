@@ -8,7 +8,7 @@
 #                                                                             #
 #                                                                             #
 #  (C) 2000-2003 Ullrich von Bassewitz                                        #
-#                Römerstrasse 52                                              #
+#                R÷merstrasse 52                                              #
 #                D-70794 Filderstadt                                          #
 #  EMail:        uz@cc65.org                                                  #
 #                                                                             #
@@ -230,7 +230,7 @@ sub DocFooter {
 
 
 sub ColorizeComment {
-    if ($Colorize) {
+    if ($Colorize && $_[0] ne "") {
         return "<font color=\"$CommentColor\">$_[0]</font>";
     } else {
         return $_[0];
@@ -291,10 +291,10 @@ sub AddFile {
 
     # Check with the full pathname. If we don't find it, search in the current
     # directory
-    if (-f $FileName && -r $FileName) {
+    if (-f $FileName && -r _) {
     	$Files{$Name} = $FileName;
     	$FileCount++;
-    } elsif (-f $Name && -r $Name) {
+    } elsif (-f $Name && -r _) {
     	$Files{$Name} = $Name;
     	$FileCount++;
     } else {
@@ -388,7 +388,7 @@ sub Process1 {
        	chop ($Line);
 
        	# Check for a label
-       	if ($Line =~ /^\s*(\@?)([_a-zA-Z][_\w]*)\s*(:|=)/) {
+       	if ($Line =~ /^\s*(\@?)([_a-zA-Z]\w*)\s*(:|=)/) {
 
 	    # Is this a local label?
 	    if ($1 eq "\@") {
@@ -423,7 +423,7 @@ sub Process1 {
 	    }
 
 	# Check for a .proc statement
-       	} elsif ($Line =~ /^\s*\.proc\s+([_a-zA-Z][_\w]*)?.*$/) {
+       	} elsif ($Line =~ /^\s*\.proc\s+([_a-zA-Z]\w*)?.*$/) {
 
 	    # Do we have an id?
 	    $Id = $1;
@@ -497,12 +497,12 @@ sub Process2 {
     Gabble ("$FileName => $OutName");
 
     # The instructions that will have hyperlinks if a label is used
-    my $LabelIns = "adc|add|and|asl|bcc|bcs|beq|bit|bmi|bne|bpl|bcv|bra|bvs|".
+    my $LabelIns = "adc|add|and|asl|bcc|bcs|beq|bit|bmi|bne|bpl|bra|bvc|bvs|".
 	           "cmp|cpx|cpy|dec|eor|inc|jmp|jsr|lda|ldx|ldy|lsr|ora|rol|".
-	           "sbc|sta|stx|sty|sub|";
+	           "ror|sbc|sta|stx|sty|stz|sub|";
 
     # The instructions that will have hyperlinks if a label is used
-    my $AllIns = "adc|add|and|asl|bcc|bcs|beq|bge|bit|blt|bmi|bne|bpl|bcv|".
+    my $AllIns = "adc|add|and|asl|bcc|bcs|beq|bge|bit|blt|bmi|bne|bpl|bvc|".
 		 "bra|brk|brl|bvs|clc|cld|cli|clv|cmp|cop|cpa|cpx|cpy|dea|".
 		 "dec|dex|dey|eor|ina|inc|inx|iny|jml|jmp|jsl|jsr|lda|ldx|".
 		 "ldy|lsr|mvn|mvp|nop|ora|pea|pei|per|pha|phb|phd|phk|php|".
@@ -544,48 +544,25 @@ sub Process2 {
 
         # Cut off a comment from the input line. Beware: We have to check for
         # strings, since these may contain a semicolon that is no comment
-        # start. A perl guru would probably write all this in one line...
-        my $L = $Line;
-        $Line = "";
-        $Comment = "";
-        while ($L ne "") {
-            if ($L =~ /^([^\"\';]+)(.*)$/) {
-                $Line .= $1;
-                $L    = $2;
-            }
-            if ($L =~ /^;/) {
-                # The remainder is a comment
-                $Comment = $L;
-                last;
-            } elsif ($L =~ /^(\"[^\"]*\")(.*)$/) {
-                $Line .= $1;
-                $L    = $2;
-            } elsif ($L =~ /^(\'[^\']*\')(.*)$/) {
-                $Line .= $1;
-                $L    = $2;
-            } elsif ($L =~ /^[\"\']/) {
-                # Line with invalid syntax - there's a string start but
-                # no string end.
-                Abort (sprintf ("Invalid input at %s(%d)", $FileName, $LineNo));
-            }
+        # start.
+        ($Line, $Comment) = $Line =~ /^((?:[^"';]+|".*?"|'.*?')*)(.*)$/;
+        if ($Comment =~ /^["']/) {
+            # Line with invalid syntax - there's a string start but
+            # no string end.
+            Abort (sprintf ("Invalid input at %s(%d)", $FileName, $LineNo));
         }
 
         # Remove trailing whitespace and move it together with the comment
         # into the $Trailer variable.
-        if ($Line =~ /^(.*?)(\s*)$/) {
-            $Line    = $1;
-            $Trailer = $2;
-        } else {
-            $Trailer = "";
-        }
-        $Trailer .= ColorizeComment (Cleanup ($Comment));
+       	$Line =~ s/\s*$//;
+	$Trailer = $& . ColorizeComment (Cleanup ($Comment));
 
        	# Check for a label at the start of the line. If we have one, process
         # it and remove it from the line
-	if ($Line =~ /^\s*?(\@?)([_a-zA-Z][_\w]*)(\s*)(:|=)(.*)$/) {
+	if ($Line =~ s/^\s*?(\@?)([_a-zA-Z]\w*)(\s*)(:|=)//) {
 
 	    # Is this a local label?
-       	    if ("$1" eq "\@") {
+       	    if ($1 eq "\@") {
 		# Use the prefix
 	     	$Id = "$CheapPrefix$1$2";
 	    } else {
@@ -600,38 +577,32 @@ sub Process2 {
 
 	    # Print the label with a tag
        	    $OutLine .= sprintf ("<a name=\"%s\">%s%s</a>%s%s", $Label, $1, $2, $3, $4);
-
-	    # Use the remainder for line
-	    $Line = $5;
 	}
 
 	# Print any leading whitespace and remove it, so we don't have to
 	# care about whitespace below.
-	if ($Line =~ /^(\s+)(.*)$/) {
-      	    $OutLine .= "$1";
-	    $Line = $2;
+	if ($Line =~ s/^\s+//) {
+      	    $OutLine .= $&;
 	}
 
 	# Handle the import statements
-	if ($Line =~ /^(\.import|\.importzp)(\s+)(.*)$/) {
+	if ($Line =~ s/^(\.import|\.importzp)\s+//) {
 
 	    # Print any fixed stuff from the line and remove it
-       	    $OutLine .= $1 . $2;
- 	    $Line = $3;
+       	    $OutLine .= $&;
 
  	    # Print all identifiers if there are any
- 	    while ($Line =~ /^([_a-zA-Z][_\w]*)(.*)$/) {
+ 	    while ($Line =~ s/^[_a-zA-Z]\w*//) {
 
-		# Identifier is $1, remainder is $2
-		$Id = $1;
-		$Line = $2;
+                # Remember the identifier
+       	       	my $Id = $&;
 
 		# Variable to assemble HTML representation
        	       	my $Contents = "";
 
 		# Make this import a link target
 		if (exists ($Imports{$OutName}{$Id})) {
-       	       	    $Label = $Imports{$OutName}{$1};
+       	       	    $Label = $Imports{$OutName}{$Id};
        	       	    $Contents .= sprintf (" name=\"%s\"", $Label);
 		}
 
@@ -650,9 +621,8 @@ sub Process2 {
 		}
 
 	     	# Check if another identifier follows
-		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
-     		    $OutLine .= "$1,$2";
-		    $Line = $3;
+		if ($Line =~ s/^\s*,\s*//) {
+     		    $OutLine .= $&;
        	     	} else {
 		    last;
       		}
@@ -662,26 +632,24 @@ sub Process2 {
 	    $OutLine .= Cleanup ($Line);
 
        	# Handle export statements
-	} elsif ($Line =~ /^(\.export|\.exportzp)(\s+)(.*)$/) {
+	} elsif ($Line =~ s/^(\.export|\.exportzp)\s+//) {
 
 	    # Print the command the and white space
-	    $OutLine .= $1 . $2;
-	    $Line = $3;
+	    $OutLine .= $&;
 
 	    # Print all identifiers if there are any
-	    while ($Line =~ /^([_a-zA-Z][_\w]*)(.*)$/) {
+	    while ($Line =~ s/^[_a-zA-Z]\w*//) {
 
-		# Identifier is $1, remainder is $2
-		$Id = $1;
-		$Line = $2;
+                # Remember the identifier
+       	       	my $Id = $&;
 
 		# Variable to assemble HTML representation
        	       	my $Contents = "";
 
 		# If we have a definition for this export in this file, add
 		# a link to the definition.
-		if (exists ($Labels{$OutName}{$1})) {
-		    $Label = $Labels{$OutName}{$1};
+		if (exists ($Labels{$OutName}{$Id})) {
+		    $Label = $Labels{$OutName}{$Id};
        	       	    $Contents = sprintf (" href=\"#%s\"", $Label);
 		}
 
@@ -690,7 +658,7 @@ sub Process2 {
 		if (exists ($Exports{$Id})) {
 		    $Label = $Exports{$Id};
        	       	    # Be sure to use only the label part
-	    	    $Label =~ s/^(.*#)(.*)$/$2/;	# ##FIXME: Expensive
+		    $Label =~ s/^.*#//;
 		    $Contents .= sprintf (" name=\"%s\"", $Label);
 	     	}
 
@@ -702,9 +670,8 @@ sub Process2 {
 		}
 
      		# Check if another identifier follows
-      	      	if ($Line =~ /^(\s*),(\s*)(.*)$/) {
-     	    	    $OutLine .= "$1,$2";
-     		    $Line = $3;
+      	      	if ($Line =~ s/^\s*,\s*//) {
+     	    	    $OutLine .= $&;
      		} else {
      		    last;
      		}
@@ -714,24 +681,22 @@ sub Process2 {
      	    $OutLine .= Cleanup ($Line);
 
      	# Check for .addr and .word
-     	} elsif ($Line =~ /^(\.addr|\.word)(\s+)(.*)$/) {
+     	} elsif ($Line =~ s/^(\.addr|\.word)\s+//) {
 
-     	    # Print the command the and white space
-       	    $OutLine .= "$1$2";
-     	    $Line = $3;
+     	    # Print the command and the white space
+       	    $OutLine .= $&;
 
      	    # Print all identifiers if there are any
-     	    while ($Line =~ /^([_a-zA-Z][_\w]*)(.*)$/) {
+     	    while ($Line =~ /^([_a-zA-Z]\w*)(.*)$/) {
      		if (exists ($Labels{$OutName}{$1})) {
      		    $Label = $Labels{$OutName}{$1};
        	       	    $OutLine .= sprintf ("<a href=\"#%s\">%s</a>", $Label, $1);
      		} else {
-     		    $OutLine .= "$1";
+     		    $OutLine .= $1;
      		}
      		$Line = $2;
-     		if ($Line =~ /^(\s*),(\s*)(.*)$/) {
-     		    $OutLine .= "$1,$2";
-     		    $Line = $3;
+     		if ($Line =~ s/^\s*,\s*//) {
+     		    $OutLine .= $&;
      		} else {
      		    last;
      		}
@@ -741,7 +706,7 @@ sub Process2 {
      	    $OutLine .= Cleanup ($Line);
 
 	# Handle .proc
-       	} elsif ($Line =~ /^(\.proc)(\s+)([_a-zA-Z][_\w]*)?(.*)$/) {
+       	} elsif ($Line =~ /^(\.proc)(\s+)([_a-zA-Z]\w*)?(.*)$/) {
 
 	    # Do we have an identifier?
 	    if ($3 ne "") {
@@ -785,13 +750,10 @@ sub Process2 {
 	    $OutLine .= Cleanup ($4);
 
         # Handle .dbg line
-        } elsif ($CRefs && $Line =~ /^(\.dbg)(\s+)(.*)$/) {
+        } elsif ($CRefs && $Line =~ s/^\.dbg\s+//) {
 
             # Add the fixed stuff to the output line
-            $OutLine .= "$1$2";
-
-            # Remember the remainder
-            $Line = $3;
+            $OutLine .= $&;
 
             # Check for the type of the .dbg directive
             if ($Line =~ /^(line,\s*)\"((?:[^\"]+?|\\\")+)\"(,\s*)(\d+)(.*)$/) {
@@ -818,7 +780,7 @@ sub Process2 {
                 # Add the remainder
                 $OutLine .= Cleanup ($Line);
 
-            } elsif ($Line =~ /^(file,\s*)\"((?:[^\"]+?|\\\")+)\"(.*)$/) {
+            } elsif ($Line =~ /^(file,\s*)\"((?:[^\"]+?|\\\")+)\"(.*)$/) { #pf FIXME: doesn't handle \" correctly!
 
                 # Get the filename into a named variables
                 my $DbgFile = Cleanup ($2);
@@ -872,10 +834,10 @@ sub Process2 {
 
   	    # Check for the first identifier in the operand and replace it
     	    # by a hyperlink
-       	    if ($Operand =~ /^([^_a-zA-Z]*?)(\@?)([_a-zA-Z][_\w]*)(.*)$/) {
+       	    if ($Operand =~ /^([^_a-zA-Z]*?)(\@?)([_a-zA-Z]\w*)(.*)$/) {
 
 		# Is this a local label?
-		if ("$2" eq "\@") {
+		if ($2 eq "\@") {
 		    # Use the prefix
 		    $Id = "$CheapPrefix$2$3";
 	     	} else {
@@ -904,7 +866,7 @@ sub Process2 {
 	}
 
         # Colorize all keywords
-       	$OutLine =~ s/(?<![\w;])\.[_a-zA-Z][_\w]*/ColorizeCtrl ($&)/ge;
+       	$OutLine =~ s/(?<![\w;])\.[_a-zA-Z]\w*/ColorizeCtrl ($&)/ge;
 
         # Add the trailer
         $OutLine .= $Trailer;

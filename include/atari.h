@@ -75,7 +75,7 @@
 #define HUE_YELLOW      14
 #define HUE_YELLOWRED   15
 
-/* Color defines, similar to c64 colors */
+/* Color defines, similar to c64 colors (untested) */
 #define COLOR_BLACK  	       	_gtia_mkcolor(HUE_GREY,0)
 #define COLOR_WHITE  	       	_gtia_mkcolor(HUE_GREY,7)
 #define COLOR_RED    	       	_gtia_mkcolor(HUE_REDORANGE,1)
@@ -96,7 +96,7 @@
 /* color register functions */
 extern void __fastcall__ setcolor     (unsigned char color_reg, unsigned char hue, unsigned char luminace);
 extern void __fastcall__ setcolor_low (unsigned char color_reg, unsigned char color_value);
-extern unsigned char  __fastcall__ getcolor (unsigned char color_reg);
+extern unsigned char __fastcall__ getcolor (unsigned char color_reg);
 
 /* other screen functions */
 extern void __fastcall__ scroll (signed char numlines);
@@ -104,9 +104,32 @@ extern void __fastcall__ scroll (signed char numlines);
                                           /* numlines < 0  scrolls down */
 
 /* misc. functions */
-extern void save_vecs(void);   /* save system vectors */
-extern void rest_vecs(void);   /* restore system vectors */
+extern void save_vecs(void);          /* save system vectors */
+extern void rest_vecs(void);          /* restore system vectors */
+extern unsigned int get_ostype(void); /* get ROM version */
 
+/* get_ostype return value defines (for explanation, see ostype.s) */
+/* masks */
+#define AT_OS_TYPE_MAIN  7
+#define AT_OS_PALNTSC    (3 << 3)
+#define AS_OS_TYPE_MINOR (7 << 5)
+/* AT_OS_TYPE_MAIN values */
+#define AT_OS_UNKNOWN  0
+#define AT_OS_400800   1
+#define AT_OS_1200XL   2
+#define AT_OS_XLXE     3
+/* AT_OS_PALNTSC values */
+#define AT_OS_PAL      1
+#define AT_OS_NTSC     2
+/* AS_OS_TYPE_MINOR values */
+#define AT_OS_400800_A 1
+#define AT_OS_400800_B 2
+#define AT_OS_1200_10  1
+#define AT_OS_1200_11  2
+#define AT_OS_XLXE_1   1
+#define AT_OS_XLXE_2   2
+#define AT_OS_XLXE_3   3
+#define AT_OS_XLXE_4   4
 
 /* Define hardware */
 #include <_gtia.h>

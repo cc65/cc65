@@ -4,13 +4,14 @@
  * (w)2002 by groepaz/hitmen                                                 *
  *                                                                           *
  * Cleanup and porting by Ullrich von Bassewitz.			     *
+ * 2004-06-08, Greg King                                                     *
  *                                                                           *
  *****************************************************************************/
 
 
 
 /* sync page-flipping to vertical blank */
-//#define DOVSYNC
+/* #define DOVSYNC */
 
 #include <stdlib.h>
 #include <string.h> /* for memset */
@@ -25,14 +26,15 @@
 #  define SCREEN2               0xE400
 #  define CHARSET               0xE800
 #  define COLORRAM              0xD800
-#  define outb(addr,val)       	(*(addr)) = (val)
+#  define outb(addr,val)       	(*(addr) = (val))
 #  define inb(addr)             (*(addr))
 #elif defined(__C128__)
+#  define BUFFER                0x0400
 #  define SCREEN1               0xE000
 #  define SCREEN2               0xE400
 #  define CHARSET               0xE800
 #  define COLORRAM              0xD800
-#  define outb(addr,val)       	(*(addr)) = (val)
+#  define outb(addr,val)       	(*(addr) = (val))
 #  define inb(addr)             (*(addr))
 #elif defined(__CBM510__)
 #  define BUFFER                0xF800
@@ -58,7 +60,7 @@
 
 
 #ifdef DOVSYNC
-#  define waitvsync() while(VIC.ctrl1 < 0x80) {}
+#  define waitvsync() while ((signed char)VIC.ctrl1 >= 0)
 #else
 #  define waitvsync()
 #endif
@@ -184,7 +186,7 @@ int main (void)
     outb (&CIA2.pra, (block & 0xFC) | ((SCREEN1 >> 14) ^ 0x03));
 #endif
 #if defined(__C128__)
-    /* Save and change some flags, so that kernal/basic interupt handler will
+    /* Save and change some flags, so that kernal/basic interrupt handler will
      * not interfere with our routine.
      */
     initflag = *(unsigned char*) 0xA04;

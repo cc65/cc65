@@ -15,6 +15,7 @@ DEVNUM 	       	= $BA  	       	; Device number
 FNAM_BANK      	= $C7  	       	; Bank for filename
 FNAM_LO	       	= $BB  	       	; Address of filename
 FNAM_HI	  	= $BC
+FNAM_BANK       = $D7           ; Bank of filename
 KEY_COUNT      	= $D0  	       	; Number of keys in input buffer
 MODE   	       	= $D7  	       	; 40/80 column mode flag
 CURS_X 	       	= $EC  	       	; Cursor column

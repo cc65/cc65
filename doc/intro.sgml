@@ -219,7 +219,7 @@ is set correctly).
 
 The cl65 utility knows, how to translate C files into object files (it will
 call the compiler and then the assembler). It does also know how to create
-object files from assembler files (it will call the assember for that). It
+object files from assembler files (it will call the assembler for that). It
 knows how to build an executable (it will pass all object files to the
 linker). And, finally, it has the C64 as a default target and will supply the
 correct startup file and runtime library names to the linker, so you don't
@@ -315,7 +315,7 @@ and enter HELLO.
 The emulation also supports this method.  Look at Atari>Settings and check
 Enable H: Patch for Hard Disk Devices, then Atari>Hard disks and set the path
 of H1: to your executables directory, then use H0:HELLO.XEX in the above
-proceedure (after pressing L) to access your hardrive directly.
+procedure (after pressing L) to access your hardrive directly.
 
 <bf>Note:</bf> There is no delay after the program exits, as you are returned
 to the DOS menu.  Your C program should wait for a keypress if you want to see
@@ -323,7 +323,7 @@ any output.
 
 <sect1>Commodore<p>
 
-<bf>Vice 1.9</bf> (available at
+<bf>Vice 1.15</bf> (available at
 <url url="ftp://ftp.funet.fi/pub/cbm/crossplatform/emulators/VICE/">):
 Emulates Commodore 64/128/Vic 20/PET/CBM II computers. Missing is the Plus/4
 and Commodore 16. Supports printer, serial port, stereo sound, disk drives and

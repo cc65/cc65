@@ -217,6 +217,83 @@ static const struct {
     }
 };
 
+/* Instruction table for the 65C02 */
+#define INS_COUNT_65C02       	66
+static const struct {
+    unsigned Count;
+    InsDesc  Ins[INS_COUNT_65C02];
+} InsTab65C02 = {
+    INS_COUNT_65C02,
+    {
+	{ "ADC", 0x080A66C, 0x60, 0, PutAll },
+	{ "AND", 0x080A66C, 0x20, 0, PutAll },
+	{ "ASL", 0x000006e, 0x02, 1, PutAll },
+	{ "BCC", 0x0020000, 0x90, 0, PutPCRel8 },
+	{ "BCS", 0x0020000, 0xb0, 0, PutPCRel8 },
+	{ "BEQ", 0x0020000, 0xf0, 0, PutPCRel8 },
+	{ "BIT", 0x0A0006C, 0x00, 2, PutAll },
+	{ "BMI", 0x0020000, 0x30, 0, PutPCRel8 },
+	{ "BNE", 0x0020000, 0xd0, 0, PutPCRel8 },
+	{ "BPL", 0x0020000, 0x10, 0, PutPCRel8 },
+	{ "BRA", 0x0020000, 0x80, 0, PutPCRel8 },
+	{ "BRK", 0x0000001, 0x00, 0, PutAll },
+	{ "BVC", 0x0020000, 0x50, 0, PutPCRel8 },
+	{ "BVS", 0x0020000, 0x70, 0, PutPCRel8 },
+	{ "CLC", 0x0000001, 0x18, 0, PutAll },
+	{ "CLD", 0x0000001, 0xd8, 0, PutAll },
+	{ "CLI", 0x0000001, 0x58, 0, PutAll },
+	{ "CLV", 0x0000001, 0xb8, 0, PutAll },
+	{ "CMP", 0x080A66C, 0xc0, 0, PutAll },
+	{ "CPX", 0x080000C, 0xe0, 1, PutAll },
+	{ "CPY", 0x080000C, 0xc0, 1, PutAll },
+	{ "DEA", 0x0000001, 0x00, 3, PutAll },   /* == DEC */
+	{ "DEC", 0x000006F, 0x00, 3, PutAll },
+	{ "DEX", 0x0000001, 0xca, 0, PutAll },
+	{ "DEY", 0x0000001, 0x88, 0, PutAll },
+	{ "EOR", 0x080A66C, 0x40, 0, PutAll },
+	{ "INA", 0x0000001, 0x00, 4, PutAll },   /* == INC */
+	{ "INC", 0x000006f, 0x00, 4, PutAll },
+	{ "INX", 0x0000001, 0xe8, 0, PutAll },
+	{ "INY", 0x0000001, 0xc8, 0, PutAll },
+	{ "JMP", 0x0010808, 0x4c, 6, PutAll },
+      	{ "JSR", 0x0000008, 0x20, 7, PutAll },
+	{ "LDA", 0x080A66C, 0xa0, 0, PutAll },
+	{ "LDX", 0x080030C, 0xa2, 1, PutAll },
+	{ "LDY", 0x080006C, 0xa0, 1, PutAll },
+	{ "LSR", 0x000006F, 0x42, 1, PutAll },
+	{ "NOP", 0x0000001, 0xea, 0, PutAll },
+	{ "ORA", 0x080A66C, 0x00, 0, PutAll },
+	{ "PHA", 0x0000001, 0x48, 0, PutAll },
+	{ "PHP", 0x0000001, 0x08, 0, PutAll },
+	{ "PHX", 0x0000001, 0xda, 0, PutAll },
+	{ "PHY", 0x0000001, 0x5a, 0, PutAll },
+	{ "PLA", 0x0000001, 0x68, 0, PutAll },
+	{ "PLP", 0x0000001, 0x28, 0, PutAll },
+	{ "PLX", 0x0000001, 0xfa, 0, PutAll },
+	{ "PLY", 0x0000001, 0x7a, 0, PutAll },
+	{ "ROL", 0x000006F, 0x22, 1, PutAll },
+	{ "ROR", 0x000006F, 0x62, 1, PutAll },
+	{ "RTI", 0x0000001, 0x40, 0, PutAll },
+	{ "RTS", 0x0000001, 0x60, 0, PutAll },
+	{ "SBC", 0x080A66C, 0xe0, 0, PutAll },
+	{ "SEC", 0x0000001, 0x38, 0, PutAll },
+	{ "SED", 0x0000001, 0xf8, 0, PutAll },
+	{ "SEI", 0x0000001, 0x78, 0, PutAll },
+	{ "STA", 0x000A66C, 0x80, 0, PutAll },
+	{ "STX", 0x000010c, 0x82, 1, PutAll },
+      	{ "STY", 0x000002c, 0x80, 1, PutAll },
+      	{ "STZ", 0x000006c, 0x04, 5, PutAll },
+      	{ "TAX", 0x0000001, 0xaa, 0, PutAll },
+      	{ "TAY", 0x0000001, 0xa8, 0, PutAll },
+      	{ "TRB", 0x000000c, 0x10, 1, PutAll },
+      	{ "TSB", 0x000000c, 0x00, 1, PutAll },
+      	{ "TSX", 0x0000001, 0xba, 0, PutAll },
+      	{ "TXA", 0x0000001, 0x8a, 0, PutAll },
+      	{ "TXS", 0x0000001, 0x9a, 0, PutAll },
+      	{ "TYA", 0x0000001, 0x98, 0, PutAll }
+    }
+};
+
 /* Instruction table for the 65816 */
 #define INS_COUNT_65816	101
 static const struct {
@@ -340,11 +417,10 @@ static const struct {
 static const InsTable* InsTabs[CPU_COUNT] = {
     (const InsTable*) &InsTab6502,
     (const InsTable*) &InsTab65SC02,
+    (const InsTable*) &InsTab65C02,
     (const InsTable*) &InsTab65816,
 #ifdef SUNPLUS
     (const InsTable*) &InsTabSunPlus,
-#else
-    NULL,
 #endif
 };
 const InsTable* InsTab = (const InsTable*) &InsTab6502;

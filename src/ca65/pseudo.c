@@ -1250,6 +1250,14 @@ static void DoProc (void)
 
 
 
+static void DoPSC02 (void)
+/* Switch to 65SC02 CPU */
+{
+    SetCPU (CPU_65SC02);
+}
+
+
+
 static void DoPushSeg (void)
 /* Push the current segment onto the segment stack */
 {
@@ -1343,12 +1351,12 @@ static void DoSegment (void)
 	strcpy (Name, SVal);
 	NextTok ();
 
-	/* Check for an optional segment attribute */
-	if (Tok == TOK_COMMA) {
-	    NextTok ();
-	    if (Tok != TOK_IDENT) {
+    	/* Check for an optional segment attribute */
+    	if (Tok == TOK_COMMA) {
+    	    NextTok ();
+    	    if (Tok != TOK_IDENT) {
 	     	ErrorSkip (ERR_IDENT_EXPECTED);
-	    } else {
+    	    } else {
 		int Attr = GetSubKey (AttrTab, sizeof (AttrTab) / sizeof (AttrTab [0]));
 		switch (Attr) {
 
@@ -1378,6 +1386,24 @@ static void DoSegment (void)
 
 	/* Set the segment */
      	UseSeg (&Def);
+    }
+}
+
+
+
+static void DoSetCPU (void)
+/* Switch the CPU instruction set */
+{
+    /* We expect an identifier */
+    if (Tok != TOK_STRCON) {
+	ErrorSkip (ERR_STRCON_EXPECTED);
+    } else {
+        /* Try to find the CPU, then skip the identifier */
+        cpu_t CPU = FindCPU (SVal);
+        NextTok ();
+
+        /* Switch to the new CPU */
+        SetCPU (CPU);
     }
 }
 
@@ -1522,6 +1548,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccKeepToken,	DoConditionals	},	/* .IFP02 */
     { ccKeepToken,	DoConditionals	},	/* .IFP816 */
     { ccKeepToken,	DoConditionals	},	/* .IFPC02 */
+    { ccKeepToken,	DoConditionals	},	/* .IFPSC02 */
     { ccKeepToken,	DoConditionals	},	/* .IFREF */
     { ccNone,		DoImport  	},
     { ccNone,		DoImportZP	},
@@ -1547,6 +1574,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoPC02		},
     { ccNone,           DoPopSeg        },
     { ccNone,		DoProc		},
+    { ccNone,  	       	DoPSC02		},
     { ccNone,           DoPushSeg       },
     { ccNone,    	DoUnexpected   	},	/* .REFERENCED */
     { ccNone,		DoReloc		},
@@ -1555,6 +1583,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoInvalid      	},     	/* .RIGHT */
     { ccNone,		DoROData	},
     { ccNone,       	DoSegment	},
+    { ccNone,          	DoSetCPU        },
     { ccNone,        	DoSmart		},
     { ccNone,		DoUnexpected	},	/* .STRAT */
     { ccNone,          	DoUnexpected	},	/* .STRING */

@@ -394,14 +394,23 @@ void DoConditionals (void)
 		IfCond = GetCurrentIfCond ();
 		break;
 
+	    case TOK_IFPSC02:
+		D = AllocIf (".IFPSC02", 1);
+		NextTok ();
+		if (IfCond) {
+       	       	    SetIfCond (D, GetCPU() == CPU_65SC02);
+		}
+		IfCond = GetCurrentIfCond ();
+		break;
+
 	    case TOK_IFREF:
 	        D = AllocIf (".IFREF", 1);
      		NextTok ();
      		if (IfCond) {
      		    if (Tok != TOK_IDENT) {
-     		  	ErrorSkip (ERR_IDENT_EXPECTED);
+     		     	ErrorSkip (ERR_IDENT_EXPECTED);
      		    } else {
-     		  	SetIfCond (D, SymIsRef (SVal, SCOPE_ANY));
+     		     	SetIfCond (D, SymIsRef (SVal, SCOPE_ANY));
      		  	NextTok ();
      		    }
      		}

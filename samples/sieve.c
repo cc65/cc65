@@ -26,12 +26,16 @@ static unsigned char Sieve[COUNT];
 
 
 /*****************************************************************************/
-/*     	      	    	  	     Code				     */
+/*     	      	    	  	     Code	      			     */
 /*****************************************************************************/
 
 
 
-int main (void)
+#pragma staticlocals(1);
+
+
+
+int main (void)					      
 {
     /* Clock variable */
     clock_t Ticks;
@@ -65,7 +69,7 @@ int main (void)
     /* Print the time used */
     printf ("Time used: %lu ticks\n", Ticks);
     printf ("Press Q to quit, any other key for list\n");
-    
+
     /* Wait for a key and print the list if not 'Q' */
     if (toupper (cgetc()) != 'Q') {
      	/* Print the result */

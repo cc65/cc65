@@ -1,5 +1,6 @@
 ;
-; Extended memory driver for the C128 RAM in bank #1
+; Extended memory driver for the C128 RAM in bank #1. Driver works without
+; problems when statically linked.
 ;
 ; Ullrich von Bassewitz, 2002-12-04
 ;
@@ -27,7 +28,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   PAGECOUNT
         .word   MAP
         .word   USE
@@ -45,10 +46,9 @@ PAGES  	= (TOPMEM - BASE) / 256
 ; ------------------------------------------------------------------------
 ; Data.
 
-.data
-curpage:        .word   $FFFF           ; Current page number (invalid)
-
 .bss
+curpage:        .res    1               ; Current page number
+
 window:         .res    256             ; Memory "window"
 
 .code
@@ -61,16 +61,19 @@ window:         .res    256             ; Memory "window"
 ;
 
 INSTALL:
-        lda     #<EM_ERR_OK
-        ldx     #>EM_ERR_OK
+        ldx     #$FF
+        stx     curpage
+        stx     curpage+1               ; Invalidate the current page
+        inx
+        txa                             ; A = X = EM_ERR_OK
         rts
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 
@@ -270,7 +273,7 @@ COPYTO: sta     ptr3
         lda     (ptr3),y                ; Get bytes in last page
         beq     @L4
         sta     tmp1
-                    
+
         ldy     #$00
 @L3:    lda     (ptr2),y
         ldx     #MMU_CFG_RAM1

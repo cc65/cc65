@@ -1,5 +1,6 @@
 ;
-; Extended memory driver for the GEORAM cartridge
+; Extended memory driver for the GEORAM cartridge. Driver works without
+; problems when statically linked.
 ;
 ; Ullrich von Bassewitz, 2002-11-29
 ;
@@ -26,7 +27,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   PAGECOUNT
         .word   MAP
         .word   USE
@@ -63,11 +64,11 @@ INSTALL:
         rts
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 

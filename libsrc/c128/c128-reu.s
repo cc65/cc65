@@ -1,5 +1,6 @@
 ;
-; Extended memory driver for the Commodore REU
+; Extended memory driver for the Commodore REU. Driver works without
+; problems when statically linked.
 ;
 ; Ullrich von Bassewitz, 2002-11-29
 ;
@@ -27,7 +28,7 @@
 ; Jump table.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   PAGECOUNT
         .word   MAP
         .word   USE
@@ -54,11 +55,10 @@ OP_COPYTO       = $EC
 ; ------------------------------------------------------------------------
 ; Data.
 
-.data
-pagecount:      .res    2               ; Number of pages available
-curpage:        .word   $FFFF           ; Current page number (invalid)
-
 .bss
+pagecount:      .res    2               ; Number of pages available
+curpage:        .res    2               ; Current page number
+
 window:         .res    256             ; Memory "window"
 
 reu_params:     .word 	$0000  		; Host address, lo, hi
@@ -94,8 +94,11 @@ INSTALL:
         ldx     #>(256*4)               ; 256KB when size bit is set
 @L1:    stx     pagecount+1
 
-        lda     #<EM_ERR_OK
-        ldx     #>EM_ERR_OK
+        ldx     #$FF
+        stx     curpage
+        stx     curpage+1               ; Invalidate the current page
+        inx
+        txa                             ; X = A = EM_ERR_OK
         rts
 
 ; No REU found
@@ -106,11 +109,11 @@ nodevice:
         rts
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory.
+; UNINSTALL routine. Is called before the driver is removed from memory.
 ; Can do cleanup or whatever. Must not return anything.
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 

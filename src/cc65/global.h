@@ -49,6 +49,7 @@ extern unsigned char	WriteableStrings;	/* Literal strings are r/w */
 extern unsigned char	NoWarn;			/* Suppress warnings */
 extern unsigned char	Optimize;		/* Optimize flag */
 extern unsigned char	FavourSize;		/* Favour size over speed */
+extern unsigned	       	CodeSizeFactor;		/* Size factor for generated code */
 extern unsigned char    InlineStdFuncs;	       	/* Inline some known functions */
 extern unsigned char	EnableRegVars;		/* Enable register variables */
 extern unsigned char	AllowRegVarAddr;	/* Allow taking addresses of register vars */
@@ -60,6 +61,7 @@ extern unsigned char	DebugInfo;		/* Add debug info to the obj */
 extern unsigned char	Debug;			/* Debug mode */
 extern unsigned char	CreateDep;		/* Create a dependency file */
 extern unsigned char	CheckStack;		/* Generate stack overflow checks */
+
 
 
 /* End of global.h */

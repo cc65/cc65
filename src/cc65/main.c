@@ -99,6 +99,7 @@ static void Usage (void)
 	     "  --bss-name seg\tSet the name of the BSS segment\n"
        	     "  --check-stack\t\tGenerate stack overflow checks\n"
        	     "  --code-name seg\tSet the name of the CODE segment\n"
+	     "  --codesize x\tAccept larger code by factor x\n"
        	     "  --cpu type\t\tSet cpu type\n"
        	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug\t\tDebug mode\n"
@@ -314,6 +315,19 @@ static void OptCodeName (const char* Opt, const char* Arg)
 
 
 
+static void OptCodeSize (const char* Opt, const char* Arg)
+/* Handle the --codesize option */
+{
+    /* Numeric argument expected */
+    if (sscanf (Arg, "%u", &CodeSizeFactor) != 1 ||
+	CodeSizeFactor < 100 ||
+       	CodeSizeFactor > 1000) {
+	AbEnd ("Argument for %s is invalid", Opt);
+    }
+}
+
+
+
 static void OptCreateDep (const char* Opt, const char* Arg)
 /* Handle the --create-dep option */
 {
@@ -439,24 +453,25 @@ int main (int argc, char* argv[])
 {
     /* Program long options */
     static const LongOpt OptTab[] = {
-	{ "--add-source",	0,    	OptAddSource		},
-	{ "--ansi",   	 	0,	OptAnsi			},
-	{ "--bss-name",		1, 	OptBssName		},
+	{ "--add-source",	0,    	OptAddSource 		},
+	{ "--ansi",   	 	0,	OptAnsi	     		},
+	{ "--bss-name",		1, 	OptBssName   		},
        	{ "--check-stack",	0,     	OptCheckStack		},
-	{ "--code-name",	1, 	OptCodeName		},
-	{ "--create-dep",	0,	OptCreateDep		},
-        { "--cpu",     	       	1, 	OptCPU 			},
-	{ "--data-name",	1, 	OptDataName		},
-       	{ "--debug",           	0,     	OptDebug		},
-	{ "--debug-info",      	0, 	OptDebugInfo		},
-	{ "--help",	 	0, 	OptHelp			},
+	{ "--code-name",	1, 	OptCodeName  		},
+	{ "--codesize",		1,	OptCodeSize		},
+	{ "--create-dep",	0,	OptCreateDep 		},
+        { "--cpu",     	       	1, 	OptCPU 	     		},
+	{ "--data-name",	1, 	OptDataName  		},
+       	{ "--debug",           	0,     	OptDebug     		},
+	{ "--debug-info",      	0, 	OptDebugInfo 		},
+	{ "--help",	 	0, 	OptHelp	     		},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
 	{ "--rodata-name",	1, 	OptRodataName		},
 	{ "--signed-chars",	0, 	OptSignedChars	       	},
        	{ "--static-locals",   	0, 	OptStaticLocals	       	},
-	{ "--target",	 	1,  	OptTarget	       	},
-	{ "--verbose",	       	0, 	OptVerbose	       	},
-	{ "--version",	       	0,	OptVersion	       	},
+	{ "--target",	 	1,  	OptTarget    	       	},
+	{ "--verbose",	       	0, 	OptVerbose   	       	},
+	{ "--version",	       	0,	OptVersion   	       	},
     };
 
     int I;
@@ -558,6 +573,7 @@ int main (int argc, char* argv[])
 		    	     	break;
 	       	    	    case 'i':
 	       	    	     	FavourSize = 0;
+				CodeSizeFactor = 200;
     	       	    	     	break;
 	       	    	    case 'r':
 	       	    	 	EnableRegVars = 1;

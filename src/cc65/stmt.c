@@ -568,7 +568,7 @@ static void doswitch (void)
     ConsumeLCurly ();
 
     /* Now decide which sort of switch we will create: */
-    if (IsTypeChar (eval.e_tptr) || (FavourSize == 0 && IsClassInt (eval.e_tptr))) {
+    if (IsTypeChar (eval.e_tptr) || (CodeSizeFactor >= 200 && IsClassInt (eval.e_tptr))) {
        	cascadeswitch (&eval);
     } else {
       	tableswitch (&eval);

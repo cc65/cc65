@@ -539,7 +539,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
      *  - we have more than one parameter to push (don't count the last param
      *    for __fastcall__ functions).
      */
-    if (Optimize && !FavourSize) {
+    if (CodeSizeFactor >= 200) {
 
 	/* Calculate the number and size of the parameters */
 	FrameParams = Func->ParamCount;

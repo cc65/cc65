@@ -677,7 +677,7 @@ void g_getimmed (unsigned flags, unsigned long val, unsigned offs)
      		    AddCodeLine ("\tsta\tsreg+1");
      		    AddCodeLine ("\tsta\tsreg");
      		    AddCodeLine ("\tldx\t#$%02X", (unsigned char) (val >> 8));
-     		} else if ((val & 0xFFFF0000) == 0 && FavourSize == 0) {
+     		} else if ((val & 0xFFFF0000) == 0 && CodeSizeFactor > 140) {
      		    AddCodeLine ("\tlda\t#$00");
      		    AddCodeLine ("\tsta\tsreg+1");
      		    AddCodeLine ("\tsta\tsreg");
@@ -820,19 +820,19 @@ void g_getlocal (unsigned flags, int offs)
 		AddCodeLine ("\tdey");
 		AddCodeLine ("\tora\t(sp),y");
 	    } else {
-		if (FavourSize) {
+		if (CodeSizeFactor > 180) {
+	    	    ldyconst (offs + 1);
+		    AddCodeLine ("\tlda\t(sp),y");
+		    AddCodeLine ("\ttax");
+		    AddCodeLine ("\tdey");
+		    AddCodeLine ("\tlda\t(sp),y");
+		} else {
 		    if (offs) {
 			ldyconst (offs+1);
        			AddCodeLine ("\tjsr\tldaxysp");
 		    } else {
 			AddCodeLine ("\tjsr\tldax0sp");
 		    }
-		} else {
-	    	    ldyconst (offs + 1);
-		    AddCodeLine ("\tlda\t(sp),y");
-		    AddCodeLine ("\ttax");
-		    AddCodeLine ("\tdey");
-		    AddCodeLine ("\tlda\t(sp),y");
 		}
 	    }
 	    break;
@@ -878,13 +878,13 @@ void g_getind (unsigned flags, unsigned offs)
      	     	}
      	    } else {
      	        if (flags & CF_UNSIGNED) {
-     		    if (FavourSize) {
-     	     	        AddCodeLine ("\tjsr\tldaui");
-     		    } else {
+     		    if (CodeSizeFactor > 250) {
      			AddCodeLine ("\tsta\tptr1");
      			AddCodeLine ("\tstx\tptr1+1");
      		     	AddCodeLine ("\tldx\t#$00");
      			AddCodeLine ("\tlda\t(ptr1,x)");
+     		    } else {
+     	     	        AddCodeLine ("\tjsr\tldaui");
      		    }
      	     	} else {
      	     	    AddCodeLine ("\tjsr\tldai");
@@ -941,14 +941,14 @@ void g_leasp (int offs)
      	AddCodeLine ("\tlda\tsp");
      	AddCodeLine ("\tldx\tsp+1");
     } else {
-     	if (FavourSize) {
+     	if (CodeSizeFactor < 300) {
      	    ldaconst (offs);         		/* Load A with offset value */
      	    AddCodeLine ("\tjsr\tleaasp");	/* Load effective address */
      	} else {
      	    if (CPU == CPU_65C02 && offs == 1) {
      	     	AddCodeLine ("\tlda\tsp");
      	     	AddCodeLine ("\tldx\tsp+1");
-     		AddCodeLine ("\tina");
+     	    	AddCodeLine ("\tina");
      	     	AddCodeLine ("\tbne\t*+3");
      	     	AddCodeLine ("\tinx");
      	     	AddCodeHint ("x:!");		/* Invalidate X */
@@ -1127,7 +1127,7 @@ void g_putlocal (unsigned Flags, int Offs, long Val)
 		    AddCodeLine ("\tsta\t(sp),y");
 		}
 	    } else {
-		if ((Flags & CF_NOKEEP) == 0 || FavourSize) {
+		if ((Flags & CF_NOKEEP) == 0 || CodeSizeFactor < 160) {
 		    if (Offs) {
 			ldyconst (Offs);
 			AddCodeLine ("\tjsr\tstaxysp");
@@ -1315,12 +1315,12 @@ void g_reglong (unsigned flags)
 	case CF_CHAR:
 	case CF_INT:
 	    if (flags & CF_UNSIGNED) {
-	    	if (FavourSize) {
-	       	    AddCodeLine ("\tjsr\taxulong");
-	    	} else {
+	    	if (CodeSizeFactor >= 200) {
 	    	    ldyconst (0);
 	    	    AddCodeLine ("\tsty\tsreg");
 		    AddCodeLine ("\tsty\tsreg+1");
+	    	} else {
+	       	    AddCodeLine ("\tjsr\taxulong");
 	    	}
 	    } else {
 	    	AddCodeLine ("\tjsr\taxlong");
@@ -1451,19 +1451,19 @@ void g_scale (unsigned flags, long val)
      	     	    /* FALLTHROUGH */
 
      	     	case CF_INT:
-     	     	    if (FavourSize || p2 >= 3) {
-     	     	       	if (flags & CF_UNSIGNED) {
-     	     	     	    AddCodeLine ("\tjsr\tshlax%d", p2);
-     	     	     	} else {
-     	     	     	    AddCodeLine ("\tjsr\taslax%d", p2);
-     	     	     	}
-     	     	    } else {
+		    if (CodeSizeFactor >= (p2+1)*130U) {
      	     		AddCodeLine ("\tstx\ttmp1");
      	     	  	while (p2--) {
      	     		    AddCodeLine ("\tasl\ta");
 	     		    AddCodeLine ("\trol\ttmp1");
      	     		}
      	     		AddCodeLine ("\tldx\ttmp1");
+     	     	    } else {
+     	     	       	if (flags & CF_UNSIGNED) {
+     	     	     	    AddCodeLine ("\tjsr\tshlax%d", p2);
+     	     	     	} else {
+     	     	     	    AddCodeLine ("\tjsr\taslax%d", p2);
+     	     	     	}
      	     	    }
      	     	    break;
 
@@ -1513,20 +1513,18 @@ void g_scale (unsigned flags, long val)
 
      		case CF_INT:
      		    if (flags & CF_UNSIGNED) {
-			if (FavourSize || p2 >= 3) {
-     			    AddCodeLine ("\tjsr\tlsrax%d", p2);
-			} else {
+			if (CodeSizeFactor >= (p2+1)*130U) {
 			    AddCodeLine ("\tstx\ttmp1");
 			    while (p2--) {
 	     		    	AddCodeLine ("\tlsr\ttmp1");
 				AddCodeLine ("\tror\ta");
 			    }
 			    AddCodeLine ("\tldx\ttmp1");
+			} else {
+     			    AddCodeLine ("\tjsr\tlsrax%d", p2);
 			}
      		    } else {
-			if (FavourSize || p2 >= 3) {
-     			    AddCodeLine ("\tjsr\tasrax%d", p2);
-			} else {
+			if (CodeSizeFactor >= (p2+1)*150U) {
 			    AddCodeLine ("\tstx\ttmp1");
 			    while (p2--) {
 			    	AddCodeLine ("\tcpx\t#$80");
@@ -1534,6 +1532,8 @@ void g_scale (unsigned flags, long val)
 			    	AddCodeLine ("\tror\ta");
 			    }
 			    AddCodeLine ("\tldx\ttmp1");
+			} else {
+     			    AddCodeLine ("\tjsr\tasrax%d", p2);
 	    	     	}
      		    }
      		    break;
@@ -1902,7 +1902,7 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
      	    break;
 
        	case CF_INT:
-	    if (!FavourSize) {
+	    if (CodeSizeFactor >= 200) {
 		/* Lots of code, use only if size is not important */
        	       	AddCodeLine ("\tsta\tptr1");
 		AddCodeLine ("\tstx\tptr1+1");
@@ -2137,7 +2137,7 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val)
      	    break;
 
        	case CF_INT:
-	    if (!FavourSize) {
+	    if (CodeSizeFactor >= 200) {
 		/* Lots of code, use only if size is not important */
 		AddCodeLine ("\tsta\tptr1");
        	       	AddCodeLine ("\tstx\tptr1+1");
@@ -2419,11 +2419,11 @@ void g_push (unsigned flags, unsigned long val)
      	if ((flags & CF_TYPE) == CF_CHAR && (flags & CF_FORCECHAR)) {
 
      	    /* Handle as 8 bit value */
-     	    if (FavourSize && val <= 2) {
-     	    	AddCodeLine ("\tjsr\tpushc%d", (int) val);
-     	    } else {
+	    if (CodeSizeFactor >= 165 || val > 2) {
      	    	ldaconst (val);
      	    	AddCodeLine ("\tjsr\tpusha");
+     	    } else {
+     	    	AddCodeLine ("\tjsr\tpushc%d", (int) val);
      	    }
 
      	} else {
@@ -3309,7 +3309,7 @@ void g_inc (unsigned flags, unsigned long val)
 		AddCodeLine ("\tinx");
 		/* Tell the optimizer that the X register may be invalid */
 		AddCodeHint ("x:!");
-     	    } else if (FavourSize) {
+     	    } else if (CodeSizeFactor < 200) {
      		/* Use jsr calls */
      		if (val <= 8) {
      		    AddCodeLine ("\tjsr\tincax%lu", val);
@@ -3324,24 +3324,24 @@ void g_inc (unsigned flags, unsigned long val)
 		if (val < 0x300) {
 		    if ((val & 0xFF) != 0) {
 		       	AddCodeLine ("\tclc");
-		    	AddCodeLine ("\tadc\t#$%02X", (unsigned char) val);
-		    	AddCodeLine ("\tbcc\t*+3");
-		    	AddCodeLine ("\tinx");
-		    	/* Tell the optimizer that the X register may be invalid */
+		       	AddCodeLine ("\tadc\t#$%02X", (unsigned char) val);
+		       	AddCodeLine ("\tbcc\t*+3");
+		       	AddCodeLine ("\tinx");
+		       	/* Tell the optimizer that the X register may be invalid */
        	       	       	AddCodeHint ("x:!");
 		    }
      		    if (val >= 0x100) {
-     		     	AddCodeLine ("\tinx");
+     		       	AddCodeLine ("\tinx");
      		    }
      		    if (val >= 0x200) {
-     		    	AddCodeLine ("\tinx");
+     		       	AddCodeLine ("\tinx");
      		    }
      		} else {
 		    AddCodeLine ("\tclc");
 		    if ((val & 0xFF) != 0) {
-	     	    	AddCodeLine ("\tadc\t#$%02X", (unsigned char) val);
-			/* Tell the optimizer that the X register may be invalid */
-			AddCodeHint ("x:!");
+	     	       	AddCodeLine ("\tadc\t#$%02X", (unsigned char) val);
+		       	/* Tell the optimizer that the X register may be invalid */
+		       	AddCodeHint ("x:!");
 		    }
      		    AddCodeLine ("\tpha");
      		    AddCodeLine ("\ttxa");
@@ -3943,7 +3943,7 @@ void g_strlen (unsigned flags, unsigned long val, unsigned offs)
     } else {
 
        	/* Address not constant but in primary */
-	if (FavourSize) {
+	if (CodeSizeFactor < 400) {
 	    /* This is too much code, so call strlen instead of inlining */
     	    AddCodeLine ("\tjsr\t_strlen");
 	} else {

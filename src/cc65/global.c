@@ -48,6 +48,7 @@ unsigned char WriteableStrings	= 0;   	/* Literal strings are r/w */
 unsigned char NoWarn		= 0;   	/* Suppress warnings */
 unsigned char Optimize		= 0;   	/* Optimize flag */
 unsigned char FavourSize	= 1;   	/* Favour size over speed */
+unsigned      CodeSizeFactor	= 100;	/* Size factor for generated code */
 unsigned char InlineStdFuncs	= 0;   	/* Inline some known functions */
 unsigned char EnableRegVars	= 0;   	/* Enable register variables */
 unsigned char AllowRegVarAddr	= 0;	/* Allow taking addresses of register vars */

@@ -187,7 +187,8 @@ static O65Import* ReadO65Import (FILE* F)
     do {
         C = Read8 (F);
         if (Len >= sizeof (Buf)) {
-            Error ("Imported identifier exceeds maximum size (%u)", sizeof (Buf));
+            Error ("Imported identifier exceeds maximum size (%u)",
+                   (unsigned) sizeof (Buf));
         }
         Buf[Len++] = C;
     } while (C != '\0');
@@ -281,7 +282,8 @@ static O65Export* ReadO65Export (FILE* F, const O65Header* H)
     do {
         C = Read8 (F);
         if (Len >= sizeof (Buf)) {
-            Error ("Exported identifier exceeds maximum size (%u)", sizeof (Buf));
+            Error ("Exported identifier exceeds maximum size (%u)",
+                   (unsigned) sizeof (Buf));
         }
         Buf[Len++] = C;
     } while (C != '\0');

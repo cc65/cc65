@@ -52,10 +52,10 @@
 void Warning (const char* Format, ...) attribute((format(printf,1,2)));
 /* Print a warning message */
 
-void Error (const char* Format, ...) attribute((format(printf,1,2)));
+void Error (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print an error message and die */
 
-void Internal (const char* Format, ...) attribute((format(printf,1,2)));
+void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print an internal error message and die */
 
 

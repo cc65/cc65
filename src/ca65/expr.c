@@ -41,6 +41,7 @@
 #include "exprdefs.h"
 #include "print.h"
 #include "tgttrans.h"
+#include "version.h"
 #include "xmalloc.h"
 
 /* ca65 */
@@ -665,6 +666,12 @@ static ExprNode* Factor (void)
 	    N = GenLiteralExpr (time (0));
 	    NextTok ();
 	    break;
+
+        case TOK_VERSION:
+            N = GenLiteralExpr (VERSION);
+            NextTok ();
+            break;
+
 
 	case TOK_XMATCH:
 	    N = Function (FuncXMatch);

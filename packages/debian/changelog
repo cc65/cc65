@@ -1,3 +1,9 @@
+cc65 (2.8.0-2) unstable; urgency=low
+
+  * debian/control: Suggest target packages, don't recommend them
+
+ -- Michael Klein <michael.klein@puffin.lb.shuttle.de>  Sat, 21 Sep 2002 20:39:53 +0200
+
 cc65 (2.8.0-1) unstable; urgency=low
 
   * Initial release.

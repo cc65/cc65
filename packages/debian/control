@@ -6,7 +6,7 @@ Build-Depends: debhelper, sgml-tools, perl
 Standards-Version: 3.2.1
 
 Package: cc65
-Recommends: cc65-apple2, cc65-atari, cc65-c128, cc65-c64, cc65-cbm510, cc65-cbm610, cc65-geos, cc65-pet, cc65-plus4
+Suggests: cc65-apple2, cc65-atari, cc65-c128, cc65-c64, cc65-cbm510, cc65-cbm610, cc65-geos, cc65-pet, cc65-plus4
 Architecture: any
 Depends: ${shlibs:Depends}
 Description: Crosscompiler/Crossassembler for 6502 systems

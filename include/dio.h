@@ -31,41 +31,58 @@
 #ifndef _DIO_H
 #define _DIO_H
 
-typedef unsigned char       _driveid_t;
-typedef unsigned int        _sectnum_t;
-typedef unsigned int        _sectsize_t;
-typedef struct __dhandle_t *_dhandle_t;
+typedef unsigned char       driveid_t;
+typedef unsigned int        sectnum_t;
+typedef unsigned int        sectsize_t;
+typedef struct __dhandle_t *dhandle_t;
 
 typedef struct {
   unsigned char  head;
   unsigned       track;
   unsigned       sector;
-} _dio_phys_pos;
+} dio_phys_pos;
 
 
 #ifdef __ATARI__
-#define _dio_query_sectsize(x) ((_sectsize_t)128)
+#define dio_query_sectsize(x) ((_sectsize_t)128)
 #else
-#define _dio_query_sectsize(x) ((_sectsize_t)256)
+#define dio_query_sectsize(x) ((_sectsize_t)256)
 #endif
+/* queries sector size, currently hardcoded */
 
-extern _dhandle_t    __fastcall__ _dio_open(_driveid_t drive_id);
-extern unsigned char __fastcall__ _dio_close(_dhandle_t handle);
-extern unsigned char __fastcall__ _dio_read(_dhandle_t handle,
-                                            _sectnum_t sect_num,
-                                            void *buffer);
-extern unsigned char __fastcall__ _dio_write(_dhandle_t handle,
-                                             _sectnum_t sect_num,
-                                             const void *buffer);
-extern unsigned char __fastcall__ _dio_write_verify(_dhandle_t handle,
-                                                    _sectnum_t sect_num,
-                                                    const void *buffer);
+extern dhandle_t     __fastcall__ dio_open(driveid_t drive_id);
+/* open drive for subsequent dio access */
 
-extern unsigned char __fastcall__ _dio_phys_to_log(_dhandle_t handle,
-                                                   const _dio_phys_pos *physpos, /* input */
-                                                   _sectnum_t *sectnum);         /* output */
-extern unsigned char __fastcall__ _dio_log_to_phys(_dhandle_t handle,
-                                                   _dio_phys_pos *physpos,       /* output */
-                                                   const _sectnum_t *sectnum);   /* input */
+extern unsigned char __fastcall__ dio_close(dhandle_t handle);
+/* close drive */
+
+extern unsigned char __fastcall__ dio_read(dhandle_t handle,
+                                           sectnum_t sect_num,
+                                           void *buffer);
+/* read sector <sect_num> from drive <handle> to memory at <buffer> */
+/* the number of bytes transferred depends on the sector size */
+
+extern unsigned char __fastcall__ dio_write(dhandle_t handle,
+                                            sectnum_t sect_num,
+                                            const void *buffer);
+/* write memory at <buffer> to sector <sect_num> on drive <handle>, no verify */
+/* the number of bytes transferred depends on the sector size */
+
+extern unsigned char __fastcall__ dio_write_verify(dhandle_t handle,
+                                                   sectnum_t sect_num,
+                                                   const void *buffer);
+/* write memory at <buffer> to sector <sect_num> on drive <handle>, verify after write */
+/* the number of bytes transferred depends on the sector size */
+
+
+extern unsigned char __fastcall__ dio_phys_to_log(dhandle_t handle,
+                                                  const dio_phys_pos *physpos, /* input */
+                                                  sectnum_t *sectnum);        /* output */
+/* convert physical sector address (head/track/sector) to logical sector number */
+
+extern unsigned char __fastcall__ dio_log_to_phys(dhandle_t handle,
+                                                  const sectnum_t *sectnum,    /* input */
+                                                  dio_phys_pos *physpos);     /* output */
+/* convert logical sector number to physical sector address (head/track/sector) */
 
 #endif /* #ifndef _DIO_H */

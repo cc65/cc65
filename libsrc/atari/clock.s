@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 25.07.2000
 ;
-; Implemented using information from Sidney Cadot <sidney@janis.pds.twi.tudelft.nl
+; Implemented using information from Sidney Cadot <sidney@janis.pds.twi.tudelft.nl>
 ;
 ; clock_t clock (void);
 ; unsigned _clocks_per_sec (void);
@@ -18,10 +18,11 @@
 	lda	#0  	      	; Byte 3 is always zero
        	sta    	sreg+1
 	php			; Save current I flag value
-	cli			; Disable interrupts
+	sei			; Disable interrupts
+	lda	RTCLOK+2
+	sta	sreg
 	lda	RTCLOK		; Read clock
 	ldx	RTCLOK+1
-	ldy	RTCLOK+2
 	plp			; Restore old I bit
 	rts
 
@@ -31,7 +32,7 @@
 .proc	__clocks_per_sec
 
 	lda	#50		; Assume PAL
-	ldx	PAL
+	ldx	PAL		; use hw register, PALNTS is only supported on XL/XE ROM
 	beq	@L1
 	ldx	#0
 	lda	#60

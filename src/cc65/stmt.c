@@ -265,24 +265,26 @@ static void docontinue (void)
 static void cascadeswitch (struct expent* eval)
 /* Handle a switch statement for chars with a cmp cascade for the selector */
 {
-    unsigned exitlab;  		/* Exit label */
-    unsigned nextlab;  		/* Next case label */
-    unsigned codelab;		/* Label that starts the actual selector code */
-    int havebreak;		/* Remember if we exited with break */
+    unsigned ExitLab;  		/* Exit label */
+    unsigned NextLab;  		/* Next case label */
+    unsigned CodeLab;		/* Label that starts the actual selector code */
+    int HaveBreak;   		/* Remember if we exited with break */
+    int HaveDefault;		/* Remember if we had a default label */
     int lcount;	       	       	/* Label count */
-    unsigned flags;    		/* Code generator flags */
+    unsigned Flags;    		/* Code generator flags */
     struct expent lval;		/* Case label expression */
-    long val;	       		/* Case label value */
+    long Val;	       		/* Case label value */
 
 
     /* Create a loop so we may break out, init labels */
-    exitlab = GetLabel ();
-    AddLoop (oursp, 0, exitlab, 0, 0);
+    ExitLab = GetLabel ();
+    AddLoop (oursp, 0, ExitLab, 0, 0);
 
     /* Setup some variables needed in the loop  below */
-    flags = TypeOf (eval->e_tptr) | CF_CONST | CF_FORCECHAR;
-    codelab = nextlab = 0;
-    havebreak = 1;
+    Flags = TypeOf (eval->e_tptr) | CF_CONST | CF_FORCECHAR;
+    CodeLab = NextLab = 0;
+    HaveBreak = 1;
+    HaveDefault = 0;
 
     /* Parse the labels */
     lcount = 0;
@@ -293,18 +295,18 @@ static void cascadeswitch (struct expent* eval)
 	    /* If the code for the previous selector did not end with a
 	     * break statement, we must jump over the next selector test.
 	     */
-	    if (!havebreak) {
+	    if (!HaveBreak) {
 		/* Define a label for the code */
-		if (codelab == 0) {
-		    codelab = GetLabel ();
+		if (CodeLab == 0) {
+		    CodeLab = GetLabel ();
 		}
-		g_jump (codelab);
+		g_jump (CodeLab);
 	    }
 
 	    /* If we have a cascade label, emit it */
-	    if (nextlab) {
-		g_defloclabel (nextlab);
-		nextlab = 0;
+	    if (NextLab) {
+		g_defloclabel (NextLab);
+		NextLab = 0;
 	    }
 
 	    while (curtok == TOK_CASE || curtok == TOK_DEFAULT) {
@@ -325,59 +327,59 @@ static void cascadeswitch (struct expent* eval)
 		    }
 
 		    /* Check the range of the expression */
-		    val = lval.e_const;
+		    Val = lval.e_const;
 		    switch (*eval->e_tptr) {
 
 			case T_SCHAR:
 			    /* Signed char */
-			    if (val < -128 || val > 127) {
+			    if (Val < -128 || Val > 127) {
 				Error ("Range error");
 			    }
 			    break;
 
 			case T_UCHAR:
-			    if (val < 0 || val > 255) {
+		  	    if (Val < 0 || Val > 255) {
 				Error ("Range error");
 			    }
 			    break;
 
 			case T_INT:
-			    if (val < -32768 || val > 32767) {
+			    if (Val < -32768 || Val > 32767) {
 				Error ("Range error");
 			    }
 			    break;
 
-			case T_UINT:
-			    if (val < 0 || val > 65535) {
+		  	case T_UINT:
+		  	    if (Val < 0 || Val > 65535) {
 				Error ("Range error");
-			    }			      
+		  	    }
 			    break;
 
 			default:
-			    Internal ("Invalid type: %02X", *eval->e_tptr & 0xFF);
+		     	    Internal ("Invalid type: %02X", *eval->e_tptr & 0xFF);
 		    }
 
 		    /* Skip the colon */
 		    ConsumeColon ();
 
 		    /* Emit a compare */
-		    g_cmp (flags, val);
+		    g_cmp (Flags, Val);
 
 		    /* If another case follows, we will jump to the code if
 		     * the condition is true.
 		     */
 		    if (curtok == TOK_CASE) {
 			/* Create a code label if needed */
-			if (codelab == 0) {
-			    codelab = GetLabel ();
+		    	if (CodeLab == 0) {
+			    CodeLab = GetLabel ();
 			}
-			g_falsejump (CF_NONE, codelab);
+			g_falsejump (CF_NONE, CodeLab);
 		    } else if (curtok != TOK_DEFAULT) {
-			/* No case follows, jump to next selector */
-			if (nextlab == 0) {
-			    nextlab = GetLabel ();
-			}
-			g_truejump (CF_NONE, nextlab);
+		  	/* No case follows, jump to next selector */
+		  	if (NextLab == 0) {
+		  	    NextLab = GetLabel ();
+		  	}
+		  	g_truejump (CF_NONE, NextLab);
 		    }
 
 		} else {
@@ -390,11 +392,14 @@ static void cascadeswitch (struct expent* eval)
 
 		    /* Handle the pathologic case: DEFAULT followed by CASE */
 		    if (curtok == TOK_CASE) {
-			if (codelab == 0) {
-			    codelab = GetLabel ();
-			}
-			g_jump (codelab);
-		    }
+		  	if (CodeLab == 0) {
+		  	    CodeLab = GetLabel ();
+		  	}
+		  	g_jump (CodeLab);
+		    }		   
+
+		    /* Remember that we had a default label */
+		    HaveDefault = 1;
 		}
 
 	    }
@@ -402,19 +407,19 @@ static void cascadeswitch (struct expent* eval)
         }
 
 	/* Emit a code label if we have one */
-	if (codelab) {
-	    g_defloclabel (codelab);
-	    codelab = 0;
+	if (CodeLab) {
+	    g_defloclabel (CodeLab);
+	    CodeLab = 0;
 	}
 
 	/* Parse statements */
 	if (curtok != TOK_RCURLY) {
-       	    havebreak = statement ();
+       	    HaveBreak = statement ();
 	}
     }
 
     /* Check if we have any labels */
-    if (lcount == 0) {
+    if (lcount == 0 && !HaveDefault) {
      	Warning ("No case labels");
     }
 
@@ -424,10 +429,10 @@ static void cascadeswitch (struct expent* eval)
     /* Define the exit label and, if there's a next label left, create this
      * one, too.
      */
-    if (nextlab) {
-	g_defloclabel (nextlab);
+    if (NextLab) {
+	g_defloclabel (NextLab);
     }
-    g_defloclabel (exitlab);
+    g_defloclabel (ExitLab);
 
     /* End the loop */
     DelLoop ();
@@ -449,8 +454,9 @@ static void tableswitch (struct expent* eval)
     int label; 	       	   	/* label for case */
     int lcase; 	       	       	/* label for compares */
     int lcount;	     	       	/* Label count */
-    int havebreak;  		/* Last statement has a break */
-    unsigned flags; 		/* Code generator flags */
+    int HaveBreak;  		/* Last statement has a break */
+    int HaveDefault;		/* Remember if we had a default label */
+    unsigned Flags; 		/* Code generator flags */
     struct expent lval;		/* Case label expression */
     struct swent *p;
     struct swent *swtab;
@@ -459,7 +465,8 @@ static void tableswitch (struct expent* eval)
     swtab = xmalloc (CASE_MAX * sizeof (struct swent));
 
     /* Create a look so we may break out, init labels */
-    havebreak = 0;  		/* Keep gcc silent */
+    HaveBreak = 0;  		/* Keep gcc silent */
+    HaveDefault = 0;		/* No default case until now */
     dlabel = 0;	     	   	/* init */
     lab = GetLabel ();		/* get exit */
     p = swtab;
@@ -488,19 +495,20 @@ static void tableswitch (struct expent* eval)
     	    	} else {
     	    	    NextToken ();
      	    	    dlabel = label;
+		    HaveDefault = 1;
     	    	}
     	    	ConsumeColon ();
     	    } while (curtok == TOK_CASE || curtok == TOK_DEFAULT);
     	    g_defloclabel (label);
-	    havebreak = 0;
+	    HaveBreak = 0;
     	}
     	if (curtok != TOK_RCURLY) {
-    	    havebreak = statement ();
+    	    HaveBreak = statement ();
     	}
     }
 
     /* Check if we have any labels */
-    if (lcount == 0) {
+    if (lcount == 0 && !HaveDefault) {
      	Warning ("No case labels");
     }
 
@@ -508,7 +516,7 @@ static void tableswitch (struct expent* eval)
     NextToken ();
 
     /* If the last statement doesn't have a break or return, add one */
-    if (!havebreak) {
+    if (!HaveBreak) {
         g_jump (lab);
     }
 
@@ -516,8 +524,8 @@ static void tableswitch (struct expent* eval)
     g_defloclabel (lcase);
 
     /* Create the call to the switch subroutine */
-    flags = TypeOf (eval->e_tptr);
-    g_switch (flags);
+    Flags = TypeOf (eval->e_tptr);
+    g_switch (Flags);
 
     /* First entry is negative of label count */
     g_defdata (CF_INT | CF_CONST, -((int)lcount)-1, 0);
@@ -526,7 +534,7 @@ static void tableswitch (struct expent* eval)
     AddCodeHint ("casetable");
     p = swtab;
     while (lcount) {
-       	g_case (flags, p->sw_lab, p->sw_const);	/* Create one label */
+       	g_case (Flags, p->sw_lab, p->sw_const);	/* Create one label */
 	--lcount;
 	++p;
     }

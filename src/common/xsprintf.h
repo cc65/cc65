@@ -38,6 +38,7 @@
 
 
 
+#include <stdlib.h>
 #include <stdarg.h>
 
 #include "attrib.h"

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
+/* (C) 2000     Ullrich von Bassewitz                                        */
 /*              Wacholderweg 14                                              */
 /*              D-70597 Stuttgart                                            */
 /* EMail:       uz@musoftware.de                                             */
@@ -66,13 +66,16 @@ int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap)
 {
 #if defined(__WATCOMC__)
     int Res = _vbprintf (Buf, BufSize, Format, ap);
-#elsif defined(__GNUC__)
+#elif defined(__GNUC__)
     int Res = vsnprintf (Buf, BufSize, Format, ap);
+#elif defined(_MSC_VER)
+    int Res = _vsnprintf (Buf, BufSize, Format, ap);
 #else
+    /* Unsafe version */
     int Res = vsprintf (Buf, Format, ap);
 #endif
     assert (Res >= 0 && (unsigned) Res < BufSize);
-    return Res;		
+    return Res;
 }
 
 

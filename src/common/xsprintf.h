@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
+/* (C) 2000     Ullrich von Bassewitz                                        */
 /*              Wacholderweg 14                                              */
 /*              D-70597 Stuttgart                                            */
 /* EMail:       uz@musoftware.de                                             */

@@ -112,7 +112,7 @@ static int DoConversion (ExprDesc* Expr, int k, type* NewType)
             exprhs (CF_NONE, k, Expr);
 
             /* Emit typecast code */
-            g_typecast (TypeOf (OldType), TypeOf (NewType));
+            g_typecast (TypeOf (NewType), TypeOf (OldType));
 
             /* Value is now in primary */
             Expr->Flags = E_MEXPR;
@@ -161,7 +161,7 @@ static int DoConversion (ExprDesc* Expr, int k, type* NewType)
                 exprhs (CF_NONE, k, Expr);
 
                 /* Emit typecast code. */
-                g_typecast (TypeOf (OldType), TypeOf (NewType) | CF_FORCECHAR);
+                g_typecast (TypeOf (NewType) | CF_FORCECHAR, TypeOf (OldType));
 
                 /* Value is now in primary */
                 Expr->Flags = E_MEXPR;

@@ -40,7 +40,7 @@ void* __fastcall__ memset (void* s, int c, size_t count);
 
 /* Non standard: */
 #ifndef __STRICT_ANSI__
-char* strdup (const char* s);				      /* SYSV/BSD */
+char* __fastcall__ strdup (const char* s);		      /* SYSV/BSD */
 int __fastcall__ stricmp (const char* s1, const char* s2);    /* DOS/Windows */
 int __fastcall__ strcasecmp (const char* s1, const char* s2); /* Same for Unix */
 char* __fastcall__ strlwr (char* s);

@@ -195,6 +195,29 @@ function.
 
 <sect1><tt/modload.h/<label id="modload.h"><p>
 
+<itemize>
+<item><ref id="mod_load" name="mod_load">
+<item><ref id="mod_free" name="mod_free">
+</itemize>
+
+
+<sect1><tt/mouse.h/<label id="mouse.h"><p>
+
+<!-- <itemize> -->
+<!-- <item><ref id="mouse_load_driver" name="mouse_load_driver"> -->
+<!-- <item><ref id="mouse_unload" name="mouse_unload"> -->
+<!-- <item><ref id="mouse_install" name="mouse_install"> -->
+<!-- <item><ref id="mouse_uninstall" name="mouse_uninstall"> -->
+<!-- <item><ref id="mouse_hide" name="mouse_hide"> -->
+<!-- <item><ref id="mouse_show" name="mouse_show"> -->
+<!-- <item><ref id="mouse_box" name="mouse_box"> -->
+<!-- <item><ref id="mouse_move" name="mouse_move"> -->
+<!-- <item><ref id="mouse_buttons" name="mouse_buttons"> -->
+<!-- <item><ref id="mouse_pos" name="mouse_pos"> -->
+<!-- <item><ref id="mouse_info" name="mouse_info"> -->
+<!-- <item><ref id="mouse_ioctl" name="mouse_ioctl"> -->
+<!-- </itemize> -->
+
 
 <sect1><tt/nes.h/<label id="nes.h"><p>
 
@@ -2797,6 +2820,58 @@ be used in presence of a prototype.
 <ref id="bzero" name="bzero">,
 <ref id="memcpy" name="memcpy">,
 <ref id="memmove" name="memmove">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mod_free<label id="mod_free"><p>
+
+<quote>
+<descrip>
+<tag/Function/Free a relocatable module.
+<tag/Header/<tt/<ref id="modload.h" name="modload.h">/
+<tag/Declaration/<tt/void __fastcall__ mod_free (void* module);/
+<tag/Description/The function will free a module loaded into memory by use of
+the <tt/<ref id="mod_load" name="mod_load">/ function.
+<tag/Limits/<itemize>
+<item>The pointer passed as parameter is the pointer to the module memory,
+not the pointer to the control structure.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mod_load" name="mod_load">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>mod_load<label id="mod_load"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load a relocatable module.
+<tag/Header/<tt/<ref id="modload.h" name="modload.h">/
+<tag/Declaration/<tt/unsigned char mod_load (struct mod_ctrl* ctrl);/
+<tag/Description/The function will load a code module into memory and relocate
+it. The function will return an error code. If <tt/MLOAD_OK/ is returned, the
+outgoing fields in the passed <tt/mod_ctrl/ struct contain information about
+the module just loaded. Possible error codes are:
+<itemize>
+<item><tt/MLOAD_OK/ - Module load successful
+<item><tt/MLOAD_ERR_READ/ - Read error
+<item><tt/MLOAD_ERR_HDR/ - Header error
+<item><tt/MLOAD_ERR_OS/ - Wrong operating system
+<item><tt/MLOAD_ERR_FMT/ - Data format error
+<item><tt/MLOAD_ERR_MEM/ - Not enough memory
+</itemize>
+<tag/Limits/<itemize>
+<item>The <htmlurl url="ld65.html" name="ld65"> linker is needed to create
+relocatable o65 modules for use with this function.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="mod_free" name="mod_free">
 <tag/Example/None.
 </descrip>
 </quote>

@@ -52,6 +52,7 @@ machines, you have to install at least one of the library packages.
 %attr(755,root,root)   		/usr/bin/ld65
 %attr(755,root,root)   		/usr/bin/od65
 %attr(755,root,root) %dir	/usr/lib/cc65
+%attr(755,root,root) %dir	/usr/lib/cc65/emd
 %attr(755,root,root) %dir	/usr/lib/cc65/lib
 %attr(755,root,root) %dir	/usr/lib/cc65/tgi
 %attr(755,root,root) %dir	/usr/lib/cc65/include
@@ -64,7 +65,7 @@ machines, you have to install at least one of the library packages.
 
 
 ###############################################################################
-#		     	       VIC20 subpackage				      #
+#		     	       VIC20 subpackage	  			      #
 ###############################################################################
 
 %package vic20
@@ -106,7 +107,7 @@ programs for the Commodore C16/116 using the cc65 crosscompiler.
 
 
 ###############################################################################
-#		     		C64 subpackage				      #
+#		     		C64 subpackage	 			      #
 ###############################################################################
 
 %package c64
@@ -122,8 +123,8 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 %files c64
 %attr(644,root,root) 		/usr/lib/cc65/lib/c64.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/c64.o
-%attr(755,root,root) %dir	/usr/lib/cc65/tgi/c64
-%attr(644,root,root) 		/usr/lib/cc65/tgi/c64/c64-*.tgi
+%attr(644,root,root) 		/usr/lib/cc65/emd/c64-*.emd
+%attr(644,root,root) 		/usr/lib/cc65/tgi/c64-*.tgi
 %doc src/ld65/cfg/c64.cfg
 
 
@@ -145,12 +146,13 @@ programs for the Commodore C128 using the cc65 crosscompiler.
 %files c128
 %attr(644,root,root) 		/usr/lib/cc65/lib/c128.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/c128.o
+%attr(644,root,root) 		/usr/lib/cc65/tgi/c128-*.emd
 %doc src/ld65/cfg/c128.cfg
 
 
 
 ###############################################################################
-#	   	      	       Atari subpackage				      #
+#	   	      	       Atari subpackage		    		      #
 ###############################################################################
 
 %package atari
@@ -171,7 +173,7 @@ programs for the 8 bit Atari machines using the cc65 crosscompiler.
 
 
 ###############################################################################
-#		       	       Plus/4 subpackage			      #
+#		       	       Plus/4 subpackage	    		      #
 ###############################################################################
 
 %package plus4
@@ -304,7 +306,7 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 
 
 ###############################################################################
-#		      		     Build				      #
+#		      		     Build		    		      #
 ###############################################################################
 
 
@@ -329,7 +331,7 @@ cd ..
 
 
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{tgi/c64,lib,include/{geos,tgi},asminc}}
+mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,emd,include/{geos,tgi},lib,tgi}}
 
 # Binaries
 install -s -m 755 src/ar65/ar65 $RPM_BUILD_ROOT/usr/bin
@@ -343,14 +345,21 @@ install -s -m 755 src/ld65/ld65 $RPM_BUILD_ROOT/usr/bin
 install -s -m 755 src/od65/od65 $RPM_BUILD_ROOT/usr/bin
 # Libraries and includes
 install -m 644 libsrc/*.lib libsrc/*.o $RPM_BUILD_ROOT/usr/lib/cc65/lib
-install -m 644 libsrc/c64-*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi/c64
 install -m 644 include/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include
 install -m 644 include/geos/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/geos
 install -m 644 include/tgi/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/tgi
 install -m 644 asminc/*.inc $RPM_BUILD_ROOT/usr/lib/cc65/asminc
 
+# TGI and EM drivers
+install -m 644 libsrc/*.emd $RPM_BUILD_ROOT/usr/lib/cc65/emd
+install -m 644 libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi
+
+
 
 %changelog
+* Mon Dec 2 2002 Ullrich von Bassewitz <uz@cc65.org>
+Changed location of TGI drivers, added EM drivers.
+
 * Fri Nov 22 2002 Ullrich von Bassewitz <uz@cc65.org>
 Added the C16 subpackage.
 

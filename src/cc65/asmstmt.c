@@ -273,8 +273,8 @@ static void ParseLVarArg (StrBuf* T, unsigned Arg)
 static void ParseAsm (void)
 /* Parse the contents of the ASM statement */
 {
-    unsigned I;
     unsigned Arg;
+    char     C;
 
     /* Create a target string buffer */
     StrBuf T = AUTO_STRBUF_INITIALIZER;
@@ -302,12 +302,8 @@ static void ParseAsm (void)
      *   %o	- Stack offset of a (local) variable
      *   %%	- The % sign
      */
-    I = 0;
     Arg = 0;
-    while (I < SB_GetLen (&S)) {
-
-       	/* Get the next character */
-       	char C = SB_AtUnchecked (&S, I++);
+    while ((C = SB_Get (&S)) != '\0') {
 
        	/* If it is a newline, the current line is ready to go */
        	if (C == '\n') {
@@ -320,27 +316,19 @@ static void ParseAsm (void)
 
        	    /* Format specifier */
        	    ++Arg;
-
-       	    /* Check if we have characters left */
-       	    if (I >= SB_GetLen (&S)) {
-       		Error ("Error in __asm__ format specifier %u", Arg);
-		AsmErrorSkip ();
-		goto Done;
-	    } else {
-		C = SB_AtUnchecked (&S, I++);
-		switch (C) {
-		    case 'b':  	ParseByteArg (&T, Arg);         break;
-		    case 'w':   ParseWordArg (&T, Arg);         break;
-		    case 'l':   ParseLongArg (&T, Arg);         break;
-		    case 'v':   ParseGVarArg (&T, Arg);         break;
-		    case 'o':   ParseLVarArg (&T, Arg);         break;
-		    case '%':   SB_AppendChar (&T, '%');        break;
-		    default:
-		        Error ("Error in __asm__ format specifier %u", Arg);
-		        AsmErrorSkip ();
-		        goto Done;
-		}
-	    }
+            C = SB_Get (&S);
+            switch (C) {
+                case 'b':   ParseByteArg (&T, Arg);         break;
+                case 'w':   ParseWordArg (&T, Arg);         break;
+                case 'l':   ParseLongArg (&T, Arg);         break;
+                case 'v':   ParseGVarArg (&T, Arg);         break;
+                case 'o':   ParseLVarArg (&T, Arg);         break;
+                case '%':   SB_AppendChar (&T, '%');        break;
+                default:
+                    Error ("Error in __asm__ format specifier %u", Arg);
+                    AsmErrorSkip ();
+                    goto Done;
+            }
 
 	} else {
 

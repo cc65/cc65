@@ -1116,17 +1116,17 @@ compatible with standard CRC routines.
 
 <sect2>FillRam and ClearRam
 <p>
-<tt/void FillRam (char *dest, char value, unsigned length)/
+<tt/void *FillRam (char *dest, char value, unsigned length)/
 <p>
-<tt/void ClearRam (char *dest, unsigned length)/
+<tt/void *ClearRam (char *dest, unsigned length)/
 <p>
-Both functions are filling given memory range. <tt/ClearRam/ fills with <tt/NULLs/, while
+Both functions are filling given memory range. <tt/ClearRam/ fills with <tt/0s/, while
 <tt/FillRam/ uses given <tt/value/. Be warned that these functions destroy <tt/r0, r1 and
-r2L/ registers. <tt/FillRam/ is an alias for <tt/memset/.
+r2L/ registers. These are aliases for <tt/memset/ and <tt/bzero/, respectively.
 
 <sect2>MoveData
 <p>
-<tt/void MoveData (char *dest, char *src, unsigned length)/
+<tt/void *MoveData (char *dest, char *src, unsigned length)/
 <p>
 This functions copies one memory region to another. There are checks for overlap and the
 non-destructive method is chosen. Be warned that this function destroys contents of

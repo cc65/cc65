@@ -19,10 +19,10 @@ void __fastcall__ CopyFString(char len, char *dest, const char *source);
 char __fastcall__ CmpFString(char len, char *dest, const char *source); 
 
 unsigned __fastcall__ CRC(const char *buffer, unsigned len);
-void __fastcall__ ClearRam(char *dest, unsigned len);
-void __fastcall__ FillRam(char *dest, char what, unsigned len);
+void* __fastcall__ ClearRam(char *dest, unsigned len);
+void* __fastcall__ FillRam(char *dest, char what, unsigned len);
 
-void __fastcall__ MoveData(char *dest, const char *source, unsigned len);
+void* __fastcall__ MoveData(char *dest, const char *source, unsigned len);
 
 void __fastcall__ InitRam(char *myInitTab);
 

@@ -4,7 +4,7 @@
 ;
 ; 30.10.99, 15.07.2001
 
-; void FillRam         (char *dest, char what, int length);
+; void * FillRam         (char *dest, char what, int length);
 
 	    .import popa, popax
 	    .export _FillRam
@@ -20,4 +20,11 @@ _FillRam:
 	    jsr popax
 	    sta r1L
 	    stx r1H
-	    jmp FillRam
+	    pha
+	    txa
+	    pha
+	    jsr FillRam
+	    pla
+	    tax
+	    pla
+	    rts

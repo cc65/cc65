@@ -6,7 +6,7 @@ Option Explicit                 ' Variables must be declared explicitly
 ' Installer defaults.
 '******************************************************************************
 const AppName     = "cc65"
-const Version     = "2.10.1"
+const Version     = "2.10.5.20050325"
 const Installer   = "cc65 Installer"
 const SpaceNeeded = 20                  ' Free space needed on drive in MB
 const Shortcut    = true                ' Create shortcut on desktop
@@ -591,7 +591,7 @@ function DirInPath (ByVal Dir)
     dim Path, Entries, I
 
     ' Get the path in lower case
-    Path = GetEnv ("%Path%")
+    Path = LCase (GetEnv ("%Path%"))
 
     ' Convert the directory to lower case
     Dir = LCase (Dir)
@@ -1060,13 +1060,14 @@ sub AddEnvironment ()
         call Abort (GetMsg ("MSG_REGWRITEERR"))
     end if
 
-    ' Add the bin directory to the path
-    call AddToSysPath (BinDir)
+    ' Add the bin directory to the path if it's not already there
+    if not DirInPath (BinDir) then
+	call AddToSysPath (BinDir)
 
-    ' Run the wm_settingchange program to notify other running programs
-    ' of the changed environment. Ignore errors.
-    call Run (BuildPath (BinDir, "wm_settingchange.exe"), 0)
-
+	' Run the wm_settingchange program to notify other running programs
+	' of the changed environment. Ignore errors.
+	call Run (BuildPath (BinDir, "wm_settingchange.exe"), 0)
+    end if
 
 end sub
 

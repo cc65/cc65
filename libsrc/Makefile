@@ -123,7 +123,7 @@ cbm510lib:
 	for i in cbm510 cbm common runtime conio dbg; do \
 	    $(AR) a cbm510.lib $$i/*.o;\
 	done
-  
+
 #-----------------------------------------------------------------------------
 # GEOS on the C64/128
 
@@ -189,7 +189,7 @@ plus4lib:
 
 .PHONY: clean
 clean:
-	@for i in apple2 atari c128 c64 cbm cbm610 common conio dbg geos pet plus4 runtime; do 	\
+	@for i in apple2 atari c128 c64 cbm cbm510 cbm610 common conio dbg geos pet plus4 runtime; do 	\
        	   $(MAKE) -C $$i clean;     	    		  	   					\
 	done
 

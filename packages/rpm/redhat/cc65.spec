@@ -195,6 +195,7 @@ programs for the Commodore C16/116 using the cc65 crosscompiler.
 %files c16
 %attr(644,root,root) 		/usr/lib/cc65/lib/c16.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/c16.o
+%attr(644,root,root) 		/usr/lib/cc65/emd/c16-*.emd
 %attr(644,root,root) 		/usr/lib/cc65/joy/c16-*.joy
 
 

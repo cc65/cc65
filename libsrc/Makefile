@@ -99,6 +99,7 @@ c16lib:
 	done
 	mv c16/crt0.o c16.o
 	cp c16/*.joy .
+	cp c16/*.emd .
 
 #-----------------------------------------------------------------------------
 # C64
@@ -131,7 +132,7 @@ c128lib:
 	    CFLAGS="-Osir -g -T -t c128 --forget-inc-paths -I. -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	    $(AR) a c128.lib $$i/*.o;\
-	done
+  	done
 	mv c128/crt0.o c128.o
 	cp c128/*.emd .
 	cp c128/*.joy .

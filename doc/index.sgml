@@ -1,0 +1,71 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>cc65 documentation overview
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
+<date>03.12.2000
+
+<abstract>
+Main documentation page, contains links to other available stuff.
+</abstract>
+
+<sect>Documentation overview<p>
+
+<descrip>
+
+  <tag><htmlurl url="BUGS" name="BUGS"></tag>
+  Known compiler bugs.
+
+  <tag><htmlurl url="CREDITS" name="CREDITS"></tag>
+  Who helped with the compiler and tools?
+
+  <tag><htmlurl url="ar65.html" name="ar65.html"></tag>
+  Describes the ar65 archiver.
+
+  <tag><htmlurl url="ca65.html" name="ca65.html"></tag>
+  Describes the ca65 macro assembler.
+
+  <tag><htmlurl url="cc65.html" name="cc65.html"></tag>
+  Describes the cc65 C compiler.
+
+  <tag><htmlurl url="cl65.html" name="cl65.html"></tag>
+  Describes the cl65 compile & link utility.
+
+  <tag><htmlurl url="coding.txt" name="coding.txt"></tag>
+  Containes hints on creating the most effective code with cc65.
+
+  <tag><htmlurl url="compile.txt" name="compile.txt"></tag>
+  How to compile cc65 and the support tools.
+
+  <tag><htmlurl url="debugging.txt" name="debugging.txt"></tag>
+  Debug programs using the VICE emulator.
+
+  <tag><htmlurl url="geos.html" name="geos.html"></tag>
+  GEOSLib manual in several formats.
+
+  <tag><htmlurl url="grc.txt" name="grc.txt"></tag>
+  grc.txt	- Describes the GEOS resource compiler (grc).
+
+  <tag><htmlurl url="index.html" name="index.html"></tag>
+  This file.
+
+  <tag><htmlurl url="internal.txt" name="internal.txt"></tag>
+  internal.doc	- A somewhat older text describing several cc65 internals.
+
+  <tag><htmlurl url="intro.txt" name="intro.txt"></tag>
+  Describes the use of the tools by a short "hello world" example.
+
+  <tag><htmlurl url="ld65.html" name="ld65.html"></tag>
+  Describes the ld65 linker.
+
+  <tag><htmlurl url="library.html" name="library.html"></tag>
+  Describes the cc65 runtime and C libraries.
+
+  <tag><htmlurl url="newvers.txt" name="newvers.txt"></tag>
+  Somewhat outdated. Lists the differences between the current cc65 release
+  and the original atari version created by J.R Dunning.
+
+</descrip>
+
+</article>
+

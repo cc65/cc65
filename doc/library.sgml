@@ -1,0 +1,251 @@
+<!doctype linuxdoc system>
+
+<article>
+
+<title>cc65 Library Overview
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
+<date>02.12.2000
+
+<abstract>
+An overview over the runtime and C libraries that come with the cc65 compiler,
+including a discussion of the differences to the ISO standard.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+<sect>Overview<p>
+
+This file contains a description of the library routines available for the
+cc65 C compiler. It is not complete in some areas, so if you miss something,
+have a look into the header files. All functions, that are not defined by the
+ISO C standard have a short comment in the headers, explaining their use.
+
+
+
+<sect>ISO C compatible library<p>
+
+The C library contains a large subset of the ISO C library. Functions are
+usually missing in areas, where there is no support on typical 6502 systems.
+Wide character sets are an example for this.
+
+I will not go into detail about the ISO functions. If a function is not
+mentioned here explicitly, expect it to be available and to behave as defined
+in the C standard.
+
+Functions that are NOT available:
+
+<itemize>
+
+  <item>ftell/fseek/fgetpos/fsetpos
+
+  <item>tmpfile/tmpnam
+
+  <item>The scanf family of functions
+
+  <item>time/asctime/ctime/difftime/asctime/gmtime/localtime/mktime/strftime
+
+  <item>system
+
+  <item>All functions that handle floating point numbers in some manner.
+
+  <item>The div and ldiv functions (because cc65 is not able to return
+    structs).
+
+  <item>All functions handling wide character strings.
+
+  <item>Signals and all related functions (having SIGSEGV would be cool:-)
+
+  <item>rename/remove/rewind
+
+  <item>setbuf/setvbuf/ungetc
+
+</itemize>
+
+Functions that are limited in any way:
+
+<itemize>
+
+  <item>fopen/fread/fwrite/fclose/fputs/fgets/fscanf....
+
+  These functions are built on open/read/write/close. Neither of these low
+  level functions is currently available for the supported systems, and so,
+  fopen and friends do not work. However, the functions exist and are tested
+  to some degree under the ACE operating systems (which is no longer
+  supported).
+
+
+  <item>The va_... family of macros
+
+  The macros do not work completely as defined by the standard. Since cc65 has
+  the wrong calling order, the (non-standard) va_fix macro must be used to
+  access fixed parameters in functions with a variable parameter size. See
+  newvers.txt for a discussion of the problem.
+
+  <item>strcspn/strpbrk/strspn
+
+  These functions have a length limitation of 256 for the second string
+  argument. Since this string gives a character set, and there are only 256
+  distinct characters, this shouldn't be a problem.
+
+  <item>getenv
+
+  Since there is no such thing as an environment on all supported systems, the
+  getenv function will always return a NULL pointer.
+
+
+  <item>locale
+
+  There is no other locale than the "C" locale. The native locale is identical
+  to the "C" locale.
+
+</itemize>
+
+
+In addition to these limitations, some more functions are limited if inlined
+versions are requested by using -Os:
+
+<itemize>
+
+  <item>The strlen function only works for strings with a maximum length of
+  255 characters.
+
+  <item>The isxxx character classification functions from <tt/&lt;ctype.h&gt;/
+  will give unpredictable results if the argument is not in character range
+  (0..255). This limitation may be removed by #undef'ing the function name
+  (when using -Os, the functions are actually macros that expand to inline
+  assembler code, but the real functions are still available if the macro
+  definition is removed).
+
+</itemize>
+
+
+
+<sect>CPU specific stuff - 6502.h<p>
+
+The header file 6502.h contains some functions that make only sense with the
+6502 CPU. Examples are macros to insert more or less useful instructions into
+your C code, or a function to call arbitrary machine language subroutines,
+passing registers in and out.
+
+
+
+<sect>Target specific stuff<p>
+
+For each supported system there's a header file that contains calls or defines
+specific for this system. So, when programming for the C64, include c64.h, for
+the C128, include c128.h and so on. To make the task for the Commodore systems
+easier, there is also a header file named cbm.h that will define stuff common
+for all CBM systems, and include the header file for the specific target
+system.
+
+The header files contain
+
+<itemize>
+
+  <item>Defines for special keys (like function keys)
+
+  <item>Defines for special characters (like the graphics characters)
+
+  <item>Variables with a fixed address in memory that may be used to access
+  special hardware. For the C64 and C128 there is a variable struct named
+  <tt/SID/. Writing to the fields of this struct will write to the SID device
+  instead. Using these variables will make your program more readable and more
+  portable. Don't fear ineffective code when using these variables, the
+  compiler will translate reads and writes to these structs into direct memory
+  accesses.
+
+  <item>Other routines that make only sense for a specific system. One example
+  are routines to write memory locations in the system bank for the CBM
+  600/700 family (called B128/B256 in the US).
+
+</itemize>
+
+
+<sect>Direct console I/O - <tt/conio.h/<p>
+
+The <tt/conio.h/ header file contains a large set of functions that do screen
+and keyboard I/O. The functions will write directly to the screen or poll the
+keyboard directly with no more help from the operating system than needed.
+This has some disadvantages, but on the other side it's fast and reasonably
+portable. conio implementations exist for the following targets:
+
+  <itemize>
+  <item>atari
+  <item>c64
+  <item>c128
+  <item>plus4
+  <item>cbm610 (all CBM series-II computers with 80 column video)
+  <item>pet (all CBM PET systems except the 2001)
+  <item>apple2
+  </itemize>
+
+The conio.h header file does also include the system specific header files
+which define constants for special characters and keys.
+
+
+
+<sect>Using the joystick - <tt/joystick.h/<p>
+
+For systems that have a joystick, <tt/joystick.h/ will define a subroutine to
+read the current value, including constants to evaluate the result of this
+function. To help in writing portable code, the header file will define the
+symbol <tt/__JOYSTICK__/ on systems that have a joystick.
+
+
+
+<sect>Using a mouse - <tt/mouse.h/<p>
+
+Some target machines support a mouse. Mouse support is currently in beta and
+available for the following targets:
+
+  <itemize>
+  <item>atari
+  <item>c64
+  </itemize>
+
+The available functions are declared in <tt/mouse.h/ To help writing portable
+code, the header file will define the symbol <tt/__MOUSE__/ in systems that
+support a mouse.
+
+
+<sect>Bugs/Feedback<p>
+
+If you have problems using the library, if you find any bugs, or if you're
+doing something interesting with it, I would be glad to hear from you. Feel
+free to contact me by email (<htmlurl url="mailto:uz@cc65.org"
+name="uz@cc65.org">).
+
+
+
+<sect>Copyright<p>
+
+This C runtime library implementation for the cc65 compiler is (C)
+Copyright 1998-1999 Ullrich von Bassewitz. For usage of the binaries
+and/or sources the following conditions do apply:
+
+This software is provided 'as-is', without any expressed or implied
+warranty.  In no event will the authors be held liable for any damages
+arising from the use of this software.
+
+Permission is granted to anyone to use this software for any purpose,
+including commercial applications, and to alter it and redistribute it
+freely, subject to the following restrictions:
+
+<enum>
+<item>	The origin of this software must not be misrepresented; you must not
+	claim that you wrote the original software. If you use this software
+	in a product, an acknowledgment in the product documentation would be
+	appreciated but is not required.
+<item>	Altered source versions must be plainly marked as such, and must not
+	be misrepresented as being the original software.
+<item>	This notice may not be removed or altered from any source
+	distribution.
+</enum>
+
+</article>
+
+
+

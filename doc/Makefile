@@ -10,7 +10,10 @@ SGML  =	ar65.sgml	\
 	cc65.sgml	\
 	cl65.sgml	\
 	dio.sgml	\
-	ld65.sgml	
+	geos.sgml	\
+	index.sgml	\
+	ld65.sgml	\
+	library.sgml
 
 TXT   =	$(SGML:.sgml=.txt)
 HTML  = $(SGML:.sgml=.html)
@@ -49,6 +52,10 @@ info:	$(INFO)
 
 .PHONY:	dvi
 dvi:	$(DVI)
+
+# The index.html target is special, since it does not get splitted
+index.html:	index.sgml
+	sgml2html --split=0 $<
 
 clean:
 	rm -f *~

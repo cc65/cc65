@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                addrsize.c                                 */
+/*                                  shift.h                                  */
 /*                                                                           */
-/*                         Address size definitions                          */
+/*                            Safe shift routines                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,8 +33,26 @@
 
 
 
-/* common */
-#include "addrsize.h"
+/* According to the C standard, shifting a data type by the number of bits it
+ * has causes undefined behaviour. So
+ *
+ *      unsigned long l = 1;
+ *      unsigned u =32;
+ *      l <<= u;
+ *
+ * maybe illegal. The functions in this module behave safely in this respect,
+ * and they use proper casting to distinguish signed from unsigned shifts.
+ * They are not a general purpose replacement for the shift operator!
+ */
+
+
+
+#ifndef SHIFT_H
+#define SHIFT_H
+
+
+
+#include <limits.h>
 
 
 
@@ -44,17 +62,23 @@
 
 
 
-const char* AddrSizeToStr (unsigned char AddrSize)
-/* Return the name for an address size specifier */
-{
-    switch (AddrSize) {
-        case ADDR_SIZE_DEFAULT:         return "default";
-        case ADDR_SIZE_ZP:              return "zeropage";
-        case ADDR_SIZE_ABS:             return "absolute";
-        case ADDR_SIZE_FAR:             return "far";
-        default:                        return "unknown";
-    }
-}
+long asl_l (long l, unsigned count);
+/* Arithmetic shift left l by count. */
+
+long asr_l (long l, unsigned count);
+/* Arithmetic shift right l by count */
+
+unsigned long shl_l (unsigned long l, unsigned count);
+/* Logical shift left l by count */
+
+unsigned long shr_l (unsigned long l, unsigned count);
+/* Logical shift right l by count */
+
+
+
+/* End of shift.h */
+
+#endif
 
 
 

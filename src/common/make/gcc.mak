@@ -29,6 +29,7 @@ OBJS =	abend.o		\
         searchpath.o    \
         segdefs.o       \
         segnames.o      \
+        shift.o         \
 	strbuf.o	\
         strpool.o       \
 	strutil.o	\

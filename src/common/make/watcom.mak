@@ -74,6 +74,7 @@ OBJS =	abend.obj	\
         searchpath.obj  \
         segdefs.obj     \
         segnames.obj    \
+        shift.obj       \
 	strbuf.obj	\
         strpool.obj     \
 	strutil.obj	\

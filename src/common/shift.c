@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                addrsize.c                                 */
+/*                                  shift.c                                  */
 /*                                                                           */
-/*                         Address size definitions                          */
+/*                            Safe shift routines                            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,8 +33,24 @@
 
 
 
+/* According to the C standard, shifting a data type by the number of bits it
+ * has causes undefined behaviour. So 
+ *
+ *      unsigned long l = 1;
+ *      unsigned u =32;
+ *      l <<= u;
+ *
+ * maybe illegal. The functions in this module behave safely in this respect,
+ * and they use proper casting to distinguish signed from unsigned shifts.
+ * They are not a general purpose replacement for the shift operator!
+ */
+
+
+
+#include <limits.h>
+
 /* common */
-#include "addrsize.h"
+#include "shift.h"
 
 
 
@@ -44,16 +60,70 @@
 
 
 
-const char* AddrSizeToStr (unsigned char AddrSize)
-/* Return the name for an address size specifier */
+long asl_l (long l, unsigned count)
+/* Arithmetic shift left l by count. */
 {
-    switch (AddrSize) {
-        case ADDR_SIZE_DEFAULT:         return "default";
-        case ADDR_SIZE_ZP:              return "zeropage";
-        case ADDR_SIZE_ABS:             return "absolute";
-        case ADDR_SIZE_FAR:             return "far";
-        default:                        return "unknown";
+    while (1) {
+        if (count >= CHAR_BIT * sizeof (l)) {
+            l <<= (CHAR_BIT * sizeof (l) - 1);
+            count -= (CHAR_BIT * sizeof (l) - 1);
+        } else {
+            l <<= count;
+            break;
+        }
     }
+    return l;
+}
+
+
+
+long asr_l (long l, unsigned count)
+/* Arithmetic shift right l by count */
+{
+    while (1) {
+        if (count >= CHAR_BIT * sizeof (l)) {
+            l >>= (CHAR_BIT * sizeof (l) - 1);
+            count -= (CHAR_BIT * sizeof (l) - 1);
+        } else {
+            l >>= count;
+            break;
+        }
+    }
+    return l;
+}
+
+
+
+unsigned long shl_l (unsigned long l, unsigned count)
+/* Logical shift left l by count */
+{
+    while (1) {
+        if (count >= CHAR_BIT * sizeof (l)) {
+            l <<= (CHAR_BIT * sizeof (l) - 1);
+            count -= (CHAR_BIT * sizeof (l) - 1);
+        } else {
+            l <<= count;
+            break;
+        }
+    }
+    return l;
+}
+
+
+
+unsigned long shr_l (unsigned long l, unsigned count)
+/* Logical shift right l by count */
+{
+    while (1) {
+        if (count >= CHAR_BIT * sizeof (l)) {
+            l >>= (CHAR_BIT * sizeof (l) - 1);
+            count -= (CHAR_BIT * sizeof (l) - 1);
+        } else {
+            l >>= count;
+            break;
+        }
+    }
+    return l;
 }
 
 

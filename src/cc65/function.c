@@ -198,6 +198,7 @@ void NewFunc (SymEntry* Func)
 /* Parse argument declarations and function body. */
 {
     int isbrk;
+    unsigned Flags;
 
     /* Get the function descriptor from the function entry */
     FuncDesc* D = DecodePtr (Func->Type+1);
@@ -251,7 +252,9 @@ void NewFunc (SymEntry* Func)
      	}
 #endif
 	RestoreRegVars (0);
-        g_leave (CF_NONE, 0);
+
+	Flags = HasVoidReturn (CurrentFunc)? CF_NONE : CF_REG;
+        g_leave (Flags, 0);				      
     }
 
     /* Dump literal data created by the function */

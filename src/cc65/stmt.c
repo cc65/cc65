@@ -166,7 +166,7 @@ static void doreturn (void)
 /* Handle 'return' statement here */
 {
     struct expent lval;
-    unsigned etype = 0;		/* Type of return expression */
+    unsigned Flags = 0;	       	/* Code generator flags */
     int HaveVal = 0;		/* Do we have a return value in ax? */
 
 
@@ -177,21 +177,21 @@ static void doreturn (void)
        	}
        	if (evalexpr (CF_NONE, hie0, &lval) == 0) {
        	    /* Constant value */
-       	    etype = CF_CONST;
+       	    Flags = CF_CONST;
        	} else {
-	    /* Value in the primary register */
-	    HaveVal = 1;
-	}
+    	    /* Value in the primary register */
+    	    HaveVal = 1;
+    	}
 
-	/* Convert the return value to the type of the function result */
-	if (!HasVoidReturn (CurrentFunc)) {
-       	    etype |= assignadjust (GetReturnType (CurrentFunc), &lval) & ~CF_CONST;
-	}
+    	/* Convert the return value to the type of the function result */
+    	if (!HasVoidReturn (CurrentFunc)) {
+       	    Flags |= (assignadjust (GetReturnType (CurrentFunc), &lval) & ~CF_CONST) | CF_REG;
+    	}
     } else if (!HasVoidReturn (CurrentFunc)) {
-	Error ("Function `%s' must return a value", GetFuncName (CurrentFunc));
+    	Error ("Function `%s' must return a value", GetFuncName (CurrentFunc));
     }
     RestoreRegVars (HaveVal);
-    g_leave (etype, lval.e_const);
+    g_leave (Flags, lval.e_const);
 }
 
 
@@ -396,7 +396,7 @@ static void cascadeswitch (struct expent* eval)
 		  	    CodeLab = GetLabel ();
 		  	}
 		  	g_jump (CodeLab);
-		    }		   
+		    }
 
 		    /* Remember that we had a default label */
 		    HaveDefault = 1;

@@ -461,7 +461,7 @@ static void FreeLines (Line* Start, Line* End)
 
 
 /*****************************************************************************/
-/*			     Line Collections				     */
+/*	    		     Line Collections				     */
 /*****************************************************************************/
 
 
@@ -532,6 +532,14 @@ static int IsLocalLabel (const Line* L)
 /* Return true if the line is a local label line */
 {
     return (L->Line [0] == 'L' && isxdigit (L->Line [1]));
+}
+
+
+
+static int IsExtLabel (const Line* L)
+/* Return true if the line is an external label line */
+{
+    return (L->Line [0] == '_');
 }
 
 
@@ -1136,13 +1144,15 @@ static unsigned RVUInt2 (Line* L,
 	     	L = GetTargetLine (L->Line+5);
 	    }
 
-	    /* Get the next instruction line */
-       	    L = NextInstruction (L);
+	    /* Get the next line, skip local labels */
+	    do {
+       	    	L = NextCodeSegLine (L);
+	    } while (L && (IsLocalLabel (L) || L->Line[0] == '\0'));
 
 	    /* Bail out if we're done */
-	    if (L == 0 || IsLabel (L)) {
-	    	/* Something is wrong */
-	    	return REG_ALL;
+	    if (L == 0 || IsExtLabel (L)) {
+	    	/* End of function reached */
+	    	goto ExitPoint;
 	    }
 
 	    /* Check if we had this line already. If so, bail out, if not,
@@ -1154,55 +1164,68 @@ static unsigned RVUInt2 (Line* L,
 
 	} while (LineMatch (L, "\tjmp\tL") || LineMatch (L, "\tbra\tL"));
 
+	/* Special handling of code hints */
+       	if (IsHintLine (L)) {
+
+	    if (IsHint (L, "a:-") && (Used & REG_A) == 0) {
+		Unused |= REG_A;
+	    } else if (IsHint (L, "x:-") && (Used & REG_X) == 0) {
+		Unused |= REG_X;
+	    } else if (IsHint (L, "y:-") && (Used & REG_Y) == 0) {
+		Unused |= REG_Y;
+	    }
+
 	/* Special handling for branches */
-	if (LineMatchX (L, ShortBranches) >= 0 ||
+	} else if (LineMatchX (L, ShortBranches) >= 0 ||
 	    LineMatchX (L, LongBranches) >= 0) {
 	    const char* Target = L->Line+5;
 	    if (Target[0] == 'L') {
-	    	/* Jump to local label. Check the register usage starting at
-	    	 * the branch target and at the code following the branch.
-	    	 * All registers that are unused in both execution flows are
-	    	 * returned as unused.
-	    	 */
-	    	unsigned U1, U2;
+	       	/* Jump to local label. Check the register usage starting at
+	       	 * the branch target and at the code following the branch.
+	       	 * All registers that are unused in both execution flows are
+	       	 * returned as unused.
+	       	 */
+	       	unsigned U1, U2;
        	       	U2 = RVUInt1 (GetTargetLine (Target), LC, Used, Unused);
-	    	U1 = RVUInt1 (L, LC, Used, Unused);
-	    	return U1 | U2;		/* Used in any of the branches */
+	       	U1 = RVUInt1 (L, LC, Used, Unused);
+	       	return U1 | U2;		/* Used in any of the branches */
 	    }
+	} else {
+
+	    /* Search for the instruction in this line */
+	    I = FindCmd (L);
+
+	    /* If we don't find it, assume all other registers are used */
+	    if (I < 0) {
+		break;
+	    }
+
+	    /* Evaluate the use flags, check for addressing modes */
+	    R = CmdDesc[I].Use;
+	    if (IsXAddrMode (L)) {
+		R |= REG_X;
+	    } else if (IsYAddrMode (L)) {
+		R |= REG_Y;
+	    }
+	    if (R) {
+		/* Remove registers that were already new loaded */
+		R &= ~Unused;
+
+		/* Remember the remaining registers */
+		Used |= R;
+	    }
+
+	    /* Evaluate the load flags */
+	    R = CmdDesc[I].Load;
+	    if (R) {
+		/* Remove registers that were already used */
+		R &= ~Used;
+
+		/* Remember the remaining registers */
+		Unused |= R;
+	    }
+
 	}
-
-	/* Search for the instruction in this line */
-	I = FindCmd (L);
-
-	/* If we don't find it, assume all other registers are */
-	if (I < 0) {
-	    break;
-	}
-
-	/* Evaluate the use flags, check for addressing modes */
-	R = CmdDesc[I].Use;
-	if (IsXAddrMode (L)) {
-	    R |= REG_X;
-	} else if (IsYAddrMode (L)) {
-	    R |= REG_Y;
-	}
-	if (R) {
-	    /* Remove registers that were already new loaded */
-	    R &= ~Unused;
-
-	    /* Remember the remaining registers */
-	    Used |= R;
-	}
-
-	/* Evaluate the load flags */
-	R = CmdDesc[I].Load;
-	if (R) {
-	    /* Remove registers that were already used */
-	    R &= ~Used;
-
-	    /* Remember the remaining registers */
-	    Unused |= R;
-       	}
 
        	/* If we know about all registers, bail out */
        	if ((Used | Unused) == REG_ALL) {

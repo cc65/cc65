@@ -485,6 +485,12 @@ void g_leave (int flags, int val)
     int k;
     char buf [40];
 
+    /* CF_REG is set if we're returning a value from the function */
+    if ((flags & CF_REG) == 0) {
+	AddCodeHint ("x:-");
+	AddCodeHint ("a:-");
+    }
+
     /* How many bytes of locals do we have to drop? */
     k = -oursp;
 
@@ -499,8 +505,10 @@ void g_leave (int flags, int val)
      	/* Drop stackframe or leave with rts */
      	k += funcargs;
      	if (k == 0) {
+	    AddCodeHint ("y:-");	/* Y register no longer used */
      	    AddCodeLine ("\trts");
      	} else if (k <= 8) {
+	    AddCodeHint ("y:-");	/* Y register no longer used */
      	    AddCodeLine ("\tjmp\tincsp%d", k);
      	} else {
      	    CheckLocalOffs (k);
@@ -515,7 +523,10 @@ void g_leave (int flags, int val)
      	    /* We've a stack frame to drop */
      	    ldyconst (k);
      	    strcat (buf, "y");
-     	}
+     	} else {
+	    /* Y register no longer used */
+	    AddCodeHint ("y:-");	
+	}
      	if (flags & CF_CONST) {
      	    if ((flags & CF_TYPE) != CF_LONG) {
      	   	/* Constant int sized value given for return code */

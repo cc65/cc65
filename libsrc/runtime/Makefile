@@ -164,6 +164,7 @@ OBJS = 	add.o		\
 	staxspp.o	\
        	steaxsp.o	\
 	steaxspp.o	\
+	stkchk.o	\
        	sub.o		\
        	subeqsp.o	\
 	subysp.o	\

@@ -22,6 +22,10 @@ C standard plus additional functions specially crafted for 6502 systems or
 just some of the supported machines. This function refrence describes the
 available functions together with any limitations.
 
+For an overview about the available libraries, their purpose, and any
+differences to the ISO standard, please have a look at the <htmlurl
+url="library.html" name="cc65 Library Overview">.
+
 <bf/Note:/ Standard C functions are listed here, but not described in detail.
 Since these functions behave identical on all standard compliant systems, they
 are described in any book covering standard C.
@@ -240,7 +244,7 @@ on stderr and aborts the program.
 <tag/Description/<tt/atexit/ registers the function pointed to by
 <tt/exitfunc/ as an exit function. Exit functions are called when the program
 terminates, they are called in LIFO order (the last function registered is
-called first). <tt/atexit/ returns zero on success and a nonzero value on 
+called first). <tt/atexit/ returns zero on success and a nonzero value on
 failure.
 <tag/Limits/A maximum of 5 exit functions can be registered. There is no way
 to unregister an exit function. The function is only available as fastcall

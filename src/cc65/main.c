@@ -567,11 +567,9 @@ int main (int argc, char* argv[])
 	    	    P = Arg + 2;
 		    while (*P) {
 		    	switch (*P++) {
-#if 0
      		    	    case 'f':
      		    	     	sscanf (P, "%lx", (long*) &OptDisable);
 		    	     	break;
-#endif
 	       	    	    case 'i':
 	       	    	     	FavourSize = 0;
 				CodeSizeFactor = 200;

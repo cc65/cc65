@@ -33,14 +33,21 @@
 
 
 
+/* common */
+#include "print.h"
+
+/* cc65 */
+#include "global.h"
+
 /* b6502 */
 #include "codeent.h"
+#include "codeinfo.h"
 #include "codeopt.h"
 
 
 
 /*****************************************************************************/
-/*  	       	 	  	     Data				     */
+/*  	       	  	  	     Data				     */
 /*****************************************************************************/
 
 
@@ -53,7 +60,7 @@ static unsigned OptChanges;
 
 
 /*****************************************************************************/
-/*			       Remove dead jumps			     */
+/*		  	       Remove dead jumps			     */
 /*****************************************************************************/
 
 
@@ -80,34 +87,15 @@ static void OptDeadJumps (CodeSeg* S)
 	/* Check if it's a branch, if it has a local target, and if the target
 	 * is the next instruction.
 	 */
-	if (E->AM == AM_BRA) {
-	    printf ("BRA on entry %u:\n", I);
-	    if (E->JumpTo) {
-		printf ("  JumpTo ok\n");
-		if (E->JumpTo->Owner == CollAt (&S->Entries, I+1)) {
-		    printf ("  Branch to next insn\n");
-		}
-	    }
-	}
-
 	if (E->AM == AM_BRA && E->JumpTo && E->JumpTo->Owner == CollAt (&S->Entries, I+1)) {
 
-	    /* Remember the label */
-	    CodeLabel* L = E->JumpTo;
+	    /* Delete the dead jump */
+	    DelCodeSegLine (S, I);
 
-	    /* Jump to next instruction, remove it */
-	    unsigned Remaining = RemoveLabelRef (L, E);
-	    CollDelete (&S->Entries, I);
-	    FreeCodeEntry (E);
+	    /* Keep the number of entries updated */
 	    --Count;
 
-	    /* If the label has no more references, remove it */
-	    if (Remaining == 0) {
-		CollDeleteItem (&L->Owner->Labels, L);
-		FreeCodeLabel (L);
-	    }
-
-	    /* Remember we had changes */
+	    /* Remember, we had changes */
 	    ++OptChanges;
 
 	} else {
@@ -122,6 +110,131 @@ static void OptDeadJumps (CodeSeg* S)
 
 
 /*****************************************************************************/
+/*			       Remove dead code				     */
+/*****************************************************************************/
+
+
+
+static void OptDeadCode (CodeSeg* S)
+/* Remove dead code (code that follows an unconditional jump or an rts/rti
+ * and has no label) 
+ */
+{
+    unsigned I;
+
+    /* Get the number of entries, bail out if we have less than two entries */
+    unsigned Count = CollCount (&S->Entries);
+    if (Count < 2) {
+     	return;
+    }
+
+    /* Walk over all entries minus the last one */
+    I = 0;
+    while (I < Count-1) {
+
+ 	/* Get this entry */
+ 	CodeEntry* E = CollAt (&S->Entries, I);
+
+       	/* Check if it's an unconditional branch, and if the next entry has
+ 	 * no labels attached
+ 	 */
+       	if ((E->OPC == OPC_JMP || E->OPC == OPC_BRA || E->OPC == OPC_RTS || E->OPC == OPC_RTI) &&
+       	    !CodeEntryHasLabel (CollAt (&S->Entries, I+1))) {
+
+ 	    /* Delete the next entry */
+ 	    DelCodeSegLine (S, I+1);
+
+ 	    /* Keep the number of entries updated */
+ 	    --Count;
+
+ 	    /* Remember, we had changes */
+ 	    ++OptChanges;
+
+ 	} else {
+
+ 	    /* Next entry */
+ 	    ++I;
+
+ 	}
+    }
+}
+
+
+
+/*****************************************************************************/
+/*			    Optimize jump cascades			     */
+/*****************************************************************************/
+
+
+
+static void OptJumpCascades (CodeSeg* S)
+/* Optimize jump cascades (jumps to jumps). In such a case, the jump is
+ * replaced by a jump to the final location. This will in some cases produce
+ * worse code, because some jump targets are no longer reachable by short
+ * branches, but this is quite rare, so there are more advantages than
+ * disadvantages.
+ */
+{
+    unsigned I;
+
+    /* Get the number of entries, bail out if we have no entries */
+    unsigned Count = CollCount (&S->Entries);
+    if (Count == 0) {
+     	return;
+    }
+
+    /* Walk over all entries */
+    I = 0;
+    while (I < Count) {
+
+	CodeLabel* OldLabel;
+	CodeLabel* NewLabel;
+
+	/* Get this entry */
+	CodeEntry* E = CollAt (&S->Entries, I);
+
+       	/* Check if it's a branch, if it has a label attached, and if the
+	 * instruction at this label is also a branch.
+	 */
+	if (E->AM == AM_BRA 				&&
+	    (OldLabel = E->JumpTo) != 0 		&&
+       	    OldLabel->Owner->AM == AM_BRA 		&&
+	    (NewLabel = OldLabel->Owner->JumpTo) != 0) {
+
+	    /* Get the instruction that has the new label attached */
+	    CodeEntry* N = OldLabel->Owner;
+
+	    /* Remove the reference to our label and delete it if this was
+	     * the last reference.
+	     */
+	    if (RemoveLabelRef (OldLabel, E) == 0) {
+		/* Delete it */
+		DelCodeLabel (S, OldLabel);
+	    }
+
+	    /* Remove usage information from the entry and use the usage
+	     * information from the new instruction instead.
+	     */
+	    E->Info &= ~(CI_MASK_USE | CI_MASK_CHG);
+	    E->Info |= N->Info & ~(CI_MASK_USE | CI_MASK_CHG);
+
+	    /* Use the new label */
+	    AddLabelRef (NewLabel, E);
+
+	    /* Remember ,we had changes */
+	    ++OptChanges;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+}
+
+
+
+/*****************************************************************************/
 /*     	       	      	  	     Code				     */
 /*****************************************************************************/
 
@@ -130,15 +243,34 @@ static void OptDeadJumps (CodeSeg* S)
 void RunOpt (CodeSeg* S)
 /* Run the optimizer */
 {
-    printf ("Optimize\n");
+    typedef void (*OptFunc) (CodeSeg*);
+
+    /* Table with optimizer steps -  are called in this order */
+    static const OptFunc OptFuncs [] = {
+	OptJumpCascades,	/* Optimize jump cascades */
+       	OptDeadJumps,  		/* Remove dead jumps */
+	OptDeadCode,		/* Remove dead code */
+    };
 
     /* Repeat all steps until there are no more changes */
     do {
 
+	unsigned long Flags;
+	unsigned      I;
+
      	/* Reset the number of changes */
      	OptChanges = 0;
 
-	OptDeadJumps (S);
+       	/* Run all optimization steps */
+	Flags = 1UL;
+       	for (I = 0; I < sizeof(OptFuncs)/sizeof(OptFuncs[0]); ++I) {
+	    if ((OptDisable & Flags) == 0) {
+		OptFuncs[I] (S);
+	    } else if (Verbosity > 0 || Debug) {
+		printf ("Optimizer pass %u skipped\n", I);
+	    }
+	    Flags <<= 1;
+	}
 
     } while (OptChanges > 0);
 }

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -48,6 +48,7 @@ extern unsigned char	ANSI;			/* Strict ANSI flag */
 extern unsigned char	WriteableStrings;	/* Literal strings are r/w */
 extern unsigned char	NoWarn;			/* Suppress warnings */
 extern unsigned char	Optimize;		/* Optimize flag */
+extern unsigned long	OptDisable;		/* Optimizer passes to disable */
 extern unsigned char	FavourSize;		/* Favour size over speed */
 extern unsigned	       	CodeSizeFactor;		/* Size factor for generated code */
 extern unsigned char    InlineStdFuncs;	       	/* Inline some known functions */

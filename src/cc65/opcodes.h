@@ -165,6 +165,11 @@ unsigned GetInsnSize (opc_t OPC, am_t AM);
 const OPCDesc* GetOPCDesc (opc_t OPC);
 /* Get an opcode description */
 
+unsigned GetAMUseInfo (am_t AM);
+/* Get usage info for the given addressing mode (addressing modes that use
+ * index registers return CI_USE... info for these registers).
+ */
+
 
 
 /* End of opcodes.h */

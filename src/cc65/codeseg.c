@@ -136,10 +136,10 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
  * white space, for example.
  */
 {
-    char   		Mnemo[16];
+    char       		Mnemo[16];
     const OPCDesc*	OPC;
     am_t     		AM = 0;		/* Initialize to keep gcc silent */
-    char     		Expr[64];
+    char     		Arg[64];
     char     	   	Reg;
     CodeEntry*		E;
     CodeLabel*		Label;
@@ -160,7 +160,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
     L = SkipSpace (L);
 
     /* Get the addressing mode */
-    Expr[0] = '\0';
+    Arg[0] = '\0';
     switch (*L) {
 
 	case '\0':
@@ -170,13 +170,13 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 
 	case '#':
 	    /* Immidiate */
-	    StrCopy (Expr, sizeof (Expr), L+1);
+	    StrCopy (Arg, sizeof (Arg), L+1);
 	    AM = AM_IMM;
 	    break;
 
 	case '(':
 	    /* Indirect */
-	    L = ReadToken (L+1, ",)", Expr, sizeof (Expr));
+	    L = ReadToken (L+1, ",)", Arg, sizeof (Arg));
 
 	    /* Check for errors */
 	    if (*L == '\0') {
@@ -214,7 +214,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 	     	    }
 	     	    L = SkipSpace (L+1);
 	     	    if (*L != '\0') {
-	     	    	Error ("ASM code error: syntax error");
+	       	    	Error ("ASM code error: syntax error");
 	     	    	return 0;
 	     	    }
 	     	    AM = AM_ZP_INDY;
@@ -238,7 +238,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 
 	default:
 	    /* Absolute, maybe indexed */
-	    L = ReadToken (L, ",", Expr, sizeof (Expr));
+	    L = ReadToken (L, ",", Arg, sizeof (Arg));
 	    if (*L == '\0') {
 	     	/* Assume absolute */
 		AM = AM_ABS;
@@ -257,7 +257,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 		     	AM = AM_ABSY;
 		    } else {
 		     	Error ("ASM code error: syntax error");
-		     	return 0;
+	       	     	return 0;
 		    }
 		    if (*L != '\0') {
 	    	     	Error ("ASM code error: syntax error");
@@ -273,7 +273,7 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
      * if it does not exist. Ignore anything but local labels here.
      */
     Label = 0;
-    if ((OPC->Info & CI_MASK_BRA) == CI_BRA && Expr[0] == 'L') {
+    if ((OPC->Info & CI_MASK_BRA) == CI_BRA && Arg[0] == 'L') {
 
 	unsigned Hash;
 
@@ -284,13 +284,13 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
 	AM = AM_BRA;
 
 	/* Generate the hash over the label, then search for the label */
-	Hash = HashStr (Expr) % CS_LABEL_HASH_SIZE;
-	Label = FindCodeLabel (S, Expr, Hash);
+	Hash = HashStr (Arg) % CS_LABEL_HASH_SIZE;
+	Label = FindCodeLabel (S, Arg, Hash);
 
 	/* If we don't have the label, it's a forward ref - create it */
 	if (Label == 0) {
 	    /* Generate a new label */
-	    Label = NewCodeSegLabel (S, Expr, Hash);
+	    Label = NewCodeSegLabel (S, Arg, Hash);
 	}
     }
 
@@ -298,9 +298,9 @@ static CodeEntry* ParseInsn (CodeSeg* S, const char* L)
      * structure and initialize it.
      */
     E = NewCodeEntry (OPC, AM, Label);
-    if (Expr[0] != '\0') {
+    if (Arg[0] != '\0') {
 	/* We have an additional expression */
-	E->Arg.Expr = xstrdup (Expr);
+	E->Arg = xstrdup (Arg);
     }
 
     /* Return the new code entry */
@@ -342,34 +342,7 @@ CodeSeg* NewCodeSeg (const char* SegName, const char* FuncName)
 void FreeCodeSeg (CodeSeg* S)
 /* Free a code segment including all code entries */
 {
-    unsigned I, Count;
-
-    /* Free the names */
-    xfree (S->SegName);
-    xfree (S->FuncName);
-
-    /* Free the entries */
-    Count = CollCount (&S->Entries);
-    for (I = 0; I < Count; ++I) {
-	FreeCodeEntry (CollAt (&S->Entries, I));
-    }
-
-    /* Free the collections */
-    DoneCollection (&S->Entries);
-    DoneCollection (&S->Labels);
-
-    /* Free all labels */
-    for (I = 0; I < sizeof(S->LabelHash) / sizeof(S->LabelHash[0]); ++I) {
-	CodeLabel* L = S->LabelHash[I];
-	while (L) {
-	    CodeLabel* Tmp = L;
-	    L = L->Next;
-	    FreeCodeLabel (Tmp);
-	}
-    }
-
-    /* Free the struct */
-    xfree (S);
+    FAIL ("Not implemented");
 }
 
 
@@ -422,7 +395,7 @@ void AddCodeSegLine (CodeSeg* S, const char* Format, ...)
     E = 0;	/* Assume no insn created */
     switch (*L) {
 
-	case '\0':
+    	case '\0':
 	    /* Empty line, just ignore it */
 	    break;
 
@@ -469,6 +442,45 @@ void AddCodeSegLine (CodeSeg* S, const char* Format, ...)
 
 
 
+void DelCodeSegLine (CodeSeg* S, unsigned Index)
+/* Delete an entry from the code segment. This includes deleting any associated
+ * labels, removing references to labels and even removing the referenced labels
+ * if the reference count drops to zero.
+ */
+{
+    /* Get the code entry for the given index */
+    CodeEntry* E = CollAt (&S->Entries, Index);
+
+    /* Remove any labels associated with this entry */
+    unsigned Count;
+    while ((Count = CollCount (&E->Labels)) > 0) {
+	DelCodeLabel (S, CollAt (&E->Labels, Count-1));
+    }
+
+    /* If this insn references a label, remove the reference. And, if the
+     * the reference count for this label drops to zero, remove this label.
+     */
+    if (E->JumpTo) {
+
+	/* Remove the reference */
+       	if (RemoveLabelRef (E->JumpTo, E) == 0) {
+	    /* No references remaining, remove the label */
+	    DelCodeLabel (S, E->JumpTo);
+	}
+
+	/* Reset the label pointer to avoid problems later */
+	E->JumpTo = 0;
+    }
+
+    /* Delete the pointer to the insn */
+    CollDelete (&S->Entries, Index);
+
+    /* Delete the instruction itself */
+    FreeCodeEntry (E);
+}
+
+
+
 void AddCodeLabel (CodeSeg* S, const char* Name)
 /* Add a code label for the next instruction to follow */
 {
@@ -480,15 +492,58 @@ void AddCodeLabel (CodeSeg* S, const char* Name)
 
     /* Did we find it? */
     if (L) {
-    	/* We found it - be sure it does not already have an owner */
-    	CHECK (L->Owner == 0);
+     	/* We found it - be sure it does not already have an owner */
+     	CHECK (L->Owner == 0);
     } else {
-    	/* Not found - create a new one */
-    	L = NewCodeSegLabel (S, Name, Hash);
+     	/* Not found - create a new one */
+     	L = NewCodeSegLabel (S, Name, Hash);
     }
 
     /* We do now have a valid label. Remember it for later */
     CollAppend (&S->Labels, L);
+}
+
+
+
+void DelCodeLabel (CodeSeg* S, CodeLabel* L)
+/* Remove references from this label and delete it. */
+{
+    unsigned Count, I;
+
+    /* Get the first entry in the hash chain */
+    CodeLabel* List = S->LabelHash[L->Hash];
+
+    /* First, remove the label from the hash chain */
+    if (List == L) {
+       	/* First entry in hash chain */
+       	S->LabelHash[L->Hash] = L->Next;
+    } else {
+       	/* Must search through the chain */
+       	while (List->Next != L) {
+       	    /* If we've reached the end of the chain, something is *really* wrong */
+       	    CHECK (List->Next != 0);
+       	    /* Next entry */
+       	    List = List->Next;
+       	}
+       	/* The next entry is the one, we have been searching for */
+       	List->Next = L->Next;
+    }
+
+    /* Remove references from insns jumping to this label */
+    Count = CollCount (&L->JumpFrom);
+    for (I = 0; I < Count; ++I) {
+       	/* Get the insn referencing this label */
+       	CodeEntry* E = CollAt (&L->JumpFrom, I);
+       	/* Remove the reference */
+       	E->JumpTo = 0;
+    }
+    CollDeleteAll (&L->JumpFrom);
+
+    /* Remove the reference to the owning instruction */
+    CollDeleteItem (&L->Owner->Labels, L);
+
+    /* All references removed, delete the label itself */
+    FreeCodeLabel (L);
 }
 
 
@@ -550,6 +605,16 @@ void OutputCodeSeg (FILE* F, const CodeSeg* S)
 
     /* Get the number of entries in this segment */
     unsigned Count = CollCount (&S->Entries);
+
+    fprintf (F, "; Labels: ");
+    for (I = 0; I < CS_LABEL_HASH_SIZE; ++I) {
+    	const CodeLabel* L = S->LabelHash[I];
+    	while (L) {
+    	    fprintf (F, "%s ", L->Name);
+    	    L = L->Next;
+    	}
+    }
+    fprintf (F, "\n");
 
     /* Output the segment directive */
     fprintf (F, ".segment\t\"%s\"\n\n", S->SegName);
@@ -633,19 +698,20 @@ void MergeCodeLabels (CodeSeg* S)
     	    unsigned RefCount = CollCount (&L->JumpFrom);
     	    for (K = 0; K < RefCount; ++K) {
 
-    	 	/* Get the next instrcuction that references this label */
+    	       	/* Get the next instruction that references this label */
     	 	CodeEntry* E = CollAt (&L->JumpFrom, K);
 
     	 	/* Change the reference */
     	 	CHECK (E->JumpTo == L);
-    	 	E->JumpTo = RefLab;
-    	 	CollAppend (&RefLab->JumpFrom, E);
+		AddLabelRef (RefLab, E);
 
     	    }
 
+	    /* There are no more instructions jumping to this label now */
+	    CollDeleteAll (&L->JumpFrom);
+
        	    /* Remove the label completely. */
-	    FreeCodeLabel (L);
-     	    CollDelete (&E->Labels, J);
+       	    DelCodeLabel (S, L);
      	}
 
     	/* The reference label is the only remaining label. Check if there
@@ -654,9 +720,7 @@ void MergeCodeLabels (CodeSeg* S)
 	 */
        	if (CollCount (&RefLab->JumpFrom) == 0) {
      	    /* Delete the label */
-     	    FreeCodeLabel (RefLab);
-     	    /* Remove it from the list */
-     	    CollDelete (&E->Labels, 0);
+       	    DelCodeLabel (S, RefLab);
      	}
     }
 }

@@ -55,6 +55,10 @@
 
 
 
+/* Flags used */
+#define CEF_USERMARK	0x0001U		/* Generic mark by user functions */
+#define CEF_NUMARG	0x0002U		/* Insn has numerical argument */
+
 /* Code entry structure */
 typedef struct CodeEntry CodeEntry;
 struct CodeEntry {
@@ -62,12 +66,10 @@ struct CodeEntry {
     am_t	    	AM;		/* Adressing mode */
     unsigned char   	Size;		/* Estimated size */
     unsigned char   	Hints;		/* Hints for this entry */
-    union {
-	unsigned    	Num;		/* Numeric argument */
-	char*	    	Expr;		/* Textual argument */
-    } Arg;
+    char*      	       	Arg;   	       	/* Argument as string */
+    unsigned    	Num;		/* Numeric argument */
     unsigned short  	Flags;		/* Flags */
-    unsigned short  	Usage;		/* Register usage for this entry */
+    unsigned short  	Info;  	       	/* Register usage info for this entry */
     CodeLabel*	  	JumpTo;		/* Jump label */
     Collection	  	Labels;		/* Labels for this instruction */
 };
@@ -85,6 +87,9 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, CodeLabel* JumpTo);
 
 void FreeCodeEntry (CodeEntry* E);
 /* Free the given code entry */
+
+int CodeEntryHasLabel (const CodeEntry* E);
+/* Check if the given code entry has labels attached */
 
 void OutputCodeEntry (FILE* F, const CodeEntry* E);
 /* Output the code entry to a file */

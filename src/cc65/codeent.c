@@ -39,6 +39,7 @@
 
 /* cc65 */
 #include "error.h"
+#include "global.h"
 
 /* b6502 */
 #include "codeinfo.h"
@@ -71,9 +72,10 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, CodeLabel* JumpTo)
     E->AM	= AM;
     E->Size	= GetInsnSize (E->OPC, E->AM);
     E->Hints	= 0;
-    E->Arg.Num	= 0;
+    E->Arg	= 0;
+    E->Num	= 0;
     E->Flags	= 0;
-    E->Usage	= D->Info & (CI_MASK_USE | CI_MASK_CHG);
+    E->Info	= D->Info | GetAMUseInfo (AM);
     E->JumpTo	= JumpTo;
     InitCollection (&E->Labels);
 
@@ -91,7 +93,8 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, CodeLabel* JumpTo)
 void FreeCodeEntry (CodeEntry* E)
 /* Free the given code entry */
 {
-    /* ## Free the string argument if we have one */
+    /* Free the string argument if we have one */
+    xfree (E->Arg);
 
     /* Cleanup the collection */
     DoneCollection (&E->Labels);
@@ -102,83 +105,105 @@ void FreeCodeEntry (CodeEntry* E)
 
 
 
+int CodeEntryHasLabel (const CodeEntry* E)
+/* Check if the given code entry has labels attached */
+{
+    return (CollCount (&E->Labels) > 0);
+}
+
+
+
 void OutputCodeEntry (FILE* F, const CodeEntry* E)
 /* Output the code entry to a file */
 {
     const OPCDesc* D;
+    unsigned Chars;
 
     /* If we have a label, print that */
     unsigned LabelCount = CollCount (&E->Labels);
     unsigned I;
     for (I = 0; I < LabelCount; ++I) {
-	OutputCodeLabel (F, CollConstAt (&E->Labels, I));
+    	OutputCodeLabel (F, CollConstAt (&E->Labels, I));
     }
 
     /* Get the opcode description */
     D = GetOPCDesc (E->OPC);
 
     /* Print the mnemonic */
-    fprintf (F, "\t%s", D->Mnemo);
+    Chars = fprintf (F, "\t%s", D->Mnemo);
 
     /* Print the operand */
     switch (E->AM) {
 
-	case AM_IMP:
-	    /* implicit */
-	    break;
+    	case AM_IMP:
+    	    /* implicit */
+    	    break;
 
-	case AM_ACC:
-	    /* accumulator */
-	    fprintf (F, "\ta");
-	    break;
+    	case AM_ACC:
+    	    /* accumulator */
+    	    Chars += fprintf (F, "%*sa", 9-Chars, "");
+    	    break;
 
-	case AM_IMM:
-	    /* immidiate */
-	    fprintf (F, "\t#%s", E->Arg.Expr);
-	    break;
+    	case AM_IMM:
+    	    /* immidiate */
+    	    Chars += fprintf (F, "%*s#%s", 9-Chars, "", E->Arg);
+    	    break;
 
-	case AM_ZP:
-	case AM_ABS:
+    	case AM_ZP:
+    	case AM_ABS:
 	    /* zeropage and absolute */
-	    fprintf (F, "\t%s", E->Arg.Expr);
+	    Chars += fprintf (F, "%*s%s", 9-Chars, "", E->Arg);
 	    break;
 
 	case AM_ZPX:
 	case AM_ABSX:
 	    /* zeropage,X and absolute,X */
-	    fprintf (F, "\t%s,x", E->Arg.Expr);
+	    Chars += fprintf (F, "%*s%s,x", 9-Chars, "", E->Arg);
 	    break;
 
 	case AM_ABSY:
 	    /* absolute,Y */
-	    fprintf (F, "\t%s,y", E->Arg.Expr);
+	    Chars += fprintf (F, "%*s%s,y", 9-Chars, "", E->Arg);
 	    break;
 
 	case AM_ZPX_IND:
 	    /* (zeropage,x) */
-       	    fprintf (F, "\t(%s,x)", E->Arg.Expr);
+       	    Chars += fprintf (F, "%*s(%s,x)", 9-Chars, "", E->Arg);
 	    break;
 
 	case AM_ZP_INDY:
 	    /* (zeropage),y */
-       	    fprintf (F, "\t(%s),y", E->Arg.Expr);
+       	    Chars += fprintf (F, "%*s(%s),y", 9-Chars, "", E->Arg);
 	    break;
 
 	case AM_ZP_IND:
 	    /* (zeropage) */
-       	    fprintf (F, "\t(%s)", E->Arg.Expr);
+       	    Chars += fprintf (F, "%*s(%s)", 9-Chars, "", E->Arg);
 	    break;
 
 	case AM_BRA:
 	    /* branch */
 	    CHECK (E->JumpTo != 0);
-	    fprintf (F, "\t%s", E->JumpTo->Name);
+	    Chars += fprintf (F, "%*s%s", 9-Chars, "", E->JumpTo->Name);
 	    break;
 
 	default:
 	    Internal ("Invalid addressing mode");
 
     }
+
+    /* Print usage info if requested by the debugging flag */
+//    if (Debug) {
+  	Chars += fprintf (F,
+  			  "%*s; USE: %c%c%c CHG: %c%c%c",
+  			  30-Chars, "",
+  			  (E->Info & CI_USE_A)? 'A' : '_',
+  			  (E->Info & CI_USE_X)? 'X' : '_',
+  			  (E->Info & CI_USE_Y)? 'Y' : '_',
+  			  (E->Info & CI_CHG_A)? 'A' : '_',
+  			  (E->Info & CI_CHG_X)? 'X' : '_',
+  			  (E->Info & CI_CHG_Y)? 'Y' : '_');
+//    }
 
     /* Terminate the line */
     fprintf (F, "\n");

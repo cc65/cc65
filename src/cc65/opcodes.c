@@ -213,4 +213,22 @@ const OPCDesc* GetOPCDesc (opc_t OPC)
 
 
 
+unsigned GetAMUseInfo (am_t AM)
+/* Get usage info for the given addressing mode (addressing modes that use
+ * index registers return CI_USE... info for these registers).
+ */			       
+{
+    /* Check the addressing mode. */
+    switch (AM) {
+	case AM_ACC:	  return CI_USE_A;
+	case AM_ZPX:	  return CI_USE_X;
+	case AM_ABSX:	  return CI_USE_X;
+	case AM_ABSY:	  return CI_USE_Y;
+	case AM_ZPX_IND:  return CI_USE_X;
+	case AM_ZP_INDY:  return CI_USE_Y;
+	default:	  return CI_USE_NONE;
+    }
+}
+
+
 

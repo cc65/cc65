@@ -89,6 +89,9 @@ CodeLabel* NewCodeLabel (const char* Name, unsigned Hash);
 void FreeCodeLabel (CodeLabel* L);
 /* Free the given code label */
 
+void AddLabelRef (CodeLabel* L, struct CodeEntry* E);
+/* Let the CodeEntry E reference the label L */
+
 unsigned RemoveLabelRef (CodeLabel* L, const struct CodeEntry* E);
 /* Remove a reference to this label, return the number of remaining references */
 

@@ -36,7 +36,8 @@
 /* common */
 #include "xmalloc.h"
 
-/* cc65 */
+/* b6502 */
+#include "codeent.h"	 
 #include "label.h"
 
 
@@ -82,6 +83,18 @@ void FreeCodeLabel (CodeLabel* L)
 
 
 
+void AddLabelRef (CodeLabel* L, struct CodeEntry* E)
+/* Let the CodeEntry E reference the label L */
+{
+    /* The insn at E jumps to this label */
+    E->JumpTo = L;
+
+    /* Remember that in the label */
+    CollAppend (&L->JumpFrom, E);
+}
+
+
+
 unsigned RemoveLabelRef (CodeLabel* L, const struct CodeEntry* E)
 /* Remove a reference to this label, return the number of remaining references */
 {
@@ -97,7 +110,7 @@ unsigned RemoveLabelRef (CodeLabel* L, const struct CodeEntry* E)
 void OutputCodeLabel (FILE* F, const CodeLabel* L)
 /* Output the code label to a file */
 {
-    fprintf (F, "%s:\n", L->Name);
+    fprintf (F, "%s:", L->Name);
 }
 
 

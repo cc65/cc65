@@ -95,8 +95,17 @@ CodeSeg* PopCodeSeg (void);
 void AddCodeSegLine (CodeSeg* S, const char* Format, ...) attribute ((format(printf,2,3)));
 /* Add a line to the given code segment */
 
+void DelCodeSegLine (CodeSeg* S, unsigned Index);
+/* Delete an entry from the code segment. This includes deleting any associated
+ * labels, removing references to labels and even removing the referenced labels
+ * if the reference count drops to zero.
+ */
+
 void AddCodeLabel (CodeSeg* S, const char* Name);
 /* Add a code label for the next instruction to follow */
+
+void DelCodeLabel (CodeSeg* S, CodeLabel* L);
+/* Remove references from this label and delete it. */
 
 void AddCodeSegHint (CodeSeg* S, unsigned Hint);
 /* Add a hint for the preceeding instruction */

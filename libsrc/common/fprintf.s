@@ -5,7 +5,7 @@
 ;
 
 	.export	      	_fprintf
-	.import		pushax, addysp, subysp, _vfprintf
+	.import	      	pushax, addysp, decsp4, _vfprintf
 	.importzp	sp, ptr1
 
 	.macpack	generic
@@ -28,36 +28,35 @@ _fprintf:
 
 ; We have to push f and format, both in the order they already have on stack.
 ; To make this somewhat more efficient, we will create space on the stack and
-; the do a copy of the complete block instead of pushing each parameter
+; then do a copy of the complete block instead of pushing each parameter
 ; separately. Since the size of the arguments passed is the same as the size
 ; of the fixed arguments, this will allow us to calculate the pointer to the
 ; fixed size arguments easier (they're just ParamSize bytes away).
 
-	ldy	#4
-	jsr	subysp
+      	jsr	decsp4
 
 ; Calculate a pointer to the Format argument
 
-	lda	ParamSize
-	add	sp
-	sta	ptr1
-	ldx	sp+1
-	bcc	@L1
-	inx
-@L1:	stx	ptr1+1
+      	lda	ParamSize
+      	add	sp
+      	sta	ptr1
+      	ldx	sp+1
+      	bcc	@L1
+      	inx
+@L1:  	stx	ptr1+1
 
 ; Now copy both, f and format
 
-	ldy	#4-1
-@L2:	lda	(ptr1),y
-	sta	(sp),y
-	dey
-	bpl	@L2
+      	ldy	#4-1
+@L2:  	lda	(ptr1),y
+      	sta	(sp),y
+      	dey
+      	bpl	@L2
 
 ; Load va_list (last and __fastcall__ parameter to vfprintf)
 
-	lda    	ptr1
-	ldx    	ptr1+1
+      	lda    	ptr1
+      	ldx    	ptr1+1
 
 ; Call vfprintf
 

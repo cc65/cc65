@@ -5,7 +5,7 @@
 ;
 
 	.export	      	_sprintf
-	.import		pushax, addysp, subysp, _vsprintf
+	.import		pushax, addysp, decsp4, _vsprintf
 	.importzp	sp, ptr1
 
 	.macpack	generic
@@ -33,8 +33,7 @@ _sprintf:
 ; of the fixed arguments, this will allow us to calculate the pointer to the
 ; fixed size arguments easier (they're just ParamSize bytes away).
 
-	ldy	#4
-	jsr	subysp
+	jsr	decsp4
 
 ; Calculate a pointer to the Format argument
 

@@ -14,6 +14,7 @@
 
 .proc	_get_ostype
 
+        ldx     #$00            ; Clear high byte
 	lda	$ff80
 	rts
 

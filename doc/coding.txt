@@ -14,16 +14,10 @@ How to generate the most effective code with cc65.
 2.  Don't declare auto variables in nested function blocks.
 
     Variable declarations in nested blocks are usually a good thing. But with
-    cc65, there are several drawbacks:
-
-     a. The compiler has only one symbol table (there's no true nesting).
-        This means that your variables must not have the same names as
-        variables in the enclosing block.
-
-     b. Since the compiler generates code in one pass, it must create the
-        the variables on the stack each time the block is entered and destroy
-    	them when the block is left. This causes a speed penalty and larger
-        code.
+    cc65, there is a drawback: Since the compiler generates code in one pass,
+    it must create the variables on the stack each time the block is entered
+    and destroy them when the block is left. This causes a speed penalty and
+    larger code.
 
 
 
@@ -137,8 +131,8 @@ How to generate the most effective code with cc65.
 
 10. Use the preincrement and predecrement operators.
 
-    The compiler is currently not smart enough to figure out, if the rvalue of
-    an increment is used or not. So it has to save and restore that value when
+    The compiler not always smart enough to figure out, if the rvalue of an
+    increment is used or not. So it has to save and restore that value when
     producing code for the postincrement and postdecrement operators, even if
     this value is never used. To avoid the additional overhead, use the
     preincrement and predecrement operators if you don't need the resulting
@@ -297,7 +291,7 @@ How to generate the most effective code with cc65.
 
     And remember: Register variables must be enabled with -Or.
 
-			     
+
 
 16. Decimal constants greater than 0x7FFF are actually long ints
 
@@ -338,3 +332,4 @@ How to generate the most effective code with cc65.
 
 
 
+			    

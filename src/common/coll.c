@@ -33,6 +33,7 @@
 
 
 
+#include <stdlib.h>
 #include <string.h>
 
 /* common */
@@ -164,7 +165,7 @@ const void* CollConstAt (const Collection* C, unsigned Index)
     /* Check the index */
     PRECONDITION (Index < C->Count);
 
-    /* Return the element */	 
+    /* Return the element */
     return C->Items[Index];
 }
 
@@ -222,6 +223,17 @@ void CollReplace (Collection* C, void* Item, unsigned Index)
     C->Items[Index] = Item;
 }
 
+
+
+void CollSort (Collection* C, int (*Compare) (const void*, const void*))
+/* Sort the collection using the given compare function.
+ * BEWARE: The function uses qsort internally, so the Compare function does
+ * actually get pointers to the object pointers, not just object pointers!
+ */
+{
+    /* Use qsort */
+    qsort (C->Items, C->Count, sizeof (void*), Compare);
+}
 
 
 

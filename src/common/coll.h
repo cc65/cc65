@@ -113,6 +113,12 @@ void CollReplace (Collection* C, void* Item, unsigned Index);
  * just the pointer will et replaced.
  */
 
+void CollSort (Collection* C, int (*Compare) (const void*, const void*));
+/* Sort the collection using the given compare function.
+ * BEWARE: The function uses qsort internally, so the Compare function does
+ * actually get pointers to the object pointers, not just object pointers!
+ */
+
 
 
 /* End of exprlist.h */

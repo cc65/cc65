@@ -20,7 +20,7 @@ List of supplied sample programs:
 
 -----------------------------------------------------------------------------
 Name:	        hello
-Description:	A fancy "Hello world" type program that uses the conio
+Description:	A nice "Hello world" type program that uses the conio
 		console I/O library for output.
 Platforms:	Runs on all platforms that support conio, which means:
 		Apple ][, Atari, C64, C128, CBM510, CBM610, PET, Plus/4

@@ -1,19 +1,47 @@
 /*
- * test program to display avail. mem.
+ * show some memory stuff
  *
+ * 04-Aug-2004, Christian Groessler
  */
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <conio.h>
+#include <atari.h>
 
-unsigned int *APPMHI = (unsigned int *)0xe;
-unsigned int *MEMTOP = (unsigned int *)0x2e5;
+extern int getsp(void);                         /* comes from ../getsp.s */
 
-unsigned char _graphmode_used = 0;
+extern char _dos_type;                          /* bss variable */
+extern unsigned char _graphmode_used;           /* data variable */
+
+unsigned int *APPMHI = (unsigned int *)14;      /* 14,15 */
+unsigned char *RAMTOP = (unsigned char *)106;   /* in pages */
+unsigned int *LOMEM = (unsigned int *)128;      /* used by BASIC */
+unsigned int *MEMTOP = (unsigned int *)741;
+unsigned int *MEMLO = (unsigned int *)743;
+void *allocmem;
 
 int main(void)
 {
-    printf("APPMHI = %04X, MEMTOP = %04X\n",*APPMHI,*MEMTOP);
-    printf("press return!\n");
-    getchar();
-    return(0);
+  allocmem = malloc(257);
+
+  clrscr();
+
+  printf("  RAMTOP = %02X (%u) - $%04X (%u)\n",
+         *RAMTOP, *RAMTOP, *RAMTOP * 256, *RAMTOP * 256);
+  printf("  APPMHI = $%04X (%u)\n", *APPMHI, *APPMHI);
+  printf("  LOMEM  = $%04X (%u)  <BASIC only>\n", *LOMEM, *LOMEM);
+  printf("  MEMTOP = $%04X (%u)\n", *MEMTOP, *MEMTOP);
+  printf("  MEMLO  = $%04X (%u)\n", *MEMLO, *MEMLO);
+
+  printf("  ----------------------\n");
+  printf("  main:            $%04X  (code)\n", &main);
+  printf("  _graphmode_used: $%04X  (data)\n", &_graphmode_used);
+  printf("  _dos_type:       $%04X  (bss)\n", &_dos_type);
+  printf("  allocmem:        $%04X  (dyn. data)\n", allocmem);
+  printf("  sp:              $%04X  (stack ptr)\n", getsp());
+
+  if (allocmem) free(allocmem);
+  if (_dos_type != 1) cgetc();
+  return(0);
 }

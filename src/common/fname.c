@@ -46,6 +46,35 @@
 
 
 
+const char* FindExt (const char* Name)
+/* Return a pointer to the file extension in Name or NULL if there is none */
+{
+    const char* S;
+
+    /* Get the length of the name */
+    unsigned Len = strlen (Name);
+    if (Len < 2) {
+	return 0;
+    }
+
+    /* Get a pointer to the last character */
+    S = Name + Len - 1;
+
+    /* Search for the dot, beware of subdirectories */
+    while (S >= Name && *S != '.' && *S != '\\' && *S != '/') {
+	--S;
+    }
+
+    /* Did we find an extension? */
+    if (*S == '.') {
+	return S;
+    } else {
+	return 0;
+    }
+}
+
+
+
 char* MakeFilename (const char* Origin, const char* Ext)
 /* Make a new file name from Origin and Ext. If Origin has an extension, it
  * is removed and Ext is appended. If Origin has no extension, Ext is simply
@@ -53,20 +82,19 @@ char* MakeFilename (const char* Origin, const char* Ext)
  * The function may be used to create "foo.o" from "foo.s".
  */
 {
-    /* Construct the name */
-    char* Result;
-    const char* P = strrchr (Origin, '.');
+    char* Out;
+    const char* P = FindExt (Origin);
     if (P == 0) {
-    	/* No dot, add the extension */
-    	Result = xmalloc (strlen (Origin) + strlen (Ext) + 1);
-    	strcpy (Result, Origin);
-    	strcat (Result, Ext);
+	/* No dot, add the extension */
+	Out = xmalloc (strlen (Origin) + strlen (Ext) + 1);
+	strcpy (Out, Origin);
+	strcat (Out, Ext);
     } else {
-    	Result = xmalloc (P - Origin + strlen (Ext) + 1);
-    	memcpy (Result, Origin, P - Origin);
-    	strcpy (Result + (P - Origin), Ext);
+	Out = xmalloc (P - Origin + strlen (Ext) + 1);
+	memcpy (Out, Origin, P - Origin);
+	strcpy (Out + (P - Origin), Ext);
     }
-    return Result;
+    return Out;
 }
 
 

@@ -44,6 +44,9 @@
 
 
 
+const char* FindExt (const char* Name);
+/* Return a pointer to the file extension in Name or NULL if there is none */
+
 char* MakeFilename (const char* Origin, const char* Ext);
 /* Make a new file name from Origin and Ext. If Origin has an extension, it
  * is removed and Ext is appended. If Origin has no extension, Ext is simply

@@ -35,7 +35,7 @@ OBJS = 	_scrsize.o     	 	\
 
 TGIS =	c64-320-200-2.tgi
 
-EMDS =	c64-georam.emd
+EMDS =	c64-georam.emd c64-reu.emd
 
 #--------------------------------------------------------------------------
 # Targets
@@ -47,5 +47,5 @@ all: 	$(OBJS) $(EMDS) $(TGIS)
 
 
 clean:
-	@rm -f $(OBJS) $(EMDS:.emd=.o) $(TGIS:.tgi=.o) 
+	@rm -f $(OBJS) $(EMDS:.emd=.o) $(TGIS:.tgi=.o)
 

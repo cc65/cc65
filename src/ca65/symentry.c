@@ -271,9 +271,9 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
      	return;
     }
 
-    /* Map a default address size to a real value */
+    /* If no address size is given, use the default address size */
     if (AddrSize == ADDR_SIZE_DEFAULT) {
-        AddrSize = SymAddrSize (S);
+        AddrSize = DefAddrSize;
     }
 
     /* If the symbol is marked as import or global, check the symbol flags,

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -33,7 +33,11 @@
 
 
 
-#include "global.h"
+/* common */
+#include "addrsize.h"
+
+/* ca65 */
+#include "global.h"                                     
 
 
 
@@ -60,7 +64,8 @@ unsigned char SmartMode	         = 0;   /* Smart mode */
 unsigned char DbgSyms	         = 0;   /* Add debug symbols */
 unsigned char Listing  	         = 0;   /* Create listing file */
 unsigned char LineCont	         = 0;   /* Allow line continuation */
-
+unsigned char DefAddrSize        = ADDR_SIZE_ABS;       /* Default address size */
+                                    
 /* Emulation features */
 unsigned char DollarIsPC         = 0;   /* Allow the $ symbol as current PC */
 unsigned char NoColonLabels      = 0;   /* Allow labels without a colon */

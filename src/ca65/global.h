@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -61,6 +61,7 @@ extern unsigned char   	SmartMode;     	    /* Smart mode */
 extern unsigned char   	DbgSyms;       	    /* Add debug symbols */
 extern unsigned char   	Listing;            /* Create listing file */
 extern unsigned char   	LineCont;      	    /* Allow line continuation */
+extern unsigned char    DefAddrSize;        /* Default address size */
 
 /* Emulation features */
 extern unsigned char   	DollarIsPC;    	    /* Allow the $ symbol as current PC */

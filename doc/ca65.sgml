@@ -1874,6 +1874,20 @@ Here's a list of all control commands and a description, what they do:
   name=".P816"></tt>
 
 
+<sect1><tt>.POPSEG</tt><label id=".POPSEG"><p>
+
+  Pop the last pushed segment from the stack, and set it.
+
+  This command will switch back to the segment that was last pushed onto the
+  segment stack using the <tt><ref id=".PUSHSEG" name=".PUSHSEG"></tt>
+  command, and remove this entry from the stack.
+
+  The assembler will print an error message if the segment stack is empty
+  when this command is issued.
+
+  See: <tt><ref id=".PUSHSEG" name=".PUSHSEG"></tt>
+
+
 <sect1><tt>.PROC</tt><label id=".PROC"><p>
 
   Start a nested lexical level. All new symbols from now on are in the local
@@ -1907,6 +1921,22 @@ Here's a list of all control commands and a description, what they do:
   </verb></tscreen>
 
   See: <tt><ref id=".ENDPROC" name=".ENDPROC"></tt>
+
+
+<sect1><tt>.PUSHSEG</tt><label id=".PUSHSEG"><p>
+
+  Push the currently active segment onto a stack. The entries on the stack
+  include the name of the segment and the segment type. The stack has a size
+  of 16 entries.
+                 
+  <tt/.PUSHSEG/ allows together with <tt><ref id=".POPSEG" name=".POPSEG"></tt>
+  to switch to another segment and to restore the old segment later, without
+  even knowing the name and type of the current segment.
+
+  The assembler will print an error message if the segment stack is already
+  full, when this command is issued.
+
+  See: <tt><ref id=".POPSEG" name=".POPSEG"></tt>
 
 
 <sect1><tt>.REF, .REFERENCED</tt><label id=".REFERENCED"><p>

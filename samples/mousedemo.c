@@ -1,5 +1,5 @@
 /*
- * Demo program for mouse usage. Will work for the C64/C128/Atari
+ * Demo program for mouse usage. Will work for the C64/C128/CBM510/Atari
  *
  * Ullrich von Bassewitz, 13.09.2001
  *
@@ -102,7 +102,7 @@ int main (void)
     VIC.spr0_color = COLOR_WHITE;
 
     /* Initialize the mouse */
-    mouse_init (MOUSE_C64);
+    mouse_init (MOUSE_CBM1351);
 
 #elif defined(__ATARI__)
 

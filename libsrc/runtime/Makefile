@@ -126,7 +126,6 @@ OBJS = 	add.o		\
 	return0.o	\
 	return1.o	\
        	rsub.o		\
-       	runtime.o	\
        	shelp.o		\
        	shl.o		\
        	shr.o		\
@@ -136,8 +135,10 @@ OBJS = 	add.o		\
        	shreax1.o	\
        	shreax2.o	\
        	shreax3.o	\
+	staspidx.o	\
 	staspp.o	\
        	staxsp.o	\
+	staxspidx.o	\
 	staxspp.o	\
        	steaxsp.o	\
        	sub.o		\

@@ -45,7 +45,7 @@ OBJS =	_scrsize.o	\
 
 EMDS =
 
-JOYS = 
+JOYS = c16-stdjoy.joy
 
 TGIS =
 

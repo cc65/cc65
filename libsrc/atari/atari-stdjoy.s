@@ -1,14 +1,15 @@
 ;
-; Standard joystick driver for the Plus/4
+; Standard joystick driver for the Atari
 ;
 ; Ullrich von Bassewitz, 2002-12-21
+; Using the readjoy code from Christian Groessler
 ;
 
-	.include 	"zeropage.inc"
+ 	.include 	"zeropage.inc"
 
       	.include 	"joy-kernel.inc"
         .include        "joy-error.inc"
-        .include        "../plus4/plus4.inc"
+        .include        "atari.inc"
 
         .macpack        generic
 
@@ -39,12 +40,12 @@
         .word   INSTALL
         .word   DEINSTALL
         .word   COUNT
-        .word   READ
+        .word   READJOY
 
 ; ------------------------------------------------------------------------
 ; Constants
 
-JOY_COUNT       = 2             ; Number of joysticks we support
+JOY_COUNT       = 4             ; Number of joysticks we support
 
 
 ; ------------------------------------------------------------------------
@@ -88,16 +89,19 @@ COUNT:
 ; READ: Read a particular joystick passed in A.
 ;
 
-READ:	ldy	#$FA		; Load index for joystick #1
-	tax			; Test joystick number
-       	beq    	@L1
-	ldy	#$FB		; Load index for joystick #2
-@L1:    sei
-	sty	TED_KBD
-	lda	TED_KBD
-	cli
-	ldx	#$00		; Clear high byte
-     	and	#$1F
-     	eor	#$1F
+READJOY:
+	and	#3		; fix joystick number
+	tax			; Joystick number (0-3) into X
+
+; Read joystick
+
+	lda	STRIG0,x	; get button
+	asl	a
+	asl	a
+	asl	a
+	asl	a
+	ora	STICK0,x	; add position information
+	eor	#$1F
+	ldx	#0		; fix X
      	rts
 

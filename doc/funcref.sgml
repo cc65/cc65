@@ -146,6 +146,14 @@ function.
 </itemize>
 
 
+<sect1><tt/signal.h/<label id="signal.h"><p>
+
+<itemize>
+<item><ref id="raise" name="raise">
+<item><ref id="signal" name="signal">
+</itemize>
+
+
 <sect1><tt/stdlib.h/<label id="stdlib.h"><p>
 
 <itemize>
@@ -415,12 +423,13 @@ already enabled (the default).
 <tag/Function/Terminates a program abnormally.
 <tag/Header/<tt/<ref id="stdlib.h" name="stdlib.h">/
 <tag/Declaration/<tt/void abort (void);/
-<tag/Description/<tt/abort/ writes a termination message on stderr, then
-terminates the program with an exit code of 3.
+<tag/Description/<tt/abort/ raises <tt/SIGABRT/, writes a termination message
+on stderr, then terminates the program with an exit code of 3.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="assert" name="assert">,
-<ref id="exit" name="exit">
+<ref id="exit" name="exit">,
+<ref id="raise" name="raise">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -1783,6 +1792,31 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>raise<label id="raise"><p>
+
+<quote>
+<descrip>
+<tag/Function/Send a signal to the executing program.
+<tag/Header/<tt/<ref id="signal.h" name="signal.h">/
+<tag/Declaration/<tt/int __fastcall__ raise (int sig);/
+<tag/Description/<tt/raise/ sends the given signal to the program. If the
+program has installed a signal handler for the signal, this signal handler
+will be executed. If no handler has been installed, the default action for
+the raised signal will be taken. The function returns zero on success,
+nonzero otherwise.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="abort" name="abort">,
+<ref id="signal" name="signal">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>rand<label id="rand"><p>
 
 <quote>
@@ -1888,6 +1922,31 @@ be used in presence of a prototype.
 <ref id="gotoy" name="gotoy">,
 <ref id="wherex" name="wherex">,
 <ref id="wherey" name="wherey">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>signal<label id="signal"><p>
+
+<quote>
+<descrip>
+<tag/Function/Install a signal handler.
+<tag/Header/<tt/<ref id="signal.h" name="signal.h">/
+<tag/Declaration/<tt/__sigfunc __fastcall__ signal (int sig, __sigfunc func);/
+<tag/Description/<tt/signal/ installs a handler for the given signal. The
+handler may either be a user supplied function, or one of the predefined
+signal handlers <tt/SIG_IGN/ or <tt/SIG_DFL/. The function returns the
+previous value if the signal , or the special function vector SIG_ERR in
+case of an error.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="abort" name="abort">,
+<ref id="raise" name="raise">
 <tag/Example/None.
 </descrip>
 </quote>

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000	 Ullrich von Bassewitz                                       */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -106,6 +106,11 @@ void CollDelete (Collection* C, unsigned Index);
 /* Remove the item with the given index from the collection. This will not
  * free the item itself, just the pointer. All items with higher indices
  * will get moved to a lower position.
+ */
+
+void CollDeleteAll (Collection* C);
+/* Delete all items from the given collection. This will not free the items
+ * itself, it will only remove the pointers.
  */
 
 void CollReplace (Collection* C, void* Item, unsigned Index);

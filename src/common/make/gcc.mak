@@ -60,5 +60,3 @@ depend dep:	$(OBJS:.o=.c)
 	$(CC) -MM $^ > .depend
 
 
-
-

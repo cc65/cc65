@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000	 Ullrich von Bassewitz                                       */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -207,6 +207,17 @@ void CollDelete (Collection* C, unsigned Index)
     /* Remove the item pointer */
     --C->Count;
     memmove (C->Items+Index, C->Items+Index+1, (C->Count-Index) * sizeof (void*));
+}
+
+
+
+void CollDeleteAll (Collection* C)
+/* Delete all items from the given collection. This will not free the items
+ * itself, it will only remove the pointers.
+ */				  
+{
+    /* This one is easy... */
+    C->Count = 0;
 }
 
 

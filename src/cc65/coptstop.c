@@ -45,13 +45,25 @@
 
 
 /*****************************************************************************/
-/*			       	    Helpers                                  */
+/*                                   Data                                    */
+/*****************************************************************************/
+
+
+
+/* Flags returned by DirectOp */
+#define OP_DIRECT       0x01            /* Direct op may be used */
+#define OP_ONSTACK      0x02            /* Operand is on stack */
+
+
+
+/*****************************************************************************/
+/*		  	       	    Helpers                                  */
 /*****************************************************************************/
 
 
 
 static unsigned AdjustStackOffset (CodeSeg* S, unsigned Start, unsigned Stop,
-				   unsigned Offs)
+		  		   unsigned Offs)
 /* Adjust the offset for all stack accesses in the range Start to Stop, both
  * inclusive. The function returns the number of instructions that have been
  * inserted.
@@ -107,6 +119,30 @@ static unsigned AdjustStackOffset (CodeSeg* S, unsigned Start, unsigned Stop,
 
     /* Return the number of inserted entries */
     return Inserted;
+}
+
+
+
+static unsigned DirectOp (CodeEntry* E)
+/* Check if the given entry is a lda instruction with an addressing mode
+ * that allows us to replace it by another operation (like ora). If so, we may
+ * use this location for the or and must not save the value in the zero
+ * page location.
+ */
+{
+    unsigned Flags = 0;
+    if (E->OPC == OP65_LDA) {
+        if (E->AM == AM65_IMM || E->AM == AM65_ZP || E->AM == AM65_ABS) {
+            /* These insns are all ok and replaceable */
+            Flags |= OP_DIRECT;
+        } else if (E->AM == AM65_ZP_INDY &&
+                   E->RI->In.RegY >= 0   &&
+                   strcmp (E->Arg, "sp") == 0) {
+            /* Load from stack with known offset is also ok */
+            Flags |= (OP_DIRECT | OP_ONSTACK);
+        }
+    }
+    return Flags;
 }
 
 
@@ -204,12 +240,12 @@ static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add,
 			      const char* ZPLo, const char* ZPHi)
 /* Optimize the tosaddax sequence if possible */
 {
-    CodeEntry* P;
-    CodeEntry* N;
-    CodeEntry* X;
-    CodeEntry* PushEntry;
-    CodeEntry* AddEntry;
-    int        DirectAdd;
+    CodeEntry*  P;
+    CodeEntry*  N;
+    CodeEntry*  X;
+    CodeEntry*  PushEntry;
+    CodeEntry*  AddEntry;
+    unsigned    Flags;
 
 
     /* We need the entry behind the add */
@@ -221,19 +257,18 @@ static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add,
     /* Get the push entry */
     PushEntry = CS_GetEntry (S, Push);
 
-    /* Check the entry before the push, if it's a lda instruction with an
-     * addressing mode that does not use an additional index register. If
-     * so, we may use this location for the add and must not save the
-     * value in the zero page location.
+    /* Check the entry before the push. If it's a lda instruction with an
+     * addressing mode that allows us to replace it, we may use this
+     * location for the op and must not save the value in the zero page
+     * location.
      */
-    DirectAdd = (P->OPC == OP65_LDA &&
-		 (P->AM == AM65_IMM || P->AM == AM65_ZP || P->AM == AM65_ABS));
+    Flags = DirectOp (P);
 
     /* Store the value into the zeropage instead of pushing it */
     X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
     CS_InsertEntry (S, X, Push+1);
     ++Add;      /* Correct the index */
-    if (!DirectAdd) {
+    if ((Flags & OP_DIRECT) == 0) {
      	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
      	CS_InsertEntry (S, X, Push+1);
 	++Add;	/* Correct the index */
@@ -245,8 +280,15 @@ static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add,
     /* Inline the add */
     X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, AddEntry->LI);
     CS_InsertEntry (S, X, Add+1);
-    if (DirectAdd) {
-	/* Add from variable location */
+    if ((Flags & OP_DIRECT) != 0) {
+       	/* Add a variable location. If the location is on the stack, we
+         * need to reload the Y register.
+         */
+        if ((Flags & OP_ONSTACK) != 0) {
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (P->RI->In.RegY), 0, AddEntry->LI);
+            CS_InsertEntry (S, X, Add);
+            ++Add;
+        }
 	X = NewCodeEntry (OP65_ADC, P->AM, P->Arg, 0, AddEntry->LI);
     } else {
 	/* Add from temp storage */
@@ -305,11 +347,11 @@ static unsigned Opt_tosandax (CodeSeg* S, unsigned Push, unsigned And,
 	    	     	      const char* ZPLo, const char* ZPHi)
 /* Optimize the tosandax sequence if possible */
 {
-    CodeEntry* P;
-    CodeEntry* X;
-    CodeEntry* PushEntry;
-    CodeEntry* AndEntry;
-    int        DirectAnd;
+    CodeEntry*  P;
+    CodeEntry*  X;
+    CodeEntry*  PushEntry;
+    CodeEntry*  AndEntry;
+    unsigned    Flags;
 
     /* Get the entry before the push */
     CHECK ((P = CS_GetPrevEntry (S, Push)) != 0);
@@ -317,19 +359,18 @@ static unsigned Opt_tosandax (CodeSeg* S, unsigned Push, unsigned And,
     /* Get the push entry */
     PushEntry = CS_GetEntry (S, Push);
 
-    /* Check the entry before the push, if it's a lda instruction with an
-     * addressing mode that does not use an additional index register. If
-     * so, we may use this location for the and and must not save the
-     * value in the zero page location.
+    /* Check the entry before the push. If it's a lda instruction with an
+     * addressing mode that allows us to replace it, we may use this
+     * location for the op and must not save the value in the zero page
+     * location.
      */
-    DirectAnd = (P->OPC == OP65_LDA &&
-	    	 (P->AM == AM65_IMM || P->AM == AM65_ZP || P->AM == AM65_ABS));
+    Flags = DirectOp (P);
 
     /* Store the value into the zeropage instead of pushing it */
     X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
     CS_InsertEntry (S, X, Push+1);
     ++And;      /* Correct the index */
-    if (!DirectAnd) {
+    if ((Flags & OP_DIRECT) == 0) {
 	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
 	CS_InsertEntry (S, X, Push+1);
 	++And;  /* Correct the index */
@@ -339,8 +380,15 @@ static unsigned Opt_tosandax (CodeSeg* S, unsigned Push, unsigned And,
     AndEntry = CS_GetEntry (S, And);
 
     /* Inline the and */
-    if (DirectAnd) {
-     	/* And with variable location */
+    if ((Flags & OP_DIRECT) != 0) {
+     	/* And with variable location. If the location is on the stack, we
+         * need to reload the Y register.
+         */
+        if ((Flags & OP_ONSTACK) != 0) {
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (P->RI->In.RegY), 0, AndEntry->LI);
+            CS_InsertEntry (S, X, And);
+            ++And;
+        }
 	X = NewCodeEntry (OP65_AND, P->AM, P->Arg, 0, AndEntry->LI);
     } else {
      	/* And with temp storage */
@@ -379,11 +427,11 @@ static unsigned Opt_tosorax (CodeSeg* S, unsigned Push, unsigned Or,
      		     	     const char* ZPLo, const char* ZPHi)
 /* Optimize the tosorax sequence if possible */
 {
-    CodeEntry* P;
-    CodeEntry* X;
-    CodeEntry* PushEntry;
-    CodeEntry* OrEntry;
-    int        DirectOr;
+    CodeEntry*  P;
+    CodeEntry*  X;
+    CodeEntry*  PushEntry;
+    CodeEntry*  OrEntry;
+    unsigned    Flags;
 
     /* Get the entry before the push */
     CHECK ((P = CS_GetPrevEntry (S, Push)) != 0);
@@ -391,19 +439,18 @@ static unsigned Opt_tosorax (CodeSeg* S, unsigned Push, unsigned Or,
     /* Get the push entry */
     PushEntry = CS_GetEntry (S, Push);
 
-    /* Check the entry before the push, if it's a lda instruction with an
-     * addressing mode that does not use an additional index register. If
-     * so, we may use this location for the or and must not save the
-     * value in the zero page location.
+    /* Check the entry before the push. If it's a lda instruction with an
+     * addressing mode that allows us to replace it, we may use this
+     * location for the op and must not save the value in the zero page
+     * location.
      */
-    DirectOr = (P->OPC == OP65_LDA &&
-     		(P->AM == AM65_IMM || P->AM == AM65_ZP || P->AM == AM65_ABS));
+    Flags = DirectOp (P);
 
     /* Store the value into the zeropage instead of pushing it */
     X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
     CS_InsertEntry (S, X, Push+1);
     ++Or;  /* Correct the index */
-    if (!DirectOr) {
+    if ((Flags & OP_DIRECT) == 0) {
      	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
      	CS_InsertEntry (S, X, Push+1);
      	++Or;  /* Correct the index */
@@ -413,10 +460,18 @@ static unsigned Opt_tosorax (CodeSeg* S, unsigned Push, unsigned Or,
     OrEntry = CS_GetEntry (S, Or);
 
     /* Inline the or */
-    if (DirectOr) {
-     	/* Or with variable location */
+    if ((Flags & OP_DIRECT) != 0) {
+     	/* Or with variable location. If the location is on the stack, we
+         * need to reload the Y register.
+         */
+        if ((Flags & OP_ONSTACK) != 0) {
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (P->RI->In.RegY), 0, OrEntry->LI);
+            CS_InsertEntry (S, X, Or);
+            ++Or;
+        }
      	X = NewCodeEntry (OP65_ORA, P->AM, P->Arg, 0, OrEntry->LI);
     } else {
+        /* Or with temp storage */
      	X = NewCodeEntry (OP65_ORA, AM65_ZP, ZPLo, 0, OrEntry->LI);
     }
     CS_InsertEntry (S, X, Or+1);
@@ -439,7 +494,7 @@ static unsigned Opt_tosorax (CodeSeg* S, unsigned Push, unsigned Or,
      	CS_InsertEntry (S, X, Or+6);
     }
 
-    /* Remove the push and the call to the tosandax function */
+    /* Remove the push and the call to the tosorax function */
     CS_DelEntry (S, Or);
     CS_DelEntry (S, Push);
 
@@ -453,11 +508,11 @@ static unsigned Opt_tosxorax (CodeSeg* S, unsigned Push, unsigned Xor,
 			      const char* ZPLo, const char* ZPHi)
 /* Optimize the tosxorax sequence if possible */
 {
-    CodeEntry* P;
-    CodeEntry* X;
-    CodeEntry* PushEntry;
-    CodeEntry* XorEntry;
-    int        DirectXor;
+    CodeEntry*  P;
+    CodeEntry*  X;
+    CodeEntry*  PushEntry;
+    CodeEntry*  XorEntry;
+    unsigned    Flags;
 
     /* Get the entry before the push */
     CHECK ((P = CS_GetPrevEntry (S, Push)) != 0);
@@ -465,19 +520,18 @@ static unsigned Opt_tosxorax (CodeSeg* S, unsigned Push, unsigned Xor,
     /* Get the push entry */
     PushEntry = CS_GetEntry (S, Push);
 
-    /* Check the entry before the push, if it's a lda instruction with an
-     * addressing mode that does not use an additional index register. If
-     * so, we may use this location for the xor and must not save the
-     * value in the zero page location.
+    /* Check the entry before the push. If it's a lda instruction with an
+     * addressing mode that allows us to replace it, we may use this
+     * location for the op and must not save the value in the zero page
+     * location.
      */
-    DirectXor = (P->OPC == OP65_LDA &&
-	 	 (P->AM == AM65_IMM || P->AM == AM65_ZP || P->AM == AM65_ABS));
+    Flags = DirectOp (P);
 
     /* Store the value into the zeropage instead of pushing it */
     X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
     CS_InsertEntry (S, X, Push+1);
     ++Xor;  /* Correct the index */
-    if (!DirectXor) {
+    if ((Flags & OP_DIRECT) != 0) {
 	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
 	CS_InsertEntry (S, X, Push+1);
 	++Xor;  /* Correct the index */
@@ -487,8 +541,15 @@ static unsigned Opt_tosxorax (CodeSeg* S, unsigned Push, unsigned Xor,
     XorEntry = CS_GetEntry (S, Xor);
 
     /* Inline the xor */
-    if (DirectXor) {
-	/* Xor with variable location */
+    if ((Flags & OP_DIRECT) != 0) {
+       	/* Xor with a variable location. If the location is on the stack, we
+         * need to reload the Y register.
+         */
+        if ((Flags & OP_ONSTACK) != 0) {
+            X = NewCodeEntry (OP65_LDY, AM65_IMM, MakeHexArg (P->RI->In.RegY), 0, XorEntry->LI);
+            CS_InsertEntry (S, X, Xor);
+            ++Xor;
+        }
 	X = NewCodeEntry (OP65_EOR, P->AM, P->Arg, 0, XorEntry->LI);
     } else {
 	/* Xor with temp storage */

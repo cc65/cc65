@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -38,6 +38,7 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "check.h"
 #include "coll.h"
 #include "hashstr.h"
@@ -90,12 +91,13 @@ static Export**	       	ExpPool  = 0;	  	/* Exports array */
 
 
 
-static Export* NewExport (unsigned char Type, unsigned Name, ObjData* Obj);
+static Export* NewExport (unsigned char Type, unsigned char AddrSize,
+                          unsigned Name, ObjData* Obj);
 /* Create a new export and initialize it */
 
 
 
-static Import* NewImport (unsigned char Type, ObjData* Obj)
+static Import* NewImport (unsigned char AddrSize, ObjData* Obj)
 /* Create a new import and initialize it */
 {
     /* Allocate memory */
@@ -107,7 +109,7 @@ static Import* NewImport (unsigned char Type, ObjData* Obj)
     I->Exp      = 0;
     I->Name     = INVALID_STRING_ID;
     I->Flags    = 0;
-    I->Type	= Type;
+    I->AddrSize = AddrSize;
 
     /* Return the new structure */
     return I;
@@ -129,7 +131,7 @@ void InsertImport (Import* I)
     /* Search through the list in that slot and print matching duplicates */
     if (HashTab[Hash] == 0) {
     	/* The slot is empty, we need to insert a dummy export */
-    	E = HashTab[Hash] = NewExport (0, Name, 0);
+       	E = HashTab[Hash] = NewExport (0, ADDR_SIZE_DEFAULT, Name, 0);
 	++ExpCount;
     } else {
     	E = HashTab [Hash];
@@ -140,7 +142,7 @@ void InsertImport (Import* I)
     	    }
     	    if (E->Next == 0) {
     	  	/* End of list an entry not found, insert a dummy */
-    	  	E->Next = NewExport (0, Name, 0);
+    	  	E->Next = NewExport (0, ADDR_SIZE_DEFAULT, Name, 0);
     	  	E = E->Next;   		/* Point to dummy */
 		++ExpCount;    		/* One export more */
        	  	break;
@@ -189,21 +191,37 @@ Import* ReadImport (FILE* F, ObjData* Obj)
 {
     Import* I;
 
-    /* Read the import type and check it */
-    unsigned char Type = Read8 (F);
-    if (Type != IMP_ZP && Type != IMP_ABS) {
-	Error ("Unknown import type in module `%s': %02X",
-	       GetObjFileName (Obj), Type);
-    }
+    /* Read the import address size */
+    unsigned char AddrSize = Read8 (F);
 
     /* Create a new import */
-    I = NewImport (Type, Obj);
+    I = NewImport (AddrSize, Obj);
 
     /* Read the name */
     I->Name = MakeGlobalStringId (Obj, ReadVar (F));
 
     /* Read the file position */
     ReadFilePos (F, &I->Pos);
+
+    /* Check the address size */
+    if (I->AddrSize == ADDR_SIZE_DEFAULT || I->AddrSize > ADDR_SIZE_LONG) {
+        /* Beware: This function may be called in cases where the object file
+         * is not read completely into memory. In this case, the file list is
+         * invalid. Be sure not to access it in this case.
+         */
+        if (ObjHasFiles (I->Obj)) {
+            Error ("Invalid import size in for `%s', imported from %s(%lu): 0x%02X",
+                   GetString (I->Name),
+                   GetSourceFileName (I->Obj, I->Pos.Name),
+                   I->Pos.Line,
+                   I->AddrSize);
+        } else {
+            Error ("Invalid import size in for `%s', imported from %s: 0x%02X",
+                   GetString (I->Name),
+                   GetObjFileName (I->Obj),
+                   I->AddrSize);
+        }
+    }
 
     /* Return the new import */
     return I;
@@ -217,7 +235,8 @@ Import* ReadImport (FILE* F, ObjData* Obj)
 
 
 
-static Export* NewExport (unsigned char Type, unsigned Name, ObjData* Obj)
+static Export* NewExport (unsigned char Type, unsigned char AddrSize,
+                          unsigned Name, ObjData* Obj)
 /* Create a new export and initialize it */
 {
     /* Allocate memory */
@@ -232,6 +251,7 @@ static Export* NewExport (unsigned char Type, unsigned Name, ObjData* Obj)
     E->ImpList  = 0;
     E->Expr    	= 0;
     E->Type    	= Type;
+    E->AddrSize = AddrSize;
     memset (E->ConDes, 0, sizeof (E->ConDes));
 
     /* Return the new entry */
@@ -335,15 +355,17 @@ void InsertExport (Export* E)
 Export* ReadExport (FILE* F, ObjData* O)
 /* Read an export from a file */
 {
-    unsigned char Type;
     unsigned      ConDesCount;
     Export* E;
 
     /* Read the type */
-    Type = Read8 (F);
+    unsigned char Type = Read8 (F);
+
+    /* Read the address size */
+    unsigned char AddrSize = Read8 (F);
 
     /* Create a new export without a name */
-    E = NewExport (Type, INVALID_STRING_ID, O);
+    E = NewExport (Type, AddrSize, INVALID_STRING_ID, O);
 
     /* Read the constructor/destructor decls if we have any */
     ConDesCount = GET_EXP_CONDES_COUNT (Type);
@@ -391,7 +413,7 @@ Export* CreateConstExport (unsigned Name, long Value)
 /* Create an export for a literal date */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_ABS | EXP_CONST | EXP_EQUATE, Name, 0);
+    Export* E = NewExport (EXP_CONST | EXP_EQUATE, ADDR_SIZE_ABS, Name, 0);
 
     /* Assign the value */
     E->Expr = LiteralExpr (Value, 0);
@@ -409,7 +431,7 @@ Export* CreateMemoryExport (unsigned Name, Memory* Mem, unsigned long Offs)
 /* Create an relative export for a memory area offset */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_ABS | EXP_EXPR | EXP_LABEL, Name, 0);
+    Export* E = NewExport (EXP_EXPR | EXP_LABEL, ADDR_SIZE_ABS, Name, 0);
 
     /* Assign the value */
     E->Expr = MemoryExpr (Mem, Offs, 0);
@@ -427,7 +449,7 @@ Export* CreateSegmentExport (unsigned Name, Segment* Seg, unsigned long Offs)
 /* Create a relative export to a segment */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_ABS | EXP_EXPR | EXP_LABEL, Name, 0);
+    Export* E = NewExport (EXP_EXPR | EXP_LABEL, Seg->AddrSize, Name, 0);
 
     /* Assign the value */
     E->Expr = SegmentExpr (Seg, Offs, 0);
@@ -445,7 +467,7 @@ Export* CreateSectionExport (unsigned Name, Section* Sec, unsigned long Offs)
 /* Create a relative export to a section */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_ABS | EXP_EXPR | EXP_LABEL, Name, 0);
+    Export* E = NewExport (EXP_EXPR | EXP_LABEL, Sec->AddrSize, Name, 0);
 
     /* Assign the value */
     E->Expr = SectionExpr (Sec, Offs, 0);
@@ -529,13 +551,12 @@ static void CheckSymType (const Export* E)
 {
     /* External with matching imports */
     Import* Imp = E->ImpList;
-    int ZP = IS_EXP_ZP (E->Type);
     while (Imp) {
-	if (ZP != IS_IMP_ZP (Imp->Type)) {
+       	if (E->AddrSize != Imp->AddrSize) {
 	    /* Export is ZP, import is abs or the other way round */
 	    if (E->Obj) {
 	      	/* User defined export */
-	      	Warning ("Type mismatch for `%s', export in "
+       	       	Warning ("Address size mismatch for `%s', export in "
 			 "%s(%lu), import in %s(%lu)",
 			 GetString (E->Name),
                          GetSourceFileName (E->Obj, E->Pos.Name),
@@ -544,7 +565,7 @@ static void CheckSymType (const Export* E)
 		   	 Imp->Pos.Line);
 	    } else {
 		/* Export created by the linker */
-		Warning ("Type mismatch for `%s', imported from %s(%lu)",
+		Warning ("Address size mismatch for `%s', imported from %s(%lu)",
 			 GetString (E->Name),
                          GetSourceFileName (Imp->Obj, Imp->Pos.Name),
 			 Imp->Pos.Line);
@@ -656,6 +677,21 @@ void CheckExports (ExpCheckFunc F, void* Data)
 
 
 
+static char GetAddrSizeCode (unsigned char AddrSize)
+/* Get a one char code for the address size */
+{
+    switch (AddrSize) {
+        case ADDR_SIZE_ZP:      return 'Z';
+        case ADDR_SIZE_ABS:     return 'A';
+        case ADDR_SIZE_FAR:     return 'F';
+        case ADDR_SIZE_LONG:    return 'L';
+        default:
+            Internal ("Invalid address size: %u", AddrSize);
+    }
+}
+
+
+
 void PrintExportMap (FILE* F)
 /* Print an export map to the given file */
 {
@@ -675,7 +711,7 @@ void PrintExportMap (FILE* F)
 	      	     GetExportVal (E),
 	      	     E->ImpCount? 'R' : ' ',
 		     IS_EXP_LABEL (E->Type)? 'L' : 'E',
-	      	     IS_EXP_ZP (E->Type)? 'Z' : ' ',
+       	       	     GetAddrSizeCode (E->AddrSize),
 		     IS_EXP_CONDES (E->Type)? 'I' : ' ');
 	    if (++Count == 2) {
 	      	Count = 0;

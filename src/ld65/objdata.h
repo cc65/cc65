@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -40,6 +40,7 @@
 
 /* common */
 #include "coll.h"
+#include "inline.h"
 #include "objdefs.h"
 
 
@@ -61,7 +62,7 @@ struct ObjData {
     unsigned            LibName;	/* Name of library */
     unsigned long       MTime;          /* Time of last modification */
     ObjHeader	 	Header;		/* Header of file */
-    unsigned long	Start;		/* Start offset of data in library */
+    unsigned long  	Start;		/* Start offset of data in library */
     unsigned 	     	Flags;
     unsigned 	 	FileCount;	/* Input file count */
     struct FileInfo**  	Files;		/* List of input files */
@@ -79,6 +80,8 @@ struct ObjData {
     unsigned*           Strings;        /* List of global string indices */
     unsigned            AssertionCount; /* Count of module assertions */
     struct Assertion**  Assertions;     /* List of module assertions */
+    unsigned            ScopeCount;     /* Count of scopes */
+    struct Scope**      Scopes;         /* List of scopes */
 };
 
 
@@ -123,6 +126,16 @@ const char* GetObjFileName (const ObjData* O);
 /* Get the name of the object file. Return "[linker generated]" if the object
  * file is NULL.
  */
+
+#if defined(HAVE_INLINE)
+INLINE int ObjHasFiles (const ObjData* O)
+/* Return true if the files list does exist */
+{
+    return (O != 0 && O->Files != 0);
+}
+#else 
+#  defined ObjHasFiles(O)       ((O) != 0 && (O)->Files != 0)
+#endif
 
 const char* GetSourceFileName (const ObjData* O, unsigned Index);
 /* Get the name of the source file with the given index. If O is NULL, return

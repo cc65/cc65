@@ -7,7 +7,7 @@
 /*									     */
 /*									     */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*									     */
@@ -104,6 +104,8 @@ static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     H->StrPoolSize  = Read32 (Obj);
     H->AssertOffs   = Read32 (Obj);
     H->AssertSize   = Read32 (Obj);
+    H->ScopeOffs    = Read32 (Obj);
+    H->ScopeSize    = Read32 (Obj);
 }
 
 
@@ -252,6 +254,24 @@ void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O)
 
 
 
+void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O)
+/* Read the scope table from a file at the given offset */
+{
+    unsigned I;
+
+    /* Seek to the correct position */
+    FileSetPos (F, Pos);
+
+    /* Read the data */
+    O->ScopeCount = ReadVar (F);
+    O->Scopes     = xmalloc (O->ScopeCount * sizeof (O->Scopes[0]));
+    for (I = 0; I < O->ScopeCount; ++I) {
+        O->Scopes[I] = 0;       /* ReadScope (F, O); ### not implemented */
+    }
+}
+
+
+
 void ObjAdd (FILE* Obj, const char* Name)
 /* Add an object file to the module list */
 {
@@ -287,6 +307,9 @@ void ObjAdd (FILE* Obj, const char* Name)
 
     /* Read the assertions from the object file */
     ObjReadAssertions (Obj, O->Header.AssertOffs, O);
+
+    /* Read the scope table from the object file */
+    ObjReadScopes (Obj, O->Header.ScopeOffs, O);
 
     /* Read the segment list from the object file. This must be last, since
      * the expressions stored in the code may reference segments or imported

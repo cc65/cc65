@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -53,7 +53,7 @@
 
 
 /* A hash table entry */
-typedef struct HashEntry HashEntry;
+typedef struct HashEntry HashEntry;   
 struct HashEntry {
     HashEntry* 		Next;		/* Next in list */
     unsigned		Module;	       	/* Module index */

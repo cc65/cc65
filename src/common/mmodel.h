@@ -56,8 +56,10 @@ typedef enum {
 /* Memory model in use */
 extern mmodel_t MemoryModel;
 
-
-
+/* Address sizes for the segments */
+extern unsigned char CodeAddrSize;
+extern unsigned char DataAddrSize;
+extern unsigned char ZpAddrSize;
 
 
 
@@ -69,6 +71,11 @@ extern mmodel_t MemoryModel;
 
 mmodel_t FindMemoryModel (const char* Name);
 /* Find a memory model by name. Return MMODEL_UNKNOWN for an unknown name. */
+
+void SetMemoryModel (mmodel_t Model);
+/* Set the memory model updating the MemoryModel variables and the address
+ * sizes for the segments.
+ */
 
 
 

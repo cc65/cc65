@@ -37,6 +37,7 @@
 #include <errno.h>
 
 /* common */
+#include "mmodel.h"
 #include "segnames.h"
 #include "xmalloc.h"
 
@@ -484,6 +485,36 @@ static void WriteOneSeg (Segment* Seg)
     ObjSetFilePos (SizePos);            /* Seek back to the size */
     ObjWrite32 (DataSize);              /* Write the size */
     ObjSetFilePos (EndPos);             /* Seek back to the end */
+}
+
+
+
+void InitSegments (void)
+/* Initialize segments */
+{
+    /* Initialize segment sizes. The segment definitions do already contain
+     * the correct values for the default case (near), so we must only change
+     * things that should be different.
+     */                    
+    switch (MemoryModel) {
+
+        case MMODEL_NEAR:
+            break;
+
+        case MMODEL_FAR:
+            CodeSegDef.AddrSize = ADDR_SIZE_FAR;
+            break;
+
+        case MMODEL_HUGE:
+            CodeSegDef.AddrSize   = ADDR_SIZE_FAR;
+            DataSegDef.AddrSize   = ADDR_SIZE_FAR;
+            BssSegDef.AddrSize    = ADDR_SIZE_FAR;
+            RODataSegDef.AddrSize = ADDR_SIZE_FAR;
+            break;
+
+        default:
+            Internal ("Invalid memory model: %d", MemoryModel);
+    }
 }
 
 

@@ -39,6 +39,7 @@
 #include "addrsize.h"
 #include "check.h"
 #include "hashstr.h"
+#include "mmodel.h"
 #include "symdefs.h"
 #include "xmalloc.h"
 
@@ -475,6 +476,8 @@ static void SymCheckUndefined (SymEntry* S)
 	    if (AutoImport) {
 		/* Mark as import, will be indexed later */
 		S->Flags |= SF_IMPORT;
+                /* Use the address size for code */
+                S->AddrSize = CodeAddrSize;
 	    } else {
 		/* Error */
 	        PError (&S->Pos, "Symbol `%s' is undefined", GetString (S->Name));
@@ -607,11 +610,7 @@ void WriteImports (void)
         if ((S->Flags & (SF_TRAMPOLINE | SF_IMPORT)) == SF_IMPORT &&
             (S->Flags & (SF_REFERENCED | SF_FORCED)) != 0) {
 
-     	    if (S->AddrSize == ADDR_SIZE_ZP) {
-     		ObjWrite8 (IMP_ZP);
-     	    } else {
-     		ObjWrite8 (IMP_ABS);
-     	    }
+            ObjWrite8 (S->AddrSize);
        	    ObjWriteVar (S->Name);
      	    ObjWritePos (&S->Pos);
      	}
@@ -645,7 +644,6 @@ void WriteExports (void)
 
 	    /* Get the expression bits */
             unsigned char ExprMask = SymIsConst (S, &ConstVal)? EXP_CONST : EXP_EXPR;
-            ExprMask |= (S->ExportSize == ADDR_SIZE_ZP)? EXP_ZP : EXP_ABS;
             ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;
 
 	    /* Count the number of ConDes types */
@@ -655,8 +653,9 @@ void WriteExports (void)
 	    	}
 	    }
 
-	    /* Write the type */
+	    /* Write the type and the export size */
 	    ObjWrite8 (ExprMask);
+            ObjWrite8 (S->ExportSize);
 
 	    /* Write any ConDes declarations */
 	    if (GET_EXP_CONDES_COUNT (ExprMask) > 0) {
@@ -674,7 +673,7 @@ void WriteExports (void)
 	    /* Write the value */
 	    if ((ExprMask & EXP_MASK_VAL) == EXP_CONST) {
 	     	/* Constant value */
-	     	ObjWrite32 (ConstVal);
+    	     	ObjWrite32 (ConstVal);
 	    } else {
 	     	/* Expression involved */
 	        WriteExpr (S->V.Expr);
@@ -704,33 +703,35 @@ void WriteDbgSyms (void)
     /* Check if debug info is requested */
     if (DbgSyms) {
 
-	/* Walk through the list and count the symbols */
-	Count = 0;
-	S = SymList;
-	while (S) {
-	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL) {
-		++Count;
-	    }
-	    S = S->List;
-	}
+    	/* Walk through the list and count the symbols */
+    	Count = 0;
+    	S = SymList;
+    	while (S) {
+    	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL) {
+    		++Count;
+    	    }
+    	    S = S->List;
+    	}
 
-	/* Write the symbol count to the list */
+    	/* Write the symbol count to the list */
        	ObjWriteVar (Count);
 
        	/* Walk through list and write all symbols to the file */
-	S = SymList;
-	while (S) {
-	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL) {
+    	S = SymList;
+    	while (S) {
+    	    if ((S->Flags & SF_DBGINFOMASK) == SF_DBGINFOVAL) {
 
                 long ConstVal;
 
 		/* Get the expression bits */
                 unsigned char ExprMask = (SymIsConst (S, &ConstVal))? EXP_CONST : EXP_EXPR;
-                ExprMask |= (S->AddrSize == ADDR_SIZE_ZP)? EXP_ZP : EXP_ABS;
                 ExprMask |= (S->Flags & SF_LABEL)? EXP_LABEL : EXP_EQUATE;
 
 		/* Write the type */
 		ObjWrite8 (ExprMask);
+
+                /* Write the address size */
+                ObjWrite8 (S->AddrSize);
 
 		/* Write the name */
        	       	ObjWriteVar (S->Name);
@@ -762,6 +763,19 @@ void WriteDbgSyms (void)
 }
 
 
+
+void WriteScopes (void)
+/* Write the scope table to the object file */
+{
+    /* Tell the object file module that we're about to start the scopes */
+    ObjStartScopes ();
+
+    /* For now ...*/
+    ObjWriteVar (0);
+
+    /* Done writing the scopes */
+    ObjEndScopes ();
+}
 
 
 

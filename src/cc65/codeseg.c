@@ -807,7 +807,7 @@ CodeLabel* CS_GenLabel (CodeSeg* S, struct CodeEntry* E)
 	/* Attach this label to the code entry */
 	CE_AttachLabel (E, L);
 
-    }
+    }    
 
     /* Return the label */
     return L;
@@ -1225,8 +1225,16 @@ void CS_OutputPrologue (const CodeSeg* S, FILE* F)
      * segment before outputing the function label.
      */
     if (Func) {
+        /* Get the function descriptor */
+        const FuncDesc* D = GetFuncDesc (Func->Type);
        	CS_PrintFunctionHeader (S, F);
-        fprintf (F, ".segment\t\"%s\"\n\n.proc\t_%s\n\n", S->SegName, Func->Name);
+        fprintf (F, ".segment\t\"%s\"\n\n.proc\t_%s", S->SegName, Func->Name);
+        if (D->Flags & FD_NEAR) {
+            fputs (": near", F);
+        } else if (D->Flags & FD_FAR) {
+            fputs (": far", F);
+        }
+        fputs ("\n\n", F);
     }
 
 }
@@ -1239,7 +1247,7 @@ void CS_OutputEpilogue (const CodeSeg* S, FILE* F)
  */
 {
     if (S->Func) {
-	fprintf (F, "\n.endproc\n\n");
+       	fputs ("\n.endproc\n\n", F);
     }
 }
 
@@ -1304,7 +1312,7 @@ void CS_Output (const CodeSeg* S, FILE* F)
 
     /* If debug info is enabled, terminate the last line number information */
     if (DebugInfo) {
-	fprintf (F, "\t.dbg\tline\n");
+       	fputs ("\t.dbg\tline\n", F);
     }
 }
 
@@ -1397,7 +1405,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			break;
 		    }
 		    if (J->RI->Out2.RegA != Regs.RegA) {
-			Regs.RegA = UNKNOWN_REGVAL;
+	 		Regs.RegA = UNKNOWN_REGVAL;
 		    }
 		    if (J->RI->Out2.RegX != Regs.RegX) {
 			Regs.RegX = UNKNOWN_REGVAL;
@@ -1443,7 +1451,7 @@ void CS_GenRegInfo (CodeSeg* S)
 		/* Check the previous instruction */
 		switch (P->OPC) {
 
-		    case OP65_ADC:
+	 	    case OP65_ADC:
 		    case OP65_AND:
 		    case OP65_DEA:
 		    case OP65_EOR:
@@ -1489,7 +1497,7 @@ void CS_GenRegInfo (CodeSeg* S)
 		    case OP65_CPY:
 			/* If this is an immidiate compare, the Y register has
 			 * the value of the compare later.
-			 */
+	 		 */
 			if (CE_KnownImm (P)) {
 			    if (BC == BC_EQ) {
 				E->RI->Out2.RegY = (unsigned char)P->Num;

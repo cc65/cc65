@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -408,20 +408,20 @@ static void LibCheckExports (ObjData* O)
     Print (stdout, 1, "Module `%s' (%u exports):\n", O->Name, Count);
     while (Count--) {
 
-	unsigned char	Tag;
 	const char*     Name;
 
-      	/* Get the export tag */
-      	Tag = *Exports++;
+      	/* Get the export tag and skip the address size */
+       	unsigned char Type = *Exports++;
+        ++Exports;
 
 	/* condes decls may follow */
-	Exports += GET_EXP_CONDES_COUNT (Tag);
+	Exports += GET_EXP_CONDES_COUNT (Type);
 
        	/* Next thing is index of name of symbol */
         Name = GetObjString (O, GetVar (&Exports));
 
      	/* Skip value of symbol */
-     	if (Tag & EXP_EXPR) {
+     	if (Type & EXP_EXPR) {
      	    /* Expression tree */
      	    SkipExpr (&Exports);
      	} else {

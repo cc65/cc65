@@ -83,7 +83,9 @@ static ObjHeader Header = {
     0,                  /* 32: Offset to string pool */
     0,                  /* 32: Size of string pool */
     0,                  /* 32: Offset to assertion table */
-    0                   /* 32: Size of assertion table */
+    0,                  /* 32: Size of assertion table */
+    0,                  /* 32: Offset into scope table */
+    0,                  /* 32: Size of scope table */
 };
 
 
@@ -138,6 +140,8 @@ static void ObjWriteHeader (void)
     ObjWrite32 (Header.StrPoolSize);
     ObjWrite32 (Header.AssertOffs);
     ObjWrite32 (Header.AssertSize);
+    ObjWrite32 (Header.ScopeOffs);
+    ObjWrite32 (Header.ScopeSize);
 }
 
 
@@ -458,6 +462,22 @@ void ObjEndAssertions (void)
 /* Mark the end of the assertion table */
 {
     Header.AssertSize = ftell (F) - Header.AssertOffs;
+}
+
+
+
+void ObjStartScopes (void)
+/* Mark the start of the scope table */
+{
+    Header.ScopeOffs = ftell (F);
+}
+
+
+
+void ObjEndScopes (void)
+/* Mark the end of the scope table */
+{
+    Header.ScopeSize = ftell (F) - Header.ScopeOffs;
 }
 
 

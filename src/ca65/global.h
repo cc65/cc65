@@ -61,7 +61,6 @@ extern unsigned char   	SmartMode;     	    /* Smart mode */
 extern unsigned char   	DbgSyms;       	    /* Add debug symbols */
 extern unsigned char   	Listing;            /* Create listing file */
 extern unsigned char   	LineCont;      	    /* Allow line continuation */
-extern unsigned char    DefAddrSize;        /* Default address size */
 
 /* Emulation features */
 extern unsigned char   	DollarIsPC;    	    /* Allow the $ symbol as current PC */

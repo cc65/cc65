@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -138,6 +138,12 @@ void ObjStartAssertions (void);
 
 void ObjEndAssertions (void);
 /* Mark the end of the assertion table */
+
+void ObjStartScopes (void);
+/* Mark the start of the scope table */
+
+void ObjEndScopes (void);
+/* Mark the end of the scope table */
 
 
 

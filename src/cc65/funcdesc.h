@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,15 +44,18 @@
 
 
 
-/* Masks for the Flags field in FuncDesc */
+/* Masks for the Flags field in FuncDesc */				       
+#define FD_NONE			0x0000U	/* No flags			     */
 #define FD_IMPLICIT		0x0001U	/* Implicitly declared function      */
 #define FD_EMPTY      		0x0002U	/* Function with empty param list    */
 #define FD_VOID_PARAM   	0x0004U	/* Function with a void param list   */
 #define FD_VARIADIC		0x0008U	/* Function with variable param list */
 #define FD_FASTCALL		0x0010U	/* __fastcall__ function 	     */
-#define FD_OLDSTYLE		0x0020U	/* Old style (K&R) function	     */
-#define FD_OLDSTYLE_INTRET    	0x0040U	/* K&R func has implicit int return  */
-#define FD_UNNAMED_PARAMS      	0x0080U	/* Function has unnamed params	     */
+#define FD_FAR			0x0020U /* __far__ function		     */
+#define FD_NEAR			0x0040U /* __near__ function		     */
+#define FD_OLDSTYLE    	       	0x0100U	/* Old style (K&R) function	     */
+#define FD_OLDSTYLE_INTRET    	0x0200U	/* K&R func has implicit int return  */
+#define FD_UNNAMED_PARAMS      	0x0400U	/* Function has unnamed params	     */
 
 /* Bits that must be ignored when comparing funcs */
 #define FD_IGNORE 	(FD_IMPLICIT | FD_UNNAMED_PARAMS)

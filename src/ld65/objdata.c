@@ -90,6 +90,8 @@ ObjData* NewObjData (void)
     O->Strings          = 0;
     O->AssertionCount   = 0;
     O->Assertions       = 0;
+    O->ScopeCount       = 0;
+    O->Scopes           = 0;
 
     /* Return the new entry */
     return O;
@@ -192,8 +194,10 @@ const char* GetSourceFileName (const ObjData* O, unsigned Index)
 
 	/* Check the parameter */
         if (Index >= O->FileCount) {
-            Error ("Invalid file index (%u) in module `%s' (input file corrupt?)",
+            /* Error() will terminate the program */
+            Warning ("Invalid file index (%u) in module `%s' (input file corrupt?)",
                    Index, GetObjFileName (O));
+            return "[invalid]";         /* ### */
         }
 
 	/* Return the name */

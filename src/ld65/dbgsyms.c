@@ -70,7 +70,7 @@ static DbgSym*	DbgSymPool[256];
 
 
 
-static DbgSym* NewDbgSym (unsigned char Type, ObjData* O)
+static DbgSym* NewDbgSym (unsigned char Type, unsigned char AddrSize, ObjData* O)
 /* Create a new DbgSym and return it */
 {
     /* Allocate memory */
@@ -83,6 +83,7 @@ static DbgSym* NewDbgSym (unsigned char Type, ObjData* O)
     D->Expr    	= 0;
     D->Name	= 0;
     D->Type    	= Type;
+    D->AddrSize = AddrSize;
 
     /* Return the new entry */
     return D;
@@ -139,11 +140,12 @@ static void InsertDbgSym (DbgSym* D, long Val)
 DbgSym* ReadDbgSym (FILE* F, ObjData* O)
 /* Read a debug symbol from a file, insert and return it */
 {
-    /* Read the type */
+    /* Read the type and address size */
     unsigned char Type = Read8 (F);
+    unsigned char AddrSize = Read8 (F);
 
     /* Create a new debug symbol */
-    DbgSym* D = NewDbgSym (Type, O);
+    DbgSym* D = NewDbgSym (Type, AddrSize, O);
 
     /* Read and assign the name */
     D->Name = MakeGlobalStringId (O, ReadVar (F));
@@ -271,3 +273,4 @@ void PrintDbgSymLabels (ObjData* O, FILE* F)
 
 
 
+                                     

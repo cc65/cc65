@@ -7,7 +7,7 @@
 /*									     */
 /*									     */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*									     */
@@ -113,6 +113,8 @@ void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     H->StrPoolSize  = Read32 (Obj);
     H->AssertOffs   = Read32 (Obj);
     H->AssertSize   = Read32 (Obj);
+    H->ScopeOffs    = Read32 (Obj);
+    H->ScopeSize    = Read32 (Obj);
 }
 
 
@@ -140,7 +142,9 @@ void ObjWriteHeader (FILE* Obj, ObjHeader* H)
     Write32 (Obj, H->StrPoolOffs);
     Write32 (Obj, H->StrPoolSize);
     Write32 (Obj, H->AssertOffs);
-    Write32 (Obj, H->AssertSize);
+    Write32 (Obj, H->AssertSize);  
+    Write32 (Obj, H->ScopeOffs);
+    Write32 (Obj, H->ScopeSize);
 }
 
 
@@ -225,6 +229,8 @@ void ObjAdd (const char* Name)
     H.LineInfoOffs = LibCopyTo (Obj, H.LineInfoSize) - O->Start;
     fseek (Obj, H.AssertOffs, SEEK_SET);
     H.AssertOffs = LibCopyTo (Obj, H.AssertSize) - O->Start;
+    fseek (Obj, H.ScopeOffs, SEEK_SET);
+    H.ScopeOffs = LibCopyTo (Obj, H.ScopeSize) - O->Start;
 
     /* Calculate the amount of data written */
     O->Size = ftell (NewLib) - O->Start;

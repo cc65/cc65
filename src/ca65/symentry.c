@@ -213,9 +213,10 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
     /* Set the symbol value */
     S->V.Expr = Expr;
 
-    /* If the symbol is marked as global, export it */
+    /* If the symbol is marked as global, export it. Address size is checked
+     * below.
+     */
     if (S->Flags & SF_GLOBAL) {
-        S->ExportSize = S->AddrSize;
         S->Flags = (S->Flags & ~SF_GLOBAL) | SF_EXPORT;
     }
 
@@ -229,18 +230,11 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
             /* Use the real size of the symbol */
             S->ExportSize = S->AddrSize;
         } else if (S->AddrSize > S->ExportSize) {
-            PWarning (GetSymPos (S), 1, "Symbol `%s' is %s but exported as %s",
+            /* We're exporting a symbol smaller than it actually is */
+            PWarning (GetSymPos (S), 1, "Symbol `%s' is %s but exported %s",
                       GetSymName (S), AddrSizeToStr (S->AddrSize),
                       AddrSizeToStr (S->ExportSize));
         }
-    }
-
-    /* If the symbol is a ZP symbol, check if the value is in correct range */
-    if (S->AddrSize == ADDR_SIZE_ZP) {
-     	/* Already marked as ZP symbol by some means */
-     	if (!IsByteExpr (Expr)) {
-     	    Error ("Range error");
-     	}
     }
 
     /* If this is not a local symbol, remember it as the last global one */
@@ -271,13 +265,15 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
      	return;
     }
 
-    /* If no address size is given, use the default address size */
+    /* If no address size is given, use the address size of the enclosing
+     * segment.
+     */
     if (AddrSize == ADDR_SIZE_DEFAULT) {
-        AddrSize = DefAddrSize;
+        AddrSize = GetCurrentSegAddrSize ();
     }
 
-    /* If the symbol is marked as import or global, check the symbol flags,
-     * then do silently remove the global flag
+    /* If the symbol is marked as import or global, check the address size,
+     * then do silently remove the global flag.
      */
     if (S->Flags & SF_IMPORT) {
      	if ((Flags & SF_FORCED) != (S->Flags & SF_FORCED)) {
@@ -288,10 +284,10 @@ void SymImport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
         }
     }
     if (S->Flags & SF_GLOBAL) {
-        if (S->AddrSize != ADDR_SIZE_DEFAULT && S->AddrSize != AddrSize) {
+        S->Flags &= ~SF_GLOBAL;
+        if (AddrSize != S->AddrSize) {
             Error ("Address size mismatch for symbol `%s'", GetSymName (S));
      	}
-        S->Flags &= ~SF_GLOBAL;
     }
 
     /* Set the symbol data */
@@ -317,23 +313,21 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
      	return;
     }
 
-    /* If the symbol was marked as global before, make it an export */
+    /* If the symbol was marked as global before, remove the global flag and
+     * proceed, but check the address size.
+     */
     if (S->Flags & SF_GLOBAL) {
-        S->ExportSize = S->AddrSize;
+        if (AddrSize != S->ExportSize) {
+            Error ("Address size mismatch for symbol `%s'", GetSymName (S));
+        }
         S->Flags &= ~SF_GLOBAL;
     }
 
-    /* If the symbol was already marked as an export, check if this was done
-     * specifiying the same address size. If the old spec had no explicit
-     * address size, use the new one.
+    /* If the symbol was already marked as an export, but wasn't defined
+     * before, the address sizes in both definitions must match.
      */
-    if (S->Flags & SF_EXPORT) {
-        if (S->ExportSize == ADDR_SIZE_DEFAULT) {
-            S->ExportSize = AddrSize;
-        } else if (AddrSize == ADDR_SIZE_DEFAULT) {
-            AddrSize = S->ExportSize;
-        }
-        if (S->ExportSize != ADDR_SIZE_DEFAULT && S->ExportSize != AddrSize) {
+    if ((S->Flags & (SF_EXPORT|SF_DEFINED)) == SF_EXPORT) {
+        if (S->ExportSize != AddrSize) {
             Error ("Address size mismatch for symbol `%s'", GetSymName (S));
         }
     }
@@ -347,7 +341,8 @@ void SymExport (SymEntry* S, unsigned char AddrSize, unsigned Flags)
             /* No export size given, use the real size of the symbol */
             S->ExportSize = S->AddrSize;
         } else if (S->AddrSize > S->ExportSize) {
-            Warning (1, "Symbol `%s' is %s but exported as %s",
+            /* We're exporting a symbol smaller than it actually is */
+            Warning (1, "Symbol `%s' is %s but exported %s",
                      GetSymName (S), AddrSizeToStr (S->AddrSize),
                      AddrSizeToStr (S->ExportSize));
         }
@@ -370,30 +365,53 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
      	return;
     }
 
-    /* If the symbol is already marked as import or export, check the
-     * size of the definition, then bail out.
+    /* If the symbol is already marked as import, the address size must match.
+     * Apart from that, ignore the global declaration.
      */
     if (S->Flags & SF_IMPORT) {
-        if (AddrSize != ADDR_SIZE_DEFAULT && AddrSize != S->AddrSize) {
+        if (AddrSize == ADDR_SIZE_DEFAULT) {
+            /* Use the size of the current segment */
+            AddrSize = GetCurrentSegAddrSize ();
+        }
+        if (AddrSize != S->AddrSize) {
             Error ("Address size mismatch for symbol `%s'", GetSymName (S));
         }
         return;
     }
+
+    /* If the symbol is already an export: If it is not defined, the address
+     * sizes must match.
+     */
     if (S->Flags & SF_EXPORT) {
-        /* If the old symbol had no explicit address size spec, use the
-         * new one.
-         */
-        if (S->ExportSize == ADDR_SIZE_DEFAULT) {
-            S->ExportSize = AddrSize;
+        if ((S->Flags & SF_DEFINED) == 0) {
+            /* Symbol is undefined */
+            if (AddrSize != S->ExportSize) {
+                Error ("Address size mismatch for symbol `%s'", GetSymName (S));
+            }
+        } else if (AddrSize != ADDR_SIZE_DEFAULT) {
+            /* Symbol is defined and address size given */
+            if (AddrSize != S->ExportSize) {
+                Error ("Address size mismatch for symbol `%s'", GetSymName (S));
+            }
         }
+        return;
+    }
+
+    /* If the symbol is already marked as global, the address size must match.
+     * Use the ExportSize here, since it contains the actual address size
+     * passed to this function.
+     */
+    if (S->Flags & SF_GLOBAL) {
         if (AddrSize != S->ExportSize) {
             Error ("Address size mismatch for symbol `%s'", GetSymName (S));
         }
         return;
     }
 
-    /* If the symbol is already defined, export it. Otherwise mark it as
-     * global.
+    /* If we come here, the symbol was neither declared as export, import or
+     * global before. Check if it is already defined, in which case it will
+     * become an export. If it is not defined, mark it as global and remember
+     * the given address sizes.
      */
     if (S->Flags & SF_DEFINED) {
         /* The symbol is defined, export it */
@@ -402,15 +420,24 @@ void SymGlobal (SymEntry* S, unsigned char AddrSize, unsigned Flags)
             /* No export size given, use the real size of the symbol */
             S->ExportSize = S->AddrSize;
         } else if (S->AddrSize > S->ExportSize) {
-            Warning (1, "Symbol `%s' is %s but exported as %s",
+            /* We're exporting a symbol smaller than it actually is */
+            Warning (1, "Symbol `%s' is %s but exported %s",
                      GetSymName (S), AddrSizeToStr (S->AddrSize),
                      AddrSizeToStr (S->ExportSize));
         }
         S->Flags |= (SF_EXPORT | Flags);
-        S->ExportSize = AddrSize;
     } else {
-        S->Flags |= (SF_GLOBAL | Flags);
+        /* Since we don't know if the symbol will get exported or imported,
+         * remember two different address sizes: One for an import in AddrSize,
+         * and the other one for an export in ExportSize.
+         */
         S->AddrSize = AddrSize;
+        if (S->AddrSize == ADDR_SIZE_DEFAULT) {
+            /* Use the size of the current segment */
+            S->AddrSize = GetCurrentSegAddrSize ();
+        }
+        S->ExportSize = AddrSize;
+        S->Flags |= (SF_GLOBAL | Flags);
     }
 }
 
@@ -470,9 +497,9 @@ void SymConDes (SymEntry* S, unsigned char AddrSize, unsigned Type, unsigned Pri
      * priority value is the same as the old one.
      */
     if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
-	if (S->ConDesPrio[Type] != Prio) {
-	    Error ("Redeclaration mismatch for symbol `%s'", GetSymName (S));
-	}
+ 	if (S->ConDesPrio[Type] != Prio) {
+ 	    Error ("Redeclaration mismatch for symbol `%s'", GetSymName (S));
+ 	}
     }
     S->ConDesPrio[Type] = Prio;
 

@@ -172,23 +172,17 @@ static const char* GetExportFlags (unsigned Flags, const unsigned char* ConDes)
     unsigned Count;
     unsigned I;
 
-    /* Adressing mode */
-    TypeDesc[0] = '\0';
-    switch (Flags & EXP_MASK_SIZE) {
-       	case EXP_ABS:   strcat (TypeDesc, "EXP_ABS");		break;
-       	case EXP_ZP:  	strcat (TypeDesc, "EXP_ZP");		break;
-    }
-
     /* Type of expression */
+    TypeDesc[0] = '\0';
     switch (Flags & EXP_MASK_VAL) {
-       	case EXP_CONST:	strcat (TypeDesc, ",EXP_CONST");	break;
-       	case EXP_EXPR:	strcat (TypeDesc, ",EXP_EXPR");		break;
+       	case EXP_CONST:	strcat (TypeDesc, "EXP_CONST");	break;
+       	case EXP_EXPR:	strcat (TypeDesc, "EXP_EXPR"); 	break;
     }
 
     /* Constructor/destructor declarations */
     T = TypeDesc + strlen (TypeDesc);
     Count = GET_EXP_CONDES_COUNT (Flags);
-    if (Count > 0) {
+    if (Count > 0 && ConDes) {
 	T += sprintf (T, ",EXP_CONDES=");
 	for (I = 0; I < Count; ++I) {
 	    unsigned Type = CD_GET_TYPE (ConDes[I]);
@@ -490,26 +484,18 @@ void DumpObjImports (FILE* F, unsigned long Offset)
     /* Read and print all imports */
     for (I = 0; I < Count; ++I) {
 
-	const char* TypeDesc;
-
        	/* Read the data for one import */
-       	unsigned char Type  = Read8 (F);
-       	const char*   Name  = GetString (&StrPool, ReadVar (F));
-	unsigned      Len   = strlen (Name);
+       	unsigned char AddrSize = Read8 (F);
+       	const char*   Name     = GetString (&StrPool, ReadVar (F));
+	unsigned      Len      = strlen (Name);
 	ReadFilePos (F, &Pos);
-
-	/* Get a description for the type */
-	switch (Type) {
-	    case IMP_ZP:	TypeDesc = "IMP_ZP";		break;
-	    case IMP_ABS:	TypeDesc = "IMP_ABS";		break;
-	    default:		TypeDesc = "IMP_UNKNOWN";	break;
-	}
 
 	/* Print the header */
 	printf ("    Index:%27u\n", I);
 
 	/* Print the data */
-       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, TypeDesc);
+	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
+                AddrSizeToStr (AddrSize));
 	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
     }
 
@@ -551,14 +537,14 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 
 	unsigned long 	Value = 0;
 	int    		HaveValue;
-	unsigned char	Type;
 	unsigned char	ConDes [CD_TYPE_COUNT];
        	const char*    	Name;
 	unsigned	Len;
 
 
        	/* Read the data for one export */
-       	Type  = Read8 (F);
+       	unsigned char Type = Read8 (F);
+        unsigned char AddrSize = Read8 (F);
 	ReadData (F, ConDes, GET_EXP_CONDES_COUNT (Type));
        	Name  = GetString (&StrPool, ReadVar (F));
 	Len   = strlen (Name);
@@ -576,6 +562,8 @@ void DumpObjExports (FILE* F, unsigned long Offset)
 
 	/* Print the data */
        	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type, ConDes));
+	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
+                AddrSizeToStr (AddrSize));
 	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
 	if (HaveValue) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);
@@ -626,17 +614,13 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
     for (I = 0; I < Count; ++I) {
 
 	unsigned long 	Value = 0;
-	int 	   	HaveValue;
-	unsigned char	Type;
-	unsigned char	ConDes [CD_TYPE_COUNT];
-       	const char*    	Name;
-	unsigned	Len;
+	int 	      	HaveValue;
 
        	/* Read the data for one symbol */
-       	Type  = Read8 (F);
-	ReadData (F, ConDes, GET_EXP_CONDES_COUNT (Type));
-       	Name  = GetString (&StrPool, ReadVar (F));
-	Len   = strlen (Name);
+       	unsigned char Type     = Read8 (F);
+        unsigned char AddrSize = Read8 (F);
+       	const char*   Name     = GetString (&StrPool, ReadVar (F));
+	unsigned      Len      = strlen (Name);
 	if (IS_EXP_EXPR (Type)) {
 	    SkipExpr (F);
 	    HaveValue = 0;
@@ -650,7 +634,9 @@ void DumpObjDbgSyms (FILE* F, unsigned long Offset)
 	printf ("    Index:%27u\n", I);
 
 	/* Print the data */
-       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type, ConDes));
+       	printf ("      Type:%22s0x%02X  (%s)\n", "", Type, GetExportFlags (Type, 0));
+	printf ("      Address size:%14s0x%02X  (%s)\n", "", AddrSize,
+                AddrSizeToStr (AddrSize));
 	printf ("      Name:%*s\"%s\"\n", 24-Len, "", Name);
 	if (HaveValue) {
 	    printf ("      Value:%15s0x%08lX  (%lu)\n", "", Value, Value);

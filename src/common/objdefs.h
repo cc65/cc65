@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -46,10 +46,10 @@
 
 /* Defines for magic and version */
 #define OBJ_MAGIC	0x616E7A55
-#define OBJ_VERSION	0x000A
+#define OBJ_VERSION	0x000B
 
 /* Size of an object file header */
-#define	OBJ_HDR_SIZE	(20*4)
+#define	OBJ_HDR_SIZE	(22*4)
 
 /* Flag bits */
 #define OBJ_FLAGS_DBGINFO	0x0001	/* File has debug info */
@@ -80,6 +80,8 @@ struct ObjHeader {
     unsigned long       StrPoolSize;    /* 32: Size of string pool */
     unsigned long       AssertOffs;     /* 32: Offset to assertion table */
     unsigned long       AssertSize;     /* 32: Size of assertion table */
+    unsigned long       ScopeOffs;      /* 32: Offset into scope table */
+    unsigned long       ScopeSize;      /* 32: Size of scope table */
 };
 
 

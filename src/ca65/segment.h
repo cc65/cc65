@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -145,6 +145,9 @@ void SegCheck (void);
 
 void SegDump (void);
 /* Dump the contents of all segments */
+
+void InitSegments (void);
+/* Initialize segments */
 
 void WriteSegments (void);
 /* Write the segment data to the object file */

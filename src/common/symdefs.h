@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -48,28 +48,12 @@
 
 
 
-/* Import size */
-#define IMP_ABS       	        0x00   	/* Import as normal value */
-#define IMP_ZP 	      	        0x01   	/* Import as zero page symbol */
-#define IMP_MASK_SIZE 	        0x01   	/* Size mask */
-
-#define IS_IMP_ABS(x)  	        (((x) & IMP_MASK_SIZE) == IMP_ABS)
-#define IS_IMP_ZP(x)  	        (((x) & IMP_MASK_SIZE) == IMP_ZP)
-
 /* Number of module constructor/destructor declarations for an export */
 #define EXP_CONDES_MASK	        0x07
 
 #define IS_EXP_CONDES(x)	(((x) & EXP_CONDES_MASK) != 0)
 #define GET_EXP_CONDES_COUNT(x)	((x) & EXP_CONDES_MASK)
 #define INC_EXP_CONDES_COUNT(x) ((x)++)
-
-/* Export size */
-#define EXP_ABS	       	        0x00   	/* Export as normal value */
-#define EXP_ZP 	       	        0x08   	/* Export as zero page value */
-#define EXP_MASK_SIZE 	        0x08   	/* Size mask */
-
-#define IS_EXP_ABS(x)  	        (((x) & EXP_MASK_SIZE) == EXP_ABS)
-#define IS_EXP_ZP(x)   	        (((x) & EXP_MASK_SIZE) == EXP_ZP)
 
 /* Export value type */
 #define EXP_CONST     	        0x00   	/* Mask bit for const values */

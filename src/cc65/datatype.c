@@ -7,9 +7,9 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -327,6 +327,12 @@ void PrintFuncSig (FILE* F, const char* Name, type* Type)
 
     /* Print a comment with the function signature */
     PrintType (F, GetFuncReturn (Type));
+    if (D->Flags & FD_NEAR) {
+        fprintf (F, " __near__");
+    }
+    if (D->Flags & FD_FAR) {
+        fprintf (F, " __far__");
+    }
     if (D->Flags & FD_FASTCALL) {
      	fprintf (F, " __fastcall__");
     }
@@ -571,7 +577,7 @@ unsigned TypeOf (const type* T)
        	    return CF_LONG | CF_UNSIGNED;
 
         case T_FLOAT:
-        case T_DOUBLE:      
+        case T_DOUBLE:
             /* These two are identical in the backend */
             return CF_FLOAT;
 

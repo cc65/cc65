@@ -65,6 +65,7 @@ struct DbgSym {
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned            Name;  	       	/* Name */
     unsigned char	Type;		/* Type of symbol */
+    unsigned char       AddrSize;       /* Address size of symbol */
 };
 
 

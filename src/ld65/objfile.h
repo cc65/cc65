@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -77,6 +77,9 @@ void ObjReadStrPool (FILE* F, unsigned long Pos, ObjData* O);
 
 void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O);
 /* Read the assertions from a file at the given offset */
+
+void ObjReadScopes (FILE* F, unsigned long Pos, ObjData* O);
+/* Read the scope table from a file at the given offset */
 
 void ObjAdd (FILE* F, const char* Name);
 /* Add an object file to the module list */

@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2001 Ullrich von Bassewitz					     */
-/*	    	 Wacholderweg 14					     */
-/*	    	 D-70597 Stuttgart					     */
-/* EMail:   	 uz@musoftware.de					     */
+/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*	    								     */
 /*	    								     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -122,7 +122,7 @@ int main (int argc, char* argv [])
 
 	    case 'V':
 		fprintf (stderr,
-			 "ar65 V%u.%u.%u - (C) Copyright 1998-2001 Ullrich von Bassewitz\n",
+       	       	       	 "ar65 V%u.%u.%u - (C) Copyright 1998-2003 Ullrich von Bassewitz\n",
 			 VER_MAJOR, VER_MINOR, VER_PATCH);
 		break;
 

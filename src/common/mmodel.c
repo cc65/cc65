@@ -36,6 +36,7 @@
 #include <string.h>
 
 /* common */
+#include "addrsize.h"
 #include "mmodel.h"
 
 
@@ -55,6 +56,11 @@ static const char* MemoryModelNames[MMODEL_COUNT] = {
     "far",
     "huge",
 };
+
+/* Address sizes for the segments */
+unsigned char CodeAddrSize = ADDR_SIZE_ABS;
+unsigned char DataAddrSize = ADDR_SIZE_ABS;
+unsigned char ZpAddrSize   = ADDR_SIZE_ZP;
 
 
 
@@ -80,5 +86,43 @@ mmodel_t FindMemoryModel (const char* Name)
     return MMODEL_UNKNOWN;
 }
 
+
+
+void SetMemoryModel (mmodel_t Model)
+/* Set the memory model updating the MemoryModel variables and the address
+ * sizes for the segments.
+ */
+{
+    /* Remember the memory model */
+    MemoryModel = Model;
+
+    /* Set the address sizes for the segments */
+    switch (MemoryModel) {
+
+        case MMODEL_NEAR:
+            /* Code: near, data: near */
+            CodeAddrSize = ADDR_SIZE_ABS;
+            DataAddrSize = ADDR_SIZE_ABS;
+            break;
+
+        case MMODEL_FAR:
+            /* Code: far, data: near */
+            CodeAddrSize = ADDR_SIZE_FAR;
+            DataAddrSize = ADDR_SIZE_ABS;
+            break;
+
+        case MMODEL_HUGE:
+            /* Code: far, data: far */
+            CodeAddrSize = ADDR_SIZE_FAR;
+            DataAddrSize = ADDR_SIZE_FAR;
+            break;
+
+        default:
+            break;
+    }
+
+    /* Zeropage is always zeropage */
+    ZpAddrSize = ADDR_SIZE_ZP;
+}
 
 

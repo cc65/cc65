@@ -1,13 +1,13 @@
 /*****************************************************************************/
-/*									     */
+/*					   				     */
 /*				   library.c				     */
-/*									     */
+/*					   				     */
 /*	    Library data structures and helpers for the ld65 linker	     */
-/*									     */
-/*									     */
-/*									     */
+/*					   				     */
+/*					   				     */
+/*					   				     */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*									     */
@@ -107,6 +107,8 @@ static void LibReadObjHeader (ObjData* O, const char* LibName)
     O->Header.StrPoolSize  = Read32 (Lib);
     O->Header.AssertOffs   = Read32 (Lib);
     O->Header.AssertSize   = Read32 (Lib);
+    O->Header.ScopeOffs    = Read32 (Lib);
+    O->Header.ScopeSize    = Read32 (Lib);
 }
 
 
@@ -260,6 +262,9 @@ void LibAdd (FILE* F, const char* Name)
 
             /* Read the assertions from the object file */
             ObjReadAssertions (Lib, O->Start + O->Header.AssertOffs, O);
+
+            /* Read the scope table from the object file */
+            ObjReadScopes (Lib, O->Start + O->Header.ScopeOffs, O);
 
  	    /* Seek to the start of the segment list and read the segments.
 	     * This must be last, since the data here may reference other

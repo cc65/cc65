@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -66,7 +66,7 @@ struct Import {
     struct Export*	Exp;		/* Matching export for this import */
     unsigned            Name;		/* Name if not in table */
     unsigned char       Flags;          /* Generic flags */
-    unsigned char    	Type;		/* Type of import */
+    unsigned char    	AddrSize;       /* Address size of import */
 };
 
 
@@ -83,6 +83,7 @@ struct Export {
     FilePos  		Pos;		/* File position of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
     unsigned char	Type;		/* Type of export */
+    unsigned char       AddrSize;       /* Address size of export */
     unsigned char	ConDes[CD_TYPE_COUNT];	/* Constructor/destructor decls */
 };
 
@@ -188,7 +189,7 @@ void CircularRefError (const Export* E);
 /* End of exports.h */
 
 #endif
-
+                                    
 
 
 

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -852,39 +852,111 @@ static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
 
 
 
+static unsigned FunctionModifierFlags (void)
+/* Parse __fastcall__, __near__ and __far__ and return the matching FD_ flags */
+{
+    /* Read the flags */
+    unsigned Flags = FD_NONE;
+    while (CurTok.Tok == TOK_FASTCALL || CurTok.Tok == TOK_NEAR || CurTok.Tok == TOK_FAR) {
+
+        /* Get the flag bit for the next token */
+        unsigned F = FD_NONE;
+        switch (CurTok.Tok) {
+            case TOK_FASTCALL:  F = FD_FASTCALL; 	break;
+            case TOK_NEAR:	    F = FD_NEAR;     	break;
+            case TOK_FAR:	    F = FD_FAR;	     	break;
+            default:            Internal ("Unexpected token: %d", CurTok.Tok);
+        }
+
+        /* Remember the flag for this modifier */
+        if (Flags & F) {
+            Error ("Duplicate modifier");
+        }
+        Flags |= F;
+
+        /* Skip the token */
+        NextToken ();
+    }
+
+    /* Sanity check */
+    if ((Flags & (FD_NEAR | FD_FAR)) == (FD_NEAR | FD_FAR)) {
+        Error ("Cannot specify both, `__near__' and `__far__' modifiers");
+        Flags &= ~(FD_NEAR | FD_FAR);
+    }
+
+    /* Return the flags read */
+    return Flags;
+}
+
+
+
+static void ApplyFunctionModifiers (type* T, unsigned Flags)
+/* Apply a set of function modifier flags to a function */
+{
+    /* Get the function descriptor */
+    FuncDesc* F = GetFuncDesc (T);
+
+    /* Special check for __fastcall__ */
+    if ((Flags & FD_FASTCALL) != 0 && IsVariadicFunc (T)) {
+        Error ("Cannot apply `__fastcall__' to functions with "
+               "variable parameter list");
+        Flags &= ~FD_FASTCALL;
+    }
+
+    /* Add the flags */
+    F->Flags |= Flags;
+}
+
+
+
 static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
 /* Recursively process declarators. Build a type array in reverse order. */
 {
-
+    /* Pointer to something */
     if (CurTok.Tok == TOK_STAR) {
-    	type T = T_PTR;
+
+    	type T;
+
+        /* Skip the star */
        	NextToken ();
+
     	/* Allow optional const or volatile qualifiers */
-    	T |= OptionalQualifiers (T_QUAL_NONE);
+       	T = T_PTR | OptionalQualifiers (T_QUAL_NONE);
+
+        /* Parse the type, the pointer points to */
        	Decl (Spec, D, Mode);
+
        	*D->T++ = T;
        	return;
-    } else if (CurTok.Tok == TOK_LPAREN) {
+    }
+
+    /* Function modifiers */
+    if (CurTok.Tok == TOK_FASTCALL || CurTok.Tok == TOK_NEAR || CurTok.Tok == TOK_FAR) {
+
+	/* Remember the current type pointer */
+	type* T = D->T;
+
+	/* Read the flags */
+	unsigned Flags = FunctionModifierFlags ();
+
+	/* Parse the function */
+	Decl (Spec, D, Mode);
+
+	/* Check that we have a function */
+	if (!IsTypeFunc (T) && !IsTypeFuncPtr (T)) {
+	    Error ("Function modifier applied to non function");
+	} else {
+            ApplyFunctionModifiers (T, Flags);
+        }
+
+	/* Done */
+	return;
+    }
+
+    if (CurTok.Tok == TOK_LPAREN) {
        	NextToken ();
        	Decl (Spec, D, Mode);
        	ConsumeRParen ();
-    } else if (CurTok.Tok == TOK_FASTCALL) {
-	/* Remember the current type pointer */
-	type* T = D->T;
-	/* Skip the fastcall token */
-      	NextToken ();
-	/* Parse the function */
-	Decl (Spec, D, Mode);
-	/* Set the fastcall flag */
-	if (!IsTypeFunc (T) && !IsTypeFuncPtr (T)) {
-	    Error ("__fastcall__ modifier applied to non function");
-	} else if (IsVariadicFunc (T)) {
-	    Error ("Cannot apply __fastcall__ to functions with variable parameter list");
-	} else {
-	    FuncDesc* F = GetFuncDesc (T);
-       	    F->Flags |= FD_FASTCALL;
-	}
-	return;
     } else {
      	/* Things depend on Mode now:
        	 *  - Mode == DM_NEED_IDENT means:

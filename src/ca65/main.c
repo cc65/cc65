@@ -42,6 +42,7 @@
 #include "addrsize.h"
 #include "chartype.h"
 #include "cmdline.h"
+#include "mmodel.h"
 #include "print.h"
 #include "target.h"
 #include "tgttrans.h"
@@ -143,6 +144,7 @@ static void DefineSymbol (const char* Def)
     long Val;
     char SymName [MAX_STR_LEN+1];
     SymEntry* Sym;
+    ExprNode* Expr;
 
 
     /* The symbol must start with a character or underline */
@@ -190,8 +192,11 @@ static void DefineSymbol (const char* Def)
 	AbEnd ("`%s' is already defined", SymName);
     }
 
+    /* Generate an expression for the symbol */
+    Expr = GenLiteralExpr (Val);
+
     /* Mark the symbol as defined */
-    SymDef (Sym, GenLiteralExpr (Val), ADDR_SIZE_DEFAULT, SF_NONE);
+    SymDef (Sym, Expr, ADDR_SIZE_DEFAULT, SF_NONE);
 }
 
 
@@ -274,16 +279,26 @@ static void OptListing (const char* Opt attribute ((unused)),
 
 
 
-static void OptMemoryModel (const char* Opt attribute ((unused)), const char* Arg)
+static void OptMemoryModel (const char* Opt, const char* Arg)
 /* Set the memory model */
 {
-    if (strcmp (Arg, "near") == 0) {
-        DefAddrSize = ADDR_SIZE_ABS;
-    } else if (strcmp (Arg, "far") == 0) {
-        DefAddrSize = ADDR_SIZE_FAR;
-    } else {
-        AbEnd ("Unknown memory model: %s", Arg);
+    mmodel_t M;
+
+    /* Check the current memory model */
+    if (MemoryModel != MMODEL_UNKNOWN) {
+        AbEnd ("Cannot use option `%s' twice", Opt);
     }
+
+    /* Translate the memory model name and check it */
+    M = FindMemoryModel (Arg);
+    if (M == MMODEL_UNKNOWN) {
+        AbEnd ("Unknown memory model: %s", Arg);
+    } else if (M == MMODEL_HUGE) {
+        AbEnd ("Unsupported memory model: %s", Arg);
+    }
+
+    /* Set the memory model */
+    SetMemoryModel (M);
 }
 
 
@@ -653,8 +668,16 @@ int main (int argc, char* argv [])
         }
     }
 
+    /* If no memory model was given, use the default */
+    if (MemoryModel == MMODEL_UNKNOWN) {
+        MemoryModel = MMODEL_NEAR;
+    }
+
     /* Intialize the target translation tables */
     TgtTranslateInit ();
+
+    /* Initialize the segments */
+    InitSegments ();
 
     /* Initialize the scanner, open the input file */
     InitScanner (InFile);

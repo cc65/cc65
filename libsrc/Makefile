@@ -13,19 +13,20 @@ CC = ../../src/cc65/cc65
 LD = ../../src/ld65/ld65
 
 # List of all targets
-ALLTARGETS =   	apple2	\
-		atari 	\
-		atmos	\
-                c16  	\
-		c128 	\
-		c64  	\
-		cbm510	\
-		cbm610	\
-		geos 	\
-                nes     \
-		pet  	\
-		plus4   \
-		vic20	\
+ALLTARGETS =   	apple2 		\
+       	       	atari  		\
+       	       	atmos  		\
+                c16    		\
+       	       	c128   		\
+       	       	c64    		\
+       	       	cbm510 		\
+       	       	cbm610 		\
+       	       	geos   		\
+                nes     	\
+       	       	pet    		\
+       	       	plus4   	\
+		supervision	\
+		vic20
 
 #-----------------------------------------------------------------------------
 
@@ -80,22 +81,6 @@ atmoslib:
 	    $(AR) a atmos.lib $$i/*.o;\
 	done
 	mv atmos/crt0.o atmos.o
-
-#-----------------------------------------------------------------------------
-# Vic20
-
-vic20lib:
-	for i in vic20 cbm common runtime conio dbg em joystick tgi zlib; do \
-	    AS=$(AS) \
-	    CC=$(CC) \
-	    LD=$(LD) \
-	    AFLAGS="-t vic20 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t vic20 --forget-inc-paths -I. -I../../include" \
-	    $(MAKE) -C $$i || exit 1; \
-	    $(AR) a vic20.lib $$i/*.o;\
-	done
-	mv vic20/crt0.o vic20.o
-	cp vic20/*.joy .
 
 #-----------------------------------------------------------------------------
 # C16, C116
@@ -260,6 +245,37 @@ plus4lib:
 	done
 	mv plus4/crt0.o plus4.o
 	cp plus4/*.joy .
+
+#-----------------------------------------------------------------------------
+# Supervision
+
+supervisionlib:
+	for i in supervision common runtime; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    LD=$(LD) \
+	    AFLAGS="-t supervision -I../../asminc" \
+	    CFLAGS="-Osir -g -T -t supervision --forget-inc-paths -I. -I../../include" \
+	    $(MAKE) -C $$i || exit 1; \
+	    $(AR) a supervision.lib $$i/*.o;\
+	done
+	mv supervision/crt0.o supervision.o
+
+#-----------------------------------------------------------------------------
+# Vic20
+
+vic20lib:
+	for i in vic20 cbm common runtime conio dbg em joystick tgi zlib; do \
+	    AS=$(AS) \
+	    CC=$(CC) \
+	    LD=$(LD) \
+	    AFLAGS="-t vic20 -I../../asminc" \
+	    CFLAGS="-Osir -g -T -t vic20 --forget-inc-paths -I. -I../../include" \
+	    $(MAKE) -C $$i || exit 1; \
+	    $(AR) a vic20.lib $$i/*.o;\
+	done
+	mv vic20/crt0.o vic20.o
+	cp vic20/*.joy .
 
 #-----------------------------------------------------------------------------
 # Dummy targets

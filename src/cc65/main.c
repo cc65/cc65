@@ -215,7 +215,11 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__NES__", 1);
             break;
 
-     	default:
+        case TGT_SUPERVISION:
+            DefineNumericMacro ("__SUPERVISION__", 1);
+            break;
+
+     	default:    
        	    AbEnd ("Unknown target system type %d", Target);
     }
 

@@ -1,7 +1,7 @@
 ;
 ; Christian Groessler, October 2000
 ;
-; this file provides the _dio_write function
+; this file provides the _dio_write_verify function
 ;
 ; unsigned char __fastcall__ dio_write_verify(dhandle_t handle,sectnum_t sect_num,const void *buffer);
 ; dhandle_t - 16bit (ptr)

@@ -33,20 +33,31 @@
 
 
 
+/* Check out if we have a spawn() function on the system, or if we must use
+ * our own.
+ */
+#if defined(__WATCOMC__) || defined(_MSC_VER) || defined(__MINGW32__) || defined(__DJGPP__)
+#  define HAVE_SPAWN    1
+#else
+#  define NEED_SPAWN   1
+#endif
+
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include <errno.h>
-#if defined(__WATCOMC__) || defined(_MSC_VER) || defined(__MINGW32__)
-#  include <process.h>		/* DOS, OS/2 and Windows */
-#else
-#  include "spawn.h"		/* All others */
+#ifdef HAVE_SPAWN
+#  include <process.h>
 #endif
 
 /* common */
+#include "attrib.h"
 #include "cmdline.h"
 #include "fname.h"
+#include "strbuf.h"
 #include "target.h"
 #include "version.h"
 #include "xmalloc.h"
@@ -124,7 +135,25 @@ static char* TargetLib	= 0;
 
 
 /*****************************************************************************/
-/*	    		     Determine a file type			     */
+/*                Include the system specific spawn function                 */
+/*****************************************************************************/
+
+
+
+#if defined(NEED_SPAWN)
+#  if defined(SPAWN_UNIX)
+#    include "spawn-unix.inc"
+#  elif defined(SPAWN_AMIGA)
+#    include "spawn-amiga.inc"
+#  else
+#    error "Don't know which spawn module to include!"
+#  endif
+#endif
+
+
+
+/*****************************************************************************/
+/*    	    		     Determine a file type			     */
 /*****************************************************************************/
 
 

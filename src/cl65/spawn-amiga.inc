@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 spawn-amiga.c                             */
+/*                                spawn-amiga.inc                            */
 /*                                                                           */
 /*                Execute other external programs (Amiga version)            */
 /*                                                                           */
@@ -33,10 +33,6 @@
 
 #include <stdio.h>
 #include <clib/dos_protos.h>
-
-/* common */
-#include "attrib.h"
-#include "strbuf.h"
 
 
 

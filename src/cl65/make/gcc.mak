@@ -5,15 +5,18 @@
 # Library dir
 COMMON	= ../common
 
+# Type of spawn function to use
+SPAWN   = SPAWN_UNIX
+
+
 CC=gcc
-CFLAGS = -O2 -g -Wall -W -I$(COMMON)
+CFLAGS = -O2 -g -Wall -W -I$(COMMON) -D$(SPAWN)
 EBIND  = emxbind
 LDFLAGS=
 
 OBJS =	error.o	 	\
 	global.o 	\
-	main.o		\
-	spawn-unix.o
+	main.o
 
 LIBS = $(COMMON)/common.a
 
@@ -31,7 +34,7 @@ endif
 
 
 cl65:	$(OBJS) $(LIBS)
-	$(CC) $(LDFLAGS) -o cl65 $(CFLAGS) $(OBJS) $(LIBS)
+	$(CC) $(LDFLAGS) -o cl65 $(OBJS) $(LIBS)
 	@if [ $(OS2_SHELL) ] ;	then $(EBIND) cl65 ; fi
 
 clean:
@@ -47,7 +50,7 @@ zap:	clean
 .PHONY: depend dep
 depend dep:	$(OBJS:.o=.c)
 	@echo "Creating dependency information"
-	$(CC) -I$(COMMON) -MM $^ > .depend
+	$(CC) -I$(COMMON) -D$(SPAWN) -MM $^ > .depend
 
 
 

@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  spawn.c				     */
+/*                              spawn-unix.inc                               */
 /*                                                                           */
 /*                Execute other external programs (Unix version)             */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1999-2002 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -39,11 +39,20 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-/* common */
-#include "attrib.h"
 
-/* cl65 */
-#include "error.h"
+
+/*****************************************************************************/
+/* 		    		     Data 				     */
+/*****************************************************************************/
+
+
+
+/* Mode argument for spawn. This value is ignored by the function and only
+ * provided for DOS/Windows compatibility.
+ */
+#ifndef P_WAIT
+#define P_WAIT	0
+#endif
 
 
 

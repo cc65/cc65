@@ -123,15 +123,15 @@ OBJS = 	add.o		\
        	lule.o		\
        	lult.o		\
        	lumod.o		\
-       	lxor.o		\
+       	lxor.o 		\
        	makebool.o	\
-       	mod.o		\
-       	mul.o		\
-       	ne.o  		\
-       	neg.o 		\
-       	or.o  		\
+       	mod.o  		\
+       	mul.o  		\
+       	ne.o   		\
+       	neg.o  		\
+       	or.o   		\
 	pleasp.o	\
-	popa.o		\
+	popa.o 		\
        	popsreg.o	\
 	push1.o	       	\
        	push2.o	       	\
@@ -153,10 +153,10 @@ OBJS = 	add.o		\
        	pushwsp.o	\
 	return0.o	\
 	return1.o	\
-       	rsub.o		\
+       	rsub.o 		\
        	shelp.o		\
-       	shl.o		\
-       	shr.o		\
+       	shl.o  		\
+       	shr.o  		\
        	shrax1.o	\
        	shrax2.o	\
        	shrax3.o	\
@@ -166,7 +166,7 @@ OBJS = 	add.o		\
 	staspidx.o	\
 	staspp.o	\
        	staxsp.o	\
-	staxspidx.o	\
+	staxspi.o	\
 	staxspp.o	\
        	steaxsp.o	\
 	steaxspi.o	\

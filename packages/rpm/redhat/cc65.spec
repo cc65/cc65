@@ -53,6 +53,7 @@ machines, you have to install at least one of the library packages.
 %attr(755,root,root)   		/usr/bin/od65
 %attr(755,root,root) %dir	/usr/lib/cc65
 %attr(755,root,root) %dir	/usr/lib/cc65/emd
+%attr(755,root,root) %dir	/usr/lib/cc65/joy
 %attr(755,root,root) %dir	/usr/lib/cc65/lib
 %attr(755,root,root) %dir	/usr/lib/cc65/tgi
 %attr(755,root,root) %dir	/usr/lib/cc65/include
@@ -81,12 +82,13 @@ programs for the Commodore VIC20 using the cc65 crosscompiler.
 %files vic20
 %attr(644,root,root) 		/usr/lib/cc65/lib/vic20.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/vic20.o
+%attr(644,root,root) 		/usr/lib/cc65/joy/vic20-*.joy
 %doc src/ld65/cfg/vic20.cfg
 
 
 
 ###############################################################################
-#      	       	       	       	 C16 subpackage				      #
+#      	       	       	       	 C16 subpackage		   		      #
 ###############################################################################
 
 %package c16
@@ -107,7 +109,7 @@ programs for the Commodore C16/116 using the cc65 crosscompiler.
 
 
 ###############################################################################
-#		     		C64 subpackage	 			      #
+#		     		C64 subpackage	 	   		      #
 ###############################################################################
 
 %package c64
@@ -124,13 +126,14 @@ programs for the Commodore C64 using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/lib/c64.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/c64.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/c64-*.emd
+%attr(644,root,root) 		/usr/lib/cc65/joy/c64-*.joy
 %attr(644,root,root) 		/usr/lib/cc65/tgi/c64-*.tgi
 %doc src/ld65/cfg/c64.cfg
 
 
 
 ###############################################################################
-#		     		C128 subpackage				      #
+#		     		C128 subpackage	 			      #
 ###############################################################################
 
 %package c128
@@ -147,12 +150,13 @@ programs for the Commodore C128 using the cc65 crosscompiler.
 %attr(644,root,root) 		/usr/lib/cc65/lib/c128.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/c128.o
 %attr(644,root,root) 		/usr/lib/cc65/emd/c128-*.emd
+%attr(644,root,root) 		/usr/lib/cc65/joy/c128-*.joy
 %doc src/ld65/cfg/c128.cfg
 
 
 
 ###############################################################################
-#	   	      	       Atari subpackage		    		      #
+#	   	      	       Atari subpackage	 	    		      #
 ###############################################################################
 
 %package atari
@@ -173,7 +177,7 @@ programs for the 8 bit Atari machines using the cc65 crosscompiler.
 
 
 ###############################################################################
-#		       	       Plus/4 subpackage	    		      #
+#		       	       Plus/4 subpackage 	    		      #
 ###############################################################################
 
 %package plus4
@@ -282,7 +286,7 @@ programs for the Apple ][ using the cc65 crosscompiler.
 
 
 ###############################################################################
-#		 		GEOS subpackage				      #
+#		 		GEOS subpackage	 			      #
 ###############################################################################
 
 %package geos
@@ -306,7 +310,7 @@ GEOS programs for the C64/C128 using the cc65 crosscompiler.
 
 
 ###############################################################################
-#		      		     Build		    		      #
+#		      		     Build	 	    		      #
 ###############################################################################
 
 
@@ -331,7 +335,7 @@ cd ..
 
 
 %install
-mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,emd,include/{geos,tgi},lib,tgi}}
+mkdir -p $RPM_BUILD_ROOT/usr/{bin,lib/cc65/{asminc,emd,include/{geos,tgi},joy,lib,tgi}}
 
 # Binaries
 install -s -m 755 src/ar65/ar65 $RPM_BUILD_ROOT/usr/bin
@@ -350,8 +354,9 @@ install -m 644 include/geos/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/geos
 install -m 644 include/tgi/*.h $RPM_BUILD_ROOT/usr/lib/cc65/include/tgi
 install -m 644 asminc/*.inc $RPM_BUILD_ROOT/usr/lib/cc65/asminc
 
-# TGI and EM drivers
+# Drivers
 install -m 644 libsrc/*.emd $RPM_BUILD_ROOT/usr/lib/cc65/emd
+install -m 644 libsrc/*.joy $RPM_BUILD_ROOT/usr/lib/cc65/joy
 install -m 644 libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi
 
 

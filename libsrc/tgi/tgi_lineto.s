@@ -9,22 +9,11 @@
         .include        "tgi-kernel.inc"
 
         .import         popax
-        .importzp       ptr1, ptr2, ptr3, ptr4
         .export         _tgi_lineto
 
 _tgi_lineto:
-        ldy     _tgi_curx       ; X1
-        sty     ptr1
-        ldy     _tgi_curx+1
-        sty     ptr1+1
-
-        ldy     _tgi_cury       ; Y1
-        sty     ptr2
-        ldy     _tgi_cury+1
-        sty     ptr2+1
-
-        jsr     tgi_linepop
-
+        jsr     tgi_curtoxy     ; Copy curx/cury into ptr1/ptr2
+        jsr     tgi_linepop     ; Pop x2/y2 into ptr3/ptr4 and curx/cury
         jmp     tgi_line        ; Call the driver
 
 

@@ -12,18 +12,13 @@
 
 
 tgi_getset:
-        sta     ptr2            ; Y
-        stx     ptr2+1
-        jsr     popax
-        sta     ptr1            ; X
-        stx     ptr1+1
+        jsr     tgi_popxy       ; Pop X/Y into ptr1/ptr2
 
-; Are the coordinates are out of range? First check if any ccord is negative.
+; Are the coordinates out of range? First check if any coord is negative.
 
         txa
         ora     ptr2+1
-        asl     a
-        bcs     @L9             ; Bail out if negative
+        bmi     @L9             ; Bail out if negative
 
 ; Check if X is larger than the maximum x coord. If so, bail out
 

@@ -22,10 +22,19 @@ _tgi_mode:          .res    1           ; Graphics mode or zero
 _tgi_curx:          .res    2           ; Current drawing cursor X
 _tgi_cury:          .res    2           ; Current drawing cursor Y
 _tgi_color:         .res    1           ; Current drawing color
+_tgi_textdir:       .res    1           ; Current text direction
+_tgi_textmagx:      .res    1           ; Text magnification in X dir
+_tgi_textmagy:      .res    1           ; Text magnification in Y dir
+
+; The following variables are copied from the driver header for faster access
+tgi_driver_vars:
 _tgi_xres:          .res    2           ; X resolution of the current mode
 _tgi_yres:          .res    2           ; Y resolution of the current mode
 _tgi_colorcount:    .res    1           ; Number of available colors
 _tgi_pagecount:     .res    1           ; Number of available screen pages
+_tgi_fontsizex:     .res    1           ; System font X size
+_tgi_fontsizey:     .res    1           ; System font Y size
+tgi_driver_var_size     = * - tgi_driver_vars
 
 
 .data
@@ -51,6 +60,8 @@ tgi_horline:        jmp     $0000
 tgi_line:           jmp     $0000
 tgi_bar:            jmp     $0000
 tgi_circle:         jmp     $0000
+tgi_textstyle:      jmp     $0000
+tgi_outtext:        jmp     $0000
 
 
 ;----------------------------------------------------------------------------
@@ -94,17 +105,17 @@ _tgi_setup:
 @L2:    ldy     #TGI_HDR_XRES
         ldx     #0
 @L3:    lda     (ptr1),y
-        sta     _tgi_xres,x
+        sta     tgi_driver_vars,x
         iny
         inx
-        cpx     #6
+        cpx     #tgi_driver_var_size
         bne     @L3
 
 ; Initialize variables
 
         lda     #$00
-        ldx     #6-1
-@L4:    sta     _tgi_error,x            ; Clear error/mode/curx/cury
+        ldx     #7-1
+@L4:    sta     _tgi_error,x            ; Clear error/mode/curx/cury/textdir
         dex
         bpl     @L4
 

@@ -17,6 +17,7 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_bar.o               \
                 tgi_circle.o            \
                 tgi_clear.o             \
+                tgi_curtoxy.o           \
                 tgi_done.o              \
                 tgi_emu_bar.o           \
                 tgi_getcolor.o          \
@@ -38,11 +39,17 @@ S_OBJS =       	tgi-kernel.o   	        \
                 tgi_linepop.o           \
                 tgi_lineto.o            \
        	       	tgi_map_mode.o          \
+                tgi_outtext.o           \
+                tgi_outtextxy.o         \
+                tgi_popxy.o             \
+                tgi_popxy2.o            \
                 tgi_setcolor.o          \
                 tgi_setdrawpage.o       \
                 tgi_setpalette.o        \
                 tgi_setpixel.o          \
                 tgi_setdrawpage.o       \
+                tgi_textsize.o          \
+                tgi_textstyle.o         \
                 tgi_unload.o
 
 
@@ -53,4 +60,5 @@ clean:
 	@rm -f $(C_OBJS:.o=.s)
 	@rm -f $(C_OBJS)
 	@rm -f $(S_OBJS)
+
 

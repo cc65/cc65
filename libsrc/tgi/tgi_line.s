@@ -8,19 +8,12 @@
         .include        "tgi-kernel.inc"
 
         .import         popax
-        .importzp       ptr1, ptr2
         .export         _tgi_line
 
 _tgi_line:
         jsr     tgi_linepop     ; Pop/store Y2/X2
-
         jsr     popax
-        sta     ptr2
-        stx     ptr2+1
-        jsr     popax
-        sta     ptr1
-        stx     ptr1+1
-
+        jsr     tgi_popxy       ; Pop/store X1/Y1 into ptr1/ptr2
         jmp     tgi_line        ; Call the driver
 
 

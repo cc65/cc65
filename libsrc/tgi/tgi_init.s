@@ -40,6 +40,16 @@ _tgi_init:
         txa
         jsr     _tgi_setcolor           ; tgi_setcolor (tgi_getmaxcolor ());
 
+; Set the text style
+
+        lda     #TGI_TEXT_HORIZONTAL
+        sta     _tgi_textdir
+        ldx     #1
+        stx     _tgi_textmagx
+        ldy     #1
+        sty     _tgi_textmagy
+        jsr     tgi_textstyle           ; Tell the driver about the text style
+
 ; Clear the screen
 
         jmp     tgi_clear

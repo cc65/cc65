@@ -6,7 +6,7 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2000 Ullrich von Bassewitz					     */
+/* (C) 1998-2002 Ullrich von Bassewitz					     */
 /*		 Wacholderweg 14					     */
 /*		 D-70597 Stuttgart					     */
 /* EMail:	 uz@musoftware.de					     */
@@ -45,8 +45,8 @@
 
 
 #define VER_MAJOR	2U
-#define VER_MINOR	8U
-#define VER_PATCH	5U
+#define VER_MINOR	9U
+#define VER_PATCH	0U
 
 
 

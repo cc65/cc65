@@ -11,7 +11,7 @@
 Summary: Crosscompiler/Crossassembler for 6502 systems
 %define name cc65
 Name: %{name}
-%define version 2.8.0
+%define version 2.9.0
 Version: %{version}
 Release: 1
 Copyright: Freeware with exceptions - see docs
@@ -357,6 +357,9 @@ install -m 644 libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi
 
 
 %changelog
+* Fri Dec 13 2002 Ullrich von Bassewitz <uz@cc65.org>
+Updated the version number.
+
 * Mon Dec 2 2002 Ullrich von Bassewitz <uz@cc65.org>
 Changed location of TGI drivers, added EM drivers.
 

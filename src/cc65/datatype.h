@@ -147,6 +147,7 @@ extern type type_uint [];
 extern type type_long [];
 extern type type_ulong [];
 extern type type_void [];
+extern type type_size_t [];
 
 
 
@@ -184,6 +185,11 @@ type* GetCharArrayType (unsigned Len);
 
 type* GetImplicitFuncType (void);
 /* Return a type string for an inplicitly declared function */
+
+type* PointerTo (const type* T);
+/* Return a type string that is "pointer to T". The type string is allocated
+ * on the heap and may be freed after use.
+ */
 
 void PrintType (FILE* F, const type* Type);
 /* Output translation of type array. */

@@ -51,7 +51,7 @@
 
 
 /*****************************************************************************/
-/*		    	 	     Data	    			     */
+/*		    	  	     Data	    			     */
 /*****************************************************************************/
 
 
@@ -63,6 +63,7 @@ type type_uint []   	= { T_UINT,	T_END };
 type type_long []   	= { T_LONG,	T_END };
 type type_ulong []  	= { T_ULONG,	T_END };
 type type_void []   	= { T_VOID,	T_END };
+type type_size_t []	= { T_UINT,     T_END };
 
 
 
@@ -190,13 +191,34 @@ type* GetImplicitFuncType (void)
 
 
 
+type* PointerTo (const type* T)
+/* Return a type string that is "pointer to T". The type string is allocated
+ * on the heap and may be freed after use.
+ */			       
+{
+    /* Get the size of the type string including the terminator */
+    unsigned Size = TypeLen (T) + 1;
+
+    /* Allocate the new type string */
+    type* P = TypeAlloc	(Size + 1);
+
+    /* Create the return type... */
+    P[0] = T_PTR;
+    memcpy (P+1, T, Size * sizeof (type));
+
+    /* ...and return it */
+    return P;
+}
+
+
+
 static type PrintTypeComp (FILE* F, type T, type Mask, const char* Name)
 /* Check for a specific component of the type. If it is there, print the
  * name and remove it. Return the type with the component removed.
  */
 {
     if ((T & Mask) == Mask) {
-	fprintf (F, "%s ", Name);
+      	fprintf (F, "%s ", Name);
 	T &= ~Mask;
     }
     return T;
@@ -361,7 +383,7 @@ unsigned SizeOf (const type* T)
 
     	case T_VOID:
     	    Error (ERR_ILLEGAL_SIZE);
-	    return 0;
+	    return 1;	/* Return something that makes sense */
 
 	case T_SCHAR:
 	case T_UCHAR:

@@ -605,6 +605,41 @@ static ExprNode* DoFunctionCall (ExprNode* Left)
 
 
 
+static ExprNode* DoPostIncDec (ExprNode* Left)
+/* Handle postincrement and postdecrement */
+{
+    ExprNode* Root;
+
+    /* Determine the type of the node */
+    nodetype_t NT = (curtok == TOK_INC)? NT_POST_INC : NT_POST_DEC;
+
+    /* Skip the operator token */
+    NextToken ();
+
+    /* The operand must be an lvalue */
+    if (Left->LValue == 0) {
+
+    	/* Print a diagnostics */
+     	Error (ERR_LVALUE_EXPECTED);
+
+    	/* It is safe to return the operand expression and probably better
+    	 * than returning an int, since the operand expression already has
+    	 * the correct type as expected by the program at this place, and
+    	 * it is even an rvalue.
+    	 */
+    	return Left;
+    }
+
+    /* Setup the expression tree */
+    Root = AllocExprNode (NT, Left->Type, RVALUE);
+    SetLeftNode (Root, Left);
+
+    /* Return the new node */
+    return Root;
+}
+
+
+
 static ExprNode* PostfixExpr (void)
 {
     /* Get the lower level expression */
@@ -632,9 +667,8 @@ static ExprNode* PostfixExpr (void)
 		break;
 
 	    case TOK_INC:
- 		break;
-
  	    case TOK_DEC:
+		Root = DoPostIncDec (Root);
  		break;
 
  	    default:
@@ -717,12 +751,26 @@ static ExprNode* DoUnaryPlusMinus (void)
     /* In case of PLUS, we must do nothing */
     if (Tok == TOK_PLUS) {
 
-	/* Use the operand unchanged */
-	Root = Op;
+       	/* Return the operand unchanged */
+	return Op;
+
+    } else if (Op->NT == NT_CONST) {
+
+	/* The value is constant, change it according to the insn */
+	if (IsClassInt (Op->Type)) {
+	    /* Integer */
+	    Op->V.I = -Op->V.I;
+	} else {
+	    /* Float */
+	    Op->V.F = -Op->V.F;
+	}
+
+	/* Return the operand itself */
+	return Op;
 
     } else {
 
-	/* Setup the expression tree */
+       	/* Non constant value, setup the expression tree */
 	Root = AllocExprNode (NT_UNARY_MINUS, Op->Type, RVALUE);
 	SetLeftNode (Root, Op);
 
@@ -734,13 +782,242 @@ static ExprNode* DoUnaryPlusMinus (void)
 
 
 
+static ExprNode* DoComplement (void)
+/* Handle ~ */
+{
+    ExprNode* Op;
+    ExprNode* Root;
+
+    /* Skip the operator token */
+    NextToken ();
+
+    /* Get the operand */
+    Op = UnaryExpr ();
+
+    /* Type check */
+    if (!IsClassInt (Op->Type)) {
+
+	/* Display diagnostic */
+	Error (ERR_OP_NOT_ALLOWED);
+
+	/* Free the errorneous node */
+	FreeExprNode (Op);
+
+	/* Return something that makes sense later */
+	return GetIntNode (0);
+    }
+
+    /* If the operand is constant, handle the operation directly */
+    if (Op->NT == NT_CONST) {
+
+	/* Change the value and return the operand node */
+	Op->V.I = ~Op->V.I;
+	return Op;
+
+    } else {
+
+	/* Setup the expression tree and return the new node */
+	Root = AllocExprNode (NT_COMPLEMENT, Op->Type, RVALUE);
+	SetLeftNode (Root, Op);
+	return Root;
+    }
+}
+
+
+
+static ExprNode* DoBoolNot (void)
+/* Handle ! */
+{
+    ExprNode* Op;
+    ExprNode* Root;
+
+    /* Skip the operator token */
+    NextToken ();
+
+    /* Get the operand */
+    Op = UnaryExpr ();
+
+    /* The boolean NOT operator eats anything - no need for a type check. */
+
+    /* Setup the expression tree and return the new node */
+    Root = AllocExprNode (NT_BOOL_NOT, type_int, RVALUE);
+    SetLeftNode (Root, Op);
+    return Root;
+}
+
+
+
+static ExprNode* DoAddress (void)
+/* Handle the address operator & */
+{
+    ExprNode* Op;
+
+    /* Skip the operator */
+    NextToken ();
+
+    /* Get the operand */
+    Op = UnaryExpr ();
+
+    /* Accept using the address operator with arrays. This is harmless, it
+     * will just be as using the array without the operator.
+     */
+    if (IsTypeArray (Op->Type)) {
+	return Op;
+    }
+
+    /* We cannot operate on rvalues */
+    if (Op->LValue == 0) {
+
+	ExprNode* Root;
+
+    	/* Print diagnostics */
+    	Error (ERR_ILLEGAL_ADDRESS);
+
+    	/* Free the problematic node */
+    	FreeExprNode (Op);
+
+    	/* Return something that is safe later */
+    	Root = AllocExprNode (NT_CONST, PointerTo (type_void), 0);
+    	Root->V.I = 0;
+    	return Root;
+
+    }
+
+    /* Create the operator node and return it */
+    return AllocExprNode (NT_ADDRESS, PointerTo (Op->Type), RVALUE);
+}
+
+
+
+static ExprNode* DoIndirect (void)
+/* Handle the indirection operaror * */
+{
+    ExprNode* Op;
+    type*     ResultType;
+    int	      LVal;
+
+    /* Skip the operator */
+    NextToken ();
+
+    /* Get the operand */
+    Op = UnaryExpr ();
+
+    /* Type check */
+    if (!IsClassPtr (Op->Type)) {
+
+    	/* Print diagnostics */
+    	Error (ERR_ILLEGAL_INDIRECT);
+
+    	/* Free the problematic node */
+    	FreeExprNode (Op);
+
+    	/* Return something that is safe later ### */
+	return GetIntNode (0);
+
+    }
+
+    /* Get the type of the result */
+    ResultType = Indirect (Op->Type);
+
+    /* The result is an lvalue if it is not an array */
+    LVal = IsTypeArray (ResultType)? RVALUE : LVALUE;
+
+    /* Create the operator node and return it */
+    return AllocExprNode (NT_INDIRECT, ResultType, LVal);
+}
+
+
+
+static ExprNode* DoSizeOf (void)
+/* Handle the sizeof operator */
+{
+    ExprNode*     N;
+    unsigned long Size;
+
+    /* Skip the left paren */
+    NextToken ();
+
+    /* A type or an actual variable access may follow */
+    if (IsTypeExpr ()) {
+
+       	type	Type[MAXTYPELEN];
+
+       	/* A type in parenthesis. Skip the left paren. */
+       	NextToken ();
+
+       	/* Read the type and calculate the size. */
+       	Size = SizeOf (ParseType (Type));
+
+       	/* Closing paren must follow */
+       	ConsumeRParen ();
+
+    } else {
+
+       	/* Some other entity */
+       	N = UnaryExpr ();
+
+       	/* Get the size */
+       	Size = SizeOf (N->Type);
+
+       	/* Free the node */
+       	FreeExprNode (N);
+
+    }
+
+    /* Create a constant node with type size_t and return it */
+    N = AllocExprNode (NT_CONST, type_size_t, RVALUE);
+    N->V.I = Size;
+    return N;
+}
+
+
+
+static ExprNode* DoTypeCast (void)
+/* Handle type casts */
+{
+    type      TargetType[MAXTYPELEN];
+    ExprNode* Op;
+    ExprNode* Root;
+
+    /* Skip the left paren */
+    NextToken ();
+
+    /* Read the type */
+    ParseType (TargetType);
+
+    /* Closing paren */
+    ConsumeRParen ();
+
+    /* Read the expression we have to cast */
+    Op = UnaryExpr ();
+
+    /* As a minor optimization, check if the type is already correct. If so,
+     * do nothing.
+     */
+    if (TypeCmp (TargetType, Op->Type) >= TC_EQUAL) {
+
+	/* Just return the operand as is */
+	return Op;
+
+    } else {
+
+	/* Must be casted. Setup the expression tree and return the new node */
+	Root = AllocExprNode (NT_BOOL_NOT, TargetType, RVALUE);
+	SetLeftNode (Root, Op);
+	return Root;
+
+    }
+}
+
+
+
 static ExprNode* UnaryExpr (void)
 {
     /* */
     if (curtok == TOK_INC    || curtok == TOK_DEC      ||
        	curtok == TOK_PLUS   || curtok == TOK_MINUS    ||
-       	curtok == TOK_AND    || curtok == TOK_STAR     ||
        	curtok == TOK_COMP   || curtok == TOK_BOOL_NOT ||
+       	curtok == TOK_AND    || curtok == TOK_STAR     ||
        	curtok == TOK_SIZEOF || IsTypeExpr ()) {
 
      	/* Check the token */
@@ -754,23 +1031,24 @@ static ExprNode* UnaryExpr (void)
      	    case TOK_MINUS:
 		return DoUnaryPlusMinus ();
 
-     	    case TOK_AND:
-     		break;
-
-     	    case TOK_STAR:
-     		break;
-
      	    case TOK_COMP:
-     		break;
+		return DoComplement ();
 
      	    case TOK_BOOL_NOT:
-     		break;
+		return DoBoolNot ();
+
+     	    case TOK_AND:
+     		return DoAddress ();
+
+     	    case TOK_STAR:
+     		return DoIndirect ();
 
 	    case TOK_SIZEOF:
-		break;
+	       	return DoSizeOf ();
 
 	    default:
-		break;
+	     	/* Type cast */
+	     	return DoTypeCast ();
 
 	}
 

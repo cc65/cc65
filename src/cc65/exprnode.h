@@ -81,10 +81,14 @@ typedef enum {
     NT_STRUCT_ACCESS,		/* Access of a struct field */
     NT_STRUCTPTR_ACCESS,       	/* Access via struct ptr */
     NT_FUNCTION_CALL,		/* Call a function */
+    NT_TYPECAST,		/* A cast */
+    NT_ADDRESS,			/* Address operator (&) */
+    NT_INDIRECT,		/* Indirection operator (*) */
 
     NT_UNARY_MINUS,
+    NT_COMPLEMENT,		/* ~ */
+    NT_BOOL_NOT,       	       	/* ! */
 
-    NT_NOT,    	       	       	/* ~ */
     NT_PLUS,   	       	       	/* + */
     NT_MINUS,  	       	       	/* - */
     NT_MUL,    	       	       	/* * */
@@ -111,7 +115,6 @@ typedef enum {
     NT_PRE_INC,	       	       	/* ++ */
     NT_POST_INC,       	       	/* ++ */
 
-    NT_BOOL_NOT,       	       	/* ! */
     NT_BOOL_OR,	       	       	/* || */
     NT_BOOL_AND,       	       	/* && */
 

@@ -121,7 +121,7 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "Too many initializers",
     "Cannot initialize incomplete type",
     "Cannot subscript",
-    "Operation not allowed on these types",
+    "Operation not allowed with this type of argument",
     "Struct expected",
     "Struct/union has no field named `%s'",
     "Struct pointer expected",

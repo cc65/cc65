@@ -15,7 +15,7 @@
 
 
 
-#if defined(__C64__)
+#if defined(__C64__) || defined(__C128__)
 #  define SCREEN1               0xE000
 #  define SCREEN2               0xE400
 #  define CHARSET               0xE800
@@ -113,7 +113,7 @@ static void doplasma (void)
     c2B -= 3;
     for (ii = 0; ii < 25; ++ii) {
 	/* Unrolling the following loop will give a speed increase of
-	 * nearly 100% (~24fps), but it will also increase the code 
+	 * nearly 100% (~24fps), but it will also increase the code
 	 * size a lot.
 	 */
         for (i = 0; i < 40; ++i, ++scrn) {
@@ -165,6 +165,14 @@ int main (void)
     unsigned long fps;
     unsigned      fps10;
 
+#if defined(__C64__)
+    unsigned char block;
+#endif
+#if defined(__C128__)
+    unsigned char block;
+    unsigned char initflag;
+    unsigned char graphflag;
+#endif
 
     clrscr ();
     cprintf ("Making charset, mompls");
@@ -176,9 +184,19 @@ int main (void)
     text       = textcolor (COLOR_BLACK);
     clrscr ();
 
-#if defined(__C64__)
+#if defined(__C64__) || defined(__C128__)
     /* Move the VIC 16K block */
-    outb (&CIA2.pra, 0x00);
+    block = inb (&CIA2.pra);
+    outb (&CIA2.pra, (block & 0xFC) | ((SCREEN1 >> 14) ^ 0x03));
+#endif
+#if defined(__C128__)
+    /* Save and change some flags, so that kernal/basic interupt handler will
+     * not interfere with our routine.
+     */
+    initflag = *(unsigned char*) 0xA04;
+    *(unsigned char*) 0xA04 &= 0xFE;
+    graphflag = *(unsigned char*) 0xD8;
+    *(unsigned char*) 0xD8 = 0xFF;     
 #endif
 
     /* Remember the VIC address register */
@@ -187,17 +205,17 @@ int main (void)
     /* Run the demo until a key was hit */
     t = clock ();
     while (!kbhit()) {
-	/* Build page 1, then make it visible */
+      	/* Build page 1, then make it visible */
         scrn = (unsigned char*)SCREEN1;
         doplasma();
-	outb (&VIC.addr, PAGE1);
+      	outb (&VIC.addr, PAGE1);
 
-	/* Build page 2, then make it visible */
+      	/* Build page 2, then make it visible */
         scrn = (unsigned char*)SCREEN2;
         doplasma();
-	outb (&VIC.addr, PAGE2);
+      	outb (&VIC.addr, PAGE2);
 
-	/* Count frames */
+      	/* Count frames */
         f += 2;
     };
     t = clock() - t;
@@ -205,9 +223,14 @@ int main (void)
     /* Switch back the VIC screen */
     outb (&VIC.addr, v);
 
-#if defined(__C64__)
+#if defined(__C64__) || defined(__C128__)
     /* Move back the VIC 16K block */
-    outb (&CIA2.pra, 0x03);
+    outb (&CIA2.pra, block);
+#endif
+#if defined(__C128__)
+    /* Restore the flags */
+    *(unsigned char*) 0xA04 = initflag;
+    *(unsigned char*) 0xD8  = graphflag;
 #endif
 
     /* Fetch the character from the keyboard buffer and discard it */

@@ -30,7 +30,7 @@ Name:           mousedemo
 Description:	Shows how to use the mouse.
 Platforms:	All systems with mouse and conio support:
 		Atari (untested), C64, C128 and CBM510
-
+                                 
 -----------------------------------------------------------------------------
 Name:           nachtm
 Description:	Plays "Eine kleine Nachtmusik" by Wolfgang Amadeus Mozart
@@ -41,8 +41,8 @@ Platforms:	All systems that have the Commodore SID (Sound Interface
 -----------------------------------------------------------------------------
 Name:           plasma
 Description:	A fancy graphics demo written by groepaz/hitmen.
-Platforms:	The program needs a VIC but has not been ported to / tested
-		on the C128, so it does currently run on the CBM510 and C64.
+Platforms:     	The program needs a VIC, so it runs on the following systems:
+		C64, C128, CBM510
 
 -----------------------------------------------------------------------------
 Name:           sieve

@@ -24,6 +24,7 @@ CRAM_PTR       	= $E2  	       	; Pointer to current char in color RAM
 
 CHARCOLOR       = $F1
 FKEY_COUNT     	= $D1  	       	; Characters for function key
+PALFLAG         = $A03          ; $FF=PAL, $00=NTSC
 INIT_STATUS	= $A04		; Flag: Reset/NMI Status
 FKEY_LEN	= $1000	       	; Function key lengths
 FKEY_TEXT	= $100A		; Function key texts

@@ -109,6 +109,24 @@ extern unsigned char _filetype;         /* Default 'u' */
 
 
 /*****************************************************************************/
+/*                               Machine info                                */
+/*****************************************************************************/
+
+
+
+#if defined(__C16__) || defined(__C64__) || defined(__C128__) || defined(__PLUS4__)
+
+#define TV_NTSC 0
+#define TV_PAL  1
+
+unsigned char __fastcall__ get_tv (void);
+/* Return the video mode the machine is using */
+
+#endif
+
+
+
+/*****************************************************************************/
 /*                           CBM kernal functions                            */
 /*****************************************************************************/
 

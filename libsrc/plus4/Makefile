@@ -19,6 +19,7 @@ OBJS =	_scrsize.o	\
 	conio.o		\
 	cputc.o		\
 	crt0.o		\
+        get_tv.o        \
         kacptr.o        \
         kbasin.o        \
 	kbhit.o		\

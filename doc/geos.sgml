@@ -1648,6 +1648,13 @@ void remove_hook(void) &lcub;
 <p>
 In your <tt/main/ function you should call <tt/hook_into_system()/ but <em/after/ all calls to GEOS
 kernal (like <tt/DoMenu/, <tt/DoIcons/, etc.) - right before passing control to the <tt/MainLoop()/.
+Be warned that vectors are most likely to be changed by GEOS kernal also by other functions (like
+<tt/GotoFirstMenu/, <tt/DoDlgBox/ and its derivatives etc.). It depends on what kernal functions
+you use and which vectors you altered. Unfortunately there is no exact list for GEOS 2.0, a complete
+list for GEOS 1.x can be found in A. Boyce's Programmers' Referenece Guide mentioned before. Most of
+information contained there should be still valid for GEOS 2.0. When calling a function that restores
+the vector you should add a <tt/hook_into_system()/ call right after it.
+<p>
 It is critical to restore old vector values before exiting the program. If you have more than one
 place where you call <tt/exit()/ then it might be worth to register <tt/remove_hook/ function to
 be called upon exiting with <tt/atexit(&amp;remove_hook);/ call. This way you will ensure that

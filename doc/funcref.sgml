@@ -57,8 +57,8 @@ function.
 <item><ref id="SEI" name="SEI">
 <item><ref id="_sys" name="_sys">
 <item><ref id="getcpu" name="getcpu">
-<!-- <item><ref id="reset_brk" name="reset_brk"> -->
-<!-- <item><ref id="set_brk" name="set_brk"> -->
+<item><ref id="reset_brk" name="reset_brk">
+<item><ref id="set_brk" name="set_brk">
 </itemize>
 
 
@@ -152,6 +152,16 @@ function.
 <item><ref id="close" name="close">
 <item><ref id="creat" name="creat">
 <item><ref id="open" name="open">
+</itemize>
+
+
+<sect1><tt/peekpoke.h/<label id="peekpoke.h"><p>
+
+<itemize>
+<item><ref id="PEEK" name="PEEK">
+<item><ref id="PEEKW" name="PEEKW">
+<item><ref id="POKE" name="POKE">
+<item><ref id="POKEW" name="POKEW">
 </itemize>
 
 
@@ -437,6 +447,104 @@ disabled.
 <tag/See also/
 <ref id="BRK" name="BRK">,
 <ref id="SEI" name="SEI">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>PEEK<label id="PEEK"><p>
+
+<quote>
+<descrip>
+<tag/Function/Read a byte from memory.
+<tag/Header/<tt/<ref id="peekpoke.h" name="peekpoke.h">/
+<tag/Declaration/<tt/unsigned char PEEK (unsigned addr);/
+<tag/Description/The function will read the absolute memory given by <tt/addr/
+and return the value read.
+<tag/Limits/<itemize>
+<item>The function is actually a macro.
+<item>This function depends highly on the platform and environment.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="PEEKW" name="PEEKW">,
+<ref id="POKE" name="POKE">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>PEEKW<label id="PEEKW"><p>
+
+<quote>
+<descrip>
+<tag/Function/Read a word (two bytes) from memory.
+<tag/Header/<tt/<ref id="peekpoke.h" name="peekpoke.h">/
+<tag/Declaration/<tt/unsigned PEEKW (unsigned addr);/
+<tag/Description/The function will read the absolute memory given by <tt/addr/
+and return the value read. The byte read from the higher address is the high
+byte of the return value.
+<tag/Limits/<itemize>
+<item>The function is actually a macro.
+<item>This function depends highly on the platform and environment.
+<item>The order in which the two bytes are read is unspecified and may
+depend of the address expression used.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="PEEK" name="PEEK">,
+<ref id="POKE" name="POKE">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>POKE<label id="POKE"><p>
+
+<quote>
+<descrip>
+<tag/Function/Write a byte to memory.
+<tag/Header/<tt/<ref id="peekpoke.h" name="peekpoke.h">/
+<tag/Declaration/<tt/void POKE (unsigned addr, unsigned char val);/
+<tag/Description/The function writes the value <tt/val/ to the absolute
+memory address given by <tt/addr/.
+<tag/Limits/<itemize>
+<item>The function is actually a macro.
+<item>This function depends highly on the platform and environment.
+<item>Careless use will cause the program to act strange or may crash the
+machine.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="PEEK" name="PEEK">,
+<ref id="POKEW" name="POKEW">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>POKEW<label id="POKEW"><p>
+
+<quote>
+<descrip>
+<tag/Function/Write a word (two bytes) to memory.
+<tag/Header/<tt/<ref id="peekpoke.h" name="peekpoke.h">/
+<tag/Declaration/<tt/void POKEW (unsigned addr, unsigned val);/
+<tag/Description/The function writes the value <tt/val/ to the absolute
+memory address given by <tt/addr/. The low byte of <tt/val/ is written to
+the <tt/addr/, the high byte is written to <tt/addr+1/.
+<tag/Limits/<itemize>
+<item>The function is actually a macro.
+<item>This function depends highly on the platform and environment.
+<item>Careless use will cause the program to act strange or may crash the
+machine.
+<item>The order in which the two bytes are written is unspecified and may
+depend of the address expression used.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="PEEK" name="PEEK">,
+<ref id="POKE" name="POKE">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -2240,6 +2348,29 @@ be used in presence of a prototype.
 </quote>
 
 
+<sect1>reset_brk<label id="reset_brk"><p>
+
+<quote>
+<descrip>
+<tag/Function/Resets the break vector to its original value.
+<tag/Header/<tt/<ref id="6502.h" name="6502.h">/
+<tag/Declaration/<tt/void __fastcall__ reset_brk (void);/
+<tag/Description/<tt/reset_brk/ resets the break vector to the value it had
+before a call to <tt/set_brk/.
+<tag/Limits/
+<itemize>
+<item>Since <tt/<ref id="set_brk" name="set_brk">/ installs an exit handler,
+it is not strictly necessary to call this function as part of the cleanup when
+the program ends.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="set_brk" name="set_brk">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>revers<label id="revers"><p>
 
 <quote>
@@ -2283,6 +2414,41 @@ be used in presence of a prototype.
 <ref id="gotoy" name="gotoy">,
 <ref id="wherex" name="wherex">,
 <ref id="wherey" name="wherey">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>set_brk<label id="set_brk"><p>
+
+<quote>
+<descrip>
+<tag/Function/Set the break vector to a user function.
+<tag/Header/<tt/<ref id="6502.h" name="6502.h">/
+<tag/Declaration/<tt/void __fastcall__ set_brk (brk_handler func);/
+<tag/Description/<tt/set_brk/ allows a user program to handle breaks within the
+program code by letting the vector point to a user written C function. The
+runtime library installs a small stub that saves the registers into global
+variables that may be accessed (and changed) by the break handler.
+<tag/Limits/
+<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>The stub saves the zero page registers used by the C runtime and switches
+to a small break handler stack. This means that it is safe to execute C code,
+even if C code was interrupted. Be careful however not to use too many local
+variables, and do not enable stack checks for the handler function or any other
+function called from it.
+<item>The <tt/brk_pc/ variable points to the <tt/BRK/ instruction. If you want
+the continue with the interrupted code, you have to adjust <tt/brk_pc/,
+otherwise the <tt/BRK/ instruction will get executed over and over again.
+<item>Since <tt/set_brk/ installs an exit handler, it is not strictly necessary
+to call <tt/<ref id="reset_brk" name="reset_brk">/ as part of the cleanup when
+the program terminates.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="reset_brk" name="reset_brk">
 <tag/Example/None.
 </descrip>
 </quote>

@@ -211,6 +211,15 @@ static void FormatInt (PrintfCtrl* P, unsigned long Val)
     /* Convert the value into a (reversed string). */
     ToStr (P, Val);
 
+    /* The default precision for all integer conversions is one. This means
+     * that the fPrec flag is always set and does not need to be checked 
+     * later on.
+     */
+    if ((P->Flags & fPrec) == 0) {
+        P->Flags |= fPrec;
+        P->Prec = 1;
+    }
+
     /* Determine the leaders for alternative forms */
     if ((P->Flags & fHash) != 0) {
         if (P->Base == 16) {
@@ -219,14 +228,14 @@ static void FormatInt (PrintfCtrl* P, unsigned long Val)
             Lead[LeadCount++] = (P->Flags & fUpcase)? 'X' : 'x';
         } else if (P->Base == 8) {
             /* Alternative form for 'o': always add a leading zero. */
-            if ((P->Flags & fPrec) == 0 || P->Prec <= P->ArgLen) {
+            if (P->Prec <= P->ArgLen) {
                 Lead[LeadCount++] = '0';
             }
         }
     }
 
     /* Determine the amount of precision padding needed */
-    if ((P->Flags & fPrec) != 0 && P->ArgLen < P->Prec) {
+    if (P->ArgLen < P->Prec) {
         PrecPadding = P->Prec - P->ArgLen;
     } else {
         PrecPadding = 0;

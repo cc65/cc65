@@ -1,6 +1,6 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     c64.h			       	     */
+/*                                peekpoke.h                                 */
 /*                                                                           */
 /*     PEEK and POKE macros for those who want to write BASIC code in C      */
 /*                                                                           */

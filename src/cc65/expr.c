@@ -46,8 +46,8 @@
 
 /* Map a generator function and its attributes to a token */
 typedef struct {
-    unsigned char Tok;	     		/* Token to map to */
-    unsigned char Flags;  		/* Flags for generator function */
+    token_t       Tok;	     		/* Token to map to */
+    unsigned      Flags;  		/* Flags for generator function */
     void       	  (*Func) (unsigned, unsigned long); 	/* Generator func */
 } GenDesc;
 

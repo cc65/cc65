@@ -38,6 +38,7 @@
 #include <stdarg.h>
 
 #include "global.h"
+#include "input.h"
 #include "io.h"
 #include "scanner.h"
 #include "stmt.h"
@@ -185,7 +186,8 @@ void Warning (unsigned WarnNum, ...)
     va_list ap;
 
     if (!NoWarn) {
-      	fprintf (stderr, "%s(%u): Warning #%u: ", fin, curpos, WarnNum);
+      	fprintf (stderr, "%s(%u): Warning #%u: ",
+		 GetCurrentFile(), curpos, WarnNum);
 
      	va_start (ap, WarnNum);
      	vfprintf (stderr, WarnMsg [WarnNum-1], ap);
@@ -207,7 +209,8 @@ void PPWarning (unsigned WarnNum, ...)
     va_list ap;
 
     if (!NoWarn) {
-      	fprintf (stderr, "%s(%u): Warning #%u: ", fin, ln, WarnNum);
+      	fprintf (stderr, "%s(%u): Warning #%u: ",
+		 GetCurrentFile(), GetCurrentLine(), WarnNum);
 
      	va_start (ap, WarnNum);
      	vfprintf (stderr, WarnMsg [WarnNum-1], ap);
@@ -224,7 +227,8 @@ void Error (unsigned ErrNum, ...)
 {
     va_list ap;
 
-    fprintf (stderr, "%s(%u): Error #%u: ", fin, curpos, ErrNum);
+    fprintf (stderr, "%s(%u): Error #%u: ",
+	     GetCurrentFile(), curpos, ErrNum);
 
     va_start (ap, ErrNum);
     vfprintf (stderr, ErrMsg [ErrNum-1], ap);
@@ -247,7 +251,8 @@ void PPError (unsigned ErrNum, ...)
 {
     va_list ap;
 
-    fprintf (stderr, "%s(%u): Error #%u: ", fin, ln, ErrNum);
+    fprintf (stderr, "%s(%u): Error #%u: ",
+	     GetCurrentFile(), GetCurrentLine(), ErrNum);
 
     va_start (ap, ErrNum);
     vfprintf (stderr, ErrMsg [ErrNum-1], ap);
@@ -267,7 +272,8 @@ void Fatal (unsigned FatNum, ...)
 {
     va_list ap;
 
-    fprintf (stderr, "%s(%u): Fatal #%u: ", fin, curpos, FatNum);
+    fprintf (stderr, "%s(%u): Fatal #%u: ",
+	     GetCurrentFile(), curpos, FatNum);
 
     va_start (ap, FatNum);
     vfprintf (stderr, FatMsg [FatNum-1], ap);
@@ -287,7 +293,8 @@ void Internal (char* Format, ...)
 {
     va_list ap;
 
-    fprintf (stderr, "%s(%u): Internal compiler error:\n", fin, curpos);
+    fprintf (stderr, "%s(%u): Internal compiler error:\n",
+	     GetCurrentFile(), curpos);
 
     va_start (ap, Format);
     vfprintf (stderr, Format, ap);
@@ -307,6 +314,7 @@ void ErrorReport (void)
      	printf ("No errors.\n");
     }
 }
+
 
 
 

@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     mem.h				     */
+/*				    input.h				     */
 /*                                                                           */
-/*		Safe memory allocation for the cc65 C compiler		     */
+/*			      Input file handling			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,43 +33,35 @@
 
 
 
-#ifndef MEM_H
-#define MEM_H
-
-
-
-#include <stddef.h>
+#ifndef INPUT_H
+#define INPUT_H
 
 
 
 /*****************************************************************************/
-/*  	     	  		     data				     */
+/*	       	     	     	     Code		     		     */
 /*****************************************************************************/
 
 
 
-extern size_t memmax;
+void OpenMainFile (const char* Name);
+/* Open the main file. Will call Fatal() in case of failures. */
+
+void OpenIncludeFile (const char* Name, unsigned DirSpec);
+/* Open an include file and insert it into the tables. */
+
+int NextLine (void);
+/* Get a line from the current input. Returns 0 on end of file. */
+
+const char* GetCurrentFile (void);
+/* Return the name of the current input file */
+
+unsigned GetCurrentLine (void);
+/* Return the line number in the current input file */
 
 
 
-/*****************************************************************************/
-/*     	     	    		     code				     */
-/*****************************************************************************/
-
-
-
-void* xmalloc (size_t size);
-/* Allocate memory, check for out of memory condition. Do some debugging */
-
-void xfree (const void* block);
-/* Free the block, do some debugging */
-
-char* xstrdup (const char* s);
-/* Duplicate a string on the heap. The function checks for out of memory */
-
-
-
-/* End of mem.h */
+/* End of input.h */
 #endif
 
 

@@ -39,6 +39,7 @@
 #include <string.h>
 
 #include "../common/hashstr.h"
+#include "../common/xmalloc.h"
 
 #include "asmcode.h"
 #include "asmlabel.h"
@@ -50,7 +51,6 @@
 #include "funcdesc.h"
 #include "global.h"
 #include "io.h"
-#include "mem.h"
 #include "symentry.h"
 #include "symtab.h"
 

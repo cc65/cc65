@@ -40,15 +40,6 @@ struct filent {
     int   f_ln;
 };
 
-/* Input file table and number of open input files */
-extern struct filent filetab[MAXFILES];
-extern int ifile;
-
-/* Current input file stream data */
-extern FILE* inp;		/* Input file stream */
-extern char* fin;		/* Input file name */
-extern unsigned ln;		/* Line number */
-
 
 
 /*****************************************************************************/
@@ -72,9 +63,6 @@ int gch (void);
 /* Get the current character in the input stream and advance line
  * pointer (no end of line check is performed).
  */
-
-int NextLine (void);
-/* Get a line from the current input.  Returns -1 on end of file. */
 
 
 

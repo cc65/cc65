@@ -35,10 +35,10 @@
 
 #include <stdio.h>
 
+#include "../common/xmalloc.h"
 #include "../common/xsprintf.h"
 
 #include "error.h"
-#include "mem.h"
 #include "asmline.h"
 
 

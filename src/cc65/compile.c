@@ -61,10 +61,7 @@
 
 
 static void Parse (void)
-/* Process all input text.
- * At this level, only static declarations, defines, includes, and function
- * definitions are legal....
- */
+/* Top level parser routine. */
 {
     int comma;
     SymEntry* Entry;
@@ -253,7 +250,6 @@ void Compile (void)
 
 
     /* Setup variables */
-    filetab[0].f_iocb = inp;
     LiteralLabel = GetLabel ();
 
     /* Add some standard paths to the include search path */

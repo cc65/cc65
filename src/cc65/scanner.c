@@ -18,6 +18,7 @@
 #include "function.h"
 #include "global.h"
 #include "ident.h"
+#include "input.h"
 #include "io.h"
 #include "litpool.h"
 #include "preproc.h"
@@ -355,7 +356,7 @@ void NextToken (void)
     CurTok = NextTok;
 
     /* Remember the starting position of the next token */
-    NextTok.Pos = ln;
+    NextTok.Pos = GetCurrentLine();
 
     /* Skip spaces and read the next line if needed */
     if (skipwhite () == 0) {
@@ -476,12 +477,12 @@ void NextToken (void)
      	if (token [0] == '_') {
      	    /* Special symbols */
      	    if (strcmp (token, "__FILE__") == 0) {
-	       	nxtval = AddLiteral (fin);
+	       	nxtval = AddLiteral (GetCurrentFile());
 	       	nxttok = TOK_SCONST;
 	       	return;
 	    } else if (strcmp (token, "__LINE__") == 0) {
 	       	nxttok  = TOK_ICONST;
-    	       	nxtval  = ln;
+    	       	nxtval  = GetCurrentLine();
     	       	nxttype = type_int;
     	       	return;
     	    } else if (strcmp (token, "__fixargs__") == 0) {

@@ -82,13 +82,13 @@ OBJS =	anonname.obj	\
 	goto.obj	\
 	ident.obj	\
 	incpath.obj    	\
+	input.obj	\
 	io.obj		\
 	litpool.obj	\
 	locals.obj	\
 	loop.obj	\
 	macrotab.obj	\
 	main.obj	\
-	mem.obj		\
 	optimize.obj	\
 	pragma.obj	\
 	preproc.obj	\
@@ -139,13 +139,13 @@ FILE global.obj
 FILE goto.obj
 FILE ident.obj
 FILE incpath.obj
+FILE input.obj
 FILE io.obj
 FILE litpool.obj
 FILE locals.obj
 FILE loop.obj
 FILE macrotab.obj
 FILE main.obj
-FILE mem.obj
 FILE optimize.obj
 FILE pragma.obj
 FILE preproc.obj

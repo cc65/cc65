@@ -42,6 +42,7 @@
 #include "../common/cmdline.h"
 #include "../common/fname.h"
 #include "../common/version.h"
+#include "../common/xmalloc.h"
 
 #include "asmcode.h"
 #include "compile.h"
@@ -49,9 +50,8 @@
 #include "error.h"
 #include "global.h"
 #include "incpath.h"
-#include "io.h"
+#include "input.h"
 #include "macrotab.h"
-#include "mem.h"
 #include "optimize.h"
 #include "scanner.h"
 
@@ -379,8 +379,7 @@ int main (int argc, char* argv[])
 
     /* Initialize the output file name */
     const char* OutputFile = 0;
-
-    fin = NULL;
+    const char* InputFile  = 0;
 
     /* Initialize the cmdline module */
     InitCmdLine (argc, argv, "cc65");
@@ -409,7 +408,7 @@ int main (int argc, char* argv[])
 
 		case 'h':
 		case '?':
-		    OptHelp (Arg, 0);
+	       	    OptHelp (Arg, 0);
 		    break;
 
 	    	case 'g':
@@ -418,7 +417,7 @@ int main (int argc, char* argv[])
 
 		case 'j':
 		    OptSignedChars (Arg, 0);
-		    break;
+	       	    break;
 
     		case 'o':
 		    OutputFile = GetArg (&I, 2);
@@ -463,44 +462,40 @@ int main (int argc, char* argv[])
 		    	    case 'f':
 		    	     	sscanf (P, "%lx", (long*) &OptDisable);
 		    	     	break;
-		    	    case 'i':
-		    	     	FavourSize = 0;
-    		    	     	break;
-		    	    case 'r':
-		    	 	EnableRegVars = 1;
-				break;
-			    case 's':
-			       	InlineStdFuncs = 1;
-				break;
-			}
-		    }
-		    break;
+	       	    	    case 'i':
+	       	    	     	FavourSize = 0;
+    	       	    	     	break;
+	       	    	    case 'r':
+	       	    	 	EnableRegVars = 1;
+	       			break;
+	       		    case 's':
+	       		       	InlineStdFuncs = 1;
+	       			break;
+	       		}
+	       	    }
+	       	    break;
 
-		case 'T':
-       		    OptAddSource (Arg, 0);
-       		    break;
+	       	case 'T':
+       	       	    OptAddSource (Arg, 0);
+       	       	    break;
 
-       		case 'V':
-       		    OptVersion (Arg, 0);
-       		    break;
+       	       	case 'V':
+       	       	    OptVersion (Arg, 0);
+       	       	    break;
 
-       		case 'W':
-       		    NoWarn = 1;
-       		    break;
+       	       	case 'W':
+       	       	    NoWarn = 1;
+       	       	    break;
 
-       		default:
+       	       	default:
        	       	    UnknownOption (Arg);
-       		    break;
+       	       	    break;
        	    }
        	} else {
-       	    if (fin) {
-       		fprintf (stderr, "additional file specs ignored\n");
+       	    if (InputFile) {
+       	       	fprintf (stderr, "additional file specs ignored\n");
        	    } else {
-       		fin = xstrdup (Arg);
-		inp = fopen (fin, "r");
-		if (inp == 0) {
-		    Fatal (FAT_CANNOT_OPEN_INPUT, strerror (errno));
-		}
+       	       	InputFile = Arg;
 	    }
 	}
 
@@ -509,14 +504,17 @@ int main (int argc, char* argv[])
     }
 
     /* Did we have a file spec on the command line? */
-    if (!fin) {
+    if (InputFile == 0) {
 	fprintf (stderr, "%s: No input files\n", argv [0]);
 	exit (EXIT_FAILURE);
     }
 
+    /* Open the input file */
+    OpenMainFile (InputFile);
+
     /* Create the output file name if it was not explicitly given */
     if (OutputFile == 0) {
-	OutputFile = MakeFilename (fin, ".s");
+	OutputFile = MakeFilename (InputFile, ".s");
     }
 
     /* Go! */

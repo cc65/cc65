@@ -28,13 +28,13 @@ OBJS =	anonname.o	\
 	goto.o		\
 	ident.o		\
 	incpath.o      	\
+	input.o		\
 	io.o		\
 	litpool.o      	\
 	locals.o	\
 	loop.o		\
 	macrotab.o	\
 	main.o		\
-	mem.o		\
 	optimize.o     	\
 	preproc.o      	\
 	pragma.o       	\

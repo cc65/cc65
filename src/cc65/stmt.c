@@ -11,6 +11,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../common/xmalloc.h"
+
 #include "asmcode.h"
 #include "asmlabel.h"
 #include "codegen.h"
@@ -23,7 +25,6 @@
 #include "litpool.h"
 #include "locals.h"
 #include "loop.h"
-#include "mem.h"
 #include "pragma.h"
 #include "scanner.h"
 #include "symtab.h"

@@ -6,8 +6,9 @@
 
 
 
+#include "../common/xmalloc.h"
+
 #include "error.h"
-#include "mem.h"
 #include "loop.h"
 
 

@@ -7,15 +7,17 @@
 #include <errno.h>
 #include <ctype.h>
 
+#include "../common/xmalloc.h"
+
 #include "codegen.h"
 #include "error.h"
 #include "expr.h"
 #include "global.h"
 #include "ident.h"
 #include "incpath.h"
+#include "input.h"
 #include "io.h"
 #include "macrotab.h"
-#include "mem.h"
 #include "scanner.h"
 #include "util.h"
 #include "preproc.h"
@@ -33,7 +35,7 @@ static int Pass1 (char* from, char* to);
 
 
 /*****************************************************************************/
-/*		    		     data				     */
+/*  		    		     data				     */
 /*****************************************************************************/
 
 
@@ -83,7 +85,7 @@ static void keepstr (const char* S)
 static void comment (void)
 /* Remove comment from line. */
 {
-    unsigned StartingLine = ln;
+    unsigned StartingLine = GetCurrentLine();
 
     gch ();
     gch ();
@@ -438,7 +440,7 @@ static int Pass1 (char* from, char* to)
 	   	  	    ++lptr;
 	   	  	}
 	   	    }
-	   	}
+    	   	}
 	    } else {
 	   	if (MaybeMacro(c)) {
 	   	    done = 0;
@@ -576,7 +578,7 @@ static int doiff (int skip)
     skipblank ();
     S = line;
     while ((*S++ = *lptr++) != '\0') ;
-    strcat (line, ";;");
+    strcpy (S-1, ";;");
     lptr = line;
 
     /* Switch into special preprocessing mode */
@@ -623,70 +625,58 @@ static int doifdef (int skip, int flag)
 static void doinclude (void)
 /* Open an include file. */
 {
-    char name [80];
-    unsigned count;
-    char term;
-    char c;
-    char *p;
+    unsigned 	Length;
+    char*   	End;
+    char*   	Name;
+    char    	RTerm;
+    unsigned	DirSpec;
 
-    if (ifile >= MAXFILES) {
-     	PPError (ERR_INCLUDE_NESTING);
-     	goto done;
-    }
+
+    /* Skip blanks */
     mptr = mline;
     skipblank ();
-    if (!strchr ("\"<", (term = cgch ()))) {
-       	PPError (ERR_INCLUDE_LTERM_EXPECTED);
-     	goto done;
-    }
-    if (term == '<') {
-     	term = '>';	  	/* get right terminator */
+
+    /* Get the next char and check for a valid file name terminator. Setup
+     * the include directory spec (SYS/USR) by looking at the terminator.
+     */
+    switch (cgch()) {
+
+	case '\"':
+	    RTerm   = '\"';
+	    DirSpec = INC_USER;
+	    break;
+
+	case '<':
+	    RTerm   = '>';
+	    DirSpec = INC_SYS;
+	    break;
+
+	default:
+	    PPError (ERR_INCLUDE_LTERM_EXPECTED);
+	    goto Done;
     }
 
-    /* Get the name of the include file */
-    count = 0;
-    while ((c = *lptr) && (c != term) && count < sizeof (name)-1) {
-	name [count++] = c;
-	++lptr;
-    }
-    if (c != term) {
+    /* Search for the right terminator */
+    End = strchr (lptr, RTerm);
+    if (End == 0) {
+ 	/* No terminator found */
      	PPError (ERR_INCLUDE_RTERM_EXPECTED);
-	goto done;
-    }
-    name [count] = '\0';
-
-    /* Now search for the name */
-    p = FindInclude (name, (term == '\"')? INC_USER : INC_SYS);
-    if (p == 0) {
-	PPError (ERR_INCLUDE_NOT_FOUND, name);
-     	goto done;
+    	goto Done;
     }
 
-    /* Save the existing file info */
-    filetab[ifile].f_ln = ln;
-    filetab[ifile].f_name = fin;
-    filetab[ifile].f_iocb = inp;
-    ++ifile;
+    /* Create a temp copy of the filename */
+    Length = End - lptr;
+    Name = xmalloc (Length + 1);
+    memcpy (Name, lptr, Length);
+    Name[Length] = '\0';
 
-    /* Assign the name and output it */
-    fin = p;
-    if (Verbose) {
-     	printf ("including '%s'\n", fin);
-    }
+    /* Open the include file */
+    OpenIncludeFile (Name, DirSpec);
 
-    /* Try to open the include file */
-    if ((inp = fopen (fin, "r")) == 0) {
-    	/* oops! restore old file */
-	PPError (ERR_INCLUDE_OPEN_FAILURE, fin);
-	xfree (fin);
-	--ifile;
-     	inp = filetab[ifile].f_iocb;
-     	fin = filetab[ifile].f_name;
-    } else {
-     	ln = 0;
-    }
+    /* Delete the temp filename copy */
+    xfree (Name);
 
-done:
+Done:
     /* clear rest of line so next read will come from new file (if open) */
     kill ();
 }

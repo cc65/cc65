@@ -37,6 +37,7 @@
 #include <string.h>
 
 #include "../common/version.h"
+#include "../common/xmalloc.h"
 
 #include "asmcode.h"
 #include "asmlabel.h"
@@ -46,7 +47,6 @@
 #include "global.h"
 #include "io.h"
 #include "litpool.h"
-#include "mem.h"
 #include "optimize.h"
 #include "util.h"
 #include "codegen.h"
@@ -946,13 +946,22 @@ void g_leasp (int offs)
 	    ldaconst (offs);         		/* Load A with offset value */
 	    AddCodeLine ("\tjsr\tleaasp");	/* Load effective address */
 	} else {
-	    ldaconst (offs);
-	    AddCodeLine ("\tclc");
-	    AddCodeLine ("\tldx\tsp+1");
-	    AddCodeLine ("\tadc\tsp");
-	    AddCodeLine ("\tbcc\t*+3");
-	    AddCodeLine ("\tinx");
-	    AddCodeHint ("x:!");		/* Invalidate X */
+	    if (CPU == CPU_65C02 && offs == 1) {
+	     	AddCodeLine ("\tlda\tsp");
+	     	AddCodeLine ("\tldx\tsp+1");
+		AddCodeLine ("\tina");
+	     	AddCodeLine ("\tbne\t*+3");
+	     	AddCodeLine ("\tinx");
+	     	AddCodeHint ("x:!");		/* Invalidate X */
+	    } else {
+	     	ldaconst (offs);
+	     	AddCodeLine ("\tclc");
+	     	AddCodeLine ("\tldx\tsp+1");
+	     	AddCodeLine ("\tadc\tsp");
+	     	AddCodeLine ("\tbcc\t*+3");
+	     	AddCodeLine ("\tinx");
+	     	AddCodeHint ("x:!");		/* Invalidate X */
+	    }
 	}
     }
 }
@@ -1764,7 +1773,7 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
        	    AddCodeLine ("\tjsr\tpushax");  	/* Push the address */
 	    push (flags);		    	/* Correct the internal sp */
 	    g_getind (flags, offs);		/* Fetch the value */
-	    g_inc (flags, val);			/* Increment value in primary */
+	    g_inc (flags, val);	   		/* Increment value in primary */
 	    g_putind (flags, offs);		/* Store the value back */
        	    break;
 
@@ -3723,7 +3732,7 @@ void g_zerobytes (unsigned n)
     AddCodeLine ("\t.res\t%u,$00", n);
 }
 
-			       
+
 
 /*****************************************************************************/
 /*	     		    Inlined known functions			     */

@@ -37,9 +37,9 @@
 #include <string.h>
 
 #include "../common/hashstr.h"
+#include "../common/xmalloc.h"
 
 #include "error.h"
-#include "mem.h"
 #include "macrotab.h"
 
 

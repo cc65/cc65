@@ -35,13 +35,14 @@
 
 #include <string.h>
 
+#include "../common/xmalloc.h"
+
 #include "check.h"
 #include "codegen.h"
 #include "datatype.h"
 #include "error.h"
 #include "funcdesc.h"
 #include "global.h"
-#include "mem.h"
 #include "util.h"
 #include "symtab.h"
 

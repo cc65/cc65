@@ -11,6 +11,8 @@
 #include <errno.h>
 #include <ctype.h>
 
+#include "../common/xmalloc.h"
+
 #include "anonname.h"
 #include "codegen.h"
 #include "datatype.h"
@@ -20,7 +22,6 @@
 #include "function.h"
 #include "global.h"
 #include "litpool.h"
-#include "mem.h"
 #include "pragma.h"
 #include "scanner.h"
 #include "symtab.h"

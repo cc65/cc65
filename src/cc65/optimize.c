@@ -37,6 +37,8 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "../common/xmalloc.h"
+
 #include "asmlabel.h"
 #include "asmline.h"
 #include "check.h"
@@ -44,7 +46,6 @@
 #include "error.h"
 #include "global.h"
 #include "io.h"
-#include "mem.h"
 #include "optimize.h"
 
 
@@ -1218,7 +1219,7 @@ static unsigned RegValUsed (Line* Start)
  * If the end of the lookahead is reached, all registers that are uncertain
  * are marked as used.
  * The result of the search is returned.
- */								
+ */
 {
     unsigned R;
 
@@ -3635,6 +3636,9 @@ static Line* OptOneBlock (Line* L)
 	     	}
 	    }
        	} else if (LineMatch (L, "\tadc\t")) {
+	    if (CPU == CPU_65C02 && Y == 0 && L->Line[5] == '(' && IsYAddrMode(L)) {
+		L->Line[strlen(L->Line)-2] = '\0';
+	    }
 	    A = -1;
 	} else if (LineMatch (L, "\tand\t")) {
 	    A = -1;
@@ -3642,7 +3646,10 @@ static Line* OptOneBlock (Line* L)
 	    if (A != -1) {
 	     	A = (A << 1) & 0xFF;
 	    }
-	} else if (CPU == CPU_65C02 && LineFullMatch (L, "\tdea")) {
+       	} else if (CPU == CPU_65C02 && Y == 0 && L->Line[5] == '(' && IsYAddrMode(L)) {
+	    L->Line[strlen(L->Line)-2] = '\0';
+	} else if (CPU == CPU_65C02 && (LineFullMatch (L, "\tdea") ||
+					LineFullMatch (L, "\tdec\ta"))) {
 	    DEC (A, 1);
 	} else if (LineFullMatch (L, "\tdex")) {
 	    DEC (X, 1);
@@ -3650,7 +3657,8 @@ static Line* OptOneBlock (Line* L)
 	    DEC (Y, 1);
 	} else if (LineMatch (L, "\teor")) {
 	    A = -1;
-	} else if (CPU == CPU_65C02 && LineFullMatch (L, "\tina")) {
+	} else if (CPU == CPU_65C02 && (LineFullMatch (L, "\tina") ||
+					LineFullMatch (L, "\tinc\ta"))) {
 	    INC (A, 1);
 	} else if (LineFullMatch (L, "\tinx")) {
 	    INC (X, 1);
@@ -4092,6 +4100,9 @@ static Line* OptOneBlock (Line* L)
 	} else if (LineFullMatch (L, "\trti")) {
 	    A = X = Y = -1;
 	} else if (LineMatch (L, "\tsbc\t")) {
+	    if (CPU == CPU_65C02 && Y == 0 && L->Line[5] == '(' && IsYAddrMode(L)) {
+		L->Line[strlen(L->Line)-2] = '\0';
+	    }
 	    A = -1;
 	} else if (CPU == CPU_65C02 && LineMatch (L, "\tst")) {
 	    /* Try to replace by stz if possible */
@@ -4099,7 +4110,7 @@ static Line* OptOneBlock (Line* L)
 		/* Not indirect and not Y allowed */
 		if (L->Line[5] != '(' && !IsYAddrMode (L)) {
 		    L->Line[3] = 'z';
-		}
+  		}
 	    } else if (X == 0 && LineMatch (L, "\tstx\t")) {
 		/* absolute,y not allowed */
 		if (!IsYAddrMode (L)) {

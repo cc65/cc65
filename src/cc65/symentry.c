@@ -33,7 +33,8 @@
 
 
 
-#include "mem.h"
+#include "../common/xmalloc.h"
+
 #include "symentry.h"
 
 

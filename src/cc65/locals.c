@@ -33,6 +33,8 @@
 
 
 
+#include "../common/xmalloc.h"
+
 #include "anonname.h"
 #include "asmlabel.h"
 #include "codegen.h"
@@ -40,7 +42,6 @@
 #include "expr.h"
 #include "function.h"
 #include "global.h"
-#include "mem.h"
 #include "symtab.h"
 #include "locals.h"
 

@@ -10,6 +10,8 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../common/xmalloc.h"
+
 #include "asmcode.h"
 #include "asmlabel.h"
 #include "check.h"
@@ -23,7 +25,6 @@
 #include "io.h"
 #include "litpool.h"
 #include "macrotab.h"
-#include "mem.h"
 #include "preproc.h"
 #include "scanner.h"
 #include "stdfunc.h"

@@ -325,7 +325,7 @@ _rs232_done:
 ;  * function will return RS_ERR_NO_DATA, so this is not a fatal error.
 ;  */
 ;
-
+                                              
 _rs232_get:
       	bit 	Initialized
       	bpl    	NotInitialized		; Jump if not initialized
@@ -342,7 +342,7 @@ _rs232_get:
 
 ; Check for buffer empty
 
-@L2:  	lda 	RecvFreeCnt
+@L2:  	lda 	RecvFreeCnt             ; (25)
    	cmp 	#$ff
    	bne 	@L3
    	lda	#RS_ERR_NO_DATA
@@ -351,7 +351,7 @@ _rs232_get:
 
 ; Check for flow stopped & enough free: release flow control
 
-@L3:  	ldx 	Stopped
+@L3:  	ldx 	Stopped                 ; (34)
    	beq 	@L4
    	cmp 	#63
    	bcc 	@L4
@@ -363,11 +363,11 @@ _rs232_get:
 
 ; Get byte from buffer
 
-@L4:  	ldx 	RecvHead
+@L4:  	ldx 	RecvHead                ; (41)
        	lda 	RecvBuf,x
       	inc 	RecvHead
    	inc 	RecvFreeCnt
-       	ldx 	#$00
+       	ldx 	#$00                    ; (59)
    	sta    	(ptr1,x)
        	txa				; Return code = 0
    	rts
@@ -532,7 +532,7 @@ _rs232_status:
 
 NmiHandler:
      	pha
-       	lda    	ACIA+RegStatus       	;(4) ;status ;check for byte received
+       	lda    	ACIA+RegStatus         	;(4) ;status ;check for byte received
      	and 	#$08           		;(2)
        	beq    	@L9  			;(2*)
      	cld
@@ -540,7 +540,7 @@ NmiHandler:
      	pha
      	tya
      	pha
-       	lda    	ACIA+RegStatus       	;(4) opt ;status ;check for receive errors
+       	lda    	ACIA+RegStatus         	;(4) opt ;status ;check for receive errors
     	and 	#$07           		;(2) opt
        	beq    	@L1            		;(3*)opt
     	inc 	Errors       		;(5^)opt

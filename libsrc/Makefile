@@ -170,7 +170,7 @@ cbm510lib:
 
 cbm610lib:
 	for i in cbm610 cbm common runtime conio dbg em; do \
-	    CC=$(CC) \
+     	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \
 	    AFLAGS="-t cbm610 -I../../asminc" \
@@ -211,6 +211,21 @@ geoslib:
 	cp geos/devel/*.emd .
 	cp geos/devel/*.joy .
 	cp geos/devel/geos-tgi.tgi geos-tgi.tgi
+
+#-----------------------------------------------------------------------------
+# NES
+
+neslib:
+	for i in nes common runtime conio em tgi; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    LD=$(LD) \
+	    AFLAGS="-t nes -I../../asminc" \
+	    CFLAGS="-Osir -g -T -t nes -I../../include" \
+	    $(MAKE) -C $$i || exit 1; \
+	    $(AR) a nes.lib $$i/*.o;\
+	done
+	mv nes/crt0.o nes.o
 
 #-----------------------------------------------------------------------------
 # CBM PET machines

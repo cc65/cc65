@@ -346,8 +346,8 @@ function.
 <item><ref id="strlen" name="strlen">
 <item><ref id="strlower" name="strlower">
 <item><ref id="strlwr" name="strlwr">
-<!-- <item><ref id="strncat" name="strncat"> -->
-<!-- <item><ref id="strncmp" name="strncmp"> -->
+<item><ref id="strncat" name="strncat">
+<item><ref id="strncmp" name="strncmp">
 <item><ref id="strncpy" name="strncpy">
 <item><ref id="strrchr" name="strrchr">
 <item><ref id="strspn" name="strspn">
@@ -364,19 +364,17 @@ function.
 
 <sect1><tt/time.h/<label id="time.h"><p>
 
-<!--
 <itemize>
-<item><ref id="_systime" name="_systime">
-<item><ref id="asctime" name="asctime">
-<item><ref id="clock" name="clock">
-<item><ref id="ctime" name="ctime">
-<item><ref id="gmtime" name="gmtime">
-<item><ref id="localtime" name="localtime">
-<item><ref id="mktime" name="mktime">
-<item><ref id="strftime" name="strftime">
+<!-- <item><ref id="_systime" name="_systime"> -->
+<!-- <item><ref id="asctime" name="asctime"> -->
+<!-- <item><ref id="clock" name="clock"> -->
+<!-- <item><ref id="ctime" name="ctime"> -->
+<!-- <item><ref id="gmtime" name="gmtime"> -->
+<!-- <item><ref id="localtime" name="localtime"> -->
+<!-- <item><ref id="mktime" name="mktime"> -->
+<!-- <item><ref id="strftime" name="strftime"> -->
 <item><ref id="time" name="time">
 </itemize>
--->
 
 
 <sect1><tt/unistd.h/<label id="unistd.h"><p>
@@ -980,7 +978,7 @@ used in presence of a prototype.
 <tag/Header/<tt/<ref id="conio.h" name="conio.h">/
 <tag/Declaration/<tt/unsigned char __fastcall__ bordercolor (unsigned char color);/
 <tag/Description/The function will set a new border color. It returns the old
-(current) border color.                    
+(current) border color.
 <tag/Limits/<itemize>
 <item>Border colors are system dependent. The function may have no effect
 on systems where the border color cannot be changed.
@@ -3161,7 +3159,8 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="strcmp" name="strcmp">,
 <ref id="strcoll" name="strcoll">,
-<ref id="stricmp" name="stricmp">
+<ref id="stricmp" name="stricmp">,
+<ref id="strncmp" name="strncmp">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3186,7 +3185,8 @@ is undefined.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
-<ref id="strcpy" name="strcpy">
+<ref id="strcpy" name="strcpy">,
+<ref id="strncat" name="strncat">,
 <ref id="strncpy" name="strncpy">
 <tag/Example/None.
 </descrip>
@@ -3236,7 +3236,8 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="strcasecmp" name="strcasecmp">,
 <ref id="strcoll" name="strcoll">,
-<ref id="stricmp" name="stricmp">
+<ref id="stricmp" name="stricmp">,
+<ref id="strncmp" name="strncmp">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3263,7 +3264,8 @@ be used in presence of a prototype.
 <ref id="setlocale" name="setlocale">,
 <ref id="strcasecmp" name="strcasecmp">,
 <ref id="strcmp" name="strcmp">,
-<ref id="stricmp" name="stricmp">
+<ref id="stricmp" name="stricmp">,
+<ref id="strncmp" name="strncmp">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3288,6 +3290,7 @@ is undefined.
 <tag/Availability/ISO 9899
 <tag/See also/
 <ref id="strcat" name="strcat">,
+<ref id="strncat" name="strncat">,
 <ref id="strncpy" name="strncpy">
 <tag/Example/
 <verb>
@@ -3394,7 +3397,8 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="strcasecmp" name="strcasecmp">,
 <ref id="strcmp" name="strcmp">,
-<ref id="strcoll" name="strcoll">
+<ref id="strcoll" name="strcoll">,
+<ref id="strncmp" name="strncmp">
 <tag/Example/None.
 </descrip>
 </quote>
@@ -3440,7 +3444,7 @@ be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/
-<ref id="strupper" name="strupper">
+<ref id="strupper" name="strupper">,
 <ref id="tolower" name="tolower">
 <tag/Example/None.
 </descrip>
@@ -3451,6 +3455,60 @@ be used in presence of a prototype.
 
 <quote>
 See <tt/strlower/.
+</quote>
+
+
+<sect1>strncat<label id="strncat"><p>
+
+<quote>
+<descrip>
+<tag/Function/Concatentate two strings.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strncat (char* s1, const char* s2, size_t n);/
+<tag/Description/The <tt/strncat/ function appends not more than n characters
+of the string pointed to by s2 to the end of the string pointed to by s1. The
+terminating null character at the end of s1 is overwritten. A terminating null
+character is appended to the result, even if not all of s2 is appended to s1.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<item>If copying takes place between objects that overlap, the behavior
+is undefined.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcpy" name="strcpy">,
+<ref id="strncat" name="strncat">,
+<ref id="strncpy" name="strncpy">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strncmp<label id="strncmp"><p>
+
+<quote>
+<descrip>
+<tag/Function/Compare two strings.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/int __fastcall__ strncmp (const char* s1, const char* s2, size_t count);/
+<tag/Description/The <tt/strncmp/ function compares not more than <tt/count/
+characters of the two strings passed as parameters. It returns a value that is
+less than zero if the first <tt/count/ characters of <tt/s1/ are less than
+<tt/s2/, zero if they are identical, and a value greater than zero they are
+greater.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+</itemize>
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcasecmp" name="strcasecmp">,
+<ref id="strcmp" name="strcmp">,
+<ref id="strcoll" name="strcoll">,
+<ref id="stricmp" name="stricmp">
+<tag/Example/None.
+</descrip>
 </quote>
 
 
@@ -3475,8 +3533,9 @@ undefined.
 </itemize>
 <tag/Availability/ISO 9899
 <tag/See also/
-<ref id="strcat" name="strcat">
-<ref id="strcpy" name="strcpy">
+<ref id="strcat" name="strcat">,
+<ref id="strcpy" name="strcpy">,
+<ref id="strncat" name="strncat">
 <tag/Example/
 <verb>
 #include <string.h>
@@ -3610,6 +3669,29 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="bgcolor" name="bgcolor">,
 <ref id="bordercolor" name="bordercolor">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>time<label id="time"><p>
+
+<quote>
+<descrip>
+<tag/Function/Get the time.
+<tag/Header/<tt/<ref id="time.h" name="time.h">/
+<tag/Declaration/<tt/time_t __fastcall__ time (time_t* t);/
+<tag/Description/The function returns the time since the 1970-01-01 00:00:00
+measured in seconds. If the pointer <tt/t/ is not <tt/NULL/, the function
+result will also be stored there. If no time is available, <tt/(time_t)-1/ is
+returned and <tt/errno/ is set to <tt/ENOSYS/.
+<tag/Limits/<itemize>
+<item>The function is only available as fastcall function, so it may
+only be used in presence of a prototype.
+<item>Many platforms supported by cc65 do not have a realtime clock, so the
+returned value may not be valid.
+</itemize>
+<tag/Availability/ISO 9899
 <tag/Example/None.
 </descrip>
 </quote>

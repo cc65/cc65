@@ -26,7 +26,7 @@ ldeax:	pla			; Low byte of return address
 	lda	(ptr4),y
 	tay			; Save low byte
 
-; Calculate the return address (remember: RTS address is one low) and 
+; Calculate the return address (remember: RTS address is one low) and
 ; jump to it
 
 	lda	ptr4
@@ -34,4 +34,5 @@ ldeax:	pla			; Low byte of return address
 	sta	ptr4
 	bcc	@L9
 	inc	ptr4+1
-@L9:	jmp	(ptr4)
+@L9:   	tya			; restore low byte
+	jmp	(ptr4)

@@ -12,7 +12,6 @@
 	.export		_mouse_buttons, _mouse_info
 	.condes		MouseIRQ, 2
 
-	.import		_readjoy
        	.import	       	popax, addysp1
    	.importzp   	ptr1, sp
 
@@ -309,8 +308,15 @@ mddone: rts
 
 .proc	_mouse_buttons
 
-	lda	#$00			; Use port #0
-	jmp	_readjoy		; Same as joystick
+        lda	#$7F
+     	sei
+     	sta	CIA1_PRA
+     	lda	CIA1_PRB                ; Read joystick #0
+     	cli
+        ldx     #0
+     	and	#$1F
+     	eor	#$1F
+        rts
 
 .endproc
 

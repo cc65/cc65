@@ -11,7 +11,6 @@
    	.export	    	_mouse_move, _mouse_pos
 	.export		_mouse_buttons, _mouse_info
 
-	.import		_readjoy
        	.import	       	popax, addysp1
    	.importzp   	ptr1, sp
 
@@ -288,9 +287,19 @@ _mouse_move:
 ; unsigned char mouse_buttons (void);
 ;
 
-_mouse_buttons:
-	lda	#$00			; Use port #0
-	jmp	_readjoy		; Same as joystick
+.proc	_mouse_buttons
+
+        lda	#$7F
+     	sei
+     	sta	CIA1_PRA
+     	lda	CIA1_PRB                ; Read joystick #0
+     	cli
+        ldx     #0
+     	and	#$1F
+     	eor	#$1F
+        rts
+
+.endproc
 
 ; --------------------------------------------------------------------------
 ;

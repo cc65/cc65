@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,13 +38,14 @@
 
 
 
-#include "symtab.h"
+/* cc65 */
 #include "expr.h"
+#include "symtab.h"
 
 
 
 /*****************************************************************************/
-/*		    		     Code				     */
+/*		     		     Code				     */
 /*****************************************************************************/
 
 
@@ -54,7 +55,7 @@ int IsStdFunc (const char* Name);
  * called in a special way.
  */
 
-void HandleStdFunc (ExprDesc* lval);
+void HandleStdFunc (struct FuncDesc* F, ExprDesc* lval);
 /* Generate code for a known standard function. */
 
 

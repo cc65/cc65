@@ -244,7 +244,7 @@ unsigned assignadjust (type* lhst, ExprDesc* rhs)
 	 	    case TC_INCOMPATIBLE:
 	 		Error ("Incompatible pointer types");
 	 		break;
-	 
+
 	 	    case TC_QUAL_DIFF:
 	 		Error ("Pointer types differ in type qualifiers");
 	 		break;
@@ -756,7 +756,7 @@ static void FunctionCall (int k, ExprDesc* lval)
     } else if (InlineStdFuncs && IsStdFunc ((const char*) lval->Name)) {
 
 	/* Inline this function */
-       	HandleStdFunc (lval);
+       	HandleStdFunc (Func, lval);
        	return;
 
     }

@@ -37,11 +37,13 @@
 #include <string.h>
 
 /* common */
+#include "attrib.h"
 #include "check.h"
 
 /* cc65 */
 #include "codegen.h"
 #include "error.h"
+#include "funcdesc.h"
 #include "global.h"
 #include "scanner.h"
 #include "stdfunc.h"
@@ -49,17 +51,18 @@
 
 
 /*****************************************************************************/
-/*			       Function forwards	    		     */
+/*		     	       Function forwards	    		     */
 /*****************************************************************************/
 
 
 
-static void StdFunc_strlen (ExprDesc*);
+static void StdFunc_memset (FuncDesc*, ExprDesc*);
+static void StdFunc_strlen (FuncDesc*, ExprDesc*);
 
 
 
 /*****************************************************************************/
-/*  		    		     Data   	    	    		     */
+/*  		    	  	     Data   	    	    		     */
 /*****************************************************************************/
 
 
@@ -69,8 +72,9 @@ static void StdFunc_strlen (ExprDesc*);
  */
 static struct StdFuncDesc {
     const char*	 	Name;
-    void 	 	(*Handler) (ExprDesc*);
+    void 	 	(*Handler) (FuncDesc*, ExprDesc*);
 } StdFuncs [] = {
+    {  	"memset",      	StdFunc_memset	  	},
     {  	"strlen",	StdFunc_strlen	  	},
 
 };
@@ -101,13 +105,106 @@ static struct StdFuncDesc* FindFunc (const char* Name)
 
 
 
+static unsigned ParseArg (type* Type, ExprDesc* pval)
+/* Parse one argument but do not push it onto the stack. Return the code
+ * generator flags needed to do the actual push.
+ */
+{
+    unsigned CFlags;
+    unsigned Flags;
+
+    /* Do some optimization: If we have a constant value to push,
+     * use a special function that may optimize.
+     */
+    CFlags = CF_NONE;
+    if (CheckedSizeOf (Type) == 1) {
+        CFlags = CF_FORCECHAR;
+    }
+    Flags = CF_NONE;
+    if (evalexpr (CFlags, hie1, pval) == 0) {
+        /* A constant value */
+        Flags |= CF_CONST;
+    }
+
+    /* Promote the argument if needed */
+    assignadjust (Type, pval);
+
+    /* We have a prototype, so chars may be pushed as chars */
+    Flags |= CF_FORCECHAR;
+
+    /* Use the type of the argument for the push */
+    return (Flags | TypeOf (pval->Type));
+}
+
+
+
 /*****************************************************************************/
 /*		 	    Handle known functions  			     */
 /*****************************************************************************/
 
 
 
-static void StdFunc_strlen (ExprDesc* lval attribute ((unused)))
+static void StdFunc_memset (FuncDesc* F attribute ((unused)),
+                            ExprDesc* lval attribute ((unused)))
+/* Handle the memset function */
+{
+    /* Argument types */
+    static type Arg1Type[] = { T_PTR, T_VOID, T_END };  /* void* */
+    static type Arg2Type[] = { T_INT, T_END };          /* int */
+    static type Arg3Type[] = { T_UINT, T_END };         /* size_t */
+
+    unsigned Flags;
+    ExprDesc Arg;
+    int      MemSet    = 1;             /* Use real memset if true */
+    unsigned ParamSize = 0;
+
+
+    /* Check the prototype of the function against what we know about it, so
+     * we can detect errors.
+     */
+    /* ### */
+
+    /* Argument #1 */
+    Flags = ParseArg (Arg1Type, &Arg);
+    g_push (Flags, Arg.ConstVal);
+    ParamSize += SizeOf (Arg1Type);
+    ConsumeComma ();
+
+    /* Argument #2. This argument is special in that we will call another
+     * function if it is a constant zero.
+     */
+    Flags = ParseArg (Arg2Type, &Arg);
+    if ((Flags & CF_CONST) != 0 && Arg.ConstVal == 0) {
+        /* Don't call memset, call bzero instead */
+        MemSet = 0;
+    } else {
+        /* Push the argument */
+        g_push (Flags, Arg.ConstVal);
+        ParamSize += SizeOf (Arg2Type);
+    }               
+    ConsumeComma ();
+
+    /* Argument #3. Since memset is a fastcall function, we must load the
+     * arg into the primary if it is not already there. This parameter is
+     * also ignored for the calculation of the parameter size, since it is
+     * not passed via the stack.
+     */
+    Flags = ParseArg (Arg3Type, &Arg);
+    if (Flags & CF_CONST) {
+        exprhs (CF_FORCECHAR, 0, &Arg);
+    }
+
+    /* Emit the actual function call */
+    g_call (CF_NONE, MemSet? "memset" : "_bzero", ParamSize);
+
+    /* We expect the closing brace */
+    ConsumeRParen ();
+}
+
+
+
+static void StdFunc_strlen (FuncDesc* F attribute ((unused)),
+                            ExprDesc* lval attribute ((unused)))
 /* Handle the strlen function */
 {
     ExprDesc pval;
@@ -169,15 +266,15 @@ int IsStdFunc (const char* Name)
 
 
 
-void HandleStdFunc (ExprDesc* lval)
+void HandleStdFunc (FuncDesc* F, ExprDesc* lval)
 /* Generate code for a known standard function. */
 {
     /* Get a pointer to the table entry */
-    struct StdFuncDesc* F = FindFunc ((const char*) lval->Name);
-    CHECK (F != 0);
+    struct StdFuncDesc* D = FindFunc ((const char*) lval->Name);
+    CHECK (D != 0);
 
     /* Call the handler function */
-    F->Handler (lval);
+    D->Handler (F, lval);
 }
 
 

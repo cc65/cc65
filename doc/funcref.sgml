@@ -64,7 +64,9 @@ function.
 
 <sect1><tt/apple2.h/<label id="apple2.h"><p>
 
-(incomplete)
+<itemize>
+<item><ref id="get_ostype" name="get_ostype">
+</itemize>
 
 
 <sect1><tt/apple2enh.h/<label id="apple2enh.h"><p>
@@ -80,6 +82,10 @@ function.
 
 
 <sect1><tt/atari.h/<label id="atari.h"><p>
+
+<itemize>
+<item><ref id="get_ostype" name="get_ostype">
+</itemize>
 
 (incomplete)
 
@@ -106,7 +112,9 @@ function.
 
 <sect1><tt/c64.h/<label id="c64.h"><p>
 
-(incomplete)
+<itemize>
+<item><ref id="get_ostype" name="get_ostype">
+</itemize>
 
 
 <sect1><tt/cbm510.h/<label id="cbm510.h"><p>
@@ -2045,6 +2053,28 @@ be used in presence of a prototype.
 <ref id="calloc" name="calloc">,
 <ref id="malloc" name="malloc">,
 <ref id="realloc" name="realloc">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>get_ostype<label id="get_ostype"><p>
+
+<quote>
+<descrip>
+<tag/Function/The function returns the operating system, the program runs on.
+<tag/Header/<tt/<ref id="apple2.h" name="apple2.h">,
+<ref id="atari.h" name="atari.h">, <ref id="c64.h" name="c64.h">/
+<tag/Declaration/<tt/unsigned char get_ostype (void);/
+<tag/Description/<tt/get_ostype/ is machine dependent and does not exist for
+all supported targets. If it exists, it returns a number that identifies the
+operating system or machine type, the program runs on. The machine dependent
+header files define constants that can be used to check the return code.     
+<tag/Limits/<itemize>
+<item>The function does not exist on all platforms.
+<item>The return codes are platform dependent.
+</itemize>
+<tag/Availability/cc65 (not all platforms)
 <tag/Example/None.
 </descrip>
 </quote>

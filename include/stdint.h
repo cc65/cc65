@@ -33,7 +33,7 @@
 
 
 
-/* Note: This file is not fully ISO 9899-1999 compatible because cc65 lacks
+/* Note: This file is not fully ISO 9899-1999 compliant because cc65 lacks
  * a 64 bit data types. The declarations have been adjusted accordingly.
  */
 
@@ -115,14 +115,14 @@ typedef unsigned long       uintmax_t;
 #define UINTMAX_MAX         ((uintmax_t) 0xFFFFFFFF)
 
 /* Limits of other integer types */
-#define PTRDIFF_MIN         ((ptrdiff_t) 0x8000)
-#define PTRDIFF_MAX         ((ptrdiff_t) 0x7FFF)
+#define PTRDIFF_MIN         ((int) 0x8000)
+#define PTRDIFF_MAX         ((int) 0x7FFF)
 
 #define SIG_ATOMIC_MIN      ((unsigned char) 0x00)
 #define SIG_ATOMIC_MAX      ((unsigned char) 0xFF)
 
 #define SIZE_MAX            0xFFFF
-                            
+
 /* Macros for minimum width integer constants */
 #define INT8_C(c)           c
 #define INT16_C(c)          c

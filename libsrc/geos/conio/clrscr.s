@@ -18,7 +18,9 @@
 _clrscr:
 	    lda #ST_WR_FORE | ST_WR_BACK
 	    sta dispBufferOn
-	    lda #0
+	    lda	curPattern		; save current pattern
+	    pha
+	    lda #0			; set pattern to clear
 	    jsr SetPattern
 	    ldx #0
 	    stx r3L
@@ -39,4 +41,6 @@ L40:	    lda #>319			; 40 columns
 	    ldx #<319
 L99:	    sta r4H
 	    stx r4L
-	    jmp Rectangle
+	    jsr Rectangle
+	    pla
+	    jmp SetPattern		; restore pattern

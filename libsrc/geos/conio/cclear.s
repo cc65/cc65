@@ -40,8 +40,12 @@ _cclear:
 	ldx	#r4
 	ldy 	#3
 	jsr 	DShiftLeft
-	lda	#0		; pattern
+	lda	curPattern	; store current pattern
+	pha
+	lda	#0		; set pattern to clear
 	jsr	SetPattern
 	jsr	Rectangle
+	pla
+	jsr	SetPattern	; restore pattern
 	jsr	fixcursor
 L9:	rts

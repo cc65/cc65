@@ -2602,12 +2602,8 @@ static void addsubeq (GenDesc* Gen, struct expent *lval, int k)
 	}
     }
 
-    /* If the lhs is character sized, the operation may be later done
-     * with characters.
-     */
-    if (SizeOf (lval->e_tptr) == 1) {
-	flags |= CF_FORCECHAR;
-    }
+    /* Adjust the rhs to the lhs */
+    g_typeadjust (flags, TypeOf (lval2.e_tptr));
 
     /* Output apropriate code */
     if (lval->e_flags & E_MGLOBAL) {

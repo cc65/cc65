@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -61,6 +61,7 @@
 #define JOY_LEFT        2
 #define JOY_RIGHT       3
 #define JOY_FIRE        4
+#define JOY_FIRE2       5               /* Second fire button if available */
 
 /* Array of masks used to check the return value of joy_read for a state */
 extern const unsigned char joy_masks[8];
@@ -71,6 +72,7 @@ extern const unsigned char joy_masks[8];
 #define JOY_BTN_LEFT(v)         ((v) & joy_masks[JOY_LEFT])
 #define JOY_BTN_RIGHT(v)        ((v) & joy_masks[JOY_RIGHT])
 #define JOY_BTN_FIRE(v)         ((v) & joy_masks[JOY_FIRE])
+#define JOY_BTN_FIRE2(v)        ((v) & joy_masks[JOY_FIRE2])
 
 /* The name of the standard joystick driver for a platform */
 extern const char joy_stddrv[];

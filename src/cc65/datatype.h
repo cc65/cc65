@@ -252,32 +252,126 @@ type* Indirect (type* Type);
  * given type points to.
  */
 
-int IsTypeChar (const type* T) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsTypeChar (const type* T)
 /* Return true if this is a character type */
+{
+    return (T[0] & T_MASK_TYPE) == T_TYPE_CHAR;
+}
+#else
+#  define IsTypeChar(T)         (((T)[0] & T_MASK_TYPE) == T_TYPE_CHAR)
+#endif
 
-int IsTypeInt (const type* T) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsTypeInt (const type* T)
 /* Return true if this is an int type (signed or unsigned) */
+{
+    return (T[0] & T_MASK_TYPE) == T_TYPE_INT;
+}
+#else
+#  define IsTypeInt(T)          (((T)[0] & T_MASK_TYPE) == T_TYPE_INT)
+#endif
 
-int IsTypeLong (const type* T) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsTypeLong (const type* T)
 /* Return true if this is a long type (signed or unsigned) */
+{
+    return (T[0] & T_MASK_TYPE) == T_TYPE_LONG;
+}
+#else
+#  define IsTypeLong(T)         (((T)[0] & T_MASK_TYPE) == T_TYPE_LONG)
+#endif
 
-int IsTypeFloat (const type* T) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsTypeFloat (const type* T)
 /* Return true if this is a float type */
+{
+    return (T[0] & T_MASK_TYPE) == T_TYPE_FLOAT;
+}
+#else
+#  define IsTypeFloat(T)        (((T)[0] & T_MASK_TYPE) == T_TYPE_FLOAT)
+#endif
 
-int IsTypeDouble (const type* T) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsTypeDouble (const type* T)
 /* Return true if this is a double type */
+{
+    return (T[0] & T_MASK_TYPE) == T_TYPE_DOUBLE;
+}
+#else
+#  define IsTypeDouble(T)       (((T)[0] & T_MASK_TYPE) == T_TYPE_DOUBLE)
+#endif
 
-int IsTypePtr (const type* Type) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsTypePtr (const type* T)
 /* Return true if this is a pointer type */
+{
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_PTR);
+}
+#else
+#  define IsTypePtr(T)          (((T)[0] & T_MASK_TYPE) == T_TYPE_PTR)
+#endif
 
-int IsTypeArray (const type* Type) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsTypeStruct (const type* T)
+/* Return true if this is a struct type */
+{
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_STRUCT);
+}
+#else
+#  define IsTypeStruct(T)       (((T)[0] & T_MASK_TYPE) == T_TYPE_STRUCT)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeUnion (const type* T)
+/* Return true if this is a union type */
+{
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_UNION);
+}
+#else
+#  define IsTypeUnion(T)       (((T)[0] & T_MASK_TYPE) == T_TYPE_UNION)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeArray (const type* T)
 /* Return true if this is an array type */
+{
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_ARRAY);
+}
+#else
+#  define IsTypeArray(T)        (((T)[0] & T_MASK_TYPE) == T_TYPE_ARRAY)
+#endif
 
-int IsTypeVoid (const type* Type) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsTypeVoid (const type* T)
 /* Return true if this is a void type */
+{
+    return (T[0] & T_MASK_TYPE) == T_TYPE_VOID;
+}
+#else
+#  define IsTypeVoid(T)         (((T)[0] & T_MASK_TYPE) == T_TYPE_VOID)
+#endif
 
-int IsTypeFunc (const type* Type) attribute ((const));
+#if defined(HAVE_INLINE)
+INLINE int IsTypeFunc (const type* T)
 /* Return true if this is a function class */
+{
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_FUNC);
+}
+#else
+#  define IsTypeFunc(T)         (((T)[0] & T_MASK_TYPE) == T_TYPE_FUNC)
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE int IsTypeFuncPtr (const type* T)
+/* Return true if this is a function pointer */
+{
+    return ((T[0] & T_MASK_TYPE) == T_TYPE_PTR && (T[1] & T_MASK_TYPE) == T_TYPE_FUNC);
+}
+#else
+#  define IsTypeFuncPtr(T)      \
+        ((((T)[0] & T_MASK_TYPE) == T_TYPE_PTR) && (((T)[1] & T_MASK_TYPE) == T_TYPE_FUNC))
+#endif
 
 int IsClassInt (const type* Type) attribute ((const));
 /* Return true if this is an integer type */
@@ -309,9 +403,6 @@ int IsVariadicFunc (const type* T) attribute ((const));
 /* Return true if this is a function type or pointer to function type with
  * variable parameter list
  */
-
-int IsTypeFuncPtr (const type* T) attribute ((const));
-/* Return true if this is a function pointer */
 
 type GetType (const type* T) attribute ((const));
 /* Get the raw type */

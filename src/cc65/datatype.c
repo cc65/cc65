@@ -488,7 +488,7 @@ unsigned PSizeOf (const type* T)
 /* Compute size of pointer object. */
 {
     /* We are expecting a pointer expression */
-    CHECK ((*T & T_CLASS_PTR) != 0);
+    CHECK ((T[0] & T_MASK_CLASS) == T_CLASS_PTR);
 
     /* Skip the pointer or array token itself */
     if (IsTypeArray (T)) {
@@ -585,7 +585,7 @@ type* Indirect (type* T)
  */
 {
     /* We are expecting a pointer expression */
-    CHECK ((*T & T_MASK_CLASS) == T_CLASS_PTR);
+    CHECK ((T[0] & T_MASK_CLASS) == T_CLASS_PTR);
 
     /* Skip the pointer or array token itself */
     if (IsTypeArray (T)) {
@@ -593,78 +593,6 @@ type* Indirect (type* T)
     } else {
       	return T + 1;
     }
-}
-
-
-
-int IsTypeChar (const type* T)
-/* Return true if this is a character type */
-{
-    return (T[0] & T_MASK_TYPE) == T_TYPE_CHAR;
-}
-
-
-
-int IsTypeInt (const type* T)
-/* Return true if this is an int type (signed or unsigned) */
-{
-    return (T[0] & T_MASK_TYPE) == T_TYPE_INT;
-}
-
-
-
-int IsTypeLong (const type* T)
-/* Return true if this is a long type (signed or unsigned) */
-{
-    return (T[0] & T_MASK_TYPE) == T_TYPE_LONG;
-}
-
-
-
-int IsTypeFloat (const type* T)
-/* Return true if this is a float type */
-{
-    return (T[0] & T_MASK_TYPE) == T_TYPE_FLOAT;
-}
-
-
-
-int IsTypeDouble (const type* T)
-/* Return true if this is a double type */
-{
-    return (T[0] & T_MASK_TYPE) == T_TYPE_DOUBLE;
-}
-
-
-
-int IsTypePtr (const type* T)
-/* Return true if this is a pointer type */
-{
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_PTR);
-}
-
-
-
-int IsTypeArray (const type* T)
-/* Return true if this is an array type */
-{
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_ARRAY);
-}
-
-
-
-int IsTypeVoid (const type* T)
-/* Return true if this is a void type */
-{
-    return (T[0] & T_MASK_TYPE) == T_TYPE_VOID;
-}
-
-
-
-int IsTypeFunc (const type* T)
-/* Return true if this is a function class */
-{
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_FUNC);
 }
 
 
@@ -743,14 +671,6 @@ int IsVariadicFunc (const type* T)
 {
     FuncDesc* F = GetFuncDesc (T);
     return (F->Flags & FD_VARIADIC) != 0;
-}
-
-
-
-int IsTypeFuncPtr (const type* T)
-/* Return true if this is a function pointer */
-{
-    return ((T[0] & T_MASK_TYPE) == T_TYPE_PTR && (T[1] & T_MASK_TYPE) == T_TYPE_FUNC);
 }
 
 

@@ -10,7 +10,7 @@
         .import         addysp, popax
         .import         scratch, fnparse, fncomplete, fnset
         .import         opencmdchannel, closecmdchannel, readdiskerror
-        .import         __errno, __oserror
+        .import         __oserror
         .import         fnunit
         .importzp       sp, tmp2, tmp3
 

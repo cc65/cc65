@@ -8,7 +8,7 @@
 
         .import         CLOSE
         .import         readdiskerror, closecmdchannel
-        .import         __errno, __oserror
+        .import         __oserror
         .importzp       tmp2
 
         .include        "errno.inc"

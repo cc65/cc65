@@ -9,10 +9,9 @@
 
         .import         SETLFS, OPEN, CKOUT, BSOUT, CLRCH
         .import         rwcommon
-        .import         __errno, __oserror
+        .import         __oserror
         .importzp       sp, ptr1, ptr2, ptr3
 
-        .include        "errno.inc"
         .include        "fcntl.inc"
         .include        "cbm.inc"
         .include        "filedes.inc"
@@ -46,7 +45,7 @@
 .proc   _write
 
         jsr     rwcommon        ; Pop params, check handle
-        bcs     invalidfd       ; Branch if handle not ok
+        bcs     errout          ; Invalid handle, errno already set
 
 ; Check if the LFN is valid and the file is open for writing
 
@@ -94,15 +93,6 @@
         lda     ptr3
         ldx     ptr3+1
         rts
-
-; Error entry, file descriptor is invalid
-
-invalidfd:
-        lda     #EINVAL
-        sta     __errno
-        lda     #0
-        sta     __errno+1
-        beq     errout
 
 ; Error entry, file is not open
 

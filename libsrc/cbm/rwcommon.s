@@ -9,6 +9,7 @@
         .import         popax
         .importzp       ptr1, ptr2, ptr3, tmp2
 
+        .include        "errno.inc"
         .include        "filedes.inc"
 
 
@@ -36,11 +37,19 @@
         sta     ptr3+1          ; Clear ptr3
 
         jsr     popax           ; Get the handle
-        sta     tmp2
         cpx     #$01
-        bcs     inv
+        bcs     invhandle
         cmp     #MAX_FDS
-inv:    rts
+        bcs     invhandle
+        sta     tmp2
+        rts                     ; Return with carry clear
+
+invhandle:
+        lda     #EINVAL
+        sta     __errno
+        lda     #0
+        sta     __errno+1
+        rts                     ; Return with carry set
 
 .endproc
 

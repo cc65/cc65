@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -66,7 +66,26 @@
 
 
 
-/* Characters codes (CBM charset) */
+/*****************************************************************************/
+/*                                 Variables                                 */
+/*****************************************************************************/
+
+
+
+/* The file stream implementation and the POSIX I/O functions will use the
+ * following variables to determine the file type and the disk unit to use.
+ */
+extern unsigned char _curunit;          /* Default 8 */
+extern unsigned char _filetype;         /* Default 'u' */
+
+
+
+/*****************************************************************************/
+/*                      Characters codes (CBM charset)                       */
+/*****************************************************************************/
+
+
+
 #define CH_HLINE    		 96
 #define CH_VLINE    		125
 #define	CH_ULCORNER 		176
@@ -87,7 +106,15 @@
 #define CH_INS			148
 #define CH_ESC			 95
 
-/* constants to use with cbm_open() for opening a file for reading or
+
+
+/*****************************************************************************/
+/*                           CBM kernal functions                            */
+/*****************************************************************************/
+
+
+
+/* Constants to use with cbm_open() for opening a file for reading or
  * writing without the need to append ",r" or ",w" to the filename.
  *
  * e.g.: cbm_open(2, 8, CBM_READ, "data,s");
@@ -112,10 +139,25 @@ void __fastcall__ cbm_k_clrch (void);
 
 
 
-/* BASIC-like file I/O functions
+/*****************************************************************************/
+/*                       BASIC-like file I/O functions                       */
+/*****************************************************************************/
+
+
+
+/* All cbm_* IO functions set _oserror (see errno.h) in case of an
+ * error.
  *
- * All cbm_* IO functions set _oserror (see errno.h) in case of an
- * error. For the meaning of the errorcode see the table below.
+ * errorcode	BASIC error
+ *	1   =	too many files
+ *	2   =	file open
+ *	3   =	file not open
+ *	4   =	file not found
+ *	5   =	device not present
+ *	6   =	not input file
+ *	7   =	not output file
+ *	8   =	missing filename
+ *	9   =	illegal device number
  */
 
 
@@ -161,19 +203,6 @@ int __fastcall__ cbm_write (unsigned char lfn, void* buffer, unsigned int size);
  * _oserror contains an errorcode then (see table below).
  */
 
-/* Errorcodes of cbm_* I/O functions:
- *
- * errorcode	BASIC error
- *	1   =	too many files
- *	2   =	file open
- *	3   =	file not open
- *	4   =	file not found
- *	5   =	device not present
- *	6   =	not input file
- *	7   =	not output file
- *	8   =	missing filename
- *	9   =	illegal device number
- */
 
 
 

@@ -27,6 +27,8 @@
 	.export	       	_rs232_init, _rs232_params, _rs232_done, _rs232_get
 	.export	      	_rs232_put, _rs232_pause, _rs232_unpause, _rs232_status
 
+	.include	"c128.inc"
+
 
 NmiExit = $ff33     ;exit address for nmi
 
@@ -120,7 +122,7 @@ _rs232_init:
 
 ;** check for super-cpu at 20 MHz
 
-      	bit 	$d0bc
+      	bit 	SCPU_Detect
    	bmi 	@L4
    	bit 	$d0b8
    	bvs 	@L4
@@ -142,14 +144,14 @@ _rs232_init:
 
 ;** set up nmi's
 
-   	lda 	$318
-   	ldy 	$319
+   	lda 	NMIVec
+   	ldy 	NMIVec+1
    	sta 	NmiSave+0
    	sty 	NmiSave+1
    	lda 	#<NmiHandler
    	ldy 	#>NmiHandler
-   	sta 	$318
-   	sty 	$319
+   	sta 	NMIVec
+   	sty 	NMIVec+1
 
 ;** set default to 2400-8N1, enable interrupts
 
@@ -313,8 +315,8 @@ _rs232_done:
 
    	lda 	NmiSave+0
       	ldy 	NmiSave+1
-   	sta 	$318
-   	sty 	$319
+   	sta 	NMIVec
+   	sty 	NMIVec+1
 
 ; Flag uninitialized
 
@@ -530,8 +532,17 @@ _rs232_status:
 ; C64  @  57.6k: 177 cycles avail, worstAvail=177-43? = 134
 ; SCPU @ 230.4k: 868 cycles avail: for a joke!
 ;
+; Because of the C128 banking, the NMI handler must go into the non banked
+; memory, since the ROM NMI entry point will switch to a configuration where
+; only the lowest 16K of RAM are visible. We will place the NMI handler into
+; it's own segment and map this segment into the lower 16K in the linker 
+; config.
+  
+.segment 	"NMI"
 
 NmiHandler:
+	lda	#CC65_MMU_CFG		;(2)
+	sta	MMU_CR			;(4)
        	lda    	ACIA+RegStatus       	;(4) ;status ;check for byte received
      	and 	#$08           		;(2)
      	beq 	@L9			;(2*)
@@ -553,7 +564,7 @@ NmiHandler:
 ; Assert flow control
 
 @L2:  	lda 	RtsOff       		;(3)  ;assert flow control if buffer space too low
-    	sta 	ACIA+RegCommand	;(4) ;command
+    	sta 	ACIA+RegCommand		;(4) ;command
     	sta 	Stopped      		;(3)
     	jmp 	NmiExit      		;(3)
 
@@ -569,6 +580,9 @@ NmiHandler:
 @L4:   	jmp 	NmiExit
 
 @L9:	jmp 	NmiContinue
+		     
+
+.code
 
 ;----------------------------------------------------------------------------
 ;

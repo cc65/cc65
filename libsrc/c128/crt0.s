@@ -18,7 +18,6 @@
 ; ------------------------------------------------------------------------
 ; Constants
 
-CC65_MMU_CFG	= $0E	; Bank 0 with kernal ROM
 IRQInd		= $2FD	; JMP $0000 - used as indirect IRQ vector
 
 ; ------------------------------------------------------------------------
@@ -45,9 +44,16 @@ tmp3:	      	.res	1
 tmp4:	      	.res	1
 regbank:      	.res	6	; 6 byte register bank
 
-zpspace	= * - zpstart		; Zero page space allocated
+zpspace	= * - zpstart	 	; Zero page space allocated
 
-.code
+; Place the startup code in a special segment to cope with the quirks of
+; c128 banking. Do also create an empty segment named "NMI" to avoid
+; warnings if the rs232 routines are not used.
+
+.segment        "NMI"
+; empty
+
+.segment       	"STARTUP"
 
 ; ------------------------------------------------------------------------
 ; BASIC header with a SYS call

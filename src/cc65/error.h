@@ -76,7 +76,7 @@ void PPError (const char* Format, ...) attribute ((format (printf, 1, 2)));
 void Fatal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
 /* Print a message about a fatal error and die */
 
-void Internal (char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
+void Internal (const char* Format, ...) attribute ((noreturn, format (printf, 1, 2)));
 /* Print a message about an internal compiler error and die. */
 
 void ErrorReport (void);

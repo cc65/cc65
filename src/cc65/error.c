@@ -147,7 +147,7 @@ void Fatal (const char* Format, ...)
 /* Print a message about a fatal error and die */
 {
     va_list ap;
-								  
+
     const char* FileName;
     unsigned    LineNum;
     if (CurTok.LI) {
@@ -171,7 +171,7 @@ void Fatal (const char* Format, ...)
 
 
 
-void Internal (char* Format, ...)
+void Internal (const char* Format, ...)
 /* Print a message about an internal compiler error and die. */
 {
     va_list ap;
@@ -196,7 +196,7 @@ void Internal (char* Format, ...)
 
     /* Use abort to create a core dump */
     abort ();
-}
+}		
 
 
 
@@ -211,4 +211,4 @@ void ErrorReport (void)
 
 
 
-				
+

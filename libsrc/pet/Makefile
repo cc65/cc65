@@ -19,7 +19,8 @@ OBJS =	_scrsize.o	\
 	conio.o		\
 	cputc.o		\
 	crt0.o		\
-	kbhit.o
+	kbhit.o         \
+        randomize.o     
 
 all:	$(OBJS)
 

@@ -20,6 +20,7 @@ OBJS =	_scrsize.o	\
 	cputc.o		\
 	crt0.o		\
 	kbhit.o		\
+        randomize.o     \
 	readjoy.o	\
 	tgi_mode_table.o
 

@@ -20,6 +20,7 @@ OBJS =	_scrsize.o	\
 	conio.o		\
 	cputc.o		\
 	kbhit.o		\
+        randomize.o     \
 	readjoy.o      	\
 	write.o
 

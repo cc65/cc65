@@ -21,6 +21,7 @@ OBJS =	_scrsize.o	\
      	cputc.o	       	\
      	kbhit.o	       	\
 	mouse.o		\
+        randomize.o     \
 	readjoy.o	\
 	rs232.o		\
 	tgi_mode_table.o\

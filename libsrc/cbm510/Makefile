@@ -28,6 +28,7 @@ OBJS =	_scrsize.o	\
 	mouse.o		\
 	peeksys.o	\
 	pokesys.o	\
+        randomize.o     \
 	readjoy.o	\
 	rs232.o		\
 	tgi_mode_table.o

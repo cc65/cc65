@@ -6,6 +6,7 @@
 ; ---------------------------------------------------------------------------
 ; Zero page, Commodore stuff
 
+TIME            = $8D           ; 60HZ clock
 MEMSIZE		= $34		; Size of memory installed
 ST     	       	= $96  	       	; IEC status byte
 SECADR		= $D3  	       	; Secondary address

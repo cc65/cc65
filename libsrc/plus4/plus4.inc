@@ -8,6 +8,7 @@
 
 ST   		= $90	     	; IEC status byte
 
+TIME            = $A3           ; 60HZ clock
 FNAM_LEN       	= $AB	     	; Length of filename
 SECADR		= $AD	     	; Secondary address
 DEVNUM		= $AE	     	; Device number

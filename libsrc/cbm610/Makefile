@@ -27,6 +27,7 @@ OBJS =	_scrsize.o	\
 	kudtim.o	\
 	peeksys.o	\
 	pokesys.o	\
+        randomize.o     \
 	rs232.o
 
 all:	$(OBJS)

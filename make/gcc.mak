@@ -47,13 +47,13 @@ zap:
 
 .PHONY:	install
 install:	all
-	@if [ `id -u` != 0 ]; then				      \
+ 	@if [ `id -u` != 0 ]; then				      \
 	    echo "";						      \
-	    echo 'Do "make install" as root';			      \
+       	    echo 'Do "make install" as root';			      \
 	    echo "";						      \
 	    false;						      \
 	fi
-	@$(MKDIR) -p $(BINDIR) $(CC65DOC) $(CC65LIB)/{asminc,emd,include/{em,geos,joystick,sys,tgi},joy,lib,ser,tgi}
+       	@$(MKDIR) -p $(BINDIR) $(CC65DOC) $(CC65LIB)/{asminc,emd,include/{em,geos,joystick,mouse,sys,tgi},joy,lib,mou,ser,tgi}
 	@$(INSTALL) -s -m 755 src/ar65/ar65 $(BINDIR)
 	@$(INSTALL) -s -m 755 src/ca65/ca65 $(BINDIR)
 	@$(INSTALL)    -m 755 src/ca65html/ca65html $(BINDIR)
@@ -69,6 +69,7 @@ install:	all
 	@$(INSTALL) -m 644 include/geos/*.h $(CC65INC)/geos
 	@$(INSTALL) -m 644 include/em/*.h $(CC65INC)/em
 	@$(INSTALL) -m 644 include/joystick/*.h $(CC65INC)/joystick
+	@$(INSTALL) -m 644 include/mouse/*.h $(CC65INC)/mouse
 	@$(INSTALL) -m 644 include/sys/*.h $(CC65INC)/sys
 	@$(INSTALL) -m 644 include/tgi/*.h $(CC65INC)/tgi
 	@$(INSTALL) -m 644 asminc/*.inc $(CC65DATA)/asminc

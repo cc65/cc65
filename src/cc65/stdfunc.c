@@ -188,6 +188,9 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)),
      */
     Flags = ParseArg (Arg3Type, &Arg);
     if (Flags & CF_CONST) {
+	if (Arg.ConstVal == 0) {
+	    Warning ("Call to memset has no effect");
+	}
         ExprLoad (CF_FORCECHAR, 0, &Arg);
     }
 

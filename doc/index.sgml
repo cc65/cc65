@@ -106,8 +106,14 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="cbm610.html" name="cbm610.html"></tag>
   Topics specific to the Commodore 610.
 
+  <tag><htmlurl url="lynx.html" name="lynx.html"></tag>
+  Topics specific to the Atari Lynx Game Console.
+
   <tag><htmlurl url="plus4.html" name="plus4.html"></tag>
   Topics specific to the Commodore Plus/4.
+
+  <tag><htmlurl url="vic20.html" name="vic20.html"></tag>
+  Topics specific to the Commodore VIC20.
 
 </descrip>
 
@@ -127,6 +133,6 @@ Main documentation page, contains links to other available stuff.
   Who helped with the compiler and tools?
 
 </descrip>
-                   
+
 </article>
 

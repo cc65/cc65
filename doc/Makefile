@@ -27,6 +27,7 @@ SGML  =	apple2.sgml	\
 	intro.sgml	\
 	ld65.sgml   	\
 	library.sgml    \
+        lynx.sgml       \
         plus4.sgml      \
         vic20.sgml
 

@@ -27,6 +27,8 @@
 	.export	       	_rs232_init, _rs232_params, _rs232_done, _rs232_get
 	.export	      	_rs232_put, _rs232_pause, _rs232_unpause, _rs232_status
 
+	.include	"c64.inc"
+
 
 NmiExit = $febc     ;exit address for nmi
 
@@ -139,14 +141,14 @@ _rs232_init:
 
 ;** set up nmi's
 
-   	lda 	$318
-   	ldy 	$319
+   	lda 	NMIVec
+   	ldy 	NMIVec+1
    	sta 	NmiSave+0
    	sty 	NmiSave+1
    	lda 	#<NmiHandler
    	ldy 	#>NmiHandler
-   	sta 	$318
-   	sty 	$319
+   	sta 	NMIVec
+   	sty 	NMIVec+1
 
 ;** set default to 2400-8N1, enable interrupts
 
@@ -310,8 +312,8 @@ _rs232_done:
 
    	lda 	NmiSave+0
       	ldy 	NmiSave+1
-   	sta 	$318
-   	sty 	$319
+   	sta 	NMIVec
+   	sty 	NMIVec+1
 
 ; Flag uninitialized
 

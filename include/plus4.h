@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -39,8 +39,8 @@
 
 
 /* Check for errors */
-#if !defined(__PLUS4__)
-#  error This module may only be used when compiling for the Plus/4!
+#if !defined(__PLUS4__) && !defined(__C16__)
+#  error This module may only be used when compiling for the Plus/4 or C16!
 #endif
 
 

@@ -148,6 +148,10 @@ static void SetSys (const char* Sys)
     	    DefineNumericMacro ("__ATARI__", 1);
 	    break;
 
+	case TGT_C16:
+	    cbmsys ("__C16__");
+	    break;
+
 	case TGT_C64:
 	    cbmsys ("__C64__");
 	    break;
@@ -402,7 +406,7 @@ static void OptDebug (const char* Opt attribute ((unused)),
 
 
 static void OptDebugInfo (const char* Opt attribute ((unused)),
-			  const char* Arg attribute ((unused)))
+		    	  const char* Arg attribute ((unused)))
 /* Add debug info to the object file */
 {
     DebugInfo = 1;

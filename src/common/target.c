@@ -56,6 +56,7 @@ const char* TargetNames [TGT_COUNT] = {
     "module",
     "atari",
     "vic20",
+    "c16",
     "c64",
     "c128",
     "ace",
@@ -68,7 +69,7 @@ const char* TargetNames [TGT_COUNT] = {
     "geos",
     "lunix",
     "atmos"
-};
+};        
 
 
 

@@ -8,6 +8,7 @@ atari.inc
 atmos.inc
 bbc.inc
 c128.inc
+c16.inc
 c64.inc
 cbm510.inc
 cbm610.inc

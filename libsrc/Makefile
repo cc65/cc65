@@ -17,6 +17,7 @@ ALLTARGETS =	apple2lib	\
 		atarilib 	\
 		atmoslib	\
 		vic20lib	\
+                c16lib          \
 		c64lib	 	\
 		c128lib	 	\
 		cbm510lib	\
@@ -96,6 +97,22 @@ vic20lib:
 	    $(AR) a vic20.lib $$i/*.o;\
 	done
 
+#-----------------------------------------------------------------------------
+# C16, C116
+
+c16lib:
+	for i in c16 cbm common runtime conio dbg tgi; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -T -t plus4 -I../../include" \
+	    AFLAGS="-t plus4 -I../../asminc" \
+	    $(MAKE) -C $$i || exit 1; \
+	done
+	mv c16/crt0.o c16.o
+	for i in c16 cbm common runtime conio dbg tgi; do \
+	    $(AR) a c16.lib $$i/*.o;\
+	done
+  
 #-----------------------------------------------------------------------------
 # C64
 
@@ -207,7 +224,7 @@ petlib:
 	done
 
 #-----------------------------------------------------------------------------
-# Commodore C116, C16 and Plus/4
+# Commodore Plus/4
 
 plus4lib:
 	for i in plus4 cbm common runtime conio dbg tgi; do \

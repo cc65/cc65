@@ -144,6 +144,7 @@ void TgtTranslateInit (void)
        	case TGT_MODULE:       	memcpy (Tab, CTNone, sizeof (Tab));  	break;
 	case TGT_ATARI:		memcpy (Tab, CTAtari, sizeof (Tab)); 	break;
 	case TGT_VIC20:		memcpy (Tab, CTPET, sizeof (Tab)); 	break;
+       	case TGT_C16:		memcpy (Tab, CTPET, sizeof (Tab)); 	break;
 	case TGT_C64:		memcpy (Tab, CTPET, sizeof (Tab)); 	break;
 	case TGT_C128:		memcpy (Tab, CTPET, sizeof (Tab));	break;
 	case TGT_ACE:		memcpy (Tab, CTPET, sizeof (Tab));	break;

@@ -53,6 +53,7 @@ static const char CfgEmpty[] = "";
 #include "atmos.inc"
 #include "bbc.inc"
 #include "c128.inc"
+#include "c16.inc"
 #include "c64.inc"
 #include "cbm510.inc"
 #include "cbm610.inc"
@@ -78,6 +79,7 @@ const TargetDesc Targets [TGT_COUNT] = {
     {  	BINFMT_O65,     CfgModule       },
     {  	BINFMT_BINARY,	CfgAtari        },
     {	BINFMT_BINARY,	CfgVic20	},
+    {   BINFMT_BINARY,  CfgC16          },
     {  	BINFMT_BINARY,	CfgC64          },
     {  	BINFMT_BINARY,	CfgC128         },
     {  	BINFMT_BINARY,	CfgEmpty	},    	/* Ace */
@@ -94,3 +96,4 @@ const TargetDesc Targets [TGT_COUNT] = {
 
 
 
+                  

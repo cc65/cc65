@@ -54,6 +54,8 @@
 #  include <c128.h>
 #elif defined(__PLUS4__) && !defined(_PLUS4_H)
 #  include <plus4.h>
+#elif defined(__C16__) && !defined(_C16_H)
+#  include <c16.h>
 #elif defined(__CBM510__) && !defined(_CBM510_H)
 #  include <cbm510.h>
 #elif defined(__CBM610__) && !defined(_CBM610_H)
@@ -158,7 +160,7 @@ int __fastcall__ cbm_write (unsigned char lfn, void* buffer, unsigned int size);
  * Returns the number of actually written bytes or -1 in case of an error.
  * _oserror contains an errorcode then (see table below).
  */
-                 
+
 /* Errorcodes of cbm_* I/O functions:
  *
  * errorcode	BASIC error

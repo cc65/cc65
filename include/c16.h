@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   target.h				     */
+/*				     c16.h                                   */
 /*                                                                           */
-/*			     Target specification			     */
+/*     	       	        C16 system specific definitions                      */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2002 Ullrich von Bassewitz                                       */
+/* (C) 2002      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -33,65 +33,29 @@
 
 
 
-#ifndef TARGET_H
-#define TARGET_H
+#ifndef _C16_H
+#define _C16_H
 
 
 
-/*****************************************************************************/
-/*     	       	    		     Data			    	     */
-/*****************************************************************************/
-
-
-
-/* Supported target systems */
-typedef enum {
-    TGT_UNKNOWN = -1,		/* Not specified or invalid target */
-    TGT_NONE,
-    TGT_MODULE,
-    TGT_ATARI,
-    TGT_VIC20,
-    TGT_C16,
-    TGT_C64,
-    TGT_C128,
-    TGT_ACE,
-    TGT_PLUS4,
-    TGT_CBM510,
-    TGT_CBM610,
-    TGT_PET,
-    TGT_BBC,
-    TGT_APPLE2,
-    TGT_GEOS,
-    TGT_LUNIX,
-    TGT_ATMOS,
-    TGT_COUNT			/* Number of target systems */
-} target_t;
-
-/* Target system */
-extern target_t		Target;
-
-/* Table with target names */
-extern const char* TargetNames [TGT_COUNT];
-
-
-
-/*****************************************************************************/
-/*     	       	    		     Code			    	     */
-/*****************************************************************************/
-
-
-
-target_t FindTarget (const char* Name);
-/* Find a target by name and return the target id. TGT_UNKNOWN is returned if
- * the given name is no valid target.
- */
-
-
-
-/* End of target.h */
-
+/* Check for errors */
+#if !defined(__C16__)
+#  error This module may only be used when compiling for the C16!
 #endif
 
+
+
+/* The C16 is actually the Plus/4 with less memory, so use the Plus/4 
+ * include file.
+ */
+#ifndef _PLUS4_H
+#include <plus4.h>
+#endif
+
+
+
+/* End of c16.h */
+#endif
 
 
 

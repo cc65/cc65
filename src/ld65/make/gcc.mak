@@ -50,6 +50,7 @@ INCS =	apple2.inc	\
 	atari.inc	\
         atmos.inc       \
 	bbc.inc		\
+	c16.inc		\
 	c64.inc		\
 	c128.inc	\
 	cbm510.inc	\
@@ -116,6 +117,9 @@ atmos.inc:     	cfg/atmos.cfg
 
 bbc.inc:     	cfg/bbc.cfg
 	@$(CVT) $< $@ CfgBBC
+
+c16.inc:     	cfg/c16.cfg
+	@$(CVT) $< $@ CfgC16
 
 c64.inc:     	cfg/c64.cfg
 	@$(CVT) $< $@ CfgC64

@@ -439,7 +439,7 @@ function.
 <tag/Limits/
 <itemize>
 <item>The minimum blocksize that can be added is 6 bytes; the function will
-ignore blocks with smaller sizes.
+ignore smaller blocks.
 </itemize>
 <tag/Availability/cc65
 <tag/See also/

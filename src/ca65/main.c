@@ -44,6 +44,7 @@
 #include "error.h"
 #include "expr.h"
 #include "global.h"
+#include "incpath.h"
 #include "instr.h"
 #include "listing.h"
 #include "macro.h"
@@ -69,20 +70,30 @@ static void Usage (void)
 {
     fprintf (stderr,
     	     "Usage: %s [options] file\n"
-    	     "Options:\n"
-	     "\t-g\t\tAdd debug info to object file\n"
-	     "\t-i\t\tIgnore case of symbols\n"
-	     "\t-l\t\tCreate a listing if assembly was ok\n"
-       	     "\t-o name\t\tName the output file\n"
-	     "\t-s\t\tEnable smart mode\n"
-    	     "\t-v\t\tIncrease verbosity\n"
-	     "\t-D name[=value]\tDefine a symbol\n"
-	     "\t-U\t\tMark unresolved symbols as import\n"
-	     "\t-V\t\tPrint the assembler version\n"
-	     "\t-W n\t\tSet warning level n\n"
-	     "\t--cpu type\tSet cpu type\n"
-	     "\t--pagelength n\tSet the page length for the listing\n"
-       	     "\t--smart\t\tEnable smart mode\n",
+    	     "Short options:\n"
+       	     "  -g\t\t\tAdd debug info to object file\n"
+       	     "  -i\t\t\tIgnore case of symbols\n"
+       	     "  -l\t\t\tCreate a listing if assembly was ok\n"
+       	     "  -o name\t\tName the output file\n"
+       	     "  -s\t\t\tEnable smart mode\n"
+       	     "  -v\t\t\tIncrease verbosity\n"
+       	     "  -D name[=value]\tDefine a symbol\n"
+       	     "  -I dir\t\tSet an include directory search path\n"
+       	     "  -U\t\t\tMark unresolved symbols as import\n"
+       	     "  -V\t\t\tPrint the assembler version\n"
+       	     "  -W n\t\t\tSet warning level n\n"
+	     "\n"
+	     "Long options:\n"
+       	     "  --auto-import\t\tMark unresolved symbols as import\n"
+       	     "  --cpu type\t\tSet cpu type\n"
+       	     "  --debug-info\t\tAdd debug info to object file\n"
+	     "  --ignore-case\t\tIgnore case of symbols\n"
+       	     "  --include-dir dir\tSet an include directory search path\n"
+       	     "  --listing\t\tCreate a listing if assembly was ok\n"
+       	     "  --pagelength n\tSet the page length for the listing\n"
+       	     "  --smart\t\tEnable smart mode\n"
+       	     "  --verbose\t\tIncrease verbosity\n"
+       	     "  --version\t\tPrint the assembler version\n",
     	     ProgName);
     exit (EXIT_FAILURE);
 }
@@ -209,6 +220,14 @@ static void DefineSymbol (const char* Def)
 
 
 
+static void OptAutoImport (const char* Opt)
+/* Mark unresolved symbols as imported */
+{
+    AutoImport = 1;
+}
+
+
+
 static void OptCPU (const char* Opt, const char* Arg)
 /* Handle the --cpu option */
 {
@@ -229,6 +248,41 @@ static void OptCPU (const char* Opt, const char* Arg)
 	fprintf (stderr, "Invalid CPU: `%s'\n", Arg);
 	exit (EXIT_FAILURE);
     }
+}
+
+
+
+static void OptDebugInfo (const char* Opt)
+/* Add debug info to the object file */
+{
+    DbgSyms = 1;
+}
+
+
+
+static void OptIgnoreCase (const char* Opt)
+/* Ignore case on symbols */
+{
+    IgnoreCase = 1;
+}
+
+
+
+static void OptIncludeDir (const char* Opt, const char* Arg)
+/* Add an include search path */
+{
+    if (Arg == 0) {
+	NeedArg (Opt);
+    }
+    AddIncludePath (Arg);
+}
+
+
+
+static void OptListing (const char* Opt)
+/* Create a listing file */
+{
+    Listing = 1;
 }
 
 
@@ -258,20 +312,53 @@ static void OptSmart (const char* Opt)
 
 
 
+static void OptVerbose (const char* Opt)
+/* Increase verbosity */
+{
+    ++Verbose;
+}
+
+
+
+static void OptVersion (const char* Opt)
+/* Print the assembler version */
+{
+    fprintf (stderr,
+       	     "ca65 V%u.%u.%u - (C) Copyright 1998-2000 Ullrich von Bassewitz\n",
+       	     VER_MAJOR, VER_MINOR, VER_PATCH);
+}
+
+
+
 static void LongOption (int* ArgNum, char* argv [])
 /* Handle a long command line option */
 {
     const char* Opt = argv [*ArgNum];
     const char* Arg = argv [*ArgNum+1];
 
-    if (strcmp (Opt, "--cpu") == 0) {
+    if (strcmp (Opt, "--auto-import") == 0) {
+       	OptAutoImport (Opt);
+    } else if (strcmp (Opt, "--cpu") == 0) {
     	OptCPU (Opt, Arg);
     	++(*ArgNum);
+    } else if (strcmp (Opt, "--debug-info") == 0) {
+    	OptIgnoreCase (Opt);
+    } else if (strcmp (Opt, "--ignore-case") == 0) {
+    	OptIgnoreCase (Opt);
+    } else if (strcmp (Opt, "--include-dir") == 0) {
+    	OptIncludeDir (Opt, Arg);
+    	++(*ArgNum);
+    } else if (strcmp (Opt, "--listing") == 0) {
+    	OptListing (Opt);
     } else if (strcmp (Opt, "--pagelength") == 0) {
     	OptPageLength (Opt, Arg);
     	++(*ArgNum);
     } else if (strcmp (Opt, "--smart") == 0) {
        	OptSmart (Opt);
+    } else if (strcmp (Opt, "--verbose") == 0) {
+       	OptVerbose (Opt);
+    } else if (strcmp (Opt, "--version") == 0) {
+       	OptVersion (Opt);
     } else {
         UnknownOption (Opt);
     }
@@ -316,7 +403,7 @@ static void OneLine (void)
 	     */
        	    if (Tok == TOK_EQ) {
 		/* Skip the '=' */
-		NextTok ();
+    		NextTok ();
 		/* Define the symbol with the expression following the
 		 * '='
 		 */
@@ -356,7 +443,7 @@ static void OneLine (void)
 	    HandleInstruction (IVal);
 	} else if (Tok == TOK_IDENT && IsMacro (SVal)) {
 	    /* A macro expansion */
-	    MacExpandStart ();
+    	    MacExpandStart ();
 	}
     }
 
@@ -449,15 +536,15 @@ int main (int argc, char* argv [])
 		    break;
 
        		case 'g':
-       		    DbgSyms = 1;
+       		    OptDebugInfo (Arg);
        		    break;
 
        	        case 'i':
-       		    IgnoreCase = 1;
+       		    OptIgnoreCase (Arg);
        		    break;
 
-       		case 'l':
-       		    Listing = 1;
+       		case 'l':     
+		    OptListing (Arg);
        		    break;
 
        	        case 'o':
@@ -469,21 +556,23 @@ int main (int argc, char* argv [])
        		    break;
 
        	       	case 'v':
-       	       	    ++Verbose;
+		    OptVerbose (Arg);
        	       	    break;
 
-	        case 'D':
-		    DefineSymbol (GetArg (&I, argv, 2));
-		    break;
+    	        case 'D':
+    		    DefineSymbol (GetArg (&I, argv, 2));
+    		    break;
+
+    		case 'I':
+    		    OptIncludeDir (Arg, GetArg (&I, argv, 2));
+    		    break;
 
        	        case 'U':
-       		    AutoImport = 1;
+		    OptAutoImport (Arg);
        		    break;
 
        	        case 'V':
-       		    fprintf (stderr,
-       			     "ca65 V%u.%u.%u - (C) Copyright 1998-2000 Ullrich von Bassewitz\n",
-       			     VER_MAJOR, VER_MINOR, VER_PATCH);
+    		    OptVersion (Arg);
        		    break;
 
        	        case 'W':
@@ -526,7 +615,7 @@ int main (int argc, char* argv [])
 
     /* If we didn't have any errors, check the unnamed labels */
     if (ErrorCount == 0) {
-        ULabCheck ();						
+        ULabCheck ();
     }
 
     /* If we didn't have any errors, check the symbol table */

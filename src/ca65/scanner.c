@@ -44,6 +44,7 @@
 #include "error.h"
 #include "fname.h"
 #include "global.h"
+#include "incpath.h"
 #include "instr.h"
 #include "listing.h"
 #include "macro.h"
@@ -323,25 +324,38 @@ void NewInputFile (const char* Name)
     InputFile* I;
     FILE* F;
 
-    /* Insert a copy of the filename into the list */
+    /* Check for nested include overflow */
     if (FileCount >= MAX_INPUT_FILES) {
      	Fatal (FAT_MAX_INPUT_FILES);
     }
-    Files [FileCount].Name = StrDup (Name);
 
     /* First try to open the file */
     F = fopen (Name, "r");
     if (F == 0) {
 
+	char* PathName;
+
      	/* Error (fatal error if this is the main file) */
      	if (ICount == 0) {
      	    Fatal (FAT_CANNOT_OPEN_INPUT, Name, strerror (errno));
-     	} else {
+       	}
+
+       	/* We are on include level. Search for the file in the include
+     	 * directories.
+     	 */
+     	PathName = FindInclude (Name);
+       	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
+     	    /* Not found or cannot open, print an error and bail out */
      	    Error (ERR_CANNOT_OPEN_INCLUDE, Name, strerror (errno));
-     	    Xfree (Files [FileCount].Name);
      	}
 
-    } else {
+     	/* Free the allocated memory */
+     	Xfree (PathName);
+
+    }
+
+    /* check again if we do now have an open file */
+    if (F != 0) {
 
      	/* Stat the file and remember the values */
      	struct stat Buf;
@@ -350,25 +364,26 @@ void NewInputFile (const char* Name)
      	}
      	Files [FileCount].MTime = Buf.st_mtime;
      	Files [FileCount].Size  = Buf.st_size;
+     	Files [FileCount].Name  = StrDup (Name);
      	++FileCount;
 
      	/* Create a new state variable and initialize it */
-       	I  	    = Xmalloc (sizeof (*I));
-       	I->F   	    = F;
-       	I->Pos.Line = 0;
+     	I  	    = Xmalloc (sizeof (*I));
+     	I->F   	    = F;
+     	I->Pos.Line = 0;
      	I->Pos.Col  = 0;
-       	I->Pos.Name = FileCount;
-     	I->Tok	    = Tok;
+     	I->Pos.Name = FileCount;
+     	I->Tok      = Tok;
      	I->C	    = C;
-        I->Line[0]  = '\0';
+     	I->Line[0]  = '\0';
 
-      	/* Use the new file */
-      	I->Next	    = IFile;
-      	IFile 	    = I;
-      	++ICount;
+     	/* Use the new file */
+     	I->Next	    = IFile;
+     	IFile 	    = I;
+     	++ICount;
 
-	/* Prime the pump */
-	NextChar ();
+     	/* Prime the pump */
+     	NextChar ();
     }
 }
 

@@ -13,6 +13,7 @@ OBJS =  condasm.o	\
 	fname.o	      	\
 	fragment.o	\
         global.o       	\
+	incpath.o	\
         instr.o	      	\
 	listing.o	\
 	macpack.o     	\

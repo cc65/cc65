@@ -70,6 +70,7 @@ OBJS = 	condasm.obj	\
 	fname.obj	\
 	fragment.obj	\
 	global.obj	\
+	incpath.obj	\
        	instr.obj	\
 	listing.obj	\
 	macpack.obj	\
@@ -113,6 +114,7 @@ FILE expr.obj
 FILE fname.obj
 FILE fragment.obj
 FILE global.obj
+FILE incpath.obj
 FILE instr.obj
 FILE listing.obj
 FILE macpack.obj

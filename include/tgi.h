@@ -169,9 +169,6 @@ void __fastcall__ tgi_lineto (int x2, int y2);
 void __fastcall__ tgi_circle (int x, int y, unsigned char radius);
 /* Draw a circle in the current drawing color. */
 
-void __fastcall__ tgi_outtext (int x, int y, const char* text);
-/* Print a text in graphics mode */
-
 void __fastcall__ tgi_bar (int x1, int y1, int x2, int y2);
 /* Draw a bar (a filled rectangle) using the current color. */
 

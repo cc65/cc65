@@ -102,6 +102,7 @@ static void Usage (void)
        	     "  -vm\t\t\tVerbose map file\n"
 	     "\n"
 	     "Long options:\n"
+       	     "  --config name\tUse linker config file\n"
 	     "  --help\t\tHelp (this text)\n"
 	     "  --mapfile name\tCreate a map file\n"
        	     "  --start-addr addr\tSet the default start address\n"

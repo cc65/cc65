@@ -288,13 +288,13 @@ static void SetTargetFiles (void)
 
  	/* Set the startup file */
  	TargetCRT0 = xmalloc (TargetNameLen + 2 + 1);
- 	strcpy (TargetCRT0, TargetName);
- 	strcat (TargetCRT0, ".o");
+       	memcpy (TargetCRT0, TargetName, TargetNameLen);
+       	strcpy (TargetCRT0 + TargetNameLen, ".o");
 
  	/* Set the library file */
  	TargetLib = xmalloc (TargetNameLen + 4 + 1);
- 	strcpy (TargetLib, TargetName);
- 	strcat (TargetLib, ".lib");
+ 	memcpy (TargetLib, TargetName, TargetNameLen);
+ 	strcpy (TargetLib + TargetNameLen, ".lib");
 
     }
 }
@@ -349,7 +349,7 @@ static void Link (void)
        	CmdAddArg2 (&LD65, "-C", LinkerConfig);
     } else if (Module) {
         CmdSetTarget (&LD65, TGT_MODULE);
-    } else if (Target != TGT_NONE) {
+    } else {
 	CmdSetTarget (&LD65, Target);
     }
 

@@ -252,11 +252,6 @@ static void OptAnsi (const char* Opt, const char* Arg)
 static void OptBssName (const char* Opt, const char* Arg)
 /* Handle the --bss-name option */
 {
-    /* Must have a segment name */
-    if (Arg == 0) {
-    	NeedArg (Opt);
-    }
-
     /* Check for a valid name */
     CheckSegName (Arg);
 
@@ -269,11 +264,6 @@ static void OptBssName (const char* Opt, const char* Arg)
 static void OptCodeName (const char* Opt, const char* Arg)
 /* Handle the --code-name option */
 {
-    /* Must have a segment name */
-    if (Arg == 0) {
-    	NeedArg (Opt);
-    }
-
     /* Check for a valid name */
     CheckSegName (Arg);
 
@@ -286,9 +276,6 @@ static void OptCodeName (const char* Opt, const char* Arg)
 static void OptCPU (const char* Opt, const char* Arg)
 /* Handle the --cpu option */
 {
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
     if (strcmp (Arg, "6502") == 0) {
        	CPU = CPU_6502;
     } else if (strcmp (Arg, "65C02") == 0) {
@@ -303,11 +290,6 @@ static void OptCPU (const char* Opt, const char* Arg)
 static void OptDataName (const char* Opt, const char* Arg)
 /* Handle the --code-name option */
 {
-    /* Must have a segment name */
-    if (Arg == 0) {
-    	NeedArg (Opt);
-    }
-
     /* Check for a valid name */
     CheckSegName (Arg);
 
@@ -345,9 +327,6 @@ static void OptHelp (const char* Opt, const char* Arg)
 static void OptIncludeDir (const char* Opt, const char* Arg)
 /* Add an include search path */
 {
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
     AddIncludePath (Arg, INC_SYS | INC_USER);
 }
 
@@ -356,11 +335,6 @@ static void OptIncludeDir (const char* Opt, const char* Arg)
 static void OptRodataName (const char* Opt, const char* Arg)
 /* Handle the --rodata-name option */
 {
-    /* Must have a segment name */
-    if (Arg == 0) {
-    	NeedArg (Opt);
-    }
-
     /* Check for a valid name */
     CheckSegName (Arg);
 
@@ -389,9 +363,6 @@ static void OptStaticLocals (const char* Opt, const char* Arg)
 static void OptTarget (const char* Opt, const char* Arg)
 /* Set the target system */
 {
-    if (Arg == 0) {
-	NeedArg (Opt);
-    }
     SetSys (Arg);
 }
 

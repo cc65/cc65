@@ -1027,12 +1027,18 @@ ATCLR	= $7D		;CLEAR SCREEN CHARACTER
 ATRUB	= $7E		;BACK SPACE (RUBOUT)
 ATTAB	= $7F		;TAB
 ATEOL	= $9B		;END-OF-LINE
-ATDELL	= $9C		;Delete line
+ATDELL	= $9C		;delete line
+ATINSL	= $9D		;insert line
+ATCTAB	= $9E		;clear TAB
+ATSTAB	= $9F		;set TAB
 ATBEL	= $FD		;CONSOLE BELL
+ATDEL	= $FE		;delete char.
+ATINS	= $FF		;insert char.
 ATURW	= $1C		;UP-ARROW
 ATDRW	= $1D		;DOWN-ARROW
 ATLRW	= $1E		;LEFT-ARROW
 ATRRW	= $1F		;RIGHT-ARROW
+ATESC	= $1B		;ESCAPE
 
 ;-------------------------------------------------------------------------
 ; OFFSETS INTO SECTSIZETAB (DIO functions)

@@ -534,7 +534,7 @@ _rs232_status:
 NmiHandler:
        	lda    	ACIA+RegStatus       	;(4) ;status ;check for byte received
      	and 	#$08           		;(2)
-     	beq 	NmiNorm      		;(2*)
+     	beq 	@L9			;(2*)
        	lda    	ACIA+RegStatus       	;(4) opt ;status ;check for receive errors
     	and 	#$07           		;(2) opt
        	beq    	@L1            		;(3*)opt
@@ -568,7 +568,7 @@ NmiHandler:
     	inc 	DropCnt+3
 @L4:   	jmp 	NmiExit
 
-@L9:	jmp NmiContinue
+@L9:	jmp 	NmiContinue
 
 ;----------------------------------------------------------------------------
 ;

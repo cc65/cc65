@@ -33,7 +33,6 @@ S_OBJS =	_fdesc.o	\
 		atexit.o	\
 		atoi.o		\
 		copydata.o	\
-		doatexit.o	\
 		errno.o		\
 		fmisc.o 	\
 		free.o		\

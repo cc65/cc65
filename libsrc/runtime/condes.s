@@ -26,6 +26,7 @@ loop:	ldy	index
 	dey
 	jsr	getbyt
 	sta	jmpvec+1
+	sty	index
 	jsr	jmpvec
 	jmp	loop
 

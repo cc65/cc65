@@ -5,12 +5,13 @@
 ;
 
       	.export		_atexit
-	.import		exitfunc_table, exitfunc_index
-	.importzp	exitfunc_max
+       	.destructor	doatexit, 16
 	.import		__errno
+ 	.import	 	jmpvec
 
 	.include	"errno.inc"
 
+; ---------------------------------------------------------------------------
 
 .proc	_atexit
 
@@ -46,5 +47,36 @@
 .endproc
 
 
+
+; ---------------------------------------------------------------------------
+
+.code
+
+.proc	doatexit
+
+       	ldy    	exitfunc_index		; Get index
+       	beq    	@L9	 		; Jump if done
+ 	dey
+ 	lda	exitfunc_table,y
+   	sta	jmpvec+2
+   	dey
+   	lda	exitfunc_table,y
+     	sta	jmpvec+1
+   	sty	exitfunc_index
+ 	jsr	jmpvec			; Call the function
+ 	jmp	doatexit     		; Next one
+
+@L9:	rts
+
+.endproc
+
+
+
+; ---------------------------------------------------------------------------
+
+.bss
+exitfunc_index:	.res	1	; Index into table, inc'ed by 2
+exitfunc_table:	.res	10	; 5 exit functions
+exitfunc_max	= <(* - exitfunc_table)
 
 

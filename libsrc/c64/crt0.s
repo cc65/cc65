@@ -5,8 +5,11 @@
 ;
 
 	.export		_exit
-       	.import	       	__hinit, initconio, zerobss, push0, doatexit
+       	.import	       	__hinit, initconio, zerobss, push0, condes
 	.import	     	_main
+
+       	.import	       	__CONSTRUCTOR_TABLE__, __CONSTRUCTOR_COUNT__
+	.import		__DESTRUCTOR_TABLE__, __DESTRUCTOR_COUNT__
 
 	.include     	"c64.inc"
 	.include     	"../cbm/cbm.inc"
@@ -105,11 +108,16 @@ L1:	lda	sp,x
 	ldy	#4	  	; Argument size
        	jsr    	_main	  	; call the users code
 
-; fall thru to exit...
+; Call module destructors
 
-_exit:	jsr	doatexit  	; call exit functions
+_exit:	lda	#<__DESTRUCTOR_TABLE__
+	ldx	#>__DESTRUCTOR_TABLE__
+	ldy	#<(__DESTRUCTOR_COUNT__*2)
+	jsr	condes
 
-	ldx	spsave
+; Restore system stuff
+
+  	ldx	spsave
 	txs	   	  	; Restore stack pointer
        	lda    	mmusave
 	sta	$01	  	; Restore memory configuration

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -216,7 +216,7 @@ unsigned GetFileIndex (const char* Name)
     /* If we don't have this index, print a diagnostic and use the main file */
     if (F == 0) {
         Error ("File name `%s' not found in file table", Name);
-        return 0;                                      
+        return 0;
     } else {
         return F->Index;
     }
@@ -265,3 +265,4 @@ void WriteFiles (void)
 
 
 
+                                          

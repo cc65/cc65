@@ -148,7 +148,7 @@ static void SetBoolOption (unsigned char* Flag)
        	/* Map the keyword to a number */
        	switch (GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]))) {
 	    case 0:    	*Flag = 0; NextTok ();		        break;
-	    case 1:	*Flag = 1; NextTok ();		        break;  
+	    case 1:	*Flag = 1; NextTok ();		        break;
 	    default:	ErrorSkip ("`on' or `off' expected");	break;
 	}
     } else if (TokIsSep (Tok)) {
@@ -256,7 +256,7 @@ static void ConDes (const char* Name, unsigned Type)
 
 static void DoA16 (void)
 /* Switch the accu to 16 bit mode (assembler only) */
-{              
+{
     if (GetCPU() != CPU_65816) {
 	Error ("Command is only valid in 65816 mode");
     } else {
@@ -410,7 +410,7 @@ static void DoAssert (void)
 
     /* Read the message */
     if (Tok != TOK_STRCON) {
-    	ErrorSkip ("String constant expected");           
+    	ErrorSkip ("String constant expected");
     } else {
         AddAssertion (Expr, Action, GetStringId (SVal));
         NextTok ();
@@ -710,6 +710,19 @@ static void DoEndProc (void)
 
 
 
+static void DoEndScope (void)
+/* Leave a lexical level */
+{
+    if (CurrentScope != RootScope) {
+        SymLeaveLevel ();
+    } else {
+        /* No local scope */
+        ErrorSkip ("No open lexical level");
+    }
+}
+
+
+
 static void DoError (void)
 /* User error */
 {
@@ -792,7 +805,7 @@ static void DoFeature (void)
 	    NextTok ();
 	}
 
-     	/* Allow more than one keyword */           
+     	/* Allow more than one keyword */
      	if (Tok == TOK_COMMA) {
      	    NextTok ();
      	} else {
@@ -1041,7 +1054,7 @@ static void DoIncBin (void)
 	size_t BytesRead = fread (Buf, 1, BytesToRead, F);
 	if (BytesToRead != BytesRead) {
 	    /* Some sort of error */
-	    ErrorSkip ("Cannot read from include file `%s': %s", 
+	    ErrorSkip ("Cannot read from include file `%s': %s",
                        Name, strerror (errno));
 	    break;
 	}
@@ -1396,6 +1409,35 @@ static void DoROData (void)
 
 
 
+static void DoScope (void)
+/* Start a local scope */
+{
+    char Name[sizeof (SVal)];
+
+    if (Tok == TOK_IDENT) {
+
+        unsigned AddrSize;
+
+	/* The new scope has a name. Remember and skip it. */
+        strcpy (Name, SVal);
+        NextTok ();
+
+        /* Read an optional address size specifier */
+        AddrSize = OptionalAddrSize ();
+
+        /* Enter a new scope with the given name */
+        SymEnterLevel (Name, AddrSize);
+
+    } else {
+
+        /* An unnamed scope */
+        SymEnterLevel (AnonName (Name, sizeof (Name), "Scope"), ADDR_SIZE_DEFAULT);
+
+    }
+}
+
+
+
 static void DoSegment (void)
 /* Switch to another segment */
 {
@@ -1570,6 +1612,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,     	DoUnexpected	},	/* .ENDMACRO */
     { ccNone,		DoEndProc	},
     { ccNone,		DoUnexpected	},	/* .ENDREPEAT */
+    { ccNone,           DoEndScope      },
     { ccNone,           DoUnexpected    },      /* .ENDSTRUCT */
     { ccNone,		DoError	  	},
     { ccNone,		DoExitMacro	},
@@ -1617,41 +1660,42 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoP02		},
     { ccNone,		DoP816		},
     { ccNone,  	       	DoPageLength	},
-    { ccNone,       	DoUnexpected   	},	/* .PARAMCOUNT */
+    { ccNone,       	DoUnexpected   	},   	/* .PARAMCOUNT */
     { ccNone,		DoPC02		},
     { ccNone,           DoPopSeg        },
     { ccNone,		DoProc		},
     { ccNone,  	       	DoPSC02		},
     { ccNone,           DoPushSeg       },
-    { ccNone,    	DoUnexpected   	},	/* .REFERENCED */
+    { ccNone,    	DoUnexpected   	},   	/* .REFERENCED */
     { ccNone,		DoReloc		},
     { ccNone,		DoRepeat	},
     { ccNone,		DoRes		},
     { ccNone,		DoInvalid      	},     	/* .RIGHT */
-    { ccNone,		DoROData	},
+    { ccNone,		DoROData	},   
+    { ccNone,           DoScope         },
     { ccNone,       	DoSegment	},
     { ccNone,          	DoSetCPU        },
     { ccNone,        	DoSmart		},
-    { ccNone,		DoUnexpected	},	/* .STRAT */
-    { ccNone,          	DoUnexpected	},	/* .STRING */
-    { ccNone,		DoUnexpected	},	/* .STRLEN */
+    { ccNone,		DoUnexpected	},   	/* .STRAT */
+    { ccNone,          	DoUnexpected	},   	/* .STRING */
+    { ccNone,		DoUnexpected	},   	/* .STRLEN */
     { ccNone,           DoStruct        },
     { ccNone,		DoSunPlus	},
     { ccNone,           DoUnexpected    },      /* .TAG */
-    { ccNone,		DoUnexpected	},	/* .TCOUNT */
-    { ccNone,  	       	DoUnexpected	},	/* .TIME */
+    { ccNone,		DoUnexpected	},   	/* .TCOUNT */
+    { ccNone,  	       	DoUnexpected	},   	/* .TIME */
     { ccNone,           DoUnion         },
     { ccNone,           DoUnexpected    },      /* .VERSION */
     { ccNone,		DoWarning	},
     { ccNone,       	DoWord		},
-    { ccNone,  	       	DoUnexpected	},	/* .XMATCH */
+    { ccNone,  	       	DoUnexpected	},   	/* .XMATCH */
     { ccNone,       	DoZeropage	},
 };
 
 
 
 /*****************************************************************************/
-/*     	       	    		     Code 				     */
+/*     	       	    		     Code    				     */
 /*****************************************************************************/
 
 

@@ -62,7 +62,7 @@ void __fastcall__ free (void* block);
 
 /* Non standard memory management functions */
 
-void* __fastcall__ _aligned_malloc (size_t size, size_t alignment)
+void* __fastcall__ _aligned_malloc (size_t size, size_t alignment);
 /* Allocate a block of memory with the given size, which is aligned to a
  * memory address that is a multiple of alignment. alignment MUST NOT be
  * zero and MUST be a power of two, otherwise a call to this function will

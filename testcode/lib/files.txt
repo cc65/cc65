@@ -2,6 +2,7 @@
 Test programs for the runtime lib:
 ----------------------------------
 
+arg-test.c	- 	test program for passing arguments to main()
 clock.c		-	test program for clock() and CLOCKS_PER_SEC
 cprintf.c	-	test program for cprintf \n and \r operators
 cursor.c	-	test the cursor() function

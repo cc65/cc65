@@ -67,7 +67,7 @@ static TokList* CollectRepeatTokens (void)
 
      	/* Check for end of input */
        	if (Tok == TOK_EOF) {
-     	    Error (ERR_UNEXPECTED_EOF);
+     	    Error ("Unexpected end of file");
 	    FreeTokList (List);
      	    return 0;
      	}
@@ -127,7 +127,7 @@ void ParseRepeat (void)
     /* Repeat count follows */
     long RepCount = ConstExpression ();
     if (RepCount < 0) {
-	Error (ERR_RANGE);
+	Error ("Range error");
 	RepCount = 0;
     }
 
@@ -140,7 +140,7 @@ void ParseRepeat (void)
 
        	/* Check for an identifier */
        	if (Tok != TOK_IDENT) {
-       	    ErrorSkip (ERR_IDENT_EXPECTED);
+       	    ErrorSkip ("Identifier expected");
        	} else {
        	    /* Remember the name and skip it */
        	    Name = xstrdup (SVal);

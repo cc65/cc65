@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -109,12 +109,12 @@ static Segment* NewSegment (const char* Name, unsigned AddrSize)
 
     /* Check for too many segments */
     if (SegmentCount >= 256) {
-     	Fatal (FAT_TOO_MANY_SEGMENTS);
+     	Fatal ("Too many segments");
     }
 
     /* Check the segment name for invalid names */
     if (!ValidSegName (Name)) {
-     	Error (ERR_ILLEGAL_SEGMENT, Name);
+     	Error ("Illegal segment name: `%s'", Name);
     }
 
     /* Create a new segment */
@@ -186,7 +186,7 @@ void UseSeg (const SegDef* D)
      	    /* We found this segment. Check if the type is identical */
 	    if (D->AddrSize != ADDR_SIZE_DEFAULT &&
                 Seg->Def->AddrSize != D->AddrSize) {
-		Error (ERR_SEG_ATTR_MISMATCH);
+		Error ("Segment attribute mismatch");
 		/* Use the new attribute to avoid errors */
 	        Seg->Def->AddrSize = D->AddrSize;
        	    }
@@ -303,24 +303,24 @@ void SegCheck (void)
      	       		if (Abs) {
      	       		    /* Absolute value */
      	       		    if (Val > 255) {
-     	       	       	     	PError (&F->Pos, ERR_RANGE);
+     	       	       	     	PError (&F->Pos, "Range error");
      	       		    }
      	       		} else {
      	     	 	    /* PC relative value */
      	     		    if (Val < -128 || Val > 127) {
-     	     	       	     	PError (&F->Pos, ERR_RANGE);
+     	     	       	     	PError (&F->Pos, "Range error");
      	     		    }
      	     		}
      	       	    } else if (F->Len == 2) {
      	     	    	if (Abs) {
      	     		    /* Absolute value */
      	     		    if (Val > 65535) {
-     	       	       	     	PError (&F->Pos, ERR_RANGE);
+     	       	       	     	PError (&F->Pos, "Range error");
      	     		    }
     	     		} else {
 	     		    /* PC relative value */
 	     		    if (Val < -32768 || Val > 32767) {
-	     	       	     	PError (&F->Pos, ERR_RANGE);
+	     	       	     	PError (&F->Pos, "Range error");
 	       		    }
 	     		}
 	     	    }
@@ -340,7 +340,7 @@ void SegCheck (void)
 	     	     * byte expressions and we will do so.
 		     */
 	       	    if (F->Type == FRAG_EXPR && F->Len == 1 && !IsByteExpr (F->V.Expr)) {
-	       	        PError (&F->Pos, ERR_RANGE);
+	       	        PError (&F->Pos, "Range error");
 	     	    }
 		}
 	    }

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -135,7 +135,7 @@ ExprNode* ULabRef (int Which)
       	}
       	if (L == 0) {
       	    /* Label does not exist */
-      	    Error (ERR_UNDEFINED_LABEL);
+      	    Error ("Undefined label");
       	    /* We must return something valid */
       	    return GenCurrentPC();
       	} else {
@@ -216,7 +216,7 @@ void ULabCheck (void)
     if (ULabLastDef) {
 	L = ULabLastDef->Next;
 	while (L) {
-	    PError (&L->Pos, ERR_UNDEFINED_LABEL);
+	    PError (&L->Pos, "Undefined label");
 	    L = L->Next;
 	}
     }

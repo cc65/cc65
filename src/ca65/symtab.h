@@ -54,6 +54,10 @@
 
 
 
+/* Symbol table flags */                                        
+#define ST_NONE         0x00            /* No flags */
+#define ST_DEFINED      0x01            /* Scope has been defined */
+
 /* A symbol table */
 typedef struct SymTable SymTable;
 struct SymTable {
@@ -61,6 +65,7 @@ struct SymTable {
     SymTable*           Right;          /* Pointer to greater entry */
     SymTable*          	Parent;   	/* Link to enclosing scope if any */
     SymTable*           Childs;         /* Pointer to child scopes */
+    unsigned short      Flags;          /* Symbol table flags */
     unsigned char	AddrSize;       /* Address size */
     unsigned char       Type;           /* Type of the scope */
     unsigned            Level;          /* Lexical level */

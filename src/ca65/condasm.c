@@ -7,9 +7,9 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -90,7 +90,7 @@ static IfDesc* AllocIf (const char* Directive, int NeedTerm)
 
     /* Check for stack overflow */
     if (IfCount >= MAX_IFS) {
-       	Fatal (FAT_IF_NESTING);
+       	Fatal ("Too many nested .IFs");
     }
 
     /* Alloc one element */
@@ -126,7 +126,7 @@ static void FreeIf (void)
     do {
        	IfDesc* D = GetCurrentIf();
        	if (D == 0) {
-       	    Error (ERR_UNEXPECTED, ".ENDIF");
+       	    Error (" Unexpected .ENDIF");
 	    Done = 1;
        	} else {
        	    Done = (D->Flags & ifNeedTerm) != 0;
@@ -210,10 +210,10 @@ void DoConditionals (void)
     	    case TOK_ELSE:
        	        D = GetCurrentIf ();
 	       	if (D == 0) {
-	       	    Error (ERR_UNEXPECTED, ".ELSE");
+	       	    Error ("Unexpected .ELSE");
        	       	} else if (GetElse(D)) {
 	       	    /* We already had a .ELSE ! */
-	       	    Error (ERR_DUPLICATE_ELSE);
+	       	    Error ("Duplicate .ELSE");
        	       	} else {
 	       	    /* Allow an .ELSE */
 	  	    InvertIfCond (D);
@@ -228,10 +228,10 @@ void DoConditionals (void)
        	    case TOK_ELSEIF:
 	        D = GetCurrentIf ();
 	       	if (D == 0) {
-	       	    Error (ERR_UNEXPECTED, ".ELSEIF");
+	       	    Error ("Unexpected .ELSEIF");
 	       	} else if (GetElse(D)) {
 	       	    /* We already had a .ELSE */
-	       	    Error (ERR_DUPLICATE_ELSE);
+	       	    Error ("Duplicate .ELSE");
 	       	} else {
 	       	    /* Handle as if there was an .ELSE first */
 	       	    InvertIfCond (D);
@@ -434,7 +434,7 @@ void CheckOpenIfs (void)
 	}
 
        	/* Start of .if is in the file we're about to leave */
-	PError (&D->Pos, ERR_OPEN_IF);
+	PError (&D->Pos, "Conditional assembly branch was never closed");
 	FreeIf ();
     }
 }

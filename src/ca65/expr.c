@@ -233,7 +233,7 @@ static int DoMatch (enum TC EqualityLevel)
 
     	/* We may not end-of-line of end-of-file here */
     	if (TokIsSep (Tok)) {
-    	    Error (ERR_UNEXPECTED_EOL);
+    	    Error ("Unexpected end of line");
     	    return 0;
     	}
 
@@ -264,7 +264,7 @@ static int DoMatch (enum TC EqualityLevel)
 
     	/* We may not end-of-line of end-of-file here */
     	if (TokIsSep (Tok)) {
-    	    Error (ERR_UNEXPECTED_EOL);
+    	    Error ("Unexpected end of line");
     	    return 0;
     	}
 
@@ -334,7 +334,7 @@ static int FuncStrAt (void)
 
     /* String constant expected */
     if (Tok != TOK_STRCON) {
-      	Error (ERR_STRCON_EXPECTED);
+      	Error ("String constant expected");
       	NextTok ();
        	return 0;
 
@@ -352,7 +352,7 @@ static int FuncStrAt (void)
 
     /* Must be a valid index */
     if (Index >= (long) strlen (Str)) {
-	Error (ERR_RANGE);
+	Error ("Range error");
 	return 0;
     }
 
@@ -370,7 +370,7 @@ static int FuncStrLen (void)
     /* String constant expected */
     if (Tok != TOK_STRCON) {
 
-     	Error (ERR_STRCON_EXPECTED);
+     	Error ("String constant expected");
     	/* Smart error recovery */
      	if (Tok != TOK_RPAREN) {
      	    NextTok ();
@@ -449,7 +449,7 @@ static ExprNode* Function (int (*F) (void))
 
     /* Expression must be enclosed in braces */
     if (Tok != TOK_LPAREN) {
-     	Error (ERR_LPAREN_EXPECTED);
+     	Error ("'(' expected");
      	SkipUntilSep ();
 	return GenLiteralExpr (0);
     }
@@ -598,7 +598,7 @@ static ExprNode* Factor (void)
 		N = GenLiteralExpr (TgtTranslateChar (SVal[0]));
 	    } else {
 		N = GenLiteralExpr (0);	/* Dummy */
-		Error (ERR_SYNTAX);
+		Error ("Syntax error");
 	    }
 	    NextTok ();
 	    break;
@@ -855,7 +855,7 @@ long ConstExpression (void)
     if (IsConstExpr (Expr)) {
      	Val = GetExprVal (Expr);
     } else {
-     	Error (ERR_CONSTEXPR_EXPECTED);
+     	Error ("Constant expression expected");
      	Val = 0;
     }
 
@@ -1040,8 +1040,8 @@ int IsConstExpr (ExprNode* Root)
 		    if (Verbosity > 0) {
 		      	DumpExpr (Root);
 		    }
-		    PError (GetSymPos (Sym), ERR_CIRCULAR_REFERENCE);
-		    Const = 0;
+		    PError (GetSymPos (Sym), "Circular reference in symbol definition");
+		    Const = 0;                
 		} else {
 		    SymMarkUser (Sym);
 		    Const = SymIsConst (Sym);
@@ -1200,7 +1200,7 @@ long GetExprVal (ExprNode* Expr)
     	    Left  = GetExprVal (Expr->Left);
 	    Right = GetExprVal (Expr->Right);
 	    if (Right == 0) {
-		Error (ERR_DIV_BY_ZERO);
+		Error ("Division by zero");
 	    	return 0;
 	    }
 	    return Left / Right;
@@ -1209,7 +1209,7 @@ long GetExprVal (ExprNode* Expr)
      	    Left  = GetExprVal (Expr->Left);
 	    Right = GetExprVal (Expr->Right);
 	    if (Right == 0) {
-		Error (ERR_MOD_BY_ZERO);
+		Error ("Modulo operation with zero");
 	    	return 0;
 	    }
 	    return Left % Right;
@@ -1315,7 +1315,7 @@ static ExprNode* RemoveSyms (ExprNode* Expr, int MustClone)
 	     	    if (Verbosity) {
 	     		DumpExpr (Expr);
 	     	    }
-	     	    PError (GetSymPos (Sym), ERR_CIRCULAR_REFERENCE);
+	     	    PError (GetSymPos (Sym), "Circular reference in symbol definition");
 	     	    return GenLiteralExpr (0);		/* Return a dummy value */
 	     	}
 	     	SymMarkUser (Sym);

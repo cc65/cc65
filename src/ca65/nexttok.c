@@ -7,9 +7,9 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -80,7 +80,7 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
 
      	/* Check for end of line or end of input */
      	if (TokIsSep (Tok)) {
-     	    Error (ERR_UNEXPECTED_EOL);
+     	    Error ("Unexpected end of line");
      	    return List;
      	}
 
@@ -133,7 +133,7 @@ static void FuncConcat (void)
 
      	/* Next token must be a string */
      	if (Tok != TOK_STRCON) {
-     	    Error (ERR_STRCON_EXPECTED);
+     	    Error ("String constant expected");
      	    SkipUntilSep ();
      	    return;
      	}
@@ -141,7 +141,7 @@ static void FuncConcat (void)
      	/* Get the length of the string const and check total length */
      	L = strlen (SVal);
      	if (Length + L > MAX_STR_LEN) {
-     	    Error (ERR_STRING_TOO_LONG);
+     	    Error ("String is too long");
      	    /* Try to recover */
      	    SkipUntilSep ();
      	    return;
@@ -171,7 +171,7 @@ static void FuncConcat (void)
      * by the string token just created.
      */
     if (Tok != TOK_RPAREN) {
-     	Error (ERR_RPAREN_EXPECTED);
+     	Error ("`)' expected");
     } else {
      	Tok = TOK_STRCON;
      	strcpy (SVal, Buf);
@@ -195,7 +195,7 @@ static void FuncLeft (void)
     /* Count argument */
     Count = ConstExpression ();
     if (Count < 0 || Count > 100) {
-     	Error (ERR_RANGE);
+     	Error ("Range error");
      	Count = 1;
     }
     ConsumeComma ();
@@ -237,7 +237,7 @@ static void FuncMid (void)
     /* Start argument */
     Start = ConstExpression ();
     if (Start < 0 || Start > 100) {
-     	Error (ERR_RANGE);
+     	Error ("Range error");
      	Start = 0;
     }
     ConsumeComma ();
@@ -245,7 +245,7 @@ static void FuncMid (void)
     /* Count argument */
     Count = ConstExpression ();
     if (Count < 0 || Count > 100) {
-     	Error (ERR_RANGE);
+     	Error ("Range error");
      	Count = 1;
     }
     ConsumeComma ();
@@ -286,7 +286,7 @@ static void FuncRight (void)
     /* Count argument */
     Count = ConstExpression ();
     if (Count < 0 || Count > 100) {
-     	Error (ERR_RANGE);
+     	Error ("Range error");
      	Count = 1;
     }
     ConsumeComma ();
@@ -353,7 +353,7 @@ static void FuncString (void)
      * by the string token just created.
      */
     if (Tok != TOK_RPAREN) {
-     	Error (ERR_RPAREN_EXPECTED);
+     	Error ("`)' expected");
     } else {
      	Tok = TOK_STRCON;
      	strcpy (SVal, Buf);
@@ -404,7 +404,7 @@ void NextTok (void)
 
 
 
-void Consume (enum Token Expected, unsigned ErrMsg)
+void Consume (enum Token Expected, const char* ErrMsg)
 /* Consume Expected, print an error if we don't find it */
 {
     if (Tok == Expected) {
@@ -422,7 +422,7 @@ void ConsumeSep (void)
     /* Accept an EOF as separator */
     if (Tok != TOK_EOF) {
      	if (Tok != TOK_SEP) {
-     	    Error (ERR_TOO_MANY_CHARS);
+     	    Error ("Too many characters");
      	    SkipUntilSep ();
      	} else {
      	    NextTok ();
@@ -435,7 +435,7 @@ void ConsumeSep (void)
 void ConsumeLParen (void)
 /* Consume a left paren */
 {
-    Consume (TOK_LPAREN, ERR_LPAREN_EXPECTED);
+    Consume (TOK_LPAREN, "`(' expected");
 }
 
 
@@ -443,7 +443,7 @@ void ConsumeLParen (void)
 void ConsumeRParen (void)
 /* Consume a right paren */
 {
-    Consume (TOK_RPAREN, ERR_RPAREN_EXPECTED);
+    Consume (TOK_RPAREN, "`)' expected");
 }
 
 
@@ -451,7 +451,7 @@ void ConsumeRParen (void)
 void ConsumeComma (void)
 /* Consume a comma */
 {
-    Consume (TOK_COMMA, ERR_COMMA_EXPECTED);
+    Consume (TOK_COMMA, "`,' expected");
 }
 
 

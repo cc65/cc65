@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -311,7 +311,7 @@ static void MacSkipDef (unsigned Style)
 	if (Tok != TOK_EOF) {
 	    SkipUntilSep ();
 	} else {
-	    Error (ERR_ENDMACRO_EXPECTED);
+	    Error ("`.ENDMACRO' expected");
 	}
     } else {
 	/* Skip until end of line */
@@ -330,7 +330,7 @@ void MacDef (unsigned Style)
 
     /* We expect a macro name here */
     if (Tok != TOK_IDENT) {
-	Error (ERR_IDENT_EXPECTED);
+	Error ("Identifier expected");
 	MacSkipDef (Style);
     	return;
     }
@@ -338,7 +338,7 @@ void MacDef (unsigned Style)
     /* Did we already define that macro? */
     if (HT_Find (&MacroTab, SVal) != 0) {
        	/* Macro is already defined */
-     	Error (ERR_SYM_ALREADY_DEFINED, SVal);
+     	Error ("A macro named `%s' is already defined", SVal);
      	/* Skip tokens until we reach the final .endmacro */
      	MacSkipDef (Style);
        	return;
@@ -380,8 +380,8 @@ void MacDef (unsigned Style)
 		IdDesc* List = M->Params;
 		while (1) {
 		    if (strcmp (List->Id, SVal) == 0) {
-			Error (ERR_SYM_ALREADY_DEFINED, SVal);
-		    }
+			Error ("Duplicate symbol `%s'", SVal);
+		    }                                 
 		    if (List->Next == 0) {
 			break;
 		    } else {
@@ -429,7 +429,7 @@ void MacDef (unsigned Style)
 	    }
 	    /* May not have end of file in a macro definition */
 	    if (Tok == TOK_EOF) {
-		Error (ERR_ENDMACRO_EXPECTED);
+		Error ("`.ENDMACRO' expected");
 		goto Done;
 	    }
 	} else {
@@ -451,7 +451,7 @@ void MacDef (unsigned Style)
 
      		/* Need an identifer */
      		if (Tok != TOK_IDENT) {
-     	       	    Error (ERR_IDENT_EXPECTED);
+     	       	    Error ("Identifier expected");
      		    SkipUntilSep ();
      		    break;
      		}
@@ -662,8 +662,8 @@ static void StartExpClassic (Macro* M)
 
        	/* Check for maximum parameter count */
 	if (E->ParamCount >= M->ParamCount) {
-	    Error (ERR_TOO_MANY_PARAMS);
-	    SkipUntilSep ();
+	    Error ("Too many macro parameters");
+	    SkipUntilSep ();                    
 	    break;
 	}
 
@@ -675,7 +675,7 @@ static void StartExpClassic (Macro* M)
 
 	    /* Check for end of file */
 	    if (Tok == TOK_EOF) {
-	    	Error (ERR_UNEXPECTED_EOF);
+	    	Error ("Unexpected end of file");
 	    	return;
 	    }
 
@@ -732,7 +732,7 @@ static void StartExpDefine (Macro* M)
 
        	/* Check if there is really a parameter */
        	if (TokIsSep (Tok) || Tok == TOK_COMMA) {
-       	    Error (ERR_MACRO_PARAM_EXPECTED);
+       	    Error ("Macro parameter expected");
        	    SkipUntilSep ();
        	    return;
        	}
@@ -767,7 +767,7 @@ static void StartExpDefine (Macro* M)
        	    if (Tok == TOK_COMMA) {
        	        NextTok ();
        	    } else {
-       		Error (ERR_COMMA_EXPECTED);
+       		Error ("`,' expected");
        	    }
        	}
     }

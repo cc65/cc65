@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -109,7 +109,7 @@ static void ObjWriteError (void)
     remove (OutFile);
 
     /* Now abort with a fatal error */
-    Fatal (FAT_CANNOT_WRITE_OUTPUT, OutFile, strerror (Error));
+    Fatal ("Cannot write to output file `%s': %s", OutFile, strerror (Error));
 }
 
 
@@ -162,7 +162,7 @@ void ObjOpen (void)
     /* Create the output file */
     F = fopen (OutFile, "w+b");
     if (F == 0) {
- 	Fatal (FAT_CANNOT_OPEN_OUTPUT, OutFile, strerror (errno));
+ 	Fatal ("Cannot open output file `%s': %s", OutFile, strerror (errno));
     }
 
     /* Write a dummy header */

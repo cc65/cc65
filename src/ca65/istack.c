@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -36,7 +36,7 @@
 /* common */
 #include "check.h"
 #include "xmalloc.h"
-		  
+
 /* ca65 */
 #include "error.h"
 #include "istack.h"
@@ -80,8 +80,8 @@ void PushInput (int (*Func) (void*), void* Data, const char* Desc)
 
     /* Check for a stack overflow */
     if (ICount > ISTACK_MAX) {
-    	Fatal (FAT_NESTING);
-    }
+    	Fatal ("Maximum input stack nesting exceeded");
+    }                                                
 
     /* Create a new stack element */
     E = xmalloc (sizeof (*E));
@@ -153,7 +153,7 @@ void CheckInputStack (void)
  */
 {
     if (IStack) {
-	Error (ERR_OPEN_STMT, IStack->Desc);
+	Error ("Open %s", IStack->Desc);
     }
 }
 

@@ -48,6 +48,7 @@
 #include "expr.h"
 #include "objfile.h"
 #include "scanner.h"
+#include "segment.h"
 #include "spool.h"
 #include "symtab.h"
 
@@ -95,7 +96,7 @@ static unsigned ScopeTableSize (unsigned Level)
 
 
 
-static SymTable* NewSymTable (SymTable* Parent, unsigned AddrSize, const char* Name)
+static SymTable* NewSymTable (SymTable* Parent, const char* Name)
 /* Allocate a symbol table on the heap and return it */
 {
     /* Determine the lexical level and the number of table slots */
@@ -109,7 +110,8 @@ static SymTable* NewSymTable (SymTable* Parent, unsigned AddrSize, const char* N
     S->Left         = 0;
     S->Right        = 0;
     S->Childs       = 0;
-    S->AddrSize     = AddrSize;
+    S->Flags        = ST_NONE;
+    S->AddrSize     = ADDR_SIZE_DEFAULT;
     S->Type         = 0;
     S->Level        = Level;
     S->TableSlots   = Slots;
@@ -207,16 +209,22 @@ static int SearchSymTree (SymEntry* T, const char* Name, SymEntry** E)
 void SymEnterLevel (const char* ScopeName, unsigned AddrSize)
 /* Enter a new lexical level */
 {
-    /* ### Check existing scope */
-
     /* Map a default address size to something real */
-    if (AddrSize == ADDR_SIZE_DEFAULT) {                            
+    if (AddrSize == ADDR_SIZE_DEFAULT) {
         /* Use the segment address size */
         AddrSize = GetCurrentSegAddrSize ();
     }
 
-    /* Create the new table */
-    CurrentScope = NewSymTable (CurrentScope, ScopeName);
+    /* Search for an existing table/create a new one */
+    CurrentScope = SymFindScope (CurrentScope, ScopeName, SYM_ALLOC_NEW);
+
+    /* Check if the scope has been defined before */
+    if (CurrentScope->Flags & ST_DEFINED) {
+        Error ("Duplicate scope `%s'", ScopeName);
+    }
+
+    /* Mark the scope as defined */
+    CurrentScope->Flags |= ST_DEFINED;
 }
 
 
@@ -270,7 +278,7 @@ SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
     	/* Local symbol, get the table */
     	if (!SymLast) {
     	    /* No last global, so there's no local table */
-    	    Error (ERR_ILLEGAL_LOCAL_USE);
+    	    Error ("No preceeding global symbol");
     	    if (AllocNew) {
     	      	return NewSymEntry (Name);
     	    } else {
@@ -385,7 +393,7 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
 
     /* Don't accept local symbols */
     if (IsLocalName (Name)) {
-     	Error (ERR_ILLEGAL_LOCAL_USE);
+     	Error ("Illegal use of a local symbol");
      	return;
     }
 
@@ -393,7 +401,7 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
     S = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
     if (S->Flags & SF_IMPORT) {
      	/* The symbol is already marked as imported external symbol */
-     	Error (ERR_SYM_ALREADY_IMPORT, Name);
+     	Error ("Symbol `%s' is already an import", Name);
      	return;
     }
 
@@ -404,7 +412,7 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
 
     /* Check if the symbol was not already defined as ZP symbol */
     if (S->AddrSize == ADDR_SIZE_ZP) {
-	Error (ERR_SYM_REDECL_MISMATCH, Name);
+	Error ("Redeclaration mismatch for symbol `%s'", Name);
     }
 
     /* If the symbol was already declared as a condes, check if the new
@@ -412,7 +420,7 @@ void SymConDes (const char* Name, unsigned Type, unsigned Prio)
      */
     if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
 	if (S->ConDesPrio[Type] != Prio) {
-	    Error (ERR_SYM_REDECL_MISMATCH, Name);
+	    Error ("Redeclaration mismatch for symbol `%s'", Name);
 	}
     }
     S->ConDesPrio[Type] = Prio;
@@ -527,7 +535,7 @@ static void SymCheckUndefined (SymEntry* S)
        	if (S->Flags & SF_EXPORT) {
 	    if (Sym->Flags & SF_IMPORT) {
 	       	/* The symbol is already marked as imported external symbol */
-	       	PError (&S->Pos, ERR_SYM_ALREADY_IMPORT, GetString (S->Name));
+	       	PError (&S->Pos, "Symbol `%s' is already an import", GetString (S->Name));
 	    }
 	    Sym->Flags |= S->Flags & (SF_EXPORT | SF_ZP);
 	}
@@ -539,14 +547,15 @@ static void SymCheckUndefined (SymEntry* S)
 	/* The symbol is definitely undefined */
 	if (S->Flags & SF_EXPORT) {
 	    /* We will not auto-import an export */
-	    PError (&S->Pos, ERR_EXPORT_UNDEFINED, GetString (S->Name));
+	    PError (&S->Pos, "Exported symbol `%s' was never defined",
+                    GetString (S->Name));
 	} else {
 	    if (AutoImport) {
 		/* Mark as import, will be indexed later */
 		S->Flags |= SF_IMPORT;
 	    } else {
 		/* Error */
-	        PError (&S->Pos, ERR_SYM_UNDEFINED, GetString (S->Name));
+	        PError (&S->Pos, "Symbol `%s' is undefined", GetString (S->Name));
 	    }
 	}
     }
@@ -559,9 +568,9 @@ void SymCheck (void)
 {
     SymEntry* S;
 
-    /* Check for open lexical levels */
+    /* Check for open scopes */
     if (CurrentScope->Parent != 0) {
-	Error (ERR_OPEN_PROC);
+	Error ("Local scope was not closed");
     }
 
     /* First pass: Walk through all symbols, checking for undefined's and
@@ -601,12 +610,16 @@ void SymCheck (void)
 	    (S->Flags & SF_UNDEFMASK) != SF_UNDEFVAL) {
 	    if ((S->Flags & SF_DEFINED) != 0 && (S->Flags & SF_REFERENCED) == 0) {
 		/* Symbol was defined but never referenced */
-		PWarning (&S->Pos, WARN_SYM_NOT_REFERENCED, GetString (S->Name));
+		PWarning (&S->Pos, 2,
+                          "Symbol `%s' is defined but never used",
+                          GetString (S->Name));
 	    }
 	    if (S->Flags & SF_IMPORT) {
 		if ((S->Flags & (SF_REFERENCED | SF_FORCED)) == SF_NONE) {
 		    /* Imported symbol is not referenced */
-		    PWarning (&S->Pos, WARN_IMPORT_NOT_REFERENCED, GetString (S->Name));
+		    PWarning (&S->Pos, 2,
+                              "Symbol `%s' is imported but never used",
+                              GetString (S->Name));
 		} else {
 		    /* Give the import an index, count imports */
 		    S->Index = ImportCount++;

@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -63,7 +63,7 @@ void DbgInfoFile (void)
 
     /* Name */
     if (Tok != TOK_STRCON) {
-       	ErrorSkip (ERR_STRCON_EXPECTED);
+       	ErrorSkip ("String constant expected");
        	return;
     }
     strcpy (Name, SVal);
@@ -106,7 +106,7 @@ void DbgInfoLine (void)
 
     /* The name of the file follows */
     if (Tok != TOK_STRCON) {
-     	ErrorSkip (ERR_STRCON_EXPECTED);
+     	ErrorSkip ("String constant expected");
      	return;
     }
 
@@ -122,7 +122,7 @@ void DbgInfoLine (void)
     /* Line number */
     LineNum = ConstExpression ();
     if (LineNum < 0) {
-	ErrorSkip (ERR_RANGE);
+	ErrorSkip ("Line number is out of valid range");
 	return;
     }
 
@@ -135,7 +135,7 @@ void DbgInfoLine (void)
 void DbgInfoSym (void)
 /* Parse and handle SYM subcommand of the .dbg pseudo instruction */
 {
-    ErrorSkip (ERR_NOT_IMPLEMENTED);
+    ErrorSkip ("Not implemented");
 }
 
 

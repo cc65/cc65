@@ -50,120 +50,6 @@
 
 
 
-/* Warning numbers */
-enum Warnings {
-    WARN_NONE,	       	    	      	/* No warning */
-    WARN_SYM_NOT_REFERENCED,
-    WARN_IMPORT_NOT_REFERENCED,
-    WARN_CANNOT_TRACK_STATUS,
-    WARN_SUSPICIOUS_ADDREXPR,
-    WARN_UNNAMED_PROC,
-    WARN_ADDR_SIZE_MISMATCH,
-    WARN_USER,
-    WARN_COUNT	     	    	      	/* Warning count */
-};
-
-/* Error numbers */
-enum Errors {
-    ERR_NONE,  	       	       	      	/* No error */
-    ERR_NOT_IMPLEMENTED,   		/* Command/operation not implemented */
-    ERR_CANNOT_OPEN_INCLUDE,
-    ERR_CANNOT_READ_INCLUDE,
-    ERR_INCLUDE_NESTING,
-    ERR_INVALID_CHAR,
-    ERR_HEX_DIGIT_EXPECTED,
-    ERR_DIGIT_EXPECTED,
-    ERR_01_EXPECTED,
-    ERR_NUM_OVERFLOW,
-    ERR_PSEUDO_EXPECTED,
-    ERR_TOO_MANY_CHARS,
-    ERR_COLON_EXPECTED,
-    ERR_LPAREN_EXPECTED,
-    ERR_RPAREN_EXPECTED,
-    ERR_RBRACK_EXPECTED,
-    ERR_COMMA_EXPECTED,
-    ERR_ONOFF_EXPECTED,
-    ERR_Y_EXPECTED,
-    ERR_X_EXPECTED,
-    ERR_INTCON_EXPECTED,
-    ERR_STRCON_EXPECTED,
-    ERR_CHARCON_EXPECTED,
-    ERR_CONSTEXPR_EXPECTED,
-    ERR_IDENT_EXPECTED,
-    ERR_ENDMACRO_EXPECTED,
-    ERR_OPTION_KEY_EXPECTED,
-    ERR_EQ_EXPECTED,
-    ERR_ADDR_SIZE_EXPECTED,
-    ERR_816_MODE_ONLY,
-    ERR_USER,
-    ERR_STRING_TOO_LONG,
-    ERR_NEWLINE_IN_STRING,
-    ERR_ILLEGAL_CHARCON,
-    ERR_ILLEGAL_ADDR_MODE,
-    ERR_ILLEGAL_LOCALSTART,
-    ERR_ILLEGAL_LOCAL_USE,
-    ERR_ILLEGAL_SEGMENT,    
-    ERR_ILLEGAL_MACPACK,
-    ERR_ILLEGAL_FEATURE,
-    ERR_ILLEGAL_SCOPE,
-    ERR_ILLEGAL_ASSERT_ACTION,
-    ERR_SYNTAX,
-    ERR_SYM_ALREADY_DEFINED,
-    ERR_SYM_UNDEFINED,
-    ERR_SYM_ALREADY_IMPORT,
-    ERR_SYM_ALREADY_EXPORT,
-    ERR_EXPORT_UNDEFINED,
-    ERR_EXPORT_MUST_BE_CONST,
-    ERR_UNEXPECTED_EOF,
-    ERR_UNEXPECTED_EOL,
-    ERR_UNEXPECTED,
-    ERR_DIV_BY_ZERO,
-    ERR_MOD_BY_ZERO,
-    ERR_RANGE,
-    ERR_TOO_MANY_PARAMS,
-    ERR_MACRO_PARAM_EXPECTED,
-    ERR_CIRCULAR_REFERENCE,
-    ERR_SYM_REDECL_MISMATCH,
-    ERR_ADDR_SIZE_MISMATCH,
-    ERR_ALIGN,
-    ERR_DUPLICATE_ELSE,
-    ERR_OPEN_IF,
-    ERR_OPEN_PROC,
-    ERR_NO_OPEN_PROC,
-    ERR_SEG_ATTR_MISMATCH,
-    ERR_SEGSTACK_OVERFLOW,
-    ERR_SEGSTACK_EMPTY,
-    ERR_SEGSTACK_NOT_EMPTY,
-    ERR_CPU_NOT_SUPPORTED,
-    ERR_COUNTER_UNDERFLOW,
-    ERR_UNDEFINED_LABEL,
-    ERR_OPEN_STMT,
-    ERR_FILENAME_NOT_FOUND,
-    ERR_COUNT  	      	       	      	/* Error count */
-};
-
-/* Fatal errors */
-enum Fatals {
-    FAT_NONE,
-    FAT_MAX_INPUT_FILES,
-    FAT_OUT_OF_MEMORY,
-    FAT_TOO_MANY_SEGMENTS,
-    FAT_STRING_TOO_LONG,
-    FAT_CANNOT_OPEN_INPUT,
-    FAT_CANNOT_STAT_INPUT,
-    FAT_CANNOT_OPEN_OUTPUT,
-    FAT_CANNOT_WRITE_OUTPUT,
-    FAT_CANNOT_OPEN_LISTING,
-    FAT_CANNOT_WRITE_LISTING,
-    FAT_CANNOT_READ_LISTING,
-    FAT_NESTING,
-    FAT_IF_NESTING,
-    FAT_TOO_MANY_SYMBOLS,
-    FAT_COUNT	    	   	      	/* Fatal error count */
-};
-
-
-
 /* Warning levels */
 extern unsigned        	WarnLevel;
 
@@ -179,22 +65,22 @@ extern unsigned WarningCount;
 
 
 
-void Warning (unsigned WarnNum, ...);
+void Warning (unsigned Level, const char* Format, ...) attribute ((format (printf, 2, 3)));
 /* Print warning message. */
 
-void PWarning (const FilePos* Pos, unsigned WarnNum, ...);
+void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...) attribute ((format (printf, 3, 4)));
 /* Print warning message giving an explicit file and position. */
 
-void Error (unsigned ErrNum, ...);
+void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message */
 
-void PError (const FilePos* Pos, unsigned ErrNum, ...);
+void PError (const FilePos* Pos, const char* Format, ...) attribute ((format (printf, 2, 3)));
 /* Print an error message giving an explicit file and position. */
 
-void ErrorSkip (unsigned ErrNum, ...);
+void ErrorSkip (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message and skip the rest of the line */
 
-void Fatal (unsigned FatNum, ...) attribute ((noreturn));
+void Fatal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));
 /* Print a message about a fatal error and die */
 
 void Internal (const char* Format, ...) attribute((noreturn, format(printf,1,2)));

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -76,7 +76,7 @@ SymEntry* ParseScopedSymName (int AllocNew)
         /* An identifier must follow. Remember and skip it. */
         char Name[sizeof (SVal)];
         if (Tok != TOK_IDENT) {
-            Error (ERR_IDENT_EXPECTED);
+            Error ("Identifier expected");
             return 0;
         }
         strcpy (Name, SVal);

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,7 +51,7 @@
 void NextTok (void);
 /* Get next token and handle token level functions */
 
-void Consume (enum Token Expected, unsigned ErrMsg);
+void Consume (enum Token Expected, const char* ErrMsg);
 /* Consume Token, print an error if we don't find it */
 
 void ConsumeSep (void);

@@ -46,6 +46,7 @@
 #include "scanner.h"
 #include "spool.h"
 #include "symentry.h"
+#include "symtab.h"
 
 
 
@@ -143,12 +144,12 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned AddrSize, unsigned Flags)
 {
     if (S->Flags & SF_IMPORT) {
        	/* Defined symbol is marked as imported external symbol */
-       	Error (ERR_SYM_ALREADY_IMPORT, GetSymName (S));
+       	Error ("Symbol `%s' is already an import", GetSymName (S));
        	return;
     }
     if (S->Flags & SF_DEFINED) {
        	/* Multiple definition */
-       	Error (ERR_SYM_ALREADY_DEFINED, GetSymName (S));
+       	Error ("Symbol `%s' is already defined", GetSymName (S));
        	S->Flags |= SF_MULTDEF;
        	return;
     }
@@ -182,7 +183,7 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned AddrSize, unsigned Flags)
     /* If the symbol is exported, check the address sizes */
     if (S->Flags & SF_EXPORT) {
         if (S->AddrSize > S->ExportSize) {
-            Warning (WARN_ADDR_SIZE_MISMATCH, GetSymName (S));
+            Warning (1, "Address size mismatch for symbol `%s'", GetSymName (S));
         }
     }
 
@@ -190,7 +191,7 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned AddrSize, unsigned Flags)
     if (S->AddrSize == ADDR_SIZE_ZP) {
      	/* Already marked as ZP symbol by some means */
      	if (!IsByteExpr (Expr)) {
-     	    Error (ERR_RANGE);
+     	    Error ("Range error");
      	}
     }
 
@@ -207,18 +208,18 @@ void SymImport (SymEntry* S, unsigned AddrSize, unsigned Flags)
 {
     /* Don't accept local symbols */
     if (IsLocalNameId (S->Name)) {
-     	Error (ERR_ILLEGAL_LOCAL_USE);
+     	Error ("Illegal use of a local symbol");
      	return;
     }
 
     if (S->Flags & SF_DEFINED) {
-     	Error (ERR_SYM_ALREADY_DEFINED, GetSymName (S));
+     	Error ("Symbol `%s' is already defined", GetSymName (S));
      	S->Flags |= SF_MULTDEF;
      	return;
     }
     if (S->Flags & SF_EXPORT) {
      	/* The symbol is already marked as exported symbol */
-     	Error (ERR_SYM_ALREADY_EXPORT, GetSymName (S));
+     	Error ("Cannot import exported symbol `%s'", GetSymName (S));
      	return;
     }
 
@@ -233,7 +234,7 @@ void SymImport (SymEntry* S, unsigned AddrSize, unsigned Flags)
     if (S->Flags & (SF_IMPORT | SF_GLOBAL)) {
      	if ((Flags & SF_FORCED) != (S->Flags & SF_FORCED) ||
             AddrSize != S->AddrSize) {
-     	    Error (ERR_SYM_REDECL_MISMATCH, GetSymName (S));
+       	    Error ("Redeclaration mismatch for symbol `%s'", GetSymName (S));
      	}
         S->Flags &= ~SF_GLOBAL;
     }
@@ -250,14 +251,14 @@ void SymExport (SymEntry* S, unsigned AddrSize, unsigned Flags)
 {
     /* Don't accept local symbols */
     if (IsLocalNameId (S->Name)) {
-     	Error (ERR_ILLEGAL_LOCAL_USE);
+     	Error ("Illegal use of a local symbol");
      	return;
     }
 
     /* Check if it's ok to export the symbol */
     if (S->Flags & SF_IMPORT) {
      	/* The symbol is already marked as imported external symbol */
-     	Error (ERR_SYM_ALREADY_IMPORT, GetSymName (S));
+     	Error ("Symbol `%s' is already an import", GetSymName (S));
      	return;
     }
 
@@ -272,7 +273,7 @@ void SymExport (SymEntry* S, unsigned AddrSize, unsigned Flags)
      */
     if (S->Flags & (SF_EXPORT | SF_GLOBAL)) {
         if (S->ExportSize != AddrSize) {
-            Error (ERR_ADDR_SIZE_MISMATCH, GetSymName (S));
+            Error ("Address size mismatch for symbol `%s'", GetSymName (S));
         }
         S->Flags &= ~SF_GLOBAL;
     }
@@ -283,7 +284,7 @@ void SymExport (SymEntry* S, unsigned AddrSize, unsigned Flags)
      */
     if (S->Flags & SF_DEFINED) {
         if (S->AddrSize > S->ExportSize) {
-            Warning (WARN_ADDR_SIZE_MISMATCH, GetSymName (S));
+            Warning (1, "Address size mismatch for symbol `%s'", GetSymName (S));
         }
     }
 
@@ -300,7 +301,7 @@ void SymGlobal (SymEntry* S, unsigned AddrSize, unsigned Flags)
 {
     /* Don't accept local symbols */
     if (IsLocalNameId (S->Name)) {
-     	Error (ERR_ILLEGAL_LOCAL_USE);
+     	Error ("Illegal use of a local symbol");
      	return;
     }
 
@@ -314,13 +315,13 @@ void SymGlobal (SymEntry* S, unsigned AddrSize, unsigned Flags)
      */
     if (S->Flags & SF_IMPORT) {
         if (AddrSize != S->AddrSize) {
-            Error (ERR_ADDR_SIZE_MISMATCH, GetSymName (S));
+            Error ("Address size mismatch for symbol `%s'", GetSymName (S));
         }
         return;
     }
     if (S->Flags & SF_EXPORT) {
         if (AddrSize != S->ExportSize) {
-            Error (ERR_ADDR_SIZE_MISMATCH, GetSymName (S));
+            Error ("Address size mismatch for symbol `%s'", GetSymName (S));
         }
         return;
     }
@@ -331,7 +332,7 @@ void SymGlobal (SymEntry* S, unsigned AddrSize, unsigned Flags)
     if (S->Flags & SF_DEFINED) {
         /* The symbol is defined, export it */
         if (S->ExportSize != AddrSize) {
-            Error (ERR_ADDR_SIZE_MISMATCH, GetSymName (S));
+            Error ("Address size mismatch for symbol `%s'", GetSymName (S));
         }
         S->Flags |= (SF_EXPORT | Flags);
         S->ExportSize = AddrSize;

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -332,7 +332,7 @@ static void DoPCAssign (void)
 {
     long PC = ConstExpression ();
     if (PC < 0 || PC > 0xFFFFFF) {
-	Error (ERR_RANGE);
+	Error ("Range error");
     } else {
 	SetAbsPC (PC);
     }
@@ -398,7 +398,7 @@ static void OneLine (void)
      	    	 */
      	    	if (Tok != TOK_COLON) {
      	    	    if (HadWS || !NoColonLabels) {
-     	    	     	Error (ERR_COLON_EXPECTED);
+     	    	     	Error ("`:' expected");
      	    	    }
      	    	    if (Tok == TOK_NAMESPACE) {
      	    	       	/* Smart :: handling */
@@ -426,7 +426,7 @@ static void OneLine (void)
      	} else if (PCAssignment && (Tok == TOK_STAR || Tok == TOK_PC)) {
 	    NextTok ();
 	    if (Tok != TOK_EQ) {
-		Error (ERR_EQ_EXPECTED);
+		Error ("`=' expected");
 		SkipUntilSep ();
 	    } else {
 		/* Skip the equal sign */

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2000-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -146,7 +146,7 @@ void DisableListing (void)
     if (Listing) {
 	if (ListingEnabled == 0) {
 	    /* Cannot switch the listing off once more */
-	    Error (ERR_COUNTER_UNDERFLOW);
+	    Error ("Counter underflow");
 	} else {
 	    --ListingEnabled;
 	}
@@ -306,7 +306,7 @@ void CreateListing (void)
     /* Open the real listing file */
     F = fopen (ListFile, "w");
     if (F == 0) {
-    	Fatal (FAT_CANNOT_OPEN_LISTING, strerror (errno));
+    	Fatal ("Cannot open listing file: %s", strerror (errno));
     }
 
     /* Reset variables, print the header for the first page */

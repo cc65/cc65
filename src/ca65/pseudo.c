@@ -147,15 +147,15 @@ static void SetBoolOption (unsigned char* Flag)
     } else if (Tok == TOK_IDENT) {
        	/* Map the keyword to a number */
        	switch (GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]))) {
-	    case 0:    	*Flag = 0; NextTok ();		break;
-	    case 1:	*Flag = 1; NextTok ();		break;
-	    default:	ErrorSkip (ERR_ONOFF_EXPECTED);	break;
+	    case 0:    	*Flag = 0; NextTok ();		        break;
+	    case 1:	*Flag = 1; NextTok ();		        break;  
+	    default:	ErrorSkip ("`on' or `off' expected");	break;
 	}
     } else if (TokIsSep (Tok)) {
 	/* Without anything assume switch on */
 	*Flag = 1;
     } else {
-       	ErrorSkip (ERR_ONOFF_EXPECTED);
+       	ErrorSkip ("`on' or `off' expected");
     }
 }
 
@@ -172,7 +172,7 @@ static void ExportImport (void (*Func) (SymEntry*, unsigned, unsigned),
 
         /* We need an identifier here */
      	if (Tok != TOK_IDENT) {
-       	    ErrorSkip (ERR_IDENT_EXPECTED);
+       	    ErrorSkip ("Identifier expected");
      	    return;
      	}
 
@@ -213,7 +213,7 @@ static long IntArg (long Min, long Max)
     } else {
 	long Val = ConstExpression ();
 	if (Val < Min || Val > Max) {
-	    Error (ERR_RANGE);
+	    Error ("Range error");
 	    Val = Min;
 	}
 	return Val;
@@ -234,7 +234,7 @@ static void ConDes (const char* Name, unsigned Type)
     	Prio = ConstExpression ();
     	if (Prio < CD_PRIO_MIN || Prio > CD_PRIO_MAX) {
     	    /* Value out of range */
-    	    Error (ERR_RANGE);
+    	    Error ("Range error");
     	    return;
     	}
     } else {
@@ -256,9 +256,9 @@ static void ConDes (const char* Name, unsigned Type)
 
 static void DoA16 (void)
 /* Switch the accu to 16 bit mode (assembler only) */
-{
+{              
     if (GetCPU() != CPU_65816) {
-	Error (ERR_816_MODE_ONLY);
+	Error ("Command is only valid in 65816 mode");
     } else {
        	/* Immidiate mode has two extension bytes */
 	ExtBytes [AMI_IMM_ACCU] = 2;
@@ -271,7 +271,7 @@ static void DoA8 (void)
 /* Switch the accu to 8 bit mode (assembler only) */
 {
     if (GetCPU() != CPU_65816) {
-	Error (ERR_816_MODE_ONLY);
+	Error ("Command is only valid in 65816 mode");
     } else {
 	/* Immidiate mode has one extension byte */
 	ExtBytes [AMI_IMM_ACCU] = 1;
@@ -310,7 +310,7 @@ static void DoAlign (void)
     /* Read the alignment value */
     Align = ConstExpression ();
     if (Align <= 0 || Align > 0x10000) {
-       	ErrorSkip (ERR_RANGE);
+       	ErrorSkip ("Range error");
       	return;
     }
 
@@ -320,7 +320,7 @@ static void DoAlign (void)
 	Val = ConstExpression ();
 	/* We need a byte value here */
 	if (!IsByteRange (Val)) {
-       	    ErrorSkip (ERR_RANGE);
+       	    ErrorSkip ("Range error");
 	    return;
 	}
     } else {
@@ -330,7 +330,7 @@ static void DoAlign (void)
     /* Check if the alignment is a power of two */
     Bit = BitFind (Align);
     if (Align != (0x01L << Bit)) {
-	Error (ERR_ALIGN);
+	Error ("Alignment value must be a power of 2");
     } else {
 	SegAlign (Bit, (int) Val);
     }
@@ -346,7 +346,7 @@ static void DoASCIIZ (void)
     while (1) {
 	/* Must have a string constant */
 	if (Tok != TOK_STRCON) {
-	    ErrorSkip (ERR_STRCON_EXPECTED);
+       	    ErrorSkip ("String constant expected");
 	    return;
 	}
 
@@ -385,7 +385,7 @@ static void DoAssert (void)
 
     /* Action follows */
     if (Tok != TOK_IDENT) {
-        ErrorSkip (ERR_IDENT_EXPECTED);
+        ErrorSkip ("Identifier expected");
         return;
     }
     Action = GetSubKey (ActionTab, sizeof (ActionTab) / sizeof (ActionTab[0]));
@@ -403,14 +403,14 @@ static void DoAssert (void)
             break;
 
         default:
-            Error (ERR_ILLEGAL_ASSERT_ACTION);
+            Error ("Illegal assert action specifier");
     }
     NextTok ();
     ConsumeComma ();
 
     /* Read the message */
     if (Tok != TOK_STRCON) {
-    	ErrorSkip (ERR_STRCON_EXPECTED);
+    	ErrorSkip ("String constant expected");           
     } else {
         AddAssertion (Expr, Action, GetStringId (SVal));
         NextTok ();
@@ -454,7 +454,7 @@ static void DoByte (void)
 	    NextTok ();
 	    /* Do smart handling of dangling comma */
 	    if (Tok == TOK_SEP) {
-	     	Error (ERR_UNEXPECTED_EOL);
+	     	Error ("Unexpected end of line");
 	 	break;
 	    }
 	}
@@ -482,7 +482,7 @@ static void DoCharMap (void)
     Index = ConstExpression ();
     if (Index < 1 || Index > 255) {
       	/* Value out of range */
-       	ErrorSkip (ERR_RANGE);
+       	ErrorSkip ("Range error");
       	return;
     }
 
@@ -493,7 +493,7 @@ static void DoCharMap (void)
     Code = ConstExpression ();
     if (Code < 1 || Code > 255) {
 	/* Value out of range */
-       	ErrorSkip (ERR_RANGE);
+       	ErrorSkip ("Range error");
 	return;
     }
 
@@ -523,7 +523,7 @@ static void DoConDes (void)
 
     /* Symbol name follows */
     if (Tok != TOK_IDENT) {
-    	ErrorSkip (ERR_IDENT_EXPECTED);
+    	ErrorSkip ("Identifier expected");
     	return;
     }
     strcpy (Name, SVal);
@@ -539,7 +539,7 @@ static void DoConDes (void)
 
 	/* Check if we got a valid keyword */
 	if (Type < 0) {
-	    Error (ERR_SYNTAX);
+	    Error ("Syntax error");
 	    SkipUntilSep ();
 	    return;
 	}
@@ -550,7 +550,7 @@ static void DoConDes (void)
        	Type = ConstExpression ();
     	if (Type < CD_TYPE_MIN || Type > CD_TYPE_MAX) {
     	    /* Value out of range */
-    	    Error (ERR_RANGE);
+    	    Error ("Range error");
     	    return;
     	}
 
@@ -569,7 +569,7 @@ static void DoConstructor (void)
 
     /* Symbol name follows */
     if (Tok != TOK_IDENT) {
-    	ErrorSkip (ERR_IDENT_EXPECTED);
+    	ErrorSkip ("Identifier expected");
     	return;
     }
     strcpy (Name, SVal);
@@ -602,7 +602,7 @@ static void DoDbg (void)
 
     /* We expect a subkey */
     if (Tok != TOK_IDENT) {
-     	ErrorSkip (ERR_IDENT_EXPECTED);
+     	ErrorSkip ("Identifier expected");
      	return;
     }
 
@@ -617,7 +617,7 @@ static void DoDbg (void)
 	case 0:     DbgInfoFile ();		break;
 	case 1:	    DbgInfoLine ();		break;
 	case 2:	    DbgInfoSym ();		break;
-	default:    ErrorSkip (ERR_SYNTAX);	break;
+	default:    ErrorSkip ("Syntax error"); break;
     }
 }
 
@@ -661,7 +661,7 @@ static void DoDestructor (void)
 
     /* Symbol name follows */
     if (Tok != TOK_IDENT) {
-    	ErrorSkip (ERR_IDENT_EXPECTED);
+    	ErrorSkip ("Identifier expected");
     	return;
     }
     strcpy (Name, SVal);
@@ -704,7 +704,7 @@ static void DoEndProc (void)
         SymLeaveLevel ();
     } else {
         /* No local scope */
-        ErrorSkip (ERR_NO_OPEN_PROC);
+        ErrorSkip ("No open lexical level");
     }
 }
 
@@ -714,9 +714,9 @@ static void DoError (void)
 /* User error */
 {
     if (Tok != TOK_STRCON) {
- 	ErrorSkip (ERR_STRCON_EXPECTED);
+ 	ErrorSkip ("String constant expected");
     } else {
-       	Error (ERR_USER, SVal);
+       	Error ("User error: %s", SVal);
 	SkipUntilSep ();
     }
 }
@@ -775,7 +775,7 @@ static void DoFeature (void)
 
      	/* We expect an identifier */
      	if (Tok != TOK_IDENT) {
-     	    ErrorSkip (ERR_IDENT_EXPECTED);
+     	    ErrorSkip ("Identifier expected");
      	    return;
      	}
 
@@ -785,14 +785,14 @@ static void DoFeature (void)
      	/* Set the feature and check for errors */
 	if (SetFeature (SVal) == FEAT_UNKNOWN) {
      	    /* Not found */
-     	    ErrorSkip (ERR_ILLEGAL_FEATURE);
+     	    ErrorSkip ("Invalid feature: `%s'", SVal);
      	    return;
      	} else {
 	    /* Skip the keyword */
 	    NextTok ();
 	}
 
-     	/* Allow more than one keyword */
+     	/* Allow more than one keyword */           
      	if (Tok == TOK_COMMA) {
      	    NextTok ();
      	} else {
@@ -820,7 +820,7 @@ static void DoFileOpt (void)
 	OptNum = GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]));
 	if (OptNum < 0) {
 	    /* Not found */
-	    ErrorSkip (ERR_OPTION_KEY_EXPECTED);
+	    ErrorSkip ("File option keyword expected");
 	    return;
 	}
 
@@ -832,7 +832,7 @@ static void DoFileOpt (void)
 
 	/* We accept only string options for now */
 	if (Tok != TOK_STRCON) {
-	    ErrorSkip (ERR_STRCON_EXPECTED);
+	    ErrorSkip ("String constant expected");
 	    return;
 	}
 
@@ -867,7 +867,7 @@ static void DoFileOpt (void)
      	/* Option given as number */
        	OptNum = ConstExpression ();
      	if (!IsByteRange (OptNum)) {
-     	    ErrorSkip (ERR_RANGE);
+     	    ErrorSkip ("Range error");
      	    return;
      	}
 
@@ -876,7 +876,7 @@ static void DoFileOpt (void)
 
 	/* We accept only string options for now */
 	if (Tok != TOK_STRCON) {
-	    ErrorSkip (ERR_STRCON_EXPECTED);
+	    ErrorSkip ("String constant expected");
 	    return;
 	}
 
@@ -918,7 +918,7 @@ static void DoI16 (void)
 /* Switch the index registers to 16 bit mode (assembler only) */
 {
     if (GetCPU() != CPU_65816) {
-     	Error (ERR_816_MODE_ONLY);
+     	Error ("Command is only valid in 65816 mode");
     } else {
        	/* Immidiate mode has two extension bytes */
      	ExtBytes [AMI_IMM_INDEX] = 2;
@@ -931,7 +931,7 @@ static void DoI8 (void)
 /* Switch the index registers to 16 bit mode (assembler only) */
 {
     if (GetCPU() != CPU_65816) {
-	Error (ERR_816_MODE_ONLY);
+	Error ("Command is only valid in 65816 mode");
     } else {
 	/* Immidiate mode has one extension byte */
 	ExtBytes [AMI_IMM_INDEX] = 1;
@@ -967,7 +967,7 @@ static void DoIncBin (void)
 
     /* Name must follow */
     if (Tok != TOK_STRCON) {
-    	ErrorSkip (ERR_STRCON_EXPECTED);
+    	ErrorSkip ("String constant expected");
     	return;
     }
     strcpy (Name, SVal);
@@ -994,7 +994,7 @@ static void DoIncBin (void)
      	char* PathName = FindInclude (Name);
        	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
      	    /* Not found or cannot open, print an error and bail out */
-       	    ErrorSkip (ERR_CANNOT_OPEN_INCLUDE, Name, strerror (errno));
+       	    ErrorSkip ("Cannot open include file `%s': %s", Name, strerror (errno));
      	}
 
      	/* Free the allocated memory */
@@ -1015,13 +1015,13 @@ static void DoIncBin (void)
 	Count = Size - Start;
 	if (Count < 0) {
 	    /* Nothing to read - flag this as a range error */
-	    ErrorSkip (ERR_RANGE);
+	    ErrorSkip ("Range error");
 	    goto Done;
 	}
     } else {
 	/* Count was given, check if it is valid */
 	if (Start + Count > Size) {
-	    ErrorSkip (ERR_RANGE);
+	    ErrorSkip ("Range error");
 	    goto Done;
 	}
     }
@@ -1041,7 +1041,8 @@ static void DoIncBin (void)
 	size_t BytesRead = fread (Buf, 1, BytesToRead, F);
 	if (BytesToRead != BytesRead) {
 	    /* Some sort of error */
-	    ErrorSkip (ERR_CANNOT_READ_INCLUDE, Name, strerror (errno));
+	    ErrorSkip ("Cannot read from include file `%s': %s", 
+                       Name, strerror (errno));
 	    break;
 	}
 
@@ -1066,7 +1067,7 @@ static void DoInclude (void)
 
     /* Name must follow */
     if (Tok != TOK_STRCON) {
-	ErrorSkip (ERR_STRCON_EXPECTED);
+	ErrorSkip ("String constant expected");
     } else {
     	strcpy (Name, SVal);
     	NextTok ();
@@ -1127,10 +1128,10 @@ static void DoLocalChar (void)
 /* Define the character that starts local labels */
 {
     if (Tok != TOK_CHARCON) {
-     	ErrorSkip (ERR_CHARCON_EXPECTED);
+     	ErrorSkip ("Character constant expected");
     } else {
 	if (IVal != '@' && IVal != '?') {
-	    Error (ERR_ILLEGAL_LOCALSTART);
+	    Error ("Invalid start character for locals");
 	} else {
      	    LocalStart = (char) IVal;
        	}
@@ -1155,7 +1156,7 @@ static void DoMacPack (void)
 
     /* We expect an identifier */
     if (Tok != TOK_IDENT) {
-    	ErrorSkip (ERR_IDENT_EXPECTED);
+    	ErrorSkip ("Identifier expected");
     	return;
     }
 
@@ -1163,7 +1164,7 @@ static void DoMacPack (void)
     Package = GetSubKey (Keys, sizeof (Keys) / sizeof (Keys [0]));
     if (Package < 0) {
     	/* Not found */
-    	ErrorSkip (ERR_ILLEGAL_MACPACK);
+    	ErrorSkip ("Invalid macro package");
     	return;
     }
 
@@ -1197,7 +1198,7 @@ static void DoOrg (void)
 {
     long PC = ConstExpression ();
     if (PC < 0 || PC > 0xFFFFFF) {
-	Error (ERR_RANGE);
+	Error ("Range error");
     	return;
     }
     SetAbsPC (PC);
@@ -1209,7 +1210,7 @@ static void DoOut (void)
 /* Output a string */
 {
     if (Tok != TOK_STRCON) {
-	ErrorSkip (ERR_STRCON_EXPECTED);
+	ErrorSkip ("String constant expected");
     } else {
 	/* Output the string and be sure to flush the output to keep it in
 	 * sync with any error messages if the output is redirected to a file.
@@ -1261,7 +1262,7 @@ static void DoPopSeg (void)
 
     /* Must have a segment on the stack */
     if (CollCount (&SegStack) == 0) {
-        ErrorSkip (ERR_SEGSTACK_EMPTY);
+        ErrorSkip ("Segment stack is empty");
         return;
     }
 
@@ -1308,7 +1309,7 @@ static void DoProc (void)
         /* A .PROC statement without a name */
         char Buf[sizeof (SVal)];
         SymEnterLevel (AnonName (Buf, sizeof (Buf), "Scope"), ADDR_SIZE_DEFAULT);
-        Warning (WARN_UNNAMED_PROC);
+        Warning (1, "Unnamed .PROCs are deprecated, please use .SCOPE");
 
     }
 }
@@ -1328,7 +1329,7 @@ static void DoPushSeg (void)
 {
     /* Can only push a limited size of segments */
     if (CollCount (&SegStack) >= MAX_PUSHED_SEGMENTS) {
-        ErrorSkip (ERR_SEGSTACK_OVERFLOW);
+        ErrorSkip ("Segment stack overflow");
         return;
     }
 
@@ -1362,7 +1363,7 @@ static void DoRes (void)
 
     Count = ConstExpression ();
     if (Count > 0xFFFF || Count < 0) {
-	ErrorSkip (ERR_RANGE);
+	ErrorSkip ("Range error");
 	return;
     }
     if (Tok == TOK_COMMA) {
@@ -1370,7 +1371,7 @@ static void DoRes (void)
 	Val = ConstExpression ();
 	/* We need a byte value here */
 	if (!IsByteRange (Val)) {
-       	    ErrorSkip (ERR_RANGE);
+       	    ErrorSkip ("Range error");
 	    return;
 	}
 
@@ -1403,7 +1404,7 @@ static void DoSegment (void)
     Def.Name = Name;
 
     if (Tok != TOK_STRCON) {
-	ErrorSkip (ERR_STRCON_EXPECTED);
+	ErrorSkip ("String constant expected");
     } else {
 
 	/* Save the name of the segment and skip it */
@@ -1425,7 +1426,7 @@ static void DoSetCPU (void)
 {
     /* We expect an identifier */
     if (Tok != TOK_STRCON) {
-	ErrorSkip (ERR_STRCON_EXPECTED);
+	ErrorSkip ("String constant expected");
     } else {
         /* Try to find the CPU, then skip the identifier */
         cpu_t CPU = FindCPU (SVal);
@@ -1449,7 +1450,7 @@ static void DoSmart (void)
 static void DoStruct (void)
 /* Struct definition */
 {
-    Error (ERR_NOT_IMPLEMENTED);
+    Error ("Not implemented");
 }
 
 
@@ -1465,7 +1466,7 @@ static void DoSunPlus (void)
 static void DoUnion (void)
 /* Union definition */
 {
-    Error (ERR_NOT_IMPLEMENTED);
+    Error ("Not implemented");
 }
 
 
@@ -1473,7 +1474,7 @@ static void DoUnion (void)
 static void DoUnexpected (void)
 /* Got an unexpected keyword */
 {
-    Error (ERR_UNEXPECTED, Keyword);
+    Error ("Unexpected `%s'", Keyword);
     SkipUntilSep ();
 }
 
@@ -1483,9 +1484,9 @@ static void DoWarning (void)
 /* User warning */
 {
     if (Tok != TOK_STRCON) {
- 	ErrorSkip (ERR_STRCON_EXPECTED);
+ 	ErrorSkip ("String constant expected");
     } else {
-       	Warning (WARN_USER, SVal);
+       	Warning (0, "User warning: %s", SVal);
 	SkipUntilSep ();
     }
 }
@@ -1697,7 +1698,7 @@ void SegStackCheck (void)
 /* Check if the segment stack is empty at end of assembly */
 {
     if (CollCount (&SegStack) != 0) {
-        Error (ERR_SEGSTACK_NOT_EMPTY);
+        Error ("Segment stack is not empty");
     }
 }
 

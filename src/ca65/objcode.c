@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -150,7 +150,7 @@ void EmitByte (ExprNode* Expr)
      	long Val = GetExprVal (Expr);
 	FreeExpr (Expr);
      	if ((Val & ~0xFF) != 0) {
-     	    Error (ERR_RANGE);
+     	    Error ("Range error");
      	}
      	Emit0 (Val & 0xFF);
     } else {
@@ -172,7 +172,7 @@ void EmitWord (ExprNode* Expr)
      	long Val = GetExprVal (Expr);
 	FreeExpr (Expr);
        	if ((Val & ~0xFFFF) != 0) {
-     	    Error (ERR_RANGE);
+     	    Error ("Range error");
      	}
      	Emit0 (Val & 0xFF);
 	Emit0 ((Val >> 8) & 0xFF);
@@ -195,7 +195,7 @@ void EmitFarAddr (ExprNode* Expr)
      	long Val = GetExprVal (Expr);
 	FreeExpr (Expr);
        	if ((Val & ~0xFFFFFF) != 0) {
-     	    Error (ERR_RANGE);
+     	    Error ("Range error");
      	}
      	Emit0 (Val & 0xFF);
 	Emit0 ((Val >> 8) & 0xFF);

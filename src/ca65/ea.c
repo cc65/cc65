@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -102,11 +102,11 @@ void GetEA (EffAddr* A)
 	/* [dir] or [dir],y */
 	NextTok ();
 	A->Expr = Expression ();
-	Consume (TOK_RBRACK, ERR_RBRACK_EXPECTED);
+	Consume (TOK_RBRACK, "']' expected");
 	if (Tok == TOK_COMMA) {
 	    /* [dir],y */
 	    NextTok ();
-	    Consume (TOK_Y, ERR_Y_EXPECTED);
+	    Consume (TOK_Y, "`Y' expected");
 	    A->AddrModeSet = AM_DIR_IND_LONG_Y;
 	} else {
 	    /* [dir] */
@@ -134,9 +134,9 @@ void GetEA (EffAddr* A)
     	 	A->AddrModeSet = AM_STACK_REL_IND_Y;
     	 	ConsumeRParen ();
     	 	ConsumeComma ();
-    	 	Consume (TOK_Y, ERR_Y_EXPECTED);
+    	 	Consume (TOK_Y, "`Y' expected");
     	    } else {
-    	 	Error (ERR_SYNTAX);
+    	 	Error ("Syntax error");
     	    }
 
        	} else {
@@ -146,7 +146,7 @@ void GetEA (EffAddr* A)
     	    if (Tok == TOK_COMMA) {
 		/* (adr),y */
     	 	NextTok ();
-    	 	Consume (TOK_Y, ERR_Y_EXPECTED);
+    	 	Consume (TOK_Y, "`Y' expected");
     	 	A->AddrModeSet = AM_DIR_IND_Y;
     	    } else {
 		/* (adr) */
@@ -176,7 +176,7 @@ void GetEA (EffAddr* A)
        	    if (Tok == TOK_COMMA) {
        	       	/* bank.adr,x */
        	       	NextTok ();
-       	       	Consume (TOK_X, ERR_X_EXPECTED);
+       	       	Consume (TOK_X, "`X' expected");
        	       	A->AddrModeSet = AM_ABS_LONG_X;
        	    } else {
        	     	/* bank.adr */
@@ -206,7 +206,7 @@ void GetEA (EffAddr* A)
 	 		break;
 
 	 	    default:
-	 		Error (ERR_SYNTAX);
+	 		Error ("Syntax error");
 
 	 	}
 

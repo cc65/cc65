@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -307,7 +307,7 @@ void NewInputFile (const char* Name)
 
      	/* Error (fatal error if this is the main file) */
      	if (ICount == 0) {
-     	    Fatal (FAT_CANNOT_OPEN_INPUT, Name, strerror (errno));
+     	    Fatal ("Cannot open input file `%s': %s", Name, strerror (errno));
        	}
 
        	/* We are on include level. Search for the file in the include
@@ -316,7 +316,7 @@ void NewInputFile (const char* Name)
      	PathName = FindInclude (Name);
        	if (PathName == 0 || (F = fopen (PathName, "r")) == 0) {
      	    /* Not found or cannot open, print an error and bail out */
-     	    Error (ERR_CANNOT_OPEN_INCLUDE, Name, strerror (errno));
+     	    Error ("Cannot open include file `%s': %s", Name, strerror (errno));
      	}
 
      	/* Free the allocated memory */
@@ -332,7 +332,7 @@ void NewInputFile (const char* Name)
      	/* Stat the file and remember the values */
      	struct stat Buf;
      	if (fstat (fileno (F), &Buf) != 0) {
-     	    Fatal (FAT_CANNOT_STAT_INPUT, Name, strerror (errno));
+     	    Fatal ("Cannot stat input file `%s': %s", Name, strerror (errno));
      	}
 
 	/* Add the file to the input file table and remember the index */
@@ -579,13 +579,13 @@ static unsigned ReadStringConst (int StringTerm)
 	    break;
 	}
 	if (C == '\n' || C == EOF) {
-	    Error (ERR_NEWLINE_IN_STRING);
+	    Error ("Newline in string constant");
 	    break;
       	}
 
 	/* Check for string length, print an error message once */
 	if (I == MAX_STR_LEN) {
-	    Error (ERR_STRING_TOO_LONG);
+	    Error ("Maximum string size exceeded");
 	} else if (I < MAX_STR_LEN) {
 	    SVal [I] = C;
 	}
@@ -651,7 +651,7 @@ Again:
 	     	Tok = TOK_PC;
 		return;
 	    } else {
-     	     	Error (ERR_HEX_DIGIT_EXPECTED);
+     	     	Error ("Hexadecimal digit expected");
 	    }
      	}
 
@@ -659,7 +659,7 @@ Again:
      	IVal = 0;
      	while (IsXDigit (C)) {
      	    if (IVal & 0xF0000000) {
-     	    	Error (ERR_NUM_OVERFLOW);
+     	    	Error ("Overflow in hexadecimal number");
      		IVal = 0;
      	    }
      	    IVal = (IVal << 4) + DigitVal (C);
@@ -677,14 +677,14 @@ Again:
 
 	/* 0 or 1 must follow */
 	if (!IsBDigit (C)) {
-	    Error (ERR_01_EXPECTED);
+	    Error ("Binary digit expected");
 	}
 
 	/* Read the number */
 	IVal = 0;
 	while (IsBDigit (C)) {
 	    if (IVal & 0x80000000) {
-	      	Error (ERR_NUM_OVERFLOW);
+	      	Error ("Overflow in binary number");
 	      	IVal = 0;
 	    }
 	    IVal = (IVal << 1) + DigitVal (C);
@@ -703,7 +703,7 @@ Again:
 	IVal = 0;
 	while (IsDigit (C)) {
        	    if (IVal > (long) (0xFFFFFFFFUL / 10)) {
-       	      	Error (ERR_NUM_OVERFLOW);
+       	      	Error ("Overflow in decimal number");
 	    	IVal = 0;
 	    }
 	    IVal = (IVal * 10) + DigitVal (C);
@@ -719,7 +719,6 @@ Again:
     if (C == '.') {
 
 	/* Remember and skip the dot */
-	SVal[0] = C;
 	NextChar ();
 
     	/* Check if it's just a dot */
@@ -731,6 +730,7 @@ Again:
 	} else {
 
 	    /* Read the remainder of the identifier */
+            SVal[0] = '.';
 	    ReadIdent (1);
 
 	    /* Dot keyword, search for it */
@@ -742,7 +742,7 @@ Again:
 		    Tok = TOK_IDENT;
 		} else {
 		    /* Invalid pseudo instruction */
-		    Error (ERR_PSEUDO_EXPECTED);
+		    Error ("`%s' is not a recognized control command", SVal);
 		    goto Again;
 		}
 	    }
@@ -759,7 +759,7 @@ Again:
 
      	/* Start character alone is not enough */
         if (SVal [1] == '\0') {
-	    Error (ERR_IDENT_EXPECTED);
+	    Error ("Invalid cheap local symbol");
        	    goto Again;
 	}
 
@@ -1024,14 +1024,14 @@ CharAgain:
 		/* Always a character constant */
 	     	NextChar ();
 	     	if (C == '\n' || C == EOF) {
-	     	    Error (ERR_ILLEGAL_CHARCON);
+	     	    Error ("Illegal character constant");
 	     	    goto CharAgain;
 	     	}
 	     	IVal = C;
 	     	Tok = TOK_CHARCON;
 	     	NextChar ();
 	     	if (C != '\'') {
-	     	    Error (ERR_ILLEGAL_CHARCON);
+	     	    Error ("Illegal character constant");
 	     	} else {
 	     	    NextChar ();
 	     	}
@@ -1082,7 +1082,7 @@ CharAgain:
     /* If we go here, we could not identify the current character. Skip it
      * and try again.
      */
-    Error (ERR_INVALID_CHAR, C & 0xFF);
+    Error ("Invalid input character: 0x%02X", C & 0xFF);
     NextChar ();
     goto Again;
 }
@@ -1150,7 +1150,7 @@ unsigned ParseAddrSize (void)
 
     /* Check for an identifier */
     if (Tok != TOK_IDENT) {
-        Error (ERR_ADDR_SIZE_EXPECTED);
+        Error ("Address size specifier expected");
         return ADDR_SIZE_DEFAULT;
     }
 
@@ -1164,7 +1164,7 @@ unsigned ParseAddrSize (void)
         case 5: return ADDR_SIZE_ABS;
         case 6: return ADDR_SIZE_FAR;
         default:
-            Error (ERR_ADDR_SIZE_EXPECTED);
+            Error ("Address size specifier expected");
             return ADDR_SIZE_DEFAULT;
     }
 }

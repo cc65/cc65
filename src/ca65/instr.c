@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -578,7 +578,7 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
 
     /* Check if we have any adressing modes left */
     if (A->AddrModeSet == 0) {
-       	Error (ERR_ILLEGAL_ADDR_MODE);
+       	Error ("Illegal addressing mode");
        	return 0;
     }
     A->AddrMode    = BitFind (A->AddrModeSet);
@@ -601,7 +601,7 @@ static int EvalEA (const InsDesc* Ins, EffAddr* A)
             !SymIsZP (Left->V.Sym)) {
 
             /* Output a warning */
-            Warning (WARN_SUSPICIOUS_ADDREXPR);
+            Warning (1, "Suspicious address expression");
         }
     }
 
@@ -744,7 +744,7 @@ static void PutREP (const InsDesc* Ins)
 	/* Check the range for Val. */
 	if (Val < 0) {
 	    /* We had an error */
-	    Warning (WARN_CANNOT_TRACK_STATUS);
+	    Warning (1, "Cannot track processor status byte");
 	} else {
 	    if (Val & 0x10) {
 	       	/* Index registers to 16 bit */
@@ -772,7 +772,7 @@ static void PutSEP (const InsDesc* Ins)
 	/* Check the range for Val. */
 	if (Val < 0) {
 	    /* We had an error */
-     	    Warning (WARN_CANNOT_TRACK_STATUS);
+     	    Warning (1, "Cannot track processor status byte");
      	} else {
      	    if (Val & 0x10) {
      	   	/* Index registers to 8 bit */
@@ -862,7 +862,7 @@ void SetCPU (cpu_t NewCPU)
     	CPU = NewCPU;
     	InsTab = InsTabs[CPU];
     } else {
-     	Error (ERR_CPU_NOT_SUPPORTED);
+     	Error ("CPU not supported");
     }
 }
 

@@ -215,8 +215,8 @@ unsigned GetFileIndex (const char* Name)
 
     /* If we don't have this index, print a diagnostic and use the main file */
     if (F == 0) {
-        Error (ERR_FILENAME_NOT_FOUND, Name);
-        return 0;
+        Error ("File name `%s' not found in file table", Name);
+        return 0;                                      
     } else {
         return F->Index;
     }

@@ -764,7 +764,7 @@ type GetQualifier (const type* T)
 FuncDesc* GetFuncDesc (const type* T)
 /* Get the FuncDesc pointer from a function or pointer-to-function type */
 {
-    if (T[0] == T_PTR) {
+    if (UnqualifiedType (T[0]) == T_PTR) {      
 	/* Pointer to function */
 	++T;
     }
@@ -781,7 +781,7 @@ FuncDesc* GetFuncDesc (const type* T)
 type* GetFuncReturn (type* T)
 /* Return a pointer to the return type of a function or pointer-to-function type */
 {
-    if (T[0] == T_PTR) {
+    if (UnqualifiedType (T[0]) == T_PTR) {
 	/* Pointer to function */
 	++T;
     }

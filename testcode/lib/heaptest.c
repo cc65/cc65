@@ -2,14 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <_heap.h>
 
-
-/* From _heap.h */
-extern unsigned	_horg;       	/* Bottom of heap */
-extern unsigned _hptr;		/* Current top */
-extern unsigned _hend;		/* Upper limit */
-extern unsigned	_hfirst; 	/* First free block in list */
-extern unsigned _hlast;		/* Last free block in list */
 
 
 static unsigned char* V[256];
@@ -79,20 +73,20 @@ static void ShowInfo (void)
 {
     /* Count free blocks */
     unsigned Count = 0;
-    unsigned** P = (unsigned**) _hfirst;
+    register struct freeblock* P = _heapfirst;
     while (P) {
 	++Count;
-	P = P[1];
+       	P = P->next;
     }
     printf ("%04X  %04X  %04X  %04X  %04X %u\n",
-      	    _horg, _hptr, _hend, _hfirst, _hlast, Count);
+      	    _heaporg, _heapptr, _heapend, _heapfirst, _heaplast, Count);
 
     if (Count) {
-	P = (unsigned**) _hfirst;
+	P = _heapfirst;
 	while (P) {
 	    printf ("%04X  %04X  %04X %04X(%u)\n",
 		    (unsigned) P, P[2], P[1], P[0], P[0]);
-	    P = P[1];
+	    P = P->next;
 	}
 	getchar ();
     }

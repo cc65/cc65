@@ -122,6 +122,20 @@ function.
 </itemize>
 
 
+<sect1><tt/em.h/<label id="em.h"><p>
+
+<itemize>
+<item><ref id="em_commit" name="em_commit">
+<item><ref id="em_copyfrom" name="em_copyfrom">
+<item><ref id="em_copyto" name="em_copyto">
+<item><ref id="em_load_driver" name="em_load_driver">
+<item><ref id="em_map" name="em_map">
+<item><ref id="em_pagecount" name="em_pagecount">
+<item><ref id="em_unload" name="em_unload">
+<item><ref id="em_use" name="em_use">
+</itemize>
+
+
 <sect1><tt/stdlib.h/<label id="stdlib.h"><p>
 
 <itemize>
@@ -549,6 +563,226 @@ used in presence of a prototype.
 </quote>
 
 
+<sect1>em_commit<label id="em_commit"><p>
+
+<quote>
+<descrip>
+<tag/Function/Commit changes into extended memory.
+<tag/Header/<tt/<ref id="em.h" name="em.h">/
+<tag/Declaration/<tt/void __fastcall__ em_commit (void);/
+<tag/Description/Commit changes in the memory window to extended storage. If
+the contents of the memory window have been changed, these changes may be lost
+if <tt/<ref id="em_map" name="em_map">/, <tt/<ref id="em_use" name="em_use">/,
+<tt/<ref id="em_copyfrom" name="em_copyfrom">/ or <tt/<ref id="em_copyto"
+name="em_copyto">/ are called without calling <tt/em_commit/ first.
+<tag/Limits/<itemize>
+<item>Calling <tt/em_commit/ does not necessarily mean that changes to the
+memory window are discarded, it does just mean that the drivers is allowed
+to discard it.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+<item>The function produces undefined results if no extended memory driver is
+loaded.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="em_load_driver" name="em_load_driver">,
+<ref id="em_map" name="em_map">,
+<ref id="em_use" name="em_use">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>em_copyfrom<label id="em_copyfrom"><p>
+
+<quote>
+<descrip>
+<tag/Function/Copy from extended into normal memory.
+<tag/Header/<tt/<ref id="em.h" name="em.h">/
+<tag/Declaration/<tt/void __fastcall__ em_copyfrom (const struct em_copy* copy_data);/
+<tag/Description/Copy data from extended memory into linear memory. Source and
+target addresses as well as the number of bytes to transfer are specified in
+the <tt/em_copy/ structure that is passed as a parameter.
+<tag/Limits/<itemize>
+<item>Calling <tt/em_copyfrom/ will invalidate the memory window, so if you
+made any changes to the data in the window, call <tt/<ref id="em_commit"
+name="em_commit">/ first, or the changes are lost.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+<item>The function produces undefined results if no extended memory driver is
+loaded.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="em_commit" name="em_commit">,
+<ref id="em_copyto" name="em_copyto">,
+<ref id="em_load_driver" name="em_load_driver">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>em_copyto<label id="em_copyto"><p>
+
+<quote>
+<descrip>
+<tag/Function/Copy from normal into extended memory.
+<tag/Header/<tt/<ref id="em.h" name="em.h">/
+<tag/Declaration/<tt/void __fastcall__ em_copyto (const struct em_copy* copy_data);/
+<tag/Description/Copy data from linear into extended memory. Source and
+target addresses as well as the number of bytes to transfer are specified in
+the <tt/em_copy/ structure that is passed as a parameter.
+<tag/Limits/<itemize>
+<item>Calling <tt/em_copyto/ will invalidate the memory window, so if you
+made any changes to the data in the window, call <tt/<ref id="em_commit"
+name="em_commit">/ first, or the changes are lost.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+<item>The function produces undefined results if no extended memory driver is
+loaded.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="em_commit" name="em_commit">,
+<ref id="em_copyfrom" name="em_copyfrom">,
+<ref id="em_load_driver" name="em_load_driver">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>em_load_driver<label id="em_load_driver"><p>
+
+<quote>
+<descrip>
+<tag/Function/Load and initialize an extended memory driver.
+<tag/Header/<tt/<ref id="em.h" name="em.h">/
+<tag/Declaration/<tt/void __fastcall__ em_load_driver (const char* name);/
+<tag/Description/Load an extended memory driver into memory and initialize
+it. The function returns an error code that tells if all this has been
+successful.
+<tag/Limits/<itemize>
+<item>Not all drivers are able to detect if the supported hardware is really
+present.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+<item>The driver is loaded by name, so currently you must know the type of
+extended memory that should be supported. There is no autodetect capability.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="em_unload" name="em_unload">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>em_map<label id="em_map"><p>
+
+<quote>
+<descrip>
+<tag/Function/Make a page of extended memory accessible.
+<tag/Header/<tt/<ref id="em.h" name="em.h">/
+<tag/Declaration/<tt/void* __fastcall__ em_map (unsigned page);/
+<tag/Description/The function maps one page of extended memory into linear
+memory and returns a pointer to the page frame. Depending on the hardware
+and driver, the data is either mapped into the address space or transfered
+into a buffer. If you don't need the actual contents of the page (for example
+because you're going to overwrite it completely, it is better to call
+<tt/<ref id="em_use" name="em_use">/ instead. <tt/em_use/ will not transfer the
+data if it is possible to avoid that.
+<tag/Limits/<itemize>
+<item>Calling <tt/em_map/ will invalidate the memory window, so if you
+made any changes to the data in the window, call <tt/<ref id="em_commit"
+name="em_commit">/ first, or the changes are lost.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+<item>The function produces undefined results if no extended memory driver is
+loaded.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="em_commit" name="em_commit">,
+<ref id="em_load_driver" name="em_load_driver">,
+<ref id="em_use" name="em_use">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>em_pagecount<label id="em_pagecount"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the number of available extended memory pages.
+<tag/Header/<tt/<ref id="em.h" name="em.h">/
+<tag/Declaration/<tt/unsigned __fastcall__ em_pagecount (void);/
+<tag/Description/The function returns the size of the extended memory supported
+by the driver in 256 byte pages.
+<tag/Limits/<itemize>
+<item>The function returns zero if no extended memory driver is loaded.
+<item>The function may return zero if the supported hardware was not detected.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="em_load_driver" name="em_load_driver">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>em_unload<label id="em_unload"><p>
+
+<quote>
+<descrip>
+<tag/Function/Unload an extended memory driver.
+<tag/Header/<tt/<ref id="em.h" name="em.h">/
+<tag/Declaration/<tt/void __fastcall__ em_unload (void);/
+<tag/Description/The function unloads a loaded extended memory driver and
+frees all memory allocated for the driver.
+<tag/Limits/<itemize>
+<item>The function does nothing if no driver is loaded.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="em_load_driver" name="em_load_driver">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>em_use<label id="em_use"><p>
+
+<quote>
+<descrip>
+<tag/Function/Prepare an extended memory page for use.
+<tag/Header/<tt/<ref id="em.h" name="em.h">/
+<tag/Declaration/<tt/void* __fastcall__ em_use (unsigned page);/
+<tag/Description/The function maps one page of extended memory into linear
+memory and returns a pointer to the page frame. This function is similar to
+<tt/<ref id="em_map" name="em_map">/, but will not transfer data into the
+actual memory window in the assumption that the existing data is wrong or
+will get overwritten.
+<tag/Limits/<itemize>
+<item>Calling <tt/em_use/ will invalidate the memory window, so if you
+made any changes to the data in the window, call <tt/<ref id="em_commit"
+name="em_commit">/ first, or the changes are lost.
+<item>The function is only available as fastcall function, so it may only be
+used in presence of a prototype.
+<item>The function produces undefined results if no extended memory driver is
+loaded.
+</itemize>
+<tag/Availability/cc65
+<tag/See also/
+<ref id="em_commit" name="em_commit">,
+<ref id="em_load_driver" name="em_load_driver">,
+<ref id="em_map" name="em_map">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
 <sect1>exit<label id="exit"><p>
 
 <quote>
@@ -644,7 +878,7 @@ screen has the coordinate 0.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may
 only be used in presence of a prototype.
-<item>Invalid values for the Y position (out of screen coordinates) may lead 
+<item>Invalid values for the Y position (out of screen coordinates) may lead
 to undefined behaviour.
 </itemize>
 <tag/Availability/cc65
@@ -670,11 +904,11 @@ is a letter or digit. The return value is non zero if the character
 is anything else.
 <tag/Limits/<itemize>
 <item>When compiling with <tt/-Os/ the function is actually a macro. The
-inline sequence generated by the macro will not work correctly for values 
-outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of 
-this range. The non inline function may be accessed by <tt/#undef/'ing 
-the macro. 
-<item>When compiling without <tt/-Os/, the function is only available as 
+inline sequence generated by the macro will not work correctly for values
+outside the range 0..255. <bf/Note:/ The constant <tt/EOF/ is not part of
+this range. The non inline function may be accessed by <tt/#undef/'ing
+the macro.
+<item>When compiling without <tt/-Os/, the function is only available as
 fastcall function, so it may only be used in presence of a prototype.
 </itemize>
 <tag/Availability/ISO 9899
@@ -1189,7 +1423,7 @@ switched off. The old value of the setting is returned.
 <tag/Limits/<itemize>
 <item>The function may not be supported by the hardware, in which case
 the call is ignored.
-<item>The function is only available as fastcall function, so it may only 
+<item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype.
 </itemize>
 <tag/Availability/cc65
@@ -1367,15 +1601,15 @@ See <tt/strlower/.
 <tag/Header/<tt/<ref id="string.h" name="string.h">/
 <tag/Declaration/<tt/char* __fastcall__ strcpy (char* s1, const char* s2, size_t n);/
 <tag/Description/The <tt/strncpy/ function copies not more than n bytes from
-the array pointed to by <tt/s2/ to the array pointed to by <tt/s1/. If the array 
-pointed to by <tt/s2/ is a string that is shorter than n bytes, null bytes are 
-appended to the copy in the array pointed to by <tt/s1/, until <tt/n/ bytes are 
+the array pointed to by <tt/s2/ to the array pointed to by <tt/s1/. If the array
+pointed to by <tt/s2/ is a string that is shorter than n bytes, null bytes are
+appended to the copy in the array pointed to by <tt/s1/, until <tt/n/ bytes are
 written. The function will always return <tt/s1/.
 <tag/Limits/<itemize>
 <item>The function is only available as fastcall function, so it may only
 be used in presence of a prototype. If there is no null byte in the first <tt/n/
 bytes of the array pointed to by <tt/s2/, the result is not null-terminated.
-<item>If copying takes place between objects that overlap, the behavior is 
+<item>If copying takes place between objects that overlap, the behavior is
 undefined.
 </itemize>
 <tag/Availability/ISO 9899

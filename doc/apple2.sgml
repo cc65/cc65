@@ -125,12 +125,12 @@ how to use it.
 
 <descrip>
 
-  <tag><tt/a2-lo.tgi/</tag>
+  <tag><tt/a2.lo.tgi/</tag>
   This driver was written by Stefan Haubenthal. It features a resolution of
   40&times;40 with 16 colors. At the bottom of the screen, 4 additional text lines
   are available.
 
-  <tag><tt/a2-hi.tgi/</tag>
+  <tag><tt/a2.hi.tgi/</tag>
   This driver was written by Stefan Haubenthal. It features a resolution of
   280&times;192 with 6 colors.
 
@@ -141,8 +141,8 @@ how to use it.
 
 <descrip>
 
-  <tag><tt/a2-lc.emd/</tag>
-  Gives access to 12KB RAM (48 pages of 256 bytes each) on the 
+  <tag><tt/a2.lc.emd/</tag>
+  Gives access to 12KB RAM (48 pages of 256 bytes each) on the
   Apple&nbsp;&rsqb;&lsqb; language card. The driver was contributed by
   Stefan Haubenthal.
 
@@ -154,7 +154,7 @@ how to use it.
 
 <descrip>
 
-  <tag><tt/a2-stdjoy.joy/</tag>
+  <tag><tt/a2.stdjoy.joy/</tag>
   Supports up to two standard analog joysticks connected to the game port of
   the Apple&nbsp;&rsqb;&lsqb;.
 

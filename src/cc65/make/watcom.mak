@@ -118,6 +118,7 @@ OBJS =	anonname.obj	\
 	swstmt.obj	\
     	symentry.obj	\
     	symtab.obj	\
+        testexpr.obj    \
 	textseg.obj	\
     	typecmp.obj	\
         typeconv.obj    \

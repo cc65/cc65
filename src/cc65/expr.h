@@ -61,6 +61,9 @@ int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval);
  * primary register and 1 is returned.
  */
 
+int expr (int (*func) (ExprDesc*), ExprDesc *lval);
+/* Expression parser; func is either hie0 or hie1. */
+
 void expression1 (ExprDesc* lval);
 /* Evaluate an expression on level 1 (no comma operator) and put it into
  * the primary register
@@ -86,16 +89,6 @@ int hie1 (ExprDesc* lval);
 
 void DefineData (ExprDesc* lval);
 /* Output a data definition for the given expression */
-
-void Test (unsigned Label, int Invert);
-/* Evaluate a boolean test expression and jump depending on the result of
- * the test and on Invert.
- */
-
-void TestInParens (unsigned Label, int Invert);
-/* Evaluate a boolean test expression in parenthesis and jump depending on
- * the result of the test * and on Invert.
- */
 
 
 

@@ -58,6 +58,7 @@
 #include "swstmt.h"
 #include "symtab.h"
 #include "stmt.h"
+#include "testexpr.h"
 #include "typeconv.h"
 
 
@@ -133,6 +134,7 @@ static int IfStatement (void)
 /* Handle an 'if' statement */
 {
     unsigned Label1;
+    unsigned TestResult;
     int GotBreak;
 
     /* Skip the if */
@@ -140,7 +142,7 @@ static int IfStatement (void)
 
     /* Generate a jump label and parse the condition */
     Label1 = GetLocalLabel ();
-    TestInParens (Label1, 0);
+    TestResult = TestInParens (Label1, 0);
 
     /* Parse the if body */
     GotBreak = Statement (0);
@@ -157,21 +159,28 @@ static int IfStatement (void)
 
     } else {
 
-	/* Generate a jump around the else branch */
+    	/* Generate a jump around the else branch */
      	unsigned Label2 = GetLocalLabel ();
-	g_jump (Label2);
+    	g_jump (Label2);
 
-	/* Skip the else */
+    	/* Skip the else */
      	NextToken ();
 
-	/* Define the target for the first test */
-	g_defcodelabel (Label1);
+        /* If the if expression was always true, the code in the else branch
+         * is never executed. Output a warning if this is the case.
+         */
+        if (TestResult == TESTEXPR_TRUE) {
+            Warning ("Unreachable code");
+        }
 
-	/* Total break only if both branches had a break. */
+    	/* Define the target for the first test */
+    	g_defcodelabel (Label1);
+
+    	/* Total break only if both branches had a break. */
      	GotBreak &= Statement (0);
 
      	/* Generate the label for the else clause */
-	g_defcodelabel (Label2);
+    	g_defcodelabel (Label2);
 
      	/* Done */
      	return GotBreak;

@@ -90,7 +90,7 @@ static GenDesc GenOASGN  = { TOK_OR_ASSIGN,	GEN_NOPUSH,     g_or  };
 int hie0 (ExprDesc *lval);
 /* Parse comma operator. */
 
-static int expr (int (*func) (ExprDesc*), ExprDesc *lval);
+int expr (int (*func) (ExprDesc*), ExprDesc *lval);
 /* Expression parser; func is either hie0 or hie1. */
 
 
@@ -2987,7 +2987,7 @@ int evalexpr (unsigned flags, int (*f) (ExprDesc*), ExprDesc* lval)
 
 
 
-static int expr (int (*func) (ExprDesc*), ExprDesc *lval)
+int expr (int (*func) (ExprDesc*), ExprDesc *lval)
 /* Expression parser; func is either hie0 or hie1. */
 {
     int k;
@@ -3067,69 +3067,6 @@ void intexpr (ExprDesc* lval)
      	/* To avoid any compiler errors, make the expression a valid int */
      	MakeConstIntExpr (lval, 1);
     }
-}
-
-
-
-void Test (unsigned Label, int Invert)
-/* Evaluate a boolean test expression and jump depending on the result of
- * the test and on Invert.
- */
-{
-    int k;
-    ExprDesc lval;
-
-    /* Evaluate the expression */
-    k = expr (hie0, InitExprDesc (&lval));
-
-    /* Check for a boolean expression */
-    CheckBoolExpr (&lval);
-
-    /* Check for a constant expression */
-    if (k == 0 && lval.Flags == E_MCONST) {
-
-      	/* Constant rvalue */
-       	if (!Invert && lval.ConstVal == 0) {
-      	    g_jump (Label);
-     	    Warning ("Unreachable code");
-     	} else if (Invert && lval.ConstVal != 0) {
- 	    g_jump (Label);
-      	}
-
-    } else {
-
-        /* If the expr hasn't set condition codes, set the force-test flag */
-        if ((lval.Test & E_CC) == 0) {
-            lval.Test |= E_FORCETEST;
-        }
-
-        /* Load the value into the primary register */
-        ExprLoad (CF_FORCECHAR, k, &lval);
-
-        /* Generate the jump */
-        if (Invert) {
-            g_truejump (CF_NONE, Label);
-        } else {
-            g_falsejump (CF_NONE, Label);
-        }
-    }
-}
-
-
-
-void TestInParens (unsigned Label, int Invert)
-/* Evaluate a boolean test expression in parenthesis and jump depending on
- * the result of the test * and on Invert.
- */
-{
-    /* Eat the parenthesis */
-    ConsumeLParen ();
-
-    /* Do the test */
-    Test (Label, Invert);
-
-    /* Check for the closing brace */
-    ConsumeRParen ();
 }
 
 

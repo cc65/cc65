@@ -84,6 +84,7 @@ OBJS =	anonname.o	\
 	swstmt.o	\
     	symentry.o	\
     	symtab.o       	\
+        testexpr.o      \
 	textseg.o	\
     	typecmp.o	\
         typeconv.o      \

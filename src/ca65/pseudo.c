@@ -1307,11 +1307,13 @@ static void DoProc (void)
 
     if (Tok == TOK_IDENT) {
 
+        SymEntry* Sym;
+
 	/* The new scope has a name. Remember it. */
         strcpy (Name, SVal);
 
         /* Search for the symbol, generate a new one if needed */
-	SymEntry* Sym = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
+       	Sym = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
 
         /* Skip the scope name */
         NextTok ();

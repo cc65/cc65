@@ -1,7 +1,7 @@
 /*
  * _printf.h
  *
- * (C) Copyright 1998 Ullrich von Bassewitz (uz@ibb.schwaben.com)
+ * (C) Copyright 1998 Ullrich von Bassewitz (uz@cc65.org)
  *
  */
 

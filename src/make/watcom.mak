@@ -18,7 +18,7 @@ all:	win32
 
 
 win32:
-     	for i in $(SUBDIRS); do $(MAKE) TARGET=NT -C $${i} -f make/watcom.mak; done
+	for i in $(SUBDIRS); do $(MAKE) TARGET=NT -C $${i} -f make/watcom.mak; done
 
 
 dos32:

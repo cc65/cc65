@@ -586,7 +586,7 @@ static void Compile (const char* File)
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*			       	     Code				     */
 /*****************************************************************************/
 
 
@@ -596,29 +596,40 @@ static void Usage (void)
 {
     fprintf (stderr,
 	     "Usage: %s [options] file\n"
-	     "Options:\n"
-	     "\t-A\t\tStrict ANSI mode\n"
-	     "\t-C name\t\tUse linker config file\n"
-	     "\t-Cl\t\tMake local variables static\n"
-	     "\t-D sym[=defn]\tDefine a preprocessor symbol\n"
-	     "\t-I path\t\tSet an include directory path\n"
-	     "\t-Ln name\tCreate a VICE label file\n"
-	     "\t-O\t\tOptimize code\n"
-	     "\t-Oi\t\tOptimize code, inline functions\n"
-       	     "\t-Or\t\tOptimize code, honour the register keyword\n"
-	     "\t-Os\t\tOptimize code, inline known C funtions\n"
-	     "\t-S\t\tCompile but don't assemble and link\n"
-	     "\t-V\t\tPrint the version number\n"
-	     "\t-W\t\tSuppress warnings\n"
-	     "\t-c\t\tCompiler and assemble but don't link\n"
-	     "\t-d\t\tDebug mode\n"
-	     "\t-g\t\tAdd debug info\n"
-	     "\t-h\t\tHelp (this text)\n"
-	     "\t-m name\t\tCreate a map file\n"
-	     "\t-o name\t\tName the output file\n"
-	     "\t-t system\tSet the target system\n"
-	     "\t-v\t\tVerbose mode\n"
-	     "\t-vm\t\tVerbose map file\n",
+       	     "Short options:\n"
+       	     "  -A\t\t\tStrict ANSI mode\n"
+       	     "  -C name\t\tUse linker config file\n"
+       	     "  -Cl\t\t\tMake local variables static\n"
+       	     "  -D sym[=defn]\t\tDefine a preprocessor symbol\n"
+       	     "  -I dir\t\tSet a compiler include directory path\n"
+       	     "  -Ln name\t\tCreate a VICE label file\n"
+       	     "  -O\t\t\tOptimize code\n"
+       	     "  -Oi\t\t\tOptimize code, inline functions\n"
+       	     "  -Or\t\t\tOptimize code, honour the register keyword\n"
+       	     "  -Os\t\t\tOptimize code, inline known C funtions\n"
+       	     "  -S\t\t\tCompile but don't assemble and link\n"
+       	     "  -V\t\t\tPrint the version number\n"
+       	     "  -W\t\t\tSuppress warnings\n"
+       	     "  -c\t\t\tCompiler and assemble but don't link\n"
+       	     "  -d\t\t\tDebug mode\n"
+       	     "  -g\t\t\tAdd debug info\n"
+       	     "  -h\t\t\tHelp (this text)\n"
+       	     "  -m name\t\tCreate a map file\n"
+       	     "  -o name\t\tName the output file\n"
+       	     "  -t sys\t\tSet the target system\n"
+       	     "  -v\t\t\tVerbose mode\n"
+       	     "  -vm\t\t\tVerbose map file\n"
+	     "\n"
+	     "Long options:\n"
+       	     "  --ansi\t\tStrict ANSI mode\n"
+	     "  --asm-include-dir dir\tSet an assembler include directory\n"
+       	     "  --debug\t\tDebug mode\n"
+       	     "  --debug-info\t\tAdd debug info\n"
+       	     "  --help\t\tHelp (this text)\n"
+       	     "  --include-dir dir\tSet a compiler include directory path\n"
+       	     "  --version\t\tPrint the version number\n"
+       	     "  --target sys\t\tSet the target system\n"
+       	     "  --verbose\t\tVerbose mode\n",
 	     ProgName);
 }
 
@@ -646,10 +657,141 @@ static const char* GetArg (int* ArgNum, char* argv [], unsigned Len)
 
 
 
-static void ArgError (const char* Arg)
+static void UnknownOption (const char* Arg)
 /* Print an error about a wrong argument */
 {
     Error ("Unknown option: `%s', use -h for help", Arg);
+}
+
+
+
+static void NeedArg (const char* Arg)
+/* Print an error about a missing option argument and exit. */
+{
+    Error ("Option requires an argument: %s\n", Arg);
+}
+
+
+
+static void OptAnsi (const char* Opt)
+/* Strict ANSI mode (compiler) */
+{
+    CmdAddArg (&CC65, "-A");
+}
+
+
+
+static void OptAsmIncludeDir (const char* Opt, const char* Arg)
+/* Include directory (assembler) */
+{
+    if (Arg == 0) {
+	NeedArg (Opt);
+    }
+    CmdAddArg (&CA65, "-I");
+    CmdAddArg (&CA65, Arg);
+}
+
+
+
+static void OptDebug (const char* Opt)
+/* Debug mode (compiler) */
+{
+    CmdAddArg (&CC65, "-d");
+}
+
+
+
+static void OptDebugInfo (const char* Opt)
+/* Debug Info - add to compiler and assembler */
+{
+    CmdAddArg (&CC65, "-g");
+    CmdAddArg (&CA65, "-g");
+}
+
+
+
+static void OptHelp (const char* Opt)
+/* Print help - cl65 */
+{
+    Usage ();
+    exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptIncludeDir (const char* Opt, const char* Arg)
+/* Include directory (compiler) */
+{
+    if (Arg == 0) {
+	NeedArg (Opt);
+    }
+    CmdAddArg (&CC65, "-I");
+    CmdAddArg (&CC65, Arg);
+}
+
+
+
+static void OptTarget (const char* Opt, const char* Arg)
+/* Set the target system */
+{
+    if (Arg == 0) {
+	NeedArg (Opt);
+    }
+    SetTargetByName (Arg);
+}
+
+
+
+static void OptVerbose (const char* Opt)
+/* Verbose mode (compiler, assembler, linker) */
+{
+    CmdAddArg (&CC65, "-v");
+    CmdAddArg (&CA65, "-v");
+    CmdAddArg (&LD65, "-v");
+}
+
+
+
+static void OptVersion (const char* Opt)
+/* Print version number */
+{
+    fprintf (stderr,
+ 	     "cl65 V%u.%u.%u - (C) Copyright 1998-2000 Ullrich von Bassewitz\n",
+ 	     VER_MAJOR, VER_MINOR, VER_PATCH);
+}
+
+
+
+static void LongOption (int* ArgNum, char* argv [])
+/* Handle a long command line option */
+{
+    const char* Opt = argv [*ArgNum];
+    const char* Arg = argv [*ArgNum+1];
+
+    if (strcmp (Opt, "--ansi") == 0) {
+	OptAnsi (Opt);
+    } else if (strcmp (Opt, "--asm-include-dir") == 0) {
+    	OptAsmIncludeDir (Opt, Arg);
+    	++(*ArgNum);
+    } else if (strcmp (Opt, "--debug") == 0) {
+       	OptDebug (Opt);
+    } else if (strcmp (Opt, "--debug-info") == 0) {
+       	OptDebugInfo (Opt);
+    } else if (strcmp (Opt, "--help") == 0) {
+       	OptHelp (Opt);
+    } else if (strcmp (Opt, "--include-dir") == 0) {
+    	OptIncludeDir (Opt, Arg);
+    	++(*ArgNum);
+    } else if (strcmp (Opt, "--target") == 0) {
+    	OptTarget (Opt, Arg);
+    	++(*ArgNum);
+    } else if (strcmp (Opt, "--verbose") == 0) {
+       	OptVerbose (Opt);
+    } else if (strcmp (Opt, "--version") == 0) {
+       	OptVersion (Opt);
+    } else {
+        UnknownOption (Opt);
+    }
 }
 
 
@@ -676,13 +818,17 @@ int main (int argc, char* argv [])
 
 	    switch (Arg [1]) {
 
+		case '-':
+		    LongOption (&I, argv);
+		    break;
+
 		case 'A':
 		    /* Strict ANSI mode (compiler) */
-		    CmdAddArg (&CC65, "-A");
+		    OptAnsi (Arg);
 		    break;
 
 		case 'C':
-		    if (Arg[2] == 'l' && Arg[3] == '\0') {
+	   	    if (Arg[2] == 'l' && Arg[3] == '\0') {
 			/* Make local variables static */
 			CmdAddArg (&CC65, "-Cl");
 		    } else {
@@ -699,17 +845,16 @@ int main (int argc, char* argv [])
 
 		case 'I':
 		    /* Include directory (compiler) */
-		    CmdAddArg (&CC65, "-I");
-		    CmdAddArg (&CC65, GetArg (&I, argv, 2));
+		    OptIncludeDir (Arg, GetArg (&I, argv, 2));
 		    break;
 
-		case 'L':
+	   	case 'L':
 		    if (Arg[2] == 'n') {
-			/* VICE label file (linker) */
-			CmdAddArg (&LD65, "-Ln");
-			CmdAddArg (&LD65, GetArg (&I, argv, 3));
+		      	/* VICE label file (linker) */
+		      	CmdAddArg (&LD65, "-Ln");
+		      	CmdAddArg (&LD65, GetArg (&I, argv, 3));
 		    } else {
-	    		ArgError (Arg);
+	    	      	UnknownOption (Arg);
 		    }
 	    	    break;
 
@@ -723,49 +868,45 @@ int main (int argc, char* argv [])
 		    DontLink = DontAssemble = 1;
 		    break;
 
-		case 'T':
+	   	case 'T':
 		    /* Include source as comment (compiler) */
 		    CmdAddArg (&CC65, "-T");
 		    break;
 
 		case 'V':
 		    /* Print version number */
-		    fprintf (stderr,
-			     "cl65 V%u.%u.%u - (C) Copyright 1998-99 Ullrich von Bassewitz\n",
-			     VER_MAJOR, VER_MINOR, VER_PATCH);
-		    break;
+	       	    OptVersion (Arg);
+	   	    break;
 
-		case 'W':
-		    /* Suppress warnings - compiler and assembler */
-		    CmdAddArg (&CC65, "-W");
+	   	case 'W':
+	   	    /* Suppress warnings - compiler and assembler */
+	   	    CmdAddArg (&CC65, "-W");
 	     	    CmdAddArg (&CA65, "-W");
-		    CmdAddArg (&CA65, "0");
-		    break;
+	   	    CmdAddArg (&CA65, "0");
+	   	    break;
 
-		case 'c':
-		    /* Don't link the resulting files */
-		    DontLink = 1;
-		    break;
+	   	case 'c':
+	   	    /* Don't link the resulting files */
+	   	    DontLink = 1;
+	   	    break;
 
 		case 'd':
 		    /* Debug mode (compiler) */
-		    CmdAddArg (&CC65, "-d");
+		    OptDebug (Arg);
 		    break;
 
 		case 'g':
 		    /* Debugging - add to compiler and assembler */
-		    CmdAddArg (&CC65, "-g");
-		    CmdAddArg (&CA65, "-g");
+		    OptDebugInfo (Arg);
 		    break;
 
 		case 'h':
 		case '?':
 		    /* Print help - cl65 */
-	     	    Usage ();
-		    exit (EXIT_SUCCESS);
+	     	    OptHelp (Arg);
 		    break;
 
-		case 'm':
+	   	case 'm':
 		    /* Create a map file (linker) */
 		    CmdAddArg (&LD65, "-m");
 		    CmdAddArg (&LD65, GetArg (&I, argv, 2));
@@ -778,23 +919,21 @@ int main (int argc, char* argv [])
 
 		case 't':
 		    /* Set target system - compiler and linker */
-		    SetTargetByName (GetArg (&I, argv, 2));
+		    OptTarget (Arg, GetArg (&I, argv, 2));
 		    break;
 
 		case 'v':
 		    if (Arg [2] == 'm') {
 	     	     	/* Verbose map file (linker) */
 		     	CmdAddArg (&LD65, "-vm");
-		    } else {
-		     	/* Verbose mode (compiler, assembler, linker) */
-		     	CmdAddArg (&CC65, "-v");
-		     	CmdAddArg (&CA65, "-v");
-		     	CmdAddArg (&LD65, "-v");
-		    }
-		    break;
+	   	    } else {
+	   	     	/* Verbose mode (compiler, assembler, linker) */
+			OptVerbose (Arg);
+	   	    }
+	   	    break;
 
 	     	default:
-	     	    ArgError (Arg);
+	     	    UnknownOption (Arg);
 	    }
 	} else {
 

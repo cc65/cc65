@@ -2,9 +2,10 @@
 ; Ullrich von Bassewitz, 16.05.2000
 ;
 
-; errno variable
+; Variables and functions
 
-        .global         __errno
+        .global         __errno, __oserror
+        .global         __maperrno, __osmaperrno
 
 ; Error codes, must match the values in the C headers
 ENOENT		=	1	; No such file or directory

@@ -83,7 +83,7 @@
 #define CH_RTEE     	0x04
 #define CH_CROSS    	0x13
 #define CH_HLINE        0x12
-#define CH_VLINE        0x16
+#define CH_VLINE        0x7C
 
 /* color defines */
 

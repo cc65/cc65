@@ -471,14 +471,14 @@ void NewFunc (SymEntry* Func)
     /* Generate the exit code */
     g_leave ();
 
-    /* Eat the closing brace */
-    ConsumeRCurly ();
-
     /* Emit references to imports/exports */
     EmitExternals ();
 
     /* Leave the lexical level */
     LeaveFunctionLevel ();
+
+    /* Eat the closing brace */
+    ConsumeRCurly ();
 
     /* Switch back to the old segments */
     PopSegments ();

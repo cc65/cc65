@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -39,7 +39,8 @@
 
 /* cc65 */
 #include "error.h"
-#include "loop.h"
+#include "loop.h" 
+#include "stackptr.h"
 
 
 
@@ -60,14 +61,14 @@ static LoopDesc* LoopStack = 0;
 
 
 
-LoopDesc* AddLoop (unsigned SP, unsigned BreakLabel, unsigned ContinueLabel)
+LoopDesc* AddLoop (unsigned BreakLabel, unsigned ContinueLabel)
 /* Create and add a new loop descriptor. */
 {
     /* Allocate a new struct */
     LoopDesc* L = xmalloc (sizeof (LoopDesc));
 
     /* Fill in the data */
-    L->StackPtr	        = SP;
+    L->StackPtr	        = StackPtr;
     L->BreakLabel       = BreakLabel;
     L->ContinueLabel   	= ContinueLabel;
 

@@ -50,7 +50,6 @@
 #include "global.h"
 #include "loop.h"
 #include "scanner.h"
-#include "stackptr.h"
 #include "stmt.h"
 #include "swstmt.h"
 
@@ -126,7 +125,7 @@ void SwitchStatement (void)
     ExitLabel = GetLocalLabel ();
 
     /* Create a loop so we may use break. */
-    AddLoop (StackPtr, ExitLabel, 0);
+    AddLoop (ExitLabel, 0);
 
     /* Create the collection for the case node tree */
     Nodes = NewCollection ();

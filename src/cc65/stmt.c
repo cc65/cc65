@@ -202,7 +202,7 @@ static void DoStatement (void)
     NextToken ();
 
     /* Add the loop to the loop stack */
-    AddLoop (StackPtr, BreakLabel, ContinueLabel);
+    AddLoop (BreakLabel, ContinueLabel);
 
     /* Define the loop label */
     g_defcodelabel (LoopLabel);
@@ -242,7 +242,7 @@ static void WhileStatement (void)
     /* Add the loop to the loop stack. In case of a while loop, the loop head
      * label is used for continue statements.
      */
-    AddLoop (StackPtr, BreakLabel, LoopLabel);
+    AddLoop (BreakLabel, LoopLabel);
 
     /* Define the head label */
     g_defcodelabel (LoopLabel);
@@ -393,7 +393,7 @@ static void ForStatement (void)
     /* Add the loop to the loop stack. A continue jumps to the start of the
      * the increment condition.
      */
-    AddLoop (StackPtr, BreakLabel, IncLabel);
+    AddLoop (BreakLabel, IncLabel);
 
     /* Skip the opening paren */
     ConsumeLParen ();
@@ -602,7 +602,7 @@ int Statement (int* PendingToken)
                     ExprLoad (CF_NONE, &Expr);
                 }
                 /* If the statement didn't generate code, and is not of type
-                 * void, emit a warning 
+                 * void, emit a warning
                  */
                 if (GetCodePos () == Start && !IsTypeVoid (Expr.Type)) {
                     Warning ("Statement has no effect");

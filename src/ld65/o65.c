@@ -707,7 +707,7 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
 
 
 
-static void O65WriteTextSeg (O65Desc* D, Memory* M attribute ((unused)))
+static void O65WriteTextSeg (O65Desc* D)
 /* Write the code segment to the o65 output file */
 {
     /* Initialize variables */
@@ -722,7 +722,7 @@ static void O65WriteTextSeg (O65Desc* D, Memory* M attribute ((unused)))
 
 
 
-static void O65WriteDataSeg (O65Desc* D, Memory* M attribute ((unused)))
+static void O65WriteDataSeg (O65Desc* D)
 /* Write the data segment to the o65 output file */
 {
     /* Initialize variables */
@@ -737,7 +737,7 @@ static void O65WriteDataSeg (O65Desc* D, Memory* M attribute ((unused)))
 
 
 
-static void O65WriteBssSeg (O65Desc* D, Memory* M attribute ((unused)))
+static void O65WriteBssSeg (O65Desc* D)
 /* "Write" the bss segments to the o65 output file. This will only update
  * the relevant header fields.
  */
@@ -754,7 +754,7 @@ static void O65WriteBssSeg (O65Desc* D, Memory* M attribute ((unused)))
 
 
 
-static void O65WriteZPSeg (O65Desc* D, Memory* M attribute ((unused)))
+static void O65WriteZPSeg (O65Desc* D)
 /* "Write" the zeropage segments to the o65 output file. This will only update
  * the relevant header fields.
  */
@@ -1101,9 +1101,10 @@ void O65SetExport (O65Desc* D, const char* Ident)
 
 
 
-static void O65SetupSegments (O65Desc* D, Memory* M)
+static void O65SetupSegments (O65Desc* D, File* F)
 /* Setup segment assignments */
 {
+    Memory* M;
     MemListNode* N;
     SegDesc* S;
     unsigned TextIdx, DataIdx, BssIdx, ZPIdx;
@@ -1114,24 +1115,30 @@ static void O65SetupSegments (O65Desc* D, Memory* M)
     D->BssCount  = 0;
     D->ZPCount   = 0;
 
-    /* Walk through the segment list and count the segment types */
-    N = M->SegList;
-    while (N) {
+    /* Walk over the memory list */
+    M = F->MemList;
+    while (M) {
+        /* Walk through the segment list and count the segment types */
+        N = M->SegList;
+        while (N) {
 
-       	/* Get the segment from the list node */
-       	S = N->Seg;
+            /* Get the segment from the list node */
+            S = N->Seg;
 
-       	/* Check the segment type. */
-	switch (O65SegType (S)) {
-	    case O65SEG_TEXT:	D->TextCount++;	break;
-	    case O65SEG_DATA:	D->DataCount++; break;
-	    case O65SEG_BSS:	D->BssCount++;	break;
-	    case O65SEG_ZP:	D->ZPCount++;	break;
-	    default:		Internal ("Invalid return from O65SegType");
-      	}
+            /* Check the segment type. */
+            switch (O65SegType (S)) {
+                case O65SEG_TEXT:   D->TextCount++; break;
+                case O65SEG_DATA:   D->DataCount++; break;
+                case O65SEG_BSS:    D->BssCount++;  break;
+                case O65SEG_ZP:	    D->ZPCount++;   break;
+                default:	    Internal ("Invalid return from O65SegType");
+            }
 
-	/* Next segment node */
-	N = N->Next;
+            /* Next segment node */
+            N = N->Next;
+        }
+        /* Next memory area */
+        M = M->FNext;
     }
 
     /* Allocate memory according to the numbers */
@@ -1142,25 +1149,30 @@ static void O65SetupSegments (O65Desc* D, Memory* M)
 
     /* Walk again through the list and setup the segment arrays */
     TextIdx = DataIdx = BssIdx = ZPIdx = 0;
-    N = M->SegList;
-    while (N) {
+    M = F->MemList;
+    while (M) {
 
-	/* Get the segment from the list node */
-	S = N->Seg;
+        N = M->SegList;
+        while (N) {
 
-	/* Check the segment type. */
-	switch (O65SegType (S)) {
-	    case O65SEG_TEXT:	D->TextSeg [TextIdx++] = S;	break;
-	    case O65SEG_DATA:	D->DataSeg [DataIdx++] = S;	break;
-	    case O65SEG_BSS:	D->BssSeg [BssIdx++]   = S;  	break;
-	    case O65SEG_ZP:	D->ZPSeg [ZPIdx++]     = S;    	break;
-	    default:		Internal ("Invalid return from O65SegType");
-      	}
+            /* Get the segment from the list node */
+            S = N->Seg;
 
-	/* Next segment node */
-	N = N->Next;
+            /* Check the segment type. */
+            switch (O65SegType (S)) {
+                case O65SEG_TEXT:   D->TextSeg [TextIdx++] = S;	break;
+                case O65SEG_DATA:   D->DataSeg [DataIdx++] = S;	break;
+                case O65SEG_BSS:    D->BssSeg [BssIdx++]   = S; break;
+                case O65SEG_ZP:	    D->ZPSeg [ZPIdx++]     = S; break;
+                default:	    Internal ("Invalid return from O65SegType");
+            }
+
+            /* Next segment node */
+            N = N->Next;
+        }
+        /* Next memory area */
+        M = M->FNext;
     }
-
 }
 
 
@@ -1216,18 +1228,11 @@ static void O65SetupHeader (O65Desc* D)
 void O65WriteTarget (O65Desc* D, File* F)
 /* Write an o65 output file */
 {
-    Memory* M;
     char OptBuf [256];	/* Buffer for option strings */
     time_t T;
 
     /* Place the filename in the control structure */
     D->Filename = F->Name;
-
-    /* The o65 format uses only one memory area per file. Check that. */
-    M = F->MemList;
-    if (M->Next != 0) {
-     	Warning ("Cannot handle more than one memory area for o65 format");
-    }
 
     /* Check for unresolved symbols. The function O65Unresolved is called
      * if we get an unresolved symbol.
@@ -1240,7 +1245,7 @@ void O65WriteTarget (O65Desc* D, File* F)
     }
 
     /* Setup the segment arrays */
-    O65SetupSegments (D, M);
+    O65SetupSegments (D, F);
 
     /* Setup additional stuff in the header */
     O65SetupHeader (D);
@@ -1265,16 +1270,16 @@ void O65WriteTarget (O65Desc* D, File* F)
     O65WriteHeader (D);
 
     /* Write the text segment */
-    O65WriteTextSeg (D, M);
+    O65WriteTextSeg (D);
 
     /* Write the data segment */
-    O65WriteDataSeg (D, M);
+    O65WriteDataSeg (D);
 
     /* "Write" the bss segments */
-    O65WriteBssSeg (D, M);
+    O65WriteBssSeg (D);
 
     /* "Write" the zeropage segments */
-    O65WriteZPSeg (D, M);
+    O65WriteZPSeg (D);
 
     /* Write the undefined references list */
     O65WriteImports (D);

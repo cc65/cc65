@@ -97,14 +97,6 @@ void FreeCollection (Collection* C)
 
 
 
-unsigned CollCount (const Collection* C)
-/* Return the number of items in the collection */
-{
-    return C->Count;
-}
-
-
-
 void CollInsert (Collection* C, void* Item, unsigned Index)
 /* Insert the data at the given position in the collection */
 {
@@ -134,77 +126,6 @@ void CollInsert (Collection* C, void* Item, unsigned Index)
 
     /* Store the new item */
     C->Items[Index] = Item;
-}
-
-
-
-void CollAppend (Collection* C, void* Item)
-/* Append an item to the end of the collection */
-{
-    /* Insert the item at the end of the current list */
-    CollInsert (C, Item, C->Count);
-}
-
-
-
-void* CollAt (Collection* C, unsigned Index)
-/* Return the item at the given index */
-{
-    /* Check the index */
-    PRECONDITION (Index < C->Count);
-
-    /* Return the element */
-    return C->Items[Index];
-}
-
-
-
-const void* CollConstAt (const Collection* C, unsigned Index)
-/* Return the item at the given index */
-{
-    /* Check the index */
-    PRECONDITION (Index < C->Count);
-
-    /* Return the element */
-    return C->Items[Index];
-}
-
-
-
-void* CollLast (Collection* C)
-/* Return the last item in a collection */
-{
-    /* We must have at least one entry */
-    PRECONDITION (C->Count > 0);
-
-    /* Return the element */
-    return C->Items[C->Count-1];
-}
-
-
-
-const void* CollConstLast (const Collection* C)
-/* Return the last item in a collection */
-{
-    /* We must have at least one entry */
-    PRECONDITION (C->Count > 0);
-
-    /* Return the element */
-    return C->Items[C->Count-1];
-}
-
-
-
-void* CollPop (Collection* C)
-/* Remove the last segment from the stack and return it. Calls FAIL if the
- * collection is empty.
- */
-{
-    /* We must have at least one entry */
-    PRECONDITION (C->Count > 0);
-
-    /* Return the element */
-    return C->Items[--C->Count];
 }
 
 
@@ -257,31 +178,6 @@ void CollDeleteItem (Collection* C, const void* Item)
     /* Delete the item with this index */
     --C->Count;
     memmove (C->Items+Index, C->Items+Index+1, (C->Count-Index) * sizeof (void*));
-}
-
-
-
-void CollDeleteAll (Collection* C)
-/* Delete all items from the given collection. This will not free the items
- * itself, it will only remove the pointers.
- */
-{
-    /* This one is easy... */
-    C->Count = 0;
-}
-
-
-
-void CollReplace (Collection* C, void* Item, unsigned Index)
-/* Replace the item at the given position. The old item will not be freed,
- * just the pointer will et replaced.
- */
-{
-    /* Check the index */
-    PRECONDITION (Index < C->Count);
-
-    /* Replace the item pointer */
-    C->Items[Index] = Item;
 }
 
 

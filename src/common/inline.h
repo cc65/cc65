@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    check.h				     */
+/*				  cfeature.h				     */
 /*                                                                           */
-/*			      Assert like macros			     */
+/*			   Define compiler features			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/* (C) 2001      Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,59 +33,26 @@
 
 
 
-#ifndef CHECK_H
-#define CHECK_H
-
-
-
-#include "attrib.h"
+#ifndef CFEATURE_H
+#define CFEATURE_H
 
 
 
 /*****************************************************************************/
-/*                                   Data                                    */
+/*				    Defines				     */
 /*****************************************************************************/
 
 
 
-extern const char* MsgInternalError;		/* "Internal error: "        */
-extern const char* MsgPrecondition;		/* "Precondition violated: " */
-extern const char* MsgCheckFailed;		/* "Check failed: "          */
-extern const char* MsgProgramAborted;		/* "Program aborted: "       */
+#if defined(__GNUC__)
+#  define HAVE_INLINE	1
+#  define INLINE    	static __inline__
+#endif
 
 
 
-extern void (*CheckFailed) (const char* Msg, const char* Cond,
-       	       	            const char* File, unsigned Line)
-			    attribute ((noreturn));
-/* Function pointer that is called from check if the condition code is true. */
+/* End of cfeature.h */
 
-
-
-/*****************************************************************************/
-/*                                   Code                                    */
-/*****************************************************************************/
-
-
-
-#define FAIL(s) CheckFailed (MsgInternalError, s, __FILE__, __LINE__)
-/* Fail macro. Is used if something evil happens, calls checkfailed directly. */
-
-#define ABORT(s) CheckFailed (MsgProgramAborted, s, __FILE__, __LINE__)
-/* Use this one instead of FAIL if there is no internal program error but an
- * error condition that is caused by the user or operating system (FAIL and
- * ABORT are essentially the same but the message differs).
- */
-
-#define PRECONDITION(c) \
-    { if (!(c)) CheckFailed (MsgPrecondition, #c, __FILE__, __LINE__); }
-
-#define CHECK(c)	\
-    { if (!(c)) CheckFailed (MsgCheckFailed, #c, __FILE__, __LINE__); }
-
-
-
-/* End of check.h */
 #endif
 
 

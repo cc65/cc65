@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -55,10 +55,10 @@ const char* MsgProgramAborted	= "Program aborted: ";
 
 
 static void DefaultCheckFailed (const char* msg, const char* cond,
-	   			int code, const char* file, unsigned line)
+	   			const char* file, unsigned line)
 	   			attribute ((noreturn));
 
-void (*CheckFailed) (const char* Msg, const char* Cond, int Code,
+void (*CheckFailed) (const char* Msg, const char* Cond,
        	       	     const char* File, unsigned Line) attribute ((noreturn))
 		= DefaultCheckFailed;
 /* Function pointer that is called from check if the condition code is true. */
@@ -66,34 +66,16 @@ void (*CheckFailed) (const char* Msg, const char* Cond, int Code,
 
 
 /*****************************************************************************/
-/*		   	  	     Code	 		   	     */
+/*		   	  	     Code      	 		   	     */
 /*****************************************************************************/
 
 
 
 static void DefaultCheckFailed (const char* Msg, const char* Cond,
-				int Code, const char* File, unsigned Line)
+				const char* File, unsigned Line)
 {
-    /* Log the error */
-    if (Code) {
-	AbEnd ("%s%s (= %d), file `%s', line %u", Msg, Cond, Code, File, Line);
-    } else {
-       	AbEnd ("%s%s, file `%s', line %u", Msg, Cond, File, Line);
-    }
-}
-
-
-
-void Check (const char* Msg, const char* Cond, int Code,
-	    const char* File, unsigned Line)
-/* This function is called from all check macros (see below). It checks,
- * wether the given Code is true (!= 0). If so, it calls the CheckFailed
- * vector with the given strings. If not, it simply returns.
- */
-{
-    if (Code != 0) {
-	CheckFailed (Msg, Cond, Code, File, Line);
-    }
+    /* Output a diagnostic and abort */
+    AbEnd ("%s%s, file `%s', line %u", Msg, Cond, File, Line);
 }
 
 

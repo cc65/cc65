@@ -99,24 +99,26 @@ AlreadyInitialized:
 ; void mouse_done (void);
 ;
 
-.proc	_mouse_done
-
+_mouse_done:
        	lda    	Initialized		; Initialized?
-       	beq    	@L1   	       	      	; Jump if no
+       	beq    	mddone			; Jump if no
    	lda 	#0
        	sta    	Initialized		; Reset the initialized flag
    	lda    	OldInitStatus		; Load the old BASIC int bit
    	and	#$01			; Mask it
-  	sei 				; Disable interrupts
    	ora	INIT_STATUS		; Restore the old state
    	sta	INIT_STATUS
+
+; Disable the mouse sprite
+
+DisableSprite:
 	lda    	#$FE			; Clear bit for sprite #0
+	sei 				; Disable interrupts
 	and 	VIC_SPR_ENA
 	sta 	VIC_SPR_ENA	     	; Disable sprite
       	cli 				; Enable interrupts
-@L1: 	rts
+mddone: rts
 
-.endproc
 
 ; --------------------------------------------------------------------------
 ;
@@ -127,13 +129,7 @@ AlreadyInitialized:
 
        	lda 	Invisible		; Get the flag
 	bne 	@L1			; Jump if already invisible
-
-	lda    	#$FE			; Clear bit for sprite #0
-  	sei 				; Disable interrupts
-	and 	VIC_SPR_ENA
-	sta 	VIC_SPR_ENA	     	; Disable sprite
-      	cli 				; Enable interrupts
-
+	jsr	DisableSprite		; Disable the mouse sprite
 @L1:	inc 	Invisible		; Set the flag to invisible
 	rts
 

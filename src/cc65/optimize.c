@@ -1765,19 +1765,19 @@ static void OptLoads (void)
 
 	/* Search for
 	 *
-	 *  	adc	#xx
+	 *  	adc	xx		 
 	 *  	bcc    	*+3
 	 *  	inx
 	 *
 	 * Remove the handling of the high byte if the X register
 	 * is not used any more
 	 */
-     	} else if (LineMatch (L, "\tadc\t#") 		&&
-     	    GetNextCodeLines (L, L2, 3)			&&
+     	} else if (LineMatch (L, "\tadc\t") 		&&
+     	    GetNextCodeLines (L, L2, 3)	 		&&
      	    LineFullMatch (L2[0], "\tbcc\t*+3")		&&
        	    LineFullMatch (L2[1], "\tinx")		&&
-     	    L2[1]->Next	     				&&
-     	    IsHint (L2[1]->Next, "x:!")			&&
+     	    L2[1]->Next	     		 		&&
+     	    IsHint (L2[1]->Next, "x:!")	 		&&
 	    !RegXUsed (L2[1])) {
 
      	    /* Delete the lines */
@@ -1785,14 +1785,14 @@ static void OptLoads (void)
 
 	/* Search for
 	 *
-	 *  	sbc	#xx
+	 *  	sbc	xx
 	 *  	bcs    	*+3
 	 *  	dex
 	 *
 	 * Remove the handling of the high byte if the X register
 	 * is not used any more
 	 */
-     	} else if (LineMatch (L, "\tsbc\t#") 		&&
+     	} else if (LineMatch (L, "\tsbc\t") 		&&
      	    GetNextCodeLines (L, L2, 3)			&&
      	    LineFullMatch (L2[0], "\tbcs\t*+3")		&&
        	    LineFullMatch (L2[1], "\tdex")		&&
@@ -1809,7 +1809,7 @@ static void OptLoads (void)
 	if (!LineFullMatch (L, "\tldx\t#$00")) {
 	    /* Next line */
 	    goto NextLine;
-	}				
+	}
 
 	/* Search for:
 	 *

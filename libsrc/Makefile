@@ -14,6 +14,7 @@ LD = ../../src/ld65/ld65
 
 # List of all targets
 ALLTARGETS =   	apple2 		\
+		apple2enh	\
        	       	atari  		\
        	       	atmos  		\
                 c16    		\
@@ -54,6 +55,41 @@ apple2lib:
 	cp apple2/apple2-280-192-6.tgi a2.hi.tgi
 	cp apple2/apple2-40-40-16.tgi a2.lo.tgi
 	cp apple2/apple2-stdjoy.joy a2.stdjoy.joy
+
+#-----------------------------------------------------------------------------
+# Apple //e
+
+apple2enhlib:
+	for i in apple2 apple2enh common runtime conio dbg em joystick tgi zlib; do \
+	    AS=$(AS) \
+	    CC=$(CC) \
+	    LD=$(LD) \
+	    AFLAGS="-t apple2enh -I../../asminc" \
+	    CFLAGS="-Osir -g -T -t apple2enh --forget-inc-paths -I. -I../../include" \
+	    $(MAKE) -C $$i || exit 1; \
+	done
+	for i in common runtime conio dbg em joystick tgi zlib; do \
+	    $(AR) a apple2enh.lib $$i/*.o;\
+	done
+	for objfile in apple2/*.o; do \
+	    basefile=`basename $$objfile .o`; \
+	    if [ -f ../apple2enh/$$basefile ]; then \
+		$(AR) a apple2enh.lib ../apple2enh/$$basefile; \
+	    else \
+		$(AR) a apple2enh.lib $$objfile; \
+	    fi \
+	done
+	for objfile in apple2enh/*.o; do \
+	    basefile=`basename $$objfile .o`; \
+	    if [ \! -f ../apple2/$$basefile ]; then \
+	     	$(AR) a apple2enh.lib $$objfile; \
+	    fi \
+	done
+	mv apple2/crt0.o apple2enh.o
+	cp apple2/apple2-lc.emd a2e.lc.emd
+	cp apple2/apple2-280-192-6.tgi a2e.hi.tgi
+	cp apple2/apple2-40-40-16.tgi a2e.lo.tgi
+	cp apple2/apple2-stdjoy.joy a2e.stdjoy.joy
 
 #-----------------------------------------------------------------------------
 # Atari

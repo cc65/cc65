@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -229,7 +229,7 @@ int F_AllocRegVar (Function* F, const type* Type)
  */
 {
     /* Allow register variables only on top level and if enabled */
-    if (EnableRegVars && GetLexicalLevel () == LEX_LEVEL_FUNCTION) {
+    if (IS_Get (&EnableRegVars) && GetLexicalLevel () == LEX_LEVEL_FUNCTION) {
 
       	/* Get the size of the variable */
       	unsigned Size = CheckedSizeOf (Type);
@@ -403,7 +403,7 @@ void NewFunc (SymEntry* Func)
     g_enter (TypeOf (Func->Type), F_GetParamSize (CurrentFunc));
 
     /* If stack checking code is requested, emit a call to the helper routine */
-    if (CheckStack) {
+    if (IS_Get (&CheckStack)) {
     	g_stackcheck ();
     }
 

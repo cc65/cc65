@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -38,12 +38,20 @@
 
 
 
+/* common */
+#include "intstack.h"
+
+
+
 /*****************************************************************************/
 /*				     Data				     */
 /*****************************************************************************/
 
 
 
+extern unsigned char	AddSource;		/* Add source lines as comments */
+extern unsigned char	DebugInfo;		/* Add debug info to the obj */
+extern unsigned char	CreateDep;		/* Create a dependency file */
 extern unsigned char	ANSI;			/* Strict ANSI flag */
 extern unsigned char	WriteableStrings;	/* Literal strings are r/w */
 extern unsigned char	NoWarn;			/* Suppress warnings */
@@ -51,17 +59,16 @@ extern unsigned char	Optimize;		/* Optimize flag */
 extern unsigned long	OptDisable;		/* Optimizer passes to disable */
 extern unsigned char	FavourSize;		/* Favour size over speed */
 extern unsigned	       	CodeSizeFactor;		/* Size factor for generated code */
-extern unsigned char    InlineStdFuncs;	       	/* Inline some known functions */
-extern unsigned char	EnableRegVars;		/* Enable register variables */
 extern unsigned         RegisterSpace;          /* Space available for register vars */
-extern unsigned char	AllowRegVarAddr;	/* Allow taking addresses of register vars */
-extern unsigned char	RegVarsToCallStack;	/* Save reg variables on call stack */
-extern unsigned char   	StaticLocals;		/* Make local variables static */
-extern unsigned char	SignedChars;		/* Make characters signed by default */
-extern unsigned char	AddSource;		/* Add source lines as comments */
-extern unsigned char	DebugInfo;		/* Add debug info to the obj */
-extern unsigned char	CreateDep;		/* Create a dependency file */
-extern unsigned char	CheckStack;		/* Generate stack overflow checks */
+
+/* Stackable options */
+extern IntStack         InlineStdFuncs;	       	/* Inline some known functions */
+extern IntStack         EnableRegVars;		/* Enable register variables */
+extern IntStack         AllowRegVarAddr;	/* Allow taking addresses of register vars */
+extern IntStack         RegVarsToCallStack;	/* Save reg variables on call stack */
+extern IntStack         StaticLocals;		/* Make local variables static */
+extern IntStack         SignedChars;		/* Make characters signed by default */
+extern IntStack         CheckStack;		/* Generate stack overflow checks */
 
 
 

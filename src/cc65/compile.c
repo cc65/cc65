@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -291,16 +291,19 @@ void Compile (const char* FileName)
 	DefineNumericMacro ("__STRICT_ANSI__", 1);
     }
 
-    /* Optimization macros */
+    /* Optimization macros. Since no source code has been parsed for now, the
+     * IS_Get functions access the values in effect now, regardless of any
+     * changes using #pragma later.
+     */
     if (Optimize) {
 	DefineNumericMacro ("__OPT__", 1);
 	if (FavourSize == 0) {
 	    DefineNumericMacro ("__OPT_i__", 1);
 	}
-	if (EnableRegVars) {
+	if (IS_Get (&EnableRegVars)) {
 	    DefineNumericMacro ("__OPT_r__", 1);
 	}
-	if (InlineStdFuncs) {
+       	if (IS_Get (&InlineStdFuncs)) {
 	    DefineNumericMacro ("__OPT_s__", 1);
 	}
     }

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -346,10 +346,10 @@ static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
 
 
 static void OptCheckStack (const char* Opt attribute ((unused)),
-			   const char* Arg attribute ((unused)))
+	       		   const char* Arg attribute ((unused)))
 /* Handle the --check-stack option */
 {
-    CheckStack = 1;
+    IS_Set (&CheckStack, 1);
 }
 
 
@@ -593,7 +593,7 @@ static void OptRegisterVars (const char* Opt attribute ((unused)),
                              const char* Arg attribute ((unused)))
 /* Handle the --register-vars option */
 {
-    EnableRegVars = 1;
+    IS_Set (&EnableRegVars, 1);
 }
 
 
@@ -611,19 +611,19 @@ static void OptRodataName (const char* Opt attribute ((unused)), const char* Arg
 
 
 static void OptSignedChars (const char* Opt attribute ((unused)),
-			    const char* Arg attribute ((unused)))
+	       		    const char* Arg attribute ((unused)))
 /* Make default characters signed */
 {
-    SignedChars = 1;
+    IS_Set (&SignedChars, 1);
 }
 
 
 
 static void OptStaticLocals (const char* Opt attribute ((unused)),
-			     const char* Arg attribute ((unused)))
+	       		     const char* Arg attribute ((unused)))
 /* Place local variables in static storage */
 {
-    StaticLocals = 1;
+    IS_Set (&StaticLocals, 1);
 }
 
 
@@ -798,10 +798,10 @@ int main (int argc, char* argv[])
 			        CodeSizeFactor = 200;
     	       	    	     	break;
 	       	    	    case 'r':
-	       	    	  	EnableRegVars = 1;
+	       	    	  	IS_Set (&EnableRegVars, 1);
 	       		  	break;
 	       		    case 's':
-	       		       	InlineStdFuncs = 1;
+	       		       	IS_Set (&InlineStdFuncs, 1);
 	       	    	  	break;
 	       		}
 	       	    }

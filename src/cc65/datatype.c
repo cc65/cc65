@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -138,7 +138,7 @@ void TypeFree (type* T)
 int SignExtendChar (int C)
 /* Do correct sign extension of a character */
 {
-    if (SignedChars && (C & 0x80) != 0) {
+    if (IS_Get (&SignedChars) && (C & 0x80) != 0) {
        	return C | ~0xFF;
     } else {
        	return C & 0xFF;
@@ -150,7 +150,7 @@ int SignExtendChar (int C)
 type GetDefaultChar (void)
 /* Return the default char type (signed/unsigned) depending on the settings */
 {
-    return SignedChars? T_SCHAR : T_UCHAR;
+    return IS_Get (&SignedChars)? T_SCHAR : T_UCHAR;
 }
 
 

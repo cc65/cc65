@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -68,6 +68,7 @@ typedef enum {
     PR_CODESEG,
     PR_DATASEG,
     PR_REGVARADDR,
+    PR_REGVARS,
     PR_RODATASEG,
     PR_SIGNEDCHARS,
     PR_STATICLOCALS,
@@ -86,6 +87,7 @@ static const struct Pragma {
     {   "codeseg",    	PR_CODESEG	},
     {   "dataseg",    	PR_DATASEG	},
     {   "regvaraddr", 	PR_REGVARADDR	},
+    {   "regvars",      PR_REGVARS      },
     {   "rodataseg",  	PR_RODATASEG	},
     {	"signedchars",	PR_SIGNEDCHARS	},
     {	"staticlocals",	PR_STATICLOCALS	},
@@ -220,24 +222,64 @@ static void CharMapPragma (StrBuf* B)
 
 
 
-static void FlagPragma (StrBuf* B, unsigned char* Flag)
+static void FlagPragma (StrBuf* B, IntStack* Stack)
 /* Handle a pragma that expects a boolean paramater */
 {
     ident Ident;
     long  Val;
+    int   Push;
 
-    if (SB_GetSym (B, Ident)) {
+    /* Try to read an identifier */
+    int IsIdent = SB_GetSym (B, Ident);
+
+    /* Check if we have a first argument named "pop" */
+    if (IsIdent && strcmp (Ident, "pop") == 0) {
+        if (IS_GetCount (Stack) < 2) {
+            Error ("Cannot pop, stack is empty");
+        } else {
+            (void) IS_Pop (Stack);
+        }
+        /* No other arguments allowed */
+        return;
+    }
+
+    /* Check if we have a first argument named "push" */
+    if (IsIdent && strcmp (Ident, "push") == 0) {
+        Push = 1;
+        SB_SkipWhite (B);
+        if (SB_Get (B) != ',') {
+            Error ("Comma expected");
+            return;
+        }
+        SB_SkipWhite (B);
+        IsIdent = SB_GetSym (B, Ident);
+    } else {
+        Push = 0;
+    }
+
+    /* Boolean argument follows */
+    if (IsIdent) {
         if (strcmp (Ident, "true") == 0 || strcmp (Ident, "on") == 0) {
-            *Flag = 1;
+            Val = 1;
         } else if (strcmp (Ident, "false") == 0 || strcmp (Ident, "off") == 0) {
-            *Flag = 0;
+            Val = 0;
         } else {
             Error ("Pragma argument must be one of `on', `off', `true' or `false'");
         }
-    } else if (SB_GetNumber (B, &Val)) {
-	*Flag = (Val != 0);
-    } else {
+    } else if (!SB_GetNumber (B, &Val)) {
         Error ("Invalid pragma argument");
+        return;
+    }
+
+    /* Set/push the new value */
+    if (Push) {
+        if (IS_IsFull (Stack)) {
+            Error ("Cannot push: stack overflow");
+        } else {
+            IS_Push (Stack, Val);
+        }
+    } else {
+        IS_Set (Stack, Val);
     }
 }
 
@@ -317,7 +359,11 @@ static void ParsePragma (void)
      	    break;
 
      	case PR_REGVARADDR:
-     	    FlagPragma (&B, &AllowRegVarAddr);
+       	    FlagPragma (&B, &AllowRegVarAddr);
+     	    break;
+
+     	case PR_REGVARS:
+       	    FlagPragma (&B, &EnableRegVars);
      	    break;
 
      	case PR_RODATASEG:
@@ -325,7 +371,7 @@ static void ParsePragma (void)
      	    break;
 
      	case PR_SIGNEDCHARS:
-     	    FlagPragma (&B, &SignedChars);
+       	    FlagPragma (&B, &SignedChars);
      	    break;
 
      	case PR_STATICLOCALS:

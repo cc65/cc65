@@ -211,7 +211,7 @@ void DefineData (ExprDesc* Expr)
 	    /* Register variable. Taking the address is usually not
 	     * allowed.
 	     */
-	    if (!AllowRegVarAddr) {
+	    if (IS_Get (&AllowRegVarAddr) == 0) {
 	     	Error ("Cannot take the address of a register variable");
 	    }
 	    /* FALLTHROUGH */
@@ -252,7 +252,7 @@ static void LoadConstant (unsigned Flags, ExprDesc* Expr)
 	    /* Register variable. Taking the address is usually not
 	     * allowed.
 	     */
-	    if (!AllowRegVarAddr) {
+	    if (IS_Get (&AllowRegVarAddr) == 0) {
 	     	Error ("Cannot take the address of a register variable");
 	    }
 	    /* FALLTHROUGH */
@@ -681,7 +681,7 @@ static void FunctionCall (int k, ExprDesc* lval)
 	}
 
     /* Check for known standard functions and inline them if requested */
-    } else if (InlineStdFuncs && IsStdFunc ((const char*) lval->Name)) {
+    } else if (IS_Get (&InlineStdFuncs) && IsStdFunc ((const char*) lval->Name)) {
 
 	/* Inline this function */
        	HandleStdFunc (Func, lval);

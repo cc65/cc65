@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -156,7 +156,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
     unsigned Size = SizeOf (Decl->Type);
 
     /* Check if this is a variable on the stack or in static memory */
-    if (StaticLocals == 0) {
+    if (IS_Get (&StaticLocals) == 0) {
 
         /* Check for an optional initialization */
         if (CurTok.Tok == TOK_ASSIGN) {
@@ -503,7 +503,7 @@ void DeclareLocals (void)
     /* In case we've allocated local variables in this block, emit a call to
      * the stack checking routine if stack checks are enabled.
      */
-    if (CheckStack && InitialStack != oursp) {
+    if (IS_Get (&CheckStack) && InitialStack != oursp) {
        	g_cstackcheck ();
     }
 }

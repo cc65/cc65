@@ -127,94 +127,118 @@ static unsigned OptBoolTransforms (CodeSeg* S)
  */
 {
     unsigned Changes = 0;
-    unsigned I;
-
-    /* Get the number of entries, bail out if we have not enough */
-    unsigned Count = GetCodeEntryCount (S);
-    if (Count < 2) {
-     	return 0;
-    }
 
     /* Walk over the entries */
-    I = 0;
-    while (I < Count-1) {
+    unsigned I = 0;
+    while (I < GetCodeEntryCount (S)) {
+
+	CodeEntry* N;
+	cmp_t Cond;
 
       	/* Get next entry */
        	CodeEntry* E = GetCodeEntry (S, I);
 
 	/* Check for a boolean transformer */
-	if (E->OPC == OPC_JSR && strncmp (E->Arg, "bool", 4) == 0) {
+	if (E->OPC == OPC_JSR                            &&
+	    strncmp (E->Arg, "bool", 4) == 0             &&
+	    (N = GetNextCodeEntry (S, I)) != 0           &&
+	    (N->Info & OF_ZBRA) != 0                     &&
+	    (Cond = FindCmpCond (E->Arg+4)) != CMP_INV) {
 
-	    cmp_t Cond;
-
-	    /* Get the next entry */
-	    CodeEntry* N = GetCodeEntry (S, I+1);
-
-	    /* Check if this is a conditional branch */
-	    if ((N->Info & OF_CBRA) == 0) {
-		/* No conditional branch, bail out */
-		goto NextEntry;
-	    }
+	    CodeEntry* X;
+	    CodeLabel* L;
 
 	    /* Make the boolean transformer unnecessary by changing the
 	     * the conditional jump to evaluate the condition flags that
 	     * are set after the compare directly. Note: jeq jumps if
 	     * the condition is not met, jne jumps if the condition is met.
+     	     * Invert the code if we jump on condition not met.
 	     */
-	    Cond = FindCmpCond (E->Arg + 4);
-	    if (Cond == CMP_INV) {
-		/* Unknown function */
-		goto NextEntry;
-	    }
-
-     	    /* Invert the code if we jump on condition not met. */
        	    if (GetBranchCond (N->OPC) == BC_EQ) {
-	     	/* Jumps if condition false, invert condition */
-	     	Cond = CmpInvertTab [Cond];
+	       	/* Jumps if condition false, invert condition */
+	       	Cond = CmpInvertTab [Cond];
   	    }
 
 	    /* Check if we can replace the code by something better */
  	    switch (Cond) {
 
-	    	case CMP_EQ:
-		    ReplaceOPC (N, OPC_JEQ);
-	    	    break;
+	       	case CMP_EQ:
+	       	    ReplaceOPC (N, OPC_JEQ);
+	      	    break;
 
-	    	case CMP_NE:
-		    ReplaceOPC (N, OPC_JNE);
-	    	    break;
+	      	case CMP_NE:
+	      	    ReplaceOPC (N, OPC_JNE);
+	      	    break;
 
 	       	case CMP_GT:
-		    /* Not now ### */
-		    goto NextEntry;
+		    /* Replace by
+		     *     beq @L
+		     *     jpl Target
+		     * @L: ...
+		     */
+		    if ((X = GetNextCodeEntry (S, I+1)) == 0) {
+		    	/* No such entry */
+		    	goto NextEntry;
+		    }
+		    L = GenCodeLabel (S, X);
+		    X = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L);
+		    InsertCodeEntry (S, X, I+1);
+       	       	    ReplaceOPC (N, OPC_JPL);
+		    break;
 
-	    	case CMP_GE:
-		    ReplaceOPC (N, OPC_JPL);
-	    	    break;
+	      	case CMP_GE:
+	      	    ReplaceOPC (N, OPC_JPL);
+	      	    break;
 
-	    	case CMP_LT:
+	      	case CMP_LT:
+	      	    ReplaceOPC (N, OPC_JMI);
+	      	    break;
+
+	      	case CMP_LE:
+		    /* Replace by
+		     *	   jmi Target
+		     *     jeq Target
+		     */
 		    ReplaceOPC (N, OPC_JMI);
-	    	    break;
+		    L = N->JumpTo;
+       	       	    X = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L);
+		    InsertCodeEntry (S, X, I+2);
+		    break;
 
-	    	case CMP_LE:
-		    /* Not now ### */
-	    	    goto NextEntry;
-
-     	    	case CMP_UGT:
-		    /* Not now ### */
-		    goto NextEntry;
-
-	    	case CMP_UGE:
+     	      	case CMP_UGT:
+		    /* Replace by
+		     *     beq @L
+		     *     jcs Target
+		     * @L: ...
+		     */
+		    if ((X = GetNextCodeEntry (S, I+1)) == 0) {
+		    	/* No such entry */
+		    	goto NextEntry;
+		    }
+		    L = GenCodeLabel (S, X);
+		    X = NewCodeEntry (OPC_BEQ, AM_BRA, L->Name, L);
+		    InsertCodeEntry (S, X, I+1);
        	       	    ReplaceOPC (N, OPC_JCS);
-	    	    break;
+		    break;
 
-	    	case CMP_ULT:
+	     	case CMP_UGE:
+       	       	    ReplaceOPC (N, OPC_JCS);
+	     	    break;
+
+	     	case CMP_ULT:
+	     	    ReplaceOPC (N, OPC_JCC);
+	     	    break;
+
+	     	case CMP_ULE:
+		    /* Replace by
+		     *	   jcc Target
+		     *     jeq Target
+		     */
 		    ReplaceOPC (N, OPC_JCC);
-	    	    break;
-
-	    	case CMP_ULE:
-		    /* Not now ### */
-	    	    goto NextEntry;
+		    L = N->JumpTo;
+       	       	    X = NewCodeEntry (OPC_JEQ, AM_BRA, L->Name, L);
+		    InsertCodeEntry (S, X, I+2);
+		    break;
 
      	    	default:
 	    	    Internal ("Unknown jump condition: %d", Cond);
@@ -223,7 +247,6 @@ static unsigned OptBoolTransforms (CodeSeg* S)
 
 	    /* Remove the call to the bool transformer */
 	    DelCodeEntry (S, I);
-	    --Count;
 
 	    /* Remember, we had changes */
 	    ++Changes;

@@ -16,7 +16,7 @@
 zpstart	= *
 sp:	      	.res   	2      	; Stack pointer
 sreg:	      	.res	2      	; Secondary register/high 16 bit for longs
-regsave:      	.res	2      	; slot to save/restore (E)AX into
+regsave:      	.res	4      	; slot to save/restore (E)AX into
 ptr1:	      	.res	2
 ptr2:	      	.res	2
 ptr3:	      	.res	2

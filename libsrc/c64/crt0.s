@@ -52,14 +52,22 @@ L1:	lda	sp,x
 	lda	#14
 	jsr	BSOUT
 
-; Save system stuff and setup the stack
+; Switch off the BASIC ROM
 
 	lda	$01
-       	tax                     ; Remember in X
+       	pha                     ; Remember the value
 	and	#$F8
        	ora	#$06		; Enable kernal+I/O, disable basic
 	sta	$01
-        stx	mmusave      	; Save the memory configuration
+
+; Clear the BSS data
+
+	jsr	zerobss
+
+; Save system settings and setup the stack
+
+        pla
+        sta	mmusave      	; Save the memory configuration
 
        	tsx
        	stx    	spsave 		; Save the system stack ptr
@@ -68,10 +76,6 @@ L1:	lda	sp,x
 	sta	sp
 	lda	#>(__RAM_START__ + __RAM_SIZE__)
        	sta	sp+1   		; Set argument stack ptr
-
-; Clear the BSS data
-
-	jsr	zerobss
 
 ; Call module constructors
 

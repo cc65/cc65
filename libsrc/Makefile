@@ -76,7 +76,7 @@ atmoslib:
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv atmos/crt0.o atmos.o
-	for i in atmos common runtime; do \
+	for i in common runtime; do \
 	    $(AR) a atmos.lib $$i/*.o;\
 	done
 

@@ -1,18 +1,18 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; void __fastcall__ cbm_setlfs (unsigned char LFN,
-;				unsigned char DEV,
-;				unsigned char SA);
+; void __fastcall__ cbm_k_setlfs (unsigned char LFN,
+;				  unsigned char DEV,
+;				  unsigned char SA);
 ;
 
        	.include     	"cbm.inc"
 
-       	.export	       	_cbm_setlfs
+       	.export	       	_cbm_k_setlfs
 	.import		popa
 	.importzp	tmp1
 
-_cbm_setlfs:
+_cbm_k_setlfs:
   	sta	tmp1		; Save SA
 	jsr	popa		; Get DEV
 	tax

@@ -94,6 +94,19 @@
 
 
 
+/* Kernel level functions */
+void __fastcall__ cbm_k_setlfs (unsigned char LFN, unsigned char DEV,
+                                unsigned char SA);
+void __fastcall__ cbm_k_setnam (const char* Name);
+unsigned __fastcall__ cbm_k_load (unsigned char flag, unsigned addr);
+unsigned __fastcall__ cbm_k_save(unsigned int start, unsigned int end);
+
+/* BASIC-like functions */
+unsigned int cbm_load(const char* name, char device, unsigned int addr);
+unsigned int cbm_save(const char* name, char device,
+                      unsigned int start, unsigned int end);
+
+
 /* End of cbm.h */
 #endif
 

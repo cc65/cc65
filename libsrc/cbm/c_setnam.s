@@ -1,15 +1,15 @@
 ;
 ; Ullrich von Bassewitz, 03.06.1999
 ;
-; void __fastcall__ cbm_setnam (const char* Name);
+; void __fastcall__ cbm_k_setnam (const char* Name);
 ;
 
        	.include     	"cbm.inc"
 
-       	.export	       	_cbm_setnam
+       	.export	       	_cbm_k_setnam
 	.importzp	ptr1
 
-_cbm_setnam:
+_cbm_k_setnam:
 	sta	ptr1		; Store pointer to file name
 	stx	ptr1+1
 	ldy	#$FF

@@ -1,69 +1,58 @@
 ;
-; Ullrich von Bassewitz, 05.08.1998
+; Ullrich von Bassewitz, 1998-08-05, 2004-06-25
 ;
-; CC65 runtime: left shift support for ints
+; CC65 runtime: left shift support for ints and unsigneds
+;
+; Note: The standard declares a shift count that is negative or >= the
+; bitcount of the shifted type for undefined behaviour.
+;
+; Note^2: The compiler knowns about the register/zero page usage of this
+; function, so you need to change the compiler source if you change it!
 ;
 
-	.export		tosasla0, tosaslax, tosshla0, tosshlax
-	.import		popsreg, return0
-	.importzp	sreg
 
-tosshla0:
-tosasla0:
-	ldx	#0
+	.export		tosaslax, tosshlax
+	.import		popax
+	.importzp	tmp1
+
 tosshlax:
 tosaslax:
-  	jsr	popsreg		; get TOS into sreg
-  	cpx	#0
-  	bne	TooLarge
-  	cmp	#16
-  	bcs	TooLarge
+        and     #$0F            ; Bring the shift count into a valid range
+        sta     tmp1            ; Save it
 
-       	cmp 	#8		; Shift count greater 8?
-	beq	L3		; Jump if exactly 8
-       	bcc    	L1		; Jump if no
+        jsr     popax           ; Get the left hand operand
 
-; Shift count is greater 8. Do the first 8 bits the fast way
+        ldy     tmp1            ; Get shift count
+        beq     L9              ; Bail out if shift count zero
 
-   	ldy	sreg
-   	sty	sreg+1
-       	stx	sreg		; Low byte = 0
-   	sec
-   	sbc	#8
+        cpy     #8              ; Shift count 8 or greater?
+        bcc     L3              ; Jump if not
 
-; Shift count less than 8 if we come here
+; Shift count is greater 7. The carry is set when we enter here.
 
-L1:	tay	  		; Shift count --> Y
-  	beq    	Zero		; Done if shift count zero
+        tax
+        tya
+        sbc     #8
+        tay
+        txa
+        jmp     L2
+L1:     asl     a
+L2:     dey
+        bpl     L1
+        tax
+        lda     #$00
+        rts
 
-  	lda	sreg		; get low byte for faster shift
+; Shift count is less than 8.
 
-; Do the actual shift
-
-L2:    	asl	a
-	rol	sreg+1
-  	dey
-       	bne	L2
+L3:     stx     tmp1            ; Save high byte of lhs
+L4:    	asl	a
+  	rol	tmp1
+        dey
+       	bne     L4
 
 ; Done with shift
 
-  	ldx	sreg+1
-  	rts
-
-; Shift count == 8
-
-L3:	txa			; X == 0, now A == 0
-	ldx	sreg
-	rts
-
-; Shift count was zero
-
-Zero:	lda	sreg
-	ldx	sreg+1
-	rts
-
-; Shift count too large, result is zero
-
-TooLarge:
-	jmp	return0
+        ldx	tmp1
+L9:     rts
 

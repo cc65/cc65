@@ -29,6 +29,7 @@ OBJS = 	add.o		\
        	asleax2.o	\
        	asleax3.o	\
 	asleax4.o	\
+        asr.o           \
        	asrax1.o	\
        	asrax2.o	\
        	asrax3.o	\

@@ -8,7 +8,7 @@
 	@$(AS) -o $@ $(AFLAGS) $<
 
 
-S_OBJS	= crt0.o oserror.o
+S_OBJS	= crt0.o oserror.o randomize.o
 
 all: $(S_OBJS)
 

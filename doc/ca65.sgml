@@ -132,10 +132,10 @@ Here is a description of all the command line options:
   Set the default for the CPU type. The option takes a parameter, which
   may be one of
 
-       	6502, 65SC02, 65C02, 65816 and sunplus
+       	6502, 65SC02, 65C02, 65816, sunplus, sweet16
 
-  The last one (sunplus) is not available in the freeware version, because the
-  instruction set of the sunplus CPU is "proprietary and confidential".
+  The sunplus cpu is not available in the freeware version, because the
+  instruction set is "proprietary and confidential".
 
 
   <label id="option--feature">
@@ -369,6 +369,35 @@ from the mentioned web page, for more information, see there.
 <item><tt>SRE: {adr}:={adr}/2; A:=A xor {adr};</tt>
 </itemize>
 
+
+
+<sect1>sweet16 mode<label id="sweet16-mode"><p>
+
+SWEET 16 is an interpreter for a pseudo 16 bit CPU written by Steve Wozniak
+for the Apple ][ machines. It is available in the Apple ][ ROM. ca65 can
+generate code for this pseudo CPU when switched into sweet16 mode. The
+following is special in sweet16 mode:
+
+<itemize> 
+
+<item>The '@' character denotes indirect addressing and is no longer available
+for cheap local labels. If you need cheap local labels, you will have to
+switch to another lead character using the <tt/<ref id=".LOCALCHAR"
+name=".LOCALCHAR">/ command.
+
+<item>Registers are specified using <tt/R0/ .. <tt/R15/. In sweet16 mode,
+these identifiers are reserved words.
+
+</itemize>
+
+Please note that the assembler does neither supply the interpreter needed for
+SWEET 16 code, nor the zero page locations needed for the SWEET 16 registers,
+nor does it call the interpreter. All this must be done by your program. Apple
+][ programmers do probably know how to use sweet16 mode.
+
+For more information about SWEET 16, see 
+<htmlurl url="http://www.6502.org/source/interpreters/sweet16.htm"
+name="http://www.6502.org/source/interpreters/sweet16.htm">.
 
 
 <sect1>Number format<p>

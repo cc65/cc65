@@ -70,6 +70,8 @@ static void GlobalSection (void)
         {   "COMMENTS",         INFOTOK_COMMENTS        },
        	{   "CPU",     	        INFOTOK_CPU     	},
        	{   "INPUTNAME",  	INFOTOK_INPUTNAME	},
+        {   "INPUTOFFS",        INFOTOK_INPUTOFFS       },
+        {   "INPUTSIZE",        INFOTOK_INPUTSIZE       },
 	{   "OUTPUTNAME",      	INFOTOK_OUTPUTNAME	},
 	{   "PAGELENGTH",      	INFOTOK_PAGELENGTH	},
 	{   "STARTADDR",	INFOTOK_STARTADDR	},
@@ -116,6 +118,21 @@ static void GlobalSection (void)
 		    InfoError ("Input file name already given");
 		}
 		InFile = xstrdup (InfoSVal);
+		InfoNextTok ();
+		break;
+
+            case INFOTOK_INPUTOFFS:
+		InfoNextTok ();
+		InfoAssureInt ();
+		InputOffs = InfoIVal;
+		InfoNextTok ();
+		break;
+
+            case INFOTOK_INPUTSIZE:
+		InfoNextTok ();
+		InfoAssureInt ();
+                InfoRangeCheck (1, 0x10000);
+		InputSize = InfoIVal;
 		InfoNextTok ();
 		break;
 
@@ -174,7 +191,7 @@ static void RangeSection (void)
       	{   "CODE",	    	INFOTOK_CODE	 },
       	{   "BYTETABLE",    	INFOTOK_BYTETAB	 },
         {   "DBYTETABLE",       INFOTOK_DBYTETAB },
-      	{   "WORDTABLE",    	INFOTOK_WORDTAB	 },       
+      	{   "WORDTABLE",    	INFOTOK_WORDTAB	 },
       	{   "DWORDTABLE",	INFOTOK_DWORDTAB },
       	{   "ADDRTABLE",	INFOTOK_ADDRTAB	 },
       	{   "RTSTABLE",	    	INFOTOK_RTSTAB	 },

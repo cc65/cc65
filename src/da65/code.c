@@ -86,18 +86,43 @@ void LoadCode (void)
 	Error ("Cannot seek on file `%s': %s", InFile, strerror (errno));
     }
     Size = ftell (F);
-    rewind (F);
+
+    /* The input offset must be smaller than the size */
+    if (InputOffs >= 0) {
+        if (InputOffs >= Size) {
+            Error ("Input offset is greater than file size");
+        }
+    } else {
+        /* Use a zero offset */
+        InputOffs = 0;
+    }
+
+    /* Seek to the input offset and correct size to contain the remainder of
+     * the file.
+     */
+    if (fseek (F, InputOffs, SEEK_SET) != 0) {
+	Error ("Cannot seek on file `%s': %s", InFile, strerror (errno));
+    }
+    Size -= InputOffs;
+
+    /* Limit the size to the maximum input size if one is given */
+    if (InputSize >= 0) {
+        if (InputSize > Size) {
+            Error ("Input size is greater than what is available");
+        }
+        Size = InputSize;
+    }
 
     /* If the start address was not given, set it so that the code loads to
      * 0x10000 - Size. This is a reasonable default assuming that the file
      * is a ROM that contains the hardware vectors at $FFFA.
      */
     if (StartAddr < 0) {
-	if (Size > 0x10000) {
-	    StartAddr = 0;
-	} else {
-	    StartAddr = 0x10000 - Size;
-	}
+     	if (Size > 0x10000) {
+     	    StartAddr = 0;
+     	} else {
+     	    StartAddr = 0x10000 - Size;
+     	}
     }
 
     /* Calculate the maximum code size */
@@ -105,7 +130,7 @@ void LoadCode (void)
 
     /* Check if the size is larger than what we can read */
     if (Size == 0) {
-       	Error ("File `%s' contains no data", InFile);
+       	Error ("Nothing to read from input file `%s'", InFile);
     }
     if (Size > MaxCount) {
        	Warning ("File `%s' is too large, ignoring %ld bytes",

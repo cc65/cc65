@@ -44,7 +44,7 @@
 
 
 
-/* File names */
+/* File stuff */
 extern const char*	InFile;		/* Name of input file */
 extern const char*	OutFile;	/* Name of output file */
 
@@ -57,15 +57,16 @@ extern unsigned char    DebugInfo;      /* Add debug info to the object file */
 extern unsigned char	FormFeeds;	/* Add form feeds to the output? */
 extern unsigned char	PassCount;	/* How many passed do we do? */
 extern long    		StartAddr;	/* Start/load address of the program */
-
+extern long             InputOffs;      /* Offset into input file */
+extern long             InputSize;      /* Number of bytes to read from input */
 
 /* Stuff needed by many routines */
-extern unsigned char	Pass;		/* Disassembler pass */
+extern unsigned         Pass;	     	/* Disassembler pass */
 
 /* Comments */
 #define MIN_COMMENTS    0
 #define MAX_COMMENTS    4
-extern unsigned char    Comments;       /* Add which comments to the output? */
+extern unsigned         Comments;       /* Add which comments to the output? */
 
 /* Page formatting */
 #define MIN_PAGE_LEN	32

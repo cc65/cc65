@@ -247,7 +247,7 @@ static void OneOpcode (unsigned RemainingBytes)
      *   - ...if we have enough bytes remaining for the code at this address.
      *   - ...if the current instruction is valid for the given CPU.
      *   - ...if there is no label somewhere between the instruction bytes.
-     * If any of these conditions is true, switch to data mode.
+     * If any of these conditions is false, switch to data mode.
      */
     if (GetStyleAttr (PC) == atDefault) {
 	if (D->Size > RemainingBytes) {

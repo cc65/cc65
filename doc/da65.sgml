@@ -79,7 +79,7 @@ Here is a description of all the command line options:
   <tag><tt>--comments n</tt></tag>
 
   Set the comment level for the output. Valid arguments are 0..4. Greater
-  values will increase the level of additional information written to the 
+  values will increase the level of additional information written to the
   output file in form of comments.
 
 
@@ -259,6 +259,20 @@ following attributes are recognized:
   The attribute is followed by a string value, which gives the name of the
   input file to read. If it is present, the disassembler does not accept an
   input file name on the command line.
+
+
+  <tag><tt>INPUTOFFS</tt></tag>
+
+  The attribute is followed by a numerical value that gives an offset into
+  the input file which is skipped before reading data. The attribute may be
+  used to skip headers or unwanted code sections in the input file.
+
+
+  <tag><tt>INPUTSIZE</tt></tag>
+
+  INPUTSIZE is followed by a numerical value that gives the amount of data
+  to read from the input file. Data beyond <tt/INPUTOFFS+INPUTSIZE/ is 
+  ignored.
 
 
   <tag><tt>OUTPUTNAME</tt></tag>

@@ -53,15 +53,17 @@ const char CfgExt[]    	      = ".cfg";	/* Config file extension */
 
 /* Flags and other command line stuff */
 unsigned char DebugInfo       = 0;      /* Add debug info to the object file */
-unsigned char FormFeeds	      = 0;	/* Add form feeds to the output? */
-unsigned char PassCount	      = 2;	/* How many passed do we do? */
-long 	      StartAddr	      = -1;	/* Start/load address of the program */
+unsigned char FormFeeds	      = 0;  	/* Add form feeds to the output? */
+unsigned char PassCount	      = 2;  	/* How many passed do we do? */
+long 	      StartAddr	      = -1L; 	/* Start/load address of the program */
+long          InputOffs       = -1L;    /* Offset into input file */
+long          InputSize       = -1L;    /* Number of bytes to read from input */
 
 /* Stuff needed by many routines */
-unsigned char Pass	      = 0;	/* Disassembler pass */
+unsigned      Pass	      = 0;	/* Disassembler pass */
 
 /* Comments */
-unsigned char Comments        = 0;      /* Add which comments to the output? */
+unsigned      Comments        = 0;      /* Add which comments to the output? */
 
 /* Page formatting */
 unsigned PageLength    	      = 0;	/* Length of a listing page */

@@ -6,10 +6,10 @@
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */
-;* (C) 2002      Ullrich von Bassewitz                                       */
-;*               Wacholderweg 14                                             */
-;*               D-70597 Stuttgart                                           */
-;* EMail:        uz@musoftware.de                                            */
+;* (C) 2002-2004 Ullrich von Bassewitz                                       */
+;*               Römerstraße 52                                              */
+;*               D-70794 Filderstadt                                         */
+;* EMail:        uz@cc65.org                                                 */
 ;*                                                                           */
 ;*                                                                           */
 ;* This software is provided 'as-is', without any expressed or implied       */
@@ -34,12 +34,15 @@
 
 
 ; Error constants
-TGI_ERR_OK              = 0     ; No error
-TGI_ERR_NO_DRIVER       = 1     ; No driver available
-TGI_ERR_LOAD_ERROR      = 2     ; Error loading driver
-TGI_ERR_INV_DRIVER      = 3     ; Invalid driver
-TGI_ERR_INV_MODE        = 4     ; Mode not supported by driver
-TGI_ERR_INV_ARG         = 5     ; Invalid function argument
-TGI_ERR_INV_FUNC	= 6	; Function not supported
+.enum
+        TGI_ERR_OK              ; No error
+        TGI_ERR_NO_DRIVER       ; No driver available
+        TGI_ERR_LOAD_ERROR      ; Error loading driver
+        TGI_ERR_INV_DRIVER      ; Invalid driver
+        TGI_ERR_INV_MODE        ; Mode not supported by driver
+        TGI_ERR_INV_ARG         ; Invalid function argument
+        TGI_ERR_INV_FUNC       	; Function not supported
 
+        TGI_ERR_COUNT           ; Special: Number of error messages
+.endenum
 

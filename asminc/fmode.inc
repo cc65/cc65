@@ -8,8 +8,8 @@
 O_RDONLY	= $01
 O_WRONLY	= $02
 O_RDWR		= $03
-O_CREAT		= $04
-O_TRUNC		= $10
-O_APPEND	= $20
+O_CREAT		= $10
+O_TRUNC		= $20
+O_APPEND	= $40
 
 

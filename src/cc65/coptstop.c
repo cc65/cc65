@@ -33,6 +33,11 @@
 
 
 
+#include <stdlib.h>
+
+/* common */
+#include "xsprintf.h"
+
 /* cc65 */
 #include "codeent.h"
 #include "codeinfo.h"
@@ -48,52 +53,55 @@
 
 
 
-static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add)
+static unsigned Opt_staspidx (CodeSeg* S, unsigned Push, unsigned Store,
+			      const char* ZPLo, const char* ZPHi)
+/* Optimize the staspidx sequence if possible */
+{
+    CodeEntry* X;
+    CodeEntry* PushEntry;
+    CodeEntry* StoreEntry;
+
+    /* Generate register info */
+    CS_GenRegInfo (S);
+
+    /* Get the push entry */
+    PushEntry = CS_GetEntry (S, Push);
+
+    /* Store the value into the zeropage instead of pushing it */
+    X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
+    CS_InsertEntry (S, X, Push+1);
+    X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
+    CS_InsertEntry (S, X, Push+2);
+
+    /* Correct the index of the store and get a pointer to the entry */
+    Store += 2;
+    StoreEntry = CS_GetEntry (S, Store);
+
+    /* Inline the store */
+    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLo, 0, StoreEntry->LI);
+    CS_InsertEntry (S, X, Store+1);
+
+    /* Remove the push and the call to the staspidx function */
+    CS_DelEntry (S, Store);
+    CS_DelEntry (S, Push);
+
+    /* Free the register info */
+    CS_FreeRegInfo (S);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
+static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add,
+			      const char* ZPLo, const char* ZPHi)
 /* Optimize the tosaddax sequence if possible */
 {
-    unsigned I;
     CodeEntry* N;
     CodeEntry* X;
     CodeEntry* PushEntry;
     CodeEntry* AddEntry;
-    const char* ZPLo;
-    const char* ZPHi;
-
-    /* Check if the sequence is safe. This means that there may not be any
-     * jumps between the two data points, and no usage of the stack. Handling
-     * these conditions is possible and may be done later.
-     */
-    unsigned UsedRegs = REG_NONE;
-    for (I = Push + 1; I < Add; ++I) {
-    	CodeEntry* E = CS_GetEntry (S, I);
-    	if ((E->Info & OF_BRA) != 0 ||
-	    E->OPC == OP65_JSR      ||
-    	    (E->Use & REG_SP) != 0  ||
-    	    CE_HasLabel (E)) {
-    	    /* A jump or stack pointer usage - bail out */
-    	    return 0;
-    	}
-	UsedRegs |= (E->Use | E->Chg);
-    }
-
-    /* We prefer usage of sreg for the intermediate value, since sreg is
-     * tracked and optimized.
-     */
-    UsedRegs |= GetRegInfo (S, Push+1, REG_ALL);
-    if ((UsedRegs & REG_SREG) == REG_NONE) {
-     	/* SREG is available */
-	ZPLo = "sreg";
-	ZPHi = "sreg+1";
-    } else if ((UsedRegs & REG_PTR1) == REG_NONE) {
-	ZPLo = "ptr1";
-	ZPHi = "ptr1+1";
-    } else if ((UsedRegs & REG_PTR2) == REG_NONE) {
-	ZPLo = "ptr2";
-	ZPHi = "ptr2+1";
-    } else {
-	/* No registers available */
-     	return 0;
-    }
 
     /* We need the entry behind the add */
     if ((N = CS_GetNextEntry (S, Add)) == 0) {
@@ -107,7 +115,7 @@ static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add)
     /* Get the push entry */
     PushEntry = CS_GetEntry (S, Push);
 
-    /* Store the value into sreg instead of pushing it */
+    /* Store the value into the zeropage instead of pushing it */
     X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
     CS_InsertEntry (S, X, Push+1);
     X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
@@ -156,58 +164,13 @@ static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add)
 
 
 
-static unsigned Opt_staspidx (CodeSeg* S, unsigned Push, unsigned Store)
-/* Optimize the staspidx sequence if possible */
+static unsigned Opt_tosandax (CodeSeg* S, unsigned Push, unsigned And,
+		     	      const char* ZPLo, const char* ZPHi)
+/* Optimize the tosandax sequence if possible */
 {
-    unsigned I;
-    CodeEntry* N;
     CodeEntry* X;
     CodeEntry* PushEntry;
-    CodeEntry* StoreEntry;
-    const char* ZPLo;
-    const char* ZPHi;
-
-    /* Check if the sequence is safe. This means that there may not be any
-     * jumps between the two data points, and no usage of the stack. Handling
-     * these conditions is possible and may be done later.
-     */
-    unsigned UsedRegs = REG_NONE;
-    for (I = Push + 1; I < Store; ++I) {
-    	CodeEntry* E = CS_GetEntry (S, I);
-    	if ((E->Info & OF_BRA) != 0 ||
-	    E->OPC == OP65_JSR      ||
-    	    (E->Use & REG_SP) != 0  ||
-    	    CE_HasLabel (E)) {
-    	    /* A jump or stack pointer usage - bail out */
-    	    return 0;
-    	}
-	UsedRegs |= (E->Use | E->Chg);
-    }
-
-    /* We prefer usage of sreg for the intermediate value, since sreg is
-     * tracked and optimized.
-     */
-    UsedRegs |= GetRegInfo (S, Push+1, REG_SREG | REG_PTR1 | REG_PTR2);
-    if ((UsedRegs & REG_SREG) == REG_NONE) {
-     	/* SREG is available */
-	ZPLo = "sreg";
-	ZPHi = "sreg+1";
-    } else if ((UsedRegs & REG_PTR1) == REG_NONE) {
-	ZPLo = "ptr1";
-	ZPHi = "ptr1+1";
-    } else if ((UsedRegs & REG_PTR2) == REG_NONE) {
-	ZPLo = "ptr2";
-	ZPHi = "ptr2+1";
-    } else {
-	/* No registers available */
-     	return 0;
-    }
-
-    /* We need the entry behind the store */
-    if ((N = CS_GetNextEntry (S, Store)) == 0) {
-	/* Unavailable */
-	return 0;
-    }
+    CodeEntry* AndEntry;
 
     /* Generate register info */
     CS_GenRegInfo (S);
@@ -215,22 +178,99 @@ static unsigned Opt_staspidx (CodeSeg* S, unsigned Push, unsigned Store)
     /* Get the push entry */
     PushEntry = CS_GetEntry (S, Push);
 
-    /* Store the value into sreg instead of pushing it */
+    /* Store the value into the zeropage instead of pushing it */
     X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
     CS_InsertEntry (S, X, Push+1);
     X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
     CS_InsertEntry (S, X, Push+2);
 
-    /* Correct the index of the store and get a pointer to the entry */
-    Store += 2;
-    StoreEntry = CS_GetEntry (S, Store);
+    /* Correct the index of the add and get a pointer to the entry */
+    And += 2;
+    AndEntry = CS_GetEntry (S, And);
 
-    /* Inline the store */
-    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, ZPLo, 0, StoreEntry->LI);
-    CS_InsertEntry (S, X, Store+1);
+    /* Inline the and */
+    X = NewCodeEntry (OP65_AND, AM65_ZP, ZPLo, 0, AndEntry->LI);
+    CS_InsertEntry (S, X, And+1);
+    if (PushEntry->RI->In.RegX == 0 || AndEntry->RI->In.RegX == 0) {
+     	/* The high byte is zero */
+       	X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, AndEntry->LI);
+	CS_InsertEntry (S, X, And+2);
+    } else {
+     	/* High byte is unknown */
+       	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, AndEntry->LI);
+     	CS_InsertEntry (S, X, And+2);
+     	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, AndEntry->LI);
+     	CS_InsertEntry (S, X, And+3);
+     	X = NewCodeEntry (OP65_AND, AM65_ZP, ZPHi, 0, AndEntry->LI);
+     	CS_InsertEntry (S, X, And+4);
+     	X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, AndEntry->LI);
+     	CS_InsertEntry (S, X, And+5);
+     	X = NewCodeEntry (OP65_LDA, AM65_ZP, ZPLo, 0, AndEntry->LI);
+     	CS_InsertEntry (S, X, And+6);
+    }
 
-    /* Remove the push and the call to the staspidx function */
-    CS_DelEntry (S, Store);
+    /* Remove the push and the call to the tosandax function */
+    CS_DelEntry (S, And);
+    CS_DelEntry (S, Push);
+
+    /* Free the register info */
+    CS_FreeRegInfo (S);
+
+    /* We changed the sequence */
+    return 1;
+}
+
+
+
+static unsigned Opt_tosorax (CodeSeg* S, unsigned Push, unsigned Or,
+		     	     const char* ZPLo, const char* ZPHi)
+/* Optimize the tosorax sequence if possible */
+{
+    CodeEntry* X;
+    CodeEntry* PushEntry;
+    CodeEntry* OrEntry;
+
+    /* Generate register info */
+    CS_GenRegInfo (S);
+
+    /* Get the push entry */
+    PushEntry = CS_GetEntry (S, Push);
+
+    /* Store the value into the zeropage instead of pushing it */
+    X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, PushEntry->LI);
+    CS_InsertEntry (S, X, Push+1);
+    X = NewCodeEntry (OP65_STX, AM65_ZP, ZPHi, 0, PushEntry->LI);
+    CS_InsertEntry (S, X, Push+2);
+
+    /* Correct the index of the add and get a pointer to the entry */
+    Or += 2;
+    OrEntry = CS_GetEntry (S, Or);
+
+    /* Inline the or */
+    X = NewCodeEntry (OP65_ORA, AM65_ZP, ZPLo, 0, OrEntry->LI);
+    CS_InsertEntry (S, X, Or+1);
+    if (PushEntry->RI->In.RegX >= 0 && OrEntry->RI->In.RegX == 0) {
+     	/* Value of X will be that of the first operand */
+	char Buf [16];
+	xsprintf (Buf, sizeof (Buf), "$%02X", PushEntry->RI->In.RegX);
+       	X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, OrEntry->LI);
+	CS_InsertEntry (S, X, Or+2);
+    } else if (PushEntry->RI->In.RegX != 0) {
+     	/* High byte is unknown */
+       	X = NewCodeEntry (OP65_STA, AM65_ZP, ZPLo, 0, OrEntry->LI);
+     	CS_InsertEntry (S, X, Or+2);
+     	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, OrEntry->LI);
+     	CS_InsertEntry (S, X, Or+3);
+       	X = NewCodeEntry (OP65_ORA, AM65_ZP, ZPHi, 0, OrEntry->LI);
+     	CS_InsertEntry (S, X, Or+4);
+     	X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, OrEntry->LI);
+     	CS_InsertEntry (S, X, Or+5);
+     	X = NewCodeEntry (OP65_LDA, AM65_ZP, ZPLo, 0, OrEntry->LI);
+     	CS_InsertEntry (S, X, Or+6);
+    }
+
+    /* Remove the push and the call to the tosandax function */
+    CS_DelEntry (S, Or);
     CS_DelEntry (S, Push);
 
     /* Free the register info */
@@ -248,42 +288,147 @@ static unsigned Opt_staspidx (CodeSeg* S, unsigned Push, unsigned Store)
 
 
 
+typedef unsigned (*OptFunc) (CodeSeg* S, unsigned Push, unsigned Store,
+			     const char* ZPLo, const char* ZPHi);
+typedef struct OptFuncDesc OptFuncDesc;
+struct OptFuncDesc {
+    const char*         Name;   /* Name of the replaced runtime function */
+    OptFunc             Func;   /* Function pointer */
+};
+
+static const OptFuncDesc FuncTable[] = {
+    { "staspidx",       Opt_staspidx    },
+    { "tosaddax",       Opt_tosaddax    },
+    { "tosandax",       Opt_tosandax    },
+    { "tosorax",        Opt_tosorax     },
+};
+#define FUNC_COUNT (sizeof(FuncTable) / sizeof(FuncTable[0]))
+
+
+
+static int CmpFunc (const void* Key, const void* Func)
+/* Compare function for bsearch */
+{
+    return strcmp (Key, ((const	OptFuncDesc*) Func)->Name);
+}
+
+
+
+static const OptFuncDesc* FindFunc (const char* Name)
+/* Find the function with the given name. Return a pointer to the table entry
+ * or NULL if the function was not found.
+ */
+{
+    return bsearch (Name, FuncTable, FUNC_COUNT, sizeof(OptFuncDesc), CmpFunc);
+}
+
+
+
+/*****************************************************************************/
+/*  		      	     	     Code                                    */
+/*****************************************************************************/
+
+
+
 unsigned OptStackOps (CodeSeg* S)
 /* Optimize operations that take operands via the stack */
 {
-    unsigned Changes = 0;          /* Number of changes in one run */
-    int LastPush = -1;             /* Last call to pushax */
+    unsigned Changes = 0;     /* Number of changes in one run */
+    int      InSeq = 0;       /* Inside a sequence */
+    unsigned Push = 0; 	      /* Index of pushax */
+    unsigned UsedRegs = 0;    /* Zeropage registers used in sequence */
 
-    /* Walk over all entries */
+
+    /* Look for a call to pushax followed by a call to some other function
+     * that takes it's first argument on the stack, and the second argument
+     * in the primary register.
+     * It depends on the code between the two if we can handle/transform the
+     * sequence, so check this code for the following list of things:
+     *
+     *  - there must not be a jump or conditional branch (this may
+     *    get relaxed later).
+     *  - there may not be accesses to local variables (may also be
+     *    relaxed later)
+     *  - no subroutine calls
+     *  - no jump labels
+     *
+     * Since we need a zero page register later, do also check the
+     * intermediate code for zero page use.
+     */
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
 	/* Get the next entry */
 	CodeEntry* E = CS_GetEntry (S, I);
 
-	/* Check for a subroutine call */
-	if (E->OPC == OP65_JSR) {
+	/* Handling depends if we're inside a sequence or not */
+	if (InSeq) {
 
-	    /* We look for two things: A call to pushax, and a call to one
-	     * of the known functions we're going to replace. We're only
-	     * interested in the latter ones, if we had a push before.
-	     */
-	    if (strcmp (E->Arg, "pushax") == 0) {
+	    /* Subroutine call? */
+	    if (E->OPC == OP65_JSR) {
 
-		/* Just remember it */
-		LastPush = I;
+		/* Check if this is one of our functions */
+		const OptFuncDesc* F = FindFunc (E->Arg);
+		if (F) {
 
-	    } else if (LastPush >= 0) {
+		    /* Determine the register to use */
+		    const char* ZPLo;
+		    const char* ZPHi;
+       	       	    UsedRegs |= GetRegInfo (S, I+1, REG_SREG | REG_PTR1 | REG_PTR2);
+		    if ((UsedRegs & REG_SREG) == REG_NONE) {
+			/* SREG is available */
+			ZPLo = "sreg";
+			ZPHi = "sreg+1";
+		    } else if ((UsedRegs & REG_PTR1) == REG_NONE) {
+			ZPLo = "ptr1";
+		     	ZPHi = "ptr1+1";
+		    } else if ((UsedRegs & REG_PTR2) == REG_NONE) {
+		     	ZPLo = "ptr2";
+		     	ZPHi = "ptr2+1";
+		    } else {
+		     	/* No registers available */
+		     	ZPLo = 0;
+		     	ZPHi = 0;
+		    }
 
-		if (strcmp (E->Arg, "tosaddax") == 0) {
-  		    Changes += Opt_tosaddax (S, LastPush, I);
-		    LastPush = -1;
-  		} else if (strcmp (E->Arg, "staspidx") == 0) {
-		    Changes += Opt_staspidx (S, LastPush, I);
-		    LastPush = -1;
+		    /* If we have a register, call the optimizer function */
+		    if (ZPLo && ZPHi) {
+		     	Changes += F->Func (S, Push, I, ZPLo, ZPHi);
+		    }
+
+		    /* End of sequence */
+		    InSeq = 0;
+
+		} else if (strcmp (E->Arg, "pushax") == 0) {
+		    /* Restart the sequence */
+		    Push     = I;
+		    UsedRegs = REG_NONE;
+		} else {
+		    /* A call to an unkown subroutine ends the sequence */
+		    InSeq = 0;
 		}
 
+	    } else if ((E->Info & OF_BRA) != 0 ||
+		       (E->Use & REG_SP) != 0  ||
+		       CE_HasLabel (E)) {
+
+		/* All this stuff is not allowed in a sequence */
+		InSeq = 0;
+
+	    } else {
+
+		/* Other stuff: Track zeropage register usage */
+		UsedRegs |= (E->Use | E->Chg);
+
 	    }
+
+	} else if (CE_IsCall (E, "pushax")) {
+
+	    /* This starts a sequence */
+	    Push     = I;
+	    UsedRegs = REG_NONE;
+	    InSeq    = 1;
+
 	}
 
 	/* Next entry */

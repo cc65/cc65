@@ -15,7 +15,7 @@
 	.export _mouse_show, _mouse_hide, _mouse_move
 	.export _mouse_buttons
 
-	.import popa,popax
+	.import popa,popax,mouse_pm0
 
 	.include "atari.inc"
 
@@ -25,18 +25,15 @@ AMIGA_MOUSE	= 2	; device Amiga mouse
 MAX_TYPE	= 3	; first illegal device type
 
 ; the default values force the mouse cursor inside the test screen (no access to border)
-defxmin = 48            ; default x minimum
-defymin = 32            ; default y minimum
-defxmax = 204           ; default x maximum
-defymax = 211           ; default y maximum
+defxmin = 48		; default x minimum
+defymin = 32		; default y minimum
+defxmax = 204		; default x maximum
+defymax = 211		; default y maximum
 
-pmsize  = 16            ; y size pm shape
+pmsize	= 16		; y size pm shape
 
-xinit   = 100            ; init. x pos.
-yinit   = 100            ; init. y pos.
-
-pmb	= $2800 	; pm base memory
-pm0	= pmb+$400	; pm 0 memory
+xinit	= defxmin	; init. x pos.
+yinit	= defymin	; init. y pos.
 
 ;--------------------------------------------------------------------
 ; Initialize mouse routines
@@ -52,13 +49,11 @@ _mouse_init:
 	cmp	#MAX_TYPE+1
 	bcc	setup
 
-ifail:
-	lda	#0		; init. failed
+ifail:	lda	#0		; init. failed
 	tax
 	rts
 
-setup:
-	tax
+setup:	tax
 	lda	lvectab,x
 	sta	mouse_vec+1
 	lda	hvectab,x
@@ -108,7 +103,7 @@ setup:
 
 	ldx	#0
 	lda	#1
-	sta	mouse_on
+	stx	mouse_on
 	rts
 
 ;--------------------------------------------------------------------
@@ -404,13 +399,21 @@ vbi_jmp:
 ;--------------------------------------------------------------------
 ; initialize mouse pm
 
-pminit: ldx	#0
+pminit:	lda	mouse_pm0
+	sta	mpatch1+2
+	sta	mpatch2+2
+	sta	mpatch3+2
+	
+	ldx	#0
 	txa
-clpm:	sta	pm0,x
+mpatch1:
+clpm:	sta	$1000,x		; will be patched
 	inx
 	bne	clpm
 
-	lda	#>pmb
+	lda	mouse_pm0
+	sec
+	sbc	#4
 	sta	PMBASE
 
 	lda	#62
@@ -435,7 +438,8 @@ drwpm:	lda	mousex
 
 	ldy	#0
 fmp2:	lda	mskpm,y
-	sta	pm0,x
+mpatch2:
+	sta	$1000,x		; will be patched
 	inx
 	iny
 	cpy	#pmsize
@@ -450,7 +454,8 @@ clrpm:	lda	omy
 
 	ldy	#0
 	tya
-fmp1:	sta	pm0,x
+mpatch3:
+fmp1:	sta	$1000,x		; will be patched
 	inx
 	iny
 	cpy	#pmsize

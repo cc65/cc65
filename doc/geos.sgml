@@ -326,7 +326,7 @@ fixed like <tt/cputs/.
 
 <sect3>PutChar
 <p>
-<tt/void PutChar (char character, char y, char x)/
+<tt/void PutChar (char character, char y, unsigned x)/
 <p>
 This function outputs single character using current style and font to screen.
 

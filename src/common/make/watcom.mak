@@ -67,6 +67,7 @@ CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
 
 OBJS =	abend.obj	\
 	bitops.obj	\
+	check.obj	\
 	cmdline.obj	\
 	exprdefs.obj	\
 	fname.obj	\

@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    abend.h				     */
+/*				    check.h				     */
 /*                                                                           */
-/*			     Abnormal program end			     */
+/*			      Assert like macros			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
+/* (C) 1998     Ullrich von Bassewitz                                        */
 /*              Wacholderweg 14                                              */
 /*              D-70597 Stuttgart                                            */
 /* EMail:       uz@musoftware.de                                             */
@@ -33,8 +33,8 @@
 
 
 
-#ifndef ABEND_H
-#define ABEND_H
+#ifndef CHECK_H
+#define CHECK_H
 
 
 
@@ -43,20 +43,58 @@
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code				     */
+/*                                   Data                                    */
 /*****************************************************************************/
 
 
 
-void AbEnd (const char* Format, ...) attribute ((format (printf, 1, 2), noreturn));
-/* Print a message preceeded by the program name and terminate the program
- * with an error exit code.
+extern const char* MsgInternalError;		/* "Internal error: "        */
+extern const char* MsgPrecondition;		/* "Precondition violated: " */
+extern const char* MsgCheckFailed;		/* "Check failed: "          */
+extern const char* MsgProgramAborted;		/* "Program aborted: "       */
+
+
+
+extern void (*CheckFailed) (const char* Msg, const char* Cond,
+       	       	            int Code, const char* File, unsigned Line)
+			    attribute ((noreturn));
+/* Function pointer that is called from check if the condition code is true. */
+
+
+
+/*****************************************************************************/
+/*                                   Code                                    */
+/*****************************************************************************/
+
+
+
+void Check (const char* Msg, const char* Cond, int Code,
+            const char* File, unsigned Line);
+/* This function is called from all check macros (see below). It checks,
+ * wether the given Code is true (!= 0). If so, it calls the CheckFailed
+ * vector with the given strings. If not, it simply returns.
  */
 
 
 
-/* End of abend.h */
+#define FAIL(s) CheckFailed (MsgInternalError, s, 0, __FILE__, __LINE__)
+/* Fail macro. Is used if something evil happens, calls checkfailed directly. */
 
+#define ABORT(s) CheckFailed (MsgProgramAborted, s, 0, __FILE__, __LINE__)
+/* Use this one instead of FAIL if there is no internal program error but an
+ * error condition that is caused by the user or operating system (FAIL and
+ * ABORT are essentially the same but the message differs).
+ */
+
+#define PRECONDITION(c) Check (MsgPrecondition, #c, !(c), __FILE__, __LINE__)
+
+#define CHECK(c)        Check (MsgCheckFailed, #c, !(c), __FILE__, __LINE__)
+
+#define ZCHECK(c)       Check (MsgCheckFailed, #c, c, __FILE__, __LINE__)
+
+
+
+/* End of check.h */
 #endif
 
 

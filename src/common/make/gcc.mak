@@ -11,6 +11,7 @@ LIB	= common.a
 
 OBJS =	abend.o		\
 	bitops.o	\
+	check.o		\
 	cmdline.o	\
 	exprdefs.o	\
 	fname.o		\
@@ -52,3 +53,4 @@ depend dep:	$(OBJS:.o=.c)
 	$(CC) -MM $^ > .depend
 
 
+			 

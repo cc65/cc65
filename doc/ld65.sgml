@@ -707,6 +707,15 @@ or (for the segment definitions from above)
      	}
 </verb></tscreen>
 
+The "<tt/align/", "<tt/start/" and "<tt/offset/" attributes change placement
+of the segment in the run memory area, because this is what is usually
+desired. If load and run memory areas are equal (which is the case if only the
+load memory area has been specified), the attributes will also work. There is
+also a "<tt/align_load/" attribute that may be used to align the start of the
+segment in the load memory area, in case different load and run areas have
+been specified. There are no special attributes to set start or offset for
+just the load memory area.
+
 To suppress the warning, the linker issues if it encounters a segment that is
 not found in any of the input files, use "<tt/optional=yes/" as additional
 segment attribute. Be careful when using this attribute, because a missing

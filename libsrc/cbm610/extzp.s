@@ -33,14 +33,23 @@ ktab4: 	       	.word  	$0000
 sysp0:          .word   $0000
 time:	      	.dword 	$0000
 segsave:        .byte   0
-scanbuf:        .byte   0
 ktmp:           .byte   0
 CURS_X:         .byte   0
 CURS_Y:         .byte   0
 RVS:            .byte   0
+config:         .byte   0
 CharPtr:        .word   0
-
-
+; Stuff for our own kbd polling routine
+keyidx:         .byte   0               ; Number of keys in keyboard buffer
+keybuf:         .res    10              ; Keyboard buffer
+keyscanbuf:     .byte   0
+keysave:        .byte   0
+modkey:         .byte   0
+norkey:         .byte   0
+graphmode:      .byte   0
+lastidx:        .byte   0
+rptdelay:       .byte   0
+rptcount:       .byte   0
 
 
 

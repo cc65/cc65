@@ -4,13 +4,13 @@
 ; This must be the *first* file on the linker command line
 ;
 
-	.export	     	_exit, BRKVec, UDTIM
+	.export	     	_exit, BRKVec
 
 	.import		condes, initlib, donelib
 	.import	     	push0, callmain
 	.import	       	__BSS_RUN__, __BSS_SIZE__, __EXTZP_RUN__
 	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
-	.import		SCNKEY
+	.import		scnkey, UDTIM
 
 	.include     	"zeropage.inc"
         .include        "extzp.inc"
@@ -55,6 +55,24 @@
    	.byte	$30,$2c,$31,$36,$39,$2c,$31,$2c,$31,$33,$33,$2c,$30,$00,$00,$00
 
 ;------------------------------------------------------------------------------
+; A table that contains values that must be transfered from the system zero
+; page into out zero page. Contains pairs of bytes, first one is the address
+; in the system ZP, second one is our ZP address. The table goes into page 2,
+; but is declared here, because it is needed earlier.
+
+.SEGMENT        "PAGE2"
+
+.proc   transfer_table
+
+        .byte   $CA, CURS_Y
+        .byte   $CB, CURS_X
+        .byte   $CC, graphmode
+        .byte   $D4, config
+
+.endproc
+
+
+;------------------------------------------------------------------------------
 ; The code in the target bank when switching back will be put at the bottom
 ; of the stack. We will jump here to switch segments. The range $F2..$FF is
 ; not used by any kernal routine.
@@ -67,7 +85,6 @@ Back:	sei
    	lda    	IndReg
    	sta	ExecReg
 
-;------------------------------------------------------------------------------
 ; We are at $100 now. The following snippet is a copy of the code that is poked
 ; in the system bank memory by the basic header program, it's only for
 ; documentation and not actually used here:
@@ -130,6 +147,11 @@ Origin: tsx
  	ldx	#$FE            ; Leave $1FF untouched for cross bank calls
  	txs	       	       	; Set up our own stack
 
+; Switch the indirect segment to the system bank
+
+      	lda	#$0F
+      	sta	IndReg
+
 ; Initialize the extended zeropage
 
         ldx     #.sizeof(extzp)-1
@@ -138,23 +160,32 @@ L1:     lda     extzp,x
         dex
         bpl     L1
 
+; Copy stuff from the system zeropage to ours
+
+        lda     #.sizeof(transfer_table)
+        sta     ktmp
+L2:     ldx     ktmp
+        ldy     transfer_table-2,x
+        lda     transfer_table-1,x
+        tax
+        lda     (sysp0),y
+        sta     $00,x
+        dec     ktmp
+        dec     ktmp
+        bne     L2
+
 ; Set the interrupt, NMI and other vectors
 
-      	ldy	#.sizeof(vectors)-1
-L2:    	lda    	vectors,y
-      	sta	$10000 - .sizeof(vectors),y
-      	dey
-       	bpl     L2
-
-; Switch the indirect segment to the system bank
-
-      	lda	#$0F
-      	sta	IndReg
+      	ldx    	#.sizeof(vectors)-1
+L3:    	lda    	vectors,x
+      	sta	$10000 - .sizeof(vectors),x
+      	dex
+       	bpl     L3
 
 ; Setup the C stack
 
 	lda    	#.lobyte($FEB5 - .sizeof(callsysbank_15))
-	sta	sp
+     	sta	sp
 	lda   	#.hibyte($FEB5 - .sizeof(callsysbank_15))
 	sta	sp+1
 
@@ -207,7 +238,7 @@ L4:     lda     (sysp1),y
 
 ; Set the indirect segment to bank we're executing in
 
- 	lda	ExecReg
+     	lda	ExecReg
  	sta	IndReg
 
 ; Zero the BSS segment. We will do that here instead calling the routine
@@ -229,7 +260,7 @@ Z1:	sta	(ptr1),y
    	iny
    	bne	Z1
    	inc	ptr1+1			; Next page
-   	dex
+     	dex
    	bne	Z1
 
 ; Clear the remaining page
@@ -269,10 +300,26 @@ _exit:  lda     #$00
         sta     irqcount        ; Disable custom irq handlers
         jsr	donelib	     	; Run module destructors
 
-; Adress the system bank
+; Address the system bank
 
         lda     #$0F
         sta     IndReg
+
+; Copy stuff back from our zeropage to the systems
+     
+.if 0
+        lda     #.sizeof(transfer_table)
+        sta     ktmp
+@L0:    ldx     ktmp
+        ldy     transfer_table-2,x
+        lda     transfer_table-1,x
+        tax
+        lda     $00,x
+        sta     (sysp0),y
+        dec     ktmp
+        dec     ktmp
+        bne     @L0
+.endif     
 
 ; Copy back the old system bank stack contents
 
@@ -345,7 +392,7 @@ irqskip:lda	#$0F
 
 	cmp	#%00000001		; ticker irq?
 	bne	irqend
-	jsr     SCNKEY                  ; Poll the keyboard
+       	jsr     scnkey                  ; Poll the keyboard
         jsr	UDTIM                   ; Bump the time
 
 ; Done
@@ -363,24 +410,6 @@ noirq:	pla
 nmi:	rti
 
 dobrk:  jmp	(BRKVec)
-
-; -------------------------------------------------------------------------
-; udtim routine for the 610. We will not check for the stop key here, since
-; C programs will not use it.
-;
-
-.proc	UDTIM
-
-	inc	time
-	bne	L9
-	inc	time+1
-	bne	L9
-	inc	time+2
-	bne	L9
-	inc	time+3
-L9:	rts
-
-.endproc
 
 ; -------------------------------------------------------------------------
 ; Page 3

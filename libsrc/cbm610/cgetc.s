@@ -5,69 +5,46 @@
 ;
 
 	.export	   	_cgetc
-	.import	   	plot, write_crtc, sys_bank, restore_bank
+	.import	   	plot, write_crtc
 	.import	   	cursor
-        .import         sysp0: zp, sysp3: zp
 
-	.include   	"cbm610.inc"
+        .import         keyidx: zp, keybuf: zp, config: zp
 
 
-_cgetc:	lda     IndReg
-        pha
-        lda     #$0F
-        sta     IndReg          ; Switch to the system bank
 
-        ldy     #$D1
-        lda     (sysp0),y       ; Get number of keys in keyboard buffer
-	bne	L2 	  	; Jump if there are already chars waiting
+_cgetc:	lda    	keyidx 	        ; Get number of characters
+	bne	L2    	  	; Jump if there are already chars waiting
 
 ; Switch on the cursor if needed
 
        	lda	cursor
-       	beq    	L0 	    	; Jump if no cursor
+       	beq	L1    	    	; Jump if no cursor
 
-       	jsr	plot		; Set the current cursor position
-        ldy     #$D4
-        lda     (sysp0),y       ; Get the cursor format
+       	jsr	plot  		; Set the current cursor position
        	ldy	#10
-       	jsr	write_crtc	; Set the cursor format
+       	lda	config 	       	; Cursor format
+       	jsr	write_crtc	; Set the cursor formar
 
-L0:     ldy     #$D1
-L1:     lda     (sysp0),y       ; Get the number of keys in the buffer
-       	beq	L1              ; Wait until we have some keys
+L1:    	lda	keyidx
+       	beq	L1
 
        	ldy	#10
-       	lda	#$20		; Cursor off
+       	lda	#$20  		; Cursor off
        	jsr	write_crtc
 
-L2:     ldy     #$D1
-        lda     (sysp0),y       ; Get number of chars in buffer
-        tax
-        ldy     #$AB
-        lda     (sysp3),y       ; Get first char from keyboard buffer
-        sta     c               ; Save for return
-        dex
-        txa
-        ldy     #$D1
-        sta     (sysp0),y
-        sei
-        jmp     L4
-L3:     iny
-        lda     (sysp3),y
-        dey
-        sta     (sysp3),y
-        iny
-L4:     dex
-        bpl     L3       
-        cli
+L2:    	ldx    	#$00  		; Get index
+       	ldy	keybuf		; Get first character in the buffer
+       	sei
+L3:    	lda	keybuf+1,x	; Move up the remaining chars
+       	sta	keybuf,x
+       	inx
+       	cpx	keyidx
+       	bne	L3
+       	dec	keyidx
+       	cli
 
-        pla
-        sta     IndReg          ; Restore old segment
-
-       	ldx	#$00		; High byte
-       	lda     c               ; First char from buffer
+       	ldx	#$00  		; High byte
+       	tya	      		; First char from buffer
        	rts
 
-.bss
 
-c:      .byte   0

@@ -23,7 +23,6 @@
         .export         LISTEN
         .export         TALK
         .export         SETLFS
-        .export         CLOSE
         .export         CHKIN
         .export         CKOUT
         .export         CLRCH
@@ -64,7 +63,7 @@ TALK		= $FFB4
 SETLFS		= $FFBA
 ;SETNAM		= $FFBD
 ;OPEN		= $FFC0
-CLOSE		= $FFC3
+;CLOSE		= $FFC3
 CHKIN		= $FFC6
 CKOUT		= $FFC9
 CLRCH		= $FFCC

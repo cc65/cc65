@@ -7,9 +7,11 @@
 
     	.export	      	_cputcxy, _cputc, cputdirect, putchar
 	.export	      	newline, plot
+	.destructor	setsyscursor
 
 	.import	      	_gotoxy
 	.import	      	popa
+	.import		PLOT
 
         .import         ktmp: zp, crtc: zp, CURS_X: zp, CURS_Y: zp, RVS: zp
         .import         CharPtr: zp
@@ -131,6 +133,17 @@ plot:   ldx     CURS_Y
 	pla
 	sta	IndReg
 	rts
+
+; -------------------------------------------------------------------------
+; Cleanup routine that sets the kernal cursor position to ours
+
+.segment	"PAGE2"
+
+setsyscursor:
+	ldy	CURS_X
+	ldx	CURS_Y
+	clc
+	jmp	PLOT		; Set the new cursor
 
 ; -------------------------------------------------------------------------
 ; Low bytes of the start address of the screen lines

@@ -1,9 +1,8 @@
 /*
   GEOS dialog box functions
 
-  ported to small C on 26.12.1999
-  by Maciej 'YTM/Alliance' Witkowiak
-  10.03.2000 - update
+  by Maciej 'YTM/Elysium' Witkowiak
+  26.12.1999, 10.03.2000, 17.8.2003
 */
 
 #ifndef	_GDLGBOX_H
@@ -22,6 +21,17 @@ char __fastcall__ DlgBoxGetString(char *myString, char strLength,
 				  const char *line1, const char *line2);
 char __fastcall__ DlgBoxFileSelect(const char *classtxt, char ftype,
 				   char *fname);
+
+/* This is a more general dialog box, works like printf in a window */
+char MessageBox(char mode, const char *format, ...);
+
+/* mode argument for MessageBox() */
+enum {
+    MB_EMPTY=0,
+    MB_OK,
+    MB_OKCANCEL,
+    MB_YESNO,
+    MB_LAST };
 
 /* Now the command string type */
 

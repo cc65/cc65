@@ -4,15 +4,21 @@
 #
 #
 
+%.o:   	%.c
+	@$(CC) $(CFLAGS) $<
+	@$(AS) -g -o $@ $(AFLAGS) $(*).s
+
 %.o:	%.s
 	@$(AS) -o $@ $(AFLAGS) $<
 
-
+C_OBJS	= messagebox.o
 S_OBJS	= dodlgbox.o rstrfrmdialogue.o\
 	  dbget2lines.o dlgboxyesno.o dlgboxokcancel.o dlgboxok.o dlgboxgetstring.o\
 	  dlgboxfileselect.o
 
-all: $(S_OBJS)
+all: $(C_OBJS) $(S_OBJS)
 
 clean:
 	@rm -f *.~ $(S_OBJS) core
+	@rm -f $(C_OBJS:.o=.s)
+	@rm -f $(C_OBJS)

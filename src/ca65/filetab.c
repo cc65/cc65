@@ -35,6 +35,7 @@
 
 /* common */
 #include "check.h"
+#include "hashstr.h"
 #include "xmalloc.h"
 
 /* ca65 */
@@ -50,19 +51,76 @@
 
 
 
-/* List of input files */
-static struct {
-    unsigned long  MTime;		/* Time of last modification */
-    unsigned long  Size;		/* Size of file */
-    const char*	   Name;		/* Name of file */
-} Files [MAX_INPUT_FILES];
-static unsigned    FileCount = 0;
+/* An entry in the file table */
+typedef struct FileEntry FileEntry;
+struct FileEntry {
+    FileEntry* 	      	Next;		/* Next in hash list */
+    unsigned	      	Index;		/* Index of entry */
+    unsigned long     	Size;		/* Size of file */
+    unsigned long     	MTime;		/* Time of last modification */
+    char	      	Name[1];	/* Name, dynamically allocated */
+};
+
+/* Array of all entries, listed by index */
+static FileEntry**	FileTab   = 0;
+static unsigned		FileCount = 0;
+static unsigned 	FileMax   = 0;
+
+/* Hash table, hashed by name */
+#define HASHTAB_SIZE	31
+static FileEntry*	HashTab[HASHTAB_SIZE];
 
 
 
 /*****************************************************************************/
 /*     	       	    		     Code			   	     */
 /*****************************************************************************/
+
+
+
+static FileEntry* NewFileEntry (const char* Name, unsigned long Size, unsigned long MTime)
+/* Create a new FileEntry, insert it into the tables and return it */
+{
+    /* Get the length of the name */
+    unsigned Len = strlen (Name);
+
+    /* Get the hash over the name */
+    unsigned Hash = HashStr (Name) % HASHTAB_SIZE;
+
+    /* Allocate memory for the entry */
+    FileEntry* F = xmalloc (sizeof (FileEntry) + Len);
+
+    /* Initialize the fields */
+    F->Index  	= FileCount+1;
+    F->Size   	= Size;
+    F->MTime  	= MTime;
+    memcpy (F->Name, Name, Len+1);
+
+    /* Count the entries and grow the file table if needed */
+    if (FileCount >= FileMax) {
+    	/* We need to grow the table. Create a new one. */
+    	unsigned NewFileMax   = (FileMax == 0)? 32 : FileMax * 2;
+       	FileEntry** NewFileTab = xmalloc (sizeof (FileEntry*) * NewFileMax);
+
+    	/* Copy the old entries */
+    	memcpy (NewFileTab, FileTab, sizeof (FileEntry*) * FileCount);
+
+    	/* Use the new table */
+    	xfree (FileTab);
+    	FileTab = NewFileTab;
+    	FileMax = NewFileMax;
+    }
+
+    /* Insert the file into the file table */
+    FileTab [FileCount++] = F;
+
+    /* Insert the entry into the hash table */
+    F->Next = HashTab[Hash];
+    HashTab[Hash] = F;
+
+    /* Return the new entry */
+    return F;
+}
 
 
 
@@ -79,11 +137,36 @@ const char* GetFileName (unsigned Name)
     	    /* No files defined until now */
        	    return "(outside file scope)";
 	} else {
-	    return Files [0].Name;
+       	    return FileTab [0]->Name;
 	}
     } else {
-        return Files [Name-1].Name;
+        return FileTab [Name-1]->Name;
     }
+}
+
+
+
+unsigned GetFileIndex (const char* Name)
+/* Return the file index for the given file name. */
+{
+    /* Get the hash over the name */
+    unsigned Hash = HashStr (Name) % HASHTAB_SIZE;
+
+    /* Search the linear hash list */
+    FileEntry* F = HashTab[Hash];
+    while (F) {
+	/* Is it this one? */
+	if (strcmp (Name, F->Name) == 0) {
+	    /* Found, return the index */
+	    return F->Index;
+	}
+	/* No, check next */
+	F = F->Next;
+    }
+
+    /* Not found, use main file */
+    Error (ERR_FILENAME_NOT_FOUND, Name);
+    return 0;
 }
 
 
@@ -93,19 +176,11 @@ unsigned AddFile (const char* Name, unsigned long Size, unsigned long MTime)
  * the table.
  */
 {
-    /* Check for a table overflow */
-    if (FileCount >= MAX_INPUT_FILES) {
-	/* Table overflow */
-	Fatal (FAT_MAX_INPUT_FILES);
-    }
+    /* Create a new file entry and insert it into the tables */
+    FileEntry* F = NewFileEntry (Name, Size, MTime);
 
-    /* Add the file to the table */
-    Files [FileCount].Name  = xstrdup (Name);
-    Files [FileCount].Size  = Size;
-    Files [FileCount].MTime = MTime;
-
-    /* One more file */
-    return ++FileCount;
+    /* Return the index */
+    return F->Index;
 }
 
 
@@ -123,9 +198,12 @@ void WriteFiles (void)
 
     /* Write the file data */
     for (I = 0; I < FileCount; ++I) {
-	ObjWrite32 (Files [I].MTime);
-	ObjWrite32 (Files [I].Size);
-	ObjWriteStr (Files [I].Name);
+	/* Get a pointer to the entry */
+	FileEntry* F = FileTab[I];
+	/* Write the fields */
+	ObjWrite32 (F->MTime);
+	ObjWrite32 (F->Size);
+	ObjWriteStr (F->Name);
     }
 
     /* Done writing files */

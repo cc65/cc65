@@ -46,6 +46,7 @@
 #include "error.h"
 #include "expr.h"
 #include "objfile.h"
+#include "scanner.h"
 #include "symtab.h"
 
 
@@ -978,7 +979,7 @@ void WriteImports (void)
 /* Write the imports list to the object file */
 {
     SymEntry* S;
-		   
+
     /* Tell the object file module that we're about to start the imports */
     ObjStartImports ();
 

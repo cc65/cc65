@@ -36,7 +36,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdarg.h>
-		    
+
 /* ca65 */
 #include "filetab.h"
 #include "nexttok.h"
@@ -186,6 +186,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
 	"Counter underflow",
 	"Undefined label",
 	"Open `%s´",
+	"File name `%s' not found in file table",
     };
 
     fprintf (stderr, "%s(%lu): Error #%u: ",

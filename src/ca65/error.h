@@ -38,7 +38,8 @@
 
 
 
-#include "scanner.h"
+/* common */
+#include "filepos.h"
 
 
 
@@ -126,6 +127,7 @@ enum Errors {
     ERR_COUNTER_UNDERFLOW,
     ERR_UNDEFINED_LABEL,
     ERR_OPEN_STMT,
+    ERR_FILENAME_NOT_FOUND,
     ERR_COUNT  	      	       	      	/* Error count */
 };
 

@@ -40,8 +40,10 @@
 
 #include <stdio.h>
 
-#include "../common/exprdefs.h"
-
+/* common */
+#include "exprdefs.h"
+	  
+/* ca65 */
 #include "symentry.h"
 
 
@@ -143,3 +145,4 @@ void WriteDbgSyms (void);
 
 
 
+	  

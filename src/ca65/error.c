@@ -147,6 +147,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
 	"Identifier expected",
 	"`.endmacro' expected",
 	"Option key expected",
+	"`=' expected",
 	"Command is only valid in 65816 mode",
 	"User error: %s",
 	"String constant too long",

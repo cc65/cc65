@@ -314,6 +314,19 @@ static void OptVersion (const char* Opt, const char* Arg)
 
 
 
+static void DoPCAssign (void)
+/* Start absolute code */
+{
+    long PC = ConstExpression ();
+    if (PC < 0 || PC > 0xFFFFFF) {
+	Error (ERR_RANGE);
+    } else {
+	SetAbsPC (PC);
+    }
+}
+
+
+
 static void OneLine (void)
 /* Assemble one line */
 {
@@ -324,49 +337,49 @@ static void OneLine (void)
      * and not from internally pushed input.
      */
     if (!HavePushedInput ()) {
-	InitListingLine ();
+     	InitListingLine ();
     }
 
     if (Tok == TOK_COLON) {
-	/* An unnamed label */
-	ULabDef ();
-	NextTok ();
+     	/* An unnamed label */
+     	ULabDef ();
+     	NextTok ();
     }
 
     /* Assemble the line */
     if (Tok == TOK_IDENT) {
 
-	/* Is it a macro? */
-	if (IsMacro (SVal)) {
+     	/* Is it a macro? */
+     	if (IsMacro (SVal)) {
 
-	    /* Yes, start a macro expansion */
-	    MacExpandStart ();
-	    Done = 1;
+     	    /* Yes, start a macro expansion */
+     	    MacExpandStart ();
+     	    Done = 1;
 
-	} else {
+     	} else {
 
-	    /* No, label. Remember the identifier, then skip it */
-	    int HadWS = WS;	/* Did we have whitespace before the ident? */
-	    strcpy (Ident, SVal);
-	    NextTok ();
+     	    /* No, label. Remember the identifier, then skip it */
+     	    int HadWS = WS;	/* Did we have whitespace before the ident? */
+     	    strcpy (Ident, SVal);
+     	    NextTok ();
 
-	    /* If a colon follows, this is a label definition. If there
-	     * is no colon, it's an assignment.
-	     */
+     	    /* If a colon follows, this is a label definition. If there
+     	     * is no colon, it's an assignment.
+     	     */
        	    if (Tok == TOK_EQ) {
-	    	/* Skip the '=' */
-    	    	NextTok ();
-	    	/* Define the symbol with the expression following the '=' */
-	    	SymDef (Ident, Expression (), 0);
-	    	/* Don't allow anything after a symbol definition */
-	    	Done = 1;
-	    } else {
-	    	/* Define a label */
-	    	SymDef (Ident, CurrentPC (), IsZPSeg ());
-	    	/* Skip the colon. If NoColonLabels is enabled, allow labels
-	    	 * without a colon if there is no whitespace before the
-	    	 * identifier.
-	    	 */
+     	    	/* Skip the '=' */
+     	    	NextTok ();
+     	    	/* Define the symbol with the expression following the '=' */
+     	    	SymDef (Ident, Expression (), 0);
+     	    	/* Don't allow anything after a symbol definition */
+     	    	Done = 1;
+     	    } else {
+     	    	/* Define a label */
+     	    	SymDef (Ident, CurrentPC (), IsZPSeg ());
+     	    	/* Skip the colon. If NoColonLabels is enabled, allow labels
+     	    	 * without a colon if there is no whitespace before the
+     	    	 * identifier.
+     	    	 */
      	    	if (Tok != TOK_COLON) {
      	    	    if (HadWS || !NoColonLabels) {
      	    	     	Error (ERR_COLON_EXPECTED);
@@ -394,7 +407,18 @@ static void OneLine (void)
      	} else if (Tok == TOK_IDENT && IsMacro (SVal)) {
      	    /* A macro expansion */
      	    MacExpandStart ();
-     	}
+     	} else if (PCAssignment && (Tok == TOK_STAR || Tok == TOK_PC)) {
+	    NextTok ();
+	    if (Tok != TOK_EQ) {
+		Error (ERR_EQ_EXPECTED);
+		SkipUntilSep ();
+	    } else {
+		/* Skip the equal sign */
+		NextTok ();
+		/* Enter absolute mode */
+		DoPCAssign ();
+	    }
+	}
     }
 
     /* Line separator must come here */

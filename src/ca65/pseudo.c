@@ -519,6 +519,7 @@ static void DoFeature (void)
     	"LOOSE_STRING_TERM",
     	"AT_IN_IDENTIFIERS",
     	"DOLLAR_IN_IDENTIFIERS",
+	"PC_ASSIGNMENT",
     };
 
     /* Allow a list of comma separated keywords */
@@ -548,6 +549,7 @@ static void DoFeature (void)
      	    case 2:	LooseStringTerm = 1;	break;
 	    case 3:	AtInIdents 	= 1;	break;
 	    case 4:	DollarInIdents	= 1;	break;
+	    case 5:	PCAssignment	= 1;	break;
      	    default:	Internal ("Invalid feature: %d", Feature);
      	}
 
@@ -870,7 +872,7 @@ static void DoOrg (void)
 /* Start absolute code */
 {
     long PC = ConstExpression ();
-    if (PC < 0 || PC > 0xFFFF) {
+    if (PC < 0 || PC > 0xFFFFFF) {
 	Error (ERR_RANGE);
     	return;
     }

@@ -68,7 +68,7 @@ unsigned char NoColonLabels   = 0;     	/* Allow labels without a colon */
 unsigned char LooseStringTerm = 0;	/* Allow ' as string terminator */
 unsigned char AtInIdents      = 0;	/* Allow '@' in identifiers */
 unsigned char DollarInIdents  = 0;  	/* Allow '$' in identifiers */
-
+unsigned char PCAssignment    = 0;	/* Allow "* = $XXX" or "$ = $XXX" */
 
 
 

@@ -138,13 +138,18 @@ static unsigned OptShift1 (CodeSeg* S)
 
 static unsigned OptShift2 (CodeSeg* S)
 /* A call to the shraxN routine may get replaced by one or more lsr insns
- * if the value of X is not used later.
+ * if the value of X is not used later, or if the value of X is known and
+ * zero.
  */
 {
     unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info */
+    CS_GenRegInfo (S);
 
     /* Walk over the entries */
-    unsigned I = 0;
+    I = 0;
     while (I < CS_GetEntryCount (S)) {
 
       	/* Get next entry */
@@ -155,13 +160,13 @@ static unsigned OptShift2 (CodeSeg* S)
        	    strncmp (E->Arg, "shrax", 5) == 0        &&
 	    strlen (E->Arg) == 6                     &&
 	    IsDigit (E->Arg[5])                      &&
-	    !RegXUsed (S, I+1)) {
+       	    (E->RI->In.RegX == 0 || !RegXUsed (S, I+1))) {
 
 	    /* Insert shift insns */
 	    unsigned Count = E->Arg[5] - '0';
 	    while (Count--) {
 	    	CodeEntry* X = NewCodeEntry (OP65_LSR, AM65_ACC, "a", 0, E->LI);
-	    	CS_InsertEntry (S, X, I+1);
+    	    	CS_InsertEntry (S, X, I+1);
 	    }
 
 	    /* Delete the call to shlax */
@@ -176,6 +181,9 @@ static unsigned OptShift2 (CodeSeg* S)
 	++I;
 
     }
+
+    /* Free the register info */
+    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;

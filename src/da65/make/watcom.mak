@@ -45,7 +45,6 @@ CFLAGS  += -i=..\common
 
 OBJS = 	attrtab.obj	\
 	code.obj       	\
-	cpu.obj	   	\
 	data.obj	\
 	error.obj  	\
 	global.obj 	\

@@ -129,10 +129,10 @@ extern unsigned        	CfgErrorCol;
 
 
 
-void CfgWarning (const char* Format, ...);
+void CfgWarning (const char* Format, ...) attribute((format(printf,1,2)));
 /* Print a warning message adding file name and line number of the config file */
 
-void CfgError (const char* Format, ...);
+void CfgError (const char* Format, ...) attribute((format(printf,1,2)));
 /* Print an error message adding file name and line number of the config file */
 
 void CfgNextTok (void);
@@ -196,3 +196,4 @@ void CfgCloseInput (void);
 
 
 
+				       

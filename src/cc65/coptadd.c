@@ -146,25 +146,22 @@ unsigned OptAdd1 (CodeSeg* S)
 unsigned OptAdd2 (CodeSeg* S)
 /* Search for the sequence
  *
- *     	ldy     #yy
- *      lda     (sp),y
- *  	tax
- *      ldy     #xx
- *      lda     (sp),y
- *      ldy     #zz
+ *     	ldy     #xx
+ *      jsr     ldaxysp
+ *      ldy     #yy
  *      jsr     addeqysp
  *
  * and replace it by:
  *
- *      ldy     #xx
+ *      ldy     #xx-1
  *      lda     (sp),y
- *      ldy     #zz
+ *      ldy     #yy
  *      clc
  *      adc     (sp),y
  *      sta     (sp),y
- *      ldy     #yy
+ *      ldy     #xx
  *      lda     (sp),y
- *      ldy     #zz+1
+ *      ldy     #yy+1
  *      adc     (sp),y
  *      sta     (sp),y
  *
@@ -177,7 +174,7 @@ unsigned OptAdd2 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-     	CodeEntry* L[7];
+     	CodeEntry* L[4];
 
       	/* Get next entry */
        	L[0] = CS_GetEntry (S, I);
@@ -185,66 +182,66 @@ unsigned OptAdd2 (CodeSeg* S)
      	/* Check for the sequence */
 	if (L[0]->OPC == OP65_LDY               &&
 	    CE_KnownImm (L[0])                  &&
-       	    CS_GetEntries (S, L+1, I+1, 6)   	&&
-	    L[1]->OPC == OP65_LDA               &&
-	    L[1]->AM == AM65_ZP_INDY            &&
-	    !CE_HasLabel (L[1])                 &&
-	    L[2]->OPC == OP65_TAX               &&
-	    !CE_HasLabel (L[2])                 &&
-	    L[3]->OPC == OP65_LDY               &&
-	    CE_KnownImm (L[3])                  &&
-       	    !CE_HasLabel (L[3])                 &&
-	    L[4]->OPC == OP65_LDA               &&
-	    L[4]->AM == AM65_ZP_INDY            &&
-	    !CE_HasLabel (L[4])                 &&
-	    L[5]->OPC == OP65_LDY               &&
-	    CE_KnownImm (L[5])                  &&
-	    !CE_HasLabel (L[5])                 &&
-	    CE_IsCall (L[6], "addeqysp")        &&
-	    !CE_HasLabel (L[6])                 &&
-	    (GetRegInfo (S, I+7, REG_AX) & REG_AX) == 0) {
+	    !CS_RangeHasLabel (S, I+1, 3)       &&
+       	    CS_GetEntries (S, L+1, I+1, 3)   	&&
+	    CE_IsCall (L[1], "ldaxysp")         &&
+       	    L[2]->OPC == OP65_LDY               &&
+	    CE_KnownImm (L[2])                  &&
+       	    CE_IsCall (L[3], "addeqysp")        &&
+       	    (GetRegInfo (S, I+4, REG_AX) & REG_AX) == 0) {
 
+	    /* Insert new code behind the addeqysp */
 	    char Buf [20];
 	    CodeEntry* X;
 
+	    /* ldy     #xx-1 */
+	    xsprintf (Buf, sizeof (Buf), "$%02X", (int)(L[0]->Num-1));
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+4);
 
-	    /* Insert new code behind the addeqysp */
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[3]->Arg, 0,	L[3]->LI);
+	    /* lda     (sp),y */
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+	    CS_InsertEntry (S, X, I+5);
+
+	    /* ldy     #yy */
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[2]->Arg, 0, L[2]->LI);
+	    CS_InsertEntry (S, X, I+6);
+
+	    /* clc */
+	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[3]->LI);
 	    CS_InsertEntry (S, X, I+7);
 
-	    X = NewCodeEntry (OP65_LDA, L[4]->AM, L[4]->Arg, 0, L[4]->LI);
+	    /* adc     (sp),y */
+       	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[3]->LI);
 	    CS_InsertEntry (S, X, I+8);
 
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[5]->Arg, 0, L[5]->LI);
+	    /* sta     (sp),y */
+	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[3]->LI);
 	    CS_InsertEntry (S, X, I+9);
 
-	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[6]->LI);
+	    /* ldy     #xx */
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
 	    CS_InsertEntry (S, X, I+10);
 
-	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[6]->LI);
+	    /* lda     (sp),y */
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
 	    CS_InsertEntry (S, X, I+11);
 
-	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[6]->LI);
+	    /* ldy     #yy+1 */
+	    xsprintf (Buf, sizeof (Buf), "$%02X", (int)(L[2]->Num+1));
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[2]->LI);
 	    CS_InsertEntry (S, X, I+12);
 
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
+	    /* adc     (sp),y */
+	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[3]->LI);
 	    CS_InsertEntry (S, X, I+13);
 
-	    X = NewCodeEntry (OP65_LDA, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
+	    /* sta     (sp),y */
+	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[3]->LI);
 	    CS_InsertEntry (S, X, I+14);
 
-	    xsprintf (Buf, sizeof (Buf), "$%02X", (int)(L[5]->Num+1));
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[5]->LI);
-	    CS_InsertEntry (S, X, I+15);
-
-	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[6]->LI);
-	    CS_InsertEntry (S, X, I+16);
-
-	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[6]->LI);
-	    CS_InsertEntry (S, X, I+17);
-
 	    /* Delete the old code */
-	    CS_DelEntries (S, I, 7);
+	    CS_DelEntries (S, I, 4);
 
 	    /* Remember, we had changes */
 	    ++Changes;

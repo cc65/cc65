@@ -120,7 +120,7 @@ static const FuncInfo FuncInfoTable[] = {
     { "ldax0sp",       	REG_Y, 	       	      REG_AX			     },
     { "ldaxi",          REG_AX,               REG_AXY | REG_PTR1	     },
     { "ldaxidx",        REG_AXY,              REG_AXY | REG_PTR1       	     },
-    { "ldaxysp",       	REG_Y, 	       	      REG_AX			     },
+    { "ldaxysp",       	REG_Y, 	       	      REG_AXY  	       	       	     },
     { "leaasp",         REG_A,                REG_AX			     },
     { "negax",          REG_AX,               REG_AX			     },
     { "pusha", 	       	REG_A, 	       	      REG_Y			     },

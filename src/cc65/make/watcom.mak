@@ -84,6 +84,7 @@ OBJS =	anonname.obj	\
 	coptcmp.obj	\
 	coptind.obj	\
 	coptneg.obj	\
+	coptpush.obj	\
 	coptstop.obj	\
 	coptsub.obj	\
 	copttest.obj	\
@@ -162,6 +163,7 @@ FILE coptc02.obj
 FILE coptcmp.obj
 FILE coptind.obj
 FILE coptneg.obj
+FILE coptpush.obj
 FILE coptstop.obj
 FILE coptsub.obj
 FILE copttest.obj

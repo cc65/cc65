@@ -726,10 +726,10 @@ unsigned OptUnusedStores (CodeSeg* S)
 	    if ((GetRegInfo (S, I+1, R) & R) == 0) {
 
 	    	/* Register value is not used, remove the load */
-		CS_DelEntry (S, I);
+	 	CS_DelEntry (S, I);
 
-		/* Remember, we had changes */
-		++Changes;
+	 	/* Remember, we had changes */
+	 	++Changes;
 
 	    }
 	}
@@ -861,7 +861,7 @@ unsigned OptDupLoads (CodeSeg* S)
 		 * that in the A register, replace the store by a STA. The
 		 * optimizer will then remove the load instruction for Y
 		 * later. If replacement by A is not possible try a
-		 * replacement by X, but check for invalid addressing modes
+	 	 * replacement by X, but check for invalid addressing modes
 		 * in this case.
 		 */
        	        } else if (In->RegY >= 0) {
@@ -1033,7 +1033,7 @@ unsigned OptTransfers (CodeSeg* S)
 		    goto NextEntry;
 		}
 		if ((X->Info & OF_FBRA) != 0) {
-		    if (I == 0) {
+	 	    if (I == 0) {
 			/* No preceeding entry */
 			goto NextEntry;
 		    }

@@ -39,6 +39,7 @@ OBJS =	anonname.o	\
 	coptcmp.o	\
 	coptind.o	\
 	coptneg.o	\
+	coptpush.o	\
 	coptstop.o	\
 	coptsub.o	\
 	copttest.o	\

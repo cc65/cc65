@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   coptsub.c                                 */
+/*				  coptpush.c                                 */
 /*                                                                           */
-/*			Optimize subtraction sequences                       */
+/*			    Optimize push sequences                          */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -33,28 +33,35 @@
 
 
 
-/* cc65 */
+/* common */
+#include "xsprintf.h"
+
+/* cc65 */			  
 #include "codeent.h"
 #include "codeinfo.h"
-#include "coptsub.h"
+#include "coptpush.h"
 
 
 
 /*****************************************************************************/
-/*			     Optimize subtractions                           */
+/*				     Code                                    */
 /*****************************************************************************/
 
 
 
-unsigned OptSub1 (CodeSeg* S)
-/* Search for the sequence
+unsigned OptPush1 (CodeSeg* S)
+/* Given a sequence
  *
- *  	sbc     ...
- *      bcs     L
- *  	dex
- * L:
+ *     ldy     #xx
+ *     jsr     ldaxysp
+ *     jsr     pushax
  *
- * and remove the handling of the high byte if X is not used later.
+ * If a/x are not used later, replace that by
+ *
+ *     ldy     #xx+2
+ *     jsr     pushwysp
+ *
+ * saving 3 bytes and several cycles.
  */
 {
     unsigned Changes = 0;
@@ -63,24 +70,36 @@ unsigned OptSub1 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[3];
+     	CodeEntry* L[3];
 
       	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+       	L[0] = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OP65_SBC 	  		             &&
-	    CS_GetEntries (S, L, I+1, 3) 	             &&
-       	    (L[0]->OPC == OP65_BCS || L[0]->OPC == OP65_JCS) &&
-	    L[0]->JumpTo != 0                                &&
-	    !CE_HasLabel (L[0])                              &&
-	    L[1]->OPC == OP65_DEX       	       	     &&
-	    !CE_HasLabel (L[1])                              &&
-	    L[0]->JumpTo->Owner == L[2]                      &&
-	    !RegXUsed (S, I+3)) {
+	if (L[0]->OPC == OP65_LDY               &&
+	    CE_KnownImm (L[0])                  &&
+	    L[0]->Num < 0xFE                    &&
+	    !CS_RangeHasLabel (S, I+1, 2)       &&
+       	    CS_GetEntries (S, L+1, I+1, 2)   	&&
+	    CE_IsCall (L[1], "ldaxysp")         &&
+       	    CE_IsCall (L[2], "pushax")          &&
+       	    (GetRegInfo (S, I+3, REG_AX) & REG_AX) == 0) {
 
-	    /* Remove the bcs/dex */
-	    CS_DelEntries (S, I+1, 2);
+	    /* Insert new code behind the pushax */
+	    char Buf [20];
+	    CodeEntry* X;
+
+	    /* ldy     #xx+1 */
+	    xsprintf (Buf, sizeof (Buf), "$%02X", (int)(L[0]->Num+2));
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+3);
+
+	    /* jsr pushwysp */
+	    X = NewCodeEntry (OP65_JSR, AM65_ABS, "pushwysp", 0, L[2]->LI);
+	    CS_InsertEntry (S, X, I+4);
+
+	    /* Delete the old code */
+	    CS_DelEntries (S, I, 3);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -95,84 +114,6 @@ unsigned OptSub1 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-
-unsigned OptSub2 (CodeSeg* S)
-/* Search for the sequence
- *
- *  	lda     xx
- *      sec
- *  	sta     tmp1
- *      lda     yy
- *      sbc     tmp1
- *      sta     yy
- *
- * and replace it by
- *
- *      sec
- *      lda     yy
- *     	sbc     xx
- *      sta     yy
- */
-{
-    unsigned Changes = 0;
-
-    /* Walk over the entries */
-    unsigned I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[5];
-
-      	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
-
-     	/* Check for the sequence */
-       	if (E->OPC == OP65_LDA 	      		           &&
-	    !CS_RangeHasLabel (S, I+1, 5)                  &&
-	    CS_GetEntries (S, L, I+1, 5) 	           &&
-       	    L[0]->OPC == OP65_SEC                          &&
-       	    L[1]->OPC == OP65_STA       	       	   &&
-	    strcmp (L[1]->Arg, "tmp1") == 0                &&
-	    L[2]->OPC == OP65_LDA                          &&
-	    L[3]->OPC == OP65_SBC                          &&
-	    strcmp (L[3]->Arg, "tmp1") == 0                &&
-	    L[4]->OPC == OP65_STA                          &&
-	    strcmp (L[4]->Arg, L[2]->Arg) == 0) {
-
-	    /* Remove the store to tmp1 */
-	    CS_DelEntry (S, I+2);
-
-	    /* Remove the subtraction */
-	    CS_DelEntry (S, I+3);
-
-	    /* Move the lda to the position of the subtraction and change the
-	     * op to SBC.
-	     */
-	    CS_MoveEntry (S, I, I+3);
-	    CE_ReplaceOPC (E, OP65_SBC);
-
-	    /* If the sequence head had a label, move this label back to the
-	     * head.
-	     */
-	    if (CE_HasLabel (E)) {
-		CS_MoveLabels (S, E, L[0]);
-  	    }
-
-	    /* Remember, we had changes */
-       	    ++Changes;
-
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
 
 
 

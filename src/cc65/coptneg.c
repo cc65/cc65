@@ -185,12 +185,11 @@ unsigned OptNegAX1 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if this is a call to bnegax, and if X is known and zero */
-	if (E->RI->In.RegX == 0             &&
-       	    CE_IsCall (E, "bnegax")) {
+	if (E->RI->In.RegX == 0 && CE_IsCall (E, "bnegax")) {
 
-	    /* We're cheating somewhat here ... */
-	    E->Arg[5] = '\0';
-	    E->Use &= ~REG_X;
+	    CodeEntry* X = NewCodeEntry (OP65_JSR, AM65_ABS, "bnega", 0, E->LI);
+	    CS_InsertEntry (S, X, I+1);
+	    CS_DelEntry (S, I);
 
 	    /* We had changes */
 	    ++Changes;
@@ -213,18 +212,17 @@ unsigned OptNegAX1 (CodeSeg* S)
 unsigned OptNegAX2 (CodeSeg* S)
 /* Search for the sequence:
  *
- *  	lda	(xx),y
- *  	tax
- *  	dey
- *  	lda	(xx),y
+ *      ldy     #xx
+ *      jsr     ldaxysp
  *  	jsr	bnegax
  *  	jne/jeq	...
  *
  * and replace it by
  *
- *  	lda    	(xx),y
+ *      ldy     #xx
+ *  	lda    	(sp),y
  *  	dey
- *  	ora    	(xx),y
+ *  	ora    	(sp),y
  *	jeq/jne	...
  */
 {
@@ -234,37 +232,39 @@ unsigned OptNegAX2 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[5];
+	CodeEntry* L[4];
 
       	/* Get next entry */
-       	CodeEntry* E = CS_GetEntry (S, I);
+       	L[0] = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OP65_LDA  	      	&&
-	    E->AM == AM65_ZP_INDY	      	&&
-	    CS_GetEntries (S, L, I+1, 5)	&&
-	    L[0]->OPC == OP65_TAX    		&&
-	    L[1]->OPC == OP65_DEY    		&&
-      	    L[2]->OPC == OP65_LDA    		&&
-	    L[2]->AM == AM65_ZP_INDY  		&&
-	    strcmp (L[2]->Arg, E->Arg) == 0	&&
-	    !CE_HasLabel (L[2])		        &&
-       	    CE_IsCall (L[3], "bnegax")          &&
-	    !CE_HasLabel (L[3])		        &&
-       	    (L[4]->Info & OF_ZBRA) != 0         &&
-	    !CE_HasLabel (L[4])) {
+	if (L[0]->OPC == OP65_LDY               &&
+	    CE_KnownImm (L[0])			&&
+	    !CS_RangeHasLabel (S, I+1, 3)       &&
+       	    CS_GetEntries (S, L+1, I+1, 3)      &&
+	    CE_IsCall (L[1], "ldaxysp")         &&
+       	    CE_IsCall (L[2], "bnegax")          &&
+       	    (L[3]->Info & OF_ZBRA) != 0) {
 
-	    /* lda --> ora */
-	    CE_ReplaceOPC (L[2], OP65_ORA);
+	    CodeEntry* X;
+
+	    /* lda (sp),y */
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+	    CS_InsertEntry (S, X, I+1);
+
+	    /* dey */
+	    X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, L[1]->LI);
+	    CS_InsertEntry (S, X, I+2);
+
+	    /* ora (sp),y */
+	    X = NewCodeEntry (OP65_ORA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
+	    CS_InsertEntry (S, X, I+3);
 
   	    /* Invert the branch */
-	    CE_ReplaceOPC (L[4], GetInverseBranch (L[4]->OPC));
+       	    CE_ReplaceOPC (L[3], GetInverseBranch (L[3]->OPC));
 
-      	    /* Delete the entries no longer needed. Beware: Deleting entries
-	     * will change the indices.
-	     */
-       	    CS_DelEntry (S, I+4);	    	/* jsr bnegax */
-	    CS_DelEntry (S, I+1);	    	/* tax */
+      	    /* Delete the entries no longer needed. */
+       	    CS_DelEntries (S, I+4, 2);
 
 	    /* Remember, we had changes */
 	    ++Changes;

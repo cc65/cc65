@@ -52,6 +52,7 @@
 #include "coptcmp.h"
 #include "coptind.h"
 #include "coptneg.h"
+#include "coptpush.h"
 #include "coptstop.h"
 #include "coptsub.h"
 #include "copttest.h"
@@ -1352,8 +1353,8 @@ struct OptFunc {
 
 /* A list of all the function descriptions */
 static OptFunc DOpt65C02Ind    	= { Opt65C02Ind,     "Opt65C02Ind",     100, 0, 0, 0, 0, 0 };
-static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",        	100, 0, 0, 0, 0, 0 };
-static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",        	100, 0, 0, 0, 0, 0 };
+static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",        	 60, 0, 0, 0, 0, 0 };
+static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",        	200, 0, 0, 0, 0, 0 };
 static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",        	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptBranchDist  	= { OptBranchDist,   "OptBranchDist",   100, 0, 0, 0, 0, 0 };
@@ -1388,6 +1389,7 @@ static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",    	100, 0, 
 static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",    	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    100, 0, 0, 0, 0, 0 };
 static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    100, 0, 0, 0, 0, 0 };
+static OptFunc DOptPush1       	= { OptPush1,        "OptPush1",         65, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",      	100, 0, 0, 0, 0, 0 };
 static OptFunc DOptShift2      	= { OptShift2,       "OptShift2",      	100, 0, 0, 0, 0, 0 };
 /*static OptFunc DOptSize1        = { OptSize1,        "OptSize1",        100, 0, 0, 0, 0, 0 };*/
@@ -1438,6 +1440,7 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrLoad6,
     &DOptPtrStore1,
     &DOptPtrStore2,
+    &DOptPush1,
     &DOptRTS,
     &DOptRTSJumps1,
     &DOptRTSJumps2,
@@ -1584,7 +1587,7 @@ static void ReadOptStats (const char* Name)
 
 	/* Parse the line */
        	if (sscanf (B, "%31s %lu %*u %lu %*u", Name, &TotalRuns, &TotalChanges) != 3) {
-	    /* Syntax error */
+      	    /* Syntax error */
 	    continue;
 	}
 
@@ -1626,7 +1629,7 @@ static void WriteOptStats (const char* Name)
        	       	 "%-20s %6lu %6lu %6lu %6lu\n",
 		 O->Name,
 		 O->TotalRuns,
-		 O->LastRuns,
+      	       	 O->LastRuns,
 		 O->TotalChanges,
 		 O->LastChanges);
     }
@@ -1642,7 +1645,7 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 {
     unsigned Changes, C;
 
-    /* Don't run the function if it is disabled or if it is prohibited by the 
+    /* Don't run the function if it is disabled or if it is prohibited by the
      * code size factor
      */
     if (F->Disabled || CodeSizeFactor < F->CodeSizeFactor) {
@@ -1671,131 +1674,174 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
 
 
 
-static void RunOptGroup1 (CodeSeg* S)
+static unsigned RunOptGroup1 (CodeSeg* S)
 /* Run the first group of optimization steps. These steps translate known
  * patterns emitted by the code generator into more optimal patterns. Order
  * of the steps is important, because some of the steps done earlier cover
  * the same patterns as later steps as subpatterns.
  */
 {
-    RunOptFunc (S, &DOptPtrStore1, 1);
-    RunOptFunc (S, &DOptPtrStore2, 1);
-    RunOptFunc (S, &DOptPtrLoad1, 1);
-    RunOptFunc (S, &DOptPtrLoad2, 1);
-    RunOptFunc (S, &DOptPtrLoad3, 1);
-    RunOptFunc (S, &DOptPtrLoad4, 1);
-    RunOptFunc (S, &DOptPtrLoad5, 1);
-    RunOptFunc (S, &DOptNegAX1, 1);
-    RunOptFunc (S, &DOptNegAX2, 1);
-    RunOptFunc (S, &DOptNegAX3, 1);
-    RunOptFunc (S, &DOptNegAX4, 1);
-    RunOptFunc (S, &DOptAdd1, 1);
-    RunOptFunc (S, &DOptAdd2, 1);
-    RunOptFunc (S, &DOptShift1, 1);
-    RunOptFunc (S, &DOptShift2, 1);
+    unsigned Changes = 0;
+
+    Changes += RunOptFunc (S, &DOptPtrStore1, 1);
+    Changes += RunOptFunc (S, &DOptPtrStore2, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad1, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad2, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad3, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad4, 1);
+    Changes += RunOptFunc (S, &DOptPtrLoad5, 1);
+    Changes += RunOptFunc (S, &DOptNegAX1, 1);
+    Changes += RunOptFunc (S, &DOptNegAX2, 1);
+    Changes += RunOptFunc (S, &DOptNegAX3, 1);
+    Changes += RunOptFunc (S, &DOptNegAX4, 1);
+    Changes += RunOptFunc (S, &DOptAdd1, 1);
+    Changes += RunOptFunc (S, &DOptAdd2, 1);
+    Changes += RunOptFunc (S, &DOptShift1, 1);
+    Changes += RunOptFunc (S, &DOptShift2, 1);
+
+    /* Return the number of changes */
+    return Changes;
 }
 
 
 
-static void RunOptGroup2 (CodeSeg* S)
+static unsigned RunOptGroup2 (CodeSeg* S)
 /* Run one group of optimization steps. This step involves just decoupling
  * instructions by replacing them by instructions that do not depend on
  * previous instructions. This makes it easier to find instructions that
  * aren't used.
  */
 {
-    RunOptFunc (S, &DOptDecouple, 1);
+    unsigned Changes = 0;
+
+    Changes += RunOptFunc (S, &DOptDecouple, 1);
+
+    /* Return the number of changes */
+    return Changes;
 }
 
 
 
-
-static void RunOptGroup3 (CodeSeg* S)
+static unsigned RunOptGroup3 (CodeSeg* S)
 /* Run one group of optimization steps. These steps depend on each other,
  * that means that one step may allow another step to do additional work,
  * so we will repeat the steps as long as we see any changes.
  */
 {
-    unsigned Changes;
+    unsigned Changes, C;
 
+    Changes = 0;
     do {
-	Changes = 0;
+       	C = 0;
 
-	Changes += RunOptFunc (S, &DOptPtrLoad6, 1);
-       	Changes += RunOptFunc (S, &DOptNegA1, 1);
-       	Changes += RunOptFunc (S, &DOptNegA2, 1);
-       	Changes += RunOptFunc (S, &DOptSub1, 1);
-       	Changes += RunOptFunc (S, &DOptSub2, 1);
-       	Changes += RunOptFunc (S, &DOptAdd3, 1);
-	Changes += RunOptFunc (S, &DOptStackOps, 1);
-       	Changes += RunOptFunc (S, &DOptJumpCascades, 1);
-       	Changes += RunOptFunc (S, &DOptDeadJumps, 1);
-       	Changes += RunOptFunc (S, &DOptRTS, 1);
-       	Changes += RunOptFunc (S, &DOptDeadCode, 1);
-       	Changes += RunOptFunc (S, &DOptJumpTarget, 1);
-	Changes += RunOptFunc (S, &DOptCondBranches, 1);
-	Changes += RunOptFunc (S, &DOptRTSJumps1, 1);
-	Changes += RunOptFunc (S, &DOptBoolTrans, 1);
-	Changes += RunOptFunc (S, &DOptCmp1, 1);
-	Changes += RunOptFunc (S, &DOptCmp2, 1);
-	Changes += RunOptFunc (S, &DOptCmp3, 1);
-	Changes += RunOptFunc (S, &DOptCmp4, 1);
-	Changes += RunOptFunc (S, &DOptCmp5, 1);
-	Changes += RunOptFunc (S, &DOptCmp6, 1);
-	Changes += RunOptFunc (S, &DOptCmp7, 1);
-	Changes += RunOptFunc (S, &DOptTest1, 1);
-	Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
-	Changes += RunOptFunc (S, &DOptUnusedStores, 1);
-	Changes += RunOptFunc (S, &DOptDupLoads, 1);
-	Changes += RunOptFunc (S, &DOptStoreLoad, 1);
-	Changes += RunOptFunc (S, &DOptTransfers, 1);
+       	C += RunOptFunc (S, &DOptPtrLoad6, 1);
+       	C += RunOptFunc (S, &DOptNegA1, 1);
+       	C += RunOptFunc (S, &DOptNegA2, 1);
+       	C += RunOptFunc (S, &DOptSub1, 1);
+       	C += RunOptFunc (S, &DOptSub2, 1);
+       	C += RunOptFunc (S, &DOptAdd3, 1);
+       	C += RunOptFunc (S, &DOptStackOps, 1);
+       	C += RunOptFunc (S, &DOptJumpCascades, 1);
+       	C += RunOptFunc (S, &DOptDeadJumps, 1);
+       	C += RunOptFunc (S, &DOptRTS, 1);
+       	C += RunOptFunc (S, &DOptDeadCode, 1);
+       	C += RunOptFunc (S, &DOptJumpTarget, 1);
+       	C += RunOptFunc (S, &DOptCondBranches, 1);
+       	C += RunOptFunc (S, &DOptRTSJumps1, 1);
+       	C += RunOptFunc (S, &DOptBoolTrans, 1);
+       	C += RunOptFunc (S, &DOptCmp1, 1);
+       	C += RunOptFunc (S, &DOptCmp2, 1);
+       	C += RunOptFunc (S, &DOptCmp3, 1);
+       	C += RunOptFunc (S, &DOptCmp4, 1);
+       	C += RunOptFunc (S, &DOptCmp5, 1);
+       	C += RunOptFunc (S, &DOptCmp6, 1);
+       	C += RunOptFunc (S, &DOptCmp7, 1);
+       	C += RunOptFunc (S, &DOptTest1, 1);
+       	C += RunOptFunc (S, &DOptUnusedLoads, 1);
+       	C += RunOptFunc (S, &DOptUnusedStores, 1);
+       	C += RunOptFunc (S, &DOptDupLoads, 1);
+       	C += RunOptFunc (S, &DOptStoreLoad, 1);
+       	C += RunOptFunc (S, &DOptTransfers, 1);
 
-    } while (Changes);
+	Changes += C;
+
+    } while (C);
+
+    /* Return the number of changes */
+    return Changes;
 }
 
 
 
-static void RunOptGroup4 (CodeSeg* S)
+static unsigned RunOptGroup4 (CodeSeg* S)
 /* 65C02 specific optimizations. */
 {
-    if (CPU < CPU_65C02) {
-	return;
+    unsigned Changes = 0;
+
+    if (CPU >= CPU_65C02) {
+    	/* Replace (zp),y by (zp) if Y is zero. If we have changes, run register
+    	 * load optimization again, since loads of Y may have become unnecessary.
+    	 */
+    	unsigned C = RunOptFunc (S, &DOpt65C02Ind, 1);
+    	Changes += C;
+    	if (C) {
+    	    Changes += RunOptFunc (S, &DOptUnusedLoads, 1);
+    	}
     }
 
-    /* Replace (zp),y by (zp) if Y is zero. If we have changes, run register
-     * load optimization again, since loads of Y may have become unnecessary.
-     */
-    if (RunOptFunc (S, &DOpt65C02Ind, 1) > 0) {
-	RunOptFunc (S, &DOptUnusedLoads, 1);
-    }
+    /* Return the number of changes */
+    return Changes;
 }
 
 
 
-static void RunOptGroup5 (CodeSeg* S)
+static unsigned RunOptGroup5 (CodeSeg* S)
+/* Run another round of pattern replacements. These are done late, since there
+ * may be better replacements before.
+ */
+{		
+    unsigned Changes = 0;
+
+    Changes += RunOptFunc (S, &DOptPush1, 1);
+    
+    /* Return the number of changes */
+    return Changes;
+}
+
+
+
+static unsigned RunOptGroup6 (CodeSeg* S)
 /* The last group of optimization steps. Adjust branches, do size optimizations.
  */
 {
+    unsigned Changes = 0;
+    unsigned C;
+
     /* Optimize for size, that is replace operations by shorter ones, even
      * if this does hinder further optimizations (no problem since we're
      * done soon).
      */
-    RunOptFunc (S, &DOptSize2, 1);
+    Changes += RunOptFunc (S, &DOptSize2, 1);
 
     /* Run the jump target optimization again, since the size optimization
      * above may have opened new oportunities.
      */
-    RunOptFunc (S, &DOptJumpTarget, 5);
+    Changes += RunOptFunc (S, &DOptJumpTarget, 5);
 
     /* Adjust branch distances */
-    RunOptFunc (S, &DOptBranchDist, 3);
+    Changes += RunOptFunc (S, &DOptBranchDist, 3);
 
     /* Replace conditional branches to RTS. If we had changes, we must run dead
      * code elimination again, since the change may have introduced dead code.
      */
-    if (RunOptFunc (S, &DOptRTSJumps2, 1)) {
-	RunOptFunc (S, &DOptDeadCode, 1);
+    C = RunOptFunc (S, &DOptRTSJumps2, 1);
+    Changes += C;
+    if (C) {
+      	Changes += RunOptFunc (S, &DOptDeadCode, 1);
     }
+
+    /* Return the number of changes */
+    return Changes;
 }
 
 
@@ -1807,7 +1853,7 @@ void RunOpt (CodeSeg* S)
 
     /* If we shouldn't run the optimizer, bail out */
     if (!Optimize) {
-    	return;
+      	return;
     }
 
     /* Check if we are requested to write optimizer statistics */
@@ -1829,6 +1875,7 @@ void RunOpt (CodeSeg* S)
     RunOptGroup3 (S);
     RunOptGroup4 (S);
     RunOptGroup5 (S);
+    RunOptGroup6 (S);
 
     /* Write statistics */
     if (StatFileName) {

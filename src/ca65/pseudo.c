@@ -816,27 +816,89 @@ static void DoImportZP (void)
 static void DoIncBin (void)
 /* Include a binary file */
 {
+    char Name [sizeof (SVal)];
+    long Start = 0L;
+    long Count = -1L;
+    long Size;
+    FILE* F;
+
     /* Name must follow */
     if (Tok != TOK_STRCON) {
-	ErrorSkip (ERR_STRCON_EXPECTED);
-    } else {
-	/* Try to open the file */
-	FILE* F = fopen (SVal, "rb");
-	if (F == 0) {
-	    Error (ERR_CANNOT_OPEN_INCLUDE, SVal, strerror (errno));
-	} else {
- 	    unsigned char Buf [1024];
-	    size_t Count;
-	    /* Read chunks and insert them into the output */
-	    while ((Count = fread (Buf, 1, sizeof (Buf), F)) > 0) {
-		EmitData (Buf, Count);
-	    }
-	    /* Close the file, ignore errors since it's r/o */
-	    (void) fclose (F);
-	}
-	/* Skip the name */
-	NextTok ();
+    	ErrorSkip (ERR_STRCON_EXPECTED);
+    	return;
     }
+    strcpy (Name, SVal);
+    NextTok ();
+
+    /* A starting offset may follow */
+    if (Tok == TOK_COMMA) {
+    	NextTok ();
+    	Start = ConstExpression ();
+
+    	/* And a length may follow */
+    	if (Tok == TOK_COMMA) {
+    	    NextTok ();
+    	    Count = ConstExpression ();
+    	}
+
+    }
+
+    /* Try to open the file */
+    F = fopen (Name, "rb");
+    if (F == 0) {
+       	ErrorSkip (ERR_CANNOT_OPEN_INCLUDE, Name, strerror (errno));
+    	return;
+    }
+
+    /* Get the size of the file */
+    fseek (F, 0, SEEK_END);
+    Size = ftell (F);
+
+    /* If a count was not given, calculate it now */
+    if (Count < 0) {
+	Count = Size - Start;
+	if (Count < 0) {
+	    /* Nothing to read - flag this as a range error */
+	    ErrorSkip (ERR_RANGE);
+	    goto Done;
+	}
+    } else {
+	/* Count was given, check if it is valid */
+	if (Start + Count > Size) {
+	    ErrorSkip (ERR_RANGE);
+	    goto Done;
+	}
+    }
+
+    /* Seek to the start position */
+    fseek (F, Start, SEEK_SET);
+
+    /* Read chunks and insert them into the output */
+    while (Count > 0) {
+
+	unsigned char Buf [1024];
+
+	/* Calculate the number of bytes to read */
+       	size_t BytesToRead = (Count > (long)sizeof(Buf))? sizeof(Buf) : (size_t) Count;
+
+	/* Read chunk */
+	size_t BytesRead = fread (Buf, 1, BytesToRead, F);
+	if (BytesToRead != BytesRead) {
+	    /* Some sort of error */
+	    ErrorSkip (ERR_CANNOT_READ_INCLUDE, Name, strerror (errno));
+	    break;
+	}
+
+	/* Insert it into the output */
+	EmitData (Buf, Count);
+
+	/* Keep the counters current */
+	Count -= BytesRead;
+    }
+
+Done:
+    /* Close the file, ignore errors since it's r/o */
+    (void) fclose (F);
 }
 
 

@@ -122,9 +122,10 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
 /* Print an error message */
 {
     static const char* Msgs [ERR_COUNT-1] = {
-	"Command/operation not implemented",
-	"Cannot open include file `%s': %s",
-	"Include nesting too deep",
+     	"Command/operation not implemented",
+     	"Cannot open include file `%s': %s",
+	"Cannot read from include file `%s': %s",
+     	"Include nesting too deep",
         "Invalid input character: %02X",
 	"Hex digit expected",
 	"Digit expected",
@@ -158,7 +159,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
 	"Illegal use of local symbol",
 	"Illegal segment name: `%s'",
 	"Illegal segment attribute",
-	"Illegal macro package name",
+     	"Illegal macro package name",
 	"Illegal emulation feature",
 	"Syntax error",
  	"Symbol `%s' is already defined",
@@ -179,7 +180,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
 	"Circular reference in symbol definition",
        	"Symbol redeclaration mismatch",
         "Alignment value must be a power of 2",
-	"Duplicate `.ELSE'",
+     	"Duplicate `.ELSE'",
        	"Conditional assembly branch was never closed",
 	"Lexical level was not terminated correctly",
 	"Segment attribute mismatch",

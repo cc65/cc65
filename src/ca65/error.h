@@ -65,6 +65,7 @@ enum Errors {
     ERR_NONE,  	       	       	      	/* No error */
     ERR_NOT_IMPLEMENTED,		/* Command/operation not implemented */
     ERR_CANNOT_OPEN_INCLUDE,
+    ERR_CANNOT_READ_INCLUDE,
     ERR_INCLUDE_NESTING,
     ERR_INVALID_CHAR,
     ERR_HEX_DIGIT_EXPECTED,

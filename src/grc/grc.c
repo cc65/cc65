@@ -50,7 +50,7 @@ unsigned char buffer[BLOODY_BIG_BUFFER];
 unsigned char vlirtabt[127];
 unsigned char vlirtabs[127];
 int i,j;
-size_t bytes;
+int bytes;
 int blocks,rest;
 
 	i=2;

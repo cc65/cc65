@@ -261,7 +261,7 @@ unsigned OptDeadJumps (CodeSeg* S)
 
 
 /*****************************************************************************/
-/*			       Remove dead code			      	     */
+/*	    		       Remove dead code			      	     */
 /*****************************************************************************/
 
 
@@ -278,16 +278,22 @@ unsigned OptDeadCode (CodeSeg* S)
     while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* N;
+        CodeLabel* LN;
 
  	/* Get this entry */
  	CodeEntry* E = CS_GetEntry (S, I);
 
        	/* Check if it's an unconditional branch, and if the next entry has
- 	 * no labels attached
+ 	 * no labels attached, or if the label is just used so that the insn
+         * can jump to itself.
  	 */
-       	if ((E->Info & OF_DEAD) != 0   	       &&
-	    (N = CS_GetNextEntry (S, I)) != 0  &&
-	    !CE_HasLabel (N)) {
+       	if ((E->Info & OF_DEAD) != 0   	                 &&     /* Dead code follows */
+	    (N = CS_GetNextEntry (S, I)) != 0            &&     /* Has next entry */
+       	    (!CE_HasLabel (N)                        ||         /* Don't has a label */
+             ((N->Info & OF_UBRA) != 0          &&              /* Uncond branch */
+              (LN = N->JumpTo) != 0             &&              /* Jumps to known label */
+              LN->Owner == N                    &&              /* Attached to insn */
+              CL_GetRefCount (LN) == 1))) {                     /* Only reference */
 
  	    /* Delete the next entry */
  	    CS_DelEntry (S, I+1);
@@ -352,10 +358,28 @@ unsigned OptJumpCascades (CodeSeg* S)
        	       	((E->Info & OF_CBRA) != 0 &&
 	    	 GetBranchCond (E->OPC)  == GetBranchCond (N->OPC))) {
 
-	     	/* This is a jump cascade and we may jump to the final target.
-	    	 * Insert a new instruction, then remove the old one
+	     	/* This is a jump cascade and we may jump to the final target,
+                 * provided that the other insn does not jump to itself. If
+                 * this is the case, we can also jump to ourselves, otherwise
+                 * insert a jump to the new instruction and remove the old one.
 	     	 */
-	    	CodeEntry* X = NewCodeEntry (E->OPC, E->AM, N->Arg, N->JumpTo, E->LI);
+       	       	CodeEntry* X;
+                CodeLabel* LN = N->JumpTo;
+
+                if (LN != 0 && LN->Owner == N) {
+
+                    /* We found a jump to a jump to itself. Replace our jump
+                     * by a jump to itself.
+                     */
+                    CodeLabel* LE = CS_GenLabel (S, E);
+                    X = NewCodeEntry (E->OPC, E->AM, LE->Name, LE, E->LI);
+
+                } else {
+
+                    /* Jump to the final jump target */
+                    X = NewCodeEntry (E->OPC, E->AM, N->Arg, N->JumpTo, E->LI);
+
+                }
 
 	    	/* Insert it behind E */
 	    	CS_InsertEntry (S, X, I+1);

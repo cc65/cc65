@@ -69,6 +69,7 @@ CCCFG	= $(CCCFG) -i=..\common
 
 OBJS =	bin.obj		\
 	binfmt.obj	\
+	condes.obj	\
 	config.obj	\
 	dbgsyms.obj	\
 	error.obj	\
@@ -110,6 +111,7 @@ OPTION QUIET
 NAME $<
 FILE bin.obj
 FILE binfmt.obj
+FILE condes.obj
 FILE config.obj
 FILE dbgsyms.obj
 FILE error.obj
@@ -117,6 +119,7 @@ FILE exports.obj
 FILE expr.obj
 FILE extsyms.obj
 FILE fileio.obj
+FILE fragment.obj
 FILE global.obj
 FILE library.obj
 FILE main.obj

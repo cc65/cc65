@@ -525,7 +525,7 @@ void g_leave (int flags, int val)
      	    strcat (buf, "y");
      	} else {
 	    /* Y register no longer used */
-	    AddCodeHint ("y:-");	
+	    AddCodeHint ("y:-");
 	}
      	if (flags & CF_CONST) {
      	    if ((flags & CF_TYPE) != CF_LONG) {
@@ -2507,10 +2507,18 @@ void g_space (int space)
 /* Create or drop space on the stack */
 {
     if (space < 0) {
-	mod_internal (-space, "inc", "addy");
+     	mod_internal (-space, "inc", "addy");
     } else if (space > 0) {
-	mod_internal (space, "dec", "suby");
+     	mod_internal (space, "dec", "suby");
     }
+}
+
+
+
+void g_stackcheck (void)
+/* Check for a stack overflow */
+{
+    AddCodeLine ("\tjsr\tstkchk");
 }
 
 

@@ -371,6 +371,9 @@ void g_falsejump (unsigned flags, unsigned label);
 void g_space (int space);
 /* Create or drop space on the stack */
 
+void g_stackcheck (void);
+/* Check for a stack overflow */
+
 void g_add (unsigned flags, unsigned long val);
 void g_sub (unsigned flags, unsigned long val);
 void g_rsub (unsigned flags, unsigned long val);

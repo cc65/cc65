@@ -97,6 +97,7 @@ static void Usage (void)
 	     "Long options:\n"
        	     "  --ansi\t\tStrict ANSI mode\n"
 	     "  --bss-name seg\tSet the name of the BSS segment\n"
+       	     "  --check-stack\tGenerate stack overflow checks\n"
        	     "  --code-name seg\tSet the name of the CODE segment\n"
        	     "  --cpu type\t\tSet cpu type\n"
        	     "  --data-name seg\tSet the name of the DATA segment\n"
@@ -293,6 +294,14 @@ static void OptBssName (const char* Opt, const char* Arg)
 
 
 
+static void OptCheckStack (const char* Opt, const char* Arg)
+/* Handle the --check-stack option */
+{
+    CheckStack = 1;
+}
+
+
+
 static void OptCodeName (const char* Opt, const char* Arg)
 /* Handle the --code-name option */
 {
@@ -433,6 +442,7 @@ int main (int argc, char* argv[])
 	{ "--add-source",	0,    	OptAddSource		},
 	{ "--ansi",   	 	0,	OptAnsi			},
 	{ "--bss-name",		1, 	OptBssName		},
+       	{ "--check-stack",	0,     	OptCheckStack		},
 	{ "--code-name",	1, 	OptCodeName		},
 	{ "--create-dep",	0,	OptCreateDep		},
         { "--cpu",     	       	1, 	OptCPU 			},
@@ -442,11 +452,11 @@ int main (int argc, char* argv[])
 	{ "--help",	 	0, 	OptHelp			},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
 	{ "--rodata-name",	1, 	OptRodataName		},
-	{ "--signed-chars",	0, 	OptSignedChars		},
-       	{ "--static-locals",   	0, 	OptStaticLocals		},
-	{ "--target",	 	1,  	OptTarget		},
-	{ "--verbose",	       	0, 	OptVerbose		},
-	{ "--version",	       	0,	OptVersion		},
+	{ "--signed-chars",	0, 	OptSignedChars	       	},
+       	{ "--static-locals",   	0, 	OptStaticLocals	       	},
+	{ "--target",	 	1,  	OptTarget	       	},
+	{ "--verbose",	       	0, 	OptVerbose	       	},
+	{ "--version",	       	0,	OptVersion	       	},
     };
 
     int I;

@@ -322,6 +322,9 @@ static void ParseOneDecl (const DeclSpec* Spec)
 void DeclareLocals (void)
 /* Declare local variables and types. */
 {
+    /* Remember the current stack pointer */
+    int InitialStack = oursp;
+
     /* Loop until we don't find any more variables */
     while (1) {
 
@@ -370,6 +373,13 @@ void DeclareLocals (void)
 
     /* In case we switched away from code segment, switch back now */
     g_usecode ();
+
+    /* In case we've allocated local variables in this block, emit a call to
+     * the stack checking routine if stack checks are enabled.
+     */
+    if (CheckStack && InitialStack != oursp) {
+	g_stackcheck ();
+    }
 }
 
 

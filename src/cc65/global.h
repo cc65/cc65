@@ -59,6 +59,7 @@ extern unsigned char	AddSource;		/* Add source lines as comments */
 extern unsigned char	DebugInfo;		/* Add debug info to the obj */
 extern unsigned char	Debug;			/* Debug mode */
 extern unsigned char	CreateDep;		/* Create a dependency file */
+extern unsigned char	CheckStack;		/* Generate stack overflow checks */
 
 
 /* End of global.h */

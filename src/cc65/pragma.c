@@ -58,6 +58,7 @@
 /* Tokens for the #pragmas */
 typedef enum {
     PR_BSSSEG,
+    PR_CHECKSTACK,
     PR_CODESEG,
     PR_DATASEG,
     PR_REGVARADDR,
@@ -74,6 +75,7 @@ static const struct Pragma {
     pragma_t	Tok;		/* Token */
 } Pragmas[] = {
     { 	"bssseg",       PR_BSSSEG	},
+    {	"checkstack",	PR_CHECKSTACK	},
     {   "codeseg",    	PR_CODESEG	},
     {   "dataseg",    	PR_DATASEG	},
     {   "regvaraddr", 	PR_REGVARADDR	},
@@ -215,6 +217,10 @@ void DoPragma (void)
 
 	case PR_BSSSEG:
 	    SegNamePragma (g_bssname);
+	    break;
+
+	case PR_CHECKSTACK:
+	    FlagPragma (&CheckStack);
 	    break;
 
 	case PR_CODESEG:

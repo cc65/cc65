@@ -114,7 +114,11 @@ void CollInsert (Collection* C, void* Item, unsigned Index)
     if (C->Count >= C->Size) {
     	/* Must grow */
        	void** NewItems;
-    	C->Size *= 2;
+	if (C->Size > 0) {
+	    C->Size *= 2;
+	} else {
+	    C->Size = 8;
+	}
     	NewItems = xmalloc (C->Size * sizeof (void*));
     	memcpy (NewItems, C->Items, C->Count * sizeof (void*));
     	xfree (C->Items);

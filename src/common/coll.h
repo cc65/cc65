@@ -56,6 +56,9 @@ struct Collection {
     void**	    	Items;		/* Array with dynamic size */
 };
 
+/* Initializer for static collections */
+#define STATIC_COLLECTION_INITIALIZER	{ 0, 0, 0 }
+
 
 
 /*****************************************************************************/
@@ -73,7 +76,7 @@ void DoneCollection (Collection* C);
  */
 
 Collection* NewCollection (void);
-/* Create and return a new collection with the given initial size */
+/* Create and return a new collection */
 
 void FreeCollection (Collection* C);
 /* Free a collection */

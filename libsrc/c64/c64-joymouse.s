@@ -126,7 +126,7 @@ INSTALL:
 
         ldx     #$00
         txa
-        rts                             ; Run into UNINSTALL instead
+        rts
 
 ;----------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.

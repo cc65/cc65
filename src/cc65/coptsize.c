@@ -64,6 +64,7 @@ struct CallDesc {
 static const CallDesc CallTable [] = {
     { "addeqysp",   -1,   -1,    0, "addeq0sp"      },
     { "laddeqysp",  -1,   -1,    0, "laddeq0sp"     },
+    { "ldaxidx",    -1,   -1,    1, "ldaxi"         },
     { "ldaxysp",    -1,   -1,    1, "ldax0sp"       },
     { "ldeaxidx",   -1,   -1,    3, "ldeaxi"        },
     { "ldeaxysp",   -1,   -1,    3, "ldeax0sp"      },
@@ -90,8 +91,6 @@ static const CallDesc CallTable [] = {
     { "tosgtax",    -1,    0,   -1, "tosgta0"       },
     { "tosleax",    -1,    0,   -1, "toslea0"       },
     { "tosorax",    -1,    0,   -1, "tosora0"       },
-    { "ldaxidx",    -1,   -1,    1, "ldaxi"         },
-    { "ldeaxysp",   -1,   -1,    3, "ldeax0sp"      },
     { "lsubeqysp",  -1,   -1,    0, "lsubeq0sp"     },
     { "steaxysp",   -1,   -1,    0, "steax0sp"      },
     { "subeqysp",   -1,   -1,    0, "subeq0sp"      },

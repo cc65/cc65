@@ -62,7 +62,7 @@
 
 
 /*****************************************************************************/
-/*		  		     data				     */
+/*		  	   	     data				     */
 /*****************************************************************************/
 
 
@@ -85,7 +85,7 @@ static const struct Keyword {
     unsigned char   Tok;    	/* The token */
     unsigned char   Std;        /* Token supported in which standards? */
 } Keywords [] = {
-    { "_Pragma",        TOK_PRAGMA,              TT_C99 | TT_CC65  },
+    { "_Pragma",        TOK_PRAGMA,     TT_C89 | TT_C99 | TT_CC65  },   /* !! */
     { "__AX__",	       	TOK_AX,	       	TT_C89 | TT_C99 | TT_CC65  },
     { "__A__", 	       	TOK_A, 	       	TT_C89 | TT_C99 | TT_CC65  },
     { "__EAX__",       	TOK_EAX,       	TT_C89 | TT_C99 | TT_CC65  },

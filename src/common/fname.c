@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -71,6 +71,25 @@ const char* FindExt (const char* Name)
     } else {
 	return 0;
     }
+}
+
+
+
+const char* FindName (const char* Path)
+/* Return a pointer to the file name in Path. If there is no path leading to
+ * the file, the function returns Path as name.
+ */
+{
+    /* Get the length of the name */
+    int Len = strlen (Path);
+
+    /* Search for the path separator */
+    while (Len > 0 && Path[Len-1] != '\\' && Path[Len-1] != '/') {
+	--Len;
+    }
+
+    /* Return the name or path */
+    return Path + Len;
 }
 
 

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,6 +46,11 @@
 
 const char* FindExt (const char* Name);
 /* Return a pointer to the file extension in Name or NULL if there is none */
+
+const char* FindName (const char* Path);
+/* Return a pointer to the file name in Path. If there is no path leading to
+ * the file, the function returns Path as name.
+ */
 
 char* MakeFilename (const char* Origin, const char* Ext);
 /* Make a new file name from Origin and Ext. If Origin has an extension, it

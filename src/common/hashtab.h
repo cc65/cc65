@@ -109,10 +109,20 @@ INLINE void InitHashNode (HashNode* N, void* Entry)
     N->Entry    = Entry;
 }
 #else
-#define InitHashNode(N, Entry)  \
-    (N)->Next   = 0;            \
-    (N)->Owner  = 0;            \
-    (N)->Entry  = (Entry)
+#define InitHashNode(N, E)  	\
+    (N)->Next   = 0,            \
+    (N)->Owner  = 0,            \
+    (N)->Entry  = (E)	
+#endif
+
+#if defined(HAVE_INLINE)
+INLINE void* HN_GetEntry (HashNode* N)
+/* Get the entry from a hash node */
+{
+    return N->Entry;
+}
+#else
+#define HN_GetEntry(N)          (N)->Entry
 #endif
 
 
@@ -174,6 +184,11 @@ void FreeHashTable (HashTable* T);
 
 HashNode* HT_Find (const HashTable* T, const void* Key);
 /* Find the node with the given key*/
+
+HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash);
+/* Find the node with the given key. Differs from HT_Find in that the hash
+ * for the key is precalculated and passed to the function.
+ */
 
 void* HT_FindEntry (const HashTable* T, const void* Key);
 /* Find the node with the given key and return the corresponding entry */

@@ -77,16 +77,28 @@ static void HT_Alloc (HashTable* T)
 HashNode* HT_Find (const HashTable* T, const void* Key)
 /* Find the node with the given index */
 {
-    unsigned  Hash;
+    /* If we don't have a table, there's nothing to find */
+    if (T->Table == 0) {
+        return 0;
+    }
+
+    /* Search for the entry */
+    return HT_FindHash (T, Key, T->Func->GenHash (Key));
+}
+
+
+
+HashNode* HT_FindHash (const HashTable* T, const void* Key, unsigned Hash)
+/* Find the node with the given key. Differs from HT_Find in that the hash
+ * for the key is precalculated and passed to the function.
+ */
+{
     HashNode* N;
 
     /* If we don't have a table, there's nothing to find */
     if (T->Table == 0) {
         return 0;
     }
-
-    /* Generate the hash over the index */
-    Hash = T->Func->GenHash (Key);
 
     /* Search for the entry in the given chain */
     N = T->Table[Hash % T->Slots];
@@ -96,7 +108,7 @@ HashNode* HT_Find (const HashTable* T, const void* Key)
          * if it is not really necessary.
          */
         if (N->Hash == Hash &&
-            T->Func->Compare (Key, T->Func->GetKey (N->Entry)) == 0) {
+            T->Func->Compare (Key, T->Func->GetKey (HN_GetEntry (N))) == 0) {
             /* Found */
             break;
         }
@@ -118,7 +130,7 @@ void* HT_FindEntry (const HashTable* T, const void* Key)
     HashNode* N = HT_Find (T, Key);
 
     /* Convert the node into an entry if necessary */
-    return N? N->Entry : 0;
+    return N? HN_GetEntry (N) : 0;
 }
 
 
@@ -134,7 +146,7 @@ void HT_Insert (HashTable* T, HashNode* N)
     }
 
     /* Generate the hash over the node key. */
-    N->Hash = T->Func->GenHash (T->Func->GetKey (N->Entry));
+    N->Hash = T->Func->GenHash (T->Func->GetKey (HN_GetEntry (N)));
 
     /* Calculate the reduced hash */
     RHash = N->Hash % T->Slots;
@@ -182,7 +194,7 @@ void HT_Walk (HashTable* T, void (*F) (void* Entry, void* Data), void* Data)
         /* Walk over all entries in this chain */
         while (N) {
             /* Call the user function */
-            F (N->Entry, Data);
+            F (HN_GetEntry (N), Data);
             /* Next node in chain */
             N = N->Next;
         }

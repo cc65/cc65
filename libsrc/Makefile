@@ -144,6 +144,7 @@ c128lib:
 	mv c128/crt0.o c128.o
 	cp c128/*.emd .
 	cp c128/*.joy .
+	cp c128/c128-640-200-2.tgi c128-vdc.tgi
 
 #-----------------------------------------------------------------------------
 # Commdore P500 / CBM 5x0
@@ -247,4 +248,4 @@ clean:
 
 .PHONY: zap
 zap:	clean
-	@rm -f *.o *.emd *.lib *.tgi
+	@rm -f *.o *.emd *.joy *.lib *.tgi

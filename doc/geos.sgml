@@ -6,7 +6,7 @@
 
 <title>GEOSLib docs
 <author>Maciej Witkowiak, <htmlurl url="mailto:ytm@elysium.pl" name="ytm@elysium.pl">
-<date>v1.2, 26.12.1999, 16.03.2000, 19-22.03.2000, 11,29.07.2000, 3-4,15.07.2001
+<date>v1.3, 26.12.1999, 16.03.2000, 19-22.03.2000, 11,29.07.2000, 3-4,15.07.2001, 27.10.2001
 <abstract>
 This is the documentation of cc65's GEOSLib, but information contained here may be also
 useful for writting GEOS applications in general.
@@ -37,8 +37,18 @@ resulting code will be smaller.
 <tt/dio/ - direct disk access is available, but you might have problems with devices other
 than 1541, 1571 or 1581. RAM drives emulating these should work.
 <p>
-It is safe to use these includes: <tt/dio.h, errno.h, geos.h, joystick.h, mouse.h, stdlib.h,
-string.h/
+<tt/conio/ - simple console input-output is available for command line applications. Note that
+unlikely other platforms this implementation does not provide fullscreen capabilities, e.g.
+you are on your own with checking last row and scrolling screen up etc. Color, line drawing and
+clearing functions are disabled because color is not supported and line drawing art can be
+easily done with graphics functions. Please note that a variable width font (to be specific:
+current font, so you can load any font you like) is used so <tt/wherex, gotox/ family functions
+will not always return the same values. In fact <tt/gotoxy/ sets current position to the place
+you would expect on a normal 40x25 screen, not a position that would regard current font's
+height. Both 40 and 80 columns modes are supported.
+<p>
+It is safe to use these standard includes: <tt/conio.h, dio.h, errno.h, geos.h, joystick.h,
+mouse.h, stdlib.h, string.h/
 <p>
 I am an assembler programmer and GEOSLib was designed in such way that cc65 could emit the best
 available code (well, the best as for machine :). Many of the <tt/void foo (void)/ functions are
@@ -103,8 +113,8 @@ This chapter describes some rules you ought to obey, and how to use GEOSLib.
 <sect1>General rules
 <p>
 Think twice before you use standard C library function. In current implementation almost always
-you will get better code using only <tt/geos.h/. This will change in next releases as standard
-functions will become wrappers to native GEOS Kernal.
+you will get better code using only <tt/geos.h/. This is constantly changing as standard
+functions are becoming wrappers to native GEOS Kernal with the new releases.
 <p>
 Apart from this file, which merely describes only standard GEOS library functions, you should read
 <tt/grc/ (GEOS resource compiler) documentation. There are informations about necessary resource

@@ -287,10 +287,7 @@ DEINSTALL:
 ; Must set an error code: YES
 ;
 
-INIT:   cmp     #TGI_MODE_640_200_2     ; Correct mode?
-        beq     @L1                     ; Jump if yes
-        lda     #TGI_ERR_INV_MODE       ; ## Error
-        bne     @L9
+INIT:
 
 ; Initialize variables
 
@@ -317,7 +314,7 @@ INIT:   cmp     #TGI_MODE_640_200_2     ; Correct mode?
 ; Done, reset the error code
 
         lda     #TGI_ERR_OK
-@L9:    sta     ERROR
+        sta     ERROR
         rts
 
 ; ------------------------------------------------------------------------

@@ -887,7 +887,11 @@ TEXTSTYLE:
 ;
 
 OUTTEXT:
-	lda	X1
+	lda	TEXTDIR
+;	cmp	#TGI_TEXT_HORIZONTAL	; this is equal 0
+	bne	@vertical
+
+	lda	X1		; horizontal text output
 	ldx	X1+1
 	ldy	Y1
 	sta	r11L
@@ -898,6 +902,27 @@ OUTTEXT:
 	sta	r0L
 	stx	r0H
 	jmp	PutString
+
+@vertical:
+	lda	X1		; vertical text output
+	ldx	X1+1
+	ldy	Y1
+	sta 	r11L
+	stx	r11H
+	sty	r1H
+	ldy	#0
+	lda	(ptr3),y
+	beq	@end
+	jsr	PutChar
+	inc	ptr3
+	bne	@L1
+	inc	ptr3+1
+@L1:	lda	Y1
+	clc
+	adc	#8
+	sta	Y1
+	bne	@vertical
+@end:	rts
 
 ;-------------
 ; copies of some runtime routines

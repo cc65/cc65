@@ -292,12 +292,8 @@ DEINSTALL:
 ; Must set an error code: YES
 ;
 
-INIT:   cmp     #TGI_MODE_640_480_2     ; Correct mode?
-        beq     @L1                     ; Jump if yes
-        lda     #TGI_ERR_INV_MODE       ; ## Error
-        bne     @L9
-
-@L1:	lda	pages			; is there enough memory?
+INIT:
+	lda	pages			; is there enough memory?
 	bne	@L11			; Jump if there is one screen
 	lda	#TGI_ERR_INV_MODE	; ## Error
 	bne	@L9

@@ -1348,9 +1348,6 @@ struct OptFunc {
 
 
 
-/* Macro that builds a function description */
-#define OptFuncEntry(func) static OptFuncDesc D##func = { func, #func, 0 }
-
 /* A list of all the function descriptions */
 static OptFunc DOpt65C02BitOps  = { Opt65C02BitOps,  "Opt65C02BitOps",   66, 0, 0, 0, 0, 0 };
 static OptFunc DOpt65C02Ind    	= { Opt65C02Ind,     "Opt65C02Ind",     100, 0, 0, 0, 0, 0 };
@@ -1777,7 +1774,7 @@ static unsigned RunOptGroup3 (CodeSeg* S)
 
 static unsigned RunOptGroup4 (CodeSeg* S)
 /* 65C02 specific optimizations. */
-{                        
+{
     unsigned C;
     unsigned Changes = 0;
 

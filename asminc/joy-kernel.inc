@@ -72,6 +72,7 @@ JOY_API_VERSION         = $00
 ;------------------------------------------------------------------------------
 ; ASM functions
 
+        .global _joy_unload
        	.global	_joy_install
        	.global _joy_uninstall
        	.global	_joy_count

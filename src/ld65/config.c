@@ -721,9 +721,6 @@ static void ParseSegments (void)
 	    CfgOptionalComma ();
 	}
 
-	/* Skip the semicolon */
-	CfgConsumeSemi ();
-
 	/* Check for mandatory parameters */
 	AttrCheck (S->Attr, SA_LOAD, "LOAD");
 
@@ -748,11 +745,19 @@ static void ParseSegments (void)
 		     CfgGetName (), CfgErrorLine);
 	}
 
+        /* If the segment is marked as BSS style, it may not have separate
+         * load and run memory areas, because it's is never written to disk.
+         */
+        if ((S->Flags & SF_BSS) != 0 && (S->Flags & SF_LOAD_AND_RUN) != 0) {
+       	    Warning ("%s(%u): Segment with type `bss' has both LOAD and RUN "
+                     "memory areas assigned", CfgGetName (), CfgErrorLine);
+        }
+
       	/* Don't allow read/write data to be put into a readonly area */
       	if ((S->Flags & SF_RO) == 0) {
        	    if (S->Run->Flags & MF_RO) {
-      		CfgError ("Cannot put r/w segment `%s' in r/o memory area `%s'",
-      		     	  S->Name, S->Run->Name);
+      	 	CfgError ("Cannot put r/w segment `%s' in r/o memory area `%s'",
+      	 	     	  S->Name, S->Run->Name);
       	    }
       	}
 
@@ -782,6 +787,9 @@ static void ParseSegments (void)
       	    /* Segment does not exist, discard the descriptor */
       	    FreeSegDesc (S);
       	}
+
+	/* Skip the semicolon */
+	CfgConsumeSemi ();
     }
 }
 

@@ -68,8 +68,7 @@ unsigned long PC;			/* Current PC */
 void LoadCode (const char* Name, unsigned long StartAddress)
 /* Load the code from the given file */
 {
-    unsigned Count, MaxCount;
-    long Size;
+    long Count, MaxCount, Size;
     FILE* F;
 
 

@@ -60,7 +60,7 @@ unsigned long StartAddr	      = 0xC000;	/* Start/load address of the program */
 unsigned char Pass	      = 0;	/* Disassembler pass */
 
 /* Page formatting */
-int PageLength		      = -1;	/* Length of a listing page */
+unsigned PageLength    	      = 0;	/* Length of a listing page */
 unsigned MIndent	      = 9;	/* Mnemonic indent */
 unsigned AIndent	      = 17;	/* Argument indent */
 unsigned CIndent	      = 49;	/* Comment indent */

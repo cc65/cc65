@@ -265,7 +265,7 @@ int main (int argc, char* argv [])
 	{ "--version",	       	0,	OptVersion		},
     };
 
-    int I;
+    unsigned I;
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "od65");

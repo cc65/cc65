@@ -58,7 +58,7 @@
 /* Current token and attributes */
 unsigned        CfgTok;
 char   	       	CfgSVal [CFG_MAX_IDENT_LEN+1];
-unsigned long   CfgIVal;
+long            CfgIVal;
 
 /* Error location */
 unsigned        	CfgErrorLine;
@@ -90,7 +90,7 @@ void CfgWarning (const char* Format, ...)
 
     va_start (ap, Format);
     xvsprintf (Buf, sizeof (Buf), Format, ap);
-    va_end (ap);	      
+    va_end (ap);
 
     Warning ("%s(%u): %s", CfgFile, CfgErrorLine, Buf);
 }
@@ -109,7 +109,7 @@ void CfgError (const char* Format, ...)
 
     Error ("%s(%u): %s", CfgFile, CfgErrorLine, Buf);
 }
-						
+
 
 
 /*****************************************************************************/
@@ -389,7 +389,7 @@ void CfgAssureIdent (void)
 
 
 
-void CfgRangeCheck (unsigned long Lo, unsigned long Hi)
+void CfgRangeCheck (long Lo, long Hi)
 /* Check the range of CfgIVal */
 {
     if (CfgIVal < Lo || CfgIVal > Hi) {

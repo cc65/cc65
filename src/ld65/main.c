@@ -304,7 +304,7 @@ int main (int argc, char* argv [])
 	{ "--version",	       	0,  	OptVersion   		},
     };
 
-    int I;
+    unsigned I;
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "ld65");
@@ -433,7 +433,7 @@ int main (int argc, char* argv [])
     }
     if (LabelFileName) {
 	CreateLabelFile ();
-    }	
+    }
     if (DbgFileName) {
 	CreateDbgFile ();
     }

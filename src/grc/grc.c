@@ -112,9 +112,9 @@ char *nextWord() {
     return strtok(NULL, " ");
     }
 
-void setLen (char *name, int len) {
+void setLen (char *name, unsigned len) {
     if (strlen(name)>len)
-	name[len]='\0';
+    	name[len]='\0';
 }
 
 void fillOut (char *name, int len, char *filler) {

@@ -2,7 +2,7 @@
 # gcc Makefile for grc
 #
 
-CFLAGS 	= -g -O2 -Wall
+CFLAGS 	= -g -O2 -Wall -W
 CC	= gcc
 LDFLAGS	=
 EBIND	= emxbind

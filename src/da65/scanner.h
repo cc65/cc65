@@ -107,7 +107,7 @@ struct IdentTok_ {
 #define CFG_MAX_IDENT_LEN  255
 extern unsigned		CfgTok;
 extern char    	       	CfgSVal [CFG_MAX_IDENT_LEN+1];
-extern unsigned long	CfgIVal;
+extern long	        CfgIVal;
 
 /* Error location */
 extern unsigned        	CfgErrorLine;
@@ -160,7 +160,7 @@ void CfgAssureStr (void);
 void CfgAssureIdent (void);
 /* Make sure the next token is an identifier */
 
-void CfgRangeCheck (unsigned long Lo, unsigned long Hi);
+void CfgRangeCheck (long Lo, long Hi);
 /* Check the range of CfgIVal */
 
 void CfgSpecialToken (const IdentTok* Table, unsigned Size, const char* Name);

@@ -168,7 +168,7 @@ static void OptPageLength (const char* Opt, const char* Arg)
 	NeedArg (Opt);
     }
     Len = atoi (Arg);
-    if (Len != -1 && (Len < MIN_PAGE_LEN || Len > MAX_PAGE_LEN)) {
+    if (Len != 0 && (Len < MIN_PAGE_LEN || Len > MAX_PAGE_LEN)) {
 	AbEnd ("Invalid page length: %d", Len);
     }
     PageLength = Len;
@@ -323,7 +323,7 @@ int main (int argc, char* argv [])
       	{ "--version", 	       	0,	OptVersion		},
     };
 
-    int I;
+    unsigned I;
 
     /* Initialize the cmdline module */
     InitCmdLine (&argc, &argv, "da65");

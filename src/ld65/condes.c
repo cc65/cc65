@@ -213,7 +213,7 @@ void ConDesSetSegName (unsigned Type, const char* SegName)
 /* Set the segment name where the table should go */
 {
     /* Check the parameters */
-    PRECONDITION (Type >= CD_TYPE_MIN && Type <= CD_TYPE_MAX && SegName != 0);
+    PRECONDITION (Type <= CD_TYPE_MAX && SegName != 0);
 
     /* Setting the segment name twice is bad */
     CHECK (ConDes[Type].SegName == 0);
@@ -228,7 +228,7 @@ void ConDesSetLabel (unsigned Type, const char* Name)
 /* Set the label for the given ConDes type */
 {
     /* Check the parameters */
-    PRECONDITION (Type >= CD_TYPE_MIN && Type <= CD_TYPE_MAX && Name != 0);
+    PRECONDITION (Type <= CD_TYPE_MAX && Name != 0);
 
     /* Setting the label twice is bad */
     CHECK (ConDes[Type].Label == 0);
@@ -243,7 +243,7 @@ void ConDesSetCountSym (unsigned Type, const char* Name)
 /* Set the name for the given ConDes count symbol */
 {
     /* Check the parameters */
-    PRECONDITION (Type >= CD_TYPE_MIN && Type <= CD_TYPE_MAX && Name != 0);
+    PRECONDITION (Type <= CD_TYPE_MAX && Name != 0);
 
     /* Setting the symbol twice is bad */
     CHECK (ConDes[Type].CountSym == 0);
@@ -258,7 +258,7 @@ void ConDesSetOrder (unsigned Type, ConDesOrder Order)
 /* Set the sorting oder for the given ConDes table */
 {
     /* Check the parameters */
-    PRECONDITION (Type >= CD_TYPE_MIN && Type <= CD_TYPE_MAX);
+    PRECONDITION (Type <= CD_TYPE_MAX);
 
     /* Set the order */
     ConDes[Type].Order = Order;
@@ -270,7 +270,7 @@ int ConDesHasSegName (unsigned Type)
 /* Return true if a segment name is already defined for this ConDes type */
 {
     /* Check the parameters */
-    PRECONDITION (Type >= CD_TYPE_MIN && Type <= CD_TYPE_MAX);
+    PRECONDITION (Type <= CD_TYPE_MAX);
 
     return (ConDes[Type].SegName != 0);
 }
@@ -281,7 +281,7 @@ int ConDesHasLabel (unsigned Type)
 /* Return true if a label is already defined for this ConDes type */
 {
     /* Check the parameters */
-    PRECONDITION (Type >= CD_TYPE_MIN && Type <= CD_TYPE_MAX);
+    PRECONDITION (Type <= CD_TYPE_MAX);
 
     return (ConDes[Type].Label != 0);
 }

@@ -10,7 +10,7 @@
  	.export		_lseek
 	.import		incsp6,__oserror
 	.import		__inviocb,ldax0sp,ldaxysp,fdtoiocb
-	.import		__seterrno
+	.import		__seterrno,__dos_type
 	.import		fd_table
 	.importzp	sreg,ptr1,ptr2,ptr3,ptr4
 	.importzp	tmp1,tmp2,tmp3
@@ -179,8 +179,9 @@ seek:	jsr	ldax0sp		; get lower word of new offset
 ; tmp3:		iocb
 ; X:		index into fd_table
 ;
+; On non-SpartaDOS, seeking is not supported.
 ; We check, whether CIO function 39 (get file size) returns OK.
-; If yes, NOTE and POINT work with real file offset. @@@ check out more DOS versions @@@
+; If yes, NOTE and POINT work with real file offset.
 ; If not, NOTE and POINT work with the standard ScNum/Offset values.
 ; We remember a successful check in fd_table.ft_flag, bit 3.
 
@@ -190,8 +191,14 @@ chk_supp:
 	bne	supp
 
 ; do the test
-unkn:	txa
+	lda	__dos_type
+	cmp	#SPARTADOS
+	bne	ns1
+	txa
 	pha
+	lda	DOS+1		; get SpartaDOS version
+	cmp	#$40
+	bcs	supp1		; SD-X (ver 4.xx) supports seeking on all disks
 	ldx	tmp3		; iocb to use
 	lda	#39		; get file size
 	sta	ICCOM,x
@@ -200,7 +207,7 @@ unkn:	txa
 
 ; seeking is supported on this DOS/Disk combination
 
-	pla
+supp1:	pla
 	tax
 	lda	#8
 	ora	fd_table+ft_flag,x
@@ -209,6 +216,6 @@ supp:	sec
 	rts
 
 notsupp:pla
-	clc
+ns1:	clc
 	rts
 

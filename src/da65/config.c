@@ -291,7 +291,7 @@ static void LabelSection (void)
 	       	    CfgError ("Size already given");
 	       	}
 	       	CfgAssureInt ();
-		CfgRangeCheck (1, 0x800);
+		CfgRangeCheck (1, 0x10000);
 	       	Size = CfgIVal;
 	       	CfgNextTok ();
 	       	break;
@@ -312,6 +312,9 @@ static void LabelSection (void)
     if (Size < 0) {
 	/* Use default */
 	Size = 1;
+    }
+    if (Value + Size > 0x10000) {
+	CfgError ("Invalid size (address out of range)");
     }
     if (HaveLabel ((unsigned) Value)) {
 	CfgError ("Label for address $%04lX already defined", Value);

@@ -444,7 +444,10 @@ void ExprLoad (unsigned Flags, int k, ExprDesc* Expr)
      	} else if (f != E_MREG) {
      	    /* Reference with address in primary */
      	    g_getind (Flags, 0);
-     	}
+     	} else if (Flags & CF_TEST) {
+            /* The value is already in the primary but needs a test */
+            g_test (Flags);
+        }
     } else {
      	/* An rvalue */
      	if (f == E_MEOFFS) {
@@ -455,14 +458,14 @@ void ExprLoad (unsigned Flags, int k, ExprDesc* Expr)
      	    /* Constant of some sort, load it into the primary */
      	    LoadConstant (Flags, Expr);
      	}
-    }
 
-    /* Are we testing this value? */
-    if (Expr->Test & E_FORCETEST) {
-        /* Yes, force a test */
-     	Flags |= TypeOf (Expr->Type);
-       	g_test (Flags);
-       	Expr->Test &= ~E_FORCETEST;
+        /* Are we testing this value? */
+        if (Expr->Test & E_FORCETEST) {
+            /* Yes, force a test */
+            Flags |= TypeOf (Expr->Type);
+            g_test (Flags);
+            Expr->Test &= ~E_FORCETEST;
+        }
     }
 }
 

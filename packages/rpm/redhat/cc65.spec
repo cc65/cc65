@@ -330,7 +330,7 @@ install -m 644 asminc/*.inc $RPM_BUILD_ROOT/usr/lib/cc65/asminc
 
 
 %changelog
-* Wen Nov 20 2002 Ullrich von Bassewitz <uz@cc65.org>
+* Wed Nov 20 2002 Ullrich von Bassewitz <uz@cc65.org>
 Added TGI stuff.
 
 * Mon Apr 08 2002 Ullrich von Bassewitz <uz@cc65.org>

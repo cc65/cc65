@@ -18,7 +18,7 @@ tgi_linepop:
         sta     ptr3            ; X2
         stx     ptr3+1
         sta     _tgi_curx
-        sta     _tgi_curx+1
+        stx     _tgi_curx+1
         rts
 
 

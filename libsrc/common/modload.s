@@ -63,7 +63,7 @@ RegBankSave:    .res    6               ; Save area for register bank
 ; The header of the o65 file. Since we don't need the first 8 bytes any
 ; longer, once we've checked them, we will overlay them with other data to
 ; save a few bytes.
-Header:         .res    O65_HDR_SIZE    ; The o65 header
+Header:         .tag    O65_HDR         ; The o65 header
 
 ; Input
 InputByte       = Header                ; Byte read from input
@@ -349,7 +349,7 @@ _mod_load:
         lda     #<Header
         ldx     #>Header
         jsr     pushax
-        lda     #O65_HDR_SIZE
+        lda     #.sizeof(O65_HDR)
         ldx     #0                      ; Always less than 256
         jsr     ReadAndCheckError       ; Bails out in case of errors
 
@@ -439,19 +439,19 @@ HeaderError:
 ; caller
 
 CalcSizes:
-        lda     Header + O65_HDR_TLEN
-        add     Header + O65_HDR_DLEN
+        lda     Header + O65_HDR::TLEN
+        add     Header + O65_HDR::DLEN
         sta     TPtr
-        lda     Header + O65_HDR_TLEN + 1
-        adc     Header + O65_HDR_DLEN + 1
+        lda     Header + O65_HDR::TLEN + 1
+        adc     Header + O65_HDR::DLEN + 1
         sta     TPtr+1
         lda     TPtr
-        add     Header + O65_HDR_BLEN
+        add     Header + O65_HDR::BLEN
         pha                             ; Save low byte of total size
         ldy     #MOD_CTRL::MODULE_SIZE
         sta     (Ctrl),y
         lda     TPtr+1
-        adc     Header + O65_HDR_BLEN + 1
+        adc     Header + O65_HDR::BLEN + 1
         iny
         sta     (Ctrl),y
         tax
@@ -489,8 +489,8 @@ GotMem: lda     Module
         tax
         pla
         jsr     pushax
-        lda     Header + O65_HDR_BLEN
-        ldx     Header + O65_HDR_BLEN+1
+        lda     Header + O65_HDR::BLEN
+        ldx     Header + O65_HDR::BLEN+1
         jsr     _bzero                  ; bzero (bss, bss_size);
 
 ; Load code and data segment into memory. The sum of the sizes of
@@ -525,10 +525,10 @@ Reloc:  lda     Module
 ; Relocate the data segment
 
         lda     Module
-        add     Header + O65_HDR_TLEN
+        add     Header + O65_HDR::TLEN
         pha
         lda     Module + 1
-        adc     Header + O65_HDR_TLEN + 1
+        adc     Header + O65_HDR::TLEN + 1
         tax
         pla                             ; Data segment address in a/x
         jsr     RelocSeg

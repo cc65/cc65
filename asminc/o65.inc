@@ -38,21 +38,22 @@
 
 
 
-; Offsets into the o65 header structure (6502 format)
-O65_HDR_MARKER          =       0       ; Non-C64 marker
-O65_HDR_MAGIC           =       2       ; o65 magic
-O65_HDR_VERSION         =       5       ; Version number
-O65_HDR_MODE            =       6       ; Mode word
-O65_HDR_TBASE           =       8       ; Original text (code) segment address
-O65_HDR_TLEN            =      10       ; Size of text (code) segment
-O65_HDR_DBASE           =      12       ; Original data segment address
-O65_HDR_DLEN            =      14       ; Size of data segment
-O65_HDR_BBASE           =      16       ; Original bss segment address
-O65_HDR_BLEN            =      18       ; Size of bss segment
-O65_HDR_ZBASE           =      20       ; Original zp segment address
-O65_HDR_ZLEN            =      22       ; Size of zp segment
-O65_HDR_STACK           =      24       ; Stacksize needed
-O65_HDR_SIZE            =      26       ; Size of header structure
+; The o65 header structure (6502 format)
+.struct O65_HDR
+        MARKER          .byte   2       ; Non-C64 marker: $01 $00
+        MAGIC           .byte   3       ; o65 magic: "o65"
+        VERSION         .byte   1       ; Version number
+        MODE            .word           ; Mode word
+        TBASE           .word           ; Original text (code) segment address
+        TLEN            .word           ; Size of text (code) segment
+        DBASE           .word           ; Original data segment address
+        DLEN            .word           ; Size of data segment
+        BBASE           .word           ; Original bss segment address
+        BLEN            .word           ; Size of bss segment
+        ZBASE           .word           ; Original zp segment address
+        ZLEN            .word           ; Size of zp segment
+        STACK           .word           ; Stacksize needed
+.endstruct
 
 ; Marker, magic and version number
 O65_MARKER_0            =       $01

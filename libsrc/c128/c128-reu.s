@@ -124,8 +124,8 @@ PAGECOUNT:
 
 ; ------------------------------------------------------------------------
 ; MAP: Map the page in a/x into memory and return a pointer to the page in
-; a/x. The contents of the currently mapped page (if any) are assumed to be
-; dirty and must be saved into secondary storage if this is necessary.
+; a/x. The contents of the currently mapped page (if any) may be discarded
+; by the driver.
 ;
 
 MAP:    sta     curpage
@@ -212,7 +212,7 @@ transfer:
         sty    	REU_COMMAND     ; Issue command
 
         ldy    	MMU_CR		; Save the current MMU settings
-	lda	#MMU_CFG_RAM0  	; 
+	lda	#MMU_CFG_RAM0  	;
   	sei          	  	;
         sta	MMU_CR		; Enable RAM in bank #0
         lda     REU_TRIGGER     ; Don't change $FF00

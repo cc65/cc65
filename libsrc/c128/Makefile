@@ -20,7 +20,8 @@ OBJS =	_scrsize.o	\
        	color.o	       	\
      	cputc.o	       	\
      	kbhit.o	       	\
-     	readjoy.o
+	mouse.o		\
+	readjoy.o		 
 
 all:   	$(OBJS)
 

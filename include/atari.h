@@ -135,12 +135,6 @@ extern void __fastcall__ setcolor     (unsigned char color_reg, unsigned char hu
 extern void __fastcall__ setcolor_low (unsigned char color_reg, unsigned char color_value);
 extern unsigned char __fastcall__ getcolor (unsigned char color_reg);
 
-/* function similar to conio color functions; please note that _atari_textcolor only sets the */
-/* luminance of the text in standard text mode */
-extern unsigned char __fastcall__ _atari_textcolor (unsigned char color);
-extern unsigned char __fastcall__ _atari_bgcolor (unsigned char color);
-extern unsigned char __fastcall__ _atari_bordercolor (unsigned char color);
-
 /* other screen functions */
 extern int  __fastcall__ graphics(unsigned char mode); /* mode value same as in BASIC */
 extern void __fastcall__ scroll (signed char numlines);

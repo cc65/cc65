@@ -70,10 +70,10 @@ zpspace	= * - zpstart		; Zero page space allocated
 
 ; Save the zero page locations we need
 
-	ldy	#zpspace-1
-L1:	lda	sp,y
-	sta	zpsave,y
-	dey
+       	ldx	#zpspace-1
+L1:	lda	sp,x
+	sta	zpsave,x
+	dex
 	bpl	L1
 
 ; Clear the BSS data
@@ -175,10 +175,10 @@ _exit:	jsr	doatexit	; call exit functions
 
 ; Copy back the zero page stuff
 
-	ldy	#zpspace-1
-L2:	lda	zpsave,y
-	sta	sp,y
-	dey
+	ldx	#zpspace-1
+L2:	lda	zpsave,x
+	sta	sp,x
+	dex
 	bpl	L2
 
 ; Back to DOS

@@ -54,10 +54,10 @@ Head:   .word   @Next
 ; ------------------------------------------------------------------------
 ; Actual code
 
-	ldy	#zpspace-1
-L1:	lda	sp,y
-   	sta	zpsave,y	; Save the zero page locations we need
-	dey
+       	ldx	#zpspace-1
+L1:	lda	sp,x
+   	sta	zpsave,x	; Save the zero page locations we need
+	dex
        	bpl	L1
 
 ; Close open files
@@ -109,10 +109,10 @@ _exit:	jsr	doatexit 	; call exit functions
 
 ; Copy back the zero page stuff
 
-	ldy	#zpspace-1
-L2:	lda	zpsave,y
-	sta	sp,y
-	dey
+	ldx	#zpspace-1
+L2:	lda	zpsave,x
+	sta	sp,x
+	dex
        	bpl	L2
 
 ; Back to basic

@@ -20,7 +20,7 @@ OBJS   = runtime.o mul.o div.o push.o inc.o dec.o shl.o shr.o add.o\
          aslax2.o asrax2.o shrax2.o aslax3.o asrax3.o shrax3.o\
 	 enter.o leave.o leaysp.o popsreg.o ldai.o ldaxi.o ldauisp.o\
 	 ldaui.o pushw.o pushb.o staxsp.o ldaxsp.o addeqsp.o\
-	 ldasp.o ldausp.o bpushbsp.o pushwsp.o pushbsp.o
+	 bpushbsp.o pushwsp.o pushbsp.o
 
 LOBJS  = lruntime.o lconvert.o ladd.o lsub.o lrsub.o leq.o lne.o\
 	 lneg.o lbneg.o lcompl.o lpush.o land.o lor.o lxor.o ldeaxi.o\

@@ -59,14 +59,16 @@
 #endif
 
 /* Include the correct machine specific file */
-#if defined(__CBM__) && !defined(_CBM_H)
-#  include <cbm.h>
-#elif defined(__APPLE2__) && !defined(_APPLE2_H)
+#if defined(__APPLE2__) && !defined(_APPLE2_H)
 #  include <apple2.h>
 #elif defined(__ATARI__) && !defined(_ATARI_H)
 #  include <atari.h>
 #elif defined(__ATMOS__) && !defined(_ATMOS_H)
 #  include <atmos.h>
+#elif defined(__CBM__) && !defined(_CBM_H)
+#  include <cbm.h>
+#elif defined(__NES__) && !defined(_NES_H)
+#  include <nes.h>
 #endif
 
 

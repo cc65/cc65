@@ -37,6 +37,7 @@
 #include "addrsize.h"
 
 /* ca65 */
+#include "condasm.h"
 #include "enum.h"
 #include "error.h"
 #include "expr.h"
@@ -75,11 +76,19 @@ void DoEnum (void)
 
         SymEntry* Sym;
         ExprNode* EnumExpr;
-        
+
+        /* Skip empty lines */
+        if (Tok == TOK_SEP) {
+            NextTok ();
+            continue;
+        }
 
         /* The format is "identifier [ = value ]" */
         if (Tok != TOK_IDENT) {
-            ErrorSkip ("Identifier expected");
+            /* Maybe it's a conditional? */
+            if (!CheckConditionals ()) {
+                ErrorSkip ("Identifier expected");
+            }
             continue;
         }
 

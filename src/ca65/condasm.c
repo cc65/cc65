@@ -321,7 +321,7 @@ void DoConditionals (void)
 		        SetIfCond (D, 1);
                         SkipUntilSep ();
                     }
-		}
+	  	}
 		IfCond = GetCurrentIfCond ();
 		break;
 
@@ -367,7 +367,7 @@ void DoConditionals (void)
 
 	    case TOK_IFP816:
 		D = AllocIf (".IFP816", 1);
-		NextTok ();
+	  	NextTok ();
 		if (IfCond) {
        	       	    SetIfCond (D, GetCPU() == CPU_65816);
 		}
@@ -409,6 +409,39 @@ void DoConditionals (void)
      	}
 
     } while (IfCond == 0 && Tok != TOK_EOF);
+}
+
+
+
+int CheckConditionals (void)
+/* Check if the current token is one that starts a conditional directive, and
+ * call DoConditionals if so. Return true if a conditional directive was found,
+ * return false otherwise.
+ */
+{
+    switch (Tok) {
+        case TOK_ELSE:
+        case TOK_ELSEIF:
+        case TOK_ENDIF:
+        case TOK_IF:
+        case TOK_IFBLANK:
+        case TOK_IFCONST:
+        case TOK_IFDEF:
+        case TOK_IFNBLANK:
+        case TOK_IFNCONST:
+        case TOK_IFNDEF:
+        case TOK_IFNREF:
+        case TOK_IFP02:
+        case TOK_IFP816:
+        case TOK_IFPC02:
+        case TOK_IFPSC02:
+        case TOK_IFREF:
+            DoConditionals ();
+            return 1;
+
+        default:
+            return 0;
+    }
 }
 
 

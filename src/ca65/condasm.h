@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -46,6 +46,12 @@
 
 void DoConditionals (void);
 /* Catch all for conditional directives */
+
+int CheckConditionals (void);
+/* Check if the current token is one that starts a conditional directive, and
+ * call DoConditionals if so. Return true if a conditional directive was found,
+ * return false otherwise.
+ */
 
 void CheckOpenIfs (void);
 /* Called from the scanner before closing an input file. Will check for any

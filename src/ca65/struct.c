@@ -37,6 +37,7 @@
 #include "addrsize.h"
 
 /* ca65 */
+#include "condasm.h"
 #include "error.h"
 #include "expr.h"
 #include "nexttok.h"
@@ -187,8 +188,10 @@ static long DoStructInternal (long Offs, unsigned Type)
                 break;
 
             default:
-                Error ("Invalid storage allocator in struct/union");
-                SkipUntilSep ();
+                if (!CheckConditionals ()) {
+                    /* Not a conditional directive */
+                    ErrorSkip ("Invalid storage allocator in struct/union");
+                }
         }
 
         /* Next member */

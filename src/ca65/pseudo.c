@@ -75,6 +75,16 @@ static char Keyword [sizeof (SVal)+1] = ".";
 
 
 static void DoUnexpected (void);
+/* Got an unexpected keyword */
+
+static void DoInvalid (void);
+/* Handle a token that is invalid here, since it should have been handled on
+ * a much lower level of the expression hierarchy. Getting this sort of token
+ * means that the lower level code has bugs.
+ * This function differs to DoUnexpected in that the latter may be triggered
+ * by the user by using keywords in the wrong location. DoUnexpected is not
+ * an error in the assembler itself, while DoInvalid is.
+ */
 
 
 
@@ -696,6 +706,20 @@ static void DoInclude (void)
 
 
 
+static void DoInvalid (void)
+/* Handle a token that is invalid here, since it should have been handled on
+ * a much lower level of the expression hierarchy. Getting this sort of token
+ * means that the lower level code has bugs.
+ * This function differs to DoUnexpected in that the latter may be triggered
+ * by the user by using keywords in the wrong location. DoUnexpected is not
+ * an error in the assembler itself, while DoInvalid is.
+ */
+{
+    Internal ("Unexpected token: %s", Keyword);
+}
+
+
+
 static void DoLineCont (void)
 /* Switch the use of line continuations */
 {
@@ -784,16 +808,6 @@ static void DoMacro (void)
 /* Start a macro definition */
 {
     MacDef (MAC_STYLE_CLASSIC);
-}
-
-
-
-static void DoMid (void)
-/* Handle .MID - this should never happen, since the keyword is actually
- * handled on a much lower level of the expression hierarchy.
- */
-{
-    Internal ("Unexpected token: .MID");
 }
 
 
@@ -1121,6 +1135,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoImportZP	},
     { ccNone,		DoIncBin	},
     { ccNone,      	DoInclude	},
+    { ccNone,		DoInvalid	},	/* .LEFT */
     { ccNone,		DoLineCont	},
     { ccNone,		DoList		},
     { ccNone,  	       	DoListBytes	},
@@ -1129,7 +1144,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoMacPack	},
     { ccNone,		DoMacro		},
     { ccNone,  	       	DoUnexpected	},	/* .MATCH */
-    { ccNone,  	       	DoMid		},
+    { ccNone,  	       	DoInvalid	},	/* .MID	*/
     { ccNone,		DoNull		},
     { ccNone,		DoOrg		},
     { ccNone,		DoOut		},
@@ -1143,6 +1158,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoReloc		},
     { ccNone,		DoRepeat	},
     { ccNone,		DoRes		},
+    { ccNone,		DoInvalid      	},     	/* .RIGHT */
     { ccNone,		DoROData	},
     { ccNone,       	DoSegment	},
     { ccNone,        	DoSmart		},

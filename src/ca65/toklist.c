@@ -37,6 +37,7 @@
 
 #include "../common/xmalloc.h"
 
+#include "error.h"
 #include "istack.h"
 #include "scanner.h"
 #include "toklist.h"
@@ -191,8 +192,14 @@ static int ReplayTokList (void* List)
     /* Cast the generic pointer to an actual list */
     TokList* L = List;
 
+    /* Last may never be a NULL pointer, otherwise there's a bug in the code */
+    CHECK (L->Last != 0);
+
     /* Set the next token from the list */
     TokSet (L->Last);
+
+    /* Set the pointer to the next token */
+    L->Last = L->Last->Next;
 
     /* If this was the last token, decrement the repeat counter. If it goes
      * zero, delete the list and remove the function from the stack.

@@ -290,6 +290,9 @@ void MacDef (unsigned Style)
 
     /* Define the macro */
     M = NewMacro (SVal, HashVal, Style);
+
+    /* Switch to raw token mode and skip the macro name */
+    EnterRawTokenMode ();
     NextTok ();
 
     /* If we have a DEFINE style macro, we may have parameters in braces,
@@ -371,7 +374,7 @@ void MacDef (unsigned Style)
 	    /* May not have end of file in a macro definition */
 	    if (Tok == TOK_EOF) {
 		Error (ERR_ENDMACRO_EXPECTED);
-		return;
+		goto Done;
 	    }
 	} else {
 	    /* Accept a newline or end of file for new style macros */
@@ -454,6 +457,10 @@ void MacDef (unsigned Style)
     if (Style == MAC_STYLE_CLASSIC) {
 	NextTok ();
     }
+
+Done:
+    /* Switch out of raw token mode */
+    LeaveRawTokenMode ();
 }
 
 
@@ -650,7 +657,7 @@ static void StartExpDefine (Macro* M)
 
     /* A define style macro must be called with as many actual parameters
      * as there are formal ones. Get the parameter count.
-     */
+     */						 
     unsigned Count = M->ParamCount;
 
     /* Skip the current token */

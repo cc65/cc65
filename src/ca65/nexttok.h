@@ -67,7 +67,18 @@ void ConsumeComma (void);
 /* Consume a comma */
 
 void SkipUntilSep (void);
-/* Skip tokens until we reach a line separator */
+/* Skip tokens until we reach a line separator or end of file */
+
+void EnterRawTokenMode (void);
+/* Enter raw token mode. In raw mode, token handling functions are not
+ * executed, but the function tokens are passed untouched to the upper
+ * layer. Raw token mode is used when storing macro tokens for later
+ * use.
+ * Calls to EnterRawTokenMode and LeaveRawTokenMode may be nested.
+ */
+
+void LeaveRawTokenMode (void);
+/* Leave raw token mode. */
 
 
 

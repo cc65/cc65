@@ -44,6 +44,16 @@
 
 
 /*****************************************************************************/
+/*     	       	    		     Data			   	     */
+/*****************************************************************************/
+
+
+
+static unsigned RawMode = 0;		/* Raw token mode flag/counter */
+
+
+
+/*****************************************************************************/
 /*     	       	    		     Code			   	     */
 /*****************************************************************************/
 
@@ -63,28 +73,28 @@ static TokList* CollectTokens (unsigned Start, unsigned Count)
     unsigned Parens  = 0;
     while (Parens != 0 || Tok != TOK_RPAREN) {
 
-    	/* Check for end of line or end of input */
-    	if (Tok == TOK_SEP || Tok == TOK_EOF) {
-	    Error (ERR_UNEXPECTED_EOL);
-	    return List;
-	}
+     	/* Check for end of line or end of input */
+     	if (Tok == TOK_SEP || Tok == TOK_EOF) {
+     	    Error (ERR_UNEXPECTED_EOL);
+     	    return List;
+     	}
 
-	/* Collect tokens in the given range */
-	if (Current >= Start && Current < Start+Count) {
-	    /* Add the current token to the list */
-	    AddCurTok (List);
-	}
+     	/* Collect tokens in the given range */
+     	if (Current >= Start && Current < Start+Count) {
+     	    /* Add the current token to the list */
+     	    AddCurTok (List);
+     	}
 
-	/* Check for and count parenthesii */
-	if (Tok == TOK_LPAREN) {
-	    ++Parens;
-	} else if (Tok == TOK_RPAREN) {
-	    --Parens;
-	}
+     	/* Check for and count parenthesii */
+     	if (Tok == TOK_LPAREN) {
+     	    ++Parens;
+     	} else if (Tok == TOK_RPAREN) {
+     	    --Parens;
+     	}
 
-	/* Get the next token */
-	++Current;
-	NextTok ();
+     	/* Get the next token */
+     	++Current;
+     	NextTok ();
     }
 
     /* Eat the closing paren */
@@ -165,6 +175,47 @@ static void FuncConcat (void)
 
 
 
+static void FuncLeft (void)
+/* Handle the .LEFT function */
+{
+    long       	Count;
+    TokList* 	List;
+
+    /* Skip it */
+    NextTok ();
+
+    /* Left paren expected */
+    ConsumeLParen ();
+
+    /* Count argument */
+    Count = ConstExpression ();
+    if (Count < 0 || Count > 100) {
+     	Error (ERR_RANGE);
+     	Count = 1;
+    }
+    ConsumeComma ();
+
+    /* Read the token list */
+    List = CollectTokens (0, (unsigned) Count);
+
+    /* Since we want to insert the list before the now current token, we have
+     * to save the current token in some way and then skip it. To do this, we
+     * will add the current token at the end of the token list (so the list
+     * will never be empty), push the token list, and then skip the current
+     * token. This will replace the current token by the first token from the
+     * list (which will be the old current token in case the list was empty).
+     */
+    AddCurTok (List);
+
+    /* Insert it into the scanner feed */
+    PushTokList (List, ".LEFT");
+
+    /* Skip the current token */
+    NextTok ();
+}
+
+
+
 static void FuncMid (void)
 /* Handle the .MID function */
 {
@@ -181,7 +232,7 @@ static void FuncMid (void)
     /* Start argument */
     Start = ConstExpression ();
     if (Start < 0 || Start > 100) {
-	Error (ERR_RANGE);
+     	Error (ERR_RANGE);
      	Start = 0;
     }
     ConsumeComma ();
@@ -189,16 +240,84 @@ static void FuncMid (void)
     /* Count argument */
     Count = ConstExpression ();
     if (Count < 0 || Count > 100) {
-	Error (ERR_RANGE);
-	Count = 1;
+     	Error (ERR_RANGE);
+     	Count = 1;
     }
     ConsumeComma ();
 
     /* Read the token list */
     List = CollectTokens ((unsigned) Start, (unsigned) Count);
 
+    /* Since we want to insert the list before the now current token, we have
+     * to save the current token in some way and then skip it. To do this, we
+     * will add the current token at the end of the token list (so the list
+     * will never be empty), push the token list, and then skip the current
+     * token. This will replace the current token by the first token from the
+     * list (which will be the old current token in case the list was empty).
+     */
+    AddCurTok (List);
+
     /* Insert it into the scanner feed */
     PushTokList (List, ".MID");
+
+    /* Skip the current token */
+    NextTok ();
+}
+
+
+
+static void FuncRight (void)
+/* Handle the .RIGHT function */
+{
+    long       	Count;
+    TokList* 	List;
+
+    /* Skip it */
+    NextTok ();
+
+    /* Left paren expected */
+    ConsumeLParen ();
+
+    /* Count argument */
+    Count = ConstExpression ();
+    if (Count < 0 || Count > 100) {
+     	Error (ERR_RANGE);
+     	Count = 1;
+    }
+    ConsumeComma ();
+
+    /* Read the complete token list */
+    List = CollectTokens (0, 9999);
+
+    /* Delete tokens from the list until Count tokens are remaining */
+    while (List->Count > Count) {
+	/* Get the first node */
+	TokNode* T = List->Root;
+
+	/* Remove it from the list */
+	List->Root = List->Root->Next;
+
+	/* Free the node */
+	FreeTokNode (T);
+
+	/* Corrent the token counter */
+	List->Count--;
+    }
+
+    /* Since we want to insert the list before the now current token, we have
+     * to save the current token in some way and then skip it. To do this, we
+     * will add the current token at the end of the token list (so the list
+     * will never be empty), push the token list, and then skip the current
+     * token. This will replace the current token by the first token from the
+     * list (which will be the old current token in case the list was empty).
+     */
+    AddCurTok (List);
+
+    /* Insert it into the scanner feed */
+    PushTokList (List, ".RIGHT");
+
+    /* Skip the current token */
+    NextTok ();
 }
 
 
@@ -244,25 +363,37 @@ void NextTok (void)
     /* Get the next raw token */
     NextRawTok ();
 
-    /* Check for token handling functions */
-    switch (Tok) {
+    /* In raw mode, pass the token unchanged */
+    if (RawMode == 0) {
 
-     	case TOK_CONCAT:
-     	    FuncConcat ();
-	    break;
+	/* Execute token handling functions */
+	switch (Tok) {
 
-	case TOK_MID:
-	    FuncMid ();
-	    break;
+	    case TOK_CONCAT:
+		FuncConcat ();
+		break;
 
-	case TOK_STRING:
-	    FuncString ();
-	    break;
+	    case TOK_LEFT:
+		FuncLeft ();
+		break;
 
-	default:
-	    /* Quiet down gcc */
-	    break;
+	    case TOK_MID:
+		FuncMid ();
+		break;
 
+	    case TOK_RIGHT:
+		FuncRight ();
+		break;
+
+	    case TOK_STRING:
+		FuncString ();
+		break;
+
+	    default:
+		/* Quiet down gcc */
+		break;
+
+	}
     }
 }
 
@@ -321,11 +452,33 @@ void ConsumeComma (void)
 
 
 void SkipUntilSep (void)
-/* Skip tokens until we reach a line separator */
+/* Skip tokens until we reach a line separator or end of file */
 {
     while (Tok != TOK_SEP && Tok != TOK_EOF) {
      	NextTok ();
     }
+}
+
+
+
+void EnterRawTokenMode (void)
+/* Enter raw token mode. In raw mode, token handling functions are not
+ * executed, but the function tokens are passed untouched to the upper
+ * layer. Raw token mode is used when storing macro tokens for later
+ * use.
+ * Calls to EnterRawTokenMode and LeaveRawTokenMode may be nested.
+ */
+{
+    ++RawMode;
+}
+
+
+
+void LeaveRawTokenMode (void)
+/* Leave raw token mode. */
+{
+    PRECONDITION (RawMode > 0);
+    --RawMode;
 }
 
 

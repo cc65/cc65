@@ -328,33 +328,31 @@ static void OneLine (void)
 	     * is no colon, it's an assignment.
 	     */
        	    if (Tok == TOK_EQ) {
-		/* Skip the '=' */
-    		NextTok ();
-		/* Define the symbol with the expression following the
-		 * '='
-		 */
-		SymDef (Ident, Expression (), 0);
-		/* Don't allow anything after a symbol definition */
-		Done = 1;
+	    	/* Skip the '=' */
+    	    	NextTok ();
+	    	/* Define the symbol with the expression following the '=' */
+	    	SymDef (Ident, Expression (), 0);
+	    	/* Don't allow anything after a symbol definition */
+	    	Done = 1;
 	    } else {
-		/* Define a label */
-		SymDef (Ident, CurrentPC (), IsZPSeg ());
-		/* Skip the colon. If NoColonLabels is enabled, allow labels
-		 * without a colon if there is no whitespace before the
-		 * identifier.
-		 */
-		if (Tok != TOK_COLON) {
-		    if (HadWS || !NoColonLabels) {
-		     	Error (ERR_COLON_EXPECTED);
-		    }
-		    if (Tok == TOK_NAMESPACE) {
-		       	/* Smart :: handling */
-		       	NextTok ();
-		    }
-		} else {
+	    	/* Define a label */
+	    	SymDef (Ident, CurrentPC (), IsZPSeg ());
+	    	/* Skip the colon. If NoColonLabels is enabled, allow labels
+	    	 * without a colon if there is no whitespace before the
+	    	 * identifier.
+	    	 */
+	    	if (Tok != TOK_COLON) {
+	    	    if (HadWS || !NoColonLabels) {
+	    	     	Error (ERR_COLON_EXPECTED);
+	    	    }
+	    	    if (Tok == TOK_NAMESPACE) {
+	    	       	/* Smart :: handling */
+	    	       	NextTok ();
+	    	    }
+	    	} else {
 	     	    /* Skip the colon */
-		    NextTok ();
-		}
+	    	    NextTok ();
+	    	}
 	    }
 	}
     }

@@ -11,7 +11,7 @@
 
         .include        "extzp.inc"
 
-.segment        "EXTZP", zeropage
+.segment        "EXTZP" : zeropage
 
 vic:  		.res    2
 sid:		.res    2

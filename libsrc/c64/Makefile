@@ -21,7 +21,6 @@ OBJS =	_scrsize.o	\
 	cputc.o		\
 	kbhit.o		\
 	mouse.o		\
-	read.o		\
 	readjoy.o      	\
 	rs232.o		\
 	write.o

@@ -1,5 +1,5 @@
 ;
-; Christian Groessler, May-2004
+; Christian Groessler, Jun-2004
 ;
 ; int __fastcall__ read(int fd,void *buf,int count)
 ;
@@ -87,7 +87,7 @@ newbuf:
 	lda	ICBLL,x		; get # of bytes read
 	sta	buflen
 	lda	#0
-	sta	index
+	sta	index		; fresh buffer
 
 	; restore user buffer address & length
 	pla
@@ -103,6 +103,7 @@ newbuf:
 	sta	ICBLL,x
 
 	; fall into use_buf
+	lda	buflen
 
 ; return bytes from line buffer
 ; use buflen and index to access buffer
@@ -110,7 +111,6 @@ newbuf:
 ; use dataptr as a temporary pointer
 
 use_buf:
-	lda	buflen
 	sec
 	sbc	index		; size of unread data in the buffer
 	sta	cbs
@@ -162,9 +162,7 @@ c1:	ldx	#0
 btsmall:
 	lda	cbs
 	sta	ICBLL,x
-	bne	icbll_copy
-
-;	brk			; not reached
+	bpl	icbll_copy
 
 	.zeropage
 

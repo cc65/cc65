@@ -38,17 +38,22 @@
 
 
 
+/* common */
+#include "attrib.h"
+
+/* da65 */
 #include "opctable.h"
 
 
 
 /*****************************************************************************/
-/*   	     			     Code				     */
+/*   	     	   		     Code	    			     */
 /*****************************************************************************/
 
 
 
 /* Generic handlers */
+void OH_Illegal (const OpcDesc* D attribute ((unused)));
 void OH_Accumulator (const OpcDesc*);
 void OH_Implicit (const OpcDesc*);
 void OH_Immidiate (const OpcDesc*);
@@ -66,6 +71,8 @@ void OH_DirectIndirect (const OpcDesc*);
 void OH_DirectIndirectY (const OpcDesc*);
 void OH_DirectXIndirect (const OpcDesc*);
 void OH_AbsoluteIndirect (const OpcDesc*);
+
+void OH_BitBranch (const OpcDesc*);
 
 void OH_StackRelative (const OpcDesc*);
 void OH_DirectIndirectLongX (const OpcDesc*);

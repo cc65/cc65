@@ -222,7 +222,7 @@ static void OneOpcode (unsigned RemainingBytes)
     if (GetStyleAttr (PC) == atDefault) {
 	if (D->Size > RemainingBytes) {
 	    MarkAddr (PC, atIllegal);
-       	} else if ((D->CPU & CPU) != CPU) {
+       	} else if (D->Flags & flIllegal) {  
 	    MarkAddr (PC, atIllegal);
 	} else {
 	    unsigned I;

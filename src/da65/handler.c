@@ -43,9 +43,9 @@
 #include "code.h"
 #include "error.h"
 #include "global.h"
+#include "handler.h"
 #include "opctable.h"
 #include "output.h"
-#include "handler.h"
 
 
 
@@ -90,34 +90,34 @@ static void OneLine (const OpcDesc* D, const char* Arg, ...)
 
 
 
-static const char* GetAddrArg (const OpcDesc* D, unsigned Addr)
+static const char* GetAddrArg (unsigned Flags, unsigned Addr)
 /* Return an address argument - a label if we have one, or the address itself */
 {
     const char* Label = 0;
-    if (D->LabelFlag & lfUseLabel) {
-	Label = GetLabel (Addr);
+    if (Flags & flUseLabel) {
+       	Label = GetLabel (Addr);
     }
     if (Label) {
-	return Label;
+       	return Label;
     } else {
-	static char Buf [32];
-	if (Addr < 0x100) {
-	    xsprintf (Buf, sizeof (Buf), "$%02X", Addr);
-	} else {
-	    xsprintf (Buf, sizeof (Buf), "$%04X", Addr);
-	}
-	return Buf;
+       	static char Buf [32];
+       	if (Addr < 0x100) {
+       	    xsprintf (Buf, sizeof (Buf), "$%02X", Addr);
+       	} else {
+       	    xsprintf (Buf, sizeof (Buf), "$%04X", Addr);
+       	}
+       	return Buf;
     }
 }
 
 
 
-static void GenerateLabel (const OpcDesc* D, unsigned Addr)
+static void GenerateLabel (unsigned Flags, unsigned Addr)
 /* Generate a label in pass one if requested */
 {
     if (Pass == 1 && !HaveLabel (Addr)) {
-	if ((D->LabelFlag & lfGenLabel) != 0 ||
-       	    ((D->LabelFlag & lfUseLabel) != 0 && Addr >= CodeStart && Addr <= CodeEnd)) {
+       	if ((Flags & flGenLabel) != 0 ||
+       	    ((Flags & flUseLabel) != 0 && Addr >= CodeStart && Addr <= CodeEnd)) {
 	    AddLabel (Addr, atIntLabel, MakeLabelName (Addr));
 	}
     }
@@ -128,6 +128,13 @@ static void GenerateLabel (const OpcDesc* D, unsigned Addr)
 /*****************************************************************************/
 /*   	       	     	      	     Code				     */
 /*****************************************************************************/
+
+
+
+void OH_Illegal (const OpcDesc* D attribute ((unused)))
+{
+    DataByteLine (1);
+}
 
 
 
@@ -160,10 +167,10 @@ void OH_Direct (const OpcDesc* D)
     unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
-    GenerateLabel (D, Addr);
+    GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%s", GetAddrArg (D, Addr));
+    OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -174,10 +181,10 @@ void OH_DirectX (const OpcDesc* D)
     unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
-    GenerateLabel (D, Addr);
+    GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%s,x", GetAddrArg (D, Addr));
+    OneLine (D, "%s,x", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -188,10 +195,10 @@ void OH_DirectY (const OpcDesc* D)
     unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
-    GenerateLabel (D, Addr);
+    GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%s,y", GetAddrArg (D, Addr));
+    OneLine (D, "%s,y", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -202,10 +209,10 @@ void OH_Absolute (const OpcDesc* D)
     unsigned Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
-    GenerateLabel (D, Addr);
+    GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%s", GetAddrArg (D, Addr));
+    OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -216,10 +223,10 @@ void OH_AbsoluteX (const OpcDesc* D)
     unsigned Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
-    GenerateLabel (D, Addr);
+    GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%s,x", GetAddrArg (D, Addr));
+    OneLine (D, "%s,x", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -230,10 +237,10 @@ void OH_AbsoluteY (const OpcDesc* D)
     unsigned Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
-    GenerateLabel (D, Addr);
+    GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%s,y", GetAddrArg (D, Addr));
+    OneLine (D, "%s,y", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -261,10 +268,10 @@ void OH_Relative (const OpcDesc* D)
     unsigned Addr = (unsigned) (((int) PC+2) + Offs);
 
     /* Generate a label in pass 1 */
-    GenerateLabel (D, Addr);
+    GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "%s", GetAddrArg (D, Addr));
+    OneLine (D, "%s", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -282,10 +289,10 @@ void OH_DirectIndirect (const OpcDesc* D)
     unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
-    GenerateLabel (D, Addr);
+    GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "(%s)", GetAddrArg (D, Addr));
+    OneLine (D, "(%s)", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -296,10 +303,10 @@ void OH_DirectIndirectY (const OpcDesc* D)
     unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
-    GenerateLabel (D, Addr);
+    GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "(%s),y", GetAddrArg (D, Addr));
+    OneLine (D, "(%s),y", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -310,10 +317,10 @@ void OH_DirectXIndirect (const OpcDesc* D)
     unsigned Addr = GetCodeByte (PC+1);
 
     /* Generate a label in pass 1 */
-    GenerateLabel (D, Addr);
+    GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "(%s,x)", GetAddrArg (D, Addr));
+    OneLine (D, "(%s,x)", GetAddrArg (D->Flags, Addr));
 }
 
 
@@ -324,10 +331,33 @@ void OH_AbsoluteIndirect (const OpcDesc* D)
     unsigned Addr = GetCodeWord (PC+1);
 
     /* Generate a label in pass 1 */
-    GenerateLabel (D, Addr);
+    GenerateLabel (D->Flags, Addr);
 
     /* Output the line */
-    OneLine (D, "(%s)", GetAddrArg (D, Addr));
+    OneLine (D, "(%s)", GetAddrArg (D->Flags, Addr));
+}
+
+
+
+void OH_BitBranch (const OpcDesc* D)
+{
+    /* Get the operands */
+    unsigned char TestAddr   = GetCodeByte (PC+1);
+    signed char   BranchOffs = GetCodeByte (PC+2);
+
+    /* Calculate the target address for the branch */
+    unsigned BranchAddr = (unsigned) (((int) PC+3) + BranchOffs);
+
+    /* Generate labels in pass 1. The bit branch codes are special in that
+     * they don't really match the remainder of the 6502 instruction set (they
+     * are a Rockwell addon), so we must pass additional flags as direct
+     * value to the second GenerateLabel call.
+     */
+    GenerateLabel (D->Flags, TestAddr);
+    GenerateLabel (flLabel, BranchAddr);
+
+    /* Output the line */
+    OneLine (D, "%s,%s", GetAddrArg (D->Flags, TestAddr), GetAddrArg (flLabel, BranchAddr));
 }
 
 

@@ -44,12 +44,14 @@
 
 
 
-/* Constants for LabelFlag */
+/* Constants for Flags */
 enum {
-    lfNoLabel	= 0x00,			/* Don't use a label */
-    lfGenLabel 	= 0x01,			/* Generate a label */
-    lfUseLabel	= 0x02,			/* Use a label if there is one */
-    lfLabel	= lfUseLabel|lfGenLabel /* Generate and use a label */
+    flNone      = 0x00,                 /* No flags given */
+    flNoLabel	= 0x00,			/* Don't use a label */
+    flGenLabel 	= 0x01,			/* Generate a label */
+    flUseLabel	= 0x02,			/* Use a label if there is one */
+    flLabel    	= flUseLabel|flGenLabel,/* Generate and use a label */
+    flIllegal   = 0x10                  /* Illegal instruction */
 };
 
 /* Forward/typedef for struct OpcDesc */
@@ -60,10 +62,9 @@ typedef void (*OpcHandler) (const OpcDesc*);
 
 /* Description for one opcode */
 struct OpcDesc {
-    char       	       	Mnemo [5]; 	/* Mnemonic */
+    char       	       	Mnemo [6]; 	/* Mnemonic */
     unsigned char     	Size;		/* Size of this command */
-    unsigned char     	LabelFlag;	/* Generate/use label? */
-    unsigned char     	CPU;		/* Available for which CPU? */
+    unsigned char      	Flags; 	        /* Flags */
     OpcHandler		Handler;	/* Handler routine */
 };
 

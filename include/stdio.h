@@ -135,8 +135,6 @@ int __fastcall__ fileno (FILE* f);			/* Unix */
 void __fastcall__ _poserror (const char* msg);  	/* cc65 */
 
 /* Masking macros for some functions */
-#define getchar()   	fgetc (stdin)		/* ANSI */
-#define putchar(c)  	fputc (c, stdout)	/* ANSI */
 #define getc(f)	       	fgetc (f)     		/* ANSI */
 #define putc(c, f)     	fputc (c, f)  		/* ANSI */
 

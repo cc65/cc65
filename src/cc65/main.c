@@ -210,8 +210,12 @@ static void SetSys (const char* Sys)
             DefineNumericMacro ("__ATMOS__", 1);
             break;
 
+        case TGT_NES:
+            DefineNumericMacro ("__NES__", 1);
+            break;
+
      	default:
-       	    AbEnd ("Unknown target system type");
+       	    AbEnd ("Unknown target system type %d", Target);
     }
 
     /* Initialize the translation tables for the target system */

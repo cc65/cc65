@@ -373,7 +373,7 @@ Expressions referencing imported symbols must always be evaluated by the
 linker.
 
 
-<sect1>Size of an expressions result<p>
+<sect1>Size of an expression result<p>
 
 Sometimes, the assembler must know about the size of the value that is the
 result of an expression. This is usually the case, if a decision has to be
@@ -413,6 +413,26 @@ already known, after evaluating the left hand side, the right hand side is
 not evaluated.
 
 
+<sect1>Constant expressions<p>
+
+Sometimes an expression must evaluate to a constant without looking at any
+further input. One such example is the <tt/<ref id=".IF" name=".IF">/ command
+that decides if parts of the code are assembled or not. An expression used in
+the <tt/.IF/ command cannot reference a symbol defined later, because the
+decision about the <tt/.IF/ must be made at the point when it is read. If the
+expression used in such a context contains only constant numerical values,
+there is no problem. When unresolvable symbols are involved it may get harder
+for the assembler to determine if the expression is actually constant, and it
+is even possible to create expressions that aren't recognized as constant.
+Simplifying the expressions will often help.
+
+In cases where the result of the expression is not needed immediately, the
+assembler will delay evaluation until all input is read, at which point all
+symbols are known. So using arbitrary complex constant expressions is no
+problem in most cases.
+
+
+
 <sect1>Available operators<label id="operators"><p>
 
 Available operators sorted by precedence:
@@ -445,8 +465,9 @@ Available operators sorted by precedence:
     .BITNOT    	Unary bitwise not      	       	       	1
     &lt;	   Low byte operator	     	     	   1
     &gt;	   High byte operator	     	     	   1
+    ^           Bank byte operator                      1
 
-    *  	       	Multiplication		     	     	2   
+    *  	       	Multiplication		     	     	2
     /  	       	Division     		     	     	2
     .MOD       	Modulo operation	     	     	2
     &amp;      	    Bitwise and	 	     	     	    2

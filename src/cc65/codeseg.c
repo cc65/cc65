@@ -1096,6 +1096,126 @@ void CS_DelCodeAfter (CodeSeg* S, unsigned Last)
 
 
 
+void CS_ResetMarks (CodeSeg* S, unsigned First, unsigned Last)
+/* Remove all user marks from the entries in the given range */
+{
+    while (First <= Last) {
+        CE_ResetMark (CS_GetEntry (S, First++));
+    }
+}
+
+
+
+int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last)
+/* Check if the given code segment range is a basic block. That is, check if
+ * First is the only entrance and Last is the only exit. This means that no
+ * jump/branch inside the block may jump to an insn below First or after(!)
+ * Last, and that no insn may jump into this block from the outside.
+ */
+{
+    unsigned I;
+
+    /* Don't accept invalid ranges */
+    CHECK (First <= Last);
+
+    /* First pass: Walk over the range and remove all marks from the entries */
+    CS_ResetMarks (S, First, Last);
+
+    /* Second pass: Walk over the range checking all labels. Note: There may be
+     * label on the first insn which is ok.
+     */
+    I = First + 1;
+    while (I <= Last) {
+
+        /* Get the next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check if this entry has one or more labels, if so, check which
+         * entries jump to this label.
+         */
+        unsigned LabelCount = CE_GetLabelCount (E);
+        unsigned LabelIndex;
+        for (LabelIndex = 0; LabelIndex < LabelCount; ++LabelIndex) {
+
+            /* Get this label */
+            CodeLabel* L = CE_GetLabel (E, LabelIndex);
+
+            /* Walk over all entries that jump to this label. Check for each
+             * of the entries if it is out of the range.
+             */
+            unsigned RefCount = CL_GetRefCount (L);
+            unsigned RefIndex;
+            for (RefIndex = 0; RefIndex < RefCount; ++RefIndex) {
+
+                /* Get the code entry that jumps here */
+                CodeEntry* Ref = CL_GetRef (L, RefIndex);
+
+                /* Walk over out complete range and check if we find the
+                 * refering entry. This is cheaper than using CS_GetEntryIndex,
+                 * because CS_GetEntryIndex will search the complete code
+                 * segment and not just our range.
+                 */
+                unsigned J;
+                for (J = First; J <= Last; ++J) {
+                    if (Ref == CS_GetEntry (S, J)) {
+                        break;
+                    }
+                }
+                if (J > Last) {
+                    /* We did not find the entry. This means that the jump to
+                     * out code segment entry E came from outside the range,
+                     * which in turn means that the given range is not a basic
+                     * block.
+                     */
+                    CS_ResetMarks (S, First, Last);
+                    return 0;
+                }
+
+                /* If we come here, we found the entry. Mark it, so we know
+                 * that the branch to the label is in range.
+                 */
+                CE_SetMark (Ref);
+            }
+        }
+
+        /* Next entry */
+        ++I;
+    }
+
+    /* Third pass: Walk again over the range and check all branches. If we
+     * find a branch that is not marked, its target is not inside the range
+     * (since we checked all the labels in the range before).
+     */
+    I = First;
+    while (I <= Last) {
+
+        /* Get the next entry */
+        CodeEntry* E = CS_GetEntry (S, I);
+
+        /* Check if this is a branch and if so, if it has a mark */
+        if (E->Info & (OF_UBRA | OF_CBRA)) {
+            if (!CE_HasMark (E)) {
+                /* No mark means not a basic block. Before bailing out, be sure
+                 * to remove the marks from the remaining entries.
+                 */
+                CS_ResetMarks (S, I+1, Last);
+                return 0;
+            }
+
+            /* Remove the mark */
+            CE_ResetMark (E);
+        }
+
+        /* Next entry */
+        ++I;
+    }
+
+    /* Done - this is a basic block */
+    return 1;
+}
+
+
+
 void CS_OutputPrologue (const CodeSeg* S, FILE* F)
 /* If the given code segment is a code segment for a function, output the
  * assembler prologue into the file. That is: Output a comment header, switch

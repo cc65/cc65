@@ -103,6 +103,16 @@ void CS_AddVLine (CodeSeg* S, LineInfo* LI, const char* Format, va_list ap) attr
 void CS_AddLine (CodeSeg* S, LineInfo* LI, const char* Format, ...) attribute ((format(printf,3,4)));
 /* Add a line to the given code segment */
 
+#if defined(HAVE_INLINE)
+INLINE unsigned CS_GetEntryCount (const CodeSeg* S)
+/* Return the number of entries for the given code segment */
+{
+    return CollCount (&S->Entries);
+}
+#else
+#  define CS_GetEntryCount(S)	CollCount (&(S)->Entries)
+#endif
+
 void CS_InsertEntry (CodeSeg* S, struct CodeEntry* E, unsigned Index);
 /* Insert the code entry at the index given. Following code entries will be
  * moved to slots with higher indices.
@@ -218,6 +228,29 @@ void CS_MoveLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L);
 void CS_DelCodeAfter (CodeSeg* S, unsigned Last);
 /* Delete all entries including the given one */
 
+void CS_ResetMarks (CodeSeg* S, unsigned First, unsigned Last);
+/* Remove all user marks from the entries in the given range */
+
+#if defined(HAVE_INLINE)
+INLINE void CS_ResetAllMarks (CodeSeg* S)
+/* Remove all user marks from the code segment */
+{
+    if (CS_GetEntryCount (S) > 0) {
+        CS_ResetMarks (S, 0, CS_GetEntryCount (S));
+    }
+}
+#else
+#  define CS_ResetAllMarks(S) \
+        ((CS_GetEntryCount (S) > 0)? CS_ResetMarks (S, 0, CS_GetEntryCount (S)) : (void) 0)
+#endif
+
+int CS_IsBasicBlock (CodeSeg* S, unsigned First, unsigned Last);
+/* Check if the given code segment range is a basic block. That is, check if
+ * First is the only entrance and Last is the only exit. This means that no
+ * jump/branch inside the block may jump to an insn below First or after(!)
+ * Last, and that no insn may jump into this block from the outside.
+ */
+
 void CS_OutputPrologue (const CodeSeg* S, FILE* F);
 /* If the given code segment is a code segment for a function, output the
  * assembler prologue into the file. That is: Output a comment header, switch
@@ -232,16 +265,6 @@ void CS_OutputEpilogue (const CodeSeg* S, FILE* F);
 
 void CS_Output (const CodeSeg* S, FILE* F);
 /* Output the code segment data to a file */
-
-#if defined(HAVE_INLINE)
-INLINE unsigned CS_GetEntryCount (const CodeSeg* S)
-/* Return the number of entries for the given code segment */
-{
-    return CollCount (&S->Entries);
-}
-#else
-#  define CS_GetEntryCount(S)	CollCount (&(S)->Entries)
-#endif
 
 void CS_FreeRegInfo (CodeSeg* S);
 /* Free register infos for all instructions */

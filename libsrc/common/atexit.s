@@ -5,7 +5,7 @@
 ;
 
       	.export		_atexit
-       	.destructor	doatexit, 28
+       	.destructor	doatexit, 5
 	.import		__errno
  	.import	 	jmpvec
 

@@ -110,3 +110,13 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
 
 
 
+type* ReplaceType (ExprDesc* Expr, const type* NewType)
+/* Replace the type of Expr by a copy of Newtype and return the old type string */
+{
+    type* OldType = Expr->Type;
+    Expr->Type = TypeDup (NewType);
+    return OldType;
+}
+
+
+

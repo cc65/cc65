@@ -37,7 +37,7 @@
 #define EXPRDESC_H
 
 
-                     
+
 /* cc65 */
 #include "datatype.h"
 
@@ -93,6 +93,9 @@ void MakeConstIntExpr (ExprDesc* Expr, long Value);
 
 void PrintExprDesc (FILE* F, ExprDesc* Expr);
 /* Print an ExprDesc */
+
+type* ReplaceType (ExprDesc* Expr, const type* NewType);
+/* Replace the type of Expr by a copy of Newtype and return the old type string */
 
 
 

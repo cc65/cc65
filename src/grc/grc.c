@@ -35,7 +35,7 @@
 
 void VLIRLinker(int argc, char *argv[]) {
 FILE *outCVT, *input;
-unsigned char buffer[BLOODY_BIG_BUFFER];
+unsigned char buffer[THIS_BUFFER_IS_SOOO_HUGE];
 unsigned char vlirtabt[127];
 unsigned char vlirtabs[127];
 int i,j,lastarg;

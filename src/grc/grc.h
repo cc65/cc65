@@ -1,6 +1,8 @@
 
 /* I hope that no one will be able to create a .grc bigger than this... */
 #define BLOODY_BIG_BUFFER 65000
+/* there are no 6MB GEOS binaries... I hope! */
+#define THIS_BUFFER_IS_SOOO_HUGE 6000000
 
 struct menuitem {
 	char *name;

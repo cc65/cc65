@@ -284,9 +284,15 @@ static void FreeMacExp (MacExp* E)
     /* One macro expansion less */
     --MacExpansions;
 
-    /* Free the parameter list */
+    /* Free the parameter lists */
     for (I = 0; I < E->ParamCount; ++I) {
-      	xfree (E->Params [I]);
+        /* Free one parameter list */
+        TokNode* N = E->Params[I];
+        while (N) {
+            TokNode* P = N->Next;
+            FreeTokNode (N);
+            N = P;
+        }
     }
     xfree (E->Params);
 

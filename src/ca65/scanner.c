@@ -706,9 +706,9 @@ Again:
 	NextChar ();
 
 	if (!IsIdStart (C)) {
-	    Error (ERR_PSEUDO_EXPECTED);
-	    /* Try to read an identifier */
-	    goto Again;
+	    /* Just a dot */
+	    Tok = TOK_DOT;
+	    return;
 	}
 
 	/* Read the identifier */

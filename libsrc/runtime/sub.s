@@ -6,7 +6,7 @@
 
        	.export		tossuba0, tossubax
 	.import		addysp1
-	.importzp	sp, ptr1
+	.importzp	sp
 
 ;
 ; AX = TOS - AX
@@ -15,22 +15,21 @@
 tossuba0:
 	ldx	#0
 tossubax:
-	sta	ptr1
-	stx	ptr1+1
+      	sec
+      	eor	#$FF
 .ifpc02
-       	lda    	(sp)		; Get lo byte
-      	ldy	#1		; Hi index
+        adc	(sp)
+	ldy	#1
 .else
       	ldy	#0
-      	lda	(sp),y		; Lo byte
-      	iny			; Hi index
+      	adc	(sp),y		; Subtract low byte
+	iny
 .endif
-	sec
-	sbc	ptr1
-	sta	ptr1		; save lo byte
-	lda	(sp),y
-	sbc	ptr1+1
-	tax
-	lda	ptr1
-	jmp	addysp1		; drop TOS, set condition codes
+	pha			; Save high byte
+        txa
+	eor	#$FF
+	adc	(sp),y		; Subtract high byte
+	tax			; High byte into X
+	pla			; Restore low byte
+	jmp	addysp1		; drop TOS
 

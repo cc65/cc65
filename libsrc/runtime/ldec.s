@@ -5,13 +5,13 @@
 ;
 
        	.export	       	deceaxy
-	.importzp	ptr4, sreg
+	.importzp	sreg, tmp1
 
 deceaxy:
-	sty	ptr4
+	sty	tmp1
 	sec
-	sbc	ptr4
-	sta	ptr4
+	sbc	tmp1
+	sta	tmp1
 	txa
 	sbc	#0
 	tax
@@ -21,6 +21,6 @@ deceaxy:
 	lda	sreg+1
 	sbc	#0
 	sta	sreg+1
-	lda	ptr4
+	lda	tmp1
 	rts
 

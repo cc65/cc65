@@ -1,4 +1,4 @@
-;
+;				  
 ; Ullrich von Bassewitz, 07.04.2000
 ;
 ; CC65 runtime: -= operator
@@ -8,7 +8,7 @@
 ;
 
        	.export	       	lsubeq1, lsubeqa, lsubeq
-       	.importzp   	sreg, ptr1, tmp1
+       	.importzp   	sreg, ptr1
 
 
 lsubeq1:
@@ -23,16 +23,15 @@ lsubeq:	sty	ptr1+1		    	; Store high byte of address
 	ldy	#$00		    	; Address low byte
 	sec
 
-	sta	tmp1
-	lda	(ptr1),y	    	; Load byte 0
-	sbc	tmp1
+	eor	#$FF
+	adc	(ptr1),y	    	; Subtract byte 0
 	sta	(ptr1),y
        	pha			    	; Save byte 0 of result for later
 
 	iny			    	; Address byte 1
-	stx	tmp1
-	lda	(ptr1),y	    	; Load byte 1
-	sbc	tmp1
+	txa
+	eor	#$FF
+	adc	(ptr1),y	  	; Subtract byte 1
 	sta	(ptr1),y
 	tax
 
@@ -48,9 +47,9 @@ lsubeq:	sty	ptr1+1		    	; Store high byte of address
 	sta	(ptr1),y
 	sta	sreg+1
 
-	pla				; Retrieve byte 0 of result
+	pla			  	; Retrieve byte 0 of result
 
-	rts				; Done
+	rts			  	; Done
 
 
 

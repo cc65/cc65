@@ -9,19 +9,18 @@
 ;
 	.export		tossubeax
 	.import		addysp1
-	.importzp	sp, sreg, tmp1, tmp2
+	.importzp   	sp, sreg
 
 tossubeax:
       	ldy	#0
        	sec
-	sta	tmp1
-	lda	(sp),y
-	sbc	tmp1	      	; byte 0
-	sta	tmp2	      	; use as temp storage
+	eor	#$FF
+       	adc	(sp),y		; byte 0
+       	pha			; Save low byte
 	iny
-	stx	tmp1
-	lda	(sp),y
-	sbc	tmp1	      	; byte 1
+	txa
+	eor	#$FF
+	adc	(sp),y		; byte 1
 	tax
 	iny
 	lda	(sp),y
@@ -31,6 +30,6 @@ tossubeax:
 	lda	(sp),y
 	sbc	sreg+1	      	; byte 3
 	sta	sreg+1
-	lda	tmp2	      	; load byte 0
-       	jmp    	addysp1	      	; drop TOS
+	pla	      		; Restore byte 0
+       	jmp    	addysp1	      	; Drop TOS
 

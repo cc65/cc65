@@ -72,7 +72,7 @@ atmoslib:
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t atmos -I../../include" \
-       	    AFLAGS="-t atmos -I../../asminc" \
+	    AFLAGS="-t atmos -I../../asminc" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv atmos/crt0.o atmos.o
@@ -233,10 +233,4 @@ clean:
 
 .PHONY: zap
 zap:	clean
-	@rm -f *.o *.lib
-
-
-
-
-
-
+	@rm -f *.o *.lib *.tgi

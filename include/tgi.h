@@ -107,7 +107,7 @@ unsigned char __fastcall__ tgi_geterror (void);
 void __fastcall__ tgi_clear (void);
 /* Clear the screen. */
 
-void __fastcall__ tgi_getpagecount (void);
+unsigned __fastcall__ tgi_getpagecount (void);
 /* Returns the number of screen pages available. */
 
 void __fastcall__ tgi_setviewpage (unsigned char page);

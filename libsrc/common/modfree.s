@@ -32,26 +32,9 @@
 ;*****************************************************************************/
 
 
-
-        .include        "modload.inc"
-
+        .export         _mod_free
         .import         _free
-        .importzp       ptr1
 
-;------------------------------------------------------------------------------
-; mod_free: Free a loaded module
-
-.code
-_mod_free:
-        sta     ptr1
-        stx     ptr1+1                          ; Save parameter
-
-        ldy     #MODCTRL_MODULE + 1
-        lda     (ptr1),y
-        tax
-        dey
-        lda     (ptr1),y                        ; Load module pointer
-
-        jmp     _free                           ; Free the module memory
+_mod_free       = _free                 ; Just free the memory
 
 

@@ -91,7 +91,7 @@ void FreeStrBuf (StrBuf* B);
 /* Free a string buffer */
 
 #if defined(HAVE_INLINE)
-INLINE unsigned SB_GetLen (StrBuf* B)
+INLINE unsigned SB_GetLen (const StrBuf* B)
 /* Return the length of the buffer contents */
 {
     return B->Len;
@@ -101,7 +101,7 @@ INLINE unsigned SB_GetLen (StrBuf* B)
 #endif
 
 #if defined(HAVE_INLINE)
-INLINE unsigned SB_GetIndex (StrBuf* B)
+INLINE unsigned SB_GetIndex (const StrBuf* B)
 /* Return the user index of the string buffer */
 {
     return B->Index;
@@ -141,7 +141,7 @@ INLINE char SB_At (const StrBuf* B, unsigned Index)
 char SB_At (const StrBuf* B, unsigned Index);
 /* Get a character from the buffer */
 #endif
-
+                                   
 #if defined(HAVE_INLINE)
 INLINE char SB_AtUnchecked (const StrBuf* B, unsigned Index)
 /* Get a character from the buffer */

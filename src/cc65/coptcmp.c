@@ -262,7 +262,7 @@ static int IsImmCmp16 (CodeEntry** L)
        	    L[2]->OPC == OP65_CMP                              &&
 	    L[2]->AM == AM65_IMM                               &&
 	    (L[2]->Flags & CEF_NUMARG) != 0                    &&
-	    (L[3]->Info & OF_ZBRA) != 0                        &&
+	    (L[3]->Info & OF_CBRA) != 0                        &&
 	    L[3]->JumpTo != 0                                  &&
 	    (L[1]->JumpTo->Owner == L[3] || L[1]->JumpTo == L[3]->JumpTo));
 }
@@ -536,7 +536,7 @@ unsigned OptCmp3 (CodeSeg* S)
  *  	cpx 	#a
  *  	bne 	L1
  *  	cmp 	#b
- *     	jne/jeq	L2
+ * L1: 	jne/jeq	L2
  *
  * If a is zero, we may remove the compare. If a and b are both zero, we may
  * replace it by the sequence
@@ -565,9 +565,10 @@ unsigned OptCmp3 (CodeSeg* S)
 	    CS_GetEntries (S, L, I+1, 5) &&
 	    L[0]->OPC == OP65_LDX            &&
 	    !CE_HasLabel (L[0])              &&
-	    IsImmCmp16 (L+1)) {
+      	    IsImmCmp16 (L+1)                 &&
+	    !RegAXUsed (S, I+6)) {
 
-	    if (L[1]->Num == 0 && L[3]->Num == 0) {
+      	    if ((L[4]->Info & OF_FBRA) != 0 && L[1]->Num == 0 && L[3]->Num == 0) {
 		/* The value is zero, we may use the simple code version. */
 		CE_ReplaceOPC (L[0], OP65_ORA);
 		CS_DelEntries (S, I+2, 3);
@@ -630,7 +631,7 @@ unsigned OptCmp4 (CodeSeg* S)
      	/* Check for the sequence */
        	if (IsLocalLoad16 (S, I, L, 9) && IsImmCmp16 (L+5)) {
 
-       	    if (L[5]->Num == 0 && L[7]->Num == 0) {
+       	    if ((L[8]->Info & OF_FBRA) != 0 && L[5]->Num == 0 && L[7]->Num == 0) {
 
 	    	/* The value is zero, we may use the simple code version:
 	    	 *      ldy     #o

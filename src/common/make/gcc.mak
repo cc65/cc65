@@ -2,7 +2,7 @@
 # gcc Makefile for the binutils common stuff
 #
 
-CFLAGS 	= -g -O2 -Wall
+CFLAGS 	= -g -O2 -Wall -W
 CC	= gcc
 LDFLAGS	=
 LIB	= common.a

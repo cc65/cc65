@@ -177,7 +177,7 @@ void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName)
  */
 {
     CmdLine	L;
-    unsigned	I;
+    int         I;
 
     /* Get the program name from argv[0] but strip a path */
     if (*(aArgVec)[0] == 0) {

@@ -91,7 +91,7 @@ namecheck:
 ; Check the maximum length, store the character
 
 nameok: ldx     fnlen
-        cpx     #16             ; Maximum length reached?
+        cpx     #18             ; Maximum length reached?
         bcs     invalidname
         lda     (ptr1),y        ; Reload char
         sta     fnbuf,x         ; Store into buffer
@@ -130,7 +130,7 @@ namedone:
 
 .proc	fncomplete
 
-	pha			; Save mode
+	pha	   		; Save mode
 	ldx	fnlen
 	lda	#','
 	sta	fnbuf,x
@@ -167,3 +167,4 @@ fnchars:.byte   ".,-_+()"
 fncharcount = *-fnchars
 
 
+		   

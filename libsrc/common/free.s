@@ -274,6 +274,11 @@ _free: 	sta    	ptr2
 ;     }
 ; }
 ;
+; 
+; On entry, ptr2 must contain a pointer to the block, which must be at least
+; HEAP_MIN_BLOCKSIZE bytes in size, and ptr1 contains the total size of the
+; block.
+;
 
 ; Check if the free list is empty, storing _hfirst into ptr3 for later
 
@@ -330,7 +335,7 @@ SearchFreeList:
        	dey	       	 	        ; Points to next
        	lda	(ptr3),y	        ; right = right->next;
   	tax
-  	iny			        ; Points to next+1
+  	iny	    		        ; Points to next+1
   	lda	(ptr3),y
   	stx	ptr3
   	sta	ptr3+1
@@ -494,13 +499,13 @@ CheckLeftMerge2:
 
 ; Do left->next->prev = left
 
-	iny			        ; Points to prev
+	iny	    		        ; Points to prev
 	lda	ptr4		        ; Low byte of left
 	sta	(ptr1),y
 	iny
 	lda	ptr4+1	       	        ; High byte of left
 	sta	(ptr1),y
-	rts			        ; Done
+	rts	    		        ; Done
 
 ; This is now the last block, do _heaplast = left
 
@@ -514,7 +519,7 @@ CheckLeftMerge2:
 ; we come here. Do left->next = f.
 
 NoLeftMerge:
-	iny			        ; Points to next
+	iny	    		        ; Points to next
 	lda	ptr2		        ; Low byte of left
 	sta	(ptr4),y
 	iny
@@ -523,13 +528,13 @@ NoLeftMerge:
 
 ; Do f->prev = left
 
-	iny	   		        ; Points to prev
+	iny	    		        ; Points to prev
 	lda	ptr4
 	sta	(ptr2),y
 	iny
 	lda	ptr4+1
 	sta	(ptr2),y
-	rts			        ; Done
+	rts	    		        ; Done
 
 
 

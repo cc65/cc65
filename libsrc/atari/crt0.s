@@ -153,6 +153,11 @@ L2:	lda	zpsave,x
 	dex
 	bpl	L2
 
+; turn on cursor
+
+	inx
+	stx	CRSINH
+
 ; Back to DOS
 
 	rts

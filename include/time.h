@@ -76,7 +76,15 @@ extern struct _timezone {
 
 
 
-#if defined(__CBM__)
+#if defined(__ATARI__)
+/* The clock depends on the video standard, so read it at runtime */
+unsigned _clocks_per_sec (void);
+#  define CLK_TCK		_clocks_per_sec()
+#  define CLOCKS_PER_SEC	_clocks_per_sec()
+#elif defined(__ATMOS__)
+#  define CLK_TCK      	       	100	/* POSIX */
+#  define CLOCKS_PER_SEC	100    	/* ANSI */
+#elif defined(__CBM__)
 #  if defined(__CBM510__) || defined(__CBM610__)
 /* The 510/610 gets its clock from the AC current */
 #    define CLK_TCK    	       	50 	/* POSIX */
@@ -85,13 +93,6 @@ extern struct _timezone {
 #    define CLK_TCK	  	60	/* POSIX */
 #    define CLOCKS_PER_SEC	60     	/* ANSI */
 #  endif
-#endif
-
-#if defined(__ATARI__)
-/* The clock depends on the video standard, so read it at runtime */
-unsigned _clocks_per_sec (void);
-#  define CLK_TCK		_clocks_per_sec()
-#  define CLOCKS_PER_SEC	_clocks_per_sec()
 #endif
 
 

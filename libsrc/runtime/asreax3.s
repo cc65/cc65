@@ -15,13 +15,11 @@ asreax3:
        	ror	sreg
        	ror	tmp1
        	ror	a
-       	ldx    	sreg+1
        	cpx	#$80  		; Get bit 7 into carry
        	ror	sreg+1
        	ror	sreg
        	ror	tmp1
        	ror	a
-       	ldx    	sreg+1
        	cpx	#$80  		; Get bit 7 into carry
        	ror	sreg+1
        	ror	sreg

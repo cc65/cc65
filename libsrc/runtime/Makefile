@@ -17,15 +17,19 @@ OBJS = 	add.o		\
        	aslax1.o	\
        	aslax2.o	\
        	aslax3.o	\
+	aslax4.o	\
        	asleax1.o	\
        	asleax2.o	\
        	asleax3.o	\
+	asleax4.o	\
        	asrax1.o	\
        	asrax2.o	\
        	asrax3.o	\
+	asrax4.o	\
        	asreax1.o	\
        	asreax2.o	\
        	asreax3.o	\
+	asreax4.o	\
        	axlong.o	\
        	bneg.o		\
        	bpushbsp.o	\
@@ -160,9 +164,11 @@ OBJS = 	add.o		\
        	shrax1.o	\
        	shrax2.o	\
        	shrax3.o	\
+	shrax4.o	\
        	shreax1.o	\
        	shreax2.o	\
        	shreax3.o	\
+	shreax4.o	\
 	staspidx.o	\
 	staspp.o	\
        	staxsp.o	\

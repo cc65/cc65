@@ -112,7 +112,7 @@ void TgtTranslateInit (void)
 	case TGT_BBC:				break;
 	case TGT_APPLE2:			break;
 	case TGT_GEOS:				break;
-	case TGT_LUNIX:         Tab = CTPET;    break;
+	case TGT_LUNIX:				break;
 	default:
 	    AbEnd ("Internal error: Target system unknown (%d)", Target);
     }

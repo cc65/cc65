@@ -11,14 +11,25 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-C_OBJS =
+OBJS =	_scrsize.o	\
+	banking.o	\
+       	break.o		\
+       	cgetc.o		\
+	clrscr.o	\
+       	color.o		\
+       	cputc.o		\
+       	crt0.o 		\
+       	crtc.o 		\
+       	kbhit.o		\
+       	kirq.o 		\
+       	kplot.o		\
+	kscnkey.o	\
+	kudtim.o	\
+	pokesys.o	\
+	rs232.o
 
-S_OBJS = crt0.o kbhit.o conio.o clrscr.o cputc.o cgetc.o\
-	 color.o break.o banking.o crtc.o pokesys.o\
-	 kscnkey.o kplot.o kudtim.o kirq.o rs232.o
-
-all:	$(C_OBJS) $(S_OBJS)
+all:	$(OBJS)
 
 clean:
-	@rm -f $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS) crt0.o
+	@rm -f $(OBJS)
 

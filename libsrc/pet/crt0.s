@@ -4,9 +4,9 @@
 ; This must be the *first* file on the linker command line
 ;
 
-	.export	      	_exit			 
+	.export	      	_exit
 	.import		initlib, donelib
-       	.import	       	initconio, zerobss, push0
+       	.import	       	zerobss, push0
 	.import		_main
 
 	.include	"pet.inc"
@@ -88,10 +88,6 @@ L1:	lda	sp,x
 ; Call module constructors
 
 	jsr	initlib
-
-; Initialize conio stuff
-
-	jsr	initconio
 
 ; Pass an empty command line
 

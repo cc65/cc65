@@ -18,11 +18,6 @@ keyvec:	.res	2
 .code
 
 initconio:
-   	jsr	SCREEN
-	inx
-   	stx	xsize
-	iny
-   	sty	ysize
 
 ; Save the old vector
 

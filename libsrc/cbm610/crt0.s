@@ -7,7 +7,6 @@
 	.export	     	_exit
 	.import		initlib, donelib
 	.import	     	push0, _main
-	.import	     	initconio
 	.import	       	__BSS_RUN__, __BSS_SIZE__
 	.import		irq, nmi
        	.import	       	k_irq, k_nmi, k_plot, k_udtim, k_scnkey
@@ -239,10 +238,6 @@ Z4:
 ; Call module constructors
 
 	jsr	initlib
-
-; Initialize conio stuff
-
-	jsr	initconio
 
 ; Create the (empty) command line for the program
 

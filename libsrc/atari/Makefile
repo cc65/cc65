@@ -16,7 +16,7 @@ ATARIDEFS = -DNUMDRVS=4
 
 C_OBJS =
 
-S_OBJS = crt0.o kbhit.o conio.o clrscr.o cputc.o ctype.o chline.o cvline.o \
+S_OBJS = crt0.o _scrsize.o kbhit.o clrscr.o cputc.o ctype.o chline.o cvline.o \
 	 color.o gotoxy.o cclear.o revers.o readjoy.o break.o where.o write.o \
 	 gotox.o gotoy.o savevec.o rwcommon.o cgetc.o read.o getargs.o close.o \
 	 open.o oserror.o fdtable.o setcolor.o scroll.o mul40.o graphuse.o \

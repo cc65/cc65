@@ -6,10 +6,10 @@
 
 	.export		xsize, ysize
 
-.bss
+.rodata
 
-xsize:	.res	1
-ysize:	.res	1
+xsize: 	.byte	40
+ysize:	.byte	24
 
 
 

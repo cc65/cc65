@@ -6,7 +6,7 @@
 
 	.export		_exit
 	.import		initlib, donelib
-       	.import	       	initconio, zerobss, push0
+       	.import	       	zerobss, push0
 	.import	     	_main
 
 	.include     	"c64.inc"
@@ -93,10 +93,6 @@ L1:	lda	sp,x
 ; Call module constructors
 
 	jsr	initlib
-
-; Initialize conio stuff
-
-	jsr	initconio
 
 ; Pass an empty command line
 

@@ -11,13 +11,23 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-C_OBJS =
+OBJS =	_scrsize.o	\
+	break.o		\
+	crt0.o		\
+	cgetc.o		\
+	clrscr.o	\
+	color.o		\
+	conio.o		\
+	cputc.o		\
+	kbhit.o		\
+	mouse.o		\
+	read.o		\
+	readjoy.o      	\
+	rs232.o		\
+	write.o
 
-S_OBJS = crt0.o read.o write.o kbhit.o conio.o clrscr.o mouse.o\
-	 cputc.o cgetc.o color.o readjoy.o break.o rs232.o
-
-all:	$(C_OBJS) $(S_OBJS)
+all:	$(OBJS)
 
 clean:
-	@rm -f $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS) crt0.o
+	@rm -f $(OBJS)
 

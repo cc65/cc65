@@ -15,9 +15,9 @@ RESERVE_MOUSE_MEMORY	= 1	; for P/M
 	.export		mouse_pm0
 .endif
 	.export		_exit
-	.import		getargs, argc, argv	  
+	.import		getargs, argc, argv
 	.import		initlib, donelib
-       	.import	       	initconio, zerobss, pushax
+       	.import	       	zerobss, pushax
 	.import		_main,__filetab,getfd
 	.import		__CODE_LOAD__, __BSS_LOAD__
 	.import		__graphmode_used
@@ -123,8 +123,6 @@ L1:	lda	sp,x
 	jsr	initlib
 
 ; Initialize conio stuff
-
-	jsr	initconio
 
 	lda	#$FF
 	sta	CH

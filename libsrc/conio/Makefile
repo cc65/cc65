@@ -11,16 +11,13 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-C_OBJS =
+OBJS =	_cursor.o	\
+	cputhex.o	\
+	cputs.o		\
+	cursor.o	\
+	scrsize.o
 
-S_OBJS = _cursor.o	\
-	 _scrsize.o	\
-	 cputhex.o	\
-	 cputs.o	\
-	 cursor.o	\
-	 scrsize.o
-
-all:  	$(C_OBJS) $(S_OBJS)
+all:  	$(OBJS)
 
 clean:
-	@rm -f *~ $(C_OBJS:.o=.s) $(C_OBJS) $(S_OBJS)
+	@rm -f *~ $(OBJS)

@@ -14,9 +14,6 @@
 .code
 
 initconio:
-     	jsr	SCREEN
-     	stx	xsize
-     	sty	ysize
      	ldy	#15
 L1:  	lda	fnkeys,y
      	sta 	FKEY_SPACE,y

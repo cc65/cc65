@@ -11,13 +11,19 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-C_OBJS =
+OBJS =	_scrsize.o	\
+	break.o	       	\
+     	cgetc.o	       	\
+       	clrscr.o       	\
+      	conio.o	       	\
+     	crt0.o	       	\
+       	color.o	       	\
+     	cputc.o	       	\
+     	kbhit.o	       	\
+     	readjoy.o
 
-S_OBJS = crt0.o conio.o kbhit.o clrscr.o cgetc.o readjoy.o\
-	 color.o cputc.o break.o
-
-all:	$(C_OBJS) $(S_OBJS)
+all:   	$(OBJS)
 
 clean:
-	@rm -f $(C_OBJS:.c=.s) $(C_OBJS) $(S_OBJS) crt0.o
+	@rm -f $(OBJS)
 

@@ -51,6 +51,7 @@ OBJS = 	asserts.o       \
 # List of all config includes
 
 INCS =	apple2.inc	\
+	apple2enh.inc	\
 	atari.inc	\
         atmos.inc       \
 	bbc.inc		\
@@ -114,6 +115,10 @@ depend dep:	$(OBJS:.o=.c)
 
 apple2.inc:	cfg/apple2.cfg
 	@$(CVT) $< $@ CfgApple2
+				  
+# The apple2enh target uses the same config as the apple2
+apple2enh.inc:	cfg/apple2.cfg
+	@$(CVT) $< $@ CfgApple2Enh
 
 atari.inc:     	cfg/atari.cfg
 	@$(CVT) $< $@ CfgAtari

@@ -53,6 +53,7 @@ static const char CfgEmpty[] = "";
 
 /* Actual target configurations, converted into C strings by a perl script */
 #include "apple2.inc"
+#include "apple2enh.inc"
 #include "atari.inc"
 #include "atmos.inc"
 #include "bbc.inc"
@@ -78,7 +79,7 @@ static const char CfgEmpty[] = "";
 /*****************************************************************************/
 
 
-
+                                          
 /* Target configurations for all systems */
 const TargetDesc Targets [TGT_COUNT] = {
     {  	BINFMT_BINARY,  CfgNone         },
@@ -95,6 +96,7 @@ const TargetDesc Targets [TGT_COUNT] = {
     {  	BINFMT_BINARY,	CfgPET          },
     {  	BINFMT_BINARY, 	CfgBBC          },
     {   BINFMT_BINARY,	CfgApple2       },
+    {   BINFMT_BINARY,  CfgApple2Enh    },
     {   BINFMT_BINARY,  CfgGeos         },
     {   BINFMT_O65,     CfgLunix        },
     {  	BINFMT_BINARY,	CfgAtmos        },

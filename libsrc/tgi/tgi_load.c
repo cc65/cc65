@@ -33,18 +33,11 @@
 
 
 
-#include <stdio.h>
 #include <string.h>
+#include <fcntl.h>
 #include <modload.h>
 #include <tgi.h>
 #include <tgi/tgi-kernel.h>
-
-
-
-static unsigned char ReadInputBlock (struct mod_ctrl* C, void* Buf, unsigned Size)
-{
-    return (fread (Buf, 1, Size, C->callerdata) != Size);
-}
 
 
 
@@ -74,7 +67,7 @@ void __fastcall__ tgi_load_driver (const char* name)
     static const unsigned char marker[4] = { 0x74, 0x67, 0x69, 0x00 };
 
     static struct mod_ctrl ctrl = {
-        ReadInputBlock           /* read_block */
+        read            /* Read from disk */
     };
     unsigned Res;
 
@@ -84,8 +77,8 @@ void __fastcall__ tgi_load_driver (const char* name)
     }
 
     /* Now open the file */
-    ctrl.callerdata = fopen (name, "r");
-    if (ctrl.callerdata == 0) {
+    ctrl.callerdata = open (name, O_RDONLY);
+    if (ctrl.callerdata < 0) {
         tgi_error = TGI_ERR_CANNOT_LOAD;
         return;
     }
@@ -94,7 +87,7 @@ void __fastcall__ tgi_load_driver (const char* name)
     Res = mod_load (&ctrl);
 
     /* Close the input file */
-    fclose (ctrl.callerdata);
+    close (ctrl.callerdata);
 
     /* Check the return code */
     if (Res == MLOAD_OK) {

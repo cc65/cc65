@@ -180,7 +180,7 @@ ret:	rts
 ;   ptr4   - 3,4  (backup)
 ;   devnum - 5
 
-	.data
+	.bss
 loc_Y:		.res	1
 loc_ptr4_l:	.res	1
 loc_ptr4_h:	.res	1

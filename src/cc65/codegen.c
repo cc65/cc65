@@ -1574,7 +1574,7 @@ void g_addeqstatic (unsigned flags, unsigned long label, long offs,
 		if (val < 0x100) {
      		    AddCodeLine ("ldy #<(%s)", lbuf);
 		    AddCodeLine ("sty ptr1");
-		    AddCodeLine ("ldy #>(%s+1)", lbuf);
+		    AddCodeLine ("ldy #>(%s)", lbuf);
 		    if (val == 1) {
 			AddCodeLine ("jsr laddeq1");
 		    } else {
@@ -1589,7 +1589,7 @@ void g_addeqstatic (unsigned flags, unsigned long label, long offs,
 	    } else {
 		AddCodeLine ("ldy #<(%s)", lbuf);
 		AddCodeLine ("sty ptr1");
-		AddCodeLine ("ldy #>(%s+1)", lbuf);
+		AddCodeLine ("ldy #>(%s)", lbuf);
 		AddCodeLine ("jsr laddeq");
 	    }
        	    break;
@@ -1809,7 +1809,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, long offs,
 		if (val < 0x100) {
 		    AddCodeLine ("ldy #<(%s)", lbuf);
 		    AddCodeLine ("sty ptr1");
-		    AddCodeLine ("ldy #>(%s+1)", lbuf);
+		    AddCodeLine ("ldy #>(%s)", lbuf);
 		    AddCodeLine ("lda #$%02X", (unsigned char)val);
 		    AddCodeLine ("jsr lsubeqa");
      		} else {
@@ -1820,7 +1820,7 @@ void g_subeqstatic (unsigned flags, unsigned long label, long offs,
 	    } else {
 		AddCodeLine ("ldy #<(%s)", lbuf);
 		AddCodeLine ("sty ptr1");
-		AddCodeLine ("ldy #>(%s+1)", lbuf);
+		AddCodeLine ("ldy #>(%s)", lbuf);
 		AddCodeLine ("jsr lsubeq");
        	    }
        	    break;

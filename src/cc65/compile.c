@@ -219,7 +219,7 @@ static void Parse (void)
 	}
 
 	/* Function declaration? */
-	if (IsTypeFunc (Decl.Type)) {
+	if (Entry && IsTypeFunc (Entry->Type)) {
 
 	    /* Function */
 	    if (!comma) {

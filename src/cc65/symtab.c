@@ -609,7 +609,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
      	if ((Entry->Flags & SC_DEF) != 0 && (Flags & SC_DEF) != 0) {
      	    /* Trying to define the label more than once */
        	    Error ("Label `%s' is defined more than once", Name);
-     	}						 
+     	}
      	Entry->Flags |= Flags;
 
     } else {
@@ -696,6 +696,7 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
     	  	TypeCmp (Type+DECODE_SIZE+1, EType+DECODE_SIZE+1) < TC_EQUAL) {
     	  	/* Types not identical: Conflicting types */
     	  	Error ("Conflicting types for `%s'", Name);
+		return Entry;
     	    } else {
     	  	/* Check if we have a size in the existing definition */
     	  	if (ESize == 0) {
@@ -708,14 +709,15 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
 	    /* New type must be identical */
 	    if (TypeCmp (EType, Type) < TC_EQUAL) {
      	     	Error ("Conflicting types for `%s'", Name);
-	    }					   
+		return Entry;
+	    }
 
 	    /* In case of a function, use the new type descriptor, since it
 	     * contains pointers to the new symbol tables that are needed if
 	     * an actual function definition follows.
 	     */
 	    if (IsTypeFunc (Type)) {
-		CopyEncode (Type+1, EType+1);
+	  	CopyEncode (Type+1, EType+1);
 	    }
      	}
 

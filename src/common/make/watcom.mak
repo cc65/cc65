@@ -55,6 +55,7 @@ OBJS =	abend.obj	\
 	hashstr.obj	\
         matchpat.obj    \
 	print.obj	\
+        searchpath.obj  \
         segdefs.obj     \
         segnames.obj    \
 	strbuf.obj	\

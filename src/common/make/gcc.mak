@@ -23,6 +23,7 @@ OBJS =	abend.o		\
 	hashstr.o	\
         matchpat.o      \
 	print.o		\
+        searchpath.o    \
         segdefs.o       \
         segnames.o      \
 	strbuf.o	\

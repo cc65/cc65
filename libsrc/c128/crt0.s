@@ -6,7 +6,7 @@
 
     	.export	     	_exit
     	.import	     	condes, initlib, donelib
-    	.import	     	initconio, doneconio, zerobss
+    	.import	     	zerobss
     	.import		push0, _main
         .import         RESTOR, BSOUT, CLRCH
 	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
@@ -93,10 +93,6 @@ L1:	lda    	sp,x
 
 	jsr	initlib
 
-; Initialize conio stuff
-
-	jsr	initconio
-
 ; If we have IRQ functions, chain our stub into the IRQ vector
 
         lda     #<__IRQFUNC_COUNT__
@@ -135,10 +131,6 @@ _exit:  lda     #<__IRQFUNC_COUNT__
 ; Run module destructors
 
 NoIRQ2: jsr    	donelib
-
-; Reset the conio stuff
-
- 	jsr	doneconio
 
 ; Reset the stack
 

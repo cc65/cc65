@@ -7,19 +7,24 @@
 ;
 
  	.export		_textcolor, _bgcolor, _bordercolor
+        .import         return0
 
 	.include	"c128.inc"
 
 
-.proc   _textcolor
-
+_textcolor:
 	bit	MODE		; Check 80/40 column mode
-       	bmi     @L1		; Jump if 40 columns
-        ldx	CHARCOLOR	; get old value
- 	sta	CHARCOLOR	; set new value
-	txa
-        ldx     #$00
-	rts
+       	bmi     @L1 		; Jump if 80 columns
+
+; 40 column mode
+
+        ldx     CHARCOLOR       ; Get the old color
+        sta     CHARCOLOR       ; Set the new color
+        txa                     ; Old color -> A
+        ldx     #$00            ; Load high byte
+        rts
+
+; 80 column mode
 
 @L1:    tax                     ; Move new color to X
         lda     CHARCOLOR       ; Get old color + attributes
@@ -30,12 +35,24 @@
         txa                     ; Old color -> A
         and     #$0F            ; Mask out attributes
         ldx     #$00            ; Load high byte
-        rts
 
-.endproc
+; translate vdc->vic colour
+
+vdctovic:
+       	ldy	#15
+@L2:    cmp	$CE5C,y
+        beq	@L3
+        dey
+        bpl	@L2
+@L3:	tya
+	rts
 
 
-.proc   _bgcolor
+_bgcolor:
+        bit     MODE
+        bmi     @L1
+
+; 40 column mode
 
 	ldx	VIC_BG_COLOR0	; get old value
 	sta	VIC_BG_COLOR0	; set new value
@@ -43,10 +60,28 @@
         ldx     #$00
 	rts
 
-.endproc
+; 80 column mode
+
+@L1:    tax                     ; Move new color to X
+       	lda     $CE5C,x		; Translate VIC color -> VDC color
+	pha
+	ldx	#26
+       	jsr    	$CDDA		; Read vdc register 26
+	jsr	vdctovic
+	tay
+	pla
+	ldx	#26
+       	jsr    	$CDCC		; Write vdc register 26
+	tya
+        ldx     #$00
+	rts
 
 
-.proc   _bordercolor
+_bordercolor:
+        bit     MODE
+        bmi     @L1
+
+; 40 column mode
 
        	ldx    	VIC_BORDERCOLOR	; get old value
 	sta	VIC_BORDERCOLOR	; set new value
@@ -54,5 +89,7 @@
         ldx     #$00
 	rts
 
-.endproc
+; 80 column mode
+
+@L1:    jmp     return0
 

@@ -7,6 +7,8 @@
 
     	.export		_cputcxy, _cputc, cputdirect, putchar
 	.export		newline, plot
+        .constructor    initcputc
+        .destructor     donecputc
 	.import		popa, _gotoxy
         .import         PLOT
 
@@ -41,3 +43,15 @@ plot:	ldy	CURS_X
 ; position in Y
 
 putchar	= $CC2F
+
+;--------------------------------------------------------------------------
+; Module constructor/destructor
+
+initcputc:
+	lda	#$80
+        .byte   $2C
+donecputc:
+        lda     #$00
+	sta	SCROLL
+        rts
+

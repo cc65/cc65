@@ -5,9 +5,14 @@
 ;
 
 	.export		_cgetc
+        .constructor    initcgetc
+        .destructor     donecgetc
+
 	.import		cursor
 
 	.include	"c128.inc"
+
+;--------------------------------------------------------------------------
 
 _cgetc:	lda	KEY_COUNT 	; Get number of characters
 	bne	L2	  	; Jump if there are already chars waiting
@@ -28,4 +33,38 @@ L2:    	lda	KEY_COUNT	; Check characters again
 	ldx	#0
 	rts
 
-	   
+;--------------------------------------------------------------------------
+; Module constructor/destructor
+
+.bss
+keyvec:	.res	2
+
+.code
+initcgetc:
+
+; Save the old vector
+
+	lda	KeyStoreVec
+	sta	keyvec
+	lda	KeyStoreVec+1
+	sta	keyvec+1
+
+; Set the new vector. I can only hope that this works for other C128
+; versions...
+
+	lda	#<$C6B7
+	ldx	#>$C6B7
+
+SetVec:	sei
+	sta	KeyStoreVec
+	stx	KeyStoreVec+1
+	cli
+	rts
+
+donecgetc:
+        lda     #$00
+        sta     SCROLL
+	lda	keyvec
+	ldx	keyvec+1
+	bne	SetVec
+

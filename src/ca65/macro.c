@@ -95,7 +95,7 @@ static Macro*  	MacroRoot = 0;	/* List of all macros */
 typedef struct MacExp_ MacExp;
 struct MacExp_ {
     MacExp*	Next;		/* Pointer to next expansion */
-    Macro* 	M; 	  	/* Which macro do we expand? */
+    Macro* 	M;  	  	/* Which macro do we expand? */
     unsigned	IfSP;		/* .IF stack pointer at start of expansion */
     TokNode*   	Exp;		/* Pointer to current token */
     TokNode*	Final;		/* Pointer to final token */
@@ -149,6 +149,7 @@ static Macro* NewMacro (const char* Name, unsigned HashVal, unsigned char Style)
 
     /* Initialize the macro struct */
     M->LocalCount = 0;
+    M->Locals     = 0;
     M->ParamCount = 0;
     M->Params     = 0;
     M->TokCount	  = 0;

@@ -47,6 +47,7 @@
 #include "function.h"
 #include "global.h"
 #include "locals.h"
+#include "stackptr.h"
 #include "symtab.h"
 #include "typeconv.h"
 
@@ -214,7 +215,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
 
                 /* If the value is not const, load it into the primary.
                  * Otherwise pass the information to the code generator.
-                 */ 
+                 */
                 if (ED_IsConstAbsInt (&Expr)) {
                     Flags |= CF_CONST;
                 } else {

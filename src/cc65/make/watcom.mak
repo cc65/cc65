@@ -112,6 +112,7 @@ OBJS =	anonname.obj	\
     	scanner.obj	\
         scanstrbuf.obj  \
 	segments.obj	\
+        stackptr.obj    \
     	stdfunc.obj	\
         stdnames.obj    \
     	stmt.obj	\

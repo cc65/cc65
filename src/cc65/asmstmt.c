@@ -46,6 +46,7 @@
 #include "function.h"
 #include "litpool.h"
 #include "scanner.h"
+#include "stackptr.h"
 #include "symtab.h"
 #include "asmstmt.h"
 

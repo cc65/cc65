@@ -48,6 +48,7 @@
 #include "locals.h"
 #include "scanner.h"
 #include "segments.h"
+#include "stackptr.h"
 #include "stmt.h"
 #include "symtab.h"
 #include "function.h"

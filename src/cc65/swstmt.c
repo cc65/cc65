@@ -7,8 +7,8 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2004 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -50,6 +50,7 @@
 #include "global.h"
 #include "loop.h"
 #include "scanner.h"
+#include "stackptr.h"
 #include "stmt.h"
 #include "swstmt.h"
 

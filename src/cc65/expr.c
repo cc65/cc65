@@ -28,6 +28,7 @@
 #include "macrotab.h"
 #include "preproc.h"
 #include "scanner.h"
+#include "stackptr.h"
 #include "stdfunc.h"
 #include "symtab.h"
 #include "typecmp.h"
@@ -97,7 +98,7 @@ static unsigned GlobalModeFlags (unsigned Flags)
 
 
 
-static void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc *Expr)
+void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc *Expr)
 /* Call an expression function with checks. */
 {
     /* Remember the stack pointer */

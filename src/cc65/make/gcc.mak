@@ -78,6 +78,7 @@ OBJS =	anonname.o	\
     	scanner.o      	\
         scanstrbuf.o    \
 	segments.o	\
+        stackptr.o      \
     	stdfunc.o	\
         stdnames.o      \
         stmt.o 	 	\

@@ -54,20 +54,10 @@
 #include "error.h"
 #include "global.h"
 #include "segments.h"
+#include "stackptr.h"
 #include "textseg.h"
 #include "util.h"
 #include "codegen.h"
-
-
-
-/*****************************************************************************/
-/*	  			     Data     				     */
-/*****************************************************************************/
-
-
-
-/* Compiler relative stack pointer */
-int StackPtr 	= 0;
 
 
 

@@ -34,12 +34,14 @@
 
 
 /* common */
+#include "check.h"
 #include "xsprintf.h"
 
 /* cc65 */
 #include "asmlabel.h"
 #include "datatype.h"
 #include "error.h"
+#include "stackptr.h"
 #include "symentry.h"
 #include "exprdesc.h"
 
@@ -119,6 +121,19 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
 
     /* Return a pointer to the static buffer */
     return Buf;
+}
+
+
+
+int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
+/* Get the stack offset of an address on the stack in Expr taking into account
+ * an additional offset in Offs.
+ */
+{
+    PRECONDITION (ED_IsLocStack (Expr));
+    Offs += ((int) Expr->Val) - StackPtr;
+    CHECK (Offs >= 0);          /* Cannot handle negative stack offsets */
+    return Offs;
 }
 
 

@@ -55,6 +55,7 @@
 #include "loop.h"
 #include "pragma.h"
 #include "scanner.h"
+#include "stackptr.h"
 #include "swstmt.h"
 #include "symtab.h"
 #include "stmt.h"
@@ -516,7 +517,7 @@ int Statement (int* PendingToken)
  * NULL, the function will skip the token.
  */
 {
-    ExprDesc lval;
+    ExprDesc Expr;
     int GotBreak;
 
     /* Assume no pending token */
@@ -590,7 +591,13 @@ int Statement (int* PendingToken)
 
 	    default:
 	        /* Actual statement */
-		Expression0 (&lval);
+                ExprWithCheck (hie0, &Expr);
+                /* Load the result only if it is an lvalue and the type is
+                 * marked as volatile. Otherwise the load is useless.
+                 */
+                if (ED_IsLVal (&Expr) && IsQualVolatile (Expr.Type)) {
+                    ExprLoad (CF_NONE, &Expr);
+                }
 	    	CheckSemi (PendingToken);
 	}
     }

@@ -229,6 +229,11 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs);
  * call to the function.
  */
 
+int ED_GetStackOffs (const ExprDesc* Expr, int Offs);
+/* Get the stack offset of an address on the stack in Expr taking into account
+ * an additional offset in Offs.
+ */
+
 ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, type* Type);
 /* Make Expr an absolute const with the given value and type. */
 

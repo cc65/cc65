@@ -85,9 +85,6 @@
 
 
 
-/* Compiler relative stackpointer */
-extern int StackPtr;
-
 /* Forward */
 struct StrBuf;
 

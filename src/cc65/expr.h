@@ -23,7 +23,10 @@
 
 
 
-void PushAddr (const ExprDesc* Expr);                           
+void ExprWithCheck (void (*Func) (ExprDesc*), ExprDesc *Expr);
+/* Call an expression function with checks. */
+
+void PushAddr (const ExprDesc* Expr);
 /* If the expression contains an address that was somehow evaluated,
  * push this address on the stack. This is a helper function for all
  * sorts of implicit or explicit assignment functions where the lvalue

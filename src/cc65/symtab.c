@@ -53,6 +53,7 @@
 #include "error.h"
 #include "funcdesc.h"
 #include "global.h"
+#include "stackptr.h"
 #include "symentry.h"
 #include "typecmp.h"
 #include "symtab.h"
@@ -672,7 +673,7 @@ SymEntry* AddLocalSym (const char* Name, const type* Type, unsigned Flags, int O
             Entry->V.Offs = Offs;
         } else if ((Flags & SC_REGISTER) == SC_REGISTER) {
             Entry->V.R.RegOffs  = Offs;
-            Entry->V.R.SaveOffs = StackPtr;        /* ### Cleaner! */
+            Entry->V.R.SaveOffs = StackPtr;      
         } else if ((Flags & SC_STATIC) == SC_STATIC) {
             /* Generate the assembler name from the label number */
             Entry->V.Label = Offs;

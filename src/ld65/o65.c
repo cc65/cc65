@@ -35,6 +35,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <limits.h>
 #include <errno.h>
 #include <time.h>
 
@@ -175,6 +176,7 @@ struct ExprDesc {
     O65Desc*   	    D;			/* File format descriptor */
     long       	    Val;		/* The offset value */
     int	       	    TooComplex;	       	/* Expression too complex */
+    Memory*         MemRef;             /* Memory reference if any */
     Segment*        SegRef;             /* Segment reference if any */
     Section*   	    SecRef;		/* Section reference if any */
     ExtSym*    	    ExtRef;		/* External reference if any */
@@ -194,6 +196,7 @@ static ExprDesc* InitExprDesc (ExprDesc* ED, O65Desc* D)
     ED->D    	   = D;
     ED->Val  	   = 0;
     ED->TooComplex = 0;
+    ED->MemRef     = 0;
     ED->SegRef     = 0;
     ED->SecRef     = 0;
     ED->ExtRef     = 0;
@@ -231,6 +234,60 @@ static unsigned O65SegType (const SegDesc* S)
     	return O65SEG_BSS;
     } else {
     	return O65SEG_DATA;
+    }
+}
+
+
+
+static void CvtMemoryToSegment (ExprDesc* ED)
+/* Convert a memory area into a segment by searching the list of run segments
+ * in this memory area and assigning the nearest one.
+ */
+{
+    /* Get the memory area from the expression */
+    Memory* M = ED->MemRef;
+
+    /* Get the list of segments in this memory area */
+    MemListNode* N = M->SegList;
+
+    /* Remember the "nearest" segment and its offset */
+    Segment* Nearest   = 0;
+    unsigned long Offs = ULONG_MAX;
+
+    /* Walk over all segments */
+    while (N != 0) {
+
+        /* Get the segment from this node and check if it's a run segment */
+        SegDesc* S = N->Seg;
+        if (S->Run == M) {
+
+            unsigned long O;
+
+            /* Get the segment from the segment descriptor */
+            Segment* Seg = S->Seg;
+
+            /* Check the PC. */
+            if ((long) Seg->PC <= ED->Val && (O = (ED->Val - Seg->PC)) < Offs) {
+                /* This is the nearest segment for now */
+                Offs = O;
+                Nearest = Seg;
+
+                /* If we found an exact match, don't look further */
+                if (Offs == 0) {
+                    break;
+                }
+            }
+        }
+
+        /* Next segment */
+        N = N->Next;
+    }
+
+    /* If we found a segment, use it and adjust the offset */
+    if (Nearest) {
+        ED->SegRef = Nearest;
+        ED->MemRef = 0;
+        ED->Val    -= Nearest->PC;
     }
 }
 
@@ -358,6 +415,25 @@ static void O65ParseExpr (ExprNode* Expr, ExprDesc* D, int Sign)
        	       	D->SegRef = Expr->V.Seg;
                 /* Add the offset of the segment to the constant value */
                 Val = D->SegRef->PC;
+                if (Sign < 0) {
+                    D->Val -= Val;
+                } else {
+                    D->Val += Val;
+                }
+    	    }
+    	    break;
+
+        case EXPR_MEMAREA:
+    	    if (D->MemRef) {
+    	        /* We cannot handle more than one memory reference in o65 */
+    		D->TooComplex = 1;
+    	    } else {
+    	 	/* Remember the memory area reference */
+       	       	D->MemRef = Expr->V.Mem;
+                /* Add the start address of the memory area to the constant
+                 * value
+                 */
+                Val = D->MemRef->Start;
                 if (Sign < 0) {
                     D->Val -= Val;
                 } else {
@@ -587,9 +663,21 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
     O65ParseExpr (Expr, InitExprDesc (&ED, D), 1);
 
     /* We cannot handle more than one external reference */
-    RefCount = (ED.SegRef != 0) + (ED.SecRef != 0) + (ED.ExtRef != 0);
+    RefCount = (ED.MemRef != 0) + (ED.SegRef != 0) +
+               (ED.SecRef != 0) + (ED.ExtRef != 0);
     if (RefCount > 1) {
        	ED.TooComplex = 1;
+    }
+
+    /* If we have a memory area reference, we need to convert it into a
+     * segment reference. If we cannot do that, we cannot handle the
+     * expression.
+     */
+    if (ED.MemRef) {
+        CvtMemoryToSegment (&ED);
+        if (ED.SegRef == 0) {
+            return SEG_EXPR_TOO_COMPLEX;
+        }
     }
 
     /* Bail out if we cannot handle the expression */

@@ -65,6 +65,14 @@ char* FindInclude (const char* Name, unsigned Where)
 
 
 
+void ForgetAllIncludePaths (void)
+/* Remove all include search paths. */
+{
+    ForgetAllSearchPaths (INC_SYS | INC_USER);
+}
+
+
+
 void InitIncludePaths (void)
 /* Initialize the include path search list */
 {

@@ -636,6 +636,7 @@ static void Usage (void)
        	     "  --debug\t\tDebug mode\n"
        	     "  --debug-info\t\tAdd debug info\n"
 	     "  --feature name\tSet an emulation feature\n"
+       	     "  --forget-inc-paths\tForget include search paths (compiler)\n"
        	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet a compiler include directory path\n"
              "  --lib file\t\tLink this library\n"
@@ -818,6 +819,14 @@ static void OptFeature (const char* Opt attribute ((unused)), const char* Arg)
 /* Emulation features for the assembler */
 {
     CmdAddArg2 (&CA65, "--feature", Arg);
+}
+
+
+
+static void OptForgetIncPaths (const char* Opt attribute ((unused)), const char* Arg)
+/* Forget all currently defined include paths */
+{
+    CmdAddArg2 (&CC65, "--forget-inc-paths", Arg);
 }
 
 
@@ -1042,6 +1051,7 @@ int main (int argc, char* argv [])
 	{ "--debug",	     	0,	OptDebug		},
 	{ "--debug-info",    	0,	OptDebugInfo		},
 	{ "--feature",	     	1,	OptFeature		},
+       	{ "--forget-inc-paths",	0,     	OptForgetIncPaths       },
 	{ "--help",	     	0,	OptHelp			},
 	{ "--include-dir",   	1,	OptIncludeDir		},
        	{ "--lib",     	       	1,     	OptLib                  },

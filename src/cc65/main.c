@@ -112,6 +112,7 @@ static void Usage (void)
 	     "  --debug-opt name\tDebug optimization steps\n"
 	     "  --disable-opt name\tDisable an optimization step\n"
        	     "  --enable-opt name\tEnable an optimization step\n"
+       	     "  --forget-inc-paths\tForget include search paths\n"
 	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
 	     "  --list-opt-steps\tList all optimizer steps and exit\n"
@@ -503,6 +504,15 @@ static void OptEnableOpt (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptForgetIncPaths (const char* Opt attribute ((unused)),
+                               const char* Arg attribute ((unused)))
+/* Forget all currently defined include paths */
+{
+    ForgetAllIncludePaths ();
+}
+
+
+
 static void OptHelp (const char* Opt attribute ((unused)),
 		     const char* Arg attribute ((unused)))
 /* Print usage information and exit */
@@ -629,7 +639,8 @@ int main (int argc, char* argv[])
 	{ "--debug-info",      	0, 	OptDebugInfo 		},
         { "--debug-opt",        1,      OptDebugOpt             },
 	{ "--disable-opt",	1,	OptDisableOpt		},
-	{ "--enable-opt",	1,	OptEnableOpt,		},
+	{ "--enable-opt",	1,	OptEnableOpt  	       	},
+       	{ "--forget-inc-paths",	0,     	OptForgetIncPaths       },
 	{ "--help",	 	0, 	OptHelp	     		},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
 	{ "--list-opt-steps",   0,      OptListOptSteps         },

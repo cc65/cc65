@@ -7,7 +7,6 @@
 	.export		_time
 
         .import         __systime
-        .import         __errno
         .importzp       ptr1, sreg, tmp1
 
         .include        "errno.inc"

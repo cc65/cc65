@@ -5,10 +5,7 @@
 ; /* Map an OS error to a system independent error code */
 ;
 
-	.export		__maperrno
-	.import		__errno
-	.import		__oserror
-	.import		__osmaperrno
+        .include        "errno.inc"
 
 
 .code

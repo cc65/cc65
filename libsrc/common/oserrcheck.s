@@ -10,9 +10,8 @@
 ;
 
         .export         oserrcheck
-        .import         __oserror
-        .import         __osmaperrno
-        .import         __errno
+
+        .include        "errno.inc"
 
 .proc   oserrcheck
 
@@ -32,4 +31,4 @@ ok:     tax                             ; Make high byte also zero
 .endproc
 
 
- 
+

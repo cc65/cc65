@@ -1,4 +1,4 @@
-;                                   
+;
 ; Ullrich von Bassewitz, 31.05.1998
 ;
 ; Several small file stream functions
@@ -6,7 +6,6 @@
 
 	.export		_clearerr, _feof, _ferror, _fileno, _fflush
 	.import	 	return0
-	.import	 	__errno
 	.importzp 	ptr1
 
         .include        "_file.inc"

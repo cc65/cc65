@@ -6,7 +6,6 @@
 
       	.export		_atexit
        	.destructor	doatexit, 5
-	.import		__errno
  	.import	 	callax
 
 	.include	"errno.inc"

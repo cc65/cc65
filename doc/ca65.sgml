@@ -2,9 +2,13 @@
 
 <article>
 <title>ca65 Users Guide
-<author>Ullrich von Bassewitz, <tt/uz@musoftware.de/
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
 <date>19.07.2000
-<abstract>ca65 is a macro assembler for the 6502, 65C02 and 65816 CPUs.
+
+<abstract>
+ca65 is a macro assembler for the 6502, 65C02 and 65816 CPUs. It is used as a
+companion assembler for the cc65 crosscompiler, but it may also be used as a
+standalone product.
 </abstract>
 
 <!-- Table of contents -->
@@ -15,16 +19,16 @@
 <sect>Overview<p>
 
 ca65 is a replacement for the ra65 assembler that was part of the cc65 C
-compiler developed by John R. Dunning. I had some problems with ra65 and
-the copyright does not permit some things which I wanted to be possible,
-so I decided to write a completely new assembler/linker/archiver suite for
-the cc65 compiler. ca65 is part of this suite.
+compiler, originally developed by John R. Dunning. I had some problems with
+ra65 and the copyright does not permit some things which I wanted to be
+possible, so I decided to write a completely new assembler/linker/archiver
+suite for the cc65 compiler. ca65 is part of this suite.
 
 Some parts of the assembler (code generation and some routines for symbol
 table handling) are taken from an older crossassembler named a816 written
 by me a long time ago.
 
-Here's a list of the design criteria, that were important for the
+Here's a list of the design criteria, that I considered important for the
 development:
 
 <itemize>
@@ -44,14 +48,12 @@ development:
 	three segments (this is the count, most other assemblers support).
 	Having more than one code segments helps developing code for systems
 	with a divided ROM area (like the C64).
-<item>	The linker must be able to resolve arbitrary expressions. Years ago I
-	spent half a day to convince Borlands Turbo Assembler to let me use
-	the size of a structure I had created. So I decided that this is a
-	must. The linker should be able to get things like
+<item>	The linker must be able to resolve arbitrary expressions. It should
+	be able to get things like
 <tscreen><verb>
-		.import	S1, S2
-		.export Special
-   		Special	       	= 2*S1 + S2/7
+	.import	S1, S2
+	.export Special
+   	Special	= 2*S1 + S2/7
 </verb></tscreen>
 	right.
 <item>	True lexical nesting for symbols. This is very convenient for larger
@@ -66,8 +68,9 @@ development:
 	started to get boring. A one pass assembler needs much more elaborated
 	data structures, and because of that it's much more fun:-)
 <item>	Non-GPLed code that may be used in any project without restrictions or
-	fear of "GPL infecting" other code.
+   	fear of "GPL infecting" other code.
 </itemize>
+<p>
 
 
 <sect>Usage<p>
@@ -83,7 +86,7 @@ Short options:
   -i	 		Ignore case of symbols
   -l	 		Create a listing if assembly was ok
   -o name		Name the output file
-  -s	 		Enable smart mode    
+  -s	 		Enable smart mode
   -t sys                Set the target system
   -v	 		Increase verbosity
   -D name[=value]	Define a symbol
@@ -120,7 +123,8 @@ Here is a description of all the command line options:
 
  	6502, 65C02, 65816 and sunplus
 
-  (the latter is not available in the freeware version).
+  The latter (sunplus) is not available in the freeware version, because the
+  instruction set of the sunplus CPU is "confidential".
 
 
   <tag><tt>--feature name</tt></tag>
@@ -130,7 +134,7 @@ Here is a description of all the command line options:
   each feature must be specified by using an extra <tt/--feature/ option,
   comma separated lists are not allowed.
 
-  See the discussion of the <tt/.FEATURE/ command for a list of emulation 
+  See the discussion of the <tt/.FEATURE/ command for a list of emulation
   features.
 
 
@@ -196,7 +200,7 @@ Here is a description of all the command line options:
   Set the target system. This will enable translation of character strings
   and character constants into the character set of the target platform.
   The default for the target system is "none", which means that no translation
-  will take place. The assembler supports the same target systems as the 
+  will take place. The assembler supports the same target systems as the
   compiler, see there for a list.
 
 
@@ -249,7 +253,7 @@ Here is a description of all the command line options:
   something lower.
 
 </descrip>
-
+<p>
 
 
 <sect>Input format<p>
@@ -304,14 +308,14 @@ the assembler to determine and would have required one more special
 separated by a dot:
 
 <tscreen><verb>
- 	jsl	3.$1234	       	; Call subroutine at $1234 in bank 3
+   	jsl	3.$1234	       	; Call subroutine at $1234 in bank 3
 </verb></tscreen>
 
 For literal values, the assembler accepts the widely used number formats:
 A preceeding '&dollar;' denotes a hex value, a preceeding '%' denotes a
 binary value, and a bare number is interpeted as a decimal. There are
 currently no octal values and no floats.
-
+<p>
 
 
 <sect>Expressions
@@ -382,7 +386,7 @@ Available operators sorted by precedence:
     .TCOUNT    	Builtin function	     		1
     .XMATCH    	Builtin function	     		1
     .PARAMCOUNT Builtin pseudo variable	(r/o)		1
-    .REFERENCED Builtin function	     		1
+    .REFERENCED Builtin function	     	       	1
     :: 	       	Global namespace override    		1
     +  	       	Unary plus		     	   	1
     -  	       	Unary minus		     		1
@@ -431,11 +435,14 @@ To force a specific order of evaluation, braces may be used as usual.
 
 Some of the pseudo variables mentioned above need some more explanation:
 
+<tscreen><verb>
   *	       	This symbol is replaced by the value of the program
 	       	counter at start of the current instruction. Note, that
 	       	'*' yields a rvalue, that means, you cannot assign to it.
    	       	Use <tt/.ORG/ to set the program counter in sections with
 	       	absolute code.
+</verb></tscreen>
+<p>
 
 
 

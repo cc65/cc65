@@ -1,0 +1,682 @@
+<!doctype linuxdoc system>
+
+<article>
+<title>cc65 Users Guide
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
+<date>03.09.2000
+
+<abstract>
+cc65 is a C compiler for 6502 targets. It supports several old 6502 based home
+computers like the Commodore and Atari machines, but it is easily retargetable.
+</abstract>
+
+<!-- Table of contents -->
+<toc>
+
+<!-- Begin the document -->
+
+
+<sect>Overview<p>
+
+cc65 was originally a C compiler for the Atari 8-bit machines written by
+John R. Dunning. In prior releases I've described the compiler by listing
+up the changes made by me. I have made many more changes in the meantime
+(and rewritten major parts of the compiler), so I will no longer do that,
+since the list would be too large and of no use to anyone. Instead I will
+describe the compiler in respect to the ANSI/ISO C standard. In fact, I'm
+planning a complete rewrite (that is, a complete new compiler) for the
+next release, since there are too many limitations in the current code,
+and removing these limitations would mean a rewrite of many more parts of
+the compiler.
+
+There is a separate document named "library.txt" that covers the library
+available for the compiler. If you know C and are interested in doing
+actual programming, the library documentation is probably of much more use
+than this document.
+
+If you need some hints for getting the best code out of the compiler, you
+may have a look at "coding.txt" which covers some code generation issues.
+
+
+
+<sect>Usage<p>
+
+The compiler translates C files into files containing assembler code that
+may be translated by the ca65 macroassembler (for more information about
+the assembler, have a look at ca65.txt).
+
+The compiler may be called as follows:
+
+<tscreen><verb>
+---------------------------------------------------------------------------
+Usage: cc65 [options] file
+Short options:
+  -d			Debug mode
+  -g			Add debug info to object file
+  -h			Help (this text)
+  -j			Default characters are signed
+  -o name		Name the output file
+  -t sys		Set the target system
+  -v			Increase verbosity
+  -A			Strict ANSI mode
+  -Cl			Make local variables static
+  -Dsym[=defn]		Define a symbol
+  -I dir		Set an include directory search path
+  -O			Optimize code
+  -Oi			Optimize code, inline more code
+  -Or			Enable register variables
+  -Os			Inline some known functions
+  -T			Include source as comment
+  -V			Print the compiler version number
+  -W			Suppress warnings
+
+Long options:
+  --ansi		Strict ANSI mode
+  --cpu type		Set cpu type
+  --debug		Debug mode
+  --debug-info		Add debug info to object file
+  --help		Help (this text)
+  --include-dir dir	Set an include directory search path
+  --signed-chars	Default characters are signed
+  --static-locals	Make local variables static
+  --target sys		Set the target system
+  --verbose		Increase verbosity
+  --version		Print the compiler version number
+---------------------------------------------------------------------------
+</verb></tscreen>
+
+Here is a description of all the command line options:
+
+<descrip>
+
+  <tag><tt>-A, --ansi</tt></tag>
+
+  This option disables any compiler exensions. Have a look at section 5
+  for a discussion of compiler extensions. In addition, the macro
+  <verb>
+       	__STRICT_ANSI__
+  </verb>
+  is defined, when using one of these options.
+
+
+  <tag><tt>--cpu CPU</tt></tag>
+
+  A new, still experimental option. You may specify "6502" or "65C02" as
+  the CPU. 6502 is the default, so this will not change anything.
+  Specifying 65C02 will use a few 65C02 instructions when generating code.
+  Don't expect too much from this option: It is still new (and may have
+  bugs), and the additional instructions for the 65C02 are not that
+  overwhelming.
+
+
+  <tag><tt>-d, --debug</tt></tag>
+
+  Enables debug mode, something that should not be needed for mere
+  mortals:-)
+
+
+  <tag><tt>-D sym[=definition]</tt></tag>
+
+  Define a macro on the command line. If no definition is given, the macro
+  is defined to the value "1".
+
+
+  <tag><tt>-g, --debug-info</tt></tag>
+
+  This will cause the compiler to insert a .DEBUGINFO command into the
+  generated assembler code. This will cause the assembler to include all
+  symbols in a special section in the object file.
+
+
+  <tag><tt>-h, --help</tt></tag>
+
+  Print the short option summary shown above.
+
+
+  <tag><tt>-j, --signed-chars</tt></tag>
+
+  Using this option, you can make the default characters signed. Since the
+  6502 has no provisions for sign extending characters (which is needed on
+  almost any load operation), this will make the code larger and slower. A
+  better way is to declare characters explicitly as "signed" if needed.
+  You can also use "#pragma signedchars" for better control of this option
+  (see section 7).
+
+
+  <tag><tt>-t target, --target target</tt></tag>
+
+  This option is used to set the target system. The target system
+  determines things like the character set that is used for strings and
+  character constants. The following target systems are supported:
+
+  	none
+     	c64
+ 	c128
+ 	ace	 	(no library support)
+ 	plus4
+       	cbm610
+ 	pet	 	(all CBM PET systems except the 2001)
+ 	nes	 	(Nintendo Entertainment System)
+ 	apple2
+ 	geos
+
+
+  <tag><tt>-v, --verbose</tt></tag>
+
+  Using this option, the compiler will be somewhat more verbose if errors
+  or warnings are encountered.
+
+
+  <tag><tt>-Cl, --static-locals</tt></tag>
+
+  Use static storage for local variables instead of storage on the stack.
+  Since the stack is emulated in software, this gives shorter and usually
+  faster code, but the code is no longer reentrant. The difference between
+  -Cl and declaring local variables as static yourself is, that
+  initializer code is executed each time, the function is entered. So when
+  using
+
+   	void f (void)
+   	{
+   	    unsigned a = 1;
+   	    ...
+   	}
+
+  the variable a will always have the value 1 when entering the function
+  and using -Cl, while in
+
+   	void f (void)
+   	{
+   	    static unsigned a = 1;
+   	    ....
+   	}
+
+  the variable a will have the value 1 only the first time, the function
+  is entered, and will keep the old value from one call of the function to
+  the next.
+
+  You may also use #pragma staticlocals to change this setting in your
+  sources (see section 7).
+
+
+  <tag><tt>-I dir, --include-dir dir</tt></tag>
+
+  Set a directory where the compiler searches for include files. You may
+  use this option multiple times to add more than one directory to the
+  search list.
+
+
+  <tag><tt>-o name</tt></tag>
+
+  Specify the name of the output file. If you don't specify a name, the
+  name of the C input file is used, with the extension replaced by ".s".
+
+
+  <tag><tt>-O, -Oi, -Or, -Os</tt></tag>
+
+  Enable an optimizer run over the produced code.
+
+  Using -Oi, the code generator will inline some code where otherwise a
+  runtime functions would have been called, even if the generated code is
+  larger. This will not only remove the overhead for a function call, but
+  will make the code visible for the optimizer.
+
+  -Or will make the compiler honor the "register" keyword. Local variables
+  may be placed in registers (which are actually zero page locations).
+  There is some overhead involved with register variables, since the old
+  contents of the registers must be saved and restored. In addition, the
+  current implementation does not make good use of register variables, so
+  using -Or may make your program even slower and larger. Use with care!
+
+  Using -Os will force the compiler to inline some known functions from
+  the C library like strlen. Note: This has two consequences:
+
+    * You may not use names of standard C functions in your own code. If
+      you do that, your program is not standard compliant anyway, but
+      using -Os will actually break things.
+
+    * The inlined string and memory functions will not handle strings or
+      memory areas larger than 255 bytes. Similar, the inlined is..()
+      functions will not work with values outside char range.
+
+  It is possible to concatenate the modifiers for -O. For example, to
+  enable register variables and inlining of known functions, you may use
+  -Ors.
+
+
+  <tag><tt>-T</tt></tag>
+
+  This include the source code as comments in the generated code. This is
+  normally not needed.
+
+
+  <tag><tt>-V, --version</tt></tag>
+
+  Print the version number of the compiler. When submitting a bug report,
+  please include the operating system you're using, and the compiler
+  version.
+
+
+  <tag><tt>-W</tt></tag>
+
+  This option will suppress any warnings generated by the compiler. Since
+  any source file may be written in a manner that it will not produce
+  compiler warnings, using this option is usually not a good idea.
+
+</descrip><p>
+
+
+<sect>Input and output<p>
+
+The compiler will accept one C file per invocation and create a file with
+the same base name, but with the extension replaced by ".s". The output
+file contains assembler code suitable for the use with the ca65 macro
+assembler.
+
+In addition to the paths named in the -I option on the command line, the
+directory named in the environment variable CC65_INC is added to the
+search path for include files on startup.
+
+
+
+<sect>Differences to the ISO standard<p>
+
+Here is a list of differences between the language, the compiler accepts,
+and the one defined by the ISO standard:
+
+<itemize>
+
+<item>	The compiler allows single line comments that start with //. This
+	feature is disabled in strict ANSI mode.
+
+<item>	The compiler allows unnamed parameters in parameter lists. The
+	compiler will not issue warnings about unused parameters that don't
+	have a name. This feature is disabled in strict ANSI mode.
+
+<item>	The compiler has some additional keywords:<p>
+
+       	<tt/asm/, <tt/__asm__/, <tt/fastcall/, <tt/__fastcall__/, <tt/__AX__/,
+	<tt/__EAX__/, <tt/__func__/, <tt/__attribute__/
+	<p>
+
+	The keywords without the underlines are disabled in strict ANSI mode.
+
+<item>	The datatypes "float" and "double" are not available.
+
+<item>	The compiler does not support bit fields.
+
+<item>	Initialization of local variables is only possible for scalar data
+	types (that is, not for arrays and structs).
+
+<item>	Because of the "wrong" order of the parameters on the stack, there is
+	an additional macro needed to access parameters in a variable
+	parameter list in a C function.
+
+<item>	Functions may not return structs. However, struct assignment *is*
+	possible.
+
+<item>	Part of the C library is available only with fastcall calling
+	conventions (see below). This means, that you may not mix pointers to
+	those functions with pointers to user written functions.
+
+</itemize>
+
+There may be some more minor differences, I'm currently not aware off. The
+biggest problem is the missing float data type. With this limitation in
+mind, you should be able to write fairly portable code.
+
+
+
+<sect>Extensions<p>
+
+This cc65 version has some extensions to the ISO C standard.
+
+<itemize>
+
+<item>	The compiler allows // comments (like in C++ and in the proposed C9x
+	standard). This feature is disabled by <tt/-A/.
+
+<item>	The compiler allows to insert assembler statements into the output
+	file. The syntax is
+	<p>
+
+       	<tt/asm (&lt;string literal&gt;) ;/
+	<p>
+
+	or
+	<p>
+
+       	<tt/__asm__ (&lt;string literal&gt;) ;/
+	<p>
+
+	The first form is in the user namespace and is disabled if the <tt/-A/
+	switch is given.
+
+	The given string is inserted literally into the output file, and a
+	newline is appended. The statements in this string are not checked by
+	the compiler, so be careful!
+
+	The asm statement may be used inside a function and on global file
+	level.
+
+<item>	There is a special calling convention named "fastcall". This calling
+	convention is currently only usable for functions written in
+	assembler. The syntax for a function declaration using fastcall is
+	<p>
+       	    &lt;return type&gt; fastcall &lt;function name&gt; (&lt;parameter list&gt;)
+	<p>
+
+	or
+	<p>
+	    &lt;return type&gt; __fastcall__ &lt;function name&gt; (&lt;parameter list&gt;)
+	<p>
+	An example would be
+
+	<tscreen><verb>
+	    void __fastcall__ f (unsigned char c)
+	</verb></tscreen>
+
+	The first form of the fastcall keyword is in the user namespace and is
+	therefore disabled in strict ANSI mode.
+
+	For functions declared as <tt/fastcall/, the rightmost parameter is not
+	pushed on the stack but left in the primary register when the function
+	is called. This will reduce the cost when calling assembler functions
+	significantly, especially when the function itself is rather small.
+
+<item>	There are two pseudo variables named <tt/__AX__/ and <tt/__EAX__/.
+	Both refer to the primary register that is used by the compiler to
+	evaluate expressions or return function results. <tt/__AX__/ is of
+	type <tt/unsigned int/ and <tt/__EAX__/ of type <tt/long unsigned int/
+	respectively. The pseudo variables may be used as lvalue and rvalue as
+	every other variable. They are most useful together with short
+	sequences of assembler code. For example, the macro
+
+	<tscreen><verb>
+	    #define hi(x) (__AX__=(x),asm("\ttxa\n\tldx\t#$00",__AX__)
+	</verb></tscreen>
+
+	will give the high byte of any unsigned value.
+
+<item>	Inside a function, the identifier <tt/__func__/ gives the name of the
+	current function as a string. Outside of functions, <tt/__func__/ is
+	undefined.
+	Example:
+
+	<tscreen><verb>
+	    #define PRINT_DEBUG(s)	printf ("%s: %s\n", __func__, s);
+	</verb></tscreen>
+
+	The macro will print the name of the current function plus a given
+	string.
+</itemize>
+<p>
+
+
+<sect>Predefined macros<p>
+
+The compiler defines several macros at startup:
+
+<descrip>
+
+  <tag><tt>__CC65__</tt></tag>
+
+  This macro is always defined. Its value is the version number of the
+  compiler in hex. Version 2.0.1 of the compiler will have this macro defined
+  as 0x0201.
+
+  <tag><tt>__CBM__</tt></tag>
+
+  This macro is defined if the target system is one of the CBM targets.
+
+  <tag><tt>__C64__</tt></tag>
+
+  This macro is defined if the target is the c64 (-t c64).
+
+  <tag><tt>__C128__</tt></tag>
+
+  This macro is defined if the target is the c128 (-t c128).
+
+  <tag><tt>__PLUS4__</tt></tag>
+
+  This macro is defined if the target is the plus/4 (-t plus4).
+
+  <tag><tt>__CBM610__</tt></tag>
+
+  This macro is defined if the target is one of the CBM 600/700 family of
+  computers (called B series in the US).
+
+  <tag><tt>__PET__</tt></tag>
+
+  This macro is defined if the target is the PET family of computers (-t pet).
+
+  <tag><tt>__ATARI__</tt></tag>
+
+  This macro is defined if the target is one of the Atari computers
+  (400/800/130XL/800XL). Note that there is no runtime and C library support
+  for atari systems.
+
+  <tag><tt>__APPLE2__</tt></tag>
+
+  This macro is defined if the target is the Apple ][ (-t apple2).
+
+  <tag><tt>__GEOS__</tt></tag>
+
+  This macro is defined if you are compiling for the GEOS system (-t geos).
+
+  <tag><tt>__FILE__</tt></tag>
+
+  This macro expands to a string containing the name of the C source file.
+
+  <tag><tt>__LINE__</tt></tag>
+
+  This macro expands to the current line number.
+
+  <tag><tt>__STRICT_ANSI__</tt></tag>
+
+  This macro is defined to 1 if the -A compiler option was given, and
+  undefined otherwise.
+
+  <tag><tt>__OPT__</tt></tag>
+
+  Is defined if the compiler was called with the -O command line option.
+
+  <tag><tt>__OPT_i__</tt></tag>
+
+  Is defined if the compiler was called with the -Oi command line option.
+
+  <tag><tt>__OPT_r__</tt></tag>
+
+  Is defined if the compiler was called with the -Or command line option.
+
+  <tag><tt>__OPT_s__</tt></tag>
+
+  Is defined if the compiler was called with the -Os command line option.
+
+</descrip>
+
+
+<sect>#pragmas<p>
+
+The compiler understands some pragmas that may be used to change code
+generation and other stuff.
+
+<descrip>
+
+  <tag><tt>#pragma bssseg (&lt;name&gt;)</tt></tag>
+
+  This pragma changes the name used for the BSS segment (the BSS segment
+  is used to store uninitialized data). The argument is a string enclosed
+  in double quotes.
+
+  Note: The default linker configuration file does only map the standard
+  segments. If you use other segments, you have to create a new linker
+  configuration file.
+
+  Beware: The startup code will zero only the default BSS segment. If you
+  use another BSS segment, you have to do that yourself, otherwise
+  uninitialized variables do not have the value zero.
+
+  Example:
+
+  	#pragma bssseg ("MyBSS")
+
+
+  <tag><tt>#pragma codeseg (&lt;name&gt;)</tt></tag>
+
+  This pragma changes the name used for the CODE segment (the CODE segment
+  is used to store executable code). The argument is a string enclosed in
+  double quotes.
+
+  Note: The default linker configuration file does only map the standard
+  segments. If you use other segments, you have to create a new linker
+  configuration file.
+
+  Example:
+
+  	#pragma bssseg ("MyCODE")
+
+
+  <tag><tt>#pragma dataseg (&lt;name&gt;)</tt></tag>
+
+  This pragma changes the name used for the DATA segment (the DATA segment
+  is used to store initialized data). The argument is a string enclosed in
+  double quotes.
+
+  Note: The default linker configuration file does only map the standard
+  segments. If you use other segments, you have to create a new linker
+  configuration file.
+
+  Example:
+
+  	#pragma bssseg ("MyDATA")
+
+
+  <tag><tt>#pragma rodataseg (&lt;name&gt;)</tt></tag>
+
+  This pragma changes the name used for the RODATA segment (the RODATA
+  segment is used to store readonly data). The argument is a string
+  enclosed in double quotes.
+
+  Note: The default linker configuration file does only map the standard
+  segments. If you use other segments, you have to create a new linker
+  configuration file.
+
+  Example:
+
+	#pragma bssseg ("MyRODATA")
+
+
+  <tag><tt>#pragma regvaraddr (&lt;const int&gt;)</tt></tag>
+
+  The compiler does not allow to take the address of register variables.
+  The regvaraddr pragma changes this. Taking the address of a register
+  variable is allowed after using this pragma, if the argument is not
+  zero. Using an argument of zero changes back to the default behaviour.
+
+  Beware: The C standard does not allow taking the address of a variable
+  declared as register. So your programs become non-portable if you use
+  this pragma. In addition, your program may not work. This is usually the
+  case if a subroutine is called with the address of a register variable,
+  and this subroutine (or a subroutine called from there) uses itself
+  register variables. So be careful with this #pragma.
+
+  Example:
+
+   	#pragma regvaraddr(1)  	/* Allow taking the address
+   			       	 * of register variables
+   			       	 */
+
+
+  <tag><tt>#pragma signedchars (&lt;const int&gt;)</tt></tag>
+
+  Changed the signedness of the default character type. If the argument
+  is not zero, default characters are signed, otherwise characters are
+  unsigned. The compiler default is to make characters unsigned since this
+  creates a lot better code.
+
+
+  <tag><tt>#pragma staticlocals (&lt;const int&gt;)</tt></tag>
+
+  Use variables in the bss segment instead of variables on the stack. This
+  pragma changes the default set by the compiler option -Cl. If the argument
+  is not zero, local variables are allocated in the BSS segment, leading to
+  shorter and in most cases faster, but non-reentrant code.
+
+
+  <tag><tt>#pragma zpsym (&lt;name&gt;)</tt></tag>
+
+  Tell the compiler that the - previously as external declared - symbol with
+  the given name is a zero page symbol (usually from an assembler file).
+  The compiler will create a matching import declaration for the assembler.
+
+  Example:
+
+	extern int foo;
+	#pragma zpsym ("foo");	/* foo is in the zeropage */
+
+</descrip>
+
+
+
+<sect>Bugs/Feedback<p>
+
+If you have problems using the compiler, if you find any bugs, or if you're
+doing something interesting with it, I would be glad to hear from you. Feel
+free to contact me by email (<htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">).
+
+
+
+<sect>Copyright<p>
+
+This is the original compiler copyright:
+
+<tscreen><verb>
+--------------------------------------------------------------------------
+  -*- Mode: Text -*-
+
+     This is the copyright notice for RA65, LINK65, LIBR65, and other
+  Atari 8-bit programs.  Said programs are Copyright 1989, by John R.
+  Dunning.  All rights reserved, with the following exceptions:
+
+      Anyone may copy or redistribute these programs, provided that:
+
+  1:  You don't charge anything for the copy.  It is permissable to
+      charge a nominal fee for media, etc.
+
+  2:  All source code and documentation for the programs is made
+      available as part of the distribution.
+
+  3:  This copyright notice is preserved verbatim, and included in
+      the distribution.
+
+      You are allowed to modify these programs, and redistribute the
+  modified versions, provided that the modifications are clearly noted.
+
+      There is NO WARRANTY with this software, it comes as is, and is
+  distributed in the hope that it may be useful.
+
+      This copyright notice applies to any program which contains
+  this text, or the refers to this file.
+
+      This copyright notice is based on the one published by the Free
+  Software Foundation, sometimes known as the GNU project.  The idea
+  is the same as theirs, ie the software is free, and is intended to
+  stay that way.  Everybody has the right to copy, modify, and re-
+  distribute this software.  Nobody has the right to prevent anyone
+  else from copying, modifying or redistributing it.
+
+--------------------------------------------------------------------------
+</verb></tscreen>
+
+In acknowledgment of this copyright, I will place my own changes to the
+compiler under the same copyright. Please note however, that the library
+and all binutils are covered by another copyright, and that I'm planning
+to do a complete rewrite of the compiler, after which the compiler
+copyright will also change.
+
+For the list of changes requested by this copyright see newvers.txt.
+
+
+</article>
+

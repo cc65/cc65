@@ -7,6 +7,7 @@
 
 SGML  =	ar65.sgml	\
 	ca65.sgml	\
+	cc65.sgml	\
 	cl65.sgml
 
 TXT   =	$(SGML:.sgml=.txt)

@@ -2,9 +2,11 @@
 
 <article>
 <title>cl65 Users Guide
-<author>Ullrich von Bassewitz, <tt/uz@musoftware.de/
+<author>Ullrich von Bassewitz, <htmlurl url="mailto:uz@cc65.org" name="uz@cc65.org">
 <date>01.08.2000
-<abstract>cl65 is the compile &amp; link utility for cc65.
+
+<abstract>
+cl65 is the compile &amp; link utility for cc65, the 6502 C compiler.
 </abstract>
 
 <!-- Table of contents -->

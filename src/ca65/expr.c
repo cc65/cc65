@@ -1107,10 +1107,13 @@ static void CheckByteExpr (const ExprNode* N, int* IsByte)
     	    case EXPR_LEAFNODE:
 		switch (N->Op) {
 
-		    case EXPR_SYMBOL:
-			if (SymIsZP (N->V.Sym)) {
-			    *IsByte = 1;
-		       	}
+    		    case EXPR_SYMBOL:
+    			if (SymIsZP (N->V.Sym)) {
+    			    *IsByte = 1;
+    		       	} else if (SymHasExpr (N->V.Sym)) {
+			    /* Check if this expression is a byte expression */
+			    *IsByte = IsByteExpr (GetSymExpr (N->V.Sym));
+			}
 			break;
 
 		    case EXPR_SEGMENT:

@@ -102,7 +102,7 @@ static void Usage (void)
        	     "  -vm\t\t\tVerbose map file\n"
 	     "\n"
 	     "Long options:\n"
-       	     "  --config name\tUse linker config file\n"
+       	     "  --config name\t\tUse linker config file\n"
 	     "  --help\t\tHelp (this text)\n"
 	     "  --mapfile name\tCreate a map file\n"
              "  --module-id id\tSpecify a module id\n"

@@ -27,30 +27,31 @@
 # Object files
 
 OBJS=	_scrsize.o	\
-	break.o		\
-	cclear.o	\
-	cgetc.o		\
-	chline.o	\
-	clrscr.o	\
-	color.o		\
-	cputc.o		\
-	crt0.o		\
-	ctype.o		\
-	cvline.o	\
+     	break.o		\
+     	cclear.o	\
+     	cgetc.o		\
+     	chline.o	\
+     	clrscr.o	\
+     	color.o		\
+     	cputc.o		\
+     	crt0.o		\
+     	ctype.o		\
+     	cvline.o	\
         get_ostype.o    \
         getenv.o        \
         joy_stddrv.o    \
-	kbhit.o		\
+     	kbhit.o		\
         mainargs.o      \
+        oserrlist.o     \
         randomize.o     \
-	read.o		\
-	revers.o	\
+     	read.o		\
+     	revers.o	\
         systime.o       \
         sysuname.o      \
         tgi_mode_table.o\
-	wherex.o       	\
+     	wherex.o       	\
        	wherey.o	\
-	write.o
+     	write.o
 
 #--------------------------------------------------------------------------
 # Drivers

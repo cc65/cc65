@@ -25,6 +25,7 @@ OBJS =	abend.o		\
 	hashstr.o	\
         hashtab.o       \
         matchpat.o      \
+        mmodel.o        \
 	print.o		\
         searchpath.o    \
         segdefs.o       \

@@ -70,6 +70,7 @@ OBJS =	abend.obj	\
 	hashstr.obj	\
         hashtab.obj     \
         matchpat.obj    \
+        mmodel.obj      \
 	print.obj	\
         searchpath.obj  \
         segdefs.obj     \

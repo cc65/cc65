@@ -1,10 +1,10 @@
 
-This directory contains sample programs for the cc65 compiler. 
+This directory contains sample programs for the cc65 compiler.
 
 Below is a short description for each of the programs together with a list of
-the supported platforms. 
+the supported platforms.
 
-Please note:				  
+Please note:
 
   * The supplied makefile needs with GNU make. It works out of the box on
     Linux and similar systems. If you're using Windows, you will have to
@@ -18,27 +18,33 @@ Please note:
 
 List of supplied sample programs:
 
----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 Name:	        hello
 Description:	A fancy "Hello world" type program that uses the conio
 		console I/O library for output.
 Platforms:	Runs on all platforms that support conio, which means:
 		Apple ][, Atari, C64, C128, CBM510, CBM610, PET, Plus/4
 
----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 Name:           mousedemo
 Description:	Shows how to use the mouse.
 Platforms:	All systems with mouse and conio support:
 		Atari (untested), C64, C128 and CBM510
 
----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
 Name:           nachtm
 Description:	Plays "Eine kleine Nachtmusik" by Wolfgang Amadeus Mozart
 Platforms:	All systems that have the Commodore SID (Sound Interface
 		Device):
 		C64, C128, CBM510, CBM610
 
----------------------------------------------------------------------------
+-----------------------------------------------------------------------------
+Name:           plasma
+Description:	A fancy graphics demo written by groepaz/hitmen.
+Platforms:	The program needs a VIC but has not been ported to / tested
+		on the C128, so it does currently run on the CBM510 and C64.
+
+-----------------------------------------------------------------------------
 Name:           sieve
 Description:	Implements the "Sieve of Eratosthenes" as a way to find all
 		prime numbers in a specific number interval. Often used as
@@ -46,4 +52,4 @@ Description:	Implements the "Sieve of Eratosthenes" as a way to find all
 Platforms:	All systems with conio and clock support:
 		Atari, C64, C128, CBM510, CBM610, PET, Plus/4
 
-		       
+

@@ -112,6 +112,10 @@ static void doplasma (void)
     c2A += 2;
     c2B -= 3;
     for (ii = 0; ii < 25; ++ii) {
+	/* Unrolling the following loop will give a speed increase of
+	 * nearly 100% (~24fps), but it will also increase the code 
+	 * size a lot.
+	 */
         for (i = 0; i < 40; ++i, ++scrn) {
             *scrn = (xbuf[i] + ybuf[ii]);
         }

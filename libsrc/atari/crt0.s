@@ -220,6 +220,8 @@ ignore:	lda	MEMTOP
 
 zpsave:	.res	zpspace
 
+	.rodata
+
 ; memory usage of the different graphics modes (0-31)
 ; values < 0 of "bytes needed" are mappped to 0
 ;               bytes needed    ; mode	; val. of MEMTOP

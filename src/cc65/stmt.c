@@ -74,22 +74,40 @@ static void CheckTok (token_t Tok, const char* Msg, int* PendingToken)
  */
 {
     if (CurTok.Tok != Tok) {
-	Error (Msg);
+   	Error (Msg);
     } else if (PendingToken) {
-	*PendingToken = 1;
+   	*PendingToken = 1;
     } else {
-	NextToken ();
+   	NextToken ();
     }
 }
 
 
 
 static void CheckSemi (int* PendingToken)
-/* Helper function for Statement. Will call CheckTok with the parameters
- * for a semicolon.
+/* Helper function for Statement. Will check for a semicolon and print an
+ * error message if not found (plus some error recovery). If PendingToken is
+ * NULL, it will the skip the token, otherwise it will store one to
+ * PendingToken.
+ * This function is a special version of CheckTok with the addition of the 
+ * error recovery.
  */
 {
-    CheckTok (TOK_SEMI, "`;' expected", PendingToken);
+    int HaveToken = (CurTok.Tok == TOK_SEMI);
+    if (!HaveToken) {
+   	Error ("`;' expected");                                  
+        /* Try to be smart about errors */
+        if (CurTok.Tok == TOK_COLON || CurTok.Tok == TOK_COMMA) {
+            HaveToken = 1;
+        }
+    }
+    if (HaveToken) {
+        if (PendingToken) {
+            *PendingToken = 1;
+        } else {
+            NextToken ();
+        }
+    }
 }
 
 

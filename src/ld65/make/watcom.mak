@@ -102,6 +102,7 @@ all:	  	$(EXE)
 
 
 $(EXE): 	$(OBJS) $(LIBS)
+	@$(MAKE) -f make/gcc.mak inc
 	@echo "DEBUG ALL" > $(LNKCFG)
 	@echo "OPTION QUIET" >> $(LNKCFG)
 	@echo "NAME $@" >> $(LNKCFG)

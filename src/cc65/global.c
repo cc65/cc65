@@ -47,7 +47,6 @@ unsigned char AddSource		= 0; 	/* Add source lines as comments */
 unsigned char DebugInfo		= 0;	/* Add debug info to the obj */
 unsigned char CreateDep		= 0;	/* Create a dependency file */
 unsigned char ANSI   	       	= 0;	/* Strict ANSI flag */
-unsigned long OptDisable	= 0;	/* Optimizer passes to disable */
 unsigned      RegisterSpace     = 6;    /* Space available for register vars */
 
 /* Stackable options */

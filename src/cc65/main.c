@@ -808,9 +808,6 @@ int main (int argc, char* argv[])
 	    	    P = Arg + 2;
 		    while (*P) {
 		    	switch (*P++) {
-     		    	    case 'f':
-     		    	     	sscanf (P, "%lx", (long*) &OptDisable);
-		    	     	break;
 	       	    	    case 'i':
 			        IS_Set (&CodeSizeFactor, 200);
     	       	    	     	break;

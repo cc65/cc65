@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -297,7 +297,7 @@ unsigned OptSize2 (CodeSeg* S)
 		    	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
 		    } else if (Val == In->RegY) {
 		    	X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
-		    } else if (RegValIsKnown (In->RegA) && CPU >= CPU_65C02) {
+		    } else if (RegValIsKnown (In->RegA) && (CPUIsets[CPU] & CPU_ISET_65SC02) != 0) {
 		    	if (Val == ((In->RegA - 1) & 0xFF)) {
 		     	    X = NewCodeEntry (OP65_DEA, AM65_IMP, 0, 0, E->LI);
 		    	} else if (Val == ((In->RegA + 1) & 0xFF)) {

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 2001-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -1997,7 +1997,7 @@ static unsigned RunOptGroup4 (CodeSeg* S)
 {
     unsigned Changes = 0;
 
-    if (CPU >= CPU_65C02) {
+    if (CPUIsets[CPU] & CPU_ISET_65SC02) {
         Changes += RunOptFunc (S, &DOpt65C02BitOps, 1);
     	Changes += RunOptFunc (S, &DOpt65C02Ind, 1);
         Changes += RunOptFunc (S, &DOpt65C02Stores, 1);

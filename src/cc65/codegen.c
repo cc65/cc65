@@ -165,9 +165,16 @@ void g_preamble (void)
     	   	    VER_MAJOR, VER_MINOR, VER_PATCH);
 
     /* If we're producing code for some other CPU, switch the command set */
-    if (CPU == CPU_65C02) {
-    	AddTextLine ("\t.setcpu\t\t\"65C02\"");
+    switch (CPU) {
+        case CPU_6502:      AddTextLine ("\t.setcpu\t\t\"6502\"");      break;
+        case CPU_65SC02:    AddTextLine ("\t.setcpu\t\t\"65SC02\"");    break;
+        case CPU_65C02:     AddTextLine ("\t.setcpu\t\t\"65C02\"");     break;
+        case CPU_65816:     AddTextLine ("\t.setcpu\t\t\"65816\"");     break;
+        default:            Internal ("Unknown CPU: %d", CPU);
     }
+
+    /* Use smart mode */
+    AddTextLine ("\t.smart\t\ton");
 
     /* Allow auto import for runtime library routines */
     AddTextLine ("\t.autoimport\ton");
@@ -283,7 +290,7 @@ unsigned sizeofarg (unsigned flags)
 }
 
 
-                                       
+
 int pop (unsigned flags)
 /* Pop an argument of the given size */
 {
@@ -920,7 +927,7 @@ void g_leasp (int offs)
        	    AddCodeLine ("jsr leaasp");	/* Load effective address */
        	} else {
 	    unsigned L = GetLocalLabel ();
-       	    if (CPU == CPU_65C02 && offs == 1) {
+       	    if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 && offs == 1) {
        	     	AddCodeLine ("lda sp");
        	     	AddCodeLine ("ldx sp+1");
        	    	AddCodeLine ("ina");
@@ -3247,7 +3254,7 @@ void g_inc (unsigned flags, unsigned long val)
 
      	case CF_CHAR:
      	    if (flags & CF_FORCECHAR) {
-		if (CPU == CPU_65C02 && val <= 2) {
+		if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 && val <= 2) {
 		    while (val--) {
 		       	AddCodeLine ("ina");
 		    }
@@ -3260,7 +3267,7 @@ void g_inc (unsigned flags, unsigned long val)
      	    /* FALLTHROUGH */
 
      	case CF_INT:
-	    if (CPU == CPU_65C02 && val == 1) {
+	    if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 && val == 1) {
 		unsigned L = GetLocalLabel();
 		AddCodeLine ("ina");
 		AddCodeLine ("bne %s", LocalLabelName (L));
@@ -3341,7 +3348,7 @@ void g_dec (unsigned flags, unsigned long val)
 
      	case CF_CHAR:
 	    if (flags & CF_FORCECHAR) {
-		if (CPU == CPU_65C02 && val <= 2) {
+		if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 && val <= 2) {
 		    while (val--) {
 		 	AddCodeLine ("dea");
 		    }

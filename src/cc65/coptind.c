@@ -1447,9 +1447,9 @@ unsigned OptBranchDist (CodeSeg* S)
 
 	    }
 
-       	} else if (CPU == CPU_65C02                                      &&
-		   (E->Info & OF_UBRA) != 0                              &&
-		   E->JumpTo != 0                                        &&
+       	} else if ((CPUIsets[CPU] & CPU_ISET_65SC02) != 0 &&
+		   (E->Info & OF_UBRA) != 0               &&
+		   E->JumpTo != 0                         &&
 		   IsShortDist (GetBranchDist (S, I, E->JumpTo->Owner))) {
 
 	    /* The jump is short and may be replaced by a BRA on the 65C02 CPU */

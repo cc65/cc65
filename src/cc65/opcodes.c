@@ -6,9 +6,9 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2002 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
+/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
@@ -449,7 +449,7 @@ const OPCDesc OPCTable[OPCODE_COUNT] = {
        	REG_NONE,     	                        /* use */
        	REG_NONE,     	                        /* chg */
 	OF_SETF	 		 		/* flags */
-    },         
+    },
     /* Mark RTI as "uses all registers but doesn't change them", so the
      * optimizer won't remove preceeding loads.
      */
@@ -726,7 +726,7 @@ opc_t MakeShortBranch (opc_t OPC)
        	case OP65_BVS:
        	case OP65_JVS:  return OP65_BVS;
        	case OP65_BRA:
-	case OP65_JMP:	return (CPU == CPU_65C02)? OP65_BRA : OP65_JMP;
+	case OP65_JMP:	return (CPUIsets[CPU] & CPU_ISET_65SC02)? OP65_BRA : OP65_JMP;
        	default:
 	    Internal ("MakeShortBranch: Invalid opcode: %d", OPC);
 	    return 0;

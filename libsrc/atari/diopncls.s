@@ -7,11 +7,11 @@
 ; drive which is later used by the _dio_read and _dio_write
 ; functions.
 ;
-; _dhandle_t    __fastcall__ _dio_open  (_driveid_t drive_id);
-; unsigned char __fastcall__ _dio_close (_dhandle_t handle);
+; dhandle_t     __fastcall__ dio_open  (driveid_t drive_id);
+; unsigned char __fastcall__ dio_close (dhandle_t handle);
 ;
 
- 	.export		__dio_open,__dio_close
+ 	.export		_dio_open,_dio_close
 	.export		sectsizetab
 	.import		__oserror
 	.importzp	ptr1,tmp1
@@ -26,7 +26,7 @@ sectsizetab:
 .code
 
 
-.proc	__dio_open
+.proc	_dio_open
 
 	cmp	#NUMDRVS	; valid drive id?
 	bcs	_inv_drive
@@ -64,15 +64,13 @@ _inv_drive:
 
 .endproc
 
-.proc	__dio_close
+.proc	_dio_close
 
 	sta	ptr1
 	stx	ptr1+1
 	lda	#0
 	ldy	#sst_flag
 	sta	(ptr1),y
-;	ldy	#sst_id
-;	sta	(ptr1),y
 	sta	__oserror	; success
 	tax
 	rts			; return no error

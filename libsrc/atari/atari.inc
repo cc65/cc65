@@ -1045,7 +1045,7 @@ sst_size     = 4	; size of one entry
 			; if changed, adapt diopncls.s
 
 ;-------------------------------------------------------------------------
-; OFFSETS INTO _dio_phys_pos
+; OFFSETS INTO dio_phys_pos
 ;-------------------------------------------------------------------------
 
 diopp_head   = 0	; head

@@ -3,16 +3,16 @@
 ;
 ; this file provides the _dio_read function
 ;
-; unsigned char __fastcall__ _dio_read(_dhandle_t handle,_sectnum_t sect_num,void *buffer);
-; _dhandle_t - 16bit (ptr)
-; _sectnum_t - 16bit
+; unsigned char __fastcall__ dio_read(dhandle_t handle,sectnum_t sect_num,void *buffer);
+; dhandle_t - 16bit (ptr)
+; sectnum_t - 16bit
 ;
 
 	.import		__sio_call,pushax
- 	.export		__dio_read
+ 	.export		_dio_read
 	.include	"atari.inc"
 
-.proc	__dio_read
+.proc	_dio_read
 
 	jsr	pushax		; push buffer address
 	ldx	#%01000000	; direction value

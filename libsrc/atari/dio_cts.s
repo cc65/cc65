@@ -8,20 +8,20 @@
 ; cylinder and head and returns as sector number the
 ; sector number it got
 ;
-; unsigned char __fastcall__ _dio_phys_to_log(_dhandle_t handle,
-;					      _dio_phys_pos *physpos,	/* input */
-;					      _sectnum_t *sectnum);	/* output */
+; unsigned char __fastcall__ dio_phys_to_log(dhandle_t handle,
+;					     dio_phys_pos *physpos,	/* input */
+;					     sectnum_t *sectnum);	/* output */
 ;
-; _dhandle_t - 16bit (ptr)
-; _sectnum_t - 16bit
+; dhandle_t - 16bit (ptr)
+; sectnum_t - 16bit
 ;
 
-	.export		__dio_phys_to_log
+	.export		_dio_phys_to_log
 	.import		popax,__oserror
 	.importzp	ptr1,ptr2,ptr3
 	.include	"atari.inc"
 
-.proc	__dio_phys_to_log
+.proc	_dio_phys_to_log
 
 	sta	ptr1
 	stx	ptr1+1		; pointer to result

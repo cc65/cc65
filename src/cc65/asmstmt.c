@@ -137,19 +137,19 @@ static void ParseByteArg (StrBuf* T, unsigned Arg)
 
     /* Check the range but allow negative values if the type is signed */
     if (IsSignUnsigned (Expr.Type)) {
-    	if (Expr.Val < 0 || Expr.Val > 0xFF) {
+    	if (Expr.IVal < 0 || Expr.IVal > 0xFF) {
     	    AsmRangeError (Arg);
-	    Expr.Val = 0;
+	    Expr.IVal = 0;
 	}
     } else {
-	if (Expr.Val < -128 || Expr.Val > 127) {
+	if (Expr.IVal < -128 || Expr.IVal > 127) {
     	    AsmRangeError (Arg);
-	    Expr.Val = 0;
+	    Expr.IVal = 0;
 	}
     }
 
     /* Convert into a hex number */
-    xsprintf (Buf, sizeof (Buf), "$%02lX", Expr.Val & 0xFF);
+    xsprintf (Buf, sizeof (Buf), "$%02lX", Expr.IVal & 0xFF);
 
     /* Add the number to the target buffer */
     SB_AppendStr (T, Buf);
@@ -171,19 +171,19 @@ static void ParseWordArg (StrBuf* T, unsigned Arg)
 
     /* Check the range but allow negative values if the type is signed */
     if (IsSignUnsigned (Expr.Type)) {
-    	if (Expr.Val < 0 || Expr.Val > 0xFFFF) {
+    	if (Expr.IVal < 0 || Expr.IVal > 0xFFFF) {
     	    AsmRangeError (Arg);
-	    Expr.Val = 0;
+	    Expr.IVal = 0;
 	}
     } else {
-	if (Expr.Val < -32768 || Expr.Val > 32767) {
+	if (Expr.IVal < -32768 || Expr.IVal > 32767) {
     	    AsmRangeError (Arg);
-	    Expr.Val = 0;
+	    Expr.IVal = 0;
 	}
     }
 
     /* Convert into a hex number */
-    xsprintf (Buf, sizeof (Buf), "$%04lX", Expr.Val & 0xFFFF);
+    xsprintf (Buf, sizeof (Buf), "$%04lX", Expr.IVal & 0xFFFF);
 
     /* Add the number to the target buffer */
     SB_AppendStr (T, Buf);
@@ -204,7 +204,7 @@ static void ParseLongArg (StrBuf* T, unsigned Arg attribute ((unused)))
     ConstAbsIntExpr (hie1, &Expr);
 
     /* Convert into a hex number */
-    xsprintf (Buf, sizeof (Buf), "$%08lX", Expr.Val & 0xFFFFFFFF);
+    xsprintf (Buf, sizeof (Buf), "$%08lX", Expr.IVal & 0xFFFFFFFF);
 
     /* Add the number to the target buffer */
     SB_AppendStr (T, Buf);
@@ -302,7 +302,7 @@ static void ParseStrArg (StrBuf* T, unsigned Arg attribute ((unused)))
 
         default:
             ConstAbsIntExpr (hie1, &Expr);
-            xsprintf (Buf, sizeof (Buf), "%ld", Expr.Val);
+            xsprintf (Buf, sizeof (Buf), "%ld", Expr.IVal);
             SB_AppendStr (T, Buf);
             break;
     }

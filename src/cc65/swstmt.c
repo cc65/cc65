@@ -148,7 +148,7 @@ void SwitchStatement (void)
 		ConstAbsIntExpr (hie1, &CaseExpr);
 
 		/* Check the range of the expression */
-		Val = CaseExpr.Val;
+		Val = CaseExpr.IVal;
 		switch (SwitchExprType) {
 
 		    case T_SCHAR:

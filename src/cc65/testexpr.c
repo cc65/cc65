@@ -63,13 +63,13 @@ unsigned Test (unsigned Label, int Invert)
     if (ED_IsConstAbs (&Expr)) {
 
         /* Result is constant, so we know the outcome */
-        Result = (Expr.Val != 0);
+        Result = (Expr.IVal != 0);
 
       	/* Constant rvalue */
-       	if (!Invert && Expr.Val == 0) {
+       	if (!Invert && Expr.IVal == 0) {
       	    g_jump (Label);
      	    Warning ("Unreachable code");
-     	} else if (Invert && Expr.Val != 0) {
+     	} else if (Invert && Expr.IVal != 0) {
  	    g_jump (Label);
       	}
 

@@ -58,9 +58,10 @@ ExprDesc* ED_Init (ExprDesc* Expr)
 {
     Expr->Sym   = 0;
     Expr->Type  = 0;
-    Expr->Val   = 0;
     Expr->Flags = 0;
     Expr->Name  = 0;
+    Expr->IVal  = 0;
+    Expr->FVal  = 0.0;
     return Expr;
 }
 
@@ -75,7 +76,7 @@ const char* ED_GetLabelName (const ExprDesc* Expr, long Offs)
     static char Buf[256];
 
     /* Expr may have it's own offset, adjust Offs accordingly */
-    Offs += Expr->Val;
+    Offs += Expr->IVal;
 
     /* Generate a label depending on the location */
     switch (ED_GetLoc (Expr)) {
@@ -130,7 +131,7 @@ int ED_GetStackOffs (const ExprDesc* Expr, int Offs)
  */
 {
     PRECONDITION (ED_IsLocStack (Expr));
-    Offs += ((int) Expr->Val) - StackPtr;
+    Offs += ((int) Expr->IVal) - StackPtr;
     CHECK (Offs >= 0);          /* Cannot handle negative stack offsets */
     return Offs;
 }
@@ -142,9 +143,10 @@ ExprDesc* ED_MakeConstAbs (ExprDesc* Expr, long Value, type* Type)
 {
     Expr->Sym   = 0;
     Expr->Type  = Type;
-    Expr->Val   = Value;
     Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL;
     Expr->Name  = 0;
+    Expr->IVal  = Value;
+    Expr->FVal  = 0.0;
     return Expr;
 }
 
@@ -155,9 +157,10 @@ ExprDesc* ED_MakeConstAbsInt (ExprDesc* Expr, long Value)
 {
     Expr->Sym   = 0;
     Expr->Type  = type_int;
-    Expr->Val   = Value;
     Expr->Flags = E_LOC_ABS | E_RTYPE_RVAL;
     Expr->Name  = 0;
+    Expr->IVal  = Value;
+    Expr->FVal  = 0.0;
     return Expr;
 }
 
@@ -169,10 +172,11 @@ ExprDesc* ED_MakeRValExpr (ExprDesc* Expr)
  */
 {
     Expr->Sym   = 0;
-    Expr->Val   = 0;    /* No offset */
     Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_NEED_TEST | E_CC_SET);
     Expr->Flags |= (E_LOC_EXPR | E_RTYPE_RVAL);
     Expr->Name  = 0;
+    Expr->IVal  = 0;    /* No offset */
+    Expr->FVal  = 0.0;
     return Expr;
 }
 
@@ -184,10 +188,11 @@ ExprDesc* ED_MakeLValExpr (ExprDesc* Expr)
  */
 {
     Expr->Sym   = 0;
-    Expr->Val   = 0;    /* No offset */
     Expr->Flags &= ~(E_MASK_LOC | E_MASK_RTYPE | E_NEED_TEST | E_CC_SET);
     Expr->Flags |= (E_LOC_EXPR | E_RTYPE_LVAL);
     Expr->Name  = 0;
+    Expr->IVal  = 0;    /* No offset */
+    Expr->FVal  = 0.0; 
     return Expr;
 }
 
@@ -227,7 +232,7 @@ int ED_IsNullPtr (const ExprDesc* Expr)
 /* Return true if the given expression is a NULL pointer constant */
 {
     return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) == (E_LOC_ABS|E_RTYPE_RVAL) &&
-           Expr->Val == 0                                                        &&
+           Expr->IVal == 0                                                        &&
            IsClassInt (Expr->Type);
 }
 
@@ -262,7 +267,8 @@ void PrintExprDesc (FILE* F, ExprDesc* E)
         fprintf (F, "Type:     (unknown)\n"
                     "Raw type: (unknown)\n");
     }
-    fprintf (F, "Value:    0x%08lX\n", E->Val);
+    fprintf (F, "IVal:     0x%08lX\n", E->IVal);
+    fprintf (F, "FVal:     %f\n", E->FVal);
 
     Flags = E->Flags;
     Sep   = '(';

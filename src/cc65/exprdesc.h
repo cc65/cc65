@@ -86,9 +86,10 @@ typedef struct ExprDesc ExprDesc;
 struct ExprDesc {
     struct SymEntry*	Sym;	/* Symbol table entry if known */
     type*	       	Type;   /* Type array of expression */
-    long       	       	Val;    /* Value if expression constant */
-    unsigned short     	Flags;
+    unsigned            Flags;
     unsigned long 	Name;	/* Name or label number */
+    long       	       	IVal;   /* Integer value if expression constant */
+    float               FVal;   /* Floating point value */
 };
 
 

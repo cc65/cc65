@@ -191,7 +191,7 @@ static void AddEncodeToDeclaration (Declaration* D, type T, unsigned long Val)
     D->Index += DECODE_SIZE;
 }
 
-
+                                                                              
 
 static void ParseStorageClass (DeclSpec* D, unsigned DefStorage)
 /* Parse a storage class */
@@ -267,10 +267,10 @@ static void ParseEnumDecl (void)
 
 	/* Check for an assigned value */
    	if (CurTok.Tok == TOK_ASSIGN) {
-    	    ExprDesc lval;
+    	    ExprDesc Expr;
    	    NextToken ();
-   	    ConstAbsIntExpr (hie1, &lval);
-   	    EnumVal = lval.Val;
+   	    ConstAbsIntExpr (hie1, &Expr);
+   	    EnumVal = Expr.IVal;
     	}
 
 	/* Add an entry to the symbol table */
@@ -281,7 +281,7 @@ static void ParseEnumDecl (void)
     	    break;
     	NextToken ();
     }
-    ConsumeRCurly ();
+    ConsumeRCurly ();     
 }
 
 
@@ -1045,17 +1045,17 @@ static void Decl (const DeclSpec* Spec, Declaration* D, unsigned Mode)
        	    NextToken ();
 	    /* Read the size if it is given */
        	    if (CurTok.Tok != TOK_RBRACK) {
-    	     	ExprDesc lval;
-       	       	ConstAbsIntExpr (hie1, &lval);
-                if (lval.Val <= 0) {
+    	     	ExprDesc Expr;
+       	       	ConstAbsIntExpr (hie1, &Expr);
+                if (Expr.IVal <= 0) {
                     if (D->Ident[0] != '\0') {
                         Error ("Size of array `%s' is invalid", D->Ident);
                     } else {
                         Error ("Size of array is invalid");
                     }
-                    lval.Val = 1;
+                    Expr.IVal = 1;
                 }
-       	       	Size = lval.Val;
+       	       	Size = Expr.IVal;
        	    }
        	    ConsumeRBrack ();
 
@@ -1431,7 +1431,7 @@ static unsigned ParseVoidInit (void)
 	    case T_UCHAR:
 		if (ED_IsConstAbsInt (&Expr)) {
 		    /* Make it byte sized */
-		    Expr.Val &= 0xFF;
+		    Expr.IVal &= 0xFF;
 		}
 		DefineData (&Expr);
                 Size += SIZEOF_CHAR;
@@ -1445,7 +1445,7 @@ static unsigned ParseVoidInit (void)
 	    case T_ARRAY:
 	   	if (ED_IsConstAbsInt (&Expr)) {
     	      	    /* Make it word sized */
-	   	    Expr.Val &= 0xFFFF;
+	   	    Expr.IVal &= 0xFFFF;
 	   	}
 	   	DefineData (&Expr);
 	   	Size += SIZEOF_INT;
@@ -1455,7 +1455,7 @@ static unsigned ParseVoidInit (void)
 	    case T_ULONG:
 	   	if (ED_IsConstAbsInt (&Expr)) {
     	      	    /* Make it dword sized */
-	   	    Expr.Val &= 0xFFFFFFFF;
+	   	    Expr.IVal &= 0xFFFFFFFF;
 	   	}
 	   	DefineData (&Expr);
 	   	Size += SIZEOF_LONG;
@@ -1527,7 +1527,7 @@ static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers)
 unsigned ParseInit (type* T)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
-    /* Parse the initialization */    
+    /* Parse the initialization */
     unsigned Size = ParseInitInternal (T, !ANSI);
 
     /* The initialization may not generate code on global level, because code

@@ -755,8 +755,8 @@ static int PushIf (int Skip, int Invert, int Cond)
 
 static int DoIf (int Skip)
 /* Process #if directive */
-{
-    ExprDesc lval;
+{                                    
+    ExprDesc Expr;
     char* S;
 
     /* We're about to abuse the compiler expression parser to evaluate the
@@ -804,7 +804,7 @@ static int DoIf (int Skip)
     NextToken ();
 
     /* Call the expression parser */
-    ConstExpr (hie1, &lval);
+    ConstExpr (hie1, &Expr);
 
     /* End preprocessing mode */
     Preprocessing = 0;
@@ -814,7 +814,7 @@ static int DoIf (int Skip)
     NextTok = sv2;
 
     /* Set the #if condition according to the expression result */
-    return PushIf (Skip, 1, lval.Val != 0);
+    return PushIf (Skip, 1, Expr.IVal != 0);
 }
 
 

@@ -224,7 +224,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
                 }
 
                 /* Push the value */
-                g_push (Flags | TypeOf (Decl->Type), Expr.Val);
+                g_push (Flags | TypeOf (Decl->Type), Expr.IVal);
 
             }
 

@@ -138,13 +138,13 @@ static void DoConversion (ExprDesc* Expr, const type* NewType)
         if (NewBits <= OldBits) {
 
             /* Cut the value to the new size */
-            Expr->Val &= (0xFFFFFFFFUL >> (32 - NewBits));
+            Expr->IVal &= (0xFFFFFFFFUL >> (32 - NewBits));
 
             /* If the new type is signed, sign extend the value */
             if (!IsSignUnsigned (NewType)) {
-                if (Expr->Val & (0x01UL << (NewBits-1))) {
+                if (Expr->IVal & (0x01UL << (NewBits-1))) {
                     /* Beware: Use the safe shift routine here. */
-                    Expr->Val |= shl_l (~0UL, NewBits);
+                    Expr->IVal |= shl_l (~0UL, NewBits);
                 }
             }
         }
@@ -233,7 +233,7 @@ void TypeConversion (ExprDesc* Expr, type* NewType)
 	    }
      	} else if (IsClassInt (Expr->Type)) {
      	    /* Int to pointer assignment is valid only for constant zero */
-     	    if (!ED_IsConstAbsInt (Expr) || Expr->Val != 0) {
+     	    if (!ED_IsConstAbsInt (Expr) || Expr->IVal != 0) {
      	       	Warning ("Converting integer to pointer without a cast");
      	    }
 	} else if (IsTypeFuncPtr (NewType) && IsTypeFunc(Expr->Type)) {

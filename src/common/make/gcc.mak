@@ -20,6 +20,7 @@ OBJS =	abend.o		\
 	fname.o		\
 	hashstr.o	\
 	print.o		\
+	strbuf.o	\
 	strutil.o	\
 	target.o	\
 	tgttrans.o	\

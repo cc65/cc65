@@ -76,6 +76,7 @@ OBJS =	abend.obj	\
 	fname.obj	\
 	hashstr.obj	\
 	print.obj	\
+	strbuf.obj	\
 	strutil.obj	\
 	target.obj	\
 	tgttrans.obj	\
@@ -102,7 +103,7 @@ clean:
 	@if exist *.obj del *.obj
 	@if exist $(LIB) del $(LIB)
 
-
+			 
 
 
 

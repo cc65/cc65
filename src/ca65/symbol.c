@@ -145,7 +145,7 @@ SymTable* ParseScopedIdent (char* Name, StrBuf* FullName)
         NextTok ();
     }
 }
-
+                                              
 
 
 SymEntry* ParseScopedSymName (int AllocNew)
@@ -174,7 +174,7 @@ SymEntry* ParseScopedSymName (int AllocNew)
          * symbol.
          */
         if (AllocNew) {
-            return NewSymEntry (Ident);
+            return NewSymEntry (Ident, SF_NONE);
         } else {
             return 0;
         }

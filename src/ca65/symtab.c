@@ -269,7 +269,7 @@ SymEntry* SymFindLocal (SymEntry* Parent, const char* Name, int AllocNew)
         /* No last global, so there's no local table */
         Error ("No preceeding global symbol");
         if (AllocNew) {
-            return NewSymEntry (Name);
+            return NewSymEntry (Name, SF_LOCAL);
         } else {
             return 0;
         }
@@ -286,7 +286,7 @@ SymEntry* SymFindLocal (SymEntry* Parent, const char* Name, int AllocNew)
     if (AllocNew) {
 
         /* Otherwise create a new entry, insert and return it */
-        SymEntry* N = NewSymEntry (Name);
+        SymEntry* N = NewSymEntry (Name, SF_LOCAL);
         if (S == 0) {
             Parent->Locals = N;
         } else if (Cmp < 0) {
@@ -325,7 +325,7 @@ SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew)
     if (AllocNew) {
 
         /* Otherwise create a new entry, insert and return it */
-        SymEntry* N = NewSymEntry (Name);
+        SymEntry* N = NewSymEntry (Name, SF_NONE);
         if (S == 0) {
             Scope->Table[Hash] = N;
         } else if (Cmp < 0) {
@@ -377,7 +377,7 @@ int SymIsZP (SymEntry* S)
      * enclosing scope for a symbol with the same name, and return the ZP
      * attribute of this symbol if we find one.
      */
-    if (!IsLocalNameId (S->Name) && (S->Flags & (SF_DEFINED | SF_IMPORT)) == 0 &&
+    if ((S->Flags & (SF_DEFINED | SF_IMPORT | SF_LOCAL)) == 0 &&
 	S->SymTab->Parent != 0) {
 
 	/* Try to find a symbol with the same name in the enclosing scope */

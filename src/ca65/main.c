@@ -374,7 +374,7 @@ static void DoPCAssign (void)
 
 static void OneLine (void)
 /* Assemble one line */
-{            
+{
     Segment*      Seg  = 0;
     unsigned long PC   = 0;
     SymEntry*     Sym  = 0;
@@ -463,14 +463,14 @@ static void OneLine (void)
 	    NextTok ();
 	    if (Tok != TOK_EQ) {
 		Error ("`=' expected");
-		SkipUntilSep ();
-	    } else {
-		/* Skip the equal sign */
-		NextTok ();
-		/* Enter absolute mode */
-		DoPCAssign ();
-	    }
-	}
+      		SkipUntilSep ();
+      	    } else {
+      		/* Skip the equal sign */
+      		NextTok ();
+      		/* Enter absolute mode */
+      		DoPCAssign ();
+      	    }
+      	}
 
         /* If we have defined a label, remember its size. Sym is also set by
          * a symbol assignment, but in this case Done is false, so we don't

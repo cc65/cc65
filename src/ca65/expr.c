@@ -394,25 +394,39 @@ static ExprNode* FuncSizeOf (void)
     long      Size;
 
 
-    /* Parse the scope and the name */
-    SymTable* ParentScope = ParseScopedIdent (Name, &FullName);
+    if (Tok == TOK_LOCAL_IDENT) {
 
-    /* Check if the parent scope is valid */
-    if (ParentScope == 0) {
-        /* No such scope */
-        DoneStrBuf (&FullName);
-        return GenLiteralExpr (0);
-    }
+        /* Cheap local symbol, special handling */
+        Sym = SymFindLocal (SymLast, SVal, SYM_FIND_EXISTING);
+        if (Sym == 0) {
+            Error ("Unknown symbol or scope: `%s'", SB_GetConstBuf (&FullName));
+            return GenLiteralExpr (0);
+        } else {
+            SizeSym = GetSizeOfSymbol (Sym);
+        }
 
-    /* The scope is valid, search first for a child scope, then for a symbol */
-    if ((Scope = SymFindScope (ParentScope, Name, SYM_FIND_EXISTING)) != 0) {
-        /* Yep, it's a scope */
-        SizeSym = GetSizeOfScope (Scope);
-    } else if ((Sym = SymFind (ParentScope, Name, SYM_FIND_EXISTING)) != 0) {
-        SizeSym = GetSizeOfSymbol (Sym);
     } else {
-        Error ("Unknown symbol or scope: `%s'", SB_GetConstBuf (&FullName));
-        return GenLiteralExpr (0);
+
+        /* Parse the scope and the name */
+        SymTable* ParentScope = ParseScopedIdent (Name, &FullName);
+    
+        /* Check if the parent scope is valid */
+        if (ParentScope == 0) {
+            /* No such scope */
+            DoneStrBuf (&FullName);
+            return GenLiteralExpr (0);
+        }
+    
+        /* The scope is valid, search first for a child scope, then for a symbol */
+        if ((Scope = SymFindScope (ParentScope, Name, SYM_FIND_EXISTING)) != 0) {
+            /* Yep, it's a scope */
+            SizeSym = GetSizeOfScope (Scope);
+        } else if ((Sym = SymFind (ParentScope, Name, SYM_FIND_EXISTING)) != 0) {
+            SizeSym = GetSizeOfSymbol (Sym);
+        } else {
+            Error ("Unknown symbol or scope: `%s'", SB_GetConstBuf (&FullName));
+            return GenLiteralExpr (0);
+        }
     }
 
     /* Check if we have a size */

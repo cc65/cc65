@@ -72,23 +72,7 @@ SymEntry* SymLast = 0;
 
 
 
-int IsLocalName (const char* Name)
-/* Return true if Name is the name of a local symbol */
-{
-    return (*Name == LocalStart);
-}
-
-
-
-int IsLocalNameId (unsigned Name)
-/* Return true if Name is the name of a local symbol */
-{
-    return (*GetString (Name) == LocalStart);
-}
-
-
-
-SymEntry* NewSymEntry (const char* Name)
+SymEntry* NewSymEntry (const char* Name, unsigned Flags)
 /* Allocate a symbol table entry, initialize and return it */
 {
     /* Allocate memory */
@@ -100,7 +84,7 @@ SymEntry* NewSymEntry (const char* Name)
     S->Locals	  = 0;
     S->SymTab	  = 0;
     S->Pos	  = CurPos;
-    S->Flags	  = 0;
+    S->Flags	  = Flags;
     S->V.Expr	  = 0;
     S->ExprRefs   = AUTO_COLLECTION_INITIALIZER;
     S->ExportSize = ADDR_SIZE_DEFAULT;
@@ -243,7 +227,7 @@ void SymDef (SymEntry* S, ExprNode* Expr, unsigned char AddrSize, unsigned Flags
     }
 
     /* If this is not a local symbol, remember it as the last global one */
-    if (!IsLocalNameId (S->Name)) {
+    if ((S->Flags & SF_LOCAL) == 0) {
        	SymLast = S;
     }
 }

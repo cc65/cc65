@@ -62,6 +62,7 @@
 #define SF_EXPORT      	0x0004	    	/* Export this symbol */
 #define SF_IMPORT   	0x0008	    	/* Import this symbol */
 #define SF_GLOBAL	0x0010	    	/* Global symbol */
+#define SF_LOCAL        0x0020          /* Cheap local symbol */
 #define SF_LABEL        0x0080          /* Used as a label */
 #define SF_FORCED       0x0100          /* Forced import, SF_IMPORT also set */
 #define SF_INDEXED	0x0800		/* Index is valid */
@@ -85,14 +86,13 @@ struct SymEntry {
     unsigned                Flags;	/* Symbol flags */
     unsigned	    	    Index;	/* Index of import/export entries */
     union {
-        struct ExprNode*    Expr;      	/* Expression if CONST not set */
-	long	    	    Val;  	/* Value (if CONST set) */
+        struct ExprNode*    Expr;      	/* Symbol expression */
 	SymEntry*  	    Sym;	/* Symbol (if trampoline entry) */
     } V;
     Collection              ExprRefs;   /* Expressions using this symbol */
     unsigned char           ExportSize; /* Export address size */
     unsigned char           AddrSize;   /* Address size of label */
-    unsigned char      	    ConDesPrio[CD_TYPE_COUNT];	/* ConDes priorities... */
+    unsigned char      	    ConDesPrio[CD_TYPE_COUNT]; 	/* ConDes priorities... */
 					/* ...actually value+1 (used as flag) */
     unsigned                Name;      	/* Name index in global string pool */
 };
@@ -111,13 +111,7 @@ extern SymEntry* SymLast;
 
 
 
-int IsLocalName (const char* Name);
-/* Return true if Name is the name of a local symbol */
-
-int IsLocalNameId (unsigned Name);
-/* Return true if Name is the name of a local symbol */
-
-SymEntry* NewSymEntry (const char* Name);
+SymEntry* NewSymEntry (const char* Name, unsigned Flags);
 /* Allocate a symbol table entry, initialize and return it */
 
 int SymSearchTree (SymEntry* T, const char* Name, SymEntry** E);

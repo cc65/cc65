@@ -33,6 +33,7 @@ S_OBJS =	_fdesc.o	\
 		atexit.o	\
 		atoi.o		\
 		copydata.o	\
+		doatexit.o	\
 		errno.o		\
 		fmisc.o 	\
 		free.o		\
@@ -94,3 +95,4 @@ clean:
 	@rm -f $(C_OBJS:.o=.s)
 	@rm -f $(C_OBJS)
 	@rm -f $(S_OBJS)
+				 

@@ -4,34 +4,28 @@
 ; int atexit (void (*f) (void));
 ;
 
-; The exit functions
-
-      	.export		_atexit, doatexit
-	.import		__errno, jmpvec
+      	.export		_atexit
+	.import		exitfunc_table, exitfunc_index
+	.importzp	exitfunc_max
+	.import		__errno
 
 	.include	"errno.inc"
 
-.bss
-ecount:	.byte	0		; Really an index, inc'ed by 2
-efunc: 	.word  	0,0,0,0,0	; 5 exit functions
-maxcount = * - efunc
 
+.proc	_atexit
 
-.code
-
-_atexit:
-	ldy	ecount
-	cpy	#maxcount	; slot available?
-	beq	E0		; jump if no
+	ldy	exitfunc_index
+       	cpy    	#exitfunc_max		; Slot available?
+       	beq    	@Error			; Jump if no
 
 ; Enter the function into the table
 
-	sta	efunc,y
+	sta	exitfunc_table,y
 	iny
 	txa
-	sta	efunc,y
+	sta	exitfunc_table,y
 	iny
-	sty	ecount
+	sty	exitfunc_index
 
 ; Done, return zero
 
@@ -41,32 +35,15 @@ _atexit:
 
 ; Error, no space left
 
-E0:	lda	#ENOSPC		; No space left
-	sta	__errno
-	ldx	#$00
-	stx	__errno+1
-	dex
-	txa
-	rts
+@Error:	lda	#ENOSPC	      	; No space left
+      	sta	__errno
+      	ldx	#$00
+      	stx	__errno+1
+      	dex			; Make return value -1
+      	txa
+      	rts
 
-; Function called from exit
-
-doatexit:
-	ldy	ecount	 	; get index
-	beq	L9	 	; jump if done
-	dey
-	lda	efunc,y
-   	sta	jmpvec+2
-   	dey
-   	lda	efunc,y
-     	sta	jmpvec+1
-   	sty	ecount
-	ldy	#0 		; number of function parms
-	jsr	jmpvec
-	jmp	doatexit     	; next one
-
-L9:	rts
-
+.endproc
 
 
 

@@ -606,6 +606,7 @@ static void Usage (void)
        	     "  -Cl\t\t\tMake local variables static\n"
        	     "  -D sym[=defn]\t\tDefine a preprocessor symbol\n"
        	     "  -I dir\t\tSet a compiler include directory path\n"
+             "  -L path\t\tSpecify a library search path\n"
        	     "  -Ln name\t\tCreate a VICE label file\n"
        	     "  -O\t\t\tOptimize code\n"
        	     "  -Oi\t\t\tOptimize code, inline functions\n"
@@ -622,6 +623,7 @@ static void Usage (void)
 	     "  --asm-include-dir dir\tSet an assembler include directory\n"
              "  --bss-label name\tDefine and export a BSS segment label\n"
 	     "  --bss-name seg\tSet the name of the BSS segment\n"
+             "  --cfg-path path\tSpecify a config file search path\n"
        	     "  --check-stack\t\tGenerate stack overflow checks\n"
              "  --code-label name\tDefine and export a CODE segment label\n"
        	     "  --code-name seg\tSet the name of the CODE segment\n"
@@ -635,11 +637,15 @@ static void Usage (void)
 	     "  --feature name\tSet an emulation feature\n"
        	     "  --help\t\tHelp (this text)\n"
        	     "  --include-dir dir\tSet a compiler include directory path\n"
+             "  --lib file\t\tLink this library\n"
+             "  --lib-path path\tSpecify a library search path\n"
        	     "  --listing\t\tCreate an assembler listing\n"
 	     "  --mapfile name\tCreate a map file\n"
              "  --module\t\tLink as a module\n"
              "  --module-id id\tSpecify a module id for the linker\n"
              "  --o65-model model\tOverride the o65 model\n"
+             "  --obj file\t\tLink this object file\n"
+             "  --obj-path path\tSpecify an object file search path\n"
              "  --register-space b\tSet space available for register variables\n"
              "  --register-vars\tEnable register variables\n"
        	     "  --rodata-name seg\tSet the name of the RODATA segment\n"
@@ -695,6 +701,14 @@ static void OptBssName (const char* Opt attribute ((unused)), const char* Arg)
 {
     CmdAddArg2 (&CC65, "--bss-name", Arg);
     CmdAddArg2 (&CO65, "--bss-name", Arg);
+}
+
+
+
+static void OptCfgPath (const char* Opt attribute ((unused)), const char* Arg)
+/* Config file search path (linker) */
+{
+    CmdAddArg2 (&LD65, "--cfg-path", Arg);
 }
 
 
@@ -817,6 +831,22 @@ static void OptIncludeDir (const char* Opt attribute ((unused)), const char* Arg
 
 
 
+static void OptLib (const char* Opt attribute ((unused)), const char* Arg)
+/* Library file follows (linker) */
+{
+    CmdAddArg2 (&LD65, "--lib", Arg);
+}
+
+
+
+static void OptLibPath (const char* Opt attribute ((unused)), const char* Arg)
+/* Library search path (linker) */
+{
+    CmdAddArg2 (&LD65, "--lib-path", Arg);
+}
+
+
+
 static void OptListing (const char* Opt attribute ((unused)),
 			const char* Arg attribute ((unused)))
 /* Create an assembler listing */
@@ -857,6 +887,22 @@ static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
 /* Handle the --o65-model option */
 {
     CmdAddArg2 (&CO65, "-m", Arg);
+}
+
+
+
+static void OptObj (const char* Opt attribute ((unused)), const char* Arg)
+/* Object file follows (linker) */
+{
+    CmdAddArg2 (&LD65, "--obj", Arg);
+}
+
+
+
+static void OptObjPath (const char* Opt attribute ((unused)), const char* Arg)
+/* Object file search path (linker) */
+{
+    CmdAddArg2 (&LD65, "--obj-path", Arg);
 }
 
 
@@ -974,6 +1020,7 @@ int main (int argc, char* argv [])
 	{ "--asm-include-dir",	1,	OptAsmIncludeDir	},
        	{ "--bss-label",       	1,     	OptBssLabel             },
 	{ "--bss-name",	 	1, 	OptBssName   		},
+       	{ "--cfg-path",	       	1,     	OptCfgPath              },
        	{ "--check-stack",	0,     	OptCheckStack		},
        	{ "--code-label",      	1,     	OptCodeLabel            },
 	{ "--code-name", 	1, 	OptCodeName  		},
@@ -987,11 +1034,15 @@ int main (int argc, char* argv [])
 	{ "--feature",	     	1,	OptFeature		},
 	{ "--help",	     	0,	OptHelp			},
 	{ "--include-dir",   	1,	OptIncludeDir		},
+       	{ "--lib",     	       	1,     	OptLib                  },
+       	{ "--lib-path",	       	1,     	OptLibPath              },
 	{ "--listing",	      	0,	OptListing		},
 	{ "--mapfile",	      	1,	OptMapFile		},
         { "--module",           0,      OptModule               },
         { "--module-id",        1,      OptModuleId             },
         { "--o65-model",        1,      OptO65Model             },
+       	{ "--obj",              1,     	OptObj                  },
+       	{ "--obj-path",	       	1,     	OptObjPath              },
         { "--register-space",   1,      OptRegisterSpace        },
         { "--register-vars",    0,      OptRegisterVars         },
 	{ "--rodata-name",    	1, 	OptRodataName		},
@@ -1062,11 +1113,12 @@ int main (int argc, char* argv [])
 		    break;
 
 	   	case 'L':
-		    if (Arg[2] == 'n') {
+		    if (Arg[2] == 'n' && Arg[3] == '\0') {
 		      	/* VICE label file (linker) */
 		      	CmdAddArg2 (&LD65, "-Ln", GetArg (&I, 3));
 		    } else {
-	    	      	UnknownOption (Arg);
+                        /* Library search path (linker) */
+                        OptLibPath (Arg, GetArg (&I, 2));
 		    }
 	    	    break;
 

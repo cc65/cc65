@@ -164,7 +164,7 @@ void LoadChipLibrary (const char* LibName)
     CollAppend (&ChipLibraries, L);
 
     /* Print some information */
-    Print (stderr, 1, "Opened plugin library `%s'", L->PathName);
+    Print (stderr, 1, "Opened chip library `%s'\n", L->PathName);
 }
 
 

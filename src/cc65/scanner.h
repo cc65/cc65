@@ -127,9 +127,12 @@ typedef enum token_t {
     TOK_ATTRIBUTE,
     TOK_FAR,
     TOK_FASTCALL,
+    TOK_A,
+    TOK_X,
+    TOK_Y,	  
     TOK_AX,
     TOK_EAX,
-	    
+
     TOK_PRAGMA
 } token_t;
 

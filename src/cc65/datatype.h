@@ -138,6 +138,7 @@ typedef unsigned short type;
 #define DECODE_SIZE    	5
 
 /* Predefined type strings */
+extern type type_uchar [];
 extern type type_int [];
 extern type type_uint [];
 extern type type_long [];

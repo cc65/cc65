@@ -57,6 +57,7 @@
 
 
 /* Predefined type strings */
+type type_uchar []     	= { T_UCHAR,	T_END };
 type type_int []	= { T_INT,	T_END };
 type type_uint []   	= { T_UINT,	T_END };
 type type_long []   	= { T_LONG,	T_END };

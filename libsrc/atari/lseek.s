@@ -20,7 +20,7 @@
 	lda	#<ENOSYS
 	sta	__errno
 	lda	#>ENOSYS
-	sta	__errno
+	sta	__errno+1
 	ldx	#0
 	stx	__oserror
 	dex

@@ -70,6 +70,7 @@ OBJS =	anonname.o	\
 	segments.o	\
     	stdfunc.o	\
     	stmt.o 		\
+	swstmt.o	\
     	symentry.o	\
     	symtab.o       	\
 	textseg.o	\

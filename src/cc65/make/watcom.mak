@@ -115,6 +115,7 @@ OBJS =	anonname.obj	\
 	segments.obj	\
     	stdfunc.obj	\
     	stmt.obj	\
+	swstmt.obj	\
     	symentry.obj	\
     	symtab.obj	\
 	textseg.obj	\
@@ -190,6 +191,7 @@ FILE scanner.obj
 FILE segments.obj
 FILE stdfunc.obj
 FILE stmt.obj
+FILE swstmt.obj
 FILE symentry.obj
 FILE symtab.obj
 FILE textseg.obj

@@ -26,7 +26,8 @@ OBJS =	_scrsize.o	\
 	kscnkey.o	\
 	kudtim.o 	\
 	peeksys.o	\
-	pokesys.o
+	pokesys.o	\
+	rs232.o
 
 all:	$(OBJS)
 

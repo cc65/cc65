@@ -22,7 +22,3 @@ Introduced with version 2.5:
     switches and the "register" keyword is still accepted, so this should not
     harm existing programs.
 
-  * In the assembler listing, data bytes for are macros are output in the
-    wrong line.
-
-

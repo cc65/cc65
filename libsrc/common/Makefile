@@ -18,7 +18,6 @@ C_OBJS =	_afailed.o	\
                 asctime.o       \
 		bsearch.o	\
 		errormsg.o	\
-		fclose.o	\
 		fdopen.o	\
 		fgetc.o		\
 		fgetpos.o	\
@@ -68,6 +67,7 @@ S_OBJS = 	_fdesc.o 	\
                 ctime.o         \
                 divt.o          \
 		errno.o		\
+		fclose.o	\
 		fmisc.o 	\
 		fopen.o		\
 		fprintf.o	\

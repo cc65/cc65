@@ -6,7 +6,6 @@ abort.s
 asctime.s
 bsearch.s
 errormsg.s
-fclose.s
 fdopen.s
 fgetc.s
 fgetpos.s

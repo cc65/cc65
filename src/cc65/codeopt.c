@@ -1112,7 +1112,7 @@ static unsigned OptDecouple (CodeSeg* S)
 /*****************************************************************************/
 
 
-		
+
 #if 0
 static unsigned OptSize1 (CodeSeg* S)
 /* Do size optimization by calling special subroutines that preload registers.
@@ -1369,7 +1369,8 @@ static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",     0, 0, 0,
 static OptFunc DOptJumpCascades	= { OptJumpCascades, "OptJumpCascades", 0, 0, 0, 0, 0 };
 static OptFunc DOptJumpTarget  	= { OptJumpTarget,   "OptJumpTarget",   0, 0, 0, 0, 0 };
 static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",       	0, 0, 0, 0, 0 };
-static OptFunc DOptRTSJumps    	= { OptRTSJumps,     "OptRTSJumps",  	0, 0, 0, 0, 0 };
+static OptFunc DOptRTSJumps1    = { OptRTSJumps1,    "OptRTSJumps1",  	0, 0, 0, 0, 0 };
+static OptFunc DOptRTSJumps2    = { OptRTSJumps2,    "OptRTSJumps2",  	0, 0, 0, 0, 0 };
 static OptFunc DOptNegA1       	= { OptNegA1,  	     "OptNegA1",     	0, 0, 0, 0, 0 };
 static OptFunc DOptNegA2       	= { OptNegA2,  	     "OptNegA2",     	0, 0, 0, 0, 0 };
 static OptFunc DOptNegAX1      	= { OptNegAX1,       "OptNegAX1",    	0, 0, 0, 0, 0 };
@@ -1434,7 +1435,8 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrStore1,
     &DOptPtrStore2,
     &DOptRTS,
-    &DOptRTSJumps,
+    &DOptRTSJumps1,
+    &DOptRTSJumps2,
     &DOptShift1,
     &DOptShift2,
     /*&DOptSize1,*/
@@ -1726,7 +1728,7 @@ static void RunOptGroup3 (CodeSeg* S)
        	Changes += RunOptFunc (S, &DOptDeadCode, 1);
        	Changes += RunOptFunc (S, &DOptJumpTarget, 1);
 	Changes += RunOptFunc (S, &DOptCondBranches, 1);
-	Changes += RunOptFunc (S, &DOptRTSJumps, 1);
+	Changes += RunOptFunc (S, &DOptRTSJumps1, 1);
 	Changes += RunOptFunc (S, &DOptBoolTrans, 1);
 	Changes += RunOptFunc (S, &DOptCmp1, 1);
 	Changes += RunOptFunc (S, &DOptCmp2, 1);
@@ -1762,8 +1764,15 @@ static void RunOptGroup4 (CodeSeg* S)
      */
     RunOptFunc (S, &DOptJumpTarget, 5);
 
-    /* Finally, adjust branch distances */
+    /* Adjust branch distances */
     RunOptFunc (S, &DOptBranchDist, 3);
+
+    /* Replace conditional branches to RTS. If we had changes, we must run dead
+     * code elimination again, since the change may have introduced dead code.
+     */
+    if (RunOptFunc (S, &DOptRTSJumps2, 1)) {
+	RunOptFunc (S, &DOptDeadCode, 1);
+    }
 }
 
 

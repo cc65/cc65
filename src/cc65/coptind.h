@@ -49,8 +49,11 @@
 
 
 
-unsigned OptRTSJumps (CodeSeg* S);
+unsigned OptRTSJumps1 (CodeSeg* S);
 /* Replace jumps to RTS by RTS */
+
+unsigned OptRTSJumps2 (CodeSeg* S);
+/* Replace long conditional jumps to RTS */
 
 unsigned OptDeadJumps (CodeSeg* S);
 /* Remove dead jumps (jumps to the next instruction) */

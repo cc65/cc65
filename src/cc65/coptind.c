@@ -43,12 +43,12 @@
 
 
 /*****************************************************************************/
-/*			  Replace jumps to RTS by RTS			     */
+/*	 		  Replace jumps to RTS by RTS			     */
 /*****************************************************************************/
 
 
 
-unsigned OptRTSJumps (CodeSeg* S)
+unsigned OptRTSJumps1 (CodeSeg* S)
 /* Replace jumps to RTS by RTS */
 {
     unsigned Changes = 0;
@@ -70,6 +70,64 @@ unsigned OptRTSJumps (CodeSeg* S)
 	    CS_InsertEntry (S, X, I+1);
 
 	    /* Delete the jump */
+	    CS_DelEntry (S, I);
+
+	    /* Remember, we had changes */
+	    ++Changes;
+
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptRTSJumps2 (CodeSeg* S)
+/* Replace long conditional jumps to RTS */
+{
+    unsigned Changes = 0;
+
+    /* Walk over all entries minus the last one */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* N;
+
+	/* Get the next entry */
+	CodeEntry* E = CS_GetEntry (S, I);
+
+       	/* Check if it's an unconditional branch to a local target */
+       	if ((E->Info & OF_CBRA) != 0 		&&   /* Conditional branch */
+	    (E->Info & OF_LBRA) != 0            &&   /* Long branch */
+	    E->JumpTo != 0    			&&   /* Local label */
+	    E->JumpTo->Owner->OPC == OP65_RTS   &&   /* Target is an RTS */
+	    (N = CS_GetNextEntry (S, I)) != 0) {     /* There is a next entry */
+
+	    CodeEntry* X;
+	    CodeLabel* LN;
+	    opc_t      NewBranch;
+
+	    /* We will create a jump around an RTS instead of the long branch */
+	    X = NewCodeEntry (OP65_RTS, AM65_IMP, 0, 0, E->JumpTo->Owner->LI);
+	    CS_InsertEntry (S, X, I+1);
+
+	    /* Get the new branch opcode */
+	    NewBranch = MakeShortBranch (GetInverseBranch (E->OPC));
+
+	    /* Get the label attached to N, create a new one if needed */
+	    LN = CS_GenLabel (S, N);
+
+	    /* Generate the branch */
+	    X = NewCodeEntry (NewBranch, AM65_BRA, LN->Name, LN, E->LI);
+	    CS_InsertEntry (S, X, I+1);
+
+	    /* Delete the long branch */
 	    CS_DelEntry (S, I);
 
 	    /* Remember, we had changes */

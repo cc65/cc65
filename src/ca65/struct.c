@@ -77,7 +77,7 @@ static long Member (long AllocSize)
     if (Tok != TOK_SEP) {
         Multiplicator = ConstExpression ();
         if (Multiplicator <= 0) {
-            Error ("Range error");
+            ErrorSkip ("Range error");
             Multiplicator = 1;
         }
         AllocSize *= Multiplicator;
@@ -85,7 +85,7 @@ static long Member (long AllocSize)
 
     /* Check the size for a reasonable value */
     if (AllocSize >= 0x10000) {
-        Error ("Range error");
+        ErrorSkip ("Range error");
     }
 
     /* Return the size */
@@ -161,8 +161,9 @@ static long DoStructInternal (long Offs, unsigned Type)
                 break;
 
             case TOK_RES:
+		NextTok ();
                 if (Tok == TOK_SEP) {
-                    Error ("Size is missing");
+                    ErrorSkip ("Size is missing");
                 } else {
                     MemberSize = Member (1);
                 }
@@ -172,16 +173,16 @@ static long DoStructInternal (long Offs, unsigned Type)
                 NextTok ();
                 Struct = ParseScopedSymTable ();
                 if (Struct == 0) {
-                    Error ("Unknown struct/union");
+                    ErrorSkip ("Unknown struct/union");
                 } else if (GetSymTabType (Struct) != ST_STRUCT) {
-                    Error ("Not a struct/union");
+                    ErrorSkip ("Not a struct/union");
                 } else {
                     SymEntry* SizeSym = GetSizeOfScope (Struct);
                     if (!SymIsDef (SizeSym) || !SymIsConst (SizeSym, &MemberSize)) {
-                        Error ("Size of struct/union is unknown");
+                        ErrorSkip ("Size of struct/union is unknown");
                     }
                 }
-                MemberSize *= Member (MemberSize);
+                MemberSize = Member (MemberSize);
                 break;
 
             case TOK_STRUCT:

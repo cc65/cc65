@@ -39,7 +39,7 @@
 ; primitives - for example ploting a line by using calls to SETPIXEL.
 
         .word   INSTALL
-        .word   DEINSTALL
+        .word   UNINSTALL
         .word   INIT
         .word   DONE
 	.word	GETERROR
@@ -146,13 +146,13 @@ INSTALL:
 
 
 ; ------------------------------------------------------------------------
-; DEINSTALL routine. Is called before the driver is removed from memory. May
+; UNINSTALL routine. Is called before the driver is removed from memory. May
 ; clean up anything done by INSTALL but is probably empty most of the time.
 ;
 ; Must set an error code: NO
 ;
 
-DEINSTALL:
+UNINSTALL:
         rts
 
 
@@ -185,7 +185,7 @@ INIT:
         lda     $DD00
         and     #$FC            ; Switch to bank 3
         sta     $DD00
-        
+
         lda     $D018
         sta     OLDD018
         lda     #$48         	; Set color map to $D000, screen to $E000

@@ -131,6 +131,18 @@ function.
 </itemize>
 
 
+<sect1><tt/string.h/<label id="string.h"><p>
+
+<itemize>
+<item><ref id="strcat" name="strcat">
+<item><ref id="strchr" name="strchr">
+<item><ref id="strcpy" name="strcpy">
+<item><ref id="strlen" name="strlen">
+<item><ref id="strncpy" name="strncpy">
+<item><ref id="strrchr" name="strrchr">
+</itemize>
+
+
 
 
 <sect>Alphabetical function reference<p>
@@ -150,7 +162,7 @@ to unexpected results if no debugger is present.
 <tag/See also/
 <ref id="CLI" name="CLI">,
 <ref id="SEI" name="SEI">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -171,7 +183,7 @@ unexpected results.
 <tag/See also/
 <ref id="BRK" name="BRK">,
 <ref id="SEI" name="SEI">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -191,7 +203,7 @@ already enabled (the default).
 <tag/See also/
 <ref id="BRK" name="BRK">,
 <ref id="CLI" name="CLI">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -209,7 +221,7 @@ terminates the program with an exit code of 3.
 <tag/See also/
 <ref id="assert" name="assert">,
 <ref id="exit" name="exit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -229,7 +241,7 @@ on stderr and aborts the program.
 <tag/See also/
 <ref id="abort" name="abort">,
 <ref id="exit" name="exit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -253,7 +265,7 @@ function, so it may only be used in presence of a prototype.
 <tag/See also/
 <ref id="abort" name="abort">,
 <ref id="exit" name="exit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -275,7 +287,7 @@ prototype.
 <tag/See also/
 <ref id="bordercolor" name="bordercolor">,
 <ref id="textcolor" name="textcolor">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -297,7 +309,7 @@ prototype.
 <tag/See also/
 <ref id="bgcolor" name="bgcolor">,
 <ref id="textcolor" name="textcolor">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -317,7 +329,7 @@ only be used in presence of a prototype.
 <tag/See also/
 <ref id="cclearxy" name="cclearxy">,
 <ref id="clrscr" name="clrscr">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -339,7 +351,7 @@ only be used in presence of a prototype.
 <tag/See also/
 <ref id="cclear" name="cclear">,
 <ref id="clrscr" name="clrscr">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -361,7 +373,7 @@ key from this buffer and wait only if the buffer is empty.
 <tag/See also/
 <ref id="cursor" name="cursor">,
 <ref id="kbhit" name="kbhit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -384,7 +396,7 @@ as fastcall function, so it may only be used in presence of a prototype.
 <ref id="chlinexy" name="chlinexy">,
 <ref id="cvline" name="cvline">,
 <ref id="cvlinexy" name="cvlinexy">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -407,7 +419,7 @@ as fastcall function, so it may only be used in presence of a prototype.
 <ref id="chline" name="chline">,
 <ref id="cvline" name="cvline">,
 <ref id="cvlinexy" name="cvlinexy">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -425,7 +437,7 @@ the upper left corner.
 <tag/See also/
 <ref id="cclear" name="cclear">,
 <ref id="cclearxy" name="cclearxy">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -446,7 +458,7 @@ be used in presence of a prototype.
 <tag/See also/
 <ref id="cgetc" name="cgetc">,
 <ref id="kbhit" name="kbhit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -469,7 +481,7 @@ as fastcall function, so it may only be used in presence of a prototype.
 <ref id="chline" name="chline">,
 <ref id="chlinexy" name="chlinexy">,
 <ref id="cvlinexy" name="cvlinexy">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -492,7 +504,7 @@ as fastcall function, so it may only be used in presence of a prototype.
 <ref id="chline" name="chline">,
 <ref id="chlinexy" name="chlinexy">,
 <ref id="cvline" name="cvline">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -517,7 +529,7 @@ program return code can be evaluated or is ignored.
 <tag/See also/
 <ref id="abort" name="abort">,
 <ref id="exit" name="exit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -541,7 +553,7 @@ only be used in presence of a prototype. Invalid values for the X position
 <ref id="gotoxy" name="gotoxy">,
 <ref id="wherex" name="wherex">,
 <ref id="wherey" name="wherey">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -565,7 +577,7 @@ coordinates (out of screen positions) may lead to undefined behaviour.
 <ref id="gotoy" name="gotoy">,
 <ref id="wherex" name="wherex">,
 <ref id="wherey" name="wherey">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -589,7 +601,7 @@ only be used in presence of a prototype. Invalid values for the Y position
 <ref id="gotoxy" name="gotoxy">,
 <ref id="wherex" name="wherex">,
 <ref id="wherey" name="wherey">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -624,7 +636,7 @@ may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -658,7 +670,7 @@ may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -693,7 +705,7 @@ may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -728,7 +740,7 @@ may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -763,7 +775,7 @@ may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -797,7 +809,7 @@ may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -833,7 +845,7 @@ may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -868,7 +880,7 @@ may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -903,7 +915,7 @@ may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -939,7 +951,7 @@ may only be used in presence of a prototype.
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -976,7 +988,7 @@ may only be used in presence of a prototype.
 <ref id="ispunct" name="ispunct">,
 <ref id="isupper" name="isupper">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -1011,7 +1023,7 @@ may only be used in presence of a prototype.
 <ref id="ispunct" name="ispunct">,
 <ref id="isspace" name="isspace">,
 <ref id="isxdigit" name="isxdigit">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -1046,7 +1058,7 @@ may only be used in presence of a prototype.
 <ref id="ispunct" name="ispunct">,
 <ref id="isspace" name="isspace">,
 <ref id="isupper" name="isupper">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -1066,7 +1078,7 @@ do), the function is rather useless.
 <tag/See also/
 <ref id="cgetc" name="cgetc">,
 <ref id="cursor" name="cursor">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -1087,7 +1099,7 @@ may only be used in presence of a prototype.
 <tag/Availability/cc65
 <tag/See also/
 <ref id="textcolor" name="textcolor">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -1109,7 +1121,156 @@ be used in presence of a prototype.
 <ref id="gotoy" name="gotoy">,
 <ref id="wherex" name="wherex">,
 <ref id="wherey" name="wherey">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strcat<label id="strcat"><p>
+
+<quote>
+<descrip>
+<tag/Function/Concatentate two strings.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strcat (char* s1, const char* s2);/
+<tag/Description/The <tt/strcat/ function appends a copy of the string
+pointed to by s2 (including the terminating null byte) to the end of the
+string pointed to by s1. The initial byte of s2 overwrites the null byte at
+the end of s1. If copying takes place between objects that overlap, the
+behavior is undefined.
+<tag/Limits/The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcpy" name="strcpy">
+<ref id="strncpy" name="strncpy">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strchr<label id="strchr"><p>
+
+<quote>
+<descrip>
+<tag/Function/Search for a character in a string.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strchr (const char* s, int c);/
+<tag/Description/The <tt/strchr/ function locates the first occurrence of <tt/c/
+(converted to a char) in the string pointed to by <tt/s/. The terminating null
+byte is considered to be part of the string. Upon completion, the function
+returns a pointer to the byte, or a null pointer if the byte was not found.
+<tag/Limits/The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strrchr" name="strrchr">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strcpy<label id="strcpy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Copy a string.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strcpy (char* s1, const char* s2);/
+<tag/Description/The <tt/strcpy/ function copies the string pointed to by
+<tt/s2/ (including the terminating null byte) into the array pointed to by
+<tt/s1/. If copying takes place between objects that overlap, the behavior
+is undefined. The function will always return <tt/s1/.
+<tag/Limits/The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcat" name="strcat">
+<ref id="strncpy" name="strncpy">
+<tag/Example/
+<verb>
+#include <string.h>
+
+static char hello[14];
+
+strcpy (hello, "Hello world!\n");
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>strlen<label id="strlen"><p>
+
+<quote>
+<descrip>
+<tag/Function/Return the length of a string.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/size_t __fastcall__ strlen (const char* s);/
+<tag/Description/The <tt/strlen/ function computes the number of bytes in the
+string to which s points, not including the terminating null byte.
+<tag/Limits/The function is only available as fastcall function, so it may only
+be used in presence of a prototype. When compiling with <tt/-Os/ (inline known
+standard functions), the function does not work correctly for strings with more
+then 255 characters.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcpy" name="strcpy">
+<tag/Example/None.
+</descrip>
+</quote>
+
+
+<sect1>strncpy<label id="strncpy"><p>
+
+<quote>
+<descrip>
+<tag/Function/Copy part of a string.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strcpy (char* s1, const char* s2, size_t n);/
+<tag/Description/The <tt/strncpy/ function copies not more than n bytes from
+the array pointed to by <tt/s2/ to the array pointed to by <tt/s1/. If copying 
+takes place between objects that overlap, the behavior is undefined.<p>
+If the array pointed to by <tt/s2/ is a string that is shorter than n bytes, 
+null bytes are appended to the copy in the array pointed to by <tt/s1/, until 
+<tt/n/ bytes are written.<p>
+The function will always return <tt/s1/.
+<tag/Limits/The function is only available as fastcall function, so it may only
+be used in presence of a prototype. If there is no null byte in the first <tt/n/
+bytes of the array pointed to by <tt/s2/, the result is not null-terminated.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strcat" name="strcat">
+<ref id="strcpy" name="strcpy">
+<tag/Example/
+<verb>
+#include <string.h>
+
+static char hello[6];
+
+strcpy (hello, "Hello world!\n", sizeof (hello) - 1);
+hello[5] = '\0';
+</verb>
+</descrip>
+</quote>
+
+
+<sect1>strrchr<label id="strrchr"><p>
+
+<quote>
+<descrip>
+<tag/Function/Search for a character in a string.
+<tag/Header/<tt/<ref id="string.h" name="string.h">/
+<tag/Declaration/<tt/char* __fastcall__ strrchr (const char* s, int c);/
+<tag/Description/The <tt/strrchr/ function locates the last occurrence of <tt/c/
+(converted to a char) in the string pointed to by <tt/s/. The terminating null
+byte is considered to be part of the string. Upon completion, the function
+returns a pointer to the byte, or a null pointer if the byte was not found.
+<tag/Limits/The function is only available as fastcall function, so it may only
+be used in presence of a prototype.
+<tag/Availability/ISO 9899
+<tag/See also/
+<ref id="strchr" name="strchr">
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -1132,7 +1293,7 @@ prototype.
 <tag/See also/
 <ref id="bgcolor" name="bgcolor">,
 <ref id="bordercolor" name="bordercolor">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -1153,7 +1314,7 @@ only be used in presence of a prototype.
 <ref id="islower" name="islower">,
 <ref id="isupper" name="isupper">,
 <ref id="toupper" name="toupper">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -1174,7 +1335,7 @@ only be used in presence of a prototype.
 <ref id="islower" name="islower">,
 <ref id="isupper" name="isupper">,
 <ref id="tolower" name="tolower">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -1194,7 +1355,7 @@ cursor. Zero is returned for the leftmost screen position.
 <ref id="gotoy" name="gotoy">,
 <ref id="gotoxy" name="gotoxy">,
 <ref id="wherey" name="wherey">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 
@@ -1214,7 +1375,7 @@ cursor. Zero is returned for the uppermost screen position.
 <ref id="gotoy" name="gotoy">,
 <ref id="gotoxy" name="gotoxy">,
 <ref id="wherex" name="wherex">
-<tag/Example/Actual code using the function.
+<tag/Example/None.
 </descrip>
 </quote>
 

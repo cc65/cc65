@@ -14,10 +14,13 @@
 %.o:	%.s
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-%.emd:	%.o ../runtime/zeropage.o
+%.emd:	%.o ../runtime/zeropage.o cbm510zp.o
 	@$(LD) -t module -o $@ $^
 
-%.tgi:	%.o ../runtime/zeropage.o
+%.joy:	%.o ../runtime/zeropage.o cbm510zp.o
+	@$(LD) -t module -o $@ $^
+
+%.tgi:	%.o ../runtime/zeropage.o cbm510zp.o
 	@$(LD) -t module -o $@ $^
 
 #--------------------------------------------------------------------------
@@ -39,6 +42,7 @@ OBJS =	_scrsize.o	\
 	conio.o		\
 	cputc.o		\
        	crt0.o 	 	\
+        extzp.o         \
        	kbhit.o	 	\
        	kirq.o 	 	\
        	kplot.o	 	\
@@ -48,7 +52,6 @@ OBJS =	_scrsize.o	\
 	peeksys.o	\
 	pokesys.o	\
         randomize.o     \
-	readjoy.o	\
 	revers.o	\
 	rs232.o		\
 	tgi_mode_table.o
@@ -56,22 +59,24 @@ OBJS =	_scrsize.o	\
 #--------------------------------------------------------------------------
 # Drivers
 
-TGIS =
-
 EMDS =	cbm510-ram.emd
+
+JOYS = cbm510-stdjoy.joy
+
+TGIS =
 
 #--------------------------------------------------------------------------
 # Targets
 
 .PHONY:	all clean zap
 
-all:	$(OBJS) $(EMDS) $(TGIS)
+all:	$(OBJS) $(EMDS) $(JOYS) $(TGIS)
 
 ../runtime/zeropage.o:
 	$(MAKE) -C $(dir $@) $(notdir $@)
 
 clean:
-	@rm -f $(OBJS) $(EMDS:.emd=.o) $(TGIS:.tgi=.o)
+	@rm -f $(OBJS) $(EMDS:.emd=.o) $(JOYS:.joy=.o) $(TGIS:.tgi=.o)
 
 zap:	clean
 	@rm -f $(EMDS) $(JOYS) $(TGIS)

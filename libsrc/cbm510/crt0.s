@@ -5,18 +5,18 @@
 ;
 
    	.export	     	_exit
-	.exportzp       vic, sid, cia1, cia2, acia, tpi1, tpi2, ktab1
-	.exportzp       ktab2, ktab3, ktab4, time, RecvBuf, SendBuf
 
      	.import	   	_clrscr, initlib, donelib
      	.import	     	push0, _main
 	.import	   	__CHARRAM_START__, __CHARRAM_SIZE__, __VIDRAM_START__
+        .import         __EXTZP_RUN__, __EXTZP_SIZE__
 	.import	       	__BSS_RUN__, __BSS_SIZE__
      	.import		irq, nmi
        	.import	       	k_irq, k_nmi, PLOT, UDTIM, SCNKEY
 
      	.include     	"zeropage.inc"
-     	.include    	"cbm510.inc"
+        .include        "extzp.inc"
+     	.include       	"cbm510.inc"
 
 
 ; ------------------------------------------------------------------------
@@ -53,32 +53,11 @@
 ; To make things more simple, make the code of this module absolute.
 
    	.org	$0001
-Head:	.byte	$03,$00,$11,$00,$0a,$00,$81,$20,$49,$b2,$30,$20,$a4,$20,$34,$00
+Head:  	.byte  	$03,$00,$11,$00,$0a,$00,$81,$20,$49,$b2,$30,$20,$a4,$20,$34,$00
    	.byte	$19,$00,$14,$00,$87,$20,$4a,$00,$27,$00,$1e,$00,$97,$20,$32,$35
    	.byte	$36,$aa,$49,$2c,$4a,$00,$2f,$00,$28,$00,$82,$20,$49,$00,$39,$00
    	.byte	$32,$00,$9e,$20,$32,$35,$36,$00,$4f,$00,$3c,$00,$83,$20,$31,$32
    	.byte	$30,$2c,$31,$36,$39,$2c,$30,$2c,$31,$33,$33,$2c,$30,$00,$00,$00
-
-; Since we need some vectors to access stuff in the system bank for our own,
-; we will include them here, starting from $60:
-
-      	.res	$60-*
-
-vic:  		.word  	$d800
-sid:		.word  	$da00
-cia1:		.word  	$db00
-cia2:  		.word  	$dc00
-acia:  		.word  	$dd00
-tpi1:		.word  	$de00
-tpi2:  		.word  	$df00
-ktab1:		.word  	$eab1
-ktab2:	       	.word  	$eb11
-ktab3:		.word	$eb71
-ktab4:		.word  	$ebd1
-time:		.dword 	$0000
-RecvBuf:	.word	$0100		; RS232 received buffer
-SendBuf:	.word	$0200		; RS232 send buffer
-
 
 ; The code in the target bank when switching back will be put at the bottom
 ; of the stack. We will jump here to switch segments. The range $F2..$FF is
@@ -111,9 +90,17 @@ Back:	ldx	spsave
 
       	ldy	#vectable_size
 L0:   	lda	vectable-1,y
-      	sta	$FF80,y
+      	sta	$FF81-1,y
       	dey
        	bne    	L0
+
+; Initialize the extended zero page variables
+
+        ldx     #zptable_size
+L1:     lda     zptable-1,x
+        sta     <(__EXTZP_RUN__-1),x
+        dex
+        bne     L1
 
 ; Switch the indirect segment to the system bank
 
@@ -127,19 +114,19 @@ L0:   	lda	vectable-1,y
 	lda	#$00
    	sta	ptr1+1
    	ldy	#$62-1
-L1:	lda	(ptr1),y
+L2:	lda	(ptr1),y
    	sta	$90,y
    	dey
-   	bpl 	L1
+   	bpl 	L2
 
 ; Copy the page 3 vectors in place
 
 	ldy	#$00
-L2:	lda	p3vectable,y
+L3:	lda	p3vectable,y
   	sta	$300,y
    	iny
   	cpy	#p3vectable_size
-       	bne	L2
+       	bne	L3
 
 ; Copy the rest of page 3 from the system bank
 
@@ -147,15 +134,15 @@ L2:	lda	p3vectable,y
       	sta	ptr1
 	lda	#$03
 	sta	ptr1+1
-L3:	lda	(ptr1),y
+L4:	lda	(ptr1),y
    	sta	$300,y
    	iny
-   	bne	L3
+   	bne	L4
 
 ; Set the indirect segment to bank we're executing in
 
   	lda	ExecReg
-	sta	IndReg
+  	sta	IndReg
 
 ; Zero the BSS segment. We will do that here instead calling the routine
 ; in the common library, since we have the memory anyway, and this way,
@@ -163,10 +150,10 @@ L3:	lda	(ptr1),y
 
    	lda	#<__BSS_RUN__
    	sta	ptr1
-	lda	#>__BSS_RUN__
+  	lda	#>__BSS_RUN__
    	sta	ptr1+1
-	lda	#0
-	tay
+  	lda	#0
+  	tay
 
 ; Clear full pages
 
@@ -199,7 +186,7 @@ Z4:
 ; We expect to be in page 2 now
 
 .if 	(* < $1FD)
-	jmp	$200
+  	jmp	$200
    	.res	$200-*
 .endif
 .if	(* < $200)
@@ -308,6 +295,23 @@ ccopy2:	lda	__VIDRAM_START__,y
 ; Additional data that we need for initialization and that's overwritten
 ; later
 
+zptable:
+        .word  	$d800           ; vic
+	.word  	$da00           ; sid
+	.word  	$db00           ; cia1
+  	.word  	$dc00           ; cia2
+  	.word  	$dd00           ; acia
+  	.word  	$de00           ; tpi1
+  	.word  	$df00           ; tpi2
+  	.word  	$eab1           ; ktab1
+  	.word  	$eb11           ; ktab2
+  	.word	$eb71           ; ktab3
+  	.word  	$ebd1           ; ktab4
+  	.dword 	$0000           ; time
+        .word	$0100		; RecvBuf
+        .word  	$0200  	       	; SendBuf
+zptable_size    = * - zptable
+
 vectable:
       	jmp	$0000		; CINT
       	jmp	$0000		; IOINIT
@@ -338,7 +342,7 @@ vectable:
 	jmp	$0000	      	; BASIN
       	jmp	$0000	      	; BSOUT
 	jmp	$0000	      	; LOAD
-	jmp	$0000	      	; SAVE
+  	jmp	$0000	      	; SAVE
 	jmp	SETTIM
        	jmp    	RDTIM
 	jmp	$0000	      	; STOP
@@ -439,8 +443,8 @@ reset_size = * - reset
 
 .export IOBASE
 .proc   IOBASE
-         ldx	cia2
-	ldy	cia2+1
+        ldx	cia2
+  	ldy	cia2+1
 	rts
 .endproc
 

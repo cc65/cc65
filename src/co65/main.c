@@ -42,6 +42,7 @@
 /* common */
 #include "chartype.h"
 #include "cmdline.h"
+#include "debugflag.h"
 #include "fname.h"
 #include "print.h"
 #include "segnames.h"
@@ -50,8 +51,10 @@
 #include "xsprintf.h"
 
 /* co65 */
+#include "convert.h"
 #include "error.h"
 #include "global.h"
+#include "model.h"
 #include "o65.h"
 
 
@@ -71,6 +74,7 @@ static void Usage (void)
        	     "  -V\t\t\tPrint the version number\n"
        	     "  -g\t\t\tAdd debug info to object file\n"
        	     "  -h\t\t\tHelp (this text)\n"
+             "  -m model\t\tOverride the o65 model\n"
        	     "  -o name\t\tName the output file\n"
        	     "  -v\t\t\tIncrease verbosity\n"
 	     "\n"
@@ -83,6 +87,7 @@ static void Usage (void)
        	     "  --data-name seg\tSet the name of the DATA segment\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
 	     "  --help\t\tHelp (this text)\n"
+             "  --o65-model model\tOverride the o65 model\n"
        	     "  --verbose\t\tIncrease verbosity\n"
        	     "  --version\t\tPrint the version number\n"
              "  --zeropage-label name\tDefine and export a ZEROPAGE segment label\n"
@@ -195,6 +200,15 @@ static void OptDataName (const char* Opt attribute ((unused)), const char* Arg)
 
 
 
+static void OptDebug (const char* Opt attribute ((unused)),
+		      const char* Arg attribute ((unused)))
+/* Enable debugging code */
+{
+    ++Debug;
+}
+
+
+
 static void OptDebugInfo (const char* Opt attribute ((unused)),
 		    	  const char* Arg attribute ((unused)))
 /* Add debug info to the object file */
@@ -210,6 +224,18 @@ static void OptHelp (const char* Opt attribute ((unused)),
 {
     Usage ();
     exit (EXIT_SUCCESS);
+}
+
+
+
+static void OptO65Model (const char* Opt attribute ((unused)), const char* Arg)
+/* Handle the --o65-model option */
+{
+    /* Search for the model name */
+    Model = FindModel (Arg);
+    if (Model == O65_MODEL_INVALID) {
+        Error ("Unknown o65 model `%s'", Arg);
+    }
 }
 
 
@@ -258,312 +284,18 @@ static void OptZeropageName (const char* Opt attribute ((unused)), const char* A
 
 
 
-static const char* SegReloc (const O65Data* D, const O65Reloc* R, unsigned long Val)
-{
-    static char Buf[256];
-    const O65Import* Import;
-
-    switch (R->SegID) {
-
-        case O65_SEGID_UNDEF:
-            if (R->SymIdx >= CollCount (&D->Imports)) {
-                Error ("Import index out of range (input file corrupt)");
-            }
-            Import = CollConstAt (&D->Imports, R->SymIdx);
-            xsprintf (Buf, sizeof (Buf), "%s%+ld", Import->Name, (long) Val);
-            break;
-
-        case O65_SEGID_TEXT:
-            xsprintf (Buf, sizeof (Buf), "%s%+ld", CodeLabel, (long) (Val - D->Header.tbase));
-            break;
-
-        case O65_SEGID_DATA:
-            xsprintf (Buf, sizeof (Buf), "%s%+ld", DataLabel, (long) (Val - D->Header.dbase));
-            break;
-
-        case O65_SEGID_BSS:
-            xsprintf (Buf, sizeof (Buf), "%s%+ld", BssLabel, (long) (Val - D->Header.bbase));
-            break;
-
-        case O65_SEGID_ZP:
-            xsprintf (Buf, sizeof (Buf), "%s%+ld", ZeropageLabel, (long) Val - D->Header.zbase);
-            break;
-
-        case O65_SEGID_ABS:
-            Error ("Relocation entry contains O65_SEGID_ABS");
-            break;
-
-        default:
-            Internal ("Cannot handle this segment reference in reloc entry");
-    }
-
-    return Buf;
-}
-
-
-
-static void ConvertSeg (FILE* F, const O65Data* D, const Collection* Relocs,
-                        const unsigned char* Data, unsigned long Size)
-/* Convert one segment */
-{
-    const O65Reloc* R;
-    unsigned        RIdx;
-    unsigned long   Byte;
-
-    /* Get the pointer to the first relocation entry if there are any */
-    R = (CollCount (Relocs) > 0)? CollConstAt (Relocs, 0) : 0;
-
-    /* Initialize for the loop */
-    RIdx = 0;
-    Byte = 0;
-
-    /* Walk over the segment data */
-    while (Byte < Size) {
-
-        if (R && R->Offs == Byte) {
-            /* We've reached an entry that must be relocated */
-            unsigned long Val;
-            switch (R->Type) {
-
-                case O65_RTYPE_WORD:
-                    if (Byte >= Size - 1) {
-                        Error ("Found WORD relocation, but not enough bytes left");
-                    } else {
-                        Val = (Data[Byte+1] << 8) + Data[Byte];
-                        Byte += 2;
-                        fprintf (F, "\t.word\t%s\n", SegReloc (D, R, Val));
-                    }
-                    break;
-
-                case O65_RTYPE_HIGH:
-                    Val = (Data[Byte++] << 8) + R->Val;
-                    fprintf (F, "\t.byte\t>(%s)\n", SegReloc (D, R, Val));
-                    break;
-
-                case O65_RTYPE_LOW:
-                    Val = Data[Byte++];
-                    fprintf (F, "\t.byte\t<(%s)\n", SegReloc (D, R, Val));
-                    break;
-
-                case O65_RTYPE_SEGADDR:
-                    if (Byte >= Size - 2) {
-                        Error ("Found SEGADDR relocation, but not enough bytes left");
-                    } else {
-                        Val = (((unsigned long) Data[Byte+2]) << 16) +
-                              (((unsigned long) Data[Byte+1]) <<  8) +
-                              (((unsigned long) Data[Byte+0]) <<  0) +
-                              R->Val;
-                        Byte += 3;
-                        fprintf (F, "\t.faraddr\t%s\n", SegReloc (D, R, Val));
-                    }
-                    break;
-
-                case O65_RTYPE_SEG:
-                    /* FALLTHROUGH for now */
-                default:
-                    Internal ("Cannot handle relocation type %d at %lu",
-                              R->Type, Byte);
-            }
-
-            /* Get the next relocation entry */
-            if (++RIdx < CollCount (Relocs)) {
-                R = CollConstAt (Relocs, RIdx);
-            } else {
-                R = 0;
-            }
-
-        } else {
-            /* Just a constant value */
-            fprintf (F, "\t.byte\t$%02X\n", Data[Byte++]);
-        }
-    }
-
-    fprintf (F, "\n");
-}
-
-
-
-static void Convert (void)
+static void ConvertOneFile (const char* InputFile, const char* OutputFile)
 /* Do file conversion */
 {
-    FILE*       F;
-    unsigned    I;
-    int         cc65;
-    char*       Author = 0;
-
     /* Read the o65 file into memory */
-    O65Data* D = ReadO65File (InputName);
+    O65Data* D = ReadO65File (InputFile);
 
-    /* For now, we do only accept o65 files generated by the ld65 linker which
-     * have a specific format.
-     */
-    if (D->Header.mode != O65_MODE_CC65) {
-        Error ("Cannot convert o65 files of this type");
-    }
+    /* Do the conversion */
+    Convert (D, OutputFile);
 
-    /* Output statistics */
-    Print (stdout, 1, "Size of text segment:               %5lu\n", D->Header.tlen);
-    Print (stdout, 1, "Size of data segment:               %5lu\n", D->Header.dlen);
-    Print (stdout, 1, "Size of bss segment:                %5lu\n", D->Header.blen);
-    Print (stdout, 1, "Size of zeropage segment:           %5lu\n", D->Header.zlen);
-    Print (stdout, 1, "Number of imports:                  %5u\n", CollCount (&D->Imports));
-    Print (stdout, 1, "Number of exports:                  %5u\n", CollCount (&D->Exports));
-    Print (stdout, 1, "Number of text segment relocations: %5u\n", CollCount (&D->TextReloc));
-    Print (stdout, 1, "Number of data segment relocations: %5u\n", CollCount (&D->DataReloc));
+    /* Free the o65 module data */
+    /* ### */
 
-    /* Walk through the options and print them if verbose mode is enabled.
-     * Check for a os=cc65 option and bail out if we didn't find one (for
-     * now - later we switch to special handling).
-     */
-    cc65 = 0;
-    for (I = 0; I < CollCount (&D->Options); ++I) {
-
-        /* Get the next option */
-        const O65Option* O = CollConstAt (&D->Options, I);
-
-        /* Check the type */
-        switch (O->Type) {
-            case O65_OPT_FILENAME:
-                Print (stdout, 1, "O65 filename option:         `%s'\n",
-                       GetO65OptionText (O));
-                break;
-            case O65_OPT_OS:
-                if (O->Len == 2) {
-                    Warning ("Operating system option without data found");
-                } else {
-                    cc65 = (O->Data[0] == O65_OS_CC65_MODULE);
-                    Print (stdout, 1, "O65 operating system option: `%s'\n",
-                           GetO65OSName (O->Data[0]));
-                }
-                break;
-            case O65_OPT_ASM:
-                Print (stdout, 1, "O65 assembler option:        `%s'\n",
-                       GetO65OptionText (O));
-                break;
-            case O65_OPT_AUTHOR:
-                if (Author) {
-                    xfree (Author);
-                }
-                Author = xstrdup (GetO65OptionText (O));
-                Print (stdout, 1, "O65 author option:           `%s'\n", Author);
-                break;
-            case O65_OPT_TIMESTAMP:
-                Print (stdout, 1, "O65 timestamp option:        `%s'\n",
-                       GetO65OptionText (O));
-                break;
-            default:
-                Warning ("Found unknown option, type %d, length %d",
-                         O->Type, O->Len);
-                break;
-        }
-    }
-
-    /* Open the output file */
-    F = fopen (OutputName, "wb");
-    if (F == 0) {
-        Error ("Cannot open `%s': %s", OutputName, strerror (errno));
-    }
-
-    /* Create a header */
-    fprintf (F, ";\n; File generated by co65 v %u.%u.%u\n;\n",
-             VER_MAJOR, VER_MINOR, VER_PATCH);
-
-    /* Select the CPU */
-    if ((D->Header.mode & O65_CPU_MASK) == O65_CPU_65816) {
-    	fprintf (F, "\t.p816\n");
-    }
-
-    /* Object file options */
-    fprintf (F, "\t.fopt\t\tcompiler,\"co65 v %u.%u.%u\"\n",
-             VER_MAJOR, VER_MINOR, VER_PATCH);
-    if (Author) {
-        fprintf (F, "\t.fopt\t\tauthor, \"%s\"\n", Author);
-        xfree (Author);
-        Author = 0;
-    }
-
-    /* Several other assembler options */
-    fprintf (F, "\t.case\t\ton\n");
-    fprintf (F, "\t.debuginfo\t%s\n", (DebugInfo != 0)? "on" : "off");
-
-    /* Setup/export the segment labels */
-    if (BssLabel) {
-        fprintf (F, "\t.export\t\t%s\n", BssLabel);
-    } else {
-        BssLabel = xstrdup ("__BSS__");
-    }
-    if (CodeLabel) {
-        fprintf (F, "\t.export\t\t%s\n", CodeLabel);
-    } else {
-        CodeLabel = xstrdup ("__CODE__");
-    }
-    if (DataLabel) {
-        fprintf (F, "\t.export\t\t%s\n", DataLabel);
-    } else {
-        DataLabel = xstrdup ("__DATA__");
-    }
-    if (ZeropageLabel) {
-        fprintf (F, "\t.export\t\t%s\n", ZeropageLabel);
-    } else {
-        /* If this is a cc65 module, override the name for the zeropage segment */
-        if (cc65) {
-            ZeropageLabel = "__ZP_START__";
-            fprintf (F, "\t.import\t\t__ZP_START__\t; Linker generated symbol\n");
-        } else {
-            ZeropageLabel = xstrdup ("__ZEROPAGE__");
-        }
-    }
-
-    /* End of header */
-    fprintf (F, "\n");
-
-    /* Imported identifiers */
-    if (CollCount (&D->Imports) > 0) {
-        for (I = 0; I < CollCount (&D->Imports); ++I) {
-
-            /* Get the next import */
-            O65Import* Import = CollAtUnchecked (&D->Imports, I);
-
-            /* Import it by name */
-            fprintf (F, "\t.import\t%s\n", Import->Name);
-        }
-        fprintf (F, "\n");
-    }
-
-    /* Exported identifiers */
-    if (CollCount (&D->Exports) > 0) {
-        for (I = 0; I < CollCount (&D->Exports); ++I) {
-
-            /* Get the next import */
-            O65Export* Export = CollAtUnchecked (&D->Exports, I);
-
-            /* First define it */
-            fprintf (F, "%s = XXX\n", Export->Name);    /* ### */
-
-            /* The export it by name */
-            fprintf (F, "\t.export\t%s\n", Export->Name);
-        }
-        fprintf (F, "\n");
-    }
-
-    /* Code segment */
-    fprintf (F, ".segment\t\"%s\"\n", CodeSeg);
-    fprintf (F, "%s:\n", CodeLabel);
-    ConvertSeg (F, D, &D->TextReloc, D->Text, D->Header.tlen);
-
-    /* Data segment */
-    fprintf (F, ".segment\t\"%s\"\n", DataSeg);
-    fprintf (F, "%s:\n", DataLabel);
-    ConvertSeg (F, D, &D->DataReloc, D->Data, D->Header.dlen);
-
-    /* BSS segment */
-    fprintf (F, ".segment\t\"%s\"\n", BssSeg);
-    fprintf (F, "%s:\n", BssLabel);
-    fprintf (F, "\t.res\t%lu\n", D->Header.blen);
-    fprintf (F, "\n");
-
-    fprintf (F, "\t.end\n");
-    fclose (F);
 }
 
 
@@ -579,8 +311,10 @@ int main (int argc, char* argv [])
 	{ "--code-name",	1, 	OptCodeName  		},
        	{ "--data-label",      	1,     	OptDataLabel   		},
 	{ "--data-name",	1, 	OptDataName  		},
+       	{ "--debug",           	0,     	OptDebug 		},
 	{ "--debug-info",      	0, 	OptDebugInfo 		},
-	{ "--help",    		0,	OptHelp			},
+	{ "--help",    	  	0,	OptHelp			},
+        { "--o65-model",        1,      OptO65Model             },
 	{ "--verbose", 	       	0,	OptVerbose		},
 	{ "--version", 	       	0,	OptVersion		},
        	{ "--zeropage-label",   1,     	OptZeropageLabel        },
@@ -614,6 +348,10 @@ int main (int argc, char* argv [])
 		case 'h':
 		    OptHelp (Arg, 0);
 		    break;
+
+                case 'm':
+                    OptO65Model (Arg, GetArg (&I, 2));
+                    break;
 
        	        case 'o':
        	  	    OutputName = GetArg (&I, 2);
@@ -656,7 +394,7 @@ int main (int argc, char* argv [])
     }
 
     /* Do the conversion */
-    Convert ();
+    ConvertOneFile (InputName, OutputName);
 
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;

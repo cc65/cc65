@@ -10,10 +10,12 @@ CC	= gcc
 EBIND	= emxbind
 LDFLAGS	=
 
-OBJS =	error.o         \
+OBJS =	convert.o       \
+        error.o         \
         fileio.o        \
         global.o        \
         main.o          \
+        model.o         \
         o65.o
 
 LIBS = $(COMMON)/common.a

@@ -60,7 +60,8 @@
 
 
 /* Define a structure for the o65 file header */
-typedef struct {
+typedef struct O65Header O65Header;
+struct O65Header {
     char            marker[2];  /* Non-C64 marker */
     char            magic[3];   /* o65 magic */
     char            version;	/* Version number */
@@ -74,38 +75,43 @@ typedef struct {
     unsigned long   zbase;      /* Original zp segment address */
     unsigned long   zlen;       /* Size of zp segment */
     unsigned long   stack;      /* Stacksize needed */
-} O65Header;
+};
 
 /* o65 option */
-typedef struct {
+typedef struct O65Option O65Option;
+struct O65Option {
     unsigned char   Len;        /* Option length */
     unsigned char   Type;       /* Option type */
     unsigned char   Data[1];    /* Option data (dynamically allocated) */
-} O65Option;
+};
 
 /* o65 relocation entry */
-typedef struct {
+typedef struct O65Reloc O65Reloc;
+struct O65Reloc {
     unsigned long   Offs;       /* Offset in segment */
     unsigned char   Type;       /* Relocation type */
     unsigned char   SegID;      /* Segment ID */
     unsigned        Val;        /* Any offset value needed for relocation */
     unsigned long   SymIdx;     /* Index into list of imported symbols */
-} O65Reloc;
+};
 
 /* o65 import */
-typedef struct {
+typedef struct O65Import O65Import;
+struct O65Import {
     char            Name[1];    /* Name of the import (dynamically allocated) */
-} O65Import;
+};
 
 /* o65 export */
-typedef struct {
+typedef struct O65Export O65Export;
+struct O65Export {
     unsigned char   SegID;      /* Segment ID */
     unsigned long   Val;        /* Relocation value */
     char            Name[1];    /* Name of the export (dynamically allocated) */
-} O65Export;
+};
 
 /* Complete o65 file data */
-typedef struct {
+typedef struct O65Data O65Data;
+struct O65Data {
     O65Header       Header;     /* File header */
     Collection      Options;    /* O65 options */
     unsigned char*  Text;       /* Text segment data (unrelocated) */
@@ -114,7 +120,7 @@ typedef struct {
     Collection      DataReloc;  /* Relocation entries for the data segment */
     Collection      Imports;    /* Imported symbols */
     Collection      Exports;    /* Exported symbols */
-} O65Data;
+};
 
 
 

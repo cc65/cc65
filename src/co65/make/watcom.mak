@@ -43,10 +43,12 @@ CFLAGS  += -i=..\common
 # ------------------------------------------------------------------------------
 # All library OBJ files
 
-OBJS = 	error.obj       \
+OBJS = 	convert.obj     \
+        error.obj       \
         fileio.obj      \
         global.obj      \
         main.obj        \
+        model.obj       \
         o65.obj
 
 LIBS = ..\common\common.lib

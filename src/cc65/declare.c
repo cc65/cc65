@@ -1008,6 +1008,243 @@ void CheckEmptyDecl (const DeclSpec* D)
 
 
 
+static void SkipInitializer (unsigned BracesExpected)
+/* Skip the remainder of an initializer in case of errors. Try to be somewhat
+ * smart so we don't have too many following errors.
+ */
+{
+    while (CurTok.Tok != TOK_CEOF && CurTok.Tok != TOK_SEMI && BracesExpected > 0) {
+        switch (CurTok.Tok) {
+            case TOK_RCURLY:    --BracesExpected;   break;
+            case TOK_LCURLY:    ++BracesExpected;   break;
+            default:                                break;
+        }
+        NextToken ();
+    }
+}
+
+
+
+static unsigned OpeningCurlyBraces (unsigned BracesNeeded)
+/* Accept any number of opening curly braces around an initialization, skip
+ * them and return the number. If the number of curly braces is less than
+ * BracesNeeded, issue a warning.
+ */
+{
+    unsigned BraceCount = 0;
+    while (CurTok.Tok == TOK_LCURLY) {
+        ++BraceCount;
+        NextToken ();
+    }
+    if (BraceCount < BracesNeeded) {
+        Error ("`{' expected");
+    }
+    return BraceCount;
+}
+
+
+
+static void ClosingCurlyBraces (unsigned BracesExpected)
+/* Accept and skip the given number of closing curly braces together with
+ * an optional comma. Output an error messages, if the input does not contain
+ * the expected number of braces.
+ */
+{
+    while (BracesExpected) {
+        if (CurTok.Tok == TOK_RCURLY) {
+            NextToken ();
+        } else if (CurTok.Tok == TOK_COMMA && NextTok.Tok == TOK_RCURLY) {
+            NextToken ();
+            NextToken ();
+        } else {
+            Error ("`}' expected");
+            return;
+        }
+        --BracesExpected;
+    }
+}
+
+
+
+static unsigned ParseSimpleInit (type* T)
+/* Parse initializaton for simple data types. Return the number of data bytes. */
+{
+    static const unsigned long Masks[] = {
+        0x000000FFUL, 0x0000FFFFUL, 0x00FFFFFFUL, 0xFFFFFFFFUL
+    };
+    ExprDesc ED;
+
+    /* Optional opening brace */
+    unsigned BraceCount = OpeningCurlyBraces (0);
+
+    /* Get the size of the expected type */
+    unsigned Size = SizeOf (T);
+    CHECK (Size > 0 && Size <= sizeof(Masks)/sizeof(Masks[0]));
+
+    /* Expression */
+    ConstExpr (&ED);
+    if ((ED.Flags & E_MCTYPE) == E_TCONST) {
+        /* Make the const value the correct size */
+        ED.ConstVal &= Masks[Size-1];
+    }
+    assignadjust (T, &ED);
+
+    /* Output the data */
+    DefineData (&ED);
+
+    /* Close eventually opening braces */
+    ClosingCurlyBraces (BraceCount);
+
+    /* Done */
+    return Size;
+}
+
+
+
+static unsigned ParseArrayInit (type* T, int AllowFlexibleMembers)
+/* Parse initializaton for arrays. Return the number of data bytes. */
+{
+    int Count;
+
+    /* Get the array data */
+    type* ElementType    = GetElementType (T);
+    unsigned ElementSize = CheckedSizeOf (ElementType);
+    long ElementCount    = GetElementCount (T);
+
+    /* Special handling for a character array initialized by a literal */
+    if (IsTypeChar (ElementType) && CurTok.Tok == TOK_SCONST) {
+
+        /* Optional curly braces */
+        unsigned BraceCount = OpeningCurlyBraces (0);
+
+        /* Char array initialized by string constant */
+        const char* Str = GetLiteral (CurTok.IVal);
+        Count = GetLiteralPoolOffs () - CurTok.IVal;
+
+        /* Translate into target charset */
+        TranslateLiteralPool (CurTok.IVal);
+        g_defbytes (Str, Count);
+
+        /* Remove string from pool */
+        ResetLiteralPoolOffs (CurTok.IVal);
+        NextToken ();
+
+        /* Closing curly braces (if we had any opening ones) */
+        ClosingCurlyBraces (BraceCount);
+
+    } else {
+
+        /* Optional curly braces */
+        unsigned BraceCount = OpeningCurlyBraces (1);
+
+        /* Initialize the array members */
+        Count = 0;
+        while (CurTok.Tok != TOK_RCURLY) {
+            /* Flexible array members may not be initialized within
+             * an array (because the size of each element may differ
+             * otherwise).
+             */
+            ParseInitInternal (ElementType, 0);
+            ++Count;
+            if (CurTok.Tok != TOK_COMMA)
+                break;
+            NextToken ();
+        }
+
+        /* Closing curly braces (if we had any opening ones) */
+        ClosingCurlyBraces (BraceCount);
+    }
+
+
+    if (ElementCount == UNSPECIFIED) {
+        /* Number of elements determined by initializer */
+        Encode (T + 1, Count);
+        ElementCount = Count;
+    } else if (ElementCount == FLEXIBLE && AllowFlexibleMembers) {
+        /* In non ANSI mode, allow initialization of flexible array
+         * members.
+         */
+        ElementCount = Count;
+    } else if (Count < ElementCount) {
+        g_zerobytes ((ElementCount - Count) * ElementSize);
+    } else if (Count > ElementCount) {
+        Error ("Too many initializers");
+    }
+    return ElementCount * ElementSize;
+}
+
+
+
+static unsigned ParseStructInit (type* Type, int AllowFlexibleMembers)
+/* Parse initialization of a struct or union. Return the number of data bytes. */
+{
+    SymEntry* Entry;
+    SymTable* Tab;
+    unsigned  StructSize;
+    unsigned  Size;
+
+
+    /* Consume the opening curly brace */
+    unsigned BraceCount = OpeningCurlyBraces (1);
+
+    /* Get a pointer to the struct entry from the type */
+    Entry = DecodePtr (Type + 1);
+
+    /* Get the size of the struct from the symbol table entry */
+    StructSize = Entry->V.S.Size;
+
+    /* Check if this struct definition has a field table. If it doesn't, it
+     * is an incomplete definition.
+     */
+    Tab = Entry->V.S.SymTab;
+    if (Tab == 0) {
+     	Error ("Cannot initialize variables with incomplete type");
+        /* Try error recovery */
+        SkipInitializer (BraceCount);
+    	/* Nothing initialized */
+    	return 0;
+    }
+
+    /* Get a pointer to the list of symbols */
+    Entry = Tab->SymHead;
+
+    /* Initialize fields */
+    Size = 0;
+    while (CurTok.Tok != TOK_RCURLY) {
+    	if (Entry == 0) {
+    	    Error ("Too many initializers");
+            SkipInitializer (BraceCount);
+    	    return Size;
+    	}
+        /* Parse initialization of one field. Flexible array members may
+         * only be initialized if they are the last field (or part of the
+         * last struct field).
+         */
+    	Size += ParseInitInternal (Entry->Type, AllowFlexibleMembers && Entry->NextSym == 0);
+    	Entry = Entry->NextSym;
+    	if (CurTok.Tok != TOK_COMMA)
+    	    break;
+    	NextToken ();
+    }
+
+    /* Consume the closing curly brace */
+    ClosingCurlyBraces (BraceCount);
+
+    /* If there are struct fields left, reserve additional storage */
+    if (Size < StructSize) {
+    	g_zerobytes (StructSize - Size);
+        Size = StructSize;
+    }
+
+    /* Return the actual number of bytes initialized. This number may be
+     * larger than StructSize if flexible array members are present and were
+     * initialized (possible in non ANSI mode).
+     */
+    return Size;
+}
+
+
+
 static unsigned ParseVoidInit (void)
 /* Parse an initialization of a void variable (special cc65 extension).
  * Return the number of bytes initialized.
@@ -1016,7 +1253,8 @@ static unsigned ParseVoidInit (void)
     ExprDesc lval;
     unsigned Size;
 
-    ConsumeLCurly ();
+    /* Opening brace */
+    unsigned BraceCount = OpeningCurlyBraces (1);
 
     /* Allow an arbitrary list of values */
     Size = 0;
@@ -1041,7 +1279,7 @@ static unsigned ParseVoidInit (void)
 	    case T_PTR:
 	    case T_ARRAY:
 	   	if ((lval.Flags & E_MCTYPE) == E_TCONST) {
-    	   	    /* Make it word sized */
+    	      	    /* Make it word sized */
 	   	    lval.ConstVal &= 0xFFFF;
 	   	}
 	   	DefineData (&lval);
@@ -1068,83 +1306,9 @@ static unsigned ParseVoidInit (void)
     } while (CurTok.Tok != TOK_RCURLY);
 
     /* Closing brace */
-    ConsumeRCurly ();
+    ClosingCurlyBraces (BraceCount);
 
     /* Return the number of bytes initialized */
-    return Size;
-}
-
-
-
-static unsigned ParseStructInit (type* Type, int AllowFlexibleMembers)
-/* Parse initialization of a struct or union. Return the number of data bytes. */
-{
-    SymEntry* Entry;
-    SymTable* Tab;
-    unsigned  StructSize;
-    unsigned  Size;
-
-    static const token_t EndTokens[] = { TOK_RCURLY, TOK_SEMI };
-
-
-    /* Consume the opening curly brace */
-    ConsumeLCurly ();
-
-    /* Get a pointer to the struct entry from the type */
-    Entry = DecodePtr (Type + 1);
-
-    /* Get the size of the struct from the symbol table entry */
-    StructSize = Entry->V.S.Size;
-
-    /* Check if this struct definition has a field table. If it doesn't, it
-     * is an incomplete definition.
-     */
-    Tab = Entry->V.S.SymTab;
-    if (Tab == 0) {
-     	Error ("Cannot initialize variables with incomplete type");
-        /* Try error recovery */
-        SkipTokens (EndTokens, sizeof(EndTokens)/sizeof(EndTokens[0]));
-        if (CurTok.Tok == TOK_RCURLY) {
-            NextToken ();
-        }
-    	/* Nothing initialized */
-    	return 0;
-    }
-
-    /* Get a pointer to the list of symbols */
-    Entry = Tab->SymHead;
-
-    /* Initialize fields */
-    Size = 0;
-    while (CurTok.Tok != TOK_RCURLY) {
-    	if (Entry == 0) {
-    	    Error ("Too many initializers");
-    	    return Size;
-    	}
-        /* Parse initialization of one field. Flexible array members may
-         * only be initialized if they are the last field (or part of the
-         * last struct field).
-         */
-    	Size += ParseInitInternal (Entry->Type, AllowFlexibleMembers && Entry->NextSym == 0);
-    	Entry = Entry->NextSym;
-    	if (CurTok.Tok != TOK_COMMA)
-    	    break;
-    	NextToken ();
-    }
-
-    /* Consume the closing curly brace */
-    ConsumeRCurly ();
-
-    /* If there are struct fields left, reserve additional storage */
-    if (Size < StructSize) {
-    	g_zerobytes (StructSize - Size);
-        Size = StructSize;
-    }
-
-    /* Return the actual number of bytes initialized. This number may be
-     * larger than StructSize if flexible array members are present and were
-     * initialized (possible in non ANSI mode).
-     */
     return Size;
 }
 
@@ -1153,96 +1317,21 @@ static unsigned ParseStructInit (type* Type, int AllowFlexibleMembers)
 static unsigned ParseInitInternal (type* T, int AllowFlexibleMembers)
 /* Parse initialization of variables. Return the number of data bytes. */
 {
-    ExprDesc    lval;
-    const char* str;
-    int         Count;
-    type*       ElementType;
-    unsigned    ElementSize;
-    long        ElementCount;
-
     switch (UnqualifiedType (*T)) {
 
      	case T_SCHAR:
      	case T_UCHAR:
-     	    ConstExpr (&lval);
-	    if ((lval.Flags & E_MCTYPE) == E_TCONST) {
-	    	/* Make it byte sized */
-	    	lval.ConstVal &= 0xFF;
-	    }
-	    assignadjust (T, &lval);
-	    DefineData (&lval);
-     	    return SIZEOF_CHAR;
-
     	case T_SHORT:
     	case T_USHORT:
      	case T_INT:
      	case T_UINT:
      	case T_PTR:
-     	    ConstExpr (&lval);
-	    if ((lval.Flags & E_MCTYPE) == E_TCONST) {
-	    	/* Make it word sized */
-	    	lval.ConstVal &= 0xFFFF;
-	    }
-	    assignadjust (T, &lval);
-	    DefineData (&lval);
-     	    return SIZEOF_INT;
-
     	case T_LONG:
     	case T_ULONG:
-	    ConstExpr (&lval);
-	    if ((lval.Flags & E_MCTYPE) == E_TCONST) {
-	    	/* Make it long sized */
-	    	lval.ConstVal &= 0xFFFFFFFF;
-	    }
-	    assignadjust (T, &lval);
-	    DefineData (&lval);
-     	    return SIZEOF_LONG;
+            return ParseSimpleInit (T);
 
      	case T_ARRAY:
-            ElementType  = GetElementType (T);
-            ElementSize  = CheckedSizeOf (ElementType);
-     	    ElementCount = GetElementCount (T);
-       	    if (IsTypeChar (ElementType) && CurTok.Tok == TOK_SCONST) {
-                /* Char array initialized by string constant */
-     	     	str = GetLiteral (CurTok.IVal);
-     	     	Count = GetLiteralPoolOffs () - CurTok.IVal;
-                /* Translate into target charset */
-	    	TranslateLiteralPool (CurTok.IVal);
-     	     	g_defbytes (str, Count);
-                /* Remove string from pool */
-     	     	ResetLiteralPoolOffs (CurTok.IVal);
-     	     	NextToken ();
-     	    } else {
-     	     	ConsumeLCurly ();
-     	     	Count = 0;
-     	     	while (CurTok.Tok != TOK_RCURLY) {
-                    /* Flexible array members may not be initialized within
-                     * an array (because the size of each element may differ
-                     * otherwise).
-                     */
-     	     	    ParseInitInternal (ElementType, 0);
-     	     	    ++Count;
-     	     	    if (CurTok.Tok != TOK_COMMA)
-     	     	 	break;
-     	     	    NextToken ();
-     	     	}
-     	     	ConsumeRCurly ();
-     	    }
-     	    if (ElementCount == UNSPECIFIED) {
-                /* Number of elements determined by initializer */
-     	     	Encode (T + 1, Count);
-                ElementCount = Count;
-            } else if (ElementCount == FLEXIBLE && AllowFlexibleMembers) {
-                /* In non ANSI mode, allow initialization of flexible array
-                 * members.
-                 */
-                ElementCount = Count;
-     	    } else if (Count < ElementCount) {
-     	     	g_zerobytes ((ElementCount - Count) * ElementSize);
-     	    } else if (Count > ElementCount) {
-     	     	Error ("Too many initializers");
-     	    }
-            return ElementCount * ElementSize;
+            return ParseArrayInit (T, AllowFlexibleMembers);
 
         case T_STRUCT:
         case T_UNION:

@@ -1247,10 +1247,10 @@ static void StructRef (ExprDesc* Expr)
      	return;
     }
 
-    /* If we have a struct pointer that is not already in the primary, load
-     * it now.
+    /* If we have a struct pointer that is an lvalue and not already in the 
+     * primary, load it now.
      */
-    if (IsTypePtr (Expr->Type)) {
+    if (ED_IsLVal (Expr) && IsTypePtr (Expr->Type)) {
 
         /* Load into the primary */
         ExprLoad (CF_NONE, Expr);

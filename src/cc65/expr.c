@@ -424,12 +424,21 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	 */
         Flags = CF_NONE;
        	if (!Ellipsis) {
+
 	    /* Convert the argument to the parameter type if needed */
             TypeConversion (&Expr, Param->Type);
 
 	    /* If we have a prototype, chars may be pushed as chars */
 	    Flags |= CF_FORCECHAR;
-       	}
+
+       	} else {
+
+            /* No prototype available. Convert array to "pointer to first
+             * element", and function to "pointer to function".
+             */
+            Param->Type = PtrConversion (Param->Type)
+
+        }
 
         /* Load the value into the primary if it is not already there */
         LoadExpr (Flags, &Expr);

@@ -197,7 +197,7 @@ int ED_IsConstAbs (const ExprDesc* Expr)
  * a numeric constant, cast to any type.
  */
 {
-    return ED_IsConst (Expr) && ED_IsLocAbs (Expr);
+    return (Expr->Flags & (E_MASK_LOC|E_MASK_RTYPE)) == (E_LOC_ABS|E_RTYPE_RVAL);
 }
 
 

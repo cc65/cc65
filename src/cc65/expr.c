@@ -1247,7 +1247,7 @@ static void StructRef (ExprDesc* Expr)
      	return;
     }
 
-    /* If we have a struct pointer that is an lvalue and not already in the 
+    /* If we have a struct pointer that is an lvalue and not already in the
      * primary, load it now.
      */
     if (ED_IsLVal (Expr) && IsTypePtr (Expr->Type)) {
@@ -1676,10 +1676,14 @@ void hie10 (ExprDesc* Expr)
 
      	case TOK_STAR:
      	    NextToken ();
-    	    if (evalexpr (CF_NONE, hie10, Expr) != 0) {
-    	       	/* Expression is not const, indirect value loaded into primary */
-       	       	ED_MakeRValExpr (Expr);
-    	    }
+            ExprWithCheck (hie10, Expr);
+            if (ED_IsLVal (Expr) || !(ED_IsLocConst (Expr) || ED_IsLocStack (Expr)))) {
+                /* Not a const, load it into the primary and make it a
+                 * calculated value.
+                 */
+                ExprLoad (CF_NONE, Expr);
+                ED_MakeRValExpr (Expr);
+            }
             /* If the expression is already a pointer to function, the
              * additional dereferencing operator must be ignored.
              */
@@ -1698,7 +1702,7 @@ void hie10 (ExprDesc* Expr)
 
      	case TOK_AND:
      	    NextToken ();
-       	    hie10 (Expr);
+       	    ExprWithCheck (hie10, Expr);
 	    /* The & operator may be applied to any lvalue, and it may be
 	     * applied to functions, even if they're no lvalues.
 	     */

@@ -46,7 +46,7 @@
 
 #define VER_MAJOR	2U
 #define VER_MINOR	6U
-#define VER_PATCH	5U
+#define VER_PATCH	6U
 
 
 

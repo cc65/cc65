@@ -19,6 +19,7 @@
 
 C_OBJS =	_afailed.o	\
 		_hextab.o	\
+                _poserror.o     \
 		_scanf.o	\
 		abort.o		\
                 asctime.o       \

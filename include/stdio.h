@@ -94,7 +94,7 @@ int fseek(FILE* f, long offset, int whence);
 void rewind(FILE *f);
 int getchar (void);
 char* gets (char* s);
-void perror (const char* s);
+void __fastcall__ perror (const char* s);
 int printf (const char* format, ...);
 int putchar (int c);
 int puts (const char* s);
@@ -117,7 +117,7 @@ int vfscanf (FILE* f, const char* format, va_list ap);
 FILE* fdopen (int fd, const char* mode); 	/* Unix */
 int __fastcall__ fileno (FILE* f);		/* Unix */
 #endif
-
+void __fastcall__ _poserror (const char* msg);  /* cc65 */
 
 /* Masking macros for some functions */
 #define getchar()   	fgetc (stdin)		/* ANSI */

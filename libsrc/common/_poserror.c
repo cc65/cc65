@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*                                 perror.c                                  */
+/*                                _poserror.c                                */
 /*                                                                           */
-/*                       Print a system error message                        */
+/*                   Output a system dependent error code                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 2003      Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -39,10 +39,10 @@
 
 
 
-void __fastcall__ perror (const char* msg)
+void __fastcall__ _poserror (const char* msg)
 {
-    /* Fetch the message that corresponds to errno */
-    const char* errormsg = strerror (errno);
+    /* Fetch the message that corresponds to _oserrno */
+    const char* errormsg = _stroserror (_oserror);
 
     /* Different output depending on msg */
     if (msg) {

@@ -34,10 +34,10 @@
 
 
 #include "../common/filepos.h"
+#include "../common/xmalloc.h"
 
 #include "error.h"
 #include "expr.h"
-#include "mem.h"
 #include "scanner.h"
 #include "ulabel.h"
 
@@ -80,7 +80,7 @@ static ULabel* NewULabel (ExprNode* Val)
  */
 {
     /* Allocate memory for the ULabel structure */
-    ULabel* L = Xmalloc (sizeof (ULabel));
+    ULabel* L = xmalloc (sizeof (ULabel));
 
     /* Initialize the fields */
     L->Pos = CurPos;
@@ -227,7 +227,7 @@ void ULabCheck (void)
      */
     if (ULabCount) {
 	unsigned I = 0;
-	ULabList = Xmalloc (ULabCount * sizeof (ULabel*));
+	ULabList = xmalloc (ULabCount * sizeof (ULabel*));
 	L = ULabRoot;
 	while (L) {
 	    ULabList[I] = L;

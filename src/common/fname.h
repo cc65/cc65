@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     mem.h				     */
+/*				    fname.h				     */
 /*                                                                           */
-/*		 Memory allocation for the ca65 macroassembler		     */
+/*			 File name handling utilities			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,33 +33,27 @@
 
 
 
-#ifndef MEM_H
-#define MEM_H
-
-
-
-#include <stddef.h>
+#ifndef FNAME_H
+#define FNAME_H
 
 
 
 /*****************************************************************************/
-/*     	     	    		     Code				     */
+/*     	       	       	       	     Code				     */
 /*****************************************************************************/
 
 
 
-void* Xmalloc (size_t size);
-/* Allocate memory, check for out of memory condition. Do some debugging */
-
-void Xfree (const void* block);
-/* Free the block, do some debugging */
-
-char* StrDup (const char* s);
-/* Duplicate a string on the heap. The function checks for out of memory */
+char* MakeFilename (const char* Origin, const char* Ext);
+/* Make a new file name from Origin and Ext. If Origin has an extension, it
+ * is removed and Ext is appended. If Origin has no extension, Ext is simply
+ * appended. The result is placed in a malloc'ed buffer and returned.
+ * The function may be used to create "foo.o" from "foo.s".
+ */
 
 
 
-/* End of mem.h */
+/* End of fname.h */
 
 #endif
 

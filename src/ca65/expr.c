@@ -34,11 +34,11 @@
 
 
 #include "../common/exprdefs.h"
+#include "../common/xmalloc.h"
 
 #include "error.h"
 #include "global.h"
 #include "instr.h"
-#include "mem.h"
 #include "nexttok.h"
 #include "objcode.h"
 #include "objfile.h"
@@ -85,7 +85,7 @@ static ExprNode* NewExprNode (void)
 	FreeExprNodes = N->Left;
     } else {
 	/* Allocate fresh memory */
-        N = Xmalloc (sizeof (ExprNode));
+        N = xmalloc (sizeof (ExprNode));
     }
     N->Op = EXPR_NULL;
     N->Left = N->Right = 0;
@@ -106,7 +106,7 @@ static void FreeExprNode (ExprNode* E)
 	    FreeExprNodes = E;
 	} else {
 	    /* Free the memory */
-	    Xfree (E);
+	    xfree (E);
 	}
     }
 }
@@ -114,10 +114,10 @@ static void FreeExprNode (ExprNode* E)
 
 
 /*****************************************************************************/
-/*		Dump an expression tree on stdout for debugging		     */
+/*	     	Dump an expression tree on stdout for debugging		     */
 /*****************************************************************************/
 
-
+	     
 
 static void InternalDumpExpr (ExprNode* Expr)
 /* Dump an expression in UPN */

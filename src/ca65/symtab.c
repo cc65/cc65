@@ -37,10 +37,10 @@
 
 #include "../common/symdefs.h"
 #include "../common/hashstr.h"
+#include "../common/xmalloc.h"
 
 #include "global.h"
 #include "error.h"
-#include "mem.h"
 #include "expr.h"
 #include "objfile.h"
 #include "symtab.h"
@@ -146,7 +146,7 @@ static SymEntry* NewSymEntry (const char* Name)
     Len = strlen (Name);
 
     /* Allocate memory */
-    S = Xmalloc (sizeof (SymEntry) + Len);
+    S = xmalloc (sizeof (SymEntry) + Len);
 
     /* Initialize the entry */
     S->Left   = 0;
@@ -174,7 +174,7 @@ static SymTable* NewSymTable (unsigned Size)
     SymTable* S;
 
     /* Allocate memory */
-    S = Xmalloc (sizeof (SymTable) + (Size-1) * sizeof (SymEntry*));
+    S = xmalloc (sizeof (SymTable) + (Size-1) * sizeof (SymEntry*));
 
     /* Set variables and clear hash table entries */
     S->TableSlots   = Size;

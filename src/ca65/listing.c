@@ -37,13 +37,13 @@
 #include <string.h>
 #include <errno.h>
 
+#include "../common/fname.h"
 #include "../common/segdefs.h"
 #include "../common/version.h"
+#include "../common/xmalloc.h"
 
 #include "error.h"
-#include "fname.h"
 #include "global.h"
-#include "mem.h"
 #include "objcode.h"
 #include "listing.h"
 
@@ -94,7 +94,7 @@ void NewListingLine (const char* Line, unsigned char File, unsigned char Depth)
 	}
 
 	/* Allocate memory */
-	L = Xmalloc (sizeof (ListLine) + Len);
+	L = xmalloc (sizeof (ListLine) + Len);
 
 	/* Initialize the fields. */
 	L->Next  	= 0;
@@ -201,7 +201,7 @@ static void PrintPageHeader (FILE* F, const ListLine* L)
  */
 {
     /* Print the header on the new page */
-    fprintf (F, 
+    fprintf (F,
 	     "ca65 V%u.%u.%u - (C) Copyright 1998-2000 Ullrich von Bassewitz\n"
     	     "Main file   : %s\n"
     	     "Current file: %s\n"
@@ -328,7 +328,7 @@ void CreateListing (void)
 	}
 
 	/* Allocate memory for the given number of bytes */
-	Buf = Xmalloc (Count*2+1);
+	Buf = xmalloc (Count*2+1);
 
 	/* Copy an ASCII representation of the bytes into the buffer */
      	B = Buf;
@@ -422,7 +422,7 @@ void CreateListing (void)
 	}
 
 	/* Delete the temporary buffer */
-	Xfree (Buf);
+	xfree (Buf);
 
 	/* Next line */
 	L = L->Next;

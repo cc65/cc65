@@ -33,9 +33,9 @@
 
 
 
-#include <stdio.h>
-#include <stdlib.h>
+#include <string.h>
 
+#include "abend.h"
 #include "cmdline.h"
 
 
@@ -46,25 +46,50 @@
 
 
 
+/* Program name - is set after call to InitCmdLine */
+const char* ProgName;
+
+/* The program argument vector */
 static char** ArgVec     = 0;
 static unsigned ArgCount = 0;
 
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Code    				     */
+/*     	       	       	       	     Code    	  			     */
 /*****************************************************************************/
 
 
 
-void InitCmdLine (unsigned aArgCount, char* aArgVec[])
+void InitCmdLine (unsigned aArgCount, char* aArgVec[], const char* aProgName)
 /* Initialize command line parsing. aArgVec is the argument array terminated by
  * a NULL pointer (as usual), ArgCount is the number of valid arguments in the
  * array. Both arguments are remembered in static storage.
  */
 {
+    /* Remember the argument vector */
     ArgCount = aArgCount;
     ArgVec   = aArgVec;
+
+    /* Get the program name from argv[0] but strip a path */
+    if (ArgVec[0] == 0) {
+	/* Use the default name given */
+	ProgName = aProgName;
+    } else {
+	/* Strip a path */
+	ProgName = strchr (ArgVec[0], '\0');
+	while (ProgName > ArgVec[0]) {
+	    --ProgName;
+       	    if (*ProgName == '/' || *ProgName == '\\') {
+	   	++ProgName;
+	 	break;
+	    }
+	}
+	if (ProgName[0] == '\0') {
+	    /* Use the default */
+	    ProgName = aProgName;
+	}
+    }
 }
 
 
@@ -72,8 +97,7 @@ void InitCmdLine (unsigned aArgCount, char* aArgVec[])
 void UnknownOption (const char* Opt)
 /* Print an error about an unknown option. */
 {
-    fprintf (stderr, "Unknown option: %s\n", Opt);
-    exit (EXIT_FAILURE);
+    AbEnd ("Unknown option: %s\n", Opt);
 }
 
 
@@ -81,8 +105,7 @@ void UnknownOption (const char* Opt)
 void NeedArg (const char* Opt)
 /* Print an error about a missing option argument and exit. */
 {
-    fprintf (stderr, "Option requires an argument: %s\n", Opt);
-    exit (EXIT_FAILURE);
+    AbEnd ("Option requires an argument: %s\n", Opt);
 }
 
 
@@ -90,8 +113,7 @@ void NeedArg (const char* Opt)
 void InvDef (const char* Def)
 /* Print an error about an invalid definition and die */
 {
-    fprintf (stderr, "Invalid definition: `%s'\n", Def);
-    exit (EXIT_FAILURE);
+    AbEnd ("Invalid definition: `%s'\n", Def);
 }
 
 
@@ -130,9 +152,9 @@ void LongOption (int* ArgNum, const LongOpt* OptTab, unsigned OptCount)
 	if (strcmp (Opt, OptTab->Option) == 0) {
 	    /* Found, call the function */
 	    if (OptTab->ArgCount > 0) {
-		OptTab->Func (Opt, ArgVec[++(*ArgNum)]);
+	   	OptTab->Func (Opt, ArgVec[++(*ArgNum)]);
 	    } else {
-		OptTab->Func (Opt, 0);
+	   	OptTab->Func (Opt, 0);
 	    }
 	    /* Done */
 	    return;

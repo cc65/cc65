@@ -44,7 +44,8 @@
 #  include <unistd.h>
 #endif
 
-#include "mem.h"
+#include "../common/xmalloc.h"
+
 #include "incpath.h"
 
 
@@ -83,7 +84,7 @@ static char* Add (char* Orig, const char* New)
     }
 
     /* Allocate memory for the new string */
-    NewPath = Xmalloc (OrigLen + NewLen + 2);
+    NewPath = xmalloc (OrigLen + NewLen + 2);
 
     /* Copy the strings */
     memcpy (NewPath, Orig, OrigLen);
@@ -92,7 +93,7 @@ static char* Add (char* Orig, const char* New)
     NewPath [OrigLen+NewLen+1] = '\0';
 
     /* Delete the original path */
-    Xfree (Orig);
+    xfree (Orig);
 
     /* Return the new path */
     return NewPath;
@@ -138,8 +139,8 @@ static char* Find (const char* Path, const char* File)
      	/* Check if this file exists */
      	if (access (PathName, R_OK) == 0) {
      	    /* The file exists */
-     	    return StrDup (PathName);
-     	}
+     	    return xstrdup (PathName);
+     	}		   
 
      	/* Skip a list separator if we have one */
      	if (*P == ';') {

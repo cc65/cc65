@@ -33,8 +33,9 @@
 
 
 
+#include "../common/xmalloc.h"
+
 #include "error.h"
-#include "mem.h"
 #include "istack.h"
 
 
@@ -80,7 +81,7 @@ void PushInput (int (*Func) (void*), void* Data, const char* Desc)
     }
 
     /* Create a new stack element */
-    E = Xmalloc (sizeof (*E));
+    E = xmalloc (sizeof (*E));
 
     /* Initialize it */
     E->Func = Func;
@@ -109,7 +110,7 @@ void PopInput (void)
     IStack = IStack->Next;
 
     /* And delete it */
-    Xfree (E);
+    xfree (E);
 }
 
 

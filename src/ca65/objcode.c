@@ -38,12 +38,12 @@
 #include <ctype.h>
 
 #include "../common/segdefs.h"
+#include "../common/xmalloc.h"
 
 #include "error.h"
 #include "fragment.h"
 #include "global.h"
 #include "listing.h"
-#include "mem.h"
 #include "objfile.h"
 #include "scanner.h"
 #include "symtab.h"
@@ -140,7 +140,7 @@ static Segment* NewSegment (const char* Name, unsigned SegType)
     } while (*N);
 
     /* Create a new segment */
-    S = Xmalloc (sizeof (*S));
+    S = xmalloc (sizeof (*S));
 
     /* Initialize it */
     S->List    = 0;
@@ -150,7 +150,7 @@ static Segment* NewSegment (const char* Name, unsigned SegType)
     S->SegType = SegType;
     S->PC      = 0;
     S->Num     = SegmentCount++;
-    S->Name    = StrDup (Name);
+    S->Name    = xstrdup (Name);
 
     /* Insert it into the segment list */
     SegmentLast->List = S;
@@ -599,7 +599,7 @@ static Fragment* NewFragment (unsigned char Type, unsigned short Len)
     Fragment* F;
 
     /* Create a new fragment */
-    F = Xmalloc (sizeof (*F));
+    F = xmalloc (sizeof (*F));
 
     /* Initialize it */
     F->List 	= 0;
@@ -631,7 +631,7 @@ static Fragment* NewFragment (unsigned char Type, unsigned short Len)
 	    LineCur->FragList = F;
 	    /* First fragment - set the PC
 	    LineCur->PC    = GetPC ();
-	    LineCur->Reloc = RelocMode;	   
+	    LineCur->Reloc = RelocMode;
 */
 	} else {
        	    LineCur->FragLast->LineList = F;

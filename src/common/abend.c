@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				    fname.c				     */
+/*				    abend.c				     */
 /*                                                                           */
-/*			 File name handling utilities			     */
+/*			     Abnormal program end			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2000     Ullrich von Bassewitz                                        */
+/*              Wacholderweg 14                                              */
+/*              D-70597 Stuttgart                                            */
+/* EMail:       uz@musoftware.de                                             */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,10 +33,12 @@
 
 
 
-#include <string.h>
+#include <stdarg.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#include "mem.h"
-#include "fname.h"
+#include "cmdline.h"
+#include "abend.h"
 
 
 
@@ -46,29 +48,27 @@
 
 
 
-char* MakeFilename (const char* Origin, const char* Ext)
-/* Make a new file name from Origin and Ext. If Origin has an extension, it
- * is removed and Ext is appended. If Origin has no extension, Ext is simply
- * appended. The result is placed in a malloc'ed buffer and returned.
- * The function may be used to create "foo.o" from "foo.s".
+void AbEnd (const char* Format, ...)
+/* Print a message preceeded by the program name and terminate the program
+ * with an error exit code.
  */
 {
-    /* Construct the name */
-    char* Result;
-    const char* P = strrchr (Origin, '.');
-    if (P == 0) {
-    	/* No dot, add the extension */
-    	Result = Xmalloc (strlen (Origin) + strlen (Ext) + 1);
-    	strcpy (Result, Origin);
-    	strcat (Result, Ext);
-    } else {
-    	Result = Xmalloc (P - Origin + strlen (Ext) + 1);
-    	memcpy (Result, Origin, P - Origin);
-    	strcpy (Result + (P - Origin), Ext);
-    }
-    return Result;
-}
+    va_list ap;
 
+    /* Print the program name */
+    fprintf (stderr, "%s: ", ProgName);
+
+    /* Format the given message and print it */
+    va_start (ap, Format);
+    vfprintf (stderr, Format, ap);
+    va_end (ap);
+
+    /* Add a newline */
+    fprintf (stderr, "\n");
+
+    /* Terminate the program */
+    exit (EXIT_FAILURE);
+}
 
 
 

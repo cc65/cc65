@@ -34,8 +34,8 @@
 
 
 #include "../common/optdefs.h"
+#include "../common/xmalloc.h"
 
-#include "mem.h"
 #include "error.h"
 #include "objfile.h"
 #include "options.h"
@@ -67,7 +67,7 @@ static Option* NewOption (unsigned char Type)
     Option* Opt;
 
     /* Allocate memory */
-    Opt = Xmalloc (sizeof (*Opt));
+    Opt = xmalloc (sizeof (*Opt));
 
     /* Initialize fields */
     Opt->Next  = 0;
@@ -101,7 +101,7 @@ void OptStr (unsigned char Type, const char* Text)
 	Fatal (FAT_STRING_TOO_LONG);
     }
     O        = NewOption (Type);
-    O->V.Str = StrDup (Text);
+    O->V.Str = xstrdup (Text);
 }
 
 

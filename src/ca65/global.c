@@ -43,8 +43,6 @@
 
 
 
-const char* ProgName   	      = "ca65"; /* Program name */
-
 /* File names */
 const char* InFile     	      = 0;      /* Name of input file */
 const char* OutFile    	      = 0;      /* Name of output file */
@@ -70,7 +68,7 @@ unsigned char NoColonLabels   = 0;     	/* Allow labels without a colon */
 unsigned char LooseStringTerm = 0;	/* Allow ' as string terminator */
 unsigned char AtInIdents      = 0;	/* Allow '@' in identifiers */
 unsigned char DollarInIdents  = 0;  	/* Allow '$' in identifiers */
-									  
+
 
 
 

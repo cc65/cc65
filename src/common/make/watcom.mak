@@ -65,10 +65,13 @@ CCCFG  = -bt=$(TARGET) -d1 -onatx -zp4 -5 -zq -w2
 # ------------------------------------------------------------------------------
 # All library OBJ files
 
-OBJS =	bitops.obj	\
+OBJS =	abend.obj	\
+	bitops.obj	\
 	cmdline.obj	\
+	fname.obj	\
 	hashstr.obj	\
 	wildargv.obj	\
+	xmalloc.obj	\
 	xsprintf.obj
 
 
@@ -89,6 +92,8 @@ $(LIB): $(OBJS)
 clean:
 	@if exist *.obj del *.obj
 	@if exist $(LIB) del $(LIB)
+
+
 
 
 

@@ -10,7 +10,6 @@ OBJS =  condasm.o	\
 	ea.o	      	\
         error.o	      	\
         expr.o	      	\
-	fname.o	      	\
 	fragment.o	\
         global.o       	\
 	incpath.o	\
@@ -20,7 +19,6 @@ OBJS =  condasm.o	\
 	macpack.o     	\
        	macro.o	      	\
         main.o 	      	\
-        mem.o  	      	\
 	nexttok.o	\
         objcode.o     	\
         objfile.o	\

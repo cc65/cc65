@@ -1,25 +1,25 @@
 /*****************************************************************************/
 /*									     */
-/*				     mem.c				     */
-/*									     */
-/*		 Memory allocation for the ca65 macroassembler		     */
-/*									     */
-/*									     */
-/*									     */
-/* (C) 1998	Ullrich von Bassewitz					     */
-/*		Wacholderweg 14						     */
-/*		D-70597 Stuttgart					     */
-/* EMail:	uz@musoftware.de					     */
-/*									     */
-/*									     */
+/*				   xmalloc.c				     */
+/*                                                                           */
+/*			 Memory allocation subroutines			     */
+/*					    				     */
+/*					    				     */
+/*					    				     */
+/* (C) 2000	Ullrich von Bassewitz	    				     */
+/*	   	Wacholderweg 14						     */
+/*	   	D-70597 Stuttgart					     */
+/* EMail:  	uz@musoftware.de					     */
+/*	   								     */
+/*	   								     */
 /* This software is provided 'as-is', without any expressed or implied	     */
 /* warranty.  In no event will the authors be held liable for any damages    */
 /* arising from the use of this software.				     */
-/*									     */
+/*	   								     */
 /* Permission is granted to anyone to use this software for any purpose,     */
 /* including commercial applications, and to alter it and redistribute it    */
 /* freely, subject to the following restrictions:			     */
-/*									     */
+/*	   								     */
 /* 1. The origin of this software must not be misrepresented; you must not   */
 /*    claim that you wrote the original software. If you use this software   */
 /*    in a product, an acknowledgment in the product documentation would be  */
@@ -28,7 +28,7 @@
 /*    be misrepresented as being the original software.			     */
 /* 3. This notice may not be removed or altered from any source		     */
 /*    distribution.							     */
-/*									     */
+/*	   								     */
 /*****************************************************************************/
 
 
@@ -36,49 +36,52 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "error.h"
-#include "mem.h"
+#include "abend.h"
+#include "xmalloc.h"
 
 
 
 /*****************************************************************************/
-/*				     code				     */
+/*		 		     code				     */
 /*****************************************************************************/
 
 
 
-void* Xmalloc (size_t size)
+void* xmalloc (size_t Size)
 /* Allocate memory, check for out of memory condition. Do some debugging */
 {
-    void* p;
+    /* Allocate memory */
+    void* P = malloc (Size);
 
-    p = malloc (size);
-    if (p == 0 && size != 0) {
-	Fatal (FAT_OUT_OF_MEMORY);
+    /* Check for errors */
+    if (P == 0 && Size != 0) {
+	AbEnd ("Out of memory - requested block size = %lu", (unsigned long) Size);
     }
 
     /* Return a pointer to the block */
-    return p;
+    return P;
 }
 
 
 
-void Xfree (const void* block)
+void xfree (const void* Block)
 /* Free the block, do some debugging */
 {
-    free ((void*) block);
+    free ((void*) Block);
 }
 
 
 
-char* StrDup (const char* s)
+char* xstrdup (const char* S)
 /* Duplicate a string on the heap. The function checks for out of memory */
 {
-    unsigned len;
+    /* Get the length of the string */
+    unsigned Len = strlen (S) + 1;
 
-    len = strlen (s) + 1;
-    return memcpy (Xmalloc (len), s, len);
+    /* Allocate memory and return a copy */
+    return memcpy (xmalloc (Len), S, Len);
 }
+
 
 
 

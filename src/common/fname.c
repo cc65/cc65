@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   cmdline.h				     */
+/*				    fname.c				     */
 /*                                                                           */
-/*		   Helper functions for command line parsing		     */
+/*			 File name handling utilities			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,27 +33,10 @@
 
 
 
-#ifndef CMDLINE_H
-#define CMDLINE_H
+#include <string.h>
 
-
-
-/*****************************************************************************/
-/*     	       	       	       	     Data				     */
-/*****************************************************************************/
-
-
-
-/* Program name - is set after call to InitCmdLine */
-extern const char* ProgName;
-
-/* Structure defining a long option */
-typedef struct LongOpt	LongOpt;
-struct LongOpt {
-    const char*	Option;
-    unsigned	ArgCount;
-    void 	(*Func) (const char* Opt, const char* Arg);
-};
+#include "xmalloc.h"
+#include "fname.h"
 
 
 
@@ -63,34 +46,28 @@ struct LongOpt {
 
 
 
-void InitCmdLine (unsigned aArgCount, char* aArgVec[], const char* aProgName);
-/* Initialize command line parsing. aArgVec is the argument array terminated by
- * a NULL pointer (as usual), ArgCount is the number of valid arguments in the
- * array. Both arguments are remembered in static storage.
+char* MakeFilename (const char* Origin, const char* Ext)
+/* Make a new file name from Origin and Ext. If Origin has an extension, it
+ * is removed and Ext is appended. If Origin has no extension, Ext is simply
+ * appended. The result is placed in a malloc'ed buffer and returned.
+ * The function may be used to create "foo.o" from "foo.s".
  */
-
-void UnknownOption (const char* Opt);
-/* Print an error about an unknown option. */
-
-void NeedArg (const char* Opt);
-/* Print an error about a missing option argument and exit. */
-
-void InvDef (const char* Def);
-/* Print an error about an invalid definition and die */
-
-const char* GetArg (int* ArgNum, unsigned Len);
-/* Get an argument for a short option. The argument may be appended to the
- * option itself or may be separate. Len is the length of the option string.
- */
-
-void LongOption (int* ArgNum, const LongOpt* OptTab, unsigned OptCount);
-/* Handle a long command line option */
-
-
-
-/* End of cmdline.h */
-
-#endif
+{
+    /* Construct the name */
+    char* Result;
+    const char* P = strrchr (Origin, '.');
+    if (P == 0) {
+    	/* No dot, add the extension */
+    	Result = xmalloc (strlen (Origin) + strlen (Ext) + 1);
+    	strcpy (Result, Origin);
+    	strcat (Result, Ext);
+    } else {
+    	Result = xmalloc (P - Origin + strlen (Ext) + 1);
+    	memcpy (Result, Origin, P - Origin);
+    	strcpy (Result + (P - Origin), Ext);
+    }
+    return Result;
+}
 
 
 

@@ -44,8 +44,6 @@
 
 
 
-extern const char*	ProgName;	/* Program name */
-
 /* File names */
 extern const char*	InFile;		/* Name of input file */
 extern const char*	OutFile;	/* Name of output file */

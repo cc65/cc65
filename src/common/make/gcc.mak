@@ -9,9 +9,12 @@ LIB	= common.a
 
 
 
-OBJS =	bitops.o	\
+OBJS =	abend.o		\
+	bitops.o	\
 	cmdline.o	\
+	fname.o		\
 	hashstr.o	\
+	xmalloc.o	\
 	xsprintf.o
 
 

@@ -1,12 +1,12 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   cmdline.h				     */
+/*				   xmalloc.h				     */
 /*                                                                           */
-/*		   Helper functions for command line parsing		     */
+/*			 Memory allocation subroutines			     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
+/* (C) 2000	Ullrich von Bassewitz                                        */
 /*              Wacholderweg 14                                              */
 /*              D-70597 Stuttgart                                            */
 /* EMail:       uz@musoftware.de                                             */
@@ -33,62 +33,33 @@
 
 
 
-#ifndef CMDLINE_H
-#define CMDLINE_H
+#ifndef XMALLOC_H
+#define XMALLOC_H
+
+
+
+#include <stddef.h>
 
 
 
 /*****************************************************************************/
-/*     	       	       	       	     Data				     */
+/*     	       	    		     Code				     */
 /*****************************************************************************/
 
 
 
-/* Program name - is set after call to InitCmdLine */
-extern const char* ProgName;
+void* xmalloc (size_t Size);
+/* Allocate memory, check for out of memory condition. Do some debugging */
 
-/* Structure defining a long option */
-typedef struct LongOpt	LongOpt;
-struct LongOpt {
-    const char*	Option;
-    unsigned	ArgCount;
-    void 	(*Func) (const char* Opt, const char* Arg);
-};
+void xfree (const void* Block);
+/* Free the block, do some debugging */
+
+char* xstrdup (const char* S);
+/* Duplicate a string on the heap. The function checks for out of memory */
 
 
 
-/*****************************************************************************/
-/*     	       	       	       	     Code				     */
-/*****************************************************************************/
-
-
-
-void InitCmdLine (unsigned aArgCount, char* aArgVec[], const char* aProgName);
-/* Initialize command line parsing. aArgVec is the argument array terminated by
- * a NULL pointer (as usual), ArgCount is the number of valid arguments in the
- * array. Both arguments are remembered in static storage.
- */
-
-void UnknownOption (const char* Opt);
-/* Print an error about an unknown option. */
-
-void NeedArg (const char* Opt);
-/* Print an error about a missing option argument and exit. */
-
-void InvDef (const char* Def);
-/* Print an error about an invalid definition and die */
-
-const char* GetArg (int* ArgNum, unsigned Len);
-/* Get an argument for a short option. The argument may be appended to the
- * option itself or may be separate. Len is the length of the option string.
- */
-
-void LongOption (int* ArgNum, const LongOpt* OptTab, unsigned OptCount);
-/* Handle a long command line option */
-
-
-
-/* End of cmdline.h */
+/* End of xmalloc.h */
 
 #endif
 

@@ -37,11 +37,11 @@
 #include <string.h>
 
 #include "../common/hashstr.h"
+#include "../common/xmalloc.h"
 
 #include "condasm.h"
 #include "error.h"
 #include "istack.h"
-#include "mem.h"
 #include "nexttok.h"
 #include "pseudo.h"
 #include "toklist.h"
@@ -123,7 +123,7 @@ static IdDesc* NewIdDesc (const char* Id)
 {
     /* Allocate memory */
     unsigned Len = strlen (Id);
-    IdDesc* I = Xmalloc (sizeof (IdDesc) + Len);
+    IdDesc* I = xmalloc (sizeof (IdDesc) + Len);
 
     /* Initialize the struct */
     I->Next = 0;
@@ -141,7 +141,7 @@ static Macro* NewMacro (const char* Name, unsigned HashVal, unsigned char Style)
 {
     /* Allocate memory */
     unsigned Len = strlen (Name);
-    Macro* M = Xmalloc (sizeof (Macro) + Len);
+    Macro* M = xmalloc (sizeof (Macro) + Len);
 
     /* Initialize the macro struct */
     M->LocalCount = 0;
@@ -174,7 +174,7 @@ static MacExp* NewMacExp (Macro* M)
     unsigned I;
 
     /* Allocate memory */
-    MacExp* E = Xmalloc (sizeof (MacExp));
+    MacExp* E = xmalloc (sizeof (MacExp));
 
     /* Initialize the data */
     E->M       	  = M;
@@ -184,7 +184,7 @@ static MacExp* NewMacExp (Macro* M)
     E->LocalStart = LocalName;
     LocalName    += M->LocalCount;
     E->ParamCount = 0;
-    E->Params     = Xmalloc (M->ParamCount * sizeof (TokNode*));
+    E->Params     = xmalloc (M->ParamCount * sizeof (TokNode*));
     E->ParamExp	  = 0;
     for (I = 0; I < M->ParamCount; ++I) {
 	E->Params [I] = 0;
@@ -209,9 +209,9 @@ static void FreeMacExp (MacExp* E)
 
     /* Free the parameter list */
     for (I = 0; I < E->ParamCount; ++I) {
-      	Xfree (E->Params [I]);
+      	xfree (E->Params [I]);
     }
-    Xfree (E->Params);
+    xfree (E->Params);
 
     /* Free the final token if we have one */
     if (E->Final) {
@@ -219,7 +219,7 @@ static void FreeMacExp (MacExp* E)
     }
 
     /* Free the structure itself */
-    Xfree (E);
+    xfree (E);
 }
 
 

@@ -38,12 +38,11 @@
 #include <string.h>
 #include <errno.h>
 
+#include "../common/fname.h"
 #include "../common/objdefs.h"
 
 #include "global.h"
 #include "error.h"
-#include "fname.h"
-#include "mem.h"
 #include "objfile.h"
 
 

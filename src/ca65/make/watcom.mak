@@ -67,7 +67,6 @@ OBJS = 	condasm.obj	\
 	ea.obj		\
 	error.obj	\
 	expr.obj	\
-	fname.obj	\
 	fragment.obj	\
 	global.obj	\
 	incpath.obj	\
@@ -77,7 +76,6 @@ OBJS = 	condasm.obj	\
 	macpack.obj	\
 	macro.obj	\
 	main.obj	\
-	mem.obj		\
 	nexttok.obj	\
 	objcode.obj	\
 	objfile.obj	\
@@ -113,7 +111,6 @@ FILE condasm.obj
 FILE ea.obj
 FILE error.obj
 FILE expr.obj
-FILE fname.obj
 FILE fragment.obj
 FILE global.obj
 FILE incpath.obj
@@ -123,7 +120,6 @@ FILE listing.obj
 FILE macpack.obj
 FILE macro.obj
 FILE main.obj
-FILE mem.obj
 FILE nexttok.obj
 FILE objcode.obj
 FILE objfile.obj

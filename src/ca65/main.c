@@ -49,7 +49,7 @@
 #include "instr.h"
 #include "listing.h"
 #include "macro.h"
-#include "mem.h"
+/*#include "mem.h"*/
 #include "nexttok.h"
 #include "objcode.h"
 #include "objfile.h"
@@ -89,7 +89,7 @@ static void Usage (void)
        	     "  --auto-import\t\tMark unresolved symbols as import\n"
        	     "  --cpu type\t\tSet cpu type\n"
        	     "  --debug-info\t\tAdd debug info to object file\n"
-	     "  --help\t\tPrint this text\n"
+	     "  --help\t\tHelp (this text)\n"
 	     "  --ignore-case\t\tIgnore case of symbols\n"
        	     "  --include-dir dir\tSet an include directory search path\n"
        	     "  --listing\t\tCreate a listing if assembly was ok\n"
@@ -98,7 +98,6 @@ static void Usage (void)
        	     "  --verbose\t\tIncrease verbosity\n"
        	     "  --version\t\tPrint the assembler version\n",
     	     ProgName);
-    exit (EXIT_FAILURE);
 }
 
 
@@ -128,7 +127,7 @@ static void DefineSymbol (const char* Def)
 
     /* The symbol must start with a character or underline */
     if (Def [0] != '_' && !isalpha (Def [0])) {
-	InvSym (Def);
+	InvDef (Def);
     }
     P = Def;
 
@@ -145,7 +144,7 @@ static void DefineSymbol (const char* Def)
     /* Do we have a value given? */
     if (*P != '=') {
 	if (*P != '\0') {
-	    InvSym (Def);
+	    InvDef (Def);
 	}
 	Val = 0;
     } else {
@@ -154,11 +153,11 @@ static void DefineSymbol (const char* Def)
 	if (*P == '$') {
 	    ++P;
 	    if (sscanf (P, "%lx", &Val) != 1) {
-	 	InvSym (Def);
+	 	InvDef (Def);
 	    }
 	} else {
 	    if (sscanf (P, "%li", &Val) != 1) {
-     		InvSym (Def);
+     		InvDef (Def);
 	    }
        	}
     }
@@ -219,6 +218,7 @@ static void OptHelp (const char* Opt, const char* Arg)
 /* Print usage information and exit */
 {
     Usage ();
+    exit (EXIT_SUCCESS);
 }
 
 
@@ -450,15 +450,7 @@ int main (int argc, char* argv [])
     int I;
 
     /* Initialize the cmdline module */
-    InitCmdLine (argc, argv);
-
-    /* Set the program name */
-    ProgName = argv [0];
-
-    /* We must have a file name */
-    if (argc < 2) {
-    	Usage ();
-    }
+    InitCmdLine (argc, argv, "ca65");
 
     /* Enter the base lexical level. We must do that here, since we may
      * define symbols using -D.
@@ -532,8 +524,9 @@ int main (int argc, char* argv [])
        	} else {
     	    /* Filename. Check if we already had one */
     	    if (InFile) {
-    	       	fprintf (stderr, "Don't know what to do with `%s'\n", Arg);
-    		Usage ();
+    	       	fprintf (stderr, "%s: Don't know what to do with `%s'\n",
+			 ProgName, Arg);
+		exit (EXIT_FAILURE);
     	    } else {
 		InFile = Arg;
 	    }
@@ -545,7 +538,7 @@ int main (int argc, char* argv [])
 
     /* Do we have an input file? */
     if (InFile == 0) {
-	fprintf (stderr, "No input file\n");
+	fprintf (stderr, "%s: No input files\n", ProgName);
 	exit (EXIT_FAILURE);
     }
 

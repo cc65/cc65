@@ -40,16 +40,17 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#include "../common/fname.h"
+#include "../common/xmalloc.h"
+
 #include "condasm.h"
 #include "error.h"
-#include "fname.h"
 #include "global.h"
 #include "incpath.h"
 #include "instr.h"
 #include "istack.h"
 #include "listing.h"
 #include "macro.h"
-#include "mem.h"
 #include "objfile.h"
 #include "toklist.h"
 #include "scanner.h"
@@ -353,7 +354,7 @@ void NewInputFile (const char* Name)
      	}
 
      	/* Free the allocated memory */
-     	Xfree (PathName);
+     	xfree (PathName);
 
     }
 
@@ -367,11 +368,11 @@ void NewInputFile (const char* Name)
      	}
      	Files [FileCount].MTime = Buf.st_mtime;
      	Files [FileCount].Size  = Buf.st_size;
-     	Files [FileCount].Name  = StrDup (Name);
+     	Files [FileCount].Name  = xstrdup (Name);
      	++FileCount;
 
      	/* Create a new state variable and initialize it */
-     	I  	    = Xmalloc (sizeof (*I));
+     	I  	    = xmalloc (sizeof (*I));
      	I->F   	    = F;
      	I->Pos.Line = 0;
      	I->Pos.Col  = 0;
@@ -407,7 +408,7 @@ void DoneInputFile (void)
 
     /* Cleanup the current stuff */
     fclose (I->F);
-    Xfree (I);
+    xfree (I);
     --ICount;
 }
 
@@ -419,7 +420,7 @@ void NewInputData (const char* Data, int Malloced)
     InputData* I;
 
     /* Create a new state variable and initialize it */
-    I  	      	= Xmalloc (sizeof (*I));
+    I  	      	= xmalloc (sizeof (*I));
     I->Data   	= Data;
     I->Pos    	= Data;
     I->Malloced = Malloced;
@@ -451,9 +452,9 @@ static void DoneInputData (void)
 
     /* Cleanup the current stuff */
     if (I->Malloced) {
-	Xfree (I->Data);
+	xfree (I->Data);
     }
-    Xfree (I);
+    xfree (I);
 }
 
 

@@ -35,7 +35,8 @@
 
 #include <string.h>
 
-#include "mem.h"
+#include "../common/xmalloc.h"
+
 #include "scanner.h"
 #include "toklist.h"
 
@@ -54,7 +55,7 @@ TokNode* NewTokNode (void)
 
     /* Allocate memory */
     unsigned Len = TokHasSVal (Tok)? strlen (SVal) : 0;
-    T = Xmalloc (sizeof (TokNode) + Len);
+    T = xmalloc (sizeof (TokNode) + Len);
 
     /* Initialize the token contents */
     T->Next   	= 0;
@@ -73,7 +74,7 @@ TokNode* NewTokNode (void)
 void FreeTokNode (TokNode* T)
 /* Free the given token node */
 {
-    Xfree (T);
+    xfree (T);
 }
 
 
@@ -132,7 +133,7 @@ TokList* NewTokList (void)
 /* Create a new, empty token list */
 {
     /* Allocate memory for the list structure */
-    TokList* T = Xmalloc (sizeof (TokList));
+    TokList* T = xmalloc (sizeof (TokList));
 
     /* Initialize the fields */
     InitTokList (T);
@@ -155,7 +156,7 @@ void FreeTokList (TokList* List)
     }
 
     /* Free the list structure itself */
-    Xfree (List);
+    xfree (List);
 }
 
 
@@ -168,18 +169,15 @@ void AddCurTok (TokList* List)
 
     /* Insert the node into the list */
     if (List->Root == 0) {
-	List->Root = T;
+     	List->Root = T;
     } else {
-	List->Last->Next = T;
+     	List->Last->Next = T;
     }
     List->Last = T;
 
     /* Count nodes */
     List->Count++;
 }
-
-
-
 
 
 

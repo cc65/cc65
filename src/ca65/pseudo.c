@@ -1164,6 +1164,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,        	DoSmart		},
     { ccNone,          	DoUnexpected	},	/* .STRING */
     { ccNone,		DoSunPlus	},
+    { ccNone,		DoUnexpected	},	/* .TCOUNT */
     { ccNone,       	DoWord		},
     { ccNone,  	       	DoUnexpected	},	/* .XMATCH */
     { ccNone,       	DoZeropage	},

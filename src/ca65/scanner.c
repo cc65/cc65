@@ -221,6 +221,7 @@ struct DotKeyword {
     { "SMART",		TOK_SMART	},
     { "STRING",		TOK_STRING	},
     { "SUNPLUS",	TOK_SUNPLUS	},
+    { "TCOUNT",		TOK_TCOUNT	},
     { "WORD", 		TOK_WORD	},
     { "XMATCH",		TOK_XMATCH	},
     { "XOR",  		TOK_BXOR  	},

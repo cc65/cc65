@@ -117,7 +117,7 @@ static void FreeExprNode (ExprNode* E)
 /*	     	Dump an expression tree on stdout for debugging		     */
 /*****************************************************************************/
 
-	     
+
 
 static void InternalDumpExpr (ExprNode* Expr)
 /* Dump an expression in UPN */
@@ -467,6 +467,44 @@ static int FuncReferenced (void)
 
 
 
+static int FuncTCount (void)
+/* Handle the .TCOUNT function */
+{
+    /* We have a list of tokens that ends with the closing paren. Skip
+     * the tokens, handling nested braces and count them.
+     */
+    int      Count  = 0;
+    unsigned Parens = 0;
+    while (Parens != 0 || Tok != TOK_RPAREN) {
+
+     	/* Check for end of line or end of input. Since the calling function
+	 * will check for the closing paren, we don't need to print an error
+	 * here, just bail out.
+	 */
+     	if (Tok == TOK_SEP || Tok == TOK_EOF) {
+	    break;
+     	}
+
+	/* One more token */
+	++Count;
+
+	/* Keep track of the nesting level */
+	switch (Tok) {
+	    case TOK_LPAREN:	++Parens;	break;
+	    case TOK_RPAREN:	--Parens;	break;
+	    default:				break;
+	}
+
+	/* Skip the token */
+	NextTok ();
+    }
+
+    /* Return the number of tokens */
+    return Count;
+}
+
+
+
 static int FuncXMatch (void)
 /* Handle the .XMATCH function */
 {
@@ -492,7 +530,7 @@ static ExprNode* Function (int (*F) (void))
     NextTok ();
 
     /* Call the function itself */
-    Result = (F () != 0);
+    Result = F ();
 
     /* Closing brace must follow */
     ConsumeRParen ();
@@ -509,7 +547,7 @@ static ExprNode* Factor (void)
     SymEntry* S;
 
     switch (Tok) {
-
+		  
 	case TOK_INTCON:
 	case TOK_CHARCON:
 	    N = LiteralExpr (IVal);
@@ -618,6 +656,10 @@ static ExprNode* Factor (void)
 
         case TOK_REFERENCED:
 	    N = Function (FuncReferenced);
+	    break;
+
+	case TOK_TCOUNT:
+	    N = Function (FuncTCount);
 	    break;
 
 	case TOK_XMATCH:

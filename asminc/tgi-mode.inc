@@ -6,10 +6,10 @@
 ;*                                                                           */
 ;*                                                                           */
 ;*                                                                           */
-;* (C) 2002      Ullrich von Bassewitz                                       */
-;*               Wacholderweg 14                                             */
-;*               D-70597 Stuttgart                                           */
-;* EMail:        uz@musoftware.de                                            */
+;* (C) 2002-2003 Ullrich von Bassewitz                                       */
+;*               Römerstraße 52                                              */
+;*               D-70794 Filderstadt                                         */
+;* EMail:        uz@cc65.org                                                 */
 ;*                                                                           */
 ;*                                                                           */
 ;* This software is provided 'as-is', without any expressed or implied       */
@@ -34,10 +34,11 @@
 
 
 ; Graphics modes. Zero may not be used as a mode number.
-TGI_MODE_320_200_2              = 1      ; 320x200, 2 colors (b/w)
-TGI_MODE_160_200_4              = 2      ; 160x200, 4 colors
-TGI_MODE_640_200_2		= 3	 ; 640x200, 2 colors (b/w)
-TGI_MODE_640_480_2		= 4	 ; 640x480, 2 colors (b/w)
+TGI_MODE_320_200_2              = 1     ; 320x200, 2 colors (b/w)
+TGI_MODE_160_200_4              = 2     ; 160x200, 4 colors
+TGI_MODE_640_200_2		= 3	; 640x200, 2 colors (b/w)
+TGI_MODE_640_480_2		= 4	; 640x480, 2 colors (b/w)
+TGI_MODE_280_192_6              = 5     ; 280x192, 6 colors
 
 
 

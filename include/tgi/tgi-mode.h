@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2002      Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2002-2003 Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -49,6 +49,7 @@
 #define TGI_MODE_160_200_4      2U      /* 160x200, 4 colors */
 #define TGI_MODE_640_200_2	3U	/* 640x200, 2 colors (b/w) */
 #define TGI_MODE_640_480_2	4U	/* 640x480, 2 colors (b/w) */
+#define TGI_MODE_280_192_6      5U      /* 280x192, 6 colors */
 
 
 

@@ -40,9 +40,9 @@ separate steps work. How to do the example with the cl65 utility is described
 <sect1>Before we start<p>
 
 You will find a copy of the sample modules used in the next section in the
-samples/tutorial directory. Windows users will also find a small batch file in
-this directory named "cc65setup.bat". Be sure to examine and understand the
-commands in this file, then adjust them for your setup, and execute the file.
+samples/tutorial directory. Please check that the compiler and linker can
+find the include library files by setting the environment variables
+<tt/CC65_INC/ and <tt/CC65_LIB/ respectively.
 
 
 <sect1>The sample modules<p>

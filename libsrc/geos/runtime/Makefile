@@ -11,7 +11,7 @@
 	@$(AS) -o $@ $(AFLAGS) $<
 
 C_OBJS	=
-S_OBJS	= call.o condes.o
+S_OBJS	= call.o
 
 all: $(C_OBJS) $(S_OBJS)
 

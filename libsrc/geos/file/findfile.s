@@ -1,12 +1,12 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char FindFile  (char *myName);
 
-	    .import __oserror
+	    .import setoserror
 	    .export _FindFile
 
 	    .include "../inc/jumptab.inc"
@@ -16,6 +16,4 @@ _FindFile:
 	sta r6L
 	stx r6H
 	jsr FindFile
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

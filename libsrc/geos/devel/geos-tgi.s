@@ -303,6 +303,8 @@ INIT:
 ;
 
 DONE:
+	jsr GETERROR		; clear error (if any)
+
 	lda #0
 	jsr SETVIEWPAGE		; switch into viewpage 0
 
@@ -434,6 +436,8 @@ SETCOLOR:
 ;
 
 SETPALETTE:
+	jsr	GETERROR	; clear error (if any)
+
         ldy     #PALETTESIZE - 1
 @L1:    lda     (ptr1),y        ; Copy the palette
         and     #$0F            ; Make a valid color

@@ -1,13 +1,13 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char FollowChain  (struct tr_se *myTrSe, char *buffer);
 
 	    .export _FollowChain
-	    .import popax, __oserror
+	    .import popax, setoserror
 	    .import gettrse
 
 	    .include "../inc/jumptab.inc"
@@ -21,6 +21,4 @@ _FollowChain:
 	sta r1L
 	stx r1H
 	jsr FollowChain
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

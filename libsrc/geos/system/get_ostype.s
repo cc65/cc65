@@ -15,6 +15,7 @@
 	    .include "../inc/geossym2.inc"
 
 get_ostype:
+	    ldx #0
 	    lda version
 	    and #%11110000
 	    cmp #$10
@@ -50,5 +51,6 @@ ntsc:	    lda #$80			; NTSC
 
 modeend:    stx tmp1
 	    ora tmp1
+	    ldx #0
 	    plp                         ; restore interrupt state
 	    rts

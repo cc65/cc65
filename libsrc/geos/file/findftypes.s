@@ -2,12 +2,12 @@
 ;
 ; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99, 30.7.2000
+; 25.12.1999, 2.1.2003
 
 ; char FindFTypes  (char *buffer, char fileType, char fileMax, char *Class);
 
 	    .export _FindFTypes
-	    .import popax, popa, __oserror
+	    .import popax, popa, setoserror
 
 	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
@@ -26,7 +26,7 @@ _FindFTypes:
 	sta r6L
 	stx r6H
 	jsr FindFTypes
-	stx __oserror
+	jsr setoserror
 ; return (fileMax - r7H)
 	lda tmpFileMax
 	sec

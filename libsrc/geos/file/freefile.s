@@ -1,12 +1,12 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char FreeFile  (struct trse myTrSe[]);
 
-	    .import __oserror
+	    .import setoserror
 	    .export _FreeFile
 
 	    .include "../inc/jumptab.inc"
@@ -16,6 +16,4 @@ _FreeFile:
 	sta r9L
 	stx r9H
 	jsr FreeFile
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

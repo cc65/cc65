@@ -1,12 +1,12 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 21.12.99
+; 21.12.1999, 2.1.2003
 
 ; char BlkAlloc (struct tr_se output[], int length);
 
-	    .import popax, __oserror
+	    .import popax, setoserror
 	    .export _BlkAlloc
 
 	    .include "../inc/jumptab.inc"
@@ -19,6 +19,4 @@ _BlkAlloc:
 	sta r4L
 	stx r4H
 	jsr BlkAlloc
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

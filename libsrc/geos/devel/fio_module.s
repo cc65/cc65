@@ -57,6 +57,7 @@ _open:
 	lda	ptr1
 	ldx	ptr1+1
 	jsr	_FindFile	; try to find the file
+	tax
 	bne	@error
 
 	lda	dirEntryBuf + OFF_DE_TR_SC		; tr&se for ReadByte (r1)
@@ -139,7 +140,7 @@ _read:
 	bne	@L2
 	inc	ptr3+1
 
-@L2:	txa			; was there error ?
+@L2:	lda	__oserror	; was there error ?
 	beq	@L3
 	cmp	#BFR_OVERFLOW	; EOF?
 	bne	@error

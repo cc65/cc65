@@ -1,19 +1,16 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char PointRecord  (char recordNum);
 
-	    .import __oserror
+	    .import setoserror
 	    .export _PointRecord
 
 	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
 	
 _PointRecord:
 	jsr PointRecord
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

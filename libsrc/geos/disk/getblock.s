@@ -1,12 +1,12 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 21.12.99
+; 21.12.1999, 2.1.2003
 
 ; char GetBlock (struct tr_se *myTS, char *buffer);
 
-	    .import popax, __oserror
+	    .import popax, setoserror
 	    .import gettrse
 	    .export _GetBlock
 
@@ -21,6 +21,4 @@ _GetBlock:
 	sta r1L
 	stx r1H
 	jsr GetBlock
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

@@ -1,8 +1,8 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char DoDlgBox         (char *myParamString);
 
@@ -15,5 +15,6 @@ _DoDlgBox:
 	    sta r0L
 	    stx r0H
 	    jsr DoDlgBox
+	    ldx #0
 	    lda r0L
 	    rts

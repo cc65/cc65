@@ -1,12 +1,12 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 21.12.99
+; 21.12.1999, 2.1.2003
 
 ; char FreeBlock (struct tr_se *TS);
 
-	    .import gettrse, __oserror
+	    .import gettrse, setoserror
 	    .export _FreeBlock
 
 	    .include "../inc/jumptab.inc"
@@ -17,6 +17,4 @@ _FreeBlock:
 	sta r6L
 	stx r6H
 	jsr FreeBlock
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

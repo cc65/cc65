@@ -290,7 +290,7 @@ Draws single point on the screen, no matter what the current pattern is.
 <p>
 <tt/char TestPoint (struct pixel *myPixel)/
 <p>
-This function tests if given pixel is set and returns true or false.
+This function tests if given pixel is set and returns <tt/true/ (non-zero) or <tt/false/ (zero).
 
 <sect2>Character and string output
 
@@ -624,6 +624,7 @@ GEOSLib function (if its type is <tt/char/), but in all cases last error is save
 location. If it is nonzero - an error occured. See <tt/gdisk.h/ for the list of possible errorcodes.
 You need to include <tt/errno.h/ to get <tt/__oserror/, together with standard <tt/errno/. The
 latter gives less verbose, but still usable information and can be used with <tt/strerror/.
+Probably you will get more information using <tt/stroserror/ in similar way.
 <p>
 For passing parameters use almost always pointer to your data e.g. <tt/ReadBuff (&amp;myTrSe)/.
 
@@ -1038,7 +1039,7 @@ is also copied.
 <tt/char CmpString (char *s1, char *s2)/
 <p>
 This function compares string <tt/s1/ to <tt/s2/ for equality - this is case sensitive, and both
-strings have to have the same length. It returns either <tt/true/ or <tt/false/.
+strings have to have the same length. It returns either <tt/true/ (non-zero) or <tt/false/ (zero).
 
 <sect2>CopyFString and CmpFString
 <p>

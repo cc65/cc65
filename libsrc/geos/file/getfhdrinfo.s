@@ -1,12 +1,12 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char GetFHdrInfo  (struct filehandle *myFile);
 
-	    .import __oserror
+	    .import setoserror
 	    .export _GetFHdrInfo
 
 	    .include "../inc/jumptab.inc"
@@ -16,6 +16,4 @@ _GetFHdrInfo:
 	sta r9L
 	stx r9H
 	jsr GetFHdrInfo
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

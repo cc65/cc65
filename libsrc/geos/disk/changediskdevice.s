@@ -1,19 +1,16 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 21.12.99
+; 21.12.1999, 2.1.2003
 
 ; char ChangeDiskDevice (char newDriveNumber);
 
-	    .import __oserror
+	    .import setoserror
 	    .export _ChangeDiskDevice
 
 	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
 	
 _ChangeDiskDevice:
 	jsr ChangeDiskDevice
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

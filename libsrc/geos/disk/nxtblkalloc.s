@@ -1,12 +1,12 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 21.12.99
+; 21.12.1999, 2.1.2003
 
 ; char NxtBlkAlloc (struct tr_se *startTS, struct tr_se output[], int length );
 
-	    .import popax, __oserror
+	    .import popax, setoserror
 	    .import gettrse
 	    .importzp ptr4
 	    .export _NxtBlkAlloc
@@ -25,6 +25,4 @@ _NxtBlkAlloc:
 	sta r3L
 	stx r3H
 	jsr NxtBlkAlloc
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

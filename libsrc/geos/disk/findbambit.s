@@ -1,13 +1,14 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 21.12.99
+; 21.12.1999, 2.1.2003
 
 ; char FindBAMBit (struct tr_se *TS);
 ; (might be called inUSE (if (!inUSE(block))))
 
 	    .import gettrse
+	    .import return0, return1
 	    .export _FindBAMBit
 
 	    .include "../inc/jumptab.inc"
@@ -19,7 +20,5 @@ _FindBAMBit:
 	stx r6H
 	jsr FindBAMBit
 	bne inUse
-	lda #0
-	rts
-inUse:	lda #$ff 
-	rts
+	jmp return0
+inUse:	jmp return1

@@ -1,19 +1,16 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 21.12.99
+; 21.12.1999, 2.1.2003
 
 ; char NewDisk (void);
 
-	    .import __oserror
+	    .import setoserror
 	    .export _NewDisk
 
 	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
 	
 _NewDisk:
 	jsr NewDisk
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

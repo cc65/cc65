@@ -1,13 +1,13 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char ReadRecord  (char *buffer, int length);
 
 	    .export _ReadRecord
-	    .import popax, __oserror
+	    .import popax, setoserror
 
 	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
@@ -19,6 +19,4 @@ _ReadRecord:
 	sta r7L
 	stx r7H
 	jsr ReadRecord
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

@@ -51,6 +51,7 @@ _mse_storex:
 	stx	mouseRight+1
 _mse_initend:
 	lda 	#0
+	tax
 ; --------------------------------------------------------------------------
 ;
 ; void mouse_done (void);
@@ -178,6 +179,7 @@ _mouse_move:
 ;
 
 _mouse_buttons:
+	ldx	#0
 	lda	pressFlag
 	and	#SET_MOUSE
 	lsr

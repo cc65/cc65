@@ -1,19 +1,16 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char PreviousRecord  (void);
 
-	    .import __oserror
+	    .import setoserror
 	    .export _PreviousRecord
 
 	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
 
 _PreviousRecord:
 	jsr PreviousRecord
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

@@ -1,19 +1,16 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 21.12.99
+; 21.12.99, 2.1.2003
 
 ; char PutDirHead (void);
 
-	    .import __oserror
+	    .import setoserror
 	    .export _PutDirHead
 
 	    .include "../inc/jumptab.inc"
-	    .include "../inc/geossym.inc"
 	
 _PutDirHead:
 	jsr PutDirHead
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

@@ -1,12 +1,12 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 26.10.99
+; 26.10.1999, 2.1.2003
 
 ; char WriteBuff (struct tr_se*);
 
-	    .import __oserror
+	    .import setoserror
 	    .import gettrse
 	    .export _WriteBuff
 
@@ -18,6 +18,4 @@ _WriteBuff:
 	sta r1L
 	stx r1H
 	jsr WriteBuff
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

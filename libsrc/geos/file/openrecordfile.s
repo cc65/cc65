@@ -1,12 +1,12 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char OpenRecordFile  (char *myName);
 
-	    .import __oserror
+	    .import setoserror
 	    .export _OpenRecordFile
 
 	    .include "../inc/jumptab.inc"
@@ -16,6 +16,4 @@ _OpenRecordFile:
 	sta r0L
 	stx r0H
 	jsr OpenRecordFile
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

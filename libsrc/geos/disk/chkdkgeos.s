@@ -1,12 +1,12 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 21.12.99
+; 21.12.1999, 2.1.2003
 
 ; char ChkDkGEOS (void);
 
-	    .import __oserror
+	    .import setoserror
 	    .export _ChkDkGEOS
 
 	    .include "../inc/jumptab.inc"
@@ -14,6 +14,6 @@
 	
 _ChkDkGEOS:
 	jsr ChkDkGEOS
-	stx __oserror
+	jsr setoserror
 	lda isGEOS
 	rts

@@ -1,12 +1,12 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char DeleteRecord  (void);
 
-	    .import __oserror
+	    .import setoserror
 	    .export _DeleteRecord
 
 	    .include "../inc/jumptab.inc"
@@ -14,6 +14,4 @@
 	
 _DeleteRecord:
 	jsr DeleteRecord
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

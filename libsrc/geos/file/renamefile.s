@@ -1,17 +1,17 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char RenameFile  (char *source, char *target);
 
 	    .export _RenameFile
-	    .import popax, __oserror
+	    .import popax, setoserror
 
 	    .include "../inc/jumptab.inc"
 	    .include "../inc/geossym.inc"
-	
+
 _RenameFile:
 	sta r0L
 	stx r0H
@@ -19,6 +19,4 @@ _RenameFile:
 	sta r6L
 	stx r6H
 	jsr RenameFile
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

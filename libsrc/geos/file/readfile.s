@@ -1,13 +1,13 @@
 
 ;
-; Maciej 'YTM/Alliance' Witkowiak
+; Maciej 'YTM/Elysium' Witkowiak
 ;
-; 25.12.99
+; 25.12.1999, 2.1.2003
 
 ; char ReadFile  (struct tr_se *myTS, char *buffer, int length);
 
 	    .export _ReadFile
-	    .import popax, __oserror
+	    .import popax, setoserror
 	    .import gettrse
 
 	    .include "../inc/jumptab.inc"
@@ -24,6 +24,4 @@ _ReadFile:
 	sta r1L
 	stx r1H
 	jsr ReadFile
-	stx __oserror
-	txa
-	rts
+	jmp setoserror

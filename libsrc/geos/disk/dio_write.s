@@ -9,7 +9,7 @@
 ; sectnum_t - 16bit
 ;
 
-	.import		dio_params, __oserror
+	.import		dio_params, setoserror
  	.export		_dio_write
 	.include "../inc/geossym.inc"
 	.include "../inc/jumptab.inc"
@@ -18,8 +18,6 @@
 
 	jsr dio_params
 	jsr WriteBlock
-	stx __oserror
-	txa
-	rts
+	jmp setoserror
 
 .endproc

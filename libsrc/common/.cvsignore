@@ -1,7 +1,6 @@
 _afailed.s
 _fopen.s
 _hextab.s
-_printf.s
 abort.s
 bsearch.s
 calloc.s

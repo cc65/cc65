@@ -20,9 +20,13 @@ typedef void (*outfunc) (struct outdesc* desc, const char* buf, unsigned count);
 
 
 
+/* Control structure passed to the low level worker function.
+ * Beware: This function will access the structure on the assembly level,
+ * so check this when altering the structure.
+ */
 struct outdesc {
-    outfunc    	fout;		/* Routine used to output data */
     int		ccount;		/* Character counter */
+    outfunc    	fout;		/* Routine used to output data */
     void*	ptr;        	/* Data internal to print routine */
     unsigned	uns;		/* Data internal to print routine */
 };

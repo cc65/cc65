@@ -2475,6 +2475,14 @@ void g_mul (unsigned flags, unsigned long val)
      		     	    AddCodeLine ("adc tmp1");
      		     	    return;
 
+     		     	case 6:
+     		     	    AddCodeLine ("sta tmp1");
+     		     	    AddCodeLine ("asl a");
+     		     	    AddCodeLine ("clc");
+     		     	    AddCodeLine ("adc tmp1");
+			    AddCodeLine ("asl a");
+     		     	    return;
+
      		     	case 10:
      		     	    AddCodeLine ("sta tmp1");
      		     	    AddCodeLine ("asl a");
@@ -2494,6 +2502,15 @@ void g_mul (unsigned flags, unsigned long val)
 		        return;
 		    case 5:
 		        AddCodeLine ("jsr mulax5");
+		        return;
+		    case 6:
+		        AddCodeLine ("jsr mulax6");
+		        return;
+		    case 7:
+		        AddCodeLine ("jsr mulax7");
+		        return;
+		    case 9:
+		        AddCodeLine ("jsr mulax9");
 		        return;
 		    case 10:
 		        AddCodeLine ("jsr mulax10");

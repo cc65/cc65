@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -45,6 +45,8 @@
 #  include <c128.h>
 #elif defined(__PLUS4__) && !defined(_PLUS4_H)
 #  include <plus4.h>
+#elif defined(__CBM510__) && !defined(_CBM510_H)
+#  include <cbm510.h>
 #elif defined(__CBM610__) && !defined(_CBM610_H)
 #  include <cbm610.h>
 #elif defined(__PET__) && !defined(_PET_H)

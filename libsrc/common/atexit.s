@@ -7,7 +7,7 @@
       	.export		_atexit
        	.destructor	doatexit, 5
 	.import		__errno
- 	.import	 	jmpvec
+ 	.import	 	callax
 
 	.include	"errno.inc"
 
@@ -58,12 +58,11 @@
        	beq    	@L9	 		; Jump if done
  	dey
  	lda	exitfunc_table,y
-   	sta	jmpvec+2
+   	tax
    	dey
    	lda	exitfunc_table,y
-     	sta	jmpvec+1
    	sty	exitfunc_index
- 	jsr	jmpvec			; Call the function
+       	jsr    	callax                  ; Call the function
 .ifpc02
 	bra	doatexit
 .else
@@ -72,7 +71,7 @@
 
 @L9:	rts
 
-.endproc
+.endproc                      
 
 
 

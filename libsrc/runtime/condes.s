@@ -15,7 +15,7 @@
 
        	.export	initlib, donelib, condes
 
-        .import jmpvec
+        .import callax
        	.import	__CONSTRUCTOR_TABLE__, __CONSTRUCTOR_COUNT__
 	.import	__DESTRUCTOR_TABLE__, __DESTRUCTOR_COUNT__
 
@@ -58,18 +58,17 @@
 
 	sta   	getbyt+1
 	stx	getbyt+2
-	sty	index
+	sty	index 
 
 loop:	ldy	index
      	beq	done
 	dey
 	jsr	getbyt
-	sta	jmpvec+2
+        tax
 	dey
 	jsr	getbyt
-	sta	jmpvec+1
 	sty	index
-	jsr	jmpvec
+	jsr	callax
 .ifpc02
 	bra	loop
 .else

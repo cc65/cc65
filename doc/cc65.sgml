@@ -194,7 +194,7 @@ Here is a description of all the command line options:
   <item>atari
   <item>c64
   <item>c128
-  <item>plus4 
+  <item>plus4
   <item>cbm510 (CBM-II series with 40 column video)
   <item>cbm610 (all CBM-II II computers with 80 column video)
   <item>pet (all CBM PET systems except the 2001)
@@ -399,22 +399,18 @@ This cc65 version has some extensions to the ISO C standard.
      	file. The syntax is
 
 	<tscreen><verb>
-	asm (&lt;string literal&gt;) ;
+	asm (&lt;string literal&gt;[, optional parameters]) ;
      	</verb></tscreen>
      	or
 	<tscreen><verb>
-       	__asm__ (&lt;string literal&gt;) ;
+       	__asm__ (&lt;string literal&gt;[, optional parameters]) ;
      	</verb></tscreen>
 
      	The first form is in the user namespace and is disabled if the <tt/-A/
      	switch is given.
 
-     	The given string is inserted literally into the output file, and a
-     	newline is appended. The statements in this string are not checked by
-     	the compiler, so be careful!
-
-     	The asm statement may be used inside a function and on global file
-     	level.
+	There is a whole section covering inline assembler statements,
+	<ref id="inline-asm" name="see there">.
 	<p>
 
 <item>	There is a special calling convention named "fastcall". This calling
@@ -724,6 +720,80 @@ id="pragma-staticlocals"<p>
       	#pragma zpsym ("foo");	/* foo is in the zeropage */
   </verb></tscreen>
 
+
+
+
+<sect>Inline assembler<label id="inline-asm"><p>
+
+The compiler allows to insert assembler statements into the output file. The
+syntax is
+
+<tscreen><verb>
+      	asm (&lt;string literal&gt;[, optional parameters]) ;
+</verb></tscreen>
+or
+<tscreen><verb>
+       	__asm__ (&lt;string literal&gt;[, optional parameters]) ;
+</verb></tscreen>
+<p>
+
+The first form is in the user namespace and is disabled by <tt><ref
+id="option-A" name="-A"></tt>.
+
+The asm statement may be used inside a function and on global file level. An
+inline assembler statement is a primary expression, so it may also be used as
+part of an expression. Please note however that the result of an expression
+containing just an inline assembler statement is always of type <tt/void/.
+
+The contents of the string literal are preparsed by the compiler and inserted
+into the generated assembly output, so that the can be further processed by
+the backend and especially the optimizer. For this reason, the compiler does
+only allow regular 6502 opcodes to be used with the inline assembler. Pseudo
+instructions (like <tt/.import/, <tt/.byte/ and so on) are <em/not/ allowed,
+even if the ca65 assembler (which is used to translate the generated assembler
+code) would accept them. The builtin inline assembler is not a replacement for
+the full blown macro assembler which comes with the compiler.
+
+Note: Inline assembler statements are subject to all optimizations done by the
+compiler. There is currently no way to protect an inline assembler statement
+from being moved or removed completely by the optimizer. If in doubt, check
+the generated assembler output, or disable optimizations.
+
+The string literal may contain format specifiers from the following list. For
+each format specifier, an argument is expected which is inserted instead of
+the format specifier before passing the assembly code line to the backend.
+
+<itemize>
+  <item><tt/%b/ - Numerical 8 bit value
+  <item><tt/%w/ - Numerical 16 bit value
+  <item><tt/%l/ - Numerical 32 bit value
+  <item><tt/%v/ - Assembler name of a (global) variable
+  <item><tt/%o/ - Stack offset of a (local) variable
+  <item><tt/%%/ - The % sign itself
+</itemize><p>
+
+Using these format specifiers, you can access C <tt/#defines/, variables or
+similar stuff from the inline assembler. For example, to load the value of
+a C <tt/#define/ into the Y register, one would use
+
+<tscreen><verb>
+      	#define OFFS  23
+       	__asm__ ("ldy #%b", OFFS);
+</verb></tscreen>
+
+Or, to access a struct member of a static variable:
+
+<tscreen><verb>
+      	typedef struct {
+      	    unsigned char x;
+      	    unsigned char y;
+      	    unsigned char color;
+      	} pixel_t;
+      	static pixel_t pixel;
+       	__asm__ ("ldy #%b", offsetof(pixel, color));
+      	__asm__ ("lda %v,y", pixel);
+</verb></tscreen>
+<p>   
 
 
 

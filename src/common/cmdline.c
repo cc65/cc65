@@ -240,7 +240,7 @@ void InitCmdLine (int* aArgCount, char** aArgVec[], const char* aProgName)
 void UnknownOption (const char* Opt)
 /* Print an error about an unknown option and die. */
 {
-    AbEnd ("Unknown option: %s\n", Opt);
+    AbEnd ("Unknown option: %s", Opt);
 }
 
 
@@ -248,7 +248,7 @@ void UnknownOption (const char* Opt)
 void NeedArg (const char* Opt)
 /* Print an error about a missing option argument and exit. */
 {
-    AbEnd ("Option requires an argument: %s\n", Opt);
+    AbEnd ("Option requires an argument: %s", Opt);
 }
 
 
@@ -256,7 +256,7 @@ void NeedArg (const char* Opt)
 void InvDef (const char* Def)
 /* Print an error about an invalid definition and die */
 {
-    AbEnd ("Invalid definition: `%s'\n", Def);
+    AbEnd ("Invalid definition: `%s'", Def);
 }
 
 
@@ -319,3 +319,4 @@ void LongOption (unsigned* ArgNum, const LongOpt* OptTab, unsigned OptCount)
 
 
 
+                                    

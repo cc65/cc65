@@ -240,20 +240,23 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		    /* Skip the '=' */
 		    NextToken ();
 
-		    /* Get the expression into the primary */
-		    expression1 (&lval);
-
-		    /* Make type adjustments if needed */
-		    assignadjust (Decl.Type, &lval);
-
 		    /* Setup the type flags for the assignment */
-		    flags = TypeOf (Decl.Type);
-		    if (Size == 1) {
-			flags |= CF_FORCECHAR;
+		    flags = Size == 1? CF_FORCECHAR : CF_NONE;
+
+	      	    /* Get the expression into the primary */
+		    if (evalexpr (flags, hie1, &lval) == 0) {
+			/* Constant expression. Adjust the types */
+			assignadjust (Decl.Type, &lval);
+			flags |= CF_CONST;
+			/* Load it into the primary */
+			exprhs (flags, 0, &lval);
+		    } else {
+			/* Expression is not constant and in the primary */
+			assignadjust (Decl.Type, &lval);
 		    }
 
 		    /* Store the value into the variable */
-		    g_putstatic (flags, SymData, 0);
+		    g_putstatic (flags | TypeOf (Decl.Type), SymData, 0);
 
 		    /* Mark the variable as referenced */
 		    SC |= SC_REF;

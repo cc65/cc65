@@ -31,11 +31,9 @@
 ; File is not open
 
         lda     #EINVAL
-        sta     __errno
-        ldx     #0
-        stx     __errno+1
-        dex
-        txa
+        jsr     __seterrno
+        lda     #$FF            ; Return -1
+        tax
         rts
 
 ; File is open. Reset the flags and close the file.

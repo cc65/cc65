@@ -36,9 +36,7 @@
 ; Failed to allocate a file stream
 
         lda     #EMFILE
-        sta     __errno
-        lda     #0
-        sta     __errno+1
+        jsr     __seterrno      ; Set __errno, will return 0 in A
         tax
         rts                     ; Return zero
 

@@ -38,10 +38,8 @@
 
 ; File not open
 
-   	lda  	#EINVAL
-   	sta  	__errno
-   	lda  	#0
-   	sta  	__errno+1
+   	lda    	#EINVAL
+        jsr     __seterrno
 @L1:    jsr     incsp6
         jmp     return0
 

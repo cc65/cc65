@@ -52,11 +52,9 @@
 
 @L1:    ldy     sreg+1
         bpl     @L2
-
-        lda     #$00
-        sta     __errno+1
+                  
         lda     #ENOSYS         ; Function not implemented
-        sta     __errno
+        jsr     __seterrno      ; Set __errno
 
 ; Reload the low byte of the result and return
 

@@ -67,6 +67,7 @@ S_OBJS = 	_cwd.o          \
                 _heapmemavail.o \
 	 	_oserror.o	\
 		_printf.o 	\
+                _seterrno.o     \
 		_swap.o	  	\
 	 	_sys.o	  	\
 		abs.o	  	\

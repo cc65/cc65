@@ -69,10 +69,8 @@
 
 invmode:
         lda     #EINVAL
-        sta     __errno
-        lda     #0
-        sta     __errno+1
-        tax
+        jsr     __seterrno      ; Set __errno, returns zero in A
+        tax                     ; a/x = 0
         jmp     incsp4
 
 ; Mode string successfully parsed. Store the binary mode onto the stack in

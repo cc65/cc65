@@ -38,10 +38,8 @@
 ; Error, no space left
 
 @Error:	lda	#ENOSPC	      	; No space left
-      	sta	__errno
-      	ldx	#$00
-      	stx	__errno+1
-      	dex			; Make return value -1
+        jsr     __seterrno
+       	ldx     #$FF            ; Return -1
       	txa
       	rts
 

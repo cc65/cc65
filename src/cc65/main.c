@@ -44,6 +44,7 @@
 #include "cmdline.h"
 #include "fname.h"
 #include "target.h"
+#include "tgttrans.h"
 #include "version.h"
 #include "xmalloc.h"
 
@@ -173,7 +174,10 @@ static void SetSys (const char* Sys)
 
      	default:
        	    AbEnd ("Unknown target system type");
-    }
+    }	    
+
+    /* Initialize the translation tables for the target system */
+    TgtTranslateInit ();
 }
 
 

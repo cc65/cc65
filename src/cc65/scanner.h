@@ -198,6 +198,9 @@ void ConsumeColon (void);
 void ConsumeSemi (void);
 /* Check for a semicolon and skip it. */
 
+void ConsumeComma (void);
+/* Check for a comma and skip it. */
+
 void ConsumeLParen (void);
 /* Check for a left parenthesis and skip it */
 

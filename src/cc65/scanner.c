@@ -11,7 +11,7 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
-	  
+
 /* common */
 #include "tgttrans.h"
 
@@ -331,7 +331,7 @@ static void CharConst (void)
     nxtval  = SignExtendChar (TgtTranslateChar (C));
 
     /* Character constants have type int */
-    nxttype = type_int;	       			
+    nxttype = type_int;
 }
 
 
@@ -799,6 +799,22 @@ void ConsumeSemi (void)
     } else {
 	Error (ERR_SEMICOLON_EXPECTED);
 	if (curtok == TOK_COLON || curtok == TOK_COMMA) {
+	    NextToken ();
+	}
+    }
+}
+
+
+
+void ConsumeComma (void)
+/* Check for a comma and skip it. */
+{
+    /* Try do be smart about typos... */
+    if (CurTok.Tok == TOK_COMMA) {
+	NextToken ();
+    } else {
+	Error (ERR_COMMA_EXPECTED);
+	if (CurTok.Tok == TOK_SEMI) {
 	    NextToken ();
 	}
     }

@@ -21,6 +21,7 @@ OBJS =	anonname.o	\
 	cpu.o		\
 	datatype.o	\
 	declare.o      	\
+	declattr.o	\
 	error.o	 	\
 	expr.o	 	\
 	exprheap.o     	\

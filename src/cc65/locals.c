@@ -33,8 +33,10 @@
 
 
 
-#include "../common/xmalloc.h"
-
+/* common */
+#include "xmalloc.h"
+	  
+/* cc65 */
 #include "anonname.h"
 #include "asmlabel.h"
 #include "codegen.h"

@@ -76,6 +76,7 @@ OBJS =	anonname.obj	\
 	cpu.obj	 	\
 	datatype.obj	\
 	declare.obj	\
+	declattr.obj	\
 	error.obj	\
 	expr.obj 	\
 	exprheap.obj   	\
@@ -134,6 +135,7 @@ FILE compile.obj
 FILE cpu.obj
 FILE datatype.obj
 FILE declare.obj
+FILE declattr.obj
 FILE error.obj
 FILE expr.obj
 FILE exprheap.obj

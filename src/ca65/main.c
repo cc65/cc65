@@ -42,6 +42,7 @@
 /* common */
 #include "cmdline.h"
 #include "target.h"
+#include "tgttrans.h"
 #include "version.h"
 
 /* ca65 */
@@ -529,7 +530,7 @@ int main (int argc, char* argv [])
 		    LongOption (&I, OptTab, sizeof(OptTab)/sizeof(OptTab[0]));
 		    break;
 
-       		case 'g':
+       	    	case 'g':
        		    OptDebugInfo (Arg, 0);
        		    break;
 
@@ -574,7 +575,7 @@ int main (int argc, char* argv [])
        		    break;
 
        	        case 'V':
-    		    OptVersion (Arg, 0);
+    	    	    OptVersion (Arg, 0);
        		    break;
 
        	        case 'W':
@@ -606,6 +607,9 @@ int main (int argc, char* argv [])
 	fprintf (stderr, "%s: No input files\n", ProgName);
 	exit (EXIT_FAILURE);
     }
+
+    /* Intialize the target translation tables */
+    TgtTranslateInit ();
 
     /* Initialize the scanner, open the input file */
     InitScanner (InFile);

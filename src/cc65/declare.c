@@ -18,6 +18,7 @@
 #include "anonname.h"
 #include "codegen.h"
 #include "datatype.h"
+#include "declattr.h"
 #include "error.h"
 #include "expr.h"
 #include "funcdesc.h"
@@ -621,7 +622,7 @@ static void ParseAnsiParamList (FuncDesc* F)
 
 	DeclSpec 	Spec;
 	Declaration 	Decl;
-
+	DeclAttr	Attr;
 
       	/* Allow an ellipsis as last parameter */
 	if (curtok == TOK_ELLIPSIS) {
@@ -657,6 +658,9 @@ static void ParseAnsiParamList (FuncDesc* F)
     	    /* Clear defined bit on nonames */
     	    Spec.StorageClass &= ~SC_DEF;
     	}
+
+	/* Parse an attribute */
+	ParseAttribute (&Decl, &Attr);
 
 	/* Create a symbol table entry */
 	AddLocalSym (Decl.Ident, ParamTypeCvt (Decl.Type), Spec.StorageClass, 0);

@@ -682,7 +682,7 @@ HaveArg:
 	lda	Prec+1
 	tay
 	sbc	ArgLen+1
-	bcc	@L1
+        bcs	@L1
 	stx	ArgLen
 	sty	ArgLen+1
 

@@ -37,6 +37,7 @@
 #include <string.h>
 
 /* common */
+#include "chartype.h"
 #include "coll.h"
 
 /* cc65 */
@@ -308,6 +309,15 @@ void GetFuncInfo (const char* Name, unsigned short* Use, unsigned short* Chg)
      	    /* Done */
      	    return;
      	}
+
+    } else if (IsDigit (Name[0]) || Name[0] == '$') {
+
+        /* A call to a numeric address. Assume that all CPU registers get
+         * used, but no memory contents are changed.
+         */
+        *Use = REG_AXY;
+        *Chg = REG_AXY;
+        return;
 
     } else {
 
@@ -629,7 +639,7 @@ unsigned GetKnownReg (unsigned Use, const RegContents* RC)
     }
 }
 
-                              
+
 
 static cmp_t FindCmpCond (const char* Code, unsigned CodeLen)
 /* Search for a compare condition by the given code using the given length */

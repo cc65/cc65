@@ -9,13 +9,14 @@
 	.import	   	cursor
 
   	.include   	"cbm510.inc"
+        .include        "extzp.inc"
 
 
 ; ------------------------------------------------------------------------
 
 .proc	_cgetc
 
-    	lda	KeyIndex		; Characters waiting?
+    	lda	keyidx		        ; Characters waiting?
        	bne    	L3			; Jump if so
 
 ; Switch on the cursor if needed
@@ -24,7 +25,7 @@
   	pha
   	lda	cursor
   	jsr	setcursor
-L1:	lda	KeyIndex
+L1:	lda	keyidx
   	beq	L1
   	ldx	#0
     	pla
@@ -36,14 +37,14 @@ L2:    	txa
 ; Read the character from the keyboard buffer
 
 L3:    	ldx    	#$00		; Get index
-       	ldy    	KeyBuf		; Get first character in the buffer
+       	ldy    	keybuf		; Get first character in the buffer
        	sei
-L4:    	lda    	KeyBuf+1,x	; Move up the remaining chars
-       	sta    	KeyBuf,x
+L4:    	lda    	keybuf+1,x	; Move up the remaining chars
+       	sta    	keybuf,x
        	inx
-       	cpx    	KeyIndex
+       	cpx    	keyidx
        	bne    	L4
-       	dec    	KeyIndex
+       	dec    	keyidx
        	cli
 
        	ldx    	#$00		; High byte
@@ -61,7 +62,7 @@ L4:    	lda    	KeyBuf+1,x	; Move up the remaining chars
        	tax			       	; On or off?
        	bne    	@L9		       	; Go set it on
     	lda	CURS_FLAG	       	; Is the cursor currently off?
-       	bne    	@L8			; Jump if yes
+       	bne    	@L8   			; Jump if yes
     	lda	#1
     	sta	CURS_FLAG		; Mark it as off
     	lda	CURS_STATE		; Cursor currently displayed?
@@ -146,5 +147,6 @@ curset:	sta	(CRAM_PTR),y	       	; Store cursor color
 curend:	rts
 
 .endproc
+
 
 

@@ -6,6 +6,7 @@
 	.import		plot
 
 	.include	"cbm510.inc"
+        .include        "extzp.inc"
 
 ; ------------------------------------------------------------------------
 ; void __fastcall__ clrscr (void);

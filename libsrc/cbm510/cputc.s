@@ -8,10 +8,14 @@
     	.export	       	_cputcxy, _cputc, cputdirect, putchar
 	.export		newline, plot
 
-        .import         PLOT
 	.import		popa, _gotoxy
+        .import         __VIDRAM_START__
+        .import         CURS_X: zp, CURS_Y: zp, CHARCOLOR: zp, RVS: zp
+        .import         SCREEN_PTR: zp, CRAM_PTR: zp
 
 	.include	"cbm510.inc"
+
+        .macpack        generic
 
 ; ------------------------------------------------------------------------
 ;
@@ -59,38 +63,32 @@ advance:
 L3:	sty	CURS_X
    	rts
 
-newline:
-   	clc
-   	lda	#XSIZE
-   	adc	SCREEN_PTR
-   	sta	SCREEN_PTR
-   	bcc	L4
-   	inc	SCREEN_PTR+1
-   	clc
-L4:	lda    	#XSIZE
-   	adc	CRAM_PTR
-   	sta	CRAM_PTR
-   	bcc	L5
-   	inc	CRAM_PTR+1
-L5:	inc	CURS_Y
-   	rts
-
 ; Handle character if high bit set
 
-L10:	and	#$7F
+L10:   	and	#$7F
        	cmp    	#$7E 	  	; PI?
-	bne	L11
-	lda	#$5E 	  	; Load screen code for PI
-	bne	cputdirect
-L11:	ora	#$40
-	bne	cputdirect
+       	bne	L11
+       	lda	#$5E 	  	; Load screen code for PI
+       	bne	cputdirect
+L11:   	ora	#$40
+       	bne	cputdirect      ; Branch always
+
+; Move the cursor into the next line
+
+newline:
+        inc	CURS_Y
 
 ; Set cursor position, calculate RAM pointers
 
-plot:	ldy	CURS_X
-	ldx	CURS_Y
-	clc
-	jmp	PLOT		; Set the new cursor
+plot:  	ldx	CURS_Y
+       	lda    	LineLSBTab,x
+       	sta    	SCREEN_PTR
+       	sta	CRAM_PTR
+       	lda    	LineMSBTab,x
+       	sta    	SCREEN_PTR+1
+       	add    	#.hibyte(COLOR_RAM - __VIDRAM_START__)
+       	sta	CRAM_PTR+1
+       	rts
 
 ; Write one character to the screen without doing anything else, return X
 ; position in Y
@@ -107,3 +105,20 @@ putchar:
 	stx	IndReg
 	rts
 
+; -------------------------------------------------------------------------
+; Low bytes of the start address of the screen lines
+
+.rodata
+
+LineLSBTab:
+	.repeat 25, I
+       	.byte   .lobyte(__VIDRAM_START__ + I * 40)
+	.endrep
+
+; -------------------------------------------------------------------------
+; High bytes of the start address of the screen lines
+
+LineMSBTab:
+	.repeat 25, I
+	.byte   .hibyte(__VIDRAM_START__ + I * 40)
+	.endrep

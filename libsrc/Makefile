@@ -157,7 +157,7 @@ cbm510lib:
 	done
 	mv cbm510/crt0.o cbm510.o
 	cp cbm510/*.emd .
-	cp cbm510/*.joy .
+	cp cbm510/cbm510-stdjoy.joy cbm510-std.joy
 	cp cbm510/cbm510-stdser.ser cbm510-std.ser
 
 #-----------------------------------------------------------------------------

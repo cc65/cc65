@@ -7,9 +7,9 @@
 
        	.export	      	_set_brk, _reset_brk
        	.export	       	_brk_a, _brk_x, _brk_y, _brk_sr, _brk_pc
-	.import	      	_atexit
+	.import	      	_atexit, BRKVec
 
-	.include   	"cbm510.inc"
+	.include	"cbm510.inc"
 
 
 .bss
@@ -74,6 +74,8 @@ L1:	lda	#<brk_handler	; Set the break vector to our routine
 
 .proc	brk_handler
 
+        pla
+	sta	_brk_01
 	pla
 	sta	_brk_y
 	pla
@@ -90,15 +92,11 @@ L1:	lda	#<brk_handler	; Set the break vector to our routine
 	pla	    	 	; PC high
 	sbc	#0
 	sta	_brk_pc+1
-	lda	IndReg
-	sta	_brk_01
-	lda	ExecReg
-	sta	IndReg
 
 	jsr	uservec	 	; Call the user's routine
 
 	lda	_brk_01
-	sta	IndReg
+        sta     IndReg
 
 	lda	_brk_pc+1
 	pha

@@ -6,13 +6,12 @@
 
    	.export	     	_exit
 
-     	.import	   	_clrscr, initlib, donelib
+     	.import	   	_clrscr, initlib, donelib, condes
      	.import	     	push0, callmain
 	.import	   	__CHARRAM_START__, __CHARRAM_SIZE__, __VIDRAM_START__
-        .import         __EXTZP_RUN__, __EXTZP_SIZE__
-	.import	       	__BSS_RUN__, __BSS_SIZE__
-     	.import		irq, nmi
-       	.import	       	k_irq, k_nmi, PLOT, UDTIM, SCNKEY
+	.import	       	__BSS_RUN__, __BSS_SIZE__, __EXTZP_RUN__
+	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
+	.import		scnkey, UDTIM
 
      	.include     	"zeropage.inc"
         .include        "extzp.inc"
@@ -48,30 +47,48 @@
 ; that is overwritten later.
 ;
 
-.code
+.segment        "BASICHDR"
 
-; To make things more simple, make the code of this module absolute.
-
-   	.org	$0001
-Head:  	.byte  	$03,$00,$11,$00,$0a,$00,$81,$20,$49,$b2,$30,$20,$a4,$20,$34,$00
+        .byte  	$03,$00,$11,$00,$0a,$00,$81,$20,$49,$b2,$30,$20,$a4,$20,$34,$00
    	.byte	$19,$00,$14,$00,$87,$20,$4a,$00,$27,$00,$1e,$00,$97,$20,$32,$35
    	.byte	$36,$aa,$49,$2c,$4a,$00,$2f,$00,$28,$00,$82,$20,$49,$00,$39,$00
    	.byte	$32,$00,$9e,$20,$32,$35,$36,$00,$4f,$00,$3c,$00,$83,$20,$31,$32
    	.byte	$30,$2c,$31,$36,$39,$2c,$30,$2c,$31,$33,$33,$2c,$30,$00,$00,$00
 
+;------------------------------------------------------------------------------
+; A table that contains values that must be transfered from the system zero
+; page into out zero page. Contains pairs of bytes, first one is the address
+; in the system ZP, second one is our ZP address. The table goes into page 2,
+; but is declared here, because it is needed earlier.
+
+.SEGMENT        "PAGE2"
+
+.proc   transfer_table
+
+        .byte   $CA, CURS_Y
+        .byte   $CB, CURS_X
+        .byte   $EC, CHARCOLOR
+        .byte   
+
+.endproc
+
+
+;------------------------------------------------------------------------------
 ; The code in the target bank when switching back will be put at the bottom
 ; of the stack. We will jump here to switch segments. The range $F2..$FF is
 ; not used by any kernal routine.
 
-      	.res	$F8-*
-Back:	ldx	spsave
+.segment        "STARTUP"
+
+Back:	sei
+        ldx	spsave
    	txs
    	lda    	IndReg
    	sta	ExecReg
 
-; The following code is a copy of the code that is poked in the system bank
-; memory by the basic header program, it's only for documentation and not
-; actually used here:
+; We are at $100 now. The following snippet is a copy of the code that is poked
+; in the system bank memory by the basic header program, it's only for
+; documentation and not actually used here:
 
      	sei
      	lda	#$00
@@ -79,70 +96,151 @@ Back:	ldx	spsave
 
 ; This is the actual starting point of our code after switching banks for
 ; startup. Beware: The following code will get overwritten as soon as we
-; use the stack (since it's in page 1)!
+; use the stack (since it's in page 1)! We jump to another location, since
+; we need some space for subroutines that aren't used later.
 
-      	tsx
-       	stx	spsave 		; Save the system stackpointer
-	ldx	#$FF
-	txs	       		; Set up our own stack
+        jmp     Origin
 
-; Set the interrupt, NMI and other vectors
+; Hardware vectors, copied to $FFFA
 
-      	ldy	#vectable_size
-L0:   	lda	vectable-1,y
-      	sta	$FF81-1,y
-      	dey
-       	bne    	L0
+.proc   vectors
+        sta     ExecReg
+        rts
+        nop
+       	.word	nmi             ; NMI vector
+       	.word	0     	      	; Reset - not used
+       	.word	irq             ; IRQ vector
+.endproc
 
-; Initialize the extended zero page variables
+; Initializers for the extended zeropage. See extzp.s
 
-        ldx     #zptable_size
-L1:     lda     zptable-1,x
-        sta     <(__EXTZP_RUN__-1),x
-        dex
-        bne     L1
+.proc   extzp
+        .word   $0100           ; sysp1
+        .word   $0300           ; sysp3
+        .word  	$d800           ; vic
+	.word  	$da00           ; sid
+	.word  	$db00           ; cia1
+  	.word  	$dc00           ; cia2
+  	.word  	$dd00           ; acia
+  	.word  	$de00           ; tpi1
+  	.word  	$df00           ; tpi2
+  	.word  	$eab1           ; ktab1
+  	.word  	$eb11           ; ktab2
+  	.word	$eb71           ; ktab3
+  	.word  	$ebd1           ; ktab4
+.endproc
+
+; The following code is part of the kernal call subroutine. It is copied
+; to $FFAE
+
+.proc   callsysbank_15
+        php
+        pha
+        lda     #$0F                    ; Bank 15
+        sta     IndReg
+        sei
+.endproc
+
+; Save the old stack pointer from the system bank and setup our hw sp
+
+Origin: tsx
+       	stx	spsave 	       	; Save the system stackpointer
+ 	ldx	#$FE            ; Leave $1FF untouched for cross bank calls
+ 	txs	       	       	; Set up our own stack
 
 ; Switch the indirect segment to the system bank
 
       	lda	#$0F
       	sta	IndReg
 
-; Copy the kernal zero page ($90-$F2) from the system bank
+; Initialize the extended zeropage
 
-   	lda  	#$90
-   	sta	ptr1
-	lda	#$00
-   	sta	ptr1+1
-   	ldy	#$62-1
-L2:	lda	(ptr1),y
-   	sta	$90,y
-   	dey
-   	bpl 	L2
+        ldx     #.sizeof(extzp)-1
+L1:     lda     extzp,x
+        sta     <__EXTZP_RUN__,x
+        dex
+        bpl     L1
 
-; Copy the page 3 vectors in place
+; Copy stuff from the system zeropage to ours
 
-	ldy	#$00
-L3:	lda	p3vectable,y
-  	sta	$300,y
-   	iny
-  	cpy	#p3vectable_size
-       	bne	L3
+        lda     #.sizeof(transfer_table)
+        sta     ktmp
+L2:     ldx     ktmp
+        ldy     transfer_table-2,x
+        lda     transfer_table-1,x
+        tax
+        lda     (sysp0),y
+        sta     $00,x
+        dec     ktmp
+        dec     ktmp
+        bne     L2
 
-; Copy the rest of page 3 from the system bank
+; Set the interrupt, NMI and other vectors
 
-      	lda	#$00
-      	sta	ptr1
-	lda	#$03
-	sta	ptr1+1
-L4:	lda	(ptr1),y
-   	sta	$300,y
-   	iny
-   	bne	L4
+      	ldx    	#.sizeof(vectors)-1
+L3:    	lda    	vectors,x
+      	sta	$10000 - .sizeof(vectors),x
+      	dex
+       	bpl     L3
+
+; Setup the C stack
+
+	lda    	#.lobyte($FEAE - .sizeof(callsysbank_15))
+     	sta	sp
+	lda   	#.hibyte($FEAE - .sizeof(callsysbank_15))
+	sta	sp+1
+
+; Setup the subroutine and jump vector table that redirects kernal calls to
+; the system bank. Copy the bank switch routines starting at $FEAE from the
+; system bank into the current bank.
+
+
+        ldy     #.sizeof(callsysbank_15)-1      ; Copy the modified part
+@L1:    lda     callsysbank_15,y
+        sta     $FEAE - .sizeof(callsysbank_15),y
+        dey
+        bpl     @L1
+
+        lda     #.lobyte($FEAE)                 ; Copy the ROM part
+        sta     ptr1
+        lda     #.hibyte($FEAE)
+        sta     ptr1+1
+        ldy     #$00
+@L2:    lda     (ptr1),y
+        sta     $FEAE,y
+        iny
+        cpy     #<($FF6F-$FEAE)
+        bne     @L2
+
+; Setup the jump vector table
+
+        ldy     #$00
+        ldx     #45-1                   ; Number of vectors
+@L3:    lda     #$20                    ; JSR opcode
+        sta     $FF6F,y
+        iny
+        lda     #.lobyte($FEAE - .sizeof(callsysbank_15))
+        sta     $FF6F,y
+        iny
+        lda     #.hibyte($FEAE - .sizeof(callsysbank_15))
+        sta     $FF6F,y
+        iny
+        dex
+        bpl     @L3
+
+; Copy the stack from the system bank into page 3
+
+        ldy     #$FF
+L4:     lda     (sysp1),y
+        sta     $300,y
+        dey
+        cpy     spsave
+        bne     L4
 
 ; Set the indirect segment to bank we're executing in
 
-  	lda	ExecReg
-  	sta	IndReg
+     	lda	ExecReg
+ 	sta	IndReg
 
 ; Zero the BSS segment. We will do that here instead calling the routine
 ; in the common library, since we have the memory anyway, and this way,
@@ -150,10 +248,10 @@ L4:	lda	(ptr1),y
 
    	lda	#<__BSS_RUN__
    	sta	ptr1
-  	lda	#>__BSS_RUN__
+	lda	#>__BSS_RUN__
    	sta	ptr1+1
-  	lda	#0
-  	tay
+	lda	#0
+	tay
 
 ; Clear full pages
 
@@ -163,7 +261,7 @@ Z1:	sta	(ptr1),y
    	iny
    	bne	Z1
    	inc	ptr1+1			; Next page
-   	dex
+     	dex
    	bne	Z1
 
 ; Clear the remaining page
@@ -174,34 +272,17 @@ Z3:	sta	(ptr1),y
    	iny
    	dex
    	bne	Z3
-Z4:
+Z4:     jmp     Init
 
-; Setup the C stack
+; ------------------------------------------------------------------------
+; We are at $200 now. We may now start calling subroutines safely, since
+; the code we execute is no longer in the stack page.
 
-	lda   	#<$FF81
-	sta 	sp
-       	lda 	#>$FF81
-	sta 	sp+1
-
-; We expect to be in page 2 now
-
-.if 	(* < $1FD)
-  	jmp	$200
-   	.res	$200-*
-.endif
-.if	(* < $200)
-     	.res	$200-*,$EA
-.endif
-.if    	(* >= $2F0)
-.error	"Code range invalid"
-.endif
-
-; This code is in page 2, so we may now start calling subroutines safely,
-; since the code we execute is no longer in the stack page.
+.segment        "PAGE2"
 
 ; Copy the character rom from the system bank into the execution bank
 
-        lda     #<$C000
+Init:   lda     #<$C000
 	sta	ptr1
 	lda	#>$C000
 	sta	ptr1+1
@@ -213,7 +294,7 @@ Z4:
 	sta	tmp1
 	ldy	#$00
 ccopy:	lda	#$0F
-     	sta	IndReg			; Access the system bank
+     	sta	IndReg	      		; Access the system bank
 ccopy1:	lda	(ptr1),y
        	sta	__VIDRAM_START__,y
        	iny
@@ -225,7 +306,7 @@ ccopy2:	lda	__VIDRAM_START__,y
        	iny
        	bne	ccopy2
        	inc	ptr1+1
-       	inc	ptr2+1			; Bump high pointer bytes
+       	inc	ptr2+1	      		; Bump high pointer bytes
        	dec	tmp1
        	bne	ccopy
 
@@ -278,96 +359,11 @@ ccopy2:	lda	__VIDRAM_START__,y
         lda     ExecReg
        	sta	IndReg
 
-; Call module constructors
+; Call module constructors, enable chained IRQs afterwards.
 
-       	jsr	initlib
-
-; Execute the program code
-
-	jmp	Start
-
-; ------------------------------------------------------------------------
-; Additional data that we need for initialization and that's overwritten
-; later
-
-zptable:
-        .word  	$d800           ; vic
-	.word  	$da00           ; sid
-	.word  	$db00           ; cia1
-  	.word  	$dc00           ; cia2
-  	.word  	$dd00           ; acia
-  	.word  	$de00           ; tpi1
-  	.word  	$df00           ; tpi2
-  	.word  	$eab1           ; ktab1
-  	.word  	$eb11           ; ktab2
-  	.word	$eb71           ; ktab3
-  	.word  	$ebd1           ; ktab4
-  	.dword 	$0000           ; time
-        .word	$0100		; RecvBuf
-        .word  	$0200  	       	; SendBuf
-zptable_size    = * - zptable
-
-vectable:
-      	jmp	$0000		; CINT
-      	jmp	$0000		; IOINIT
-      	jmp	$0000		; RAMTAS
-      	jmp	$0000	      	; RESTOR
-      	jmp	$0000	      	; VECTOR
-      	jmp	$0000	      	; SETMSG
-      	jmp	$0000  	      	; SECOND
-      	jmp	$0000	      	; TKSA
-      	jmp	$0000	      	; MEMTOP
-      	jmp	$0000	      	; MEMBOT
-       	jmp    	SCNKEY
-      	jmp	$0000	      	; SETTMO
-      	jmp	$0000	      	; ACPTR
-      	jmp	$0000	      	; CIOUT
-      	jmp	$0000  	      	; UNTLK
-      	jmp	$0000	      	; UNLSN
-      	jmp	$0000	      	; LISTEN
-      	jmp	$0000	      	; TALK
-   	jmp	$0000	      	; READST
-       	jmp    	SETLFS
-       	jmp    	SETNAM
-     	jmp	$0000	      	; OPEN
-	jmp	$0000 	      	; CLOSE
-     	jmp	$0000	      	; CHKIN
-	jmp	$0000	      	; CKOUT
-	jmp	$0000	      	; CLRCH
-	jmp	$0000	      	; BASIN
-      	jmp	$0000	      	; BSOUT
-	jmp	$0000	      	; LOAD
-  	jmp	$0000	      	; SAVE
-	jmp	SETTIM
-       	jmp    	RDTIM
-	jmp	$0000	      	; STOP
-   	jmp	$0000	      	; GETIN
-	jmp	$0000	      	; CLALL
-	jmp	UDTIM
-   	jmp	SCREEN
-	jmp	PLOT
-	jmp	IOBASE
-   	sta	ExecReg
-	rts
-	.byte  	$01 	      	; Filler
-       	.word	nmi
-       	.word	0     	      	; Reset - not used
-       	.word	irq
-vectable_size	= * - vectable
-
-p3vectable:
-	.word	k_irq		; IRQ user vector
-	.word	k_brk		; BRK user vector
-	.word	k_nmi		; NMI user vector
-p3vectable_size	= * - p3vectable
-
-
-; ------------------------------------------------------------------------
-; This is the program code after setup. It starts at $400
-
-   	.res	$400-*
-
-Start:
+        jsr	initlib
+        lda     #.lobyte(__IRQFUNC_COUNT__*2)
+        sta     irqcount
 
 ; Enable interrupts
 
@@ -377,14 +373,17 @@ Start:
 
        	jsr    	callmain
 
-; Call module destructors. This is also the _exit entry.
+; Call module destructors. This is also the _exit entry and the default entry
+; point for the break vector.
 
-_exit:	jsr	donelib		; Run module destructors
+_exit:  lda     #$00
+        sta     irqcount        ; Disable custom irq handlers
+        jsr	donelib	     	; Run module destructors
 
-; We need access to the system bank now
+; Address the system bank
 
-      	lda	#$0F
-      	sta	IndReg
+        lda     #$0F
+        sta     IndReg
 
 ; Switch back the video to the system bank
 
@@ -400,102 +399,128 @@ _exit:	jsr	donelib		; Run module destructors
 	lda	vidsave+2
 	sta	(vic),y
 
-; Clear the start of the zero page, since it will be interpreted as a
-; (garbage) BASIC program otherwise. This is also the default entry for
-; the break vector.
+; Copy stuff back from our zeropage to the systems
 
-k_brk:	sei
-      	lda	#$00
-      	ldx	#$3E
-Clear:	sta	$02,x
-      	dex
-      	bne	Clear
-
-; Setup the welcome code at the stack bottom in the system bank. Use
-; the F4/F5 vector to access the system bank
-
-      	ldy    	#$00
-       	sty	$F4
-      	iny
-      	sty	$F5
-   	ldy	#reset_size-1
-@L1:	lda	reset,y
-   	sta	($F4),y
-   	dey
-   	bne	@L1
-   	jmp	Back
-
-; ------------------------------------------------------------------------
-; Code that is copied into the system bank at $100 when switching back
-
-reset:	cli
-	jmp	$8000		   	; BASIC cold start
-reset_size = * - reset
-
-; ------------------------------------------------------------------------
-; Code for a few simpler kernal calls goes here
-
-.export IOBASE
-.proc   IOBASE
-        ldx	cia2
-  	ldy	cia2+1
-	rts
-.endproc
-
-.export SCREEN
-.proc   SCREEN
-       	ldx    	#40	   	; Columns
-	ldy	#25	   	; Lines
-	rts
-.endproc
-
-.export SETLFS
-.proc   SETLFS
-        sta     LogicalAdr
-        stx     FirstAdr
-        sty     SecondAdr
-        rts
-.endproc
-
-.export SETNAM
-.proc   SETNAM
-        sta     FileNameLen
+.if 0
+        lda     #.sizeof(transfer_table)
+        sta     ktmp
+@L0:    ldx     ktmp
+        ldy     transfer_table-2,x
+        lda     transfer_table-1,x
+        tax
         lda     $00,x
-        sta     FileNameAdrLo
-        lda     $01,x
-        sta     FileNameAdrHi
-        lda     $02,x
-        sta     FileNameAdrSeg
-        rts
-.endproc
+        sta     (sysp0),y
+        dec     ktmp
+        dec     ktmp
+        bne     @L0
+.endif
 
-.export RDTIM
-.proc   RDTIM
-     	sei
-     	lda   	time+0
-     	ldx   	time+1
-     	ldy   	time+2
-     	cli
-     	rts
-.endproc
+; Copy back the old system bank stack contents
 
-.export SETTIM
-.proc   SETTIM
-     	sei
-     	sta	time+0
-     	stx	time+1
-     	sty	time+2
-     	cli
-     	rts
-.endproc
+        ldy     #$FF
+@L1:    lda     $300,y
+        sta     (sysp1),y
+        dey
+        cpy     spsave
+        bne     @L1
+
+; Setup the welcome code at the stack bottom in the system bank.
+
+        ldy     #$00
+        lda     #$58            ; CLI opcode
+        sta     (sysp1),y
+        iny
+        lda     #$60            ; RTS opcode
+        sta     (sysp1),y
+        jmp     Back
 
 ; -------------------------------------------------------------------------
-; Data area - switch back to relocatable mode
+; The IRQ handler goes into PAGE2. For performance reasons, and to allow
+; easier chaining, we do handle the IRQs in the execution bank (instead of
+; passing them to the system bank).
 
-	.reloc
+; This is the mapping of the active irq register of the	6525 (tpi1):
+;
+; Bit   7       6       5       4       3       2       1       0
+;                               |       |       |       |       ^ 50 Hz
+;                               |       |       |       ^ SRQ IEEE 488
+;                               |       |       ^ cia
+;                               |       ^ IRQB ext. Port
+;                               ^ acia
+
+irq:    pha
+        txa
+        pha
+        tya
+        pha
+        lda     IndReg
+        pha
+        lda     ExecReg
+        sta     IndReg                  ; Be sure to address our segment
+	tsx
+       	lda    	$105,x	    		; Get the flags from the stack
+	and	#$10	    		; Test break flag
+       	bne     dobrk
+
+; It's an IRQ
+
+        cld
+
+; Call chained IRQ handlers
+
+       	ldy    	irqcount
+        beq     irqskip
+       	lda    	#<__IRQFUNC_TABLE__
+	ldx 	#>__IRQFUNC_TABLE__
+	jsr	condes 		   	; Call the functions
+
+; Done with chained IRQ handlers, check the TPI for IRQs and handle them
+
+irqskip:lda	#$0F
+	sta	IndReg
+	ldy	#TPI::AIR
+	lda	(tpi1),y		; Interrupt Register 6525
+	beq	noirq
+
+; 50/60Hz interrupt
+
+	cmp	#%00000001		; ticker irq?
+	bne	irqend
+       	jsr     scnkey                  ; Poll the keyboard
+        jsr	UDTIM                   ; Bump the time
+
+; Done
+
+irqend:	ldy	#TPI::AIR
+       	sta	(tpi1),y    		; Clear interrupt
+
+noirq:	pla
+        sta     IndReg
+        pla
+        tay
+        pla
+        tax
+        pla
+nmi:	rti
+
+dobrk:  jmp	(BRKVec)
+
+; -------------------------------------------------------------------------
+; Page 3
+
+.segment        "PAGE3"
+
+BRKVec: .addr   _exit           ; BRK indirect vector
+
+
+; -------------------------------------------------------------------------
+; Data area
 
 .data
 spsave:	.res	1
 vidsave:.res	3
+
+.bss
+irqcount:       .byte   0
 
 

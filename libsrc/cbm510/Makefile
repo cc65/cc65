@@ -42,14 +42,17 @@ OBJS =	_scrsize.o	\
        	cgetc.o		\
 	clrscr.o	\
        	color.o	 	\
-	conio.o		\
 	cputc.o		\
        	crt0.o 	 	\
         extzp.o         \
        	kbhit.o	 	\
-       	kirq.o 	 	\
-       	kplot.o	 	\
+        kclose.o        \
+        kernal.o        \
+	kiobase.o	\
+	kopen.o		\
+        kreadst.o       \
 	kscnkey.o	\
+        ksetnam.o       \
 	kudtim.o 	\
         mainargs.o      \
 	mouse.o		\

@@ -4,19 +4,21 @@
 ; Keyboard polling stuff for the 510.
 ;
 
- 	.export	  	SCNKEY
+ 	.export	      	scnkey
 	.importzp     	tpi2, ktab1, ktab2, ktab3, ktab4
+        .importzp       keyidx, keybuf, keyscanbuf, keysave, modkey, norkey
+        .importzp       graphmode, lastidx, rptdelay, rptcount
 
 	.include      	"cbm510.inc"
 
 
-.proc	SCNKEY
+.proc	scnkey
 
         lda     #$FF
-        sta     ModKey
-        sta     NorKey
+        sta     modkey
+        sta     norkey
         lda	#$00
-	sta	KbdScanBuf
+	sta	keyscanbuf
 	ldy	#TPI::PRB
 	sta	(tpi2),y
 	ldy	#TPI::PRA
@@ -35,7 +37,7 @@ L1:	lda     #$FF
 	sta	(tpi2),y
         jsr     Poll
         pha
-        sta     ModKey
+        sta     modkey
         ora     #$30
         bne     L3		; Branch always
 
@@ -44,11 +46,11 @@ L3:	ldx     #$05
 	ldy	#$00
 L4:	lsr     a
         bcc     L5
-        inc	KbdScanBuf
+        inc	keyscanbuf
         dex
         bpl     L4
         sec
-	ldy	TPI::PRB
+	ldy	#TPI::PRB
   	lda	(tpi2),y
   	rol   	a
   	sta	(tpi2),y
@@ -60,8 +62,8 @@ L4:	lsr     a
         pla
         bcc     NoKey 	  	; Branch always
 
-L5:	ldy	KbdScanBuf
-	sty     NorKey
+L5:	ldy	keyscanbuf
+	sty     norkey
         pla
         asl     a
         asl     a
@@ -69,7 +71,7 @@ L5:	ldy	KbdScanBuf
         bcc     L6
         bmi     L7
         lda     (ktab2),y		; Shifted normal key
-        ldx     GrafMode
+        ldx     graphmode
         beq     L8
         lda     (ktab3),y		; Shifted key in graph mode
         bne     L8
@@ -80,23 +82,23 @@ L7:	lda	(ktab1),y		; Normal key
 L8:	tax
 	cpx     #$FF  	 		; Valid key?
         beq     Done
-        cpy     LastIndex
+        cpy     lastidx
         beq     Repeat
         ldx     #$13
-        stx     RepeatDelay
-        ldx     KeyIndex
+        stx     rptdelay
+        ldx     keyidx
         cpx     #$09
         beq     NoKey
         cpy     #$59
         bne     PutKey
         cpx     #$08
         beq     NoKey
-        sta     KeyBuf,x
+        sta     keybuf,x
         inx
         bne     PutKey
 
 NoKey:	ldy     #$FF
-Done:  	sty     LastIndex
+Done:  	sty     lastidx
 End:	lda	#$7F
 	ldy	#TPI::PRA
 	sta	(tpi2),y
@@ -105,20 +107,20 @@ End:	lda	#$7F
 	sta   	(tpi2),y
         rts
 
-Repeat:	dec     RepeatDelay
+Repeat:	dec     rptdelay
         bpl     End
-        inc     RepeatDelay
-        dec     RepeatCount
+        inc     rptdelay
+        dec     rptcount
         bpl     End
-        inc     RepeatCount
-        ldx     KeyIndex
+        inc     rptcount
+        ldx     keyidx
         bne     End
 
-PutKey:	sta     KeyBuf,x
+PutKey:	sta     keybuf,x
         inx
-        stx     KeyIndex
+        stx     keyidx
         ldx     #$03
-        stx     RepeatCount
+        stx     rptcount
         bne     Done
 
 .endproc
@@ -127,18 +129,15 @@ PutKey:	sta     KeyBuf,x
 ; Poll the keyboard port until it's stable
 
 .proc	Poll
-	ldy	TPI::PRC
+	ldy	#TPI::PRC
 L1:	lda	(tpi2),y
-	sta	KeySave
+	sta	keysave
 	lda   	(tpi2),y
-	cmp	KeySave
+	cmp	keysave
 	bne	L1
 	rts
 .endproc
 
 
-.bss
-
-KeySave:	.res	1
 
 

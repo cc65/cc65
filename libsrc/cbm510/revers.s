@@ -5,8 +5,8 @@
 ;
 
       	.export		_revers
+        .import         RVS: zp
 
-        .include        "cbm510.inc"
 
 .proc   _revers
 

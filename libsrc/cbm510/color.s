@@ -4,7 +4,7 @@
 
  	.export	    	_textcolor, _bgcolor, _bordercolor
 	.import	    	sys_bank, restore_bank
-	.importzp	vic
+	.import         vic: zp, CHARCOLOR: zp
 
 	.include    	"cbm510.inc"
 

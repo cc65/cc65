@@ -121,7 +121,7 @@ static int IfStatement (void)
 
     /* Generate a jump label and parse the condition */
     Label1 = GetLocalLabel ();
-    test (Label1, 0);
+    TestInParens (Label1, 0);
 
     /* Parse the if body */
     GotBreak = Statement (0);
@@ -182,7 +182,7 @@ static void DoStatement (void)
 
     /* Parse the end condition */
     Consume (TOK_WHILE, "`while' expected");
-    test (loop, 1);
+    TestInParens (loop, 1);
     ConsumeSemi ();
 
     /* Define the break label */
@@ -213,7 +213,7 @@ static void WhileStatement (void)
     g_defcodelabel (loop);
 
     /* Test the loop condition */
-    test (lab, 0);
+    TestInParens (lab, 0);
 
     /* Loop body */
     Statement (&PendingToken);
@@ -339,7 +339,6 @@ static void ForStatement (void)
 /* Handle a 'for' statement */
 {
     ExprDesc lval1;
-    ExprDesc lval2;
     ExprDesc lval3;
     int HaveIncExpr;
     CodeMark IncExprStart;
@@ -372,8 +371,7 @@ static void ForStatement (void)
 
     /* Parse the test expression */
     if (CurTok.Tok != TOK_SEMI) {
-    	boolexpr (&lval2);
-    	g_truejump (CF_NONE, lstat);
+        Test (lstat, 1);
     	g_jump (lab);
     } else {
     	g_jump (lstat);

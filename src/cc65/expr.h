@@ -37,6 +37,11 @@ void ConstSubExpr (int (*F) (ExprDesc*), ExprDesc* Expr);
  * from this input error.
  */
 
+void CheckBoolExpr (ExprDesc* lval);
+/* Check if the given expression is a boolean expression, output a diagnostic
+ * if not.
+ */
+
 unsigned assignadjust (type* lhst, ExprDesc* rhs);
 /* Adjust the type of the right hand expression so that it can be assigned to
  * the type on the left hand side. This function is used for assignment and
@@ -77,12 +82,6 @@ void ConstIntExpr (ExprDesc* Val);
 void intexpr (ExprDesc* lval);
 /* Get an integer expression */
 
-void boolexpr (ExprDesc* lval);
-/* Get a boolean expression */
-
-void test (unsigned label, int cond);
-/* Generate code to perform test and jump if false. */
-
 int hie10 (ExprDesc* lval);
 /* Handle ++, --, !, unary - etc. */
 
@@ -94,6 +93,16 @@ int hie0 (ExprDesc* lval);
 
 void DefineData (ExprDesc* lval);
 /* Output a data definition for the given expression */
+
+void Test (unsigned Label, int Invert);
+/* Evaluate a boolean test expression and jump depending on the result of
+ * the test and on Invert.
+ */
+
+void TestInParens (unsigned Label, int Invert);
+/* Evaluate a boolean test expression in parenthesis and jump depending on
+ * the result of the test * and on Invert.
+ */
 
 
 

@@ -475,6 +475,23 @@ void ConstSubExpr (int (*F) (ExprDesc*), ExprDesc* Expr)
 
 
 
+void CheckBoolExpr (ExprDesc* lval)
+/* Check if the given expression is a boolean expression, output a diagnostic
+ * if not.
+ */
+{
+    /* If it's an integer, it's ok. If it's not an integer, but a pointer,
+     * the pointer used in a boolean context is also ok
+     */
+    if (!IsClassInt (lval->Type) && !IsClassPtr (lval->Type)) {
+ 	Error ("Boolean expression expected");
+ 	/* To avoid any compiler errors, make the expression a valid int */
+	MakeConstIntExpr (lval, 1);
+    }
+}
+
+
+
 /*****************************************************************************/
 /*   	     	     		     code				     */
 /*****************************************************************************/
@@ -3108,75 +3125,67 @@ void intexpr (ExprDesc* lval)
 
 
 
-void boolexpr (ExprDesc* lval)
-/* Get a boolean expression */
-{
-    /* Read an expression */
-    expression (lval);
-
-    /* If it's an integer, it's ok. If it's not an integer, but a pointer,
-     * the pointer used in a boolean context is also ok
-     */
-    if (!IsClassInt (lval->Type) && !IsClassPtr (lval->Type)) {
- 	Error ("Boolean expression expected");
- 	/* To avoid any compiler errors, make the expression a valid int */
-	MakeConstIntExpr (lval, 1);
-    }
-}
-
-
-
-void test (unsigned label, int cond)
-/* Generate code to perform test and jump if false. */
+void Test (unsigned Label, int Invert)
+/* Evaluate a boolean test expression and jump depending on the result of
+ * the test and on Invert.
+ */
 {
     int k;
     ExprDesc lval;
 
+    /* Evaluate the expression */
+    memset (&lval, 0, sizeof (lval));
+    k = expr (hie0, &lval);
+
+    /* Check for a boolean expression */
+    CheckBoolExpr (&lval);
+
+    /* Check for a constant expression */
+    if (k == 0 && lval.Flags == E_MCONST) {
+
+      	/* Constant rvalue */
+       	if (!Invert && lval.ConstVal == 0) {
+      	    g_jump (Label);
+     	    Warning ("Unreachable code");
+     	} else if (Invert && lval.ConstVal != 0) {
+ 	    g_jump (Label);
+      	}
+
+    } else {
+
+        /* If the expr hasn't set condition codes, set the force-test flag */
+        if ((lval.Test & E_CC) == 0) {
+            lval.Test |= E_FORCETEST;
+        }
+
+        /* Load the value into the primary register */
+        exprhs (CF_FORCECHAR, k, &lval);
+
+        /* Generate the jump */
+        if (Invert) {
+            g_truejump (CF_NONE, Label);
+        } else {
+            g_falsejump (CF_NONE, Label);
+        }
+    }
+}
+
+
+
+void TestInParens (unsigned Label, int Invert)
+/* Evaluate a boolean test expression in parenthesis and jump depending on
+ * the result of the test * and on Invert.
+ */
+{
     /* Eat the parenthesis */
     ConsumeLParen ();
 
-    /* Prepare the expression, setup labels */
-    memset (&lval, 0, sizeof (lval));
-
-    /* Generate code to eval the expr */
-    k = expr (hie0, &lval);
-    if (k == 0 && lval.Flags == E_MCONST) {
-      	/* Constant rvalue */
-       	if (cond == 0 && lval.ConstVal == 0) {
-      	    g_jump (label);
-     	    Warning ("Unreachable code");
-     	} else if (cond && lval.ConstVal) {
- 	    g_jump (label);
-      	}
-     	ConsumeRParen ();
-     	return;
-    }
-
-    /* If the expr hasn't set condition codes, set the force-test flag */
-    if ((lval.Test & E_CC) == 0) {
-     	lval.Test |= E_FORCETEST;
-    }
-
-    /* Load the value into the primary register */
-    exprhs (CF_FORCECHAR, k, &lval);
-
-    /* Generate the jump */
-    if (cond) {
-     	g_truejump (CF_NONE, label);
-    } else {
-	/* Special case (putting this here is a small hack - but hey, the
-	 * compiler itself is one big hack...): If a semicolon follows, we
-	 * don't have a statement and may omit the jump.
-	 */
-	if (CurTok.Tok != TOK_SEMI) {
-            g_falsejump (CF_NONE, label);
-	}
-    }
+    /* Do the test */
+    Test (Label, Invert);
 
     /* Check for the closing brace */
     ConsumeRParen ();
 }
-
 
 
 

@@ -38,10 +38,10 @@ callirq:
         ldy     #.lobyte(__IRQFUNC_COUNT__*2)
 callirq_y:
         dey
-        lda     __IRQFUNC_TABLE__+1,y
+        lda     __IRQFUNC_TABLE__,y
         sta     jmpvec+2                ; Modify code below
      	dey
-        lda     __IRQFUNC_TABLE__+0,y
+        lda     __IRQFUNC_TABLE__,y
         sta     jmpvec+1                ; Modify code below
        	sty    	index+1                 ; Modify code below
 jmpvec: jsr    	$FFFF                   ; Patched at runtime

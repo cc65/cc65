@@ -243,10 +243,10 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes);
 
 
 
-void g_getimmed (unsigned Flags, unsigned long Val, unsigned Offs);
+void g_getimmed (unsigned Flags, unsigned long Val, long Offs);
 /* Load a constant into the primary register */
 
-void g_getstatic (unsigned Flags, unsigned long Label, unsigned Offs);
+void g_getstatic (unsigned Flags, unsigned long Label, long Offs);
 /* Fetch an static memory cell into the primary register */
 
 void g_getlocal (unsigned Flags, int Offs);
@@ -273,7 +273,7 @@ void g_leavariadic (int Offs);
 
 
 
-void g_putstatic (unsigned flags, unsigned long label, unsigned offs);
+void g_putstatic (unsigned flags, unsigned long label, long offs);
 /* Store the primary register into the specified static memory cell */
 
 void g_putlocal (unsigned Flags, int Offs, long Val);
@@ -295,7 +295,7 @@ void g_putind (unsigned flags, unsigned offs);
 void g_addlocal (unsigned flags, int offs);
 /* Add a local variable to ax */
 
-void g_addstatic (unsigned flags, unsigned long label, unsigned offs);
+void g_addstatic (unsigned flags, unsigned long label, long offs);
 /* Add a static variable to ax */
 
 
@@ -306,7 +306,7 @@ void g_addstatic (unsigned flags, unsigned long label, unsigned offs);
 
 
 
-void g_addeqstatic (unsigned flags, unsigned long label, unsigned offs,
+void g_addeqstatic (unsigned flags, unsigned long label, long offs,
        		    unsigned long val);
 /* Emit += for a static variable */
 
@@ -316,7 +316,7 @@ void g_addeqlocal (unsigned flags, int offs, unsigned long val);
 void g_addeqind (unsigned flags, unsigned offs, unsigned long val);
 /* Emit += for the location with address in ax */
 
-void g_subeqstatic (unsigned flags, unsigned long label, unsigned offs,
+void g_subeqstatic (unsigned flags, unsigned long label, long offs,
        		    unsigned long val);
 /* Emit -= for a static variable */
 
@@ -329,7 +329,7 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val);
 
 
 /*****************************************************************************/
-/*     		   Add a variable address to the value in ax		     */
+/*     		   Add a variable address to the value in ax  		     */
 /*****************************************************************************/
 
 
@@ -337,7 +337,7 @@ void g_subeqind (unsigned flags, unsigned offs, unsigned long val);
 void g_addaddr_local (unsigned flags, int offs);
 /* Add the address of a local variable to ax */
 
-void g_addaddr_static (unsigned flags, unsigned long label, unsigned offs);
+void g_addaddr_static (unsigned flags, unsigned long label, long offs);
 /* Add the address of a static variable to ax */
 
 
@@ -420,7 +420,7 @@ void g_ge (unsigned flags, unsigned long val);
 void g_res (unsigned n);
 /* Reserve static storage, n bytes */
 
-void g_defdata (unsigned flags, unsigned long val, unsigned offs);
+void g_defdata (unsigned flags, unsigned long val, long offs);
 /* Define data with the size given in flags */
 
 void g_defbytes (const void* bytes, unsigned count);
@@ -459,7 +459,7 @@ void g_asmcode (struct StrBuf* B);
 
 
 
-void g_strlen (unsigned flags, unsigned long val, unsigned offs);
+void g_strlen (unsigned flags, unsigned long val, long offs);
 /* Inline the strlen() function */
 
 

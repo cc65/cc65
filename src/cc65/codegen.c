@@ -96,7 +96,7 @@ static void CheckLocalOffs (unsigned Offs)
 
 
 
-static char* GetLabelName (unsigned flags, unsigned long label, unsigned offs)
+static char* GetLabelName (unsigned flags, unsigned long label, long offs)
 {
     static char lbuf [128];		/* Label name */
 
@@ -105,12 +105,12 @@ static char* GetLabelName (unsigned flags, unsigned long label, unsigned offs)
 
 	case CF_STATIC:
        	    /* Static memory cell */
-	    sprintf (lbuf, "%s+%u", LocalLabelName (label), offs);
+	    sprintf (lbuf, "%s%+ld", LocalLabelName (label), offs);
 	    break;
 
 	case CF_EXTERNAL:
 	    /* External label */
-	    sprintf (lbuf, "_%s+%u", (char*) label, offs);
+	    sprintf (lbuf, "_%s%+ld", (char*) label, offs);
 	    break;
 
 	case CF_ABSOLUTE:
@@ -566,7 +566,7 @@ void g_restore_regvars (int StackOffs, int RegOffs, unsigned Bytes)
 
 
 
-void g_getimmed (unsigned Flags, unsigned long Val, unsigned Offs)
+void g_getimmed (unsigned Flags, unsigned long Val, long Offs)
 /* Load a constant into the primary register */
 {
     unsigned char B1, B2, B3, B4;
@@ -652,7 +652,7 @@ void g_getimmed (unsigned Flags, unsigned long Val, unsigned Offs)
 
 
 
-void g_getstatic (unsigned flags, unsigned long label, unsigned offs)
+void g_getstatic (unsigned flags, unsigned long label, long offs)
 /* Fetch an static memory cell into the primary register */
 {
     /* Create the correct label name */
@@ -901,7 +901,7 @@ void g_leavariadic (int Offs)
 
 
 
-void g_putstatic (unsigned flags, unsigned long label, unsigned offs)
+void g_putstatic (unsigned flags, unsigned long label, long offs)
 /* Store the primary register into the specified static memory cell */
 {
     /* Create the correct label name */
@@ -1202,7 +1202,7 @@ unsigned g_typeadjust (unsigned lhs, unsigned rhs)
 }
 
 
-
+							    
 unsigned g_typecast (unsigned lhs, unsigned rhs)
 /* Cast the value in the primary register to the operand size that is flagged
  * by the lhs value. Return the result value.
@@ -1432,7 +1432,7 @@ void g_addlocal (unsigned flags, int offs)
 
 
 
-void g_addstatic (unsigned flags, unsigned long label, unsigned offs)
+void g_addstatic (unsigned flags, unsigned long label, long offs)
 /* Add a static variable to ax */
 {
     unsigned L;
@@ -1467,7 +1467,7 @@ void g_addstatic (unsigned flags, unsigned long label, unsigned offs)
 	    g_getstatic (flags, label, offs);
 	    g_add (flags, 0);
 	    break;
-
+							      
 	default:
 	    typeerror (flags);
 
@@ -1482,7 +1482,7 @@ void g_addstatic (unsigned flags, unsigned long label, unsigned offs)
 
 
 
-void g_addeqstatic (unsigned flags, unsigned long label, unsigned offs,
+void g_addeqstatic (unsigned flags, unsigned long label, long offs,
        	    	    unsigned long val)
 /* Emit += for a static variable */
 {
@@ -1725,7 +1725,7 @@ void g_addeqind (unsigned flags, unsigned offs, unsigned long val)
 
 
 
-void g_subeqstatic (unsigned flags, unsigned long label, unsigned offs,
+void g_subeqstatic (unsigned flags, unsigned long label, long offs,
        		    unsigned long val)
 /* Emit -= for a static variable */
 {
@@ -1982,7 +1982,7 @@ void g_addaddr_local (unsigned flags attribute ((unused)), int offs)
 
 
 
-void g_addaddr_static (unsigned flags, unsigned long label, unsigned offs)
+void g_addaddr_static (unsigned flags, unsigned long label, long offs)
 /* Add the address of a static variable to ax */
 {
     /* Create the correct label name */
@@ -3695,7 +3695,7 @@ void g_res (unsigned n)
 
 
 
-void g_defdata (unsigned flags, unsigned long val, unsigned offs)
+void g_defdata (unsigned flags, unsigned long val, long offs)
 /* Define data with the size given in flags */
 {
     if (flags & CF_CONST) {
@@ -3876,7 +3876,7 @@ void g_asmcode (struct StrBuf* B)
 
 
 
-void g_strlen (unsigned flags, unsigned long val, unsigned offs)
+void g_strlen (unsigned flags, unsigned long val, long offs)
 /* Inline the strlen() function */
 {
     /* We need a label in both cases */

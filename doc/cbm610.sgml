@@ -229,6 +229,16 @@ While this simplifies things, it should be noted that the wrappers do have
 quite an impact on performance: A cross bank call has an extra 300&micro;s
 penalty added by the wrapper.
 
+<sect1>Interrupts<p>
+
+Compiled programs contain an interrupt handler that runs in the program bank.
+This has several advantages, one of them being performance (see cross bank
+call overhead mentioned above). However, this introduces one problem:
+Interrupts are lost while the CPU executes code in the kernal bank. As a
+result, the clock may go wrong and (worse) serial interrupts may get lost.
+
+Since the cc65 runtime does only call the kernal for disk I/O, this means that
+a program should not do file I/O while it depends on interrupts.
 
 
 <sect>Other hints<p>

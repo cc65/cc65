@@ -16,26 +16,25 @@
 
 .proc   _readjoy
 
-        lda     #$C3            ; mask for VIA1 JOYBITS: sw0,sw1,sw2,sw4
-        ldx     #$7F            ; mask for VIA2 JOYBIT: sw3
+        lda     #$7F            ; mask for VIA2 JOYBIT: sw3
+        ldx     #$C3            ; mask for VIA1 JOYBITS: sw0,sw1,sw2,sw4
         sei                     ; necessary?
 
-        ldy     VIA1_DDRA       ; remember the state of DDRA
-        sta     VIA1_DDRA       ; set JOYBITS on this VIA for input
-        lda     VIA1_JOY        ; read JOYBITS: sw0,sw1,sw2,sw4
-        sty     VIA1_DDRA       ; restore the state of DDRA
-        and     #$3C            ; Mask relevant bits...
-        sta     tmp1            ; ...and save for later
-
         ldy     VIA2_DDRB       ; remember the date of DDRB
-        stx     VIA2_DDRB       ; set JOYBITS on this VIA for input
+        sta     VIA2_DDRB       ; set JOYBITS on this VIA for input
         lda     VIA2_JOY        ; read JOYBIT: sw3
         sty     VIA2_DDRB       ; restore the state of DDRB
+        asl                     ; Shift sw3 into carry
+
+        ldy     VIA1_DDRA       ; remember the state of DDRA
+        stx     VIA1_DDRA       ; set JOYBITS on this VIA for input
+        lda     VIA1_JOY        ; read JOYBITS: sw0,sw1,sw2,sw4
+        sty     VIA1_DDRA       ; restore the state of DDRA
 
         cli                     ; necessary?
-        and     #$80            ; Mask sw3
-        ora     tmp1            ; Get sw0, sw1, sw2, sw4
-        eor     #$BC            ; Active states are inverted
+        ror                     ; Shift sw3 into bit 7
+        and     #$9E            ; Mask relevant bits
+        eor     #$9E            ; Active states are inverted
 
         rts
 

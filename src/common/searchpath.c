@@ -179,6 +179,21 @@ void AddSearchPathFromEnv (const char* EnvVar, unsigned Where)
 
 
 
+void ForgetAllSearchPaths (unsigned Where)
+/* Forget all search paths in the given lists. */
+{
+    unsigned I;
+    for (I = 0; I < MAX_SEARCH_PATHS; ++I) {
+        unsigned Mask = (0x01U << I);
+        if (Where & Mask) {
+            xfree (SearchPaths[I]);
+            SearchPaths[I] = 0;
+        }
+    }
+}
+
+
+
 char* SearchFile (const char* Name, unsigned Where)
 /* Search for a file in a list of directories. Return a pointer to a malloced
  * area that contains the complete path, if found, return 0 otherwise.

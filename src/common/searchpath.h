@@ -69,6 +69,9 @@ void AddSearchPath (const char* NewPath, unsigned Where);
 void AddSearchPathFromEnv (const char* EnvVar, unsigned Where);
 /* Add a search from an environment variable */
 
+void ForgetAllSearchPaths (unsigned Where);
+/* Forget all search paths in the given lists. */
+
 char* SearchFile (const char* Name, unsigned Where);
 /* Search for a file in a list of directories. Return a pointer to a malloced
  * area that contains the complete path, if found, return 0 otherwise.

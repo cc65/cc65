@@ -121,54 +121,50 @@ static void DoConversion (ExprDesc* Expr, const type* NewType)
             ED_MakeRValExpr (Expr);
         }
 
-    } else {
+    } else if (ED_IsLocAbs (Expr)) {
 
-        /* We have an rvalue. Check for a constant. */
-        if (ED_IsLocAbs (Expr)) {
+        /* A cast of a constant numeric value to another type. Be sure
+         * to handle sign extension correctly.
+         */
 
-            /* A cast of a constant to an integer. Be sure to handle sign
-             * extension correctly.
-             */
+        /* Get the current and new size of the value */
+        unsigned OldBits = OldSize * 8;
+        unsigned NewBits = NewSize * 8;
 
-            /* Get the current and new size of the value */
-            unsigned OldBits = OldSize * 8;
-            unsigned NewBits = NewSize * 8;
+        /* Check if the new datatype will have a smaller range. If it
+         * has a larger range, things are ok, since the value is
+         * internally already represented by a long.
+         */
+        if (NewBits <= OldBits) {
 
-            /* Check if the new datatype will have a smaller range. If it
-             * has a larger range, things are ok, since the value is
-             * internally already represented by a long.
-             */
-            if (NewBits <= OldBits) {
+            /* Cut the value to the new size */
+            Expr->Val &= (0xFFFFFFFFUL >> (32 - NewBits));
 
-                /* Cut the value to the new size */
-                Expr->Val &= (0xFFFFFFFFUL >> (32 - NewBits));
-
-                /* If the new type is signed, sign extend the value */
-                if (!IsSignUnsigned (NewType)) {
-                    if (Expr->Val & (0x01UL << (NewBits-1))) {
-                        /* Beware: Use the safe shift routine here. */
-                        Expr->Val |= shl_l (~0UL, NewBits);
-                    }
+            /* If the new type is signed, sign extend the value */
+            if (!IsSignUnsigned (NewType)) {
+                if (Expr->Val & (0x01UL << (NewBits-1))) {
+                    /* Beware: Use the safe shift routine here. */
+                    Expr->Val |= shl_l (~0UL, NewBits);
                 }
             }
+        }
 
-        } else {
+    } else {
 
-            /* The value is not a constant. If the sizes of the types are
-             * not equal, add conversion code. Be sure to convert chars
-             * correctly.
-             */
-            if (OldSize != NewSize) {
+        /* The value is not a constant. If the sizes of the types are
+         * not equal, add conversion code. Be sure to convert chars
+         * correctly.
+         */
+        if (OldSize != NewSize) {
 
-                /* Load the value into the primary */
-                ExprLoad (CF_NONE, Expr);
+            /* Load the value into the primary */
+            ExprLoad (CF_NONE, Expr);
 
-                /* Emit typecast code. */
-                g_typecast (TypeOf (NewType) | CF_FORCECHAR, TypeOf (OldType));
+            /* Emit typecast code. */
+            g_typecast (TypeOf (NewType) | CF_FORCECHAR, TypeOf (OldType));
 
-                /* Value is now a rvalue in the primary */
-                ED_MakeRValExpr (Expr);
-            }
+            /* Value is now a rvalue in the primary */
+            ED_MakeRValExpr (Expr);
         }
     }
 

@@ -1,18 +1,34 @@
 ;
-; Ullrich von Bassewitz, 06.08.1998
-;
-; unsigned char __fastcall__ textcolor (unsigned char color);
-; unsigned char __fastcall__ bgcolor (unsigned char color);
-; unsigned char __fastcall__ bordercolor (unsigned char color);
+; Christian Groessler, 27-Dec-2002
 ;
 
  	.export		_textcolor, _bgcolor, _bordercolor
-	.import		return0, return1
+	.import		return1
 
-_textcolor	= return1
+	.include	"atari.inc"
 
-_bgcolor 	= return0
 
-_bordercolor	= return0
+_textcolor	=	return1
 
+_bgcolor:
+	ldx	COLOR2	; get old value
+	sta	COLOR2	; set new value
+	and	#$0e
+	cmp	#8
+	bcs	bright
+	lda	#$0e
+	sta	COLOR1
+	txa
+	rts
+bright:	lda	#0
+	sta	COLOR1
+	txa
+	rts
+
+
+_bordercolor:
+	ldx	COLOR4	; get old value
+	sta	COLOR4	; set new value
+	txa
+	rts
 

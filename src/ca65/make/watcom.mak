@@ -70,6 +70,7 @@ OBJS = 	asserts.obj     \
 	scanner.obj	\
         segment.obj     \
         spool.obj       \
+        symentry.obj    \
 	symtab.obj	\
 	toklist.obj	\
 	ulabel.obj

@@ -36,7 +36,6 @@
 #include <string.h>
 
 /* common */
-#include "cddefs.h"
 #include "check.h"
 #include "hashstr.h"
 #include "symdefs.h"
@@ -59,53 +58,13 @@
 
 
 
-/* Bits for the Flags value in SymEntry */
-#define SF_NONE         0x0000          /* Empty flag set */
-#define SF_USER		0x0001		/* User bit */
-#define SF_TRAMPOLINE  	0x0002		/* Trampoline entry */
-#define SF_EXPORT      	0x0004		/* Export this symbol */
-#define SF_IMPORT   	0x0008		/* Import this symbol */
-#define SF_GLOBAL	0x0010		/* Global symbol */
-#define SF_ZP  	       	0x0020		/* Declared as zeropage symbol */
-#define SF_ABS		0x0040 		/* Declared as absolute symbol */
-#define SF_LABEL        0x0080          /* Used as a label */
-#define SF_FORCED       0x0100          /* Forced import, SF_IMPORT also set */
-#define SF_FINALIZED    0x0200          /* Symbol is finalized */
-#define SF_INDEXED	0x0800		/* Index is valid */
-#define SF_CONST    	0x1000		/* The symbol has a constant value */
-#define SF_MULTDEF     	0x2000		/* Multiply defined symbol */
-#define	SF_DEFINED  	0x4000 	       	/* Defined */
-#define SF_REFERENCED	0x8000 	       	/* Referenced */
-
-/* Combined stuff */
+/* Combined symbol entry flags used within this module */
 #define SF_UNDEFMASK	(SF_REFERENCED | SF_DEFINED | SF_IMPORT)
 #define SF_UNDEFVAL	(SF_REFERENCED)
 #define SF_EXPMASK	(SF_TRAMPOLINE | SF_EXPORT)
 #define SF_EXPVAL	(SF_EXPORT)
 #define SF_DBGINFOMASK	(SF_TRAMPOLINE | SF_DEFINED | SF_EXPORT | SF_IMPORT)
 #define SF_DBGINFOVAL 	(SF_DEFINED)
-
-/* Structure of a symbol table entry */
-struct SymEntry {
-    SymEntry*  	      	    Left;      	/* Lexically smaller entry */
-    SymEntry*  	    	    Right; 	/* Lexically larger entry */
-    SymEntry*  	    	    List;	/* List of all entries */
-    SymEntry*  	       	    Locals;  	/* Root of subtree for local symbols */
-    struct SymTable*	    SymTab;	/* Table this symbol is in, 0 for locals */
-    FilePos    	       	    Pos;  	/* File position for this symbol */
-    unsigned                Flags;	/* Symbol flags */
-    unsigned	    	    Index;	/* Index of import/export entries */
-    union {
-        struct ExprNode*    Expr;      	/* Expression if CONST not set */
-	long	    	    Val;  	/* Value (if CONST set) */
-	SymEntry*  	    Sym;	/* Symbol (if trampoline entry) */
-    } V;
-    unsigned char      	    ConDesPrio[CD_TYPE_COUNT];	/* ConDes priorities... */
-					/* ...actually value+1 (used as flag) */
-    char       	       	    Name [1];	/* Dynamic allocation */
-};
-
-
 
 /* Definitions for the hash table */
 #define MAIN_HASHTAB_SIZE    	213
@@ -118,16 +77,11 @@ struct SymTable {
     SymEntry*  	    	Table [1];  	/* Dynamic allocation */
 };
 
-
-
 /* Arguments for SymFind */
 #define SF_FIND_EXISTING 	0
 #define SF_ALLOC_NEW		1
 
-
-
 /* Symbol table variables */
-static SymEntry*       	SymList = 0;  	/* List of all symbol table entries */
 static SymEntry*    	SymLast = 0;   	/* Pointer to last defined symbol */
 static SymTable*    	SymTab  = 0; 	/* Pointer to current symbol table */
 static SymTable*	RootTab = 0;	/* Root symbol table */
@@ -146,39 +100,6 @@ static int IsLocal (const char* Name)
 /* Return true if Name is the name of a local symbol */
 {
     return (*Name == LocalStart);
-}
-
-
-
-static SymEntry* NewSymEntry (const char* Name)
-/* Allocate a symbol table entry, initialize and return it */
-{
-    SymEntry* S;
-    unsigned Len;
-
-    /* Get the length of the name */
-    Len = strlen (Name);
-
-    /* Allocate memory */
-    S = xmalloc (sizeof (SymEntry) + Len);
-
-    /* Initialize the entry */
-    S->Left	= 0;
-    S->Right	= 0;
-    S->Locals	= 0;
-    S->SymTab	= 0;
-    S->Pos	= CurPos;
-    S->Flags	= 0;
-    S->V.Expr	= 0;
-    memset (S->ConDesPrio, 0, sizeof (S->ConDesPrio));
-    memcpy (S->Name, Name, Len+1);
-
-    /* Insert it into the list of all entries */
-    S->List = SymList;
-    SymList = S;
-
-    /* Return the initialized entry */
-    return S;
 }
 
 

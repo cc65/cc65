@@ -37,6 +37,7 @@ OBJS =  asserts.o       \
         scanner.o	\
         segment.o       \
         spool.o         \
+        symentry.o      \
         symtab.o	\
        	toklist.o      	\
 	ulabel.o

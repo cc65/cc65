@@ -707,7 +707,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
 
 
 
-static void CallFunction (ExprDesc* lval)
+static void FunctionCall (ExprDesc* lval)
 /* Perform a function call.  Called from hie11, this routine will
  * either call the named function, or the function pointer in a/x.
  */
@@ -1260,7 +1260,7 @@ static int hie11 (ExprDesc *lval)
 	    	    ++lval->Type; 	    	/* Skip T_PTR */
 	    	    lval->Flags |= E_MEXPR;
      	    	}
-     	    	CallFunction (lval);
+     	    	FunctionCall (lval);
      	    	lval->Flags = E_MEXPR;
      	    	lval->Type += DECODE_SIZE + 1;       	/* Set to result */
      	    } else {

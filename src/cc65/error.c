@@ -152,7 +152,8 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "Variable has unknown size",
     "Unknown identifier: `%s'",
     "Duplicate qualifier: `%s'",
-    "Assignment to const",
+    "Assignment discards `const' qualifier",
+    "Passing argument %u discards `const' qualifier",
 };
 
 

@@ -191,7 +191,7 @@ static void ParseOneDecl (const DeclSpec* Spec)
 		    /* Setup the type flags for the assignment */
 		    flags = Size == 1? CF_FORCECHAR : CF_NONE;
 
-		    /* Get the expression into the primary */
+	      	    /* Get the expression into the primary */
 		    if (evalexpr (flags, hie1, &lval) == 0) {
 			/* Constant expression. Adjust the types */
 			assignadjust (Decl.Type, &lval);
@@ -268,20 +268,24 @@ static void ParseOneDecl (const DeclSpec* Spec)
 	    /* Static data */
 	    if (curtok == TOK_ASSIGN) {
 
-		/* Initialization ahead, switch to data segment */
-		g_usedata ();
+	      	/* Initialization ahead, switch to data segment */
+		if (IsConst (Decl.Type)) {
+		    g_userodata ();
+		} else {
+		    g_usedata ();
+		}
 
-		/* Define the variable label */
-		SymData = GetLabel ();
-		g_defloclabel (SymData);
+	      	/* Define the variable label */
+	      	SymData = GetLabel ();
+	      	g_defloclabel (SymData);
 
-		/* Skip the '=' */
-		NextToken ();
+	      	/* Skip the '=' */
+	      	NextToken ();
 
-		/* Allow initialization of static vars */
-		ParseInit (Decl.Type);
+	      	/* Allow initialization of static vars */
+	      	ParseInit (Decl.Type);
 
-		/* Mark the variable as referenced */
+	      	/* Mark the variable as referenced */
 		SC |= SC_REF;
 
 	    } else {

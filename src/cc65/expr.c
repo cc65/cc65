@@ -580,6 +580,16 @@ static void callfunction (struct expent* lval)
 	 * convert the actual argument to the type needed.
 	 */
        	if (!Ellipsis) {
+	    /* If the left side is not const and the right is const, print
+	     * an error. Note: This is an incomplete check, since other parts
+	     * of the type string may have a const qualifier, but it catches
+	     * some errors and is cheap here. We will redo it the right way
+	     * as soon as the parser is rewritten. ####
+	     */
+	    if (!IsConst (Param->Type) && IsConst (lval2.e_tptr)) {
+		Error (ERR_CONST_PARAM, ParamCount);
+	    }
+
 	    /* Promote the argument if needed */
        	    assignadjust (Param->Type, &lval2);
 	    /* If we have a prototype, chars may be pushed as chars */

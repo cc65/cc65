@@ -148,6 +148,7 @@ enum Errors {
     ERR_UNKNOWN_IDENT,
     ERR_DUPLICATE_QUALIFIER,
     ERR_CONST_ASSIGN,
+    ERR_CONST_PARAM,
     ERR_COUNT 	     	    	   	/* Error count */
 };
 

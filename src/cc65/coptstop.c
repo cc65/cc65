@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -34,9 +34,6 @@
 
 
 #include <stdlib.h>
-
-/* common */
-#include "xsprintf.h"
 
 /* cc65 */
 #include "codeent.h"
@@ -89,10 +86,8 @@ static unsigned AdjustStackOffset (CodeSeg* S, unsigned Start, unsigned Stop,
      	    } else {
 
      		/* Insert a new load instruction before the stack access */
-     		char Buf [16];
-		CodeEntry* X;
-     		xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.RegY - Offs);
-     		X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
+     		const char* Arg = MakeHexArg (E->RI->In.RegY - Offs);
+     		CodeEntry* X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, E->LI);
      		CS_InsertEntry (S, X, I);
 
      		/* One more inserted entries */
@@ -185,9 +180,8 @@ static unsigned Opt_staxspidx (CodeSeg* S, unsigned Push, unsigned Store,
     CS_InsertEntry (S, X, Store+2);
     if (StoreEntry->RI->In.RegX >= 0) {
 	/* Value of X is known */
-	char Buf [16];
-	xsprintf (Buf, sizeof (Buf), "$%02X", StoreEntry->RI->In.RegX);
-       	X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, StoreEntry->LI);
+	const char* Arg = MakeHexArg (StoreEntry->RI->In.RegX);
+       	X = NewCodeEntry (OP65_LDA, AM65_IMM, Arg, 0, StoreEntry->LI);
     } else {
      	/* Value unknown */
      	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, StoreEntry->LI);
@@ -271,9 +265,8 @@ static unsigned Opt_tosaddax (CodeSeg* S, unsigned Push, unsigned Add,
      	CodeLabel* L;
      	if (PushEntry->RI->In.RegX >= 0) {
      	    /* Value of first op high byte is known */
-     	    char Buf [16];
-	    xsprintf (Buf, sizeof (Buf), "$%02X", PushEntry->RI->In.RegX);
-	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, AddEntry->LI);
+	    const char* Arg = MakeHexArg (PushEntry->RI->In.RegX);
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, AddEntry->LI);
 	} else {
 	    /* Value of first op high byte is unknown */
 	    X = NewCodeEntry (OP65_LDX, AM65_ZP, ZPHi, 0, AddEntry->LI);
@@ -429,10 +422,8 @@ static unsigned Opt_tosorax (CodeSeg* S, unsigned Push, unsigned Or,
     CS_InsertEntry (S, X, Or+1);
     if (PushEntry->RI->In.RegX >= 0 && OrEntry->RI->In.RegX >= 0) {
      	/* Both values known, precalculate the result */
-	char Buf [16];
-	int Val = (PushEntry->RI->In.RegX | OrEntry->RI->In.RegX);
-	xsprintf (Buf, sizeof (Buf), "$%02X", Val);
-       	X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, OrEntry->LI);
+	const char* Arg = MakeHexArg (PushEntry->RI->In.RegX | OrEntry->RI->In.RegX);
+       	X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, OrEntry->LI);
 	CS_InsertEntry (S, X, Or+2);
     } else if (PushEntry->RI->In.RegX != 0) {
      	/* High byte is unknown */
@@ -506,10 +497,8 @@ static unsigned Opt_tosxorax (CodeSeg* S, unsigned Push, unsigned Xor,
     CS_InsertEntry (S, X, Xor+1);
     if (PushEntry->RI->In.RegX >= 0 && XorEntry->RI->In.RegX >= 0) {
      	/* Both values known, precalculate the result */
-     	char Buf [16];
-     	int Val = (PushEntry->RI->In.RegX ^ XorEntry->RI->In.RegX);
-     	xsprintf (Buf, sizeof (Buf), "$%02X", Val);
-       	X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, XorEntry->LI);
+     	const char* Arg = MakeHexArg (PushEntry->RI->In.RegX ^ XorEntry->RI->In.RegX);
+       	X = NewCodeEntry (OP65_LDX, AM65_IMM, Arg, 0, XorEntry->LI);
      	CS_InsertEntry (S, X, Xor+2);
     } else if (PushEntry->RI->In.RegX != 0) {
      	/* High byte is unknown */

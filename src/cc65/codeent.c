@@ -214,7 +214,7 @@ const char* MakeHexArg (unsigned Num)
  * safe).
  */
 {
-    static char Buf[4];
+    static char Buf[16];
     xsprintf (Buf, sizeof (Buf), "$%02X", (char) Num);
     return Buf;
 }

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -32,9 +32,6 @@
 /*****************************************************************************/
 
 
-
-/* common */
-#include "xsprintf.h"
 
 /* cc65 */
 #include "codeent.h"
@@ -191,12 +188,12 @@ unsigned OptAdd2 (CodeSeg* S)
        	    (GetRegInfo (S, I+4, REG_AX) & REG_AX) == 0) {
 
 	    /* Insert new code behind the addeqysp */
-	    char Buf [20];
+	    const char* Arg;
 	    CodeEntry* X;
 
 	    /* ldy     #xx-1 */
-	    xsprintf (Buf, sizeof (Buf), "$%02X", (int)(L[0]->Num-1));
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
+	    Arg = MakeHexArg (L[0]->Num-1);
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[0]->LI);
 	    CS_InsertEntry (S, X, I+4);
 
 	    /* lda     (sp),y */
@@ -228,8 +225,8 @@ unsigned OptAdd2 (CodeSeg* S)
 	    CS_InsertEntry (S, X, I+11);
 
 	    /* ldy     #yy+1 */
-	    xsprintf (Buf, sizeof (Buf), "$%02X", (int)(L[2]->Num+1));
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[2]->LI);
+	    Arg = MakeHexArg (L[2]->Num+1);
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[2]->LI);
 	    CS_InsertEntry (S, X, I+12);
 
 	    /* adc     (sp),y */

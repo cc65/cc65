@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001      Ullrich von Bassewitz                                       */
+/* (C) 2001-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -33,10 +33,7 @@
 
 
 
-/* common */
-#include "xsprintf.h"
-
-/* cc65 */			  
+/* cc65 */
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptpush.h"
@@ -86,12 +83,12 @@ unsigned OptPush1 (CodeSeg* S)
        	    (GetRegInfo (S, I+3, REG_AX) & REG_AX) == 0) {
 
 	    /* Insert new code behind the pushax */
-	    char Buf [20];
+	    const char* Arg;
 	    CodeEntry* X;
 
 	    /* ldy     #xx+1 */
-	    xsprintf (Buf, sizeof (Buf), "$%02X", (int)(L[0]->Num+2));
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
+	    Arg = MakeHexArg (L[0]->Num+2);
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Arg, 0, L[0]->LI);
 	    CS_InsertEntry (S, X, I+3);
 
 	    /* jsr pushwysp */

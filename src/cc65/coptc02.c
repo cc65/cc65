@@ -201,11 +201,14 @@ unsigned Opt65C02Stores (CodeSeg* S)
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
-	/* Check for the sequence */
-	if (E->OPC == OP65_STA      	       	        &&
+	/* Check for a store with a register value of zero and an addressing
+	 * mode available with STZ.
+	 */
+       	if (((E->OPC == OP65_STA && E->RI->In.RegA == 0) ||
+	     (E->OPC == OP65_STX && E->RI->In.RegX == 0) ||
+	     (E->OPC == OP65_STY && E->RI->In.RegY == 0))     	&&
             (E->AM == AM65_ZP  || E->AM == AM65_ABS ||
-             E->AM == AM65_ZPX || E->AM == AM65_ABSX )  &&
-            E->RI->In.RegA == 0) {
+             E->AM == AM65_ZPX || E->AM == AM65_ABSX)) {
 
             /* Replace by STZ */
             CodeEntry* X = NewCodeEntry (OP65_STZ, E->AM, E->Arg, 0, E->LI);

@@ -846,6 +846,10 @@ types:
 		    type = destructor,
 		    label = __DESTRUCTOR_TABLE__,
 		    count = __DESTRUCTOR_COUNT__;
+	    CONDES: segment = RODATA,
+		    type = 2,
+		    label = __IRQFUNC_TABLE__,
+		    count = __IRQFUNC_COUNT__;
 	}
 	SYMBOLS {
 	    __STACKSIZE__ = $781;      	# ~2K stack

@@ -12,13 +12,14 @@ AR = ../src/ar65/ar65
 
 # List of all targets
 ALLTARGETS =	apple2lib	\
-		atarilib	\
-		c64lib		\
-		c128lib		\
+		atarilib 	\
+		atmoslib	\
+		c64lib	 	\
+		c128lib	 	\
 		cbm510lib	\
 		cbm610lib	\
-		geoslib		\
-		petlib		\
+		geoslib	 	\
+		petlib	 	\
 		plus4lib
 
 #-----------------------------------------------------------------------------
@@ -58,6 +59,22 @@ atarilib:
 	mv atari/crt0.o atari.o
 	for i in atari common runtime conio dbg; do \
 	    $(AR) a atari.lib $$i/*.o;\
+	done
+
+#-----------------------------------------------------------------------------
+# Oric Atmos
+
+atmoslib:
+	for i in atmos common runtime; do \
+	    CC=$(CC) \
+	    AS=$(AS) \
+	    CFLAGS="-Osir -g -T -t atmos -I../../include" \
+       	    AFLAGS="-t atmos -I../../asminc" \
+	    $(MAKE) -C $$i || exit 1; \
+	done
+	mv atmos/crt0.o atmos.o
+	for i in atmos common runtime; do \
+	    $(AR) a atmos.lib $$i/*.o;\
 	done
 
 #-----------------------------------------------------------------------------

@@ -51,7 +51,7 @@
 unsigned OptRTSJumps (CodeSeg* S);
 /* Replace jumps to RTS by RTS */
 
-unsigned OptDeadJumps (CodeSeg* S); 
+unsigned OptDeadJumps (CodeSeg* S);
 /* Remove dead jumps (jumps to the next instruction) */
 
 unsigned OptDeadCode (CodeSeg* S);
@@ -88,6 +88,9 @@ unsigned OptCondBranches (CodeSeg* S);
 
 unsigned OptUnusedLoads (CodeSeg* S);
 /* Remove loads of registers where the value loaded is not used later. */
+
+unsigned OptDuplicateLoads (CodeSeg* S);
+/* Remove loads of registers where the value loaded is already in the register. */
 
 unsigned OptBranchDist (CodeSeg* S);
 /* Change branches for the distance needed. */

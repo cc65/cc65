@@ -169,6 +169,7 @@ typedef enum {
     AM65_IMM,       	   	/* immidiate */
     AM65_ZP,        	   	/* zeropage */
     AM65_ZPX,       	   	/* zeropage,X */
+    AM65_ZPY,                   /* zeropage,Y */
     AM65_ABS,       	   	/* absolute */
     AM65_ABSX,      	   	/* absolute,X */
     AM65_ABSY,      	   	/* absolute,Y */

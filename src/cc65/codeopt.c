@@ -1296,6 +1296,7 @@ static OptFunc OptFuncs [] = {
     { OptCmp5,              "OptCmp5",                  0       },
     /* Remove unused loads */
     { OptUnusedLoads,	    "OptUnusedLoads",		0	},
+    { OptDuplicateLoads,    "OptDuplicateLoads",        0       },
     /* Optimize branch distance */
     { OptBranchDist,   	    "OptBranchDist",		0	},
 };

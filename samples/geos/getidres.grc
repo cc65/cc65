@@ -1,0 +1,6 @@
+HEADER APPLICATION "getid" "GetId" "V1.0" {
+mode any
+dostype USR
+author "Maciej Witkowiak"
+info "This is an example."
+}

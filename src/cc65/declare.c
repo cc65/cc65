@@ -745,23 +745,23 @@ static FuncDesc* ParseFuncDecl (const DeclSpec* Spec)
      	NextToken ();
      	F->Flags |= FD_VOID_PARAM;
     } else if (CurTok.Tok == TOK_IDENT &&
-	       (NextTok.Tok == TOK_COMMA || NextTok.Tok == TOK_RPAREN)) {
-	/* If the identifier is a typedef, we have a new style parameter list,
-	 * if it's some other identifier, it's an old style parameter list.
-	 */
-	Sym = FindSym (CurTok.Ident);
-	if (Sym == 0 || !SymIsTypeDef (Sym)) {
-	    /* Old style (K&R) function. Assume variable param list. */
-	    F->Flags |= (FD_OLDSTYLE | FD_VARIADIC);
+     	       (NextTok.Tok == TOK_COMMA || NextTok.Tok == TOK_RPAREN)) {
+     	/* If the identifier is a typedef, we have a new style parameter list,
+     	 * if it's some other identifier, it's an old style parameter list.
+     	 */
+     	Sym = FindSym (CurTok.Ident);
+     	if (Sym == 0 || !SymIsTypeDef (Sym)) {
+     	    /* Old style (K&R) function. Assume variable param list. */
+     	    F->Flags |= (FD_OLDSTYLE | FD_VARIADIC);
+     	}
+    }
 
-	    /* Check for an implicit int return in the K&R function */
-	    if ((Spec->Flags & DS_DEF_TYPE) != 0 &&
-	    	Spec->Type[0] == T_INT 	 &&
-	    	Spec->Type[1] == T_END) {
-	    	/* Function has an implicit int return */
-	    	F->Flags |= FD_OLDSTYLE_INTRET;
-	    }
-	}
+    /* Check for an implicit int return in the function */
+    if ((Spec->Flags & DS_DEF_TYPE) != 0 &&
+        Spec->Type[0] == T_INT 	         &&
+        Spec->Type[1] == T_END) {
+        /* Function has an implicit int return */
+        F->Flags |= FD_OLDSTYLE_INTRET;
     }
 
     /* Parse params */

@@ -220,7 +220,7 @@ static void OutputDataLine (DataSeg* S, const char* Format, ...)
 {
     va_list ap;
     va_start (ap, Format);
-    AddDataEntry (S, Format, ap);
+    DS_AddLine (S, Format, ap);
     va_end (ap);
 }
 

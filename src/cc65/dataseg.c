@@ -67,7 +67,7 @@ DataSeg* NewDataSeg (const char* Name, SymEntry* Func)
 
 
 
-void AppendDataSeg (DataSeg* Target, const DataSeg* Source)
+void DS_Append (DataSeg* Target, const DataSeg* Source)
 /* Append the data from Source to Target */
 {
     unsigned I;
@@ -81,7 +81,7 @@ void AppendDataSeg (DataSeg* Target, const DataSeg* Source)
 
 
 
-void AddDataEntry (DataSeg* S, const char* Format, va_list ap)
+void DS_AddLine (DataSeg* S, const char* Format, va_list ap)
 /* Add a line to the given data segment */
 {
     /* Format the line */
@@ -94,7 +94,7 @@ void AddDataEntry (DataSeg* S, const char* Format, va_list ap)
 
 
 
-void OutputDataSeg (const DataSeg* S, FILE* F)
+void DS_Output (const DataSeg* S, FILE* F)
 /* Output the data segment data to a file */
 {
     unsigned I;
@@ -118,6 +118,7 @@ void OutputDataSeg (const DataSeg* S, FILE* F)
     /* Add an additional newline after the segment output */
     fprintf (F, "\n");
 }
+
 
 
 

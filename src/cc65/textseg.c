@@ -70,7 +70,7 @@ TextSeg* NewTextSeg (SymEntry* Func)
 
 
 
-void AddTextEntry (TextSeg* S, const char* Format, va_list ap)
+void TS_AddLine (TextSeg* S, const char* Format, va_list ap)
 /* Add a line to the given text segment */
 {
     /* Format the line */
@@ -83,7 +83,7 @@ void AddTextEntry (TextSeg* S, const char* Format, va_list ap)
 
 
 
-void OutputTextSeg (const TextSeg* S, FILE* F)
+void TS_Output (const TextSeg* S, FILE* F)
 /* Output the text segment data to a file */
 {
     unsigned I;

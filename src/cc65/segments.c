@@ -201,7 +201,7 @@ void AddTextLine (const char* Format, ...)
     va_list ap;
     va_start (ap, Format);
     CHECK (CS != 0);
-    AddTextEntry (CS->Text, Format, ap);
+    TS_AddLine (CS->Text, Format, ap);
     va_end (ap);
 }
 
@@ -213,7 +213,7 @@ void AddCodeLine (const char* Format, ...)
     va_list ap;
     va_start (ap, Format);
     CHECK (CS != 0);
-    CS_AddEntryLine (CS->Code, CurTok.LI, Format, ap);
+    CS_AddLine (CS->Code, CurTok.LI, Format, ap);
     va_end (ap);
 }
 
@@ -234,7 +234,7 @@ void AddDataLine (const char* Format, ...)
     va_list ap;
     va_start (ap, Format);
     CHECK (CS != 0);
-    AddDataEntry (GetDataSeg(), Format, ap);
+    DS_AddLine (GetDataSeg(), Format, ap);
     va_end (ap);
 }
 
@@ -264,12 +264,12 @@ void OutputSegments (const Segments* S, FILE* F)
     }
 
     /* Output the text segment */
-    OutputTextSeg (S->Text, F);
+    TS_Output (S->Text, F);
 
     /* Output the three data segments */
-    OutputDataSeg (S->Data, F);
-    OutputDataSeg (S->ROData, F);
-    OutputDataSeg (S->BSS, F);
+    DS_Output (S->Data, F);
+    DS_Output (S->ROData, F);
+    DS_Output (S->BSS, F);
 
     /* Output the code segment */
     CS_Output (S->Code, F);

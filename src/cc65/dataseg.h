@@ -58,8 +58,8 @@
 
 typedef struct DataSeg DataSeg;
 struct DataSeg {
-    char*		SegName; 	/* Segment name */
-    SymEntry*		Func;		/* Owner function */
+    char*      		SegName; 	/* Segment name */
+    SymEntry*  		Func;		/* Owner function */
     Collection 	       	Lines;	       	/* List of code lines */
 };
 
@@ -74,13 +74,13 @@ struct DataSeg {
 DataSeg* NewDataSeg (const char* SegName, SymEntry* Func);
 /* Create a new data segment, initialize and return it */
 
-void AppendDataSeg (DataSeg* Target, const DataSeg* Source);
+void DS_Append (DataSeg* Target, const DataSeg* Source);
 /* Append the data from Source to Target. */
 
-void AddDataEntry (DataSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
+void DS_AddLine (DataSeg* S, const char* Format, va_list ap) attribute ((format(printf,2,0)));
 /* Add a line to the given data segment */
 
-void OutputDataSeg (const DataSeg* S, FILE* F);
+void DS_Output (const DataSeg* S, FILE* F);
 /* Output the data segment data to a file */
 
 

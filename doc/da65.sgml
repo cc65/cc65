@@ -233,6 +233,13 @@ anything). Each attribute is terminated by a semicolon.
 </verb></tscreen>
 
 
+<sect1>Comments<p>
+
+Comments start with a hash mark (<tt/#/)  and extend from the position of
+the mark to the end of the current line. Hash marks inside of strings will
+of course <em/not/ start a comment.
+
+
 <sect1>Specifying global options<p>
 
 Global options may be specified in a group with the name <tt/GLOBAL/. The
@@ -241,7 +248,6 @@ following attributes are recognized:
 <descrip>
 
   <tag><tt>COMMENTS</tt></tag>
-
   This attribute may be used instead of the <tt><ref id="option--comments"
   name="--comments"></tt> option on the command line. It takes a numerical
   parameter between 0 and 4. Higher values increase the amount of information
@@ -249,34 +255,29 @@ following attributes are recognized:
 
 
   <tag><tt>CPU</tt></tag>
-
   This attribute may be used instead of the <tt><ref id="option--cpu"
   name="--cpu"></tt> option on the command line. It takes a string parameter.
 
 
   <tag><tt>INPUTNAME</tt></tag>
-
   The attribute is followed by a string value, which gives the name of the
   input file to read. If it is present, the disassembler does not accept an
   input file name on the command line.
 
 
   <tag><tt>INPUTOFFS</tt></tag>
-
   The attribute is followed by a numerical value that gives an offset into
   the input file which is skipped before reading data. The attribute may be
   used to skip headers or unwanted code sections in the input file.
 
 
   <tag><tt>INPUTSIZE</tt></tag>
-
   <tt/INPUTSIZE/ is followed by a numerical value that gives the amount of
   data to read from the input file. Data beyond <tt/INPUTOFFS + INPUTSIZE/
   is ignored.
 
 
   <tag><tt>OUTPUTNAME</tt></tag>
-
   The attribute is followed by string value, which gives the name of the
   output file to write. If it is present, specification of an output file on
   the command line using the <tt><ref id="option-o" name="-o"></tt> option is
@@ -287,7 +288,6 @@ following attributes are recognized:
 
 
   <tag><tt>PAGELENGTH</tt></tag>
-
   This attribute may be used instead of the <tt><ref id="option--pagelength"
   name="--pagelength"></tt> option on the command line. It takes a numerical
   parameter. Using zero as page length (which is the default) means that no
@@ -295,7 +295,6 @@ following attributes are recognized:
 
 
   <tag><tt>STARTADDR</tt></tag>
-
   This attribute may be used instead of the <tt><ref id="option--start-addr"
   name="--start-addr"></tt> option on the command line. It takes a numerical
   parameter. The default for the start address is $10000 minus the size of
@@ -312,47 +311,44 @@ following attributes are recognized:
 
 <descrip>
 
-  <tag><tt>START</tt></tag>
-
-  This gives the start address of the range.
-
-
   <tag><tt>END</tt></tag>
-
   This gives the end address of the range. The end address is inclusive, that
   means, it is part of the range. Of course, it may not be smaller than the
   start address.
 
+  <tag><tt>NAME</tt></tag>
+  This is a convenience attribute. It takes a string argument and will cause
+  the disassembler to define a label for the start of the range with the
+  given name. So a separate <tt><ref id="infofile-label" name="LABEL"></tt>
+  directive is not needed.
+
+  <tag><tt>START</tt></tag>
+  This gives the start address of the range.
 
   <tag><tt>TYPE</tt></tag>
-
   This attribute specifies the type of data within the range. The attribute
   value is one of the following keywords:
 
   <descrip>
-    <tag><tt>CODE</tt></tag>
-    The range consists of code.
+    <tag><tt>ADDRTABLE</tt></tag>
+    The range consists of data and is disassembled as a table of words
+    (16 bit values). The difference to the <tt/WORDTABLE/ type is that
+    a label is defined for each entry in the table.
 
     <tag><tt>BYTETABLE</tt></tag>
     The range consists of data and is disassembled as a byte table.
+
+    <tag><tt>CODE</tt></tag>
+    The range consists of code.
 
     <tag><tt>DBYTETABLE</tt></tag>
     The range consists of data and is disassembled as a table of dbytes
     (double byte values, 16 bit values with the low byte containing the
     most significant byte of the 16 bit value).
 
-    <tag><tt>WORDTABLE</tt></tag>
-    The range consists of data and is disassembled as a table of words
-    (16 bit values).
-
     <tag><tt>DWORDTABLE</tt></tag>
     The range consists of data and is disassembled as a table of double
     words (32 bit values).
-
-    <tag><tt>ADDRTABLE</tt></tag>
-    The range consists of data and is disassembled as a table of words
-    (16 bit values). The difference to the <tt/WORDTABLE/ type is that
-    a label is defined for each entry in the table.
 
     <tag><tt>RTSTABLE</tt></tag>
     The range consists of data and is disassembled as a table of words (16 bit
@@ -361,41 +357,40 @@ following attributes are recognized:
     <tt/address-1/ of a function, for which a label will get defined by the
     disassembler.
 
+    <tag><tt>SKIP</tt></tag>
+    The range is simply ignored when generating the output file. Please note
+    that this means that reassembling the output file will <em/not/ generate
+    the original file, not only because the missing piece in between, but also
+    because the following code will be located on wrong addresses. Output
+    generated with <tt/SKIP/ ranges will need manual rework.
+
     <tag><tt>TEXTTABLE</tt></tag>
     The range consists of readable text.
 
-    <tag><tt>SKIP</tt></tag>
-    The range is simply ignored when generating the output file. Please note 
-    that this means that reassembling the output file will <em/not/ generate
-    the original file, not only because the missing piece in between, but also
-    because the following code will located on wrong addresses. Output 
-    generated with <tt/SKIP/ ranges will need manual rework.
+    <tag><tt>WORDTABLE</tt></tag>
+    The range consists of data and is disassembled as a table of words
+    (16 bit values).
 
   </descrip>
 
 </descrip>
 
 
-<sect1>Specifying Labels<p>
+<sect1>Specifying Labels<label id="infofile-label"><p>
 
 The <tt/LABEL/ directive is used to give names for labels in the disassembled
 code. The following attributes are recognized:
 
 <descrip>
 
-  <tag><tt>NAME</tt></tag>
+  <tag><tt>ADDR</tt></tag>
+  Followed by a numerical value. Specifies the value of the label.
 
+  <tag><tt>NAME</tt></tag>
   The attribute is followed by a string value which gives the name of the
   label.
 
-
-  <tag><tt>ADDR</tt></tag>
-
-  Followed by a numerical value. Specifies the value of the label.
-
-
   <tag><tt>SIZE</tt></tag>
-
   This attribute is optional and may be used to specifiy the size of the data
   that follows. If a size greater than 1 is specified, the disassembler will
   create labels in the form <tt/label+offs/ for all bytes within the given
@@ -411,12 +406,13 @@ The following is a short example for an info file that contains most of the
 directives explained above:
 
 <tscreen><verb>
+        # This is a comment. It extends to the end of the line
         GLOBAL {
-                OUTPUTNAME "kernal.s";
-                INPUTNAME  "kernal.bin";
-                STARTADDR  $E000;
-                PAGELENGTH 0;       	# No paging
-                CPU        "6502";
+            OUTPUTNAME      "kernal.s";
+            INPUTNAME       "kernal.bin";
+            STARTADDR       $E000;
+            PAGELENGTH      0;                  # No paging
+            CPU             "6502";
         };
 
 

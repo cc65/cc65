@@ -14,6 +14,8 @@
 C_OBJS =
 
 S_OBJS =	tgi-kernel.o	\
+                tgi_circle.o    \
+                tgi_clear.o     \
                 tgi_done.o      \
                 tgi_geterror.o  \
                 tgi_getmaxx.o   \
@@ -21,6 +23,7 @@ S_OBJS =	tgi-kernel.o	\
                 tgi_getxres.o   \
                 tgi_getyres.o   \
                 tgi_init.o      \
+                tgi_line.o      \
 		tgi_map_mode.o  \
                 tgi_unload.o
 

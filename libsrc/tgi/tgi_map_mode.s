@@ -44,5 +44,8 @@ Found:  tya
         ldx     #>_tgi_mode_table
         sec                             ; Account for the mode byte
         adc     #<_tgi_mode_table       ; Return pointer to file name
-        rts
+        bcc     @L1
+        inx
+@L1:    rts
 
+    

@@ -39,11 +39,11 @@ _textcolor:
 ; translate vdc->vic colour
 
 vdctovic:
-       	ldy	#15
-@L2:    cmp	$CE5C,y
+       	ldy	#16
+@L2:    cmp	$CE5C-1,y
         beq	@L3
         dey
-        bpl	@L2
+        bne     @L2
 @L3:	tya
 	rts
 

@@ -74,6 +74,8 @@ endif
 ld65:   $(INCS) $(OBJS) $(LIBS)
 	$(CC) $(CFLAGS) -o $@ $(OBJS) $(LIBS)
 
+inc:	$(INCS)
+
 clean:
 	rm -f *~ core *.map
 

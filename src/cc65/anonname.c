@@ -34,13 +34,25 @@
 
 
 #include <stdio.h>
+#include <string.h>
 
+/* cc65 */
 #include "anonname.h"
 
 
 
 /*****************************************************************************/
-/*				     Code				     */
+/*				     Data				     */
+/*****************************************************************************/
+
+
+
+static const char AnonTag[] = "$anon";
+
+
+
+/*****************************************************************************/
+/*		      		     Code				     */
 /*****************************************************************************/
 
 
@@ -51,8 +63,16 @@ char* AnonName (char* Buf, const char* Spec)
  */
 {
     static unsigned ACount = 0;
-    sprintf (Buf, "$anon-%s-%04X", Spec, ++ACount);
+    sprintf (Buf, "%s-%s-%04X", AnonTag, Spec, ++ACount);
     return Buf;
+}
+
+
+
+int IsAnonName (const char* Name)
+/* Check if the given symbol name is that of an anonymous symbol */
+{
+    return (strncmp (Name, AnonTag, sizeof (AnonTag) - 1) == 0);
 }
 
 

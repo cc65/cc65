@@ -39,6 +39,7 @@
 #include "xmalloc.h"
 
 /* cc65 */
+#include "anonname.h"
 #include "symentry.h"
 
 
@@ -166,10 +167,18 @@ void ChangeSymType (SymEntry* Entry, type* Type)
 
 
 void ChangeAsmName (SymEntry* Entry, const char* NewAsmName)
-/* Change the assembler name of the symbol */		    
+/* Change the assembler name of the symbol */
 {
     xfree (Entry->AsmName);
     Entry->AsmName = xstrdup (NewAsmName);
+}
+
+
+
+int HasAnonName (const SymEntry* Entry)
+/* Return true if the symbol entry has an anonymous name */
+{
+    return IsAnonName (Entry->Name);
 }
 
 

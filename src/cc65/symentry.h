@@ -154,6 +154,9 @@ void ChangeSymType (SymEntry* Entry, type* Type);
 void ChangeAsmName (SymEntry* Entry, const char* NewAsmName);
 /* Change the assembler name of the symbol */
 
+int HasAnonName (const SymEntry* Entry);
+/* Return true if the symbol entry has an anonymous name */
+
 
 
 /* End of symentry.h */

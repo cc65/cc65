@@ -33,6 +33,9 @@
 
 
 
+#include <string.h>
+
+/* cc65 */
 #include "funcdesc.h"
 #include "symtab.h"
 #include "typecmp.h"
@@ -78,8 +81,8 @@ static int EqualFuncParams (SymTable* Tab1, SymTable* Tab2)
 	Sym2 = Sym2->NextSym;
     }
 
-    /* Check both pointers against NULL or a non parameter to compare the 
-     * field count 
+    /* Check both pointers against NULL or a non parameter to compare the
+     * field count
      */
     return (Sym1 == 0 || (Sym1->Flags & SC_PARAM) == 0) &&
 	   (Sym2 == 0 || (Sym2->Flags & SC_PARAM) == 0);
@@ -97,7 +100,15 @@ static int EqualSymTables (SymTable* Tab1, SymTable* Tab2)
     /* Compare the fields */
     while (Sym1 && Sym2) {
 
-	/* Compare this field */
+	/* Compare the names of this field */
+        if (!HasAnonName (Sym1) || !HasAnonName (Sym2)) {
+            if (strcmp (Sym1->Name, Sym2->Name) != 0) {
+                /* Names are not identical */
+                return 0;
+            }
+        }
+                                
+        /* Compare the types of this field */
        	if (TypeCmp (Sym1->Type, Sym2->Type) < TC_EQUAL) {
 	    /* Field types not equal */
 	    return 0;
@@ -282,6 +293,15 @@ static void DoCompare (const type* lhs, const type* rhs, typecmp_t* Result)
     	       	 */
     	       	Sym1 = DecodePtr (lhs+1);
     	       	Sym2 = DecodePtr (rhs+1);
+
+                /* If one symbol has a name, the names must be identical */
+                if (!HasAnonName (Sym1) || !HasAnonName (Sym2)) {
+                    if (strcmp (Sym1->Name, Sym2->Name) != 0) {
+                        /* Names are not identical */
+                        SetResult (Result, TC_INCOMPATIBLE);
+                        return;
+                    }
+                }
 
 		/* Get the field tables from the struct entry */
 		Tab1 = Sym1->V.S.SymTab;

@@ -49,6 +49,9 @@ char* AnonName (char* Buf, const char* Spec);
  * to be IDENTSIZE characters long. A pointer to the buffer is returned.
  */
 
+int IsAnonName (const char* Name);
+/* Check if the given symbol name is that of an anonymous symbol */
+
 
 
 /* End of anonname.h */

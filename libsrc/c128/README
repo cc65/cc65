@@ -1,0 +1,6 @@
+Implementation notes:
+
+CONDES routines with a type code of 2 are used to implement interrupt
+handlers. Note that these are called as soon as the program is started,
+so they have to cope with this.
+

@@ -8,7 +8,8 @@
        	.export	    	_set_brk, _reset_brk
 	.destructor	_reset_brk
   	.export	    	_brk_a, _brk_x, _brk_y, _brk_sr, _brk_pc
-  	.importzp	ptr1
+	.import		BRKStub, BRKOld, BRKInd
+	.importzp	ptr1
 
   	.include    	"c128.inc"
 
@@ -20,17 +21,10 @@ _brk_y:	 	.res   	1
 _brk_sr: 	.res	1
 _brk_pc: 	.res	2
 
-oldvec:       	.res	2   		; Old vector
-
-
 .data
-uservec:    	jmp 	$FFFF		; Patched at runtime
+uservec:    	jmp 	$FFFF	 	; Patched at runtime
 
 .code
-
-; Where will we put the break stub?
-stub_addr	= $0E00			; BASIC sprite area
-
 
 
 ; Set the break vector
@@ -39,26 +33,26 @@ stub_addr	= $0E00			; BASIC sprite area
 	sta	uservec+1
   	stx	uservec+2     	; Set the user vector
 
-	lda	oldvec
-	ora	oldvec+1      	; Did we save the vector already?
-       	bne    	L2    	      	; Jump if we installed the handler already
+	lda	BRKOld+1
+	ora	BRKOld+2      	; Did we save the vector already?
+       	bne    	@L1   	      	; Jump if we installed the handler already
 
-	lda	BRKVec
- 	sta    	oldvec
+	lda	BRKVec		; Save the old vector
+ 	sta    	BRKOld+1
  	lda 	BRKVec+1
- 	sta	oldvec+1      	; Save the old vector
+ 	sta	BRKOld+2
 
-   	ldy	#stub_size-1	; Copy our stub into the low mem area
-L1:	lda	brk_stub,y
-	sta	stub_addr,y
-	dey
-	bpl	L1
+   	lda    	#<BRKStub	; Set the break vector to our stub
+    	ldx	#>BRKStub
+    	sta	BRKVec
+    	stx    	BRKVec+1
 
-L2:    	lda    	#<stub_addr 	; Set the break vector to our stub
-  	sta	BRKVec
-  	lda	#>stub_addr
-  	sta	BRKVec+1
-  	rts
+	lda	#<brk_handler	; Set the indirect vector to our handler
+	ldx	#>brk_handler
+	sta	BRKInd+1
+	stx	BRKInd+2
+
+@L1:   	rts
 
 .endproc
 
@@ -66,12 +60,14 @@ L2:    	lda    	#<stub_addr 	; Set the break vector to our stub
 ; Reset the break vector
 .proc	_reset_brk
 
-	lda  	oldvec
-	bne  	@L1
-	ldx  	oldvec
-	beq  	@L9		; Jump if vector not installed
-@L1:	sta    	BRKVec
-	stx  	BRKVec+1
+    	lda  	BRKOld+1
+    	ldx  	BRKOld+2
+    	beq  	@L9		; Jump if vector not installed
+    	sta    	BRKVec
+    	stx  	BRKVec+1
+	lda	#$00
+	sta	BRKOld+1	; Clear the saved vector
+	sta	BRKOld+2
 @L9:	rts
 
 .endproc
@@ -115,11 +111,3 @@ L2:    	lda    	#<stub_addr 	; Set the break vector to our stub
 .endproc
 
 
-brk_stub:
-	.org	stub_addr
-       	pla			; Get original MMU value
-	sta	MMU_CR		; Re-enable our config
-	jmp	brk_handler	; Jump to the user handler
-	.reloc
-
-stub_size	= * - brk_stub

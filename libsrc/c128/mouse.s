@@ -10,6 +10,7 @@
    	.export	    	_mouse_box, _mouse_info
    	.export	    	_mouse_move, _mouse_pos
 	.export		_mouse_buttons, _mouse_info
+	.condes		MouseIRQ, 2
 
 	.import		_readjoy
        	.import	       	popa, popax, addysp1
@@ -39,10 +40,11 @@ XCORR		= SPRITE_WIDTH
 ;					 unsigned char type);
 ;
 
-_mouse_init:
+.proc	_mouse_init
+
 	jsr	popa			; Ignore type and port
 
-       	ldy    	OldIRQ+1		; Already initialized?
+       	lda    	Initialized		; Already initialized?
        	bne    	AlreadyInitialized	; Jump if yes
 
 ; Initialize variables
@@ -75,49 +77,53 @@ _mouse_init:
 	sta	XMax
 	stx	XMax+1	     		; XMax = 320 + sprite width
 
-; Remember the old IRQ vector
+; Save the old init status and reset bit 0. This will disable the BASIC
+; IRQ handler which will otherwise try to manage the mouse sprite on its
+; own
 
-     	lda    	IRQVec
-     	sta   	OldIRQ	     
-     	lda   	IRQVec+1
-     	sta   	OldIRQ+1
+        lda	INIT_STATUS
+	sta	OldInitStatus
+	and	#$FE
+	sta	INIT_STATUS
 
-; Set our own IRQ vector. We cheat here to save a few bytes of code:
-; The function is expected to return a value not equal to zero on success,
-; and since we know that the high byte of the IRQ handler address is never
-; zero, we will return just this byte.
+; Mouse successfully initialized
 
-     	ldx    	#<MouseIRQ
-     	lda   	#>MouseIRQ
-     	bne   	SetIRQ			; Branch always
+        lda     #1
+	sta	Initialized
+	rts
 
 AlreadyInitialized:
-	lda	#0			; Error
+	lda	#0  			; Error
 	rts
+
+.endproc
 
 ; --------------------------------------------------------------------------
 ;
 ; void mouse_done (void);
 ;
 
-_mouse_done:
-       	ldx    	OldIRQ	  	      	; Initialized?
-     	lda 	OldIRQ+1
-     	beq    	Done   	       	      	; Jump if no
-	ldy 	#0
-   	sty 	OldIRQ+1  		; Reset the initialized flag
-SetIRQ:	sei 		  		; Disable interrupts
-      	stx 	IRQVec	  		; Set the new/old vector
-      	sta 	IRQVec+1
-   	cli 				; Enable interrupts
-Done: 	rts
+.proc	_mouse_done
+
+       	lda    	Initialized		; Initialized?
+       	beq    	@L1   	       	      	; Jump if no
+   	lda 	#0
+       	sta    	Initialized		; Reset the initialized flag
+   	lda    	OldInitStatus		; Load the old BASIC int bit
+   	and	#$01			; Mask it
+   	ora	INIT_STATUS		; Restore the old state
+   	sta	INIT_STATUS
+@L1: 	rts
+
+.endproc
 
 ; --------------------------------------------------------------------------
 ;
 ; void mouse_hide (void);
 ;
 
-_mouse_hide:
+.proc	_mouse_hide
+
        	lda 	Invisible		; Get the flag
 	bne 	@L1			; Jump if already invisible
 
@@ -130,12 +136,15 @@ _mouse_hide:
 @L1:	inc 	Invisible		; Set the flag to invisible
 	rts
 
+.endproc
+
 ; --------------------------------------------------------------------------
 ;
 ; void mouse_show (void);
 ;
 
-_mouse_show:
+.proc	_mouse_show
+
 	lda 	Invisible		; Mouse invisible?
 	beq 	@L1			; Jump if no
        	dec 	Invisible 		; Set the flag
@@ -150,12 +159,15 @@ _mouse_show:
 
 @L1:	rts
 
+.endproc
+
 ; --------------------------------------------------------------------------
 ;
 ; void __fastcall__ mouse_box (int minx, int miny, int maxx, int maxy);
 ;
 
-_mouse_box:
+.proc	_mouse_box
+
    	ldy 	#0			; Stack offset
 
     	add	YCorr			; Adjust the Y value
@@ -197,13 +209,16 @@ _mouse_box:
 
    	jmp	addysp1			; Drop params, return
 
+.endproc
+
 ; --------------------------------------------------------------------------
 ;
 ; void __fastcall__ mouse_pos (struct mouse_pos* pos);
 ; /* Return the current mouse position */
 ;
 
-_mouse_pos:
+.proc	_mouse_pos
+
        	sta	ptr1
 	stx	ptr1+1			; Remember the argument pointer
 
@@ -233,13 +248,15 @@ _mouse_pos:
 
     	rts				; Done
 
+.endproc
+
 ; --------------------------------------------------------------------------
 ;
 ; void __fastcall__ mouse_info (struct mouse_info* info);
 ; /* Return the state of the mouse buttons and the position of the mouse */
 ;
 
-_mouse_info:
+.proc	_mouse_info
 
 ; We're cheating here to keep the code smaller: The first fields of the
 ; mouse_info struct are identical to the mouse_pos struct, so we will just
@@ -256,12 +273,15 @@ _mouse_info:
 
       	rts
 
+.endproc
+
 ; --------------------------------------------------------------------------
 ;
 ; void __fastcall__ mouse_move (int x, int y);
 ;
 
-_mouse_move:
+.proc	_mouse_move
+
 	add     YCorr			; Add Y coordinate correction
 	bcc	@L1
 	inx
@@ -283,23 +303,32 @@ _mouse_move:
 
 	rts
 
+.endproc
+
 ; --------------------------------------------------------------------------
 ;
 ; unsigned char mouse_buttons (void);
 ;
 
-_mouse_buttons:
+.proc	_mouse_buttons
+
 	lda	#$00			; Use port #0
 	jmp	_readjoy		; Same as joystick
+
+.endproc
 
 ; --------------------------------------------------------------------------
 ;
 ; Mouse interrupt handler
-;
+;	 
+
+IRQDone:rts
 
 MouseIRQ:
-	cld
-      	lda	SID_ADConv1		; Get mouse X movement
+
+	lda	Initialized		; Mouse initialized?
+       	beq    	IRQDone			; Jump if no
+  	lda	SID_ADConv1		; Get mouse X movement
       	ldy	OldPotX
       	jsr	MoveCheck  		; Calculate movement vector
       	sty	OldPotX
@@ -364,14 +393,39 @@ MouseIRQ:
 @L4:	sty	YPos
 	stx	YPos+1
 
-; Move the mouse sprite if it is enabled
+; Move the mouse sprite to the current mouse position. Must be called
+; with interrupts off. MoveSprite1 is an entry without checking.
 
-	jsr	MoveSprite		; Move the sprite
+MoveSprite:
 
-; Jump to the next IRQ handler
+	lda   	Invisible		; Mouse visible?
+       	bne    	Done			; Jump if no
 
-	jmp	(OldIRQ)
+; Set the high X bit
 
+MoveSprite1:
+   	lda	VIC_SPR_HI_X		; Get high X bits of all sprites
+   	and	#$FE			; Clear bit for sprite #0
+   	ldy	XPos+1 			; Test Y position
+   	beq	@L5
+       	ora    	#$01		        ; Set high X bit
+@L5:	sta	VIC_SPR_HI_X		; Set hi X sprite values
+
+; Set the low X byte
+
+   	lda	XPos
+       	sta    	VIC_SPR0_X 	       	; Set low byte
+
+; Set the Y position
+
+   	ldy	YPos+1 	      		; Negative or too large?
+       	bne    	Done 			; Jump if yes
+   	lda	YPos
+   	sta	VIC_SPR0_Y		; Set Y position
+
+; Done
+
+Done:   rts
 
 ; --------------------------------------------------------------------------
 ;
@@ -383,7 +437,8 @@ MouseIRQ:
 ;     	   	x/a = delta value for position
 ;
 
-MoveCheck:
+.proc	MoveCheck
+
       	sty	OldValue
       	sta	NewValue
       	ldx 	#$00
@@ -409,50 +464,15 @@ MoveCheck:
 @L2:   	txa				; A = $00
       	rts
 
-; --------------------------------------------------------------------------
-;
-; Move the mouse sprite to the current mouse position. Must be called
-; with interrupts off. MoveSprite1 is an entry without checking.
-;
-
-MoveSprite:
-
-	lda   	Invisible		; Mouse visible?
-       	bne    	MoveSpriteDone		; Jump if no
-
-; Set the high X bit
-
-MoveSprite1:
-   	lda	VIC_SPR_HI_X		; Get high X bits of all sprites
-   	and	#$FE			; Clear bit for sprite #0
-   	ldy	XPos+1 			; Test Y position
-   	beq	@L1
-       	ora    	#$01		        ; Set high X bit
-@L1:	sta	VIC_SPR_HI_X		; Set hi X sprite values
-
-; Set the low X byte
-
-   	lda	XPos
-       	sta    	VIC_SPR0_X 	       	; Set low byte
-
-; Set the Y position
-
-   	ldy	YPos+1 	      		; Negative or too large?
-   	bne	MoveSpriteDone		; Jump if yes
-   	lda	YPos
-   	sta	VIC_SPR0_Y		; Set Y position
-
-; Done
-
-MoveSpriteDone:
-	rts
+.endproc
 
 ; --------------------------------------------------------------------------
 ; Data
 
 .bss
 
-OldIRQ:	       	.res   	2 		; Old IRQ vector
+Initialized:   	.res   	1 		; True if mouse initialized
+OldInitStatus:	.res	1		; Old IRQ flag value
 OldValue:	.res   	1		; Temp for MoveCheck routine
 NewValue:	.res   	1		; Temp for MoveCheck routine
 YCorr:		.res	1		; Correction for Y coordinate

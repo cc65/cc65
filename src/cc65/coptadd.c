@@ -146,25 +146,25 @@ unsigned OptAdd1 (CodeSeg* S)
 unsigned OptAdd2 (CodeSeg* S)
 /* Search for the sequence
  *
- *     	ldy     #xx
+ *     	ldy     #yy
  *      lda     (sp),y
  *  	tax
- *      dey
+ *      ldy     #xx
  *      lda     (sp),y
- *      ldy     #$yy
+ *      ldy     #zz
  *      jsr     addeqysp
  *
  * and replace it by:
  *
- *      ldy     #xx-1
+ *      ldy     #xx
  *      lda     (sp),y
- *      ldy     #yy
+ *      ldy     #zz
  *      clc
  *      adc     (sp),y
  *      sta     (sp),y
- *      ldy     #xx
+ *      ldy     #yy
  *      lda     (sp),y
- *      ldy     #yy+1
+ *      ldy     #zz+1
  *      adc     (sp),y
  *      sta     (sp),y
  *
@@ -191,7 +191,8 @@ unsigned OptAdd2 (CodeSeg* S)
 	    !CE_HasLabel (L[1])                 &&
 	    L[2]->OPC == OP65_TAX               &&
 	    !CE_HasLabel (L[2])                 &&
-	    L[3]->OPC == OP65_DEY               &&
+	    L[3]->OPC == OP65_LDY               &&
+	    CE_KnownImm (L[3])                  &&
        	    !CE_HasLabel (L[3])                 &&
 	    L[4]->OPC == OP65_LDA               &&
 	    L[4]->AM == AM65_ZP_INDY            &&
@@ -207,44 +208,43 @@ unsigned OptAdd2 (CodeSeg* S)
 	    CodeEntry* X;
 
 
-	    /* Adjust the operand of the first LDY */
-	    CE_SetNumArg (L[0], L[0]->Num - 1);
+	    /* Insert new code behind the addeqysp */
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[3]->Arg, 0,	L[3]->LI);
+	    CS_InsertEntry (S, X, I+7);
 
-	    /* Load Y with the low offset of the target variable */
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[5]->Arg, 0, L[1]->LI);
-	    CS_InsertEntry (S, X, I+2);
-
-	    /* Add the CLC */
-	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[1]->LI);
-	    CS_InsertEntry (S, X, I+3);
-
-	    /* Remove the TAX/DEY sequence */
-	    CS_DelEntry (S, I+5);      /* dey */
-	    CS_DelEntry (S, I+4);      /* tax */
-
-	    /* Addition of the low byte */
-	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[4]->LI);
-	    CS_InsertEntry (S, X, I+4);
-	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[4]->LI);
-	    CS_InsertEntry (S, X, I+5);
-
-	    /* LDY */
-	    xsprintf (Buf, sizeof (Buf), "$%02X", (int) (L[0]->Num+1));
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[4]->LI);
-	    CS_InsertEntry (S, X, I+6);
-
-	    /* Addition of the high byte */
-	    xsprintf (Buf, sizeof (Buf), "$%02X", (int)(L[5]->Num+1));
-	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[5]->LI);
+	    X = NewCodeEntry (OP65_LDA, L[4]->AM, L[4]->Arg, 0, L[4]->LI);
 	    CS_InsertEntry (S, X, I+8);
-	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[6]->LI);
+
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[5]->Arg, 0, L[5]->LI);
 	    CS_InsertEntry (S, X, I+9);
-	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[6]->LI);
+
+	    X = NewCodeEntry (OP65_CLC, AM65_IMP, 0, 0, L[6]->LI);
 	    CS_InsertEntry (S, X, I+10);
 
-	    /* Delete the remaining stuff */
-	    CS_DelEntry (S, I+12);
-	    CS_DelEntry (S, I+11);
+	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[6]->LI);
+	    CS_InsertEntry (S, X, I+11);
+
+	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[6]->LI);
+	    CS_InsertEntry (S, X, I+12);
+
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
+	    CS_InsertEntry (S, X, I+13);
+
+	    X = NewCodeEntry (OP65_LDA, L[1]->AM, L[1]->Arg, 0, L[1]->LI);
+	    CS_InsertEntry (S, X, I+14);
+
+	    xsprintf (Buf, sizeof (Buf), "$%02X", (int)(L[5]->Num+1));
+	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[5]->LI);
+	    CS_InsertEntry (S, X, I+15);
+
+	    X = NewCodeEntry (OP65_ADC, AM65_ZP_INDY, "sp", 0, L[6]->LI);
+	    CS_InsertEntry (S, X, I+16);
+
+	    X = NewCodeEntry (OP65_STA, AM65_ZP_INDY, "sp", 0, L[6]->LI);
+	    CS_InsertEntry (S, X, I+17);
+
+	    /* Delete the old code */
+	    CS_DelEntries (S, I, 7);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -311,6 +311,7 @@ unsigned OptAdd3 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
+
 
 
 

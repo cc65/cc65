@@ -790,6 +790,7 @@ static unsigned OptPtrLoad1 (CodeSeg* S)
 static unsigned OptPtrLoad2 (CodeSeg* S)
 /* Search for the sequence:
  *
+ *      clc
  *      adc    	xxx
  *      tay
  *      txa
@@ -801,6 +802,7 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
  *
  * and replace it by:
  *
+ *      clc
  *      adc    	xxx
  *      sta     ptr1
  *      txa
@@ -817,52 +819,67 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[8];
+	CodeEntry* L[9];
 
       	/* Get next entry */
        	L[0] = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (L[0]->OPC == OP65_ADC      	       	&&
-       	    CS_GetEntries (S, L+1, I+1, 7)     	&&
-       	    L[1]->OPC == OP65_TAY              	&&
-	    !CE_HasLabel (L[1])        	       	&&
-	    L[2]->OPC == OP65_TXA               &&
-	    !CE_HasLabel (L[2])                 &&
-	    L[3]->OPC == OP65_ADC               &&
+       	if (L[0]->OPC == OP65_CLC               &&
+       	    CS_GetEntries (S, L+1, I+1, 8)     	&&
+	    L[1]->OPC == OP65_ADC      	       	&&
+	    !CE_HasLabel (L[1])                 &&
+       	    L[2]->OPC == OP65_TAY              	&&
+	    !CE_HasLabel (L[2])        	       	&&
+	    L[3]->OPC == OP65_TXA               &&
 	    !CE_HasLabel (L[3])                 &&
-	    L[4]->OPC == OP65_TAX               &&
+	    L[4]->OPC == OP65_ADC               &&
 	    !CE_HasLabel (L[4])                 &&
-	    L[5]->OPC == OP65_TYA               &&
+	    L[5]->OPC == OP65_TAX               &&
 	    !CE_HasLabel (L[5])                 &&
-	    L[6]->OPC == OP65_LDY               &&
+	    L[6]->OPC == OP65_TYA               &&
 	    !CE_HasLabel (L[6])                 &&
-       	    CE_IsCall (L[7], "ldauidx")         &&
-	    !CE_HasLabel (L[7])) {
+	    L[7]->OPC == OP65_LDY               &&
+	    !CE_HasLabel (L[7])                 &&
+       	    CE_IsCall (L[8], "ldauidx")         &&
+	    !CE_HasLabel (L[8])) {
 
 	    CodeEntry* X;
+	    CodeEntry* P;
 
        	    /* Store the low byte and remove the TAY instead */
-	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+1);
-	    CS_DelEntry (S, I+2);
+	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[1]->LI);
+	    CS_InsertEntry (S, X, I+2);
+	    CS_DelEntry (S, I+3);
 
 	    /* Store the high byte */
-	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[3]->LI);
-	    CS_InsertEntry (S, X, I+4);
+	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1+1", 0, L[4]->LI);
+	    CS_InsertEntry (S, X, I+5);
+
+	    /* If the instruction before the adc is a ldx, replace the
+	     * txa by and lda with the same location of the ldx.
+	     */
+	    if ((P = CS_GetPrevEntry (S, I)) != 0 &&
+	    	P->OPC == OP65_LDX                &&
+	    	!CE_HasLabel (P)) {
+
+	    	X = NewCodeEntry (OP65_LDA, P->AM, P->Arg, 0, P->LI);
+	    	CS_InsertEntry (S, X, I+4);
+	    	CS_DelEntry (S,	I+3);
+	    }
 
 	    /* Delete more transfer insns */
+	    CS_DelEntry (S, I+7);
 	    CS_DelEntry (S, I+6);
-	    CS_DelEntry (S, I+5);
 
 	    /* Delete the call to ldauidx */
-	    CS_DelEntry (S, I+6);
+	    CS_DelEntry (S, I+7);
 
 	    /* Load high and low byte */
-	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[6]->LI);
-	    CS_InsertEntry (S, X, I+6);
-	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[6]->LI);
+	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[7]->LI);
 	    CS_InsertEntry (S, X, I+7);
+	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[7]->LI);
+	    CS_InsertEntry (S, X, I+8);
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -1381,7 +1398,7 @@ static unsigned OptDecouple (CodeSeg* S)
 
 
 /*****************************************************************************/
-/*			       Size optimization                             */
+/*	      		       Size optimization                             */
 /*****************************************************************************/
 
 
@@ -1424,7 +1441,7 @@ static unsigned OptSize (CodeSeg* S)
 		     	    X = NewCodeEntry (OP65_DEA, AM65_IMP, 0, 0, E->LI);
 		    	} else if (Val == ((E->RI->In.RegA + 1) & 0xFF)) {
 		    	    X = NewCodeEntry (OP65_INA, AM65_IMP, 0, 0, E->LI);
-		    	}
+	      	    	}
 		    }
 		}
 	        break;

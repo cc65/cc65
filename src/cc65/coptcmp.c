@@ -324,14 +324,15 @@ static int IsLocalLoad16 (CodeSeg* S, unsigned Index,
 
     /* Check for the sequence */
     return (L[0]->OPC == OP65_LDY                        &&
-	    L[0]->AM == AM65_IMM                         &&
-	    (L[0]->Flags & CEF_NUMARG) != 0              &&
+	    CE_KnownImm (L[0])                           &&
        	    CS_GetEntries (S, L+1, Index+1, Count-1)     &&
        	    IsSpLoad (L[1])                              &&
 	    !CE_HasLabel (L[1])                          &&
 	    L[2]->OPC == OP65_TAX                        &&
 	    !CE_HasLabel (L[2])                          &&
-	    L[3]->OPC == OP65_DEY                        &&
+	    L[3]->OPC == OP65_LDY                        &&
+	    CE_KnownImm (L[3])                           &&
+	    L[3]->Num == L[0]->Num - 1                   &&
 	    !CE_HasLabel (L[3])                          &&
 	    IsSpLoad (L[4])                              &&
 	    !CE_HasLabel (L[4]));
@@ -404,7 +405,7 @@ unsigned OptBoolTrans (CodeSeg* S)
 /*****************************************************************************/
 /*		  	  Optimizations for compares                         */
 /*****************************************************************************/
-
+				    
 
 
 unsigned OptCmp1 (CodeSeg* S)
@@ -631,10 +632,10 @@ unsigned OptCmp4 (CodeSeg* S)
 
        	    if (L[5]->Num == 0 && L[7]->Num == 0) {
 
-		/* The value is zero, we may use the simple code version:
-		 *      ldy     #o
-		 *      lda     (sp),y
-		 *      dey
+	    	/* The value is zero, we may use the simple code version:
+	    	 *      ldy     #o
+	    	 *      lda     (sp),y
+	    	 *      ldy     #o-1
 	    	 *      ora    	(sp),y
 		 *      jne/jeq ...
 		 */
@@ -651,7 +652,7 @@ unsigned OptCmp4 (CodeSeg* S)
 		 *      lda     (sp),y
 		 *      cmp     #a
 		 *      bne     L1
-		 *      dey
+		 *      ldy     #o-1
 		 *      lda     (sp),y
 		 *   	cmp	#b
 		 *      jne/jeq ...
@@ -697,7 +698,7 @@ unsigned OptCmp5 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (E->OPC == OP65_JSR 	  		        &&
+       	if (E->OPC == OP65_JSR 	    		        &&
 	    (Cond = FindTosCmpCond (E->Arg)) != CMP_INV	&&
 	    (N = CS_GetNextEntry (S, I)) != 0           &&
 	    (N->Info & OF_ZBRA) != 0                    &&

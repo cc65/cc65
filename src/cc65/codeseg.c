@@ -1047,9 +1047,9 @@ void CS_GenRegInfo (CodeSeg* S)
 /* Generate register infos for all instructions */
 {
     unsigned I;
-    RegContents Regs;
-    RegContents* CurrentRegs;
-    int WasJump;
+    RegContents Regs;		/* Initial register contents */
+    RegContents* CurrentRegs;   /* Current register contents */
+    int WasJump;                /* True if last insn was a jump */
 
     /* Be sure to delete all register infos */
     CS_FreeRegInfo (S);

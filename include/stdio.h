@@ -99,7 +99,7 @@ int printf (const char* format, ...);
 int putchar (int c);
 int puts (const char* s);
 int __fastcall__ remove (const char* name);
-int rename (const char* old, const char* new);
+int __fastcall__ rename (const char* oldname, const char* newname);
 int sprintf (char* buf, const char* format, ...);
 int __fastcall__ vfprintf (FILE* f, const char* format, va_list ap);
 int __fastcall__ vprintf (const char* format, va_list ap);

@@ -53,7 +53,7 @@ install:	all
 	    echo "";						      \
 	    false;						      \
 	fi
-	@$(MKDIR) -p $(BINDIR) $(CC65DOC) $(CC65LIB)/{asminc,emd,include/{em,geos,joystick,sys,tgi},joy,lib,tgi}
+	@$(MKDIR) -p $(BINDIR) $(CC65DOC) $(CC65LIB)/{asminc,emd,include/{em,geos,joystick,sys,tgi},joy,lib,ser,tgi}
 	@$(INSTALL) -s -m 755 src/ar65/ar65 $(BINDIR)
 	@$(INSTALL) -s -m 755 src/ca65/ca65 $(BINDIR)
 	@$(INSTALL)    -m 755 src/ca65html/ca65html $(BINDIR)
@@ -74,6 +74,7 @@ install:	all
 	@$(INSTALL) -m 644 asminc/*.inc $(CC65DATA)/asminc
 	@$(INSTALL) -m 644 libsrc/*.emd $(CC65DATA)/emd
 	@$(INSTALL) -m 644 libsrc/*.joy $(CC65DATA)/joy
+	@$(INSTALL) -m 644 libsrc/*.ser $(CC65DATA)/ser
 	@$(INSTALL) -m 644 libsrc/*.tgi $(CC65DATA)/tgi
 	@$(INSTALL) -m 644 doc/*.html $(CC65DOC)
 	@$(INSTALL) -m 644 doc/{compile.txt,grc.txt,internal.txt,newvers.txt} $(CC65DOC)

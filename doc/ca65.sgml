@@ -2671,6 +2671,42 @@ parameters:
 </verb></tscreen>
 
 
+<sect1>Detecting parameter types<p>
+
+Sometimes it is nice to write a macro that acts differently depending on the
+type of the argument supplied. An example would be a macro that loads a 16 bit
+value from either an immediate operand, or from memory. The <tt/<ref
+id=".MATCH" name=".MATCH">/ and <tt/<ref id=".XMATCH" name=".XMATCH">/
+functions will allow you to do exactly this:
+
+<tscreen><verb>
+        .macro  ldax    arg
+                .if (.match (.left (1, arg), #))
+                    ; immediate mode
+                    lda     #<(.right (.tcount (arg)-1, arg))
+                    ldx     #>(.right (.tcount (arg)-1, arg))
+                .else
+                    ; assume absolute or zero page
+                    lda     arg
+                    ldx     1+(arg)
+                .endif
+        .endmacro
+</verb></tscreen>
+
+Using the <tt/<ref id=".MATCH" name=".MATCH">/ function, the macro is able to
+check if its argument begins with a hash mark. If so, two immediate loads are
+emitted, Otherwise a load from an absolute zero page memory location is
+assumed. So this macro can be used as
+
+<tscreen><verb>
+        foo:    .word   $5678
+        ...
+                ldax    #$1234          ; X=$12, A=$34
+        ...
+                ldax    foo             ; X=$56, A=$78
+</verb></tscreen>
+
+
 <sect1>Recursive macros<p>
 
 Macros may be used recursively:
@@ -3161,7 +3197,7 @@ notice that other than the original TASS, ca65 can never move the
 programmcounter backwards - think of it as if you are assembling to disc with
 TASS.
 
-<item>Conditional assembly (<tt/.ifeq//<tt/.endif//<tt/.gogo/ etc.) must be
+<item>Conditional assembly (<tt/.ifeq//<tt/.endif//<tt/.goto/ etc.) must be
 rewritten to match ca65 syntax. Most importantly notice that due to the lack
 of <tt/.goto/, everything involving loops must be replaced by
 <tt><ref id=".REPEAT" name=".REPEAT"></tt>.

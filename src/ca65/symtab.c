@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -344,7 +344,7 @@ static SymEntry* SymFindAny (SymTable* Tab, const char* Name)
     SymEntry* Sym;
     do {
 	/* Search in the current table */
-	Sym = SymFind (Tab, Name, 0);
+	Sym = SymFind (Tab, Name, SF_FIND_EXISTING);
 	if (Sym) {
 	    /* Found, return it */
 	    return Sym;

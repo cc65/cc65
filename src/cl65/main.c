@@ -908,6 +908,7 @@ static void OptMemoryModel (const char* Opt attribute ((unused)), const char* Ar
         Error ("Unsupported memory model: %s", Arg);
     } else {
         CmdAddArg2 (&CA65, "-mm", Arg);
+        CmdAddArg2 (&CC65, "-mm", Arg);
     }
 }
 

@@ -34,46 +34,49 @@
 
 
 ;------------------------------------------------------------------------------
-; Offsets into the driver header
+; The driver header
 
-TGI_HDR_ID              = 0             ; Contains 0x74, 0x67, 0x69 ("tgi")
-TGI_HDR_VERSION         = 3             ; Interface version
-TGI_HDR_XRES            = 4             ; X resolution
-TGI_HDR_YRES            = 6             ; Y resolution
-TGI_HDR_COLORCOUNT      = 8             ; Number of available colors
-TGI_HDR_PAGECOUNT       = 9             ; Number of screens available
-TGI_HDR_FONTSIZE_X      = 10            ; System font size in X direction
-TGI_HDR_FONTSIZE_Y      = 11            ; System font size in Y direction
-TGI_HDR_RES             = 12            ; Reserved for extensions
-
-TGI_HDR_JUMPTAB         = 16
-TGI_HDR_INSTALL         = TGI_HDR_JUMPTAB+0     ; INSTALL routine
-TGI_HDR_UNINSTALL       = TGI_HDR_JUMPTAB+2     ; UNINSTALL routine
-TGI_HDR_INIT            = TGI_HDR_JUMPTAB+4     ; INIT routine
-TGI_HDR_DONE            = TGI_HDR_JUMPTAB+6     ; DONE routine
-TGI_HDR_GETERROR	= TGI_HDR_JUMPTAB+8 	; GETERROR routine
-TGI_HDR_CONTROL         = TGI_HDR_JUMPTAB+10    ; CONTROL routine
-TGI_HDR_CLEAR           = TGI_HDR_JUMPTAB+12    ; CLEAR routine
-TGI_HDR_SETVIEWPAGE     = TGI_HDR_JUMPTAB+14    ; SETVIEWPAGE routine
-TGI_HDR_SETDRAWPAGE     = TGI_HDR_JUMPTAB+16    ; SETDRAWPAGE routine
-TGI_HDR_SETCOLOR        = TGI_HDR_JUMPTAB+18    ; SETCOLOR routine
-TGI_HDR_SETPALETTE      = TGI_HDR_JUMPTAB+20    ; SETPALETTE routine
-TGI_HDR_GETPALETTE      = TGI_HDR_JUMPTAB+22    ; GETPALETTE routine
-TGI_HDR_GETDEFPALETTE   = TGI_HDR_JUMPTAB+24    ; GETDEFPALETTE routine
-TGI_HDR_SETPIXEL        = TGI_HDR_JUMPTAB+26    ; SETPIXEL routine
-TGI_HDR_GETPIXEL        = TGI_HDR_JUMPTAB+28    ; GETPIXEL routine
-TGI_HDR_LINE            = TGI_HDR_JUMPTAB+30    ; LINE routine
-TGI_HDR_BAR             = TGI_HDR_JUMPTAB+32    ; BAR routine
-TGI_HDR_CIRCLE          = TGI_HDR_JUMPTAB+34    ; CIRCLE routine
-TGI_HDR_TEXTSTYLE       = TGI_HDR_JUMPTAB+36    ; TEXTSTYLE routine
-TGI_HDR_OUTTEXT         = TGI_HDR_JUMPTAB+38    ; OUTTEXT routine
-
-TGI_HDR_JUMPCOUNT       = 20			; Number of jump vectors
+.struct TGI_HDR
+        ID                  .byte   3   ; Contains 0x74, 0x67, 0x69 ("tgi")
+        VERSION             .byte   1   ; Interface version
+        VARS                .struct
+            XRES            .word   1   ; X resolution
+            YRES            .word   1   ; Y resolution
+            COLORCOUNT      .byte   1   ; Number of available colors
+            PAGECOUNT       .byte   1   ; Number of screens available
+            FONTSIZE_X      .byte   1   ; System font size in X direction
+            FONTSIZE_Y      .byte   1   ; System font size in Y direction
+        .endstruct
+        RESERVED            .byte   4   ; Reserved for extensions
+        JUMPTAB             .struct
+            INSTALL         .addr       ; INSTALL routine
+            UNINSTALL       .addr       ; UNINSTALL routine
+            INIT            .addr       ; INIT routine
+            DONE            .addr       ; DONE routine
+            GETERROR   	    .addr       ; GETERROR routine
+            CONTROL         .addr       ; CONTROL routine
+            CLEAR           .addr       ; CLEAR routine
+            SETVIEWPAGE     .addr       ; SETVIEWPAGE routine
+            SETDRAWPAGE     .addr       ; SETDRAWPAGE routine
+            SETCOLOR        .addr       ; SETCOLOR routine
+            SETPALETTE      .addr       ; SETPALETTE routine
+            GETPALETTE      .addr       ; GETPALETTE routine
+            GETDEFPALETTE   .addr       ; GETDEFPALETTE routine
+            SETPIXEL        .addr       ; SETPIXEL routine
+            GETPIXEL        .addr       ; GETPIXEL routine
+            LINE            .addr       ; LINE routine
+            BAR             .addr       ; BAR routine
+            CIRCLE          .addr       ; CIRCLE routine
+            TEXTSTYLE       .addr       ; TEXTSTYLE routine
+            OUTTEXT         .addr       ; OUTTEXT routine
+            IRQ             .addr       ; IRQ routine
+        .endstruct
+.endstruct
 
 ;------------------------------------------------------------------------------
 ; The TGI API version, stored at TGI_HDR_VERSION
 
-TGI_API_VERSION         = $01
+TGI_API_VERSION         = $02
 
 ;------------------------------------------------------------------------------
 ; Text style constants

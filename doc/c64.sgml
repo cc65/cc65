@@ -41,10 +41,11 @@ config.
 <sect>Memory layout<p>
 
 cc65 generated programs with the default setup run with the I/O area and the
-kernal ROM enabled. The BASIC ROM is disabled, which gives a usable memory
-range of &dollar;0800 - &dollar;CFFF. This means that kernal entry points may
-be called directly, but using the BASIC ROM is not possible without additional
-code.
+kernal ROM enabled (memory under the kernal may be used for graphics or as
+extended memory - see the sections about graphics and extended memory
+drivers). The BASIC ROM is disabled, which gives a usable memory range of
+&dollar;0800 - &dollar;CFFF. This means that kernal entry points may be called
+directly, but using the BASIC ROM is not possible without additional code.
 
 Special locations:
 

@@ -1,39 +1,29 @@
 ; get arguments from command line (when DOS supports it)
-; and supply function to get default device: char *getdefdev(void);
 
 ; Freddy Offenga, 4/21/2000
-
-; SpartaDOS:
-; the ZCRNAME routine is only used to get the default drive because
-; ZCRNAME has two disadvantages:
-; 1. It will convert D: into D1: instead of Dn: (n = default drive)
-; 2. It will give a 'no arguments' status if it detects something
-;    like Dn: (without filename).
-
-; OS/A+ DOS:
-; ZCRNAME is slightly different from SpartaDOS. It will convert D:
-; into Dn: where n is the default drive.
 
 MAXARGS	= 16		; max. amount of arguments in arg. table
 CL_SIZE = 64		; command line buffer size
 SPACE	= 32		; SPACE char.
 
-        .include "atari.inc"
-	.export getargs, argc, argv, __dos_type
-	.export _getdefdev		; get default device (e.g. "D1:")
-	.importzp ptr1
+	.include	"atari.inc"
+	.import		__argc, __argv
+	.importzp	ptr1
+	.import		__dos_type
+	.constructor	initmainargs,25
 
 ; Get command line
 
-getargs:
+initmainargs:
 	lda	#0
-	sta	argc
-	sta	argc+1
-	sta	argv
-	sta	argv+1
+	sta	__argc
+	sta	__argc+1
+	sta	__argv
+	sta	__argv+1
 
-	jsr	detect
-	bcs	argdos		; carry set = DOS supports arguments
+	lda	__dos_type	; which DOS?
+	cmp	#ATARIDOS
+	bne	argdos		; DOS supports arguments
 	rts
 
 ; Initialize ourcl buffer
@@ -63,50 +53,10 @@ cpcl:	lda	(ptr1),y
 movdon:	lda	#0
 	sta	ourcl,y		; null terminate behind ATEOL
 
-; Get default device (LBUF will be destroyed!!)
-
-	ldy	#BUFOFF
-	lda	#0
-	sta	(DOSVEC),y	; reset buffer offset
-
-; Store dummy argument
-
-	ldy	#LBUF
-	lda	#'X'
-	sta	(DOSVEC),y
-	iny
-	lda	#ATEOL
-	sta	(DOSVEC),y
-
-; One extra store to avoid the buggy sequence from OS/A+ DOS:
-; <D><RETURN><:> => drive number = <RETURN>
-
-	iny
-	sta	(DOSVEC),y
-
-; Create crunch vector
-
-	ldy	#ZCRNAME+1
-	lda	(DOSVEC),y
-	sta	crvec+1
-	iny
-	lda	(DOSVEC),y
-	sta	crvec+2
-
-crvec:	jsr	$FFFF		; will be set to crunch vector
-
-; Get default device
-
-	ldy	#COMFNAM	;  COMFNAM is always "Dn:"
-	lda	(DOSVEC),y
-	sta	defdev
-	iny
-	lda	(DOSVEC),y
-	sta	defdev+1
-
 ; Turn command line into argv table
 
-	ldy	#0
+	;ldy	#0
+	tay
 eatspc:	lda	ourcl,y		; eat spaces
 	cmp	#ATEOL
 	beq	finargs
@@ -119,7 +69,7 @@ eatspc:	lda	ourcl,y		; eat spaces
 
 ; Store argument vector
 
-rpar:	lda	argc		; low-byte
+rpar:	lda	__argc		; low-byte
 	asl
 	tax			; table index
 	tya			; ourcl index
@@ -129,9 +79,9 @@ rpar:	lda	argc		; low-byte
 	lda	#>ourcl
 	adc	#0
 	sta	argv+1,x
-	ldx	argc
+	ldx	__argc
 	inx
-	stx	argc
+	stx	__argc
 	cpx	#MAXARGS
 	beq	finargs
 
@@ -159,68 +109,21 @@ eopar:
 ; Finish args
 
 finargs:
-	lda	argc
+	lda	__argc
 	asl
 	tax
 	lda	#0
 	sta	argv,x
 	sta	argv+1,x
+	lda	#<argv
+	ldx	#>argv
+	sta	__argv
+	stx	__argv+1
 	rts
-
-; DOS type detection
-
-detect:
-	lda	#ATARIDOS
-	sta	__dos_type	; set default
-
-	lda	DOS
-	cmp	#$53		; "S" (SpartaDOS)
-	beq	spdos
-
-	ldy	#COMTAB
-	lda	#$4C
-	cmp	(DOSVEC),y
-	bne	nordos
-
-	ldy	#ZCRNAME
-	cmp	(DOSVEC),y
-	bne	nordos
-
-	ldy	#6		; OS/A+ has a jmp here
-	cmp	(DOSVEC),y
-	beq	nordos
-	lda	#OSADOS
-	sta	__dos_type
-	bne	spdos1
-
-spdos:	lda	#SPARTADOS
-	sta	__dos_type
-spdos1:	sec			; SpartaDOS, OS/A+ or DOS XL
-	rts
-
-nordos:	clc			; normal DOS (no args) detected
-	rts
-
-; Get default device (set by getargs routine)
-
-_getdefdev:
-	lda	#<defdev
-	ldx	#>defdev
-	rts
-
-	.data
-
-; Default device
-
-defdev:
-	.byte	"D1:", 0
 
 	.bss
 
-argc:	.res	2
 argv:	.res	(1 + MAXARGS) * 2
-
-__dos_type:	.res	1
 
 ; Buffer for command line / argv strings
 

@@ -2,7 +2,7 @@
 # gcc Makefile for ar65
 #
 
-CFLAGS 	= -g -O2 -Wall
+CFLAGS 	= -g -O2 -Wall -I../common
 CC	= gcc
 LDFLAGS	=
 

@@ -1,3 +1,9 @@
 *.man
 *.dvi
 *.html
+*.info
+ar65.txt
+ca65.txt
+cc65.txt
+cl65.txt
+dio.txt

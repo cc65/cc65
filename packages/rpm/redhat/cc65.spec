@@ -104,6 +104,7 @@ programs for the Commodore C16/116 using the cc65 crosscompiler.
 %files c16
 %attr(644,root,root) 		/usr/lib/cc65/lib/c16.lib
 %attr(644,root,root) 		/usr/lib/cc65/lib/c16.o
+%attr(644,root,root) 		/usr/lib/cc65/joy/c16-*.joy
 %doc src/ld65/cfg/c16.cfg
 
 
@@ -194,6 +195,7 @@ crosscompiler.
 %files plus4
 %attr(644,root,root)   		/usr/lib/cc65/lib/plus4.lib
 %attr(644,root,root)   		/usr/lib/cc65/lib/plus4.o
+%attr(644,root,root) 		/usr/lib/cc65/joy/plus4-*.joy
 %doc src/ld65/cfg/plus4.cfg
 
 
@@ -365,7 +367,7 @@ install -m 644 libsrc/*.tgi $RPM_BUILD_ROOT/usr/lib/cc65/tgi
 * Fri Dec 13 2002 Ullrich von Bassewitz <uz@cc65.org>
 Updated the version number.
 
-* Mon Dec 2 2002 Ullrich von Bassewitz <uz@cc65.org>
+* Mon Dec 2 2002 Ullrich von Bassewitz <uz@cc65.org>   
 Changed location of TGI drivers, added EM drivers.
 
 * Fri Nov 22 2002 Ullrich von Bassewitz <uz@cc65.org>

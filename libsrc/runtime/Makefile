@@ -192,7 +192,8 @@ OBJS = 	add.o		\
        	ule.o		\
        	ult.o		\
        	umod.o		\
-       	xor.o
+       	xor.o           \
+        zeropage.o      
 
 all:   	$(OBJS)
 

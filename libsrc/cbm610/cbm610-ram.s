@@ -2,7 +2,7 @@
 ; Extended memory driver for the CBM610 additional RAM banks. Driver works
 ; without problems when linked statically.
 ;
-; Ullrich von Bassewitz, 2002-12-09        !!! UNTESTED !!!
+; Ullrich von Bassewitz, 2002-12-09, 2003-12-20
 ;
 
 	.include 	"zeropage.inc"
@@ -112,12 +112,11 @@ MAP:    sta     curpage	   		; Remember the new page
         sta     IndReg
 
         ldy     #$00
-@L1:    lda     (ptr1),y
-        sta     window,y
-        iny
+@L1:    .repeat 2
         lda     (ptr1),y
         sta     window,y
         iny
+        .endrepeat
         bne     @L1
 
         stx     IndReg
@@ -154,12 +153,11 @@ COMMIT: lda     curpage			; Get the current page
         sta     IndReg
 
         ldy     #$00
-@L1:    lda     window,y
-        sta     (ptr1),y
-        iny
+@L1:    .repeat 2
         lda     window,y
         sta     (ptr1),y
         iny
+        .endrepeat
         bne     @L1
 
         stx     IndReg
@@ -280,10 +278,10 @@ setup:  sta     ptr3
         sta     ptr2+1                  ; Get count into ptr2
 
         ldy     #EM_COPY::BUF+1
-        lda     (ptr1),y
+        lda     (ptr3),y
         tax
         dey
-        lda     (ptr1),y                ; Get the buffer pointer into a/x
+        lda     (ptr3),y                ; Get the buffer pointer into a/x
 
         ldy     #RAMBANK
         sty     IndReg

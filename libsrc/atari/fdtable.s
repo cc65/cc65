@@ -5,45 +5,15 @@
 ;
 
 	.include "atari.inc"
+	.include "fd.inc"
 	.importzp tmp1,tmp2,tmp3,ptr4,sp
 	.import	subysp,addysp
+	.import fd_table,fd_index
+	.import fdt_to_fdi
 	.export	fdtoiocb
 	.export	fdtoiocb_down
-	.export	fd_table
 	.export	fddecusage
 	.export	newfd
-	.export	getfd
-
-	.export	___fd_table,___fd_index	; for test(debug purposes only
-
-	.data
-MAX_FD_INDEX	=	12
-___fd_index:
-fd_index:	; fd number is index into this table, entry's value specifies the fd_table entry
-	.res	MAX_FD_INDEX,$ff
-
-___fd_table:
-fd_table:	; each entry represents an open iocb
-	.byte	0,0,'E',0	; system console, app starts with opened iocb #0 for E:
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
-	.byte	0,$ff,0,0
-
-MAX_FD_VAL	=	(* - fd_table) / 4
-
-ft_entrylen = 4	; length of table entry (it's not sufficient to change here!
-		; the code sometimes does two bit shifts to multiply/divide by
-		; this length)
-
-ft_usa  = 0	; usage counter
-ft_iocb	= 1	; iocb index (0,$10,$20,etc.), $ff for empty entry
-ft_dev  = 2	; device of open iocb (0 - device not remembered, eg. filename specified)
-ft_flag = 3	; flags
-		; lower 3 bits: device number (for R: and D:)
 
 	.code
 
@@ -367,53 +337,3 @@ finish:	lda	ptr4
 
 .endproc
 
-; ftp_to_fdi
-; returns a fd_index entry pointing to the given ft_table entry
-; get fd_table entry in A
-; return C = 0/1 for OK/error
-; return fd_index entry in A if OK
-; registers destroyed
-.proc	fdt_to_fdi
-
-	tay
-	lda	#$ff
-	tax
-	inx
-loop:	cmp	fd_index,x
-	beq	found
-	inx
-	cpx	#MAX_FD_INDEX
-	bcc	loop
-	rts
-
-found:	tya
-	sta	fd_index,x
-	txa
-	clc
-	rts
-
-.endproc
-
-; getfd
-; get a new fd pointing to a ft_table entry
-; usage counter of ft_table entry incremented
-; A - fd_table entry
-; return C = 0/1 for OK/error
-; returns fd in A if OK
-; registers destroyed, tmp1 destroyed
-.proc	getfd
-
-	sta	tmp1		; save fd_table entry
-	jsr	fdt_to_fdi
-	bcs	error
-
-	pha
-	lda	tmp1
-	asl	a
-	asl	a			; also clears C
-	tax
-	inc	fd_table+ft_usa,x	; increment usage counter
-	pla
-error:	rts
-
-.endproc

@@ -892,7 +892,7 @@ static void DoIncBin (void)
 	}
 
 	/* Insert it into the output */
-	EmitData (Buf, Count);
+	EmitData (Buf, BytesRead);
 
 	/* Keep the counters current */
 	Count -= BytesRead;

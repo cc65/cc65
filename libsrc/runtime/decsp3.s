@@ -5,16 +5,23 @@
 ;
 
        	.export	  	decsp3
-	.import		subysp
+       	.importzp	sp
 
 .proc	decsp3
 
-	ldy	#3
-	jmp	subysp
+	lda	sp
+	sec
+	sbc	#3
+	sta	sp
+	bcc	@L1
+	rts
+
+@L1:	dec	sp+1
+	rts
 
 .endproc
 
 
 
 
-	
+

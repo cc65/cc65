@@ -5,27 +5,23 @@
 ;
 
        	.export	  	decsp2
-	.importzp	sp
+ 	.importzp	sp
 
 .proc	decsp2
 
-	ldy	sp
-       	beq	@L1
-       	dey
-       	beq	@L2
-       	dey
-       	sty	sp
-       	rts
+	lda	sp
+	sec
+	sbc	#2
+	sta	sp
+	bcc	@L1
+	rts
 
-@L1:	dey
-@L2:    dey
-       	sty	sp
-       	dec	sp+1
+@L1:	dec	sp+1
 	rts
 
 .endproc
-	
 
 
 
-	
+
+

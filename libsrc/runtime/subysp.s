@@ -9,7 +9,6 @@
 
 .proc	subysp
 
-	pha			; Save A
        	sty    	tmp1		; Save the value
 	lda	sp    		; Get lo byte
 	sec
@@ -17,12 +16,11 @@
 	sta	sp  	  	; Put result back
 	bcs	@L1
 	dec	sp+1
-@L1:	pla	   		; Restore A
-	rts			; Done
+@L1:   	rts			; Done
 
 .endproc
 
 
 
 
-	
+

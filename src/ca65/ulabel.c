@@ -113,7 +113,7 @@ ExprNode* ULabRef (int Which)
     if (Which > 0) {
      	--Which;
     }
-    Index = (int) CollCount (&ULabList) + Which;
+    Index = (int) ULabDefCount + Which;
 
     /* We cannot have negative label indices */
     if (Index < 0) {
@@ -123,19 +123,27 @@ ExprNode* ULabRef (int Which)
 	return GenCurrentPC();
     }
 
-    /* If the label does already exist, return it's value, otherwise create
-     * enough forward references, and return a label reference.
-     */
+    /* Check if the label exists. If not, generate enough forward labels. */
     if (Index < (int) CollCount (&ULabList)) {
+        /* The label exists, get it. */
 	L = CollAtUnchecked (&ULabList, Index);
-        ++L->Ref;
-	return CloneExpr (L->Val);
     } else {
+        /* Generate new, undefined labels */
 	while (Index >= (int) CollCount (&ULabList)) {
             L = NewULabel (0);
 	}
-        ++L->Ref;
-	return GenULabelExpr (Index);
+    }
+
+    /* Mark the label as referenced */
+    ++L->Ref;
+
+    /* If the label is already defined, return its value, otherwise return
+     * just a reference.
+     */
+    if (L->Val) {
+        return CloneExpr (L->Val);
+    } else {
+        return GenULabelExpr (Index);
     }
 }
 

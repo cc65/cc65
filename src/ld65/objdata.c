@@ -115,35 +115,35 @@ void FreeObjData (ObjData* O)
 
 
 const char* GetObjFileName (const ObjData* O)
-/* Get the name of the object file. Return "(linker generated)" if the object
+/* Get the name of the object file. Return "[linker generated]" if the object
  * file is NULL.
  */
 {
-    return O? O->Name : "(linker generated)";
+    return O? O->Name : "[linker generated]";
 }
 
 
 
 const char* GetSourceFileName (const ObjData* O, unsigned Index)
 /* Get the name of the source file with the given index. If O is NULL, return
- * "(linker generated)" as the file name.
+ * "[linker generated]" as the file name.
  */
-{      
+{
     /* Check if we have an object file */
     if (O == 0) {
-	
-	/* No object file */
-	return "(linker generated)";
+
+     	/* No object file */
+     	return "[linker generated]";
 
     } else {
-    
+
 	/* Check the parameter */
 	PRECONDITION (Index < O->FileCount);
-    
+
 	/* Return the name */
 	return O->Files[Index];
 
-    }
+    }		 
 }
 
 

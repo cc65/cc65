@@ -153,7 +153,7 @@ Segment* GetSegment (const char* Name, unsigned char Type, const char* ObjName)
        	if (S->Type != Type) {
      	    /* Allow an empty object name */
 	    if (ObjName == 0) {
-		ObjName = "(linker generated)";
+		ObjName = "[linker generated]";
 	    }
 	    Error ("Module `%s': Type mismatch for segment `%s'", ObjName, Name);
      	}
@@ -505,13 +505,13 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 
 			case SEG_EXPR_RANGE_ERROR:
 			    Error ("Range error in module `%s', line %lu",
-			    	   GetSourceFileName (Frag->Obj, Frag->Pos.Name), 
+			    	   GetSourceFileName (Frag->Obj, Frag->Pos.Name),
 				   Frag->Pos.Line);
 			    break;
 
 			case SEG_EXPR_TOO_COMPLEX:
 			    Error ("Expression too complex in module `%s', line %lu",
-			    	   GetSourceFileName (Frag->Obj, Frag->Pos.Name), 
+			    	   GetSourceFileName (Frag->Obj, Frag->Pos.Name),
 				   Frag->Pos.Line);
 			    break;
 

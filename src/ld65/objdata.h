@@ -98,13 +98,13 @@ void FreeObjData (ObjData* O);
 /* Free a complete struct */
 
 const char* GetObjFileName (const ObjData* O);
-/* Get the name of the object file. Return "(linker generated)" if the object
+/* Get the name of the object file. Return "[linker generated]" if the object
  * file is NULL.
  */
 
 const char* GetSourceFileName (const ObjData* O, unsigned Index);
 /* Get the name of the source file with the given index. If O is NULL, return
- * "(linker generated)" as the file name.
+ * "[linker generated]" as the file name.		      
  */
 
 

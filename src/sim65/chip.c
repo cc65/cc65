@@ -89,7 +89,7 @@ static int CmpChips (void* Data attribute ((unused)),
 
 
 /*****************************************************************************/
-/*     	      	    	   	     Code				     */
+/*     	      	       	   	     Code				     */
 /*****************************************************************************/
 
 
@@ -150,6 +150,13 @@ void LoadChips (void)
 
             /* Generate a new chip and insert it into the collection */
             CollAppend (&Chips, NewChip (L, Data));
+
+	    /* Output chip name and version to keep the user happy */
+	    Print (stdout, 1,
+		   "Found chip `%s' version %u.%u\n",
+		   Data->ChipName,
+		   Data->MajorVersion,
+		   Data->MinorVersion);
         }
     }
 
@@ -164,6 +171,22 @@ const Chip* FindChip (const char* Name)
  * could not be found.
  */
 {
+    unsigned I;
+
+    /* ## We do a linear search for now */
+    for (I = 0; I < CollCount (&Chips); ++I) {
+
+	/* Get the chip at this position */
+	const Chip* C = CollConstAt (&Chips, I);
+
+	/* Compare the name */
+	if (strcmp (Name, C->Data->ChipName) == 0) {
+	    /* Found */
+	    return C;
+	}
+    }
+
+    /* Not found */
     return 0;
 }
 

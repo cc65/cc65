@@ -53,16 +53,16 @@ int InitChip (const struct SimData* Data);
 static void* InitInstance (unsigned Addr, unsigned Range);
 /* Initialize a new chip instance */
 
-static void WriteCtrl (void* Data, unsigned Addr, unsigned char Val);
+static void WriteCtrl (void* Data, unsigned Offs, unsigned char Val);
 /* Write control data */
 
-static void Write (void* Data, unsigned Addr, unsigned char Val);
+static void Write (void* Data, unsigned Offs, unsigned char Val);
 /* Write user data */
 
-static unsigned char ReadCtrl (void* Data, unsigned Addr);
+static unsigned char ReadCtrl (void* Data, unsigned Offs);
 /* Read control data */
 
-static unsigned char Read (void* Data, unsigned Addr);
+static unsigned char Read (void* Data, unsigned Offs);
 /* Read user data */
 
 
@@ -166,63 +166,63 @@ static void* InitInstance (unsigned Addr, unsigned Range)
 
 
 
-static void WriteCtrl (void* Data, unsigned Addr, unsigned char Val)
+static void WriteCtrl (void* Data, unsigned Offs, unsigned char Val)
 /* Write control data */
 {
     /* Cast the data pointer */
     InstanceData* D = (InstanceData*) Data;
 
     /* Do the write and remember the cell as initialized */
-    D->Mem[Addr] = Val;
-    D->MemAttr[Addr] |= ATTR_INITIALIZED;
+    D->Mem[Offs] = Val;
+    D->MemAttr[Offs] |= ATTR_INITIALIZED;
 }
 
 
 
-static void Write (void* Data, unsigned Addr, unsigned char Val)
+static void Write (void* Data, unsigned Offs, unsigned char Val)
 /* Write user data */
 {
     /* Cast the data pointer */
     InstanceData* D = (InstanceData*) Data;
 
     /* Check for a write to a write protected cell */
-    if (D->MemAttr[Addr] & ATTR_WPROT) {
-        Sim->Warning ("Writing to write protected memory at $%04X", Addr);
+    if (D->MemAttr[Offs] & ATTR_WPROT) {
+        Sim->Warning ("Writing to write protected memory at $%04X", D->BaseAddr+Offs);
     }
 
     /* Do the write and remember the cell as initialized */
-    D->Mem[Addr] = Val;
-    D->MemAttr[Addr] |= ATTR_INITIALIZED;
+    D->Mem[Offs] = Val;
+    D->MemAttr[Offs] |= ATTR_INITIALIZED;
 }
 
 
 
-static unsigned char ReadCtrl (void* Data, unsigned Addr)
+static unsigned char ReadCtrl (void* Data, unsigned Offs)
 /* Read control data */
 {
     /* Cast the data pointer */
     InstanceData* D = (InstanceData*) Data;
 
     /* Read the cell and return the value */
-    return D->Mem[Addr];
+    return D->Mem[Offs];
 }
 
 
 
-static unsigned char Read (void* Data, unsigned Addr)
+static unsigned char Read (void* Data, unsigned Offs)
 /* Read user data */
 {
     /* Cast the data pointer */
     InstanceData* D = (InstanceData*) Data;
 
     /* Check for a read from an uninitialized cell */
-    if ((D->MemAttr[Addr] & ATTR_INITIALIZED) == 0) {
+    if ((D->MemAttr[Offs] & ATTR_INITIALIZED) == 0) {
         /* We're reading a memory cell that was never written to */
-        Sim->Warning ("Reading from uninitialized memory at $%04X", Addr);
+        Sim->Warning ("Reading from uninitialized memory at $%04X", D->BaseAddr+Offs);
     }
 
     /* Read the cell and return the value */
-    return D->Mem[Addr];
+    return D->Mem[Offs];
 }
 
 

@@ -244,17 +244,19 @@ int main (int argc, char* argv[])
        	Error ("Simulator configuration missing");
     }
 
-    /* Read the config file */
-    CfgRead ();
-
-    /* Initialize modules */
+    /* Load the chips */
     AddChipPath ("chips");
     LoadChipLibrary ("ram.so");
     LoadChips ();
+
+    /* Read the config file */
+    CfgRead ();
+
     MemInit ();
-    MemLoad ("uz.bin", 0x200, 0);
     CPUInit ();
+#if 0
     CPURun ();
+#endif
 
     /* Return an apropriate exit code */
     return EXIT_SUCCESS;

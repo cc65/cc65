@@ -44,7 +44,8 @@
 #include "print.h"
 #include "xmalloc.h"
 
-/* ld65 */
+/* sim65 */
+#include "chip.h"
 #include "error.h"
 #include "global.h"
 #include "scanner.h"
@@ -58,9 +59,154 @@
 
 
 
+static void FlagAttr (unsigned* Flags, unsigned Mask, const char* Name)
+/* Check if the item is already defined. Print an error if so. If not, set
+ * the marker that we have a definition now.
+ */
+{
+    if (*Flags & Mask) {
+    	CfgError ("%s is already defined", Name);
+    }
+    *Flags |= Mask;
+}
+
+
+
+static void AttrCheck (unsigned Attr, unsigned Mask, const char* Name)
+/* Check that a mandatory attribute was given */
+{
+    if ((Attr & Mask) == 0) {
+	CfgError ("%s attribute is missing", Name);
+    }
+}
+
+
+
+static void ParseChips (void)
+/* Parse a CHIPS section */
+{
+    static const IdentTok Attributes [] = {
+       	{   "ADDR",    	CFGTOK_ADDR     },
+	{   "RANGE",   	CFGTOK_RANGE    },
+    };
+
+    /* Bits and stuff to remember which attributes we have read */
+    enum {
+	CA_ADDR  = 0x01,
+	CA_RANGE = 0x02
+    };
+    unsigned Attr;
+
+    /* Attribute values. Initialize to make gcc happy. */
+    const Chip* C;
+    unsigned Addr  = 0;
+    unsigned Range = 0;
+
+    while (CfgTok == CFGTOK_IDENT) {
+
+	/* Search the chip with the given name */
+	C = FindChip (CfgSVal);
+	if (C == 0) {
+	    CfgError ("No such chip: `%s'", CfgSVal);
+	}
+
+	/* Skip the name plus the following colon */
+	CfgNextTok ();
+	CfgConsumeColon ();
+
+       	/* Read the attributes */
+	Attr = 0;
+	while (CfgTok == CFGTOK_IDENT) {
+
+	    /* Map the identifier to a token */
+	    cfgtok_t AttrTok;
+	    CfgSpecialToken (Attributes, ENTRY_COUNT (Attributes), "Attribute");
+	    AttrTok = CfgTok;
+
+	    /* An optional assignment follows */
+	    CfgNextTok ();
+	    CfgOptionalAssign ();
+
+	    /* Check which attribute was given */
+	    switch (AttrTok) {
+
+		case CFGTOK_ADDR:
+		    CfgAssureInt ();
+ 		    CfgRangeCheck (0, 0xFFFF);
+	      	    FlagAttr (&Attr, CA_ADDR, "ADDR");
+		    Addr = (unsigned) CfgIVal;
+		    break;
+
+		case CFGTOK_RANGE:
+		    CfgAssureInt ();
+		    CfgRangeCheck (0, 0xFFFF);
+      		    FlagAttr (&Attr, CA_RANGE, "RANGE");
+ 		    Range = (unsigned) CfgIVal;
+		    break;
+
+		default:
+       	       	    FAIL ("Unexpected attribute token");
+
+	    }
+
+	    /* Skip the attribute value and an optional comma */
+	    CfgNextTok ();
+	    CfgOptionalComma ();
+	}
+
+	/* Skip the semicolon */
+	CfgConsumeSemi ();
+
+	/* Check for mandatory parameters */
+	AttrCheck (Attr, CA_ADDR, "ADDR");
+	AttrCheck (Attr, CA_RANGE, "RANGE");
+
+	/* Address + Range may not exceed 16 bits */
+       	if (((unsigned long) Range) > 0x10000UL - Addr) {
+	    CfgError ("Range error");
+	}
+
+	/* Create the chip ## */
+
+    }
+}
+
+
+
 static void ParseConfig (void)
 /* Parse the config file */
 {
+    static const IdentTok BlockNames [] = {
+       	{   "CHIPS",   	CFGTOK_CHIPS	},
+    };
+    cfgtok_t BlockTok;
+
+    do {
+
+	/* Read the block ident */
+       	CfgSpecialToken (BlockNames, ENTRY_COUNT (BlockNames), "Block identifier");
+	BlockTok = CfgTok;
+	CfgNextTok ();
+
+	/* Expected a curly brace */
+	CfgConsume (CFGTOK_LCURLY, "`{' expected");
+
+	/* Read the block */
+	switch (BlockTok) {
+
+	    case CFGTOK_CHIPS:
+       	       	ParseChips ();
+	     	break;
+
+	    default:
+	     	FAIL ("Unexpected block token");
+
+	}
+
+	/* Skip closing brace */
+	CfgConsume (CFGTOK_RCURLY, "`}' expected");
+
+    } while (CfgTok != CFGTOK_EOF);
 }
 
 

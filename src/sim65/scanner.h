@@ -59,10 +59,18 @@ typedef enum {
     CFGTOK_DOT,
     CFGTOK_EOF,
 
+    /* Primary blocks */
+    CFGTOK_CHIPS,
+
+    /* Chips section */
+    CFGTOK_NAME,
+    CFGTOK_ADDR,
+    CFGTOK_RANGE,
+
     /* Special identifiers */
     CFGTOK_TRUE,
     CFGTOK_FALSE
-               
+
 } cfgtok_t;
 
 

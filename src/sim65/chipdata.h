@@ -61,10 +61,10 @@ struct ChipData {
     /* -- Exported functions -- */
     int           (*InitChip) (const struct SimData* Data);
     void*         (*InitInstance) (unsigned Addr, unsigned Range);
-    void          (*WriteCtrl) (void* Data, unsigned Addr, unsigned char Val);
-    void          (*Write) (void* Data, unsigned Addr, unsigned char Val);
-    unsigned char (*ReadCtrl) (void* Data, unsigned Addr);
-    unsigned char (*Read) (void* Data, unsigned Addr);
+    void          (*WriteCtrl) (void* Data, unsigned Offs, unsigned char Val);
+    void          (*Write) (void* Data, unsigned Offs, unsigned char Val);
+    unsigned char (*ReadCtrl) (void* Data, unsigned Offs);
+    unsigned char (*Read) (void* Data, unsigned Offs);
 };
 
 

@@ -32,7 +32,7 @@
 /*****************************************************************************/
 
 
-		   
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -57,10 +57,10 @@ int InitChip (const struct SimData* Data);
 static void* InitInstance (unsigned Addr, unsigned Range);
 /* Initialize a new chip instance */
 
-static void Write (void* Data, unsigned Addr, unsigned char Val);
+static void Write (void* Data, unsigned Offs, unsigned char Val);
 /* Write user data */
 
-static unsigned char Read (void* Data, unsigned Addr);
+static unsigned char Read (void* Data, unsigned Offs);
 /* Read user data */
 
 
@@ -140,7 +140,7 @@ static void* InitInstance (unsigned Addr attribute ((unused)),
 
 
 static void Write (void* Data attribute ((unused)),
-		   unsigned Addr attribute ((unused)),
+		   unsigned Offs attribute ((unused)),
 		   unsigned char Val)
 /* Write user data */
 {
@@ -150,7 +150,7 @@ static void Write (void* Data attribute ((unused)),
 
 
 static unsigned char Read (void* Data attribute ((unused)),
-			   unsigned Addr attribute ((unused)))
+			   unsigned Offs attribute ((unused)))
 /* Read user data */
 {
     /* Read a character and return the value */
@@ -159,3 +159,4 @@ static unsigned char Read (void* Data attribute ((unused)),
 
 
 
+					 

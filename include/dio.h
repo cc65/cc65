@@ -1,8 +1,8 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				     dio.h			       	     */
+/*                                   dio.h                                   */
 /*                                                                           */
-/*		         Low-Level diskette I/O functions		     */
+/*                       Low-Level diskette I/O functions                    */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -31,10 +31,16 @@
 #ifndef _DIO_H
 #define _DIO_H
 
-typedef unsigned char _driveid_t;
-typedef unsigned int  _sectnum_t;
-typedef unsigned int  _sectsize_t;
-typedef void *_dhandle_t;
+typedef unsigned char       _driveid_t;
+typedef unsigned int        _sectnum_t;
+typedef unsigned int        _sectsize_t;
+typedef struct __dhandle_t *_dhandle_t;
+
+typedef struct {
+  unsigned char  head;
+  unsigned       track;
+  unsigned       sector;
+} _dio_phys_pos;
 
 
 #ifdef __ATARI__
@@ -57,14 +63,11 @@ extern unsigned char __fastcall__ _dio_write_verify(_dhandle_t handle,
                                                     _sectnum_t sect_num,
                                                     const void *buffer);
 
-extern _sectnum_t __fastcall__ _dio_chs_to_snum(_dhandle_t handle,
-                                                unsigned int cyl,
-                                                unsigned int head,
-                                                unsigned int sector);
-extern void       __fastcall__ _dio_snum_to_chs(_dhandle_t handle,
-                                                _sectnum_t sect_num,
-                                                unsigned int *cyl,
-                                                unsigned int *head,
-                                                unsigned int *sector);
+extern unsigned char __fastcall__ _dio_phys_to_log(_dhandle_t handle,
+                                                   _dio_phys_pos *physpos,   /* input */
+                                                   _sectnum_t *sectnum);     /* output */
+extern unsigned char __fastcall__ _dio_log_to_phys(_dhandle_t handle,
+                                                   _dio_phys_pos *physpos,   /* output */
+                                                   _sectnum_t *sectnum);     /* input */
 
 #endif /* #ifndef _DIO_H */

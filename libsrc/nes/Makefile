@@ -22,9 +22,11 @@ C_OBJS =
 S_OBJS  =       _scrsize.o      \
                 clock.o         \
                 color.o         \
+                cputc.o         \
                 crt0.o          \
                 ppu.o           \
                 ppubuf.o        \
+                setcursor.o     \
                 waitvblank.o
 
 #--------------------------------------------------------------------------

@@ -8,7 +8,7 @@
 ;
 
         .export         _exit
-	.import		initlib, donelib
+	.import		initlib, donelib, callmain
 	.import	        push0, _main, zerobss
         .import         ppubuf_flush
 
@@ -226,6 +226,6 @@ irq:
 
 .segment "CHARS"
 
-        .incbin "nes/neschar.bin"
+        .include        "neschar.inc"
 
 

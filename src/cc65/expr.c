@@ -25,6 +25,7 @@
 #include "function.h"
 #include "global.h"
 #include "litpool.h"
+#include "loadexpr.h"
 #include "macrotab.h"
 #include "preproc.h"
 #include "scanner.h"
@@ -226,47 +227,6 @@ void DefineData (ExprDesc* Expr)
 
 
 
-static void LoadConstant (unsigned Flags, ExprDesc* Expr)
-/* Load the primary register with some constant value. */
-{
-    switch (ED_GetLoc (Expr)) {
-
-       	case E_LOC_ABS:
-	    /* Number constant */
-       	    g_getimmed (Flags | TypeOf (Expr->Type) | CF_CONST, Expr->IVal, 0);
-       	    break;
-
-        case E_LOC_GLOBAL:
-       	    /* Global symbol, load address */
-	    g_getimmed ((Flags | CF_EXTERNAL) & ~CF_CONST, Expr->Name, Expr->IVal);
-       	    break;
-
-       	case E_LOC_STATIC:
-       	case E_LOC_LITERAL:
-       	    /* Static symbol or literal, load address */
-       	    g_getimmed ((Flags | CF_STATIC) & ~CF_CONST, Expr->Name, Expr->IVal);
-       	    break;
-
-       	case E_LOC_REGISTER:
-	    /* Register variable. Taking the address is usually not
-	     * allowed.
-	     */
-	    if (IS_Get (&AllowRegVarAddr) == 0) {
-	     	Error ("Cannot take the address of a register variable");
-	    }
-       	    g_getimmed ((Flags | CF_REGVAR) & ~CF_CONST, Expr->Name, Expr->IVal);
-
-    	case E_LOC_STACK:
-       	    g_leasp (Expr->IVal);
-	    break;
-
-       	default:
-	    Internal ("Unknown constant type: %04X", Expr->Flags);
-    }
-}
-
-
-
 static int kcalc (token_t tok, long val1, long val2)
 /* Calculate an operation with left and right operand constant. */
 {
@@ -372,93 +332,6 @@ void PushAddr (const ExprDesc* Expr)
 /*****************************************************************************/
 /*   	     	     		     code				     */
 /*****************************************************************************/
-
-
-
-void ExprLoad (unsigned Flags, ExprDesc* Expr)
-/* Place the result of an expression into the primary register if it is not
- * already there.
- */
-{
-    if (ED_IsLVal (Expr)) {
-
-       	/* Dereferenced lvalue */
-       	Flags |= TypeOf (Expr->Type);
-     	if (ED_NeedsTest (Expr)) {
-     	    Flags |= CF_TEST;
-     	}
-
-        switch (ED_GetLoc (Expr)) {
-
-            case E_LOC_ABS:
-                /* Absolute: numeric address or const */
-                g_getstatic (Flags | CF_ABSOLUTE, Expr->IVal, 0);
-                break;
-
-            case E_LOC_GLOBAL:
-                /* Global variable */
-                g_getstatic (Flags | CF_EXTERNAL, Expr->Name, Expr->IVal);
-                break;
-
-            case E_LOC_STATIC:
-            case E_LOC_LITERAL:
-                /* Static variable or literal in the literal pool */
-                g_getstatic (Flags | CF_STATIC, Expr->Name, Expr->IVal);
-                break;
-
-            case E_LOC_REGISTER:
-                /* Register variable */
-                g_getstatic (Flags | CF_REGVAR, Expr->Name, Expr->IVal);
-                break;
-
-            case E_LOC_STACK:
-                /* Value on the stack */
-                g_getlocal (Flags, Expr->IVal);
-                break;
-
-            case E_LOC_PRIMARY:
-                /* The primary register - just test if necessary */
-                if (Flags & CF_TEST) {
-                    g_test (Flags);
-                }
-                break;
-
-            case E_LOC_EXPR:
-                /* Reference to address in primary with offset in Expr */
-                g_getind (Flags, Expr->IVal);
-                break;
-
-            default:
-                Internal ("Invalid location in ExprLoad: 0x%04X", ED_GetLoc (Expr));
-        }
-
-        /* Expression was tested */
-        ED_TestDone (Expr);
-
-    } else {
-     	/* An rvalue */
-       	if (ED_IsLocExpr (Expr)) {
-            if (Expr->IVal != 0) {
-                /* We have an expression in the primary plus a constant
-                 * offset. Adjust the value in the primary accordingly.
-                 */
-                Flags |= TypeOf (Expr->Type);
-                g_inc (Flags | CF_CONST, Expr->IVal);
-            }
-     	} else {
-     	    /* Constant of some sort, load it into the primary */
-     	    LoadConstant (Flags, Expr);
-     	}
-
-        /* Are we testing this value? */
-        if (ED_NeedsTest (Expr)) {
-            /* Yes, force a test */
-            Flags |= TypeOf (Expr->Type);
-            g_test (Flags);
-            ED_TestDone (Expr);
-        }
-    }
-}
 
 
 
@@ -571,7 +444,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
        	}
 
         /* Load the value into the primary if it is not already there */
-        ExprLoad (Flags, &Expr);
+        LoadExpr (Flags, &Expr);
 
 	/* Use the type of the argument for the push */
        	Flags |= TypeOf (Expr.Type);
@@ -667,7 +540,7 @@ static void FunctionCall (ExprDesc* Expr)
 	    /* Not a global or local variable, or a fastcall function. Load
 	     * the pointer into the primary and mark it as an expression.
 	     */
-       	    ExprLoad (CF_NONE, Expr);
+       	    LoadExpr (CF_NONE, Expr);
        	    ED_MakeRValExpr (Expr);
 
 	    /* Remember the code position */
@@ -717,7 +590,7 @@ static void FunctionCall (ExprDesc* Expr)
 	    	}
 	    } else {
 	     	/* Load from original location */
-	     	ExprLoad (CF_NONE, Expr);
+	     	LoadExpr (CF_NONE, Expr);
 	    }
 
 	    /* Call the function */
@@ -995,7 +868,7 @@ static void ArrayRef (ExprDesc* Expr)
     Mark2 = 0; 	       	/* Silence gcc */
     if (!ConstBaseAddr) {
     	/* Get a pointer to the array into the primary */
-    	ExprLoad (CF_NONE, Expr);
+    	LoadExpr (CF_NONE, Expr);
 
     	/* Get the array pointer on stack. Do not push more than 16
     	 * bit, even if this value is greater, since we cannot handle
@@ -1053,7 +926,7 @@ static void ArrayRef (ExprDesc* Expr)
      	    pop (CF_PTR);
       	} else {
     	    /* Get an array pointer into the primary */
-    	    ExprLoad (CF_NONE, Expr);
+    	    LoadExpr (CF_NONE, Expr);
     	}
 
      	if (IsClassPtr (Expr->Type)) {
@@ -1081,7 +954,7 @@ static void ArrayRef (ExprDesc* Expr)
                  * first (if it's not already there).
                  */
                 if (ConstBaseAddr) {
-                    ExprLoad (CF_NONE, Expr);
+                    LoadExpr (CF_NONE, Expr);
                     ED_MakeRValExpr (Expr);
                 }
 
@@ -1096,7 +969,7 @@ static void ArrayRef (ExprDesc* Expr)
 
             /* Add the subscript. Since arrays are indexed by integers,
              * we will ignore the true type of the subscript here and
-             * use always an int. #### Use offset but beware of ExprLoad!
+             * use always an int. #### Use offset but beware of LoadExpr!
              */
             g_inc (CF_INT | CF_CONST, SubScript.IVal);
 
@@ -1106,7 +979,7 @@ static void ArrayRef (ExprDesc* Expr)
 
     	/* Array subscript is not constant. Load it into the primary */
 	Mark2 = GetCodePos ();
-        ExprLoad (CF_NONE, &SubScript);
+        LoadExpr (CF_NONE, &SubScript);
 
         /* Do scaling */
 	if (IsClassPtr (Expr->Type)) {
@@ -1127,7 +1000,7 @@ static void ArrayRef (ExprDesc* Expr)
     	     */
 	    if (ConstBaseAddr) {
 	       	g_push (CF_INT, 0);
-	       	ExprLoad (CF_NONE, Expr);
+	       	LoadExpr (CF_NONE, Expr);
 	       	ConstBaseAddr = 0;
 	    } else {
 	        g_swap (CF_INT);
@@ -1175,7 +1048,7 @@ static void ArrayRef (ExprDesc* Expr)
     	     	RemoveCode (Mark2);
 
 	    	/* Get a pointer to the array into the primary. */
-	    	ExprLoad (CF_NONE, Expr);
+	    	LoadExpr (CF_NONE, Expr);
 
 	    	/* Add the variable */
 	    	if (ED_IsLocStack (&SubScript)) {
@@ -1264,7 +1137,7 @@ static void StructRef (ExprDesc* Expr)
     if (ED_IsLVal (Expr) && IsTypePtr (Expr->Type)) {
 
         /* Load into the primary */
-        ExprLoad (CF_NONE, Expr);
+        LoadExpr (CF_NONE, Expr);
 
         /* Make it an lvalue expression */
         ED_MakeLValExpr (Expr);
@@ -1577,7 +1450,7 @@ static void PostIncDec (ExprDesc* Expr, void (*inc) (unsigned, unsigned long))
     PushAddr (Expr);
 
     /* Fetch the value and save it (since it's the result of the expression) */
-    ExprLoad (CF_NONE, Expr);
+    LoadExpr (CF_NONE, Expr);
     g_save (Flags | CF_FORCECHAR);
 
     /* If we have a pointer expression, increment by the size of the type */
@@ -1628,7 +1501,7 @@ static void UnaryOp (ExprDesc* Expr)
 	}
     } else {
     	/* Value is not constant */
-     	ExprLoad (CF_NONE, Expr);
+     	LoadExpr (CF_NONE, Expr);
 
     	/* Get the type of the expression */
     	Flags = TypeOf (Expr->Type);
@@ -1688,7 +1561,7 @@ void hie10 (ExprDesc* Expr)
                 /* Not a const, load it into the primary and make it a
                  * calculated value.
                  */
-                ExprLoad (CF_NONE, Expr);
+                LoadExpr (CF_NONE, Expr);
                 ED_MakeRValExpr (Expr);
             }
             /* If the expression is already a pointer to function, the
@@ -1809,7 +1682,7 @@ static void hie_internal (const GenDesc* Ops,   /* List of generators */
        	    g_push (ltype | CF_CONST, Expr->IVal);
 	} else {
 	    /* Value not constant */
-	    ExprLoad (CF_NONE, Expr);
+	    LoadExpr (CF_NONE, Expr);
 	    Mark2 = GetCodePos ();
 	    g_push (ltype, 0);
 	}
@@ -1905,7 +1778,7 @@ static void hie_compare (const GenDesc* Ops,    /* List of generators */
        	    g_push (ltype | CF_CONST, Expr->IVal);
     	} else {
     	    /* Value not constant */
-    	    ExprLoad (CF_NONE, Expr);
+    	    LoadExpr (CF_NONE, Expr);
     	    Mark2 = GetCodePos ();
     	    g_push (ltype, 0);
       	}
@@ -2066,7 +1939,7 @@ static void parseadd (ExprDesc* Expr)
 	    /* lhs is a constant and rhs is not constant. Load rhs into
 	     * the primary.
 	     */
-    	    ExprLoad (CF_NONE, &Expr2);
+    	    LoadExpr (CF_NONE, &Expr2);
 
        	    /* Beware: The check above (for lhs) lets not only pass numeric
 	     * constants, but also constant addresses (labels), maybe even
@@ -2150,7 +2023,7 @@ static void parseadd (ExprDesc* Expr)
     } else {
 
     	/* Left hand side is not constant. Get the value onto the stack. */
-    	ExprLoad (CF_NONE, Expr);              /* --> primary register */
+    	LoadExpr (CF_NONE, Expr);              /* --> primary register */
        	Mark = GetCodePos ();
     	g_push (TypeOf (Expr->Type), 0);	/* --> stack */
 
@@ -2263,7 +2136,7 @@ static void parsesub (ExprDesc* Expr)
 
     /* Remember the output queue position, then bring the value onto the stack */
     Mark1 = GetCodePos ();
-    ExprLoad (CF_NONE, Expr);  /* --> primary register */
+    LoadExpr (CF_NONE, Expr);  /* --> primary register */
     Mark2 = GetCodePos ();
     g_push (TypeOf (lhst), 0);	/* --> stack */
 
@@ -2571,7 +2444,7 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
        	}
 
        	/* Load the value */
-       	ExprLoad (CF_FORCECHAR, Expr);
+       	LoadExpr (CF_FORCECHAR, Expr);
 
        	/* Generate the jump */
        	g_falsejump (CF_NONE, lab);
@@ -2587,7 +2460,7 @@ static void hieAnd (ExprDesc* Expr, unsigned TrueLab, int* BoolOp)
     	    if (!ED_IsTested (&Expr2)) {
     		ED_MarkForTest (&Expr2);
     	    }
-    	    ExprLoad (CF_FORCECHAR, &Expr2);
+    	    LoadExpr (CF_FORCECHAR, &Expr2);
 
        	    /* Do short circuit evaluation */
     	    if (CurTok.Tok == TOK_BOOL_AND) {
@@ -2633,7 +2506,7 @@ static void hieOr (ExprDesc *Expr)
     	}
 
     	/* Get first expr */
-      	ExprLoad (CF_FORCECHAR, Expr);
+      	LoadExpr (CF_FORCECHAR, Expr);
 
        	/* For each expression jump to TrueLab if true. Beware: If we
     	 * had && operators, the jump is already in place!
@@ -2657,7 +2530,7 @@ static void hieOr (ExprDesc *Expr)
        	    if (!ED_IsTested (&Expr2)) {
     	    	ED_MarkForTest (&Expr2);
     	    }
-    	    ExprLoad (CF_FORCECHAR, &Expr2);
+    	    LoadExpr (CF_FORCECHAR, &Expr2);
 
        	    /* If there is more to come, add shortcut boolean eval. */
     	    g_truejump (CF_NONE, TrueLab);
@@ -2708,7 +2581,7 @@ static void hieQuest (ExprDesc* Expr)
     	    /* Condition codes not set, request a test */
     	    ED_MarkForTest (Expr);
     	}
-    	ExprLoad (CF_NONE, Expr);
+    	LoadExpr (CF_NONE, Expr);
     	labf = GetLocalLabel ();
     	g_falsejump (CF_NONE, labf);
 
@@ -2719,7 +2592,7 @@ static void hieQuest (ExprDesc* Expr)
         Expr2IsNULL = ED_IsNullPtr (&Expr2);
         if (!IsTypeVoid (Expr2.Type)) {
             /* Load it into the primary */
-            ExprLoad (CF_NONE, &Expr2);
+            LoadExpr (CF_NONE, &Expr2);
             ED_MakeRValExpr (&Expr2);
         }
     	labt = GetLocalLabel ();
@@ -2736,7 +2609,7 @@ static void hieQuest (ExprDesc* Expr)
         Expr3IsNULL = ED_IsNullPtr (&Expr3);
         if (!IsTypeVoid (Expr3.Type)) {
             /* Load it into the primary */
-            ExprLoad (CF_NONE, &Expr3);
+            LoadExpr (CF_NONE, &Expr3);
             ED_MakeRValExpr (&Expr3);
         }
 
@@ -2844,7 +2717,7 @@ static void opeq (const GenDesc* Gen, ExprDesc* Expr)
     PushAddr (Expr);
 
     /* Fetch the lhs into the primary register if needed */
-    ExprLoad (CF_NONE, Expr);
+    LoadExpr (CF_NONE, Expr);
 
     /* Bring the lhs on stack */
     Mark = GetCodePos ();
@@ -2953,7 +2826,7 @@ static void addsubeq (const GenDesc* Gen, ExprDesc *Expr)
     	lflags |= CF_CONST;
     } else {
      	/* Not constant, load into the primary */
-        ExprLoad (CF_NONE, &Expr2);
+        LoadExpr (CF_NONE, &Expr2);
        	if (MustScale) {
      	    /* lhs is a pointer, scale rhs */
        	    g_scale (TypeOf (Expr2.Type), CheckedSizeOf (Indirect (Expr->Type)));
@@ -3102,7 +2975,7 @@ void hie0 (ExprDesc *Expr)
 int evalexpr (unsigned Flags, void (*Func) (ExprDesc*), ExprDesc* Expr)
 /* Will evaluate an expression via the given function. If the result is a
  * constant, 0 is returned and the value is put in the Expr struct. If the
- * result is not constant, ExprLoad is called to bring the value into the
+ * result is not constant, LoadExpr is called to bring the value into the
  * primary register and 1 is returned.
  */
 {
@@ -3115,7 +2988,7 @@ int evalexpr (unsigned Flags, void (*Func) (ExprDesc*), ExprDesc* Expr)
      	return 0;
     } else {
      	/* Not constant, load into the primary */
-        ExprLoad (Flags, Expr);
+        LoadExpr (Flags, Expr);
      	return 1;
     }
 }
@@ -3126,7 +2999,7 @@ void Expression0 (ExprDesc* Expr)
 /* Evaluate an expression via hie0 and put the result into the primary register */
 {
     ExprWithCheck (hie0, Expr);
-    ExprLoad (CF_NONE, Expr);
+    LoadExpr (CF_NONE, Expr);
 }
 
 

@@ -33,9 +33,6 @@ void PushAddr (const ExprDesc* Expr);
  * must be saved if it's not constant, before evaluating the rhs.
  */
 
-void ExprLoad (unsigned flags, ExprDesc* Expr);
-/* Put the result of an expression into the primary register */
-
 void Store (ExprDesc* Expr, const type* StoreType);
 /* Store the primary register into the location denoted by lval. If StoreType
  * is given, use this type when storing instead of lval->Type. If StoreType
@@ -48,7 +45,7 @@ void hie0 (ExprDesc* Expr);
 int evalexpr (unsigned flags, void (*Func) (ExprDesc*), ExprDesc* Expr);
 /* Will evaluate an expression via the given function. If the result is a
  * constant, 0 is returned and the value is put in the lval struct. If the
- * result is not constant, ExprLoad is called to bring the value into the
+ * result is not constant, LoadExpr is called to bring the value into the
  * primary register and 1 is returned.
  */
 

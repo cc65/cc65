@@ -56,7 +56,6 @@ OBJS =	anonname.o	\
 	error.o	  	\
 	expr.o	 	\
         exprdesc.o      \
-	exprnode.o	\
 	funcdesc.o	\
 	function.o     	\
 	global.o 	\
@@ -67,6 +66,7 @@ OBJS =	anonname.o	\
 	input.o		\
 	lineinfo.o	\
 	litpool.o      	\
+        loadexpr.o      \
 	locals.o	\
 	loop.o		\
 	macrotab.o	\

@@ -51,6 +51,7 @@
 #include "global.h"
 #include "goto.h"
 #include "litpool.h"
+#include "loadexpr.h"
 #include "locals.h"
 #include "loop.h"
 #include "pragma.h"
@@ -293,7 +294,7 @@ static void ReturnStatement (void)
 	    TypeConversion (&Expr, F_GetReturnType (CurrentFunc));
 
 	    /* Load the value into the primary */
-	    ExprLoad (CF_NONE, &Expr);
+	    LoadExpr (CF_NONE, &Expr);
     	}
 
     } else if (!F_HasVoidReturn (CurrentFunc) && !F_HasOldStyleIntRet (CurrentFunc)) {
@@ -599,7 +600,7 @@ int Statement (int* PendingToken)
                  * marked as volatile. Otherwise the load is useless.
                  */
                 if (ED_IsLVal (&Expr) && IsQualVolatile (Expr.Type)) {
-                    ExprLoad (CF_NONE, &Expr);
+                    LoadExpr (CF_NONE, &Expr);
                 }
                 /* If the statement didn't generate code, and is not of type
                  * void, emit a warning

@@ -46,6 +46,7 @@
 #include "expr.h"
 #include "function.h"
 #include "global.h"
+#include "loadexpr.h"
 #include "locals.h"
 #include "stackptr.h"
 #include "symtab.h"
@@ -118,7 +119,7 @@ static unsigned ParseRegisterDecl (Declaration* Decl, unsigned* SC, int Reg)
             TypeConversion (&Expr, Decl->Type);
 
             /* Load the value into the primary */
-            ExprLoad (CF_NONE, &Expr);
+            LoadExpr (CF_NONE, &Expr);
 
             /* Store the value into the variable */
             g_putstatic (CF_REGVAR | TypeOf (Decl->Type), Reg, 0);
@@ -219,7 +220,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
                 if (ED_IsConstAbsInt (&Expr)) {
                     Flags |= CF_CONST;
                 } else {
-                    ExprLoad (CF_NONE, &Expr);
+                    LoadExpr (CF_NONE, &Expr);
                     ED_MakeRVal (&Expr);
                 }
 
@@ -290,7 +291,7 @@ static unsigned ParseAutoDecl (Declaration* Decl, unsigned* SC)
                 TypeConversion (&Expr, Decl->Type);
 
                 /* Load the value into the primary */
-                ExprLoad (CF_NONE, &Expr);
+                LoadExpr (CF_NONE, &Expr);
 
                 /* Store the value into the variable */
                 g_putstatic (TypeOf (Decl->Type), SymData, 0);

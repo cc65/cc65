@@ -101,6 +101,7 @@ OBJS =	anonname.obj	\
 	input.obj	\
 	lineinfo.obj	\
 	litpool.obj	\
+        loadexpr.obj    \
 	locals.obj	\
 	loop.obj 	\
 	macrotab.obj	\

@@ -48,6 +48,7 @@
 #include "funcdesc.h"
 #include "global.h"
 #include "litpool.h"
+#include "loadexpr.h"
 #include "scanner.h"
 #include "stackptr.h"
 #include "stdfunc.h"
@@ -169,7 +170,7 @@ static void ParseArg (ArgDesc* Arg, type* Type)
         Arg->Flags |= CF_CONST;
     } else {
         /* Load into the primary */
-        ExprLoad (CF_NONE, &Arg->Expr);
+        LoadExpr (CF_NONE, &Arg->Expr);
     }
 
     /* Remember the following code position */
@@ -224,7 +225,7 @@ static void StdFunc_memcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
      */
     ParseArg (&Arg3, Arg3Type);
     if (Arg3.Flags & CF_CONST) {
-        ExprLoad (CF_FORCECHAR, &Arg3.Expr);
+        LoadExpr (CF_NONE, &Arg3.Expr);
     }
 
     /* Emit the actual function call. This will also cleanup the stack. */
@@ -527,7 +528,7 @@ static void StdFunc_memset (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
      */
     ParseArg (&Arg3, Arg3Type);
     if (Arg3.Flags & CF_CONST) {
-        ExprLoad (CF_FORCECHAR, &Arg3.Expr);
+        LoadExpr (CF_NONE, &Arg3.Expr);
     }
 
     /* Emit the actual function call. This will also cleanup the stack. */
@@ -731,7 +732,7 @@ static void StdFunc_strcpy (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
      */
     ParseArg (&Arg2, Arg2Type);
     if (Arg2.Flags & CF_CONST) {
-        ExprLoad (CF_FORCECHAR, &Arg2.Expr);
+        LoadExpr (CF_NONE, &Arg2.Expr);
     }
 
     /* Emit the actual function call. This will also cleanup the stack. */
@@ -1017,7 +1018,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     } else if (CodeSizeFactor > 400 && IS_Get (&InlineStdFuncs)) {
 
         /* Load the expression into the primary */
-        ExprLoad (CF_NONE, &Arg);
+        LoadExpr (CF_NONE, &Arg);
 
         /* Inline the function */
         L = GetLocalLabel ();
@@ -1038,7 +1039,7 @@ static void StdFunc_strlen (FuncDesc* F attribute ((unused)), ExprDesc* Expr)
     } else {
 
         /* Load the expression into the primary */
-        ExprLoad (CF_NONE, &Arg);
+        LoadExpr (CF_NONE, &Arg);
 
         /* Call the strlen function */
         AddCodeLine ("jsr _%s", Func_strlen);

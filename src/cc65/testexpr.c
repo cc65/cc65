@@ -32,10 +32,12 @@
 /*****************************************************************************/
 
 
-
+                     
+/* cc65 */
 #include "codegen.h"
 #include "error.h"
 #include "expr.h"
+#include "loadexpr.h"
 #include "scanner.h"
 #include "testexpr.h"
 
@@ -84,7 +86,7 @@ unsigned Test (unsigned Label, int Invert)
         }
 
         /* Load the value into the primary register */
-        ExprLoad (CF_FORCECHAR, &Expr);
+        LoadExpr (CF_FORCECHAR, &Expr);
 
         /* Generate the jump */
         if (Invert) {

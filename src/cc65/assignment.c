@@ -39,6 +39,7 @@
 #include "datatype.h"
 #include "error.h"
 #include "expr.h"
+#include "loadexpr.h"
 #include "scanner.h"
 #include "stdnames.h"
 #include "typecmp.h"
@@ -55,7 +56,7 @@
 void Assignment (ExprDesc* Expr)
 /* Parse an assignment */
 {
-    ExprDesc lval2;
+    ExprDesc Expr2;
     type* ltype = Expr->Type;
 
 
@@ -96,27 +97,27 @@ void Assignment (ExprDesc* Expr)
         if (UseReg) {
             PushAddr (Expr);
         } else {
-    	    ExprLoad (CF_NONE, Expr);
+    	    LoadExpr (CF_NONE, Expr);
             g_push (CF_PTR | CF_UNSIGNED, 0);
         }
 
      	/* Get the expression on the right of the '=' into the primary */
-	hie1 (&lval2);
+	hie1 (&Expr2);
 
         /* Check for equality of the structs */
-        if (TypeCmp (ltype, lval2.Type) < TC_STRICT_COMPATIBLE) {
+        if (TypeCmp (ltype, Expr2.Type) < TC_STRICT_COMPATIBLE) {
             Error ("Incompatible types");
         }
 
         /* Check if the right hand side is an lvalue */
-	if (ED_IsLVal (&lval2)) {
+	if (ED_IsLVal (&Expr2)) {
 	    /* We have an lvalue. Do we copy using the primary? */
             if (UseReg) {
                 /* Just use the replacement type */
-                lval2.Type = stype;
+                Expr2.Type = stype;
 
                 /* Load the value into the primary */
-                ExprLoad (CF_FORCECHAR, &lval2);
+                LoadExpr (CF_FORCECHAR, &Expr2);
 
                 /* Store it into the new location */
                 Store (Expr, stype);
@@ -124,8 +125,8 @@ void Assignment (ExprDesc* Expr)
             } else {
 
                 /* We will use memcpy. Push the address of the rhs */
-                ED_MakeRVal (&lval2);
-                ExprLoad (CF_NONE, &lval2);
+                ED_MakeRVal (&Expr2);
+                LoadExpr (CF_NONE, &Expr2);
 
                 /* Push the address (or whatever is in ax in case of errors) */
                 g_push (CF_PTR | CF_UNSIGNED, 0);
@@ -162,13 +163,13 @@ void Assignment (ExprDesc* Expr)
      	PushAddr (Expr);
 
      	/* Read the expression on the right side of the '=' */
-     	hie1 (&lval2);
+     	hie1 (&Expr2);
 
      	/* Do type conversion if necessary */
-     	TypeConversion (&lval2, ltype);
+     	TypeConversion (&Expr2, ltype);
 
      	/* If necessary, load the value into the primary register */
-     	ExprLoad (CF_NONE, &lval2);
+     	LoadExpr (CF_NONE, &Expr2);
 
      	/* Generate a store instruction */
      	Store (Expr, 0);

@@ -42,6 +42,7 @@
 #include "declare.h"
 #include "error.h"
 #include "expr.h"
+#include "loadexpr.h"
 #include "scanner.h"
 #include "typecmp.h"
 #include "typeconv.h"
@@ -112,7 +113,7 @@ static void DoConversion (ExprDesc* Expr, const type* NewType)
          */
         if (NewSize > OldSize) {
             /* Load the value into the primary */
-            ExprLoad (CF_NONE, Expr);
+            LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code */
             g_typecast (TypeOf (NewType), TypeOf (OldType));
@@ -158,7 +159,7 @@ static void DoConversion (ExprDesc* Expr, const type* NewType)
         if (OldSize != NewSize) {
 
             /* Load the value into the primary */
-            ExprLoad (CF_NONE, Expr);
+            LoadExpr (CF_NONE, Expr);
 
             /* Emit typecast code. */
             g_typecast (TypeOf (NewType) | CF_FORCECHAR, TypeOf (OldType));

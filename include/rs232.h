@@ -20,6 +20,7 @@
 /*****************************************************************************/
 
 
+#if defined(__C64__)
 
 /* Baudrate settings */
 #define RS_BAUD_50     	       		0x00
@@ -36,10 +37,6 @@
 #define RS_BAUD_57600  	       		0x0B
 #define RS_BAUD_115200 	       		0x0C
 #define RS_BAUD_230400 	       		0x0D
-
-/* Stop bit settings */
-#define RS_STOP_1      	       		0x00
-#define RS_STOP_2      	       		0x80
 
 /* Data bit settings */
 #define RS_BITS_5      	       		0x60
@@ -63,6 +60,50 @@
 #define RS_STATUS_DCD			0x20	/* NOT data carrier detect */
 #define RS_STATUS_DSR			0x40	/* NOT data set ready */
 #define RS_STATUS_IRQ  	       		0x80	/* IRQ condition */
+
+#elif defined(__ATARI__)
+
+/* Baudrate settings */
+#define RS_BAUD_300    	       		0x00
+#define RS_BAUD_45_5   	       		0x01
+#define RS_BAUD_50     	       		0x02
+#define RS_BAUD_56_875 	       		0x03
+#define RS_BAUD_75 	       		0x04
+#define RS_BAUD_110    	       		0x05
+#define RS_BAUD_134_5  	       	  	0x06
+#define RS_BAUD_150    	       		0x07
+/*#define RS_BAUD_300    	       	0x08  alternative */
+#define RS_BAUD_600    	       		0x09
+#define RS_BAUD_1200   	       		0x0A
+#define RS_BAUD_1800   	       		0x0B
+#define RS_BAUD_2400   	       		0x0C
+#define RS_BAUD_4800   	       		0x0D
+#define RS_BAUD_9600   	       		0x0E
+
+/* Data bit settings */
+#define RS_BITS_5      	       		0x30
+#define RS_BITS_6      	       		0x20
+#define RS_BITS_7      	       		0x10
+#define RS_BITS_8      	       		0x00
+
+/* Parity settings */
+#define RS_PAR_NONE    	       		0x00
+#define RS_PAR_ODD     	       		0x05
+#define RS_PAR_EVEN    	       		0x0A
+#define RS_PAR_MARK    	       		0x03
+#define RS_PAR_SPACE   	       		0x0C
+
+/* Bit masks to mask out things from the status returned by rs232_status */
+#define RS_STATUS_PE   	       		0x20	/* Parity error */
+#define RS_STATUS_FE			0x80	/* Framing error */
+#define RS_STATUS_OVERRUN		0x40	/* Overrun error */
+#define RS_STATUS_RDRF			0x10	/* Receiver data register full */
+
+#endif /* __ATARI__ section */
+
+/* Stop bit settings */
+#define RS_STOP_1      	       		0x00
+#define RS_STOP_2      	       		0x80
 
 /* Error codes returned by all functions */
 #define RS_ERR_OK     	       		0x00	/* Not an error - relax */

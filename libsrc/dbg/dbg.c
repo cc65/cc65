@@ -522,8 +522,8 @@ static char Input (char* Prompt, char* Buf, unsigned char Count)
 
 
 
-static int InputHex (char* Prompt, unsigned* Val)
-/* Prompt for a hexadecimal value */
+static char InputHex (char* Prompt, unsigned* Val)
+/* Prompt for a hexadecimal value. Return 0 on failure. */
 {
     char Buf [5];
     char* P;
@@ -563,14 +563,6 @@ static int InputHex (char* Prompt, unsigned* Val)
 
 
 
-static int InputGoto (unsigned* Addr)
-/* Prompt "Goto" and read an address */
-{
-    return InputHex ("Goto: ", Addr);
-}
-
-
-
 static void ErrorPrompt (char* Msg)
 /* Display an error message and wait for a key */
 {
@@ -585,6 +577,19 @@ static void ErrorPrompt (char* Msg)
 
     /* Restore the old prompt */
     DisplayPrompt (OldPrompt);
+}
+
+
+
+static char InputGoto (unsigned* Addr)
+/* Prompt "Goto" and read an address. Print an error and return 0 on failure. */
+{
+    char Ok;
+    Ok = InputHex ("Goto: ", Addr);
+    if (!Ok) {
+        ErrorPrompt ("Invalid input - press a key");
+    }
+    return Ok;
 }
 
 

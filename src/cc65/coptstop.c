@@ -33,8 +33,6 @@
 
 
 
-#include <string.h>
-
 /* cc65 */
 #include "codeent.h"
 #include "codeinfo.h"

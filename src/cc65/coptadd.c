@@ -33,8 +33,6 @@
 
 
 
-#include <string.h>
-
 /* common */
 #include "xsprintf.h"
 
@@ -82,20 +80,18 @@ unsigned OptAdd1 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-	if (E->OPC == OP65_JSR                               &&
-	    strcmp (E->Arg, "pushax") == 0                   &&
-       	    CS_GetEntries (S, L, I+1, 5)   	             &&
-       	    L[0]->OPC == OP65_LDY                            &&
-	    CE_KnownImm (L[0])                               &&
-	    !CE_HasLabel (L[0])                              &&
-	    L[1]->OPC == OP65_LDX                            &&
-	    CE_KnownImm (L[1])                               &&
-	    L[1]->Num == 0                                   &&
-	    !CE_HasLabel (L[1])                              &&
-	    L[2]->OPC == OP65_LDA                            &&
-	    !CE_HasLabel (L[2])                              &&
-	    L[3]->OPC == OP65_JSR                            &&
-	    strcmp (L[3]->Arg, "tosaddax") == 0              &&
+       	if (CE_IsCall (E, "pushax")          &&
+       	    CS_GetEntries (S, L, I+1, 5)     &&
+       	    L[0]->OPC == OP65_LDY            &&
+	    CE_KnownImm (L[0])               &&
+	    !CE_HasLabel (L[0])              &&
+	    L[1]->OPC == OP65_LDX            &&
+	    CE_KnownImm (L[1])               &&
+	    L[1]->Num == 0                   &&
+	    !CE_HasLabel (L[1])              &&
+	    L[2]->OPC == OP65_LDA            &&
+	    !CE_HasLabel (L[2])              &&
+	    CE_IsCall (L[3], "tosaddax")     &&
 	    !CE_HasLabel (L[3])) {
 
 	    CodeEntry* X;
@@ -203,8 +199,7 @@ unsigned OptAdd2 (CodeSeg* S)
 	    L[5]->OPC == OP65_LDY               &&
 	    CE_KnownImm (L[5])                  &&
 	    !CE_HasLabel (L[5])                 &&
-	    L[6]->OPC == OP65_JSR               &&
-       	    strcmp (L[6]->Arg, "addeqysp") == 0 &&
+	    CE_IsCall (L[6], "addeqysp")        &&
 	    !CE_HasLabel (L[6])                 &&
 	    (GetRegInfo (S, I+7, REG_AX) & REG_AX) == 0) {
 

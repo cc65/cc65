@@ -39,6 +39,7 @@
 
 
 #include <stdio.h>
+#include <string.h>
 
 /* common */
 #include "coll.h"
@@ -176,6 +177,16 @@ void CE_SetNumArg (CodeEntry* E, long Num);
 
 int CE_KnownImm (const CodeEntry* E);
 /* Return true if the argument of E is a known immediate value */
+
+#if defined(HAVE_INLINE)
+INLINE int CE_IsCall (const CodeEntry* E, const char* Name)
+/* Check if this is a call to the given function */
+{
+    return (E->OPC == OP65_JSR && strcmp (E->Arg, Name) == 0);
+}
+#else
+#  define CE_IsCall(E, Name) ((E)->OPC == OP65_JSR && strcmp ((E)->Arg, (Name)) == 0)
+#endif
 
 void CE_FreeRegInfo (CodeEntry* E);
 /* Free an existing register info struct */

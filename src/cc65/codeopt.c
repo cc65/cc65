@@ -53,6 +53,7 @@
 #include "coptstop.h"
 #include "coptsub.h"
 #include "copttest.h"
+#include "cpu.h"
 #include "error.h"
 #include "global.h"
 #include "codeopt.h"
@@ -149,8 +150,7 @@ static unsigned OptNegA1 (CodeSeg* S)
 	    L[0]->OPC == OP65_LDA		&&
 	    (L[0]->Use & REG_X) == 0	    	&&
 	    !CE_HasLabel (L[0])                 &&
-	    L[1]->OPC == OP65_JSR	    	&&
-	    strcmp (L[1]->Arg, "bnega") == 0    &&
+	    CE_IsCall (L[1], "bnega")           &&
 	    !CE_HasLabel (L[1])) {
 
 	    /* Remove the ldx instruction */
@@ -206,8 +206,7 @@ static unsigned OptNegA2 (CodeSeg* S)
 	     E->OPC == OP65_TXA ||
 	     E->OPC == OP65_TYA)                &&
 	    CS_GetEntries (S, L, I+1, 2)	&&
-       	    L[0]->OPC == OP65_JSR  	    	&&
-	    strcmp (L[0]->Arg, "bnega") == 0	&&
+       	    CE_IsCall (L[0], "bnega")           &&
 	    !CE_HasLabel (L[0])	  	        &&
 	    (L[1]->Info & OF_ZBRA) != 0         &&
 	    !CE_HasLabel (L[1])) {
@@ -260,9 +259,8 @@ static unsigned OptNegAX1 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if this is a call to bnegax, and if X is known and zero */
-	if (E->OPC == OP65_JSR              &&
-	    E->RI->In.RegX == 0             &&
-	    strcmp (E->Arg, "bnegax") == 0) {
+	if (E->RI->In.RegX == 0             &&
+       	    CE_IsCall (E, "bnegax")) {
 
 	    /* We're cheating somewhat here ... */
 	    E->Arg[5] = '\0';
@@ -325,8 +323,7 @@ static unsigned OptNegAX2 (CodeSeg* S)
 	    L[2]->AM == AM65_ZP_INDY  		&&
 	    strcmp (L[2]->Arg, E->Arg) == 0	&&
 	    !CE_HasLabel (L[2])		        &&
-	    L[3]->OPC == OP65_JSR    		&&
-	    strcmp (L[3]->Arg, "bnegax") == 0	&&
+       	    CE_IsCall (L[3], "bnegax")          &&
 	    !CE_HasLabel (L[3])		        &&
        	    (L[4]->Info & OF_ZBRA) != 0         &&
 	    !CE_HasLabel (L[4])) {
@@ -390,8 +387,7 @@ static unsigned OptNegAX3 (CodeSeg* S)
        	    CS_GetEntries (S, L, I+1, 3)	&&
 	    L[0]->OPC == OP65_LDX       	&&
 	    !CE_HasLabel (L[0]) 		&&
-       	    L[1]->OPC == OP65_JSR      		&&
-	    strcmp (L[1]->Arg, "bnegax") == 0	&&
+       	    CE_IsCall (L[1], "bnegax")          &&
 	    !CE_HasLabel (L[1]) 		&&
        	    (L[2]->Info & OF_ZBRA) != 0         &&
 	    !CE_HasLabel (L[2])) {
@@ -574,22 +570,19 @@ static unsigned OptPtrStore1 (CodeSeg* S)
        	L[0] = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (L[0]->OPC == OP65_JSR    	      	    &&
-     	    strcmp (L[0]->Arg, "pushax") == 0       &&
+       	if (CE_IsCall (L[0], "pushax")              &&
        	    CS_GetEntries (S, L+1, I+1, 3)     	    &&
        	    L[1]->OPC == OP65_LDY              	    &&
      	    CE_KnownImm (L[1])                      &&
      	    !CE_HasLabel (L[1])      	       	    &&
-     	    L[2]->OPC == OP65_JSR                   &&
-     	    strcmp (L[2]->Arg, "ldauidx") == 0      &&
+       	    CE_IsCall (L[2], "ldauidx")             &&
      	    !CE_HasLabel (L[2])                     &&
        	    (K = OptPtrStore1Sub (S, I+3, L+3)) > 0 &&
 	    CS_GetEntries (S, L+3+K, I+3+K, 2)      &&
        	    L[3+K]->OPC == OP65_LDY                 &&
      	    CE_KnownImm (L[3+K])                    &&
 	    !CE_HasLabel (L[3+K])                   &&
-	    L[4+K]->OPC == OP65_JSR                 &&
-	    strcmp (L[4+K]->Arg, "staspidx") == 0   &&
+	    CE_IsCall (L[4+K], "staspidx")          &&
 	    !CE_HasLabel (L[4+K])) {
 
 	    CodeEntry* X;
@@ -665,15 +658,13 @@ static unsigned OptPtrStore2 (CodeSeg* S)
        	L[0] = CS_GetEntry (S, I);
 
      	/* Check for the sequence */
-       	if (L[0]->OPC == OP65_JSR  	      	&&
-	    strcmp (L[0]->Arg, "pushax") == 0   &&
+       	if (CE_IsCall (L[0], "pushax")          &&
        	    CS_GetEntries (S, L+1, I+1, 3)   	&&
        	    L[1]->OPC == OP65_LDA              	&&
 	    !CE_HasLabel (L[1])    	       	&&
 	    L[2]->OPC == OP65_LDY               &&
 	    !CE_HasLabel (L[2])                 &&
-	    L[3]->OPC == OP65_JSR               &&
-	    strcmp (L[3]->Arg, "staspidx") == 0 &&
+	    CE_IsCall (L[3], "staspidx")        &&
 	    !CE_HasLabel (L[3])) {
 
 	    CodeEntry* X;
@@ -757,8 +748,7 @@ static unsigned OptPtrLoad1 (CodeSeg* S)
 	    !CE_HasLabel (L[2])                 &&
 	    L[3]->OPC == OP65_LDY               &&
 	    !CE_HasLabel (L[3])                 &&
-	    L[4]->OPC == OP65_JSR               &&
-       	    strcmp (L[4]->Arg, "ldauidx") == 0  &&
+	    CE_IsCall (L[4], "ldauidx")         &&
 	    !CE_HasLabel (L[4])) {
 
 	    CodeEntry* X;
@@ -847,8 +837,7 @@ static unsigned OptPtrLoad2 (CodeSeg* S)
 	    !CE_HasLabel (L[5])                 &&
 	    L[6]->OPC == OP65_LDY               &&
 	    !CE_HasLabel (L[6])                 &&
-	    L[7]->OPC == OP65_JSR               &&
-       	    strcmp (L[7]->Arg, "ldauidx") == 0  &&
+       	    CE_IsCall (L[7], "ldauidx")         &&
 	    !CE_HasLabel (L[7])) {
 
 	    CodeEntry* X;
@@ -945,8 +934,7 @@ static unsigned OptPtrLoad3 (CodeSeg* S)
 	    !CE_HasLabel (L[6])                 &&
 	    L[7]->OPC == OP65_LDY               &&
 	    !CE_HasLabel (L[7])                 &&
-	    L[8]->OPC == OP65_JSR               &&
-       	    strcmp (L[8]->Arg, "ldauidx") == 0  &&
+       	    CE_IsCall (L[8], "ldauidx")         &&
 	    !CE_HasLabel (L[8])) {
 
 	    CodeEntry* X;
@@ -1041,8 +1029,7 @@ static unsigned OptPtrLoad4 (CodeSeg* S)
 	    L[6]->OPC == OP65_LDY                            &&
 	    CE_KnownImm (L[6])                               &&
 	    L[6]->Num == 0                                   &&
-       	    L[7]->OPC == OP65_JSR                            &&
-       	    strcmp (L[7]->Arg, "ldauidx") == 0               &&
+       	    CE_IsCall (L[7], "ldauidx")                      &&
 	    !CE_HasLabel (L[7])                              &&
 	    /* Check the label last because this is quite costly */
 	    (Len = strlen (L[0]->Arg)) > 3                   &&
@@ -1147,8 +1134,7 @@ static unsigned OptPtrLoad5 (CodeSeg* S)
 	    L[7]->OPC == OP65_LDY                            &&
 	    CE_KnownImm (L[7])                               &&
 	    L[7]->Num == 0                                   &&
-       	    L[8]->OPC == OP65_JSR                            &&
-       	    strcmp (L[8]->Arg, "ldauidx") == 0               &&
+       	    CE_IsCall (L[8], "ldauidx")                      &&
 	    !CE_HasLabel (L[8])                              &&
 	    /* Check the label last because this is quite costly */
 	    (Len = strlen (L[0]->Arg)) > 3                   &&
@@ -1223,7 +1209,7 @@ static unsigned OptPtrLoad6 (CodeSeg* S)
     unsigned I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	CodeEntry* L[2];
+    	CodeEntry* L[2];
 
       	/* Get next entry */
        	L[0] = CS_GetEntry (S, I);
@@ -1231,24 +1217,23 @@ static unsigned OptPtrLoad6 (CodeSeg* S)
      	/* Check for the sequence */
        	if (L[0]->OPC == OP65_LDY      	       	&&
        	    CS_GetEntries (S, L+1, I+1, 1)     	&&
-       	    L[1]->OPC == OP65_JSR               &&
-       	    strcmp (L[1]->Arg, "ldauidx") == 0  &&
-	    !CE_HasLabel (L[1])) {
+       	    CE_IsCall (L[1], "ldauidx")         &&
+    	    !CE_HasLabel (L[1])) {
 
-	    CodeEntry* X;
+    	    CodeEntry* X;
 
        	    /* Store the high byte */
        	    X = NewCodeEntry (OP65_STA, AM65_ZP, "ptr1", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+1);
+    	    CS_InsertEntry (S, X, I+1);
 
-	    /* Store the low byte */
-	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
-	    CS_InsertEntry (S, X, I+2);
+    	    /* Store the low byte */
+    	    X = NewCodeEntry (OP65_STX, AM65_ZP, "ptr1+1", 0, L[0]->LI);
+    	    CS_InsertEntry (S, X, I+2);
 
-	    /* Delete the call to ldauidx */
-	    CS_DelEntry (S, I+3);
+    	    /* Delete the call to ldauidx */
+    	    CS_DelEntry (S, I+3);
 
-	    /* Load the high and low byte */
+    	    /* Load the high and low byte */
 	    X = NewCodeEntry (OP65_LDX, AM65_IMM, "$00", 0, L[0]->LI);
 	    CS_InsertEntry (S, X, I+3);
 	    X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "ptr1", 0, L[0]->LI);
@@ -1263,6 +1248,233 @@ static unsigned OptPtrLoad6 (CodeSeg* S)
 	++I;
 
     }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*			      Decouple operations                            */
+/*****************************************************************************/
+
+
+
+static unsigned OptDecouple (CodeSeg* S)
+/* Decouple operations, that is, do the following replacements:
+ *
+ *   dex  -> ldx
+ *   inx  -> ldx
+ *   dey  -> ldy
+ *   iny  -> ldy
+ *   tax  -> ldx
+ *   txa  -> lda
+ *   tay  -> ldy
+ *   tya  -> lda
+ *
+ * Provided that the register values are known of course.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for the following step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	char Buf [16];
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Assume we have no replacement */
+	CodeEntry* X = 0;
+
+	/* Check the instruction */
+	switch (E->OPC) {
+
+	    case OP65_DEX:
+	        if (E->RI->In.RegX >= 0) {
+	      	    xsprintf (Buf, sizeof (Buf), "$%02X", (E->RI->In.RegX - 1) & 0xFF);
+	      	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, E->LI);
+	    	}
+	        break;
+
+	    case OP65_DEY:
+	        if (E->RI->In.RegY >= 0) {
+	      	    xsprintf (Buf, sizeof (Buf), "$%02X", (E->RI->In.RegY - 1) & 0xFF);
+	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
+	    	}
+	        break;
+
+	    case OP65_INX:
+	        if (E->RI->In.RegX >= 0) {
+	      	    xsprintf (Buf, sizeof (Buf), "$%02X", (E->RI->In.RegX + 1) & 0xFF);
+	      	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, E->LI);
+	    	}
+	        break;
+
+	    case OP65_INY:
+	        if (E->RI->In.RegY >= 0) {
+	      	    xsprintf (Buf, sizeof (Buf), "$%02X", (E->RI->In.RegY + 1) & 0xFF);
+	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
+	    	}
+	        break;
+
+	    case OP65_TAX:
+	        if (E->RI->In.RegA >= 0) {
+	      	    xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.RegA);
+	      	    X = NewCodeEntry (OP65_LDX, AM65_IMM, Buf, 0, E->LI);
+	    	}
+	        break;
+
+	    case OP65_TAY:
+	        if (E->RI->In.RegA >= 0) {
+	      	    xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.RegA);
+	      	    X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, E->LI);
+	    	}
+	        break;
+
+	    case OP65_TXA:
+	        if (E->RI->In.RegX >= 0) {
+	      	    xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.RegX);
+	      	    X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, E->LI);
+	    	}
+	        break;
+
+	    case OP65_TYA:
+	        if (E->RI->In.RegY >= 0) {
+	      	    xsprintf (Buf, sizeof (Buf), "$%02X", E->RI->In.RegY);
+	      	    X = NewCodeEntry (OP65_LDA, AM65_IMM, Buf, 0, E->LI);
+	    	}
+	        break;
+
+	    default:
+	        /* Avoid gcc warnings */
+	        break;
+
+	}
+
+	/* Insert the replacement if we have one */
+	if (X) {
+	    CS_InsertEntry (S, X, I+1);
+	    CS_DelEntry (S, I);
+	    ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+/*****************************************************************************/
+/*			       Size optimization                             */
+/*****************************************************************************/
+
+
+
+static unsigned OptSize (CodeSeg* S)
+/* Do size optimization by using shorter code sequences, even if this
+ * introduces relations between instructions. This step must be one of the
+ * last steps, because it makes further work much more difficult.
+ */
+{
+    unsigned Changes = 0;
+    unsigned I;
+
+    /* Generate register info for the following step */
+    CS_GenRegInfo (S);
+
+    /* Walk over the entries */
+    I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Assume we have no replacement */
+	CodeEntry* X = 0;
+
+	/* Check the instruction */
+	switch (E->OPC) {
+
+	    case OP65_LDA:
+	        if (CE_KnownImm (E)) {
+		    short Val = (short) E->Num;
+		    if (Val == E->RI->In.RegX) {
+		    	X = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, E->LI);
+		    } else if (Val == E->RI->In.RegY) {
+		    	X = NewCodeEntry (OP65_TYA, AM65_IMP, 0, 0, E->LI);
+		    } else if (E->RI->In.RegA >= 0 && CPU >= CPU_65C02) {
+		    	if (Val == ((E->RI->In.RegA - 1) & 0xFF)) {
+		     	    X = NewCodeEntry (OP65_DEA, AM65_IMP, 0, 0, E->LI);
+		    	} else if (Val == ((E->RI->In.RegA + 1) & 0xFF)) {
+		    	    X = NewCodeEntry (OP65_INA, AM65_IMP, 0, 0, E->LI);
+		    	}
+		    }
+		}
+	        break;
+
+	    case OP65_LDX:
+	        if (CE_KnownImm (E)) {
+		    short Val = (short) E->Num;
+		    if (E->RI->In.RegX >= 0 && Val == ((E->RI->In.RegX - 1) & 0xFF)) {
+			X = NewCodeEntry (OP65_DEX, AM65_IMP, 0, 0, E->LI);
+		    } else if (E->RI->In.RegX >= 0 && Val == ((E->RI->In.RegX + 1) & 0xFF)) {
+			X = NewCodeEntry (OP65_INX, AM65_IMP, 0, 0, E->LI);
+		    } else if (Val == E->RI->In.RegA) {
+			X = NewCodeEntry (OP65_TAX, AM65_IMP, 0, 0, E->LI);
+		    }
+		}
+	        break;
+
+	    case OP65_LDY:
+	        if (CE_KnownImm (E)) {
+		    short Val = (short) E->Num;
+		    if (E->RI->In.RegY >= 0 && Val == ((E->RI->In.RegY - 1) & 0xFF)) {
+			X = NewCodeEntry (OP65_DEY, AM65_IMP, 0, 0, E->LI);
+		    } else if (E->RI->In.RegY >= 0 && Val == ((E->RI->In.RegY + 1) & 0xFF)) {
+			X = NewCodeEntry (OP65_INY, AM65_IMP, 0, 0, E->LI);
+		    } else if (Val == E->RI->In.RegA) {
+			X = NewCodeEntry (OP65_TAY, AM65_IMP, 0, 0, E->LI);
+		    }
+		}
+	        break;
+
+	    default:
+	        /* Avoid gcc warnings */
+	        break;
+
+	}
+
+	/* Insert the replacement if we have one */
+	if (X) {
+	    CS_InsertEntry (S, X, I+1);
+	    CS_DelEntry (S, I);
+	    ++Changes;
+	}
+
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Free register info */
+    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -1299,34 +1511,11 @@ struct OptFunc {
 #define OptFuncEntry(func) static OptFuncDesc D##func = { func, #func, 0 }
 
 /* A list of all the function descriptions */
-static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    0, 0, 0, 0, 0 };
-static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad1    	= { OptPtrLoad1,     "OptPtrLoad1",  	0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad2    	= { OptPtrLoad2,     "OptPtrLoad2",  	0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad3    	= { OptPtrLoad3,     "OptPtrLoad3",  	0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad4    	= { OptPtrLoad4,     "OptPtrLoad4",  	0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",  	0, 0, 0, 0, 0 };
-static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",  	0, 0, 0, 0, 0 };
-static OptFunc DOptNegA1       	= { OptNegA1,  	     "OptNegA1",     	0, 0, 0, 0, 0 };
-static OptFunc DOptNegA2       	= { OptNegA2,  	     "OptNegA2",     	0, 0, 0, 0, 0 };
-static OptFunc DOptNegAX1      	= { OptNegAX1,       "OptNegAX1",    	0, 0, 0, 0, 0 };
-static OptFunc DOptNegAX2      	= { OptNegAX2,       "OptNegAX2",    	0, 0, 0, 0, 0 };
-static OptFunc DOptNegAX3      	= { OptNegAX3,       "OptNegAX3",    	0, 0, 0, 0, 0 };
-static OptFunc DOptNegAX4      	= { OptNegAX4,       "OptNegAX4",    	0, 0, 0, 0, 0 };
-static OptFunc DOptSub1	       	= { OptSub1,   	     "OptSub1",      	0, 0, 0, 0, 0 };
-static OptFunc DOptSub2	       	= { OptSub2,   	     "OptSub2",      	0, 0, 0, 0, 0 };
 static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",      	0, 0, 0, 0, 0 };
 static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",      	0, 0, 0, 0, 0 };
 static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",      	0, 0, 0, 0, 0 };
-static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",    	0, 0, 0, 0, 0 };
-static OptFunc DOptJumpCascades	= { OptJumpCascades, "OptJumpCascades", 0, 0, 0, 0, 0 };
-static OptFunc DOptDeadJumps   	= { OptDeadJumps,    "OptDeadJumps",    0, 0, 0, 0, 0 };
-static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",       	0, 0, 0, 0, 0 };
-static OptFunc DOptDeadCode    	= { OptDeadCode,     "OptDeadCode",  	0, 0, 0, 0, 0 };
-static OptFunc DOptJumpTarget  	= { OptJumpTarget,   "OptJumpTarget",   0, 0, 0, 0, 0 };
-static OptFunc DOptCondBranches	= { OptCondBranches, "OptCondBranches", 0, 0, 0, 0, 0 };
-static OptFunc DOptRTSJumps    	= { OptRTSJumps,     "OptRTSJumps",  	0, 0, 0, 0, 0 };
 static OptFunc DOptBoolTrans    = { OptBoolTrans,    "OptBoolTrans",    0, 0, 0, 0, 0 };
+static OptFunc DOptBranchDist  	= { OptBranchDist,   "OptBranchDist",   0, 0, 0, 0, 0 };
 static OptFunc DOptCmp1	       	= { OptCmp1,   	     "OptCmp1",      	0, 0, 0, 0, 0 };
 static OptFunc DOptCmp2	       	= { OptCmp2,   	     "OptCmp2",      	0, 0, 0, 0, 0 };
 static OptFunc DOptCmp3	       	= { OptCmp3,   	     "OptCmp3",      	0, 0, 0, 0, 0 };
@@ -1334,14 +1523,40 @@ static OptFunc DOptCmp4	       	= { OptCmp4,   	     "OptCmp4",      	0, 0, 0, 0
 static OptFunc DOptCmp5	       	= { OptCmp5,   	     "OptCmp5",      	0, 0, 0, 0, 0 };
 static OptFunc DOptCmp6	       	= { OptCmp6,   	     "OptCmp6",      	0, 0, 0, 0, 0 };
 static OptFunc DOptCmp7	       	= { OptCmp7,   	     "OptCmp7",      	0, 0, 0, 0, 0 };
+static OptFunc DOptCondBranches	= { OptCondBranches, "OptCondBranches", 0, 0, 0, 0, 0 };
+static OptFunc DOptDeadCode    	= { OptDeadCode,     "OptDeadCode",  	0, 0, 0, 0, 0 };
+static OptFunc DOptDeadJumps   	= { OptDeadJumps,    "OptDeadJumps",    0, 0, 0, 0, 0 };
+static OptFunc DOptDecouple     = { OptDecouple,     "OptDecouple",     0, 0, 0, 0, 0 };
+static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",     0, 0, 0, 0, 0 };
+static OptFunc DOptJumpCascades	= { OptJumpCascades, "OptJumpCascades", 0, 0, 0, 0, 0 };
+static OptFunc DOptJumpTarget  	= { OptJumpTarget,   "OptJumpTarget",   0, 0, 0, 0, 0 };
+static OptFunc DOptRTS 	       	= { OptRTS,    	     "OptRTS",       	0, 0, 0, 0, 0 };
+static OptFunc DOptRTSJumps    	= { OptRTSJumps,     "OptRTSJumps",  	0, 0, 0, 0, 0 };
+static OptFunc DOptNegA1       	= { OptNegA1,  	     "OptNegA1",     	0, 0, 0, 0, 0 };
+static OptFunc DOptNegA2       	= { OptNegA2,  	     "OptNegA2",     	0, 0, 0, 0, 0 };
+static OptFunc DOptNegAX1      	= { OptNegAX1,       "OptNegAX1",    	0, 0, 0, 0, 0 };
+static OptFunc DOptNegAX2      	= { OptNegAX2,       "OptNegAX2",    	0, 0, 0, 0, 0 };
+static OptFunc DOptNegAX3      	= { OptNegAX3,       "OptNegAX3",    	0, 0, 0, 0, 0 };
+static OptFunc DOptNegAX4      	= { OptNegAX4,       "OptNegAX4",    	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad1    	= { OptPtrLoad1,     "OptPtrLoad1",  	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad2    	= { OptPtrLoad2,     "OptPtrLoad2",  	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad3    	= { OptPtrLoad3,     "OptPtrLoad3",  	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad4    	= { OptPtrLoad4,     "OptPtrLoad4",  	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad5    	= { OptPtrLoad5,     "OptPtrLoad5",  	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrLoad6    	= { OptPtrLoad6,     "OptPtrLoad6",  	0, 0, 0, 0, 0 };
+static OptFunc DOptPtrStore1   	= { OptPtrStore1,    "OptPtrStore1",    0, 0, 0, 0, 0 };
+static OptFunc DOptPtrStore2   	= { OptPtrStore2,    "OptPtrStore2",    0, 0, 0, 0, 0 };
+static OptFunc DOptShift1      	= { OptShift1,       "OptShift1",    	0, 0, 0, 0, 0 };
+static OptFunc DOptSize         = { OptSize,         "OptSize",         0, 0, 0, 0, 0 };
+static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",  	0, 0, 0, 0, 0 };
+static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",    0, 0, 0, 0, 0 };
+static OptFunc DOptSub1	       	= { OptSub1,   	     "OptSub1",      	0, 0, 0, 0, 0 };
+static OptFunc DOptSub2	       	= { OptSub2,   	     "OptSub2",      	0, 0, 0, 0, 0 };
 static OptFunc DOptTest1       	= { OptTest1,  	     "OptTest1",     	0, 0, 0, 0, 0 };
+static OptFunc DOptTransfers   	= { OptTransfers,    "OptTransfers",    0, 0, 0, 0, 0 };
 static OptFunc DOptUnusedLoads 	= { OptUnusedLoads,  "OptUnusedLoads",  0, 0, 0, 0, 0 };
 static OptFunc DOptUnusedStores	= { OptUnusedStores, "OptUnusedStores", 0, 0, 0, 0, 0 };
-static OptFunc DOptDupLoads     = { OptDupLoads,     "OptDupLoads",     0, 0, 0, 0, 0 };
-static OptFunc DOptStoreLoad   	= { OptStoreLoad,    "OptStoreLoad",    0, 0, 0, 0, 0 };
-static OptFunc DOptTransfers   	= { OptTransfers,    "OptTransfers",    0, 0, 0, 0, 0 };
-static OptFunc DOptStackOps    	= { OptStackOps,     "OptStackOps",  	0, 0, 0, 0, 0 };
-static OptFunc DOptBranchDist  	= { OptBranchDist,   "OptBranchDist",   0, 0, 0, 0, 0 };
+
 
 /* Table containing all the steps in alphabetical order */
 static OptFunc* OptFuncs[] = {
@@ -1360,6 +1575,7 @@ static OptFunc* OptFuncs[] = {
     &DOptCondBranches,
     &DOptDeadCode,
     &DOptDeadJumps,
+    &DOptDecouple,
     &DOptDupLoads,
     &DOptJumpCascades,
     &DOptJumpTarget,
@@ -1379,9 +1595,10 @@ static OptFunc* OptFuncs[] = {
     &DOptPtrLoad6,
     &DOptRTS,
     &DOptRTSJumps,
+    &DOptShift1,
+    &DOptSize,
     &DOptSub1,
     &DOptSub2,
-    &DOptShift1,
     &DOptStackOps,
     &DOptStoreLoad,
     &DOptTest1,
@@ -1558,7 +1775,7 @@ static void WriteOptStats (const char* Name)
     for (I = 0; I < OPTFUNC_COUNT; ++I) {
 	const OptFunc* O = OptFuncs[I];
 	fprintf (F,
-		 "%s %lu %lu %lu %lu\n",
+       	       	 "%-20s %6lu %6lu %6lu %6lu\n",
 		 O->Name,
 		 O->TotalRuns,
 		 O->LastRuns,
@@ -1630,6 +1847,19 @@ static void RunOptGroup1 (CodeSeg* S)
 
 
 static void RunOptGroup2 (CodeSeg* S)
+/* Run one group of optimization steps. This step involves just decoupling
+ * instructions by replacing them by instructions that do not depend on
+ * previous instructions. This makes it easier to find instructions that
+ * aren't used.
+ */
+{
+    RunOptFunc (S, &DOptDecouple, 1);
+}
+
+
+
+
+static void RunOptGroup3 (CodeSeg* S)
 /* Run one group of optimization steps. These steps depend on each other,
  * that means that one step may allow another step to do additional work,
  * so we will repeat the steps as long as we see any changes.
@@ -1641,16 +1871,16 @@ static void RunOptGroup2 (CodeSeg* S)
 	Changes = 0;
 
 	Changes += RunOptFunc (S, &DOptPtrLoad6, 1);
-	Changes += RunOptFunc (S, &DOptNegA1, 1);
-	Changes += RunOptFunc (S, &DOptNegA2, 1);
-	Changes += RunOptFunc (S, &DOptSub1, 1);
-	Changes += RunOptFunc (S, &DOptSub2, 1);
-	Changes += RunOptFunc (S, &DOptAdd3, 1);
-	Changes += RunOptFunc (S, &DOptJumpCascades, 1);
-	Changes += RunOptFunc (S, &DOptDeadJumps, 1);
-	Changes += RunOptFunc (S, &DOptRTS, 1);
-	Changes += RunOptFunc (S, &DOptDeadCode, 1);
-	Changes += RunOptFunc (S, &DOptJumpTarget, 1);
+       	Changes += RunOptFunc (S, &DOptNegA1, 1);
+       	Changes += RunOptFunc (S, &DOptNegA2, 1);
+       	Changes += RunOptFunc (S, &DOptSub1, 1);
+       	Changes += RunOptFunc (S, &DOptSub2, 1);
+       	Changes += RunOptFunc (S, &DOptAdd3, 1);
+       	Changes += RunOptFunc (S, &DOptJumpCascades, 1);
+       	Changes += RunOptFunc (S, &DOptDeadJumps, 1);
+       	Changes += RunOptFunc (S, &DOptRTS, 1);
+       	Changes += RunOptFunc (S, &DOptDeadCode, 1);
+       	Changes += RunOptFunc (S, &DOptJumpTarget, 1);
 	Changes += RunOptFunc (S, &DOptCondBranches, 1);
 	Changes += RunOptFunc (S, &DOptRTSJumps, 1);
 	Changes += RunOptFunc (S, &DOptBoolTrans, 1);
@@ -1674,10 +1904,22 @@ static void RunOptGroup2 (CodeSeg* S)
 
 
 
-static void RunOptGroup3 (CodeSeg* S)
+static void RunOptGroup4 (CodeSeg* S)
 /* The last group of optimization steps. Adjust branches.
  */
 {
+    /* Optimize for size, that is replace operations by shorter ones, even
+     * if this does hinder further optimizations (no problem since we're
+     * done soon).
+     */
+    RunOptFunc (S, &DOptSize, 1);
+
+    /* Run the jump target optimization again, since the size optimization
+     * above may have opened new oportunities.
+     */
+    RunOptFunc (S, &DOptJumpTarget, 5);
+
+    /* Finally, adjust branch distances */
     RunOptFunc (S, &DOptBranchDist, 3);
 }
 
@@ -1710,6 +1952,7 @@ void RunOpt (CodeSeg* S)
     RunOptGroup1 (S);
     RunOptGroup2 (S);
     RunOptGroup3 (S);
+    RunOptGroup4 (S);
 
     /* Write statistics */
     if (StatFileName) {

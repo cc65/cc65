@@ -118,7 +118,7 @@ c64lib:
 # C128
 
 c128lib:
-	for i in c128 cbm common runtime conio dbg; do \
+	for i in c128 cbm common runtime conio dbg tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t c128 -I../../include" \
@@ -126,7 +126,7 @@ c128lib:
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv c128/crt0.o c128.o
-	for i in c128 cbm common runtime conio dbg; do \
+	for i in c128 cbm common runtime conio dbg tgi; do \
 	    $(AR) a c128.lib $$i/*.o;\
 	done
 
@@ -134,7 +134,7 @@ c128lib:
 # Commdore P500 / CBM 5x0
 
 cbm510lib:
-	for i in cbm510 cbm common runtime conio dbg; do \
+	for i in cbm510 cbm common runtime conio dbg tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t cbm510 -I../../include" \
@@ -142,7 +142,7 @@ cbm510lib:
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv cbm510/crt0.o cbm510.o
-	for i in cbm510 cbm common runtime conio dbg; do \
+	for i in cbm510 cbm common runtime conio dbg tgi; do \
 	    $(AR) a cbm510.lib $$i/*.o;\
 	done
 
@@ -210,7 +210,7 @@ petlib:
 # Commodore C116, C16 and Plus/4
 
 plus4lib:
-	for i in plus4 cbm common runtime conio dbg; do \
+	for i in plus4 cbm common runtime conio dbg tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    CFLAGS="-Osir -g -T -t plus4 -I../../include" \
@@ -218,7 +218,7 @@ plus4lib:
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv plus4/crt0.o plus4.o
-	for i in plus4 cbm common runtime conio dbg; do \
+	for i in plus4 cbm common runtime conio dbg tgi; do \
 	    $(AR) a plus4.lib $$i/*.o;\
 	done
 
@@ -228,7 +228,7 @@ plus4lib:
 .PHONY: clean
 clean:
 	@for i in apple2 atari c128 c64 cbm cbm510 cbm610 common conio dbg geos pet plus4 runtime tgi; do 	\
-	   $(MAKE) -C $$i clean;     	    		  	   					\
+	   $(MAKE) -C $$i clean;     	    	       	  	   					\
 	done
 
 .PHONY: zap

@@ -49,7 +49,7 @@
 #define OBJ_VERSION	0x000A
 
 /* Size of an object file header */
-#define	OBJ_HDR_SIZE	72
+#define	OBJ_HDR_SIZE	(20*4)
 
 /* Flag bits */
 #define OBJ_FLAGS_DBGINFO	0x0001	/* File has debug info */
@@ -78,6 +78,8 @@ struct ObjHeader {
     unsigned long       LineInfoSize;   /* 32: Size of line infos */
     unsigned long       StrPoolOffs;    /* 32: Offset to string pool */
     unsigned long       StrPoolSize;    /* 32: Size of string pool */
+    unsigned long       AssertOffs;     /* 32: Offset to assertion table */
+    unsigned long       AssertSize;     /* 32: Size of assertion table */
 };
 
 

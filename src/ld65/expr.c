@@ -101,8 +101,9 @@ int IsConstExpr (ExprNode* Root)
  * with no references to external symbols.
  */
 {
-    int Const;
-    Export* E;
+    int         Const;
+    Export*     E;
+    Section*    S;      
 
     if (EXPR_IS_LEAF (Root->Op)) {
       	switch (Root->Op) {
@@ -111,23 +112,39 @@ int IsConstExpr (ExprNode* Root)
       	      	return 1;
 
       	    case EXPR_SYMBOL:
-		/* Get the referenced export */
+    		/* Get the referenced export */
        	       	E = GetExprExport (Root);
-		/* If this export has a mark set, we've already encountered it.
-		 * This means that the export is used to define it's own value,
-		 * which in turn means, that we have a circular reference.
-		 */
-		if (ExportHasMark (E)) {
+    		/* If this export has a mark set, we've already encountered it.
+    		 * This means that the export is used to define it's own value,
+    		 * which in turn means, that we have a circular reference.
+    		 */
+    		if (ExportHasMark (E)) {
                     CircularRefError (E);
-		    Const = 0;
-		} else {
-		    MarkExport (E);
-		    Const = IsConstExport (E);
-		    UnmarkExport (E);
-		}
-		return Const;
+    		    Const = 0;
+    		} else {
+    		    MarkExport (E);
+    		    Const = IsConstExport (E);
+    		    UnmarkExport (E);
+    		}
+    		return Const;
+
+            case EXPR_SECTION:
+                /* A section expression is const if the segment it is in is
+                 * not relocatable.
+                 */
+                S = GetExprSection (Root);
+                return !S->Seg->Relocatable;
+
+            case EXPR_SEGMENT:
+                /* A segment is const if it is not relocatable */
+                return !Root->V.Seg->Relocatable;
+
+            case EXPR_MEMAREA:
+                /* A memory area is const if it is not relocatable */
+                return !Root->V.Mem->Relocatable;
 
       	    default:
+                /* Anything else is not const */
       	 	return 0;
 
       	}
@@ -213,7 +230,7 @@ Section* GetExprSection (ExprNode* Expr)
      */
     if (Expr->Obj) {
 	/* Return the export */
-	return Expr->Obj->Sections [Expr->V.SegNum];
+	return Expr->Obj->Sections[Expr->V.SegNum];
     } else {
 	return Expr->V.Sec;
     }
@@ -231,47 +248,47 @@ long GetExprVal (ExprNode* Expr)
     switch (Expr->Op) {
 
        	case EXPR_LITERAL:
-    	    return Expr->V.Val;
+     	    return Expr->V.Val;
 
        	case EXPR_SYMBOL:
-	    /* Get the referenced export */
+     	    /* Get the referenced export */
        	    E = GetExprExport (Expr);
-	    /* If this export has a mark set, we've already encountered it.
-	     * This means that the export is used to define it's own value,
-	     * which in turn means, that we have a circular reference.
-	     */
-	    if (ExportHasMark (E)) {
-	  	CircularRefError (E);
-	  	Val = 0;
-	    } else {
-	  	MarkExport (E);
-	    	Val = GetExportVal (E);
-	  	UnmarkExport (E);
-	    }
-	    return Val;
+     	    /* If this export has a mark set, we've already encountered it.
+     	     * This means that the export is used to define it's own value,
+     	     * which in turn means, that we have a circular reference.
+     	     */
+     	    if (ExportHasMark (E)) {
+     	  	CircularRefError (E);
+     	  	Val = 0;
+     	    } else {
+     	  	MarkExport (E);
+     	    	Val = GetExportVal (E);
+     	  	UnmarkExport (E);
+     	    }
+     	    return Val;
 
         case EXPR_SECTION:
        	    S = GetExprSection (Expr);
-	    return S->Offs + S->Seg->PC;
+     	    return S->Offs + S->Seg->PC;
 
-	case EXPR_SEGMENT:
+     	case EXPR_SEGMENT:
        	    return Expr->V.Seg->PC;
 
         case EXPR_MEMAREA:
             return Expr->V.Mem->Start;
 
        	case EXPR_PLUS:
-    	    return GetExprVal (Expr->Left) + GetExprVal (Expr->Right);
+     	    return GetExprVal (Expr->Left) + GetExprVal (Expr->Right);
 
        	case EXPR_MINUS:
-	    return GetExprVal (Expr->Left) - GetExprVal (Expr->Right);
+     	    return GetExprVal (Expr->Left) - GetExprVal (Expr->Right);
 
        	case EXPR_MUL:
-	    return GetExprVal (Expr->Left) * GetExprVal (Expr->Right);
+     	    return GetExprVal (Expr->Left) * GetExprVal (Expr->Right);
 
        	case EXPR_DIV:
-	    Left  = GetExprVal (Expr->Left);
-	    Right = GetExprVal (Expr->Right);
+     	    Left  = GetExprVal (Expr->Left);
+     	    Right = GetExprVal (Expr->Right);
 	    if (Right == 0) {
 	  	Error ("Division by zero");
 	    }

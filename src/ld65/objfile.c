@@ -44,6 +44,7 @@
 #include "xmalloc.h"
 
 /* ld65 */
+#include "asserts.h"
 #include "dbgsyms.h"
 #include "error.h"
 #include "exports.h"
@@ -101,15 +102,21 @@ static void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     H->LineInfoSize = Read32 (Obj);
     H->StrPoolOffs  = Read32 (Obj);
     H->StrPoolSize  = Read32 (Obj);
+    H->AssertOffs   = Read32 (Obj);
+    H->AssertSize   = Read32 (Obj);
 }
 
 
 
-void ObjReadFiles (FILE* F, ObjData* O)
-/* Read the files list from a file at the current position */
+void ObjReadFiles (FILE* F, unsigned long Pos, ObjData* O)
+/* Read the files list from a file at the given position */
 {
     unsigned I;
 
+    /* Seek to the correct position */
+    FileSetPos (F, Pos);
+
+    /* Read the data */
     O->FileCount  = ReadVar (F);
     O->Files      = xmalloc (O->FileCount * sizeof (O->Files[0]));
     for (I = 0; I < O->FileCount; ++I) {
@@ -119,41 +126,69 @@ void ObjReadFiles (FILE* F, ObjData* O)
 
 
 
-void ObjReadImports (FILE* F, ObjData* O)
-/* Read the imports from a file at the current position */
+void ObjReadSections (FILE* F, unsigned long Pos, ObjData* O)
+/* Read the section data from a file at the given position */
 {
     unsigned I;
 
+    /* Seek to the correct position */
+    FileSetPos (F, Pos);
+
+    /* Read the data */
+    O->SectionCount = ReadVar (F);
+    O->Sections     = xmalloc (O->SectionCount * sizeof (O->Sections[0]));
+    for (I = 0; I < O->SectionCount; ++I) {
+	O->Sections [I] = ReadSection (F, O);
+    }
+}
+
+
+
+void ObjReadImports (FILE* F, unsigned long Pos, ObjData* O)
+/* Read the imports from a file at the given position */
+{
+    unsigned I;
+
+    /* Seek to the correct position */
+    FileSetPos (F, Pos);
+
+    /* Read the data */
     O->ImportCount = ReadVar (F);
     O->Imports     = xmalloc (O->ImportCount * sizeof (O->Imports[0]));
     for (I = 0; I < O->ImportCount; ++I) {
    	O->Imports [I] = ReadImport (F, O);
-	InsertImport (O->Imports [I]);
     }
 }
 
 
 
-void ObjReadExports (FILE* F, ObjData* O)
-/* Read the exports from a file at the current position */
+void ObjReadExports (FILE* F, unsigned long Pos, ObjData* O)
+/* Read the exports from a file at the given position */
 {
     unsigned I;
 
+    /* Seek to the correct position */
+    FileSetPos (F, Pos);
+
+    /* Read the data */
     O->ExportCount = ReadVar (F);
     O->Exports     = xmalloc (O->ExportCount * sizeof (O->Exports[0]));
     for (I = 0; I < O->ExportCount; ++I) {
 	O->Exports [I] = ReadExport (F, O);
-	InsertExport (O->Exports [I]);
     }
 }
 
 
 
-void ObjReadDbgSyms (FILE* F, ObjData* O)
-/* Read the debug symbols from a file at the current position */
+void ObjReadDbgSyms (FILE* F, unsigned long Pos, ObjData* O)
+/* Read the debug symbols from a file at the given position */
 {
     unsigned I;
 
+    /* Seek to the correct position */
+    FileSetPos (F, Pos);
+
+    /* Read the data */
     O->DbgSymCount = ReadVar (F);
     O->DbgSyms	   = xmalloc (O->DbgSymCount * sizeof (O->DbgSyms[0]));
     for (I = 0; I < O->DbgSymCount; ++I) {
@@ -163,11 +198,15 @@ void ObjReadDbgSyms (FILE* F, ObjData* O)
 
 
 
-void ObjReadLineInfos (FILE* F, ObjData* O)
-/* Read the line infos from a file at the current position */
+void ObjReadLineInfos (FILE* F, unsigned long Pos, ObjData* O)
+/* Read the line infos from a file at the given position */
 {
     unsigned I;
 
+    /* Seek to the correct position */
+    FileSetPos (F, Pos);
+
+    /* Read the data */
     O->LineInfoCount = ReadVar (F);
     O->LineInfos     = xmalloc (O->LineInfoCount * sizeof (O->LineInfos[0]));
     for (I = 0; I < O->LineInfoCount; ++I) {
@@ -177,11 +216,15 @@ void ObjReadLineInfos (FILE* F, ObjData* O)
 
 
 
-void ObjReadStrPool (FILE* F, ObjData* O)
-/* Read the string pool from a file at the current position */
+void ObjReadStrPool (FILE* F, unsigned long Pos, ObjData* O)
+/* Read the string pool from a file at the given position */
 {
     unsigned I;
 
+    /* Seek to the correct position */
+    FileSetPos (F, Pos);
+
+    /* Read the data */
     O->StringCount = ReadVar (F);
     O->Strings     = xmalloc (O->StringCount * sizeof (O->Strings[0]));
     for (I = 0; I < O->StringCount; ++I) {
@@ -191,15 +234,19 @@ void ObjReadStrPool (FILE* F, ObjData* O)
 
 
 
-void ObjReadSections (FILE* F, ObjData* O)
-/* Read the section data from a file at the current position */
+void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O)
+/* Read the assertions from a file at the given offset */
 {
     unsigned I;
 
-    O->SectionCount = ReadVar (F);
-    O->Sections     = xmalloc (O->SectionCount * sizeof (O->Sections[0]));
-    for (I = 0; I < O->SectionCount; ++I) {
-	O->Sections [I] = ReadSection (F, O);
+    /* Seek to the correct position */
+    FileSetPos (F, Pos);
+
+    /* Read the data */
+    O->AssertionCount = ReadVar (F);
+    O->Assertions     = xmalloc (O->AssertionCount * sizeof (O->Assertions[0]));
+    for (I = 0; I < O->AssertionCount; ++I) {
+        O->Assertions[I] = ReadAssertion (F, O);
     }
 }
 
@@ -221,35 +268,31 @@ void ObjAdd (FILE* Obj, const char* Name)
     O->Name  = GetModule (Name);
 
     /* Read the string pool from the object file */
-    fseek (Obj, O->Header.StrPoolOffs, SEEK_SET);
-    ObjReadStrPool (Obj, O);
+    ObjReadStrPool (Obj, O->Header.StrPoolOffs, O);
 
     /* Read the files list from the object file */
-    fseek (Obj, O->Header.FileOffs, SEEK_SET);
-    ObjReadFiles (Obj, O);
+    ObjReadFiles (Obj, O->Header.FileOffs, O);
 
     /* Read the imports list from the object file */
-    fseek (Obj, O->Header.ImportOffs, SEEK_SET);
-    ObjReadImports (Obj, O);
+    ObjReadImports (Obj, O->Header.ImportOffs, O);
 
     /* Read the object file exports and insert them into the exports list */
-    fseek (Obj, O->Header.ExportOffs, SEEK_SET);
-    ObjReadExports (Obj, O);
+    ObjReadExports (Obj, O->Header.ExportOffs, O);
 
     /* Read the object debug symbols from the object file */
-    fseek (Obj, O->Header.DbgSymOffs, SEEK_SET);
-    ObjReadDbgSyms (Obj, O);
+    ObjReadDbgSyms (Obj, O->Header.DbgSymOffs, O);
 
     /* Read the line infos from the object file */
-    fseek (Obj, O->Header.LineInfoOffs, SEEK_SET);
-    ObjReadLineInfos (Obj, O);
+    ObjReadLineInfos (Obj, O->Header.LineInfoOffs, O);
+
+    /* Read the assertions from the object file */
+    ObjReadAssertions (Obj, O->Header.AssertOffs, O);
 
     /* Read the segment list from the object file. This must be last, since
      * the expressions stored in the code may reference segments or imported
      * symbols.
      */
-    fseek (Obj, O->Header.SegOffs, SEEK_SET);
-    ObjReadSections (Obj, O);
+    ObjReadSections (Obj, O->Header.SegOffs, O);
 
     /* Mark this object file as needed */
     O->Flags |= OBJ_REF;
@@ -257,13 +300,16 @@ void ObjAdd (FILE* Obj, const char* Name)
     /* Done, close the file (we read it only, so no error check) */
     fclose (Obj);
 
+    /* Insert the imports and exports to the global lists */
+    InsertObjGlobals (O);
+
+    /* Insert the object into the list of all used object files */
+    InsertObjData (O);
+
     /* All references to strings are now resolved, so we can delete the module
      * string pool.
      */
     FreeObjStrings (O);
-
-    /* Insert the object into the list of all used object files */
-    InsertObjData (O);
 }
 
 

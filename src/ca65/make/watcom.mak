@@ -55,6 +55,7 @@ OBJS = 	condasm.obj	\
 	incpath.obj	\
        	instr.obj	\
 	istack.obj	\
+        ldassert.obj    \
 	lineinfo.obj	\
 	listing.obj	\
 	macpack.obj	\

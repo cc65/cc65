@@ -66,17 +66,19 @@ struct ObjData {
     unsigned 	 	FileCount;	/* Input file count */
     struct FileInfo**  	Files;		/* List of input files */
     unsigned	 	SectionCount;	/* Count of sections in this object */
-    struct Section**  	Sections;	/* List of all sections */
+    struct Section**  	Sections;  	/* List of all sections */
     unsigned	  	ExportCount;	/* Count of exports */
     struct Export**	Exports;       	/* List of all exports */
     unsigned	 	ImportCount;	/* Count of imports */
-    struct Import**	Imports;	/* List of all imports */
+    struct Import**	Imports;   	/* List of all imports */
     unsigned	 	DbgSymCount;	/* Count of debug symbols */
     struct DbgSym**   	DbgSyms;       	/* List of debug symbols */
     unsigned            LineInfoCount;  /* Count of additional line infos */
     struct LineInfo**   LineInfos;      /* List of additional line infos */
     unsigned            StringCount;    /* Count of strings */
     unsigned*           Strings;        /* List of global string indices */
+    unsigned            AssertionCount; /* Count of module assertions */
+    struct Assertion**  Assertions;     /* List of module assertions */
 };
 
 
@@ -108,6 +110,11 @@ void FreeObjStrings (ObjData* O);
 
 void InsertObjData (ObjData* O);
 /* Insert the ObjData object into the collection of used ObjData objects. */
+
+void InsertObjGlobals (ObjData* O);
+/* Insert imports and exports from the object file into the global import and
+ * export lists.
+ */
 
 unsigned MakeGlobalStringId (const ObjData* O, unsigned Index);
 /* Convert a local string id into a global one and return it. */

@@ -65,7 +65,8 @@ struct Segment {
     unsigned char     	Align;		/* Alignment needed */
     unsigned char     	FillVal;	/* Value to use for fill bytes */
     unsigned char     	Type;		/* Type of segment */
-    char      	      	Dumped;		/* Did we dump this segment? */
+    unsigned char       Relocatable;    /* True if the segment is relocatable */
+    unsigned char      	Dumped;		/* Did we dump this segment? */
 };
 
 
@@ -156,5 +157,5 @@ void CheckSegments (void);
 #endif
 
 
-                           
+
 

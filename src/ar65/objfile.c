@@ -111,6 +111,8 @@ void ObjReadHeader (FILE* Obj, ObjHeader* H, const char* Name)
     H->LineInfoSize = Read32 (Obj);
     H->StrPoolOffs  = Read32 (Obj);
     H->StrPoolSize  = Read32 (Obj);
+    H->AssertOffs   = Read32 (Obj);
+    H->AssertSize   = Read32 (Obj);
 }
 
 
@@ -137,6 +139,8 @@ void ObjWriteHeader (FILE* Obj, ObjHeader* H)
     Write32 (Obj, H->LineInfoSize);
     Write32 (Obj, H->StrPoolOffs);
     Write32 (Obj, H->StrPoolSize);
+    Write32 (Obj, H->AssertOffs);
+    Write32 (Obj, H->AssertSize);
 }
 
 
@@ -201,7 +205,7 @@ void ObjAdd (const char* Name)
     O->StringCount = ReadVar (Obj);
     O->Strings     = xmalloc (O->StringCount * sizeof (char*));
     for (I = 0; I < O->StringCount; ++I) {
-        O->Strings[I] = ReadStr (Obj);    
+        O->Strings[I] = ReadStr (Obj);
     }
 
     /* Skip the object file header */
@@ -219,6 +223,8 @@ void ObjAdd (const char* Name)
     H.FileOffs = LibCopyTo (Obj, H.FileSize) - O->Start;
     fseek (Obj, H.LineInfoOffs, SEEK_SET);
     H.LineInfoOffs = LibCopyTo (Obj, H.LineInfoSize) - O->Start;
+    fseek (Obj, H.AssertOffs, SEEK_SET);
+    H.AssertOffs = LibCopyTo (Obj, H.AssertSize) - O->Start;
 
     /* Calculate the amount of data written */
     O->Size = ftell (NewLib) - O->Start;
@@ -270,7 +276,7 @@ void ObjExtract (const char* Name)
     	Error ("Cannot open target file `%s': %s", Name, strerror (errno));
     }
 
-    /* Copy the first four segments including the header to the new file */
+    /* Copy anything to the new file that has no special handling */
     LibCopyFrom (O->Start, O->Size, Obj);
 
     /* Write imports and exports */
@@ -284,7 +290,7 @@ void ObjExtract (const char* Name)
     WriteVar (Obj, O->StringCount);
     for (I = 0; I < O->StringCount; ++I) {
         WriteStr (Obj, O->Strings[I]);
-    }                             
+    }
     StrPoolSize = ftell (Obj) - StrPoolStart;
 
     /* Seek back and read the header */

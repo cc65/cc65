@@ -78,6 +78,7 @@ struct Memory {
     unsigned long      	Size; 	  	/* Length of memory section */
     unsigned long      	FillLevel;	/* Actual fill level of segment */
     unsigned char   	FillVal;  	/* Value used to fill rest of seg */
+    unsigned char       Relocatable;    /* Memory are is relocatable */
     MemListNode* 	SegList;  	/* List of segments for this section */
     MemListNode* 	SegLast;  	/* Last segment in this section */
     File*    	    	F;    	  	/* File that contains the entry */

@@ -287,18 +287,19 @@ static Memory* NewMemory (unsigned Name)
     M = xmalloc (sizeof (Memory));
 
     /* Initialize the fields */
-    M->Name      = Name;
-    M->Next	 = 0;
-    M->FNext     = 0;
-    M->Attr      = 0;
-    M->Flags     = 0;
-    M->Start     = 0;
-    M->Size      = 0;
-    M->FillLevel = 0;
-    M->FillVal   = 0;
-    M->SegList   = 0;
-    M->SegLast   = 0;
-    M->F         = 0;
+    M->Name        = Name;
+    M->Next    	   = 0;
+    M->FNext       = 0;
+    M->Attr        = 0;
+    M->Flags       = 0;
+    M->Start       = 0;
+    M->Size        = 0;
+    M->FillLevel   = 0;
+    M->FillVal     = 0;
+    M->Relocatable = 0;
+    M->SegList     = 0;
+    M->SegLast     = 0;
+    M->F           = 0;
 
     /* Insert the struct into the list */
     if (MemoryLast == 0) {
@@ -992,7 +993,7 @@ static void ParseFormats (void)
 	/* Map the identifier to a token */
 	cfgtok_t FormatTok;
        	CfgSpecialToken (Formats, ENTRY_COUNT (Formats), "Format");
-	FormatTok = CfgTok;                        
+	FormatTok = CfgTok;
 
 	/* Skip the name and the following colon */
 	CfgNextTok ();
@@ -1432,11 +1433,16 @@ void CfgAssignSegments (void)
     Memory* M = MemoryList;
     while (M) {
 
+        MemListNode* N;
+
      	/* Get the start address of this memory area */
      	unsigned long Addr = M->Start;
 
+        /* Remember if this is a relocatable memory area */
+        M->Relocatable = RelocatableBinFmt (M->F->Format);
+
      	/* Walk through the segments in this memory area */
-     	MemListNode* N = M->SegList;
+     	N = M->SegList;
      	while (N) {
 
      	    /* Get the segment from the node */
@@ -1444,32 +1450,35 @@ void CfgAssignSegments (void)
 
      	    /* Handle ALIGN and OFFSET/START */
      	    if (S->Flags & SF_ALIGN) {
-     		/* Align the address */
-     		unsigned long Val = (0x01UL << S->Align) - 1;
-     		Addr = (Addr + Val) & ~Val;
+     	   	/* Align the address */
+     	   	unsigned long Val = (0x01UL << S->Align) - 1;
+     	   	Addr = (Addr + Val) & ~Val;
      	    } else if (S->Flags & (SF_OFFSET | SF_START)) {
-     		/* Give the segment a fixed starting address */
-     		unsigned long NewAddr = S->Addr;
-     		if (S->Flags & SF_OFFSET) {
-     		    /* An offset was given, no address, make an address */
-     		    NewAddr += M->Start;
-     		}
+     	   	/* Give the segment a fixed starting address */
+     	   	unsigned long NewAddr = S->Addr;
+     	   	if (S->Flags & SF_OFFSET) {
+     	   	    /* An offset was given, no address, make an address */
+     	   	    NewAddr += M->Start;
+     	   	}
        	       	if (Addr > NewAddr) {
-     		    /* Offset already too large */
-     		    if (S->Flags & SF_OFFSET) {
-     		        Error ("Offset too small in `%s', segment `%s'",
-     		     	       GetString (M->Name), GetString (S->Name));
-     		    } else {
-     		     	Error ("Start address too low in `%s', segment `%s'",
-     		     	       GetString (M->Name), GetString (S->Name));
-     		    }
-     		}
-     		Addr = NewAddr;
+     	   	    /* Offset already too large */
+     	   	    if (S->Flags & SF_OFFSET) {
+     	   	        Error ("Offset too small in `%s', segment `%s'",
+     	   	     	       GetString (M->Name), GetString (S->Name));
+     	   	    } else {
+     	   	     	Error ("Start address too low in `%s', segment `%s'",
+     	   	     	       GetString (M->Name), GetString (S->Name));
+     	   	    }
+     	   	}
+     	   	Addr = NewAddr;
      	    }
 
-       	    /* If this is the run area, set the start address of this segment */
+       	    /* If this is the run area, set the start address of this segment
+             * and remember if the segment is in a relocatable file or not.
+             */
      	    if (S->Run == M) {
      	        S->Seg->PC = Addr;
+                S->Seg->Relocatable = M->Relocatable;
      	    }
 
      	    /* Increment the fill level of the memory area and check for an

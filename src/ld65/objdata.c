@@ -88,6 +88,8 @@ ObjData* NewObjData (void)
     O->LineInfos        = 0;
     O->StringCount      = 0;
     O->Strings          = 0;
+    O->AssertionCount   = 0;
+    O->Assertions       = 0;
 
     /* Return the new entry */
     return O;
@@ -131,6 +133,24 @@ void InsertObjData (ObjData* O)
 /* Insert the ObjData object into the collection of used ObjData objects. */
 {
     CollAppend (&ObjDataList, O);
+}
+
+
+
+void InsertObjGlobals (ObjData* O)
+/* Insert imports and exports from the object file into the global import and
+ * export lists.
+ */
+{
+    unsigned I;
+
+    /* Insert exports and imports */
+    for (I = 0; I < O->ExportCount; ++I) {
+        InsertExport (O->Exports[I]);
+    }
+    for (I = 0; I < O->ImportCount; ++I) {
+        InsertImport (O->Imports[I]);
+    }
 }
 
 

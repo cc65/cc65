@@ -105,6 +105,8 @@ static void LibReadObjHeader (ObjData* O, const char* LibName)
     O->Header.LineInfoSize = Read32 (Lib);
     O->Header.StrPoolOffs  = Read32 (Lib);
     O->Header.StrPoolSize  = Read32 (Lib);
+    O->Header.AssertOffs   = Read32 (Lib);
+    O->Header.AssertSize   = Read32 (Lib);
 }
 
 
@@ -112,8 +114,6 @@ static void LibReadObjHeader (ObjData* O, const char* LibName)
 static ObjData* ReadIndexEntry (void)
 /* Read one entry in the index */
 {
-    unsigned I;
-
     /* Create a new entry and insert it into the list */
     ObjData* O	= NewObjData ();
 
@@ -127,23 +127,15 @@ static ObjData* ReadIndexEntry (void)
     Read32 (Lib);			/* Skip Size */
 
     /* Read the string pool */
-    ObjReadStrPool (Lib, O);
+    ObjReadStrPool (Lib, FileGetPos (Lib), O);
 
     /* Skip the export size, then read the exports */
     (void) ReadVar (Lib);
-    O->ExportCount = ReadVar (Lib);
-    O->Exports = xmalloc (O->ExportCount * sizeof (Export*));
-    for (I = 0; I < O->ExportCount; ++I) {
- 	O->Exports[I] = ReadExport (Lib, O);
-    }
+    ObjReadExports (Lib, FileGetPos (Lib), O);
 
     /* Skip the import size, then read the imports */
     (void) ReadVar (Lib);
-    O->ImportCount = ReadVar (Lib);
-    O->Imports = xmalloc (O->ImportCount * sizeof (Import*));
-    for (I = 0; I < O->ImportCount; ++I) {
-       	O->Imports[I] = ReadImport (Lib, O);
-    }
+    ObjReadImports (Lib, FileGetPos (Lib), O);
 
     /* Done */
     return O;
@@ -158,7 +150,7 @@ static void ReadIndex (void)
 
     /* Read the object file count and allocate memory */
     ModuleCount = ReadVar (Lib);
-    Index = xmalloc (ModuleCount * sizeof (ObjData*));
+    Index = xmalloc (ModuleCount * sizeof (Index[0]));
 
     /* Read all entries in the index */
     for (I = 0; I < ModuleCount; ++I) {
@@ -192,14 +184,7 @@ static void LibCheckExports (ObjData* O)
 
     /* If we need this module, insert the imports and exports */
     if (O->Flags & OBJ_REF) {
-	/* Insert the exports */
-	for (I = 0; I < O->ExportCount; ++I) {
-	    InsertExport (O->Exports[I]);
-	}
- 	/* Insert the imports */
- 	for (I = 0; I < O->ImportCount; ++I) {
-	    InsertImport (O->Imports[I]);
-	}
+        InsertObjGlobals (O);
     }
 }
 
@@ -265,23 +250,22 @@ void LibAdd (FILE* F, const char* Name)
  	    LibReadObjHeader (O, Name);
 
  	    /* Seek to the start of the files list and read the files list */
- 	    fseek (Lib, O->Start + O->Header.FileOffs, SEEK_SET);
- 	    ObjReadFiles (Lib, O);
+ 	    ObjReadFiles (Lib, O->Start + O->Header.FileOffs, O);
 
  	    /* Seek to the start of the debug info and read the debug info */
- 	    fseek (Lib, O->Start + O->Header.DbgSymOffs, SEEK_SET);
-       	    ObjReadDbgSyms (Lib, O);
+       	    ObjReadDbgSyms (Lib, O->Start + O->Header.DbgSymOffs, O);
 
 	    /* Seek to the start of the line infos and read them */
-	    fseek (Lib, O->Start + O->Header.LineInfoOffs, SEEK_SET);
-	    ObjReadLineInfos (Lib, O);
+	    ObjReadLineInfos (Lib, O->Start + O->Header.LineInfoOffs, O);
+
+            /* Read the assertions from the object file */
+            ObjReadAssertions (Lib, O->Start + O->Header.AssertOffs, O);
 
  	    /* Seek to the start of the segment list and read the segments.
 	     * This must be last, since the data here may reference other
 	     * stuff.
 	     */
- 	    fseek (Lib, O->Start + O->Header.SegOffs, SEEK_SET);
- 	    ObjReadSections (Lib, O);
+ 	    ObjReadSections (Lib, O->Start + O->Header.SegOffs, O);
 
             /* Add a pointer to the library name */
             O->LibName = LibName;

@@ -225,6 +225,8 @@ void ReadObjHeader (FILE* F, ObjHeader* H)
     H->LineInfoSize = Read32 (F);
     H->StrPoolOffs  = Read32 (F);
     H->StrPoolSize  = Read32 (F);
+    H->AssertOffs   = Read32 (F);
+    H->AssertSize   = Read32 (F);
 }
 
 

@@ -60,14 +60,14 @@ static FileInfo* NewFileInfo (void)
 
 
 
-FileInfo* ReadFileInfo (FILE* F, ObjData* O attribute ((unused)))
+FileInfo* ReadFileInfo (FILE* F, ObjData* O)
 /* Read a file info from a file and return it */
 {
     /* Allocate a new FileInfo structure */
     FileInfo* FI = NewFileInfo ();
 
     /* Read the fields from the file */
-    FI->Name  = ReadVar (F);
+    FI->Name  = MakeGlobalStringId (O, ReadVar (F));
     FI->MTime = Read32 (F);
     FI->Size  = Read32 (F);
 

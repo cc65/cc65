@@ -133,6 +133,12 @@ void ObjStartStrPool (void);
 void ObjEndStrPool (void);
 /* Mark the end of the string pool section */
 
+void ObjStartAssertions (void);
+/* Mark the start of the assertion table */
+
+void ObjEndAssertions (void);
+/* Mark the end of the assertion table */
+
 
 
 /* End of objfile.h */

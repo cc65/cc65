@@ -18,7 +18,8 @@ CVT=cfg/cvt-cfg.pl
 # -----------------------------------------------------------------------------
 # List of all object files
 
-OBJS = 	bin.o		\
+OBJS = 	asserts.o       \
+        bin.o		\
 	binfmt.o	\
 	condes.o	\
 	config.o	\

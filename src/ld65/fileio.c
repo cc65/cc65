@@ -34,6 +34,7 @@
 
 
 #include <string.h>
+#include <errno.h>
 
 /* common */
 #include "xmalloc.h"
@@ -48,6 +49,28 @@
 /*****************************************************************************/
 /*     	      	    		     Code				     */
 /*****************************************************************************/
+
+
+
+void FileSetPos (FILE* F, unsigned long Pos)
+/* Seek to the given absolute position, fail on errors */
+{
+    if (fseek (F, Pos, SEEK_SET) != 0) {
+ 	Error ("Cannot seek: %s", strerror (errno));
+    }
+}
+
+
+
+unsigned long FileGetPos (FILE* F)
+/* Return the current file position, fail on errors */
+{
+    long Pos = ftell (F);
+    if (Pos < 0) {
+       	Error ("Error in ftell: %s", strerror (errno));
+    }
+    return Pos;
+}
 
 
 

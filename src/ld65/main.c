@@ -49,6 +49,7 @@
 #include "xmalloc.h"
 
 /* ld65 */
+#include "asserts.h"
 #include "binfmt.h"
 #include "condes.h"
 #include "config.h"
@@ -508,6 +509,9 @@ int main (int argc, char* argv [])
 
     /* Assign start addresses for the segments, define linker symbols */
     CfgAssignSegments ();
+
+    /* Check module assertions */
+    CheckAssertions ();
 
     /* Create the output file */
     CfgWriteTarget ();

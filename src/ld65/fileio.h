@@ -51,6 +51,12 @@
 
 
 
+void FileSetPos (FILE* F, unsigned long Pos);
+/* Seek to the given absolute position, fail on errors */
+
+unsigned long FileGetPos (FILE* F);
+/* Return the current file position, fail on errors */
+
 void Write8 (FILE* F, unsigned Val);
 /* Write an 8 bit value to the file */
 

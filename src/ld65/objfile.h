@@ -54,26 +54,29 @@
 
 
 
-void ObjReadFiles (FILE* F, ObjData* O);
-/* Read the files list from a file at the current position */
+void ObjReadFiles (FILE* F, unsigned long Pos, ObjData* O);
+/* Read the files list from a file at the given position */
 
-void ObjReadImports (FILE* F, ObjData* O);
-/* Read the imports from a file at the current position */
+void ObjReadSections (FILE* F, unsigned long Pos, ObjData* O);
+/* Read the section data from a file at the given position */
 
-void ObjReadExports (FILE* F, ObjData* O);
-/* Read the exports from a file at the current position */
+void ObjReadImports (FILE* F, unsigned long Pos, ObjData* O);
+/* Read the imports from a file at the given position */
 
-void ObjReadDbgSyms (FILE* F, ObjData* O);
-/* Read the debug symbols from a file at the current position */
+void ObjReadExports (FILE* F, unsigned long Pos, ObjData* O);
+/* Read the exports from a file at the given position */
 
-void ObjReadLineInfos (FILE* F, ObjData* O);
-/* Read the line infos from a file at the current position */
+void ObjReadDbgSyms (FILE* F, unsigned long Pos, ObjData* O);
+/* Read the debug symbols from a file at the given position */
 
-void ObjReadStrPool (FILE* F, ObjData* O);
-/* Read the string pool from a file at the current position */
+void ObjReadLineInfos (FILE* F, unsigned long Pos, ObjData* O);
+/* Read the line infos from a file at the given position */
 
-void ObjReadSections (FILE* F, ObjData* O);
-/* Read the section data from a file at the current position */
+void ObjReadStrPool (FILE* F, unsigned long Pos, ObjData* O);
+/* Read the string pool from a file at the given position */
+
+void ObjReadAssertions (FILE* F, unsigned long Pos, ObjData* O);
+/* Read the assertions from a file at the given offset */
 
 void ObjAdd (FILE* F, const char* Name);
 /* Add an object file to the module list */

@@ -162,6 +162,7 @@ void ErrorMsg (const FilePos* Pos, unsigned ErrNum, va_list ap)
      	"Illegal macro package name",
      	"Illegal emulation feature",
         "Illegal scope specifier",
+        "Illegal assert action",
 	"Syntax error",
  	"Symbol `%s' is already defined",
 	"Undefined symbol `%s'",

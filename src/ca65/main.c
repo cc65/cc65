@@ -56,6 +56,7 @@
 #include "incpath.h"
 #include "instr.h"
 #include "istack.h"
+#include "ldassert.h"
 #include "lineinfo.h"
 #include "listing.h"
 #include "macro.h"
@@ -483,6 +484,9 @@ static void CreateObjFile (void)
 
     /* Write the string pool */
     WriteStrPool ();
+
+    /* Write the assertions */
+    WriteAssertions ();
 
     /* Write an updated header and close the file */
     ObjClose ();

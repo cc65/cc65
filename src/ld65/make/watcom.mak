@@ -43,7 +43,8 @@ CFLAGS  += -i=..\common
 # ------------------------------------------------------------------------------
 # All OBJ files
 
-OBJS =	bin.obj		\
+OBJS =	asserts.obj     \
+        bin.obj		\
 	binfmt.obj	\
 	condes.obj	\
 	config.obj	\

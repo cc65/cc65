@@ -89,17 +89,18 @@ static Segment* NewSegment (unsigned Name, unsigned char Type)
     Segment* S = xmalloc (sizeof (Segment));
 
     /* Initialize the fields */
-    S->Name     = Name;
-    S->Next	= 0;
-    S->SecRoot	= 0;
-    S->SecLast	= 0;
-    S->PC   	= 0;
-    S->Size    	= 0;
-    S->AlignObj	= 0;
-    S->Align    = 0;
-    S->FillVal	= 0;
-    S->Type     = Type;
-    S->Dumped   = 0;
+    S->Name        = Name;
+    S->Next	   = 0;
+    S->SecRoot	   = 0;
+    S->SecLast	   = 0;
+    S->PC   	   = 0;
+    S->Size    	   = 0;
+    S->AlignObj	   = 0;
+    S->Align       = 0;
+    S->FillVal	   = 0;
+    S->Type        = Type;
+    S->Relocatable = 0;
+    S->Dumped      = 0;
 
     /* Insert the segment into the segment list */
     S->List = SegRoot;

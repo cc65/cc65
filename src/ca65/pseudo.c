@@ -56,15 +56,17 @@
 #include "global.h"
 #include "incpath.h"
 #include "instr.h"
+#include "ldassert.h"
 #include "listing.h"
 #include "macpack.h"
 #include "macro.h"
 #include "nexttok.h"
 #include "objcode.h"
 #include "options.h"
-#include "repeat.h"
-#include "symtab.h"
 #include "pseudo.h"
+#include "repeat.h"
+#include "spool.h"
+#include "symtab.h"
 
 
 
@@ -322,6 +324,55 @@ static void DoASCIIZ (void)
 	}
     }
     Emit0 (0);
+}
+
+
+
+static void DoAssert (void)
+/* Add an assertion */
+{
+    static const char* ActionTab [] = {
+	"WARN", "WARNING",
+        "ERROR"
+    };
+
+    int Action;
+
+
+    /* First we have the expression that has to evaluated */
+    ExprNode* Expr = Expression ();
+    ConsumeComma ();
+
+    /* Action follows */
+    if (Tok != TOK_IDENT) {
+        ErrorSkip (ERR_IDENT_EXPECTED);
+        return;
+    }
+    Action = GetSubKey (ActionTab, sizeof (ActionTab) / sizeof (ActionTab[0]));
+    switch (Action) {
+
+        case 0:
+        case 1:
+            /* Warning */
+            break;
+
+        case 2:
+            /* Error */
+            break;
+
+        default:
+            Error (ERR_ILLEGAL_SEG_ATTR);
+    }
+    NextTok ();
+    ConsumeComma ();
+
+    /* Read the message */
+    if (Tok != TOK_STRCON) {
+    	ErrorSkip (ERR_STRCON_EXPECTED);
+    } else {
+        AddAssertion (Expr, Action, GetStringId (SVal));
+        NextTok ();
+    }
 }
 
 
@@ -1078,7 +1129,7 @@ static void DoMacPack (void)
 
     /* Insert the package */
     InsertMacPack (Package);
-}            
+}
 
 
 
@@ -1403,11 +1454,11 @@ enum {
 };
 
 /* Control command table */
-struct CtrlDesc_ {
+typedef struct CtrlDesc CtrlDesc;
+struct CtrlDesc {
     unsigned   	Flags; 			/* Flags for this directive */
     void       	(*Handler) (void);	/* Command handler */
 };
-typedef struct CtrlDesc_ CtrlDesc;
 
 #define PSEUDO_COUNT 	(sizeof (CtrlCmdTab) / sizeof (CtrlCmdTab [0]))
 static CtrlDesc CtrlCmdTab [] = {
@@ -1416,6 +1467,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,        	DoAddr 	       	},     	/* .ADDR */
     { ccNone,       	DoAlign		},
     { ccNone,       	DoASCIIZ	},
+    { ccNone,           DoAssert        },
     { ccNone,       	DoAutoImport	},
     { ccNone,        	DoUnexpected	},	/* .BLANK */
     { ccNone,       	DoBss		},

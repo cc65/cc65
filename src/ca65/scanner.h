@@ -115,6 +115,7 @@ enum Token {
     TOK_ADDR,
     TOK_ALIGN,
     TOK_ASCIIZ,
+    TOK_ASSERT,
     TOK_AUTOIMPORT,
     TOK_BLANK,
     TOK_BSS,
@@ -235,7 +236,7 @@ extern int     	ForcedEnd;		/* Force end of assembly */
 /*****************************************************************************/
 
 
-                    
+
 void NewInputFile (const char* Name);
 /* Open a new input file */
 

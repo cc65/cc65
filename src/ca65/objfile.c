@@ -81,7 +81,9 @@ static ObjHeader Header = {
     0,                  /* 32: Offset to list of line infos */
     0,                  /* 32: Size of line infos */
     0,                  /* 32: Offset to string pool */
-    0                   /* 32: Size of string pool */
+    0,                  /* 32: Size of string pool */
+    0,                  /* 32: Offset to assertion table */
+    0                   /* 32: Size of assertion table */
 };
 
 
@@ -134,6 +136,8 @@ static void ObjWriteHeader (void)
     ObjWrite32 (Header.LineInfoSize);
     ObjWrite32 (Header.StrPoolOffs);
     ObjWrite32 (Header.StrPoolSize);
+    ObjWrite32 (Header.AssertOffs);
+    ObjWrite32 (Header.AssertSize);
 }
 
 
@@ -438,6 +442,22 @@ void ObjEndStrPool (void)
 /* Mark the end of the string pool section */
 {
     Header.StrPoolSize = ftell (F) - Header.StrPoolOffs;
+}
+
+
+
+void ObjStartAssertions (void)
+/* Mark the start of the assertion table */
+{
+    Header.AssertOffs = ftell (F);
+}
+
+
+
+void ObjEndAssertions (void)
+/* Mark the end of the assertion table */
+{
+    Header.AssertSize = ftell (F) - Header.AssertOffs;
 }
 
 

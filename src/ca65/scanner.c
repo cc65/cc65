@@ -123,6 +123,7 @@ struct DotKeyword {
     { ".ALIGN",	       	TOK_ALIGN     	},
     { ".AND", 	    	TOK_BAND 	},
     { ".ASCIIZ",       	TOK_ASCIIZ	},
+    { ".ASSERT",        TOK_ASSERT      },
     { ".AUTOIMPORT", 	TOK_AUTOIMPORT	},
     { ".BITAND",	TOK_AND		},
     { ".BITNOT",	TOK_NOT		},

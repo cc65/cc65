@@ -91,6 +91,9 @@ const char* GetCurrentFile (void);
 unsigned GetCurrentLine (void);
 /* Return the line number in the current input file */
 
+void WriteDependencies (FILE* F, const char* OutputFile);
+/* Write a makefile dependency list to the given file */
+
 
 
 /* End of input.h */

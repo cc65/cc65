@@ -39,6 +39,7 @@
 
 /* common */
 #include "check.h"
+#include "coll.h"
 #include "xmalloc.h"
 
 /* cc65 */
@@ -71,22 +72,24 @@ char NextC = '\0';
 /* Struct that describes an input file */
 typedef struct IFile IFile;
 struct IFile {
-    IFile*	Next; 	 	/* Next file in single linked list 	*/
-    IFile*	Active;		/* Next file in list of active includes */
     unsigned	Index;	 	/* File index 				*/
-    unsigned	Line; 	 	/* Line number for this file 		*/
-    FILE*	F;    	 	/* Input file stream 			*/
+    unsigned	Usage;		/* Usage counter 		        */
     char       	Name[1]; 	/* Name of file (dynamically allocated) */
 };
 
-/* Main file input data */
-static const IFile* MainFile = 0;
+/* Struct that describes an active input file */
+typedef struct AFile AFile;
+struct AFile {
+    unsigned	Line; 	 	/* Line number for this file 		*/
+    FILE*   	F;    	 	/* Input file stream 			*/
+    const char*	Name;		/* Points to corresponding IFile name	*/
+};
 
-/* List of input files */
-static unsigned IFileTotal = 0;	/* Total number of files 		*/
-static IFile*  	IFileList  = 0;	/* Single linked list of all files 	*/
-static unsigned IFileCount = 0; /* Number of active input files 	*/
-static IFile*   Input 	   = 0; /* Single linked list of active files	*/
+/* List of all input files */
+static Collection IFiles = STATIC_COLLECTION_INITIALIZER;
+
+/* List of all active files */
+static Collection AFiles = STATIC_COLLECTION_INITIALIZER;
 
 
 
@@ -96,7 +99,7 @@ static IFile*   Input 	   = 0; /* Single linked list of active files	*/
 
 
 
-static IFile* NewIFile (const char* Name, FILE* F)
+static IFile* NewIFile (const char* Name)
 /* Create and return a new IFile */
 {
     /* Get the length of the name */
@@ -106,21 +109,52 @@ static IFile* NewIFile (const char* Name, FILE* F)
     IFile* IF = xmalloc (sizeof (IFile) + Len);
 
     /* Initialize the fields */
-    IF->Index	= ++IFileTotal;
-    IF->Line	= 0;
-    IF->F	= F;
+    IF->Index = CollCount (&IFiles) + 1;
+    IF->Usage = 0;
     memcpy (IF->Name, Name, Len+1);
 
-    /* Insert the structure into both lists */
-    IF->Next 	= IFileList;
-    IFileList	= IF;
-    IF->Active	= Input;
-    Input	= IF;
-    ++IFileCount;
-    ++IFileTotal;
+    /* Insert the new structure into the IFile collection */
+    CollAppend (&IFiles, IF);
 
     /* Return the new struct */
     return IF;
+}
+
+
+
+/*****************************************************************************/
+/*	       	      		 struct AFile				     */
+/*****************************************************************************/
+
+
+
+static AFile* NewAFile (IFile* IF, FILE* F)
+/* Create and return a new AFile */
+{
+    /* Allocate a AFile structure */
+    AFile* AF = xmalloc (sizeof (AFile));
+
+    /* Initialize the fields */
+    AF->Line  = 0;
+    AF->F     = F;
+    AF->Name  = IF->Name;
+
+    /* Increment the usage counter of the corresponding IFile */
+    ++IF->Usage;
+
+    /* Insert the new structure into the AFile collection */
+    CollAppend (&AFiles, AF);
+
+    /* Return the new struct */
+    return AF;
+}
+
+
+
+static void FreeAFile (AFile* AF)
+/* Free an AFile structure */
+{
+    xfree (AF);
 }
 
 
@@ -131,18 +165,44 @@ static IFile* NewIFile (const char* Name, FILE* F)
 
 
 
+static IFile* FindFile (const char* Name)
+/* Find the file with the given name in the list of all files. Since the list
+ * is not large (usually less than 10), I don't care about using hashes or
+ * similar things and do a linear search.
+ */
+{
+    unsigned I;
+    for (I = 0; I < CollCount (&IFiles); ++I) {
+	/* Get the file struct */
+	IFile* IF = CollAt (&IFiles, I);
+	/* Check the name */
+	if (strcmp (Name, IF->Name) == 0) {
+	    /* Found, return the struct */
+	    return IF;
+	}
+    }
+
+    /* Not found */
+    return 0;
+}
+
+
+
 void OpenMainFile (const char* Name)
 /* Open the main file. Will call Fatal() in case of failures. */
 {
+    /* Setup a new IFile structure for the main file */
+    IFile* IF = NewIFile (Name);
+
     /* Open the file for reading */
     FILE* F = fopen (Name, "r");
     if (F == 0) {
-	/* Cannot open */
-	Fatal (FAT_CANNOT_OPEN_INPUT, strerror (errno));
+       	/* Cannot open */
+       	Fatal (FAT_CANNOT_OPEN_INPUT, strerror (errno));
     }
 
-    /* Setup a new IFile structure */
-    MainFile = NewIFile (Name, F);
+    /* Allocate a new AFile structure for the file */
+    (void) NewAFile (IF, F);
 }
 
 
@@ -150,11 +210,12 @@ void OpenMainFile (const char* Name)
 void OpenIncludeFile (const char* Name, unsigned DirSpec)
 /* Open an include file and insert it into the tables. */
 {
-    char* N;
-    FILE* F;
+    char*  N;
+    FILE*  F;
+    IFile* IF;
 
     /* Check for the maximum include nesting */
-    if (IFileCount > MAX_INC_NESTING) {
+    if (CollCount (&AFiles) > MAX_INC_NESTING) {
      	PPError (ERR_INCLUDE_NESTING);
       	return;
     }
@@ -166,20 +227,27 @@ void OpenIncludeFile (const char* Name, unsigned DirSpec)
      	return;
     }
 
+    /* Search the list of all input files for this file. If we don't find
+     * it, create a new IFile object.
+     */
+    IF = FindFile (N);
+    if (IF == 0) {
+	IF = NewIFile (N);
+    }
+
+    /* We don't need N any longer, since we may now use IF->Name */
+    xfree (N);
+
     /* Open the file */
-    F = fopen (N, "r");
+    F = fopen (IF->Name, "r");
     if (F == 0) {
 	/* Error opening the file */
-	PPError (ERR_INCLUDE_OPEN_FAILURE, N, strerror (errno));
-	xfree (N);
+	PPError (ERR_INCLUDE_OPEN_FAILURE, IF->Name, strerror (errno));
 	return;
     }
 
-    /* Allocate a new IFile structure */
-    NewIFile (N, F);
-
-    /* We don't need the full name any longer */
-    xfree (N);
+    /* Allocate a new AFile structure */
+    (void) NewAFile (IF, F);
 }
 
 
@@ -189,17 +257,25 @@ static void CloseIncludeFile (void)
  * NULL if this was the main file.
  */
 {
+    AFile* Input;
+
+    /* Get the number of active input files */
+    unsigned AFileCount = CollCount (&AFiles);
+
     /* Must have an input file when called */
-    PRECONDITION (Input != 0);
+    PRECONDITION (AFileCount > 0);
+
+    /* Get the current active input file */
+    Input = CollLast (&AFiles);
 
     /* Close the current input file (we're just reading so no error check) */
     fclose (Input->F);
 
-    /* Make this file inactive and the last one active again */
-    Input = Input->Active;
+    /* Delete the last active file from the active file collection */
+    CollDelete (&AFiles, AFileCount-1);
 
-    /* Adjust the counter */
-    --IFileCount;
+    /* Delete the active file structure */
+    FreeAFile (Input);
 }
 
 
@@ -253,6 +329,7 @@ void NextChar (void)
 int NextLine (void)
 /* Get a line from the current input. Returns 0 on end of file. */
 {
+    AFile*	Input;
     unsigned   	Len;
     unsigned   	Part;
     unsigned   	Start;
@@ -261,10 +338,11 @@ int NextLine (void)
     /* Setup the line */
     ClearLine ();
 
-    /* If there is no file open, bail out */
-    if (Input == 0) {
+    /* If there is no file open, bail out, otherwise get the current input file */
+    if (CollCount (&AFiles) == 0) {
 	return 0;
     }
+    Input = CollLast (&AFiles);
 
     /* Read lines until we get one with real contents */
     Len = 0;
@@ -279,10 +357,14 @@ int NextLine (void)
       	    /* Leave the current file */
       	    CloseIncludeFile ();
 
-      	    /* If this was the last file, bail out */
-	    if (Input == 0) {
-	       	return 0;
+	    /* If there is no file open, bail out, otherwise get the
+	     * current input file
+	     */
+	    if (CollCount (&AFiles) == 0) {
+		return 0;
 	    }
+	    Input = CollLast (&AFiles);
+
        	}
 
 	/* We got a new line */
@@ -326,14 +408,19 @@ int NextLine (void)
 const char* GetCurrentFile (void)
 /* Return the name of the current input file */
 {
-    if (Input == 0) {
-	if (MainFile) {
-	    return MainFile->Name;
+    unsigned AFileCount = CollCount (&AFiles);
+    if (AFileCount > 0) {
+	const AFile* AF = CollAt (&AFiles, AFileCount-1);
+	return AF->Name;
+    } else {
+	/* No open file. Use the main file if we have one. */
+	unsigned IFileCount = CollCount (&IFiles);
+	if (IFileCount > 0) {
+	    const IFile* IF = CollAt (&IFiles, 0);
+	    return IF->Name;
 	} else {
       	    return "(outside file scope)";
 	}
-    } else {
-      	return Input->Name;
     }
 }
 
@@ -342,7 +429,41 @@ const char* GetCurrentFile (void)
 unsigned GetCurrentLine (void)
 /* Return the line number in the current input file */
 {
-    return Input? Input->Line : 0;
+    unsigned AFileCount = CollCount (&AFiles);
+    if (AFileCount > 0) {
+	const AFile* AF = CollAt (&AFiles, AFileCount-1);
+	return AF->Line;
+    } else {
+	/* No open file */
+	return 0;
+    }
+}
+
+
+
+void WriteDependencies (FILE* F, const char* OutputFile)
+/* Write a makefile dependency list to the given file */
+{
+    unsigned I;
+
+    /* Get the number of input files */
+    unsigned IFileCount = CollCount (&IFiles);
+
+    /* Print the output file followed by a tab char */
+    fprintf (F, "%s:\t", OutputFile);
+
+    /* Loop over all files */
+    for (I = 0; I < IFileCount; ++I) {
+	/* Get the next input file */
+	const IFile* IF = CollAt (&IFiles, I);
+	/* If this is not the first file, add a space */
+	const char* Format = (I == 0)? "%s" : " %s";
+	/* Print the dependency */
+	fprintf (F, Format, IF->Name);
+    }
+
+    /* End the line */
+    fprintf (F, "\n\n");
 }
 
 

@@ -178,6 +178,33 @@ static void SetSys (const char* Sys)
 
 
 
+static void DoCreateDep (const char* OutputName)
+/* Create the dependency file */
+{
+    /* Make the dependency file name from the output file name */
+    char* DepName = MakeFilename (OutputName, ".u");
+
+    /* Open the file */
+    FILE* F = fopen (DepName, "w");
+    if (F == 0) {
+    	Fatal (FAT_CANNOT_OPEN_OUTPUT, strerror (errno));
+    }
+
+    /* Write the dependencies to the file */
+    WriteDependencies (F, OutputName);
+
+    /* Close the file, check for errors */
+    if (fclose (F) != 0) {
+    	remove (DepName);
+    	Fatal (FAT_CANNOT_WRITE_OUTPUT);
+    }
+
+    /* Free the name */
+    xfree (DepName);
+}
+
+
+
 static void DefineSym (const char* Def)
 /* Define a symbol on the command line */
 {
@@ -269,6 +296,14 @@ static void OptCodeName (const char* Opt, const char* Arg)
 
     /* Set the name */
     NewSegName (SEG_CODE, Arg);
+}
+
+
+
+static void OptCreateDep (const char* Opt, const char* Arg)
+/* Handle the --create-dep option */
+{
+    CreateDep = 1;
 }
 
 
@@ -393,18 +428,19 @@ int main (int argc, char* argv[])
 	{ "--add-source",	0,    	OptAddSource		},
 	{ "--ansi",   	 	0,	OptAnsi			},
 	{ "--bss-name",		1, 	OptBssName		},
-	{ "--code-name",	1,	OptCodeName		},
-        { "--cpu",     	       	1,	OptCPU 			},
-	{ "--data-name",	1,	OptDataName		},
+	{ "--code-name",	1, 	OptCodeName		},
+	{ "--create-dep",	0,	OptCreateDep		},
+        { "--cpu",     	       	1, 	OptCPU 			},
+	{ "--data-name",	1, 	OptDataName		},
        	{ "--debug",           	0,     	OptDebug		},
-	{ "--debug-info",      	0,	OptDebugInfo		},
-	{ "--help",	 	0,	OptHelp			},
+	{ "--debug-info",      	0, 	OptDebugInfo		},
+	{ "--help",	 	0, 	OptHelp			},
 	{ "--include-dir",     	1,   	OptIncludeDir		},
-	{ "--rodata-name",	1,	OptRodataName		},
-	{ "--signed-chars",	0,	OptSignedChars		},
-       	{ "--static-locals",   	0,	OptStaticLocals		},
+	{ "--rodata-name",	1, 	OptRodataName		},
+	{ "--signed-chars",	0, 	OptSignedChars		},
+       	{ "--static-locals",   	0, 	OptStaticLocals		},
 	{ "--target",	 	1,  	OptTarget		},
-	{ "--verbose",	       	0,	OptVerbose		},
+	{ "--verbose",	       	0, 	OptVerbose		},
 	{ "--version",	       	0,	OptVersion		},
     };
 
@@ -463,6 +499,10 @@ int main (int argc, char* argv[])
 		    OptTarget (Arg, GetArg (&I, 2));
 		    break;
 
+		case 'u':
+		    OptCreateDep (Arg, 0);
+		    break;
+
 		case 'v':
 		    OptVerbose (Arg, 0);
 		    break;
@@ -478,9 +518,9 @@ int main (int argc, char* argv[])
 		    	    case 'l':
 		    	     	OptStaticLocals (Arg, 0);
 		    	     	break;
-			    default:
-				UnknownOption (Arg);
-				break;
+		  	    default:
+		  		UnknownOption (Arg);
+		  		break;
 		    	}
 		    }
 		    break;
@@ -495,7 +535,7 @@ int main (int argc, char* argv[])
 
 		case 'O':
 		    Optimize = 1;
-		    P = Arg + 2;
+	    	    P = Arg + 2;
 		    while (*P) {
 		    	switch (*P++) {
 		    	    case 'f':
@@ -506,7 +546,7 @@ int main (int argc, char* argv[])
     	       	    	     	break;
 	       	    	    case 'r':
 	       	    	 	EnableRegVars = 1;
-	       			break;
+	       		  	break;
 	       		    case 's':
 	       		       	InlineStdFuncs = 1;
 	       	   		break;
@@ -582,6 +622,12 @@ int main (int argc, char* argv[])
 	    remove (OutputFile);
 	    Fatal (FAT_CANNOT_WRITE_OUTPUT);
 	}
+
+	/* Create dependencies if requested */
+	if (CreateDep) {
+	    DoCreateDep (OutputFile);
+	}
+
     }
 
     /* Return an apropriate exit code */

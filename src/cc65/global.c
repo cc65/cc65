@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -43,23 +43,22 @@
 
 
 
-unsigned char ANSI   	       	= 0;   	    /* Strict ANSI flag */
-unsigned char WriteableStrings	= 0;   	    /* Literal strings are r/w */
-unsigned char NoWarn		= 0;   	    /* Suppress warnings */
-unsigned char Optimize		= 0;   	    /* Optimize flag */
-unsigned char FavourSize	= 1;   	    /* Favour size over speed */
-unsigned char InlineStdFuncs	= 0;   	    /* Inline some known functions */
-unsigned char EnableRegVars	= 0;   	    /* Enable register variables */
-unsigned char AllowRegVarAddr	= 0;	    /* Allow taking addresses of register vars */
-unsigned char RegVarsToCallStack= 0;   	    /* Save reg variables on call stack */
-unsigned char StaticLocals	= 0;   	    /* Make local variables static */
-unsigned char SignedChars	= 0;	    /* Make characters signed by default */
-unsigned char Verbose		= 0;   	    /* Verbose flag */
-unsigned char AddSource		= 0; 	    /* Add source lines as comments */
-unsigned char DebugInfo		= 0;	    /* Add debug info to the obj */
-unsigned char Debug		= 0;	    /* Debug mode */
-
-
+unsigned char ANSI   	       	= 0;	/* Strict ANSI flag */
+unsigned char WriteableStrings	= 0;   	/* Literal strings are r/w */
+unsigned char NoWarn		= 0;   	/* Suppress warnings */
+unsigned char Optimize		= 0;   	/* Optimize flag */
+unsigned char FavourSize	= 1;   	/* Favour size over speed */
+unsigned char InlineStdFuncs	= 0;   	/* Inline some known functions */
+unsigned char EnableRegVars	= 0;   	/* Enable register variables */
+unsigned char AllowRegVarAddr	= 0;	/* Allow taking addresses of register vars */
+unsigned char RegVarsToCallStack= 0;   	/* Save reg variables on call stack */
+unsigned char StaticLocals	= 0;   	/* Make local variables static */
+unsigned char SignedChars	= 0;	/* Make characters signed by default */
+unsigned char Verbose		= 0;   	/* Verbose flag */
+unsigned char AddSource		= 0; 	/* Add source lines as comments */
+unsigned char DebugInfo		= 0;	/* Add debug info to the obj */
+unsigned char Debug		= 0;	/* Debug mode */
+unsigned char CreateDep		= 0;	/* Create a dependency file */
 
 
 

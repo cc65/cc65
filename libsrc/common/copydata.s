@@ -31,7 +31,7 @@ copydata:
     	iny
     	bne	@L1
 	inc	ptr1+1
-	inc	ptr2+2		; Bump pointers
+	inc	ptr2+1		; Bump pointers
     	dex
 	bne	@L1
 
@@ -39,7 +39,7 @@ copydata:
 
 @L2:	ldx	#<__DATA_SIZE__	; Get remaining bytes
     	beq	@L4
-	   
+
 @L3:	lda	(ptr1),y
     	sta	(ptr2),y
     	iny

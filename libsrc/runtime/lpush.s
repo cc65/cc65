@@ -16,19 +16,19 @@ push0ax:
 	sty	sreg
 	sty	sreg+1
 pusheax:
+	pha			; decsp will destroy A (but not X)
 	jsr	decsp4
-	pha
-	ldy	#0
-	sta	(sp),y
-	iny
-	txa
-	sta	(sp),y
-	iny
-	lda	sreg
-	sta	(sp),y
-	iny
+	ldy	#3
 	lda	sreg+1
 	sta	(sp),y
+	dey
+	lda	sreg
+	sta	(sp),y
+	dey
+	txa
+	sta	(sp),y
+	dey
 	pla
+	sta	(sp),y
 	rts
 

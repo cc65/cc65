@@ -18,18 +18,22 @@ _strdup:
 ; Since we need some place to store the intermediate results, allocate a
 ; stack frame. To make this somewhat more efficient, create the stackframe
 ; as needed for the final call to the memcpy function.
-
+		
+	pha			; decsp will destroy A (but not X)
 	jsr	decsp4	       	; Target/source
 
 ; Store the pointer into the source slot
 
-	ldy	#0
-	sta	(sp),y
-	iny
-	pha
+	ldy	#1
 	txa
 	sta	(sp),y
-	pla
+	pla	      
+.ifpc02
+	sta	(sp)
+.else
+       	dey
+       	sta	(sp),y
+.endif
 
 ; Get length of S (which is still in a/x)
 

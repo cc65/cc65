@@ -11,3 +11,4 @@ cprintf.c	-	test program for cprintf \n and \r operators
 
 deb.c		-	test program for the library debugger
 
+clock.c		-	test program for clock() and CLOCKS_PER_SEC

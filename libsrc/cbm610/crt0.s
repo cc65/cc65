@@ -6,10 +6,10 @@
 
 	.export	     	_exit, BRKVec
 
-	.import		condes, initlib, donelib
+	.import		callirq_y, initlib, donelib
 	.import	     	push0, callmain
 	.import	       	__BSS_RUN__, __BSS_SIZE__, __EXTZP_RUN__
-	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
+	.import	       	__IRQFUNC_COUNT__
 	.import		scnkey, UDTIM
 
 	.include     	"zeropage.inc"
@@ -435,8 +435,8 @@ irq:    pha
         lda     ExecReg
         sta     IndReg                  ; Be sure to address our segment
 	tsx
-       	lda    	$105,x	    		; Get the flags from the stack
-	and	#$10	    		; Test break flag
+       	lda    	$105,x	       		; Get the flags from the stack
+	and	#$10	       		; Test break flag
        	bne     dobrk
 
 ; It's an IRQ
@@ -447,9 +447,7 @@ irq:    pha
 
        	ldy    	irqcount
         beq     irqskip
-       	lda    	#<__IRQFUNC_TABLE__
-	ldx 	#>__IRQFUNC_TABLE__
-	jsr	condes 		   	; Call the functions
+       	jsr    	callirq_y               ; Call the functions
 
 ; Done with chained IRQ handlers, check the TPI for IRQs and handle them
 

@@ -5,11 +5,11 @@
 ;
 
     	.export	     	_exit
-    	.import	     	condes, initlib, donelib
+    	.import	     	callirq, initlib, donelib
     	.import	     	zerobss
     	.import		push0, callmain
         .import         RESTOR, BSOUT, CLRCH
-	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
+	.import	       	__IRQFUNC_COUNT__
     	.import	 	__RAM_START__, __RAM_SIZE__
 
         .include        "zeropage.inc"
@@ -171,10 +171,7 @@ IRQStub:
 	pha    	       		   	; And save on stack
 	lda     #MMU_CFG_CC65		; Bank 0 with kernal ROM
 	sta    	MMU_CR
-	ldy 	#<(__IRQFUNC_COUNT__*2)
-       	lda    	#<__IRQFUNC_TABLE__
-	ldx 	#>__IRQFUNC_TABLE__
-	jsr	condes 		   	; Call the functions
+       	jsr    	callirq                 ; Call the functions
 	pla    	       			; Get old register value
 	sta    	MMU_CR
        	jmp    	IRQInd			; Jump to the saved IRQ vector

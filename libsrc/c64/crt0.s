@@ -5,11 +5,11 @@
 ;
 
 	.export		_exit
-	.import		initlib, donelib, condes
+	.import		initlib, donelib, callirq
        	.import	       	zerobss, push0
 	.import	     	callmain
         .import         RESTOR, BSOUT, CLRCH
-	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
+	.import	       	__IRQFUNC_COUNT__
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 
         .include        "zeropage.inc"
@@ -142,10 +142,7 @@ L2:   	lda	zpsave,x
 
 IRQStub:
 	cld    	       		   	; Just to be sure
-	ldy 	#<(__IRQFUNC_COUNT__*2)
-       	lda    	#<__IRQFUNC_TABLE__
-	ldx 	#>__IRQFUNC_TABLE__
-	jsr	condes 		   	; Call the functions
+       	jsr    	callirq                 ; Call the functions
        	jmp    	IRQInd			; Jump to the saved IRQ vector
 
 ; ------------------------------------------------------------------------

@@ -6,11 +6,11 @@
 
    	.export	     	_exit
 
-     	.import	   	_clrscr, initlib, donelib, condes
+     	.import	   	_clrscr, initlib, donelib, callirq_y
      	.import	     	push0, callmain
 	.import	   	__CHARRAM_START__, __CHARRAM_SIZE__, __VIDRAM_START__
 	.import	       	__BSS_RUN__, __BSS_SIZE__, __EXTZP_RUN__
-	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
+	.import	       	__IRQFUNC_COUNT__
 	.import		scnkey, UDTIM
 
      	.include     	"zeropage.inc"
@@ -540,9 +540,7 @@ irq:    pha
 
        	ldy    	irqcount
         beq     irqskip
-       	lda    	#<__IRQFUNC_TABLE__
-	ldx 	#>__IRQFUNC_TABLE__
-	jsr	condes 		   	; Call the functions
+       	jsr    	callirq_q               ; Call the functions
 
 ; Done with chained IRQ handlers, check the TPI for IRQs and handle them
 

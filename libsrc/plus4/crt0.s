@@ -7,9 +7,9 @@
 	.export		_exit
         .export         brk_jmp
 
-	.import		condes, initlib, donelib
+	.import		callirq_y, initlib, donelib
 	.import	     	push0, callmain, zerobss
-	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
+	.import	       	__IRQFUNC_COUNT__
 
         .include        "zeropage.inc"
 	.include	"plus4.inc"
@@ -59,7 +59,7 @@ L1:	lda	sp,x
 ; usable RAM.
 
        	tsx
-       	stx    	spsave       	; save system stk ptr
+       	stx    	spsave         	; save system stk ptr
 
         lda     #<$FD00
         sta     sp
@@ -96,7 +96,7 @@ L1:	lda	sp,x
 
 ; Back from main (this is also the _exit entry). Run module destructors.
 
-_exit: 	pha			; Save the return code
+_exit: 	pha		       	; Save the return code
 	lda     #0
         sta     irqcount        ; Disable custom IRQ handlers
         jsr	donelib         ; Run module destructors
@@ -153,9 +153,7 @@ IRQ:    cld			; Just to be sure
 
    	ldy    	irqcount
     	beq	@L1
-       	lda    	#<__IRQFUNC_TABLE__
-    	ldx 	#>__IRQFUNC_TABLE__
-    	jsr	condes 	 	   	; Call the IRQ functions
+        jsr     callirq_y       ; Call the IRQ functions
 
 ; Since the ROM handler will end with an RTI, we have to fake an IRQ return
 ; on stack, so we get control of the CPU after the ROM handler and can switch
@@ -165,10 +163,10 @@ IRQ:    cld			; Just to be sure
         pha
         lda     #<irq_ret
         pha
-       	php			; Push faked IRQ frame on stack
-	pha			; Push faked A register
-	pha			; Push faked X register
-	pha			; Push faked Y register
+       	php		       	; Push faked IRQ frame on stack
+	pha		       	; Push faked A register
+	pha		       	; Push faked X register
+	pha		       	; Push faked Y register
         sta     ENABLE_ROM      ; Switch to ROM
         jmp     (IRQVec)        ; Jump indirect to kernal irq handler
 

@@ -28,6 +28,9 @@ Main documentation page, contains links to other available stuff.
   <tag><htmlurl url="cl65.html" name="cl65.html"></tag>
   Describes the cl65 compile & link utility.
 
+  <tag><htmlurl url="co65.html" name="co65.html"></tag>
+  Describes the co65 object file converter.
+
   <tag><htmlurl url="da65.html" name="da65.html"></tag>
   Describes the da65 6502/65C02 disassembler.
 
@@ -58,6 +61,7 @@ Main documentation page, contains links to other available stuff.
 
 </descrip>
 
+
 <sect>Library information and other references<p>
 
 <descrip>
@@ -75,7 +79,7 @@ Main documentation page, contains links to other available stuff.
   A somewhat older text describing several cc65 internals.
 
   <tag><htmlurl url="library.html" name="library.html"></tag>
-  Describes the cc65 runtime and C libraries.
+  An overview over the cc65 runtime and C libraries.
 
 </descrip>
 
@@ -123,6 +127,6 @@ Main documentation page, contains links to other available stuff.
   Who helped with the compiler and tools?
 
 </descrip>
-
+                   
 </article>
 

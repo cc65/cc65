@@ -45,7 +45,7 @@
 #include "xmalloc.h"
 
 /* cc65 */
-#include "asmcode.h" 
+#include "asmcode.h"
 #include "codegen.h"
 #include "error.h"
 #include "incpath.h"
@@ -89,53 +89,7 @@ static Collection AFiles = STATIC_COLLECTION_INITIALIZER;
 
 
 /*****************************************************************************/
-/*			       Helper functions                              */
-/*****************************************************************************/
-
-
-
-static long GetFileSize (FILE* F)
-/* Calculate the size of the file F, return -1 on error. */
-{
-    long Size;
-    long CurPos = ftell (F);
-    if (CurPos < 0) {
-     	/* Error */
-     	return -1;
-    }
-    if (fseek (F, 0, SEEK_END) != 0) {
-     	/* Error */
-     	return -1;
-    }
-    Size = ftell (F);
-    if (Size < 0) {
-     	/* Error */
-	return -1;
-    }
-    if (fseek (F, CurPos, SEEK_SET) != 0) {
-     	/* Error */
-	return -1;
-    }
-    return Size;
-}
-
-
-
-static long GetFileTime (const char* Name)
-/* Get the time of last modification for the given file. Return -1 on errors. */
-{
-    struct stat Buf;
-    if (stat (Name, &Buf) != 0) {
-	/* Error */
-     	return -1;
-    }
-    return (long) Buf.st_mtime;
-}
-
-
-
-/*****************************************************************************/
-/*  	       	      		 struct IFile				     */
+/*  	       	      		 struct IFile	 			     */
 /*****************************************************************************/
 
 
@@ -188,21 +142,14 @@ static AFile* NewAFile (IFile* IF, FILE* F)
      */
     if (IF->Usage++ == 0) {
 
-	long Val;
-
-	/* Get the file size */
-	Val = GetFileSize (AF->F);
-	if (Val < 0) {
-	    Fatal ("Cannot seek on `%s': %s", IF->Name, strerror (errno));
-	}
-	IF->Size = Val;
-
-	/* Get the file modification time */
-       	Val = GetFileTime (IF->Name);
-	if (Val < 0) {
+	/* Get file size and modification time */
+	struct stat Buf;
+	if (fstat (fileno (F), &Buf) != 0) {
+	    /* Error */
 	    Fatal ("Cannot stat `%s': %s", IF->Name, strerror (errno));
 	}
-	IF->MTime = Val;
+       	IF->Size  = (unsigned long) Buf.st_size;
+	IF->MTime = (unsigned long) Buf.st_mtime;
 
 	/* Set the debug data */
 	g_fileinfo (IF->Name, IF->Size, IF->MTime);

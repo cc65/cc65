@@ -46,6 +46,7 @@
 #include "objcode.h"
 #include "objfile.h"
 #include "symtab.h"
+#include "target.h"
 #include "toklist.h"
 #include "ulabel.h"
 #include "expr.h"
@@ -478,8 +479,12 @@ static ExprNode* Factor (void)
     switch (Tok) {
 
 	case TOK_INTCON:
-	case TOK_CHARCON:
     	    N = LiteralExpr (IVal);
+       	    NextTok ();
+	    break;
+
+	case TOK_CHARCON:
+    	    N = LiteralExpr ((unsigned char) XlatChar ((char)IVal));
        	    NextTok ();
 	    break;
 

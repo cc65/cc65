@@ -44,6 +44,7 @@
 #include "version.h"
 
 /* ca65 */
+#include "abend.h"
 #include "error.h"
 #include "expr.h"
 #include "filetab.h"
@@ -60,6 +61,7 @@
 #include "pseudo.h"
 #include "scanner.h"
 #include "symtab.h"
+#include "target.h"
 #include "ulabel.h"
 
 
@@ -82,6 +84,7 @@ static void Usage (void)
        	     "  -l\t\t\tCreate a listing if assembly was ok\n"
        	     "  -o name\t\tName the output file\n"
        	     "  -s\t\t\tEnable smart mode\n"
+       	     "  -t sys\t\tSet the target system\n"
        	     "  -v\t\t\tIncrease verbosity\n"
        	     "  -D name[=value]\tDefine a symbol\n"
        	     "  -I dir\t\tSet an include directory search path\n"
@@ -99,6 +102,7 @@ static void Usage (void)
        	     "  --listing\t\tCreate a listing if assembly was ok\n"
        	     "  --pagelength n\tSet the page length for the listing\n"
        	     "  --smart\t\tEnable smart mode\n"
+       	     "  --target sys\t\tSet the target system\n"
        	     "  --verbose\t\tIncrease verbosity\n"
        	     "  --version\t\tPrint the assembler version\n",
     	     ProgName);
@@ -168,8 +172,7 @@ static void DefineSymbol (const char* Def)
 
     /* Check if have already a symbol with this name */
     if (SymIsDef (SymName)) {
-	fprintf (stderr, "`%s' is already defined\n", SymName);
-	exit (EXIT_FAILURE);
+	AbEnd ("`%s' is already defined", SymName);
     }
 
     /* Define the symbol */
@@ -203,8 +206,7 @@ static void OptCPU (const char* Opt, const char* Arg)
 	SetCPU (CPU_SUNPLUS);
 #endif
     } else {
-	fprintf (stderr, "Invalid CPU: `%s'\n", Arg);
-	exit (EXIT_FAILURE);
+	AbEnd ("Invalid CPU: `%s'", Arg);
     }
 }
 
@@ -263,8 +265,7 @@ static void OptPageLength (const char* Opt, const char* Arg)
     }
     Len = atoi (Arg);
     if (Len != -1 && (Len < MIN_PAGE_LEN || Len > MAX_PAGE_LEN)) {
-	fprintf (stderr, "Invalid page length: %d\n", Len);
-	exit (EXIT_FAILURE);
+	AbEnd ("Invalid page length: %d", Len);
     }
     PageLength = Len;
 }
@@ -275,6 +276,24 @@ static void OptSmart (const char* Opt, const char* Arg)
 /* Handle the -s/--smart options */
 {
     SmartMode = 1;
+}
+
+
+
+static void OptTarget (const char* Opt, const char* Arg)
+/* Set the target system */
+{
+    int T;
+    if (Arg == 0) {
+	NeedArg (Opt);
+    }
+
+    /* Map the target name to a target id */
+    T = MapTarget (Arg);
+    if (T < 0) {
+	AbEnd ("Invalid target name: `%s'", Arg);
+    }
+    Target = (target_t) T;
 }
 
 
@@ -444,6 +463,7 @@ int main (int argc, char* argv [])
 	{ "--listing",	       	0,	OptListing		},
 	{ "--pagelength",      	1,	OptPageLength		},
 	{ "--smart",	       	0,	OptSmart		},
+	{ "--target",		1,	OptTarget		},
 	{ "--verbose",	       	0,	OptVerbose		},
 	{ "--version",	       	0,	OptVersion		},
     };
@@ -496,6 +516,10 @@ int main (int argc, char* argv [])
        		case 's':
        		    OptSmart (Arg, 0);
        		    break;
+
+		case 't':
+		    OptTarget (Arg, GetArg (&I, 2));
+		    break;
 
        	       	case 'v':
 		    OptVerbose (Arg, 0);

@@ -90,6 +90,7 @@ OBJS = 	condasm.obj	\
 	repeat.obj	\
 	scanner.obj	\
 	symtab.obj	\
+	target.obj	\
 	toklist.obj	\
 	ulabel.obj
 
@@ -117,7 +118,7 @@ FILE condasm.obj
 FILE dbginfo.obj
 FILE ea.obj
 FILE error.obj
-FILE expr.obj	
+FILE expr.obj
 FILE filetab.obj
 FILE fragment.obj
 FILE global.obj
@@ -136,6 +137,7 @@ FILE pseudo.obj
 FILE repeat.obj
 FILE scanner.obj
 FILE symtab.obj
+FILE target.obj
 FILE toklist.obj
 FILE ulabel.obj
 LIBRARY ..\common\common.lib

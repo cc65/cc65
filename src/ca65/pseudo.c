@@ -58,6 +58,7 @@
 #include "options.h"
 #include "repeat.h"
 #include "symtab.h"
+#include "target.h"
 #include "pseudo.h"
 
 
@@ -268,6 +269,8 @@ static void DoASCIIZ (void)
 	    ErrorSkip (ERR_STRCON_EXPECTED);
 	    return;
 	}
+	/* Translate into target charset and emit */
+	XlatStr (SVal);
        	EmitData ((unsigned char*) SVal, strlen (SVal));
 	NextTok ();
 	if (Tok == TOK_COMMA) {
@@ -302,7 +305,8 @@ static void DoByte (void)
 {
     while (1) {
 	if (Tok == TOK_STRCON) {
-	    /* A string */
+	    /* A string, translate into target charset and emit */
+	    XlatStr (SVal);
        	    EmitData ((unsigned char*) SVal, strlen (SVal));
 	    NextTok ();
 	} else {

@@ -52,7 +52,7 @@ apple2lib:
 # Atari
 
 atarilib:
-	for i in atari common runtime conio dbg em tgi; do \
+	for i in atari common runtime conio dbg em joystick tgi; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
@@ -67,7 +67,7 @@ atarilib:
 # Oric Atmos
 
 atmoslib:
-	for i in atmos common runtime em tgi; do \
+	for i in atmos common runtime em joystick tgi; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
@@ -82,7 +82,7 @@ atmoslib:
 # Vic20
 
 vic20lib:
-	for i in vic20 cbm common runtime conio dbg em tgi; do \
+	for i in vic20 cbm common runtime conio dbg em joystick tgi; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
@@ -97,7 +97,7 @@ vic20lib:
 # C16, C116
 
 c16lib:
-	for i in c16 cbm common runtime conio dbg em tgi; do \
+	for i in c16 cbm common runtime conio dbg em joystick tgi; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
@@ -112,7 +112,7 @@ c16lib:
 # C64
 
 c64lib:
-	for i in c64 cbm common runtime conio dbg em tgi; do \
+	for i in c64 cbm common runtime conio dbg em joystick tgi; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
@@ -122,14 +122,15 @@ c64lib:
 	    $(AR) a c64.lib $$i/*.o;\
 	done
 	mv c64/crt0.o c64.o
-	cp c64/c64-320-200-2.tgi c64-hi.tgi
 	cp c64/*.emd .
+	cp c64/*.joy .
+	cp c64/c64-320-200-2.tgi c64-hi.tgi
 
 #-----------------------------------------------------------------------------
 # C128
 
 c128lib:
-	for i in c128 cbm common runtime conio dbg em tgi; do \
+	for i in c128 cbm common runtime conio dbg em joystick tgi; do \
 	    AS=$(AS) \
 	    CC=$(CC) \
 	    LD=$(LD) \
@@ -145,7 +146,7 @@ c128lib:
 # Commdore P500 / CBM 5x0
 
 cbm510lib:
-	for i in cbm510 cbm common runtime conio dbg em tgi; do \
+	for i in cbm510 cbm common runtime conio dbg em joystick tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \
@@ -220,7 +221,7 @@ petlib:
 # Commodore Plus/4
 
 plus4lib:
-	for i in plus4 cbm common runtime conio dbg em tgi; do \
+	for i in plus4 cbm common runtime conio dbg em joystick tgi; do \
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    LD=$(LD) \

@@ -4,7 +4,7 @@
 ; Common functions of the joystick API.
 ;
 
-        .export         _joy_install, _joy_deinstall
+        .export         _joy_install, _joy_deinstall, _joy_masks
 
         .importzp       ptr1
 
@@ -58,7 +58,7 @@ _joy_install:
 ; Copy the mask array
 
         ldy     #JOY_MASKS + JOY_MASK_COUNT - 1
-        ldx     #JOY_MASK_COUNT
+        ldx     #JOY_MASK_COUNT-1
 @L1:    lda     (ptr1),y
         sta     _joy_masks,x
         dey

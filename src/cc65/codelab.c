@@ -101,11 +101,11 @@ void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel)
  */
 {
     /* Walk through all instructions referencing the old label */
-    unsigned Count = CollCount (&OldLabel->JumpFrom);
+    unsigned Count = CL_GetRefCount (OldLabel);
     while (Count--) {
 
 	/* Get the instruction that references the old label */
-	CodeEntry* E = CollAt (&OldLabel->JumpFrom, Count);
+	CodeEntry* E = CL_GetRef (OldLabel, Count);
 
 	/* Change the reference to the new label */
 	CHECK (E->JumpTo == OldLabel);
@@ -127,3 +127,4 @@ void CL_Output (const CodeLabel* L, FILE* F)
 
 
 
+			

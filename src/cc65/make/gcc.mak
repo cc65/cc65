@@ -26,6 +26,7 @@ OBJS =	anonname.o	\
      	asmcode.o 	\
 	asmlabel.o	\
 	asmstmt.o	\
+	casenode.o	\
 	codeent.o	\
 	codegen.o 	\
 	codelab.o	\

@@ -38,6 +38,9 @@
 
 
 
+/* common */
+#include "coll.h"
+
 /* cc65 */
 #include "segments.h"
 
@@ -376,12 +379,6 @@ void g_callind (unsigned Flags, unsigned ArgSize, int Offs);
 void g_jump (unsigned Label);
 /* Jump to specified internal label number */
 
-void g_switch (unsigned Flags);
-/* Output switch statement preamble */
-
-void g_case (unsigned flags, unsigned label, unsigned long val);
-/* Create table code for one case selector */
-
 void g_truejump (unsigned flags, unsigned label);
 /* Jump to label if zero flag clear */
 
@@ -431,6 +428,17 @@ void g_defbytes (const void* bytes, unsigned count);
 
 void g_zerobytes (unsigned n);
 /* Output n bytes of data initialized with zero */
+
+
+
+/*****************************************************************************/
+/*     			       Switch statement                              */
+/*****************************************************************************/
+
+
+
+void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth);
+/* Generate code for a switch statement */
 
 
 

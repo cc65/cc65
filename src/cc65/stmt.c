@@ -62,17 +62,6 @@
 
 
 /*****************************************************************************/
-/*	  	  	       	     Data		     		     */
-/*****************************************************************************/
-
-
-
-/* Maximum count of cases */
-#define CASE_MAX 	257
-
-
-
-/*****************************************************************************/
 /*			       Helper functions                              */
 /*****************************************************************************/
 
@@ -235,8 +224,8 @@ static void WhileStatement (void)
     /* Exit label */
     g_defcodelabel (lab);
 
-    /* Eat remaining tokens that were delayed because of line info 
-     * correctness 
+    /* Eat remaining tokens that were delayed because of line info
+     * correctness
      */
     SkipPending (PendingToken);
 
@@ -572,4 +561,4 @@ int Statement (int* PendingToken)
 
 
 
-     
+

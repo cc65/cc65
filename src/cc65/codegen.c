@@ -47,6 +47,7 @@
 /* cc65 */
 #include "asmcode.h"
 #include "asmlabel.h"
+#include "casenode.h"
 #include "codeseg.h"
 #include "cpu.h"
 #include "dataseg.h"
@@ -2354,53 +2355,6 @@ void g_jump (unsigned Label)
 
 
 
-void g_switch (unsigned Flags)
-/* Output switch statement preamble */
-{
-    switch (Flags & CF_TYPE) {
-
-     	case CF_CHAR:
-     	case CF_INT:
-     	    AddCodeLine ("jsr switch");
-     	    break;
-
-     	case CF_LONG:
-     	    AddCodeLine ("jsr lswitch");
-     	    break;
-
-     	default:
-     	    typeerror (Flags);
-
-    }
-}
-
-
-
-void g_case (unsigned flags, unsigned label, unsigned long val)
-/* Create table code for one case selector */
-{
-    switch (flags & CF_TYPE) {
-
-     	case CF_CHAR:
-    	case CF_INT:
-    	    AddCodeLine (".word $%04X, %s",
-			 (unsigned)(val & 0xFFFF),
-			 LocalLabelName (label));
-       	    break;
-
-    	case CF_LONG:
-	    AddCodeLine (".dword $%08lX", val);
-	    AddCodeLine (".word %s", LocalLabelName (label));
-    	    break;
-
-    	default:
-    	    typeerror (flags);
-
-    }
-}
-
-
-
 void g_truejump (unsigned flags attribute ((unused)), unsigned label)
 /* Jump to label if zero flag clear */
 {
@@ -3798,7 +3752,7 @@ void g_defdata (unsigned flags, unsigned long val, unsigned offs)
 	const char* Label = GetLabelName (flags, val, offs);
 
 	/* Labels are always 16 bit */
-	AddDataLine ("\t.word\t%s", Label);
+       	AddDataLine ("\t.addr\t%s", Label);
 
     }
 }
@@ -3850,6 +3804,84 @@ void g_zerobytes (unsigned n)
 
 
 /*****************************************************************************/
+/*     			       Switch statement                              */
+/*****************************************************************************/
+
+
+
+void g_switch (Collection* Nodes, unsigned DefaultLabel, unsigned Depth)
+/* Generate code for a switch statement */
+{
+    unsigned NextLabel = 0;
+    unsigned I;
+
+    /* Setup registers and determine which compare insn to use */
+    const char* Compare;
+    switch (Depth) {
+     	case 1:
+     	    Compare = "cmp #$%02X";
+     	    break;
+     	case 2:
+     	    Compare = "cpx #$%02X";
+     	    break;
+     	case 3:
+     	    AddCodeLine ("ldy sreg");
+     	    Compare = "cpy #$%02X";
+     	    break;
+     	case 4:
+     	    AddCodeLine ("ldy sreg+1");
+     	    Compare = "cpy #$%02X";
+     	    break;
+     	default:
+     	    Internal ("Invalid depth in g_switch: %u", Depth);
+    }
+
+    /* Walk over all nodes */
+    for (I = 0; I < CollCount (Nodes); ++I) {
+
+ 	/* Get the next case node */
+ 	CaseNode* N = CollAtUnchecked (Nodes, I);
+
+ 	/* If we have a next label, define it */
+ 	if (NextLabel) {
+ 	    g_defcodelabel (NextLabel);
+ 	    NextLabel = 0;
+ 	}
+
+ 	/* Do the compare */
+ 	AddCodeLine (Compare, CN_GetValue (N));
+
+ 	/* If this is the last level, jump directly to the case code if found */
+ 	if (Depth == 1) {
+
+ 	    /* Branch if equal */
+	    g_falsejump (0, CN_GetLabel (N));
+
+ 	} else {
+
+ 	    /* Determine the next label */
+ 	    if (I == CollCount (Nodes) - 1) {
+ 	      	/* Last node means not found */
+		g_truejump (0, DefaultLabel);
+ 	    } else {
+ 	      	/* Jump to the next check */
+ 	      	NextLabel = GetLocalLabel ();
+		g_truejump (0, NextLabel);
+ 	    }
+
+ 	    /* Check the next level */
+ 	    g_switch (N->Nodes, DefaultLabel, Depth-1);
+
+ 	}
+    }
+
+    /* If we go here, we haven't found the label */
+    g_jump (DefaultLabel);
+}
+
+
+
+/*****************************************************************************/
 /*			 User supplied assembler code			     */
 /*****************************************************************************/
 
@@ -3864,7 +3896,7 @@ void g_asmcode (struct StrBuf* B)
 
 
 /*****************************************************************************/
-/*	     		    Inlined known functions			     */
+/*   	     		    Inlined known functions			     */
 /*****************************************************************************/
 
 

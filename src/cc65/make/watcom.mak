@@ -71,6 +71,7 @@ OBJS =	anonname.obj	\
      	asmcode.obj	\
 	asmlabel.obj	\
 	asmstmt.obj	\
+	casenode.obj	\
 	codeent.obj	\
 	codegen.obj	\
 	codelab.obj	\
@@ -104,7 +105,7 @@ OBJS =	anonname.obj	\
 	lineinfo.obj	\
 	litpool.obj	\
 	locals.obj	\
-	loop.obj	\
+	loop.obj 	\
 	macrotab.obj	\
 	main.obj	\
 	opcodes.obj	\
@@ -147,6 +148,7 @@ FILE anonname.obj
 FILE asmcode.obj
 FILE asmlabel.obj
 FILE asmstmt.obj
+FILE casenode.obj
 FILE codeent.obj
 FILE codegen.obj
 FILE codelab.obj

@@ -69,6 +69,7 @@ extern unsigned char _ctype[256];
 
 #define isalnum(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$07"), __AX__)
 #define isalpha(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$03"), __AX__)
+#define isblank(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$80"), __AX__)
 #define iscntrl(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$10"), __AX__)
 #define isdigit(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$04"), __AX__)
 #define isgraph(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\teor\t#$30\n\tand\t#$30"), __AX__)
@@ -78,7 +79,6 @@ extern unsigned char _ctype[256];
 #define isspace(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$60"), __AX__)
 #define isupper(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$02"), __AX__)
 #define isxdigit(c) (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$08"), __AX__)
-#define isblank(c)  (__AX__ = (c), __asm__ ("\ttay\n\tlda\t__ctype,y\n\tand\t#$80"), __AX__)
 
 
 

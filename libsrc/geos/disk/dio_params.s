@@ -26,9 +26,14 @@ dio_secnum:	.res 2
 	stx dio_secnum
 
 	jsr popax		; get 3rd parameter
+	pha			; save it
+	txa
+	pha
 	jsr pushax		; put it back
+	pla			; restore it
+	sta ptr1+1
+	pla
 	sta ptr1
-	stx ptr1+1
 	ldy #sst_driveno
 	lda (ptr1),y
 	clc

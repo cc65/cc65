@@ -474,7 +474,7 @@ static unsigned FunctionParamList (FuncDesc* Func)
  * The function returns the size of the parameters pushed.
  */
 {
-    ExprDesc lval;
+    ExprDesc Expr;
 
     /* Initialize variables */
     SymEntry* Param    	  = 0;	/* Keep gcc silent */
@@ -520,8 +520,8 @@ static unsigned FunctionParamList (FuncDesc* Func)
     /* Parse the actual parameter list */
     while (CurTok.Tok != TOK_RPAREN) {
 
-    	unsigned CFlags;
     	unsigned Flags;
+        int k;
 
     	/* Count arguments */
     	++ParamCount;
@@ -556,43 +556,29 @@ static unsigned FunctionParamList (FuncDesc* Func)
 	    Ellipsis = 1;
      	}
 
-     	/* Do some optimization: If we have a constant value to push,
-     	 * use a special function that may optimize.
-     	 */
-       	CFlags = CF_NONE;
-       	if (!Ellipsis && CheckedSizeOf (Param->Type) == 1) {
-	    CFlags = CF_FORCECHAR;
-      	}
-	Flags = CF_NONE;
-       	if (evalexpr (CFlags, hie1, &lval) == 0) {
-       	    /* A constant value */
-	    Flags |= CF_CONST;
-     	}
+        /* Evaluate the parameter expression */
+        k = hie1 (InitExprDesc (&Expr));
 
       	/* If we don't have an argument spec, accept anything, otherwise
 	 * convert the actual argument to the type needed.
-	 */
+	 */ 
+        Flags = CF_NONE;
        	if (!Ellipsis) {
 	    /* Convert the argument to the parameter type if needed */
-            TypeConversion (&lval, 0, Param->Type);
+            k = TypeConversion (&Expr, k, Param->Type);
 
 	    /* If we have a prototype, chars may be pushed as chars */
 	    Flags |= CF_FORCECHAR;
        	}
 
+        /* Load the value into the primary if it is not already there */
+        exprhs (Flags, k, &Expr);
+
 	/* Use the type of the argument for the push */
-       	Flags |= TypeOf (lval.Type);
+       	Flags |= TypeOf (Expr.Type);
 
 	/* If this is a fastcall function, don't push the last argument */
-       	if (ParamCount == Func->ParamCount && (Func->Flags & FD_FASTCALL) != 0) {
-	    /* Just load the argument into the primary. This is only needed if
-	     * we have a constant argument, otherwise the value is already in
-	     * the primary.
-	     */
-	    if (Flags & CF_CONST) {
-	    	exprhs (CF_FORCECHAR, 0, &lval);
-	    }
-      	} else {
+       	if (ParamCount != Func->ParamCount || (Func->Flags & FD_FASTCALL) == 0) {
 	    unsigned ArgSize = sizeofarg (Flags);
 	    if (FrameSize > 0) {
 	    	/* We have the space already allocated, store in the frame.
@@ -608,11 +594,11 @@ static unsigned FunctionParamList (FuncDesc* Func)
                 }
 	    	FrameOffs -= ArgSize;
 	    	/* Store */
-	    	g_putlocal (Flags | CF_NOKEEP, FrameOffs, lval.ConstVal);
+	      	g_putlocal (Flags | CF_NOKEEP, FrameOffs, Expr.ConstVal);
 	    } else {
 	    	/* Push the argument */
-	    	g_push (Flags, lval.ConstVal);
-	    }
+	    	g_push (Flags, Expr.ConstVal);
+	    }           
 
 	    /* Calculate total parameter size */
      	    ParamSize += ArgSize;

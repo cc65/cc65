@@ -17,9 +17,12 @@ OBJS =	anonname.o	\
 	asmcode.o	\
 	asmlabel.o	\
 	asmline.o	\
+	codeent.o	\
 	codegen.o	\
+	codeseg.o	\
 	compile.o	\
 	cpu.o		\
+	dataseg.o	\
 	datatype.o	\
 	declare.o      	\
 	declattr.o	\
@@ -39,6 +42,7 @@ OBJS =	anonname.o	\
 	loop.o		\
 	macrotab.o	\
 	main.o		\
+	opcodes.o	\
 	optimize.o     	\
 	preproc.o      	\
 	pragma.o       	\

@@ -225,6 +225,9 @@ void SwitchStatement (void)
 
     /* Eat the closing curly brace */
     NextToken ();
+		    
+    /* Free the case value tree */
+    FreeCaseNodeColl (Nodes);
 
     /* End the loop */
     DelLoop ();

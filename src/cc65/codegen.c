@@ -1410,7 +1410,7 @@ void g_scale (unsigned flags, long val)
     } else if (val > 0) {
 
      	/* Scale up */
-     	if ((p2 = powerof2 (val)) > 0 && p2 <= 4) {
+     	if ((p2 = PowerOf2 (val)) > 0 && p2 <= 4) {
 
        	    /* Factor is 2, 4, 8 and 16, use special function */
      	    switch (flags & CF_TYPE) {
@@ -1465,7 +1465,7 @@ void g_scale (unsigned flags, long val)
 
      	/* Scale down */
      	val = -val;
-     	if ((p2 = powerof2 (val)) > 0 && p2 <= 4) {
+     	if ((p2 = PowerOf2 (val)) > 0 && p2 <= 4) {
 
      	    /* Factor is 2, 4, 8 and 16 use special function */
      	    switch (flags & CF_TYPE) {
@@ -2600,7 +2600,7 @@ void g_mul (unsigned flags, unsigned long val)
     int p2;
 
     /* Do strength reduction if the value is constant and a power of two */
-    if (flags & CF_CONST && (p2 = powerof2 (val)) >= 0) {
+    if (flags & CF_CONST && (p2 = PowerOf2 (val)) >= 0) {
      	/* Generate a shift instead */
      	g_asl (flags, p2);
      	return;
@@ -2709,7 +2709,7 @@ void g_div (unsigned flags, unsigned long val)
 
     /* Do strength reduction if the value is constant and a power of two */
     int p2;
-    if ((flags & CF_CONST) && (p2 = powerof2 (val)) >= 0) {
+    if ((flags & CF_CONST) && (p2 = PowerOf2 (val)) >= 0) {
 	/* Generate a shift instead */
 	g_asr (flags, p2);
     } else {
@@ -2737,7 +2737,7 @@ void g_mod (unsigned flags, unsigned long val)
     int p2;
 
     /* Check if we can do some cost reduction */
-    if ((flags & CF_CONST) && (flags & CF_UNSIGNED) && val != 0xFFFFFFFF && (p2 = powerof2 (val)) >= 0) {
+    if ((flags & CF_CONST) && (flags & CF_UNSIGNED) && val != 0xFFFFFFFF && (p2 = PowerOf2 (val)) >= 0) {
      	/* We can do that with an AND operation */
      	g_and (flags, val - 1);
     } else {

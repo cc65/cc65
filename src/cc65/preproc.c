@@ -1,9 +1,9 @@
-/* 
+/*
  * C pre-processor functions.
- * Portions of this code are copyright (C) 1989 John R. Dunning.  
+ * Portions of this code are copyright (C) 1989 John R. Dunning.
  * See copyleft.jrd for license information.
  */
-   
+
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -29,7 +29,6 @@
 #include "preproc.h"
 #include "scanner.h"
 #include "standard.h"
-#include "util.h"
 
 
 

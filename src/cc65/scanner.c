@@ -57,7 +57,6 @@
 #include "scanner.h"
 #include "standard.h"
 #include "symtab.h"
-#include "util.h"
 
 
 

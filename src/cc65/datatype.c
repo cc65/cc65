@@ -45,7 +45,6 @@
 #include "error.h"
 #include "funcdesc.h"
 #include "global.h"
-#include "util.h"
 #include "symtab.h"
 
 

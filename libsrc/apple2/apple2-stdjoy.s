@@ -42,16 +42,17 @@ PREAD  	:=  	$FB1E	; Read paddle in X, return AD conv. value in Y
         .byte   $10
         .byte   $20
         .byte   $08
-        .byte   $00                     ; Future expansion
+        .byte   $00                     ; FIRE2 not available
         .byte   $00                     ; Future expansion
         .byte   $00                     ; Future expansion
 
 ; Jump table.
 
-        .word   INSTALL
-        .word   UNINSTALL
-        .word   COUNT
-        .word   READJOY
+        .addr   INSTALL
+        .addr   UNINSTALL
+        .addr   COUNT
+        .addr   READJOY
+        .addr   0                       ; IRQ not used
 
 ; ------------------------------------------------------------------------
 ; Constants

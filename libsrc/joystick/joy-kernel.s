@@ -29,6 +29,7 @@ joy_install:   	jmp     $0000
 joy_uninstall: 	jmp     $0000
 joy_count:      jmp     $0000
 joy_read:       jmp     $0000
+joy_irq:        .byte   $60, $00, $00   ; RTS plus two dummy bytes
 
 ; Driver header signature
 .rodata
@@ -75,7 +76,16 @@ _joy_install:
         cpy     #(JOY_HDR::JUMPTAB + .sizeof(JOY_HDR::JUMPTAB))
         bne     @L2
 
-        jmp     joy_install             ; Call driver install routine
+        jsr     joy_install             ; Call driver install routine
+
+; Install the IRQ vector if the driver needs it. A/X contains the error code
+; from joy_install, so don't use it.
+
+        ldy     joy_irq+2               ; Check high byte of IRQ vector
+        beq     @L3                     ; Jump if vector invalid
+   	ldy	#$4C			; JMP opcode
+       	sty    	joy_irq                 ; Activate IRQ routine
+@L3:    rts
 
 ; Driver signature invalid
 
@@ -99,6 +109,9 @@ set:    sta     joy_vectors,x
 ;  */
 
 _joy_uninstall:
+	lda	#$60                    ; RTS opcode
+       	sta    	joy_irq                 ; Disable IRQ entry point
+
         jsr     joy_uninstall           ; Call the driver routine
 
 joy_clear_ptr:                          ; External entry point

@@ -160,7 +160,7 @@ static void CS_RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
 
 
 
-static CodeLabel* CS_AddLabelInternal (CodeSeg* S, const char* Name, 
+static CodeLabel* CS_AddLabelInternal (CodeSeg* S, const char* Name,
 				       void (*ErrorFunc) (const char*, ...))
 /* Add a code label for the next instruction to follow */
 {
@@ -1109,217 +1109,232 @@ void CS_GenRegInfo (CodeSeg* S)
     RegContents Regs;		/* Initial register contents */
     RegContents* CurrentRegs;   /* Current register contents */
     int WasJump;                /* True if last insn was a jump */
+    int Done;                   /* All runs done flag */
 
     /* Be sure to delete all register infos */
     CS_FreeRegInfo (S);
 
-    /* On entry, the register contents are unknown */
-    RC_Invalidate (&Regs);
-    CurrentRegs = &Regs;
+    /* We may need two runs to get back references right */
+    do {
 
-    /* First pass. Walk over all insns and note just the changes from one
-     * insn to the next one.
-     */
-    WasJump = 0;
-    for (I = 0; I < CS_GetEntryCount (S); ++I) {
+	/* Assume we're done after this run */
+	Done = 1;
+    
+	/* On entry, the register contents are unknown */
+	RC_Invalidate (&Regs);
+	CurrentRegs = &Regs;
 
-	CodeEntry* P;
-
-     	/* Get the next instruction */
-     	CodeEntry* E = CollAtUnchecked (&S->Entries, I);
-
-     	/* If the instruction has a label, we need some special handling */
-	unsigned LabelCount = CE_GetLabelCount (E);
-     	if (LabelCount > 0) {
-
-	    /* Loop over all entry points that jump here. If these entry
-	     * points already have register info, check if all values are
-	     * known and identical. If all values are identical, and the
-	     * preceeding instruction was not an unconditional branch, check
-	     * if the register value on exit of the preceeding instruction
-	     * is also identical. If all these values are identical, the
-	     * value of a register is known, otherwise it is unknown.
-	     */
-	    CodeLabel* Label = CE_GetLabel (E, 0);
-	    unsigned Entry;
-	    if (WasJump) {
-	     	/* Preceeding insn was an unconditional branch */
-	     	CodeEntry* J = CL_GetRef(Label, 0);
-		if (J->RI) {
-		    Regs = J->RI->Out2;
-		} else {
-		    RC_Invalidate (&Regs);
-		}
-	     	Entry = 1;
-	    } else {
-	     	Regs = *CurrentRegs;
-	     	Entry = 0;
-	    }
-
-	    while (Entry < CL_GetRefCount (Label)) {
-		/* Get this entry */
-		CodeEntry* J = CL_GetRef (Label, Entry);
-		if (J->RI == 0) {
-		    /* No register info for this entry, bail out */
-		    RC_Invalidate (&Regs);
-		    break;
-		}
-		if (J->RI->Out2.RegA != Regs.RegA) {
-		    Regs.RegA = -1;
-		}
-		if (J->RI->Out2.RegX != Regs.RegX) {
-		    Regs.RegX = -1;
-		}
-		if (J->RI->Out2.RegY != Regs.RegY) {
-		    Regs.RegY = -1;
-		}
-		if (J->RI->Out2.SRegLo != Regs.SRegLo) {
-		    Regs.SRegLo = -1;
-		}
-		if (J->RI->Out2.SRegHi != Regs.SRegHi) {
-		    Regs.SRegHi = -1;
-		}
-		++Entry;
-	    }
-
-	    /* Use this register info */
-	    CurrentRegs = &Regs;
-
-     	}
-
-     	/* Generate register info for this instruction */
-        CE_GenRegInfo (E, CurrentRegs);
-
-	/* Remember for the next insn if this insn was an uncondition branch */
-	WasJump = (E->Info & OF_UBRA) != 0;
-
-     	/* Output registers for this insn are input for the next */
-     	CurrentRegs = &E->RI->Out;
-
-	/* If this insn is a branch on zero flag, we may have more info on
-	 * register contents for one of both flow directions, but only if
-	 * there is a previous instruction.
+	/* Walk over all insns and note just the changes from one insn to the
+	 * next one.
 	 */
-	if ((E->Info & OF_ZBRA) != 0 && (P = CS_GetPrevEntry (S, I)) != 0) {
+	WasJump = 0;
+	for (I = 0; I < CS_GetEntryCount (S); ++I) {
 
-	    /* Get the branch condition */
-	    bc_t BC = GetBranchCond (E->OPC);
+	    CodeEntry* P;
 
-	    /* Check the previous instruction */
-	    switch (P->OPC) {
+	    /* Get the next instruction */
+	    CodeEntry* E = CollAtUnchecked (&S->Entries, I);
 
-		case OP65_ADC:
-		case OP65_AND:
-		case OP65_DEA:
-		case OP65_EOR:
-		case OP65_INA:
-		case OP65_LDA:
-		case OP65_ORA:
-		case OP65_PLA:
-		case OP65_SBC:
-		    /* A is zero in one execution flow direction */
-		    if (BC == BC_EQ) {
-       	       	       	E->RI->Out2.RegA = 0;
+	    /* If the instruction has a label, we need some special handling */
+	    unsigned LabelCount = CE_GetLabelCount (E);
+	    if (LabelCount > 0) {
+
+		/* Loop over all entry points that jump here. If these entry
+		 * points already have register info, check if all values are
+		 * known and identical. If all values are identical, and the
+		 * preceeding instruction was not an unconditional branch, check
+		 * if the register value on exit of the preceeding instruction
+		 * is also identical. If all these values are identical, the
+		 * value of a register is known, otherwise it is unknown.
+		 */
+		CodeLabel* Label = CE_GetLabel (E, 0);
+		unsigned Entry;
+		if (WasJump) {
+		    /* Preceeding insn was an unconditional branch */
+		    CodeEntry* J = CL_GetRef(Label, 0);
+		    if (J->RI) {
+			Regs = J->RI->Out2;
 		    } else {
-			E->RI->Out.RegA = 0;
+			RC_Invalidate (&Regs);
 		    }
-	 	    break;
+		    Entry = 1;
+		} else {
+		    Regs = *CurrentRegs;
+		    Entry = 0;
+		}
 
-	 	case OP65_CMP:
-	 	    /* If this is an immidiate compare, the A register has
-	 	     * the value of the compare later.
-	 	     */
-	 	    if (CE_KnownImm (P)) {
-	 		if (BC == BC_EQ) {
-	 		    E->RI->Out2.RegA = (unsigned char)P->Num;
-	 		} else {
-	 		    E->RI->Out.RegA = (unsigned char)P->Num;
-	 	       	}
-	 	    }
-	 	    break;
-
-	 	case OP65_CPX:
-	 	    /* If this is an immidiate compare, the X register has
-	 	     * the value of the compare later.
-	 	     */
-	 	    if (CE_KnownImm (P)) {
-	 		if (BC == BC_EQ) {
-	 		    E->RI->Out2.RegX = (unsigned char)P->Num;
-	 		} else {
-	 		    E->RI->Out.RegX = (unsigned char)P->Num;
-	 		}
-	 	    }
-	 	    break;
-
-	 	case OP65_CPY:
-	 	    /* If this is an immidiate compare, the Y register has
-	 	     * the value of the compare later.
-	 	     */
-	 	    if (CE_KnownImm (P)) {
-	 	    	if (BC == BC_EQ) {
-	 	    	    E->RI->Out2.RegY = (unsigned char)P->Num;
-	 	    	} else {
-	 	    	    E->RI->Out.RegY = (unsigned char)P->Num;
-	 	    	}
-	 	    }
-	 	    break;
-
-		case OP65_DEX:
-		case OP65_INX:
-		case OP65_LDX:
-		case OP65_PLX:
-		    /* X is zero in one execution flow direction */
-		    if (BC == BC_EQ) {
-       	       	       	E->RI->Out2.RegX = 0;
-		    } else {
-			E->RI->Out.RegX = 0;
+		while (Entry < CL_GetRefCount (Label)) {
+		    /* Get this entry */
+		    CodeEntry* J = CL_GetRef (Label, Entry);
+		    if (J->RI == 0) {
+			/* No register info for this entry. This means that the
+			 * instruction that jumps here is at higher addresses and
+			 * the jump is a backward jump. We need a second run to
+			 * get the register info right in this case. Until then,
+			 * assume unknown register contents.
+			 */
+			Done = 0;
+			RC_Invalidate (&Regs);
+			break;
 		    }
-	 	    break;
-
-		case OP65_DEY:
-		case OP65_INY:
-		case OP65_LDY:
-		case OP65_PLY:
-		    /* X is zero in one execution flow direction */
-		    if (BC == BC_EQ) {
-       	       	       	E->RI->Out2.RegY = 0;
-		    } else {
-			E->RI->Out.RegY = 0;
+		    if (J->RI->Out2.RegA != Regs.RegA) {
+			Regs.RegA = -1;
 		    }
-	 	    break;
-
-		case OP65_TAX:
-		case OP65_TXA:
-		    /* If the branch is a beq, both A and X are zero at the
-		     * branch target, otherwise they are zero at the next
-		     * insn.
-		     */
-		    if (BC == BC_EQ) {
-		     	E->RI->Out2.RegA = E->RI->Out2.RegX = 0;
-		    } else {
-		     	E->RI->Out.RegA = E->RI->Out.RegX = 0;
+		    if (J->RI->Out2.RegX != Regs.RegX) {
+			Regs.RegX = -1;
 		    }
-		    break;
-
-		case OP65_TAY:
-		case OP65_TYA:
-		    /* If the branch is a beq, both A and Y are zero at the
-		     * branch target, otherwise they are zero at the next
-		     * insn.
-		     */
-		    if (BC == BC_EQ) {
-		     	E->RI->Out2.RegA = E->RI->Out2.RegY = 0;
-		    } else {
-		     	E->RI->Out.RegA = E->RI->Out.RegY = 0;
+		    if (J->RI->Out2.RegY != Regs.RegY) {
+			Regs.RegY = -1;
 		    }
-		    break;
+		    if (J->RI->Out2.SRegLo != Regs.SRegLo) {
+			Regs.SRegLo = -1;
+		    }
+		    if (J->RI->Out2.SRegHi != Regs.SRegHi) {
+			Regs.SRegHi = -1;
+		    }
+		    ++Entry;
+		}
+    
+		/* Use this register info */
+		CurrentRegs = &Regs;
+    
+	    }
+    
+	    /* Generate register info for this instruction */
+	    CE_GenRegInfo (E, CurrentRegs);
+    
+	    /* Remember for the next insn if this insn was an uncondition branch */
+	    WasJump = (E->Info & OF_UBRA) != 0;
 
-	 	default:
-	 	    break;
-
+	    /* Output registers for this insn are input for the next */
+	    CurrentRegs = &E->RI->Out;
+    
+	    /* If this insn is a branch on zero flag, we may have more info on
+	     * register contents for one of both flow directions, but only if
+	     * there is a previous instruction.
+	     */
+	    if ((E->Info & OF_ZBRA) != 0 && (P = CS_GetPrevEntry (S, I)) != 0) {
+    
+		/* Get the branch condition */
+		bc_t BC = GetBranchCond (E->OPC);
+    
+		/* Check the previous instruction */
+		switch (P->OPC) {
+    
+		    case OP65_ADC:
+		    case OP65_AND:
+		    case OP65_DEA:
+		    case OP65_EOR:
+		    case OP65_INA:
+		    case OP65_LDA:
+		    case OP65_ORA:
+		    case OP65_PLA:
+		    case OP65_SBC:
+			/* A is zero in one execution flow direction */
+			if (BC == BC_EQ) {
+			    E->RI->Out2.RegA = 0;
+			} else {
+			    E->RI->Out.RegA = 0;
+			}
+			break;
+    
+		    case OP65_CMP:
+			/* If this is an immidiate compare, the A register has
+			 * the value of the compare later.
+			 */
+			if (CE_KnownImm (P)) {
+			    if (BC == BC_EQ) {
+				E->RI->Out2.RegA = (unsigned char)P->Num;
+			    } else {
+				E->RI->Out.RegA = (unsigned char)P->Num;
+			    }
+    			}
+			break;
+    
+		    case OP65_CPX:
+			/* If this is an immidiate compare, the X register has
+			 * the value of the compare later.
+			 */
+			if (CE_KnownImm (P)) {
+			    if (BC == BC_EQ) {
+				E->RI->Out2.RegX = (unsigned char)P->Num;
+			    } else {
+				E->RI->Out.RegX = (unsigned char)P->Num;
+			    }
+			}
+			break;
+    
+		    case OP65_CPY:
+			/* If this is an immidiate compare, the Y register has
+			 * the value of the compare later.
+			 */
+			if (CE_KnownImm (P)) {
+			    if (BC == BC_EQ) {
+				E->RI->Out2.RegY = (unsigned char)P->Num;
+			    } else {
+				E->RI->Out.RegY = (unsigned char)P->Num;
+			    }
+			}
+			break;
+    
+		    case OP65_DEX:
+		    case OP65_INX:
+		    case OP65_LDX:
+		    case OP65_PLX:
+			/* X is zero in one execution flow direction */
+			if (BC == BC_EQ) {
+			    E->RI->Out2.RegX = 0;
+			} else {
+			    E->RI->Out.RegX = 0;
+			}
+			break;
+    
+		    case OP65_DEY:
+		    case OP65_INY:
+    		    case OP65_LDY:
+		    case OP65_PLY:
+			/* X is zero in one execution flow direction */
+			if (BC == BC_EQ) {
+			    E->RI->Out2.RegY = 0;
+			} else {
+			    E->RI->Out.RegY = 0;
+			}
+			break;
+    
+		    case OP65_TAX:
+		    case OP65_TXA:
+			/* If the branch is a beq, both A and X are zero at the
+			 * branch target, otherwise they are zero at the next
+			 * insn.
+			 */
+			if (BC == BC_EQ) {
+			    E->RI->Out2.RegA = E->RI->Out2.RegX = 0;
+			} else {
+			    E->RI->Out.RegA = E->RI->Out.RegX = 0;
+			}
+			break;
+    
+		    case OP65_TAY:
+		    case OP65_TYA:
+			/* If the branch is a beq, both A and Y are zero at the
+			 * branch target, otherwise they are zero at the next
+			 * insn.
+			 */
+			if (BC == BC_EQ) {
+			    E->RI->Out2.RegA = E->RI->Out2.RegY = 0;
+			} else {
+			    E->RI->Out.RegA = E->RI->Out.RegY = 0;
+			}
+			break;
+    
+		    default:
+			break;
+    
+		}
 	    }
 	}
-    }
+    } while (!Done);
+
 }
 
 

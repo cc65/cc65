@@ -35,6 +35,7 @@ OBJS =	anonname.o	\
 	codeseg.o	\
 	compile.o 	\
 	coptadd.o	\
+	coptc02.o	\
 	coptcmp.o	\
 	coptind.o	\
 	coptneg.o	\

@@ -80,6 +80,7 @@ OBJS =	anonname.obj	\
 	codeseg.obj	\
 	compile.obj	\
 	coptadd.obj	\
+	coptc02.obj	\
 	coptcmp.obj	\
 	coptind.obj	\
 	coptneg.obj	\
@@ -157,6 +158,7 @@ FILE codeopt.obj
 FILE codeseg.obj
 FILE compile.obj
 FILE coptadd.obj
+FILE coptc02.obj
 FILE coptcmp.obj
 FILE coptind.obj
 FILE coptneg.obj

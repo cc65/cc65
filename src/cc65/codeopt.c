@@ -48,6 +48,7 @@
 #include "codeent.h"
 #include "codeinfo.h"
 #include "coptadd.h"
+#include "coptc02.h"
 #include "coptcmp.h"
 #include "coptind.h"
 #include "coptneg.h"
@@ -1349,6 +1350,7 @@ struct OptFunc {
 #define OptFuncEntry(func) static OptFuncDesc D##func = { func, #func, 0 }
 
 /* A list of all the function descriptions */
+static OptFunc DOpt65C02Ind    	= { Opt65C02Ind,     "Opt65C02Ind",     0, 0, 0, 0, 0 };
 static OptFunc DOptAdd1	       	= { OptAdd1,   	     "OptAdd1",      	0, 0, 0, 0, 0 };
 static OptFunc DOptAdd2	       	= { OptAdd2,   	     "OptAdd2",      	0, 0, 0, 0, 0 };
 static OptFunc DOptAdd3	       	= { OptAdd3,   	     "OptAdd3",      	0, 0, 0, 0, 0 };
@@ -1401,6 +1403,7 @@ static OptFunc DOptUnusedStores	= { OptUnusedStores, "OptUnusedStores", 0, 0, 0,
 
 /* Table containing all the steps in alphabetical order */
 static OptFunc* OptFuncs[] = {
+    &DOpt65C02Ind,
     &DOptAdd1,
     &DOptAdd2,
     &DOptAdd3,
@@ -1750,7 +1753,24 @@ static void RunOptGroup3 (CodeSeg* S)
 
 
 static void RunOptGroup4 (CodeSeg* S)
-/* The last group of optimization steps. Adjust branches.
+/* 65C02 specific optimizations. */
+{
+    if (CPU < CPU_65C02) {
+	return;
+    }
+
+    /* Replace (zp),y by (zp) if Y is zero. If we have changes, run register
+     * load optimization again, since loads of Y may have become unnecessary.
+     */
+    if (RunOptFunc (S, &DOpt65C02Ind, 1) > 0) {
+	RunOptFunc (S, &DOptUnusedLoads, 1);
+    }
+}
+
+
+
+static void RunOptGroup5 (CodeSeg* S)
+/* The last group of optimization steps. Adjust branches, do size optimizations.
  */
 {
     /* Optimize for size, that is replace operations by shorter ones, even
@@ -1805,6 +1825,7 @@ void RunOpt (CodeSeg* S)
     RunOptGroup2 (S);
     RunOptGroup3 (S);
     RunOptGroup4 (S);
+    RunOptGroup5 (S);
 
     /* Write statistics */
     if (StatFileName) {

@@ -24,17 +24,23 @@ char __fastcall__ GetRandom(void);
 void __fastcall__ SetDevice(char newdev);
 
 char __fastcall__ get_ostype(void);
+
 /* possible return values of get_ostype, machine and version flags will
-   be combined */
+   be combined with OR */
+  /* machine flags */
 #define GEOS64		0x00
 #define GEOS128		0x80
+  /* version flags */
 #define GEOS_V10	0x10
 #define GEOS_V12	0x12	/* ??? not sure */
 #define GEOS_V20	0x20
+#define WHEELS		0x40	/* only Wheels? */
 
 char __fastcall__ get_tv(void);
+
 /* possible return values of get_tv, these flags will be combined
-   note that columns state can be changed during runtime */
+   note that columns state can be changed during runtime and get_tv
+   always returns the current state */
 #define COLUMNS40	0x00
 #define COLUMNS80	0x01
 #define TV_PAL		0x00

@@ -59,17 +59,15 @@ static void InternalDumpExpr (const ExprNode* Expr, const ExprNode* (*ResolveSym
 
 	case EXPR_LITERAL:
 	case EXPR_ULABEL:
-	    printf (" $%04lX", Expr->V.Val & 0xFFFF);
+       	    printf (" $%04lX", Expr->V.Val);
 	    break;
 
 	case EXPR_SYMBOL:
+            printf (" SYM(");
             if (ResolveSym && (Expr = ResolveSym (Expr->V.Sym)) != 0) {
-       	        printf (" SYM (");
                 InternalDumpExpr (Expr, ResolveSym);
-                printf (") ");
-            } else {
-                printf ("SYM ");
             }
+            printf (") ");
 	    break;
 
 	case EXPR_SECTION:

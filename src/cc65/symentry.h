@@ -56,21 +56,22 @@
 #define SC_STATIC    	0x0004U
 #define SC_EXTERN    	0x0008U
 
-#define SC_ENUM	     	0x0010U	/* An enum (numeric constant) */
-#define SC_LABEL       	0x0020U	/* A goto label */
-#define SC_PARAM       	0x0040U	/* This is a function parameter */
-#define SC_FUNC		0x0080U	/* Function entry */
+#define SC_ENUM	     	0x0030U	/* An enum (numeric constant) */    
+#define SC_CONST	0x0020U	/* A numeric constant with a type */
+#define SC_LABEL       	0x0040U	/* A goto label */
+#define SC_PARAM       	0x0080U	/* This is a function parameter */
+#define SC_FUNC		0x0100U	/* Function entry */
 
-#define SC_STORAGE     	0x0100U	/* Symbol with associated storage */
-#define SC_DEFAULT     	0x0200U	/* Flag: default storage class was used */
+#define SC_STORAGE     	0x0400U	/* Symbol with associated storage */
+#define SC_DEFAULT     	0x0800U	/* Flag: default storage class was used */
 
-#define SC_DEF       	0x0400U	/* Symbol is defined */
-#define SC_REF 	     	0x0800U /* Symbol is referenced */
+#define SC_DEF       	0x1000U	/* Symbol is defined */
+#define SC_REF 	     	0x2000U /* Symbol is referenced */
 
-#define SC_TYPE	       	0x1000U	/* This is a type, struct, typedef, etc. */
-#define SC_STRUCT      	0x1001U	/* Struct or union */
-#define SC_SFLD	       	0x1002U	/* Struct or union field */
-#define SC_TYPEDEF     	0x1003U	/* A typedef */
+#define SC_TYPE	       	0x4000U	/* This is a type, struct, typedef, etc. */
+#define SC_STRUCT      	0x4001U	/* Struct or union */
+#define SC_SFLD	       	0x4002U	/* Struct or union field */
+#define SC_TYPEDEF     	0x4003U	/* A typedef */
 
 #define SC_ZEROPAGE  	0x8000U	/* Symbol marked as zeropage */
 

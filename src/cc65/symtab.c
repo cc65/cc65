@@ -631,7 +631,7 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 
 
 
-SymEntry* AddLocalSym (const char* Name, type* Type, unsigned Flags, int Offs)
+SymEntry* AddLocalSym (const char* Name, const type* Type, unsigned Flags, int Offs)
 /* Add a local symbol and return the symbol entry */
 {
     /* Do we have an entry with this name already? */
@@ -661,7 +661,7 @@ SymEntry* AddLocalSym (const char* Name, type* Type, unsigned Flags, int Offs)
 
 
 
-SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
+SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags)
 /* Add an external or global symbol to the symbol table and return the entry */
 {
     /* Functions must be inserted in the global symbol table */
@@ -729,7 +729,7 @@ SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags)
 	/* Create a new entry */
      	Entry = NewSymEntry (Name, Flags);
 
-     	/* Set the symbol attributes */
+     	/* Set the symbol attributes */		
      	Entry->Type = TypeDup (Type);
 
      	/* Add the entry to the symbol table */

@@ -143,10 +143,10 @@ SymEntry* AddEnumSym (const char* Name, int Val);
 SymEntry* AddLabelSym (const char* Name, unsigned Flags);
 /* Add a goto label to the symbol table */
 
-SymEntry* AddLocalSym (const char* Name, type* Type, unsigned Flags, int Offs);
+SymEntry* AddLocalSym (const char* Name, const type* Type, unsigned Flags, int Offs);
 /* Add a local symbol and return the symbol entry */
 
-SymEntry* AddGlobalSym (const char* Name, type* Type, unsigned Flags);
+SymEntry* AddGlobalSym (const char* Name, const type* Type, unsigned Flags);
 /* Add an external or global symbol to the symbol table and return the entry */
 
 

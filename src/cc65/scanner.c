@@ -507,11 +507,6 @@ void NextToken (void)
     	       	nxtval  = GetCurrentLine();
     	       	nxttype = type_int;
     	       	return;
-    	    } else if (strcmp (token, "__fixargs__") == 0) {
-    	       	nxttok  = TOK_ICONST;
-    	       	nxtval  = GetParamSize (CurrentFunc);
-    	       	nxttype = type_uint;
-    	       	return;
     	    } else if (strcmp (token, "__func__") == 0) {
 	       	/* __func__ is only defined in functions */
 	       	if (CurrentFunc) {

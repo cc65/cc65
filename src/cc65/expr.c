@@ -772,7 +772,8 @@ static int primary (struct expent* lval)
 	    }
 
 	    /* Check for legal symbol types */
-       	    if ((Sym->Flags & SC_ENUM) == SC_ENUM) {
+       	    if ((Sym->Flags & SC_CONST) == SC_CONST) {
+		/* Enum or some other numeric constant */
 	       	lval->e_flags = E_MCONST;
 	    	lval->e_const = Sym->V.EnumVal;
 	       	return 0;

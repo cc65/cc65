@@ -1075,14 +1075,10 @@ unsigned OptBranchDist (CodeSeg* S)
 /* Change branches for the distance needed. */
 {
     unsigned Changes = 0;
-    unsigned I;
-
-    /* Get the number of entries, bail out if we have not enough */
-    unsigned Count = CS_GetEntryCount (S);
 
     /* Walk over the entries */
-    I = 0;
-    while (I < Count) {
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
 
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);

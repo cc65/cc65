@@ -7,7 +7,7 @@
 
     	.export	       	_cputcxy, _cputc
 	.export		plot, cputdirect, putchar
-	.import		popa, _gotoxy
+	.import		popa, _gotoxy, mul40
 
 	.include	"atari.inc"
 
@@ -70,22 +70,8 @@ plot:	ldy	COLCRS
 
 putchar:
 	pha			; save char
-	lda	#0
-	sta	tmp4
 	lda	ROWCRS
-	asl	a
-	rol	tmp4
-	asl	a
-	rol	tmp4		; row * 4
-	adc	ROWCRS
-	bcc	L1
-	inc	tmp4		; row * 5
-L1:	asl	a
-	rol	tmp4		; row * 10
-	asl	a
-	rol	tmp4
-	asl	a
-	rol	tmp4		; row * 40
+	jsr	mul40
 L3:	clc
 	adc	SAVMSC		; add start of screen memory
 	sta	ptr4

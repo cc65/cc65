@@ -209,7 +209,7 @@ static void CheckDirectOp (StackOpData* D)
             D->Flags |= OP_DIRECT;
         } else if (E->AM == AM65_ZP_INDY          &&
                    RegValIsKnown (E->RI->In.RegY) &&
-       	       	   (E->Use & REG_SP) != 0) {      
+       	       	   (E->Use & REG_SP) != 0) {
             /* Load from stack with known offset is also ok */
             D->Flags |= (OP_DIRECT | OP_ONSTACK);
         }
@@ -482,7 +482,7 @@ static unsigned Opt_tosorax (StackOpData* D)
     AddOpLow (D, OP65_ORA);
 
     /* High byte */
-    if (RegValIsKnown (D->PushEntry->RI->In.RegX) && 
+    if (RegValIsKnown (D->PushEntry->RI->In.RegX) &&
         RegValIsKnown (D->OpEntry->RI->In.RegX)) {
      	/* Both values known, precalculate the result */
 	const char* Arg = MakeHexArg (D->PushEntry->RI->In.RegX | D->OpEntry->RI->In.RegX);
@@ -522,7 +522,7 @@ static unsigned Opt_tosxorax (StackOpData* D)
     AddOpLow (D, OP65_EOR);
 
     /* High byte */
-    if (RegValIsKnown (D->PushEntry->RI->In.RegX) && 
+    if (RegValIsKnown (D->PushEntry->RI->In.RegX) &&
         RegValIsKnown (D->OpEntry->RI->In.RegX)) {
      	/* Both values known, precalculate the result */
      	const char* Arg = MakeHexArg (D->PushEntry->RI->In.RegX ^ D->OpEntry->RI->In.RegX);
@@ -607,6 +607,7 @@ static int HarmlessCall (const char* Name)
  */
 {
     static const char* Tab[] = {
+        "ldaxidx",
         "ldaxysp",
     };
 

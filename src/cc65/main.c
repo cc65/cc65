@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000      Ullrich von Bassewitz                                       */
+/* (C) 2000-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -625,6 +625,9 @@ int main (int argc, char* argv[])
     if (OutputFile == 0) {
 	OutputFile = MakeFilename (InputFile, ".s");
     }
+
+
+
 
     /* Go! */
     Compile ();

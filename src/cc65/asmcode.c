@@ -63,7 +63,7 @@ void AddCodeHint (const char* Hint)
 CodeMark GetCodePos (void)
 /* Get a marker pointing to the current output position */
 {
-    return GetCodeSegEntries (CS->Code);
+    return GetCodeEntryCount (CS->Code);
 }
 
 
@@ -83,7 +83,7 @@ void WriteOutput (FILE* F)
     SymEntry* Entry;
 
     /* Output the global data segment */
-    CHECK (GetCodeSegEntries (CS->Code) == 0);
+    CHECK (GetCodeEntryCount (CS->Code) == 0);
     OutputSegments (CS, F);
 
     /* Output all global or referenced functions */

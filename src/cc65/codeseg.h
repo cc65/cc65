@@ -103,11 +103,44 @@ void DelCodeEntry (CodeSeg* S, unsigned Index);
 struct CodeEntry* GetCodeEntry (CodeSeg* S, unsigned Index);
 /* Get an entry from the given code segment */
 
+unsigned GetCodeEntryIndex (CodeSeg* S, struct CodeEntry* E);
+/* Return the index of a code entry */
+
 void AddCodeLabel (CodeSeg* S, const char* Name);
 /* Add a code label for the next instruction to follow */
 
+CodeLabel* GenCodeLabel (CodeSeg* S, struct CodeEntry* E);
+/* If the code entry E does already have a label, return it. Otherwise
+ * create a new label, attach it to E and return it.
+ */
+
 void DelCodeLabel (CodeSeg* S, CodeLabel* L);
 /* Remove references from this label and delete it. */
+
+void MergeCodeLabels (CodeSeg* S);
+/* Merge code labels. That means: For each instruction, remove all labels but
+ * one and adjust references accordingly.
+ */
+
+void MoveCodeLabels (CodeSeg* S, struct CodeEntry* Old, struct CodeEntry* New);
+/* Move all labels from Old to New. The routine will move the labels itself
+ * if New does not have any labels, and move references if there is at least
+ * a label for new. If references are moved, the old label is deleted
+ * afterwards.
+ */
+
+void RemoveCodeLabelRef (CodeSeg* S, struct CodeEntry* E);
+/* Remove the reference between E and the label it jumps to. The reference
+ * will be removed on both sides and E->JumpTo will be 0 after that. If
+ * the reference was the only one for the label, the label will get
+ * deleted.
+ */
+
+void MoveCodeLabelRef (CodeSeg* S, struct CodeEntry* E, CodeLabel* L);
+/* Change the reference of E to L instead of the current one. If this
+ * was the only reference to the old label, the old label will get
+ * deleted.
+ */
 
 void AddCodeSegHint (CodeSeg* S, unsigned Hint);
 /* Add a hint for the preceeding instruction */
@@ -118,12 +151,7 @@ void DelCodeSegAfter (CodeSeg* S, unsigned Last);
 void OutputCodeSeg (const CodeSeg* S, FILE* F);
 /* Output the code segment data to a file */
 
-void MergeCodeLabels (CodeSeg* S);
-/* Merge code labels. That means: For each instruction, remove all labels but
- * one and adjust the code entries accordingly.
- */
-
-unsigned GetCodeSegEntries (const CodeSeg* S);
+unsigned GetCodeEntryCount (const CodeSeg* S);
 /* Return the number of entries for the given code segment */
 
 

@@ -33,6 +33,8 @@
 
 
 
+#include <string.h>
+
 /* common */
 #include "check.h"
 #include "xmalloc.h"
@@ -53,6 +55,41 @@
 
 
 
+/* Empty argument */
+static char EmptyArg[] = "";
+
+
+
+/*****************************************************************************/
+/*			       Helper functions				     */
+/*****************************************************************************/
+
+
+
+static void FreeArg (char* Arg)
+/* Free a code entry argument */
+{
+    if (Arg != EmptyArg) {
+	xfree (Arg);
+    }
+}
+
+
+
+static char* GetArgCopy (const char* Arg)
+/* Create an argument copy for assignment */
+{
+    if (Arg && Arg[0] != '\0') {
+	/* Create a copy */
+	return xstrdup (Arg);
+    } else {
+	/* Use the empty argument string */
+	return EmptyArg;
+    }
+}
+
+
+
 /*****************************************************************************/
 /*     	       	      	   	     Code				     */
 /*****************************************************************************/
@@ -70,17 +107,17 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* 
     E->AM   	= AM;
     E->Size 	= GetInsnSize (E->OPC, E->AM);
     E->Hints	= 0;
-    E->Arg  	= (Arg && Arg[0] != '\0')? xstrdup (Arg) : 0;
+    E->Arg     	= GetArgCopy (Arg);
     E->Num  	= 0;
     E->Flags	= 0;
     E->Info	= D->Info;
     E->Use	= D->Use;
     E->Chg	= D->Chg;
-    if (E->OPC == OPC_JSR && E->Arg) {
-	/* A subroutine call */
+    if (E->OPC == OPC_JSR) {
+     	/* A subroutine call */
      	GetFuncInfo (E->Arg, &E->Use, &E->Chg);
     } else {
-	/* Some other instruction */
+     	/* Some other instruction */
      	E->Use |= GetAMUseInfo (AM);
     }
     E->JumpTo	= JumpTo;
@@ -88,7 +125,7 @@ CodeEntry* NewCodeEntry (const OPCDesc* D, am_t AM, const char* Arg, CodeLabel* 
 
     /* If we have a label given, add this entry to the label */
     if (JumpTo) {
-	CollAppend (&JumpTo->JumpFrom, E);
+     	CollAppend (&JumpTo->JumpFrom, E);
     }
 
     /* Return the initialized struct */
@@ -101,7 +138,7 @@ void FreeCodeEntry (CodeEntry* E)
 /* Free the given code entry */
 {
     /* Free the string argument if we have one */
-    xfree (E->Arg);
+    FreeArg (E->Arg);
 
     /* Cleanup the collection */
     DoneCollection (&E->Labels);
@@ -112,10 +149,62 @@ void FreeCodeEntry (CodeEntry* E)
 
 
 
+int CodeEntriesAreEqual (const CodeEntry* E1, const CodeEntry* E2)
+/* Check if both code entries are equal */
+{
+    return E1->OPC == E2->OPC && E1->AM == E2->AM && strcmp (E1->Arg, E2->Arg) == 0;
+}
+
+
+
+void AttachCodeLabel (CodeEntry* E, CodeLabel* L)
+/* Attach the label to the entry */
+{
+    /* Mark the label as defined */
+    L->Flags |= LF_DEF;
+
+    /* Add it to the entries label list */
+    CollAppend (&E->Labels, L);
+
+    /* Tell the label about it's owner */
+    L->Owner = E;
+}
+
+
+
 int CodeEntryHasLabel (const CodeEntry* E)
 /* Check if the given code entry has labels attached */
 {
     return (CollCount (&E->Labels) > 0);
+}
+
+
+
+unsigned GetCodeLabelCount (const CodeEntry* E)
+/* Get the number of labels attached to this entry */
+{
+    return CollCount (&E->Labels);
+}
+
+
+
+CodeLabel* GetCodeLabel (CodeEntry* E, unsigned Index)
+/* Get a label from this code entry */
+{
+    return CollAt (&E->Labels, Index);
+}
+
+
+
+void MoveCodeLabel (CodeLabel* L, CodeEntry* E)
+/* Move the code label L from it's former owner to the code entry E. */
+{
+    /* Delete the label from the owner */
+    CollDeleteItem (&L->Owner->Labels, L);
+
+    /* Set the new owner */
+    CollAppend (&E->Labels, L);
+    L->Owner = E;
 }
 
 
@@ -144,23 +233,14 @@ void CodeEntryResetMark (CodeEntry* E)
 
 
 
-CodeLabel* GetCodeLabel (CodeEntry* E, unsigned Index)
-/* Get a label from this code entry */
+void CodeEntrySetArg (CodeEntry* E, const char* Arg)
+/* Set a new argument for the given code entry. An old string is deleted. */
 {
-    return CollAt (&E->Labels, Index);
-}
+    /* Free the old argument */
+    FreeArg (E->Arg);
 
-
-
-void MoveCodeLabel (CodeLabel* L, CodeEntry* E)
-/* Move the code label L from it's former owner to the code entry E. */
-{
-    /* Delete the label from the owner */
-    CollDeleteItem (&L->Owner->Labels, L);
-
-    /* Set the new owner */
-    CollAppend (&E->Labels, L);
-    L->Owner = E;
+    /* Assign the new one */
+    E->Arg = GetArgCopy (Arg);
 }
 
 
@@ -170,6 +250,7 @@ void OutputCodeEntry (const CodeEntry* E, FILE* F)
 {
     const OPCDesc* D;
     unsigned Chars;
+    const char* Target;
 
     /* If we have a label, print that */
     unsigned LabelCount = CollCount (&E->Labels);
@@ -235,8 +316,8 @@ void OutputCodeEntry (const CodeEntry* E, FILE* F)
 
 	case AM_BRA:
 	    /* branch */
-	    CHECK (E->JumpTo != 0);
-	    Chars += fprintf (F, "%*s%s", 9-Chars, "", E->JumpTo->Name);
+	    Target = E->JumpTo? E->JumpTo->Name : E->Arg;
+	    Chars += fprintf (F, "%*s%s", 9-Chars, "", Target);
 	    break;
 
 	default:

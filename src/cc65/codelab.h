@@ -92,9 +92,6 @@ void FreeCodeLabel (CodeLabel* L);
 void AddLabelRef (CodeLabel* L, struct CodeEntry* E);
 /* Let the CodeEntry E reference the label L */
 
-unsigned RemoveLabelRef (CodeLabel* L, const struct CodeEntry* E);
-/* Remove a reference to this label, return the number of remaining references */
-
 void MoveLabelRefs (CodeLabel* OldLabel, CodeLabel* NewLabel);
 /* Move all references to OldLabel to point to NewLabel. OldLabel will have no
  * more references on return.

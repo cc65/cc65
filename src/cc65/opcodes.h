@@ -138,6 +138,19 @@ typedef enum {
     AM_BRA     	= 0x0800       		/* branch */
 } am_t;
 
+/* Branch conditions */
+typedef enum {
+    BC_CC,
+    BC_CS,
+    BC_EQ,
+    BC_MI,
+    BC_NE,
+    BC_PL,
+    BC_SR,
+    BC_VC,
+    BC_VS
+} bc_t;
+
 /* Opcode info */
 #define OF_NONE	0x0000U	       		/* No additional information */
 #define OF_UBRA	0x0001U	       		/* Unconditional branch */
@@ -185,6 +198,28 @@ unsigned char GetAMUseInfo (am_t AM);
 
 opc_t GetInverseBranch (opc_t OPC);
 /* Return a branch that reverse the condition of the branch given in OPC */
+
+opc_t MakeShortBranch (opc_t OPC);
+/* Return the short version of the given branch. If the branch is already
+ * a short branch, return the opcode unchanged.
+ */
+
+opc_t MakeLongBranch (opc_t OPC);
+/* Return the long version of the given branch. If the branch is already
+ * a long branch, return the opcode unchanged.
+ */
+
+bc_t GetBranchCond (opc_t OPC);
+/* Get the condition for the conditional branch in OPC */
+
+bc_t GetInverseCond (bc_t BC);
+/* Return the inverse condition of the given one */
+
+opc_t GetLongBranch (bc_t BC);
+/* Return a long branch for the given branch condition */
+
+opc_t GetShortBranch (bc_t BC);
+/* Return a short branch for the given branch condition */
 
 
 

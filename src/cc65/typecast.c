@@ -73,8 +73,10 @@ int TypeCast (ExprDesc* lval)
     /* Read the expression we have to cast */
     k = hie10 (lval);
 
-    /* If the expression is a function, treat it as pointer-to-function */
-    if (IsTypeFunc (lval->Type)) {
+    /* If the expression is a function or an array, treat it as 
+     * "pointer to type" 
+     */
+    if (IsTypeFunc (lval->Type) || IsTypeArray (lval->Type)) {
     	lval->Type = PointerTo (lval->Type);
     }
 

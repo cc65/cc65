@@ -242,10 +242,11 @@ programs for the Commodore CBM 510 (aka P500) using the cc65
 crosscompiler.
 
 %files cbm510
-%attr(644,root,root)   		/usr/lib/cc65/lib/cbm510.lib
-%attr(644,root,root)   		/usr/lib/cc65/lib/cbm510.o
-%attr(644,root,root) 		/usr/lib/cc65/emd/cbm510-*.emd
-%attr(644,root,root) 		/usr/lib/cc65/joy/cbm510-*.joy
+%attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm510.lib
+%attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm510.o
+%attr(644,root,root) 	       	/usr/lib/cc65/emd/cbm510-*.emd
+%attr(644,root,root) 	       	/usr/lib/cc65/joy/cbm510-*.joy
+%attr(644,root,root) 	       	/usr/lib/cc65/ser/cbm510-*.ser
 
 
 
@@ -265,10 +266,10 @@ programs for the Commodore PET-II (CBM600/700) family of computers using
 the cc65 crosscompiler.
 
 %files cbm610
-%attr(644,root,root)   		/usr/lib/cc65/lib/cbm610.lib
-%attr(644,root,root)   		/usr/lib/cc65/lib/cbm610.o
-%attr(644,root,root) 		/usr/lib/cc65/emd/cbm610-*.emd
-%attr(644,root,root) 		/usr/lib/cc65/ser/cbm610-*.ser
+%attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm610.lib
+%attr(644,root,root)   	       	/usr/lib/cc65/lib/cbm610.o
+%attr(644,root,root) 	       	/usr/lib/cc65/emd/cbm610-*.emd
+%attr(644,root,root) 	       	/usr/lib/cc65/ser/cbm610-*.ser
 
 
 

@@ -1,15 +1,13 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				  spawn.c				     */
+/*                                 spawn-amiga.c                             */
 /*                                                                           */
-/*		      Execute other external programs			     */
+/*                Execute other external programs (Amiga version)            */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2002     Wolfgang Hosemann                                            */
+/* EMail:       whose@t-online.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,66 +31,50 @@
 
 
 
-#include <unistd.h>
-#include <string.h>
-#include <errno.h>
-#include <sys/types.h>
-#include <sys/wait.h>
-	  
+#include <stdio.h>
+#include <clib/dos_protos.h>
+
 /* common */
 #include "attrib.h"
-
-/* cl65 */
-#include "error.h"
+#include "strbuf.h"
 
 
 
 /*****************************************************************************/
-/* 		    		     Code 				     */
+/*  		    		     Code 				     */
 /*****************************************************************************/
 
 
 
-int spawnvp (int Mode attribute ((unused)), const char* File, char* const argv [])
+int spawnvp (int Mode attribute ((unused)),
+             const char* File attribute ((unused)),
+             char* const argv [])
 /* Execute the given program searching and wait til it terminates. The Mode
  * argument is ignored (compatibility only). The result of the function is
  * the return code of the program. The function will terminate the program
  * on errors.
  */
 {
-    int Status = 0;
+    int Status;
+    StrBuf Command = AUTO_STRBUF_INITIALIZER;
 
-    /* Fork */
-    int pid = fork ();
-    if (pid < 0) {
-
-	/* Error forking */
-	Error ("Cannot fork: %s", strerror (errno));
-
-    } else if (pid == 0) {
-
-       	/* The son - exec the program */
-	if (execvp (File, argv) < 0) {
-	    Error ("Cannot exec `%s': %s", File, strerror (errno));
-	}
-
-    } else {
-
-	/* The father: Wait for the subprocess to terminate */
-	if (waitpid (pid, &Status, 0) < 0) {
-	    Error ("Failure waiting for subprocess: %s", strerror (errno));
-	}
-
-	/* Examine the child status */
-	if (!WIFEXITED (Status)) {
-	    Error ("Subprocess `%s' aborted by signal %d", File, WTERMSIG (Status));
-      	}
+    /* Build the command line */
+    while (*argv) {
+        SB_AppendStr (&Command, *argv++);
+        SB_AppendChar (&Command, ' ');
     }
 
-    /* Only the father goes here, we place a return here regardless of that
-     * to avoid compiler warnings.
-     */
-    return WEXITSTATUS (Status);
+    /* Terminate the command line */
+    SB_Terminate (&Command);
+
+    /* Invoke the shell to execute the command */
+    Status = System (SB->GetConstBuf (&Command), TAG_END)
+
+    /* Free the string buf data */
+    DoneStrBuf (&Command);
+
+    /* Return the result */
+    return Status;
 }
 
 

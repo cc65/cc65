@@ -13,7 +13,7 @@ LDFLAGS=
 OBJS =	error.o	 	\
 	global.o 	\
 	main.o		\
-	spawn.o
+	spawn-unix.o
 
 LIBS = $(COMMON)/common.a
 

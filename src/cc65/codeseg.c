@@ -161,7 +161,7 @@ static void CS_RemoveLabelFromHash (CodeSeg* S, CodeLabel* L)
 
 
 static CodeLabel* CS_AddLabelInternal (CodeSeg* S, const char* Name,
-				       void (*ErrorFunc) (const char*, ...))
+		  		       void (*ErrorFunc) (const char*, ...))
 /* Add a code label for the next instruction to follow */
 {
     /* Calculate the hash from the name */
@@ -725,6 +725,36 @@ unsigned CS_GetEntryIndex (CodeSeg* S, struct CodeEntry* E)
 
 
 
+int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count)
+/* Return true if any of the code entries in the given range has a label
+ * attached. If the code segment does not span the given range, check the
+ * possible span instead.
+ */
+{
+    unsigned EntryCount = CS_GetEntryCount(S);
+
+    /* Adjust count. We expect at least Start to be valid. */
+    CHECK (Start < EntryCount);
+    if (Start + Count > EntryCount) {
+    	Count = EntryCount - Start;
+    }
+
+    /* Check each entry. Since we have validated the index above, we may
+     * use the unchecked access function in the loop which is faster.
+     */
+    while (Count--) {
+	const CodeEntry* E = CollAtUnchecked (&S->Entries, Start++);
+	if (CE_HasLabel (E)) {
+	    return 1;
+	}
+    }
+    
+    /* No label in the complete range */
+    return 0;
+}
+
+
+
 CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name)
 /* Add a code label for the next instruction to follow */
 {
@@ -806,6 +836,7 @@ void CS_MergeLabels (CodeSeg* S)
  */
 {
     unsigned I;
+    unsigned J;
 
     /* First, remove all labels from the label symbol table that don't have an
      * owner (this means that they are actually external labels but we didn't
@@ -817,12 +848,25 @@ void CS_MergeLabels (CodeSeg* S)
       	CodeLabel** L = &S->LabelHash[I];
       	while (*L) {
       	    if ((*L)->Owner == 0) {
-      	 	/* The label does not have an owner, remove it from the chain */
+
+		/* The label does not have an owner, remove it from the chain */
       	 	CodeLabel* X = *L;
        	       	*L = X->Next;
+
+		/* Cleanup any entries jumping to this label */
+	       	for (J = 0; J < CL_GetRefCount (X); ++J) {
+		    /* Get the entry referencing this label */
+		    CodeEntry* E = CL_GetRef (X, J);
+		    /* And remove the reference */
+		    E->JumpTo = 0;
+		}
+
+		/* Print some debugging output */
       		if (Debug) {
       		    printf ("Removing unused global label `%s'", X->Name);
       		}
+
+		/* And free the label */
       	 	FreeCodeLabel (X);
       	    } else {
       	 	/* Label is owned, point to next code label pointer */
@@ -1119,7 +1163,7 @@ void CS_GenRegInfo (CodeSeg* S)
 
 	/* Assume we're done after this run */
 	Done = 1;
-    
+
 	/* On entry, the register contents are unknown */
 	RC_Invalidate (&Regs);
 	CurrentRegs = &Regs;
@@ -1194,33 +1238,33 @@ void CS_GenRegInfo (CodeSeg* S)
 		    }
 		    ++Entry;
 		}
-    
+
 		/* Use this register info */
 		CurrentRegs = &Regs;
-    
+
 	    }
-    
+
 	    /* Generate register info for this instruction */
 	    CE_GenRegInfo (E, CurrentRegs);
-    
+
 	    /* Remember for the next insn if this insn was an uncondition branch */
 	    WasJump = (E->Info & OF_UBRA) != 0;
 
 	    /* Output registers for this insn are input for the next */
 	    CurrentRegs = &E->RI->Out;
-    
+
 	    /* If this insn is a branch on zero flag, we may have more info on
 	     * register contents for one of both flow directions, but only if
 	     * there is a previous instruction.
 	     */
 	    if ((E->Info & OF_ZBRA) != 0 && (P = CS_GetPrevEntry (S, I)) != 0) {
-    
+
 		/* Get the branch condition */
 		bc_t BC = GetBranchCond (E->OPC);
-    
+
 		/* Check the previous instruction */
 		switch (P->OPC) {
-    
+
 		    case OP65_ADC:
 		    case OP65_AND:
 		    case OP65_DEA:
@@ -1237,7 +1281,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			    E->RI->Out.RegA = 0;
 			}
 			break;
-    
+
 		    case OP65_CMP:
 			/* If this is an immidiate compare, the A register has
 			 * the value of the compare later.
@@ -1250,7 +1294,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			    }
     			}
 			break;
-    
+
 		    case OP65_CPX:
 			/* If this is an immidiate compare, the X register has
 			 * the value of the compare later.
@@ -1263,7 +1307,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			    }
 			}
 			break;
-    
+
 		    case OP65_CPY:
 			/* If this is an immidiate compare, the Y register has
 			 * the value of the compare later.
@@ -1276,7 +1320,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			    }
 			}
 			break;
-    
+
 		    case OP65_DEX:
 		    case OP65_INX:
 		    case OP65_LDX:
@@ -1288,7 +1332,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			    E->RI->Out.RegX = 0;
 			}
 			break;
-    
+
 		    case OP65_DEY:
 		    case OP65_INY:
     		    case OP65_LDY:
@@ -1300,7 +1344,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			    E->RI->Out.RegY = 0;
 			}
 			break;
-    
+
 		    case OP65_TAX:
 		    case OP65_TXA:
 			/* If the branch is a beq, both A and X are zero at the
@@ -1313,7 +1357,7 @@ void CS_GenRegInfo (CodeSeg* S)
 			    E->RI->Out.RegA = E->RI->Out.RegX = 0;
 			}
 			break;
-    
+
 		    case OP65_TAY:
 		    case OP65_TYA:
 			/* If the branch is a beq, both A and Y are zero at the
@@ -1326,10 +1370,10 @@ void CS_GenRegInfo (CodeSeg* S)
 			    E->RI->Out.RegA = E->RI->Out.RegY = 0;
 			}
 			break;
-    
+
 		    default:
 			break;
-    
+
 		}
 	    }
 	}

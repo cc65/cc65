@@ -171,6 +171,12 @@ int CS_GetEntries (CodeSeg* S, struct CodeEntry** List,
 unsigned CS_GetEntryIndex (CodeSeg* S, struct CodeEntry* E);
 /* Return the index of a code entry */
 
+int CS_RangeHasLabel (CodeSeg* S, unsigned Start, unsigned Count);
+/* Return true if any of the code entries in the given range has a label
+ * attached. If the code segment does not span the given range, check the
+ * possible span instead.
+ */
+
 CodeLabel* CS_AddLabel (CodeSeg* S, const char* Name);
 /* Add a code label for the next instruction to follow */
 

@@ -34,6 +34,7 @@
 
 
 #include <string.h>
+#include <unistd.h>
 #include <fcntl.h>
 #include <modload.h>
 #include <serial.h>
@@ -76,7 +77,7 @@ unsigned char __fastcall__ ser_load_driver (const char* name)
 
         /* Load the module */
         Res = mod_load (&ctrl);
-
+                   
         /* Close the input file */
         close (ctrl.callerdata);
 

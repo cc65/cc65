@@ -9,7 +9,7 @@
 <date>v1.5, 26.12.1999, 2000, 2001, 2002, 2003
 <abstract>
 This is the documentation of cc65's GEOSLib, but information contained here may be also
-useful for writting GEOS applications in general.
+useful for writing GEOS applications in general.
 </abstract>
 
 <!-- Table of contents -->
@@ -68,7 +68,7 @@ cc65 to simple <tt/lda/ and <tt/sta/. Don't be afraid to use C syntax.
 <sect1>Requirements
 <p>
 You will not need c64 or c128 for development. The only hardware requirement is a PC capable of
-runing cc65. You will however need c64 or c128 emulator and GEOS image disks (.d64) to test your
+running cc65. You will however need c64 or c128 emulator and GEOS image disks (.d64) to test your
 programs.
 
 The software needed:
@@ -86,7 +86,7 @@ The software needed:
 		disk image files.
     <item><em/cbm4linux/ A Linux kernel module that allows for communication with 1541 and
 		other Commodore IEC bus drives. It can be replacement for Star Commander if
-		you want only to transfer files to a disk and uncovert using GEOS program for
+		you want only to transfer files to a disk and unconvert using GEOS program for
 		this purpose. Check out: <htmlurl url="http://www.lb.shuttle.de/puffin/cbm4linux/"
 		name="http://www.lb.shuttle.de/puffin/cbm4linux">
 </itemize>
@@ -123,7 +123,7 @@ This chapter describes some rules you ought to obey, and how to use GEOSLib.
 <p>
 Apart from this file, which merely describes only standard GEOS library functions, you should read
 <tt/grc/ (GEOS resource compiler) documentation. There are informations about necessary resource
-files (each GEOS application neeeds at least one) and the building process - what should be done
+files (each GEOS application needs at least one) and the building process - what should be done
 and in what order. Please also read cc65's documentation on how to compile C, assembler and link
 everything together.
 <p>
@@ -177,7 +177,7 @@ wanted to avoid unnecessary pushing and popping arguments from stack because cc6
 Do not try to compile in strict ANSI mode. Library uses cc65 extensions which are not available in
 ANSI.
 <p>
-It is possible to use dynamicaly loaded modules, three such modules are provided:
+It is possible to use dynamically loaded modules, three such modules are provided:
 GEOS TGI driver, GEOS EMD driver (for VDC extended memory) and GEOS JOY driver.
 Just make sure that their filenames appear UPPERCASE in DeskTop. There are no more special
 recommendations, read cc65 documentation about modules and demo programs source code.
@@ -407,7 +407,7 @@ Here you will find information about functions related with menus and icons.
 
 <sect2>Menus
 <p>
-Menus are essencial for GUI. GEOS can handle only one menu at a time, but each menu can call
+Menus are essential for GUI. GEOS can handle only one menu at a time, but each menu can call
 another one, which results in submenu tree. There can be up to 8 menu levels, each one with up
 to 32 items.
 <p>
@@ -462,7 +462,7 @@ same as <tt/DoPreviousMenu/.
 Icons are working similar to menus except the fact that there is only one level. Icons are
 defined as a screen area filled with a bitmap, but if you would setup icons and erase the
 screen they are still active and clicking in the place where formerly an icon was will cause
-an effect. Similary if you would setup icons and then turn them off with <tt/ClearMouseMode/
+an effect. Similarly if you would setup icons and then turn them off with <tt/ClearMouseMode/
 the bitmap will be still on the screen but clicking on it would not cause any action.
 There is only one, but powerful icon function.
 
@@ -573,7 +573,7 @@ calls <tt/MouseUp/.
 <p>
 <tt/void ClearMouseMode (void)/
 <p>
-This function disables all mouse actitivies - icons and menus stop to respond to mouse events,
+This function disables all mouse activities - icons and menus stop to respond to mouse events,
 but they are not cleared from the screen.
 
 <sect3>MouseUp and MouseOff
@@ -696,8 +696,8 @@ enabled. <tt/ReadBlock/ assumes that it is already enabled thus being slightly f
 <p>
 <tt/char VerWriteBlock (struct tr_se *myTrSe, char *buffer)/
 <p>
-Similar to previous but needed for writting the disk. <tt/VerWriteBlock/ verifies the data after
-writting. In case of error five tries are attempted before error code is returned.
+Similar to previous but needed for writing the disk. <tt/VerWriteBlock/ verifies the data after
+writing. In case of error five tries are attempted before error code is returned.
 
 <sect2>Directory header
 <p>
@@ -718,7 +718,7 @@ Note that passed pointer must point to an array of at least 17 bytes.
 <p>
 <tt/char PutDirHead (void)/
 <p>
-These functions are reading and writting the directory header. You should use <tt/GetDirHead/ before
+These functions are reading and writing the directory header. You should use <tt/GetDirHead/ before
 using any functions described below, and you should use <tt/PutDirHead/ to save the changes on the
 disk. Otherwise they will be lost. Operating area is the <tt/curDirHead/.
 
@@ -769,7 +769,7 @@ Anyway, I feel that this function is too low-level.
 <p>
 Both functions are allocating enough disk sectors to fit the number of <tt/length/ in them. You
 will find output in <tt/output/ which is table of <tt/struct tr_se/. The last entry will have the
-number of track equal to 0 and sector equal to 255. The simpliest way of using them is to use
+number of track equal to 0 and sector equal to 255. The simplest way of using them is to use
 predefined space in GEOS data space and pass <tt/fileTrScTab/, which is a predefined table.
 <p>
 The difference between those two is that <tt/NextBlkAlloc/ will start allocating from given sector,
@@ -963,7 +963,7 @@ want to skip before searching for a free slot for directory entry. In most cases
 <tt/0/ there.
 <p>
 You have to declare a <tt/struct fileheader/ and fill it with proper values. There is only one
-difference - the first two bytes which are link to nonexistant next sector are replaced by a
+difference - the first two bytes which are link to nonexistent next sector are replaced by a
 pointer to the DOS filename of the file.
 <p>
 When saving sequential files two most important fields in <tt/struct fileheader/ are <tt/fileheader.load_address/
@@ -1076,7 +1076,7 @@ are replacement for those like <tt/memset, memcpy, strcpy/ etc. from standard li
 If you are dealing with short strings (up to 255 characters) you should use these functions
 instead of standard ones. E.g. <tt/CopyString/ instead of <tt/strcpy/. It will work faster.
 <p>
-However some of them have slighty different calling convention (order of arguments to be specific),
+However some of them have slightly different calling convention (order of arguments to be specific),
 so please check their syntax here before direct replacing.
 <p>
 Please note that the memory areas described here as <em/strings/ are up to 255 characters (without
@@ -1367,7 +1367,7 @@ This structure describes a font in one pointsize. There is current font - <tt/st
 bound to <tt/curFontDesc/. You can also force GEOS to use your own fonts by calling
 <tt/LoadCharSet/. You just need to open a VLIR font file and load one record - one pointsize -
 somewhere. At the start of this area you already have all data for <tt/fontdesc/ so you can
-pass a pointer to the load adress of that pointsize to <tt/LoadCharSet/. (Note that although
+pass a pointer to the load address of that pointsize to <tt/LoadCharSet/. (Note that although
 it has 'Load' in the name, that function loads only GEOS internal data structures, not data
 from disk).
 

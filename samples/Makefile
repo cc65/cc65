@@ -32,10 +32,13 @@ C1541  	= c1541
 # --------------------------------------------------------------------------
 # Rules how to make each one of the binaries
 
-EXELIST=hello mousedemo nachtm plasma sieve tgidemo
+EXELIST=fire hello mousedemo nachtm plasma sieve tgidemo
 
 .PHONY:	all
 all:   	$(EXELIST)
+
+fire: 		$(CRT0) fire.o $(CLIB)
+	@$(LD) -t $(SYS) -m fire.map -Ln fire.lbl -o $@ $^
 
 hello: 		$(CRT0) hello.o $(CLIB)
 	@$(LD) -t $(SYS) -m hello.map -Ln hello.lbl -o $@ $^
@@ -64,11 +67,13 @@ tgidemo:	$(CRT0) tgidemo.o $(CLIB)
 disk:  	samples.d64
 
 samples.d64:	all
-	$(C1541) -format samples,AA  d64 $@
-	for exe in $(EXELIST); do\
-	    $(C1541) -attach $@ -write $$exe;\
-	done
-
+	@$(C1541) -format samples,AA  d64 $@ > /dev/null
+	@for exe in $(EXELIST); do\
+	    $(C1541) -attach $@ -write $$exe > /dev/null;\
+	done;\
+	for tgi in *.tgi; do\
+	    $(C1541) -attach $@ -write $$tgi > /dev/null;\
+	done;
 
 # --------------------------------------------------------------------------
 # Cleanup rules

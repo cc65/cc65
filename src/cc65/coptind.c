@@ -37,8 +37,55 @@
 #include "codeent.h"
 #include "codeinfo.h"
 #include "codeopt.h"
+#include "cpu.h"
 #include "error.h"
 #include "coptind.h"
+
+
+
+/*****************************************************************************/
+/*			       Helper functions                              */
+/*****************************************************************************/
+
+
+
+static int GetBranchDist (CodeSeg* S, unsigned From, CodeEntry* To)
+/* Get the branch distance between the two entries and return it. The distance
+ * will be negative for backward jumps and positive for forward jumps.
+ */
+{
+    /* Get the index of the branch target */
+    unsigned TI = CS_GetEntryIndex (S, To);
+
+    /* Determine the branch distance */
+    int Distance = 0;
+    if (TI >= From) {
+    	/* Forward branch, do not count the current insn */
+    	unsigned J = From+1;
+    	while (J < TI) {
+	    CodeEntry* N = CS_GetEntry (S, J++);
+	    Distance += N->Size;
+	}
+    } else {
+	/* Backward branch */
+	unsigned J = TI;
+	while (J < From) {
+	    CodeEntry* N = CS_GetEntry (S, J++);
+       	    Distance -= N->Size;
+	}
+    }
+
+    /* Return the calculated distance */
+    return Distance;
+}
+
+
+
+static int IsShortDist (int Distance)
+/* Return true if the given distance is a short branch distance */
+{
+    return (Distance >= -125 && Distance <= 125);
+}
 
 
 
@@ -156,21 +203,13 @@ unsigned OptDeadJumps (CodeSeg* S)
 /* Remove dead jumps (jumps to the next instruction) */
 {
     unsigned Changes = 0;
-    CodeEntry* E;
-    unsigned I;
-
-    /* Get the number of entries, bail out if we have less than two entries */
-    unsigned Count = CS_GetEntryCount (S);
-    if (Count < 2) {
-     	return 0;
-    }
 
     /* Walk over all entries minus the last one */
-    I = 0;
-    while (I < Count-1) {
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
 
 	/* Get the next entry */
-	E = CS_GetEntry (S, I);
+	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if it's a branch, if it has a local target, and if the target
 	 * is the next instruction.
@@ -179,9 +218,6 @@ unsigned OptDeadJumps (CodeSeg* S)
 
 	    /* Delete the dead jump */
 	    CS_DelEntry (S, I);
-
-	    /* Keep the number of entries updated */
-	    --Count;
 
 	    /* Remember, we had changes */
 	    ++Changes;
@@ -212,17 +248,10 @@ unsigned OptDeadCode (CodeSeg* S)
  */
 {
     unsigned Changes = 0;
-    unsigned I;
-
-    /* Get the number of entries, bail out if we have less than two entries */
-    unsigned Count = CS_GetEntryCount (S);
-    if (Count < 2) {
-     	return 0;
-    }
 
     /* Walk over all entries */
-    I = 0;
-    while (I < Count) {
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* N;
 
@@ -238,9 +267,6 @@ unsigned OptDeadCode (CodeSeg* S)
 
  	    /* Delete the next entry */
  	    CS_DelEntry (S, I+1);
-
- 	    /* Keep the number of entries updated */
- 	    --Count;
 
  	    /* Remember, we had changes */
  	    ++Changes;
@@ -389,17 +415,10 @@ unsigned OptRTS (CodeSeg* S)
  */
 {
     unsigned Changes = 0;
-    unsigned I;
-
-    /* Get the number of entries, bail out if we have less than 2 entries */
-    unsigned Count = CS_GetEntryCount (S);
-    if (Count < 2) {
-     	return 0;
-    }
 
     /* Walk over all entries minus the last one */
-    I = 0;
-    while (I < Count-1) {
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* N;
 
@@ -451,17 +470,10 @@ unsigned OptJumpTarget (CodeSeg* S)
     CodeEntry* T2;		/* Jump target entry 2 */
     CodeLabel* TL1;		/* Target label 1 */
     unsigned TI;		/* Target index */
-    unsigned I;
-
-    /* Get the number of entries, bail out if we have not enough */
-    unsigned Count = CS_GetEntryCount (S);
-    if (Count < 3) {
-     	return 0;
-    }
 
     /* Walk over the entries */
-    I = 0;
-    while (I < Count-1) {
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
 
       	/* Get next entry */
        	E2 = CS_GetEntry (S, I+1);
@@ -507,7 +519,6 @@ unsigned OptJumpTarget (CodeSeg* S)
 
 	    /* Remove the entry preceeding the jump */
 	    CS_DelEntry (S, I);
-	    --Count;
 
        	    /* Remember, we had changes */
 	    ++Changes;
@@ -546,17 +557,10 @@ unsigned OptCondBranches (CodeSeg* S)
  */
 {
     unsigned Changes = 0;
-    unsigned I;
-
-    /* Get the number of entries, bail out if we have not enough */
-    unsigned Count = CS_GetEntryCount (S);
-    if (Count < 2) {
-     	return 0;
-    }
 
     /* Walk over the entries */
-    I = 0;
-    while (I < Count-1) {
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
 
 	CodeEntry* N;
 	CodeLabel* L;
@@ -583,7 +587,6 @@ unsigned OptCondBranches (CodeSeg* S)
 
 	    	/* Remove the conditional branch */
 	    	CS_DelEntry (S, I+1);
-	    	--Count;
 
 	    	/* Remember, we had changes */
 	    	++Changes;
@@ -616,7 +619,6 @@ unsigned OptCondBranches (CodeSeg* S)
 
       	    /* Remove the conditional branch */
       	    CS_DelEntry (S, I);
-      	    --Count;
 
       	    /* Remember, we had changes */
       	    ++Changes;
@@ -1090,38 +1092,20 @@ unsigned OptBranchDist (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if it's a conditional branch to a local label. */
-       	if ((E->Info & OF_CBRA) != 0) {
+       	if (E->Info & OF_CBRA) {
 
 	    /* Is this a branch to a local symbol? */
 	    if (E->JumpTo != 0) {
 
-		/* Get the index of the branch target */
-		unsigned TI = CS_GetEntryIndex (S, E->JumpTo->Owner);
-
-		/* Determine the branch distance */
-		int Distance = 0;
-		if (TI >= I) {
-		    /* Forward branch */
-		    unsigned J = I;
-		    while (J < TI) {
-			CodeEntry* N = CS_GetEntry (S, J++);
-		       	Distance += N->Size;
-		    }
-		} else {
-		    /* Backward branch */
-		    unsigned J = TI;
-		    while (J < I) {
-			CodeEntry* N = CS_GetEntry (S, J++);
-			Distance += N->Size;
-		    }
-		}
+       	       	/* Check if the branch distance is short */
+       	       	int IsShort = IsShortDist (GetBranchDist (S, I, E->JumpTo->Owner));
 
 		/* Make the branch short/long according to distance */
-	    	if ((E->Info & OF_LBRA) == 0 && Distance > 125) {
+	    	if ((E->Info & OF_LBRA) == 0 && !IsShort) {
 		    /* Short branch but long distance */
 		    CE_ReplaceOPC (E, MakeLongBranch (E->OPC));
 		    ++Changes;
-		} else if ((E->Info & OF_LBRA) != 0 && Distance < 125) {
+		} else if ((E->Info & OF_LBRA) != 0 && IsShort) {
 		    /* Long branch but short distance */
 		    CE_ReplaceOPC (E, MakeShortBranch (E->OPC));
 		    ++Changes;
@@ -1134,6 +1118,15 @@ unsigned OptBranchDist (CodeSeg* S)
 		++Changes;
 
 	    }
+
+       	} else if (CPU == CPU_65C02                                      &&
+		   (E->Info & OF_UBRA) != 0                              &&
+		   E->JumpTo != 0                                        &&
+		   IsShortDist (GetBranchDist (S, I, E->JumpTo->Owner))) {
+
+	    /* The jump is short and may be replaced by a BRA on the 65C02 CPU */
+	    CE_ReplaceOPC (E, OP65_BRA);
+	    ++Changes;
 	}
 
 	/* Next entry */

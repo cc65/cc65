@@ -33,9 +33,10 @@
 
 
 
-#include <ctype.h>
+#include <string.h>
+#include <ctype.h>					      
 
-/* common */ 
+/* common */
 #include "xmalloc.h"
 
 /* cc65 */
@@ -45,7 +46,7 @@
 
 
 /*****************************************************************************/
-/*	       	    		     Data				     */
+/*	       	    		     Data		      		     */
 /*****************************************************************************/
 
 
@@ -89,7 +90,7 @@ int ValidSegName (const char* Name)
 /* Return true if the given segment name is valid, return false otherwise */
 {
     /* Must start with '_' or a letter */
-    if (*Name != '_' && !isalpha(*Name)) {
+    if ((*Name != '_' && !isalpha(*Name)) || strlen(Name) > 80) {
      	return 0;
     }
 

@@ -122,7 +122,7 @@ struct DotKeyword {
 } DotKeywords [] = {
     { "A16",  	    	TOK_A16		},
     { "A8",   	    	TOK_A8		},
-    { "ADDR",	    	TOK_ADDR	},
+    { "ADDR", 	    	TOK_ADDR	},
     { "ALIGN",	       	TOK_ALIGN     	},
     { "AND", 	    	TOK_BAND 	},
     { "ASCIIZ",	    	TOK_ASCIIZ	},
@@ -164,6 +164,7 @@ struct DotKeyword {
     { "FEATURE",	TOK_FEATURE	},
     { "FILEOPT",	TOK_FILEOPT	},
     { "FOPT",  		TOK_FILEOPT	},
+    { "FORCEWORD",	TOK_FORCEWORD	},
     { "GLOBAL",		TOK_GLOBAL	},
     { "GLOBALZP",	TOK_GLOBALZP	},
     { "I16",   		TOK_I16		},
@@ -500,7 +501,7 @@ static void NextChar (void)
       	       	/* End of file. Add an empty line to the listing. This is a
       		 * small hack needed to keep the PC output in sync.
       		 */
-      	     	NewListingLine ("", IFile->Pos.Name, ICount);
+      	      	NewListingLine ("", IFile->Pos.Name, ICount);
       	       	C = EOF;
       	       	return;
       	    }
@@ -731,7 +732,7 @@ Again:
 	IVal = 0;
 	while (IsDigit (C)) {
 	    if (IVal > (0xFFFFFFFF / 10)) {
-       		Error (ERR_NUM_OVERFLOW);
+       	      	Error (ERR_NUM_OVERFLOW);
 	    	IVal = 0;
 	    }
 	    IVal = (IVal * 10) + DigitVal (C);

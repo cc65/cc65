@@ -1131,6 +1131,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,        	DoFarAddr	},
     { ccNone,		DoFeature	},
     { ccNone,		DoFileOpt	},
+    { ccNone,		DoUnexpected	},	/* .FORCEWORD */
     { ccNone,		DoGlobal	},
     { ccNone,		DoGlobalZP	},
     { ccNone,		DoI16	  	},

@@ -33,9 +33,11 @@
 
 
 
-#include "../common/exprdefs.h"
-#include "../common/xmalloc.h"
+/* common */
+#include "exprdefs.h"
+#include "xmalloc.h"
 
+/* ca65 */
 #include "error.h"
 #include "global.h"
 #include "instr.h"
@@ -109,145 +111,6 @@ static void FreeExprNode (ExprNode* E)
 	    xfree (E);
 	}
     }
-}
-
-
-
-/*****************************************************************************/
-/*	     	Dump an expression tree on stdout for debugging		     */
-/*****************************************************************************/
-
-
-
-static void InternalDumpExpr (ExprNode* Expr)
-/* Dump an expression in UPN */
-{
-    if (Expr == 0) {
-	return;
-    }
-    InternalDumpExpr (Expr->Left);
-    InternalDumpExpr (Expr->Right);
-
-    switch (Expr->Op) {
-
-	case EXPR_LITERAL:
-	case EXPR_ULABEL:
-	    printf (" $%04lX", Expr->V.Val & 0xFFFF);
-	    break;
-
-	case EXPR_SYMBOL:
-       	    printf (" %s", GetSymName (Expr->V.Sym));
-	    break;
-
-	case EXPR_SEGMENT:
-	    printf (" SEG");
-	    break;
-
-       	case EXPR_PLUS:
-	    printf (" +");
-     	    break;
-
-       	case EXPR_MINUS:
-	    printf (" -");
-     	    break;
-
-       	case EXPR_MUL:
-     	    printf (" *");
-     	    break;
-
-       	case EXPR_DIV:
-     	    printf (" /");
-     	    break;
-
-       	case EXPR_MOD:
-     	    printf (" %%");
-     	    break;
-
-	case EXPR_OR:
-     	    printf (" OR");
-     	    break;
-
-	case EXPR_XOR:
-     	    printf (" XOR");
-     	    break;
-
-	case EXPR_AND:
-     	    printf (" AND");
-     	    break;
-
-	case EXPR_SHL:
-     	    printf (" SHL");
-     	    break;
-
-	case EXPR_SHR:
-     	    printf (" SHR");
-     	    break;
-
-       	case EXPR_EQ:
-     	    printf (" =");
-     	    break;
-
-       	case EXPR_NE:
-     	    printf ("<>");
-     	    break;
-
-       	case EXPR_LT:
-     	    printf (" <");
-     	    break;
-
-       	case EXPR_GT:
-     	    printf (" >");
-     	    break;
-
-       	case EXPR_UNARY_MINUS:
-	    printf (" NEG");
-	    break;
-
-       	case EXPR_NOT:
-	    printf (" ~");
-	    break;
-
-       	case EXPR_LOBYTE:
-	    printf (" LO");
-	    break;
-
-       	case EXPR_HIBYTE:
-	    printf (" HI");
-	    break;
-
-       	case EXPR_SWAP:
-	    printf (" SWAP");
-	    break;
-
-	case EXPR_BAND:
-	    printf (" BOOL_AND");
-	    break;
-
-	case EXPR_BOR:
-	    printf (" BOOL_OR");
-	    break;
-
-	case EXPR_BXOR:
-	    printf (" BOOL_XOR");
-	    break;
-
-	case EXPR_BNOT:
-    	    printf (" BOOL_NOT");
-	    break;
-
-        default:
-       	    Internal ("Unknown Op type: %u", Expr->Op);
-
-    }
-}
-
-
-
-void DumpExpr (ExprNode* Expr)
-/* Dump an expression tree to stdout */
-{
-    InternalDumpExpr (Expr);
-    printf ("\n");
 }
 
 
@@ -682,14 +545,14 @@ static ExprNode* Factor (void)
 	    NextTok ();
 	    N = NewExprNode ();
 	    N->Left = Factor ();
-	    N->Op   = EXPR_LOBYTE;
+	    N->Op   = EXPR_BYTE0;
 	    break;
 
 	case TOK_GT:
 	    NextTok ();
 	    N = NewExprNode ();
 	    N->Left = Factor ();
-	    N->Op   = EXPR_HIBYTE;
+	    N->Op   = EXPR_BYTE1;
 	    break;
 
 	case TOK_LPAREN:
@@ -1273,7 +1136,8 @@ int IsByteExpr (ExprNode* Root)
     	    SimplifyExpr (Root);
      	}
        	return IsByteRange (GetExprVal (Root));
-    } else if (Root->Op == EXPR_LOBYTE || Root->Op == EXPR_HIBYTE) {
+    } else if (Root->Op == EXPR_BYTE0 || Root->Op == EXPR_BYTE1 ||
+	       Root->Op == EXPR_BYTE2 || Root->Op == EXPR_BYTE3) {
     	/* Symbol forced to have byte range */
        	IsByte = 1;
     } else {
@@ -1370,11 +1234,17 @@ long GetExprVal (ExprNode* Expr)
        	case EXPR_NOT:
 	    return ~GetExprVal (Expr->Left);
 
-       	case EXPR_LOBYTE:
+       	case EXPR_BYTE0:
 	    return GetExprVal (Expr->Left) & 0xFF;
 
-       	case EXPR_HIBYTE:
+       	case EXPR_BYTE1:
 	    return (GetExprVal (Expr->Left) >> 8) & 0xFF;
+
+       	case EXPR_BYTE2:
+	    return (GetExprVal (Expr->Left) >> 16) & 0xFF;
+
+       	case EXPR_BYTE3:
+	    return (GetExprVal (Expr->Left) >> 24) & 0xFF;
 
         case EXPR_SWAP:
 	    Left = GetExprVal (Expr->Left);

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -84,10 +84,17 @@
 /* Unary operations, right hand side is empty */
 #define EXPR_UNARY_MINUS       	(EXPR_UNARYNODE | 0x01)
 #define EXPR_NOT       	       	(EXPR_UNARYNODE | 0x02)
-#define EXPR_LOBYTE            	(EXPR_UNARYNODE | 0x03)
-#define EXPR_HIBYTE            	(EXPR_UNARYNODE | 0x04)
-#define EXPR_SWAP      	       	(EXPR_UNARYNODE | 0x05)
-#define EXPR_BNOT		(EXPR_UNARYNODE | 0x06)
+#define EXPR_SWAP      	       	(EXPR_UNARYNODE | 0x03)
+#define EXPR_BNOT		(EXPR_UNARYNODE | 0x04)
+#define EXPR_FORCEWORD		(EXPR_UNARYNODE | 0x05)
+#define EXPR_FORCEFAR		(EXPR_UNARYNODE | 0x06)
+
+#define EXPR_BYTE0            	(EXPR_UNARYNODE | 0x08)	
+#define EXPR_BYTE1            	(EXPR_UNARYNODE | 0x09)
+#define EXPR_BYTE2		(EXPR_UNARYNODE | 0x0A)
+#define EXPR_BYTE3		(EXPR_UNARYNODE | 0x0B)
+#define EXPR_WORD0		(EXPR_UNARYNODE | 0x0C)
+#define EXPR_WORD1		(EXPR_UNARYNODE | 0x0D)
 
 
 
@@ -101,7 +108,7 @@ struct ExprNode_ {
     union {
        	long         	    Val;	/* If this is a value */
        	struct SymEntry_*   Sym;	/* If this is a symbol */
-	unsigned	    SegNum;	/* If this is a segment */
+	unsigned	    SegNum;  	/* If this is a segment */
 	unsigned	    ImpNum;	/* If this is an import */
 	struct Memory_*	    MemArea;	/* If this is a memory area */
     } V;
@@ -113,6 +120,17 @@ struct ExprNode_ {
 #define EXPR_IS_LEAF(Op)       	(((Op) & EXPR_TYPEMASK) == EXPR_LEAFNODE)
 #define EXPR_IS_UNARY(Op)  	(((Op) & EXPR_TYPEMASK) == EXPR_UNARYNODE)
 #define EXPR_IS_BINARY(OP)	(((Op) & EXPR_TYPEMASK) == EXPR_BINARYNODE)
+
+
+
+/*****************************************************************************/
+/*     	      	    		     Code	   		       	     */
+/*****************************************************************************/
+
+
+
+void DumpExpr (const ExprNode* Expr);
+/* Dump an expression tree to stdout */
 
 
 

@@ -12,6 +12,7 @@ LIB	= common.a
 OBJS =	abend.o		\
 	bitops.o	\
 	cmdline.o	\
+	exprdefs.o	\
 	fname.o		\
 	hashstr.o	\
 	xmalloc.o	\

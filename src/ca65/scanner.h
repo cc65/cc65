@@ -143,6 +143,7 @@ enum Token {
     TOK_FARADDR,
     TOK_FEATURE,
     TOK_FILEOPT,
+    TOK_FORCEWORD,
     TOK_GLOBAL,
     TOK_GLOBALZP,
     TOK_I16,

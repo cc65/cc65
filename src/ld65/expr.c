@@ -36,7 +36,7 @@
 /* common */
 #include "exprdefs.h"
 #include "xmalloc.h"
-	  
+
 /* ld65 */
 #include "global.h"
 #include "error.h"
@@ -73,144 +73,6 @@ static void FreeExprNode (ExprNode* E)
 {
     /* Free the memory */
     xfree (E);
-}
-
-
-
-/*****************************************************************************/
-/*   		Dump an expression tree on stdout for debugging		     */
-/*****************************************************************************/
-
-
-
-static void InternalDumpExpr (const ExprNode* Expr)
-/* Dump an expression in UPN */
-{
-    if (Expr == 0) {
-	return;
-    }
-    InternalDumpExpr (Expr->Left);
-    InternalDumpExpr (Expr->Right);
-
-    switch (Expr->Op) {
-
-	case EXPR_LITERAL:
-	    printf (" $%04lX", Expr->V.Val & 0xFFFF);
-	    break;
-
-	case EXPR_SYMBOL:
-       	    printf (" SYM");
-	    break;
-
-	case EXPR_SEGMENT:
-	    printf (" SEG");
-	    break;
-
-       	case EXPR_PLUS:
-	    printf (" +");
-     	    break;
-
-       	case EXPR_MINUS:
-	    printf (" -");
-     	    break;
-
-       	case EXPR_MUL:
-     	    printf (" *");
-     	    break;
-
-       	case EXPR_DIV:
-     	    printf (" /");
-     	    break;
-
-       	case EXPR_MOD:
-     	    printf (" %%");
-     	    break;
-
-	case EXPR_OR:
-     	    printf (" OR");
-     	    break;
-
-	case EXPR_XOR:
-     	    printf (" XOR");
-     	    break;
-
-	case EXPR_AND:
-     	    printf (" AND");
-     	    break;
-
-	case EXPR_SHL:
-     	    printf (" SHL");
-     	    break;
-
-	case EXPR_SHR:
-     	    printf (" SHR");
-     	    break;
-
-       	case EXPR_EQ:
-     	    printf (" =");
-     	    break;
-
-       	case EXPR_NE:
-     	    printf ("<>");
-     	    break;
-
-       	case EXPR_LT:
-     	    printf (" <");
-     	    break;
-
-       	case EXPR_GT:
-     	    printf (" >");
-     	    break;
-
-       	case EXPR_UNARY_MINUS:
-	    printf (" NEG");
-	    break;
-
-       	case EXPR_NOT:
-	    printf (" ~");
-	    break;
-
-       	case EXPR_LOBYTE:
-	    printf (" LO");
-	    break;
-
-       	case EXPR_HIBYTE:
-	    printf (" HI");
-	    break;
-
-       	case EXPR_SWAP:
-	    printf (" SWAP");
-	    break;
-
-	case EXPR_BAND:
-	    printf (" BOOL_AND");
-	    break;
-
-	case EXPR_BOR:
-	    printf (" BOOL_OR");
-	    break;
-
-	case EXPR_BXOR:
-	    printf (" BOOL_XOR");
-	    break;
-
-	case EXPR_BNOT:
-    	    printf (" BOOL_NOT");
-	    break;
-
-        default:
-       	    Internal ("Unknown Op type: %u", Expr->Op);
-
-    }
-}
-
-
-
-void DumpExpr (const ExprNode* Expr)
-/* Dump an expression tree to stdout */
-{
-    InternalDumpExpr (Expr);
-    printf ("\n");
 }
 
 
@@ -451,11 +313,17 @@ long GetExprVal (ExprNode* Expr)
        	case EXPR_NOT:
 	    return ~GetExprVal (Expr->Left);
 
-       	case EXPR_LOBYTE:
+       	case EXPR_BYTE0:
 	    return GetExprVal (Expr->Left) & 0xFF;
 
-       	case EXPR_HIBYTE:
+       	case EXPR_BYTE1:
 	    return (GetExprVal (Expr->Left) >> 8) & 0xFF;
+
+       	case EXPR_BYTE2:
+	    return (GetExprVal (Expr->Left) >> 16) & 0xFF;
+
+       	case EXPR_BYTE3:
+	    return (GetExprVal (Expr->Left) >> 24) & 0xFF;
 
         case EXPR_SWAP:
 	    Left = GetExprVal (Expr->Left);

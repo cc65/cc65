@@ -37,9 +37,11 @@
 #include <errno.h>
 #include <ctype.h>
 
-#include "../common/segdefs.h"
-#include "../common/xmalloc.h"
-
+/* common */
+#include "segdefs.h"
+#include "xmalloc.h"
+	   
+/* cc65 */
 #include "error.h"
 #include "fragment.h"
 #include "global.h"
@@ -160,7 +162,7 @@ static Segment* NewSegment (const char* Name, unsigned SegType)
     return S;
 }
 
-
+	  
 
 void UseCodeSeg (void)
 /* Use the code segment */
@@ -629,10 +631,6 @@ static Fragment* NewFragment (unsigned char Type, unsigned short Len)
     if (LineCur) {
 	if (LineCur->FragList == 0) {
 	    LineCur->FragList = F;
-	    /* First fragment - set the PC
-	    LineCur->PC    = GetPC ();
-	    LineCur->Reloc = RelocMode;
-*/
 	} else {
        	    LineCur->FragLast->LineList = F;
      	}

@@ -38,7 +38,8 @@
 
 
 
-#include "../common/exprdefs.h"
+/* common */
+#include "exprdefs.h"
 
 
 
@@ -98,9 +99,6 @@ int IsByteRange (long Val);
 
 int IsWordRange (long Val);
 /* Return true if this is a word value */
-
-void DumpExpr (ExprNode* Expr);
-/* Dump an expression tree to stdout */
 
 ExprNode* FinalizeExpr (ExprNode* Expr);
 /* Resolve any symbols by cloning the symbol expression tree instead of the

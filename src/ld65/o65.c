@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1999-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,9 +38,11 @@
 #include <errno.h>
 #include <time.h>
 
-#include "../common/version.h"
-#include "../common/xmalloc.h"
+/* common */
+#include "version.h"
+#include "xmalloc.h"
 
+/* ld65 */
 #include "error.h"
 #include "exports.h"
 #include "expr.h"
@@ -448,7 +450,7 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
      * Calculate the number of bytes between this entry and the last one, and
      * setup all necessary intermediate bytes in the relocation table.
      */
-    Offs += D->SegSize;		/* Calulate full offset */
+    Offs += D->SegSize;	   	/* Calulate full offset */
     Diff = ((long) Offs) - D->LastOffs;
     while (Diff > 0xFE) {
     	O65RelocPutByte (D->CurReloc, 0xFF);
@@ -461,7 +463,9 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
 
     /* Determine the expression to relocate */
     Expr = E;
-    if (E->Op == EXPR_LOBYTE || E->Op == EXPR_HIBYTE) {
+    if (E->Op == EXPR_BYTE0 || E->Op == EXPR_BYTE1 ||
+	E->Op == EXPR_BYTE2 || E->Op == EXPR_BYTE3 ||
+	E->Op == EXPR_WORD0 || E->Op == EXPR_WORD1) {
       	/* Use the real expression */
        	Expr = E->Left;
     }
@@ -491,19 +495,22 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
 
     /* Write out the offset that goes into the segment. */
     BinVal = ED.Val;
-    if (E->Op == EXPR_LOBYTE) {
-	BinVal &= 0x00FF;
-    } else if (E->Op == EXPR_HIBYTE) {
-       	BinVal = (BinVal >> 8) & 0x00FF;
+    switch (E->Op) {
+	case EXPR_BYTE0:    BinVal &= 0xFF;			break;
+	case EXPR_BYTE1:    BinVal = (BinVal >>  8) & 0xFF;	break;
+	case EXPR_BYTE2:    BinVal = (BinVal >> 16) & 0xFF;	break;
+	case EXPR_BYTE3:    BinVal = (BinVal >> 24) & 0xFF;	break;
+	case EXPR_WORD0:    BinVal &= 0xFFFF;			break;
+	case EXPR_WORD1:    BinVal = (BinVal >> 16) & 0xFFFF;	break;
     }
     WriteVal (D->F, BinVal, Size);
 
     /* Determine the actual type of relocation entry needed from the
      * information gathered about the expression.
      */
-    if (E->Op == EXPR_LOBYTE) {
+    if (E->Op == EXPR_BYTE0) {
 	RelocType = O65RELOC_LOW;
-    } else if (E->Op == EXPR_HIBYTE) {
+    } else if (E->Op == EXPR_BYTE1) {
 	RelocType = O65RELOC_HIGH;
     } else {
 	switch (Size) {
@@ -526,7 +533,7 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
 
 	    default:
 	 	Internal ("O65WriteExpr: Invalid expression size: %u", Size);
-    		RelocType = 0;		/* Avoid gcc warnings */
+    		RelocType = 0;	  	/* Avoid gcc warnings */
 	}
     }
 

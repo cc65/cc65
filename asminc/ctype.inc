@@ -10,6 +10,7 @@
 
 ; Define bitmapped constants for the table entries
 
+CT_NONE         = $00           ; Nothing special
 CT_LOWER	= $01		; 0 - Lower case char
 CT_UPPER	= $02		; 1 - Upper case char
 CT_DIGIT	= $04		; 2 - Numeric digit

@@ -38,12 +38,9 @@
  * used for the debugger are quite usable even in another context, they
  * are declared here.
  *
- * To use the debugger, just call DbgStart in your application. This will
- * clear the screen and startup the debugger with the program counter
- * pointing to the next instruction after the call to DbgStart. Once DbgStart
- * has been executed, the debugger will also catch any BRK opcode. Use the
- * BREAK function declared below to insert additional breakpoints into your
- * code.
+ * To use the debugger, just call DbgInit in your application. Once it has
+ * been called, the debugger will catch any BRK opcode. Use the BREAK macro 
+ * defined below to insert breakpoints into your code.
  *
  * There are currently a lot of things that cannot be debugged, graphical
  * applications are an example. The debugger does not save your screen
@@ -64,7 +61,7 @@
 
 
 /*****************************************************************************/
-/*			      Utuility functions			     */
+/*     	       	       	       Utility functions			     */
 /*****************************************************************************/
 
 
@@ -114,7 +111,7 @@ void __fastcall__ DbgInit (unsigned unused);
  * next brk encountered.
  */
 
-#define BREAK()	       	__asm__ ("\tbrk")
+#define BREAK()	       	__asm__ ("brk")
 /* Use this to insert breakpoints into your code */
 
 
@@ -124,3 +121,4 @@ void __fastcall__ DbgInit (unsigned unused);
 
 
 
+                                  

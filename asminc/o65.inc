@@ -73,14 +73,6 @@ O65_ALIGN_4             =       $0002   ; Align longwords
 O65_ALIGN_256           =       $0003   ; Align pages (256 bytes)
 O65_ALIGN_MASK          =       $0003   ; Mask to extract alignment
 
-; The o65 segment types
-O65_SEG_UNDEF  	        =       $00
-O65_SEG_ABS   	        =       $01
-O65_SEG_TEXT   	        =       $02
-O65_SEG_DATA   	        =       $03
-O65_SEG_BSS    	        =       $04
-O65_SEG_ZP     	        =       $05
-
 ; Relocation type codes
 O65_RTYPE_WORD          =       $80
 O65_RTYPE_HIGH          =       $40

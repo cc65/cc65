@@ -34,7 +34,7 @@ all:
 
 #-----------------------------------------------------------------------------
 # Apple ][
-				 
+
 apple2lib:
 	for i in apple2 common runtime conio dbg; do \
 	    CC=$(CC) \
@@ -88,7 +88,7 @@ vic20lib:
 	    CC=$(CC) \
 	    AS=$(AS) \
 	    AFLAGS="-t vic20 -I../../asminc" \
-	    CFLAGS="-Osir -g -T -t c64 -I../../include" \
+	    CFLAGS="-Osir -g -T -t vic20 -I../../include" \
 	    $(MAKE) -C $$i || exit 1; \
 	done
 	mv vic20/crt0.o vic20.o

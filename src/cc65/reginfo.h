@@ -57,6 +57,7 @@ struct RegContents {
     short       RegY;
     short       SRegLo;
     short       SRegHi;
+    short	Tmp1;
 };
 
 /* Register change info */
@@ -97,3 +98,4 @@ void FreeRegInfo (RegInfo* RI);
 
 
 
+		    

@@ -200,6 +200,30 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 
 
 
+static unsigned GetReg (unsigned short Use, const RegContents* RC)
+/* Map the register info in Use plus the validity into in RI into exactly
+ * one register.
+ */
+{
+    if ((Use & REG_A) != 0) {
+	return (RC && RC->RegA >= 0)? REG_A : REG_NONE;
+    } else if ((Use & REG_X) != 0) {
+	return (RC && RC->RegX >= 0)? REG_X : REG_NONE;
+    } else if ((Use & REG_Y) != 0) {
+	return (RC && RC->RegY >= 0)? REG_Y : REG_NONE;
+    } else if ((Use & REG_TMP1) != 0) {
+	return (RC && RC->Tmp1 >= 0)? REG_TMP1 : REG_NONE;
+    } else if ((Use & REG_SREG_LO) != 0) {
+	return (RC && RC->SRegLo >= 0)? REG_SREG_LO : REG_NONE;
+    } else if ((Use & REG_SREG_HI) != 0) {
+	return (RC && RC->SRegHi >= 0)? REG_SREG_HI : REG_NONE;
+    } else {
+	return REG_NONE;
+    }
+}
+
+
+
 /*****************************************************************************/
 /*     	       	      	   	     Code				     */
 /*****************************************************************************/
@@ -405,6 +429,21 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
        	    if (In->RegA >= 0) {
 		if (CE_KnownImm (E)) {
 		    Out->RegA = In->RegA & (short) E->Num;
+		} else if (E->AM == AM65_ZP) {
+		    switch (GetReg (E->Use, In)) {
+		    	case REG_TMP1:
+		    	    Out->RegA = In->RegA & In->Tmp1;
+		    	    break;
+			case REG_SREG_LO:
+			    Out->RegA = In->RegA & In->SRegLo;
+			    break;
+			case REG_SREG_HI:
+			    Out->RegA = In->RegA & In->SRegHi;
+			    break;
+		    	default:
+		    	    Out->RegA = -1;
+		    	    break;
+		    }
 		} else {
 		    Out->RegA = -1;
 		}
@@ -415,10 +454,16 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
 		Out->RegA = (In->RegA << 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
-		if ((E->Chg & REG_SREG_LO) != 0 && In->SRegLo >= 0) {
-		    Out->SRegLo = (In->SRegLo << 1) & 0xFF;
-		} else if ((E->Chg & REG_SREG_HI) != 0 && In->SRegHi >= 0) {
-		    Out->SRegHi = (In->SRegHi << 1) & 0xFF;
+		switch (GetReg (E->Chg, In)) {
+		    case REG_TMP1:
+			Out->Tmp1 = (In->Tmp1 << 1) & 0xFF;
+			break;
+		    case REG_SREG_LO:
+			Out->SRegLo = (In->SRegLo << 1) & 0xFF;
+			break;
+		    case REG_SREG_HI:
+			Out->SRegHi = (In->SRegHi << 1) & 0xFF;
+			break;
 		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
@@ -490,10 +535,16 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
 	    	Out->RegA = (In->RegA - 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
-		if ((E->Chg & REG_SREG_LO) != 0 && In->SRegLo >= 0) {
-		    Out->SRegLo = (In->SRegLo - 1) & 0xFF;
-		} else if ((E->Chg & REG_SREG_HI) != 0 && In->SRegHi >= 0) {
-		    Out->SRegHi = (In->SRegHi - 1) & 0xFF;
+		switch (GetReg (E->Chg, In)) {
+		    case REG_TMP1:
+			Out->Tmp1 = (In->Tmp1 - 1) & 0xFF;
+			break;
+		    case REG_SREG_LO:
+			Out->SRegLo = (In->SRegLo - 1) & 0xFF;
+			break;
+		    case REG_SREG_HI:
+			Out->SRegHi = (In->SRegHi - 1) & 0xFF;
+			break;
 		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
@@ -517,6 +568,21 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
        	    if (In->RegA >= 0) {
 		if (CE_KnownImm (E)) {
 		    Out->RegA = In->RegA ^ (short) E->Num;
+		} else if (E->AM == AM65_ZP) {
+		    switch (GetReg (E->Use, In)) {
+		    	case REG_TMP1:
+		    	    Out->RegA = In->RegA ^ In->Tmp1;
+		    	    break;
+			case REG_SREG_LO:
+			    Out->RegA = In->RegA ^ In->SRegLo;
+			    break;
+			case REG_SREG_HI:
+			    Out->RegA = In->RegA ^ In->SRegHi;
+			    break;
+		    	default:
+		    	    Out->RegA = -1;
+		    	    break;
+		    }
 		} else {
 		    Out->RegA = -1;
 		}
@@ -531,12 +597,18 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_INC:
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
-		Out->RegA = (In->RegA + 1) & 0xFF;
+	     	Out->RegA = (In->RegA + 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
-		if ((E->Chg & REG_SREG_LO) != 0 && In->SRegLo >= 0) {
-		    Out->SRegLo = (In->SRegLo + 1) & 0xFF;
-		} else if ((E->Chg & REG_SREG_HI) != 0 && In->SRegHi >= 0) {
-		    Out->SRegHi = (In->SRegHi + 1) & 0xFF;
+	     	switch (GetReg (E->Chg, In)) {
+		    case REG_TMP1:
+			Out->Tmp1 = (In->Tmp1 + 1) & 0xFF;
+			break;
+		    case REG_SREG_LO:
+			Out->SRegLo = (In->SRegLo + 1) & 0xFF;
+			break;
+		    case REG_SREG_HI:
+			Out->SRegHi = (In->SRegHi + 1) & 0xFF;
+			break;
 		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
@@ -589,11 +661,14 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (Chg & REG_Y) {
 		Out->RegY = -1;
 	    }
+	    if (Chg & REG_TMP1) {
+		Out->Tmp1 = -1;
+	    }
             if (Chg & REG_SREG_LO) {
-		Out->SRegLo = -1;
+	     	Out->SRegLo = -1;
 	    }
 	    if (Chg & REG_SREG_HI) {
-		Out->SRegHi = -1;
+	     	Out->SRegHi = -1;
 	    }
 	    break;
 
@@ -607,12 +682,19 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (CE_KnownImm (E)) {
 	     	Out->RegA = (unsigned char) E->Num;
 	    } else if (E->AM == AM65_ZP) {
-		if (E->Use & REG_SREG_LO) {
-		    Out->RegA = In->SRegLo;
-		} else if (E->Use & REG_SREG_HI) {
-		    Out->RegA = In->SRegHi;
-		} else {
-		    Out->RegA = -1;
+		switch (GetReg (E->Use, In)) {
+		    case REG_TMP1:
+			Out->RegA = In->Tmp1;
+			break;
+		    case REG_SREG_LO:
+			Out->RegA = In->SRegLo;
+			break;
+		    case REG_SREG_HI:
+			Out->RegA = In->SRegHi;
+			break;
+		    default:
+			Out->RegA = -1;
+			break;
 		}
 	    } else {
 	     	/* A is now unknown */
@@ -624,12 +706,19 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (CE_KnownImm (E)) {
 	     	Out->RegX = (unsigned char) E->Num;
 	    } else if (E->AM == AM65_ZP) {
-		if (E->Use & REG_SREG_LO) {
-		    Out->RegX = In->SRegLo;
-		} else if (E->Use & REG_SREG_HI) {
-		    Out->RegX = In->SRegHi;
-		} else {
-		    Out->RegX = -1;
+		switch (GetReg (E->Use, In)) {
+		    case REG_TMP1:
+			Out->RegX = In->Tmp1;
+			break;
+		    case REG_SREG_LO:
+			Out->RegX = In->SRegLo;
+			break;
+		    case REG_SREG_HI:
+			Out->RegX = In->SRegHi;
+			break;
+		    default:
+			Out->RegX = -1;
+			break;
 		}
 	    } else {
 	     	/* X is now unknown */
@@ -641,12 +730,19 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (CE_KnownImm (E)) {
 	     	Out->RegY = (unsigned char) E->Num;
 	    } else if (E->AM == AM65_ZP) {
-		if (E->Use & REG_SREG_LO) {
-		    Out->RegY = In->SRegLo;
-		} else if (E->Use & REG_SREG_HI) {
-		    Out->RegY = In->SRegHi;
-		} else {
-		    Out->RegY = -1;
+		switch (GetReg (E->Use, In)) {
+		    case REG_TMP1:
+			Out->RegY = In->Tmp1;
+			break;
+		    case REG_SREG_LO:
+			Out->RegY = In->SRegLo;
+			break;
+		    case REG_SREG_HI:
+			Out->RegY = In->SRegHi;
+			break;
+		    default:
+			Out->RegY = -1;
+			break;
 		}
 	    } else {
 		/* Y is now unknown */
@@ -658,10 +754,16 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (E->AM == AM65_ACC && In->RegA >= 0) {
 		Out->RegA = (In->RegA >> 1) & 0xFF;
 	    } else if (E->AM == AM65_ZP) {
-		if ((E->Chg & REG_SREG_LO) != 0 && In->SRegLo >= 0) {
-		    Out->SRegLo = (In->SRegLo >> 1) & 0xFF;
-		} else if (E->Chg & REG_SREG_HI) {
-		    Out->SRegHi = (In->SRegHi >> 1) & 0xFF;
+		switch (GetReg (E->Chg, In)) {
+		    case REG_TMP1:
+			Out->Tmp1 = (In->Tmp1 >> 1) & 0xFF;
+			break;
+		    case REG_SREG_LO:
+			Out->SRegLo = (In->SRegLo >> 1) & 0xFF;
+			break;
+		    case REG_SREG_HI:
+			Out->SRegHi = (In->SRegHi >> 1) & 0xFF;
+			break;
 		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
@@ -676,6 +778,21 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    if (In->RegA >= 0) {
 		if (CE_KnownImm (E)) {
 		    Out->RegA = In->RegA | (short) E->Num;
+		} else if (E->AM == AM65_ZP) {
+		    switch (GetReg (E->Use, In)) {
+		    	case REG_TMP1:
+		    	    Out->RegA = In->RegA | In->Tmp1;
+		    	    break;
+			case REG_SREG_LO:
+			    Out->RegA = In->RegA | In->SRegLo;
+			    break;
+			case REG_SREG_HI:
+			    Out->RegA = In->RegA | In->SRegHi;
+			    break;
+		    	default:
+		    	    Out->RegA = -1;
+		    	    break;
+		    }
 		} else {
 		    /* A is now unknown */
 		    Out->RegA = -1;
@@ -711,14 +828,21 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
     	    break;
 
     	case OP65_ROL:
+	    /* We don't know the value of the carry bit */
     	    if (E->AM == AM65_ACC) {
     		Out->RegA = -1;
     	    } else if (E->AM == AM65_ZP) {
-    		if (E->Chg & REG_SREG_LO) {
-    		    Out->SRegLo = -1;
-    		} else if (E->Chg & REG_SREG_HI) {
-    		    Out->SRegHi = -1;
-    		}
+	     	switch (GetReg (E->Chg, In)) {
+		    case REG_TMP1:
+			Out->Tmp1 = -1;
+			break;
+		    case REG_SREG_LO:
+			Out->SRegLo = -1;
+			break;
+		    case REG_SREG_HI:
+			Out->SRegHi = -1;
+			break;
+		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
                 RC_InvalidateZP (Out);
@@ -726,14 +850,21 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
     	    break;
 
     	case OP65_ROR:
+	    /* We don't know the value of the carry bit */
     	    if (E->AM == AM65_ACC) {
     		Out->RegA = -1;
     	    } else if (E->AM == AM65_ZP) {
-    		if (E->Chg & REG_SREG_LO) {
-    		    Out->SRegLo = -1;
-    		} else if (E->Chg & REG_SREG_HI) {
-    		    Out->SRegHi = -1;
-    		}
+	     	switch (GetReg (E->Chg, In)) {
+		    case REG_TMP1:
+			Out->Tmp1 = -1;
+			break;
+		    case REG_SREG_LO:
+			Out->SRegLo = -1;
+			break;
+		    case REG_SREG_HI:
+			Out->SRegHi = -1;
+			break;
+		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
                 RC_InvalidateZP (Out);
@@ -762,10 +893,16 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
     	case OP65_STA:
 	    if (E->AM == AM65_ZP) {
-		if (E->Chg & REG_SREG_LO) {
-		    Out->SRegLo = In->RegA;
-		} else if (E->Chg & REG_SREG_HI) {
-		    Out->SRegHi = In->RegA;
+		switch (GetReg (E->Chg, 0)) {
+		    case REG_TMP1:
+			Out->Tmp1 = In->RegA;
+			break;
+		    case REG_SREG_LO:
+			Out->SRegLo = In->RegA;
+			break;
+		    case REG_SREG_HI:
+			Out->SRegHi = In->RegA;
+			break;
 		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
@@ -775,11 +912,17 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_STX:
 	    if (E->AM == AM65_ZP) {
-	     	if (E->Chg & REG_SREG_LO) {
-	     	    Out->SRegLo = In->RegX;
-	     	} else if (E->Chg & REG_SREG_HI) {
-	     	    Out->SRegHi = In->RegX;
-	     	}
+		switch (GetReg (E->Chg, 0)) {
+		    case REG_TMP1:
+			Out->Tmp1 = In->RegX;
+			break;
+		    case REG_SREG_LO:
+			Out->SRegLo = In->RegX;
+			break;
+		    case REG_SREG_HI:
+			Out->SRegHi = In->RegX;
+			break;
+		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
                 RC_InvalidateZP (Out);
@@ -788,11 +931,17 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_STY:
 	    if (E->AM == AM65_ZP) {
-	     	if (E->Chg & REG_SREG_LO) {
-	     	    Out->SRegLo = In->RegY;
-	     	} else if (E->Chg & REG_SREG_HI) {
-	     	    Out->SRegHi = In->RegY;
-	     	}
+		switch (GetReg (E->Chg, 0)) {
+		    case REG_TMP1:
+			Out->Tmp1 = In->RegY;
+			break;
+		    case REG_SREG_LO:
+			Out->SRegLo = In->RegY;
+			break;
+		    case REG_SREG_HI:
+			Out->SRegHi = In->RegY;
+			break;
+		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
                 RC_InvalidateZP (Out);
@@ -801,11 +950,17 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 
 	case OP65_STZ:
 	    if (E->AM == AM65_ZP) {
-	     	if (E->Chg & REG_SREG_LO) {
-	     	    Out->SRegLo = 0;
-	     	} else if (E->Chg & REG_SREG_HI) {
-	     	    Out->SRegHi = 0;
-	     	}
+		switch (GetReg (E->Chg, 0)) {
+		    case REG_TMP1:
+			Out->Tmp1 = 0;
+			break;
+		    case REG_SREG_LO:
+			Out->SRegLo = 0;
+			break;
+		    case REG_SREG_HI:
+		    	Out->SRegHi = 0;
+			break;
+		}
 	    } else if (E->AM == AM65_ZPX) {
                 /* Invalidates all ZP registers */
                 RC_InvalidateZP (Out);
@@ -821,13 +976,69 @@ void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
 	    break;
 
 	case OP65_TRB:
-	    /* For now... */
-	    Out->RegA = -1;
+	    if (E->AM == AM65_ZPX) {
+	     	/* Invalidates all ZP registers */
+	    	RC_InvalidateZP (Out);
+	    } else if (E->AM == AM65_ZP) {
+	    	if (In->RegA >= 0) {
+		    switch (GetReg (E->Chg, In)) {
+			case REG_TMP1:
+			    Out->Tmp1 &= ~In->RegA;
+			    break;
+			case REG_SREG_LO:
+			    Out->SRegLo &= ~In->RegA;
+			    break;
+			case REG_SREG_HI:
+			    Out->SRegHi &= ~In->RegA;
+			    break;
+		    }
+	    	} else {
+		    switch (GetReg (E->Chg, In)) {
+			case REG_TMP1:
+			    Out->Tmp1 = -1;
+			    break;
+			case REG_SREG_LO:
+			    Out->SRegLo = -1;
+			    break;
+			case REG_SREG_HI:
+			    Out->SRegHi = -1;
+			    break;
+		    }
+	    	}
+	    }
 	    break;
 
 	case OP65_TSB:
-	    /* For now... */
-	    Out->RegA = -1;
+	    if (E->AM == AM65_ZPX) {
+	     	/* Invalidates all ZP registers */
+	    	RC_InvalidateZP (Out);
+	    } else if (E->AM == AM65_ZP) {
+	    	if (In->RegA >= 0) {
+		    switch (GetReg (E->Chg, In)) {
+			case REG_TMP1:
+			    Out->Tmp1 |= In->RegA;
+			    break;
+			case REG_SREG_LO:
+			    Out->SRegLo |= In->RegA;
+			    break;
+			case REG_SREG_HI:
+			    Out->SRegHi |= In->RegA;
+			    break;
+		    }
+	    	} else {
+		    switch (GetReg (E->Chg, In)) {
+			case REG_TMP1:
+			    Out->Tmp1 = -1;
+			    break;
+			case REG_SREG_LO:
+			    Out->SRegLo = -1;
+			    break;
+			case REG_SREG_HI:
+			    Out->SRegHi = -1;
+			    break;
+		    }
+	    	}
+	    }
 	    break;
 
 	case OP65_TSX:

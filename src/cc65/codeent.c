@@ -161,7 +161,7 @@ static void SetUseChgInfo (CodeEntry* E, const OPCDesc* D)
 
 
 CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
-			 CodeLabel* JumpTo, LineInfo* LI)
+	   		 CodeLabel* JumpTo, LineInfo* LI)
 /* Create a new code entry, initialize and return it */
 {
     /* Get the opcode description */
@@ -179,6 +179,7 @@ CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
     E->Size   = GetInsnSize (E->OPC, E->AM);
     E->JumpTo = JumpTo;
     E->LI     = UseLineInfo (LI);
+    E->RI     = 0;
     SetUseChgInfo (E, D);
     InitCollection (&E->Labels);
 
@@ -204,6 +205,9 @@ void FreeCodeEntry (CodeEntry* E)
 
     /* Release the line info */
     ReleaseLineInfo (E->LI);
+
+    /* Delete the register info */
+    CE_FreeRegInfo (E);
 
     /* Free the entry */
     xfree (E);
@@ -273,6 +277,384 @@ void CE_SetArg (CodeEntry* E, const char* Arg)
 
 
 
+int CE_KnownImm (const CodeEntry* E)
+/* Return true if the argument of E is a known immediate value */
+{
+    return (E->AM == AM65_IMM && (E->Flags & CEF_NUMARG) != 0);
+}
+
+
+
+void CE_FreeRegInfo (CodeEntry* E)
+/* Free an existing register info struct */
+{
+    if (E->RI) {
+	FreeRegInfo (E->RI);
+	E->RI = 0;
+    }
+}
+
+
+
+void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs)
+/* Generate register info for this instruction. If an old info exists, it is
+ * overwritten.
+ */
+{
+    /* Pointers to the register contents */
+    RegContents* In;
+    RegContents* Out;
+
+    /* Function register usage */
+    unsigned char Use, Chg;
+
+    /* If we don't have a register info struct, allocate one. */
+    if (E->RI == 0) {
+	E->RI = NewRegInfo (InputRegs);
+    } else {
+	if (InputRegs) {
+	    E->RI->In  = *InputRegs;
+	} else {
+	    RC_Invalidate (&E->RI->In);
+	}
+	E->RI->Out = E->RI->In;
+    }
+
+    /* Get pointers to the register contents */
+    In  = &E->RI->In;
+    Out	= &E->RI->Out;
+
+    /* Handle the different instructions */
+    switch (E->OPC) {
+
+	case OP65_ADC:
+	    /* We don't know the value of the carry, so the result is
+	     * always unknown.
+	     */
+	    Out->RegA = -1;
+	    break;
+
+	case OP65_AND:
+       	    if (In->RegA >= 0) {
+		if (CE_KnownImm (E)) {
+		    Out->RegA = In->RegA & (short) E->Num;
+		} else {
+		    Out->RegA = -1;
+		}
+	    }
+	    break;
+
+	case OP65_ASL:
+	    if (E->AM == AM65_ACC && In->RegA >= 0) {
+		Out->RegA = (In->RegA << 1) & 0xFF;
+	    }
+	    break;
+
+	case OP65_BCC:
+	    break;
+
+	case OP65_BCS:
+	    break;
+
+	case OP65_BEQ:
+	    break;
+
+	case OP65_BIT:
+	    break;
+
+	case OP65_BMI:
+	    break;
+
+	case OP65_BNE:
+	    break;
+
+	case OP65_BPL:
+	    break;
+
+	case OP65_BRA:
+	    break;
+
+	case OP65_BRK:
+	    break;
+
+	case OP65_BVC:
+	    break;
+
+	case OP65_BVS:
+	    break;
+
+	case OP65_CLC:
+	    break;
+
+	case OP65_CLD:
+	    break;
+
+	case OP65_CLI:
+	    break;
+
+	case OP65_CLV:
+	    break;
+
+	case OP65_CMP:
+	    break;
+
+	case OP65_CPX:
+	    break;
+
+	case OP65_CPY:
+	    break;
+
+	case OP65_DEA:
+	    if (In->RegA >= 0) {
+	    	Out->RegA = In->RegA - 1;
+	    }
+	    break;
+
+	case OP65_DEC:
+	    if (E->AM == AM65_ACC && In->RegA >= 0) {
+	    	Out->RegA = In->RegA - 1;
+	    }
+	    break;
+
+	case OP65_DEX:
+       	    if (In->RegX >= 0) {
+	    	Out->RegX = In->RegX - 1;
+	    }
+	    break;
+
+	case OP65_DEY:
+       	    if (In->RegY >= 0) {
+	    	Out->RegY = In->RegY - 1;
+	    }
+	    break;
+
+	case OP65_EOR:
+       	    if (In->RegA >= 0) {
+		if (CE_KnownImm (E)) {
+		    Out->RegA = In->RegA ^ (short) E->Num;
+		} else {
+		    Out->RegA = -1;
+		}
+	    }
+	    break;
+
+	case OP65_INA:
+	    if (In->RegA >= 0) {
+		Out->RegA = In->RegA + 1;
+	    }
+	    break;
+
+	case OP65_INC:
+	    if (E->AM == AM65_ACC && In->RegA >= 0) {
+		Out->RegA = In->RegA + 1;
+	    }
+	    break;
+
+	case OP65_INX:
+	    if (In->RegX >= 0) {
+		Out->RegX = In->RegX + 1;
+	    }
+	    break;
+
+	case OP65_INY:
+	    if (In->RegY >= 0) {
+		Out->RegY = In->RegY + 1;
+	    }
+	    break;
+
+	case OP65_JCC:
+	    break;
+
+	case OP65_JCS:
+	    break;
+
+	case OP65_JEQ:
+	    break;
+
+	case OP65_JMI:
+	    break;
+
+	case OP65_JMP:
+	    break;
+
+	case OP65_JNE:
+	    break;
+
+	case OP65_JPL:
+	    break;
+
+	case OP65_JSR:
+	    /* Get the code info for the function */
+	    GetFuncInfo (E->Arg, &Use, &Chg);
+	    if (Chg & REG_A) {
+		Out->RegA = -1;
+	    }
+	    if (Chg & REG_X) {
+		Out->RegX = -1;
+	    }
+	    if (Chg & REG_Y) {
+		Out->RegY = -1;
+	    }
+	    break;
+
+	case OP65_JVC:
+	    break;
+
+	case OP65_JVS:
+	    break;
+
+	case OP65_LDA:
+	    if (CE_KnownImm (E)) {
+		Out->RegA = (unsigned char) E->Num;
+	    } else {
+		/* A is now unknown */
+		Out->RegA = -1;
+	    }
+	    break;
+
+	case OP65_LDX:
+	    if (CE_KnownImm (E)) {
+		Out->RegX = (unsigned char) E->Num;
+	    } else {
+		/* X is now unknown */
+		Out->RegX = -1;
+	    }
+	    break;
+
+	case OP65_LDY:
+	    if (CE_KnownImm (E)) {
+		Out->RegY = (unsigned char) E->Num;
+	    } else {
+		/* Y is now unknown */
+		Out->RegY = -1;
+	    }
+	    break;
+
+	case OP65_LSR:
+	    if (E->AM == AM65_ACC && In->RegA >= 0) {
+		Out->RegA = (In->RegA >> 1) & 0xFF;
+	    }
+	    break;
+
+	case OP65_NOP:
+	    break;
+
+	case OP65_ORA:
+	    if (In->RegA >= 0) {
+		if (CE_KnownImm (E)) {
+		    Out->RegA = In->RegA | (short) E->Num;
+		} else {
+		    /* A is now unknown */
+		    Out->RegA = -1;
+		}
+	    }
+	    break;
+
+	case OP65_PHA:
+	    break;
+
+	case OP65_PHP:
+	    break;
+
+	case OP65_PHX:
+	    break;
+
+	case OP65_PHY:
+	    break;
+
+	case OP65_PLA:
+	    Out->RegA = -1;
+	    break;
+
+	case OP65_PLP:
+	    break;
+
+	case OP65_PLX:
+	    Out->RegX = -1;
+	    break;
+
+	case OP65_PLY:
+	    Out->RegY = -1;
+	    break;
+
+	case OP65_ROL:
+	    Out->RegA = -1;
+	    break;
+
+	case OP65_ROR:
+	    Out->RegA = -1;
+	    break;
+
+	case OP65_RTI:
+	    break;
+
+	case OP65_RTS:
+	    break;
+
+	case OP65_SBC:
+	    /* We don't know the value of the carry bit */
+	    Out->RegA = -1;
+	    break;
+
+	case OP65_SEC:
+	    break;
+
+	case OP65_SED:
+	    break;
+
+	case OP65_SEI:
+	    break;
+
+	case OP65_STA:
+	    break;
+
+	case OP65_STX:
+	    break;
+
+	case OP65_STY:
+	    break;
+
+	case OP65_TAX:
+	    Out->RegX = In->RegA;
+	    break;
+
+	case OP65_TAY:
+	    Out->RegY = In->RegA;
+	    break;
+
+	case OP65_TRB:
+	    /* For now... */
+	    Out->RegA = -1;
+	    break;
+
+	case OP65_TSB:
+	    /* For now... */
+	    Out->RegA = -1;
+	    break;
+
+	case OP65_TSX:
+	    Out->RegX = -1;
+	    break;
+
+	case OP65_TXA:
+	    Out->RegA = In->RegX;
+	    break;
+
+	case OP65_TXS:
+	    break;
+
+	case OP65_TYA:
+	    Out->RegA = In->RegY;
+	    break;
+
+	default:
+	    break;
+
+    }
+}
+
+
+
 void CE_Output (const CodeEntry* E, FILE* F)
 /* Output the code entry to a file */
 {
@@ -311,7 +693,7 @@ void CE_Output (const CodeEntry* E, FILE* F)
     	    /* immidiate */
     	    Chars += fprintf (F, "%*s#%s", 9-Chars, "", E->Arg);
     	    break;
-		    
+
 	case AM_ABS:
     	case AM65_ZP:
     	case AM65_ABS:

@@ -58,6 +58,7 @@ OBJS =	anonname.o	\
 	opcodes.o	\
 	preproc.o      	\
 	pragma.o       	\
+	reginfo.o	\
     	scanner.o      	\
 	segments.o	\
     	stdfunc.o	\

@@ -57,20 +57,6 @@
 
 
 /*****************************************************************************/
-/*				    Helpers                                  */
-/*****************************************************************************/
-
-
-
-static int IsKnownImm (const CodeEntry* E)
-/* Return true if the argument of E is a known immediate value */
-{
-    return (E->AM == AM65_IMM && (E->Flags & CEF_NUMARG) != 0);
-}
-
-
-
-/*****************************************************************************/
 /*			  Replace jumps to RTS by RTS			     */
 /*****************************************************************************/
 
@@ -670,310 +656,54 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 /* Remove loads of registers where the value loaded is already in the register. */
 {
     unsigned Changes = 0;
+    unsigned I;
 
-    /* Remember the last load instructions for all registers */
-    int RegA = -1;
-    int RegX = -1;
-    int RegY = -1;
+    /* Generate register info for this step */
+    CS_GenRegInfo (S);
 
     /* Walk over the entries */
-    unsigned I = 0;
+    I = 0;
     while (I < CS_GetEntryCount (S)) {
 
-	unsigned char Use, Chg;
-	CodeEntry* N;
+    	CodeEntry* N;
 
       	/* Get next entry */
        	CodeEntry* E = CS_GetEntry (S, I);
 
-	/* Assume we won't delete the entry */
-	int Delete = 0;
-
-      	/* If this entry has a label attached, remove all knownledge about the
-       	 * register contents. This may be improved but for now it's ok.
-      	 */
-      	if (CE_HasLabel (E)) {
-      	    RegA = RegX = RegY = -1;
-      	}
+    	/* Assume we won't delete the entry */
+    	int Delete = 0;
 
 	/* Handle the different instructions */
 	switch (E->OPC) {
 
-	    case OP65_ADC:
-	        /* We don't know the value of the carry, so the result is
-		 * always unknown.
-		 */
-	        RegA = -1;
-	        break;
-
-	    case OP65_AND:
-	        if (RegA >= 0) {
-       	       	    if (IsKnownImm (E)) {
-		    	RegA &= (int) E->Num;
-		    } else {
-		    	RegA = -1;
-		    }
-	    	}
-	        break;
-
-	    case OP65_ASL:
-	        if (RegA >= 0) {
-		    RegA = (RegA << 1) & 0xFF;
-		}
-	        break;
-
-	    case OP65_BCC:
-	        break;
-
-	    case OP65_BCS:
-	        break;
-
-	    case OP65_BEQ:
-	        break;
-
-	    case OP65_BIT:
-	        break;
-
-	    case OP65_BMI:
-	        break;
-
-	    case OP65_BNE:
-	        break;
-
-	    case OP65_BPL:
-	        break;
-
-	    case OP65_BRA:
-	        break;
-
-	    case OP65_BRK:
-	        break;
-
-	    case OP65_BVC:
-	        break;
-
-	    case OP65_BVS:
-	        break;
-
-	    case OP65_CLC:
-	        break;
-
-	    case OP65_CLD:
-	        break;
-
-	    case OP65_CLI:
-	        break;
-
-	    case OP65_CLV:
-	        break;
-
-	    case OP65_CMP:
-	        break;
-
-	    case OP65_CPX:
-	        break;
-
-	    case OP65_CPY:
-	        break;
-
-	    case OP65_DEA:
-	        DEC (RegA, 1);
-	        break;
-
-	    case OP65_DEC:
-	        break;
-
-	    case OP65_DEX:
-		DEC (RegX, 1);
-	        break;
-
-	    case OP65_DEY:
-	        DEC (RegY, 1);
-	        break;
-
-	    case OP65_EOR:
-	        if (RegA >= 0) {
-       	       	    if (IsKnownImm (E)) {
-       	       	       	RegA ^= (int) E->Num;
-		    } else {
-			RegA = -1;
-	       	    }
-		}
-	        break;
-
-	    case OP65_INA:
-	        INC (RegA, 1);
-	        break;
-
-	    case OP65_INC:
-	        break;
-
-	    case OP65_INX:
-	        INC (RegX, 1);
-	        break;
-
-	    case OP65_INY:
-	        INC (RegY, 1);
-	        break;
-
-	    case OP65_JCC:
-	        break;
-
-	    case OP65_JCS:
-	        break;
-
-	    case OP65_JEQ:
-	        break;
-
-	    case OP65_JMI:
-	        break;
-
-	    case OP65_JMP:
-	        break;
-
-	    case OP65_JNE:
-	        break;
-
-	    case OP65_JPL:
-	        break;
-
-	    case OP65_JSR:
-	        /* Get the code info for the function */
-	        GetFuncInfo (E->Arg, &Use, &Chg);
-	        if (Chg & REG_A) {
-		    RegA = -1;
-		}
-	        if (Chg & REG_X) {
-		    RegX = -1;
-		}
-	        if (Chg & REG_Y) {
-		    RegY = -1;
-		}
-	        break;
-
-	    case OP65_JVC:
-	        break;
-
-	    case OP65_JVS:
-	        break;
-
 	    case OP65_LDA:
-	        if (IsKnownImm (E)) {
-		    N = CS_GetNextEntry (S, I);
-		    if (RegA >= 0 && RegA == E->Num && N && (N->Info & OF_FBRA) == 0) {
-		     	Delete = 1;
-		    } else {
-		     	RegA = (unsigned char) E->Num;
-		    }
-		} else {
-		    /* A is now unknown */
-		    RegA = -1;
+	        if (E->RI->In.RegA >= 0               && /* Value of A is known */
+       		    CE_KnownImm (E)                   && /* Value to be loaded is known */
+       	       	    E->RI->In.RegA == E->Num          && /* Both are equal */
+       	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
+		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
+		    Delete = 1;
 		}
 	        break;
 
 	    case OP65_LDX:
-	        if (IsKnownImm (E)) {
-		    N = CS_GetNextEntry (S, I);
-       	       	    if (RegX >= 0 && RegX == E->Num && N && (N->Info & OF_FBRA) == 0) {
-		     	Delete = 1;
-		    } else {
-		     	RegX = (unsigned char) E->Num;
-		    }
-		} else {
-		    /* X is now unknown */
-		    RegX = -1;
+       	        if (E->RI->In.RegX >= 0               && /* Value of X is known */
+		    CE_KnownImm (E)                   && /* Value to be loaded is known */
+		    E->RI->In.RegX == E->Num          && /* Both are equal */
+       	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
+		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
+		    Delete = 1;
 		}
 	        break;
 
 	    case OP65_LDY:
-	        if (IsKnownImm (E)) {
-		    N = CS_GetNextEntry (S, I);
-       	       	    if (RegY >= 0 && RegY == E->Num && N && (N->Info & OF_FBRA) == 0) {
-	    	     	Delete = 1;
-	    	    } else {
-		     	RegY = (unsigned char) E->Num;
-		    }
-		} else {
-		    /* Y is now unknown */
-		    RegY = -1;
+       	        if (E->RI->In.RegY >= 0               && /* Value of Y is known */
+		    CE_KnownImm (E)                   && /* Value to be loaded is known */
+		    E->RI->In.RegY == E->Num          && /* Both are equal */
+       	       	    (N = CS_GetNextEntry (S, I)) != 0 && /* There is a next entry */
+		    (N->Info & OF_FBRA) == 0) {	       	 /* Which is not a cond branch */
+		    Delete = 1;
 		}
-	        break;
-
-	    case OP65_LSR:
-	        if (RegA >= 0) {
-		    RegA = (RegA >> 1) & 0xFF;
-		}
-	        break;
-
-	    case OP65_NOP:
-	        break;
-
-	    case OP65_ORA:
-	        if (RegA >= 0) {
-		    if (IsKnownImm (E)) {
-			RegA |= (unsigned char) E->Num;
-		    } else {
-		 	/* A is now unknown */
-		 	RegA = -1;
-		    }
-		}
-	        break;
-
-	    case OP65_PHA:
-	        break;
-
-	    case OP65_PHP:
-	        break;
-
-	    case OP65_PHX:
-	        break;
-
-	    case OP65_PHY:
-	        break;
-
-	    case OP65_PLA:
-	        RegA = -1;
-	        break;
-
-	    case OP65_PLP:
-	        break;
-
-	    case OP65_PLX:
-	        RegX = -1;
-	        break;
-
-	    case OP65_PLY:
-	        RegY = -1;
-	        break;
-
-	    case OP65_ROL:
-	        RegA = -1;
-	        break;
-
-	    case OP65_ROR:
-	        RegA = -1;
-	        break;
-
-	    case OP65_RTI:
-	        break;
-
-	    case OP65_RTS:
-	        break;
-
-	    case OP65_SBC:
-	        RegA = -1;
-	        break;
-
-	    case OP65_SEC:
-	        break;
-
-	    case OP65_SED:
-	        break;
-
-	    case OP65_SEI:
-	        break;
-
-	    case OP65_STA:
 	        break;
 
 	    case OP65_STX:
@@ -983,11 +713,13 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 		 * later. STX does support the zeropage,y addressing mode,
 		 * so be sure to check for that.
 		 */
-	        if (RegX >= 0 && RegX == RegA &&
-		    E->AM != AM65_ABSY && E->AM != AM65_ZPY) {
+       	        if (E->RI->In.RegX >= 0               &&
+		    E->RI->In.RegX == E->RI->In.RegA  &&
+		    E->AM != AM65_ABSY                &&
+		    E->AM != AM65_ZPY) {
 		    /* Use the A register instead */
-		    CE_ReplaceOPC (E, OP65_STA);
-		}
+       		    CE_ReplaceOPC (E, OP65_STA);
+		}				
 	        break;
 
 	    case OP65_STY:
@@ -998,65 +730,54 @@ unsigned OptDuplicateLoads (CodeSeg* S)
 		 * replacement by X, but check for invalid addressing modes
 		 * in this case.
 		 */
-       	        if (RegY >= 0) {
-		    if (RegY == RegA) {
-			CE_ReplaceOPC (E, OP65_STA);
-		    } else if (RegY == RegX && E->AM != AM65_ABSX && E->AM != AM65_ZPX) {
-			CE_ReplaceOPC (E, OP65_STX);
+       	        if (E->RI->In.RegY >= 0) {
+		    if (E->RI->In.RegY == E->RI->In.RegA) {
+		    	CE_ReplaceOPC (E, OP65_STA);
+		    } else if (E->RI->In.RegY == E->RI->In.RegX &&
+			       E->AM != AM65_ABSX               &&
+			       E->AM != AM65_ZPX) {
+		    	CE_ReplaceOPC (E, OP65_STX);
 		    }
 		}
 	        break;
 
 	    case OP65_TAX:
-		N = CS_GetNextEntry (S, I);
-		if (RegA >= 0 && RegA == RegX && N && (N->Info & OF_FBRA) == 0) {
+                if (E->RI->In.RegA >= 0                 &&
+		    E->RI->In.RegA == E->RI->In.RegX    &&
+		    (N = CS_GetNextEntry (S, I)) != 0   &&
+		    (N->Info & OF_FBRA) == 0) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
-		} else {
-		    RegX = RegA;
 		}
 	        break;
 
 	    case OP65_TAY:
-	       	N = CS_GetNextEntry (S, I);
-       	       	if (RegA >= 0 && RegA == RegY && N && (N->Info & OF_FBRA) == 0) {
+                if (E->RI->In.RegA >= 0                 &&
+		    E->RI->In.RegA == E->RI->In.RegY    &&
+		    (N = CS_GetNextEntry (S, I)) != 0   &&
+		    (N->Info & OF_FBRA) == 0) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
-		} else {
-		    RegY = RegA;
 		}
 	        break;
 
-	    case OP65_TRB:
-	        break;
-
-	    case OP65_TSB:
-	        break;
-
-	    case OP65_TSX:
-	        RegX = -1;
-	        break;
-
-	    case OP65_TXA:
-		N = CS_GetNextEntry (S, I);
-       	       	if (RegX >= 0 && RegX == RegA && N && (N->Info & OF_FBRA) == 0) {
+       	    case OP65_TXA:
+                if (E->RI->In.RegX >= 0                 &&
+		    E->RI->In.RegX == E->RI->In.RegA    &&
+		    (N = CS_GetNextEntry (S, I)) != 0   &&
+		    (N->Info & OF_FBRA) == 0) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
-		} else {
-		    RegA = RegX;
 		}
-	        break;
-
-	    case OP65_TXS:
 	        break;
 
 	    case OP65_TYA:
-		N = CS_GetNextEntry (S, I);
-       	       	if (RegY >= 0 && RegY == RegA && N && (N->Info & OF_FBRA) == 0) {
+                if (E->RI->In.RegY >= 0                 &&
+		    E->RI->In.RegY == E->RI->In.RegA    &&
+		    (N = CS_GetNextEntry (S, I)) != 0   &&
+		    (N->Info & OF_FBRA) == 0) {
 		    /* Value is identical and not followed by a branch */
 		    Delete = 1;
-		} else {
-		    RegA = RegY;
 		}
 	        break;
 

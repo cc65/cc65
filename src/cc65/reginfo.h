@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   codelab.h				     */
+/*				   reginfo.h                                 */
 /*                                                                           */
-/*			     Code label structure			     */
+/*			  6502 register tracking info                        */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2001      Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -33,92 +33,62 @@
 
 
 
-#ifndef CODELAB_H
-#define CODELAB_H
+#ifndef REGINFO_H
+#define REGINFO_H
 
 
-
-#include <stdio.h>
 
 /* common */
-#include "coll.h"
+#include "inline.h"
 
 
 
 /*****************************************************************************/
-/*				   Forwards				     */
+/*  	       	   	  	     Data				     */
 /*****************************************************************************/
 
 
 
-struct CodeEntry;
+/* Register contents */
+typedef struct RegContents RegContents;
+struct RegContents {
+    short      	RegA;
+    short       RegX;
+    short       RegY;
+    short       SRegLo;
+    short       SRegHi;
+};
 
-
-
-/*****************************************************************************/
-/*		  	       struct CodeLabel				     */
-/*****************************************************************************/
-
-
-
-/* Label structure */
-typedef struct CodeLabel CodeLabel;
-struct CodeLabel {
-    CodeLabel*		Next;		/* Next in hash list */
-    char*		Name;		/* Label name */
-    unsigned            Hash;		/* Hash over the name */
-    struct CodeEntry*	Owner;		/* Owner entry */
-    Collection	    	JumpFrom;	/* Entries that jump here */
+/* Register change info */
+typedef struct RegInfo RegInfo;
+struct RegInfo {
+    RegContents	In;                     /* Incoming register values */
+    RegContents Out;                    /* Outgoing register values */
 };
 
 
 
 /*****************************************************************************/
-/*     	       	      	  	     Code			     	     */
+/*     	       	      	   	     Code		    		     */
 /*****************************************************************************/
 
 
 
-CodeLabel* NewCodeLabel (const char* Name, unsigned Hash);
-/* Create a new code label, initialize and return it */
+void RC_Invalidate (RegContents* C);
+/* Invalidate all registers */
 
-void FreeCodeLabel (CodeLabel* L);
-/* Free the given code label */
-
-#if defined(HAVE_INLINE)
-INLINE unsigned CL_GetRefCount (const CodeLabel* L)
-/* Get the number of references for this label */
-{
-    return CollCount (&L->JumpFrom);
-}
-#else
-#  define CL_GetRefCount(L)    	CollCount (&(L)->JumpFrom)
-#endif
-
-#if defined(HAVE_INLINE)
-INLINE struct CodeEntry* CL_GetRef (CodeLabel* L, unsigned Index)
-/* Get a code entry referencing this label */
-{
-    return CollAt (&L->JumpFrom, Index);
-}
-#else
-#  define CL_GetRef(L, Index)  	CollAt (&(L)->JumpFrom, (Index))
-#endif
-
-void CL_AddRef (CodeLabel* L, struct CodeEntry* E);
-/* Let the CodeEntry E reference the label L */
-
-void CL_MoveRefs (CodeLabel* OldLabel, CodeLabel* NewLabel);
-/* Move all references to OldLabel to point to NewLabel. OldLabel will have no
- * more references on return.
+RegInfo* NewRegInfo (const RegContents* RC);
+/* Allocate a new register info, initialize and return it. If RC is not
+ * a NULL pointer, it is used to initialize both, the input and output
+ * registers. If the pointer is NULL, all registers are set to unknown.
  */
 
-void CL_Output (const CodeLabel* L, FILE* F);
-/* Output the code label to a file */
+void FreeRegInfo (RegInfo* RI);
+/* Free a RegInfo struct */
 
 
 
-/* End of codelab.h */
+/* End of reginfo.h */
 #endif
 
 

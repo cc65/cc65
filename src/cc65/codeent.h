@@ -48,6 +48,7 @@
 #include "codelab.h"
 #include "lineinfo.h"
 #include "opcodes.h"
+#include "reginfo.h"
 
 
 
@@ -76,6 +77,7 @@ struct CodeEntry {
     CodeLabel*	     	JumpTo;		/* Jump label */
     Collection	     	Labels;		/* Labels for this instruction */
     LineInfo*           LI;             /* Source line info for this insn */
+    RegInfo*            RI;             /* Register info for this insn */
 };
 
 
@@ -87,7 +89,7 @@ struct CodeEntry {
 
 
 CodeEntry* NewCodeEntry (opc_t OPC, am_t AM, const char* Arg,
-	       		 CodeLabel* JumpTo, LineInfo* LI);
+	       	    	 CodeLabel* JumpTo, LineInfo* LI);
 /* Create a new code entry, initialize and return it */
 
 void FreeCodeEntry (CodeEntry* E);
@@ -170,6 +172,17 @@ INLINE void CE_ResetMark (CodeEntry* E)
 void CE_SetArg (CodeEntry* E, const char* Arg);
 /* Set a new argument for the given code entry. An old string is deleted. */
 
+int CE_KnownImm (const CodeEntry* E);
+/* Return true if the argument of E is a known immediate value */
+
+void CE_FreeRegInfo (CodeEntry* E);
+/* Free an existing register info struct */
+
+void CE_GenRegInfo (CodeEntry* E, RegContents* InputRegs);
+/* Generate register info for this instruction. If an old info exists, it is
+ * overwritten.
+ */
+
 void CE_Output (const CodeEntry* E, FILE* F);
 /* Output the code entry to a file */
 
@@ -180,4 +193,4 @@ void CE_Output (const CodeEntry* E, FILE* F);
 
 
 
-	 
+

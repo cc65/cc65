@@ -215,6 +215,12 @@ INLINE unsigned CS_GetEntryCount (const CodeSeg* S)
 #  define CS_GetEntryCount(S)	CollCount (&(S)->Entries)
 #endif
 
+void CS_FreeRegInfo (CodeSeg* S);
+/* Free register infos for all instructions */
+
+void CS_GenRegInfo (CodeSeg* S);
+/* Generate register infos for all instructions */
+
 
 
 /* End of codeseg.h */

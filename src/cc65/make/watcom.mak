@@ -103,6 +103,7 @@ OBJS =	anonname.obj	\
 	opcodes.obj	\
 	preproc.obj	\
 	pragma.obj	\
+	reginfo.obj	\
     	scanner.obj	\
 	segments.obj	\
     	stdfunc.obj	\
@@ -170,6 +171,7 @@ FILE main.obj
 FILE opcodes.obj
 FILE preproc.obj
 FILE pragma.obj
+FILE reginfo.obj
 FILE scanner.obj
 FILE segments.obj
 FILE stdfunc.obj

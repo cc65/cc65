@@ -63,7 +63,7 @@
 
 
 static void CS_MoveLabelsToEntry (CodeSeg* S, CodeEntry* E)
-/* Move all labels from the label pool to the given entry and remove them 
+/* Move all labels from the label pool to the given entry and remove them
  * from the pool.
  */
 {
@@ -545,7 +545,7 @@ void CS_DelEntry (CodeSeg* S, unsigned Index)
     FreeCodeEntry (E);
 }
 
-		   
+
 
 void CS_DelEntries (CodeSeg* S, unsigned Start, unsigned Count)
 /* Delete a range of code entries. This includes removing references to labels,
@@ -998,6 +998,106 @@ void CS_Output (const CodeSeg* S, FILE* F)
     }
 }
 
+
+
+void CS_FreeRegInfo (CodeSeg* S)
+/* Free register infos for all instructions */
+{
+    unsigned I;
+    for (I = 0; I < CS_GetEntryCount (S); ++I) {
+        CE_FreeRegInfo (CS_GetEntry(S, I));
+    }
+}
+
+
+
+void CS_GenRegInfo (CodeSeg* S)
+/* Generate register infos for all instructions */
+{
+    unsigned I;
+    RegContents Regs;
+    RegContents* CurrentRegs;
+    int WasJump;
+
+    /* Be sure to delete all register infos */
+    CS_FreeRegInfo (S);
+
+    /* On entry, the register contents are unknown */
+    RC_Invalidate (&Regs);
+    CurrentRegs = &Regs;
+
+    /* First pass. Walk over all insns an note just the changes from one
+     * insn to the next one.
+     */
+    WasJump = 0;
+    for (I = 0; I < CS_GetEntryCount (S); ++I) {
+
+     	/* Get the next instruction */
+     	CodeEntry* E = CollAtUnchecked (&S->Entries, I);
+
+     	/* If the instruction has a label, we need some special handling */
+	unsigned LabelCount = CE_GetLabelCount (E);
+     	if (LabelCount > 0) {
+
+	    /* Loop over all entry points that jump here. If these entry
+	     * points already have register info, check if all values are
+	     * known and identical. If all values are identical, and the
+	     * preceeding instruction was not an unconditional branch, check
+	     * if the register value on exit of the preceeding instruction
+	     * is also identical. If all these values are identical, the
+	     * value of a register is known, otherwise it is unknown.
+	     */
+	    CodeLabel* Label = CE_GetLabel (E, 0);
+	    unsigned Entry;
+	    if (WasJump) {
+	     	/* Preceeding insn was an unconditional branch */
+	     	CodeEntry* J = CL_GetRef(Label, 0);
+		if (J->RI) {
+		    Regs = J->RI->Out;
+		} else {
+		    RC_Invalidate (&Regs);
+		}
+	     	Entry = 1;
+	    } else {
+	     	Regs = *CurrentRegs;
+	     	Entry = 0;
+	    }
+
+	    while (Entry < CL_GetRefCount (Label)) {
+		/* Get this entry */
+		CodeEntry* J = CL_GetRef (Label, Entry);
+		if (J->RI == 0) {
+		    /* No register info for this entry, bail out */
+		    RC_Invalidate (&Regs);
+		    break;
+		}
+		if (J->RI->Out.RegA != Regs.RegA) {
+		    Regs.RegA = -1;
+		}
+		if (J->RI->Out.RegX != Regs.RegX) {
+		    Regs.RegX = -1;
+		}
+		if (J->RI->Out.RegY != Regs.RegY) {
+		    Regs.RegY = -1;
+		}
+		++Entry;
+	    }
+
+	    /* Use this register info */
+	    CurrentRegs = &Regs;
+
+     	}
+
+     	/* Generate register info for this instruction */
+        CE_GenRegInfo (E, CurrentRegs);
+
+     	/* Output registers for this insn are input for the next */
+     	CurrentRegs = &E->RI->Out;
+
+	/* Remember for the next insn if this insn was an uncondition branch */
+	WasJump = (E->Info & OF_UBRA) != 0;
+    }
+}
 
 
 

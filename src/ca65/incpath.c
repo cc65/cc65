@@ -38,7 +38,6 @@
 #if defined(_MSC_VER)
 /* Microsoft compiler */
 #  include <io.h>
-#  define R_OK	4
 #else
 /* Anyone else */
 #  include <unistd.h>
@@ -137,10 +136,10 @@ static char* Find (const char* Path, const char* File)
      	strcpy (PathName + Count, File);
 
      	/* Check if this file exists */
-     	if (access (PathName, R_OK) == 0) {
+     	if (access (PathName, 0) == 0) {
      	    /* The file exists */
      	    return xstrdup (PathName);
-     	}		   
+     	}
 
      	/* Skip a list separator if we have one */
      	if (*P == ';') {

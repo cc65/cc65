@@ -101,7 +101,7 @@ static char* ErrMsg [ERR_COUNT-1] = {
     "`\"' or `<' expected",
     "Missing terminator or name too long",
     "Include file `%s' not found",
-    "Open failure on include file `%s'",
+    "Cannot open include file `%s': %s",
     "Invalid #error directive",
     "#error: %s",
     "Unexpected `#endif'",

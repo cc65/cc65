@@ -156,7 +156,7 @@ void OpenIncludeFile (const char* Name, unsigned DirSpec)
     F = fopen (N, "r");
     if (F == 0) {
 	/* Error opening the file */
-	PPError (ERR_INCLUDE_OPEN_FAILURE, N);
+	PPError (ERR_INCLUDE_OPEN_FAILURE, N, strerror (errno));
 	xfree (N);
 	return;
     }

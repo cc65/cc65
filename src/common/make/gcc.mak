@@ -23,6 +23,7 @@ OBJS =	abend.o		\
         matchpat.o      \
 	print.o		\
         segdefs.o       \
+        segnames.o      \
 	strbuf.o	\
 	strutil.o	\
 	target.o	\

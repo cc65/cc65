@@ -99,9 +99,6 @@ void FreeSegDef (SegDef* D);
 SegDef* DupSegDef (const SegDef* D);
 /* Duplicate a segment definition and return it */
 
-int ValidSegName (const char* Name);
-/* Return true if the given segment name is valid, return false otherwise */
-
 
 
 /* End of segdefs.h */

@@ -33,10 +33,7 @@
 
 
 
-#include <string.h>
-
 /* common */
-#include "chartype.h"
 #include "xmalloc.h"
 #include "segdefs.h"
 
@@ -79,27 +76,6 @@ SegDef* DupSegDef (const SegDef* Def)
 /* Duplicate a segment definition and return it */
 {
     return NewSegDef (Def->Name, Def->Type);
-}
-
-
-
-int ValidSegName (const char* Name)
-/* Return true if the given segment name is valid, return false otherwise */
-{
-    /* Must start with '_' or a letter */
-    if ((*Name != '_' && !IsAlpha(*Name)) || strlen(Name) > 80) {
-       	return 0;
-    }
-
-    /* Can have letters, digits or the underline */
-    while (*++Name) {
-       	if (*Name != '_' && !IsAlNum(*Name)) {
-       	    return 0;
-       	}
-    }
-
-    /* Name is ok */
-    return 1;
 }
 
 

@@ -55,6 +55,7 @@ OBJS =	abend.obj	\
         matchpat.obj    \
 	print.obj	\
         segdefs.obj     \
+        segnames.obj    \
 	strbuf.obj	\
 	strutil.obj	\
 	target.obj	\

@@ -33,24 +33,11 @@
 
 
 
-#ifndef SEGNAMES_H
-#define SEGNAMES_H
+#include <string.h>
 
-
-
-/*****************************************************************************/
-/*     	       	    	    	     Data				     */
-/*****************************************************************************/
-
-
-
-/* Default segment names */
-#define SEGNAME_NULL     "NULL"
-#define SEGNAME_ZEROPAGE "ZEROPAGE"
-#define SEGNAME_DATA     "DATA"
-#define SEGNAME_BSS      "BSS"
-#define SEGNAME_RODATA   "RODATA"
-#define SEGNAME_CODE     "CODE"
+/* common */
+#include "chartype.h"
+#include "segnames.h"
 
 
 
@@ -60,14 +47,24 @@
 
 
 
-int ValidSegName (const char* Name);
+int ValidSegName (const char* Name)
 /* Return true if the given segment name is valid, return false otherwise */
+{
+    /* Must start with '_' or a letter */
+    if ((*Name != '_' && !IsAlpha(*Name)) || strlen(Name) > 80) {
+       	return 0;
+    }
 
+    /* Can have letters, digits or the underline */
+    while (*++Name) {
+       	if (*Name != '_' && !IsAlNum(*Name)) {
+       	    return 0;
+       	}
+    }
 
-
-/* End of segnames.h */
-
-#endif
+    /* Name is ok */
+    return 1;
+}
 
 
 

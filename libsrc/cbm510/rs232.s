@@ -30,7 +30,7 @@
    	.export	      	_rs232_put, _rs232_pause, _rs232_unpause, _rs232_status
 	.export		k_rs232
 
-   	.include	"zeropage.inc"
+   	.include	"cbm510.inc"
 
 
 ;----------------------------------------------------------------------------

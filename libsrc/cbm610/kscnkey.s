@@ -7,9 +7,7 @@
  	.export	  	k_scnkey
 	.importzp     	tpi2, ktab1, ktab2, ktab3, ktab4
 
-	.include      	"zeropage.inc"
-	.include	"io.inc"
-	.include	"page3.inc"
+	.include      	"cbm610.inc"
 
 
 .proc	k_scnkey

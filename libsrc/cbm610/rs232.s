@@ -30,7 +30,7 @@
    	.export	      	_rs232_put, _rs232_pause, _rs232_unpause, _rs232_status
 	.export		k_rs232
 
-   	.include	"zeropage.inc"
+   	.include	"cbm610.inc"
 
 
 ;----------------------------------------------------------------------------
@@ -327,7 +327,7 @@ _rs232_put:
    	lda 	#ErrOverflow
    	ldx	#$00
    	rts
-	  
+
 ; There is enough room (character still in A)
 
 @L3:	ldx	IndReg

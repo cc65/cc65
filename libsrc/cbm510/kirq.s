@@ -10,9 +10,7 @@
 	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
  	.importzp     	tpi1
 
- 	.include      	"zeropage.inc"
- 	.include	"io.inc"
- 	.include	"page3.inc"
+ 	.include      	"cbm510.inc"
 
 
 ; -------------------------------------------------------------------------

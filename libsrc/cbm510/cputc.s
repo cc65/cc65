@@ -10,7 +10,7 @@
 	.import		popa, _gotoxy
 	.import		xsize, revers
 
-	.include	"zeropage.inc"
+	.include	"cbm510.inc"
 	.include	"../cbm/cbm.inc"
 
 ; ------------------------------------------------------------------------
@@ -60,7 +60,7 @@ L3:	sty	CURS_X
    	rts
 
 newline:
-   	clc		 
+   	clc
    	lda	xsize
    	adc	SCREEN_PTR
    	sta	SCREEN_PTR

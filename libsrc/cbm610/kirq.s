@@ -8,9 +8,7 @@
 	.import		k_scnkey, k_udtim, k_rs232
 	.importzp     	tpi1
 
-	.include      	"zeropage.inc"
-	.include	"io.inc"
-	.include	"page3.inc"
+	.include      	"cbm610.inc"
 
 
 ; -------------------------------------------------------------------------

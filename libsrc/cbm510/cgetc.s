@@ -8,8 +8,7 @@
 	.condes		k_blncur, 2
 	.import	   	cursor
 
-	.include   	"zeropage.inc"
-	.include	"page3.inc"
+  	.include   	"cbm510.inc"
 
 
 ; ------------------------------------------------------------------------
@@ -91,7 +90,7 @@ L4:    	lda    	KeyBuf+1,x	; Move up the remaining chars
 
 @L9: 	sty	CURS_FLAG	       	; Cursor on (Y = 0)
 	rts
-				   
+
 .endproc
 
 

@@ -13,38 +13,8 @@
        	.import	       	k_irq, k_nmi, k_plot, k_udtim, k_scnkey
 
      	.include     	"zeropage.inc"
-     	.include    	"io.inc"
+     	.include    	"cbm510.inc"
 
-
-; ------------------------------------------------------------------------
-; Define and export the ZP variables for the CBM510 runtime
-
-     	.exportzp	sp, sreg, regsave
-     	.exportzp	ptr1, ptr2, ptr3, ptr4
-     	.exportzp	tmp1, tmp2, tmp3, tmp4
-     	.exportzp	regbank, zpspace
-      	.exportzp	vic, sid, cia1, cia2, acia, tpi1, tpi2
-      	.exportzp	ktab1, ktab2, ktab3, ktab4, time, RecvBuf, SendBuf
-
-.zeropage
-
-zpstart	= *
-sp:	      	.res   	2 	; Stack pointer
-sreg:	      	.res	2	; Secondary register/high 16 bit for longs
-regsave:      	.res	2	; slot to save/restore (E)AX into
-ptr1:	      	.res	2
-ptr2:	      	.res	2
-ptr3:	      	.res	2
-ptr4:	      	.res	2
-tmp1:	      	.res	1
-tmp2:	      	.res	1
-tmp3:	      	.res	1
-tmp4:	      	.res	1
-regbank:      	.res	6	; 6 byte register bank
-
-zpspace	= * - zpstart		; Zero page space allocated
-
-.code
 
 ; ------------------------------------------------------------------------
 ; BASIC header and a small BASIC program. Since it is not possible to start
@@ -74,6 +44,8 @@ zpspace	= * - zpstart		; Zero page space allocated
 ; this, we will use the system memory ($00-$3FF) for initialization stuff
 ; that is overwritten later.
 ;
+
+.code
 
 ; To make things more simple, make the code of this module absolute.
 

@@ -7,7 +7,7 @@
       	.export		k_plot
 	.importzp	crtc
 
-      	.include      	"zeropage.inc"
+      	.include      	"cbm610.inc"
 
 
 .proc	k_plot

@@ -17,8 +17,7 @@
        	.import	       	popax, addysp1
    	.importzp   	vic, sid, ptr1, sp
 
-	.include	"zeropage.inc"
-   	.include    	"io.inc"
+	.include	"cbm510.inc"
 
 	.macpack	generic
 

@@ -7,7 +7,7 @@
 	.export		_kbhit
 	.import		return0, return1
 
-	.include	"zeropage.inc"
+	.include	"cbm610.inc"
 
 .proc	_kbhit
 	lda	KeyIndex      	; Get number of characters

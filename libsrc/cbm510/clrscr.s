@@ -5,8 +5,7 @@
 	.export		_clrscr
 	.import		plot
 
-	.include	"zeropage.inc"
-	.include	"io.inc"
+	.include	"cbm510.inc"
 
 ; ------------------------------------------------------------------------
 ; void __fastcall__ clrscr (void);
@@ -30,7 +29,7 @@
 
 
 .proc	clearpage
-				
+
 	txa
 	pha	 		; Save count
 

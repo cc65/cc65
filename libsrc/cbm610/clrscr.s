@@ -7,7 +7,7 @@
 	.export		_clrscr
 	.import		plot
 
-	.include	"zeropage.inc"
+	.include	"cbm610.inc"
 
 .proc	_clrscr
 

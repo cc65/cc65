@@ -8,8 +8,7 @@
 	.import		__VIDRAM_START__
 	.importzp	crtc
 
-      	.include      	"zeropage.inc"
-	.include	"io.inc"
+      	.include      	"cbm510.inc"
 
 	.macpack	generic
 

@@ -9,8 +9,7 @@
        	.export	       	_brk_a, _brk_x, _brk_y, _brk_sr, _brk_pc
 	.import	      	_atexit
 
-	.include	"zeropage.inc"
-	.include   	"page3.inc"
+	.include   	"cbm510.inc"
 
 
 .bss

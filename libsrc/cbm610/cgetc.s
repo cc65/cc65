@@ -8,8 +8,7 @@
 	.import	   	plot, write_crtc
 	.import	   	cursor
 
-	.include   	"zeropage.inc"
-	.include	"page3.inc"
+	.include   	"cbm610.inc"
 
 
 _cgetc:	lda    	KeyIndex	; Get number of characters

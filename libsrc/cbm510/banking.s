@@ -7,7 +7,7 @@
  	.export		set_bank, sys_bank, restore_bank
 	.importzp     	ptr1
 
-	.include      	"zeropage.inc"
+	.include      	"cbm510.inc"
 
 .code
 

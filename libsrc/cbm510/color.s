@@ -6,8 +6,7 @@
 	.import	    	sys_bank, restore_bank
 	.importzp	vic
 
-	.include    	"zeropage.inc"
-	.include	"io.inc"
+	.include    	"cbm510.inc"
 
 
 ; ------------------------------------------------------------------------

@@ -8,7 +8,7 @@
 	.import		sys_bank, restore_bank
 	.importzp	cia2, tmp1
 
-	.include	"io.inc"
+	.include	"cbm510.inc"
 
 ; ------------------------------------------------------------------------
 ; unsigned __fastcall__ readjoy (unsigned char joy);

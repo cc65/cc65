@@ -5,7 +5,7 @@
  	.export	     	_peekbsys, _peekwsys
  	.importzp    	ptr1
 
- 	.include       	"zeropage.inc"
+ 	.include       	"cbm610.inc"
 
 
 ; ------------------------------------------------------------------------

@@ -8,7 +8,6 @@
 	.importzp	crtc
 
 	.include      	"cbm610.inc"
-	.include      	"zeropage.inc"
 
 
 ; Write a value to the CRTC. The index is in Y, the value in A

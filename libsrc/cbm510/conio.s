@@ -6,5 +6,5 @@
 
 	.exportzp	CURS_X, CURS_Y
 
-	.include	"zeropage.inc"
-
+	.include	"cbm510.inc"
+                               

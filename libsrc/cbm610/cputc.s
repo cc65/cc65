@@ -13,7 +13,6 @@
 	.import	     	xsize, revers
 
 	.include     	"cbm610.inc"
-	.include	"zeropage.inc"
 	.include     	"../cbm/cbm.inc"
 
 _cputcxy:
@@ -71,7 +70,7 @@ L4:	inc	CURS_Y
 
 ; Handle character if high bit set
 
-L10:	and	#$7F	 
+L10:	and	#$7F
        	cmp    	#$7E 	       	; PI?
 	bne	L11
 	lda	#$5E 	       	; Load screen code for PI

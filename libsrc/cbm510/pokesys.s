@@ -8,7 +8,7 @@
  	.import		popsreg
  	.importzp    	sreg, tmp1
 
- 	.include       	"zeropage.inc"
+ 	.include       	"cbm510.inc"
 
 
 ; ------------------------------------------------------------------------

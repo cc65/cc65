@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -115,6 +115,7 @@ typedef enum {
 
     CFGTOK_CONSTRUCTOR,
     CFGTOK_DESTRUCTOR,
+    CFGTOK_INTERRUPTOR,
 
     CFGTOK_DECREASING,
     CFGTOK_INCREASING,

@@ -1,15 +1,15 @@
 /*****************************************************************************/
 /*                                                                           */
-/*				   global.h				     */
+/*				   global.h			    	     */
 /*                                                                           */
-/*		     Global variables for the ld65 linker		     */
+/*		     Global variables for the ld65 linker	    	     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,6 +51,7 @@ extern unsigned long 	StartAddr;	/* Start address */
 extern unsigned char	VerboseMap;	/* Verbose map file */
 extern const char*	MapFileName;	/* Name of the map file */
 extern const char*	LabelFileName;	/* Name of the label file */
+extern const char*      DbgFileName;    /* Name of the debug file */
 extern unsigned char   	WProtSegs;	/* Mark write protected segments */
 
 

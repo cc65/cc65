@@ -71,6 +71,7 @@ OBJS =	bin.obj		\
 	binfmt.obj	\
 	condes.obj	\
 	config.obj	\
+	dbginfo.obj	\
 	dbgsyms.obj	\
 	error.obj	\
 	exports.obj	\
@@ -115,6 +116,7 @@ FILE bin.obj
 FILE binfmt.obj
 FILE condes.obj
 FILE config.obj
+FILE dbginfo.obj
 FILE dbgsyms.obj
 FILE error.obj
 FILE exports.obj
@@ -124,7 +126,7 @@ FILE fileinfo.obj
 FILE fileio.obj
 FILE fragment.obj
 FILE global.obj
-FILE library.obj 
+FILE library.obj
 FILE lineinfo.obj
 FILE main.obj
 FILE mapfile.obj

@@ -48,8 +48,26 @@
 
 
 /*****************************************************************************/
-/*  		 		     Data                                    */
+/*				   Forwards                                  */
 /*****************************************************************************/
+
+
+
+struct Segment;
+
+
+
+/*****************************************************************************/
+/*  	       	 		     Data                                    */
+/*****************************************************************************/
+
+
+
+typedef struct CodeRange CodeRange;
+struct CodeRange {
+    unsigned long Offs;
+    unsigned long Size;
+};
 
 
 
@@ -58,6 +76,7 @@ struct LineInfo {
     struct FileInfo*    File;		      /* File struct for this line */
     FilePos             Pos;                  /* File position */
     Collection          Fragments;            /* Fragments for this line */
+    Collection          CodeRanges;           /* Code ranges for this line */
 };
 
 
@@ -70,6 +89,9 @@ struct LineInfo {
 
 LineInfo* ReadLineInfo (FILE* F, ObjData* O);
 /* Read a line info from a file and return it */
+
+void RelocLineInfo (struct Segment* S);
+/* Relocate the line info for a segment. */
 
 
 

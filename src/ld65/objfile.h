@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -40,8 +40,10 @@
 
 #include <stdio.h>
 
-#include "../common/objdefs.h"
-
+/* common */
+#include "objdefs.h"
+	  
+/* ld65 */
 #include "objdata.h"
 
 
@@ -63,6 +65,9 @@ void ObjReadExports (FILE* F, ObjData* O);
 
 void ObjReadDbgSyms (FILE* F, ObjData* O);
 /* Read the debug symbols from a file at the current position */
+
+void ObjReadLineInfos (FILE* F, ObjData* O);
+/* Read the line infos from a file at the current position */
 
 void ObjReadSections (FILE* F, ObjData* O);
 /* Read the section data from a file at the current position */

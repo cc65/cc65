@@ -312,7 +312,13 @@ Section* ReadSection (FILE* F, ObjData* O)
 	LineInfoIndex = ReadVar (F);
 	if (LineInfoIndex) {
 	    --LineInfoIndex;
-	    CHECK (LineInfoIndex < O->LineInfoCount);
+	    if (LineInfoIndex >= O->LineInfoCount) {
+       	       	Internal ("In module `%s', file `%s', line %lu: Invalid line "
+			  "info with index %u (max count %u)",
+			  GetObjFileName (O),
+			  GetSourceFileName (O, Frag->Pos.Name),
+       	       	       	  Frag->Pos.Line, LineInfoIndex, O->LineInfoCount);
+	    }
 	    /* Point from the fragment to the line info... */
 	    Frag->LI = O->LineInfos[LineInfoIndex];
 	    /* ...and back from the line info to the fragment */
@@ -495,6 +501,7 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 
 	/* If we have fill bytes, write them now */
 	WriteMult (Tgt, S->FillVal, Sec->Fill);
+	Offs += Sec->Fill;
 
 	/* Loop over all fragments in this section */
 	Frag = Sec->FragRoot;

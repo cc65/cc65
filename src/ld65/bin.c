@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2000 Ullrich von Bassewitz                                       */
+/* (C) 1999-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -45,6 +45,7 @@
 #include "global.h"
 #include "error.h"
 #include "fileio.h"
+#include "lineinfo.h"
 #include "segments.h"
 #include "exports.h"
 #include "config.h"
@@ -186,6 +187,7 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 	 * if the memory area is the load area.
 	 */
        	if (DoWrite) {
+	    RelocLineInfo (S->Seg);
 	    SegWrite (D->F, S->Seg, BinWriteExpr, D);
 	} else if (M->Flags & MF_FILL) {
 	    WriteMult (D->F, M->FillVal, S->Seg->Size);

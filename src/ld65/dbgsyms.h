@@ -2,7 +2,7 @@
 /*                                                                           */
 /*				   dbgsyms.h				     */
 /*                                                                           */
-/*		   Debug symbol handing for the ld65 linker		     */
+/*		   Debug symbol handling for the ld65 linker		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
@@ -93,4 +93,4 @@ void PrintDbgSymLabels (ObjData* O, FILE* F);
 
 
 
-	     
+

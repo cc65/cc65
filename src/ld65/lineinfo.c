@@ -39,6 +39,8 @@
 
 /* ld65 */
 #include "fileio.h"
+#include "fragment.h"
+#include "segments.h"
 #include "lineinfo.h"
 
 
@@ -46,6 +48,22 @@
 /*****************************************************************************/
 /*     	       	      	      	     Code			     	     */
 /*****************************************************************************/
+
+
+
+static CodeRange* NewCodeRange (unsigned long Offs, unsigned long Size)
+/* Create and return a new CodeRange struct */
+{
+    /* Allocate memory */
+    CodeRange* R = xmalloc (sizeof (CodeRange));
+
+    /* Initialize the fields */
+    R->Offs = Offs;
+    R->Size = Size;
+
+    /* Return the new struct */
+    return R;
+}
 
 
 
@@ -59,6 +77,7 @@ static LineInfo* NewLineInfo (void)
     LI->File = 0;
     InitFilePos (&LI->Pos);
     InitCollection (&LI->Fragments);
+    InitCollection (&LI->CodeRanges);
 
     /* Return the new struct */
     return LI;
@@ -81,6 +100,91 @@ LineInfo* ReadLineInfo (FILE* F, ObjData* O)
 
     /* Return the new LineInfo */
     return LI;
+}
+
+
+
+static void AddCodeRange (LineInfo* LI, unsigned long Offs, unsigned long Size)
+/* Add a range of code to this line */
+{
+    unsigned I;
+
+    /* Get a pointer to the collection */
+    Collection* CodeRanges = &LI->CodeRanges;
+
+    /* We will keep the CodeRanges collection sorted by starting offset,
+     * so we have to search for the correct insert position. Since in most
+     * cases, the fragments have increasing order, and there is usually not
+     * more than one or two ranges, we do a linear search.
+     */
+    for (I = 0; I < CollCount (CodeRanges); ++I) {
+	CodeRange* R = CollAtUnchecked (CodeRanges, I);
+       	if (Offs < R->Offs) {
+
+       	    /* Got the insert position */
+       	    if (Offs + Size == R->Offs) {
+    		/* Merge the two */
+       	     	R->Offs = Offs;
+       	     	R->Size += Size;
+       	    } else {
+       	     	/* Insert a new entry */
+       	     	CollInsert (CodeRanges, NewCodeRange (Offs, Size), I);
+       	    }
+
+       	    /* Done */
+       	    return;
+
+       	} else if (R->Offs + R->Size == Offs) {
+
+	    /* This is the regular case. Merge the two. */
+       	    R->Size += Size;
+
+       	    /* Done */
+       	    return;
+
+       	}
+    }
+
+    /* We must append an entry */
+    CollAppend (CodeRanges, NewCodeRange (Offs, Size));
+}
+
+
+
+void RelocLineInfo (struct Segment* S)
+/* Relocate the line info for a segment. */
+{
+    unsigned long Offs = 0;
+
+    /* Loop over all sections in this segment */
+    Section* Sec = S->SecRoot;
+    while (Sec) {
+       	Fragment* Frag;
+
+       	/* Adjust for fill bytes */
+       	Offs += Sec->Fill;
+
+       	/* Loop over all fragments in this section */
+       	Frag = Sec->FragRoot;
+       	while (Frag) {
+
+       	    /* Add the range for this fragment to the line info if there
+       	     * is any
+       	     */
+       	    if (Frag->LI) {
+       	     	AddCodeRange (Frag->LI, Offs, Frag->Size);
+       	    }
+
+       	    /* Update the offset */
+       	    Offs += Frag->Size;
+
+       	    /* Next fragment */
+       	    Frag = Frag->Next;
+       	}
+
+       	/* Next section */
+       	Sec = Sec->Next;
+    }
 }
 
 

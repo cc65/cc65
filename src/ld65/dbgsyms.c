@@ -2,7 +2,7 @@
 /*                                                                           */
 /*				   dbgsyms.c				     */
 /*                                                                           */
-/*		   Debug symbol handing for the ld65 linker		     */
+/*		   Debug symbol handling for the ld65 linker		     */
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */

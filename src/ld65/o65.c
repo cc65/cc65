@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2000 Ullrich von Bassewitz                                       */
+/* (C) 1999-2001 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -50,6 +50,7 @@
 #include "expr.h"
 #include "fileio.h"
 #include "global.h"
+#include "lineinfo.h"
 #include "o65.h"
 
 
@@ -72,7 +73,7 @@
 #define O65SEG_TEXT	0x02
 #define O65SEG_DATA	0x03
 #define O65SEG_BSS	0x04
-#define O65SEG_ZP	0x05
+#define O65SEG_ZP 	0x05
 
 /* Relocation type codes for the o65 format */
 #define O65RELOC_WORD	0x80
@@ -82,8 +83,8 @@
 #define O65RELOC_SEG	0xa0
 
 /* O65 executable file header */
-typedef struct O65Header_ O65Header;
-struct O65Header_ {
+typedef struct O65Header O65Header;
+struct O65Header {
     unsigned	    Version;	    	/* Version number for o65 format */
     unsigned        Mode;      	    	/* Mode word */
     unsigned long   TextBase;		/* Base address of text segment */
@@ -98,8 +99,8 @@ struct O65Header_ {
 };
 
 /* An o65 option */
-typedef struct O65Option_ O65Option;
-struct O65Option_ {
+typedef struct O65Option O65Option;
+struct O65Option {
     O65Option*	    Next;		/* Next in option list */
     unsigned char   Type;		/* Type of option */
     unsigned char   Len;		/* Data length */
@@ -108,54 +109,54 @@ struct O65Option_ {
 
 /* A o65 relocation table */
 #define RELOC_BLOCKSIZE	4096
-typedef struct O65RelocTab_ O65RelocTab;
-struct O65RelocTab_ {
+typedef struct O65RelocTab O65RelocTab;
+struct O65RelocTab {
     unsigned 	    Size;   		/* Size of the table */
     unsigned	    Fill;   		/* Amount used */
     unsigned char*  Buf; 		/* Buffer, dynamically allocated */
 };
 
 /* Structure describing the format */
-struct O65Desc_ {
-    O65Header	    Header; 		/* File header */
+struct O65Desc {
+    O65Header 	    Header; 		/* File header */
     O65Option*	    Options;		/* List of file options */
     ExtSymTab*	    Exports;		/* Table with exported symbols */
     ExtSymTab*	    Imports;		/* Table with imported symbols */
-    unsigned	    Undef;		/* Count of undefined symbols */
-    FILE*   	    F;			/* The file we're writing to */
-    char*   	    Filename;		/* Name of the output file */
+    unsigned  	    Undef;		/* Count of undefined symbols */
+    FILE*     	    F;			/* The file we're writing to */
+    char*     	    Filename;		/* Name of the output file */
     O65RelocTab*    TextReloc;		/* Relocation table for text segment */
     O65RelocTab*    DataReloc;		/* Relocation table for data segment */
 
-    unsigned	    TextCount;		/* Number of segments assigned to .text */
-    SegDesc**	    TextSeg;		/* Array of text segments */
-    unsigned	    DataCount;		/* Number of segments assigned to .data */
-    SegDesc**	    DataSeg;	    	/* Array of data segments */
-    unsigned	    BssCount;	    	/* Number of segments assigned to .bss */
-    SegDesc**	    BssSeg;    	    	/* Array of bss segments */
-    unsigned 	    ZPCount;		/* Number of segments assigned to .zp */
-    SegDesc**	    ZPSeg;		/* Array of zp segments */
+    unsigned  	    TextCount;		/* Number of segments assigned to .text */
+    SegDesc** 	    TextSeg;		/* Array of text segments */
+    unsigned  	    DataCount;		/* Number of segments assigned to .data */
+    SegDesc** 	    DataSeg;	    	/* Array of data segments */
+    unsigned  	    BssCount;	    	/* Number of segments assigned to .bss */
+    SegDesc** 	    BssSeg;    	    	/* Array of bss segments */
+    unsigned  	    ZPCount;		/* Number of segments assigned to .zp */
+    SegDesc** 	    ZPSeg;		/* Array of zp segments */
 
     /* Temporary data for writing segments */
     unsigned long   SegSize;
     O65RelocTab*    CurReloc;
-    long	    LastOffs;
+    long      	    LastOffs;
 };
 
 /* Structure for parsing expression trees */
-typedef struct ExprDesc_ ExprDesc;
-struct ExprDesc_ {
-    O65Desc*	    D;			/* File format descriptor */
-    long	    Val;		/* The offset value */
+typedef struct ExprDesc ExprDesc;
+struct ExprDesc {
+    O65Desc*   	    D;			/* File format descriptor */
+    long       	    Val;		/* The offset value */
     int	       	    TooComplex;	       	/* Expression too complex */
-    Section*	    SegRef;		/* Section referenced if any */
-    ExtSym*	    ExtRef;		/* External reference if any */
+    Section*   	    SegRef;		/* Section referenced if any */
+    ExtSym*    	    ExtRef;		/* External reference if any */
 };
 
 
 
 /*****************************************************************************/
-/*	     	    	       Helper functions				     */
+/*	       	    	       Helper functions				     */
 /*****************************************************************************/
 
 
@@ -343,7 +344,7 @@ static void O65WriteReloc (O65RelocTab* R, FILE* F)
 
 
 /*****************************************************************************/
-/*  	      			Option handling				     */
+/*  	       			Option handling				     */
 /*****************************************************************************/
 
 
@@ -380,7 +381,7 @@ static void FreeO65Option (O65Option* O)
 
 
 /*****************************************************************************/
-/*		       Subroutines to write o65 sections		     */
+/*	       	       Subroutines to write o65 sections		     */
 /*****************************************************************************/
 
 
@@ -427,7 +428,7 @@ static void O65WriteHeader (O65Desc* D)
 
 
 static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
-       		  	      unsigned long Offs, void* Data)
+       	       	  	      unsigned long Offs, void* Data)
 /* Called from SegWrite for an expression. Evaluate the expression, check the
  * range and write the expression value to the file, update the relocation
  * table.
@@ -522,7 +523,7 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
 		break;
 
 	    case 2:
-		RelocType = O65RELOC_WORD;
+	       	RelocType = O65RELOC_WORD;
 		break;
 
 	    case 3:
@@ -580,6 +581,7 @@ static void O65WriteSeg (O65Desc* D, SegDesc** Seg, unsigned Count, int DoWrite)
 
 	/* Write this segment */
 	if (DoWrite) {
+	    RelocLineInfo (S->Seg);
        	    SegWrite (D->F, S->Seg, O65WriteExpr, D);
       	}
 
@@ -1066,7 +1068,6 @@ void O65WriteTarget (O65Desc* D, File* F)
     D->F        = 0;
     D->Filename = 0;
 }
-
 
 
 

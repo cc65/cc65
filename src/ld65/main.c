@@ -226,6 +226,14 @@ static void OptConfig (const char* Opt, const char* Arg)
 
 
 
+static void OptDbgFile (const char* Opt, const char* Arg)
+/* Give the name of the debug file */
+{
+    DbgFileName = Arg;
+}
+
+
+
 static void OptHelp (const char* Opt, const char* Arg)
 /* Print usage information and exit */
 {
@@ -288,7 +296,8 @@ int main (int argc, char* argv [])
     /* Program long options */
     static const LongOpt OptTab[] = {
        	{ "--config",  	       	1,     	OptConfig    		},
-       	{ "--help",	       	0,     	OptHelp	     		},
+	{ "--dbgfile",          1,      OptDbgFile              },
+	{ "--help",	       	0,     	OptHelp	     		},
 	{ "--mapfile",		1,	OptMapFile		},
 	{ "--start-addr",	1,	OptStartAddr		},
 	{ "--target",		1,	OptTarget    		},
@@ -424,6 +433,9 @@ int main (int argc, char* argv [])
     }
     if (LabelFileName) {
 	CreateLabelFile ();
+    }	
+    if (DbgFileName) {
+	CreateDbgFile ();
     }
 
     /* Dump the data for debugging */

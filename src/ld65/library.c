@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998-2000 Ullrich von Bassewitz					     */
+/* (C) 1998-2001 Ullrich von Bassewitz					     */
 /*		 Wacholderweg 14					     */
 /*		 D-70597 Stuttgart					     */
-/* EMail:	 uz@musoftware.de					     */
+/* EMail:	 uz@cc65.org    					     */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -78,29 +78,31 @@ static ObjData**	Index		= 0;
 static void LibReadObjHeader (ObjData* O)
 /* Read the header of the object file checking the signature */
 {
-    O->Header.Magic	 = Read32 (Lib);
+    O->Header.Magic = Read32 (Lib);
     if (O->Header.Magic != OBJ_MAGIC) {
-	Error ("Object file `%s' in library `%s' is invalid", 
+	Error ("Object file `%s' in library `%s' is invalid",
 	       GetObjFileName (O), LibName);
     }
-    O->Header.Version	 = Read16 (Lib);
+    O->Header.Version = Read16 (Lib);
     if (O->Header.Version != OBJ_VERSION) {
 	Error ("Object file `%s' in library `%s' has wrong version",
 	       GetObjFileName (O), LibName);
     }
-    O->Header.Flags	 = Read16 (Lib);
-    O->Header.OptionOffs = Read32 (Lib);
-    O->Header.OptionSize = Read32 (Lib);
-    O->Header.FileOffs	 = Read32 (Lib);
-    O->Header.FileSize	 = Read32 (Lib);
-    O->Header.SegOffs	 = Read32 (Lib);
-    O->Header.SegSize	 = Read32 (Lib);
-    O->Header.ImportOffs = Read32 (Lib);
-    O->Header.ImportSize = Read32 (Lib);
-    O->Header.ExportOffs = Read32 (Lib);
-    O->Header.ExportSize = Read32 (Lib);
-    O->Header.DbgSymOffs = Read32 (Lib);
-    O->Header.DbgSymSize = Read32 (Lib);
+    O->Header.Flags    	   = Read16 (Lib);
+    O->Header.OptionOffs   = Read32 (Lib);
+    O->Header.OptionSize   = Read32 (Lib);
+    O->Header.FileOffs	   = Read32 (Lib);
+    O->Header.FileSize	   = Read32 (Lib);
+    O->Header.SegOffs	   = Read32 (Lib);
+    O->Header.SegSize	   = Read32 (Lib);
+    O->Header.ImportOffs   = Read32 (Lib);
+    O->Header.ImportSize   = Read32 (Lib);
+    O->Header.ExportOffs   = Read32 (Lib);
+    O->Header.ExportSize   = Read32 (Lib);
+    O->Header.DbgSymOffs   = Read32 (Lib);
+    O->Header.DbgSymSize   = Read32 (Lib);
+    O->Header.LineInfoOffs = Read32 (Lib);
+    O->Header.LineInfoSize = Read32 (Lib);
 }
 
 
@@ -187,7 +189,7 @@ static void LibCheckExports (ObjData* O)
 	for (I = 0; I < O->ExportCount; ++I) {
 	    InsertExport (O->Exports [I]);
 	}
-	/* Insert the imports */
+ 	/* Insert the imports */
 	for (I = 0; I < O->ImportCount; ++I) {
 	    InsertImport (O->Imports [I]);
 	}
@@ -230,45 +232,52 @@ void LibAdd (FILE* F, const char* Name)
     do {
 	Add = 0;
 	for (I = 0; I < ModuleCount; ++I) {
-	    ObjData* O = Index [I];
-	    if ((O->Flags & OBJ_REF) == 0) {
-		LibCheckExports (O);
-		if (O->Flags & OBJ_REF) {
-		    /* The routine added the file */
-		    Add = 1;
-		}
-	    }
-	}
+ 	    ObjData* O = Index [I];
+ 	    if ((O->Flags & OBJ_REF) == 0) {
+ 		LibCheckExports (O);
+ 		if (O->Flags & OBJ_REF) {
+ 		    /* The routine added the file */
+ 		    Add = 1;
+ 		}
+ 	    }
+ 	}
     } while (Add);
 
     /* Add the files list and sections for all requested modules */
     for (I = 0; I < ModuleCount; ++I) {
-	ObjData* O = Index [I];
-	if (O->Flags & OBJ_REF) {
+ 	ObjData* O = Index [I];
+ 	if (O->Flags & OBJ_REF) {
 
-	    /* Seek to the start of the object file and read the header */
-	    fseek (Lib, O->Start, SEEK_SET);
-	    LibReadObjHeader (O);
+ 	    /* Seek to the start of the object file and read the header */
+ 	    fseek (Lib, O->Start, SEEK_SET);
+ 	    LibReadObjHeader (O);
 
-	    /* Seek to the start of the files list and read the files list */
-	    fseek (Lib, O->Start + O->Header.FileOffs, SEEK_SET);
-	    ObjReadFiles (Lib, O);
+ 	    /* Seek to the start of the files list and read the files list */
+ 	    fseek (Lib, O->Start + O->Header.FileOffs, SEEK_SET);
+ 	    ObjReadFiles (Lib, O);
 
-	    /* Seek to the start of the segment list and read the segments */
-	    fseek (Lib, O->Start + O->Header.SegOffs, SEEK_SET);
-	    ObjReadSections (Lib, O);
+ 	    /* Seek to the start of the debug info and read the debug info */
+ 	    fseek (Lib, O->Start + O->Header.DbgSymOffs, SEEK_SET);
+ 	    ObjReadDbgSyms (Lib, O);
 
-	    /* Seek to the start of the debug info and read the debug info */
-	    fseek (Lib, O->Start + O->Header.DbgSymOffs, SEEK_SET);
-	    ObjReadDbgSyms (Lib, O);
+	    /* Seek to the start of the line infos and read them */
+	    fseek (Lib, O->Start + O->Header.LineInfoOffs, SEEK_SET);
+	    ObjReadLineInfos (Lib, O);
+
+ 	    /* Seek to the start of the segment list and read the segments.
+	     * This must be last, since the data here may reference other
+	     * stuff.
+	     */
+ 	    fseek (Lib, O->Start + O->Header.SegOffs, SEEK_SET);
+ 	    ObjReadSections (Lib, O);
 
 	    /* We have the data now */
-	    O->Flags |= OBJ_HAVEDATA;
+ 	    O->Flags |= OBJ_HAVEDATA;
 
-	}
+ 	}
 
-	/* Add a pointer to the library name */
-	O->LibName = LibName;
+ 	/* Add a pointer to the library name */
+ 	O->LibName = LibName;
     }
 
     /* Done. Close the file, release allocated memory */

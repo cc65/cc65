@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -50,6 +50,7 @@ unsigned long StartAddr	    = 0x200;	/* Start address */
 unsigned char VerboseMap    = 0;	/* Verbose map file */
 const char* MapFileName	    = 0;       	/* Name of the map file */
 const char* LabelFileName   = 0;	/* Name of the label file */
+const char* DbgFileName     = 0;        /* Name of the debug file */
 unsigned char WProtSegs     = 0;	/* Mark write protected segments */
 
 

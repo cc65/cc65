@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -41,6 +41,7 @@
 #include "error.h"
 #include "objdata.h"
 #include "segments.h"
+#include "dbginfo.h"
 #include "dbgsyms.h"
 #include "exports.h"
 #include "config.h"
@@ -82,7 +83,7 @@ void CreateMapFile (void)
      	    for (I = 0; I < O->SectionCount; ++I) {
      		const Section* S = O->Sections [I];
      		/* Don't include zero sized sections if not explicitly
-     		 * requested
+     	      	 * requested
      		 */
      		if (VerboseMap || S->Size > 0) {
        	       	    fprintf (F, "    %-15s   Offs = %06lX   Size = %06lX\n",
@@ -124,7 +125,7 @@ void CreateLabelFile (void)
 {
     ObjData* O;
 
-    /* Open the map file */
+    /* Open the label file */
     FILE* F = fopen (LabelFileName, "w");
     if (F == 0) {
     	Error ("Cannot create label file `%s': %s", LabelFileName, strerror (errno));
@@ -163,6 +164,36 @@ void CreateLabelFile (void)
     /* Close the file */
     if (fclose (F) != 0) {
 	Error ("Error closing map file `%s': %s", LabelFileName, strerror (errno));
+    }
+}
+
+
+
+void CreateDbgFile (void)
+/* Create a debug info file */
+{
+    ObjData* O;
+
+    /* Open the debug info file */
+    FILE* F = fopen (DbgFileName, "w");
+    if (F == 0) {
+    	Error ("Cannot create label file `%s': %s", DbgFileName, strerror (errno));
+    }
+
+    /* Print line infos from all modules we have linked into the output file */
+    O = ObjRoot;
+    while (O) {
+     	if (O->Flags & OBJ_HAVEDATA) {
+     	    /* We've linked this module */
+	    PrintDbgInfo (O, F);
+
+     	}
+     	O = O->Next;
+    }
+
+    /* Close the file */
+    if (fclose (F) != 0) {
+	Error ("Error closing map file `%s': %s", DbgFileName, strerror (errno));
     }
 }
 

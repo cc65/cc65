@@ -6,10 +6,10 @@
 /*									     */
 /*									     */
 /*									     */
-/* (C) 1998	Ullrich von Bassewitz					     */
-/*		Wacholderweg 14						     */
-/*		D-70597 Stuttgart					     */
-/* EMail:	uz@musoftware.de					     */
+/* (C) 1998-2001 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@cc65.org                                                 */
 /*									     */
 /*									     */
 /* This software is provided 'as-is', without any expressed or implied	     */
@@ -206,8 +206,8 @@ void ObjAdd (FILE* Obj, const char* Name)
     ObjReadHeader (Obj, &O->Header, Name);
 
     /* Initialize the object module data structure */
-    O->Name    	  = xstrdup (GetModule (Name));
-    O->Flags   	  = OBJ_HAVEDATA;
+    O->Name  = xstrdup (GetModule (Name));
+    O->Flags = OBJ_HAVEDATA;
 
     /* Read the files list from the object file */
     fseek (Obj, O->Header.FileOffs, SEEK_SET);

@@ -22,6 +22,7 @@ OBJS = 	bin.o		\
 	binfmt.o	\
 	condes.o	\
 	config.o	\
+	dbginfo.o	\
 	dbgsyms.o	\
 	error.o		\
 	exports.o	\
@@ -41,7 +42,7 @@ OBJS = 	bin.o		\
 	scanner.o	\
 	segments.o	\
 	tgtcfg.o
-
+ 			 
 # -----------------------------------------------------------------------------
 # List of all config includes
 

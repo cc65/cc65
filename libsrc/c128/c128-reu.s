@@ -78,35 +78,34 @@ reu_params:     .word 	$0000  		; Host address, lo, hi
 ;
 
 INSTALL:
+        ldx     #$00                    ; High byte of return code
         lda     #$55
         sta     REU_REUADDR
         cmp     REU_REUADDR             ; Check for presence of REU
         bne     nodevice
-        lda     #$AA
+        asl     a                       ; A = $AA
         sta     REU_REUADDR
         cmp     REU_REUADDR             ; Check for presence of REU
         bne     nodevice
 
-        ldx     #>(128*4)               ; Assume 128KB
+        ldy     #>(128*4)               ; Assume 128KB
         lda     REU_STATUS
         and     #$10                    ; Check size bit
         beq     @L1
-        ldx     #>(256*4)               ; 256KB when size bit is set
-@L1:    stx     pagecount+1
+        ldy     #>(256*4)               ; 256KB when size bit is set
+@L1:    sty     pagecount+1
 
-        ldx     #$FF
-        stx     curpage
-        stx     curpage+1               ; Invalidate the current page
-        inx
+        ldy     #$FF
+        sty     curpage
+        sty     curpage+1               ; Invalidate the current page
         txa                             ; X = A = EM_ERR_OK
         rts
 
 ; No REU found
 
 nodevice:
-        lda     #<EM_ERR_NO_DEVICE
-        ldx     #>EM_ERR_NO_DEVICE
-        rts
+        lda     #EM_ERR_NO_DEVICE
+;       rts                             ; Run into UNINSTALL instead
 
 ; ------------------------------------------------------------------------
 ; UNINSTALL routine. Is called before the driver is removed from memory.

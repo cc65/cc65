@@ -52,24 +52,6 @@
 /* Definitions for the possible opcodes */
 typedef enum {
 
-    /* Opcodes for the virtual stack machine */
-    OPC_CALL,
-    OPC_ENTER,
-    OPC_JMP,
-    OPC_LDA,
-    OPC_LDAX,
-    OPC_LDEAX,
-    OPC_LEA,
-    OPC_LEAVE,
-    OPC_PHA,
-    OPC_PHAX,
-    OPC_PHEAX,
-    OPC_RET,
-    OPC_SPACE,
-    OPC_STA,
-    OPC_STAX,
-    OPC_STEAX,
-
     /* 65XX opcodes */
     OP65_ADC,
     OP65_AND,
@@ -193,19 +175,18 @@ typedef enum {
 
 /* Opcode info */
 #define OF_NONE	        0x0000U	/* No additional information */
-#define OF_CPU_6502     0x0000U	/* 6502 opcode */
-#define OF_CPU_VM       0x0001U /* Virtual machine opcode */
-#define OF_MASK_CPU     0x0001U /* Mask for the cpu field */
-#define OF_UBRA	        0x0010U	/* Unconditional branch */
-#define OF_CBRA	        0x0020U	/* Conditional branch */
-#define OF_ZBRA         0x0040U	/* Branch on zero flag condition */
-#define OF_FBRA         0x0080U /* Branch on cond set by a load */
-#define OF_LBRA         0x0100U	/* Jump/branch is long */
-#define OF_RET 	        0x0200U	/* Return from function */
-#define OF_LOAD         0x0400U	/* Register load */
-#define OF_STORE        0x0800U /* Register store */
-#define OF_XFR          0x1000U /* Transfer instruction */
-#define OF_CALL         0x2000U /* A subroutine call */
+#define OF_UBRA	        0x0001U	/* Unconditional branch */
+#define OF_CBRA	        0x0002U	/* Conditional branch */
+#define OF_ZBRA         0x0004U	/* Branch on zero flag condition */
+#define OF_FBRA         0x0008U /* Branch on cond set by a load */
+#define OF_LBRA         0x0010U	/* Jump/branch is long */
+#define OF_RET 	        0x0020U	/* Return from function */
+#define OF_LOAD         0x0040U	/* Register load */
+#define OF_STORE        0x0080U /* Register store */
+#define OF_XFR          0x0100U /* Transfer instruction */
+#define OF_CALL         0x0200U /* A subroutine call */
+#define OF_REG_INCDEC   0x0400U /* A register increment or decrement */
+#define OF_SETF         0x0800U /* Insn will set all load flags (not carry) */
 
 /* Combined infos */
 #define OF_BRA 	(OF_UBRA | OF_CBRA)	/* Operation is a jump/branch */

@@ -95,6 +95,9 @@ unsigned OptDuplicateLoads (CodeSeg* S);
 unsigned OptStoreLoad (CodeSeg* S);
 /* Remove a store followed by a load from the same location. */
 
+unsigned OptTransfers (CodeSeg* S);
+/* Remove transfers from one register to another and back */
+
 unsigned OptBranchDist (CodeSeg* S);
 /* Change branches for the distance needed. */
 

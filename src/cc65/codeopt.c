@@ -1032,7 +1032,7 @@ static unsigned OptCmp6 (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
        	/* Check for the sequence */
-       	if ((E->OPC == OP65_LDX || E->OPC == OP65_TAX)  &&
+       	if ((E->OPC == OP65_LDX)                        &&
        	    CS_GetEntries (S, L, I+1, 2)                &&
        	    L[0]->OPC == OP65_TXA                       &&
        	    !CE_HasLabel (L[0])                         &&
@@ -1072,12 +1072,18 @@ static unsigned OptTest1 (CodeSeg* S)
  *     ora     xxx
  *     beq/bne ...
  *
- * if X is zero, the sequence may be changed
+ * if X is zero, the sequence may be changed to
  *
  *     cmp     #$00
  *     beq/bne ...
  *
  * which may be optimized further by another step.
+ *
+ * If A is zero, the sequence may be changed to
+ *
+ *     txa
+ *     beq/bne ...
+ *
  */
 {
     unsigned Changes = 0;
@@ -1097,7 +1103,6 @@ static unsigned OptTest1 (CodeSeg* S)
 
 	/* Check if it's the sequence we're searching for */
 	if (L[0]->OPC == OP65_STX              &&
-	    L[0]->RI->In.RegX == 0             &&
 	    CS_GetEntries (S, L+1, I+1, 2)     &&
 	    !CE_HasLabel (L[1])                &&
 	    L[1]->OPC == OP65_ORA              &&
@@ -1105,16 +1110,34 @@ static unsigned OptTest1 (CodeSeg* S)
 	    !CE_HasLabel (L[2])                &&
 	    (L[2]->Info & OF_ZBRA) != 0) {
 
-	    /* Insert the compare */
-       	    CodeEntry* N = NewCodeEntry (OP65_CMP, AM65_IMM, "$00", 0, L[0]->LI);
-	    CS_InsertEntry (S, N, I+2);
+	    /* Check if X is zero */
+	    if (L[0]->RI->In.RegX == 0) {
 
-	    /* Remove the two other insns */
-	    CS_DelEntry (S, I+1);
-	    CS_DelEntry (S, I);
+		/* Insert the compare */
+		CodeEntry* N = NewCodeEntry (OP65_CMP, AM65_IMM, "$00", 0, L[0]->LI);
+		CS_InsertEntry (S, N, I+2);
 
-	    /* We had changes */
-	    ++Changes;
+		/* Remove the two other insns */
+		CS_DelEntry (S, I+1);
+		CS_DelEntry (S, I);
+
+		/* We had changes */
+		++Changes;
+
+	    /* Check if A is zero */
+	    } else if (L[1]->RI->In.RegA == 0) {
+
+		/* Insert the txa */
+		CodeEntry* N = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, L[1]->LI);
+		CS_InsertEntry (S, N, I+2);
+
+		/* Remove the two other insns */
+		CS_DelEntry (S, I+1);
+		CS_DelEntry (S, I);
+
+		/* We had changes */
+		++Changes;
+	    }
 	}
 
 	/* Next entry */
@@ -1128,10 +1151,6 @@ static unsigned OptTest1 (CodeSeg* S)
     /* Return the number of changes made */
     return Changes;
 }
-
-
-
-
 
 
 
@@ -1967,8 +1986,9 @@ static OptFunc OptFuncs [] = {
     OptEntry (OptUnusedLoads, optMain),
     OptEntry (OptDuplicateLoads, optMain),
     OptEntry (OptStoreLoad, optMain),
+    OptEntry (OptTransfers, optMain),
     /* Optimize branch distance */
-    OptEntry (OptBranchDist, optMain),
+    OptEntry (OptBranchDist, optPost),
 };
 
 

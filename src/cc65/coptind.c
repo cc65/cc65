@@ -45,18 +45,6 @@
 
 
 /*****************************************************************************/
-/*				    Macros                                   */
-/*****************************************************************************/
-
-
-
-/* Macro to increment and decrement register contents if they're valid */
-#define INC(reg,val)    if ((reg) >= 0) (reg) = ((reg) + val) & 0xFF
-#define DEC(reg,val)   	if ((reg) >= 0) (reg) = ((reg) - val) & 0xFF
-
-
-
-/*****************************************************************************/
 /*			  Replace jumps to RTS by RTS			     */
 /*****************************************************************************/
 
@@ -611,20 +599,26 @@ unsigned OptUnusedLoads (CodeSeg* S)
        	CodeEntry* E = CS_GetEntry (S, I);
 
 	/* Check if it's a register load or transfer insn */
-	if ((E->Info & (OF_LOAD | OF_XFR)) != 0    &&
-	    (N = CS_GetNextEntry (S, I)) != 0      &&
+	if ((E->Info & (OF_LOAD | OF_XFR | OF_REG_INCDEC)) != 0  &&
+	    (N = CS_GetNextEntry (S, I)) != 0                    &&
 	    (N->Info & OF_FBRA) == 0) {
 
 	    /* Check which sort of load or transfer it is */
 	    unsigned R;
 	    switch (E->OPC) {
+		case OP65_DEA:
+		case OP65_INA:
+		case OP65_LDA:
 	    	case OP65_TXA:
-	    	case OP65_TYA:
-	    	case OP65_LDA:	R = REG_A;	break;
-	    	case OP65_TAX:
-       	       	case OP65_LDX:  R = REG_X;	break;
-	    	case OP65_TAY:
-	    	case OP65_LDY:	R = REG_Y;	break;
+	    	case OP65_TYA: 	R = REG_A;	break;
+		case OP65_DEX:
+		case OP65_INX:
+		case OP65_LDX:
+	    	case OP65_TAX: 	R = REG_X;     	break;
+		case OP65_DEY:
+		case OP65_INY:
+       	       	case OP65_LDY:
+	    	case OP65_TAY: 	R = REG_Y;	break;
 	    	default:     	goto NextEntry;	      	/* OOPS */
 	    }
 
@@ -847,6 +841,76 @@ unsigned OptStoreLoad (CodeSeg* S)
 
 	}
 
+	/* Next entry */
+	++I;
+
+    }
+
+    /* Return the number of changes made */
+    return Changes;
+}
+
+
+
+unsigned OptTransfers (CodeSeg* S)
+/* Remove transfers from one register to another and back */
+{
+    unsigned Changes = 0;
+
+    /* Walk over the entries */
+    unsigned I = 0;
+    while (I < CS_GetEntryCount (S)) {
+
+	CodeEntry* N;
+	CodeEntry* X;
+	CodeEntry* P;
+
+      	/* Get next entry */
+       	CodeEntry* E = CS_GetEntry (S, I);
+
+	/* Check if it is a store instruction followed by a load from the
+	 * same address which is itself not followed by a conditional branch.
+	 */
+       	if ((E->Info & OF_XFR) != 0                 &&
+	    (N = CS_GetNextEntry (S, I)) != 0  	    &&
+	    !CE_HasLabel (N)                        &&
+       	    (N->Info & OF_XFR) != 0) {
+
+	    /* Check if it's a transfer and back */
+       	    if ((E->OPC == OP65_TAX && N->OPC == OP65_TXA && !RegXUsed (S, I+2)) ||
+       	        (E->OPC == OP65_TAY && N->OPC == OP65_TYA && !RegYUsed (S, I+2)) ||
+       	        (E->OPC == OP65_TXA && N->OPC == OP65_TAX && !RegAUsed (S, I+2)) ||
+       	        (E->OPC == OP65_TYA && N->OPC == OP65_TAY && !RegAUsed (S, I+1))) {
+
+		/* If the next insn is a conditional branch, check if the insn
+		 * preceeding the first xfr will set the flags right, otherwise we
+		 * may not remove the sequence.
+		 */
+		if ((X = CS_GetNextEntry (S, I+1)) == 0) {
+		    goto NextEntry;
+		}
+		if ((X->Info & OF_FBRA) != 0) {
+		    if (I == 0) {
+			/* No preceeding entry */
+			goto NextEntry;
+		    }
+		    P = CS_GetEntry (S, I-1);
+		    if ((P->Info & OF_SETF) == 0) {
+			/* Does not set the flags */
+			goto NextEntry;
+		    }
+		}
+    
+		/* Remove both transfers */
+		CS_DelEntry (S, I+1);
+		CS_DelEntry (S, I);
+    
+		/* Remember, we had changes */
+		++Changes;
+	    }
+	}
+
+NextEntry:
 	/* Next entry */
 	++I;
 

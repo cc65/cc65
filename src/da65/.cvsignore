@@ -1,5 +1,8 @@
+.kdbgrc.da65
 .depend
 da65
+*.asm
+*.cfg
+*.dis
 *.map
 *.s
-*.dis

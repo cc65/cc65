@@ -93,6 +93,17 @@ struct ExprDesc {
 
 
 /*****************************************************************************/
+/*                                 Forwards                                  */
+/*****************************************************************************/
+
+
+
+static void StudyExpr (ExprNode* Expr, ExprDesc* D, int Sign);
+/* Study an expression tree and place the contents into D */
+
+
+
+/*****************************************************************************/
 /*	    			    Helpers				     */
 /*****************************************************************************/
 
@@ -559,8 +570,13 @@ static ExprNode* Factor (void)
 	    } else {
 		/* Mark the symbol as referenced */
 		SymRef (S);
-		/* Create symbol node */
-		N = GenSymExpr (S);
+                /* Remove the symbol if possible */
+                if (SymHasExpr (S)) {
+                    N = CloneExpr (GetSymExpr (S));
+                } else {
+                    /* Create symbol node */
+                    N = GenSymExpr (S);
+                }
 	    }
 	    break;
 
@@ -787,7 +803,7 @@ static ExprNode* Term (void)
 
             /* Generate an expression tree */
             unsigned char Op;
-            switch (T) {                           
+            switch (T) {
                 case TOK_MUL:   Op = EXPR_MUL;	break;
                 case TOK_DIV:   Op = EXPR_DIV;  break;
                 case TOK_MOD:   Op = EXPR_MOD;  break;
@@ -819,22 +835,50 @@ static ExprNode* SimpleExpr (void)
     /* Handle additive operations */
     while (Tok == TOK_PLUS || Tok == TOK_MINUS || Tok == TOK_OR) {
 
-	/* Create the new node */
-	ExprNode* Left = Root;
-	switch (Tok) {
-       	    case TOK_PLUS:     	Root = NewExprNode (EXPR_PLUS);	        break;
-       	    case TOK_MINUS:    	Root = NewExprNode (EXPR_MINUS); 	break;
-       	    case TOK_OR:       	Root = NewExprNode (EXPR_OR);  	        break;
-	    default:   	  	Internal ("Invalid token");
-      	}
-	Root->Left = Left;
+        long LVal, RVal, Val;
+        ExprNode* Left;
+        ExprNode* Right;
 
-        /* Skip the operator token */
-	NextTok ();
+        /* Remember the token and skip it */
+        enum Token T = Tok;
+        NextTok ();
 
-	/* Parse the right hand side */
-	Root->Right = Term ();
+        /* Move root to left side and read the right side */
+        Left  = Root;
+        Right = Term ();
 
+        /* If both expressions are constant, we can evaluate the term */
+        if (IsEasyConst (Left, &LVal) && IsEasyConst (Right, &RVal)) {
+
+            switch (T) {
+                case TOK_PLUS:  Val = LVal + RVal;      break;
+                case TOK_MINUS: Val = LVal - RVal;      break;
+                case TOK_OR:    Val = LVal | RVal;      break;
+                default:        Internal ("Invalid token");
+            }
+
+            /* Generate a literal expression and delete the old left and
+             * right sides.
+             */
+            FreeExpr (Left);
+            FreeExpr (Right);
+            Root = GenLiteralExpr (Val);
+
+        } else {
+
+            /* Generate an expression tree */
+            unsigned char Op;
+            switch (T) {
+                case TOK_PLUS:  Op = EXPR_PLUS;  break;
+                case TOK_MINUS: Op = EXPR_MINUS; break;
+                case TOK_OR:    Op = EXPR_OR;    break;
+                default:       	Internal ("Invalid token");
+            }
+            Root        = NewExprNode (Op);
+            Root->Left  = Left;
+            Root->Right = Right;
+
+        }
     }
 
     /* Return the expression tree we've created */
@@ -853,25 +897,56 @@ static ExprNode* BoolExpr (void)
     while (Tok == TOK_EQ || Tok == TOK_NE || Tok == TOK_LT ||
 	   Tok == TOK_GT || Tok == TOK_LE || Tok == TOK_GE) {
 
-	/* Create the new node */
-	ExprNode* Left = Root;
-	switch (Tok) {
-       	    case TOK_EQ:       	Root = NewExprNode (EXPR_EQ);	break;
-       	    case TOK_NE:       	Root = NewExprNode (EXPR_NE);	break;
-       	    case TOK_LT:       	Root = NewExprNode (EXPR_LT);	break;
-       	    case TOK_GT:       	Root = NewExprNode (EXPR_GT);	break;
-       	    case TOK_LE:       	Root = NewExprNode (EXPR_LE);	break;
-       	    case TOK_GE:       	Root = NewExprNode (EXPR_GE);	break;
-	    default:	   	Internal ("Invalid token");
-      	}
-	Root->Left = Left;
+        long LVal, RVal, Val;
+        ExprNode* Left;
+        ExprNode* Right;
 
-        /* Skip the operator token */
-	NextTok ();
+        /* Remember the token and skip it */
+        enum Token T = Tok;
+        NextTok ();
 
-	/* Parse the right hand side */
-	Root->Right = SimpleExpr ();
+        /* Move root to left side and read the right side */
+        Left  = Root;
+        Right = SimpleExpr ();
 
+        /* If both expressions are constant, we can evaluate the term */
+        if (IsEasyConst (Left, &LVal) && IsEasyConst (Right, &RVal)) {
+
+            switch (T) {
+                case TOK_EQ:    Val = (LVal == RVal);   break;
+                case TOK_NE:    Val = (LVal != RVal);   break;
+                case TOK_LT:    Val = (LVal < RVal);    break;
+                case TOK_GT:    Val = (LVal > RVal);    break;
+                case TOK_LE:    Val = (LVal <= RVal);   break;
+                case TOK_GE:    Val = (LVal >= RVal);   break;
+                default:        Internal ("Invalid token");
+            }
+
+            /* Generate a literal expression and delete the old left and
+             * right sides.
+             */
+            FreeExpr (Left);
+            FreeExpr (Right);
+            Root = GenLiteralExpr (Val);
+
+        } else {
+
+            /* Generate an expression tree */
+            unsigned char Op;
+            switch (T) {
+                case TOK_EQ:    Op = EXPR_EQ;   break;
+                case TOK_NE:    Op = EXPR_NE;   break;
+                case TOK_LT:    Op = EXPR_LT;   break;
+                case TOK_GT:    Op = EXPR_GT;   break;
+                case TOK_LE:    Op = EXPR_LE;   break;
+                case TOK_GE:    Op = EXPR_GE;   break;
+                default:       	Internal ("Invalid token");
+            }
+            Root        = NewExprNode (Op);
+            Root->Left  = Left;
+            Root->Right = Right;
+
+        }
     }
 
     /* Return the expression tree we've created */
@@ -889,21 +964,48 @@ static ExprNode* Expr2 (void)
     /* Handle booleans */
     while (Tok == TOK_BOOLAND || Tok == TOK_BOOLXOR) {
 
-	/* Create the new node */
-	ExprNode* Left = Root;
-	switch (Tok) {
-       	    case TOK_BOOLAND:   Root = NewExprNode (EXPR_BOOLAND); break;
-       	    case TOK_BOOLXOR:   Root = NewExprNode (EXPR_BOOLXOR); break;
-	    default:	   	Internal ("Invalid token");
-      	}
-	Root->Left = Left;
+        long LVal, RVal, Val;
+        ExprNode* Left;
+        ExprNode* Right;
 
-        /* Skip the operator token */
-	NextTok ();
+        /* Remember the token and skip it */
+        enum Token T = Tok;
+        NextTok ();
 
-	/* Parse the right hand side */
-	Root->Right = BoolExpr ();
+        /* Move root to left side and read the right side */
+        Left  = Root;
+        Right = BoolExpr ();
 
+        /* If both expressions are constant, we can evaluate the term */
+        if (IsEasyConst (Left, &LVal) && IsEasyConst (Right, &RVal)) {
+
+            switch (T) {
+                case TOK_BOOLAND:   Val = ((LVal != 0) && (RVal != 0)); break;
+                case TOK_BOOLXOR:   Val = ((LVal != 0) ^  (RVal != 0)); break;
+                default:        Internal ("Invalid token");
+            }
+
+            /* Generate a literal expression and delete the old left and
+             * right sides.
+             */
+            FreeExpr (Left);
+            FreeExpr (Right);
+            Root = GenLiteralExpr (Val);
+
+        } else {
+
+            /* Generate an expression tree */
+            unsigned char Op;
+            switch (T) {
+                case TOK_BOOLAND:   Op = EXPR_BOOLAND; break;
+                case TOK_BOOLXOR:   Op = EXPR_BOOLXOR; break;
+                default:       	    Internal ("Invalid token");
+            }
+            Root        = NewExprNode (Op);
+            Root->Left  = Left;
+            Root->Right = Right;
+
+        }
     }
 
     /* Return the expression tree we've created */
@@ -921,20 +1023,46 @@ static ExprNode* Expr1 (void)
     /* Handle booleans */
     while (Tok == TOK_BOOLOR) {
 
-	/* Create the new node */
-	ExprNode* Left = Root;
-	switch (Tok) {
-       	    case TOK_BOOLOR:    Root = NewExprNode (EXPR_BOOLOR);  break;
-	    default:  	   	Internal ("Invalid token");
-      	}
-	Root->Left = Left;
+        long LVal, RVal, Val;
+        ExprNode* Left;
+        ExprNode* Right;
 
-        /* Skip the operator token */
-	NextTok ();
+        /* Remember the token and skip it */
+        enum Token T = Tok;
+        NextTok ();
 
-	/* Parse the right hand side */
-	Root->Right = Expr2 ();
+        /* Move root to left side and read the right side */
+        Left  = Root;
+        Right = Expr2 ();
 
+        /* If both expressions are constant, we can evaluate the term */
+        if (IsEasyConst (Left, &LVal) && IsEasyConst (Right, &RVal)) {
+
+            switch (T) {
+                case TOK_BOOLOR:    Val = ((LVal != 0) || (RVal != 0)); break;
+                default:        Internal ("Invalid token");
+            }
+
+            /* Generate a literal expression and delete the old left and
+             * right sides.
+             */
+            FreeExpr (Left);
+            FreeExpr (Right);
+            Root = GenLiteralExpr (Val);
+
+        } else {
+
+            /* Generate an expression tree */
+            unsigned char Op;
+            switch (T) {
+                case TOK_BOOLOR:    Op = EXPR_BOOLOR;  break;
+                default:       	    Internal ("Invalid token");
+            }
+            Root        = NewExprNode (Op);
+            Root->Left  = Left;
+            Root->Right = Right;
+
+        }
     }
 
     /* Return the expression tree we've created */
@@ -951,14 +1079,23 @@ static ExprNode* Expr0 (void)
     /* Handle booleans */
     if (Tok == TOK_BOOLNOT) {
 
-	/* Create the new node */
-        Root = NewExprNode (EXPR_BOOLNOT);
+        long Val;
+        ExprNode* Left;
 
         /* Skip the operator token */
      	NextTok ();
 
-     	/* Parse the left hand side, allow more BNOTs */
-     	Root->Left = Expr0 ();
+        /* Read the argument */
+        Left = Expr0 ();
+
+        /* If the argument is const, evaluate it directly */
+        if (IsEasyConst (Left, &Val)) {
+            FreeExpr (Left);
+            Root = GenLiteralExpr (!Val);
+        } else {
+            Root = NewExprNode (EXPR_BOOLNOT);
+            Root->Left = Left;
+        }
 
     } else {
 
@@ -973,9 +1110,8 @@ static ExprNode* Expr0 (void)
 
 
 
-static void StudyExpr (ExprNode* Expr, ExprDesc* D, int Sign);
 static void StudyBinaryExpr (ExprNode* Expr, ExprDesc* D)
-/* Study a binary expression subtree */
+/* Study a binary expression subtree. Helper function for StudyExpr. */
 {
     StudyExpr (Expr->Left, D, 1);
     if (ExprDescIsConst (D)) {
@@ -1542,23 +1678,52 @@ ExprNode* GenBranchExpr (unsigned Offs)
 {
     ExprNode* N;
     ExprNode* Root;
+    long      Val;
 
-    /* Create *+Offs */
-    if (RelocMode) {
-	N = NewExprNode (EXPR_PLUS);
-	N->Left  = GenSectionExpr (GetCurrentSegNum ());
-    	N->Right = GenLiteralExpr (GetPC () + Offs);
+    /* Read Expression() */
+    N = Expression ();
+
+    /* If the expression is a cheap constant, generate a simpler tree */
+    if (IsEasyConst (N, &Val)) {
+
+        /* Free the constant expression tree */
+        FreeExpr (N);
+
+        /* Generate the final expression:
+         * Val - (* + Offs)
+         * Val - ((Seg + PC) + Offs)
+         * Val - Seg - PC - Offs
+         * (Val - PC - Offs) - Seg
+         */
+        Root = GenLiteralExpr (Val - GetPC () - Offs);
+        if (RelocMode) {
+            N = Root;
+            Root = NewExprNode (EXPR_MINUS);
+            Root->Left  = N;
+            Root->Right = GenSectionExpr (GetCurrentSegNum ());
+        }
+
     } else {
-	N = GenLiteralExpr (GetPC () + Offs);
+
+        /* Generate the expression:
+         * N - (* + Offs)
+         * N - ((Seg + PC) + Offs)
+         * N - Seg - PC - Offs
+         * N - (PC + Offs) - Seg
+         */
+        Root = NewExprNode (EXPR_MINUS);
+        Root->Left  = N;
+        Root->Right = GenLiteralExpr (GetPC () + Offs);
+        if (RelocMode) {
+            N = Root;
+            Root = NewExprNode (EXPR_MINUS);
+            Root->Left  = N;
+            Root->Right = GenSectionExpr (GetCurrentSegNum ());
+        }
     }
 
-    /* Create the root node */
-    Root = NewExprNode (EXPR_MINUS);
-    Root->Left = Expression ();
-    Root->Right = N;
-
     /* Return the result */
-    return SimplifyExpr (Root);
+    return Root;
 }
 
 

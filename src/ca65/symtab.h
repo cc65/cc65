@@ -58,6 +58,13 @@
 #define ST_NONE         0x00            /* No flags */
 #define ST_DEFINED      0x01            /* Scope has been defined */
 
+/* Symbol table types */
+#define ST_GLOBAL       0x00            /* Root level */
+#define ST_PROC         0x01            /* .PROC */
+#define ST_SCOPE        0x02            /* .SCOPE */
+#define ST_STUCT        0x03            /* .STRUCT */
+#define ST_UNDEF        0xFF
+
 /* A symbol table */
 typedef struct SymTable SymTable;
 struct SymTable {
@@ -87,7 +94,7 @@ SymTable*	RootScope;      /* Root symbol table */
 
 
 
-void SymEnterLevel (const char* ScopeName, unsigned AddrSize);
+void SymEnterLevel (const char* ScopeName, unsigned char Type, unsigned char AddrSize);
 /* Enter a new lexical level */
 
 void SymLeaveLevel (void);
@@ -102,13 +109,11 @@ SymEntry* SymFind (SymTable* Scope, const char* Name, int AllocNew);
  * new entry created, or - in case AllocNew is zero - return 0.
  */
 
-void SymConDes (const char* Name, unsigned Type, unsigned Prio);
-/* Mark the given symbol as a module constructor/destructor. This will also
- * mark the symbol as an export. Initializers may never be zero page symbols.
- */
-
 int SymIsZP (SymEntry* Sym);
 /* Return true if the symbol is explicitly marked as zeropage symbol */
+
+unsigned char GetCurrentSymTabType ();
+/* Return the type of the current symbol table */
 
 void SymCheck (void);
 /* Run through all symbols and check for anomalies and errors */

@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -51,7 +51,7 @@
 
 
 /* Warning levels */
-extern unsigned        	WarnLevel;
+extern unsigned WarnLevel;
 
 /* Statistics */
 extern unsigned ErrorCount;
@@ -73,7 +73,7 @@ void PWarning (const FilePos* Pos, unsigned Level, const char* Format, ...) attr
 
 void Error (const char* Format, ...) attribute ((format (printf, 1, 2)));
 /* Print an error message */
-
+                
 void PError (const FilePos* Pos, const char* Format, ...) attribute ((format (printf, 2, 3)));
 /* Print an error message giving an explicit file and position. */
 

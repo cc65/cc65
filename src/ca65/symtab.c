@@ -112,7 +112,7 @@ static SymTable* NewSymTable (SymTable* Parent, const char* Name)
     S->Childs       = 0;
     S->Flags        = ST_NONE;
     S->AddrSize     = ADDR_SIZE_DEFAULT;
-    S->Type         = 0;
+    S->Type         = ST_UNDEF;
     S->Level        = Level;
     S->TableSlots   = Slots;
     S->TableEntries = 0;
@@ -203,7 +203,7 @@ static int SearchSymTree (SymEntry* T, const char* Name, SymEntry** E)
 
 
 
-void SymEnterLevel (const char* ScopeName, unsigned AddrSize)
+void SymEnterLevel (const char* ScopeName, unsigned char Type, unsigned char AddrSize)
 /* Enter a new lexical level */
 {
     /* Map a default address size to something real */
@@ -216,18 +216,23 @@ void SymEnterLevel (const char* ScopeName, unsigned AddrSize)
      * new one if it doesn't exist. If this is the root scope, just create it.
      */
     if (CurrentScope) {
+
+        /* Search for the scope, create a new one */
         CurrentScope = SymFindScope (CurrentScope, ScopeName, SYM_ALLOC_NEW);
 
         /* Check if the scope has been defined before */
         if (CurrentScope->Flags & ST_DEFINED) {
             Error ("Duplicate scope `%s'", ScopeName);
         }
+
     } else {
         CurrentScope = RootScope = NewSymTable (0, ScopeName);
     }
 
-    /* Mark the scope as defined */
-    CurrentScope->Flags |= ST_DEFINED;
+    /* Mark the scope as defined and set type and address size */
+    CurrentScope->Flags    |= ST_DEFINED;
+    CurrentScope->AddrSize = AddrSize;
+    CurrentScope->Type     = Type;
 }
 
 
@@ -364,7 +369,7 @@ static SymEntry* SymFindAny (SymTable* Scope, const char* Name)
     do {
 	/* Search in the current table */
 	Sym = SymFind (Scope, Name, SYM_FIND_EXISTING);
-	if (Sym) {
+       	if (Sym) {
 	    /* Found, return it */
 	    return Sym;
 	} else {
@@ -375,61 +380,6 @@ static SymEntry* SymFindAny (SymTable* Scope, const char* Name)
 
     /* Not found */
     return 0;
-}
-
-
-
-void SymConDes (const char* Name, unsigned Type, unsigned Prio)
-/* Mark the given symbol as a module constructor/destructor. This will also
- * mark the symbol as an export. Initializers may never be zero page symbols.
- */
-{
-    SymEntry* S;
-
-    /* Check the parameters */
-#if (CD_TYPE_MIN != 0)
-    CHECK (Type >= CD_TYPE_MIN && Type <= CD_TYPE_MAX);
-#else
-    CHECK (Type <= CD_TYPE_MAX);
-#endif
-    CHECK (Prio >= CD_PRIO_MIN && Prio <= CD_PRIO_MAX);
-
-    /* Don't accept local symbols */
-    if (IsLocalName (Name)) {
-     	Error ("Illegal use of a local symbol");
-     	return;
-    }
-
-    /* Do we have such a symbol? */
-    S = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
-    if (S->Flags & SF_IMPORT) {
-     	/* The symbol is already marked as imported external symbol */
-     	Error ("Symbol `%s' is already an import", Name);
-     	return;
-    }
-
-    /* If the symbol is marked as global, silently remove the global flag */
-    if (S->Flags & SF_GLOBAL) {
-        S->Flags &= ~SF_GLOBAL;
-    }
-
-    /* Check if the symbol was not already defined as ZP symbol */
-    if (S->AddrSize == ADDR_SIZE_ZP) {
-	Error ("Redeclaration mismatch for symbol `%s'", Name);
-    }
-
-    /* If the symbol was already declared as a condes, check if the new
-     * priority value is the same as the old one.
-     */
-    if (S->ConDesPrio[Type] != CD_PRIO_NONE) {
-	if (S->ConDesPrio[Type] != Prio) {
-	    Error ("Redeclaration mismatch for symbol `%s'", Name);
-	}
-    }
-    S->ConDesPrio[Type] = Prio;
-
-    /* Set the symbol data */
-    S->Flags |= SF_EXPORT | SF_REFERENCED;
 }
 
 
@@ -460,6 +410,15 @@ int SymIsZP (SymEntry* S)
 
     /* Check the ZP flag */
     return (S->AddrSize == ADDR_SIZE_ZP);
+}
+
+
+
+unsigned char GetCurrentSymTabType ()
+/* Return the type of the current symbol table */
+{
+    CHECK (CurrentScope != 0);
+    return CurrentScope->Type;
 }
 
 
@@ -821,4 +780,4 @@ void WriteDbgSyms (void)
 
 
 
-                                 
+

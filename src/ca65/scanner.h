@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -294,7 +294,7 @@ int GetSubKey (const char** Keys, unsigned Count);
  * or -1 if the keyword was not found.
  */
 
-unsigned ParseAddrSize (void);
+unsigned char ParseAddrSize (void);
 /* Check if the next token is a keyword that denotes an address size specifier.
  * If so, return the corresponding address size constant, otherwise output an
  * error message and return ADDR_SIZE_DEFAULT.

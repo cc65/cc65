@@ -136,21 +136,26 @@ INLINE void SymDelExprRef (SymEntry* Sym, struct ExprNode* Expr)
 #define SymDelExprRef(Sym,Expr)     CollDeleteItem (&(Sym)->ExprRefs, Expr)
 #endif
 
-void SymDef (SymEntry* Sym, ExprNode* Expr, unsigned AddrSize, unsigned Flags);
+void SymDef (SymEntry* Sym, ExprNode* Expr, unsigned char AddrSize, unsigned Flags);
 /* Mark a symbol as defined */
 
 void SymRef (SymEntry* Sym);
 /* Mark the given symbol as referenced */
 
-void SymImport (SymEntry* Sym, unsigned AddrSize, unsigned Flags);
+void SymImport (SymEntry* Sym, unsigned char AddrSize, unsigned Flags);
 /* Mark the given symbol as an imported symbol */
 
-void SymExport (SymEntry* Sym, unsigned AddrSize, unsigned Flags);
+void SymExport (SymEntry* Sym, unsigned char AddrSize, unsigned Flags);
 /* Mark the given symbol as an exported symbol */
 
-void SymGlobal (SymEntry* S, unsigned AddrSize, unsigned Flags);
+void SymGlobal (SymEntry* Sym, unsigned char AddrSize, unsigned Flags);
 /* Mark the given symbol as a global symbol, that is, as a symbol that is
  * either imported or exported.
+ */
+
+void SymConDes (SymEntry* Sym, unsigned char AddrSize, unsigned Type, unsigned Prio);
+/* Mark the given symbol as a module constructor/destructor. This will also
+ * mark the symbol as an export. Initializers may never be zero page symbols.
  */
 
 int SymIsDef (const SymEntry* Sym);

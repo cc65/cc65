@@ -7,7 +7,7 @@
 /*                                                                           */
 /*                                                                           */
 /* (C) 1998-2003 Ullrich von Bassewitz                                       */
-/*               Römerstrasse 52                                             */
+/*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
@@ -114,7 +114,7 @@ static void DoInvalid (void);
 
 
 
-static unsigned OptionalAddrSize (void)
+static unsigned char OptionalAddrSize (void)
 /* If a colon follows, parse an optional address size spec and return it.
  * Otherwise return ADDR_SIZE_DEFAULT.
  */
@@ -161,12 +161,12 @@ static void SetBoolOption (unsigned char* Flag)
 
 
 
-static void ExportImport (void (*Func) (SymEntry*, unsigned, unsigned),
-                          unsigned DefAddrSize, unsigned Flags)
+static void ExportImport (void (*Func) (SymEntry*, unsigned char, unsigned),
+                          unsigned char DefAddrSize, unsigned Flags)
 /* Export or import symbols */
 {
     SymEntry* Sym;
-    unsigned  AddrSize;
+    unsigned char AddrSize;
 
     while (1) {
 
@@ -227,6 +227,10 @@ static void ConDes (const char* Name, unsigned Type)
 {
     long Prio;
 
+
+    /* Find the symbol table entry, allocate a new one if necessary */
+    SymEntry* Sym = SymFind (CurrentScope, Name, SYM_ALLOC_NEW);
+
     /* Optional constructor priority */
     if (Tok == TOK_COMMA) {
     	/* Priority value follows */
@@ -243,7 +247,7 @@ static void ConDes (const char* Name, unsigned Type)
     }
 
     /* Define the symbol */
-    SymConDes (Name, Type, (unsigned) Prio);
+    SymConDes (Sym, ADDR_SIZE_DEFAULT, Type, (unsigned) Prio);
 }
 
 
@@ -700,11 +704,11 @@ static void DoEnd (void)
 static void DoEndProc (void)
 /* Leave a lexical level */
 {
-    if (CurrentScope != RootScope) {
-        SymLeaveLevel ();
-    } else {
+    if (CurrentScope == RootScope || GetCurrentSymTabType () != ST_PROC) {
         /* No local scope */
-        ErrorSkip ("No open lexical level");
+        ErrorSkip ("No open .PROC");
+    } else {
+        SymLeaveLevel ();
     }
 }
 
@@ -713,11 +717,11 @@ static void DoEndProc (void)
 static void DoEndScope (void)
 /* Leave a lexical level */
 {
-    if (CurrentScope != RootScope) {
-        SymLeaveLevel ();
-    } else {
+    if (CurrentScope == RootScope || GetCurrentSymTabType () != ST_SCOPE) {
         /* No local scope */
-        ErrorSkip ("No open lexical level");
+        ErrorSkip ("No open .SCOPE");
+    } else {
+        SymLeaveLevel ();
     }
 }
 
@@ -1294,12 +1298,12 @@ static void DoPopSeg (void)
 static void DoProc (void)
 /* Start a new lexical scope */
 {
+    char Name[sizeof(SVal)];
+    unsigned char AddrSize;
+
     if (Tok == TOK_IDENT) {
 
-        unsigned AddrSize;
-
 	/* The new scope has a name. Remember it. */
-        char Name[sizeof(SVal)];
         strcpy (Name, SVal);
 
         /* Search for the symbol, generate a new one if needed */
@@ -1314,17 +1318,17 @@ static void DoProc (void)
         /* Mark the symbol as defined */
     	SymDef (Sym, GenCurrentPC (), AddrSize, SF_LABEL);
 
-        /* Enter a new scope with the given name */
-        SymEnterLevel (Name, AddrSize);
-
     } else {
 
         /* A .PROC statement without a name */
-        char Buf[sizeof (SVal)];
-        SymEnterLevel (AnonName (Buf, sizeof (Buf), "Scope"), ADDR_SIZE_DEFAULT);
         Warning (1, "Unnamed .PROCs are deprecated, please use .SCOPE");
+        AnonName (Name, sizeof (Name), "PROC");
+        AddrSize = ADDR_SIZE_DEFAULT;
 
     }
+
+    /* Enter a new scope */
+    SymEnterLevel (Name, ST_PROC, AddrSize);
 }
 
 
@@ -1413,27 +1417,28 @@ static void DoScope (void)
 /* Start a local scope */
 {
     char Name[sizeof (SVal)];
+    unsigned char AddrSize;
+
 
     if (Tok == TOK_IDENT) {
 
-        unsigned AddrSize;
-
-	/* The new scope has a name. Remember and skip it. */
+    	/* The new scope has a name. Remember and skip it. */
         strcpy (Name, SVal);
         NextTok ();
-
-        /* Read an optional address size specifier */
-        AddrSize = OptionalAddrSize ();
-
-        /* Enter a new scope with the given name */
-        SymEnterLevel (Name, AddrSize);
 
     } else {
 
         /* An unnamed scope */
-        SymEnterLevel (AnonName (Name, sizeof (Name), "Scope"), ADDR_SIZE_DEFAULT);
+        AnonName (Name, sizeof (Name), "SCOPE");
 
     }
+
+    /* Read an optional address size specifier */
+    AddrSize = OptionalAddrSize ();
+
+    /* Enter the new scope */
+    SymEnterLevel (Name, ST_SCOPE, AddrSize);
+
 }
 
 
@@ -1671,7 +1676,7 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoRepeat	},
     { ccNone,		DoRes		},
     { ccNone,		DoInvalid      	},     	/* .RIGHT */
-    { ccNone,		DoROData	},   
+    { ccNone,		DoROData	},
     { ccNone,           DoScope         },
     { ccNone,       	DoSegment	},
     { ccNone,          	DoSetCPU        },

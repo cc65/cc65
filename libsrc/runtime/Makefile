@@ -131,6 +131,9 @@ OBJS = 	add.o		\
        	mul.o  		\
 	mulax3.o	\
 	mulax5.o	\
+	mulax6.o	\
+	mulax7.o	\
+	mulax9.o	\
 	mulax10.o	\
        	ne.o   		\
        	neg.o  		\

@@ -49,19 +49,20 @@ void RememberEntry (Function* F);
 unsigned GetRetLab (const Function* F);
 /* Return the return jump label */
 
-int AllocLocalSpace (Function* F, unsigned Size);
-/* Allocate space for the function locals, return stack offset  */
+int ReserveLocalSpace (Function* F, unsigned Size);
+/* Reserve (but don't allocate) the given local space and return the stack
+ * offset.
+ */
 
-void FreeLocalSpace (Function* F, unsigned Size);
-/* Free space allocated for function locals */
+void AllocLocalSpace (Function* F);
+/* Allocate any local space previously reserved. The function will do
+ * nothing if there is no reserved local space.
+ */
 
 void NewFunc (struct SymEntry* Func);
 /* Parse argument declarations and function body. */
 
-unsigned GetLocalSpace (const Function* F);
-/* Get the local variable space needed for the function */
 
-				 
 
 /* End of function.h */
 #endif

@@ -631,18 +631,8 @@ SymEntry* AddLabelSym (const char* Name, unsigned Flags)
 SymEntry* AddLocalSym (const char* Name, type* Type, unsigned Flags, int Offs)
 /* Add a local symbol and return the symbol entry */
 {
-    SymEntry* Entry;
-
-    /* Functions declared inside of functions do always have external linkage */
-    if (Type != 0 && IsFunc (Type)) {
-       	if ((Flags & (SC_DEFAULT | SC_EXTERN)) == 0) {
-       	    Warning (WARN_FUNC_MUST_BE_EXTERN);
-       	}
-       	Flags = SC_EXTERN;
-    }
-
     /* Do we have an entry with this name already? */
-    Entry = FindSymInTable (SymTab, Name, HashStr (Name));
+    SymEntry* Entry = FindSymInTable (SymTab, Name, HashStr (Name));
     if (Entry) {
 
     	/* We have a symbol with this name already */

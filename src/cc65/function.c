@@ -61,9 +61,8 @@ struct Function {
     type*   	  	ReturnType;	/* Function return type */
     struct FuncDesc*	Desc;	  	/* Function descriptor */
     CodeMark 	       	EntryCode;     	/* Backpatch addr for entry code */
-    int			LocalMax; 	/* Total space for locals */
-    int			LocalSize;	/* Current space for locals */
-    unsigned	  	RetLab;		/* Return code label */
+    int			Reserved;	/* Reserved local space */
+    unsigned	  	RetLab;	    	/* Return code label */
 };
 
 /* Pointer to current function */
@@ -88,8 +87,7 @@ static Function* NewFunction (struct SymEntry* Sym)
     F->ReturnType = Sym->Type + 1 + DECODE_SIZE;
     F->Desc   	  = DecodePtr (Sym->Type + 1);
     F->EntryCode  = 0;
-    F->LocalMax	  = 0;
-    F->LocalSize  = 0;
+    F->Reserved	  = 0;
     F->RetLab	  = GetLabel ();
 
     /* Return the new structure */
@@ -154,39 +152,42 @@ unsigned GetRetLab (const Function* F)
 
 
 
-int AllocLocalSpace (Function* F, unsigned Size)
-/* Allocate space for the function locals, return stack offset */
+int ReserveLocalSpace (Function* F, unsigned Size)
+/* Reserve (but don't allocate) the given local space and return the stack
+ * offset.
+ */
 {
-    /* Add the size */
-    F->LocalSize += Size;
-    if (F->LocalSize > F->LocalMax) {
-      	F->LocalMax = F->LocalSize;
+    F->Reserved += Size;
+    return oursp - F->Reserved;
+}
+
+
+
+void AllocLocalSpace (Function* F)
+/* Allocate any local space previously reserved. The function will do
+ * nothing if there is no reserved local space.
+ */
+{
+    if (F->Reserved > 0) {
+
+	/* Switch to the code segment */
+	g_usecode ();
+
+	/* Create space on the stack */
+	g_space (F->Reserved);
+
+	/* Correct the stack pointer */
+	oursp -= F->Reserved;
+
+	/* Nothing more reserved */
+	F->Reserved = 0;
     }
-
-    /* Return the offset, it is below the initial stack pointer */
-    return -F->LocalSize;;
-}
-
-
-
-void FreeLocalSpace (Function* F, unsigned Size)
-/* Free space allocated for function locals */
-{
-    F->LocalSize -= Size;
-}
-
-
-
-unsigned GetLocalSpace (const Function* F)
-/* Get the local variable space needed for the function */
-{
-    return F->LocalMax;
 }
 
 
 
 /*****************************************************************************/
-/*     	      	 	    	     code	      		 	     */
+/*     	      	  	    	     code	      		 	     */
 /*****************************************************************************/
 
 

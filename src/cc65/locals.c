@@ -39,6 +39,7 @@
 #include "asmlabel.h"
 #include "codegen.h"
 #include "declare.h"
+#include "error.h"
 #include "expr.h"
 #include "function.h"
 #include "global.h"
@@ -129,17 +130,188 @@ static int AllocRegVar (const SymEntry* Sym, const type* tarray)
 
 
 
+static void ParseOneDecl (const DeclSpec* Spec)
+/* Parse one variable declaration */
+{
+    int     	Size; 		/* Size of an auto variable */
+    int     	SC;      	/* Storage class for symbol */
+    int	       	SymData = 0;	/* Symbol data (offset, label name, ...) */
+    unsigned 	flags = 0;	/* Code generator flags */
+    Declaration Decl;		/* Declaration data structure */
+
+    /* Remember the storage class for the new symbol */
+    SC = Spec->StorageClass;
+
+    /* Read the declaration */
+    ParseDecl (Spec, &Decl, DM_NEED_IDENT);
+
+    /* Set the correct storage class for functions */
+    if (IsFunc (Decl.Type)) {
+	/* Function prototypes are always external */
+	if ((SC & SC_EXTERN) == 0) {
+       	    Warning (WARN_FUNC_MUST_BE_EXTERN);
+	}
+       	SC |= SC_FUNC | SC_EXTERN;
+
+    }
+
+    /* If we don't have a name, this was flagged as an error earlier.
+     * To avoid problems later, use an anonymous name here.
+     */
+    if (Decl.Ident[0] == '\0') {
+	AnonName (Decl.Ident, "param");
+    }
+
+    /* Handle anything that needs storage (no functions, no typdefs) */
+    if ((SC & SC_FUNC) != SC_FUNC && (SC & SC_TYPEDEF) != SC_TYPEDEF) {
+
+	/* Get the size of the variable */
+	Size = SizeOf (Decl.Type);
+
+       	if (SC & (SC_AUTO | SC_REGISTER)) {
+
+	    /* Auto variable */
+	    if (StaticLocals == 0) {
+
+     		/* Change SC in case it was register */
+		SC = (SC & ~SC_REGISTER) | SC_AUTO;
+		if (curtok == TOK_ASSIGN) {
+
+		    struct expent lval;
+
+		    /* Allocate previously reserved local space */
+		    AllocLocalSpace (CurrentFunc);
+
+		    /* Skip the '=' */
+		    NextToken ();
+
+		    /* Setup the type flags for the assignment */
+		    flags = Size == 1? CF_FORCECHAR : CF_NONE;
+
+		    /* Get the expression into the primary */
+		    if (evalexpr (flags, hie1, &lval) == 0) {
+			/* Constant expression. Adjust the types */
+			assignadjust (Decl.Type, &lval);
+			flags |= CF_CONST;
+		    } else {
+			/* Expression is not constant and in the primary */
+			assignadjust (Decl.Type, &lval);
+		    }
+
+		    /* Push the value */
+		    g_push (flags | TypeOf (Decl.Type), lval.e_const);
+
+		    /* Mark the variable as referenced */
+		    SC |= SC_REF;
+
+		    /* Variable is located at the current SP */
+		    SymData = oursp;
+
+		} else {
+		    /* Non-initialized local variable. Just keep track of
+		     * the space needed.
+		     */
+		    SymData = ReserveLocalSpace (CurrentFunc, Size);
+		}
+
+	    } else {
+
+		/* Static local variables. */
+		SC = (SC & ~(SC_REGISTER | SC_AUTO)) | SC_STATIC;
+
+		/* Put them into the BSS */
+		g_usebss ();
+
+		/* Define the variable label */
+		SymData = GetLabel ();
+		g_defloclabel (SymData);
+
+		/* Reserve space for the data */
+		g_res (Size);
+
+		/* Allow assignments */
+		if (curtok == TOK_ASSIGN) {
+
+		    struct expent lval;
+
+		    /* Switch to the code segment. */
+		    g_usecode ();
+
+		    /* Skip the '=' */
+		    NextToken ();
+
+		    /* Get the expression into the primary */
+		    expression1 (&lval);
+
+		    /* Make type adjustments if needed */
+		    assignadjust (Decl.Type, &lval);
+
+		    /* Setup the type flags for the assignment */
+		    flags = TypeOf (Decl.Type);
+		    if (Size == 1) {
+			flags |= CF_FORCECHAR;
+		    }
+
+		    /* Store the value into the variable */
+		    g_putstatic (flags, SymData, 0);
+
+		    /* Mark the variable as referenced */
+		    SC |= SC_REF;
+		}
+     	    }
+
+	} else if ((SC & SC_STATIC) == SC_STATIC) {
+
+	    /* Static data */
+	    if (curtok == TOK_ASSIGN) {
+
+		/* Initialization ahead, switch to data segment */
+		g_usedata ();
+
+		/* Define the variable label */
+		SymData = GetLabel ();
+		g_defloclabel (SymData);
+
+		/* Skip the '=' */
+		NextToken ();
+
+		/* Allow initialization of static vars */
+		ParseInit (Decl.Type);
+
+		/* Mark the variable as referenced */
+		SC |= SC_REF;
+
+	    } else {
+
+		/* Uninitialized data, use BSS segment */
+		g_usebss ();
+
+		/* Define the variable label */
+		SymData = GetLabel ();
+		g_defloclabel (SymData);
+
+		/* Reserve space for the data */
+		g_res (Size);
+
+	    }
+	}
+
+    }
+
+    /* If the symbol is not marked as external, it will be defined */
+    if ((SC & SC_EXTERN) == 0) {
+	SC |= SC_DEF;
+    }
+
+    /* Add the symbol to the symbol table */
+    AddLocalSym (Decl.Ident, Decl.Type, SC, SymData);
+}
+
+
+
 void DeclareLocals (void)
 /* Declare local variables and types. */
 {
-    int offs = oursp;  	      	/* Current stack offset for variable */
-    int AutoSpace = 0; 		/* Unallocated space on the stack */
-    int Size;	       	      	/* Size of an auto variable */
-    int Reg; 	       		/* Register variable offset */
-    unsigned flags = 0;		/* Code generator flags */
-    int SymbolSC;      		/* Storage class for symbol */
-    int ldata = 0;     		/* Local symbol data temp storage */
-
     /* Loop until we don't find any more variables */
     while (1) {
 
@@ -166,239 +338,28 @@ void DeclareLocals (void)
       	/* Parse a comma separated variable list */
       	while (1) {
 
-      	    Declaration Decl;
+	    /* Parse one declaration */
+	    ParseOneDecl (&Spec);
 
-      	    /* Remember the storage class for the new symbol */
-      	    SymbolSC = Spec.StorageClass;
-
-      	    /* Read the declaration */
-      	    ParseDecl (&Spec, &Decl, DM_NEED_IDENT);
-
-      	    /* If we don't have a name, this was flagged as an error earlier.
-      	     * To avoid problems later, use an anonymous name here.
-      	     */
-       	    if (Decl.Ident[0] == '\0') {
-      	    	AnonName (Decl.Ident, "param");
-      	    }
-
-       	    if (!IsFunc (Decl.Type) && (SymbolSC & SC_TYPEDEF) != SC_TYPEDEF) {
-
-	     	/* Get the size of the variable */
-	     	Size = SizeOf (Decl.Type);
-
-#if 0
-    	      	/* Check the storage class */
-    	      	if ((SymbolSC & SC_REGISTER) && (Reg = AllocRegVar (psym, tarray)) >= 0) {
-
-    	      	    /* We will store the current value of the register onto the
-    	      	     * stack, thus making functions with register variables
-    	      	     * reentrant. If we have pending auto variables, emit them
-    	     	     * now.
-    	      	     */
-    	      	    g_usecode ();
-    	     	    g_space (AutoSpace);
-    	     	    oursp -= AutoSpace;
-    	     	    AutoSpace = 0;
-
-    	     	    /* Remember the register bank offset */
-    	     	    ldata = Reg;
-
-    	     	    /* Save the current register value onto the stack */
-    	     	    g_save_regvars (Reg, Size);
-
-    	     	    /* Allow variable initialization */
-    	      	    if (curtok == TOK_ASSIGN) {
-
-    	      	       	struct expent lval;
-
-    	      	       	/* Skip the '=' */
-    	      	       	NextToken ();
-
-    	      	       	/* Get the expression into the primary */
-	    		expression1 (&lval);
-
-    	     		/* Make type adjustments if needed */
-    	     		assignadjust (tarray, &lval);
-
-    	      	     	/* Setup the type flags for the assignment */
-	    		flags = TypeOf (tarray) | CF_REGVAR;
-	    		if (Size == 1) {
-	    		    flags |= CF_FORCECHAR;
-	    		}
-
-       	       	       	/* Store the value into the register */
-       	       	       	g_putstatic (flags, Reg, 0);
-
-     	      	       	/* Mark the variable as referenced */
-     	      	       	SymbolSC |= SC_REF;
-
-     	     	    }
-
-     	     	    /* Account for the stack space needed and remember the
-     	     	     * stack offset of the save area.
-     	     	     */
-     	     	    offs -= Size;
-     	     	    psym->h_lattr = offs;
-
-     	      	} else if (SymbolSC & (SC_AUTO | SC_REGISTER)) {
-#endif
-      	      	if (SymbolSC & (SC_AUTO | SC_REGISTER)) {
-
-    	     	    /* Auto variable */
-	    	    if (StaticLocals == 0) {
-
-			/* Change SC in case it was register */
-       	       	       	SymbolSC = (SymbolSC & ~SC_REGISTER) | SC_AUTO;
-	    	    	if (curtok == TOK_ASSIGN) {
-
-	    	    	    struct expent lval;
-
-	    	    	    /* Switch to the code segment, allocate space for
-	    	    	     * uninitialized variables.
-	    	    	     */
-	    	    	    g_usecode ();
-	    	    	    g_space (AutoSpace);
-	    	    	    oursp -= AutoSpace;
-	    	    	    AutoSpace = 0;
-
-	    	    	    /* Skip the '=' */
-	    	    	    NextToken ();
-
-	    	    	    /* Setup the type flags for the assignment */
-	    	    	    flags = Size == 1? CF_FORCECHAR : CF_NONE;
-
-	    	    	    /* Get the expression into the primary */
-	    	    	    if (evalexpr (flags, hie1, &lval) == 0) {
-	    	    		/* Constant expression. Adjust the types */
-	    	    		assignadjust (Decl.Type, &lval);
-	    	    		flags |= CF_CONST;
-	    	    	    } else {
-	    	    		/* Expression is not constant and in the primary */
-	    	    		assignadjust (Decl.Type, &lval);
-	    	    	    }
-
-	    	    	    /* Push the value */
-	    	    	    g_push (flags | TypeOf (Decl.Type), lval.e_const);
-
-	    	    	    /* Mark the variable as referenced */
-	    	    	    SymbolSC |= SC_REF;
-
-	    	    	} else {
-	    	    	    /* Non-initialized local variable. Just keep track of
-	    	    	     * the space needed.
-	    	    	     */
-	    	    	    AutoSpace += Size;
-	    	    	}
-
-	    	    	/* Allocate space on the stack, assign the offset */
-	    	    	offs -= Size;
-	    	    	ldata = offs;
-
-	    	    } else {
-
-	    	    	/* Static local variables. */
-       	       	       	SymbolSC = (SymbolSC & ~(SC_REGISTER | SC_AUTO)) | SC_STATIC;
-
-	    	    	/* Put them into the BSS */
-	      	    	g_usebss ();
-
-	      	       	/* Define the variable label */
-     	      	        g_defloclabel (ldata = GetLabel ());
-
-	      	       	/* Reserve space for the data */
-     	      	       	g_res (Size);
-
-	    	    	/* Allow assignments */
-	    	    	if (curtok == TOK_ASSIGN) {
-
-	    	    	    struct expent lval;
-
-	    	    	    /* Switch to the code segment. */
-	    	    	    g_usecode ();
-
-	    	    	    /* Skip the '=' */
-	    	    	    NextToken ();
-
-	    	    	    /* Get the expression into the primary */
-	    	    	    expression1 (&lval);
-
-	    	    	    /* Make type adjustments if needed */
-	    	    	    assignadjust (Decl.Type, &lval);
-
-	    	    	    /* Setup the type flags for the assignment */
-	    	    	    flags = TypeOf (Decl.Type);
-	    	    	    if (Size == 1) {
-	    	    		flags |= CF_FORCECHAR;
-	    	    	    }
-
-	    	    	    /* Store the value into the variable */
-	    	     	    g_putstatic (flags, ldata, 0);
-
-	    	     	    /* Mark the variable as referenced */
-	    	     	    SymbolSC |= SC_REF;
-	    	     	}
-	    	    }
-
-     	       	} else if ((SymbolSC & SC_STATIC) == SC_STATIC) {
-
-	      	    /* Static data */
-     	      	    if (curtok == TOK_ASSIGN) {
-
-    	      	    	/* Initialization ahead, switch to data segment */
-      	      	    	g_usedata ();
-
-	      	    	/* Define the variable label */
-     	      	        g_defloclabel (ldata = GetLabel ());
-
-	      	      	/* Skip the '=' */
-     	      	       	NextToken ();
-
-     	      	       	/* Allow initialization of static vars */
-     	      	       	ParseInit (Decl.Type);
-
-	      		/* Mark the variable as referenced */
-    	      	       	SymbolSC |= SC_REF;
-
-     	      	    } else {
-
-	      	  	/* Uninitialized data, use BSS segment */
-	      	  	g_usebss ();
-
-	      	       	/* Define the variable label */
-     	      	        g_defloclabel (ldata = GetLabel ());
-
-	      	       	/* Reserve space for the data */
-     	      	       	g_res (Size);
-
-     	      	    }
-     	      	}
-
-	    }
-
-	    /* If the symbol is not marked as external, it will be defined */
-	    if ((SymbolSC & SC_EXTERN) == 0) {
-		SymbolSC |= SC_DEF;
-	    }
-
-	    /* Add the symbol to the symbol table */
- 	    AddLocalSym (Decl.Ident, Decl.Type, SymbolSC, ldata);
-
-     	    if (curtok != TOK_COMMA) {
+	    /* Check if there is more */
+     	    if (curtok == TOK_COMMA) {
+		/* More to come */
+		NextToken ();
+	    } else {
+		/* Done */
      	      	break;
 	    }
-     	    NextToken ();
        	}
-     	if (curtok == TOK_SEMI) {
-     	    NextToken ();
-     	}
+
+	/* A semicolon must follow */
+	ConsumeSemi ();
     }
+
+    /* Be sure to allocate any reserved space for locals */
+    AllocLocalSpace (CurrentFunc);
 
     /* In case we switched away from code segment, switch back now */
     g_usecode ();
-
-    /* Create space for locals */
-    g_space (AutoSpace);
-    oursp -= AutoSpace;
 }
 
 

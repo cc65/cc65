@@ -42,15 +42,24 @@ typedef unsigned int  _sectsize_t;
 #define _dio_query_sectsize(x) ((_sectsize_t)256)
 #endif
 
-extern unsigned char __fastcall__ _dio_open        (_driveid_t drive_id);
-extern unsigned char __fastcall__ _dio_close       (_driveid_t drive_id);
-extern unsigned char __fastcall__ _dio_format      (_driveid_t drive_id, unsigned int format);
-extern unsigned char __fastcall__ _dio_read        (_driveid_t drive_id, _sectnum_t sect_num, void *buffer);
-extern unsigned char __fastcall__ _dio_write       (_driveid_t drive_id, _sectnum_t sect_num, void *buffer);
-extern unsigned char __fastcall__ _dio_write_verify(_driveid_t drive_id, _sectnum_t sect_num, void *buffer);
+extern unsigned char __fastcall__ _dio_open  (_driveid_t drive_id);
+extern unsigned char __fastcall__ _dio_close (_driveid_t drive_id);
+extern unsigned char __fastcall__ _dio_format(_driveid_t drive_id,
+                                              unsigned int format);
+extern unsigned char __fastcall__ _dio_read(_driveid_t drive_id,
+                                            _sectnum_t sect_num,
+                                            void *buffer);
+extern unsigned char __fastcall__ _dio_write(_driveid_t drive_id,
+                                             _sectnum_t sect_num,
+                                             const void *buffer);
+extern unsigned char __fastcall__ _dio_write_verify(_driveid_t drive_id,
+                                                    _sectnum_t sect_num,
+                                                    const void *buffer);
 
 
-extern _sectnum_t __fastcall__ _dio_chs_to_snum(unsigned int cyl, unsigned int head, unsigned int sector);
+extern _sectnum_t __fastcall__ _dio_chs_to_snum(unsigned int cyl,
+                                                unsigned int head,
+                                                unsigned int sector);
 extern void       __fastcall__ _dio_snum_to_chs(_sectnum_t sect_num,
                                                 unsigned int *cyl,
                                                 unsigned int *head,

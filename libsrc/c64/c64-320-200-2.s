@@ -461,27 +461,6 @@ GETPIXEL:
         rts
 
 ; ------------------------------------------------------------------------
-; HORLINE: Draw a horizontal line from X1/Y to X2/Y, where X1 = ptr1,
-; Y = ptr2 and X2 = ptr3, using the current drawing color.
-;
-; This is a special line drawing entry used when the line is know to be
-; horizontal, for example by the BAR emulation routine. If the driver does
-; not have special code for horizontal lines, it may just copy Y to Y2 and
-; proceed with the generic line drawing code.
-;
-; Note: Line coordinates will always be sorted (Y1 <= X2) and clipped.
-;
-; Must set an error code: NO
-;
-
-HORLINE:
-        lda     ptr2
-        sta     ptr4
-        lda     ptr2+1
-        sta     ptr4+1
-;       jmp     LINE
-
-; ------------------------------------------------------------------------
 ; LINE: Draw a line from X1/Y1 to X2/Y2, where X1/Y1 = ptr1/ptr2 and
 ; X2/Y2 = ptr3/ptr4 using the current drawing color.
 ;
@@ -818,9 +797,9 @@ FIXY:   cpy     #255         ;Y=255 or Y=8
 ;
 ; Must set an error code: NO
 ;
-		  
-; Note: This function needs optimization. It's just a cheap translation of 
-; the original C wrapper and could be written much smaller (besides that, 
+
+; Note: This function needs optimization. It's just a cheap translation of
+; the original C wrapper and could be written much smaller (besides that,
 ; calling LINE is not a good idea either).
 
 BAR:	lda     Y2

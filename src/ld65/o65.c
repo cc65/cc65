@@ -39,6 +39,7 @@
 #include <time.h>
 
 /* common */
+#include "chartype.h"
 #include "check.h"
 #include "print.h"
 #include "version.h"
@@ -586,7 +587,7 @@ static unsigned O65WriteExpr (ExprNode* E, int Signed, unsigned Size,
 
     /* We cannot handle more than one external reference */
     RefCount = (ED.SegRef != 0) + (ED.SecRef != 0) + (ED.ExtRef != 0);
-    if (RefCount > 1) {                  
+    if (RefCount > 1) {
        	ED.TooComplex = 1;
     }
 
@@ -879,7 +880,7 @@ static void O65WriteExports (O65Desc* D)
 	O65ParseExpr (Expr, InitExprDesc (&ED, D), 1);
 
        	/* We cannot handle expressions with imported symbols, or expressions
-         * with more than one segment reference here 
+         * with more than one segment reference here
          */
 	if (ED.ExtRef != 0 || (ED.SegRef != 0 && ED.SecRef != 0)) {
 	    ED.TooComplex = 1;
@@ -892,7 +893,7 @@ static void O65WriteExports (O65Desc* D)
 
 	/* Determine the segment id for the expression */
         if (ED.SegRef != 0 || ED.SecRef != 0) {
-            
+
             const SegDesc* Seg;
 
             /* Segment or section reference */
@@ -1274,8 +1275,9 @@ static void O65SetupHeader (O65Desc* D)
 void O65WriteTarget (O65Desc* D, File* F)
 /* Write an o65 output file */
 {
-    char OptBuf [256];	/* Buffer for option strings */
-    time_t T;
+    char        OptBuf [256];	/* Buffer for option strings */
+    unsigned    OptLen;
+    time_t      T;
 
     /* Place the filename in the control structure */
     D->Filename = F->Name;
@@ -1308,7 +1310,12 @@ void O65WriteTarget (O65Desc* D, File* F)
     /* Define some more options: A timestamp and the linker version */
     T = time (0);
     strcpy (OptBuf, ctime (&T));
-    O65SetOption (D, O65OPT_TIMESTAMP, OptBuf, strlen (OptBuf) + 1);
+    OptLen = strlen (OptBuf);
+    while (OptLen > 0 && IsControl (OptBuf[OptLen-1])) {
+        --OptLen;
+    }
+    OptBuf[OptLen] = '\0';
+    O65SetOption (D, O65OPT_TIMESTAMP, OptBuf, OptLen + 1);
     sprintf (OptBuf, "ld65 V%u.%u.%u", VER_MAJOR, VER_MINOR, VER_PATCH);
     O65SetOption (D, O65OPT_ASM, OptBuf, strlen (OptBuf) + 1);
 

@@ -68,6 +68,7 @@ C_OBJS =	_afailed.o	\
                 system.o        \
                 timezone.o      \
                 vfscanf.o       \
+                vscanf.o        \
                 vsscanf.o
 
 

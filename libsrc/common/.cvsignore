@@ -38,6 +38,7 @@ strxfrm.s
 system.s
 timezone.s
 vfscanf.s
+vscanf.s
 vsscanf.s
 
 

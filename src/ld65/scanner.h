@@ -33,7 +33,7 @@
 
 
 
-#ifndef SCANNER_H
+#ifndef SCANNER_H      
 #define SCANNER_H
 
 
@@ -119,7 +119,7 @@ typedef enum {
 
 
 /* Mapping table entry, special identifier --> token */
-typedef struct IdentTok_ IdentTok;
+typedef struct IdentTok IdentTok;
 struct IdentTok_ {
     const char*	Ident;	     	/* Identifier */
     cfgtok_t	Tok;	     	/* Token for identifier */

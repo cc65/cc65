@@ -1,0 +1,40 @@
+#
+# Makefile for the serial driver API
+#
+
+.SUFFIXES: .o .s .c
+
+#--------------------------------------------------------------------------
+# Rules
+
+%.o:   	%.c
+	@$(CC) $(CFLAGS) $<
+	@$(AS) -g -o $@ $(AFLAGS) $(*).s
+
+%.o:	%.s
+	@$(AS) -g -o $@ $(AFLAGS) $<
+
+#--------------------------------------------------------------------------
+# Object files
+
+C_OBJS =        ser_load.o
+
+S_OBJS =       	ser-kernel.o	\
+		ser_unload.o
+
+
+#--------------------------------------------------------------------------
+# Targets
+
+.PHONY:	all clean zap
+
+all:  	$(C_OBJS) $(S_OBJS)
+
+clean:
+	@rm -f *~
+	@rm -f $(C_OBJS:.o=.s)
+	@rm -f $(C_OBJS)
+	@rm -f $(S_OBJS)
+
+zap:	clean
+

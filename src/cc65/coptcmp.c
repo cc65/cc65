@@ -670,17 +670,16 @@ unsigned OptCmp4 (CodeSeg* S)
 		/* Change the code to just use the A register. Move the load
 		 * of the low byte after the first branch if possible:
 		 *
-		 *      ldy     #o-1
+		 *      ldy     #o
 		 *      lda     (sp),y
 		 *      cmp     #a
 		 *      bne     L1
-		 *      ldy     #o
+		 *      ldy     #o-1
 		 *      lda     (sp),y
 		 *   	cmp	#b
 		 *      jne/jeq ...
 		 */
-		sprintf (Buf, "$%02X", (int)(L[0]->Num-1));
-		X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
+		X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
 		CS_InsertEntry (S, X, I+3);
 
 		X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);
@@ -689,7 +688,8 @@ unsigned OptCmp4 (CodeSeg* S)
 		X = NewCodeEntry (OP65_CMP, L[2]->AM, L[2]->Arg, 0, L[2]->LI);
 		CS_InsertEntry (S, X, I+5);
 
-		X = NewCodeEntry (OP65_LDY, AM65_IMM, L[0]->Arg, 0, L[0]->LI);
+		sprintf (Buf, "$%02X", (int)(L[0]->Num-1));
+		X = NewCodeEntry (OP65_LDY, AM65_IMM, Buf, 0, L[0]->LI);
 		CS_InsertEntry (S, X, I+7);
 
 		X = NewCodeEntry (OP65_LDA, AM65_ZP_INDY, "sp", 0, L[1]->LI);

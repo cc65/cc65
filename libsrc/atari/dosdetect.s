@@ -1,5 +1,5 @@
 ;
-; Freddy Offenga & Christian Groessler, August 2003
+; Freddy Offenga & Christian Groessler, June 2004
 ;
 ; detect the DOS version we're running on
 ;
@@ -33,7 +33,7 @@ detect:	lda	#ATARIDOS
 	beq	done
 	lda	#OSADOS
 	sta	__dos_type
-	bne	done
+	rts
 
 spdos:	lda	#SPARTADOS
 	sta	__dos_type

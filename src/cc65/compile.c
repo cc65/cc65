@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2001 Ullrich von Bassewitz                                       */
+/* (C) 2000-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@cc65.org                                                 */
@@ -34,9 +34,11 @@
 
 
 #include <stdlib.h>
+#include <time.h>
 
 /* common */
 #include "version.h"
+#include "xmalloc.h"
 
 /* cc65 */
 #include "asmlabel.h"
@@ -255,8 +257,10 @@ static void Parse (void)
 void Compile (const char* FileName)
 /* Top level compile routine. Will setup things and call the parser. */
 {
-    char* Path;
-
+    char*  Path;
+    char   Buf[16];
+    time_t Time;
+    char*  TimeStr;
 
     /* Add some standard paths to the include search path */
     AddIncludePath ("", INC_USER);		/* Current directory */
@@ -292,6 +296,14 @@ void Compile (const char* FileName)
 	    DefineNumericMacro ("__OPT_s__", 1);
 	}
     }
+
+    /* __TIME__ and __DATE__ macros */
+    Time = time (0);
+    TimeStr = ctime (&Time);
+    sprintf (Buf, "\"%.10s\"", TimeStr);
+    DefineTextMacro ("__DATE__", Buf);
+    sprintf (Buf, "\"%.15s\"", TimeStr+11);
+    DefineTextMacro ("__TIME__", Buf);
 
     /* Initialize the literal pool */
     InitLiteralPool ();

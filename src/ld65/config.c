@@ -1472,7 +1472,7 @@ void CfgAssignSegments (void)
      	    }
 
        	    /* If this is the run area, set the start address of this segment,
-             * set the readonly flag in the segment and and remember if the 
+             * set the readonly flag in the segment and and remember if the
              * segment is in a relocatable file or not.
              */
      	    if (S->Run == M) {
@@ -1539,7 +1539,7 @@ void CfgAssignSegments (void)
 	    sprintf (Buf, "__%s_SIZE__", GetString (M->Name));
 	    CreateConstExport (GetStringId (Buf), M->Size);
 	    sprintf (Buf, "__%s_LAST__", GetString (M->Name));
-	    CreateConstExport (GetStringId (Buf), M->FillLevel);
+	    CreateMemoryExport (GetStringId (Buf), M, M->FillLevel);
 	}
 
 	/* Next memory area */

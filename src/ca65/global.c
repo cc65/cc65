@@ -75,6 +75,7 @@ unsigned char DollarInIdents     = 0;   /* Allow '$' in identifiers */
 unsigned char LeadingDotInIdents = 0;   /* Allow '.' to start an identifier */
 unsigned char PCAssignment       = 0;	/* Allow "* = $XXX" or "$ = $XXX" */
 unsigned char MissingCharTerm    = 0;   /* Allow lda #'a (no closing term) */
+unsigned char UbiquitousIdents   = 0;   /* Allow ubiquitous identifiers */
 
 /* Misc stuff */
 const char Copyright[]           = "(C) Copyright 1998-2004 Ullrich von Bassewitz";

@@ -617,7 +617,7 @@ static unsigned ReadStringConst (int StringTerm)
 
     /* Return the length of the string */
     return I;
-}               
+}
 
 
 
@@ -844,13 +844,9 @@ Again:
    	    }
 	}
 
-	/* Search for an opcode */
-	IVal = FindInstruction (SVal);
-	if (IVal >= 0) {
-	    /* This is a mnemonic */
-       	    Tok = TOK_MNEMO;
-       	} else if (IsDefine (SVal)) {
-	    /* This is a define style macro - expand it */
+	/* Check for define style macro */
+       	if (IsDefine (SVal)) {
+	    /* Macro - expand it */
 	    MacExpandStart ();
 	    goto Restart;
 	} else {
@@ -1122,7 +1118,7 @@ int TokHasSVal (enum Token Tok)
 int TokHasIVal (enum Token Tok)
 /* Return true if the given token has an attached IVal */
 {
-    return (Tok == TOK_INTCON || Tok == TOK_CHARCON || Tok == TOK_MNEMO);
+    return (Tok == TOK_INTCON || Tok == TOK_CHARCON);
 }
 
 

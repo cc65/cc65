@@ -55,6 +55,7 @@ typedef enum {
     FEAT_LEADING_DOT_IN_IDENTIFIERS,
     FEAT_PC_ASSIGNMENT,
     FEAT_MISSING_CHAR_TERM,
+    FEAT_UBIQUITOUS_IDENTS,
 
     /* Special value: Number of features available */
     FEAT_COUNT

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -46,6 +46,7 @@
 #include "condasm.h"
 #include "error.h"
 #include "global.h"
+#include "instr.h"
 #include "istack.h"
 #include "nexttok.h"
 #include "pseudo.h"
@@ -333,6 +334,13 @@ void MacDef (unsigned Style)
 	Error ("Identifier expected");
 	MacSkipDef (Style);
     	return;
+    } else if (!UbiquitousIdents && FindInstruction (SVal) >= 0) {
+        /* The identifier is a name of a 6502 instruction, which is not
+         * allowed if not explicitly enabled.
+         */
+        Error ("Cannot use an instruction as macro name");
+        MacSkipDef (Style);
+        return;
     }
 
     /* Did we already define that macro? */
@@ -381,7 +389,7 @@ void MacDef (unsigned Style)
 		while (1) {
 		    if (strcmp (List->Id, SVal) == 0) {
 			Error ("Duplicate symbol `%s'", SVal);
-		    }                                 
+		    }
 		    if (List->Next == 0) {
 			break;
 		    } else {
@@ -663,7 +671,7 @@ static void StartExpClassic (Macro* M)
        	/* Check for maximum parameter count */
 	if (E->ParamCount >= M->ParamCount) {
 	    Error ("Too many macro parameters");
-	    SkipUntilSep ();                    
+	    SkipUntilSep ();
 	    break;
 	}
 

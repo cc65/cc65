@@ -375,26 +375,44 @@ static void DoPCAssign (void)
 static void OneLine (void)
 /* Assemble one line */
 {
-    Segment*      Seg  = 0;
-    unsigned long PC   = 0;
-    SymEntry*     Sym  = 0;
-    int           Done = 0;
+    Segment*      Seg   = 0;
+    unsigned long PC    = 0;
+    SymEntry*     Sym   = 0;
+    int           Done  = 0;
+    int           Macro = 0;
+    int           Instr = -1;
 
     /* Initialize the new listing line if we are actually reading from file
      * and not from internally pushed input.
      */
     if (!HavePushedInput ()) {
-     	InitListingLine ();
+       	InitListingLine ();
     }
 
     if (Tok == TOK_COLON) {
-     	/* An unnamed label */
-     	ULabDef ();
-     	NextTok ();
+       	/* An unnamed label */
+       	ULabDef ();
+       	NextTok ();
     }
 
-    /* Assemble the line */
-    if (Tok == TOK_LOCAL_IDENT || (Tok == TOK_IDENT && !IsMacro (SVal))) {
+    /* If the first token on the line is an identifier, check for a macro or
+     * an instruction.
+     */
+    if (Tok == TOK_IDENT) {
+        if (!UbiquitousIdents) {
+            /* Macros and symbols cannot use instruction names */
+            Instr = FindInstruction (SVal);
+            if (Instr < 0) {
+                Macro = IsMacro (SVal);
+            }
+        } else {
+            /* Macros and symbols may use the names of instructions */
+            Macro = IsMacro (SVal);
+        }
+    }
+
+    /* Handle an identifier */
+    if (Tok == TOK_LOCAL_IDENT || (Tok == TOK_IDENT && Instr < 0 && !Macro)) {
 
         /* Did we have whitespace before the ident? */
         int HadWS = WS;
@@ -453,12 +471,13 @@ static void OneLine (void)
      	if (Tok >= TOK_FIRSTPSEUDO && Tok <= TOK_LASTPSEUDO) {
      	    /* A control command */
      	    HandlePseudo ();
-     	} else if (Tok == TOK_MNEMO) {
-     	    /* A mnemonic - assemble one instruction */
-     	    HandleInstruction (IVal);
-     	} else if (Tok == TOK_IDENT && IsMacro (SVal)) {
+     	} else if (Macro) {
      	    /* A macro expansion */
      	    MacExpandStart ();
+     	} else if (Instr >= 0 ||
+                   (UbiquitousIdents && ((Instr = FindInstruction (SVal)) >= 0))) {
+     	    /* A mnemonic - assemble one instruction */
+     	    HandleInstruction (Instr);
      	} else if (PCAssignment && (Tok == TOK_STAR || Tok == TOK_PC)) {
 	    NextTok ();
 	    if (Tok != TOK_EQ) {

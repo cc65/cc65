@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000-2003 Ullrich von Bassewitz                                       */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -58,6 +58,7 @@ static const char* FeatureKeys[FEAT_COUNT] = {
     "leading_dot_in_identifiers",
     "pc_assignment",
     "missing_char_term",
+    "ubiquitous_idents",
 };
 
 
@@ -109,6 +110,7 @@ feature_t SetFeature (const char* Key)
        	case FEAT_LEADING_DOT_IN_IDENTIFIERS: LeadingDotInIdents= 1;    break;
      	case FEAT_PC_ASSIGNMENT:	      PCAssignment	= 1;	break;
         case FEAT_MISSING_CHAR_TERM:          MissingCharTerm   = 1;    break;
+        case FEAT_UBIQUITOUS_IDENTS:          UbiquitousIdents  = 1;    break;
 	default:     			 /* Keep gcc silent */	        break;
     }
 

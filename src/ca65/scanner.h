@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2003 Ullrich von Bassewitz                                       */
+/* (C) 1998-2004 Ullrich von Bassewitz                                       */
 /*               Römerstraße 52                                              */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -57,7 +57,6 @@ enum Token {
     TOK_SEP, 	 	/* Separator (usually newline) */
     TOK_IDENT,	 	/* An identifier */
     TOK_LOCAL_IDENT,    /* A cheap local identifier */
-    TOK_MNEMO, 	 	/* A mnemonic */
 
     TOK_INTCON,  	/* Integer constant */
     TOK_CHARCON,  	/* Character constant */

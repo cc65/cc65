@@ -10,17 +10,17 @@
 
 
 	.include	"atari.inc"
-	.export		_get_tv
+	.include	"get_tv.inc"
 
 .proc	_get_tv
 
-	lda	PAL		; use hw register, PALNTS is only supported on XL/XE ROM
-	ldx	#0
+	ldx	#TV::NTSC	; Assume NTSC
+	lda	PAL	 	; use hw register, PALNTS is only supported on XL/XE ROM
 	and	#$0e
 	bne	@NTSC
-	lda	#1
-	rts
+	inx			; = TV::PAL
 @NTSC:	txa
+	ldx	#0		; Expand to int
 	rts
 
 .endproc

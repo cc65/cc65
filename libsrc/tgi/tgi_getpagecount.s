@@ -1,7 +1,7 @@
 ;
 ; Ullrich von Bassewitz, 23.06.2002
 ;
-; void __fastcall__ tgi_getpagecount (void);
+; unsigned __fastcall__ tgi_getpagecount (void);
 ; /* Returns the number of screen pages available. */
 ;
 

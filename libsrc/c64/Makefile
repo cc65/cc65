@@ -47,7 +47,7 @@ OBJS = 	_scrsize.o     	 	\
 
 TGIS =	c64-320-200-2.tgi
 
-EMDS =	c64-georam.emd c64-ram.emd c64-reu.emd
+EMDS =	c64-georam.emd c64-ram.emd c64-reu.emd c64-vdc.emd
 
 #--------------------------------------------------------------------------
 # Targets

@@ -46,7 +46,7 @@ OBJS =	_scrsize.o	\
 
 TGIS =
 
-EMDS =	c128-georam.emd c128-ram.emd c128-reu.emd
+EMDS =	c128-georam.emd c128-ram.emd c128-reu.emd c128-vdc.emd
 
 #--------------------------------------------------------------------------
 # Targets

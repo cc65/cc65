@@ -8,28 +8,32 @@
 	.import		initlib, donelib
        	.import	       	zerobss, push0
 	.import	     	_main
-	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
+     	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 
         .include        "zeropage.inc"
-	.include     	"vic20.inc"
-	.include     	"../cbm/cbm.inc"
-
-.code
+     	.include     	"vic20.inc"
+     	.include     	"../cbm/cbm.inc"
 
 ; ------------------------------------------------------------------------
 ; BASIC header with a SYS call
 
-	.org	$FFF
+.segment        "EXEHDR"
         .word   Head            ; Load address
 Head:   .word   @Next
         .word   1000            ; Line number
-        .byte   $9E,"4109"      ; SYS 4109
+        .byte   $9E             ; SYS token
+        .byte   <(((@Start / 1000) .mod 10) + $30)
+        .byte   <(((@Start /  100) .mod 10) + $30)
+        .byte   <(((@Start /   10) .mod 10) + $30)
+        .byte   <(((@Start /    1) .mod 10) + $30)
         .byte   $00             ; End of BASIC line
 @Next:  .word   0               ; BASIC end marker
-	.reloc
+@Start:
 
 ; ------------------------------------------------------------------------
 ; Actual code
+
+.code
 
 	ldx    	#zpspace-1
 L1:	lda	sp,x

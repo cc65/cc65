@@ -1162,7 +1162,9 @@ static CtrlDesc CtrlCmdTab [] = {
     { ccNone,		DoROData	},
     { ccNone,       	DoSegment	},
     { ccNone,        	DoSmart		},
+    { ccNone,		DoUnexpected	},	/* .STRAT */
     { ccNone,          	DoUnexpected	},	/* .STRING */
+    { ccNone,		DoUnexpected	},	/* .STRLEN */
     { ccNone,		DoSunPlus	},
     { ccNone,		DoUnexpected	},	/* .TCOUNT */
     { ccNone,       	DoWord		},

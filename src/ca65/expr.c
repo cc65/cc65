@@ -467,6 +467,71 @@ static int FuncReferenced (void)
 
 
 
+static int FuncStrAt (void)
+/* Handle the .STRAT function */
+{
+    char Str [sizeof(SVal)];
+    long Index;
+
+    /* String constant expected */
+    if (Tok != TOK_STRCON) {
+      	Error (ERR_STRCON_EXPECTED);
+      	NextTok ();
+       	return 0;
+
+    }
+
+    /* Remember the string and skip it */
+    strcpy (Str, SVal);
+    NextTok ();
+
+    /* Comma must follow */
+    ConsumeComma ();
+
+    /* Expression expected */
+    Index = ConstExpression ();
+
+    /* Must be a valid index */
+    if (Index >= strlen (Str)) {
+	Error (ERR_RANGE);
+	return 0;
+    }
+
+    /* Return the char, handle as unsigned */
+    return (unsigned char) Str[(size_t)Index];
+}
+
+
+
+static int FuncStrLen (void)
+/* Handle the .STRLEN function */
+{
+    /* String constant expected */
+    if (Tok != TOK_STRCON) {
+
+     	Error (ERR_STRCON_EXPECTED);
+    	/* Smart error recovery */
+     	if (Tok != TOK_RPAREN) {
+     	    NextTok ();
+     	}
+       	return 0;
+
+    } else {
+
+        /* Get the length of the string */
+     	int Len = strlen (SVal);
+
+	/* Skip the string */
+	NextTok ();
+
+	/* Return the length */
+	return Len;
+
+    }
+}
+
+
+
 static int FuncTCount (void)
 /* Handle the .TCOUNT function */
 {
@@ -492,7 +557,7 @@ static int FuncTCount (void)
 	switch (Tok) {
 	    case TOK_LPAREN:	++Parens;	break;
 	    case TOK_RPAREN:	--Parens;	break;
-	    default:				break;
+	    default:		  		break;
 	}
 
 	/* Skip the token */
@@ -547,10 +612,10 @@ static ExprNode* Factor (void)
     SymEntry* S;
 
     switch (Tok) {
-		  
+
 	case TOK_INTCON:
 	case TOK_CHARCON:
-	    N = LiteralExpr (IVal);
+    	    N = LiteralExpr (IVal);
        	    NextTok ();
 	    break;
 
@@ -568,7 +633,7 @@ static ExprNode* Factor (void)
 	    	    /* Create symbol node */
 		    N = NewExprNode ();
 		    N->Op    = EXPR_SYMBOL;
-		    N->V.Sym = S;
+	   	    N->V.Sym = S;
 		}
 		NextTok ();
 	    }
@@ -656,6 +721,14 @@ static ExprNode* Factor (void)
 
         case TOK_REFERENCED:
 	    N = Function (FuncReferenced);
+	    break;
+
+	case TOK_STRAT:
+	    N = Function (FuncStrAt);
+	    break;
+
+	case TOK_STRLEN:
+	    N = Function (FuncStrLen);
 	    break;
 
 	case TOK_TCOUNT:

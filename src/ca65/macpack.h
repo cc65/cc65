@@ -47,6 +47,7 @@
 /* Constants for the predefined packages */
 #define MAC_GENERIC		0
 #define	MAC_LONGBRANCH		1
+#define MAC_CBM                 2
 
 
 

@@ -1052,8 +1052,9 @@ static void DoMacPack (void)
 {
     /* Macro package names */
     static const char* Keys [] = {
-	"GENERIC",
+    	"GENERIC",
        	"LONGBRANCH",
+        "CBM"
     };
 
     int Package;
@@ -1077,7 +1078,7 @@ static void DoMacPack (void)
 
     /* Insert the package */
     InsertMacPack (Package);
-}
+}            
 
 
 

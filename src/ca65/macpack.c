@@ -50,7 +50,9 @@
 
 
 /* Predefined packages */
-static char MacGeneric [] = 	        /* Generic macros */
+
+/* Generic macros */
+static char MacGeneric[] =
     ".macro  add     Arg1, Arg2\n"
     "        clc\n"
     "        .if .paramcount = 2\n"
@@ -68,9 +70,8 @@ static char MacGeneric [] = 	        /* Generic macros */
     "        .endif\n"
     ".endmacro\n";
 
-
-
-static char MacLongBranch [] =	        /* Long branch macros */
+/* Long branch macros */
+static char MacLongBranch[] =
     ".macro  jeq     Target\n"
     "        .if     .match(Target, 0)\n"
     "        bne     *+5\n"
@@ -160,12 +161,36 @@ static char MacLongBranch [] =	        /* Long branch macros */
     "        .endif\n"
     ".endmacro\n";
 
+/* Commodore specific macros */
+static char MacCBM[] =
+    ".macro scrcode str\n"
+    "        .repeat .strlen(str), i\n"
+    "                .if (.strat(str, i) >= '@' .and .strat(str, i) <= 'z')\n"
+    "                        .byte .strat(str, i) - '@'\n"
+    "                .elseif (.strat(str, i) >= 'A' .and .strat(str, i) <= 'Z')\n"
+    "                        .byte .strat(str, i) - 'A' + 65\n"
+    "                .elseif (.strat(str, i) = '[')\n"
+    "                        .byte 27\n"
+    "                .elseif (.strat(str, i) = ']')\n"
+    "                        .byte 29\n"
+    "                .elseif (.strat(str, i) = '^')\n"
+    "                        .byte 30\n"
+    "                .elseif (.strat(str, i) = '_')\n"
+    "                        .byte 31\n"
+    "                .else\n"
+    "                        .byte .strat(str, i)\n"
+    "                .endif\n"
+    "        .endrepeat\n"
+    ".endmacro\n";
+
+
 
 
 /* Table with pointers to the different packages */
 static char* MacPackages [] = {
     MacGeneric,
     MacLongBranch,
+    MacCBM
 };
 
 

@@ -52,6 +52,7 @@
 #include "coptind.h"
 #include "coptstop.h"
 #include "coptsub.h"
+#include "copttest.h"
 #include "error.h"
 #include "global.h"
 #include "codeopt.h"
@@ -105,101 +106,6 @@ static unsigned OptShift1 (CodeSeg* S)
 	++I;
 
     }
-
-    /* Return the number of changes made */
-    return Changes;
-}
-
-
-
-/*****************************************************************************/
-/*	    			Optimize tests                               */
-/*****************************************************************************/
-
-
-
-static unsigned OptTest1 (CodeSeg* S)
-/* On a sequence
- *
- *     stx     xxx
- *     ora     xxx
- *     beq/bne ...
- *
- * if X is zero, the sequence may be changed to
- *
- *     cmp     #$00
- *     beq/bne ...
- *
- * which may be optimized further by another step.
- *
- * If A is zero, the sequence may be changed to
- *
- *     txa
- *     beq/bne ...
- *
- */
-{
-    unsigned Changes = 0;
-    unsigned I;
-
-    /* Generate register info for this step */
-    CS_GenRegInfo (S);
-
-    /* Walk over the entries */
-    I = 0;
-    while (I < CS_GetEntryCount (S)) {
-
-	CodeEntry* L[3];
-
-      	/* Get next entry */
-       	L[0] = CS_GetEntry (S, I);
-
-	/* Check if it's the sequence we're searching for */
-	if (L[0]->OPC == OP65_STX              &&
-	    CS_GetEntries (S, L+1, I+1, 2)     &&
-	    !CE_HasLabel (L[1])                &&
-	    L[1]->OPC == OP65_ORA              &&
-	    strcmp (L[0]->Arg, L[1]->Arg) == 0 &&
-	    !CE_HasLabel (L[2])                &&
-	    (L[2]->Info & OF_ZBRA) != 0) {
-
-	    /* Check if X is zero */
-	    if (L[0]->RI->In.RegX == 0) {
-
-		/* Insert the compare */
-		CodeEntry* N = NewCodeEntry (OP65_CMP, AM65_IMM, "$00", 0, L[0]->LI);
-		CS_InsertEntry (S, N, I+2);
-
-		/* Remove the two other insns */
-		CS_DelEntry (S, I+1);
-		CS_DelEntry (S, I);
-
-		/* We had changes */
-		++Changes;
-
-	    /* Check if A is zero */
-	    } else if (L[1]->RI->In.RegA == 0) {
-
-		/* Insert the txa */
-		CodeEntry* N = NewCodeEntry (OP65_TXA, AM65_IMP, 0, 0, L[1]->LI);
-		CS_InsertEntry (S, N, I+2);
-
-		/* Remove the two other insns */
-		CS_DelEntry (S, I+1);
-	  	CS_DelEntry (S, I);
-
-	  	/* We had changes */
-	  	++Changes;
-	    }
-	}
-
-	/* Next entry */
-	++I;
-
-    }
-
-    /* Free register info */
-    CS_FreeRegInfo (S);
 
     /* Return the number of changes made */
     return Changes;
@@ -1679,7 +1585,7 @@ static unsigned RunOptFunc (CodeSeg* S, OptFunc* F, unsigned Max)
     /* Run this until there are no more changes */
     Changes = 0;
     do {
-	
+
 	/* Run the function */
     	C = F->Func (S);
     	Changes += C;

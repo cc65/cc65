@@ -83,6 +83,7 @@ OBJS =	anonname.obj	\
 	coptind.obj	\
 	coptstop.obj	\
 	coptsub.obj	\
+	copttest.obj	\
 	cpu.obj		\
 	dataseg.obj	\
 	datatype.obj	\
@@ -156,6 +157,7 @@ FILE coptcmp.obj
 FILE coptind.obj
 FILE coptstop.obj
 FILE coptsub.obj
+FILE copttest.obj
 FILE cpu.obj
 FILE dataseg.obj
 FILE datatype.obj

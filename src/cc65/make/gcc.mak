@@ -38,6 +38,7 @@ OBJS =	anonname.o	\
 	coptind.o	\
 	coptstop.o	\
 	coptsub.o	\
+	copttest.o	\
 	cpu.o	  	\
 	dataseg.o	\
 	datatype.o	\

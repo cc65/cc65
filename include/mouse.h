@@ -6,10 +6,12 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1999-2001 Ullrich von Bassewitz                                       */
-/*               Wacholderweg 14                                             */
-/*               D-70597 Stuttgart                                           */
-/* EMail:        uz@musoftware.de                                            */
+/* (C) 2003      Ullrich von Bassewitz                                       */
+/*               Römerstraße 52                                              */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
+/*                                                                           */
+/*                                                                           */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,26 +40,18 @@
 
 
 
-/* Define __MOUSE__ for systems that support a mouse */
-#if defined(__ATARI__) || defined(__C64__) || defined(__C128__) || defined(__CBM510__) || defined(__GEOS__)
-#  define __MOUSE__
-#else
-#  error The target system does not support a mouse!
-# endif
-
-
-
 /*****************************************************************************/
 /* 	      			  Definitions	     			     */
 /*****************************************************************************/
 
 
 
-/* The different mouse types */
-#define MOUSE_TRAKBALL 		0
-#define MOUSE_ST		1
-#define MOUSE_AMIGA		2
-#define MOUSE_CBM1351  	        3      /* 1351 mouse */
+/* Error codes */
+#define MOUSE_ERR_OK            0       /* No error */
+#define MOUSE_ERR_NO_DRIVER     1       /* No driver available */
+#define MOUSE_ERR_CANNOT_LOAD   2       /* Error loading driver */
+#define MOUSE_ERR_INV_DRIVER    3       /* Invalid driver */
+#define MOUSE_ERR_NO_DEVICE     4       /* Mouse hardware not found */
 
 /* Mouse button masks */
 #define MOUSE_BTN_LEFT	     0x10
@@ -75,6 +69,24 @@ struct mouse_info {
     unsigned char       buttons;       /* Mouse button mask */
 };
 
+/* Structure containing mouse callback functions. These functions are declared
+ * in C notation here, but they cannot be C functions (at least not easily),
+ * since they may be called from within an interrupt.
+ */
+struct mouse_callbacks {
+
+    void (*hide) (void);
+    /* Hide the mouse cursor. */
+
+    void (*show) (void);
+    /* Show the mouse cursor */
+
+    void (*move) (void);
+    /* Move the mouse cursor. This function is called, even when the cursor
+     * is currently invisible.
+     */
+};
+
 
 
 /*****************************************************************************/
@@ -83,45 +95,29 @@ struct mouse_info {
 
 
 
-unsigned char __fastcall__ mouse_init (unsigned char type);
-/* Setup the mouse interrupt handler. The mouse routines will use a predefined
- * system resource for the mouse port and mouse cursor:
- *     C64:      Port #0, Sprite #0
- *     C128:     Port #0, Sprite #0
- *     GEOS:     System defined port, Sprite #0
- *     Atari:    Port #0, PM #0
- * However, the mouse routines will not initialize this cursor or set a
- * specific shape - this is platform dependent and up to the user program.
- * The mouse cursor is moved if the mouse is moved (provided that the mouse
- * cursor is visible), and switched on and off in the show and hide functions.
- * The type parameter is needed on some systems to determine the type of
- * the mouse connected to the given port, on others it is ignored.
- * After calling this function, the mouse is invisble, the cursor is placed
- * at 0/0 (upper left corner), and the bounding box is reset to cover the
- * whole screen. Call mouse_show once to make the mouse cursor visible.
- * The function will return zero if a mouse was not found and a non zero
- * value if the mouse was found and initialized (or if there is no way to
- * detect a mouse reliably).
- */
+unsigned char __fastcall__ mouse_set_callbacks (const struct mouse_callbacks* c);
+/* Sets the callbacks to be used by the driver. */
 
-void __fastcall__ mouse_done (void);
-/* Disable the mouse, remove the interrupt handler. This function MUST be
- * called before terminating the program, otherwise odd things may happen.
- * If in doubt, install an exit handler (using atexit) that calls this
- * function.
- */
+unsigned char __fastcall__ mouse_load_driver (const char* driver);
+/* Load and install a mouse driver, return an error code. */
+
+unsigned char __fastcall__ mouse_unload (void);
+/* Uninstall, then unload the currently loaded driver. */
+
+unsigned char __fastcall__ mouse_install (void* driver);
+/* Install an already loaded driver. Returns an error code. */
+
+unsigned char __fastcall__ mouse_uninstall (void);
+/* Uninstall the currently loaded driver. Returns an error code. */
 
 void __fastcall__ mouse_hide (void);
-/* Hide the mouse. This function doesn't do anything visible if no sprite is
- * used. The function manages a counter and may be called more than once.
- * For each call to mouse_hide there must be a call to mouse_show to make
+/* Hide the mouse. The function manages a counter and may be called more than
+ * once. For each call to mouse_hide there must be a call to mouse_show to make
  * the mouse visible again.
  */
 
 void __fastcall__ mouse_show (void);
-/* Show the mouse. This function doesn't do anything visible if no sprite is
- * used. See mouse_hide for more information.
- */
+/* Show the mouse. See mouse_hide for more information. */
 
 void __fastcall__ mouse_box (int minx, int miny, int maxx, int maxy);
 /* Set the bounding box for the mouse pointer movement. The mouse X and Y

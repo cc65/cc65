@@ -396,6 +396,14 @@ void NextToken (void)
     }
     CurTok = NextTok;
 
+    /* When reading the first time from the file, the line info in NextTok,
+     * which was copied to CurTok is invalid. Since the information from
+     * the token is used for error messages, we must make it valid.
+     */
+    if (CurTok.LI == 0) {
+	CurTok.LI = UseLineInfo (GetCurLineInfo ());
+    }
+
     /* Remember the starting position of the next token */
     NextTok.LI = UseLineInfo (GetCurLineInfo ());
 

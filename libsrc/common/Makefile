@@ -13,7 +13,7 @@
 	@echo $<
 	@$(AS) -g -o $@ $(AFLAGS) $<
 
-C_OBJS = fclose.o fgets.o fprintf.o strdup.o calloc.o _fopen.o\
+C_OBJS = fclose.o fgets.o fprintf.o calloc.o _fopen.o\
       	 fputs.o fread.o fwrite.o gets.o realloc.o bsearch.o strxfrm.o\
       	 printf.o _hextab.o vfprintf.o fdopen.o strtok.o\
     	 _afailed.o fopen.o fgetc.o fputc.o puts.o gets.o perror.o getchar.o\
@@ -68,6 +68,7 @@ S_OBJS =	_fdesc.o	\
 		strcoll.o	\
 		strcpy.o	\
 		strcspn.o	\
+		strdup.o	\
 		strerror.o	\
 		stricmp.o	\
 		strlen.o	\

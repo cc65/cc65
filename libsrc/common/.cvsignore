@@ -1,7 +1,6 @@
 fclose.s
 fgets.s
 fprintf.s
-strdup.s
 calloc.s
 _fopen.s
 fputs.s

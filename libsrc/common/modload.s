@@ -38,6 +38,7 @@
 
         .import         pushax, pusha0, push0, push1, decax1
         .import         _malloc, _free, _memset
+        .import         __ZP_START__    ; Linker generated
         .importzp       sp, ptr1, tmp1, regbank
 
         .macpack        generic
@@ -59,18 +60,22 @@ TPtr            = regbank+4             ; Pointer to module data for relocation
 Stack:          .byte   0               ; Old stackpointer
 RegBankSave:    .res    6               ; Save area for register bank
 
-; The header of the o65 file. Since we don't need the 8 bytes any longer,
-; once we've checked them, we will overlay them with other data to save a
-; few bytes.
+; The header of the o65 file. Since we don't need the first 8 bytes any
+; longer, once we've checked them, we will overlay them with other data to
+; save a few bytes.
 Header:         .res    O65_HDR_SIZE    ; The o65 header
 
 ; Input
 InputByte       = Header                ; Byte read from input
 
-; Stuff needed for relocation
-TextReloc       = Header + 1            ; Relocation value for code seg
-DataReloc       = Header + 3            ; Relocation value for data seg
-BssReloc        = Header + 5            ; Relocation value for bss seg
+; Stuff needed for relocation. Since the ld65 linker uses a relocation base
+; address of zero for all segments, the relocation values needed are actually
+; the start addresses of the segments. Among other things this means that the
+; relocation value for the text segment is the same as the start address as
+; the whole module block.
+TextReloc       = Module                ; Relocation value for code seg
+DataReloc       = Header + 1            ; Relocation value for data seg
+BssReloc        = Header + 3            ; Relocation value for bss seg
 
 .data
 Read:           jmp     $FFFF           ; Jump to read routine
@@ -106,15 +111,15 @@ LoadCtrl:
 
 ;------------------------------------------------------------------------------
 ; RestoreRegBank: Restore the register bank contents from the save area. Will
-;                 destroy A and X
+;                 destroy A and X (the latter will be zero on return).
 
 .code
 RestoreRegBank:
-        ldx     #6-1
-@L1:    lda     RegBankSave,x
-        sta     regbank,x
+        ldx     #6
+@L1:    lda     RegBankSave-1,x
+        sta     regbank-1,x
         dex
-        bpl     @L1
+        bne     @L1
         rts
 
 ;------------------------------------------------------------------------------
@@ -140,7 +145,17 @@ GetReloc:
         ldx     BssReloc+1
         rts
 
-@L3:    lda     #MLOAD_ERR_FMT
+@L3:    cmp     #O65_SEGID_ZP
+        bne     FormatError
+        lda     #<__ZP_START__
+        ldx     #>__ZP_START__
+        rts
+
+;------------------------------------------------------------------------------
+; FormatError: Bail out with an o65 format error
+
+FormatError:
+        lda     #MLOAD_ERR_FMT
 ;       bne     CleanupAndExit          ; Branch always
 
 ;------------------------------------------------------------------------------
@@ -181,6 +196,7 @@ CleanupAndExit:
 
 ;------------------------------------------------------------------------------
 ; ReadByte: Read one byte with error checking into InputByte and A.
+; ReadAndCheckError: Call read with the current C stack and check for errors.
 
 .code
 ReadByte:
@@ -192,6 +208,10 @@ ReadByte:
         ldx     #>InputByte
         jsr     pushax
         jsr     push1
+
+; This is a second entry point used by the other calls to Read
+
+ReadAndCheckError:
         jsr     Read
 
 ; Check the return code and bail out in case of problems
@@ -203,7 +223,7 @@ ReadByte:
 
 ; Done
 
-@L1:    lda     InputByte
+@L1:    lda     InputByte               ; If called ReadByte, load the byte read
 Done:   rts
 
 ;------------------------------------------------------------------------------
@@ -254,43 +274,44 @@ Loop:   jsr     ReadByte                ; Read byte from relocation table
 ; Check for and handle the different relocation types.
 
         cmp     #O65_RTYPE_WORD
-        bne     @L3
+        beq     RelocWord
+        cmp     #O65_RTYPE_HIGH
+        beq     RelocHigh
+        cmp     #O65_RTYPE_LOW
+        bne     FormatError
+
+; Relocate the low byte
+
+RelocLow:
+        ldy     #0
+        clc
+        lda     (TPtr),y
+        adc     ptr1
+        sta     (TPtr),y
+        jmp     Loop
+
+; Relocate a high byte
+
+RelocHigh:
+        jsr     ReadByte                ; Read low byte from relocation table
+        ldy     #0
+        clc
+        adc     ptr1                    ; We just need the carry
+AddHigh:lda     (TPtr),y
+        adc     ptr1+1
+        sta     (TPtr),y
+        jmp     Loop                    ; Done, next entry
+
+; Relocate a word
+
+RelocWord:
         ldy     #0
         clc
         lda     (TPtr),y
         adc     ptr1
         sta     (TPtr),y
         iny
-        bne     @L4                     ; Branch always (add high byte)
-
-@L3:    cmp     #O65_RTYPE_HIGH
-        bne     @L5
-        jsr     ReadByte                ; Read low byte from relocation table
-        ldy     #0
-        clc
-        adc     ptr1                    ; We just need the carry
-@L4:    lda     (TPtr),y
-        adc     ptr1+1
-        sta     (TPtr),y
-        jmp     Loop                    ; Done, next entry
-
-@L5:    cmp     #O65_RTYPE_LOW
-        beq     @L6
-
-; Problem: Invalid relocation code
-
-        lda     #MLOAD_ERR_FMT
-        jmp     CleanupAndExit
-
-@L6:    ldy     #0
-        clc
-        lda     (TPtr),y
-        adc     ptr1
-        sta     (TPtr),y
-
-; Finished with this relocation
-
-        jmp     Loop
+        bne     AddHigh                 ; Branch always (add high byte)
 
 ;------------------------------------------------------------------------------
 ; mod_load: Load and relocate an o65 module
@@ -336,18 +357,11 @@ _mod_load:
         jsr     pushax
         lda     #O65_HDR_SIZE
         jsr     pusha0                  ; Always less than 256
-        jsr     Read
-
-; Check the return code
-
-        tax
-        beq     @L2
-        lda     #MLOAD_ERR_READ
-        jmp     CleanupAndExit
+        jsr     ReadAndCheckError       ; Bails out in case of errors
 
 ; We read the o65 header successfully. Validate it.
 
-@L2:    ldy     #ExpectedHdrSize-1
+        ldy     #ExpectedHdrSize-1
 @L3:    lda     Header,y
         cmp     ExpectedHdr,y
         beq     @L4
@@ -368,7 +382,10 @@ OneOpt: dec     TPtr
         jmp     OneOpt
 OptDone:
 
-; Skipped all options. Calculate the sizes of several areas needed later
+; Skipped all options. Calculate the size of text+data and of text+data+bss
+; (the latter is the size of the memory block we need). We will store the
+; total module size also into the control structure for evaluation by the
+; caller
 
         lda     Header + O65_HDR_TLEN
         add     Header + O65_HDR_DLEN
@@ -378,20 +395,17 @@ OptDone:
         sta     TPtr+1
         lda     TPtr
         add     Header + O65_HDR_BLEN
-        sta     tmp1
+        pha                             ; Save low byte of total size
+        ldy     #MODCTRL_MODULE_SIZE
+        sta     (Ctrl),y
         lda     TPtr+1
         adc     Header + O65_HDR_BLEN + 1
-
-; Load the total module size into a/x and store it into the control structure
-
-        ldy     #MODCTRL_MODULE_SIZE + 1
+        iny
         sta     (Ctrl),y
         tax
-        dey
-        lda     tmp1
-        sta     (Ctrl),y
+        pla                             ; Restore low byte of total size
 
-; Allocate memory, check if we got it
+; Total memory size is now in a/x. Allocate memory, check if we got it.
 
         jsr     _malloc
         sta     Module
@@ -408,10 +422,10 @@ OptDone:
 ; structure. We will use internal knowlege about the layout of the structure
 ; here to save some code.
 
-GotMem: lda     Module
+GotMem: lda     Module                  ; Ctrl->module = Module;
         ldy     #MODCTRL_MODULE
         sta     (Ctrl),y
-        ldy     #MODCTRL_CODE
+        ldy     #MODCTRL_CODE           ; Ctrl->code = Module;
         sta     (Ctrl),y
         txa
         iny
@@ -431,28 +445,34 @@ CLoop:  lda     Header,x
         cpy     #MODCTRL_SIZE
         bne     CLoop
 
-; Missing in the control structure now: start of the data and bss segments
+; Missing in the control structure now: start of the data and bss segments.
+; Since the linker relocates all segments to zero, these addresses are also
+; the relocation values for the segments.
 
         ldy     #MODCTRL_DATA
         lda     Module
         add     Header + O65_HDR_TLEN
         sta     (Ctrl),y
+        sta     DataReloc
         iny
         lda     Module + 1
         adc     Header + O65_HDR_TLEN + 1
         sta     (Ctrl),y
+        sta     DataReloc + 1
 
         ldy     #MODCTRL_BSS
         lda     Module
         add     TPtr
         sta     (Ctrl),y
+        sta     BssReloc
         iny
         lda     Module+1
         add     TPtr+1
         sta     (Ctrl),y
+        sta     BssReloc + 1
 
 ; Control structure is complete now. Load code and data segment into memory.
-; The sum of the sizes of code and data segment is still in TPtr.
+; The sum of the sizes of code+data segment is still in TPtr.
 ; C->read (C, C->module, H.tlen + H.dlen)
 
         jsr     PushCtrl
@@ -462,80 +482,44 @@ CLoop:  lda     Header,x
         lda     TPtr
         ldx     TPtr+1
         jsr     pushax
-        jsr     Read
-
-; Check for errors
-
-        tax
-        beq     LoadOk
-        lda     #MLOAD_ERR_READ
-        jmp     CleanupAndExit
+        jsr     ReadAndCheckError       ; Bails out in case of errors
 
 ; We've got the code and data segments in memory. Next section contains
 ; undefined references which we don't support. So check if the count of
 ; undefined references is actually zero.
 
-LoadOk: jsr     ReadByte
+        jsr     ReadByte
         bne     Undef
         jsr     ReadByte
         beq     Reloc
-Undef:  lda     #MLOAD_ERR_FMT
-        jmp     CleanupAndExit
+Undef:  jmp     FormatError
 
 ; Number of undefined references was zero. Next sections are the relocation
-; tables for code and data segment. Before doing the actual relocation, we
-; have to setup the relocation values for the three segments.
+; tables for code and data segment. Relocate the code segment
 
 Reloc:  lda     Module
-        sub     Header + O65_HDR_TBASE
-        sta     TextReloc
-        lda     Module + 1
-        sbc     Header + O65_HDR_TBASE + 1
-        sta     TextReloc + 1
-
-        ldy     #MODCTRL_DATA
-        lda     (Ctrl),y
-        sub     Header + O65_HDR_DBASE
-        sta     DataReloc
-        iny
-        lda     (Ctrl),y
-        sbc     Header + O65_HDR_DBASE + 1
-        sta     DataReloc + 1
-
-        ldy     #MODCTRL_BSS
-        lda     (Ctrl),y
-        sub     Header + O65_HDR_BBASE
-        sta     BssReloc
-        iny
-        lda     (Ctrl),y
-        sbc     Header + O65_HDR_BBASE + 1
-        sta     BssReloc + 1
-
-; Relocate the code segment
-
-        lda     Module
-        ldx     Module + 1                      ; Code segment address
+        ldx     Module + 1              ; Code segment address
         jsr     RelocSeg
 
 ; Relocate the data segment
 
         ldy     #MODCTRL_DATA + 1
-        jsr     LoadCtrl                        ; Get data segment address
+        jsr     LoadCtrl                ; Get data segment address
         jsr     RelocSeg
 
 ; Clear the bss segment
 
         ldy     #MODCTRL_BSS + 1
-        jsr     LoadCtrl                        ; Load bss segment address
+        jsr     LoadCtrl                ; Load bss segment address
         jsr     pushax
         jsr     push0
-        ldy     #MODCTRL_BSS_SIZE + 1
-        jsr     LoadCtrl                        ; Load bss segment size
-        jsr     _memset                         ; memset (bss, 0, bss_size);
+        lda     Header + O65_HDR_BLEN
+        ldx     Header + O65_HDR_BLEN+1
+        jsr     _memset                 ; memset (bss, 0, bss_size);
 
 ; We're done. Restore the register bank and return a success code
 
-        jsr     RestoreRegBank
+        jsr     RestoreRegBank          ; X will be zero on return
         lda     #MLOAD_OK
         rts
 

@@ -28,14 +28,9 @@
 	.export	      	_rs232_put, _rs232_pause, _rs232_unpause, _rs232_status
 
 
-useC64 	= 1
-.if useC64
-   NmiExit  = $febc     ;exit address for nmi
-.else
-   NmiExit  = $ff33     ;exit address for nmi
-.endif
+NmiExit = $febc     ;exit address for nmi
 
-ACIA		= $DE00
+ACIA   	= $DE00
 
 
 
@@ -116,16 +111,9 @@ _rs232_init:
 @L3:  	stx 	Turbo232
 
 ;** get C128/C64 cpu speed
-.if useC64
+
       	lda 	#1
       	sta 	CpuSpeed
-.else
-      	lda 	$d030
-      	and 	#$01
-      	clc
-      	adc 	#1
-      	sta 	CpuSpeed
-.endif
 
 ;** check for super-cpu at 20 MHz
 
@@ -541,7 +529,6 @@ _rs232_status:
 ;
 
 NmiHandler:
-.if useC64
      	pha
        	lda    	ACIA+RegStatus       	;(4) ;status ;check for byte received
      	and 	#$08           		;(2)
@@ -551,11 +538,6 @@ NmiHandler:
      	pha
      	tya
      	pha
-.else
-       	lda    	ACIA+RegStatus       	;(4) ;status ;check for byte received
-     	and 	#$08           		;(2)
-     	beq 	NmiNorm      		;(2*)
-.endif
        	lda    	ACIA+RegStatus       	;(4) opt ;status ;check for receive errors
     	and 	#$07           		;(2) opt
        	beq    	@L1            		;(3*)opt
@@ -589,11 +571,8 @@ NmiHandler:
     	inc 	DropCnt+3
 @L4:   	jmp 	NmiExit
 
-@L9:
-.if useC64
-   pla
-.endif
-   jmp NmiContinue
+@L9:	pla
+	jmp NmiContinue
 
 ;----------------------------------------------------------------------------
 ;

@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2000     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 2000-2004 Ullrich von Bassewitz                                       */
+/*               Römerstrasse 52                                             */
+/*               D-70794 Filderstadt                                         */
+/* EMail:        uz@cc65.org                                                 */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -51,13 +51,25 @@
 
 
 
+int xvsnprintf (char* Buf, size_t Size, const char* Format, va_list ap)
+	attribute ((format (printf, 3, 0)));
+/* A basic vsnprintf implementation. Does currently only support integer
+ * formats.
+ */
+
+int xsnprintf (char* Buf, size_t Size, const char* Format, ...)
+	attribute ((format (printf, 3, 4)));
+/* A basic snprintf implementation. Does currently only support integer
+ * formats.
+ */
+
 int xsprintf (char* Buf, size_t BufSize, const char* Format, ...)
 	attribute ((format (printf, 3, 4)));
-/* Replacement function for sprintf */
+/* Replacement function for sprintf. Will FAIL on errors. */
 
 int xvsprintf (char* Buf, size_t BufSize, const char* Format, va_list ap)
 	attribute ((format (printf, 3, 0)));
-/* Replacement function for sprintf */
+/* Replacement function for sprintf. Will FAIL on errors. */
 
 
 

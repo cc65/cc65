@@ -36,8 +36,9 @@
 #include <string.h>
 
 /* common */
-#include "xmalloc.h"
 #include "strbuf.h"
+#include "xmalloc.h"
+#include "xsprintf.h"
 
 
 
@@ -102,7 +103,7 @@ void FreeStrBuf (StrBuf* B)
 
 
 
-static void SB_Realloc (StrBuf* B, unsigned NewSize)
+void SB_Realloc (StrBuf* B, unsigned NewSize)
 /* Reallocate the string buffer space, make sure at least NewSize bytes are
  * available.
  */
@@ -304,7 +305,7 @@ void SB_Move (StrBuf* Target, StrBuf* Source)
 
 int SB_Compare (const StrBuf* S1, const StrBuf* S2)
 /* Do a lexical compare of S1 and S2. See strcmp for result codes. */
-{       
+{
     int Result;
     if (S1->Len < S2->Len) {
         Result = memcmp (S1->Buf, S2->Buf, S1->Len);
@@ -322,6 +323,58 @@ int SB_Compare (const StrBuf* S1, const StrBuf* S2)
         Result = memcmp (S1->Buf, S2->Buf, S1->Len);
     }
     return Result;
+}
+
+
+
+void SB_VPrintf (StrBuf* S, const char* Format, va_list ap)
+/* printf function with S as target. The function is safe, which means that
+ * the current contents of S are discarded, and are allocated again with
+ * a matching size for the output. The function will call FAIL when problems
+ * are detected (anything that let xsnprintf return -1).
+ */
+{
+    va_list tmp;
+    int SizeNeeded;
+
+    /* Since we must determine the space needed anyway, we will try with
+     * the currently allocated memory. If the call succeeds, we've saved
+     * an allocation. If not, we have to reallocate and try again.
+     */
+    va_copy (tmp, ap);
+    SizeNeeded = xvsnprintf (S->Buf, S->Allocated, Format, ap);
+    va_end (tmp);
+
+    /* Check the result, the xvsnprintf function should not fail */
+    CHECK (SizeNeeded >= 0);
+
+    /* Check if we must reallocate */
+    if ((unsigned) SizeNeeded >= S->Allocated) {
+        /* Must retry. Don't use Realloc to avoid copying */
+        xfree (S->Buf);
+        S->Allocated = SizeNeeded + 1;          /* Account for '\0' */
+        S->Buf = xmalloc (S->Allocated);
+        (void) xvsnprintf (S->Buf, S->Allocated, Format, ap);
+    }
+
+    /* Update string buffer variables */
+    S->Len = SizeNeeded;
+    S->Index = 0;
+}
+
+
+
+void SB_Printf (StrBuf* S, const char* Format, ...)
+/* vprintf function with S as target. The function is safe, which means that
+ * the current contents of S are discarded, and are allocated again with
+ * a matching size for the output. The function will call FAIL when problems
+ * are detected (anything that let xsnprintf return -1).
+ */
+{
+    va_list ap;
+    va_start (ap, Format);
+    SB_VPrintf (S, Format, ap);
+    va_end (ap);
 }
 
 

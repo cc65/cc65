@@ -38,6 +38,7 @@
 
 
 
+#include <stdarg.h>
 #include <string.h>
 
 /* common */
@@ -90,6 +91,11 @@ StrBuf* NewStrBuf (void);
 void FreeStrBuf (StrBuf* B);
 /* Free a string buffer */
 
+void SB_Realloc (StrBuf* B, unsigned NewSize);
+/* Reallocate the string buffer space, make sure at least NewSize bytes are
+ * available.
+ */
+
 #if defined(HAVE_INLINE)
 INLINE unsigned SB_GetLen (const StrBuf* B)
 /* Return the length of the buffer contents */
@@ -141,7 +147,7 @@ INLINE char SB_At (const StrBuf* B, unsigned Index)
 char SB_At (const StrBuf* B, unsigned Index);
 /* Get a character from the buffer */
 #endif
-                                   
+
 #if defined(HAVE_INLINE)
 INLINE char SB_AtUnchecked (const StrBuf* B, unsigned Index)
 /* Get a character from the buffer */
@@ -345,6 +351,20 @@ void SB_Move (StrBuf* Target, StrBuf* Source);
 
 int SB_Compare (const StrBuf* S1, const StrBuf* S2);
 /* Do a lexical compare of S1 and S2. See strcmp for result codes. */
+
+void SB_VPrintf (StrBuf* S, const char* Format, va_list ap);
+/* printf function with S as target. The function is safe, which means that
+ * the current contents of S are discarded, and are allocated again with
+ * a matching size for the output. The function will call FAIL when problems
+ * are detected (anything that let xsnprintf return -1).
+ */
+
+void SB_Printf (StrBuf* S, const char* Format, ...);
+/* vprintf function with S as target. The function is safe, which means that
+ * the current contents of S are discarded, and are allocated again with
+ * a matching size for the output. The function will call FAIL when problems
+ * are detected (anything that let xsnprintf return -1).
+ */
 
 
 

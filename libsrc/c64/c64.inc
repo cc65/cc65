@@ -11,7 +11,8 @@ ST   		= $90		; IEC status byte
 TIME            = $A0           ; 60 HZ clock
 FNAM_LEN	= $B7		; Length of filename
 SECADR		= $B9		; Secondary address
-DEVNUM		= $BA		; Device number
+DEVNUM		= $BA		; Device number     
+FNAM            = $BB           ; Pointer to filename
 KEY_COUNT      	= $C6		; Number of keys in input buffer
 RVS             = $C7           ; Reverse flag
 CURS_FLAG	= $CC		; 1 = cursor off

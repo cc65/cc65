@@ -9,7 +9,7 @@
 	.exportzp       ktab2, ktab3, ktab4, time, RecvBuf, SendBuf
 
 	.import		initlib, donelib
-	.import	     	push0, _main
+	.import	     	push0, callmain
 	.import	       	__BSS_RUN__, __BSS_SIZE__
 	.import		irq, nmi
        	.import	       	k_irq, k_nmi, PLOT, UDTIM, SCNKEY
@@ -214,11 +214,6 @@ Z4:
 
 	jsr	initlib
 
-; Create the (empty) command line for the program
-
-       	jsr    	push0 	       	; argc
-       	jsr	push0	       	; argv
-
 ; Execute the program code
 
 	jmp	Start
@@ -293,10 +288,9 @@ Start:
 
       	cli
 
-; Call the user code
+; Push arguments and call main()
 
-       	ldy	#4    	       	; Argument size
-       	jsr    	_main 		; call the users code
+       	jsr    	callmain
 
 ; Call module destructors. This is also the _exit entry.
 

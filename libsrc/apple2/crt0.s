@@ -8,7 +8,7 @@
 	.import	   	initlib, donelib
 	.import	   	zerobss, push0
        	.import	       	__STARTUP_LOAD__, __BSS_LOAD__	; Linker generated
-	.import		_main
+	.import		callmain
 
         .include        "zeropage.inc"
 	.include	"apple2.inc"
@@ -33,7 +33,7 @@
 
        	ldx	#zpspace-1
 L1:	lda	sp,x
-   	sta	zpsave,x	; Save the zero page locations we need
+   	sta	zpsave,x    	; Save the zero page locations we need
 	dex
        	bpl	L1
 
@@ -44,12 +44,12 @@ L1:	lda	sp,x
 ; Save system stuff and setup the stack
 
        	tsx
-       	stx    	spsave 		; Save the system stack ptr
+       	stx    	spsave 	    	; Save the system stack ptr
 
 	lda    	MEMSIZE
 	sta	sp
 	lda	MEMSIZE+1
-       	sta	sp+1   		; Set argument stack ptr
+       	sta	sp+1   	    	; Set argument stack ptr
 
 ; Call module constructors
 
@@ -64,13 +64,9 @@ L1:	lda	sp,x
 
 	;; 	sta    	USEROM
 
-; Pass an empty command line
+; Push arguments and call main()
 
-	jsr	push0  	 	; argc
-	jsr	push0  	 	; argv
-
-	ldy	#4     	 	; Argument size
-       	jsr    	_main  	 	; call the users code
+	jsr	callmain
 
 ; Call module destructors. This is also the _exit entry.
 
@@ -78,7 +74,7 @@ _exit:	jsr	donelib
 
 ; Restore system stuff
 
-	lda	#$ff  		; Reset text mode
+	lda	#$ff  	    	; Reset text mode
 	sta	TEXTTYP
 
 	ldx	spsave

@@ -8,7 +8,7 @@
         .export         brk_jmp
 
 	.import		condes, initlib, donelib
-	.import	     	push0, _main, zerobss
+	.import	     	push0, callmain, zerobss
 	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
 
         .include        "zeropage.inc"
@@ -99,13 +99,9 @@ L1:	lda	sp,x
       	stx	IRQVec+1
       	cli
 
-; Pass an empty command line
+; Push arguments and call main()
 
-NoIRQ1: jsr    	push0		; argc
-	jsr	push0		; argv
-
-	ldy	#4    		; Argument size
-       	jsr    	_main 		; call the users code
+NoIRQ1: jsr    	callmain
 
 ; Back from main (this is also the _exit entry). Reset the IRQ vector if
 ; we chained it.

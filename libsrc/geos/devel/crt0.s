@@ -8,7 +8,7 @@
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 	.import		initlib, donelib
        	.import	       	pushax
-	.import		_main
+	.import		callmain
 	.import		_MainLoop, _EnterDeskTop
 	.import		zerobss
 	.importzp	sp
@@ -39,16 +39,10 @@
 
 	jsr	initlib
 
-; Pass an empty command line
-
-	lda  	#0
-	tax
-	jsr	pushax 	 	; argc
-	jsr	pushax	 	; argv
+; Push arguments and call main()
 
 	cli
-	ldy	#4	 	; Argument size
-       	jsr    	_main	 	; call the users code
+       	jsr    	callmain
 
 ; Call module destructors. This is also the _exit entry which must be called
 ; explicitly by the code.

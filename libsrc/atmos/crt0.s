@@ -8,7 +8,7 @@
 
 	.export		_exit
 	.import		initlib, donelib
-	.import	     	push0, _main, zerobss
+	.import	     	push0, callmain, zerobss
 	.import		__RAM_START__, __RAM_SIZE__	; Linker generated
 
         .importzp       sp
@@ -41,13 +41,9 @@
 
 	jsr	initlib
 
-; Pass an empty command line
+; Push arguments and call main()
 
-       	jsr    	push0		; argc
-	jsr	push0		; argv
-
-	ldy	#4    		; Argument size
-       	jsr    	_main 		; call the users code
+       	jsr    	callmain
 
 ; Call module destructors. This is also the _exit entry.
 

@@ -37,6 +37,7 @@ OBJS =	_scrsize.o	\
        	kplot.o		\
 	kscnkey.o	\
 	kudtim.o	\
+        mainargs.o      \
 	peeksys.o	\
 	pokesys.o	\
         randomize.o     \

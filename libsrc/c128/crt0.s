@@ -7,7 +7,7 @@
     	.export	     	_exit
     	.import	     	condes, initlib, donelib
     	.import	     	zerobss
-    	.import		push0, _main
+    	.import		push0, callmain
         .import         RESTOR, BSOUT, CLRCH
 	.import	       	__IRQFUNC_TABLE__, __IRQFUNC_COUNT__
     	.import	 	__RAM_START__, __RAM_SIZE__
@@ -108,13 +108,9 @@ L1:	lda    	sp,x
       	stx	IRQVec+1
       	cli
 
-; Pass an empty command line
+; Push arguments and call main()
 
-NoIRQ1:	jsr	push0 	 	; argc
- 	jsr	push0 	 	; argv
-
- 	ldy	#4    	 	; Argument size
-       	jsr    	_main 	 	; call the users code
+NoIRQ1:	jsr	callmain
 
 ; Back from main (this is also the _exit entry). Reset the IRQ vector if
 ; we chained it.

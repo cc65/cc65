@@ -7,7 +7,7 @@
 	.export	      	_exit
 	.import		initlib, donelib
        	.import	       	zerobss, push0
-	.import		_main
+	.import		callmain
         .import         CLRCH, BSOUT
 
         .include        "zeropage.inc"
@@ -70,13 +70,9 @@ L1:	lda	sp,x
 
 	jsr	initlib
 
-; Pass an empty command line
+; Push arguments and call main()
 
-	jsr	push0 	  	; argc
-	jsr	push0	 	; argv
-
-	ldy	#4  	 	; Argument size
-       	jsr    	_main	 	; call the users code
+	jsr	callmain
 
 ; Call module destructors. This is also the _exit entry.
 

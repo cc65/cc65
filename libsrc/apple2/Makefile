@@ -29,6 +29,7 @@ OBJS=	_scrsize.o	\
 	ctype.o		\
 	cvline.o	\
 	kbhit.o		\
+        mainargs.o      \
         randomize.o     \
 	read.o		\
 	revers.o	\

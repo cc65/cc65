@@ -48,6 +48,7 @@ OBJS =	_scrsize.o	\
        	kplot.o	 	\
 	kscnkey.o	\
 	kudtim.o 	\
+        mainargs.o      \
 	mouse.o		\
 	peeksys.o	\
 	pokesys.o	\

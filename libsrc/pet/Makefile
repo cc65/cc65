@@ -38,6 +38,7 @@ OBJS =	_scrsize.o	\
         kreadst.o       \
         ksetlfs.o       \
         ksetnam.o       \
+        mainargs.o      \
         randomize.o	\
 	revers.o
 

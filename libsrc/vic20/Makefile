@@ -38,6 +38,7 @@ OBJS =	_scrsize.o	\
 	kbhit.o		\
         kernal.o        \
         kplot.o         \
+        mainargs.o      \
         randomize.o     \
 	revers.o
 
@@ -66,4 +67,4 @@ clean:
 zap:	clean
 	@rm -f $(EMDS) $(JOYS) $(TGIS)
 
-		     
+

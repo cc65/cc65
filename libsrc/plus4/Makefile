@@ -60,6 +60,7 @@ OBJS =	_scrsize.o	\
         ktalk.o         \
         kunlsn.o        \
         kuntlk.o        \
+        mainargs.o      \
         randomize.o     \
         revers.o        \
 	tgi_mode_table.o

@@ -39,6 +39,7 @@ OBJS = 	_scrsize.o     	 	\
 	joy_stddrv.o		\
        	kbhit.o	       	 	\
         kernal.o                \
+        mainargs.o              \
        	mouse.o	       	 	\
         randomize.o             \
         revers.o                \

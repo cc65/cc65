@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -202,7 +202,7 @@ void SB_AppendChar (StrBuf* B, int C)
     if (NewLen > B->Allocated) {
 	SB_Realloc (B, NewLen);
     }
-    B->Buf[B->Len] = (char) C;            
+    B->Buf[B->Len] = (char) C;
     B->Len = NewLen;
 }
 
@@ -298,6 +298,30 @@ void SB_Move (StrBuf* Target, StrBuf* Source)
 
     /* Clear Source */
     InitStrBuf (Source);
+}
+
+
+
+int SB_Compare (const StrBuf* S1, const StrBuf* S2)
+/* Do a lexical compare of S1 and S2. See strcmp for result codes. */
+{       
+    int Result;
+    if (S1->Len < S2->Len) {
+        Result = memcmp (S1->Buf, S2->Buf, S1->Len);
+        if (Result == 0) {
+            /* S1 considered lesser because it's shorter */
+            Result = -1;
+        }
+    } else if (S1->Len > S2->Len) {
+        Result = memcmp (S1->Buf, S2->Buf, S2->Len);
+        if (Result == 0) {
+            /* S2 considered lesser because it's shorter */
+            Result = 1;
+        }
+    } else {
+        Result = memcmp (S1->Buf, S2->Buf, S1->Len);
+    }
+    return Result;
 }
 
 

@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 2001-2003 Ullrich von Bassewitz                                       */
+/* (C) 2001-2004 Ullrich von Bassewitz                                       */
 /*               Römerstrasse 52                                             */
 /*               D-70794 Filderstadt                                         */
 /* EMail:        uz@cc65.org                                                 */
@@ -342,6 +342,9 @@ void SB_Move (StrBuf* Target, StrBuf* Source);
 /* Move the complete contents of Source to target. This will delete the old
  * contents of Target, and Source will be empty after the call.
  */
+
+int SB_Compare (const StrBuf* S1, const StrBuf* S2);
+/* Do a lexical compare of S1 and S2. See strcmp for result codes. */
 
 
 

@@ -204,6 +204,20 @@ The program return code (low byte) is passed back to BASIC by use of the
 <tt/ST/ variable.
 
 
+<sect1>Using extended memory<p>
+
+The extended memory at $A000 may be added to the heap by using the following
+code:
+
+<tscreen><verb>
+    /* Check for the existence of RAM */
+    if (PEEK(0xA000) == POKE(0xA000, PEEK(0xA000)+1)) {<br>
+        /* Add it to the heap */
+        _heapadd ((void *) 0xA000, 0x2000);
+    }
+</verb></tscreen>
+
+
 
 
 <sect>Bugs/Feedback<p>

@@ -4,7 +4,7 @@
 ; File name handling for CBM file I/O
 ;
 
-        .export         fnparse, fnset, fncomplete
+        .export         fnparse, fnset, fnaddmode, fncomplete
         .export         fnunit, fnlen, fncmd, fnbuf
 
         .import         SETNAM
@@ -94,8 +94,7 @@ nameok: ldx     fnlen
         cpx     #18             ; Maximum length reached?
         bcs     invalidname
         lda     (ptr1),y        ; Reload char
-        sta     fnbuf,x         ; Store into buffer
-        inc     fnlen           ; Count characters
+        jsr     fnadd           ; Add character to name
         iny                     ; Next char from name
         bne     nameloop        ; Branch always
 
@@ -127,27 +126,28 @@ namedone:
 ;--------------------------------------------------------------------------
 ; fncomplete: Complete a filename by adding ",t,m" where t is the file type
 ; and m is the access mode passed in in the A register
+;
+; fnaddmode: Add ",m" to a filename, where "m" is passed in A
 
-.proc	fncomplete
-
+fncomplete:
 	pha	   		; Save mode
-	ldx	fnlen
-	lda	#','
-	sta	fnbuf,x
-	inx
-	lda	__filetype
-	sta	fnbuf,x
-	inx
-	lda	#','
-	sta	fnbuf,x
-	inx
-	pla
-	sta	fnbuf,x
-	inx
-	stx	fnlen
-	rts
+        jsr     fnaddcomma      ; Add a comma
+        lda     __filetype
+        jsr     fnadd           ; Add the type
+        pla
+fnaddmode:
+        pha
+        jsr     fnaddcomma
+        pla
 
-.endproc
+fnadd:  ldx     fnlen
+        inc     fnlen
+        sta     fnbuf,x
+        rts
+
+fnaddcomma:
+        lda     #','
+        bne     fnadd
 
 ;--------------------------------------------------------------------------
 ; Data
@@ -167,4 +167,4 @@ fnchars:.byte   ".,-_+()"
 fncharcount = *-fnchars
 
 
-		   
+

@@ -13,7 +13,7 @@
 
         .import         SETLFS, OPEN, CLOSE
         .import         addysp, popax
-        .import         scratch, fnparse, fncomplete, fnset
+        .import         scratch, fnparse, fnaddmode, fncomplete, fnset
         .import         opencmdchannel, closecmdchannel, readdiskerror
         .import         __oserror
         .import         fnunit
@@ -109,7 +109,7 @@ notrunc:
         bne     append          ; Branch if yes
         ldx     #'w'
 append: txa
-        jsr     fncomplete
+        jsr     fncomplete      ; Add type and mode to the name
 
 ; Setup the real open flags
 
@@ -119,7 +119,7 @@ append: txa
 ; Read bit is set. Add an 'r' to the name
 
 doread: lda     #'r'
-        jsr     fncomplete
+        jsr     fnaddmode       ; Add the mode to the name
         lda     #LFN_READ
 
 ; Common read/write code. Flags in A, handle in tmp2

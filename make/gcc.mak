@@ -46,7 +46,7 @@ zap:
 	$(MAKE) -C doc zap
 
 .PHONY:	install
-install:
+install:	all
 	@if [ `id -u` != 0 ]; then				      \
 	    echo "";						      \
 	    echo 'Do "make install" as root';			      \
@@ -78,4 +78,4 @@ install:
 	@$(INSTALL) -m 644 doc/*.html $(CC65DOC)
 	@$(INSTALL) -m 644 doc/{compile.txt,grc.txt,internal.txt,newvers.txt} $(CC65DOC)
 	@$(INSTALL) -m 644 src/ld65/cfg/*.cfg $(CC65DOC)
-  
+

@@ -543,9 +543,9 @@ unsigned OptJumpTarget (CodeSeg* S)
 	/* Check if we have a jump or branch, and a matching label, which
 	 * is not attached to the jump itself
 	 */
-       	if (E2 != 0 			&&
+       	if (E2 != 0 	 		&&
 	    (E2->Info & OF_UBRA) != 0 	&&
-	    E2->JumpTo			&&
+	    E2->JumpTo	 		&&
 	    E2->JumpTo->Owner != E2) {
 
 	    /* Get the entry preceeding the branch target */
@@ -561,7 +561,7 @@ unsigned OptJumpTarget (CodeSeg* S)
 	    /* Check if both preceeding instructions are identical */
 	    if (!CodeEntriesAreEqual (E1, T1)) {
 	    	/* Not equal, try next */
-	    	goto NextEntry;
+                goto NextEntry;
 	    }
 
 	    /* Get the label for the instruction preceeding the jump target.
@@ -586,12 +586,11 @@ unsigned OptJumpTarget (CodeSeg* S)
        	    /* Remember, we had changes */
 	    ++Changes;
 
-	}
-
+	} else {
 NextEntry:
-	/* Next entry */
-	++I;
-
+            /* Next entry */
+            ++I;
+        }
     }
 
     /* Return the number of changes made */

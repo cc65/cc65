@@ -94,13 +94,26 @@ static unsigned AdjustStackOffset (CodeSeg* S, unsigned Start, unsigned Stop,
 
      	CodeEntry* E = CS_GetEntry (S, I);
 
-     	if (E->Use & REG_SP) {
-
-     	    CodeEntry* P;
+        int NeedCorrection = 0;
+     	if ((E->Use & REG_SP) != 0) {
 
      	    /* Check for some things that should not happen */
      	    CHECK (E->AM == AM65_ZP_INDY || E->RI->In.RegY >= (short) Offs);
 	    CHECK (strcmp (E->Arg, "sp") == 0);
+
+            /* We need to correct this one */
+            NeedCorrection = 1;
+
+        } else if (CE_IsCall (E, "ldaxysp")) {
+
+            /* We need to correct this one */
+            NeedCorrection = 1;
+
+        }
+
+        if (NeedCorrection) {
+
+     	    CodeEntry* P;
 
      	    /* Get the code entry before this one. If it's a LDY, adjust the
      	     * value.
@@ -632,8 +645,7 @@ unsigned OptStackOps (CodeSeg* S)
      * It depends on the code between the two if we can handle/transform the
      * sequence, so check this code for the following list of things:
      *
-     *  - there must not be a jump or conditional branch (this may
-     *    get relaxed later).
+     *  - the range must be a basic block (one entry, one exit)
      *  - there may not be accesses to local variables with unknown
      *    offsets (because we have to adjust these offsets).
      *  - no subroutine calls
@@ -653,8 +665,7 @@ unsigned OptStackOps (CodeSeg* S)
 
 	    if ((E->Info & OF_BRA) != 0                              ||
 		((E->Use & REG_SP) != 0                         &&
-		 (E->AM != AM65_ZP_INDY || E->RI->In.RegY < 0))      ||
-		CE_HasLabel (E)) {
+		 (E->AM != AM65_ZP_INDY || E->RI->In.RegY < 0))) {
 
 	    	/* All this stuff is not allowed in a sequence */
 	    	InSeq = 0;
@@ -695,6 +706,11 @@ unsigned OptStackOps (CodeSeg* S)
 		     	    PreCondOk = 0;
 		     	}
 		    }
+
+                    /* Determine if we have a basic block */
+                    if (PreCondOk) {
+                        PreCondOk = CS_IsBasicBlock (S, Push, I);
+                    }
 
 	    	    /* If preconditions are ok, call the optimizer function */
 	    	    if (PreCondOk) {

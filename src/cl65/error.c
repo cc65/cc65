@@ -37,26 +37,12 @@
 #include <stdlib.h>
 #include <stdarg.h>
 
-#include "../common/cmdline.h"
-
+/* common */
+#include "cmdline.h"
+	  
+/* cl65 */
 #include "global.h"
 #include "error.h"
-
-
-
-/*****************************************************************************/
-/*	  			     Data		     		     */
-/*****************************************************************************/
-
-
-
-/* Messages for internal compiler errors */
-const char _MsgCheckFailed [] =
-    "Check failed: `%s' (= %d), file `%s', line %u\n";
-const char _MsgPrecondition [] =
-    "Precondition violated: `%s' (= %d), file `%s', line %u\n";
-const char _MsgFail [] =
-    "%s, file `%s', line %u\n";
 
 
 

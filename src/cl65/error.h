@@ -39,19 +39,6 @@
 
 
 /*****************************************************************************/
-/*	  		   	     Data		     		     */
-/*****************************************************************************/
-
-
-
-/* Messages for internal compiler errors */
-extern const char _MsgCheckFailed [];
-extern const char _MsgPrecondition [];
-extern const char _MsgFail [];
-
-
-
-/*****************************************************************************/
 /*     	      	    		     Code				     */
 /*****************************************************************************/
 
@@ -65,17 +52,6 @@ void Error (const char* Format, ...);
 
 void Internal (const char* Format, ...);
 /* Print an internal error message and die */
-
-#define CHECK(c)     							\
-    if (!(c)) 	       	       	       	       	       	     		\
- 	Internal (_MsgCheckFailed, #c, c, __FILE__, __LINE__)
-
-#define PRECONDITION(c)							\
-    if (!(c)) 	       	       	       	       	       	     		\
-       	Internal (_MsgPrecondition, #c, c, __FILE__, __LINE__)
-
-#define FAIL(s)								\
-    Internal (_MsgFail, s, __FILE__, __LINE__)
 
 
 

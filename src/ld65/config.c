@@ -38,9 +38,12 @@
 #include <string.h>
 #include <errno.h>
 
-#include "../common/bitops.h"
-#include "../common/xmalloc.h"
-
+/* common */
+#include "check.h"
+#include "bitops.h"
+#include "xmalloc.h"
+	  
+/* ld65 */
 #include "error.h"
 #include "global.h"
 #include "bin.h"

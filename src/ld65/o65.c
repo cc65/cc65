@@ -39,6 +39,7 @@
 #include <time.h>
 
 /* common */
+#include "check.h"
 #include "version.h"
 #include "xmalloc.h"
 

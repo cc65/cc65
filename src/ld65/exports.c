@@ -37,10 +37,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../common/symdefs.h"
-#include "../common/hashstr.h"
-#include "../common/xmalloc.h"
-
+/* common */
+#include "check.h"
+#include "hashstr.h"
+#include "symdefs.h"
+#include "xmalloc.h"
+	  
+/* ld65 */
 #include "global.h"
 #include "error.h"
 #include "fileio.h"

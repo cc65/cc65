@@ -36,10 +36,11 @@
 #include <string.h>
 
 /* common */
-#include "symdefs.h"
+#include "check.h"
 #include "hashstr.h"
+#include "symdefs.h"
 #include "xmalloc.h"
-	  
+
 /* ca65 */
 #include "global.h"
 #include "error.h"
@@ -998,7 +999,7 @@ void WriteImports (void)
      	}
      	S = S->List;
     }
-     
+
     /* Done writing imports */
     ObjEndImports ();
 }

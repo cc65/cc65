@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -44,19 +44,6 @@
 
 
 /*****************************************************************************/
-/*	  		   	     Data		     		     */
-/*****************************************************************************/
-
-
-
-/* Messages for internal compiler errors */
-extern const char _MsgCheckFailed [];
-extern const char _MsgPrecondition [];
-extern const char _MsgFail [];
-
-
-
-/*****************************************************************************/
 /*     	      	    		     Code				     */
 /*****************************************************************************/
 
@@ -71,18 +58,7 @@ void Error (const char* Format, ...) attribute((format(printf,1,2)));
 void Internal (const char* Format, ...) attribute((format(printf,1,2)));
 /* Print an internal error message and die */
 
-#define CHECK(c)     							\
-    if (!(c)) 	       	       	       	       	       	     		\
- 	Internal (_MsgCheckFailed, #c, c, __FILE__, __LINE__)
-
-#define PRECONDITION(c)							\
-    if (!(c)) 	       	       	       	       	       	     		\
-       	Internal (_MsgPrecondition, #c, c, __FILE__, __LINE__)
-
-#define FAIL(s)								\
-    Internal (_MsgFail, s, __FILE__, __LINE__)
-
-
+									     
 
 /* End of error.h */
 

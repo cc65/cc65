@@ -153,11 +153,6 @@ enum Fatals {
 /* Warning levels */
 extern unsigned        	WarnLevel;
 
-/* Messages for internal compiler errors */
-extern const char _MsgCheckFailed [];
-extern const char _MsgPrecondition [];
-extern const char _MsgFail [];
-
 /* Statistics */
 extern unsigned ErrorCount;
 extern unsigned WarningCount;
@@ -190,17 +185,6 @@ void Fatal (unsigned FatNum, ...);
 
 void Internal (const char* Format, ...);
 /* Print a message about an internal compiler error and die. */
-
-#define CHECK(c)       							\
-    if (!(c)) 	       	       	       	       	       	     		\
- 	Internal (_MsgCheckFailed, #c, c, __FILE__, __LINE__)
-
-#define PRECONDITION(c)							\
-    if (!(c)) 	       	       	       	       	       	     		\
-       	Internal (_MsgPrecondition, #c, c, __FILE__, __LINE__)
-
-#define FAIL(s)	       							\
-    Internal (_MsgFail, s, __FILE__, __LINE__)
 
 
 

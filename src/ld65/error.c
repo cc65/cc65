@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -38,22 +38,6 @@
 #include <stdarg.h>
 
 #include "error.h"
-
-
-
-/*****************************************************************************/
-/*	  			     Data		     		     */
-/*****************************************************************************/
-
-
-
-/* Messages for internal compiler errors */
-const char _MsgCheckFailed [] =
-    "Check failed: `%s' (= %d), file `%s', line %u\n";
-const char _MsgPrecondition [] =
-    "Precondition violated: `%s' (= %d), file `%s', line %u\n";
-const char _MsgFail [] =
-    "%s, file `%s', line %u\n";
 
 
 

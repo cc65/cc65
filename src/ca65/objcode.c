@@ -38,9 +38,10 @@
 #include <ctype.h>
 
 /* common */
+#include "check.h"
 #include "segdefs.h"
 #include "xmalloc.h"
-	   
+
 /* cc65 */
 #include "error.h"
 #include "fragment.h"
@@ -162,7 +163,7 @@ static Segment* NewSegment (const char* Name, unsigned SegType)
     return S;
 }
 
-	  
+
 
 void UseCodeSeg (void)
 /* Use the code segment */

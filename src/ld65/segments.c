@@ -37,12 +37,13 @@
 #include <string.h>
 
 /* common */
+#include "check.h"
 #include "exprdefs.h"
 #include "hashstr.h"
 #include "segdefs.h"
 #include "symdefs.h"
 #include "xmalloc.h"
-	  
+
 /* ld65 */
 #include "error.h"
 #include "expr.h"

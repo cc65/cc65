@@ -51,15 +51,6 @@
 /* Warning level */
 unsigned WarnLevel	    = 1;
 
-/* Messages for internal compiler errors */
-const char _MsgCheckFailed [] =
-    "Check failed: `%s' (= %d), file `%s', line %u\n";
-const char _MsgPrecondition [] =
-    "Precondition violated: `%s' (= %d), file `%s', line %u\n";
-const char _MsgFail [] =
-    "%s, file `%s', line %u\n";
-
-
 /* Statistics */
 unsigned ErrorCount	= 0;
 unsigned WarningCount	= 0;

@@ -37,8 +37,11 @@
 #include <string.h>
 #include <ctype.h>
 
-#include "../common/bitops.h"
+/* common */
+#include "bitops.h"
+#include "check.h"
 
+/* ca65 */
 #include "ea.h"
 #include "error.h"
 #include "expr.h"

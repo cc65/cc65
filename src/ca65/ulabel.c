@@ -33,9 +33,12 @@
 
 
 
-#include "../common/filepos.h"
-#include "../common/xmalloc.h"
-
+/* common */
+#include "check.h"
+#include "filepos.h"
+#include "xmalloc.h"
+	  
+/* ca65 */
 #include "error.h"
 #include "expr.h"
 #include "scanner.h"

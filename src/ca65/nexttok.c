@@ -35,6 +35,10 @@
 
 #include <stdio.h>
 
+/* common */
+#include "check.h"
+		   
+/* ca65 */
 #include "error.h"
 #include "expr.h"
 #include "scanner.h"

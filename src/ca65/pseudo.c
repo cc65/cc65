@@ -41,6 +41,7 @@
 
 /* common */
 #include "bitops.h"
+#include "check.h"
 
 /* ca65 */
 #include "condasm.h"

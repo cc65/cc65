@@ -34,6 +34,7 @@
 
 
 /* common */
+#include "check.h"
 #include "exprdefs.h"
 #include "xmalloc.h"
 

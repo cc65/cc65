@@ -38,6 +38,7 @@
 #include <errno.h>
 
 /* common */
+#include "check.h"
 #include "fname.h"
 #include "segdefs.h"
 #include "version.h"

@@ -36,9 +36,12 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "../common/hashstr.h"
-#include "../common/xmalloc.h"
-
+/* common */
+#include "check.h"
+#include "hashstr.h"
+#include "xmalloc.h"
+	  
+/* ca65 */
 #include "condasm.h"
 #include "error.h"
 #include "istack.h"
@@ -657,7 +660,7 @@ static void StartExpDefine (Macro* M)
 
     /* A define style macro must be called with as many actual parameters
      * as there are formal ones. Get the parameter count.
-     */						 
+     */
     unsigned Count = M->ParamCount;
 
     /* Skip the current token */

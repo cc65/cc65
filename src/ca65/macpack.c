@@ -33,6 +33,10 @@
 
 
 
+/* common */
+#include "check.h"
+		  
+/* ca65 */
 #include "error.h"
 #include "scanner.h"
 #include "macpack.h"

@@ -33,8 +33,11 @@
 
 
 
-#include "../common/xmalloc.h"
-
+/* common */
+#include "check.h"
+#include "xmalloc.h"
+		  
+/* ca65 */
 #include "error.h"
 #include "istack.h"
 

@@ -41,9 +41,10 @@
 #include <sys/stat.h>
 
 /* common */
+#include "check.h"
 #include "fname.h"
 #include "xmalloc.h"
-	  
+
 /* ca65 */
 #include "condasm.h"
 #include "error.h"

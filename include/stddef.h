@@ -6,7 +6,7 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/* (C) 1998-2002 Ullrich von Bassewitz                                       */
 /*               Wacholderweg 14                                             */
 /*               D-70597 Stuttgart                                           */
 /* EMail:        uz@musoftware.de                                            */
@@ -45,7 +45,7 @@ typedef int ptrdiff_t;
 #endif
 #ifndef _WCHAR_T
 #define _WCHAR_T
-typedef char wchar_t;
+typedef unsigned short wchar_t;
 #endif
 #ifndef _SIZE_T
 #define _SIZE_T

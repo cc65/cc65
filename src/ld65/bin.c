@@ -36,10 +36,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-					    
+
 /* common */
 #include "xmalloc.h"
-	  
+
 /* ld65 */
 #include "global.h"
 #include "error.h"
@@ -140,7 +140,7 @@ static void BinWriteMem (BinDesc* D, Memory* M)
 	     * in the linker.
 	     */
 	    Warning ("Segment `%s' in module `%s' requires larger alignment",
-	     	     S->Name, S->Seg->AlignObj->Name);
+	     	     S->Name, GetObjFileName (S->Seg->AlignObj));
 	}
 
 	/* Handle ALIGN and OFFSET/START */

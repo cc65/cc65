@@ -6,10 +6,10 @@
 /*                                                                           */
 /*                                                                           */
 /*                                                                           */
-/* (C) 1998     Ullrich von Bassewitz                                        */
-/*              Wacholderweg 14                                              */
-/*              D-70597 Stuttgart                                            */
-/* EMail:       uz@musoftware.de                                             */
+/* (C) 1998-2000 Ullrich von Bassewitz                                       */
+/*               Wacholderweg 14                                             */
+/*               D-70597 Stuttgart                                           */
+/* EMail:        uz@musoftware.de                                            */
 /*                                                                           */
 /*                                                                           */
 /* This software is provided 'as-is', without any expressed or implied       */
@@ -35,8 +35,11 @@
 
 #include <string.h>
 
-#include "../common/xmalloc.h"
+/* common */
+#include "check.h"
+#include "xmalloc.h"
 
+/* ld65 */
 #include "error.h"
 #include "objdata.h"
 
@@ -108,6 +111,41 @@ void FreeObjData (ObjData* O)
     xfree (O->DbgSyms);
     xfree (O);
 }
+
+
+
+const char* GetObjFileName (const ObjData* O)
+/* Get the name of the object file. Return "(linker generated)" if the object
+ * file is NULL.
+ */
+{
+    return O? O->Name : "(linker generated)";
+}
+
+
+
+const char* GetSourceFileName (const ObjData* O, unsigned Index)
+/* Get the name of the source file with the given index. If O is NULL, return
+ * "(linker generated)" as the file name.
+ */
+{      
+    /* Check if we have an object file */
+    if (O == 0) {
+	
+	/* No object file */
+	return "(linker generated)";
+
+    } else {
+    
+	/* Check the parameter */
+	PRECONDITION (Index < O->FileCount);
+    
+	/* Return the name */
+	return O->Files[Index];
+
+    }
+}
+
 
 
 

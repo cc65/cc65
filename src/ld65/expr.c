@@ -119,7 +119,8 @@ int IsConstExpr (ExprNode* Root)
 		 */
 		if (ExportHasMark (E)) {
 		    Error ("Circular reference for symbol `%s', %s(%lu)",
-			   E->Name, E->Obj->Files [E->Pos.Name], E->Pos.Line);
+			   E->Name, GetSourceFileName (E->Obj, E->Pos.Name),
+			   E->Pos.Line);
 		    Const = 0;
 		} else {
 		    MarkExport (E);
@@ -208,8 +209,16 @@ Section* GetExprSection (ExprNode* Expr)
     /* Check that this is really a segment node */
     PRECONDITION (Expr->Op == EXPR_SEGMENT);
 
-    /* Return the export */
-    return Expr->Obj->Sections [Expr->V.SegNum];
+    /* If we have an object file, get the section from it, otherwise
+     * (internally generated expressions), get the section from the
+     * section pointer.
+     */
+    if (Expr->Obj) {
+	/* Return the export */
+	return Expr->Obj->Sections [Expr->V.SegNum];
+    } else {
+	return Expr->V.Sec;
+    }
 }
 
 
@@ -381,6 +390,25 @@ ExprNode* MemExpr (Memory* Mem, long Offs, ObjData* O)
 
 
 
+ExprNode* SegExpr (Section* Sec, long Offs, ObjData* O)
+/* Return an expression tree that encodes an offset into a segment */
+{
+    ExprNode* Root;
+
+    ExprNode* Expr = NewExprNode (O);
+    Expr->Op = EXPR_SEGMENT;
+    Expr->V.Sec = Sec;
+
+    Root = NewExprNode (O);
+    Root->Op = EXPR_PLUS;
+    Root->Left = Expr;
+    Root->Right = LiteralExpr (Offs, O);
+
+    return Root;
+}
+
+
+
 ExprNode* ReadExpr (FILE* F, ObjData* O)
 /* Read an expression from the given file */
 {
@@ -461,8 +489,8 @@ int EqualExpr (ExprNode* E1, ExprNode* E2)
 	    return (E1->V.ImpNum == E2->V.ImpNum);
 
 	case EXPR_SEGMENT:
-       	    /* Segment number must be identical */
-       	    return (E1->V.SegNum == E2->V.SegNum);
+       	    /* Section must be identical */
+       	    return (GetExprSection (E1) == GetExprSection (E2));
 
 	case EXPR_MEMAREA:
        	    /* Memory area must be identical */

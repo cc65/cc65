@@ -107,6 +107,15 @@ typedef unsigned (*SegWriteFunc) (ExprNode* E, 	      /* The expression to write
 
 
 
+Segment* GetSegment (const char* Name, unsigned char Type, const char* ObjName);
+/* Search for a segment and return an existing one. If the segment does not
+ * exist, create a new one and return that. ObjName is only used for the error
+ * message and may be NULL if the segment is linker generated.
+ */
+
+Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Type);
+/* Create a new section for the given segment */
+
 Section* ReadSection (FILE* F, struct ObjData* O);
 /* Read a section from a file */
 

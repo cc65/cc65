@@ -958,7 +958,9 @@ static void ParseConDes (void)
     static const IdentTok Attributes [] = {
        	{   "SEGMENT",		CFGTOK_SEGMENT		},
 	{   "LABEL",  		CFGTOK_LABEL  		},
+	{   "COUNT",		CFGTOK_COUNT		},
 	{   "TYPE",		CFGTOK_TYPE   		},
+	{   "ORDER",		CFGTOK_ORDER		},
     };
 
     static const IdentTok Types [] = {
@@ -966,17 +968,27 @@ static void ParseConDes (void)
 	{   "DESTRUCTOR",      	CFGTOK_DESTRUCTOR	},
     };
 
+    static const IdentTok Orders [] = {
+	{   "DECREASING",      	CFGTOK_DECREASING	},
+       	{   "INCREASING",      	CFGTOK_INCREASING	},
+    };
+
     /* Attribute values. */
     char SegName[sizeof (CfgSVal)];
     char Label[sizeof (CfgSVal)];
-    int Type = -1;	/* Initialize to avoid gcc warnings */
+    char Count[sizeof (CfgSVal)];
+    /* Initialize to avoid gcc warnings: */
+    int Type = -1;
+    ConDesOrder Order = cdIncreasing;
 
     /* Bitmask to remember the attributes we got already */
     enum {
 	atNone		= 0x0000,
 	atSegName	= 0x0001,
 	atLabel		= 0x0002,
-	atType		= 0x0004
+	atCount		= 0x0004,
+	atType		= 0x0008,
+	atOrder		= 0x0010
     };
     unsigned AttrFlags = atNone;
 
@@ -1013,6 +1025,14 @@ static void ParseConDes (void)
 		strcpy (Label, CfgSVal);
 		break;
 
+	    case CFGTOK_COUNT:
+	       	/* Don't allow this twice */
+		FlagAttr (&AttrFlags, atCount, "COUNT");
+	      	/* We expect an identifier */
+		CfgAssureIdent ();
+		/* Remember the value for later */
+		strcpy (Count, CfgSVal);
+		break;
 
 	    case CFGTOK_TYPE:
 	  	/* Don't allow this twice */
@@ -1028,6 +1048,17 @@ static void ParseConDes (void)
 		     	case CFGTOK_DESTRUCTOR:	 Type = CD_TYPE_DES;	break;
 		     	default: FAIL ("Unexpected type token");
 		    }
+		}
+		break;
+
+	    case CFGTOK_ORDER:
+	       	/* Don't allow this twice */
+		FlagAttr (&AttrFlags, atOrder, "ORDER");
+		CfgSpecialToken (Orders, ENTRY_COUNT (Orders), "Order");
+		switch (CfgTok) {
+		    case CFGTOK_DECREASING: Order = cdDecreasing;	break;
+		    case CFGTOK_INCREASING: Order = cdIncreasing;	break;
+		    default: FAIL ("Unexpected order token");
 		}
 		break;
 
@@ -1060,6 +1091,12 @@ static void ParseConDes (void)
     /* Define the attributes */
     ConDesSetSegName (Type, SegName);
     ConDesSetLabel (Type, Label);
+    if (AttrFlags & atCount) {
+	ConDesSetCountSym (Type, Count);
+    }
+    if (AttrFlags & atOrder) {
+	ConDesSetOrder (Type, Order);
+    }
 }
 
 

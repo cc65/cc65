@@ -75,7 +75,26 @@ static Segment*	     	SegRoot = 0;	/* List of all segments */
 
 
 
-static Segment* NewSegment (const char* Name, unsigned char Type)
+static Segment* SegFindInternal (const char* Name, unsigned HashVal)
+/* Try to find the segment with the given name, return a pointer to the
+ * segment structure, or 0 if not found.
+ */
+{
+    Segment* S = HashTab [HashVal];
+    while (S) {
+	if (strcmp (Name, S->Name) == 0) {
+	    /* Found */
+	    break;
+	}
+	S = S->Next;
+    }
+    /* Not found */
+    return S;
+}
+
+
+
+static Segment* NewSegment (const char* Name, unsigned HashVal, unsigned char Type)
 /* Create a new segment and initialize it */
 {
     /* Get the length of the symbol name */
@@ -103,13 +122,50 @@ static Segment* NewSegment (const char* Name, unsigned char Type)
     SegRoot = S;
     ++SegCount;
 
+    /* Insert the segment into the segment hash list */
+    S->Next = HashTab [HashVal];
+    HashTab [HashVal] = S;
+
     /* Return the new entry */
     return S;
 }
 
 
 
-static Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Type)
+Segment* GetSegment (const char* Name, unsigned char Type, const char* ObjName)
+/* Search for a segment and return an existing one. If the segment does not
+ * exist, create a new one and return that. ObjName is only used for the error
+ * message and may be NULL if the segment is linker generated.
+ */
+{
+    /* Create a hash over the name and try to locate the segment in the table */
+    unsigned HashVal = HashStr (Name) % HASHTAB_SIZE;
+    Segment* S = SegFindInternal (Name, HashVal);
+
+    /* If we don't have that segment already, allocate it using the type of
+     * the first section.
+     */
+    if (S == 0) {
+      	/* Create a new segment */
+      	S = NewSegment (Name, HashVal, Type);
+    } else {
+       	/* Check if the existing segment has the requested type */
+       	if (S->Type != Type) {
+     	    /* Allow an empty object name */
+	    if (ObjName == 0) {
+		ObjName = "(linker generated)";
+	    }
+	    Error ("Module `%s': Type mismatch for segment `%s'", ObjName, Name);
+     	}
+    }
+
+    /* Return the segment */
+    return S;
+}
+
+
+
+Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Type)
 /* Create a new section for the given segment */
 {
     unsigned long V;
@@ -123,7 +179,7 @@ static Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Typ
     S->Seg   	= Seg;
     S->FragRoot = 0;
     S->FragLast = 0;
-    S->Size	= 0;
+    S->Size  	= 0;
     S->Align    = Align;
     S->Type     = Type;
 
@@ -150,29 +206,9 @@ static Section* NewSection (Segment* Seg, unsigned char Align, unsigned char Typ
 
 
 
-static Segment* SegFindInternal (const char* Name, unsigned HashVal)
-/* Try to find the segment with the given name, return a pointer to the
- * segment structure, or 0 if not found.
- */
-{
-    Segment* S = HashTab [HashVal];
-    while (S) {
-	if (strcmp (Name, S->Name) == 0) {
-	    /* Found */
-	    break;
-	}
-	S = S->Next;
-    }
-    /* Not found */
-    return S;
-}
-
-
-
 Section* ReadSection (FILE* F, ObjData* O)
 /* Read a section from a file */
 {
-    unsigned HashVal;
     char* Name;
     unsigned long Size;
     unsigned char Align;
@@ -195,34 +231,17 @@ Section* ReadSection (FILE* F, ObjData* O)
     /* Print some data */
     if (Verbose > 1) {
        	printf ("Module `%s': Found segment `%s', size = %lu, align = %u, type = %u\n",
-	       	O->Name, Name, Size, Align, Type);
+	       	GetObjFileName (O), Name, Size, Align, Type);
     }
 
-    /* Create a hash over the name and try to locate the segment in the table */
-    HashVal = HashStr (Name) % HASHTAB_SIZE;
-    S = SegFindInternal (Name, HashVal);
-
-    /* If we don't have that segment already, allocate it using the type of
-     * the first section.
-     */
-    if (S == 0) {
-     	/* Create a new segment and insert it */
-     	S = NewSegment (Name, Type);
-    	S->Next = HashTab [HashVal];
-    	HashTab [HashVal] = S;
-    }
+    /* Get the segment for this section */
+    S = GetSegment (Name, Type, GetObjFileName (O));
 
     /* We have the segment and don't need the name any longer */
     xfree (Name);
 
     /* Allocate the section we will return later */
     Sec = NewSection (S, Align, Type);
-
-    /* Check if the section has the same type as the segment */
-    if (Sec->Type != S->Type) {
-	/* OOPS */
-	Error ("Module `%s': Type mismatch for segment `%s'", O->Name, S->Name);
-    }
 
     /* Set up the minimum segment alignment */
     if (Sec->Align > S->Align) {
@@ -264,7 +283,7 @@ Section* ReadSection (FILE* F, ObjData* O)
 
 	    default:
 	  	Error ("Unknown fragment type in module `%s', segment `%s': %02X",
-	  	       O->Name,	S->Name, Type);
+	  	       GetObjFileName (O), S->Name, Type);
 	  	/* NOTREACHED */
 	 	return 0;
        	}
@@ -295,9 +314,6 @@ Section* ReadSection (FILE* F, ObjData* O)
 	CHECK (Size >= Frag->Size);
      	Size -= Frag->Size;
     }
-
-    /* Increment the segment size by the section size */
-    S->Size += Sec->Size;
 
     /* Return the section */
     return Sec;
@@ -489,12 +505,14 @@ void SegWrite (FILE* Tgt, Segment* S, SegWriteFunc F, void* Data)
 
 			case SEG_EXPR_RANGE_ERROR:
 			    Error ("Range error in module `%s', line %lu",
-			    	   Frag->Obj->Files [Frag->Pos.Name], Frag->Pos.Line);
+			    	   GetSourceFileName (Frag->Obj, Frag->Pos.Name), 
+				   Frag->Pos.Line);
 			    break;
 
 			case SEG_EXPR_TOO_COMPLEX:
 			    Error ("Expression too complex in module `%s', line %lu",
-			    	   Frag->Obj->Files [Frag->Pos.Name], Frag->Pos.Line);
+			    	   GetSourceFileName (Frag->Obj, Frag->Pos.Name), 
+				   Frag->Pos.Line);
 			    break;
 
 			default:

@@ -31,7 +31,7 @@
 /*                                                                           */
 /*****************************************************************************/
 
-		    
+
 
 /* common */
 #include "xmalloc.h"
@@ -59,9 +59,10 @@ Fragment* NewFragment (unsigned char Type, unsigned long Size, Section* S)
     F->Obj  = 0;
     F->Size = Size;
     F->Expr = 0;
+    InitFilePos (&F->Pos);
     F->Type = Type;
 
-    /* Insert the code fragment into the segment */
+    /* Insert the code fragment into the section */
     if (S->FragRoot == 0) {
       	/* First fragment */
       	S->FragRoot = F;
@@ -69,7 +70,12 @@ Fragment* NewFragment (unsigned char Type, unsigned long Size, Section* S)
       	S->FragLast->Next = F;
     }
     S->FragLast = F;
+
+    /* Increment the size of the section by the size of the fragment */
     S->Size += Size;
+
+    /* Increment the size of the segment that contains the section */
+    S->Seg->Size += Size;
 
     /* Return the new fragment */
     return F;

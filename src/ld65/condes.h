@@ -49,6 +49,20 @@ struct Export;
 
 
 /*****************************************************************************/
+/*				     Data				     */
+/*****************************************************************************/
+
+
+
+/* Order of the tables */
+typedef enum {
+    cdIncreasing,		/* Increasing priority - default */
+    cdDecreasing		/* Decreasing priority */
+} ConDesOrder;
+
+
+
+/*****************************************************************************/
 /*     	       	     	   	     Code  	      	  	  	     */
 /*****************************************************************************/
 
@@ -63,11 +77,11 @@ void ConDesSetSegName (unsigned Type, const char* SegName);
 void ConDesSetLabel (unsigned Type, const char* Name);
 /* Set the label for the given ConDes type */
 
-const char* ConDesGetSegName (unsigned Type);
-/* Return the segment name for the given ConDes type */
+void ConDesSetCountSym (unsigned Type, const char* Name);
+/* Set the name for the given ConDes count symbol */
 
-const char* ConDesGetLabel (unsigned Type);
-/* Return the label for the given ConDes type */
+void ConDesSetOrder (unsigned Type, ConDesOrder Order);
+/* Set the sorting oder for the given ConDes table */
 
 int ConDesHasSegName (unsigned Type);
 /* Return true if a segment name is already defined for this ConDes type */

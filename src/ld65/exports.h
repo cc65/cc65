@@ -82,7 +82,7 @@ struct Export {
     Import*  		ImpList;	/* List of imports for this symbol */
     FilePos  		Pos;		/* File position of definition */
     ExprNode*  		Expr;		/* Expression (0 if not def'd) */
-    unsigned char	Type;		/* Type of export */		  
+    unsigned char	Type;		/* Type of export */
     unsigned char	ConDes[CD_TYPE_COUNT];	/* Constructor/destructor decls */
     char*      	       	Name;		/* Name - dynamically allocated */
 };
@@ -122,6 +122,9 @@ Export* CreateConstExport (const char* Name, long Value);
 
 Export* CreateMemExport (const char* Name, Memory* Mem, unsigned long Offs);
 /* Create an relative export for a memory area offset */
+
+Export* CreateSegExport (const char* Name, Section* S, unsigned long Offs);
+/* Create a relative export to a segment (section) */
 
 int IsUnresolved (const char* Name);
 /* Check if this symbol is an unresolved export */

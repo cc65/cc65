@@ -80,12 +80,13 @@ static void LibReadObjHeader (ObjData* O)
 {
     O->Header.Magic	 = Read32 (Lib);
     if (O->Header.Magic != OBJ_MAGIC) {
-	Error ("Object file `%s' in library `%s' is invalid", O->Name, LibName);
+	Error ("Object file `%s' in library `%s' is invalid", 
+	       GetObjFileName (O), LibName);
     }
     O->Header.Version	 = Read16 (Lib);
     if (O->Header.Version != OBJ_VERSION) {
 	Error ("Object file `%s' in library `%s' has wrong version",
-	       O->Name, LibName);
+	       GetObjFileName (O), LibName);
     }
     O->Header.Flags	 = Read16 (Lib);
     O->Header.OptionOffs = Read32 (Lib);
@@ -278,10 +279,6 @@ void LibAdd (FILE* F, const char* Name)
     ModuleCount = 0;
     Index	= 0;
 }
-
-
-
-
 
 
 

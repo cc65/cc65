@@ -75,9 +75,9 @@ void CreateMapFile (void)
      	    /* We've linked this module */
      	    if (O->LibName) {
      	       	/* The file is from a library */
-     	       	fprintf (F, "%s(%s):\n", O->LibName, O->Name);
+     	       	fprintf (F, "%s(%s):\n", O->LibName, GetObjFileName (O));
      	    } else {
-     	       	fprintf (F, "%s:\n", O->Name);
+     	       	fprintf (F, "%s:\n", GetObjFileName (O));
      	    }
      	    for (I = 0; I < O->SectionCount; ++I) {
      		const Section* S = O->Sections [I];

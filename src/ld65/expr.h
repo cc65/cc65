@@ -40,7 +40,7 @@
 
 /* common */
 #include "exprdefs.h"
-	  
+
 /* ld65 */
 #include "objdata.h"
 #include "exports.h"
@@ -79,6 +79,9 @@ ExprNode* LiteralExpr (long Val, ObjData* O);
 
 ExprNode* MemExpr (Memory* Mem, long Offs, ObjData* O);
 /* Return an expression tree that encodes an offset into the memory area */
+
+ExprNode* SegExpr (Section* Sec, long Offs, ObjData* O);
+/* Return an expression tree that encodes an offset into a segment */
 
 void DumpExpr (const ExprNode* Expr);
 /* Dump an expression tree to stdout */

@@ -170,7 +170,8 @@ Import* ReadImport (FILE* F, ObjData* Obj)
     /* Read the import type and check it */
     unsigned char Type = Read8 (F);
     if (Type != IMP_ZP && Type != IMP_ABS) {
-	Error ("Unknown import type in module `%s': %02X", Obj->Name, Type);
+	Error ("Unknown import type in module `%s': %02X",
+	       GetObjFileName (Obj), Type);
     }
 
     /* Create a new import */
@@ -349,7 +350,7 @@ Export* CreateConstExport (const char* Name, long Value)
 /* Create an export for a literal date */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_ABS, Name, 0);
+    Export* E = NewExport (EXP_ABS | EXP_CONST, Name, 0);
 
     /* Assign the value */
     E->Expr = LiteralExpr (Value, 0);
@@ -367,10 +368,28 @@ Export* CreateMemExport (const char* Name, Memory* Mem, unsigned long Offs)
 /* Create an relative export for a memory area offset */
 {
     /* Create a new export */
-    Export* E = NewExport (EXP_ABS, Name, 0);
+    Export* E = NewExport (EXP_ABS | EXP_EXPR, Name, 0);
 
     /* Assign the value */
     E->Expr = MemExpr (Mem, Offs, 0);
+
+    /* Insert the export */
+    InsertExport (E);
+
+    /* Return the new export */
+    return E;
+}
+
+
+
+Export* CreateSegExport (const char* Name, Section* Sec, unsigned long Offs)
+/* Create a relative export to a segment (section) */
+{
+    /* Create a new export */
+    Export* E = NewExport (EXP_ABS | EXP_EXPR, Name, 0);
+
+    /* Assign the value */
+    E->Expr = SegExpr (Sec, Offs, 0);		       
 
     /* Insert the export */
     InsertExport (E);
@@ -453,13 +472,13 @@ static void CheckSymType (const Export* E)
 	      	/* User defined export */
 	      	Warning ("Type mismatch for `%s', export in "
 			 "%s(%lu), import in %s(%lu)",
-			 E->Name, E->Obj->Files [Imp->Pos.Name],
-    			 E->Pos.Line, Imp->Obj->Files [Imp->Pos.Name],
+			 E->Name, GetSourceFileName (E->Obj, Imp->Pos.Name),
+    			 E->Pos.Line, GetSourceFileName (Imp->Obj, Imp->Pos.Name),
 		   	 Imp->Pos.Line);
 	    } else {
 		/* Export created by the linker */
 		Warning ("Type mismatch for `%s', imported from %s(%lu)",
-			 E->Name, Imp->Obj->Files [Imp->Pos.Name],
+			 E->Name, GetSourceFileName (Imp->Obj, Imp->Pos.Name),
 			 Imp->Pos.Line);
 	    }
 	}
@@ -503,7 +522,7 @@ static void PrintUnresolved (ExpCheckFunc F, void* Data)
 		     "Unresolved external `%s' referenced in:\n",
 		     E->Name);
 	    while (Imp) {
-		const char* Name = Imp->Obj->Files [Imp->Pos.Name];
+		const char* Name = GetSourceFileName (Imp->Obj, Imp->Pos.Name);
 		fprintf (stderr, "  %s(%lu)\n", Name, Imp->Pos.Line);
 		Imp = Imp->Next;
 	    }
@@ -580,7 +599,7 @@ void PrintExportMap (FILE* F)
      	const Export* E = ExpPool [I];
 
 	/* Print unreferenced symbols only if explictly requested */
-	if (VerboseMap || E->ImpCount > 0) {
+	if (VerboseMap || E->ImpCount > 0 || IS_EXP_CONDES (E->Type)) {
 	    fprintf (F,
 	      	     "%-25s %06lX %c%c%c   ",
 	      	     E->Name,
@@ -616,17 +635,11 @@ void PrintImportMap (FILE* F)
 	 */
 	if (VerboseMap || Exp->ImpCount > 0) {
 
-	    /* Get the name of the object file that exports the symbol.
-	     * Beware: There may be no object file if the symbol is a linker
-	     * generated symbol.
-	     */
-	    const char* ObjName = (Exp->Obj != 0)? Exp->Obj->Name : "linker generated";
-
 	    /* Print the export */
 	    fprintf (F,
 	      	     "%s (%s):\n",
 	      	     Exp->Name,
-	      	     ObjName);
+	      	     GetObjFileName (Exp->Obj));
 
 	    /* Print all imports for this symbol */
 	    Imp = Exp->ImpList;
@@ -635,8 +648,8 @@ void PrintImportMap (FILE* F)
 	      	/* Print the import */
 	      	fprintf (F,
 	      		 "    %-25s %s(%lu)\n",
-	      		 Imp->Obj->Name,
-	      		 Imp->Obj->Files [Imp->Pos.Name],
+	      		 GetObjFileName (Imp->Obj),
+	      		 GetSourceFileName (Imp->Obj, Imp->Pos.Name),
 	      	       	 Imp->Pos.Line);
 
 	      	/* Next import */
@@ -691,7 +704,7 @@ void CircularRefError (const Export* E)
 /* Print an error about a circular reference using to define the given export */
 {
     Error ("Circular reference for symbol `%s', %s(%lu)",
-	   E->Name, E->Obj->Files [E->Pos.Name], E->Pos.Line);
+	   E->Name, GetSourceFileName (E->Obj, E->Pos.Name), E->Pos.Line);
 }
 
 

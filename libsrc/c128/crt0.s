@@ -120,7 +120,8 @@ NoIRQ1:	jsr	push0 	 	; argc
  	ldy	#4    	 	; Argument size
        	jsr    	_main 	 	; call the users code
 
-; This is also the _exit entry. Reset the IRQ vector if we chained it.
+; Back from main (this is also the _exit entry). Reset the IRQ vector if
+; we chained it.
 
 _exit:  lda     #<__IRQFUNC_COUNT__
 	beq	NoIRQ2

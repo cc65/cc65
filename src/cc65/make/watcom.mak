@@ -90,7 +90,6 @@ OBJS =	anonname.obj	\
 	error.obj	\
 	expr.obj 	\
         exprdesc.obj    \
-	exprnode.obj	\
 	funcdesc.obj	\
 	function.obj	\
 	global.obj	\
